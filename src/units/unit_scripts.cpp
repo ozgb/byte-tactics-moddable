@@ -360,10 +360,15 @@ struct Obj_0043e3c0 {
 // Looks up the "SweetSpot" entry in the object's name table at +0x9a and
 // passes the value found on to GetPieceCenter.
 // FUNCTION: 0x43e3c0
+int HarnessTestMode();
+void HarnessPoseObject(void* unit);
+
 void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out)
 {
     int value = 0;
     obj->table->QueryScript("SweetSpot", &value, 0, 0, 0);
+    if (HarnessTestMode())
+        HarnessPoseObject(obj);
     GetPieceCenter((Obj_0043e0b0*)obj, (Vec3*)out, value);
 }
 

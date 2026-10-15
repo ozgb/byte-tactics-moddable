@@ -2023,4 +2023,3 @@ int __stdcall HasSpecialUnit(int param_1)
 template class std::vector<Unit*>;
 
 // FUNCTION: 0x40c510 ??0?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@ABV?$allocator@PAUUnit@@@1@@Z
-// explain why this is here

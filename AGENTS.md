@@ -158,6 +158,8 @@ Files from the decompilation still carry its matching notes. Leave them in
 files your issue doesn't otherwise change; #35 removes them all in one
 pass.
 
+`tools/commentlint.py` checks this in CI, on the lines a pull request adds.
+
 ## Writing style
 
 These apply to commit messages, pull requests, issue comments and the

@@ -91,6 +91,13 @@ class CommentLintTest(unittest.TestCase):
         self.check("src/a.cpp", 'const char *u = "http://x"; char c = \'"\';\n'
                                 'const char *v = "a /* b */ c";\nint n = 1\'000;\n')
 
+    def test_r_quote_after_identifier_is_not_raw(self):
+        self.check("src/a.cpp", '#define STR(x) x\nconst char* s = STR"x"; // stray\n', [2])
+        self.check("src/b.cpp", 'const char* s = FOOR"x"; // stray\n', [1])
+
+    def test_raw_string_with_slashes(self):
+        self.check("src/a.cpp", 'const char* s = R"x(a // b /* c )" )x"; const char* t = u8R"(//)";\n')
+
     def test_stray_python_comment(self):
         self.check("tools/a.py", "x = 1\n# note\n", [2])
 

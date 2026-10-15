@@ -71,6 +71,10 @@ class Comment:
     code_before: bool
 
 
+RAW_OPEN = re.compile(r'"([^()\\ ]{0,16})\(')
+RAW_PREFIX = re.compile(r"(?<![A-Za-z0-9_])(?:u8|u|U|L)?R$")
+
+
 def scan_c(text):
     """Every comment in C or C++ source, skipping string and char literals."""
     comments = []
@@ -100,10 +104,9 @@ def scan_c(text):
             comments.append(Comment(start, line, body, start in code_lines))
             i = j
         elif c == '"' or (c == "'" and not (i and text[i - 1].isdigit())):
-            raw = c == '"' and i and text[i - 1] == "R"
-            if raw:
-                m = re.compile(r'"([^()\\ ]{0,16})\(').match(text, i)
-                end = text.find(")" + m.group(1) + '"', m.end()) if m else -1
+            m = RAW_OPEN.match(text, i) if c == '"' and RAW_PREFIX.search(text, max(0, i - 3), i) else None
+            end = text.find(")" + m.group(1) + '"', m.end()) if m else -1
+            if m:
                 j = n if end < 0 else end + len(m.group(1)) + 2
             else:
                 j = i + 1

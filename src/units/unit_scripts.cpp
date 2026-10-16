@@ -357,12 +357,12 @@ struct Obj_0043e3c0 {
 };
 #pragma pack(pop)
 
-// Looks up the "SweetSpot" entry in the object's name table at +0x9a and
-// passes the value found on to GetPieceCenter.
-// FUNCTION: 0x43e3c0
 int HarnessTestMode();
 void HarnessPoseObject(void* unit);
 
+// Looks up the "SweetSpot" entry in the object's name table at +0x9a and
+// passes the value found on to GetPieceCenter.
+// FUNCTION: 0x43e3c0
 void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out)
 {
     int value = 0;

@@ -787,7 +787,11 @@ int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj)
 // FUNCTION: 0x421620
 void __stdcall StartExplodePiece(ExplodedPiece* piece)
 {
+    int HarnessTestMode();
+    void HarnessPoseObject(void* unit);
     Unit* obj = piece->unit;
+    if (HarnessTestMode())
+        HarnessPoseObject(obj);
     PieceRec* rec = (PieceRec*)((char*)obj->state + 0x22 + piece->index * 0x36);
     rec->flags &= 0xfffe;
     if (piece->b2) {

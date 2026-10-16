@@ -241,7 +241,7 @@ The gate applies when a pull request changes `src/`, `include/`,
 changes do not need it.
 
 `--traces` writes every trace with the built sha as `commit`. `--check` plays
-every scenario (two at a time), prints one line per scenario with its run time
+every scenario (`--parallel N` at a time, default half the CPUs and at most 6), prints one line per scenario with its run time
 and a total, and exits 0 when every digest equals the stored one. It exits 1
 when a trace has no scenario or a scenario has no trace, and on a difference:
 it builds the reference from the commit the trace records (cached in
@@ -249,13 +249,38 @@ it builds the reference from the commit the trace records (cached in
 differing scenario and exits 1. `--check --exe <path>` checks a given exe instead
 of building HEAD.
 
+The full `--check` is what a pull request's gate needs.
+
+## Quick check
+
+```sh
+uv run tools/reference.py HEAD --check --quick     # a fixed subset, for a fast look
+```
+
+`--quick` is the same `--check` restricted to the five scenarios in the
+`QUICK` constant of `tools/reference.py`. Its scenarios take about 1 to 2
+minutes at the default `--parallel`, after the build and checkall. A pass says so and reminds you that it is not the gate; a failure
+prints the same `tools/tracediff.py` report as the full run. `--quick` goes with
+`--check` and `--exe`, and `--traces` rejects it. It is no substitute for the
+full `--check`, which is what a pull request's gate needs.
+
+| Name | Players | Sides | Start positions |
+| --- | ---: | --- | --- |
+| duel-coast-to-coast | 2 | Core | fixed |
+| duel-great-divide | 2 | Arm | random |
+| eight-full-moon | 8 | Arm and Core | fixed |
+| eight-greenhaven | 8 | Arm | random |
+| orders-move-attack | 2 | Arm and Core, scripted orders | fixed |
+
 `tools/tracediff.py --ignore-view-seed` accepts traces whose headers differ only
 in `view_seed`; with `--scenario` given twice, run mode runs A on the first file
 and B on the second.
 
-Run time of the suite, measured on a 20-core machine with Wine, two scenarios at
-a time, and other jobs running: `--check` took 7:35 and 6:34 (the second on a
-fresh Wine prefix), and `--traces` 7:07, not counting the build. The longest
-scenarios, `long-greenhaven-8p` and `skirmish4-long`, take about 2 minutes each.
-With the three `orders-` scenarios (27 in all), `--traces` took 10:15 and `--check` 15:46,
-the latter with other jobs running on the machine.
+Run time of the suite (27 scenarios), measured on a 20-core machine with Wine and
+other jobs running, not counting the build. Each run hardlinks its Wine prefix from
+the template and copies only the registry files, so runs share nothing else, and the
+longest scenarios start first. `--check` with the default 6 scenarios at a time took
+5:39 and 6:16 (load average 30 and 50), and 7:57 with `--parallel 2`. The code before
+this change took 9:59 and 9:19 on the same machine. `long-greenhaven-8p` alone takes
+about 4:30 and sets the floor. Digests are identical between `--parallel 1` and the
+default.

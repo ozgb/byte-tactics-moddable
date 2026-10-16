@@ -367,6 +367,7 @@ void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out)
 {
     int value = 0;
     obj->table->QueryScript("SweetSpot", &value, 0, 0, 0);
+    // TODO(#113): the render_pose_reads quirk flag replaces this test-mode branch
     if (HarnessTestMode())
         HarnessPoseObject(obj);
     GetPieceCenter((Obj_0043e0b0*)obj, (Vec3*)out, value);

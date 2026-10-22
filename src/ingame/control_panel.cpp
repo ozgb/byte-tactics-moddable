@@ -430,7 +430,7 @@ void __stdcall QueueBuildOrder(char* name, Unit* unit, int count)
     unsigned short id = FindUnitTypeId(name);
     if (id == 0)
         return;
-    int mobile = unit->motion;
+    int mobile = (int)unit->motion;
     const char* kind = mobile ? "MOBILEBUILD" : "BUILDINGBUILD";
     AdjustBuildCount(MissionType(kind), unit, id, count);
 }

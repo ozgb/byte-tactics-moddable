@@ -97,8 +97,8 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
                 g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
                 if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
                 g_seams.units->SetStateBits(unit, 1,1);
-                if ((((UnitMotion*)unit->motion)->flags&3)==1) {
-                    ((UnitMotion*)unit->motion)->SetFlightMode(unit,2);
+                if ((unit->motion->flags&3)==1) {
+                    unit->motion->SetFlightMode(unit,2);
                     Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,unit->pos);
                     ((Class_0044e6c0*)move)->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx(move);

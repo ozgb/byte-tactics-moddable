@@ -311,7 +311,7 @@ void __stdcall SetOwner(Unit* unit, UnitBucket* bucket)
             unit->cargoNext = bucket->first;
             bucket->first = unit;
         }
-        unit->spatialBucket = (int)(bucket);
+        unit->spatialBucket = (SpatialBucket*)(bucket);
     }
 }
 
@@ -334,7 +334,7 @@ void __stdcall ClearFootprintAndUnlink(Unit* unit)
             unit->cargoNext = 0;
         }
     }
-    unit->spatialBucket = (int)(0);
+    unit->spatialBucket = 0;
 }
 
 // Can a unit's footprint stand on the map cell `cell`? The guards are the map

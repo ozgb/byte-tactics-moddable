@@ -248,7 +248,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
 
     g_seams.economy->LoadUnitAccounts(&unit->resourceSlot, (UnitInfo*)unit, file);
     if (rec.f27 != 0)
-        g_seams.orders->LoadMotion((UnitMotion*)unit->motion, 0, unit, file);
+        g_seams.orders->LoadMotion(unit->motion, 0, unit, file);
 
     Order** normal = (Order**)&unit->list;
     Order** special = (Order**)&unit->list2;
@@ -334,7 +334,7 @@ void __stdcall SaveUnits(HapiBank* file)
             }
 
             if (unit->motion != 0)
-                g_seams.orders->SaveMotion((UnitMotion*)unit->motion, 0, unit, file);
+                g_seams.orders->SaveMotion(unit->motion, 0, unit, file);
             g_seams.economy->SaveUnitAccounts((UnitResources*)((char*)unit + 0xbc), (UnitInfo*)unit, file);
 
             strcpy(rec.name, (char*)(*(char**)((char*)unit + 0x92) + 0x20));
@@ -350,7 +350,7 @@ void __stdcall SaveUnits(HapiBank* file)
 
             // Plain short local assigned in the nested if, not a pointer.
             short id8b = 0;
-            Unit* a = (Unit*)unit->carrier;
+            Unit* a = unit->carrier;
             if (a != 0 && (a->flags & 0x10000000)) {
                 rec.childA = unit->carrier == 0 ? 0 : a->id;
                 rec.b8d = unit->transportPiece;

@@ -48,7 +48,7 @@ static inline Unit* OrderTarget(Order*order) { return order->target; }
 int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
 {
     if (order->target && !(flags&0x48)) {
-        if (unit->spatialBucket==g_game->overflowBucket) {
+        if ((int)unit->spatialBucket == g_game->overflowBucket) {
             Vec3 center;
             center.x=(g_game->mapWidth/2)<<16;
             center.z=(g_game->mapHeight/2)<<16;
@@ -70,8 +70,8 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                 g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
                 if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
                 g_seams.units->SetStateBits(unit, 1,1);
-                if ((((UnitMotion*)unit->motion)->flags&3)==1) {
-                    ((UnitMotion*)unit->motion)->SetFlightMode(unit,2);
+                if ((unit->motion->flags&3)==1) {
+                    unit->motion->SetFlightMode(unit,2);
                     Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,unit->pos);
                     move->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx(move);

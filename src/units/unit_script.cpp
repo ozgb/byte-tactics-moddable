@@ -472,7 +472,7 @@ void UnitScript::AttachUnit(unsigned short id, int a, int b)
 {
     Unit* u = GetUnit(id);
     if (u != 0 && (u->flags & 0x10000000)
-        && (u->carrier == 0 || u->carrier == (int)state->unit)) {
+        && (u->carrier == 0 || u->carrier == state->unit)) {
         AttachUnitToPiece(u, state->unit, a, b);
     }
 }

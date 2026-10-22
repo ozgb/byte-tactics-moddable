@@ -1701,7 +1701,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     Vec3 da = PosMinus(unit->pos, a);
     Vec3 db = PosMinus(velocity, b);
 
-    if (unit->spatialBucket != g_game->overflowBucket) {
+    if ((int)unit->spatialBucket != g_game->overflowBucket) {
         int lim;
         if ((speed & -4) < 0x40000)
             lim = 0x10000;
@@ -1794,13 +1794,13 @@ void UnitMotion::UpdatePosition(Unit* u)
     if (u->carrier != 0) {
         // Copy through the returned pointer, not an initialiser.
         Vec3 v;
-        v = g_seams.units->GetPiecePosition((Unit*)u->carrier, (signed char)u->transportPiece);
+        v = g_seams.units->GetPiecePosition(u->carrier, (signed char)u->transportPiece);
         if (((UnitType_0043cd20*)u->def)->b19) {
             // MAX stays a macro over the Fixed union with a prvalue second operand.
             *(Fixed_0043d6d0*)&v.y = MAXM_0043d6d0(*(Fixed_0043d6d0*)&v.y, MakeFixed_0043d6d0(((UnitType_0043cd20*)u->def)->draft * 0xffff + g_game->seaLevel));
         }
         g_seams.units->SetUnitPosition(u, v, mode);
-        Angles16 o = g_seams.units->GetPieceAngles((Unit*)u->carrier, (signed char)u->transportPiece);
+        Angles16 o = g_seams.units->GetPieceAngles(u->carrier, (signed char)u->transportPiece);
         u->angles = o;
         if (((Path_0043d6d0*)u->carrier)->motion != 0) {
             speed = ((Path_0043d6d0*)u->carrier)->motion->speed;

@@ -13,13 +13,14 @@ struct Limits_0043e490;
 struct Order;
 struct UnitDef;
 struct Player;
+class SpatialBucket;
 class Class_004b0a70;
 struct SpotState;
 class PathOrderAttach;
 
 #pragma pack(push, 1)
 struct Unit {
-    int motion;
+    UnitMotion* motion;
     union {
         struct {
             TdfRecord* current;
@@ -81,8 +82,8 @@ struct Unit {
         };
     };
     Point16 footprint;
-    int spatialBucket;
-    int carrier;
+    SpatialBucket* spatialBucket;
+    Unit* carrier;
     Unit* cargo;
     Unit* cargoNext;
     UnitDef* def;

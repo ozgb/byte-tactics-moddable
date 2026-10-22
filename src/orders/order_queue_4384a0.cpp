@@ -185,7 +185,7 @@ void __stdcall AddBeCarriedOrder(Unit* p)
             }
         }
         Order* child =
-            new (kSim) Order("BECARRIED", (Unit*)p->carrier, 0, 0, 0, 0);
+            new (kSim) Order("BECARRIED", p->carrier, 0, 0, 0, 0);
         InsertBefore(p, child, (child->flags_42 & 0x40000) ? p->list2 : p->list);
     }
 }

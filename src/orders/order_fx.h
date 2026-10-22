@@ -14,12 +14,12 @@ extern void* g_orderFxVtable[];
 
 class __declspec(novtable) OrderFx {
 public:
-    int source;                        // +0x4
+    Order* source;                      // +0x4
 
     OrderFx() {}
 
     // FUNCTION: 0x44ce20
-    OrderFx(int param_1)
+    OrderFx(Order* param_1)
     {
         SetVtable(g_orderFxVtable);
         source = param_1;

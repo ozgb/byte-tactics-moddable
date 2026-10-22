@@ -300,7 +300,7 @@ struct PointVectorUfillAccess : Vec_0044eec0 {
 
 static inline UnitMotion* Motion(Unit* unit)
 {
-    return (UnitMotion*)unit->motion;
+    return unit->motion;
 }
 
 // Unused here: a forward declaration of a later function of this file; its
@@ -464,9 +464,9 @@ int OrderFx::ApproxDist(int, int)
 // FUNCTION: 0x44ced0
 void OrderFx::AddFlags(int param_1)
 {
-    int val = source;
+    Order* val = source;
     if (val != 0) {
-        ((Order*)val)->subFlags |= param_1;
+        val->subFlags |= param_1;
     }
 }
 #pragma auto_inline(on)
@@ -515,7 +515,7 @@ void OrderFx::WriteBits(int)
 // so this is probably a second constructor of that class.
 // FUNCTION: 0x44cf60 ??0ApproachRadius@@QAE@PAUOrder@@HHH@Z
 ApproachRadius::ApproachRadius(Order* source, int x, int y, int r)
-    : OrderFx((int)source)
+    : OrderFx(source)
 {
     SetVtable(g_approachRadiusVtable);
     Point16 org = source->unit->footprint;
@@ -547,7 +547,7 @@ void* ApproachRadius::Destroy(unsigned char flag)
 // a named entry of an open file and keeps its last three dwords.
 // FUNCTION: 0x44d010 ??0ApproachRadius@@QAE@HPAVHapiBank@@PAD@Z
 ApproachRadius::ApproachRadius(int owner, HapiBank* file, char* name)
-    : OrderFx(owner)
+    : OrderFx((Order*)owner)
 {
     SetVtable(g_approachRadiusVtable);
     int bad = 0;
@@ -657,7 +657,7 @@ int ApproachRadius::ApproxDistExcess(int px, int py)
 // and each (radius / 16) squared. Two-radius version of 0x44cf60.
 // FUNCTION: 0x44d3b0 ??0RingApproach@@QAE@PAUOrder@@HHHH@Z
 RingApproach::RingApproach(Order* source, int x, int y, int r1, int r2)
-    : OrderFx((int)source)
+    : OrderFx(source)
 {
     SetVtable(g_ringApproachVtable);
     Point16 org = source->unit->footprint;
@@ -692,7 +692,7 @@ void* RingApproach::Destroy(unsigned char flag)
 // a named entry of an open file and keeps its last five dwords.
 // FUNCTION: 0x44d470 ??0RingApproach@@QAE@HPAVHapiBank@@PAD@Z
 RingApproach::RingApproach(int owner, HapiBank* file, char* name)
-    : OrderFx(owner)
+    : OrderFx((Order*)owner)
 {
     SetVtable(g_ringApproachVtable);
     int bad = 0;
@@ -832,7 +832,7 @@ int RingApproach::ApproxDistExcess(int px, int py)
 // the owner's view origin, and a size.
 // FUNCTION: 0x44d8a0 ??0PointMarker@@QAE@PAUOrder@@UPoint16@@1@Z
 PointMarker::PointMarker(Order* owner, Point16 pos, Point16 size)
-    : OrderFx((int)owner)
+    : OrderFx(owner)
 {
     SetVtable(g_pointMarkerVtable);
     x1 = pos.x - owner->unit->footprint.x;
@@ -862,7 +862,7 @@ void* PointMarker::Destroy(unsigned char should_delete)
 // a named entry of an open file and keeps its last four dwords.
 // FUNCTION: 0x44d930 ??0PointMarker@@QAE@HPAVHapiBank@@PAD@Z
 PointMarker::PointMarker(int owner, HapiBank* file, char* name)
-    : OrderFx(owner)
+    : OrderFx((Order*)owner)
 {
     SetVtable(g_pointMarkerVtable);
     file->OpenNamedBox(name);
@@ -997,7 +997,7 @@ void PathOrder::SerializeToBits(BitWriter* stream)
 // built by 0x44dfb0 and by 0x44e330 / 0x44e250.
 // FUNCTION: 0x44de80 ??0PathOrder@@QAE@HPAVHapiBank@@PAD@Z
 PathOrder::PathOrder(int owner, HapiBank* file, char* name)
-    : OrderFx(owner), ref(0, 0)
+    : OrderFx((Order*)owner), ref(0, 0)
 {
     SetVtable(g_pathOrderVtable);
     PathOrderRecord rec;
@@ -1113,7 +1113,7 @@ PathOrder::PathOrder(Unit* owner_, BitReader* reader)
 // picks a type of 7 or 1 from the unit definition's flag bit 11.
 // FUNCTION: 0x44e190 ??0PathOrder@@QAE@PAUOrder@@PAUUnit@@@Z
 PathOrder::PathOrder(Order* order, Unit* unit)
-    : OrderFx((int)order), ref(0, 0)
+    : OrderFx(order), ref(0, 0)
 {
     SetVtable(g_pathOrderVtable);
     ref.SetUnit((Unit*)unit);
@@ -1138,7 +1138,7 @@ PathOrder::PathOrder(Order* order, Unit* unit)
 // g_pathOrderVtable): it takes its position from the source's unit instead.
 // FUNCTION: 0x44e250 ??0PathOrder@@QAE@PAUOrder@@HF@Z
 PathOrder::PathOrder(Order* source, int unit, short value)
-    : OrderFx((int)source), piece(value), ref(0, 0)
+    : OrderFx(source), piece(value), ref(0, 0)
 {
     SetVtable(g_pathOrderVtable);
     approachRadius = 0;
@@ -1153,7 +1153,7 @@ PathOrder::PathOrder(Order* source, int unit, short value)
 // g_pathOrderVtable), with a type of 0x20 and the position passed in.
 // FUNCTION: 0x44e2d0 ??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z
 PathOrder::PathOrder(Order* source, const Vec3& p)
-    : OrderFx((int)source), ref(0, 0), pos(p)
+    : OrderFx(source), ref(0, 0), pos(p)
 {
     SetVtable(g_pathOrderVtable);
     approachRadius = 0;
@@ -1165,7 +1165,7 @@ PathOrder::PathOrder(Order* source, const Vec3& p)
 
 // FUNCTION: 0x44e330 ??0PathOrder@@QAE@PAUOrder@@HABUVec3@@@Z
 PathOrder::PathOrder(Order* source, int unit, const Vec3& p)
-    : OrderFx((int)source), ref(0, 0)
+    : OrderFx(source), ref(0, 0)
 {
     SetVtable(g_pathOrderVtable);
     ref.SetUnit((Unit*)unit);
@@ -1204,7 +1204,7 @@ int PathOrder::FillWorldPos(Vec3* out)
 {
     unsigned short f = flags;
     if ((f & 1) && !(f & 0x80)) {
-        if (ref.owner == 0 || ref.owner->spatialBucket == g_game->overflowBucket)
+        if (ref.owner == 0 || (int)ref.owner->spatialBucket == g_game->overflowBucket)
             return 0;
         // Through a local pointer: keeps the struct-assignment destination in edi.
         Vec3* p = &pos;
@@ -1225,7 +1225,7 @@ int PathOrder::FillWorldPos(Vec3* out)
             if (def->b22)
                 pos.y = (def->altitude + g_game->seaLevel) << 16;
             else
-                pos.y = (def->altitude + *(unsigned char*)(unit->spatialBucket + 1)) << 16;
+                pos.y = (def->altitude + *((unsigned char*)unit->spatialBucket + 1)) << 16;
         }
     }
     if (pos.y > 0x1ff0000)
@@ -1326,7 +1326,7 @@ void PathOrder::SetApproachRadius(short v)
 // The constructor.
 // FUNCTION: 0x44e740 ??0AirManeuverOrder@@QAE@PAUOrder@@ABUVec3@@1@Z
 AirManeuverOrder::AirManeuverOrder(Order* source, const Vec3& a, const Vec3& b)
-    : OrderFx((int)source)
+    : OrderFx(source)
 {
     SetVtable(g_airManeuverOrderVtable);
     self = source->unit;
@@ -1357,7 +1357,7 @@ void* AirManeuverOrder::Destroy(int param_1)
 // FUNCTION: 0x44e7d0 ??0AirManeuverOrder@@QAE@HPAVHapiBank@@PAD@Z
 AirManeuverOrder::AirManeuverOrder(int owner, HapiBank* file, char* name)
 {
-    source = owner;
+    source = (Order*)owner;
     SetVtable(g_airManeuverOrderVtable);
     file->OpenNamedBox(name);
     file->SeekBox(0);

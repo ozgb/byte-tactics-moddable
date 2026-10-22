@@ -330,7 +330,7 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                     if (t == 0
                         || ((t->flags & 0x10000000) && t != u && t->carrier == 0)) {
                         if (u->carrier != 0) {
-                            Unit* n = (Unit*)u->carrier;
+                            Unit* n = u->carrier;
                             Unit** link = &n->cargo;
                             n = n->cargo;
                             while (n != u) {
@@ -339,11 +339,11 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                             }
                             *link = u->cargoNext;
                         } else {
-                            g_seams.map->SpatialBucketUnlinkUnit((SpatialBucket*)u->spatialBucket, 0, u);
+                            g_seams.map->SpatialBucketUnlinkUnit(u->spatialBucket, 0, u);
                         }
                         u->transportPiece = order->param;
                         if (t) {
-                            u->carrier = (int)t;
+                            u->carrier = t;
                             u->cargoNext = t->cargo;
                             t->cargo = u;
                             // Named bool, `char` compared with -1, masked with `& 1`: keeps the field width mask.
@@ -353,9 +353,9 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                             u->cargoNext = 0;
                             u->carriedNoPiece = 0;
                             u->carrier = 0;
-                            g_seams.map->SpatialBucketPrependUnit((SpatialBucket*)u->spatialBucket, 0, u);
+                            g_seams.map->SpatialBucketPrependUnit(u->spatialBucket, 0, u);
                         }
-                        ((UnitMotion*)u->motion)->mode = order->param2;
+                        u->motion->mode = order->param2;
                         if (u->player->active) {
                             unsigned char k = u->player->type;
                             if (k == 1 || k == 2) {
@@ -421,7 +421,7 @@ void __stdcall UpdateAllUnits(void)
                         }
                         if (u->selected != 0) {
                             if (!(u->selectable) || u->buildLeft != 0.0f || u->postTransferHoldoff != 0
-                                || (u->carrier != 0 && !(((Unit*)u->carrier)->cargoSelectable))) {
+                                || (u->carrier != 0 && !(u->carrier->cargoSelectable))) {
                                 u->selected = 0;
                             }
                         }
@@ -455,7 +455,7 @@ void __stdcall UpdateAllUnits(void)
                                 g_seams.orders->RunOrders(u);
                                 g_seams.orders->RunSecondaryOrders(u);
                                 if (u->motion != 0) {
-                                    g_seams.orders->UpdateMotion((UnitMotion*)u->motion, 0, u);
+                                    g_seams.orders->UpdateMotion(u->motion, 0, u);
                                     UpdateUnitHeight(u);
                                 }
                             }
@@ -518,7 +518,7 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
             stream->data[stream->index] = 0;
         }
         // `!owner ? 0 : ...` lays the zero arm ahead of the load; keep the redundant `& 0xffff`.
-        stream->WriteBits((!u->carrier ? 0 : ((Unit*)u->carrier)->id) & 0xffff, 0xf);
+        stream->WriteBits((!u->carrier ? 0 : u->carrier->id) & 0xffff, 0xf);
         stream->WriteBits((signed char)u->transportPiece, 8);
     } else {
         stream->bit++;
@@ -537,7 +537,7 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
         stream->WriteBits((unsigned short)u->angles.pitch, 0x10);
         stream->WriteBits((unsigned short)u->angles.bank, 0x10);
         if (u->motion)
-            stream->WriteBits(((UnitMotion*)u->motion)->speed, 0x20);
+            stream->WriteBits(u->motion->speed, 0x20);
     }
 }
 
@@ -643,7 +643,7 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     u->moved = 1;
     u->angles = tail;
     if (u->motion)
-        ((UnitMotion*)u->motion)->speed = reader->ReadBits(0x20);
+        u->motion->speed = reader->ReadBits(0x20);
 }
 
 // Builds one player's whole unit list as a single packet and sends it: a
@@ -667,11 +667,11 @@ void __stdcall SendUnitStates(Player* p)
             continue;
         if (!u->motion)
             continue;
-        if (!((UnitMotion*)u->motion)->player->v7())
+        if (!u->motion->player->v7())
             continue;
         stream.WriteBits(u->id - u->player->firstIndex, 0x10);
         stream.WriteBits(u->unitDefIndex, g_game->unitDefCountBits);
-        ((UnitMotion*)u->motion)->player->WriteTo(&stream);
+        u->motion->player->WriteTo(&stream);
         // `>> 3`, not `/ 8`: that is the original's `add ecx, 7; sar ecx, 3`
         // with no sign fix-up.
         if (((stream.bit + 7) >> 3) + stream.index * 4 >= 0x200)
@@ -741,14 +741,14 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
             spawn.tail.dword = *(Tail32*)&unit->angles;
             CreateUnitFromPacket(unit->playerIndex, &spawn);
         }
-        ((UnitMotion*)unit->motion)->player->ReadFrom(&reader);
+        unit->motion->player->ReadFrom(&reader);
         index = (short)reader.ReadBits(0x10);
     }
 
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd;
          u = (Unit*)((char*)u + 0x118)) {
         if ((u->flags & 0x10000000) && u->motion) {
-            g_seams.orders->UpdateMotion((UnitMotion*)u->motion, 0, u);
+            g_seams.orders->UpdateMotion(u->motion, 0, u);
             UpdateUnitHeight(u);
         }
     }

@@ -78,8 +78,8 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     if (unit->carrier)
         g_seams.units->AttachUnitToPiece(unit, 0, -1, 2);
     g_seams.units->SetStateBits(unit, 1, 1);
-    if ((((UnitMotion*)unit->motion)->flags & 3) == 1) {
-        ((UnitMotion*)unit->motion)->SetFlightMode(unit, 2);
+    if ((unit->motion->flags & 3) == 1) {
+        unit->motion->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx(obj);
@@ -162,7 +162,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         // Float local x: keeps the constant multiply from moving outermost.
         float x = (float)sqrt(size * 2.0 / rate) * 30.0f;
         // attackrunlength is added in a second statement: one sum changes the x87 order.
-        int time = (int)(x * ((UnitMotion*)unit->motion)->field_22) + 1;
+        int time = (int)(x * unit->motion->field_22) + 1;
         time += def->attackrunlength;
         Class_0044e2d0* obj;
         if (order->target)

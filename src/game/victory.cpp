@@ -589,7 +589,7 @@ void VictoryMoveUnitToRadius::VisitUnit(Unit* unit)
             return;
         }
         if ((unit->flags & 0x20) && unit->buildLeft == 0.0f && unit->postTransferHoldoff == 0
-            && (((Unit *)unit->carrier) == 0 || (((Unit *)unit->carrier)->flags & 0x40000000))) {
+            && ((unit->carrier) == 0 || (unit->carrier->flags & 0x40000000))) {
             satisfied = 1;
             if (celebrated == 0) {
                 PlaySoundByName("Victory Condition", 0);
@@ -787,7 +787,7 @@ extern char g_allUnitsKilledKey[]; // "DefeatCondition_AllUnitsKilled"
 int DefeatAllUnitsKilled::VisitUnit(Unit* unit)
 {
     if ((unit->flags & 0x20) && unit->buildLeft == 0.0f && unit->postTransferHoldoff == 0
-        && (((Unit *)unit->carrier) == 0 || (((Unit *)unit->carrier)->flags & 0x40000000))) {
+        && ((unit->carrier) == 0 || (unit->carrier->flags & 0x40000000))) {
         satisfied = 0;
     }
     return satisfied;
@@ -1440,7 +1440,7 @@ void PackedPosGoal::DeserializeNetUnitState(BitReader* reader)
     else if (kind == 2)
         target = new (kSim) AirManeuverOrder(owner, reader);
     int state = reader->ReadBits(2);
-    ((UnitMotion*)owner->motion)->SetFlightMode(owner, state);
+    owner->motion->SetFlightMode(owner, state);
 }
 
 // FUNCTION: 0x490aa0

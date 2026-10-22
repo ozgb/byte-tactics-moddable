@@ -405,8 +405,8 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     if (unit->carrier)
         g_seams.units->AttachUnitToPiece(unit, 0, -1, 2);
     g_seams.units->SetStateBits(unit, 1, 1);
-    if ((((UnitMotion*)unit->motion)->flags & 3) == 1) {
-        ((UnitMotion*)unit->motion)->SetFlightMode(unit, 2);
+    if ((unit->motion->flags & 3) == 1) {
+        unit->motion->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, unit->pos);
         ((Class_0044e6c0*)obj)->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx(obj);
@@ -426,7 +426,7 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         return 5;
     if (flags & 0x40)
         return 5;
-    if (unit->spatialBucket == g_game->overflowBucket) {
+    if ((int)unit->spatialBucket == g_game->overflowBucket) {
         Vec3 centre;
         centre.x = g_game->mapWidth / 2 << 16;
         centre.z = g_game->mapHeight / 2 << 16;
@@ -494,7 +494,7 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
     }
     case 2:
         if (flags & 0x20) {
-            ((UnitMotion*)unit->motion)->SetFlightMode(unit, 1);
+            unit->motion->SetFlightMode(unit, 1);
             return 5;
         }
         return 8;
@@ -833,8 +833,8 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
             g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
             if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
             g_seams.units->SetStateBits(unit, 1,1);
-            if ((((UnitMotion*)unit->motion)->flags&3)==1) {
-                ((UnitMotion*)unit->motion)->SetFlightMode(unit,2);
+            if ((unit->motion->flags&3)==1) {
+                unit->motion->SetFlightMode(unit,2);
                 Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,unit->pos);
                 ((Class_0044e6c0*)move)->SetAltitude(unit->def->altitude/2);
                 order->SetAttachedFx(move);
@@ -1123,7 +1123,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", 0, &unit->pos, 0, 0, 0));
         return 5;
     }
-    if (unit->spatialBucket == g_game->overflowBucket) {
+    if ((int)unit->spatialBucket == g_game->overflowBucket) {
         Vec3 centre;
         centre.x = g_game->mapWidth / 2 << 16;
         centre.z = g_game->mapHeight / 2 << 16;

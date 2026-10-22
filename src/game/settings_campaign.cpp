@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 #include "../../interfaces/seams.h"
 #include "../host/settings_io.h"
 #include "mission_conditions.h"

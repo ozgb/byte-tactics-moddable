@@ -17,7 +17,7 @@
 #include "../state/game_rand.h"
 
 #include "../util/tdf.h"
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 #include "../util/rot16.h"
 
 #pragma pack(push, 1)

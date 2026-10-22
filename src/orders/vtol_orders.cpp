@@ -82,7 +82,7 @@ union Fixed {
 
 // Unused here: these headers and forward declarations take the symbol ids that keep
 // 0x413bc0, 0x413d80, 0x414e70, 0x415250 and 0x4158d0 matching (docs/c2-regalloc.md).
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
 struct BmpFileHeader;

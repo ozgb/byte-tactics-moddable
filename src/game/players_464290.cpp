@@ -981,7 +981,7 @@ void InitPlayerResources()
     }
 }
 
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 
 // Reads each player's "Controller" value from its "Player%i" section.
 // FUNCTION: 0x465fb0

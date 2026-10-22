@@ -30,7 +30,7 @@ union Fixed {
 
 // Unused here: these headers and forward declarations take the symbol ids that keep
 // WeaponCanReachPos (0x49aa80) and WeaponCanReachUnit (0x49abb0) matching (docs/c2-regalloc.md).
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
 struct BmpFileHeader;

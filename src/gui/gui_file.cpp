@@ -11,7 +11,7 @@
 
 #include "../util/tdf.h"
 
-#include "../util/file_handle.h"
+#include "../files/file_handle.h"
 #include "../state/sim_globals.h"
 
 extern int DAT_0051fba8;

@@ -108,7 +108,7 @@ struct Struct_00487af0 {
 };
 #pragma pack(pop)
 
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 
 #include "cob_script.h"
 

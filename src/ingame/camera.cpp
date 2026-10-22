@@ -24,7 +24,7 @@ public:
 #include "../game/game.h"
 #pragma pack(pop)
 
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 
 // GLOBAL: 0x511de8
 extern Game* g_game;

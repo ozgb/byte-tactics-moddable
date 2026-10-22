@@ -22,7 +22,7 @@ struct Game_00466050 {
 
 extern Game_00466050* g_game;
 
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 
 // Loads the "Players" section of a saved game: the human player, the game
 // clock, and each player's resources, statistics, logo, side and alliances

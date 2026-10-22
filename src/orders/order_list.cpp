@@ -41,7 +41,7 @@ static inline void Vec3Add(Vec3* v, const Vec3* o)
     v->y += o->y;
     v->z += o->z;
 }
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 
 #pragma pack(push, 1)
 

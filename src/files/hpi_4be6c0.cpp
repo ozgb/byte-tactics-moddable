@@ -8,7 +8,7 @@
 // releases the handle through 0x4c9390.
 #include <vector>
 
-#include "string_ref.h"
+#include "../util/string_ref.h"
 
 typedef std::vector<StringRef> Vec_004be6c0;
 typedef void (Vec_004be6c0::*InsertFn_004be6c0)(

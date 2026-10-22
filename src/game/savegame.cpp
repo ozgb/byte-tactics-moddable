@@ -8,7 +8,7 @@
 
 class Mission;
 
-#include "../util/hapi_bank.h"
+#include "../files/hapi_bank.h"
 
 // Pack 1: the 4-byte pad after the pointer at +0x391e9 would shift later fields.
 #pragma pack(push, 1)

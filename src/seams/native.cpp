@@ -21,7 +21,6 @@
 #include "../orders/unit_motion.h"
 #include "../orders/order.h"
 #include "../util/angles.h"
-#include "../files/files_api.h"
 
 struct Player;
 

@@ -1,8 +1,3 @@
-// AccountBank: a bank of named accounts, each holding named items (integers,
-// doubles and strings) and safe-deposit boxes, saved to and loaded from a
-// HAPIBANK file. The one declaration of the class, for hapi_bank.cpp and every
-// file that calls it; the types behind the pointers stay private to
-// hapi_bank.cpp.
 #ifndef ACCOUNT_BANK_H
 #define ACCOUNT_BANK_H
 

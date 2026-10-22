@@ -203,7 +203,6 @@ static inline int LzssEnablePreset(void)
     return g_seams.files->LzssEnablePreset();
 }
 
-// Callers that keep a handle in a void* get these overloads.
 static inline int HAPI_CloseFile(void* file)
 {
     return HAPI_CloseFile((FileHandle*)file);

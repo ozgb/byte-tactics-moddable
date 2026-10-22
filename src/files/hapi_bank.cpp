@@ -1,7 +1,4 @@
 // Decompiled by Haiku, deepseek-v4.1-flash, GPT-5.6-Terra, GPT-6, GPT-6.1-sol, deepseek-v4.1, space-bunny-free, Claude Opus 5.5, mimo-v2.6-pro, longcat-2.5-preview-free, muse-spark-1.3-free, Sonnet 5.5, Claude Fable 5.1, Opus and Sonnet. Names are provisional.
-// AccountBank: a bank of named accounts, each holding named items (integers,
-// doubles and strings) and safe-deposit boxes (blocks of bytes under a name
-// or a number), saved to and loaded from a HAPIBANK file.
 
 #include <stdio.h>
 #include <string.h>
@@ -142,8 +139,6 @@ AccountBank* AccountBank::InitBank()
     return this;
 }
 
-// The out-of-line destructor of AccountBank: frees the account list and
-// everything hanging off it.
 // FUNCTION: 0x4b3630
 void AccountBank::CloseBank()
 {
@@ -482,10 +477,6 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
     host_file_seek(file, 0, HOST_SEEK_END);
 }
 
-// Reads one 0x20-byte section header out of a AccountBank archive (called in a loop
-// by 0x4b3770) and, when the caller's name matches the section name, unpacks the
-// section body and files its records away in the current section of the parsed
-// bank: integers, doubles, strings and raw blobs, in that order.
 // FUNCTION: 0x4b4270
 void AccountBank::LoadAccount(FileHandle* fh, int* image, char* name)
 {

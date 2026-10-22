@@ -7,7 +7,7 @@ struct AccountList;
 
 class HapiBank {
 public:
-    AccountList* bank;               // +0x00
+    AccountList* bank;
 
     HapiBank* InitBank()
     {

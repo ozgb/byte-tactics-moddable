@@ -16,7 +16,7 @@ extern void* g_orderFxVtable[];
 
 class __declspec(novtable) OrderFx {
 public:
-    Ref<Order> source;                 // +0x4
+    Ref<Order> source;
 
     OrderFx() {}
 

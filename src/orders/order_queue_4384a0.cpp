@@ -23,7 +23,7 @@ class CobScript;
 class Slot_0043a1f0;
 
 struct Owner_0043a1f0 {
-    Ref<Slot_0043a1f0> slot;           // +0x0
+    Ref<Slot_0043a1f0> slot;
 };
 
 struct UnitType {                      // 0x249 bytes

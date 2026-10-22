@@ -46,7 +46,7 @@ struct Cell {
 struct Unit_0047d820 {
     char unknown_0[0x14a];
     Point16 origin;                     // +0x14a, footprint in map cells
-    Ref<unsigned char> mask;            // +0x14e, one byte per footprint cell
+    Ref<unsigned char> mask;
     char unknown_152[0x22c - 0x152];
     unsigned char draft;                // +0x22c
 };

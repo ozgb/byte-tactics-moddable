@@ -27,12 +27,12 @@ public:
     };
     union {
         int f14e;                      // +0x14e
-        Ref<char> yardmap;                 // +0x14e
+        Ref<char> yardmap;
     };
     int count;                         // +0x152
     // The unit type ids it can build; vtol_orders_414380.cpp tests it as
     // canBuild, but every indexing read is unsigned short.
-    Ref<unsigned short> ids;               // +0x156
+    Ref<unsigned short> ids;
     int maxThisUnit;                   // +0x15a
     // The model bounding box (nModelMinX..nModelSizeZ in Thaldren's UnitDef);
     // each file that reads it as a Vec3 casts at the use.
@@ -94,7 +94,7 @@ public:
     int buildtime;                     // +0x1ea
     // The three weapon type pointers (0x115 bytes each); the loader stores what
     // FindWeaponByName returns.
-    Ref<WeaponDef> weapons[3];             // +0x1ee
+    Ref<WeaponDef> weapons[3];
     unsigned int maxHealth;            // +0x1fa
     unsigned short buildRate;          // +0x1fe
     short healtime;                    // +0x200
@@ -113,8 +113,8 @@ public:
     short sortbias;                    // +0x21a
     short altitude;                    // +0x21c
     unsigned short id;                 // +0x21e
-    Ref<char> explodeas;                   // +0x220
-    Ref<char> selfdestructas;              // +0x224
+    Ref<char> explodeas;
+    Ref<char> selfdestructas;
     unsigned char maxslope;            // +0x228
     unsigned char maxwaterslope;       // +0x229
     unsigned char capacity;            // +0x22a

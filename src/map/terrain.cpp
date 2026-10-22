@@ -116,7 +116,7 @@ struct Los_0047d2e0 {
 
 struct Node_0047cb00 {
     char unknown_0[0x8e];
-    Ref<Node_0047cb00> next;            // +0x8e
+    Ref<Node_0047cb00> next;
 };
 
 class SpatialBucket {

@@ -182,7 +182,7 @@ struct PieceRec {
 
 // An exploding piece: the 0x30-byte header each pool slot starts with.
 struct ExplodedPiece {
-    Ref<Unit> unit;                        // +0x00
+    Ref<Unit> unit;
     int index;                         // +0x04
     int angVelZ;                       // +0x08
     int angVelX;                       // +0x0c
@@ -199,7 +199,7 @@ struct ExplodedPiece {
     unsigned int b4 : 1;
     unsigned int b5 : 1;
     unsigned int rest : 26;
-    Ref<PieceRec> rec;                     // +0x2c
+    Ref<PieceRec> rec;
 };
 
 struct ExplodedBlock {

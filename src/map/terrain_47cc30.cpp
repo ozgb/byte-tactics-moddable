@@ -13,7 +13,7 @@ struct Owner_0047cc30 {
 
 struct Unit_0047cc30 {
     char unknown_0[0x14e];
-    Ref<unsigned char> mask;            // +0x14e
+    Ref<unsigned char> mask;
 };
 
 #include "../network/player.h"
@@ -21,7 +21,7 @@ struct Unit_0047cc30 {
 struct UnitRec_0047cc30 {               // 0x118 bytes
     char unknown_0[0x92];
     void* def;                          // +0x92
-    Ref<Player> player;                 // +0x96
+    Ref<Player> player;
     char unknown_9a[0x110 - 0x9a];
     unsigned int flags;                 // +0x110
     char unknown_114[0x118 - 0x114];
@@ -47,7 +47,7 @@ union Flags_0047cc30 {
 };
 
 struct Obj_0047cc30 {
-    Ref<unsigned char> motion;          // +0x0
+    Ref<unsigned char> motion;
     char unknown_4[0x26 - 0x4];
     int field_26;                       // +0x26
     char unknown_2a[0x6a - 0x2a];
@@ -55,11 +55,11 @@ struct Obj_0047cc30 {
     Point16 pos;                 // +0x76
     char unknown_7a[4];
     Point16 footprint;           // +0x7e
-    Ref<Owner_0047cc30> spatialBucket;  // +0x82
+    Ref<Owner_0047cc30> spatialBucket;
     int carrier;                        // +0x86
     char unknown_8a[4];
-    Ref<Obj_0047cc30> cargoNext;        // +0x8e
-    Ref<Unit_0047cc30> def;             // +0x92
+    Ref<Obj_0047cc30> cargoNext;
+    Ref<Unit_0047cc30> def;
     char unknown_96[0xa8 - 0x96];
     unsigned short id;                  // +0xa8
     char unknown_aa[0x10f - 0xaa];

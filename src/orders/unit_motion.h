@@ -47,8 +47,8 @@ class UnitTable;
 class UnitMotion {
 public:
     union {
-        Ref<Iface_0043dd20> obj;           // +0x0, the path the mover follows
-        Ref<PlayerData> player;            // +0x0, the serialisation interface
+        Ref<Iface_0043dd20> obj;
+        Ref<PlayerData> player;
     };
     int movementClass;                 // +0x4
     Vec3 velocity;                     // +0x8

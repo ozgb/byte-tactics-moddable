@@ -55,9 +55,9 @@ union Flags_00489a90 {
 
 struct Node_00489a90 {
     char unknown_0[0x86];
-    Ref<Unit> owner;                   // +0x86
+    Ref<Unit> owner;
     char unknown_8a[4];
-    Ref<Node_00489a90> next;           // +0x8e
+    Ref<Node_00489a90> next;
 };
 
 #include "../game/game.h"

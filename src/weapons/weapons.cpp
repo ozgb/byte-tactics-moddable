@@ -223,7 +223,7 @@ struct Kind_00499ab0 {
 
 struct Obj_00499ab0 {
     char unknown_0[0x96];
-    Ref<Kind_00499ab0> kind;         // +0x96
+    Ref<Kind_00499ab0> kind;
     char unknown_9a[0xa8 - 0x9a];
     unsigned short team;             // +0xa8
 };
@@ -309,7 +309,7 @@ struct Object_00499c10 {
     char unknown_0[0x66];
     short heading;                     // +0x66
     char unknown_68[0x9a - 0x68];
-    Ref<CobScript> anims;              // +0x9a
+    Ref<CobScript> anims;
 };
 #pragma pack(pop)
 

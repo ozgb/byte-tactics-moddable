@@ -41,8 +41,8 @@ class CobScript
     int scale;                         // +0x004
     ScriptTable *table;                // +0x008
     int unknown_c;                     // +0x00c, the script's checksum
-    Ref<int> statics;                      // +0x010
-    Ref<Piece> pieces;                     // +0x014
+    Ref<int> statics;
+    Ref<Piece> pieces;
     int changed;                       // +0x018, a piece is still moving
     Channel channels[8];               // +0x01c
     int activeCount;                   // +0x53c

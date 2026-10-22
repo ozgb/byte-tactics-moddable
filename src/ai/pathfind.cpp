@@ -107,7 +107,7 @@ class Planner_0040eb70;
 
 #pragma pack(push, 1)
 struct Owner_0040eb70 {
-    Ref<Planner_0040eb70> planner;     // +0x0
+    Ref<Planner_0040eb70> planner;
     void* owner;                       // +0x4, the movement class
 };
 

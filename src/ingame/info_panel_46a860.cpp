@@ -52,8 +52,8 @@ struct WeaponDef_0046a860 {
 // signednesses of +0x108 both appear in this file, so the field is a union.
 struct Unit_0046a860 {
     char unknown_0[0x92];
-    Ref<UnitDef> def;                 // +0x92
-    Ref<Player> player;               // +0x96
+    Ref<UnitDef> def;
+    Ref<Player> player;
     char unknown_9a[0xa6 - 0x9a];
     unsigned short unitDefIndex;      // +0xa6
     unsigned short id;                // +0xa8

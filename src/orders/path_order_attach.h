@@ -16,8 +16,8 @@ struct Unit;
 
 class PathOrderAttach {
 public:
-    Ref<Unit> owner;                   // +0x4
-    Ref<PathOrderAttach> next;         // +0x8
+    Ref<Unit> owner;
+    Ref<PathOrderAttach> next;
     void* value;                   // +0xc, the object the link belongs to
 
     PathOrderAttach(Unit* o, int v);

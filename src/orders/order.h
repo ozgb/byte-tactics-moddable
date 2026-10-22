@@ -101,7 +101,7 @@ struct Order : public OrderBase {
     };
     unsigned int flags_42;         // +0x42
     unsigned int created;          // +0x46
-    Ref<Order> next;                   // +0x4a
+    Ref<Order> next;
     unsigned int subFlags;         // +0x4e
     void* attached;                // +0x52
 

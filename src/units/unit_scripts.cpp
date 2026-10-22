@@ -30,7 +30,7 @@ struct Object {
     char unknown_0[0x6a];
     Vec3 pos;                          // +0x6a
     char unknown_76[0x9a - 0x76];
-    Ref<CobScript> script;             // +0x9a
+    Ref<CobScript> script;
 };
 
 #pragma pack(pop)
@@ -99,7 +99,7 @@ struct Object_0043def0 {
     char unknown_0[0x64];
     Angles16 angles;                   // +0x64
     char unknown_6a[0x9e - 0x6a];
-    Ref<Block_0043def0> recs;          // +0x9e
+    Ref<Block_0043def0> recs;
 };
 #pragma pack(pop)
 
@@ -186,7 +186,7 @@ struct Obj_0043e0b0 {
     char pad0[0x6a];
     Vec3 pos;                          // +0x6a
     char pad76[0x9e - 0x76];
-    Ref<char> table;                   // +0x9e
+    Ref<char> table;
 };
 #pragma pack(pop)
 
@@ -237,7 +237,7 @@ struct Obj_0043e180 {
     char pad0[0x64];
     Angles16 angles;               // +0x64
     char pad1[0x9e - 0x6a];
-    Ref<Rec_0043e180> recs;        // +0x9e
+    Ref<Rec_0043e180> recs;
 };
 #pragma pack(pop)
 
@@ -314,7 +314,7 @@ void __stdcall GetAimFromPosition(Object* obj, Vec3* out, unsigned char weapon)
 #pragma pack(push, 2)
 struct Obj_0043e3c0 {
     char unknown_0[0x9a];
-    Ref<CobScript> table;              // +0x9a
+    Ref<CobScript> table;
 };
 #pragma pack(pop)
 
@@ -431,10 +431,10 @@ struct Unit_0043e490 {
     Limits_0043e490* f48; // +0x48
     char unknown_4c[0x6a - 0x4c];
     char f6a[0x86 - 0x6a]; // +0x6a
-    Ref<Unit_0043e490> carrier; // +0x86
+    Ref<Unit_0043e490> carrier;
     char unknown_8a[0x92 - 0x8a];
-    Ref<UnitDef> def;        // +0x92
-    Ref<Player> player; // +0x96
+    Ref<UnitDef> def;
+    Ref<Player> player;
     char unknown_9a[0xec - 0x9a];
     Stats_0043e490* fec; // +0xec
     char unknown_f0[0xfb - 0xf0];

@@ -49,10 +49,10 @@ struct Unit_0043e490 {
     Limits_0043e490* f48; // +0x48
     char unknown_4c[0x6a - 0x4c];
     char f6a[0x86 - 0x6a]; // +0x6a
-    Ref<Unit_0043e490> carrier; // +0x86
+    Ref<Unit_0043e490> carrier;
     char unknown_8a[0x92 - 0x8a];
-    Ref<UnitDef> def;        // +0x92
-    Ref<Player> player; // +0x96
+    Ref<UnitDef> def;
+    Ref<Player> player;
     char unknown_9a[0xec - 0x9a];
     Stats_0043e490* fec; // +0xec
     char unknown_f0[0xfb - 0xf0];
@@ -169,10 +169,10 @@ struct Unit_0043f0e0 {
     char unknown_3c[0x70 - 0x3c];
     short f70; // +0x70
     char unknown_72[0x86 - 0x72];
-    Ref<Unit_0043f0e0> carrier; // +0x86
+    Ref<Unit_0043f0e0> carrier;
     char unknown_8a[0x92 - 0x8a];
-    Ref<Def_0043f0e0> def;   // +0x92
-    Ref<Player> player; // +0x96
+    Ref<Def_0043f0e0> def;
+    Ref<Player> player;
     char unknown_9a[0xfb - 0x9a];
     int postTransferHoldoff; // +0xfb
     unsigned char unknown_ff[1];

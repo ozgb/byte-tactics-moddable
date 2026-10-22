@@ -36,11 +36,11 @@ struct Order_00408100 {
 
 struct Unit_00408100 {
     char unknown_0[0x5c];
-    Ref<Order_00408100> list;            // +0x5c
+    Ref<Order_00408100> list;
     char unknown_60[0x6a - 0x60];
     Vec3 pos;                          // +0x6a
     char unknown_76[0x92 - 0x76];
-    Ref<UnitDef_00408100> def;            // +0x92
+    Ref<UnitDef_00408100> def;
 };
 
 struct Item_00408100 {                 // 0x249 bytes

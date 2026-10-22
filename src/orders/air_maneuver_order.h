@@ -22,7 +22,7 @@ public:
     short saveOnly22;                  // +0x22
     unsigned short heading;            // +0x24
     unsigned short value_26;           // +0x26
-    Ref<Unit> self;                        // +0x28
+    Ref<Unit> self;
 
     AirManeuverOrder(Order* order, const Vec3& a, const Vec3& b);
     AirManeuverOrder(int owner, HapiBank* file, char* name);

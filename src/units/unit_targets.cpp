@@ -42,7 +42,7 @@ struct Target_0048a1e0 {
 struct UnitType {
     char unknown_0[0x152];
     int count;                         // +0x152, entries of ids
-    Ref<short> ids;                    // +0x156, the unit ids it can build
+    Ref<short> ids;
     char unknown_15a[0x186 - 0x15a];
     float energyCost;                  // +0x186
     float metalCost;                   // +0x18a

@@ -41,7 +41,7 @@ struct UnitDefFlags_00467440 {
 struct UnitType_004685a0 {
     char name[0x152];                  // +0x0
     int count;                         // +0x152
-    Ref<unsigned short> ids;           // +0x156
+    Ref<unsigned short> ids;
     char unknown_15a[0x22f - 0x15a];
     unsigned char mobile;              // +0x22f
 };
@@ -185,9 +185,9 @@ struct Mission_00467e50 {
     char pad_0[5];
     unsigned char state;               // +0x5
     char pad_6[0x16 - 0x6];
-    Ref<Unit> target;                  // +0x16
+    Ref<Unit> target;
     char pad_1a[0x4a - 0x1a];
-    Ref<Mission_00467e50> next;        // +0x4a
+    Ref<Mission_00467e50> next;
 };
 
 struct MissionName_00467e50 {

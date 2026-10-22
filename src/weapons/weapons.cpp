@@ -14,6 +14,7 @@
 // order: their register plans follow their symbol ids (docs/c2-regalloc.md).
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 #include "../state/block.h"
 
 typedef Vec3 Vec3_0049e1a0;
@@ -222,7 +223,7 @@ struct Kind_00499ab0 {
 
 struct Obj_00499ab0 {
     char unknown_0[0x96];
-    Kind_00499ab0* kind;             // +0x96
+    Ref<Kind_00499ab0> kind;         // +0x96
     char unknown_9a[0xa8 - 0x9a];
     unsigned short team;             // +0xa8
 };
@@ -308,7 +309,7 @@ struct Object_00499c10 {
     char unknown_0[0x66];
     short heading;                     // +0x66
     char unknown_68[0x9a - 0x68];
-    CobScript* anims;                  // +0x9a
+    Ref<CobScript> anims;              // +0x9a
 };
 #pragma pack(pop)
 
@@ -1029,8 +1030,8 @@ void __stdcall ApplyProjectileHitPacket(int unused, ProjectileDetonatePacket* p)
 void __stdcall DetonateUnitWeapon(Unit* unit, int second)
 {
     // The self-destruct and explosion weapons of the unit's definition.
-    WeaponDef* weapon = second ? (WeaponDef*)unit->def->selfdestructas
-                               : (WeaponDef*)unit->def->explodeas;
+    WeaponDef* weapon = second ? (WeaponDef*)unit->def->selfdestructas.get()
+                               : (WeaponDef*)unit->def->explodeas.get();
     if (weapon) {
         Projectile proj;
         proj.type = weapon;
@@ -1311,11 +1312,11 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
     proj->targetUnit = param_5;
 
     proj->active = fire->shot->burst;
-    g_seams.units->StartScript((CobScript*)unit->script, g_fireScriptNames[(fire->f_1b >> 2) & 3], 0, 0);
+    g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(fire->f_1b >> 2) & 3], 0, 0);
     short angle = unit->weapons[(fire->f_1b >> 2) & 3].fireHeading - unit->heading;
     int a = -FUN_004b70ef(angle, 800);
     int b = -FUN_004b7123(angle, 800);
-    g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "RockUnit", 0, 0, 2, b, a, 0, 0);
+    g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
 
     if (fire->shot->flags.b.startSmoke)
         EmitWeaponSmoke(p3, 9);
@@ -1370,11 +1371,11 @@ int __stdcall FireVLaunchProjectile(Shot_0049cc20* shot, Unit* unit, Vec3* pos,
     proj->targetUnit = param_5;
     proj->interceptedProjectile = (Projectile*)param_6;
     proj->active = shot->def->burst;
-    g_seams.units->StartScript((CobScript*)unit->script, g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
+    g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
     short angle = unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
     int a = -FUN_004b70ef(angle, 800);
     int b = -FUN_004b7123(angle, 800);
-    g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "RockUnit", 0, 0, 2, b, a, 0, 0);
+    g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
     if (shot->def->flags.b.startSmoke)
         EmitWeaponSmoke(pos, 9);
     return 1;
@@ -1427,11 +1428,11 @@ int __stdcall FireBallisticProjectile(Shot_0049cde0* shot, Unit* unit, Vec3* pos
         // active before targetUnit: the reverse of the natural order is the original's.
         proj->active = shot->def->burst;
         proj->targetUnit = param_5;
-        g_seams.units->StartScript((CobScript*)unit->script, g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
+        g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
         short angle = *(int*)&unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
         int a = -FUN_004b70ef(angle, 800);
         int b = -FUN_004b7123(angle, 800);
-        g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "RockUnit", 0, 0, 2, b, a, 0, 0);
+        g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
         if (shot->def->flags.b.startSmoke)
             EmitWeaponSmoke(pos, 9);
         return 1;
@@ -1468,8 +1469,8 @@ int __stdcall SpawnProjectileFromUnitMotion(Shot_0049d000* shot, Unit* unit, Vec
     if (proj) {
         InitProjectile(proj, shot->weapon, pos, 0, g_game->ticks, unit);
         Setup_0049d000(proj, unit);
-        proj->direction.x = -FUN_004b70ef(proj->angles.heading, ((UnitType_0049d000*)unit->motion)->range);
-        proj->direction.z = -FUN_004b7123(proj->angles.heading, ((UnitType_0049d000*)unit->motion)->range);
+        proj->direction.x = -FUN_004b70ef(proj->angles.heading, ((UnitType_0049d000*)unit->motion.get())->range);
+        proj->direction.z = -FUN_004b7123(proj->angles.heading, ((UnitType_0049d000*)unit->motion.get())->range);
         return 1;
     }
     return 0;
@@ -1670,8 +1671,8 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
         proj->angles.heading = unit->heading;
         proj->speed = 0;
         proj->direction.y = 0;
-        proj->direction.x = -FUN_004b70ef(proj->angles.heading, ((Type_0049d270*)unit->motion)->param);
-        proj->direction.z = -FUN_004b7123(proj->angles.heading, ((Type_0049d270*)unit->motion)->param);
+        proj->direction.x = -FUN_004b70ef(proj->angles.heading, ((Type_0049d270*)unit->motion.get())->param);
+        proj->direction.z = -FUN_004b7123(proj->angles.heading, ((Type_0049d270*)unit->motion.get())->param);
         return;
     }
 }
@@ -1916,7 +1917,7 @@ struct Kind_0049db70 {
 
 struct Object_0049db70 {
     char unknown_0[0x96];
-    Kind_0049db70* kind;
+    Ref<Kind_0049db70> kind;
     char unknown_9a[0xa8 - 0x9a];
     short team;
 };
@@ -2015,8 +2016,8 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
         projectile->angles.heading = unit->heading;
         projectile->speed = 0;
         projectile->direction.y = 0;
-        projectile->direction.x = -FUN_004b70ef(projectile->angles.heading, ((Owner_0049dd60*)unit->motion)->id);
-        projectile->direction.z = -FUN_004b7123(projectile->angles.heading, ((Owner_0049dd60*)unit->motion)->id);
+        projectile->direction.x = -FUN_004b70ef(projectile->angles.heading, ((Owner_0049dd60*)unit->motion.get())->id);
+        projectile->direction.z = -FUN_004b7123(projectile->angles.heading, ((Owner_0049dd60*)unit->motion.get())->id);
         if (g_game->netGameFlags & 1) {
             WeaponFirePacket packet;
             packet.type = 0xd;
@@ -2133,7 +2134,7 @@ void __stdcall InitUnitWeaponSlots(Unit* unit)
         if (s->weapon->reloadTime > frame.maxTime)
             frame.maxTime = s->weapon->reloadTime;
     }
-    g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "SetMaxReloadTime", 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
+    g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetMaxReloadTime", 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
 }
 
 // The three aim script names. The original's array has three elements, with
@@ -2197,7 +2198,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     e->f_16 = heading;
                     e->f_8 = 0;
                     // Name read afresh for each call, no cached local: lets the two tails merge.
-                    g_seams.units->StartScriptWithArgs((CobScript*)unit->script, g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->name, 0, 2,
+                    g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->name, 0, 2,
                                                heading, angle, 0, 0);
                     SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, heading, angle, 0, 0);
                     e->flags |= 1;
@@ -2208,7 +2209,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             bool armed = attached->flags.b.vLaunch;
             if (armed && (!attached->flags.b.stockpile || e->f_1a) && !(e->flags & 1)) {
                 e->f_8 = 0;
-                g_seams.units->StartScriptWithArgs((CobScript*)unit->script, g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->name, 0, 2, 0, 0,
+                g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->name, 0, 2, 0, 0,
                                            0, 0);
                 SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, 0, 0, 0, 0);
                 e->flags |= 1;

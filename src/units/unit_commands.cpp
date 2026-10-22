@@ -319,7 +319,7 @@ void __cdecl CreateMissionUnits()
         if (u) {
             // The mask is 0xffffff80, not 0x80: keeps the byte zero-extension.
             u->flags = (u->flags & ~0x8000) | ((e->flags & 0xffffff80) << 8);
-            u->health = (unsigned short)((unsigned)(((Def_00488310*)u->def)->f1fa * e->health) / 100);
+            u->health = (unsigned short)((unsigned)(((Def_00488310*)u->def.get())->f1fa * e->health) / 100);
             u->angles.heading = e->angle;
             units[i] = u;
         }

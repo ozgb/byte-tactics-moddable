@@ -9,6 +9,7 @@
 #define UNIT_MOTION_H
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 struct Unit;
 class HapiBank;
@@ -46,8 +47,8 @@ class UnitTable;
 class UnitMotion {
 public:
     union {
-        Iface_0043dd20* obj;           // +0x0, the path the mover follows
-        PlayerData* player;            // +0x0, the serialisation interface
+        Ref<Iface_0043dd20> obj;           // +0x0, the path the mover follows
+        Ref<PlayerData> player;            // +0x0, the serialisation interface
     };
     int movementClass;                 // +0x4
     Vec3 velocity;                     // +0x8

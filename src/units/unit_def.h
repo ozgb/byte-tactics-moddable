@@ -1,5 +1,6 @@
 #ifndef UNIT_DEF_H
 #define UNIT_DEF_H
+#include "../../interfaces/ref.h"
 
 #pragma pack(push, 1)
 
@@ -26,12 +27,12 @@ public:
     };
     union {
         int f14e;                      // +0x14e
-        char* yardmap;                 // +0x14e
+        Ref<char> yardmap;                 // +0x14e
     };
     int count;                         // +0x152
     // The unit type ids it can build; vtol_orders_414380.cpp tests it as
     // canBuild, but every indexing read is unsigned short.
-    unsigned short* ids;               // +0x156
+    Ref<unsigned short> ids;               // +0x156
     int maxThisUnit;                   // +0x15a
     // The model bounding box (nModelMinX..nModelSizeZ in Thaldren's UnitDef);
     // each file that reads it as a Vec3 casts at the use.
@@ -93,7 +94,7 @@ public:
     int buildtime;                     // +0x1ea
     // The three weapon type pointers (0x115 bytes each); the loader stores what
     // FindWeaponByName returns.
-    WeaponDef* weapons[3];             // +0x1ee
+    Ref<WeaponDef> weapons[3];             // +0x1ee
     unsigned int maxHealth;            // +0x1fa
     unsigned short buildRate;          // +0x1fe
     short healtime;                    // +0x200
@@ -112,8 +113,8 @@ public:
     short sortbias;                    // +0x21a
     short altitude;                    // +0x21c
     unsigned short id;                 // +0x21e
-    char* explodeas;                   // +0x220
-    char* selfdestructas;              // +0x224
+    Ref<char> explodeas;                   // +0x220
+    Ref<char> selfdestructas;              // +0x224
     unsigned char maxslope;            // +0x228
     unsigned char maxwaterslope;       // +0x229
     unsigned char capacity;            // +0x22a

@@ -1,3 +1,4 @@
+#include "../../interfaces/ref.h"
 // MovementClass: one of the 32 entries of the movement class table at
 // 0x512358: the name, the footprint, the water depths and slopes read from
 // moveinfo.tdf (the TDF keys FootPrintX, FootPrintZ, maxwaterdepth,
@@ -26,7 +27,7 @@ public:
     unsigned char badWaterSlope;       // +0x0f
     unsigned int width;                // +0x10, of the pass map
     unsigned int height;               // +0x14
-    unsigned int* cells;               // +0x18
+    Ref<unsigned int> cells;               // +0x18
     unsigned int lastTick;             // +0x1c
 
     MovementClass();

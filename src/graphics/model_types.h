@@ -2,6 +2,7 @@
 #define MODEL_TYPES_H
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 #include "gaf_frame.h"
 #include "object3do.h"
 
@@ -76,11 +77,11 @@ struct Unit_459200 {
     int pos_z;
     char unknown_76[0x86 - 0x76];
     int carrier;
-    Unit_459200* cargo;
-    Unit_459200* cargoNext;
-    UnitDef* def;
+    Ref<Unit_459200> cargo;
+    Ref<Unit_459200> cargoNext;
+    Ref<UnitDef> def;
     char unknown_96[8];
-    Model_459200* state;
+    Ref<Model_459200> state;
     char unknown_a2[4];
     short unitDefIndex;
     unsigned short id;

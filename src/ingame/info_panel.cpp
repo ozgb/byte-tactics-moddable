@@ -10,6 +10,7 @@
 // 0x46a610 and 0x46a860 keep their own files (their symbol counts, the include
 // set or /Gi decide their matches).
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -40,7 +41,7 @@ struct UnitDefFlags_00467440 {
 struct UnitType_004685a0 {
     char name[0x152];                  // +0x0
     int count;                         // +0x152
-    unsigned short* ids;               // +0x156
+    Ref<unsigned short> ids;           // +0x156
     char unknown_15a[0x22f - 0x15a];
     unsigned char mobile;              // +0x22f
 };
@@ -184,9 +185,9 @@ struct Mission_00467e50 {
     char pad_0[5];
     unsigned char state;               // +0x5
     char pad_6[0x16 - 0x6];
-    void* target;                      // +0x16
+    Ref<Unit> target;                  // +0x16
     char pad_1a[0x4a - 0x1a];
-    void* next;                        // +0x4a
+    Ref<Mission_00467e50> next;        // +0x4a
 };
 
 struct MissionName_00467e50 {
@@ -559,20 +560,20 @@ int __stdcall DrawUnitStateProbe(void* surface)
     y += lineH;
     DrawString(surface, "================", 0x86, y, -1);
     y += lineH;
-    sprintf(buf, "uid: %03d/%04x '%s'\n", unit->id, unit->id, ((char *)unit->def));
+    sprintf(buf, "uid: %03d/%04x '%s'\n", unit->id, unit->id, ((char *)unit->def.get()));
     DrawString(surface, buf, 0x86, y, -1);
     y += lineH;
     sprintf(buf, "playerno: %d '%s' %s - %s\n",
-            *(unsigned char*)((char*)((int *)unit->player) + 0x146),
-            (char*)((int *)unit->player) + 0x2b,
-            (*((int *)unit->player) != 0
-             && (*(unsigned char*)((char*)((int *)unit->player) + 0x73) == 1
-                 || *(unsigned char*)((char*)((int *)unit->player) + 0x73) == 2))
+            *(unsigned char*)((char*)((int *)unit->player.get()) + 0x146),
+            (char*)((int *)unit->player.get()) + 0x2b,
+            (*((int *)unit->player.get()) != 0
+             && (*(unsigned char*)((char*)((int *)unit->player.get()) + 0x73) == 1
+                 || *(unsigned char*)((char*)((int *)unit->player.get()) + 0x73) == 2))
                 ? "LOCAL" : "REMOTE",
-            *(unsigned char*)(((char *)unit->def) + 0x22f) != 0 ? "MOBILE" : "BUILDING");
+            *(unsigned char*)(((char *)unit->def.get()) + 0x22f) != 0 ? "MOBILE" : "BUILDING");
     DrawString(surface, buf, 0x86, y, -1);
     y += lineH;
-    sprintf(buf, "controller: %d\n", *(unsigned char*)((char*)((int *)unit->player) + 0x73));
+    sprintf(buf, "controller: %d\n", *(unsigned char*)((char*)((int *)unit->player.get()) + 0x73));
     DrawString(surface, buf, 0x86, y, -1);
     y += lineH;
     sprintf(buf, "buildtimeleft: %1.3f\n", unit->buildLeft);
@@ -587,9 +588,9 @@ int __stdcall DrawUnitStateProbe(void* surface)
     sprintf(buf, "occupy: %s\n", names[((int)unit->flags) & 3]);
     DrawString(surface, buf, 0x86, y, -1);
     y += lineH;
-    if (*((int *)unit->player) != 0
-        && (*(unsigned char*)((char*)((int *)unit->player) + 0x73) == 1
-            || *(unsigned char*)((char*)((int *)unit->player) + 0x73) == 2)) {
+    if (*((int *)unit->player.get()) != 0
+        && (*(unsigned char*)((char*)((int *)unit->player.get()) + 0x73) == 1
+            || *(unsigned char*)((char*)((int *)unit->player.get()) + 0x73) == 2)) {
         sprintf(buf, "autotarget w[pri:sec:spe]: w[%c:%c:%c]\n",
                 (unit->f_1f & 0x10) ? 'X' : '-',
                 (unit->f_3b & 0x10) ? 'X' : '-',
@@ -600,11 +601,11 @@ int __stdcall DrawUnitStateProbe(void* surface)
             DrawString(surface, "Mission Q:", 0x86, y, -1);
             y += lineH;
             for (m = (Mission_00467e50*)((void *)unit->list); m != 0;
-                 m = (Mission_00467e50*)m->next) {
+                 m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
                             ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
-                            m->state, *(char**)((char*)m->target + 0x92));
+                            m->state, (char*)m->target->def.get());
                 else
                     sprintf(buf, "    '%s' state: %d\n",
                             ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
@@ -617,11 +618,11 @@ int __stdcall DrawUnitStateProbe(void* surface)
             DrawString(surface, "Background Mission Q:", 0x86, y, -1);
             y += lineH;
             for (m = (Mission_00467e50*)((void *)unit->list2); m != 0;
-                 m = (Mission_00467e50*)m->next) {
+                 m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
                             ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
-                            m->state, *(char**)((char*)m->target + 0x92));
+                            m->state, (char*)m->target->def.get());
                 else
                     sprintf(buf, "    '%s' state: %d\n",
                             ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
@@ -717,7 +718,7 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
         return 0;
     Unit* unit = &g_game->units[g_game->unitBuilderHoverUnitId];
     if ((((int)unit->flags) & 0x10000000) == 0 || (((int)unit->flags) & 0x4000) != 0
-            || ((UnitType_004685a0 *)unit->def)->ids == 0) {
+            || ((UnitType_004685a0 *)unit->def.get())->ids == 0) {
         g_game->unitInfoHoverTrack = 0;
         g_game->unitInfoHoverUnitId = 0;
     }
@@ -745,22 +746,22 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
     y += lineHeight;
     DrawString(surface, "==================", 0x86, y, -1);
     y += lineHeight;
-    sprintf(buf, "uid: %03d '%s'\n", unit->id, (char*)((UnitType_004685a0 *)unit->def));
+    sprintf(buf, "uid: %03d '%s'\n", unit->id, (char*)((UnitType_004685a0 *)unit->def.get()));
     DrawString(surface, buf, 0x86, y, -1);
     y += lineHeight;
-    char* mobile = (char*)(((UnitType_004685a0 *)unit->def)->mobile ? "MOBILE" : "BUILDING");
+    char* mobile = (char*)(((UnitType_004685a0 *)unit->def.get())->mobile ? "MOBILE" : "BUILDING");
     char* remote;
-    if (((PlayerInfo_004685a0 *)unit->player)->f_0 != 0 && (((PlayerInfo_004685a0 *)unit->player)->controller == 1 || ((PlayerInfo_004685a0 *)unit->player)->controller == 2))
+    if (((PlayerInfo_004685a0 *)unit->player.get())->f_0 != 0 && (((PlayerInfo_004685a0 *)unit->player.get())->controller == 1 || ((PlayerInfo_004685a0 *)unit->player.get())->controller == 2))
         remote = "LOCAL";
     else
         remote = "REMOTE";
-    sprintf(buf, "playerno: %d '%s' %s - %s\n", ((PlayerInfo_004685a0 *)unit->player)->player, ((PlayerInfo_004685a0 *)unit->player)->name, remote, mobile);
+    sprintf(buf, "playerno: %d '%s' %s - %s\n", ((PlayerInfo_004685a0 *)unit->player.get())->player, ((PlayerInfo_004685a0 *)unit->player.get())->name, remote, mobile);
     DrawString(surface, buf, 0x86, y, -1);
     y += lineHeight;
-    sprintf(buf, "controller: %d\n\n", ((PlayerInfo_004685a0 *)unit->player)->controller);
+    sprintf(buf, "controller: %d\n\n", ((PlayerInfo_004685a0 *)unit->player.get())->controller);
     DrawString(surface, buf, 0x86, y, -1);
     y += lineHeight;
-    if (((PlayerInfo_004685a0 *)unit->player)->f_0 != 0 && (((PlayerInfo_004685a0 *)unit->player)->controller == 1 || ((PlayerInfo_004685a0 *)unit->player)->controller == 2)) {
+    if (((PlayerInfo_004685a0 *)unit->player.get())->f_0 != 0 && (((PlayerInfo_004685a0 *)unit->player.get())->controller == 1 || ((PlayerInfo_004685a0 *)unit->player.get())->controller == 2)) {
         sprintf(buf, "Units I can build, and the probabilities:\n",
                 ((unit->f_1f & 0x10) ? 'X' : '-'),
                 ((unit->f_3b & 0x10) ? 'X' : '-'),
@@ -768,9 +769,9 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
         DrawString(surface, buf, 0x86, y, -1);
         int i = 0;
         y += lineHeight;
-        if (((UnitType_004685a0 *)unit->def)->count > 0) {
+        if (((UnitType_004685a0 *)unit->def.get())->count > 0) {
             do {
-                unsigned short id = ((UnitType_004685a0 *)unit->def)->ids[i];
+                unsigned short id = ((UnitType_004685a0 *)unit->def.get())->ids[i];
                 int prob = GetBuildRating(unit->playerIndex, id);
                 Def_004685a0* def = &((Def_004685a0 *)g_game->defs)[id];
                 Rect bar;
@@ -784,7 +785,7 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
                 DrawString(surface, buf, 0x86, y, -1);
                 y += lineHeight;
                 i++;
-            } while (i < ((UnitType_004685a0 *)unit->def)->count);
+            } while (i < ((UnitType_004685a0 *)unit->def.get())->count);
         }
     }
     g_probePanelBottom = y;

@@ -95,9 +95,9 @@ void PlayerAI::RefreshUnitLists()
                 if((unsigned char)(u->flags>>8)&1) known.units.push_back(u);
             } else if(u->PlayerIndex()==owner->index && u->buildLeft==0.0) {
                 ++counts[u->unitDefIndex];
-                if(((Def*)u->def)->builder) ++builders;
-                if((((Def*)u->def)->flags&0x40) && (((Def*)u->def)->flags&0x200) && (u->activateFlags&1)) factories.list.units.push_back(u);
-                if((((Def*)u->def)->flags&0x400) && (u->activateFlags&1)) hasSpecial=1;
+                if(((Def*)u->def.get())->builder) ++builders;
+                if((((Def*)u->def.get())->flags&0x40) && (((Def*)u->def.get())->flags&0x200) && (u->activateFlags&1)) factories.list.units.push_back(u);
+                if((((Def*)u->def.get())->flags&0x400) && (u->activateFlags&1)) hasSpecial=1;
                 // The table holds signed bytes: the cast gives the sign-extending load.
                 float weight=(char)weights[u->unitDefIndex];
                 sum.total+=weight;

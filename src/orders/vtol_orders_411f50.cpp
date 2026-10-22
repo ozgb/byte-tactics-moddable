@@ -191,7 +191,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         order->flags = 0xe2;
         if (unit->health < unit->def->maxHealth / 4 * 3) {
             std::vector<Unit*> pads;
-            g_seams.ai->GetFactoriesInRadius(((Struct_Unit96*)unit->player)->slotIndex, &unit->pos, 0xf00, &pads);
+            g_seams.ai->GetFactoriesInRadius(((Struct_Unit96*)unit->player.get())->slotIndex, &unit->pos, 0xf00, &pads);
             if (!pads.empty()) {
                 order->SetAttachedFx(0);
                 Unit* pad = pads[RandomInt(pads.size())];

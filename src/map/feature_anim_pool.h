@@ -1,6 +1,10 @@
 #ifndef FEATURE_ANIM_POOL_H
 #define FEATURE_ANIM_POOL_H
 
+#include "../../interfaces/ref.h"
+
+struct UnitDef;
+
 #pragma pack(push, 1)
 struct AnimEntry_00421f20 {
     short next;
@@ -10,7 +14,7 @@ struct AnimEntry_00421f20 {
 
 struct FeatureUnit_00421f20 {
     char unknown_0[0x92];
-    int def;
+    Ref<UnitDef> def;
     char unknown_96[0xa6 - 0x96];
     unsigned short unitDefIndex;
     char unknown_a8[0x110 - 0xa8];

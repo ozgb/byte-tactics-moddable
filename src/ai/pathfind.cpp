@@ -107,7 +107,7 @@ class Planner_0040eb70;
 
 #pragma pack(push, 1)
 struct Owner_0040eb70 {
-    Planner_0040eb70* planner;         // +0x0
+    Ref<Planner_0040eb70> planner;     // +0x0
     void* owner;                       // +0x4, the movement class
 };
 
@@ -492,7 +492,7 @@ greedy:
 // FUNCTION: 0x40e630
 void Pathfinder::StartSearch(Target* t)
 {
-    owner = (MovementClass*)((Owner_0040eb70 *)object->motion)->owner;
+    owner = (MovementClass*)((Owner_0040eb70 *)object->motion.get())->owner;
     target = t;
     start = object->cell;
     g_seams.units->RefreshMovedUnits(owner, object);
@@ -677,8 +677,8 @@ void Pathfinder::RunSearches()
             else
                 (*c)++;
             Unit* u = cursor[player];
-            if (((short)u->unitDefIndex) != 0 && ((Owner_0040eb70 *)u->motion) != 0 && ((Owner_0040eb70 *)u->motion)->owner != 0) {
-                path = ((Owner_0040eb70 *)u->motion)->planner->GetPath();
+            if (((short)u->unitDefIndex) != 0 && ((Owner_0040eb70 *)u->motion.get()) != 0 && ((Owner_0040eb70 *)u->motion.get())->owner != 0) {
+                path = ((Owner_0040eb70 *)u->motion.get())->planner->GetPath();
                 if (path != 0) {
                     object = u;
                     steps += 100;

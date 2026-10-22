@@ -41,7 +41,7 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color
                 Object3do* info = piece->object;
                 Vertex_0045a610* v = (Vertex_0045a610*)piece->points;
                 for (int j = 0; j < info->vertexCount; j++, v++) {
-                    int bright = ((Map_00458fa0*)model->owner->def)->brightFaces ? 125 : 50;
+                    int bright = ((Map_00458fa0*)model->owner->def.get())->brightFaces ? 125 : 50;
                     int x = (short)(v->x >> 16);
                     int y = (short)(v->y >> 16);
                     int z = (short)(-v->z >> 16);

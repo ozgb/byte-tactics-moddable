@@ -2,6 +2,7 @@
 #define MISSION_H
 
 #include "../util/tdf.h"
+#include "../../interfaces/ref.h"
 
 struct MissionRule;
 struct Vec3;
@@ -45,13 +46,13 @@ public:
     TdfFile list;                      // +0xa08, the campaign file
     char missionName[0x100];           // +0xa14
     char text_b14[0x100];              // +0xb14
-    char* briefing;                    // +0xc14
+    Ref<char> briefing;                    // +0xc14
     int missionIndex;                  // +0xc18
     int tntChecksum;                   // +0xc1c
     int headerChecksum;                // +0xc20
     char description[0x80];            // +0xc24
     char planet[0x80];                 // +0xca4
-    char* mapList;                     // +0xd24
+    Ref<char> mapList;                     // +0xd24
     int mapCount;                      // +0xd28
     int multi;                         // +0xd2c
     int surfaceMetal;                  // +0xd30
@@ -67,11 +68,11 @@ public:
     float timeMul;                     // +0xd58
     float startMetal[10];              // +0xd5c, per player
     float startEnergy[10];             // +0xd84, per player
-    MissionUnit* units;                // +0xdac
+    Ref<MissionUnit> units;                // +0xdac
     int unitCount;                     // +0xdb0
-    MissionRule* rules;                // +0xdb4
+    Ref<MissionRule> rules;                // +0xdb4
     int ruleCount;                     // +0xdb8
-    MissionFeature* features;          // +0xdbc
+    Ref<MissionFeature> features;          // +0xdbc
     int featureCount;                  // +0xdc0
     char memory[0x80];                 // +0xdc4
     char numPlayers[0x80];             // +0xe44

@@ -716,7 +716,7 @@ int HandleNetPackets()
             UnitScriptCallPacket* call = (UnitScriptCallPacket*)packet;
             Unit* unit = UnitAt(call->id);
             if (unit->flags & 0x10000000)
-                ((CobScript*)unit->script)->StartScriptWithArgsByIndex(call->index, 0, 0, call->argCount,
+                ((CobScript*)unit->script.get())->StartScriptWithArgsByIndex(call->index, 0, 0, call->argCount,
                                              call->arg0, call->arg1, call->arg2, call->arg3);
             break;
         }

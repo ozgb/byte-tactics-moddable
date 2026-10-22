@@ -62,7 +62,7 @@ public:
 // IsDamaged, FindPads and SearchRange stay small helpers: the vector calls
 // inline or not according to the original.
 static inline int IsDamaged(Unit* u) { return (unsigned int)u->health < (u->def->maxHealth>>2)*3; }
-static inline void FindPads(Unit* u, std::vector<Unit*>* pads) { g_seams.ai->GetFactoriesInRadius(((Owner*)u->player)->index,&u->pos,0xf00,pads); }
+static inline void FindPads(Unit* u, std::vector<Unit*>* pads) { g_seams.ai->GetFactoriesInRadius(((Owner*)u->player.get())->index,&u->pos,0xf00,pads); }
 static inline int SearchRange(Unit* u) { return u->def->range<<16; }
 static inline int Patrol(Unit* unit, Order* order, int flags)
 {
@@ -79,7 +79,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     }
     UnitList units;
     int range=SearchRange(unit);
-    GroundAllyVisitor visitor((Owner*)unit->player,&units,unit);
+    GroundAllyVisitor visitor((Owner*)unit->player.get(),&units,unit);
     g_seams.map->VisitObjectsInRange(&unit->pos,range,(UnitVisitor*)&visitor);
     if (!units.empty()) {
         order->SetAttachedFx(0);
@@ -102,7 +102,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
 int __stdcall VtolSeekGuardOrder(Unit* unit, Order* order, int flags)
 {
     if (flags&0x40) return 5;
-    if ((int)unit->spatialBucket == g_game->overflowBucket) {
+    if ((int)unit->spatialBucket.get() == g_game->overflowBucket) {
         Vec3 center;
         center.x=(g_game->mapWidth/2)<<16;
         center.z=(g_game->mapHeight/2)<<16;

@@ -491,7 +491,7 @@ void FUN_00406f40(void)
 // FUNCTION: 0x406f50
 void SquadManager::MarkOwnerNetDirtyFromDamageSplit(Projectile* projectile, int a, int b)
 {
-    Target_00406f50* t = (Target_00406f50*)projectile->attacker;
+    Target_00406f50* t = (Target_00406f50*)projectile->attacker.get();
     if (t) {
         if (a > b * 2) {
             t->flag6 = 1;
@@ -879,7 +879,7 @@ ScoutTimer::ScoutTimer(SquadManager* p, Group* q)
 // FUNCTION: 0x408670
 void __stdcall UpdateConverter(Unit* unit)
 {
-    Economy* economy = (Economy*)unit->player;
+    Economy* economy = (Economy*)unit->player.get();
     if (economy->cost + economy->cost < economy->energy) {
         if (g_seams.players->GetNetEnergy((Player*)economy) > Zero_004fc968 && RandomInt(5) != 0) {
             g_seams.units->SetStateBits(unit, 1, 1);
@@ -900,7 +900,7 @@ void BuildTimer::OnTimer()
         Unit* u = *it;
         if ((u->flags & 0x20000000) && (u->flags & 0x10000000) && !(u->flags & 0x4000)) {
             if (u->def->makesMetal) {
-                if (((Economy*)u->player)->cost + ((Economy*)u->player)->cost < ((Economy*)u->player)->energy) {
+                if (((Economy*)u->player.get())->cost + ((Economy*)u->player.get())->cost < ((Economy*)u->player.get())->energy) {
                     if (g_seams.players->GetNetEnergy(u->player) > Zero_004fc968 && RandomInt(5))
                         g_seams.units->SetStateBits(u, 1, 1);
                 } else

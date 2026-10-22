@@ -1,3 +1,4 @@
+#include "../../interfaces/ref.h"
 // PathOrderAttach: the 0x10-byte link at +0x12 of an order, the node the
 // PathGoal family and the order handlers hang off the order's target. Its
 // constructor puts it in its owner's list (the head is the unit's +0xa2) and
@@ -15,8 +16,8 @@ struct Unit;
 
 class PathOrderAttach {
 public:
-    Unit* owner;                   // +0x4
-    PathOrderAttach* next;         // +0x8
+    Ref<Unit> owner;                   // +0x4
+    Ref<PathOrderAttach> next;         // +0x8
     void* value;                   // +0xc, the object the link belongs to
 
     PathOrderAttach(Unit* o, int v);

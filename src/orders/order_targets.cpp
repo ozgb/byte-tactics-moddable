@@ -1204,7 +1204,7 @@ int PathOrder::FillWorldPos(Vec3* out)
 {
     unsigned short f = flags;
     if ((f & 1) && !(f & 0x80)) {
-        if (ref.owner == 0 || (int)ref.owner->spatialBucket == g_game->overflowBucket)
+        if (ref.owner == 0 || (int)ref.owner->spatialBucket.get() == g_game->overflowBucket)
             return 0;
         // Through a local pointer: keeps the struct-assignment destination in edi.
         Vec3* p = &pos;
@@ -1225,7 +1225,7 @@ int PathOrder::FillWorldPos(Vec3* out)
             if (def->b22)
                 pos.y = (def->altitude + g_game->seaLevel) << 16;
             else
-                pos.y = (def->altitude + *((unsigned char*)unit->spatialBucket + 1)) << 16;
+                pos.y = (def->altitude + *((unsigned char*)unit->spatialBucket.get() + 1)) << 16;
         }
     }
     if (pos.y > 0x1ff0000)

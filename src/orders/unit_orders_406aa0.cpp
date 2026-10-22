@@ -19,8 +19,8 @@ void __stdcall EmitTeleportParticles(Vec*,Vec*,int,int);
 // FUNCTION: 0x406aa0
 int __stdcall TeleportOrder(Unit* unit,Order* order,int unused)
 {
-    Vec low = Add(*(Vec*)&unit->pos, ((Def*)unit->def)->low);
-    Vec high = Add(*(Vec*)&unit->pos, ((Def*)unit->def)->high);
+    Vec low = Add(*(Vec*)&unit->pos, ((Def*)unit->def.get())->low);
+    Vec high = Add(*(Vec*)&unit->pos, ((Def*)unit->def.get())->high);
     for(Unit* p=g_game->units;p<=g_game->unitsEnd;++p) {
         if(p->pos.x >= low.x && p->pos.x <= high.x && p->pos.z >= low.z && p->pos.z <= high.z && p->pos.y >= low.y && p->pos.y <= high.y && unit != p) {
             Vec dest = Sub(Add(*(Vec*)&order->pos,*(Vec*)&p->pos),*(Vec*)&unit->pos);

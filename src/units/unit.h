@@ -5,6 +5,7 @@
 #include "../util/angles.h"
 #include "../game/unit_resources.h"
 #include "../weapons/unit_weapon_slot.h"
+#include "../../interfaces/ref.h"
 
 class TdfRecord;
 struct UnitMotion;
@@ -13,14 +14,14 @@ struct Limits_0043e490;
 struct Order;
 struct UnitDef;
 struct Player;
-class SpatialBucket;
+struct Class_0047cb00;
 class Class_004b0a70;
 struct SpotState;
 class PathOrderAttach;
 
 #pragma pack(push, 1)
 struct Unit {
-    UnitMotion* motion;
+    Ref<UnitMotion> motion;
     union {
         struct {
             TdfRecord* current;
@@ -52,8 +53,8 @@ struct Unit {
         UnitWeaponSlot weapons[3];
     };
     int extraction;
-    Order* list;
-    Order* list2;
+    Ref<Order> list;
+    Ref<Order> list2;
     union {
         struct {
             short field_64;
@@ -82,15 +83,15 @@ struct Unit {
         };
     };
     Point16 footprint;
-    SpatialBucket* spatialBucket;
-    Unit* carrier;
-    Unit* cargo;
-    Unit* cargoNext;
-    UnitDef* def;
-    Player* player;
-    Class_004b0a70* script;
-    SpotState* state;
-    PathOrderAttach* head;
+    Ref<Class_0047cb00> spatialBucket;
+    Ref<Unit> carrier;
+    Ref<Unit> cargo;
+    Ref<Unit> cargoNext;
+    Ref<UnitDef> def;
+    Ref<Player> player;
+    Ref<Class_004b0a70> script;
+    Ref<SpotState> state;
+    Ref<PathOrderAttach> head;
     unsigned short unitDefIndex;
     unsigned short id;
     unsigned short hoverBobPhase;
@@ -121,7 +122,7 @@ struct Unit {
         };
         UnitResources resourceSlot;
     };
-    Unit* attacker;
+    Ref<Unit> attacker;
     unsigned char lastAttackerSlot;
     unsigned char lastDamageType;
     unsigned char healthPercent;

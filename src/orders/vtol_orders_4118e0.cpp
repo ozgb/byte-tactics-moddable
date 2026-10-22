@@ -102,7 +102,7 @@ int __stdcall FindLandingPad(Unit* unit, int pad)
     pads[1] = -1;
     pads[2] = -1;
     pads[3] = -1;
-    g_seams.units->QueryScript((CobScript*)unit->script, "QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
+    g_seams.units->QueryScript((CobScript*)unit->script.get(), "QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
     for (int i = 0; i < 4; i++) {
         if (pads[i] != -1 && g_seams.map->IsPadSlotFree(unit, pads[i])) {
             return pads[i];
@@ -183,7 +183,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             ((Class_0044e2d0*)obj)->SetAltitude(unit->cargo->def->field_170);
         else
             ((Class_0044e2d0*)obj)->SetAltitude(0);
-        g_seams.units->StartScript((CobScript*)unit->script, "EndTransport", 0, 1);
+        g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
         order->SetAttachedFx(obj);
         order->SetDeadlineTicks(0xf);
         order->state = 5;
@@ -199,7 +199,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             return 0;
         }
         if (unit->cargo) {
-            g_seams.units->StartScript((CobScript*)unit->script, "EndTransport", 0, 0);
+            g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
             g_seams.units->AttachUnitToPiece(unit->cargo, order->target, order->angle, 0);
             dropped = 1;
         } else {

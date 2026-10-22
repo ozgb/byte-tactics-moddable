@@ -584,9 +584,9 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
                 ->GetFieldString(weapon, "selfdestructas", 128, DAT_005119b8);
             char* selfdestructas = (char*)g_seams.weapons->FindWeaponByName(weapon);
             unitdef->selfdestructas = selfdestructas ? selfdestructas : defaultWeapon;
-            if ((char*)unitdef->weapons[0] == defaultWeapon &&
-                (char*)unitdef->weapons[1] == defaultWeapon &&
-                (char*)unitdef->weapons[2] == defaultWeapon)
+            if ((char*)unitdef->weapons[0].get() == defaultWeapon &&
+                (char*)unitdef->weapons[1].get() == defaultWeapon &&
+                (char*)unitdef->weapons[2].get() == defaultWeapon)
                 unitdef->flags1 &= ~0x10000;
             else
                 unitdef->flags1 |= 0x10000;
@@ -602,7 +602,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
                 char* cursor = yard;
                 int y = 0;
                 // Declared after the loop locals: its larger symbol id makes it the base.
-                char*& map = unitdef->yardmap;
+                Ref<char>& map = unitdef->yardmap;
                 while (y < unitdef->footprintz) {
                     for (int x = 0; x < unitdef->footprintx;) {
                         switch (*cursor) {

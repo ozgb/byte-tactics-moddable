@@ -3,6 +3,7 @@
 
 #include "../util/angles.h"
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 struct Unit;
 struct WeaponDef;
@@ -10,7 +11,7 @@ struct WeaponDef;
 #pragma pack(push, 1)
 
 struct Projectile {
-    WeaponDef* type;
+    Ref<WeaponDef> type;
     union {
         Vec3 position;
         Vec3Words positionWords;
@@ -26,12 +27,12 @@ struct Projectile {
     int nextSmokeTick;
     union {
         int targetUnit;
-        Unit* targetUnitPtr;
+        Ref<Unit> targetUnitPtr;
     };
-    Unit* attacker;
+    Ref<Unit> attacker;
     union {
         int field_56;
-        Projectile* interceptedProjectile;
+        Ref<Projectile> interceptedProjectile;
     };
     short cellX;
     short cellZ;

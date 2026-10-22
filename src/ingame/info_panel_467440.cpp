@@ -117,8 +117,8 @@ void UpdateSensorRadarAndCloak(void)
         if (a->flags & 0x10000000) {
             a->flags &= ~0x1000;
             if (a->playerIndex == player
-                || (((PlayerInfo_00467440*)a->player)->allied[pl->index] != 0
-                    && (((PlayerInfo_00467440*)a->player)->data->flags_97 & 0x40) != 0)
+                || (((PlayerInfo_00467440*)a->player.get())->allied[pl->index] != 0
+                    && (((PlayerInfo_00467440*)a->player.get())->data->flags_97 & 0x40) != 0)
                 || (*(int*)pl != 0 && (pl->data->flags_9b & 0x40) != 0)) {
                 a->flags |= 0x300;
             } else {
@@ -169,8 +169,8 @@ void UpdateSensorRadarAndCloak(void)
     }
 
     for (u = first; u <= last; u++) {
-        if ((u->flags & 0x10000000) && ((PlayerInfo_00467440*)u->player)->active != 0) {
-            char c = ((PlayerInfo_00467440*)u->player)->type;
+        if ((u->flags & 0x10000000) && ((PlayerInfo_00467440*)u->player.get())->active != 0) {
+            char c = ((PlayerInfo_00467440*)u->player.get())->type;
             if (c == 1 || c == 2) {
                 if (u->def->flags2 & 0x2000) {
                     if (g_seams.ai->HasReadyUnitInRange(u->playerIndex, (Vec3*)&u->pos, u->def->mincloakdistance)) {

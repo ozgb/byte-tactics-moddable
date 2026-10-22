@@ -250,8 +250,8 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     if (rec.f27 != 0)
         g_seams.orders->LoadMotion(unit->motion, 0, unit, file);
 
-    Order** normal = (Order**)&unit->list;
-    Order** special = (Order**)&unit->list2;
+    Ref<Order>* normal = &unit->list;
+    Ref<Order>* special = &unit->list2;
     int k = 0;
     if (rec.f23 > 0) {
         do {
@@ -271,7 +271,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
         g_seams.orders->ReattachFxToUnit((Order*)unit->list);
     sprintf(script, "Script%i", i);
     file->OpenNamedBox(script);
-    ((CobScript*)unit->script)->LoadScriptState(file);
+    ((CobScript*)unit->script.get())->LoadScriptState(file);
 
     // Plain array indexing in this field order: it anchors the loop pointer.
     for (int j = 0; j < 3; j++) {
@@ -315,7 +315,7 @@ void __stdcall SaveUnits(HapiBank* file)
 
             sprintf(script, "Script%i", count);
             file->OpenNamedBox(script);
-            ((CobScript*)unit->script)->SaveScriptState(file);
+            ((CobScript*)unit->script.get())->SaveScriptState(file);
 
             int n = 0;
             Order* c = (Order*)unit->list;
@@ -337,7 +337,7 @@ void __stdcall SaveUnits(HapiBank* file)
                 g_seams.orders->SaveMotion(unit->motion, 0, unit, file);
             g_seams.economy->SaveUnitAccounts((UnitResources*)((char*)unit + 0xbc), (UnitInfo*)unit, file);
 
-            strcpy(rec.name, (char*)(*(char**)((char*)unit + 0x92) + 0x20));
+            strcpy(rec.name, ((char*)unit->def.get() + 0x20));
             rec.player = unit->playerIndex;
             rec.id = unit->id;
 

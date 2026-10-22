@@ -711,11 +711,13 @@ int Mission::AdvanceMission()
 void Mission::RefreshMapList(int multiplayer)
 {
     if (multi != 0 && multiplayer == 0 && mapList != 0) {
-        GameFreeThunk((int*)mapList);
+        GameFreeThunk((int*)mapList.get());
         mapList = 0;
     }
     if (mapList == 0) {
-        mapCount = LoadMapList(&mapList, multiplayer, multiplayer);
+        char* list = mapList;
+        mapCount = LoadMapList(&list, multiplayer, multiplayer);
+        mapList = list;
     }
     LoadMissionByName(mapList);
     multi = multiplayer;
@@ -1069,7 +1071,7 @@ void Mission::LoadMissionData(char* name, TdfFile* parser)
     units = (MissionUnit*)SimAllocTagged(
         "MISSIONUNIT DATA",
         (total / 0x400 + 2) * 0x400 + unitBytes);
-    char* strings = (char*)units + unitBytes;
+    char* strings = (char*)units.get() + unitBytes;
     for (i = 0; i < count; i++) {
         MissionUnit* u = &units[i];
         TdfRecord* s = list->GetSubRecord(i);

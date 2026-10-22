@@ -90,14 +90,14 @@ void __stdcall CutFrameBelow(GafFrame* param_1, int value);
 // digger_bias (if/return) is used only in the digger arm; other sites keep shade_bias.
 static inline int digger_bias(Model_459200* model)
 {
-    if (((UnitDefFlags_459200*)model->owner->def)->flags.bits.digger)
+    if (((UnitDefFlags_459200*)model->owner->def.get())->flags.bits.digger)
         return 125;
     return 50;
 }
 
 static inline int shade_bias(Model_459200* model)
 {
-    bool c = ((((UnitDefFlags_459200*)model->owner->def)->flags.word >> 30) & 1) != 0;
+    bool c = ((((UnitDefFlags_459200*)model->owner->def.get())->flags.word >> 30) & 1) != 0;
     return c ? 125 : 50;
 }
 
@@ -136,7 +136,7 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
     if (bmp->scratch == 0) {
         GameFlags_459200 gameFlags = (*(GameFlags_459200*)&g_game->flags_37f06);
         if (gameFlags.whole & 4) {
-            f = ((UnitDefFlags_459200*)model->owner->def)->flags;
+            f = ((UnitDefFlags_459200*)model->owner->def.get())->flags;
             if ((f.word & 0x2000000) == 0) {
                 if ((model->owner->flags & 0x20000000)
                     && (f.word & 0x40000000) == 0) {
@@ -188,7 +188,7 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
     {
         GameFlags_459200 gameFlags = (*(GameFlags_459200*)&g_game->flags_37f06);
         if (gameFlags.whole & 4) {
-            f = ((UnitDefFlags_459200*)model->owner->def)->flags;
+            f = ((UnitDefFlags_459200*)model->owner->def.get())->flags;
             if ((f.word & 0x2000000) == 0) {
                 if (f.bits.digger) {
                     MakeSilhouette(bmp);
@@ -253,7 +253,7 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
                 TintFrameBelow(this->bitmap, diff);
             }
         }
-        if (((UnitDefFlags_459200*)model->owner->def)->flags.bits.digger)
+        if (((UnitDefFlags_459200*)model->owner->def.get())->flags.bits.digger)
             CutFrameBelow(this->bitmap, 0x7d);
         if (!(model->owner->activateFlags & 4) && g_game->debugMode == 0)
             DrawFrame((Surface*)param_2, this->bitmap, v.p.x.whole + 0x80, z);

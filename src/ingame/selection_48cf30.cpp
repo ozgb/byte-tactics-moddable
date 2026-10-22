@@ -99,9 +99,9 @@ void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
         // fire and move are named locals from the Order() wrapper, not constructed
         // directly: that decides their frame slots.
         MissionType fire = Order("Standing_FireOrder");
-        if (kind.index != fire.index || (((UnitDef_0048cf30 *)u->def)->flags & 2)) {
+        if (kind.index != fire.index || (((UnitDef_0048cf30 *)u->def.get())->flags & 2)) {
             MissionType move = Order("Standing_MoveOrder");
-            if (kind.index != move.index || (((UnitDef_0048cf30 *)u->def)->flags & 1)) {
+            if (kind.index != move.index || (((UnitDef_0048cf30 *)u->def.get())->flags & 1)) {
                 if (pos && (kind.GetTableEntry()->flags & 2)) {
                     // Two-step deltas, z first then x: one-step avoids a CSE across the branch.
                     int dz = u->pos.z;

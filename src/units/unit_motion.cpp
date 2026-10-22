@@ -66,7 +66,7 @@ extern Game* g_game;
 // FUNCTION: 0x437840
 void __stdcall UpdateMetalExtraction(Unit* unit)
 {
-    if (((UnitType_437840*)unit->def)->extractsMetal > 0.0f) {
+    if (((UnitType_437840*)unit->def.get())->extractsMetal > 0.0f) {
         Fixed_437840 total;
         total.value = 0;
         Point16_437840 fp = *(Point16_437840*)&unit->footprint;
@@ -78,9 +78,9 @@ void __stdcall UpdateMetalExtraction(Unit* unit)
                 }
             }
         }
-        *(float*)&unit->extraction = ((UnitType_437840*)unit->def)->extractsMetal * 1.52587890625e-05 * (float)total.value;
+        *(float*)&unit->extraction = ((UnitType_437840*)unit->def.get())->extractsMetal * 1.52587890625e-05 * (float)total.value;
         if (unit->script)
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "SetSpeed", 0, 0, 1, total.parts.whole, 0, 0, 0);
+            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", 0, 0, 1, total.parts.whole, 0, 0, 0);
     }
 }
 
@@ -90,9 +90,9 @@ void __stdcall UpdateMetalExtraction(Unit* unit)
 // FUNCTION: 0x437910
 void __stdcall UpdateWindGenerator(Unit* unit)
 {
-    if (((UnitType_437840*)unit->def)->windGenerator > 0.0f && g_game->windEnabled) {
-        ((CobScript*)unit->script)->StartScriptWithArgs("SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);
-        ((CobScript*)unit->script)->StartScriptWithArgs("SetSpeed", 0, 0, 1, g_game->windSpeed << 4, 0, 0, 0);
+    if (((UnitType_437840*)unit->def.get())->windGenerator > 0.0f && g_game->windEnabled) {
+        ((CobScript*)unit->script.get())->StartScriptWithArgs("SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);
+        ((CobScript*)unit->script.get())->StartScriptWithArgs("SetSpeed", 0, 0, 1, g_game->windSpeed << 4, 0, 0, 0);
     }
 }
 

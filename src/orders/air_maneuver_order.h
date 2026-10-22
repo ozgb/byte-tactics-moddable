@@ -3,6 +3,7 @@
 
 #include "../util/vec3.h"
 #include "order_fx.h"
+#include "../../interfaces/ref.h"
 
 class BitReader;
 
@@ -21,7 +22,7 @@ public:
     short saveOnly22;                  // +0x22
     unsigned short heading;            // +0x24
     unsigned short value_26;           // +0x26
-    Unit* self;                        // +0x28
+    Ref<Unit> self;                        // +0x28
 
     AirManeuverOrder(Order* order, const Vec3& a, const Vec3& b);
     AirManeuverOrder(int owner, HapiBank* file, char* name);

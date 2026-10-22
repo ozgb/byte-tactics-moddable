@@ -80,7 +80,7 @@ int __stdcall GetOrderName(Unit* obj);
 int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 0x40) return 5;
-    if ((int)unit->spatialBucket == g_game->overflowBucket) {
+    if ((int)unit->spatialBucket.get() == g_game->overflowBucket) {
         Vec3 center;
         center.x=(g_game->mapWidth/2)<<16;
         center.z=(g_game->mapHeight/2)<<16;
@@ -120,7 +120,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
         if ((unsigned int)unit->health < (unit->def->maxHealth>>2)*3) {
             LandingPadList pads;
-            g_seams.ai->GetFactoriesInRadius(((Owner*)unit->player)->index,&unit->pos,0xf00,&pads);
+            g_seams.ai->GetFactoriesInRadius(((Owner*)unit->player.get())->index,&unit->pos,0xf00,&pads);
             if (!pads.empty()) {
                 order->SetAttachedFx(0);
                 Unit* pad=pads[RandomInt(pads.count())];

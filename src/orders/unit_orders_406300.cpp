@@ -53,7 +53,7 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
     }
     case 1: {
         Unit* attacker=order->target->attacker;
-        if (attacker && !((Owner*)attacker->player)->allied[((Owner*)unit->player)->index] && (flags & 0x10) &&
+        if (attacker && !((Owner*)attacker->player.get())->allied[((Owner*)unit->player.get())->index] && (flags & 0x10) &&
             !Contains(unit->def->categories,attacker->unitDefIndex)) {
             if (IssueAttackOrder(unit,attacker,1)) { order->flags=0; return 3; }
             if (unit->flags & 0x300000) {

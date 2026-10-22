@@ -290,7 +290,7 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
                             int unused1, int unused2)
 {
     Unit* unit = order->unit;
-    UnitType* def = (UnitType*)unit->def;
+    UnitType* def = (UnitType*)unit->def.get();
     int index = 0;
     if (g_game->showRanges == 0) {
         short mincloak = def->minCloakDistance;
@@ -510,7 +510,7 @@ void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
                 }
             }
         }
-        unsigned short len = ((UnitType*)u->def)->attackLength;
+        unsigned short len = ((UnitType*)u->def.get())->attackLength;
         if (len != 0)
             DrawRangeCircle(surface, view, &pos, len, color, "attack length", 2);
     }
@@ -533,7 +533,7 @@ void __stdcall DrawOrderRangeRing(void* surface, View* view, Order* order,
     int height;
     if (order->target != 0) {
         p = *(Pos*)&order->target->pos;
-        height = ((UnitType*)order->target->def)->field_178;
+        height = ((UnitType*)order->target->def.get())->field_178;
     } else {
         p = *(Pos*)&order->pos;
         height = 0x20;

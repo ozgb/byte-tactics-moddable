@@ -269,7 +269,7 @@ extern char g_celebratedKey[]; // "Celebrated"
 void VictoryKillEnemyCommander::OnUnitDied(Unit* unit)
 {
     if (unit->playerIndex == 1) {
-        if (_strcmpi(((UnitType *)unit->def)->name, (*(PlayerName(*)[5])&g_game->sideDefs)[((Link_0048ea40 *)unit->player)->owner->side].commander) == 0) {
+        if (_strcmpi(((UnitType *)unit->def.get())->name, (*(PlayerName(*)[5])&g_game->sideDefs)[((Link_0048ea40 *)unit->player.get())->owner->side].commander) == 0) {
             satisfied = 1;
             if (celebrated == 0) {
                 PlaySoundByName("Victory Condition", 0);
@@ -449,7 +449,7 @@ void VictoryBuildUnitType::LoadState(HapiBank* obj)
 // FUNCTION: 0x48eeb0
 void VictoryCaptureUnitType::OnUnitCaptured(Unit* unit)
 {
-    if (unit->playerIndex == 1 && _strcmpi(name, ((UnitType *)unit->def)->name) == 0) {
+    if (unit->playerIndex == 1 && _strcmpi(name, ((UnitType *)unit->def.get())->name) == 0) {
         satisfied = 1;
         if (celebrated == 0) {
             PlaySoundByName("Victory Condition", 0);
@@ -493,7 +493,7 @@ int VictoryKillAllOfType::VisitUnit(Unit* unit)
 // FUNCTION: 0x48efb0
 void VictoryKillAllOfType::OnUnitDied(Unit* unit)
 {
-    if (satisfied == 0 && unit->playerIndex == 1 && _strcmpi(name, ((UnitType *)unit->def)->name) == 0) {
+    if (satisfied == 0 && unit->playerIndex == 1 && _strcmpi(name, ((UnitType *)unit->def.get())->name) == 0) {
         id = g_seams.units->FindUnitTypeId(name);
         count = 0;
         (*(struct UnitList*)((char*)g_game + 0x1d15)).ForEach(this);
@@ -535,7 +535,7 @@ extern char g_numLeftToKillKey[]; // "NumLeftToKill"
 // FUNCTION: 0x48f0f0
 void VictoryKillUnitType::OnUnitDied(Unit* unit)
 {
-    if (numLeftToKill > 0 && unit->playerIndex == 1 && _strcmpi(name, ((UnitType *)unit->def)->name) == 0) {
+    if (numLeftToKill > 0 && unit->playerIndex == 1 && _strcmpi(name, ((UnitType *)unit->def.get())->name) == 0) {
         if (--numLeftToKill <= 0) {
             satisfied = 1;
             if (celebrated == 0) {
@@ -585,7 +585,7 @@ int VictoryMoveUnitToRadius::IsSatisfied()
 void VictoryMoveUnitToRadius::VisitUnit(Unit* unit)
 {
     if (unit->playerIndex == 0) {
-        if (name[0] != 0 && _strcmpi(name, ((UnitType *)unit->def)->name) != 0) {
+        if (name[0] != 0 && _strcmpi(name, ((UnitType *)unit->def.get())->name) != 0) {
             return;
         }
         if ((unit->flags & 0x20) && unit->buildLeft == 0.0f && unit->postTransferHoldoff == 0
@@ -623,7 +623,7 @@ void VictoryMoveUnitToRadius::LoadState(HapiBank* obj)
 // FUNCTION: 0x48f370
 int VictoryUnitTypePassesX::VisitUnit(Unit* unit)
 {
-    if (name[0] == 0 || _strcmpi(name, ((UnitType *)unit->def)->name) == 0) {
+    if (name[0] == 0 || _strcmpi(name, ((UnitType *)unit->def.get())->name) == 0) {
         if (abs(unit->cell.x - x) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
@@ -672,7 +672,7 @@ void VictoryUnitTypePassesX::LoadState(HapiBank* obj)
 // FUNCTION: 0x48f4c0
 int VictoryUnitTypePassesZ::VisitUnit(Unit* unit)
 {
-    if (name[0] == 0 || _strcmpi(name, ((UnitType *)unit->def)->name) == 0) {
+    if (name[0] == 0 || _strcmpi(name, ((UnitType *)unit->def.get())->name) == 0) {
         if (abs(unit->cell.y - z) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
@@ -751,7 +751,7 @@ void VictoryTimerRunsOut::LoadState(HapiBank* obj)
 void DefeatCommanderKilled::OnUnitDied(Unit* unit)
 {
     if (unit->playerIndex == 0) {
-        if (_strcmpi(((UnitType *)unit->def)->name, (*(PlayerName(*)[5])&g_game->sideDefs)[((Link_0048ea40 *)unit->player)->owner->side].commander) == 0) {
+        if (_strcmpi(((UnitType *)unit->def.get())->name, (*(PlayerName(*)[5])&g_game->sideDefs)[((Link_0048ea40 *)unit->player.get())->owner->side].commander) == 0) {
             satisfied = 1;
         }
     }
@@ -828,7 +828,7 @@ void DefeatAllUnitsKilled::LoadState(HapiBank* obj)
 // FUNCTION: 0x48f8c0
 void DefeatUnitTypeKilled::OnUnitDied(Unit* unit)
 {
-    if (_strcmpi(name, ((UnitType *)unit->def)->name) == 0) {
+    if (_strcmpi(name, ((UnitType *)unit->def.get())->name) == 0) {
         if (--numLeftToKill <= 0) {
             satisfied = 1;
         }
@@ -875,7 +875,7 @@ int DefeatAllUnitsKilledOfType::VisitUnit(Unit* unit)
 // FUNCTION: 0x48f9d0
 void DefeatAllUnitsKilledOfType::OnUnitDied(Unit* unit)
 {
-    if (_strcmpi(name, ((UnitType *)unit->def)->name) == 0) {
+    if (_strcmpi(name, ((UnitType *)unit->def.get())->name) == 0) {
         id = g_seams.units->FindUnitTypeId(name);
         count = 0;
         (*(struct UnitList*)((char*)g_game + 0x1bca)).ForEach(this);
@@ -1320,12 +1320,12 @@ void PackedGoal::TickTowardGoal()
     vel = pos - old;
     int dist = (int)_hypot(owner->pos.x - pos.x, owner->pos.z - pos.z);
     if (dist > 0xa00000) {
-        if (((UnitDefFlags_0048dfb0*)owner->def)->seaUnit)
+        if (((UnitDefFlags_0048dfb0*)owner->def.get())->seaUnit)
             pos.y = (g_game->seaLevel + owner->def->altitude) << 16;
         else
             // altitude via owner->def-> and first in the add: keeps the two
             // branches from being tail-merged.
-            pos.y = (owner->def->altitude + ((unsigned char*)owner->spatialBucket)[1]) << 16;
+            pos.y = (owner->def->altitude + ((unsigned char*)owner->spatialBucket.get())[1]) << 16;
     }
     if (dist > 0x1400000 || (!((OrderFx*)target)->GetDesiredHeading((unsigned short*)&heading) && dist > 0x100000))
         heading = (short)GetHeadingBetween(&owner->pos, &pos);
@@ -1368,7 +1368,7 @@ void LiteGoal::SetPathOrder(void* param)
 // FUNCTION: 0x490880
 void LiteGoal::TickTowardGoal()
 {
-    if ((((Target_00490880*)owner->motion)->flags & 3) != mode)
+    if ((((Target_00490880*)owner->motion.get())->flags & 3) != mode)
         dirty = 1;
     PackedGoal::TickTowardGoal();
 }
@@ -1395,8 +1395,8 @@ void LiteGoal::SerializeNetUnitState(BitWriter* stream)
         stream->WriteBits(2, 2);
         ((OrderFx*)target)->SerializeToBits(stream);
     }
-    stream->WriteBits(((Target_00490880*)owner->motion)->mode, 2);
-    state = ((Target_00490880*)owner->motion)->mode << 1;
+    stream->WriteBits(((Target_00490880*)owner->motion.get())->mode, 2);
+    state = ((Target_00490880*)owner->motion.get())->mode << 1;
 }
 
 // PackedPosGoal (vtable 0x4fd9e0), derived from PackedGoal and

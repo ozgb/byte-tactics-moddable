@@ -56,7 +56,7 @@ struct Poly_459c70 { int x; int y; int z; int shade; };
 // doubled-bitmap test, once per projected vertex.
 static __inline int shade_bias(Model_459200* list)
 {
-    bool c = ((*(unsigned int*)((char*)list->owner->def + 0x241) >> 30) & 1) != 0;
+    bool c = ((*(unsigned int*)((char*)list->owner->def.get() + 0x241) >> 30) & 1) != 0;
     return c ? 125 : 50;
 }
 

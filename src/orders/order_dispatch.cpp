@@ -5,6 +5,7 @@
 // in the exe, is its sibling that returns the cursor code.
 // Keep the headers and the unused declarations below: their count before the function matters.
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -48,10 +49,10 @@ struct Unit_0043e490 {
     Limits_0043e490* f48; // +0x48
     char unknown_4c[0x6a - 0x4c];
     char f6a[0x86 - 0x6a]; // +0x6a
-    Unit_0043e490* carrier; // +0x86
+    Ref<Unit_0043e490> carrier; // +0x86
     char unknown_8a[0x92 - 0x8a];
-    UnitDef* def;            // +0x92
-    Player* player; // +0x96
+    Ref<UnitDef> def;        // +0x92
+    Ref<Player> player; // +0x96
     char unknown_9a[0xec - 0x9a];
     Stats_0043e490* fec; // +0xec
     char unknown_f0[0xfb - 0xf0];
@@ -168,10 +169,10 @@ struct Unit_0043f0e0 {
     char unknown_3c[0x70 - 0x3c];
     short f70; // +0x70
     char unknown_72[0x86 - 0x72];
-    Unit_0043f0e0* carrier; // +0x86
+    Ref<Unit_0043f0e0> carrier; // +0x86
     char unknown_8a[0x92 - 0x8a];
-    Def_0043f0e0* def;       // +0x92
-    Player* player; // +0x96
+    Ref<Def_0043f0e0> def;   // +0x92
+    Ref<Player> player; // +0x96
     char unknown_9a[0xfb - 0x9a];
     int postTransferHoldoff; // +0xfb
     unsigned char unknown_ff[1];
@@ -298,7 +299,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
     switch (mode) {
     case 3:
-        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0])->f111b.b8)
+        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0].get())->f111b.b8)
             return 2;
         if (def->c04) {
             node = unit->f10;

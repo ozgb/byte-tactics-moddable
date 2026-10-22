@@ -5,6 +5,7 @@
 #include "mission_type.h"
 #include "order_base.h"
 #include "path_order_attach.h"
+#include "../../interfaces/ref.h"
 
 struct Unit;
 class OrderFx;
@@ -40,13 +41,13 @@ struct Order : public OrderBase {
     };
     unsigned int wakeFrame;        // +0x0a
     union {
-        Unit* unit;
-        Unit* source;
+        Ref<Unit> unit;
+        Ref<Unit> source;
     };
     union {
         struct {
             char unknown_12[4];
-            Unit* target;
+            Ref<Unit> target;
             char unknown_1a[8];
         };
         PathOrderAttach link;
@@ -100,7 +101,7 @@ struct Order : public OrderBase {
     };
     unsigned int flags_42;         // +0x42
     unsigned int created;          // +0x46
-    Order* next;                   // +0x4a
+    Ref<Order> next;                   // +0x4a
     unsigned int subFlags;         // +0x4e
     void* attached;                // +0x52
 

@@ -9,6 +9,7 @@
 #include <setjmp.h>
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& b)
 {
@@ -173,7 +174,7 @@ struct PieceRec {
     short angle_12;                    // +0x12
     short angle_14;                    // +0x14
     Vec3 pos;
-    Vec3* verts;
+    Ref<Vec3> verts;
     char unknown_26[2];
     unsigned short flags;              // +0x28
     char unknown_2a[0x36 - 0x2a];
@@ -181,7 +182,7 @@ struct PieceRec {
 
 // An exploding piece: the 0x30-byte header each pool slot starts with.
 struct ExplodedPiece {
-    Unit* unit;                        // +0x00
+    Ref<Unit> unit;                        // +0x00
     int index;                         // +0x04
     int angVelZ;                       // +0x08
     int angVelX;                       // +0x0c
@@ -198,7 +199,7 @@ struct ExplodedPiece {
     unsigned int b4 : 1;
     unsigned int b5 : 1;
     unsigned int rest : 26;
-    PieceRec* rec;                     // +0x2c
+    Ref<PieceRec> rec;                     // +0x2c
 };
 
 struct ExplodedBlock {
@@ -427,7 +428,7 @@ void __stdcall ExplodeUnitPieces(Unit* unit)
     s.unit = unit;
     s.ticks = 900;
     s.scale = 1;
-    for (int i = 0; i < ((PieceList*)unit->state)->count; i++) {
+    for (int i = 0; i < ((PieceList*)unit->state.get())->count; i++) {
         s.b1 = RandomInt(100) & 1;
         s.b2 = 1;
         s.b3 = 1;
@@ -732,7 +733,7 @@ void __stdcall StartExplodePiece(ExplodedPiece* piece)
     Unit* obj = piece->unit;
     if (!g_quirks.renderPoseReads)
         g_seams.units->PoseUnitModel(obj);
-    PieceRec* rec = (PieceRec*)((char*)obj->state + 0x22 + piece->index * 0x36);
+    PieceRec* rec = (PieceRec*)((char*)obj->state.get() + 0x22 + piece->index * 0x36);
     rec->flags &= 0xfffe;
     if (piece->b2) {
         BreakPieceIntoDebris(piece);
@@ -751,7 +752,7 @@ void __stdcall StartExplodePiece(ExplodedPiece* piece)
     PieceRec* dst = (PieceRec*)((char*)block + 0x30);
     block->header.rec = dst;
     *dst = *rec;
-    block->header.rec->verts = (Vec3*)((char*)block->header.rec + 0x36);
+    block->header.rec->verts = (Vec3*)((char*)block->header.rec.get() + 0x36);
     block->header.rec->pos.x += obj->pos.x;
     block->header.rec->pos.y += obj->pos.y;
     block->header.rec->pos.z += obj->pos.z;
@@ -782,7 +783,7 @@ void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
     // piece is computed from unit, and desc is read before verts: the order of
     // first uses sets the frame slots.
     PieceRec* piece =
-        (PieceRec*)((char*)unit->state + 0x22 + param->index * 0x36);
+        (PieceRec*)((char*)unit->state.get() + 0x22 + param->index * 0x36);
     int* count = &g_game->count_1491b;
     Object3D* desc = piece->desc;
     Vec3* verts = piece->verts;
@@ -799,9 +800,9 @@ void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
                 return;
             d->flag = param->b5;
             if (unit->motion) {
-                d->size.x = ((Size*)unit->motion)->x >> 1;
-                d->size.z = ((Size*)unit->motion)->z >> 1;
-                d->size.y = ((Size*)unit->motion)->y >> 1;
+                d->size.x = ((Size*)unit->motion.get())->x >> 1;
+                d->size.z = ((Size*)unit->motion.get())->z >> 1;
+                d->size.y = ((Size*)unit->motion.get())->y >> 1;
             }
             d->vel.x = (0x50 - RandomInt(0xa0)) << 9;
             d->vel.z = (0x50 - RandomInt(0xa0)) << 9;

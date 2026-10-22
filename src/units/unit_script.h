@@ -2,12 +2,13 @@
 #define UNIT_SCRIPT_H
 
 #include "cob_script.h"
+#include "../../interfaces/ref.h"
 
 struct ObjectState;
 
 class UnitScript : public CobScript {
 public:
-    ObjectState* state;
+    Ref<ObjectState> state;
 
     virtual void SetPieceTranslation(int index, int slot, int v);
     virtual void SetPieceRotation(int index, int slot, int v);

@@ -34,6 +34,7 @@ extern int pad47d820_23;
 #pragma pack(push, 1)
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 struct Cell {
     char unknown_0[0x5];
@@ -45,7 +46,7 @@ struct Cell {
 struct Unit_0047d820 {
     char unknown_0[0x14a];
     Point16 origin;                     // +0x14a, footprint in map cells
-    unsigned char* mask;                // +0x14e, one byte per footprint cell
+    Ref<unsigned char> mask;            // +0x14e, one byte per footprint cell
     char unknown_152[0x22c - 0x152];
     unsigned char draft;                // +0x22c
 };

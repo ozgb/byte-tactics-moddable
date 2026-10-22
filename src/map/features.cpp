@@ -17,7 +17,7 @@
 #include "../state/game_rand.h"
 
 #include "../util/tdf.h"
-#include "../files/hapi_bank.h"
+#include "../files/files_api.h"
 #include "../util/rot16.h"
 
 #pragma pack(push, 1)
@@ -404,7 +404,6 @@ GafFrame* __stdcall GetGafSequenceFrame(Anim* anim);
 void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
 void* __stdcall CreateObjectState(void* obj);
 void __stdcall EmitTimedSubParticles(Vec3* p, short index);
-void __stdcall FindFilesRecursive(char* dir, char* pattern, void* list, int flags, char recurse);
 
 // Reading the field directly each time (no local) gives `or ax, 0xffff` for
 // the 0xffff return; a local gives `mov eax, 0xffff`.
@@ -511,7 +510,7 @@ void __stdcall LoadFeatureFileList()
 {
     s_featureTdfParsers = new std::vector<TdfFile*>;
     std::vector<Elem> list;
-    FindFilesRecursive("features", "*.tdf", &list, -1, 1);
+    FindFilesRecursive("features", "*.tdf", (std::vector<StringRef>*)&list, -1, 1);
     for (std::vector<Elem>::iterator it = list.begin(); it < list.end(); it++) {
         TdfFile* obj = new TdfFile;
         if (obj->LoadFile(it->name.data)) {

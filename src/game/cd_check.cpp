@@ -18,13 +18,8 @@ struct FindData_0041d4c0 {
 
 extern int DAT_0050289c;
 
-void HAPI_DropMissingArchives();
+#include "../files/files_api.h"
 void ChdirToExeDirectory();
-void HAPI_ResolveShadowedFiles();
-int __stdcall HAPI_FindFirst(const char* path, FindData_0041d4c0* fd, int a, int b);
-int __stdcall HAPI_FindNext(int handle, FindData_0041d4c0* fd);
-void __stdcall HAPI_FindClose(int handle);
-int __stdcall HAPI_AddArchive(char* path, int flag);
 void __cdecl AllocNotifyNop(int);
 
 // FUNCTION: 0x41d4c0

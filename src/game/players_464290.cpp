@@ -19,6 +19,7 @@ class Pathfinder;
 #include "../ai/squad_manager.h"
 
 #include "../util/vec3.h"
+#include "../files/files_api.h"
 
 struct Map {
     char unknown_0[0x620];
@@ -275,7 +276,6 @@ public:
     CommandArgs* InitArgs();
 };
 
-char* __stdcall HAPI_LoadFile(const char* name, int* size);
 int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int param_4);
 void __cdecl GameFreeThunk(char* text);
 
@@ -284,9 +284,9 @@ void LoadDefaultAIScript()
 {
     int size;
     char* name = g_seams.map->GetNameSlot(g_game->net, 7);
-    char* text = HAPI_LoadFile(name, &size);
+    char* text = (char*)HAPI_LoadFile(name, &size);
     if (text == 0) {
-        text = HAPI_LoadFile("ai\\default.txt", &size);
+        text = (char*)HAPI_LoadFile("ai\\default.txt", &size);
     }
     if (text != 0) {
         CommandArgs vars;
@@ -980,8 +980,6 @@ void InitPlayerResources()
         }
     }
 }
-
-#include "../files/hapi_bank.h"
 
 // Reads each player's "Controller" value from its "Player%i" section.
 // FUNCTION: 0x465fb0

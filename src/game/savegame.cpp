@@ -8,7 +8,7 @@
 
 class Mission;
 
-#include "../files/hapi_bank.h"
+#include "../files/files_api.h"
 
 // Pack 1: the 4-byte pad after the pointer at +0x391e9 would shift later fields.
 #pragma pack(push, 1)
@@ -139,13 +139,10 @@ void __stdcall ConfigureListBoxByName(void* menu, char* name, void* text, int va
 void __stdcall BeginTextEdit(void* menu, int index);
 void __stdcall RenderLayer(void* menu, int value);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-void __stdcall MakeDirectoryPath(char* path);
 void __stdcall CloseTopScreen(char* sub);
-void __stdcall RemoveFile(char* path);
 char* __stdcall BuildDataPath(char* buf, char* dir, char* name, char* ext);
 char* __stdcall BuildSideList();
 int __stdcall SaveGameFile(char* path, char* description, int param_3);
-int __stdcall CountDirectoryEntries(const char* path, int flag);
 void __stdcall ScanDirectory(char* path, char* list, char* sizes, int mode, int flag, int what);
 void __cdecl InitMissionStatus();
 void OrLabelAttribs();

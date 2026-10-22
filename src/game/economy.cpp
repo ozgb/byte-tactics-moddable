@@ -27,7 +27,7 @@ struct Obj_00401320 {
     float prev1;                       // +0x14
 };
 
-#include "../files/hapi_bank.h"
+#include "../files/files_api.h"
 
 struct UnitInfo {
     char unknown_0[0xa8];

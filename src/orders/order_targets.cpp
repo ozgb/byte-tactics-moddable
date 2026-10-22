@@ -13,7 +13,7 @@
 // Keep the header include: without it the operand order of 0x44d560's sum flips.
 #include <memory.h>
 #include "../state/block.h"
-#include "../files/hapi_bank.h"
+#include "../files/files_api.h"
 #include <stdlib.h>
 #include <vector>
 #include "../util/vec3.h"

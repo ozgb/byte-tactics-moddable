@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "win_types.h"
 #include "../../interfaces/host.h"
-#include "../files/hapi_bank.h"
+#include "../files/files_api.h"
 #include "../harness/condition_class.h"
 #include "victory_conditions.h"
 #include "../state/sim_globals.h"

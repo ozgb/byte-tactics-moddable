@@ -14,7 +14,7 @@
 
 #include "../util/vec3.h"
 
-#include "../files/hapi_bank.h"
+#include "../files/files_api.h"
 
 #include "../util/tdf.h"
 #include "../../interfaces/seams.h"

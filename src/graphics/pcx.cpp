@@ -13,9 +13,7 @@ struct PCX_004caa40 {
     int height;              // +0xc
 };
 
-int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
-void __stdcall HAPI_SeekFile(void* file, int pos);
-int __stdcall HAPI_FileLength(void* file);
+#include "../files/files_api.h"
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 
 // Static inline: the only shape that puts x, b, run, then p in the first four
@@ -85,9 +83,6 @@ int __stdcall DecodePcx(void* file, PCX_004caa40* pcx)
 
 #include <stdio.h>
 
-extern void* __stdcall HAPI_OpenFileAppend(void* thing);
-extern void __stdcall HAPI_CloseFile(void* file);
-extern unsigned int __stdcall HAPI_WriteFile(void* file, void* buf, unsigned int size);
 
 // PCX file header (128 bytes).
 struct Header_004cac40 {
@@ -119,7 +114,7 @@ struct Header_004cac40 {
 int __stdcall WritePcx(void* filename, unsigned char* data, int width, int height, unsigned char* block)
 {
     Header_004cac40 hdr;
-    void* file = HAPI_OpenFileAppend(filename);
+    FileHandle* file = HAPI_OpenFileAppend((char*)filename);
     int total;
     int rows;
     int n;
@@ -274,7 +269,6 @@ void __stdcall SaveSurfacePcx(char* name, Bitmap_004caec0* bitmap)
     WritePcx(name, bitmap->data, bitmap->width, bitmap->height, pal);
 }
 
-void* __stdcall HAPI_OpenFileRead(char* path);
 Bitmap_004caec0* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall FreeSurface(void* p);
 void __cdecl GameFreeThunk(void* p);
@@ -288,7 +282,7 @@ void __cdecl GameFreeThunk(void* p);
 // FUNCTION: 0x4caf30
 Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
 {
-    void* file = HAPI_OpenFileRead(path);
+    FileHandle* file = HAPI_OpenFileRead(path);
     if (file == 0)
         return 0;
     int ok;
@@ -338,7 +332,7 @@ Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
 // FUNCTION: 0x4cb080
 int __stdcall LoadPcxPalette(char* path, unsigned int* out)
 {
-    void* file = HAPI_OpenFileRead(path);
+    FileHandle* file = HAPI_OpenFileRead(path);
     if (file == 0)
         return 0;
     PCX_004caa40 pcx;
@@ -381,9 +375,6 @@ struct FindData_004cb170 {
 
 extern char g_pathSepBackslash[];
 
-int __stdcall HAPI_FindFirst(const char* path, FindData_004cb170* fd, int a, int b);
-int __stdcall HAPI_FindNext(int handle, FindData_004cb170* fd);
-void __stdcall HAPI_FindClose(int handle);
 
 // FUNCTION: 0x4cb170
 int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
@@ -562,7 +553,6 @@ void __stdcall RelocateObject(int delta, Object_004cb2f0* node)
     SortPrimitives(node);
 }
 
-extern void* __stdcall HAPI_LoadFile(void*, int);
 
 // FUNCTION: 0x4cb560
 void* __stdcall Load3do(char* param)

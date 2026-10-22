@@ -103,6 +103,7 @@ static inline void FreeFeatureList()
 }
 
 #include "../../interfaces/seams.h"
+#include "../files/files_api.h"
 
 // FUNCTION: 0x424c00
 void __stdcall LoadFeatures(HapiBank* file)

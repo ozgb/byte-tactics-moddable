@@ -93,9 +93,7 @@ extern char g_pathSepBackslash[];
 
 int __stdcall FindGadgetIndexBySubstring(int value, const char* name);
 void __stdcall ClearGroupStatus(Gui* gui, int handle);
-int __stdcall HAPI_FindFirst(const char* path, void* findData, int a, int b);
-int __stdcall HAPI_FindNext(int handle, void* findData);
-void __stdcall HAPI_FindClose(int handle);
+#include "../files/files_api.h"
 void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name, const char* ext);
 GafFrame* __stdcall AllocFrame(const char* name, int width, int height);
 void __cdecl SetOutOfMemoryHandler(int param);
@@ -146,7 +144,6 @@ void __stdcall BroadcastPacket(int id, void* packet, int size);
 void ToggleTabMenu(void);
 void __stdcall HandleDebugHotkey(int eventType);
 void __stdcall OpenInGameOptions(void);
-void __stdcall MakeDirectoryPath(char* path);
 void __stdcall SaveScreenshot(char* dir, const char* prefix);
 void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind, int d, int e, int f);
 int __stdcall FindOrderByType(int unit, MissionType kind);

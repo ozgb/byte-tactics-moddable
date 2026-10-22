@@ -920,10 +920,8 @@ void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 void __stdcall FreeSurface(void* image);
 void ShowSoftwareCursor();
-void __stdcall MakeDirectoryPath(char* path);
-void __stdcall RemoveFile(char* path);
+#include "../files/files_api.h"
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall CountDirectoryEntries(const char* path, int flag);
 int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
 void __stdcall HandleAlliesClick(Gui* gadget);
 void __stdcall HandleBattleRoomClick(Gui* gadget);

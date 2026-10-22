@@ -1,6 +1,8 @@
 #include <vector>
 
 #include "../../interfaces/seams.h"
+#include "../files/files_impl.h"
+#include "../files/files_bank.h"
 #include "../game/unit_resources.h"
 #include "../units/movement_class.h"
 #include "../units/cob_script.h"
@@ -19,6 +21,7 @@
 #include "../orders/unit_motion.h"
 #include "../orders/order.h"
 #include "../util/angles.h"
+#include "../files/files_api.h"
 
 struct Player;
 
@@ -673,10 +676,118 @@ static OrdersSeam s_orders;
 static UnitsSeam s_units;
 static PlayersSeam s_players;
 static MapSeam s_map;
+static FilesSeam s_files;
 
 static void __fastcall LoadMeteorDefaultsNative(MeteorParams* params)
 {
     params->LoadMeteorDefaults();
+}
+
+static_assert(sizeof(HapiBank) == sizeof(AccountBank), "HapiBank and AccountBank must have the same size");
+
+static HapiBank* __stdcall BankInitNative(HapiBank* self)
+{
+    return (HapiBank*)((AccountBank*)self)->InitBank();
+}
+
+static void __stdcall BankCloseNative(HapiBank* self)
+{
+    ((AccountBank*)self)->CloseBank();
+}
+
+static void __stdcall BankNewNative(HapiBank* self)
+{
+    ((AccountBank*)self)->NewBank();
+}
+
+static int __stdcall BankOpenNative(HapiBank* self, char* filename, char* name, char* account)
+{
+    return ((AccountBank*)self)->OpenBank(filename, name, account);
+}
+
+static int __stdcall BankSaveNative(HapiBank* self, char* filename, char* name, int compress, int audit)
+{
+    return ((AccountBank*)self)->SaveBank(filename, name, compress, audit);
+}
+
+static int __stdcall BankOpenAccountNative(HapiBank* self, char* name)
+{
+    return ((AccountBank*)self)->OpenAccount(name);
+}
+
+static int __stdcall BankSetIntegerNative(HapiBank* self, const char* name, int value)
+{
+    return ((AccountBank*)self)->SetIntegerItem(name, value);
+}
+
+static int __stdcall BankSetDoubleNative(HapiBank* self, const char* name, double value)
+{
+    return ((AccountBank*)self)->SetDoubleItem(name, value);
+}
+
+static int __stdcall BankSetStringNative(HapiBank* self, const char* name, char* value)
+{
+    return ((AccountBank*)self)->SetStringItem(name, value);
+}
+
+static int __stdcall BankGetIntegerNative(HapiBank* self, char* name, int def)
+{
+    return ((AccountBank*)self)->GetIntegerItem(name, def);
+}
+
+static double __stdcall BankGetDoubleNative(HapiBank* self, char* name, double def)
+{
+    return ((AccountBank*)self)->GetDoubleItem(name, def);
+}
+
+static char* __stdcall BankGetStringNative(HapiBank* self, char* name, char* def)
+{
+    return ((AccountBank*)self)->GetStringItem(name, def);
+}
+
+static int __stdcall BankHasItemNative(HapiBank* self, const char* name)
+{
+    return ((AccountBank*)self)->HasItem(name);
+}
+
+static int __stdcall BankOpenNumberedBoxNative(HapiBank* self, int number)
+{
+    return ((AccountBank*)self)->OpenNumberedBox(number);
+}
+
+static int __stdcall BankOpenNamedBoxNative(HapiBank* self, char* name)
+{
+    return ((AccountBank*)self)->OpenNamedBox(name);
+}
+
+static int __stdcall BankGetBoxSizeNative(HapiBank* self)
+{
+    return ((AccountBank*)self)->GetBoxSize();
+}
+
+static void __stdcall BankSeekBoxNative(HapiBank* self, int pos)
+{
+    ((AccountBank*)self)->SeekBox(pos);
+}
+
+static int __stdcall BankReadBoxNative(HapiBank* self, void* dst, int len)
+{
+    return ((AccountBank*)self)->ReadBox(dst, len);
+}
+
+static int __stdcall BankWriteBoxNative(HapiBank* self, void* src, int len)
+{
+    return ((AccountBank*)self)->WriteBox(src, len);
+}
+
+static void __stdcall ListDirectoryNative(const char* path, int dirsOnly, FileNameList* list)
+{
+    ListDirectory(path, dirsOnly, (std::vector<StringRef>*)list);
+}
+
+static void __stdcall FindFilesRecursiveNative(char* path, const char* pat, FileNameList* tree, int state, int recursive)
+{
+    FindFilesRecursive(path, pat, (std::vector<StringRef>*)tree, state, recursive);
 }
 
 void InstallNativeSeams()
@@ -943,6 +1054,64 @@ void InstallNativeSeams()
     s_weapons.SpawnProjectile = SpawnProjectile;
     s_units.UpdateAllUnits = UpdateAllUnits;
     s_players.UpdatePlayers = UpdatePlayers;
+    s_files.OpenRead = HAPI_OpenFileRead;
+    s_files.OpenAppend = HAPI_OpenFileAppend;
+    s_files.Create = HAPI_CreateFile;
+    s_files.Close = HAPI_CloseFile;
+    s_files.IsInArchive = HAPI_IsInArchive;
+    s_files.Seek = HAPI_SeekFile;
+    s_files.Tell = HAPI_TellFile;
+    s_files.Read = HAPI_readfromfile;
+    s_files.Write = HAPI_WriteFile;
+    s_files.Length = HAPI_FileLength;
+    s_files.LengthByName = HAPI_FileLengthByName;
+    s_files.ReadAt = HAPI_ReadFileAt;
+    s_files.Load = HAPI_LoadFile;
+    s_files.LoadOpenFile = HAPI_LoadOpenFile;
+    s_files.WriteBuffer = WriteBufferToFile;
+    s_files.Remove = RemoveFile;
+    s_files.Rename = RenameFile;
+    s_files.GetCurrentDriveLetter = GetCurrentDriveLetter;
+    s_files.ChangeDrive = ChangeDrive;
+    s_files.GetDriveDirectory = GetDriveDirectory;
+    s_files.ChangeDirectory = ChangeDirectory;
+    s_files.MatchWildcard = MatchWildcard;
+    s_files.FindFirst = HAPI_FindFirst;
+    s_files.FindNext = HAPI_FindNext;
+    s_files.FindClose = HAPI_FindClose;
+    s_files.CountDirectoryEntries = CountDirectoryEntries;
+    s_files.ListDirectory = ListDirectoryNative;
+    s_files.FindFilesRecursive = FindFilesRecursiveNative;
+    s_files.MakeDirectoryPath = MakeDirectoryPath;
+    s_files.SaveStartDirectory = SaveStartDirectory;
+    s_files.GetStartDirectory = GetStartDirectory;
+    s_files.AddArchive = HAPI_AddArchive;
+    s_files.CloseArchive = HAPI_CloseArchive;
+    s_files.DropMissingArchives = HAPI_DropMissingArchives;
+    s_files.ResolveShadowedFiles = HAPI_ResolveShadowedFiles;
+    s_files.LzssCompress = LzssCompress;
+    s_files.LzssExpand = LzssExpand;
+    s_files.LzssDisablePreset = LzssDisablePreset;
+    s_files.LzssEnablePreset = LzssEnablePreset;
+    s_files.BankInit = BankInitNative;
+    s_files.BankClose = BankCloseNative;
+    s_files.BankNew = BankNewNative;
+    s_files.BankOpen = BankOpenNative;
+    s_files.BankSave = BankSaveNative;
+    s_files.BankOpenAccount = BankOpenAccountNative;
+    s_files.BankSetInteger = BankSetIntegerNative;
+    s_files.BankSetDouble = BankSetDoubleNative;
+    s_files.BankSetString = BankSetStringNative;
+    s_files.BankGetInteger = BankGetIntegerNative;
+    s_files.BankGetDouble = BankGetDoubleNative;
+    s_files.BankGetString = BankGetStringNative;
+    s_files.BankHasItem = BankHasItemNative;
+    s_files.BankOpenNumberedBox = BankOpenNumberedBoxNative;
+    s_files.BankOpenNamedBox = BankOpenNamedBoxNative;
+    s_files.BankGetBoxSize = BankGetBoxSizeNative;
+    s_files.BankSeekBox = BankSeekBoxNative;
+    s_files.BankReadBox = BankReadBoxNative;
+    s_files.BankWriteBox = BankWriteBoxNative;
     g_seams.wind_meteors = &s_wind_meteors;
     g_seams.economy = &s_economy;
     g_seams.features = &s_features;
@@ -955,4 +1124,5 @@ void InstallNativeSeams()
     g_seams.units = &s_units;
     g_seams.players = &s_players;
     g_seams.map = &s_map;
+    g_seams.files = &s_files;
 }

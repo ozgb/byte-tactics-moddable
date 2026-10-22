@@ -1,5 +1,5 @@
 // Decompiled by Haiku, deepseek-v4.1-flash, GPT-5.6-Terra, GPT-6, GPT-6.1-sol, deepseek-v4.1, space-bunny-free, Claude Opus 5.5, mimo-v2.6-pro, longcat-2.5-preview-free, muse-spark-1.3-free, Sonnet 5.5, Claude Fable 5.1, Opus and Sonnet. Names are provisional.
-// HapiBank: a bank of named accounts, each holding named items (integers,
+// AccountBank: a bank of named accounts, each holding named items (integers,
 // doubles and strings) and safe-deposit boxes (blocks of bytes under a name
 // or a number), saved to and loaded from a HAPIBANK file.
 
@@ -57,7 +57,7 @@ FileHandle* __stdcall HAPI_OpenFileRead(char* name);
 int __stdcall HAPI_CloseFile(FileHandle* file);
 long __stdcall HAPI_SeekFile(FileHandle* file, long pos);
 long __stdcall HAPI_TellFile(FileHandle* file);
-void __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
+int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
 long __stdcall HAPI_FileLength(FileHandle* file);
 
 void* __cdecl GameAllocShared(unsigned int size);
@@ -136,16 +136,16 @@ struct BoxRecord {                   // 16 bytes
 #include "hapi_bank.h"
 
 // FUNCTION: 0x4b3620
-HapiBank* HapiBank::InitBank()
+AccountBank* AccountBank::InitBank()
 {
     bank = 0;
     return this;
 }
 
-// The out-of-line destructor of HapiBank: frees the account list and
+// The out-of-line destructor of AccountBank: frees the account list and
 // everything hanging off it.
 // FUNCTION: 0x4b3630
-void HapiBank::CloseBank()
+void AccountBank::CloseBank()
 {
     if (bank != 0) {
         for (int i = 0; i < bank->count; i++) {
@@ -180,7 +180,7 @@ void HapiBank::CloseBank()
 }
 
 // FUNCTION: 0x4b3750
-void HapiBank::NewBank()
+void AccountBank::NewBank()
 {
     CloseBank();
     bank = (AccountList*)GameCalloc(1, 0xc);
@@ -188,7 +188,7 @@ void HapiBank::NewBank()
 }
 
 // FUNCTION: 0x4b3770
-int HapiBank::OpenBank(char* filename, char* name, char* account)
+int AccountBank::OpenBank(char* filename, char* name, char* account)
 {
     void* raw;
     BankFileHeader h;
@@ -231,7 +231,7 @@ int HapiBank::OpenBank(char* filename, char* name, char* account)
         raw = GameAllocShared(dsize);
         err = SquashUnpack(raw, src);
         if (err != 0) {
-            sprintf(errmsg, "[HapiBank::OpenBank] Decompression Error: %s",
+            sprintf(errmsg, "[AccountBank::OpenBank] Decompression Error: %s",
                     SquashErrorString(err));
             FatalError(errmsg);
         }
@@ -281,7 +281,7 @@ int HapiBank::OpenBank(char* filename, char* name, char* account)
 }
 
 // FUNCTION: 0x4b39c0
-int HapiBank::SaveBank(char* filename, char* name, int compress, int audit)
+int AccountBank::SaveBank(char* filename, char* name, int compress, int audit)
 {
     char path[256];
     BankFileHeader header;
@@ -337,7 +337,7 @@ int HapiBank::SaveBank(char* filename, char* name, int compress, int audit)
 }
 
 // FUNCTION: 0x4b3c60
-void HapiBank::SaveAccount(int index, void* file, StringPool* buf, int compress)
+void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compress)
 {
     BankAccount* slot = &bank->accounts[index];
     if (slot->itemCount <= 0 && slot->boxCount <= 0) {
@@ -482,12 +482,12 @@ void HapiBank::SaveAccount(int index, void* file, StringPool* buf, int compress)
     host_file_seek(file, 0, HOST_SEEK_END);
 }
 
-// Reads one 0x20-byte section header out of a HapiBank archive (called in a loop
+// Reads one 0x20-byte section header out of a AccountBank archive (called in a loop
 // by 0x4b3770) and, when the caller's name matches the section name, unpacks the
 // section body and files its records away in the current section of the parsed
 // bank: integers, doubles, strings and raw blobs, in that order.
 // FUNCTION: 0x4b4270
-void HapiBank::LoadAccount(FileHandle* fh, int* image, char* name)
+void AccountBank::LoadAccount(FileHandle* fh, int* image, char* name)
 {
     // The image base is an int and the record offsets are pointer-typed.
     int buf;
@@ -513,7 +513,7 @@ void HapiBank::LoadAccount(FileHandle* fh, int* image, char* name)
             buf = (int)GameAllocShared(SquashUnpackedSize((unsigned char*)tmp));
             int err = SquashUnpack((void*)buf, tmp);
             if (err != 0) {
-                sprintf(message, "[HapiBank::LoadAccount] Decompression Error: %s\nFile: %s",
+                sprintf(message, "[AccountBank::LoadAccount] Decompression Error: %s\nFile: %s",
                         SquashErrorString(err), fh->name);
                 FatalError(message);
             }
@@ -569,7 +569,7 @@ void HapiBank::LoadAccount(FileHandle* fh, int* image, char* name)
 // when there is none, and makes it the current one; returns 1 when it
 // already existed.
 // FUNCTION: 0x4b4560
-int HapiBank::OpenAccount(char* name)
+int AccountBank::OpenAccount(char* name)
 {
     for (int i = 0; i < bank->count; i++) {
         if (_strcmpi(bank->accounts[i].name, name) == 0) {
@@ -592,7 +592,7 @@ int HapiBank::OpenAccount(char* name)
 // finds or adds the item), freeing the old value first when it was a string;
 // returns 0 when there is no current account.
 // FUNCTION: 0x4b4630
-int HapiBank::SetIntegerItem(const char* name, int value)
+int AccountBank::SetIntegerItem(const char* name, int value)
 {
     if (bank && bank->current >= 0) {
         int i = FindItem(name, 1);
@@ -607,7 +607,7 @@ int HapiBank::SetIntegerItem(const char* name, int value)
 
 // The double counterpart of SetIntegerItem.
 // FUNCTION: 0x4b46c0
-int HapiBank::SetDoubleItem(const char* name, double value)
+int AccountBank::SetDoubleItem(const char* name, double value)
 {
     if (bank && bank->current >= 0) {
         int i = FindItem(name, 1);
@@ -623,7 +623,7 @@ int HapiBank::SetDoubleItem(const char* name, double value)
 // The string counterpart of SetIntegerItem: stores a copy of the string, and
 // does nothing when it is null.
 // FUNCTION: 0x4b4750
-int HapiBank::SetStringItem(const char* name, char* value)
+int AccountBank::SetStringItem(const char* name, char* value)
 {
     if (bank && bank->current >= 0 && value) {
         int i = FindItem(name, 1);
@@ -639,7 +639,7 @@ int HapiBank::SetStringItem(const char* name, char* value)
 // Reads an integer item of the current account; returns `def` when there is
 // no current account, the item is missing, or it is not an integer.
 // FUNCTION: 0x4b4800
-int HapiBank::GetIntegerItem(char* name, int def)
+int AccountBank::GetIntegerItem(char* name, int def)
 {
     if (bank && bank->current >= 0) {
         int i = FindItem(name, 0);
@@ -650,7 +650,7 @@ int HapiBank::GetIntegerItem(char* name, int def)
 }
 
 // FUNCTION: 0x4b4850
-double HapiBank::GetDoubleItem(char* name, double def)
+double AccountBank::GetDoubleItem(char* name, double def)
 {
     if (bank && bank->current >= 0) {
         int i = FindItem(name, 0);
@@ -661,7 +661,7 @@ double HapiBank::GetDoubleItem(char* name, double def)
 }
 
 // FUNCTION: 0x4b48a0
-char* HapiBank::GetStringItem(char* name, char* def)
+char* AccountBank::GetStringItem(char* name, char* def)
 {
     if (bank && bank->current >= 0) {
         int i = FindItem(name, 0);
@@ -672,7 +672,7 @@ char* HapiBank::GetStringItem(char* name, char* def)
 }
 
 // FUNCTION: 0x4b48f0
-int HapiBank::HasItem(const char* name)
+int AccountBank::HasItem(const char* name)
 {
     int i = FindItem(name, 0);
     return i >= 0 ? 1 : 0;
@@ -681,7 +681,7 @@ int HapiBank::HasItem(const char* name)
 // Returns the index of the named item of the current account; when it is
 // missing, adds it if `create` is set and returns -1 otherwise.
 // FUNCTION: 0x4b4910
-int HapiBank::FindItem(const char* name, int create)
+int AccountBank::FindItem(const char* name, int create)
 {
     AccountList* f = bank;
     if (!f || f->current < 0)
@@ -702,7 +702,7 @@ int HapiBank::FindItem(const char* name, int create)
 }
 
 // FUNCTION: 0x4b49d0
-int HapiBank::FindNumberedBox(int number, int create)
+int AccountBank::FindNumberedBox(int number, int create)
 {
     AccountList* t = bank;
     if (!t || t->current < 0)
@@ -724,7 +724,7 @@ int HapiBank::FindNumberedBox(int number, int create)
 }
 
 // FUNCTION: 0x4b4a80
-int HapiBank::FindNamedBox(char* name, int create)
+int AccountBank::FindNamedBox(char* name, int create)
 {
     AccountList* t = bank;
     if (!t || t->current < 0)
@@ -748,7 +748,7 @@ int HapiBank::FindNamedBox(char* name, int create)
 // Makes the numbered box (added when missing) the current one; returns
 // whether it holds any bytes.
 // FUNCTION: 0x4b4b50
-int HapiBank::OpenNumberedBox(int number)
+int AccountBank::OpenNumberedBox(int number)
 {
     int r = FindNumberedBox(number, 1);
     bank->accounts[bank->current].currentBox = r;
@@ -756,7 +756,7 @@ int HapiBank::OpenNumberedBox(int number)
 }
 
 // FUNCTION: 0x4b4ba0
-int HapiBank::OpenNamedBox(char* name)
+int AccountBank::OpenNamedBox(char* name)
 {
     int i = FindNamedBox(name, 1);
     bank->accounts[bank->current].currentBox = i;
@@ -764,7 +764,7 @@ int HapiBank::OpenNamedBox(char* name)
 }
 
 // FUNCTION: 0x4b4bf0
-int HapiBank::GetBoxSize()
+int AccountBank::GetBoxSize()
 {
     AccountList* p = bank;
     BankAccount* a = &p->accounts[p->current];
@@ -774,7 +774,7 @@ int HapiBank::GetBoxSize()
 
 // Sets the current box's position, clamped to 0..size.
 // FUNCTION: 0x4b4c10
-void HapiBank::SeekBox(int pos)
+void AccountBank::SeekBox(int pos)
 {
     BankAccount* s = &bank->accounts[bank->current];
     SafeDepositBox* c = &s->boxes[s->currentBox];
@@ -790,7 +790,7 @@ void HapiBank::SeekBox(int pos)
 // Moves the current box's position to its end and returns it (the returned
 // value is what keeps it in eax).
 // FUNCTION: 0x4b4c50
-int HapiBank::SeekBoxEnd()
+int AccountBank::SeekBoxEnd()
 {
     BankAccount* e = &bank->accounts[bank->current];
     SafeDepositBox* it = &e->boxes[e->currentBox];
@@ -801,7 +801,7 @@ int HapiBank::SeekBoxEnd()
 // Reads up to len bytes from the current box into dst and advances its
 // position.
 // FUNCTION: 0x4b4c80
-int HapiBank::ReadBox(void* dst, int len)
+int AccountBank::ReadBox(void* dst, int len)
 {
     SafeDepositBox* c = &bank->accounts[bank->current].boxes[bank->accounts[bank->current].currentBox];
     int avail = c->size - c->pos;
@@ -819,7 +819,7 @@ int HapiBank::ReadBox(void* dst, int len)
 // Writes len bytes from src at the current box's position, growing the box
 // as needed, and advances the position.
 // FUNCTION: 0x4b4cf0
-int HapiBank::WriteBox(void* src, int len)
+int AccountBank::WriteBox(void* src, int len)
 {
     SafeDepositBox* c = &bank->accounts[bank->current].boxes[bank->accounts[bank->current].currentBox];
     int need = len + c->pos;
@@ -833,7 +833,7 @@ int HapiBank::WriteBox(void* src, int len)
 }
 
 // FUNCTION: 0x4b4d70
-void HapiBank::WriteAuditFile(char* filename)
+void AccountBank::WriteAuditFile(char* filename)
 {
     void* file = host_file_create(filename, HOST_FILE_TEXT);
     int i;

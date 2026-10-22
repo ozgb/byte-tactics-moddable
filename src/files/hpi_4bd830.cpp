@@ -40,7 +40,7 @@ struct Info {
 struct ArchiveDirectory;
 
 FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
-int __stdcall HAPI_readfromfile(FileHandle* file, unsigned char* buf, int size);
+int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
 int __stdcall SquashPack(void* chunk, int* chunkSize, char* data,
                            int size, int method, int encrypt);
 unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode);

@@ -152,12 +152,9 @@ src/units/unit_scripts.cpp,src/graphics/spot_state.h,#22
 src/units/unit_scripts.cpp,src/sound/sound.h,#22
 src/units/unit_types.cpp,src/graphics/memory_cache.h,#22
 src/units/units_485010.cpp,src/sound/sound.h,#22
-src/util/hapi_bank.cpp,interfaces/host.h,#25
-src/util/hpi.cpp,interfaces/host.h,#25
 src/util/math.cpp,interfaces/host.h,#29
 src/util/registry.cpp,interfaces/host.h,#29
 src/util/registry.cpp,src/graphics/rect.h,#22
-src/util/sqsh.cpp,interfaces/host.h,#25
 src/weapons/explosions.cpp,src/graphics/memory_cache.h,#22
 src/weapons/explosions_420d20.cpp,src/graphics/gaf_frame.h,#22
 src/weapons/weapons.cpp,src/sound/sound.h,#22

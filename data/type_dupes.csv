@@ -232,7 +232,7 @@ Map_004658e0,no,2,include/ta_types.h:8036|src/game/players_4658e0.cpp:20,differs
 Map_004745e0,no,2,include/ta_types.h:8068|src/graphics/particles.cpp:608,differs,include/ta_types.h
 MappedFile,no,2,include/ta_types.h:17076|src/host/win32/crash.cpp:309,differs,include/ta_types.h
 Message_0047fad0,no,2,include/ta_types.h:10202|src/sound/sound.cpp:133,differs,src/sound/sound.cpp
-MeteorParams,no,4,include/ta_types.h:5134|src/map/map_list.cpp:58|src/map/meteors.cpp:24|src/seams/native.cpp:28,differs,include/ta_types.h
+MeteorParams,no,4,include/ta_types.h:5134|src/map/map_list.cpp:58|src/map/meteors.cpp:24|src/seams/native.cpp:27,differs,include/ta_types.h
 MissionHolder,no,2,include/ta_types.h:4616|src/units/unit_types.cpp:97,differs,include/ta_types.h
 MissionName_00467e50,no,2,include/ta_types.h:8155|src/ingame/info_panel.cpp:192,differs,include/ta_types.h
 MissionOrderTable,no,2,include/ta_types.h:5541|src/orders/order_list.cpp:759,differs,include/ta_types.h

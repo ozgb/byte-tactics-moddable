@@ -711,7 +711,7 @@ int Mission::AdvanceMission()
 void Mission::RefreshMapList(int multiplayer)
 {
     if (multi != 0 && multiplayer == 0 && mapList != 0) {
-        GameFreeThunk((int*)mapList.get());
+        GameFreeThunk((int*)mapList);
         mapList = 0;
     }
     if (mapList == 0) {

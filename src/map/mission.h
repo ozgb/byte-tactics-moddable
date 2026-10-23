@@ -52,7 +52,7 @@ public:
     int headerChecksum;                // +0xc20
     char description[0x80];            // +0xc24
     char planet[0x80];                 // +0xca4
-    Ref<char> mapList;
+    char* mapList;
     int mapCount;                      // +0xd28
     int multi;                         // +0xd2c
     int surfaceMetal;                  // +0xd30

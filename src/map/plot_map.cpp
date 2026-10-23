@@ -33,7 +33,7 @@ struct Cell {
 extern Game* g_game;
 
 // Chunked file reader/writer.
-#include "../util/hapi_bank.h"
+#include "../files/files_api.h"
 
 // Writes the "Metal" "Plotmap" chunk: the metal byte of every map cell
 // (the save counterpart of 0x484d60).

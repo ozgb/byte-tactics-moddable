@@ -186,7 +186,7 @@ void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 void __stdcall FadeRectangle(Surface_0041df20* dst, void* rect, int level);
 Display* GetDisplay();
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall HAPI_FileLengthByName(char* path);
+#include "../files/files_api.h"
 void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void __stdcall FillSurface(void* surface, int colour);

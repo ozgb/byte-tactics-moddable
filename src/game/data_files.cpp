@@ -24,8 +24,7 @@ void* __cdecl GameReallocTagged(void* block, const char* name, unsigned int size
 void __cdecl GameFreeThunk(void* p);
 char* __stdcall StripExtension(char* name);
 int GetPreferredLanguage(void);
-void* __stdcall HAPI_OpenFileRead(char* path);
-int __stdcall HAPI_CloseFile(void* file);
+#include "../files/files_api.h"
 void __stdcall FatalError(char* path);
 char* __stdcall Translate(char* text);
 void __stdcall OpenMessageBox(char* dest, char* text, int wrapWidth, int centre, int autoHeight);
@@ -73,7 +72,7 @@ char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, cons
             strcat(buf, ".");
             strcat(buf, ext);
         }
-        void* file = HAPI_OpenFileRead(buf);
+        FileHandle* file = HAPI_OpenFileRead(buf);
         if (file) {
             HAPI_CloseFile(file);
             return buf;
@@ -105,7 +104,6 @@ void* __stdcall LoadBitmapByName(const char* name, int palette)
     return bitmap;
 }
 
-void* __stdcall HAPI_LoadFile(char* path, int* outSize);
 
 // FUNCTION: 0x4292e0
 void* __stdcall LoadFontByName(const char* name)
@@ -119,10 +117,7 @@ void* __stdcall LoadFontByName(const char* name)
     return font;
 }
 
-int __stdcall HAPI_FileLengthByName(char* path);
 int __stdcall LoadPcxPalette(char* path, void* data);
-int __stdcall WriteBufferToFile(char* filename, void* data, int size);
-void __stdcall RemoveFile(char* path);
 
 // Loads palettes\<name>.PAL; when that is missing, builds it from the
 // palettes\PALETTE.PCX file (0x400 bytes) and tries to drop the cached
@@ -202,9 +197,6 @@ struct Pic_004295b0 {
     char header[0x40];   // +0xc
 };
 
-int __stdcall HAPI_FileLength(void* file);
-int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
-int __stdcall HAPI_SeekFile(void* file, int pos);
 GafFrame* __stdcall AllocFrame(char* name, int width, int height);
 
 // Loads a picture from `path`. It reads a 0x40-byte header; if bit 0 of the
@@ -215,7 +207,7 @@ GafFrame* __stdcall AllocFrame(char* name, int width, int height);
 // FUNCTION: 0x4295b0
 GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY)
 {
-    void* file = HAPI_OpenFileRead(path);
+    FileHandle* file = HAPI_OpenFileRead(path);
     if (file == 0) {
         return 0;
     }
@@ -244,7 +236,7 @@ GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY)
 // FUNCTION: 0x429660
 char* __stdcall LoadFileWithProgress(char* path)
 {
-    void* file = HAPI_OpenFileRead(path);
+    FileHandle* file = HAPI_OpenFileRead(path);
     if (file == 0) {
         FatalError(path);
     }
@@ -586,10 +578,6 @@ struct FindData_0042a440 {
     char name[260];                    // +0x14
 };
 
-int __stdcall CountDirectoryEntries(const char* path, int flag);
-int __stdcall HAPI_FindFirst(const char* path, FindData_0042a440* fd, int a, int b);
-int __stdcall HAPI_FindNext(int handle, FindData_0042a440* fd);
-void __stdcall HAPI_FindClose(int handle);
 
 // FUNCTION: 0x42a440
 void LoadTextureGafs()
@@ -651,8 +639,6 @@ void FreeTextureGafs()
 #include "../util/string_ref.h"
 
 int __stdcall ComputeChecksum(unsigned char* data, int len);
-void __stdcall ListDirectory(const char* pattern, int flags, std::vector<StringRef>* out);
-void* __stdcall HAPI_LoadOpenFile(char* name, void* f, unsigned int* outSize);
 void __cdecl ProtectBlockReadWrite(void* p);
 void __cdecl ProtectBlockReadOnly(void* p);
 
@@ -695,7 +681,7 @@ void __stdcall ComputeUnitScriptChecksum(UnitDef* def)
     }
 
     BuildDataPath(path, "download", def->unitname, "tdf");
-    void* f = HAPI_OpenFileRead(path);
+    FileHandle* f = HAPI_OpenFileRead(path);
     if (f) {
         size = HAPI_FileLength(f);
         if (size > 0) {

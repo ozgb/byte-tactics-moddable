@@ -2140,15 +2140,6 @@ public:
     void SaveUnitAccounts(Unit*, HapiBank*);
 };
 
-class HapiBank {        // 0x4 bytes, 106 views
-public:
-    Table_004b3630* table;  // +0x0
-    int OpenAccount(char*);
-    int OpenNamedBox(char*);
-    int ReadBox(void*, int);
-    int GetIntegerItem(char*, int);
-};
-
 class Class_004b4c10 {  // 0x4 bytes, 26 views
 public:
     Table_004b3630* table;  // +0x0

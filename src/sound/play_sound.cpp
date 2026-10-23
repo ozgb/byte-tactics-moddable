@@ -5,7 +5,7 @@
 extern char* g_loopingWav;
 extern int* g_diskWav;
 
-void* __stdcall HAPI_LoadFile(char* path, int flags);
+#include "../files/files_api.h"
 void __cdecl GameFreeThunk(int* p);
 
 // FUNCTION: 0x49f610

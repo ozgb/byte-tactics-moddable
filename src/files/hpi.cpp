@@ -75,9 +75,9 @@ FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
 
 // Opens a file in "a+b" mode through HAPI_OpenFile (sibling of 0x4bb5b0).
 // FUNCTION: 0x4bb2c0
-void __stdcall HAPI_OpenFileAppend(void* param1)
+FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
 {
-    HAPI_OpenFile((char*)param1, "a+b");
+    return HAPI_OpenFile(param1, "a+b");
 }
 
 DisplayContext* GetDisplay(void);
@@ -157,9 +157,9 @@ FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode)
 }
 
 // FUNCTION: 0x4bb5b0
-void __stdcall HAPI_OpenFileRead(void* param1)
+FileHandle* __stdcall HAPI_OpenFileRead(char* param1)
 {
-    HAPI_OpenFile((char*)param1, "rb");
+    return HAPI_OpenFile(param1, "rb");
 }
 
 // FUNCTION: 0x4bb5d0
@@ -269,8 +269,9 @@ static inline int BlockOffset(FileHandle* file, int& counter, int b, int tableSi
 }
 
 // FUNCTION: 0x4bb7c0
-int __stdcall HAPI_readfromfile(FileHandle* file, unsigned char* buf, int size)
+int __stdcall HAPI_readfromfile(FileHandle* file, void* out, int size)
 {
+    unsigned char* buf = (unsigned char*)out;
     int n;
     unsigned char* dst;
     int remaining;
@@ -501,7 +502,7 @@ fail:
 // pointers, free the handle) written out inline, with its fclose results dead
 // because the return value is the block.
 // FUNCTION: 0x4bbe50
-char* __stdcall HAPI_LoadFile(char* name, int* size)
+void* __stdcall HAPI_LoadFile(char* name, int* size)
 {
     char buf[0x100];
     char* data = 0;
@@ -810,7 +811,7 @@ struct FindFiles {
 
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
-int __stdcall HAPI_FindNext(FindFiles* f, struct _finddata_t* fd);
+int __stdcall HAPI_FindNext(int handle, void* fd);
 
 // Strips the directory from a path in place ("a\\b\\c.txt" -> "c.txt").
 static char* StripDir(char* path)
@@ -867,7 +868,7 @@ int __stdcall HAPI_FindFirst(const char* path, void* fd, int state, char recursi
         f->state = 0;
     }
     f->index = -1;
-    if (HAPI_FindNext(f, (struct _finddata_t*)fd) != -1)
+    if (HAPI_FindNext((int)f, fd) != -1)
         return (int)f;
 fail:
     GameFreeThunk(f);
@@ -878,8 +879,10 @@ fail:
 ArchiveDirectory* __stdcall HAPI_FindDirectory(ArchiveDirectory* list, char* path);
 
 // FUNCTION: 0x4bc640
-int __stdcall HAPI_FindNext(FindFiles* f, struct _finddata_t* fd)
+int __stdcall HAPI_FindNext(int handle, void* out)
 {
+    FindFiles* f = (FindFiles*)handle;
+    struct _finddata_t* fd = (struct _finddata_t*)out;
     if (f == (FindFiles*)-1 || f == 0)
         return -1;
     if (f->state < 0) {
@@ -929,8 +932,9 @@ int __stdcall HAPI_FindNext(FindFiles* f, struct _finddata_t* fd)
 
 // Closes the search handle (if open) and frees the search; -1 for no search.
 // FUNCTION: 0x4bc8d0
-int __stdcall HAPI_FindClose(FindFiles* f)
+int __stdcall HAPI_FindClose(int handle)
 {
+    FindFiles* f = (FindFiles*)handle;
     if (f == (FindFiles*)-1 || f == 0)
         return -1;
     int result;
@@ -956,7 +960,7 @@ int __stdcall CountDirectoryEntries(const char* path, int flag)
                 && (flag == 0 || (fd.attrib & 0x10))) {
                 count++;
             }
-        } while (HAPI_FindNext((FindFiles*)handle, &fd) != -1);
+        } while (HAPI_FindNext(handle, &fd) != -1);
         if (handle != 0) {
             FindFiles* h = (FindFiles*)handle;
             if (h->state < 0)
@@ -967,7 +971,7 @@ int __stdcall CountDirectoryEntries(const char* path, int flag)
     return count;
 }
 
-#include "string_ref.h"
+#include "../util/string_ref.h"
 
 typedef std::vector<StringRef> FileList;
 
@@ -983,7 +987,7 @@ void __stdcall ListDirectory(const char* path, int dirsOnly, FileList* list)
                 StringRef key(fd.name);
                 list->insert(list->end(), 1, key);
             }
-        } while (HAPI_FindNext((FindFiles*)h, &fd) != -1);
+        } while (HAPI_FindNext(h, &fd) != -1);
         if (h != 0) {
             FindFiles* f = (FindFiles*)h;
             if (f->state < 0)
@@ -992,8 +996,6 @@ void __stdcall ListDirectory(const char* path, int dirsOnly, FileList* list)
         }
     }
 }
-
-static inline int Next(int h, struct _finddata_t* fd) { int r = HAPI_FindNext((FindFiles*)h, fd); return r; }
 
 // Recursive directory walk: opens path with the search 0x4bc4b0 and, for every
 // entry whose name is neither "." nor "..", either descends into the
@@ -1024,7 +1026,7 @@ void __stdcall FindFilesRecursive(char* path, const char* pat, FileList* tree, i
                     tree->insert(tree->end(), 1, key);
                 }
             }
-        } while ((r = HAPI_FindNext((FindFiles*)h, &fd)) != -1);
+        } while ((r = HAPI_FindNext(h, &fd)) != -1);
         if (f != (FindFiles*)-1 && f != 0) {
             if (f->state < 0)
                 host_dir_close(f->handle);
@@ -1050,7 +1052,7 @@ void __stdcall GetDirectoryEntry(struct _finddata_t* fd, int index, const char* 
                     count++;
                 }
             }
-        } while (HAPI_FindNext(handle, fd) != -1);
+        } while (HAPI_FindNext((int)handle, fd) != -1);
         if (handle != 0) {
             if (handle->state < 0)
                 host_dir_close(handle->handle);
@@ -1382,7 +1384,7 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
         do {
             if (strcmp(fd.name, g_dotExtSep) != 0 && strcmp(fd.name, g_dotDot) != 0)
                 ++(*(unsigned int*)(base + root));
-        } while (HAPI_FindNext(h, &fd) == 0);
+        } while (HAPI_FindNext((int)h, &fd) == 0);
         if (h != 0) {
             if (h->state < 0)
                 host_dir_close(h->handle);
@@ -1430,7 +1432,7 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
                 }
                 k++;
             }
-        } while (HAPI_FindNext(h, &fd) == 0);
+        } while (HAPI_FindNext((int)h, &fd) == 0);
         if (h != 0) {
             if (h->state < 0)
                 host_dir_close(h->handle);
@@ -1720,7 +1722,7 @@ void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
                     e->flags |= 2;
             }
         }
-    } while (HAPI_FindNext((FindFiles*)h, &fd) != -1);
+    } while (HAPI_FindNext(h, &fd) != -1);
     if (f) {
         if (f->state < 0)
             host_dir_close(f->handle);

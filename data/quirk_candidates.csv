@@ -54,9 +54,9 @@ src/network/packets.cpp,849,alloc-size,PacketChannel::GrowPools (0x461fd0),not-a
 src/orders/order_targets.cpp,689,pragma-pack,file scope,not-a-bug,,the pack(2) push covers the rest of the file by design; nothing follows the end of the file
 src/sound/sound.cpp,711,pointer-bool-conversion,SpeechQueue::PlaySpeech (0x47fd70),not-a-bug,,redundant test of a local array; the following tests decide
 src/units/unit_commands.cpp,633,delete-incomplete,FreeUnitCategories (0x488bf0),not-a-bug,,"delete of a void pointer calls operator delete(void*) with no destructor, as MSVC 5 does"
-src/util/hpi.cpp,346,shift-op-parentheses,HAPI_readfromfile (0x4bb7c0),not-a-bug,,"the shifted operand is a difference of two multiples of 64K, evaluated as the original; archive file IO, not traced"
-src/util/hpi.cpp,1122,tautological-pointer-compare,SaveStartDirectory (0x4bce10),not-a-bug,,redundant test of a local array; archive path code
-src/util/hpi.cpp,1368,format-security,HAPI_PackDirectory (0x4bd160),not-a-bug,,copyright text has no percent sign
-src/util/sqsh.cpp,779,format,SquashDumpHeader (0x4d1c00),not-a-bug,,"format width mismatch only: int, long, unsigned and pointers are all 32 bits on the i686 target, so the output is identical; debug printf"
-src/util/sqsh.cpp,780,format,SquashDumpHeader (0x4d1c00),not-a-bug,,"format width mismatch only: int, long, unsigned and pointers are all 32 bits on the i686 target, so the output is identical; debug printf"
+src/files/hpi.cpp,346,shift-op-parentheses,HAPI_readfromfile (0x4bb7c0),not-a-bug,,"the shifted operand is a difference of two multiples of 64K, evaluated as the original; archive file IO, not traced"
+src/files/hpi.cpp,1122,tautological-pointer-compare,SaveStartDirectory (0x4bce10),not-a-bug,,redundant test of a local array; archive path code
+src/files/hpi.cpp,1368,format-security,HAPI_PackDirectory (0x4bd160),not-a-bug,,copyright text has no percent sign
+src/files/sqsh.cpp,779,format,SquashDumpHeader (0x4d1c00),not-a-bug,,"format width mismatch only: int, long, unsigned and pointers are all 32 bits on the i686 target, so the output is identical; debug printf"
+src/files/sqsh.cpp,780,format,SquashDumpHeader (0x4d1c00),not-a-bug,,"format width mismatch only: int, long, unsigned and pointers are all 32 bits on the i686 target, so the output is identical; debug printf"
 src/weapons/explosions.cpp,732,vexing-parse,StartExplodePiece (0x421620),not-a-bug,,"a block-scope declaration of HarnessTestMode, not a call"

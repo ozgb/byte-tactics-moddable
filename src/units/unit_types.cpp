@@ -116,13 +116,12 @@ void* __cdecl GameAllocIgnoreTag(const char* name, int size);
 unsigned short __stdcall FindUnitTypeId(char* name);
 void __stdcall LoadUnitFbi(char* path, UnitDef* type);
 void AddDownloadBuildOptions();
-void __stdcall ListDirectory(const char* pattern, int flags, std::vector<StringRef>* out);
+#include "../files/files_api.h"
 void __stdcall InsertionSortUnitTypes(void* start, void* end, void* cmp, int param);
 void __stdcall SortUnitTypes(void* start, void* end, void* cmp, int param);
 int __stdcall CompareUnitTypeNames(const char* a, const char* b);
 int __cdecl GameStrdup(char* name);
 void __stdcall FatalError(const char* msg);
-int __stdcall HAPI_FileLengthByName(char* path);
 void* __stdcall Load3do(char* path);
 void __stdcall MirrorObject(void* obj);
 int __stdcall GetObjectHeight(void* obj);

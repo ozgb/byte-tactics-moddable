@@ -59,6 +59,7 @@ extern Root_004a32a0* g_guiContext;
 
 #include "../graphics/rect.h"
 #include "../state/sim_globals.h"
+#include "../files/files_api.h"
 
 // Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
 void ShowFrontendErrorText(void);
@@ -4249,7 +4250,6 @@ done:
 
 // Unused here: real functions declared to keep the file's symbol count.
 void __stdcall DrawBattleFrame(int param_1, int param_2);
-void __stdcall HAPI_FindClose(int handle);
 void __stdcall InstallOutOfMemoryHandler();
 int GetDisplayFieldE4();
 
@@ -4265,13 +4265,11 @@ struct Gui;
 int WalkFrameChain(int, int, int, int, int, int, int, int, int, int);
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int OrderSquad(int, int, int, int, int, int, int, int);
-int HAPI_WriteArchiveData(int, int, int, int, int, int, int, int);
 int AddBlinkWord(int, int, int, int, int, int, int, int);
 int WalkStack(int, int, int, int, int, int, int);
 int SendScriptCallByName(int, int, int, int, int, int, int);
 int SendScriptCall(int, int, int, int, int, int, int);
 int IssueOrCancelOrder(int, int, int, int, int, int, int);
-int SquashPack(int, int, int, int, int, int);
 int IsFootprintVisible(int, int, int, int, int, int);
 int DrawProgressBar(int, int, int, int, int, int);
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
@@ -4323,8 +4321,6 @@ GafFrame* __stdcall GetGafFrame(GafEntry* table, int index);
 GafEntry* __stdcall FindGafEntry(void* gaf, const char* name);
 void* __stdcall LoadGaf(char* path);
 char* __stdcall ChangeExtension(char* out, char* in, const char* ext);
-long __stdcall HAPI_FileLengthByName(char* path);
-char* __stdcall HAPI_LoadFile(char* name, int* size);
 char* __stdcall Translate(char* key);
 char* __stdcall GetGadgetText(Gui* menu, char* name, char* buf);
 char* __stdcall SkipTextLines(char* text, int line);

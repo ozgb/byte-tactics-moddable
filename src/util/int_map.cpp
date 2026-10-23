@@ -32,8 +32,7 @@ struct Pair8_004b2450 {
     int offset;       // +0x04
 };
 
-extern Data_004b2450* __stdcall HAPI_LoadFile(char* name, int reserved);
-extern int __stdcall HAPI_FileLengthByName(char* name);
+#include "../files/files_api.h"
 extern int __stdcall ComputeChecksum(unsigned char* data, int len);
 extern void __cdecl GameFreeThunk(void* x);
 
@@ -62,7 +61,7 @@ static void Relocate(Data_004b2450* data)
 // FUNCTION: 0x4b2450
 Data_004b2450* __stdcall LoadCobScript(char* name)
 {
-    Data_004b2450* data = HAPI_LoadFile(name, 0);
+    Data_004b2450* data = (Data_004b2450*)HAPI_LoadFile(name, 0);
     if (data == 0)
         return 0;
     int sum = ComputeChecksum((unsigned char*)data, HAPI_FileLengthByName(name));

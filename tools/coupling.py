@@ -23,7 +23,8 @@ file) and rewrites the rest; an override that no longer names a function is an e
 
 Rules, first match wins:
 
-  folder        src/harness is harness; src/seams is seams; src/debug, src/util, src/runtime, src/data and src/host are platform
+  folder        src/harness is harness; src/seams is seams; src/debug, src/util, src/runtime, src/data and src/host are platform;
+                src/files is files
   draw          a name that starts (after `Class::`) with Draw, Render or Blit is presentation, unless
                 a phase walk reaches it (see phase)
   library       _Construct, _Destroy, operator new and delete, Unguarded_insert and Copy_backward (the
@@ -81,7 +82,7 @@ Seams. The sim subsystems (SIM_SUBSYSTEMS) call each other only through the seam
 interfaces/seams.h (#8), and there is no list of exceptions. --seams reads data/coupling.csv, takes
 every `call` row whose `from` and `to` are both sim subsystems, or whose `from` is `game` and whose
 `to` is a sim subsystem, and fails on each one, listing it. An `indirect` row, a shared_write row and a
-call to or from presentation, network, harness, seams or platform code is not an edge. src/seams holds
+call to or from presentation, network, harness, seams, files or platform code is not an edge. src/seams holds
 the code that fills the seam tables; it is the `seams` subsystem, so the direct calls it makes into the
 sim are not edges, and the function addresses it takes (`fn_ref` rows) are not `call` rows in any case.
 
@@ -114,13 +115,15 @@ SUBSYSTEM_COLUMNS = ["function", "file", "subsystem", "rule", "override"]
 COUPLING_COLUMNS = ["from", "to", "kind", "target", "count"]
 SIM_SUBSYSTEMS = ["wind_meteors", "economy", "features", "ai", "pathfinding", "weapons", "targeting", "los_radar",
                   "orders", "units", "players", "map"]
-SUBSYSTEMS = SIM_SUBSYSTEMS + ["network", "game", "harness", "seams", "presentation", "platform"]
+SUBSYSTEMS = SIM_SUBSYSTEMS + ["network", "game", "harness", "seams", "presentation", "platform",
+              "files"]
 PHASE_SUBSYSTEMS = {"UpdateAllUnits": "units", "UpdateProjectiles": "weapons",
                     "UpdateExplosions": "weapons", "UpdatePlayers": "players", "UpdateFeatures": "features",
                     "StepAllGafSequences": "game", "UpdateWind": "wind_meteors", "UpdateMeteors": "wind_meteors",
                     "UpdateResourceSharing": "economy"}
 FOLDER_FIXED = [("src/harness/", "harness"), ("src/seams/", "seams"), ("src/debug/", "platform"), ("src/util/", "platform"),
-                ("src/runtime/", "platform"), ("src/data/", "platform"), ("src/host/", "platform")]
+                ("src/runtime/", "platform"), ("src/data/", "platform"), ("src/host/", "platform"),
+                ("src/files/", "files")]
 DISPATCH_ROOTS = {"HandleNetPackets"}
 DRAW = re.compile(r"(^|::)(Draw|Render|Blit)")
 LIBRARY = re.compile(r"^(_Construct|_Destroy|operator new|operator delete|Unguarded_insert|Copy_backward)$")

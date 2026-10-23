@@ -17,7 +17,7 @@ int GetMemSetValue();
 
 // Unused here: these headers and forward declarations take the symbol ids that keep
 // CanLoad (0x489a90) and SetStateBits (0x48b090) matching (docs/c2-regalloc.md).
-#include "../util/hapi_bank.h"
+#include "../files/files_api.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
 

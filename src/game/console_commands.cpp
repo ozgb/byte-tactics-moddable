@@ -307,7 +307,7 @@ void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind, int d, in
 void SaveSettings();
 void __stdcall SetLightVector(int x, int y, int z);
 void __stdcall SetBrightness(float value);
-void __stdcall MakeDirectoryPath(char* dir);
+#include "../files/files_api.h"
 void __stdcall SaveGameFile(char* path, char* description, int gameId);
 extern void ClearCameraFollowState(void);
 void FUN_004161f0();
@@ -316,12 +316,8 @@ unsigned int GetTicks();
 void EnableMeteors();
 void DisableMeteors();
 void StartMeteorShower();
-void* __stdcall HAPI_OpenFileRead(char* path);
-void* __stdcall HAPI_LoadOpenFile(char* path, void* file, int* out);
 unsigned int __stdcall ExecuteCommandText(char* text, int size, CommandArgs* vars, unsigned int mask);
 void __cdecl GameFreeThunk(void* data);
-int __stdcall HAPI_CloseFile(void* file);
-int __stdcall MatchWildcard(const char* name, const char* pattern);
 extern Display_00417a60* GetDisplay();
 void ToggleFullScreen();
 void __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
@@ -1066,10 +1062,10 @@ void __stdcall CmdInclude(CommandArgs* args)
     char path[60];
 
     sprintf(path, "debugdat\\%s.txt", args->GetArg(0, DAT_005119b8));
-    void* file = HAPI_OpenFileRead(path);
+    FileHandle* file = HAPI_OpenFileRead(path);
     if (file != 0) {
         pos = g_game->pos;
-        void* data = HAPI_LoadOpenFile(path, file, &info);
+        void* data = HAPI_LoadOpenFile(path, file, (unsigned int*)&info);
         if (data != 0) {
             ExecuteCommandText((char*)data, info, args, 0xffffffff);
             GameFreeThunk(data);
@@ -1101,10 +1097,10 @@ void __stdcall DefaultCommandHandler(CommandArgs* args)
         char path[60];
         // The original unbounded formatting can overflow path for a long argument.
         sprintf(path,"debugdat\\%s.txt",args->GetArg(0,DAT_005119b8));
-        void* file=HAPI_OpenFileRead(path);
+        FileHandle* file=HAPI_OpenFileRead(path);
         if (file) {
             saved=g_game->pos;
-            void* data=HAPI_LoadOpenFile(path,file,&size);
+            void* data=HAPI_LoadOpenFile(path,file,(unsigned int*)&size);
             if (data) {
                 ExecuteCommandText((char*)data,size,args,0xffffffff);
                 GameFreeThunk(data);

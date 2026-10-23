@@ -11,19 +11,14 @@
 
 #include "../util/tdf.h"
 
-#include "../util/file_handle.h"
+#include "../files/file_handle.h"
 #include "../state/sim_globals.h"
 
 extern int DAT_0051fba8;
 
-unsigned int __stdcall HAPI_WriteFile(FileHandle* file, void* data, unsigned int size);
+#include "../files/files_api.h"
 void __stdcall WriteTabs(FileHandle* out, int indent);
 char* __stdcall ChangeExtension(char* name, char* out, const char* ext);
-int __stdcall HAPI_FileLengthByName(char* path);
-void __stdcall RemoveFile(char* path);
-void __stdcall RenameFile(char* from, char* to);
-FileHandle* __stdcall HAPI_CreateFile(char* path);
-void __stdcall HAPI_CloseFile(FileHandle* file);
 char* __stdcall Translate(char* text);
 void* __stdcall LoadGaf(char* path);
 void* __stdcall GetGafFrame(void* table, int index);

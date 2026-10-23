@@ -223,7 +223,7 @@ int __stdcall GetClickMode(Gui* menu);
 void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
 void __stdcall RefreshBuildCountTexts(Gui* menu, Unit* unit);
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall HAPI_FileLengthByName(char* path);
+#include "../files/files_api.h"
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 void __stdcall HandleBuildPanelClick(Gui* menu);
 void __stdcall RefreshOrderButtons(Unit* unit);

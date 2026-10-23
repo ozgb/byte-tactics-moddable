@@ -33,16 +33,13 @@ extern int g_otaEnumFileListBytes;
 extern int g_otaEnumFileCount;
 extern int g_usePacketManager;
 
-int __stdcall HAPI_FileLengthByName(char* path);
+#include "../files/files_api.h"
 void __stdcall OpenMessageBox(char* dest, char* text, int wrapWidth, int centre, int autoHeight);
 
-void __stdcall HAPI_ReadFileAt(char* filename, void* buffer, int offset, int size);
 void __cdecl GameFreeThunk(void* p);
 
 int GetPreferredLanguage(void);
 char* __stdcall StripExtension(char* name);
-void* __stdcall HAPI_OpenFileRead(char* path);
-int __stdcall HAPI_CloseFile(void* file);
 
 char* __stdcall SkipTextLines(char* list, int index);
 int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, int def);
@@ -74,7 +71,6 @@ char* __stdcall FindTranslation(char* name);
 int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, char* def);
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall SetCursorMode(int n);
-void __stdcall ListDirectory(const char* pattern, int flags, std::vector<StringRef>* out);
 void HandleNetPackets();
 
 // Every float field is read through this: the double result goes into a float
@@ -119,8 +115,6 @@ struct Header_004373a0 {
     char unknown_24[0x40 - 0x24];
 };
 
-int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
-int __stdcall HAPI_SeekFile(void* file, int pos);
 int __stdcall ComputeChecksum(unsigned char* data, int len);
 
 class MapCacheEntry {
@@ -448,7 +442,7 @@ void Mission::BuildCampaignFilePath(int index, char* dir, char* name, char* ext)
         StripExtension(path);
         strcat(path, ".");
         strcat(path, ext);
-        void* file = HAPI_OpenFileRead(path);
+        FileHandle* file = HAPI_OpenFileRead(path);
         if (file) {
             HAPI_CloseFile(file);
             SetNameSlot(index, path);
@@ -1243,7 +1237,7 @@ int Mission::ComputeMapChecksum()
             return headerChecksum ^ tntChecksum;
         }
     }
-    void* file = HAPI_OpenFileRead(name);
+    FileHandle* file = HAPI_OpenFileRead(name);
     if (file == 0) {
         return 0;
     }

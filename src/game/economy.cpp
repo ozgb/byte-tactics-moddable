@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "../files/files_api.h"
 
 #pragma pack(push, 1)
 
@@ -27,7 +28,6 @@ struct Obj_00401320 {
     float prev1;                       // +0x14
 };
 
-#include "../util/hapi_bank.h"
 
 struct UnitInfo {
     char unknown_0[0xa8];

@@ -1036,7 +1036,7 @@ harness,game,call,QuirksFlipFirstSim,1
 harness,game,call,QuirksHash,2
 harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
-harness,game,call,SimBlockBase,2
+harness,game,call,SimBlockBase,3
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimOwns,1
 harness,game,shared_write,Game::difficulty,4
@@ -1386,7 +1386,7 @@ map,platform,call,Translate,3
 map,platform,call,WorldToCell,1
 map,platform,call,operator delete,11
 map,platform,call,operator new,7
-map,platform,call,operator==,4
+map,platform,call,operator==,3
 map,platform,shared_write,Point16::x,11
 map,platform,shared_write,Point16::y,11
 map,platform,shared_write,Vec3::x,21

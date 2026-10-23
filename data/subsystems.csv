@@ -4040,6 +4040,7 @@ ReadMasked,src/harness/harness.cpp,harness,folder:src/harness/,
 ReadOrder,src/harness/harness.cpp,harness,folder:src/harness/,
 ReadPlayerKey,src/harness/harness.cpp,harness,folder:src/harness/,
 ReadPlayerSetting,src/game/settings.cpp,game,name:Player,game
+ReadRefAt,src/harness/harness.cpp,harness,folder:src/harness/,
 ReadScenario,src/harness/harness.cpp,harness,folder:src/harness/,
 ReadSettingInt,src/game/settings.cpp,game,default:src/game/,
 ReadSettingIntOr,src/game/settings.cpp,game,default:src/game/,

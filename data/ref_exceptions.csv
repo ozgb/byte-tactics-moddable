@@ -220,6 +220,7 @@ MapGrid,tiles,int-pointer,src/ingame/map_grid.h,#353
 MapInfo,grid,pointer,src/map/map_info.h,#350
 MapInfo,visibilityMask,pointer,src/map/map_info.h,#350
 Menu_0045b800,holder,pointer,src/frontend/menu_0045b800.h,#353
+Mission,mapList,pointer,src/map/mission.h,#352
 MissionConditions,defeat,pointer,src/game/mission_conditions.h,#351
 MissionConditions,victory,pointer,src/game/mission_conditions.h,#351
 MissionUnit,ident,pointer,src/map/mission.h,#350
@@ -270,7 +271,6 @@ PieceRec,desc,pointer,src/weapons/explosions.cpp,#349
 Piece_459c70,child,pointer,src/graphics/model_types.h,#353
 Piece_459c70,object,pointer,src/graphics/model_types.h,#353
 Piece_459c70,parent,pointer,src/graphics/model_types.h,#353
-Piece_459c70,points,pointer,src/graphics/model_types.h,#353
 Piece_459c70,sibling,pointer,src/graphics/model_types.h,#353
 Player,explored,pointer,src/network/player.h,#351
 Player,info,pointer,src/network/player.h,#351
@@ -333,5 +333,4 @@ UnitDef,data,pointer,src/units/unit_def.h,#352
 UnitDef,weaponCategories,pointer,src/units/unit_def.h,#352
 UnitList_00409160,units,container,src/ai/player_ai.h,#351
 UnitResources,player,pointer,src/game/unit_resources.h,#350
-Unit_459200,motion,pointer,src/graphics/model_types.h,#353
 WeaponDef,fire,pointer,src/weapons/weapon_def.h,#352

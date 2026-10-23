@@ -1180,11 +1180,11 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
     }
 }
 
-static void HashPointer(unsigned p, int target)
+static void HashPointer(unsigned p, int target, bool isRef = false)
 {
     unsigned tag;
     unsigned index;
-    Resolve((unsigned)SimBlockBase(), p, false, target, &tag, &index);
+    Resolve((unsigned)SimBlockBase(), p, isRef, target, &tag, &index);
     HashByte((unsigned char)tag);
     HashU32(index);
 }
@@ -1199,8 +1199,8 @@ static unsigned ReadMasked(const unsigned char* p, const TraceField* f)
 
 static void HashField(const unsigned char* base, const TraceField* f)
 {
-    if (f->kind == TF_POINTER)
-        HashPointer(*(const unsigned*)(base + f->offset), f->target);
+    if (f->kind == TF_POINTER || f->kind == TF_REF)
+        HashPointer(*(const unsigned*)(base + f->offset), f->target, f->kind == TF_REF);
     else if (f->mask != 0)
         HashU32(ReadMasked(base + f->offset, f));
     else
@@ -1220,10 +1220,10 @@ static void DumpPrefix(const char* path)
 
 static void DumpValue(const unsigned char* p, const TraceField* f)
 {
-    if (f->kind == TF_POINTER) {
+    if (f->kind == TF_POINTER || f->kind == TF_REF) {
         unsigned tag;
         unsigned index;
-        Resolve((unsigned)SimBlockBase(), *(const unsigned*)p, false, f->target, &tag, &index);
+        Resolve((unsigned)SimBlockBase(), *(const unsigned*)p, f->kind == TF_REF, f->target, &tag, &index);
         if (tag == 0)
             fputs("null", s_dump);
         else if (tag == TT_HEAP)
@@ -1465,8 +1465,8 @@ static void VisitGlobalList(const char* prefix, const TraceGlobal* list, unsigne
         if (g->relative)
             address = TRACE_SIM_BASE + (size_t)g->address;
 #endif
-        if (g->kind == TF_POINTER)
-            HashPointer(*(const unsigned*)address, g->target);
+        if (g->kind == TF_POINTER || g->kind == TF_REF)
+            HashPointer(*(const unsigned*)address, g->target, g->kind == TF_REF);
         else
             HashBuf(address, g->size);
         if (s_dumpNow) {

@@ -1378,7 +1378,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
     Player* player = &g_game->players[g_game->playerIndex];
     if (g_game->debugMode == 1) {
         Unit* unit = FindNextSelectedUnit(0, 0);
-        if (unit) movement = (Movement*)unit->def->movementclass;
+        if (unit) movement = (Movement*)unit->def->movementclass.get();
     }
     int firstY = g_game->scrollY / 16;
     int firstX = g_game->scrollX / 16;

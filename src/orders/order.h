@@ -103,7 +103,7 @@ struct Order : public OrderBase {
     unsigned int created;          // +0x46
     Ref<Order> next;
     unsigned int subFlags;         // +0x4e
-    void* attached;                // +0x52
+    Ref<OrderFx> attached;
 
     Order(unsigned char kind, Unit* unit, Vec3* pos, int a, int b, int c);
     Order(MissionType kind, Unit* unit, void* pos, int a, int b, int c);

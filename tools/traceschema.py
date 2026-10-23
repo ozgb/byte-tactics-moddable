@@ -397,7 +397,7 @@ SYNTHETIC.update({
         unsigned int created;         // +0x46
         OrderRef* next;               // +0x4a
         unsigned int subFlags;        // +0x4e
-        OrderFxRef* attached;         // +0x52
+        Ref<OrderFxRef> attached;        // +0x52
     """,
     "ApproachRadius": """
         char vptr[4];                 // +0x0
@@ -757,7 +757,7 @@ SYNTHETIC.update({
         int damagemodifier;           // +0x1aa
         int moverate1;                // +0x1ae
         int moverate2;                // +0x1b2
-        MovementClass* movementclass; // +0x1b6
+        Ref<MovementClass> movementclass; // +0x1b6
         short turnrate;               // +0x1ba
         short corpse;                 // +0x1bc
         short maxwaterdepth;          // +0x1be

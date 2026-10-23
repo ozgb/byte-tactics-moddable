@@ -5,6 +5,7 @@
 #pragma pack(push, 1)
 
 struct WeaponDef;
+class MovementClass;
 
 class UnitDef {
 public:
@@ -76,7 +77,7 @@ public:
     int damagemodifier;                // +0x1aa
     int moverate1;                     // +0x1ae
     int moverate2;                     // +0x1b2
-    void* movementclass;               // +0x1b6
+    Ref<MovementClass> movementclass;
     short turnrate;                    // +0x1ba
     short corpse;                      // +0x1bc
     short maxwaterdepth;               // +0x1be

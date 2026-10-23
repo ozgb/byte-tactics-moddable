@@ -19,6 +19,7 @@
 
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 static inline int Vec3Length(const Vec3* v)
 {
@@ -137,6 +138,7 @@ struct Path_0043d6d0 {
     TargetData_0043d6d0* motion;       // +0x0
 };
 
+class MovementClass;
 struct UnitType_0043cd20 {           // 0x249 bytes
     char unknown_0[0x20];
     char name[0x20];                 // +0x20
@@ -150,7 +152,7 @@ struct UnitType_0043cd20 {           // 0x249 bytes
     char unknown_1aa[0x1ae - 0x1aa];
     int moverate1;                     // +0x1ae
     int moverate2;                     // +0x1b2
-    int movementclass;                 // +0x1b6
+    Ref<MovementClass> movementclass;
     unsigned short max_turn;           // +0x1ba
     char unknown_1bc[0x202 - 0x1bc];
     short range;                       // +0x202
@@ -1919,7 +1921,7 @@ UnitMotion::UnitMotion(Unit* unit)
     p2 = OrderVec3(0, 0, 0);
     mode = 1;
     flag = 0;
-    movementClass = ((UnitType_0043cd20*)unit->def.get())->movementclass;
+    movementClass = (int)((UnitType_0043cd20*)unit->def.get())->movementclass.get();
     if (((Target_0043d6d0*)unit->player.get())->active != 0 && ((Target_0043d6d0*)unit->player.get())->type == 3) {
         if (((UnitType_0043cd20*)unit->def.get())->flag_800)
             obj = (Iface_0043dd20*)new (kSim) PackedPosGoal(unit);

@@ -55,7 +55,7 @@ struct Piece_459c70 {
     short short_12;
     short short_14;
     Vec3 offset;
-    Vec3* points;
+    Ref<Vec3> points;
     short modified;
     PieceFlags_459c70 flags;
     Piece_459c70* sibling;
@@ -69,7 +69,7 @@ struct Model_459200;
 
 #pragma pack(push, 1)
 struct Unit_459200 {
-    void* motion;
+    Ref<char> motion;
     char unknown_4[0x60];
     Vector3s angles;
     int pos_x;

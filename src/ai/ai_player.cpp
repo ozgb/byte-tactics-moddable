@@ -1139,9 +1139,9 @@ int __stdcall RateWeapons(UnitDef* p)
     int result = 1;
     if (((Flags245*)&p->flags2)->flag4)
         result = 0xb;
-    Sub_00409520** pp = (Sub_00409520**)p->weapons;
+    Ref<Sub_00409520>* pp = (Ref<Sub_00409520>*)p->weapons;
     for (int i = 3; i != 0; i--) {
-        Sub_00409520* s = *pp;
+        Sub_00409520* s = pp->get();
         if (s->index != 0)
             result = result + s->damage / 40 + s->range / 100 + 5;
         pp++;
@@ -1165,9 +1165,9 @@ int __stdcall RateUnitType(UnitDef* p)
     int extra = 1;
     if (((Flags245*)&p->flags2)->flag4)
         extra = 0xb;
-    Sub_00409520** pp = (Sub_00409520**)p->weapons;
+    Ref<Sub_00409520>* pp = (Ref<Sub_00409520>*)p->weapons;
     for (int i = 3; i != 0; i--) {
-        Sub_00409520* s = *pp;
+        Sub_00409520* s = pp->get();
         if (s->index != 0)
             extra = extra + s->damage / 40 + s->range / 100 + 5;
         pp++;

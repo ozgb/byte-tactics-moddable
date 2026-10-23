@@ -174,7 +174,7 @@ struct Unit_00468cf0 {                 // 0x118 bytes
   short zWhole;                       // +0x74
   char unknown_76[0x96 - 0x76];
   Ref<PlayerState_00468cf0> player;
-  void* script;                       // +0x9a
+  Ref<char> script;
   char unknown_9e[0xac - 0x9e];
   int group;                          // +0xac, the control group number
   char unknown_b0[0x110 - 0xb0];

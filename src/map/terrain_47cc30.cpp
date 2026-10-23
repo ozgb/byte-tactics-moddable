@@ -20,7 +20,7 @@ struct Unit_0047cc30 {
 
 struct UnitRec_0047cc30 {               // 0x118 bytes
     char unknown_0[0x92];
-    void* def;                          // +0x92
+    Ref<char> def;
     Ref<Player> player;
     char unknown_9a[0x110 - 0x9a];
     unsigned int flags;                 // +0x110

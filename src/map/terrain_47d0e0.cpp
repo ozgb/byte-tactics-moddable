@@ -35,7 +35,7 @@ struct Obj_0047db20 {
     Point16 pos;
     char unknown_7a[4];
     Point16 footprint;
-    int spatialBucket;
+    Ref<char> spatialBucket;
     char unknown_86[0x92 - 0x86];
     Ref<Unit_0047db20> def;
     char unknown_96[0xa8 - 0x96];
@@ -71,7 +71,7 @@ static inline Cell* CellAt(const Point16& p)
 // FUNCTION: 0x47d0e0
 void __stdcall RemoveUnitFromMap(Obj_0047db20* obj)
 {
-    if (obj->spatialBucket != g_game->overflowBucket) {
+    if ((int)obj->spatialBucket.get() != g_game->overflowBucket) {
         Point16 size = obj->footprint;
         Cell* cell = CellAt(obj->pos);
         int index = 0;

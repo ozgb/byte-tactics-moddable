@@ -139,7 +139,7 @@ struct Def_0043f0e0 {
     char unknown_15a[0x170 - 0x15a];
     short f170; // +0x170
     char unknown_172[0x1ee - 0x172];
-    Node_0043f0e0* f1ee; // +0x1ee
+    Ref<Node_0043f0e0> f1ee;
     char unknown_1f2[0x1fa - 0x1f2];
     unsigned int f1fa; // +0x1fa
     char unknown_1fe[0x241 - 0x1fe];

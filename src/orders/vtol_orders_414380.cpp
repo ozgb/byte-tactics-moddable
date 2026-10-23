@@ -41,7 +41,7 @@ void __stdcall DetonateUnitWeapon(Unit*, int);
 // function's bounds-add register allocation.
 struct UnitRef {
     void* table;
-    Unit* ptr;
+    Ref<Unit> ptr;
     // The empty do-while is a debug check that compiles to nothing.
     Unit* Get() { do {} while (0); return ptr; }
 };

@@ -66,7 +66,7 @@ struct Type_0049d270 {
 
 struct Entry_0049d270 {                // 0x1c bytes
     char unknown_0[0xc];
-    Type_0049d270* type;               // +0xc
+    Ref<Type_0049d270> type;
     char unknown_10[0x16 - 0x10];
     short f_16;                        // +0x16
     short f_18;                        // +0x18
@@ -82,7 +82,7 @@ struct Entry_0049e1a0 {        // 0x1c bytes
     Point_0049e1a0 point;      // +0x00
     char* name;                // +0x04
     int f_8;                   // +0x08
-    WeaponDef* attached;       // +0x0c
+    Ref<WeaponDef> attached;
     char unknown_10[0x14 - 0x10];
     unsigned short f_14; // +0x14, the slot's tick counter
     short f_16;          // +0x16
@@ -527,7 +527,7 @@ struct Vec3_0049a0c0 {
 
 #pragma pack(push, 1)
 struct Params_0049a0c0 {
-    void* owner;                       // +0x0
+    Ref<char> owner;
     Vec3_0049a0c0 pos;                 // +0x4
     char unknown_10[0x42];
     int ownerUnit;                     // +0x52
@@ -545,7 +545,7 @@ void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
     Params_0049a0c0 p;
     memset(&p, 0, sizeof(p));
     p.ownerUnit = 0;
-    p.owner = owner;
+    p.owner = (char*)owner;
     p.kind = 10;
     p.pos = *pos;
     ApplyAreaDamage(&p, pos);
@@ -929,8 +929,8 @@ int __stdcall GetWeaponRange(int param1, unsigned int param2)
 {
     unsigned char idx = (unsigned char)param2;
     int offset = idx * 7;
-    int* intermediate = (int*)((char*)param1 + offset * 4 + 0x10);
-    int result = *(int*)((char*)*intermediate + 0xdc);
+    Ref<char>* intermediate = (Ref<char>*)((char*)param1 + offset * 4 + 0x10);
+    int result = *(int*)((char*)intermediate->get() + 0xdc);
     return result;
 }
 
@@ -1250,7 +1250,7 @@ extern char* g_fireScriptNames[4];
 
 struct Fire_0049c9c0 {
     char unknown_0[0xc];
-    WeaponDef* shot;                   // +0xc
+    Ref<WeaponDef> shot;
     char unknown_10[0x1b - 0x10];
     unsigned char f_1b;                // +0x1b
 };
@@ -1309,7 +1309,7 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
         proj->time = (u->range << 16) / (unsigned int)u->speed + g_game->ticks;
     else
         proj->time = g_game->ticks + u->lifetime;
-    proj->targetUnit = param_5;
+    proj->targetUnitPtr = (Unit*)param_5;
 
     proj->active = fire->shot->burst;
     g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(fire->f_1b >> 2) & 3], 0, 0);
@@ -1329,7 +1329,7 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
 struct Shot_0049cc20 {
     char unknown_0[0x8];
     int aimCobDone;                    // +0x8, the slot's aimCob.nAimCobDone
-    WeaponDef* def;                    // +0xc, the weapon that fired
+    Ref<WeaponDef> def;
     char unknown_10[0x1b - 0x10];
     unsigned char flags;               // +0x1b
 };
@@ -1368,7 +1368,7 @@ int __stdcall FireVLaunchProjectile(Shot_0049cc20* shot, Unit* unit, Vec3* pos,
     } else {
         proj->time = g_game->ticks + u->lifetime;
     }
-    proj->targetUnit = param_5;
+    proj->targetUnitPtr = (Unit*)param_5;
     proj->interceptedProjectile = (Projectile*)param_6;
     proj->active = shot->def->burst;
     g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
@@ -1384,7 +1384,7 @@ int __stdcall FireVLaunchProjectile(Shot_0049cc20* shot, Unit* unit, Vec3* pos,
 #pragma pack(push, 1)
 struct Shot_0049cde0 {
     char unknown_0[0xc];
-    WeaponDef* def;                    // +0xc, the weapon that fired
+    Ref<WeaponDef> def;
     unsigned int muzzleAimFromDeltaZ;  // +0x10
     char unknown_14[0x16 - 0x14];
     short heading;                     // +0x16
@@ -1427,7 +1427,7 @@ int __stdcall FireBallisticProjectile(Shot_0049cde0* shot, Unit* unit, Vec3* pos
         }
         // active before targetUnit: the reverse of the natural order is the original's.
         proj->active = shot->def->burst;
-        proj->targetUnit = param_5;
+        proj->targetUnitPtr = (Unit*)param_5;
         g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
         short angle = *(int*)&unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
         int a = -FUN_004b70ef(angle, 800);
@@ -1443,7 +1443,7 @@ int __stdcall FireBallisticProjectile(Shot_0049cde0* shot, Unit* unit, Vec3* pos
 #pragma pack(push, 1)
 struct Shot_0049d000 {
     char unknown_0[0xc];
-    void* weapon;                     // +0xc
+    Ref<char> weapon;
 };
 
 #pragma pack(pop)
@@ -1478,7 +1478,7 @@ int __stdcall SpawnProjectileFromUnitMotion(Shot_0049d000* shot, Unit* unit, Vec
 
 struct Object_0049d0c0 {
     char unknown_0[0xc];
-    WeaponDef* info;                   // +0xc
+    Ref<WeaponDef> info;
 };
 
 int __stdcall FireLineOfSightProjectile(Object_0049d0c0* obj, int a, int b, int c, int d);
@@ -1499,7 +1499,7 @@ int __stdcall FireWeaponByFlags(Object_0049d0c0* obj, int a, int b, int d, int c
 #pragma pack(push, 1)
 struct Entry_0049d120 {              // 0x1c bytes
     char unknown_0[0xc];
-    WeaponDef* def;                  // +0xc
+    Ref<WeaponDef> def;
     char unknown_10[0x1a - 0x10];
     unsigned char active;            // +0x1a
     char unknown_1b;
@@ -1788,7 +1788,7 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
 
 struct Aim_0049d880 {
     char unknown_0[0xc];
-    WeaponDef* type;                   // +0xc
+    Ref<WeaponDef> type;
     char unknown_10[0x16 - 0x10];
     short fireHeading;                 // +0x16
     short firePitch;                   // +0x18
@@ -1843,7 +1843,7 @@ int __stdcall CalcAimAngles(Unit* unit, Unit* target, short* out_heading, short*
 #pragma pack(push, 1)
 struct Aim_0049d9c0 {
     char unknown_0[0xc];
-    WeaponDef* type;                  // +0xc
+    Ref<WeaponDef> type;
     char unknown_10[0x16 - 0x10];
     short fireHeading;                // +0x16
     short firePitch;                  // +0x18
@@ -1902,7 +1902,7 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, Aim_0049d9c0* aim,
 struct Shot_0049db70 {
     char unknown_0[8];
     int piece;
-    WeaponDef* def;
+    Ref<WeaponDef> def;
     char unknown_10[6];
     short heading;
     short pitch;
@@ -1985,7 +1985,7 @@ int __stdcall FireVLaunchWeapon(Object_0049db70* source, Shot_0049db70* shot,
 #pragma pack(push, 1)
 struct Aim_0049dd60 {
     char unknown_0[0xc];
-    WeaponDef* type;
+    Ref<WeaponDef> type;
     char unknown_10[0x16 - 0x10];
     short fireHeading;
     short firePitch;

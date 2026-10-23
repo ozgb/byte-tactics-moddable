@@ -139,7 +139,7 @@ public:
     short altitude;                    // +0xc
     short heading;                     // +0xe
     short piece;                       // +0x10
-    Unit* unit;
+    Ref<Unit> unit;
     PathOrderAttach ref;               // +0x16
     union {
         Vec3 pos;

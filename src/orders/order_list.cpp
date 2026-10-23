@@ -135,7 +135,7 @@ struct TargetData_0043d6d0 {
 };
 
 struct Path_0043d6d0 {
-    TargetData_0043d6d0* motion;       // +0x0
+    Ref<TargetData_0043d6d0> motion;
 };
 
 class MovementClass;

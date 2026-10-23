@@ -761,7 +761,7 @@ int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell)
         return 0;
     if (cell->unit != 0) {
         // A reference, not a pointer: gives the original's two-step unit load.
-        Unit*& unit = (*(Unit **)&g_game->units[cell->unit].motion);
+        Ref<Unit>& unit = (*(Ref<Unit>*)&g_game->units[cell->unit].motion);
         if (!unit || ((unsigned int)unit->lastTick) < obj->lastTick)
             return 0;
     }
@@ -828,7 +828,7 @@ int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, 
                 return 0;
             if (cell->unit != 0) {
                 // A reference, not a pointer: gives the original's two-step load.
-                Unit*& unit = (*(Unit **)&g_game->units[cell->unit].motion);
+                Ref<Unit>& unit = (*(Ref<Unit>*)&g_game->units[cell->unit].motion);
                 if (!unit || ((unsigned int)unit->lastTick) < obj->lastTick)
                     return 0;
             }

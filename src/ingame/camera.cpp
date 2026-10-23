@@ -1,5 +1,7 @@
 // Decompiled by DeepSeek V4.1 Flash, deepseek-v4.1-flash, Opus, Sonnet and Haiku. Names are provisional.
 
+#include "../../interfaces/ref.h"
+
 #pragma pack(push, 1)
 struct Rect_0041d0f0 {
     int x;                             // +0x0
@@ -17,7 +19,7 @@ struct Entry_0041d1f0 {
 class Class_0041d1f0_net {
 public:
     char unknown_0[0xdb4];
-    Entry_0041d1f0* entries;           // +0xdb4
+    Ref<Entry_0041d1f0> entries;
     int entry_count;                   // +0xdb8
 };
 

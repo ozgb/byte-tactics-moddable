@@ -387,7 +387,7 @@ void __stdcall AllocateUnitMemory(void)
     unsigned short n;
     for (n = 0; n < g_game->poolCount; n++) {
         *(unsigned short*)(pool + n * 0x118 + 0xa8) = n;
-        *(UnitType**)(pool + n * 0x118 + 0x92) = (UnitType *)g_game->defs;
+        *(Ref<UnitDef>*)(pool + n * 0x118 + 0x92) = g_game->defs;
     }
 
     Player* v[10];

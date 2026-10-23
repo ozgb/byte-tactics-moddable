@@ -33,6 +33,7 @@ struct Pos {
 };
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 static inline int Vec3Length(const Vec3* v)
 {
@@ -77,7 +78,7 @@ struct UnitType {
     unsigned short attackLength;      // +0x216
     unsigned short kamikazeDistance;  // +0x218
     char unknown_21a[0x220 - 0x21a];
-    Weapon* weapon_220;               // +0x220
+    Ref<Weapon> weapon_220;
     char unknown_224[0x241 - 0x224];
     unsigned int flags;               // +0x241
     char unknown_245[0x249 - 0x245];

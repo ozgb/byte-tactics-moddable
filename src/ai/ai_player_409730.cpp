@@ -35,9 +35,9 @@ int __stdcall RateWeapons_409730(UnitDef* p)
     int result = 1;
     if (p->c04)
         result = 0xb;
-    Weapon_00409730** pp = (Weapon_00409730**)p->weapons;
+    Ref<Weapon_00409730>* pp = (Ref<Weapon_00409730>*)p->weapons;
     for (int i = 3; i != 0; i--) {
-        Weapon_00409730* s = *pp;
+        Weapon_00409730* s = pp->get();
         if (s->index != 0)
             result = result + s->damage / 40 + s->range / 100 + 5;
         pp++;

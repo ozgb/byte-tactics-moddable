@@ -1759,6 +1759,8 @@ static void VisitMoveClasses()
 
 static unsigned s_passRow[PASSMAP_ROW_LIMIT];
 
+static unsigned ReadRefAt(unsigned p, unsigned offset);
+
 static void VisitPassMaps()
 {
     unsigned char* classes = MoveClasses();

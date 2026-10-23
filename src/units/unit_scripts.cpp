@@ -179,7 +179,7 @@ struct Geom_0043e0b0 {
 struct Piece_0043e0b0 {
     Geom_0043e0b0* geom;               // +0x00
     char pad4[0x22 - 4];
-    Vec3* verts;                       // +0x22
+    Ref<Vec3> verts;
 };
 
 struct Obj_0043e0b0 {

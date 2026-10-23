@@ -853,7 +853,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
                         QueueBuildOrder(text, unit, -1);
                 }
                 if (unit->immobile
-                    || (((UnitType*)unit->weapons[0].weapon)->field_111 & 0x10000000))
+                    || (((UnitType*)unit->weapons[0].weapon.get())->field_111 & 0x10000000))
                     RefreshBuildCountTexts(menu, unit);
                 MarkChanged(&g_game->gui);
             }

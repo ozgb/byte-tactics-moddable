@@ -12,6 +12,7 @@ struct UnitMotion;
 struct Mover;
 struct Limits_0043e490;
 struct Order;
+struct WeaponDef;
 struct UnitDef;
 struct Player;
 struct Class_0047cb00;
@@ -24,10 +25,10 @@ struct Unit {
     Ref<UnitMotion> motion;
     union {
         struct {
-            TdfRecord* current;
+            int current;
             int field_8;
-            UnitMotion* type;
-            Mover* weapon;
+            int type;
+            Ref<WeaponDef> weapon;
             char unknown_14[2];
             short field_16;
             short field_18;
@@ -40,12 +41,12 @@ struct Unit {
             char unknown_24[2];
             int lastTick;
             char unknown_2a[2];
-            Mover* f2c;
+            Ref<WeaponDef> f2c;
             char unknown_30[10];
             unsigned char b3a;
             unsigned char f_3b;
             char unknown_3c[12];
-            Limits_0043e490* f48;
+            Ref<WeaponDef> f48;
             char unknown_4c[10];
             unsigned char b56;
             unsigned char f_57;

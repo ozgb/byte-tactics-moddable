@@ -277,7 +277,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     for (int j = 0; j < 3; j++) {
         *(int*)&unit->weapons[j] = rec.pieces[j].f0;
         unit->weapons[j].aimCob.nAimCobDone = rec.pieces[j].f4;
-        ((unsigned char*)unit->weapons[j].weapon)[0x10a] = rec.pieces[j].f8b;
+        ((unsigned char*)unit->weapons[j].weapon.get())[0x10a] = rec.pieces[j].f8b;
         unit->weapons[j].muzzleAimFromDeltaZ = rec.pieces[j].fc;
         unit->weapons[j].reloadTimer = rec.pieces[j].f10;
         unit->weapons[j].fireHeading = rec.pieces[j].f12;
@@ -394,7 +394,7 @@ void __stdcall SaveUnits(HapiBank* file)
             for (int k = 0; k < 3; k++) {
                 rec.pieces[k].f0 = *(int*)&unit->weapons[k];
                 rec.pieces[k].f4 = unit->weapons[k].aimCob.nAimCobDone;
-                rec.pieces[k].f8 = ((Obj*)unit->weapons[k].weapon)->f10a;
+                rec.pieces[k].f8 = ((Obj*)unit->weapons[k].weapon.get())->f10a;
                 rec.pieces[k].fc = unit->weapons[k].muzzleAimFromDeltaZ;
                 rec.pieces[k].f10 = unit->weapons[k].reloadTimer;
                 rec.pieces[k].f12 = unit->weapons[k].fireHeading;

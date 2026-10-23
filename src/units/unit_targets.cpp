@@ -626,14 +626,14 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
         return 0;
     }
     g_seams.units->GetSweetSpot(def, (Vec3*)pos);
-    if ((e->flags & 2) && !(((Target_0048a1e0*)e->weapon)->field_111 & 0x2000000) && def->motion != 0
-        && unit->killCount > 5 && ((Target_0048a1e0*)e->weapon)->radius != 0) {
+    if ((e->flags & 2) && !(((Target_0048a1e0*)e->weapon.get())->field_111 & 0x2000000) && def->motion != 0
+        && unit->killCount > 5 && ((Target_0048a1e0*)e->weapon.get())->radius != 0) {
         Vec3_0048a1e0 d;
         d.x = unit->pos.x - pos->x;
         d.y = unit->pos.y - pos->y;
         d.z = unit->pos.z - pos->z;
         int dist = (int)sqrt((double)d.x * d.x + (double)d.y * d.y + (double)d.z * d.z);
-        int scale = (int)(((__int64)dist << 16) / ((Target_0048a1e0*)e->weapon)->radius);
+        int scale = (int)(((__int64)dist << 16) / ((Target_0048a1e0*)e->weapon.get())->radius);
         scale = (int)((scale * (__int64)0xcccc) >> 16);
         __int64 s = scale;
         d = offset_0048a1e0((Body_0048a1e0*)def->motion.get(), s);

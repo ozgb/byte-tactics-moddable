@@ -632,6 +632,7 @@ void HarnessStartSkirmish()
         return;
     s_started = 1;
     SetUpSkirmish();
+    *(int*)((char*)g_game + 0x579) = -1;
 }
 
 void HarnessAfterStep()

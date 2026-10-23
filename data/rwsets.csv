@@ -11061,9 +11061,12 @@ address,function,file,kind,target
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,call,get
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,call,operator OrderFx *
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,call,operator!=
+0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,call,operator->
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,deref_read,*void
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,field_read,Order::attached
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,field_read,Order::unit
+0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,field_read,Owner_0043a1f0::slot
+0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,field_read,Unit::motion
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,function,
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,indirect_call,"indirect via void (*)(void *, int) __attribute__((thiscall))"
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,call,OrderFx::~OrderFx

@@ -4160,7 +4160,7 @@ units,orders,shared_write,Unit::killCount,2
 units,orders,shared_write,Unit::lastAttackerSlot,2
 units,orders,shared_write,Unit::lastDamageType,2
 units,orders,shared_write,Unit::mode,4
-units,orders,shared_write,Unit::motion,53
+units,orders,shared_write,Unit::motion,54
 units,orders,shared_write,Unit::moveOrder,3
 units,orders,shared_write,Unit::moved,4
 units,orders,shared_write,Unit::netDirtyFlags,1

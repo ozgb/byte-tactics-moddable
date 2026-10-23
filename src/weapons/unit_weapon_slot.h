@@ -15,7 +15,7 @@ struct UnitWeaponSlot {
     short aimTargetXOrUnitId;          // +0x0
     short aimTargetZOrUnitSentinel;    // +0x2
     WeaponAimCobCb aimCob;             // +0x4
-    Ref<WeaponDef> weapon;             // +0xc
+    Ref<WeaponDef> weapon;
     int muzzleAimFromDeltaZ;           // +0x10
     unsigned short reloadTimer;        // +0x14
     short fireHeading;                 // +0x16

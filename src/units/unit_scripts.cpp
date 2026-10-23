@@ -426,9 +426,9 @@ struct Limits_0043e490 {
 struct Unit_0043e490 {
     int motion; // +0x0
     char unknown_4[0x10 - 0x4];
-    Ref<Node_0043e490> f10; // +0x10
+    Ref<Node_0043e490> f10;
     char unknown_14[0x48 - 0x14];
-    Ref<Limits_0043e490> f48; // +0x48
+    Ref<Limits_0043e490> f48;
     char unknown_4c[0x6a - 0x4c];
     char f6a[0x86 - 0x6a]; // +0x6a
     Ref<Unit_0043e490> carrier;

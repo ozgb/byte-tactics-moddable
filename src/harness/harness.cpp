@@ -1766,7 +1766,7 @@ static void VisitPassMaps()
     HashByte(19);
     for (unsigned c = 0; c < MOVECLASS_COUNT; c++) {
         unsigned char* e = classes + c * MOVECLASS_STRIDE;
-        const unsigned* cells = *(const unsigned**)(e + 0x18);
+        const unsigned* cells = (const unsigned*)ReadRefAt((unsigned)e, 0x18);
         unsigned width = *(unsigned*)(e + 0x10);
         unsigned height = *(unsigned*)(e + 0x14);
         unsigned full = height >> 4;
@@ -1793,6 +1793,12 @@ enum GoalClass { GOAL_UNKNOWN, GOAL_PATROL, GOAL_AISEARCH, GOAL_PACKED, GOAL_LIT
 static unsigned ReadU32At(unsigned p, unsigned offset)
 {
     return *(const unsigned*)(p + offset);
+}
+
+static unsigned ReadRefAt(unsigned p, unsigned offset)
+{
+    unsigned value = ReadU32At(p, offset);
+    return value == 0 ? 0 : (unsigned)SimBlockBase() + value;
 }
 
 static int FxClassOf(unsigned fx)
@@ -1871,16 +1877,16 @@ static void NumberUnitHeap(unsigned char* units, unsigned count)
         if (!UnitIsLive(u))
             continue;
         for (unsigned which = 0; which < 2; which++) {
-            unsigned order = ReadU32At((unsigned)u, which == 0 ? UNIT_LIST : UNIT_LIST2);
+            unsigned order = ReadRefAt((unsigned)u, which == 0 ? UNIT_LIST : UNIT_LIST2);
             for (unsigned guard = 0; order != 0 && guard < ORDER_CHAIN_LIMIT; guard++) {
                 RegisterOrder(order);
-                RegisterFx(ReadU32At(order, ORDER_ATTACHED));
-                order = ReadU32At(order, ORDER_NEXT);
+                RegisterFx(ReadRefAt(order, ORDER_ATTACHED));
+                order = ReadRefAt(order, ORDER_NEXT);
             }
         }
-        unsigned motion = ReadU32At((unsigned)u, UNIT_MOTION);
-        if (motion != 0 && ReadU32At(motion, 0) != 0)
-            RegisterFx(ReadU32At(ReadU32At(motion, 0), GOAL_TARGET));
+        unsigned motion = ReadRefAt((unsigned)u, UNIT_MOTION);
+        if (motion != 0 && ReadRefAt(motion, 0) != 0)
+            RegisterFx(ReadU32At(ReadRefAt(motion, 0), GOAL_TARGET));
     }
 }
 
@@ -1906,7 +1912,7 @@ static int OrderPosYUnset(unsigned order)
 
 static int FxPosYUnset(unsigned fx)
 {
-    unsigned order = ReadU32At(fx, FX_SOURCE);
+    unsigned order = ReadRefAt(fx, FX_SOURCE);
     const char* name = order != 0 ? OrderKindName(order) : NULL;
     return name != NULL && (strcmp(name, "VTOL_MobileBuild") == 0 || strcmp(name, "VTOL_Reclaim") == 0);
 }
@@ -1922,9 +1928,9 @@ static void VisitOrders(unsigned char* units, unsigned count)
         HashU32(i);
         if (s_dumpNow)
             sprintf(path, "units[%u].head", i);
-        VisitPointer(path, ReadU32At((unsigned)u, UNIT_HEAD), TT_LINK);
+        VisitPointer(path, ReadRefAt((unsigned)u, UNIT_HEAD), TT_LINK);
         for (unsigned which = 0; which < 2; which++) {
-            unsigned order = ReadU32At((unsigned)u, which == 0 ? UNIT_LIST : UNIT_LIST2);
+            unsigned order = ReadRefAt((unsigned)u, which == 0 ? UNIT_LIST : UNIT_LIST2);
             HashByte((unsigned char)(which + 1));
             for (unsigned n = 0; order != 0 && n < ORDER_CHAIN_LIMIT; n++) {
                 if (s_dumpNow)
@@ -1932,7 +1938,7 @@ static void VisitOrders(unsigned char* units, unsigned count)
                 VisitElement(path, (const unsigned char*)order, &kOrderTable);
                 if (!OrderPosYUnset(order))
                     VisitElement(path, (const unsigned char*)order, &kOrderPosYTable);
-                order = ReadU32At(order, ORDER_NEXT);
+                order = ReadRefAt(order, ORDER_NEXT);
             }
             HashByte(0);
         }
@@ -1994,7 +2000,7 @@ static void VisitMotions(unsigned char* units, unsigned count)
         unsigned motion;
         if (!UnitIsLive(u))
             continue;
-        motion = ReadU32At((unsigned)u, UNIT_MOTION);
+        motion = ReadRefAt((unsigned)u, UNIT_MOTION);
         HashU32(i);
         HashByte(motion != 0);
         if (motion == 0)
@@ -2004,7 +2010,7 @@ static void VisitMotions(unsigned char* units, unsigned count)
         VisitElement(path, (const unsigned char*)motion, &kUnitMotionTable);
         if (s_dumpNow)
             strcat(path, ".goal");
-        VisitGoal(path, ReadU32At(motion, 0));
+        VisitGoal(path, ReadRefAt(motion, 0));
     }
     EndSection();
 }
@@ -2103,9 +2109,9 @@ static void VisitScript(unsigned i, const unsigned char* script)
 {
     char path[112];
     unsigned table = ReadU32At((unsigned)script, SCRIPT_TABLE);
-    unsigned statics = ReadU32At((unsigned)script, SCRIPT_STATICS);
-    unsigned pieces = ReadU32At((unsigned)script, SCRIPT_PIECES);
-    unsigned objectState = ReadU32At((unsigned)script, SCRIPT_OBJECT_STATE);
+    unsigned statics = ReadRefAt((unsigned)script, SCRIPT_STATICS);
+    unsigned pieces = ReadRefAt((unsigned)script, SCRIPT_PIECES);
+    unsigned objectState = ReadRefAt((unsigned)script, SCRIPT_OBJECT_STATE);
     unsigned staticCount = 0;
     unsigned pieceCount = 0;
     if (s_dumpNow)
@@ -2153,7 +2159,7 @@ static void VisitScripts(unsigned char* units, unsigned count)
         unsigned script;
         if (!UnitIsLive(u))
             continue;
-        script = ReadU32At((unsigned)u, UNIT_SCRIPT);
+        script = ReadRefAt((unsigned)u, UNIT_SCRIPT);
         HashU32(i);
         HashByte(script != 0);
         if (script != 0)
@@ -2474,8 +2480,8 @@ static void VisitUnitDefs()
     VisitU32("defs.count", count);
     for (unsigned i = 0; i < count; i++) {
         const unsigned char* d = defs + i * UNITDEF_STRIDE;
-        unsigned yardmap = ReadU32At((unsigned)d, DEF_YARDMAP);
-        unsigned ids = ReadU32At((unsigned)d, DEF_IDS);
+        unsigned yardmap = ReadRefAt((unsigned)d, DEF_YARDMAP);
+        unsigned ids = ReadRefAt((unsigned)d, DEF_IDS);
         unsigned idCount = ReadU32At((unsigned)d, DEF_ID_COUNT);
         unsigned yardSize = (unsigned)*(const short*)(d + DEF_FOOTPRINT_X) * (unsigned)*(const short*)(d + DEF_FOOTPRINT_Z);
         sprintf(path, "defs[%u]", i);
@@ -2508,11 +2514,11 @@ static void VisitMission()
     HashByte(31);
     HashByte(mission != 0);
     if (mission != 0) {
-        unsigned units = ReadU32At(mission, MISSION_UNITS);
+        unsigned units = ReadRefAt(mission, MISSION_UNITS);
         unsigned unitCount = ReadU32At(mission, MISSION_UNIT_COUNT);
-        unsigned rules = ReadU32At(mission, MISSION_RULES);
+        unsigned rules = ReadRefAt(mission, MISSION_RULES);
         unsigned ruleCount = ReadU32At(mission, MISSION_RULE_COUNT);
-        unsigned features = ReadU32At(mission, MISSION_FEATURES);
+        unsigned features = ReadRefAt(mission, MISSION_FEATURES);
         unsigned featureCount = ReadU32At(mission, MISSION_FEATURE_COUNT);
         VisitElement("mission", (const unsigned char*)mission, &kMissionDataTable);
         if (ReadU32At(mission, MISSION_TYPE) == MISSION_TYPE_CAMPAIGN)
@@ -2622,7 +2628,7 @@ static int FindDefIndex(const ScriptedOrder* o, const char* name)
 
 static int UnitIsSlot(const unsigned char* u, int slot)
 {
-    return *(unsigned*)(u + UNIT_PLAYER) == (unsigned)(GameAt(GAME_PLAYERS) + slot * PLAYER_STRIDE);
+    return ReadRefAt((unsigned)u, UNIT_PLAYER) == (unsigned)(GameAt(GAME_PLAYERS) + slot * PLAYER_STRIDE);
 }
 
 static int SelectorMatches(const unsigned char* u, const UnitSelector* sel, int defIndex)
@@ -2777,7 +2783,7 @@ static void ReachQuirkGuard()
         unsigned char* u = PoolUnit(i);
         if (*(unsigned short*)(u + UNIT_TYPE) == 0 || !UnitIsSlot(u, 0))
             continue;
-        void* script = (void*)ReadU32At((unsigned)u, UNIT_SCRIPT);
+        void* script = (void*)ReadRefAt((unsigned)u, UNIT_SCRIPT);
         if (script == NULL)
             Fail("quirks_reach: the unit has no script\n");
         void (__thiscall* setUnitValue)(void*, int, int) = (void (__thiscall*)(void*, int, int))(*(void***)script)[SCRIPT_SET_UNIT_VALUE_SLOT];

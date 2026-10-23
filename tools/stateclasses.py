@@ -230,6 +230,7 @@ PLATFORM_ALLOCATORS = {"VirtualAlloc"}
 SIM_ALLOCATORS = {"SimAlloc": "operator new", "SimAllocTagged": "GameAllocIgnoreTag", "SimRealloc": "realloc"}
 ALLOCATORS = (set(hazards.ALLOCATORS) | {"calloc", "GameAllocIgnoreTag", "GameAllocShared", "GameAllocThunk",
                                          "VirtualAlloc"} | set(SIM_ALLOCATORS))
+TEMPORARIES = ("MaterializeTemporaryExpr", "CXXBindTemporaryExpr")
 PRIMITIVES = {"void", "char", "unsigned char", "signed char", "short", "unsigned short", "int", "unsigned int",
               "long", "unsigned long", "float", "double", "?"}
 LAYOUT_FLAG = ["-Xclang", "-fdump-record-layouts-complete"]
@@ -443,15 +444,26 @@ def context_type(node: dict, parents: list[dict]) -> str | None:
     return None
 
 
+def is_assignment(node: dict, child: dict) -> bool:
+    """Whether the node assigns the child to its left operand: a built-in `=` or a call of `operator=`."""
+    inner = node.get("inner", ())
+    if node["kind"] == "BinaryOperator":
+        return node["opcode"] == "=" and inner[1] is child
+    if node["kind"] == "CXXOperatorCallExpr" and len(inner) == 3 and inner[2] is child:
+        callee = peel(inner[0])
+        return callee["kind"] == "DeclRefExpr" and callee.get("referencedDecl", {}).get("name") == "operator="
+    return False
+
+
 def stored_target(node: dict, parents: list[dict], locals_: dict[str, str]) -> str:
     """The rwsets target (`Type::field`, a global's name or a static) an allocation is assigned to, else empty."""
     child = node
     for parent in reversed(parents):
         kind = parent["kind"]
-        if kind in hazards.WRAPPING:
+        if kind in hazards.WRAPPING or kind in TEMPORARIES or (kind == "CXXConstructExpr" and len(parent["inner"]) == 1):
             child = parent
-        elif kind == "BinaryOperator" and parent["opcode"] == "=" and parent["inner"][1] is child:
-            target = peel(parent["inner"][0])
+        elif is_assignment(parent, child):
+            target = peel(parent["inner"][1 if kind == "CXXOperatorCallExpr" else 0])
             if target["kind"] == "MemberExpr":
                 return "%s::%s" % (record_name(peel(target["inner"][0])["type"]), target.get("name") or "<anon>")
             if target["kind"] == "DeclRefExpr" and target["referencedDecl"]["kind"] == "VarDecl":

@@ -15,10 +15,7 @@
 // file if it cannot be opened for appending.
 struct FileHandle;
 
-FileHandle* __stdcall HAPI_OpenFileAppend(char* path);
-FileHandle* __stdcall HAPI_CreateFile(char* path);
-unsigned int __stdcall HAPI_WriteFile(FileHandle* file, void* data, unsigned int size);
-int __stdcall HAPI_CloseFile(FileHandle* file);
+#include "../files/files_api.h"
 
 // FUNCTION: 0x49e640
 void __stdcall AppendToDebugFile(char* text)

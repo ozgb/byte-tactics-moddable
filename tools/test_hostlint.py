@@ -125,6 +125,29 @@ class HostLintTest(unittest.TestCase):
                 self.exceptions(f"src/units/unit.cpp,{header},#29")
                 self.assertEqual(self.lint(), [])
 
+    def test_files_service_may_include_host_h_but_not_host_internals(self):
+        self.write("interfaces/host.h", "int h;\n")
+        self.write("src/host/foo.h", "int f;\n")
+        self.write("src/sound/sound.h", "int snd;\n")
+        self.write("src/files/x.cpp", '#include "../../interfaces/host.h"\n')
+        self.logic("src/files/x.cpp")
+        self.assertEqual(self.lint(), [])
+        for include, header in [('"../host/foo.h"', "src/host/foo.h"), ('"../sound/sound.h"', "src/sound/sound.h")]:
+            with self.subTest(include=include):
+                self.write("src/files/x.cpp", f"#include {include}\n")
+                found = self.lint()
+                self.assertEqual(len(found), 1)
+                self.assertIn(header, found[0])
+
+    def test_exceptions_row_for_a_files_file_is_stale(self):
+        self.write("interfaces/host.h", "int h;\n")
+        self.write("src/files/x.cpp", '#include "../../interfaces/host.h"\n')
+        self.logic("src/files/x.cpp")
+        self.exceptions("src/files/x.cpp,interfaces/host.h,#29")
+        found = self.lint()
+        self.assertEqual(len(found), 1)
+        self.assertIn("stale row", found[0])
+
     def test_other_files_may_include_presentation_headers(self):
         self.boundary_tree('"../sound/sound.h"')
         self.logic("src/units/other.cpp")

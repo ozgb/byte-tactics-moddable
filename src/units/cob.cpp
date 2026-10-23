@@ -46,7 +46,7 @@ struct SavedPiece {
     int shaded;
 };
 
-#include "../util/hapi_bank.h"
+#include "../files/files_api.h"
 
 extern int GetTickRate();
 void __cdecl GameFreeThunk(void* p);

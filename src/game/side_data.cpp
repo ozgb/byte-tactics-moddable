@@ -22,7 +22,7 @@ void* __stdcall FindGafEntry(void* gaf, const char* name);
 void __stdcall FatalError(char* message);
 void __cdecl GameFreeThunk(int* p);
 void __stdcall ReadSideRect(TdfFile* obj, int* out, char* name, char* side);
-void* __stdcall HAPI_LoadFile(char* path, int flags);
+#include "../files/files_api.h"
 
 // FUNCTION: 0x4318c0
 void LoadLogos()

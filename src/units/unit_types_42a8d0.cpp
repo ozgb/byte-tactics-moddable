@@ -37,7 +37,7 @@ struct Elem_00432be0 {
 
 typedef std::vector<Elem_00432be0> FileList;
 
-void __stdcall ListDirectory(const char* pattern, int dirs, FileList* out);
+#include "../files/files_api.h"
 
 // Unused here: the symbol ids these declarations take keep the allocation,
 // standing in for the three TdfRecord views merged into the class below
@@ -48,16 +48,6 @@ void SetCameraPosition(int, int, int);
 void StartScreenShake(int, int, int);
 void AccumulateScreenShake(int, int, int);
 int RegisterUnitOrders();
-
-// The override file (units\NAME.OVR).
-class HapiBank {
-public:
-    HapiBank* InitBank();
-    void CloseBank();
-    int OpenBank(char* path, char* type, int flag);
-    int OpenAccount(char* name);
-    int GetIntegerItem(char* name, int def);
-};
 
 // The override file object: 0x4b3620 builds it and 0x4b3630 frees it.
 class OvrFile : public HapiBank {
@@ -101,11 +91,6 @@ void* __cdecl GameAllocIgnoreTag(char* name, int size);
 void __cdecl GameFreeThunk(void* p);
 void __cdecl ProtectBlockReadOnly(void* p);
 void __cdecl ProtectBlockReadWrite(void* p);
-void* __stdcall HAPI_OpenFileRead(char* path);
-int __stdcall HAPI_CloseFile(void* file);
-int __stdcall HAPI_IsInArchive(void* file);
-int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
-int __stdcall HAPI_FileLength(void* file);
 unsigned int __stdcall ComputeChecksum(char* data, int len);
 void __stdcall ShowErrorBox(const char* text, const char* caption);
 char* __stdcall Translate(char* text);
@@ -118,7 +103,7 @@ void __stdcall GetLocalizedString(void* parser, char* dst, char* key, int size, 
 static inline void LoadWeaponTDFs()
 {
     FileList files;
-    ListDirectory("Weapons\\*.tdf", 0, &files);
+    ListDirectory("Weapons\\*.tdf", 0, (std::vector<StringRef>*)&files);
     if (files.size() == 0)
         return;
     s_weaponTdfAllocCount = files.size();
@@ -165,7 +150,7 @@ int LoadUnitInfo()
 
     BuildDataPath(path, "units", "*", "FBI");
     FileList files;
-    ListDirectory(path, 0, &files);
+    ListDirectory(path, 0, (std::vector<StringRef>*)&files);
     int count = files.size() + 1;
     g_game->unitDefCount = count;
     int size = count * sizeof(UnitDef);
@@ -179,7 +164,7 @@ int LoadUnitInfo()
         UnitDef* u = &g_game->defs[i];
         u->id = i;
         BuildDataPath(path, "units", files[i - 1], "FBI");
-        void* f = HAPI_OpenFileRead(path);
+        FileHandle* f = HAPI_OpenFileRead(path);
         if (f) {
             int len = HAPI_FileLength(f);
             char* buf = (char*)GameAllocIgnoreTag(path, len);

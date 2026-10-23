@@ -26,7 +26,7 @@ int PeekKey();
 void PopKey();
 void ToggleFullScreen();
 void __stdcall PopUntilNamedLayout(int);
-void __stdcall MakeDirectoryPath(char*);
+#include "../files/files_api.h"
 int __stdcall GetTicks();
 void __stdcall PeekMouseEvent(Input_00499890*);
 void __stdcall UpdateMenu(void*);

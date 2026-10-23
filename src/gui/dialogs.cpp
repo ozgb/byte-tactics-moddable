@@ -119,7 +119,7 @@ extern int* g_guiContext;
 extern void __stdcall FadeRectangle(void* surface, int* rect, int mode);
 extern char* __stdcall StripPath(char* path);
 extern char* __stdcall ChangeExtension(char* out, char* in, char* ext);
-extern int __stdcall HAPI_FileLengthByName(char* path);
+#include "../files/files_api.h"
 extern void* __cdecl GameAllocIgnoreTag(const char* path, unsigned int size);
 extern int __stdcall ReadGuiFile(void* entry, char* path);
 extern void __cdecl GameFreeThunk(void* p);
@@ -915,7 +915,6 @@ int __stdcall FillRectangle(void* surface, Rect_004b6720* rect, int color);
 int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 
 struct FileHandle;
-unsigned int __stdcall HAPI_WriteFile(FileHandle* file, void* data, unsigned int size);
 
 void __stdcall YesNoDialogHandler(Gui* menu);
 void __stdcall MessageBoxHandler(Gui* menu);

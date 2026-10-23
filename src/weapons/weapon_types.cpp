@@ -58,7 +58,7 @@ void* __stdcall LoadAnimGaf(char* name);
 void* __stdcall FindGafEntry(void* a, char* b);
 int __stdcall LoadSoundByName(void* a, char* b);
 
-void __stdcall ListDirectory(const char* pattern, int flags, std::vector<StringRef>* out);
+#include "../files/files_api.h"
 void __stdcall LoadWeaponType(TdfRecord* section);
 int FUN_0041d8a0(void);
 extern void __cdecl operator delete(void*);

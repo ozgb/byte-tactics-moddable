@@ -42,10 +42,7 @@ struct Pos_004cf570 {
     int x, y, z;
 };
 
-int __stdcall HAPI_CloseFile(FileHandle* file);
-long __stdcall HAPI_TellFile(FileHandle* file);
-long __stdcall HAPI_FileLength(FileHandle* file);
-int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
+#include "../files/files_api.h"
 
 void __stdcall OnStreamTimer(int unused1);
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
@@ -53,8 +50,6 @@ int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 extern int g_delayedSampleVolume;
 extern char g_delayedSampleName[];
 
-int __stdcall HAPI_SeekFile(void* file, int pos);
-int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
 
 // The sound system: the CD audio player, the DirectSound sample channels and
 // the streamed sample, at g_game+0x10.

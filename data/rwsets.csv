@@ -45783,7 +45783,9 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_tracePhase@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_traceTick@src/harness/harness.cpp
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,SetUpSkirmish
+,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Gui::hotGadgetIndex
 ,HarnessStartSkirmish,src/harness/harness.cpp,function,
+,HarnessStartSkirmish,src/harness/harness.cpp,global_read,g_game
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_read,s_started@src/harness/harness.cpp
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_write,s_started@src/harness/harness.cpp

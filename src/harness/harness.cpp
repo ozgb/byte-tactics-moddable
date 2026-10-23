@@ -746,6 +746,7 @@ void HarnessStartSkirmish()
         return;
     s_started = 1;
     SetUpSkirmish();
+    g_game->gui.hotGadgetIndex = -1;
 }
 
 void HarnessAfterStep()

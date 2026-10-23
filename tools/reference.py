@@ -195,8 +195,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     With `want` (the stored header and digests), a run that differs is kept: the last element is the
     directory holding its trace.txt, otherwise None. With `keep_always` the run is kept whatever it did.
 
-    A run whose exe crashes (a nonzero exit) is tried once more, since an exe fault at startup
-    was seen in 1 of 300 runs, and so is one that stopped on the DirectX initialisation dialog before
+    A run whose exe crashes (a nonzero exit) is tried once more, since the reference exe has faulted
+    at startup in FlipScreen with a NULL primary surface (2 in about 1150 runs, cause not found, #120),
+    and so is one that stopped on the DirectX initialisation dialog before
     tick 1 (startup under load). A run that is still going at the timeout is a hang, and a run that
     stopped on any other error dialog (R6025 and the like) is a game fault: both fail at once.
 

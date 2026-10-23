@@ -411,6 +411,7 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,UpdateBuildMenuIfFocusUnit
+0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,operator WeaponDef *
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_maybe_written,Unit::resourceSlot
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,EconomySeam::RequestEnergyAndMetal
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,Order::count
@@ -1334,6 +1335,7 @@ address,function,file,kind,target
 0x406300,FollowGroundOrder,src/orders/unit_orders_406300.cpp,call,get
 0x406300,FollowGroundOrder,src/orders/unit_orders_406300.cpp,call,operator Order *
 0x406300,FollowGroundOrder,src/orders/unit_orders_406300.cpp,call,operator Unit *
+0x406300,FollowGroundOrder,src/orders/unit_orders_406300.cpp,call,operator WeaponDef *
 0x406300,FollowGroundOrder,src/orders/unit_orders_406300.cpp,call,operator bool
 0x406300,FollowGroundOrder,src/orders/unit_orders_406300.cpp,call,operator new
 0x406300,FollowGroundOrder,src/orders/unit_orders_406300.cpp,call,operator+
@@ -1902,6 +1904,7 @@ address,function,file,kind,target
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,field_read,UnitDef::minwaterdepth
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,field_write,Unit::flags
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,function,
+0x408920,RetargetWeapon,src/ai/ai_player.cpp,call,operator->
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,<anon>::interceptor
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,Seams::targeting
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,Seams::weapons
@@ -3130,6 +3133,7 @@ address,function,file,kind,target
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders_40fbe0.cpp,call,UnitMotion::SetFlightMode
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders_40fbe0.cpp,call,get
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders_40fbe0.cpp,call,operator Unit *
+0x40fbe0,VtolFollowOrder,src/orders/vtol_orders_40fbe0.cpp,call,operator WeaponDef *
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders_40fbe0.cpp,call,operator bool
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders_40fbe0.cpp,call,operator new
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders_40fbe0.cpp,call,operator!=
@@ -3223,6 +3227,7 @@ address,function,file,kind,target
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,empty
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,get
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator Unit *
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator WeaponDef *
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator bool
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator new
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator->
@@ -3489,6 +3494,7 @@ address,function,file,kind,target
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders_4118e0.cpp,call,RandomInt
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders_4118e0.cpp,call,get
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders_4118e0.cpp,call,operator Unit *
+0x4118e0,VtolLandingOrder,src/orders/vtol_orders_4118e0.cpp,call,operator WeaponDef *
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders_4118e0.cpp,call,operator bool
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders_4118e0.cpp,call,operator new
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders_4118e0.cpp,call,operator->
@@ -3766,6 +3772,7 @@ address,function,file,kind,target
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,get
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator Player *
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator Unit *
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator WeaponDef *
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator new
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator->
@@ -3832,6 +3839,7 @@ address,function,file,kind,target
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,PosPlus
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,operator WeaponDef *
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,operator new
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,operator->
@@ -5405,6 +5413,7 @@ address,function,file,kind,target
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,call,PlaySoundByName
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,call,QueueBuildOrder
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,call,RefreshBuildCountTexts
+0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,call,get
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,call,strstr
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,deref_escape,*Unit
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,field_maybe_written,Game::gui
@@ -11347,6 +11356,7 @@ address,function,file,kind,target
 0x439cf0,GetOrderTargetIfFlagged,src/orders/order_list.cpp,field_read,Unit::list
 0x439cf0,GetOrderTargetIfFlagged,src/orders/order_list.cpp,function,
 0x439d20,GetBuildWeaponPercent,src/orders/order_list.cpp,call,operator Order *
+0x439d20,GetBuildWeaponPercent,src/orders/order_list.cpp,call,operator->
 0x439d20,GetBuildWeaponPercent,src/orders/order_list.cpp,field_read,Order::flags_42
 0x439d20,GetBuildWeaponPercent,src/orders/order_list.cpp,field_read,Order::id
 0x439d20,GetBuildWeaponPercent,src/orders/order_list.cpp,field_read,Order::next
@@ -12332,6 +12342,8 @@ address,function,file,kind,target
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,Selectable
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,Visible
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,get
+0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator Limits_0043e490 *
+0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator Node_0043e490 *
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator UnitDef *
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator!=
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator->
@@ -12388,6 +12400,7 @@ address,function,file,kind,target
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,call,Pick
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,call,Visible
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,call,operator Def_0043f0e0 *
+0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,call,operator Node_0043f0e0 *
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,call,operator bool
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,call,operator!=
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,call,operator->
@@ -31861,6 +31874,7 @@ address,function,file,kind,target
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,function,
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,global_read,g_game
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,call,LineOfFire_0049aa80
+0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,call,operator->
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,deref_read,*Vec3_0049aa80
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,<anon>::ballistic
@@ -31879,6 +31893,7 @@ address,function,file,kind,target
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,global_read,g_game
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,Dist2_0049abb0
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,LineOfFire_0049abb0
+0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,operator->
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,deref_read,*Vec3_0049abb0
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,field_escape,Unit::pos
@@ -32084,6 +32099,7 @@ address,function,file,kind,target
 0x49b720,UpdateProjectiles,src/weapons/weapons_49b720.cpp,call,operator+=
 0x49b720,UpdateProjectiles,src/weapons/weapons_49b720.cpp,call,operator->
 0x49b720,UpdateProjectiles,src/weapons/weapons_49b720.cpp,call,operator=
+0x49b720,UpdateProjectiles,src/weapons/weapons_49b720.cpp,call,operator==
 0x49b720,UpdateProjectiles,src/weapons/weapons_49b720.cpp,deref_escape,*Projectile
 0x49b720,UpdateProjectiles,src/weapons/weapons_49b720.cpp,deref_read,*Projectile
 0x49b720,UpdateProjectiles,src/weapons/weapons_49b720.cpp,deref_read,*Vec3
@@ -32247,6 +32263,7 @@ address,function,file,kind,target
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,PlaySoundAt
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,QueryWeaponPiece
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,operator=
+0x49c740,InitProjectile,src/weapons/weapons.cpp,call,operator==
 0x49c740,InitProjectile,src/weapons/weapons.cpp,deref_read,*Unit
 0x49c740,InitProjectile,src/weapons/weapons.cpp,deref_read,*Vec3
 0x49c740,InitProjectile,src/weapons/weapons.cpp,field_escape,Game::value_142f3
@@ -32564,6 +32581,7 @@ address,function,file,kind,target
 0x49d580,FireTurretWeapon,src/weapons/weapons.cpp,call,GetWeaponPiecePosition
 0x49d580,FireTurretWeapon,src/weapons/weapons.cpp,call,RandomInt
 0x49d580,FireTurretWeapon,src/weapons/weapons.cpp,call,SolveLaunchAngle
+0x49d580,FireTurretWeapon,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x49d580,FireTurretWeapon,src/weapons/weapons.cpp,call,operator->
 0x49d580,FireTurretWeapon,src/weapons/weapons.cpp,call,operator=
 0x49d580,FireTurretWeapon,src/weapons/weapons.cpp,deref_read,*Vec3
@@ -32801,8 +32819,8 @@ address,function,file,kind,target
 0x49e010,SetWeaponFireHandler,src/weapons/weapons.cpp,function,
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,GetWeaponPiecePosition
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,get
-0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,operator->
+0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,operator=
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_escape,Unit::weapons
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,Frame_0049e070::i
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,Frame_0049e070::maxTime
@@ -45077,6 +45095,8 @@ address,function,file,kind,target
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,Selectable
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,Visible
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,get
+,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator Limits_0043e490 *
+,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator Node_0043e490 *
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator UnitDef *
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator!=
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator->
@@ -45181,9 +45201,11 @@ address,function,file,kind,target
 ,GetSlotDpid_00452cc0,src/network/net_game.cpp,field_read,Player::type
 ,GetSlotDpid_00452cc0,src/network/net_game.cpp,function,
 ,GetSlotDpid_00452cc0,src/network/net_game.cpp,global_read,g_game
+,GetSpeed,src/orders/vtol_orders.cpp,call,operator WeaponDef *
 ,GetSpeed,src/orders/vtol_orders.cpp,field_read,UnitWeaponSlot::weapon
 ,GetSpeed,src/orders/vtol_orders.cpp,field_read,WeaponDef::range
 ,GetSpeed,src/orders/vtol_orders.cpp,function,
+,GetSpeed,src/orders/vtol_orders_412710.cpp,call,operator WeaponDef *
 ,GetSpeed,src/orders/vtol_orders_412710.cpp,field_read,Unit::weapon
 ,GetSpeed,src/orders/vtol_orders_412710.cpp,field_read,WeaponDef::range
 ,GetSpeed,src/orders/vtol_orders_412710.cpp,function,
@@ -48266,6 +48288,7 @@ address,function,file,kind,target
 ,Patrol,src/orders/vtol_orders.cpp,call,UnitList::~UnitList
 ,Patrol,src/orders/vtol_orders.cpp,call,empty
 ,Patrol,src/orders/vtol_orders.cpp,call,operator Player *
+,Patrol,src/orders/vtol_orders.cpp,call,operator WeaponDef *
 ,Patrol,src/orders/vtol_orders.cpp,call,operator new
 ,Patrol,src/orders/vtol_orders.cpp,call,operator[]
 ,Patrol,src/orders/vtol_orders.cpp,call,size
@@ -48298,6 +48321,7 @@ address,function,file,kind,target
 ,Patrol,src/orders/vtol_orders_410850.cpp,call,UnitList::~UnitList
 ,Patrol,src/orders/vtol_orders_410850.cpp,call,empty
 ,Patrol,src/orders/vtol_orders_410850.cpp,call,get
+,Patrol,src/orders/vtol_orders_410850.cpp,call,operator WeaponDef *
 ,Patrol,src/orders/vtol_orders_410850.cpp,call,operator new
 ,Patrol,src/orders/vtol_orders_410850.cpp,call,operator+
 ,Patrol,src/orders/vtol_orders_410850.cpp,call,operator[]

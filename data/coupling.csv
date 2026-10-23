@@ -2509,7 +2509,7 @@ presentation,game,shared_write,g_game,115
 presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,Game::difficulty,1
 presentation,harness,shared_write,g_explodedPieces,1
-presentation,harness,shared_write,g_game,4
+presentation,harness,shared_write,g_game,5
 presentation,los_radar,call,BuildFogTiles,1
 presentation,los_radar,call,CalcRadarViewportRect,1
 presentation,los_radar,call,GetMapCell,1

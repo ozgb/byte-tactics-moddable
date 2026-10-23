@@ -44109,7 +44109,9 @@ address,function,file,kind,target
 ,HarnessPoseObject,src/harness/harness.cpp,deref_write,*short
 ,HarnessPoseObject,src/harness/harness.cpp,function,
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,SetUpSkirmish
+,HarnessStartSkirmish,src/harness/harness.cpp,deref_write,*int
 ,HarnessStartSkirmish,src/harness/harness.cpp,function,
+,HarnessStartSkirmish,src/harness/harness.cpp,global_read,g_game
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_read,s_started@src/harness/harness.cpp
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_write,s_started@src/harness/harness.cpp

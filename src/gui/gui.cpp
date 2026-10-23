@@ -59,6 +59,7 @@ extern Root_004a32a0* g_guiContext;
 
 #include "../graphics/rect.h"
 #include "../state/sim_globals.h"
+#include "../files/files_api.h"
 
 // Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
 void ShowFrontendErrorText(void);
@@ -4249,7 +4250,6 @@ done:
 
 // Unused here: real functions declared to keep the file's symbol count.
 void __stdcall DrawBattleFrame(int param_1, int param_2);
-#include "../files/files_api.h"
 void __stdcall InstallOutOfMemoryHandler();
 int GetDisplayFieldE4();
 

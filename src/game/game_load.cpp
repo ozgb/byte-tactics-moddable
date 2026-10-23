@@ -17,6 +17,7 @@
 #include <time.h>
 #include "../../interfaces/host.h"
 #include "../state/game_rand.h"
+#include "../files/files_api.h"
 
 #pragma pack(push, 1)
 
@@ -182,7 +183,6 @@ struct Options_00497180 {               // at g_game+0x29a0
 // One view of the game state. The ranges two views name differently sit in
 // anonymous unions, so each function keeps the names it matched with.
 class Sound;
-#include "../files/files_api.h"
 
 
 #pragma pack(pop)

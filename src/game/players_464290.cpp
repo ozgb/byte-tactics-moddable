@@ -9,6 +9,7 @@
 #include "../map/mission.h"
 #include "mission_conditions.h"
 #include "../game/unit_resources.h"
+#include "../files/files_api.h"
 
 struct Player;
 struct Unit;
@@ -19,7 +20,6 @@ class Pathfinder;
 #include "../ai/squad_manager.h"
 
 #include "../util/vec3.h"
-#include "../files/files_api.h"
 
 struct Map {
     char unknown_0[0x620];

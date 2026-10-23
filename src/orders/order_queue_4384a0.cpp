@@ -328,8 +328,8 @@ void Order::AnnounceStatusIfFlagged(const char* text)
 void Order::ReattachFxToUnit()
 {
     if (attached != 0) {
-        void* p1 = *(void**)unit.get();
-        void* p2 = *(void**)p1;
+        void* p1 = unit->motion.get();
+        void* p2 = ((Owner_0043a1f0*)p1)->slot.get();
         void* p3 = *(void**)p2;
         void* fn_ptr = *(void**)((char*)p3 + 4);
 #ifdef __clang__

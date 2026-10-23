@@ -178,7 +178,7 @@ extern long g_gfxBlitLockHeld;
 extern long g_gfxBlitLockOwner;
 extern void* g_gfxBlitLockEvent;
 
-void SaveStartDirectory(void);
+#include "../files/files_api.h"
 void __stdcall SetCurrentMouseEvent(int* p);
 void __stdcall InitKeyQueue(int size);
 void __stdcall InitMouse(int count, int start);
@@ -202,7 +202,6 @@ void __stdcall FreeShadeTable(App_4b5980* obj);
 void __stdcall FreeLightTable(App_4b5980* obj);
 void __stdcall FreeGrayTable(App_4b5980* obj);
 void __stdcall FreeBlueTable(App_4b5980* obj);
-void __stdcall HAPI_CloseArchive(void* item);
 void __cdecl GameFreeThunk(void* p);
 
 // Re-applies the display palette: in GDI mode selects and realizes the
@@ -624,7 +623,7 @@ void __stdcall ShutdownEnvironment(App_4b5980* d)
     DestroyPreCleanup();
     ShutdownMouse();
     for (int i = 0; i < d->itemCount; i++)
-        HAPI_CloseArchive(d->items[i]);
+        HAPI_CloseArchive((OPENHAPIFILE*)d->items[i]);
     if (d->items)
         GameFreeThunk(d->items);
     if (d->flags.bits.has_c4)

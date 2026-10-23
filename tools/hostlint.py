@@ -12,7 +12,10 @@ header is stale, so the list only shrinks.
 
 The game-logic rule: a game-logic file is a file with any function in data/game_logic.csv
 (its file column). Presentation headers are the headers under PRESENTATION_DIRS of
-tools/stateclasses.py. Host headers are interfaces/host.h and anything under src/host/.
+tools/stateclasses.py. Host headers are interfaces/host.h and anything under src/host/. Files under src/files/ are the
+files service, an engine service that is neither game logic nor host code: they may include
+interfaces/host.h without a row, but not src/host/ headers or presentation headers, and a row
+naming a src/files/ file for interfaces/host.h is stale.
 Each quoted or angle include of a game-logic file is resolved against the including file's
 directory, include/ and the repository root (the directories the build searches), and a
 resolved host or presentation header is listed by its path from the root, for example
@@ -39,6 +42,7 @@ SUFFIXES = {".c", ".cpp", ".h", ".hpp", ".inc", ".cc"}
 SKIP_DIRS = {".git", "build", "toolchain", "orig"}
 HOST_DIR = "src/host"
 HOST_HEADER = "interfaces/host.h"
+FILES_DIR = "src/files"
 GAME_LOGIC = "data/game_logic.csv"
 INCLUDE_DIRS = ("include", "")
 INCLUDE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.MULTILINE)
@@ -74,7 +78,9 @@ def game_logic_files(root):
         return sorted({r["file"] for r in csv.DictReader(f)})
 
 
-def boundary_header(resolved):
+def boundary_header(resolved, file=""):
+    if resolved == HOST_HEADER and file.startswith(FILES_DIR + "/"):
+        return False
     return resolved == HOST_HEADER or resolved.startswith(HOST_DIR + "/") or resolved.startswith(PRESENTATION_DIRS)
 
 
@@ -97,7 +103,7 @@ def boundary_includes(root, files):
             text = f.read()
         for name in sorted({m.group(1) for m in INCLUDE.finditer(text)}):
             resolved = resolve_include(root, file, name)
-            if resolved and boundary_header(resolved):
+            if resolved and boundary_header(resolved, file):
                 yield file, resolved
 
 

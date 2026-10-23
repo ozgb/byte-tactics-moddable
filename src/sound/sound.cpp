@@ -159,7 +159,7 @@ void* __cdecl operator new(size_t size);
 void __cdecl operator delete(void* p);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
-void* __stdcall HAPI_LoadFile(char* path, int flags);
+#include "../files/files_api.h"
 void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, char last);
 BOOL __stdcall PlayWavFromDisk(char* path);
 int __stdcall PlayWavMemory(int sound);

@@ -569,7 +569,7 @@ struct Src_004b8ae0 {
 
 // Unused here: real functions declared to keep the file's symbol count.
 void __stdcall DrawBattleFrame(int param_1, int param_2);
-void __stdcall HAPI_FindClose(int handle);
+#include "../files/files_api.h"
 
 // Initialises a frame from a surface description. The width is written
 // twice in the original (first the surface's width, then its pitch).
@@ -695,7 +695,6 @@ void __stdcall AdvanceGafSequence(Ref_004b8bf0* ref, short step)
     }
 }
 
-void* __stdcall HAPI_LoadFile(char* name, int flags);
 
 // A block of the root object: a count, a sub-count, then a run of 8-byte
 // entries whose first int is an offset that is rebased in place.

@@ -717,7 +717,7 @@ void __stdcall DrawSurfaceKeyed(Surface* dst, Surface* src, int x, int y, int co
 // Only for its symbol ids: DrawTexturedSpan and DrawLitTexturedSpan match only
 // in a window of the symbol count (docs/c2-regalloc.md, "Symbol ids").
 #include <malloc.h>
-#include "../util/hapi_bank.h"
+#include "../files/files_api.h"
 #include "../util/point.h"
 
 void __cdecl BlitRect(Surface* dst, Surface* src, Rect* rect, Point* pos);

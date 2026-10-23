@@ -253,6 +253,16 @@ class SeamTest(unittest.TestCase):
         lines, _ = cp.check_seams(cp.read_csv(cp.COUPLING_CSV))
         self.assertEqual(lines, [])
 
+    def test_calls_into_and_out_of_files_are_not_edges(self):
+        rows = [call_row("units", "files"), call_row("game", "files"), call_row("presentation", "files"),
+                call_row("files", "units")]
+        self.assertEqual(cp.seam_edges(rows), set())
+
+    def test_src_files_is_its_own_subsystem(self):
+        self.assertEqual(cp.rule_of("OpenArchive", "src/files/hpi.cpp", {}), ("files", "folder:src/files/"))
+        self.assertIn("files", cp.SUBSYSTEMS)
+        self.assertNotIn("files", cp.SIM_SUBSYSTEMS)
+
     def test_src_seams_is_its_own_subsystem(self):
         self.assertEqual(cp.rule_of("InstallNativeSeams", "src/seams/install.cpp", {}),
                          ("seams", "folder:src/seams/"))

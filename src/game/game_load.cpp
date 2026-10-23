@@ -17,6 +17,7 @@
 #include <time.h>
 #include "../../interfaces/host.h"
 #include "../state/game_rand.h"
+#include "../files/files_api.h"
 
 #pragma pack(push, 1)
 
@@ -182,7 +183,6 @@ struct Options_00497180 {               // at g_game+0x29a0
 // One view of the game state. The ranges two views name differently sit in
 // anonymous unions, so each function keeps the names it matched with.
 class Sound;
-#include "../util/hapi_bank.h"
 
 
 #pragma pack(pop)
@@ -298,7 +298,6 @@ void* __stdcall GetGafFrame(void*, int);
 void __stdcall DrawFrame(void*, void*, int, int);
 void* __stdcall FindGafEntry(int, char*);
 void __stdcall SetPaletteColors(void*, int, int);
-void* __stdcall HAPI_LoadFile(void*, unsigned int*);
 void __stdcall SetTextColors(int, int);
 void __stdcall SetFont(int);
 int __stdcall LockScreen(void*);
@@ -766,7 +765,7 @@ void LoadingScreenFrame(void)
             SetOffscreenSurface((void*)g_game->screen);
         }
         BuildDataPath(aux, "palettes", "guipal", "PAL");
-        surfaceHandle = HAPI_LoadFile((unsigned int*)aux, 0);
+        surfaceHandle = HAPI_LoadFile(aux, 0);
         RemapPaletteToClosestIndices(&g_game->field_519, g_game->paletteRgba, surfaceHandle);
         GameFreeThunk(surfaceHandle);
         g_game->lastTick = GetTicks();

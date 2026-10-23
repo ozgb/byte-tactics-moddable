@@ -463,7 +463,7 @@ int __stdcall GetOrderFlags(void* param)
     return *(int*)((char*)ptr1 + 0x42);
 }
 
-#include "../util/hapi_bank.h"
+#include "../files/files_api.h"
 
 // Destructor (callers do `if (p) { p->~X(); operator delete(p); }`): notifies
 // the owner through a callback table, stops the unit's build animation (the

@@ -28,7 +28,7 @@ void CenterCameraOnRadarClick();
 
 // Unused here: these headers and forward declarations take the symbol ids that keep
 // VtolLandingOrder (0x4118e0) matching (docs/c2-regalloc.md).
-#include "../util/hapi_bank.h"
+#include "../files/files_api.h"
 #include "../sound/sound.h"
 struct BmpFileHeader;
 struct BmpInfo;

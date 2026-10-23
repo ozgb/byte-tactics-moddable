@@ -159,7 +159,7 @@ extern char g_campsDirName[];          // "camps"
 extern int DAT_00511de8;               // the same pointer as g_game
 
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall CountDirectoryEntries(const char* path, int flag);
+#include "../files/files_api.h"
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);

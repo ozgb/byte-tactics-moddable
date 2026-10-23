@@ -1,8 +1,7 @@
 // Decompiled by Opus, Haiku and Sonnet. Names are provisional.
 
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall HAPI_FileLengthByName(char* path);
-void* __stdcall HAPI_LoadFile(char* path, int flags);
+#include "../files/files_api.h"
 void __stdcall FatalError(char* path);
 void __stdcall SetAlphaTable(unsigned int* table);
 void __stdcall SetShadeTable(unsigned int* table);
@@ -11,7 +10,6 @@ void __cdecl GameFreeThunk(void* p);
 unsigned int* __stdcall BuildAlphaTable(void* palette);
 unsigned int* __stdcall BuildShadeTable(void* palette);
 unsigned int* __stdcall BuildLightTable(void* palette);
-int __stdcall WriteBufferToFile(char* filename, void* data, int size);
 void __stdcall BuildGrayTable(unsigned int palette);
 void __stdcall BuildBlueTable(unsigned int palette);
 

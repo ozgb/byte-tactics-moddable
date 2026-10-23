@@ -13,9 +13,7 @@ struct Net_0044f9c0 {
 #pragma pack(pop)
 
 void __stdcall CountPacket(int size, int overhead, int sent);
-int __stdcall LzssExpand(char* out, char* in);
-void LzssDisablePreset();
-void LzssEnablePreset();
+#include "../files/files_api.h"
 
 #pragma pack(push, 1)
 // The three byte header of a condensed packet: the kind (3 stored, 4
@@ -30,9 +28,6 @@ struct CondensedHeader {
 
 extern Game* g_game;
 
-int __stdcall LzssCompress(char* out, char* in, int size);
-void LzssDisablePreset();
-void LzssEnablePreset();
 void __stdcall CountPacket(int size, int overhead, int sent);
 int HarnessViewRand();
 
@@ -162,7 +157,7 @@ int NetCondenser::ReceivePacket(void* net, char* data, int* size)
                 return 0x887700be;
             if (received->kind == 4) {
                 LzssEnablePreset();
-                unpackedSize = LzssExpand(buffer, data + 3);
+                unpackedSize = LzssExpand((unsigned char*)buffer, (unsigned char*)(data + 3));
                 LzssDisablePreset();
             } else {
                 memcpy(buffer, data + 3, n);
@@ -205,7 +200,7 @@ int NetCondenser::SendPacket(void* session, int from)
     unsigned int compressed;
     if (sendSize > 12) {
         LzssEnablePreset();
-        compressed = LzssCompress(packet + 3, sendBuffer, sendSize);
+        compressed = LzssCompress((unsigned char*)(packet + 3), (unsigned char*)sendBuffer, sendSize);
         LzssDisablePreset();
     } else {
         compressed = 0xffff;

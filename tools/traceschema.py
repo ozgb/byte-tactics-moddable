@@ -62,12 +62,16 @@ NAMES: dict[str, dict[int, str]] = {
 }
 
 POINTERS: dict[str, dict[int, str]] = {
-    "Unit": {0x0: "HEAP", 0x8: "HEAP", 0x24: "HEAP", 0x40: "HEAP", 0x82: "REC", 0x86: "UNIT"},
+    "Unit": {0x0: "HEAP", 0x4: "HEAP", 0x8: "HEAP", 0xC: "WEAPONDEF", 0x10: "HEAP", 0x24: "HEAP", 0x2C: "HEAP",
+             0x40: "HEAP", 0x48: "HEAP", 0x82: "REC", 0x86: "UNIT"},
     "Projectile": {0x4E: "HEAP"},
     "Debris": {0x0: "PIECE"},
 }
 
-POINTER_NAMES: dict[tuple[str, int], str] = {}
+POINTER_NAMES: dict[tuple[str, int], str] = {
+    ("Unit", 0x4): "current", ("Unit", 0xC): "type", ("Unit", 0x10): "weapon",
+    ("Unit", 0x2C): "f2c", ("Unit", 0x48): "f48",
+}
 
 EXCLUSIONS: list[tuple[str, str, str]] = [
     ("Eye", "screen", "points at the record's own screenPos"),

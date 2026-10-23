@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <vector>
 
 #include "../../interfaces/seams.h"
@@ -683,6 +684,7 @@ static void __fastcall LoadMeteorDefaultsNative(MeteorParams* params)
 }
 
 static_assert(sizeof(HapiBank) == sizeof(AccountBank), "HapiBank and AccountBank must have the same size");
+static_assert(offsetof(HapiBank, bank) == offsetof(AccountBank, bank), "HapiBank and AccountBank must keep the bank pointer at the same offset");
 
 static HapiBank* __stdcall BankInitNative(HapiBank* self)
 {

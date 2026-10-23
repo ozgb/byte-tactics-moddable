@@ -646,7 +646,7 @@ static const TraceField kOrderFields[] = {
     { "flags", 0x42, 4, TF_SCALAR, TT_NONE, 0xffdfffff },
     { "created", 0x46, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "subFlags", 0x4e, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "attached", 0x52, 4, TF_POINTER, TT_ORDERFX, 0x0 },
+    { "attached", 0x52, 4, TF_REF, TT_ORDERFX, 0x0 },
 };
 
 static const TraceField kOrderPlan[] = {
@@ -661,7 +661,7 @@ static const TraceField kOrderPlan[] = {
     { "", 0x42, 4, TF_SCALAR, TT_NONE, 0xffdfffff },
     { "", 0x46, 4, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x4e, 4, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x52, 4, TF_POINTER, TT_ORDERFX, 0x0 },
+    { "", 0x52, 4, TF_REF, TT_ORDERFX, 0x0 },
 };
 
 static const TraceField kOrderPosYFields[] = {
@@ -1229,7 +1229,7 @@ static const TraceField kUnitDefDataFields[] = {
     { "damagemodifier", 0x1aa, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "moverate1", 0x1ae, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "moverate2", 0x1b2, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "movementclass", 0x1b6, 4, TF_POINTER, TT_MOVECLASS, 0x0 },
+    { "movementclass", 0x1b6, 4, TF_REF, TT_MOVECLASS, 0x0 },
     { "turnrate", 0x1ba, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "corpse", 0x1bc, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "maxwaterdepth", 0x1be, 2, TF_SCALAR, TT_NONE, 0x0 },
@@ -1286,7 +1286,7 @@ static const TraceField kUnitDefDataPlan[] = {
     { "", 0x152, 4, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x15a, 52, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x192, 36, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x1b6, 4, TF_POINTER, TT_MOVECLASS, 0x0 },
+    { "", 0x1b6, 4, TF_REF, TT_MOVECLASS, 0x0 },
     { "", 0x1ba, 52, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x1ee, 4, TF_POINTER, TT_WEAPONDEF, 0x0 },
     { "", 0x1f2, 4, TF_POINTER, TT_WEAPONDEF, 0x0 },

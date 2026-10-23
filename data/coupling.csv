@@ -1882,7 +1882,7 @@ orders,platform,call,WorldToCell,3
 orders,platform,call,operator delete,20
 orders,platform,call,operator new,56
 orders,platform,call,operator-,1
-orders,platform,call,operator==,21
+orders,platform,call,operator==,22
 orders,platform,shared_write,Fixed::value,1
 orders,platform,shared_write,Point16::x,11
 orders,platform,shared_write,Point16::y,11

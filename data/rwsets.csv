@@ -5019,6 +5019,7 @@ address,function,file,kind,target
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,SetFont
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,SetTextColors
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,_itoa
+0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,get
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,operator->
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,deref_escape,*Tile
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,deref_read,*unsigned char
@@ -9132,6 +9133,7 @@ address,function,file,kind,target
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,_strcmpi
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,atoi
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,get
+0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,operator MovementClass *
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,operator char *
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,operator-
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,operator=
@@ -11051,6 +11053,8 @@ address,function,file,kind,target
 0x438880,Order::AnnounceStatusIfFlagged,src/orders/order_queue_4384a0.cpp,field_write,Order::flags_42
 0x438880,Order::AnnounceStatusIfFlagged,src/orders/order_queue_4384a0.cpp,function,
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,call,get
+0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,call,operator OrderFx *
+0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,call,operator!=
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,deref_read,*void
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,field_read,Order::attached
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,field_read,Order::unit
@@ -11058,8 +11062,11 @@ address,function,file,kind,target
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue_4384a0.cpp,indirect_call,"indirect via void (*)(void *, int) __attribute__((thiscall))"
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,call,OrderFx::~OrderFx
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,call,get
+0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,call,operator OrderFx *
+0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,call,operator bool
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,call,operator delete
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,call,operator->
+0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,call,operator=
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,field_read,Order::attached
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,field_read,Order::subFlags
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,field_read,Order::unit
@@ -11072,9 +11079,12 @@ address,function,file,kind,target
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue_4384a0.cpp,indirect_call,virtual Slot_0043a1f0::Attach
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,call,OrderFx::~OrderFx
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,call,get
+0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,call,operator OrderFx *
+0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,call,operator bool
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,call,operator delete
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,call,operator new
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,call,operator->
+0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,call,operator=
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,field_read,Order::attached
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,field_read,Order::subFlags
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,field_read,Order::unit
@@ -11092,9 +11102,12 @@ address,function,file,kind,target
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue_4384a0.cpp,indirect_call,virtual Slot_0043a1f0::Attach
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,call,OrderFx::~OrderFx
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,call,get
+0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,call,operator OrderFx *
+0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,call,operator bool
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,call,operator delete
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,call,operator new
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,call,operator->
+0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,call,operator=
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,field_read,Order::attached
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,field_read,Order::subFlags
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,field_read,Order::unit
@@ -11112,9 +11125,12 @@ address,function,file,kind,target
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue_4384a0.cpp,indirect_call,virtual Slot_0043a1f0::Attach
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,call,OrderFx::~OrderFx
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,call,get
+0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,call,operator OrderFx *
+0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,call,operator bool
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,call,operator delete
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,call,operator new
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,call,operator->
+0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,call,operator=
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,field_read,Order::attached
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,field_read,Order::subFlags
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue_4384a0.cpp,field_read,Order::unit
@@ -11447,10 +11463,14 @@ address,function,file,kind,target
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,OrderFx::~OrderFx
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,SendScriptCallNoArgs
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,get
+0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,operator OrderFx *
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,operator Slot_0043a1f0 *
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,operator Unit *
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,operator delete
+0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,operator!=
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,operator->
+0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,operator=
+0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,call,operator==
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,field_escape,Order::link
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,field_read,Entry_0043a1f0::notify
 0x43a1f0,Order::~Order,src/orders/order_queue_4384a0.cpp,field_read,MissionType::index
@@ -11569,7 +11589,9 @@ address,function,file,kind,target
 0x43a970,Order::SerializeToSave,src/orders/order_queue_4384a0.cpp,call,HapiBank::SeekBox
 0x43a970,Order::SerializeToSave,src/orders/order_queue_4384a0.cpp,call,HapiBank::SetStringItem
 0x43a970,Order::SerializeToSave,src/orders/order_queue_4384a0.cpp,call,HapiBank::WriteBox
+0x43a970,Order::SerializeToSave,src/orders/order_queue_4384a0.cpp,call,operator OrderFx *
 0x43a970,Order::SerializeToSave,src/orders/order_queue_4384a0.cpp,call,operator Unit *
+0x43a970,Order::SerializeToSave,src/orders/order_queue_4384a0.cpp,call,operator bool
 0x43a970,Order::SerializeToSave,src/orders/order_queue_4384a0.cpp,call,operator!=
 0x43a970,Order::SerializeToSave,src/orders/order_queue_4384a0.cpp,call,operator->
 0x43a970,Order::SerializeToSave,src/orders/order_queue_4384a0.cpp,call,operator=

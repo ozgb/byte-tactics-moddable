@@ -245,7 +245,6 @@ Object3do,name,pointer,src/graphics/object3do.h,#353
 Object3do,sibling,pointer,src/graphics/object3do.h,#353
 OpenHeap,items,pointer,src/ai/pathfinder.h,#350
 OpenHeap,pool,pointer,src/ai/pathfinder.h,#350
-Order,attached,pointer,src/orders/order.h,#349
 PacketBuffer,first,pointer,src/network/packets.cpp,#351
 PacketBuffer,pool,pointer,src/network/packets.cpp,#351
 PacketChannel,buffers,pointer,src/network/packet_channel.h,#351
@@ -336,7 +335,6 @@ Unit,type,pointer,src/units/unit.h,#349
 Unit,weapon,pointer,src/units/unit.h,#349
 UnitDef,categories,pointer,src/units/unit_def.h,#349
 UnitDef,data,pointer,src/units/unit_def.h,#349
-UnitDef,movementclass,pointer,src/units/unit_def.h,#349
 UnitDef,weaponCategories,pointer,src/units/unit_def.h,#349
 UnitList_00409160,units,container,src/ai/player_ai.h,#351
 UnitResources,player,pointer,src/game/unit_resources.h,#350

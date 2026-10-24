@@ -1273,9 +1273,6 @@ los_radar,presentation,call,StringRef::ReleaseRef,3
 los_radar,presentation,call,SurfaceFromFrame,2
 los_radar,presentation,shared_write,Cell::feature,1
 los_radar,presentation,shared_write,Flags_14281::raw,1
-los_radar,presentation,shared_write,FogGrid::cells,1
-los_radar,presentation,shared_write,FogGrid::height,1
-los_radar,presentation,shared_write,FogGrid::width,1
 los_radar,presentation,shared_write,GafFrame::height,64
 los_radar,presentation,shared_write,GafFrame::pixelsOrLayers,41
 los_radar,presentation,shared_write,GafFrame::transparency,25

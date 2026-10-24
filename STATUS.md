@@ -46,7 +46,8 @@ sub-issue per step. The mod-support design it builds on is
 - **Quirk flags**
   ([#40](https://github.com/ozgb/byte-tactics-moddable/issues/40)): 3.1c
   quirks can be fixed behind flags that are off by default, so the default
-  game stays 3.1c.
+  game stays 3.1c. Six flags so far, listed in
+  [docs/quirks.md](docs/quirks.md).
 - **Host interface**
   ([#24](https://github.com/ozgb/byte-tactics-moddable/issues/24)): every
   platform call (files, window, input, sound, network, display, movies) goes

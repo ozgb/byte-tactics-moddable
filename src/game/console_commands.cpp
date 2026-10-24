@@ -907,7 +907,7 @@ void __stdcall CmdMusicMode(void* args)
 {
     CommandArgs* obj = (CommandArgs*)args;
     int result = obj->GetIntArg(1, 0);
-    void* p = g_game->field_10;
+    void* p = *(void**)((char*)g_game + 0x10);
     ((Sound*)p)->SetTrackCategory(result);
 }
 

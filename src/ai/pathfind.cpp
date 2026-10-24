@@ -615,7 +615,7 @@ Pathfinder::Pathfinder()
     for (unsigned int k = 0; k < 10; k++) {
         g_playerBudgetCap[k] = baseScale;
         budget[k] = 0;
-        cursor[k] = *(Unit**)((char*)g_game + 0x1a7f + 0x14b * (k + 1));
+        cursor[k] = *(Ref<Unit>*)((char*)g_game + 0x1a7f + 0x14b * (k + 1));
     }
 }
 

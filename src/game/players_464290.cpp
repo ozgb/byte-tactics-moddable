@@ -339,9 +339,9 @@ void FreePlayers()
         int* q = (int*)((char*)p + 0x84);
         q[-1] = 0;
         q[0] = 0;
-        delete[] ((void**)q)[-2];
+        delete[] (void*)((Ref<unsigned char>*)q)[-2].get();
         q[1] = 0;
-        ((void**)q)[-2] = 0;
+        ((Ref<unsigned char>*)q)[-2] = (unsigned char*)0;
         g_seams.ai->FreeSquads(p);
         if (((SquadManager**)q)[-4]) {
             g_seams.ai->DestroyPlayerAI(((unsigned char*)q)[0xc2]);

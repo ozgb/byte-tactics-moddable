@@ -256,7 +256,7 @@ void UpdateBattleRoom()
                 } else if (IsScreenNamed(&g_game->gui, "viewmap.gui") != 0) {
                     PlayerInfo* info = g_game->players[host].info;
                     if (strcmp(g_seams.map->GetMissionName(g_game->net), info->map) != 0) {
-                        g_seams.map->LoadMissionByName(g_game->net, 0, (char*)g_game->players[host].info);
+                        g_seams.map->LoadMissionByName(g_game->net, 0, (char*)g_game->players[host].info.get());
                         ShowSelectedMapInfo();
                         MarkLayerChanged(&g_game->gui);
                     }

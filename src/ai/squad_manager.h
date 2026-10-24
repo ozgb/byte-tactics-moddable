@@ -1,3 +1,4 @@
+#include "../../interfaces/ref.h"
 // SquadManager: the AI controller behind Player::ai, 0x3d bytes, one per
 // player (the constructor at 0x408cb0 is called from the player setup). It owns
 // ten SquadTimer slots, one per unit group of the player, ticks them and
@@ -16,13 +17,13 @@ class SquadTimer;
 
 class SquadManager {
 public:
-    Player* player;                    // +0x0
+    Ref<Player> player;
     unsigned char index;               // +0x4, the player's index
     int countdown;                     // +0x5
     int unused_9;                      // +0x9
     int nextAction;                    // +0xd
-    SquadTimer* timers[10];            // +0x11
-    Unit* cursor;                      // +0x39
+    Ref<SquadTimer> timers[10];
+    Ref<Unit> cursor;
 
     SquadManager(Player* p);
     void MarkOwnerNetDirtyFromDamageSplit(Projectile* projectile, int a, int b);

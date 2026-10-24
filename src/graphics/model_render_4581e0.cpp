@@ -20,6 +20,7 @@ extern const float DAT_004fd4cc;
 struct GafFrame;
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 #include "model_types.h"
 #include "memory_cache.h"
 
@@ -226,7 +227,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                             void* pic;
                             if (face->flags.bits.usePic) {
                                 if (face->flags.bits.shaded) {
-                                    int unit = *(int*)(g_game + 0x1b8a + kind * 0x14b);
+                                    int unit = (int)(*(Ref<char>*)(g_game + 0x1b8a + kind * 0x14b)).get();
                                     pic = GetGafFrame(face->color,
                                         *(unsigned char*)(unit + 0x96));
                                 } else if (useColor) {

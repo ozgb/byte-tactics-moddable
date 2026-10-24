@@ -615,7 +615,7 @@ Pathfinder::Pathfinder()
     for (unsigned int k = 0; k < 10; k++) {
         g_playerBudgetCap[k] = baseScale;
         budget[k] = 0;
-        cursor[k] = *(Unit**)((char*)g_game + 0x1a7f + 0x14b * (k + 1));
+        cursor[k] = *(Ref<Unit>*)((char*)g_game + 0x1a7f + 0x14b * (k + 1));
     }
 }
 
@@ -684,7 +684,7 @@ void Pathfinder::RunSearches()
                     steps += 100;
                     costScale = g_playerBudgetCap[player];
                     // The redundant ((Pathfinder*)this)-> casts stay; removing them changes ProbeStraightPath.
-                    ((Pathfinder*)this)->StartSearch((Target*)path->target);
+                    ((Pathfinder*)this)->StartSearch((Target*)path->target.get());
                 }
             }
         // Loop is `while (1)` with the empty test inside, under this else-if.

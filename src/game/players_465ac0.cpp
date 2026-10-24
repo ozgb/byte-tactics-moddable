@@ -10,6 +10,7 @@
 // modelSizeZ), and finally at p again. The first three go through IsPointVisible unless the player's map
 // flags say to use the explored byte map instead; the fourth inlines the shared
 // visibility bit mask.
+#include "../../interfaces/ref.h"
 #pragma pack(push, 1)
 struct MapSize_00465ac0 {
     unsigned int width;
@@ -17,7 +18,7 @@ struct MapSize_00465ac0 {
     int Contains(unsigned int tx, unsigned int ty) { return tx < width && ty < height; }
 };
 struct ByteMap_00465ac0 {
-    unsigned char* data;
+    Ref<unsigned char> data;
     MapSize_00465ac0 size;
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };

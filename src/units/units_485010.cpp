@@ -404,16 +404,15 @@ void __stdcall AllocateUnitMemory(void)
     for (i = 0; i < 10; i++) {
         Player* item = v[i];
         int c = g_game->field_37ee6 * i + 1;
-        *(unsigned char**)((char*)item + 0x67) = pool + c * 0x118;
-        *(unsigned char**)((char*)item + 0x6b) =
-            *(unsigned char**)((char*)item + 0x67) + g_game->field_37ee6 * 0x118 - 0x118;
+        item->unitsBegin = (Unit*)(pool + c * 0x118);
+        item->unitsEnd = (Unit*)((unsigned char*)item->unitsBegin.get() + g_game->field_37ee6 * 0x118 - 0x118);
         *(unsigned short*)((char*)item + 0x6f) =
-            *(unsigned short*)(*(unsigned char**)((char*)item + 0x67) + 0xa8);
+            *(unsigned short*)((unsigned char*)item->unitsBegin.get() + 0xa8);
         *(unsigned short*)((char*)item + 0x71) =
-            *(unsigned short*)(*(unsigned char**)((char*)item + 0x6b) + 0xa8);
+            *(unsigned short*)((unsigned char*)item->unitsEnd.get() + 0xa8);
         // Item fields read back directly, no `slot` local: keeps the edx/esi roles.
-        for (unsigned char* q = *(unsigned char**)((char*)item + 0x67);
-             q <= *(unsigned char**)((char*)item + 0x6b); q += 0x118) {
+        for (unsigned char* q = (unsigned char*)item->unitsBegin.get();
+             q <= (unsigned char*)item->unitsEnd.get(); q += 0x118) {
             ((Unit*)q)->player = item;
             q[0xff] = *(unsigned char*)((char*)item + 0x146);
             *(unsigned int*)(q + 0xac) = 0xffffffffu;

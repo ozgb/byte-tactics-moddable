@@ -473,15 +473,15 @@ SYNTHETIC.update({
     """,
     "PatrolGoal": """
         char vptr[4];                 // +0x0
-        OrderFxRef* target;           // +0x4
-        Unit* owner;                  // +0x8
+        Ref<OrderFxRef> target;           // +0x4
+        Ref<Unit> owner;                  // +0x8
         char points[12];              // +0xc
         int count;                    // +0x18
     """,
     "AiSearchGoal": """
         char vptr[4];                 // +0x0
-        OrderFxRef* target;           // +0x4
-        Unit* owner;                  // +0x8
+        Ref<OrderFxRef> target;           // +0x4
+        Ref<Unit> owner;                  // +0x8
         char points[80];              // +0xc
         int count;                    // +0x5c
         unsigned int repathClaimTick; // +0x60
@@ -489,8 +489,8 @@ SYNTHETIC.update({
     """,
     "PackedGoal": """
         char vptr[4];                 // +0x0
-        OrderFxRef* target;           // +0x4
-        Unit* owner;                  // +0x8
+        Ref<OrderFxRef> target;           // +0x4
+        Ref<Unit> owner;                  // +0x8
         Vec3 pos;                     // +0xc
         Vec3 vel;                     // +0x18
         short heading;                // +0x24
@@ -543,7 +543,7 @@ SYNTHETIC.update({
 })
 SYNTHETIC.update({
     "PlayerAI": """
-        Player* owner;                // +0x0
+        Ref<Player> owner;                // +0x0
         unsigned char index;          // +0x4
         char visible[16];             // +0x5
         char known[16];               // +0x15
@@ -573,13 +573,13 @@ SYNTHETIC.update({
         int searchRadius;             // +0x109
     """,
     "SquadManager": """
-        Player* player;               // +0x0
+        Ref<Player> player;               // +0x0
         unsigned char index;          // +0x4
         int countdown;                // +0x5
         int unused_9;                 // +0x9
         int nextAction;               // +0xd
         char timers[0x28];            // +0x11
-        Unit* cursor;                 // +0x39
+        Ref<Unit> cursor;                 // +0x39
     """,
     "SquadTimer": """
         char vptr[4];                 // +0x0
@@ -620,7 +620,7 @@ SYNTHETIC.update({
         int bestRating;               // +0x38
     """,
     "Squad": """
-        Player* owner;                // +0x0
+        Ref<Player> owner;                // +0x0
         int index;                    // +0x4
         int field_8;                  // +0x8
         int field_c;                  // +0xc

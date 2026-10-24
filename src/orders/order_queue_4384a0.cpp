@@ -108,7 +108,7 @@ class Slot_0043a1f0 {
 public:
     virtual void Slot0();
     virtual void Attach(void* obj);
-    OrderFx* current;                  // +0x4
+    Ref<OrderFx> current;
 };
 
 int __stdcall OrderTypeNameLess(int param_1, char* param_2);
@@ -485,7 +485,7 @@ Order::~Order()
     }
     if (((Owner_0043a1f0 *)unit->motion.get()) != 0) {
         Slot_0043a1f0* slot = ((Owner_0043a1f0 *)unit->motion.get())->slot;
-        if (slot->current != 0 && slot->current == attached) {
+        if (slot->current.get() != 0 && slot->current.get() == attached.get()) {
             if (attached != 0) {
                 slot->Attach(0);
                 delete (OrderFx*)attached;

@@ -10,7 +10,10 @@
 #ifndef PACKET_RECEIVER_H
 #define PACKET_RECEIVER_H
 
+#include "../../interfaces/ref.h"
+
 struct FrameRing;
+class PacketManager;
 
 // One player's queue of received frames: a copy of the packet and the ring of
 // the frames cut out of it.
@@ -48,13 +51,13 @@ public:
 class PacketReceiver {
 public:
     PacketReceiver() { }
-    PacketReceiver(void* o);
+    PacketReceiver(PacketManager* o);
     virtual ~PacketReceiver();
     int unused;                        // +0x04
-    void* owner;                       // +0x08
+    Ref<PacketManager> owner;
     int fromId;                        // +0x0c current frame's sender
     int toId;                          // +0x10
-    PlayerFrameInfo* savedFrameEntry;  // +0x14 entry whose saved frame is in use
+    Ref<PlayerFrameInfo> savedFrameEntry;
     char* buffer;                      // +0x18
     char* spare;                       // +0x1c
     PlayerFrameInfo entries[10];       // +0x20

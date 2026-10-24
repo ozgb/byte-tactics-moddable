@@ -377,6 +377,50 @@ class HeadersTest(unittest.TestCase):
         run(self.tmp)
         self.assertEqual(self.text("src/a.h"), before)
 
+    def test_cpp_includes_its_own_header_once(self):
+        run(self.tmp)
+        for name in ("src/a.cpp", "src/d.cpp"):
+            self.assertEqual(self.text(name).count(f'#include "{name[4:-4]}.h"'), 1)
+        self.assertTrue(self.text("src/a.cpp").index('#include "a.h"') > self.text("src/a.cpp").index('#include "types.h"'))
+        self.assertTrue(self.text("src/d.cpp").index('#include "d.h"') < self.text("src/d.cpp").index("FromCdecl"))
+        before = {p.name: p.read_text() for p in self.tmp.rglob("*") if p.is_file()}
+        run(self.tmp)
+        self.assertEqual({p.name: p.read_text() for p in self.tmp.rglob("*") if p.is_file()}, before)
+
+    def test_self_include_is_reported_by_the_check(self):
+        run(self.tmp)
+        self.edit("src/d.cpp", '#include "d.h"\n', "")
+        code, out = run(self.tmp, "--check")
+        self.assertEqual(code, 1)
+        self.assertIn("would change src/d.cpp", out)
+
+    def test_self_include_that_redefines_a_type_is_left_out_and_reported(self):
+        files = dict(FILES)
+        files["src/c.cpp"] = "struct Point { int x; };\n" + FILES["src/c.cpp"]
+        files["src/a.h"] = '#include "types.h"\n'
+        self._dir.cleanup()
+        self._dir = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._dir.name)
+        make(self.tmp, files)
+        make(self.tmp, {"src/c.h": '#include "types.h"\n'})
+        run(self.tmp)
+        self.assertNotIn('#include "c.h"', self.text("src/c.cpp"))
+        self.assertIn("src/c.cpp: Point is defined again", run(self.tmp, "--dry-run")[1])
+
+    def no_self_include(self, *rows):
+        (self.tmp / "data").mkdir(exist_ok=True)
+        (self.tmp / "data/headers_no_self_include.csv").write_text("path,reason\n" + "".join(f"{r}\n" for r in rows))
+
+    def test_listed_self_include_is_left_out_and_a_stale_row_fails_the_check(self):
+        self.no_self_include("src/d.cpp,does not build", "src/gone.cpp,stale")
+        run(self.tmp)
+        self.assertNotIn('#include "d.h"', self.text("src/d.cpp"))
+        self.assertIn("src/d.cpp: does not build", run(self.tmp, "--dry-run")[1])
+        code, out = run(self.tmp, "--check")
+        self.assertIn("src/gone.cpp is listed but", out)
+        self.assertNotIn("src/d.cpp is listed", out)
+        self.assertNotIn("would change src/d.cpp", out)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -47,6 +47,12 @@ uses none of the names it lost does not get the include.
 name, kind, reason; kind is mismatch, ambiguous or skip) and fails on any other,
 and on a listed name that no longer needs listing.
 
+Each .cpp that has a header next to it includes it, after its other includes (or at the
+top when it has none), unless that would define a type a second time in the file, or
+data/headers_no_self_include.csv (columns path, reason) lists the file because the include
+does not build or hostlint refuses it; --check fails on a listed file that already includes
+its header or has none. The report names each file left out and why.
+
 Running it twice changes nothing. Generated files, src/util/math_4b70a0.cpp
 (left out of the build) and src/state/layout_asserts.cpp are skipped.
 Standard library only.
@@ -80,6 +86,7 @@ TAGS = ("struct", "class", "union")
 PLACEHOLDER_PARAM = re.compile(r"^param_[0-9]+$")
 PLACEHOLDER_TYPE = re.compile(r"^[A-Za-z]\w*_00[0-9a-fA-F]{6}$")
 LEFT_OUT = "data/headers_left_out.csv"
+NO_SELF_INCLUDE = "data/headers_no_self_include.csv"
 
 
 @dataclass
@@ -571,6 +578,7 @@ class World:
         self.macros = {}
         self.aliases = {}
         self.closure_cache = {}
+        self.no_self_include = load_no_self_include(root)
         self.index()
 
     def read(self, path):
@@ -1292,13 +1300,44 @@ class World:
             new = self.write_header(home, entries, taken, plan.rewrites.get(home, ()))
             if home not in self.files or new != self.files[home].text:
                 out[home] = new
-        for path in sorted(set(plan.removals) | set(plan.default_edits)):
+        own = {}
+        for path in self.cpps:
+            home = self.home_of_cpp(path)
+            if path != LINK_DATA and (home in self.files or home in out):
+                own[path] = home
+        for path in sorted(set(plan.removals) | set(plan.default_edits) | set(own)):
             edits = self.cpp_edits(path, plan.removals.get(path, {}))
             extra = plan.default_edits.get(path)
             if extra:
                 edits += extra
-            out[path] = self.apply_edits(self.files[path].text, edits)
+            if path in own:
+                edits += self.self_include_edit(path, own[path], edits, plan, out)
+            if edits:
+                out[path] = self.apply_edits(self.files[path].text, edits)
         return out
+
+    def self_include_edit(self, path, home, edits, plan, out):
+        """The edit that makes a .cpp include its own header, [] when it has, or when that header conflicts with it."""
+        rel = self.relative(path, home)
+        line = f'#include "{rel}"'
+        if any(line in e[2] for e in edits) or any(self.resolve_include(path, k, n) == home for _, k, n in self.files[path].includes):
+            return []
+        plan.self_needed.add(path)
+        if path in self.no_self_include:
+            plan.no_self_include.append((path, self.no_self_include[path]))
+            return []
+        if home in self.files and self.type_conflict(path, home):
+            plan.no_self_include.append((path, f"{self.type_conflict(path, home)} is defined again"))
+            return []
+        src = self.files[path]
+        first = min([it.begin for it in src.items if it.kind != "other" or it.text] or [len(src.text)])
+        first = min([first] + [it.marker_line[0] for it in src.items if it.begin == first and it.marker_line])
+        last = [off for off, _, _ in src.includes if off < first]
+        if last:
+            at = src.text.index("\n", max(last)) + 1 if "\n" in src.text[max(last):] else len(src.text)
+            return [(at, at, line + "\n")]
+        at = src.text.rfind("\n", 0, first) + 1
+        return [(at, at, line + "\n\n")]
 
 
 @dataclass
@@ -1321,6 +1360,8 @@ class Plan:
     default_edits: dict = field(default_factory=dict)
     header_mismatches: list = field(default_factory=list)
     rewrites: dict = field(default_factory=dict)
+    no_self_include: list = field(default_factory=list)
+    self_needed: set = field(default_factory=set)
 
 
 def decl_line(w, d):
@@ -1361,12 +1402,23 @@ def load_left_out(root):
         return {(r["name"], r["kind"]): r["reason"] for r in csv.DictReader(f)}
 
 
+def load_no_self_include(root):
+    """{path: reason} from the committed list of .cpp files that cannot include their own header."""
+    path = Path(root) / NO_SELF_INCLUDE
+    if not path.exists():
+        return {}
+    import csv
+    with path.open(newline="") as f:
+        return {r["path"]: r["reason"] for r in csv.DictReader(f)}
+
+
 def check_left_out(w, plan, listed):
     """[(location, message)] for the declarations left in a .cpp that the list does not name, and the listed names with none."""
     rows = violation_rows(w, plan)
     found = [(loc, msg) for loc, msg, kind, name in rows if (name, kind) not in listed]
     present = {(name, kind) for _, _, kind, name in rows}
     found += [(LEFT_OUT, f"{name} ({kind}) is listed but needs no listing: remove the row") for name, kind in sorted(listed) if (name, kind) not in present]
+    found += [(NO_SELF_INCLUDE, f"{p} is listed but includes its own header or has none: remove the row") for p in sorted(w.no_self_include) if p not in plan.self_needed]
     return found
 
 
@@ -1384,6 +1436,7 @@ def report(w, plan, outs):
     lines.append(f"prototypes removed: {removed_f}")
     lines.append(f"externs removed: {removed_v}")
     lines.append(f"includes added: {added_inc}")
+    lines.append(f"files that do not include their own header: {len(plan.no_self_include)}")
     lines.append(f"mismatches: {len(plan.mismatches)}")
     lines.append(f"ambiguities: {len(plan.ambiguous)}")
     lines.append(f"skips (type not nameable in a header): {len(plan.skipped)}")
@@ -1419,6 +1472,10 @@ def report(w, plan, outs):
     lines.append("== Home declarations that drifted from their definition (rewritten)")
     for h, defn, diffs in sorted(plan.header_mismatches, key=lambda x: (x[0].path, x[0].item.line)):
         lines.append(f"{h.path}:{h.item.line}: {h.item.name}: {'; '.join(diffs)}")
+    lines.append("")
+    lines.append("== Files that do not include their own header (rule: it would define a type a second time; or a row of data/headers_no_self_include.csv)")
+    for p, why in sorted(plan.no_self_include):
+        lines.append(f"{p}: {why}")
     lines.append("")
     lines.append("== Ambiguities (several definitions; left in place)")
     for d in sorted(plan.ambiguous, key=lambda d: (d.path, d.item.line)):

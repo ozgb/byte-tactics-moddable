@@ -480,7 +480,7 @@ void UpdateExplosions()
                 }
             } else {
                 if (d->flag) {
-                    Net* net = (Net *)g_game->net;
+                    Net* net = (Net *)g_game->net.get();
                     if (net->f_d48 == 0) {
                         GafSequence* src = net->f_d44 != 0 ? (GafSequence *)g_game->src2 : (GafSequence *)g_game->src1;
                         AddExplosionEffect(&d->pos, src, -1, 1);
@@ -642,9 +642,9 @@ int __stdcall UpdateExplodedPiece(ExplodedPiece* obj)
 
     Vec3 pos;
     if (inner->pos.y <= (int)((unsigned)g_game->seaLevel << 16)) {
-        if (obj->b4 && ((Net *)g_game->net)->f_d48 == 0) {
+        if (obj->b4 && ((Net *)g_game->net.get())->f_d48 == 0) {
             GafSequence* src;
-            if (((Net *)g_game->net)->f_d44 != 0)
+            if (((Net *)g_game->net.get())->f_d44 != 0)
                 src = (GafSequence *)g_game->src2;
             else
                 src = (GafSequence *)g_game->src1;

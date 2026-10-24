@@ -518,7 +518,7 @@ void BuildDerivedLayers(void)
 {
     Rec* rec = new (kSim) Rec;
     (*(Rec **)&g_game->overflowBucket) = rec;
-    ((Rec *)g_game->overflowBucket)->flags = 0x1f;
+    ((Rec *)g_game->overflowBucket.get())->flags = 0x1f;
 
     Grid2* grid2 = &g_game->spatialGrid_1429f;
     int b = g_game->baseY * 0x10000;
@@ -537,24 +537,24 @@ void BuildDerivedLayers(void)
 
     grid2->cells = count2 != 0 ? (FogCell*)new (kSim) Rec[count2] : 0;
     int outer;
-    unsigned char* cells2 = (unsigned char*)grid2->cells;
-    unsigned char* cellp = (unsigned char*)g_game->cells;
+    unsigned char* cells2 = (unsigned char*)grid2->cells.get();
+    unsigned char* cellp = (unsigned char*)g_game->cells.get();
     int inner;
     int accum;
 
     for (unsigned int lb1 = 0; lb1 < (unsigned int)grid2->width; lb1++)
-        ((Rec*)grid2->cells)[lb1].flags |= 1;
+        ((Rec*)grid2->cells.get())[lb1].flags |= 1;
     for (unsigned int lb2 = 0; lb2 < (unsigned int)grid2->width; lb2++)
-        ((Rec*)grid2->cells)[(grid2->height - 1) * grid2->width + lb2].flags |= 2;
+        ((Rec*)grid2->cells.get())[(grid2->height - 1) * grid2->width + lb2].flags |= 2;
     for (unsigned int lb3 = 0; lb3 < (unsigned int)grid2->height; lb3++)
-        ((Rec*)grid2->cells)[lb3 * grid2->width].flags |= 4;
+        ((Rec*)grid2->cells.get())[lb3 * grid2->width].flags |= 4;
     for (unsigned int i = 0; i < (unsigned int)grid2->height; i++) {
-        int* fp = &((Rec*)grid2->cells)[(i + 1) * grid2->width - 1].flags;
+        int* fp = &((Rec*)grid2->cells.get())[(i + 1) * grid2->width - 1].flags;
         *fp = *fp | 8;
     }
 
     for (int d = 0; d < grid2->count; d++)
-        ((unsigned char*)grid2->cells)[d * 10] = g_game->seaLevel;
+        ((unsigned char*)grid2->cells.get())[d * 10] = g_game->seaLevel;
 
     {
         for (int y = 0; y < g_game->height; y++) {
@@ -571,7 +571,7 @@ void BuildDerivedLayers(void)
     }
 
     for (unsigned int r = 0; r < (unsigned int)grid2->height; r++) {
-        unsigned char* p = (unsigned char*)grid2->cells + r * grid2->width * 10;
+        unsigned char* p = (unsigned char*)grid2->cells.get() + r * grid2->width * 10;
         unsigned char prev = 0;
         for (unsigned int fr = 1; fr < (unsigned int)grid2->width; fr++, p += 10) {
             unsigned char t = p[10];
@@ -586,7 +586,7 @@ void BuildDerivedLayers(void)
     }
 
     for (outer = 0; (unsigned int)outer < (unsigned int)grid2->width; outer++) {
-        unsigned char* p = (unsigned char*)grid2->cells + outer * 10;
+        unsigned char* p = (unsigned char*)grid2->cells.get() + outer * 10;
         unsigned char prev = 0;
         for (unsigned int gc = 1; gc < (unsigned int)grid2->height; gc++, p += grid2->width * 10) {
             unsigned char t = p[grid2->width * 10 + 1];
@@ -628,7 +628,7 @@ void BuildDerivedLayers(void)
             accum = 0;
             do {
                 int idx = g_game->width * inner + outer;
-                int cellval = ((unsigned char*)g_game->cells)[idx * 0xd + 4];
+                int cellval = ((unsigned char*)g_game->cells.get())[idx * 0xd + 4];
                 int v = accum - (cellval >> 1);
                 int block = v >> 5;
                 if (block > -1) {
@@ -1136,7 +1136,7 @@ void FreeMapResources()
     g2->count = 0;
     g2->cells = 0;
 
-    operator delete((Rec *)g_game->overflowBucket);
+    operator delete((Rec *)g_game->overflowBucket.get());
     (*(Rec **)&g_game->overflowBucket) = 0;
 }
 
@@ -1540,7 +1540,7 @@ void __stdcall AddEyeball(Vec3* src, int a, int b, int c)
 {
     if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2) == 2 && g_game->count_14277 < 0x14) {
         Eye* e = &((Eye *)g_game->eyes)[g_game->count_14277];
-        e->player = &g_game->players[g_game->playerIndex];
+        e->player = (char*)&g_game->players[g_game->playerIndex];
         // Assigned before screen: &e->screenPos would clobber ecx, which holds g_game.
         e->screen = &e->screenPos;
         e->x = a;

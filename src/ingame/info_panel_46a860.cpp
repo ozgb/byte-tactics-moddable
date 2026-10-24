@@ -214,7 +214,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
 
         if (g_game->hoverUnitId != 0) {
             int idx = g_game->hoverUnitId & 0xffff;
-            Unit_0046a860* unit = (Unit_0046a860 *)g_game->units + idx;
+            Unit_0046a860* unit = (Unit_0046a860 *)g_game->units.get() + idx;
             sprintf(text, "MOVEORD: %d FIREORD: %d\n", (unit->flags >> 0x12) & 3,
                     (unit->flags >> 0x14) & 3);
             DrawString(surface, (unsigned char*)text, 0x108, pfstate, -1);
@@ -240,7 +240,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         int v = g_game->width;
         v *= (short)(unsigned short)g_game->y;
         v += (short)(unsigned short)g_game->x;
-        unsigned char c = ((Cell_0046a860 *)g_game->cells)[v].shade;
+        unsigned char c = ((Cell_0046a860 *)g_game->cells.get())[v].shade;
         sprintf(text, "XYH: %d %d %d\n", (short)(unsigned short)g_game->x,
                 (short)(unsigned short)g_game->y, c);
         DrawString(surface, (unsigned char*)text, 0x208, pfstate, -1);
@@ -254,7 +254,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
     snapshot.width = g_game->selectionInfoCache.width;
 
     if (snapshot.selected != 0) {
-        Unit_0046a860* unit = (Unit_0046a860 *)g_game->units + snapshot.selected;
+        Unit_0046a860* unit = (Unit_0046a860 *)g_game->units.get() + snapshot.selected;
         snapshot.health = unit->healthRaw;
         snapshot.build = unit->killCount;
         snapshot.orderName = GetOrderName(unit);
@@ -334,7 +334,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             }
         }
     } else if (snapshot.selected != 0) {
-        Unit_0046a860* unit = (Unit_0046a860 *)g_game->units + snapshot.selected;
+        Unit_0046a860* unit = (Unit_0046a860 *)g_game->units.get() + snapshot.selected;
         if (unit->unitDefIndex != 0) {
             char* playerMap = (char*)&g_game->players[g_game->playerIndex];
             if (IsUnitVisibleToPlayer(playerMap, unit)) {
@@ -412,7 +412,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     return;
                 }
                 if (snapshot.targetType) {
-                    Unit_0046a860* target = (Unit_0046a860 *)g_game->units + snapshot.targetType;
+                    Unit_0046a860* target = (Unit_0046a860 *)g_game->units.get() + snapshot.targetType;
                     if (!target->unitDefIndex || !IsUnitVisibleToPlayer(playerMap, target))
                         return;
                     int targetX = panel->rcUnitName2.left -

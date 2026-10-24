@@ -2,6 +2,7 @@
 #define EYE_H
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 struct ScreenPos {
     short x;
@@ -9,12 +10,12 @@ struct ScreenPos {
 };
 
 struct Eye {
-    void* player;
-    ScreenPos* screen;
+    Ref<char> player;
+    Ref<ScreenPos> screen;
     short x;
     unsigned char flagA;
     char flagB;
-    char* flagPtr;
+    Ref<char> flagPtr;
     Vec3 pos;
     unsigned int expires;
     ScreenPos screenPos;

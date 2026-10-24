@@ -1,5 +1,6 @@
 #ifndef FEATURE_ANIM_POOL_H
 #define FEATURE_ANIM_POOL_H
+#include "../../interfaces/ref.h"
 
 #pragma pack(push, 1)
 struct AnimEntry_00421f20 {
@@ -20,8 +21,8 @@ struct FeatureUnit_00421f20 {
 
 struct FeatureAnimPool {
     char unknown_0[16];
-    AnimEntry_00421f20* anim;
-    FeatureUnit_00421f20* featureUnit;
+    Ref<AnimEntry_00421f20> anim;
+    Ref<FeatureUnit_00421f20> featureUnit;
     int activeHead;
     int idleHead;
     int freeHead;

@@ -472,7 +472,7 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
         }
         projectile->flags = projectile->flags | 2;
     }
-    if (((Net *)g_game->net)->noSeaLevelTrigger && hostile && !unit) {
+    if (((Net *)g_game->net.get())->noSeaLevelTrigger && hostile && !unit) {
         if (projectile == g_game->tracked) {
             g_game->trackedPos = g_game->tracked->position;
             g_game->value_1434b = projectile->type->holdTime;
@@ -2420,7 +2420,7 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
         return;
     } else if (proj->positionWords.yWhole >= g_game->seaLevel) {
         return;
-    } else if (((Net *)g_game->net)->noSeaLevelTrigger) {
+    } else if (((Net *)g_game->net.get())->noSeaLevelTrigger) {
         return;
     }
     DetonateProjectile(proj, 0);
@@ -2486,7 +2486,7 @@ void __stdcall DrawProjectiles(void* surface)
         return;
     int offset = 0;
     while (1) {
-        Projectile* p = (Projectile*)((char*)g_game->projectiles + offset);
+        Projectile* p = (Projectile*)((char*)g_game->projectiles.get() + offset);
         if (p->active == 0) {
             unsigned char player = (char)g_game->playerIndex;
             Player* pb = &g_game->players_1b63[player];

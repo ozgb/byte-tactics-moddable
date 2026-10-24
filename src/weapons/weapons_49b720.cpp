@@ -227,7 +227,7 @@ void UpdateProjectiles()
             }
             if (oldY > g_game->seaLevel && p->positionWords.yWhole <= g_game->seaLevel) {
                 Cell* cell = g_seams.los_radar->GetMapCellAtPosition((Vec3*)&p->position);
-                if (cell && cell->high < g_game->seaLevel && ((Net_0049b720 *)g_game->net)->noSeaLevelTrigger == 0)
+                if (cell && cell->high < g_game->seaLevel && ((Net_0049b720 *)g_game->net.get())->noSeaLevelTrigger == 0)
                     AddExplosionEffect(&p->position, type->splash, 0, 1);
             }
         }

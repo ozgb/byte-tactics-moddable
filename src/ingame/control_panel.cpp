@@ -279,7 +279,7 @@ void InitCommands()
 // FUNCTION: 0x4195f0
 void __stdcall CopyMenuEntryName(char* dest, unsigned short index)
 {
-    strncpy(dest, ((UnitType *)g_game->defs)[index].unitname, 0x20);
+    strncpy(dest, ((UnitType *)g_game->defs.get())[index].unitname, 0x20);
     dest[0x1f] = 0;
 }
 
@@ -302,7 +302,7 @@ void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
 {
     unsigned int remove = (arg->keyFlags >> 2) & 1;
     unsigned short index = g_game->buildTypeIndex;
-    UnitType* def = &((UnitType *)g_game->defs)[index];
+    UnitType* def = &((UnitType *)g_game->defs.get())[index];
     Vec3 pos = g_game->pos;
     // origin read once into a local: passing def->origin to each helper changes the frame.
     Point16 origin = def->origin;
@@ -329,7 +329,7 @@ void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
 // FUNCTION: 0x4197d0
 int UpdatePlacementGhostValidity(void)
 {
-    UnitType* item = &((UnitType *)g_game->defs)[g_game->buildTypeIndex];
+    UnitType* item = &((UnitType *)g_game->defs.get())[g_game->buildTypeIndex];
     Point16 cell = WorldToCell(g_game->pos, item->origin);
     g_game->boxStartX = cell.x << 4;
     g_game->boxStartZ = cell.y << 4;
@@ -353,7 +353,7 @@ int UpdatePlacementGhostValidity(void)
 // FUNCTION: 0x419940
 void __stdcall SetBuildCountText(Gui* obj, unsigned short index, int n)
 {
-    Gadget* e = FindGadgetOrNull(obj->layer->entries, ((UnitType *)g_game->defs)[index].unitname);
+    Gadget* e = FindGadgetOrNull(obj->layer->entries, ((UnitType *)g_game->defs.get())[index].unitname);
     if (e) {
         if (n)
             sprintf(e->u.text, "+%d", n);
@@ -832,7 +832,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
         } else if (strstr(name, "BUILD")) {
             g_game->ordersPanelFlags_37ebe_6.bits.build = 1;
             PlaySoundByName("buildbutton", 0);
-        } else if (id != 0 && ((UnitType *)g_game->defs)[id].mobile == 0) {
+        } else if (id != 0 && ((UnitType *)g_game->defs.get())[id].mobile == 0) {
             g_game->orderMode = 0xe;
             g_game->buildTypeIndex = id;
             PlaySoundByName("addbuild", 0);
@@ -1008,7 +1008,7 @@ int __stdcall GetBuildMenuPage(Unit* obj)
 void __stdcall BuildEntryGuiName(char* dest, unsigned short index, int n)
 {
     char name[256];
-    strncpy(name, ((UnitType *)g_game->defs)[index].unitname, 0x20);
+    strncpy(name, ((UnitType *)g_game->defs.get())[index].unitname, 0x20);
     name[0x1f] = 0;
     sprintf(dest, "%s%d.GUI", name, n);
 }

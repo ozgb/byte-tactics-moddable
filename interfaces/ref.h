@@ -36,6 +36,8 @@ inline void RefOutsideBlock(const char* signature)
 #endif
 #endif
 
+#pragma pack(push, 4)
+
 // A reference to a T in the state block: a 4-byte offset from the block base (0 is null) natively, a plain pointer on wasm32.
 template <class T>
 struct Ref {
@@ -95,8 +97,11 @@ struct Ref {
     friend bool operator!=(T* a, const Ref& b) { return a != b.get(); }
 };
 
+#pragma pack(pop)
+
 #if !defined(__wasm32__)
 static_assert(sizeof(Ref<int>) == 4, "a Ref is one 4-byte offset");
+static_assert(__alignof(Ref<int>) == 4, "a Ref is aligned to 4 bytes");
 #endif
 
 #endif

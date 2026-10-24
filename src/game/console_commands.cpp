@@ -1389,7 +1389,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
         unsigned char heights[4];
         for (int x = firstX; x < lastX; ++x) {
             // The four corners, walking round the cell from its own tile.
-            Tile* tile = &((Tile*)g_game->cells)[y * g_game->width + x];
+            Tile* tile = &((Tile*)g_game->cells.get())[y * g_game->width + x];
             heights[0] = tile->height;
             p[0].x = (x + 8) * 16 - g_game->scrollX;
             p[0].y = (y + 2) * 16 - (heights[0] >> 1) - g_game->scrollY;

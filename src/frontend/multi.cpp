@@ -2080,9 +2080,9 @@ void ShowSelectedMapInfo()
     }
 
     sprintf(buffer, "%s  %s: %s",
-            (char*)g_game->net + 0xdc4,
+            (char*)g_game->net.get() + 0xdc4,
             Translate("Players"),
-            (char*)g_game->net + 0xe44);
+            (char*)g_game->net.get() + 0xe44);
     SetTranslatedTextByName(&g_game->gui, "SIZE", (char*)buffer, 0);
 
     Gadget* entry = FindGadgetChecked_E(g_game->gui.layer->entries, "MAPPIC");
@@ -4259,7 +4259,7 @@ void __stdcall LoadUnitRestrictListFile(char* name)
         host_file_read(f, &b, 4);
         int n = g_game->unitDefCount;
         for (int idx = 1; idx < n; idx++) {
-            if (((UnitType_00446f50 *)g_game->defs)[idx].fbiChecksum == a) {
+            if (((UnitType_00446f50 *)g_game->defs.get())[idx].fbiChecksum == a) {
                 for (int j = 0; j < n; j++) {
                     if (g_unitRestrictEntries[j].unitIndex == idx) {
                         g_unitRestrictEntries[j].max = b;
@@ -4285,7 +4285,7 @@ void __stdcall SaveUnitRestrictListFile(char* filename)
     for (int i = 1; i < count; i++) {
         for (int j = 0; j < g_game->unitDefCount; j++) {
             if (*(int*)((char*)g_unitRestrictEntries + 0x52 + j * 0x62) == i) {
-                int v = ((UnitType_00446f50 *)g_game->defs)[i].fbiChecksum;
+                int v = ((UnitType_00446f50 *)g_game->defs.get())[i].fbiChecksum;
                 host_file_write(f, &v, 4);
                 v = *(int*)((char*)g_unitRestrictEntries + 0x5a + j * 0x62);
                 host_file_write(f, &v, 4);
@@ -4565,7 +4565,7 @@ void __stdcall HandleUnitCountSlider(void* obj, char* gadget)
     }
     g_unitRestrictEntries[n + desc->firstRow].max = value;
     ((UnitSync *)g_game->sync)->SetUnitLimit(
-        &((UnitType_00446f50 *)g_game->defs)[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
+        &((UnitType_00446f50 *)g_game->defs.get())[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
     desc->flags[n + desc->firstRow] = g_unitRestrictEntries[n + desc->firstRow].peerEnabled == 0;
     desc->flags[n + desc->firstRow] |= g_unitRestrictEntries[n + desc->firstRow].max == 0 ? 2 : 0;
     SetTranslatedTextByName(obj, count, (char*)buf, 0);
@@ -4620,7 +4620,7 @@ void LoadUnitPortrait()
     int i = g_unitRestrictPicLoadIndex++;
     if (i < g_game->unitDefCount) {
         int type = g_unitRestrictEntries[i].unitIndex;
-        UnitType_00446f50* defs = (UnitType_00446f50 *)g_game->defs;
+        UnitType_00446f50* defs = (UnitType_00446f50 *)g_game->defs.get();
         if (defs[type].name && ((unsigned char)(defs[type].flags2.raw >> 15) & 1) == 0) {
             // Indexed by the reloaded entry field, not defs[type].name.
             BuildDataPath(path, "unitpics", defs[g_unitRestrictEntries[i].unitIndex].name, "PCX");
@@ -4658,7 +4658,7 @@ void UnitRestrictDialogFrame()
     while (((UnitSync *)g_game->sync)->PopChangedEntry(&event) != 0) {
         n++;
         for (int i = 0; i < entry->list.count; i++) {
-            if (event.fbiChecksum == ((UnitType_00446f50 *)g_game->defs)[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
+            if (event.fbiChecksum == ((UnitType_00446f50 *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
                 entry->flags[i] = (event.peerEnabled == 0);
                 g_unitRestrictEntries[i].peerEnabled = event.peerEnabled;
                 g_unitRestrictEntries[i].max = event.max;
@@ -4677,7 +4677,7 @@ void UnitRestrictDialogFrame()
 void __stdcall ShowSelectedUnitCosts(void* panel, Gadget* unit)
 {
     char buf[20];
-    UnitType_00446f50* def = &((UnitType_00446f50 *)g_game->defs)[unit->records[unit->field_ba].unitIndex];
+    UnitType_00446f50* def = &((UnitType_00446f50 *)g_game->defs.get())[unit->records[unit->field_ba].unitIndex];
     sprintf(buf, "%d", (int)def->energyCost);
     SetTranslatedTextByName(panel, "ENERGYTEXT", (char*)buf, 0);
     sprintf(buf, "%d", (int)def->metalCost);
@@ -4765,19 +4765,19 @@ void OpenUnitRestrictions()
     n = 0;
     for (i = 1; i < g_game->unitDefCount; i++) {
         // continue on the bit, an int bitfield tested positively.
-        if (((UnitType_00446f50 *)g_game->defs)[i].flags2.bits.flag)
+        if (((UnitType_00446f50 *)g_game->defs.get())[i].flags2.bits.flag)
             continue;
-        if (!((UnitType_00446f50 *)g_game->defs)[i].name)
+        if (!((UnitType_00446f50 *)g_game->defs.get())[i].name)
             continue;
         {
-            UnitType_00446f50* type = &((UnitType_00446f50 *)g_game->defs)[i];
+            UnitType_00446f50* type = &((UnitType_00446f50 *)g_game->defs.get())[i];
             Info_0044c7e0 info;
             int count;
             sprintf(g_unitRestrictEntries[n].name, "%s\r%s %dM  %dE",
-                    ((UnitType_00446f50 *)g_game->defs)[i].unitName, Translate(type->description),
+                    ((UnitType_00446f50 *)g_game->defs.get())[i].unitName, Translate(type->description),
                     (int)type->metalCost, (int)type->energyCost);
             g_unitRestrictEntries[n].unitIndex = i;
-            ((UnitSync *)g_game->sync)->GetUnitEntry(&((UnitType_00446f50 *)g_game->defs)[i], &info);
+            ((UnitSync *)g_game->sync)->GetUnitEntry(&((UnitType_00446f50 *)g_game->defs.get())[i], &info);
             // One ternary: the if-statement form swaps the ebx/ebp registers.
             count = info.max == -1 ? 0x65 : info.max;
             g_unitRestrictEntries[n].max = count;
@@ -4813,7 +4813,7 @@ void OpenUnitRestrictions()
 
     {
         Gui* gui = &g_game->gui;
-        UnitType_00446f50* type = &((UnitType_00446f50 *)g_game->defs)[desc->records[desc->field_ba].unitIndex];
+        UnitType_00446f50* type = &((UnitType_00446f50 *)g_game->defs.get())[desc->records[desc->field_ba].unitIndex];
         char buf[0x14];
         sprintf(buf, "%d", (int)type->energyCost);
         SetTranslatedTextByName(gui, "ENERGYTEXT", buf, 0);

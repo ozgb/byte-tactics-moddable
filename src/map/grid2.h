@@ -1,11 +1,12 @@
 #ifndef GRID2_H
 #define GRID2_H
+#include "../../interfaces/ref.h"
 
 struct FogCell;
 
 #pragma pack(push, 1)
 struct Grid2 {
-    FogCell* cells;
+    Ref<FogCell> cells;
     unsigned int width;
     unsigned int height;
     int count;

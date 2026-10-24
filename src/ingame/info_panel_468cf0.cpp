@@ -444,7 +444,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     ushort *pIdx = g_game->list_1435f;
     k = 0;
     while (k < g_game->count_14367) {
-      Unit_00468cf0 *unit = (Unit_00468cf0 *)((int)g_game->units + *pIdx * 0x118);
+      Unit_00468cf0 *unit = (Unit_00468cf0 *)((int)g_game->units.get() + *pIdx * 0x118);
       int row = ((int)unit->zWhole - g_game->scrollY) / 16 + 0x10;
       if (row >= 0 && row < mv->rows) {
         Unit_00468cf0 ***pCur = (Unit_00468cf0***)&mv->cursor[row];
@@ -555,7 +555,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   if (param_1 != 0) {
     ushort *pIdx = g_game->list_1435f;
     for (k = 0; k < g_game->count_14367; k++, pIdx++) {
-      Unit_00468cf0 *unit = (Unit_00468cf0 *)((int)g_game->units + *pIdx * 0x118);
+      Unit_00468cf0 *unit = (Unit_00468cf0 *)((int)g_game->units.get() + *pIdx * 0x118);
       if ((g_game->visualFlagsByte & 1) || unit->group != 0) {
         char str[2];
         str[1] = 0;

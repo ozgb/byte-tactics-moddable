@@ -47,7 +47,7 @@ void __stdcall InitFeatureAnimPool(List_00421f20* list)
     m->featureUnit->flags_110 |= 0x20000000;
     m->featureUnit->unitDefIndex = 0;
     m->featureUnit->flags_114 |= 1;
-    m->featureUnit->def = (int)g_game->defs;
+    m->featureUnit->def = (int)g_game->defs.get();
     m->names = 0;
     m->nameCount = 0;
 

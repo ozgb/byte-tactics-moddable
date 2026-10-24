@@ -1,9 +1,10 @@
 #ifndef PLAYER_GRID_H
 #define PLAYER_GRID_H
+#include "../../interfaces/ref.h"
 
 #pragma pack(push, 1)
 struct PlayerGrid {
-    unsigned char* cells;
+    Ref<unsigned char> cells;
     unsigned int width;
     unsigned int height;
     char unknown_c[319];

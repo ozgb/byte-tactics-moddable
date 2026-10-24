@@ -245,7 +245,7 @@ int LoadUnitInfo()
         UnitDef* u = &g_game->defs[j];
         if (!(u->flags1 & 0x800000)) {
             if (j != count - 1) {
-                *u = *(UnitDef*)((char*)g_game->defs + size - sizeof(UnitDef));
+                *u = *(UnitDef*)((char*)g_game->defs.get() + size - sizeof(UnitDef));
                 u->id = j;
             }
             count--;

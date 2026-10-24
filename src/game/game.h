@@ -82,7 +82,6 @@ struct Feature;
 struct FeatureSpot;
 struct Font;
 class HapiBank;
-class SpatialBucket;
 struct FrameTable;
 struct IconSet_00466780;
 struct List_00420960;
@@ -201,9 +200,9 @@ struct Game {
             char unknown_12f3[1868];
             PlayerInfo* infos[11];
             char unknown_1a6b[287];
-            SideData* p1b8a;
+            Ref<SideData> p1b8a;
             char unknown_1b8e[327];
-            SideData* p1cd5;
+            Ref<SideData> p1cd5;
             char unknown_1cd9[281];
             short field_1df2;
             char unknown_1df4[2988];
@@ -391,13 +390,13 @@ struct Game {
             CursorState_0041cc60 cursor;
             WeaponDef weapons[256];
             int projectileCount;
-            Projectile* projectiles;
+            Ref<Projectile> projectiles;
             void* field_141fb;
             void* field_141ff;
             void* field_14203;
-            Pathfinder* pathfinder;
-            FeatureSpot* spots;
-            Unit* unit;
+            Ref<Pathfinder> pathfinder;
+            Ref<FeatureSpot> spots;
+            Ref<Unit> unit;
             char unknown_14213[8];
             int list_1421b;
             void** field_1421f;
@@ -425,16 +424,16 @@ struct Game {
             unsigned char debugMode;
             unsigned short mapFlags;
             IconSet_00466780* iconSet;
-            Cell* cells;
+            Ref<Cell> cells;
             unsigned short* mapValues;
             Grid grid1;
-            Class_0047cb00* cells_1429f;
+            Ref<Class_0047cb00> cells_1429f;
             unsigned int width_142a3;
             unsigned int height_142a7;
             char unknown_142ab[4];
             int field_142af;
             int field_142b3;
-            SpatialBucket* overflowBucket;
+            Ref<Class_0047cb00> overflowBucket;
             Rect viewLimit;
             char field_142cb[16];
             void* finalSurface;
@@ -614,8 +613,8 @@ struct Game {
     unsigned short unitsPerPlayer;
     unsigned short poolCount;
     int f14353;
-    Unit* units;
-    Unit* unitsEnd;
+    Ref<Unit> units;
+    Ref<Unit> unitsEnd;
     unsigned short* list_1435f;
     void* hotRadar;
     int count_14367;
@@ -631,7 +630,7 @@ struct Game {
         F14373 autoFollowFlags;
         unsigned int autoFollowFlags_14373;
     };
-    Class_0045ae80** types;
+    Ref<Class_0045ae80*> types;
     Class_00437c80* unitTable;
     char unknown_1437f[4];
     void* xform;
@@ -640,7 +639,7 @@ struct Game {
     int unitDefCount;
     int unitDefCountBits;
     int unitDefEnumDirty;
-    UnitDef* defs;
+    Ref<UnitDef> defs;
     char unknown_1439f[8];
     union {
         struct {
@@ -691,7 +690,7 @@ struct Game {
         unsigned short* sidePanelRows[10];
     };
     unsigned short* sidePanelSideSeq[5];
-    FrameTable* losTable;
+    Ref<FrameTable> losTable;
     union {
         void* black[4];
         struct {
@@ -1236,8 +1235,8 @@ struct Game {
         char campaignMissionStatus_391cf[25];
         char campaignMissionStatus[26];
     };
-    Mission* net;
-    MissionConditions* list_391ed;
+    Ref<Mission> net;
+    Ref<MissionConditions> list_391ed;
     int mode_391f1;
     void (__stdcall *handler)(void);
     int fontComix;
@@ -1332,6 +1331,7 @@ inline Player* Game::Current2(void)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
 #include <stddef.h>
+#include "../../interfaces/ref.h"
 static_assert(sizeof(Game) == 0x3924d, "Game is 0x3924d bytes");
 static_assert(offsetof(Game, unknown_0) == 0x0, "unknown_0");
 static_assert(offsetof(Game, field_0) == 0x0, "field_0");

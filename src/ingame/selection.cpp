@@ -436,7 +436,7 @@ int __stdcall PointInPolygon(Point* pts, int n, int px, int py);
 // FUNCTION: 0x48c6a0
 int __stdcall HitTestUnitScreenHull(Unit* obj, Point* p)
 {
-    void** models = (void **)g_game->types;
+    void** models = (void **)g_game->types.get();
     Vec3 corners[4];
     Point pts[4];
     int i;

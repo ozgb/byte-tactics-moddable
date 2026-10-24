@@ -1,3 +1,4 @@
+#include "../../interfaces/ref.h"
 // Feature: one placed map feature (a rock, a tree, a wreck), 0x100 bytes, the
 // elements of the pool at g_game+0x1426f. The one declaration of the struct for
 // the files that read or write a feature record. map/features.cpp, which owns
@@ -18,7 +19,7 @@ struct Feature {
     short footprintZ;                  // +0x96
     char unknown_98[0x4c];             // +0x98, the object and the animation
                                        // sequences
-    char* burnweapon;                  // +0xe4
+    Ref<char> burnweapon;
     unsigned short burnTime;           // +0xe8
     unsigned short damage;             // +0xea
     float metal;                       // +0xec

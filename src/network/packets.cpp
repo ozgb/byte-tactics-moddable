@@ -1241,8 +1241,8 @@ void PacketBuffer::RemovePacket(NetPacketPendingEntry* packet)
 {
     PacketTrace("removing packet (len=%ld, type=%d, data=\"%s\")\n",
                  packet->size,
-                 *(unsigned char*)((char*)packet->offset + (int)packet->owner + 0x14),
-                 (char*)packet->offset + (int)packet->owner + 0x15);
+                 *(unsigned char*)((char*)packet->owner + packet->offset + 0x14),
+                 (char*)packet->owner + packet->offset + 0x15);
 
     if (packet->queued >= 0) {
         PacketTrace("Warning! RemovePacket called for packet in pending queue!\n");

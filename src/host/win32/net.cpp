@@ -794,7 +794,7 @@ extern "C" int HOST_CALL host_net_register_application(const char* name, const c
     return registered;
 }
 
-// TODO(#28): carry the online service's transport through the net seam
+// TODO(#392): carry the online service's transport through the net seam
 namespace {
 
 typedef unsigned int (__stdcall* OnlGetVersion)(void);

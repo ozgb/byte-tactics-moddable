@@ -71,10 +71,10 @@ struct FogGrid {
 };
 
 struct MapFogGrid {
-    FogCell* cells;                    // +0x0
-    unsigned int width;                // +0x4
-    unsigned int height;               // +0x8
-    int count;                         // +0xc
+    FogCell* cells;
+    unsigned int width;
+    unsigned int height;
+    int count;
 };
 
 // A 10-byte cell of the second fog grid.

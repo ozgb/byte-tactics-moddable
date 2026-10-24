@@ -1441,16 +1441,6 @@ void RegisterGroundOrders()
 #endif
 }
 
-typedef std::vector<Unit*> Vec_00406c00;
-typedef void (Vec_00406c00::*DestroyFn_00406c00)(Vec_00406c00::iterator, Vec_00406c00::iterator);
-
-struct Access_00406c00 : Vec_00406c00 {
-    static DestroyFn_00406c00 fn;
-};
-
-// FUNCTION: 0x406c00 ?_Destroy@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@IAEXPAPAUUnit@@0@Z
-DestroyFn_00406c00 Access_00406c00::fn = &Access_00406c00::_Destroy;
-
 // FUNCTION: 0x401e00
 int __stdcall AttackUTypeOrder(Unit* unit, Order* order, int unused)
 {

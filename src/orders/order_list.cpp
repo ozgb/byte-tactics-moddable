@@ -1203,15 +1203,6 @@ int MissionOrderTable::GetCount(void)
     return first == 0 ? 0 : (last - first) / 0x19;
 }
 
-typedef void (Vec_0043c390::*DestroyFn_0043c390)(Vec_0043c390::iterator, Vec_0043c390::iterator);
-
-struct Access_0043c390 : Vec_0043c390 {
-    static DestroyFn_0043c390 fn;
-};
-
-// FUNCTION: 0x43c390 ?_Destroy@?$vector@UElem_0043c390@@V?$allocator@UElem_0043c390@@@std@@@std@@IAEXPAUElem_0043c390@@0@Z
-DestroyFn_0043c390 Access_0043c390::fn = &Access_0043c390::_Destroy;
-
 template class std::vector<Elem_0043c390>;
 
 // FUNCTION: 0x43c3a0 ?insert@?$vector@UElem_0043c390@@V?$allocator@UElem_0043c390@@@std@@@std@@QAEXPAUElem_0043c390@@IABU3@@Z

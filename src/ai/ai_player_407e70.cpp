@@ -129,7 +129,7 @@ void SpatialTimer::OnTimer()
         Unit* u = *it;
         if (((UnitDefFlags_00407e90*)u->def.get())->flag4) {
             if (u->motion || g_seams.weapons->WeaponCanReachPos(u, (Vec3*)&u->pos, (Vec3*)&best, 0)) {
-                MissionType kind = g_seams.orders->GetOrderType(3, u, 0, (Vec3*)&best);
+                MissionType kind = g_seams.orders->GetOrderType(3, u, 0, (Vec3*)&best );
                 if (kind.index)
                     g_seams.orders->AddOrder(kind, 0, u, 0, (Vec3*)&best, 0, 0);
             }

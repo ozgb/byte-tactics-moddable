@@ -279,8 +279,8 @@ void LoadGameResources()
 
     g_game->fxGaf = (int)LoadAnimGaf("fx");
     gaf = (char*)g_game->fxGaf;
-    g_game->unknown_147cf = (void*)((int)FindGafEntry(gaf, "smoke 1"));
-    g_game->unknown_147d3 = (void*)((int)FindGafEntry(gaf, "smoke 2"));
+    g_game->smoke1 = (void*)((int)FindGafEntry(gaf, "smoke 1"));
+    g_game->smoke2 = (void*)((int)FindGafEntry(gaf, "smoke 2"));
     g_game->fire1 = (int)FindGafEntry(gaf, "fire1");
     g_game->alfboom1 = (int)FindGafEntry(gaf, "alfboom1");
     FLAG(g_game->alfboom1);

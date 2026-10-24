@@ -559,7 +559,7 @@ void __stdcall SendUnitStates(Player* p)
             break;
     }
     stream.WriteBits(-1, 0x10);
-    int i = g_game->ticks % g_game->field_37ee6;
+    int i = g_game->ticks % g_game->maxUnitsSetting;
     stream.data[stream.index] |= 1 << stream.bit;
     stream.bit++;
     if (stream.bit == 0x20) {
@@ -620,5 +620,5 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
     }
 
     if (reader.ReadBit())
-        ReadUnitState(&reader, &p->unitsBegin[tick % g_game->field_37ee6]);
+        ReadUnitState(&reader, &p->unitsBegin[tick % g_game->maxUnitsSetting]);
 }

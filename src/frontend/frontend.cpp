@@ -317,8 +317,8 @@ void __stdcall SetFrontendSubState(char state, int line, char* file)
         sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]", line, file);
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbf) = state;
-    (*(char*)&g_game->field_2bc0) = state;
+    (*(char*)&g_game->frontendSubState) = state;
+    (*(char*)&g_game->frontendNextSubState) = state;
 }
 #pragma auto_inline(on)
 
@@ -331,13 +331,13 @@ void __stdcall SetFrontendState(char state, int line, char* file)
         sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]", line, file);
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbe) = state;
+    (*(char*)&g_game->frontendState) = state;
     if (CodeChecksumFailed()) {
         sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]", 155, "c:\\cavedog\\wargame\\frontend.cpp");
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbf) = 0;
-    (*(char*)&g_game->field_2bc0) = 0;
+    (*(char*)&g_game->frontendSubState) = 0;
+    (*(char*)&g_game->frontendNextSubState) = 0;
 }
 #pragma auto_inline(on)
 
@@ -345,15 +345,15 @@ void __stdcall SetFrontendState(char state, int line, char* file)
 void ApplyPendingSubState()
 {
     char buf[256];
-    char next = (char)g_game->field_2bc0;
-    if (next != (char)g_game->field_2bbf) {
+    char next = (char)g_game->frontendNextSubState;
+    if (next != (char)g_game->frontendSubState) {
         if (CodeChecksumFailed()) {
             sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]",
                     163, "c:\\cavedog\\wargame\\frontend.cpp");
             OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
         }
-        (*(char*)&g_game->field_2bbf) = next;
-        (*(char*)&g_game->field_2bc0) = next;
+        (*(char*)&g_game->frontendSubState) = next;
+        (*(char*)&g_game->frontendNextSubState) = next;
     }
 }
 
@@ -365,13 +365,13 @@ void ResetFrontendState()
         sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]", 0xa9, "c:\\cavedog\\wargame\\frontend.cpp");
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbe) = 0;
+    (*(char*)&g_game->frontendState) = 0;
     if (CodeChecksumFailed()) {
         sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]", 0x9b, "c:\\cavedog\\wargame\\frontend.cpp");
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbf) = 0;
-    (*(char*)&g_game->field_2bc0) = 0;
+    (*(char*)&g_game->frontendSubState) = 0;
+    (*(char*)&g_game->frontendNextSubState) = 0;
     g_game->mode_2bf0 = 0;
     *(unsigned short*)&g_game->dplayAddressDialogFlags &= 0xfffe;
     g_frontendErrorText[0] = 0;
@@ -386,14 +386,14 @@ void EnterMainMenuState()
                 178, "c:\\cavedog\\wargame\\frontend.cpp");
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbe) = 2;
+    (*(char*)&g_game->frontendState) = 2;
     if (CodeChecksumFailed()) {
         sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]",
                 155, "c:\\cavedog\\wargame\\frontend.cpp");
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbf) = 0;
-    (*(char*)&g_game->field_2bc0) = 0;
+    (*(char*)&g_game->frontendSubState) = 0;
+    (*(char*)&g_game->frontendNextSubState) = 0;
     LoadPictureCached(0, 0, 0, 0);
 }
 
@@ -497,7 +497,7 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
     if (IsCurrentGadgetNamed(gadget, "SINGLE")) {
         PlaySoundByName("BigButton", 0);
         SetCursorMode(0x14);
-        (*(char*)&g_game->field_2bc0) = 5;
+        (*(char*)&g_game->frontendNextSubState) = 5;
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "MULTI")) {
@@ -507,7 +507,7 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
         BuildDataPath(buf, "maps", "multiplay", "tdf");
         TdfFile obj;
         if ((&obj)->LoadFile(buf) != 0) {
-            (*(char*)&g_game->field_2bc0) = 6;
+            (*(char*)&g_game->frontendNextSubState) = 6;
             SetOffscreenSurface((int)g_game->screen);
             FillSurface(0, 0);
             FlipScreen();
@@ -542,20 +542,20 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
                     580, "c:\\cavedog\\wargame\\frontend.cpp");
             OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
         }
-        (*(char*)&g_game->field_2bbe) = 1;
+        (*(char*)&g_game->frontendState) = 1;
         if (CodeChecksumFailed()) {
             sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]",
                     155, "c:\\cavedog\\wargame\\frontend.cpp");
             OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
         }
-        (*(char*)&g_game->field_2bbf) = 0;
-        (*(char*)&g_game->field_2bc0) = 0;
+        (*(char*)&g_game->frontendSubState) = 0;
+        (*(char*)&g_game->frontendNextSubState) = 0;
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "EXIT")) {
         PlaySoundByName("exit", 0);
         SetCursorMode(0x14);
-        (*(char*)&g_game->field_2bc0) = 8;
+        (*(char*)&g_game->frontendNextSubState) = 8;
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "Credits")) {
@@ -569,7 +569,7 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
             return;
         }
         SetCursorMode(0x14);
-        (*(char*)&g_game->field_2bc0) = 9;
+        (*(char*)&g_game->frontendNextSubState) = 9;
         return;
     }
     ClearSelectedGadget(gadget);
@@ -814,14 +814,14 @@ void HandleFrontendDebugKey(void)
                     938, "c:\\cavedog\\wargame\\frontend.cpp");
             OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
         }
-        (*(char*)&g_game->field_2bbe) = 2;
+        (*(char*)&g_game->frontendState) = 2;
         if (CodeChecksumFailed()) {
             sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]",
                     155, "c:\\cavedog\\wargame\\frontend.cpp");
             OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
         }
-        (*(char*)&g_game->field_2bbf) = 0;
-        (*(char*)&g_game->field_2bc0) = 0;
+        (*(char*)&g_game->frontendSubState) = 0;
+        (*(char*)&g_game->frontendNextSubState) = 0;
         return;
     }
 }
@@ -841,21 +841,21 @@ int ConnectToService(void)
                 956, "c:\\cavedog\\wargame\\frontend.cpp");
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbe) = 0xf;
+    (*(char*)&g_game->frontendState) = 0xf;
     if (CodeChecksumFailed()) {
         sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]",
                 155, "c:\\cavedog\\wargame\\frontend.cpp");
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbf) = 0;
-    (*(char*)&g_game->field_2bc0) = 0;
+    (*(char*)&g_game->frontendSubState) = 0;
+    (*(char*)&g_game->frontendNextSubState) = 0;
     if (CodeChecksumFailed()) {
         sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]",
                 957, "c:\\cavedog\\wargame\\frontend.cpp");
         OpenMessageBox(&g_game->gui, buf, 500, 1, 1);
     }
-    (*(char*)&g_game->field_2bbf) = 0;
-    (*(char*)&g_game->field_2bc0) = 0;
+    (*(char*)&g_game->frontendSubState) = 0;
+    (*(char*)&g_game->frontendNextSubState) = 0;
     return 0;
 }
 
@@ -871,42 +871,42 @@ static void LogStateChange(int line, char* file)
 static void SetSubState(char state, int line, char* file)
 {
     CheckFrontendStateChange(line, file);
-    (*(char*)&g_game->field_2bbf) = state;
-    (*(char*)&g_game->field_2bc0) = state;
+    (*(char*)&g_game->frontendSubState) = state;
+    (*(char*)&g_game->frontendNextSubState) = state;
 }
 
 static void SetSubStateLogged(char state, int line, char* file)
 {
     LogStateChange(line, file);
-    (*(char*)&g_game->field_2bbf) = state;
-    (*(char*)&g_game->field_2bc0) = state;
+    (*(char*)&g_game->frontendSubState) = state;
+    (*(char*)&g_game->frontendNextSubState) = state;
 }
 
 static void SetState(char state, int line, char* file)
 {
     CheckFrontendStateChange(line, file);
-    (*(char*)&g_game->field_2bbe) = state;
+    (*(char*)&g_game->frontendState) = state;
     SetSubState(0, 0x9b, g_frontendSourceFile);
 }
 
 static void SetStateSubCall(char state, int line, char* file)
 {
     CheckFrontendStateChange(line, file);
-    (*(char*)&g_game->field_2bbe) = state;
+    (*(char*)&g_game->frontendState) = state;
     SetFrontendSubState(0, 0x9b, g_frontendSourceFile);
 }
 
 static void SetStateLogged(char state, int line, char* file)
 {
     LogStateChange(line, file);
-    (*(char*)&g_game->field_2bbe) = state;
+    (*(char*)&g_game->frontendState) = state;
     SetFrontendSubState(0, 0x9b, g_frontendSourceFile);
 }
 
 static void UpdateSubState()
 {
-    char next = (char)g_game->field_2bc0;
-    if (next != (char)g_game->field_2bbf)
+    char next = (char)g_game->frontendNextSubState;
+    if (next != (char)g_game->frontendSubState)
         SetSubState(next, 0xa3, g_frontendSourceFile);
 }
 
@@ -939,7 +939,7 @@ void RunFrontendStateMachine(void)
 {
     UpdateSubState();
 
-    switch ((unsigned char)(char)g_game->field_2bbe) {
+    switch ((unsigned char)(char)g_game->frontendState) {
     case 0: {
         Display_00425d80* p = GetDisplay();
         SetCursorOverlayEnabled(0);
@@ -963,7 +963,7 @@ void RunFrontendStateMachine(void)
 
     case 2:
         PopKey();
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             if (InitLobbiedConnection()) {
                 (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b0 = 1;
@@ -1020,7 +1020,7 @@ void RunFrontendStateMachine(void)
         break;
 
     case 4:
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             SetSubState(1, 0x443, g_frontendSourceFile);
             return;
@@ -1035,7 +1035,7 @@ void RunFrontendStateMachine(void)
         break;
 
     case 5:
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             SetSubState(1, 0x454, g_frontendSourceFile);
             return;
@@ -1051,7 +1051,7 @@ void RunFrontendStateMachine(void)
 
     case 7:
         PopKey();
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             OpenSingleMenu();
             ResetPlayerSlots();
@@ -1087,7 +1087,7 @@ void RunFrontendStateMachine(void)
         break;
 
     case 10:
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 1:
             PresentFrontendFrame();
             return;
@@ -1099,7 +1099,7 @@ void RunFrontendStateMachine(void)
 
     case 8:
         PopKey();
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 1:
             PresentFrontendFrame();
             return;
@@ -1119,7 +1119,7 @@ void RunFrontendStateMachine(void)
 
     case 9:
         PopKey();
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             OpenSkirmishMenu();
             SetSubState(1, 0x4d9, g_frontendSourceFile);
@@ -1141,7 +1141,7 @@ void RunFrontendStateMachine(void)
     case 13:
     case 14:
         PopKey();
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             OpenMissionBriefing();
             SetSubState(1, 0x4f5, g_frontendSourceFile);
@@ -1153,7 +1153,7 @@ void RunFrontendStateMachine(void)
             (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2 = 1;
             return;
         case 3:
-            switch ((unsigned char)(char)g_game->field_2bbe) {
+            switch ((unsigned char)(char)g_game->frontendState) {
             case 0xb:
                 OpenNewGameMenu(0);
                 SetState(8, 0x505, g_frontendSourceFile);
@@ -1182,7 +1182,7 @@ void RunFrontendStateMachine(void)
 
     case 15:
         PopKey();
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             g_game->dplayAddressDialogFlags.b1 = 0;
             g_game->dplayAddressDialogFlags.b0 = 0;
@@ -1237,7 +1237,7 @@ void RunFrontendStateMachine(void)
         break;
 
     case 20:
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 1:
             if (g_game->dplayAddressDialogFlags.b1) {
                 if (UseServiceCalls()) {
@@ -1257,7 +1257,7 @@ void RunFrontendStateMachine(void)
 
     case 16:
         PopKey();
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             host_net_guarantee_packets(1);
             SetSubState(1, 0x587, g_frontendSourceFile);
@@ -1268,7 +1268,7 @@ void RunFrontendStateMachine(void)
                     SetSubState(0x11, 0x58f, g_frontendSourceFile);
                     return;
                 }
-                g_game->field_2ba2 = DAT_004fdaf0;
+                g_game->joinGuid = DAT_004fdaf0;
             }
             OpenSelectGameDialog();
             ShowFrontendErrorText();
@@ -1286,11 +1286,11 @@ void RunFrontendStateMachine(void)
         case 19:
             g_game->players[(unsigned char)g_game->localPlayer].info->bit6 = 1;
         case 18:
-            if (JoinNetGame(g_game->field_2ba2, (unsigned char)g_game->localPlayer) == 0) {
+            if (JoinNetGame(g_game->joinGuid, (unsigned char)g_game->localPlayer) == 0) {
                 SetSubState(0, 0x5b3, g_frontendSourceFile);
                 return;
             }
-            if ((char)g_game->field_2bbf == 0x12) {
+            if ((char)g_game->frontendSubState == 0x12) {
                 BlankScreen();
                 Force640x480Surfaces();
                 if (InitScoreReporting()) {
@@ -1310,7 +1310,7 @@ void RunFrontendStateMachine(void)
                 g_game->players[(unsigned char)g_game->localPlayer].info->host = *(unsigned int*)(unit + 4) >> 1;
             else
                 g_game->players[(unsigned char)g_game->localPlayer].info->host = 0;
-            if ((char)g_game->field_2bbf == 0x13)
+            if ((char)g_game->frontendSubState == 0x13)
                 g_game->players[(unsigned char)g_game->localPlayer].info->bit6 = 1;
             unsigned char* q = (unsigned char*)g_game + 0x14b * (unsigned char)g_game->localPlayer + 0x1b84;
             *q = ((*(Bits_00426e80*)&g_game->flags_2b4c).b4 << 1) | (*q & 0xfd);
@@ -1337,7 +1337,7 @@ void RunFrontendStateMachine(void)
         break;
 
     case 17:
-        switch ((unsigned char)(char)g_game->field_2bbf) {
+        switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             if (!(*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2) {
                 OpenBattleRoom();

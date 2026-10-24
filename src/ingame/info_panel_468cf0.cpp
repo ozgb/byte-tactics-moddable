@@ -328,7 +328,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   int i, k;
 
   cx = (g_game->width_37e1f + 0x80) / 2;
-  cy = g_game->field_37e23 / 2;
+  cy = g_game->screenHeight / 2;
   SetOffscreenSurface((int)g_game->screen);
   ctx = **(Surface **)&g_game->screen;
   colors = &g_game->colors[0];
@@ -625,7 +625,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     DrawString((int)&ctx, (int)gameTime, 0x82, -0x22 - GetFontHeight() + GetScreenHeight(), -1);
   }
   if ((*(Bits8*)&g_game->flags_38a51).b1)
-    DrawFrame((int)&ctx, GetGafFrame(g_game->cursorHourglass, 0), g_game->width_37e1f - 0x10, g_game->field_37e23 - 0x50);
+    DrawFrame((int)&ctx, GetGafFrame(g_game->cursorHourglass, 0), g_game->width_37e1f - 0x10, g_game->screenHeight - 0x50);
   ResetClipRect((int)&ctx);
   BlitMenuLayers((int)&g_game->field_519, (int)&ctx, (int)&g_game->rect);
   if (g_game->profileBarsEnabled != 0 && param_1 != 0) {

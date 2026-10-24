@@ -72,7 +72,7 @@ struct Game_0049a120 {
     int mapHeightTiles;
     char unknown_1423b[0x1426f - 0x1423b];
     FeatureDef_0049a120* features;
-    char unknown_14273[0x14287 - 0x14273];
+    char pad_14273[0x14287 - 0x14273];
     Ref<Cell> heightMap;
     char unknown_1428b[0x14357 - 0x1428b];
     Ref<Unit> units;

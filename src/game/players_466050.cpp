@@ -8,7 +8,7 @@
 struct Game_00466050 {
     char unknown_0[0x1b63];
     Player players[10];
-    char unknown_2851[0x2a42 - 0x2851];
+    char pad_2851[0x2a42 - 0x2851];
     unsigned char localPlayer;
     unsigned char playerIndex;
     char unknown_2a44[0x38a37 - 0x2a44];

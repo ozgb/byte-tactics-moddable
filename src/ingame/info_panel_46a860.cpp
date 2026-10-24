@@ -170,7 +170,7 @@ struct SideDef_0046a860 {
 
 // FUNCTION: 0x46a860
 void __stdcall DrawUnitInfoPanel(void* surface) {
-    int yOffset = g_game->field_37e23 - g_game->baseHeight;
+    int yOffset = g_game->screenHeight - g_game->baseHeight;
     Snapshot_0046a860 snapshot;
     memset(&snapshot, 0, sizeof(snapshot));
     char text[256];
@@ -192,7 +192,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
 
         SetFont(g_game->fontComix);
         SetTextColors(0x53, GetTextKeyColor());
-        int pfstate = g_game->field_37e23 - GetFontHeight() - 1;
+        int pfstate = g_game->screenHeight - GetFontHeight() - 1;
         sprintf(text, "PFSTATE %d, PFABLE %d\n", ((Display_0046a860 *)g_game->unknown_c)->flags & 1,
                 ((Display_0046a860 *)g_game->unknown_c)->haveBackBuffer);
         DrawString(surface, (unsigned char*)text, 0x82, pfstate, -1);

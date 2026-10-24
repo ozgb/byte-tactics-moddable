@@ -21,11 +21,11 @@ struct Stat_0041dc20 {
 struct Game_0041dc20 {
     char unknown_0[0x1b63];
     Player players[10];
-    char unknown_2851[0x38a47 - 0x2851];
+    char pad_2851[0x38a47 - 0x2851];
     unsigned int gameTick;
     char unknown_38a4b[0x38dd9 - 0x38a4b];
     Stat_0041dc20 stats[10];
-    char unknown_3901d[0x3918f - 0x3901d];
+    char pad_3901d[0x3918f - 0x3901d];
     int maxKills;
     int maxLosses;
     int max_26;

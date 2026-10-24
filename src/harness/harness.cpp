@@ -544,9 +544,9 @@ static void SetUpSkirmish()
     g_game->localPlayer = (unsigned char)local;
     g_game->playerIndex = (unsigned char)local;
 
-    g_game->field_2bbe = 9;
-    g_game->field_2bbf = 2;
-    g_game->field_2bc0 = 2;
+    g_game->frontendState = 9;
+    g_game->frontendSubState = 2;
+    g_game->frontendNextSubState = 2;
 }
 
 static void OpenTrace(unsigned controlWord);

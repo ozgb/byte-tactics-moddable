@@ -1590,7 +1590,7 @@ void UpdateEdgeScroll()
     if (!(d->flags_f0 & 2)) {
         host_cursor_get((int*)&pt.x, (int*)&pt.y);
         int w = g_game->width_37e1f;
-        int h = g_game->field_37e23;
+        int h = g_game->screenHeight;
         if ((pt.x >= w || pt.y >= h) && pt.x < w + 100 && pt.y < h + 100
             && host_window_has_focus()) {
             mouse.x = pt.x;
@@ -1602,7 +1602,7 @@ void UpdateEdgeScroll()
         }
     } else {
         int w = g_game->width_37e1f;
-        int h = g_game->field_37e23;
+        int h = g_game->screenHeight;
         if (mouse.x >= w)
             mouse.x = w - 1;
         if (mouse.y >= h)
@@ -1611,13 +1611,13 @@ void UpdateEdgeScroll()
     int talk = IsScreenNamed(&g_game->gui, "TALK.GUI");
     int x = g_game->scrollX;
     int y = g_game->scrollY;
-    if ((IsKeyDown(0xf4) && !talk) || (mouse.x == 0 && mouse.y < g_game->field_37e23))
+    if ((IsKeyDown(0xf4) && !talk) || (mouse.x == 0 && mouse.y < g_game->screenHeight))
         x -= speed;
     else if ((IsKeyDown(0xf6) && !talk) || mouse.x == g_game->width_37e1f - 1)
         x += speed;
     if ((IsKeyDown(0xf5) && !talk) || (mouse.y == 0 && mouse.x < g_game->width_37e1f))
         y -= speed;
-    else if ((IsKeyDown(0xf7) && !talk) || mouse.y == g_game->field_37e23 - 1)
+    else if ((IsKeyDown(0xf7) && !talk) || mouse.y == g_game->screenHeight - 1)
         y += speed;
     if (g_game->scrollX != x || g_game->scrollY != y) {
         g_game->scrollX = x;

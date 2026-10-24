@@ -694,7 +694,7 @@ int Mission::LoadMission(char* map)
             }
             parser.ResetCurrentRecord();
             if (parser.SelectRecord("GlobalHeader")) {
-                (*(short*)&g_game->field_37ee6) = parser.current->GetFieldInt("maxunits", 200);
+                (*(short*)&g_game->maxUnitsSetting) = parser.current->GetFieldInt("maxunits", 200);
                 parser.ResetCurrentRecord();
                 BuildCampaignFilePath(1, "Maps", path, "TNT");
             } else {

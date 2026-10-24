@@ -478,7 +478,7 @@ void HandleGameKey(void)
                 g_game->movieCaptureIndex = 0;
                 char path[0x100];
                 char findData[0x118];
-                sprintf(path, "%s\\MOVIE*", g_game->field_38a53);
+                sprintf(path, "%s\\MOVIE*", g_game->movieCaptureDir);
                 int h = HAPI_FindFirst(path, findData, -1, 1);
                 if (h >= 0) {
                     do {
@@ -490,7 +490,7 @@ void HandleGameKey(void)
                 }
                 g_game->movieCaptureIndex++;
                 sprintf(g_game->text_38b53, "%s\\MOVIE%03i",
-                        g_game->field_38a53, g_game->movieCaptureIndex);
+                        g_game->movieCaptureDir, g_game->movieCaptureIndex);
                 MakeDirectoryPath(g_game->text_38b53);
                 DrawBattleFrame(0, 1);
                 SaveScreenshot(g_game->text_38b53, "FRAM");

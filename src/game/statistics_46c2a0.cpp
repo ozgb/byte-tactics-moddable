@@ -11,7 +11,7 @@
 struct Game_0046c2a0 {
     char unknown_0[0x1b63];
     Player players[10];
-    char unknown_2851[0x2a42 - 0x2851];
+    char pad_2851[0x2a42 - 0x2851];
     unsigned char localPlayer;
     char unknown_2a43[0x38a47 - 0x2a43];
     unsigned int gameTick;

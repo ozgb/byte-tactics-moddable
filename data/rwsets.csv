@@ -10469,6 +10469,7 @@ address,function,file,kind,target
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,call,GameFreeThunk
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,call,LoadMapList
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,call,Mission::LoadMissionByName
+0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,field_maybe_written,Mission::mapList
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,field_read,Mission::mapList
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,field_read,Mission::multi
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,field_write,Mission::mapCount

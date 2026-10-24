@@ -2902,7 +2902,7 @@ address,function,file,kind,target
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,operator delete
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,operator new
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,operator=
-0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,deref_read,*Unit
+0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,deref_read,*Ref<Unit>
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,deref_read,*unsigned int
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,deref_write,*int
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,deref_write,*unsigned int
@@ -20667,10 +20667,14 @@ address,function,file,kind,target
 0x4649d0,RebuildAIFeatureCells,src/game/players_464290.cpp,global_read,g_game
 0x4649d0,RebuildAIFeatureCells,src/game/players_464290.cpp,global_read,g_seams
 0x4649d0,RebuildAIFeatureCells,src/game/players_464290.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::RebuildFeatureCells]
+0x464a00,FreePlayers,src/game/players_464290.cpp,call,get
 0x464a00,FreePlayers,src/game/players_464290.cpp,call,operator delete
+0x464a00,FreePlayers,src/game/players_464290.cpp,call,operator=
+0x464a00,FreePlayers,src/game/players_464290.cpp,deref_read,*Ref<unsigned char>
 0x464a00,FreePlayers,src/game/players_464290.cpp,deref_read,*SquadManager
 0x464a00,FreePlayers,src/game/players_464290.cpp,deref_read,*unsigned char
 0x464a00,FreePlayers,src/game/players_464290.cpp,deref_read,*void
+0x464a00,FreePlayers,src/game/players_464290.cpp,deref_write,*Ref<unsigned char>
 0x464a00,FreePlayers,src/game/players_464290.cpp,deref_write,*SquadManager
 0x464a00,FreePlayers,src/game/players_464290.cpp,deref_write,*int
 0x464a00,FreePlayers,src/game/players_464290.cpp,deref_write,*void

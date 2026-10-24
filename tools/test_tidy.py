@@ -47,9 +47,10 @@ class Stub:
         self.calls = []
 
     def __call__(self, clang_tidy, root, build_dir, path):
-        self.calls.append(path)
-        status, text = self.answers.get(path, (0, ""))
-        return status, text.replace("ROOT", str(self.root))
+        base = Path(root).resolve() != self.root
+        self.calls.append(("base", path) if base else path)
+        status, text = self.answers.get(("base", path) if base else path, (0, ""))
+        return status, text.replace("ROOT", str(root))
 
 
 class Repo:
@@ -234,6 +235,52 @@ class TidyTest(Repo, unittest.TestCase):
         found, _ = self.lint()
         self.assertEqual([f[:2] for f in found], [("src/c.cpp", 1)])
 
+    def test_modified_line_keeping_an_old_finding_passes(self):
+        self.edit("src/a.cpp", "    int total = a + b;", "    int total = a + b;\n    int t = 1;")
+        self.edit("src/a.cpp", "    int t = 1;", "    int t = 2;")
+        text = finding("ROOT", "src/a.cpp", 5, "modernize-use-nullptr")
+        found, stub = self.lint({"src/a.cpp": (0, text), ("base", "src/a.cpp"): (0, text)})
+        self.assertEqual(found, [])
+        self.assertIn(("base", "src/a.cpp"), stub.calls)
+
+    def test_modified_line_adding_a_new_check_fails(self):
+        self.edit("src/a.cpp", "    return total;", "    return total;\n    int t = 1;")
+        self.edit("src/a.cpp", "    int t = 1;", "    int t = 2;")
+        old = finding("ROOT", "src/a.cpp", 6, "modernize-use-nullptr")
+        new = old + finding("ROOT", "src/a.cpp", 6)
+        found, _ = self.lint({"src/a.cpp": (0, new), ("base", "src/a.cpp"): (0, old)})
+        self.assertEqual([(f[0], f[1]) for f in found], [("src/a.cpp", 6)])
+        self.assertIn("bugprone-assignment-in-if-condition", found[0][2])
+
+    def test_modified_line_with_same_check_but_other_message_fails(self):
+        self.edit("src/a.cpp", "    return total;", "    return total;\n    int t = 1;")
+        self.edit("src/a.cpp", "    int t = 1;", "    int t = 2;")
+        head = finding("ROOT", "src/a.cpp", 6).replace("an assignment", "another assignment")
+        found, _ = self.lint({"src/a.cpp": (0, head), ("base", "src/a.cpp"): (0, finding("ROOT", "src/a.cpp", 6))})
+        self.assertEqual(len(found), 1)
+
+    def test_pure_addition_with_the_same_finding_as_elsewhere_fails(self):
+        self.edit("src/a.cpp", "    return total;", "    int t = 1;\n    return total;")
+        text = finding("ROOT", "src/a.cpp", 4) + finding("ROOT", "src/a.cpp", 5)
+        found, stub = self.lint({"src/a.cpp": (0, text), ("base", "src/a.cpp"): (0, finding("ROOT", "src/a.cpp", 4))})
+        self.assertEqual([f[:2] for f in found], [("src/a.cpp", 5)])
+        self.assertNotIn(("base", "src/a.cpp"), stub.calls)
+
+    def test_base_parse_failure_counts_as_no_base_findings(self):
+        self.edit("src/a.cpp", "    return total;", "    return total;\n    int t = 1;")
+        self.edit("src/a.cpp", "    int t = 1;", "    int t = 2;")
+        text = finding("ROOT", "src/a.cpp", 6)
+        error = "ROOT/src/a.cpp:1:10: error: boom [clang-diagnostic-error]\n"
+        found, _ = self.lint({"src/a.cpp": (0, text), ("base", "src/a.cpp"): (1, error)})
+        self.assertEqual(len(found), 1)
+
+    def test_base_worktree_is_removed(self):
+        self.edit("src/a.cpp", "    return total;", "    return total;\n    int t = 1;")
+        self.edit("src/a.cpp", "    int t = 1;", "    int t = 2;")
+        self.lint({"src/a.cpp": (0, finding("ROOT", "src/a.cpp", 6))})
+        listing = subprocess.run(["git", "worktree", "list"], cwd=self.root, capture_output=True, text=True).stdout
+        self.assertEqual(len(listing.splitlines()), 1, listing)
+
     def test_touching_a_line_with_an_old_placeholder_passes(self):
         self.edit("src/b.cpp", "return FUN_00401000();", "return FUN_00401000( );")
         found, _ = self.lint({"src/b.cpp": (0, "")})
@@ -264,6 +311,8 @@ class RealClangTidyTest(Repo, unittest.TestCase):
         found = self.real()
         self.assertEqual([f[:2] for f in found], [("src/c.cpp", 1)], found)
         self.assertIn("bugprone-assignment-in-if-condition", found[0][2])
+        self.edit("src/c.cpp", "if (x = 2) {}", "if (x = 3) {}")
+        self.assertEqual(self.real(), [])
         self.edit("src/c.cpp", "return x;", "return x + 0;")
         self.assertEqual(self.real(), [])
 

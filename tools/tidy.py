@@ -10,7 +10,11 @@ BUILD_DIR/compile_commands.json (configure with -DCMAKE_EXPORT_COMPILE_COMMANDS=
 once on each changed C++ file under src/ and once on one translation unit for
 each changed header under src/ or interfaces/ (the first, in path order, that
 reaches the header through #include lines). Only findings on an added line are
-reported, so a change that touches a line with an old finding passes.
+reported. When the line replaces others (a hunk that also removes lines), a
+finding is old, and not reported, if the base had the same check and message on
+one of the removed lines; the base is checked in a temporary detached worktree,
+only when needed, and a base that does not parse counts as having no findings.
+Pure additions are always reported.
 
 Also fails an added line that introduces a placeholder name from the
 decompiler: FUN_<addr>, DAT_<addr>, field_<offset>, unk*, unknown_<offset>,
@@ -229,8 +233,70 @@ def targets(root, build_dir, changed):
     return sorted(chosen), missed
 
 
+def hunks_of(root, rev_range):
+    """{path: [(old path, removed lines, added lines)]} from git diff -U0, one entry per hunk."""
+    diff = git(root, "diff", "-U0", "--no-color", "--no-ext-diff", "--diff-filter=d", rev_range, "--")
+    result, old_path, path = {}, None, None
+    for row in diff.splitlines():
+        if row.startswith("--- "):
+            old_path = row[6:].split("\t")[0] if row.startswith("--- a/") else None
+        elif row.startswith("+++ "):
+            path = row[6:].split("\t")[0] if row.startswith("+++ b/") else None
+        elif row.startswith("@@") and path:
+            m = re.match(r"@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@", row)
+            old, old_n, new, new_n = int(m.group(1)), int(m.group(2) or 1), int(m.group(3)), int(m.group(4) or 1)
+            result.setdefault(path, []).append(
+                (old_path or path, set(range(old, old + old_n)), set(range(new, new + new_n))))
+    return result
+
+
+def modified_hunk(hunks, path, line):
+    """The (old path, removed lines) of the hunk that adds the line and removes others, or None."""
+    for old_path, removed, added in hunks.get(path, ()):
+        if removed and line in added:
+            return old_path, removed
+    return None
+
+
+def base_findings(root, build_dir, base, units, clang_tidy, runner):
+    """[diagnostics] that clang-tidy reports on the units at the base commit, or [] with a note on stderr."""
+    tmp = Path(tempfile.mkdtemp(prefix="tidy-base-"))
+    work = tmp / "base"
+    found = []
+    try:
+        subprocess.run(["git", "worktree", "add", "-q", "--detach", str(work), base], cwd=root,
+                       capture_output=True, text=True, check=True)
+        head = Path(root).resolve()
+        db_dir = tmp / "db"
+        db_dir.mkdir()
+        db = Path(root) / build_dir
+        entries = json.loads((db / "compile_commands.json").read_text())
+        for entry in entries:
+            for key in ("command", "file", "output"):
+                if key in entry:
+                    entry[key] = entry[key].replace(str(head), str(work))
+        (db_dir / "compile_commands.json").write_text(json.dumps(entries))
+        if (db / "overlay.json").exists():
+            shutil.copy(db / "overlay.json", db_dir / "overlay.json")
+        for unit in units:
+            try:
+                found += tidy_files(str(work), str(db_dir), [unit], clang_tidy, 1, runner)[unit]
+            except ToolError as e:
+                print(f"note: no base findings for {unit}: {e}", file=sys.stderr)
+    except (subprocess.CalledProcessError, OSError, ValueError, KeyError) as e:
+        print(f"note: no base findings: {e}", file=sys.stderr)
+    finally:
+        subprocess.run(["git", "worktree", "remove", "--force", str(work)], cwd=root, capture_output=True)
+        shutil.rmtree(tmp, ignore_errors=True)
+    return found
+
+
 def lint(root, rev_range, build_dir=DEFAULT_BUILD_DIR, clang_tidy="clang-tidy", jobs=None, runner=run_tidy):
-    """[(path, line, message)] for the added lines: clang-tidy findings and new placeholder names."""
+    """[(path, line, message)] for the added lines: new clang-tidy findings and new placeholder names.
+
+    A finding on a line that replaces others is old when the base had the same check and message
+    on one of the lines the hunk removes.
+    """
     lines_by_path = added_lines(root, rev_range)
     findings = list(lint_placeholders(root, rev_range, lines_by_path))
     changed = [p for p, added in lines_by_path.items() if added]
@@ -238,12 +304,24 @@ def lint(root, rev_range, build_dir=DEFAULT_BUILD_DIR, clang_tidy="clang-tidy", 
     for path in missed:
         print(f"note: no translation unit reaches {path}, not checked by clang-tidy", file=sys.stderr)
     results = tidy_files(root, build_dir, units, clang_tidy, jobs or os.cpu_count() or 1, runner)
-    seen = set()
-    for diags in results.values():
+    hunks = hunks_of(root, rev_range)
+    seen, candidates = set(), []
+    for unit, diags in results.items():
         for path, line, _, message, check in diags:
-            if line in lines_by_path.get(path, ()) and (path, line, message, check) not in seen:
-                seen.add((path, line, message, check))
-                findings.append((path, line, f"{message} [{check}]"))
+            if line not in lines_by_path.get(path, ()) or (path, line, message, check) in seen:
+                continue
+            seen.add((path, line, message, check))
+            candidates.append((unit, path, line, message, check))
+    modified_units = sorted({u for u, p, ln, _, _ in candidates if modified_hunk(hunks, p, ln)})
+    base = []
+    if modified_units:
+        base = base_findings(root, build_dir, base_of(root, rev_range), modified_units, clang_tidy, runner)
+    old = {(p, check, message, ln) for p, ln, _, message, check in base}
+    for unit, path, line, message, check in candidates:
+        hunk = modified_hunk(hunks, path, line)
+        if hunk and any((hunk[0], check, message, ln) in old for ln in hunk[1]):
+            continue
+        findings.append((path, line, f"{message} [{check}]"))
     return sorted(set(findings))
 
 

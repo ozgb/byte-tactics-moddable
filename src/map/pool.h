@@ -1,12 +1,13 @@
 #ifndef POOL_H
 #define POOL_H
+#include "../../interfaces/ref.h"
 
 struct Spot;
 
 #pragma pack(push, 1)
 struct Pool {
-    Spot* entries;
-    void* featureUnit;
+    Ref<Spot> entries;
+    Ref<char> featureUnit;
     int usedHead;
     int restHead;
     int freeHead;

@@ -72,7 +72,7 @@ GafFrame* __stdcall GetGafFrame(unsigned short* table, int index);
 // FUNCTION: 0x482270
 void __stdcall AddLineOfSight(SightQuery* params)
 {
-    if (((Player_482270*)params->player)->playerIndex == g_game->playerIndex) {
+    if (((Player_482270*)params->player.get())->playerIndex == g_game->playerIndex) {
         g_game->bits_14281_1.flag3 = 0;
         g_game->bits_142f1_2.flagA = 1;
     }
@@ -95,7 +95,7 @@ void __stdcall AddLineOfSight(SightQuery* params)
                 : (short)g_losTables.GetLosTableCount() - 1);
         short count = table->GetLosLineCount();
         short i = 0;
-        ((Player_482270*)params->player)->grid.at(x, y)++;
+        ((Player_482270*)params->player.get())->grid.at(x, y)++;
         int ref = *params->frameIdx;
         for (i = 0; i < count; i++) {
             LosLine* line = table->GetLosLine(i);
@@ -122,7 +122,7 @@ void __stdcall AddLineOfSight(SightQuery* params)
                     int d1 = cell[1] - ref;
                     int d0 = cell[0] - ref;
                     if (d0 * bestIdx > bestDiff * j1) {
-                        ((Player_482270*)params->player)
+                        ((Player_482270*)params->player.get())
                             ->grid.at((short)dx, (short)dy)++;
                         if (d1 * bestIdx > bestDiff * j1) {
                             bestIdx = j1;
@@ -155,7 +155,7 @@ void __stdcall AddLineOfSight(SightQuery* params)
             return;
         for (int i = ny; i < limitY; i++) {
             // Named ex local: shapes the destination address.
-            ByteMap_482270* ex = &((Player_482270*)params->player)->grid;
+            ByteMap_482270* ex = &((Player_482270*)params->player.get())->grid;
             unsigned char* dst = ex->data + (y + i) * ex->size.width + nx + x;
             unsigned char* src = frame->pixelsOrLayers + i * frame->width + nx;
             // Counted j loop: lets the compiler turn it into dec/jne.

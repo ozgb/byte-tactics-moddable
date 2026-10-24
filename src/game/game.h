@@ -9,6 +9,7 @@
 #include "../network/settings.h"
 #endif
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 #include "../frontend/bits_00426e80.h"
 #include "../frontend/conn_info_443ff0.h"
 #include "../frontend/flags37f14_0045cf60.h"
@@ -81,6 +82,7 @@ struct Eye_00482130;
 struct Feature;
 struct FeatureSpot;
 struct Font;
+class HapiBank;
 struct FrameTable;
 struct IconSet_00466780;
 struct List_00420960;
@@ -389,13 +391,13 @@ struct Game {
             CursorState_0041cc60 cursor;
             WeaponDef weapons[256];
             int projectileCount;
-            Projectile* projectiles;
+            Ref<Projectile> projectiles;
             void* field_141fb;
             void* field_141ff;
             void* field_14203;
-            Pathfinder* pathfinder;
-            FeatureSpot* spots;
-            Unit* unit;
+            Ref<Pathfinder> pathfinder;
+            Ref<FeatureSpot> spots;
+            Ref<Unit> unit;
             char unknown_14213[8];
             int list_1421b;
             void** field_1421f;
@@ -416,23 +418,23 @@ struct Game {
             float tidal;
             void* radarFrame;
             Feature* features;
-            unsigned short* visibilityMask;
+            Ref<unsigned short> visibilityMask;
             int count_14277;
             Eye_00482130* eyes;
             unsigned char seaLevel;
             unsigned char debugMode;
             unsigned short mapFlags;
             IconSet_00466780* iconSet;
-            Cell* cells;
+            Ref<Cell> cells;
             unsigned short* mapValues;
             Grid grid1;
-            Class_0047cb00* cells_1429f;
+            Ref<Class_0047cb00> cells_1429f;
             unsigned int width_142a3;
             unsigned int height_142a7;
             char unknown_142ab[4];
             int field_142af;
             int field_142b3;
-            int overflowBucket;
+            Ref<Class_0047cb00> overflowBucket;
             Rect viewLimit;
             char field_142cb[16];
             void* finalSurface;
@@ -612,8 +614,8 @@ struct Game {
     unsigned short unitsPerPlayer;
     unsigned short poolCount;
     int f14353;
-    Unit* units;
-    Unit* unitsEnd;
+    Ref<Unit> units;
+    Ref<Unit> unitsEnd;
     unsigned short* list_1435f;
     void* hotRadar;
     int count_14367;
@@ -629,7 +631,7 @@ struct Game {
         F14373 autoFollowFlags;
         unsigned int autoFollowFlags_14373;
     };
-    Class_0045ae80** types;
+    Ref<Class_0045ae80*> types;
     Class_00437c80* unitTable;
     char unknown_1437f[4];
     void* xform;
@@ -638,7 +640,7 @@ struct Game {
     int unitDefCount;
     int unitDefCountBits;
     int unitDefEnumDirty;
-    UnitDef* defs;
+    Ref<UnitDef> defs;
     char unknown_1439f[8];
     union {
         struct {
@@ -783,7 +785,7 @@ struct Game {
     };
     Entry_0042f740* entries_37e13;
     int entry_count;
-    int screen;
+    void* screen;
     int width_37e1f;
     int field_37e23;
     union {
@@ -1087,7 +1089,7 @@ struct Game {
             int unusedAfterMovieOutputRateDirty;
             char saveName[1];
             char unknown_38c6c[255];
-            int pendingSaveStore;
+            HapiBank* pendingSaveStore;
             char progress;
             unsigned char loadProgress;
             unsigned char loadPctUnits;
@@ -1234,8 +1236,8 @@ struct Game {
         char campaignMissionStatus_391cf[25];
         char campaignMissionStatus[26];
     };
-    Mission* net;
-    MissionConditions* list_391ed;
+    Ref<Mission> net;
+    Ref<MissionConditions> list_391ed;
     int mode_391f1;
     void (__stdcall *handler)(void);
     int fontComix;

@@ -1,5 +1,6 @@
 #ifndef MAP_GRID_H
 #define MAP_GRID_H
+#include "../../interfaces/ref.h"
 
 #pragma pack(push, 1)
 struct MapGrid {
@@ -13,7 +14,7 @@ struct MapGrid {
     int stride;
     int rows;
     char unknown_58[52];
-    int tiles;
+    Ref<char> tiles;
 };
 #pragma pack(pop)
 

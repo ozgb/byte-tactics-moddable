@@ -9,6 +9,7 @@
 // <windows.h> must come before <stdio.h>: it decides the registers of
 // `features[j].anims`.
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -55,7 +56,7 @@ struct FeatureDef_004224b0 {
     Seq_004224b0* seqreclamateshad;     // +0xc8
     Ref_004224b0 ref;                   // +0xcc
     Ref_004224b0 refshad;               // +0xd8
-    char* burnweapon;                   // +0xe4
+    Ref<char> burnweapon;
     short sparktime;                    // +0xe8
     short damage;                       // +0xea
     float energy;                       // +0xec

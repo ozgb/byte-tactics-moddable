@@ -483,7 +483,7 @@ void MovementClass::RefreshMovedUnits(Object_00440af0* p)
         g_seams.map->RefreshPassMap(this, 0, p->a, p->b);
     }
     if (start != old) {
-        for (Record_00440af0* r = &((Record_00440af0 *)g_game->units)[1]; r <= (Record_00440af0 *)g_game->unitsEnd; r++) {
+        for (Record_00440af0* r = &((Record_00440af0 *)g_game->units.get())[1]; r <= (Record_00440af0 *)g_game->unitsEnd.get(); r++) {
             if ((r->flags & 0x10000000) != 0 && r->unit != 0) {
                 unsigned int t = r->unit->lastTick;
                 if (t >= old && t < start) {

@@ -55,7 +55,7 @@ struct Game_00444580 {
     Conn_00444580* conns;               // +0x2aa3
     char unknown_2aa7[0x143a7 - 0x2aa7];
     unsigned char paletteRgba[0x391e9 - 0x143a7];  // +0x143a7
-    Mission* mapInfo;                   // +0x391e9
+    Ref<Mission> mapInfo;
 };
 #pragma pack(pop)
 

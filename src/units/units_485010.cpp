@@ -376,13 +376,14 @@ void __stdcall AllocateUnitMemory(void)
     g_game->unitsPerPlayer = g_game->field_37ee6;
     g_game->poolCount = (unsigned short)(g_game->field_37ee6 * 10 + 1);
 
-    unsigned char* pool = (*(unsigned char **)&g_game->units) = (unsigned char*)SimAllocTagged("UNIT MEMORY", g_game->poolCount * 0x118);
+    unsigned char* pool = (unsigned char*)SimAllocTagged("UNIT MEMORY", g_game->poolCount * 0x118);
+    g_game->units = (Unit*)pool;
     memset(pool, 0, g_game->poolCount * 0x118);
 
     unsigned int ten = g_game->field_37ee6 * 10;
     (*(void **)&g_game->list_1435f) = SimAllocTagged("HOT UNITS", ten * 2);
     g_game->hotRadar = SimAllocTagged("HOT RADAR UNITS", ten * 10);
-    (*(unsigned char **)&g_game->unitsEnd) = (unsigned char *)g_game->units + g_game->poolCount * 0x118 - 0x118;
+    g_game->unitsEnd = (Unit*)((unsigned char *)g_game->units.get() + g_game->poolCount * 0x118 - 0x118);
 
     unsigned short n;
     for (n = 0; n < g_game->poolCount; n++) {
@@ -463,7 +464,7 @@ int __stdcall RandomInt(int range);
 // FUNCTION: 0x485a40
 void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
 {
-    unit->def = (UnitDef*)&((UnitType *)g_game->defs)[(unsigned short)unit->unitDefIndex];
+    unit->def = (UnitDef*)&((UnitType *)g_game->defs.get())[(unsigned short)unit->unitDefIndex];
     unit->alive = 1;
     unit->immobile = (((UnitType*)unit->def.get())->mobile == 0);
     unit->killPending = 0;
@@ -583,7 +584,7 @@ ObjectState_00485d40* __stdcall CreateObjectState(Object3do* obj);
 // FUNCTION: 0x485d40
 void __stdcall InitUnitScript(Unit* self)
 {
-    Object3do* obj = ((Object3do **)g_game->types)[self->unitDefIndex];
+    Object3do* obj = ((Object3do **)g_game->types.get())[self->unitDefIndex];
     if (((UnitType*)self->def.get())->data) {
         self->script = (Class_004b0a70*)new (kSim) UnitScript;
         ((CobScript*)self->script.get())->SetCob(((UnitType*)self->def.get())->data);
@@ -646,7 +647,7 @@ extern void* g_weaponAimCobVtable[];
 // FUNCTION: 0x485e90
 void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
 {
-    UnitType* type = &((UnitType *)g_game->defs)[(unsigned short)unitType];
+    UnitType* type = &((UnitType *)g_game->defs.get())[(unsigned short)unitType];
     if (unit) {
         for (int i = 0; i < 3; i++)
             unit->weapons[i].aimCob.ppVtbl = g_weaponAimCobVtable;
@@ -681,7 +682,7 @@ void __stdcall BroadcastBuilderLink(Unit* a, Unit* b);
 static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Vec3 pos,
                                                int param_5, Unit* unit)
 {
-    UnitType* type = &((UnitType *)g_game->defs)[unitType];
+    UnitType* type = &((UnitType *)g_game->defs.get())[unitType];
     if (unit) {
         for (int i = 0; i < 3; i++)
             unit->weapons[i].aimCob.ppVtbl = g_weaponAimCobVtable;
@@ -705,7 +706,7 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos
     Player* pl = (Player*)((char*)g_game + off + 0x1b63);
     if (typeId == 0)
         return 0;
-    UnitType* type = &((UnitType *)g_game->defs)[typeId];
+    UnitType* type = &((UnitType *)g_game->defs.get())[typeId];
     if (!(type->flags.all & 0x800000))
         return 0;
     if (type->limit != -1) {
@@ -1126,7 +1127,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     unit->unitDefIndex = 0;
     // Keep this order: adjacent clears would fold into one `and`.
     unit->flags &= ~0x10000000;
-    unit->def = (UnitDef*)(UnitType *)g_game->defs;
+    unit->def = (UnitDef*)(UnitType *)g_game->defs.get();
     unit->flags &= ~0x30;
     unit->player->unitCount--;
     if (unit->player->unitCount == 0) {

@@ -811,7 +811,8 @@ void LoadUnitTypes() {
         } while (c);
     }
 
-    (*(void ***)&g_game->types) = (void**)SimAllocTagged("MODEL PTRS", g_game->unitDefCount * 4);
+    void** models = (void**)SimAllocTagged("MODEL PTRS", g_game->unitDefCount * 4);
+    g_game->types = (Class_0045ae80**)models;
 
     // `u` must be an unsigned short: an int counter breaks the loop.
     for (unsigned short u = 1; u < g_game->unitDefCount; u++) {
@@ -832,9 +833,9 @@ void LoadUnitTypes() {
             FatalError(objpath);
         MirrorObject(model);
         BindModelTextures(model, namebuf);
-        ((void **)g_game->types)[u] = model;
+        ((void **)g_game->types.get())[u] = model;
         type->modelMinY = 0;
-        type->modelMaxY = GetObjectHeight(((void **)g_game->types)[u]);
+        type->modelMaxY = GetObjectHeight(((void **)g_game->types.get())[u]);
         type->modelSizeY = type->modelMaxY - type->modelMinY;
 
         strcpy(namebuf, type->unitname);
@@ -871,7 +872,7 @@ void LoadUnitTypes() {
         type->data = LoadCobScript(path);
     }
 
-    ProtectBlockReadOnly((void **)g_game->types);
+    ProtectBlockReadOnly(g_game->types.get());
 
     TdfFile parser2;
     BuildDataPath(path, "gamedata", "sidedata", "TDF");
@@ -930,14 +931,14 @@ int __stdcall CompareUnitTypeNames(const char* param_1, const char* param_2)
 void FreeUnitTypes()
 {
     ProtectBlockReadWrite(g_game->defs);
-    ProtectBlockReadWrite((void **)g_game->types);
+    ProtectBlockReadWrite(g_game->types.get());
 
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
         UnitDef* type = &g_game->defs[i];
-        void* p = ((void **)g_game->types)[i];
+        void* p = ((void **)g_game->types.get())[i];
         if (p != 0) {
             GameFreeThunk(p);
-            ((void **)g_game->types)[i] = 0;
+            ((void **)g_game->types.get())[i] = 0;
         }
         if (type->yardmap != 0) {
             GameFreeThunk(type->yardmap);
@@ -961,10 +962,10 @@ void FreeUnitTypes()
     }
     (*(UnitTable **)&g_game->unitTable) = 0;
 
-    GameFreeThunk((void **)g_game->types);
+    GameFreeThunk(g_game->types.get());
     GameFreeThunk(g_game->defs);
 
-    (*(void ***)&g_game->types) = 0;
+    g_game->types = 0;
     g_game->defs = 0;
 }
 

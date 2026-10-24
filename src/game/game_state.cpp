@@ -38,8 +38,8 @@ void __stdcall SetRestoreSurface(int surface);
 // FUNCTION: 0x490ac0
 void CreateOffscreenSurface()
 {
-    g_game->screen = AllocSurface(g_offscreenSurfaceName, g_game->width_37e1f, g_game->field_37e23);
-    SetRestoreSurface(g_game->screen);
+    g_game->screen = (void*)AllocSurface(g_offscreenSurfaceName, g_game->width_37e1f, g_game->field_37e23);
+    SetRestoreSurface((int)g_game->screen);
 }
 
 // Releases the offscreen object created by 0x490ac0.
@@ -395,9 +395,9 @@ void InitGame()
     }
     g_game->width_37e1f = GetScreenWidth();
     g_game->field_37e23 = GetScreenHeight();
-    g_game->screen = AllocSurface(g_offscreenSurfaceName, g_game->width_37e1f,
+    g_game->screen = (void*)AllocSurface(g_offscreenSurfaceName, g_game->width_37e1f,
                                       g_game->field_37e23);
-    SetRestoreSurface(g_game->screen);
+    SetRestoreSurface((int)g_game->screen);
     g_game->endGameFlags &= 0xfffe;
     g_game->endGameFlags &= 0xfffd;
     g_game->restartMissionRequest = 0;
@@ -629,9 +629,9 @@ void Force640x480Surfaces()
         RestoreScreen();
         host_window_place(0, 0, 0x280, 0x1e0);
         SetResolution(0x280, 0x1e0);
-        g_game->screen = AllocSurface(g_offscreenSurfaceName, g_game->width_37e1f, g_game->field_37e23);
-        SetRestoreSurface(g_game->screen);
-        SetOffscreenSurface(g_game->screen);
+        g_game->screen = (void*)AllocSurface(g_offscreenSurfaceName, g_game->width_37e1f, g_game->field_37e23);
+        SetRestoreSurface((int)g_game->screen);
+        SetOffscreenSurface((int)g_game->screen);
     }
 }
 

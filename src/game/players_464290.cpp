@@ -757,7 +757,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                                     do {
                                         cell.x = xacc >> 20;
                                         if (g_seams.map->CanPlaceUnitFootprint(
-                                                (UnitDef*)((char*)g_game->defs + typeOff),
+                                                (UnitDef*)((char*)g_game->defs.get() + typeOff),
                                                 0, cell, 1) != 0)
                                             hits++;
                                         xacc += hw;

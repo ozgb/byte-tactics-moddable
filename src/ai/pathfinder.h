@@ -7,6 +7,7 @@
 #include "../state/block.h"
 #include "../units/movement_class.h"
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 struct Unit;
 class AiSearchGoal;
@@ -146,8 +147,8 @@ static int FixMul(int a, int b)
 
 class OpenHeap {
 public:
-    Node* pool;
-    Node** items;
+    Ref<Node> pool;
+    Ref<Node*> items;
     int freeHead;
     int used;
     int capacity;
@@ -285,10 +286,10 @@ public:
     int steps;
     int costScale;
     int baseScale;
-    Unit* object;
-    AiSearchGoal* path;
-    Target* target;
-    MovementClass* owner;
+    Ref<Unit> object;
+    Ref<AiSearchGoal> path;
+    Ref<Target> target;
+    Ref<MovementClass> owner;
     union {
         Table_0040d880 table;
         unsigned char turnCost[8];
@@ -298,7 +299,7 @@ public:
         unsigned char stepCost[8];
     };
     unsigned char player;
-    Unit* cursor[10];
+    Ref<Unit> cursor[10];
     int budget[10];
 
     int EstimateCost(int x, int y)

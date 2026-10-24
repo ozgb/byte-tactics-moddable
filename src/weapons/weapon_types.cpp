@@ -217,7 +217,7 @@ model_done:
         w->explosionSeq = r;
     }
     w->splash = 0;
-    if (*(int*)(*(char**)((char*)g_game + 0x391e9) + 0xd44) != 0) {
+    if (*(int*)((char*)g_game->net.get() + 0xd44) != 0) {
         if (parser->GetFieldString(gaf, "lavaexplosiongaf", 0x100, DAT_005119b8) != 0 &&
             parser->GetFieldString(model, "lavaexplosionart", 0x100, DAT_005119b8) != 0) {
             void* a = LoadAnimGaf(gaf);

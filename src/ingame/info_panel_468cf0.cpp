@@ -356,7 +356,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
 
   cx = (g_game->width_37e1f + 0x80) / 2;
   cy = g_game->field_37e23 / 2;
-  SetOffscreenSurface(g_game->screen);
+  SetOffscreenSurface((int)g_game->screen);
   ctx = **(Surface **)&g_game->screen;
   colors = &g_game->colors[0];
   HideSoftwareCursor();
@@ -445,7 +445,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     ushort *pIdx = g_game->list_1435f;
     k = 0;
     while (k < g_game->count_14367) {
-      Unit_00468cf0 *unit = (Unit_00468cf0 *)((int)g_game->units + *pIdx * 0x118);
+      Unit_00468cf0 *unit = (Unit_00468cf0 *)((int)g_game->units.get() + *pIdx * 0x118);
       int row = ((int)unit->zWhole - g_game->scrollY) / 16 + 0x10;
       if (row >= 0 && row < mv->rows) {
         Unit_00468cf0 ***pCur = (Unit_00468cf0***)&mv->cursor[row];
@@ -466,7 +466,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     i = 0;
     while (i < h) {
       x = x0;
-      Tile_00468cf0 *tile = (Tile_00468cf0*)mv->tiles + (mv->width * y + x);
+      Tile_00468cf0 *tile = (Tile_00468cf0*)mv->tiles.get() + (mv->width * y + x);
       int c = 0;
       while (c < w) {
         tile->flags &= 0xfb;
@@ -507,7 +507,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
             DrawUnit((int)&ctx, (int)u);
         }
       }
-      Tile_00468cf0 *tile = (Tile_00468cf0*)mv->tiles + (y * mv->width + x0);
+      Tile_00468cf0 *tile = (Tile_00468cf0*)mv->tiles.get() + (y * mv->width + x0);
       for (int c = 0; c < w; c++, tile++) {
         x = x0 + c;
 
@@ -556,7 +556,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   if (param_1 != 0) {
     ushort *pIdx = g_game->list_1435f;
     for (k = 0; k < g_game->count_14367; k++, pIdx++) {
-      Unit_00468cf0 *unit = (Unit_00468cf0 *)((int)g_game->units + *pIdx * 0x118);
+      Unit_00468cf0 *unit = (Unit_00468cf0 *)((int)g_game->units.get() + *pIdx * 0x118);
       if ((g_game->visualFlagsByte & 1) || unit->group != 0) {
         char str[2];
         str[1] = 0;

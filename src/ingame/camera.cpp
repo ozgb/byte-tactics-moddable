@@ -69,8 +69,8 @@ void CenterCameraOnRadarClick()
 void CenterCameraOnStartPosition()
 {
     int i = 0;
-    Entry_0041d1f0* e = ((Class_0041d1f0_net *)g_game->net)->entries;
-    int count = ((Class_0041d1f0_net *)g_game->net)->entry_count;
+    Entry_0041d1f0* e = ((Class_0041d1f0_net *)g_game->net.get())->entries;
+    int count = ((Class_0041d1f0_net *)g_game->net.get())->entry_count;
     for (; i < count; i++, e++) {
         if (e->type == 1 && e->id == 0) {
             SetPos(e->x - g_game->viewWidth / 2, e->z - g_game->viewHeight / 2);

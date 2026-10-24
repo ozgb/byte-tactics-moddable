@@ -23,7 +23,7 @@ struct Game_0046c2a0 {
     char unknown_2a43[0x38a47 - 0x2a43];
     unsigned int gameTick;             // +0x38a47
     char unknown_38a4b[0x391e9 - 0x38a4b];
-    Mission* mapInfo;                  // +0x391e9
+    Ref<Mission> mapInfo;
     char unknown_391ed[0x3923b - 0x391ed];
     unsigned short bits0_3923b : 2;    // +0x3923b
     unsigned short bit2_3923b : 1;

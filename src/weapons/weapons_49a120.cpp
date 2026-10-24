@@ -27,6 +27,7 @@ struct CellPos_0049a120 {
 #include "weapon_def.h"
 #include "projectile.h"
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 #include "../units/unit.h"
 #include "../units/unit_def.h"
 #include "../network/player.h"
@@ -67,18 +68,18 @@ struct ProjectileDetonatePacket {
 struct Game_0049a120 {
     char unknown_0[0x141f3];
     int projectileCount;               // +0x141f3
-    Projectile* projectiles;
+    Ref<Projectile> projectiles;
     char unknown_141fb[0x1420b - 0x141fb];
-    Spot_0049a120* spots;              // +0x1420b
+    Ref<Spot_0049a120> spots;
     char unknown_1420f[0x14233 - 0x1420f];
     int mapWidthTiles;                 // +0x14233
     int mapHeightTiles;                // +0x14237
     char unknown_1423b[0x1426f - 0x1423b];
     FeatureDef_0049a120* features;     // +0x1426f
     char unknown_14273[0x14287 - 0x14273];
-    Cell* heightMap;                   // +0x14287
+    Ref<Cell> heightMap;
     char unknown_1428b[0x14357 - 0x1428b];
-    Unit* units;
+    Ref<Unit> units;
 };
 #pragma pack(pop)
 

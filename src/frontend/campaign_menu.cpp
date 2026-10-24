@@ -258,7 +258,7 @@ void __stdcall DrawBitmapBackground(char* name, int lock)
     BuildDataPath(path, "bitmaps", name, "PCX");
     image = LoadBitmapByName(name, palette);
     SetPaletteColors(palette, 0, 0x100);
-    SetOffscreenSurface(g_game->screen);
+    SetOffscreenSurface((int)g_game->screen);
     DrawSurface(0, image, 0, 0);
     FreeSurface(image);
     if (lock) {

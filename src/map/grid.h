@@ -7,8 +7,10 @@
 #ifndef GRID_H
 #define GRID_H
 
+#include "../../interfaces/ref.h"
+
 struct Grid {
-    unsigned char* cells;              // +0x0
+    Ref<unsigned char> cells;
     unsigned int width;                // +0x4
     unsigned int height;               // +0x8
     int count;                         // +0xc

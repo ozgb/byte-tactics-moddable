@@ -49,6 +49,7 @@ TYPE_OVERRIDES = {
     "g_playerAI": "PlayerAI*[10]",
     "g_quirks": "Quirks",
 }
+REF_FIELDS = {"g_explodedPieces", "g_meteorWeapon", "g_playerAI"}
 STATIC_FILES = {"g_movementClasses": "src/units/movement_class.cpp"}
 ELEMENT_SIZES = {"char": 1, "unsigned char": 1, "signed char": 1, "short": 2, "unsigned short": 2, "int": 4,
                  "unsigned int": 4, "float": 4}
@@ -58,6 +59,7 @@ HEADER_INCLUDES = [
     "<stddef.h>",
     "<memory>",
     '"block.h"',
+    '"../../interfaces/ref.h"',
     '"../graphics/memory_cache.h"',
     '"../map/los_tables.h"',
     '"../map/vector_00438480.h"',
@@ -176,8 +178,21 @@ def load_rows() -> list[Row]:
     return rows
 
 
+def as_ref(t: str) -> str:
+    """The type with its element pointer held as Ref, so T*[10] becomes Ref<T>[10]."""
+    m = re.match(r"^([^()\[\]]*?)\s*\*\s*(\[.*)?$", t)
+    if m is None:
+        sys.exit(f"simglobals: cannot make a Ref of {t}")
+    return f"Ref<{m.group(1).strip()}>{m.group(2) or ''}"
+
+
 def resolve_type(row: Row) -> str:
     """The canonical type of a field or interior view, with an unsized array sized."""
+    t = resolve_plain_type(row)
+    return as_ref(t) if row.leaf in REF_FIELDS else t
+
+
+def resolve_plain_type(row: Row) -> str:
     if row.leaf in TYPE_OVERRIDES:
         return TYPE_OVERRIDES[row.leaf]
     if row.csv is None:

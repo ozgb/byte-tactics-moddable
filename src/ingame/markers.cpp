@@ -179,7 +179,7 @@ void __stdcall DrawBuildFootprint(void* surface, View* view, Order* order,
 {
     if ((unsigned short)order->type == 0)
         return;
-    UnitType* type = &((UnitType *)g_game->defs)[(unsigned short)order->type];
+    UnitType* type = &((UnitType *)g_game->defs.get())[(unsigned short)order->type];
     Pos lo = *(Pos*)&order->pos + type->lo;
     Pos hi = *(Pos*)&order->pos + type->hi;
     Rect r;

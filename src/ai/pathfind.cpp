@@ -516,21 +516,21 @@ void Pathfinder::StartSearch(Target* t)
 
     // Each early exit is its own `Finish(); return;`, not a goto to a shared block.
     if (target->IsGoal(start.x, start.y)) {
-        g_seams.orders->OrderFxAddFlags((OrderFx*)target, 0x100);
+        g_seams.orders->OrderFxAddFlags((OrderFx*)target.get(), 0x100);
         Finish();
         return;
     }
     int cost = Cost(start.x, start.y);
     if (!grid.InBounds(start.x, start.y)) {
-        g_seams.orders->OrderFxAddFlags((OrderFx*)target, 0x200);
+        g_seams.orders->OrderFxAddFlags((OrderFx*)target.get(), 0x200);
         Finish();
         return;
     }
     probe = ProbeStraightPath();
     if (probe == 0) {
-        g_seams.orders->OrderFxAddFlags((OrderFx*)target, 0x100);
+        g_seams.orders->OrderFxAddFlags((OrderFx*)target.get(), 0x100);
     } else {
-        g_seams.orders->OrderFxAddFlags((OrderFx*)target, 0x200);
+        g_seams.orders->OrderFxAddFlags((OrderFx*)target.get(), 0x200);
         if (probe >= cost) {
             Finish();
             return;
@@ -557,7 +557,7 @@ void Pathfinder::ReleaseHeldPathLock()
 // FUNCTION: 0x40e9c0
 void Pathfinder::AbortIfGoalMatch(int goal)
 {
-    if (goal == (int)path) {
+    if (goal == (int)path.get()) {
         object = 0;
         path = 0;
         target = 0;
@@ -671,11 +671,11 @@ void Pathfinder::RunSearches()
             }
             Player* pl = &g_game->players[player];
             g_playerTickLoad[player]++;
-            Unit** c = &cursor[player];
+            Ref<Unit>* c = &cursor[player];
             if (*c == pl->unitsEnd)
                 *c = pl->unitsBegin;
             else
-                (*c)++;
+                *c = c->get() + 1;
             Unit* u = cursor[player];
             if (((short)u->unitDefIndex) != 0 && ((Owner_0040eb70 *)u->motion.get()) != 0 && ((Owner_0040eb70 *)u->motion.get())->owner != 0) {
                 path = ((Owner_0040eb70 *)u->motion.get())->planner->GetPath();

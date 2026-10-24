@@ -157,7 +157,7 @@ class MovedGlobalsTest(unittest.TestCase):
         moved = self.generate("field,name,container,offset\ng_meteorWeapon,g_meteorWeapon,,\n")
         names = lambda t: [l.split(",")[0] for l in t.splitlines() if l.startswith("    { \"")]
         self.assertEqual(names(plain), names(moved))
-        self.assertIn('{ "weapon", (const void*)(offsetof(SimGlobals, g_meteorWeapon)), 4, TF_POINTER, TT_WEAPONDEF, 1 },',
+        self.assertIn('{ "weapon", (const void*)(offsetof(SimGlobals, g_meteorWeapon)), 4, TF_REF, TT_WEAPONDEF, 1 },',
                       moved)
 
 

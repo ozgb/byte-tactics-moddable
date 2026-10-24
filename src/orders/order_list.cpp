@@ -530,7 +530,7 @@ void __stdcall WriteUnitTypeNameKey(HapiBank* file, unsigned short id)
     char key[0x80];
     sprintf(key, "UTYPENAME%4d", id);
     if (!file->HasItem(key) && id >= 1 && id < g_game->unitDefCount)
-        file->SetStringItem(key, ((UnitType_0043cd20 *)g_game->defs)[id].name);
+        file->SetStringItem(key, ((UnitType_0043cd20 *)g_game->defs.get())[id].name);
 }
 
 // Resolves a unit definition slot number to a unit type id. The parsed text
@@ -548,7 +548,7 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
     int i, n = 0;                     // n counts every table entry, k only the
     unsigned short k = 0;             // ones without flag bit 5
     for (i = 1; i < g_game->unitDefCount; i++, n++) {
-        if (!(((UnitType_0043cd20 *)g_game->defs)[(unsigned short)i].flags & 0x20)) {
+        if (!(((UnitType_0043cd20 *)g_game->defs.get())[(unsigned short)i].flags & 0x20)) {
             if (k == id)
                 return n;
             k++;
@@ -1703,7 +1703,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     Vec3 da = PosMinus(unit->pos, a);
     Vec3 db = PosMinus(velocity, b);
 
-    if ((int)unit->spatialBucket.get() != g_game->overflowBucket) {
+    if ((int)unit->spatialBucket.get() != (int)g_game->overflowBucket.get()) {
         int lim;
         if ((speed & -4) < 0x40000)
             lim = 0x10000;

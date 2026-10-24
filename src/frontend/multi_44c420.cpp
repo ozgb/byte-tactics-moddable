@@ -115,7 +115,7 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
             for (i = 0; i < g_game->unitDefCount; i++) {
                 type = g_unitRestrictEntries[i].unitIndex;
                 if (type != 0) {
-                    item = &((Item_0044c420 *)g_game->defs)[type];
+                    item = &((Item_0044c420 *)g_game->defs.get())[type];
                     if (item->flags2.bits.flag) {
                     } else {
                         if (g_unitRestrictEntries[i].max == 0)
@@ -153,13 +153,13 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         for (i = 0; i < g_game->unitDefCount; i++) {
             type = g_unitRestrictEntries[i].unitIndex;
             if (type != 0) {
-                if ((((Item_0044c420 *)g_game->defs)[type].flags2.raw & 0x10000) == 0)
+                if ((((Item_0044c420 *)g_game->defs.get())[type].flags2.raw & 0x10000) == 0)
                     g_unitRestrictEntries[i].max = 100;
                 else
                     g_unitRestrictEntries[i].max = 0;
                 if (g_unitRestrictEntries[i].max != g_unitRestrictEntries[i].previousMax) {
                     ((UnitSync *)g_game->sync)->SetUnitLimit(
-                        (Unit_0046e330*)&((Item_0044c420 *)g_game->defs)[g_unitRestrictEntries[i].unitIndex],
+                        (Unit_0046e330*)&((Item_0044c420 *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex],
                         g_unitRestrictEntries[i].max);
                 }
             }
@@ -179,10 +179,10 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         for (i = 1; i < g_game->unitDefCount; i++) {
             // The original also tests the address of items[i].name (an array at
             // +0x20, so its address can never be null); kept for byte fidelity.
-            if (((Item_0044c420 *)g_game->defs)[i].flags2.bits.flag) {
-            } else if (((Item_0044c420 *)g_game->defs)[i].name != 0) {
+            if (((Item_0044c420 *)g_game->defs.get())[i].flags2.bits.flag) {
+            } else if (((Item_0044c420 *)g_game->defs.get())[i].name != 0) {
                 ((UnitSync *)g_game->sync)->SetUnitLimit(
-                    (Unit_0046e330*)&((Item_0044c420 *)g_game->defs)[i], g_unitRestrictOldCounts[n]);
+                    (Unit_0046e330*)&((Item_0044c420 *)g_game->defs.get())[i], g_unitRestrictOldCounts[n]);
                 n++;
             }
         }

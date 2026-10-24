@@ -121,7 +121,7 @@ void __stdcall AddUnitToMap(Obj_0047cc30* obj)
     {
         Position_0047cc30 p = obj->position;
         SetOwner_0047cc30(obj,
-            &((Owner_0047cc30 *)g_game->cells_1429f)[(p.x >> 23) + (p.z >> 23) * (int)g_game->width_142a3]);
+            &((Owner_0047cc30 *)g_game->cells_1429f.get())[(p.x >> 23) + (p.z >> 23) * (int)g_game->width_142a3]);
     }
     {
         Cell* cell = &g_game->cells[g_game->width * obj->pos.y + obj->pos.x];
@@ -135,7 +135,7 @@ void __stdcall AddUnitToMap(Obj_0047cc30* obj)
                     if (m & (obj->bit2 ? 2 : 4)) {
                         unsigned short id = cell->unit;
                         if (id != 0) {
-                            UnitRec_0047cc30* rec = &((UnitRec_0047cc30 *)g_game->units)[id];
+                            UnitRec_0047cc30* rec = &((UnitRec_0047cc30 *)g_game->units.get())[id];
                             if (rec->player->active == 0) {
                                 goto a_bad;
                             } else if (rec->player->type != 3) {
@@ -174,7 +174,7 @@ void __stdcall AddUnitToMap(Obj_0047cc30* obj)
                 for (int x = size.x; x > 0; x--) {
                     unsigned short id = cell->unit;
                     if (id != 0) {
-                        UnitRec_0047cc30* rec = &((UnitRec_0047cc30 *)g_game->units)[id];
+                        UnitRec_0047cc30* rec = &((UnitRec_0047cc30 *)g_game->units.get())[id];
                         if (rec->player->active == 0) {
                             goto b_bad;
                         } else if (rec->player->type != 3) {
@@ -202,7 +202,7 @@ void __stdcall AddUnitToMap(Obj_0047cc30* obj)
                 for (int x = size.x; x > 0; x--) {
                     unsigned short id = cell->unit2;
                     if (id != 0) {
-                        UnitRec_0047cc30* rec = &((UnitRec_0047cc30 *)g_game->units)[id];
+                        UnitRec_0047cc30* rec = &((UnitRec_0047cc30 *)g_game->units.get())[id];
                         if (rec->player->active == 0) {
                             goto c_bad;
                         } else if (rec->player->type != 3) {
@@ -228,5 +228,5 @@ void __stdcall AddUnitToMap(Obj_0047cc30* obj)
     return;
 
 remove:
-    SetOwner_0047cc30(obj, (*(Owner_0047cc30 **)&g_game->overflowBucket));
+    SetOwner_0047cc30(obj, (Owner_0047cc30*)g_game->overflowBucket.get());
 }

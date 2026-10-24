@@ -260,7 +260,7 @@ void BattleFrame(void)
     MainLoopTick();
     {
         unsigned short unit = g_game->unitIndex;
-        if (unit != 0 && *(short*)((char *)g_game->units + unit * 0x118 + 0xa6) == 0) {
+        if (unit != 0 && *(short*)((char *)g_game->units.get() + unit * 0x118 + 0xa6) == 0) {
             PopUntilNamedLayout(0);
         }
     }

@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <memory>
 #include "block.h"
+#include "../../interfaces/ref.h"
 #include "../graphics/memory_cache.h"
 #include "../map/los_tables.h"
 #include "../map/vector_00438480.h"
@@ -22,13 +23,13 @@ struct WeaponDef;
 struct SimGlobals {
     int g_aiCommandsEnabled = 1;
     char DAT_005119b8[8];
-    PlayerAI* g_playerAI[10];
+    Ref<PlayerAI> g_playerAI[10];
     int g_playerBudgetCap[10];
     int g_playerTickLoad[10];
     int g_budgetRefreshCounter;
     unsigned char DAT_00511a3c[4];
     int g_cdPathMismatch;
-    ExplodedPiece* g_explodedPieces[100];
+    Ref<ExplodedPiece> g_explodedPieces[100];
     CMemoryCache g_debrisMemCache;
     unsigned char DAT_00511fb4[4];
     int g_meteorNextStrikeTime;
@@ -40,7 +41,7 @@ struct SimGlobals {
     int g_meteorStrikeEndTime;
     Point16 g_meteorOrigin;
     int g_meteorShowerDuration;
-    WeaponDef* g_meteorWeapon;
+    Ref<WeaponDef> g_meteorWeapon;
     int g_meteorsEnabled;
     int g_meteorNextHitTime;
     Point16 g_meteorTarget;

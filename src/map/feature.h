@@ -9,6 +9,8 @@
 #ifndef FEATURE_H
 #define FEATURE_H
 
+#include "../../interfaces/ref.h"
+
 #pragma pack(push, 1)
 
 struct Feature {
@@ -18,7 +20,7 @@ struct Feature {
     short footprintZ;                  // +0x96
     char unknown_98[0x4c];             // +0x98, the object and the animation
                                        // sequences
-    char* burnweapon;                  // +0xe4
+    Ref<char> burnweapon;
     unsigned short burnTime;           // +0xe8
     unsigned short damage;             // +0xea
     float metal;                       // +0xec

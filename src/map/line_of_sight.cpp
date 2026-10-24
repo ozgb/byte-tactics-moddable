@@ -64,10 +64,17 @@ struct FogCell {
 
 // Typed cells: grid.h's byte pointer would need a cast at every use.
 struct FogGrid {
-    FogCell* cells;                    // +0x0
+    Ref<FogCell> cells;
     unsigned int width;                // +0x4
     unsigned int height;               // +0x8
     int count;                         // +0xc
+};
+
+struct MapFogGrid {
+    FogCell* cells;
+    unsigned int width;
+    unsigned int height;
+    int count;
 };
 
 // A 10-byte cell of the second fog grid.
@@ -517,8 +524,8 @@ void __stdcall InitUnitSightCircleReveal(SightQuery* params)
 void BuildDerivedLayers(void)
 {
     Rec* rec = new (kSim) Rec;
-    (*(Rec **)&g_game->overflowBucket) = rec;
-    ((Rec *)g_game->overflowBucket)->flags = 0x1f;
+    g_game->overflowBucket = (Class_0047cb00*)rec;
+    ((Rec *)g_game->overflowBucket.get())->flags = 0x1f;
 
     Grid2* grid2 = &g_game->spatialGrid_1429f;
     int b = g_game->baseY * 0x10000;
@@ -537,24 +544,24 @@ void BuildDerivedLayers(void)
 
     grid2->cells = count2 != 0 ? (FogCell*)new (kSim) Rec[count2] : 0;
     int outer;
-    unsigned char* cells2 = (unsigned char*)grid2->cells;
-    unsigned char* cellp = (unsigned char*)g_game->cells;
+    unsigned char* cells2 = (unsigned char*)grid2->cells.get();
+    unsigned char* cellp = (unsigned char*)g_game->cells.get();
     int inner;
     int accum;
 
     for (unsigned int lb1 = 0; lb1 < (unsigned int)grid2->width; lb1++)
-        ((Rec*)grid2->cells)[lb1].flags |= 1;
+        ((Rec*)grid2->cells.get())[lb1].flags |= 1;
     for (unsigned int lb2 = 0; lb2 < (unsigned int)grid2->width; lb2++)
-        ((Rec*)grid2->cells)[(grid2->height - 1) * grid2->width + lb2].flags |= 2;
+        ((Rec*)grid2->cells.get())[(grid2->height - 1) * grid2->width + lb2].flags |= 2;
     for (unsigned int lb3 = 0; lb3 < (unsigned int)grid2->height; lb3++)
-        ((Rec*)grid2->cells)[lb3 * grid2->width].flags |= 4;
+        ((Rec*)grid2->cells.get())[lb3 * grid2->width].flags |= 4;
     for (unsigned int i = 0; i < (unsigned int)grid2->height; i++) {
-        int* fp = &((Rec*)grid2->cells)[(i + 1) * grid2->width - 1].flags;
+        int* fp = &((Rec*)grid2->cells.get())[(i + 1) * grid2->width - 1].flags;
         *fp = *fp | 8;
     }
 
     for (int d = 0; d < grid2->count; d++)
-        ((unsigned char*)grid2->cells)[d * 10] = g_game->seaLevel;
+        ((unsigned char*)grid2->cells.get())[d * 10] = g_game->seaLevel;
 
     {
         for (int y = 0; y < g_game->height; y++) {
@@ -571,7 +578,7 @@ void BuildDerivedLayers(void)
     }
 
     for (unsigned int r = 0; r < (unsigned int)grid2->height; r++) {
-        unsigned char* p = (unsigned char*)grid2->cells + r * grid2->width * 10;
+        unsigned char* p = (unsigned char*)grid2->cells.get() + r * grid2->width * 10;
         unsigned char prev = 0;
         for (unsigned int fr = 1; fr < (unsigned int)grid2->width; fr++, p += 10) {
             unsigned char t = p[10];
@@ -586,7 +593,7 @@ void BuildDerivedLayers(void)
     }
 
     for (outer = 0; (unsigned int)outer < (unsigned int)grid2->width; outer++) {
-        unsigned char* p = (unsigned char*)grid2->cells + outer * 10;
+        unsigned char* p = (unsigned char*)grid2->cells.get() + outer * 10;
         unsigned char prev = 0;
         for (unsigned int gc = 1; gc < (unsigned int)grid2->height; gc++, p += grid2->width * 10) {
             unsigned char t = p[grid2->width * 10 + 1];
@@ -613,8 +620,8 @@ void BuildDerivedLayers(void)
     grid1->count = count1;
     grid1->cells = count1 != 0 ? (FogCell*)SimAlloc(count1 * 2) : 0;
     for (int hf = 0; hf < grid1->count; hf++) {
-        ((unsigned char*)grid1->cells)[hf * 2] = 0;
-        ((unsigned char*)grid1->cells)[hf * 2 + 1] = 0xff;
+        ((unsigned char*)grid1->cells.get())[hf * 2] = 0;
+        ((unsigned char*)grid1->cells.get())[hf * 2 + 1] = 0xff;
     }
 
     for (outer = 0; outer < g_game->width; outer++) {
@@ -628,7 +635,7 @@ void BuildDerivedLayers(void)
             accum = 0;
             do {
                 int idx = g_game->width * inner + outer;
-                int cellval = ((unsigned char*)g_game->cells)[idx * 0xd + 4];
+                int cellval = ((unsigned char*)g_game->cells.get())[idx * 0xd + 4];
                 int v = accum - (cellval >> 1);
                 int block = v >> 5;
                 if (block > -1) {
@@ -643,7 +650,7 @@ void BuildDerivedLayers(void)
                     }
                     if ((unsigned int)t20 < (unsigned int)grid1->width
                             && (unsigned int)block < (unsigned int)grid1->height) {
-                        p1 = (unsigned char*)grid1->cells + (block * grid1->width + t20) * 2;
+                        p1 = (unsigned char*)grid1->cells.get() + (block * grid1->width + t20) * 2;
                         p1[0] = max(p1[0], q);
                         p1[1] = min(p1[1], q);
                     } else {
@@ -652,7 +659,7 @@ void BuildDerivedLayers(void)
                     if (t20 != t24
                             && (unsigned int)t24 < (unsigned int)grid1->width
                             && (unsigned int)block < (unsigned int)grid1->height) {
-                        p2 = (unsigned char*)grid1->cells + (block * grid1->width + t24) * 2;
+                        p2 = (unsigned char*)grid1->cells.get() + (block * grid1->width + t24) * 2;
                         p2[0] = max(p2[0], q);
                         p2[1] = min(p2[1], q);
                     } else {
@@ -675,7 +682,7 @@ void BuildDerivedLayers(void)
 
     int def = g_game->seaLevel;
     for (int jf = 0; jf < grid1->count; jf++) {
-        unsigned char* p = (unsigned char*)grid1->cells + jf * 2;
+        unsigned char* p = (unsigned char*)grid1->cells.get() + jf * 2;
         int aa = p[0];
         int bb = p[1];
         int q1 = (aa * 2 + bb) / 3;
@@ -800,7 +807,7 @@ struct MapSettings {
     int* sortIndices;                  // +0x04
     int* sortLineCount;                // +0x08
     char unknown_c[0x24 - 0xc];
-    FogGrid* grid;
+    MapFogGrid* grid;
     int baseX;                         // +0x28
     int baseY;                         // +0x2c
     char unknown_30[0x38 - 0x30];
@@ -819,11 +826,11 @@ struct MapSettings {
     int rise;                          // +0x68
     int tidal;                         // +0x6c, a float copied as bits
     char unknown_70[0x78 - 0x70];
-    unsigned short* visibilityMask;    // +0x78
+    Ref<unsigned short> visibilityMask;
     char unknown_7c[0x84 - 0x7c];
     unsigned char seaLevel;            // +0x84
     IconSet* iconSet;                  // +0x88
-    Cell* cells;                       // +0x8c
+    Ref<Cell> cells;
     unsigned short* mapValues;         // +0x90
 };
 
@@ -957,7 +964,7 @@ void LoadTntMap()
     }
     g_seams.features->InitFeatureAnimPool((List_00421f20*)&info.version);
     if (info.attr_b != 0) {
-        unsigned char* q = (unsigned char*)mapSettings->cells;
+        unsigned char* q = (unsigned char*)mapSettings->cells.get();
         if (a.n > 0) {
             unsigned char* src = info.attr_b;
             for (int i = a.n; i > 0; i--) {
@@ -969,7 +976,7 @@ void LoadTntMap()
             }
         }
         if (g_game->pendingSaveStore == 0) {
-            q = (unsigned char*)mapSettings->cells;
+            q = (unsigned char*)mapSettings->cells.get();
             if (a.n > 0) {
                 unsigned char* src = info.attr_b + 2;
                 do {
@@ -983,7 +990,7 @@ void LoadTntMap()
         }
     } else {
         if (info.attr_a != 0) {
-            unsigned char* q = (unsigned char*)mapSettings->cells;
+            unsigned char* q = (unsigned char*)mapSettings->cells.get();
             unsigned char* src = info.attr_a;
             if (a.n > 0) {
                 b.n = a.n;
@@ -998,7 +1005,7 @@ void LoadTntMap()
                 } while (b.n != 0);
             }
             if (g_game->pendingSaveStore == 0) {
-                q = (unsigned char*)mapSettings->cells;
+                q = (unsigned char*)mapSettings->cells.get();
                 if (a.n > 0) {
                     unsigned short* sp = (unsigned short*)(info.attr_a + 1);
                     int n = a.n;
@@ -1040,7 +1047,7 @@ void LoadTntMap()
         obj = list;
     }
     int rb = 2;
-    mapSettings->grid = (FogGrid*)obj;
+    mapSettings->grid = (MapFogGrid*)obj;
     a.n = 2;
     if (mw % 32 != 0)
         a.n = 3;
@@ -1115,12 +1122,12 @@ void FreeMapResources()
     g_game->cells = 0;
     g_game->mapValues = 0;
 
-    void** p = (void**)(FogGrid *)g_game->field_1421f;
+    void** p = (void**)(MapFogGrid *)g_game->field_1421f;
     if (p) {
         operator delete(p[0]);
         operator delete(p);
     }
-    (*(FogGrid **)&g_game->field_1421f) = 0;
+    (*(MapFogGrid **)&g_game->field_1421f) = 0;
 
     FogGrid* g1 = (FogGrid*)&g_game->grid1;
     g1->width = 0;
@@ -1136,8 +1143,8 @@ void FreeMapResources()
     g2->count = 0;
     g2->cells = 0;
 
-    operator delete((Rec *)g_game->overflowBucket);
-    (*(Rec **)&g_game->overflowBucket) = 0;
+    operator delete(g_game->overflowBucket.get());
+    g_game->overflowBucket = 0;
 }
 
 // FUNCTION: 0x483fa0
@@ -1249,7 +1256,7 @@ void __stdcall DrawFogOfWar(void* surface)
         (*(Flags_14281*)&g_game->mapFlags_14281).raw |= 8;
     }
 
-    FogGrid* grid = (FogGrid *)g_game->field_1421f;
+    MapFogGrid* grid = (MapFogGrid *)g_game->field_1421f;
     int scrollY = g_game->scrollY;
     int scrollX = g_game->scrollX;
     int q = (scrollY + 16) / 32 + (scrollX + 16) / 32;
@@ -1469,7 +1476,7 @@ void __stdcall RevealAroundUnit(SightQuery* params)
                         if ((unsigned)(short)x2 < grid->width &&
                             (unsigned)(short)y2 < grid->height) {
                             unsigned char* c =
-                                (unsigned char*)grid->cells + ((short)y2 * grid->width + (short)x2) * 2;
+                                (unsigned char*)grid->cells.get() + ((short)y2 * grid->width + (short)x2) * 2;
                             int d1 = c[1] - ref;
                             int d0 = c[0] - ref;
                             if (d0 * bestIdx > bestDiff * j1) {
@@ -1510,7 +1517,7 @@ void __stdcall RevealAroundUnit(SightQuery* params)
             do {
                 // dst is declared before src, the reverse of the order of use.
                 unsigned short* dst =
-                    (unsigned short*)((unsigned char*)g_game->visibilityMask + off);
+                    (unsigned short*)((unsigned char*)g_game->visibilityMask.get() + off);
                 unsigned char* src = frame->pixelsOrLayers + i * frame->width + nx;
                 if (nx < limitX) {
                     int n = limitX - nx;
@@ -1540,7 +1547,7 @@ void __stdcall AddEyeball(Vec3* src, int a, int b, int c)
 {
     if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2) == 2 && g_game->count_14277 < 0x14) {
         Eye* e = &((Eye *)g_game->eyes)[g_game->count_14277];
-        e->player = &g_game->players[g_game->playerIndex];
+        e->player = (char*)&g_game->players[g_game->playerIndex];
         // Assigned before screen: &e->screenPos would clobber ecx, which holds g_game.
         e->screen = &e->screenPos;
         e->x = a;

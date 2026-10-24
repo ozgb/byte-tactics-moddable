@@ -709,9 +709,7 @@ void Mission::RefreshMapList(int multiplayer)
         mapList = 0;
     }
     if (mapList == 0) {
-        char* list = mapList;
-        mapCount = LoadMapList(&list, multiplayer, multiplayer);
-        mapList = list;
+        mapCount = LoadMapList(&mapList, multiplayer, multiplayer);
     }
     LoadMissionByName(mapList);
     multi = multiplayer;

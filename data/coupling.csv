@@ -575,7 +575,7 @@ game,orders,shared_write,Game::mapHeight,6
 game,orders,shared_write,Game::mapWidth,6
 game,orders,shared_write,Game::playerIndex,1
 game,orders,shared_write,Game::seaLevel,8
-game,orders,shared_write,Game::ticks,20
+game,orders,shared_write,Game::ticks,21
 game,orders,shared_write,Player::allied,7
 game,orders,shared_write,Player::energy,2
 game,orders,shared_write,Player::metal,1
@@ -940,7 +940,7 @@ game,presentation,call,WriteCameraPosition,1
 game,presentation,call,WriteScreenshot,1
 game,presentation,shared_write,Angles16::heading,1
 game,presentation,shared_write,Game::commanderDeath,2
-game,presentation,shared_write,Game::difficulty,9
+game,presentation,shared_write,Game::difficulty,10
 game,presentation,shared_write,Game::effectiveGameSpeed,6
 game,presentation,shared_write,Game::endGameFlags,2
 game,presentation,shared_write,Game::flags_2a44,4
@@ -1138,7 +1138,7 @@ harness,presentation,call,InitMissionStatus,1
 harness,presentation,call,IssueMobileBuildOrders,1
 harness,presentation,call,IssueOrderToSelection,1
 harness,presentation,call,UpdatePlacementGhostValidity,1
-harness,presentation,shared_write,Game::difficulty,9
+harness,presentation,shared_write,Game::difficulty,10
 harness,presentation,shared_write,Game::localPlayer,68
 harness,presentation,shared_write,Game::numPlayers,4
 harness,presentation,shared_write,Game::playerIndex,28

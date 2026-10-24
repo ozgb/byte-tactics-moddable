@@ -1672,7 +1672,7 @@ network,platform,call,host_time_ms,2
 network,platform,call,host_user_name,2
 network,platform,call,operator delete,26
 network,platform,call,operator new,17
-network,platform,call,operator==,5
+network,platform,call,operator==,6
 network,players,call,FillScoreTables,2
 network,players,call,GiveUnitToPlayer,1
 network,players,call,IsReporterDllLoaded,2
@@ -1936,7 +1936,7 @@ orders,platform,call,WorldToCell,3
 orders,platform,call,operator delete,20
 orders,platform,call,operator new,56
 orders,platform,call,operator-,1
-orders,platform,call,operator==,22
+orders,platform,call,operator==,23
 orders,platform,shared_write,Fixed::value,1
 orders,platform,shared_write,Point16::x,11
 orders,platform,shared_write,Point16::y,11
@@ -2129,6 +2129,7 @@ pathfinding,orders,shared_write,Point16::y,43
 pathfinding,platform,call,GameFreeThunk,1
 pathfinding,platform,call,operator delete,3
 pathfinding,platform,call,operator new,1
+pathfinding,platform,call,operator==,1
 pathfinding,platform,shared_write,Point16::x,11
 pathfinding,platform,shared_write,Point16::y,11
 pathfinding,players,shared_write,Point16::x,3
@@ -2778,9 +2779,9 @@ players,units,shared_write,Player::rank,1
 players,units,shared_write,Player::syncTick,2
 players,units,shared_write,Player::type,8
 players,units,shared_write,Player::unitCount,2
-players,units,shared_write,Player::unitsBegin,4
+players,units,shared_write,Player::unitsBegin,5
 players,units,shared_write,Player::unitsCreated,1
-players,units,shared_write,Player::unitsEnd,4
+players,units,shared_write,Player::unitsEnd,5
 players,units,shared_write,PlayerInfo::bit6,1
 players,units,shared_write,PlayerInfo::color,1
 players,units,shared_write,PlayerInfo::side,3
@@ -3878,6 +3879,8 @@ units,ai,shared_write,Game::unitDefCount,9
 units,ai,shared_write,Game::units,1
 units,ai,shared_write,Game::unitsPerPlayer,1
 units,ai,shared_write,Player::unitCount,1
+units,ai,shared_write,Player::unitsBegin,5
+units,ai,shared_write,Player::unitsEnd,5
 units,ai,shared_write,Point16::x,7
 units,ai,shared_write,Point16::y,7
 units,ai,shared_write,Unit::activateFlags,4
@@ -3921,7 +3924,9 @@ units,ai,shared_write,Vec3::z,21
 units,economy,indirect,UpdateMetalExtraction,2
 units,economy,shared_write,Player::flags,1
 units,economy,shared_write,Player::unitCount,1
+units,economy,shared_write,Player::unitsBegin,1
 units,economy,shared_write,Player::unitsCreated,1
+units,economy,shared_write,Player::unitsEnd,1
 units,economy,shared_write,Point16::x,1
 units,economy,shared_write,Point16::y,1
 units,economy,shared_write,Unit::activateFlags,1
@@ -4102,6 +4107,7 @@ units,network,shared_write,Player::commanderLosses,2
 units,network,shared_write,Player::kills,2
 units,network,shared_write,Player::losses,2
 units,network,shared_write,Player::unitCount,6
+units,network,shared_write,Player::unitsBegin,1
 units,network,shared_write,Player::unitsCreated,7
 units,network,shared_write,Unit::angles,1
 units,network,shared_write,Unit::flags,2
@@ -4213,6 +4219,8 @@ units,orders,shared_write,Vec3::z,110
 units,pathfinding,shared_write,Game::unitsPerPlayer,1
 units,pathfinding,shared_write,MovementClass::footprintX,2
 units,pathfinding,shared_write,MovementClass::footprintZ,2
+units,pathfinding,shared_write,Player::unitsBegin,1
+units,pathfinding,shared_write,Player::unitsEnd,1
 units,pathfinding,shared_write,Point16::x,7
 units,pathfinding,shared_write,Point16::y,7
 units,pathfinding,shared_write,Unit::cell,1
@@ -4263,7 +4271,7 @@ units,platform,call,WorldToCell,1
 units,platform,call,operator delete,6
 units,platform,call,operator new,9
 units,platform,call,operator-,1
-units,platform,call,operator==,12
+units,platform,call,operator==,13
 units,platform,shared_write,Fixed::value,1
 units,platform,shared_write,Game::defs,1
 units,platform,shared_write,Point16::x,11
@@ -4288,7 +4296,9 @@ units,players,shared_write,Player::losses,4
 units,players,shared_write,Player::rank,1
 units,players,shared_write,Player::syncTick,1
 units,players,shared_write,Player::unitCount,9
+units,players,shared_write,Player::unitsBegin,4
 units,players,shared_write,Player::unitsCreated,4
+units,players,shared_write,Player::unitsEnd,4
 units,players,shared_write,Point16::x,3
 units,players,shared_write,Point16::y,3
 units,players,shared_write,Unit::activateFlags,1
@@ -4356,7 +4366,9 @@ units,presentation,shared_write,Player::kills,2
 units,presentation,shared_write,Player::losses,2
 units,presentation,shared_write,Player::rank,1
 units,presentation,shared_write,Player::unitCount,11
+units,presentation,shared_write,Player::unitsBegin,19
 units,presentation,shared_write,Player::unitsCreated,11
+units,presentation,shared_write,Player::unitsEnd,19
 units,presentation,shared_write,Point16::x,6
 units,presentation,shared_write,Point16::y,6
 units,presentation,shared_write,Unit::activateFlags,1

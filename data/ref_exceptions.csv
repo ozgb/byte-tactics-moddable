@@ -150,8 +150,6 @@ Game,net,pointer,src/game/game.h,#350
 Game,nuclogo,pointer,src/game/game.h,#353
 Game,nuke1,int-pointer,src/game/game.h,#353
 Game,overflowBucket,int-pointer,src/game/game.h,#350
-Game,p1b8a,pointer,src/game/game.h,#350
-Game,p1cd5,pointer,src/game/game.h,#350
 Game,palette_3907f,pointer,src/game/game.h,#353
 Game,pathIcon,int-pointer,src/game/game.h,#353
 Game,pathfinder,pointer,src/game/game.h,#350
@@ -230,7 +228,6 @@ Model_459200,shadow,pointer,src/graphics/model_types.h,#353
 MovementClass,name,pointer,src/units/movement_class.h,#349
 NameTable_004b0830,names,pointer,include/ta_types.h,#353
 NetPacketPendingEntry,next,pointer,src/network/packets.cpp,#351
-NetPacketPendingEntry,offset,int-pointer,src/network/packets.cpp,#351
 NetPacketPendingEntry,owner,pointer,src/network/packets.cpp,#351
 NetPacketPendingEntry,prev,pointer,src/network/packets.cpp,#351
 Object3D,faces,pointer,src/weapons/explosions.cpp,#349
@@ -276,9 +273,7 @@ PlayerAI,vec_8d,container,src/ai/player_ai.h,#361
 PlayerAI,vec_ad,container,src/ai/player_ai.h,#361
 PlayerAI,vec_bd,container,src/ai/player_ai.h,#361
 PlayerAI,weights,container,src/ai/player_ai.h,#361
-PlayerEntry_004777a0,info,pointer,src/frontend/player_entry_004777a0.h,#353
 PlayerFrameInfo,frame,pointer,src/network/packet_receiver.h,#351
-PlayerGrid,cells,pointer,src/map/player_grid.h,#350
 Pool,entries,pointer,src/map/pool.h,#350
 Pool,featureUnit,pointer,src/map/pool.h,#350
 Screen,callback,function-pointer,src/game/players_464290.cpp,#22

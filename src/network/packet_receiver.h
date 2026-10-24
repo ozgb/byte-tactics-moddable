@@ -51,7 +51,7 @@ public:
 class PacketReceiver {
 public:
     PacketReceiver() { }
-    PacketReceiver(void* o);
+    PacketReceiver(PacketManager* o);
     virtual ~PacketReceiver();
     int unused;                        // +0x04
     Ref<PacketManager> owner;

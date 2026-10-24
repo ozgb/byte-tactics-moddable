@@ -1301,8 +1301,8 @@ int NetPacketPendingEntry::GetData()
 // The real constructor of PacketReceiver (vtable 0x4fd518, scalar deleting
 // destructor 0x462cc0, destructor 0x462d30).
 // FUNCTION: 0x462c00
-PacketReceiver::PacketReceiver(void* o)
-    : unused(0), owner((PacketManager*)o), fromId(-1), toId(-1), savedFrameEntry(0), buffer(0), spare(0),
+PacketReceiver::PacketReceiver(PacketManager* o)
+    : unused(0), owner(o), fromId(-1), toId(-1), savedFrameEntry(0), buffer(0), spare(0),
       capacity(0), length(0), spareLength(0), spareFromId(-1), spareToId(-1)
 {
 }

@@ -163,23 +163,18 @@ extern void* g_gfxBlitLockEvent;
 
 #include "../files/files_api.h"
 void __stdcall SetCurrentMouseEvent(int* p);
-void __stdcall InitKeyQueue(int size);
-void __stdcall InitMouse(int count, int start);
+#include "../gui/keyboard.h"
+#include "../gui/mouse.h"
 int __stdcall AllocShadeTable(App_4b5980* d);
 int __stdcall AllocAlphaTable(App_4b5980* d);
 int __stdcall AllocLightTable(App_4b5980* d);
 int __stdcall AllocGrayTable(App_4b5980* d);
 int __stdcall AllocBlueTable(App_4b5980* d);
-void __stdcall PushKeyCode(int v);
-void __stdcall HandleVirtualKey(int v, int flag);
 void __stdcall PushMouseEvent(Event_4b5cc0* ev);
-void __stdcall InitSurface(Surface *s, int width, int height, int a, int b);
 int __stdcall LockScreen(Surface *s);
 void __cdecl BlitSurface(Surface *dst, void *src, int x, int y);
 int __stdcall UnlockScreen(Surface *s);
 int __stdcall SetPaletteColors(tagPALETTEENTRY *entries, int start, int count);
-void DestroyPreCleanup(void);
-void ShutdownMouse(void);
 void __stdcall FreeAlphaTable(App_4b5980* obj);
 void __stdcall FreeShadeTable(App_4b5980* obj);
 void __stdcall FreeLightTable(App_4b5980* obj);

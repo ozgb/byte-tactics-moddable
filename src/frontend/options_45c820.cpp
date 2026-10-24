@@ -13,7 +13,7 @@ public:
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern int g_optionsBackupFxVolume;
 extern unsigned char g_optionsBackupUnitChat;
 extern unsigned int g_optionsBackupSoundFlags;

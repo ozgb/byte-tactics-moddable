@@ -95,8 +95,6 @@ struct Display {
 #include "../network/player_info.h"
 #include "../../interfaces/seams.h"
 
-int StepTowards(int, int, int);
-
 struct EndGamePlayerStat {
     char name[0x1e];
     union {
@@ -160,10 +158,10 @@ struct Options {
 
 // GLOBAL: 0x511de8
 extern Game* g_game;
-extern int g_endGameGlamourSoundStarted;
+#include "../../link/globals.h"
 extern void __cdecl FreeMemoryCache();
 
-void __cdecl AllocNotifyNop(int);
+#include "../debug/debug_lib.h"
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 unsigned int __cdecl GetTicks();
@@ -178,19 +176,16 @@ void __stdcall FillSurface(void* surface, int colour);
 void BlankScreen();
 void FlipScreen();
 void __stdcall FreeSurface(void* image);
-void LeaveNetGame();
-void ShowLoadGameScreen();
-void ShowSaveGameScreen();
-void RegisterDataArchives();
-void EnterMainMenuState();
-void __stdcall SetGameMode(int a);
-void __stdcall SetCursorOverlayEnabled(int param);
+#include "../network/net_game.h"
+#include "../game/savegame.h"
+#include "../game/cd_check.h"
+#include "frontend.h"
+#include "../game/game_state.h"
+#include "../gui/keyboard.h"
 void __stdcall SetFrontendState(int state, int line, const char* file);
-void __stdcall SetMissionType(int param);
+#include "../map/map_list.h"
 void __stdcall SetCursorMode(int n);
-void Force640x480Surfaces();
-void ApplyDifficultyButtons();
-void StartGlamourSound();
+#include "campaign_menu.h"
 const char* __stdcall Translate(const char* text);
 void __stdcall OpenMessageBox(Gui* menu, const char* text, int wrapWidth, int centre, int autoHeight);
 void __stdcall PlaySoundByName(const char* name, int broadcast);
@@ -200,12 +195,11 @@ Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 void __stdcall ClearSelectedGadget(Gui* menu);
 int __stdcall AddHotspotGadget(Gui* menu, Button* record);
 int __stdcall AddBarGadget(Gui* menu, Bar* record);
-int GetFontLineHeight();
 int __stdcall AddTextGadget(Layer* holder, char* type, char* text, int x, int y,
                            int width, int attribs);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 void __stdcall SelectGadgetByName(Gui* menu, const char* name);
-char* __stdcall BuildScrollItems1(char* names, char* flags, int count);
+#include "endgame.h"
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, void* items, int count, int flag);
 Gadget* __stdcall FindGadgetChecked_D(char* entries, char* name);
 void __stdcall SetListBoxScrollByName(Gui* menu, char* name, int index);
@@ -227,13 +221,12 @@ void* __stdcall AllocSurface(const char* name, int width, int height);
 void HandleNetPackets();
 void __stdcall ReportGameEvent(int event);
 const char* __stdcall GetRejectReasonText(unsigned reason);
-int GetTickRate();
+#include "../graphics/display.h"
 void __stdcall GetCurrentMouseEvent(int* event);
 int PopKey();
 void __stdcall DrawOutlinedString(void* surface, const char* text, int color, int color2, int y);
 void ShowSoftwareCursor();
 void HideSoftwareCursor();
-void __stdcall StartPaletteFade(unsigned char* target, unsigned char* current, int steps);
 void __stdcall SendPlayerEconomy(Player* player, int a, int b);
 int __stdcall IsScreenNamed(Gui* menu, const char* name);
 
@@ -804,8 +797,6 @@ static inline int StatsComplete()
     }
     return 1;
 }
-
-void __stdcall ClearBorderFeatures();
 
 // FUNCTION: 0x41f7f0
 void __stdcall RunEndGameState()

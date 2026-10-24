@@ -31,7 +31,7 @@ struct Object {
 
 #include "unit.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x43db50
 void Class_0043db50::UpdateSfxOccupy(Unit* unit)

@@ -20,23 +20,20 @@ struct Struct_00499200_531 {
 #include "../orders/mission_type.h"
 #include "../../interfaces/seams.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-void BeginMouseScroll();
+#include "control_panel.h"
 void UpdatePlacementGhostValidity();
-void DispatchOrdersPanelPageFlags();
-void UpdateMouseScroll();
-void CenterCameraOnRadarClick();
+#include "camera.h"
 void __stdcall SetEndGameState(int a);
 void BlankScreen();
-int BroadcastPendingViewState();
-void ResetChatHudIndices();
-void ApplySlotsToGamePlayers();
-void ClearSelection();
-int __stdcall SelectUnitsInBox(void* p);
+#include "../network/net_game.h"
+#include "../network/packets.h"
+#include "../frontend/skirmish_menu.h"
+#include "selection.h"
 unsigned short __stdcall PickUnitUnderCursor();
 int __stdcall ResolveCursorModeForSelection(char mode);
-void ShutdownIngameSystems();
+#include "../game/game_state.h"
 void __stdcall PopUntilNamedLayout(int a);
 void MainLoopTick();
 void __stdcall UpdateCursorWorldPos(MouseEvent* p);
@@ -51,10 +48,10 @@ void __stdcall SetCursorAnimation(void* a, void* b);
 void __stdcall SetCloseHandler(void* a, int b);
 int GetTicks();
 void ClearKeyQueue();
-int __stdcall IsKeyDown(int a);
-void EndGameFrame();
-void RunEndGameState(void);
-void MenuFrame();
+#include "../gui/keyboard.h"
+#include "build_placement.h"
+#include "../frontend/endgame.h"
+#include "../game/main_loop.h"
 void __cdecl LeaveNetGameCallback();
 
 // FUNCTION: 0x498f70

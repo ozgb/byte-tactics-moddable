@@ -363,7 +363,7 @@ struct Elem {
     Class_004c9390 name;
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 typedef std::vector<TdfFile*> FeatureList;
 static FeatureList* s_featureTdfParsers;
@@ -376,22 +376,18 @@ int __stdcall LoadFeatureType(char* name);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot,
                              unsigned char owner);
 int __stdcall RemoveFeature(Cell* cell, int flag);
-void __stdcall MoveFeatureSpot(int index, int* head);
-int __stdcall RandomInt(int range);
+#include "features.h"
+#include "../util/math_4b6c30.h"
 void __stdcall PlaySoundAtByName(char* name, Vec3* pos, int param_3);
 int GetLocalDpid();
 int GetHostDpid();
 int __stdcall BroadcastPacket(int player, void* data, int size);
 int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
-void __stdcall StartFeatureBurning(int x, int z, int flag);
-void __stdcall KillFeature(int x, int z, int flag);
-void __stdcall ReplaceFeatureWithDead(int x, int y, int flag);
-void __stdcall SpreadFire(Feature* f, Point16* cell);
 int __stdcall StepGafSequence(Anim* anim);
 GafFrame* __stdcall GetGafSequenceFrame(Anim* anim);
 void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
 void* __stdcall CreateObjectState(void* obj);
-void __stdcall EmitTimedSubParticles(Vec3* p, short index);
+#include "../graphics/particles_472630.h"
 
 // FUNCTION: 0x421e60
 unsigned short __stdcall GetCellFeature(Cell* cell)

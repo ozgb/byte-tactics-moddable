@@ -11,7 +11,6 @@
 #include "../network/player_info.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
-int CheckDirectXVersion(int, int, int, int, int);
 int AimCobStub(int, int, int, int);
 
 struct Gadget_0044a680 {
@@ -48,17 +47,12 @@ struct UnitSync {
     void SendSyncMessage(unsigned char, int, int, int);
 };
 
-extern Game* g_game;
-extern int g_battleRoomSlotsBuilt;
-extern int g_startCountdownNextTick;
-extern unsigned int g_heartbeatNextTick;
-extern unsigned int g_lastPlayerCount;
+#include "../../link/globals.h"
 
 int __stdcall HandleNetPackets();
 unsigned char __stdcall FindHostSlot();
 void __stdcall BuildPlayerSlotGadgets();
-void __stdcall RefreshBattleRoomRows();
-void ShowSelectedMapInfo();
+#include "multi.h"
 void __stdcall UpdateMaxUnitsText(Gui* gui, int index);
 void __stdcall UpdateMetalText(Gui* gui, int index);
 void __stdcall PlaySoundByName(char* name, int param);
@@ -72,7 +66,6 @@ Gadget_0044a680* __stdcall FindGadgetChecked_D(Gadget_0044a680* entries, char* n
 Gadget_0044a680* __stdcall FindGadgetChecked_E(Gadget_0044a680* entries, char* name);
 void __stdcall GetGadgetRectByIndex(Gadget_0044a680* entries, int widget, RECT* rect);
 int __stdcall GetTextPixelWidth(char* text);
-int __stdcall GetFontLineHeight();
 void __stdcall DrawTextClipped(int a, char* text, int x, int y, int w, int h);
 void __stdcall SetCurrentFont(Gui* gui, int flag);
 void __stdcall CloseTopScreen(void* gui);
@@ -80,10 +73,7 @@ int __stdcall IsScreenNamed(Gui* gui, char* name);
 void __stdcall SetSliderFromValue(Gadget_0044a680* gadget, int value);
 int __stdcall ReadSliderValue(Gadget_0044a680* gadget);
 int __stdcall GetTicks();
-void __stdcall SendNetHeartbeat();
-void __stdcall BroadcastPlayerInfo();
-void __stdcall UpdateNetGameInfo();
-int __stdcall AreAllPlayersReady();
+#include "../network/net_game.h"
 
 int CheckMapCrc()
 {

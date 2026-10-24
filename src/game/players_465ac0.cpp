@@ -30,7 +30,7 @@ struct Pos_00465ac0 {
 };
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../../interfaces/seams.h"
 

@@ -72,15 +72,14 @@ extern Game* g_game;
 extern char* g_leftGameTexts[8];
 extern int g_usePacketManager;
 
-int __stdcall InitPacketManager(int a, int b);
-bool IsReporterDllLoaded();
-void __stdcall RemovePlayer(int id);
-void ShutdownScoreTables();
+#include "packets.h"
+#include "../game/statistics.h"
+#include "net_game.h"
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 void __stdcall QuitApp(char* message);
 char* __stdcall Translate(char* text);
 void __stdcall AddMessage(char* text, int key, int value, char last);
-void SendLobbySyncRequests();
+#include "net_game_450530.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall SetupPlayerSlot(unsigned char player, char type);
 int GetTicks();
@@ -353,7 +352,7 @@ static inline unsigned char FindPlayerIndex_00450380(int id)
     return 10;
 }
 
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x450380
 void __stdcall AnnouncePlayerLeft(int id)
@@ -923,34 +922,26 @@ typedef EntryFunc SimView_g_packetHandlerType2;
 
 void* __cdecl GameAllocIgnoreTag(char* tag, int size);
 int __stdcall InitPacketTables(Class_00451fd0* obj);
-void __stdcall EnumPlayersCallback(int id, int unused1, int unused2, int unused3, int unused4);
-int __stdcall JoinLobbyGame(Player* p);
 void __stdcall JoinLobbyGameThread(Args_00451640* args);
 unsigned __stdcall JoinLobbyGameThread(void* args);
 int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
 int __stdcall AssignPlayerColor(int from, int to, int group);
-int __stdcall IsColorFree(int id, int slot);
 int __stdcall RequestPlayerColor(int param);
 int __stdcall SetAlliance(int from, int to, unsigned char value, int extra);
 int __stdcall BroadcastAllyTeam(Player* player);
 int __stdcall RejectPlayer(int id, unsigned char value);
-int __stdcall ReceiveNetPacket(void);
-void __stdcall OpenTimeoutDialog(int id);
-void CheckPlayerTimeouts(void);
 void __stdcall HandleTimeoutDialog(void* gadget);
 void __stdcall UpdateTimeoutDialog(void* gadget);
-void RebuildAllyList(void);
 int IsOnlineConfigLoaded(void);
 void __stdcall SetCursorMode(int n);
 void __cdecl GameFreeThunk(void* p);
 void* __cdecl GameReallocTagged(void* ptr, const char* name, unsigned int size);
-void ResetPlayerSlots(void);
+#include "../game/players_464290.h"
 Obj_00451640* GetDisplay(void);
-void ToggleFullScreen(void);
+#include "../graphics/display.h"
 void __stdcall FatalError(char* msg);
-void __stdcall CountMessage(unsigned char kind, int amount, int player);
-void __stdcall CountPacket(int size, int overhead, int sent);
-void __stdcall KillPlayerUnits(unsigned char player);
+#include "net_stats.h"
+#include "../units/units_485010.h"
 void __stdcall HandlePing(void* msg);
 void __stdcall CreateUnitFromPacket(unsigned char p, void* packet);
 void __stdcall ReceiveUnitStates(Player* player, void* packet);
@@ -959,15 +950,11 @@ void __stdcall ApplyUnitDamage(void* packet);
 void __stdcall ApplyUnitDeath(void* packet, int local);
 void __stdcall ApplyWeaponFirePacket(Player* player, void* packet);
 void __stdcall ApplyProjectileHitPacket(Player* player, void* packet);
-void __stdcall KillFeature(int x, int y, int flag);
-void __stdcall StartFeatureBurning(int x, int y, int flag);
 int __stdcall GetMapCell(int x, int y);
 void __stdcall DamageFeature(int cell, int x, int y, WeaponDef* weapon);
-void __stdcall FinishConstruction(Unit* unit, Unit* builder);
 void __stdcall PlaySoundByIndex(int index, int param_2);
 void __stdcall PlaySoundAt(int index, void* pos, int param_3);
 void __stdcall GiveUnitToPlayer(Unit* unit, Player* player, void* packet);
-void __stdcall ShareMapInfo(unsigned char from, unsigned char to);
 void __stdcall HandlePlayerEconomy(void* packet, Player* player);
 void __stdcall SetGameSpeed(int speed, int param_2);
 void __stdcall PlaySoundByName(char* name, int param_2);
@@ -982,7 +969,6 @@ int __stdcall IsScreenNamed(void* obj, const char* name);
 void* __stdcall LoadGuiLayer(void* obj, const char* name, int size);
 void __stdcall CloseTopScreen(void* obj);
 void* __stdcall FindGadgetChecked(void* entries, char* name);
-int GetFontLineHeight(void);
 void __stdcall ConfigureListBoxByName(void* obj, char* name, void* p, int count, int flags);
 void __stdcall SetTranslatedTextByName(void* obj, char* name, void* out, int flag);
 void __stdcall SetKeyboardInput(void* obj, int value);
@@ -2481,7 +2467,7 @@ extern char DAT_00512c98[];
 
 int __stdcall RequestPlayerColor(int color);
 void __stdcall SendPlayerEconomy(Player* from, Player* to, unsigned char flag);
-void __stdcall SetMissionType(int a);
+#include "../map/map_list.h"
 
 // FUNCTION: 0x456110
 int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name)

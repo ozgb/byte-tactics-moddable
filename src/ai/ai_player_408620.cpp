@@ -12,10 +12,10 @@ struct Item_00408620 {
 
 #include "../units/unit.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 unsigned short __stdcall ChooseBuildOption(int player, Unit* unit);
-void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
+#include "../ingame/control_panel.h"
 
 #include "group.h"
 #include "squad_timer.h"

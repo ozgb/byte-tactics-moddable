@@ -30,9 +30,9 @@ struct UnitDef_0048cf30 {
 
 #include "../game/game.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-int __stdcall OrderModeTakesTarget(unsigned char type);
+#include "../units/unit_scripts.h"
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit,
                                        Unit* target, void* pos);
 void __stdcall IssueOrCancelOrder(OrderType kind, int flag, Unit* unit,

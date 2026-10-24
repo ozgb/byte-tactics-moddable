@@ -5,7 +5,7 @@
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 struct Position_00408090 {
     short xFrac;
@@ -66,7 +66,7 @@ static inline Vec3 MakeVec3(int ax, int ay, int az)
     return v;
 }
 
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
 

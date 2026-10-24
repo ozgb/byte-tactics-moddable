@@ -15,9 +15,8 @@ extern int g_cdCategorySavedTrack[];
 extern int g_cdFadeTimer;
 extern int g_cdNextTrackTimer;
 
-extern int __stdcall RemoveTimer(int handle);
+#include "../graphics/display.h"
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
-extern void __stdcall OnCdFadeTimer(void* unused);
 
 struct App_004b6220 {
     char unknown_0[0x40];
@@ -40,7 +39,7 @@ struct Pos_004cf570 {
 
 #include "../files/files_api.h"
 
-void __stdcall OnStreamTimer(int unused1);
+#include "samples.h"
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 
 extern int g_delayedSampleVolume;
@@ -59,11 +58,6 @@ static inline int ClampVolume(int v)
     return v;
 }
 
-void EnableAICommands();
-void ResetAIPlayers();
-void StepAllGafSequences();
-void ResetNetStats();
-void InitCommands();
 int UpdatePlacementGhostValidity();
 void RegisterUnitOrders();
 

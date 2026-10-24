@@ -12,9 +12,7 @@ struct Span_004c0330 {
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
 
-int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl BlitLine(Surface* dst, int x0, int y0, int x1, int y1, int color);
-int __stdcall ClipRectangle(Surface* surface, Rect* r);
 
 // FUNCTION: 0x4c0330
 int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned char color)

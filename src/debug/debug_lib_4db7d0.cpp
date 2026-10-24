@@ -2,7 +2,7 @@
 #include <vector>
 #include "free_block_map.h"
 
-extern unsigned int g_committedBytes;
+#include "../../link/globals.h"
 extern void (*g_outOfMemoryHandler)();
 
 class BlockInfo {
@@ -112,12 +112,10 @@ inline void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
     InsertOrFind(p);
 }
 
-void* GetAllocLock();
+#include "debug_lib.h"
 BlockMap* GetBlockMap();
 Arena_004da9f0* GetFreedBlockRing();
-FreeBlockMap* GetFreeBlockSet();
-char IsBackAlign();
-int GetDebugFillPattern();
+#include "debug_lib_4db610.h"
 void __cdecl CheckFillPattern(void* at, int value, unsigned int count);
 void __cdecl CountFree(unsigned int size);
 unsigned int __cdecl RoundUpToPage(unsigned int size);

@@ -159,16 +159,11 @@ extern char* g_battleRoomGadgetNames[];
 #include "ta_protos.h"
 
 int __stdcall LoadPictureCached(const char* name, int clear, int setPalette, int cacheOnly);
-void OrLabelAttribs();
+#include "frontend.h"
 void __stdcall UpdateMaxUnitsText(Gui_00449bb0* gui, int index);
 void __stdcall UpdateMetalText(Gui_00449bb0* gui, int index);
-void UpdateBattleRoomFlags();
-void RefreshTeamIcons();
-void RefreshBattleRoomRows();
-void BroadcastPlayerInfo();
-void UpdateNetGameInfo();
-int AreAllPlayersReady();
-int IsHostLocal();
+#include "multi.h"
+#include "../network/net_game.h"
 int IsOnlineConfigLoaded();
 void __stdcall SetSliderFromValue(Gadget_00449bb0* gadget, int value);
 int __stdcall ReadSliderValue(Gadget_00449bb0* gadget);

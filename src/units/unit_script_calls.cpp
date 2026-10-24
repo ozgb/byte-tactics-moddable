@@ -2,9 +2,6 @@
 
 #include "../util/vec3.h"
 
-int __stdcall CheckDirectXVersion(int, int, int, int, int);
-void __stdcall EnumPlayersCallback(int, int, int, int, int);
-void __stdcall EmitBubbles(int, int, int, short);
 
 struct Diff_00480570 { int dx; int dy; };
 

@@ -478,7 +478,6 @@ struct Src_004b8ae0 {
     unsigned short f;
 };
 
-void __stdcall DrawBattleFrame(int param_1, int param_2);
 #include "../files/files_api.h"
 
 // FUNCTION: 0x4b8ae0
@@ -1099,7 +1098,7 @@ void __stdcall CutOutFrame(GafFrame* src, GafFrame* dst, int x, int y)
     }
 }
 
-int __stdcall CompressRow(char* dest, char* src, int width, unsigned char key);
+#include "gaf.h"
 
 // FUNCTION: 0x4b9e60
 int __stdcall CompressFrame(unsigned char* dest, GafFrame* img)
@@ -1382,7 +1381,6 @@ void __stdcall DrawFrameDepth(GafFrame* src, GafFrame* dst, int x, int y, int le
     }
 }
 
-void __stdcall DownsampleFrame(GafFrame* src, GafFrame* dst);
 // FUNCTION: 0x4b95a0
 void __stdcall DownsampleFrame(GafFrame* src, GafFrame* dst)
 {

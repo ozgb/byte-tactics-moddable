@@ -22,7 +22,7 @@ struct Cell {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../files/files_api.h"
 

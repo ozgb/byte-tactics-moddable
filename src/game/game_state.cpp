@@ -28,7 +28,7 @@ extern Game* g_game;
 extern const char g_offscreenSurfaceName[];
 
 int __stdcall AllocSurface(const char* name, int width, int height);
-void __stdcall SetRestoreSurface(int surface);
+#include "../graphics/surface.h"
 
 // FUNCTION: 0x490ac0
 void CreateOffscreenSurface()
@@ -51,15 +51,10 @@ void FreeOffscreenSurface()
 
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 void __cdecl LeaveNetGameCallback(int param);
-void __cdecl HandleBattleQuitPrompt(int param);
-void InitFrame();
-void ReturnToMainMenuFrame();
-void MenuFrame();
-void PreBattleFrame();
-void CampaignSetupFrame();
-void LoadingScreenFrame();
-void BattleFrame();
-void EndGameFrame();
+#include "../frontend/options.h"
+#include "main_loop.h"
+#include "game_load.h"
+#include "../ingame/build_placement.h"
 
 // FUNCTION: 0x490b30
 void __stdcall SetGameMode(int param)
@@ -103,7 +98,7 @@ void __stdcall SetGameMode(int param)
 
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 
 void __cdecl UpdateWind()
 {
@@ -319,23 +314,20 @@ extern const char g_unitLimitKey[];
 int GetScreenWidth();
 int GetScreenHeight();
 void __stdcall SetPageFlipping(int enable);
-void LoadGameResources();
+#include "data_files.h"
 void InitSound();
-void ResetFrontendState();
+#include "../frontend/frontend.h"
 void __stdcall InitPacketTables(void* param_1);
-void LoadGameFonts();
 void LoadDefaultPalette();
-void LoadAllSound();
+#include "../sound/sound_types.h"
 void __stdcall LoadAlphaTable(void* palette);
 void __stdcall LoadShadeTable(void* palette);
 void __stdcall LoadLightTable(void* palette);
 void __stdcall MakeGrayTable(void* palette);
 void __stdcall MakeBlueTable(void* palette);
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-void LoadSettings();
-void ApplyBrightnessAndVolume();
-void LoadSideData();
-void LoadLogos();
+#include "settings.h"
+#include "side_data.h"
 void __stdcall SetBrightness(float brightness);
 void __stdcall SetCurrentGuiContext(void* ctx);
 void __stdcall SetGuiPath(void* obj, const char* name);
@@ -346,9 +338,8 @@ void* __stdcall GetGafFrame(void* gaf, int frame);
 void __stdcall InitCursorFrames(void* p, void* value);
 void __stdcall LoadGafFile(void* obj, const char* name);
 void __stdcall LoadGafIntoSlot(void* obj, const char* name, int index);
-void __stdcall SetTextKeyColor(int value);
+#include "../graphics/draw.h"
 void __stdcall SetFont(int font);
-void ClearPictureCache();
 int __stdcall GetPreferenceInt(const char* name, int defaultValue);
 
 // FUNCTION: 0x491200
@@ -452,12 +443,7 @@ struct Class_00452370;
 void FreePictureCache();
 void __stdcall FreeGafSlot(Obj_004aeda0* obj, int i);
 void __stdcall FreeCommonGuiGaf(Obj_004aef80* obj);
-void FreeLogos();
-void FreeSideFonts();
-void FreeSounds();
-void FreeGameFonts();
 void ShutdownSound();
-void FreeAnimFiles();
 void __stdcall ReleasePacketData(Class_00452370* obj);
 
 // FUNCTION: 0x4916a0
@@ -495,13 +481,11 @@ extern unsigned int g_scorePanelSlidePos;
 extern unsigned int g_cdActivityRingWriteIdx;
 extern int g_cdActivitySampleRing[30];
 
-void ResetChatHudIndices();
-void LoadLightBar();
+#include "../network/packets.h"
+#include "../ingame/info_panel.h"
 void ResetSpeech();
-void LoadTextureGafs();
-void CreateParticleLists();
-void ResetCameraState();
-void InitCommands();
+#include "../graphics/particles.h"
+#include "../ingame/control_panel.h"
 unsigned int GetTicks();
 
 // FUNCTION: 0x4917d0
@@ -574,7 +558,7 @@ struct Display_00491a70 {
     HWND hwnd;
 };
 
-void __stdcall SetResolution(int x, int y);
+#include "../graphics/display.h"
 void __stdcall SetOffscreenSurface(int surface);
 
 // FUNCTION: 0x491a70
@@ -596,9 +580,8 @@ void Force640x480Surfaces()
 }
 
 void __cdecl CollectEndGameStats();
-void DestroyParticleLists();
-void FreeTextureGafs();
-void CloseNetSession();
+#include "../graphics/particles_471de0.h"
+#include "../network/net_game.h"
 
 // FUNCTION: 0x491b60
 void ShutdownIngameSystems()
@@ -634,7 +617,6 @@ void ShutdownIngameSystems()
 }
 
 void BlankScreen();
-void RemoveLocalPlayers();
 void __stdcall QuitApp(const char*);
 
 // FUNCTION: 0x491c60

@@ -72,10 +72,10 @@ void __stdcall HandleSelectProviderClick(void* menu);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
-unsigned int __stdcall OnlineGetLinkInfo(LinkInfo* links);
+#include "../network/online_45b490.h"
 void __stdcall SetTranslatedText(void* menu, int index, int source, int value);
 void __stdcall ConfigureListBoxByName(void* menu, char* name, void* items, int count, int flag);
-void OrLabelAttribs();
+#include "frontend.h"
 void __stdcall SetKeyboardInput(void* menu, int value);
 void __stdcall RenderLayer(void* menu, int value);
 
@@ -91,7 +91,6 @@ static int __stdcall CloneServiceSlot(Entry_00444580* entries, int from, short y
     return index;
 }
 
-void ActivatePlayerGadgets(char*);
 // FUNCTION: 0x444580
 void FillProviderList()
 {

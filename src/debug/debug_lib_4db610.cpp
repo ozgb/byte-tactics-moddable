@@ -58,7 +58,7 @@ public:
     }
 };
 
-extern FreeBlockMap* g_freeBlockSet;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x4db610
 FreeBlockMap* GetFreeBlockSet()

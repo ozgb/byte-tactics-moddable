@@ -45,8 +45,7 @@ extern "C" void HOST_CALL host_log(const char* text)
     WriteFile(GetStdHandle(STD_ERROR_HANDLE), text, (DWORD)strlen(text), &written, NULL);
 }
 
-int __stdcall GameEntry(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                        LPSTR lpCmdLine, int nCmdShow);
+#include "../../game/main.h"
 
 extern "C" int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                                  LPSTR lpCmdLine, int nCmdShow)

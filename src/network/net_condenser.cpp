@@ -10,7 +10,7 @@ struct Net_0044f9c0 {
 };
 #pragma pack(pop)
 
-void __stdcall CountPacket(int size, int overhead, int sent);
+#include "net_stats.h"
 #include "../files/files_api.h"
 
 #pragma pack(push, 1)
@@ -22,10 +22,9 @@ struct CondensedHeader {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-void __stdcall CountPacket(int size, int overhead, int sent);
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 #pragma pack(push, 1)
 class NetCondenser {

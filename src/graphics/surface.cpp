@@ -5,12 +5,6 @@
 #include "surface.h"
 #include "gaf_frame.h"
 
-void StepAllGafSequences(void);
-void StartScreenFade(void);
-void StepScreenFade(void);
-void ScheduleFadeTick(void);
-void StepPaletteFade(void);
-int IsFadeDone(void);
 
 union Flags_004c61b0 {
     unsigned short word;
@@ -144,7 +138,6 @@ void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);
 void __cdecl BlitSurfaceKeyed(Surface* dst, Surface* src, int x, int y, int color);
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
-void __stdcall DrawCursor(Display* obj, Surface* dst);
 int GetScreenWidth(void);
 int GetScreenHeight(void);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
@@ -871,9 +864,6 @@ void __stdcall InterpEdgeUvFromScanline_B(int value, Range* out, int at_low, int
     }
 }
 
-void __stdcall AccumulateScreenShake(int dx, int dy, int value);
-void __stdcall ActivatePlayerGadgets(char* prefix);
-void AddDownloadBuildOptions();
 
 void __cdecl BlitSpan128(unsigned char* dest, unsigned char* src, int width, int y, int x, int rowstep, int colstep);
 void __cdecl BlitSpan64(unsigned char* dest, unsigned char* src, int width, int y, int x, int rowstep, int colstep);
@@ -953,8 +943,6 @@ struct Rec_004c7580 {
 };
 
 int __stdcall AssignPlayerColor(int from, int to, int group);
-void __stdcall AddAnimplayPointer(void* item);
-int AllocFeatureSpot();
 
 void __stdcall DrawQuadRow(int y, int* rect, void* surf, void* info);
 
@@ -1150,12 +1138,8 @@ unlock:
 }
 
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
-void __stdcall AddCdActivitySample(int value);
-int AllocScoreTables();
 
-void __stdcall BuildEntryGuiName(char* dest, unsigned short index, int n);
 int __stdcall AddNetPlayer(int id);
-void ApplyBrightnessAndVolume();
 
 // FUNCTION: 0x4c7a20
 void __stdcall DrawTexturedSpan(int row, int* span, GafFrame* surf, GafFrame* info)
@@ -1462,8 +1446,6 @@ void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFram
     }
 }
 
-void __stdcall DrawTexturedSpan(int, int*, GafFrame*, GafFrame*);
-
 // FUNCTION: 0x4c8760
 void __stdcall DrawTexturedPolygon(GafFrame* target, GafFrame* texture, int* vertices, int* coords)
 {
@@ -1594,8 +1576,6 @@ void __stdcall DrawTexturedPolygon(GafFrame* target, GafFrame* texture, int* ver
             }
         }
 }
-
-void __stdcall DrawLitTexturedSpan(int, int*, GafFrame*, GafFrame*);
 
 // FUNCTION: 0x4c8bb0
 void __stdcall DrawLitTexturedPolygon(GafFrame* target, GafFrame* texture, int* vertices, int* coords)

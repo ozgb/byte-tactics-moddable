@@ -11,9 +11,8 @@ struct Pair_00419560 {
     int b;
 };
 
-void __stdcall CountPacket(int, int, int);
-extern int g_byteRatesLastSent;
-extern int g_byteRatesLastReceived;
+#include "net_stats.h"
+#include "../../link/globals.h"
 
 #include "bit_writer.h"
 
@@ -27,31 +26,6 @@ unsigned int __cdecl GetTicks();
 // GLOBAL: 0x511de8
 extern Game* g_game;
 extern char g_vtolOrders[];
-extern int g_messageBytesReceived;
-extern int g_messageBytesSent;
-extern int g_packetBytesSent;
-extern int DAT_00511c20;
-extern int g_packetsSent;
-extern int g_packetsReceived;
-extern int g_packetBytesReceived;
-extern int g_compressedBytesSent;
-extern int g_messageCountByType[45][2];
-extern int g_messageBytesByType[45][2];
-extern unsigned int g_netStatsTick;
-extern int g_lastMessageBytesReceived;
-extern int g_lastMessageBytesSent;
-extern int g_lastCompressedBytesSent;
-extern int g_lastPacketBytesSent;
-extern int g_lastPacketBytesReceived;
-extern int g_lastPacketsSent;
-extern int g_lastPacketsReceived;
-extern unsigned int g_messageBytesReceivedRate;
-extern unsigned int g_messageBytesSentRate;
-extern int g_compressionPercent;
-extern unsigned int g_packetBytesSentRate;
-extern unsigned int g_packetBytesReceivedRate;
-extern unsigned int g_packetsSentRate;
-extern unsigned int g_packetsReceivedRate;
 
 // FUNCTION: 0x415b20
 void RegisterVtolOrders()
@@ -242,9 +216,6 @@ void __stdcall FormatNetStats(char* text)
             g_packetsSentRate, g_packetBytesSentRate, g_packetsReceivedRate, g_packetBytesReceivedRate, g_compressionPercent);
 }
 
-extern unsigned int g_byteRatesTick;
-extern unsigned int g_bytesSentPerSecond;
-extern unsigned int g_bytesReceivedPerSecond;
 
 #include "../network/packet_manager.h"
 #include "../state/sim_globals.h"

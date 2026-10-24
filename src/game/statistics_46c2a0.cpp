@@ -49,8 +49,7 @@ struct ScoreBoard_0046c2a0 {
 extern Game_0046c2a0* g_game;
 extern PlayerInfo_0046c2a0** g_onlineReportPlayers;
 extern ScoreBoard_0046c2a0** g_onlineReportScoreBoards;
-extern char* g_sideNames[2];
-extern char* g_scoreNames[9];
+#include "../data/exe_only.h"
 
 // FUNCTION: 0x46c2a0
 int FillScoreTables()

@@ -82,7 +82,6 @@ struct Feature;
 struct Camera;
 struct Palette;
 void RegisterUnitOrders();
-void RegisterGroundOrders();
 #include "../network/player.h"
 
 #include "../units/unit_def.h"
@@ -147,9 +146,7 @@ struct TntInfo {
     unsigned short* feature_data;
 };
 
-void __stdcall SetCameraPosition(int x, int y, int z);
-void __stdcall RecalculateLineOfSight(int param);
-void __stdcall CollectVisibleUnitIds();
+#include "line_of_sight.h"
 
 union Slot {
     int n;
@@ -174,7 +171,7 @@ struct Flags_004848e0 {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 class LosTable {
 public:
@@ -190,7 +187,6 @@ public:
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
-void ParseDownloadableAiWeightScripts(int);
 int ScanDirectory(char*, char*, char*, int, int, int);
 
 #include "../map/mission.h"
@@ -201,14 +197,10 @@ void __cdecl GameFreeThunk(void* p);
 void __stdcall FatalError(char* message);
 int* __stdcall LoadFileWithProgress(int* file);
 GafFrame* __stdcall GetGafFrame(void* table, int index);
-void __stdcall UpdateLineOfSight(SightQuery* params);
-void __stdcall AddLineOfSight(SightQuery* params);
-void __stdcall RemoveLineOfSight(SightQuery* params);
-void __stdcall RevealAroundUnit(SightQuery* params);
-void __stdcall UpdateCellHeightRange(Point16 pos, Point16 size);
-void UpdateRadarMapped();
-void DrawRadarUnits();
-void BuildFogTiles();
+#include "line_of_sight_482270.h"
+#include "line_of_sight_481d50.h"
+#include "radar.h"
+#include "line_of_sight_4843c0.h"
 void* __stdcall AllocFrame(const char* name, int width, int height);
 void __stdcall SurfaceFromFrame(void* dst, void* src);
 void __stdcall DrawFrame(void* surface, void* header, int x, int y);

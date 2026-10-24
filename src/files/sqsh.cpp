@@ -76,7 +76,7 @@ int __stdcall LzssFindNextNode(int index)
     return cur;
 }
 
-void __stdcall LzssDeleteString(int t);
+#include "sqsh.h"
 
 // FUNCTION: 0x4d0c50
 void __stdcall LzssDeleteString(int t)
@@ -569,7 +569,7 @@ int __stdcall SquashPack(Chunk_4d1820* chunk, int* chunkSize, char* data, int si
     return 0;
 }
 
-int __stdcall LzssExpand(unsigned char* dest, unsigned char* src);
+#include "files_impl.h"
 int __stdcall _uncompress(unsigned char* dest, unsigned long* destLen, unsigned char* source, unsigned long sourceLen);
 
 // FUNCTION: 0x4d1970

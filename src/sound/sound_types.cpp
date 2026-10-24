@@ -30,8 +30,7 @@ struct Entry_0042f740 {
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-extern Game* g_game;
-extern char g_sayChoiceArrayName[];
+#include "../../link/globals.h"
 extern SoundInfo_005086fc g_speechCategories[];
 
 int __cdecl GameReallocTagged(int block, char* name, int size);
@@ -40,9 +39,8 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 int __stdcall ReadSoundEntry(Source_0042f450* source, char* key, int* out);
 void __stdcall LoadSoundByName(char* name, char* value);
-void LoadSoundCategories();
-void FreeSoundCategories();
-void __stdcall FreeSoundSet(void** set);
+#include "sound_types.h"
+#include "sound.h"
 
 // FUNCTION: 0x42f450
 int __stdcall ReadSoundEntry(Source_0042f450* source, char* key, int* out)

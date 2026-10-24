@@ -6,8 +6,8 @@ struct ChatHudEntryView {
 
 #include "../game/game.h"
 
-extern Game* g_game;
-int ScrollToNextMessageUnit(void);
+#include "../../link/globals.h"
+#include "net_chat.h"
 
 // FUNCTION: 0x464000
 void CycleMessageUnits(void)

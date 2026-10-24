@@ -146,7 +146,7 @@ void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
-char* __stdcall SkipTextLines(char* text, int n);
+#include "../util/registry.h"
 void __stdcall StreamSoundDelayed(char* text, int a, int b);
 int __stdcall SetGadgetStatusByName(Gui* menu, const char* name, int value);
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
@@ -155,14 +155,7 @@ Gadget* __stdcall FindGadgetOrNull(Gadget* entries, const char* name);
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, const char* name);
 void __stdcall SelectFontForEntry(Gadget* entries, int index);
 char* __stdcall WordWrapText(Gui* menu, char* text, int value, int index);
-void DrawHelpPage();
-char* __stdcall AllocColorMarkupText(char* text);
-void InitBriefingText();
-void __cdecl ApplyCampaignSideSelection();
-void __stdcall UpdateSolarSystem(Gui* window, Gadget* item);
-void __stdcall UpdatePlanet(Gui* window, Gadget* item);
-void __stdcall HandleMissionBriefingClick(Gui* menu);
-void __stdcall HandleNewGameClick(Gui* menu);
+#include "campaign_menu.h"
 void __stdcall FillMissionList();
 char* __stdcall Translate(const char* text);
 void __stdcall AddTextGadget(Layer* dialog, const char* name, char* text, int x, int y,
@@ -186,7 +179,6 @@ void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 unsigned int __cdecl GetTicks();
 int __stdcall GetGafFrame(void* gaf, int frame);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
-int __stdcall LoadScreenGaf(Gui* menu, char* name);
 void __stdcall InitGafSequence(void* state, void* gaf, int param_3);
 int __stdcall StepGafSequence(Anim_00478b40* anim);
 int __stdcall GetButtonStageByName(Gui* menu, char* name);
@@ -204,12 +196,12 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 void __stdcall SelectGadgetByName(Gui* menu, const char* name);
 void __stdcall RemapPaletteToClosestIndices(Gui* menu, void* param_2, void* param_3);
 void __stdcall PlaySoundByName(const char* name, int value);
-void RegisterDataArchives();
+#include "../game/cd_check.h"
 void InitMissionStatus();
 void SaveSettings();
-void SaveAllMissionsSetting();
-void ShowLoadGameScreen();
-void OpenOptionsPanel();
+#include "../game/settings_campaign.h"
+#include "../game/savegame.h"
+#include "options.h"
 void BlankScreen();
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
@@ -222,9 +214,8 @@ void __stdcall OpenMessageBox(char* dest, char* text, int param_3, int param_4, 
 void __stdcall ClearSelectedGadget(void* menu);
 void __stdcall SetCursorMode(int n);
 int __stdcall IsCurrentGadgetNamed(Gui* menu, char* name);
-int __stdcall BuildCampaignNameList(char** out, int side);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-void __stdcall SetMissionType(int owner);
+#include "../map/map_list.h"
 int GetPreferredLanguage();
 
 // FUNCTION: 0x476740
@@ -1069,7 +1060,7 @@ void __stdcall OpenNewGameMenu(int param_1)
     SetCursorMode(0x13);
 }
 
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x478790
 void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)

@@ -7,7 +7,7 @@
 #include "../../../interfaces/host.h"
 #include "headless.h"
 
-extern HWND host_win32_window(void);
+#include "window.h"
 
 namespace {
 

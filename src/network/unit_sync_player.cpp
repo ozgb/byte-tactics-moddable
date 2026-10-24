@@ -75,7 +75,7 @@ public:
 
 #include "../game/game.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x470300 ??_GUnitSyncPlayer@@QAEPAXI@Z
 void FinishUnitSync()

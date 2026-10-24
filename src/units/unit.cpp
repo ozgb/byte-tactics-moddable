@@ -3,10 +3,6 @@
 
 #include "cob_script.h"
 
-char IsMemFussy();
-char IsGonzo();
-char IsMemSet();
-int GetMemSetValue();
 
 #include "unit_def.h"
 
@@ -62,7 +58,7 @@ struct ActivateFlagsPacket {
 };
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../orders/order_base.h"
 
@@ -73,7 +69,7 @@ extern Game* g_game;
 inline unsigned char Unit::GetState() { return activateFlags; }
 
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
-void __stdcall MarkSelectionOrdersDirty(Unit* unit);
+#include "../ingame/control_panel.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 
 #include "../../interfaces/seams.h"

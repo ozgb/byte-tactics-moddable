@@ -32,11 +32,6 @@ typedef std::vector<Elem_00432be0> FileList;
 
 #include "../files/files_api.h"
 
-void ProbeUnitDefEnergyRate(int, int, int);
-void CountMessage(unsigned char, int, int);
-void SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
-void AccumulateScreenShake(int, int, int);
 int RegisterUnitOrders();
 
 class OvrFile : public HapiBank {
@@ -46,36 +41,19 @@ public:
     ~OvrFile() { CloseBank(); }
 };
 
-void SetMissionStatus(int, int, int);
-void StartFeatureBurning(int, int, int);
-void KillFeature(int, int, int);
-void ReplaceFeatureWithDead(int, int, int);
 void FillWaypointWorldPos(int, int, int);
-void ResetAIPlayers(void);
-void RegisterGroundOrders(void);
-void EnableAICommands(void);
-void RegisterAICommands(void);
-void InitCommands(void);
-void RegisterVtolOrders(void);
-void StepAllGafSequences(void);
-void ResetNetStats(void);
-void ResetCameraState(void);
-void CountPacket(int, int, int);
-void SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
 
-extern Game* g_game;
+#include "../../link/globals.h"
 static TdfFile* s_weaponTdfParsers;
 static int s_weaponTdfLoadedCount;
 static int s_weaponTdfAllocCount;
 
 
-int UsesDataArchives();
+#include "../game/cd_check.h"
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void* __cdecl GameAllocIgnoreTag(char* name, int size);
 void __cdecl GameFreeThunk(void* p);
-void __cdecl ProtectBlockReadOnly(void* p);
-void __cdecl ProtectBlockReadWrite(void* p);
+#include "../debug/debug_lib.h"
 unsigned int __stdcall ComputeChecksum(char* data, int len);
 void __stdcall ShowErrorBox(const char* text, const char* caption);
 char* __stdcall Translate(char* text);

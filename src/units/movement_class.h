@@ -2,6 +2,7 @@
 #define MOVEMENT_CLASS_H
 
 #include "../../interfaces/ref.h"
+struct Point16;
 
 struct Point16;
 struct Source_00440340;
@@ -44,5 +45,12 @@ public:
 struct MovementClassTable {
     MovementClass entries[32];
 };
+
+MovementClass* __stdcall FindMovementClass(char* name);
+void __stdcall NopAfterFeatureEnum(void);
+void __stdcall BuildAllPassMaps(void);
+void __stdcall FreeMovementClasses(void);
+void __stdcall RefreshAllPassMaps(Point16 a, Point16 b);
+int __stdcall FindUnusedLogo();
 
 #endif

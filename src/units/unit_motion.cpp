@@ -44,12 +44,11 @@ struct Chunk_00437a30 {
 #include "../graphics/model_types.h"
 #include "../graphics/memory_cache.h"
 
-void __stdcall CutOutFrame(GafFrame* dst, GafFrame* src, int x, int y);
-int __stdcall CompressFrame(unsigned char* dest, GafFrame* img);
+#include "../graphics/gaf.h"
 
 #include "../../interfaces/seams.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x437840
 void __stdcall UpdateMetalExtraction(Unit* unit)

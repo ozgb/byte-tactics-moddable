@@ -2,8 +2,6 @@
 #include "ta_types.h"
 #include <string.h>
 
-void SetMissionStatus(int, int, int);
-
 struct Spot_00424c00 {
     char unknown_0[4];
     unsigned short frame;
@@ -51,7 +49,7 @@ struct Model3D_00424c00 {
 };
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 typedef std::vector<TdfFile*> FeatureList;
 #ifdef __clang__
 static FeatureList* volatile s_featureTdfParsers;
@@ -59,11 +57,9 @@ static FeatureList* volatile s_featureTdfParsers;
 static FeatureList* s_featureTdfParsers;
 #endif
 
-void __stdcall LoadFeatureFileList();
+#include "features.h"
 unsigned short __stdcall LoadFeatureType(char* name);
-void __stdcall ResolveFeatureLinks();
-void __stdcall StartFeatureBurning(int x, int y, int flag);
-void __stdcall KillFeature(int x, int y, int flag);
+#include "features_422ea0.h"
 void* __stdcall PlaceFeature(Cell_00424c00* cell, unsigned short feature, void* pos, void* rot, unsigned char owner);
 
 static inline unsigned short FindName(char* name)

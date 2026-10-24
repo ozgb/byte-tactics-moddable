@@ -551,11 +551,6 @@ struct Map_004745e0 {
 
 #include "../network/player.h"
 
-void AbortProgram(void);
-void MemFussyAtexitHandler(void);
-void GonzoAtexitHandler(void);
-void MemSetAtexitHandler(void);
-void SetValueAtexitHandler(void);
 
 #pragma pack(push, 1)
 #include "../game/game.h"
@@ -565,7 +560,7 @@ extern Game* g_game;
 extern ObjectPool g_particlePool;
 extern char g_fxEventPoolBlocked;
 extern unsigned char g_particlePoolDestroyed;
-extern void __stdcall ExitParticlePool();
+#include "particles.h"
 
 void* __stdcall GetGafFrame(void* a, int b);
 void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
@@ -1344,7 +1339,7 @@ void TeleportParticles::Init(Vec3_004736e0* a, Vec3_004736e0* b, int c)
     Emit();
 }
 
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x4737c0
 void TeleportParticles::Emit()

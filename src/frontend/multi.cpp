@@ -250,7 +250,7 @@ typedef Layer Layer_00446f50;
 #include "../game/game.h"
 
 void __stdcall SetGadgetText(void* gui, int index, char* text);
-void __stdcall HandleNewMultiClick(Gui* gadget);
+#include "multi.h"
 // GLOBAL: 0x511de8
 extern Game* g_game;
 extern char g_onlineLobbyPassword;
@@ -271,12 +271,10 @@ void __stdcall SetOffscreenSurface(int a);
 void FlipScreen();
 int PeekKey();
 int PopKey();
-int DispatchHostEvents();
+#include "../graphics/display.h"
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 int IsOnlineConfigLoaded();
 char* GetPreferredLanguage();
-void __stdcall UpdateGameSelection(Gui* menu, Gadget* entry);
-int __stdcall ConnectToGame(Layer* gadget);
 Gadget* __stdcall FindGadgetChecked(void* entries, const char* name);
 int __stdcall IsCurrentGadgetNamed(void* menu, const char* name);
 int __stdcall IsCurrentGadgetNamed(Gui* gadget, const char* name);
@@ -666,12 +664,7 @@ class Class_004a1080;
 struct Dialog;
 struct Struct_004c6ac0;
 
-void EnableAICommands(void);
-
 void RegisterUnitOrders();
-void RegisterGroundOrders();
-void ResetAIPlayers();
-void InitCommands();
 
 typedef void (__stdcall* Callback_00449bb0)(Gui* gui, int index);
 typedef void (__stdcall* Callback_0044c7e0)(Gui* gui, int index);
@@ -776,78 +769,42 @@ void BlankScreen();
 char* __stdcall Translate(char* text);
 void __stdcall SetFrontendState(int state, int line, const char* file);
 void __stdcall SetFrontendState(int a, int line, char* file);
-void __stdcall SetFrontendErrorText(char* text);
-void __stdcall SetFrontendSubState(char state, int line, char* file);
+#include "frontend.h"
 int __stdcall ReadGameRegistryValue(const char* key, void* buf, unsigned int* size);
 void __stdcall WriteGameRegistryValue(void* key, void* buf, int value);
 void __stdcall SetCursorMode(int value);
 void __stdcall EnableReporter(int value);
-int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
-void OrLabelAttribs();
 int __stdcall LoadReporterDll(unsigned int* a, unsigned int* b);
 void __stdcall RunWhileScreenNamed(void* p, char* name);
 unsigned char FindHostSlot();
 char* __stdcall GetRejectReasonText(int value);
-unsigned int __stdcall OnlineGetLinkInfo(LinkInfo* links);
-int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int size);
 void OnlineUnload();
-void OpenOptionsPanel();
-int __stdcall SelectConnection(int index);
 void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* param_3);
-void SendNetHeartbeat(void);
-void __stdcall OpenSelectGameDialog();
-int InitScoreReporting();
-void __stdcall HandleSerialDialogClick(Gui* gadget);
-void __stdcall SetSerialBaudFromGadget(Gui* menu, Gadget* entry);
-void __stdcall SetSerialPortFromGadget(Gui* menu, Gadget* entry);
-void __stdcall HandleTcpDialogClick(Gui* gadget);
-void __stdcall HandleModemDialogClick(Gui* gadget);
-void __stdcall HandleSelectGameClick(Gui* menu);
-void __stdcall HandleReportClick(Gui* obj);
-void __stdcall ShowSelectedAccount(Gui* menu, Gadget* entry);
-void __stdcall OpenReportDialog(unsigned int* count, char** names);
-void FillAccountList(void);
-int __stdcall CloneServiceSlot(Gadget* entries, int param_2, short param_3,
-                           int param_4, char* param_5);
-void ReportDialogFrame(void);
+#include "../network/net_game.h"
 
 void __stdcall RequestPlayerColor(int value);
 void* __stdcall LoadRadarPic(char* path, int* outX, int* outY);
 void __stdcall ResizeRadarPicture(void* bmp, int param_2, int param_3, int param_4, int param_5);
-char* __stdcall SkipTextLines(char* text, int n);
+#include "../util/registry.h"
 void __stdcall ReportGameEvent(int msg);
-void BroadcastPlayerInfo(void);
-void UpdateNetGameInfo(void);
 int __stdcall LoadMapList(char** out, int param_2, int param_3);
 void __stdcall SortFileList(char* items, int b, int c, int count);
 void __stdcall SetGadgetItems(void* gui, const char* name, void** items, int count);
 int __stdcall ReadSliderValue(void* gadget);
 void __stdcall SetSliderFromValue(Gadget* gadget, int value);
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
-int __stdcall GetSlotDpid(unsigned char player);
 void __stdcall RejectPlayer(int param_1, int param_2);
 void SaveSettings(void);
 int __stdcall GetDisplayModes(ModeList* obj);
 void __stdcall SortDisplayModes(ModeList* obj);
-void __stdcall RefreshAlliesScreen(int value);
-void __stdcall OpenRejectDialog(int player);
 void __stdcall BroadcastAllyTeam(Player* player);
-int IsHostLocal();
-void __stdcall HandleControlDialogClick(Gui* gadget);
 void __stdcall SetAlliance(int, int, int, int);
 void __stdcall SetAlliance(int a, int b, unsigned char allied, int d);
-void ShowSelectedMapInfo(void);
-void __stdcall HandleViewMapClick(Gui* gadget);
-void __stdcall HandleMapSelectClick(Gui* gadget);
-void __stdcall HandleLogoSelectClick(Gui* gadget);
-void __stdcall HandleRejectChoice(Gui* gadget);
-void __stdcall UpdateMapSelection(Gui* menu, int unused);
 
-void __stdcall SetGameMode(int a);
-void LeaveNetGame();
+#include "../game/game_state.h"
 void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 void __stdcall FreeSurface(void* image);
@@ -855,39 +812,23 @@ void ShowSoftwareCursor();
 #include "../files/files_api.h"
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
-void __stdcall HandleAlliesClick(Gui* gadget);
 void __stdcall HandleBattleRoomClick(Gui* gadget);
-void __stdcall HandleEndMultiClick(Gui* gadget);
-void __stdcall HandleLoadListClick(Gui* menu);
 void __stdcall HandleRestrictionsClick(Gui* menu);
-void __stdcall HandleSaveGameClick(Gui* menu);
-void __stdcall HandleUnitCountSlider(void* obj, char* gadget);
-void __stdcall UpdateSideGadget(int side);
 void __stdcall UpdateUnitSliders(Gui* gui, int value);
 void __stdcall UpdateMaxUnitsText(Gui* gui, int index);
 void __stdcall UpdateMetalText(Gui* gui, int index);
-void RefreshBattleRoomRows();
-void RebuildAllyList();
-void OpenLoadListDialog();
-void OpenSaveGameDialog();
-void OpenUnitRestrictions();
-void UnitRestrictDialogFrame();
 int __stdcall IsScreenNamed(void* gui, const char* name);
 void __stdcall GetGadgetRectByIndex(Gadget* entries, int widget, RECT* rect);
 void __stdcall DrawTextClipped(int a, char* text, int x, int y, int w, int h);
-int AreAllPlayersReady();
 void __stdcall CreateUnitSync(int param_1);
 int __stdcall HandleNetPackets();
 void* __stdcall LoadPcx(char* path, int param_2);
 void __stdcall FrameFromSurface(void* dst, void* src);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
 void FatalError(char* message);
-int CountLocalComputerPlayers();
 unsigned int GetTicks();
 void __stdcall AddMessage(char* text, int a, int b, int c);
 void __stdcall SendChatMessage(void* from, char* text, int a, int b);
-int __stdcall CreateLocalPlayer(unsigned char player, int state);
-int __stdcall GetFontLineHeight();
 int __stdcall GetTextPixelWidth(char* text);
 
 // FUNCTION: 0x440d70
@@ -2666,8 +2607,6 @@ int __stdcall CountPlayersInAlliance(int alliance)
     return count;
 }
 
-int CountHumanPlayers();
-int CountComputerPlayers();
 
 // FUNCTION: 0x4468c0
 char AreAllPlayersInOneAlliance()

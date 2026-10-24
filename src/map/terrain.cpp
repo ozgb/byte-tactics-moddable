@@ -125,9 +125,8 @@ struct Entry_0047ea40 {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern ClaimFootprintVisitor g_claimFootprintVtable[];
-void __stdcall RefreshAllPassMaps(Point16 pos, Point16 size);
 void __stdcall RemoveUnitFromMap(Unit* unit);
 
 #include "../../interfaces/seams.h"
@@ -230,7 +229,7 @@ void __stdcall ClaimFootprintCells(Unit* obj)
     }
 }
 
-void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
+#include "terrain.h"
 
 // FUNCTION: 0x47cac0
 void __stdcall ClaimFootprintsInArea(Point16 pos, Point16 size)
@@ -522,9 +521,6 @@ int __stdcall IsFootprintClear(Unit* obj, int flag)
     return 1;
 }
 
-int __stdcall IsFootprintClear(Unit* obj, int flag);
-void __stdcall ClaimFootprintCells(Unit* obj);
-void __stdcall RefreshAllPassMaps(Point16 pos, Point16 size);
 
 // FUNCTION: 0x47dac0
 void __stdcall SetYardOpen(Unit* obj, int flag)
@@ -539,8 +535,6 @@ void __stdcall SetYardOpen(Unit* obj, int flag)
     }
 }
 
-void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
-void __stdcall RefreshAllPassMaps(Point16 pos, Point16 size);
 
 // FUNCTION: 0x47db20
 void __stdcall ForceNeighborFootprintReclaim(Unit* obj)
@@ -762,8 +756,6 @@ int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, 
     return result;
 }
 
-int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, int h);
-
 // FUNCTION: 0x47e1f0
 unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y)
 {
@@ -922,7 +914,7 @@ void __stdcall VisitObjectsInRange(Vec3* pos, int range, DamagedAllyCollector& v
 
 void __cdecl operator delete(void* p);
 
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 
 // FUNCTION: 0x47ea40
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* center, Fixed radius, Vec3** out1, float* val1, Vec3** out2, float* val2)
@@ -998,8 +990,6 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* center, Fixed radius,
     operator delete(a);
     return found;
 }
-
-void __stdcall ClaimFootprintCells(Unit* obj);
 
 // FUNCTION: 0x47ed30
 void ClaimFootprintVisitor::ClaimFootprint(Unit* obj)

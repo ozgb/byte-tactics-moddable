@@ -2,7 +2,7 @@
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 struct SquadManager;
 #include "squad_manager.h"

@@ -71,10 +71,10 @@ struct Obj_0047cc30 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../../interfaces/seams.h"
-void __stdcall RefreshAllPassMaps(Point16 pos, Point16 size);
+#include "../units/movement_class.h"
 
 static void SetOwner_0047cc30(Obj_0047cc30* obj, Owner_0047cc30* nw)
 {

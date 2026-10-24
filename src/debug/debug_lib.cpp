@@ -41,8 +41,7 @@ void GonzoAtexitHandler(void)
 {
 }
 
-char IsMemSet();
-int GetMemSetValue();
+#include "debug_lib.h"
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8200
@@ -93,8 +92,6 @@ void __cdecl FillPattern(void* p, unsigned int pattern, unsigned int n)
 }
 #pragma auto_inline(on)
 
-unsigned int __cdecl LookupBlockSize(unsigned int key);
-
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8360
 size_t __cdecl GetBlockSize(void* p)
@@ -121,8 +118,6 @@ void __cdecl AllocNotifyNop(int)
 {
 }
 
-void* __cdecl GameAlloc(unsigned int size);
-
 // FUNCTION: 0x4d83b0
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size)
 {
@@ -130,9 +125,7 @@ void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size)
     return GameAlloc(size);
 }
 
-void* GetAllocLock();
 void* __cdecl AllocDebugBlock(unsigned int size, int flags);
-void __cdecl CountAlloc(unsigned int size);
 extern void (*g_outOfMemoryHandler)();
 
 #pragma auto_inline(off)
@@ -184,8 +177,6 @@ void* __cdecl GameCalloc(unsigned int count, unsigned int size)
     return p;
 }
 
-void* __cdecl GameRealloc(void* block, unsigned int size);
-
 #pragma auto_inline(off)
 // FUNCTION: 0x4d84a0
 void* __cdecl GameReallocTagged(void* block, int unused_param_2, unsigned int size)
@@ -195,9 +186,8 @@ void* __cdecl GameReallocTagged(void* block, int unused_param_2, unsigned int si
 }
 #pragma auto_inline(on)
 
-void* __cdecl ReallocDebugBlock(void* p, unsigned int size, int flags);
 void __cdecl CountFree(int size);
-int HarnessTestMode();
+#include "../../interfaces/ref.h"
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4d84c0
@@ -251,8 +241,6 @@ void* __cdecl GameReallocIgnoreTag(int* block, int size)
     return GameReallocTagged(block, 0, size);
 }
 
-void __cdecl GameFree(void* p);
-
 #pragma auto_inline(off)
 // FUNCTION: 0x4d85a0
 void __cdecl GameFreeThunk(int* p)
@@ -261,7 +249,7 @@ void __cdecl GameFreeThunk(int* p)
 }
 #pragma auto_inline(on)
 
-void __cdecl FreeDebugBlock(void* p, int flags);
+#include "debug_lib_4db7d0.h"
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4d85b0
@@ -320,8 +308,6 @@ char __cdecl AvWriteDetectStub(unsigned long)
 }
 #pragma auto_inline(on)
 
-void __cdecl ProtectPages(int addr, int size, int protect);
-
 #pragma auto_inline(off)
 // FUNCTION: 0x4d86b0
 void __cdecl ProtectPages(int addr, int size, int protect)
@@ -336,15 +322,11 @@ void __cdecl ProtectPages(int addr, int size, int protect)
 #pragma auto_inline(on)
 
 
-void __cdecl ProtectBlock(void* p, int protect);
-
 // FUNCTION: 0x4d8710
 void __cdecl ProtectBlockReadOnly(void* p)
 {
     ProtectBlock(p, HOST_MEM_READONLY);
 }
-
-void __cdecl RoundRangeToPages(unsigned int* start, unsigned int* end);
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8720
@@ -481,8 +463,6 @@ CommandLineNumber::CommandLineNumber(char* name, int a, int def, char* sw)
     }
 }
 #pragma auto_inline(on)
-
-void NopAbortHook(void);
 
 // FUNCTION: 0x4da0c0
 void AbortProgram(void)
@@ -1256,8 +1236,6 @@ public:
     void RotateRight(Node_004db000* x);
 };
 
-FreeBlockMap* GetFreeBlockSet();
-
 struct Elem_004dd8c0 {
     unsigned int w[0xc];
 };
@@ -1299,24 +1277,14 @@ typedef std::vector<Elem_004dd8c0, Alloc_004dd8c0> Vec_004dd8c0;
 typedef void (Vec_004dd8c0::*InsertFn_004dd8c0)(
     Vec_004dd8c0::iterator, Vec_004dd8c0::size_type, const Elem_004dd8c0&);
 
-char IsMemFussy();
-char IsBackAlign();
-int GetDebugFillPattern();
-void* GetAllocLock();
 void* GetBlockMap();
 Container_004da9f0<int>* GetFreedBlockRing();
 unsigned int __cdecl RoundUpToPage(unsigned int size);
 unsigned int __cdecl RoundUpToDoublePage(unsigned int size);
-void __cdecl CountAlloc(unsigned int size);
 void __cdecl CountFree(int size);
 void __cdecl FillPattern(void* at, int value, unsigned int count);
 void __cdecl CheckFillPattern(void* at, int value, unsigned int count);
-unsigned int __cdecl LookupBlockSize(unsigned int key);
-void __cdecl RoundRangeToPages(unsigned int* lo, unsigned int* hi);
 void* __cdecl AllocDebugBlock(unsigned int size, int flags);
-void __cdecl FreeDebugBlock(void* p, int flags);
-void* __cdecl ReallocDebugBlock(void* p, unsigned int size, int flags);
-size_t __cdecl GetBlockSize(void* p);
 
 // FUNCTION: 0x4db000
 void FreeBlockMap::AddFreeBlock(Pair_004db000 p)

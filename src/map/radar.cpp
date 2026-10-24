@@ -85,11 +85,7 @@ struct UnitType_00466dc0 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
-extern char g_radarPictureName[];
-extern char g_radarPicTempName[];
-extern char g_radarFinalName[];
-extern char g_radarMappedName[];
+#include "../../link/globals.h"
 
 void* __stdcall AllocFrame(char* name, int width, int height);
 void __stdcall SurfaceFromFrame(Surface_4665d0* surface, void* pic);
@@ -99,7 +95,7 @@ void __stdcall DrawFrameQuad(Surface_4665d0* surface, void* pic, Quad_4665d0* ds
 void __cdecl GameFreeThunk(void* pic);
 
 void __stdcall FrameFromSurface(GafFrame* dst, void* src);
-void __stdcall DownsampleFrame(GafFrame* dst, GafFrame* src);
+#include "../graphics/gaf.h"
 void __stdcall DrawPixel(void* picture, int x, int y, int pixel);
 void* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall FreeSurface(void* picture);

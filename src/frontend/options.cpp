@@ -379,15 +379,6 @@ struct Entry_45ffb0 {
     unsigned short h;
 };
 
-void __stdcall AccumulateScreenShake(int dx, int dy, int value);
-void __stdcall ActivatePlayerGadgets(char* prefix);
-void AddDownloadBuildOptions();
-void RegisterVtolOrders();
-void StepAllGafSequences();
-void ResetNetStats();
-void __stdcall StartScreenShake(int dx, int dy, int value);
-void __stdcall KillFeature(int x, int z, int flag);
-void __stdcall ToggleShareLos(int unused);
 
 struct Link_0045ead0 {
     void* obj;
@@ -517,7 +508,7 @@ int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 void __stdcall SetGadgetStatus(Menu_0045b800* menu, int index, short value);
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
-void RestoreSoundOptions();
+#include "options_45c820.h"
 
 void __stdcall RenderLayer(Sub_0045cf60* sub, int value);
 void __stdcall RenderLayer(void* obj, int n);
@@ -616,14 +607,13 @@ void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void __stdcall AddTextGadget(Layer* layer, char* type, char* text, int x, int y,
                              int width, int attr);
-char* __stdcall SkipTextLines(char* text, int n);
+#include "../util/registry.h"
 char* __stdcall Translate(char* text);
 const char* __stdcall Translate(const char* text);
-void __stdcall InitBriefingText();
+#include "campaign_menu.h"
 void __stdcall FreeBlinkWords(int param_1);
 void __stdcall AllocBlinkWords(Sub_0045f800* sub, int value);
 void __stdcall AllocBlinkWords(Gui* sub, int value);
-void DrawHelpPage();
 
 void __stdcall HandleBriefingClick(void* gadget);
 void __stdcall HandleHelpClick(void* gadget);
@@ -647,8 +637,7 @@ void __stdcall HandleSurrenderChoice(void* gadget);
 void __stdcall HandleExitMenuClick(void* gadget);
 void __stdcall HandleOptionsPanelClick(void* gadget);
 void __stdcall HandleInGameOptionsClick(void* gadget);
-void ShowLoadGameScreen();
-void ShowSaveGameScreen();
+#include "../game/savegame.h"
 
 void __cdecl GameFreeThunk(void* p);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
@@ -659,15 +648,12 @@ int FindHostSlot();
 char* __cdecl _itoa(int value, char* buf, int radix);
 char* __stdcall WordWrapText(Menu_004604a0* menu, char* text, int width, int index);
 int __stdcall SetCursorMode(int value);
-void ApplyDifficultyButtons();
-void __stdcall RegisterDataArchives();
+#include "../game/cd_check.h"
 void __stdcall OpenMessageBox(char* dest, char* text, int param_3, int param_4, int param_5);
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
-void ShutdownIngameSystems();
-void ShutdownIngameAndQuit();
+#include "../game/game_state.h"
 int __stdcall PopUntilNamedLayout(int force);
 void BlankScreen();
-void __stdcall SetGameMode(int a);
 void __stdcall SelectGadgetByName(Sub_00460680* sub, const char* name);
 void __stdcall FrameFromSurface(GafFrame* dst, Surface* src);
 Surface* __stdcall AllocSurface(char* name, int width, int height);
@@ -680,15 +666,8 @@ void* __stdcall GetGafFrame(void* a, int b);
 void __stdcall DrawFrame(int a, void* b, int c, int d);
 void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_45ffb0* dst, Quad_45ffb0* src);
 
-void __stdcall UpdateTrackGadgets();
-void __stdcall OpenMusicOptions();
-void __stdcall OpenSoundOptions();
-void __stdcall OpenVisualOptions(int param_1);
-void __stdcall OpenSpeedOptions();
-void __stdcall OpenExitMenu();
-void __stdcall EnsureOptionsPanelGadget();
-void RestoreVisualOptions();
-void OrLabelAttribs();
+#include "options.h"
+#include "frontend.h"
 void SaveSettings();
 
 static inline int SliderValue(Gadget* e)

@@ -100,8 +100,6 @@ struct UnitType {
 #include "../gui/layer.h"
 #include "../gui/gui.h"
 
-void StepAllGafSequences();
-
 #include "../network/player_info.h"
 
 #include "../network/player.h"
@@ -141,15 +139,7 @@ struct Follow_0041ca10 {
 // GLOBAL: 0x511de8
 extern Game* g_game;
 
-extern int g_messageBytesReceived;
-extern int g_messageBytesSent;
-extern int g_packetBytesSent;
-extern int DAT_00511c20;
-extern int g_packetsSent;
-extern int g_packetsReceived;
-extern int g_packetBytesReceived;
-extern int g_messageCountByType[45][2];
-extern int g_messageBytesByType[45][2];
+#include "../../link/globals.h"
 extern Option_00419560 g_consoleCommands;
 extern Option_00419560 g_cheatCommands;
 extern Option_00419560 g_debugCommands;
@@ -168,7 +158,7 @@ unsigned int* __stdcall GetCategoryMask(char* name);
 void __stdcall CalcRadarViewportRect(void* rect);
 int GetScreenWidth();
 int GetScreenHeight();
-void __stdcall SetCursorPosition(int x, int y);
+#include "../gui/keyboard.h"
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
 void __stdcall GetCurrentMouseEvent(MouseEvent* mouse);
@@ -182,7 +172,7 @@ void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 void __stdcall IssueOrCancelOrder(MissionType kind, int remove, Unit* owner,
                             int id, Vec3* pos, int typeId, int amount);
 int __stdcall CanBuildAt(UnitType* type, Point16 cell, int a, Player* player);
-int GetBuildSiteHeight(void);
+#include "../graphics/movies.h"
 int __stdcall GetFootprintHeight(UnitType* unit, Point16 cell);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 unsigned short __stdcall FindUnitTypeId(char* name);
@@ -200,22 +190,15 @@ void __stdcall SetGadgetActive(Gui* menu, int index, char value);
 void __stdcall RenderLayer(Gui* menu, int value);
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 void __stdcall ClearSelectedGadget(Gui* menu);
-int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries);
+#include "control_panel.h"
 int __stdcall HandleOrderButtonClick(Gui* menu, Gadget* entries);
-int __stdcall IsKeyDown(int key);
-int __stdcall GetClickMode(Gui* menu);
-void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
-void __stdcall RefreshBuildCountTexts(Gui* menu, Unit* unit);
+#include "../gui/dialogs.h"
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 #include "../files/files_api.h"
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-void __stdcall HandleBuildPanelClick(Gui* menu);
-void __stdcall RefreshOrderButtons(Unit* unit);
 int __stdcall IsScreenNamed(Gui* menu, const char* name);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4);
-void __stdcall BroadcastBuilderLink(Unit* obj, Unit* target);
-void __stdcall FinishConstruction(Unit* builder, Unit* unit);
-int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount);
+#include "../network/net_game.h"
 
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {
@@ -1168,7 +1151,7 @@ void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit)
     }
 }
 
-void __stdcall StepBuildMenuPage(int toggle);
+#include "control_panel_41bde0.h"
 
 static Unit* GetSelectedUnit()
 {
@@ -1357,7 +1340,7 @@ void __stdcall AccumulateScreenShake(int dx, int dy, int value)
 }
 
 #pragma auto_inline(off)
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x41c6f0
 void UpdateScreenShake()

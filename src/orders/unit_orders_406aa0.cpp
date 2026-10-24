@@ -12,7 +12,7 @@ struct Def { char pad[0x15e]; Vec low, high; };
 #include "order.h"
 #include "../game/game.h"
 #pragma pack(pop)
-extern Game* g_game;
+#include "../../link/globals.h"
 void __stdcall EmitTeleportParticles(Vec*,Vec*,int,int);
 // FUNCTION: 0x406aa0
 int __stdcall TeleportOrder(Unit* unit,Order* order,int unused)

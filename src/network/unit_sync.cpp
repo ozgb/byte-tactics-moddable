@@ -161,12 +161,10 @@ extern void (*g_riIntervalTimer)(void);
 extern int (__stdcall* g_riReportGameChat)(int, int);
 
 Rect_0046c620* __stdcall GetSessionGuidInstance(Net_4c97b0* p);
-int __stdcall GetCreatedLobbyInterface(Net_4c97b0* p);
-int __stdcall QueryOnlineFlags(int mode);
+#include "online_report.h"
 int __stdcall RIReport(int, Rect_0046c620*, void*, int, Name_0046c620*, int,
                            int, int, void*, void*);
-int FillScoreTables();
-int __stdcall RIReportGameChat(int arg1, int arg2);
+#include "../game/statistics_46c2a0.h"
 
 // FUNCTION: 0x46c620
 int __stdcall ReportGameEvent(int msg)
@@ -459,10 +457,9 @@ public:
 int __cdecl GetLocalHumanDpid();
 unsigned int GetHostDpid();
 void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
-Player* __stdcall FindPlayerByDpid(int id);
+#include "net_game.h"
 int __stdcall ComputeUnitScriptChecksum(UnitDef* def);
-void ProtectUnitDefsReadWrite();
-void ProtectUnitDefsReadOnly();
+#include "../ai/ai_profile.h"
 extern char g_unitSyncStatusText[];
 
 static inline void SendPacket(unsigned int to, UnitSyncPacket* packet)

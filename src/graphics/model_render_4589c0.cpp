@@ -73,12 +73,11 @@ template <class T> inline void Swap(T& a, T& b)
     b = t;
 }
 
-extern Game* g_game;
-extern const float DAT_004fd4c0;
+#include "../../link/globals.h"
 
 int __stdcall GetGroundHeight(Pos_459200* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
-void __stdcall DrawFrameDepth(GafFrame* bmp, GafFrame* param_2, int x, int y, int z);
+#include "gaf.h"
 void __stdcall TintFrameBelow(GafFrame* param_1, int value);
 void __stdcall CutFrameBelow(GafFrame* param_1, int value);
 

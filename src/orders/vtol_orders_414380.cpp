@@ -26,11 +26,8 @@ class Class_0044e6c0 { public: void SetAltitude(int); };
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
 #include "../units/unit.h"
-int __stdcall IsUnitCommander(Unit*);
 int __stdcall FindLandingPad(Unit*, int);
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
-void __stdcall ClearWeaponTarget(Unit*, int);
-void __stdcall DetonateUnitWeapon(Unit*, int);
 
 struct UnitRef {
     void* table;
@@ -41,11 +38,11 @@ struct UnitRef {
 #include "../game/game.h"
 #include "path_fx.h"
 #pragma pack(pop)
-extern Game* g_game;
+#include "../../link/globals.h"
 static inline UnitDef* Definitions() { return g_game->defs; }
 union Fixed { int value; struct { unsigned short fraction; short whole; }; };
 void __stdcall QueueUnitSpeech(Unit*, int, const char*);
-void __stdcall MarkSelectionOrdersDirty(Unit*);
+#include "../ingame/control_panel.h"
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall StartBuildingScript(Unit*, Order*, short);
@@ -63,13 +60,11 @@ static inline void CellToWorld(Point16 origin, Point16 c, Vec3* v)
     v->x = (origin.x + c.x * 2) << 19;
     v->z = (origin.y + c.y * 2) << 19;
 }
-void __stdcall CellToWorldPos(Point16,Vec3*,Point16);
 int __cdecl ScaledSin(short,int);
 int __cdecl ScaledCos(short,int);
 short __cdecl AngleOfVector(int,int);
 static inline Vec3 Offset(short angle,int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
 static inline short Angle(Vec3* a,Vec3* b) { return AngleOfVector(a->x-b->x,a->z-b->z); }
-int CheckDirectXVersion(int, int, int, int, int);
 struct Feature;
 // FUNCTION: 0x414380
 int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)

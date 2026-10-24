@@ -17,7 +17,7 @@
 #include "../graphics/rect.h"
 #include "../state/sim_globals.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 void __stdcall PlaySoundByName(char* name, int param_2);
 int __stdcall IsScreenNamed(void* obj, const char* name);
@@ -25,7 +25,7 @@ void __stdcall MarkChanged(void* obj);
 void __stdcall MarkLayerChanged(void* obj);
 void __stdcall SendChatPacket(char* text);
 void __stdcall ReportGameChat(char* msg);
-void __stdcall CenterCameraOnPoint(int a, int b, int c);
+#include "../ingame/control_panel.h"
 void __stdcall SetFont(int);
 void __stdcall SetTextColors(int, int);
 int GetFontHeight();

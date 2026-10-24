@@ -21,15 +21,10 @@ struct Slot_00436860 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../network/packet_manager.h"
 
-extern char* g_otaEnumFileList;
-extern int g_otaEnumCacheComplete;
-extern int g_otaEnumFileListBytes;
-extern int g_otaEnumFileCount;
-extern int g_usePacketManager;
 
 #include "../files/files_api.h"
 void __stdcall OpenMessageBox(char* dest, char* text, int wrapWidth, int centre, int autoHeight);
@@ -39,7 +34,7 @@ void __cdecl GameFreeThunk(void* p);
 int GetPreferredLanguage(void);
 char* __stdcall StripExtension(char* name);
 
-char* __stdcall SkipTextLines(char* list, int index);
+#include "../util/registry.h"
 int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, int def);
 
 char* __stdcall Translate(char* text);

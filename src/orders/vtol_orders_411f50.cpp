@@ -20,10 +20,6 @@ struct Unit;
 #include "path_order_attach.h"
 #include "mission_type.h"
 
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
 struct Struct_Unit96 {
@@ -38,14 +34,13 @@ struct Struct_Game391e9 {
 #include "path_fx.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall AppendOrder(Unit*, Order*);
-void __stdcall AppendOrderToTail(Unit*, Order*);
+#include "order_list.h"
 
 static inline Vec3 Offset(short angle, int distance)
 {

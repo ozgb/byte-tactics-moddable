@@ -8,12 +8,11 @@
 #pragma pack(push, 1)
 #include "../game/game.h"
 #pragma pack(pop)
-extern Game* g_game;
+#include "../../link/globals.h"
 
 extern int __cdecl _strcmpi(const char*, const char*);
 
-void __cdecl ProtectBlockReadOnly(void* p);
-void __cdecl ProtectBlockReadWrite(void* p);
+#include "../debug/debug_lib.h"
 
 class AIProfileParser {
 public:

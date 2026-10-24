@@ -11,7 +11,7 @@ void __cdecl GameFreeThunk(void* p);
 void __cdecl operator delete(void* p);
 
 struct MovementClass;
-unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y);
+#include "../map/terrain.h"
 
 struct Source_00440340 {
     char unknown_0[4];
@@ -86,8 +86,6 @@ struct Struct_00440a70 {
 #include "../network/player.h"
 #include "../../interfaces/seams.h"
 
-void AbortProgram(void);
-
 #include "../map/mission.h"
 
 #pragma pack(push, 1)
@@ -114,7 +112,7 @@ struct Src_00440ca0 {
     Rect_00440ca0 rect;
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x4402e0
 MovementClass::MovementClass()

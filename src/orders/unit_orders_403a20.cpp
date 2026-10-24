@@ -21,11 +21,11 @@ struct Unit;
 #include "order.h"
 #include "../game/game.h"
 #pragma pack(pop)
-extern Game* g_game;
+#include "../../link/globals.h"
 static inline UnitDef* Definitions() { return g_game->defs; }
 union Fixed { int value; struct { unsigned short fraction; short whole; }; };
 void __stdcall QueueUnitSpeech(Unit*, int, const char*);
-void __stdcall MarkSelectionOrdersDirty(Unit*);
+#include "../ingame/control_panel.h"
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
 short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall StartBuildingScript(Unit*, Order*, short);

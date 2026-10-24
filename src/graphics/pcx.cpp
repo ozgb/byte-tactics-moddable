@@ -329,7 +329,7 @@ struct FindData_004cb170 {
     char name[260];
 };
 
-extern char g_pathSepBackslash[];
+#include "../../link/globals.h"
 
 
 // FUNCTION: 0x4cb170
@@ -753,12 +753,9 @@ done:
     return 1;
 }
 
-extern LONG g_gfxBlitLockHeld;
-extern LONG g_gfxBlitLockOwner;
-extern HANDLE g_gfxBlitLockEvent;
 
 void __stdcall ReleaseDirectDraw(Game_004caec0* app);
-void UnlockAllScreens(void);
+#include "surface.h"
 
 static inline LONG Lock()
 {

@@ -1,0 +1,47 @@
+#ifndef OPTIONS_H
+#define OPTIONS_H
+
+void __stdcall SetDirectConnectAddress(char*);
+void __stdcall SetHostGameName(int flag, char* text);
+void __stdcall SetDirectPlayProvider(int);
+void __stdcall SetGadgetsDisabledByPrefix(char* name, int value);
+void __stdcall DeactivateGadgetsByPrefix(char* prefix);
+void __stdcall SetGadgetStatusAndText(int index, int state, char* offText, char* onText);
+void __stdcall ClearGadgetText(void*, int);
+void __stdcall ApplyBrightnessAndVolume();
+void __stdcall SetGameSpeedLabel(char* name, char* label, int speed, int normal);
+void __stdcall SetLockedCdTrack(int value);
+void __stdcall UpdateTrackGadgets();
+void __stdcall ApplyTrackType();
+void __stdcall ApplyDefaultSoundOptions();
+void __stdcall ApplyDefaultMusicOptions();
+void __stdcall ApplyDefaultUiOptions();
+void __stdcall ApplyDefaultVisualOptions();
+void __stdcall LoadSavedAudioSettings();
+void __stdcall RestoreUiOptions();
+void __stdcall RestoreVisualOptions();
+void __stdcall LoadSavedSettings();
+void __stdcall SaveGameSettings();
+void __stdcall EnsureOptionsPanelGadget();
+void __stdcall BlitOptionsPanel();
+int __cdecl OpenOptionsLayout();
+void __stdcall TickMusicOptions();
+void __stdcall UpdateMusicGadgets();
+void __stdcall OpenMusicOptions();
+void __stdcall UpdateSoundGadgets();
+void __stdcall OpenSoundOptions();
+void __stdcall OpenVisualOptions(int);
+void __stdcall OpenSpeedOptions();
+void __stdcall ShowGameSettingsDialog();
+void __stdcall OpenBriefingDialog();
+void __stdcall OpenHelpDialog();
+void __stdcall ClearScreenWithHudPalette();
+void __stdcall CloseOptionsPanel();
+void __stdcall OpenOptionsPanel();
+void __stdcall OpenRestartDialog();
+void __stdcall OpenSurrenderDialog();
+void __stdcall OpenExitMenu();
+void __cdecl HandleBattleQuitPrompt(int);
+void __stdcall OpenInGameOptions();
+
+#endif

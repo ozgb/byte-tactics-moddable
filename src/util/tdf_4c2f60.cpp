@@ -8,7 +8,7 @@ struct Elem_004c2f60 {
     StringRef b;
 };
 
-void __stdcall ReleasePair(char* p);
+#include "tdf.h"
 
 namespace std {
 inline void _Destroy(Elem_004c2f60* p)

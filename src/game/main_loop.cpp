@@ -76,50 +76,39 @@ struct FixedPos_00496ee0 {
 
 #pragma pack(pop)
 
-extern Game* g_game;
-extern int g_usePacketManager;
-extern int g_netProbeNextTick;
-extern int g_netHeartbeatNextTick;
+#include "../../link/globals.h"
 
 int GetMilliseconds();
-void UpdateFramePacing();
-void __stdcall RunGameSteps(int showStats);
+#include "../ingame/dialogs_493340.h"
 void MainLoopContinueStub();
 void MainLoopContinueStub_B();
 void MainLoopContinueStub_C();
-void EmptyMainLoopHook();
-void EmptyMainLoopHook_B();
-void EmptyMainLoopHook_C();
+#include "../frontend/frontend.h"
 int AssignStartPositions();
 void HandleNetPackets();
 unsigned int GetTicks();
 int GetLocalDpid();
 void __stdcall SendProbe(int a, int b);
-void HandleGameKey();
-void UpdateEdgeScroll();
-void CollectVisibleUnitIds();
-void RefreshSelectionOrders();
-void __stdcall DrawBattleFrame(int a, int b);
+#include "../ingame/keys.h"
+#include "../ingame/control_panel.h"
+#include "../ingame/selection.h"
+#include "../ingame/control_panel_41b2e0.h"
+#include "../ingame/info_panel_468cf0.h"
 void __stdcall SaveScreenshot(char* buf, char* name);
 void __stdcall SetCursorAnimation(Obj_004ab400* p, Src_004ab400* src);
 void ShowSoftwareCursor();
 void ClearKeyQueue();
 void __cdecl LeaveNetGameCallback(int param);
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
-void MenuFrame();
-void EnterMainMenuState();
+#include "main_loop.h"
 void __stdcall EnableKeyCommands(Gui* p);
-void RunFrontendStateMachine();
-void HarnessStartSkirmish();
+#include "../harness/harness.h"
 void HideSoftwareCursor();
-void PreBattleFrame();
-void CampaignSetupFrame();
-void LoadingScreenFrame();
+#include "game_load.h"
 void __stdcall BlitMenuLayers(Gui* sub, unsigned int* dest, int* clip);
 int __stdcall BroadcastPacket(int player, void* data, int size);
-void SendNetHeartbeat();
+#include "../network/net_game.h"
 void __stdcall FatalError(char* message);
-void __stdcall SetCameraPosition(int x, int y, int instant);
 void __stdcall CreateUnit(int team, unsigned short id, FixedPos_00496ee0 pos, int a, int b,
     int c);
 

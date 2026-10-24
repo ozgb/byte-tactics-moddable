@@ -57,10 +57,7 @@ struct Struct_004c6ac0 {
     unsigned char flags;
 };
 
-extern Game* g_game;
-extern int* g_unitRestrictPics;
-extern Record_005129b4* g_unitRestrictEntries;
-extern int* g_unitRestrictOldCounts;
+#include "../../link/globals.h"
 
 Entry_0044c420* __stdcall FindGadgetChecked(void* gadgets, char* name);
 int __stdcall IsCurrentGadgetNamed(Menu_0044c420* gui, char* name);
@@ -69,11 +66,10 @@ void __stdcall SetDescListCleanupFlag(int param_1, int param_2);
 void __stdcall MarkChanged(Menu_0044c420* obj);
 void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall UpdateUnitSliders(Menu_0044c420* menu, int value);
-void OpenLoadListDialog();
-void OpenSaveGameDialog();
+#include "multi.h"
 void __stdcall FreeSurface(Struct_004c6ac0* obj);
 void __cdecl GameFreeThunk(void* p);
-int IsHostLocal();
+#include "../network/net_game.h"
 
 // FUNCTION: 0x44c420
 void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)

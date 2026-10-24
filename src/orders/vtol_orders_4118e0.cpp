@@ -11,9 +11,6 @@ struct Unit;
 #include "path_order_attach.h"
 #include "mission_type.h"
 
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
 #include "../units/cob_script.h"
 
 #include "../files/files_api.h"
@@ -28,20 +25,17 @@ struct CalcedExplosion;
 #include "../weapons/weapon_def.h"
 #include "../units/unit.h"
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
-void __stdcall ClearWeaponTarget(Unit*, int);
-void __stdcall DetonateUnitWeapon(Unit*, int);
 void __stdcall DrawUnit(void*, Unit*);
 
 #include "order.h"
-int __stdcall DirectionFromStep(int, int);
 #include "path_fx.h"
 #pragma pack(pop)
 
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 void __stdcall QueueUnitSpeech(Unit*, int, const char*);
-void __stdcall AppendOrder(Unit*, Order*);
+#include "order_list.h"
 
 static inline Vec3 Offset(short angle, int distance)
 {

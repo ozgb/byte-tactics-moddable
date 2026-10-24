@@ -94,16 +94,6 @@ inline TdfRecord* TdfRecord::GetChild(int index)
     return index >= Kids(this).size() ? 0 : Kids(this).at(index);
 }
 
-void EnableAICommands(void);
-
-void CountMessage(unsigned char, int, int);
-void CountPacket(int, int, int);
-void SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
-void AccumulateScreenShake(int, int, int);
-void CenterCameraOnPoint(int, int, int);
-void SetMissionStatus(int, int, int);
-void StartFeatureBurning(int, int, int);
 void SetGameSpeed(int, int);
 // FUNCTION: 0x4c42a0
 TdfRecord::~TdfRecord()
@@ -360,11 +350,7 @@ int WalkFrameChain(int, int, int, int, int, int, int, int, int, int);
 void CopyDwordIfNonNull(int*, int*);
 int GetBuildRating(int, unsigned short);
 void RegisterUnitOrders();
-void EnableMeteors();
-void DisableMeteors();
 void HandleNetPackets();
-void ResetAIPlayers();
-void InitCommands();
 void BlankScreen();
 void FlipScreen();
 void ShowSoftwareCursor();

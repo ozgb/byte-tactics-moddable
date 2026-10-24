@@ -138,11 +138,6 @@ struct Net {
 };
 
 void WriteScreenshot(char*, char*, int, int, int, int);
-void SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
-void AccumulateScreenShake(int, int, int);
-void CenterCameraOnPoint(int, int, int);
-void SetMissionStatus(int, int, int);
 
 #include "../graphics/memory_cache.h"
 
@@ -209,13 +204,12 @@ struct DebrisView {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern int g_explosion0Duration, g_explosion0StartSize, g_explosion0EndSize, g_explosion1Duration, g_explosion1StartSize, g_explosion1EndSize, g_explosion2Duration, g_explosion2StartSize, g_explosion2EndSize;
-extern unsigned short g_faceVertexIndices[6][4];
 
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned size);
 void __cdecl GameFreeThunk(void* p);
-void* __stdcall BuildLensFrame(int, int, int);
+#include "../graphics/gaf.h"
 void __stdcall InitGafSequence(GafRef* ref, GafSequence* src, int index);
 void __stdcall EmitSmoke(int* pos, int a, int b, int c);
 void __stdcall EmitWhiteSmoke(void* buf, int arg);
@@ -228,7 +222,7 @@ void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 void __stdcall DrawModel3doProjected(void* surface, Position* pos, void* model, short* rotation);
 void __stdcall FillPolygon(void* surface, Point* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src);
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 int __stdcall StepGafSequence(GafRef* ref);
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 Vec3f __stdcall VectorFromTo(Vec3f from, Vec3f to);
@@ -237,12 +231,9 @@ Vec3f __stdcall NormalizeVector(Vec3f v);
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
 void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int flag);
-Explosion* __stdcall BuildCalcedExplosion(int n, int from, int to);
+#include "explosions.h"
 void* __stdcall BuildExplosionFrame(int size);
-int __stdcall UpdateExplodedPiece(ExplodedPiece* obj);
-int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj);
 void __stdcall StartExplodePiece(ExplodedPiece* spawn);
-void __stdcall BreakPieceIntoDebris(ExplodedPiece* param);
 
 inline Explosion* MakeExplosion(int count, int start, int end)
 {

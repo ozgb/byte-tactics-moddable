@@ -13,9 +13,9 @@ struct Msg_00450530 {
 };
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-int __stdcall GetSlotDpid(unsigned char index);
+#include "net_game.h"
 int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
 unsigned char FindHostSlot();
 

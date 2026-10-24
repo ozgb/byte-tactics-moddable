@@ -7,8 +7,6 @@ struct Unit;
 
 #include "unit_motion.h"
 
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
 
 #pragma pack(push, 1)
 #include "../map/feature.h"
@@ -18,8 +16,6 @@ void UpdateEdgeScroll();
 #include "../units/unit.h"
 int __stdcall FindLandingPad(Unit*, int);
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
-void __stdcall ClearWeaponTarget(Unit*, int);
-void __stdcall DetonateUnitWeapon(Unit*, int);
 void __stdcall DrawUnit(void*, Unit*);
 
 #include "order.h"
@@ -28,7 +24,7 @@ void __stdcall DrawUnit(void*, Unit*);
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../../interfaces/seams.h"
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);

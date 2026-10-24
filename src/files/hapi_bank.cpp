@@ -44,21 +44,17 @@ struct AccountList {
 #include "../util/file_printf.h"
 #include "../../interfaces/host.h"
 
-FileHandle* __stdcall HAPI_OpenFileRead(char* name);
-int __stdcall HAPI_CloseFile(FileHandle* file);
-long __stdcall HAPI_SeekFile(FileHandle* file, long pos);
-long __stdcall HAPI_TellFile(FileHandle* file);
-int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
+#include "files_impl.h"
 long __stdcall HAPI_FileLength(FileHandle* file);
 
 void* __cdecl GameAllocShared(unsigned int size);
-void* __cdecl GameCalloc(unsigned int count, unsigned int size);
+#include "../debug/debug_lib.h"
 void* __cdecl GameReallocIgnoreTag(void* ptr, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 char* __cdecl GameStrdup(char* s);
 int __cdecl SetOutOfMemoryHandler(int handle);
 
-int __stdcall SquashUnpackedSize(unsigned char* src);
+#include "sqsh.h"
 int __stdcall SquashUnpack(void* dest, void* src);
 char* __stdcall SquashErrorString(int code);
 int __stdcall SquashMaxPackedSize(int size, int level);

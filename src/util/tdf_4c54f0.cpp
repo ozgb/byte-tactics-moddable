@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <new>
 
-extern char g_language[64];
+#include "../../link/globals.h"
 
-void __cdecl AllocNotifyNop(int);
+#include "../debug/debug_lib.h"
 
 #include "string_ref.h"
 #include "tdf.h"
@@ -67,8 +67,6 @@ public:
     TdfField* FindLowerBound(const char* key);
 };
 #pragma pack(pop)
-
-extern TranslationTable* g_translations;
 
 static inline StringRef* InsertNew(TranslationTable* s, TdfField* e, const StringRef& key)
 {

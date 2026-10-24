@@ -5,7 +5,7 @@
 #include "../../../interfaces/host.h"
 #include "headless.h"
 
-extern "C" const GUID IID_IDirectSound3DBuffer;
+#include "guids.h"
 
 struct IDirectSound3DBuffer : public IUnknown {
     virtual HRESULT __stdcall GetAllParameters(void* p) = 0;

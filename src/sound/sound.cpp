@@ -133,20 +133,12 @@ struct Message_0047fad0 {
 };
 #pragma pack(pop)
 
-extern Game* g_game;
-extern SpeechQueue* g_speechQueue;
+#include "../../link/globals.h"
 extern Message_0047fad0 g_speechTypes[24];
-extern int g_noDirectSound;
-extern int g_useWindowsSound;
-extern int g_playLooping;
-extern int g_cmdSingEnabled;
 
-extern char g_noDirectSoundKey[];
-extern char g_useWindowsSoundKey[];
-extern char g_soundInitError[];
 
 unsigned int __stdcall GetPreferenceInt(char* key, int defaultValue);
-int IsWindowsSoundAvailable(void);
+#include "play_sound.h"
 void __stdcall FatalError(char* text);
 void* __cdecl operator new(size_t size);
 void __cdecl operator delete(void* p);
@@ -154,11 +146,8 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
 #include "../files/files_api.h"
 void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, char last);
-BOOL __stdcall PlayWavFromDisk(char* path);
 int __stdcall PlayWavMemory(int sound);
 int __stdcall PlayLoopingWavMemory(int sound);
-void ResumeLoopingWav();
-void StopWindowsSound();
 int __cdecl GetLocalDpid();
 int __stdcall BroadcastPacket(int player, void* data, int size);
 struct Cell;
@@ -613,7 +602,7 @@ void SpeechQueue::PlayNextSpeechEntry()
     count--;
 }
 
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x47fd70
 void SpeechQueue::PlaySpeech(int index, int param_2, int param_3)

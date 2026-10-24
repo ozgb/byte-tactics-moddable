@@ -23,7 +23,7 @@ void __stdcall AppendToDebugFile(char* text)
     HAPI_CloseFile(file);
 }
 
-void OutOfMemoryHandler();
+#include "main.h"
 int __cdecl SetOutOfMemoryHandler(int param_1);
 
 // FUNCTION: 0x49e6f0
@@ -33,7 +33,7 @@ void InstallOutOfMemoryHandler()
 }
 
 void __stdcall ReportViaException(char* text);
-void NopAbortHook(void);
+#include "../debug/debug_lib.h"
 
 // FUNCTION: 0x49e700
 void OutOfMemoryHandler()
@@ -77,7 +77,7 @@ void __stdcall DrawFrame(void* surface, void* header, int x, int y);
 
 extern Game* g_game;
 
-int DispatchHostEvents();
+#include "../graphics/display.h"
 
 extern unsigned char g_atexitRegistered;
 extern char* g_appName;
@@ -151,29 +151,23 @@ extern const char g_audioCdShellKey[];
 extern const char g_cdShellValueName[];
 extern const char g_defaultLanguage[];
 
-void AtexitNoOp();
-void __cdecl InitDebugSupport(unsigned int param_1);
-void CreateGameObject();
-void RegisterDataArchives();
-void EmptyPreFrontendInitHook();
-void InitGame();
+#include "../debug/debug_lib_4da120.h"
+#include "../frontend/endgame.h"
+#include "cd_check.h"
+#include "../frontend/frontend.h"
+#include "game_state.h"
 void __stdcall InitDisplayDefaults(void* param_1);
 int __stdcall InitEnvironment(void* param_1);
-void __stdcall InitTimers(int param_1);
 void __stdcall EmptyPostArchiveMountHook(const char* param_1);
 void __stdcall ShutdownEnvironment(void* param_1);
-void SaveCdLists();
-void ReopenCdAudio();
-void MainFrameTick();
-void ShutdownMouse();
-void ShutdownGame();
-int __stdcall ParseCommandLine(char* param_1, char* param_2);
+#include "../ingame/screenshots.h"
+#include "../gui/mouse.h"
+#include "main_49eda0.h"
 void __stdcall ReadGameRegistryValue(const char* param_1, void* param_2, int* param_3);
 void __stdcall WriteGameRegistryValue(const char* param_1, void* param_2, int param_3);
 void __stdcall LoadTranslations(const char* param_1, char* param_2);
 
-void HarnessInit(char* cmdLine);
-unsigned HarnessCrtSeed(unsigned live);
+#include "../harness/harness.h"
 
 // FUNCTION: 0x49e830
 int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,

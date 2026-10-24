@@ -36,10 +36,10 @@ struct SavedPiece {
 
 #include "../files/files_api.h"
 
-extern int GetTickRate();
+#include "../graphics/display.h"
 void __cdecl GameFreeThunk(void* p);
 int __stdcall GetCobChecksum(void* param);
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 
 // FUNCTION: 0x4b0610
 CobScript::CobScript()

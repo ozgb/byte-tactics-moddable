@@ -24,8 +24,7 @@ struct State_004be320 {
 
 
 State_004be320* GetDisplay(void);
-void __stdcall HAPI_ClearShadowFlags(ArchiveDirectory* list);
-void __stdcall HAPI_MarkShadowedFiles(char* name, int a, int b);
+#include "hpi.h"
 
 // FUNCTION: 0x4be320
 void HAPI_ResolveShadowedFiles(void)

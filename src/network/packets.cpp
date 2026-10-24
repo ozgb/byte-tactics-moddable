@@ -13,10 +13,10 @@
 
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* ptr);
-void __cdecl PacketTrace(const char* fmt, ...);
+#include "packets.h"
 unsigned int GetTicks();
-void __stdcall CountMessage(unsigned char type, int len, int which);
-void __stdcall ReportPacketGap(int a, int b, int c);
+#include "net_stats.h"
+#include "net_game.h"
 
 class PacketBuffer;
 class PacketChannel;
@@ -54,18 +54,7 @@ public:
 #include "packet_ring.h"
 
 void RegisterUnitOrders();
-void RegisterGroundOrders();
-void EnableAICommands();
-void RegisterAICommands();
-void ResetAIPlayers();
-void RegisterVtolOrders();
-void StepAllGafSequences();
-void ResetNetStats();
-void InitCommands();
 int UpdatePlacementGhostValidity();
-void RefreshSelectionOrders();
-void DispatchOrdersPanelPageFlags();
-void ResetCameraState();
 
 #pragma pack(push, 1)
 struct Net_00462f30 {
@@ -162,10 +151,8 @@ public:
 };
 #pragma pack(pop)
 
-extern Game* g_game;
-extern NetCondenser g_sendCondenser;
-extern NetCondenser g_receiveCondenser;
-extern int g_usePacketManager;
+#include "../../link/globals.h"
+#include "net_condenser.h"
 extern int g_netFrameRateConfig;
 
 #include "packet_channel.h"
@@ -179,10 +166,6 @@ struct Msg_00461900 {
 #include "packet_manager.h"
 #include "../state/sim_globals.h"
 
-int __stdcall DefaultPacketHandler(int arg1);
-int __stdcall RejectPacketType2(int arg1);
-void __stdcall AnnouncePlayerLeft(int id);
-int __stdcall GetPlayerName(int dpid, char* shortName, char* longName);
 
 // FUNCTION: 0x460f40
 PacketRing::PacketRing()
@@ -1698,9 +1681,7 @@ int FrameQueue::QueueFrames(char* src, unsigned int size, int tick, int a4, int 
     return 1;
 }
 
-extern char g_emptyAtexitRegistered;
 extern void __cdecl atexit(void*);
-void EmptyAtexitHandler(void);
 
 // FUNCTION: 0x463ba0
 void RegisterEmptyAtexit()
@@ -1716,7 +1697,7 @@ void EmptyAtexitHandler(void)
 {
 }
 
-void __cdecl AllocNotifyNop(int);
+#include "../debug/debug_lib.h"
 
 #include "player.h"
 #include "player_info.h"

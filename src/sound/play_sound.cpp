@@ -1,7 +1,6 @@
 #include "../../interfaces/host.h"
 
-extern char* g_loopingWav;
-extern int* g_diskWav;
+#include "../../link/globals.h"
 
 #include "../files/files_api.h"
 void __cdecl GameFreeThunk(int* p);

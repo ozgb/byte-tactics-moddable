@@ -108,7 +108,7 @@ struct SyncPlayerRecord {
     SyncPlayerRecord& operator=(const SyncPlayerRecord& src);
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern int DAT_00000000;
 
 int __stdcall ComputeUnitScriptChecksum(UnitDef* def);

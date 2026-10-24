@@ -37,27 +37,27 @@ inline Entry_00432cf0* Table_00499cd0::LowerBound(const char* key) {
     return first;
 }
 
-void __stdcall SetWeaponFireHandler(WeaponDef*);
+#include "weapons.h"
 
 #pragma pack(push, 1)
 #include "../game/game.h"
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void __stdcall FatalError(char* path);
-void* __stdcall Load3do(char* path);
+#include "../graphics/pcx.h"
 void __stdcall MirrorObject(void* p);
 void __stdcall BindModelTextures(void* a, char* b);
-void* __stdcall LoadAnimGaf(char* name);
+#include "../game/data_files.h"
 void* __stdcall FindGafEntry(void* a, char* b);
 int __stdcall LoadSoundByName(void* a, char* b);
 
 #include "../files/files_api.h"
-void __stdcall LoadWeaponType(TdfRecord* section);
-int UsesDataArchives(void);
+#include "weapon_types.h"
+#include "../game/cd_check.h"
 extern void __cdecl operator delete(void*);
 void __cdecl GameFreeThunk(void* p);
 

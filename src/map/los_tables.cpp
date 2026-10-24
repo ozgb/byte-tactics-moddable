@@ -70,7 +70,6 @@ struct Elem_004336c0 {
 void CopyDwordIfNonNull(int*, int*);
 #include "../orders/approach_areas.h"
 #include "../state/sim_globals.h"
-int IsLocalPlayerOutOfUnits();
 int GetBuildRating(int, unsigned short);
 
 extern void __cdecl operator delete(void*);
@@ -497,8 +496,6 @@ Inner_00433500* LosTables::GetLosTable(int n)
 {
     return (Inner_00433500*)&(*(Outer_004330b0*)this)[(short)(n - 1)];
 }
-
-void StepAllGafSequences(void);
 
 // FUNCTION: 0x432d40
 void __stdcall SortUnitTypes(UnitDef* first, UnitDef* last,

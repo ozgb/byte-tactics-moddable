@@ -52,17 +52,17 @@ struct Name_0048d630 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-void SelectStopOrder(void);
+#include "keys.h"
 int __stdcall PopUntilNamedLayout(int force);
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
-void __stdcall CenterCameraOnMapPosition(Vec3* p, int param_2);
+#include "control_panel.h"
 UnitTypeSet* __stdcall GetCategoryMask(char* name);
 
 #include "../map/cell.h"
 
-Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
+#include "../map/line_of_sight.h"
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
 
 // FUNCTION: 0x48bae0
@@ -309,8 +309,6 @@ struct Select_0048c390 {
     unsigned int flags;
 };
 
-extern char s_SelectMultipleUnits_00508d8c[];
-
 int __stdcall PlaySoundByName(char* msg, int a);
 
 // FUNCTION: 0x48c390
@@ -371,7 +369,7 @@ int __stdcall SelectUnitsInBox(void* param_1)
 
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 void __stdcall GetObjectBounds(void* obj, Vec3* lo, Vec3* hi, int arg);
-int __stdcall PointInPolygon(Point* pts, int n, int px, int py);
+#include "../graphics/draw.h"
 
 // FUNCTION: 0x48c6a0
 int __stdcall HitTestUnitScreenHull(Unit* obj, Point* p)
@@ -764,7 +762,7 @@ done:
     (*(Orders_37ebe*)&g_game->ordersPanelFlags_37ebe).flags |= flag;
 }
 
-void __stdcall SetUnitSquad(Unit* unit, int arg);
+#include "../units/squads.h"
 
 // FUNCTION: 0x48d920
 void __stdcall CreateSquad(int param_1)

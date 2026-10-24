@@ -187,7 +187,7 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 typedef Elem_0043c390* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
@@ -667,12 +667,8 @@ public:
     int GetCount(void);
 };
 
-void ResetAIPlayers();
-void StepAllGafSequences();
-void ResetNetStats();
-void InitCommands();
+#include "../network/net_stats.h"
 int UpdatePlacementGhostValidity();
-void RefreshSelectionOrders();
 
 typedef std::vector<Elem_0043c390> Vec_0043c390;
 typedef int(__stdcall* Pred_0043c390)(const Elem_0043c390&, const Elem_0043c390&);
@@ -704,7 +700,6 @@ class Class_0043db50 { public: void UpdateSfxOccupy(Unit* u); };
 #include "unit_motion.h"
 #pragma pack(pop)
 
-extern Game* g_game;
 typedef Elem_0043c390* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
@@ -720,15 +715,12 @@ int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 MissionType __stdcall GetOrderType(unsigned char relation, Unit* unit, Unit* target, Vec3* pos);
 void __stdcall AddOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7);
 int __stdcall FindWeaponTarget(Unit* unit, int a, int b);
-int __stdcall RandomInt(int n);
+#include "../util/math_4b6c30.h"
 int __stdcall CompareOrderTypeNames(const Elem_0043c390& a, const Elem_0043c390& b);
-void RegisterGroundOrders();
-void RegisterVtolOrders();
+#include "unit_orders.h"
 void RegisterUnitOrders();
 void __stdcall DeleteOrder(Unit* owner, Order* node);
-void __stdcall DeleteOrders(Unit* owner, int all);
-void __stdcall MoveOrderToTail(Unit* owner, Order* node);
-void __stdcall InsertOrderBefore(Unit* owner, Order* node, Order* before);
+#include "order_list.h"
 
 static inline int InRange(int d)
 {

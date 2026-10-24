@@ -59,7 +59,7 @@ unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit_00408100* u
 int __stdcall FindBuildPosition(unsigned int player, Vec3* from, Item_00408100* item, Vec3* out);
 int __stdcall GetBuilderCount(unsigned int player);
 #include "../../interfaces/seams.h"
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);

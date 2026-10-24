@@ -18,7 +18,7 @@ struct Position_00408090 {
     short z;
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x408090
 int __stdcall IsPointVisible(Map_00408090* map, Position_00408090* pos)

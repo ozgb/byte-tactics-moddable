@@ -79,14 +79,12 @@ union Flags_3923b {
 #include "game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../map/mission.h"
 #include "../state/sim_globals.h"
 
 extern char* g_savegameDir;
-extern const char g_invalidSavegameText[];
-extern char g_savegameRadarFrame[];
 extern char* g_savegameFileNames;
 extern char* g_savegameDescs;
 extern char* g_savegameSideList;
@@ -105,17 +103,16 @@ void __stdcall SetGadgetText(Gui* menu, int index, char* text);
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
 void __stdcall SetGadgetActiveByName(void* menu, char* name, int value);
 void __stdcall SetTranslatedTextByName(void* menu, char* name, char* text, int param_4);
-char* __stdcall SkipTextLines(char* text, int n);
+#include "../util/registry.h"
 void __stdcall FrameFromSurface(void* dst, void* src);
 void __stdcall FreeSurface(void* image);
 void* __stdcall LoadSurface(HapiBank* obj);
-HapiBank* __stdcall OpenSummaryBank(char* name);
+#include "settings_campaign.h"
 void __stdcall FreeSummaryBank(void* handle);
-HapiBank* __stdcall OpenHapiBank(char* path);
 void __stdcall PlaySoundByName(char* name, int param);
-void __stdcall ShutdownIngameSystems();
+#include "game_state.h"
 void __stdcall PopUntilNamedLayout(int flag);
-void MenuFrame();
+#include "main_loop.h"
 void __stdcall DisableKeyCommands(void* menu);
 void __stdcall EnableKeyCommands(void* menu);
 void __stdcall SetKeyboardInput(void* menu, int value);
@@ -125,13 +122,13 @@ void __stdcall RenderLayer(void* menu, int value);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void __stdcall CloseTopScreen(char* sub);
 char* __stdcall BuildDataPath(char* buf, char* dir, char* name, char* ext);
-char* __stdcall BuildSideList();
+#include "../frontend/campaign_menu.h"
 int __stdcall SaveGameFile(char* path, char* description, int param_3);
 void __stdcall ScanDirectory(char* path, char* list, char* sizes, int mode, int flag, int what);
 void __cdecl InitMissionStatus();
-void OrLabelAttribs();
+#include "../frontend/frontend.h"
 void __stdcall BlankScreen();
-void __stdcall RegisterDataArchives();
+#include "cd_check.h"
 void __stdcall SetFrontendState(int code, int line, char* file);
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 void __cdecl LeaveNetGameCallback(int param);
@@ -149,11 +146,7 @@ void __stdcall SetCursorAnimation(void* menu, void* data);
 void __stdcall SetDescListCleanupFlag(Gui* menu, int flag);
 const char* __stdcall Translate(const char* key);
 void __stdcall OpenMessageBox(void* menu, const char* message, int a, int b, int c);
-void __stdcall LoadGameScreenHandler(Gui* gadget);
-void __stdcall SaveGameScreenHandler(Gui* gadget);
-void __stdcall SavedGameSelectHandler(int a, int b);
-char* __stdcall ListSavedGames(int* count);
-void ShowSavedGameInfo();
+#include "savegame.h"
 
 __inline void DeleteSave_00492360(HapiBank* obj)
 {

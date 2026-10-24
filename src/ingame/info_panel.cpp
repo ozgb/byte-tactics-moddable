@@ -225,10 +225,8 @@ public:
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-extern int g_probePanelBottom;
-extern int g_statusPanelNextTick;
 
 unsigned short* __stdcall FindGafEntry(void* gaf, const char* name);
 int __stdcall GetGafFrame(unsigned short* param_1, int param_2);
@@ -267,11 +265,11 @@ unsigned long GetMilliseconds();
 
 void __stdcall FadeRectangle(void* surface, Rect* rect, int level);
 void __stdcall FadeRectangle(void* surface, void* rect, int level);
-void __stdcall GetByteRates(unsigned int* sent, unsigned int* received);
+#include "../network/net_stats.h"
 int __stdcall GetBuildRating(int player, unsigned short type);
 
 void __stdcall PlaySoundByName(char* name, int param_2);
-int __stdcall IsKeyDown(int key);
+#include "../gui/keyboard.h"
 void __stdcall DrawTextClipped(void* surf, void* text, int x, int y, int color, int just);
 
 void __stdcall GetObjectBounds(Object_004cb650* obj, Vec3* lo, Vec3* hi, int arg);
@@ -915,9 +913,6 @@ void __stdcall DrawClosedPolygon(void* surface, Point* points, int count, int co
     DrawLine(surface, points->x, points->y, p->x, p->y, color);
 }
 
-void ResetCameraState(void);
-void ClampCameraPosition(void);
-void ClampCameraTarget(void);
 
 // FUNCTION: 0x46bae0
 void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,

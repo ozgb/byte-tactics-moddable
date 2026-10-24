@@ -29,28 +29,22 @@ struct Weapon;
 struct Feature;
 #include "../network/player.h"
 #include "../units/unit.h"
-int __stdcall IsUnitCommander(Unit*);
-void __stdcall AlignUnitToGround(Unit*);
 
 #include "order.h"
-int __stdcall DirectionFromStep(int, int);
 int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
-void __stdcall ReactToAttack(Unit*, Unit*, int);
 int __stdcall GetBuilderCount(int);
-int __stdcall GetUnitCount(int, unsigned int);
 #include "../game/game.h"
 #include "path_fx.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 int __cdecl AngleOfVector(int x, int z);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall AppendOrderToTail(Unit*, Order*);
-void __stdcall AppendOrder(Unit*, Order*);
+#include "order_list.h"
 
 class LandingPadList : public std::vector<Unit*> {};
 

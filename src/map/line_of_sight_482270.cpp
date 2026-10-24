@@ -22,14 +22,6 @@ public:
 void CopyDwordIfNonNull(int*, int*);
 int ScanDirectory(char*, char*, char*, int, int, int);
 void RegisterUnitOrders(void);
-void RegisterGroundOrders(void);
-void EnableAICommands(void);
-void RegisterAICommands(void);
-void FUN_00406f40(void);
-void ResetAIPlayers(void);
-void SumMessageStats(void);
-void InitCommands(void);
-void ResetNetStats(void);
 
 
 struct MapSize_482270 {
@@ -61,7 +53,7 @@ struct Player_482270 {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 GafFrame* __stdcall GetGafFrame(unsigned short* table, int index);
 

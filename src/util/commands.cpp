@@ -24,8 +24,7 @@ static std::vector<CommandEntry> s_commandTable;
 
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
-extern int g_defaultCommandHandler;
-extern int g_defaultCommandMask;
+#include "../../link/globals.h"
 
 #include "string_ref.h"
 #include "../state/sim_globals.h"

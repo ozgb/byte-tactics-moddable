@@ -61,10 +61,7 @@ public:
 
 static int g_errorLogWritten;
 
-char* __cdecl GetExceptionName(unsigned long code);
-void __cdecl NormalizeLineEndings(char* buf, int size);
-void __cdecl FormatSystemInfo(char* dst, int size);
-void UnloadImageHelp();
+#include "crash.h"
 
 // FUNCTION: 0x4d8e60
 int __cdecl ReportException(EXCEPTION_POINTERS* ep, char* handlerName)
@@ -297,7 +294,6 @@ void StackTrace::FormatStackReport()
     }
 }
 
-int __cdecl ReportException(EXCEPTION_POINTERS*, char*);
 static const char g_exceptionHandlerName[28] = "Global Exception Handler";
 
 // FUNCTION: 0x4da2a0
@@ -683,8 +679,6 @@ void __cdecl WalkStack(int param1, int param2, int param3, int param4, int* para
 }
 
 static char* g_libraryDateStamp = (char*)"Library date stamp: Jun 30 1998 16:08:53";
-int __cdecl GetStackLow(void);
-void* GetStackHigh(void);
 
 // FUNCTION: 0x4ded60
 void __cdecl FormatSystemInfo(char* dest, int destLen)

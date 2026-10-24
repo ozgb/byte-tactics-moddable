@@ -28,10 +28,8 @@ public:
     virtual void CollectRepairableUnit(Unit*);
 };
 
-int __stdcall RandomInt(int);
-void __stdcall EnsurePatrolReturnOrder(Unit*, Order*);
-void __stdcall AppendOrder(Unit*, Order*);
-int __stdcall IssueRepairOrder(Unit*, Unit*, int);
+#include "../util/math_4b6c30.h"
+#include "order_list.h"
 union Fixed { int v; struct { unsigned short frac; short whole; } p; };
 
 inline void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)

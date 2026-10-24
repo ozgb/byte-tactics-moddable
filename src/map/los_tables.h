@@ -2,6 +2,7 @@
 #define LOS_TABLES_H
 
 #include "../util/string_ref.h"
+struct Elem_432cb0;
 
 struct Elem_00434020;
 #ifdef __clang__
@@ -47,5 +48,9 @@ public:
     int* last;
     int* end;
 };
+
+void __stdcall AssignRange(Elem_432cb0* first, Elem_432cb0* last, Elem_432cb0* value);
+Elem_432cb0* __stdcall AssignRangeBack(Elem_432cb0*, Elem_432cb0*, Elem_432cb0*);
+void __stdcall DestroyPoint(int);
 
 #endif

@@ -5,7 +5,7 @@ struct Elem_00434020 {
     unsigned short b;
 };
 
-void __stdcall DestroyPoint(int);
+#include "los_tables.h"
 void __stdcall StoreDwordIfDst(int* p, const int* q);
 
 namespace std {

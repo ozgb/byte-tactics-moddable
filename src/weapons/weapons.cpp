@@ -149,7 +149,7 @@ struct Cell;
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x499a30
 void AllocWeaponArray(void)
@@ -285,7 +285,7 @@ void __stdcall RockUnit(Object_00499c10* obj, Source_00499c10* src)
 
 #include "damage_table.h"
 
-int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target, float scale);
+#include "weapons.h"
 
 // FUNCTION: 0x499c70
 void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target)
@@ -392,7 +392,9 @@ void __stdcall UntrackProjectile(Projectile* projectile)
     projectile->flags |= 2;
 }
 
-void __stdcall AccumulateScreenShake(int a, int b, int c);void __stdcall AddExplosionEffect(Vec3* position, void* value, int a, int b);
+
+#include "../ingame/control_panel.h"
+void __stdcall AddExplosionEffect(Vec3* position, void* value, int a, int b);
 void __stdcall EmitWhiteSmoke(Vec3* position, int value);
 void __stdcall PlaySoundAt(unsigned int sound, Vec3* position, int value);
 void __stdcall ApplyAreaDamage(Projectile* projectile, Vec3* position);
@@ -511,7 +513,6 @@ struct CellPos_0049a120 {
 
 #pragma pack(push, 1)
 int CloakOnOrder(char*, int, int);
-int GetUnitCount(int, unsigned int);
 
 struct Cell {
     unsigned short unit;
@@ -578,7 +579,6 @@ struct Hits_0049a120 {
     }
 };
 
-int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target, float scale);
 void __stdcall DetonateProjectile(Projectile* weapon, Unit* unit);
 int __stdcall VectorLength(Vec3* v);
 Vec3 __stdcall GetFootprintCentre(CellPos_0049a120* cell, FeatureDef_0049a120* def);
@@ -673,32 +673,9 @@ short __stdcall SolveLaunchAngle(int x, int height, int z, int speed, float angl
 }
 
 void RegisterUnitOrders();
-void RegisterGroundOrders();
-void EnableAICommands();
-void RegisterAICommands();
-void ResetAIPlayers();
-void RegisterVtolOrders();
-void StepAllGafSequences();
-void ResetNetStats();
-void InitCommands();
-void RefreshSelectionOrders();
 int RIReport(int, int, int, int, int, int, int, int, int, int);
-void EnumPlayersCallback(int, int, int, int, int);
-int CheckDirectXVersion(int, int, int, int, int);
-void EmitThrustParticles(int, int, int, int, short);
 int AimCobStub(int, int, int, int);
-void DispatchOrdersPanelPageFlags();
-void ResetCameraState();
-void FindLocalCommander();
 void ClearCameraFollowState();
-void ClampCameraPosition();
-void ClampCameraTarget();
-void UpdateScreenShake();
-void UpdateCameraFollow();
-void BeginMouseScroll();
-void EndMouseScroll();
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
 
 #pragma pack(push, 1)
 
@@ -1012,8 +989,6 @@ Projectile* AllocProjectile()
 }
 
 
-extern Game* g_game;
-
 int __stdcall QueryWeaponPiece(Unit* unit, unsigned char weapon);
 void __stdcall PlaySoundAt(int sound, Vec3* pos, int param_3);
 
@@ -1051,8 +1026,6 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
     }
     PlaySoundAt(shot->sound, pos, 0);
 }
-
-void CompactProjectiles();
 
 static inline void Untrack_0049c880(Projectile* proj)
 {
@@ -1106,9 +1079,7 @@ void __stdcall CopyWeaponVelocityParam(Projectile* obj, WeaponDef* src)
 short __cdecl AngleOfVector(int x, int z);
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
-void __stdcall EmitWeaponSmoke(Vec3* p, short index);
-
-extern char* g_fireScriptNames[4];
+#include "../graphics/particles_472630.h"
 
 struct Fire_0049c9c0 {
     char unknown_0[0xc];
@@ -1531,7 +1502,7 @@ int __stdcall FireLineOfSightProjectile(Unit* fire, Unit* unit, Vec3* p3,
                            Vec3* point, Unit* target);
 int __stdcall FireBallisticProjectile(Unit* shot, Unit* unit, Vec3* pos,
                            Vec3* aim, Unit* target);
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // FUNCTION: 0x49d580
@@ -1941,8 +1912,6 @@ void __stdcall InitUnitWeaponSlots(Unit* unit)
     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetMaxReloadTime", 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
 }
 
-extern char* g_aimScriptNames[3];
-
 void __stdcall SubtractVec3(Vec3* a, Vec3* b, int* dx, int* dy, int* dz);
 int __stdcall CalcAimAngles(Unit* unit, WeaponDef* target,
                            unsigned short* out_heading, unsigned short* out_pitch,
@@ -2088,14 +2057,12 @@ void WriteScreenshot(char*, char*, int, int, int, int);
 void DrawTextClipped(void*, char*, int, int, int, int);
 int OpenInputDialog(void*, char*, char*, char*, char*, int);
 int ScanDirectory(char*, char*, char*, int, int, int);
-double DotProduct(float, float, float, float, float, float);
 void DrawFrameScaledBlended(void*, void*, int, int, double, double);
 void DrawFrameScaled(void*, void*, int, int, double, double);
 void* DrawLitLine(void*, int, int, int, int, int);
 void* DrawBlendedLine(void*, int, int, int, int, int);
 void OrderSquad(void*, int, unsigned char, int, void*, int, int, int);
 int AddBlinkWord(void*, const char*, int, int, int, int, float, float);
-void CenterCameraOnRadarClick();
 
 #pragma pack(push, 1)
 
@@ -2230,7 +2197,7 @@ void __stdcall DrawLens(void* dest, void* src, int x, int y);
 void __stdcall DrawLine(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
 int __stdcall GetGafFrameCount(void* gaf);
 int __stdcall IsPointVisible(Player* pi, Vec3* pos);
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x49be60
 void __stdcall DrawProjectiles(void* surface)

@@ -48,11 +48,11 @@ public:
 };
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern ClaimFootprintVisitor g_claimFootprintVtable[];
 
 #include "../../interfaces/seams.h"
-void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
+#include "terrain.h"
 void __stdcall RefreshPassMapsForUnit(Obj_0047db20* obj);
 
 static inline Cell* CellAt(const Point16& p)

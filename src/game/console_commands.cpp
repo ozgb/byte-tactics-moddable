@@ -165,83 +165,49 @@ struct Pair_00419560 {
 
 void __stdcall CmdMemDump(CommandArgs* args);
 void __stdcall CmdMem(CommandArgs* args);
-void __stdcall CmdAI(CommandArgs* args);
-void __stdcall CmdAssign(CommandArgs* args);
+#include "console_commands.h"
 void __stdcall CmdAssert(CommandArgs* args);
 void __stdcall CmdDPrint(CommandArgs* args);
 void __stdcall CmdBurnAll(CommandArgs* args);
 void __stdcall CmdBurnOne(CommandArgs* args);
-void __stdcall CmdFeature(CommandArgs* args);
 void __stdcall CmdShading(CommandArgs* args);
 void __stdcall CmdSelectable(CommandArgs* args);
-void __stdcall CmdKill(CommandArgs* args);
 void __stdcall CmdZBuffer(CommandArgs* args);
 void __stdcall CmdAntiAlias(CommandArgs* args);
 void __stdcall CmdShadow(CommandArgs* args);
 void __stdcall CmdDither(CommandArgs* args);
-void __stdcall CmdSwitchAlt(CommandArgs* args);
 void __stdcall CmdTShadow(CommandArgs* args);
 void __stdcall CmdFShadow(CommandArgs* args);
 void __stdcall CmdLOSType(CommandArgs* args);
-void __stdcall CmdLight(CommandArgs* args);
 void __stdcall CmdRCache(CommandArgs* args);
-void __stdcall CmdEdge(CommandArgs* args);
-void __stdcall CmdSearch(CommandArgs* args);
-void __stdcall CmdCDPlay(CommandArgs* args);
 void __stdcall CmdCDStop(CommandArgs* args);
 void __stdcall CmdSound3D(CommandArgs* args);
-void __stdcall CmdMove(CommandArgs* args);
-void __stdcall CmdLogo(CommandArgs* args);
-void __stdcall CmdIWin(CommandArgs* args);
-void __stdcall CmdILose(CommandArgs* args);
-void __stdcall CmdSeaLevel(CommandArgs* args);
-void __stdcall CmdControl(CommandArgs* args);
-void __stdcall CmdView(CommandArgs* args);
-void __stdcall CmdGive(CommandArgs* args);
 void __stdcall CmdScrollSpeed(CommandArgs* args);
 void __stdcall CmdIFace(CommandArgs* args);
 void __stdcall CmdLOS(CommandArgs* args);
 void __stdcall CmdMapping(CommandArgs* args);
-void __stdcall CmdContour(CommandArgs* args);
 void __stdcall CmdSelBoxes(CommandArgs* args);
 void __stdcall CmdTreeDeath(CommandArgs* args);
 void __stdcall CmdNoShake(CommandArgs* args);
-void __stdcall CmdNow(CommandArgs* args);
 void __stdcall CmdDoubleShot(CommandArgs* args);
 void __stdcall CmdHalfShot(CommandArgs* args);
 void __stdcall CmdRadar(CommandArgs* args);
-void __stdcall CmdATM(CommandArgs* args);
 void __stdcall CmdScreenChat(CommandArgs* args);
-void __stdcall CmdNoMetal(CommandArgs* args);
-void __stdcall CmdNoEnergy(CommandArgs* args);
-void __stdcall CmdGamma(CommandArgs* args);
 void __stdcall CmdSing(CommandArgs* args);
 void __stdcall CmdClock(CommandArgs* args);
-void __stdcall CmdFilm(CommandArgs* args);
-void __stdcall CmdFilmSpeed(CommandArgs* args);
-void __stdcall CmdSave(CommandArgs* args);
-void __stdcall CmdReload(CommandArgs* args);
 void __stdcall CmdReloadAIProfiles(CommandArgs* args);
 void __stdcall CmdBigBrother(CommandArgs* args);
 void __stdcall CmdProfile(CommandArgs* args);
 void __stdcall CmdNowISee(CommandArgs* args);
 void __stdcall CmdNetStats(CommandArgs* args);
 void __stdcall CmdMusicMode(CommandArgs* args);
-void __stdcall CmdMakePoster(CommandArgs* args);
-void __stdcall CmdMeteor(CommandArgs* args);
-void __stdcall CmdDrop(CommandArgs* args);
-void __stdcall CmdInclude(CommandArgs* args);
-void __stdcall CmdDebugBreak(CommandArgs* args);
-void __stdcall CmdPrintWeights(CommandArgs* args);
-void __stdcall CmdSenderror(CommandArgs* args);
 void __stdcall CmdShootAll(CommandArgs* args);
 void __stdcall CmdShareMetal(CommandArgs* args);
 void __stdcall CmdShareEnergy(CommandArgs* args);
 void __stdcall CmdShareMapping(CommandArgs* args);
 void __stdcall CmdShareRadar(CommandArgs* args);
 void __stdcall CmdShareAll(CommandArgs* args);
-void __stdcall CmdSetShareMetal(CommandArgs* args);
-void __stdcall CmdSetShareEnergy(CommandArgs* args);
+#include "share_commands.h"
 void __stdcall CmdShowRanges(CommandArgs* args);
 void __stdcall CmdCompression(CommandArgs* args);
 void __stdcall CmdBPS(CommandArgs* args);
@@ -267,28 +233,25 @@ extern unsigned char g_movementClassColors[];
 extern signed char g_dirDeltaX[], g_dirDeltaZ[];
 
 void __stdcall AddMessage(char* text, int key, int value, int last);
-extern void RemoveAllFeatures();
+#include "../map/features.h"
 void __stdcall RemoveFeature(void* target, int flag);
-short __stdcall FindFeatureType(char* name);
 void* __stdcall PlaceFeature(void* target, unsigned short id, void* pos, void* active,
                              unsigned char owner);
 void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind, int d, int e, int f);
 void SaveSettings();
-void __stdcall SetLightVector(int x, int y, int z);
+#include "../graphics/model_render.h"
 void __stdcall SetBrightness(float value);
 #include "../files/files_api.h"
 void __stdcall SaveGameFile(char* path, char* description, int gameId);
 extern void ClearCameraFollowState(void);
-void SumMessageStats();
+#include "../network/net_stats.h"
 void __stdcall WriteScreenshot(char* name, char* description, int x, int y, int w, int h);
 unsigned int GetTicks();
-void EnableMeteors();
-void DisableMeteors();
-void StartMeteorShower();
+#include "../map/meteors.h"
 unsigned int __stdcall ExecuteCommandText(char* text, int size, CommandArgs* vars, unsigned int mask);
 void __cdecl GameFreeThunk(void* data);
 extern Display_00417a60* GetDisplay();
-void ToggleFullScreen();
+#include "../graphics/display.h"
 void __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __stdcall ExecuteCommand(void* obj, int mask);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
@@ -1229,7 +1192,7 @@ struct MissionRule;
 struct MissionFeature;
 struct HapiFile;
 struct StringPool;
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x418310
 void __stdcall DrawMapDebugOverlay(void* surface)

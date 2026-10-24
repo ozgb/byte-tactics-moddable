@@ -4,7 +4,7 @@
 
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
-char* __stdcall SkipTextLines(char* list, int index);
+#include "../util/registry.h"
 int __cdecl _strcmpi(const char* a, const char* b);
 #include "../files/files_api.h"
 char* __stdcall StripExtension(char* name);
@@ -12,7 +12,7 @@ int __stdcall ScanDirectory(char* path, char* list, char* sizes, int mode, int f
 void __stdcall ConfigureListBoxByName(void* gui, const char* name, int x, int y, int z);
 void __stdcall StripFileName(char* path);
 void __stdcall StripPath(char* path);
-int GetTickRate();
+#include "../graphics/display.h"
 unsigned int GetTicks();
 int GetTextKeyColor();
 
@@ -92,7 +92,7 @@ int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 void __stdcall MarkChanged(void* obj);
 void __stdcall ClearSelectedGadget(void* obj);
-void __stdcall RefreshFileList(FileRequester* obj);
+#include "file_list.h"
 void* __stdcall LoadGuiLayer(void* param_1, char* param_2, int param_3);
 void __stdcall SelectFontForEntry(Entry_004a1810* entries, int index);
 void __stdcall SetTextColors(int param_1, int param_2);

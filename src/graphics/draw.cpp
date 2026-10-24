@@ -80,23 +80,17 @@ struct Obj {
 
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
-int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
+#include "draw.h"
 void __cdecl BlitLine(Surface* dst, int x0, int y0, int x1, int y1, int color);
 void __cdecl BlitLineRemapped(Surface* dst, int x0, int y0, int x1, int y1,
                               int color, unsigned int* palette);
 int __stdcall GetDisplay();
-int __stdcall ClipRectangle(Surface* surface, Rect* r);
 void __cdecl FillSolidRect(Surface* s, Rect* r, int color);
 void __cdecl RemapRect(int dst, int pitch, int w, int h, int table);
 void __cdecl XorRect(Surface* s, Rect* r, int value);
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
-int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n,
-                              unsigned char color);
-void __stdcall PlotSpanEnds(int row, Span* span, GafFrame* surf,
-                            unsigned char color);
-void __stdcall FillFlatSpan(int row, Span* span, GafFrame* surf,
-                            unsigned char color);
+#include "draw_4c0330.h"
 void __cdecl BlitRectKeyed(Surface* dst, Surface* src, Rect* rect, Rect* pos,
                            int colour);
 void __cdecl BlitRect(Surface* dst, Surface* src, Rect* rect, Rect* pos);

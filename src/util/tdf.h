@@ -98,4 +98,6 @@ public:
     void SetCurrentRecord(int val);
 };
 
+void __stdcall ReleasePair(char*);
+
 #endif

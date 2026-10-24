@@ -120,31 +120,19 @@ struct AllyFlagsPacket {
 #include "../network/packet_manager.h"
 #include "../state/sim_globals.h"
 
-extern Game* g_game;
-extern int g_usePacketManager;
-extern char g_allySoundName[];
-extern char g_playerDisconnectedText[];
-extern char g_integrityBreachText[];
-extern char g_playerMessageFormat[];
+#include "../../link/globals.h"
 
-int ReceiveNetPacket();
-void CheckDuplicatePlayerIds();
-void CheckPlayerTimeouts();
+#include "net_game.h"
 int GetTicks();
-void SendLobbySyncRequests();
-void RebuildAllyList();
-int __stdcall GetSlotDpid(unsigned char);
-unsigned char __stdcall FindSlotByDpid(int);
+#include "net_game_450530.h"
+#include "../frontend/multi.h"
 int __stdcall AddNetPlayer(int);
 int __stdcall RejectPlayer(int, int);
-void __stdcall BuildGameInfo(char*, int*, int*, int*, int*);
 void __stdcall HandlePing(void*);
 void __stdcall AddMessage(void*, int, int, unsigned char);
 int __stdcall SendPacketToPlayer(int, int, void*, int);
 int __stdcall BroadcastPacket(int, void*, int);
 void __stdcall BroadcastAllyTeam(Player*);
-void __stdcall RemovePlayer(int);
-int __stdcall IsColorFree(int, int);
 void __stdcall AssignPlayerColor(int, int, int);
 void __stdcall SetAlliance(int, int, unsigned char, int);
 char* __stdcall Translate(char*);
@@ -156,17 +144,16 @@ void __stdcall ApplyUnitDamage(void*);
 void __stdcall ApplyUnitDeath(void*, int);
 void __stdcall ApplyWeaponFirePacket(Player*, void*);
 void __stdcall ApplyProjectileHitPacket(Player*, void*);
-void __stdcall KillFeature(int, int, int);
-void __stdcall StartFeatureBurning(int, int, int);
+#include "../map/features.h"
 int __stdcall GetMapCell(int, int);
 void __stdcall DamageFeature(int, int, int, WeaponDef*);
-void __stdcall FinishConstruction(Unit*, Unit*);
+#include "../ingame/control_panel.h"
 void __stdcall PlaySoundByIndex(int, int);
 void __stdcall PlaySoundAt(int, void*, int);
 void __stdcall GiveUnitToPlayer(Unit*, Player*, void*);
 void __stdcall TransferMetal(unsigned char, unsigned char, int, int);
 void __stdcall TransferEnergy(unsigned char, unsigned char, int, int);
-void __stdcall ShareMapInfo(unsigned char, unsigned char);
+#include "../units/units_485010.h"
 void __stdcall HandlePlayerEconomy(void*, Player*);
 void __stdcall SetGameSpeed(int, int);
 

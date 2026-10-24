@@ -35,8 +35,6 @@ struct Entry_486360 {
 
 #include "../network/player_info.h"
 
-int StepTowards(int, int, int);
-
 struct Unit;
 
 #include "../network/player.h"
@@ -328,7 +326,7 @@ template<class _RI, class _Ty, class _Pr> void __stdcall QuickSort(_RI _F, _RI _
 #include <algorithm>
 
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-int __stdcall ComparePlayers(Player* a, Player* b);
+#include "units_485010.h"
 
 // FUNCTION: 0x4854a0
 void __stdcall AllocateUnitMemory(void)
@@ -389,7 +387,6 @@ int __stdcall ComparePlayers(Player* a, Player* b)
     return a < b;
 }
 
-void __stdcall KillUnit(Unit* unit, int param_2);
 void __cdecl GameFreeThunk(void* p);
 
 // FUNCTION: 0x485980
@@ -415,7 +412,7 @@ void FreeUnitMemory(void)
 }
 
 
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 
 // FUNCTION: 0x485a40
 void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
@@ -577,10 +574,9 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
 #include "../game/mission_conditions.h"
 #include "../state/sim_globals.h"
 
-void __stdcall UpdateUnitHeight(Unit* unit);
+#include "unit_position.h"
 void __stdcall AddUnitToMap(Unit* unit);
-void __stdcall SendNewUnit(Unit* unit);
-void __stdcall BroadcastBuilderLink(Unit* a, Unit* b);
+#include "../network/net_game.h"
 
 static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Vec3 pos,
                                                int param_5, Unit* unit)
@@ -753,11 +749,9 @@ struct UnitKilledPacket {
 };
 #pragma pack(pop)
 
-int __stdcall GetSlotDpid(unsigned char index);
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
 void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int param);
 void __stdcall PopUntilNamedLayout(int param);
-void __stdcall KillPlayerUnits(unsigned char player);
 
 // FUNCTION: 0x4864b0
 void __stdcall KillUnit(Unit* unit, int param_2)
@@ -811,20 +805,16 @@ void __stdcall KillUnit(Unit* unit, int param_2)
     }
 }
 
-extern char g_killedScriptName[];
-extern char g_takenLeadFormat[];
+#include "../../link/globals.h"
 
-unsigned char __stdcall FindSlotByDpid(int id);
 void __stdcall RemoveSpeechOfUnit(void* unit);
 void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
-void __stdcall AddCdActivitySample(int flag);
+#include "../ingame/dialogs_493340.h"
 char* __stdcall Translate(char* text);
 void __stdcall AddMessage(char* text, int a, int b, int c);
-void __stdcall FlashScorePanelKillLoss(int a, int b);
 void __stdcall ClearUnitRefs(void* unit);
 void __stdcall FreeObjectState(void* state);
 void __cdecl operator delete(void* p);
-void __stdcall AnnouncePlayerLeft(int id);
 void __stdcall AnnounceForcesDestroyed(void* player);
 
 // FUNCTION: 0x4866d0
@@ -1067,8 +1057,6 @@ void __stdcall KillPlayerUnits(unsigned char player)
         }
     }
 }
-
-void __stdcall NopRetC_B(int, int, int);
 
 struct Vec3_004851c0 {
     int x;

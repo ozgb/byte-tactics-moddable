@@ -101,12 +101,10 @@ struct MissionOrderTableEntry {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 typedef MissionOrderTableEntry* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-extern double TWO_PI;
-extern double ONE_EIGHTH;
 
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);

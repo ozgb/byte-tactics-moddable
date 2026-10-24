@@ -13,7 +13,7 @@ struct AnimEntry {
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 void* __cdecl GameAllocIgnoreTag(const char* name, int size);
 void* __cdecl GameReallocTagged(void* block, const char* name, unsigned int size);
@@ -144,7 +144,7 @@ void* __stdcall LoadPaletteByName(char* name)
     return result;
 }
 
-void* __stdcall LoadSoundFile(const char* name);
+#include "../sound/sound.h"
 
 // FUNCTION: 0x429470
 int __stdcall LoadSoundByName(char* name, const char* file)
@@ -486,7 +486,7 @@ void __stdcall BindModelTextures(Model_0042a140* model, const char* name)
     }
 }
 
-void* __stdcall Load3do(char* param);
+#include "../graphics/pcx.h"
 void __stdcall MirrorObject(void* data);
 
 // FUNCTION: 0x42a2c0
@@ -591,8 +591,7 @@ void FreeTextureGafs()
 #include "../util/string_ref.h"
 
 int __stdcall ComputeChecksum(unsigned char* data, int len);
-void __cdecl ProtectBlockReadWrite(void* p);
-void __cdecl ProtectBlockReadOnly(void* p);
+#include "../debug/debug_lib.h"
 
 // FUNCTION: 0x42a610
 void __stdcall ComputeUnitScriptChecksum(UnitDef* def)

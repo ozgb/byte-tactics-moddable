@@ -59,8 +59,6 @@ struct Record_004ab2b0 {
 };
 
 int PlaceFeature(int, int, int, int, int);
-void __stdcall UpdateAllCellHeightRanges();
-void __stdcall ClearBorderFeatures();
 
 struct Record_004ab310 {
     unsigned char type;
@@ -113,8 +111,7 @@ extern int __cdecl GetTextKeyColor(void);
 extern void __stdcall SetTextColors(int a, int b);
 extern void __stdcall SetFont(int a);
 extern void __cdecl ClearKeyQueue(void);
-extern void __stdcall CommitTextEdit(Gui* menu, int index, char* text,
-                                   int maxLength, int clear);
+#include "dialogs.h"
 
 extern int __stdcall PointInRect(Rect_004b6720* r, int x, int y);
 extern int __stdcall RectsOverlap(Rect_004b6720* a, Rect_004b6720* b);
@@ -122,8 +119,7 @@ extern void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 
 extern void __stdcall InitGafSequence(Ref_004ab400* ref, Src_004ab400* src, int index);
 extern int __stdcall GetGafSequenceFrame(Ref_004ab400* ref);
-extern void __stdcall SetCursorSprite(int handle);
-int GetCursorSprite();
+#include "mouse.h"
 
 extern void __stdcall AdvanceGafSequence(Ref_004ab400* ref, int step);
 extern int __stdcall PeekMouseEvent(MouseEvent* out);
@@ -789,7 +785,7 @@ struct PaletteDialog_004aa8f0 {
 
 #pragma pack(pop)
 
-extern char g_okGadgetName[];
+#include "../../link/globals.h"
 
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
 int __stdcall IsGadgetNamed(Gadget* entries, int index, char* name);
@@ -810,11 +806,6 @@ int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 
 struct FileHandle;
 
-void __stdcall YesNoDialogHandler(Gui* menu);
-void __stdcall MessageBoxHandler(Gui* menu);
-void __stdcall NotExistDialogHandler(Gui* menu);
-void __stdcall Choice3DialogHandler(Gui* menu);
-void __stdcall InputDialogHandler(Gui* menu);
 
 // FUNCTION: 0x4abb20
 int __stdcall OpenConfirmDialog(Gui* sub, char* title)
@@ -1148,7 +1139,6 @@ struct Block_004c5ff0;
 struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;
-void __stdcall CopyPaletteEntries(char* obj, void* dest);
 
 // FUNCTION: 0x4ac710
 void __stdcall BuildColorRemapTable(PalEntry_004aa8f0* src, PalEntry_004aa8f0* dest, unsigned char* table)
@@ -1205,9 +1195,6 @@ void __stdcall CopyPaletteEntries(char* obj, void* dest)
     memcpy(dest, obj + 0xb2, 0x100 * sizeof(int));
 }
 
-void __stdcall ShowPaletteEntryRgb(Gui* obj, unsigned char* colors, int index);
-void __stdcall LerpPaletteRange(unsigned char* data, int a, int b);
-void __stdcall WriteTabs(FileHandle* file, int depth);
 
 // FUNCTION: 0x4ac8c0
 void __stdcall DrawColorGrid(Gui* obj)

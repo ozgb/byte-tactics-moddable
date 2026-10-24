@@ -1,0 +1,27 @@
+#ifndef SKIRMISH_MENU_H
+#define SKIRMISH_MENU_H
+
+struct Cheat;
+struct Gui;
+struct Rec1;
+
+void __stdcall RefreshAllyIcons(void);
+int __stdcall AreAllPlayersInOneAllyGroup(void);
+void __stdcall CycleSlotController(int playerIndex);
+void __stdcall BindGadgetAnimSequence(Rec1* obj, char* name);
+void __stdcall BuildSkirmishPlayerRows(void);
+void __stdcall RefreshSkirmishSetup();
+int __stdcall FindNextAllySlot(int self, int start);
+void __stdcall ApplySlotsToGamePlayers();
+void __cdecl CycleCurrentPlayerSide();
+void __stdcall HandleSkirmishMapClick(Gui* menu);
+void __stdcall UpdateSkirmishMapSelection(Gui* menu, int unused);
+void __stdcall OpenSkirmishMapSelector();
+void __stdcall SelectLogosGadget(Gui* obj, void* unused);
+void __stdcall CyclePlayerColor(int reverse);
+void __cdecl CycleCurrentPlayerAllyGroup();
+void __stdcall HandleSkirmishClick(Gui* menu);
+void __stdcall HandleSkirmishCheatText(Cheat* cheat);
+void __stdcall OpenSkirmishMenu(void);
+
+#endif

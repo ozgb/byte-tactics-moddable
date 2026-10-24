@@ -21,17 +21,12 @@ class Class_0044e730 { public: void SetApproachRadius(short); };
 #include "path_fx.h"
 #pragma pack(pop)
 
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall AppendOrder(Unit*, Order*);
-void __stdcall EnsurePatrolReturnOrder(Unit*, Order*);
+#include "order_list.h"
 int __stdcall IssueAttackOrder(Unit*, Unit*, int);
-int __stdcall VtolMoveOrder(Unit*, Order*, int);
-int __stdcall VtolFollowOrder(Unit*, Order*, int);
-int __stdcall VtolStandbyOrder(Unit*, Order*, int);
-int __stdcall VtolLandIfCanOrder(Unit*, Order*, int);
 
 static inline Vec3 Offset(short angle, int distance)
 {

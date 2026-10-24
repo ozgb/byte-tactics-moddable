@@ -42,7 +42,7 @@ struct SmokeParticle {
 };
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 static inline int Identity_00474b80(int v) { return v; }
 

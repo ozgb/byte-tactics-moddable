@@ -51,10 +51,9 @@ struct Gadget_497180 {
 
 #include "../network/player_info.h"
 
-int CheckDirectXVersion(int, int, int, int, int);
-void EnumPlayersCallback(int, int, int, int, int);
+#include "../graphics/display.h"
+#include "../network/net_game.h"
 int AimCobStub(int, int, int, int);
-void EmitBubbles(int, int, int, short);
 void DrawLine(int, int, int, int, int, int);
 
 struct PlayerRec_00497f40 {
@@ -187,52 +186,23 @@ extern int g_nonCampaignGame;
 #include "../sound/sound.h"
 int GetHostDpid();
 void RegisterUnitOrders(void);
-void RegisterGroundOrders(void);
-void EnableAICommands(void);
-void RegisterAICommands(void);
-void ResetAIPlayers(void);
-void RegisterVtolOrders(void);
-void StepAllGafSequences(void);
-void ResetNetStats(void);
-void InitCommands(void);
-void RefreshSelectionOrders(void);
-void DispatchOrdersPanelPageFlags(void);
-void ResetCameraState(void);
-void FindLocalCommander(void);
-void ClampCameraPosition(void);
-void ClampCameraTarget(void);
-void UpdateScreenShake(void);
-void UpdateCameraFollow(void);
-void BeginMouseScroll(void);
-void EndMouseScroll(void);
-void UpdateMouseScroll(void);
-void UpdateEdgeScroll(void);
-void CenterCameraOnRadarClick(void);
-void RegisterDataArchives(void);
+#include "../ingame/control_panel.h"
+#include "../ingame/camera.h"
 void InitMissionStatus(void);
-void ScheduleFadeTick(void);
-void InitExplosions(void);
-void FreeExplosions(void);
-void UpdateExplosions(void);
 
 void __stdcall SeedRandom(int x);
-unsigned HarnessGameSeed(unsigned live);
-unsigned HarnessCrtSeed(unsigned live);
-int __stdcall RandomInt(int x);
+#include "../harness/harness.h"
+#include "../util/math_4b6c30.h"
 unsigned char __stdcall FindHostSlot();
-void ApplyUseOnlyUnits();
+#include "settings.h"
 void HandleNetPackets();
-void ApplySlotsToGamePlayers();
-void LoadBattleAssets();
+#include "../frontend/skirmish_menu.h"
+#include "game_state.h"
 void __stdcall LoadSavedGameState(void* mission);
 void CreateMissionUnits();
-void CenterCameraOnStartPosition();
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-void BroadcastPlayerInfo();
-void UpdateNetGameInfo();
 void __stdcall ReportGameEvent(int x);
-void __stdcall SetCameraPosition(int x, int y, int z);
-void __stdcall SpawnCommanderAtStartPos(int team, int startpos);
+#include "main_loop.h"
 void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedPos_497180 pos, int a,
     int b, int c);
 Gadget_497180* __stdcall LoadGuiLayer(Sub_497180* sub, const char* name, int flags);
@@ -247,8 +217,8 @@ void __stdcall DrawTextClipped(void* surface, const char* text, int x, int y, in
 char* __stdcall Translate(char* s);
 
 void LoadThreadMain();
-void BattleFrame();
-void __cdecl HandleBattleQuitPrompt(int);
+#include "../ingame/build_placement.h"
+#include "../frontend/options.h"
 void __cdecl BlankScreen();
 void __cdecl FreePictureCache();
 void __cdecl SaveSettings();
@@ -265,14 +235,13 @@ int __cdecl IsCdPlaying();
 void __cdecl GameFreeThunk(void*);
 void __stdcall BuildDataPath(void*, char*, char*, char*);
 void __stdcall SendProbe(unsigned int, int);
-void __stdcall DrawSyncStatus(void*);
+#include "game_load.h"
 void __stdcall DisableKeyCommands(void*);
 int __stdcall GetTextPixelWidth(char*);
 void __stdcall CloseTopScreen(void*);
 void __stdcall SetCursorAnimation(void*, void*);
 void __stdcall RemapPaletteToClosestIndices(void*, void*, void*);
 void __stdcall SetCloseHandler(void (__cdecl *)(int), int);
-void __stdcall SetResolution(int, int);
 void __stdcall FatalError(char*);
 void* __stdcall GetGafFrame(void*, int);
 void __stdcall DrawFrame(void*, void*, int, int);
@@ -281,7 +250,7 @@ void __stdcall SetPaletteColors(void*, int, int);
 void __stdcall SetTextColors(int, int);
 void __stdcall SetFont(int);
 int __stdcall LockScreen(void*);
-void __stdcall SetRestoreSurface(int);
+#include "../graphics/surface.h"
 void __stdcall SetOffscreenSurface(void*);
 void* __stdcall AllocSurface(char*, int, int);
 void __stdcall DrawSurface(void*, void*, int, int);

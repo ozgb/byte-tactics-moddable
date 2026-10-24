@@ -107,7 +107,7 @@ inline void __stdcall swap(_Ty& _X, _Ty& _Y)
 
 #include "../util/vec3.h"
 
-Point16* __stdcall CopyDwordRangeUnchecked(Point16* first, Point16* last, Point16* dest);
+#include "order_targets.h"
 
 namespace std {
 template <>

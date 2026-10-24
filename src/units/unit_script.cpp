@@ -52,17 +52,16 @@ struct Header_00481140 {
 };
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 Vec3 __stdcall GetPiecePosition(Unit* obj, int param);
 int __stdcall GetGroundHeight(Vec3* pos);
 int __cdecl AngleOfVector(int a, int b);
 #include "../../interfaces/seams.h"
-void __stdcall EmitThrustParticles(int, int, int, int, short);
-void __stdcall EmitWakeParticles(int, int, int, short);
+#include "../graphics/particles.h"
 void __stdcall EmitWhiteSmoke(int, short);
 void __stdcall EmitBlackSmoke(int, short);
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 void __stdcall StartExplodePiece(Header_00481140* h);
 void __stdcall AddExplosionEffect(void* pos, void* src, int index, int flag);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* transporter, int a, int b);
@@ -212,7 +211,6 @@ void UnitScript::SetPieceTranslation(int index, int slot, int v)
 }
 
 void __stdcall UpdateObjectState(Unit* unit);
-void __stdcall EmitBubbles(int, int, int, short);
 
 // FUNCTION: 0x480cb0
 int UnitScript::GetPieceRotation(int index, int slot)

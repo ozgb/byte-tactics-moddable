@@ -2,11 +2,7 @@
 #include <set>
 #include "free_block_map.h"
 
-extern unsigned int g_lastAllocOffset;
-extern unsigned int g_freeBlockWraps;
-extern unsigned int g_committedBytes;
-extern unsigned int g_committedBytesPeak;
-extern unsigned int g_allocSerial;
+#include "../../link/globals.h"
 
 class BlockInfo {
 public:
@@ -21,14 +17,11 @@ public:
 
 class BlockMap { public: MapInsertResult Insert(const BlockInfo& v); };
 
-void* GetAllocLock();
+#include "debug_lib.h"
 unsigned int __cdecl RoundUpToDoublePage(unsigned int size);
 unsigned int __cdecl RoundUpToPage(unsigned int size);
-FreeBlockMap* GetFreeBlockSet();
+#include "debug_lib_4db610.h"
 BlockMap* GetBlockMap();
-void __cdecl CountAlloc(unsigned int size);
-char IsBackAlign();
-int GetDebugFillPattern();
 void __cdecl FillPattern(void* at, int value, unsigned int count);
 
 inline unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)

@@ -16,22 +16,19 @@ struct Ctx_00499890 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
-extern char g_screenshotDirFormat[];
-extern char g_screenshotPrefix[];
+#include "../../link/globals.h"
 
 int PeekKey();
 void PopKey();
-void ToggleFullScreen();
+#include "../graphics/display.h"
 void __stdcall PopUntilNamedLayout(int);
 #include "../files/files_api.h"
 int __stdcall GetTicks();
 void __stdcall PeekMouseEvent(Input_00499890*);
 void __stdcall UpdateMenu(void*);
-void UpdateCdCategoryByActivity();
-void PlayNextSpeech();
+#include "dialogs_493340.h"
+#include "../sound/sound.h"
 void __stdcall PopMouseEvent(int*);
-void UpdateTimers();
 void __stdcall SaveScreenshot(char*, char*);
 
 // FUNCTION: 0x499890

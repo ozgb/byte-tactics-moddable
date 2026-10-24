@@ -4,7 +4,7 @@
 #include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
 
-extern const char g_errorCaption[];
+#include "../../link/globals.h"
 
 // FUNCTION: 0x4b6b80
 void __stdcall ShowErrorBox(const char* message, int unused)

@@ -7,17 +7,13 @@
 #include <io.h>
 
 
-extern HWND g_cdPlayerWindow;
+#include "../../link/globals.h"
 
 
-extern int g_cdFadeVolume;
-extern int g_cdCategorySavedTrack[];
-extern int g_cdFadeTimer;
-extern int g_cdNextTrackTimer;
 
-extern int __stdcall RemoveTimer(int handle);
+#include "../graphics/display.h"
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
-extern void __stdcall OnCdFadeTimer(void* unused);
+#include "cd_audio.h"
 
 struct FileHandle;
 
@@ -25,23 +21,16 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 
 void __cdecl GameFreeThunk(void* p);
 
-extern int g_playBufferLooping;
-
 struct Pos_004cf570 {
     int x, y, z;
 };
 
 #include "../files/files_api.h"
 
-void __stdcall OnStreamTimer(int unused1);
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 
-extern int g_delayedSampleVolume;
-extern char g_delayedSampleName[];
 
 #include "sound.h"
-
-extern Sound* g_cdPlayer;
 
 extern void __stdcall SetMediaNotifyCallback(void (__stdcall*)(int, int, int));
 
@@ -89,7 +78,7 @@ int Sound::QueryDisc()
     return 0;
 }
 
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x4cdb40
 void Sound::PlayNextTrack()

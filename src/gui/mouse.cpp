@@ -50,9 +50,7 @@ struct Obj_004c2380 {
 
 Obj_004c2380* GetDisplay(void);
 
-extern LONG g_gfxBlitLockHeld;
-extern LONG g_gfxBlitLockOwner;
-extern HANDLE g_gfxBlitLockEvent;
+#include "../../link/globals.h"
 
 void __cdecl BlitSurface(void* dst, void* src, int x, int y);
 void __stdcall DrawFrame(void* dst, GafFrame* bmp, int x, int y);
@@ -66,7 +64,7 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 
 void __stdcall RedrawMouseCursor(Obj_004c2380* app);
-void __cdecl MouseThreadProc(int param);
+#include "mouse.h"
 
 static inline void GetRect(Event_4c2d60* out)
 {

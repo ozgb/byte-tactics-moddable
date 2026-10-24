@@ -187,12 +187,6 @@ struct Pos_0043f0e0 {
 };
 
 void RegisterUnitOrders();
-void RegisterGroundOrders();
-void EnableAICommands();
-void RegisterAICommands();
-void FUN_00406f40();
-void ResetAIPlayers();
-void RegisterVtolOrders();
 
 struct Thing_0043f0e0 {
     char unknown_0[0xfe];
@@ -200,15 +194,12 @@ struct Thing_0043f0e0 {
 };
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../../interfaces/seams.h"
 #include "../units/unit.h"
-int __stdcall IsUnitCommander(Unit*);
 int __stdcall FindLandingPad(Unit*, int);
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
-void __stdcall ClearWeaponTarget(Unit*, int);
-void __stdcall DetonateUnitWeapon(Unit*, int);
 void __stdcall DrawUnit(void*, Unit*);
 
 MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,

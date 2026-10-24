@@ -34,34 +34,25 @@ class SquadManager;
 #include "../../interfaces/seams.h"
 #include "order.h"
 
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-void CreateGameObject();
 void InitMissionStatus();
 
 #include "path_fx.h"
 #include "../game/game.h"
 #pragma pack(pop)
-extern Game* g_game;
+#include "../../link/globals.h"
 class Class_0044e730 { public: void SetApproachRadius(int); };
 class Class_0044e6c0 { public: void SetAltitude(int); };
 short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 union Fixed { int value; struct { unsigned short frac; short whole; } parts; };
-Vec3 __stdcall DirectionFromAngle(short, Fixed);
+#include "vtol_orders.h"
 static inline Vec3 Direction(short angle, int range) { Fixed distance; distance.value=range; return DirectionFromAngle(angle,distance); }
 Vec3 __stdcall AddVec3(const Vec3&, const Vec3&);
-void __stdcall AppendOrderToTail(Unit*, Order*);
+#include "order_list.h"
 
 int __stdcall IssueAttackOrder(Unit*, Unit*, int);
-Unit* __stdcall GetWeaponTargetUnit(Unit*, int);
-int __stdcall WeaponCanReachUnit(Unit*, Unit*, unsigned char);
 void __stdcall SetWeaponTargetUnit(Unit*, Unit*, int);
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
-void __stdcall AppendOrder(Unit*, Order*);
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }

@@ -9,10 +9,10 @@
 #include "../files/file_handle.h"
 #include "../state/sim_globals.h"
 
-extern int DAT_0051fba8;
+#include "../../link/globals.h"
 
 #include "../files/files_api.h"
-void __stdcall WriteTabs(FileHandle* out, int indent);
+#include "dialogs.h"
 char* __stdcall ChangeExtension(char* name, char* out, const char* ext);
 char* __stdcall Translate(char* text);
 void* __stdcall LoadGaf(char* path);

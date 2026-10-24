@@ -11,15 +11,10 @@
 extern "C" void __cdecl GameFreeThunk(void* p);
 void* __cdecl GameAllocIgnoreTag(char* name, int size);
 
-extern float g_lightY;
-extern float g_lightX;
-extern float g_lightZ;
-extern const float DAT_004fd4cc;
-extern const float DAT_004fd4c0;
+#include "../../link/globals.h"
 
 // GLOBAL: 0x511de8
 struct Game;
-extern Game* g_game;
 
 union Fixed {
     int value;
@@ -87,13 +82,6 @@ union Flags_37f06 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-void CountMessage(unsigned char, int, int);
-void CountPacket(int, int, int);
-void SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
-void AccumulateScreenShake(int, int, int);
-void CenterCameraOnPoint(int, int, int);
-void SetMissionStatus(int, int, int);
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
@@ -106,7 +94,7 @@ Vec3f __stdcall CrossProduct(Vec3f a, Vec3f b);
 Vec3f __stdcall NormalizeVector(Vec3f v);
 void* __stdcall GetGafSequenceFrame(void** pic);
 void* __stdcall GetGafFrame(unsigned short* table, int index);
-void __stdcall DownsampleFrame(GafFrame* dst, GafFrame* src);
+#include "gaf.h"
 void __stdcall FillFlatPolygon(GafFrame* surface, void* poly, int count, int flag);
 void __stdcall DrawTexturedPolygon(GafFrame* surface, void* pic, void* poly, int flag);
 void __stdcall FillShadedPolygon(GafFrame* surface, void* poly, int count, int flag);
@@ -118,17 +106,10 @@ void __stdcall SurfaceFromFrame(Surface_4589c0* dst, GafFrame* src);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
 int __stdcall GetGroundHeight(Pos_459200* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
-void __stdcall DrawFrameDepth(GafFrame* bmp, GafFrame* param_2, int x, int y, int z);
 void __stdcall TintFrameBelow(GafFrame* param_1, int value);
 void __stdcall CutFrameBelow(GafFrame* param_1, int value);
-void __stdcall ZeroFramePixels(GafFrame* image);
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
-int __stdcall CountObjects(Object3do* obj);
-Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent);
-Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent);
-void __fastcall PoseModel(Model_459200* state, Piece_459c70* entry, int flag);
-void __fastcall TransformPieces(Model_459200* model, Piece_459c70* piece,
-                                Vector3s* pos, Vec3* box, int force);
+#include "model_render.h"
 
 // FUNCTION: 0x458160
 UnitTable* UnitTable::Construct(void)

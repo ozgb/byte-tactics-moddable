@@ -1,7 +1,7 @@
 #include <excpt.h>
 #include "win_types.h"
 
-void __cdecl LoadMatch(void* param);
+#include "game_load.h"
 int __stdcall ExceptionFilter(EXCEPTION_POINTERS* exception, const char* thread);
 
 // FUNCTION: 0x497c70

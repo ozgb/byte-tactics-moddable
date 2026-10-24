@@ -34,16 +34,15 @@ struct Unit;
 
 #include "air_maneuver_order.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall AppendOrderToTail(Unit*, Order*);
-void __stdcall AppendOrder(Unit*, Order*);
+#include "order_list.h"
 
-Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale);
+#include "vtol_orders.h"
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b);
 
 static inline Vec3 Offset(short angle, int distance)

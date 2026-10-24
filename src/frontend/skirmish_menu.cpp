@@ -84,7 +84,7 @@ struct Table {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int flag);
 void __stdcall MarkChanged(Gui* menu);
@@ -635,7 +635,7 @@ Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
 void __stdcall SetControlTextByName(Gui* menu, char* name, char* value);
 void __stdcall ClearSelectedGadget(Gui* menu);
-char* __stdcall SkipTextLines(char* text, int line);
+#include "../util/registry.h"
 
 // FUNCTION: 0x47a910
 void __stdcall HandleSkirmishMapClick(Gui* menu)
@@ -673,7 +673,7 @@ void __stdcall HandleSkirmishMapClick(Gui* menu)
     SetControlTextByName(menu, "MapName", buffer);
 }
 
-void ShowSelectedMapInfo();
+#include "multi.h"
 
 // FUNCTION: 0x47aaa0
 void __stdcall UpdateSkirmishMapSelection(Gui* menu, int unused)
@@ -799,7 +799,7 @@ struct ClickFrame {
 #pragma pack(pop)
 
 void __stdcall GetGadgetName(Gadget* entries, char* text, int id);
-void RegisterDataArchives();
+#include "../game/cd_check.h"
 void InitMissionStatus();
 void SaveSettings();
 void __stdcall UpdateHelpText(Gui* gui);
@@ -1082,18 +1082,9 @@ struct Cheat {
 };
 #pragma pack(pop)
 
-extern const char g_cheatFourPlayers[];
-extern const char g_cheatFivePlayers[];
-extern const char g_cheatSixPlayers[];
-extern const char g_cheatSevenPlayers[];
-extern const char g_cheatEightPlayers[];
-extern const char g_cheatThreePlayers[];
-extern const char g_cheatNinePlayers[];
-extern const char g_cheatTenPlayers[];
-extern const char g_skirmishCheatSoundName[];
 
-void SaveNumSkirmishPlayers();
-void LoadSettings();
+#include "../game/settings_campaign.h"
+#include "../game/settings.h"
 void __stdcall SelectAdjacentGadget(Cheat*, int);
 
 // FUNCTION: 0x47b9f0
@@ -1135,12 +1126,6 @@ void __stdcall HandleSkirmishCheatText(Cheat* cheat)
     }
 }
 
-extern char g_skirmishGuiName[];
-extern char g_skirmishSetupPictureName[];
-extern char g_difficultyKey[];
-extern char g_easyGadgetName[];
-extern char g_mediumGadgetName[];
-extern char g_hardGadgetName[];
 
 void BlankScreen();
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
@@ -1186,11 +1171,9 @@ void OpenSkirmishMenu(void)
     SetCursorMode(0x13);
 }
 
-extern char* g_forcesDestroyedTexts[];
-
 void __stdcall AddMessage(char* text, int key, int value, unsigned char last);
 
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x47bd70
 void __stdcall AnnounceForcesDestroyed(Player* player)

@@ -16,14 +16,13 @@
 #include "block_scan.h"
 #include "../state/block.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-void __stdcall SetMissionType(int owner);
-void __stdcall ResetPlayerSlots(void);
-void ApplySlotsToGamePlayers();
+#include "../map/map_list.h"
+#include "../game/players_464290.h"
+#include "../frontend/skirmish_menu.h"
 void InitMissionStatus();
-char IsMemSet();
-int GetMemSetValue();
+#include "../debug/debug_lib.h"
 
 enum { MAX_PLAYERS = 10 };
 
@@ -2215,7 +2214,7 @@ static int TimerClassOf(unsigned slot)
     return classes[slot];
 }
 
-int HarnessConditionClass(void* condition);
+#include "../game/victory.h"
 
 static int ConditionClassOf(unsigned condition)
 {

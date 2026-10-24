@@ -58,7 +58,7 @@ public:
     void Emit();
 };
 
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x473d50
 void NanoParticles::Emit()

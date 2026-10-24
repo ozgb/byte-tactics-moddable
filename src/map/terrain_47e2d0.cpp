@@ -14,7 +14,7 @@ struct UnitDef;
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x47e2d0
 int __stdcall CanPlaceFootprintAt(Unit* unit, Vec3* pos)

@@ -34,7 +34,7 @@ Vec3f __stdcall CrossProduct(Vec3f a, Vec3f b);
 Vec3f __stdcall NormalizeVector(Vec3f v);
 void* __stdcall GetGafSequenceFrame(void* pic);
 void* __stdcall GetGafFrame(unsigned short* table, int index);
-void __stdcall DownsampleFrame(GafFrame* dst, GafFrame* src);
+#include "gaf.h"
 void __stdcall FillFlatPolygon(GafFrame* surface, void* poly, int count, int flag);
 void __stdcall DrawTexturedPolygon(GafFrame* surface, void* pic, void* poly, int flag);
 void __stdcall FillShadedPolygon(GafFrame* surface, void* poly, int count, int flag);

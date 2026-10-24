@@ -45,15 +45,15 @@ void __cdecl GameFreeThunk(void* p);
 int __stdcall IsCurrentGadgetNamed(void* menu, char* name);
 Gadget* __stdcall FindGadgetChecked(void* entries, char* name);
 int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
-int __stdcall SelectConnection(int index);
+#include "multi_443ff0.h"
 void __stdcall PlaySoundByName(char* name, int flag);
 void __stdcall SetCursorMode(int value);
-int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int size);
+#include "../network/online_45b250.h"
 void OnlineUnload();
 char* __stdcall Translate(char* text);
 void __stdcall OpenMessageBox(void* menu, char* text, int size, int param_4, int param_5);
 void __stdcall ClearSelectedGadget(void* menu);
-void OpenOptionsPanel();
+#include "options.h"
 
 // FUNCTION: 0x4441a0
 void __stdcall HandleSelectProviderClick(Menu_004441a0* menu)

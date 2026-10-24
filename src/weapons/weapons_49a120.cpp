@@ -117,7 +117,7 @@ struct Hits_0049a120 {
     }
 };
 
-int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target, float scale);
+#include "weapons.h"
 void __stdcall DetonateProjectile(Projectile* weapon, Unit* unit);
 int __stdcall VectorLength(Vec3* v);
 int __stdcall BroadcastPacket(int id, void* data, int size);

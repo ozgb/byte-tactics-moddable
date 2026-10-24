@@ -102,14 +102,13 @@ void __stdcall ClearSelectedGadget(Gui* menu);
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetButtonStageByName(Gui* menu, char* name);
-unsigned char __stdcall FindSlotByDpid(int id);
-void __stdcall ShareMapInfo(unsigned char from, unsigned char to);
-void __stdcall SendShareMapInfo(unsigned char from, unsigned char to);
+#include "../network/net_game.h"
+#include "../units/units_485010.h"
 void __stdcall CollectSelectedUnits(std::vector<Unit*>* list);
 unsigned int* __stdcall GetCategoryMask(char* name);
 void __stdcall GiveUnitToPlayer(Unit* unit, Player* player, int arg);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-void __stdcall HandleShareDialogEvent(Gui* gadget);
+#include "dialogs_493340.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 void __stdcall SetSliderFromValue(Gadget* entry, int param_2);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
@@ -122,19 +121,13 @@ void __stdcall SetButtonStageByName(Gui* menu, char* name, int value);
 int __stdcall GetButtonStage(Gui* menu, int index);
 Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name);
 void __stdcall GetGadgetText(Gui* menu, char* name, char* text);
-void ResetPlayerGadgets();
-void OpenTalkDialog();
 int __stdcall ExecuteCommandLine(char* cmd, int flags);
 void __stdcall TrySetFocus(Gui* menu, int index);
 void __stdcall SendChatMessage(Player* from, char* text, int param_3, char* to);
-void __stdcall HandleTalkDialogEvent(Gui* gadget);
-void __stdcall RefreshAlliesScreen(int value);
+#include "../frontend/multi.h"
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
 void __stdcall FreeSurface(void* param_1);
-void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);
-void __stdcall HandleUnitInfoDialogEvent(Gui* gadget);
-void __stdcall DrawUnitInfoImage(Gui* gadget, Gadget* entry);
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void* __stdcall LoadPcx(char* path, int param);
 char* __stdcall MakePropList(void* obj);
@@ -143,33 +136,26 @@ void __stdcall AddTextGadget(Layer* obj, char* name, char* text, int x, short y,
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
 unsigned short __stdcall FindUnitTypeId(char* name);
 void __stdcall DisableKeyCommands(Gui* menu);
-void OpenInGameOptions();
-void OpenShareDialog();
-void OpenControlDialog();
-void OpenAlliesDialog();
+#include "../frontend/options.h"
 void __stdcall HandleMain2LayoutEvent(Gui* gadget);
 unsigned int GetTicks();
 int GetScreenWidth();
-int __stdcall IsKeyDown(int key);
+#include "../gui/keyboard.h"
 void __stdcall FadeRectangle(void* surface, Rect* rect, int level);
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 int __stdcall GetTextPixelWidth(char* text);
 void* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Quad* dst, Quad* src);
-void ReportIntervalTimer();
+#include "../network/unit_sync.h"
 int __stdcall IsScreenNamed(Gui* menu, const char* name);
 void HideSoftwareCursor();
-void __stdcall HandleTabMenuEvent(Gui* gadget);
-int IsHostLocal();
 void __stdcall EnableKeyCommands(Gui* menu);
 void ShowSoftwareCursor();
 void HandleNetPackets(void);
-void StepAllGafSequences(void);
-void UpdateCameraFollow(void);
-void UpdateParticles(void);
-void EmptyPostSimStepHook(void);
-void EmptyPostSimStepHook_B(void);
-void EmptyPostSimStepHook_C(void);
+#include "../network/net_stats.h"
+#include "control_panel.h"
+#include "../graphics/particles.h"
+#include "../frontend/frontend.h"
 void ExpireOldestMessage(void);
 int __stdcall SetPageFlipping(int enable);
 
@@ -973,8 +959,8 @@ void OpenMain2Layout()
     gadget->data = g_game;
 }
 
-int HarnessTestMode();
-unsigned HarnessStepsPerFrame();
+#include "../../interfaces/ref.h"
+#include "../harness/harness.h"
 
 // FUNCTION: 0x495230
 void UpdateFramePacing()
@@ -1044,9 +1030,6 @@ void UpdateFramePacing()
     }
 }
 
-void HarnessAfterStep();
-void HarnessBeforeStep();
-void HarnessPhase(int phase);
 
 // FUNCTION: 0x495490
 void __stdcall RunGameSteps(int showStats)

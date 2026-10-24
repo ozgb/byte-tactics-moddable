@@ -46,7 +46,7 @@ struct Cell {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 int __stdcall GetGafSequenceFrame(Handle* h);
 int __stdcall GetGafFrame(unsigned short* table, int index);

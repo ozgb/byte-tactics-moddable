@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 struct Game;
-extern Game* g_game;
+#include "../../link/globals.h"
 
 int GetScreenHeight();
 int __stdcall GetGafFrame(unsigned short* param_1, int param_2);

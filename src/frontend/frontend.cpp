@@ -164,20 +164,20 @@ extern int g_directXCheckDone;
 extern int g_cdPlayerDialogShown;
 extern Entry_00428730 g_pictureCache[10];
 
-int CodeChecksumFailed(void);
+#include "frontend_428bc0.h"
 void __stdcall OpenMessageBox(Gui* sub, char* text, int param_3, int param_4, int param_5);
 int __stdcall GetTextPixelWidth(char* text);
 void __stdcall SetOffscreenSurface(int param_1);
 void __stdcall FillSurface(int param_1, int param_2);
 void __stdcall FlipScreen(void);
 int __stdcall PopKey(void);
-void __stdcall SetCursorOverlayEnabled(int param);
-void __stdcall SetMissionType(int param);
-void __stdcall PlayMovie(char* param);
+#include "../gui/keyboard.h"
+#include "../map/map_list.h"
+#include "frontend.h"
 char* __stdcall StripExtension(char* name);
 int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4);
 void __stdcall MarkLayerChanged(void* menu);
-void RegisterDataArchives();
+#include "../game/cd_check.h"
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void __cdecl GameFreeThunk(void* p);
 void __stdcall PlaySoundByName(char* name, int param_2);
@@ -188,7 +188,7 @@ char* __stdcall Translate(char* text);
 Display_00425d80* __stdcall GetDisplay(void);
 void __stdcall CloseTopScreen(Gui* sub);
 void HideSoftwareCursor();
-void Force640x480Surfaces();
+#include "../game/game_state.h"
 Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
 void __stdcall PlayLoopingSoundByName(const char* name, int param_2);
 void __stdcall EnableKeyCommands(Gui* sub);
@@ -203,10 +203,10 @@ int __stdcall FindGadgetIndex(char* gadgets, const char* name, int type);
 int GetTextKeyColor();
 void __stdcall SetTextColors(unsigned int a, int b);
 void ShowSoftwareCursor();
-void ClearMouseEventQueue();
+#include "../gui/mouse.h"
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-int __stdcall CheckDirectXVersion(int a, int b, int c, int d, int e);
-void __stdcall CheckGpfVersion();
+#include "../graphics/display.h"
+#include "../game/data_files.h"
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void __stdcall SetTranslatedTextByName(char* sub, const char* name, const char* text, int param_4);
 void __stdcall SelectGadgetByName(char* sub, const char* name);
@@ -215,52 +215,32 @@ void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 int GetTicks(void);
 int __stdcall InitNetConnection(void);
-void __stdcall OpenNewGameMenu(int param);
-void __stdcall SetGameMode(int param);
+#include "campaign_menu.h"
 void __stdcall SetEndGameState(int param);
-int __stdcall SelectConnection(int param);
-int __stdcall CreateLocalPlayer(unsigned char playerIndex, int param2);
+#include "multi_443ff0.h"
+#include "../network/net_game.h"
 int __stdcall JoinNetGame(V4i v, int idx);
 void __stdcall AddNetPlayer(int param);
 void __stdcall QuitApp(int param);
-int __stdcall InitPacketManager(int param1, int param2);
-void __stdcall OpenMainMenu(void);
+#include "../network/packets.h"
 void __stdcall SaveSettings(void);
-int __stdcall InitLobbiedConnection(void);
-void __stdcall ResetPlayerSlots(void);
-void __stdcall OpenSingleMenu(void);
-void __stdcall LoadSettings(void);
-void __stdcall OpenMissionBriefing(void);
-void __stdcall OpenSkirmishMenu(void);
-void __stdcall FillProviderList(void);
-void __stdcall OpenModemDialog(void);
-void __stdcall OpenSerialDialog(void);
-void __stdcall OpenTcpDialog(void);
-void __stdcall OpenSelectGameDialog(void);
-void __stdcall CloseNetSession(void);
-void __stdcall CreateNetGame(void);
-void __stdcall LeaveNetGame(void);
-void __stdcall BroadcastPlayerInfo(void);
-void __stdcall OpenOptionsPanel(void);
+#include "../game/players_464290.h"
+#include "../game/settings.h"
+#include "skirmish_menu.h"
+#include "multi_444580.h"
+#include "multi.h"
+#include "options.h"
 void __stdcall FinishUnitSync(void);
-void __stdcall OpenBattleRoom(void);
-void __stdcall UpdateBattleRoom(void);
-int __stdcall GetServiceProviderIndex(void);
+#include "multi_449bb0.h"
+#include "multi_44a680.h"
 void __stdcall ReportGameEvent(int param);
 void __stdcall DeleteUnitSync(void);
-void __stdcall ShutdownScoreTables(void);
-int __stdcall InitScoreReporting(void);
-void __stdcall ShowEndMissionScreen(void);
-void __stdcall CheckFrontendStateChange(int line, char* file);
-void __stdcall SetFrontendSubState(char state, int line, char* file);
+#include "../game/statistics.h"
+#include "endgame.h"
 void __stdcall SetFrontendState(char state, int line, char* file);
-void __stdcall SetFrontendErrorText(char* text);
-void ShowFrontendErrorText();
 void BlankScreen();
-void PresentFrontendFrame();
 void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget);
 void __stdcall HandleCloseCdPlayerChoice(Gadget_00426190* gadget);
-void __stdcall OpenCloseCdPlayerDialog();
 void __stdcall FreeSurface(void* param_1);
 void* __stdcall LoadBitmapByName(const char* name, int param_2);
 int __stdcall SetBackgroundSurface(int param_1, int param_2);
@@ -406,7 +386,7 @@ void PresentFrontendFrame()
     FlipScreen();
 }
 
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x425b80
 void UpdateMenuSparks()

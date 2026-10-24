@@ -1,9 +1,7 @@
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 #include "../files/files_api.h"
 void __stdcall FatalError(char* path);
-void __stdcall SetAlphaTable(unsigned int* table);
-void __stdcall SetShadeTable(unsigned int* table);
-void __stdcall SetLightTable(unsigned int* table);
+#include "palette.h"
 void __cdecl GameFreeThunk(void* p);
 unsigned int* __stdcall BuildAlphaTable(void* palette);
 unsigned int* __stdcall BuildShadeTable(void* palette);

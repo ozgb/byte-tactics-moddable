@@ -31,9 +31,9 @@ struct Unit;
 
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, const char* text);
 void __stdcall EmitReverseNanoParticles(Vec3* box, Vec3* from, int count);
-int __stdcall ComputeReclaimDamagePulse(Unit* unit, Unit* target, int n);
+#include "order_queue_4384a0.h"
 #include "../../interfaces/seams.h"
-void __stdcall CellToWorldPos(Point16 cell, Vec3* out, Point16 origin);
+#include "vtol_orders.h"
 
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {

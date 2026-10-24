@@ -59,14 +59,13 @@ struct MusicFlags_0042f9a0 {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern char g_onlineLobbyPlayerName[];
 extern char g_cmdlineHostGameName[];
 
 int __stdcall GetWindowsUserName(void* buf);
 int __cdecl IsOnlineConfigLoaded();
-void __cdecl ProtectBlockReadWrite(void* p);
-void __cdecl ProtectBlockReadOnly(void* p);
+#include "../debug/debug_lib.h"
 
 // FUNCTION: 0x42f910
 void __stdcall SaveTrackSettings(unsigned char* tracks)

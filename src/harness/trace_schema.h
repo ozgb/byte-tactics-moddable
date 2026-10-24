@@ -103,7 +103,7 @@ static const TraceField kUnitFields[] = {
     { "field_e4", 0xe4, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "f_e6", 0xe6, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "", 0xe8, 4, TF_BYTES, TT_NONE, 0x0 },
-    { "owner", 0xec, 4, TF_POINTER, TT_PLAYER, 0x0 },
+    { "owner", 0xec, 4, TF_REF, TT_PLAYER, 0x0 },
     { "attacker", 0xf0, 4, TF_REF, TT_UNIT, 0x0 },
     { "lastAttackerSlot", 0xf4, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "lastDamageType", 0xf5, 1, TF_SCALAR, TT_NONE, 0x0 },
@@ -152,7 +152,7 @@ static const TraceField kUnitPlan[] = {
     { "", 0x9e, 4, TF_REF, TT_HEAP, 0x0 },
     { "", 0xa2, 4, TF_REF, TT_HEAP, 0x0 },
     { "", 0xa6, 70, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0xec, 4, TF_POINTER, TT_PLAYER, 0x0 },
+    { "", 0xec, 4, TF_REF, TT_PLAYER, 0x0 },
     { "", 0xf0, 4, TF_REF, TT_UNIT, 0x0 },
     { "", 0xf4, 36, TF_BYTES, TT_NONE, 0x0 },
 };

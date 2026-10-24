@@ -2,6 +2,7 @@
 
     uv run tools/rename.py OLD NEW [OLD NEW ...]   # rename
     uv run tools/rename.py --from FILE             # the pairs from a CSV (old,new[,evidence])
+    uv run tools/rename.py Type::member NEW        # one type's member only, see below
     uv run tools/rename.py OLD NEW --dry-run       # what would change, and what is refused
     uv run tools/rename.py --from FILE --join --keep-going
                                                    # several views to one type, skipping the
@@ -35,6 +36,32 @@ What it rewrites:
                               are left to it: the commands to run follow a rename.
   docs/*.md, AGENTS.md,       OLD as a whole word, but not in a --join: there
   lib/bitexact/README.md      the docs keep the view names they tell apart
+
+A member shared by several types (`field_0` is in a dozen) is renamed for one type
+with the row `Type::member,newName[,evidence]` (or `Type::member NEW` on the command
+line). Only what is proven to belong to `Type` changes:
+
+  - the member's declaration in the definition of `Type` (struct, class or union,
+    through the anonymous unions and structs inside it, not a nested named type),
+    and the uses of the bare name in its member functions, in the body or out of
+    class as `Type::Name(...)`, where `this->member` counts too;
+  - `offsetof(Type, member)` and the `"member"` message of the static_assert
+    around it;
+  - `root->member` and `root.member` where `root` is a name declared `Type`, `Type*`
+    or `Type&` in the same top-level function or declaration (parameters included),
+    or a global declared that way in a file that spells `Type`, and is never
+    declared as another type in that function. `((Type*)expr)->member` and
+    `static_cast<Type*>(expr)->member` count as well;
+  - in data/ref_exceptions.csv the `field` of the rows whose `struct` is `Type`;
+    in state_classes.csv and trace_coverage.csv the `name` of the rows whose
+    kind is the type's region (`game-region` for Game); and the spellings
+    `Type::member` and `Type.member` in the other hand-set tables and the docs.
+
+It refuses a `Type` with no definition, a `member` it does not declare, and a NEW
+that is already a member of `Type`. The strings of the generated trace_schema.h are
+for tools/traceschema.py to regenerate. Every other `x->member` or `x.member` that
+is left is listed as a warning, by the expression before it, for a human to check:
+the tool cannot tell whether it is a `Type`.
 
 A gap entry label (`// ENTRY: 0x4b70ef`) has no name of its own: tools/aliases.py makes
 the public symbol `_FUN_004b70ef` from its address at link time. Renaming FUN_004b70ef
@@ -299,25 +326,33 @@ def sources_and_headers() -> list[Path]:
     return sorted(p for d in CODE_DIRS for p in (ROOT / d).rglob("*") if p.suffix in CODE_SUFFIXES and p.is_file())
 
 
-def rename_cells(text: str, columns: list[tuple[str, str]], renamer: "Renamer") -> str:
-    """A CSV with the renamer applied to the cells of some columns, the rest byte for byte."""
+def edit_cells(text: str, edit) -> str:
+    """A CSV with edit(header, row) applied to every data row (it returns whether it changed the row),
+    the rest byte for byte."""
     eol = "\r\n" if "\r\n" in text else "\n"
     rows = list(csv.reader(io.StringIO(text, newline="")))
     if not rows:
         return text
-    header = rows[0]
-    todo = [(header.index(c), renamer.words if mode == "words" else renamer.symbols)
-            for c, mode in columns if c in header]
     changed = False
     for row in rows[1:]:
-        for i, convert in todo:
-            if i < len(row) and (new := convert(row[i])) != row[i]:
-                row[i], changed = new, True
+        changed |= edit(rows[0], row)
     if not changed:
         return text
     out = io.StringIO(newline="")
     csv.writer(out, lineterminator=eol).writerows(rows)
     return out.getvalue()
+
+
+def rename_cells(text: str, columns: list[tuple[str, str]], renamer: "Renamer") -> str:
+    """A CSV with the renamer applied to the cells of some columns, the rest byte for byte."""
+    def edit(header: list[str], row: list[str]) -> bool:
+        changed = False
+        for c, mode in columns:
+            convert = renamer.words if mode == "words" else renamer.symbols
+            if c in header and (i := header.index(c)) < len(row) and (new := convert(row[i])) != row[i]:
+                row[i], changed = new, True
+        return changed
+    return edit_cells(text, edit)
 
 
 def apply(pairs: list[tuple[str, str]], texts: dict[Path, str], dry_run: bool, docs: bool = True) -> list[str]:
@@ -349,6 +384,254 @@ def apply(pairs: list[tuple[str, str]], texts: dict[Path, str], dry_run: bool, d
     return changed
 
 
+SCOPED_NAME = re.compile(r"([A-Za-z_]\w*)::([A-Za-z_]\w*)$")
+KIND_OF = {"Game": "game-region"}
+ROW_KEYED = {"data/ref_exceptions.csv": ("struct", "field")}
+KIND_KEYED = ["data/state_classes.csv", "data/trace_coverage.csv"]
+GENERATED = {"rwsets", "coupling", "type_dupes", "layout_refs", "outside_pointers"}
+QUALIFIERS = re.compile(r"\b(?:struct|class|union|enum|const|volatile|register|static|extern)\s+")
+DECL = re.compile(r"\b([A-Za-z_]\w*)(?:\s*[*&]+\s*|\s+)([A-Za-z_]\w*)\s*(?=[,;=)\[])")
+NOT_TYPES = {"return", "else", "delete", "goto", "case", "new", "throw", "sizeof", "typedef", "do", "operator"}
+SEPARATORS = re.compile(r"[{};]")
+WARN_LIMIT = 40
+
+
+def matching(code: str, open_at: int) -> int:
+    depth = 0
+    for m in re.finditer(r"[{}]", code[open_at:]):
+        depth += 1 if m.group(0) == "{" else -1
+        if depth == 0:
+            return open_at + m.start()
+    return len(code)
+
+
+def top_level(code: str) -> list[tuple[int, int, int]]:
+    """The (start, end, open brace or -1) of every top-level block or statement, a block from the
+    end of the one before it, so that its header and parameters are in it."""
+    out, depth, boundary, opened = [], 0, 0, -1
+    for m in SEPARATORS.finditer(code):
+        c = m.group(0)
+        if c == "{":
+            if depth == 0:
+                opened = m.start()
+            depth += 1
+        elif c == "}":
+            depth = max(depth - 1, 0)
+            if depth == 0:
+                out.append((boundary, m.end(), opened))
+                boundary = m.end()
+        elif depth == 0:
+            out.append((boundary, m.end(), -1))
+            boundary = m.end()
+    if boundary < len(code):
+        out.append((boundary, len(code), -1))
+    return out
+
+
+def own_spans(code: str, lo: int, hi: int) -> list[tuple[int, int]]:
+    """The parts of code[lo:hi] that are the type's own scope: not the body of a nested named type,
+    or of a struct or union that declares an instance (the members of an anonymous one are the
+    type's)."""
+    spans, cur, i = [], lo, lo
+    while (j := code.find("{", i, hi)) >= 0:
+        k = max(code.rfind(c, lo, j) for c in ";{}")
+        prefix = code[k + 1 if k >= 0 else lo:j]
+        close = matching(code, j)
+        anonymous = re.fullmatch(r"\s*(?:struct|union)\s*", prefix) and code[close + 1:close + 40].lstrip()[:1] == ";"
+        if re.search(r"\b(?:struct|union|class|enum)\b", prefix) and "(" not in prefix and not anonymous:
+            spans.append((cur, j))
+            cur = i = close + 1
+        else:
+            i = j + 1
+    spans.append((cur, hi))
+    return spans
+
+
+def bare(code: str, at: int) -> bool:
+    """Whether the name at `at` is not the member of some other object (`x.name`, `x->name`, `X::name`)."""
+    k = at - 1
+    while k >= 0 and code[k] in " \t\r\n":
+        k -= 1
+    return k < 0 or not (code[k] == "." or code[max(k - 1, 0):k + 1] in ("->", "::"))
+
+
+def declarations(text: str) -> dict[str, set[str]]:
+    """Each name the code declares as `T name`, `T *name` or `T &name`, with its types."""
+    out: dict[str, set[str]] = defaultdict(set)
+    for m in DECL.finditer(QUALIFIERS.sub(" ", text)):
+        if m.group(1) not in NOT_TYPES:
+            out[m.group(2)].add(m.group(1))
+    return out
+
+
+class Scoped:
+    """The rename of one member of one type, and what it could not prove."""
+
+    def __init__(self, typ: str, old: str, new: str):
+        self.typ, self.old, self.new = typ, old, new
+        self.counts = {"definition": 0, "offsetof": 0, "access": 0}
+        self.warnings: dict[str, list] = {}
+
+    @staticmethod
+    def definitions(typ: str, tree: Tree) -> list[tuple[Path, int, int, list[tuple[int, int]]]]:
+        pattern = re.compile(rf"\b(?:struct|class|union)\s+{typ}\b\s*(?::[^{{;]*)?\{{")
+        out = []
+        for p, code in tree.codes.items():
+            if typ in tree.tokens[p]:
+                for m in pattern.finditer(code):
+                    close = matching(code, m.end() - 1)
+                    out.append((p, m.end() - 1, close, own_spans(code, m.end(), close)))
+        return out
+
+    def occurrences(self, code: str, spans: list[tuple[int, int]], name: str) -> list[int]:
+        word = re.compile(rf"(?<!{WORD}){name}(?!{WORD})")
+        return [lo + m.start() for lo, hi in spans for m in word.finditer(code[lo:hi]) if bare(code, lo + m.start())]
+
+    def refusals(self, tree: Tree) -> list[str]:
+        if not IDENT.match(self.new) or self.new in KEYWORDS:
+            return [f"{self.new!r} is not a name C++ allows"]
+        defs = self.definitions(self.typ, tree)
+        if not defs:
+            return [f"{self.typ} has no struct, class or union definition in the tree"]
+        if not any(self.occurrences(tree.codes[p], spans, self.old) for p, _, _, spans in defs):
+            return [f"{self.typ} does not declare {self.old}"]
+        if any(self.occurrences(tree.codes[p], spans, self.new) for p, _, _, spans in defs):
+            return [f"{self.new} is already a member of {self.typ}"]
+        return []
+
+    def edits(self, tree: Tree) -> dict[Path, dict[int, str]]:
+        """Where the member is renamed, by file: start offset -> category."""
+        typ, old = self.typ, self.old
+        found: dict[Path, dict[int, str]] = defaultdict(dict)
+        mention = re.compile(rf"(?<!{WORD}){old}(?!{WORD})")
+        files = [p for p, c in tree.codes.items() if old in tree.tokens[p]]
+        method = re.compile(rf"(?<!{WORD}){typ}::~?\w+\s*\(")
+        class_units: dict[Path, set[int]] = defaultdict(set)
+        for p, opened, close, spans in self.definitions(typ, tree):
+            for at in self.occurrences(tree.codes[p], spans, old):
+                found[p][at] = "definition"
+            class_units[p].add(opened)
+        global_types: dict[str, set[str]] = defaultdict(set)
+        for p, code in tree.codes.items():
+            if typ in tree.tokens[p]:
+                blank = list(code)
+                for a, b, opened in top_level(code):
+                    if opened >= 0:
+                        blank[opened:b] = " " * (b - opened)
+                flat = "".join(blank)
+                while (shrunk := re.sub(r"\([^()]*\)", " ", flat)) != flat:
+                    flat = shrunk
+                for name, types in declarations(flat).items():
+                    global_types[name] |= types
+        global_roots = {n for n, t in global_types.items() if t == {typ}}
+        for p in files:
+            code = tree.codes[p]
+            for a, b, opened in top_level(code):
+                text = code[a:b]
+                if not mention.search(text):
+                    continue
+                roots = set(global_roots)
+                for name, types in declarations(text).items():
+                    roots.discard(name)
+                    if types == {typ}:
+                        roots.add(name)
+                if opened in class_units[p] or (opened >= 0 and method.search(code[a:opened])):
+                    roots.add("this")
+                    if opened not in class_units[p]:
+                        for at in self.occurrences(code, own_spans(code, opened + 1, b - 1), old):
+                            found[p][at] = "definition"
+                if roots:
+                    names = "|".join(re.escape(r) for r in sorted(roots, key=len, reverse=True))
+                    access = re.compile(rf"(?<![\w.])(?<!->)(?:{names})\s*(?:->|\.)\s*({old})(?!{WORD})")
+                    for m in access.finditer(text):
+                        found[p].setdefault(a + m.start(1), "access")
+            for pattern in (rf"\(\s*(?:struct\s+)?{typ}\s*\*\s*\)\s*\w+\s*\)\s*->\s*({old})(?!{WORD})",
+                            rf"<\s*(?:struct\s+)?{typ}\s*\*\s*>\s*\([^()]*\)\s*->\s*({old})(?!{WORD})"):
+                for m in re.finditer(pattern, code):
+                    found[p].setdefault(m.start(1), "access")
+            for m in re.finditer(rf"\boffsetof\s*\(\s*(?:struct\s+)?{typ}\s*,\s*({old})\s*\)", code):
+                found[p][m.start(1)] = "offsetof"
+                text = tree.texts[p]
+                message = re.compile(rf'[^;"]*?,\s*"({old})"').match(text, m.end())
+                if message:
+                    found[p][message.start(1)] = "offsetof"
+            access_any = re.compile(rf"([A-Za-z_]\w*|\)|\])\s*(->|\.)\s*({old})(?!{WORD})")
+            for m in access_any.finditer(code):
+                if m.start(3) not in found[p]:
+                    prev = "(...)" if m.group(1) == ")" else "[...]" if m.group(1) == "]" else m.group(1)
+                    where = f"{p.relative_to(ROOT)}:{tree.texts[p].count(chr(10), 0, m.start(3)) + 1}"
+                    self.warnings.setdefault(f"{prev}{m.group(2)}{old}", []).append(where)
+        return found
+
+    def apply_source(self, texts: dict[Path, str], tree: Tree) -> dict[Path, str]:
+        out = {}
+        for p, at in self.edits(tree).items():
+            text = texts[p]
+            for start in sorted(at, reverse=True):
+                text = text[:start] + self.new + text[start + len(self.old):]
+            for kind in at.values():
+                self.counts[kind] += 1
+            out[p] = text
+        return out
+
+    def data_text(self, text: str) -> str:
+        qualified = re.compile(rf"(?<!{WORD}){self.typ}(::|\.){self.old}(?!{WORD})")
+        return qualified.sub(lambda m: f"{self.typ}{m.group(1)}{self.new}", text)
+
+    def apply_data(self, dry_run: bool) -> list[str]:
+        changed = []
+        kind = KIND_OF.get(self.typ)
+
+        def row_edit(key: str, column: str, value: str):
+            def edit(header: list[str], row: list[str]) -> bool:
+                if key in header and column in header and header.index(column) < len(row) \
+                        and row[header.index(key)] == value and row[header.index(column)] == self.old:
+                    row[header.index(column)] = self.new
+                    return True
+                return False
+            return edit
+
+        for path in sorted(ROOT.glob("data/*.csv")):
+            name = str(path.relative_to(ROOT))
+            if path.stem in GENERATED:
+                continue
+            before = path.read_bytes().decode("latin-1")
+            after = self.data_text(before)
+            if name in ROW_KEYED:
+                key, column = ROW_KEYED[name]
+                after = edit_cells(after, row_edit(key, column, self.typ))
+            if name in KIND_KEYED and kind:
+                after = edit_cells(after, row_edit("kind", "name", kind))
+            if after != before:
+                self.counts["data"] = self.counts.get("data", 0) + 1
+                changed.append(name)
+                if not dry_run:
+                    path.write_bytes(after.encode("latin-1"))
+        for pattern in TEXT_FILES:
+            for path in sorted(ROOT.glob(pattern)):
+                before = path.read_bytes().decode("latin-1")
+                after = self.data_text(before)
+                if after != before:
+                    changed.append(str(path.relative_to(ROOT)))
+                    if not dry_run:
+                        path.write_bytes(after.encode("latin-1"))
+        return changed
+
+    def report(self) -> list[str]:
+        lines = [f"{self.typ}::{self.old} -> {self.new}: {self.counts['definition']} definition, "
+                 f"{self.counts['offsetof']} offsetof, {self.counts['access']} access site(s), "
+                 f"{self.counts.get('data', 0)} data file(s)"]
+        if self.warnings:
+            total = sum(len(v) for v in self.warnings.values())
+            lines.append(f"warning: {total} other spelling(s) of {self.old} could not be proven to be a "
+                         f"{self.typ}; check them:")
+            for key, where in sorted(self.warnings.items(), key=lambda kv: -len(kv[1]))[:WARN_LIMIT]:
+                lines.append(f"  {key}: {len(where)} site(s), first {where[0]}")
+            if len(self.warnings) > WARN_LIMIT:
+                lines.append(f"  ... and {len(self.warnings) - WARN_LIMIT} more expression(s)")
+        return lines
+
+
 FOLLOW_UP = [
     "cmake --build build/modern --target game data bitexact",
     "uv run tools/traceschema.py",
@@ -371,7 +654,7 @@ def implied(pairs: list[tuple[str, str]], tree: "Tree") -> dict[tuple[str, str],
 def main() -> None:
     global ROOT
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("names", nargs="*", help="OLD NEW pairs")
+    ap.add_argument("names", nargs="*", help="OLD NEW pairs (OLD may be Type::member)")
     ap.add_argument("--from", dest="table", type=Path, help="a CSV of old,new[,evidence] rows")
     ap.add_argument("--dry-run", action="store_true", help="print what would change and stop")
     ap.add_argument("--join", action="store_true",
@@ -390,9 +673,26 @@ def main() -> None:
         ap.error("nothing to rename")
     if len({o for o, _ in pairs}) != len(pairs):
         sys.exit("an OLD name appears twice among the pairs")
+    scoped = [(o, n) for o, n in pairs if "::" in o]
+    pairs = [pr for pr in pairs if "::" not in pr[0]]
+    for old, _ in scoped:
+        if not SCOPED_NAME.match(old):
+            ap.error(f"{old!r} is not Type::member")
     texts = {p: p.read_bytes().decode("latin-1") for p in sources_and_headers()}
     tree = Tree(texts)
-    while True:
+    runs = [Scoped(*SCOPED_NAME.match(o).groups(), n) for o, n in scoped]
+    bad = {(r.typ + "::" + r.old, r.new): why for r in runs if (why := r.refusals(tree))}
+    if bad:
+        print(f"refused {len(bad)} of {len(runs)} scoped pair(s):")
+        for (old, new), why in sorted(bad.items()):
+            print(f"  {old} -> {new}: {'; '.join(why)}")
+        if not args.keep_going:
+            sys.exit(2)
+        runs = [r for r in runs if (r.typ + "::" + r.old, r.new) not in bad]
+        if not runs and not pairs:
+            sys.exit(2)
+    changed: list[str] = []
+    while pairs:
         extra = implied(pairs, tree)
         base_of = {pr: pr for pr in pairs} | extra
         refused = refusals(pairs + list(extra), tree, args.join)
@@ -405,13 +705,33 @@ def main() -> None:
             sys.exit(2)
         gone = {base_of[pr] for pr in refused}
         pairs = [p for p in pairs if p not in gone]
-        if not pairs:
+        if not pairs and not runs:
             sys.exit(2)
-    pairs += list(extra)
-    changed = apply(pairs, texts, args.dry_run, docs=not args.join)
+    if pairs:
+        pairs += list(extra)
+        changed = apply(pairs, texts, args.dry_run, docs=not args.join)
+        if runs and not args.dry_run:
+            texts = {p: p.read_bytes().decode("latin-1") for p in sources_and_headers()}
+            tree = Tree(texts)
+    reports = []
+    original = dict(texts)
+    for i, run in enumerate(runs):
+        texts.update(run.apply_source(texts, tree))
+        changed += run.apply_data(args.dry_run)
+        reports += run.report()
+        if i + 1 < len(runs):
+            tree = Tree(texts)
+    for path, text in texts.items():
+        if text != original[path]:
+            changed.append(str(path.relative_to(ROOT)))
+            if not args.dry_run:
+                path.write_bytes(text.encode("latin-1"))
+    changed = list(dict.fromkeys(changed))
     for f in changed:
         print(f)
-    print(f"{len(pairs)} pair(s): {'would change' if args.dry_run else 'changed'} {len(changed)} file(s)")
+    for line in reports:
+        print(line)
+    print(f"{len(pairs) + len(runs)} pair(s): {'would change' if args.dry_run else 'changed'} {len(changed)} file(s)")
     if changed and not args.dry_run:
         print("Regenerate, in this order, then run the --check of each:")
         for cmd in FOLLOW_UP:

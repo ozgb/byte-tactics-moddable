@@ -701,8 +701,8 @@ static inline int SliderValue(Gadget* e)
 static inline void ApplySound()
 {
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-    ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-    ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+    ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+    ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
 // FUNCTION: 0x45b800
@@ -846,8 +846,8 @@ void __stdcall HandleVideoModeSlider(Menu_0045b800* obj, int unused)
 void ApplyBrightnessAndVolume()
 {
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-    ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-    ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+    ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+    ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
 // FUNCTION: 0x45bd20
@@ -974,7 +974,7 @@ void __stdcall HandleTextScrollSlider(Menu_0045b800* obj, int unused)
 // FUNCTION: 0x45c3d0
 void __stdcall SetLockedCdTrack(int value)
 {
-    ((Sound *)g_game->field_10)->SetLockedTrack(value);
+    ((Sound *)g_game->sound)->SetLockedTrack(value);
 }
 
 // FUNCTION: 0x45c3f0
@@ -987,7 +987,7 @@ void UpdateTrackGadgets()
         int disc = g_musicUiSelectedTrack;
         SetGrayedOutByName(menu, "TRACKTYPE",
                      (((char)g_game->musicMode & 1) && g_game->cdMode == 4) ? 0 : 1);
-        SetButtonStageByName(menu, "TRACKTYPE", ((Sound *)g_game->field_10)->GetCategoryOfTrack(disc));
+        SetButtonStageByName(menu, "TRACKTYPE", ((Sound *)g_game->sound)->GetCategoryOfTrack(disc));
         if (disc == 0)
             strcpy(buf, "NO DISC");
         else
@@ -997,7 +997,7 @@ void UpdateTrackGadgets()
     SetGadgetGrayedOutByName(menu, "TRACKNUM", (char)(~(char)g_game->musicMode) & 1);
     if (g_game->cdMode == 3) {
         int track = g_musicUiSelectedTrack;
-        ((Sound *)g_game->field_10)->SetLockedTrack(track);
+        ((Sound *)g_game->sound)->SetLockedTrack(track);
     }
 }
 
@@ -1007,7 +1007,7 @@ void ApplyTrackType()
     Gadget* gadgets = g_game->menu_519_1c.holder->entries;
     if (g_game->cdMode == 4) {
         int index = FindGadgetIndex(gadgets, "TRACKTYPE", 1);
-        ((Sound *)g_game->field_10)->SetCategoryOfTrack(g_musicUiSelectedTrack, gadgets[index].stageIndex);
+        ((Sound *)g_game->sound)->SetCategoryOfTrack(g_musicUiSelectedTrack, gadgets[index].stageIndex);
     }
 }
 
@@ -1018,12 +1018,12 @@ void ApplyDefaultSoundOptions()
     (*(SoundFlags_0045cf60*)&g_game->soundFlags).bits.b4 = 1;
     (*(SoundFlags_0045cf60*)&g_game->soundFlags).bits.b5 = 1;
     (*(SoundFlags_0045cf60*)&g_game->soundFlags).bits.speech = 1;
-    ((Sound *)g_game->field_10)->Disable3D();
+    ((Sound *)g_game->sound)->Disable3D();
     (*(SoundFlags_0045cf60*)&g_game->soundFlags).word = ((*(SoundFlags_0045cf60*)&g_game->soundFlags).word & 0xfff9) | 1;
     g_game->unitChat = 10;
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-    ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-    ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+    ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+    ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
 // FUNCTION: 0x45c630
@@ -1033,7 +1033,7 @@ void ApplyDefaultMusicOptions()
     g_game->cdMode = 4;
     if (!(g_game->flags_37f14 & 1)) {
         g_game->flags_37f14 |= 1;
-        ((Sound *)g_game->field_10)->PlayNextTrack();
+        ((Sound *)g_game->sound)->PlayNextTrack();
     }
     ApplyBrightnessAndVolume();
 }
@@ -1066,24 +1066,24 @@ void ApplyDefaultVisualOptions()
         g_game->bits_37f06.bit6 = 0;
     }
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-    ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-    ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+    ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+    ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
 // FUNCTION: 0x45c950
 void LoadSavedAudioSettings()
 {
     g_game->volume2 = g_optionsBackupMusicVolume;
-    ((Sound *)g_game->field_10)->CopyTrackTypeTable(&g_optionsBackupTrackTypes);
+    ((Sound *)g_game->sound)->CopyTrackTypeTable(&g_optionsBackupTrackTypes);
     g_game->cdMode = g_optionsBackupCdMode;
-    ((Sound *)g_game->field_10)->SetPlaybackOrder(g_game->cdMode);
+    ((Sound *)g_game->sound)->SetPlaybackOrder(g_game->cdMode);
     if (((unsigned char)g_game->flags_37f14 ^ (unsigned char)g_optionsBackupMusicMode.i) & 1) {
-        ((Sound *)g_game->field_10)->PlayNextTrack();
+        ((Sound *)g_game->sound)->PlayNextTrack();
     }
     unsigned short f = g_game->flags_37f14;
     f = f ^ ((f ^ g_optionsBackupMusicMode.i) & 1);
     g_game->flags_37f14 = f;
-    ((Sound *)g_game->field_10)->SetLockedTrack(g_optionsBackupLockedTrack);
+    ((Sound *)g_game->sound)->SetLockedTrack(g_optionsBackupLockedTrack);
     ApplyBrightnessAndVolume();
 }
 
@@ -1123,8 +1123,8 @@ void RestoreVisualOptions()
     }
 
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-    ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-    ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+    ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+    ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
 // FUNCTION: 0x45cc50
@@ -1132,18 +1132,18 @@ void LoadSavedSettings()
 {
     RestoreSoundOptions();
     g_game->volume2 = g_optionsBackupMusicVolume;
-    ((Sound *)g_game->field_10)->CopyTrackTypeTable(&g_optionsBackupTrackTypes);
+    ((Sound *)g_game->sound)->CopyTrackTypeTable(&g_optionsBackupTrackTypes);
     g_game->cdMode = g_optionsBackupCdMode;
-    ((Sound *)g_game->field_10)->SetPlaybackOrder(g_game->cdMode);
+    ((Sound *)g_game->sound)->SetPlaybackOrder(g_game->cdMode);
     if (((unsigned char)g_game->flags_37f14 ^ (unsigned char)g_optionsBackupMusicMode.i) & 1) {
-        ((Sound *)g_game->field_10)->PlayNextTrack();
+        ((Sound *)g_game->sound)->PlayNextTrack();
     }
     unsigned short f = g_game->flags_37f14;
     g_game->flags_37f14 = f ^ ((f ^ g_optionsBackupMusicMode.i) & 1);
-    ((Sound *)g_game->field_10)->SetLockedTrack(g_optionsBackupLockedTrack);
+    ((Sound *)g_game->sound)->SetLockedTrack(g_optionsBackupLockedTrack);
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-    ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-    ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+    ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+    ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
     g_game->textScroll = g_optionsBackupTextScroll;
     g_game->gameSpeed = g_optionsBackupGameSpeed.i;
     g_game->effectiveGameSpeed = g_optionsBackupGameSpeed.i;
@@ -1163,9 +1163,9 @@ void SaveGameSettings()
     g_optionsPrefsSnapshot.bit1 = (*(Los_0045cf60*)&g_game->mapFlags_14281).bits.bit2;
     g_optionsBackupGameSpeed.i = g_game->gameSpeed;
     g_optionsBackupEdgeScroll.i = g_game->scrollSpeed;
-    g_optionsBackupLockedTrack = ((Sound *)g_game->field_10)->GetLockedTrack();
+    g_optionsBackupLockedTrack = ((Sound *)g_game->sound)->GetLockedTrack();
     for (int i = 0; i < 100; i++) {
-        g_optionsBackupTrackTypes[i] = ((Sound *)g_game->field_10)->GetCategoryOfTrack(i);
+        g_optionsBackupTrackTypes[i] = ((Sound *)g_game->sound)->GetCategoryOfTrack(i);
     }
 }
 
@@ -1221,7 +1221,7 @@ int __cdecl OpenOptionsLayout()
         strcpy(buf, "STARTOPT.GUI");
     }
     int result = LoadGuiLayer((void*)&g_game->gui, buf, 0x80);
-    SetGrayedOutByName(&g_game->gui, "MUSIC", *(int*)(Sound *)g_game->field_10 == 0);
+    SetGrayedOutByName(&g_game->gui, "MUSIC", *(int*)(Sound *)g_game->sound == 0);
     EnableKeyCommands(&g_game->gui);
     if ((*(Bits_0045cf60*)&g_game->netGameFlags_2a44).prefsWord.prefs && g_game->net->GetGameType() != 3) {
         g_game->pauseFlags |= 1;
@@ -1236,8 +1236,8 @@ void TickMusicOptions()
     char value[20];
     GetGadgetText(&g_game->gui, "TRACKNUM", value);
     int track = atoi(value);
-    if (track != ((Sound *)g_game->field_10)->GetCurrentTrack()) {
-        g_musicUiSelectedTrack = ((Sound *)g_game->field_10)->GetCurrentTrack();
+    if (track != ((Sound *)g_game->sound)->GetCurrentTrack()) {
+        g_musicUiSelectedTrack = ((Sound *)g_game->sound)->GetCurrentTrack();
         UpdateTrackGadgets();
         MarkChanged((Dialog*)&g_game->gui);
     }
@@ -1263,11 +1263,11 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
     Gadget* entries = obj->holder->entries;
     if (obj->hotGadgetIndex == -1) {
         if (!(*(Bits_0045cf60*)&g_game->netGameFlags_2a44).prefsByte.prefs) {
-            ((Sound *)g_game->field_10)->StopCdAudio();
+            ((Sound *)g_game->sound)->StopCdAudio();
             (*(Flags37ebe_0045cf60*)&g_game->ordersPanelFlags_37ebe).loadedBits.loaded = 0;
             return;
         }
-        ((Sound *)g_game->field_10)->PlayNextTrack();
+        ((Sound *)g_game->sound)->PlayNextTrack();
         (*(Flags37ebe_0045cf60*)&g_game->ordersPanelFlags_37ebe).loadedBits.loaded = 0;
         return;
     }
@@ -1278,21 +1278,21 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
         int v = GetButtonStageByName(obj, g_notrakGadgetName);
         unsigned short f = g_game->flags_37f14_37f14.word;
         g_game->flags_37f14_37f14.word = f ^ ((f ^ v) & 1);
-        ((Sound *)g_game->field_10)->EnableCdAudio(g_game->flags_37f14_37f14.word & 1);
+        ((Sound *)g_game->sound)->EnableCdAudio(g_game->flags_37f14_37f14.word & 1);
         ClearSelectedGadget(obj);
         UpdateMusicGadgets();
     } else if (IsCurrentGadgetNamed(obj, g_trackModeGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         g_game->cdMode = GetButtonStageByName(obj, g_trackModeGadgetName) + 1;
-        ((Sound *)g_game->field_10)->SetPlaybackOrder(g_game->cdMode);
+        ((Sound *)g_game->sound)->SetPlaybackOrder(g_game->cdMode);
         if (g_game->cdMode == 3) {
-            g_musicUiSelectedTrack = ((Sound *)g_game->field_10)->GetLockedTrack();
+            g_musicUiSelectedTrack = ((Sound *)g_game->sound)->GetLockedTrack();
             ClearSelectedGadget(obj);
             UpdateTrackGadgets();
             return;
         }
         if (g_game->cdMode == 4) {
-            SetButtonStageByName(obj, g_trackTypeGadgetName, (unsigned char)((Sound *)g_game->field_10)->GetCategoryOfTrack(g_musicUiSelectedTrack));
+            SetButtonStageByName(obj, g_trackTypeGadgetName, (unsigned char)((Sound *)g_game->sound)->GetCategoryOfTrack(g_musicUiSelectedTrack));
             ApplyTrackType();
         }
         ClearSelectedGadget(obj);
@@ -1301,23 +1301,23 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
     } else if (IsCurrentGadgetNamed(obj, g_trackTypeGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         int i = obj->hotGadgetIndex;
-        ((Sound *)g_game->field_10)->SetCategoryOfTrack(g_musicUiSelectedTrack, entries[i].stageIndex);
+        ((Sound *)g_game->sound)->SetCategoryOfTrack(g_musicUiSelectedTrack, entries[i].stageIndex);
         UpdateTrackGadgets();
         ClearSelectedGadget(obj);
         return;
     }
     if (IsCurrentGadgetNamed(obj, g_cdPlayGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
-        ((Sound *)g_game->field_10)->PlayCdTrack(g_musicUiSelectedTrack, 1);
+        ((Sound *)g_game->sound)->PlayCdTrack(g_musicUiSelectedTrack, 1);
         ClearSelectedGadget(obj);
         return;
     } else if (IsCurrentGadgetNamed(obj, g_cdNextGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         g_musicUiSelectedTrack = g_musicUiSelectedTrack + 1;
-        int n = ((Sound *)g_game->field_10)->GetTrackCount();
+        int n = ((Sound *)g_game->sound)->GetTrackCount();
         if (g_musicUiSelectedTrack > n)
             g_musicUiSelectedTrack = 1;
-        g_musicUiSelectedTrack = ((Sound *)g_game->field_10)->SelectTrack(g_musicUiSelectedTrack);
+        g_musicUiSelectedTrack = ((Sound *)g_game->sound)->SelectTrack(g_musicUiSelectedTrack);
         UpdateTrackGadgets();
         ClearSelectedGadget(obj);
         return;
@@ -1325,15 +1325,15 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
         PlaySoundByName(g_optionsSoundName, 0);
         g_musicUiSelectedTrack = g_musicUiSelectedTrack - 1;
         if (g_musicUiSelectedTrack < 1)
-            g_musicUiSelectedTrack = ((Sound *)g_game->field_10)->GetTrackCount();
-        g_musicUiSelectedTrack = ((Sound *)g_game->field_10)->SelectTrack(g_musicUiSelectedTrack);
+            g_musicUiSelectedTrack = ((Sound *)g_game->sound)->GetTrackCount();
+        g_musicUiSelectedTrack = ((Sound *)g_game->sound)->SelectTrack(g_musicUiSelectedTrack);
         UpdateTrackGadgets();
         ClearSelectedGadget(obj);
         return;
     } else if (IsCurrentGadgetNamed(obj, g_cdStopGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
-        ((Sound *)g_game->field_10)->StopCdAudio();
-        g_musicUiSelectedTrack = ((Sound *)g_game->field_10)->SelectTrack(1);
+        ((Sound *)g_game->sound)->StopCdAudio();
+        g_musicUiSelectedTrack = ((Sound *)g_game->sound)->SelectTrack(1);
         UpdateTrackGadgets();
         ClearSelectedGadget(obj);
         return;
@@ -1398,13 +1398,13 @@ void OpenMusicOptions()
     }
     UpdateMusicGadgets();
     if (g_game->cdMode == 3) {
-        g_musicUiSelectedTrack = ((Sound *)g_game->field_10)->GetLockedTrack();
+        g_musicUiSelectedTrack = ((Sound *)g_game->sound)->GetLockedTrack();
     }
     UpdateTrackGadgets();
     Gadget* gadgets = ((Holder_0045d7c0*)g_game->gui.layer)->gadgets;
     if (g_game->cdMode == 4) {
         int index = FindGadgetIndex(gadgets, "TRACKTYPE", 1);
-        ((Sound *)g_game->field_10)->SetCategoryOfTrack(g_musicUiSelectedTrack, gadgets[index].stageIndex);
+        ((Sound *)g_game->sound)->SetCategoryOfTrack(g_musicUiSelectedTrack, gadgets[index].stageIndex);
     }
     MarkChanged(&g_game->gui);
     SetKeyboardInput(&g_game->gui, 1);
@@ -1444,9 +1444,9 @@ void __stdcall HandleSoundOptionsClick(Object_0045da90* obj)
         if (((*(SoundFlags_0045cf60*)&g_game->soundFlags).word & 7) == 0)
             StopAllSounds();
         if (((*(SoundFlags_0045cf60*)&g_game->soundFlags).word & 7) == 2)
-            ((Sound *)g_game->field_10)->Enable3D();
+            ((Sound *)g_game->sound)->Enable3D();
         else
-            ((Sound *)g_game->field_10)->Disable3D();
+            ((Sound *)g_game->sound)->Disable3D();
         if (((*(SoundFlags_0045cf60*)&g_game->soundFlags).word & 7) == 1 && !(*(Bits_0045cf60*)&g_game->netGameFlags_2a44).prefsWord.prefs)
             PlayLoopingSoundByName(g_bgmSoundName, 0);
         SetButtonStageByName(&g_game->gui, g_modeGadgetName, (*(SoundFlags_0045cf60*)&g_game->soundFlags).word & 7);
@@ -1470,12 +1470,12 @@ void __stdcall HandleSoundOptionsClick(Object_0045da90* obj)
         (*(SoundFlags_0045cf60*)&g_game->soundFlags).bits.b4 = 1;
         (*(SoundFlags_0045cf60*)&g_game->soundFlags).bits.b5 = 1;
         (*(SoundFlags_0045cf60*)&g_game->soundFlags).bits.speech = 1;
-        ((Sound *)g_game->field_10)->Disable3D();
+        ((Sound *)g_game->sound)->Disable3D();
         (*(SoundFlags_0045cf60*)&g_game->soundFlags).word = ((*(SoundFlags_0045cf60*)&g_game->soundFlags).word & 0xfff9) | 1;
         g_game->unitChat = 10;
         SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-        ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-        ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+        ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+        ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
         CloseTopScreen(obj);
         OpenSoundOptions();
         PlaySoundByName(g_optionsSoundName, 0);
@@ -1621,8 +1621,8 @@ void __stdcall HandleVisualOptionsClick(Gui* gui)
             (*(Flags37f06_0045cf60*)&g_game->flags_37f06).bits.b6 = 0;
         }
         SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-        ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-        ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+        ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+        ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
         CloseTopScreen(gui);
         OpenVisualOptions(0);
         return;
@@ -2200,18 +2200,18 @@ void __stdcall HandleOptionsPanelClick(Gui* gui)
             PlaySoundByName("Previous", 0);
             RestoreSoundOptions();
             g_game->volume2 = g_optionsBackupMusicVolume;
-            ((Sound *)g_game->field_10)->CopyTrackTypeTable(&g_optionsBackupTrackTypes);
+            ((Sound *)g_game->sound)->CopyTrackTypeTable(&g_optionsBackupTrackTypes);
             g_game->cdMode = g_optionsBackupCdMode;
-            ((Sound *)g_game->field_10)->SetPlaybackOrder(g_game->cdMode);
+            ((Sound *)g_game->sound)->SetPlaybackOrder(g_game->cdMode);
             if (((unsigned char)g_game->flags_37f14_37f14.word ^ (unsigned char)g_optionsBackupMusicMode.s) & 1) {
-                ((Sound *)g_game->field_10)->PlayNextTrack();
+                ((Sound *)g_game->sound)->PlayNextTrack();
             }
             unsigned short f = g_game->flags_37f14_37f14.word;
             g_game->flags_37f14_37f14.word = f ^ ((f ^ g_optionsBackupMusicMode.s) & 1);
-            ((Sound *)g_game->field_10)->SetLockedTrack(g_optionsBackupLockedTrack);
+            ((Sound *)g_game->sound)->SetLockedTrack(g_optionsBackupLockedTrack);
             SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-            ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-            ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+            ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+            ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
             g_game->textScroll = g_optionsBackupTextScroll;
             g_game->gameSpeed = g_optionsBackupGameSpeed.i;
             g_game->effectiveGameSpeed = g_optionsBackupGameSpeed.i;
@@ -2335,9 +2335,9 @@ void OpenOptionsPanel()
     g_optionsPrefsSnapshot.bit1 = (*(Los_0045cf60*)&g_game->mapFlags_14281).bits.bit2;
     g_optionsBackupGameSpeed.i = g_game->gameSpeed;
     g_optionsBackupEdgeScroll.i = g_game->scrollSpeed;
-    g_optionsBackupLockedTrack = ((Sound *)g_game->field_10)->GetLockedTrack();
+    g_optionsBackupLockedTrack = ((Sound *)g_game->sound)->GetLockedTrack();
     for (int i = 0; i < 100; i++) {
-        g_optionsBackupTrackTypes[i] = ((Sound *)g_game->field_10)->GetCategoryOfTrack(i);
+        g_optionsBackupTrackTypes[i] = ((Sound *)g_game->sound)->GetCategoryOfTrack(i);
     }
     SetKeyboardInput((Menu_00460160*)&g_game->gui, 1);
     RenderLayer((Menu_00460160*)&g_game->gui, 0xc0);
@@ -2410,7 +2410,7 @@ void __stdcall HandleSurrenderChoice(Gui* gui)
         return;
     PlaySoundByName("Exit", 0);
     if (IsGadgetNamed(owner, gui->hotGadgetIndex, "CHOICE1")) {
-        ((Sound *)g_game->field_10)->SetTrackCategory(4);
+        ((Sound *)g_game->sound)->SetTrackCategory(4);
         switch (g_battleQuitIntent) {
         case 0:
         case 1:
@@ -2536,7 +2536,7 @@ void __stdcall HandleInGameOptionsClick(Gui* gui)
                 g_game->otherFlags &= 0xfffe;
         }
         (*(Flags37ebe_0045cf60*)&g_game->ordersPanelFlags_37ebe).word &= 0xfffe;
-        ((Sound *)g_game->field_10)->PauseCdAudio(0);
+        ((Sound *)g_game->sound)->PauseCdAudio(0);
         return;
     }
     if (IsCurrentGadgetNamed(gui, "LOADGAME")) {
@@ -2615,5 +2615,5 @@ void OpenInGameOptions()
     if (g_game->net->GetGameType() != 3) {
         g_game->pauseFlags |= 1;
     }
-    ((Sound *)g_game->field_10)->PauseCdAudio(1);
+    ((Sound *)g_game->sound)->PauseCdAudio(1);
 }

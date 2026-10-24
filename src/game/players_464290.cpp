@@ -100,7 +100,7 @@ void __stdcall SetupPlayerSlot(int player, char type)
     p->rejectReason = 0;
 
     if (p->active != 0 && (p->type == 1 || p->type == 2)) {
-        p->info->memory = ((Map*)g_game->unknown_c)->field_620 / 0x100000 + 1;
+        p->info->memory = ((Map*)g_game->displayContext)->field_620 / 0x100000 + 1;
     }
 
     if (g_seams.map->GetGameType(g_game->net) == 1) {

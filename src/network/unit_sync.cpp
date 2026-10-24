@@ -193,7 +193,7 @@ int __stdcall ReportGameEvent(int msg)
             g_reportFlags = QueryOnlineFlags(msg == 1 ? 1 : 2 + (msg != 6));
         if (g_reportFlags & 3) {
             int team = (int)g_game->net->GetMissionName();
-            if (RIReport(msg, &rect, (char*)&g_game->field_39201, thing, &g_reportPlayerName,
+            if (RIReport(msg, &rect, (char*)&g_game->providerGuid, thing, &g_reportPlayerName,
                              team, g_game->localPlayer,
                              id, g_onlineReportPlayers, g_onlineReportScoreBoards))
                 g_hapinetOnlineReport = 0;
@@ -202,7 +202,7 @@ int __stdcall ReportGameEvent(int msg)
 
     if (g_reporterDll) {
         int team = (int)g_game->net->GetMissionName();
-        g_riReport(msg, &rect, (char*)&g_game->field_39201, thing, &g_reportPlayerName,
+        g_riReport(msg, &rect, (char*)&g_game->providerGuid, thing, &g_reportPlayerName,
                      team, g_game->localPlayer,
                      id, g_onlineReportPlayers, g_onlineReportScoreBoards);
     }

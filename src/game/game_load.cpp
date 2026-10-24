@@ -591,10 +591,10 @@ void __stdcall DrawSyncStatus(void* surface)
             {
                 r.left = x;
                 r.right = slot + x - 2;
-                FillRectangle(surface, &r, g_game->field_dcf);
+                FillRectangle(surface, &r, g_game->colors[4]);
                 int pc = q->percent;
                 r.right = r.left + (pc * (slot - 2)) / 100;
-                FillRectangle(surface, &r, g_game->field_dd5);
+                FillRectangle(surface, &r, g_game->colors[10]);
                 DrawTextClipped(surface, q->name, r.left, 420, slot - 2, 0);
                 x += slot;
             }
@@ -651,12 +651,12 @@ void LoadingScreenFrame(void)
 
     if (!(*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.started) {
         while (((int)g_game->layer) != 0) {
-            CloseTopScreen(&g_game->field_519);
+            CloseTopScreen(&g_game->gui);
         }
-        DisableKeyCommands(&g_game->field_519);
+        DisableKeyCommands(&g_game->gui);
         if (((unsigned char)g_game->cursorMode) != 0x14) {
             g_game->cursorMode = (char)(0x14);
-            SetCursorAnimation(&g_game->field_519, (void*)g_game->cursorHourglass);
+            SetCursorAnimation(&g_game->gui, (void*)g_game->cursorHourglass);
         }
         SetFont(g_game->fontComix);
         SetPaletteColors(g_game->paletteRgba, 0, 0x100);
@@ -664,7 +664,7 @@ void LoadingScreenFrame(void)
             SaveSettings();
         }
         while (((int)g_game->layer) != 0) {
-            CloseTopScreen(&g_game->field_519);
+            CloseTopScreen(&g_game->gui);
         }
         BlankScreen();
         g_game->width_37e1f = 0x280;
@@ -682,7 +682,7 @@ void LoadingScreenFrame(void)
         }
         BuildDataPath(aux, "palettes", "guipal", "PAL");
         surfaceHandle = HAPI_LoadFile(aux, 0);
-        RemapPaletteToClosestIndices(&g_game->field_519, g_game->paletteRgba, surfaceHandle);
+        RemapPaletteToClosestIndices(&g_game->gui, g_game->paletteRgba, surfaceHandle);
         GameFreeThunk(surfaceHandle);
         g_game->lastTick = GetTicks();
         g_game->frames_38a3b = 0;
@@ -740,9 +740,9 @@ void LoadingScreenFrame(void)
         SetCloseHandler(HandleBattleQuitPrompt, 0);
         g_game->field_589 = 0;
         memset((void*)(*(volatile unsigned char(*)[6])&g_game->progress_38d6f), 0, 8);
-        ((Sound*)g_game->field_10)->SetTrackCategory(0);
-        if (!((Sound*)g_game->field_10)->IsCdPlaying()) {
-            ((Sound*)g_game->field_10)->PlayNextTrack();
+        ((Sound*)g_game->sound)->SetTrackCategory(0);
+        if (!((Sound*)g_game->sound)->IsCdPlaying()) {
+            ((Sound*)g_game->sound)->PlayNextTrack();
         }
         for (i = 0; i < 10; i++) {
             if ((*(PlayerRec_00497f40(*)[10])&g_game->players)[i].active != 0)

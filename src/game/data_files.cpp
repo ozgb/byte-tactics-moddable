@@ -296,7 +296,7 @@ void LoadGameResources()
     g_game->gaf_147c3 = (void*)((int)FindGafEntry(gaf, "plasmamd"));
     g_game->gaf_147c7 = (void*)((int)FindGafEntry(gaf, "ultrashell"));
     g_game->gaf_147cb = (void*)((int)FindGafEntry(gaf, "plasmasm"));
-    g_game->unknown_147f3 = (void*)((int)FindGafEntry(gaf, "flamestream"));
+    g_game->flamestreamGaf = (void*)((int)FindGafEntry(gaf, "flamestream"));
     g_game->src3 = (void*)((int)FindGafEntry(gaf, "explosion"));
     FLAG(((int)g_game->src3));
     g_game->explode2 = (int)FindGafEntry(gaf, "explode2");
@@ -332,8 +332,8 @@ void LoadGameResources()
     g_game->gray3 = (int)FindGafEntry(gaf, "Gray3");
     g_game->gray4 = (int)FindGafEntry(gaf, "Gray4");
 
-    g_game->field_14903 = (int)LoadAnimGaf("cursors");
-    gaf = (char*)g_game->field_14903;
+    g_game->cursorsGaf = (int)LoadAnimGaf("cursors");
+    gaf = (char*)g_game->cursorsGaf;
     g_game->cursorAttack = (int)FindGafEntry(gaf, "cursorattack");
     g_game->cursorAirstrike = (int)FindGafEntry(gaf, "cursorairstrike");
     g_game->cursorTooFar = (int)FindGafEntry(gaf, "cursortoofar");
@@ -404,7 +404,7 @@ void FreeAnimFiles()
         g_game->panelTop[i] = 0;
     }
     g_game->gafAnimClearedSlot = g_game->fxGaf = g_game->igTitles =
-        g_game->vismasks = g_game->fog = g_game->field_14903 = 0;
+        g_game->vismasks = g_game->fog = g_game->cursorsGaf = 0;
 }
 
 // FUNCTION: 0x42a0e0

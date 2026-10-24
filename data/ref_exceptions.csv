@@ -92,6 +92,7 @@ GafFrame,scratch,pointer,src/graphics/gaf_frame.h,#353
 GafRef,pic,pointer,src/weapons/explosions.cpp,#352
 GafRef,src,pointer,src/weapons/explosions.cpp,#352
 Game,alfboom1,int-pointer,src/game/game.h,#353
+Game,assemPoints,pointer,src/game/game.h,#353
 Game,buildLists,pointer,src/game/game.h,#353
 Game,build_date,pointer,src/game/game.h,#353
 Game,build_time,pointer,src/game/game.h,#353
@@ -100,10 +101,12 @@ Game,conns,pointer,src/game/game.h,#353
 Game,currentPalette,pointer,src/game/game.h,#353
 Game,cursorHourglass,int-pointer,src/game/game.h,#353
 Game,cursorNormal,pointer,src/game/game.h,#353
+Game,cursorsGaf,int-pointer,src/game/game.h,#353
 Game,data,pointer,src/game/game.h,#353
 Game,data16,pointer,src/game/game.h,#353
 Game,desc,pointer,src/game/game.h,#353
 Game,desiredPalette,pointer,src/game/game.h,#353
+Game,displayContext,pointer,src/game/game.h,#353
 Game,dplConnection,pointer,src/game/game.h,#353
 Game,explode2,int-pointer,src/game/game.h,#353
 Game,explode3,int-pointer,src/game/game.h,#353
@@ -111,8 +114,7 @@ Game,explode4,int-pointer,src/game/game.h,#353
 Game,explode5,int-pointer,src/game/game.h,#353
 Game,eyes,pointer,src/game/game.h,#353
 Game,fadeTable,pointer,src/game/game.h,#353
-Game,field_1438b,pointer,src/game/game.h,#353
-Game,field_14903,int-pointer,src/game/game.h,#353
+Game,flamestreamGaf,pointer,src/game/game.h,#353
 Game,fog,int-pointer,src/game/game.h,#353
 Game,font,pointer,src/game/game.h,#353
 Game,fontComix,int-pointer,src/game/game.h,#353
@@ -158,8 +160,6 @@ Game,sync,pointer,src/game/game.h,#353
 Game,table,pointer,src/game/game.h,#353
 Game,tracked,pointer,src/game/game.h,#353
 Game,unitTable,pointer,src/game/game.h,#353
-Game,unknown_147f3,pointer,src/game/game.h,#353
-Game,unknown_c,pointer,src/game/game.h,#353
 Game,value_142f3,int-pointer,src/game/game.h,#353
 Game,vismasks,int-pointer,src/game/game.h,#353
 Game,xform,pointer,src/game/game.h,#353

@@ -54,6 +54,43 @@ void Walk(int FUN_local, int other)
     "docs/notes.md": "FUN_00401000 is the sine.\n",
 }
 
+SCOPED_FILES = {
+    "src/game/game.h": """#pragma pack(push, 1)
+struct Game {
+    union {
+        struct { char unknown_0; char version; };
+        int field_0;
+    };
+    int field_4;
+    struct Inner { int field_0; } inner;
+    int Get() { return field_0 + this->field_0; }
+};
+#pragma pack(pop)
+static_assert(offsetof(Game, field_0) == 0x0, "field_0");
+static_assert(offsetof(Game, field_4) == 0x4, "field_4");
+""",
+    "src/game/other.h": "struct Other { int field_0; int field_4; };\n",
+    "src/game/use.cpp": """extern Game* g_game;
+extern Other* g_other;
+int Game::Total() { return field_0 + field_4; }
+int Read(Game* game, Game& ref, Other* other, Unknown* p)
+{
+    int a = g_game->field_0 + game->field_0 + ref.field_0;
+    int b = other->field_0 + g_other->field_0 + p->field_0;
+    int c = ((Game*)p)->field_0 + static_cast<Game*>(p)->field_0;
+    const char* s = "g_game->field_0";  // g_game->field_0 in a comment
+    return a + b + c + g_game->field_4;
+}
+int Shadow(Other* g_game) { return g_game->field_0; }
+""",
+    "data/ref_exceptions.csv": "struct,field,kind,file,issue\nGame,field_0,pointer,src/game/game.h,#1\nOther,field_0,pointer,src/game/other.h,#1\n",
+    "data/state_classes.csv": ("name,address,kind,proposed,class,rule,note\n"
+                               "field_0,0x0,game-region,,platform,r,Game::field_0 note\n"
+                               "field_0,0x0,heap,,platform,r,other field_0\n"),
+    "data/trace_coverage.csv": "kind,name,address,class\ngame-region,field_0,0x0,mixed\nheap,field_0,0x0,mixed\n",
+    "data/hazards.csv": "function,note\nF,Game.field_0 and Other.field_0\n",
+}
+
 
 def write(root: Path, files: dict[str, str]) -> None:
     for name, text in files.items():
@@ -198,6 +235,67 @@ class Scope(Fixture):
         self.assertIn("uv run tools/traceschema.py", out)
         self.assertIn("uv run tools/layoutasserts.py --write --build-dir build/modern", out)
         self.assertIn("uv run tools/rwsets.py", out)
+
+
+class ScopedMember(Fixture):
+    def setUp(self):
+        super().setUp()
+        write(self.root, SCOPED_FILES)
+
+    def test_only_the_named_type_changes(self):
+        out = self.ok("Game::field_0", "hp")
+        header = read(self.root, "src/game/game.h")
+        self.assertIn("        int hp;\n", header)
+        self.assertIn("struct Inner { int field_0; }", header)
+        self.assertIn("return hp + this->hp;", header)
+        self.assertIn('offsetof(Game, hp) == 0x0, "hp"', header)
+        self.assertIn("offsetof(Game, field_4)", header)
+        self.assertEqual(read(self.root, "src/game/other.h"), "struct Other { int field_0; int field_4; };\n")
+        use = read(self.root, "src/game/use.cpp")
+        self.assertIn("int Game::Total() { return hp + field_4; }", use)
+        self.assertIn("g_game->hp + game->hp + ref.hp;", use)
+        self.assertIn("other->field_0 + g_other->field_0 + p->field_0;", use)
+        self.assertIn("((Game*)p)->hp + static_cast<Game*>(p)->hp;", use)
+        self.assertIn('"g_game->field_0";  // g_game->field_0 in a comment', use)
+        self.assertIn("return g_game->field_0; }", use)
+        self.assertIn("p->field_0: 1 site(s), first src/game/use.cpp:7", out)
+        self.assertNotIn("other->field_0:", out.split("warning")[0])
+
+    def test_data_rows_of_the_type_only(self):
+        self.ok("Game::field_0", "hp")
+        self.assertEqual(read(self.root, "data/ref_exceptions.csv").splitlines()[1:],
+                         ["Game,hp,pointer,src/game/game.h,#1", "Other,field_0,pointer,src/game/other.h,#1"])
+        self.assertEqual(read(self.root, "data/state_classes.csv").splitlines()[1:],
+                         ["hp,0x0,game-region,,platform,r,Game::hp note", "field_0,0x0,heap,,platform,r,other field_0"])
+        self.assertEqual(read(self.root, "data/trace_coverage.csv").splitlines()[1:],
+                         ["game-region,hp,0x0,mixed", "heap,field_0,0x0,mixed"])
+        self.assertIn("Game.hp and Other.field_0", read(self.root, "data/hazards.csv"))
+
+    def test_from_a_csv(self):
+        table = self.root / "pairs.csv"
+        table.write_text("old,new,evidence\nGame::field_0,hp,seen\nFUN_00401000,Sine,\n")
+        self.ok("--from", str(table))
+        self.assertIn("g_game->hp", read(self.root, "src/game/use.cpp"))
+        self.assertIn("int Sine(int a);", read(self.root, "src/units/unit.h"))
+
+    def test_dry_run_writes_nothing(self):
+        before = snapshot(self.root)
+        out = self.ok("Game::field_0", "hp", "--dry-run")
+        self.assertEqual(snapshot(self.root), before)
+        self.assertIn("would change", out)
+
+    def test_new_is_already_a_member(self):
+        self.assertIn("already a member of Game", self.refused("Game::field_0", "field_4"))
+
+    def test_not_a_name(self):
+        self.assertIn("is not a name", self.refused("Game::field_0", "class"))
+        self.assertIn("is not a name", self.refused("Game::field_0", "1x"))
+
+    def test_member_the_type_lacks(self):
+        self.assertIn("does not declare", self.refused("Game::nothing", "hp"))
+
+    def test_type_without_a_definition(self):
+        self.assertIn("no struct, class or union definition", self.refused("Missing::field_0", "hp"))
 
 
 class RealTree(unittest.TestCase):

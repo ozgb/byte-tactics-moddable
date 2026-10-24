@@ -237,8 +237,8 @@ void __stdcall WriteGameRegistryValue(void* key, void* buf, int value);
 // FUNCTION: 0x490f80
 void SaveCdLists()
 {
-    for (int i = 0; i < ((Sound*)g_game->field_10)->GetTrackCount(); i++) {
-        g_cdListsDiscEntries.tracks[i] = ((Sound*)g_game->field_10)->GetCategoryOfTrack(i + 1);
+    for (int i = 0; i < ((Sound*)g_game->sound)->GetTrackCount(); i++) {
+        g_cdListsDiscEntries.tracks[i] = ((Sound*)g_game->sound)->GetCategoryOfTrack(i + 1);
     }
     WriteGameRegistryValue((void*)"CDLISTS", &g_cdListsDiscEntries, sizeof(g_cdListsDiscEntries));
 }
@@ -256,14 +256,14 @@ void ReopenCdAudio()
     char tracks[16] = {1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     char buf[0x88];
 
-    int saved = ((Sound*)g_game->field_10)->GetTrackCategory();
+    int saved = ((Sound*)g_game->sound)->GetTrackCategory();
     host_music_close();
     host_music_open();
-    ((Sound*)g_game->field_10)->EnableCdAudio(g_game->musicMode & 1);
-    ((Sound*)g_game->field_10)->SetPlaybackOrder(g_game->cdMode);
-    ((Sound*)g_game->field_10)->SetTrackCategory(saved);
+    ((Sound*)g_game->sound)->EnableCdAudio(g_game->musicMode & 1);
+    ((Sound*)g_game->sound)->SetPlaybackOrder(g_game->cdMode);
+    ((Sound*)g_game->sound)->SetTrackCategory(saved);
 
-    int id = ((Sound*)g_game->field_10)->GetDiscSerial();
+    int id = ((Sound*)g_game->sound)->GetDiscSerial();
     int index = 0;
     int* slot = &DAT_0051e848;
     while (1) {
@@ -282,13 +282,13 @@ void ReopenCdAudio()
             memcpy((char*)&g_cdListsDiscEntries + j * 0x88,
                    (char*)&g_cdListsDiscEntries + (j - 1) * 0x88, 0x88);
         memcpy(&g_cdListsDiscEntries, buf, 0x88);
-        ((Sound*)g_game->field_10)->CopyTrackTypeTable(&g_cachedCdTrackTypes);
+        ((Sound*)g_game->sound)->CopyTrackTypeTable(&g_cachedCdTrackTypes);
     }
 newdisc:
     if (index == 0x14) {
-        if (((Sound*)g_game->field_10)->GetTrackCount() == 0x10) {
-            if (((Sound*)g_game->field_10)->IsFirstTrackData() != 0) {
-                ((Sound*)g_game->field_10)->CopyTrackTypeTable(tracks);
+        if (((Sound*)g_game->sound)->GetTrackCount() == 0x10) {
+            if (((Sound*)g_game->sound)->IsFirstTrackData() != 0) {
+                ((Sound*)g_game->sound)->CopyTrackTypeTable(tracks);
             }
         }
         int p = (int)&g_cdListsDiscEntries + 0xa18;
@@ -301,9 +301,9 @@ newdisc:
         DAT_0051e848 = id;
     }
     if ((g_game->netGameFlags & 4) != 0 && g_game->mode_391f1 == 6)
-        ((Sound*)g_game->field_10)->PlayNextTrack();
+        ((Sound*)g_game->sound)->PlayNextTrack();
     else
-        ((Sound*)g_game->field_10)->StopCdAudio();
+        ((Sound*)g_game->sound)->StopCdAudio();
 }
 
 extern const char g_skirmishInfoTag[];
@@ -389,22 +389,22 @@ void InitGame()
     LoadGameFonts();
     LoadDefaultPalette();
     LoadAllSound();
-    LoadAlphaTable(g_game->field_143a7);
-    LoadShadeTable(g_game->field_143a7);
-    LoadLightTable(g_game->field_143a7);
-    MakeGrayTable(g_game->field_143a7);
-    MakeBlueTable(g_game->field_143a7);
+    LoadAlphaTable(g_game->paletteRgba);
+    LoadShadeTable(g_game->paletteRgba);
+    LoadLightTable(g_game->paletteRgba);
+    MakeGrayTable(g_game->paletteRgba);
+    MakeBlueTable(g_game->paletteRgba);
     g_game->options = (Entry_00479620*)(GameAllocIgnoreTag(g_skirmishInfoTag, 0x22c));
     LoadSettings();
     size = 0xaa0;
     int ok = ReadGameRegistryValue(g_cdListsKey, &g_cdListsDiscEntries, &size);
     if (ok == 0)
         memset(&g_cdListsDiscEntries, 0, 0xaa0);
-    ((Sound*)g_game->field_10)->EnableCdAudio(g_game->musicMode & 1);
-    ((Sound*)g_game->field_10)->SetPlaybackOrder(g_game->cdMode);
-    ((Sound*)g_game->field_10)->SetCdCallback(ReopenCdAudio);
+    ((Sound*)g_game->sound)->EnableCdAudio(g_game->musicMode & 1);
+    ((Sound*)g_game->sound)->SetPlaybackOrder(g_game->cdMode);
+    ((Sound*)g_game->sound)->SetCdCallback(ReopenCdAudio);
     ReopenCdAudio();
-    ((Sound*)g_game->field_10)->SetTrackCategory(0);
+    ((Sound*)g_game->sound)->SetTrackCategory(0);
     ApplyBrightnessAndVolume();
     LoadSideData();
     LoadLogos();
@@ -463,8 +463,8 @@ void __stdcall ReleasePacketData(Class_00452370* obj);
 // FUNCTION: 0x4916a0
 void ShutdownGame(void)
 {
-    for (int i = 0; i < ((Sound*)g_game->field_10)->GetTrackCount(); i++) {
-        g_cdListsDiscEntries.tracks[i] = ((Sound*)g_game->field_10)->GetCategoryOfTrack(i + 1);
+    for (int i = 0; i < ((Sound*)g_game->sound)->GetTrackCount(); i++) {
+        g_cdListsDiscEntries.tracks[i] = ((Sound*)g_game->sound)->GetCategoryOfTrack(i + 1);
     }
     WriteGameRegistryValue((void*)"CDLISTS", &g_cdListsDiscEntries, 0xaa0);
     FreePictureCache();
@@ -542,7 +542,7 @@ void LoadBattleAssets()
     g_seams.wind_meteors->UpdateWindOnStream(RAND_STREAM_LOAD);
     g_game->xform = GameAllocIgnoreTag("TEMP XFORM PTS", 0x960);
     g_game->projected = GameAllocIgnoreTag("TEMP PROJECTED PTS", 0x640);
-    g_game->field_1438b = GameAllocIgnoreTag("ASSEM PTS", 0xa0);
+    g_game->assemPoints = GameAllocIgnoreTag("ASSEM PTS", 0xa0);
     g_game->lastTick = GetTicks();
     g_game->ticks = (int)(0);
     if (g_seams.map->GetGameType(g_game->net) == 3) {
@@ -604,8 +604,8 @@ void CloseNetSession();
 void ShutdownIngameSystems()
 {
     g_game->flags_2a44 &= 0xfffb;
-    ((Sound*)g_game->field_10)->StopCdAudio();
-    ((Sound*)g_game->field_10)->SetTrackCategory(4);
+    ((Sound*)g_game->sound)->StopCdAudio();
+    ((Sound*)g_game->sound)->SetTrackCategory(4);
     CollectEndGameStats();
     g_seams.wind_meteors->EmptyShutdownPreCleanup();
     g_seams.units->FreeUnitMemory();
@@ -615,10 +615,10 @@ void ShutdownIngameSystems()
     g_seams.players->FreePlayers();
     g_seams.los_radar->FreeRadar();
     g_seams.los_radar->FreeMapResources();
-    GameFreeThunk((int*)g_game->field_1438b);
+    GameFreeThunk((int*)g_game->assemPoints);
     GameFreeThunk((int*)g_game->projected);
     GameFreeThunk((int*)g_game->xform);
-    g_game->field_1438b = 0;
+    g_game->assemPoints = 0;
     g_game->projected = 0;
     g_game->xform = 0;
     g_seams.units->FreeDownloadMenus();

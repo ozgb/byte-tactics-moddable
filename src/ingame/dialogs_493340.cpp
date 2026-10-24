@@ -873,7 +873,7 @@ void UpdateCdCategoryByActivity()
     if ((g_game->netGameFlags & 4)
         && (!((*(volatile unsigned short*)&g_game->loadingFlags) & 1) || ((*(volatile unsigned short*)&g_game->loadingFlags) & 2))
         && GetTicks() > g_cdActivityLastSampleTick + 0x1e) {
-        int state = ((Sound *)g_game->field_10)->GetTrackCategory();
+        int state = ((Sound *)g_game->sound)->GetTrackCategory();
         if (++g_cdActivityStableTicks > 10) {
             int recent = 0;
             int n = 5;
@@ -903,7 +903,7 @@ void UpdateCdCategoryByActivity()
             else if (state == 1 && total < 10 && recent == 0 && g_cdActivityStableTicks > 0x3c)
                 newstate = 0;
             if (newstate != g_lastCdActivityMode) {
-                ((Sound *)g_game->field_10)->SetTrackCategory(newstate);
+                ((Sound *)g_game->sound)->SetTrackCategory(newstate);
                 g_cdActivityStableTicks = 0;
                 g_lastCdActivityMode = newstate;
             }

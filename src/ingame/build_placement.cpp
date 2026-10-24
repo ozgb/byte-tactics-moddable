@@ -266,7 +266,7 @@ void BattleFrame(void)
             }
             ShutdownIngameSystems();
             ClearKeyQueue();
-            ((Sound *)g_game->field_10)->SetTrackCategory(4);
+            ((Sound *)g_game->sound)->SetTrackCategory(4);
             g_game->mode_391f1 = 7;
             g_game->handler = EndGameFrame;
             SetCloseHandler(LeaveNetGameCallback, 0);
@@ -305,7 +305,7 @@ void BattleFrame(void)
             g_game->handler = MenuFrame;
             SetCloseHandler(LeaveNetGameCallback, 0);
         }
-        ((Sound *)g_game->field_10)->SetTrackCategory(4);
+        ((Sound *)g_game->sound)->SetTrackCategory(4);
     }
 }
 

@@ -1270,7 +1270,7 @@ void ClampCameraPosition()
     } else if (g_game->scrollY > maxY) {
         g_game->scrollY = maxY;
     }
-    CalcRadarViewportRect(g_game->field_142cb_142cb);
+    CalcRadarViewportRect(g_game->radarViewport);
 }
 #pragma auto_inline(on)
 

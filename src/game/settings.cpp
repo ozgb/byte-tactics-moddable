@@ -180,21 +180,21 @@ void LoadSettings()
     int ok13 = SettingGetInt((void*)"Total Annihilation", (void*)"Sound Mode", &value);
     if (ok13 != 0) {
         if (value == 2) {
-            ((Sound*)g_game->field_10)->Enable3D();
+            ((Sound*)g_game->sound)->Enable3D();
         } else {
-            ((Sound*)g_game->field_10)->Disable3D();
+            ((Sound*)g_game->sound)->Disable3D();
         }
         (*(struct SoundFlags*)&g_game->soundFlags).soundMode = value;
     } else {
         SettingSetInt((void*)"Total Annihilation", (void*)"Sound Mode",
-                     (((Sound*)g_game->field_10)->Is3DEnabled() != 0) + 1);
+                     (((Sound*)g_game->sound)->Is3DEnabled() != 0) + 1);
         (*(struct SoundFlags*)&g_game->soundFlags).soundMode = 1;
     }
     int ok14 = SettingGetInt((void*)"Total Annihilation", (void*)"MixingBuffers", &value);
     if (ok14 != 0) {
-        ((Sound*)g_game->field_10)->SetMaxBuffers(value);
+        ((Sound*)g_game->sound)->SetMaxBuffers(value);
     } else {
-        ((Sound*)g_game->field_10)->SetMaxBuffers(8);
+        ((Sound*)g_game->sound)->SetMaxBuffers(8);
     }
     int ok15 = SettingGetInt((void*)"Total Annihilation", (void*)"RestoreVolume", &value);
     if (ok15 != 0) {
@@ -205,11 +205,11 @@ void LoadSettings()
     if ((*(struct SoundFlags*)&g_game->soundFlags).restoreVolume) {
         int ok16 = SettingGetInt((void*)"Total Annihilation", (void*)"WaveOutVolume", &value);
         if (ok16 != 0) {
-            ((Sound*)g_game->field_10)->SetWaveVolume(value);
+            ((Sound*)g_game->sound)->SetWaveVolume(value);
         }
         int ok17 = SettingGetInt((void*)"Total Annihilation", (void*)"CDAudioVolume", &value);
         if (ok17 != 0) {
-            ((Sound*)g_game->field_10)->SetAuxVolume(value, 0);
+            ((Sound*)g_game->sound)->SetAuxVolume(value, 0);
         }
     }
     int ok18 = SettingGetInt((void*)"Total Annihilation", (void*)"Anti-Alias", &value);
@@ -298,7 +298,7 @@ void LoadSettings()
         if (GetWindowsUserName(buf) == 0) {
             strcpy(buf, "user_images");
         }
-        sprintf(g_game->imageOutputDirectory, "%s\\%s", ((char*)g_game->unknown_c) + 0x628, buf);
+        sprintf(g_game->imageOutputDirectory, "%s\\%s", ((char*)g_game->displayContext) + 0x628, buf);
     }
     ReadSettingIntOr("Movie Output Rate", &Game::movieOutputRate, 10, value);
     ReadSettingIntOr("textlines", &Game::textLines, 10, value);
@@ -450,12 +450,12 @@ void SaveSettings()
     SettingSetInt((void*)"Total Annihilation", (void*)"Sound Mode", (*(struct SoundFlags*)&g_game->soundFlags).soundMode);
     SettingSetInt((void*)"Total Annihilation", (void*)"RestoreVolume", (*(struct SoundFlags*)&g_game->soundFlags).restoreVolume);
     SettingSetInt((void*)"Total Annihilation", (void*)"MixingBuffers",
-                 ((Sound*)g_game->field_10)->GetMaxBuffers());
+                 ((Sound*)g_game->sound)->GetMaxBuffers());
     if ((*(struct SoundFlags*)&g_game->soundFlags).restoreVolume) {
         SettingSetInt((void*)"Total Annihilation", (void*)"WaveOutVolume",
-                     ((Sound*)g_game->field_10)->QueryWaveVolume());
+                     ((Sound*)g_game->sound)->QueryWaveVolume());
         SettingSetInt((void*)"Total Annihilation", (void*)"CDAudioVolume",
-                     ((Sound*)g_game->field_10)->QueryAuxVolume());
+                     ((Sound*)g_game->sound)->QueryAuxVolume());
     }
     SettingSetInt((void*)"Total Annihilation", (void*)"Anti-Alias", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).antiAlias);
     SettingSetInt((void*)"Total Annihilation", (void*)"Shadows", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).shadows);

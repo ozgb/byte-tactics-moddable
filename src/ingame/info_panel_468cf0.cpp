@@ -627,7 +627,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   if ((*(Bits8*)&g_game->flags_38a51).b1)
     DrawFrame((int)&ctx, GetGafFrame(g_game->cursorHourglass, 0), g_game->width_37e1f - 0x10, g_game->screenHeight - 0x50);
   ResetClipRect((int)&ctx);
-  BlitMenuLayers((int)&g_game->field_519, (int)&ctx, (int)&g_game->rect);
+  BlitMenuLayers((int)&g_game->gui, (int)&ctx, (int)&g_game->rect);
   if (g_game->profileBarsEnabled != 0 && param_1 != 0) {
     DrawProfileBarLine((int)&ctx, (int)"Network", 0);
     DrawProfileBarLine((int)&ctx, (int)"Units", 1);

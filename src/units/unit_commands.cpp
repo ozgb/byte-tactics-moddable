@@ -311,7 +311,7 @@ void __cdecl CreateMissionUnits()
             || (p = &g_game->players[pl], g_game->players[pl].active == 0)
             || (p->type != 1 && p->type != 2 && p->type != 3)
             || p->index == 10) {
-            sprintf(buf, "Player number %d invalid for unit %s", e->player, e->name);
+            sprintf(buf, "Player number %d invalid for unit %s", e->player, e->name.get());
             FatalError(buf);
         }
         g_seams.map->SnapWorldPosToFootprint((UnitDef*)item, (Vec3*)&e->x);

@@ -2,19 +2,33 @@
 
 This is the moddable fork of TA: Byte Tactics. Byte Tactics is a matching
 decompilation of Total Annihilation 3.1c: source that compiles, with the
-original Visual C++ 5.0, to the shipped exe byte for byte. This fork turns that
-source into a moddable engine. Every game-logic subsystem becomes a WASM
-module, the 3.1c code compiled to WASM is the default module for each, and the
-whole game runs as WASM on thin native and browser hosts.
+original Visual C++ 5.0, to the shipped exe byte for byte. This fork makes that
+source deterministic, traces it and cuts it into subsystems behind seams, so
+that it can serve as the oracle and the contract for a clean-room
+re-implementation in Rust ([ozgb/btm](https://github.com/ozgb/btm)).
 
-The one rule above all others is **conformity**: with no mods loaded, the game
-logic behaves exactly like 3.1c, bit for bit, tick for tick. The fork drops
-byte-matching and network compatibility with 3.1c clients; it never drops
-conformity.
+The work runs in three milestones:
+
+1. **This repository** (#2): the reference, its traces and the tools that
+   judge a re-implementation by its behaviour alone.
+2. **The clean-room engine** (#180, in ozgb/btm): Rust, MIT, with each
+   subsystem a WASM module over one shared memory, written from
+   behaviour-only specs by agents in a sandbox that can't reach this
+   repository.
+3. **The features on that engine** (ozgb/btm#1): multiplayer, native and
+   browser hosts, and mod support.
+
+The one rule above all others is **conformity**: the game logic behaves
+exactly like 3.1c, bit for bit, tick for tick. The fork drops byte-matching
+and network compatibility with 3.1c clients; it never drops conformity.
 
 The plan, its decisions and its order are in issue #2 and its sub-issues. Read
 #2 before your first issue. #1 is the mod-support design (quirk flags, Lua
-hooks) that the plan builds on.
+hooks); its quirk flags are here, and the rest comes in Milestone 3.
+
+**You are a spec writer, never an implementer.** Anyone who has read this
+repository's source can't write implementation code for ozgb/btm. You may
+push specs, data kit imports, CI and tooling there, never engine code.
 
 ## Words used here
 
@@ -81,9 +95,8 @@ issue lands:
   `tools/determinismlint.py` checks this on the lines a change adds, in CI.
 - Game state lives in the shared state block (#7). A module keeps nothing
   between ticks outside it.
-- Subsystems call each other through seams (#8).
-- Presentation (rendering, UI, sound, UI modules) reads the player view and
-  changes the game only by sending orders (#22).
+- Subsystems call each other through seams (#8), and nothing else
+  (#386 checks this at link time).
 - Platform calls go through the host interface (#24).
 - A change in behaviour is either a bug or a quirk flag that is off by default
   (#1). With every flag off, traces match the reference.

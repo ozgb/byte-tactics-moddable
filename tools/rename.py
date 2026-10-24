@@ -109,8 +109,6 @@ ENTRY_LABEL = re.compile(r"(//\s*ENTRY:\s*0x([0-9a-fA-F]+))(?:([ \t]+)(\S+))?([ 
 TRAILING = re.compile(r"^(.*?\S)(\s{2,})(//.*?)(\r?)$")
 
 
-# --- the scanner ------------------------------------------------------------------------
-
 def segments(text: str) -> list[tuple[str, str]]:
     """The text cut into ("code" | "comment" | "literal", text) pieces, in order."""
     out, i, n, start, kind = [], 0, len(text), 0, "code"
@@ -194,7 +192,6 @@ class Renamer:
         new = "".join(out)
         if new == text:
             return text
-        # Keep trailing comments in their column where a name got shorter or longer.
         old_lines, new_lines = text.split("\n"), new.split("\n")
         for i, (o, n) in enumerate(zip(old_lines, new_lines)):
             if o == n:
@@ -206,8 +203,6 @@ class Renamer:
         return "\n".join(new_lines)
 
 
-# --- what is refused ------------------------------------------------------------------------
-
 class Tree:
     """What the refusals need from every source file, read once."""
 
@@ -216,9 +211,6 @@ class Tree:
         self.headers = {p for p in texts if p.suffix == ".h"}
         self.codes = {p: code_of(t) for p, t in texts.items()}
         self.tokens = {p: set(TOKEN.findall(c)) for p, c in self.codes.items()}
-        # A file that includes one of the generated headers sees its names too,
-        # unless it includes it inside a namespace (`namespace ta { #include ... }`,
-        # for the header's symbol count alone), where they cannot clash with its own.
         self.included: dict[Path, set[str]] = defaultdict(set)
         for p, text in texts.items():
             for m in re.finditer(r'^\s*#\s*include\s*["<]([^">]+)[">]', text, re.M):
@@ -246,11 +238,10 @@ def refusals(pairs: list[tuple[str, str]], tree: Tree, join: bool) -> dict[tuple
     groups: dict[str, set[str]] = defaultdict(set)
     for old, new in pairs:
         groups[new].add(old)
-    rel = lambda p: str(p.relative_to(ROOT))  # noqa: E731
-    # Which class each name is a method of, from data/symbols.csv's `Class::FUN_`
-    # rows: the one clash a rename allows below is between methods of different
-    # classes. A name the table gives no class is no method (a free function, a
-    # type, a global).
+
+    def rel(p):
+        return str(p.relative_to(ROOT))
+
     rows = symbols_rows()
     members: dict[str, set[str]] = defaultdict(set)
     plain: set[str] = set()
@@ -290,7 +281,6 @@ def refusals(pairs: list[tuple[str, str]], tree: Tree, join: bool) -> dict[tuple
             out[(old, new)].append(f"{new} is already a type in {len(types)} file(s) ({rel(types[0])}, ...): "
                                    f"renaming {old} to it makes their views one type; pass --join if the "
                                    f"evidence says they are")
-    # The name table after the rename: one address per name.
     if rows:
         renamer = Renamer(pairs)
         seen: dict[str, tuple[str, str]] = {}
@@ -304,8 +294,6 @@ def refusals(pairs: list[tuple[str, str]], tree: Tree, join: bool) -> dict[tuple
             seen.setdefault(name, (r["address"], r["name"]))
     return out
 
-
-# --- the rewrite and the checks ------------------------------------------------------------
 
 def sources_and_headers() -> list[Path]:
     return sorted(p for d in CODE_DIRS for p in (ROOT / d).rglob("*") if p.suffix in CODE_SUFFIXES and p.is_file())
@@ -415,13 +403,11 @@ def main() -> None:
             print(f"  {old} -> {new}: {'; '.join(dict.fromkeys(why))}")
         if not args.keep_going:
             sys.exit(2)
-        # Without the refused pairs, others may now pass (or clash): look again.
         gone = {base_of[pr] for pr in refused}
         pairs = [p for p in pairs if p not in gone]
         if not pairs:
             sys.exit(2)
     pairs += list(extra)
-    # A join gives many views one name: the docs keep the names they tell apart.
     changed = apply(pairs, texts, args.dry_run, docs=not args.join)
     for f in changed:
         print(f)

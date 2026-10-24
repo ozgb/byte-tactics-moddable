@@ -81,14 +81,12 @@ GAME_DIRS = [
     Path.home() / ".steam/steam/steamapps/common/Total Annihilation",
     Path.home() / "GOG Games/Total Annihilation",
 ]
-# Files at least this big are linked into the run's game directory, not copied
-# (the .hpi/.ccx archives the game only reads).
 LINK_SIZE = 4_000_000
 REGKEY = r"HKEY_CURRENT_USER\Software\Cavedog Entertainment\Total Annihilation"
-POLL = 1.0          # seconds between checks of the watched screens while waiting
-SOUND_LEVEL = 200   # RMS (16-bit samples) above which a second counts as sound
+POLL = 1.0
+SOUND_LEVEL = 200
 PREFIX_WRITTEN = ("system.reg", "user.reg", "userdef.reg", ".update-timestamp")
-TEMPLATE_REVISION = 2   # bump to remake the template prefixes
+TEMPLATE_REVISION = 2
 
 _live: list["Instance"] = []
 _live_lock = threading.Lock()
@@ -100,9 +98,6 @@ def log_time(t0: float) -> str:
     return f"{int(s // 60):3d}:{s % 60:05.2f}"
 
 
-# --- screens --------------------------------------------------------------
-
-
 @dataclass
 class Screen:
     """A known screen, recognised by a signature of one area of it."""
@@ -112,12 +107,12 @@ class Screen:
     y: int
     w: int
     h: int
-    kind: str                      # "grid": mean grey per cell; "mask": text over any background
+    kind: str
     cell: int = 4
     tolerance: float = 8.0
     grid: list[int] = field(default_factory=list)
-    bright: list[int] = field(default_factory=list)   # mask: indexes of the text's bright pixels
-    dark: list[int] = field(default_factory=list)     # mask: indexes of its dark outline
+    bright: list[int] = field(default_factory=list)
+    dark: list[int] = field(default_factory=list)
 
     def distance(self, img: "Gray") -> float:
         """Grid: mean difference per cell (0 to 255). Mask: share of mask pixels that disagree."""
@@ -250,9 +245,6 @@ def make_signature(name: str, geo: str, images: list[Path], kind: str, cell: int
     return f"{name} {geo} grid {cell} {tolerance:g} {bytes(mean).hex()}"
 
 
-# --- one game instance ----------------------------------------------------
-
-
 def find_game_dir(arg: str | None) -> Path:
     if arg:
         return Path(arg).expanduser()
@@ -375,14 +367,14 @@ class Instance:
         self.shot_every = 0.0
         self.shot_event = threading.Event()
         self.sound_seconds = 0
-        self.music_seconds = 0     # seconds with sound while a music track was open
+        self.music_seconds = 0
         self.loudest = 0
-        self.music: dict[str, float] = {}     # track -> first time it was open
+        self.music: dict[str, float] = {}
         self.music_open: set[str] = set()
         self.last_level = 0
         self.stop_lock = threading.Lock()
         self.stopped = False
-        self.quit = False          # exited when the scenario told it to
+        self.quit = False
 
     def env(self) -> dict[str, str]:
         env = wine_env(self.prefix, self.display)
@@ -390,7 +382,6 @@ class Instance:
             env["PULSE_SINK"] = self.sink
         return env
 
-    # setting up
 
     def prepare(self, template: Path, game_src: Path, reg: list[str], files: dict[str, str]) -> None:
         self.base.mkdir(parents=True, exist_ok=True)
@@ -491,7 +482,6 @@ class Instance:
         t.start()
         self.threads.append(t)
 
-    # watching
 
     def alive(self) -> bool:
         """Is the game running? Notes its exit code when it has ended by itself."""
@@ -508,7 +498,7 @@ class Instance:
         log.write("# second, RMS of the game's output (16-bit), music files open\n")
         n = 0
         while not self.stop_threads.is_set() and self.parec and self.parec.stdout:
-            chunk = self.parec.stdout.read(16000)      # one second at 8 kHz
+            chunk = self.parec.stdout.read(16000)
             if not chunk:
                 break
             samples = memoryview(chunk).cast("h") if len(chunk) % 2 == 0 else memoryview(chunk[:-1]).cast("h")
@@ -569,7 +559,6 @@ class Instance:
             if self.shot_every > 0 and self.alive():
                 self.shot(f"auto_{int(time.time() - self.run.t0):05d}{self.suffix}", jpeg=True)
 
-    # input and output
 
     def xdo(self, *args: str) -> None:
         subprocess.run(["xdotool", *args], env={**os.environ, "DISPLAY": self.display}, capture_output=True)
@@ -619,7 +608,6 @@ class Instance:
         subprocess.run([*args, str(path)], env={**os.environ, "DISPLAY": self.display},
                        capture_output=True, timeout=30)
 
-    # stopping
 
     def stop(self) -> None:
         """Stop everything this instance started; safe to call twice and from two threads."""
@@ -637,7 +625,6 @@ class Instance:
                 subprocess.run(["wineserver", "-k"], env=wine_env(self.prefix), capture_output=True, timeout=30)
             except subprocess.TimeoutExpired:
                 pass
-        # The game first, so that it is gone before its X server.
         for p in (self.wine, self.parec, self.xserver):
             if p and p.poll() is None:
                 try:
@@ -656,7 +643,6 @@ class Instance:
                         os.killpg(p.pid, signal.SIGKILL)
                     except OSError:
                         pass
-        # Anything else still running in the prefix (winedevice, services...).
         for pid in prefix_pids(str(self.prefix)):
             try:
                 os.kill(pid, signal.SIGKILL)
@@ -707,9 +693,6 @@ def stop_all(*_args) -> None:
             pass
 
 
-# --- scenarios ------------------------------------------------------------
-
-
 @dataclass
 class Scenario:
     name: str
@@ -740,7 +723,6 @@ def load_scenario(name: str) -> Scenario:
         elif cmd == "timeout":
             sc.timeout = float(words[1]) * 60
         elif cmd == "reg":
-            # reg [<subkey>/]<name> dword|sz <value>
             key, _, val_name = words[1].rpartition("/")
             full = REGKEY + ("\\" + key.replace("/", "\\") if key else "")
             if words[2] == "dword":
@@ -759,7 +741,6 @@ def load_scenario(name: str) -> Scenario:
     return sc
 
 
-# Each step, with how many arguments it needs and where a screen or label goes.
 STEPS = {
     "start": 0, "sleep": 1, "click": 2, "sclick": 2, "dclick": 2, "hold": 2, "drag": 4, "move": 2,
     "key": 1, "keyhold": 2, "type": 1, "chat": 1, "shot": 1, "every": 1, "waitfor": 2, "trywait": 2,
@@ -862,15 +843,15 @@ class Run:
         self.number = number
         self.name = name
         self.scenario = scenario
-        self.exes = exes             # one per instance; the last serves any more
+        self.exes = exes
         self.exe_tag = exe_tag
         self.out = session / name
         self.work = OUT / "work" / f"{session.name}-{name}"
         self.screens = screens
         self.debug = debug
-        self.window = window         # a visible Xephyr window instead of an invisible Xvfb display
-        self.testmode = testmode     # a reference/ scenario file to run the exe on
-        self.testdump = testdump     # the tick to dump the state of, with testmode
+        self.window = window
+        self.testmode = testmode
+        self.testdump = testdump
         self.poison = poison
         self.blockscan = blockscan
         self.windowed = windowed
@@ -970,7 +951,6 @@ class Run:
             inst.xdo("mousemove", args[0], args[1], "sleep", "0.15", "mousedown", button, "sleep", "0.12",
                      "mouseup", button)
         elif cmd == "sclick":
-            # shift-click: queue an order, or five of a unit in a factory's menu
             inst.xdo("mousemove", args[0], args[1], "sleep", "0.15", "keydown", "shift", "sleep", "0.05",
                      "mousedown", "1", "sleep", "0.12", "mouseup", "1", "sleep", "0.05", "keyup", "shift")
         elif cmd == "dclick":
@@ -1010,7 +990,6 @@ class Run:
         elif cmd == "trywait":
             self.waitfor(inst, args[0], float(args[1]))
         elif cmd == "until":
-            # until <screen> <timeout> <step> [; <step>...]: repeat the steps until the screen shows
             deadline = time.time() + float(args[1])
             while not self.on_screen(inst, args[0]):
                 if time.time() > deadline:
@@ -1107,9 +1086,6 @@ class Run:
                   f"scenario {self.scenario.name}")
         lock = None
         if self.scenario.directplay:
-            # A host on 127.0.0.1 holds DirectPlay's port, and a guest joins the
-            # first game it finds there: one network game at a time on this
-            # machine, also across sessions.
             lock = (Path(tempfile.gettempdir()) / f"byte-tactics-playtest-{os.getuid()}.lock").open("w")
             self.note("  waiting for the network (one DirectPlay game at a time)")
             while True:
@@ -1149,7 +1125,7 @@ class Run:
             for inst in self.instances:
                 if inst.alive():
                     inst.shot(f"failed{inst.suffix}")
-        except (Exception, SystemExit) as e:     # a broken harness, not a broken game
+        except (Exception, SystemExit) as e:
             self.result, self.reason = "ERROR", f"{type(e).__name__}: {e}"
         finally:
             self.duration = time.time() - self.t0
@@ -1193,9 +1169,6 @@ class Run:
             "loudest": [i.loudest for i in self.instances],
         }
         (self.out / "result.json").write_text(json.dumps(data, indent=1) + "\n")
-
-
-# --- the session ----------------------------------------------------------
 
 
 def resolve_exes(values: list[str]) -> list[list[tuple[str, Path]]]:
@@ -1244,7 +1217,7 @@ def stub_traps(exe: Path, out: Path) -> str:
         va = int(m.group(2), 16)
         if m.group(3):
             off = pe.get_offset_from_rva(va - base)
-            if data[off] != 0x31:           # xor eax, eax; ret
+            if data[off] != 0x31:
                 raise SystemExit(f"{exe}: {m.group(1)} at {va:#x} is not a stub")
             data[off] = 0xCC
             funcs += 1
@@ -1252,7 +1225,7 @@ def stub_traps(exe: Path, out: Path) -> str:
         datas += 1
         needle = va.to_bytes(4, "little")
         for sec in pe.sections:
-            if not sec.Characteristics & 0x20000000:      # code
+            if not sec.Characteristics & 0x20000000:
                 continue
             lo, hi = sec.PointerToRawData, sec.PointerToRawData + sec.SizeOfRawData
             i = data.find(needle, lo, hi)
@@ -1454,8 +1427,6 @@ def main() -> None:
     atexit.register(stop_all)
 
     def interrupt(*_args) -> None:
-        # Only set the flag: the main loop stops the games (a handler that took locks could
-        # deadlock), each run ends as INTERRUPTED and the summary is still written.
         _interrupted.set()
 
     for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):

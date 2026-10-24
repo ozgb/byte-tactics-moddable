@@ -29,12 +29,10 @@ EXTRACTED = OUT / "art"
 RES = OUT / "TotalA.res"
 OBJ = OUT / "TotalA.obj"
 EXE = ROOT / "orig/TotalA.exe"
-ART = ("TotalA.ico", "TotalA.cur")       # the files the script names
+ART = ("TotalA.ico", "TotalA.cur")
 
 RT_CURSOR, RT_ICON, RT_GROUP_CURSOR, RT_GROUP_ICON, RT_VERSION = 1, 3, 12, 14, 16
 
-
-# --- the art --------------------------------------------------------------------------
 
 def art_dir(given: Path | None = None, extracted: Path = EXTRACTED) -> Path:
     """The directory holding the icon and cursor: --art, BT_ART_DIR, or the
@@ -78,8 +76,6 @@ def write_atomic(path: Path, data: bytes) -> None:
     os.replace(temp, path)
 
 
-# --- extracting ---------------------------------------------------------------------
-
 def resources(pe) -> list[tuple[int, int, int, bytes]]:
     """(type, id, language, data) for every resource, in the order of their data."""
     image = pe.get_memory_mapped_image()
@@ -108,8 +104,6 @@ def group_file(group: bytes, images: dict[int, bytes], cursor: bool) -> bytes:
         (ident,) = struct.unpack_from("<H", e, 12)
         data = images[ident]
         if cursor:
-            # The group gives a cursor's width and height as words, the height
-            # doubled (the image and its mask); the file, as bytes.
             width, height, _, _ = struct.unpack_from("<HHHH", e, 0)
             hx, hy = struct.unpack_from("<HH", data, 0)
             data = data[4:]
@@ -166,8 +160,6 @@ def version_block(data: bytes) -> list[str]:
                 children(value_at, at + length, depth + 1)
                 lines.append(f"{pad}END")
             elif kind == 1:
-                # A string, its length in characters with the terminator, which
-                # the script spells out as Developer Studio's scripts do.
                 text = data[value_at:value_at + 2 * value_len].decode("utf-16-le")
                 assert text.endswith("\0")
                 lines.append(f"{pad}VALUE {rc_string(key)}, {rc_string(text[:-1])[:-1]}\\0\"")

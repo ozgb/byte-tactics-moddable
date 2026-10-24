@@ -4677,18 +4677,18 @@ address,function,file,kind,target
 0x416780,CmdSearch,src/game/console_commands.cpp,global_read,g_game
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,call,Sound::PlayCdTrack
-0x4167f0,CmdCDPlay,src/game/console_commands.cpp,field_read,Game::field_10
+0x4167f0,CmdCDPlay,src/game/console_commands.cpp,field_read,Game::sound
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,function,
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,global_read,g_game
 0x416810,CmdCDStop,src/game/console_commands.cpp,call,Sound::StopCdAudio
-0x416810,CmdCDStop,src/game/console_commands.cpp,field_read,Game::field_10
+0x416810,CmdCDStop,src/game/console_commands.cpp,field_read,Game::sound
 0x416810,CmdCDStop,src/game/console_commands.cpp,function,
 0x416810,CmdCDStop,src/game/console_commands.cpp,global_read,g_game
 0x416820,CmdSound3D,src/game/console_commands.cpp,call,SaveSettings
 0x416820,CmdSound3D,src/game/console_commands.cpp,call,Sound::Disable3D
 0x416820,CmdSound3D,src/game/console_commands.cpp,call,Sound::Enable3D
 0x416820,CmdSound3D,src/game/console_commands.cpp,call,Sound::Is3DEnabled
-0x416820,CmdSound3D,src/game/console_commands.cpp,field_read,Game::field_10
+0x416820,CmdSound3D,src/game/console_commands.cpp,field_read,Game::sound
 0x416820,CmdSound3D,src/game/console_commands.cpp,function,
 0x416820,CmdSound3D,src/game/console_commands.cpp,global_read,g_game
 0x416860,CmdMove,src/game/console_commands.cpp,call,CommandArgs::GetArg
@@ -5934,7 +5934,7 @@ address,function,file,kind,target
 0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,function,
 0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,global_read,g_game
 0x41c3c0,ClampCameraPosition,src/ingame/control_panel.cpp,call,CalcRadarViewportRect
-0x41c3c0,ClampCameraPosition,src/ingame/control_panel.cpp,field_escape,Game::field_142cb_142cb
+0x41c3c0,ClampCameraPosition,src/ingame/control_panel.cpp,field_escape,Game::radarViewport
 0x41c3c0,ClampCameraPosition,src/ingame/control_panel.cpp,field_read,Game::mapHeight
 0x41c3c0,ClampCameraPosition,src/ingame/control_panel.cpp,field_read,Game::mapWidth
 0x41c3c0,ClampCameraPosition,src/ingame/control_panel.cpp,field_read,Game::scrollX
@@ -6565,12 +6565,12 @@ address,function,file,kind,target
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::desiredPalette
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::difficulty
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::fadeTable
-0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::field_10
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::image_3907b
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::lastFrame
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::net
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::options
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::palette_3907f
+0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Game::sound
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Gui::hotGadgetIndex
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Gui::layer
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_read,Layer::data
@@ -6769,7 +6769,6 @@ address,function,file,kind,target
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::deadline
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::done
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::endGameState
-0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::field_10
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::image_3907b
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::lastFrame
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::localPlayer
@@ -6780,6 +6779,7 @@ address,function,file,kind,target
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::screen
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::screenHeight
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::skip
+0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::sound
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::statBarStep
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::steps
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::width_37e1f
@@ -8206,7 +8206,7 @@ address,function,file,kind,target
 0x426190,HandleCloseCdPlayerChoice,src/frontend/frontend.cpp,field_read,GadgetOwner_00426190::gadgets
 0x426190,HandleCloseCdPlayerChoice,src/frontend/frontend.cpp,field_read,Gadget_00426190::owner
 0x426190,HandleCloseCdPlayerChoice,src/frontend/frontend.cpp,field_read,Gadget_00426190::selected
-0x426190,HandleCloseCdPlayerChoice,src/frontend/frontend.cpp,field_read,Game::field_10
+0x426190,HandleCloseCdPlayerChoice,src/frontend/frontend.cpp,field_read,Game::sound
 0x426190,HandleCloseCdPlayerChoice,src/frontend/frontend.cpp,function,
 0x426190,HandleCloseCdPlayerChoice,src/frontend/frontend.cpp,global_read,g_game
 0x426200,OpenCloseCdPlayerDialog,src/frontend/frontend.cpp,call,FindGadgetIndex
@@ -8265,9 +8265,9 @@ address,function,file,kind,target
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,deref_read,*short
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,deref_write,*short
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_maybe_written,Game::gui
-0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_read,Game::field_10
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_read,Game::fontComix
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_read,Game::screen
+0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_read,Game::sound
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_read,Gui::colours
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_read,Gui::layer
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_read,Layer::gadgets
@@ -8755,11 +8755,11 @@ address,function,file,kind,target
 0x429870,LoadGameResources,src/game/data_files.cpp,field_escape,Game::sidePanelSideSeq
 0x429870,LoadGameResources,src/game/data_files.cpp,field_escape,Game::sidePanelTopSeq
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::alfboom1
+0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::cursorsGaf
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::explode2
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::explode3
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::explode4
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::explode5
-0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::field_14903
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::fog
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::fxGaf
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::igTitles
@@ -8796,12 +8796,13 @@ address,function,file,kind,target
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::cursorTeleport
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::cursorTooFar
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::cursorUnload
+0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::cursorsGaf
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::explode2
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::explode3
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::explode4
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::explode5
-0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::field_14903
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::fire1
+0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::flamestreamGaf
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::fog
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::fxGaf
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::gaf_147bb
@@ -8830,7 +8831,6 @@ address,function,file,kind,target
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::src1
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::src2
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::src3
-0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::unknown_147f3
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::vismasks
 0x429870,LoadGameResources,src/game/data_files.cpp,function,
 0x429870,LoadGameResources,src/game/data_files.cpp,global_maybe_written,DAT_005119b8
@@ -8841,8 +8841,8 @@ address,function,file,kind,target
 0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_read,Game::entries_147af
 0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_read,Game::sides
 0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_write,Game::count_147ab
+0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_write,Game::cursorsGaf
 0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_write,Game::entries_147af
-0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_write,Game::field_14903
 0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_write,Game::fog
 0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_write,Game::fxGaf
 0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_write,Game::gafAnimClearedSlot
@@ -9565,12 +9565,12 @@ address,function,file,kind,target
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_escape,UnitDef::unitname
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_maybe_written,UnitDef::unitname
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::defs
+0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::displayContext
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::screenHeight
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::types
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::unitDefCount
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::unitDefCountBits
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::unitTable
-0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::unknown_c
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::width_37e1f
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,TdfFile::current
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,UnitDef::canbuild
@@ -9977,14 +9977,14 @@ address,function,file,kind,target
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Flags_0042f9a0::vehicleShadows
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::brightness
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::difficulty
-0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::field_10
+0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::displayContext
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::gameSpeed
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::interfaceType
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::net
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::options
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::playerCount
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::scrollSpeed
-0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::unknown_c
+0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,Game::sound
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,MapSeam::GetMissionName
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,MapSeam::RefreshMapList
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_read,MapSeam::SetMissionType
@@ -10063,7 +10063,6 @@ address,function,file,kind,target
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::brightness
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::cdMode
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::difficulty
-0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::field_10
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::flag_37ef2
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::gameSpeed
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::height_37f1f
@@ -10084,6 +10083,7 @@ address,function,file,kind,target
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::singleLOSType
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::singleLineOfSight
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::singleMapping
+0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::sound
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::textLines
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::textScroll
 0x430f00,SaveSettings,src/game/settings.cpp,field_read,Game::unitChat
@@ -11437,11 +11437,8 @@ address,function,file,kind,target
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,deref_write,*Pos
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_escape,Order::pos
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Fixed::whole
+0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Game::colors
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Game::defs
-0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Game::field_dcc
-0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Game::field_dce
-0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Game::field_dd4
-0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Game::field_dd5
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Game::ticks
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Order::created
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Order::type
@@ -11478,12 +11475,9 @@ address,function,file,kind,target
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,call,operator!=
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,call,operator->
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_escape,Unit::pos
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Game::field_dcf
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Game::field_dd7
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Game::field_dda
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Game::colors
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Game::showRanges
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Game::ticks
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Game::unknown_dd9
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Order::unit
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Unit::activateFlags
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Unit::def
@@ -11549,8 +11543,7 @@ address,function,file,kind,target
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Anim::count
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Anim::duration
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Fixed::whole
-0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Game::field_dcf
-0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Game::field_dd7
+0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Game::colors
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Game::showRanges
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Game::ticks
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,MissionOrderTableEntry::markerAnim
@@ -11589,7 +11582,7 @@ address,function,file,kind,target
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_escape,Order::pos
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_escape,Unit::pos
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,Fixed::whole
-0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,Game::field_dd7
+0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,Game::colors
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,Order::target
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,Unit::def
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,UnitType::field_178
@@ -18511,7 +18504,7 @@ address,function,file,kind,target
 0x45bcc0,ApplyBrightnessAndVolume,src/frontend/options.cpp,call,Sound::SetAuxVolume
 0x45bcc0,ApplyBrightnessAndVolume,src/frontend/options.cpp,call,Sound::SetWaveVolume
 0x45bcc0,ApplyBrightnessAndVolume,src/frontend/options.cpp,field_read,Game::brightness
-0x45bcc0,ApplyBrightnessAndVolume,src/frontend/options.cpp,field_read,Game::field_10
+0x45bcc0,ApplyBrightnessAndVolume,src/frontend/options.cpp,field_read,Game::sound
 0x45bcc0,ApplyBrightnessAndVolume,src/frontend/options.cpp,field_read,Game::volume1
 0x45bcc0,ApplyBrightnessAndVolume,src/frontend/options.cpp,field_read,Game::volume2
 0x45bcc0,ApplyBrightnessAndVolume,src/frontend/options.cpp,function,
@@ -18600,7 +18593,7 @@ address,function,file,kind,target
 0x45c330,HandleTextScrollSlider,src/frontend/options.cpp,function,
 0x45c330,HandleTextScrollSlider,src/frontend/options.cpp,global_read,g_game
 0x45c3d0,SetLockedCdTrack,src/frontend/options.cpp,call,Sound::SetLockedTrack
-0x45c3d0,SetLockedCdTrack,src/frontend/options.cpp,field_read,Game::field_10
+0x45c3d0,SetLockedCdTrack,src/frontend/options.cpp,field_read,Game::sound
 0x45c3d0,SetLockedCdTrack,src/frontend/options.cpp,function,
 0x45c3d0,SetLockedCdTrack,src/frontend/options.cpp,global_read,g_game
 0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,call,FindGadgetIndex
@@ -18614,8 +18607,8 @@ address,function,file,kind,target
 0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,call,strcpy
 0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,field_escape,Game::menu_519_1c
 0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,field_read,Game::cdMode
-0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,field_read,Game::field_10
 0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,field_read,Game::musicMode
+0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,field_read,Game::sound
 0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,field_read,Holder_0045b800::entries
 0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,field_read,Menu_0045b800::holder
 0x45c3f0,UpdateTrackGadgets,src/frontend/options.cpp,function,
@@ -18625,7 +18618,7 @@ address,function,file,kind,target
 0x45c510,ApplyTrackType,src/frontend/options.cpp,call,Sound::SetCategoryOfTrack
 0x45c510,ApplyTrackType,src/frontend/options.cpp,field_read,Gadget::stageIndex
 0x45c510,ApplyTrackType,src/frontend/options.cpp,field_read,Game::cdMode
-0x45c510,ApplyTrackType,src/frontend/options.cpp,field_read,Game::field_10
+0x45c510,ApplyTrackType,src/frontend/options.cpp,field_read,Game::sound
 0x45c510,ApplyTrackType,src/frontend/options.cpp,field_read,Holder_0045b800::entries
 0x45c510,ApplyTrackType,src/frontend/options.cpp,field_read,Menu_0045b800::holder
 0x45c510,ApplyTrackType,src/frontend/options.cpp,function,
@@ -18638,7 +18631,7 @@ address,function,file,kind,target
 0x45c570,ApplyDefaultSoundOptions,src/frontend/options.cpp,deref_read,*SoundFlags_0045cf60
 0x45c570,ApplyDefaultSoundOptions,src/frontend/options.cpp,field_escape,Game::soundFlags
 0x45c570,ApplyDefaultSoundOptions,src/frontend/options.cpp,field_read,Game::brightness
-0x45c570,ApplyDefaultSoundOptions,src/frontend/options.cpp,field_read,Game::field_10
+0x45c570,ApplyDefaultSoundOptions,src/frontend/options.cpp,field_read,Game::sound
 0x45c570,ApplyDefaultSoundOptions,src/frontend/options.cpp,field_read,Game::volume1
 0x45c570,ApplyDefaultSoundOptions,src/frontend/options.cpp,field_read,Game::volume2
 0x45c570,ApplyDefaultSoundOptions,src/frontend/options.cpp,field_read,SoundFlags_0045cf60::word
@@ -18652,8 +18645,8 @@ address,function,file,kind,target
 0x45c570,ApplyDefaultSoundOptions,src/frontend/options.cpp,global_read,g_game
 0x45c630,ApplyDefaultMusicOptions,src/frontend/options.cpp,call,ApplyBrightnessAndVolume
 0x45c630,ApplyDefaultMusicOptions,src/frontend/options.cpp,call,Sound::PlayNextTrack
-0x45c630,ApplyDefaultMusicOptions,src/frontend/options.cpp,field_read,Game::field_10
 0x45c630,ApplyDefaultMusicOptions,src/frontend/options.cpp,field_read,Game::flags_37f14
+0x45c630,ApplyDefaultMusicOptions,src/frontend/options.cpp,field_read,Game::sound
 0x45c630,ApplyDefaultMusicOptions,src/frontend/options.cpp,field_write,Game::cdMode
 0x45c630,ApplyDefaultMusicOptions,src/frontend/options.cpp,field_write,Game::flags_37f14
 0x45c630,ApplyDefaultMusicOptions,src/frontend/options.cpp,field_write,Game::volume2
@@ -18674,7 +18667,7 @@ address,function,file,kind,target
 0x45c740,ApplyDefaultVisualOptions,src/frontend/options.cpp,call,Sound::SetWaveVolume
 0x45c740,ApplyDefaultVisualOptions,src/frontend/options.cpp,field_read,<anon>::bit2
 0x45c740,ApplyDefaultVisualOptions,src/frontend/options.cpp,field_read,Game::brightness
-0x45c740,ApplyDefaultVisualOptions,src/frontend/options.cpp,field_read,Game::field_10
+0x45c740,ApplyDefaultVisualOptions,src/frontend/options.cpp,field_read,Game::sound
 0x45c740,ApplyDefaultVisualOptions,src/frontend/options.cpp,field_read,Game::volume1
 0x45c740,ApplyDefaultVisualOptions,src/frontend/options.cpp,field_read,Game::volume2
 0x45c740,ApplyDefaultVisualOptions,src/frontend/options.cpp,field_write,<anon>::bit1
@@ -18694,7 +18687,7 @@ address,function,file,kind,target
 0x45c820,RestoreSoundOptions,src/frontend/options_45c820.cpp,call,Sound::SetAuxVolume
 0x45c820,RestoreSoundOptions,src/frontend/options_45c820.cpp,call,Sound::SetWaveVolume
 0x45c820,RestoreSoundOptions,src/frontend/options_45c820.cpp,field_read,Game::brightness
-0x45c820,RestoreSoundOptions,src/frontend/options_45c820.cpp,field_read,Game::field_10
+0x45c820,RestoreSoundOptions,src/frontend/options_45c820.cpp,field_read,Game::sound
 0x45c820,RestoreSoundOptions,src/frontend/options_45c820.cpp,field_read,Game::soundFlags_37f19_2
 0x45c820,RestoreSoundOptions,src/frontend/options_45c820.cpp,field_read,Game::volume1
 0x45c820,RestoreSoundOptions,src/frontend/options_45c820.cpp,field_read,Game::volume2
@@ -18712,8 +18705,8 @@ address,function,file,kind,target
 0x45c950,LoadSavedAudioSettings,src/frontend/options.cpp,call,Sound::SetLockedTrack
 0x45c950,LoadSavedAudioSettings,src/frontend/options.cpp,call,Sound::SetPlaybackOrder
 0x45c950,LoadSavedAudioSettings,src/frontend/options.cpp,field_read,Game::cdMode
-0x45c950,LoadSavedAudioSettings,src/frontend/options.cpp,field_read,Game::field_10
 0x45c950,LoadSavedAudioSettings,src/frontend/options.cpp,field_read,Game::flags_37f14
+0x45c950,LoadSavedAudioSettings,src/frontend/options.cpp,field_read,Game::sound
 0x45c950,LoadSavedAudioSettings,src/frontend/options.cpp,field_read,OptionsBackupMusicMode::i
 0x45c950,LoadSavedAudioSettings,src/frontend/options.cpp,field_write,Game::cdMode
 0x45c950,LoadSavedAudioSettings,src/frontend/options.cpp,field_write,Game::flags_37f14
@@ -18748,8 +18741,8 @@ address,function,file,kind,target
 0x45cae0,RestoreVisualOptions,src/frontend/options.cpp,call,Sound::SetAuxVolume
 0x45cae0,RestoreVisualOptions,src/frontend/options.cpp,call,Sound::SetWaveVolume
 0x45cae0,RestoreVisualOptions,src/frontend/options.cpp,field_read,Game::brightness
-0x45cae0,RestoreVisualOptions,src/frontend/options.cpp,field_read,Game::field_10
 0x45cae0,RestoreVisualOptions,src/frontend/options.cpp,field_read,Game::netGameFlags
+0x45cae0,RestoreVisualOptions,src/frontend/options.cpp,field_read,Game::sound
 0x45cae0,RestoreVisualOptions,src/frontend/options.cpp,field_read,Game::visualFlags
 0x45cae0,RestoreVisualOptions,src/frontend/options.cpp,field_read,Game::volume1
 0x45cae0,RestoreVisualOptions,src/frontend/options.cpp,field_read,Game::volume2
@@ -18774,8 +18767,8 @@ address,function,file,kind,target
 0x45cc50,LoadSavedSettings,src/frontend/options.cpp,call,Sound::SetWaveVolume
 0x45cc50,LoadSavedSettings,src/frontend/options.cpp,field_read,Game::brightness
 0x45cc50,LoadSavedSettings,src/frontend/options.cpp,field_read,Game::cdMode
-0x45cc50,LoadSavedSettings,src/frontend/options.cpp,field_read,Game::field_10
 0x45cc50,LoadSavedSettings,src/frontend/options.cpp,field_read,Game::flags_37f14
+0x45cc50,LoadSavedSettings,src/frontend/options.cpp,field_read,Game::sound
 0x45cc50,LoadSavedSettings,src/frontend/options.cpp,field_read,Game::volume1
 0x45cc50,LoadSavedSettings,src/frontend/options.cpp,field_read,Game::volume2
 0x45cc50,LoadSavedSettings,src/frontend/options.cpp,field_read,OptionsBackupEdgeScroll::i
@@ -18815,9 +18808,9 @@ address,function,file,kind,target
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_escape,Settings_45cde0::block
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,<anon>::bit1
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,<anon>::bit2
-0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,Game::field_10
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,Game::gameSpeed
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,Game::scrollSpeed
+0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,Game::sound
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_write,OptionsBackupEdgeScroll::i
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_write,OptionsBackupGameSpeed::i
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_write,Settings_45cde0::bit0
@@ -18880,9 +18873,9 @@ address,function,file,kind,target
 0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,field_read,<anon>::loaded
 0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,field_read,<anon>::prefs
-0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,field_read,Game::field_10
 0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,field_read,Game::net
 0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,field_read,Game::pauseFlags
+0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,field_read,Game::sound
 0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,field_write,<anon>::loaded
 0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,field_write,Game::pauseFlags
 0x45cfc0,OpenOptionsLayout,src/frontend/options.cpp,function,
@@ -18894,7 +18887,7 @@ address,function,file,kind,target
 0x45d0c0,TickMusicOptions,src/frontend/options.cpp,call,atoi
 0x45d0c0,TickMusicOptions,src/frontend/options.cpp,field_escape,Game::gui
 0x45d0c0,TickMusicOptions,src/frontend/options.cpp,field_maybe_written,Game::gui
-0x45d0c0,TickMusicOptions,src/frontend/options.cpp,field_read,Game::field_10
+0x45d0c0,TickMusicOptions,src/frontend/options.cpp,field_read,Game::sound
 0x45d0c0,TickMusicOptions,src/frontend/options.cpp,function,
 0x45d0c0,TickMusicOptions,src/frontend/options.cpp,global_read,g_game
 0x45d0c0,TickMusicOptions,src/frontend/options.cpp,global_write,g_musicUiSelectedTrack
@@ -18938,7 +18931,7 @@ address,function,file,kind,target
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_read,Gadget::stageIndex
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_read,Gadget::state
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_read,Game::cdMode
-0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_read,Game::field_10
+0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_read,Game::sound
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_read,Holder_0045d280::entries
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_read,Holder_0045d280::next
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_read,Object_0045d280::holder
@@ -18987,7 +18980,7 @@ address,function,file,kind,target
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_read,Gadget::range
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_read,Gadget::stageIndex
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_read,Game::cdMode
-0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_read,Game::field_10
+0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_read,Game::sound
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_read,Game::volume2Word
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_read,Gui::layer
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_read,Holder_0045d7c0::gadgets
@@ -19048,7 +19041,7 @@ address,function,file,kind,target
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_read,Gadget::stageIndex
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_read,Gadget::type
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_read,Game::brightness
-0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_read,Game::field_10
+0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_read,Game::sound
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_read,Game::volume1
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_read,Game::volume2
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_read,Holder_0045da90::entries
@@ -19147,7 +19140,7 @@ address,function,file,kind,target
 0x45e100,HandleVisualOptionsClick,src/frontend/options.cpp,field_read,FreeObj_0045e100::field_4
 0x45e100,HandleVisualOptionsClick,src/frontend/options.cpp,field_read,Gadget::state
 0x45e100,HandleVisualOptionsClick,src/frontend/options.cpp,field_read,Game::brightness
-0x45e100,HandleVisualOptionsClick,src/frontend/options.cpp,field_read,Game::field_10
+0x45e100,HandleVisualOptionsClick,src/frontend/options.cpp,field_read,Game::sound
 0x45e100,HandleVisualOptionsClick,src/frontend/options.cpp,field_read,Game::unitTable
 0x45e100,HandleVisualOptionsClick,src/frontend/options.cpp,field_read,Game::volume1
 0x45e100,HandleVisualOptionsClick,src/frontend/options.cpp,field_read,Game::volume2
@@ -19481,8 +19474,8 @@ address,function,file,kind,target
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,Flags37f14_0045cf60::word
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,Game::brightness
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,Game::cdMode
-0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,Game::field_10
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,Game::screen
+0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,Game::sound
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,Game::volume1
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,Game::volume2
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,Gui::hotGadgetIndex
@@ -19574,9 +19567,9 @@ address,function,file,kind,target
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Gadget::surface
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Gadget::width
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Gadget::y
-0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Game::field_10
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Game::gameSpeed
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Game::scrollSpeed
+0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Game::sound
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Gui::layer
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Layer::entries
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Surface::pixels
@@ -19651,8 +19644,8 @@ address,function,file,kind,target
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,ShutdownIngameSystems
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,Sound::SetTrackCategory
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_maybe_written,Game::gui
-0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Game::field_10
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Game::flagsByte_3923b
+0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Game::sound
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Gui::hotGadgetIndex
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Gui::layer
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Layer::entries
@@ -19739,9 +19732,9 @@ address,function,file,kind,target
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_read,Flags37ebe_0045cf60::word
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_read,Gadget::attribs
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_read,Gadget::count
-0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_read,Game::field_10
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_read,Game::net
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_read,Game::otherFlags
+0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_read,Game::sound
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_read,Gui::hotGadgetIndex
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_read,Layer::entries
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_write,Flags37ebe_0045cf60::word
@@ -19770,9 +19763,9 @@ address,function,file,kind,target
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,call,Translate
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,call,operator->
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_maybe_written,Game::gui
-0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_read,Game::field_10
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_read,Game::net
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_read,Game::pauseFlags
+0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_read,Game::sound
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_read,Layer::entries
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_write,Game::pauseFlags
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_write,Layer::handler
@@ -20507,8 +20500,8 @@ address,function,file,kind,target
 0x464290,SetupPlayerSlot,src/game/players_464290.cpp,field_escape,Player::shareVision
 0x464290,SetupPlayerSlot,src/game/players_464290.cpp,field_maybe_written,Player::fullName
 0x464290,SetupPlayerSlot,src/game/players_464290.cpp,field_maybe_written,Player::name
+0x464290,SetupPlayerSlot,src/game/players_464290.cpp,field_read,Game::displayContext
 0x464290,SetupPlayerSlot,src/game/players_464290.cpp,field_read,Game::net
-0x464290,SetupPlayerSlot,src/game/players_464290.cpp,field_read,Game::unknown_c
 0x464290,SetupPlayerSlot,src/game/players_464290.cpp,field_read,Map::field_620
 0x464290,SetupPlayerSlot,src/game/players_464290.cpp,field_read,MapSeam::GetGameType
 0x464290,SetupPlayerSlot,src/game/players_464290.cpp,field_read,Player::active
@@ -21147,12 +21140,12 @@ address,function,file,kind,target
 0x466aa0,FreeRadar,src/map/radar.cpp,global_read,g_game
 0x466b00,DrawRadar,src/map/radar.cpp,call,DrawRectangle
 0x466b00,DrawRadar,src/map/radar.cpp,call,DrawSurface
-0x466b00,DrawRadar,src/map/radar.cpp,field_escape,Game::field_142cb
+0x466b00,DrawRadar,src/map/radar.cpp,field_escape,Game::radarViewportRect
 0x466b00,DrawRadar,src/map/radar.cpp,field_read,<anon>::pending
+0x466b00,DrawRadar,src/map/radar.cpp,field_read,Game::colors
 0x466b00,DrawRadar,src/map/radar.cpp,field_read,Game::finalSurface
 0x466b00,DrawRadar,src/map/radar.cpp,field_read,Game::posX
 0x466b00,DrawRadar,src/map/radar.cpp,field_read,Game::posY
-0x466b00,DrawRadar,src/map/radar.cpp,field_read,Game::unknown_dd9
 0x466b00,DrawRadar,src/map/radar.cpp,field_write,<anon>::pending
 0x466b00,DrawRadar,src/map/radar.cpp,function,
 0x466b00,DrawRadar,src/map/radar.cpp,global_read,g_game
@@ -21178,13 +21171,13 @@ address,function,file,kind,target
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_escape,Game::players_1b63_14b
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,<anon>::mapChanged
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Fx_00466c20::colorMap
+0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::displayContext
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::height
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::mappedSurface
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::pictureSurface
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::playerIndex
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::screen_h
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::textColor
-0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::unknown_c
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::visibilityMask
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::width
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::width_142eb
@@ -21366,7 +21359,7 @@ address,function,file,kind,target
 0x467a20,BlitGafFrameAtOffset,src/ingame/info_panel.cpp,function,
 0x467a50,DrawRotatedQuadOutline,src/ingame/info_panel.cpp,call,DrawLine
 0x467a50,DrawRotatedQuadOutline,src/ingame/info_panel.cpp,call,RotateByAngles
-0x467a50,DrawRotatedQuadOutline,src/ingame/info_panel.cpp,field_read,Game::field_dd5
+0x467a50,DrawRotatedQuadOutline,src/ingame/info_panel.cpp,field_read,Game::colors
 0x467a50,DrawRotatedQuadOutline,src/ingame/info_panel.cpp,field_read,Game::projected
 0x467a50,DrawRotatedQuadOutline,src/ingame/info_panel.cpp,field_read,Game::xform
 0x467a50,DrawRotatedQuadOutline,src/ingame/info_panel.cpp,field_read,Point::x
@@ -21486,7 +21479,7 @@ address,function,file,kind,target
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,global_write,g_probePanelBottom
 0x468310,DrawPercentBar,src/ingame/info_panel.cpp,call,DrawRectangle
 0x468310,DrawPercentBar,src/ingame/info_panel.cpp,call,FillRectangle
-0x468310,DrawPercentBar,src/ingame/info_panel.cpp,field_read,Game::field_dda
+0x468310,DrawPercentBar,src/ingame/info_panel.cpp,field_read,Game::colors
 0x468310,DrawPercentBar,src/ingame/info_panel.cpp,field_read,Rect::left
 0x468310,DrawPercentBar,src/ingame/info_panel.cpp,field_read,Rect::right
 0x468310,DrawPercentBar,src/ingame/info_panel.cpp,field_write,Rect::right
@@ -21673,8 +21666,8 @@ address,function,file,kind,target
 0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,field_escape,Game::a
 0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,field_escape,Game::colors
 0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,field_escape,Game::endGameFlags_3923b
-0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,field_escape,Game::field_519
 0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,field_escape,Game::flags_38a51
+0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,field_escape,Game::gui
 0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,field_escape,Game::players_1b63
 0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,field_escape,Game::rect
 0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,field_escape,Game::screen
@@ -21935,6 +21928,7 @@ address,function,file,kind,target
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::colors
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::count_14367
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::defs
+0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::displayContext
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::endGameFlags
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::f14353
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::features
@@ -21952,7 +21946,6 @@ address,function,file,kind,target
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::sidePanelBotSeq
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::ticks
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::units
-0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::unknown_c
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::width
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::width_37e1f
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel_46a860.cpp,field_read,Game::x
@@ -22050,7 +22043,7 @@ address,function,file,kind,target
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,deref_read,*Point
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,deref_read,*unsigned short
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,deref_write,*Point
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::field_1438b
+0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::assemPoints
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::projected
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::xform
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Object_0046bae0::count
@@ -22077,7 +22070,7 @@ address,function,file,kind,target
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,call,GetScreenWidth
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,call,OpenMessageBox
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,deref_read,*char
-0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,field_escape,Game::field_519
+0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,field_escape,Game::gui
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,field_write,<anon>::dirty
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,function,
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,global_read,g_game
@@ -22210,7 +22203,7 @@ address,function,file,kind,target
 0x46c620,ReportGameEvent,src/network/unit_sync.cpp,deref_read,*Rect_0046c620
 0x46c620,ReportGameEvent,src/network/unit_sync.cpp,deref_read,*char
 0x46c620,ReportGameEvent,src/network/unit_sync.cpp,deref_write,*char
-0x46c620,ReportGameEvent,src/network/unit_sync.cpp,field_escape,Game::field_39201
+0x46c620,ReportGameEvent,src/network/unit_sync.cpp,field_escape,Game::providerGuid
 0x46c620,ReportGameEvent,src/network/unit_sync.cpp,field_escape,Name_0046c620::text
 0x46c620,ReportGameEvent,src/network/unit_sync.cpp,field_read,Game::localPlayer
 0x46c620,ReportGameEvent,src/network/unit_sync.cpp,field_read,Game::net
@@ -23215,8 +23208,8 @@ address,function,file,kind,target
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,call,size
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_escape,TeleportParticles::items
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_maybe_written,TeleportParticles::items
+0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,Game::flamestreamGaf
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,Game::ticks
-0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,Game::unknown_147f3
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,List_004737c0::last
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,ParticleSystem::deadline
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,TeleportParticle::frameCount
@@ -23364,8 +23357,8 @@ address,function,file,kind,target
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_escape,ThrustParticles::items
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_escape,ThrustParticles::pos0
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_maybe_written,ThrustParticles::items
+0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_read,Game::flamestreamGaf
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_read,Game::ticks
-0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_read,Game::unknown_147f3
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_read,ParticleSystem::deadline
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_read,ThrustParticles::items
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_read,ThrustParticles::period
@@ -24154,7 +24147,7 @@ address,function,file,kind,target
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,Gadget::y
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,GafFrame::height
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,GafFrame::width
-0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,Game::field_10
+0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,Game::sound
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,Layer::entries
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_write,Gadget::frame
@@ -24187,9 +24180,9 @@ address,function,file,kind,target
 0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,call,StreamSoundDelayed
 0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,call,operator->
 0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
-0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,field_read,Game::field_10
 0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,field_read,Game::mode_391f1
 0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,field_read,Game::net
+0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,field_read,Game::sound
 0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,field_read,Gui::hotGadgetIndex
 0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,field_write,Game::frontendNextSubState
 0x478cb0,HandleMissionBriefingClick,src/frontend/campaign_menu.cpp,function,
@@ -25312,8 +25305,8 @@ address,function,file,kind,target
 0x47ed40,InitSound,src/sound/sound.cpp,call,Sound::InitDirectSound
 0x47ed40,InitSound,src/sound/sound.cpp,call,Sound::OpenCdAudio
 0x47ed40,InitSound,src/sound/sound.cpp,call,operator new
-0x47ed40,InitSound,src/sound/sound.cpp,field_read,Game::field_10
-0x47ed40,InitSound,src/sound/sound.cpp,field_read,Game::unknown_c
+0x47ed40,InitSound,src/sound/sound.cpp,field_read,Game::displayContext
+0x47ed40,InitSound,src/sound/sound.cpp,field_read,Game::sound
 0x47ed40,InitSound,src/sound/sound.cpp,field_read,SoundParams_0047ed40::hwnd
 0x47ed40,InitSound,src/sound/sound.cpp,function,
 0x47ed40,InitSound,src/sound/sound.cpp,global_maybe_written,g_noDirectSoundKey
@@ -25349,10 +25342,10 @@ address,function,file,kind,target
 0x47eee0,ShutdownSound,src/sound/sound.cpp,deref_read,*int
 0x47eee0,ShutdownSound,src/sound/sound.cpp,deref_write,*Sound
 0x47eee0,ShutdownSound,src/sound/sound.cpp,deref_write,*int
-0x47eee0,ShutdownSound,src/sound/sound.cpp,field_escape,Game::field_10
+0x47eee0,ShutdownSound,src/sound/sound.cpp,field_escape,Game::sound
 0x47eee0,ShutdownSound,src/sound/sound.cpp,field_escape,SpeechQueue::count
 0x47eee0,ShutdownSound,src/sound/sound.cpp,field_escape,SpeechQueue::entries
-0x47eee0,ShutdownSound,src/sound/sound.cpp,field_read,Game::field_10
+0x47eee0,ShutdownSound,src/sound/sound.cpp,field_read,Game::sound
 0x47eee0,ShutdownSound,src/sound/sound.cpp,field_read,SpeechEntry::data
 0x47eee0,ShutdownSound,src/sound/sound.cpp,field_read,SpeechQueue::count
 0x47eee0,ShutdownSound,src/sound/sound.cpp,field_read,SpeechQueue::entries
@@ -25371,19 +25364,19 @@ address,function,file,kind,target
 0x47efe0,LoadSoundFile,src/sound/sound.cpp,call,BuildDataPath
 0x47efe0,LoadSoundFile,src/sound/sound.cpp,call,HAPI_LoadFile
 0x47efe0,LoadSoundFile,src/sound/sound.cpp,call,Sound::LoadSample
-0x47efe0,LoadSoundFile,src/sound/sound.cpp,field_read,Game::field_10
+0x47efe0,LoadSoundFile,src/sound/sound.cpp,field_read,Game::sound
 0x47efe0,LoadSoundFile,src/sound/sound.cpp,function,
 0x47efe0,LoadSoundFile,src/sound/sound.cpp,global_read,g_game
 0x47efe0,LoadSoundFile,src/sound/sound.cpp,global_read,g_noDirectSound
 0x47efe0,LoadSoundFile,src/sound/sound.cpp,global_read,g_useWindowsSound
 0x47f060,FreeSoundSet,src/sound/sound.cpp,call,GameFreeThunk
 0x47f060,FreeSoundSet,src/sound/sound.cpp,call,Sound::ReleaseSampleSet
-0x47f060,FreeSoundSet,src/sound/sound.cpp,field_read,Game::field_10
+0x47f060,FreeSoundSet,src/sound/sound.cpp,field_read,Game::sound
 0x47f060,FreeSoundSet,src/sound/sound.cpp,function,
 0x47f060,FreeSoundSet,src/sound/sound.cpp,global_read,g_game
 0x47f060,FreeSoundSet,src/sound/sound.cpp,global_read,g_useWindowsSound
 0x47f090,StreamSoundDelayed,src/sound/sound.cpp,call,Sound::StreamSampleDelayed
-0x47f090,StreamSoundDelayed,src/sound/sound.cpp,field_read,Game::field_10
+0x47f090,StreamSoundDelayed,src/sound/sound.cpp,field_read,Game::sound
 0x47f090,StreamSoundDelayed,src/sound/sound.cpp,function,
 0x47f090,StreamSoundDelayed,src/sound/sound.cpp,global_read,g_game
 0x47f090,StreamSoundDelayed,src/sound/sound.cpp,global_read,g_noDirectSound
@@ -25393,7 +25386,7 @@ address,function,file,kind,target
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,call,PlayWavMemory
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,call,Sound::PlayLooping
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,call,Sound::PlaySampleSet
-0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,field_read,Game::field_10
+0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,field_read,Game::sound
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,field_read,Game::soundFlags_37f19
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,field_read,Game::sounds
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,field_read,Game::volume1
@@ -25415,7 +25408,7 @@ address,function,file,kind,target
 0x47f290,PlaySoundFile,src/sound/sound.cpp,call,PlayWavFromDisk
 0x47f290,PlaySoundFile,src/sound/sound.cpp,call,Sound::PlaySample
 0x47f290,PlaySoundFile,src/sound/sound.cpp,call,strlen
-0x47f290,PlaySoundFile,src/sound/sound.cpp,field_read,Game::field_10
+0x47f290,PlaySoundFile,src/sound/sound.cpp,field_read,Game::sound
 0x47f290,PlaySoundFile,src/sound/sound.cpp,field_read,Game::soundFlags_37f19
 0x47f290,PlaySoundFile,src/sound/sound.cpp,field_read,Game::volume1
 0x47f290,PlaySoundFile,src/sound/sound.cpp,function,
@@ -25437,7 +25430,6 @@ address,function,file,kind,target
 0x47f300,PlaySoundAt,src/sound/sound.cpp,deref_read,*Pos_0047f300
 0x47f300,PlaySoundAt,src/sound/sound.cpp,deref_read,*unsigned char
 0x47f300,PlaySoundAt,src/sound/sound.cpp,deref_read,*unsigned short
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::field_10
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::height
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::mapFlags
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::playerIndex
@@ -25445,6 +25437,7 @@ address,function,file,kind,target
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::screenTilesY
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::scrollX
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::scrollY
+0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::sound
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::soundFlags_37f19
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::sounds
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::visibilityMask
@@ -25491,7 +25484,7 @@ address,function,file,kind,target
 0x47f680,PlayNextSpeech,src/sound/sound.cpp,global_read,g_useWindowsSound
 0x47f750,StopAllSounds,src/sound/sound.cpp,call,Sound::StopAllBuffers
 0x47f750,StopAllSounds,src/sound/sound.cpp,call,StopWindowsSound
-0x47f750,StopAllSounds,src/sound/sound.cpp,field_read,Game::field_10
+0x47f750,StopAllSounds,src/sound/sound.cpp,field_read,Game::sound
 0x47f750,StopAllSounds,src/sound/sound.cpp,function,
 0x47f750,StopAllSounds,src/sound/sound.cpp,global_read,g_game
 0x47f750,StopAllSounds,src/sound/sound.cpp,global_read,g_noDirectSound
@@ -25589,7 +25582,7 @@ address,function,file,kind,target
 0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp,field_escape,SpeechQueue::entries
 0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp,field_maybe_written,UnitDef::name
 0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp,field_read,Game::entries_37e13
-0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp,field_read,Game::field_10
+0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp,field_read,Game::sound
 0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp,field_read,Game::soundFlags_37f19
 0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp,field_read,Game::ticks
 0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp,field_read,Game::unitChat
@@ -30132,7 +30125,7 @@ address,function,file,kind,target
 0x490f80,SaveCdLists,src/game/game_state.cpp,call,Sound::GetCategoryOfTrack
 0x490f80,SaveCdLists,src/game/game_state.cpp,call,Sound::GetTrackCount
 0x490f80,SaveCdLists,src/game/game_state.cpp,call,WriteGameRegistryValue
-0x490f80,SaveCdLists,src/game/game_state.cpp,field_read,Game::field_10
+0x490f80,SaveCdLists,src/game/game_state.cpp,field_read,Game::sound
 0x490f80,SaveCdLists,src/game/game_state.cpp,field_write,CdLists_490f80::tracks
 0x490f80,SaveCdLists,src/game/game_state.cpp,function,
 0x490f80,SaveCdLists,src/game/game_state.cpp,global_maybe_written,g_cdListsDiscEntries
@@ -30153,10 +30146,10 @@ address,function,file,kind,target
 0x490fe0,ReopenCdAudio,src/game/game_state.cpp,call,memcpy
 0x490fe0,ReopenCdAudio,src/game/game_state.cpp,deref_read,*int
 0x490fe0,ReopenCdAudio,src/game/game_state.cpp,field_read,Game::cdMode
-0x490fe0,ReopenCdAudio,src/game/game_state.cpp,field_read,Game::field_10
 0x490fe0,ReopenCdAudio,src/game/game_state.cpp,field_read,Game::mode_391f1
 0x490fe0,ReopenCdAudio,src/game/game_state.cpp,field_read,Game::musicMode
 0x490fe0,ReopenCdAudio,src/game/game_state.cpp,field_read,Game::netGameFlags
+0x490fe0,ReopenCdAudio,src/game/game_state.cpp,field_read,Game::sound
 0x490fe0,ReopenCdAudio,src/game/game_state.cpp,function,
 0x490fe0,ReopenCdAudio,src/game/game_state.cpp,global_escape,DAT_0051e848
 0x490fe0,ReopenCdAudio,src/game/game_state.cpp,global_escape,g_cdListsDiscEntries
@@ -30215,13 +30208,12 @@ address,function,file,kind,target
 0x491200,InitGame,src/game/game_state.cpp,call,memset
 0x491200,InitGame,src/game/game_state.cpp,call,operator Mission *
 0x491200,InitGame,src/game/game_state.cpp,field_escape,Game::chatHudRing
-0x491200,InitGame,src/game/game_state.cpp,field_escape,Game::field_143a7
+0x491200,InitGame,src/game/game_state.cpp,field_escape,Game::paletteRgba
 0x491200,InitGame,src/game/game_state.cpp,field_maybe_written,Game::gui
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::brightness
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::cdMode
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::cursorNormal
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::endGameFlags
-0x491200,InitGame,src/game/game_state.cpp,field_read,Game::field_10
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::fontComix
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::maxUnitsSetting
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::maxUnits_37eec
@@ -30229,6 +30221,7 @@ address,function,file,kind,target
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::net
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::screen
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::screenHeight
+0x491200,InitGame,src/game/game_state.cpp,field_read,Game::sound
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::uiOptionFlags
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::width_37e1f
 0x491200,InitGame,src/game/game_state.cpp,field_read,Gui::values
@@ -30300,9 +30293,9 @@ address,function,file,kind,target
 0x4916a0,ShutdownGame,src/game/game_state.cpp,call,WriteGameRegistryValue
 0x4916a0,ShutdownGame,src/game/game_state.cpp,field_escape,Game::chatHudRing
 0x4916a0,ShutdownGame,src/game/game_state.cpp,field_escape,Game::gui
-0x4916a0,ShutdownGame,src/game/game_state.cpp,field_read,Game::field_10
 0x4916a0,ShutdownGame,src/game/game_state.cpp,field_read,Game::options
 0x4916a0,ShutdownGame,src/game/game_state.cpp,field_read,Game::screen
+0x4916a0,ShutdownGame,src/game/game_state.cpp,field_read,Game::sound
 0x4916a0,ShutdownGame,src/game/game_state.cpp,field_read,MapSeam::FreeOtaEnumCacheAndMission
 0x4916a0,ShutdownGame,src/game/game_state.cpp,field_read,OrdersSeam::ClearOrderTypeTable
 0x4916a0,ShutdownGame,src/game/game_state.cpp,field_read,Seams::map
@@ -30370,12 +30363,12 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::flag5
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::flag6
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::flags_2bee
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::assemPoints
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::bit5_2cc6
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::bit6_2cc6
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::buildTypeIndex
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::carry
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::effectiveGameSpeed
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::field_1438b
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::field_2a46
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::gameSpeed
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::hoverUnitId
@@ -30439,11 +30432,11 @@ address,function,file,kind,target
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,Sound::SetTrackCategory
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,Sound::StopCdAudio
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,operator Mission *
-0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Game::field_10
-0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Game::field_1438b
+0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Game::assemPoints
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Game::flags_2a44
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Game::net
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Game::projected
+0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Game::sound
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Game::xform
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,LosRadarSeam::FreeMapResources
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,LosRadarSeam::FreeRadar
@@ -30466,7 +30459,7 @@ address,function,file,kind,target
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,WeaponsSeam::FreeWeaponArray
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,WeaponsSeam::FreeWeaponTypes
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,WindMeteorsSeam::EmptyShutdownPreCleanup
-0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_write,Game::field_1438b
+0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_write,Game::assemPoints
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_write,Game::flags_2a44
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_write,Game::projected
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_write,Game::xform
@@ -31185,9 +31178,9 @@ address,function,file,kind,target
 0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,deref_read,*int
 0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,deref_read,*unsigned short
 0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,field_escape,Game::loadingFlags
-0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,field_read,Game::field_10
 0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,field_read,Game::localPlayer
 0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,field_read,Game::netGameFlags
+0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,field_read,Game::sound
 0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,field_read,Player::unitCount
 0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,function,
 0x494e70,UpdateCdCategoryByActivity,src/ingame/dialogs_493340.cpp,global_escape,g_cdActivitySampleRing
@@ -31904,8 +31897,7 @@ address,function,file,kind,target
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_escape,PlayerRec_00497ce0::name
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_maybe_written,Game::menu_519_18
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,<anon>::synced
-0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,Game::field_dcf
-0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,Game::field_dd5
+0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,Game::colors
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,Game::loaded
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,PlayerRec_00497ce0::kind
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,PlayerRec_00497ce0::percent
@@ -31989,7 +31981,7 @@ address,function,file,kind,target
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_escape,Game::paletteRgba
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_escape,Game::players
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_escape,Game::progress_38d6f
-0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_maybe_written,Game::field_519
+0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_maybe_written,Game::gui
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_maybe_written,Game::slots_29a4
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,<anon>::b2
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,<anon>::loaded
@@ -31997,7 +31989,6 @@ address,function,file,kind,target
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::colors
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::cursorHourglass
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::cursorMode
-0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::field_10
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::fontComix
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::gaf
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::height_37f1f
@@ -32005,6 +31996,7 @@ address,function,file,kind,target
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::net
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::screen
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::screenHeight
+0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::sound
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::surface
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::viewCullMaxX
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_read,Game::viewCullMaxY
@@ -32232,7 +32224,6 @@ address,function,file,kind,target
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::boxStartTick
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::boxStartX
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::boxStartZ
-0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::field_10
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::inputFlags
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::interfaceType
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::layer
@@ -32242,6 +32233,7 @@ address,function,file,kind,target
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::options
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::orderMode
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::restartMissionRequest
+0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::sound
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::unitIndex
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::units
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::xWhole
@@ -32311,11 +32303,11 @@ address,function,file,kind,target
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_maybe_written,Input_00499890::fields
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,<anon>::screenBitB
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,Ctx_00499890::flags
+0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,Game::displayContext
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,Game::flags_37ebe
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,Game::handler
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,Game::net
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,Game::otherFlags
-0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,Game::unknown_c
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,Input_00499890::fields
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,MapSeam::GetGameType
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_read,Seams::map
@@ -32957,6 +32949,7 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Angles16::pitch
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::colors_dcb
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::explosionLensFrame
+0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::flamestreamGaf
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::gaf_147bb
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::gaf_147bf
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::gaf_147c3
@@ -32970,7 +32963,6 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::scrollX
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::scrollY
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::ticks
-0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::unknown_147f3
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Player::explored
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Player::exploredHeight
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Player::exploredWidth
@@ -33755,9 +33747,9 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,field_read,<anon>::b11
 0x49e830,GameMain,src/game/main.cpp,field_read,App_0049e830::active
 0x49e830,GameMain,src/game/main.cpp,field_read,Game::cdMode
-0x49e830,GameMain,src/game/main.cpp,field_read,Game::field_10
 0x49e830,GameMain,src/game/main.cpp,field_read,Game::flags_2a44
 0x49e830,GameMain,src/game/main.cpp,field_read,Game::musicMode
+0x49e830,GameMain,src/game/main.cpp,field_read,Game::sound
 0x49e830,GameMain,src/game/main.cpp,field_write,<anon>::b0
 0x49e830,GameMain,src/game/main.cpp,field_write,<anon>::b1
 0x49e830,GameMain,src/game/main.cpp,field_write,<anon>::b4
@@ -33773,9 +33765,9 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,field_write,App_0049e830::startHeight
 0x49e830,GameMain,src/game/main.cpp,field_write,App_0049e830::startWidth
 0x49e830,GameMain,src/game/main.cpp,field_write,App_0049e830::title
-0x49e830,GameMain,src/game/main.cpp,field_write,Game::field_10
+0x49e830,GameMain,src/game/main.cpp,field_write,Game::displayContext
 0x49e830,GameMain,src/game/main.cpp,field_write,Game::field_3
-0x49e830,GameMain,src/game/main.cpp,field_write,Game::unknown_c
+0x49e830,GameMain,src/game/main.cpp,field_write,Game::sound
 0x49e830,GameMain,src/game/main.cpp,field_write,Game::version
 0x49e830,GameMain,src/game/main.cpp,field_write,Game::versionMinor
 0x49e830,GameMain,src/game/main.cpp,fn_ref,AtexitNoOp
@@ -43512,7 +43504,7 @@ address,function,file,kind,target
 ,ApplySound,src/frontend/options.cpp,call,Sound::SetAuxVolume
 ,ApplySound,src/frontend/options.cpp,call,Sound::SetWaveVolume
 ,ApplySound,src/frontend/options.cpp,field_read,Game::brightness
-,ApplySound,src/frontend/options.cpp,field_read,Game::field_10
+,ApplySound,src/frontend/options.cpp,field_read,Game::sound
 ,ApplySound,src/frontend/options.cpp,field_read,Game::volume1
 ,ApplySound,src/frontend/options.cpp,field_read,Game::volume2
 ,ApplySound,src/frontend/options.cpp,function,
@@ -43600,7 +43592,7 @@ address,function,file,kind,target
 ,BankWriteBoxNative,src/seams/native.cpp,function,
 ,Bar,src/ingame/info_panel.cpp,call,DrawRectangle
 ,Bar,src/ingame/info_panel.cpp,call,FillRectangle
-,Bar,src/ingame/info_panel.cpp,field_read,Game::field_dda
+,Bar,src/ingame/info_panel.cpp,field_read,Game::colors
 ,Bar,src/ingame/info_panel.cpp,field_read,Rect::left
 ,Bar,src/ingame/info_panel.cpp,field_read,Rect::right
 ,Bar,src/ingame/info_panel.cpp,field_write,Rect::right

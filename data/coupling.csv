@@ -470,6 +470,7 @@ game,los_radar,indirect,GetMapCellAtPosition,1
 game,los_radar,indirect,InitRadar,1
 game,los_radar,indirect,LoadTntMap,1
 game,los_radar,indirect,RecalculateLineOfSight,3
+game,los_radar,shared_write,Game::displayContext,1
 game,los_radar,shared_write,Game::hoverUnitId,1
 game,los_radar,shared_write,Game::localPlayer,3
 game,los_radar,shared_write,Game::mapFlags,5
@@ -479,7 +480,6 @@ game,los_radar,shared_write,Game::numPlayers,1
 game,los_radar,shared_write,Game::playerIndex,14
 game,los_radar,shared_write,Game::seaLevel,10
 game,los_radar,shared_write,Game::ticks,5
-game,los_radar,shared_write,Game::unknown_c,1
 game,los_radar,shared_write,Grid::cells,2
 game,los_radar,shared_write,Grid::height,3
 game,los_radar,shared_write,Grid::width,3
@@ -699,6 +699,7 @@ game,players,indirect,UpdatePlayers,1
 game,players,indirect,UpdatePlayersOnStream,1
 game,players,shared_write,Game::commanderDeath,2
 game,players,shared_write,Game::difficulty,3
+game,players,shared_write,Game::displayContext,1
 game,players,shared_write,Game::endGameCountdown,1
 game,players,shared_write,Game::endGameFlags,1
 game,players,shared_write,Game::localPlayer,8
@@ -706,7 +707,6 @@ game,players,shared_write,Game::mapFlags,1
 game,players,shared_write,Game::playerIndex,2
 game,players,shared_write,Game::seaLevel,1
 game,players,shared_write,Game::ticks,4
-game,players,shared_write,Game::unknown_c,1
 game,players,shared_write,Player::allied,8
 game,players,shared_write,Player::displayTimer,3
 game,players,shared_write,Player::energy,5
@@ -941,6 +941,7 @@ game,presentation,call,WriteScreenshot,1
 game,presentation,shared_write,Angles16::heading,1
 game,presentation,shared_write,Game::commanderDeath,2
 game,presentation,shared_write,Game::difficulty,10
+game,presentation,shared_write,Game::displayContext,2
 game,presentation,shared_write,Game::effectiveGameSpeed,6
 game,presentation,shared_write,Game::endGameFlags,2
 game,presentation,shared_write,Game::flags_2a44,4
@@ -961,7 +962,6 @@ game,presentation,shared_write,Game::seaLevel,4
 game,presentation,shared_write,Game::ticks,32
 game,presentation,shared_write,Game::uiOptionFlags,2
 game,presentation,shared_write,Game::unitIndex,22
-game,presentation,shared_write,Game::unknown_c,2
 game,presentation,shared_write,Game::version,3
 game,presentation,shared_write,Player::allied,6
 game,presentation,shared_write,Player::energy,2
@@ -1027,6 +1027,7 @@ game,units,shared_write,Angles16::heading,10
 game,units,shared_write,Game::autoFollowTicks,1
 game,units,shared_write,Game::commanderDeath,2
 game,units,shared_write,Game::difficulty,2
+game,units,shared_write,Game::displayContext,1
 game,units,shared_write,Game::localPlayer,2
 game,units,shared_write,Game::mapFlags,1
 game,units,shared_write,Game::maxUnitsSetting,3
@@ -1034,7 +1035,6 @@ game,units,shared_write,Game::playerIndex,3
 game,units,shared_write,Game::seaLevel,9
 game,units,shared_write,Game::ticks,4
 game,units,shared_write,Game::unitIndex,1
-game,units,shared_write,Game::unknown_c,1
 game,units,shared_write,Game::version,1
 game,units,shared_write,Game::versionMinor,1
 game,units,shared_write,Player::unitsCreated,1

@@ -9,6 +9,7 @@
 #include "../network/settings.h"
 #endif
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 #include "../frontend/bits_00426e80.h"
 #include "../frontend/conn_info_443ff0.h"
 #include "../frontend/flags37f14_0045cf60.h"
@@ -1331,7 +1332,6 @@ inline Player* Game::Current2(void)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
 #include <stddef.h>
-#include "../../interfaces/ref.h"
 static_assert(sizeof(Game) == 0x3924d, "Game is 0x3924d bytes");
 static_assert(offsetof(Game, unknown_0) == 0x0, "unknown_0");
 static_assert(offsetof(Game, field_0) == 0x0, "field_0");

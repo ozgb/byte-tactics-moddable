@@ -1136,7 +1136,7 @@ void FreeMapResources()
     g2->count = 0;
     g2->cells = 0;
 
-    operator delete((Rec *)g_game->overflowBucket.get());
+    operator delete(g_game->overflowBucket.get());
     g_game->overflowBucket = 0;
 }
 

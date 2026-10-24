@@ -1,4 +1,3 @@
-#include "../../interfaces/ref.h"
 // Feature: one placed map feature (a rock, a tree, a wreck), 0x100 bytes, the
 // elements of the pool at g_game+0x1426f. The one declaration of the struct for
 // the files that read or write a feature record. map/features.cpp, which owns
@@ -9,6 +8,8 @@
 // a WeaponDef (src/weapons/weapon_def.h).
 #ifndef FEATURE_H
 #define FEATURE_H
+
+#include "../../interfaces/ref.h"
 
 #pragma pack(push, 1)
 

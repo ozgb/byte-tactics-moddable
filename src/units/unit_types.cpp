@@ -811,7 +811,8 @@ void LoadUnitTypes() {
         } while (c);
     }
 
-    g_game->types = (Class_0045ae80**)SimAllocTagged("MODEL PTRS", g_game->unitDefCount * 4);
+    void** models = (void**)SimAllocTagged("MODEL PTRS", g_game->unitDefCount * 4);
+    g_game->types = (Class_0045ae80**)models;
 
     // `u` must be an unsigned short: an int counter breaks the loop.
     for (unsigned short u = 1; u < g_game->unitDefCount; u++) {
@@ -871,7 +872,7 @@ void LoadUnitTypes() {
         type->data = LoadCobScript(path);
     }
 
-    ProtectBlockReadOnly((void **)g_game->types.get());
+    ProtectBlockReadOnly(g_game->types.get());
 
     TdfFile parser2;
     BuildDataPath(path, "gamedata", "sidedata", "TDF");
@@ -930,7 +931,7 @@ int __stdcall CompareUnitTypeNames(const char* param_1, const char* param_2)
 void FreeUnitTypes()
 {
     ProtectBlockReadWrite(g_game->defs);
-    ProtectBlockReadWrite((void **)g_game->types.get());
+    ProtectBlockReadWrite(g_game->types.get());
 
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
         UnitDef* type = &g_game->defs[i];
@@ -961,7 +962,7 @@ void FreeUnitTypes()
     }
     (*(UnitTable **)&g_game->unitTable) = 0;
 
-    GameFreeThunk((void **)g_game->types.get());
+    GameFreeThunk(g_game->types.get());
     GameFreeThunk(g_game->defs);
 
     g_game->types = 0;

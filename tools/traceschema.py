@@ -306,11 +306,11 @@ SYNTHETIC.update({
     """,
     "Eye": """
         Ref<Player> player;
-        void* screen;
+        Ref<void> screen;
         short x;
         unsigned char flagA;
         char flagB;
-        void* flagPtr;
+        Ref<char> flagPtr;
         Vec3 pos;
         unsigned int expires;
         int screenPos;

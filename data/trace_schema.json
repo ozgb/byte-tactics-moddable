@@ -1,0 +1,1596 @@
+{
+  "trace_format": 3,
+  "targets": [{"tag": 1, "name": "heap"}, {"tag": 2, "name": "unit"}, {"tag": 3, "name": "player"}, {"tag": 4, "name": "unitdef"}, {"tag": 5, "name": "weapondef"}, {"tag": 6, "name": "projectile"}, {"tag": 7, "name": "feature"}, {"tag": 8, "name": "piece"}, {"tag": 9, "name": "rec"}, {"tag": 10, "name": "node"}, {"tag": 11, "name": "moveclass"}, {"tag": 12, "name": "order"}, {"tag": 13, "name": "orderfx"}, {"tag": 14, "name": "link"}],
+  "tables": {
+    "AiSearchGoal": {
+      "size": 101,
+      "fields": [
+        {"name": "target", "offset": 4, "size": 4, "kind": "ref", "target": "orderfx"},
+        {"name": "owner", "offset": 8, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "count", "offset": 92, "size": 4, "kind": "scalar", "target": null},
+        {"name": "repathClaimTick", "offset": 96, "size": 4, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 100, "size": 1, "kind": "scalar", "target": null, "mask": 11, "mask_reason": "bits 4 to 7 are never written; bit 2 is unset by the constructor and read only after SerializeNetUnitState writes it"}
+      ],
+      "plan": [
+        {"name": "target", "offset": 4, "size": 4, "kind": "ref", "target": "orderfx"},
+        {"name": "owner", "offset": 8, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "", "offset": 92, "size": 8, "kind": "bytes", "target": null},
+        {"name": "flags", "offset": 100, "size": 1, "kind": "scalar", "target": null, "mask": 11}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"},
+        {"field": "points", "reason": "only the first count points are live: the visit hashes those"}
+      ]
+    },
+    "AirManeuverOrder": {
+      "size": 44,
+      "fields": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "flags", "offset": 8, "size": 2, "kind": "scalar", "target": null},
+        {"name": "target.x", "offset": 10, "size": 4, "kind": "scalar", "target": null},
+        {"name": "target.y", "offset": 14, "size": 4, "kind": "scalar", "target": null},
+        {"name": "target.z", "offset": 18, "size": 4, "kind": "scalar", "target": null},
+        {"name": "other.x", "offset": 22, "size": 4, "kind": "scalar", "target": null},
+        {"name": "other.y", "offset": 26, "size": 4, "kind": "scalar", "target": null},
+        {"name": "other.z", "offset": 30, "size": 4, "kind": "scalar", "target": null},
+        {"name": "self", "offset": 40, "size": 4, "kind": "ref", "target": "unit"}
+      ],
+      "plan": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "", "offset": 8, "size": 26, "kind": "bytes", "target": null},
+        {"name": "self", "offset": 40, "size": 4, "kind": "ref", "target": "unit"}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"},
+        {"field": "saveOnly22", "reason": "set to 0 by the constructor and read only by SerializeToSave"},
+        {"field": "value26", "reason": "set only by the loading constructors and read only by SerializeToSave"}
+      ]
+    },
+    "AirManeuverOrderHeading": {
+      "size": 44,
+      "split_of": "AirManeuverOrder",
+      "fields": [
+        {"name": "heading", "offset": 36, "size": 2, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 36, "size": 2, "kind": "bytes", "target": null}
+      ]
+    },
+    "ApproachRadius": {
+      "size": 20,
+      "fields": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "pos.x", "offset": 8, "size": 2, "kind": "scalar", "target": null},
+        {"name": "pos.y", "offset": 10, "size": 2, "kind": "scalar", "target": null},
+        {"name": "radius", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "radiusSq", "offset": 16, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "", "offset": 8, "size": 12, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"}
+      ]
+    },
+    "AssaultTimer": {
+      "size": 40,
+      "fields": [
+        {"name": "next", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "player", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "minimum", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "maximum", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "limit", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "kind", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "attacking", "offset": 36, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 12, "size": 28, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"},
+        {"field": "manager", "reason": "points back at the SquadManager that owns the timer"},
+        {"field": "group", "reason": "points into the Player's own groups, which the Player table hashes"}
+      ]
+    },
+    "ConditionNumLeft": {
+      "size": 48,
+      "fields": [
+        {"name": "numLeftToKill", "offset": 44, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 44, "size": 4, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "head", "reason": "the MissionCondition table hashes these bytes"}
+      ]
+    },
+    "ConditionNumUnits": {
+      "size": 20,
+      "fields": [
+        {"name": "numUnits", "offset": 16, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 16, "size": 4, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "head", "reason": "the MissionCondition table hashes these bytes"}
+      ]
+    },
+    "Debris": {
+      "size": 84,
+      "fields": [
+        {"name": "obj", "offset": 0, "size": 4, "kind": "pointer", "target": "piece"},
+        {"name": "ref1.index", "offset": 4, "size": 2, "kind": "scalar", "target": null},
+        {"name": "ref1.value", "offset": 6, "size": 2, "kind": "scalar", "target": null},
+        {"name": "ref1.kind", "offset": 8, "size": 1, "kind": "scalar", "target": null},
+        {"name": "", "offset": 9, "size": 3, "kind": "bytes", "target": null},
+        {"name": "ref1.src", "offset": 12, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "ref2.index", "offset": 16, "size": 2, "kind": "scalar", "target": null},
+        {"name": "ref2.value", "offset": 18, "size": 2, "kind": "scalar", "target": null},
+        {"name": "ref2.kind", "offset": 20, "size": 1, "kind": "scalar", "target": null},
+        {"name": "", "offset": 21, "size": 3, "kind": "bytes", "target": null},
+        {"name": "ref2.src", "offset": 24, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "pos.x", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.y", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.z", "offset": 36, "size": 4, "kind": "scalar", "target": null},
+        {"name": "size.x", "offset": 40, "size": 4, "kind": "scalar", "target": null},
+        {"name": "size.y", "offset": 44, "size": 4, "kind": "scalar", "target": null},
+        {"name": "size.z", "offset": 48, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel.x", "offset": 52, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel.y", "offset": 56, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel.z", "offset": 60, "size": 4, "kind": "scalar", "target": null},
+        {"name": "spin.x", "offset": 64, "size": 4, "kind": "scalar", "target": null},
+        {"name": "spin.y", "offset": 68, "size": 4, "kind": "scalar", "target": null},
+        {"name": "spin.z", "offset": 72, "size": 4, "kind": "scalar", "target": null},
+        {"name": "angle_x", "offset": 76, "size": 2, "kind": "scalar", "target": null},
+        {"name": "angle_y", "offset": 78, "size": 2, "kind": "scalar", "target": null},
+        {"name": "angle_z", "offset": 80, "size": 2, "kind": "scalar", "target": null},
+        {"name": "flag", "offset": 82, "size": 2, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "obj", "offset": 0, "size": 4, "kind": "pointer", "target": "piece"},
+        {"name": "", "offset": 4, "size": 8, "kind": "bytes", "target": null},
+        {"name": "ref1.src", "offset": 12, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 16, "size": 8, "kind": "bytes", "target": null},
+        {"name": "ref2.src", "offset": 24, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 28, "size": 56, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "EscortTimer": {
+      "size": 24,
+      "fields": [
+        {"name": "next", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "player", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "other", "offset": 20, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 12, "size": 12, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"},
+        {"field": "manager", "reason": "points back at the SquadManager that owns the timer"},
+        {"field": "group", "reason": "points into the Player's own groups, which the Player table hashes"}
+      ]
+    },
+    "ExplodedPiece": {
+      "size": 48,
+      "fields": [
+        {"name": "unit", "offset": 0, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "index", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "angVelZ", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "angVelX", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "angVelY", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel_x", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel_y", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel_z", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "ticks", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "scale", "offset": 36, "size": 4, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 40, "size": 4, "kind": "scalar", "target": null, "mask": 63, "mask_reason": "bits 6 to 31 are never written; StartExplodePiece copies them from an uninitialised stack header"},
+        {"name": "rec", "offset": 44, "size": 4, "kind": "ref", "target": "heap"}
+      ],
+      "plan": [
+        {"name": "unit", "offset": 0, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "", "offset": 4, "size": 36, "kind": "bytes", "target": null},
+        {"name": "flags", "offset": 40, "size": 4, "kind": "scalar", "target": null, "mask": 63},
+        {"name": "rec", "offset": 44, "size": 4, "kind": "ref", "target": "heap"}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "Eye": {
+      "size": 36,
+      "fields": [
+        {"name": "player", "offset": 0, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "x", "offset": 8, "size": 2, "kind": "scalar", "target": null},
+        {"name": "flagA", "offset": 10, "size": 1, "kind": "scalar", "target": null},
+        {"name": "flagB", "offset": 11, "size": 1, "kind": "scalar", "target": null},
+        {"name": "pos.x", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.y", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.z", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "expires", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "screenPos", "offset": 32, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "player", "offset": 0, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "", "offset": 8, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 16, "size": 20, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "screen", "reason": "points at the record's own screenPos"},
+        {"field": "flagPtr", "reason": "points at the record's own flagB"}
+      ]
+    },
+    "Face": {
+      "size": 32,
+      "fields": [
+        {"name": "color", "offset": 0, "size": 4, "kind": "scalar", "target": null},
+        {"name": "nverts", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vindex", "offset": 12, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "texFrame", "offset": 16, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "texKind", "offset": 20, "size": 1, "kind": "scalar", "target": null},
+        {"name": "", "offset": 21, "size": 3, "kind": "bytes", "target": null},
+        {"name": "texSrc", "offset": 24, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "flags", "offset": 28, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 12, "kind": "bytes", "target": null},
+        {"name": "vindex", "offset": 12, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "texFrame", "offset": 16, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 20, "size": 4, "kind": "bytes", "target": null},
+        {"name": "texSrc", "offset": 24, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 28, "size": 4, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "LiteGoalState": {
+      "size": 40,
+      "split_of": "PackedGoal",
+      "fields": [
+        {"name": "netDirty", "offset": 39, "size": 1, "kind": "scalar", "target": null, "mask": 7, "mask_reason": "bits 3 to 7 are never written"}
+      ],
+      "plan": [
+        {"name": "netDirty", "offset": 39, "size": 1, "kind": "scalar", "target": null, "mask": 7}
+      ]
+    },
+    "MissionCondition": {
+      "size": 12,
+      "fields": [
+        {"name": "satisfied", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "celebrated", "offset": 8, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 4, "size": 8, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"}
+      ]
+    },
+    "MissionConditions": {
+      "size": 140,
+      "fields": [
+        {"name": "victoryCount", "offset": 64, "size": 4, "kind": "scalar", "target": null},
+        {"name": "defeatCount", "offset": 132, "size": 4, "kind": "scalar", "target": null},
+        {"name": "active", "offset": 136, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 64, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 132, "size": 8, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "victory", "reason": "the visit walks the condition objects"},
+        {"field": "defeat", "reason": "the visit walks the condition objects"}
+      ]
+    },
+    "MissionData": {
+      "size": 3780,
+      "fields": [
+        {"name": "type", "offset": 0, "size": 4, "kind": "scalar", "target": null},
+        {"name": "multi", "offset": 3372, "size": 4, "kind": "scalar", "target": null},
+        {"name": "threshold", "offset": 3376, "size": 4, "kind": "scalar", "target": null},
+        {"name": "gravity", "offset": 3388, "size": 4, "kind": "scalar", "target": null},
+        {"name": "tidalStrength", "offset": 3392, "size": 4, "kind": "scalar", "target": null},
+        {"name": "lavaWorld", "offset": 3396, "size": 4, "kind": "scalar", "target": null},
+        {"name": "noSeaLevelTrigger", "offset": 3400, "size": 4, "kind": "scalar", "target": null},
+        {"name": "waterDoesDamage", "offset": 3404, "size": 4, "kind": "scalar", "target": null},
+        {"name": "waterDamage", "offset": 3408, "size": 4, "kind": "scalar", "target": null},
+        {"name": "killMul", "offset": 3412, "size": 4, "kind": "scalar", "target": null},
+        {"name": "timeMul", "offset": 3416, "size": 4, "kind": "scalar", "target": null},
+        {"name": "startMetal", "offset": 3420, "size": 8, "kind": "bytes", "target": null},
+        {"name": "startEnergy", "offset": 3460, "size": 8, "kind": "bytes", "target": null},
+        {"name": "unitCount", "offset": 3504, "size": 4, "kind": "scalar", "target": null},
+        {"name": "ruleCount", "offset": 3512, "size": 4, "kind": "scalar", "target": null},
+        {"name": "featureCount", "offset": 3520, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 3372, "size": 8, "kind": "bytes", "target": null},
+        {"name": "", "offset": 3388, "size": 40, "kind": "bytes", "target": null},
+        {"name": "", "offset": 3460, "size": 8, "kind": "bytes", "target": null},
+        {"name": "", "offset": 3504, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 3512, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 3520, "size": 4, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "text", "reason": "campaign, map names, descriptions and file names: nothing in a phase reads them"},
+        {"field": "minWindSpeed", "reason": "Game.windSpeedMin is the traced copy"},
+        {"field": "maxWindSpeed", "reason": "Game.windSpeedMax is the traced copy"},
+        {"field": "units", "reason": "the visit hashes the unit records and their names"},
+        {"field": "rules", "reason": "the visit hashes the rule records"},
+        {"field": "features", "reason": "the visit hashes the feature records and their names"},
+        {"field": "tail", "reason": "the memory and player count strings of the lobby: nothing in a phase reads them"}
+      ]
+    },
+    "MissionStartRest": {
+      "size": 3780,
+      "split_of": "MissionData",
+      "fields": [
+        {"name": "startMetalRest", "offset": 3428, "size": 32, "kind": "bytes", "target": null},
+        {"name": "startEnergyRest", "offset": 3468, "size": 32, "kind": "bytes", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 3428, "size": 32, "kind": "bytes", "target": null},
+        {"name": "", "offset": 3468, "size": 32, "kind": "bytes", "target": null}
+      ]
+    },
+    "MoveClass": {
+      "size": 32,
+      "fields": [
+        {"name": "name", "offset": 0, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "footprintX", "offset": 4, "size": 2, "kind": "scalar", "target": null},
+        {"name": "footprintZ", "offset": 6, "size": 2, "kind": "scalar", "target": null},
+        {"name": "maxWaterDepth", "offset": 8, "size": 2, "kind": "scalar", "target": null},
+        {"name": "minWaterDepth", "offset": 10, "size": 2, "kind": "scalar", "target": null},
+        {"name": "maxSlope", "offset": 12, "size": 1, "kind": "scalar", "target": null},
+        {"name": "badSlope", "offset": 13, "size": 1, "kind": "scalar", "target": null},
+        {"name": "maxWaterSlope", "offset": 14, "size": 1, "kind": "scalar", "target": null},
+        {"name": "badWaterSlope", "offset": 15, "size": 1, "kind": "scalar", "target": null},
+        {"name": "width", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "height", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "cells", "offset": 24, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "lastTick", "offset": 28, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "name", "offset": 0, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 4, "size": 20, "kind": "bytes", "target": null},
+        {"name": "cells", "offset": 24, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 28, "size": 4, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "Node": {
+      "size": 20,
+      "fields": [
+        {"name": "index", "offset": 0, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos_x", "offset": 4, "size": 2, "kind": "scalar", "target": null},
+        {"name": "pos_y", "offset": 6, "size": 2, "kind": "scalar", "target": null},
+        {"name": "g", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "f", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "steps", "offset": 18, "size": 2, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 16, "kind": "bytes", "target": null},
+        {"name": "", "offset": 18, "size": 2, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "penalty", "reason": "NodeData(x, y, g, f, steps) leaves it unset for the start node; the visit hashes it when g is not 0"}
+      ]
+    },
+    "Order": {
+      "size": 86,
+      "fields": [
+        {"name": "kind", "offset": 4, "size": 1, "kind": "scalar", "target": null},
+        {"name": "state", "offset": 5, "size": 1, "kind": "scalar", "target": null},
+        {"name": "flags6", "offset": 6, "size": 4, "kind": "scalar", "target": null},
+        {"name": "wakeFrame", "offset": 10, "size": 4, "kind": "scalar", "target": null},
+        {"name": "unit", "offset": 14, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "linkOwner", "offset": 22, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "linkNext", "offset": 26, "size": 4, "kind": "ref", "target": "link"},
+        {"name": "linkValue", "offset": 30, "size": 4, "kind": "pointer", "target": "order"},
+        {"name": "pos.x", "offset": 34, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.z", "offset": 42, "size": 4, "kind": "scalar", "target": null},
+        {"name": "start.x", "offset": 46, "size": 2, "kind": "scalar", "target": null},
+        {"name": "start.y", "offset": 48, "size": 2, "kind": "scalar", "target": null},
+        {"name": "arg0", "offset": 54, "size": 4, "kind": "scalar", "target": null},
+        {"name": "arg1", "offset": 58, "size": 4, "kind": "scalar", "target": null},
+        {"name": "arg2", "offset": 62, "size": 4, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 66, "size": 4, "kind": "scalar", "target": null, "mask": 4292870143, "mask_reason": "bit 0x200000 is set by DrawWeaponCoverage (markers.cpp:564) and read only there (markers.cpp:556)"},
+        {"name": "created", "offset": 70, "size": 4, "kind": "scalar", "target": null},
+        {"name": "subFlags", "offset": 78, "size": 4, "kind": "scalar", "target": null},
+        {"name": "attached", "offset": 82, "size": 4, "kind": "ref", "target": "orderfx"}
+      ],
+      "plan": [
+        {"name": "", "offset": 4, "size": 10, "kind": "bytes", "target": null},
+        {"name": "unit", "offset": 14, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "linkOwner", "offset": 22, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "linkNext", "offset": 26, "size": 4, "kind": "ref", "target": "link"},
+        {"name": "linkValue", "offset": 30, "size": 4, "kind": "pointer", "target": "order"},
+        {"name": "", "offset": 34, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 42, "size": 8, "kind": "bytes", "target": null},
+        {"name": "", "offset": 54, "size": 12, "kind": "bytes", "target": null},
+        {"name": "flags", "offset": 66, "size": 4, "kind": "scalar", "target": null, "mask": 4292870143},
+        {"name": "", "offset": 70, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 78, "size": 4, "kind": "bytes", "target": null},
+        {"name": "attached", "offset": 82, "size": 4, "kind": "ref", "target": "orderfx"}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the vtable, the same for every order"},
+        {"field": "linkVptr", "reason": "the vtable of the embedded PathOrderAttach"},
+        {"field": "cached", "reason": "written only by DrawWeaponCoverage (markers.cpp:563) and read only there (markers.cpp:557)"},
+        {"field": "next", "reason": "the chain: the visit walks it, so the order of the records carries it"}
+      ]
+    },
+    "OrderPosY": {
+      "size": 86,
+      "split_of": "Order",
+      "fields": [
+        {"name": "pos.y", "offset": 38, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 38, "size": 4, "kind": "bytes", "target": null}
+      ]
+    },
+    "PackedGoal": {
+      "size": 40,
+      "fields": [
+        {"name": "target", "offset": 4, "size": 4, "kind": "ref", "target": "orderfx"},
+        {"name": "owner", "offset": 8, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "pos.x", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.y", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.z", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel.x", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel.y", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel.z", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "heading", "offset": 36, "size": 2, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "target", "offset": 4, "size": 4, "kind": "ref", "target": "orderfx"},
+        {"name": "owner", "offset": 8, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "", "offset": 12, "size": 26, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"},
+        {"field": "field26", "reason": "padding byte no constructor or method writes or reads"}
+      ]
+    },
+    "PathOrder": {
+      "size": 54,
+      "fields": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "flags", "offset": 8, "size": 2, "kind": "scalar", "target": null},
+        {"name": "approachRadius", "offset": 10, "size": 2, "kind": "scalar", "target": null},
+        {"name": "altitude", "offset": 12, "size": 2, "kind": "scalar", "target": null},
+        {"name": "unit", "offset": 18, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "refOwner", "offset": 26, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "refNext", "offset": 30, "size": 4, "kind": "ref", "target": "link"},
+        {"name": "refValue", "offset": 34, "size": 4, "kind": "pointer", "target": "order"},
+        {"name": "pos.x", "offset": 38, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.z", "offset": 46, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "", "offset": 8, "size": 6, "kind": "bytes", "target": null},
+        {"name": "unit", "offset": 18, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "refOwner", "offset": 26, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "refNext", "offset": 30, "size": 4, "kind": "ref", "target": "link"},
+        {"name": "refValue", "offset": 34, "size": 4, "kind": "pointer", "target": "order"},
+        {"name": "", "offset": 38, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 46, "size": 4, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"},
+        {"field": "refVptr", "reason": "the vtable of the embedded PathOrderAttach"}
+      ]
+    },
+    "PathOrderFollow": {
+      "size": 54,
+      "split_of": "PathOrder",
+      "fields": [
+        {"name": "followOffset", "offset": 50, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 50, "size": 4, "kind": "bytes", "target": null}
+      ]
+    },
+    "PathOrderHeading": {
+      "size": 54,
+      "split_of": "PathOrder",
+      "fields": [
+        {"name": "heading", "offset": 14, "size": 2, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 14, "size": 2, "kind": "bytes", "target": null}
+      ]
+    },
+    "PathOrderPiece": {
+      "size": 54,
+      "split_of": "PathOrder",
+      "fields": [
+        {"name": "piece", "offset": 16, "size": 2, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 16, "size": 2, "kind": "bytes", "target": null}
+      ]
+    },
+    "PathOrderPosY": {
+      "size": 54,
+      "split_of": "PathOrder",
+      "fields": [
+        {"name": "pos.y", "offset": 42, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 42, "size": 4, "kind": "bytes", "target": null}
+      ]
+    },
+    "Pathfinder": {
+      "size": 201,
+      "fields": [
+        {"name": "pool", "offset": 0, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "items", "offset": 4, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "freeHead", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "used", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "count", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "topPopped", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "cells", "offset": 28, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "width", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "height", "offset": 36, "size": 4, "kind": "scalar", "target": null},
+        {"name": "cellCount", "offset": 40, "size": 4, "kind": "scalar", "target": null},
+        {"name": "dirty", "offset": 44, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "stepsPerTick", "offset": 72, "size": 4, "kind": "scalar", "target": null},
+        {"name": "steps", "offset": 76, "size": 4, "kind": "scalar", "target": null},
+        {"name": "costScale", "offset": 80, "size": 4, "kind": "scalar", "target": null},
+        {"name": "baseScale", "offset": 84, "size": 4, "kind": "scalar", "target": null},
+        {"name": "object", "offset": 88, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "player", "offset": 120, "size": 1, "kind": "scalar", "target": null},
+        {"name": "cursor[0]", "offset": 121, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[1]", "offset": 125, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[2]", "offset": 129, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[3]", "offset": 133, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[4]", "offset": 137, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[5]", "offset": 141, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[6]", "offset": 145, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[7]", "offset": 149, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[8]", "offset": 153, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[9]", "offset": 157, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "budget", "offset": 161, "size": 40, "kind": "bytes", "target": null}
+      ],
+      "plan": [
+        {"name": "pool", "offset": 0, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "items", "offset": 4, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 8, "size": 8, "kind": "bytes", "target": null},
+        {"name": "", "offset": 20, "size": 8, "kind": "bytes", "target": null},
+        {"name": "cells", "offset": 28, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 32, "size": 12, "kind": "bytes", "target": null},
+        {"name": "dirty", "offset": 44, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 72, "size": 16, "kind": "bytes", "target": null},
+        {"name": "object", "offset": 88, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "", "offset": 120, "size": 1, "kind": "bytes", "target": null},
+        {"name": "cursor[0]", "offset": 121, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[1]", "offset": 125, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[2]", "offset": 129, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[3]", "offset": 133, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[4]", "offset": 137, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[5]", "offset": 141, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[6]", "offset": 145, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[7]", "offset": 149, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[8]", "offset": 153, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cursor[9]", "offset": 157, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "", "offset": 161, "size": 40, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "capacity", "reason": "an allocation size, not behaviour: nothing reads it but the growth of the pool"},
+        {"field": "found_x", "reason": "written only when a search reaches its goal, read right after"},
+        {"field": "found_y", "reason": "written only when a search reaches its goal, read right after"}
+      ]
+    },
+    "PathfinderSearch": {
+      "size": 201,
+      "split_of": "Pathfinder",
+      "fields": [
+        {"name": "start_x", "offset": 48, "size": 2, "kind": "scalar", "target": null},
+        {"name": "start_y", "offset": 50, "size": 2, "kind": "scalar", "target": null},
+        {"name": "goalX", "offset": 56, "size": 4, "kind": "scalar", "target": null},
+        {"name": "goalY", "offset": 60, "size": 4, "kind": "scalar", "target": null},
+        {"name": "probe", "offset": 64, "size": 4, "kind": "scalar", "target": null},
+        {"name": "range", "offset": 68, "size": 4, "kind": "scalar", "target": null},
+        {"name": "path", "offset": 92, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "target", "offset": 96, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "owner", "offset": 100, "size": 4, "kind": "ref", "target": "moveclass"},
+        {"name": "turnCost", "offset": 104, "size": 8, "kind": "bytes", "target": null},
+        {"name": "stepCost", "offset": 112, "size": 8, "kind": "bytes", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 48, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 56, "size": 16, "kind": "bytes", "target": null},
+        {"name": "path", "offset": 92, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "target", "offset": 96, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "owner", "offset": 100, "size": 4, "kind": "ref", "target": "moveclass"},
+        {"name": "", "offset": 104, "size": 16, "kind": "bytes", "target": null}
+      ]
+    },
+    "PatrolGoal": {
+      "size": 28,
+      "fields": [
+        {"name": "target", "offset": 4, "size": 4, "kind": "ref", "target": "orderfx"},
+        {"name": "owner", "offset": 8, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "count", "offset": 24, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "target", "offset": 4, "size": 4, "kind": "ref", "target": "orderfx"},
+        {"name": "owner", "offset": 8, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "", "offset": 24, "size": 4, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"},
+        {"field": "points", "reason": "only the first count points are live: the visit hashes those"}
+      ]
+    },
+    "Piece": {
+      "size": 52,
+      "fields": [
+        {"name": "state", "offset": 0, "size": 1, "kind": "scalar", "target": null},
+        {"name": "", "offset": 1, "size": 3, "kind": "bytes", "target": null},
+        {"name": "vertexCount", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "faceCount", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "firstFace", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "f10", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "f14", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "color", "offset": 24, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "name", "offset": 28, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "active", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vertices", "offset": 36, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "faces", "offset": 40, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "sibling", "offset": 44, "size": 4, "kind": "pointer", "target": "piece"},
+        {"name": "child", "offset": 48, "size": 4, "kind": "pointer", "target": "piece"}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 24, "kind": "bytes", "target": null},
+        {"name": "color", "offset": 24, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "name", "offset": 28, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 32, "size": 4, "kind": "bytes", "target": null},
+        {"name": "vertices", "offset": 36, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "faces", "offset": 40, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "sibling", "offset": 44, "size": 4, "kind": "pointer", "target": "piece"},
+        {"name": "child", "offset": 48, "size": 4, "kind": "pointer", "target": "piece"}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "PieceRec": {
+      "size": 54,
+      "fields": [
+        {"name": "desc", "offset": 0, "size": 4, "kind": "pointer", "target": "piece"},
+        {"name": "", "offset": 4, "size": 12, "kind": "bytes", "target": null},
+        {"name": "angle_10", "offset": 16, "size": 2, "kind": "scalar", "target": null},
+        {"name": "angle_12", "offset": 18, "size": 2, "kind": "scalar", "target": null},
+        {"name": "angle_14", "offset": 20, "size": 2, "kind": "scalar", "target": null},
+        {"name": "pos.x", "offset": 22, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.y", "offset": 26, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.z", "offset": 30, "size": 4, "kind": "scalar", "target": null},
+        {"name": "verts", "offset": 34, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 38, "size": 2, "kind": "bytes", "target": null},
+        {"name": "flags", "offset": 40, "size": 2, "kind": "scalar", "target": null},
+        {"name": "link0", "offset": 42, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "link1", "offset": 46, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "link2", "offset": 50, "size": 4, "kind": "pointer", "target": "heap"}
+      ],
+      "plan": [
+        {"name": "desc", "offset": 0, "size": 4, "kind": "pointer", "target": "piece"},
+        {"name": "", "offset": 4, "size": 30, "kind": "bytes", "target": null},
+        {"name": "verts", "offset": 34, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 38, "size": 4, "kind": "bytes", "target": null},
+        {"name": "link0", "offset": 42, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "link1", "offset": 46, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "link2", "offset": 50, "size": 4, "kind": "pointer", "target": "heap"}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "PieceTransform": {
+      "size": 54,
+      "fields": [
+        {"name": "translation", "offset": 4, "size": 12, "kind": "bytes", "target": null},
+        {"name": "rotation", "offset": 16, "size": 6, "kind": "bytes", "target": null},
+        {"name": "flags", "offset": 40, "size": 2, "kind": "scalar", "target": null, "mask": 7, "mask_reason": "bits 3 to 15 are never written; SaveScriptState saves visible, cached and shaded"}
+      ],
+      "plan": [
+        {"name": "", "offset": 4, "size": 18, "kind": "bytes", "target": null},
+        {"name": "flags", "offset": 40, "size": 2, "kind": "scalar", "target": null, "mask": 7}
+      ],
+      "excluded": [
+        {"field": "object", "reason": "the model piece, fixed when the state is built"},
+        {"field": "pos", "reason": "the world position UpdateObjectState derives from the transforms"},
+        {"field": "sfxOffset", "reason": "points at constant model data"},
+        {"field": "value", "reason": "a cache cleared when the piece changes"},
+        {"field": "rest", "reason": "bytes 0x2a to 0x35, which nothing in the script or the sim writes"}
+      ]
+    },
+    "Player": {
+      "size": 331,
+      "fields": [
+        {"name": "active", "offset": 0, "size": 4, "kind": "scalar", "target": null},
+        {"name": "id", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "joinTime", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "lobbyDataSynced", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "messages", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "ping", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "syncTick", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "lastHeard", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "progress", "offset": 32, "size": 1, "kind": "scalar", "target": null},
+        {"name": "keepaliveFlags", "offset": 33, "size": 1, "kind": "scalar", "target": null},
+        {"name": "rejectReason", "offset": 34, "size": 1, "kind": "scalar", "target": null},
+        {"name": "", "offset": 35, "size": 4, "kind": "bytes", "target": null},
+        {"name": "info", "offset": 39, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "name", "offset": 43, "size": 30, "kind": "bytes", "target": null},
+        {"name": "fullName", "offset": 73, "size": 30, "kind": "bytes", "target": null},
+        {"name": "unitsBegin", "offset": 103, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "unitsEnd", "offset": 107, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "firstIndex", "offset": 111, "size": 2, "kind": "scalar", "target": null},
+        {"name": "lastIndex", "offset": 113, "size": 2, "kind": "scalar", "target": null},
+        {"name": "type", "offset": 115, "size": 1, "kind": "scalar", "target": null},
+        {"name": "ai", "offset": 116, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "groups", "offset": 120, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "explored", "offset": 124, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "exploredWidth", "offset": 128, "size": 4, "kind": "scalar", "target": null},
+        {"name": "exploredHeight", "offset": 132, "size": 4, "kind": "scalar", "target": null},
+        {"name": "exploredSize", "offset": 136, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energy", "offset": 140, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyIncome", "offset": 144, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyUsage", "offset": 148, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metal", "offset": 152, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalIncome", "offset": 156, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalUsage", "offset": 160, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyCapacity", "offset": 164, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalCapacity", "offset": 168, "size": 4, "kind": "scalar", "target": null},
+        {"name": "totalEnergyProduced", "offset": 172, "size": 8, "kind": "scalar", "target": null},
+        {"name": "totalMetalProduced", "offset": 180, "size": 8, "kind": "scalar", "target": null},
+        {"name": "totalEnergyConsumed", "offset": 188, "size": 8, "kind": "scalar", "target": null},
+        {"name": "totalMetalConsumed", "offset": 196, "size": 8, "kind": "scalar", "target": null},
+        {"name": "energyWasted", "offset": 204, "size": 8, "kind": "scalar", "target": null},
+        {"name": "metalWasted", "offset": 212, "size": 8, "kind": "scalar", "target": null},
+        {"name": "energyStorageBonus", "offset": 220, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalStorageBonus", "offset": 224, "size": 4, "kind": "scalar", "target": null},
+        {"name": "shareMetal", "offset": 228, "size": 4, "kind": "scalar", "target": null},
+        {"name": "shareEnergy", "offset": 232, "size": 4, "kind": "scalar", "target": null},
+        {"name": "econ", "offset": 236, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "updateTime", "offset": 240, "size": 4, "kind": "scalar", "target": null},
+        {"name": "winLoseTime", "offset": 244, "size": 4, "kind": "scalar", "target": null},
+        {"name": "displayTimer", "offset": 248, "size": 4, "kind": "scalar", "target": null},
+        {"name": "kills", "offset": 252, "size": 2, "kind": "scalar", "target": null},
+        {"name": "losses", "offset": 254, "size": 2, "kind": "scalar", "target": null},
+        {"name": "unused_100", "offset": 256, "size": 2, "kind": "scalar", "target": null},
+        {"name": "unused_102", "offset": 258, "size": 2, "kind": "scalar", "target": null},
+        {"name": "commanderKills", "offset": 260, "size": 2, "kind": "scalar", "target": null},
+        {"name": "commanderLosses", "offset": 262, "size": 2, "kind": "scalar", "target": null},
+        {"name": "allied", "offset": 264, "size": 11, "kind": "bytes", "target": null},
+        {"name": "alliedBy", "offset": 275, "size": 11, "kind": "bytes", "target": null},
+        {"name": "shareLos", "offset": 286, "size": 11, "kind": "bytes", "target": null},
+        {"name": "shareVision", "offset": 297, "size": 11, "kind": "bytes", "target": null},
+        {"name": "shareMapping", "offset": 308, "size": 11, "kind": "bytes", "target": null},
+        {"name": "alliance", "offset": 319, "size": 1, "kind": "scalar", "target": null},
+        {"name": "unitsCreated", "offset": 320, "size": 4, "kind": "scalar", "target": null},
+        {"name": "unitCount", "offset": 324, "size": 2, "kind": "scalar", "target": null},
+        {"name": "index", "offset": 326, "size": 1, "kind": "scalar", "target": null},
+        {"name": "startPos", "offset": 327, "size": 1, "kind": "scalar", "target": null},
+        {"name": "rank", "offset": 328, "size": 1, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 329, "size": 2, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 39, "kind": "bytes", "target": null},
+        {"name": "info", "offset": 39, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 43, "size": 60, "kind": "bytes", "target": null},
+        {"name": "unitsBegin", "offset": 103, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "unitsEnd", "offset": 107, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "", "offset": 111, "size": 5, "kind": "bytes", "target": null},
+        {"name": "ai", "offset": 116, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "groups", "offset": 120, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "explored", "offset": 124, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 128, "size": 108, "kind": "bytes", "target": null},
+        {"name": "econ", "offset": 236, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 240, "size": 91, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "PlayerAI": {
+      "size": 269,
+      "fields": [
+        {"name": "owner", "offset": 0, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "index", "offset": 4, "size": 1, "kind": "scalar", "target": null},
+        {"name": "centre.x", "offset": 53, "size": 4, "kind": "scalar", "target": null},
+        {"name": "centre.y", "offset": 57, "size": 4, "kind": "scalar", "target": null},
+        {"name": "centre.z", "offset": 61, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos_41.x", "offset": 65, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos_41.y", "offset": 69, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos_41.z", "offset": 73, "size": 4, "kind": "scalar", "target": null},
+        {"name": "center.x", "offset": 93, "size": 2, "kind": "scalar", "target": null},
+        {"name": "center.y", "offset": 95, "size": 2, "kind": "scalar", "target": null},
+        {"name": "centerPad", "offset": 97, "size": 4, "kind": "scalar", "target": null},
+        {"name": "builders", "offset": 117, "size": 4, "kind": "scalar", "target": null},
+        {"name": "hasSpecial", "offset": 121, "size": 4, "kind": "scalar", "target": null},
+        {"name": "lastTick", "offset": 237, "size": 4, "kind": "scalar", "target": null},
+        {"name": "spacing0.x", "offset": 241, "size": 2, "kind": "scalar", "target": null},
+        {"name": "spacing0.y", "offset": 243, "size": 2, "kind": "scalar", "target": null},
+        {"name": "offset0.x", "offset": 245, "size": 2, "kind": "scalar", "target": null},
+        {"name": "offset0.y", "offset": 247, "size": 2, "kind": "scalar", "target": null},
+        {"name": "margin0", "offset": 249, "size": 4, "kind": "scalar", "target": null},
+        {"name": "spacing1.x", "offset": 253, "size": 2, "kind": "scalar", "target": null},
+        {"name": "spacing1.y", "offset": 255, "size": 2, "kind": "scalar", "target": null},
+        {"name": "offset1.x", "offset": 257, "size": 2, "kind": "scalar", "target": null},
+        {"name": "offset1.y", "offset": 259, "size": 2, "kind": "scalar", "target": null},
+        {"name": "margin1", "offset": 261, "size": 4, "kind": "scalar", "target": null},
+        {"name": "searchRadius", "offset": 265, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "owner", "offset": 0, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "", "offset": 4, "size": 1, "kind": "bytes", "target": null},
+        {"name": "", "offset": 53, "size": 24, "kind": "bytes", "target": null},
+        {"name": "", "offset": 93, "size": 8, "kind": "bytes", "target": null},
+        {"name": "", "offset": 117, "size": 8, "kind": "bytes", "target": null},
+        {"name": "", "offset": 237, "size": 32, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "visible", "reason": "the visit hashes the size and the unit IDs it holds"},
+        {"field": "known", "reason": "the visit hashes the size and the unit IDs it holds"},
+        {"field": "factories", "reason": "the visit hashes the size and the unit IDs it holds"},
+        {"field": "cells", "reason": "the visit hashes the size and the elements it holds, never the begin and end pointers"},
+        {"field": "vec_65", "reason": "the visit hashes the size and the elements it holds"},
+        {"field": "counts", "reason": "the visit hashes the size and the elements it holds"},
+        {"field": "vec_8d", "reason": "the visit hashes the size and the elements it holds"},
+        {"field": "weights", "reason": "the visit hashes the size and the elements it holds"},
+        {"field": "vec_ad", "reason": "the visit hashes the size and the elements it holds"},
+        {"field": "vec_bd", "reason": "the visit hashes the size and the elements it holds"},
+        {"field": "values", "reason": "the visit hashes the size and the elements it holds"},
+        {"field": "locked", "reason": "the visit hashes the size and the elements it holds"}
+      ]
+    },
+    "PointMarker": {
+      "size": 24,
+      "fields": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "x1", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "x2", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "y1", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "y2", "offset": 20, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "", "offset": 8, "size": 16, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"}
+      ]
+    },
+    "Projectile": {
+      "size": 107,
+      "fields": [
+        {"name": "type", "offset": 0, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "position.x", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "position.y", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "position.z", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "start.x", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "start.y", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "start.z", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "direction.x", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "direction.y", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "direction.z", "offset": 36, "size": 4, "kind": "scalar", "target": null},
+        {"name": "target.x", "offset": 40, "size": 4, "kind": "scalar", "target": null},
+        {"name": "target.y", "offset": 44, "size": 4, "kind": "scalar", "target": null},
+        {"name": "target.z", "offset": 48, "size": 4, "kind": "scalar", "target": null},
+        {"name": "angles.bank", "offset": 52, "size": 2, "kind": "scalar", "target": null},
+        {"name": "angles.heading", "offset": 54, "size": 2, "kind": "scalar", "target": null},
+        {"name": "angles.pitch", "offset": 56, "size": 2, "kind": "scalar", "target": null},
+        {"name": "speed", "offset": 58, "size": 4, "kind": "scalar", "target": null},
+        {"name": "range", "offset": 62, "size": 4, "kind": "scalar", "target": null},
+        {"name": "spawnTick", "offset": 66, "size": 4, "kind": "scalar", "target": null},
+        {"name": "time", "offset": 70, "size": 4, "kind": "scalar", "target": null},
+        {"name": "nextSmokeTick", "offset": 74, "size": 4, "kind": "scalar", "target": null},
+        {"name": "", "offset": 78, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "attacker", "offset": 82, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "field_56", "offset": 86, "size": 4, "kind": "scalar", "target": null},
+        {"name": "cellX", "offset": 90, "size": 2, "kind": "scalar", "target": null},
+        {"name": "cellZ", "offset": 92, "size": 2, "kind": "scalar", "target": null},
+        {"name": "radius", "offset": 94, "size": 2, "kind": "scalar", "target": null},
+        {"name": "active", "offset": 96, "size": 2, "kind": "scalar", "target": null},
+        {"name": "piece", "offset": 98, "size": 2, "kind": "scalar", "target": null},
+        {"name": "propellerSpin", "offset": 100, "size": 2, "kind": "scalar", "target": null},
+        {"name": "owner", "offset": 102, "size": 1, "kind": "scalar", "target": null},
+        {"name": "compactIndex", "offset": 103, "size": 2, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 105, "size": 2, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "type", "offset": 0, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "", "offset": 4, "size": 74, "kind": "bytes", "target": null},
+        {"name": "", "offset": 78, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "attacker", "offset": 82, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "", "offset": 86, "size": 21, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "Rec": {
+      "size": 10,
+      "fields": [
+        {"name": "a", "offset": 0, "size": 1, "kind": "scalar", "target": null},
+        {"name": "b", "offset": 1, "size": 1, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 2, "size": 4, "kind": "scalar", "target": null},
+        {"name": "first", "offset": 6, "size": 4, "kind": "pointer", "target": "unit"}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 6, "kind": "bytes", "target": null},
+        {"name": "first", "offset": 6, "size": 4, "kind": "pointer", "target": "unit"}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "RingApproach": {
+      "size": 28,
+      "fields": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "pos.x", "offset": 8, "size": 2, "kind": "scalar", "target": null},
+        {"name": "pos.y", "offset": 10, "size": 2, "kind": "scalar", "target": null},
+        {"name": "radius2", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "radius1", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "radius2Sq", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "radius1Sq", "offset": 24, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "source", "offset": 4, "size": 4, "kind": "ref", "target": "order"},
+        {"name": "", "offset": 8, "size": 20, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"}
+      ]
+    },
+    "ScriptChannel": {
+      "size": 164,
+      "fields": [
+        {"name": "state", "offset": 0, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pc", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "sp", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "signal", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "callback", "offset": 32, "size": 4, "kind": "ref", "target": "heap"}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 12, "kind": "bytes", "target": null},
+        {"name": "", "offset": 28, "size": 4, "kind": "bytes", "target": null},
+        {"name": "callback", "offset": 32, "size": 4, "kind": "ref", "target": "heap"}
+      ],
+      "excluded": [
+        {"field": "stack", "reason": "only the words up to sp are live: the visit hashes those"}
+      ]
+    },
+    "ScriptChannelDelay": {
+      "size": 164,
+      "split_of": "ScriptChannel",
+      "fields": [
+        {"name": "delay", "offset": 12, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 12, "size": 4, "kind": "bytes", "target": null}
+      ]
+    },
+    "ScriptChannelPiece": {
+      "size": 164,
+      "split_of": "ScriptChannel",
+      "fields": [
+        {"name": "piece", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "axis", "offset": 20, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 16, "size": 8, "kind": "bytes", "target": null}
+      ]
+    },
+    "ScriptChannelWait": {
+      "size": 164,
+      "split_of": "ScriptChannel",
+      "fields": [
+        {"name": "waiting", "offset": 24, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 24, "size": 4, "kind": "bytes", "target": null}
+      ]
+    },
+    "ScriptPiece": {
+      "size": 76,
+      "fields": [
+        {"name": "active", "offset": 0, "size": 4, "kind": "scalar", "target": null},
+        {"name": "move", "offset": 4, "size": 12, "kind": "bytes", "target": null},
+        {"name": "moveSpeed", "offset": 16, "size": 12, "kind": "bytes", "target": null},
+        {"name": "turn", "offset": 28, "size": 12, "kind": "bytes", "target": null},
+        {"name": "turnSpeed", "offset": 40, "size": 12, "kind": "bytes", "target": null},
+        {"name": "spin", "offset": 52, "size": 12, "kind": "bytes", "target": null},
+        {"name": "acceleration", "offset": 64, "size": 12, "kind": "bytes", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 76, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "ScriptState": {
+      "size": 1348,
+      "fields": [
+        {"name": "scale", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "table", "offset": 8, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "checksum", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "changed", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "activeCount", "offset": 1340, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 4, "size": 4, "kind": "bytes", "target": null},
+        {"name": "table", "offset": 8, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 12, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 24, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 1340, "size": 4, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the vtable of UnitScript"},
+        {"field": "statics", "reason": "the visit hashes the staticCount ints it points at"},
+        {"field": "pieces", "reason": "the visit hashes the pieceCount records it points at"},
+        {"field": "channels", "reason": "the visit hashes the channels that are not idle"},
+        {"field": "state", "reason": "the visit hashes the piece transforms it points at"}
+      ]
+    },
+    "SpatialTimer": {
+      "size": 60,
+      "fields": [
+        {"name": "next", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "player", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "best.x", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "best.y", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "best.z", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "probe.x", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "probe.y", "offset": 36, "size": 4, "kind": "scalar", "target": null},
+        {"name": "probe.z", "offset": 40, "size": 4, "kind": "scalar", "target": null},
+        {"name": "step.x", "offset": 44, "size": 4, "kind": "scalar", "target": null},
+        {"name": "step.y", "offset": 48, "size": 4, "kind": "scalar", "target": null},
+        {"name": "step.z", "offset": 52, "size": 4, "kind": "scalar", "target": null},
+        {"name": "bestRating", "offset": 56, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 12, "size": 48, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"},
+        {"field": "manager", "reason": "points back at the SquadManager that owns the timer"},
+        {"field": "group", "reason": "points into the Player's own groups, which the Player table hashes"}
+      ]
+    },
+    "SpotAnim": {
+      "size": 48,
+      "fields": [
+        {"name": "prev", "offset": 0, "size": 2, "kind": "scalar", "target": null},
+        {"name": "next", "offset": 2, "size": 2, "kind": "scalar", "target": null},
+        {"name": "anim.index", "offset": 4, "size": 2, "kind": "scalar", "target": null},
+        {"name": "anim.value", "offset": 6, "size": 2, "kind": "scalar", "target": null},
+        {"name": "anim.kind", "offset": 8, "size": 1, "kind": "scalar", "target": null},
+        {"name": "", "offset": 9, "size": 3, "kind": "bytes", "target": null},
+        {"name": "anim.src", "offset": 12, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "shadow.index", "offset": 16, "size": 2, "kind": "scalar", "target": null},
+        {"name": "shadow.value", "offset": 18, "size": 2, "kind": "scalar", "target": null},
+        {"name": "shadow.kind", "offset": 20, "size": 1, "kind": "scalar", "target": null},
+        {"name": "", "offset": 21, "size": 3, "kind": "bytes", "target": null},
+        {"name": "shadow.src", "offset": 24, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 28, "size": 4, "kind": "bytes", "target": null},
+        {"name": "rot.x", "offset": 32, "size": 2, "kind": "scalar", "target": null},
+        {"name": "rot.y", "offset": 34, "size": 2, "kind": "scalar", "target": null},
+        {"name": "rot.z", "offset": 36, "size": 2, "kind": "scalar", "target": null},
+        {"name": "damage", "offset": 38, "size": 2, "kind": "scalar", "target": null},
+        {"name": "x", "offset": 40, "size": 2, "kind": "scalar", "target": null},
+        {"name": "z", "offset": 42, "size": 2, "kind": "scalar", "target": null},
+        {"name": "feature", "offset": 44, "size": 2, "kind": "scalar", "target": null},
+        {"name": "timer", "offset": 46, "size": 1, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 47, "size": 1, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 12, "kind": "bytes", "target": null},
+        {"name": "anim.src", "offset": 12, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 16, "size": 8, "kind": "bytes", "target": null},
+        {"name": "shadow.src", "offset": 24, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 28, "size": 20, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "SpotObject": {
+      "size": 48,
+      "fields": [
+        {"name": "prev", "offset": 0, "size": 2, "kind": "scalar", "target": null},
+        {"name": "next", "offset": 2, "size": 2, "kind": "scalar", "target": null},
+        {"name": "state", "offset": 4, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "pos.x", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.y", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.z", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel.x", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel.y", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "vel.z", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "rot.x", "offset": 32, "size": 2, "kind": "scalar", "target": null},
+        {"name": "rot.y", "offset": 34, "size": 2, "kind": "scalar", "target": null},
+        {"name": "rot.z", "offset": 36, "size": 2, "kind": "scalar", "target": null},
+        {"name": "damage", "offset": 38, "size": 2, "kind": "scalar", "target": null},
+        {"name": "x", "offset": 40, "size": 2, "kind": "scalar", "target": null},
+        {"name": "z", "offset": 42, "size": 2, "kind": "scalar", "target": null},
+        {"name": "feature", "offset": 44, "size": 2, "kind": "scalar", "target": null},
+        {"name": "timer", "offset": 46, "size": 1, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 47, "size": 1, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 4, "kind": "bytes", "target": null},
+        {"name": "state", "offset": 4, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 8, "size": 40, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "Squad": {
+      "size": 32,
+      "fields": [
+        {"name": "owner", "offset": 0, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "index", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "field_8", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "field_c", "offset": 12, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "owner", "offset": 0, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "", "offset": 4, "size": 12, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "items", "reason": "the visit hashes the size and the unit IDs it holds, never the begin and end pointers"}
+      ]
+    },
+    "SquadManager": {
+      "size": 61,
+      "fields": [
+        {"name": "player", "offset": 0, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "index", "offset": 4, "size": 1, "kind": "scalar", "target": null},
+        {"name": "countdown", "offset": 5, "size": 4, "kind": "scalar", "target": null},
+        {"name": "unused_9", "offset": 9, "size": 4, "kind": "scalar", "target": null},
+        {"name": "nextAction", "offset": 13, "size": 4, "kind": "scalar", "target": null},
+        {"name": "cursor", "offset": 57, "size": 4, "kind": "ref", "target": "unit"}
+      ],
+      "plan": [
+        {"name": "player", "offset": 0, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "", "offset": 4, "size": 13, "kind": "bytes", "target": null},
+        {"name": "cursor", "offset": 57, "size": 4, "kind": "ref", "target": "unit"}
+      ],
+      "excluded": [
+        {"field": "timers", "reason": "the visit hashes the class and the fields of each timer"}
+      ]
+    },
+    "SquadTimer": {
+      "size": 20,
+      "fields": [
+        {"name": "next", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "player", "offset": 16, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 12, "size": 8, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "vptr", "reason": "the class is hashed as a tag"},
+        {"field": "manager", "reason": "points back at the SquadManager that owns the timer"},
+        {"field": "group", "reason": "points into the Player's own groups, which the Player table hashes"}
+      ]
+    },
+    "Unit": {
+      "size": 280,
+      "fields": [
+        {"name": "", "offset": 0, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "current", "offset": 4, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 8, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "type", "offset": 12, "size": 4, "kind": "pointer", "target": "weapondef"},
+        {"name": "weapon", "offset": 16, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 20, "size": 2, "kind": "bytes", "target": null},
+        {"name": "field_16", "offset": 22, "size": 2, "kind": "scalar", "target": null},
+        {"name": "field_18", "offset": 24, "size": 2, "kind": "scalar", "target": null},
+        {"name": "", "offset": 26, "size": 1, "kind": "scalar", "target": null},
+        {"name": "f_1b", "offset": 27, "size": 1, "kind": "scalar", "target": null},
+        {"name": "", "offset": 28, "size": 2, "kind": "bytes", "target": null},
+        {"name": "field_1e", "offset": 30, "size": 1, "kind": "scalar", "target": null},
+        {"name": "f_1f", "offset": 31, "size": 1, "kind": "scalar", "target": null},
+        {"name": "field_20", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "", "offset": 36, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 40, "size": 2, "kind": "bytes", "target": null},
+        {"name": "", "offset": 42, "size": 2, "kind": "bytes", "target": null},
+        {"name": "f2c", "offset": 44, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 48, "size": 10, "kind": "bytes", "target": null},
+        {"name": "b3a", "offset": 58, "size": 1, "kind": "scalar", "target": null},
+        {"name": "f_3b", "offset": 59, "size": 1, "kind": "scalar", "target": null},
+        {"name": "", "offset": 60, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 64, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 68, "size": 4, "kind": "bytes", "target": null},
+        {"name": "f48", "offset": 72, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 76, "size": 10, "kind": "bytes", "target": null},
+        {"name": "b56", "offset": 86, "size": 1, "kind": "scalar", "target": null},
+        {"name": "f_57", "offset": 87, "size": 1, "kind": "scalar", "target": null},
+        {"name": "extraction", "offset": 88, "size": 4, "kind": "scalar", "target": null},
+        {"name": "list", "offset": 92, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "list2", "offset": 96, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "field_64", "offset": 100, "size": 2, "kind": "scalar", "target": null},
+        {"name": "heading", "offset": 102, "size": 2, "kind": "scalar", "target": null},
+        {"name": "pitch", "offset": 104, "size": 2, "kind": "scalar", "target": null},
+        {"name": "pos.x", "offset": 106, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.y", "offset": 110, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pos.z", "offset": 114, "size": 4, "kind": "scalar", "target": null},
+        {"name": "cell.x", "offset": 118, "size": 2, "kind": "scalar", "target": null},
+        {"name": "cell.y", "offset": 120, "size": 2, "kind": "scalar", "target": null},
+        {"name": "losCacheCell", "offset": 122, "size": 4, "kind": "scalar", "target": null},
+        {"name": "footprint.x", "offset": 126, "size": 2, "kind": "scalar", "target": null},
+        {"name": "footprint.y", "offset": 128, "size": 2, "kind": "scalar", "target": null},
+        {"name": "", "offset": 130, "size": 4, "kind": "ref", "target": "rec"},
+        {"name": "", "offset": 134, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cargo", "offset": 138, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cargoNext", "offset": 142, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "def", "offset": 146, "size": 4, "kind": "ref", "target": "unitdef"},
+        {"name": "player", "offset": 150, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "script", "offset": 154, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "state", "offset": 158, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "head", "offset": 162, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "unitDefIndex", "offset": 166, "size": 2, "kind": "scalar", "target": null},
+        {"name": "id", "offset": 168, "size": 2, "kind": "scalar", "target": null},
+        {"name": "hoverBobPhase", "offset": 170, "size": 2, "kind": "scalar", "target": null},
+        {"name": "group", "offset": 172, "size": 4, "kind": "scalar", "target": null},
+        {"name": "workTime", "offset": 176, "size": 4, "kind": "scalar", "target": null},
+        {"name": "", "offset": 180, "size": 4, "kind": "bytes", "target": null},
+        {"name": "killCount", "offset": 184, "size": 2, "kind": "scalar", "target": null},
+        {"name": "", "offset": 186, "size": 2, "kind": "scalar", "target": null},
+        {"name": "energy", "offset": 188, "size": 4, "kind": "scalar", "target": null},
+        {"name": "", "offset": 192, "size": 20, "kind": "bytes", "target": null},
+        {"name": "metal", "offset": 212, "size": 4, "kind": "scalar", "target": null},
+        {"name": "", "offset": 216, "size": 4, "kind": "bytes", "target": null},
+        {"name": "f_dc", "offset": 220, "size": 4, "kind": "scalar", "target": null},
+        {"name": "", "offset": 224, "size": 4, "kind": "bytes", "target": null},
+        {"name": "field_e4", "offset": 228, "size": 2, "kind": "scalar", "target": null},
+        {"name": "f_e6", "offset": 230, "size": 2, "kind": "scalar", "target": null},
+        {"name": "", "offset": 232, "size": 4, "kind": "bytes", "target": null},
+        {"name": "owner", "offset": 236, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "attacker", "offset": 240, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "lastAttackerSlot", "offset": 244, "size": 1, "kind": "scalar", "target": null},
+        {"name": "lastDamageType", "offset": 245, "size": 1, "kind": "scalar", "target": null},
+        {"name": "healthPercent", "offset": 246, "size": 1, "kind": "scalar", "target": null},
+        {"name": "prevHealthPercent", "offset": 247, "size": 1, "kind": "scalar", "target": null},
+        {"name": "losSightFrameIdx", "offset": 248, "size": 1, "kind": "scalar", "target": null},
+        {"name": "transportPiece", "offset": 249, "size": 1, "kind": "scalar", "target": null},
+        {"name": "recentlyDamagedTimer", "offset": 250, "size": 1, "kind": "scalar", "target": null},
+        {"name": "postTransferHoldoff", "offset": 251, "size": 4, "kind": "scalar", "target": null},
+        {"name": "playerIndex", "offset": 255, "size": 1, "kind": "scalar", "target": null},
+        {"name": "unfinishedInitZero", "offset": 256, "size": 4, "kind": "scalar", "target": null},
+        {"name": "speed", "offset": 260, "size": 4, "kind": "scalar", "target": null},
+        {"name": "health", "offset": 264, "size": 2, "kind": "scalar", "target": null},
+        {"name": "", "offset": 266, "size": 4, "kind": "bytes", "target": null},
+        {"name": "activateFlags", "offset": 270, "size": 1, "kind": "scalar", "target": null},
+        {"name": "bit0", "offset": 271, "size": 1, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 272, "size": 4, "kind": "scalar", "target": null},
+        {"name": "zBufferFlag", "offset": 276, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "current", "offset": 4, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 8, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "type", "offset": 12, "size": 4, "kind": "pointer", "target": "weapondef"},
+        {"name": "weapon", "offset": 16, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 20, "size": 16, "kind": "bytes", "target": null},
+        {"name": "", "offset": 36, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 40, "size": 4, "kind": "bytes", "target": null},
+        {"name": "f2c", "offset": 44, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 48, "size": 16, "kind": "bytes", "target": null},
+        {"name": "", "offset": 64, "size": 4, "kind": "pointer", "target": "heap"},
+        {"name": "", "offset": 68, "size": 4, "kind": "bytes", "target": null},
+        {"name": "f48", "offset": 72, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 76, "size": 16, "kind": "bytes", "target": null},
+        {"name": "list", "offset": 92, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "list2", "offset": 96, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 100, "size": 30, "kind": "bytes", "target": null},
+        {"name": "", "offset": 130, "size": 4, "kind": "ref", "target": "rec"},
+        {"name": "", "offset": 134, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cargo", "offset": 138, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "cargoNext", "offset": 142, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "def", "offset": 146, "size": 4, "kind": "ref", "target": "unitdef"},
+        {"name": "player", "offset": 150, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "script", "offset": 154, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "state", "offset": 158, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "head", "offset": 162, "size": 4, "kind": "ref", "target": "heap"},
+        {"name": "", "offset": 166, "size": 70, "kind": "bytes", "target": null},
+        {"name": "owner", "offset": 236, "size": 4, "kind": "ref", "target": "player"},
+        {"name": "attacker", "offset": 240, "size": 4, "kind": "ref", "target": "unit"},
+        {"name": "", "offset": 244, "size": 36, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "UnitDefData": {
+      "size": 585,
+      "fields": [
+        {"name": "name", "offset": 0, "size": 32, "kind": "bytes", "target": null},
+        {"name": "unitname", "offset": 32, "size": 32, "kind": "bytes", "target": null},
+        {"name": "objectname", "offset": 128, "size": 32, "kind": "bytes", "target": null},
+        {"name": "side", "offset": 160, "size": 30, "kind": "bytes", "target": null},
+        {"name": "aiWeight", "offset": 190, "size": 64, "kind": "bytes", "target": null},
+        {"name": "aiLimit", "offset": 254, "size": 64, "kind": "bytes", "target": null},
+        {"name": "fbiChecksum", "offset": 318, "size": 4, "kind": "scalar", "target": null},
+        {"name": "scriptChecksum", "offset": 322, "size": 4, "kind": "scalar", "target": null},
+        {"name": "weaponHashXor", "offset": 326, "size": 4, "kind": "scalar", "target": null},
+        {"name": "footprintx", "offset": 330, "size": 2, "kind": "scalar", "target": null},
+        {"name": "footprintz", "offset": 332, "size": 2, "kind": "scalar", "target": null},
+        {"name": "count", "offset": 338, "size": 4, "kind": "scalar", "target": null},
+        {"name": "maxThisUnit", "offset": 346, "size": 4, "kind": "scalar", "target": null},
+        {"name": "modelBox", "offset": 350, "size": 36, "kind": "bytes", "target": null},
+        {"name": "radius", "offset": 386, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyCost", "offset": 390, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalCost", "offset": 394, "size": 4, "kind": "scalar", "target": null},
+        {"name": "maxvelocity", "offset": 402, "size": 4, "kind": "scalar", "target": null},
+        {"name": "maxslopevelocity", "offset": 406, "size": 4, "kind": "scalar", "target": null},
+        {"name": "brakerate", "offset": 410, "size": 4, "kind": "scalar", "target": null},
+        {"name": "acceleration", "offset": 414, "size": 4, "kind": "scalar", "target": null},
+        {"name": "bankscale", "offset": 418, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pitchscale", "offset": 422, "size": 4, "kind": "scalar", "target": null},
+        {"name": "damagemodifier", "offset": 426, "size": 4, "kind": "scalar", "target": null},
+        {"name": "moverate1", "offset": 430, "size": 4, "kind": "scalar", "target": null},
+        {"name": "moverate2", "offset": 434, "size": 4, "kind": "scalar", "target": null},
+        {"name": "movementclass", "offset": 438, "size": 4, "kind": "ref", "target": "moveclass"},
+        {"name": "turnrate", "offset": 442, "size": 2, "kind": "scalar", "target": null},
+        {"name": "corpse", "offset": 444, "size": 2, "kind": "scalar", "target": null},
+        {"name": "maxwaterdepth", "offset": 446, "size": 2, "kind": "scalar", "target": null},
+        {"name": "minwaterdepth", "offset": 448, "size": 2, "kind": "scalar", "target": null},
+        {"name": "energymake", "offset": 450, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyuse", "offset": 454, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalmake", "offset": 458, "size": 4, "kind": "scalar", "target": null},
+        {"name": "extractsMetal", "offset": 462, "size": 4, "kind": "scalar", "target": null},
+        {"name": "windgenerator", "offset": 466, "size": 4, "kind": "scalar", "target": null},
+        {"name": "tidalgenerator", "offset": 470, "size": 4, "kind": "scalar", "target": null},
+        {"name": "cloakcost", "offset": 474, "size": 4, "kind": "scalar", "target": null},
+        {"name": "cloakcostmoving", "offset": 478, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energystorage", "offset": 482, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalstorage", "offset": 486, "size": 4, "kind": "scalar", "target": null},
+        {"name": "buildtime", "offset": 490, "size": 4, "kind": "scalar", "target": null},
+        {"name": "weapons[0]", "offset": 494, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "weapons[1]", "offset": 498, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "weapons[2]", "offset": 502, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "maxHealth", "offset": 506, "size": 4, "kind": "scalar", "target": null},
+        {"name": "buildRate", "offset": 510, "size": 2, "kind": "scalar", "target": null},
+        {"name": "healtime", "offset": 512, "size": 2, "kind": "scalar", "target": null},
+        {"name": "range", "offset": 514, "size": 2, "kind": "scalar", "target": null},
+        {"name": "radardistance", "offset": 516, "size": 2, "kind": "scalar", "target": null},
+        {"name": "sonardistance", "offset": 518, "size": 2, "kind": "scalar", "target": null},
+        {"name": "mincloakdistance", "offset": 520, "size": 2, "kind": "scalar", "target": null},
+        {"name": "radardistancejam", "offset": 522, "size": 2, "kind": "scalar", "target": null},
+        {"name": "sonardistancejam", "offset": 524, "size": 2, "kind": "scalar", "target": null},
+        {"name": "buildangle", "offset": 528, "size": 2, "kind": "scalar", "target": null},
+        {"name": "buildRange", "offset": 530, "size": 2, "kind": "scalar", "target": null},
+        {"name": "maneuverleashlength", "offset": 532, "size": 2, "kind": "scalar", "target": null},
+        {"name": "attackrunlength", "offset": 534, "size": 2, "kind": "scalar", "target": null},
+        {"name": "kamikazedistance", "offset": 536, "size": 2, "kind": "scalar", "target": null},
+        {"name": "sortbias", "offset": 538, "size": 2, "kind": "scalar", "target": null},
+        {"name": "altitude", "offset": 540, "size": 2, "kind": "scalar", "target": null},
+        {"name": "id", "offset": 542, "size": 2, "kind": "scalar", "target": null},
+        {"name": "explodeas", "offset": 544, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "selfdestructas", "offset": 548, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "maxslope", "offset": 552, "size": 1, "kind": "scalar", "target": null},
+        {"name": "maxwaterslope", "offset": 553, "size": 1, "kind": "scalar", "target": null},
+        {"name": "capacity", "offset": 554, "size": 1, "kind": "scalar", "target": null},
+        {"name": "transportcapacity", "offset": 555, "size": 1, "kind": "scalar", "target": null},
+        {"name": "draft", "offset": 556, "size": 1, "kind": "scalar", "target": null},
+        {"name": "makesMetal", "offset": 557, "size": 1, "kind": "scalar", "target": null},
+        {"name": "buildMenuPageCount", "offset": 558, "size": 1, "kind": "scalar", "target": null},
+        {"name": "mobile", "offset": 559, "size": 1, "kind": "scalar", "target": null},
+        {"name": "defaultmissiontype", "offset": 560, "size": 1, "kind": "scalar", "target": null},
+        {"name": "flags1", "offset": 577, "size": 4, "kind": "scalar", "target": null},
+        {"name": "flags2", "offset": 581, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 64, "kind": "bytes", "target": null},
+        {"name": "", "offset": 128, "size": 206, "kind": "bytes", "target": null},
+        {"name": "", "offset": 338, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 346, "size": 52, "kind": "bytes", "target": null},
+        {"name": "", "offset": 402, "size": 36, "kind": "bytes", "target": null},
+        {"name": "movementclass", "offset": 438, "size": 4, "kind": "ref", "target": "moveclass"},
+        {"name": "", "offset": 442, "size": 52, "kind": "bytes", "target": null},
+        {"name": "weapons[0]", "offset": 494, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "weapons[1]", "offset": 498, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "weapons[2]", "offset": 502, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "", "offset": 506, "size": 20, "kind": "bytes", "target": null},
+        {"name": "", "offset": 528, "size": 16, "kind": "bytes", "target": null},
+        {"name": "explodeas", "offset": 544, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "selfdestructas", "offset": 548, "size": 4, "kind": "ref", "target": "weapondef"},
+        {"name": "", "offset": 552, "size": 9, "kind": "bytes", "target": null},
+        {"name": "", "offset": 577, "size": 8, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "description", "reason": "text shown to the player"},
+        {"field": "data", "reason": "the loaded COB script: constant, read from the files"},
+        {"field": "soundcategory", "reason": "sound selection, read only by sound playback"},
+        {"field": "yardmap", "reason": "the visit hashes the footprint it points at"},
+        {"field": "ids", "reason": "the visit hashes the build list it points at"},
+        {"field": "weaponCategories", "reason": "the visit hashes the masks they point at"},
+        {"field": "categories", "reason": "the visit hashes the mask it points at"}
+      ]
+    },
+    "UnitMotion": {
+      "size": 47,
+      "fields": [
+        {"name": "movementClass", "offset": 4, "size": 4, "kind": "pointer", "target": "moveclass"},
+        {"name": "velocity.x", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "velocity.y", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "velocity.z", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "p2.x", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "p2.y", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "p2.z", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "speed", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "turn", "offset": 36, "size": 2, "kind": "scalar", "target": null},
+        {"name": "pathLockStamp", "offset": 38, "size": 4, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 46, "size": 1, "kind": "scalar", "target": null, "mask": 7, "mask_reason": "bits 3 to 7 are never written; the constructor sets mode and flag (order_list.cpp:2096)"}
+      ],
+      "plan": [
+        {"name": "movementClass", "offset": 4, "size": 4, "kind": "pointer", "target": "moveclass"},
+        {"name": "", "offset": 8, "size": 34, "kind": "bytes", "target": null},
+        {"name": "flags", "offset": 46, "size": 1, "kind": "scalar", "target": null, "mask": 7}
+      ],
+      "excluded": [
+        {"field": "obj", "reason": "the goal object: the visit hashes its class and fields"},
+        {"field": "lastMoveTick", "reason": "written by UpdatePosition (order_list.cpp:2001) and read by nothing"}
+      ]
+    },
+    "UnitResources": {
+      "size": 52,
+      "fields": [
+        {"name": "energyMake", "offset": 0, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyUse", "offset": 4, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyUsePaid", "offset": 8, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyStall", "offset": 12, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyMakePrev", "offset": 16, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyUsePrev", "offset": 20, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalMake", "offset": 24, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalUse", "offset": 28, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalUsePaid", "offset": 32, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalStall", "offset": 36, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalMakePrev", "offset": 40, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalUsePrev", "offset": 44, "size": 4, "kind": "scalar", "target": null},
+        {"name": "player", "offset": 48, "size": 4, "kind": "ref", "target": "player"}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 48, "kind": "bytes", "target": null},
+        {"name": "player", "offset": 48, "size": 4, "kind": "ref", "target": "player"}
+      ],
+      "excluded": [
+
+      ]
+    },
+    "WeaponDefData": {
+      "size": 277,
+      "fields": [
+        {"name": "name", "offset": 0, "size": 32, "kind": "bytes", "target": null},
+        {"name": "speed", "offset": 104, "size": 4, "kind": "scalar", "target": null},
+        {"name": "startSpeed", "offset": 108, "size": 4, "kind": "scalar", "target": null},
+        {"name": "acceleration", "offset": 112, "size": 4, "kind": "scalar", "target": null},
+        {"name": "energyPerShot", "offset": 192, "size": 4, "kind": "scalar", "target": null},
+        {"name": "metalPerShot", "offset": 196, "size": 4, "kind": "scalar", "target": null},
+        {"name": "pitch", "offset": 200, "size": 4, "kind": "scalar", "target": null},
+        {"name": "damage", "offset": 212, "size": 2, "kind": "scalar", "target": null},
+        {"name": "areaOfEffect", "offset": 214, "size": 2, "kind": "scalar", "target": null},
+        {"name": "edgeDamage", "offset": 216, "size": 4, "kind": "scalar", "target": null},
+        {"name": "range", "offset": 220, "size": 4, "kind": "scalar", "target": null},
+        {"name": "coverage", "offset": 224, "size": 4, "kind": "scalar", "target": null},
+        {"name": "reloadTime", "offset": 228, "size": 2, "kind": "scalar", "target": null},
+        {"name": "lifetime", "offset": 230, "size": 2, "kind": "scalar", "target": null},
+        {"name": "turnRate", "offset": 232, "size": 2, "kind": "scalar", "target": null},
+        {"name": "burst", "offset": 234, "size": 2, "kind": "scalar", "target": null},
+        {"name": "burstRate", "offset": 236, "size": 2, "kind": "scalar", "target": null},
+        {"name": "spread", "offset": 238, "size": 2, "kind": "scalar", "target": null},
+        {"name": "duration", "offset": 240, "size": 2, "kind": "scalar", "target": null},
+        {"name": "lifeRand", "offset": 242, "size": 2, "kind": "scalar", "target": null},
+        {"name": "smokeRate", "offset": 250, "size": 2, "kind": "scalar", "target": null},
+        {"name": "flightTime", "offset": 252, "size": 2, "kind": "scalar", "target": null},
+        {"name": "holdTime", "offset": 254, "size": 2, "kind": "scalar", "target": null},
+        {"name": "accuracy", "offset": 260, "size": 2, "kind": "scalar", "target": null},
+        {"name": "tolerance", "offset": 262, "size": 2, "kind": "scalar", "target": null},
+        {"name": "pitchTolerance", "offset": 264, "size": 2, "kind": "scalar", "target": null},
+        {"name": "index", "offset": 266, "size": 1, "kind": "scalar", "target": null},
+        {"name": "fireStarter", "offset": 267, "size": 1, "kind": "scalar", "target": null},
+        {"name": "flags", "offset": 273, "size": 4, "kind": "scalar", "target": null}
+      ],
+      "plan": [
+        {"name": "", "offset": 0, "size": 32, "kind": "bytes", "target": null},
+        {"name": "", "offset": 104, "size": 12, "kind": "bytes", "target": null},
+        {"name": "", "offset": 192, "size": 12, "kind": "bytes", "target": null},
+        {"name": "", "offset": 212, "size": 32, "kind": "bytes", "target": null},
+        {"name": "", "offset": 250, "size": 6, "kind": "bytes", "target": null},
+        {"name": "", "offset": 260, "size": 8, "kind": "bytes", "target": null},
+        {"name": "", "offset": 273, "size": 4, "kind": "bytes", "target": null}
+      ],
+      "excluded": [
+        {"field": "description", "reason": "text shown to the player"},
+        {"field": "fire", "reason": "SetWeaponFireHandler derives it from the flags"},
+        {"field": "table", "reason": "the visit hashes the damage entries it points at"},
+        {"field": "model", "reason": "render asset pointer"},
+        {"field": "explosionSeq", "reason": "render asset pointer"},
+        {"field": "splash", "reason": "render asset pointer"},
+        {"field": "modelName", "reason": "name of the render model"},
+        {"field": "shakeMagnitude", "reason": "screen shake, read only by drawing"},
+        {"field": "shakeDuration", "reason": "screen shake, read only by drawing"},
+        {"field": "sound", "reason": "sound index, read only by sound playback"},
+        {"field": "soundHit", "reason": "sound index, read only by sound playback"},
+        {"field": "soundWater", "reason": "sound index, read only by sound playback"},
+        {"field": "pad100", "reason": "unnamed bytes no code reads or writes"},
+        {"field": "shotKind", "reason": "how the shot is drawn"},
+        {"field": "colour", "reason": "palette index of the line"},
+        {"field": "colour2", "reason": "palette index of the second line"},
+        {"field": "pad10f", "reason": "unnamed bytes no code reads or writes"}
+      ]
+    }
+  },
+  "game_scalars": [
+    {"name": "numPlayers", "offset": 10812, "size": 2, "kind": "scalar", "target": null},
+    {"name": "localPlayer", "offset": 10818, "size": 1, "kind": "scalar", "target": null},
+    {"name": "playerIndex", "offset": 10819, "size": 1, "kind": "scalar", "target": null},
+    {"name": "netGameFlags", "offset": 10820, "size": 2, "kind": "scalar", "target": null},
+    {"name": "spotFeatureUnit", "offset": 82447, "size": 4, "kind": "pointer", "target": "unit"},
+    {"name": "spotUsedHead", "offset": 82451, "size": 4, "kind": "scalar", "target": null},
+    {"name": "spotRestHead", "offset": 82455, "size": 4, "kind": "scalar", "target": null},
+    {"name": "spotFreeHead", "offset": 82459, "size": 4, "kind": "scalar", "target": null},
+    {"name": "spotField_1421f", "offset": 82463, "size": 4, "kind": "pointer", "target": "heap"},
+    {"name": "scanIndex", "offset": 82519, "size": 4, "kind": "scalar", "target": null},
+    {"name": "mapFlags", "offset": 82561, "size": 2, "kind": "scalar", "target": null, "mask": 65527, "mask_reason": "bit 3 is cleared by the camera, which is presentation"},
+    {"name": "endGameCountdown", "offset": 234041, "size": 2, "kind": "scalar", "target": null},
+    {"name": "endGameFlags", "offset": 234043, "size": 2, "kind": "scalar", "target": null},
+    {"name": "uiOptionFlags", "offset": 229167, "size": 2, "kind": "scalar", "target": null, "mask": 1928, "mask_reason": "only bits 3 and 7 to 10, the treedeath and cheat toggles the simulation reads, are kept"}
+  ],
+  "wind": [
+    {"name": "windCounter", "offset": 229060, "size": 4, "kind": "scalar", "target": null},
+    {"name": "windSpeedDenominator", "offset": 229064, "size": 4, "kind": "scalar", "target": null},
+    {"name": "windX", "offset": 229068, "size": 4, "kind": "scalar", "target": null},
+    {"name": "windY", "offset": 229072, "size": 4, "kind": "scalar", "target": null},
+    {"name": "windZ", "offset": 229076, "size": 4, "kind": "scalar", "target": null},
+    {"name": "windDirection", "offset": 229080, "size": 2, "kind": "scalar", "target": null},
+    {"name": "windSpeed", "offset": 229082, "size": 4, "kind": "scalar", "target": null},
+    {"name": "windStrength", "offset": 229086, "size": 4, "kind": "scalar", "target": null},
+    {"name": "windEnabled", "offset": 229090, "size": 4, "kind": "scalar", "target": null},
+    {"name": "windSpeedMin", "offset": 82523, "size": 4, "kind": "scalar", "target": null},
+    {"name": "windSpeedMax", "offset": 82527, "size": 4, "kind": "scalar", "target": null}
+  ],
+  "globals": {
+    "meteors": [
+      {"name": "nextStrikeTime", "size": 4, "kind": "scalar", "target": null},
+      {"name": "weaponName", "size": 32, "kind": "bytes", "target": null},
+      {"name": "spawnMagnitude", "size": 4, "kind": "scalar", "target": null},
+      {"name": "spawnInterval", "size": 4, "kind": "scalar", "target": null},
+      {"name": "active", "size": 4, "kind": "scalar", "target": null},
+      {"name": "strikeEndTime", "size": 4, "kind": "scalar", "target": null},
+      {"name": "origin", "size": 4, "kind": "scalar", "target": null},
+      {"name": "showerDuration", "size": 4, "kind": "scalar", "target": null},
+      {"name": "weapon", "size": 4, "kind": "ref", "target": "weapondef"},
+      {"name": "enabled", "size": 4, "kind": "scalar", "target": null},
+      {"name": "nextHitTime", "size": 4, "kind": "scalar", "target": null},
+      {"name": "target", "size": 4, "kind": "scalar", "target": null},
+      {"name": "scheduleGap", "size": 4, "kind": "scalar", "target": null}
+    ],
+    "game": [
+      {"name": "cdPathMismatch", "size": 4, "kind": "scalar", "target": null},
+      {"name": "cdMismatchDefeatTick", "size": 4, "kind": "scalar", "target": null},
+      {"name": "economyPacketTick", "size": 4, "kind": "scalar", "target": null}
+    ],
+    "pathfinder": [
+      {"name": "playerTickLoad", "size": 40, "kind": "bytes", "target": null},
+      {"name": "playerBudgetCap", "size": 40, "kind": "bytes", "target": null},
+      {"name": "budgetRefreshCounter", "size": 4, "kind": "scalar", "target": null}
+    ]
+  }
+}

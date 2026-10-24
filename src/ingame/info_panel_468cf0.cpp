@@ -355,7 +355,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
 
   cx = (g_game->width_37e1f + 0x80) / 2;
   cy = g_game->field_37e23 / 2;
-  SetOffscreenSurface(g_game->screen);
+  SetOffscreenSurface((int)g_game->screen);
   ctx = **(Surface **)&g_game->screen;
   colors = &g_game->colors[0];
   HideSoftwareCursor();

@@ -102,7 +102,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
 int __stdcall VtolSeekGuardOrder(Unit* unit, Order* order, int flags)
 {
     if (flags&0x40) return 5;
-    if (unit->spatialBucket==g_game->overflowBucket) {
+    if (unit->spatialBucket==(int)g_game->overflowBucket) {
         Vec3 center;
         center.x=(g_game->mapWidth/2)<<16;
         center.z=(g_game->mapHeight/2)<<16;

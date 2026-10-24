@@ -70,7 +70,7 @@ static inline Cell* CellAt(const Point16& p)
 // FUNCTION: 0x47d0e0
 void __stdcall RemoveUnitFromMap(Obj_0047db20* obj)
 {
-    if (obj->spatialBucket != g_game->overflowBucket) {
+    if (obj->spatialBucket != (int)g_game->overflowBucket) {
         Point16 size = obj->footprint;
         Cell* cell = CellAt(obj->pos);
         int index = 0;

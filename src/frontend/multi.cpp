@@ -437,8 +437,8 @@ conn:
     msg = "Connecting  (ESC to abort)";
 shown:
     OpenMessageBox(&g_game->gui, Translate(msg), 0x96, 0, 1);
-    BlitMenuLayers(&g_game->gui, g_game->screen, 0);
-    SetOffscreenSurface(g_game->screen);
+    BlitMenuLayers(&g_game->gui, (int)g_game->screen, 0);
+    SetOffscreenSurface((int)g_game->screen);
     FlipScreen();
     FlipScreen();
 
@@ -1813,7 +1813,7 @@ int InitScoreReporting(void)
             return 1;
         }
     } else if (r != 4) {
-        SetOffscreenSurface(g_game->screen);
+        SetOffscreenSurface((int)g_game->screen);
         OpenMessageBox(&g_game->gui, Translate("Unable to initialize scores reporting."), 0x190, 1, 0);
         LoadPictureCached("ReportError", 0, 1, 0);
         RunWhileScreenNamed(&g_game->gui, "MSGBOX.GUI");
@@ -4219,7 +4219,7 @@ void OpenEndMultiScreen()
     BlankScreen();
     image = LoadBitmapByName("Mission02WinBW", palette);
     SetPaletteColors(palette, 0, 0x100);
-    SetOffscreenSurface(g_game->screen);
+    SetOffscreenSurface((int)g_game->screen);
     DrawSurface(0, image, 0, 0);
     FreeSurface(image);
     FlipScreen();

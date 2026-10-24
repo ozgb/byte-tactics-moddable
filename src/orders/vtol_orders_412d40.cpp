@@ -115,7 +115,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", 0, &unit->pos, 0, 0, 0));
         return 5;
     }
-    if (unit->spatialBucket == g_game->overflowBucket) {
+    if (unit->spatialBucket == (int)g_game->overflowBucket) {
         Vec3 centre;
         centre.x = g_game->mapWidth / 2 << 16;
         centre.z = g_game->mapHeight / 2 << 16;

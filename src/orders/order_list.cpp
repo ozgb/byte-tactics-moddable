@@ -1701,7 +1701,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     Vec3 da = PosMinus(unit->pos, a);
     Vec3 db = PosMinus(velocity, b);
 
-    if (unit->spatialBucket != g_game->overflowBucket) {
+    if (unit->spatialBucket != (int)g_game->overflowBucket) {
         int lim;
         if ((speed & -4) < 0x40000)
             lim = 0x10000;

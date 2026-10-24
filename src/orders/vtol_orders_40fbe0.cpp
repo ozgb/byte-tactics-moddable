@@ -48,7 +48,7 @@ static inline Unit* OrderTarget(Order*order) { return order->target; }
 int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
 {
     if (order->target && !(flags&0x48)) {
-        if (unit->spatialBucket==g_game->overflowBucket) {
+        if (unit->spatialBucket==(int)g_game->overflowBucket) {
             Vec3 center;
             center.x=(g_game->mapWidth/2)<<16;
             center.z=(g_game->mapHeight/2)<<16;

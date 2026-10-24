@@ -81,6 +81,8 @@ struct Eye_00482130;
 struct Feature;
 struct FeatureSpot;
 struct Font;
+class HapiBank;
+class SpatialBucket;
 struct FrameTable;
 struct IconSet_00466780;
 struct List_00420960;
@@ -432,7 +434,7 @@ struct Game {
             char unknown_142ab[4];
             int field_142af;
             int field_142b3;
-            int overflowBucket;
+            SpatialBucket* overflowBucket;
             Rect viewLimit;
             char field_142cb[16];
             void* finalSurface;
@@ -783,7 +785,7 @@ struct Game {
     };
     Entry_0042f740* entries_37e13;
     int entry_count;
-    int screen;
+    void* screen;
     int width_37e1f;
     int field_37e23;
     union {
@@ -1087,7 +1089,7 @@ struct Game {
             int unusedAfterMovieOutputRateDirty;
             char saveName[1];
             char unknown_38c6c[255];
-            int pendingSaveStore;
+            HapiBank* pendingSaveStore;
             char progress;
             unsigned char loadProgress;
             unsigned char loadPctUnits;

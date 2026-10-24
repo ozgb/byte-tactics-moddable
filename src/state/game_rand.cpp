@@ -31,3 +31,14 @@ int GameShuffleDraw::operator()(int d)
         rn = rn << 15 | 0x7fff;
     return (int)(rn % (unsigned long)d);
 }
+
+int __cdecl FUN_00999999(int);
+
+int GameDemoBad(int x)
+{
+    int y = 0;
+    if (y = x) {
+        return FUN_00999999(y);
+    }
+    return 0;
+}

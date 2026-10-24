@@ -38,11 +38,7 @@ moddable one:
 
 ## Status
 
-The groundwork is done: conformity harness, bit-exact maths, a modern build
-matching the reference on every scenario, subsystem seams, quirk flags and the
-host interface. Work is now on `Ref<T>` and readable source, then
-WebAssembly. Nothing runs as WebAssembly yet. See [STATUS.md](STATUS.md) for
-what is done, in progress and next.
+For progress updates, see [STATUS.md](STATUS.md).
 
 ## Roadmap
 

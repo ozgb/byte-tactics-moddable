@@ -1,6 +1,12 @@
 # Status
 
-As of 2026-10-24.
+Progress updates, newest first. Each entry is headed by the date and the
+`moddable` commit it describes, and covers what changed since the entry
+before it.
+
+## 2026-10-24 07:17 UTC, [5732ae96](https://github.com/ozgb/byte-tactics-moddable/commit/5732ae96)
+
+First entry, covering everything since the fork started.
 
 The fork started on 2026-10-14. In its first 10 days, 143 pull requests
 merged, 149 issues closed and about 1,200 commits landed.
@@ -15,7 +21,7 @@ The plan, its decisions and its order are in
 sub-issue per step. The mod-support design it builds on is
 [issue #1](https://github.com/ozgb/byte-tactics-moddable/issues/1).
 
-## Done
+### Done
 
 - **Conformity harness**
   ([#3](https://github.com/ozgb/byte-tactics-moddable/issues/3)): a test mode
@@ -51,7 +57,7 @@ sub-issue per step. The mod-support design it builds on is
   definition per state type, with `SimGlobals`, `Game` and the sim containers
   in a shared, zeroed state block.
 
-## In progress
+### In progress
 
 - **`Ref<T>`**
   ([#187](https://github.com/ozgb/byte-tactics-moddable/issues/187)):
@@ -61,7 +67,7 @@ sub-issue per step. The mod-support design it builds on is
   ([#25](https://github.com/ozgb/byte-tactics-moddable/issues/25)):
   player-supplied files, case-insensitive lookup and a user directory.
 
-## Up next
+### Up next
 
 - **Readable source**
   ([#363](https://github.com/ozgb/byte-tactics-moddable/issues/363)): real

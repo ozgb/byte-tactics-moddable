@@ -186,17 +186,43 @@ def demangle(name: str) -> str:
     return re.sub(r"@\d+$", "", name[1:] if name.startswith("_") else name)
 
 
-def parse_map(text: str) -> CodeMap:
-    """The code symbols of a linker map. Of several names at one address the first by (FUN_ last, name) wins."""
+def empty_functions(objs_dir: Path) -> set[str] | None:
+    """The decorated names of functions whose code the link left out (empty sections in the post-prune objects), or
+    None if the directory is missing. The linker puts such a name at the next live function's address."""
+    if not objs_dir.is_dir():
+        return None
+    import objread
+    dead: set[str] = set()
+    for path in sorted(objs_dir.glob("*.obj")):
+        obj = objread.parse(path)
+        dead.update(name for name, sym in obj.externals.items()
+                    if sym.is_func and sym.section > 0 and not obj.secs[sym.section - 1].data)
+    return dead
+
+
+def parse_map(text: str, dead: set[str] | None = None) -> CodeMap:
+    """The code symbols of a linker map. Of several names at one address the first by (FUN_ last, name) wins,
+    leaving out the names in `dead` (functions with no code) unless every name there is dead."""
     by_address: dict[int, list[str]] = {}
     for line in text.splitlines():
         m = MAP_LINE.match(line)
         if not m or m.group(1).startswith(SKIPPED):
             continue
-        by_address.setdefault(int(m.group(2), 16), []).append(demangle(m.group(1)))
+        by_address.setdefault(int(m.group(2), 16), []).append(m.group(1))
     addresses = sorted(by_address)
-    names = [min(by_address[a], key=lambda n: (n.startswith("FUN_"), n)) for a in addresses]
+    names = []
+    for a in addresses:
+        live = [n for n in by_address[a] if not dead or n not in dead] or by_address[a]
+        names.append(min((demangle(n) for n in live), key=lambda n: (n.startswith("FUN_"), n)))
     return CodeMap(addresses, names)
+
+
+def load_code_map(map_path: Path) -> CodeMap:
+    """The map's code symbols, named by live code when the objects beside the map (objs/) are there."""
+    dead = empty_functions(map_path.parent / "objs")
+    if dead is None:
+        print("warning: no objs/ beside %s; sites are named without knowing which functions are empty" % map_path)
+    return parse_map(map_path.read_text(errors="replace"), dead)
 
 
 class Namer:
@@ -515,7 +541,7 @@ def check_scans(texts: dict[str, str | None], map_path: Path, build_dir: Path,
         return problems
     if not map_path.is_file():
         return problems + ["%s: no linker map to name the sites with" % map_path]
-    code = parse_map(map_path.read_text(errors="replace"))
+    code = load_code_map(map_path)
     needs_layout = any(r.holder == SIM_GLOBALS for s in scans for r in s.rows)
     members = load_members(build_dir) if needs_layout else []
     listed = read_rows() if rows is None else rows
@@ -637,7 +663,7 @@ def main() -> None:
         print("warning: the scans come from different commits: " + ", ".join(sorted(commits)))
     members = load_members(args.build_dir or default_build_dir()) \
         if any(r.holder == SIM_GLOBALS for s in scans for r in s.rows) else []
-    code = parse_map(map_path.read_text(errors="replace"))
+    code = load_code_map(map_path)
     merged = merge_kept(with_wild(merge(resolve(scans, code, members)), old), old)
     now = {row_key(r) for r in merged}
     lost = [r for r in old if (r["class"] or r["note"]) and row_key(r) not in now]

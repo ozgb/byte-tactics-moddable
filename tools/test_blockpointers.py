@@ -91,6 +91,14 @@ class NamingTest(unittest.TestCase):
         self.assertEqual(self.code.function(0x401160), "Vec::Make")
         self.assertEqual(self.code.function(0x401201), "Other")
 
+    def test_dead_names_leave_the_address(self):
+        dead = {"?Alias@@YAXXZ"}
+        code = bp.parse_map(MAP, dead)
+        self.assertEqual(code.function(0x401010), "Loader::Load")
+        self.assertEqual(code.function(0x401030), "Setup")
+        both = bp.parse_map(MAP, {"?Alias@@YAXXZ", "?Load@Loader@@QAEXXZ"})
+        self.assertEqual(both.function(0x401010), "Alias")
+
     def test_names_and_numbers(self):
         sites = [(0x401010, ""), (0x401018, ""), (0x401012, "T"), (0x401014, "T"), (0x401030, "")]
         namer = bp.Namer(self.code, sites)

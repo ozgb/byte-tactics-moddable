@@ -1,4 +1,3 @@
-#include "../../interfaces/ref.h"
 // UnitResources: a unit's (and an AI player's) resource account (Thaldren's
 // UnitResourceSlot, 0x34 bytes), embedded at +0xbc of the unit, its player
 // pointer at +0x30 pointing back at the unit's owner (unit+0xec). The one
@@ -7,6 +6,8 @@
 // methods take, stays private to economy.cpp.
 #ifndef UNIT_RESOURCES_H
 #define UNIT_RESOURCES_H
+
+#include "../../interfaces/ref.h"
 
 struct Player;
 struct UnitInfo;

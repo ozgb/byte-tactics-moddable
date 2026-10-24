@@ -274,6 +274,26 @@ class TidyTest(Repo, unittest.TestCase):
         found, _ = self.lint({"src/a.cpp": (0, text), ("base", "src/a.cpp"): (1, error)})
         self.assertEqual(len(found), 1)
 
+    def test_untracked_include_dir_is_visible_in_the_base_worktree(self):
+        self.write_db(["src/a.cpp"], f"clang++ -imsvc {self.root}/toolchain/INC -c")
+        self.commit()
+        self.edit("src/a.cpp", "    return total;", "    return total;\n    int t = 1;")
+        self.edit("src/a.cpp", "    int t = 1;", "    int t = 2;")
+        (self.root / "toolchain/INC").mkdir(parents=True)
+        text = finding("ROOT", "src/a.cpp", 6)
+
+        def runner(clang_tidy, root, build_dir, path):
+            if Path(root).resolve() == self.root:
+                return 0, text.replace("ROOT", str(root))
+            command = json.loads((Path(build_dir) / "compile_commands.json").read_text())[0]["command"]
+            include = command.split("-imsvc ")[1].split()[0]
+            if not Path(include).exists():
+                return 1, f"{root}/{path}:1:10: error: 'vector' file not found [clang-diagnostic-error]\n"
+            return 0, text.replace("ROOT", str(root))
+
+        found = tidy.lint(str(self.root), "HEAD~1...HEAD", jobs=1, runner=runner)
+        self.assertEqual(found, [])
+
     def test_range_not_ending_at_head_is_a_tool_error(self):
         self.edit("src/c.cpp", "return 0;", "return 1;")
         self.git("branch", "later")

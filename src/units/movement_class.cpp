@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #include "../util/tdf.h"
+#include "../../interfaces/ref.h"
 
 void __cdecl GameFreeThunk(void* p);
 
@@ -36,7 +37,7 @@ struct Unit_00440af0 {
 };
 
 struct Object_00440af0 {
-    Unit_00440af0* unit;               // +0x0
+    Ref<Unit_00440af0> unit;
     char unknown_4[0x76 - 0x4];
     Point16 a;               // +0x76
     char unknown_7a[0x7e - 0x7a];
@@ -46,7 +47,7 @@ struct Object_00440af0 {
 
 #pragma pack(push, 1)
 struct Record_00440af0 {
-    Unit_00440af0* unit;               // +0x0
+    Ref<Unit_00440af0> unit;
     char unknown_4[0x76 - 0x4];
     Point16 a;               // +0x76
     char unknown_7a[0x7e - 0x7a];
@@ -77,7 +78,7 @@ public:
     unsigned char badWaterSlope;
     unsigned int width;                // +0x10
     unsigned int height;               // +0x14
-    unsigned int* cells;               // +0x18, the 2-bit map
+    Ref<unsigned int> cells;
     int lastTick;
 
     void BuildPassMap();
@@ -89,7 +90,7 @@ int __stdcall GetPassMapCellValue(Class_00440500* obj, Cell* cell);
 // (0x440af0 / 0x440be0 declare the same bytes as Object_00440af0).
 #pragma pack(push, 2)
 struct Struct_00440a70 {
-    Unit_00440af0* unit;               // +0x0
+    Ref<Unit_00440af0> unit;
     char unknown_4[0x76 - 0x4];
     Point16 a;               // +0x76
     char unknown_7a[0x7e - 0x7a];
@@ -380,11 +381,12 @@ void BuildAllPassMaps(void)
             q[-1] = h;
             // Size from the stored entry fields q[-1], q[-2], not the w/h locals.
             n = ((unsigned)(q[-1] + 0xf) >> 4) * q[-2];
-            operator delete((void*)q[0]);
+            Ref<unsigned int>* slot = (Ref<unsigned int>*)q;
+            operator delete((void*)slot->get());
             if (n != 0) {
-                q[0] = (unsigned int)SimAlloc(n * 4);
+                *slot = (unsigned int*)SimAlloc(n * 4);
             } else {
-                q[0] = 0;
+                *slot = (unsigned int*)0;
             }
             ((Class_00440500*)(q - 6))->BuildPassMap();
             progress += 100;
@@ -404,7 +406,7 @@ static inline void FreeA(int p)
 
 static inline void FreeC(int p)
 {
-    void* c = *(void**)p;
+    void* c = ((Ref<unsigned int>*)p)->get();
     *(void**)(p - 8) = 0;
     *(void**)(p - 4) = 0;
     operator delete(c);

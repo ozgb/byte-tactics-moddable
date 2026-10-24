@@ -81,8 +81,8 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     if (unit->carrier)
         g_seams.units->AttachUnitToPiece(unit, 0, -1, 2);
     g_seams.units->SetStateBits(unit, 1, 1);
-    if ((((UnitMotion*)unit->motion)->flags & 3) == 1) {
-        ((UnitMotion*)unit->motion)->SetFlightMode(unit, 2);
+    if ((unit->motion->flags & 3) == 1) {
+        unit->motion->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx(obj);
@@ -115,7 +115,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", 0, &unit->pos, 0, 0, 0));
         return 5;
     }
-    if (unit->spatialBucket == (int)g_game->overflowBucket.get()) {
+    if ((int)unit->spatialBucket.get() == (int)g_game->overflowBucket.get()) {
         Vec3 centre;
         centre.x = g_game->mapWidth / 2 << 16;
         centre.z = g_game->mapHeight / 2 << 16;

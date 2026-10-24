@@ -3,6 +3,7 @@
 // multiply folds.
 
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 
 #pragma pack(push, 1)
 
@@ -17,7 +18,7 @@ struct Cell {
 
 struct Unit_0047db20 {
     char unknown_0[0x14e];
-    unsigned char* mask;
+    Ref<unsigned char> mask;
 };
 
 union Flags_0047db20 {
@@ -34,9 +35,9 @@ struct Obj_0047db20 {
     Point16 pos;
     char unknown_7a[4];
     Point16 footprint;
-    int spatialBucket;
+    Ref<char> spatialBucket;
     char unknown_86[0x92 - 0x86];
-    Unit_0047db20* def;
+    Ref<Unit_0047db20> def;
     char unknown_96[0xa8 - 0x96];
     short id;
     char unknown_aa[0x110 - 0xaa];
@@ -70,7 +71,7 @@ static inline Cell* CellAt(const Point16& p)
 // FUNCTION: 0x47d0e0
 void __stdcall RemoveUnitFromMap(Obj_0047db20* obj)
 {
-    if (obj->spatialBucket != (int)g_game->overflowBucket.get()) {
+    if ((int)obj->spatialBucket.get() != (int)g_game->overflowBucket.get()) {
         Point16 size = obj->footprint;
         Cell* cell = CellAt(obj->pos);
         int index = 0;

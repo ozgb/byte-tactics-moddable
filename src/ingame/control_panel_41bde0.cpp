@@ -33,14 +33,14 @@ void __stdcall StepBuildMenuPage(int toggle)
                 if (!unit->menu.menuOpen) {
                     unit->menu.menuOpen = 1;
                     unit->menu.page = 1;
-                } else if (unit->menu.page == ((Sub_0041bde0*)unit->def)->pageCount - 1) {
+                } else if (unit->menu.page == ((Sub_0041bde0*)unit->def.get())->pageCount - 1) {
                     unit->menu.menuOpen = 0;
                 } else {
                     unit->menu.page++;
                 }
             } else {
                 // Compared as page == pageCount - 1; keeps the original load order.
-                if (unit->menu.page == ((Sub_0041bde0*)unit->def)->pageCount - 1)
+                if (unit->menu.page == ((Sub_0041bde0*)unit->def.get())->pageCount - 1)
                     unit->menu.page = 1;
                 else
                     unit->menu.page++;

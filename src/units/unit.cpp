@@ -2,6 +2,7 @@
 
 // <windows.h> is needed for CanRepair's operand order (see there).
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 
 #include "cob_script.h"
 
@@ -54,9 +55,9 @@ union Flags_00489a90 {
 
 struct Node_00489a90 {
     char unknown_0[0x86];
-    Unit* owner;                       // +0x86
+    Ref<Unit> owner;
     char unknown_8a[4];
-    Node_00489a90* next;               // +0x8e
+    Ref<Node_00489a90> next;
 };
 
 #include "../game/game.h"
@@ -104,8 +105,8 @@ void Unit::ReleaseWeapons(unsigned char index)
         if (p->a != 0 || p->b != (short)0x8000) {
             p->a = 0;
             p->b = (short)0x8000;
-            g_seams.units->FindScript((CobScript*)script, "StartBuilding");
-            g_seams.units->StartScriptWithArgs((CobScript*)script, "TargetCleared", 0, 0, 1, i, 0, 0, 0);
+            g_seams.units->FindScript((CobScript*)script.get(), "StartBuilding");
+            g_seams.units->StartScriptWithArgs((CobScript*)script.get(), "TargetCleared", 0, 0, 1, i, 0, 0, 0);
         }
     }
 }
@@ -134,8 +135,8 @@ void Unit::ClaimWeapons(unsigned char index)
         if (p->a != 0 || p->b != (short)0x8000) {
             p->a = 0;
             p->b = (short)0x8000;
-            g_seams.units->FindScript((CobScript*)script, "StartBuilding");
-            g_seams.units->StartScriptWithArgs((CobScript*)script, "TargetCleared", 0, 0, 1, i, 0, 0, 0);
+            g_seams.units->FindScript((CobScript*)script.get(), "StartBuilding");
+            g_seams.units->StartScriptWithArgs((CobScript*)script.get(), "TargetCleared", 0, 0, 1, i, 0, 0, 0);
         }
     }
     // The guard only fires when bit 4 is *set* and then clears it, so this
@@ -148,14 +149,14 @@ void Unit::ClaimWeapons(unsigned char index)
 // FUNCTION: 0x489960
 int Unit::CanReclaim(void *param_1)
 {
-    void *ptr = *(void **)((char *)this + 0x92);
+    void *ptr = def.get();
     unsigned int val1 = *(unsigned int *)((char *)ptr + 0x245);
 
     if ((val1 & 0x400) != 0) {
         unsigned int val2 = *(unsigned int *)((char *)param_1 + 0x110);
 
         if ((val2 & 3) != 2) {
-            void *ptr2 = *(void **)((char *)param_1 + 0x92);
+            void *ptr2 = ((Unit*)param_1)->def.get();
             unsigned int val3 = *(unsigned int *)((char *)ptr2 + 0x245);
 
             if ((val3 & 0x1000) == 0) {
@@ -198,7 +199,7 @@ fail:
 int Unit::CountCargo()
 {
     int count = 0;
-    Node_00489a90* node = (Node_00489a90*)cargo;
+    Node_00489a90* node = (Node_00489a90*)cargo.get();
     while (node) {
         if (node->owner == this)
             count++;
@@ -278,17 +279,17 @@ void Unit::SetStateBits(int mask, int set)
             gained = ~old & now;
             lost = (unsigned char)newLost;
             if (gained & 1) {
-                ((CobScript*)script)->StartScript("Activate", 0, 0);
+                ((CobScript*)script.get())->StartScript("Activate", 0, 0);
                 QueueUnitSpeech(this, 3, 0);
             }
             if (lost & 1) {
-                ((CobScript*)script)->StartScript("Deactivate", 0, 0);
+                ((CobScript*)script.get())->StartScript("Deactivate", 0, 0);
                 QueueUnitSpeech(this, 4, 0);
             }
             if (gained & 8)
-                ((CobScript*)script)->StartScript("StartBuilding", 0, 0);
+                ((CobScript*)script.get())->StartScript("StartBuilding", 0, 0);
             if (lost & 8)
-                ((CobScript*)script)->StartScript("StopBuilding", 0, 0);
+                ((CobScript*)script.get())->StartScript("StopBuilding", 0, 0);
             if (gained & 4) {
                 QueueUnitSpeech(this, 0xe, 0);
                 for (link = head; link; link = link->next) {

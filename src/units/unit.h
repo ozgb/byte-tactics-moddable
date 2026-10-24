@@ -5,27 +5,30 @@
 #include "../util/angles.h"
 #include "../game/unit_resources.h"
 #include "../weapons/unit_weapon_slot.h"
+#include "../../interfaces/ref.h"
 
 class TdfRecord;
 struct UnitMotion;
 struct Mover;
 struct Limits_0043e490;
 struct Order;
+struct WeaponDef;
 struct UnitDef;
 struct Player;
+struct Class_0047cb00;
 class Class_004b0a70;
 struct SpotState;
 class PathOrderAttach;
 
 #pragma pack(push, 1)
 struct Unit {
-    int motion;
+    Ref<UnitMotion> motion;
     union {
         struct {
-            TdfRecord* current;
+            int current;
             int field_8;
-            UnitMotion* type;
-            Mover* weapon;
+            int type;
+            Ref<WeaponDef> weapon;
             char unknown_14[2];
             short field_16;
             short field_18;
@@ -38,12 +41,12 @@ struct Unit {
             char unknown_24[2];
             int lastTick;
             char unknown_2a[2];
-            Mover* f2c;
+            Ref<WeaponDef> f2c;
             char unknown_30[10];
             unsigned char b3a;
             unsigned char f_3b;
             char unknown_3c[12];
-            Limits_0043e490* f48;
+            Ref<WeaponDef> f48;
             char unknown_4c[10];
             unsigned char b56;
             unsigned char f_57;
@@ -51,8 +54,8 @@ struct Unit {
         UnitWeaponSlot weapons[3];
     };
     int extraction;
-    Order* list;
-    Order* list2;
+    Ref<Order> list;
+    Ref<Order> list2;
     union {
         struct {
             short field_64;
@@ -81,15 +84,15 @@ struct Unit {
         };
     };
     Point16 footprint;
-    int spatialBucket;
-    int carrier;
-    Unit* cargo;
-    Unit* cargoNext;
-    UnitDef* def;
-    Player* player;
-    Class_004b0a70* script;
-    SpotState* state;
-    PathOrderAttach* head;
+    Ref<Class_0047cb00> spatialBucket;
+    Ref<Unit> carrier;
+    Ref<Unit> cargo;
+    Ref<Unit> cargoNext;
+    Ref<UnitDef> def;
+    Ref<Player> player;
+    Ref<Class_004b0a70> script;
+    Ref<SpotState> state;
+    Ref<PathOrderAttach> head;
     unsigned short unitDefIndex;
     unsigned short id;
     unsigned short hoverBobPhase;
@@ -120,7 +123,7 @@ struct Unit {
         };
         UnitResources resourceSlot;
     };
-    Unit* attacker;
+    Ref<Unit> attacker;
     unsigned char lastAttackerSlot;
     unsigned char lastDamageType;
     unsigned char healthPercent;

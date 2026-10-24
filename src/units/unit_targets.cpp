@@ -3,6 +3,7 @@
 // weapon target entries (set, clear, query), the links in a unit's owner list
 // (head at +0xa2), and the damage and paralyze events.
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include <stdio.h>
 #include <string.h>
@@ -41,7 +42,7 @@ struct Target_0048a1e0 {
 struct UnitType {
     char unknown_0[0x152];
     int count;                         // +0x152, entries of ids
-    short* ids;                        // +0x156, the unit ids it can build
+    Ref<short> ids;
     char unknown_15a[0x186 - 0x15a];
     float energyCost;                  // +0x186
     float metalCost;                   // +0x18a
@@ -152,8 +153,8 @@ char* __stdcall MakePropList(UnitType* obj)
 // FUNCTION: 0x4894f0
 int __stdcall UnitCanBuild(Unit* unit, short id)
 {
-    for (int i = 0; i < ((UnitType*)unit->def)->count; i++) {
-        if (((UnitType*)unit->def)->ids[i] == id)
+    for (int i = 0; i < ((UnitType*)unit->def.get())->count; i++) {
+        if (((UnitType*)unit->def.get())->ids[i] == id)
             return 1;
     }
     return 0;
@@ -166,7 +167,7 @@ void UnitRef::LinkToUnit(Unit* o)
 {
     if (o != 0 && o->unitDefIndex != 0) {
         owner = o;
-        next = (UnitRef*)o->head;
+        next = (UnitRef*)o->head.get();
         o->head = (PathOrderAttach*)this;
         return;
     }
@@ -180,7 +181,7 @@ void UnitRef::LinkToUnit(Unit* o)
 void UnitRef::UnlinkFromUnit()
 {
     if (owner != 0) {
-        UnitRef** link = (UnitRef**)&owner->head;
+        Ref<UnitRef>* link = (Ref<UnitRef>*)&owner->head;
         while (*link != this)
             link = &(*link)->next;
         *link = next;
@@ -227,7 +228,7 @@ void UnitRef::Unlink()
 inline PathOrderAttach::~PathOrderAttach()
 {
     if (owner != 0) {
-        PathOrderAttach** pp = &owner->head;
+        Ref<PathOrderAttach>* pp = &owner->head;
         while (*pp != this)
             pp = &(*pp)->next;
         *pp = next;
@@ -243,7 +244,7 @@ inline PathOrderAttach::~PathOrderAttach()
 void PathOrderAttach::SetUnit(Unit* o)
 {
     if (owner != 0) {
-        PathOrderAttach** pp = &owner->head;
+        Ref<PathOrderAttach>* pp = &owner->head;
         while (*pp != this)
             pp = &(*pp)->next;
         *pp = next;
@@ -267,7 +268,7 @@ void UnitRef::ClearRef(void)
     if (listener)
         listener->Notify(8);
     if (owner == saved && owner) {
-        UnitRef** pp = (UnitRef**)&owner->head;
+        Ref<UnitRef>* pp = (Ref<UnitRef>*)&owner->head;
         while (*pp != this)
             pp = &(*pp)->next;
         *pp = next;
@@ -282,12 +283,12 @@ void UnitRef::ClearRef(void)
 // FUNCTION: 0x489740
 void __stdcall ClearUnitRefs(Unit* obj)
 {
-    for (UnitRef* n = (UnitRef*)obj->head; n != 0; n = (UnitRef*)obj->head) {
+    for (UnitRef* n = (UnitRef*)obj->head.get(); n != 0; n = (UnitRef*)obj->head.get()) {
         Unit* saved = n->owner;
         if (n->listener)
             n->listener->Notify(8);
         if (n->owner == saved && n->owner) {
-            UnitRef** pp = (UnitRef**)&n->owner->head;
+            Ref<UnitRef>* pp = (Ref<UnitRef>*)&n->owner->head;
             while (*pp != n)
                 pp = &(*pp)->next;
             *pp = n->next;
@@ -301,7 +302,7 @@ void __stdcall ClearUnitRefs(Unit* obj)
 // FUNCTION: 0x4897b0
 void __stdcall NotifyUnitRefs(Unit* obj, int event)
 {
-    for (UnitRef* n = (UnitRef*)obj->head; n != 0; n = n->next) {
+    for (UnitRef* n = (UnitRef*)obj->head.get(); n != 0; n = n->next) {
         if (n->listener != 0)
             n->listener->Notify(event);
     }
@@ -356,7 +357,7 @@ void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsi
     int dmg;
     if (type != 10) {
         if ((target->activateFlags & 2) && amount < 0x7530)
-            amount = (int)(((__int64)((UnitType*)target->def)->f1aa * amount) >> 0x10);
+            amount = (int)(((__int64)((UnitType*)target->def.get())->f1aa * amount) >> 0x10);
         int armour = target->killCount / 5;
         if (armour > 5)
             armour = 5;
@@ -432,8 +433,8 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
         return;
 
     if (ev->damageKind == 10) {
-        unit->health = (short)((unsigned int)(unit->health + ev->amount) < ((UnitType*)unit->def)->maxhp
-                           ? unit->health + ev->amount : ((UnitType*)unit->def)->maxhp);
+        unit->health = (short)((unsigned int)(unit->health + ev->amount) < ((UnitType*)unit->def.get())->maxhp
+                           ? unit->health + ev->amount : ((UnitType*)unit->def.get())->maxhp);
         return;
     }
 
@@ -458,7 +459,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
             if (!(unit->flags & 0x4000)) {
                 Player* owner = unit->player;
                 if (owner->active && (owner->type == 1 || owner->type == 2)) {
-                    if (!(((UnitType*)unit->def)->f241 & 0x4000000)) {
+                    if (!(((UnitType*)unit->def.get())->f241 & 0x4000000)) {
                         MissionType kind(s_paralyze_00508d80);
                         Order* e = unit->list;
                         if (e && e->kind == kind) {
@@ -483,13 +484,13 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
         if (ev->damageKind == 1) {
             int a = FUN_004b7123(ev->headingByte << 8, 400);
             int b = FUN_004b70ef(ev->headingByte << 8, 400);
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script, s_HitByWeapon_00508d74, 0, 0, 2, a, b, 0, 0);
-            int pct = unit->health * 100 / ((UnitType*)unit->def)->maxhp;
+            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), s_HitByWeapon_00508d74, 0, 0, 2, a, b, 0, 0);
+            int pct = unit->health * 100 / ((UnitType*)unit->def.get())->maxhp;
             if (pct < 0)
                 pct = 0;
             if (pct > 100)
                 pct = 100;
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script, s_TakeDamage_00508d68, 0, 0, 1, pct, 0, 0, 0);
+            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), s_TakeDamage_00508d68, 0, 0, 1, pct, 0, 0, 0);
         }
     }
 }
@@ -511,7 +512,7 @@ void __stdcall ParalyzeUnit(Unit* unit, int ticks)
     if (!owner->active)
         return;
     if (owner->type == 1 || owner->type == 2) {
-        if (!(((UnitType*)unit->def)->f241 & 0x4000000)) {
+        if (!(((UnitType*)unit->def.get())->f241 & 0x4000000)) {
             MissionType kind("paralyze");
             Order* effect = unit->list;
             if (effect && effect->kind == kind) {
@@ -557,8 +558,8 @@ void __stdcall ClearWeaponTarget(Unit* unit, int index)
     if (p->a != 0 || p->b != (short)0x8000) {
         p->a = 0;
         p->b = (short)0x8000;
-        g_seams.units->FindScript((CobScript*)unit->script, "StartBuilding");
-        g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "TargetCleared", 0, 0, 1, index, 0, 0, 0);
+        g_seams.units->FindScript((CobScript*)unit->script.get(), "StartBuilding");
+        g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TargetCleared", 0, 0, 1, index, 0, 0, 0);
     }
 }
 
@@ -619,23 +620,23 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
         if (f->aimTargetXOrUnitId != 0 || f->aimTargetZOrUnitSentinel != (short)0x8000) {
             e->aimTargetXOrUnitId = 0;
             e->aimTargetZOrUnitSentinel = (short)0x8000;
-            g_seams.units->FindScript((CobScript*)unit->script, "StartBuilding");
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "TargetCleared", 0, 0, 1, index, 0, 0, 0);
+            g_seams.units->FindScript((CobScript*)unit->script.get(), "StartBuilding");
+            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TargetCleared", 0, 0, 1, index, 0, 0, 0);
         }
         return 0;
     }
     g_seams.units->GetSweetSpot(def, (Vec3*)pos);
-    if ((e->flags & 2) && !(((Target_0048a1e0*)e->weapon)->field_111 & 0x2000000) && def->motion != 0
-        && unit->killCount > 5 && ((Target_0048a1e0*)e->weapon)->radius != 0) {
+    if ((e->flags & 2) && !(((Target_0048a1e0*)e->weapon.get())->field_111 & 0x2000000) && def->motion != 0
+        && unit->killCount > 5 && ((Target_0048a1e0*)e->weapon.get())->radius != 0) {
         Vec3_0048a1e0 d;
         d.x = unit->pos.x - pos->x;
         d.y = unit->pos.y - pos->y;
         d.z = unit->pos.z - pos->z;
         int dist = (int)sqrt((double)d.x * d.x + (double)d.y * d.y + (double)d.z * d.z);
-        int scale = (int)(((__int64)dist << 16) / ((Target_0048a1e0*)e->weapon)->radius);
+        int scale = (int)(((__int64)dist << 16) / ((Target_0048a1e0*)e->weapon.get())->radius);
         scale = (int)((scale * (__int64)0xcccc) >> 16);
         __int64 s = scale;
-        d = offset_0048a1e0((Body_0048a1e0*)def->motion, s);
+        d = offset_0048a1e0((Body_0048a1e0*)def->motion.get(), s);
         pos->x = pos->x + d.x;
         pos->y = pos->y + d.y;
         pos->z = pos->z + d.z;
@@ -743,7 +744,7 @@ void __stdcall AlignUnitToGround(Unit* u)
             int H0 = b0 + ((c0 - b0) * fx) / 16;
             int H1 = b1 + ((c1 - b1) * fx) / 16;
             hs[k].wx = wx;
-            if ((((UnitType*)u->def)->f241 & 0x1000) && (u->flags & 0x10000000)
+            if ((((UnitType*)u->def.get())->f241 & 0x1000) && (u->flags & 0x10000000)
                 && !(u->flags & 0x4000)) {
                 // Stored through the array, then read back into H.
                 hs[k].h = H0 + ((H1 - H0) * fz) / 16;
@@ -753,9 +754,9 @@ void __stdcall AlignUnitToGround(Unit* u)
                 // short p and `* 2048`, not `<< 11`: keeps the 0x1f mask and 16-bit add.
                 unsigned int bobClock = g_quirks.hoverBobWallClock ? GetTicks() : g_game->ticks;
                 short p = (short)(((bobClock & 0x1f) + k * 8) * 2048 + u->hoverBobPhase);
-                int s = ((UnitType*)u->def)->sight / 2;
+                int s = ((UnitType*)u->def.get())->sight / 2;
                 // Owner kept in a local across the 64-bit helper calls.
-                Body_0048a1e0* o = (Body_0048a1e0*)u->motion;
+                Body_0048a1e0* o = (Body_0048a1e0*)u->motion.get();
                 int q = o->sight;
                 if (q >= s)
                     q = s;

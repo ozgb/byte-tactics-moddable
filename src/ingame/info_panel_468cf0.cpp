@@ -11,6 +11,7 @@
 // original file defines after this function.
 // No <windows.h>: it flips the imul operand order in the row and unit loops.
 #include <stdio.h>
+#include "../../interfaces/ref.h"
 #include <math.h>
 #include <memory.h>
 typedef unsigned char byte;
@@ -172,8 +173,8 @@ struct Unit_00468cf0 {                 // 0x118 bytes
   char unknown_72[2];
   short zWhole;                       // +0x74
   char unknown_76[0x96 - 0x76];
-  PlayerState_00468cf0* player;       // +0x96
-  void* script;                       // +0x9a
+  Ref<PlayerState_00468cf0> player;
+  Ref<char> script;
   char unknown_9e[0xac - 0x9e];
   int group;                          // +0xac, the control group number
   char unknown_b0[0x110 - 0xb0];

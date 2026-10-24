@@ -472,7 +472,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         return WaitIfNotInBuildStance(unit, order, 2);
     case 2: {
         int piece = -1;
-        g_seams.units->QueryScript((CobScript*)unit->script, "QueryBuildInfo", &piece, 0, 0, 0);
+        g_seams.units->QueryScript((CobScript*)unit->script.get(), "QueryBuildInfo", &piece, 0, 0, 0);
         order->pos = g_seams.units->GetPiecePosition(unit, piece);
         UnitDef* ut = &g_game->defs[order->unitType];
         Point16 cell = GridCell(order->pos, *(Point16*)&ut->footprintx);
@@ -694,7 +694,7 @@ int __stdcall BeCarriedOrder(Unit* unit, Order* order, int unused)
 // FUNCTION: 0x403010
 int __stdcall ActivateOrder(Unit* unit, int unused1, int unused2)
 {
-    if (((Sub_403010*)unit->def)->flag) {
+    if (((Sub_403010*)unit->def.get())->flag) {
         g_seams.units->SetStateBits(unit, 1, 1);
     }
     return 5;
@@ -703,7 +703,7 @@ int __stdcall ActivateOrder(Unit* unit, int unused1, int unused2)
 // FUNCTION: 0x403040
 int __stdcall DeactivateOrder(Unit* unit, int unused1, int unused2)
 {
-    if (((Sub_403010*)unit->def)->flag) {
+    if (((Sub_403010*)unit->def.get())->flag) {
         g_seams.units->SetStateBits(unit, 1, 0);
     }
     return 5;
@@ -712,7 +712,7 @@ int __stdcall DeactivateOrder(Unit* unit, int unused1, int unused2)
 // FUNCTION: 0x403070
 int __stdcall CloakOnOrder(char* param1, int unused1, int unused2)
 {
-    CloakDefView* p = *(CloakDefView**)(param1 + 0x92);
+    CloakDefView* p = (CloakDefView*)((Unit*)param1)->def.get();
     if (p->flag) {
         *(unsigned int*)(param1 + 0x110) |= 0x800;
     }
@@ -722,7 +722,7 @@ int __stdcall CloakOnOrder(char* param1, int unused1, int unused2)
 // FUNCTION: 0x4030a0
 int __stdcall CloakOffOrder(char* unit, int unused1, int unused2)
 {
-    CloakDefView* p = *(CloakDefView**)(unit + 0x92);
+    CloakDefView* p = (CloakDefView*)((Unit*)unit)->def.get();
     if (p->flag) {
         *(unsigned int*)(unit + 0x110) &= ~0x800;
     }
@@ -1556,7 +1556,7 @@ int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
         case 2:
             {
             int id = target->id;
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "TransportPickup", 0, 1, 1, id, 0, 0, 0);
+            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportPickup", 0, 1, 1, id, 0, 0, 0);
             QueueUnitSpeech(unit, 12, 0);
             ++order->attempts;
             order->SetDeadlineTicks(15); return 1;
@@ -1589,14 +1589,14 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
         order->link.SetUnit(unit->cargo);
         if (!order->target) return 5;
         order->AnnounceStatusIfFlagged("Unloading");
-        g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "TransportDrop",0,1,1,order->target->id,
+        g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportDrop",0,1,1,order->target->id,
             (order->pos.x&0xffff0000)+(order->pos.z>>16),0,0);
         ++order->attempts;
         order->SetDeadlineTicks(15);
         return 1;
     case 1: return WaitIfCobBusy(unit,order,8);
     case 2:
-        if (*(Unit**)&order->target->carrier!=unit) { QueueUnitSpeech(unit,13,0); return 5; }
+        if (order->target->carrier!=unit) { QueueUnitSpeech(unit,13,0); return 5; }
         if (order->attempts>=3) return 9;
         if ((unsigned char)(unit->def->flags1>>12)&1)
             order->AttachApproachRadiusGoal(&order->pos,(int)(unit->def->height180*1.5));

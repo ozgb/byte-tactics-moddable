@@ -26,6 +26,6 @@ public:
 // FUNCTION: 0x410c70
 void GroundAllyVisitor::CollectGroundAlly(Unit* unit)
 {
-    if (((Owner*)unit->player)->allied[owner->index] && !(unit->def->flags1 & 0x800) && unit != self)
+    if (((Owner*)unit->player.get())->allied[owner->index] && !(unit->def->flags1 & 0x800) && unit != self)
         units->push_back(unit);
 }

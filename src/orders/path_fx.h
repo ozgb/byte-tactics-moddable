@@ -3,6 +3,7 @@
 
 #include "order_fx.h"
 #include "path_order_attach.h"
+#include "../../interfaces/ref.h"
 
 #pragma pack(push, 1)
 class Class_0044e2d0 : public OrderFx {
@@ -29,7 +30,7 @@ public:
     short field_c;
     short field_e;
     short field_10;
-    Unit* field_12;
+    Ref<Unit> field_12;
     PathOrderAttach ref;
     Vec3 pos;
     int field_32;
@@ -44,7 +45,7 @@ public:
     short field_c;
     short field_e;
     short field_10;
-    Unit* field_12;
+    Ref<Unit> field_12;
     PathOrderAttach ref;
     Vec3 pos;
     char unknown_32[4];
@@ -76,7 +77,7 @@ public:
     short field_c;
     short field_e;
     short field_10;
-    Unit* field_12;
+    Ref<Unit> field_12;
     PathOrderAttach ref;
     Vec3 pos;
     int field_32;

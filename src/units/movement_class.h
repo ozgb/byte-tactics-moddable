@@ -9,6 +9,8 @@
 #ifndef MOVEMENT_CLASS_H
 #define MOVEMENT_CLASS_H
 
+#include "../../interfaces/ref.h"
+
 struct Point16;
 struct Source_00440340;
 struct Object_00440af0;
@@ -26,7 +28,7 @@ public:
     unsigned char badWaterSlope;       // +0x0f
     unsigned int width;                // +0x10, of the pass map
     unsigned int height;               // +0x14
-    unsigned int* cells;               // +0x18
+    Ref<unsigned int> cells;
     unsigned int lastTick;             // +0x1c
 
     MovementClass();

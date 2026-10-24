@@ -404,7 +404,7 @@ void DrawRadarUnits(void)
     Unit* end = g_game->unitsEnd;
     if (u <= end) {
         do {
-            UnitType_00466dc0*& type = *(UnitType_00466dc0**)&u->def;
+            UnitType_00466dc0* type = (UnitType_00466dc0*)u->def.get();
             if (u->unitDefIndex != 0) {
                 if (enabled != 0 || (u->flags & 0x300) != 0 ||
                     u->playerIndex == g_game->playerIndex) {

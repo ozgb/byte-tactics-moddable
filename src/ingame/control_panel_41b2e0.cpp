@@ -5,6 +5,7 @@
 // g_game->orders, then opens the unit's build menu page or redraws the bar.
 // This include set decides the symbol ids of the locals: do not change it.
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include <memory.h>
 #include "ta_types.h"
 
@@ -49,7 +50,7 @@ struct UnitFlags_0041b2e0 {
 
 struct Unit_0041b2e0 {
     char unknown_0[0x92];
-    UnitType_0041b2e0* def;            // +0x92
+    Ref<UnitType_0041b2e0> def;
     char unknown_96[0xa6 - 0x96];
     unsigned short unitDefIndex;       // +0xa6
     unsigned short id;                 // +0xa8

@@ -248,10 +248,10 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
 
     g_seams.economy->LoadUnitAccounts(&unit->resourceSlot, (UnitInfo*)unit, file);
     if (rec.f27 != 0)
-        g_seams.orders->LoadMotion((UnitMotion*)unit->motion, 0, unit, file);
+        g_seams.orders->LoadMotion(unit->motion, 0, unit, file);
 
-    Order** normal = (Order**)&unit->list;
-    Order** special = (Order**)&unit->list2;
+    Ref<Order>* normal = &unit->list;
+    Ref<Order>* special = &unit->list2;
     int k = 0;
     if (rec.f23 > 0) {
         do {
@@ -271,13 +271,13 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
         g_seams.orders->ReattachFxToUnit((Order*)unit->list);
     sprintf(script, "Script%i", i);
     file->OpenNamedBox(script);
-    ((CobScript*)unit->script)->LoadScriptState(file);
+    ((CobScript*)unit->script.get())->LoadScriptState(file);
 
     // Plain array indexing in this field order: it anchors the loop pointer.
     for (int j = 0; j < 3; j++) {
         *(int*)&unit->weapons[j] = rec.pieces[j].f0;
         unit->weapons[j].aimCob.nAimCobDone = rec.pieces[j].f4;
-        ((unsigned char*)unit->weapons[j].weapon)[0x10a] = rec.pieces[j].f8b;
+        ((unsigned char*)unit->weapons[j].weapon.get())[0x10a] = rec.pieces[j].f8b;
         unit->weapons[j].muzzleAimFromDeltaZ = rec.pieces[j].fc;
         unit->weapons[j].reloadTimer = rec.pieces[j].f10;
         unit->weapons[j].fireHeading = rec.pieces[j].f12;
@@ -315,7 +315,7 @@ void __stdcall SaveUnits(HapiBank* file)
 
             sprintf(script, "Script%i", count);
             file->OpenNamedBox(script);
-            ((CobScript*)unit->script)->SaveScriptState(file);
+            ((CobScript*)unit->script.get())->SaveScriptState(file);
 
             int n = 0;
             Order* c = (Order*)unit->list;
@@ -334,10 +334,10 @@ void __stdcall SaveUnits(HapiBank* file)
             }
 
             if (unit->motion != 0)
-                g_seams.orders->SaveMotion((UnitMotion*)unit->motion, 0, unit, file);
+                g_seams.orders->SaveMotion(unit->motion, 0, unit, file);
             g_seams.economy->SaveUnitAccounts((UnitResources*)((char*)unit + 0xbc), (UnitInfo*)unit, file);
 
-            strcpy(rec.name, (char*)(*(char**)((char*)unit + 0x92) + 0x20));
+            strcpy(rec.name, ((char*)unit->def.get() + 0x20));
             rec.player = unit->playerIndex;
             rec.id = unit->id;
 
@@ -350,7 +350,7 @@ void __stdcall SaveUnits(HapiBank* file)
 
             // Plain short local assigned in the nested if, not a pointer.
             short id8b = 0;
-            Unit* a = (Unit*)unit->carrier;
+            Unit* a = unit->carrier;
             if (a != 0 && (a->flags & 0x10000000)) {
                 rec.childA = unit->carrier == 0 ? 0 : a->id;
                 rec.b8d = unit->transportPiece;
@@ -394,7 +394,7 @@ void __stdcall SaveUnits(HapiBank* file)
             for (int k = 0; k < 3; k++) {
                 rec.pieces[k].f0 = *(int*)&unit->weapons[k];
                 rec.pieces[k].f4 = unit->weapons[k].aimCob.nAimCobDone;
-                rec.pieces[k].f8 = ((Obj*)unit->weapons[k].weapon)->f10a;
+                rec.pieces[k].f8 = ((Obj*)unit->weapons[k].weapon.get())->f10a;
                 rec.pieces[k].fc = unit->weapons[k].muzzleAimFromDeltaZ;
                 rec.pieces[k].f10 = unit->weapons[k].reloadTimer;
                 rec.pieces[k].f12 = unit->weapons[k].fireHeading;

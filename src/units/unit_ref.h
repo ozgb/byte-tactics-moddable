@@ -7,14 +7,16 @@
 #ifndef UNIT_REF_H
 #define UNIT_REF_H
 
+#include "../../interfaces/ref.h"
+
 struct Unit;
 class Listener_004896f0;
 
 class UnitRef {
 public:
     void* table;                   // +0x0, the object's vtable
-    Unit* owner;                   // +0x4
-    UnitRef* next;                 // +0x8
+    Ref<Unit> owner;
+    Ref<UnitRef> next;
     Listener_004896f0* listener;   // +0xc
 
     // The empty do-while is a debug check that compiles to nothing.

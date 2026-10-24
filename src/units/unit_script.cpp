@@ -23,7 +23,7 @@ struct PieceState {                     // 0x36 bytes
     int translation[3];                 // +0x04
     unsigned short rotation[3];         // +0x10
     Vec3 pos;                           // +0x16
-    int* sfxOffset;                     // +0x22, two points EmitSfx emits between
+    Ref<int> sfxOffset;
     short value;                        // +0x26, cleared when the piece changes
     unsigned short visible : 1;         // +0x28 bit 0
     unsigned short cached : 1;          // +0x28 bit 1
@@ -48,7 +48,7 @@ struct ObjectState {
 
 // The 0x30-byte record StartExplodePiece consumes.
 struct Header_00481140 {
-    void* obj;                         // +0x00
+    Ref<Unit> obj;
     int index;                         // +0x04
     int r1;                            // +0x08
     int r2;                            // +0x0c
@@ -59,7 +59,7 @@ struct Header_00481140 {
     int f20;                           // +0x20
     int f24;                           // +0x24
     unsigned int bits;                 // +0x28
-    void* rec;                         // +0x2c
+    Ref<char> rec;
 };
 #pragma pack(pop)
 
@@ -472,7 +472,7 @@ void UnitScript::AttachUnit(unsigned short id, int a, int b)
 {
     Unit* u = GetUnit(id);
     if (u != 0 && (u->flags & 0x10000000)
-        && (u->carrier == 0 || u->carrier == (int)state->unit)) {
+        && (u->carrier == 0 || u->carrier == state->unit)) {
         AttachUnitToPiece(u, state->unit, a, b);
     }
 }
@@ -483,7 +483,7 @@ void UnitScript::AttachUnit(unsigned short id, int a, int b)
 void UnitScript::DropUnit(unsigned short id)
 {
     Unit* u = GetUnit(id);
-    if (u != 0 && (u->flags & 0x10000000) && *(Unit**)&u->carrier == state->unit) {
+    if (u != 0 && (u->flags & 0x10000000) && u->carrier == state->unit) {
         if (g_seams.map->CanPlaceUnitFootprint(u->def, (unsigned short)u->id, *(Point16*)&u->cell, 1)) {
             AttachUnitToPiece(u, 0, -1, 1);
         }

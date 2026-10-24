@@ -47,8 +47,8 @@ inline void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags
     if (unit->carrier)
         g_seams.units->AttachUnitToPiece(unit, 0, -1, 2);
     g_seams.units->SetStateBits(unit, 1, 1);
-    if ((((UnitMotion*)unit->motion)->flags & 3) == 1) {
-        ((UnitMotion*)unit->motion)->SetFlightMode(unit, 2);
+    if ((unit->motion->flags & 3) == 1) {
+        unit->motion->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0((Order*)order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx(obj);

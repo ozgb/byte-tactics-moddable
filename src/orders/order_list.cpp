@@ -19,6 +19,7 @@
 
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 static inline int Vec3Length(const Vec3* v)
 {
@@ -134,9 +135,10 @@ struct TargetData_0043d6d0 {
 };
 
 struct Path_0043d6d0 {
-    TargetData_0043d6d0* motion;       // +0x0
+    Ref<TargetData_0043d6d0> motion;
 };
 
+class MovementClass;
 struct UnitType_0043cd20 {           // 0x249 bytes
     char unknown_0[0x20];
     char name[0x20];                 // +0x20
@@ -150,7 +152,7 @@ struct UnitType_0043cd20 {           // 0x249 bytes
     char unknown_1aa[0x1ae - 0x1aa];
     int moverate1;                     // +0x1ae
     int moverate2;                     // +0x1b2
-    int movementclass;                 // +0x1b6
+    Ref<MovementClass> movementclass;
     unsigned short max_turn;           // +0x1ba
     char unknown_1bc[0x202 - 0x1bc];
     short range;                       // +0x202
@@ -274,14 +276,14 @@ int __stdcall GetOrderTargetIfFlagged(void* param_1)
     if (param_1 == 0) {
         eax = 0;
     } else {
-        int* field_5c = *(int**)((char*)param_1 + 0x5c);
+        int* field_5c = (int*)((Unit*)param_1)->list.get();
         if (field_5c == 0)
             eax = 0;
         else
             eax = *(int*)((char*)field_5c + 0x42);
     }
     if ((eax & 8) != 0)
-        return *(int*)((char*)*(int**)((char*)param_1 + 0x5c) + 0x16);
+        return (int)((Unit*)param_1)->list->target.get();
     return 0;
 }
 
@@ -319,9 +321,9 @@ int __stdcall GetOrderTarget(int param_1)
 {
     int eax = param_1;
     if (eax != 0) {
-        eax = *(int*)(eax + 0x5c);
+        eax = (int)((Unit*)eax)->list.get();
         if (eax != 0) {
-            eax = *(int*)(eax + 0x16);
+            eax = (int)((Order*)eax)->target.get();
             return eax;
         }
     }
@@ -378,7 +380,7 @@ int __stdcall ReadyOrder(int arg1, int arg2, int arg3)
 void __stdcall DeleteOrders(Unit* owner, int all)
 {
     Order* first = owner->list;
-    Order** pp = &owner->list;
+    Ref<Order>* pp = &owner->list;
     Order* node;
     while ((node = *pp) != 0) {
         if (!all && (node->flags_42 & 4)) {
@@ -404,7 +406,7 @@ void __stdcall DeleteOrders(Unit* owner, int all)
 void __stdcall DeleteOrder(Unit* owner, Order* node)
 {
     Order* first = owner->list;
-    Order** link = (node->flags_42 & 0x40000) ? &owner->list2 : &owner->list;
+    Ref<Order>* link = (node->flags_42 & 0x40000) ? &owner->list2 : &owner->list;
     for (Order* n = *link; n != 0; n = n->next) {
         if (n == node) {
             *link = node->next;
@@ -421,24 +423,24 @@ void __stdcall DeleteOrder(Unit* owner, Order* node)
 // FUNCTION: 0x439fe0 ?MoveOrderToTail@@YGXPAD0@Z
 void __stdcall MoveOrderToTail(char* param_1, char* param_2)
 {
-    char** pp = (char**)(param_1 + 0x5c);
-    char* node = *pp;
-    for (; node != param_2; node = *(char**)(node + 0x4a)) {
-        pp = (char**)(node + 0x4a);
+    Ref<Order>* pp = &((Unit*)param_1)->list;
+    Order* node = *pp;
+    for (; node != (Order*)param_2; node = node->next) {
+        pp = &node->next;
     }
-    node = *(char**)(param_2 + 0x4a);
+    node = ((Order*)param_2)->next;
     *pp = node;
-    for (; node != 0; node = *(char**)(node + 0x4a)) {
-        pp = (char**)(node + 0x4a);
+    for (; node != 0; node = node->next) {
+        pp = &node->next;
     }
-    *pp = param_2;
-    *(char**)(param_2 + 0x4a) = 0;
+    *pp = (Order*)param_2;
+    ((Order*)param_2)->next = 0;
 }
 
 // Links `child` into the parent's list in front of `before` (see EnqueueOrderType).
 static inline void InsertBefore(Unit* p, Order* child, Order* before)
 {
-    Order** link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
+    Ref<Order>* link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
     while (*link != before) {
         link = &(*link)->next;
     }
@@ -566,7 +568,7 @@ int __stdcall OrderTypeNameLess(int param_1, char* param_2)
 void __stdcall InsertOrderBefore(Unit* owner, Order* node,
                             Order* before)
 {
-    Order** link = (node->flags_42 & 0x40000) ? &owner->list2
+    Ref<Order>* link = (node->flags_42 & 0x40000) ? &owner->list2
                                                    : &owner->list;
     while (*link != before)
         link = &(*link)->next;
@@ -582,7 +584,7 @@ void __stdcall AppendOrder(Unit* owner, Order* node)
 {
     unsigned int which = node->flags_42 & 0x40000;
     Order* before = which ? owner->list2 : owner->list;
-    Order** link = which ? &owner->list2 : &owner->list;
+    Ref<Order>* link = which ? &owner->list2 : &owner->list;
     while (*link != before) {
         link = &(*link)->next;
     }
@@ -599,7 +601,7 @@ void __stdcall AppendOrder(Unit* owner, Order* node)
 // FUNCTION: 0x43ad10
 void __stdcall AppendOrderToTail(Unit* owner, Order* node)
 {
-    Order** link = (node->flags_42 & 0x40000) ? &owner->list2 : &owner->list;
+    Ref<Order>* link = (node->flags_42 & 0x40000) ? &owner->list2 : &owner->list;
     for (Order* n = *link; n != 0; n = n->next)
         link = &n->next;
     *link = node;
@@ -613,7 +615,7 @@ void __stdcall AppendOrderToTail(Unit* owner, Order* node)
 // FUNCTION: 0x43ad50
 void __stdcall InsertOrderAfterMarked(Unit* owner, Order* node)
 {
-    Order** link = &owner->list;
+    Ref<Order>* link = &owner->list;
     node->unit = owner;
     node->flags_42 |= 0x1000;
     for (Order* n = *link; n != 0; n = n->next) {
@@ -632,7 +634,7 @@ void __stdcall InsertOrderAfterMarked(Unit* owner, Order* node)
 
 // Unlinks the node `link` points at and deletes it, marking it 0x10000 (so its
 // destructor does not unlink it again) unless it is the list head.
-static inline void UnlinkNode(Order** link, Order* node, Order* first)
+static inline void UnlinkNode(Ref<Order>* link, Order* node, Order* first)
 {
     *link = node->next;
     if (node != first)
@@ -641,9 +643,9 @@ static inline void UnlinkNode(Order** link, Order* node, Order* first)
 }
 
 // Unlinks `node` from the list starting at `list` and deletes it.
-static inline void RemoveFromList(Order** list, Order* node, Order* first)
+static inline void RemoveFromList(Ref<Order>* list, Order* node, Order* first)
 {
-    Order** link = list;
+    Ref<Order>* link = list;
     for (Order* n = *link; n != 0; n = n->next) {
         if (n == node) {
             UnlinkNode(link, node, first);
@@ -654,7 +656,7 @@ static inline void RemoveFromList(Order** list, Order* node, Order* first)
 }
 
 // Drops every node of the owner's +0x5c list that has no flag 4.
-static inline void PruneLoose(Order** link, Order* first)
+static inline void PruneLoose(Ref<Order>* link, Order* first)
 {
     Order* n = *link;
     while (n != 0) {
@@ -670,7 +672,7 @@ static inline void PruneLoose(Order** link, Order* first)
 // own flag 0x40000 selects.
 static inline void PruneUsed(Unit* owner)
 {
-    Order** base = &owner->list;
+    Ref<Order>* base = &owner->list;
     for (Order* n = owner->list; n != 0; n = owner->list) {
         if (!(n->flags_42 & 0x4000))
             break;
@@ -684,7 +686,7 @@ static inline void PruneUsed(Unit* owner)
 static inline void AddFront(Unit* owner, Order* node)
 {
     Order* before = (node->flags_42 & 0x40000) ? owner->list2 : owner->list;
-    Order** link = (node->flags_42 & 0x40000) ? &owner->list2 : &owner->list;
+    Ref<Order>* link = (node->flags_42 & 0x40000) ? &owner->list2 : &owner->list;
     while (*link != before)
         link = &(*link)->next;
     *link = node;
@@ -699,7 +701,7 @@ static inline void AddFront(Unit* owner, Order* node)
 // Puts `node` right after the node carrying flag 0x1000 (0x43ad50).
 static inline void AddMarked(Unit* owner, Order* node)
 {
-    Order** link = &owner->list;
+    Ref<Order>* link = &owner->list;
     node->unit = owner;
     node->flags_42 |= 0x1000;
     for (Order* n = *link; n != 0; n = n->next) {
@@ -842,14 +844,14 @@ static inline int InRange(int d)
 // get other registers and the blocks lay out differently.
 static inline int Matches(Order* node, unsigned char kind, int id, int* pos)
 {
-    return kind == node->kind.index && (id == 0 || id == (int)node->link.owner) &&
+    return kind == node->kind.index && (id == 0 || id == (int)node->link.owner.get()) &&
            (!pos || (InRange(pos[0] - node->pos.x) && InRange(pos[2] - node->pos.z)));
 }
 
 // Unlinks `node` from the list its flag 0x40000 selects and deletes it.
 static inline void RemoveNode(Unit* owner, Order* node, Order* first)
 {
-    Order** link = &owner->list;
+    Ref<Order>* link = &owner->list;
     if (node->flags_42 & 0x40000) {
         link = &owner->list2;
     }
@@ -927,7 +929,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
         }
         Order* first = owner->list;
         amount += found->count;
-        Order** link = &owner->list;
+        Ref<Order>* link = &owner->list;
         if (found->flags_42 & 0x40000)
             link = &owner->list2;
         for (node = *link; node != 0; node = node->next) {
@@ -949,7 +951,7 @@ static inline void Insert(Unit* unit, Order* cmd, Order* before)
 {
     unsigned int which = cmd->flags_42 & 0x40000;
     Order* last = which ? unit->list2 : unit->list;
-    Order** link = which ? &unit->list2 : &unit->list;
+    Ref<Order>* link = which ? &unit->list2 : &unit->list;
     while (*link != before) {
         link = &(*link)->next;
     }
@@ -983,7 +985,7 @@ int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3)
         MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
-        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitType_0043cd20*)unit->def)->maneuverleashlength);
+        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitType_0043cd20*)unit->def.get())->maneuverleashlength);
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
         Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
@@ -1013,7 +1015,7 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
         MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
-        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitType_0043cd20*)unit->def)->range);
+        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitType_0043cd20*)unit->def.get())->range);
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
         Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
@@ -1023,7 +1025,7 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
         MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
-        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitType_0043cd20*)unit->def)->maneuverleashlength);
+        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitType_0043cd20*)unit->def.get())->maneuverleashlength);
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
         Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
@@ -1056,7 +1058,7 @@ void __stdcall EnqueueOrderType(Unit* p, unsigned char type)
 // 0x439fe0: moves `node` to the end of the +0x5c list.
 void __stdcall MoveOrderToTail(Unit* owner, Order* node)
 {
-    Order** pp = &owner->list;
+    Ref<Order>* pp = &owner->list;
     Order* n = *pp;
     for (; n != node; n = n->next) {
         pp = &n->next;
@@ -1165,9 +1167,9 @@ void __stdcall RunOrders(Unit* unit)
     char state = unit->player->type;
     if (state != 1 && state != 2)
         return;
-    if (((UnitType_0043cd20*)unit->def)->defaultmissiontype == 0)
+    if (((UnitType_0043cd20*)unit->def.get())->defaultmissiontype == 0)
         return;
-    InsertCommand(unit, ((UnitType_0043cd20*)unit->def)->defaultmissiontype);
+    InsertCommand(unit, ((UnitType_0043cd20*)unit->def.get())->defaultmissiontype);
 }
 
 // Takes the node out of the parent's list and frees it. The search can fail,
@@ -1177,7 +1179,7 @@ void __stdcall RunOrders(Unit* unit)
 static void RemoveAndDelete(Unit* p, Order* child)
 {
     Order* first = p->list;
-    Order** link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
+    Ref<Order>* link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
     Order* node = *link;
     while (node != 0) {
         if (node == child) {
@@ -1450,7 +1452,7 @@ Elem_0043c390* __stdcall LowerBoundOrderTypes(Elem_0043c390* first, Elem_0043c39
 void UnitMotion::ApplyClampedTurnDelta(Unit* unit, short amount)
 {
     if (amount != 0) {
-        unsigned short max = ((UnitType_0043cd20*)unit->def)->max_turn;
+        unsigned short max = ((UnitType_0043cd20*)unit->def.get())->max_turn;
         if (amount >= max)
             turn = max;
         else if (amount <= -max)
@@ -1516,9 +1518,9 @@ void UnitMotion::UpdateVelocityFromHeading(Unit* unit, int amount)
         idx = 5;
 
     // 16.16 range from the table entry, halved below sea level.
-    int range = (int)(((__int64)(g_slopeSpeedFactor[idx] << 16) * ((UnitType_0043cd20*)unit->def)->maxvelocity) >> 16);
+    int range = (int)(((__int64)(g_slopeSpeedFactor[idx] << 16) * ((UnitType_0043cd20*)unit->def.get())->maxvelocity) >> 16);
     range = (int)(((__int64)range << 16) / 0x640000);
-    if (unit->yWhole < g_game->seaLevel && !(((UnitType_0043cd20*)unit->def)->flags1 & 0x81000))
+    if (unit->yWhole < g_game->seaLevel && !(((UnitType_0043cd20*)unit->def.get())->flags1 & 0x81000))
         range = (int)(((__int64)range * 0x8000) >> 16);
     if (speed > range)
         speed = range;
@@ -1538,7 +1540,7 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
     if (obj->v5() == 0) {
         turn = 0;
         // Bound temporary: loads unit before the turn store and keeps the rate in eax.
-        const int& amount = -((UnitType_0043cd20*)unit->def)->brakerate;
+        const int& amount = -((UnitType_0043cd20*)unit->def.get())->brakerate;
         UpdateVelocityFromHeading(unit, amount);
         return;
     }
@@ -1580,7 +1582,7 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
     int d2 = (int)(((__int64)bx * bx) >> 32) + (int)(((__int64)bz * bz) >> 32);
 
     if (diff != 0) {
-        unsigned short max = ((UnitType_0043cd20*)unit->def)->max_turn;
+        unsigned short max = ((UnitType_0043cd20*)unit->def.get())->max_turn;
         if (sdiff >= max)
             turn = max;
         else if (sdiff <= -max)
@@ -1596,8 +1598,8 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
     // speed is copied to spd below so its sign extension is not shared with this
     // multiply; otherwise it becomes _allmul instead of a one-operand imul.
     int turned = (int)((((__int64)(adiff & 0xffff) * (__int64)speed)
-                        / ((UnitType_0043cd20*)unit->def)->max_turn));
-    int rate = ((UnitType_0043cd20*)unit->def)->brakerate;
+                        / ((UnitType_0043cd20*)unit->def.get())->max_turn));
+    int rate = ((UnitType_0043cd20*)unit->def.get())->brakerate;
     int spd = speed;
     int t = (int)(((__int64)spd * spd) >> 16);
     int q = (int)(((__int64)t << 16) / (2 * rate));
@@ -1606,7 +1608,7 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
 
     // UpdateVelocityFromHeading stays defined above this function so the two calls cross-jump.
     if (d1 > lim && d2 > r)
-        UpdateVelocityFromHeading(unit, ((UnitType_0043cd20*)unit->def)->acceleration);
+        UpdateVelocityFromHeading(unit, ((UnitType_0043cd20*)unit->def.get())->acceleration);
     else
         UpdateVelocityFromHeading(unit, -rate);
 }
@@ -1633,8 +1635,8 @@ void UnitMotion::ApplyBankAndPitch(Unit* owner, Vec3* v)
     xz[1] = p2.z;
     FUN_004b7173(owner->angles.heading, xz);
     int n = (int)(((__int64)g_game->gravity << 16) / 0xccd);
-    owner->angles.bank = (short)FUN_004b715a((int)(((__int64)((UnitType_0043cd20*)owner->def)->bankscale * -xz[0]) >> 16), n);
-    owner->angles.pitch = (short)FUN_004b715a((int)(((__int64)((UnitType_0043cd20*)owner->def)->pitchscale * -xz[0]) >> 16), n);
+    owner->angles.bank = (short)FUN_004b715a((int)(((__int64)((UnitType_0043cd20*)owner->def.get())->bankscale * -xz[0]) >> 16), n);
+    owner->angles.pitch = (short)FUN_004b715a((int)(((__int64)((UnitType_0043cd20*)owner->def.get())->pitchscale * -xz[0]) >> 16), n);
 }
 #pragma auto_inline(on)
 
@@ -1678,7 +1680,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     short heading;
     obj->v4(&a, &b, &heading);
 
-    UnitType_0043cd20* type = (UnitType_0043cd20*)unit->def;
+    UnitType_0043cd20* type = (UnitType_0043cd20*)unit->def.get();
     const float eps = 1.52587890625e-05f;
 
     float f18 = (float)type->acceleration * eps;
@@ -1687,7 +1689,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     Vec3Scale(&velocity, scale);
 
     float dist = (float)_hypot(velocity.x, velocity.z) * eps;
-    float maxd = (float)((UnitType_0043cd20*)unit->def)->brakerate * eps;
+    float maxd = (float)((UnitType_0043cd20*)unit->def.get())->brakerate * eps;
     if (dist > maxd) {
         int f = (int)((double)maxd / dist * 65536.0);
         // MulFixed and AddFixed take the component by reference; written
@@ -1701,7 +1703,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     Vec3 da = PosMinus(unit->pos, a);
     Vec3 db = PosMinus(velocity, b);
 
-    if (unit->spatialBucket != (int)g_game->overflowBucket.get()) {
+    if ((int)unit->spatialBucket.get() != (int)g_game->overflowBucket.get()) {
         int lim;
         if ((speed & -4) < 0x40000)
             lim = 0x10000;
@@ -1722,7 +1724,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
 #endif
     short d = (short)(heading - unit->angles.heading);
     if (d != 0) {
-        unsigned short max = ((UnitType_0043cd20*)unit->def)->max_turn;
+        unsigned short max = ((UnitType_0043cd20*)unit->def.get())->max_turn;
         if (d >= (int)max)
             turn = max;
         else if (d <= -(int)max)
@@ -1794,17 +1796,17 @@ void UnitMotion::UpdatePosition(Unit* u)
     if (u->carrier != 0) {
         // Copy through the returned pointer, not an initialiser.
         Vec3 v;
-        v = g_seams.units->GetPiecePosition((Unit*)u->carrier, (signed char)u->transportPiece);
-        if (((UnitType_0043cd20*)u->def)->b19) {
+        v = g_seams.units->GetPiecePosition(u->carrier, (signed char)u->transportPiece);
+        if (((UnitType_0043cd20*)u->def.get())->b19) {
             // MAX stays a macro over the Fixed union with a prvalue second operand.
-            *(Fixed_0043d6d0*)&v.y = MAXM_0043d6d0(*(Fixed_0043d6d0*)&v.y, MakeFixed_0043d6d0(((UnitType_0043cd20*)u->def)->draft * 0xffff + g_game->seaLevel));
+            *(Fixed_0043d6d0*)&v.y = MAXM_0043d6d0(*(Fixed_0043d6d0*)&v.y, MakeFixed_0043d6d0(((UnitType_0043cd20*)u->def.get())->draft * 0xffff + g_game->seaLevel));
         }
         g_seams.units->SetUnitPosition(u, v, mode);
-        Angles16 o = g_seams.units->GetPieceAngles((Unit*)u->carrier, (signed char)u->transportPiece);
+        Angles16 o = g_seams.units->GetPieceAngles(u->carrier, (signed char)u->transportPiece);
         u->angles = o;
-        if (((Path_0043d6d0*)u->carrier)->motion != 0) {
-            speed = ((Path_0043d6d0*)u->carrier)->motion->speed;
-            velocity = ((Path_0043d6d0*)u->carrier)->motion->velocity;
+        if (((Path_0043d6d0*)u->carrier.get())->motion != 0) {
+            speed = ((Path_0043d6d0*)u->carrier.get())->motion->speed;
+            velocity = ((Path_0043d6d0*)u->carrier.get())->motion->velocity;
         } else {
             speed = 0;
             Vec3 zero = OrderVec3(0, 0, 0);
@@ -1834,8 +1836,8 @@ void UnitMotion::UpdatePosition(Unit* u)
         return;
     }
 
-    if (((Target_0043d6d0*)u->player)->active != 0) {
-        if (((Target_0043d6d0*)u->player)->type == 1 || ((Target_0043d6d0*)u->player)->type == 2)
+    if (((Target_0043d6d0*)u->player.get())->active != 0) {
+        if (((Target_0043d6d0*)u->player.get())->type == 1 || ((Target_0043d6d0*)u->player.get())->type == 2)
             flag = g_seams.map->CanPlaceUnitFootprint((UnitDef*)u->def, (unsigned short)u->id, *(Point16*)&cell, m) == 0;
     }
 
@@ -1843,8 +1845,8 @@ void UnitMotion::UpdatePosition(Unit* u)
         // ClampToCell stays an inline helper taking both Points by value.
         ClampToCell(pos, *(PointInit_0043a1f0*)&u->cell, *(PointInit_0043a1f0*)&u->footprint);
 
-        if (speed > (((UnitType_0043cd20*)u->def)->maxvelocity / 2)) {
-            int half = ((UnitType_0043cd20*)u->def)->maxvelocity / 2;
+        if (speed > (((UnitType_0043cd20*)u->def.get())->maxvelocity / 2)) {
+            int half = ((UnitType_0043cd20*)u->def.get())->maxvelocity / 2;
             speed = half;
             unsigned short angle = u->angles.heading;
             Vec3 vec;
@@ -1876,10 +1878,10 @@ void UnitMotion::UpdateMoveRate(Unit* unit)
     int rate;
     if ((flags & 4) == 0 && unit->carrier == 0
         && (speed != 0 || turn != 0)) {
-        if (speed <= ((UnitType_0043cd20*)unit->def)->moverate1) {
+        if (speed <= ((UnitType_0043cd20*)unit->def.get())->moverate1) {
             rate = 1;
         } else {
-            rate = 2 + (speed > ((UnitType_0043cd20*)unit->def)->moverate2);
+            rate = 2 + (speed > ((UnitType_0043cd20*)unit->def.get())->moverate2);
         }
     } else {
         rate = 0;
@@ -1887,19 +1889,19 @@ void UnitMotion::UpdateMoveRate(Unit* unit)
     if (rate == (int)((unit->flags >> 2) & 3))
         return;
     if (rate == 0) {
-        g_seams.units->StartScript((CobScript*)unit->script, "StopMoving", 0, 1);
+        g_seams.units->StartScript((CobScript*)unit->script.get(), "StopMoving", 0, 1);
     } else if ((unit->flags & 0xc) == 0) {
-        g_seams.units->StartScript((CobScript*)unit->script, "StartMoving", 0, 1);
+        g_seams.units->StartScript((CobScript*)unit->script.get(), "StartMoving", 0, 1);
     }
     switch (rate) {
     case 1:
-        g_seams.units->StartScript((CobScript*)unit->script, "MoveRate1", 0, 1);
+        g_seams.units->StartScript((CobScript*)unit->script.get(), "MoveRate1", 0, 1);
         break;
     case 2:
-        g_seams.units->StartScript((CobScript*)unit->script, "MoveRate2", 0, 1);
+        g_seams.units->StartScript((CobScript*)unit->script.get(), "MoveRate2", 0, 1);
         break;
     case 3:
-        g_seams.units->StartScript((CobScript*)unit->script, "MoveRate3", 0, 1);
+        g_seams.units->StartScript((CobScript*)unit->script.get(), "MoveRate3", 0, 1);
         break;
     }
     unit->flags = (unit->flags & 0xfffffff3) | ((rate & 3) << 2);
@@ -1919,14 +1921,14 @@ UnitMotion::UnitMotion(Unit* unit)
     p2 = OrderVec3(0, 0, 0);
     mode = 1;
     flag = 0;
-    movementClass = ((UnitType_0043cd20*)unit->def)->movementclass;
-    if (((Target_0043d6d0*)unit->player)->active != 0 && ((Target_0043d6d0*)unit->player)->type == 3) {
-        if (((UnitType_0043cd20*)unit->def)->flag_800)
+    movementClass = (int)((UnitType_0043cd20*)unit->def.get())->movementclass.get();
+    if (((Target_0043d6d0*)unit->player.get())->active != 0 && ((Target_0043d6d0*)unit->player.get())->type == 3) {
+        if (((UnitType_0043cd20*)unit->def.get())->flag_800)
             obj = (Iface_0043dd20*)new (kSim) PackedPosGoal(unit);
         else
             obj = (Iface_0043dd20*)new (kSim) PatrolGoal(unit);
     } else {
-        if (((UnitType_0043cd20*)unit->def)->flag_800)
+        if (((UnitType_0043cd20*)unit->def.get())->flag_800)
             obj = (Iface_0043dd20*)new (kSim) LiteGoal(unit);
         else
             obj = (Iface_0043dd20*)new (kSim) AiSearchGoal(unit);
@@ -1945,7 +1947,7 @@ void UnitMotion::DestroyObject()
 void UnitMotion::UpdateMotion(Unit* u)
 {
     obj->v2();
-    if (((UnitType_0043cd20*)u->def)->flag_800)
+    if (((UnitType_0043cd20*)u->def.get())->flag_800)
         SteerAircraft(u);
     else
         SteerGroundUnit(u);

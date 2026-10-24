@@ -20,6 +20,7 @@
 #include <math.h>
 #include <malloc.h>
 #include "../../interfaces/host.h"
+#include "../../interfaces/ref.h"
 // Only for its symbol ids: it puts 0x4181d0 in the window it matches in.
 #include <wctype.h>
 
@@ -45,7 +46,7 @@ struct Movement {
     char unknown_0[0x10];
     int width;                         // +0x10
     char unknown_14[4];
-    unsigned int* states;              // +0x18, 2 bits per cell, 16 rows per word
+    Ref<unsigned int> states;
 };
 
 // The original declares the tag as a struct here (the decorated name of
@@ -1374,7 +1375,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
     Player* player = &g_game->players[g_game->playerIndex];
     if (g_game->debugMode == 1) {
         Unit* unit = FindNextSelectedUnit(0, 0);
-        if (unit) movement = (Movement*)unit->def->movementclass;
+        if (unit) movement = (Movement*)unit->def->movementclass.get();
     }
     int firstY = g_game->scrollY / 16;
     int firstX = g_game->scrollX / 16;

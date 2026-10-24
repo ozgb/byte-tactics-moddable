@@ -164,7 +164,7 @@ void SelectAllIdleUnits(void)
     if (u <= pl->unitsEnd) {
         do {
             if ((u->flags & 0x20) && u->buildLeft == 0.0f && u->postTransferHoldoff == 0
-                && (u->carrier == 0 || (((Unit*)u->carrier)->flags & 0x40000000))) {
+                && (u->carrier == 0 || (u->carrier->flags & 0x40000000))) {
                 u->flags |= 0x10;
                 g_game->unitIndex = 0;
             }
@@ -213,7 +213,7 @@ void SelectUnitsOfSameTypes(void)
         if (f & 0x20) {
             if (u->buildLeft == 0.0f) {
                 if (u->postTransferHoldoff == 0) {
-                    if (u->carrier == 0 || (*FlagsPtr((Unit*)u->carrier) & 0x40000000)) {
+                    if (u->carrier == 0 || (*FlagsPtr(u->carrier) & 0x40000000)) {
                         unsigned int v = u->unitDefIndex & 0xffff;
                         if (selected[v >> 5] & (1 << (v & 0x1f)))
                             *FlagsPtr(u) = f | 0x10;
@@ -243,7 +243,7 @@ void __stdcall SelectUnitsByCategory(char* name, int param_2)
     for (; u <= p->unitsEnd; u++) {
         unsigned int flags = u->flags;
         if ((flags & 0x20) && u->buildLeft == 0.0f && u->postTransferHoldoff == 0
-            && (u->carrier == 0 || (((Unit*)u->carrier)->flags & 0x40000000))) {
+            && (u->carrier == 0 || (u->carrier->flags & 0x40000000))) {
             unsigned short bits = u->unitDefIndex;
             unsigned int bit = 1 << (bits & 0x1f);
             if (mask[bits >> 5] & bit) {
@@ -276,7 +276,7 @@ void SelectAllVisibleUnits(void)
         Unit* u = &g_game->units[list[i]];
         unsigned int flags = u->flags;
         if ((flags & 0x20) && u->buildLeft == 0.0f && u->postTransferHoldoff == 0
-            && (u->carrier == 0 || (((unsigned char*)&((Unit*)u->carrier)->flags)[3] & 0x40))
+            && (u->carrier == 0 || (((unsigned char*)&u->carrier->flags)[3] & 0x40))
             && u->playerIndex == g_game->localPlayer) {
             found = 1;
             u->flags = flags | 0x10;
@@ -392,7 +392,7 @@ int __stdcall SelectUnitsInBox(void* param_1)
     Unit* last;
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
         if ((u->flags & 0x20) && u->buildLeft == 0.0f && !u->postTransferHoldoff &&
-            (!u->carrier || (((Unit*)u->carrier)->flags & 0x40000000))) {
+            (!u->carrier || (u->carrier->flags & 0x40000000))) {
             int sy = (u->xWhole - g_game->scrollX) + 0x80;
             int sx = (u->zWhole - g_game->scrollY - (u->yWhole >> 1)) + 0x20;
             if (sy >= ymin && sy <= ymax && sx >= xmin && sx <= xmax) {
@@ -494,7 +494,7 @@ void __stdcall ClickSelectHoverUnit(Param_0048c7f0* param)
         return;
     if (unit->postTransferHoldoff != 0)
         return;
-    if (unit->carrier != 0 && !(((Unit*)unit->carrier)->flags & 0x40000000))
+    if (unit->carrier != 0 && !(unit->carrier->flags & 0x40000000))
         return;
 
     if (param->flags & 4) {
@@ -526,7 +526,7 @@ void __stdcall DeselectIfIneligible(Unit* unit)
     unsigned int flags = unit->flags;
     if (flags & 0x10) {
         if (!(flags & 0x20) || unit->buildLeft != 0.0f || unit->postTransferHoldoff != 0
-            || (unit->carrier != 0 && !(((Unit*)unit->carrier)->flags & 0x40000000))) {
+            || (unit->carrier != 0 && !(unit->carrier->flags & 0x40000000))) {
             unit->flags = flags & ~0x10;
             g_game->unitIndex = 0;
             (*(Orders_37ebe*)&g_game->ordersPanelFlags_37ebe).byte |= 0x10;
@@ -677,7 +677,7 @@ int __stdcall ResolveCursorModeForSelection(char arg)
             && target->selectable
             && target->buildLeft == 0.0f
             && target->postTransferHoldoff == 0
-            && (target->carrier == 0 || (((Unit*)target->carrier)->flags & 0x40000000)))
+            && (target->carrier == 0 || (target->carrier->flags & 0x40000000)))
             return 0x0f;
         return 0x13;
     }
@@ -799,7 +799,7 @@ void __stdcall FocusCommander(int param_1)
     Unit* last = team->unitsEnd;
     for (Unit* u = team->unitsBegin; u <= last; u++) {
         if (u->selectable && u->buildLeft == 0.0f && u->postTransferHoldoff == 0
-            && (u->carrier == 0 || ((Unit*)u->carrier)->cargoSelectable)) {
+            && (u->carrier == 0 || u->carrier->cargoSelectable)) {
             if (strcmp(u->def->unitname, playerName) == 0) {
                 ClearCameraFollowState();
                 CenterCameraOnMapPosition(&u->pos, 1);
@@ -834,7 +834,7 @@ void __stdcall CycleSelection(void)
     for (; u <= last; u++) {
         if (u->flags & 0x20) {
             if (u->buildLeft == 0.0f && u->postTransferHoldoff == 0) {
-                Unit* owner = (Unit*)u->carrier;
+                Unit* owner = u->carrier;
                 if (owner == 0 || (owner->flags & 0x40000000)) {
                     if (found == 0) {
                         found = u;
@@ -858,7 +858,7 @@ void __stdcall CycleSelection(void)
         if (u <= t->unitsEnd) {
             do {
                 if ((u->flags & 0x20) && u->buildLeft == 0.0f && u->postTransferHoldoff == 0) {
-                    Unit* owner = (Unit*)u->carrier;
+                    Unit* owner = u->carrier;
                     if (owner == 0 || (owner->flags & 0x40000000)) {
                         u->flags |= flag;
                         g_game->unitIndex = 0;
@@ -913,14 +913,14 @@ bool __stdcall SelectSquad(int id, int param_2)
     Player* q = &g_game->players[g_game->localPlayer];
     for (u = q->unitsBegin; u <= q->unitsEnd; u++) {
         if ((*(unsigned char*)&u->flags & 0x20) && u->buildLeft == 0.0f && u->postTransferHoldoff == 0
-            && (u->carrier == 0 || (((Unit*)u->carrier)->flags & 0x40000000))
+            && (u->carrier == 0 || (u->carrier->flags & 0x40000000))
             && u->group == id && TestBit(setB, u->unitDefIndex)) {
             {
                 Player* r = &g_game->players[g_game->localPlayer];
                 for (v = r->unitsBegin;
                      v <= r->unitsEnd; v++) {
                     if ((v->flags & 0x20) && v->buildLeft == 0.0f && v->postTransferHoldoff == 0
-                        && (v->carrier == 0 || (((Unit*)v->carrier)->flags & 0x40000000))
+                        && (v->carrier == 0 || (v->carrier->flags & 0x40000000))
                         && v->group == id && (v->flags & 0x80000000)) {
                         goto found_match;
                     }
@@ -938,7 +938,7 @@ select_units:
     for (w = player->unitsBegin;
          w <= player->unitsEnd; w++) {
         if ((w->flags & 0x20) && w->buildLeft == 0.0f && w->postTransferHoldoff == 0
-            && (w->carrier == 0 || (((Unit*)w->carrier)->flags & 0x40000000))) {
+            && (w->carrier == 0 || (w->carrier->flags & 0x40000000))) {
             if (w->group == id) {
                 if (found) {
                     if (TestBit(setA, w->unitDefIndex)) {
@@ -980,7 +980,7 @@ int __stdcall SquadHasCtrlFMember(int id)
         return 0;
     while (u <= end) {
         if ((*(unsigned char*)&u->flags & 0x20) && u->buildLeft == 0.0f && u->postTransferHoldoff == 0
-            && (u->carrier == 0 || (((Unit*)u->carrier)->flags & 0x40000000))
+            && (u->carrier == 0 || (u->carrier->flags & 0x40000000))
             && u->group == id && TestBit(set, u->unitDefIndex))
             return 1;
         u++;
@@ -1004,7 +1004,7 @@ int __stdcall SquadHasReadyMember(int param_1)
         if (flags & 0x20) {
             if (u->buildLeft == 0.0f) {
                 if (u->postTransferHoldoff == 0) {
-                    Unit* owner = (Unit*)u->carrier;
+                    Unit* owner = u->carrier;
                     if (owner == 0 || (owner->flags & 0x40000000)) {
                         if (u->group == param_1) {
                             if (flags & 0x80000000)

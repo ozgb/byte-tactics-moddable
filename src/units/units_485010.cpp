@@ -388,7 +388,7 @@ void __stdcall AllocateUnitMemory(void)
     unsigned short n;
     for (n = 0; n < g_game->poolCount; n++) {
         *(unsigned short*)(pool + n * 0x118 + 0xa8) = n;
-        *(UnitType**)(pool + n * 0x118 + 0x92) = (UnitType *)g_game->defs.get();
+        *(Ref<UnitDef>*)(pool + n * 0x118 + 0x92) = g_game->defs;
     }
 
     Player* v[10];
@@ -414,7 +414,7 @@ void __stdcall AllocateUnitMemory(void)
         // Item fields read back directly, no `slot` local: keeps the edx/esi roles.
         for (unsigned char* q = *(unsigned char**)((char*)item + 0x67);
              q <= *(unsigned char**)((char*)item + 0x6b); q += 0x118) {
-            *(void**)(q + 0x96) = item;
+            ((Unit*)q)->player = item;
             q[0xff] = *(unsigned char*)((char*)item + 0x146);
             *(unsigned int*)(q + 0xac) = 0xffffffffu;
         }
@@ -466,16 +466,16 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
 {
     unit->def = (UnitDef*)&((UnitType *)g_game->defs.get())[(unsigned short)unit->unitDefIndex];
     unit->alive = 1;
-    unit->immobile = (((UnitType*)unit->def)->mobile == 0);
+    unit->immobile = (((UnitType*)unit->def.get())->mobile == 0);
     unit->killPending = 0;
-    unit->footprint = ((UnitType*)unit->def)->offset;
-    unit->armed = ((UnitType*)unit->def)->flags.bits.hi;
-    unit->zBufferBit0 = ((UnitType*)unit->def)->flags.bits.b7;
-    unit->cargoSelectable = ((UnitType*)unit->def)->flags.bits.b9;
+    unit->footprint = ((UnitType*)unit->def.get())->offset;
+    unit->armed = ((UnitType*)unit->def.get())->flags.bits.hi;
+    unit->zBufferBit0 = ((UnitType*)unit->def.get())->flags.bits.b7;
+    unit->cargoSelectable = ((UnitType*)unit->def.get())->flags.bits.b9;
 
     if (param_5) {
         unit->buildLeft = 0;
-        unit->health = ((UnitType*)unit->def)->hp;
+        unit->health = ((UnitType*)unit->def.get())->hp;
     } else {
         unit->buildLeft = 1.0f;
         unit->unfinishedInitZero = 0;
@@ -507,8 +507,8 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
     screen.y = (short)((pos.z - off.y * 0x80000 + 0x80000) >> 20);
     unit->cell = screen;
 
-    unit->angles.heading = (short)(RandomInt(((UnitType*)unit->def)->buildangle)
-                                    + (0x8000 - ((UnitType*)unit->def)->buildangle / 2));
+    unit->angles.heading = (short)(RandomInt(((UnitType*)unit->def.get())->buildangle)
+                                    + (0x8000 - ((UnitType*)unit->def.get())->buildangle / 2));
     unit->angles.bank = 0;
     unit->losCacheCellX = 0;
     unit->losCacheCellZ = 0;
@@ -526,11 +526,11 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
     unit->killCount = 0;
     unit->attacker = 0;
     unit->lastAttackerSlot = 0xa;
-    unit->moveOrder = ((UnitType*)unit->def)->flags.bits.movOrder;
-    unit->fireOrder = ((UnitType*)unit->def)->flags.bits.fireOrder;
-    unit->cloakOn = ((UnitType*)unit->def)->flags.bits.initCloaked;
+    unit->moveOrder = ((UnitType*)unit->def.get())->flags.bits.movOrder;
+    unit->fireOrder = ((UnitType*)unit->def.get())->flags.bits.fireOrder;
+    unit->cloakOn = ((UnitType*)unit->def.get())->flags.bits.initCloaked;
     unit->f26_27 = 0;
-    if (((UnitType*)unit->def)->buildMenuPageCount > 1) {
+    if (((UnitType*)unit->def.get())->buildMenuPageCount > 1) {
         unit->f22_23 = 3;
         unit->f24_25 = 0;
     } else {
@@ -585,19 +585,19 @@ ObjectState_00485d40* __stdcall CreateObjectState(Object3do* obj);
 void __stdcall InitUnitScript(Unit* self)
 {
     Object3do* obj = ((Object3do **)g_game->types.get())[self->unitDefIndex];
-    if (((UnitType*)self->def)->data) {
+    if (((UnitType*)self->def.get())->data) {
         self->script = (Class_004b0a70*)new (kSim) UnitScript;
-        ((CobScript*)self->script)->SetCob(((UnitType*)self->def)->data);
-        self->state = (SpotState*)CreatePlayerObjectState(obj, ((UnitType*)self->def)->data, (int)self);
-        ((UnitScript*)self->script)->SetObjectState((int)self->state);
-        ((CobScript*)self->script)->StartScript("Create", 0, 1);
+        ((CobScript*)self->script.get())->SetCob(((UnitType*)self->def.get())->data);
+        self->state = (SpotState*)CreatePlayerObjectState(obj, ((UnitType*)self->def.get())->data, (int)self);
+        ((UnitScript*)self->script.get())->SetObjectState((int)self->state.get());
+        ((CobScript*)self->script.get())->StartScript("Create", 0, 1);
     } else {
         self->script = 0;
         self->state = (SpotState*)CreateObjectState(obj);
-        ((ObjectState_00485d40*)self->state)->unit = self;
+        ((ObjectState_00485d40*)self->state.get())->unit = self;
     }
     // Shared tail after the if/else: reloads the block in both exits.
-    ((ObjectState_00485d40*)self->state)->drawFrame = 0;
+    ((ObjectState_00485d40*)self->state.get())->drawFrame = 0;
 }
 
 // The compiler-generated scalar deleting destructor of UnitScript, the
@@ -628,8 +628,8 @@ UnitScript* emit_00485e30() { return new UnitScript; }
 // FUNCTION: 0x485e50
 void __stdcall CreateUnitMotion(Unit* unit)
 {
-    unit->motion = (int)new (kSim) UnitMotion(unit);
-    unit->angles.heading = ((UnitType*)unit->def)->buildangle;
+    unit->motion = new (kSim) UnitMotion(unit);
+    unit->angles.heading = ((UnitType*)unit->def.get())->buildangle;
 }
 
 extern void* g_weaponAimCobVtable[];
@@ -658,8 +658,8 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
     g_seams.weapons->InitUnitWeaponSlots(unit);
     g_seams.economy->UpdateMetalExtraction((Unit*)unit);
     if (type->mobile == 1) {
-        unit->motion = (int)new (kSim) UnitMotion(unit);
-        unit->angles.heading = ((UnitType*)unit->def)->buildangle;
+        unit->motion = new (kSim) UnitMotion(unit);
+        unit->angles.heading = ((UnitType*)unit->def.get())->buildangle;
     }
 }
 
@@ -693,8 +693,8 @@ static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Vec3 pos
     g_seams.weapons->InitUnitWeaponSlots(unit);
     g_seams.economy->UpdateMetalExtraction((Unit*)unit);
     if (type->mobile == 1) {
-        unit->motion = (int)new (kSim) UnitMotion(unit);
-        unit->angles.heading = ((UnitType*)unit->def)->buildangle;
+        unit->motion = new (kSim) UnitMotion(unit);
+        unit->angles.heading = ((UnitType*)unit->def.get())->buildangle;
     }
 }
 
@@ -740,9 +740,9 @@ found:
     if (param_5) {
         if (type->mobile == 0)
             BroadcastBuilderLink(unit, unit);
-        if (((UnitType*)unit->def)->flags.bit18)
+        if (((UnitType*)unit->def.get())->flags.bit18)
             ((Unit*)unit)->SetStateBits(1, 1);
-        if (((UnitType*)unit->def)->flags.bit24) {
+        if (((UnitType*)unit->def.get())->flags.bit24) {
             unit->lastDamageType = 7;
             unit->killPending = 1;
         }
@@ -815,7 +815,7 @@ void __stdcall EmitSmoke(Pos_00485070* pos, int a, int b, int c);
 // FUNCTION: 0x486360
 void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
 {
-    unsigned short id = ((UnitType*)unit->def)->corpse;
+    unsigned short id = ((UnitType*)unit->def.get())->corpse;
     for (; depth > 1; depth--) {
         if (id >= 0xfffb) {
             return;
@@ -829,7 +829,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
             if (GetGroundHeight(pos) <= g_game->seaLevel) {
                 Result_486360* r = (Result_486360*)g_seams.features->PlaceFeature((Cell*)target, id, (Vec3*)pos, (Rot16*)&unit->angles, unit->playerIndex);
                 if (r != 0) {
-                    if (!(((UnitType*)unit->def)->flags.all & 0x1000000)) {
+                    if (!(((UnitType*)unit->def.get())->flags.all & 0x1000000)) {
                         r->velY = -11468;
                         r->velZ = 0;
                     }
@@ -848,7 +848,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
 // FUNCTION: 0x486460
 int __stdcall IsUnitCommander(Unit* unit)
 {
-    return _strcmpi(g_game->names_37f5f[unit->player->info->side].name, ((UnitType*)unit->def)->name) == 0;
+    return _strcmpi(g_game->names_37f5f[unit->player->info->side].name, ((UnitType*)unit->def.get())->name) == 0;
 }
 
 // A live unit that changed its type (the linked unit name at g_game+0x37f5f
@@ -883,7 +883,7 @@ void __stdcall KillUnit(Unit* unit, int param_2)
 {
     if ((unit->flags & 0x10000000) != 0) {
         int same = _strcmpi(g_game->names_37f5f[unit->player->info->side].name,
-                            ((UnitType*)unit->def)->name) == 0;
+                            ((UnitType*)unit->def.get())->name) == 0;
         if (same) {
             unit->player->flags &= 0xfffe;
         }
@@ -896,12 +896,12 @@ void __stdcall KillUnit(Unit* unit, int param_2)
             amount = 0;
             flag = 0;
         } else {
-            amount = ((int)(unit->health * -100 / ((UnitType*)unit->def)->maxHealth) + unit->prevHealthPercent) / 2;
+            amount = ((int)(unit->health * -100 / ((UnitType*)unit->def.get())->maxHealth) + unit->prevHealthPercent) / 2;
             if (amount < 1)
                 amount = 1;
             if (amount > 100)
                 amount = 100;
-            ((CobScript*)unit->script)->QueryScript("Killed", &amount, &flag, 0, 0);
+            ((CobScript*)unit->script.get())->QueryScript("Killed", &amount, &flag, 0, 0);
         }
         if (unit->buildLeft != 0.0f) {
             flag = 0;
@@ -964,7 +964,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         return;
 
     if (unit->player->index == g_game->playerIndex)
-        g_seams.los_radar->AddEyeball((Vec3*)&unit->pos, ((UnitType*)unit->def)->x202, ((UnitType*)unit->def)->x170, 60);
+        g_seams.los_radar->AddEyeball((Vec3*)&unit->pos, ((UnitType*)unit->def.get())->x202, ((UnitType*)unit->def.get())->x170, 60);
     Unit* parent;
     if (cmd->attackerUnitId == 0)
         parent = 0;
@@ -988,7 +988,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     if ((g_game->mapFlags & 2) == 2)
         g_seams.los_radar->RemoveUnitLineOfSight(unit);
     if (local == 0 && cmd->cobKilledSeverity > 0)
-        ((CobScript*)unit->script)->StartScriptWithArgs(g_killedScriptName, 0, 1, 1, cmd->cobKilledSeverity, 0, 0, 0);
+        ((CobScript*)unit->script.get())->StartScriptWithArgs(g_killedScriptName, 0, 1, 1, cmd->cobKilledSeverity, 0, 0, 0);
 
     int credited = 0;
     switch (cmd->killType) {
@@ -1002,7 +1002,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
             if (unit->lastAttackerSlot != 10 && unit->buildLeft == 0.0f && unit->playerIndex != unit->lastAttackerSlot)
                 g_game->players[unit->lastAttackerSlot].kills++;
             int same = _strcmpi(g_game->names_37f5f[unit->player->info->side].name,
-                                ((UnitType*)unit->def)->name) == 0;
+                                ((UnitType*)unit->def.get())->name) == 0;
             if (same) {
                 if (unit->lastAttackerSlot != 10)
                     g_game->players[unit->lastAttackerSlot].commanderKills++;
@@ -1019,7 +1019,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         if (unit->player != 0 && g_game->players[g_game->localPlayer].shareVision[unit->player->index] == 0) {
             unit->player->losses++;
             int same = _strcmpi(g_game->names_37f5f[unit->player->info->side].name,
-                                ((UnitType*)unit->def)->name) == 0;
+                                ((UnitType*)unit->def.get())->name) == 0;
             if (same)
                 unit->player->commanderLosses++;
             credited = 1;
@@ -1082,10 +1082,10 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
 
     if (cmd->killType == 5 && unit->attacker != 0) {
         // Field pointer, not a Unit* copy; and the copy into f is needed too.
-        Unit** par = &unit->attacker;
+        Ref<Unit>* par = &unit->attacker;
         float health = 1.0f - unit->buildLeft;
         float f = health;
-        f *= ((UnitType*)unit->def)->x18a;
+        f *= ((UnitType*)unit->def.get())->x18a;
         if ((*par)->resourceSlot.player->active != 0 && (*par)->resourceSlot.player->type == 2) {
             switch (g_game->difficulty) {
             case 0:
@@ -1111,14 +1111,14 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
 
     ClearUnitRefs(unit);
     if (unit->script != 0) {
-        delete (CobScript*)unit->script;
+        delete (CobScript*)unit->script.get();
         unit->script = 0;
     }
     if (unit->state != 0) {
         FreeObjectState(unit->state);
         unit->state = 0;
     }
-    UnitMotion* head = (UnitMotion*)unit->motion;
+    UnitMotion* head = unit->motion;
     if (head != 0) {
         g_seams.orders->DestroyMotionObject(head);
         operator delete(head);
@@ -1238,7 +1238,7 @@ int __stdcall FindHighestPointOnLine(Vec3_004851c0 a, Vec3_004851c0 b)
             if (best < v) best = v;
             if (c->unit) {
                 Unit* o = &g_game->units[c->unit];
-                short w = (((UnitType*)o->def)->modelMaxY + o->pos.y) >> 16;
+                short w = (((UnitType*)o->def.get())->modelMaxY + o->pos.y) >> 16;
                 if (best < w) best = w;
             }
         }

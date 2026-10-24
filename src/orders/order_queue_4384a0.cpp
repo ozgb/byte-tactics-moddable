@@ -1,4 +1,5 @@
 #include "../../interfaces/seams.h"
+#include "../../interfaces/ref.h"
 // Decompiled by Opus, Haiku, deepseek-v4.1, DeepSeek V4.1 Flash, deepseek-v4.1-flash, space-bunny-free, Space Bunny Free and Claude Opus 5.5. Names are provisional.
 // The build-queue object Order and the code around it: the unit's
 // list of orders at +0x5c, the order-type table at g_missionOrderTableBegin, the
@@ -22,7 +23,7 @@ class CobScript;
 class Slot_0043a1f0;
 
 struct Owner_0043a1f0 {
-    Slot_0043a1f0* slot;               // +0x0
+    Ref<Slot_0043a1f0> slot;
 };
 
 struct UnitType {                      // 0x249 bytes
@@ -150,7 +151,7 @@ int GetUnitCount(int, unsigned int);
 // Links `child` into the owner's list in front of `before`.
 static inline void InsertBefore(Unit* p, Order* child, Order* before)
 {
-    Order** link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
+    Ref<Order>* link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
     while (*link != before) {
         link = &(*link)->next;
     }
@@ -171,7 +172,7 @@ void __stdcall AddBeCarriedOrder(Unit* p)
 {
     if (p->carrier) {
         Order* first = p->list;
-        Order** pp = &p->list;
+        Ref<Order>* pp = &p->list;
         Order* node;
         while ((node = *pp) != 0) {
             if (node->flags_42 & 4) {
@@ -185,7 +186,7 @@ void __stdcall AddBeCarriedOrder(Unit* p)
             }
         }
         Order* child =
-            new (kSim) Order("BECARRIED", (Unit*)p->carrier, 0, 0, 0, 0);
+            new (kSim) Order("BECARRIED", p->carrier, 0, 0, 0, 0);
         InsertBefore(p, child, (child->flags_42 & 0x40000) ? p->list2 : p->list);
     }
 }
@@ -193,8 +194,8 @@ void __stdcall AddBeCarriedOrder(Unit* p)
 // FUNCTION: 0x438590
 void __stdcall StartBuildingScript(Unit* obj, Order* target, unsigned short param_3)
 {
-    int index = g_seams.units->FindScript((CobScript*)obj->script, "StartBuilding");
-    g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script, index, 0, 0, 1, param_3, 0, 0, 0);
+    int index = g_seams.units->FindScript((CobScript*)obj->script.get(), "StartBuilding");
+    g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 1, param_3, 0, 0, 0);
     SendScriptCall(obj, index, 1, param_3, 0, 0, 0);
     target->flags_42 |= 0x400000;
 }
@@ -203,8 +204,8 @@ void __stdcall StartBuildingScript(Unit* obj, Order* target, unsigned short para
 void __stdcall StopBuildingScript(Unit* obj, Order* target)
 {
     if (target->flags_42 & 0x400000) {
-        int index = g_seams.units->FindScript((CobScript*)obj->script, "StopBuilding");
-        g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script, index, 0, 0, 0, 0, 0, 0, 0);
+        int index = g_seams.units->FindScript((CobScript*)obj->script.get(), "StopBuilding");
+        g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
         SendScriptCallNoArgs(obj, index);
         target->flags_42 &= ~0x400000;
     }
@@ -213,7 +214,7 @@ void __stdcall StopBuildingScript(Unit* obj, Order* target)
 // FUNCTION: 0x438650
 int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n)
 {
-    UnitType* bt = ((UnitType *)b->def);
+    UnitType* bt = ((UnitType *)b->def.get());
     float v = bt->metalCost > 10.0f ? bt->metalCost : 10.0f;
     // The 64-bit numerator is built by hand (signed 32-bit chain in lo, zero hi):
     // keeps the multiply order and the unsigned fild qword.
@@ -224,7 +225,7 @@ int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n)
             int hi;
         } w;
     } p;
-    p.w.lo = ((UnitType *)a->def)->field_1fe * ((a->killCount + 5) / 5) * (int)bt->maxHealth * n;
+    p.w.lo = ((UnitType *)a->def.get())->field_1fe * ((a->killCount + 5) / 5) * (int)bt->maxHealth * n;
     p.w.hi = 0;
     int r = (int)((double)p.q / (v * 300.0f));
     if (r <= 1) {
@@ -327,8 +328,8 @@ void Order::AnnounceStatusIfFlagged(const char* text)
 void Order::ReattachFxToUnit()
 {
     if (attached != 0) {
-        void* p1 = *(void**)unit;
-        void* p2 = *(void**)p1;
+        void* p1 = unit->motion.get();
+        void* p2 = ((Owner_0043a1f0*)p1)->slot.get();
         void* p3 = *(void**)p2;
         void* fn_ptr = *(void**)((char*)p3 + 4);
 #ifdef __clang__
@@ -342,15 +343,15 @@ void Order::ReattachFxToUnit()
 // FUNCTION: 0x4388d0
 void Order::SetAttachedFx(OrderFx* obj)
 {
-    if (((Owner_0043a1f0 *)unit->motion)) {
+    if (((Owner_0043a1f0 *)unit->motion.get())) {
         if (attached) {
-            ((Owner_0043a1f0 *)unit->motion)->slot->Attach(0);
+            ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
             delete (OrderFx*)attached;
             attached = 0;
         }
         if (obj) {
             subFlags &= ~0x3e0;
-            ((Owner_0043a1f0 *)unit->motion)->slot->Attach(obj);
+            ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(obj);
             attached = obj;
         }
     }
@@ -362,23 +363,23 @@ void Order::SetAttachedFx(OrderFx* obj)
 // FUNCTION: 0x438930
 void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 {
-    if ((((UnitType *)unit->def)->flags32 & 0x800) == 0) {
+    if ((((UnitType *)unit->def.get())->flags32 & 0x800) == 0) {
         ApproachRadius* obj = new (kSim) ApproachRadius(this, p->x, p->z, n);
-        if (((Owner_0043a1f0 *)unit->motion)) {
+        if (((Owner_0043a1f0 *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion)->slot->Attach(0);
+                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                ((Owner_0043a1f0 *)unit->motion)->slot->Attach(obj);
+                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(obj);
                 attached = obj;
             }
         }
     } else {
-        if (((Owner_0043a1f0 *)unit->motion) && attached) {
-            ((Owner_0043a1f0 *)unit->motion)->slot->Attach(0);
+        if (((Owner_0043a1f0 *)unit->motion.get()) && attached) {
+            ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
             delete (OrderFx*)attached;
             attached = 0;
         }
@@ -388,24 +389,24 @@ void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 // FUNCTION: 0x438a00
 void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 {
-    if (!(((UnitType *)unit->def)->flags32 & 0x800)) {
+    if (!(((UnitType *)unit->def.get())->flags32 & 0x800)) {
         RingApproach* obj = new (kSim) RingApproach(this, pos->x, pos->z, radius1, radius2);
-        if (((Owner_0043a1f0 *)unit->motion)) {
+        if (((Owner_0043a1f0 *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion)->slot->Attach(0);
+                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                ((Owner_0043a1f0 *)unit->motion)->slot->Attach(obj);
+                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(obj);
                 attached = obj;
             }
         }
     } else {
-        if (((Owner_0043a1f0 *)unit->motion)) {
+        if (((Owner_0043a1f0 *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion)->slot->Attach(0);
+                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
@@ -416,24 +417,24 @@ void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 // FUNCTION: 0x438ad0
 void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 {
-    if (!(((UnitType *)unit->def)->flags32 & 0x800)) {
+    if (!(((UnitType *)unit->def.get())->flags32 & 0x800)) {
         PointMarker* obj = new (kSim) PointMarker(this, cell, size);
-        if (((Owner_0043a1f0 *)unit->motion)) {
+        if (((Owner_0043a1f0 *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion)->slot->Attach(0);
+                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                ((Owner_0043a1f0 *)unit->motion)->slot->Attach(obj);
+                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(obj);
                 attached = obj;
             }
         }
     } else {
-        if (((Owner_0043a1f0 *)unit->motion)) {
+        if (((Owner_0043a1f0 *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion)->slot->Attach(0);
+                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
@@ -458,7 +459,7 @@ void Order::MergeFlagsFromTable(int k)
 int __stdcall GetOrderFlags(void* param)
 {
     if (!param) return 0;
-    void* ptr1 = *(void**)((char*)param + 0x5c);
+    void* ptr1 = ((Unit*)param)->list.get();
     if (!ptr1) return 0;
     return *(int*)((char*)ptr1 + 0x42);
 }
@@ -477,13 +478,13 @@ Order::~Order()
     }
     if (flags_42 & 0x400000) {
         Unit* obj = unit;
-        int index = g_seams.units->FindScript((CobScript*)obj->script, "StopBuilding");
-        g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script, index, 0, 0, 0, 0, 0, 0, 0);
+        int index = g_seams.units->FindScript((CobScript*)obj->script.get(), "StopBuilding");
+        g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
         SendScriptCallNoArgs(obj, index);
         flags_42 &= ~0x400000;
     }
-    if (((Owner_0043a1f0 *)unit->motion) != 0) {
-        Slot_0043a1f0* slot = ((Owner_0043a1f0 *)unit->motion)->slot;
+    if (((Owner_0043a1f0 *)unit->motion.get()) != 0) {
+        Slot_0043a1f0* slot = ((Owner_0043a1f0 *)unit->motion.get())->slot;
         if (slot->current != 0 && slot->current == attached) {
             if (attached != 0) {
                 slot->Attach(0);

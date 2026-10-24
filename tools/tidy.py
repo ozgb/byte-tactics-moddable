@@ -10,7 +10,8 @@ BUILD_DIR/compile_commands.json (configure with -DCMAKE_EXPORT_COMPILE_COMMANDS=
 once on each changed C++ file under src/ and once on one translation unit for
 each changed header under src/ or interfaces/ (the first, in path order, that
 reaches the header through #include lines). Only findings on an added line are
-reported. When the line replaces others (a hunk that also removes lines), a
+reported. The range must end at HEAD and its changed C and C++ files must be committed,
+because clang-tidy reads the working tree; otherwise it exits 2. When the line replaces others (a hunk that also removes lines), a
 finding is old, and not reported, if the base had the same check and message on
 one of the removed lines; the base is checked in a temporary detached worktree,
 only when needed, and a base that does not parse counts as having no findings.
@@ -291,6 +292,19 @@ def base_findings(root, build_dir, base, units, clang_tidy, runner):
     return found
 
 
+def require_checkout(root, rev_range, changed):
+    """Raise ToolError unless the range ends at the checked-out commit and the changed files are committed."""
+    m = re.match(r"^.*?\.\.\.?(.*)$", rev_range)
+    if m:
+        end = git(root, "rev-parse", "--verify", "-q", (m.group(1) or "HEAD") + "^{commit}").strip()
+        if end != git(root, "rev-parse", "HEAD").strip():
+            raise ToolError(f"the range must end at HEAD (the checked-out commit); check out {m.group(1)} first")
+    dirty = sorted(set(git(root, "diff", "--name-only", "HEAD", "--").splitlines()) & set(changed))
+    dirty = [p for p in dirty if Path(p).suffix in C_SUFFIXES]
+    if dirty:
+        raise ToolError("uncommitted changes in " + ", ".join(dirty) + ": commit or stash them first")
+
+
 def lint(root, rev_range, build_dir=DEFAULT_BUILD_DIR, clang_tidy="clang-tidy", jobs=None, runner=run_tidy):
     """[(path, line, message)] for the added lines: new clang-tidy findings and new placeholder names.
 
@@ -300,6 +314,7 @@ def lint(root, rev_range, build_dir=DEFAULT_BUILD_DIR, clang_tidy="clang-tidy", 
     lines_by_path = added_lines(root, rev_range)
     findings = list(lint_placeholders(root, rev_range, lines_by_path))
     changed = [p for p, added in lines_by_path.items() if added]
+    require_checkout(root, rev_range, changed)
     units, missed = targets(root, build_dir, changed)
     for path in missed:
         print(f"note: no translation unit reaches {path}, not checked by clang-tidy", file=sys.stderr)

@@ -274,6 +274,31 @@ class TidyTest(Repo, unittest.TestCase):
         found, _ = self.lint({"src/a.cpp": (0, text), ("base", "src/a.cpp"): (1, error)})
         self.assertEqual(len(found), 1)
 
+    def test_range_not_ending_at_head_is_a_tool_error(self):
+        self.edit("src/c.cpp", "return 0;", "return 1;")
+        self.git("branch", "later")
+        self.edit("src/c.cpp", "return 1;", "return 2;")
+        with self.assertRaises(tidy.ToolError) as ctx:
+            tidy.lint(str(self.root), "HEAD~2...later", jobs=1, runner=Stub(self.root, {}))
+        self.assertIn("must end at HEAD", str(ctx.exception))
+        tidy.lint(str(self.root), "HEAD~1...", jobs=1, runner=Stub(self.root, {}))
+
+    def test_uncommitted_change_to_a_changed_file_is_a_tool_error(self):
+        self.edit("src/c.cpp", "return 0;", "return 1;")
+        self.write("src/c.cpp", "int C(void) { return 2; }\n")
+        with self.assertRaises(tidy.ToolError) as ctx:
+            self.lint()
+        self.assertIn("uncommitted", str(ctx.exception))
+        self.git("checkout", "src/c.cpp")
+        self.write("src/b.cpp", "int B(void) { return 2; }\n")
+        self.lint()
+
+    def test_main_exits_2_when_the_range_does_not_end_at_head(self):
+        self.edit("src/c.cpp", "return 0;", "return 1;")
+        status, _, err = self.main(["HEAD~1...HEAD~1", "--clang-tidy", "true"])
+        self.assertEqual(status, 2)
+        self.assertIn("must end at HEAD", err)
+
     def test_base_worktree_is_removed(self):
         self.edit("src/a.cpp", "    return total;", "    return total;\n    int t = 1;")
         self.edit("src/a.cpp", "    int t = 1;", "    int t = 2;")

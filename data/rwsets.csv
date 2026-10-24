@@ -9687,10 +9687,10 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,TdfRecord::GetRecordName
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,_strcmpi
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,end
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,get
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,insert
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,operator new
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,strcpy
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_read,*char
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_read,*int
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_write,*int
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_write,*unsigned char
@@ -9702,6 +9702,7 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_maybe_written,WeaponDef::modelName
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_maybe_written,WeaponDef::name
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,Entry_00432cf0::name
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,Game::net
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,StringRef::ptr
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,WeaponDef::index
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,WeaponDef::model
@@ -12547,6 +12548,7 @@ address,function,file,kind,target
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,get
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator Limits_0043e490 *
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator Node_0043e490 *
+0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator Stats_0043e490 *
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator UnitDef *
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator!=
 0x43e490,GetOrderCursor,src/units/unit_scripts.cpp,call,operator->
@@ -45670,6 +45672,7 @@ address,function,file,kind,target
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,get
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator Limits_0043e490 *
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator Node_0043e490 *
+,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator Stats_0043e490 *
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator UnitDef *
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator!=
 ,GetOrderCursor,src/orders/order_dispatch.cpp,call,operator->

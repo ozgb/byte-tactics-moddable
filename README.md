@@ -38,21 +38,7 @@ moddable one:
 
 ## Status
 
-The groundwork is done. A test harness records reference traces from the
-original compiler's build, the CRT and maths are bit-exact, and the source
-builds with a modern compiler, with all 27 test scenarios matching the
-reference. The game state and the coupling between subsystems are mapped.
-
-Work is now splitting the engine into subsystems. Wind and meteors, economy,
-features and targeting are now called through their own interfaces (seams);
-the rest of the seams, the shared
-state block, quirk flags and the host interface are in progress. Nothing runs
-as WebAssembly yet.
-
-The plan, its decisions and its order are in
-[issue #2](https://github.com/ozgb/byte-tactics-moddable/issues/2), with one
-sub-issue per step. The mod-support design it builds on is
-[issue #1](https://github.com/ozgb/byte-tactics-moddable/issues/1).
+For progress updates, see [STATUS.md](STATUS.md).
 
 ## Roadmap
 

@@ -81,6 +81,43 @@ It does not
 link: the link needs `orig/TotalA.exe`, which must never be committed, and
 trace runs need the game's data, so both stay local.
 
+## Naming and clang-tidy
+
+Code that has a real name follows the style of `src/units/unit.h` and
+`src/game/game.h`:
+
+| Kind | Style | Example |
+| --- | --- | --- |
+| types (class, struct, union, enum, typedef) | `PascalCase` | `Unit`, `UnitWeaponSlot` |
+| functions and methods | `PascalCase` | `SelectRecord`, `CanRepair` |
+| fields, locals, parameters | `camelBack` | `healthPercent`, `losCacheCell` |
+| globals | `g_` and `camelBack` | `g_game`, `g_seams` |
+| file-scope statics | `s_` and `camelBack` | `s_traceTick` |
+| global constants | `k` and `PascalCase` | `kSimBlockBytes` |
+| macros and enum constants | `UPPER_CASE` | `RAND_STREAM_MAIN` |
+
+Names the decompiler gave (`FUN_<addr>`, `DAT_<addr>`, `field_<offset>`,
+`unk*`, `param_N`, `<Name>_<addr>`) stay as they are until someone names them,
+but a change cannot add a new one. The host interface (`host_*`) is a C ABI and
+keeps `snake_case`, and the seam tables name function pointers like functions.
+
+`.clang-tidy` holds the checks: `bugprone-*` and `clang-analyzer-*` (without
+the checks that only fire on decompiled idioms), `misc-include-cleaner`,
+`readability-identifier-naming` with the table above, and
+`modernize-use-nullptr` and `modernize-use-override`. The rest of `modernize-*`
+assumes a standard library newer than MSVC 5's. CI runs `tools/tidy.py` on the
+lines a pull request adds, so old findings never fail it. Run it locally with
+LLVM 22.1.8's `clang-tidy` after configuring the modern build:
+
+```sh
+cmake -S . -B build/modern -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+uv run tools/tidy.py origin/moddable...HEAD
+uv run tools/tidy.py --all src/units/cob.cpp     # every finding in a file
+```
+
+A finding on an added line is fixed, or, when it is a real 3.1c bug that
+conformity keeps, becomes a quirk flag or a `TODO(#n)`.
+
 ## Dynamic initialisation
 
 New code must not rely on dynamic initialisation of namespace-scope objects

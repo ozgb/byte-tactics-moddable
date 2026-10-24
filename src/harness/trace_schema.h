@@ -1077,12 +1077,12 @@ static const TraceField kUnitResourcesFields[] = {
     { "metalStall", 0x24, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "metalMakePrev", 0x28, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "metalUsePrev", 0x2c, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "player", 0x30, 4, TF_POINTER, TT_PLAYER, 0x0 },
+    { "player", 0x30, 4, TF_REF, TT_PLAYER, 0x0 },
 };
 
 static const TraceField kUnitResourcesPlan[] = {
     { "", 0x0, 48, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x30, 4, TF_POINTER, TT_PLAYER, 0x0 },
+    { "", 0x30, 4, TF_REF, TT_PLAYER, 0x0 },
 };
 
 static const TraceField kMissionConditionsFields[] = {

@@ -638,7 +638,7 @@ SYNTHETIC.update({
         float metalStall;             // +0x24
         float metalMakePrev;          // +0x28
         float metalUsePrev;           // +0x2c
-        Player* player;               // +0x30
+        Ref<Player> player;           // +0x30
     """,
     "MissionConditions": """
         char victory[0x40];           // +0x0

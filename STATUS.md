@@ -27,7 +27,12 @@ sub-issue per step. The mod-support design it builds on is
   ([#3](https://github.com/ozgb/byte-tactics-moddable/issues/3)): a test mode
   with fixed seeds and one step per frame, AI-vs-AI skirmishes, and a hash of
   the game state after every phase of every tick. When two builds diverge, it
-  names the first tick, phase and field that differ.
+  names the first tick, phase and field that differ. Getting there meant
+  finding and removing every source of non-determinism in 3.1c's game logic:
+  seeds from the clock, `rand()` shared with graphics and sound, per-thread
+  random state, uninitialised memory, and reads of the wall clock and of
+  render-only state. A game now replays exactly from the same initial state
+  and seeds, which bit-for-bit conformity depends on.
   - [`reference/README.md`](reference/README.md)
   - [`reference/scenarios/`](reference/scenarios)
   - [`src/harness/`](src/harness)
@@ -83,8 +88,11 @@ sub-issue per step. The mod-support design it builds on is
 
 - **`Ref<T>`**
   ([#187](https://github.com/ozgb/byte-tactics-moddable/issues/187)):
-  pointers stored in the state block become offsets, valid in every WASM
-  module. Units, orders, weapons, game, paths, map and LOS are done.
+  pointers stored in the state block become 4-byte offsets from the block's
+  base instead of process addresses. That lets native code and WASM modules
+  share one block while subsystems move to WASM one at a time, and lets the
+  block be saved and restored at a different address. Units, orders, weapons,
+  game, paths, map and LOS are done.
   - [`interfaces/ref.h`](interfaces/ref.h)
   - [`tools/refcheck.py`](tools/refcheck.py)
 - **Game data loading**

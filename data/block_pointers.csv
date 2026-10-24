@@ -79,6 +79,7 @@ holder,offsets,target,scenarios,ticks,target_offsets,class,note
 ??0Pathfinder@@QAE@XZ: AISearch touched mapentries,0x290+0x8*k 0x2bf 0x2d8+0x88*k 0x2e0+0x88*k 0x2e8+0x8c*k 0x2f0 0x350+0xe0*k 0x358+0xa0*k 0x35c+0x8*k 0x410+0x8*k 0x438+0x8*k 0x480+0x8*k 0x508 0x714 0xc30+0x8*k 0xc50 0xe6a,NanoParticles::Emit,2,25,0x20-0x1e0,not-a-pointer,Pathfinder touched map entries: cell indices
 ??0Pathfinder@@QAE@XZ: AISearch touched mapentries,0xed4,vector::insert #2,1,1,0x10,not-a-pointer,Pathfinder touched map entries: cell indices
 ??0Pathfinder@@QAE@XZ: AISearch touched mapentries,0xed4+0x8*k,vector::insert #3,1,1,0x10,not-a-pointer,Pathfinder touched map entries: cell indices
+??0PlayerFrameInfo@@QAE@XZ,*,*,0,0,-,outside,"Frame (FrameRing, inlined from the FrameQueue constructor): Frame.data holds received packet buffers that come from outside the block (#21 moves them in)"
 ??0Squad@@QAE@HH@Z: SQUADS,*,*,0,0,-,not-a-pointer,words of ??0Squad@@QAE@HH@Z: SQUADS that only look like addresses
 ??0Squad@@QAE@HH@Z: SQUADS,0x92,AllocDepthFrame: CompositeBuffer,1,1562,0x9ffe0,not-a-pointer,Squad words that only look like addresses
 ??0Squad@@QAE@HH@Z: SQUADS,0x52+0x4*k,CMemoryCache::InitCache: CMemoryCache CCH,1,301,0x6ffe0-0xb0333,not-a-pointer,Squad words that only look like addresses
@@ -1321,6 +1322,7 @@ SimGlobals.g_movementClasses,0x59 0x5a 0x99 0x116 0x157 0x1a9 0x1c9,LoadTntMap: 
 SimGlobals.g_movementClasses,0x0+0x20*k,LoadUnitTypes,27,277800,0x0,outside,"MovementClass.name (0x0, stride 0x20): name string loaded with the unit types; target names change with the heap layout"
 SimGlobals.g_movementClasses,0x0,SmokeParticles::Emit,1,6,0x20,outside,"MovementClass.name (0x0, stride 0x20): name string loaded with the unit types; target names change with the heap layout"
 SimGlobals.g_movementClasses,0x20 0xa0 0x180,Sound::CreateSampleFromFile: Digital Audio Sample,4,8400,0x10,outside,"MovementClass.name (0x0, stride 0x20): name string loaded with the unit types; target names change with the heap layout"
+SimGlobals.g_packetManager,*,*,0,0,-,outside,"PacketManager and the PacketChannel, PacketRing, PacketReceiver, PlayerFrameInfo and FrameQueue it holds by value: their packet and frame buffers come from outside the block (#21 moves them in)"
 SimGlobals.g_packetSizes,*,*,0,0,-,not-a-pointer,"g_packetSizes: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_packetSizes,0x5,LoadTntMap: TILE SET,6,46800,0xaffe0-0x57ffe0,not-a-pointer,"g_packetSizes: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_playerBudgetCap,*,*,0,0,-,not-a-pointer,"g_playerBudgetCap: integers (ticks, counts, seed) that only look like addresses"

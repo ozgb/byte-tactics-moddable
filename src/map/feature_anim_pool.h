@@ -2,8 +2,6 @@
 #define FEATURE_ANIM_POOL_H
 #include "../../interfaces/ref.h"
 
-#include "../../interfaces/ref.h"
-
 struct UnitDef;
 
 #pragma pack(push, 1)

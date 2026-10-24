@@ -83,8 +83,8 @@ typedef std::vector<Point16> Vec_0044d560;
 unsigned short __stdcall GetHeadingBetween(void* from, void* to);
 
 // Fixed-point trig helpers written in assembly.
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
 
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
@@ -414,7 +414,7 @@ extern int Pad6260_65;
 extern int Pad6260_66;
 extern int Pad6260_67;
 
-void __cdecl FUN_004b7173(short angle, int* xy);
+void __cdecl RotatePoint2D(short angle, int* xy);
 
 // FUNCTION: 0x44ce40
 int OrderFx::GetType()
@@ -759,10 +759,10 @@ static inline void ToWorld(Vec3* out, Point16 a, Point16 b)
 static inline Vec3 Direction(short angle, int scale)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, scale);
+    v.x = -ScaledSin(angle, scale);
     v.y = 0;
     // The casts stay: without them 0x44d720's radius loads come out in the other order.
-    v.z = -FUN_004b7123((short)angle, (int)scale);
+    v.z = -ScaledCos((short)angle, (int)scale);
     return v;
 }
 
@@ -1193,9 +1193,9 @@ int PathOrder::KeepAfterComplete() {
 static inline Vec3 Direction_0044e3c0(short angle, int scale)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, scale);
+    v.x = -ScaledSin(angle, scale);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, scale);
+    v.z = -ScaledCos(angle, scale);
     return v;
 }
 
@@ -1469,7 +1469,7 @@ int AirManeuverOrder::FillWorldPos(Vec3* out)
             step = max >> 3;
         else if (step <= -(max >> 3))
             step = -(max >> 3);
-        FUN_004b7173(-step, (int*)&v);
+        RotatePoint2D(-step, (int*)&v);
         other.x = v.x;
         other.z = v.y;
         other.y = 0;

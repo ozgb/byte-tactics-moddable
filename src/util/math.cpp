@@ -47,8 +47,8 @@ struct Vec3_004b6cc0 {
 };
 
 // Fixed-point rotation helper written in assembly.
-void __cdecl FUN_004b7173(short angle, int* xy);
-void __cdecl FUN_004b7173(int angle, int* xy);
+void __cdecl RotatePoint2D(short angle, int* xy);
+void __cdecl RotatePoint2D(int angle, int* xy);
 
 // Rotates a vector by three angles (one per axis pair).
 // FUNCTION: 0x4b6cc0
@@ -58,13 +58,13 @@ void __stdcall RotateByAngles(Vec3_004b6cc0* in, Vec3_004b6cc0* out, short* angl
     int b[2];
     a[0] = in->x;
     a[1] = in->y;
-    FUN_004b7173(angles[0], a);
+    RotatePoint2D(angles[0], a);
     b[0] = a[1];
     b[1] = in->z;
-    FUN_004b7173(angles[2], b);
+    RotatePoint2D(angles[2], b);
     out->y = b[0];
     a[1] = b[1];
-    FUN_004b7173(angles[1], a);
+    RotatePoint2D(angles[1], a);
     out->x = a[0];
     out->z = a[1];
 }
@@ -77,7 +77,7 @@ void __stdcall RotateAboutZ(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
     int xy[2];
     xy[0] = in->x;
     xy[1] = in->y;
-    FUN_004b7173(angle, xy);
+    RotatePoint2D(angle, xy);
     out->x = xy[0];
     out->y = xy[1];
     out->z = in->z;
@@ -90,7 +90,7 @@ void __stdcall RotateAboutY(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
     int xz[2];
     xz[0] = in->x;
     xz[1] = in->z;
-    FUN_004b7173(angle, xz);
+    RotatePoint2D(angle, xz);
     out->x = xz[0];
     out->y = in->y;
     out->z = xz[1];
@@ -102,7 +102,7 @@ void __stdcall RotateAboutX(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
     int yz[2];
     yz[0] = in->y;
     yz[1] = in->z;
-    FUN_004b7173(angle, yz);
+    RotatePoint2D(angle, yz);
     out->x = in->x;
     out->y = yz[0];
     out->z = yz[1];

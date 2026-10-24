@@ -1367,7 +1367,7 @@ struct Obj_004a1950 {
 };
 
 // FUNCTION: 0x4a1950
-int __stdcall FUN_004a1950(Obj_004a1950* param_1, int param_2) {
+int __stdcall IsAboveRectTop(Obj_004a1950* param_1, int param_2) {
     return param_2 < param_1->top;
 }
 
@@ -1377,7 +1377,7 @@ struct Struct_004a1970 {
 };
 
 // FUNCTION: 0x4a1970
-int __stdcall FUN_004a1970(Struct_004a1970* obj, int value)
+int __stdcall IsBelowRectBottom(Struct_004a1970* obj, int value)
 {
     return value > obj->bottom;
 }
@@ -3079,7 +3079,7 @@ struct Pad_a3eb0_1 { int field; };
 struct Pad_a3eb0_2 { int field; };
 
 // FUNCTION: 0x4a3eb0
-void __stdcall FUN_004a3eb0(Dialog_4a3eb0* obj, int i)
+void __stdcall ResetSliderGadget(Dialog_4a3eb0* obj, int i)
 {
     ClearEntry(&obj->table->entries[i]);
 }

@@ -67,7 +67,7 @@ extern Game* g_game;
 
 Vec3 __stdcall GetPiecePosition(Unit* obj, int param);
 int __stdcall GetGroundHeight(Vec3* pos);
-int __cdecl FUN_004b715a(int a, int b);
+int __cdecl AngleOfVector(int a, int b);
 #include "../../interfaces/seams.h"
 void __stdcall EmitThrustParticles(int, int, int, int, short);
 void __stdcall EmitWakeParticles(int, int, int, short);
@@ -142,7 +142,7 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         int lo = a << 16;
         if (lo < 0)
             hi += 0x10000;
-        return (unsigned short)(FUN_004b715a(hi, lo) - unit->heading);
+        return (unsigned short)(AngleOfVector(hi, lo) - unit->heading);
     }
     case 13: {
         int hi = a & 0xffff0000;
@@ -152,7 +152,7 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         return (int)_hypot((double)hi, (double)lo);
     }
     case 14:
-        return FUN_004b715a(a, b) & 0xffff;
+        return AngleOfVector(a, b) & 0xffff;
     case 15:
         return (int)_hypot((double)a, (double)b);
     case 16: {

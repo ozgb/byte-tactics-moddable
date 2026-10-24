@@ -60,7 +60,7 @@ int __stdcall LoadSoundByName(void* a, char* b);
 
 #include "../files/files_api.h"
 void __stdcall LoadWeaponType(TdfRecord* section);
-int FUN_0041d8a0(void);
+int UsesDataArchives(void);
 extern void __cdecl operator delete(void*);
 void __cdecl GameFreeThunk(void* p);
 
@@ -84,7 +84,7 @@ void LoadWeaponTypes()
         TdfFile parser;
         BuildDataPath(path, "Weapons", p->ptr, "TDF");
         if (parser.LoadFile(path)
-            && (parser.flags || FUN_0041d8a0() == 0)) {
+            && (parser.flags || UsesDataArchives() == 0)) {
             int i = 0;
             while (1) {
                 parser.ResetCurrentRecord();

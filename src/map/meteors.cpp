@@ -39,8 +39,8 @@ typedef char SimView_g_meteorWeaponName[];
 // larger symbol id goes first, and the original computes it in edx.
 extern Game* g_game;
 
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void __stdcall FatalError(char* text);
 
@@ -142,9 +142,9 @@ void UpdateMeteors()
             int radius = r << 16;
             int angle = (int)((__int64)GameRand(RAND_STREAM_MAIN) * 0x10000 / 0x8000);
             Vec3 offset;
-            offset.x = -FUN_004b70ef(angle, radius);
+            offset.x = -ScaledSin(angle, radius);
             offset.y = 0;
-            offset.z = -FUN_004b7123(angle, radius);
+            offset.z = -ScaledCos(angle, radius);
             // The offset is copied into pos as a struct: keeps the first stores of pos.x, pos.y.
             Vec3 pos = offset;
             pos.x += g_meteorOrigin.x << 20;

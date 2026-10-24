@@ -57,9 +57,9 @@ int __stdcall GetUnitCount(int, unsigned int);
 extern Game* g_game;
 
 int __stdcall RandomInt(int);
-int __cdecl FUN_004b70ef(short, int);
-int __cdecl FUN_004b7123(short, int);
-int __cdecl FUN_004b715a(int x, int z);
+int __cdecl ScaledSin(short, int);
+int __cdecl ScaledCos(short, int);
+int __cdecl AngleOfVector(int x, int z);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall AppendOrderToTail(Unit*, Order*);
 void __stdcall AppendOrder(Unit*, Order*);
@@ -71,9 +71,9 @@ class LandingPadList : public std::vector<Unit*> {};
 static inline Vec3 Offset(short angle, int distance)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, distance);
+    v.x = -ScaledSin(angle, distance);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, distance);
+    v.z = -ScaledCos(angle, distance);
     return v;
 }
 
@@ -164,7 +164,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         return 1;
     }
     case 3: {
-        short angle = FUN_004b715a(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
+        short angle = AngleOfVector(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
         Vec3 off = Offset(angle, speed * 0x30000);
         Vec3 p = PosPlus(order->pos, off);
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, p);

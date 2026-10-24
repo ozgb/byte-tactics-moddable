@@ -149,7 +149,7 @@ struct Block {
 int __stdcall GetGroundHeight(Vec3* pos);
 void __stdcall AlignUnitToGround(Unit* unit);
 #include "../../interfaces/seams.h"
-int __cdecl FUN_004b715a(int x, int z);
+int __cdecl AngleOfVector(int x, int z);
 int __cdecl GetLocalDpid();
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall ApplyAttachUnit(OrderView* order);
@@ -221,7 +221,7 @@ void __stdcall UpdateUnitHeight(Unit* unit)
 // FUNCTION: 0x48a980
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to)
 {
-    return FUN_004b715a(from->x - to->x, from->z - to->z);
+    return AngleOfVector(from->x - to->x, from->z - to->z);
 }
 
 // Heading from one position to another in the x/z plane (like 0x48a980),
@@ -233,7 +233,7 @@ unsigned short __stdcall GetHeadingBetweenOrDefault(Vec3* from, Vec3* to, unsign
     int dz = from->z - to->z;
     if (dx == 0 && dz == 0)
         return def;
-    return FUN_004b715a(dx, dz);
+    return AngleOfVector(dx, dz);
 }
 
 // Moves a unit to a new position. The cell (the two shorts at +0x76) and the

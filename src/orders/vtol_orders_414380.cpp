@@ -72,11 +72,11 @@ static inline void CellToWorld(Point16 origin, Point16 c, Vec3* v)
     v->z = (origin.y + c.y * 2) << 19;
 }
 void __stdcall CellToWorldPos(Point16,Vec3*,Point16);
-int __cdecl FUN_004b70ef(short,int);
-int __cdecl FUN_004b7123(short,int);
-short __cdecl FUN_004b715a(int,int);
-static inline Vec3 Offset(short angle,int distance) { Vec3 v; v.x=-FUN_004b70ef(angle,distance); v.y=0; v.z=-FUN_004b7123(angle,distance); return v; }
-static inline short Angle(Vec3* a,Vec3* b) { return FUN_004b715a(a->x-b->x,a->z-b->z); }
+int __cdecl ScaledSin(short,int);
+int __cdecl ScaledCos(short,int);
+short __cdecl AngleOfVector(int,int);
+static inline Vec3 Offset(short angle,int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
+static inline short Angle(Vec3* a,Vec3* b) { return AngleOfVector(a->x-b->x,a->z-b->z); }
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int CheckDirectXVersion(int, int, int, int, int);
 struct Feature;

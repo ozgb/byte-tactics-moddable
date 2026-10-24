@@ -75,8 +75,8 @@ int __stdcall GetBuilderCount(unsigned int player);
 int __stdcall RandomInt(int range);
 
 // Fixed-point trig helpers written in assembly.
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
 
 // Takes a const reference and names its sum and result: breaks a register
 // priority tie in the callers.
@@ -94,9 +94,9 @@ static inline int Length(const Vec3& v)
 static inline Vec3 Direction(short angle, int scale)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, scale);
+    v.x = -ScaledSin(angle, scale);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, scale);
+    v.z = -ScaledCos(angle, scale);
     return v;
 }
 

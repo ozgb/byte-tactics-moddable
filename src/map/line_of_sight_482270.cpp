@@ -31,7 +31,7 @@ void EnableAICommands(void);
 void RegisterAICommands(void);
 void FUN_00406f40(void);
 void ResetAIPlayers(void);
-void FUN_004161f0(void);
+void SumMessageStats(void);
 void InitCommands(void);
 void ResetNetStats(void);
 

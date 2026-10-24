@@ -148,7 +148,7 @@ void ResetAIPlayers();
 void RegisterVtolOrders();
 void StepAllGafSequences();
 void ResetNetStats();
-void FUN_004161f0();
+void SumMessageStats();
 void InitCommands();
 int UpdatePlacementGhostValidity();
 void RefreshSelectionOrders();
@@ -167,7 +167,7 @@ void UpdateEdgeScroll();
 void CenterCameraOnRadarClick();
 void CenterCameraOnStartPosition();
 void RegisterDataArchives();
-int FUN_0041d8a0();
+int UsesDataArchives();
 void CreateGameObject();
 void InitMissionStatus();
 void SetUpEndMissionScreen();
@@ -960,8 +960,8 @@ void __stdcall RemoveFeature(void* target, int flag);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount,
                            Vec3** metal, float* metalAmount);
-int __cdecl FUN_004b70ef(int angle, int distance);
-int __cdecl FUN_004b7123(int angle, int distance);
+int __cdecl ScaledSin(int angle, int distance);
+int __cdecl ScaledCos(int angle, int distance);
 void __stdcall EmitTeleportParticles(Vec3* from, Vec3* to, int count, int param);
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall IsUnitCommander(Unit*);
@@ -1020,8 +1020,8 @@ int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
                 int angle = GetHeadingBetween(&order->target->pos, &unit->pos);
                 angle += RandomInt(0x8000) - 0x4000;
                 int distance = weapon << 16;
-                int dx = -FUN_004b70ef(angle, distance);
-                int dz = -FUN_004b7123(angle, distance);
+                int dx = -ScaledSin(angle, distance);
+                int dz = -ScaledCos(angle, distance);
                 Vec3* target = &order->target->pos;
                 Vec3 offset = { dx, 0, dz };
                 Vec3 pos = Vec3Add(*target, offset);
@@ -1533,7 +1533,7 @@ int __stdcall ParkOrder(Unit* unit,Order* order,int flags)
 // take keep the allocation (docs/c2-regalloc.md).
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }
 
-static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-FUN_004b70ef(angle,distance); v.y=0; v.z=-FUN_004b7123(angle,distance); return v; }
+static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
 
 // Unused here: the symbol ids this declaration takes keeps the allocation (docs/c2-regalloc.md).
 void FreeMemoryCache();

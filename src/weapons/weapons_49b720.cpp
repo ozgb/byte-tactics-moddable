@@ -45,8 +45,8 @@ void __stdcall EmitWhiteSmoke(Vec3* pos, short kind);
 #include "../../interfaces/seams.h"
 void __stdcall AddExplosionEffect(Vec3* pos, void* src, int index, int flag);
 int __stdcall RandomInt(int range);
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
 
 // A copy of AllocProjectile (matched in its own file), the function just before
 // this one in the original source; defined here so that /Ob2 inlines it.
@@ -117,9 +117,9 @@ void UpdateProjectiles()
                     q->active = 0;
                     if (type->spread != 0) {
                         short ang = RandomInt(type->spread) + (short)(p->angles.heading - (type->spread >> 1));
-                        int t = FUN_004b7123(p->angles.pitch, type->speed);
-                        p->direction.x = -FUN_004b70ef(ang, t);
-                        p->direction.z = -FUN_004b7123(ang, t);
+                        int t = ScaledCos(p->angles.pitch, type->speed);
+                        p->direction.x = -ScaledSin(ang, t);
+                        p->direction.z = -ScaledCos(ang, t);
                     }
                 }
                 if (p->active == 0)
@@ -154,10 +154,10 @@ void UpdateProjectiles()
                         if (TurnUnitTowardsPoint(p, target) == 0)
                             DetonateProjectile(p, 0);
                     }
-                    p->direction.y = FUN_004b70ef(p->angles.pitch, p->speed);
-                    int t = FUN_004b7123(p->angles.pitch, p->speed);
-                    p->direction.x = -FUN_004b70ef(p->angles.heading, t);
-                    p->direction.z = -FUN_004b7123(p->angles.heading, t);
+                    p->direction.y = ScaledSin(p->angles.pitch, p->speed);
+                    int t = ScaledCos(p->angles.pitch, p->speed);
+                    p->direction.x = -ScaledSin(p->angles.heading, t);
+                    p->direction.z = -ScaledCos(p->angles.heading, t);
                 }
             } else if (type->flags.b.burnBlow) {
                 DetonateProjectile(p, 0);

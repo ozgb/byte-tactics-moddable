@@ -27,7 +27,7 @@ displaced vertices are restored); `field_152` cleared with `field_156` in
 skips both); the two "CHOICE2" names in the surrender dialog 0x460680 (the
 stores fill the layer's Enter and Escape default-gadget fields, the Yes and No
 gadgets keep their own names, and both defaults pick No, as the dialog's initial
-selection does); the position pointer passed to `FUN_004b7123` by 0x49c9c0 (the
+selection does); the position pointer passed to `ScaledCos` by 0x49c9c0 (the
 argument slot is reused as scratch and holds the computed speed there; the
 source already matched 600 of 600 bytes with that reading); the slider rounding
 in 0x45d7c0 and 0x45b9b0 (the fraction test works on a copy, the position is
@@ -171,7 +171,7 @@ shorts, `push 0x3c` at 0x42dac7), two bytes short. The guard should be
 
 ## Z offset computed from the rotated x (likely)
 
-**0x43d0d0**: its second FUN_004b715a call, for the +0x68 (z) offset, reads the
+**0x43d0d0**: its second AngleOfVector call, for the +0x68 (z) offset, reads the
 same stack slot as the first (`[esp+8]` at 0x43d1a0, then `push edi;
 mov ecx, [esp+0xc]` at 0x43d1ce), so both use the rotated x and the rotated z
 is never read. Found by DeepSeek V4.1 Flash in #33.

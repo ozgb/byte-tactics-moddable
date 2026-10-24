@@ -64,14 +64,14 @@ typedef struct {
 static stat_t st_sine = {"bx_FixedSine"};
 static stat_t st_cos = {"bx_fixed_cos"};
 static stat_t st_mulhi = {"bx_mul_hi32"};
-static stat_t st_sin_scaled = {"bx_FUN_004b70ef"};
-static stat_t st_cos_scaled = {"bx_FUN_004b7123"};
-static stat_t st_atan = {"bx_FUN_004b715a"};
+static stat_t st_sin_scaled = {"bx_ScaledSin"};
+static stat_t st_cos_scaled = {"bx_ScaledCos"};
+static stat_t st_atan = {"bx_AngleOfVector"};
 static stat_t st_fsincos = {"fsincos_table"};
-static stat_t st_rotate = {"bx_FUN_004b7173"};
+static stat_t st_rotate = {"bx_RotatePoint2D"};
 static stat_t st_build = {"bx_build_rotation_matrix"};
 static stat_t st_apply = {"bx_apply_rotation_matrix"};
-static stat_t st_div3 = {"bx_FUN_004b7381"};
+static stat_t st_div3 = {"bx_MulDivTrunc"};
 static stat_t *all_stats[] = {&st_sine, &st_cos, &st_mulhi, &st_sin_scaled, &st_cos_scaled, &st_atan,
                               &st_rotate, &st_build, &st_apply, &st_div3};
 
@@ -187,12 +187,12 @@ static void test_mul_hi(void)
 static void one_scaled(unsigned int a, int scale)
 {
     int want = ORACLE_INT(orig_sin_scaled((short)a, scale));
-    int got = bx_FUN_004b70ef((bx_i16)a, scale);
+    int got = bx_ScaledSin((bx_i16)a, scale);
     st_sin_scaled.cases++;
     if (want != got)
         mismatch(&st_sin_scaled, "angle 0x%04x scale %d want %d got %d", a & 0xffff, scale, want, got);
     want = ORACLE_INT(orig_cos_scaled((short)a, scale));
-    got = bx_FUN_004b7123((bx_i16)a, scale);
+    got = bx_ScaledCos((bx_i16)a, scale);
     st_cos_scaled.cases++;
     if (want != got)
         mismatch(&st_cos_scaled, "angle 0x%04x scale %d want %d got %d", a & 0xffff, scale, want, got);
@@ -215,7 +215,7 @@ static void test_scaled(void)
 static void one_atan(int x, int z)
 {
     int want = ORACLE_INT(orig_atan(x, z));
-    int got = bx_FUN_004b715a(x, z);
+    int got = bx_AngleOfVector(x, z);
     st_atan.cases++;
     if (want != got)
         mismatch(&st_atan, "x %d z %d want %d got %d", x, z, want, got);
@@ -298,7 +298,7 @@ static void one_rotate(unsigned int a, int x, int z)
     w[0] = g[0] = x;
     w[1] = g[1] = z;
     ORACLE_WORDS(orig_rotate((short)a, w), w, 2);
-    bx_FUN_004b7173((bx_i16)a, g);
+    bx_RotatePoint2D((bx_i16)a, g);
     st_rotate.cases++;
     if (w[0] != g[0] || w[1] != g[1])
         mismatch(&st_rotate, "angle 0x%04x xz (%d, %d) want (%d, %d) got (%d, %d)", a & 0xffff, x, z, w[0], w[1], g[0], g[1]);
@@ -406,7 +406,7 @@ static void one_div3(int a, int b, int c)
         }
     }
     want = ORACLE_INT(orig_div3(a, b, c));
-    got = bx_FUN_004b7381(a, b, c);
+    got = bx_MulDivTrunc(a, b, c);
     st_div3.cases++;
     if (want != got)
         mismatch(&st_div3, "a %d b %d c %d want %d got %d", a, b, c, want, got);

@@ -101,7 +101,7 @@ struct Elem_004336c0 {
 void CopyDwordIfNonNull(int*, int*);
 #include "../orders/approach_areas.h"
 #include "../state/sim_globals.h"
-int FUN_00490200();
+int IsLocalPlayerOutOfUnits();
 int GetBuildRating(int, unsigned short);
 
 extern void __cdecl operator delete(void*);

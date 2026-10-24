@@ -11,14 +11,14 @@
 // int  FixedSine(unsigned short angle)        sine table entry (sin * 0x2000)
 // int  (unsigned short angle)                    cosine table entry (0x4b70c0)
 // int  (int a, int b)                            (a * b) >> 32 (0x4b70e0)
-// int  FUN_004b70ef(short angle, int scale)      scale * sin(angle), rounded
-// int  FUN_004b7123(short angle, int scale)      scale * cos(angle), rounded
-// int  FUN_004b715a(int x, int z)                atan2(z, x) as an angle
-// void FUN_004b7173(short angle, int* xz)        rotate the point xz by angle
+// int  ScaledSin(short angle, int scale)      scale * sin(angle), rounded
+// int  ScaledCos(short angle, int scale)      scale * cos(angle), rounded
+// int  AngleOfVector(int x, int z)                atan2(z, x) as an angle
+// void RotatePoint2D(short angle, int* xz)        rotate the point xz by angle
 // void (short* angles)                           build the rotation matrix g_rotationMatrix
 //                                                from the angles at +0xc, +0xe, +0x10 (0x4b71a7)
 // void (int* in, int* out)                       out = g_rotationMatrix applied to in (0x4b72e2)
-// int  FUN_004b7381(int a, int b, int c)         a * b / c, or 0 when c is 0
+// int  MulDivTrunc(int a, int b, int c)         a * b / c, or 0 when c is 0
 
 // GLOBAL: 0x509f00
 extern "C" short g_sinTable[128];
@@ -78,7 +78,7 @@ extern "C" __declspec(naked) int __cdecl FixedSine(unsigned short angle)
         leave
         ret
 
-        // ENTRY: 0x4b70ef
+        // ENTRY: 0x4b70ef _ScaledSin
         push ebp
         mov ebp, esp
         push esi
@@ -100,7 +100,7 @@ extern "C" __declspec(naked) int __cdecl FixedSine(unsigned short angle)
         leave
         ret
 
-        // ENTRY: 0x4b7123
+        // ENTRY: 0x4b7123 _ScaledCos
         push ebp
         mov ebp, esp
         push esi
@@ -122,7 +122,7 @@ extern "C" __declspec(naked) int __cdecl FixedSine(unsigned short angle)
         leave
         ret
 
-        // ENTRY: 0x4b715a
+        // ENTRY: 0x4b715a _AngleOfVector
         push ebp
         mov ebp, esp
         fild dword ptr [ebp + 8]
@@ -134,7 +134,7 @@ extern "C" __declspec(naked) int __cdecl FixedSine(unsigned short angle)
         leave
         ret
 
-        // ENTRY: 0x4b7173
+        // ENTRY: 0x4b7173 _RotatePoint2D
         push ebp
         mov ebp, esp
         cmp word ptr [ebp + 8], 0
@@ -316,7 +316,7 @@ extern "C" __declspec(naked) int __cdecl FixedSine(unsigned short angle)
         leave
         ret
 
-        // ENTRY: 0x4b7381
+        // ENTRY: 0x4b7381 _MulDivTrunc
         push ebp
         mov ebp, esp
         push ebx

@@ -196,9 +196,9 @@ extern Game* g_game;
 
 // External functions the handlers call.
 int __stdcall RandomInt(int);
-int __cdecl FUN_004b70ef(short, int);
-int __cdecl FUN_004b7123(short, int);
-short __cdecl FUN_004b715a(int, int);
+int __cdecl ScaledSin(short, int);
+int __cdecl ScaledCos(short, int);
+short __cdecl AngleOfVector(int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall QueueUnitSpeech(Unit*, int, const char*);
 int __stdcall IssueAttackOrder(Unit*, Unit*, int);
@@ -248,9 +248,9 @@ static inline Vec3 Direction(short angle, int range)
 static inline Vec3 Offset(short angle, int distance)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, distance);
+    v.x = -ScaledSin(angle, distance);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, distance);
+    v.z = -ScaledCos(angle, distance);
     return v;
 }
 
@@ -606,9 +606,9 @@ int __stdcall VtolMoveOrder(Unit* unit, Order* order, int flags)
 Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, scale.value);
+    v.x = -ScaledSin(angle, scale.value);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, scale.value);
+    v.z = -ScaledCos(angle, scale.value);
     return v;
 }
 #pragma auto_inline(on)
@@ -870,7 +870,7 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         if (!order->target) { QueueUnitSpeech(unit,7,"Unable to create any more units"); return 8; }
         QueueUnitSpeech(unit,9,"Starting construction");
         AddOrder("GETBUILT",1,order->target,unit,0,0,0);
-        StartBuildingScript(unit,order,FUN_004b715a(unit->pos.x-order->target->pos.x,unit->pos.z-order->target->pos.z)-unit->heading);
+        StartBuildingScript(unit,order,AngleOfVector(unit->pos.x-order->target->pos.x,unit->pos.z-order->target->pos.z)-unit->heading);
         MarkSelectionOrdersDirty(unit);
         return 1;
     }

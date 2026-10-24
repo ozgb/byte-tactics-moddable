@@ -211,7 +211,10 @@ class RealTree(unittest.TestCase):
                 if (REAL / name).exists():
                     shutil.copy(REAL / name, root / name)
             env = dict(os.environ)
-            run = lambda *a: subprocess.run([sys.executable, *a], cwd=root, env=env, capture_output=True, text=True)  # noqa: E731
+
+            def run(*a):
+                return subprocess.run([sys.executable, *a], cwd=root, env=env, capture_output=True, text=True)
+
             schema = (root / "src/harness/trace_schema.h").read_text(errors="replace")
             types = (root / "include/ta_types.h").read_text(errors="replace")
             import re

@@ -86,7 +86,6 @@ CODE_DIRS = ["src", "include", "interfaces", "lib", "cmake", "link", "tests"]
 CODE_SUFFIXES = {".c", ".cpp", ".h"}
 TEXT_FILES = ["AGENTS.md", "docs/*.md", "lib/bitexact/README.md"]
 NAME_TABLES = ["data/aliases.csv", "data/symbols.csv"]
-# The name cells of the tables nothing regenerates whole: table -> (column, "words" | "symbols").
 CELLS = {
     "data/state_classes.csv": [("name", "words")],
     "data/trace_coverage.csv": [("name", "words")],
@@ -362,7 +361,6 @@ def apply(pairs: list[tuple[str, str]], texts: dict[Path, str], dry_run: bool, d
     return changed
 
 
-# The commands that bring the generated files and tables back in step, in order.
 FOLLOW_UP = [
     "cmake --build build/modern --target game data bitexact",
     "uv run tools/traceschema.py",

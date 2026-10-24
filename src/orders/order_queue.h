@@ -1,5 +1,5 @@
-#ifndef ORDER_QUEUE_4384A0_H
-#define ORDER_QUEUE_4384A0_H
+#ifndef ORDER_QUEUE_H
+#define ORDER_QUEUE_H
 
 struct Order;
 struct Unit;

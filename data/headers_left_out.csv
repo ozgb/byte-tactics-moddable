@@ -145,7 +145,6 @@ FindGadgetOrNull,mismatch,placeholder type Entry_0049f8c0: left for the type-nam
 FindGafEntry,mismatch,placeholder type GafEntry_004b8d40: left for the type-naming issues
 FindHighestPointOnLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FindHostSlot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-FindLandingPad,ambiguous,several definitions share the name
 FindLeftmost,skip,placeholder type Node_004dd1b0: left for the type-naming issues
 FindMissionUnit,mismatch,placeholder type Struct_00487af0: left for the type-naming issues
 FindNextSelectedUnit,mismatch,pointer/int cast: definition's type is likely wrong

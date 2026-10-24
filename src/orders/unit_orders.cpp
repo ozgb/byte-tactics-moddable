@@ -90,7 +90,7 @@ void __stdcall RegisterOrderTypes(void* table, int id);
 #include "order_list.h"
 #include "../util/math_4b6c30.h"
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, void* flags);
-#include "order_queue_4384a0.h"
+#include "order_queue.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
                            int a, int b, int c);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* id, void* pos,
@@ -812,7 +812,7 @@ extern const float DAT_004fc930, DAT_004fc934, DAT_004fc938, DAT_004fc93c;
 
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
-#include "order_queue_4384a0.h"
+#include "order_queue.h"
 void __stdcall EmitNanoParticles(Vec3* from, Vec3* to, int count);
 void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
 void __stdcall EmitReverseNanoParticles(Vec3* from, Vec3* to, int count);
@@ -822,7 +822,6 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3*
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
 void __stdcall EmitTeleportParticles(Vec3* from, Vec3* to, int count, int param);
-int __stdcall FindLandingPad(Unit*, int);
 void WriteScreenshot(char*, char*, int, int, int, int);
 int ScanDirectory(char*, char*, char*, int, int, int);
 
@@ -1557,17 +1556,9 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
 #include "unit_orders_404db0.h"
 int __stdcall GroundPickupOrder(Unit* unit, Order* order, int flags);
 #include "vtol_orders.h"
-#include "vtol_orders_40fbe0.h"
 #include "vtol_orders_4103e0.h"
 #include "vtol_orders_410850.h"
-#include "vtol_orders_410e70.h"
-#include "vtol_orders_4118e0.h"
-#include "vtol_orders_411f50.h"
-#include "vtol_orders_412710.h"
 #include "vtol_orders_412d40.h"
-#include "vtol_orders_414380.h"
-#include "vtol_orders_414770.h"
-#include "vtol_orders_414a80.h"
 #include "vtol_orders_4152f0.h"
 #include "../ingame/markers.h"
 
@@ -1684,7 +1675,7 @@ struct Unit;
 #include "../sound/sound.h"
 #include "../ingame/control_panel.h"
 void __stdcall StartBuildingScript(Unit*, Order*, short);
-#include "order_queue_4384a0.h"
+#include "order_queue.h"
 void __stdcall EmitNanoParticles(Vec3*, Vec3*, int);
 static inline Point16 WorldToCell16(Vec3 v, Point16 origin)
 {
@@ -1809,7 +1800,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
 #include "../sound/sound.h"
 #include "../util/math_4b6c30.h"
 void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
-#include "order_queue_4384a0.h"
+#include "order_queue.h"
 void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
 
 // FUNCTION: 0x404ad0

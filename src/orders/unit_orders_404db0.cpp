@@ -57,7 +57,7 @@ struct FeatureDamagePacket {
 #include "../util/math_4b6c30.h"
 unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
-#include "order_queue_4384a0.h"
+#include "order_queue.h"
 void __stdcall EmitNanoParticles(Vec3* from, Box* to, int count);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 #include "../ingame/control_panel.h"

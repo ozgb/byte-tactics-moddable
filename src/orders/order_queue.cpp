@@ -2,7 +2,7 @@
 #include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <string.h>
-#include "order_queue_4384a0.h"
+#include "order_queue.h"
 
 class Order;
 class HapiBank;

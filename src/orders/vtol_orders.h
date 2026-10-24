@@ -1,5 +1,6 @@
 #ifndef VTOL_ORDERS_H
 #define VTOL_ORDERS_H
+struct Unit;
 
 struct Order;
 struct Point16;
@@ -19,5 +20,16 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags);
 int __stdcall VtolGetRepairedOrder(Unit* unit, Order* order, int unused);
 int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags);
 int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags);
+
+int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags);
+int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags);
+int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags);
+int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags);
+int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags);
+int __stdcall VtolHelpBuildOrder(Unit* unit, Order* order, int flags);
+int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags);
+int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags);
+
+int __stdcall FindLandingPad(Unit* unit, int pad);
 
 #endif

@@ -1,4 +1,5 @@
 #include "../util/vec3.h"
+#include "vec3_add.h"
 
 struct Unit;
 

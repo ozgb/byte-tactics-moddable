@@ -1294,7 +1294,7 @@ address,size,file,symbol,status,similarity
 0x462ae0,233,src/network/packets.cpp,?RemovePacket@PacketBuffer@@QAEXPAUNetPacketPendingEntry@@@Z,matched,100.0
 0x462bd0,21,src/network/packets.cpp,?RemoveFromBuffer@NetPacketPendingEntry@@QAEXXZ,matched,100.0
 0x462bf0,11,src/network/packets.cpp,?GetData@NetPacketPendingEntry@@QAEHXZ,matched,100.0
-0x462c00,188,src/network/packets.cpp,??0PacketReceiver@@QAE@PAX@Z,matched,100.0
+0x462c00,188,src/network/packets.cpp,??0PacketReceiver@@QAE@PAVPacketManager@@@Z,matched,100.0
 0x462cc0,106,src/network/packets.cpp,??_GPacketReceiver@@UAEPAXI@Z,matched,100.0
 0x462d30,84,src/network/packets.cpp,??1PacketReceiver@@UAE@XZ,matched,100.0
 0x462d90,314,src/network/packets.cpp,?FindPlayerFrameInfo@PacketReceiver@@QAEPAVPlayerFrameInfo@@J@Z,matched,100.0

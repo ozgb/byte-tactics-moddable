@@ -195,10 +195,10 @@ Layer,next,pointer,src/frontend/multi.cpp|src/gui/dialogs.cpp|src/gui/layer.h,#3
 Layer,owner,pointer,src/frontend/multi.cpp,#353
 Layer,surface,pointer,src/frontend/frontend.cpp|src/gui/layer.h,#353
 Layer,textHandler,function-pointer,src/gui/layer.h,#353
-LosTables,allocator,container,src/map/los_tables.h,#350
-LosTables,end,pointer,src/map/los_tables.h,#350
-LosTables,first,pointer,src/map/los_tables.h,#350
-LosTables,last,pointer,src/map/los_tables.h,#350
+LosTables,allocator,container,src/map/los_tables.h,#353
+LosTables,end,pointer,src/map/los_tables.h,#353
+LosTables,first,pointer,src/map/los_tables.h,#353
+LosTables,last,pointer,src/map/los_tables.h,#353
 MapGrid,buf,pointer,src/ingame/map_grid.h,#353
 MapGrid,count,pointer,src/ingame/map_grid.h,#353
 MapGrid,cursor,pointer,src/ingame/map_grid.h,#353
@@ -289,7 +289,7 @@ Screen,surface,pointer,src/graphics/surface.cpp,#353
 ScriptTable,code,pointer,src/units/cob_types.h,#349
 ScriptTable,entries,pointer,src/units/cob_types.h,#349
 ScriptTable,names,pointer,src/units/cob_types.h,#349
-SimGlobals,g_packetHandlers,function-pointer,src/state/sim_globals.h,#350
+SimGlobals,g_packetHandlers,function-pointer,src/state/sim_globals.h,#352
 Snapshot_0046a860,orderName,int-pointer,src/ingame/snapshot_0046a860.h,#353
 Spot,state,pointer,src/map/features.cpp,#353
 SpotState,bitmap,pointer,src/graphics/spot_state.h,#353

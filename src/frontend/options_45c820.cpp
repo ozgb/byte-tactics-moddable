@@ -28,12 +28,12 @@ void RestoreSoundOptions()
     g_game->soundFlags_37f19_2 = (g_game->soundFlags_37f19_2 & ~0x20) | (g_optionsBackupSoundFlags & 0x20);
     g_game->soundFlags_37f19_2 = (g_game->soundFlags_37f19_2 & ~0x40) | ((g_optionsBackupSoundFlags & 0x20) << 1);
     if ((((unsigned char)g_optionsBackupSoundFlags) & 7) == 2)
-        ((Sound *)g_game->field_10)->Enable3D();
+        ((Sound *)g_game->sound)->Enable3D();
     else
-        ((Sound *)g_game->field_10)->Disable3D();
+        ((Sound *)g_game->sound)->Disable3D();
     g_game->soundFlags_37f19_2 = (g_game->soundFlags_37f19_2 & ~7) | (g_optionsBackupSoundFlags & 7);
     g_game->unitChat = g_optionsBackupUnitChat;
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-    ((Sound *)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
-    ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
+    ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+    ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
 }

@@ -2369,7 +2369,7 @@ void __stdcall DrawProjectiles(void* surface)
                     int sy = ((int)*(short*)((char*)pos + 10)
                               - ((int)*(short*)((char*)pos + 6) >> 1))
                              - (short)g_game->scrollY + 0x20;
-                    void* gaf = g_game->unknown_147f3;
+                    void* gaf = g_game->flamestreamGaf;
                     int n = GetGafFrameCount(gaf);
                     fr = n - ((p->time - time) * n) / (int)type->lifetime;
                     if (fr >= 0 && fr < n) {

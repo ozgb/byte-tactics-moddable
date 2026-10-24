@@ -740,9 +740,9 @@ void LoadingScreenFrame(void)
         SetCloseHandler(HandleBattleQuitPrompt, 0);
         g_game->field_589 = 0;
         memset((void*)(*(volatile unsigned char(*)[6])&g_game->progress_38d6f), 0, 8);
-        ((Sound*)g_game->field_10)->SetTrackCategory(0);
-        if (!((Sound*)g_game->field_10)->IsCdPlaying()) {
-            ((Sound*)g_game->field_10)->PlayNextTrack();
+        ((Sound*)g_game->sound)->SetTrackCategory(0);
+        if (!((Sound*)g_game->sound)->IsCdPlaying()) {
+            ((Sound*)g_game->sound)->PlayNextTrack();
         }
         for (i = 0; i < 10; i++) {
             if ((*(PlayerRec_00497f40(*)[10])&g_game->players)[i].active != 0)

@@ -583,7 +583,7 @@ void __stdcall HandleCloseCdPlayerChoice(Gadget_00426190* gadget)
         return;
     PlaySoundByName("SmallButton", 0);
     if (IsGadgetNamed(owner, gadget->selected, "CHOICE1")) {
-        ((Sound *)g_game->field_10)->CloseCdPlayerWindow();
+        ((Sound *)g_game->sound)->CloseCdPlayerWindow();
     } else if (!IsGadgetNamed(owner, gadget->selected, "CHOICE2")) {
         ClearSelectedGadget(gadget);
     }
@@ -640,7 +640,7 @@ void __stdcall OpenMainMenu()
 
     LoadPictureCached("FrontendX", 1, 1, 0);
     PlayLoopingSoundByName("BGM", 0);
-    ((Sound *)g_game->field_10)->SetTrackCategory(4);
+    ((Sound *)g_game->sound)->SetTrackCategory(4);
     EnableKeyCommands(&g_game->gui);
 
     char* name = "FrontendX";
@@ -676,7 +676,7 @@ void __stdcall OpenMainMenu()
     memset(g_menuSparks, 0, 0x145 * 4);
 
     if (g_cdPlayerDialogShown == 0) {
-        if (((Sound *)g_game->field_10)->HasCdPlayerWindow()) {
+        if (((Sound *)g_game->sound)->HasCdPlayerWindow()) {
             OpenCloseCdPlayerDialog();
             g_cdPlayerDialogShown = 1;
         }
@@ -693,7 +693,7 @@ void __stdcall OpenMainMenu()
     }
 
     if (g_noSoundDriverShown == 0) {
-        if (((Sound *)g_game->field_10)->HasNoDriver()) {
+        if (((Sound *)g_game->sound)->HasNoDriver()) {
             OpenMessageBox(&g_game->gui, Translate("No sound driver is available for use.\n"), 500, 1, 1);
             g_noSoundDriverShown = 1;
         }

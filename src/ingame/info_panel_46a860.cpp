@@ -193,8 +193,8 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         SetFont(g_game->fontComix);
         SetTextColors(0x53, GetTextKeyColor());
         int pfstate = g_game->screenHeight - GetFontHeight() - 1;
-        sprintf(text, "PFSTATE %d, PFABLE %d\n", ((Display_0046a860 *)g_game->unknown_c)->flags & 1,
-                ((Display_0046a860 *)g_game->unknown_c)->haveBackBuffer);
+        sprintf(text, "PFSTATE %d, PFABLE %d\n", ((Display_0046a860 *)g_game->displayContext)->flags & 1,
+                ((Display_0046a860 *)g_game->displayContext)->haveBackBuffer);
         DrawString(surface, (unsigned char*)text, 0x82, pfstate, -1);
 
         if (g_game->hoverUnitId != 0) {

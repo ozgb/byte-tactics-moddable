@@ -75,6 +75,6 @@ void MainFrameTick()
     else
         (*(Input_00499890*)&g_game->view) = second;
     UpdateTimers();
-    if (!(g_game->unknown_c->flags & 8))
+    if (!(g_game->displayContext->flags & 8))
         ((void (__cdecl*)())g_game->handler)();
 }

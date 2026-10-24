@@ -1177,7 +1177,7 @@ void __stdcall UpdatePlanet(Gui* arg1, Gadget* arg2)
     void* surface = arg1->layer->entries->surface;
     if (g_briefingPlanetNextTick <= host_time_ms()) {
         g_briefingPlanetNextTick = host_time_ms() + 0x19;
-        if (((Sound *)g_game->field_10)->IsStreamActive() == 0) {
+        if (((Sound *)g_game->sound)->IsStreamActive() == 0) {
             if (GetButtonStageByName(arg1, "SHUTUP")) {
                 SetButtonStageByName(arg1, "SHUTUP", 0);
                 MarkChanged(arg1);
@@ -1231,7 +1231,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
         PlaySoundByName("BigButton", 0);
         RegisterDataArchives();
         SetCursorMode(0x14);
-        ((Sound *)g_game->field_10)->StopStream();
+        ((Sound *)g_game->sound)->StopStream();
         BlankScreen();
         g_game->frontendNextSubState = 2;
         return;
@@ -1239,7 +1239,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
     if (IsCurrentGadgetNamed(menu, "SHUTUP")) {
         PlaySoundByName("Options", 0);
         if (!GetButtonStageByName(menu, "SHUTUP")) {
-            ((Sound *)g_game->field_10)->StopStream();
+            ((Sound *)g_game->sound)->StopStream();
         } else if (g_game->mode_391f1 != 6) {
             char* text = (char*)g_game->net->GetNameSlot(3);
             if (text) {
@@ -1251,7 +1251,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
         return;
     }
     if (IsCurrentGadgetNamed(menu, "PrevMenu")) {
-        ((Sound *)g_game->field_10)->StopStream();
+        ((Sound *)g_game->sound)->StopStream();
         PlaySoundByName("Previous", 0);
         BlankScreen();
         g_game->frontendNextSubState = 3;

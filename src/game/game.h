@@ -111,8 +111,8 @@ struct Game {
     };
     char* build_date;
     char* build_time;
-    Ctx_00499890* unknown_c;
-    Class_004cdb40* field_10;
+    Ctx_00499890* displayContext;
+    Class_004cdb40* sound;
     union {
         struct {
             char session[4];
@@ -436,7 +436,7 @@ struct Game {
             int field_142b3;
             Ref<Class_0047cb00> overflowBucket;
             Rect viewLimit;
-            char field_142cb[16];
+            char radarViewportRect[16];
             void* finalSurface;
             void* mappedSurface;
             void* pictureSurface;
@@ -538,7 +538,7 @@ struct Game {
             char pad_14283_a[28];
             Grid2 spatialGrid_1429f;
             char pad_142b7[20];
-            char field_142cb_142cb[38];
+            char radarViewport[38];
             CameraFlags viewDirtyFlags;
             char pad_142f3_a[90];
         };
@@ -636,7 +636,7 @@ struct Game {
     char pad_1437f[4];
     void* xform;
     void* projected;
-    void* field_1438b;
+    void* assemPoints;
     int unitDefCount;
     int unitDefCountBits;
     int unitDefEnumDirty;
@@ -667,7 +667,7 @@ struct Game {
     void* nuclogo;
     void* src1;
     void* src2;
-    void* unknown_147f3;
+    void* flamestreamGaf;
     union {
         struct {
             void* src3;
@@ -748,7 +748,7 @@ struct Game {
     int igTitles;
     int vismasks;
     int fog;
-    int field_14903;
+    int cursorsGaf;
     union {
         struct {
             int array_14907[1];

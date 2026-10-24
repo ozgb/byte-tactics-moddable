@@ -502,23 +502,23 @@ void __stdcall CmdSearch(CommandArgs* args)
 // FUNCTION: 0x4167f0
 void __stdcall CmdCDPlay(CommandArgs* args)
 {
-    ((Sound*)g_game->field_10)->PlayCdTrack(args->GetIntArg(1, 0), 1);
+    ((Sound*)g_game->sound)->PlayCdTrack(args->GetIntArg(1, 0), 1);
 }
 
 // FUNCTION: 0x416810
 void __stdcall CmdCDStop(int unused)
 {
-    ((Sound*)g_game->field_10)->StopCdAudio();
+    ((Sound*)g_game->sound)->StopCdAudio();
 }
 
 // FUNCTION: 0x416820
 void __stdcall CmdSound3D(int unused)
 {
-    if (((Sound*)g_game->field_10)->Is3DEnabled()) {
-        ((Sound*)g_game->field_10)->Disable3D();
+    if (((Sound*)g_game->sound)->Is3DEnabled()) {
+        ((Sound*)g_game->sound)->Disable3D();
         SaveSettings();
     } else {
-        ((Sound*)g_game->field_10)->Enable3D();
+        ((Sound*)g_game->sound)->Enable3D();
         SaveSettings();
     }
 }

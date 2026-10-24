@@ -556,7 +556,7 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
         GameFreeThunk(data);
         if (g_game->bits_2bee.flag4)
             LeaveNetGame();
-        ((Sound*)g_game->field_10)->SetTrackCategory(4);
+        ((Sound*)g_game->sound)->SetTrackCategory(4);
         Display* display = GetDisplay();
         display->paletteBrightness = *(float*)&g_game->savedPaletteBrightness;
         return;
@@ -905,7 +905,7 @@ void __stdcall RunEndGameState()
             if(g_game->deadline<GetTicks()) {
                 GetCurrentMouseEvent(event);
                 if(PopKey() || g_game->cursorKeyFlags) {
-                    ((Sound*)g_game->field_10)->StopStream();
+                    ((Sound*)g_game->sound)->StopStream();
                     OpenEndMissionScreen(); EnableEndMissionButtons(); FillEndGameStatistics();
                     MarkLayerChanged(&g_game->gui); MarkChanged(&g_game->gui);
                     g_game->endGameState=7;

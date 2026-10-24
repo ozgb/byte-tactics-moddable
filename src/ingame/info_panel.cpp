@@ -946,7 +946,7 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
     }
     for (; j < obj->faceCount; j++, e++) {
         unsigned short* idx = e->indices;
-        Point* dst = (Point *)g_game->field_1438b;
+        Point* dst = (Point *)g_game->assemPoints;
         for (int k = 0; k < e->count; k++, idx++, dst++) {
             *dst = ((Point *)g_game->projected)[*idx];
         }
@@ -957,10 +957,10 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
                     tex = (void*)GetGafSequenceFrame((short*)((char*)e + 0x10));
                 else
                     tex = (void*)e->pic;
-                DrawFrameQuad(surface, tex, (Point *)g_game->field_1438b, 0);
+                DrawFrameQuad(surface, tex, (Point *)g_game->assemPoints, 0);
             }
         } else {
-            FillPolygon(surface, (Point *)g_game->field_1438b, e->count, e->colorIndex);
+            FillPolygon(surface, (Point *)g_game->assemPoints, e->count, e->colorIndex);
         }
     }
 }

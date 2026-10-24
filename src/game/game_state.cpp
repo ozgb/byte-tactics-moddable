@@ -389,11 +389,11 @@ void InitGame()
     LoadGameFonts();
     LoadDefaultPalette();
     LoadAllSound();
-    LoadAlphaTable(g_game->field_143a7);
-    LoadShadeTable(g_game->field_143a7);
-    LoadLightTable(g_game->field_143a7);
-    MakeGrayTable(g_game->field_143a7);
-    MakeBlueTable(g_game->field_143a7);
+    LoadAlphaTable(g_game->paletteRgba);
+    LoadShadeTable(g_game->paletteRgba);
+    LoadLightTable(g_game->paletteRgba);
+    MakeGrayTable(g_game->paletteRgba);
+    MakeBlueTable(g_game->paletteRgba);
     g_game->options = (Entry_00479620*)(GameAllocIgnoreTag(g_skirmishInfoTag, 0x22c));
     LoadSettings();
     size = 0xaa0;

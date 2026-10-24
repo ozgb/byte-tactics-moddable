@@ -357,7 +357,7 @@ void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset,
 {
     Vec3* scratch = (Vec3 *)g_game->xform;
     Point* points = (Point *)g_game->projected;
-    unsigned char color = g_game->field_dd5;
+    unsigned char color = g_game->colors[10];
     Vec3* c = corners;
 
     for (int i = 0; i < 4; i++) {
@@ -586,7 +586,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
 // FUNCTION: 0x468310
 void __stdcall DrawPercentBar(void* surface, Rect* rect, int percent)
 {
-    unsigned char& color = g_game->field_dda;
+    unsigned char& color = g_game->colors[15];
     DrawRectangle(surface, rect, color);
     if (percent >= 100)
         percent = 100;
@@ -598,7 +598,7 @@ void __stdcall DrawPercentBar(void* surface, Rect* rect, int percent)
 
 static void Bar(void* surface, Rect* rect, int percent)
 {
-    unsigned char& color = g_game->field_dda;
+    unsigned char& color = g_game->colors[15];
     DrawRectangle(surface, rect, color);
     if (percent >= 100)
         percent = 100;
@@ -982,7 +982,7 @@ int __stdcall ShowGameMessage(char* text, int mode)
     }
     if (mode == 1) {
         int t = GetScreenWidth();
-        result = OpenMessageBox((*(char (*)[4])&g_game->field_519), text, (int)(t * 0.5), 1, 1);
+        result = OpenMessageBox((*(char (*)[4])&g_game->gui), text, (int)(t * 0.5), 1, 1);
     }
     return result;
 }

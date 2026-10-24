@@ -151,11 +151,11 @@ void __stdcall DrawBuildFootprint(void* surface, View* view, Order* order,
     unsigned char outer;
     unsigned char inner;
     if (order->unit->selected) {
-        outer = g_game->field_dce;
-        inner = g_game->field_dd5;
+        outer = g_game->colors[3];
+        inner = g_game->colors[10];
     } else {
-        outer = g_game->field_dcc;
-        inner = g_game->field_dd4;
+        outer = g_game->colors[1];
+        inner = g_game->colors[9];
     }
     DrawLine(surface, r.left + dx - 1, r.top - 1, r.left + dx - 1, r.bottom + 1, outer);
     DrawLine(surface, r.right - dx + 1, r.top - 1, r.right - dx + 1, r.bottom + 1, outer);
@@ -242,7 +242,7 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
     if (g_game->showRanges == 0) {
         short mincloak = def->minCloakDistance;
         if (mincloak != 0 && (unit->activateFlags & 4)) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, mincloak, g_game->field_dda, 0, 0);
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, mincloak, g_game->colors[15], 0, 0);
         }
         if ((def->flags & 0x10000000) && def->weapon_220 != 0) {
             int r = def->weapon_220->areaOfEffect;
@@ -251,58 +251,58 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
             int radius = (t < 8) ? 8 : t;
             if (radius >= r)
                 radius = r;
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, radius, g_game->field_dd7, 0, 0);
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, radius, g_game->colors[12], 0, 0);
             if (unit->motion != 0) {
                 DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->kamikazeDistance,
-                             g_game->field_dd7, 0, 0);
+                             g_game->colors[12], 0, 0);
                 return;
             }
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sight, g_game->field_dd7, 0, 0);
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sight, g_game->colors[12], 0, 0);
             return;
         }
     } else {
         short mincloak = def->minCloakDistance;
         if (mincloak != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, mincloak, g_game->unknown_dd9,
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, mincloak, g_game->colors[14],
                          "mincloak", index++);
         }
         if (def->sight != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sight, g_game->unknown_dd9,
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sight, g_game->colors[14],
                          "sight", index++);
         }
         if (def->radar != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->radar, g_game->unknown_dd9,
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->radar, g_game->colors[14],
                          "radar", index++);
         }
         if (def->sonar != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sonar, g_game->unknown_dd9,
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sonar, g_game->colors[14],
                          "sonar", index++);
         }
         if (def->radarJam != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->radarJam, g_game->unknown_dd9,
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->radarJam, g_game->colors[14],
                          "radarjam", index++);
         }
         if (def->sonarJam != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sonarJam, g_game->unknown_dd9,
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sonarJam, g_game->colors[14],
                          "sonarjam", index++);
         }
         if (def->buildDistance != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->buildDistance, g_game->unknown_dd9,
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->buildDistance, g_game->colors[14],
                          "build distance", index++);
         }
         if (def->maneuver != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->maneuver, g_game->unknown_dd9,
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->maneuver, g_game->colors[14],
                          "maneuver", index++);
         }
         if (def->kamikazeDistance != 0) {
             DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->kamikazeDistance,
-                         g_game->unknown_dd9, "kamikazedistance", index);
+                         g_game->colors[14], "kamikazedistance", index);
         }
         int color;
         if ((unsigned int)g_game->ticks & 1)
-            color = g_game->field_dcf;
+            color = g_game->colors[4];
         else
-            color = g_game->field_dd7;
+            color = g_game->colors[12];
         if ((unit->weapons[0].flags & 2) && ((Weapon*)unit->weapons[0].weapon.get())->range != 0) {
             DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[0].weapon.get())->range, color,
                          "weapon1 range", 0);
@@ -420,9 +420,9 @@ void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
         (g_missionOrderTableBegin[order->kind.index].markerAnim == 1 || g_missionOrderTableBegin[order->kind.index].markerAnim == 2)) {
         int color;
         if ((unsigned int)g_game->ticks & 1)
-            color = g_game->field_dcf;
+            color = g_game->colors[4];
         else
-            color = g_game->field_dd7;
+            color = g_game->colors[12];
         for (int i = 0; i < 3; i++) {
             if (u->weapons[(unsigned char)i].flags & 2) {
                 if (((Weapon*)u->weapons[i].weapon.get())->areaOfEffect != 0) {
@@ -469,7 +469,7 @@ void __stdcall DrawOrderRangeRing(void* surface, View* view, Order* order,
     for (int angle = 0x1000; angle <= 0x10000; angle += 0x1000) {
         int nx = ScaledCos(angle, height) + xc;
         int ny = ScaledSin(angle, ry) + yc;
-        DrawLine(surface, x1, y1, nx, ny, g_game->field_dd7);
+        DrawLine(surface, x1, y1, nx, ny, g_game->colors[12]);
         x1 = nx;
         y1 = ny;
     }

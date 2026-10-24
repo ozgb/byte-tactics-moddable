@@ -390,8 +390,8 @@ files,seams,indirect,BankWriteBoxNative,1
 game,ai,indirect,DumpPlayerAI,1
 game,ai,indirect,ResetAIPlayers,1
 game,ai,shared_write,Game::difficulty,2
-game,ai,shared_write,Game::field_37ee6,1
 game,ai,shared_write,Game::mapFlags,1
+game,ai,shared_write,Game::maxUnitsSetting,1
 game,ai,shared_write,Game::playerIndex,1
 game,ai,shared_write,Game::ticks,11
 game,ai,shared_write,Game::windSpeedDenominator,1
@@ -499,8 +499,8 @@ game,map,indirect,SavePlayerFeaturesPlotmap,1
 game,map,indirect,SetMissionType,5
 game,map,indirect,SnapWorldPosToFootprint,2
 game,map,shared_write,Game::difficulty,1
-game,map,shared_write,Game::field_37ee6,1
 game,map,shared_write,Game::mapFlags,1
+game,map,shared_write,Game::maxUnitsSetting,1
 game,map,shared_write,Game::numPlayers,1
 game,map,shared_write,Game::playerIndex,1
 game,map,shared_write,Game::seaLevel,6
@@ -943,7 +943,6 @@ game,presentation,shared_write,Game::commanderDeath,2
 game,presentation,shared_write,Game::difficulty,9
 game,presentation,shared_write,Game::effectiveGameSpeed,6
 game,presentation,shared_write,Game::endGameFlags,2
-game,presentation,shared_write,Game::field_37ee6,2
 game,presentation,shared_write,Game::flags_2a44,4
 game,presentation,shared_write,Game::flags_37ebe,7
 game,presentation,shared_write,Game::frames_38a3b,1
@@ -954,6 +953,7 @@ game,presentation,shared_write,Game::localPlayer,68
 game,presentation,shared_write,Game::mapFlags,19
 game,presentation,shared_write,Game::mapHeight,7
 game,presentation,shared_write,Game::mapWidth,7
+game,presentation,shared_write,Game::maxUnitsSetting,2
 game,presentation,shared_write,Game::mode_391f1,5
 game,presentation,shared_write,Game::numPlayers,4
 game,presentation,shared_write,Game::playerIndex,28
@@ -1027,9 +1027,9 @@ game,units,shared_write,Angles16::heading,10
 game,units,shared_write,Game::autoFollowTicks,1
 game,units,shared_write,Game::commanderDeath,2
 game,units,shared_write,Game::difficulty,2
-game,units,shared_write,Game::field_37ee6,3
 game,units,shared_write,Game::localPlayer,2
 game,units,shared_write,Game::mapFlags,1
+game,units,shared_write,Game::maxUnitsSetting,3
 game,units,shared_write,Game::playerIndex,3
 game,units,shared_write,Game::seaLevel,9
 game,units,shared_write,Game::ticks,4

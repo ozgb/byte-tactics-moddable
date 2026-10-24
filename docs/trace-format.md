@@ -248,6 +248,10 @@ latest number. An order effect keeps the number it got when it was first met. Ad
 absolute (the `ref` plus the block base). If more than 65536 orders or effects are met the run
 fails.
 
+The dump never shows addresses, so a reader of a dump never rebuilds these maps. Every `HP(...)`
+link, order and order effect pointer is already written as its ID (`order:5`, `orderfx:2`, `link:N`,
+`null` or `heap`), and the dump holds the lines to hash it as it is.
+
 In the dump, `order:5` is tag 12, index 5; a `link` index of 2147483650 is link ID `2 | 0x80000000`,
 the link inside order effect 2.
 
@@ -377,6 +381,10 @@ END
 ```
 Dump: `features[i].list` (value `0x01` or `0x02`) and `features[i].<field>`.
 
+The two tables are told apart by the field names of the lines. The first line after
+`features[i].next` is `features[i].anim.index` for a SpotAnim and `features[i].state` for a
+SpotObject.
+
 ### 7.6 wind (section 8)
 
 ```
@@ -424,7 +432,9 @@ if the cell array (ref at game+0x14287) is not null:
     HB(all n*13 bytes of the copy, as one run)
 END
 ```
-Dump: `cells.count`, then `cells[i]` per cell with the bytes of the modified copy.
+Dump: `cells.count`, then `cells[i]` per cell with the bytes of the modified copy. A `cells[i]` line
+is `hex:` and the 13 bytes of that cell, lowest address first. When the cell array is null there are
+no `cells[i]` lines, only `cells.count`.
 
 ### 8.3 visibility (section 12)
 
@@ -540,6 +550,9 @@ for w in 0 .. words-1:
 ```
 Dump values of these are `VisitValue` style: `0x` plus `2*size` hex digits.
 
+A `.dir` or `.node` line is present only when its condition above holds, and a line that is present
+is hashed. A cell with neither condition has only its `.flags` line.
+
 ### 8.8 moving classes and pass maps (sections 18 and 19)
 
 ```
@@ -563,6 +576,10 @@ for c in 0 .. 31:
 END
 ```
 The first `HB` is one run; so is the second (the tail row is a separate run).
+
+A `moveClasses[c].passMap[k]` line is `hex:` and the 4 bytes of word `k`, lowest address first (the
+words in memory order, not written as a number). The mask is already applied in the dump: the lines
+from `full*width` on hold the masked tail row, and the lines before them are the cells as they are.
 
 ### 8.9 orders (section 20)
 
@@ -687,6 +704,14 @@ channel(ch):
             0x400000:            HT(ScriptChannelDelay, ch)
             0x800000:            HT(ScriptChannelWait, ch)
 ```
+A channel with `state == 0` has exactly one line, `<prefix>.state` with the value `0x00000000`, and
+no `.stack` line. A channel with a state other than 0 has the lines of its table (the first is
+`<prefix>.state`, with a non-zero value), then `<prefix>.stack`, then any lines of the conditional
+table. So a `.state` line of value 0 means a one-line channel.
+
+The `statics` path has two lines in a row with the same path: the count line (`0x` and 8 digits),
+then the `hex:` line of the bytes (`hex:` alone when the count is 0).
+
 The stack holds the words up to and including `sp`: the channel's stack pointer `sp` is the index of
 the top word, so `sp + 1` words are live.
 
@@ -719,8 +744,9 @@ rawVector(path, V, e): n = count with element size e
                        H32(n)                       # dump: <path>
                        HB(n*e bytes at begin)       # dump: <path> (hex:)
 ```
-The dump paths of `rawVector` are `players[i].ai.<name>`; the count line and the bytes line share the
-path.
+The dump paths of `rawVector` are `players[i].ai.<name>`. Each `rawVector` has two lines with the
+same path, in order: the count line (`0x` and 8 digits), then the `hex:` line of the bytes (`hex:`
+alone when the count is 0). The `statics` path of section 8.12 is the same.
 
 ### 8.14 squad managers (section 25)
 
@@ -792,6 +818,12 @@ if cs != null:
             elif class == 12 or class == 4: HT(ConditionNumLeft, c)
 END
 ```
+The counts are the dumped fields `conditions.victoryCount` (offset 0x40) and
+`conditions.defeatCount` (offset 0x84): read them from the lines of the table itself (a count above
+16 counts as 0 for the loop). A null entry has no line, so its index `k` is simply missing from the
+dump; the entries that are present are those with a `conditions.victory[k].class` (or `defeat`)
+line.
+
 Condition classes: 0 unknown (fails the run), defeat: passes z 1, passes x 2, death timer 3,
 type killed 4, all of type 5, all killed 6, commander 7; victory: timer 8, passes z 9, passes x 10,
 move to radius 11, kill type 12, kill all of type 13, capture 14, build 15, kill mobile 16, destroy
@@ -918,8 +950,14 @@ with single spaces between the first three fields and the value, which runs to t
 **Order.** For each phase of the tick that runs (`units` to `meteors`; `net` first if it runs) the
 dump has, in order: the lines of the phase row (`gameTick`, `rng.parkMiller`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
-tick is 1). The lines come in exactly the order the hash consumes them, so reading the lines of one
-(phase, part) block in order and applying the rules of sections 6 to 8 reproduces its hash. The
+tick is 1; sections 29 to 31 appear only at tick 1). The lines come in exactly the order the hash consumes them, so reading the lines of one
+(phase, part) block in order and applying the rules of sections 6 to 8 reproduces its hash.
+
+The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
+The phase row ends with the last `meteors.<name>` line (section 9), and the world row begins with
+the first `game.<name>` line (section 10). Both parts have `units[i].*` and `players[i].*` lines, so
+tell them apart by that position: lines before the boundary are the phase row's, lines from it on
+are the world row's. The
 `world` row is a trace row only after `meteors`, and its lines in the `meteors` block are its hash
 input. The world lines in the other phases' blocks are the world tables at that phase; they have no
 row of their own.
@@ -972,7 +1010,8 @@ To recompute a hash from the dump:
   `LiteGoalState`) and of 8.12 (`ScriptChannelPiece`, `ScriptChannelDelay`, `ScriptChannelWait`),
   and `MissionStartRest`, `PathfinderSearch`, are hashed exactly when the table's fields are present
   at the same path.
-- `SpotObject` against `SpotAnim` is told by the names of the fields at the path.
+- `SpotObject` against `SpotAnim` is told by the names of the fields at the path: the line after
+  `features[i].next` is `anim.index` for a SpotAnim and `state` for a SpotObject (section 7.5).
 
 ## 11. Rules that decide hashed bytes
 

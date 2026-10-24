@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "unit_orders_406300.h"
 class UnitMotion;
 struct Player;
 struct Unit;

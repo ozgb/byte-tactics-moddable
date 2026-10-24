@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../util/vec3.h"
+#include "vtol_orders_412710.h"
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& v) { Vec3 r = a; r.x += v.x; r.y += v.y; r.z += v.z; return r; }
 
 #include "../state/block.h"

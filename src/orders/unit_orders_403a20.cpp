@@ -2,6 +2,7 @@
 #include "win_types.h"
 #include <math.h>
 #include "../util/vec3.h"
+#include "unit_orders_403a20.h"
 
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& other)
 {

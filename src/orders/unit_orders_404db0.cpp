@@ -5,6 +5,7 @@
 #include "box.h"
 
 #include "../util/angles.h"
+#include "unit_orders_404db0.h"
 
 struct Unit;
 

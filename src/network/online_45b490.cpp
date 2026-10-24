@@ -1,5 +1,6 @@
 #include <string.h>
 #include "../../interfaces/host.h"
+#include "online_45b490.h"
 
 char* __stdcall Translate(char* text);
 

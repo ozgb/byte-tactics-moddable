@@ -1,5 +1,6 @@
 #include <string.h>
 #include "../../interfaces/host.h"
+#include "online_45b670.h"
 
 extern int DAT_00512c80[0x54];
 extern int g_onlineConfigLoaded;

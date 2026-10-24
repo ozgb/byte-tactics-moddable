@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ta_types.h"
+#include "multi_449bb0.h"
 
 #pragma pack(push, 1)
 struct PlayerInfo_00449bb0 {

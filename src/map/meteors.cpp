@@ -16,6 +16,7 @@
 #include "../util/tdf.h"
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
+#include "meteors.h"
 
 
 class MeteorParams {

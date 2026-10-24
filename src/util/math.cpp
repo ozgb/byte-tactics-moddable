@@ -5,6 +5,7 @@
 #include "../state/sim_globals.h"
 
 #include "../../link/globals.h"
+#include "math.h"
 
 // FUNCTION: 0x4b6b80
 void __stdcall ShowErrorBox(const char* message, int unused)

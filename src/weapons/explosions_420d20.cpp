@@ -5,6 +5,7 @@
 #include "../graphics/gaf_frame.h"
 
 #include "../graphics/gaf.h"
+#include "explosions_420d20.h"
 
 // FUNCTION: 0x420d20
 GafFrame* BuildExplosionFrame(int size)

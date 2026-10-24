@@ -10,6 +10,7 @@
 
 #include "string_ref.h"
 #include "tdf.h"
+#include "tdf_4c54f0.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 

@@ -5,6 +5,7 @@
 #include "../util/vec3.h"
 
 #include "mission_type.h"
+#include "vtol_orders_4152f0.h"
 
 struct Unit;
 class LandingPadList : public std::vector<Unit*> {};

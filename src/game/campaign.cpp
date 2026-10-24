@@ -1,3 +1,5 @@
+#include "campaign.h"
+
 struct FileHandle;
 
 #include "data_files.h"

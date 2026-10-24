@@ -1,4 +1,5 @@
 #include <vector>
+#include "vtol_orders_4103e0.h"
 struct Unit;
 namespace std {
 template<> class vector<Unit*,allocator<Unit*> > {

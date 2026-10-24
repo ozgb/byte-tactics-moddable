@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "../util/vec3.h"
+#include "unit_script_calls.h"
 
 
 struct Diff_00480570 { int dx; int dy; };

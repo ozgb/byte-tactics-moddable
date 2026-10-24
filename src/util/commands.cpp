@@ -1,4 +1,5 @@
 #include <vector>
+#include "commands.h"
 
 class CommandEntry;
 

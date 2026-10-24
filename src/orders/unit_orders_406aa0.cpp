@@ -3,6 +3,7 @@
 #include "../util/vec3.h"
 #include "../../interfaces/seams.h"
 #include "../ai/vec.h"
+#include "unit_orders_406aa0.h"
 static inline Vec Add(const Vec& a,const Vec& b) { Vec r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
 static inline Vec Sub(const Vec& a,const Vec& b) { Vec r; r.x=a.x-b.x; r.y=a.y-b.y; r.z=a.z-b.z; return r; }
 #pragma pack(push,1)

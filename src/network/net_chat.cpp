@@ -18,6 +18,7 @@
 #include "../state/sim_globals.h"
 
 #include "../../link/globals.h"
+#include "net_chat.h"
 
 void __stdcall PlaySoundByName(char* name, int param_2);
 #include "../gui/dialogs.h"

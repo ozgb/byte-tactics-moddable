@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "vtol_orders_40fbe0.h"
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& b) { Vec3 r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
 struct Unit;
 struct Order;

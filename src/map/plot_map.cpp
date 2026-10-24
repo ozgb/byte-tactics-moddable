@@ -1,5 +1,6 @@
 #include "win_types.h"
 #include <string.h>
+#include "plot_map.h"
 
 #pragma pack(push, 1)
 struct Cell {

@@ -6,6 +6,7 @@
 
 #include "../state/block.h"
 #include "mission_type.h"
+#include "vtol_orders_410e70.h"
 
 struct Unit;
 #include "unit_motion.h"

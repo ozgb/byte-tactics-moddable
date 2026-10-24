@@ -1,3 +1,5 @@
+#include "exe_only.h"
+
 // GLOBAL: 0x507948
 char* g_sideNames[2] = {"Arm", "Core"};
 // GLOBAL: 0x507950

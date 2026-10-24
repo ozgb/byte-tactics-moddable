@@ -7,6 +7,7 @@
 #include "../state/game_rand.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/host.h"
+#include "game_state.h"
 
 struct Display_00491a70;
 struct Src_004ab400;

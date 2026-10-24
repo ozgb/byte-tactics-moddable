@@ -3,6 +3,7 @@
 #include "display.h"
 #include "palette.h"
 #include "object_pool.h"
+#include "palette_tables.h"
 void __stdcall BuildGrayTable(unsigned int palette);
 void __stdcall BuildBlueTable(unsigned int palette);
 

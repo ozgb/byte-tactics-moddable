@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "../map/mission.h"
+#include "settings.h"
 
 #pragma pack(push, 1)
 struct SkirmishPlayer {

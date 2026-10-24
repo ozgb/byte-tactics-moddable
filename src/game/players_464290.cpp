@@ -7,6 +7,7 @@
 #include "mission_conditions.h"
 #include "../game/unit_resources.h"
 #include "../files/files_api.h"
+#include "players_464290.h"
 
 struct Player;
 struct Unit;

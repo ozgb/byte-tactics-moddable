@@ -10,6 +10,7 @@
 #include "../harness/condition_class.h"
 #include "victory_conditions.h"
 #include "../state/sim_globals.h"
+#include "victory.h"
 
 typedef void* SimView_DAT_005119b8;
 #undef DAT_005119b8

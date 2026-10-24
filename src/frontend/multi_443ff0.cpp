@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "multi_443ff0.h"
 extern "C" __declspec(dllimport) char* __stdcall lstrcpynA(char*, const char*, int);
 struct Guid_443ff0 { unsigned long data1; unsigned short data2; unsigned short data3; unsigned char data4[8]; };
 #pragma pack(push,1)

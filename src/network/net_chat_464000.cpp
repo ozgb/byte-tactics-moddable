@@ -1,3 +1,5 @@
+#include "net_chat_464000.h"
+
 struct ChatHudEntryView {
     char unknown_0[0x1e];
     unsigned char flags;

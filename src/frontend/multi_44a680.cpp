@@ -9,6 +9,7 @@
 #include "../network/player.h"
 
 #include "../network/player_info.h"
+#include "multi_44a680.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int AimCobStub(int, int, int, int);

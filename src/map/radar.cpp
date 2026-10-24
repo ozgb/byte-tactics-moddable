@@ -1,6 +1,7 @@
 #include "win_types.h"
 #include <stdio.h>
 #include <math.h>
+#include "radar.h"
 
 struct Point_4665d0 {
     int x;

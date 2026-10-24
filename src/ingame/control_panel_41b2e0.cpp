@@ -2,6 +2,7 @@
 #include "../../interfaces/ref.h"
 #include <memory.h>
 #include "ta_types.h"
+#include "control_panel_41b2e0.h"
 
 #pragma pack(push, 1)
 struct UnitType_0041b2e0 {

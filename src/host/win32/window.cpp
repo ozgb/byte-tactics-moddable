@@ -3,6 +3,7 @@
 
 #include "../../../interfaces/host.h"
 #include "headless.h"
+#include "window.h"
 
 namespace {
 

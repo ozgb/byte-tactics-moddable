@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../interfaces/host.h"
+#include "net_condenser.h"
 
 #pragma pack(push, 1)
 struct Net_0044f9c0 {

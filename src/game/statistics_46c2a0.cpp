@@ -7,6 +7,7 @@
 
 #pragma pack(push, 1)
 #include "../network/player_info.h"
+#include "statistics_46c2a0.h"
 
 struct Game_0046c2a0 {
     char unknown_0[0x1b63];

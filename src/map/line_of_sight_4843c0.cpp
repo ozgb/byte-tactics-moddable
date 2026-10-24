@@ -1,5 +1,6 @@
 #include <string.h>
 #include "win_types.h"
+#include "line_of_sight_4843c0.h"
 
 #pragma pack(push, 1)
 

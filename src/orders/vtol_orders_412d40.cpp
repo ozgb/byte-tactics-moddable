@@ -3,6 +3,7 @@
 
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "vtol_orders_412d40.h"
 
 static inline short Whole(const int& v) { return ((short*)&v)[1]; }
 

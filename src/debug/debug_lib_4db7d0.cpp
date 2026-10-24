@@ -3,6 +3,7 @@
 #include "free_block_map.h"
 
 #include "../../link/globals.h"
+#include "debug_lib_4db7d0.h"
 extern void (*g_outOfMemoryHandler)();
 
 class BlockInfo {

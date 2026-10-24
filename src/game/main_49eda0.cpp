@@ -5,6 +5,7 @@
 #include "../quirks/quirks.h"
 #include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
+#include "main_49eda0.h"
 
 #pragma pack(push, 1)
 struct Game_0049ee30 {

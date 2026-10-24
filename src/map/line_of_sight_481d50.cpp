@@ -5,6 +5,7 @@
 #include "los_tables.h"
 
 #include "../../interfaces/ref.h"
+#include "line_of_sight_481d50.h"
 #pragma pack(push, 1)
 
 class LosLine {

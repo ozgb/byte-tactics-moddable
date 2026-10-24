@@ -2,6 +2,7 @@
 
 #include "../state/block.h"
 #include "box.h"
+#include "vtol_orders_414770.h"
 
 struct Unit;
 

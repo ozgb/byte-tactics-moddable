@@ -10,6 +10,7 @@
 #pragma pack(pop)
 
 #include "../../link/globals.h"
+#include "share_commands.h"
 
 class CommandArgs {
 public:

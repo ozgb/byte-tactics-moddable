@@ -1,5 +1,6 @@
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "vtol_orders_414a80.h"
 
 static inline Vec3 Sub(const Vec3& a, const Vec3& b)
 {

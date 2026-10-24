@@ -1,4 +1,5 @@
 #include "../util/vec3.h"
+#include "terrain_47e2d0.h"
 
 struct UnitDef;
 

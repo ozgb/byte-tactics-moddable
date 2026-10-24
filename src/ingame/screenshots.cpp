@@ -2,6 +2,7 @@
 
 #include "../map/mission.h"
 #include "../../interfaces/seams.h"
+#include "screenshots.h"
 
 struct Input_00499890 {
     int fields[6];

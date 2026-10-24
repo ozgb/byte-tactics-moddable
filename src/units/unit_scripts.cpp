@@ -9,6 +9,7 @@
 
 #include "../map/mission.h"
 #include "../sound/sound.h"
+#include "unit_scripts.h"
 
 
 struct Unit_0043e490;

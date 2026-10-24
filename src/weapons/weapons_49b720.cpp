@@ -10,6 +10,7 @@
 
 
 #include "../units/unit.h"
+#include "weapons_49b720.h"
 
 struct Net_0049b720 {
     char unknown_0[0xd48];

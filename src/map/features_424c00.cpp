@@ -1,6 +1,7 @@
 #include "win_types.h"
 #include "ta_types.h"
 #include <string.h>
+#include "features_424c00.h"
 
 struct Spot_00424c00 {
     char unknown_0[4];

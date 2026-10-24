@@ -9,6 +9,7 @@
 #include <float.h>
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "vtol_orders_410850.h"
 struct Unit;
 struct Order;
 #include "mission_type.h"

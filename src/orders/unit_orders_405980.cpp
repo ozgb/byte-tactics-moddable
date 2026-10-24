@@ -1,6 +1,7 @@
 #include <vector>
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "unit_orders_405980.h"
 struct Unit;
 #include "mission_type.h"
 

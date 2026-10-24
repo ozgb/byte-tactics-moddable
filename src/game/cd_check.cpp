@@ -2,6 +2,7 @@
 #include <string.h>
 #include "win_types.h"
 #include "../../interfaces/host.h"
+#include "cd_check.h"
 
 class TdfRecord;
 

@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "../../interfaces/host.h"
+#include "online_report.h"
 
 struct Net_4c97b0;
 

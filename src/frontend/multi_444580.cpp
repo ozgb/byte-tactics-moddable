@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "../../interfaces/host.h"
+#include "multi_444580.h"
 
 #pragma pack(push, 1)
 struct Entry_00444580 {

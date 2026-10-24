@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../util/vec3.h"
+#include "vtol_orders_411f50.h"
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& other)
 {
     Vec3 r;

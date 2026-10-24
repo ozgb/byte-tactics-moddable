@@ -1,3 +1,5 @@
+#include "debug_lib_4d8310.h"
+
 // FUNCTION: 0x4d8310
 void __cdecl CheckFillPattern(unsigned int* block, unsigned int fill, unsigned int size)
 {

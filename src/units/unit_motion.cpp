@@ -8,6 +8,7 @@
 #include "cob_script.h"
 
 #include "../map/cell.h"
+#include "unit_motion.h"
 
 struct Point16_437840 {
     short x;

@@ -4,6 +4,7 @@
 #include "player_info.h"
 
 #include "../game/game.h"
+#include "net_game_450530.h"
 
 struct Msg_00450530 {
     unsigned char type;

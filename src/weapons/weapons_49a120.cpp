@@ -1,5 +1,6 @@
 #include <math.h>
 #include <string.h>
+#include "weapons_49a120.h"
 
 union Fixed_0049a120 {
     int raw;

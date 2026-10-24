@@ -1,3 +1,5 @@
+#include "options_45c820.h"
+
 class Sound {
 public:
     char unknown_0[4];

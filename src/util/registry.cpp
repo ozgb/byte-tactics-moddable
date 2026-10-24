@@ -4,6 +4,7 @@
 #include "../../interfaces/host.h"
 
 #include "../graphics/rect.h"
+#include "registry.h"
 
 // FUNCTION: 0x4b6750
 int __stdcall RectInsideRect(Rect* a, Rect* b)

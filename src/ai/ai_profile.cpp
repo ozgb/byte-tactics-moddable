@@ -9,6 +9,7 @@
 #include "../game/game.h"
 #pragma pack(pop)
 #include "../../link/globals.h"
+#include "ai_profile.h"
 
 extern int __cdecl _strcmpi(const char*, const char*);
 

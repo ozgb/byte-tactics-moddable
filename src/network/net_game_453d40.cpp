@@ -17,6 +17,7 @@
 #include "../units/cob_script.h"
 
 #include "../units/unit.h"
+#include "net_game_453d40.h"
 
 class UnitSync {
 public:

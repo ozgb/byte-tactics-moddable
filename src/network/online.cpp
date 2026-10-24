@@ -1,6 +1,7 @@
 #include "../../interfaces/host.h"
 
 #include "../../link/globals.h"
+#include "online.h"
 
 void __stdcall Translate(unsigned char* text);
 

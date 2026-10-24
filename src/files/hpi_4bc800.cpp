@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "archive_entry.h"
+#include "hpi_4bc800.h"
 
 struct ArchiveDirectory {
     int count;

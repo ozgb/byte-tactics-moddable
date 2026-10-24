@@ -23,6 +23,7 @@
 #include "../frontend/skirmish_menu.h"
 #include "../frontend/endgame.h"
 #include "../debug/debug_lib.h"
+#include "harness.h"
 
 enum { MAX_PLAYERS = 10 };
 

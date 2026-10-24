@@ -1,6 +1,7 @@
 #include "../../interfaces/seams.h"
 #include "win_types.h"
 #include <math.h>
+#include "vtol_orders_4118e0.h"
 
 struct Point { short x, y; };
 #include "../state/block.h"

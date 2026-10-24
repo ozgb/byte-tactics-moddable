@@ -3,6 +3,7 @@
 #include "free_block_map.h"
 
 #include "../../link/globals.h"
+#include "debug_lib_4dacf0.h"
 
 class BlockInfo {
 public:

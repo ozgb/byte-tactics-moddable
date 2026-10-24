@@ -20,6 +20,7 @@
 
 #include "../util/string_ref.h"
 #include "../state/sim_globals.h"
+#include "unit_types_42a8d0.h"
 
 struct Elem_00432be0 {
     char* data;

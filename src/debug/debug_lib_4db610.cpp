@@ -1,5 +1,6 @@
 #include <map>
 #include "../../interfaces/host.h"
+#include "debug_lib_4db610.h"
 
 class FreeBlockAllocator {
 public:

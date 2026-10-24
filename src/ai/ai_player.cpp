@@ -705,7 +705,7 @@ void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
 
 // SquadTimer::TryGetBaseBuildOrScoutCentroid, inlined: the position of the first of three of
 // the owner's squads that has one.
-static inline int Rally(SquadManager*& owner, Vec3* pos)
+static inline int Rally(Ref<SquadManager>& owner, Vec3* pos)
 {
     if (owner->timers[5]->GetAveragePosition(pos))
         return 1;
@@ -969,9 +969,11 @@ void __stdcall RetargetWeapon(Unit* unit, unsigned int weapon)
 void SquadManager::RetargetWeapons(int force)
 {
     for (int i = 0; i <= g_game->field_37ee6 / 30; i++) {
-        if (cursor && cursor != player->unitsEnd)
-            cursor++;
-        else
+        if (cursor && cursor != player->unitsEnd) {
+            Unit* next = cursor;
+            next++;
+            cursor = next;
+        } else
             cursor = player->unitsBegin;
         if (cursor->unitDefIndex != 0 && cursor->buildLeft == Zero_004fc968 && (cursor->flags & 0x80000000)
             && (cursor->flags & 0x300000) == 0x200000) {

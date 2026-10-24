@@ -2,6 +2,7 @@
 #define SQUAD_TIMER_H
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 class SquadManager;
 struct Group;
@@ -9,8 +10,8 @@ struct Unit;
 
 class SquadTimer {
 public:
-    SquadManager* owner;
-    Group* group;
+    Ref<SquadManager> owner;
+    Ref<Group> group;
     int next;
     unsigned int player;
 

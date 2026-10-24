@@ -187,7 +187,6 @@ Game,vismasks,int-pointer,src/game/game.h,#353
 Game,xform,pointer,src/game/game.h,#353
 Grid,cells,pointer,src/map/grid.h,#350
 Grid2,cells,pointer,src/map/grid2.h,#350
-Group,player,pointer,src/ai/group.h,#351
 Group,units,container,src/ai/group.h,#361
 Gui,fallback,pointer,src/gui/gui.h,#353
 Gui,gaf,pointer,src/gui/gui.h,#353
@@ -221,8 +220,6 @@ MapInfo,grid,pointer,src/map/map_info.h,#350
 MapInfo,visibilityMask,pointer,src/map/map_info.h,#350
 Menu_0045b800,holder,pointer,src/frontend/menu_0045b800.h,#353
 Mission,mapList,pointer,src/map/mission.h,#352
-MissionConditions,defeat,pointer,src/game/mission_conditions.h,#351
-MissionConditions,victory,pointer,src/game/mission_conditions.h,#351
 MissionUnit,ident,pointer,src/map/mission.h,#350
 MissionUnit,initialMission,pointer,src/map/mission.h,#350
 MissionUnit,name,pointer,src/map/mission.h,#350
@@ -258,8 +255,6 @@ PacketReceiver,owner,pointer,src/network/packet_receiver.h,#351
 PacketReceiver,savedFrameEntry,pointer,src/network/packet_receiver.h,#351
 PacketReceiver,spare,pointer,src/network/packet_receiver.h,#351
 PacketRing,buf,pointer,src/network/packet_ring.h,#351
-PathGoal,owner,pointer,src/ai/ai_search_goal.h,#351
-PathGoal,target,pointer,src/ai/ai_search_goal.h,#351
 PathOrderAttach,value,pointer,src/orders/path_order_attach.h,#349
 Pathfinder,cursor,pointer,src/ai/pathfinder.h,#350
 Pathfinder,object,pointer,src/ai/pathfinder.h,#350
@@ -272,14 +267,9 @@ Piece_459c70,child,pointer,src/graphics/model_types.h,#353
 Piece_459c70,object,pointer,src/graphics/model_types.h,#353
 Piece_459c70,parent,pointer,src/graphics/model_types.h,#353
 Piece_459c70,sibling,pointer,src/graphics/model_types.h,#353
-Player,explored,pointer,src/network/player.h,#351
-Player,info,pointer,src/network/player.h,#351
-Player,unitsBegin,pointer,src/network/player.h,#351
-Player,unitsEnd,pointer,src/network/player.h,#351
 PlayerAI,cells,container,src/ai/player_ai.h,#361
 PlayerAI,counts,container,src/ai/player_ai.h,#361
 PlayerAI,locked,container,src/ai/player_ai.h,#361
-PlayerAI,owner,pointer,src/ai/player_ai.h,#351
 PlayerAI,values,container,src/ai/player_ai.h,#361
 PlayerAI,vec_65,container,src/ai/player_ai.h,#361
 PlayerAI,vec_8d,container,src/ai/player_ai.h,#361
@@ -308,11 +298,6 @@ SpotState,bitmap,pointer,src/graphics/spot_state.h,#353
 SpotState,owner,pointer,src/graphics/spot_state.h,#353
 SpotState,ownerPointer,pointer,src/graphics/spot_state.h,#353
 SpotState,root,pointer,src/graphics/spot_state.h,#353
-SquadManager,cursor,pointer,src/ai/squad_manager.h,#351
-SquadManager,player,pointer,src/ai/squad_manager.h,#351
-SquadManager,timers,pointer,src/ai/squad_manager.h,#351
-SquadTimer,group,pointer,src/ai/squad_timer.h,#351
-SquadTimer,owner,pointer,src/ai/squad_timer.h,#351
 StringRef,data,pointer,src/util/string_ref.h,#353
 StringRef,p,pointer,src/util/string_ref.h,#353
 StringRef,ptr,pointer,src/util/string_ref.h,#353

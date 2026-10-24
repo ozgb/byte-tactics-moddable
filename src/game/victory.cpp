@@ -102,7 +102,7 @@ void __stdcall PlaySoundByName(char* str, int flag);
 
 
 // Appends a condition to one of the two lists, at the caller's count.
-static inline void AddCondition(MissionCondition** list, int* count, MissionCondition* value)
+static inline void AddCondition(Ref<MissionCondition>* list, int* count, MissionCondition* value)
 {
     list[*count] = value;
     (*count)++;
@@ -1436,7 +1436,7 @@ void PackedPosGoal::DeserializeNetUnitState(BitReader* reader)
     }
     int kind = reader->ReadBits(2);
     if (kind == 1)
-        target = new (kSim) Class_0044e080((Struct_004907e0*)owner, reader);
+        target = new (kSim) Class_0044e080((Struct_004907e0*)owner.get(), reader);
     else if (kind == 2)
         target = new (kSim) AirManeuverOrder(owner, reader);
     int state = reader->ReadBits(2);

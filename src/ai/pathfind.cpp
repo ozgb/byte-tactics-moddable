@@ -684,7 +684,7 @@ void Pathfinder::RunSearches()
                     steps += 100;
                     costScale = g_playerBudgetCap[player];
                     // The redundant ((Pathfinder*)this)-> casts stay; removing them changes ProbeStraightPath.
-                    ((Pathfinder*)this)->StartSearch((Target*)path->target);
+                    ((Pathfinder*)this)->StartSearch((Target*)path->target.get());
                 }
             }
         // Loop is `while (1)` with the empty test inside, under this else-if.

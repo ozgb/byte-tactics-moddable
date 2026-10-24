@@ -220,7 +220,7 @@ void __stdcall UpdateEnergyText(Gui_00449bb0* gui, int unused)
 
         _itoa(shown, text, 10);
         SetTranslatedTextByName(gui, "ENERGYTEXT", text, 0);
-        info = (PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info;
+        info = (PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info.get();
         info->energy = (unsigned short)(shown / 100);
         if (info->f97_0 & 1) {
             BroadcastPlayerInfo();
@@ -265,7 +265,7 @@ void OpenBattleRoom()
     g_game->dirty = 1;
     memset(g_game->playerIds, 0, sizeof(g_game->playerIds));
     // info before player: stores the player pointer without its 0x1b63 bias.
-    info = (PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info;
+    info = (PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info.get();
     player = &g_game->players[g_game->localPlayer];
     host = info->f97_0;
     g_game->lobbyInitScratch = 0;
@@ -306,7 +306,7 @@ void OpenBattleRoom()
                 g_game->commanderDeath = commander;
                 // Block-local pointer: the original forms 0x1b63 first, then reads +0x27.
                 Player* p = &g_game->players[g_game->localPlayer];
-                ((PlayerInfo_00449bb0*)p->info)->b.commander = commander;
+                ((PlayerInfo_00449bb0*)p->info.get())->b.commander = commander;
             }
         }
         if (g_lobbyEnergy)
@@ -354,10 +354,10 @@ void OpenBattleRoom()
     *g_game->chatter = 0;
     {
         Gadget_00449bb0* mem = FindGadgetChecked_C(g_game->gui.table->entries, "MEMx");
-        mem->colour = ((PlayerInfo_00449bb0*)player->info)->memory < ((Class_00435920*)g_game->map)->GetTerrainSizeTier() ? 0xc : 0;
-        sprintf(mem->text, "%d", ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info)->memory);
+        mem->colour = ((PlayerInfo_00449bb0*)player->info.get())->memory < ((Class_00435920*)g_game->map)->GetTerrainSizeTier() ? 0xc : 0;
+        sprintf(mem->text, "%d", ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info.get())->memory);
     }
-    isHost = ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info)->f97_0;
+    isHost = ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info.get())->f97_0;
     CreateUnitSync(isHost);
     SetGadgetActiveByName(&g_game->gui, "START", g_game->net->AllPlayersSynced());
     SetGrayedOutByName(&g_game->gui, "START",

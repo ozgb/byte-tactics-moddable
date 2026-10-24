@@ -161,8 +161,8 @@ void RefreshSelectionOrders()
     } else {
         first = 0;
         count = 0;
-        Unit_0041b2e0* last = (Unit_0041b2e0*)player->unitsEnd;
-        for (u = (Unit_0041b2e0*)player->unitsBegin; u <= last; u++) {
+        Unit_0041b2e0* last = (Unit_0041b2e0*)player->unitsEnd.get();
+        for (u = (Unit_0041b2e0*)player->unitsBegin.get(); u <= last; u++) {
             if (u->unitDefIndex == 0)
                 continue;
             UnitFlags_0041b2e0 flags = u->flags;

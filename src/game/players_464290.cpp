@@ -259,7 +259,7 @@ guard:
     // stops that propagation, and it also stops the scheduler from hoisting
     // the size load `mov ecx, [esi+0x88]` above the phi store (with the size
     // read directly the load comes first, the original has it second).
-    unsigned char*& bref = p->explored;
+    Ref<unsigned char>& bref = p->explored;
     memset(bref, 0, sz);
     g_seams.ai->CreateSquads(p);
     // Keep `||` with both tests as written: the branch layout depends on it.

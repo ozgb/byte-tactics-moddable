@@ -2,13 +2,14 @@
 #define GROUP_H
 
 #include "../state/sim_allocator.h"
+#include "../../interfaces/ref.h"
 
 struct Player;
 struct Unit;
 struct Vec3;
 
 struct Group {
-    Player* player;
+    Ref<Player> player;
     int id;
     char unknown_8[0x10 - 0x8];
     SimVector<Unit*> units;

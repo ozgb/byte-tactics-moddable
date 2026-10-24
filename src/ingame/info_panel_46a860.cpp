@@ -4,6 +4,7 @@
 // not use.
 // Draws the selected unit / feature info panel (and the PFSTATE debug overlay).
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include <stdio.h>
 
 struct Game;
@@ -51,8 +52,8 @@ struct WeaponDef_0046a860 {
 // signednesses of +0x108 both appear in this file, so the field is a union.
 struct Unit_0046a860 {
     char unknown_0[0x92];
-    UnitDef* def;                     // +0x92
-    Player* player;                   // +0x96
+    Ref<UnitDef> def;
+    Ref<Player> player;
     char unknown_9a[0xa6 - 0x9a];
     unsigned short unitDefIndex;      // +0xa6
     unsigned short id;                // +0xa8
@@ -345,7 +346,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                 if (gameMode == 3 && flagsOk)
                     strcpy(text, unit->player->name);
                 else
-                    strcpy(text, (char*)unit->def);
+                    strcpy(text, (char*)unit->def.get());
                 int titleX = panel->rcUnitName.left -
                              GetTextWidth((void*)panel->pFontData, (unsigned char*)text) / 2;
                 SetTextColors(0x53, GetTextKeyColor());
@@ -416,9 +417,9 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     if (!target->unitDefIndex || !IsUnitVisibleToPlayer(playerMap, target))
                         return;
                     int targetX = panel->rcUnitName2.left -
-                                  GetTextWidth((void*)panel->pFontData, (unsigned char*)target->def) / 2;
+                                  GetTextWidth((void*)panel->pFontData, (unsigned char*)target->def.get()) / 2;
                     SetTextColors(0x53, GetTextKeyColor());
-                    DrawString(surface, (unsigned char*)target->def, targetX,
+                    DrawString(surface, (unsigned char*)target->def.get(), targetX,
                                  panel->rcUnitName2.top + yOffset, -1);
                     if (target->player->index == g_game->playerIndex ||
                         !(target->def->flags1 & 0x4000)) {

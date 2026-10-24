@@ -80,7 +80,7 @@ int __stdcall GetOrderName(Unit* obj);
 int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 0x40) return 5;
-    if (unit->spatialBucket == g_game->overflowBucket) {
+    if ((int)unit->spatialBucket.get() == g_game->overflowBucket) {
         Vec3 center;
         center.x=(g_game->mapWidth/2)<<16;
         center.z=(g_game->mapHeight/2)<<16;
@@ -105,8 +105,8 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
                 g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
                 if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
                 g_seams.units->SetStateBits(unit, 1,1);
-                if ((((UnitMotion*)unit->motion)->flags&3)==1) {
-                    ((UnitMotion*)unit->motion)->SetFlightMode(unit,2);
+                if ((unit->motion->flags&3)==1) {
+                    unit->motion->SetFlightMode(unit,2);
                     Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,unit->pos);
                     ((Class_0044e6c0*)move)->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx(move);
@@ -120,7 +120,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
         if ((unsigned int)unit->health < (unit->def->maxHealth>>2)*3) {
             LandingPadList pads;
-            g_seams.ai->GetFactoriesInRadius(((Owner*)unit->player)->index,&unit->pos,0xf00,&pads);
+            g_seams.ai->GetFactoriesInRadius(((Owner*)unit->player.get())->index,&unit->pos,0xf00,&pads);
             if (!pads.empty()) {
                 order->SetAttachedFx(0);
                 Unit* pad=pads[RandomInt(pads.count())];

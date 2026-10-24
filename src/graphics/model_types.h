@@ -2,6 +2,7 @@
 #define MODEL_TYPES_H
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 #include "gaf_frame.h"
 #include "object3do.h"
 
@@ -54,7 +55,7 @@ struct Piece_459c70 {
     short short_12;
     short short_14;
     Vec3 offset;
-    Vec3* points;
+    Ref<Vec3> points;
     short modified;
     PieceFlags_459c70 flags;
     Piece_459c70* sibling;
@@ -68,7 +69,7 @@ struct Model_459200;
 
 #pragma pack(push, 1)
 struct Unit_459200 {
-    void* motion;
+    Ref<char> motion;
     char unknown_4[0x60];
     Vector3s angles;
     int pos_x;
@@ -76,11 +77,11 @@ struct Unit_459200 {
     int pos_z;
     char unknown_76[0x86 - 0x76];
     int carrier;
-    Unit_459200* cargo;
-    Unit_459200* cargoNext;
-    UnitDef* def;
+    Ref<Unit_459200> cargo;
+    Ref<Unit_459200> cargoNext;
+    Ref<UnitDef> def;
     char unknown_96[8];
-    Model_459200* state;
+    Ref<Model_459200> state;
     char unknown_a2[4];
     short unitDefIndex;
     unsigned short id;

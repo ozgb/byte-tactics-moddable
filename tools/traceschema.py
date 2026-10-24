@@ -62,12 +62,21 @@ NAMES: dict[str, dict[int, str]] = {
 }
 
 POINTERS: dict[str, dict[int, str]] = {
-    "Unit": {0x0: "HEAP", 0x8: "HEAP", 0x24: "HEAP", 0x40: "HEAP", 0x82: "REC", 0x86: "UNIT"},
+    "Unit": {0x0: "HEAP", 0x4: "HEAP", 0x8: "HEAP", 0xC: "WEAPONDEF", 0x10: "HEAP", 0x24: "HEAP", 0x2C: "HEAP",
+             0x40: "HEAP", 0x48: "HEAP", 0x82: "REC", 0x86: "UNIT"},
     "Projectile": {0x4E: "HEAP"},
     "Debris": {0x0: "PIECE"},
 }
 
-POINTER_NAMES: dict[tuple[str, int], str] = {}
+REFS: dict[str, set[int]] = {
+    "MoveClass": {0x18},
+    "Projectile": {0x4E},
+}
+
+POINTER_NAMES: dict[tuple[str, int], str] = {
+    ("Unit", 0x4): "current", ("Unit", 0xC): "type", ("Unit", 0x10): "weapon",
+    ("Unit", 0x2C): "f2c", ("Unit", 0x48): "f48",
+}
 
 EXCLUSIONS: list[tuple[str, str, str]] = [
     ("Eye", "screen", "points at the record's own screenPos"),
@@ -230,7 +239,7 @@ MASKS: dict[tuple[str, int], tuple[int, str]] = {
 
 SYNTHETIC: dict[str, str] = {
     "ExplodedPiece": """
-        Unit* unit;
+        Ref<Unit> unit;
         int index;
         int angVelZ;
         int angVelX;
@@ -241,7 +250,7 @@ SYNTHETIC: dict[str, str] = {
         int ticks;
         int scale;
         unsigned int flags;
-        void* rec;
+        Ref<void> rec;
     """,
     "PieceRec": """
         Object3do* desc;
@@ -250,7 +259,7 @@ SYNTHETIC: dict[str, str] = {
         short angle_12;
         short angle_14;
         Vec3 pos;
-        void* verts;
+        Ref<void> verts;
         char unknown_26[2];
         unsigned short flags;
         void* link0;
@@ -382,10 +391,10 @@ SYNTHETIC.update({
         unsigned char state;          // +0x5
         unsigned int flags6;          // +0x6
         unsigned int wakeFrame;       // +0xa
-        Unit* unit;                   // +0xe
+        Ref<Unit> unit;                   // +0xe
         char linkVptr[4];             // +0x12
-        Unit* linkOwner;              // +0x16
-        LinkRef* linkNext;            // +0x1a
+        Ref<Unit> linkOwner;              // +0x16
+        Ref<LinkRef> linkNext;            // +0x1a
         OrderRef* linkValue;          // +0x1e
         Vec3 pos;                     // +0x22
         Point16 start;                // +0x2e
@@ -395,20 +404,20 @@ SYNTHETIC.update({
         int arg2;                     // +0x3e
         unsigned int flags;           // +0x42
         unsigned int created;         // +0x46
-        OrderRef* next;               // +0x4a
+        Ref<OrderRef> next;           // +0x4a
         unsigned int subFlags;        // +0x4e
-        OrderFxRef* attached;         // +0x52
+        Ref<OrderFxRef> attached;        // +0x52
     """,
     "ApproachRadius": """
         char vptr[4];                 // +0x0
-        OrderRef* source;             // +0x4
+        Ref<OrderRef> source;             // +0x4
         Point16 pos;                  // +0x8
         int radius;                   // +0xc
         int radiusSq;                 // +0x10
     """,
     "RingApproach": """
         char vptr[4];                 // +0x0
-        OrderRef* source;             // +0x4
+        Ref<OrderRef> source;             // +0x4
         Point16 pos;                  // +0x8
         int radius2;                  // +0xc
         int radius1;                  // +0x10
@@ -417,7 +426,7 @@ SYNTHETIC.update({
     """,
     "PointMarker": """
         char vptr[4];                 // +0x0
-        OrderRef* source;             // +0x4
+        Ref<OrderRef> source;             // +0x4
         int x1;                       // +0x8
         int x2;                       // +0xc
         int y1;                       // +0x10
@@ -425,33 +434,33 @@ SYNTHETIC.update({
     """,
     "PathOrder": """
         char vptr[4];                 // +0x0
-        OrderRef* source;             // +0x4
+        Ref<OrderRef> source;             // +0x4
         unsigned short flags;         // +0x8
         short approachRadius;         // +0xa
         short altitude;               // +0xc
         short heading;                // +0xe
         short piece;                  // +0x10
-        Unit* unit;                   // +0x12
+        Ref<Unit> unit;               // +0x12
         char refVptr[4];              // +0x16
-        Unit* refOwner;               // +0x1a
-        LinkRef* refNext;             // +0x1e
+        Ref<Unit> refOwner;               // +0x1a
+        Ref<LinkRef> refNext;             // +0x1e
         OrderRef* refValue;           // +0x22
         Vec3 pos;                     // +0x26
         int followOffset;             // +0x32
     """,
     "AirManeuverOrder": """
         char vptr[4];                 // +0x0
-        OrderRef* source;             // +0x4
+        Ref<OrderRef> source;             // +0x4
         unsigned short flags;         // +0x8
         Vec3 target;                  // +0xa
         Vec3 other;                   // +0x16
         short saveOnly22;             // +0x22
         unsigned short heading;       // +0x24
         unsigned short value26;       // +0x26
-        Unit* self;                   // +0x28
+        Ref<Unit> self;                   // +0x28
     """,
     "UnitMotion": """
-        char* obj;                    // +0x0
+        Ref<Iface_0043dd20> obj;     // +0x0
         MovementClass* movementClass; // +0x4
         Vec3 velocity;                // +0x8
         Vec3 p2;                      // +0x14
@@ -508,7 +517,7 @@ SYNTHETIC.update({
         int axis;                     // +0x14
         int waiting;                  // +0x18
         int signal;                   // +0x1c
-        char* callback;               // +0x20
+        Ref<char> callback;               // +0x20
         char stack[0x80];             // +0x24
     """,
     "ScriptPiece": """
@@ -757,7 +766,7 @@ SYNTHETIC.update({
         int damagemodifier;           // +0x1aa
         int moverate1;                // +0x1ae
         int moverate2;                // +0x1b2
-        MovementClass* movementclass; // +0x1b6
+        Ref<MovementClass> movementclass; // +0x1b6
         short turnrate;               // +0x1ba
         short corpse;                 // +0x1bc
         short maxwaterdepth;          // +0x1be
@@ -773,7 +782,7 @@ SYNTHETIC.update({
         float energystorage;          // +0x1e2
         float metalstorage;           // +0x1e6
         int buildtime;                // +0x1ea
-        WeaponDef* weapons[3];        // +0x1ee
+        Ref<WeaponDef> weapons[3];        // +0x1ee
         unsigned int maxHealth;       // +0x1fa
         unsigned short buildRate;     // +0x1fe
         short healtime;               // +0x200
@@ -792,8 +801,8 @@ SYNTHETIC.update({
         short sortbias;               // +0x21a
         short altitude;               // +0x21c
         unsigned short id;            // +0x21e
-        WeaponDef* explodeas;         // +0x220
-        WeaponDef* selfdestructas;    // +0x224
+        Ref<WeaponDef> explodeas;         // +0x220
+        Ref<WeaponDef> selfdestructas;    // +0x224
         unsigned char maxslope;       // +0x228
         unsigned char maxwaterslope;  // +0x229
         unsigned char capacity;       // +0x22a
@@ -1055,13 +1064,16 @@ class Schema:
         m = re.match(r"^(.*?)(\w+)((?:\[[^\]]+\])*)$", text)
         ctype = " ".join(m.group(1).replace("*", " * ").split())
         dims = [int(x, 0) for x in re.findall(r"\[([^\]]+)\]", m.group(3))]
+        ref = re.fullmatch(r"Ref<\s*([\w ]+?)\s*>", ctype)
+        if ref:
+            ctype = ref.group(1) + "*"
         ptr = "*" in ctype
         elem = 4 if ptr else self.size_of(ctype)
         count = 1
         for n in dims:
             count *= n
         return {"name": m.group(2), "ctype": ctype.replace(" * ", "*").replace(" *", "*"), "ptr": ptr,
-                "dims": dims, "bits": None, "size": elem * count}
+                "ref": bool(ref), "dims": dims, "bits": None, "size": elem * count}
 
     def place(self, tname, leaves, pos, explicit, d):
         if explicit is not None and explicit != pos:
@@ -1080,7 +1092,7 @@ class Schema:
             target = POINTER_TARGETS.get(base, "HEAP")
             for i in range(count):
                 label = name + ("[%d]" % i if d["dims"] else "")
-                leaves.append({"name": label, "offset": pos + 4 * i, "size": 4, "kind": "pointer",
+                leaves.append({"name": label, "offset": pos + 4 * i, "size": 4, "kind": "ref" if d.get("ref") else "pointer",
                                "target": target})
         elif ctype in BASE_SIZES:
             size = d["size"]
@@ -1100,18 +1112,21 @@ def retype_pointer(schema, key, leaves, offset, target):
     """Make bytes offset..offset+4 one pointer leaf; leaves it overlaps are cut to the bytes outside it."""
     end = offset + 4
     out = []
+    kind = "pointer"
     for leaf in leaves:
         lo, hi = leaf["offset"], leaf["offset"] + leaf["size"]
         if hi <= offset or lo >= end:
             out.append(leaf)
             continue
-        if leaf["kind"] == "pointer":
+        if leaf["kind"] == "ref" and lo == offset and hi == end:
+            kind = "ref"
+        elif leaf["kind"] in ("pointer", "ref"):
             schema.errors.append("%s: pointer override at %#x cuts the pointer at %#x" % (key, offset, lo))
         if lo < offset:
             out.append({"name": "", "offset": lo, "size": offset - lo, "kind": "bytes", "target": None})
         if hi > end:
             out.append({"name": "", "offset": end, "size": hi - end, "kind": "bytes", "target": None})
-    out.append({"name": POINTER_NAMES.get((key, offset), ""), "offset": offset, "size": 4, "kind": "pointer",
+    out.append({"name": POINTER_NAMES.get((key, offset), ""), "offset": offset, "size": 4, "kind": kind,
                 "target": target})
     out.sort(key=lambda leaf: leaf["offset"])
     return out
@@ -1124,6 +1139,9 @@ def finish(schema, ctype, key):
     leaves = [dict(leaf) for leaf in leaves]
     for offset, target in sorted(POINTERS.get(key, {}).items()):
         leaves = retype_pointer(schema, key, leaves, offset, target)
+    for leaf in leaves:
+        if leaf["offset"] in REFS.get(key, ()) and leaf["kind"] == "pointer":
+            leaf["kind"] = "ref"
     out = []
     for leaf in leaves:
         if leaf["offset"] in names and "." not in leaf["name"]:
@@ -1149,7 +1167,7 @@ def base_name(leaf):
 def plan_of(fields):
     plan = []
     for f in fields:
-        if f["kind"] == "pointer" or f.get("mask"):
+        if f["kind"] in ("pointer", "ref") or f.get("mask"):
             plan.append(f)
         elif plan and plan[-1]["kind"] == "bytes" and plan[-1]["offset"] + plan[-1]["size"] == f["offset"]:
             plan[-1] = dict(plan[-1], size=plan[-1]["size"] + f["size"])
@@ -1161,7 +1179,7 @@ def plan_of(fields):
 def emit_table(lines, cname, entries, with_name):
     lines.append("static const TraceField %s[] = {" % cname)
     for e in entries:
-        kind = {"scalar": "TF_SCALAR", "bytes": "TF_BYTES", "pointer": "TF_POINTER"}[e["kind"]]
+        kind = {"scalar": "TF_SCALAR", "bytes": "TF_BYTES", "pointer": "TF_POINTER", "ref": "TF_REF"}[e["kind"]]
         target = "TT_" + e["target"] if e["target"] else "TT_NONE"
         name = c_string(e["name"]) if with_name else '""'
         lines.append("    { %s, 0x%x, %d, %s, %s, 0x%x }," % (name, e["offset"], e["size"], kind, target,
@@ -1179,7 +1197,7 @@ def generate():
         "",
         "#define TRACE_FORMAT %d" % TRACE_FORMAT,
         "",
-        "enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER };",
+        "enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF };",
         "enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,",
         "                   TT_FEATURE, TT_PIECE, TT_REC, TT_NODE, TT_MOVECLASS, TT_ORDER, TT_ORDERFX, TT_LINK };",
         "",

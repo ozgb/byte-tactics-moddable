@@ -11,12 +11,14 @@
 #ifndef PATH_ORDER_ATTACH_H
 #define PATH_ORDER_ATTACH_H
 
+#include "../../interfaces/ref.h"
+
 struct Unit;
 
 class PathOrderAttach {
 public:
-    Unit* owner;                   // +0x4
-    PathOrderAttach* next;         // +0x8
+    Ref<Unit> owner;
+    Ref<PathOrderAttach> next;
     void* value;                   // +0xc, the object the link belongs to
 
     PathOrderAttach(Unit* o, int v);

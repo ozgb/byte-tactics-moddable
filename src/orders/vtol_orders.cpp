@@ -405,8 +405,8 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     if (unit->carrier)
         g_seams.units->AttachUnitToPiece(unit, 0, -1, 2);
     g_seams.units->SetStateBits(unit, 1, 1);
-    if ((((UnitMotion*)unit->motion)->flags & 3) == 1) {
-        ((UnitMotion*)unit->motion)->SetFlightMode(unit, 2);
+    if ((unit->motion->flags & 3) == 1) {
+        unit->motion->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, unit->pos);
         ((Class_0044e6c0*)obj)->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx(obj);
@@ -426,7 +426,7 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         return 5;
     if (flags & 0x40)
         return 5;
-    if (unit->spatialBucket == g_game->overflowBucket) {
+    if ((int)unit->spatialBucket.get() == g_game->overflowBucket) {
         Vec3 centre;
         centre.x = g_game->mapWidth / 2 << 16;
         centre.z = g_game->mapHeight / 2 << 16;
@@ -454,7 +454,7 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         break;
     case 1: {
         if (g_seams.map->CanPlaceFootprintAt(unit, &unit->pos)) {
-            g_seams.units->StartScript((CobScript*)unit->script, "EndTransport", 0, 1);
+            g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
             Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, unit->pos);
             int h = max(g_seams.units->GetGroundHeight(&unit->pos), g_game->seaLevel);
             ((Class_0044e6c0*)obj)->SetAltitude(h <= g_game->seaLevel ? g_seams.units->GetGroundHeight(&unit->pos) - g_game->seaLevel : 0);
@@ -494,7 +494,7 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
     }
     case 2:
         if (flags & 0x20) {
-            ((UnitMotion*)unit->motion)->SetFlightMode(unit, 1);
+            unit->motion->SetFlightMode(unit, 1);
             return 5;
         }
         return 8;
@@ -744,7 +744,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
             QueueUnitSpeech(unit, 7, "Unable to unload unit");
             return 9;
         }
-        g_seams.units->StartScript((CobScript*)unit->script, "EndTransport", 0, 0);
+        g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
         g_seams.units->AttachUnitToPiece(unit->cargo, 0, -1, 1);
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, unit->pos);
         ((Class_0044e6c0*)obj)->SetAltitude(unit->def->altitude);
@@ -772,7 +772,7 @@ int __stdcall FindLandingPad(Unit* unit, int pad)
     pads[1] = -1;
     pads[2] = -1;
     pads[3] = -1;
-    g_seams.units->QueryScript((CobScript*)unit->script, "QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
+    g_seams.units->QueryScript((CobScript*)unit->script.get(), "QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
     for (int i = 0; i < 4; i++) {
         if (pads[i] != -1 && g_seams.map->IsPadSlotFree(unit, pads[i])) {
             return pads[i];
@@ -833,8 +833,8 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
             g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
             if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
             g_seams.units->SetStateBits(unit, 1,1);
-            if ((((UnitMotion*)unit->motion)->flags&3)==1) {
-                ((UnitMotion*)unit->motion)->SetFlightMode(unit,2);
+            if ((unit->motion->flags&3)==1) {
+                unit->motion->SetFlightMode(unit,2);
                 Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,unit->pos);
                 ((Class_0044e6c0*)move)->SetAltitude(unit->def->altitude/2);
                 order->SetAttachedFx(move);
@@ -1123,7 +1123,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", 0, &unit->pos, 0, 0, 0));
         return 5;
     }
-    if (unit->spatialBucket == g_game->overflowBucket) {
+    if ((int)unit->spatialBucket.get() == g_game->overflowBucket) {
         Vec3 centre;
         centre.x = g_game->mapWidth / 2 << 16;
         centre.z = g_game->mapHeight / 2 << 16;
@@ -1262,12 +1262,12 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
         case 2:
             order->AnnounceStatusIfFlagged("Preparing for transport");
             order->piece = -1;
-            g_seams.units->QueryScript((CobScript*)unit->script, "QueryTransport", &order->piece, 0, 0, 0);
+            g_seams.units->QueryScript((CobScript*)unit->script.get(), "QueryTransport", &order->piece, 0, 0, 0);
             order->flags = 0x100e8;
             return 1;
         case 3: {
             int height = target->def->modelMaxY;
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script, "BeginTransport", 0, 1, 1, height, 0, 0, 0);
+            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "BeginTransport", 0, 1, 1, height, 0, 0, 0);
             SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
             Vec3 offset = g_seams.units->GetPieceOffset(unit, order->piece);
             Class_0044e250* obj = new (kSim) Class_0044e250(order, order->target, -1);
@@ -1280,7 +1280,7 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             // Suspected original bug: the waypoint built below is never
             // handed to the order (no SetAttachedFx call), so it leaks.
             if (flags & 0x42) {
-                g_seams.units->StartScript((CobScript*)unit->script, "EndTransport", 0, 0);
+                g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
                 return 8;
             }
             g_seams.units->AttachUnitToPiece(target, unit, order->piece, 0);

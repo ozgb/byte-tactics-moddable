@@ -33,6 +33,7 @@ struct Pos {
 };
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 static inline int Vec3Length(const Vec3* v)
 {
@@ -77,7 +78,7 @@ struct UnitType {
     unsigned short attackLength;      // +0x216
     unsigned short kamikazeDistance;  // +0x218
     char unknown_21a[0x220 - 0x21a];
-    Weapon* weapon_220;               // +0x220
+    Ref<Weapon> weapon_220;
     char unknown_224[0x241 - 0x224];
     unsigned int flags;               // +0x241
     char unknown_245[0x249 - 0x245];
@@ -290,7 +291,7 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
                             int unused1, int unused2)
 {
     Unit* unit = order->unit;
-    UnitType* def = (UnitType*)unit->def;
+    UnitType* def = (UnitType*)unit->def.get();
     int index = 0;
     if (g_game->showRanges == 0) {
         short mincloak = def->minCloakDistance;
@@ -358,18 +359,18 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
             color = g_game->field_dcf;
         else
             color = g_game->field_dd7;
-        if ((unit->weapons[0].flags & 2) && ((Weapon*)unit->weapons[0].weapon)->range != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[0].weapon)->range, color,
+        if ((unit->weapons[0].flags & 2) && ((Weapon*)unit->weapons[0].weapon.get())->range != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[0].weapon.get())->range, color,
                          "weapon1 range", 0);
         }
-        if ((unit->weapons[1].flags & 2) && ((Weapon*)unit->weapons[1].weapon)->range != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[1].weapon)->range, color,
+        if ((unit->weapons[1].flags & 2) && ((Weapon*)unit->weapons[1].weapon.get())->range != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[1].weapon.get())->range, color,
                          "weapon2 range", 1);
         }
         // Original bug: tests weapons[0].flags (unit+0x1f) but reads weapons[2].weapon
         // (unit+0x48); weapons[2].flags is at unit+0x57.
-        if ((unit->weapons[0].flags & 2) && ((Weapon*)unit->weapons[2].weapon)->range != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[2].weapon)->range, color,
+        if ((unit->weapons[0].flags & 2) && ((Weapon*)unit->weapons[2].weapon.get())->range != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[2].weapon.get())->range, color,
                          "weapon3 range", 2);
         }
     }
@@ -500,17 +501,17 @@ void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
             color = g_game->field_dd7;
         for (int i = 0; i < 3; i++) {
             if (u->weapons[(unsigned char)i].flags & 2) {
-                if (((Weapon*)u->weapons[i].weapon)->areaOfEffect != 0) {
+                if (((Weapon*)u->weapons[i].weapon.get())->areaOfEffect != 0) {
                     sprintf(buf, "weapon %d - area of effect", i);
-                    DrawRangeCircle(surface, view, &pos, ((Weapon*)u->weapons[i].weapon)->areaOfEffect, color, buf, 0);
+                    DrawRangeCircle(surface, view, &pos, ((Weapon*)u->weapons[i].weapon.get())->areaOfEffect, color, buf, 0);
                 }
-                if (((Weapon*)u->weapons[i].weapon)->coverage != 0) {
+                if (((Weapon*)u->weapons[i].weapon.get())->coverage != 0) {
                     sprintf(buf, "weapon %d - coverage", i);
-                    DrawRangeCircle(surface, view, &pos, ((Weapon*)u->weapons[i].weapon)->coverage, color, buf, 1);
+                    DrawRangeCircle(surface, view, &pos, ((Weapon*)u->weapons[i].weapon.get())->coverage, color, buf, 1);
                 }
             }
         }
-        unsigned short len = ((UnitType*)u->def)->attackLength;
+        unsigned short len = ((UnitType*)u->def.get())->attackLength;
         if (len != 0)
             DrawRangeCircle(surface, view, &pos, len, color, "attack length", 2);
     }
@@ -533,7 +534,7 @@ void __stdcall DrawOrderRangeRing(void* surface, View* view, Order* order,
     int height;
     if (order->target != 0) {
         p = *(Pos*)&order->target->pos;
-        height = ((UnitType*)order->target->def)->field_178;
+        height = ((UnitType*)order->target->def.get())->field_178;
     } else {
         p = *(Pos*)&order->pos;
         height = 0x20;

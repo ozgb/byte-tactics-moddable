@@ -1,5 +1,6 @@
 #ifndef COB_SCRIPT_H
 #define COB_SCRIPT_H
+#include "../../interfaces/ref.h"
 
 struct ScriptTable;
 struct Piece;
@@ -17,7 +18,7 @@ struct Channel
     int axis;
     int waiting;
     int signal;
-    Callback *callback;
+    Ref<Callback> callback;
     int stack[32];
     int Pop()
     {
@@ -40,8 +41,8 @@ class CobScript
     int scale;                         // +0x004
     ScriptTable *table;                // +0x008
     int unknown_c;                     // +0x00c, the script's checksum
-    int *statics;                      // +0x010
-    Piece *pieces;                     // +0x014
+    Ref<int> statics;
+    Ref<Piece> pieces;
     int changed;                       // +0x018, a piece is still moving
     Channel channels[8];               // +0x01c
     int activeCount;                   // +0x53c

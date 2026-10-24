@@ -76,6 +76,9 @@ void StoreField(Pool* p) { p->buffer = (char*)malloc(32); }
 void StoreGlobal() { g_held = (char*)malloc(32); }
 void StoreStatic() { static char* s; s = (char*)malloc(32); }
 void StoreLocal() { char* b; b = (char*)malloc(32); (void)b; }
+template <class T> struct Ref { unsigned offset; Ref() = default; Ref(T* p) { offset = (unsigned)p; } T* get() const { return (T*)offset; } };
+struct Slots { Ref<char> cells; };
+void StoreRef(Slots* s, unsigned n) { s->cells = new (kSim) char[n]; }
 char g_end[4];
 long Bound() { char* p = 0; return (long)p < (long)g_end; }
 """
@@ -179,6 +182,10 @@ class ScanTest(unittest.TestCase):
                   for name in ("StoreField", "StoreGlobal", "StoreStatic", "StoreLocal", "Tag")}
         self.assertEqual(stored, {"StoreField": "Pool::buffer", "StoreGlobal": "g_held", "StoreStatic": "s@StoreStatic",
                                   "StoreLocal": "", "Tag": ""})
+
+    def test_an_allocation_stored_into_a_ref_field_is_stored_like_one_into_a_pointer(self):
+        self.assertEqual([(a, w, t) for a, w, _, t in self.by_name["StoreRef"]["allocs"]],
+                         [("new[]", "char", "Slots::cells")])
 
     def test_a_wrapper_placement_new_and_the_allocator_itself_are_not_sites(self):
         for name in ("Wrapper", "Placement", "GameAlloc"):

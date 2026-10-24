@@ -5,6 +5,7 @@
 // in the exe, is its sibling that returns the cursor code.
 // Keep the headers and the unused declarations below: their count before the function matters.
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -43,15 +44,15 @@ struct Limits_0043e490 {
 struct Unit_0043e490 {
     int motion; // +0x0
     char unknown_4[0x10 - 0x4];
-    Node_0043e490* f10; // +0x10
+    Ref<Node_0043e490> f10;
     char unknown_14[0x48 - 0x14];
-    Limits_0043e490* f48; // +0x48
+    Ref<Limits_0043e490> f48;
     char unknown_4c[0x6a - 0x4c];
     char f6a[0x86 - 0x6a]; // +0x6a
-    Unit_0043e490* carrier; // +0x86
+    Ref<Unit_0043e490> carrier;
     char unknown_8a[0x92 - 0x8a];
-    UnitDef* def;            // +0x92
-    Player* player; // +0x96
+    Ref<UnitDef> def;
+    Ref<Player> player;
     char unknown_9a[0xec - 0x9a];
     Stats_0043e490* fec; // +0xec
     char unknown_f0[0xfb - 0xf0];
@@ -138,7 +139,7 @@ struct Def_0043f0e0 {
     char unknown_15a[0x170 - 0x15a];
     short f170; // +0x170
     char unknown_172[0x1ee - 0x172];
-    Node_0043f0e0* f1ee; // +0x1ee
+    Ref<Node_0043f0e0> f1ee;
     char unknown_1f2[0x1fa - 0x1f2];
     unsigned int f1fa; // +0x1fa
     char unknown_1fe[0x241 - 0x1fe];
@@ -160,18 +161,18 @@ struct Size_0043f0e0 {
 struct Unit_0043f0e0 {
     int motion; // +0x0
     char unknown_4[0x10 - 0x4];
-    Node_0043f0e0* f10; // +0x10
+    Ref<Node_0043f0e0> f10;
     char unknown_14[0x2c - 0x14];
-    Node_0043f0e0* f2c; // +0x2c
+    Ref<Node_0043f0e0> f2c;
     char unknown_30[0x3b - 0x30];
     unsigned char f3b; // +0x3b
     char unknown_3c[0x70 - 0x3c];
     short f70; // +0x70
     char unknown_72[0x86 - 0x72];
-    Unit_0043f0e0* carrier; // +0x86
+    Ref<Unit_0043f0e0> carrier;
     char unknown_8a[0x92 - 0x8a];
-    Def_0043f0e0* def;       // +0x92
-    Player* player; // +0x96
+    Ref<Def_0043f0e0> def;
+    Ref<Player> player;
     char unknown_9a[0xfb - 0x9a];
     int postTransferHoldoff; // +0xfb
     unsigned char unknown_ff[1];
@@ -298,7 +299,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
     switch (mode) {
     case 3:
-        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0])->f111b.b8)
+        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0].get())->f111b.b8)
             return 2;
         if (def->c04) {
             node = unit->f10;

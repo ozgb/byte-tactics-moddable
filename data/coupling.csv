@@ -1090,7 +1090,7 @@ harness,game,call,QuirksFlipFirstSim,1
 harness,game,call,QuirksHash,2
 harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
-harness,game,call,SimBlockBase,2
+harness,game,call,SimBlockBase,3
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimOwns,1
 harness,game,shared_write,Game::difficulty,4
@@ -1440,6 +1440,7 @@ map,platform,call,Translate,3
 map,platform,call,WorldToCell,1
 map,platform,call,operator delete,11
 map,platform,call,operator new,7
+map,platform,call,operator==,3
 map,platform,shared_write,Point16::x,11
 map,platform,shared_write,Point16::y,11
 map,platform,shared_write,Vec3::x,21
@@ -1935,7 +1936,7 @@ orders,platform,call,WorldToCell,3
 orders,platform,call,operator delete,20
 orders,platform,call,operator new,56
 orders,platform,call,operator-,1
-orders,platform,call,operator==,3
+orders,platform,call,operator==,22
 orders,platform,shared_write,Fixed::value,1
 orders,platform,shared_write,Point16::x,11
 orders,platform,shared_write,Point16::y,11
@@ -2667,6 +2668,7 @@ players,platform,call,host_memory_status,1
 players,platform,call,host_net_uninit,1
 players,platform,call,operator delete,3
 players,platform,call,operator new,5
+players,platform,call,operator==,3
 players,platform,shared_write,Point16::x,11
 players,platform,shared_write,Point16::y,11
 players,platform,shared_write,Vec3::x,21
@@ -3304,6 +3306,7 @@ presentation,platform,call,host_window_set_topmost,1
 presentation,platform,call,operator delete,16
 presentation,platform,call,operator new,23
 presentation,platform,call,operator-,5
+presentation,platform,call,operator==,10
 presentation,platform,shared_write,CMemoryCache::base,1
 presentation,platform,shared_write,CMemoryCache::cap,1
 presentation,platform,shared_write,CMemoryCache::cur,1
@@ -3886,6 +3889,7 @@ units,ai,shared_write,Unit::lastAttackerSlot,1
 units,ai,shared_write,Unit::lastDamageType,1
 units,ai,shared_write,Unit::mode,1
 units,ai,shared_write,Unit::motion,1
+units,ai,shared_write,Unit::player,6
 units,ai,shared_write,Unit::pos,2
 units,ai,shared_write,Unit::unitDefIndex,5
 units,ai,shared_write,Unit::yWhole,1
@@ -3946,6 +3950,7 @@ units,features,indirect,PlaceFeature,1
 units,features,shared_write,Game::defs,1
 units,features,shared_write,Point16::x,11
 units,features,shared_write,Point16::y,11
+units,features,shared_write,Unit::player,1
 units,features,shared_write,Vec3::x,7
 units,features,shared_write,Vec3::y,5
 units,features,shared_write,Vec3::z,7
@@ -4000,6 +4005,7 @@ units,los_radar,shared_write,Unit::def,8
 units,los_radar,shared_write,Unit::flags,6
 units,los_radar,shared_write,Unit::losCacheCellX,4
 units,los_radar,shared_write,Unit::losSightFrameIdx,4
+units,los_radar,shared_write,Unit::player,6
 units,los_radar,shared_write,Unit::pos,5
 units,los_radar,shared_write,Unit::recentlyDamagedTimer,1
 units,los_radar,shared_write,Unit::selected,1
@@ -4043,13 +4049,14 @@ units,map,shared_write,Point16::x,12
 units,map,shared_write,Point16::y,12
 units,map,shared_write,Unit::bit2,2
 units,map,shared_write,Unit::cargo,2
-units,map,shared_write,Unit::cargoNext,6
+units,map,shared_write,Unit::cargoNext,7
 units,map,shared_write,Unit::carrier,3
 units,map,shared_write,Unit::cell,4
 units,map,shared_write,Unit::def,4
 units,map,shared_write,Unit::flags,3
 units,map,shared_write,Unit::footprint,6
 units,map,shared_write,Unit::motion,2
+units,map,shared_write,Unit::player,1
 units,map,shared_write,Unit::pos,1
 units,map,shared_write,Unit::transportPiece,1
 units,map,shared_write,UnitDef::draft,1
@@ -4098,6 +4105,7 @@ units,network,shared_write,Player::unitCount,6
 units,network,shared_write,Player::unitsCreated,7
 units,network,shared_write,Unit::angles,1
 units,network,shared_write,Unit::flags,2
+units,network,shared_write,Unit::player,6
 units,network,shared_write,Unit::pos,1
 units,network,shared_write,Unit::script,3
 units,network,shared_write,Unit::unitDefIndex,2
@@ -4141,7 +4149,7 @@ units,orders,shared_write,Unit::buildLeft,15
 units,orders,shared_write,Unit::cargo,5
 units,orders,shared_write,Unit::carrier,22
 units,orders,shared_write,Unit::cell,4
-units,orders,shared_write,Unit::def,86
+units,orders,shared_write,Unit::def,88
 units,orders,shared_write,Unit::fireOrder,3
 units,orders,shared_write,Unit::flags,25
 units,orders,shared_write,Unit::footprint,13
@@ -4152,10 +4160,11 @@ units,orders,shared_write,Unit::killCount,2
 units,orders,shared_write,Unit::lastAttackerSlot,2
 units,orders,shared_write,Unit::lastDamageType,2
 units,orders,shared_write,Unit::mode,4
-units,orders,shared_write,Unit::motion,53
+units,orders,shared_write,Unit::motion,54
 units,orders,shared_write,Unit::moveOrder,3
 units,orders,shared_write,Unit::moved,4
 units,orders,shared_write,Unit::netDirtyFlags,1
+units,orders,shared_write,Unit::player,25
 units,orders,shared_write,Unit::pos,69
 units,orders,shared_write,Unit::script,13
 units,orders,shared_write,Unit::transportPiece,1
@@ -4254,6 +4263,7 @@ units,platform,call,WorldToCell,1
 units,platform,call,operator delete,6
 units,platform,call,operator new,9
 units,platform,call,operator-,1
+units,platform,call,operator==,12
 units,platform,shared_write,Fixed::value,1
 units,platform,shared_write,Game::defs,1
 units,platform,shared_write,Point16::x,11
@@ -4289,6 +4299,7 @@ units,players,shared_write,Unit::def,10
 units,players,shared_write,Unit::flags,6
 units,players,shared_write,Unit::health,1
 units,players,shared_write,Unit::motion,2
+units,players,shared_write,Unit::player,4
 units,players,shared_write,Unit::pos,1
 units,players,shared_write,Unit::postTransferHoldoff,3
 units,players,shared_write,Unit::speed_bits,1
@@ -4365,6 +4376,7 @@ units,presentation,shared_write,Unit::immobile,1
 units,presentation,shared_write,Unit::killCount,1
 units,presentation,shared_write,Unit::lastAttackerSlot,1
 units,presentation,shared_write,Unit::motion,2
+units,presentation,shared_write,Unit::player,6
 units,presentation,shared_write,Unit::pos,9
 units,presentation,shared_write,Unit::postTransferHoldoff,13
 units,presentation,shared_write,Unit::selectable,2
@@ -4419,6 +4431,7 @@ units,targeting,shared_write,Unit::fireOrder,1
 units,targeting,shared_write,Unit::flags,1
 units,targeting,shared_write,Unit::killCount,1
 units,targeting,shared_write,Unit::motion,1
+units,targeting,shared_write,Unit::player,1
 units,targeting,shared_write,Unit::pos,1
 units,targeting,shared_write,Unit::script,2
 units,targeting,shared_write,Unit::unitDefIndex,2
@@ -4455,6 +4468,7 @@ units,weapons,shared_write,Unit::lastAttackerSlot,1
 units,weapons,shared_write,Unit::lastDamageType,1
 units,weapons,shared_write,Unit::motion,4
 units,weapons,shared_write,Unit::netDirtyFlags,2
+units,weapons,shared_write,Unit::player,10
 units,weapons,shared_write,Unit::pos,6
 units,weapons,shared_write,Unit::script,8
 units,weapons,shared_write,Unit::state,3

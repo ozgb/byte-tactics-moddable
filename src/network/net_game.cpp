@@ -2637,7 +2637,7 @@ void __stdcall SetMissionType(int a);
 int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name)
 {
     UnitScriptCallPacket packet;
-    int index = ((CobScript *)obj->script)->FindScript(name);
+    int index = ((CobScript *)obj->script.get())->FindScript(name);
     if (!(g_game->netGameFlags & 1)) {
         return 0;
     }
@@ -2677,7 +2677,7 @@ int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount,
                            int arg0, int arg1, int arg2, int arg3)
 {
     UnitScriptCallPacket packet;
-    short index = ((CobScript *)obj->script)->FindScript(name);
+    short index = ((CobScript *)obj->script.get())->FindScript(name);
     if (!(g_game->netGameFlags & 1)) {
         return 0;
     }

@@ -2,6 +2,7 @@
 
 // Must stay: decides which register GetOrderCursor's GetFeature results use.
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 // Must stay: GetPieceOffset's main path depends on the symbols it declares.
 #include <string.h>
 
@@ -29,7 +30,7 @@ struct Object {
     char unknown_0[0x6a];
     Vec3 pos;                          // +0x6a
     char unknown_76[0x9a - 0x76];
-    CobScript* script;                 // +0x9a
+    Ref<CobScript> script;
 };
 
 #pragma pack(pop)
@@ -59,7 +60,7 @@ void Class_0043db50::UpdateSfxOccupy(Unit* unit)
         newState = 0;
     }
     if (*(int*)unit->unknown_10a != newState) {
-        ((CobScript*)unit->script)->StartScriptWithArgs("setSFXoccupy", 0, 1, 1, newState, 0, 0, 0);
+        ((CobScript*)unit->script.get())->StartScriptWithArgs("setSFXoccupy", 0, 1, 1, newState, 0, 0, 0);
         *(int*)unit->unknown_10a = newState;
     }
 }
@@ -98,7 +99,7 @@ struct Object_0043def0 {
     char unknown_0[0x64];
     Angles16 angles;                   // +0x64
     char unknown_6a[0x9e - 0x6a];
-    Block_0043def0* recs;              // +0x9e
+    Ref<Block_0043def0> recs;
 };
 #pragma pack(pop)
 
@@ -178,14 +179,14 @@ struct Geom_0043e0b0 {
 struct Piece_0043e0b0 {
     Geom_0043e0b0* geom;               // +0x00
     char pad4[0x22 - 4];
-    Vec3* verts;                       // +0x22
+    Ref<Vec3> verts;
 };
 
 struct Obj_0043e0b0 {
     char pad0[0x6a];
     Vec3 pos;                          // +0x6a
     char pad76[0x9e - 0x76];
-    char* table;                       // +0x9e
+    Ref<char> table;
 };
 #pragma pack(pop)
 
@@ -236,7 +237,7 @@ struct Obj_0043e180 {
     char pad0[0x64];
     Angles16 angles;               // +0x64
     char pad1[0x9e - 0x6a];
-    Rec_0043e180* recs;            // +0x9e
+    Ref<Rec_0043e180> recs;
 };
 #pragma pack(pop)
 
@@ -313,7 +314,7 @@ void __stdcall GetAimFromPosition(Object* obj, Vec3* out, unsigned char weapon)
 #pragma pack(push, 2)
 struct Obj_0043e3c0 {
     char unknown_0[0x9a];
-    CobScript* table;                  // +0x9a
+    Ref<CobScript> table;
 };
 #pragma pack(pop)
 
@@ -425,15 +426,15 @@ struct Limits_0043e490 {
 struct Unit_0043e490 {
     int motion; // +0x0
     char unknown_4[0x10 - 0x4];
-    Node_0043e490* f10; // +0x10
+    Ref<Node_0043e490> f10;
     char unknown_14[0x48 - 0x14];
-    Limits_0043e490* f48; // +0x48
+    Ref<Limits_0043e490> f48;
     char unknown_4c[0x6a - 0x4c];
     char f6a[0x86 - 0x6a]; // +0x6a
-    Unit_0043e490* carrier; // +0x86
+    Ref<Unit_0043e490> carrier;
     char unknown_8a[0x92 - 0x8a];
-    UnitDef* def;            // +0x92
-    Player* player; // +0x96
+    Ref<UnitDef> def;
+    Ref<Player> player;
     char unknown_9a[0xec - 0x9a];
     Stats_0043e490* fec; // +0xec
     char unknown_f0[0xfb - 0xf0];
@@ -537,7 +538,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
     switch (mode) {
     case 3:
-        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0])->f111b.b8)
+        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0].get())->f111b.b8)
             return 2;
         if (((UnitDefFlags_0043e490*)def)->f245b.b4) {
             node = unit->f10;

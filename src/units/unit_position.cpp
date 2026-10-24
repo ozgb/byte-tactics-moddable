@@ -176,8 +176,8 @@ extern float g_buildPercentScale;
 void __stdcall SnapUnitToGround(Unit* unit)
 {
     extern Game* g_game;
-    if (((UnitType*)unit->def)->f241.bits.floats) {
-        unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - ((UnitType*)unit->def)->draft) << 16;
+    if (((UnitType*)unit->def.get())->f241.bits.floats) {
+        unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - ((UnitType*)unit->def.get())->draft) << 16;
     } else {
         unit->pos.y = GetGroundHeight(&unit->pos) << 16;
     }
@@ -195,19 +195,19 @@ void __stdcall SnapUnitToGround(Unit* unit)
 void __stdcall UpdateUnitHeight(Unit* unit)
 {
     extern Game* g_game;
-    if ((unit->flags & 0x10000) || ((UnitType*)unit->def)->f241.bits.floats) {
+    if ((unit->flags & 0x10000) || ((UnitType*)unit->def.get())->f241.bits.floats) {
         unit->flags &= ~0x10000;
         if (unit->motion && (unit->flags & 3) == 1) {
-            if (((UnitType*)unit->def)->f241.bits.over_water) {
-                if (((UnitType*)unit->def)->f241.bits.floats) {
-                    unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - ((UnitType*)unit->def)->draft) << 16;
+            if (((UnitType*)unit->def.get())->f241.bits.over_water) {
+                if (((UnitType*)unit->def.get())->f241.bits.floats) {
+                    unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - ((UnitType*)unit->def.get())->draft) << 16;
                 } else {
                     unit->pos.y = GetGroundHeight(&unit->pos) << 16;
                 }
-            } else if (((UnitType*)unit->def)->f241.bits.on_water) {
+            } else if (((UnitType*)unit->def.get())->f241.bits.on_water) {
                 // Union copy: an int would fold the product, sum and shift into (sea - draft) << 16.
                 Fixed h;
-                h.value = ((UnitType*)unit->def)->draft * 0xffff + g_game->seaLevel;
+                h.value = ((UnitType*)unit->def.get())->draft * 0xffff + g_game->seaLevel;
                 h.value <<= 16;
                 unit->pos.y = h.value;
             } else {
@@ -330,8 +330,8 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                     if (t == 0
                         || ((t->flags & 0x10000000) && t != u && t->carrier == 0)) {
                         if (u->carrier != 0) {
-                            Unit* n = (Unit*)u->carrier;
-                            Unit** link = &n->cargo;
+                            Unit* n = u->carrier;
+                            Ref<Unit>* link = &n->cargo;
                             n = n->cargo;
                             while (n != u) {
                                 link = &n->cargoNext;
@@ -339,11 +339,11 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                             }
                             *link = u->cargoNext;
                         } else {
-                            g_seams.map->SpatialBucketUnlinkUnit((SpatialBucket*)u->spatialBucket, 0, u);
+                            g_seams.map->SpatialBucketUnlinkUnit((SpatialBucket*)u->spatialBucket.get(), 0, u);
                         }
                         u->transportPiece = order->param;
                         if (t) {
-                            u->carrier = (int)t;
+                            u->carrier = t;
                             u->cargoNext = t->cargo;
                             t->cargo = u;
                             // Named bool, `char` compared with -1, masked with `& 1`: keeps the field width mask.
@@ -353,13 +353,13 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                             u->cargoNext = 0;
                             u->carriedNoPiece = 0;
                             u->carrier = 0;
-                            g_seams.map->SpatialBucketPrependUnit((SpatialBucket*)u->spatialBucket, 0, u);
+                            g_seams.map->SpatialBucketPrependUnit((SpatialBucket*)u->spatialBucket.get(), 0, u);
                         }
-                        ((UnitMotion*)u->motion)->mode = order->param2;
+                        u->motion->mode = order->param2;
                         if (u->player->active) {
                             unsigned char k = u->player->type;
                             if (k == 1 || k == 2) {
-                                if (t && !(((UnitType*)t->def)->f241.bits.low & 0x200))
+                                if (t && !(((UnitType*)t->def.get())->f241.bits.low & 0x200))
                                     g_seams.orders->AddBeCarriedOrder(u);
                             }
                         }
@@ -411,7 +411,7 @@ void __stdcall UpdateAllUnits(void)
                             }
                         }
                         if (u->script != 0) {
-                            ((CobScript*)u->script)->RunScripts(1);
+                            ((CobScript*)u->script.get())->RunScripts(1);
                         }
                         if (u->recentlyDamagedTimer != 0) {
                             u->recentlyDamagedTimer--;
@@ -421,13 +421,13 @@ void __stdcall UpdateAllUnits(void)
                         }
                         if (u->selected != 0) {
                             if (!(u->selectable) || u->buildLeft != 0.0f || u->postTransferHoldoff != 0
-                                || (u->carrier != 0 && !(((Unit*)u->carrier)->cargoSelectable))) {
+                                || (u->carrier != 0 && !(u->carrier->cargoSelectable))) {
                                 u->selected = 0;
                             }
                         }
                         // Unsigned `% 30` (here and below) keeps the original's `div`.
                         if ((unsigned int)g_game->ticks % 30 == 0) {
-                            int v = u->health * 100 / ((UnitType*)u->def)->f1fa;
+                            int v = u->health * 100 / ((UnitType*)u->def.get())->f1fa;
                             if (v < 0) {
                                 v = 0;
                             }
@@ -444,18 +444,18 @@ void __stdcall UpdateAllUnits(void)
                                 if (g_game->net->waterDoesDamage != 0
                                     && g_game->net->waterDamage != 0
                                     && (unsigned int)g_game->ticks % 30 == 0 && u->yWhole <= g_game->seaLevel
-                                    && !((UnitType*)u->def)->f241.bits.floats) {
+                                    && !((UnitType*)u->def.get())->f241.bits.floats) {
                                     g_seams.weapons->DamageUnit(0, u, g_game->net->waterDamage, 0xb, 0);
                                 }
-                                if (((UnitType*)u->def)->f200 != 0 && u->health < ((UnitType*)u->def)->f1fa
+                                if (((UnitType*)u->def.get())->f200 != 0 && u->health < ((UnitType*)u->def.get())->f1fa
                                     && (g_game->ticks & 7) == 0) {
-                                    int n = ((UnitType*)u->def)->f200 * 8;
+                                    int n = ((UnitType*)u->def.get())->f200 * 8;
                                     AddRepairProgress(u, u, (float)(n / 30));
                                 }
                                 g_seams.orders->RunOrders(u);
                                 g_seams.orders->RunSecondaryOrders(u);
                                 if (u->motion != 0) {
-                                    g_seams.orders->UpdateMotion((UnitMotion*)u->motion, 0, u);
+                                    g_seams.orders->UpdateMotion(u->motion, 0, u);
                                     UpdateUnitHeight(u);
                                 }
                             }
@@ -518,7 +518,7 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
             stream->data[stream->index] = 0;
         }
         // `!owner ? 0 : ...` lays the zero arm ahead of the load; keep the redundant `& 0xffff`.
-        stream->WriteBits((!u->carrier ? 0 : ((Unit*)u->carrier)->id) & 0xffff, 0xf);
+        stream->WriteBits((!u->carrier ? 0 : u->carrier->id) & 0xffff, 0xf);
         stream->WriteBits((signed char)u->transportPiece, 8);
     } else {
         stream->bit++;
@@ -537,7 +537,7 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
         stream->WriteBits((unsigned short)u->angles.pitch, 0x10);
         stream->WriteBits((unsigned short)u->angles.bank, 0x10);
         if (u->motion)
-            stream->WriteBits(((UnitMotion*)u->motion)->speed, 0x20);
+            stream->WriteBits(u->motion->speed, 0x20);
     }
 }
 
@@ -583,7 +583,7 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
         spawn.tail.words = u->angles;
         CreateUnitFromPacket((u->angles.bank & ~0xff) | u->playerIndex, &spawn);
     }
-    ((Block*)u->state)->field_10 = zero;
+    ((Block*)u->state.get())->field_10 = zero;
     u->health = reader->ReadBits(0x10);
     // Unsigned into an __int64: gives `fild qword` with no `cdq`.
     __int64 alpha = (unsigned int)reader->ReadBits(8);
@@ -643,7 +643,7 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     u->moved = 1;
     u->angles = tail;
     if (u->motion)
-        ((UnitMotion*)u->motion)->speed = reader->ReadBits(0x20);
+        u->motion->speed = reader->ReadBits(0x20);
 }
 
 // Builds one player's whole unit list as a single packet and sends it: a
@@ -667,11 +667,11 @@ void __stdcall SendUnitStates(Player* p)
             continue;
         if (!u->motion)
             continue;
-        if (!((UnitMotion*)u->motion)->player->v7())
+        if (!u->motion->player->v7())
             continue;
         stream.WriteBits(u->id - u->player->firstIndex, 0x10);
         stream.WriteBits(u->unitDefIndex, g_game->unitDefCountBits);
-        ((UnitMotion*)u->motion)->player->WriteTo(&stream);
+        u->motion->player->WriteTo(&stream);
         // `>> 3`, not `/ 8`: that is the original's `add ecx, 7; sar ecx, 3`
         // with no sign fix-up.
         if (((stream.bit + 7) >> 3) + stream.index * 4 >= 0x200)
@@ -741,14 +741,14 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
             spawn.tail.dword = *(Tail32*)&unit->angles;
             CreateUnitFromPacket(unit->playerIndex, &spawn);
         }
-        ((UnitMotion*)unit->motion)->player->ReadFrom(&reader);
+        unit->motion->player->ReadFrom(&reader);
         index = (short)reader.ReadBits(0x10);
     }
 
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd;
          u = (Unit*)((char*)u + 0x118)) {
         if ((u->flags & 0x10000000) && u->motion) {
-            g_seams.orders->UpdateMotion((UnitMotion*)u->motion, 0, u);
+            g_seams.orders->UpdateMotion(u->motion, 0, u);
             UpdateUnitHeight(u);
         }
     }

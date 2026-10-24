@@ -4,6 +4,8 @@
 #ifndef ORDER_FX_H
 #define ORDER_FX_H
 
+#include "../../interfaces/ref.h"
+
 struct Vec3;
 struct Unit;
 struct Order;
@@ -14,12 +16,12 @@ extern void* g_orderFxVtable[];
 
 class __declspec(novtable) OrderFx {
 public:
-    int source;                        // +0x4
+    Ref<Order> source;
 
     OrderFx() {}
 
     // FUNCTION: 0x44ce20
-    OrderFx(int param_1)
+    OrderFx(Order* param_1)
     {
         SetVtable(g_orderFxVtable);
         source = param_1;

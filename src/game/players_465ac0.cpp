@@ -111,7 +111,7 @@ static inline int IsVisible3(Map_00465ac0* map, Position_00465ac0* pos)
 // FUNCTION: 0x465ac0
 int __stdcall IsUnitVisibleToPlayer(Map_00465ac0* map, Unit* u)
 {
-    if ((Map_00465ac0*)u->player == map)
+    if ((Map_00465ac0*)u->player.get() == map)
         return 1;
     if (u->activateFlags & 4)
         return 0;

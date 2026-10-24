@@ -1063,7 +1063,7 @@ void Mission::LoadMissionData(char* name, TdfFile* parser)
     units = (MissionUnit*)SimAllocTagged(
         "MISSIONUNIT DATA",
         (total / 0x400 + 2) * 0x400 + unitBytes);
-    char* strings = (char*)units + unitBytes;
+    char* strings = (char*)units.get() + unitBytes;
     for (i = 0; i < count; i++) {
         MissionUnit* u = &units[i];
         TdfRecord* s = list->GetSubRecord(i);

@@ -116,7 +116,7 @@ struct Los_0047d2e0 {
 
 struct Node_0047cb00 {
     char unknown_0[0x8e];
-    Node_0047cb00* next;                // +0x8e
+    Ref<Node_0047cb00> next;
 };
 
 class SpatialBucket {
@@ -176,7 +176,7 @@ void __stdcall ClaimFootprintCells(Unit* obj)
         int index = 0;
         for (int j = size.y; j > 0; j--) {
             for (int i = size.x; i > 0; i--) {
-                if (((unsigned char*)obj->def->yardmap)[index] & (obj->bit2 ? 2 : 4)) {
+                if (((unsigned char*)obj->def->yardmap.get())[index] & (obj->bit2 ? 2 : 4)) {
                     Unit* rec;
                     unsigned short id = cell->unit;
                     if (id == 0)
@@ -277,12 +277,14 @@ void FUN_0047caf0(void)
 // FUNCTION: 0x47cb00
 void SpatialBucket::UnlinkUnit(Node_0047cb00* node)
 {
-    Node_0047cb00** pp = &head;
-    Node_0047cb00* n = head;
-    while (n != node) {
-        pp = &n->next;
-        n = n->next;
+    if (head == node) {
+        head = node->next;
+        node->next = 0;
+        return;
     }
+    Ref<Node_0047cb00>* pp = &head->next;
+    while (*pp != node)
+        pp = &(*pp)->next;
     *pp = node->next;
     node->next = 0;
 }
@@ -295,23 +297,32 @@ void SpatialBucket::PrependUnit(int node)
     field_6 = node;
 }
 
+static void UnlinkBucketUnit(UnitBucket* bucket, Unit* unit)
+{
+    if (bucket->first == unit) {
+        bucket->first = unit->cargoNext;
+        return;
+    }
+    Ref<Unit>* pp = &bucket->first->cargoNext;
+    while (*pp != unit)
+        pp = &(*pp)->cargoNext;
+    *pp = unit->cargoNext;
+}
+
 // FUNCTION: 0x47cb60
 void __stdcall SetOwner(Unit* unit, UnitBucket* bucket)
 {
-    UnitBucket* cur = ((UnitBucket *)unit->spatialBucket);
+    UnitBucket* cur = ((UnitBucket *)unit->spatialBucket.get());
     if (bucket != cur) {
         if (unit->carrier == 0) {
             if (cur != 0) {
-                Unit** pp = &cur->first;
-                while (*pp != unit)
-                    pp = &(*pp)->cargoNext;
-                *pp = unit->cargoNext;
+                UnlinkBucketUnit(cur, unit);
                 unit->cargoNext = 0;
             }
             unit->cargoNext = bucket->first;
             bucket->first = unit;
         }
-        unit->spatialBucket = (int)(bucket);
+        unit->spatialBucket = (Class_0047cb00*)(bucket);
     }
 }
 
@@ -325,16 +336,13 @@ void __stdcall ClearFootprintAndUnlink(Unit* unit)
 {
     RemoveUnitFromMap(unit);
     if (unit->carrier == 0) {
-        UnitBucket* cur = ((UnitBucket *)unit->spatialBucket);
+        UnitBucket* cur = ((UnitBucket *)unit->spatialBucket.get());
         if (cur != 0) {
-            Unit** pp = &cur->first;
-            while (*pp != unit)
-                pp = &(*pp)->cargoNext;
-            *pp = unit->cargoNext;
+            UnlinkBucketUnit(cur, unit);
             unit->cargoNext = 0;
         }
     }
-    unit->spatialBucket = (int)(0);
+    unit->spatialBucket = 0;
 }
 
 // Can a unit's footprint stand on the map cell `cell`? The guards are the map
@@ -486,7 +494,7 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
         do {
             for (col = 0; col < cols; col++) {
                 g_lastPlaceMetalSum += c->metal;
-                int m = ((unsigned char*)unit->yardmap)[index++];
+                int m = ((unsigned char*)unit->yardmap.get())[index++];
                 if (m & 8) {
                     if (c->low < min6)
                         min6 = c->low;
@@ -568,7 +576,7 @@ int __stdcall IsFootprintClear(Unit* obj, int flag)
         Cell* c = g_game->cells + y * width;
         for (int x = p.x; x < xend; x++) {
             // The post-increment stays inside the mask read, not at the loop bottom.
-            if ((((unsigned char*)obj->def->yardmap)[n++] & bit) && c[x].unit != 0 && c[x].unit != obj->id)
+            if ((((unsigned char*)obj->def->yardmap.get())[n++] & bit) && c[x].unit != 0 && c[x].unit != obj->id)
                 return 0;
         }
     }
@@ -753,7 +761,7 @@ int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell)
         return 0;
     if (cell->unit != 0) {
         // A reference, not a pointer: gives the original's two-step unit load.
-        Unit*& unit = (*(Unit **)&g_game->units[cell->unit].motion);
+        Ref<Unit>& unit = (*(Ref<Unit>*)&g_game->units[cell->unit].motion);
         if (!unit || ((unsigned int)unit->lastTick) < obj->lastTick)
             return 0;
     }
@@ -820,7 +828,7 @@ int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, 
                 return 0;
             if (cell->unit != 0) {
                 // A reference, not a pointer: gives the original's two-step load.
-                Unit*& unit = (*(Unit **)&g_game->units[cell->unit].motion);
+                Ref<Unit>& unit = (*(Ref<Unit>*)&g_game->units[cell->unit].motion);
                 if (!unit || ((unsigned int)unit->lastTick) < obj->lastTick)
                     return 0;
             }

@@ -1213,6 +1213,8 @@ Order::AttachBuildFootprintMarker,0x9+0x4*k,LoadTntMap: TILE SET,3,2180,0x23ffe1
 Order::AttachBuildFootprintMarker,0x6,NanoParticles::Emit,2,624,0x1a0-0x1d6,not-a-pointer,"Order goal words (ticks, coordinates) that only look like addresses"
 Order::AttachRingApproachGoal,*,*,0,0,-,not-a-pointer,"Order goal words (ticks, coordinates) that only look like addresses"
 Order::AttachRingApproachGoal,0x7,HAPI_LoadFile,1,1502,0xcf72,not-a-pointer,"Order goal words (ticks, coordinates) that only look like addresses"
+Pathfinder::GrowNodes,*,*,0,0,-,not-a-pointer,"Pathfinder node pool (Node, 0x14): index, position, costs and steps, and words that straddle them, that only look like addresses"
+Pathfinder::GrowNodes #2,*,*,0,0,-,not-a-pointer,"Pathfinder item array: in-block Node pointers, and words that straddle two of them, that only look like addresses"
 PlayerAI::BuildFeatureCells,*,*,0,0,-,not-a-pointer,words of the PlayerAI cells allocation that only look like addresses
 PlayerAI::BuildFeatureCells,0x630,AllocAlphaTable: ALPHA TABLE,1,7200,0x4b0c,not-a-pointer,"PlayerAI cells (0xc bytes: x, y, feature value): coordinates and a float that only look like addresses"
 PlayerAI::BuildFeatureCells,0x4d 0x47d 0x795,CMemoryCache::InitCache: CMemoryCache CCH,2,12600,0x21f3e0-0x225ee0,not-a-pointer,"PlayerAI cells (0xc bytes: x, y, feature value): coordinates and a float that only look like addresses"

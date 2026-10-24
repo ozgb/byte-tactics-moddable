@@ -1553,13 +1553,8 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
 }
 
 #include "unit_orders.h"
-#include "unit_orders_404db0.h"
 int __stdcall GroundPickupOrder(Unit* unit, Order* order, int flags);
 #include "vtol_orders.h"
-#include "vtol_orders_4103e0.h"
-#include "vtol_orders_410850.h"
-#include "vtol_orders_412d40.h"
-#include "vtol_orders_4152f0.h"
 #include "../ingame/markers.h"
 
 // GLOBAL: 0x4fc490
@@ -2095,4 +2090,128 @@ void __stdcall CopyDwordIfNonNull(int* dest, int* src)
     if (dest != 0) {
         *dest = *src;
     }
+}
+
+// FUNCTION: 0x404db0
+int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
+{
+    Point16 cell;
+    Point16 size;
+    Feature* f = &g_game->features[0xffff];
+    if (order->state <= 5) {
+        unsigned short index = g_seams.weapons->FindFeatureAtPos(&order->pos, &cell, &size);
+        if (index == 0xffff) {
+            QueueUnitSpeech(unit, 7, "Resurrection failed");
+            return 8;
+        }
+        f = &g_game->features[index];
+        if (!(f->flags & 0x80))
+            return 8;
+    }
+    switch (order->state) {
+    case 0:
+        if (unit->motion && (unit->def->flags2 & 0x800)) {
+            order->AttachBuildFootprintMarker(cell, size);
+            order->flags = 0xe0;
+            return 1;
+        }
+        return 7;
+    case 1: {
+        if (flags & 0x40)
+            return 8;
+        Vec3 pos;
+        pos.x = (size.x + cell.x * 2) << 19;
+        pos.z = (size.y + cell.y * 2) << 19;
+        pos.y = (RandomInt(f->height) + g_seams.units->GetGroundHeight(&pos)) << 16;
+        StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &pos) - unit->angles.heading);
+        return 1;
+    }
+    case 2:
+        return WaitIfNotInBuildStance(unit, order, 0);
+    case 3: {
+        char name[0x40];
+        {
+            int n = 0;
+            while (n < 0x3f && f->name[n]) {
+                name[n] = f->name[n];
+                n++;
+            }
+            name[n] = 0;
+        }
+        for (int i = 0; i < 0x40; i++) {
+            if (name[i] == '_') {
+                name[i] = 0;
+                break;
+            }
+        }
+        order->unitType = g_seams.units->FindUnitTypeId(name);
+        if (!order->unitType) {
+            QueueUnitSpeech(unit, 7, "Ressurection failed");
+            return 8;
+        }
+        order->countdown = (int)(g_game->defs[order->unitType].buildtime * 0.3 / (unit->def->buildRate / 30));
+        QueueUnitSpeech(unit, 11, 0);
+        return 1;
+    }
+    case 4:
+        if (order->countdown--) {
+            Vec3 nano;
+            g_seams.units->GetNanoPiecePosition(unit, &nano);
+            Box box;
+            box.lo.x = cell.x << 20;
+            box.lo.z = cell.y << 20;
+            box.lo.y = g_seams.units->GetGroundHeight(&box.lo) << 16;
+            box.hi = box.lo;
+            box.hi.x += f->footprintX << 20;
+            box.hi.z += f->footprintZ << 20;
+            box.hi.y += f->height << 16;
+            EmitNanoParticles(&nano, &box, 6);
+            unit->workTime = g_game->ticks + 300;
+            order->SetDeadlineTicks(1);
+            return 2;
+        }
+        break;
+    case 5: {
+        order->link.SetUnit(g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
+        if (!order->target) {
+            QueueUnitSpeech(unit, 7, "Unable to create any more units");
+            order->SetDeadlineTicks(300);
+            return 2;
+        }
+        Cell* c = g_seams.los_radar->GetOriginCellAtPosition(&order->pos);
+        if (g_seams.features->GetCellFeature(c) >= 0xfffb)
+            return 8;
+        FeatureSpot* spot = &g_game->spots[c->offsetY | (c->offsetX << 8)];
+        if (spot)
+            order->target->angles = spot->rot;
+        g_seams.features->RemoveFeature(g_seams.los_radar->GetMapCellAtPosition(&order->pos), 0);
+        if (g_seams.map->GetGameType(g_game->net) == 3) {
+            FeatureDamagePacket packet;
+            int n = c - g_game->cells;
+            int w = g_game->width;
+            packet.type = 0x0f;
+            packet.sub = 0xff;
+            Point16 xz;
+            xz.x = n % w;
+            xz.y = n / w;
+            packet.x = xz.x;
+            packet.z = xz.y;
+            BroadcastPacket(unit->player->id, &packet, 6);
+        }
+        order->target->buildLeft = 0;
+        order->target->health = 1;
+        MarkSelectionOrdersDirty(unit);
+        break;
+    }
+    case 6: {
+        QueueUnitSpeech(unit, 8, "Resurrection complete");
+        MissionType kind = GetOrderType(8, unit, order->target, 0);
+        if (kind.index)
+            AppendOrder(unit, new (kSim) Order(kind, order->target, 0, 0, 0, 0));
+        return 5;
+    }
+    default:
+        return 7;
+    }
+    return 1;
 }

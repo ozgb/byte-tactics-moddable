@@ -47,6 +47,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags);
 
 int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags);
 int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags);
+int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags);
 int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags);
 int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags);
 int __stdcall TeleportOrder(Unit* unit, Order* order, int unused);

@@ -1610,3 +1610,26 @@ void __stdcall Grow_0044ec30(Vec_0044ec30* v, int extra)
 
 // FUNCTION: 0x44ec30 ?insert@?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@QAEXPAUPoint16@@IABU3@@Z
 InsertFn_0044ec30 g_insert_0044ec30 = &Vec_0044ec30::insert;
+
+static Point16 MakePoint_0044da00(int x, int y)
+{
+    Point16 p;
+    p.x = (short)x;
+    p.y = (short)y;
+    return p;
+}
+
+// FUNCTION: 0x44da00
+void PointMarker::AppendGoalCell(void* cells)
+{
+    Vec_0044da00* list = (Vec_0044da00*)cells;
+    list->clear();
+    for (int i = x1; i <= x2; i++) {
+        list->push_back(MakePoint_0044da00(i, y1));
+        list->push_back(MakePoint_0044da00(i, y2));
+    }
+    for (int j = y1 + 1; j <= y2 - 1; j++) {
+        list->push_back(MakePoint_0044da00(x1, j));
+        list->push_back(MakePoint_0044da00(x2, j));
+    }
+}

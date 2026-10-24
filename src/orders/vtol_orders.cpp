@@ -158,7 +158,7 @@ void __stdcall DamageUnit(Unit*, Unit*, int, int, int);
 int __stdcall SendScriptCallByName(Unit*, char*, char, int, int, int, int);
 void __stdcall DrawUnit(void*, Unit*);
 
-Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b);
+#include "vtol_orders.h"
 #include "vtol_orders.h"
 
 static inline Vec3 Direction(short angle, int range)
@@ -1087,7 +1087,6 @@ struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index
 #pragma pack(pop)
 #include "../../link/globals.h"
 #include "vtol_orders.h"
-Vec3 __stdcall AddVec3(const Vec3&, const Vec3&);
 #include "order_list.h"
 
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
@@ -1245,6 +1244,7 @@ int __cdecl ScaledCos(short, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 #include "order_list.h"
 
+// FUNCTION: 0x40f790
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b)
 {
     Vec3 r;
@@ -2078,4 +2078,273 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     }
     }
     return 7;
+}
+
+// FUNCTION: 0x4103e0
+int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
+{
+    if (flags & 0x40) return 5;
+    if ((int)unit->spatialBucket.get() == (int)g_game->overflowBucket.get()) {
+        Vec3 center;
+        center.x=(g_game->mapWidth/2)<<16;
+        center.z=(g_game->mapHeight/2)<<16;
+        short angle=GetHeadingBetween(&unit->pos,&center);
+        Vec3 pos=AddVec3(unit->pos,Offset(angle,0x3200000));
+        Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,pos);
+        ((Class_0044e730*)move)->SetApproachRadius(128);
+        order->flags|=0xe0;
+        order->SetAttachedFx(move);
+        return 2;
+    }
+    unsigned int state=0; state=order->state;
+    switch(state) {
+    case 0:
+        if (unit->motion && (unit->def->flags1&0x800)) {
+            if (order->target) {
+                if (IssueAttackOrder(unit,order->target,0)) { order->flags=0; return 0; }
+            } else {
+                if (!order->pos.x && !order->pos.z && !order->pos.y) order->pos=unit->pos;
+                order->angle=RandomInt(0x10000);
+                order->parity=order->angle&1;
+                g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+                if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
+                g_seams.units->SetStateBits(unit, 1,1);
+                if ((unit->motion->flags&3)==1) {
+                    unit->motion->SetFlightMode(unit,2);
+                    Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,unit->pos);
+                    ((Class_0044e6c0*)move)->SetAltitude(unit->def->altitude/2);
+                    order->SetAttachedFx(move);
+                    order->flags|=0xe0;
+                }
+            }
+            return 1;
+        }
+        break;
+    case 1: {
+        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        if ((unsigned int)unit->health < (unit->def->maxHealth>>2)*3) {
+            LandingPadList pads;
+            g_seams.ai->GetFactoriesInRadius(((Owner*)unit->player.get())->index,&unit->pos,0xf00,&pads);
+            if (!pads.empty()) {
+                order->SetAttachedFx(0);
+                Unit* pad=pads[RandomInt(pads.size())];
+                AppendOrder(unit,new (kSim) Order("VTOL_LANDING",pad,0,0,0,0));
+                order->flags=0;
+                return 0;
+            }
+        }
+        Unit* target=g_seams.targeting->FindBestTargetIfFireAtWill(unit);
+        if (target && IssueAttackOrder(unit,target,0)) return 5;
+        if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x5555;
+        Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
+        Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,pos);
+        ((Class_0044e730*)move)->SetApproachRadius(128);
+        order->SetAttachedFx(move);
+        order->SetDeadlineTicks(RandomInt(30)+30);
+        order->flags|=0xe0;
+        return 2;
+    }
+    }
+    return 7;
+}
+
+// FUNCTION: 0x410850
+int __stdcall VtolSeekGuardOrder(Unit* unit, Order* order, int flags)
+{
+    if (flags&0x40) return 5;
+    if ((int)unit->spatialBucket.get() == (int)g_game->overflowBucket.get()) {
+        Vec3 center;
+        center.x=(g_game->mapWidth/2)<<16;
+        center.z=(g_game->mapHeight/2)<<16;
+        short angle=GetHeadingBetween(&unit->pos,&center);
+        Vec3 pos=AddVec3(unit->pos,Direction(angle,0x3200000));
+        Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,pos);
+        move->SetApproachRadius(128);
+        order->flags|=0xe0;
+        order->SetAttachedFx(move);
+        return 2;
+    }
+    switch(order->state) {
+    case 0:
+        if (unit->motion && (unit->def->flags1&0x800)) {
+            Vec3* pos=&order->pos;
+            if (!pos->x && !pos->z && !pos->y) *pos=unit->pos;
+            order->angle=RandomInt(0x10000);
+            order->parity=order->angle&1;
+            return 1;
+        }
+        break;
+    case 1:
+        int result=Patrol(unit,order,flags);
+        return result;
+    }
+    return 7;
+}
+
+// FUNCTION: 0x412d40
+int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
+{
+    if (flags & 0x10008) {
+        if (*(int*)&order->next == 0 && (unit->flags & 0x300000))
+            AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", order->target, &order->pos, 0, 0, 0));
+        return 5;
+    }
+    if (order->target == 0 && (order->flags_42 & 0x200)) {
+        if (*(int*)&order->next == 0)
+            AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", 0, &unit->pos, 0, 0, 0));
+        return 5;
+    }
+    if ((int)unit->spatialBucket.get() == (int)g_game->overflowBucket.get()) {
+        Vec3 centre;
+        centre.x = g_game->mapWidth / 2 << 16;
+        centre.z = g_game->mapHeight / 2 << 16;
+        short angle = GetHeadingBetween(&unit->pos, &centre);
+        Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x3200000));
+        Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, dest);
+        obj->SetApproachRadius(0x80);
+        order->flags |= 0xe0;
+        order->SetAttachedFx(obj);
+        return 2;
+    }
+    if (order->range && (int)_hypot(unit->xWhole - order->x, unit->zWhole - order->z) >= order->range)
+        return 5;
+    switch (order->state) {
+    case 0:
+        if (unit->motion && (unit->def->flags1 & 0x800)) {
+            order->AnnounceStatusIfFlagged("Attacking");
+            PrepVtolClimb(unit, order, 0);
+            order->SetDeadlineTicks(1);
+            order->ticks = 0;
+            return 1;
+        }
+        break;
+    case 1:
+        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
+        g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
+        if (flags & 0xe0) {
+            if (IsAhead(unit, order)) {
+                Vec3 from = Add(unit->pos, Offset(unit->heading, unit->def->maxvelocity * 30));
+                Vec3 to = Offset(unit->heading, unit->def->maxvelocity);
+                AirManeuverOrder* obj = new (kSim) AirManeuverOrder(order, from, to);
+                obj->SetAltitude(unit->def->altitude);
+                order->SetAttachedFx(obj);
+                order->SetDeadlineTicks(RandomInt(0x1e) + 0x3c);
+                order->ticks = 0;
+                return 2;
+            }
+        }
+        if (!(flags & 0xe0) && order->ticks < 0x5a) {
+            if (IsAhead(unit, order))
+                order->ticks = 0;
+            else
+                order->ticks += 0x2d;
+            Fixed d;
+            d.value = (int)_hypot(unit->pos.x - order->target->pos.x, unit->pos.z - order->target->pos.z);
+            if (d.parts.whole > 0xa0) {
+                Vec3 p = order->target->pos;
+                p.x += ((UnitMotion*)order->target->motion)->velocity.x * 45;
+                p.z += ((UnitMotion*)order->target->motion)->velocity.z * 45;
+                order->SetAttachedFx(new (kSim) AirManeuverOrder(order, p,
+                    Sum(((UnitMotion*)order->target->motion)->velocity, Offset(order->target->heading, order->target->def->maxvelocity / 2))));
+            }
+            order->SetDeadlineTicks(0x2d);
+            order->flags |= 0x100e8;
+            return 2;
+        }
+        order->SetAttachedFx(0);
+        AppendOrder(unit, new (kSim) Order("VTOL_EVADE", order->target, 0, 0, 0, 0));
+        order->ticks = 0;
+        order->flags = 0;
+        return 0;
+    }
+    return 7;
+}
+
+// FUNCTION: 0x4152f0
+int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags)
+{
+    if ((flags & 0x48) != 0) {
+        order->SetDeadlineTicks(0x1e);
+        return 0;
+    }
+    for (;;) {
+        switch (order->state) {
+        case 0:
+            if (unit->motion && (unit->def->flags1 & 0x800) && (unit->def->flags2 & 0x200)) {
+                if (order->target != 0)
+                    order->pos = order->target->pos;
+                EnsurePatrolReturnOrder(unit, order);
+                order->AnnounceStatusIfFlagged("Patrolling");
+                PrepVtolClimb(unit, order, 0);
+                return 1;
+            }
+            break;
+        case 1: {
+            if (flags & 0xe0)
+                return 6;
+            Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, order->pos);
+            obj->SetAltitude(unit->def->altitude);
+            order->SetAttachedFx(obj);
+            order->SetDeadlineTicks(0x2d);
+            order->flags |= 0xe0;
+            if (Land(unit, order))
+                return 0;
+            if (((Player*)unit->player)->energy >= ((Player*)unit->player)->energyCapacity * 0.2) {
+                std::vector<Unit*> units;
+                int range = unit->def->range << 16;
+                RepairableUnitVisitor collector((Player*)unit->player, &units, unit);
+                g_seams.map->VisitObjectsInRange(&unit->pos, range, (UnitVisitor*)&collector);
+                if (!units.empty()) {
+                    Unit* target = units[RandomInt(units.size())];
+                    if (g_seams.units->CanRepair(unit, 0, target) && target->buildLeft == 0.0f) {
+                        if (IssueRepairOrder(unit, target, 0))
+                            return 6;
+                        return 3;
+                    }
+                    if (g_seams.units->CanRepair(unit, 0, target) && target->buildLeft != 0.0f) {
+                        order->SetAttachedFx(0);
+                        AppendOrder(unit, new (kSim) Order("VTOL_HELPBUILD", target, 0, 0, 0, 0));
+                        order->flags = 0;
+                        return 3;
+                    }
+                }
+            }
+            Vec3 energyPos, metalPos;
+            Vec3* energy = &energyPos;
+            Vec3* metal = &metalPos;
+            float energyAmount, metalAmount;
+            Fixed range;
+            range.value = 0xf00000;
+            if (g_seams.map->PickRandomReclaimableResourcesInRadius(&unit->pos, range.value, &energy, &energyAmount, &metal, &metalAmount)) {
+                if (((Player*)unit->player)->GetMetal() < ((Player*)unit->player)->metalCapacity * 0.2 && metal) {
+                    order->SetAttachedFx(0);
+                    AppendOrder(unit, new (kSim) Order("VTOL_RECLAIM", 0, metal, 0, 0, 0));
+                    order->flags = 0;
+                    return 3;
+                }
+                if (((Player*)unit->player)->GetEnergy() < ((Player*)unit->player)->energyCapacity * 0.2 && energy) {
+                    order->SetAttachedFx(0);
+                    AppendOrder(unit, new (kSim) Order("VTOL_RECLAIM", 0, energy, 0, 0, 0));
+                    order->flags = 0;
+                    return 3;
+                }
+                if (metal && Total(((Player*)unit->player)->GetMetal(), metalAmount) <= ((Player*)unit->player)->metalCapacity) {
+                    order->SetAttachedFx(0);
+                    AppendOrder(unit, new (kSim) Order("VTOL_RECLAIM", 0, metal, 0, 0, 0));
+                    order->flags = 0;
+                    return 3;
+                }
+                if (energy && Total(((Player*)unit->player)->GetEnergy(), energyAmount) <= ((Player*)unit->player)->energyCapacity) {
+                    order->SetAttachedFx(0);
+                    AppendOrder(unit, new (kSim) Order("VTOL_RECLAIM", 0, energy, 0, 0, 0));
+                    order->flags = 0;
+                    return 3;
+                }
+            }
+            return 2;
+        }
+        }
+        return 7;
+    }
 }

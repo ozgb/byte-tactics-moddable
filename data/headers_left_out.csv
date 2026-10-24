@@ -10,7 +10,6 @@ AddOrder,mismatch,"static risk rule: a convention, parameter count, or non-point
 AddTextGadget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AddTimer,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AddUnitToMap,mismatch,placeholder type Obj_0047cc30: left for the type-naming issues
-AddVec3,ambiguous,several definitions share the name
 AdjustBuildCount,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AdvanceGafSequence,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AimCobStub,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

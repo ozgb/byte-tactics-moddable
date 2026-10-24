@@ -2351,6 +2351,7 @@ CommandArgs::Tokenize,src/util/commands.cpp,platform,folder:src/util/,
 CommandArgs::SubstituteArgs,src/util/commands.cpp,platform,folder:src/util/,
 CommandArgs::ShiftArgs,src/util/commands.cpp,platform,folder:src/util/,
 ClearDefaultCommandHandler,src/util/commands.cpp,platform,folder:src/util/,
+operator==,src/util/commands.cpp,platform,folder:src/util/,
 RegisterCommand,src/util/commands.cpp,platform,folder:src/util/,
 RegisterCommands,src/util/commands.cpp,platform,folder:src/util/,
 SetDefaultCommandHandler,src/util/commands.cpp,platform,folder:src/util/,
@@ -4699,7 +4700,6 @@ operator-,src/graphics/particles.cpp,platform,presentation,platform
 operator-,src/ingame/markers.cpp,platform,presentation,platform
 operator-,src/weapons/weapons.cpp,platform,file:src/weapons/,platform
 operator<,src/ai/pathfind.cpp,pathfinding,file:src/ai/pathfind,
-operator==,src/util/commands.cpp,platform,folder:src/util/,
 operator==,src/util/tdf.cpp,platform,folder:src/util/,
 operator==,src/util/tdf_4c54f0.cpp,platform,folder:src/util/,
 operator==,src/weapons/weapon_types.cpp,weapons,file:src/weapons/,

@@ -1367,7 +1367,7 @@ static_assert(offsetof(Game, dplayAddressDialogFlags_2aaf) == 0x2aaf, "dplayAddr
 static_assert(offsetof(Game, flags_2b4c) == 0x2b4c, "flags_2b4c");
 static_assert(offsetof(Game, buffer_2ab1) == 0x2ab1, "buffer_2ab1");
 static_assert(offsetof(Game, game_info) == 0x2b6a, "game_info");
-static_assert(offsetof(Game, joinGuid) == 0x2ba2, "field_2ba2");
+static_assert(offsetof(Game, joinGuid) == 0x2ba2, "joinGuid");
 static_assert(offsetof(Game, gameName) == 0x2bc1, "gameName");
 static_assert(offsetof(Game, gameName_2bc1) == 0x2bc1, "gameName_2bc1");
 static_assert(offsetof(Game, password) == 0x2be3, "password");
@@ -1414,7 +1414,7 @@ static_assert(offsetof(Game, ordersPanelFlags_37ebe_6) == 0x37ebe, "ordersPanelF
 static_assert(offsetof(Game, region_37e27) == 0x37e27, "region_37e27");
 static_assert(offsetof(Game, windX) == 0x37ecc, "windX");
 static_assert(offsetof(Game, wind) == 0x37ecc, "wind");
-static_assert(offsetof(Game, maxUnitsSetting) == 0x37ee6, "field_37ee6");
+static_assert(offsetof(Game, maxUnitsSetting) == 0x37ee6, "maxUnitsSetting");
 static_assert(offsetof(Game, side) == 0x37ef2, "side");
 static_assert(offsetof(Game, visualFlags) == 0x37f06, "visualFlags");
 static_assert(offsetof(Game, bits_37f06) == 0x37f06, "bits_37f06");
@@ -1432,7 +1432,7 @@ static_assert(offsetof(Game, names_37f5f) == 0x37f5f, "names_37f5f");
 static_assert(offsetof(Game, sideNames_37f5b) == 0x37f5b, "sideNames_37f5b");
 static_assert(offsetof(Game, maxStats) == 0x3918f, "maxStats");
 static_assert(offsetof(Game, maxKills) == 0x3918f, "maxKills");
-static_assert(offsetof(Game, pad_391cf) == 0x391cf, "field_391cf");
+static_assert(offsetof(Game, pad_391cf) == 0x391cf, "pad_391cf");
 static_assert(offsetof(Game, campaignMissionStatus_391cf) == 0x391cf, "campaignMissionStatus_391cf");
 static_assert(offsetof(Game, campaignMissionStatus) == 0x391cf, "campaignMissionStatus");
 static_assert(offsetof(Game, pad_39201) == 0x39201, "pad_39201");

@@ -70,6 +70,13 @@ struct FogGrid {
     int count;                         // +0xc
 };
 
+struct MapFogGrid {
+    FogCell* cells;                    // +0x0
+    unsigned int width;                // +0x4
+    unsigned int height;               // +0x8
+    int count;                         // +0xc
+};
+
 // A 10-byte cell of the second fog grid.
 struct Rec {
     Rec() { a = 0; b = 0; flags = 0; field_6 = 0; }
@@ -800,7 +807,7 @@ struct MapSettings {
     int* sortIndices;                  // +0x04
     int* sortLineCount;                // +0x08
     char unknown_c[0x24 - 0xc];
-    FogGrid* grid;
+    MapFogGrid* grid;
     int baseX;                         // +0x28
     int baseY;                         // +0x2c
     char unknown_30[0x38 - 0x30];
@@ -1040,7 +1047,7 @@ void LoadTntMap()
         obj = list;
     }
     int rb = 2;
-    mapSettings->grid = (FogGrid*)obj;
+    mapSettings->grid = (MapFogGrid*)obj;
     a.n = 2;
     if (mw % 32 != 0)
         a.n = 3;
@@ -1115,12 +1122,12 @@ void FreeMapResources()
     g_game->cells = 0;
     g_game->mapValues = 0;
 
-    void** p = (void**)(FogGrid *)g_game->field_1421f;
+    void** p = (void**)(MapFogGrid *)g_game->field_1421f;
     if (p) {
         operator delete(p[0]);
         operator delete(p);
     }
-    (*(FogGrid **)&g_game->field_1421f) = 0;
+    (*(MapFogGrid **)&g_game->field_1421f) = 0;
 
     FogGrid* g1 = (FogGrid*)&g_game->grid1;
     g1->width = 0;
@@ -1249,7 +1256,7 @@ void __stdcall DrawFogOfWar(void* surface)
         (*(Flags_14281*)&g_game->mapFlags_14281).raw |= 8;
     }
 
-    FogGrid* grid = (FogGrid *)g_game->field_1421f;
+    MapFogGrid* grid = (MapFogGrid *)g_game->field_1421f;
     int scrollY = g_game->scrollY;
     int scrollX = g_game->scrollX;
     int q = (scrollY + 16) / 32 + (scrollX + 16) / 32;

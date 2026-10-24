@@ -106,7 +106,7 @@ int CobScript::GetTransporterId()
 CobScript::~CobScript()
 {
     if (pieces) {
-        GameFreeThunk((int*)pieces.get());
+        GameFreeThunk(pieces.get());
     }
     if (statics) {
         GameFreeThunk((int*)statics);

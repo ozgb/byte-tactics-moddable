@@ -1,4 +1,3 @@
-#include "../../interfaces/ref.h"
 // MovementClass: one of the 32 entries of the movement class table at
 // 0x512358: the name, the footprint, the water depths and slopes read from
 // moveinfo.tdf (the TDF keys FootPrintX, FootPrintZ, maxwaterdepth,
@@ -9,6 +8,8 @@
 // pointers stay private to their own files.
 #ifndef MOVEMENT_CLASS_H
 #define MOVEMENT_CLASS_H
+
+#include "../../interfaces/ref.h"
 
 struct Point16;
 struct Source_00440340;

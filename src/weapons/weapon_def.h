@@ -1,4 +1,3 @@
-#include "../../interfaces/ref.h"
 // WeaponDef: one weapon definition (Thaldren's WeaponDef, 0x115 bytes), the
 // elements of the table at g_game+0x2cf3. The one declaration of the struct for
 // every file that reads a weapon's range, damage, flags or projectile numbers;

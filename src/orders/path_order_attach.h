@@ -1,4 +1,3 @@
-#include "../../interfaces/ref.h"
 // PathOrderAttach: the 0x10-byte link at +0x12 of an order, the node the
 // PathGoal family and the order handlers hang off the order's target. Its
 // constructor puts it in its owner's list (the head is the unit's +0xa2) and
@@ -11,6 +10,8 @@
 // and vtol_orders_414380.cpp the class decides a register allocation.
 #ifndef PATH_ORDER_ATTACH_H
 #define PATH_ORDER_ATTACH_H
+
+#include "../../interfaces/ref.h"
 
 struct Unit;
 

@@ -2013,6 +2013,7 @@ address,function,file,kind,target
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player_409730.cpp,global_read,g_seams
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player_409730.cpp,indirect_call,indirect via float (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,begin
+0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,operator[]
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,deref_read,*int
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,deref_read,*unsigned int
@@ -2025,6 +2026,7 @@ address,function,file,kind,target
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,function,
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,global_read,g_game
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,global_read,g_playerAI
+0x409e90,SetUnitLimits,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x409e90,SetUnitLimits,src/ai/ai_player.cpp,call,operator[]
 0x409e90,SetUnitLimits,src/ai/ai_player.cpp,deref_read,*unsigned int
 0x409e90,SetUnitLimits,src/ai/ai_player.cpp,field_read,Elem_0040d550::unknown_0
@@ -2035,6 +2037,7 @@ address,function,file,kind,target
 0x409e90,SetUnitLimits,src/ai/ai_player.cpp,function,
 0x409e90,SetUnitLimits,src/ai/ai_player.cpp,global_read,g_game
 0x409e90,SetUnitLimits,src/ai/ai_player.cpp,global_read,g_playerAI
+0x409f20,IsUnderLimit,src/ai/ai_player.cpp,call,operator->
 0x409f20,IsUnderLimit,src/ai/ai_player.cpp,call,operator[]
 0x409f20,IsUnderLimit,src/ai/ai_player.cpp,deref_read,*int
 0x409f20,IsUnderLimit,src/ai/ai_player.cpp,field_read,Game::unitDefCount
@@ -2045,6 +2048,7 @@ address,function,file,kind,target
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,CommandArgs::InitArgs
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,EnableAICommands
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,ExecuteCommandText
+0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,operator UnitDef *
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,operator[]
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,strlen
@@ -2063,6 +2067,7 @@ address,function,file,kind,target
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,CommandArgs::InitArgs
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,EnableAICommands
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,ExecuteCommandText
+0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,operator UnitDef *
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,operator[]
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,strlen
@@ -2079,6 +2084,7 @@ address,function,file,kind,target
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,global_read,g_game
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,call,PlayerAI::InitUnitTables
+0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,call,operator->
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,field_read,Player::active
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,field_read,Player::type
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,field_read,PlayersSeam::LoadDefaultAIScript
@@ -2250,6 +2256,8 @@ address,function,file,kind,target
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,call,begin
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,call,empty
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,call,end
+0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,call,operator PlayerAI *
+0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,call,operator->
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,call,push_back
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,deref_read,*Unit
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,field_maybe_written,UnitList_00409160::units
@@ -2263,6 +2271,7 @@ address,function,file,kind,target
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40b0d0,HasReadyUnitInRange,src/ai/ai_player.cpp,call,begin
 0x40b0d0,HasReadyUnitInRange,src/ai/ai_player.cpp,call,end
+0x40b0d0,HasReadyUnitInRange,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x40b0d0,HasReadyUnitInRange,src/ai/ai_player.cpp,deref_read,*Unit
 0x40b0d0,HasReadyUnitInRange,src/ai/ai_player.cpp,field_read,Unit::flags
 0x40b0d0,HasReadyUnitInRange,src/ai/ai_player.cpp,field_read,UnitList_00409160::units
@@ -2274,6 +2283,7 @@ address,function,file,kind,target
 0x40b0d0,HasReadyUnitInRange,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player_40b1c0.cpp,call,begin
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player_40b1c0.cpp,call,end
+0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player_40b1c0.cpp,call,operator PlayerAI *
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player_40b1c0.cpp,call,operator[]
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player_40b1c0.cpp,deref_read,*Unit
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player_40b1c0.cpp,field_read,PlayerAI::vec_8d
@@ -2288,6 +2298,7 @@ address,function,file,kind,target
 0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp,call,PlayerAI::ComputeBaseWeights
 0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp,call,PlayerAI::RefreshUnitLists
 0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp,call,RandomInt
+0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp,field_read,Game::ticks
 0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp,field_read,PlayerAI::lastTick
 0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp,field_write,PlayerAI::lastTick
@@ -2296,19 +2307,25 @@ address,function,file,kind,target
 0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40b320,CreatePlayerAI,src/ai/ai_player.cpp,call,PlayerAI::ComputeBaseWeights
 0x40b320,CreatePlayerAI,src/ai/ai_player.cpp,call,operator new
+0x40b320,CreatePlayerAI,src/ai/ai_player.cpp,call,operator->
+0x40b320,CreatePlayerAI,src/ai/ai_player.cpp,call,operator=
 0x40b320,CreatePlayerAI,src/ai/ai_player.cpp,function,
 0x40b320,CreatePlayerAI,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40b320,CreatePlayerAI,src/ai/ai_player.cpp,global_read,kSim
 0x40b370,RebuildFeatureCells,src/ai/ai_player.cpp,call,PlayerAI::BuildFeatureCells
+0x40b370,RebuildFeatureCells,src/ai/ai_player.cpp,call,operator->
 0x40b370,RebuildFeatureCells,src/ai/ai_player.cpp,function,
 0x40b370,RebuildFeatureCells,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40b390,DestroyPlayerAI,src/ai/ai_player.cpp,call,PlayerAI::~PlayerAI
+0x40b390,DestroyPlayerAI,src/ai/ai_player.cpp,call,get
 0x40b390,DestroyPlayerAI,src/ai/ai_player.cpp,call,operator delete
+0x40b390,DestroyPlayerAI,src/ai/ai_player.cpp,call,operator=
 0x40b390,DestroyPlayerAI,src/ai/ai_player.cpp,function,
 0x40b390,DestroyPlayerAI,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40b390,DestroyPlayerAI,src/ai/ai_player.cpp,global_write,g_playerAI
 0x40b530,GetFactoriesInRadius,src/ai/ai_player_40b530.cpp,call,begin
 0x40b530,GetFactoriesInRadius,src/ai/ai_player_40b530.cpp,call,end
+0x40b530,GetFactoriesInRadius,src/ai/ai_player_40b530.cpp,call,operator->
 0x40b530,GetFactoriesInRadius,src/ai/ai_player_40b530.cpp,call,push_back
 0x40b530,GetFactoriesInRadius,src/ai/ai_player_40b530.cpp,deref_read,*Unit
 0x40b530,GetFactoriesInRadius,src/ai/ai_player_40b530.cpp,field_read,Def::flags
@@ -2357,11 +2374,13 @@ address,function,file,kind,target
 0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
 0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::GetWeaponRange]"
 0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadius]"
+0x40ba80,GetBasePosition,src/ai/ai_player.cpp,call,get
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,call,operator=
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,deref_read,*Struct_0040ba80
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,deref_write,*Struct_0040ba80
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,function,
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,global_read,g_playerAI
+0x40bab0,GetMirroredBasePosition,src/ai/ai_player.cpp,call,get
 0x40bab0,GetMirroredBasePosition,src/ai/ai_player.cpp,field_read,Game::baseX
 0x40bab0,GetMirroredBasePosition,src/ai/ai_player.cpp,field_read,Struct_0040bab0::a
 0x40bab0,GetMirroredBasePosition,src/ai/ai_player.cpp,field_read,Struct_0040bab0::c
@@ -2373,6 +2392,7 @@ address,function,file,kind,target
 0x40bab0,GetMirroredBasePosition,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,IsCountBelowAiLimit
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,Max
+0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,get
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,operator Mission *
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,operator UnitDef *
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,deref_escape,*Elem_0040cfb0
@@ -2436,6 +2456,7 @@ address,function,file,kind,target
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,call,PlayerAI::FindCellNearFeatures
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,call,PlayerAI::FindRandomPlacementCell
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,call,RandomInt
+0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,call,operator->
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,deref_read,*Point16
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_escape,PlayerAI::centre
@@ -2451,16 +2472,18 @@ address,function,file,kind,target
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,function,
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,global_read,g_game
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,global_read,g_playerAI
+0x40c200,GetUnitCount,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x40c200,GetUnitCount,src/ai/ai_player.cpp,deref_read,*int
 0x40c200,GetUnitCount,src/ai/ai_player.cpp,deref_read,*short
 0x40c200,GetUnitCount,src/ai/ai_player.cpp,function,
 0x40c200,GetUnitCount,src/ai/ai_player.cpp,global_read,g_playerAI
+0x40c230,GetBuilderCount,src/ai/ai_player.cpp,call,get
 0x40c230,GetBuilderCount,src/ai/ai_player.cpp,deref_read,*int
-0x40c230,GetBuilderCount,src/ai/ai_player.cpp,deref_read,*void
 0x40c230,GetBuilderCount,src/ai/ai_player.cpp,function,
-0x40c230,GetBuilderCount,src/ai/ai_player.cpp,global_escape,g_playerAI
+0x40c230,GetBuilderCount,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40c250,DumpPlayerAI,src/ai/ai_player.cpp,call,FilePrintf
 0x40c250,DumpPlayerAI,src/ai/ai_player.cpp,call,operator Mission *
+0x40c250,DumpPlayerAI,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x40c250,DumpPlayerAI,src/ai/ai_player.cpp,call,operator UnitDef *
 0x40c250,DumpPlayerAI,src/ai/ai_player.cpp,call,operator[]
 0x40c250,DumpPlayerAI,src/ai/ai_player.cpp,call,sprintf
@@ -2490,6 +2513,7 @@ address,function,file,kind,target
 0x40c250,DumpPlayerAI,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40c250,DumpPlayerAI,src/ai/ai_player.cpp,global_read,g_seams
 0x40c250,DumpPlayerAI,src/ai/ai_player.cpp,indirect_call,"indirect via char *(*)(Mission *, int) __attribute__((stdcall)) [MapSeam::GetNameSlot]"
+0x40c4f0,HasSpecialUnit,src/ai/ai_player.cpp,call,get
 0x40c4f0,HasSpecialUnit,src/ai/ai_player.cpp,deref_read,*int
 0x40c4f0,HasSpecialUnit,src/ai/ai_player.cpp,function,
 0x40c4f0,HasSpecialUnit,src/ai/ai_player.cpp,global_read,g_playerAI
@@ -6618,6 +6642,9 @@ address,function,file,kind,target
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawModel3doProjected
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,GetGafSequenceFrame
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,PointInRect
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator ExplodedPiece *
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator bool
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator=
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,deref_read,*int
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_escape,Game::count_1491b
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_escape,Game::viewport
@@ -6677,6 +6704,8 @@ address,function,file,kind,target
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,StepGafSequence
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,UpdateExplodedPiece
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,get
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator ExplodedPiece *
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator!=
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator=
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,deref_read,*DebrisView
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,deref_read,*int
@@ -6724,13 +6753,20 @@ address,function,file,kind,target
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,global_read,g_seams
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,global_write,g_explodedPieces
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
+0x421150,FindFreeExplodedPieceSlot,src/weapons/explosions.cpp,call,operator==
 0x421150,FindFreeExplodedPieceSlot,src/weapons/explosions.cpp,function,
 0x421150,FindFreeExplodedPieceSlot,src/weapons/explosions.cpp,global_read,g_explodedPieces
 0x421170,UpdateExplodedPieces,src/weapons/explosions.cpp,call,UpdateExplodedPiece
+0x421170,UpdateExplodedPieces,src/weapons/explosions.cpp,call,operator ExplodedPiece *
+0x421170,UpdateExplodedPieces,src/weapons/explosions.cpp,call,operator!=
+0x421170,UpdateExplodedPieces,src/weapons/explosions.cpp,call,operator=
 0x421170,UpdateExplodedPieces,src/weapons/explosions.cpp,function,
 0x421170,UpdateExplodedPieces,src/weapons/explosions.cpp,global_read,g_explodedPieces
 0x421170,UpdateExplodedPieces,src/weapons/explosions.cpp,global_write,g_explodedPieces
 0x4211a0,DrawExplodedPieces,src/weapons/explosions.cpp,call,DrawExplodedPiece
+0x4211a0,DrawExplodedPieces,src/weapons/explosions.cpp,call,operator ExplodedPiece *
+0x4211a0,DrawExplodedPieces,src/weapons/explosions.cpp,call,operator!=
+0x4211a0,DrawExplodedPieces,src/weapons/explosions.cpp,call,operator=
 0x4211a0,DrawExplodedPieces,src/weapons/explosions.cpp,function,
 0x4211a0,DrawExplodedPieces,src/weapons/explosions.cpp,global_read,g_explodedPieces
 0x4211a0,DrawExplodedPieces,src/weapons/explosions.cpp,global_write,g_explodedPieces
@@ -6842,6 +6878,7 @@ address,function,file,kind,target
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,BreakPieceIntoDebris
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,CMemoryCache::AllocHandle
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,FindFreeExplodedPieceSlot
+0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,get
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,operator=
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,deref_read,*ExplodedPiece
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,deref_read,*PieceRec
@@ -10689,9 +10726,10 @@ address,function,file,kind,target
 0x437a20,CMemoryCache::FreeBuffer,src/units/unit_motion.cpp,call,GameFreeThunk
 0x437a20,CMemoryCache::FreeBuffer,src/units/unit_motion.cpp,field_read,CMemoryCache::base
 0x437a20,CMemoryCache::FreeBuffer,src/units/unit_motion.cpp,function,
+0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,call,HandleGet
+0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,call,HandleSet
 0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,deref_read,*int
 0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,deref_read,*void
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,deref_write,*void
 0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,field_read,CMemoryCache::base
 0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,field_read,CMemoryCache::cap
 0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,field_read,CMemoryCache::cur
@@ -10744,6 +10782,9 @@ address,function,file,kind,target
 0x437c90,CMemoryCache::ReleaseHandle,src/units/unit_motion.cpp,field_read,Chunk_00437a30::size
 0x437c90,CMemoryCache::ReleaseHandle,src/units/unit_motion.cpp,field_write,Chunk_00437a30::owner
 0x437c90,CMemoryCache::ReleaseHandle,src/units/unit_motion.cpp,function,
+0x437cd0,InitMeteors,src/map/meteors.cpp,call,operator->
+0x437cd0,InitMeteors,src/map/meteors.cpp,call,operator=
+0x437cd0,InitMeteors,src/map/meteors.cpp,call,operator==
 0x437cd0,InitMeteors,src/map/meteors.cpp,field_escape,Game::weapons
 0x437cd0,InitMeteors,src/map/meteors.cpp,field_read,<anon>::meteor
 0x437cd0,InitMeteors,src/map/meteors.cpp,field_read,Seams::weapons
@@ -10779,6 +10820,7 @@ address,function,file,kind,target
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,FUN_004b7123
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,GameRand
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,StartShower
+0x437de0,UpdateMeteors,src/map/meteors.cpp,call,operator WeaponDef *
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Game::ticks
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Point16::x
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Point16::y
@@ -45126,6 +45168,9 @@ address,function,file,kind,target
 ,HAPI_readfromfile,src/files/files_api.h,function,
 ,HAPI_readfromfile,src/files/files_api.h,global_read,g_seams
 ,HAPI_readfromfile,src/files/files_api.h,indirect_call,"indirect via int (*)(FileHandle *, void *, int) __attribute__((stdcall)) [FilesSeam::Read]"
+,HandleGet,src/units/unit_motion.cpp,call,get
+,HandleGet,src/units/unit_motion.cpp,deref_read,*void
+,HandleGet,src/units/unit_motion.cpp,function,
 ,HandleHostEvent,src/graphics/display.cpp,call,HandleVirtualKey
 ,HandleHostEvent,src/graphics/display.cpp,call,PushKeyCode
 ,HandleHostEvent,src/graphics/display.cpp,call,PushMouseEvent
@@ -45158,6 +45203,10 @@ address,function,file,kind,target
 ,HandleHostEvent,src/graphics/display.cpp,global_read,g_timerSlots
 ,HandleHostEvent,src/graphics/display.cpp,indirect_call,indirect via void (*)(int) __attribute__((cdecl)) [TimerTable_4b63f0::closeHandler]
 ,HandleHostEvent,src/graphics/display.cpp,indirect_call,"indirect via void (*)(int, int, int) __attribute__((cdecl)) [App_4b5980::callback]"
+,HandleSet,src/units/unit_motion.cpp,call,operator=
+,HandleSet,src/units/unit_motion.cpp,deref_write,*Ref<char>
+,HandleSet,src/units/unit_motion.cpp,deref_write,*void
+,HandleSet,src/units/unit_motion.cpp,function,
 ,HapiBank::CloseBank,src/files/files_bank.h,field_read,FilesSeam::BankClose
 ,HapiBank::CloseBank,src/files/files_bank.h,field_read,Seams::files
 ,HapiBank::CloseBank,src/files/files_bank.h,function,
@@ -49005,6 +49054,7 @@ address,function,file,kind,target
 ,ReachQuirkGuard,src/harness/harness.cpp,call,UnitIsSlot
 ,ReachQuirkGuard,src/harness/harness.cpp,call,memcpy
 ,ReachQuirkGuard,src/harness/harness.cpp,call,memset
+,ReachQuirkGuard,src/harness/harness.cpp,call,operator unsigned char *
 ,ReachQuirkGuard,src/harness/harness.cpp,deref_read,*unsigned short
 ,ReachQuirkGuard,src/harness/harness.cpp,deref_read,*void
 ,ReachQuirkGuard,src/harness/harness.cpp,field_read,AiSeam::SetUnitSquad
@@ -50991,6 +51041,7 @@ address,function,file,kind,target
 ,VisitExplosions,src/harness/harness.cpp,call,VisitElement
 ,VisitExplosions,src/harness/harness.cpp,call,VisitRaw
 ,VisitExplosions,src/harness/harness.cpp,call,memset
+,VisitExplosions,src/harness/harness.cpp,call,operator unsigned char *
 ,VisitExplosions,src/harness/harness.cpp,call,sprintf
 ,VisitExplosions,src/harness/harness.cpp,deref_read,*unsigned int
 ,VisitExplosions,src/harness/harness.cpp,function,
@@ -51234,6 +51285,7 @@ address,function,file,kind,target
 ,VisitPlayerAI,src/harness/harness.cpp,call,VisitElement
 ,VisitPlayerAI,src/harness/harness.cpp,call,VisitRawVector
 ,VisitPlayerAI,src/harness/harness.cpp,call,VisitUnitVector
+,VisitPlayerAI,src/harness/harness.cpp,call,get
 ,VisitPlayerAI,src/harness/harness.cpp,call,sprintf
 ,VisitPlayerAI,src/harness/harness.cpp,field_read,VectorSpec::elem
 ,VisitPlayerAI,src/harness/harness.cpp,field_read,VectorSpec::name

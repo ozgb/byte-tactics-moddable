@@ -2385,6 +2385,8 @@ platform,seams,shared_write,Vec3::x,1
 platform,targeting,shared_write,Vec3::x,2
 platform,targeting,shared_write,Vec3::y,1
 platform,targeting,shared_write,Vec3::z,2
+platform,units,call,HandleGet,1
+platform,units,call,HandleSet,1
 platform,units,indirect,CompareUnitTypeNames,1
 platform,units,shared_write,Fixed::value,3
 platform,units,shared_write,Point16::x,7
@@ -4804,6 +4806,7 @@ wind_meteors,platform,call,TdfFile::~TdfFile,1
 wind_meteors,platform,call,TdfRecord::GetFieldDouble,1
 wind_meteors,platform,call,TdfRecord::GetFieldInt,1
 wind_meteors,platform,call,TdfRecord::GetFieldString,1
+wind_meteors,platform,call,operator==,1
 wind_meteors,platform,shared_write,Point16::x,11
 wind_meteors,platform,shared_write,Point16::y,11
 wind_meteors,platform,shared_write,Vec3::x,21

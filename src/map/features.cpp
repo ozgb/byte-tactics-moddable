@@ -18,6 +18,7 @@
 
 #include "../util/tdf.h"
 #include "../files/files_api.h"
+#include "../../interfaces/ref.h"
 #include "../util/rot16.h"
 
 #pragma pack(push, 1)
@@ -104,8 +105,8 @@ struct NameEntry {
 
 struct AnimManager {
     char unknown_0[0x10];
-    AnimEntry* anim;                   // +0x10
-    FeatureUnit* featureUnit;          // +0x14
+    Ref<AnimEntry> anim;
+    Ref<FeatureUnit> featureUnit;
     int activeHead;                    // +0x18
     int idleHead;                      // +0x1c
     int freeHead;                      // +0x20
@@ -223,7 +224,7 @@ struct Feature {                       // the feature definition (0x100 bytes)
     };
     Anim ref;                          // +0xcc
     Anim refshad;                      // +0xd8
-    char* burnweapon;                  // +0xe4
+    Ref<char> burnweapon;
     union {
         short sparktime;               // +0xe8
         unsigned short burnTime;
@@ -762,7 +763,7 @@ void __stdcall ReplaceFeatureWithDead(int x, int y, int flag)
     else
         v = f->dead;
     if (cell->flags & 1) {
-        Spot* spot = (Spot *)g_game->spots + cell->spot;
+        Spot* spot = (Spot *)g_game->spots.get() + cell->spot;
         if (spot->flags & 2)
             v = f->reclamate;
         RemoveFeature(cell, 0);
@@ -910,7 +911,7 @@ void __stdcall SpreadFire(Feature* f, Point16* cell)
     }
     if (f->burnweapon) {
         Vec3 pos = FootprintCentre(cell, f);
-        g_seams.weapons->ApplyAreaDamageAt((WeaponDef*)f->burnweapon, &pos);
+        g_seams.weapons->ApplyAreaDamageAt((WeaponDef*)f->burnweapon.get(), &pos);
     }
 }
 
@@ -1173,7 +1174,7 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon)
         StartFeatureBurning(x, z, 0);
     } else if (cell->flags & 1) {
         if (!f->noobject) {
-            Spot* s = &((Spot *)g_game->spots)[cell->spot];
+            Spot* s = &((Spot *)g_game->spots.get())[cell->spot];
             if (s->x != x)
                 return;
             if (s->z != z)
@@ -1218,7 +1219,7 @@ int __stdcall RemoveFeature(Cell* cell, int flag)
     if (flag == 0 && (f->flags16 & 0x200))
         return 0;
     if (cell->flags & 1) {
-        Spot* spot = &((Spot *)g_game->spots)[cell->sf.spot];
+        Spot* spot = &((Spot *)g_game->spots.get())[cell->sf.spot];
         if (!(f->flags16 & 1)) {
             FreeObjectState(spot->state);
             spot->state = 0;
@@ -1279,7 +1280,7 @@ void __stdcall SaveFeatures(HapiBank* file)
             Feature* f = &g_game->features[c->feature];
             if (!(f->flags & 1)) {
                 Model rec;
-                Spot* s = &((Spot *)g_game->spots)[c->spot];
+                Spot* s = &((Spot *)g_game->spots.get())[c->spot];
                 rec.x = x;
                 rec.y = y;
                 rec.feature = c->feature;
@@ -1292,7 +1293,7 @@ void __stdcall SaveFeatures(HapiBank* file)
                 modelCount++;
             } else if (c->flags & 1) {
                 AnimRecord rec;
-                Spot* s = &((Spot *)g_game->spots)[c->spot];
+                Spot* s = &((Spot *)g_game->spots.get())[c->spot];
                 rec.x = x;
                 rec.y = y;
                 rec.feature = c->feature;

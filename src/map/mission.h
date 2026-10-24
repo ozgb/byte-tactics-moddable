@@ -8,9 +8,9 @@ struct MissionRule;
 struct Vec3;
 
 struct MissionUnit {
-    char* name;
-    char* ident;
-    char* initialMission;
+    Ref<char> name;
+    Ref<char> ident;
+    Ref<char> initialMission;
     int x;
     int y;
     int z;

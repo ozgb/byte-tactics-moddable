@@ -7,6 +7,8 @@
 #ifndef UNIT_RESOURCES_H
 #define UNIT_RESOURCES_H
 
+#include "../../interfaces/ref.h"
+
 struct Player;
 struct UnitInfo;
 class HapiBank;
@@ -25,7 +27,7 @@ public:
     float metalStall;                  // +0x24
     float metalMakePrev;               // +0x28
     float metalUsePrev;                // +0x2c
-    Player* player;                    // +0x30
+    Ref<Player> player;
 
     void SaveUnitAccounts(UnitInfo* info, HapiBank* file);
     void LoadUnitAccounts(UnitInfo* info, HapiBank* file);

@@ -661,7 +661,7 @@ void __stdcall OpenUnitInfoDialog(void)
     layer->data = g_game;
     Gadget* hotr = FindGadgetChecked_E(entries, "HOTR");
     hotr->u.hotspot.callback = (void (__stdcall*)(Gui*, Gadget*))DrawUnitInfoImage;
-    char* def = (char *)g_game->defs + 0x249 * (unsigned)type;
+    char* def = (char *)g_game->defs.get() + 0x249 * (unsigned)type;
     BuildDataPath(buf, "unitpics", def + 0x20, "PCX");
     hotr->u.anim.value = (int)LoadPcx(buf, 0);
     stats = MakePropList(def);

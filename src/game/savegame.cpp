@@ -362,7 +362,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
             ShutdownIngameSystems();
         (*(union Flags_3923b*)&g_game->endGameFlags_3923b).b3 = 1;
 
-        g_game->pendingSaveStore = (int)(OpenHapiBank(g_game->saveName_38c6b));
+        g_game->pendingSaveStore = OpenHapiBank(g_game->saveName_38c6b);
         if (((HapiBank*)g_game->pendingSaveStore) == 0)
             goto invalid;
         (((HapiBank*)g_game->pendingSaveStore))->OpenAccount("summary");

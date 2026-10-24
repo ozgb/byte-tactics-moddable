@@ -44,7 +44,7 @@ struct Game_0041dc20 {
     int won;                           // +0x391af
     char unknown_391b3[0x391cf - 0x391b3];
     char results[0x391e9 - 0x391cf];   // +0x391cf
-    Mission* mapInfo;                  // +0x391e9
+    Ref<Mission> mapInfo;
     char unknown_391ed[0x3923b - 0x391ed];
     unsigned short bits0_3923b : 2;    // +0x3923b
     unsigned short bit2_3923b : 1;

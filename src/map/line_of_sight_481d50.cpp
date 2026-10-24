@@ -73,7 +73,7 @@ GafFrame* __stdcall GetGafFrame(unsigned short* table, int index);
 // FUNCTION: 0x481d50
 void __stdcall RemoveLineOfSight(SightQuery* params)
 {
-    if (((Map_00481d50*)params->player)->playerIndex == g_game->playerIndex) {
+    if (((Map_00481d50*)params->player.get())->playerIndex == g_game->playerIndex) {
         g_game->bits_14281_1.flag3 = 0;
         g_game->bits_142f1_1.flags_142f1_mapChanged = 1;
     }
@@ -94,7 +94,7 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
                 : (short)g_losTables.GetLosTableCount() - 1);
         short count = table->GetLosLineCount();
         short i = 0;
-        ((Map_00481d50*)params->player)->explored.at(x, y)--;
+        ((Map_00481d50*)params->player.get())->explored.at(x, y)--;
         int ref = *params->frameIdx;
         for (i = 0; i < count; i++) {
             LosLine* line = table->GetLosLine(i);
@@ -121,7 +121,7 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
                     int d1 = cell[1] - ref;
                     int d0 = cell[0] - ref;
                     if (d0 * bestIdx > bestDiff * j1) {
-                        ((Map_00481d50*)params->player)
+                        ((Map_00481d50*)params->player.get())
                             ->explored.at((short)dx, (short)dy)--;
                         if (d1 * bestIdx > bestDiff * j1) {
                             bestIdx = j1;
@@ -152,7 +152,7 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
         if (nx >= limitX)
             return;
         for (int i = ny; i < limitY; i++) {
-            ByteMap_00481d50* ex = &((Map_00481d50*)params->player)->explored;
+            ByteMap_00481d50* ex = &((Map_00481d50*)params->player.get())->explored;
             unsigned char* dst = ex->data + (y + i) * ex->size.width + nx + x;
             unsigned char* src = frame->pixelsOrLayers + i * frame->width + nx;
             for (int j = nx; j < limitX; j++) {

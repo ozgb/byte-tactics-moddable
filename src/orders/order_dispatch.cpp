@@ -54,7 +54,7 @@ struct Unit_0043e490 {
     Ref<UnitDef> def;
     Ref<Player> player;
     char unknown_9a[0xec - 0x9a];
-    Stats_0043e490* fec; // +0xec
+    Ref<Stats_0043e490> fec;
     char unknown_f0[0xfb - 0xf0];
     int postTransferHoldoff; // +0xfb
     unsigned char playerIndex; // +0xff

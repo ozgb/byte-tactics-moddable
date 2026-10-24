@@ -965,7 +965,7 @@ static unsigned char* MoveClasses()
     return (unsigned char*)DAT_00512370 - 0x18;
 }
 
-typedef unsigned char* SimView_g_explodedPieces[EXPLODED_SLOTS];
+typedef Ref<unsigned char> SimView_g_explodedPieces[EXPLODED_SLOTS];
 #undef g_explodedPieces
 #define g_explodedPieces (*reinterpret_cast<SimView_g_explodedPieces*>(&Sim().g_explodedPieces))
 extern void* g_approachRadiusVtable[];
@@ -978,7 +978,7 @@ extern void* g_aiSearchGoalVtable[];
 extern void* g_packedGoalVtable[];
 extern void* g_liteGoalVtable[];
 extern void* g_packedPosGoalVtable[];
-typedef unsigned char* SimView_g_playerAI[MAX_PLAYERS];
+typedef Ref<unsigned char> SimView_g_playerAI[MAX_PLAYERS];
 #undef g_playerAI
 #define g_playerAI (*reinterpret_cast<SimView_g_playerAI*>(&Sim().g_playerAI))
 
@@ -1001,6 +1001,16 @@ static unsigned char* GameAt(unsigned offset)
 static unsigned GameU32(unsigned offset)
 {
     return *(unsigned*)GameAt(offset);
+}
+
+static unsigned RefAbs(unsigned stored)
+{
+    return stored == 0 ? 0 : (unsigned)SimBlockBase() + stored;
+}
+
+static unsigned GameRef(unsigned offset)
+{
+    return RefAbs(GameU32(offset));
 }
 
 
@@ -1104,7 +1114,7 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
     *tag = TT_HEAP;
     switch (target) {
     case TT_UNIT:
-        base = GameU32(GAME_UNITS);
+        base = GameRef(GAME_UNITS);
         stride = UNIT_STRIDE;
         count = *(unsigned short*)GameAt(GAME_POOL_COUNT);
         break;
@@ -1114,7 +1124,7 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
         count = PLAYER_SLOTS;
         break;
     case TT_UNITDEF:
-        base = GameU32(GAME_DEFS);
+        base = GameRef(GAME_DEFS);
         stride = UNITDEF_STRIDE;
         count = GameU32(GAME_DEF_COUNT);
         break;
@@ -1124,7 +1134,7 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
         count = 256;
         break;
     case TT_PROJECTILE:
-        base = GameU32(GAME_PROJECTILES);
+        base = GameRef(GAME_PROJECTILES);
         stride = PROJECTILE_STRIDE;
         count = GameU32(GAME_PROJECTILE_COUNT);
         break;
@@ -1139,21 +1149,21 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
         count = PIECE_COUNT;
         break;
     case TT_REC:
-        if (p == GameU32(GAME_SPATIAL_OVERFLOW)) {
+        if (p == GameRef(GAME_SPATIAL_OVERFLOW)) {
             *tag = TT_REC;
             *index = 0xffffffff;
             return;
         }
-        base = GameU32(GAME_SPATIAL_CELLS);
+        base = GameRef(GAME_SPATIAL_CELLS);
         stride = REC_STRIDE;
         count = GameU32(GAME_SPATIAL_COUNT);
         break;
     case TT_NODE:
-        if (GameU32(GAME_PATHFINDER) == 0)
+        if (GameRef(GAME_PATHFINDER) == 0)
             return;
-        base = *(unsigned*)(GameU32(GAME_PATHFINDER) + PF_POOL);
+        base = RefAbs(*(unsigned*)(GameRef(GAME_PATHFINDER) + PF_POOL));
         stride = NODE_STRIDE;
-        count = *(unsigned*)(GameU32(GAME_PATHFINDER) + PF_USED);
+        count = *(unsigned*)(GameRef(GAME_PATHFINDER) + PF_USED);
         break;
     case TT_MOVECLASS:
         base = (unsigned)MoveClasses();
@@ -1296,7 +1306,7 @@ static void EndSection()
 
 static void VisitUnits()
 {
-    unsigned char* units = (unsigned char*)GameU32(GAME_UNITS);
+    unsigned char* units = (unsigned char*)GameRef(GAME_UNITS);
     unsigned count = *(unsigned short*)GameAt(GAME_POOL_COUNT);
     char path[64];
     HashByte(1);
@@ -1313,7 +1323,7 @@ static void VisitUnits()
 
 static void VisitProjectiles()
 {
-    unsigned char* projectiles = (unsigned char*)GameU32(GAME_PROJECTILES);
+    unsigned char* projectiles = (unsigned char*)GameRef(GAME_PROJECTILES);
     unsigned count = GameU32(GAME_PROJECTILE_COUNT);
     char path[64];
     HashByte(2);
@@ -1397,7 +1407,7 @@ static void VisitPlayers()
 
 static void VisitFeatures()
 {
-    unsigned char* entries = (unsigned char*)GameU32(GAME_SPOT_ENTRIES);
+    unsigned char* entries = (unsigned char*)GameRef(GAME_SPOT_ENTRIES);
     unsigned char list[SPOT_CAPACITY];
     unsigned featureCount = GameU32(GAME_FEATURE_COUNT);
     unsigned char* defs = (unsigned char*)GameU32(GAME_FEATURES);
@@ -1558,7 +1568,7 @@ static void VisitGameScalars()
 
 static void VisitMapCells()
 {
-    unsigned char* cells = (unsigned char*)GameU32(GAME_CELLS);
+    unsigned char* cells = (unsigned char*)GameRef(GAME_CELLS);
     unsigned n = MapCellCount();
     HashByte(11);
     VisitValue("cells.count", n, 4);
@@ -1582,7 +1592,7 @@ static void VisitMapCells()
 
 static void VisitVisibility()
 {
-    unsigned char* mask = (unsigned char*)GameU32(GAME_VISIBILITY);
+    unsigned char* mask = (unsigned char*)GameRef(GAME_VISIBILITY);
     unsigned entries = MapCellCount() / 4;
     HashByte(12);
     VisitValue("visibility.count", entries, 4);
@@ -1613,9 +1623,9 @@ static void VisitExplored()
 
 static void VisitSpatial()
 {
-    unsigned char* recs = (unsigned char*)GameU32(GAME_SPATIAL_CELLS);
+    unsigned char* recs = (unsigned char*)GameRef(GAME_SPATIAL_CELLS);
     unsigned count = GameU32(GAME_SPATIAL_COUNT);
-    unsigned char* overflow = (unsigned char*)GameU32(GAME_SPATIAL_OVERFLOW);
+    unsigned char* overflow = (unsigned char*)GameRef(GAME_SPATIAL_OVERFLOW);
     char path[64];
     HashByte(14);
     VisitValue("spatial.width", GameU32(GAME_SPATIAL_WIDTH), 4);
@@ -1653,8 +1663,8 @@ static unsigned char s_nodeFree[NODE_LIMIT];
 
 static void VisitPathNodes(const unsigned char* pf)
 {
-    unsigned char* pool = *(unsigned char**)(pf + PF_POOL);
-    unsigned char** items = *(unsigned char***)(pf + PF_ITEMS);
+    unsigned char* pool = (unsigned char*)RefAbs(*(unsigned*)(pf + PF_POOL));
+    unsigned char** items = (unsigned char**)RefAbs(*(unsigned*)(pf + PF_ITEMS));
     int freeHead = *(int*)(pf + PF_FREE_HEAD);
     unsigned used = *(unsigned*)(pf + PF_USED);
     unsigned count = *(unsigned*)(pf + PF_COUNT);
@@ -1732,7 +1742,7 @@ static void VisitPathCells(const unsigned char* pf)
 
 static void VisitPathfinder()
 {
-    unsigned char* pf = (unsigned char*)GameU32(GAME_PATHFINDER);
+    unsigned char* pf = (unsigned char*)GameRef(GAME_PATHFINDER);
     HashByte(16);
     HashByte(pf != NULL);
     if (pf != NULL) {
@@ -2175,7 +2185,7 @@ static void VisitScripts(unsigned char* units, unsigned count)
 
 static void VisitUnitHeap()
 {
-    unsigned char* units = (unsigned char*)GameU32(GAME_UNITS);
+    unsigned char* units = (unsigned char*)GameRef(GAME_UNITS);
     unsigned count = *(unsigned short*)GameAt(GAME_POOL_COUNT);
     NumberUnitHeap(units, count);
     VisitOrders(units, count);
@@ -2283,7 +2293,7 @@ static void VisitPlayerAI()
     char path[96];
     HashByte(24);
     for (unsigned i = 0; i < MAX_PLAYERS; i++) {
-        unsigned ai = (unsigned)g_playerAI[i];
+        unsigned ai = (unsigned)g_playerAI[i].get();
         HashU32(i);
         HashByte(ai != 0);
         if (ai == 0)
@@ -2409,7 +2419,7 @@ static void VisitCondition(const char* path, unsigned condition)
 
 static void VisitMissionConditions()
 {
-    unsigned conditions = GameU32(GAME_CONDITIONS);
+    unsigned conditions = GameRef(GAME_CONDITIONS);
     char path[96];
     HashByte(28);
     HashByte(conditions != 0);
@@ -2476,7 +2486,7 @@ static void VisitWeaponDefs()
 
 static void VisitUnitDefs()
 {
-    unsigned char* defs = (unsigned char*)GameU32(GAME_DEFS);
+    unsigned char* defs = (unsigned char*)GameRef(GAME_DEFS);
     unsigned count = GameU32(GAME_DEF_COUNT);
     char path[96];
     HashByte(29);
@@ -2514,7 +2524,7 @@ static void VisitUnitDefs()
 
 static void VisitMission()
 {
-    unsigned mission = GameU32(GAME_MISSION);
+    unsigned mission = GameRef(GAME_MISSION);
     char path[96];
     HashByte(31);
     HashByte(mission != 0);
@@ -2538,11 +2548,11 @@ static void VisitMission()
         for (unsigned ku = 0; ku < unitCount; ku++) {
             unsigned unit = units + ku * MISSION_UNIT_SIZE;
             sprintf(path, "mission.units[%u].name", ku);
-            VisitString(path, (const char*)ReadU32At(unit, 0));
+            VisitString(path, (const char*)RefAbs(ReadU32At(unit, 0)));
             sprintf(path, "mission.units[%u].ident", ku);
-            VisitString(path, (const char*)ReadU32At(unit, 4));
+            VisitString(path, (const char*)RefAbs(ReadU32At(unit, 4)));
             sprintf(path, "mission.units[%u].initialMission", ku);
-            VisitString(path, (const char*)ReadU32At(unit, 8));
+            VisitString(path, (const char*)RefAbs(ReadU32At(unit, 8)));
             sprintf(path, "mission.units[%u]", ku);
             VisitRaw(path, (const unsigned char*)unit + 0xc, MISSION_UNIT_SIZE - 0xc);
         }
@@ -2614,12 +2624,12 @@ int __stdcall GetGroundHeight(int* pos);
 
 static unsigned char* PoolUnit(unsigned index)
 {
-    return (unsigned char*)GameU32(GAME_UNITS) + index * UNIT_STRIDE;
+    return (unsigned char*)GameRef(GAME_UNITS) + index * UNIT_STRIDE;
 }
 
 static int FindDefIndex(const ScriptedOrder* o, const char* name)
 {
-    unsigned char* defs = (unsigned char*)GameU32(GAME_DEFS);
+    unsigned char* defs = (unsigned char*)GameRef(GAME_DEFS);
     unsigned count = GameU32(GAME_DEF_COUNT);
     for (unsigned i = 1; i < count; i++) {
         if (_stricmp((const char*)defs + i * UNITDEF_STRIDE + UNITDEF_NAME, name) == 0)

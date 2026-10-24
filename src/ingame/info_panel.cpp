@@ -534,7 +534,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
 
     if (g_game->unitInfoHoverTrack == 0 || g_game->unitInfoHoverUnitId == 0)
         return 0;
-    unit = (Unit*)(*(int*)((char*)g_game + 0x14357)
+    unit = (Unit*)((char*)g_game->units.get()
                             + g_game->unitInfoHoverUnitId * 0x118);
     if ((((int)unit->flags) & 0x10000000) == 0 || (((int)unit->flags) & 0x4000) != 0) {
         g_game->unitInfoHoverTrack = 0;
@@ -773,7 +773,7 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
             do {
                 unsigned short id = ((UnitType_004685a0 *)unit->def.get())->ids[i];
                 int prob = GetBuildRating(unit->playerIndex, id);
-                Def_004685a0* def = &((Def_004685a0 *)g_game->defs)[id];
+                Def_004685a0* def = &((Def_004685a0 *)g_game->defs.get())[id];
                 Rect bar;
                 bar.left = 0x88;
                 bar.top = y + 1;
@@ -911,7 +911,7 @@ void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
     if (f->flag) {
         Vec3 lo;
         Vec3 hi;
-        GetObjectBounds(((Object_004cb650 **)g_game->types)[unit->unitDefIndex], &lo, &hi, 0);
+        GetObjectBounds(((Object_004cb650 **)g_game->types.get())[unit->unitDefIndex], &lo, &hi, 0);
         Vec3 corners[4];
         corners[0].x = lo.x;
         corners[0].y = lo.y;

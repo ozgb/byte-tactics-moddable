@@ -35,6 +35,7 @@ struct Unit;
 #pragma pack(push, 1)
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 // Unused here: the forward declaration takes the symbol id replacing the
 // removed Cell view, keeping CanBuildAt in its register window (docs/c2-regalloc.md).
@@ -81,7 +82,7 @@ struct Feature {
 
 // Typed cells and no count: grid.h's Grid is 0x10 bytes with a byte pointer.
 struct BucketGrid {
-    UnitBucket* cells;                  // +0x0
+    Ref<UnitBucket> cells;
     unsigned int width;                 // +0x4
     unsigned int height;                // +0x8
 };

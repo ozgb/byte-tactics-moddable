@@ -317,7 +317,7 @@ void ShowFrontendErrorText()
 // FUNCTION: 0x4257a0
 void BlankScreen()
 {
-    SetOffscreenSurface(g_game->screen);
+    SetOffscreenSurface((int)g_game->screen);
     FillSurface(0, 0);
     FlipScreen();
 }
@@ -431,7 +431,7 @@ void EnterMainMenuState()
 // FUNCTION: 0x425b60
 void PresentFrontendFrame()
 {
-    SetOffscreenSurface(g_game->screen);
+    SetOffscreenSurface((int)g_game->screen);
     HideSoftwareCursor();
     ShowSoftwareCursor();
     FlipScreen();
@@ -559,7 +559,7 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
         TdfFile obj;
         if ((&obj)->LoadFile(buf) != 0) {
             (*(char*)&g_game->field_2bc0) = 6;
-            SetOffscreenSurface(g_game->screen);
+            SetOffscreenSurface((int)g_game->screen);
             FillSurface(0, 0);
             FlipScreen();
             return;
@@ -687,7 +687,7 @@ void __stdcall OpenMainMenu()
     }
 
     HideSoftwareCursor();
-    SetOffscreenSurface(g_game->screen);
+    SetOffscreenSurface((int)g_game->screen);
     FillSurface(0, 0);
     FlipScreen();
     Force640x480Surfaces();
@@ -774,7 +774,7 @@ void __stdcall PlayMovie(char* param_1)
     StripExtension(path);
     strcat(path, ".zrb");
     if (HAPI_FileLengthByName(path) != 0) {
-        SetOffscreenSurface(g_game->screen);
+        SetOffscreenSurface((int)g_game->screen);
         FillSurface(0, 0);
         FlipScreen();
         SetCursorOverlayEnabled(0);
@@ -790,7 +790,7 @@ void __stdcall PlayMovie(char* param_1)
         g_game->moviePlayer = 0;
         while (PopKey() != 0) {
         }
-        SetOffscreenSurface(g_game->screen);
+        SetOffscreenSurface((int)g_game->screen);
         FillSurface(0, 0);
         FlipScreen();
     }
@@ -1530,7 +1530,7 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
     Entry_00428730 saved;
 
     if (param_2 != 0) {
-        SetOffscreenSurface(g_game->screen);
+        SetOffscreenSurface((int)g_game->screen);
         FillSurface(0, 0);
         FlipScreen();
     }

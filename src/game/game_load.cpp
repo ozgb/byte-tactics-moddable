@@ -600,7 +600,7 @@ tail:
     if (mission != 0) {
         mission->CloseBank();
         operator delete(mission);
-        g_game->pendingSaveStore = (int)(0);
+        g_game->pendingSaveStore = 0;
     }
     g_seams.players->RebuildAIFeatureCells();
 
@@ -761,8 +761,8 @@ void LoadingScreenFrame(void)
             RestoreScreen();
             host_window_place(0, 0, 0x280, 0x1e0);
             SetResolution(0x280, 0x1e0);
-            g_game->screen = (int)AllocSurface("OFFSCREEN", g_game->width_37e1f, g_game->field_37e23);
-            SetRestoreSurface(g_game->screen);
+            g_game->screen = (void*)AllocSurface("OFFSCREEN", g_game->width_37e1f, g_game->field_37e23);
+            SetRestoreSurface((int)g_game->screen);
             SetOffscreenSurface((void*)g_game->screen);
         }
         BuildDataPath(aux, "palettes", "guipal", "PAL");
@@ -815,8 +815,8 @@ void LoadingScreenFrame(void)
             RestoreScreen();
             host_window_place(0, 0, g_game->width_37f1b, g_game->height_37f1f);
             SetResolution(g_game->width_37f1b, g_game->height_37f1f);
-            g_game->screen = (int)AllocSurface("OFFSCREEN", g_game->width_37e1f, g_game->field_37e23);
-            SetRestoreSurface(g_game->screen);
+            g_game->screen = (void*)AllocSurface("OFFSCREEN", g_game->width_37e1f, g_game->field_37e23);
+            SetRestoreSurface((int)g_game->screen);
         }
         DrawLightBars();
         MainLoopTick();

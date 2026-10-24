@@ -7,6 +7,7 @@
 // +0x30 (unit+0xec); 0x401180..0x4012a0 are its methods and 0x401320 is the
 // end-of-tick update, all defined above without FUNCTION lines.
 #include <float.h>
+#include "../../interfaces/ref.h"
 // Load-bearing: the symbol id this forward declaration takes keeps UseEnergy's
 // x87 code; the header's own declaration of Player comes later.
 struct Player;
@@ -25,7 +26,7 @@ struct Res_00401360 {
 class Econ_00401360 {
 public:
     Res_00401360 res[2];               // +0x0
-    Player* owner;                     // +0x30
+    Ref<Player> owner;
     int RequestEnergy(Econ_00401360* e, float amount);
     int RequestEnergyAndMetal(float energy, float metal);
     int SpendEnergy(float amount);

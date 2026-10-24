@@ -123,7 +123,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
     }
     if (order->target)
         order->pos = order->target->pos;
-    if ((int)unit->spatialBucket.get() == g_game->overflowBucket) {
+    if ((int)unit->spatialBucket.get() == (int)g_game->overflowBucket.get()) {
         order->SetDeadlineTicks(0x1e);
         order->state = 2;
     }

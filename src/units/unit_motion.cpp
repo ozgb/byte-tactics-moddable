@@ -154,26 +154,39 @@ void CMemoryCache::FreeBuffer()
     GameFreeThunk((int*)base);
 }
 
+static int HandleGet(void** slot, bool ref)
+{
+    return ref ? (int)((Ref<char>*)slot)->get() : (int)*slot;
+}
+
+static void HandleSet(void** slot, int address, bool ref)
+{
+    if (ref)
+        *(Ref<char>*)slot = (char*)address;
+    else
+        *slot = (void*)address;
+}
+
 // Memory cache allocation: grows or reuses the handle in *p, splitting the
 // block found at `cur` (or wrapping to the base) into an allocated chunk plus
 // a leftover free chunk. Chunks are {owner handle, size} and the handle points
 // just past the 8-byte header.
 // FUNCTION: 0x437a30
-int CMemoryCache::AllocHandle(void** p, int need)
+int CMemoryCache::AllocHandle(void** p, int need, bool ref)
 {
     int total = 0;
     if (need <= 0) {
-        *p = 0;
+        HandleSet(p, 0, ref);
         return 0;
     }
     int size = need + 8;
-    int existing = (int)*p;
+    int existing = HandleGet(p, ref);
     if (existing != 0)
         existing = *(int*)(existing - 4);
     if (existing >= size)
         return 1;
     if (size > cap) {
-        *p = 0;
+        HandleSet(p, 0, ref);
         return 0;
     }
     Chunk_00437a30* start;
@@ -183,8 +196,8 @@ int CMemoryCache::AllocHandle(void** p, int need)
         start = (Chunk_00437a30*)base;
         while (q < end) {
             void** owner = *(void***)q;
-            if (owner != 0 && (int)*owner == q + 8)
-                *owner = 0;
+            if (owner != 0 && HandleGet(owner, ref) == q + 8)
+                HandleSet(owner, 0, ref);
             q += *(int*)(q + 4);
             end = base + cap;
         }
@@ -195,8 +208,8 @@ int CMemoryCache::AllocHandle(void** p, int need)
     while (total < size) {
         total += *(int*)(q + 4);
         void** owner = *(void***)q;
-        if (owner != 0 && (int)*owner == q + 8)
-            *owner = 0;
+        if (owner != 0 && HandleGet(owner, ref) == q + 8)
+            HandleSet(owner, 0, ref);
         q += *(int*)(q + 4);
     }
     if (total - size > 8u) {
@@ -213,7 +226,7 @@ int CMemoryCache::AllocHandle(void** p, int need)
     }
     start->owner = p;
     start->size = size;
-    *p = (void*)((char*)start + 8);
+    HandleSet(p, (int)((char*)start + 8), ref);
     return 1;
 }
 

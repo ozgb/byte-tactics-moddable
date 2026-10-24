@@ -1090,7 +1090,7 @@ harness,game,call,QuirksFlipFirstSim,1
 harness,game,call,QuirksHash,2
 harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
-harness,game,call,SimBlockBase,3
+harness,game,call,SimBlockBase,4
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimOwns,1
 harness,game,shared_write,Game::difficulty,4
@@ -1199,6 +1199,7 @@ los_radar,map,shared_write,Cell::feature,7
 los_radar,map,shared_write,Cell::high,7
 los_radar,map,shared_write,Cell::low,7
 los_radar,map,shared_write,Game::cells,14
+los_radar,map,shared_write,Game::overflowBucket,2
 los_radar,map,shared_write,Game::visibilityMask,5
 los_radar,map,shared_write,Point16::x,12
 los_radar,map,shared_write,Point16::y,12
@@ -1213,6 +1214,7 @@ los_radar,orders,shared_write,Cell::feature,2
 los_radar,orders,shared_write,Game::cells,1
 los_radar,orders,shared_write,Game::mapHeight,6
 los_radar,orders,shared_write,Game::mapWidth,6
+los_radar,orders,shared_write,Game::overflowBucket,9
 los_radar,orders,shared_write,Game::visibilityMask,1
 los_radar,orders,shared_write,Point16::x,46
 los_radar,orders,shared_write,Point16::y,43
@@ -1271,9 +1273,6 @@ los_radar,presentation,call,StringRef::ReleaseRef,3
 los_radar,presentation,call,SurfaceFromFrame,2
 los_radar,presentation,shared_write,Cell::feature,1
 los_radar,presentation,shared_write,Flags_14281::raw,1
-los_radar,presentation,shared_write,FogGrid::cells,1
-los_radar,presentation,shared_write,FogGrid::height,1
-los_radar,presentation,shared_write,FogGrid::width,1
 los_radar,presentation,shared_write,GafFrame::height,64
 los_radar,presentation,shared_write,GafFrame::pixelsOrLayers,41
 los_radar,presentation,shared_write,GafFrame::transparency,25
@@ -1502,7 +1501,7 @@ map,units,shared_write,Vec3::z,9
 map,weapons,shared_write,Cell::flags,1
 map,weapons,shared_write,Cell::unit,2
 map,weapons,shared_write,Cell::unit2,2
-map,weapons,shared_write,Game::net,5
+map,weapons,shared_write,Game::net,6
 map,weapons,shared_write,Point16::x,1
 map,weapons,shared_write,Point16::y,1
 map,weapons,shared_write,Unit::flags,6
@@ -2384,6 +2383,8 @@ platform,seams,shared_write,Vec3::x,1
 platform,targeting,shared_write,Vec3::x,2
 platform,targeting,shared_write,Vec3::y,1
 platform,targeting,shared_write,Vec3::z,2
+platform,units,call,HandleGet,1
+platform,units,call,HandleSet,1
 platform,units,indirect,CompareUnitTypeNames,1
 platform,units,shared_write,Fixed::value,3
 platform,units,shared_write,Point16::x,7
@@ -3877,6 +3878,7 @@ units,ai,indirect,SetUnitSquad,3
 units,ai,shared_write,Game::defs,11
 units,ai,shared_write,Game::unitDefCount,9
 units,ai,shared_write,Game::units,1
+units,ai,shared_write,Game::unitsEnd,1
 units,ai,shared_write,Game::unitsPerPlayer,1
 units,ai,shared_write,Player::unitCount,1
 units,ai,shared_write,Player::unitsBegin,5
@@ -3982,6 +3984,7 @@ units,game,shared_write,Angles16::heading,1
 units,game,shared_write,Game::defs,2
 units,game,shared_write,Game::unitDefCount,2
 units,game,shared_write,Game::units,2
+units,game,shared_write,Game::unitsEnd,1
 units,game,shared_write,Player::syncTick,1
 units,game,shared_write,Player::unitCount,1
 units,game,shared_write,Player::unitsCreated,1
@@ -4003,6 +4006,7 @@ units,los_radar,indirect,RevealNewUnit,1
 units,los_radar,indirect,UpdateUnitLineOfSight,2
 units,los_radar,shared_write,Game::hotRadar,1
 units,los_radar,shared_write,Game::units,3
+units,los_radar,shared_write,Game::unitsEnd,3
 units,los_radar,shared_write,Point16::x,4
 units,los_radar,shared_write,Point16::y,4
 units,los_radar,shared_write,Unit::activateFlags,3
@@ -4146,6 +4150,7 @@ units,orders,shared_write,Fixed::value,9
 units,orders,shared_write,Game::defs,10
 units,orders,shared_write,Game::unitDefCount,4
 units,orders,shared_write,Game::units,4
+units,orders,shared_write,Game::unitsEnd,2
 units,orders,shared_write,Point16::x,46
 units,orders,shared_write,Point16::y,43
 units,orders,shared_write,Unit::activateFlags,2
@@ -4357,8 +4362,10 @@ units,presentation,shared_write,Angles16::pitch,1
 units,presentation,shared_write,Fixed::value,7
 units,presentation,shared_write,Game::defs,18
 units,presentation,shared_write,Game::hotRadar,1
+units,presentation,shared_write,Game::types,2
 units,presentation,shared_write,Game::unitDefCount,5
-units,presentation,shared_write,Game::units,29
+units,presentation,shared_write,Game::units,30
+units,presentation,shared_write,Game::unitsEnd,10
 units,presentation,shared_write,Piece_459c70::modified,5
 units,presentation,shared_write,Player::commanderKills,1
 units,presentation,shared_write,Player::commanderLosses,1
@@ -4553,6 +4560,7 @@ weapons,los_radar,shared_write,GafFrame::transparency,4
 weapons,los_radar,shared_write,GafFrame::xOffset,6
 weapons,los_radar,shared_write,GafFrame::yOffset,6
 weapons,los_radar,shared_write,Game::projectileCount,1
+weapons,los_radar,shared_write,Game::projectiles,1
 weapons,los_radar,shared_write,Point16::x,4
 weapons,los_radar,shared_write,Point16::y,4
 weapons,los_radar,shared_write,Projectile::attacker,1
@@ -4683,6 +4691,7 @@ weapons,presentation,shared_write,GafRef::pic,1
 weapons,presentation,shared_write,GafRef::src,2
 weapons,presentation,shared_write,Game::count_1491b,1
 weapons,presentation,shared_write,Game::projectileCount,1
+weapons,presentation,shared_write,Game::projectiles,1
 weapons,presentation,shared_write,Game::tracked,6
 weapons,presentation,shared_write,Game::trackedPos,1
 weapons,presentation,shared_write,Game::value_1434b,6
@@ -4819,6 +4828,7 @@ wind_meteors,platform,call,TdfFile::~TdfFile,1
 wind_meteors,platform,call,TdfRecord::GetFieldDouble,1
 wind_meteors,platform,call,TdfRecord::GetFieldInt,1
 wind_meteors,platform,call,TdfRecord::GetFieldString,1
+wind_meteors,platform,call,operator==,1
 wind_meteors,platform,shared_write,Point16::x,11
 wind_meteors,platform,shared_write,Point16::y,11
 wind_meteors,platform,shared_write,Vec3::x,21

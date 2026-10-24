@@ -1,5 +1,6 @@
 #ifndef MAP_INFO_H
 #define MAP_INFO_H
+#include "../../interfaces/ref.h"
 
 struct Grid;
 
@@ -11,7 +12,7 @@ struct MapInfo {
     int width;
     int height;
     char unknown_40[56];
-    unsigned short* visibilityMask;
+    Ref<unsigned short> visibilityMask;
 };
 #pragma pack(pop)
 

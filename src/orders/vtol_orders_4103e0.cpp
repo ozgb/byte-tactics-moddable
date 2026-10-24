@@ -80,7 +80,7 @@ int __stdcall GetOrderName(Unit* obj);
 int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 0x40) return 5;
-    if ((int)unit->spatialBucket.get() == g_game->overflowBucket) {
+    if ((int)unit->spatialBucket.get() == (int)g_game->overflowBucket.get()) {
         Vec3 center;
         center.x=(g_game->mapWidth/2)<<16;
         center.z=(g_game->mapHeight/2)<<16;

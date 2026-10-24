@@ -100,9 +100,9 @@ struct Game_0041b2e0 {
     char unknown_2851[0x2a42 - 0x2851];
     unsigned char localPlayer;         // +0x2a42
     char unknown_2a43[0x14357 - 0x2a43];
-    Unit_0041b2e0* units;              // +0x14357
+    Ref<Unit_0041b2e0> units;
     char unknown_1435b[0x1439b - 0x1435b];
-    BuildType_0041b2e0* unitDefs;      // +0x1439b
+    Ref<BuildType_0041b2e0> unitDefs;
     char unknown_1439f[0x37e9c - 0x1439f];
     unsigned short unitIndex;          // +0x37e9c
     char unknown_37e9e[0x37ebe - 0x37e9e];

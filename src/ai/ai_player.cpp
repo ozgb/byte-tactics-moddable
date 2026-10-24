@@ -1497,7 +1497,7 @@ void __stdcall UpdatePlayerAI(int player)
 // FUNCTION: 0x40b320
 void __stdcall CreatePlayerAI(int player)
 {
-    PlayerAI*& slot = g_playerAI[player];
+    Ref<PlayerAI>& slot = g_playerAI[player];
     slot = new (kSim) PlayerAI(player);
     slot->ComputeBaseWeights();
 }
@@ -1505,13 +1505,13 @@ void __stdcall CreatePlayerAI(int player)
 // FUNCTION: 0x40b370
 void __stdcall RebuildFeatureCells(int param_1)
 {
-    ((PlayerAI*)g_playerAI[param_1])->BuildFeatureCells();
+    g_playerAI[param_1]->BuildFeatureCells();
 }
 
 // FUNCTION: 0x40b390
 void __stdcall DestroyPlayerAI(int player)
 {
-    delete g_playerAI[player];
+    delete g_playerAI[player].get();
     g_playerAI[player]=0;
 }
 
@@ -1554,7 +1554,7 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
 // FUNCTION: 0x40ba80
 void __stdcall GetBasePosition(int index, Struct_0040ba80* out)
 {
-    Struct_0040ba80* entry = (Struct_0040ba80*)((char*)g_playerAI[index] + 0x35);
+    Struct_0040ba80* entry = (Struct_0040ba80*)((char*)g_playerAI[index].get() + 0x35);
     *out = *entry;
 }
 
@@ -1562,10 +1562,10 @@ void __stdcall GetBasePosition(int index, Struct_0040ba80* out)
 void __stdcall GetMirroredBasePosition(int index, int unused, Struct_0040bab0* out)
 {
     out->a = (g_game->baseX << 16) -
-             ((Struct_0040bab0*)((char*)g_playerAI[index] + 0x35))->a;
+             ((Struct_0040bab0*)((char*)g_playerAI[index].get() + 0x35))->a;
     out->b = 0;
     out->c = (g_game->baseX << 16) -
-             ((Struct_0040bab0*)((char*)g_playerAI[index] + 0x35))->c;
+             ((Struct_0040bab0*)((char*)g_playerAI[index].get() + 0x35))->c;
 }
 
 // Both <minmax.h> and <math.h> are needed: together they set the SIB slot of
@@ -1584,7 +1584,7 @@ int __stdcall GetBuildRating(int player,unsigned short type)
         unsigned char* weights;        // +0xb1
     };
 #pragma pack(pop)
-    Owner_40bb00* owner=(Owner_40bb00*)g_playerAI[player];
+    Owner_40bb00* owner=(Owner_40bb00*)g_playerAI[player].get();
     Player* p=&g_game->players[player];
     if(p->energy<50.0f) return 0;
     if(p->metal<25.0f) return 0;
@@ -1680,8 +1680,7 @@ int __stdcall GetUnitCount(int param_1, unsigned int param_2)
 // FUNCTION: 0x40c230
 int __stdcall GetBuilderCount(int param_1)
 {
-    char* base = (char*)&g_playerAI;
-    void* ptr = *(void**)(base + param_1 * 4);
+    void* ptr = g_playerAI[param_1].get();
     return *(int*)((char*)ptr + 0x75);
 }
 
@@ -1722,7 +1721,7 @@ void __stdcall DumpPlayerAI(int player, _iobuf* file)
 // FUNCTION: 0x40c4f0
 int __stdcall HasSpecialUnit(int param_1)
 {
-    return *(int*)((char*)g_playerAI[param_1] + 0x79);
+    return *(int*)((char*)g_playerAI[param_1].get() + 0x79);
 }
 
 // std::vector<Unit*>::vector(const allocator&) from MSVC 5's <vector>, out of

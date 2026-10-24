@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 from rwsets import load_sim_map
+from simglobals import REF_FIELDS
 
 ROOT = Path(__file__).resolve().parent.parent
 TRACE_FORMAT = 3
@@ -314,12 +315,12 @@ SYNTHETIC.update({
         Unit* first;
     """,
     "Eye": """
-        Player* player;
-        void* screen;
+        Ref<Player> player;
+        Ref<void> screen;
         short x;
         unsigned char flagA;
         char flagB;
-        void* flagPtr;
+        Ref<char> flagPtr;
         Vec3 pos;
         unsigned int expires;
         int screenPos;
@@ -349,8 +350,8 @@ SYNTHETIC.update({
         unsigned int lastTick;
     """,
     "Pathfinder": """
-        void* pool;
-        void* items;
+        Ref<void> pool;
+        Ref<void> items;
         int freeHead;
         int used;
         int capacity;
@@ -373,14 +374,14 @@ SYNTHETIC.update({
         int steps;
         int costScale;
         int baseScale;
-        Unit* object;
-        void* path;
-        void* target;
-        MovementClass* owner;
+        Ref<Unit> object;
+        Ref<void> path;
+        Ref<void> target;
+        Ref<MovementClass> owner;
         unsigned char turnCost[8];
         unsigned char stepCost[8];
         unsigned char player;
-        Unit* cursor[10];
+        Ref<Unit> cursor[10];
         int budget[10];
     """,
 })
@@ -638,7 +639,7 @@ SYNTHETIC.update({
         float metalStall;             // +0x24
         float metalMakePrev;          // +0x28
         float metalUsePrev;           // +0x2c
-        Player* player;               // +0x30
+        Ref<Player> player;           // +0x30
     """,
     "MissionConditions": """
         char victory[0x40];           // +0x0
@@ -898,6 +899,7 @@ METEOR_GLOBALS: list[tuple[str, str, int, str | None]] = [
     ("target", "g_meteorTarget", 4, None),
     ("scheduleGap", "g_meteorScheduleGap", 4, None),
 ]
+REF_GLOBALS = REF_FIELDS
 GLOBAL_DECLS: dict[str, str] = {
     "g_cdMismatchDefeatTick": "unsigned int g_cdMismatchDefeatTick",
     "g_playerTickLoad": "int g_playerTickLoad[10]",
@@ -1310,7 +1312,7 @@ def generate():
                          ("kPathGlobals", PATH_GLOBALS)):
         lines.append("static const TraceGlobal %s[] = {" % cname)
         for name, symbol, size, target in group:
-            kind = "TF_POINTER" if target else ("TF_BYTES" if size > 8 else "TF_SCALAR")
+            kind = "TF_REF" if symbol in REF_GLOBALS else "TF_POINTER" if target else ("TF_BYTES" if size > 8 else "TF_SCALAR")
             tail = "TT_" + target if target else "TT_NONE"
             if symbol in moved:
                 lines.append("    { %s, (const void*)(%s), %d, %s, %s, 1 }," % (

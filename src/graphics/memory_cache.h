@@ -32,7 +32,7 @@ public:
     int InitSimCache(unsigned int size);
     void FreeCache();
     void FreeBuffer();
-    int AllocHandle(void** handle, int size);
+    int AllocHandle(void** handle, int size, bool ref = false);
     int AllocBitmap(GafFrame** handle, int w, int h);
     int AllocTwoPlaneBitmap(GafFrame** handle, int w, int h);
     void FlushCache();

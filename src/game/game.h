@@ -116,23 +116,23 @@ struct Game {
     union {
         struct {
             char session[4];
-            char unknown_18[492];
+            char pad_18[492];
             Font* font;
             int colour1;
             int colour2;
             int colour3;
-            char unknown_214[561];
+            char pad_214[561];
             V4i* guids;
             char pad_449[40];
             Settings settings;
-            char unknown_4c1[8];
+            char pad_4c1[8];
             int from_id;
             int lobby1;
             char pad_4d1[12];
         };
         struct {
             char session_14_1[1];
-            char unknown_15[1156];
+            char pad_15[1156];
             int field_499;
             char pad_49d[64];
         };
@@ -167,19 +167,19 @@ struct Game {
             int field_589;
             char unknown_58d[2110];
             unsigned char textColor;
-            unsigned char field_dcc;
+            unsigned char pad_dcc;
             char pad_dcd[1];
-            unsigned char field_dce;
-            unsigned char field_dcf;
+            unsigned char pad_dce;
+            unsigned char pad_dcf;
             char pad_dd0[3];
             unsigned char color2;
-            unsigned char field_dd4;
-            unsigned char field_dd5;
+            unsigned char pad_dd4;
+            unsigned char pad_dd5;
             char pad_dd6[1];
-            unsigned char field_dd7;
+            unsigned char pad_dd7;
             char pad_dd8[1];
-            unsigned char unknown_dd9;
-            unsigned char field_dda;
+            unsigned char pad_dd9;
+            unsigned char pad_dda;
             char pad_ddb[1040];
             void* surface;
             char pad_11ef[256];
@@ -193,7 +193,7 @@ struct Game {
             };
         };
         struct {
-            int field_519;
+            int pad_519;
             char unknown_51d[2222];
             unsigned char colors[16];
             char pad_ddb_a[1300];
@@ -206,7 +206,7 @@ struct Game {
             Ref<SideData> p1cd5;
             char unknown_1cd9[281];
             short field_1df2;
-            char unknown_1df4[2988];
+            char pad_1df4[2988];
         };
         struct {
             char menu_519[16];
@@ -324,14 +324,14 @@ struct Game {
     };
     union {
         struct {
-            char unknown_2ab1[155];
+            char pad_2ab1[155];
             unsigned short low_2b4c : 4;
             unsigned short flag_2b4c : 1;
             unsigned short rest_2b4c : 11;
             char pad_2b4e[28];
         };
         struct {
-            char unknown_2ab1_a[155];
+            char pad_2ab1_a[155];
             Flags_00496ce0 flags_2b4c;
             char pad_2b4e_a[28];
         };
@@ -507,7 +507,7 @@ struct Game {
             struct {
                 short v[4];
             } dim;
-            char unknown_142ef[2];
+            char pad_142ef[2];
             unsigned char viewDirtyFlags_142f1;
             char pad_142f2;
             char pad_142f3[90];
@@ -644,7 +644,7 @@ struct Game {
     char pad_1439f[8];
     union {
         struct {
-            char field_143a7[4];
+            char pad_143a7[4];
             char pad_143ab[1020];
         };
         char paletteRgba[1024];
@@ -948,7 +948,7 @@ struct Game {
             int netSendDropPct;
         };
         struct {
-            char unknown_37ee6[12];
+            char pad_37ee6[12];
             unsigned char side;
             char pad_37ef3[19];
             unsigned char visualFlagsByte;
@@ -971,7 +971,7 @@ struct Game {
             char pad_37f31[8];
         };
         struct {
-            char unknown_37ee6_a[32];
+            char pad_37ee6_a[32];
             union {
                 unsigned short visualFlags;
                 struct {
@@ -996,7 +996,7 @@ struct Game {
             char pad_37f31_a[8];
         };
         struct {
-            char unknown_37ee6_b[32];
+            char pad_37ee6_b[32];
             struct {
                 unsigned short bit0 : 1;
                 unsigned short bit1 : 1;
@@ -1025,7 +1025,7 @@ struct Game {
             char pad_37f31_b[8];
         };
         struct {
-            char unknown_37ee6_c[32];
+            char pad_37ee6_c[32];
             struct {
                 unsigned short b0 : 1;
                 unsigned short b1 : 1;
@@ -1055,7 +1055,7 @@ struct Game {
             char pad_37f31_c[8];
         };
         struct {
-            char unknown_37ee6_d[73];
+            char pad_37ee6_d[73];
             struct {
                 unsigned short screenBitA : 1;
                 unsigned short screenBitB : 1;
@@ -1135,7 +1135,7 @@ struct Game {
             unsigned char flags_38d75;
             char pad_38d76[9];
             MissionFlags_0042f9a0 allMissionsFlags;
-            char unknown_38d81[8];
+            char pad_38d81[8];
             int total;
             int values[8];
             char pad_38dad[994];
@@ -1150,7 +1150,7 @@ struct Game {
             char imageOutputDirectory[516];
             char pad_38c57[286];
             LoadFlags_00497f40 loadingFlags;
-            char unknown_38d77[1048];
+            char pad_38d77[1048];
         };
         struct {
             Side_00431a60 sideDefs[5];
@@ -1165,7 +1165,7 @@ struct Game {
                 unsigned short : 2;
                 unsigned short net_bit2 : 1;
             } net_bits;
-            char unknown_38d79[1046];
+            char pad_38d77_a[1046];
         };
         struct {
             char unknown_37f3d_b[2836];
@@ -1175,14 +1175,14 @@ struct Game {
                 unsigned short : 3;
                 unsigned short synced : 1;
             } netBits;
-            char unknown_38d79_a[1046];
+            char pad_38d77_b[1046];
         };
         struct {
             char unknown_37f3d_c[2836];
             struct {
                 unsigned short bits_38a51 : 15;
             } bits_38a51_1;
-            char unknown_38a53_a[1852];
+            char pad_38a53_a[1852];
         };
         struct {
             char unknown_37f3d_d[2836];
@@ -1192,7 +1192,7 @@ struct Game {
                 unsigned short faster : 1;
                 unsigned short rest : 13;
             } bits_38a51_3;
-            char unknown_38a53_b[1852];
+            char pad_38a53_b[1852];
         };
         struct {
             char unknown_37f3d_e[34];
@@ -1244,7 +1244,7 @@ struct Game {
     void* fontSmlFont;
     union {
         struct {
-            char field_39201[1];
+            char pad_39201[1];
             char pad_39202[15];
             int connection;
             int pad_39215;
@@ -1340,7 +1340,7 @@ static_assert(offsetof(Game, session_14_1) == 0x14, "session_14_1");
 static_assert(offsetof(Game, session_14) == 0x14, "session_14");
 static_assert(offsetof(Game, net_14) == 0x14, "net_14");
 static_assert(offsetof(Game, menu) == 0x519, "menu");
-static_assert(offsetof(Game, field_519) == 0x519, "field_519");
+static_assert(offsetof(Game, pad_519) == 0x519, "pad_519");
 static_assert(offsetof(Game, menu_519) == 0x519, "menu_519");
 static_assert(offsetof(Game, message) == 0x519, "message");
 static_assert(offsetof(Game, menu_519_18) == 0x519, "menu_519_18");
@@ -1381,7 +1381,7 @@ static_assert(offsetof(Game, name_2be3) == 0x2be3, "name_2be3");
 static_assert(offsetof(Game, password_2be3_1176a) == 0x2be3, "password_2be3_1176a");
 static_assert(offsetof(Game, autoFollowFlags) == 0x14373, "autoFollowFlags");
 static_assert(offsetof(Game, autoFollowFlags_14373) == 0x14373, "autoFollowFlags_14373");
-static_assert(offsetof(Game, field_143a7) == 0x143a7, "field_143a7");
+static_assert(offsetof(Game, pad_143a7) == 0x143a7, "pad_143a7");
 static_assert(offsetof(Game, paletteRgba) == 0x143a7, "paletteRgba");
 static_assert(offsetof(Game, src3) == 0x147f7, "src3");
 static_assert(offsetof(Game, sources) == 0x147f7, "sources");
@@ -1435,7 +1435,7 @@ static_assert(offsetof(Game, maxKills) == 0x3918f, "maxKills");
 static_assert(offsetof(Game, pad_391cf) == 0x391cf, "field_391cf");
 static_assert(offsetof(Game, campaignMissionStatus_391cf) == 0x391cf, "campaignMissionStatus_391cf");
 static_assert(offsetof(Game, campaignMissionStatus) == 0x391cf, "campaignMissionStatus");
-static_assert(offsetof(Game, field_39201) == 0x39201, "field_39201");
+static_assert(offsetof(Game, pad_39201) == 0x39201, "pad_39201");
 static_assert(offsetof(Game, providerGuid) == 0x39201, "providerGuid");
 static_assert(offsetof(Game, info) == 0x39201, "info");
 static_assert(offsetof(Game, singleCommanderDeath) == 0x39219, "singleCommanderDeath");

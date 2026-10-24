@@ -10,9 +10,6 @@
 struct Unit;
 class OrderFx;
 class HapiBank;
-// Unused here: the symbol ids these declarations take keep the allocation of
-// the files that share this header (docs/c2-regalloc.md). They are the types
-// behind the pointers the order views carry.
 struct Feature;
 struct Point;
 struct SaveDesc_0043a1f0;
@@ -22,10 +19,10 @@ struct Vec3_0043a1f0;
 
 #pragma pack(push, 1)
 struct Order : public OrderBase {
-    MissionType kind;              // +0x04, index into the order-type table
-    unsigned char state;           // +0x05
+    MissionType kind;
+    unsigned char state;
     union {
-        unsigned int flags;        // +0x06
+        unsigned int flags;
         struct {
             unsigned int low : 15;
             unsigned int waiting : 1;
@@ -39,7 +36,7 @@ struct Order : public OrderBase {
             unsigned int flag_rest : 28;
         } groups;
     };
-    unsigned int wakeFrame;        // +0x0a
+    unsigned int wakeFrame;
     union {
         Ref<Unit> unit;
         Ref<Unit> source;
@@ -52,20 +49,19 @@ struct Order : public OrderBase {
         };
         PathOrderAttach link;
     };
-    Vec3 pos;                      // +0x22
-    // One-arm unions: each costs symbol ids the including files match at.
+    Vec3 pos;
     union {
-        Point16 start;             // +0x2e
+        Point16 start;
         struct {
             short x;
             short z;
         };
     };
     union {
-        Point16 cached;            // +0x32
+        Point16 cached;
     };
     union {
-        int type;                  // +0x36
+        int type;
         int id;
         int wait;
         int weapon;
@@ -83,7 +79,7 @@ struct Order : public OrderBase {
         int piece;
     };
     union {
-        int radius;                // +0x3a
+        int radius;
         int step;
         int waitLimit;
         int count;
@@ -94,15 +90,15 @@ struct Order : public OrderBase {
         int misses;
     };
     union {
-        int progress;              // +0x3e
+        int progress;
         int range;
         int retries;
         int capabilities;
     };
-    unsigned int flags_42;         // +0x42
-    unsigned int created;          // +0x46
+    unsigned int flags_42;
+    unsigned int created;
     Ref<Order> next;
-    unsigned int subFlags;         // +0x4e
+    unsigned int subFlags;
     Ref<OrderFx> attached;
 
     Order(unsigned char kind, Unit* unit, Vec3* pos, int a, int b, int c);

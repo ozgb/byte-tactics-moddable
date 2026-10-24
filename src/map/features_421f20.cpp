@@ -1,19 +1,15 @@
-// Decompiled by DeepSeek V4.1 Flash. Names are provisional.
-// Stays in its own file: in features.cpp the loop address's base and index
-// swap (lea [edx+ebx+4] against the original's [ebx+edx+4]; docs/c2-regalloc.md,
-// "Symbol ids").
 #include <string.h>
 #include "../state/block.h"
 
 struct NameEntry_00421f20 {
     char unknown_0[4];
-    char name[0x80];                   // +0x4
+    char name[0x80];
 };
 
 struct List_00421f20 {
     char unknown_0[0x1c];
-    int count;                         // +0x1c
-    NameEntry_00421f20* entries;       // +0x20
+    int count;
+    NameEntry_00421f20* entries;
 };
 
 #pragma pack(push, 1)
@@ -51,9 +47,6 @@ void __stdcall InitFeatureAnimPool(List_00421f20* list)
     m->names = 0;
     m->nameCount = 0;
 
-    // A reference to the field, not a local copy: every use re-reads
-    // list->entries, and that is what makes MSVC base the address on the loop
-    // offset (lea [ebx+edx+4]) instead of on the loaded pointer.
     NameEntry_00421f20*& entries = list->entries;
 
     for (int j = 0; j < list->count; j++) {

@@ -1,13 +1,3 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// Stays in its own file: in features.cpp the merged file's symbol ids schedule
-// the `name` load after the strncpy setup instead of before it
-// (docs/c2-regalloc.md, "Symbol ids").
-// Loads the feature type `name` from the feature files: appends a 0x100-byte
-// record to the feature table in g_game, fills it from the record's TDF
-// fields (3D object, or GAF file and sequences, flags, resources, burn
-// weapon) and returns the new feature type number.
-// <windows.h> must come before <stdio.h>: it decides the registers of
-// `features[j].anims`.
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 #include <stdio.h>
@@ -17,58 +7,58 @@
 
 struct List_004224b0 {
     int unknown_0;
-    TdfFile** first;                    // +0x4
-    TdfFile** last;                     // +0x8
+    TdfFile** first;
+    TdfFile** last;
 };
 
 struct Seq_004224b0 {
-    unsigned short count;               // +0x0
-    unsigned char kind;                 // +0x2
+    unsigned short count;
+    unsigned char kind;
 };
 
 struct Gaf_004224b0;
 
 struct Ref_004224b0 {
-    unsigned short index;               // +0x0
-    unsigned short value;               // +0x2
-    unsigned char kind;                 // +0x4
+    unsigned short index;
+    unsigned short value;
+    unsigned char kind;
     char unknown_5[3];
-    Seq_004224b0* src;                  // +0x8
+    Seq_004224b0* src;
 };
 
 struct FeatureDef_004224b0 {
-    char name[0x80];                    // +0x00
-    char description[0x14];             // +0x80
-    short footprintx;                   // +0x94
-    short footprintz;                   // +0x96
+    char name[0x80];
+    char description[0x14];
+    short footprintx;
+    short footprintz;
     union {
-        void* object;                   // +0x98
-        char filename[0x10];            // +0x98
+        void* object;
+        char filename[0x10];
     };
-    Gaf_004224b0* anims;                // +0xa8
-    Seq_004224b0* seq;                  // +0xac
-    Seq_004224b0* seqshad;              // +0xb0
-    Seq_004224b0* seqburn;              // +0xb4
-    Seq_004224b0* seqburnshad;          // +0xb8
-    Seq_004224b0* seqdie;               // +0xbc
-    Seq_004224b0* seqdieshad;           // +0xc0
-    Seq_004224b0* seqreclamate;         // +0xc4
-    Seq_004224b0* seqreclamateshad;     // +0xc8
-    Ref_004224b0 ref;                   // +0xcc
-    Ref_004224b0 refshad;               // +0xd8
+    Gaf_004224b0* anims;
+    Seq_004224b0* seq;
+    Seq_004224b0* seqshad;
+    Seq_004224b0* seqburn;
+    Seq_004224b0* seqburnshad;
+    Seq_004224b0* seqdie;
+    Seq_004224b0* seqdieshad;
+    Seq_004224b0* seqreclamate;
+    Seq_004224b0* seqreclamateshad;
+    Ref_004224b0 ref;
+    Ref_004224b0 refshad;
     Ref<char> burnweapon;
-    short sparktime;                    // +0xe8
-    short damage;                       // +0xea
-    float energy;                       // +0xec
-    float metal;                        // +0xf0
-    unsigned short dead;                // +0xf4
-    unsigned short burnt;               // +0xf6
-    unsigned short reclamate;           // +0xf8
-    char height;                        // +0xfa
-    char spreadchance;                  // +0xfb
-    char reproduce;                     // +0xfc
-    char reproducearea;                 // +0xfd
-    unsigned short noobject : 1;        // +0xfe
+    short sparktime;
+    short damage;
+    float energy;
+    float metal;
+    unsigned short dead;
+    unsigned short burnt;
+    unsigned short reclamate;
+    char height;
+    char spreadchance;
+    char reproduce;
+    char reproducearea;
+    unsigned short noobject : 1;
     unsigned short animating : 1;
     unsigned short animtrans : 1;
     unsigned short shadtrans : 1;
@@ -98,7 +88,6 @@ Gaf_004224b0* __stdcall LoadGaf(char* path);
 Seq_004224b0* __stdcall FindGafEntry(Gaf_004224b0* gaf, const char* name);
 void __stdcall InitGafSequence(Ref_004224b0* ref, Seq_004224b0* src, int index);
 
-// FindFeatureFile, inlined
 static inline TdfFile* FindEntry(char* name)
 {
     for (TdfFile** p = s_featureTdfParsers->first; p < s_featureTdfParsers->last; p++) {
@@ -109,7 +98,6 @@ static inline TdfFile* FindEntry(char* name)
     return 0;
 }
 
-// FindOptionalGafEntry, inlined
 static inline Seq_004224b0* SeqByName(Gaf_004224b0* gaf, int unused, char* name)
 {
     if (strlen(name) == 0) {
@@ -118,9 +106,6 @@ static inline Seq_004224b0* SeqByName(Gaf_004224b0* gaf, int unused, char* name)
     return FindGafEntry(gaf, name);
 }
 
-// Reads one seqname-style field into *out: the sequence named by key from the
-// feature's GAF, or 0. The tested lookup goes through an int local: it changes
-// the zero compare.
 static inline void LoadFeatureSeq(TdfRecord* rec, char* key, char* seqname, Gaf_004224b0* anims, Seq_004224b0** out)
 {
     int ok = rec->GetFieldString(seqname, key, 0x100, DAT_005119b8);
@@ -130,8 +115,6 @@ static inline void LoadFeatureSeq(TdfRecord* rec, char* key, char* seqname, Gaf_
         *out = 0;
 }
 
-// The same read for the burn, die and reclaim sequences, which play once: the
-// sequence's loop flag is cleared.
 static inline void LoadFeatureSeqOnce(TdfRecord* rec, char* key, char* seqname, Gaf_004224b0* anims, Seq_004224b0** out)
 {
     int ok = rec->GetFieldString(seqname, key, 0x100, DAT_005119b8);
@@ -146,16 +129,11 @@ static inline void LoadFeatureSeqOnce(TdfRecord* rec, char* key, char* seqname, 
 
 #include "../../interfaces/seams.h"
 
-// The return value is the full old count (0x422e40.cpp declares it unsigned
-// short).
-// The sequence references must be cleared field by field, not by a Reset()
-// method or a pointer local.
 // FUNCTION: 0x4224b0
 int __stdcall LoadFeatureType(char* name)
 {
     Gaf_004224b0* anims;
     int j;
-    // Tested TDF lookups go through an int local: it changes the zero compare.
     int ok;
     char seqname[0x100];
     char file[0x100];

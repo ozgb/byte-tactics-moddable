@@ -1,10 +1,3 @@
-// Decompiled by Sonnet, Haiku, Opus, deepseek-v4.1-flash, GPT-6, space-bunny-free, deepseek-v4.1, GPT-5.6-Terra, LongCat 2.5 Preview Free, GPT-6.1-sol, mimo-v2.6-pro, claude-sonnet-5-5 and Space Bunny Free. Names are provisional.
-// CobScript: the interpreter of a unit's COB script, an abstract base class
-// of 0x540 bytes (vtable 0x4fdb00, 21 slots). Slots 0-6 are pure; each is
-// named after the one override that fills it, in the vtable of the only
-// derived class, UnitScript (src/units/unit_script.cpp). Slot 20 is the
-// virtual destructor (the vtable holds its scalar deleting destructor).
-
 #include <string.h>
 #include "../state/block.h"
 #include <stdlib.h>
@@ -12,20 +5,15 @@
 #include "cob_script.h"
 #include "cob_types.h"
 
-// 0x4b0c40's view of a channel. Its channel array starts at offset 0, so its
-// fields sit 0x1c after the real Channel's: `count` is the real `sp`, `values`
-// the real `stack` and `unknown_3c` the real `callback`. The function does not
-// use activeCount, so the view's offset does not matter.
 struct Channel_004b0c40 {
     char unknown_0[0x24];
-    int count;                         // +0x24
+    int count;
     char unknown_28[0x3c - 0x28];
-    int unknown_3c;                    // +0x3c
-    int values[5];                     // +0x40
+    int unknown_3c;
+    int values[5];
     char unknown_54[0xa4 - 0x54];
 };
 
-// The saved state of a script (0x528 bytes) and of one piece (0x6c bytes).
 struct SavedScript {
     int checksum;
     Channel channels[8];
@@ -99,8 +87,6 @@ int CobScript::GetTransporterId()
     return 0;
 }
 
-// The compiler-generated scalar deleting destructor (0x4b06b0, vtable slot
-// 20) comes from the destructor definition below, with its body inlined.
 // FUNCTION: 0x4b06b0 ??_GCobScript@@UAEPAXI@Z
 // FUNCTION: 0x4b06f0
 CobScript::~CobScript()
@@ -113,10 +99,6 @@ CobScript::~CobScript()
     }
 }
 
-// SetCob attaches the
-// object's state data: it stores the data block, looks up its runtime state,
-// reallocates the "Object States" and "Static Varibles" tables and clears the
-// state table. Called from 0x485d40 with unit->type->field_18e.
 // FUNCTION: 0x4b0720
 void CobScript::SetCob(ScriptTable* data)
 {
@@ -141,9 +123,6 @@ int CobScript::FUN_004b07b0(int, int)
     return 0;
 }
 
-// Looks a name up in the table at +8 and claims a channel slot for its index
-// (StartThread, see 0x4b0a10.cpp); -1 when there is no table.
-// The name lookup is defined as a member here, not a static inline helper, so it is inlined.
 // FUNCTION: 0x4b07c0
 int CobScript::FindScript(const char* name)
 {
@@ -164,9 +143,6 @@ int CobScript::StartThreadByName(const char* name)
     return StartThread(FindScript(name));
 }
 
-// Claims the first free one of 8 channel slots for entry `id` of the table
-// at +8 and returns its index; -1 when `id` is out of range or no slot is
-// free (see 0x4b0830.cpp and 0x4b0a10.cpp).
 // FUNCTION: 0x4b08c0
 int CobScript::StartThread(int id)
 {
@@ -186,9 +162,6 @@ int CobScript::StartThread(int id)
     return -1;
 }
 
-// Looks a name up in the table at +8 (the lookup at 0x4b07c0, inlined here),
-// claims a channel slot for its index with 0x4b08c0, stores the value and
-// refreshes the channels when asked. Compare 0x4b0a10, its index-taking twin.
 // FUNCTION: 0x4b0940
 int CobScript::StartScript(const char* name, Callback* callback, int update)
 {
@@ -206,8 +179,6 @@ int CobScript::StartScript(const char* name, Callback* callback, int update)
     return 1;
 }
 
-// StartThread claims one of the 8 channel slots for an id and returns its
-// index (or -1); this one then stores a value in the new slot.
 // FUNCTION: 0x4b0a10
 int CobScript::StartScriptByIndex(int id, Callback* callback, int update)
 {
@@ -231,16 +202,6 @@ int CobScript::StartScriptWithArgs(char* name, Callback* callback, int update, i
     return StartScriptWithArgsByIndex(FindScript(name), callback, update, count, a, b, c, d);
 }
 
-// Index-taking twin of 0x4b0a70 (the name lookup version): StartThread claims
-// one of the 8 channel slots, this stores the value plus a four-deep call
-// frame on the slot's own stack, truncates the slot's stack pointer to
-// count - 1 and refreshes the channels when asked. Compare 0x4b0a10 (same
-// shape without the frame) and 0x4b0c40.
-//
-// The channel array is viewed from `this + i * 0xa4` with the fields at
-// +0x24 (stack pointer, starts at -1), +0x3c (value) and +0x40 (stack). The
-// real 0x1c-byte channel header sits 0x1c before this view, which is why the
-// array is declared at offset 0 here; the offsets are what the code reads.
 // FUNCTION: 0x4b0b00
 int CobScript::StartScriptWithArgsByIndex(int index, Callback* callback, int update,
                                            int count, int a, int b, int c, int d)
@@ -257,8 +218,6 @@ int CobScript::StartScriptWithArgsByIndex(int index, Callback* callback, int upd
     ch->stack[++ch->sp] = b;
     ch->stack[++ch->sp] = c;
     ch->stack[++ch->sp] = d;
-    // Spelled through channels[i] (not ch) so MSVC keeps the fourth push's
-    // increment instead of folding it into the array store.
     channels[i].sp = count - 1;
     if (update) {
         if (activeCount) {
@@ -276,25 +235,14 @@ int CobScript::QueryScript(char* name, int* p2, int* p3, int* p4, int* p5)
     return QueryScriptByIndex(FindScript(name), p2, p3, p4, p5);
 }
 
-// Index-taking core of 0x4b0bc0: claims a channel for `index` (0x4b08c0),
-// pushes the four pointed-to values (0 when the pointer is null) onto the
-// channel's value list, processes the channel with 0x4b0da0, then writes the
-// four processed values back through the pointers. Compare 0x4b0bc0, its
-// name-taking wrapper.
-//
-// The channel is viewed from `this + index * 0xa4` with the fields at +0x24
-// (the real `sp`, starts at -1), +0x3c (the real `callback`) and +0x40 (the
-// real `stack`), the offsets 0x1c past the real Channel.
 // FUNCTION: 0x4b0c40
 int CobScript::QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5)
 {
     int i = this->StartThread(index);
     if (i < 0)
         return 0;
-    // Not the real channels[i]: that folds the 0x1c base into every field offset.
     Channel_004b0c40* c = (Channel_004b0c40*)((char*)this + i * 0xa4);
     c->unknown_3c = 0;
-    // The reference keeps the count store in the fourth push; ++c->count drops it.
     int& cnt = c->count;
     c->values[++cnt] = p2 ? *p2 : 0;
     c->values[++cnt] = p3 ? *p3 : 0;
@@ -321,7 +269,6 @@ void CobScript::RemoveCallback(Callback* callback)
     }
 }
 
-// Updates every channel with the value (compare the tail of 0x4b0a10).
 // FUNCTION: 0x4b0d60
 void CobScript::RunScripts(int elapsed)
 {
@@ -364,7 +311,6 @@ void CobScript::RunThread(unsigned int channel, int elapsed)
         int arguments[4];
         do
         {
-            // One shared p, declared here and used by both the move and turn cases.
             Piece *p;
             unsigned int opcode = table->code[c->pc];
             switch (opcode & 0x100ff000)
@@ -706,7 +652,6 @@ void CobScript::RunThread(unsigned int channel, int elapsed)
                 break;
             }
             case 0x10059000: {
-                // Through the inline XorOp(): the inline boundary sets the pop registers.
                 c->XorOp();
                 c->pc++;
                 break;
@@ -849,11 +794,6 @@ void CobScript::RunThread(unsigned int channel, int elapsed)
     }
 }
 
-// Advance every moving piece by elapsed (a percentage) of its per-axis speed:
-// e[1] is the translation speed toward the e[0] limit, e[5] the turn speed with the
-// e[4] limit, e[3] the current angle, e[2] the wanted angle (-1 means none). Each
-// element that still moves leaves its record's active flag set, and any such flag
-// keeps `changed` (the "something is still animating" flag) at 1.
 // FUNCTION: 0x4b1c00
 void CobScript::AnimatePieces(int elapsed)
 {
@@ -862,7 +802,6 @@ void CobScript::AnimatePieces(int elapsed)
     if (changed == 0)
         return;
     changed = 0;
-    // Piece records are indexed through the e[6][3] view, not the named arrays.
     for (int i = 0; i < table->pieceCount; i++) {
         if (pieces[i].active != 0) {
             pieces[i].active = 0;
@@ -930,7 +869,6 @@ void CobScript::AnimatePieces(int elapsed)
     }
 }
 
-// Vtable slots 7-13 of CobScript.
 // FUNCTION: 0x4b1e50
 int CobScript::IsPieceVisible(int)
 {
@@ -969,9 +907,6 @@ void CobScript::ExplodePiece(int, unsigned int)
 {
 }
 
-// Save method of CobScript (the object at Unit+0x9a), the counterpart of
-// the loader 0x4b2040. Writes the eight 0xa4-byte records at +0x1c, the block
-// at ptr10, then one 0x6c-byte record per element of the array at ptr14.
 // FUNCTION: 0x4b1ec0
 void CobScript::SaveScriptState(HapiBank* file)
 {
@@ -1006,9 +941,6 @@ void CobScript::SaveScriptState(HapiBank* file)
     }
 }
 
-// The record is the plain 0x6c struct (int e[6][3] at 0, a[3] at 0x48, b[3] at
-// 0x54, h[3] at 0x60). The three virtual calls before the j loop read the
-// record's h[3] at 0x60; the two in the j loop read a[j] at 0x48 and b[j] at 0x54.
 // FUNCTION: 0x4b2040
 int CobScript::LoadScriptState(HapiBank* file)
 {
@@ -1037,7 +969,6 @@ int CobScript::LoadScriptState(HapiBank* file)
     if (file->ReadBox(buffer, bytes) != bytes) {
         return 0;
     }
-    // Walk the buffer by index (buffer[i]), not with a moving pointer.
     for (int i = 0; i < table->pieceCount; i++) {
         pieces[i].active = 1;
         SetPieceVisible(i, buffer[i].visible);

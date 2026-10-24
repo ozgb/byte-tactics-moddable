@@ -1,60 +1,53 @@
-// Sound: the game's audio system (Thaldren's AudioEngine), the CD audio
-// player, the DirectSound sample channels and the streamed sample, at
-// g_game+0x10. The one declaration of the class, for cd_audio.cpp,
-// samples.cpp and every file that calls it; the types behind the pointers
-// stay private to the sound module.
 #ifndef SOUND_H
 #define SOUND_H
 
 struct FileHandle;
 struct Pos_004cf570;
-// HWND__ has no use with STRICT off; the declaration stays because
-// frontend/endgame.cpp matches only at this symbol count (docs/c2-regalloc.md).
 struct HWND__;
 
 class Sound {
 public:
-    int open;                          // +0x00
-    int use3D;                         // +0x04
-    float minDistance;                 // +0x08
-    float maxDistance;                 // +0x0c
-    int waveDevices;                   // +0x10
-    int auxDevice;                     // +0x14
-    int waveVolume;                    // +0x18
-    int auxVolume;                     // +0x1c
-    int cdVolume;                      // +0x20
+    int open;
+    int use3D;
+    float minDistance;
+    float maxDistance;
+    int waveDevices;
+    int auxDevice;
+    int waveVolume;
+    int auxVolume;
+    int cdVolume;
     void* directSound;
     void* primary;
-    int maxBuffers;                    // +0x2c
-    int count;                         // +0x30, of the playing buffers
-    int sequence;                      // +0x34
+    int maxBuffers;
+    int count;
+    int sequence;
     void* buffers[0x20];
-    int priority[0x20];                // +0xb8
-    int flags[0x20];                   // +0x138, looping
-    int sampleRate;                    // +0x1b8
-    int sampleBits;                    // +0x1bc
-    int sampleChannels;                // +0x1c0
+    int priority[0x20];
+    int flags[0x20];
+    int sampleRate;
+    int sampleBits;
+    int sampleChannels;
     void** sets[8];
     void* stream;
-    FileHandle* streamFile;            // +0x1e8, the streamed sample's
-    int streamBits;                    // +0x1ec
-    int streamSize;                    // +0x1f0
-    int streamPos;                     // +0x1f4
-    int streamOffset;                  // +0x1f8
-    int playbackOrder;                 // +0x1fc
-    int trackCount;                    // +0x200
-    int lockedTrack;                   // +0x204
-    int currentTrack;                  // +0x208
-    int playState;                     // +0x20c
-    int discSerial;                    // +0x210
-    unsigned char arr_214[100];        // +0x214
-    int trackCategory;                 // +0x278
-    int cdEnabled;                     // +0x27c
-    int dataTrack;                     // +0x280, track 1 is not audio
-    int step;                          // +0x284
-    int streamTimer;                   // +0x288, the stream's timer
-    void (*callback)();                // +0x28c
-    int noDriver;                      // +0x290
+    FileHandle* streamFile;
+    int streamBits;
+    int streamSize;
+    int streamPos;
+    int streamOffset;
+    int playbackOrder;
+    int trackCount;
+    int lockedTrack;
+    int currentTrack;
+    int playState;
+    int discSerial;
+    unsigned char arr_214[100];
+    int trackCategory;
+    int cdEnabled;
+    int dataTrack;
+    int step;
+    int streamTimer;
+    void (*callback)();
+    int noDriver;
 
     int SetCdCallback(void (*cb)());
     int OpenCdAudio();
@@ -91,9 +84,6 @@ public:
     int PlayCdTrack(int index, int flag);
     Sound();
     void ReleaseDirectSound();
-    // HWND, DWORD and LONG are spelled out so the header needs no include:
-    // windows.h, without STRICT, has HWND as void*, DWORD as unsigned long
-    // and LONG as long.
     int InitDirectSound(int rate, int bits, int channels, void* handle);
     void ReapFinishedBuffers();
     void StopAllBuffers();

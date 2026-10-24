@@ -1,33 +1,20 @@
-// Decompiled by deepseek-v4.1-flash, finished by claude-opus-5-5, finished by GPT-6, finished by Claude Opus 5.5. Names are provisional.
-// Stays out of multi.cpp: merged, UpdateMetalText is inlined into it (docs/split-modules.md).
-// Opens the multiplayer battle room (LOUNGE2.GUI): resets the room state,
-// copies the lobby's command-line options (g_lobbyLock..g_lobbyWatching) or the
-// host's game options into the local player's flags, sets up the chat list,
-// MEM, START, the METAL/MAXUNITS/ENERGY sliders and the map, then refreshes
-// the whole room.
-//
-// The flag word at +0x9b is the bitfield layout of 0x447b10; the game's
-// mapping/los/losType/commander and the options' fixedloc are ints read for
-// their low bit. f97 (host) and the word at +0x9d are unsigned short
-// bitfields, as in 0x44a680.
 #include "win_types.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// First: gives g_game a symbol id below 65536.
 #include "ta_types.h"
 
 #pragma pack(push, 1)
 struct PlayerInfo_00449bb0 {
-    char map[0x8b];                     // +0x00
-    unsigned short width;               // +0x8b
-    unsigned short height;              // +0x8d
+    char map[0x8b];
+    unsigned short width;
+    unsigned short height;
     char unknown_8f[0x97 - 0x8f];
-    unsigned short f97_0 : 1;           // +0x97, host
+    unsigned short f97_0 : 1;
     unsigned short f97_rest : 15;
-    unsigned short memory;              // +0x99
+    unsigned short memory;
     struct {
-        unsigned short low : 4;         // +0x9b
+        unsigned short low : 4;
         unsigned short started : 1;
         unsigned short ready : 1;
         unsigned short bit6 : 1;
@@ -36,117 +23,116 @@ struct PlayerInfo_00449bb0 {
         unsigned short los : 1;
         unsigned short losType : 1;
         unsigned short commander : 2;
-        // Unsigned short, not signed: the writes compute the value before masking.
         unsigned short cheating : 1;
         unsigned short fixedloc : 1;
         unsigned short closed : 1;
     } b;
-    unsigned short f9d_0 : 2;           // +0x9d
+    unsigned short f9d_0 : 2;
     unsigned short f9d_2 : 1;
     unsigned short f9d_rest : 13;
     char unknown_9f[0xa1 - 0x9f];
-    unsigned short energy;              // +0xa1
-    unsigned short metal;               // +0xa3
-    unsigned short maxUnits;            // +0xa5
-    unsigned char versionMajor;         // +0xa7
-    unsigned char versionMinor;         // +0xa8
-    int mapCrc;                         // +0xa9
+    unsigned short energy;
+    unsigned short metal;
+    unsigned short maxUnits;
+    unsigned char versionMajor;
+    unsigned char versionMinor;
+    int mapCrc;
 };
 
 struct Gadget_00449bb0;
 struct Gui_00449bb0;
 typedef void (__stdcall* Callback_00449bb0)(Gui_00449bb0* gui, int index);
 
-struct Gadget_00449bb0 {                // 0x15b bytes
+struct Gadget_00449bb0 {
     char unknown_0[0x1b];
-    int attribs;                        // +0x1b
+    int attribs;
     char unknown_1f[0x23 - 0x1f];
-    int colour;                         // +0x23
+    int colour;
     char unknown_27[0x29 - 0x27];
-    unsigned char visible;              // +0x29
+    unsigned char visible;
     char unknown_2a[0xb6 - 0x2a];
     union {
-        char text[0x10];                // +0xb6
-        struct {                        // the layer's first entry
-            short count;                // +0xb6
+        char text[0x10];
+        struct {
+            short count;
             char unknown_b8[8];
-            void* gaf;                  // +0xc0
+            void* gaf;
         } head;
         struct {
             char unknown_b6[8];
-            void* frames;               // +0xbe
+            void* frames;
         } anim;
     };
-    short frame;                        // +0xc6
-    unsigned int c8_0 : 1;              // +0xc8
+    short frame;
+    unsigned int c8_0 : 1;
     unsigned int c8_rest : 31;
     char unknown_cc[0x138 - 0xcc];
-    unsigned short maxchars;            // +0x138
+    unsigned short maxchars;
     char unknown_13a[0x13c - 0x13a];
-    int max;                            // +0x13c
-    short value;                        // +0x140
+    int max;
+    short value;
     short knobSize;
-    Callback_00449bb0 sliderCallback;   // +0x144
+    Callback_00449bb0 sliderCallback;
     char unknown_148[2];
-    void* game;                         // +0x14a
+    void* game;
     char unknown_14e[0x15b - 0x14e];
 };
 
 struct Layer_00449bb0 {
     int unknown_0;
-    Gadget_00449bb0* entries;           // +0x4
-    void* handler;                      // +0x8
-    void* game;                         // +0xc
+    Gadget_00449bb0* entries;
+    void* handler;
+    void* game;
 };
 
 struct Gui_00449bb0 {
     char unknown_0[0x18];
-    Layer_00449bb0* table;              // +0x18
+    Layer_00449bb0* table;
 };
 
 struct Options_00449bb0 {
     char unknown_0[0x118];
-    int fixedloc;                       // +0x118
+    int fixedloc;
 };
 
 struct Game_00449bb0 {
     char unknown_0[0x519];
-    Gui_00449bb0 gui;                   // +0x519
+    Gui_00449bb0 gui;
     char unknown_535[0x1b63 - 0x535];
-    Player players[10];                 // +0x1b63
+    Player players[10];
     char unknown_2851[0x29a0 - 0x2851];
-    Options_00449bb0* options;          // +0x29a0
+    Options_00449bb0* options;
     char unknown_29a4[0x2a30 - 0x29a4];
-    UnitSync* net;                      // +0x2a30
+    UnitSync* net;
     char unknown_2a34[0x2a42 - 0x2a34];
-    unsigned char localPlayer;          // +0x2a42
+    unsigned char localPlayer;
     char unknown_2a43[0x2a9b - 0x2a43];
-    char* chatter;                      // +0x2a9b
+    char* chatter;
     char unknown_2a9f[0x2bee - 0x2a9f];
-    unsigned short dirty : 1;           // +0x2bee
+    unsigned short dirty : 1;
     unsigned short dirty_rest : 15;
     char unknown_2bf0[0x2c28 - 0x2bf0];
-    int playerIds[11];                  // +0x2c28
+    int playerIds[11];
     char unknown_2c54[0x2c74 - 0x2c54];
-    unsigned short locked : 1;          // +0x2c74
+    unsigned short locked : 1;
     unsigned short locked_rest : 15;
     char unknown_2c76[0x37ee8 - 0x2c76];
-    unsigned short lobbyInitScratch;    // +0x37ee8
-    unsigned short maxUnits;            // +0x37eea
-    unsigned short unitLimit;           // +0x37eec
+    unsigned short lobbyInitScratch;
+    unsigned short maxUnits;
+    unsigned short unitLimit;
     char unknown_37eee[0x37ef6 - 0x37eee];
-    int commanderDeath;                 // +0x37ef6
+    int commanderDeath;
     char unknown_37efa[0x37f1b - 0x37efa];
-    unsigned short width;               // +0x37f1b
+    unsigned short width;
     char unknown_37f1d[2];
-    unsigned short height;              // +0x37f1f
+    unsigned short height;
     char unknown_37f21[0x391e9 - 0x37f21];
     Ref<char> map;
     char unknown_391ed[0x39229 - 0x391ed];
-    int commander;                      // +0x39229
-    int mapping;                        // +0x3922d
-    int los;                            // +0x39231
-    int losType;                        // +0x39235
+    int commander;
+    int mapping;
+    int los;
+    int losType;
 };
 #pragma pack(pop)
 
@@ -170,7 +156,6 @@ extern int g_lobbyWatching;
 extern char g_lobbyMapName[];
 extern char* g_hostOnlyGadgets[];
 extern char* g_battleRoomGadgetNames[];
-// After the externs: keeps the locals' symbol ids past 65536 (g_game stays below).
 #include "ta_protos.h"
 
 int __stdcall LoadPictureCached(const char* name, int clear, int setPalette, int cacheOnly);
@@ -208,7 +193,6 @@ void __stdcall FatalError(char* message);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 
-// The ENERGY slider handler at 0x445d60, which has no callers: /Ob2 inlined it.
 void __stdcall UpdateEnergyText(Gui_00449bb0* gui, int unused)
 {
     char text[20];
@@ -229,7 +213,6 @@ void __stdcall UpdateEnergyText(Gui_00449bb0* gui, int unused)
     }
 }
 
-// The slider set-up at 0x445e50, which has no callers: /Ob2 inlined it.
 void __stdcall BindNamedSliderWithCallback(char* name, int max, int value, Callback_00449bb0 callback)
 {
     Gui_00449bb0* gui = &g_game->gui;
@@ -264,7 +247,6 @@ void OpenBattleRoom()
     g_lastPlayerCount = -1;
     g_game->dirty = 1;
     memset(g_game->playerIds, 0, sizeof(g_game->playerIds));
-    // info before player: stores the player pointer without its 0x1b63 bias.
     info = (PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info.get();
     player = &g_game->players[g_game->localPlayer];
     host = info->f97_0;
@@ -304,7 +286,6 @@ void OpenBattleRoom()
             if (commander >= 0 && commander <= 2) {
                 g_game->commander = commander;
                 g_game->commanderDeath = commander;
-                // Block-local pointer: the original forms 0x1b63 first, then reads +0x27.
                 Player* p = &g_game->players[g_game->localPlayer];
                 ((PlayerInfo_00449bb0*)p->info.get())->b.commander = commander;
             }
@@ -373,7 +354,6 @@ void OpenBattleRoom()
 
     BindNamedSliderWithCallback("METAL", 0x2711, metal, UpdateMetalText);
     {
-        // maxUnits - 20 twice, not a named local: one CSE in the slot `player` used.
         BindNamedSliderWithCallback("MAXUNITS", g_game->maxUnits - 20, g_game->maxUnits - 20, UpdateMaxUnitsText);
     }
     if (!isHost || g_game->locked) {

@@ -1,5 +1,3 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1, gate polarity checked by space-bunny-free, gate spelling changed by space-bunny-free, finished by Claude Sonnet 5.5, finished by Claude Opus 5.5. Names are provisional.
-// Stays in its own file: in unit_orders.cpp the stack address setup for the reclaim search arguments is scheduled differently.
 #include <vector>
 #include "../state/block.h"
 #include "../util/vec3.h"
@@ -30,7 +28,6 @@ void __stdcall AppendOrder(Unit*, Order*);
 // FUNCTION: 0x405980
 int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
 {
-    // The loop around the switch lets the cases share one `new` tail.
     for (;;) {
         switch (order->state) {
         case 0:
@@ -58,7 +55,6 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
                     }
                 }
             }
-            // Player* local with `energy < 0.2 * capacity` in this operand order and `<`.
             Player* owner = unit->player;
             if (unit->player->energy < 0.2 * owner->energyCapacity ||
                 unit->player->metal < unit->player->metalCapacity * 0.2) {
@@ -66,8 +62,7 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
                 Vec3* energy = &energyPos;
                 Vec3* metal = &metalPos;
                 int range2 = unit->def->range << 16;
-                // Empty statement stops range2 being folded into the call.
-                do {} while (0); // emits no code; keeps range2 out of the call (see top)
+                do {} while (0);
                 float energyAmount, metalAmount;
                 if (g_seams.map->PickRandomReclaimableResourcesInRadius(&unit->pos, range2, &energy, &energyAmount, &metal, &metalAmount)) {
                     if (metal && unit->player->metal < unit->player->metalCapacity * 0.2) {

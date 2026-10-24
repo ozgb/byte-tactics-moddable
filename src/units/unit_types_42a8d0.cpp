@@ -1,9 +1,4 @@
 #include "../../interfaces/seams.h"
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// The unit type loader: loads every Weapons\*.tdf into the weapon TDF table,
-// reads the UNITINFO section of every units\*.fbi into the unit type table at
-// g_game+0x1439b, then drops the units whose version or copyright does not
-// check out and compacts the table.
 
 #include "win_types.h"
 #include "../state/block.h"
@@ -26,12 +21,10 @@
 #include "../util/string_ref.h"
 #include "../state/sim_globals.h"
 
-// One file name of ListDirectory's list (a reference-counted string handle).
 struct Elem_00432be0 {
-    char* data;                        // +0x0
+    char* data;
 
     ~Elem_00432be0() { ((StringRef*)this)->ReleaseRef(); }
-    // Used instead of `.data`: keeps the path temporary's order.
     operator char*() const { return data; }
 };
 
@@ -39,9 +32,6 @@ typedef std::vector<Elem_00432be0> FileList;
 
 #include "../files/files_api.h"
 
-// Unused here: the symbol ids these declarations take keep the allocation,
-// standing in for the three TdfRecord views merged into the class below
-// (docs/c2-regalloc.md).
 void ProbeUnitDefEnergyRate(int, int, int);
 void CountMessage(unsigned char, int, int);
 void SetCameraPosition(int, int, int);
@@ -49,7 +39,6 @@ void StartScreenShake(int, int, int);
 void AccumulateScreenShake(int, int, int);
 int RegisterUnitOrders();
 
-// The override file object: 0x4b3620 builds it and 0x4b3630 frees it.
 class OvrFile : public HapiBank {
 public:
     void* table;
@@ -57,9 +46,6 @@ public:
     ~OvrFile() { CloseBank(); }
 };
 
-// Unused here: the symbol ids these declarations take keep the allocation,
-// standing in for the HapiBank views merged into the class above and for
-// the placeholder class removed beside it (docs/c2-regalloc.md).
 void SetMissionStatus(int, int, int);
 void StartFeatureBurning(int, int, int);
 void KillFeature(int, int, int);
@@ -79,7 +65,6 @@ void SetCameraPosition(int, int, int);
 void StartScreenShake(int, int, int);
 
 extern Game* g_game;
-// File statics, not externs: with an extern count new[] reads its own copy.
 static TdfFile* s_weaponTdfParsers;
 static int s_weaponTdfLoadedCount;
 static int s_weaponTdfAllocCount;
@@ -98,8 +83,6 @@ void __stdcall GetLocalizedString(void* parser, char* dst, char* key, int size, 
 
 #define COPYRIGHT "Copyright 0000 Humongous Entertainment. All rights reserved."
 
-// Loads every Weapons\*.tdf into the weapon TDF table.
-// Must stay an inline helper (like the TDF getters): it sets the inline budget.
 static inline void LoadWeaponTDFs()
 {
     FileList files;
@@ -119,7 +102,6 @@ static inline void LoadWeaponTDFs()
     }
 }
 
-// The id of the weapon named `name` in the weapon TDFs, 0 when there is none.
 static inline int FindWeapon(char* name)
 {
     if (name != 0 && *name != 0) {
@@ -183,9 +165,6 @@ int LoadUnitInfo()
             TdfFile parser;
             (&parser)->LoadBuffer(buf, len, 0, "<NO FILE>");
             if (!(&parser)->SelectRecord("UNITINFO")) {
-                // Original bug: this exit leaves the FBI file open (no
-                // HAPI_CloseFile), the weapon TDF table allocated and the unit
-                // table locked (no ProtectBlockReadOnly).
                 GameFreeThunk(buf);
                 return 0;
             }
@@ -218,7 +197,6 @@ int LoadUnitInfo()
                 u->flags1 &= ~0x800000;
                 bad = 1;
             }
-            // 128 bytes, so it sorts before the 0x100 path buffers.
             char copyright[128];
             parser.GetString(copyright, "Copyright", 0x80, "Run to the Village!  Warn your brother!");
             memcpy(copyright + offset, "0000", 4);
@@ -237,9 +215,6 @@ int LoadUnitInfo()
     s_weaponTdfLoadedCount = 0;
     s_weaponTdfAllocCount = 0;
 
-    // Drop the units marked incompatible, moving the last kept one into each
-    // hole; `size` is the byte offset of the end of the kept units.
-    // Keep `size` and decrement it; indexing unitDefs[count - 1] loses ebp.
     int oldcount = count;
     for (unsigned short j = count - 1; j > 0; j--) {
         UnitDef* u = &g_game->defs[j];

@@ -1,21 +1,3 @@
-// Decompiled by Haiku, Opus, Sonnet, space-bunny-free, longcat-2.5-preview-free,
-// GPT-6, GPT-6.1-sol, deepseek-v4.1, deepseek-v4.1-flash, claude-opus-5-5,
-// GPT-6-Luna, Space Bunny Free, Fledge Alpha Free, LongCat 2.5 Preview Free,
-// GPT-6., Claude Opus 5.5 and DeepSeek V4.1 Flash. Names are provisional.
-// The model_render module: the object-picture builder (the projected bounds,
-// the composite buffer and its shadow bitmap, the flat and lit piece
-// rasterisers), the per-piece draw calls and their bitmap helpers, and the
-// runtime "Object State" clone of a model's piece tree (its piece records,
-// their links and transforms). DrawPiece (0x4584d0) and PoseModel (0x45b0a0)
-// joined at the end and out of address order, where their bodies' symbol ids
-// do not move the other functions' register windows (docs/c2-regalloc.md).
-// Three functions cannot join: DrawObjectPicture (0x459200,
-// model_render_4589c0.cpp) needs its own CMemoryCache that derives from
-// UnitTable to reach BuildObjectPicture and DrawPieces, where this file's
-// CMemoryCache is the base; DrawLitPieces (0x459c70, model_render_4581e0.cpp)
-// needs to be the first function defined after its types, and even then the
-// summing loop's lea moves above the fadd; DrawPieceEdges (0x458fa0,
-// model_render_458fa0.cpp) is one load order short of the original.
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
@@ -24,15 +6,11 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-// <direct.h> is here only for its symbols: they put the functions below in
-// the register windows they match in.
 #include <direct.h>
 
 extern "C" void __cdecl GameFreeThunk(void* p);
 void* __cdecl GameAllocIgnoreTag(char* name, int size);
 
-// g_lightY is declared before g_lightX: the order decides which product of
-// DrawLitPieces' lighting sum MSVC loads first.
 extern float g_lightY;
 extern float g_lightX;
 extern float g_lightZ;
@@ -43,7 +21,6 @@ extern const float DAT_004fd4c0;
 struct Game;
 extern Game* g_game;
 
-// A 16.16 fixed-point number: the whole part in the high half.
 union Fixed {
     int value;
     struct {
@@ -56,13 +33,10 @@ union Fixed {
 
 struct Vec3f { float x; float y; float z; };
 
-// A 16-byte rectangle: a projected vertex with its shade, or a point of a
-// 16.16 polygon.
 struct Poly_459c70 { int x; int y; int z; int shade; };
 
 #include "../util/point.h"
 
-// A 12-byte 16.16 position with its constructor.
 struct Pos_4589c0 {
     int x;
     int y;
@@ -73,16 +47,16 @@ struct Pos_4589c0 {
 #include "gaf_frame.h"
 
 struct Surface_4589c0 {
-    int width;                         // +0x00
-    int height;                        // +0x04
-    int pitch;                         // +0x08
-    void* bits;                        // +0x0c
-    int zPriority;                     // +0x10
-    int colorKey;                      // +0x14
-    unsigned short x;                  // +0x18
-    unsigned short y;                  // +0x1a
+    int width;
+    int height;
+    int pitch;
+    void* bits;
+    int zPriority;
+    int colorKey;
+    unsigned short x;
+    unsigned short y;
     char unknown_1c[0x10];
-    unsigned int flag0 : 1;            // +0x2c
+    unsigned int flag0 : 1;
     unsigned int flag1 : 1;
 };
 
@@ -92,7 +66,6 @@ class Surface;
 
 #include "../units/unit_def.h"
 
-// The game's flags word at +0x37f06.
 union Flags_37f06 {
     unsigned short whole;
     struct {
@@ -108,17 +81,12 @@ union Flags_37f06 {
     } bits;
 };
 
-// The game state the module reads: the unit table, the render flags and the
-// screen height.
 #include "memory_cache.h"
 
 #pragma pack(push, 1)
 #include "../game/game.h"
 #pragma pack(pop)
 
-// Unused here: the symbol ids these declarations take keep the allocation,
-// standing in for the four view classes merged into CMemoryCache above
-// (docs/c2-regalloc.md).
 void CountMessage(unsigned char, int, int);
 void CountPacket(int, int, int);
 void SetCameraPosition(int, int, int);
@@ -127,7 +95,6 @@ void AccumulateScreenShake(int, int, int);
 void CenterCameraOnPoint(int, int, int);
 void SetMissionStatus(int, int, int);
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
@@ -159,7 +126,6 @@ void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 int __stdcall CountObjects(Object3do* obj);
 Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent);
 Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent);
-// Defined at the end of this file, out of address order.
 void __fastcall PoseModel(Model_459200* state, Piece_459c70* entry, int flag);
 void __fastcall TransformPieces(Model_459200* model, Piece_459c70* piece,
                                 Vector3s* pos, Vec3* box, int force);
@@ -190,8 +156,6 @@ void UnitTable::Destroy()
     this->FreeBuffer();
 }
 
-// The 50 or 125 bias the original materialises separately in each arm of the
-// doubled-bitmap test, once per projected vertex.
 static __inline int shade_bias(Unit_459200* owner)
 {
     bool c = ((owner->def->flags1 >> 30) & 1) != 0;
@@ -241,14 +205,9 @@ void UnitTable::MeasureModel(int* width, int* height, int* originX, int* originY
     *originY = -minY;
 }
 
-// Builds the composite bitmap for a model's piece list: asks 0x4581e0 for the
-// bounds, allocates a one-plane (0x437b50) or two-plane (0x437be0) bitmap for
-// them, stores the origin in the bitmap header and hands the drawing to
-// 0x459c70 / 0x459830.
 // FUNCTION: 0x4586a0
 int UnitTable::BuildObjectPicture(Model_459200* list, int param_2, int param_3)
 {
-    // Plain ints: the stores into the short header fields narrow them.
     int w;
     int h;
     int oy;
@@ -264,7 +223,6 @@ int UnitTable::BuildObjectPicture(Model_459200* list, int param_2, int param_3)
     if (bitmap != 0) {
         bitmap->xOffset = (short)oy;
         bitmap->yOffset = (short)ox;
-        // kind is an int parameter so the byte at owner+0xff is pushed zero-extended.
         if ((owner->flags & 0x20000000) != 0
             && (*(unsigned char*)&(*(Flags_37f06*)&g_game->flags_37f06) & 0x20) != 0) {
             DrawLitPieces(bitmap, list, owner->playerIndex, param_3);
@@ -276,9 +234,6 @@ int UnitTable::BuildObjectPicture(Model_459200* list, int param_2, int param_3)
     return 0;
 }
 
-// Draws a unit model's pieces into a bitmap. With anti-aliasing on and the
-// unit flagged, it draws into the doubled shadow bitmap instead and then
-// downsamples that back into the caller's bitmap.
 // FUNCTION: 0x459830
 void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
     int kind, int useColor)
@@ -300,7 +255,6 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
             shadow->yOffset = (short)(bitmap->yOffset << 1);
             memset(shadow->scratch, 0, shadow->width * shadow->height);
             memset(shadow->pixelsOrLayers, 1, shadow->width * shadow->height);
-            // Last in the shadow branch.
             src = bitmap;
             bitmap = shadow;
         } else {
@@ -311,7 +265,6 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
     }
 
     for (int p = list->count - 1; p >= 0; p--) {
-        // Flags tested as positive nested ifs on the bitfield, not via a piece pointer.
         if (list->pieces[p].flags.bits.visible) {
             if (useColor == -1 || useColor == list->pieces[p].flags.bits.colored
                     || list->owner->buildLeft != 0.0f) {
@@ -322,7 +275,6 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
                     int x;
                     int y;
                     int z;
-                    // Each arm reads verts->x itself, not a shared x load before the test.
                     if (mode) {
                         x = (short)(verts->x >> 16) << 1;
                         y = (short)(verts->y >> 16) << 1;
@@ -477,15 +429,10 @@ template <class T> inline void Swap(T& a, T& b)
     b = t;
 }
 
-// Grows this->bitmap to cover the model and its child pieces, then copies or
-// re-blits `bmp` (pixels, then the shade plane through a pixels/shade swap) into
-// it.
 // FUNCTION: 0x4589c0
 void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
 {
-    // One named origin is passed to both AddModelBounds calls.
     Pos_4589c0 origin(0, 0, 0);
-    // Outer bounds declared in this order, child bounds as cminX, cminY, cmaxX, cmaxY.
     int minX = 0;
     int maxX = 0;
     int minY = 0;
@@ -500,7 +447,6 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
             int cmaxX = 0;
             int cmaxY = 0;
             AddModelBounds(&cminX, &cmaxX, &cminY, &cmaxY, child->state, origin);
-            // The y projection goes through a Fixed temporary.
             int* op = &model->owner->pos_x;
             Vec3 d;
             d.x = child->pos_x - op[0];
@@ -548,7 +494,6 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
     } else {
         short sdx = 0;
         short sdy = 0;
-        // All swaps and save/restores go through the inline Swap(T&, T&).
         Swap(bmp->xOffset, sdx);
         Swap(bmp->yOffset, sdy);
         Surface_4589c0 surface;
@@ -558,7 +503,6 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
         memset(this->bitmap->scratch, 0, this->bitmap->height * this->bitmap->width);
         DrawFrame((Surface*)&surface, bmp,
                      this->bitmap->xOffset - sdx, this->bitmap->yOffset - sdy);
-        // Read before the first swap.
         surface.bits = this->bitmap->scratch;
         Swap(bmp->pixelsOrLayers, bmp->scratch);
         DrawFrame((Surface*)&surface, bmp,
@@ -571,7 +515,7 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
 }
 
 struct Count_00458d20 {
-    int count;                  // +0x00
+    int count;
 };
 
 // FUNCTION: 0x458d20
@@ -581,11 +525,8 @@ void __stdcall DecrementCountArgument(int param_1, Count_00458d20* list, int par
     }
 }
 
-// The three branches without - 1 go through this helper: the call boundary keeps the tail merge.
 static inline unsigned char Scale(int v, int num, int div) { return (unsigned char)((v * num) / div); }
 
-// Recolours every opaque pixel by its shade: below level - 4, at or above
-// level, or in between. -1 leaves the pixel, -2 makes it transparent.
 // FUNCTION: 0x458d30
 void CMemoryCache::RecolorByShade(GafFrame* img, unsigned char level, int above, int below, int between)
 {
@@ -671,8 +612,6 @@ void __stdcall SetLightVector(int param_1, int param_2, int param_3)
     g_lightZ = (float)param_3 * 0.01f;
 }
 
-// Copies an 8-bit image (header, pixels and the optional second plane) into
-// the image at +0x10, clears its non-key pixels (ZeroFramePixels) and returns it.
 // FUNCTION: 0x45a470
 GafFrame* CMemoryCache::MakeSilhouette(GafFrame* src)
 {
@@ -731,11 +670,9 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, Model_459200* model)
 {
     Vec3 verts[2000];
     Vec3 tmp[25];
-    // Function-level and initialised: keeps the reload order after the vertex loop.
-    int segno = 0;                    // the initialiser only sets the scope, see above
+    int segno = 0;
     int i = model->count - 1;
     if (i >= 0) {
-        // Loop variable stepped beside the index: anchors on the element base.
         Piece_459c70* piece = &model->pieces[i];
         while (i >= 0) {
             if (piece->flags.word & 1) {
@@ -758,7 +695,6 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, Model_459200* model)
                     } else {
                         segno = 0;
                     }
-                    // A segment with more than 25 vertices overruns tmp[].
                     for (; segno < info->faceCount; segno++, seg++) {
                         unsigned short* ip = seg->indices;
                         for (int k = 0; k < seg->count; k++, ip++) {
@@ -795,9 +731,9 @@ Model_459200* __stdcall CreateObjectState(Object3do* obj)
 
 struct BuildList_0045a950 {
     char unknown_0[8];
-    int count;                          // +0x8
+    int count;
     char unknown_c[0x20 - 0xc];
-    const char** names;                 // +0x20
+    const char** names;
 };
 
 // FUNCTION: 0x45a950
@@ -846,11 +782,6 @@ void __stdcall FreeObjectState(Model_459200* state)
     GameFreeThunk(state);
 }
 
-// Restores the vertices of every modified piece in the tree (or of every
-// piece, when `force` is set) from the object and clears its offset. Defined
-// here so that /Ob2 inlines its first level into UpdateObjectState and
-// DrawUnit, as the original does; the out-of-line body is the loop MSVC
-// makes of it.
 // FUNCTION: 0x45b030
 int __fastcall RestorePieceVertices(Piece_459c70* piece, int force)
 {
@@ -863,7 +794,6 @@ int __fastcall RestorePieceVertices(Piece_459c70* piece, int force)
         piece->modified = 0;
         result = 1;
     }
-    // Recursive, not a loop: the first level gets inlined.
     if (piece->child)
         result = RestorePieceVertices(piece->child, result);
     if (piece->sibling)
@@ -871,8 +801,6 @@ int __fastcall RestorePieceVertices(Piece_459c70* piece, int force)
     return result;
 }
 
-// Nonzero when the state's position is 8 or more away from `pos` on any axis.
-// Takes a pointer to the position: other signatures change the register use.
 static inline int FarFrom(Model_459200* state, const Vector3s* pos)
 {
     return abs((short)(state->pos.z - pos->z)) >= 8
@@ -885,7 +813,6 @@ void __stdcall UpdateObjectState(Unit_459200* unit)
 {
     Model_459200* state = unit->state;
     if (FarFrom(state, &unit->angles)) {
-        // One 6-byte struct copy.
         state->pos = unit->angles;
         state->animDirty = 1;
         state->root->modified = 0;
@@ -906,7 +833,6 @@ void __stdcall DrawUnit(void* context, Unit_459200* unit)
     if (unit->carrier == 0) {
         Model_459200* state = unit->state;
         if (FarFrom(state, &unit->angles)) {
-            // One 6-byte struct copy.
             state->pos = unit->angles;
             state->animDirty = 1;
             state->root->modified = 0;
@@ -941,8 +867,6 @@ void __stdcall DrawUnit(void* context, Unit_459200* unit)
     }
 }
 
-// The original calls this one out of line from the state builders; in one
-// file /Ob2 would inline it, so the pragmas hold it back.
 #pragma auto_inline(off)
 
 // FUNCTION: 0x45ae80
@@ -995,8 +919,6 @@ Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj,
     } else {
         e->sibling = 0;
     }
-    // Stored after the sibling if/else, with no early return: keeps the null
-    // tests as `test reg,reg` and the argument load order.
     e->parent = parent;
     return e;
 }
@@ -1064,9 +986,6 @@ void __fastcall TransformPieces(Model_459200* owner, Piece_459c70* piece,
     }
 }
 
-// The two functions below are kept after 0x45b150 and out of address order:
-// defined at their addresses their bodies' symbol ids would move the register
-// windows the other functions match in (docs/c2-regalloc.md).
 // FUNCTION: 0x45b0a0
 void __fastcall PoseModel(Model_459200* model, Piece_459c70* piece, int force)
 {

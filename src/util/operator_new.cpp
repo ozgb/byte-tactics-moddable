@@ -1,5 +1,3 @@
-// Decompiled by Opus and Haiku. Names are provisional, except the operators.
-
 #include <stddef.h>
 
 #include "../state/block.h"
@@ -7,8 +5,6 @@
 void* __cdecl GameAllocThunk(size_t size);
 void __cdecl GameFreeIndirectThunk(void* p);
 
-// Cavedog replaced the global operator new and delete, scalar and array,
-// with wrappers around the game's own allocator.
 // FUNCTION: 0x4b4f10
 __declspec(noinline) void* __cdecl operator new(size_t size)
 {

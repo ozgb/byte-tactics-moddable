@@ -1,50 +1,42 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by Claude Opus 5.5, finished by GPT-6, finished by Claude Opus 5.5. Names are provisional.
-// Refreshes the order buttons for the current selection: a single unit
-// (g_game->unitIndex) or every selected unit of the local player, merging
-// their fire and move orders, cloak and on/off states and the can* bits into
-// g_game->orders, then opens the unit's build menu page or redraws the bar.
-// This include set decides the symbol ids of the locals: do not change it.
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 #include <memory.h>
 #include "ta_types.h"
 
-
-// Own views of the unit, UnitDef and game, with the names of units/unit_def.h: the shared header's types have plain words where bitfields are needed.
 #pragma pack(push, 1)
 struct UnitType_0041b2e0 {
     char unknown_0[0x22e];
-    unsigned char buildMenuPageCount;  // +0x22e
+    unsigned char buildMenuPageCount;
     char unknown_22f[0x241 - 0x22f];
-    unsigned int flags1;               // +0x241
-    unsigned int canMoveOrder : 1;     // +0x245 bit 0
-    unsigned int canFireOrder : 1;     // bit 1
-    unsigned int canOnOff : 1;         // bit 2
-    unsigned int canStop : 1;          // bit 3
-    unsigned int canAttack : 1;        // bit 4
-    unsigned int canDefend : 1;        // bit 5
-    unsigned int canPatrol : 1;        // bit 6
-    unsigned int canMove : 1;          // bit 7
-    unsigned int canLoad : 1;          // bit 8
-    unsigned int canRepair : 1;        // bit 9
-    unsigned int canReclaim : 1;       // bit 10
+    unsigned int flags1;
+    unsigned int canMoveOrder : 1;
+    unsigned int canFireOrder : 1;
+    unsigned int canOnOff : 1;
+    unsigned int canStop : 1;
+    unsigned int canAttack : 1;
+    unsigned int canDefend : 1;
+    unsigned int canPatrol : 1;
+    unsigned int canMove : 1;
+    unsigned int canLoad : 1;
+    unsigned int canRepair : 1;
+    unsigned int canReclaim : 1;
     unsigned int bit11 : 1;
-    unsigned int canCapture : 1;       // bit 12
-    unsigned int canCloak : 1;         // bit 13
-    unsigned int canBlast : 1;         // bit 14
+    unsigned int canCapture : 1;
+    unsigned int canCloak : 1;
+    unsigned int canBlast : 1;
     unsigned int bits15 : 17;
 };
 
 struct UnitFlags_0041b2e0 {
     unsigned int bits0 : 4;
-    unsigned int selected : 1;         // bit 4
+    unsigned int selected : 1;
     unsigned int bits5 : 6;
-    unsigned int cloak : 1;            // bit 11
+    unsigned int cloak : 1;
     unsigned int bits12 : 6;
-    unsigned int moveOrder : 2;        // bits 18-19
-    unsigned int fireOrder : 2;        // bits 20-21
-    unsigned int buildPage : 1;        // bit 22
-    unsigned int page : 3;             // bits 23-25
+    unsigned int moveOrder : 2;
+    unsigned int fireOrder : 2;
+    unsigned int buildPage : 1;
+    unsigned int page : 3;
     unsigned int bits26 : 6;
 };
 
@@ -52,39 +44,39 @@ struct Unit_0041b2e0 {
     char unknown_0[0x92];
     Ref<UnitType_0041b2e0> def;
     char unknown_96[0xa6 - 0x96];
-    unsigned short unitDefIndex;       // +0xa6
-    unsigned short id;                 // +0xa8
+    unsigned short unitDefIndex;
+    unsigned short id;
     char unknown_aa[0x10e - 0xaa];
-    unsigned char activateFlags;       // +0x10e
+    unsigned char activateFlags;
     char cobStateFlags;
-    UnitFlags_0041b2e0 flags;          // +0x110
+    UnitFlags_0041b2e0 flags;
     char unknown_114[0x118 - 0x114];
 };
 
 struct BuildType_0041b2e0 {
     char unknown_0[0x20];
-    char unitname[0x229];              // +0x20
+    char unitname[0x229];
 };
 
 struct Orders_0041b2e0 {
-    unsigned short unknown_0 : 1;      // +0x37ebe
-    unsigned short refresh : 1;        // bit 1
+    unsigned short unknown_0 : 1;
+    unsigned short refresh : 1;
     unsigned short unknown_2 : 10;
-    unsigned short fireOrder : 3;      // bits 12-14
+    unsigned short fireOrder : 3;
     unsigned short unknown_15 : 1;
-    unsigned short moveOrder : 3;      // +0x37ec0 bits 0-2
-    unsigned short cloak : 2;          // bits 3-4
-    unsigned short onOff : 2;          // bits 5-6
-    unsigned short canMove : 1;        // bit 7
-    unsigned short canStop : 1;        // bit 8
-    unsigned short canAttack : 1;      // bit 9
-    unsigned short canDefend : 1;      // bit 10
-    unsigned short canPatrol : 1;      // bit 11
-    unsigned short canLoad : 1;        // bit 12
-    unsigned short canReclaim : 1;     // bit 13
-    unsigned short canCapture : 1;     // bit 14
-    unsigned short canRepair : 1;      // bit 15
-    unsigned short canBlast : 1;       // +0x37ec2 bit 0
+    unsigned short moveOrder : 3;
+    unsigned short cloak : 2;
+    unsigned short onOff : 2;
+    unsigned short canMove : 1;
+    unsigned short canStop : 1;
+    unsigned short canAttack : 1;
+    unsigned short canDefend : 1;
+    unsigned short canPatrol : 1;
+    unsigned short canLoad : 1;
+    unsigned short canReclaim : 1;
+    unsigned short canCapture : 1;
+    unsigned short canRepair : 1;
+    unsigned short canBlast : 1;
     unsigned short unknown_1 : 15;
 };
 
@@ -94,19 +86,19 @@ struct Menu_0041b2e0 {
 
 struct Game_0041b2e0 {
     char unknown_0[0x519];
-    Menu_0041b2e0 menu;                // +0x519
+    Menu_0041b2e0 menu;
     char unknown_529[0x1b63 - 0x529];
-    Player players[10];                 // +0x1b63
+    Player players[10];
     char unknown_2851[0x2a42 - 0x2851];
-    unsigned char localPlayer;         // +0x2a42
+    unsigned char localPlayer;
     char unknown_2a43[0x14357 - 0x2a43];
     Ref<Unit_0041b2e0> units;
     char unknown_1435b[0x1439b - 0x1435b];
     Ref<BuildType_0041b2e0> unitDefs;
     char unknown_1439f[0x37e9c - 0x1439f];
-    unsigned short unitIndex;          // +0x37e9c
+    unsigned short unitIndex;
     char unknown_37e9e[0x37ebe - 0x37e9e];
-    Orders_0041b2e0 orders;            // +0x37ebe
+    Orders_0041b2e0 orders;
 };
 #pragma pack(pop)
 
@@ -125,14 +117,10 @@ static inline Unit_0041b2e0* GetUnit(unsigned short index)
     return u;
 }
 
-// Stays in its own file: its locals' symbol ids decide the match, and only
-// this include set puts them in the window (docs/c2-regalloc.md).
 // FUNCTION: 0x41b2e0
 void RefreshSelectionOrders()
 {
     g_game->orders.refresh = 1;
-    // Declaration order matters: cloak before onOff, first and count left
-    // uninitialised and set at the top of each branch.
     int fireOrder = 4;
     int moveOrder = 4;
     int cloak = 3;
@@ -217,7 +205,6 @@ void RefreshSelectionOrders()
                 canBlast = 1;
             count++;
         }
-        // Stores in the original's order.
         g_game->orders.fireOrder = fireOrder;
         g_game->orders.moveOrder = moveOrder;
         g_game->orders.cloak = cloak;

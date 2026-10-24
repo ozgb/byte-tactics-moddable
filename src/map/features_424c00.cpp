@@ -1,34 +1,24 @@
-// Decompiled by Claude Opus 5.5, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by fledge-alpha-free, finished by Claude Opus 5.5, finished by GPT-6, finished by Claude Opus 5.5. Names are provisional.
-// Loads the map's features: the type-name table into a remap vector, then
-// the "Normal", "Animating" and "3D" feature records. The save counterpart is
-// 0x424890.
-// These headers set g_game's symbol id: the 3D loop's `c` must be numbered
-// past 65536, the Animating loop's `c` and `s` below it.
 #include "win_types.h"
 #include "ta_types.h"
 #include <string.h>
 
-// Unused here: the symbol ids these declarations take keep the allocation
-// (docs/c2-regalloc.md), standing in for the placeholder class ta_types.h
-// no longer declares.
 void SetMissionStatus(int, int, int);
 
-// Own views of the cell, spot and Animating record: the header's differ.
 struct Spot_00424c00 {
     char unknown_0[4];
-    unsigned short frame;              // +0x4
+    unsigned short frame;
     char unknown_6[0x26 - 6];
-    unsigned short damage;             // +0x26
+    unsigned short damage;
     char unknown_28[0x2e - 0x28];
-    unsigned char animBits;            // +0x2e
+    unsigned char animBits;
     char unknown_2f;
 };
 
 struct Cell_00424c00 {
     char unknown_0[8];
-    unsigned short feature;            // +0x8
-    unsigned short spot;               // +0xa
-    unsigned char flags;               // +0xc
+    unsigned short feature;
+    unsigned short spot;
+    unsigned char flags;
 };
 
 struct Vec3_00424c00 {
@@ -51,7 +41,6 @@ struct Anim_00424c00 {
     };
 };
 
-// Plain data: a Vec3 with a declared constructor changes the inlining.
 struct Model3D_00424c00 {
     unsigned short x;
     unsigned short y;
@@ -64,7 +53,6 @@ struct Model3D_00424c00 {
 
 extern Game* g_game;
 typedef std::vector<TdfFile*> FeatureList;
-// File-scope static, as in 0x4223e0.
 #ifdef __clang__
 static FeatureList* volatile s_featureTdfParsers;
 #else
@@ -78,7 +66,6 @@ void __stdcall StartFeatureBurning(int x, int y, int flag);
 void __stdcall KillFeature(int x, int y, int flag);
 void* __stdcall PlaceFeature(Cell_00424c00* cell, unsigned short feature, void* pos, void* rot, unsigned char owner);
 
-// FindOrLoadFeatureType, inlined
 static inline unsigned short FindName(char* name)
 {
     for (int i = 0; i < g_game->featureCount; i++) {
@@ -93,7 +80,6 @@ static inline unsigned short FeatureIndex(char* name)
     return i != 0xffff ? i : LoadFeatureType(name);
 }
 
-// FreeFeatureFileList, inlined
 static inline void FreeFeatureList()
 {
     for (TdfFile** p = s_featureTdfParsers->begin(); p < s_featureTdfParsers->end(); p++)
@@ -145,7 +131,6 @@ void __stdcall LoadFeatures(HapiBank* file)
     for (k = 0; k < n; k++) {
         Normal_00424890 rec;
         ((Class_004b4c10*)file)->SeekBox(k * sizeof(Normal_00424890));
-        // The `got` and `type` locals add IL size that the inlining depends on.
         int got = file->ReadBox(&rec, sizeof(Normal_00424890));
         if (got >= sizeof(Normal_00424890)) {
             Cell_00424c00* c = (Cell_00424c00*)g_seams.los_radar->GetMapCell(rec.x, rec.y);

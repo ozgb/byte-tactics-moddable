@@ -1,4 +1,3 @@
-// Decompiled by GPT-6 Astra, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, edited by Claude Opus 5.5, finished by Claude Opus 5.5. re-verified by GPT-6, retried by Claude Opus 5.5, finished by GPT-6, retried by Claude Opus 5.5, finished by GPT-6, matched by Claude Opus 5.5. Names are provisional.
 #include "win_types.h"
 #include <stdio.h>
 #include <vector>
@@ -41,13 +40,11 @@ static inline Vec3 Offset(short angle, int distance)
     Vec3 v;
     v.x=-ScaledSin(angle,distance);
     v.y=0;
-    // Names its result: keeps unit and order in esi and edi.
     int z=ScaledCos(angle,distance);
     v.z=-z;
     return v;
 }
 
-// Keeps a declared constructor (never inlined); UnitList below is a separate class.
 class LandingPadList : public std::vector<Unit*> { public: LandingPadList(); };
 #include "../../interfaces/seams.h"
 class UnitList : public std::vector<Unit*> {};
@@ -55,12 +52,9 @@ class UnitList : public std::vector<Unit*> {};
 class GroundAllyVisitor {
 public:
     virtual void CollectGroundAlly(Unit*);
-    // Three-argument constructor: puts the vtable store after the member stores.
     GroundAllyVisitor(Owner* o, std::vector<Unit*>* u, Unit* s) : owner(o), units(u), self(s) {}
     Owner* owner; std::vector<Unit*>* units; Unit* self;
 };
-// IsDamaged, FindPads and SearchRange stay small helpers: the vector calls
-// inline or not according to the original.
 static inline int IsDamaged(Unit* u) { return (unsigned int)u->health < (u->def->maxHealth>>2)*3; }
 static inline void FindPads(Unit* u, std::vector<Unit*>* pads) { g_seams.ai->GetFactoriesInRadius(((Owner*)u->player.get())->index,&u->pos,0xf00,pads); }
 static inline int SearchRange(Unit* u) { return u->def->range<<16; }
@@ -97,7 +91,6 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     order->flags|=0xf8;
     return 2;
 }
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x410850
 int __stdcall VtolSeekGuardOrder(Unit* unit, Order* order, int flags)
 {

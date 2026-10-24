@@ -1,7 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, finished by claude-opus-5-5, finished by DeepSeek V4.1 Flash,
-// checked by GPT-6, finished by claude-opus-5-5. Names are provisional.
-// Headers and declaration count are load-bearing: windows.h sets the base/index
-// order of address operands, memory.h the form of the case 35 allies store.
 #define WIN32_LEAN_AND_MEAN
 #include "win_types.h"
 #include <string.h>
@@ -31,125 +27,92 @@ public:
 
 #include "../game/game.h"
 
-// The player data HAPINET_addplayer sends with a create-player message (the
-// same record in hapinet.cpp).
 struct PlayerData_004ca6a0 {
-    char name[17];                     // +0x00, the game password
-    short versionMajor;                // +0x11, the host rejects a joiner unless 0
-    short versionMinor;                // +0x13, the host rejects a joiner unless 0x50
+    char name[17];
+    short versionMajor;
+    short versionMinor;
 };
 
-// The DirectPlay system message HandleNetPackets reads when the sender is 0:
-// +0x00 is its DPSYS_ type (3 create, 5 destroy, 0x102 set data, 0x103 set
-// name, 0x104 set session description). The fields are named for the
-// create-player layout and the set-data layout, which overlay: a create has
-// its data at createData/dataSize, a set-data has it at data, a set-name has
-// its short name at +0x14 and the long name at longName, and a set-session
-// description starts at +0x04.
 struct Packet_00453d40 {
-    unsigned int type;                 // +0x00
-    int playerType;                    // +0x04, 1 is a player
-    int id;                            // +0x08
-    char* data;                        // +0x0c
-    PlayerData_004ca6a0* createData;   // +0x10
-    int dataSize;                      // +0x14
-    char* longName;                    // +0x18
+    unsigned int type;
+    int playerType;
+    int id;
+    char* data;
+    PlayerData_004ca6a0* createData;
+    int dataSize;
+    char* longName;
 };
 
-// The player-info broadcast packet (type 0x20): a type byte then the sender's
-// PlayerInfo, whose id sits at +0x91. net_game.cpp has the same record.
 struct SideDataPacket {
-    unsigned char type;                // +0x0
-    PlayerInfo data;                   // +0x1
+    unsigned char type;
+    PlayerInfo data;
 };
 
-// The packets whose payload is a player id dword at +0x1: reject (0x1b), drop
-// (0x1c), integrity (0x1d), start-position ack (0x1f), team assignment (0x22),
-// alliance (0x24) and breach (0x27) all start with it, and nothing reads a byte
-// before it. The integrity packet's second dword follows at +0x5.
 struct PlayerIdPacket {
-    unsigned char type;                // +0x0
-    int id;                            // +0x1
-    int field_5;                       // +0x5
+    unsigned char type;
+    int id;
+    int field_5;
 };
 
-// A feature's damage (0x0f): the sub-command (a weapon index or 0xfd to
-// 0xff), then the cell. map/features.cpp and orders/unit_orders.cpp name it;
-// the fields are unsigned here because this file loads them zero-extended.
 struct FeatureDamagePacket {
-    unsigned char type;                // +0x0
-    unsigned char sub;                 // +0x1
-    unsigned short x;                  // +0x2
-    unsigned short z;                  // +0x4
+    unsigned char type;
+    unsigned char sub;
+    unsigned short x;
+    unsigned short z;
 };
 
-// A unit script call (0x10): the unit, the script index, the argument count
-// and four arguments. net_game.cpp has the same record, but this file's unit id
-// and argument count are unsigned (zero-extended loads).
 struct UnitScriptCallPacket {
-    unsigned char type;                // +0x0
-    unsigned short id;                 // +0x1
-    short index;                       // +0x3
-    unsigned char argCount;            // +0x5
-    int arg0;                          // +0x6
-    int arg1;                          // +0xa
-    int arg2;                          // +0xe
-    int arg3;                          // +0x12
+    unsigned char type;
+    unsigned short id;
+    short index;
+    unsigned char argCount;
+    int arg0;
+    int arg1;
+    int arg2;
+    int arg3;
 };
 
-// A builder link (0x12): the constructed unit and the builder. net_game.cpp
-// has the same record.
 struct BuilderLinkPacket {
-    unsigned char type;                // +0x0
-    short constructedUnitId;           // +0x1
-    short builderUnitId;               // +0x3
+    unsigned char type;
+    short constructedUnitId;
+    short builderUnitId;
 };
 
-// A sound (0x13): the positional flag, the sound index and the sound's
-// position. sound/sound.cpp names the same record.
 struct Packet_0047f0c0 {
-    unsigned char type;                // +0x0
-    unsigned char flag;                // +0x1
-    int index;                         // +0x2
-    int pos[3];                        // +0x6, x, y and z in 16.16
+    unsigned char type;
+    unsigned char flag;
+    int index;
+    int pos[3];
 };
 
-// A unit ownership transfer (0x14): the unit, the new owner and the rest of
-// the unit's state. units/unit_commands.cpp names the same record.
 struct OwnershipTransferPacket {
-    unsigned char type;                // +0x0
-    short unitId;                      // +0x1
-    int newOwnerNetId;                 // +0x3
-    char unknown_7[0x18 - 7];          // +0x7
+    unsigned char type;
+    short unitId;
+    int newOwnerNetId;
+    char unknown_7[0x18 - 7];
 };
 
-// A metal, energy or map share (0x16): the subtype, the two players and the
-// amount. net_game.cpp has the same record.
 struct ResourceSharePacket {
-    unsigned char type;                // +0x0
-    int subtype;                       // +0x1
-    int fromNetId;                     // +0x5
-    int toNetId;                       // +0x9
-    int amount;                        // +0xd
+    unsigned char type;
+    int subtype;
+    int fromNetId;
+    int toNetId;
+    int amount;
 };
 
-// A lobby sync request (0x21): the flag, the player asked about and the
-// caller. net_game_450530.cpp names the same record.
 struct Msg_00450530 {
-    unsigned char type;                // +0x0
-    unsigned char flag;                // +0x1
-    int id;                            // +0x2
-    int arg;                           // +0x6
+    unsigned char type;
+    unsigned char flag;
+    int id;
+    int arg;
 };
 
-// An alliance flag change (0x23): the two players, the flag and the mode.
-// net_game.cpp and net_game_452960.cpp name the same record.
 struct AllyFlagsPacket {
-    unsigned char type;                // +0x0
-    int fromNetId;                     // +0x1
-    int toNetId;                       // +0x5
-    char allied;                       // +0x9
-    int force;                         // +0xa
+    unsigned char type;
+    int fromNetId;
+    int toNetId;
+    char allied;
+    int force;
 };
 
 #pragma pack(pop)
@@ -173,7 +136,6 @@ void RebuildAllyList();
 int __stdcall GetSlotDpid(unsigned char);
 unsigned char __stdcall FindSlotByDpid(int);
 int __stdcall AddNetPlayer(int);
-// Second parameter must be an int.
 int __stdcall RejectPlayer(int, int);
 void __stdcall BuildGameInfo(char*, int*, int*, int*, int*);
 void __stdcall HandlePing(void*);
@@ -208,8 +170,6 @@ void __stdcall ShareMapInfo(unsigned char, unsigned char);
 void __stdcall HandlePlayerEconomy(void*, Player*);
 void __stdcall SetGameSpeed(int, int);
 
-// The lookups below stay spelled out as inlined, half inlined or called: the
-// inline budget makes each variant differ.
 static inline int GetPlayerId(unsigned char i)
 {
     if (i != 10 && g_game->players[i].type)
@@ -217,8 +177,6 @@ static inline int GetPlayerId(unsigned char i)
     return -1;
 }
 
-// FindPlayerIndex and FindPlayerSlot test `id == -1` first, not a wrapped loop:
-// adds a reference per inlined result, which orders the frame slots.
 static inline unsigned char FindPlayerIndex(int id)
 {
     if (id == -1)
@@ -273,7 +231,6 @@ static inline unsigned char FindHost()
     return 10;
 }
 
-// A real function, not inline.
 int GetHostDpid()
 {
     int i;
@@ -325,7 +282,6 @@ static inline int IsValid(Player* p)
     return p->active && (p->type == 1 || p->type == 2 || p->type == 3);
 }
 
-// One helper, not split.
 static inline int InGame(Player* p)
 {
     return IsValid(p) && p->index != 10;
@@ -383,8 +339,6 @@ static inline int CommandAllowed(unsigned char* bytes)
     return 0;
 }
 
-// Stays in its own file: the dispatch loop's register allocation follows the
-// original translation unit's symbol ids, which the gathered file changes.
 // FUNCTION: 0x453d40
 int HandleNetPackets()
 {
@@ -444,11 +398,9 @@ int HandleNetPackets()
                 if (!AddNetPlayer(msg->id))
                     break;
                 PlayerById(msg->id);
-                // int, not unsigned char.
                 int target = FindPlayerIndex(msg->id);
                 if (!g_game->players[FindHost()].IsPlayableSlot())
                     break;
-                // info is read before payload: on equal priority the register goes to the first written.
                 PlayerInfo* info = LocalPlayer()->info;
                 PlayerData_004ca6a0* payload = msg->createData;
                 if (info->closed) {
@@ -515,8 +467,6 @@ int HandleNetPackets()
             RejectPlayer(sender, 6);
             continue;
         }
-        // Original bug: a command byte is never <= 1 and >= 0x2d at once, so
-        // this error reply is dead (`||` was meant; docs/bugs.md).
         if (packet[0] <= 1 && packet[0] >= 0x2d) {
             RejectPlayer(sender, 6);
             continue;
@@ -558,7 +508,6 @@ int HandleNetPackets()
             if (to == g_game->localPlayer && (g_game->netGameFlags & 1)) {
                 for (int i = 0; i < 10; i++) {
                     Player* p = &g_game->players[i];
-                    // Declared here, not inside the IsConnected block: keeps the pushes after the stores.
                     unsigned char reply[0xba];
                     if (IsConnected(p)) {
                         BroadcastPacket(p->id, InfoPacket(reply, p), 0xba);
@@ -753,8 +702,6 @@ int HandleNetPackets()
                 p = 0;
             else
                 p = &g_game->players[FindPlayerSlot(id)];
-            // Original bug: p is 0 when the named player has left, and
-            // IsConnected reads through it (docs/bugs.md).
             if (IsConnected(p))
                 GiveUnitToPlayer(unit, p, packet);
             break;

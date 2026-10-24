@@ -1,15 +1,10 @@
-// Decompiled by Sonnet, Opus, Claude Opus 5.5, deepseek-v4.1-flash and space-bunny-free. Names are provisional.
-// Checksums, random numbers and vector maths. RandomInt is in math_4b6c30.cpp
-// (it needs /Gi) and the fixed-point trigonometry in math_4b70a0.cpp (a gap
-// region's hand-written assembly, which the build places apart).
-
 #include "win_types.h"
 #include <stdlib.h>
 #include <math.h>
 #include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
 
-extern const char g_errorCaption[];  // "Error"
+extern const char g_errorCaption[];
 
 // FUNCTION: 0x4b6b80
 void __stdcall ShowErrorBox(const char* message, int unused)
@@ -18,8 +13,6 @@ void __stdcall ShowErrorBox(const char* message, int unused)
     host_message(NULL, g_errorCaption, message, HOST_MESSAGE_TOPMOST);
 }
 
-// Four-byte checksum of a buffer: byte sum, byte xor, sum of (index ^ byte)
-// and xor of (index + byte), packed low byte first.
 // FUNCTION: 0x4b6ba0
 int __stdcall ComputeChecksum(unsigned char* data, int len)
 {
@@ -33,7 +26,6 @@ int __stdcall ComputeChecksum(unsigned char* data, int len)
     return (d << 24) | (c << 16) | (b << 8) | a;
 }
 
-// Seeds a random number generator (the seed is kept odd).
 // FUNCTION: 0x4b6ca0
 void __stdcall SeedRandom(unsigned int seed)
 {
@@ -46,11 +38,9 @@ struct Vec3_004b6cc0 {
     int z;
 };
 
-// Fixed-point rotation helper written in assembly.
 void __cdecl RotatePoint2D(short angle, int* xy);
 void __cdecl RotatePoint2D(int angle, int* xy);
 
-// Rotates a vector by three angles (one per axis pair).
 // FUNCTION: 0x4b6cc0
 void __stdcall RotateByAngles(Vec3_004b6cc0* in, Vec3_004b6cc0* out, short* angles)
 {
@@ -69,8 +59,6 @@ void __stdcall RotateByAngles(Vec3_004b6cc0* in, Vec3_004b6cc0* out, short* angl
     out->z = a[1];
 }
 
-// Rotates a vector about the third axis: sibling of 0x4b6df0, which rotates
-// (y, z) instead of (x, y).
 // FUNCTION: 0x4b6d50
 void __stdcall RotateAboutZ(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
 {
@@ -83,7 +71,6 @@ void __stdcall RotateAboutZ(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
     out->z = in->z;
 }
 
-// Rotates a vector in the x/z plane.
 // FUNCTION: 0x4b6da0
 void __stdcall RotateAboutY(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
 {
@@ -108,8 +95,6 @@ void __stdcall RotateAboutX(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
     out->z = yz[1];
 }
 
-// Approximate length of (dx, dy): the larger magnitude plus a quarter of the
-// smaller one.
 // FUNCTION: 0x4b6e40
 int __stdcall ApproxDistance(int dx, int dy)
 {
@@ -136,7 +121,6 @@ struct Vec3f_004b6eb0 {
     float z;
 };
 
-// Difference to - from, passed and returned by value.
 // FUNCTION: 0x4b6eb0
 Vec3f_004b6eb0 __stdcall VectorFromTo(Vec3f_004b6eb0 from, Vec3f_004b6eb0 to)
 {
@@ -157,9 +141,6 @@ Vec3f_004b6eb0 __stdcall VectorFromToInt(Vec3_004b6cc0 from, Vec3_004b6cc0 to)
     return r;
 }
 
-// Cross product a x b, passed and returned by value. The (float) casts on the
-// differences emit nothing, but without them MSVC copies r to the return
-// buffer with the stores interleaved (three registers instead of four).
 // FUNCTION: 0x4b6f70
 Vec3f_004b6eb0 __stdcall CrossProduct(Vec3f_004b6eb0 a, Vec3f_004b6eb0 b)
 {
@@ -185,12 +166,9 @@ Vec3f_004b6eb0 __stdcall CrossProduct(Vec3f_004b6eb0 a, Vec3f_004b6eb0 b)
     return r;
 }
 
-// Returns v scaled to unit length. The vector is passed and returned by value
-// (the results are spilled into v's own stack slots before being copied out).
 // FUNCTION: 0x4b6ff0
 Vec3f_004b6eb0 __stdcall NormalizeVector(Vec3f_004b6eb0 v)
 {
-    // Squares stay in their own locals: an inline sum hoists the x87 loads.
 #ifdef __clang__
     struct { double x, y, z; } sq;
     sq.x = (double)v.x * v.x;

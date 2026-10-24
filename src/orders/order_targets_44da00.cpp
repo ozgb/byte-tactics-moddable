@@ -1,18 +1,6 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// Builds the outline of a rectangle (x1..x2, y1..y2) into a
-// std::vector<Point_0044eec0>: first the two vertical edges (for each x, the
-// bottom and top points), then the two horizontal edges (for each interior y,
-// the left and right points). Every point is appended with push_back.
-// Stays in its own file: the std::copy specialization below changes the
-// vector<Point_0044eec0> instantiations 0x44d0e0 and 0x44d560 share (their
-// inlined clear turns into a call to 0x44eef0), so it cannot join them in
-// order_targets.cpp.
 #include <string.h>
 #include <utility>
 
-// <xutility> as this file compiled it (with /Gz): the same templates, but
-// __stdcall. Defining _XUTILITY_ keeps out the header's __cdecl ones, which
-// <vector> and <xstring> would otherwise pull in.
 #define _XUTILITY_
 namespace std {
 template <class _II, class _OI>
@@ -119,7 +107,6 @@ inline void __stdcall swap(_Ty& _X, _Ty& _Y)
 
 #include "../util/vec3.h"
 
-// The out-of-line copy the inlined vector::clear tail calls (0x44eef0).
 Point16* __stdcall CopyDwordRangeUnchecked(Point16* first, Point16* last, Point16* dest);
 
 namespace std {

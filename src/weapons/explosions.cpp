@@ -1,10 +1,5 @@
-// Decompiled by Opus, GPT-6, deepseek-v4.1, deepseek-v4.1-flash, DeepSeek V4.1 Flash, Claude Opus 5.5, space-bunny-free, GPT-6.1-sol, Sonnet 5.5, mimo-v2.6-pro, xiaomi/mimo-v2.6-pro, fledge-alpha-free and GPT-6. Names are provisional.
-// Explosions: the CalcedExplosion frames built at start-up, the 300-entry
-// debris table and the 100-slot pool of exploded pieces, all reached through
-// g_game.
 #include "win_types.h"
 #include <string.h>
-// <minmax.h> and <setjmp.h> are here for their symbols only (docs/c2-regalloc.md).
 #include <minmax.h>
 #include <setjmp.h>
 
@@ -43,24 +38,23 @@ struct Position {
 };
 
 struct ImageFrame {
-    void* image;                       // +0x0
-    short duration;                    // +0x4
+    void* image;
+    short duration;
     short unknown;
 };
 
 struct Explosion {
-    unsigned short count;            // +0x0
-    char flags;                        // +0x2
+    unsigned short count;
+    char flags;
     char unknown_3[0x25];
-    ImageFrame frames[1];              // +0x28
+    ImageFrame frames[1];
 };
 
-// The explosions as InitGafSequence reads them.
 struct GafSequence {
-    unsigned short count;              // +0x0
-    unsigned char kind;                // +0x2
+    unsigned short count;
+    unsigned char kind;
     char unknown_3[0x2c - 3];
-    struct { unsigned short value; char unknown_2[6]; } entries[1]; // +0x2c
+    struct { unsigned short value; char unknown_2[6]; } entries[1];
 };
 
 struct GafRef {
@@ -71,13 +65,12 @@ struct GafRef {
             unsigned short index;
             unsigned short value;
         };
-    };                                 // +0x0
-    unsigned char kind;                // +0x4
+    };
+    unsigned char kind;
     char unknown_5[3];
-    GafSequence* src;                  // +0x8
+    GafSequence* src;
 };
 
-// Bitfield union: gives the original's shr/test chain for the flag tests.
 struct FaceFlags {
     union {
         unsigned int raw;
@@ -91,46 +84,44 @@ struct FaceFlags {
 };
 
 struct Face {
-    int color;                         // +0x00
-    int nverts;                        // +0x04
+    int color;
+    int nverts;
     int unknown_8;
-    unsigned short* vindex;            // +0x0c
-    GafRef tex;                        // +0x10
-    FaceFlags flags;                   // +0x1c
+    unsigned short* vindex;
+    GafRef tex;
+    FaceFlags flags;
 };
 
-// A model: the 300 "explodepiece" objects in g_game and the piece models
-// of the units are the same thing.
 struct Object3D {
-    signed char state;                 // +0x00 (-1 = free)
+    signed char state;
     char unknown_1[3];
-    int vertexCount;                   // +0x04
-    int faceCount;                     // +0x08
-    int firstFace;                     // +0x0c
+    int vertexCount;
+    int faceCount;
+    int firstFace;
     char unknown_10[12];
-    const char* name;                  // +0x1c
-    int active;                        // +0x20
+    const char* name;
+    int active;
     Vec3* verts;
-    Face* faces;                       // +0x28
+    Face* faces;
     char unknown_2c[8];
 };
 
 struct Size {
     char unknown_0[8];
-    int x;                             // +0x08
-    int y;                             // +0x0c
-    int z;                             // +0x10
+    int x;
+    int y;
+    int z;
 };
 
 struct PieceList {
-    int count;                         // +0x0
+    int count;
 };
 
 struct Cell {
     char unknown_0[8];
-    unsigned short feature;            // +0x8
-    unsigned char offsetY;             // +0xa
-    unsigned char offsetX;             // +0xb
+    unsigned short feature;
+    unsigned char offsetY;
+    unsigned char offsetX;
     char unknown_c;
 };
 
@@ -142,13 +133,10 @@ struct Feature {
 
 struct Net {
     char unknown_0[0xd44];
-    int f_d44;                         // +0xd44
-    int f_d48;                         // +0xd48
+    int f_d44;
+    int f_d48;
 };
 
-// Unused here: the symbol ids these declarations take keep UpdateExplosions
-// and BreakPieceIntoDebris in the register windows they match in now that
-// CMemoryCache comes from a shared header (docs/c2-regalloc.md).
 void WriteScreenshot(char*, char*, int, int, int, int);
 void SetCameraPosition(int, int, int);
 void StartScreenShake(int, int, int);
@@ -165,34 +153,31 @@ void SetMissionStatus(int, int, int);
 #include "../units/unit.h"
 #include "../quirks/quirks.h"
 
-// A piece of a unit's model, 0x36 bytes each, 0x22 bytes after the count in
-// PieceList.
 struct PieceRec {
-    Object3D* desc;                    // +0x00
+    Object3D* desc;
     char unknown_4[0xc];
-    short angle_10;                    // +0x10
-    short angle_12;                    // +0x12
-    short angle_14;                    // +0x14
+    short angle_10;
+    short angle_12;
+    short angle_14;
     Vec3 pos;
     Ref<Vec3> verts;
     char unknown_26[2];
-    unsigned short flags;              // +0x28
+    unsigned short flags;
     char unknown_2a[0x36 - 0x2a];
 };
 
-// An exploding piece: the 0x30-byte header each pool slot starts with.
 struct ExplodedPiece {
     Ref<Unit> unit;
-    int index;                         // +0x04
-    int angVelZ;                       // +0x08
-    int angVelX;                       // +0x0c
-    int angVelY;                       // +0x10
-    int vel_x;                         // +0x14
-    int vel_y;                         // +0x18
-    int vel_z;                         // +0x1c
-    int ticks;                         // +0x20
-    int scale;                         // +0x24
-    unsigned int b0 : 1;               // +0x28
+    int index;
+    int angVelZ;
+    int angVelX;
+    int angVelY;
+    int vel_x;
+    int vel_y;
+    int vel_z;
+    int ticks;
+    int scale;
+    unsigned int b0 : 1;
     unsigned int b1 : 1;
     unsigned int b2 : 1;
     unsigned int b3 : 1;
@@ -203,22 +188,22 @@ struct ExplodedPiece {
 };
 
 struct ExplodedBlock {
-    ExplodedPiece header;              // +0x00
-    PieceRec rec;                      // +0x30
+    ExplodedPiece header;
+    PieceRec rec;
 };
 
 struct DebrisView {
-    Object3D* obj;                     // +0x00
-    GafRef ref1;                       // +0x04
-    GafRef ref2;                       // +0x10
+    Object3D* obj;
+    GafRef ref1;
+    GafRef ref2;
     Vec3 pos;
     Vec3 size;
     Vec3 vel;
     Vec3 spin;
-    short angle_x;                     // +0x4c
-    short angle_y;                     // +0x4e
-    short angle_z;                     // +0x50
-    unsigned short flag : 1;           // +0x52
+    short angle_x;
+    short angle_y;
+    short angle_z;
+    unsigned short flag : 1;
 };
 
 #include "../game/game.h"
@@ -259,7 +244,6 @@ int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj);
 void __stdcall StartExplodePiece(ExplodedPiece* spawn);
 void __stdcall BreakPieceIntoDebris(ExplodedPiece* param);
 
-// BuildCalcedExplosion (0x420cb0) again: InitExplosions inlines this copy.
 inline Explosion* MakeExplosion(int count, int start, int end)
 {
     Explosion* result = (Explosion*)GameAllocIgnoreTag("CalcedExplosion", 0x28 + count * 8);
@@ -311,8 +295,6 @@ void InitExplosions()
     memset(g_explodedPieces, 0, sizeof(g_explodedPieces));
 }
 
-// Claims a free object (first byte -1), marks it used and returns it, or
-// returns 0 when all 300 are taken.
 // FUNCTION: 0x420920
 Object3D* AllocExplodePieceObject()
 {
@@ -345,8 +327,6 @@ void FreeExplosions(void)
     }
 }
 
-// Appends one entry (up to 300) to the table at g_game+0x1491b: a position and
-// two references built by InitGafSequence.
 // FUNCTION: 0x420a30
 void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int flag)
 {
@@ -400,9 +380,6 @@ void __stdcall DrawExplosions(void* surface)
     }
 }
 
-// Builds a "CalcedExplosion": a header followed by one entry per frame, each
-// frame generated by 0x420d20 (an "ExplosionFrame" of the given size), with
-// sizes stepping evenly from `from` towards `to`.
 // FUNCTION: 0x420cb0
 Explosion* __stdcall BuildCalcedExplosion(int n, int from, int to)
 {
@@ -443,7 +420,6 @@ void __stdcall ExplodeUnitPieces(Unit* unit)
     }
 }
 
-// MATCH: use a local int pointer for the gravity subtraction so MSVC reloads vel.y after the position updates.
 // FUNCTION: 0x420f30
 void UpdateExplosions()
 {
@@ -516,8 +492,6 @@ void UpdateExplosions()
     }
 }
 
-// Returns the index of the first free (zero) slot of the 100-entry table of
-// exploded pieces, or -1 when it is full.
 // FUNCTION: 0x421150
 int FindFreeExplodedPieceSlot()
 {
@@ -529,8 +503,6 @@ int FindFreeExplodedPieceSlot()
     return -1;
 }
 
-// Updates every entry of the 100-slot table (see FindFreeExplodedPieceSlot)
-// with UpdateExplodedPiece and clears the slots it reports finished.
 // FUNCTION: 0x421170
 void UpdateExplodedPieces()
 {
@@ -541,8 +513,6 @@ void UpdateExplodedPieces()
     }
 }
 
-// Passes every entry of the 100-slot table to DrawExplodedPiece with the
-// argument and clears the slots it reports finished (compare 0x421170).
 // FUNCTION: 0x4211a0
 void __stdcall DrawExplodedPieces(void* surface)
 {
@@ -567,7 +537,6 @@ void __stdcall DrawExplodedPieceFaces(void* surface, ExplodedPiece* obj, PieceRe
     off.y = inner->pos.y;
     off.b = inner->pos.z - (g_game->scrollY << 16);
 
-    // Address of off taken once, high words read as hp[n]: forces the original's spill.
     short* hp = (short*)&off;
     int sy = hp[5] - (hp[3] >> 1) + 0x20;
     int sx = hp[1] + 0x80;
@@ -576,7 +545,6 @@ void __stdcall DrawExplodedPieceFaces(void* surface, ExplodedPiece* obj, PieceRe
     }
 
     Vec3* v = inner->verts;
-    // Indexed destination with a walked source pointer u: the byte-exact form.
     Vec3* u = v;
     for (i = 0; i < arr->vertexCount; i++, u++) {
         projected[i].x = (short)((u->x + off.a) >> 16) + 0x80;
@@ -586,7 +554,6 @@ void __stdcall DrawExplodedPieceFaces(void* surface, ExplodedPiece* obj, PieceRe
 
     int j;
     Face* face;
-    // face and i assigned in both arms: keeps arr in a register, i stored once.
     if (arr->firstFace != -1) {
         face = arr->faces + 1;
         i = 1;
@@ -597,7 +564,6 @@ void __stdcall DrawExplodedPieceFaces(void* surface, ExplodedPiece* obj, PieceRe
     for (; i < arr->faceCount; i++, face++) {
         unsigned short* idx = face->vindex;
         j = 0;
-        // Guarded do/while with the load, ++j and ++idx as separate statements.
         if (face->nverts > 0) {
             do {
                 poly[j] = projected[*idx];
@@ -626,12 +592,6 @@ void __stdcall DrawExplodedPieceFaces(void* surface, ExplodedPiece* obj, PieceRe
     }
 }
 
-// One tick of an exploded piece (a slot of g_explodedPieces, see 0x421170 and
-// 0x420f30). obj is the 0x30-byte header 0x481140 builds; its rec holds the
-// position and the three rotation shorts. The timer counts down. Above sea
-// level the piece moves and GetCellMeanHeight (map height under the point)
-// decides whether it hit the ground: on a hit it damps the velocity and, when
-// the ground is above +0x20000, stops.
 // FUNCTION: 0x4213b0
 int __stdcall UpdateExplodedPiece(ExplodedPiece* obj)
 {
@@ -725,8 +685,6 @@ int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj)
     return 1;
 }
 
-// Takes a free slot from the 100-entry pool at g_explodedPieces and copies the
-// argument header plus the per-unit record into the freshly allocated block.
 // FUNCTION: 0x421620
 void __stdcall StartExplodePiece(ExplodedPiece* piece)
 {
@@ -758,30 +716,18 @@ void __stdcall StartExplodePiece(ExplodedPiece* piece)
     block->header.rec->pos.z += obj->pos.z;
 }
 
-// For its symbols only: it sets the registers of 0x421700.
 #include <stddef.h>
 
-// Cast and whole expression each parenthesised: keeps the a, b, c stores
-// list-scheduled.
 #ifdef __clang__
 #define FIX2F(x) ((float)((double)(x) * 1.5259021893143654e-05))
 #else
 #define FIX2F(x) (((float)(x)) / 65535.0f)
 #endif
 
-// Breaks a unit piece into debris: for each quad face of the piece, takes a
-// free debris slot and a free 3D object (AllocExplodePieceObject, inlined),
-// gives it a random velocity and spin, copies the face's four vertices into the
-// object
-// (twice, as a box), pushes the back four out along the face normal by
-// param->scale, centres the box on its own origin and copies the face's
-// texture and colour into the object's faces.
 // FUNCTION: 0x421700
 void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
 {
     Unit* unit = param->unit;
-    // piece is computed from unit, and desc is read before verts: the order of
-    // first uses sets the frame slots.
     PieceRec* piece =
         (PieceRec*)((char*)unit->state.get() + 0x22 + param->index * 0x36);
     int* count = &g_game->count_1491b;
@@ -834,7 +780,6 @@ void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
             c.z = FIX2F(v[2].z);
             Vec3f ab, n;
             ab = VectorFromTo(b, a);
-            // Second difference goes into n itself, not nested in CrossProduct.
             n = VectorFromTo(b, c);
             n = NormalizeVector(CrossProduct(n, ab));
             d->vel.x += RandomInt(200) * (short)(n.x * 512.0f);

@@ -1,26 +1,16 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by GPT-6.1-sol, finished by space-bunny-free, finished by mimo-v2.6-pro. Names are provisional.
-// The function: for every unit of the local player with flag 0x10 that is not
-// g_game->units[g_game->hoverUnitId], if its order kind is not Standing_FireOrder
-// (or the unit type allows fire) and not Standing_MoveOrder (or allows move),
-// issue IssueOrCancelOrder at pos offset by the unit's delta from the player's
-// average unit position, when the unit is within count*3000 of that average,
-// else at pos unchanged.
-// <stdio.h> and <stdlib.h> must both stay included: they set the compiler state.
 #include <stdio.h>
 #include <stdlib.h>
 
 #pragma pack(push, 1)
 
-// The order type table entry (not a UnitDef), indexed by an OrderType.
 struct OrderTypeEntry {
-    unsigned char index;                // +0x00
+    unsigned char index;
     char unknown_1[0x8 - 0x1];
-    unsigned int flags_a;               // +0x08
+    unsigned int flags_a;
     char unknown_c[0x11 - 0xc];
-    unsigned int flags;                 // +0x11
+    unsigned int flags;
 };
 
-// A unit type index, passed and returned by value.
 class OrderType {
 public:
     unsigned char index;
@@ -29,13 +19,11 @@ public:
 
 #include "../orders/mission_type.h"
 
-// Not units/unit_def.h: its symbol ids move 0x48cf30 out of its window.
 struct UnitDef_0048cf30 {
     char unknown_0[0x245];
-    unsigned char flags;                // +0x245
+    unsigned char flags;
 };
 
-// pos stays as x and z: util/vec3.h adds 14 symbol ids and 0x48cf30 matches only within 5 of this count.
 #include "../units/unit.h"
 
 #include "../network/player.h"
@@ -52,7 +40,6 @@ void __stdcall IssueOrCancelOrder(OrderType kind, int flag, Unit* unit,
 
 static inline MissionType Order(const char* name) { return MissionType(name); }
 
-// Kept out of the merged selection.cpp: it only matches at this file's symbol count.
 // FUNCTION: 0x48cf30
 void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
                             OrderType kind, int* pos, int typeId, int amount)
@@ -84,7 +71,6 @@ void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
     }
     if (!count)
         return;
-    // One avg[3] aggregate (y unused): sets the frame slot layout.
     int avg[3];
     avg[0] = (sum_x / count) * 65536.0;
     avg[2] = (sum_z / count) * 65536.0;
@@ -96,14 +82,11 @@ void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
             kind.index = GetOrderType(mode, u, except, &g_game->pos_2caa).index;
         if (!kind.index)
             continue;
-        // fire and move are named locals from the Order() wrapper, not constructed
-        // directly: that decides their frame slots.
         MissionType fire = Order("Standing_FireOrder");
         if (kind.index != fire.index || (((UnitDef_0048cf30 *)u->def.get())->flags & 2)) {
             MissionType move = Order("Standing_MoveOrder");
             if (kind.index != move.index || (((UnitDef_0048cf30 *)u->def.get())->flags & 1)) {
                 if (pos && (kind.GetTableEntry()->flags & 2)) {
-                    // Two-step deltas, z first then x: one-step avoids a CSE across the branch.
                     int dz = u->pos.z;
                     dz -= avg[2];
                     int dx = u->pos.x;

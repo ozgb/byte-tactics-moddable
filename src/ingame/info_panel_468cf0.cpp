@@ -1,15 +1,3 @@
-// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, claude-sonnet-5-5, Space Bunny Free and Claude Opus 5.5. Names are provisional.
-// Kept its own file: info_panel.cpp includes <windows.h> and <ddraw.h> for
-// 0x4685a0 and 0x46a610, which flips this function's imul operand order.
-// Draws the game view's overlays into a copy of the screen context: the
-// cursor cross, the resource panel (metal and energy bars and counters, only
-// redrawn when the smoothed values change), the features and units of the
-// visible map rows (first bucketed per row into the unit lists at
-// g_game+0x141fb), the unit group numbers, the selection box and the debug and
-// timing text. Profile marks go to g_game+0x38d85 (phases 8, 3, 4 and 5); the
-// last mark (phase 3) is the out-of-line AccumulateProfileTime, which the
-// original file defines after this function.
-// No <windows.h>: it flips the imul operand order in the row and unit loops.
 #include <stdio.h>
 #include "../../interfaces/ref.h"
 #include <math.h>
@@ -76,16 +64,11 @@ int __stdcall ResetClipRect(int);
 
 #include "../graphics/surface.h"
 
-// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
 void UpdateScreenShake(void);
 void BeginMouseScroll(void);
 void EndMouseScroll(void);
 void UpdateMouseScroll(void);
 
-// The frame-time profile at g_game+0x38d85 (FrameTimers): last tick at +0,
-// one accumulator per phase at +0x2c. AccumulateProfileTime itself is defined after
-// this function in the original file, so only the hand-inlined copies below
-// were expanded; the last call stays out of line.
 #include "frame_timers.h"
 static inline void ProfileMark(FrameTimers *p, int i)
 {
@@ -95,37 +78,37 @@ static inline void ProfileMark(FrameTimers *p, int i)
 }
 
 #pragma pack(push, 1)
-struct Resources {          // g_game+0x37e3f, 33 bytes
+struct Resources {
   char owner;
-  float metal;              // +0x01
-  float metalIncome;        // +0x05
-  float metalUse;           // +0x09
-  float energy;             // +0x0d
-  float energyIncome;       // +0x11
-  float energyUse;          // +0x15
-  float maxMetal;           // +0x19
-  float maxEnergy;          // +0x1d
+  float metal;
+  float metalIncome;
+  float metalUse;
+  float energy;
+  float energyIncome;
+  float energyUse;
+  float maxMetal;
+  float maxEnergy;
 };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-struct Tile_00468cf0 {       // 0xd bytes
+struct Tile_00468cf0 {
   char unknown_0[4];
-  byte height;               // +0x04
+  byte height;
   char unknown_5[3];
-  ushort feature;            // +0x08, a feature index; 0xfffb and up is none
+  ushort feature;
   char unknown_a[2];
-  byte flags;                // +0x0c
+  byte flags;
 };
 
-struct Feature_00468cf0 {    // 0x100 bytes
+struct Feature_00468cf0 {
   char unknown_0[0x94];
-  short footprintX;          // +0x94
-  short footprintZ;          // +0x96
+  short footprintX;
+  short footprintZ;
   char unknown_98[0xfa - 0x98];
-  byte height;               // +0xfa
+  byte height;
   char unknown_fb[4];
-  byte flags;                // +0xff
+  byte flags;
 };
 #pragma pack(pop)
 
@@ -133,15 +116,12 @@ struct Unit_00468cf0;
 struct Bits8 { ushort b0:1; ushort b1:1; ushort b2:1; ushort b3:1; ushort b4:1; ushort b5:1; ushort b6:1; ushort b7:1; };
 struct UnitFlags { uint kind:2; uint b2:1; uint b3:1; uint b4:1; uint b5:1; uint b6:1; uint b7:1; };
 
-// The game state this file reads, with the member names the other Game views
-// use. The bit words share a union with each view's bitfield type.
 #pragma pack(push, 1)
-// A player's entry at g_game+0x1b63, stride 0x14b (Thaldren: PlayerState).
 struct SideData_00468cf0 {
   char unknown_0[0x95];
-  unsigned char bSideId;              // +0x95
+  unsigned char bSideId;
   char unknown_96[0x9b - 0x96];
-  unsigned char gameOptFlags;         // +0x9b, low byte of wGameOptFlags
+  unsigned char gameOptFlags;
   char unknown_9c[0xb9 - 0x9c];
 };
 
@@ -149,76 +129,75 @@ struct PlayerState_00468cf0 {
   char unknown_0[0x27];
   Ref<SideData_00468cf0> info;
   char unknown_2b[0x8c - 0x2b];
-  float flEnergyAmount;               // +0x8c
+  float flEnergyAmount;
   char unknown_90[0x98 - 0x90];
-  float flMetalAmount;                // +0x98
+  float flMetalAmount;
   char unknown_9c[0xa4 - 0x9c];
-  float flEnergyStorage;              // +0xa4
-  float flMetalStorage;               // +0xa8
+  float flEnergyStorage;
+  float flMetalStorage;
   char unknown_ac[0xe4 - 0xac];
-  float flShareThresholdMetal;        // +0xe4
-  float flShareThresholdEnergy;       // +0xe8
+  float flShareThresholdMetal;
+  float flShareThresholdEnergy;
   char unknown_ec[0xf8 - 0xec];
-  unsigned int nDisplayTimer;         // +0xf8
+  unsigned int nDisplayTimer;
   char unknown_fc[0x146 - 0xfc];
-  unsigned char bSlotIndex;           // +0x146
+  unsigned char bSlotIndex;
   char unknown_147[0x14b - 0x147];
 };
 
-struct Unit_00468cf0 {                 // 0x118 bytes
+struct Unit_00468cf0 {
   char unknown_0[0x6c];
-  short xWhole;                       // +0x6c
+  short xWhole;
   char unknown_6e[2];
-  short yWhole;                       // +0x70
+  short yWhole;
   char unknown_72[2];
-  short zWhole;                       // +0x74
+  short zWhole;
   char unknown_76[0x96 - 0x76];
   Ref<PlayerState_00468cf0> player;
   Ref<char> script;
   char unknown_9e[0xac - 0x9e];
-  int group;                          // +0xac, the control group number
+  int group;
   char unknown_b0[0x110 - 0xb0];
-  UnitFlags flags;                    // +0x110
+  UnitFlags flags;
   char unknown_111[0x118 - 0x111];
 };
 
-// A side's panel layout at g_game+0x37f3d, stride 0x232 (Thaldren: SideDef).
 struct SideDef_00468cf0 {
-  char aName[0x1e];                   // +0x000
-  char aNamePrefix[4];                // +0x01e
-  char aCommander[0x20];              // +0x022
-  Rect rcLogo;                 // +0x042
-  Rect rcEnergyBar;            // +0x052
-  Rect rcEnergyNum;            // +0x062
-  Rect rcMetalBar;             // +0x072
-  Rect rcMetalNum;             // +0x082
-  Rect rcTotalUnits;           // +0x092
-  Rect rcTotalTime;            // +0x0a2
-  Rect rcEnergyMax;            // +0x0b2
-  Rect rcMetalMax;             // +0x0c2
-  Rect rcEnergy0;              // +0x0d2
-  Rect rcMetal0;               // +0x0e2
-  Rect rcEnergyProduced;       // +0x0f2
-  Rect rcEnergyConsumed;       // +0x102
-  Rect rcMetalProduced;        // +0x112
-  Rect rcMetalConsumed;        // +0x122
-  Rect rcLogo2;                // +0x132
-  Rect rcUnitName;             // +0x142
-  Rect rcDamageBar;            // +0x152
-  Rect rcUnitEnergyMake;       // +0x162
-  Rect rcUnitEnergyUse;        // +0x172
-  Rect rcUnitMetalMake;        // +0x182
-  Rect rcUnitMetalUse;         // +0x192
-  Rect rcMissionText;          // +0x1a2
-  Rect rcUnitName2;            // +0x1b2
-  Rect rcDamageBar2;           // +0x1c2
-  Rect rcName;                 // +0x1d2
-  Rect rcDescription;          // +0x1e2
-  Rect aReloadRects[3];        // +0x1f2
-  int nEnergyColor;                   // +0x222
-  int nMetalColor;                    // +0x226
-  int nSideIndex;                     // +0x22a
-  char* pFontData;                    // +0x22e
+  char aName[0x1e];
+  char aNamePrefix[4];
+  char aCommander[0x20];
+  Rect rcLogo;
+  Rect rcEnergyBar;
+  Rect rcEnergyNum;
+  Rect rcMetalBar;
+  Rect rcMetalNum;
+  Rect rcTotalUnits;
+  Rect rcTotalTime;
+  Rect rcEnergyMax;
+  Rect rcMetalMax;
+  Rect rcEnergy0;
+  Rect rcMetal0;
+  Rect rcEnergyProduced;
+  Rect rcEnergyConsumed;
+  Rect rcMetalProduced;
+  Rect rcMetalConsumed;
+  Rect rcLogo2;
+  Rect rcUnitName;
+  Rect rcDamageBar;
+  Rect rcUnitEnergyMake;
+  Rect rcUnitEnergyUse;
+  Rect rcUnitMetalMake;
+  Rect rcUnitMetalUse;
+  Rect rcMissionText;
+  Rect rcUnitName2;
+  Rect rcDamageBar2;
+  Rect rcName;
+  Rect rcDescription;
+  Rect aReloadRects[3];
+  int nEnergyColor;
+  int nMetalColor;
+  int nSideIndex;
+  char* pFontData;
 };
 
 #include "../game/game.h"
@@ -226,8 +205,6 @@ struct SideDef_00468cf0 {
 
 extern Game* g_game;
 
-
-// Takes and returns floats.
 static inline float Approach(float fcur, float ftarget)
 {
   int cur = (int)fcur;
@@ -247,7 +224,6 @@ static inline float Approach(float fcur, float ftarget)
   return (float)(d + cur);
 }
 
-// pl must be a parameter: a load through it then schedules above the bar copy.
 static void DrawResourcePanel(Surface *ctx, PlayerState_00468cf0 *pl, Resources *res)
 {
   Rect bar, box;
@@ -259,7 +235,6 @@ static void DrawResourcePanel(Surface *ctx, PlayerState_00468cf0 *pl, Resources 
   byte *pal = &g_game->colors[0];
   SetTextColors(pal[0xf], GetTextKeyColor());
   int bx = 0x81;
-  // do/while, not a for loop.
   do {
     ushort *gaf = (ushort *)GetGafFrame((int)g_game->sidePanelRows[side + (bx > 0x81) * 5], 0);
     BlitGafFrameAtOffset((int)ctx, (int)gaf, bx, 0);
@@ -337,8 +312,6 @@ static inline int ShowSelectBox(int drawObjects)
 // FUNCTION: 0x468cf0
 void __stdcall DrawBattleFrame(int param_1, int param_2)
 {
-  // Plain locals in this order (an escaping struct changes the frame layout);
-  // the tail also needs these while loops and (int) casts.
   char debugText[80];
   int y2;
   Surface ctx;
@@ -365,8 +338,6 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   DrawMapTiles((int)&ctx);
   DrawMapDebugOverlay((int)&ctx);
   x = g_game->xWhole - g_game->scrollX + 0x80;
-  // Compiler state, not meaning: reading viewY through this char* alias of
-  // g_game is what makes MSVC subtract (h >> 1) first, as the original does.
   char *&game = *(char**)&g_game;
   int *viewY = &((Game *)game)->scrollY;
   y = g_game->zWhole - (g_game->yWhole >> 1) - *viewY + 0x20;
@@ -376,11 +347,9 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   }
   ResetClipRect((int)&ctx);
 
-  // resource bars
   {
     PlayerState_00468cf0 *pl = &(*(PlayerState_00468cf0 (*)[11])&g_game->players_1b63)[g_game->playerIndex];
     res = (*(Resources*)&g_game->a);
-    // owner is read through pl: gives the folded addresses.
     res.owner = pl->bSlotIndex;
     res.metal = Approach(res.metal, pl->flEnergyAmount);
     res.energy = Approach(res.energy, pl->flMetalAmount);
@@ -408,7 +377,6 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   ctx.SetClipRect(g_game->rect);
   ProfileMark(&g_game->timers, 3);
 
-  // features and units on the visible part of the map
   idx = g_game->playerIndex;
   mv = &g_game->sortUnits;
   player = &(*(PlayerState_00468cf0 (*)[11])&g_game->players_1b63)[idx];
@@ -422,7 +390,6 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
       mv->count[i] = 0;
       i++;
     }
-    // y0 is assigned before h, and x0 before w.
     y0 = vy - 16;
     h = mv->rows;
     if (y0 < 0) {
@@ -461,7 +428,6 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     DrawParticleList((int)&ctx, 0);
     DrawParticleList((int)&ctx, 1);
     DrawParticleList((int)&ctx, 2);
-    // y = y0 here and x = x0 per row, indexed (width * y + x).
     y = y0;
     i = 0;
     while (i < h) {
@@ -493,7 +459,6 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     DrawParticleList((int)&ctx, 3);
     DrawParticleList((int)&ctx, 4);
     for (i = 0; i < h; i++) {
-      // row and y are computed inside the loop: y becomes the induction variable.
       int row = i + skip;
       y = y0 + i;
       Unit_00468cf0 **pUnit = (Unit_00468cf0**)mv->buf + row * mv->stride;
@@ -549,10 +514,6 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   if (IsKeyDown(0xf9))
     DrawSelectedUnitOrderOverlays((int)&ctx, (int)&(*(void **)&g_game->value_142f3));
 
-  // unit group numbers. Suspected original bug: the outer test lets a unit
-  // with a group number (group) through when the 0x37f06 bit is clear, but the
-  // inner test requires that bit for the number as well, so the position is
-  // computed and nothing is drawn (0x469c4a to 0x469c9a).
   if (param_1 != 0) {
     ushort *pIdx = g_game->list_1435f;
     for (k = 0; k < g_game->count_14367; k++, pIdx++) {
@@ -563,7 +524,6 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         x = unit->xWhole - g_game->scrollX + 0x80;
         y = unit->zWhole - g_game->scrollY - (unit->yWhole >> 1) + 0x20;
         if (g_game->visualFlagsByte & 1) {
-          // The slot compares as a signed char, as the original does.
           if ((char)unit->player->bSlotIndex == (char)idx)
             DrawHitPointBar((int)&ctx, (int)unit, x, y + 10);
           if ((char)unit->player->bSlotIndex == (char)idx && unit->group != 0) {
@@ -582,7 +542,6 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     DrawFogOfWar((int)&ctx);
   ProfileMark(&g_game->timers, 5);
 
-  // selection box
   if (ShowSelectBox(param_1)) {
     Rect box;
     int x1 = g_game->boxStartX - g_game->scrollX + 0x80;

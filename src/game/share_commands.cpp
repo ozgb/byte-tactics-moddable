@@ -1,4 +1,3 @@
-// Decompiled by DeepSeek V4.1 Flash, Claude Opus 5.5, Opus and Haiku. Names are provisional.
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,7 +11,6 @@
 
 extern Game* g_game;
 
-// Command arguments.
 class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
@@ -23,8 +21,6 @@ void BroadcastPlayerInfo();
 
 extern char g_fxEventPoolBlocked;
 
-// Chat command: toggles the local player's ShareMetal bit and prints the new
-// state ("ON"/"OFF"); compare the sibling toggles 0x4194d0 and 0x419400.
 // FUNCTION: 0x418cd0
 void __stdcall CmdShareMetal(int unused)
 {
@@ -40,8 +36,6 @@ void __stdcall CmdShareMetal(int unused)
     }
 }
 
-// Chat command: toggles the local player's energy-sharing flag and prints the
-// new state.
 // FUNCTION: 0x418d90
 void __stdcall CmdShareEnergy(int unused)
 {
@@ -57,8 +51,6 @@ void __stdcall CmdShareEnergy(int unused)
     }
 }
 
-// Chat command: toggles the local player's ShareMapping flag and prints the
-// new state.
 // FUNCTION: 0x418e50
 void __stdcall CmdShareMapping(int unused)
 {
@@ -74,7 +66,6 @@ void __stdcall CmdShareMapping(int unused)
     }
 }
 
-// Chat command: toggles the local player's ShareLOS bit and prints the state.
 // FUNCTION: 0x418f10
 void __stdcall ToggleShareLos(int unused)
 {
@@ -90,8 +81,6 @@ void __stdcall ToggleShareLos(int unused)
     }
 }
 
-// Chat command: toggles the local player's ShareRadar flag and prints the
-// new state.
 // FUNCTION: 0x418fd0
 void __stdcall CmdShareRadar(int unused)
 {
@@ -146,33 +135,24 @@ void __stdcall CmdShareAll(int unused)
     }
 }
 
-// Chat command: sets the local player's metal-sharing threshold to the
-// argument, capped at metalCapacity, and prints a confirmation.
 // FUNCTION: 0x419340
 void __stdcall CmdSetShareMetal(CommandArgs* args)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
         Player* p = &g_game->players[g_game->localPlayer];
-        // __min macro with an explicit (float) cast: the cast places the store
-        // after the next call's pushes.
         p->shareMetal = __min(p->metalCapacity, (float)args->GetIntArg(1, 0));
         sprintf(buf, "OK.  Will share metal if above %d", args->GetIntArg(1, 0));
         AddMessage(buf, 2, 0, 10);
     }
 }
 
-// Chat command: sets the local player's energy-sharing threshold to the
-// argument, capped at energyCapacity (a min() macro, so the argument is read twice),
-// and prints a confirmation.
 // FUNCTION: 0x419400
 void __stdcall CmdSetShareEnergy(CommandArgs* args)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
         Player* p = &g_game->players[g_game->localPlayer];
-        // __min macro with an explicit (float) cast: the cast places the store
-        // after the next call's pushes.
         p->shareEnergy = __min(p->energyCapacity, (float)args->GetIntArg(1, 0));
         sprintf(buf, "OK.  Will share energy if above %d", args->GetIntArg(1, 0));
         AddMessage(buf, 2, 0, 10);
@@ -186,7 +166,6 @@ void __stdcall CmdShowRanges(int unused)
     *ptr ^= 1;
 }
 
-// Chat command: toggles outgoing packet compression and prints the new state.
 // FUNCTION: 0x4194d0
 void __stdcall CmdCompression(int unused)
 {

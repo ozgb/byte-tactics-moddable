@@ -1,11 +1,3 @@
-// Decompiled by Opus, Haiku, Sonnet, Claude Opus 5.5, deepseek-v4.1-flash, DeepSeek V4.1 Flash and GPT-6. Names are provisional.
-// The end-of-game module (0x41d920 to 0x420610), Cavedog's endgame.cpp: the
-// game object's creation, the end-of-mission outcome screen, the statistics
-// screen and its bars, the screen and palette fades, the CD check dialog,
-// the end-game state machine, and the memory cache shutdown. The module's
-// files gathered in address order; 0x41dc20 (a gap region) stays in
-// endgame_41dc20.cpp, and 41e260's raw offset view is folded into the Game
-// type below.
 #include "win_types.h"
 #include <stdio.h>
 #include <string.h>
@@ -21,8 +13,8 @@
 #include "../graphics/memory_cache.h"
 
 struct Amount {
-    int current;                       // +0x0
-    int required;                      // +0x4
+    int current;
+    int required;
 };
 
 #include "../map/grid.h"
@@ -35,54 +27,51 @@ struct Surface_0041df20;
 
 struct Data {
     char unknown_0[0x14];
-    void* items;                       // +0x14
+    void* items;
     char unknown_18[8];
 };
 
 struct Gui;
 
-// One 0x15b-byte GUI entry. The views disagree about the bytes at +0xba:
-// 41ea30's and 41f7f0's Amount against 41ec50's short selected and 41e420's
-// image pointer at +0xbe; the union keeps both readings.
 struct Gadget {
-    unsigned char type;                // +0x0
+    unsigned char type;
     char unknown_1;
-    char name[0x11];                   // +0x2
-    short x;                           // +0x13
-    short y;                           // +0x15
-    short width;                       // +0x17
-    short height;                      // +0x19
-    int attribs;                       // +0x1b
-    int color;                         // +0x1f
-    int color2;                        // +0x23
+    char name[0x11];
+    short x;
+    short y;
+    short width;
+    short height;
+    int attribs;
+    int color;
+    int color2;
     char unknown_27[2];
-    unsigned char flag;                // +0x29
+    unsigned char flag;
     char unknown_2a[0xb6 - 0x2a];
-    short count;                       // +0xb6
+    short count;
     char unknown_b8[2];
-    union {                            // +0xba
-        Amount amount;                 // 41ea30's and 41f7f0's
+    union {
+        Amount amount;
         struct {
-            short selected;            // 41ec50's
+            short selected;
             char unknown_bc[2];
-            void* image;               // +0xbe, 41e420's
+            void* image;
             char unknown_c2[4];
-            unsigned short frame;      // +0xc6, 41e420's
+            unsigned short frame;
         };
     };
     char unknown_c8[0xcc - 0xc8];
-    char okName[0x10];                 // +0xcc, entry 0 only
+    char okName[0x10];
     char unknown_dc[0x136 - 0xdc];
-    union {                            // +0x136
+    union {
         short range;
         struct {
-            unsigned char stages;      // +0x136
-            unsigned char stageIndex;  // +0x137
+            unsigned char stages;
+            unsigned char stageIndex;
         };
     };
     char unknown_138[0x142 - 0x138];
-    short knobSize;                    // +0x142
-    void (__stdcall* sliderCallback)(Gui*, int); // +0x144
+    short knobSize;
+    void (__stdcall* sliderCallback)(Gui*, int);
     char unknown_148[0x15b - 0x148];
 };
 
@@ -93,29 +82,25 @@ struct Layer;
 
 struct Display {
     char unknown_0[0xd4];
-    int width;                         // +0xd4
-    int height;                        // +0xd8
+    int width;
+    int height;
     char unknown_dc[0xf0 - 0xdc];
-    unsigned short low : 1;            // +0xf0
+    unsigned short low : 1;
     unsigned short network : 1;
     unsigned short high : 14;
     char unknown_f2[0x614 - 0xf2];
-    float paletteBrightness;           // +0x614
+    float paletteBrightness;
 };
 
 #include "../network/player_info.h"
 #include "../../interfaces/seams.h"
 
-// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
 int StepTowards(int, int, int);
 
-// The per-player statistics row: 41e420 indexes the seven ints at +0x1e;
-// 41dc20's names for them stay as their own view, unused here, since the
-// union's symbols keep the allocation (docs/c2-regalloc.md).
-struct EndGamePlayerStat {             // 0x3a bytes
-    char name[0x1e];                   // +0x0
+struct EndGamePlayerStat {
+    char name[0x1e];
     union {
-        int stats[7];                  // +0x1e
+        int stats[7];
         struct {
             int kills;
             int losses;
@@ -129,42 +114,42 @@ struct EndGamePlayerStat {             // 0x3a bytes
 };
 
 struct Header {
-    unsigned char type;                // +0x0
+    unsigned char type;
     char unknown_1;
-    char name[0x11];                   // +0x2
-    short x;                           // +0x13
-    short y;                           // +0x15
-    short width;                       // +0x17
-    short height;                      // +0x19
-    int attribs;                       // +0x1b
-    int color;                         // +0x1f
-    int color2;                        // +0x23
+    char name[0x11];
+    short x;
+    short y;
+    short width;
+    short height;
+    int attribs;
+    int color;
+    int color2;
     char unknown_27[2];
-    unsigned char flag;                // +0x29
+    unsigned char flag;
     char unknown_2a[0xb6 - 0x2a];
 };
 
-struct Bar {                           // 0xd6 bytes, passed to AddBarGadget
+struct Bar {
     Header h;
-    int max;                           // +0xb6
-    int current;                       // +0xba
-    int value;                         // +0xbe
-    int interval;                      // +0xc2
-    int next;                          // +0xc6
-    float scale;                       // +0xca
-    int active;                        // +0xce
-    int showText;                      // +0xd2
+    int max;
+    int current;
+    int value;
+    int interval;
+    int next;
+    float scale;
+    int active;
+    int showText;
 };
 
-struct Button {                        // 0xcc bytes, passed to AddHotspotGadget
+struct Button {
     Header h;
     char unknown_b6[0xc8 - 0xb6];
-    int flags;                         // +0xc8
+    int flags;
 };
 
 struct Options {
     char unknown_0[0x228];
-    int difficulty;                    // +0x228
+    int difficulty;
 };
 
 #include "../network/player.h"
@@ -286,11 +271,6 @@ void InitMissionStatus(void)
     g_game->campaignMissionStatus[25] = 0;
 }
 
-// Sets up the end-of-mission screen: allocates the fade table and palette
-// buffers, forces the display's +0x614 value to 1.0 (saving the old one for
-// HandleEndMissionClick to restore), then either loads the campaign's "glamour"
-// picture (falling back to glamour\Arm01.PCX) or opens the Outcome1 or
-// Outcome0 screen.
 // FUNCTION: 0x41da60
 void SetUpEndMissionScreen()
 {
@@ -322,8 +302,6 @@ void SetUpEndMissionScreen()
         LoadPictureCached("Outcome0", 0, 0, 1);
 }
 
-// Starts the fade handled by 0x41df20: ten steps, the first one due on the
-// next tick.
 // FUNCTION: 0x41dee0
 void StartScreenFade(void)
 {
@@ -348,9 +326,6 @@ void StepScreenFade(void)
     }
 }
 
-// Starts a palette fade: keeps copies of the target and current palettes,
-// shows the current one and works out a signed step per channel (at least
-// 1 towards the target) that 0x41e270 then adds on each tick.
 #define FADE_STEP(k)                                                        \
     if (current[k] > target[k]) {                                           \
         ((char*)g_game->fadeTable)[k] = min(-1, (target[k] - current[k]) / steps);       \
@@ -387,10 +362,6 @@ int IsFadeDone()
     return g_game->done;
 }
 
-// One tick of the palette fade set up by 0x41dfc0: once the next tick is
-// due, moves every channel of the current palette by its step without
-// overshooting the target, marks the fade done when the palettes are equal,
-// shows the palette and schedules the next tick.
 #define FADE_TICK(k)                                                        \
     {                                                                       \
         int v = ((unsigned char*)g_game->currentPalette)[k] + ((char*)g_game->fadeTable)[k];                      \
@@ -416,11 +387,6 @@ void StepPaletteFade(void)
     }
 }
 
-// Fills the end-of-game statistics screen: for each of the 10 player slots
-// in use, adds a "PlayerColor<n>" button (given the logo image and the
-// player's colour), the player's name as a TEXT gadget, and seven bars
-// (Kills, Losses, EProduced, MProduced, EWasted, MWasted, Score) scaled
-// against the per-stat values at +0x3918f, one row every 0x14 pixels.
 #define STAT_BAR(n, px, fmt)                                                \
     bar.h.x = px;                                                           \
     bar.value = g_game->slots_38dd9[i].stats[n];                                  \
@@ -437,7 +403,6 @@ void FillEndGameStatistics(void)
     char name[64];
     Gui* menu = &g_game->gui;
     Gadget* entries = menu->layer->entries;
-    // Keep the setup statements in this order: it fixes the register choice.
     memset(&bar, 0, sizeof(bar));
     bar.h.flag = 0;
     bar.h.y = 0x5d;
@@ -506,10 +471,6 @@ int AreStatBarsComplete(void)
     return 1;
 }
 
-// Builds a block of 128-byte scroll-list item strings from a packed list of
-// NUL-terminated names, prefixing each with marker glyphs chosen by its flag
-// character ('L', 'W', 'U'). Frees the packed name list and returns the block.
-
 // FUNCTION: 0x41eaa0
 char* __stdcall BuildScrollItems1(char* names, char* flags, int count)
 {
@@ -537,11 +498,6 @@ char* __stdcall BuildScrollItems1(char* names, char* flags, int count)
     GameFreeThunk(names);
     return items;
 }
-
-// Builds a block of 258-byte scroll-list item strings from a packed list of
-// NUL-terminated names. The first min(a, b) names are copied verbatim; any
-// remaining slots up to b get a "&G" marker prefixed to the next name. Frees
-// the packed name list and returns the block.
 
 // FUNCTION: 0x41eb60
 char* __stdcall BuildScrollItems2(char* names, int a, int b)
@@ -571,11 +527,6 @@ char* __stdcall BuildScrollItems2(char* names, int a, int b)
     return items;
 }
 
-// Click handler of the end-of-mission screen (ENDMSN.GUI, opened by
-// OpenEndMissionScreen). On close (field +0x60 == -1) it frees the outcome images
-// and the Missions list; otherwise it handles LoadGame, SaveGame,
-// Start/Missions (checks the campaign CD and starts the chosen mission),
-// MainMenu and Difficulty (cycles easy, medium, hard).
 // FUNCTION: 0x41ec50
 void __stdcall HandleEndMissionClick(Gui* gadget)
 {
@@ -610,8 +561,6 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
         display->paletteBrightness = *(float*)&g_game->savedPaletteBrightness;
         return;
     }
-    // LoadGame and SaveGame reset the gadget (ClearSelectedGadget) twice in a row;
-    // the second call is redundant.
     if (IsCurrentGadgetNamed(gadget, "LoadGame")) {
         PlaySoundByName("BigButton", 0);
         ShowLoadGameScreen();
@@ -687,12 +636,8 @@ int ShouldShowNextMission()
     return 0;
 }
 
-// Inlined copy of ShouldShowNextMission.
 static inline int HasNextMission()
 {
-    // Casts stay: this helper is inlined into OpenEndMissionScreen and
-    // EnableEndMissionButtons, which RunEndGameState calls, so its allocation
-    // follows them (docs/c2-regalloc.md).
     if (g_game->net->GetGameType() == 1 &&
         ((g_game->won == 0 &&
           ((Mission*)g_game->net)->MissionExists(g_game->mission + 1) == 0) ||
@@ -702,12 +647,6 @@ static inline int HasNextMission()
     return 0;
 }
 
-// Opens the end-of-mission screen (ENDMSN.GUI) with HandleEndMissionClick as its
-// handler. When the campaign goes on to another mission (the inlined
-// ShouldShowNextMission) it plays "outcome1", makes Start the default button and
-// fills the Missions list; otherwise it plays "outcome0" and focuses
-// MainMenu. Then it draws the outcome image and shows the menu.
-// __stdcall although it takes no arguments: as __cdecl the load of `entries` moves up.
 // FUNCTION: 0x41f0a0
 void __stdcall OpenEndMissionScreen()
 {
@@ -733,9 +672,6 @@ void __stdcall OpenEndMissionScreen()
     if (next) {
         int count = g_game->net->BuildMissionList((char**)&data->items);
         data->items = BuildScrollItems1((char*)data->items, g_game->campaignMissionStatus, count);
-        // Suspected original bug: this finds the first 'U' mission flag but
-        // the index is never used (perhaps a lost "select the first
-        // unplayed mission" step).
         int i;
         for (i = 0; i < 0x19; i++) {
             if (g_game->campaignMissionStatus[i] == 'U')
@@ -762,10 +698,6 @@ void __stdcall OpenEndMissionScreen()
     SetCursorMode(0x13);
 }
 
-// Enables the end-of-mission buttons: all of them when the campaign goes on
-// to another mission (the inlined ShouldShowNextMission), otherwise only MainMenu,
-// whose entry field +0x15 is set to 0x1a0. Then focuses Missions or
-// MainMenu and refreshes the menu.
 // FUNCTION: 0x41f400
 void EnableEndMissionButtons()
 {
@@ -790,8 +722,6 @@ void EnableEndMissionButtons()
     MarkChanged(&g_game->gui);
 }
 
-// For each of the 10 slots at +0x38dd9 that is in use, sets the menu entry
-// named "<prefix><slot>" to 1.
 // FUNCTION: 0x41f5c0
 void __stdcall ActivatePlayerGadgets(char* prefix)
 {
@@ -830,7 +760,6 @@ void __stdcall HandleCdCheckClick(Gui* gadget)
     }
 }
 
-// Opens the CD check dialog (CDCHECK.GUI) with HandleCdCheckClick as its handler.
 // FUNCTION: 0x41f700
 void OpenCdCheckDialog()
 {
@@ -840,9 +769,6 @@ void OpenCdCheckDialog()
     RenderLayer(&g_game->gui, 0x40);
 }
 
-// Called through a pointer (no direct callers): when the game state at
-// +0x39057 is 1, draws the image at +0x39077 onto the surface at +0x37e1b at
-// the display's position, then refreshes the GUI at +0x519.
 // FUNCTION: 0x41f760
 int DrawEndGameFrame()
 {
@@ -879,8 +805,6 @@ static inline int StatsComplete()
     return 1;
 }
 
-// Unused here: the symbol id this declaration takes keeps 0x41f7f0's register allocation
-// (docs/c2-regalloc.md).
 void __stdcall ClearBorderFeatures();
 
 // FUNCTION: 0x41f7f0

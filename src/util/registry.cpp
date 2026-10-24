@@ -1,6 +1,3 @@
-// Decompiled by Opus, Haiku, Space Bunny Free, GPT-6.1-sol, mimo-v2.6-pro and Sonnet. Names are provisional.
-// The game's values under Software\Cavedog Entertainment, with the rectangle
-// tests and the thread, sleep and display helpers that share this unit.
 #include "win_types.h"
 #include <string.h>
 
@@ -8,7 +5,6 @@
 
 #include "../graphics/rect.h"
 
-// Returns 1 when rectangle a lies entirely inside rectangle b.
 // FUNCTION: 0x4b6750
 int __stdcall RectInsideRect(Rect* a, Rect* b)
 {
@@ -39,7 +35,6 @@ int __stdcall RectInsideRect(Rect* a, Rect* b)
     return 1;
 }
 
-// Returns 1 when rectangles a and b overlap.
 // FUNCTION: 0x4b67d0
 int __stdcall RectsOverlap(Rect* a, Rect* b)
 {
@@ -82,10 +77,6 @@ int __stdcall GetWindowsUserName(char* out)
     return 0;
 }
 
-// The loop test was an inlined helper with one return per outcome. Its
-// multi-block body stops MSVC from rotating the loop (moving the test to the
-// bottom) and from merging the two identical "next line" branches; written
-// as a plain `while (n != lines)` the loop is rotated and the branches merged.
 static inline int NotDone(int wanted, int current)
 {
     if (wanted == current) {
@@ -94,7 +85,6 @@ static inline int NotDone(int wanted, int current)
     return 1;
 }
 
-// Returns a pointer to the start of line `n` of `text`; lines end at '\n' or '\0'.
 // FUNCTION: 0x4b6af0
 char* __stdcall SkipTextLines(char* text, int n)
 {

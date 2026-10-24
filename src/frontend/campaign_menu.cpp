@@ -1,23 +1,13 @@
-// Decompiled by Opus, Haiku, space-bunny-free, Space Bunny Free, Sonnet, deepseek-v4.1-flash, deepseek-v4.1, GPT-6, mimo-v2.6-pro, DeepSeek V4.1 Flash and longcat-2.5-preview-free. Names are provisional.
-// The campaign menu module (0x476740 to 0x479620): the single-player and
-// campaign front end. It builds the side and campaign name lists from the
-// camps\*.TDF files, runs the SINGLE, NEWGAME and MSNBRIEF dialogs and the
-// mission briefing page, animates the solar-system and taskbar gadgets, and
-// keeps the player slots the skirmish setup uses. The module's files gathered
-// in address order.
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../../interfaces/host.h"
-// Included only for its symbol ids: DrawHelpPage matches only with it
-// (docs/c2-regalloc.md).
 #include <math.h>
 
 #include "../util/tdf.h"
 
-// A view of Sound, not sound/sound.h: the header's symbol ids change DrawHelpPage's registers.
 class Sound {
 public:
     int IsStreamActive();
@@ -28,17 +18,16 @@ public:
 
 struct Info_00477510 {
     char unknown_0[0x30];
-    char name[8];                      // +0x30
+    char name[8];
 };
 
 struct Object_00477510 {
     char unknown_0[0x18];
-    Info_00477510* info;               // +0x18
+    Info_00477510* info;
 };
 
-// The frame sequencer at g_briefingPlanetFrameCursor.
 struct Anim_00478b40 {
-    short index;                       // +0x0
+    short index;
     char unknown_2[6];
 };
 
@@ -51,62 +40,56 @@ struct Layer;
 
 #pragma pack(push, 1)
 
-// One 0x15b-byte GUI record: a layout entry, a gadget, or the root of a
-// dialog's gadget array. The views disagree about the bytes from +0xb6 on:
-// 476ef0's text buffer and count, 478e80's callback at +0xb6 and gaf at
-// +0xbe, 4779e0's selected line and text pointer, 478790's surface at +0xbc
-// and gaf at +0xc0, 478240's callback at +0xce and stage index at +0x137. The
-// anonymous union keeps every reading.
-struct Gadget {                        // 0x15b bytes
+struct Gadget {
     char unknown_0[0x13];
-    short x;                           // +0x13
-    short y;                           // +0x15
-    short w;                           // +0x17
-    short h;                           // +0x19
-    int attribs;                       // +0x1b
-    int colour_1f;                     // +0x1f
-    void* colours;                     // +0x23
+    short x;
+    short y;
+    short w;
+    short h;
+    int attribs;
+    int colour_1f;
+    void* colours;
     char unknown_27[0x28 - 0x27];
-    unsigned char tab;                 // +0x28
+    unsigned char tab;
     char unknown_29[0x60 - 0x29];
-    int index;                         // +0x60
+    int index;
     char unknown_64[0xb6 - 0x64];
-    union {                            // +0xb6
-        short count;                   // 476ef0's text-gadget count
-        char text_b6[0x80];            // 476ef0's text buffer
-        void* hotspotCallback;         // 478e80's per-gadget callback
+    union {
+        short count;
+        char text_b6[0x80];
+        void* hotspotCallback;
         struct {
             char unknown_b6[4];
-            short selected;            // +0xba, 4779e0's and 478240's
-            union {                    // +0xbc
+            short selected;
+            union {
                 struct {
-                    void* surface;     // +0xbc, 478790's and 478b40's
-                    void* gaf;         // +0xc0, 478790's and 478240's
+                    void* surface;
+                    void* gaf;
                     char unknown_c4[2];
                 };
                 struct {
                     char unknown_bc[2];
-                    void* hotspotGaf;  // +0xbe, 478e80's
+                    void* hotspotGaf;
                     char unknown_c2[4];
                 };
                 struct {
                     char unknown_c0[6];
-                    char* text;        // +0xc2, 4779e0's and 478240's
+                    char* text;
                 };
             };
-            short frame;               // +0xc6, 478790's and 478e80's
+            short frame;
             char unknown_c8[0xce - 0xc8];
-            void (__stdcall* callback)();  // +0xce, 478240's
+            void (__stdcall* callback)();
             char unknown_d2[0x136 - 0xd2];
-            union {                    // +0x136
+            union {
                 short range;
                 struct {
-                    unsigned char stages;  // +0x136
-                    unsigned char stageIndex;  // +0x137, 477410's and 478240's
+                    unsigned char stages;
+                    unsigned char stageIndex;
                 };
             };
             char unknown_138[0x144 - 0x138];
-            void (__stdcall* sliderCallback)(Gui*, int); // +0x144
+            void (__stdcall* sliderCallback)(Gui*, int);
             char unknown_148[0x15b - 0x148];
         };
     };
@@ -118,18 +101,17 @@ struct Gadget {                        // 0x15b bytes
 
 #include "../network/player_info.h"
 
-// A player slot, 0x18 bytes, as the skirmish setup's array at +0x29a0.
 struct Item {
     union {
-        int id;                        // +0x0, 0 = free slot
-        int type;                      // CountComputerSlots'
-        int flag;                      // AreAllSlotsEmpty's
-        int active;                    // CountPlayersInAllyGroup's
+        int id;
+        int type;
+        int flag;
+        int active;
     };
-    int unknown_4;                     // +0x4
-    int allyGroup;                     // +0x8, the ally group
+    int unknown_4;
+    int allyGroup;
     char unknown_c[0x14 - 0xc];
-    int owner;                         // +0x14
+    int owner;
 };
 
 #include "../game/game.h"
@@ -154,10 +136,10 @@ extern unsigned int g_briefingPlanetNextTick;
 extern Anim_00478b40 g_briefingPlanetFrameCursor;
 extern unsigned char g_briefingTextColors[];
 extern int g_campaignSimplifiedLayout;
-extern char g_tdfExtension[];          // "TDF"
-extern char g_star[];                  // "*"
-extern char g_campsDirName[];          // "camps"
-extern int DAT_00511de8;               // the same pointer as g_game
+extern char g_tdfExtension[];
+extern char g_star[];
+extern char g_campsDirName[];
+extern int DAT_00511de8;
 
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 #include "../files/files_api.h"
@@ -273,7 +255,6 @@ int GetSideCount(void)
     return g_game->sides;
 }
 
-// Counts the campaign files (camps\*.TDF); compare 0x4769f0.
 // FUNCTION: 0x4767f0
 void CountCampaignFiles()
 {
@@ -329,8 +310,6 @@ int __stdcall CampaignExists(const char* name)
     return found;
 }
 
-// Lists the campaign files (camps\*.TDF) into a buffer of 256-byte names and
-// returns how many there are.
 // FUNCTION: 0x4769f0
 int __stdcall ListCampaignFiles(void** names)
 {
@@ -343,7 +322,6 @@ int __stdcall ListCampaignFiles(void** names)
     return count;
 }
 
-// Copies one name onto the end of the result list and steps the cursor past it.
 static inline char* AppendName_00476a60(char* p, char* s)
 {
     strcpy(p, s);
@@ -363,7 +341,6 @@ int __stdcall BuildCampaignNameList(char** out, int side)
     char* names = (char*)GameAllocIgnoreTag("CAMPAIGN NAMES1", n << 8);
     *out = (char*)GameAllocIgnoreTag("CAMPAIGN NAMES2", n << 8);
     ScanDirectory(path, names, 0, 0, 1, 2);
-    // q declared before p, and the append goes through the inline helper.
     char* q = names;
     char* p = *out;
     for (int i = 0; i < n; i++) {
@@ -493,8 +470,6 @@ char* __stdcall SkipToPageOffset(char* param_1, int param_2, int param_3)
     return found ? p : 0;
 }
 
-// Inlined twice into DrawHelpPage; two pointers walk in step, found and
-// count declared first.
 static inline char* FindPageStart(char* start, int lines, int page)
 {
     if (!page) return start;
@@ -573,7 +548,6 @@ void DrawHelpPage()
     for (int i = linesPerPage * g_briefingPageIndex;
          i < (g_briefingPageIndex + 1) * linesPerPage; i++) {
         AddTextGadget(dialog, "TextRegion", DAT_005119b8, textX, y, -1, 2);
-        // The gadget index is count itself, incremented here.
         count++;
         char* dst = gadgets[count].text_b6;
         gadgets[count].attribs = 0x411;
@@ -590,7 +564,6 @@ void DrawHelpPage()
                 break;
             if (c == '&') {
                 if (colourState != 0) {
-                    // Increment then read, not lineStart[1]: fixes the pointer registers.
                     lineStart++;
                     char code = *lineStart;
                     colourState = 0;
@@ -598,7 +571,6 @@ void DrawHelpPage()
                             : code == 'Y' ? 2
                             : code == 'G' ? 1 : 3;
                     lineStart++;
-                    // Own local, not the gadget count: it shares count's slot once count is dead.
                     int colour =
                         g_briefingTextColors[g_game->flag_37ef2 * 4 + sel];
                     int x = GetTextWidth(GetFont(), gadgets[count].text_b6) + textX;
@@ -626,8 +598,6 @@ void DrawHelpPage()
     }
 }
 
-// The original calls this out of line: with the definition visible
-// the compiler inlines it into OpenNewGameMenu (0x478240).
 #pragma auto_inline(off)
 
 // FUNCTION: 0x477360
@@ -762,7 +732,6 @@ void OpenSingleMenu()
     SetMissionType(1);
     if (g_game->flags_38d7f & 1) {
         SetGadgetActiveByName(&g_game->gui, "AnyMsn", 1);
-        // Original oddity, kept: the test guards an |= of the same bit.
         g_game->flags_38d7f |= 1;
     }
     g_game->gui.layer->textHandler = (void (__stdcall*)(void*))ToggleAnyMission;
@@ -810,9 +779,6 @@ void __stdcall FillMissionList(Gui* menu, int unused)
     MarkChanged(&g_game->gui);
 }
 
-// Inlined copies of FillCampaignList (0x477940) and FillMissionList (0x4779e0):
-// the compiler inlined these bodies into HandleNewGameClick, and the copies'
-// argument shapes are what the inlined code needs.
 static inline void FillCampaignListInline(int side)
 {
     Layer* layer = g_game->gui.layer;
@@ -905,7 +871,6 @@ void __stdcall HandleNewGameClick(Gui* menu)
         }
         if (IsCurrentGadgetNamed(menu, "Difficulty")) {
             PlaySoundByName("SmlButton", 0);
-            // If/else-if chain into one shared exit: a switch or per-arm return changes registers.
             int diff = *(int*)((char*)g_game + 0x37eee);
             if (diff == 0) {
                 *(int*)((char*)g_game + 0x37eee) = 1;
@@ -1050,7 +1015,6 @@ void __stdcall OpenNewGameMenu(int param_1)
         SetGadgetActiveByName(&g_game->gui, "Campaign", 1);
         SetGadgetActiveByName(&g_game->gui, "CampaignKnob", 1);
         Gadget* c = FindGadgetChecked(entries, "Campaign");
-        // Original bug, kept: c is dereferenced on both branches even if null.
         if (c != 0 && g_anyMissionMode != 0)
             c->callback = FillMissionList;
         else
@@ -1177,7 +1141,6 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
         if (f == 0)
             return;
 
-        // Original quirk, kept: indexed by the window pointer, not a palette slot.
         unsigned char colour =
             ((unsigned char*)arg2->colours)[(int)arg1 + 0x8b2];
         FillRectangle(surface, &rect2, colour);
@@ -1185,7 +1148,6 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
         int x = arg2->x - g_briefingPanoramaScrollX;
         int y = arg2->y;
         int n = *(unsigned short*)arg2->hotspotGaf;
-        // Original quirk, kept: `<=` runs one frame past the count.
         for (int k = 0; k <= n; k++) {
             GafFrame* fr =
                 (GafFrame*)GetGafFrame((unsigned short*)arg2->hotspotGaf, k % n);

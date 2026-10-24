@@ -1,5 +1,3 @@
-// Decompiled by Opus, Haiku, space-bunny-free, deepseek-v4.1-flash, deepseek-v4.1 and Sonnet 5.5. Names are provisional.
-// WinMain of Total Annihilation.
 #include "win_types.h"
 #include <excpt.h>
 #include <string.h>
@@ -11,8 +9,6 @@
 #include "../state/game_rand.h"
 #include "../../interfaces/host.h"
 
-// Appends a string (with its terminating zero) to DEBUG.FIL, creating the
-// file if it cannot be opened for appending.
 struct FileHandle;
 
 #include "../files/files_api.h"
@@ -36,8 +32,6 @@ void InstallOutOfMemoryHandler()
     SetOutOfMemoryHandler((int)OutOfMemoryHandler);
 }
 
-// Out of memory handler: appends a note to ErrorLog.txt beside the
-// executable, then reports and aborts.
 void __stdcall ReportViaException(char* text);
 void NopAbortHook(void);
 
@@ -58,20 +52,6 @@ void OutOfMemoryHandler()
     _exit(3);
 }
 
-// The g_displayContext initialisation block is order sensitive:
-//  1. The field stores are in plain program order (startWidth, b0, b1, b8,
-//     b4, b9, b5, b6, b7, startHeight, hInstance, nCmdShow, className,
-//     title, menuId). Only the order of the last four stores matters for the
-//     bytes: hInstance before nCmdShow is the original.
-//  2. The bit-0 write is a bare `video.bits.b0 = ~g_cmdlineDisplaySeed;`. A
-//     named `int notFlags` local, or an explicit xor form, changes the
-//     schedule.
-//  3. `#include <stdio.h>` is load bearing, and nothing in this file uses it,
-//     as docs/agent-guide.md warns: without it the b0 delta register, the
-//     order of the single-bit sets and the g_game and inlined-strcpy
-//     registers all change.
-//     <string.h> <stdio.h>; every other header set scores below that.
-// A view of Sound, not sound/sound.h: with the header GameMain's registers move and the three fillers below cannot restore them.
 class Sound {
 public:
     char pad[0x294];
@@ -86,8 +66,6 @@ public:
     void SetPlaybackOrder(int param_1);
 };
 
-// Unused here: the symbol ids these declarations take keep the allocation,
-// standing in for the view classes merged into Sound (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void ScaleUnitWeights(int, unsigned int*, float, int);
 void __stdcall DrawFrame(void* surface, void* header, int x, int y);
@@ -147,20 +125,20 @@ union Dword_0051f410 {
 
 #pragma pack(push, 2)
 struct App_0049e830 {
-    int hInstance;                     // +0x00
-    int nCmdShow;                      // +0x04
-    int className;                     // +0x08
-    int title;                         // +0x0c
-    int unknown_10;                    // +0x10
-    int menuId;                        // +0x14
+    int hInstance;
+    int nCmdShow;
+    int className;
+    int title;
+    int unknown_10;
+    int menuId;
     char unknown_18[0xe0 - 0x18];
-    int active;                        // +0xe0
+    int active;
     char unknown_e4[0xf0 - 0xe4];
-    Dword_0051f410 flags;              // +0xf0
+    Dword_0051f410 flags;
     char unknown_f4[0x1fa - 0xf4];
-    int startWidth;                    // +0x1fa
-    int startHeight;                   // +0x1fe
-    Word_0051f522 video;               // +0x202
+    int startWidth;
+    int startHeight;
+    Word_0051f522 video;
 };
 #pragma pack(pop)
 extern App_0049e830 g_displayContext;
@@ -215,7 +193,6 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     SetOutOfMemoryHandler((int)OutOfMemoryHandler);
     if ((g_atexitRegistered & 1) == 0) {
         g_atexitRegistered |= 1;
-        // atexit wants a __cdecl handler; /Gz makes AtexitNoOp __stdcall.
         atexit((void (__cdecl *)(void))AtexitNoOp);
     }
     CreateGameObject();
@@ -346,7 +323,6 @@ int __stdcall GameEntry(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return 0;
 }
 
-// Changes the current directory to the one holding the executable.
 char* __stdcall StripFileName(char* path);
 
 // FUNCTION: 0x49f540

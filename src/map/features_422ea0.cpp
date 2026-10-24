@@ -1,29 +1,19 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// Stays in its own file: in features.cpp the merged file's symbol ids change
-// the base and index of the feature-table address and of the dead, burnt and
-// reclamate stores (docs/c2-regalloc.md, "Symbol ids").
-// Resolves every feature type's "featuredead", "featurereclamate" and
-// "featureburnt" names to feature type numbers (loading them when needed),
-// updating the load progress byte as it goes.
-// Must stay the only header.
 #include <string.h>
 
-// Keeps its own view of the parser classes: with the shared tdf.h the inlined
-// FindEntry's register allocation changes and 0x422ea0 drops.
 #include "../util/tdf.h"
 
 
 struct List_00422ea0 {
     int unknown_0;
-    TdfFile** first;                    // +0x4
-    TdfFile** last;                     // +0x8
+    TdfFile** first;
+    TdfFile** last;
 };
 
 struct FeatureDef_00422ea0 {
     char name[0xf4];
-    unsigned short dead;                // +0xf4
-    unsigned short burnt;               // +0xf6
-    unsigned short reclamate;           // +0xf8
+    unsigned short dead;
+    unsigned short burnt;
+    unsigned short reclamate;
     char unknown_fa[0x100 - 0xfa];
 };
 
@@ -37,7 +27,6 @@ extern List_00422ea0* s_featureTdfParsers;
 
 unsigned short __stdcall LoadFeatureType(char* name);
 
-// FindFeatureFile, inlined
 static inline TdfFile* FindEntry(char* name)
 {
     for (TdfFile** p = s_featureTdfParsers->first; p < s_featureTdfParsers->last; p++) {
@@ -48,7 +37,6 @@ static inline TdfFile* FindEntry(char* name)
     return 0;
 }
 
-// FindFeatureType-like search, inlined
 static inline unsigned short FindName(char* name)
 {
     for (int i = 0; i < g_game->featureCount; i++) {
@@ -59,7 +47,6 @@ static inline unsigned short FindName(char* name)
     return 0xffff;
 }
 
-// FindOrLoadFeatureType, inlined
 static inline unsigned short FeatureIndex(char* name)
 {
     unsigned short i = FindName(name);
@@ -68,8 +55,6 @@ static inline unsigned short FeatureIndex(char* name)
     return LoadFeatureType(name);
 }
 
-// Do/while behind its own guard, table pointer taken after the guard; i = 0 is
-// stored before the count pointer.
 // FUNCTION: 0x422ea0
 void ResolveFeatureLinks()
 {

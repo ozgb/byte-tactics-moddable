@@ -1,7 +1,3 @@
-// Decompiled by Sonnet 5.5, space-bunny-free, deepseek-v4.1-flash, Sonnet, Haiku and Opus. Names are provisional.
-// The palette module: the display's palette table and brightness, the alpha,
-// shade, light, gray and blue tables, the palette index lookups and the file
-// name helpers, in address order (the palette module of data/modules.csv).
 #include <string.h>
 #include "../../interfaces/host.h"
 #include "win_types.h"
@@ -13,36 +9,34 @@ struct DisplayContext {
     char unknown_48[0x94 - 0x48];
     void* ddPalette;
     char unknown_98[0xc0 - 0x98];
-    void* alphaTable;                  // +0xc0
-    void* shadeTable;                  // +0xc4
-    void* lightTable;                  // +0xc8
-    void* grayTable;                   // +0xcc
-    void* blueTable;                   // +0xd0
+    void* alphaTable;
+    void* shadeTable;
+    void* lightTable;
+    void* grayTable;
+    void* blueTable;
     char unknown_d4[0xf0 - 0xd4];
-    unsigned short opt : 1;            // +0xf0
+    unsigned short opt : 1;
     unsigned short bit1 : 1;
-    unsigned short gdi : 1;            // bit 2
+    unsigned short gdi : 1;
     unsigned short bit3 : 1;
     unsigned short bit4 : 1;
-    unsigned short has_c0 : 1;         // bit 5
-    unsigned short has_c4 : 1;         // bit 6
-    unsigned short has_c8 : 1;         // bit 7
-    unsigned short has_cc : 1;         // bit 8
-    unsigned short has_d0 : 1;         // bit 9
+    unsigned short has_c0 : 1;
+    unsigned short has_c4 : 1;
+    unsigned short has_c8 : 1;
+    unsigned short has_cc : 1;
+    unsigned short has_d0 : 1;
     unsigned short bit10_15 : 6;
     char unknown_f2[0x214 - 0xf2];
-    unsigned int entries[256];         // +0x214
-    int paletteBrightness;             // +0x614, read as a float by SetPaletteColors
+    unsigned int entries[256];
+    int paletteBrightness;
 };
 #pragma pack(pop)
 
-// A palette entry's four bytes, as the table builders and GetPaletteColors
-// walk them.
 struct RGBA {
-    unsigned char r;                   // +0
-    unsigned char g;                   // +1
-    unsigned char b;                   // +2
-    unsigned char a;                   // +3
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char a;
 };
 
 DisplayContext* GetDisplay(void);
@@ -90,8 +84,6 @@ int __stdcall SetPaletteColors(unsigned char* src, int start, int count)
     int i;
     int end;
     d = GetDisplay();
-    // Statement order brightness, p, end, s before the copy loop; p and s both
-    // advance in the for header.
     brightness = *(float*)((char*)d + 0x614);
     unsigned int* p = d->entries + start;
     end = start + count;
@@ -224,10 +216,6 @@ void __stdcall FreeBlueTable(DisplayContext* obj)
     GameFreeThunk(obj->blueTable);
 }
 
-// Builds the 256x256 colour-blend table at obj->alphaTable when has_c0 is
-// set: diagonal entries are the palette index itself, off-diagonal entries
-// are the palette index closest to the per-channel average of palette entries
-// row and col.
 // FUNCTION: 0x4ba750
 unsigned int* __stdcall BuildAlphaTable(unsigned char* data)
 {
@@ -257,10 +245,6 @@ unsigned int* __stdcall BuildAlphaTable(unsigned char* data)
     return 0;
 }
 
-// Returns the index of the palette entry closest to `color` (squared RGB
-// distance). The colour fields are read in the loop in the source; MSVC
-// hoists their widened values out of it, which is why the loop counter,
-// not the colour, gets a callee-saved register.
 // FUNCTION: 0x4ba880
 unsigned char __stdcall NearestColor(tagPALETTEENTRY* palette, tagPALETTEENTRY color)
 {
@@ -279,8 +263,6 @@ unsigned char __stdcall NearestColor(tagPALETTEENTRY* palette, tagPALETTEENTRY c
     return bestIndex;
 }
 
-// Sums the first three bytes of each 4-byte entry into sums[256], fills
-// idx[256] with 0..255, then selection-sorts sums and carries idx along.
 // FUNCTION: 0x4ba920
 void __stdcall SortByBrightness(unsigned char* data, int* sums, unsigned char* idx)
 {
@@ -304,13 +286,8 @@ void __stdcall SortByBrightness(unsigned char* data, int* sums, unsigned char* i
     }
 }
 
-// The shade table's scale factor, declared here rather than at the top: the
-// symbol count in front of SortByBrightness is what its allocation needs
-// (docs/c2-regalloc.md).
 extern double g_shadeStep;
 
-// Finds the palette entry closest to `color` whose brightness band `band[k]`
-// is within 40 of the colour's brightness; returns `order[bestIndex]`.
 // FUNCTION: 0x4ba9d0
 unsigned char __stdcall NearestColorInBand(tagPALETTEENTRY* palette, int* band, unsigned char* order, tagPALETTEENTRY color)
 {
@@ -318,13 +295,11 @@ unsigned char __stdcall NearestColorInBand(tagPALETTEENTRY* palette, int* band, 
     unsigned char bestIndex;
     int sum = color.peRed + (color.peGreen + color.peBlue);
     int i;
-    // Index `band` directly: no local pointer copy.
     for (i = 0; i < 256; i++) {
         if (band[i] >= sum - 40) {
             if (band[i] > sum + 40)
                 break;
             int k = order[i];
-            // One expression, not three locals: puts the loop counter in edx.
             int d = (palette[k].peRed - color.peRed) * (palette[k].peRed - color.peRed)
                   + (palette[k].peGreen - color.peGreen) * (palette[k].peGreen - color.peGreen)
                   + (palette[k].peBlue - color.peBlue) * (palette[k].peBlue - color.peBlue);
@@ -339,8 +314,6 @@ unsigned char __stdcall NearestColorInBand(tagPALETTEENTRY* palette, int* band, 
     return order[bestIndex];
 }
 
-// Sibling of 0x4bab00 and 0x4bab60: copies a 64 KB table into the buffer at
-// +0xc0 when bit 5 of the flags word at +0xf0 is set.
 // FUNCTION: 0x4baad0
 void __stdcall SetAlphaTable(unsigned int* table)
 {
@@ -359,8 +332,6 @@ void __stdcall SetShadeTable(unsigned int* table)
     }
 }
 
-// Sibling of 0x4bab00: copies an 8 KB table into the buffer at +0xc8 when
-// bit 7 of the flags word at +0xf0 is set.
 // FUNCTION: 0x4bab30
 void __stdcall SetLightTable(unsigned int* table)
 {
@@ -370,8 +341,6 @@ void __stdcall SetLightTable(unsigned int* table)
     }
 }
 
-// Sibling of 0x4bab00: copies a 256-byte table into the buffer at +0xcc
-// when bit 8 of the flags word at +0xf0 is set.
 // FUNCTION: 0x4bab60
 void __stdcall SetGrayTable(unsigned int* table)
 {
@@ -386,8 +355,6 @@ void __stdcall NopRetC(int, int, int)
 {
 }
 
-// Sibling of 0x4bab60: copies a 256-byte table into the buffer at +0xd0
-// when bit 9 of the flags word at +0xf0 is set.
 // FUNCTION: 0x4baba0
 void __stdcall SetBlueTable(unsigned int* table)
 {
@@ -455,10 +422,6 @@ unsigned char* __stdcall BuildGrayTable(tagPALETTEENTRY* palette)
     return 0;
 }
 
-// Builds the 32 row (x 256 entries) shaded palette table into app->shadeTable.
-// The scaling factor starts at 0.0 and grows by 0.06875 (g_shadeStep is
-// -0.06875) once per row, so the first row is all black; kept as it is in the
-// original.
 // FUNCTION: 0x4badf0
 unsigned char* __stdcall BuildShadeTable(tagPALETTEENTRY* palette)
 {
@@ -538,7 +501,6 @@ char* __stdcall ChangeExtension(char* a, char* b, char* c)
     return b;
 }
 
-// Returns 1 if the string contains a '.', else 0.
 // FUNCTION: 0x4bb0a0
 int __stdcall HasExtension(char* name)
 {
@@ -549,7 +511,6 @@ int __stdcall HasExtension(char* name)
     return 0;
 }
 
-// Cuts a file name at its last '.' ("a\\b.txt" -> "a\\b").
 // FUNCTION: 0x4bb0f0
 char* __stdcall StripExtension(char* name)
 {
@@ -562,9 +523,6 @@ char* __stdcall StripExtension(char* name)
     return name;
 }
 
-// Cuts a path after its last backslash ("a\\b\\c.txt" -> "a\\b\\").
-// The scan starts at strlen, on the terminator, not at strlen - 1: starting
-// one lower adds a `dec ecx` that MSVC cannot fold into the strlen sequence.
 // FUNCTION: 0x4bb120
 char* __stdcall StripFileName(char* path)
 {
@@ -577,8 +535,6 @@ char* __stdcall StripFileName(char* path)
     return path;
 }
 
-// Strips the directory from a path in place ("a\\b\\c.txt" -> "c.txt");
-// compare 0x4bb120, which keeps the directory instead.
 // FUNCTION: 0x4bb150
 char* __stdcall StripPath(char* path)
 {
@@ -586,7 +542,6 @@ char* __stdcall StripPath(char* path)
     int i = len - 1;
     while (i >= 0 && path[i] != '\\')
         i--;
-    // Two indices into the same array, not pointers: keeps the offset addressing.
     int j = i + 1;
     int k = 0;
     do {

@@ -1,8 +1,3 @@
-// Decompiled by Sonnet, Opus, Space Bunny Free, deepseek-v4.1-flash, deepseek-v4.1, Sonnet 5.5 and space-bunny-free. Names are provisional.
-// The game state: the offscreen surface, the game mode and its frame handler,
-// the wind, the game speed, the CD list settings in the registry, start-up and
-// shutdown of the game, the reset for a new match and the selection of a
-// screen.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,7 +25,7 @@ class Sound;
 // GLOBAL: 0x511de8
 extern Game* g_game;
 
-extern const char g_offscreenSurfaceName[];  // "OFFSCREEN"
+extern const char g_offscreenSurfaceName[];
 
 int __stdcall AllocSurface(const char* name, int width, int height);
 void __stdcall SetRestoreSurface(int surface);
@@ -42,7 +37,6 @@ void CreateOffscreenSurface()
     SetRestoreSurface((int)g_game->screen);
 }
 
-// Releases the offscreen object created by 0x490ac0.
 void __cdecl GameFreeThunk(int* p);
 void RestoreScreen();
 
@@ -55,9 +49,6 @@ void FreeOffscreenSurface()
     RestoreScreen();
 }
 
-// Stores the new game mode in g_game->frontendState (+0x391f1) and installs the state
-// handler for it in g_game->handler (+0x391f5), through the 0x490c14 jump
-// table. Mode 6 also gets a different quit callback from SetCloseHandler.
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 void __cdecl LeaveNetGameCallback(int param);
 void __cdecl HandleBattleQuitPrompt(int param);
@@ -110,14 +101,6 @@ void __stdcall SetGameMode(int param)
     }
 }
 
-// The wind update. While the per-tick counter at +0x37ec4 is below the tick
-// count at +0x38a47 it jitters the wind direction by a random amount, picks a
-// random wind speed in the range at +0x1425b..+0x1425f and, when that speed is
-// not zero, a fresh direction, then turns direction and speed into the two wind
-// vector components and a 0..1 strength. Once the counter has caught up with the
-// tick count the wind is switched off instead.
-
-// Fixed-point trig helpers, written in assembly: the angle is a short.
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 int __stdcall RandomInt(int range);
@@ -131,11 +114,8 @@ void __cdecl UpdateWind()
 void __cdecl UpdateWindOnStream(RandStream stream)
 {
     if (g_game->windCounter < ((unsigned int)g_game->ticks)) {
-        // The __int64 cast keeps the _allmul/_alldiv calls; keep this one
-        // expression with no temporary.
         g_game->windCounter += ((int)((__int64)GameRand(stream) * 10 / 0x8000) + 5) * 30;
 
-        // Separate statements: one expression changes how the low bound is added.
         int range = g_game->windSpeedMax - g_game->windSpeedMin;
         int n = RandomInt(range);
         g_game->windSpeed = g_game->windSpeedMin + n;
@@ -209,7 +189,6 @@ void IncreaseGameSpeed()
     }
 }
 
-// The counterpart of 0x490ee0: steps a 16-bit game setting down by one.
 // FUNCTION: 0x490f10
 void DecreaseGameSpeed()
 {
@@ -221,7 +200,7 @@ void DecreaseGameSpeed()
 
 struct CdLists_490f80 {
     char unknown_0[0x24];
-    unsigned char tracks[0xaa0 - 0x24]; // +0x24
+    unsigned char tracks[0xaa0 - 0x24];
 };
 
 extern CdLists_490f80 g_cdListsDiscEntries;
@@ -237,8 +216,6 @@ void LoadCdLists(void)
     }
 }
 
-// Copies the per-track bytes from the CD object into the CD-list settings
-// block and saves it to the registry under "CDLISTS".
 class Sound {
 public:
     void SetTrackCategory(int mode);
@@ -266,14 +243,6 @@ void SaveCdLists()
     WriteGameRegistryValue((void*)"CDLISTS", &g_cdListsDiscEntries, sizeof(g_cdListsDiscEntries));
 }
 
-// Refreshes the CD-list table at g_cdListsDiscEntries from the CD object: it saves and
-// restores the object's track table across an MCI close/open, looks the current
-// disc id up in the 20-entry table and, when found, moves that entry to the
-// front and re-reads its track bytes. A disc not in the table is inserted at the
-// front after shifting the others up, provided the drive reports 16 audio
-// tracks. The final cleanup call depends on the game mode.
-
-
 extern int DAT_0051e848;
 extern int g_cachedCdTrackTypes;
 extern int DAT_0051e850;
@@ -297,7 +266,6 @@ void ReopenCdAudio()
     int id = ((Sound*)g_game->field_10)->GetDiscSerial();
     int index = 0;
     int* slot = &DAT_0051e848;
-    // Test *slot != id first, with the break as its own block: else the loop is rotated.
     while (1) {
         if (*slot != id) {
             slot = (int*)((char*)slot + 0x88);
@@ -323,7 +291,6 @@ newdisc:
                 ((Sound*)g_game->field_10)->CopyTrackTypeTable(tracks);
             }
         }
-        // Downward pointer walk against the addresses, not an index loop.
         int p = (int)&g_cdListsDiscEntries + 0xa18;
         for (; p > (int)&g_cdListsDiscEntries; p -= 0x88)
             memcpy((void*)p, (void*)(p - 0x88), 0x88);
@@ -339,15 +306,15 @@ newdisc:
         ((Sound*)g_game->field_10)->StopCdAudio();
 }
 
-extern const char g_skirmishInfoTag[];     // "SkirmishInfo"
-extern const char g_cdListsKey[];          // "CDLISTS"
-extern const char g_guisDirName[];         // "guis"
-extern const char g_animsDirName[];        // "anims"
-extern const char g_fontsDirName[];        // "fonts"
-extern const char g_commonGuiName[];       // "commongui"
-extern const char g_hattFont12Name[];      // "hattfont12"
-extern const char g_hattFont11Name[];      // "hattfont11"
-extern const char g_unitLimitKey[];        // "UnitLimit"
+extern const char g_skirmishInfoTag[];
+extern const char g_cdListsKey[];
+extern const char g_guisDirName[];
+extern const char g_animsDirName[];
+extern const char g_fontsDirName[];
+extern const char g_commonGuiName[];
+extern const char g_hattFont12Name[];
+extern const char g_hattFont11Name[];
+extern const char g_unitLimitKey[];
 
 int GetScreenWidth();
 int GetScreenHeight();
@@ -478,9 +445,6 @@ void InitGame()
     g_game->maxUnits_37eec = (unsigned short)(limit);
 }
 
-// Saves the per-track bytes from the CD object into the CD-list settings
-// block and writes it to the registry under "CDLISTS", then releases the
-// CD-list buffers, the track buffer and the rest of the game state.
 struct Obj_004aeda0;
 struct Obj_004aef80;
 struct Class_00452370;
@@ -527,10 +491,6 @@ void ShutdownGame(void)
 
 #include "../../interfaces/seams.h"
 
-// Resets the game state for a new match: clears the scratch fields and flags
-// in g_game, runs the per-subsystem reset functions, allocates the three
-// transform point buffers, and zeroes the per-player counters and the input
-// history.
 extern unsigned int g_scorePanelSlidePos;
 extern unsigned int g_cdActivityRingWriteIdx;
 extern int g_cdActivitySampleRing[30];
@@ -611,7 +571,7 @@ void LoadBattleAssets()
 
 struct Display_00491a70 {
     char unknown_0[0x40];
-    HWND hwnd;                         // +0x40
+    HWND hwnd;
 };
 
 void __stdcall SetResolution(int x, int y);
@@ -686,8 +646,6 @@ void ShutdownIngameAndQuit()
     QuitApp(0);
 }
 
-// Selects entry n (a signed byte at +0x2cbe) and hands the matching table
-// entry at +0x1487f to SetCursorAnimation for the object at +0x519.
 struct Obj_004ab400;
 
 void __stdcall SetCursorAnimation(Obj_004ab400* p, Src_004ab400* src);
@@ -701,8 +659,6 @@ void __stdcall SetCursorMode(int n)
     }
 }
 
-// Picks the order/state table entry at +0x1487f and hands it to
-// SetCursorAnimation for the object at +0x519, mirroring 0x491c80.
 int __cdecl UpdatePlacementGhostValidity(void);
 unsigned short __cdecl PickUnitUnderCursor(void);
 int __stdcall ResolveCursorModeForSelection(unsigned char mode);
@@ -751,7 +707,6 @@ int __stdcall PopUntilNamedLayout(int force)
     return 0;
 }
 
-// Compare 0x491d70.
 // FUNCTION: 0x491e10
 void CloseTopScreenIfNotNamed()
 {

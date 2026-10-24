@@ -1,26 +1,14 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-//
-// Fixed-point trigonometry, hand-written in assembly: every routine has a
-// MASM-style frame (`push ebp / mov ebp, esp ... leave / ret`), saves the
-// registers it uses, and the routines follow one another with no alignment,
-// so they are one naked function here with a public label for each entry
-// point. Angles are 16-bit (0x10000 is a full turn); the sine table holds
-// 1024 entries of sin * 0x2000 (the cosine table is the same, a quarter turn
-// on), so a lookup is the angle's top 10 bits.
-
 // GLOBAL: 0x509f00
 extern "C" short g_sinTable[128];
 // GLOBAL: 0x50a000
 extern "C" short g_cosTable[512];
 // GLOBAL: 0x509ef0
-extern "C" double g_radToAngle16;       // 0x8000 / pi: radians to angle units
+extern "C" double g_radToAngle16;
 // GLOBAL: 0x509ef8
-extern "C" double g_angle16ToRad;       // pi / 0x8000: angle units to radians
+extern "C" double g_angle16ToRad;
 // GLOBAL: 0x50a400
-extern "C" int g_rotationMatrix[9];     // the rotation matrix 0x4b71a7 builds
+extern "C" int g_rotationMatrix[9];
 
-// Stays in its own file: it is a gap region's hand-written assembly, which
-// the builds place apart from the game's functions in src/util/math.cpp.
 // FUNCTION: 0x4b70a0
 extern "C" __declspec(naked) int __cdecl FixedSine(unsigned short angle)
 {

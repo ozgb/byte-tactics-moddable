@@ -1,7 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, Opus, space-bunny-free, Sonnet, GPT-5.6-Terra, GPT-6.1-sol, deepseek-v4.1, mimo-v2.6-pro, Space Bunny Free, Claude Opus 5.5, GPT-6, Claude Sonnet 5.5, claude-opus-5-5, mimo-v2.6-flash and Haiku. Names are provisional.
-// The selection module: the selected-unit list and box selection, the same-type
-// and category selectors, the click and rubber-band picking, the order issue to
-// the selection, and the squads (CTRL_F).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,14 +5,12 @@
 struct Unit;
 void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
 namespace std {
-// Non-template overload forwarding to the __stdcall 0x406c70: it pops its own arguments.
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
 }
 #include <vector>
 
 #pragma pack(push, 1)
 
-// Positions are read through this union (whole part at +2): gives the movsx loads.
 #include "../util/vec3.h"
 #include "../util/point.h"
 #include "../graphics/rect.h"
@@ -25,7 +19,6 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest,
 
 #include "../units/unit.h"
 
-// A 0x40-byte set of unit type ids, as in 0x488d30.
 class UnitTypeSet {
 public:
     int bits[16];
@@ -34,10 +27,9 @@ public:
 #include "../network/player.h"
 #include "../network/player_info.h"
 
-// The bit set here is bit 4 of the 12-bit group at 0x37ebe (see 0x41a120.cpp).
 union Orders_37ebe {
-    unsigned short flags;              // +0x37ebe
-    unsigned char byte;                // +0x37ebe, the low byte
+    unsigned short flags;
+    unsigned char byte;
     struct {
         unsigned short bits0 : 4;
         unsigned short bit4 : 1;
@@ -46,16 +38,14 @@ union Orders_37ebe {
 };
 
 struct Slot_0048cd80 {
-    unsigned short unitId;             // +0x0
-    int x;                             // +0x2
-    int y;                             // +0x6
+    unsigned short unitId;
+    int x;
+    int y;
 };
 
-// One side's SideDef record (0x232 bytes): the commander name read at +0x22
-// is what FocusCommander matches against a unit type name.
 struct Name_0048d630 {
-    char unknown_0[0x22];              // +0x00
-    char name[0x20];                   // +0x22, the commander name
+    char unknown_0[0x22];
+    char name[0x20];
     char unknown_42[0x232 - 0x42];
 };
 
@@ -70,16 +60,6 @@ void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
 void __stdcall CenterCameraOnMapPosition(Vec3* p, int param_2);
 UnitTypeSet* __stdcall GetCategoryMask(char* name);
 
-// The unit's screen bounding box: the six shorts of the type's 3D box, the
-// scroll offsets, and the game's rubber-band rect. Builds g_game->visibleUnitIdList (short
-// array at +0x1435f, count at +0x14367) with the ids of every unit whose screen
-// bounding box intersects the limit rect at +0x37e27 and which the local player
-// can see.
-//
-// The unit type stores a 3D box in six shorts at +0x160..+0x174, four bytes
-// apart: x1, y1, z1, x2, y2, z2. The screen box is (x + xOff - scrollX,
-// z + zOff - scrollY - (y + yOff) / 2), so the top corner pairs x1 with y2
-// and z1 and the bottom corner pairs x2 with y1 and z2.
 #include "../map/cell.h"
 
 Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
@@ -112,7 +92,6 @@ void CollectVisibleUnitIds(void)
                         y1 = h;
                 }
             }
-            // Named locals, with top declared before right: keeps register use and the final adds.
             int left = x1 + 0x80;
             int top = z1 - (y2 >> 1) + 0x20;
             int right = x2 + 0x80;
@@ -130,8 +109,6 @@ void CollectVisibleUnitIds(void)
     g_game->count_14367 = count;
 }
 
-// Returns 1 when the unit's type id (+0xa8) is in the game's list of ids at
-// +0x1435f (count at +0x14367).
 // FUNCTION: 0x48bcb0
 int __stdcall IsUnitVisible(char* unit)
 {
@@ -152,10 +129,6 @@ void ClearSelection(void)
     PopUntilNamedLayout(0);
 }
 
-// Scans the local player's unit list for the same "build finished and the
-// builder is dead or gone" state the victory condition check in 0x48f250
-// tests, marks each such unit with flag 0x10 and drops the current selection
-// (+0x37e9c) to none, then issues the STOP order and sets order flag 0x10.
 // FUNCTION: 0x48bd50
 void SelectAllIdleUnits(void)
 {
@@ -175,20 +148,6 @@ void SelectAllIdleUnits(void)
     (*(Orders_37ebe*)&g_game->ordersPanelFlags_37ebe).byte |= 0x10;
 }
 
-// Builds a 512-entry bitmap of the type indices (+0xa6) of the local player's
-// selected units (bit 4 of the unit flags at +0x110), then sets bit 4 on every
-// unit of that player that is tagged (bit 5), whose float at +0x104 is 0.0f,
-// whose dword at +0xfb is 0, that has either no attached unit at +0x86 or one
-// whose flags carry 0x40000000, and whose type index is in the bitmap. It then
-// drops the current selection (+0x37e9c) to none, issues the STOP order
-// (SelectStopOrder) and sets order flag 0x10 at +0x37ebe. It is the mirror image
-// of 0x48c9b0, which clears the same bit under the opposite conditions, and it
-// repeats the loop 0x48bd50 does without the two-pass bitmap.
-
-// The flags word at +0x110 is read whole in the second loop and through the
-// bitfield view in the first, which is what the original does: bit 4 through
-// the bitfield (shr 4; test cl, 1), bits 5, 30 and the store as a dword
-// (test bl, 0x20; test dword [...], esi; or ebx, 0x10).
 static inline unsigned int* FlagsPtr(Unit* u)
 {
     return (unsigned int*)&u->flags;
@@ -227,15 +186,11 @@ void SelectUnitsOfSameTypes(void)
     (*(Orders_37ebe*)&g_game->ordersPanelFlags_37ebe).bit4 = 1;
 }
 
-// Sets or clears flag 0x10 on every finished unit of the local player that
-// stands in the line-of-sight bitmask named by the first argument, then clears
-// the selected unit and re-sends the stop order.
 // FUNCTION: 0x48bf30
 void __stdcall SelectUnitsByCategory(char* name, int param_2)
 {
     int* mask = (int*)GetCategoryMask(name);
     int player = g_game->localPlayer;
-    // Head read through q, end read through p: two pointers fix the address forms.
     Player* p = &g_game->players[player];
     Player* q = &g_game->players[player];
     Unit* u = q->unitsBegin;
@@ -258,12 +213,6 @@ void __stdcall SelectUnitsByCategory(char* name, int param_2)
     (*(Orders_37ebe*)&g_game->ordersPanelFlags_37ebe).bit4 = 1;
 }
 
-// Clears flag bit 5 (0x20) on every unit, then walks the selection list at
-// +0x1435f and puts flag bit 4 (0x10) back on the local player's units that
-// are still idle: bit 5 set, no work left at +0x104, no target at +0xfb, and
-// either no link object at +0x86 or bit 0x40 set in its byte at +0x113. If any
-// unit qualified, the single selected unit at +0x37e9c is cleared and bit
-// 0x10 is set in the order byte at +0x37ebe to refresh the orders menu.
 // FUNCTION: 0x48c030
 void SelectAllVisibleUnits(void)
 {
@@ -355,13 +304,9 @@ void MarkLocalVisibleUnits(void)
     }
 }
 
-// Rubber-band unit selection: converts the drag rectangle in map units to
-// screen coordinates, marks every unit of the local player inside it
-// selected, then normalises the player's selection state and reports how
-// many units ended up selected.
 struct Select_0048c390 {
     char unknown_0[8];
-    unsigned int flags;                 // +8
+    unsigned int flags;
 };
 
 extern char s_SelectMultipleUnits_00508d8c[];
@@ -372,8 +317,6 @@ int __stdcall PlaySoundByName(char* msg, int a);
 int __stdcall SelectUnitsInBox(void* param_1)
 {
     int found = 0;
-    // Declared in the order ymin, xmin, ymax, xmax, reading g_game->scrollX/Y
-    // directly (no scroll temporaries): fixes the order of the loads.
     int ymin = (g_game->boxStartX - g_game->scrollX) + 0x80;
     int xmin = ((g_game->boxStartZ - (g_game->boxStartHeight >> 1)) - g_game->scrollY) + 0x20;
     int ymax = (g_game->boxEndX - g_game->scrollX) + 0x80;
@@ -426,9 +369,6 @@ int __stdcall SelectUnitsInBox(void* param_1)
     return 1;
 }
 
-// Builds the four corners of an object's bounding box footprint at the box's low
-// y, rotates each corner by the object's three angles, converts it to screen space
-// and runs a point-in-polygon test against the rotated quad.
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 void __stdcall GetObjectBounds(void* obj, Vec3* lo, Vec3* hi, int arg);
 int __stdcall PointInPolygon(Point* pts, int n, int px, int py);
@@ -440,7 +380,6 @@ int __stdcall HitTestUnitScreenHull(Unit* obj, Point* p)
     Vec3 corners[4];
     Point pts[4];
     int i;
-    // The three screen offsets stay in one Vec3: that local fixes the 0x88 frame.
     Vec3 o;
     Vec3 lo;
     Vec3 hi;
@@ -470,14 +409,9 @@ int __stdcall HitTestUnitScreenHull(Unit* obj, Point* p)
     return PointInPolygon(pts, 4, p->x, p->y) != 0;
 }
 
-// Toggles bit 4 (0x10) of the currently selected unit at +0x110 when the
-// command byte at param+8 has bit 2 set, or otherwise clears bits 4 and 7
-// from every unit, restores bit 6 (0x40) on the local player's units in the
-// selection list and sets bit 4 on the selected unit, then refreshes the
-// orders menu through g_game+0x37ebe.
 struct Param_0048c7f0 {
     char unknown_0[8];
-    unsigned char flags;                // +0x8
+    unsigned char flags;
 };
 
 // FUNCTION: 0x48c7f0
@@ -534,9 +468,6 @@ void __stdcall DeselectIfIneligible(Unit* unit)
     }
 }
 
-// Empties the given list, then walks the local player's team list at
-// g_game + player*0x14b + 0x1b63 and appends every unit whose bit 4 flag at
-// +0x110 is set.
 // FUNCTION: 0x48ca20
 void __stdcall CollectSelectedUnits(std::vector<Unit*>* list)
 {
@@ -548,12 +479,6 @@ void __stdcall CollectSelectedUnits(std::vector<Unit*>* list)
     }
 }
 
-// The flags dword at +0x110 mixes plain masks (0x10000000, 0x4000) with a
-// 1-bit bitfield at bit 4: the bitfield test is the only one the original
-// emits as a shift (shr ecx,4 / test cl,1) instead of a masked test, so the
-// union keeps both spellings available.
-// The team array is indexed by an unsigned char, so its stride shows up as
-// g_game + player*0x14b + 0x1b63 (0x14b = 330 + 1).
 void __stdcall DrawOrderOverlays(Unit* unit, int mask, void* obj,
                            Unit** sel, int flag);
 
@@ -579,9 +504,6 @@ void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Unit** sel)
     }
 }
 
-// Picks what lies under the view point: in the unit area, the listed unit
-// with the lowest value whose box contains the point (branch A); otherwise
-// the nearest slot within distance 2 (branch B).
 int __stdcall PointInRect(Rect* rect, int x, int y);
 
 static inline int FixMul(int a, int b)
@@ -599,7 +521,6 @@ unsigned short __stdcall PickUnitUnderCursor(void)
         unsigned short* ids = g_game->list_1435f;
         if (ids == 0)
             return 0;
-        // Walk the id list with the pointer itself (i++, ids++), not ids[i].
         for (int i = 0; i < g_game->count_14367; i++, ids++) {
             Unit* u = &g_game->units[*ids];
             if (u->unitDefIndex != 0) {
@@ -618,7 +539,6 @@ unsigned short __stdcall PickUnitUnderCursor(void)
         int best = 99999;
         Slot_0048cd80* s = (Slot_0048cd80 *)g_game->hotRadar;
         for (int i = g_game->hotRadarCount; i > 0; i--) {
-            // Both coordinates are read through p, dy first.
             int dy = s->y - p->y;
             int dx = s->x - p->x;
             int d = dx * dx + dy * dy;
@@ -632,14 +552,6 @@ unsigned short __stdcall PickUnitUnderCursor(void)
     return result;
 }
 
-// IssueOrderToSelection (0x48cf30) stays in selection_48cf30.cpp: it only
-// matches at its old file's symbol count.
-
-// Builds the local player's selected-unit list, drops the unit at
-// g_game->units[g_game->hoverUnitId] from it, and returns an order code.
-// With no other selected unit it returns 0xf when arg is 1 and that unit is
-// finished and valid, else 0x13; otherwise it folds 0x13 with GetOrderCursor
-// over the remaining units and returns the minimum.
 static inline void Dummy(void) {}
 
 int __stdcall GetOrderCursor(unsigned char type, Unit* unit, Unit* target, int* out);
@@ -664,7 +576,6 @@ int __stdcall ResolveCursorModeForSelection(char arg)
     Player* player = &g_game->players[g_game->localPlayer];
     for (Unit* u = player->unitsBegin; u <= player->unitsEnd; u++) {
         if (u->selected)
-            // push_back, not insert(end(), u): picks the out-of-line insert overload.
             vec.push_back(u);
     }
 
@@ -689,7 +600,6 @@ int __stdcall ResolveCursorModeForSelection(char arg)
             result = r;
     }
 
-    // Keep these Dummy() calls: they use inline budget so the _Destroy calls stay out of line.
     Dummy();
     Dummy();
     Dummy();
@@ -729,10 +639,6 @@ Unit* FindNextUnmarkedLocalUnit(void)
     return 0;
 }
 
-// Picks a unit of the local player, scrolls the map to it and marks it (and
-// every unit in g_game->visibleUnitIdList with the same owner) as selected. When the first
-// search fails, the selected flag of every unit is cleared and the search is
-// repeated, so search, clear and search form one inlined helper.
 static inline Unit* PickUnit(Player* player)
 {
     Unit* u = player->unitsBegin;
@@ -777,18 +683,6 @@ void FocusNextLocalUnit(void)
     u->selectState = 1;
 }
 
-// Finds, in the current team's unit list, a finished unit (bit 5 of the flags
-// dword at +0x110, build fraction at +0x104 down to 0, nothing queued at
-// +0xfb, not attached to something that blocks it) whose type name matches
-// the owning player's name, then centres the view on it and selects it.
-// Layout notes for the neighbours 0x48d4d0 and 0x48d790 (same structs):
-// - the 10 team records at g_game+0x1b63 are 0x14b bytes: +0x27 the player
-//   (its +0x95 is the index), +0x67 / +0x6b the unit list bounds, +0x6a a
-//   Pos for CenterCameraOnMapPosition, +0xa8 a word copied to g_game+0x1436f.
-// - a unit is 0x118 bytes: +0x6a Pos, +0x86 a pointer to a struct with a
-//   flags dword at +0x110, +0x92 the type (unitname at +0x20), +0xa6 a type
-//   index, +0xfb an int, +0x104 the build fraction, +0x110 the flags dword.
-// - the unit array at g_game+0x14357 is indexed by the same 0x118 stride.
 void __cdecl ClearCameraFollowState(void);
 
 // FUNCTION: 0x48d630
@@ -818,10 +712,6 @@ void __stdcall FocusCommander(int param_1)
         }
     }
 }
-
-// The match path in the second loop jumps to the shared `g_game->flags |= flag`
-// tail with a goto; MSVC then duplicates that tail into the match block (reloading
-// g_game after each store through a pointer), which is the original's layout.
 
 // FUNCTION: 0x48d790
 void __stdcall CycleSelection(void)
@@ -908,8 +798,6 @@ bool __stdcall SelectSquad(int id, int param_2)
     Unit* v;
     Unit* w;
     int found;
-    // The outer and nested scans each read through their own Player pointer
-    // local (q, r); sharing or dropping one changes the addressing.
     Player* q = &g_game->players[g_game->localPlayer];
     for (u = q->unitsBegin; u <= q->unitsEnd; u++) {
         if ((*(unsigned char*)&u->flags & 0x20) && u->buildLeft == 0.0f && u->postTransferHoldoff == 0
@@ -962,13 +850,6 @@ select_units:
     return cnt > 0;
 }
 
-// Searches the local player's unit list for a live unit whose type is in the
-// "CTRL_F" category and whose field at +0xac holds the given id. Returns 1 on
-// the first match. The unit's own flags at +0x110 are read as a byte here,
-// while the owner object's flags at the same offset are read as a dword
-// (0x40000000), so both views of the union are used. The guard before the
-// loop (u > end) and the test at the bottom are both present in the original.
-
 // FUNCTION: 0x48dc30
 int __stdcall SquadHasCtrlFMember(int id)
 {
@@ -987,13 +868,6 @@ int __stdcall SquadHasCtrlFMember(int id)
     }
     return 0;
 }
-
-// Scans the local player's unit list for a unit whose +0x110 flags hold 0x20 and
-// 0x80000000, whose +0x104 float is 0.0f, whose +0xfb is clear, whose +0x86
-// owner (when there is one) has flag 0x40000000 and whose +0xac equals the
-// argument. Returns 1 for the first such unit, else 0. The predicate is the
-// negation of the one in the matched DeselectIfIneligible, which clears the unit's
-// 0x10 flag when exactly this state no longer holds.
 
 // FUNCTION: 0x48dd10
 int __stdcall SquadHasReadyMember(int param_1)
@@ -1018,10 +892,6 @@ int __stdcall SquadHasReadyMember(int param_1)
     return 0;
 }
 
-// std::vector<Unit*>::insert(iterator _P, const T& _X) from MSVC 5's <vector>
-// (the two-argument overload, VECTOR line 146): remembers the offset, calls
-// insert(_P, 1, _X), then returns begin() + offset. Element type is Unit*
-// (0x406c00.cpp).
 typedef std::vector<Unit*> Vec_0048ddc0;
 typedef Vec_0048ddc0::iterator (Vec_0048ddc0::*InsertFn_0048ddc0)(
     Vec_0048ddc0::iterator, Unit* const&);

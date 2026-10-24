@@ -1,26 +1,20 @@
-// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash and
-// Space Bunny Free, finished by claude-opus-5-5. Names are provisional.
-// Commits a block for a pool allocation: rounds the request into need/want,
-// takes `want` bytes of reserved address space from the free-block set (the
-// allocator's TakeFreeBlock, inlined here), commits `need` of it with
-// VirtualAlloc, pads the block and records it in the second set.
 #include "../../interfaces/host.h"
 #include <set>
 #include "free_block_map.h"
 
-extern unsigned int g_lastAllocOffset; // offset the last block was handed out at
-extern unsigned int g_freeBlockWraps; // how often the search wrapped around
-extern unsigned int g_committedBytes; // bytes committed
-extern unsigned int g_committedBytesPeak; // high-water mark of g_committedBytes
+extern unsigned int g_lastAllocOffset;
+extern unsigned int g_freeBlockWraps;
+extern unsigned int g_committedBytes;
+extern unsigned int g_committedBytesPeak;
 extern unsigned int g_allocSerial;
 
 class BlockInfo {
 public:
-    unsigned int base;    // +0x0
-    unsigned int size;    // +0x4
-    unsigned int count;   // +0x8
-    char unknown_c[0x20]; // +0xc
-    unsigned int tag;     // +0x2c
+    unsigned int base;
+    unsigned int size;
+    unsigned int count;
+    char unknown_c[0x20];
+    unsigned int tag;
 
     BlockInfo(int a, int b, int c, int d, const char* e);
 };
@@ -37,10 +31,6 @@ char IsBackAlign();
 int GetDebugFillPattern();
 void __cdecl FillPattern(void* at, int value, unsigned int count);
 
-// The allocator's alloc() (0x4db1c0): find a free block
-// of `bytes`, preferring the one the last allocation came from, and hand back
-// the leftovers around the request as new free blocks.
-// Needs `inline`: MSVC 5 does not inline the recursive member on its own.
 inline unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
 {
     if (size() > 0) {
@@ -55,7 +45,6 @@ inline unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
                 lb = it;
         }
         FreeBlockIter cur = lb;
-        // Declared just before the loop, not at the top: it changes how zeros are allocated.
         int tries = 0;
         do {
             if (cur == end()) {
@@ -65,12 +54,10 @@ inline unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
                 tries++;
             }
             if (cur->length >= bytes) {
-                // Copies the free block's value: its fields share one 8-byte local.
                 Pair_004db000 b = *cur;
                 EraseCopyIter(cur);
                 if (g_lastAllocOffset == 0)
                     g_lastAllocOffset = b.offset;
-                // The clamp reads g_lastAllocOffset directly; going through mark shifts registers.
                 unsigned int mark;
                 if (g_lastAllocOffset >= b.offset && g_lastAllocOffset + bytes <= b.offset + b.length)
                     mark = g_lastAllocOffset;
@@ -79,7 +66,6 @@ inline unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
                 if (mark > b.offset)
                     InsertOrFind(Pair_004db000(b.offset, mark - b.offset));
                 unsigned int end = mark + bytes;
-                // Length written as offset - mark + length - bytes: the other form is shorter.
                 if (end < b.offset + b.length)
                     InsertOrFind(Pair_004db000(end, b.offset - mark + b.length - bytes));
                 g_lastAllocOffset = end;

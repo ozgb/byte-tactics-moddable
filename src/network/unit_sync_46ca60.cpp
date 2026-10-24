@@ -1,4 +1,3 @@
-// Decompiled by GPT-5.6-Terra, finished by Sonnet 5.5. Names are provisional.
 #include <list>
 #include <map>
 #include <vector>
@@ -20,7 +19,7 @@ typedef List_0046ca60::iterator (List_0046ca60::iterator::*PostIncFn_0046ca60)(i
 EraseFn_0046ca60 g_erase_0046ca60 = &List_0046ca60::erase;
 PostIncFn_0046ca60 g_postinc_0046ca60 = &List_0046ca60::iterator::operator++;
 
-struct UnitSyncEntry {                 // the map mapped type, 0x10 bytes
+struct UnitSyncEntry {
     int x;
     int y;
     short w;
@@ -28,7 +27,7 @@ struct UnitSyncEntry {                 // the map mapped type, 0x10 bytes
     int limit;
 };
 
-class VecInt_0046ca60 {               // std::vector<int>
+class VecInt_0046ca60 {
 public:
     std::allocator<int> alloc;
     int* _First;
@@ -42,20 +41,20 @@ public:
     }
 };
 
-class UnitSyncPlayer {                 // 0x5c bytes
+class UnitSyncPlayer {
 public:
-    int id;                            // +0x00
-    VecInt_0046ca60 ids;               // +0x04
-    VecInt_0046ca60 pairs;             // +0x14
-    char unknown_24[0x18];             // +0x24
-    VecInt_0046ca60 sentQueue;         // +0x3c
-    VecInt_0046ca60 heldQueue;         // +0x4c
+    int id;
+    VecInt_0046ca60 ids;
+    VecInt_0046ca60 pairs;
+    char unknown_24[0x18];
+    VecInt_0046ca60 sentQueue;
+    VecInt_0046ca60 heldQueue;
 };
 
 static inline void DestroyR0_0046ca60(UnitSyncPlayer* _F, UnitSyncPlayer* _L);
 static inline void DestroyR1_0046ca60(UnitSyncPlayer* _F, UnitSyncPlayer* _L);
 static inline void DestroyR2_0046ca60(UnitSyncPlayer* _F, UnitSyncPlayer* _L);
-class VecElems_0046ca60 {              // std::vector<UnitSyncPlayer>
+class VecElems_0046ca60 {
 public:
     std::allocator<UnitSyncPlayer> alloc;
     UnitSyncPlayer* _First;
@@ -96,7 +95,6 @@ static inline void DestroyR2_0046ca60(UnitSyncPlayer* _F, UnitSyncPlayer* _L)
 
 class UnitSync {
 public:
-    // Real std::map: its erase keeps the symbols.csv name.
     std::map<unsigned int, UnitSyncEntry> rects;
     VecElems_0046ca60 elems;
     std::list<int> ids;
@@ -119,7 +117,6 @@ public:
 extern Game* g_game;
 
 // FUNCTION: 0x46ca60
-// __fastcall: keeps the erase loop comparing the iterator slot directly.
 void __fastcall FinishUnitSync()
 {
     ((UnitSync *)g_game->sync)->ApplyToUnitTypes();

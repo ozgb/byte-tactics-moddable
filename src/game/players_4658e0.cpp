@@ -1,10 +1,3 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
-// Is point (x, y) or point (x+dx, y+dy) visible to the local player?  The
-// 12-byte Position local (6 shorts, x/y/z among them) is zeroed with an
-// inlined memset and then filled from the arguments. When bit 1 of the game
-// map flags word at g_game+0x14281 is set the player's explored byte map at +0x7c
-// (width +0x80, height +0x84) is used, otherwise the shared visibility bit
-// mask at +0x14273 with this player's bit (g_game+0x2a43).
 #include <memory.h>
 #include "../../interfaces/ref.h"
 #pragma pack(push, 1)
@@ -53,12 +46,9 @@ static inline int IsSeen(Map_004658e0* map, Pos_004658e0* pos)
 // FUNCTION: 0x4658e0
 int __stdcall IsFootprintVisible(Map_004658e0* map, int x, int y, int dx, int dy, short size)
 {
-    // Local copy of map: keeps the pointer in eax across both evaluations.
     Map_004658e0* m = map;
-    // unsigned int: char or int changes the test and the register assignment.
     unsigned int vis;
     Pos_004658e0 pos;
-    // Kept even though the stores are dead: reproduces the original prologue.
     memset(&pos, 0, sizeof(pos));
     pos.x = (short)(x << 4);
     pos.y = size;

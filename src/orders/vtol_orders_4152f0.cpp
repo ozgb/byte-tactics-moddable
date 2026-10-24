@@ -1,10 +1,4 @@
 #include "../../interfaces/seams.h"
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6, verified by GPT-6.1-Sol, finished by space-bunny-free, edited by deepseek-v4.1-flash, edited by Claude Opus 5.5, matched by Claude Opus 5.5. Names are provisional.
-// VTOL patrol order handler for construction aircraft. State 0 starts
-// patrolling ("Patrolling"; PrepVtolClimb). State 1 sets the next waypoint,
-// then lands on a free pad when damaged (VTOL_LANDING), helps build or guards
-// a unit it can see (VTOL_HELPBUILD), or reclaims metal or energy
-// (VTOL_RECLAIM).
 #include <vector>
 
 #include "../state/block.h"
@@ -40,7 +34,6 @@ void __stdcall AppendOrder(Unit*, Order*);
 int __stdcall IssueRepairOrder(Unit*, Unit*, int);
 union Fixed { int v; struct { unsigned short frac; short whole; } p; };
 
-// inline: no function may be compiled before VtolRepairPatrolOrder, or the landed test returns.
 inline void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 {
     g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
@@ -69,7 +62,6 @@ static inline int Land(Unit* unit, Order* order)
             return 1;
         }
     }
-    // Empty statement after the health test folds the landed test away.
     do {} while (0);
     return 0;
 }
@@ -81,16 +73,13 @@ static inline float Total(float base, float amount)
     return value;
 }
 
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x4152f0
 int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags)
 {
-    // flags is unsigned int: the repeated 0xe0 then keeps order in esi.
     if ((flags & 0x48) != 0) {
         order->SetDeadlineTicks(0x1e);
         return 0;
     }
-    // The loop lets the four reclaim arms share the last arm's constructor tail.
     for (;;) {
         switch (order->state) {
         case 0:
@@ -140,7 +129,6 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
             Fixed range;
             range.v = 0xf00000;
             if (g_seams.map->PickRandomReclaimableResourcesInRadius(&unit->pos, range.v, &energy, &energyAmount, &metal, &metalAmount)) {
-                // Amounts read through GetEnergy/GetMetal and Total: gives the x87 load order.
                 if (((Player*)unit->player)->GetMetal() < ((Player*)unit->player)->metalCapacity * 0.2 && metal) {
                     order->SetAttachedFx(0);
                     AppendOrder(unit, new (kSim) Order("VTOL_RECLAIM", 0, metal, 0, 0, 0));

@@ -1,8 +1,4 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
 #include <stdio.h>
-
-// Two functions with aligned frames (`and esp, -8`) under the default flags,
-// no /Op: the doubles they pass and receive are enough for MSVC to align.
 
 #pragma pack(push, 1)
 #include "../network/player_info.h"
@@ -11,12 +7,12 @@
 
 struct Game_00466050 {
     char unknown_0[0x1b63];
-    Player players[10];                // +0x1b63
+    Player players[10];
     char unknown_2851[0x2a42 - 0x2851];
-    unsigned char localPlayer;         // +0x2a42
-    unsigned char playerIndex;         // +0x2a43
+    unsigned char localPlayer;
+    unsigned char playerIndex;
     char unknown_2a44[0x38a37 - 0x2a44];
-    char gameTime[0x1c];               // +0x38a37
+    char gameTime[0x1c];
 };
 #pragma pack(pop)
 
@@ -24,9 +20,6 @@ extern Game_00466050* g_game;
 
 #include "../files/files_api.h"
 
-// Loads the "Players" section of a saved game: the human player, the game
-// clock, and each player's resources, statistics, logo, side and alliances
-// from its "Player%i" section (a player without one gets no controller).
 // FUNCTION: 0x466050
 void __stdcall LoadPlayers(HapiBank* file)
 {
@@ -69,7 +62,6 @@ void __stdcall LoadPlayers(HapiBank* file)
     }
 }
 
-// Saves what LoadPlayers loads, for every player that has a controller.
 // FUNCTION: 0x4662f0
 void __stdcall SavePlayers(HapiBank* file)
 {

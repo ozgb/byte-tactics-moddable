@@ -1,11 +1,5 @@
-// Decompiled by Opus, space-bunny-free, Sonnet 5.5, deepseek-v4.1-flash, GPT-6.1-sol, claude-opus-5-5, mimo-v2.6-pro, GPT-6, DeepSeek V4.1 Flash, deepseek-v4.1, Space Bunny Free, Haiku, Claude Opus 5.5, Claude Sonnet 5.5, claude-sonnet-5-5 and Sonnet. Names are provisional.
-// The unit code: map cell and height helpers, the highest point along a line, the unit memory pool, creating
-// a unit (InitUnitFromType, InitUnitScript, InitUnit, CreateUnit and the
-// network CreateUnitFromPacket) and killing units (KillUnit, ApplyUnitDeath).
-
 #include <stdio.h>
 #include "../state/block.h"
-// Included only for its declarations: the symbol counter of GetCellMeanHeight needs them.
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
@@ -17,17 +11,17 @@ class CobScript;
 class UnitMotion;
 class UnitResources;
 struct ObjectState_00485d40;
-struct Object3do;                      // object definition, only passed on
+struct Object3do;
 
 #pragma pack(push, 1)
 struct Cell {
-    unsigned short unit;               // +0x0
+    unsigned short unit;
     char unknown_2[0x4 - 0x2];
-    unsigned char height;              // +0x4
-    unsigned char high;                // +0x5
-    unsigned char low;                 // +0x6
+    unsigned char height;
+    unsigned char high;
+    unsigned char low;
     char metal;
-    unsigned short feature;            // +0x8
+    unsigned short feature;
     char unknown_a[0xd - 0xa];
 };
 
@@ -35,13 +29,12 @@ struct Cell {
 
 struct Entry_486360 {
     char unknown_0[0xf4];
-    unsigned short next;               // +0xf4
+    unsigned short next;
     char unknown_f6[0x100 - 0xf6];
 };
 
 #include "../network/player_info.h"
 
-// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
 int StepTowards(int, int, int);
 
 struct Unit;
@@ -52,24 +45,24 @@ struct Unit;
 
 #include "cob_types.h"
 
-union TypeFlags {                      // the type's word at +0x241
+union TypeFlags {
     unsigned int all;
     struct {
-        unsigned int movOrder : 2;     // bits 0-1
-        unsigned int fireOrder : 2;    // bits 2-3
+        unsigned int movOrder : 2;
+        unsigned int fireOrder : 2;
         unsigned int initCloaked : 1;
         unsigned int b5 : 1;
         unsigned int b6 : 1;
-        unsigned int b7 : 1;           // bit 7
+        unsigned int b7 : 1;
         unsigned int b8 : 1;
-        unsigned int b9 : 1;           // bit 9
+        unsigned int b9 : 1;
         unsigned int b10 : 1;
         unsigned int b11 : 1;
         unsigned int b12 : 1;
         unsigned int b13 : 1;
         unsigned int b14 : 1;
         unsigned int b15 : 1;
-        unsigned int hi : 16;          // bits 16-31
+        unsigned int hi : 16;
     } bits;
     struct {
         unsigned int lo : 18;
@@ -80,42 +73,40 @@ union TypeFlags {                      // the type's word at +0x241
     };
 };
 
-// A view of UnitDef (units/unit_def.h): its bit-field flag words and ShortPair
-// offset do not fit that header, so it stays a view of its own.
-struct UnitType {                      // 0x249 bytes
+struct UnitType {
     char unknown_0[0x20];
-    char name[0x20];                   // +0x20
+    char name[0x20];
     char unknown_40[0x14a - 0x40];
     Point16 offset;
     char unknown_14e[0x15a - 0x14e];
-    int limit;                         // +0x15a
+    int limit;
     char unknown_15e[0x16e - 0x15e];
     union {
-        int modelMaxY;                 // +0x16e
+        int modelMaxY;
         struct {
             short unknown_16e;
-            short x170;                // +0x170
+            short x170;
         };
     };
     char unknown_172[0x18a - 0x172];
-    float x18a;                        // +0x18a
-    ScriptTable* data;               // +0x18e
+    float x18a;
+    ScriptTable* data;
     char unknown_192[0x1bc - 0x192];
-    unsigned short corpse;             // +0x1bc
+    unsigned short corpse;
     char unknown_1be[0x1fa - 0x1be];
     union {
-        unsigned int maxHealth;        // +0x1fa
+        unsigned int maxHealth;
         short hp;
     };
     char unknown_1fe[0x202 - 0x1fe];
-    short x202;                        // +0x202
+    short x202;
     char unknown_204[0x210 - 0x204];
-    unsigned short buildangle;         // +0x210
+    unsigned short buildangle;
     char unknown_212[0x22e - 0x212];
-    unsigned char buildMenuPageCount;  // +0x22e
-    unsigned char mobile;              // +0x22f
+    unsigned char buildMenuPageCount;
+    unsigned char mobile;
     char unknown_230[0x241 - 0x230];
-    TypeFlags flags;                   // +0x241
+    TypeFlags flags;
     char unknown_245[0x249 - 0x245];
 };
 
@@ -125,9 +116,9 @@ struct Fixed_00485070 {
 };
 
 struct Pos_00485070 {
-    Fixed_00485070 x;                  // +0x0
-    Fixed_00485070 y;                  // +0x4
-    Fixed_00485070 z;                  // +0x8
+    Fixed_00485070 x;
+    Fixed_00485070 y;
+    Fixed_00485070 z;
 };
 
 
@@ -148,8 +139,6 @@ struct Vec3_004853b0 {
     Fixed_004853b0 z;
 };
 
-// This header's symbol ids replace those of the local aim callback view
-// (docs/c2-regalloc.md).
 #include "../weapons/unit_weapon_slot.h"
 
 class SpatialBucket {
@@ -165,8 +154,6 @@ public:
 
 #include "../game/unit_resources.h"
 
-// This header's symbol ids replace those of three declarations that were here
-// to keep 0x485140 and 0x4854a0 matching (docs/c2-regalloc.md).
 #include "../util/angles.h"
 
 #include "unit.h"
@@ -199,13 +186,9 @@ int __stdcall GetCellHeight(Point16_00485010* p)
     return 0;
 }
 
-// Returns the average of the two height bytes (+5, +6) of the map cell under a
-// 16.16 fixed-point position, or -1 off the map.
-
 static inline Cell* GetCellCachedWidth(int x, int y)
 {
     if (x >= 0) {
-        // Width read into its own local after the x >= 0 test: decides the register tie.
         int w = g_game->width;
         if (x < w && y >= 0 && y < g_game->height)
             return &g_game->cells[w * y + x];
@@ -216,18 +199,12 @@ static inline Cell* GetCellCachedWidth(int x, int y)
 // FUNCTION: 0x485140
 int __stdcall GetCellMeanHeight(Pos_00485070* p)
 {
-    // One statement for x and y: settles the order of the two height-byte loads.
     int x = p->x.whole / 16, y = p->z.whole / 16;
     Cell* cell = GetCellCachedWidth(x, y);
     if (cell)
         return (cell->low + cell->high) >> 1;
     return -1;
 }
-
-// Converts map cell (x, y) to a 16.16 fixed-point position (cell * 16 in x
-// and z, the cell's height byte in y); leaves `out` unchanged off the map.
-// The zeroing is an inlined memset (a zero register stored three times
-// through a copy of the pointer).
 
 // FUNCTION: 0x485330
 void __stdcall GetCellPosition(int x, int y, Pos_00485070* out)
@@ -241,10 +218,6 @@ void __stdcall GetCellPosition(int x, int y, Pos_00485070* out)
     }
 }
 
-// Clamps a 16.16 fixed-point position's x and z to the map
-// ([0, mapWidthWorld) and [0, mapHeightWorld) in whole units).
-
-// Built as a bitfield struct in a local: plain integer arithmetic folds (size - 1) << 16.
 static inline Fixed_004853b0 MakeFixed(int i)
 {
     Fixed_004853b0 f;
@@ -266,8 +239,6 @@ void __stdcall ClampPositionToMap(Vec3_004853b0* p)
         p->z = MakeFixed(g_game->baseY - 1);
 }
 
-
-// Copies one player's visibility bit into another player's bit on every cell.
 // FUNCTION: 0x485420
 void __stdcall ShareMapInfo(unsigned char from, unsigned char to)
 {
@@ -280,15 +251,6 @@ void __stdcall ShareMapInfo(unsigned char from, unsigned char to)
             *p |= toBit;
     }
 }
-
-// This translation unit stands in for <algorithm> with __stdcall
-// instantiations, because the original was built with /Gz and its sort helpers
-// are callee-clean (0x488810, 0x488920, 0x488960). The three helper templates
-// carry their real global names (QuickSort/InsertShift/Partition) so
-// the recursive and out-of-line calls at 0x485691/0x48574b/0x48576d/0x485778
-// reference the names data/symbols.csv already has, while the body and
-// one-level inline stay exactly as the std:: originals. The std headers are
-// included for their __cdecl helper templates (copy_backward) and type traits.
 
 #include <iterator>
 #include "../../interfaces/seams.h"
@@ -410,7 +372,6 @@ void __stdcall AllocateUnitMemory(void)
             *(unsigned short*)((unsigned char*)item->unitsBegin.get() + 0xa8);
         *(unsigned short*)((char*)item + 0x71) =
             *(unsigned short*)((unsigned char*)item->unitsEnd.get() + 0xa8);
-        // Item fields read back directly, no `slot` local: keeps the edx/esi roles.
         for (unsigned char* q = (unsigned char*)item->unitsBegin.get();
              q <= (unsigned char*)item->unitsEnd.get(); q += 0x118) {
             ((Unit*)q)->player = item;
@@ -420,8 +381,6 @@ void __stdcall AllocateUnitMemory(void)
     }
 }
 
-// Ordering of two items: by the key at +4 when the mode object reports 3,
-// otherwise by address.
 // FUNCTION: 0x485940
 int __stdcall ComparePlayers(Player* a, Player* b)
 {
@@ -458,8 +417,6 @@ void FreeUnitMemory(void)
 
 int __stdcall RandomInt(int range);
 
-// Sets up a unit from its unit type: flags, offsets, screen position, weapon
-// targets and the squad. The screen Y projection uses the passed position Z.
 // FUNCTION: 0x485a40
 void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
 {
@@ -544,30 +501,15 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
     g_seams.ai->SetUnitSquad(unit, 0);
 }
 
-// Builds the piece-tree "Object State" block of a placed object, called from
-// the three places that finish placing a unit. The block comes from
-// CreatePlayerObjectState, which also reorders the entries to match the build list, when
-// the definition reached through +0x92 has object data at +0x18e; a 0x544-byte
-// variable block is allocated for the object first and told about that data.
-// Without the data the plain CreateObjectState builds the block and the owner
-// pointer at +0xc is filled in by hand. Both arms store the block at +0x9e and
-// clear its flag at +0x10.
-//
-// Both calls take the definition object (g_game->unitModels[id]) as their
-// argument.
-
-
 struct ObjectState_00485d40 {
     char unknown_0[8];
-    int dirty;                         // +0x8
-    void* unit;                        // +0xc
-    int drawFrame;                     // +0x10
+    int dirty;
+    void* unit;
+    int drawFrame;
 };
 
 #include "cob_script.h"
 
-// Unused here: this header and these forward declarations take the symbol ids that keep
-// AllocateUnitMemory (0x4854a0) and KillUnit (0x4864b0) matching (docs/c2-regalloc.md).
 #include "../sound/sound.h"
 struct BmpFileHeader;
 struct BmpInfo;
@@ -595,35 +537,15 @@ void __stdcall InitUnitScript(Unit* self)
         self->state = (SpotState*)CreateObjectState(obj);
         ((ObjectState_00485d40*)self->state.get())->unit = self;
     }
-    // Shared tail after the if/else: reloads the block in both exits.
     ((ObjectState_00485d40*)self->state.get())->drawFrame = 0;
 }
 
-// The compiler-generated scalar deleting destructor of UnitScript, the
-// only class derived from CobScript (src/units/cob.cpp). Its
-// vtable at 0x4fd698 has the base's 21 slots, all overridden; slot 20 holds
-// this function. The derived class has no destructor of its own, so the
-// implicit one only calls the base destructor.
-//
-// The overrides live at 0x480770-0x481470. Slots 7-19 here carry the base
-// names, with their addresses (from 0x4fd698) noted beside them. All 20 are
-// defined as members of UnitScript (src/units/unit_script.cpp).
-//
-// InitUnitScript builds the object (`new` of 0x544 bytes, then this class's
-// vtable).
-// The global below exists only to emit the vtable and this COMDAT, as in
-// src/game/data_files_42a870.cpp.
-
 // FUNCTION: 0x485e30 ??_GUnitScript@@UAEPAXI@Z
 static UnitScript* s_object;
-// A namespace-scope `new` would construct the object during CRT init, and the
-// base constructor reads a global that is not set until later.
 UnitScript* emit_00485e30() { return new UnitScript; }
 
 #include "../orders/unit_motion.h"
 
-// Creates the unit's 0x2f-byte object (constructor 0x43dc00) and copies a
-// value from the unit type.
 // FUNCTION: 0x485e50
 void __stdcall CreateUnitMotion(Unit* unit)
 {
@@ -633,16 +555,6 @@ void __stdcall CreateUnitMotion(Unit* unit)
 
 extern void* g_weaponAimCobVtable[];
 
-
-// Initialises a unit: finds its unit type, gives the aim callback of each of
-// the three weapon slots (at +8, +0x24 and +0x40) its vtable, stores the type
-// id at +0xa6, then hands the unit to the position/flags setter, the object
-// builder and two more methods. When the unit type's +0x22f is 1 the unit
-// also gets a new UnitMotion and the type's +0x210 copied to +0x66, the tail
-// of the matched CreateUnitMotion inlined.
-// The three vtable stores are guarded by `if (unit)` but the +0xa6 store right
-// after them, and the new expression at the end, are not: a null unit pointer
-// writes to 0xa6, then to 0, and reads 0x92. Kept as the original has it.
 // FUNCTION: 0x485e90
 void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
 {
@@ -662,16 +574,8 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
     }
 }
 
-// Creates a unit of a given type for a player: refuses when the type is not
-// buildable or the player already has its limit of that type, takes the
-// requested unit slot (or the first free one) from the player's unit list,
-// initialises it (InitUnit inlined) and registers it.
-
 #include "../game/mission_conditions.h"
 #include "../state/sim_globals.h"
-
-// Unused here: the symbol id this declaration takes keeps 0x4854a0 matching
-// after the header moved the file's symbol count (docs/c2-regalloc.md).
 
 void __stdcall UpdateUnitHeight(Unit* unit);
 void __stdcall AddUnitToMap(Unit* unit);
@@ -747,26 +651,17 @@ found:
         }
     }
     g_seams.los_radar->RevealNewUnit(unit);
-    // Array subscript, not a byte-offset cast: it fixes the SIB operand order.
     g_game->players[player].unitCount++;
     g_game->players[player].unitsCreated++;
     g_seams.players->NotifyUnitCreated(g_game->list_391ed, 0, unit);
     return unit;
 }
 
-// Creates a unit from a spawn record (the 0x11-byte record the build and
-// placement code fills in: player, unit type, unit id, position). It takes the
-// unit slot for the record's id out of the unit array, refuses to go on when
-// that player has no unit list, clears the slot when it is still in use,
-// initialises the unit (the matched InitUnit, inlined), then registers it
-// with UpdateUnitHeight, AddUnitToMap, RevealNewUnit and the list manager and bumps
-// the player's counters at +0x144 and +0x140.
-
 #pragma pack(push, 1)
-struct Spawn_004861d0 {                  // 0x11 bytes
-    unsigned char player;                // +0x0
-    unsigned short type;                 // +0x1
-    unsigned short id;                   // +0x3
+struct Spawn_004861d0 {
+    unsigned char player;
+    unsigned short type;
+    unsigned short id;
     Vec3 pos;
 };
 #pragma pack(pop)
@@ -791,7 +686,6 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, Spawn_004861d0* spawn
     UpdateUnitHeight(unit);
     AddUnitToMap(unit);
     g_seams.los_radar->RevealNewUnit(unit);
-    // Indexed again from g_game, not through pl: keeps the player index live early.
     g_game->players[player].unitCount++;
     g_game->players[player].unitsCreated++;
     g_game->list_391ed->NotifyUnitCreated(unit);
@@ -800,14 +694,11 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, Spawn_004861d0* spawn
 
 struct Result_486360 {
     char unknown_0[0x18];
-    int velY;                        // +0x18
-    int velZ;                        // +0x1c
+    int velY;
+    int velZ;
 };
 
-// GetGroundHeight (units_485070.cpp) only matches in a file of its own: its symbol
-// ids have to stay below a low limit.
 int __stdcall GetGroundHeight(Pos_00485070* pos);
-// Also declared for the symbol count that AllocateUnitMemory needs.
 int __stdcall FindHighestPointOnLine(Vec3 a, Vec3 b);
 void __stdcall EmitSmoke(Pos_00485070* pos, int a, int b, int c);
 
@@ -850,24 +741,15 @@ int __stdcall IsUnitCommander(Unit* unit)
     return _strcmpi(g_game->names_37f5f[unit->player->info->side].name, ((UnitType*)unit->def.get())->name) == 0;
 }
 
-// A live unit that changed its type (the linked unit name at g_game+0x37f5f
-// matches the unit type's name) recomputes a "Killed" kill count and sends the
-// 0xb byte killed packet (type 0xc) it builds here to its own player; the
-// handler ApplyUnitDeath takes the same packet. param_2 is the kill type
-// (the packet's high nibble at +0xa): 7 means a spy / non-kill path, 4/5/9 or a positive
-// health skip the recount, otherwise the kills are a percentage of the
-// type's maxHealth.
-
 #pragma pack(push, 1)
 struct UnitKilledPacket {
-    unsigned char type;                // +0x0
-    unsigned short unitId;             // +0x1
-    int attackerPlayerNetId;           // +0x3, the player net id of the last attacker slot
-    unsigned short attackerUnitId;     // +0x7, 0 for none
-    signed char cobKilledSeverity;     // +0x9, the Killed script's first result
-    // 4-bit bitfields, not a plain char: they give the XOR read-modify-writes.
-    unsigned char wreckageLevel : 4;   // +0xa
-    unsigned char killType : 4;        // +0xa
+    unsigned char type;
+    unsigned short unitId;
+    int attackerPlayerNetId;
+    unsigned short attackerUnitId;
+    signed char cobKilledSeverity;
+    unsigned char wreckageLevel : 4;
+    unsigned char killType : 4;
 };
 #pragma pack(pop)
 
@@ -906,7 +788,6 @@ void __stdcall KillUnit(Unit* unit, int param_2)
             flag = 0;
         }
         UnitKilledPacket cmd;
-        // unitId before the severity: sets the register roles.
         cmd.unitId = unit->id;
         cmd.cobKilledSeverity = amount;
         cmd.type = 0xc;
@@ -929,9 +810,6 @@ void __stdcall KillUnit(Unit* unit, int param_2)
         }
     }
 }
-
-// Handles the "unit died" record that 0x4864b0 builds: credits the kill, updates the
-// kill leaderboard ("%s has taken the lead with %d kills"), then tears the unit down.
 
 extern char g_killedScriptName[];
 extern char g_takenLeadFormat[];
@@ -1037,12 +915,10 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
             int mine = g_game->commanderDeath == 2 ? rec->commanderKills : rec->kills;
             int i = 10;
             Player* p = g_game->players;
-            // do/while over a Player pointer: otherwise the frame grows.
             do {
                 if (p->type != 0) {
                     bool hid = p->info->bit6;
                     if (!hid) {
-                        // Two compare arms: the compiler merges their setg.
                         int ahead;
                         if (g_game->commanderDeath == 2)
                             ahead = mine > p->commanderKills;
@@ -1080,7 +956,6 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     }
 
     if (cmd->killType == 5 && unit->attacker != 0) {
-        // Field pointer, not a Unit* copy; and the copy into f is needed too.
         Ref<Unit>* par = &unit->attacker;
         float health = 1.0f - unit->buildLeft;
         float f = health;
@@ -1103,7 +978,6 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     if (cmd->cobKilledSeverity > 0 && unit->buildLeft == 0.0f)
         g_seams.weapons->DetonateUnitWeapon(unit, cmd->killType == 3);
     if (cmd->wreckageLevel > 0) {
-        // Local flag: without it the script's virtual delete uses another register.
         int flag = cmd->killType != 7;
         CreateUnitCorpse(unit, cmd->wreckageLevel, flag);
     }
@@ -1124,7 +998,6 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         unit->motion = 0;
     }
     unit->unitDefIndex = 0;
-    // Keep this order: adjacent clears would fold into one `and`.
     unit->flags &= ~0x10000000;
     unit->def = (UnitDef*)(UnitType *)g_game->defs.get();
     unit->flags &= ~0x30;
@@ -1165,17 +1038,12 @@ void KillAllUnits(void)
     }
 }
 
-// Walks one player slot's unit list and either damages every unit whose owner
-// is a human or computer player (DamageUnit) or fires its second weapon and
-// flags it (DetonateUnitWeapon / KillUnit).
-
 // FUNCTION: 0x486f10
 void __stdcall KillPlayerUnits(unsigned char player)
 {
     Player* p = &g_game->players[player];
     if (p != 0) {
         if (p->unitCount != 0) {
-            // Indexed again from g_game, not through p: keeps the index base clean.
             Unit* u = g_game->players[player].unitsBegin;
             Unit* last = g_game->players[player].unitsEnd;
             if (u != 0) {
@@ -1200,8 +1068,6 @@ void __stdcall KillPlayerUnits(unsigned char player)
     }
 }
 
-// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md);
-// SaveUnits stands in for the ids the weapon slot header moved.
 void __stdcall NopRetC_B(int, int, int);
 
 struct Vec3_004851c0 {
@@ -1213,14 +1079,12 @@ struct Vec3_004851c0 {
 // FUNCTION: 0x4851c0
 int __stdcall FindHighestPointOnLine(Vec3_004851c0 a, Vec3_004851c0 b)
 {
-    // dz, then dx, as named locals written back into b before the copy; y stays in place on b.
     int dz = b.z - a.z;
     b.z = dz;
     b.y -= a.y;
     int dx = b.x - a.x;
     b.x = dx;
     Vec3_004851c0 d = b;
-    // n computed in each arm with one `n++` after: the two tails merge.
     int n;
     if (abs(dx) < abs(dz))
         n = abs(dz) / 0x100000;

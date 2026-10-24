@@ -1,5 +1,3 @@
-// Decompiled by Opus, Haiku and Sonnet. Names are provisional.
-
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 #include "../files/files_api.h"
 void __stdcall FatalError(char* path);
@@ -13,9 +11,6 @@ unsigned int* __stdcall BuildLightTable(void* palette);
 void __stdcall BuildGrayTable(unsigned int palette);
 void __stdcall BuildBlueTable(unsigned int palette);
 
-// Loads palettes\PALETTE.ALP (a 0x10000-byte table) when it exists;
-// otherwise builds it from the palette with BuildAlphaTable and saves it.
-// Returns the table (freed again in the load case). Same shape as 0x42e1d0.
 // FUNCTION: 0x42e140
 unsigned int* __stdcall LoadAlphaTable(void* palette)
 {
@@ -35,9 +30,6 @@ unsigned int* __stdcall LoadAlphaTable(void* palette)
     return table;
 }
 
-// Loads palettes\PALETTE.SHD (a 0x2000-byte shade table) when it exists;
-// otherwise builds it from the palette with BuildShadeTable and saves it.
-// Returns the table (freed again in the load case).
 // FUNCTION: 0x42e1d0
 unsigned int* __stdcall LoadShadeTable(void* palette)
 {
@@ -57,9 +49,6 @@ unsigned int* __stdcall LoadShadeTable(void* palette)
     return table;
 }
 
-// Loads palettes\PALETTE.LHT (a 0x2000-byte lighting table) when it exists;
-// otherwise builds it from the palette with BuildLightTable and saves it.
-// Returns the table (freed again in the load case). Twin of 0x42e1d0 (SHD).
 // FUNCTION: 0x42e260
 unsigned int* __stdcall LoadLightTable(void* palette)
 {

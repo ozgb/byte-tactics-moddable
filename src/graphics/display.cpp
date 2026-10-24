@@ -1,7 +1,3 @@
-// Decompiled by Opus, space-bunny-free, GPT-6.1-sol, deepseek-v4.1, deepseek-v4.1-flash, Space Bunny Free, Claude Fable 5.1, DeepSeek V4.1 Flash, GPT-6, Claude Opus 5.5, Sonnet, muse-spark-1.3-free, Haiku and Sonnet 5.5. Names are provisional.
-// The display module: the display context (window, DirectDraw and GDI set-up,
-// palette, screen size, flags and work area), the installed DirectX version
-// check, the display mode list, the timer table and the frame rate counter.
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -10,34 +6,30 @@
 
 #include "rect.h"
 
-// +0xf0: the display context's state flags. Set through the bitfield and read
-// whole by SetFullScreen.
 union Flags_4b5980 {
     unsigned short value;
     struct {
-        unsigned short opt : 1;        // bit 0
-        unsigned short bit1 : 1;       // bit 1, full screen
-        unsigned short gdi : 1;        // bit 2
-        unsigned short bit3 : 1;       // bit 3
-        unsigned short bit4 : 1;       // bit 4
-        unsigned short has_c0 : 1;     // bit 5
-        unsigned short has_c4 : 1;     // bit 6
-        unsigned short has_c8 : 1;     // bit 7
-        unsigned short has_cc : 1;     // bit 8
-        unsigned short has_d0 : 1;     // bit 9
-        unsigned short sound_opt : 1;  // bit 10
-        unsigned short quitting : 1;   // bit 11
-        unsigned short bit12 : 4;      // bits 12 to 15
+        unsigned short opt : 1;
+        unsigned short bit1 : 1;
+        unsigned short gdi : 1;
+        unsigned short bit3 : 1;
+        unsigned short bit4 : 1;
+        unsigned short has_c0 : 1;
+        unsigned short has_c4 : 1;
+        unsigned short has_c8 : 1;
+        unsigned short has_cc : 1;
+        unsigned short has_d0 : 1;
+        unsigned short sound_opt : 1;
+        unsigned short quitting : 1;
+        unsigned short bit12 : 4;
     } bits;
 };
 
-// The frame counter at +0x1da: milliseconds accumulated since the last sample,
-// the last tick, the frames since then and the rate of the last second.
 struct FrameCounter_4b66a0 {
-    int accum;                       // +0x0
-    unsigned int lastTick;           // +0x4
-    int frames;                      // +0x8
-    int rate;                        // +0xc
+    int accum;
+    unsigned int lastTick;
+    int frames;
+    int rate;
 
     void Tick()
     {
@@ -56,84 +48,76 @@ struct FrameCounter_4b66a0 {
     }
 };
 
-// The display's DirectDraw objects at +0x84.
 struct DirectDrawState {
     void *ddraw;
     void *primary;
     void *back;
     void *clipper;
     void *palette;
-    void *activeSurface;         // +0x98
-    int haveBackBuffer;          // +0x9c
+    void *activeSurface;
+    int haveBackBuffer;
 };
 
-// The display context at g_display. Packed to 2: the mode struct and the two
-// ints after it sit at 0x1ea, 0x1fa and 0x1fe, and videoFlags is a word at
-// +0x202.
 #pragma pack(push, 2)
 struct App_4b5980 {
     void* hInstance;
-    int nCmdShow;                        // +0x04
-    char* className;                     // +0x08
-    char* title;                         // +0x0c
+    int nCmdShow;
+    char* className;
+    char* title;
     void* wndProc;
-    unsigned short menuId;               // +0x14
-    // Pads WNDCLASSA to +0x18 by hand, for the same packing reason.
+    unsigned short menuId;
     char unknown_16[2];
     char wc[0x28];
     void* hwnd;
     int windowed;
     char unknown_48[8];
     char unknown_50[0x80 - 0x50];
-    void (__cdecl *callback)(int, int, int); // +0x80
-    DirectDrawState draw;                // +0x84
-    Rect mode;                           // +0xa0
+    void (__cdecl *callback)(int, int, int);
+    DirectDrawState draw;
+    Rect mode;
     void* font;
     char unknown_b4[0xc4 - 0xb4];
-    int shadeTable;                      // +0xc4
-    int lightTable;                      // +0xc8
+    int shadeTable;
+    int lightTable;
     char unknown_cc[0xd4 - 0xcc];
-    int width;                           // +0xd4
-    int height;                          // +0xd8
-    int useOverrideSurface;              // +0xdc
-    int active;                          // +0xe0
+    int width;
+    int height;
+    int useOverrideSurface;
+    int active;
     char unknown_e4[0xe8 - 0xe4];
-    int tickScale;                       // +0xe8, ticks per second
-    int wa_left;                         // +0xec, work area left
-    Flags_4b5980 flags;                  // +0xf0, work area top
+    int tickScale;
+    int wa_left;
+    Flags_4b5980 flags;
     char wa_rest[0xfc - 0xf2];
     char unknown_fc[0x1da - 0xfc];
-    FrameCounter_4b66a0 counter;         // +0x1da
-    Rect startMode;                      // +0x1ea
-    int startWidth;                      // +0x1fa
-    int startHeight;                     // +0x1fe
-    unsigned short videoFlags;           // +0x202
+    FrameCounter_4b66a0 counter;
+    Rect startMode;
+    int startWidth;
+    int startHeight;
+    unsigned short videoFlags;
     char unknown_204[0x214 - 0x204];
     tagPALETTEENTRY entries[256];
-    float scale;                         // +0x614
-    void** items;                        // +0x618
-    int itemCount;                       // +0x61c
-    int availPhys;                       // +0x620
-    int unknown_624;                     // +0x624
+    float scale;
+    void** items;
+    int itemCount;
+    int availPhys;
+    int unknown_624;
     char unknown_628[0x728 - 0x628];
-    unsigned char lastDir;               // +0x728, the first byte of the last directory set
+    unsigned char lastDir;
 };
 #pragma pack(pop)
 
-// One display mode, as the EnumModesCallback enum callback stores it.
 struct Mode_004b5330 {
     unsigned int width;
     unsigned int height;
     unsigned int refreshRate;
 };
 
-// The caller's list: a count and the array of modes to fill.
 struct ModeList_004b5330 {
-    int count;                         // +0x0
-    Mode_004b5330* modes;              // +0x4
+    int count;
+    Mode_004b5330* modes;
 };
 
-// A point the mouse code starts from: the 24 bytes of Event_4b5cc0.
 struct View_4b5980 {
     int x;
     int y;
@@ -145,21 +129,20 @@ struct View_4b5980 {
 
 #include "surface.h"
 
-// 24 byte event packet shared with SetCurrentMouseEvent and PushMouseEvent.
 struct Event_4b5cc0 {
-    int x;          // +0x00
-    int y;          // +0x04
-    int buttons;    // +0x08
-    int time;       // +0x0c
-    int message;    // +0x10
-    int flag;       // +0x14
+    int x;
+    int y;
+    int buttons;
+    int time;
+    int message;
+    int flag;
 };
 
 struct Timer_4b63f0 {
-    void* callback;                    // +0
-    int id;                            // +4, the handle the callback removes
-    int interval;                      // +8, -1 when the slot is free
-    int countdown;                     // +0xc
+    void* callback;
+    int id;
+    int interval;
+    int countdown;
 };
 
 struct TimerTable_4b63f0 {
@@ -173,7 +156,7 @@ typedef void (__stdcall *TimerCb_4b63f0)(int);
 
 extern App_4b5980* g_display;
 extern TimerTable_4b63f0 g_timerSlots;
-extern unsigned int g_lastTimerTick;   // last tick count, in game ticks
+extern unsigned int g_lastTimerTick;
 extern long g_gfxBlitLockHeld;
 extern long g_gfxBlitLockOwner;
 extern void* g_gfxBlitLockEvent;
@@ -204,9 +187,6 @@ void __stdcall FreeGrayTable(App_4b5980* obj);
 void __stdcall FreeBlueTable(App_4b5980* obj);
 void __cdecl GameFreeThunk(void* p);
 
-// Re-applies the display palette: in GDI mode selects and realizes the
-// HPALETTE on the window's DC, otherwise attaches the DirectDraw palette to
-// the primary surface. Returns 1 on success.
 // FUNCTION: 0x4b4f50
 int ApplyPalette()
 {
@@ -218,7 +198,6 @@ int ApplyPalette()
     return host_palette_apply();
 }
 
-// Stores a callback and the argument it will be called with.
 // FUNCTION: 0x4b4fd0
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param)
 {
@@ -226,24 +205,12 @@ void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param)
     g_timerSlots.closeHandlerArg = param;
 }
 
-// Releases the display's DirectDraw objects (palette, surfaces, then the
-// DirectDraw object itself) and clears the pointers.
 // FUNCTION: 0x4b4ff0
 void __stdcall ReleaseDirectDraw(App_4b5980* d)
 {
     host_display_close();
 }
 
-// Reads the installed DirectX version: first through dsetup.dll's
-// DirectXSetupGetVersion, then, if that fails, through
-// HKLM\Software\Microsoft\DirectX (the "InstalledVersion" DWORD on NT, the
-// "Version" string on Win9x), and compares the result with the wanted version.
-// The caller (0x4263b0) asks for 4.05.00.0155 (DirectX 5), or 3 on NT.
-//
-// One thing in the original still looks like Cavedog's own bug, kept as it is:
-// the "installed major version differs" arm at 0x4b5233, reached when the major
-// half is not the wanted one, compares the major half against argument 2 (the
-// minor half) instead of against argument 1.
 // FUNCTION: 0x4b5070
 int __stdcall CheckDirectXVersion(int want0, int want1, int want2, int want3, int want4)
 {
@@ -292,9 +259,6 @@ void __stdcall EnumModesCallback(const host_display_mode* desc, void* context)
     }
 }
 
-// Fills the list with the display modes to offer. In GDI mode the modes come
-// from a fixed table plus the two big desktop sizes when the screen is big
-// enough; in DirectDraw mode they come from EnumDisplayModes. Returns 1.
 // FUNCTION: 0x4b5370
 int __stdcall GetDisplayModes(ModeList_004b5330* list)
 {
@@ -339,10 +303,6 @@ int __stdcall GetDisplayModes(ModeList_004b5330* list)
     return result;
 }
 
-// Switches the display between DirectDraw full screen (mode != 0: cooperative
-// level, display mode, flipping primary with one back buffer, clipper, palette,
-// then redraws the saved picture) and a windowed GDI DIB section (mode == 0),
-// under the display lock at g_gfxBlitLockHeld, and finally reloads the palette.
 static inline void FreeGdi_004b5510(App_4b5980 *d)
 {
     d->windowed = 0;
@@ -459,7 +419,6 @@ int __stdcall InitEnvironment(App_4b5980* d)
     d->draw.activeSurface = 0;
     d->unknown_624 = 0;
     d->useOverrideSurface = 0;
-    // Three plain bitfield statements, not one whole-word expression.
     d->flags.bits.quitting = 0;
     d->hwnd = 0;
     d->flags.bits.sound_opt = (d->videoFlags >> 9) & 1;
@@ -475,13 +434,10 @@ int __stdcall InitEnvironment(App_4b5980* d)
 
     d->items = 0;
     d->itemCount = 0;
-    // w is declared before h.
     int w = d->startWidth;
     int h = d->startHeight;
     d->width = w;
     d->height = h;
-    // bits 1..8 of the video flags become bits 2..9 of the flag word
-    // Named int local: adds the temporary the original's second flag update has.
     int subsys = (d->videoFlags & 0x1fe) << 1;
     d->flags.value = (d->flags.value & 0xfc03) | subsys | 1;
     if (d->flags.bits.has_c4) {
@@ -614,9 +570,6 @@ int DispatchHostEvents()
     return alive;
 }
 
-// Shuts a display object down: stops the input thread, frees the item list and
-// the five cached objects, releases the DirectDraw surfaces and the GDI
-// objects, then asks for the work area again.
 // FUNCTION: 0x4b6110
 void __stdcall ShutdownEnvironment(App_4b5980* d)
 {
@@ -646,9 +599,6 @@ int GetDisplay(void)
     return (int)g_display;
 }
 
-// Shuts the application down: marks it as quitting, calls SetFullScreen(0)
-// when flag 1 is set, shows an optional message box and posts WM_DESTROY
-// to the main window.
 // FUNCTION: 0x4b6230
 void __stdcall QuitApp(char* message)
 {
@@ -662,7 +612,6 @@ void __stdcall QuitApp(char* message)
     host_window_post(HOST_EVENT_DESTROY);
 }
 
-// Fatal error: shows an optional message box and exits the process.
 // FUNCTION: 0x4b6290
 void __stdcall FatalError(char* message)
 {
@@ -692,8 +641,6 @@ int GetTickRate()
     return g_display->tickScale;
 }
 
-// Milliseconds since boot scaled by the rate at +0xe8 of the object at
-// g_display, divided by 1000 (unsigned, so `mul` by the magic number).
 // FUNCTION: 0x4b6340
 unsigned int GetTicks()
 {
@@ -749,8 +696,6 @@ int __stdcall AddTimer(int interval, int id, TimerCb_4b63f0 callback)
     return -1;
 }
 
-// Disables one entry of the timer table (period = -1, see 0x4b6510);
-// returns 0 when the index is out of range.
 // FUNCTION: 0x4b64d0
 int __stdcall RemoveTimer(int i)
 {
@@ -762,8 +707,6 @@ int __stdcall RemoveTimer(int i)
     return 1;
 }
 
-// Resets the timer table (period = -1 disables an entry) and restarts the
-// clock used by UpdateTimers.
 // FUNCTION: 0x4b6510
 void ResetTimers()
 {
@@ -780,10 +723,6 @@ unsigned long GetMilliseconds(void)
     return host_time_ms();
 }
 
-// Frame rate counter: adds the time since the last call to the counter, and once
-// a second stores the number of frames in that second as the frame rate. When
-// there is no offscreen GDI device context it draws "FRATE <rate>" over the
-// frame through the surface's device context.
 // FUNCTION: 0x4b6570
 int __stdcall DrawFrameRate()
 {

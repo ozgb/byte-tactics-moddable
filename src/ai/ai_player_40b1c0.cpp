@@ -1,7 +1,3 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// Sums the player's signed byte table (at +0x91) over the units within
-// `range` of `pos`; the distance is the 64-bit high product (>> 32).
-
 #include <vector>
 #include "../state/sim_allocator.h"
 #pragma pack(push, 1)

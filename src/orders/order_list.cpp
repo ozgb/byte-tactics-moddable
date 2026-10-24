@@ -1,12 +1,3 @@
-// Decompiled by space-bunny-free, Space Bunny Free, Sonnet, Opus, Haiku, Claude Sonnet 5.5, Claude Opus 5.5, DeepSeek V4.1 Flash, GPT-6.1-sol, GPT-6, deepseek-v4.1, deepseek-v4.1-flash and mimo-v2.6-pro. Names are provisional.
-// The unit's order list: the nodes (Order) linked through the unit's
-// two lists at +0x5c and +0x60, their creation, insertion, deletion, and the
-// dispatcher that walks the list and calls one helper per kind flag bit; then
-// adding, removing and driving the command nodes in the two lists, the global
-// order-type table at 0x512340 and its sort, and the unit's mover (UnitMotion).
-// The sort's five out-of-line instantiations (0x43c720, 0x43c940, 0x43c990,
-// 0x43ca70, 0x43cb20) are the inline helpers the two registration functions
-// (0x43bc90 and 0x43c050) use, so they are defined here.
 #include "win_types.h"
 #include <stdio.h>
 #include <string.h>
@@ -99,14 +90,10 @@ static inline Vec3 PosMinus(const Vec3& a, const Vec3& b)
     return r;
 }
 
-// The temporary the position is built through (the derived type is what
-// makes the compiler materialise it).
 struct Vec3Init_0043a1f0 : Vec3 {
     Vec3Init_0043a1f0(int a, int b, int c) { x = a; y = b; z = c; }
 };
 
-// A 4-byte point of two shorts, and the temporary the constructor builds it
-// through (the derived type is what makes the compiler keep the temporary).
 struct PointInit_0043a1f0 : Point16 {
     PointInit_0043a1f0() {}
     PointInit_0043a1f0(short a, short b) { x = a; y = b; }
@@ -117,21 +104,19 @@ struct PointInit_0043a1f0 : Point16 {
 
 #include "../network/player.h"
 
-// The unit's target: the object at unit+0x96, whose +0xe4 is the divisor
-// 0x439d20 uses.
 struct Target_0043d6d0 {
-    int active;                        // +0x0
+    int active;
     char unknown_4[0x73 - 0x4];
-    unsigned char type;                // +0x73
+    unsigned char type;
     char unknown_74[0xe4 - 0x74];
-    unsigned short field_e4;           // +0xe4
+    unsigned short field_e4;
 };
 
 struct TargetData_0043d6d0 {
     char unknown_0[8];
     Vec3 velocity;
     char unknown_14[0x20 - 0x14];
-    int speed;                         // +0x20
+    int speed;
 };
 
 struct Path_0043d6d0 {
@@ -139,40 +124,40 @@ struct Path_0043d6d0 {
 };
 
 class MovementClass;
-struct UnitType_0043cd20 {           // 0x249 bytes
+struct UnitType_0043cd20 {
     char unknown_0[0x20];
-    char name[0x20];                 // +0x20
+    char name[0x20];
     char unknown_40[0x192 - 0x40];
-    int maxvelocity;                   // +0x192, the range
+    int maxvelocity;
     char unknown_196[0x19a - 0x196];
-    int brakerate;                     // +0x19a
-    int acceleration;                  // +0x19e
-    int bankscale;                     // +0x1a2
-    int pitchscale;                    // +0x1a6
+    int brakerate;
+    int acceleration;
+    int bankscale;
+    int pitchscale;
     char unknown_1aa[0x1ae - 0x1aa];
-    int moverate1;                     // +0x1ae
-    int moverate2;                     // +0x1b2
+    int moverate1;
+    int moverate2;
     Ref<MovementClass> movementclass;
-    unsigned short max_turn;           // +0x1ba
+    unsigned short max_turn;
     char unknown_1bc[0x202 - 0x1bc];
-    short range;                       // +0x202
+    short range;
     char unknown_204[0x214 - 0x204];
-    unsigned short maneuverleashlength; // +0x214
+    unsigned short maneuverleashlength;
     char unknown_216[0x22c - 0x216];
-    unsigned char draft;               // +0x22c
+    unsigned char draft;
     char unknown_22d[0x230 - 0x22d];
-    unsigned char defaultmissiontype;  // +0x230
+    unsigned char defaultmissiontype;
     char unknown_231[0x241 - 0x231];
     union {
-        int flags1;                    // +0x241
-        unsigned char flags;           // +0x241
+        int flags1;
+        unsigned char flags;
         struct {
             unsigned int mode_bits : 11;
-            unsigned int flag_800 : 1; // bit 11
+            unsigned int flag_800 : 1;
         };
         struct {
             unsigned int low : 19;
-            unsigned int b19 : 1;      // bit 19
+            unsigned int b19 : 1;
             unsigned int rest : 12;
         };
     };
@@ -187,22 +172,15 @@ struct Unit;
 
 #include "../weapons/weapon_def.h"
 
-// This header's symbol ids replace those of the Slot view and of the
-// declarations dropped above and below (docs/c2-regalloc.md).
 #include "../weapons/unit_weapon_slot.h"
 
 #include "../game/game.h"
 
 #include "../units/unit.h"
 
-// The whole (high) halves of the position's x and z components, which 43b1f0
-// reads as its own short view of the position.
 static inline short PosXWhole(Unit* unit) { return *(short*)((char*)&unit->pos + 2); }
 static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos + 0xa); }
 
-// One 25-byte record of the global order-type table at 0x512344 (a
-// std::vector's _First): the status text at +0, a per-kind notify callback at
-// +4, the draw mask at +0xc and its name at +0x15.
 #include "order_type_entry.h"
 #include "../state/sim_globals.h"
 
@@ -225,20 +203,10 @@ void __stdcall DrawPathAnim(void* a, void* b, Order* e, Vec3* p, int c);
 void __stdcall DrawWeaponCoverage(void* a, void* b, Order* e, Vec3* p, int c);
 void __stdcall DrawOrderRangeRing(void* a, void* b, Order* e, Vec3* p, int c);
 
-// The list-walking dispatcher of the unit: for every object linked into the unit's
-// list at +0x5c (link field at +0x4a, kind byte at +0x4) it looks up the kind's
-// default flags in the table at g_missionOrderTableBegin (0x19-byte entries, the flags dword
-// at +0xc, indexed by the kind byte) and, masked with the `mask` parameter, calls
-// one of five helpers per bit: bit 0 -> 0x438c00, bit 1 -> 0x4394e0, bit 2 ->
-// 0x4399f0, bit 3 -> 0x439740, bit 4 -> 0x4390a0. Bit 4 is only acted on for the
-// first object of the list (`done`). Every helper is __stdcall with five dword
-// arguments and takes the position as a pointer to a 12-byte object.
 // FUNCTION: 0x439b30
 void __stdcall DrawOrderOverlays(Unit* unit, unsigned int mask, void* obj,
                             void* sel, int flag)
 {
-    // Two copies, base first: each call but bit 4's is preceded by pos = base,
-    // and the loop ends with base = pos.
     Vec3 base = unit->pos;
     Vec3 pos = unit->pos;
     bool done = false;
@@ -298,8 +266,6 @@ int __stdcall GetBuildWeaponPercent(Unit* owner)
     return 0;
 }
 
-// Sums the amounts of the nodes flagged 0x100 with the given index over both
-// of the owner's node lists (+0x5c and +0x60).
 // FUNCTION: 0x439d80
 int __stdcall SumQueuedBuildCount(Unit* owner, int index)
 {
@@ -339,8 +305,6 @@ int __stdcall GetOrderName(Unit* obj)
     return g_missionOrderTableBegin[0].value;
 }
 
-// Finds the object's list node of the given kind; the kind table's flag
-// 0x40000 selects which of the object's two lists (+0x60 or +0x5c) to search.
 // FUNCTION: 0x439e30
 Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind)
 {
@@ -371,11 +335,6 @@ int __stdcall ReadyOrder(int arg1, int arg2, int arg3)
     return 5;
 }
 
-// Deletes the objects in the owner's list at +0x5c (all of them, or only
-// those without flag 4 when `all` is 0). With `all` set, also deletes every
-// object of the list at +0x60, unlinking each from the list its flag 0x40000
-// selects. Every deleted object except the list's head is marked 0x10000
-// first.
 // FUNCTION: 0x439eb0
 void __stdcall DeleteOrders(Unit* owner, int all)
 {
@@ -399,9 +358,6 @@ void __stdcall DeleteOrders(Unit* owner, int all)
     }
 }
 
-// Unlinks `node` from the owner's list at +0x5c (or +0x60 when the node has
-// flag 0x40000) and deletes it; every node except the head of the +0x5c list
-// is marked 0x10000 first. 0x439eb0 inlines the same code.
 // FUNCTION: 0x439f80
 void __stdcall DeleteOrder(Unit* owner, Order* node)
 {
@@ -437,7 +393,6 @@ void __stdcall MoveOrderToTail(char* param_1, char* param_2)
     ((Order*)param_2)->next = 0;
 }
 
-// Links `child` into the parent's list in front of `before` (see EnqueueOrderType).
 static inline void InsertBefore(Unit* p, Order* child, Order* before)
 {
     Ref<Order>* link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
@@ -469,19 +424,6 @@ void __stdcall EnsurePatrolReturnOrder(Unit* p, Order* item)
     item->flags_42 |= 0x8000;
 }
 
-// The constructor of Order (destructor 0x43a1f0, vtable 0x4fd2c8).
-// The rest of the class is in order_queue_4384a0.cpp.
-// It first stores 0x4fd2cc, the vtable of the inline constructor of the base
-// class OrderBase, then runs the member initialisers, then stores its
-// own vtable. Each vtable has one slot: the base's is the empty 0x43a1e0 and
-// the derived class overrides it with 0x438870 (which ORs bits into +0x4e).
-// The other constructor, 0x43a420 (which loads the object from a file),
-// stores the same two vtables; the destructor stores only 0x4fd2c8, so the
-// base has no destructor of its own.
-// The link member's constructor puts the object in its owner's list and the
-// body then points the link's value at the object; the kind's default flag
-// bits come from the kind table at g_missionOrderTableBegin, with bits 9 and 10 cleared
-// when the list owner or the position pointer is absent.
 static inline MissionType MissionTypeOf(unsigned char k)
 {
     MissionType m;
@@ -494,8 +436,6 @@ Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
     : kind(MissionTypeOf(k)), link(o, 0), start(PointInit_0043a1f0(0, 0)), cached(PointInit_0043a1f0(0, 0)),
       id(a), count(b), progress(c), created((unsigned int)g_game->ticks)
 {
-    // Through the inline method: a plain `link.value = this` reorders the
-    // position pointer's compare before the vtable store.
     link.SetValue(this);
     state = 0;
     flags = 0;
@@ -514,16 +454,11 @@ Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
         link.SetUnit(0);
 }
 
-// Slot 0 of OrderBase's vtable (0x4fd2cc): an empty virtual method.
-// OrderBase is the base of Order (vtable 0x4fd2c8), which
-// overrides this slot with 0x438870 (see order_queue_4384a0.cpp).
 // FUNCTION: 0x43a1e0
 void OrderBase::OrStatusFlags(unsigned int)
 {
 }
 
-// Makes sure the text file has a "UTYPENAME<id>" key: if it is missing and
-// `id` is a valid unit type, writes the type's name under that key.
 // FUNCTION: 0x43a2d0
 void __stdcall WriteUnitTypeNameKey(HapiBank* file, unsigned short id)
 {
@@ -533,11 +468,6 @@ void __stdcall WriteUnitTypeNameKey(HapiBank* file, unsigned short id)
         file->SetStringItem(key, ((UnitType_0043cd20 *)g_game->defs.get())[id].name);
 }
 
-// Resolves a unit definition slot number to a unit type id. The parsed text
-// file can name the type of each slot with the key "UTYPENAME<id>"; when that
-// key is present the name it holds is looked up in the unit type table by
-// FindUnitTypeId. Otherwise the id'th unit type whose +0x241 flags do not have
-// bit 5 set is taken, and its table index minus one is returned.
 // FUNCTION: 0x43a360
 short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
 {
@@ -545,8 +475,8 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
     sprintf(key, "UTYPENAME%4d", id);
     if (file->HasItem(key))
         return g_seams.units->FindUnitTypeId(file->GetStringItem(key, 0));
-    int i, n = 0;                     // n counts every table entry, k only the
-    unsigned short k = 0;             // ones without flag bit 5
+    int i, n = 0;
+    unsigned short k = 0;
     for (i = 1; i < g_game->unitDefCount; i++, n++) {
         if (!(((UnitType_0043cd20 *)g_game->defs.get())[(unsigned short)i].flags & 0x20)) {
             if (k == id)
@@ -596,8 +526,6 @@ void __stdcall AppendOrder(Unit* owner, Order* node)
     }
 }
 
-// Appends a node to the end of the owner's list that its flag 0x40000
-// selects (+0x60 when set, +0x5c otherwise); compare 0x43acb0.
 // FUNCTION: 0x43ad10
 void __stdcall AppendOrderToTail(Unit* owner, Order* node)
 {
@@ -609,9 +537,6 @@ void __stdcall AppendOrderToTail(Unit* owner, Order* node)
     node->next = 0;
 }
 
-// Marks a node with flag 0x1000 and links it into the owner's list at +0x5c
-// just after the node currently carrying that mark (moving the mark to the
-// new node), or at the end of the list when no node has it; compare 0x43ad10.
 // FUNCTION: 0x43ad50
 void __stdcall InsertOrderAfterMarked(Unit* owner, Order* node)
 {
@@ -632,8 +557,6 @@ void __stdcall InsertOrderAfterMarked(Unit* owner, Order* node)
     *link = node;
 }
 
-// Unlinks the node `link` points at and deletes it, marking it 0x10000 (so its
-// destructor does not unlink it again) unless it is the list head.
 static inline void UnlinkNode(Ref<Order>* link, Order* node, Order* first)
 {
     *link = node->next;
@@ -642,7 +565,6 @@ static inline void UnlinkNode(Ref<Order>* link, Order* node, Order* first)
     delete node;
 }
 
-// Unlinks `node` from the list starting at `list` and deletes it.
 static inline void RemoveFromList(Ref<Order>* list, Order* node, Order* first)
 {
     Ref<Order>* link = list;
@@ -655,7 +577,6 @@ static inline void RemoveFromList(Ref<Order>* list, Order* node, Order* first)
     }
 }
 
-// Drops every node of the owner's +0x5c list that has no flag 4.
 static inline void PruneLoose(Ref<Order>* link, Order* first)
 {
     Order* n = *link;
@@ -668,21 +589,17 @@ static inline void PruneLoose(Ref<Order>* link, Order* first)
     }
 }
 
-// Drops the leading run of nodes carrying flag 0x4000, each from the list its
-// own flag 0x40000 selects.
 static inline void PruneUsed(Unit* owner)
 {
     Ref<Order>* base = &owner->list;
     for (Order* n = owner->list; n != 0; n = owner->list) {
         if (!(n->flags_42 & 0x4000))
             break;
-        // Keep the `node = n` copy and the fresh owner->list read at the call.
         Order* node = n;
         RemoveFromList((node->flags_42 & 0x40000) ? &owner->list2 : base, node, owner->list);
     }
 }
 
-// Puts `node` in front of the list head its flag 0x40000 selects (0x43acb0).
 static inline void AddFront(Unit* owner, Order* node)
 {
     Order* before = (node->flags_42 & 0x40000) ? owner->list2 : owner->list;
@@ -698,7 +615,6 @@ static inline void AddFront(Unit* owner, Order* node)
     }
 }
 
-// Puts `node` right after the node carrying flag 0x1000 (0x43ad50).
 static inline void AddMarked(Unit* owner, Order* node)
 {
     Ref<Order>* link = &owner->list;
@@ -718,28 +634,13 @@ static inline void AddMarked(Unit* owner, Order* node)
     *link = node;
 }
 
-// Creates a new Order node of the given kind and links it into the
-// owner's two lists (+0x60 when the node has flag 0x40000, otherwise +0x5c),
-// after pruning them.  With `remove` clear and the new node lacking flag 0x40,
-// every node of the +0x5c list that has no flag 4 is deleted, all but the
-// first getting flag 0x10000 so that its destructor does not unlink it again.
-// Then, while the new node has no flag 0x40000, the leading run of nodes
-// carrying flag 0x4000 is deleted, each from the list its own flag 0x40000
-// selects.  The new node is marked in use (flag 1, plus flag 0x2000 when
-// `remove` is clear) and linked in: in front of the old list head, taking over
-// its flag 0x4000, through the code of 0x43acb0 when the new node has flag
-// 0x20 or 0x40000, otherwise right after the node that carries flag 0x1000, as
-// 0x43ad50 does.
 // FUNCTION: 0x43adc0
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id,
                             Vec3* pos, int param_6, int param_7)
 {
-    // The constructor's owner argument is the fourth parameter, not `owner`,
-    // which stays in its stack slot.
     Order* obj = new (kSim) Order(kind, (Unit*)id, pos, param_6, param_7, 0);
 
     if (remove == 0 && !(obj->flags_42 & 0x40))
-        // Link and head passed separately so the two loads of owner->list stay.
         PruneLoose(&owner->list, owner->list);
 
     if (!(obj->flags_42 & 0x40000))
@@ -755,7 +656,6 @@ void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id,
         AddMarked(owner, obj);
 }
 
-// The second part's own views: the mover object and the sort's holders.
 #pragma pack(push, 1)
 
 class MissionOrderTable {
@@ -767,8 +667,6 @@ public:
     int GetCount(void);
 };
 
-// Unused here: forward declarations of real functions; their symbol ids keep
-// the allocation the merged UnitMotion view moved (docs/c2-regalloc.md).
 void ResetAIPlayers();
 void StepAllGafSequences();
 void ResetNetStats();
@@ -779,18 +677,16 @@ void RefreshSelectionOrders();
 typedef std::vector<Elem_0043c390> Vec_0043c390;
 typedef int(__stdcall* Pred_0043c390)(const Elem_0043c390&, const Elem_0043c390&);
 
-// The movement state saved as "u%04xmob".
 struct Record_0043dd70 {
     Vec3 velocity;
     Vec3 p2;
-    int speed;                         // +0x18
-    short turn;                        // +0x1c
-    int pathLockStamp;                 // +0x1e
-    unsigned char mode : 2;            // +0x22 bits 0-1
-    unsigned char flag : 1;            // +0x22 bit 2
+    int speed;
+    short turn;
+    int pathLockStamp;
+    unsigned char mode : 2;
+    unsigned char flag : 1;
 };
 
-// The behaviour object at +0x0: the path the mover follows.
 class Iface_0043dd20 {
 public:
     virtual void v0(int);
@@ -834,21 +730,17 @@ void __stdcall DeleteOrders(Unit* owner, int all);
 void __stdcall MoveOrderToTail(Unit* owner, Order* node);
 void __stdcall InsertOrderBefore(Unit* owner, Order* node, Order* before);
 
-// |d| <= 0x100000
 static inline int InRange(int d)
 {
     return (unsigned int)(d + 0x100000) <= 0x200000;
 }
 
-// Matches and RemoveNode stay helpers: written in place, the parameters
-// get other registers and the blocks lay out differently.
 static inline int Matches(Order* node, unsigned char kind, int id, int* pos)
 {
     return kind == node->kind.index && (id == 0 || id == (int)node->link.owner.get()) &&
            (!pos || (InRange(pos[0] - node->pos.x) && InRange(pos[2] - node->pos.z)));
 }
 
-// Unlinks `node` from the list its flag 0x40000 selects and deletes it.
 static inline void RemoveNode(Unit* owner, Order* node, Order* first)
 {
     Ref<Order>* link = &owner->list;
@@ -868,10 +760,6 @@ static inline void RemoveNode(Unit* owner, Order* node, Order* first)
     }
 }
 
-// With `remove` set, looks in the owner's list at +0x5c for an object of the
-// given kind (and id, and within 0x100000 of `pos` in x and z, when those are
-// given) and deletes it; otherwise, or when nothing matches, hands all the
-// arguments on to AddOrder.
 // FUNCTION: 0x43afc0
 void __stdcall IssueOrCancelOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7)
 {
@@ -887,11 +775,6 @@ void __stdcall IssueOrCancelOrder(unsigned char kind, int remove, Unit* owner, i
     AddOrder(kind, remove, owner, id, pos, param_6, param_7);
 }
 
-// Adds `amount` to the object's last list node of the given kind and id when the
-// amount is positive (asking AddOrder to make a new node if there is none);
-// when it is not positive it takes the amount off the matching node, deleting
-// nodes (and asking again) until the amount is used up. The kind table's flag
-// 0x40000 selects which of the object's two lists (+0x60 or +0x5c) is used.
 // FUNCTION: 0x43b0b0
 void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
 {
@@ -945,8 +828,6 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
     }
 }
 
-// Puts `cmd` in front of `before` in the list its own flag 0x40000 picks, and
-// copies bit 0x4000 of the command it displaces.
 static inline void Insert(Unit* unit, Order* cmd, Order* before)
 {
     unsigned int which = cmd->flags_42 & 0x40000;
@@ -963,12 +844,6 @@ static inline void Insert(Unit* unit, Order* cmd, Order* before)
     }
 }
 
-// Appends a command object (Order, 0x56 bytes) to the unit's list
-// when the unit is allowed to use one on the target: GetOrderType (with
-// relation 3, then 2) picks the kind of the command. The unit's flags at
-// +0x110 gate it (bits 18-19 and 20-21), except when the third argument is
-// non-zero, and when bit 18 alone is set a second, positional command is made
-// at the unit's own position before the one aimed at the target.
 // FUNCTION: 0x43b1f0
 int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3)
 {
@@ -996,14 +871,6 @@ int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3)
     return 1;
 }
 
-// Sibling of 0x43b1f0: appends command objects (Order, 0x56 bytes)
-// to the unit's list. GetOrderType (relation 8, then 2) picks the kinds; the
-// unit's flags at +0x110 gate the three cases (bits 18-19 equal to 0, 0x40000
-// or 0x80000), and when bit 18 alone is set a second, positional command is
-// made at the unit's own position before the one aimed at the target.
-// The two-command cases differ only in the last constructor argument: the
-// first reads a signed short at def+0x202, the second an unsigned short at
-// def+0x214.
 // FUNCTION: 0x43b400
 int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
 {
@@ -1019,7 +886,6 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
         Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
-        // Explicit `return 1;` in each case: a single trailing return splits the store blocks.
         return 1;
     } else if (f == 0x40000 && !param_3) {
         MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
@@ -1055,7 +921,6 @@ void __stdcall EnqueueOrderType(Unit* p, unsigned char type)
     InsertBefore(p, child, (child->flags_42 & 0x40000) ? p->list2 : p->list);
 }
 
-// 0x439fe0: moves `node` to the end of the +0x5c list.
 void __stdcall MoveOrderToTail(Unit* owner, Order* node)
 {
     Ref<Order>* pp = &owner->list;
@@ -1072,8 +937,6 @@ void __stdcall MoveOrderToTail(Unit* owner, Order* node)
     node->next = 0;
 }
 
-// 0x43b730 inlined into RunOrders: links through 0x43ac60 rather than
-// inlining its body, so the call stays.
 static void InsertCommand(Unit* p, unsigned char type)
 {
     Order* child = new (kSim) Order(type, 0, 0, 0, 0, 0);
@@ -1081,8 +944,6 @@ static void InsertCommand(Unit* p, unsigned char type)
     InsertOrderBefore(p, child, (child->flags_42 & 0x40000) ? p->list2 : p->list);
 }
 
-// Puts the node to sleep: it is due again a random delay (RandomInt(n))
-// plus 30 frames from now.
 static void Wait_0043b7c0(Order* node, int n)
 {
     unsigned int when = RandomInt(n) + 0x1e;
@@ -1090,25 +951,16 @@ static void Wait_0043b7c0(Order* node, int n)
     node->wakeFrame = (unsigned int)g_game->ticks + when;
 }
 
-
-// Clears the unit's three weapon targets.
 static void ClearTargets_0043b7c0(Unit* unit)
 {
-    // Char counter: the loop countdown register depends on it.
     for (char i = 0; i < 3; i++)
         g_seams.targeting->ClearWeaponTarget(unit, i);
 }
 
-// Per-frame driver of a unit's command list (+0x5c): every node that is due
-// (or has a pending bit) is handed to its kind's callback in g_missionOrderTableBegin,
-// and the answer decides what happens to it. The list head is re-read after
-// every node, so a node the callback re-queues is seen again in the same
-// pass. 0x43bad0 is the twin for the +0x60 list.
 // FUNCTION: 0x43b7c0
 void __stdcall RunOrders(Unit* unit)
 {
     Order* node;
-    // This loop shape puts the early returns on the default case's epilogue.
     for (;;) {
         node = unit->list;
         if (node == 0)
@@ -1172,10 +1024,6 @@ void __stdcall RunOrders(Unit* unit)
     InsertCommand(unit, ((UnitType_0043cd20*)unit->def.get())->defaultmissiontype);
 }
 
-// Takes the node out of the parent's list and frees it. The search can fail,
-// when the node is not in the list at all, and then nothing is freed. The head
-// of the list is read before the unlink, so a node that was the head does not
-// get the 0x10000 flag. The local `first` is what forces that early read.
 static void RemoveAndDelete(Unit* p, Order* child)
 {
     Order* first = p->list;
@@ -1194,11 +1042,6 @@ static void RemoveAndDelete(Unit* p, Order* child)
     }
 }
 
-// Drives a parent's list of attach/spot nodes (Order) once per pass:
-// every node that is due (or not waiting) is offered to the callback table
-// g_missionOrderTableBegin, and the answer decides what happens to it. The list is
-// restarted from the head after every node, so nodes added by the callback
-// are seen in the same pass.
 // FUNCTION: 0x43bad0
 void __stdcall RunSecondaryOrders(Unit* p)
 {
@@ -1206,11 +1049,8 @@ void __stdcall RunSecondaryOrders(Unit* p)
     while (child != 0) {
         if (child->flags == 0 || (unsigned int)g_game->ticks >= child->wakeFrame) {
             child->flags = 0;
-            // Case order (3, 1, 0, 2/4, 5/8/9, 6/7, default) sets the body layout.
             switch (g_missionOrderTableBegin[child->kind.index].notify(child->unit, child, 0)) {
             case 3: {
-                // Ask again in a while. The temporary keeps the sum from being
-                // folded into one lea, which is what the original does.
                 unsigned int when = RandomInt(0xf) + 0x1e;
                 child->flags |= 1;
                 child->wakeFrame = (unsigned int)g_game->ticks + when;
@@ -1250,7 +1090,6 @@ typedef Vec_0043c390 SimView_g_missionOrderTableVec;
 #undef g_missionOrderTableVec
 #define g_missionOrderTableVec (*reinterpret_cast<SimView_g_missionOrderTableVec*>(&Sim().g_missionOrderTableVec))
 
-// std::_Unguarded_insert
 // FUNCTION: 0x43c940
 inline void __stdcall InsertShiftOrderTypes(Elem_0043c390* _L, Elem_0043c390 _V, Pred_0043c390 _P)
 {
@@ -1259,7 +1098,6 @@ inline void __stdcall InsertShiftOrderTypes(Elem_0043c390* _L, Elem_0043c390 _V,
     *_L = _V;
 }
 
-// std::_Insertion_sort_1
 // FUNCTION: 0x43c990
 inline void __stdcall InsertionSortOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P,
                                    Elem_0043c390*)
@@ -1276,16 +1114,11 @@ inline void __stdcall InsertionSortOrderTypes(Elem_0043c390* _F, Elem_0043c390* 
         }
 }
 
-// std::_Insertion_sort
 inline void _Insertion_sort_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P)
 {
     InsertionSortOrderTypes(_F, _L, _P, std::_Val_type(_F));
 }
 
-// std::_Median
-// Suspected original bug: the out-of-line copy's epilogue is `ret 0x5c`, four bytes
-// fewer than its callers push (0x60); the error cancels against 0x43cb20, which
-// pops 0x28 for 0x24 bytes of arguments.
 // FUNCTION: 0x43ca70
 inline Elem_0043c390 __stdcall MedianOrderTypes(Elem_0043c390 _X, Elem_0043c390 _Y, Elem_0043c390 _Z,
                                             Pred_0043c390 _P)
@@ -1296,7 +1129,6 @@ inline Elem_0043c390 __stdcall MedianOrderTypes(Elem_0043c390 _X, Elem_0043c390 
         return (_P(_X, _Z) ? _X : _P(_Y, _Z) ? _Z : _Y);
 }
 
-// std::_Unguarded_partition
 // FUNCTION: 0x43cb20
 inline Elem_0043c390* __stdcall PartitionOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L,
                                              Elem_0043c390 _Piv, Pred_0043c390 _P)
@@ -1312,7 +1144,6 @@ inline Elem_0043c390* __stdcall PartitionOrderTypes(Elem_0043c390* _F, Elem_0043
     }
 }
 
-// std::_Sort
 // FUNCTION: 0x43c720
 inline void __stdcall SortOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P,
                                    Elem_0043c390*)
@@ -1327,7 +1158,6 @@ inline void __stdcall SortOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L, Pred_
     }
 }
 
-// std::_Sort_0
 inline void _Sort_0_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P,
                              Elem_0043c390*)
 {
@@ -1341,24 +1171,16 @@ inline void _Sort_0_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390
     }
 }
 
-// std::sort with a predicate
 inline void sort_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P)
 {
     _Sort_0_0043bc90(_F, _L, _P, std::_Val_type(_F));
 }
 
-// The vector's _End at +0xc, declared for the symbol count the sort needs
-// (one declaration here keeps 0x43bc90's inlined sort on the original's
-// registers).
 extern int DAT_0051234c;
 
-// Appends `count` 25-byte records to the global registration table (a
-// std::vector at 0x512340) and sorts the whole table by name. The record has a
-// per-kind notify callback at +4 (0x43bad0 calls it) and its name at +0x15.
 // FUNCTION: 0x43bc90
 void __stdcall RegisterOrderTypes(Elem_0043c390* from, int count)
 {
-    // Own statement: `size() + count` in one expression swaps the lea operands.
     int sz = g_missionOrderTableVec.size();
     g_missionOrderTableVec.reserve(sz + count);
     std::copy(from, from + count, std::back_inserter(g_missionOrderTableVec));
@@ -1371,10 +1193,6 @@ int __stdcall CompareOrderTypeNames(const Elem_0043c390& a, const Elem_0043c390&
     return _strcmpi(a.name, b.name) < 0 ? 1 : 0;
 }
 
-// Registers this module's own entry of the global registration table (the
-// 25-byte record at 0x4fd288) and then calls four other modules' registration
-// functions, each of which calls 0x43bc90 with its own records.
-// Nothing may follow this function in the file: a later function flips the sort order tie.
 // FUNCTION: 0x43c050
 void RegisterAllOrderTypes()
 {
@@ -1397,13 +1215,8 @@ int MissionOrderTable::GetCount(void)
     return first == 0 ? 0 : (last - first) / 0x19;
 }
 
-// std::vector<Elem_0043c390>::_Destroy(first, last) from MSVC 5's <vector>:
-// empty for a trivial element type. Its callers (0x43bc90, 0x43c050)
-// inline vector::reserve on the global vector of 25-byte records at
-// 0x512340 and call this with ecx set to it.
 typedef void (Vec_0043c390::*DestroyFn_0043c390)(Vec_0043c390::iterator, Vec_0043c390::iterator);
 
-// _Destroy is protected: a derived class takes its address to emit it out of line.
 struct Access_0043c390 : Vec_0043c390 {
     static DestroyFn_0043c390 fn;
 };
@@ -1411,21 +1224,10 @@ struct Access_0043c390 : Vec_0043c390 {
 // FUNCTION: 0x43c390 ?_Destroy@?$vector@UElem_0043c390@@V?$allocator@UElem_0043c390@@@std@@@std@@IAEXPAUElem_0043c390@@0@Z
 DestroyFn_0043c390 Access_0043c390::fn = &Access_0043c390::_Destroy;
 
-// std::vector<Elem_0043c390>::insert(iterator, size_type, const _Ty&) of
-// MSVC 5's <vector>, the three-argument insert, emitted out of line: the two
-// callers (0x43bc90 and 0x43c050) insert one 25-byte record at a time into the
-// global table at 0x512340. It calls the global operator new (0x4b4f10) and
-// delete (0x4b4f20). The element is the same 25-byte record as the one
-// _Destroy (0x43c390) destroys.
-// Explicit instantiation: the member is emitted itself, not inlined into a wrapper.
 template class std::vector<Elem_0043c390>;
 
 // FUNCTION: 0x43c3a0 ?insert@?$vector@UElem_0043c390@@V?$allocator@UElem_0043c390@@@std@@@std@@QAEXPAUElem_0043c390@@IABU3@@Z
 
-// std::_Lower_bound(first, last, value, pred, (int*)0) over a sorted table of
-// 25-byte entries (the order-type table at 0x512344..0x512348), instantiated
-// in a file compiled with __stdcall as the default; the one caller (0x43a513)
-// passes the case-insensitive name compare 0x43a940.
 typedef int (__stdcall* Pred_0043c6b0)(const Elem_0043c390& entry, char* name);
 
 // FUNCTION: 0x43c6b0
@@ -1446,8 +1248,6 @@ Elem_0043c390* __stdcall LowerBoundOrderTypes(Elem_0043c390* first, Elem_0043c39
     return first;
 }
 
-// Clamps a turn amount to +-the unit type's limit, applies it to the unit's
-// heading and flags the unit as moved.
 // FUNCTION: 0x43cbb0
 void UnitMotion::ApplyClampedTurnDelta(Unit* unit, short amount)
 {
@@ -1466,7 +1266,6 @@ void UnitMotion::ApplyClampedTurnDelta(Unit* unit, short amount)
     }
 }
 
-// The behaviour object at +0x0: the path the mover follows.
 static inline void ClampToZero(int& value)
 {
     if (value < 0)
@@ -1501,23 +1300,18 @@ static inline void ClampToCell(Vec3& pos, PointInit_0043a1f0 cell, PointInit_004
         pos.z = cz - 0x7ffff;
 }
 
-// Adds `amount` to the object's distance accumulator (clamped at zero), limits
-// it to a range taken from the table at g_slopeSpeedFactor, then writes the offset
-// for the unit's heading at that distance into the velocity.
 // FUNCTION: 0x43cc20
 void UnitMotion::UpdateVelocityFromHeading(Unit* unit, int amount)
 {
     speed = speed + amount;
     ClampToZero(speed);
 
-    // Direction index, limited to the eleven entries of the table.
     int idx = unit->angles.pitch >> 11;
     if (idx < -5)
         idx = -5;
     if (idx > 5)
         idx = 5;
 
-    // 16.16 range from the table entry, halved below sea level.
     int range = (int)(((__int64)(g_slopeSpeedFactor[idx] << 16) * ((UnitType_0043cd20*)unit->def.get())->maxvelocity) >> 16);
     range = (int)(((__int64)range << 16) / 0x640000);
     if (unit->yWhole < g_game->seaLevel && !(((UnitType_0043cd20*)unit->def.get())->flags1 & 0x81000))
@@ -1539,7 +1333,6 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
 {
     if (obj->v5() == 0) {
         turn = 0;
-        // Bound temporary: loads unit before the turn store and keeps the rate in eax.
         const int& amount = -((UnitType_0043cd20*)unit->def.get())->brakerate;
         UpdateVelocityFromHeading(unit, amount);
         return;
@@ -1595,8 +1388,6 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
         turn = 0;
     }
 
-    // speed is copied to spd below so its sign extension is not shared with this
-    // multiply; otherwise it becomes _allmul instead of a one-operand imul.
     int turned = (int)((((__int64)(adiff & 0xffff) * (__int64)speed)
                         / ((UnitType_0043cd20*)unit->def.get())->max_turn));
     int rate = ((UnitType_0043cd20*)unit->def.get())->brakerate;
@@ -1606,7 +1397,6 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
     int r = (int)(((__int64)q * q) >> 32);
     int lim = (int)(((__int64)turned * turned) >> 32) * 4;
 
-    // UpdateVelocityFromHeading stays defined above this function so the two calls cross-jump.
     if (d1 > lim && d2 > r)
         UpdateVelocityFromHeading(unit, ((UnitType_0043cd20*)unit->def.get())->acceleration);
     else
@@ -1617,8 +1407,6 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
 // FUNCTION: 0x43d0d0
 void UnitMotion::ApplyBankAndPitch(Unit* owner, Vec3* v)
 {
-    // Scale and Add stay inlined methods, not separate statements on p2:
-    // each field is then stored immediately.
     Vec3Scale(&p2, 0xf333);
     Vec3Add(&p2, v);
     int xz[2];
@@ -1631,8 +1419,6 @@ void UnitMotion::ApplyBankAndPitch(Unit* owner, Vec3* v)
 }
 #pragma auto_inline(on)
 
-// Changes the 2-bit mode at +0x2e; entering state 1 clears the velocity and
-// speed and clears flag 1 on the owner, any other state sets it.
 // FUNCTION: 0x43d210
 void UnitMotion::SetFlightMode(Unit* owner, int newState)
 {
@@ -1650,12 +1436,6 @@ void UnitMotion::SetFlightMode(Unit* owner, int newState)
     }
 }
 
-// Steering update for the mover object (UnitMotion): in mode 2 it asks the
-// path object for a target position `a`, a target velocity `b` and a heading,
-// damps the velocity, clamps its horizontal speed (bleeding the excess off
-// along the unit's heading), turns the unit towards the heading, then steers
-// p1 towards the target: k * (pos - a) - (velocity - b), limited to the acceleration
-// f18. Finally it stores the new speed and hands the velocity change on.
 // FUNCTION: 0x43d290
 void UnitMotion::SteerAircraft(Unit* unit) {
     if (mode != 2) {
@@ -1683,8 +1463,6 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     float maxd = (float)((UnitType_0043cd20*)unit->def.get())->brakerate * eps;
     if (dist > maxd) {
         int f = (int)((double)maxd / dist * 65536.0);
-        // MulFixed and AddFixed take the component by reference; written
-        // inline the clamp differs.
         MulFixed(velocity.x, f);
         MulFixed(velocity.z, f);
         int g = (int)(((double)dist - maxd) * 65536.0);
@@ -1745,7 +1523,6 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     }
 #else
     float k = -sqrt((2.0f * f18) / hd);
-    // The parentheses keep k * eps in st(2) instead of spilling it.
     float vx = ((float)da.x) * k * eps - (float)db.x * eps;
     float vz = (float)da.z * k * eps - (float)db.z * eps;
     float mag = (float)_hypot(vx, vz);
@@ -1764,32 +1541,19 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     AddFixed(velocity.z, vz);
     speed = Vec3Length(&velocity);
 
-    // Own block so the address-taken delta shares a stack slot with db.
     {
         Vec3 delta = PosMinus(velocity, old);
         ApplyBankAndPitch(unit, &delta);
     }
 }
 
-// Unused here: a real function declared for the symbol count that RegisterOrderTypes
-// (0x43bc90) and UpdatePosition (0x43d6d0) need with the shared Angles16
-// (docs/c2-regalloc.md).
-
-// Moves the unit one step. With a path object it snaps to the path's next
-// point (raised to the draft/sea-level floor for units with the type flag at
-// +0x241 bit 19) and copies the path's velocity; without one it adds the
-// velocity to the position, and if the unit moves into a new cell that the
-// target says is blocked it clamps the position to the current cell and caps
-// the speed at half the type's range.
 // FUNCTION: 0x43d6d0
 void UnitMotion::UpdatePosition(Unit* u)
 {
     if (u->carrier != 0) {
-        // Copy through the returned pointer, not an initialiser.
         Vec3 v;
         v = g_seams.units->GetPiecePosition(u->carrier, (signed char)u->transportPiece);
         if (((UnitType_0043cd20*)u->def.get())->b19) {
-            // MAX stays a macro over the Fixed union with a prvalue second operand.
             *(Fixed_0043d6d0*)&v.y = MAXM_0043d6d0(*(Fixed_0043d6d0*)&v.y, MakeFixed_0043d6d0(((UnitType_0043cd20*)u->def.get())->draft * 0xffff + g_game->seaLevel));
         }
         g_seams.units->SetUnitPosition(u, v, mode);
@@ -1807,8 +1571,6 @@ void UnitMotion::UpdatePosition(Unit* u)
         return;
     }
 
-    // Assigned (not initialised) through the inline operator+: its result temporary
-    // fixes the frame layout. The operands' order is the original's load order.
     Vec3 pos;
     pos = PosPlus(u->pos, velocity);
     int m = mode;
@@ -1817,7 +1579,6 @@ void UnitMotion::UpdatePosition(Unit* u)
 
     lastMoveTick = g_game->ticks;
     PointInit_0043a1f0 draft = *(PointInit_0043a1f0*)&u->footprint;
-    // Field by field, with draft.x * 0x80000 (a << 19 evaluates draft.x first).
     PointInit_0043a1f0 cell;
     cell.x = (pos.x - draft.x * 0x80000 + 0x80000) >> 20;
     cell.y = (pos.z - draft.y * 0x80000 + 0x80000) >> 20;
@@ -1833,7 +1594,6 @@ void UnitMotion::UpdatePosition(Unit* u)
     }
 
     if (flag) {
-        // ClampToCell stays an inline helper taking both Points by value.
         ClampToCell(pos, *(PointInit_0043a1f0*)&u->cell, *(PointInit_0043a1f0*)&u->footprint);
 
         if (speed > (((UnitType_0043cd20*)u->def.get())->maxvelocity / 2)) {
@@ -1843,7 +1603,6 @@ void UnitMotion::UpdatePosition(Unit* u)
             Vec3 vec;
             vec.x = -ScaledSin(angle, half);
             vec.y = 0;
-            // z goes through an int temporary.
             int z = -ScaledCos(angle, half);
             vec.z = z;
             velocity = vec;
@@ -1856,7 +1615,6 @@ void UnitMotion::UpdatePosition(Unit* u)
     g_seams.map->RemoveUnitFromMap(u);
     u->pos = pos;
     *(Point16*)&u->cell = cell;
-    // The (short) cast gives the and/and/or store of the 2-bit field.
     u->mode = (short)m;
     g_seams.map->AddUnitToMap(u);
     u->moved = 1;
@@ -1898,10 +1656,6 @@ void UnitMotion::UpdateMoveRate(Unit* unit)
     unit->flags = (unit->flags & 0xfffffff3) | ((rate & 3) << 2);
 }
 
-// Constructor of the 0x2f-byte behaviour holder stored at unit+0. It zeroes two
-// Vec3-shaped triples and a few scalars, mirrors a value from the unit type and
-// then creates one of four behaviour objects, chosen by the unit's target type
-// (byte at +0x73 == 3) and bit 11 of the unit type's flags at +0x241.
 // FUNCTION: 0x43dc00
 UnitMotion::UnitMotion(Unit* unit)
 {
@@ -1965,8 +1719,6 @@ void UnitMotion::SaveMotion(Unit* info, HapiBank* file)
     file->WriteBox(&hdr, 0x23);
 }
 
-// Load counterpart of 0x43dd70: reads this unit type's movement state back
-// from the unit's "u%04xmob" entry.
 // FUNCTION: 0x43de30
 void UnitMotion::LoadMotion(Unit* unit, HapiBank* file)
 {

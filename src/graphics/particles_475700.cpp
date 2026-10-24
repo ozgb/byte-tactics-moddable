@@ -1,25 +1,17 @@
-// Decompiled by Opus, Haiku and Sonnet. Names are provisional.
-// Stays in its own file: merged with the module's second part the inlined draw
-// rotates its temporaries (particles.cpp).
-// TimedSubParticles (vtable 0x4fd638, 0x34 bytes), derived from ParticleSystem
-// (the family is listed in particles.cpp): the same shape as SmokeParticles,
-// without the fog culling.
-// Needed: without <windows.h> slot 2 subtracts the scroll y before the half height.
 #include "win_types.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <vector>
 
-// The TimedSubParticles 16.16 position and the class.
 #include "timed_sub_particles.h"
 
-struct Position_00475150 {             // 16.16 fixed point; only high words read
+struct Position_00475150 {
     short xFrac;
-    short x;                           // +0x2
+    short x;
     short yFrac;
-    short y;                           // +0x6, the height
+    short y;
     short zFrac;
-    short z;                           // +0xa
+    short z;
 };
 
 #pragma pack(push, 1)
@@ -28,22 +20,20 @@ struct Position_00475150 {             // 16.16 fixed point; only high words rea
 
 extern Game* g_game;
 
-// Declared returning int: the original uses the full eax without masking it.
 int __stdcall GetGafFrameCount(void* ptr);
 void* __stdcall GetGafFrame(void* a, int b);
 void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 
-// One particle, 0x20 bytes.
 struct TimedSubParticle {
-    void* data;                        // +0x00, the animation
+    void* data;
     union {
         Vec3 pos;
         Position_00475150 posw;
     };
-    int limit;                         // +0x10, the rounds it lives
-    int count;                         // +0x14, the rounds so far (the frame)
-    int period;                        // +0x18
-    int timer;                         // +0x1c
+    int limit;
+    int count;
+    int period;
+    int timer;
 
     void Step();
     void DrawParticle(int dest, short px, short py);
@@ -56,7 +46,6 @@ struct TimedSubParticle {
     }
 };
 
-// The particle vector, to call its out-of-line insert under this name.
 class Vec_00476490 {
 public:
     void insert(TimedSubParticle* pos, int count, const TimedSubParticle* src);

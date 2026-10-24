@@ -1,6 +1,3 @@
-// Decompiled by space-bunny-free, deepseek-v4.1-flash, Opus, Claude Opus 5.5, GPT-6, GPT-6.1-sol and mimo-v2.6-pro. Names are provisional.
-// The radar: builds the minimap picture from the terrain icon map, keeps its
-// view and zoom, and draws the units, projectiles and fog over it.
 #include "win_types.h"
 #include <stdio.h>
 #include <math.h>
@@ -15,16 +12,16 @@ struct Quad_4665d0 {
 };
 
 struct Surface_4665d0 {
-    int width;                          // +0x0
-    int height;                         // +0x4
-    int pitch;                          // +0x8
-    int bits;                           // +0xc
-    int zPriority;                      // +0x10
-    int colorKey;                       // +0x14
-    unsigned short x;                   // +0x18
-    unsigned short y;                   // +0x1a
+    int width;
+    int height;
+    int pitch;
+    int bits;
+    int zPriority;
+    int colorKey;
+    unsigned short x;
+    unsigned short y;
     char unknown_1c[0x10];
-    unsigned int flag0 : 1;             // +0x2c
+    unsigned int flag0 : 1;
     unsigned int flag1 : 1;
 };
 
@@ -33,13 +30,13 @@ struct Surface_4665d0 {
 #pragma pack(push, 1)
 
 struct IconSet_00466780 {
-    int count;                      // +0x0
-    unsigned char (*cell)[32][32];  // +0x4
+    int count;
+    unsigned char (*cell)[32][32];
 };
 
 struct Fx_00466c20 {
     char unknown_0[0xcc];
-    unsigned char* colorMap;         // +0xcc
+    unsigned char* colorMap;
 };
 
 struct WeaponDef;
@@ -67,30 +64,23 @@ union Flags14281_00466dc0 {
 
 #include "../weapons/weapon_def.h"
 
-// These headers' symbol ids replace those of seven declarations and a type that
-// were here to balance the ids (docs/c2-regalloc.md).
 #include "../util/angles.h"
 #include "../weapons/unit_weapon_slot.h"
 
-// A partial view of UnitDef (units/unit_def.h) with flags1 as a bit field, which the header lacks.
 struct UnitType_00466dc0 {
     char unknown_0[0x204];
-    short radardistance;                 // +0x204
-    short sonardistance;                 // +0x206
+    short radardistance;
+    short sonardistance;
     char unknown_208[0x20a - 0x208];
-    short radardistancejam;              // +0x20a
-    short sonardistancejam;              // +0x20c
+    short radardistancejam;
+    short sonardistancejam;
     char unknown_20e[0x241 - 0x20e];
-    Flags241_00466dc0 flags1;           // +0x241
-    unsigned char flags2;                // +0x245
+    Flags241_00466dc0 flags1;
+    unsigned char flags2;
 };
 
 #include "../units/unit.h"
 #include "../weapons/projectile.h"
-
-// The four shorts at +0x142e7 are named minimapGadgetX/Y/W/H, originX/
-// originY/sizeX/sizeY and the four-element `dim` the rectangle test indexes,
-// depending on the function; the union in Game keeps every spelling addressable.
 
 #include "../game/game.h"
 #pragma pack(pop)
@@ -121,12 +111,6 @@ void* __stdcall GetGafFrame(void* a, int index);
 void __stdcall DrawCircle(void* surface, int x, int y, int radius, int color);
 void __stdcall DrawDashedCircle(void* surface, int x, int y, int radius, int color,
                             int a6, int a7);
-
-// Rescales a radar picture. The picture is first copied into a temp bitmap of
-// its own size, then p is given the new size (x, y) and used as the surface to
-// draw on, and the copy is blitted into it, scaled to fit (w - 0x20) by
-// (h - 0x80) and centred: when the box is wider than tall the height is the
-// scaled one and it is centred, otherwise the width is.
 
 // FUNCTION: 0x4665d0
 void __stdcall ResizeRadarPicture(GafFrame* pic, int x, int y, int w, int h)
@@ -190,9 +174,6 @@ void __stdcall ResizeRadarPicture(GafFrame* pic, int x, int y, int w, int h)
     GameFreeThunk(temp);
 }
 
-// Rebuilds the radar picture: fits the map onto 126 pixels along its long side,
-// then blits it onto the stored radar frame, or, when there is none, scales the
-// 8x8 icon map up to twice that size through a temporary picture.
 // FUNCTION: 0x466780
 void __stdcall BuildRadarPicture()
 {
@@ -242,7 +223,6 @@ void __stdcall BuildRadarPicture()
     FreeSurface(temp);
 }
 
-// The two rectangle edges are `size + pos - 1`.
 // FUNCTION: 0x4669b0
 void InitRadar()
 {
@@ -251,8 +231,6 @@ void InitRadar()
     g_game->mappedSurface = AllocSurface(g_radarMappedName, g_game->dim.v[2], g_game->dim.v[3]);
     g_game->viewLeft = g_game->dim.v[0];
     g_game->viewTop = g_game->dim.v[1];
-    // viewRight indexes the four radar shorts, viewBottom goes through a char*:
-    // the shape of each address decides the load order.
     g_game->viewRight = g_game->dim.v[2] + g_game->dim.v[0] - 1;
     {
         char* c = (char*)g_game;
@@ -309,11 +287,8 @@ void UpdateRadarMapped()
             int mapY = i * halfHeight;
             int mapX = 0;
             int j = 0;
-            // A while loop, tail in this order: a for loop computes dst+1 before the store.
             while (j < g_game->width_142eb) {
                 int index = (mapY / g_game->screen_h) * halfWidth + mapX / g_game->width_142eb;
-                // Outputs assigned directly in each branch, no pixel temporary;
-                // the unsigned short cast stays.
                 if (!(unsigned short)(g_game->visibilityMask[index] & mask)) {
                     *dst = fog;
                 } else if (t->explored[index]) {
@@ -331,21 +306,11 @@ void UpdateRadarMapped()
     }
 }
 
-// The unit loop's x multiply (`movsx eax, [ebx+0x6c]; movsx ecx,
-// [esi+0x142eb]` in the original) is ordered by a key built from the symbol
-// ids of the two bases plus the displacement. <windows.h> supplies the
-// declaration count that gives the original's order; reading the type through
-// a reference taken at the top of the loop body leaves the x multiply on `u`.
-// The radar helpers use the ByteMap Index/Get methods (width materialised,
-// `mov ecx, [edx+0x80]; imul ecx, edi`) and the slot loop reads `slot->weapon`
-// at each use instead of a `shot` local.
 static Player* Player_Get(unsigned char p)
 {
     return &g_game->players_1b63_14b[0] + p;
 }
 
-// True when (px, py) is inside the current player's visible area. The two
-// halves match the uint8 terrain bitmap and the packed 16-bit bitfield variant.
 static inline int OnRadarByte_00466dc0(Player* pi, int px, int py)
 {
     int tx = px >> 5;
@@ -376,7 +341,6 @@ static inline int OnRadar_00466dc0(int px, int py)
     return OnRadarShort_00466dc0(pi, px, py);
 }
 
-// A unit's screen y (height folded into z) times the minimap scale.
 static inline int ScaleY_00466dc0(Unit* u)
 {
     return ((int)u->zWhole - ((int)u->yWhole >> 1)) * (int)g_game->screen_h;

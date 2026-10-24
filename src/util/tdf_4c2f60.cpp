@@ -1,28 +1,16 @@
-// Decompiled by space-bunny-free, finished by space-bunny-free. Names are provisional.
-// Loads a .TDF file: opens it, takes the file length, reads the whole file
-// into a fresh block, copies it into a "TDF file" block that is NUL
-// terminated, blanks out comments in that copy (TdfFile::StripComments,
-// reached through a base class of the object that holds the tree) and parses
-// it into a new root section named "root" (TdfRecord::TdfRecord). The tree parsed by
-// the previous load is deleted first. Returns 1 on success, 0 when the file
-// cannot be opened or the read fails. The tail of the function is the same
-// code as TdfFile::LoadBuffer (0x4c3120), written out again here.
 #include <vector>
 #include <string.h>
 
 #include "string_ref.h"
 
-// One key/value entry of a section: two reference-counted string handles.
 struct Elem_004c2f60 {
-    StringRef a;                // +0x0 key
-    StringRef b;                // +0x4 value
+    StringRef a;
+    StringRef b;
 };
 
 void __stdcall ReleasePair(char* p);
 
 namespace std {
-// The entries are released by a plain function rather than by an element
-// destructor, so the vector's destroy loop calls this once per element.
 inline void _Destroy(Elem_004c2f60* p)
 {
     ReleasePair((char*)p);
@@ -39,7 +27,6 @@ void* __cdecl GameAllocIgnoreTag(char* name, int size);
 
 #include "../files/files_api.h"
 
-// Own file: needs its own view of TdfRecord (see the note in TdfFile, tdf.cpp).
 // FUNCTION: 0x4c2f60
 int TdfFile::LoadFile(char* path)
 {
@@ -51,7 +38,6 @@ int TdfFile::LoadFile(char* path)
     if (size > 0) {
         char* buf = (char*)GameAllocIgnoreTag(path, size);
         HAPI_SeekFile(file, 0);
-        // got and flag stay locals: result must spill to its frame slot.
         int got = HAPI_readfromfile(file, buf, size);
         if (got >= 0) {
             int flag = HAPI_IsInArchive(file);

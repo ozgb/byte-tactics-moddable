@@ -1,8 +1,3 @@
-// Decompiled by space-bunny-free, finished by Sonnet 5.5. Names are provisional.
-// Bilinear terrain height at a 12.4 fixed point position (x in the high word at
-// +2, z at +10), or -1 outside the map.
-// Kept its own file: merged into units_485010.cpp it is compiled with other
-// registers, and no count of added declarations brings the original back.
 #pragma pack(push, 1)
 #include "../map/cell.h"
 
@@ -15,9 +10,9 @@ struct Fixed_00485070 {
 };
 
 struct Pos_00485070 {
-    Fixed_00485070 x;                  // +0x0
-    Fixed_00485070 y;                  // +0x4
-    Fixed_00485070 z;                  // +0x8
+    Fixed_00485070 x;
+    Fixed_00485070 y;
+    Fixed_00485070 z;
 };
 
 extern Game* g_game;
@@ -36,11 +31,9 @@ int __stdcall GetGroundHeight(Pos_00485070* p)
     Cell* c = &g_game->cells[zc * g_game->width + xc];
     int a = c->height;
     int b = c[1].height;
-    // Advance the pointer instead of indexing c[width]: gives the original's address chain.
     c += g_game->width;
     int e = c->height;
     int f = c[1].height;
-    // Named local used inside the second expression: computed once, stays in ecx.
     int r1 = a + (b - a) * xf / 16;
     return r1 + ((e + (f - e) * xf / 16) - r1) * zf / 16;
 }

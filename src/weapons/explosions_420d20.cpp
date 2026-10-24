@@ -1,17 +1,11 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
 #include <math.h>
 #include <stdlib.h>
 #include "../state/game_rand.h"
-
-// The aligned frame (`and esp, -8`) comes from the default flags here, no /Op:
-// MSVC 5 aligns the frame itself once enough doubles live in stack slots.
 
 #include "../graphics/gaf_frame.h"
 
 GafFrame* __stdcall AllocFrame(const char* name, int width, int height);
 
-// A size x size explosion frame: a noisy, slightly squashed radial gradient
-// from the centre outwards, transparent (0xff) outside the circle.
 // FUNCTION: 0x420d20
 GafFrame* BuildExplosionFrame(int size)
 {

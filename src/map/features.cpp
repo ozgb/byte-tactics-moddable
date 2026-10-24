@@ -1,13 +1,3 @@
-// Decompiled by Opus, DeepSeek V4.1 Flash, Claude Opus 5.5, deepseek-v4.1-flash, deepseek-v4.1, GPT-6, fledge-alpha-free, Haiku, Space Bunny Free, LongCat 2.5 Preview Free, GPT-6.1-sol, space-bunny-free and mimo-v2.6-pro. Names are provisional.
-// The features module's translation unit (0x421e60 to 0x4256a0): the map's
-// feature types and the pool of feature spots, placing, burning, killing and
-// reclaiming them, the per-tick update, saving and loading, and the
-// out-of-line std::vector members they call.
-//
-// 0x421f20, 0x4224b0, 0x422ea0 and 0x424c00 stay in files of their own:
-// their register plans and operand orders follow their old files' symbol ids
-// (docs/c2-regalloc.md), and 0x424c00 also matches only with include/ta_types.h
-// at its exact size.
 // FLAGS: /Gi
 #include "win_types.h"
 #include <stdio.h>
@@ -23,14 +13,14 @@
 
 #pragma pack(push, 1)
 
-struct Gaf;                            // a GAF file's header
+struct Gaf;
 
-struct AnimSrc {                       // a GAF sequence header
+struct AnimSrc {
     unsigned short count;
     unsigned char kind;
 };
 
-struct Anim {                          // an animation reference (0xc bytes)
+struct Anim {
     unsigned short index;
     unsigned short value;
     unsigned char kind;
@@ -84,85 +74,85 @@ struct FeatureDamagePacket {
 
 struct FeatureUnit {
     char unknown_0[0x92];
-    int def;                           // +0x92
+    int def;
     char unknown_96[0xa6 - 0x96];
-    unsigned short unitDefIndex;       // +0xa6
+    unsigned short unitDefIndex;
     char unknown_a8[0x110 - 0xa8];
-    int flags_110;                     // +0x110
-    int flags_114;                     // +0x114
+    int flags_110;
+    int flags_114;
 };
 
 struct AnimEntry {
-    short next;                        // +0x0
-    short prev;                        // +0x2
+    short next;
+    short prev;
     char unknown_4[0x2c];
 };
 
 struct NameEntry {
     char unknown_0[4];
-    char name[0x80];                   // +0x4
+    char name[0x80];
 };
 
 struct AnimManager {
     char unknown_0[0x10];
     Ref<AnimEntry> anim;
     Ref<FeatureUnit> featureUnit;
-    int activeHead;                    // +0x18
-    int idleHead;                      // +0x1c
-    int freeHead;                      // +0x20
+    int activeHead;
+    int idleHead;
+    int freeHead;
     char unknown_24[0x58 - 0x24];
-    int nameCount;                     // +0x58
+    int nameCount;
     char unknown_5c[0x74 - 0x5c];
-    char (*names)[0x100];              // +0x74
+    char (*names)[0x100];
 };
 
-struct List {                          // 0x421f20's feature name list
+struct List {
     char unknown_0[0x1c];
-    int count;                         // +0x1c
-    NameEntry* entries;                // +0x20
+    int count;
+    NameEntry* entries;
 };
 
-struct Feature;                        // the 0x100-byte feature definition
+struct Feature;
 
-struct Spot {                          // a feature spot (0x30 bytes)
-    short prev;                        // +0x0
-    short next;                        // +0x2
+struct Spot {
+    short prev;
+    short next;
     union {
         struct {
-            Anim anim;                 // +0x4
-            Anim shadow;               // +0x10
+            Anim anim;
+            Anim shadow;
         };
         struct {
-            void* state;               // +0x4
-            Vec3 pos;                  // +0x8
-            Vec3 vel;                  // +0x14
+            void* state;
+            Vec3 pos;
+            Vec3 vel;
         };
         struct {
-            unsigned char frame;       // +0x4
+            unsigned char frame;
             char unknown_5[3];
             union {
                 struct {
-                    Vec3 pos2;         // +0x8
+                    Vec3 pos2;
                 };
                 struct {
-                    int unknown_8;     // +0x8
-                    int animIndex;     // +0xc
+                    int unknown_8;
+                    int animIndex;
                 };
             };
         };
     };
-    Rot16 rot;                         // +0x20
-    unsigned short damage;             // +0x26
+    Rot16 rot;
+    unsigned short damage;
     union {
         struct {
-            short x;                   // +0x28
-            short z;                   // +0x2a
+            short x;
+            short z;
         };
-        Point16 cell;                  // +0x28
+        Point16 cell;
     };
-    unsigned short feature;            // +0x2c
+    unsigned short feature;
     union {
-        unsigned char burnTime;        // +0x2e
+        unsigned char burnTime;
         unsigned char timer;
         unsigned char animBits;
         struct {
@@ -171,7 +161,7 @@ struct Spot {                          // a feature spot (0x30 bytes)
         };
     };
     union {
-        unsigned char flags;           // +0x2f
+        unsigned char flags;
         struct {
             unsigned char used : 1;
             unsigned char reclaimed : 1;
@@ -183,76 +173,76 @@ struct Spot {                          // a feature spot (0x30 bytes)
     };
 };
 
-struct Feature {                       // the feature definition (0x100 bytes)
-    char name[0x80];                   // +0x00
-    char description[0x14];            // +0x80
+struct Feature {
+    char name[0x80];
+    char description[0x14];
     union {
-        Point16 footprint;             // +0x94
+        Point16 footprint;
         struct {
-            short footprintx;          // +0x94
-            short footprintz;          // +0x96
+            short footprintx;
+            short footprintz;
         };
     };
     union {
-        void* object;                  // +0x98
-        char filename[0x10];           // +0x98
+        void* object;
+        char filename[0x10];
     };
-    Gaf* anims;                        // +0xa8
-    AnimSrc* seq;                      // +0xac
-    AnimSrc* seqshad;                  // +0xb0
+    Gaf* anims;
+    AnimSrc* seq;
+    AnimSrc* seqshad;
     union {
         struct {
-            AnimSrc* seqburn;          // +0xb4
-            AnimSrc* seqburnshad;      // +0xb8
-            AnimSrc* seqdie;           // +0xbc
-            AnimSrc* seqdieshad;       // +0xc0
-            AnimSrc* seqreclamate;     // +0xc4
-            AnimSrc* seqreclamateshad; // +0xc8
+            AnimSrc* seqburn;
+            AnimSrc* seqburnshad;
+            AnimSrc* seqdie;
+            AnimSrc* seqdieshad;
+            AnimSrc* seqreclamate;
+            AnimSrc* seqreclamateshad;
         };
         struct {
-            AnimPair burn;             // +0xb4
-            AnimPair death[2];         // +0xbc: destroyed, reclaimed
+            AnimPair burn;
+            AnimPair death[2];
         };
         struct {
-            int anim0;                 // +0xb4
+            int anim0;
             int field_b8;
-            int anim1;                 // +0xbc
+            int anim1;
             int field_c0;
-            int anim2;                 // +0xc4
+            int anim2;
             int field_c8;
         };
     };
-    Anim ref;                          // +0xcc
-    Anim refshad;                      // +0xd8
+    Anim ref;
+    Anim refshad;
     Ref<char> burnweapon;
     union {
-        short sparktime;               // +0xe8
+        short sparktime;
         unsigned short burnTime;
     };
-    unsigned short damage;             // +0xea
-    float energy;                      // +0xec
+    unsigned short damage;
+    float energy;
     union {
-        float metal;                   // +0xf0
+        float metal;
         float value;
     };
-    unsigned short dead;               // +0xf4
-    unsigned short burnt;              // +0xf6
-    unsigned short reclamate;          // +0xf8
-    char height;                       // +0xfa
+    unsigned short dead;
+    unsigned short burnt;
+    unsigned short reclamate;
+    char height;
     union {
-        char spreadchance;             // +0xfb
+        char spreadchance;
         unsigned char spreadChance;
     };
     union {
-        char reproduce;                // +0xfc
+        char reproduce;
         unsigned char seedChance;
     };
     union {
-        char reproducearea;            // +0xfd
+        char reproducearea;
         unsigned char seedSpread;
     };
     union {
-        unsigned short flags16;        // +0xfe
+        unsigned short flags16;
         unsigned char flags;
         struct {
             unsigned short noobject : 1;
@@ -272,37 +262,37 @@ struct Feature {                       // the feature definition (0x100 bytes)
     };
 };
 
-union SpotField {                      // the cell's spot or footprint offset
+union SpotField {
     struct {
-        unsigned char offsetY;         // +0xa
-        unsigned char offsetX;         // +0xb
+        unsigned char offsetY;
+        unsigned char offsetX;
     };
-    unsigned short spot;               // +0xa
+    unsigned short spot;
 };
 
-struct Cell {                          // 13 bytes per cell
+struct Cell {
     union {
         char unknown_0[8];
         struct {
-            short unit;                // +0x0
+            short unit;
             char unknown_2[6];
         };
         struct {
             char unknown_0b[7];
-            char field7;               // +0x7
+            char field7;
         };
     };
-    unsigned short feature;            // +0x8
+    unsigned short feature;
     union {
         struct {
-            unsigned char offsetY;     // +0xa
-            unsigned char offsetX;     // +0xb
+            unsigned char offsetY;
+            unsigned char offsetX;
         };
-        unsigned short spot;           // +0xa
-        SpotField sf;                  // +0xa
+        unsigned short spot;
+        SpotField sf;
     };
     union {
-        unsigned char flags;           // +0xc
+        unsigned char flags;
         struct {
             unsigned char flag0 : 1;
             unsigned char bits1 : 2;
@@ -319,17 +309,17 @@ struct Cell {                          // 13 bytes per cell
 
 struct Weapon {
     char unknown_0[0xd4];
-    unsigned short damage;             // +0xd4
+    unsigned short damage;
     char unknown_d6[0x10a - 0xd6];
-    unsigned char kind;                // +0x10a
-    char flag_10b;                     // +0x10b
+    unsigned char kind;
+    char flag_10b;
 };
 
 struct Obj {
     char unknown_0[0x28];
-    short x;                           // +0x28
-    short y;                           // +0x2a
-    unsigned short entry;              // +0x2c
+    short x;
+    short y;
+    unsigned short entry;
 };
 
 struct FeatureName {
@@ -370,15 +360,12 @@ struct Model {
 #include "class_004c9390.h"
 
 struct Elem {
-    Class_004c9390 name;               // +0x0
+    Class_004c9390 name;
 };
 
 extern Game* g_game;
 
 typedef std::vector<TdfFile*> FeatureList;
-// File-scope static: 0x4223e0 needs it static (an extern global changes
-// register use in its inlined ~vector), and 0x422460, 0x4224b0 and 0x422ea0
-// walk the vector through begin() and end().
 static FeatureList* s_featureTdfParsers;
 
 void __cdecl GameFreeThunk(void* p);
@@ -406,8 +393,6 @@ void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
 void* __stdcall CreateObjectState(void* obj);
 void __stdcall EmitTimedSubParticles(Vec3* p, short index);
 
-// Reading the field directly each time (no local) gives `or ax, 0xffff` for
-// the 0xffff return; a local gives `mov eax, 0xffff`.
 // FUNCTION: 0x421e60
 unsigned short __stdcall GetCellFeature(Cell* cell)
 {
@@ -497,15 +482,12 @@ void FreeFeaturePool()
 // FUNCTION: 0x4222b0
 void* __stdcall FindOptionalGafEntry(void* list, int unused, char* name)
 {
-    // Returning a value on both paths keeps them apart: with a void return the
-    // early exit is folded into a jump to the shared epilogue.
     if (strlen(name) == 0) {
         return 0;
     }
     return FindGafEntry(list, name);
 }
 
-// Must not be __cdecl: the calling convention changes the loop entry order.
 // FUNCTION: 0x4222e0
 void __stdcall LoadFeatureFileList()
 {
@@ -553,7 +535,6 @@ short __stdcall FindFeatureType(char* name)
     return -1;
 }
 
-// FindFeatureType-like search, inlined
 static inline unsigned short FindName(char* name)
 {
     for (int i = 0; i < g_game->featureCount; i++) {
@@ -594,7 +575,6 @@ void PlaceMissionFeatures(void)
                 continue;
         }
         Feature* f = &g_game->features[id];
-        // A cell local with one GetMapCell call per branch, not x/y locals and one call.
         Cell* cell;
         if (f->flags16 & 1)
             cell = g_seams.los_radar->GetMapCell(p->x, p->y);
@@ -720,7 +700,6 @@ void __stdcall KillFeature(int x, int z, int flag)
         else
             pair = f->death[0];
     }
-    // If/else, not an early return: keeps the ReplaceFeatureWithDead call last.
     if (pair.anim != 0) {
         if (cell->flags & 1)
             return;
@@ -785,13 +764,11 @@ static inline Feature* GetFeature(Cell* cell)
     }
     if (cell->feature != 0xfffe)
         return 0;
-    // Full expression twice, no locals or `cell -=`; ends with the feature return.
     if ((cell - (cell->offsetY * g_game->width + cell->offsetX))->feature >= 0xfffb)
         return 0;
     return &g_game->features[(cell - (cell->offsetY * g_game->width + cell->offsetX))->feature];
 }
 
-// Takes the field by reference and the amount as a double; the metal add stays plain code.
 static inline void AddScaled(Unit* unit, float& res, double amount)
 {
     if (unit->owner->active && unit->owner->type == 2) {
@@ -850,8 +827,6 @@ int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
     return 1;
 }
 
-// Inlined copy of GetFootprintCentre: the 16.16 world position of the centre of a
-// feature footprint whose corner is at map cell `cell`.
 static inline Vec3 FootprintCentre(Point16* cell, Feature* def)
 {
     Point16 f = def->footprint;
@@ -862,10 +837,6 @@ static inline Vec3 FootprintCentre(Point16* cell, Feature* def)
     p.y = g_seams.units->GetGroundHeight(&p) << 16;
     return p;
 }
-// A burning feature at `cell` sets fire (StartFeatureBurning) to flammable features
-// within 3 cells, then to up to five cells downwind (the wind vector at
-// +0x37ecc/+0x37ed4 times 2.0 in 16.16), and leaves its burnt remains
-// (ApplyAreaDamageAt) at its centre.
 // FUNCTION: 0x4239c0
 void __stdcall SpreadFire(Feature* f, Point16* cell)
 {
@@ -875,7 +846,6 @@ void __stdcall SpreadFire(Feature* f, Point16* cell)
                 Cell* c = g_seams.los_radar->GetMapCell(x, z);
                 if (c && c->feature < 0xfffb && !(c->flags & 1)) {
                     Feature* g = &g_game->features[c->feature];
-                    // Its own `if`, not part of the `&&` chain.
                     if (g->flamable) {
                         if (RandomInt(100) < g->spreadChance)
                             StartFeatureBurning(x, z, 0);
@@ -887,7 +857,6 @@ void __stdcall SpreadFire(Feature* f, Point16* cell)
     Coord px;
     Coord pz;
     px.value = cell->x << 16;
-    // Computed from its own read of cell->z, before lastZ copies it.
     pz.value = cell->y << 16;
     int lastX = cell->x;
     int lastZ = cell->y;
@@ -928,11 +897,6 @@ void __stdcall ReplaceFeatureWithBurnt(Obj* obj)
     }
 }
 
-// Places feature `feature` on map cell `cell` (its footprint's corner): fails
-// when the footprint leaves the map or a feature already there cannot be
-// removed (RemoveFeature), takes a spot for features that keep state, marks the
-// other footprint cells 0xfffe with their offsets from the corner, and returns
-// the spot (0 when none).
 // FUNCTION: 0x423c50
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
                                       Vec3* pos, Rot16* rot,
@@ -945,7 +909,6 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
         cell->feature = feature;
         return 0;
     }
-    // Computed before the cell index.
     Feature* f = &g_game->features[feature];
     int n = cell - g_game->cells;
     int w = g_game->width;
@@ -956,7 +919,6 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
         return 0;
     if (at.y + f->footprint.y > g_game->height)
         return 0;
-    // Both footprint loops walk an explicit `c++` pointer, not `row[x]`.
     for (int z = 0; z < f->footprint.y; z++) {
         Cell* c = &cell[z * g_game->width];
         for (int x = 0; x < f->footprint.x; x++, c++) {
@@ -1017,8 +979,6 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
     return spot;
 }
 
-// Inlined copy of GetFootprintCentre: the 16.16 world position of the centre of a
-// feature footprint whose corner is at map cell `cell`.
 static inline SmokePos FootprintCentreSmoke(Point16* cell, Feature* def)
 {
     Point16 f = def->footprint;
@@ -1030,7 +990,6 @@ static inline SmokePos FootprintCentreSmoke(Point16* cell, Feature* def)
     return p;
 }
 
-// Inlined copy of ReplaceFeatureWithBurnt: replaces a burnt-out feature with its remains.
 static inline void BurnOut(Spot* spot)
 {
     Cell* target = g_seams.los_radar->GetMapCell(spot->cell.x, spot->cell.y);
@@ -1053,22 +1012,11 @@ static inline SmokePos SmokeAt(Spot* spot, Feature* f)
     SmokePos p = FootprintCentreSmoke(&spot->cell, f);
     GafFrame* frame = GetGafSequenceFrame(&spot->anim);
     unsigned short w = frame->width;
-    // The narrowed (unsigned short)(w >> 2) keeps `r - originX` before the add.
     p.x.f.whole += Rand(w >> 1) - (unsigned short)frame->xOffset + (unsigned short)(w >> 2);
     unsigned short h = frame->height;
-    // The second term is a shift of a narrowed value: a linear form gets factored.
     p.y.f.whole += ((unsigned short)frame->yOffset - Rand(h >> 1)) * 2 - ((unsigned short)(h >> 2) << 1);
     return p;
 }
-// Per-tick update of map features: advances the animations of animated
-// feature types, lets one scanned map cell per tick seed a copy of its feature
-// nearby (chance +0xfc, spread +0xfd), then walks the used spot list: falling
-// debris moves under gravity until it lands (or sinks below sea level), burning
-// features puff smoke every third tick, burn down and spread fire
-// (SpreadFire), and finished animations are replaced by their remains.
-// Suspected original bug: the seed position's row is scanIndex / mapHeightTiles
-// (+0x14237), not scanIndex / mapWidthTiles, so on non-square maps the seed lands in
-// the wrong row.
 // FUNCTION: 0x424050
 void __stdcall UpdateFeatures()
 {
@@ -1202,7 +1150,6 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon)
     }
 }
 
-// Must stay an inline helper, feature then flags: by hand in the loop the store order changes.
 static inline void ClearCell(Cell* c)
 {
     c->feature = 0xffff;
@@ -1266,7 +1213,6 @@ void __stdcall SaveFeatures(HapiBank* file)
     file->OpenNamedBox("Feature Type Names");
     file->WriteBox(names.begin(), g_game->featureCount * sizeof(FeatureName));
 
-    // Declared before `end` and the counters, and walked by `for (; c < end; c++)`.
     Cell* c = g_game->cells;
     Cell* end = g_game->cells + g_game->width * g_game->height;
     int normalCount = 0;
@@ -1275,7 +1221,6 @@ void __stdcall SaveFeatures(HapiBank* file)
     int x = 0;
     int y = 0;
     for (; c < end; c++) {
-        // The test comes before the definition of `f`.
         if (c->feature < 0xfffb) {
             Feature* f = &g_game->features[c->feature];
             if (!(f->flags & 1)) {
@@ -1339,7 +1284,6 @@ void __stdcall SaveFeatures(HapiBank* file)
 typedef std::vector<TdfFile*> Vec_004251e0;
 typedef void (Vec_004251e0::*DestroyFn_004251e0)(Vec_004251e0::iterator, Vec_004251e0::iterator);
 
-// _Destroy is protected: the derived class takes its address to emit it out of line.
 struct Access_004251e0 : Vec_004251e0 {
     static DestroyFn_004251e0 fn;
 };
@@ -1348,7 +1292,6 @@ struct Access_004251e0 : Vec_004251e0 {
 DestroyFn_004251e0 Access_004251e0::fn = &Access_004251e0::_Destroy;
 
 typedef std::vector<unsigned short> Vec_004251f0;
-// Taking the member's address is what emits it out of line.
 typedef Vec_004251f0::size_type (Vec_004251f0::*SizeFn_004251f0)() const;
 
 // FUNCTION: 0x4251f0 ?size@?$vector@GV?$allocator@G@std@@@std@@QBEIXZ
@@ -1358,9 +1301,6 @@ typedef std::vector<unsigned short> Vec_00425210;
 typedef void (Vec_00425210::*InsertFn_00425210)(
     Vec_00425210::iterator, Vec_00425210::size_type, const unsigned short&);
 
-// A growth step on this vector type, standing in for the original TU's own;
-// the insert's bytes need the TU to instantiate reserve (or resize, or the
-// copy constructor).
 void __stdcall Grow_00425210(Vec_00425210* v, int extra)
 {
     v->reserve(extra + v->size());
@@ -1370,8 +1310,6 @@ void __stdcall Grow_00425210(Vec_00425210* v, int extra)
 InsertFn_00425210 g_insert_00425210 = &Vec_00425210::insert;
 
 typedef std::vector<unsigned short> Vec_00425430;
-// The element is a scalar, not a 2-byte struct: the resize value temporary in
-// 0x424c00 is stored as a dword.
 typedef Vec_00425430::iterator (Vec_00425430::*EraseFn_00425430)(
     Vec_00425430::iterator, Vec_00425430::iterator);
 
@@ -1381,7 +1319,6 @@ EraseFn_00425430 g_erase_00425430 = &Vec_00425430::erase;
 typedef std::vector<unsigned short> Vec_00425470;
 typedef void (Vec_00425470::*DestroyFn_00425470)(Vec_00425470::iterator, Vec_00425470::iterator);
 
-// _Destroy is protected: the derived class takes its address to emit it out of line.
 struct Access_00425470 : Vec_00425470 {
     static DestroyFn_00425470 fn;
 };
@@ -1393,8 +1330,6 @@ typedef std::vector<TdfFile*> Vec_00425480;
 typedef void (Vec_00425480::*InsertFn_00425480)(
     Vec_00425480::iterator, Vec_00425480::size_type, TdfFile* const&);
 
-// An assignment on this vector type, standing in for the original TU's own;
-// the insert's bytes need the TU to instantiate operator=.
 void __stdcall Assign_00425480(Vec_00425480* a, const Vec_00425480* b)
 {
     *a = *b;
@@ -1405,7 +1340,6 @@ InsertFn_00425480 g_insert_00425480 = &Vec_00425480::insert;
 
 namespace std {
 // FUNCTION: 0x4256a0 ?copy@std@@YGPAGPAG00@Z
-// Explicit __stdcall specialization: the original instantiated it under /Gz.
 template <>
 unsigned short* __stdcall copy(unsigned short* first, unsigned short* last, unsigned short* dest)
 {

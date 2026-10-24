@@ -1,20 +1,3 @@
-// Decompiled by Space Bunny Free, deepseek-v4.1-flash, Haiku, GPT-6, deepseek-v4.1, space-bunny-free, claude-sonnet-5-5, Opus, DeepSeek V4.1 Flash, Claude Opus 5.5, Sonnet, Sonnet 5.5, deepseek-v4-flash, LongCat 2.5 Preview Free, GPT-6.1-sol, GPT-5.6-Terra, claude-opus-5-5, mimo-v2.6-pro and Haiku. Names are provisional.
-//
-// The multiplayer front end (0x440d70 to 0x44ce20): the new game, TCP,
-// serial, modem and game list dialogs, the connection and service provider
-// screens and the score reporting setup, the game setup dialogs (map, team
-// logo, battle room, watching, alliances, the unit limit and the display
-// mode chooser), the allies screen, the battle room's click handler and
-// per-frame refresh, the end-of-multi screen, the save and load game lists
-// and the unit restrictions dialog, in address order.
-//
-// 0x441220 and 0x441460 sit after the Game type, ahead of the other types and
-// out of address order: their registers follow their symbol ids
-// (docs/c2-regalloc.md). 0x443ff0, 0x449bb0, 0x44a680 and 0x44c420 stay in
-// files of their own (docs/split-modules.md). 0x4441a0 and 0x444580 stay in
-// multi_4441a0.cpp and multi_444580.cpp: they are gap regions
-// (data/functions.csv), and place.py builds a gap region from a file that holds
-// only that region's functions.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,79 +20,73 @@ class UnitSync;
 
 #pragma pack(push, 1)
 
-// The 0x15b-byte menu control record. Entry 0 holds the count at +0xb6; the
-// other entries hold NUL terminated text there. +0xcc is entry 0's label,
-// +0xce the two-argument handler the menu calls for its own entries, and
-// +0xd2 the record the entry is bound to. The views of the three parts are
-// one type here: +0xb6's text, count and entry_text, +0xc2's text pointer,
-// +0xce's handler and +0xd6's flags keep their part's name.
-struct Gadget {                        // 0x15b bytes
-    union {                            // +0x00
+struct Gadget {
+    union {
         unsigned char type;
         unsigned char state;
     };
-    char team;                         // +0x01
-    char name[0x11];                   // +0x02
-    short x;                           // +0x13
-    short y;                           // +0x15
-    short width;                       // +0x17
-    short height;                      // +0x19
-    int attribs;                       // +0x1b
-    int colours;                       // +0x1f
-    int colour;                        // +0x23
-    char unknown_27[0x29 - 0x27];      // +0x27
-    union {                            // +0x29
+    char team;
+    char name[0x11];
+    short x;
+    short y;
+    short width;
+    short height;
+    int attribs;
+    int colours;
+    int colour;
+    char unknown_27[0x29 - 0x27];
+    union {
         char active;
         unsigned char visible;
     };
-    char unknown_2a[0xb6 - 0x2a];      // +0x2a
-    union {                            // +0xb6
-        char text[0x138 - 0xb6];       // the list or label text
-        short count;                   // entry 0's count
-        char entry_text[0xcc - 0xb6];  // one entry's own text
-        struct {                       // entry 0's label
+    char unknown_2a[0xb6 - 0x2a];
+    union {
+        char text[0x138 - 0xb6];
+        short count;
+        char entry_text[0xcc - 0xb6];
+        struct {
             char unknown_b6l[0xcc - 0xb6];
-            char label[0x138 - 0xcc];  // +0xcc
+            char label[0x138 - 0xcc];
         };
-        struct {                       // the unit restrictions' flags list
+        struct {
             char unknown_b6f[0xbe - 0xb6];
             union {
-                int hotspotGaf;        // +0xbe
+                int hotspotGaf;
                 struct {
                     short unknown_be;
-                    short count;       // +0xc0, the list's length
+                    short count;
                 } list;
             };
         };
-        struct {                       // the dialog's own fields
+        struct {
             char unknown_b6b[0xba - 0xb6];
-            union {                    // +0xba
+            union {
                 short selected;
                 short field_ba;
                 unsigned char field_ba_byte;
                 short index;
             };
-            union {                    // +0xbc
+            union {
                 struct {
                     char unknown_bc[0xc0 - 0xbc];
-                    unsigned short rowCount;   // +0xc0
+                    unsigned short rowCount;
                 };
                 struct {
-                    short firstRow;    // +0xbc
+                    short firstRow;
                     char unknown_be2[0xc0 - 0xbe];
                 };
             };
-            union {                    // +0xc2
+            union {
                 char* text_c2;
                 void* hotspotFrame;
             };
-            union {                    // +0xc6
+            union {
                 char unknown_c6[0xcc - 0xc6];
-                void* rows;            // +0xc6
+                void* rows;
                 struct {
-                    short frame;       // +0xc6
+                    short frame;
                     union {
-                        unsigned int hotspotFlags; // +0xc8
+                        unsigned int hotspotFlags;
                         struct {
                             unsigned int c8_0 : 1;
                             unsigned int c8_rest : 31;
@@ -117,28 +94,28 @@ struct Gadget {                        // 0x15b bytes
                     };
                 };
             };
-            char unknown_cc[0xce - 0xcc];  // +0xcc
-            union {                    // +0xce
+            char unknown_cc[0xce - 0xcc];
+            union {
                 void (__stdcall* handler)(Gui* menu, Gadget* entry);
                 void (__stdcall* onSelect)(Gui* menu, int index);
                 void* callback;
             };
-            union {                    // +0xd2
+            union {
                 int data;
                 Record_00446f50* records;
             };
-            union {                    // +0xd6
+            union {
                 char* flags;
                 unsigned char* bits;
             };
-            short scroll;              // +0xda
-            char unknown_dc[0x138 - 0xdc]; // +0xdc
+            short scroll;
+            char unknown_dc[0x138 - 0xdc];
         };
     };
-    unsigned short status;             // +0x138
-    unsigned char quickKey;            // +0x13a
-    char unknown_13b;                  // +0x13b
-    union {                            // +0x13c
+    unsigned short status;
+    unsigned char quickKey;
+    char unknown_13b;
+    union {
         int max;
         struct {
             unsigned short field_13c_bit : 1;
@@ -149,82 +126,71 @@ struct Gadget {                        // 0x15b bytes
             unsigned short b13c_rest : 15;
         };
     };
-    short knobPos;                     // +0x140
-    short knobSize;                    // +0x142
-    void (__stdcall* sliderCallback)(Gui* menu, int index); // +0x144
-    char unknown_148[2];               // +0x148
-    void* sliderUser;                  // +0x14a
-    char unknown_14e[0x15b - 0x14e];   // +0x14e
+    short knobPos;
+    short knobSize;
+    void (__stdcall* sliderCallback)(Gui* menu, int index);
+    char unknown_148[2];
+    void* sliderUser;
+    char unknown_14e[0x15b - 0x14e];
 };
 
-
-// The 16-byte group copied out of g_game+0x2b6e.
 struct Group_00441220 {
-    unsigned int a;                    // +0x00
-    unsigned int b;                    // +0x04
-    unsigned int c;                    // +0x08
-    unsigned int d;                    // +0x0c
+    unsigned int a;
+    unsigned int b;
+    unsigned int c;
+    unsigned int d;
 };
 
-// The 0xb9-byte message 441220 copies into g_game+0x2ab1.
 struct Msg_00441220 {
     char pad_0[0x99];
-    Group_00441220 group;              // +0x99
+    Group_00441220 group;
     char pad_1[0xb9 - 0xa9];
 };
 
-// The 0xbc-byte message 4437c0 copies the group into.
 struct Msg_004437c0 {
     char pad_0[0x99];
-    Group_00441220 group;              // +0x99
+    Group_00441220 group;
     char pad_1[0x13];
 };
 
-// The network object at g_game+0x14, as the HAPINET_ wrappers lay it out.
 struct Net_00443100 {
-    void* dp;                          // +0x00
-    void* dp3;                         // +0x04
-    char unknown_8[0x431 - 8];         // +0x08
-    GUID* guids;                       // +0x431
-    char unknown_435[0x4b9 - 0x435];   // +0x435
-    void* lobby;                       // +0x4b9
-    char unknown_4bd[0x4e5 - 0x4bd];   // +0x4bd
-    int count;                         // +0x4e5
-    int gameCount;                     // +0x4e9
-    char unknown_4ed[0x505 - 0x4ed];   // +0x4ed
+    void* dp;
+    void* dp3;
+    char unknown_8[0x431 - 8];
+    GUID* guids;
+    char unknown_435[0x4b9 - 0x435];
+    void* lobby;
+    char unknown_4bd[0x4e5 - 0x4bd];
+    int count;
+    int gameCount;
+    char unknown_4ed[0x505 - 0x4ed];
 };
 
-// One 0x54-byte game description: its size and the offset of its block.
 struct Desc_004437c0 {
-    char unknown_0[0x4c];              // +0x00
-    int size;                          // +0x4c
-    int offset;                        // +0x50
+    char unknown_0[0x4c];
+    int size;
+    int offset;
 };
 
-// One 0x102-byte account record: a name and a number string.
 struct Entry_004426e0 {
-    char name[0x81];                   // +0x00
-    char number[0x81];                 // +0x81
+    char name[0x81];
+    char number[0x81];
 };
 
-// The serial address block written to g_serialPortNumber.
-struct Serial_00441c30 {               // 0x14 bytes
-    int unknown_0;                     // +0x00
-    char unknown_4[4];                 // +0x04
-    unsigned long unknown_8;           // +0x08
-    unsigned long unknown_c;           // +0x0c
-    unsigned long unknown_10;          // +0x10
+struct Serial_00441c30 {
+    int unknown_0;
+    char unknown_4[4];
+    unsigned long unknown_8;
+    unsigned long unknown_c;
+    unsigned long unknown_10;
 };
 
-// One element of the compound address list.
-struct Elem_00441c30 {                 // 0x18 bytes
-    GUID guid;                         // +0x00
-    unsigned long size;                // +0x10
-    void* data;                        // +0x14
+struct Elem_00441c30 {
+    GUID guid;
+    unsigned long size;
+    void* data;
 };
 
-// The record header of a game description block: a flag word with bitfields
-// at offset 2, then the fields up to version.
 struct Settings_00441460 {
     unsigned short memory;
     unsigned short players : 4;
@@ -244,11 +210,11 @@ struct Settings_00441460 {
     unsigned short version;
 };
 
-struct Record_00441460 {               // 0x54 bytes
-    Settings_00441460 settings;        // +0x00
-    int maxPlayers;                    // +0x10
-    char name[0x20];                   // +0x14
-    char name2[0x20];                  // +0x34
+struct Record_00441460 {
+    Settings_00441460 settings;
+    int maxPlayers;
+    char name[0x20];
+    char name2[0x20];
 };
 
 #include "../network/link_info.h"
@@ -257,27 +223,23 @@ struct Record_00441460 {               // 0x54 bytes
 
 #include "../network/player.h"
 
-// The mission object g_game+0x391e9 points at (defined in the game's own
-// files).
 #include "../map/mission.h"
 
-// The layer LoadGuiLayer returns: the entry table at +4, the click handler at
-// +8 and the dialog's block or owner at +0xc.
 struct Layer {
-    Layer* next;                       // +0x00
-    Gadget* entries;                   // +0x04
-    void* handler;                     // +0x08
-    union {                            // +0x0c
+    Layer* next;
+    Gadget* entries;
+    void* handler;
+    union {
         void* owner;
         void* layout;
         void* data;
         int field_c;
     };
-    char unknown_10[0x1c - 0x10];      // +0x10
-    void* cb1c;                        // +0x1c
-    int current;                       // +0x20
-    char unknown_24[0x37 - 0x24];      // +0x24
-    int clickMode;                     // +0x37
+    char unknown_10[0x1c - 0x10];
+    void* cb1c;
+    int current;
+    char unknown_24[0x37 - 0x24];
+    int clickMode;
 };
 
 typedef Layer Holder_00444930;
@@ -285,15 +247,8 @@ typedef Layer Layer_00446f50;
 
 #include "../gui/gui.h"
 
-// The game state. Every view of it in this module meets here: the fields are
-// at the offsets the functions use, and the differently typed views of the
-// flag words share a union.
 #include "../game/game.h"
 
-// 0x441220 and 0x441460 sit here. The declarations they use came up from the
-// prototype block with them; the first two below and the gadget lookups after
-// ConnectToGame are used only further down, and are here for the symbol ids
-// they take (docs/c2-regalloc.md).
 void __stdcall SetGadgetText(void* gui, int index, char* text);
 void __stdcall HandleNewMultiClick(Gui* gadget);
 // GLOBAL: 0x511de8
@@ -353,7 +308,6 @@ static int HOST_CALL PollGetGames(void)
 void __stdcall UpdateGameSelection(Gui* menu, Gadget* entry)
 {
     void* gadgets = menu->layer->entries;
-    // Reference to gv: makes ge a real 32-bit read, so ge == 0 tests edi.
     int gv; int& ge = gv;
     unsigned short* p;
     Gadget* gd;
@@ -403,7 +357,6 @@ int __stdcall ConnectToGame(Layer* gadget) {
     char* p[21];
     char names[0x20];
     char buf[0x80];
-    // Never address-taken, bigger than temp and names so it lands after them.
     struct { char pre[0x99]; Settings_00441460 s; char pad[0x13]; } sb;
     const char* msg;
     char* lang;
@@ -413,13 +366,11 @@ int __stdcall ConnectToGame(Layer* gadget) {
     if (!PE(g_dpspGuidModem) && !PE(g_dpspGuidTcpip)) {
         if (PE(g_dpspGuidIpx))
             goto upd;
-        // Stores through the unused p[20]: keeps both dead memcmp results.
         if (PE(g_dpspGuidSerial))
             ;
         else
             *(int*)&p[20] = memcmp(&g_game->info.guid, &g_dpspGuidSerial, 0x10) != 0;
     }
-    // The a8 case falls into upd:, which is followed by conn:.
     if (PE(g_dpspGuidModem))
         goto conn;
     if (!PE(g_dpspGuidTcpip)) {
@@ -455,11 +406,9 @@ shown:
         memset(p[i], 0, 0xa00);
     } while (i < 15);
 
-    // dsc is loaded before the if and used inside it.
     char* dsc = (char*)g_game->desc;
     if (count > 0) {
         p[0] = dsc + 0x18;
-        // Separate counter: its store lands after the jle.
         left = count;
         do {
             char* e;
@@ -552,112 +501,99 @@ shown:
 #undef PE
 #undef temp
 
-// One element of the team logo table at g_game+0x148db.
 struct LogoEntry_00445110 {
-    void* ptr;                             // +0x00
-    int unknown_4;                         // +0x04
+    void* ptr;
+    int unknown_4;
 };
 
 struct Logos_00445110 {
-    unsigned short count;                  // +0x00
-    char unknown_2[0x28 - 0x2];            // +0x02
-    LogoEntry_00445110 entries[1];         // +0x28
+    unsigned short count;
+    char unknown_2[0x28 - 0x2];
+    LogoEntry_00445110 entries[1];
 };
 
-// The map selector's layout block at layer+0xc (0x444ea0).
 struct Data_00444ea0 {
-    char unknown_0[0x14];                  // +0x00
-    char* items;                           // +0x14
+    char unknown_0[0x14];
+    char* items;
 };
 
-// The map dialog's layout block at holder+0xc (0x444cb0).
 struct Layout_00444cb0 {
-    char unknown_0[0x14];                  // +0x00
-    void* items;                           // +0x14
+    char unknown_0[0x14];
+    void* items;
 };
 
-// The logo dialog's layout block at holder+0xc (0x445110): the byte list of
-// the free logo indices, the pointer list handed to the GUI and the copied
-// animation sequences.
 struct AnimSeq_00445110 {
-    char unknown_0[0x28];                  // +0x00
-    void* frame;                           // +0x28
-    char unknown_2c[0x30 - 0x2c];          // +0x2c
+    char unknown_0[0x28];
+    void* frame;
+    char unknown_2c[0x30 - 0x2c];
 };
 
 struct Layout_00445110 {
-    char selected[0x18];                   // +0x00
-    void** ptrList;                        // +0x18
-    AnimSeq_00445110* seqs;                // +0x1c
+    char selected[0x18];
+    void** ptrList;
+    AnimSeq_00445110* seqs;
 };
 
-// The map preview dialog's layout block at holder+0xc (0x444930).
 struct Layout_00444930 {
-    char unknown_0[0x18];                  // +0x00
-    void* ptrList;                         // +0x18
-    void* seqs;                            // +0x1c
+    char unknown_0[0x18];
+    void* ptrList;
+    void* seqs;
 };
 
-// The display mode list 0x4461d0 and 0x446310 share.
 struct Mode_00446310 {
-    int width;                             // +0x00
-    int height;                            // +0x04
-    int refreshRate;                       // +0x08
+    int width;
+    int height;
+    int refreshRate;
 };
 
 struct ModeList {
-    int count;                             // +0x00
-    Mode_00446310* modes;                  // +0x04
-    char unknown_8[0x14 - 0x8];            // +0x08
-    char* available;                       // +0x14
-    char unknown_18[0x20 - 0x18];          // +0x18
+    int count;
+    Mode_00446310* modes;
+    char unknown_8[0x14 - 0x8];
+    char* available;
+    char unknown_18[0x20 - 0x18];
 };
 
-// The first 0x13e bytes of an entry, copied out by 0x445300 and 0x4455b0.
 struct Head_00444930 {
-    unsigned char state;                   // +0x00
-    char team;                             // +0x01
-    char name[0x13];                       // +0x02
-    short y;                               // +0x15
-    char unknown_17[2];                    // +0x17
-    short height;                          // +0x19
-    int attribs;                           // +0x1b
-    char unknown_1f[0x29 - 0x1f];          // +0x1f
-    unsigned char active;                  // +0x29
-    char unknown_2a[0xb6 - 0x2a];          // +0x2a
-    char text[0x13e - 0xb6];               // +0xb6
+    unsigned char state;
+    char team;
+    char name[0x13];
+    short y;
+    char unknown_17[2];
+    short height;
+    int attribs;
+    char unknown_1f[0x29 - 0x1f];
+    unsigned char active;
+    char unknown_2a[0xb6 - 0x2a];
+    char text[0x13e - 0xb6];
 };
 
-// One 0x62-byte record of the unit restrictions table at 0x5129b4.
 struct Record_00446f50 {
-    char name[0x52];                   // +0x00
-    int unitIndex;                     // +0x52 unit type index
-    int previousMax;                   // +0x56 previous value
-    int max;                           // +0x5a value
-    int peerEnabled;                   // +0x5e
+    char name[0x52];
+    int unitIndex;
+    int previousMax;
+    int max;
+    int peerEnabled;
 };
 
-// One 0x249-byte unit type instance of g_game->unitDefs: the name and
-// description area, the costs and the bit at +0x245 that marks a type that
-// cannot be restricted.
 struct UnitType_00446f50 {
-    char unitName[0x20];               // +0x00
+    char unitName[0x20];
     union {
-        char name[0x225];              // +0x20
+        char name[0x225];
         struct {
-            char nameShort[0x80];      // +0x20
-            char description[0xe6];    // +0xa0
-            float energyCost;          // +0x186
-            float metalCost;           // +0x18a
+            char nameShort[0x80];
+            char description[0xe6];
+            float energyCost;
+            float metalCost;
             char unknown_18e[0x245 - 0x18e];
         };
         struct {
             char unknown_13e[0x13e - 0x20];
-            int fbiChecksum;           // +0x13e
+            int fbiChecksum;
         };
     };
     union {
-        unsigned int raw;              // +0x245
+        unsigned int raw;
         struct {
             unsigned int low : 15;
             unsigned int flag : 1;
@@ -672,17 +608,17 @@ struct UnitType_00446f50 {
 };
 
 struct Event_44c220 {
-    int fbiChecksum;                   // +0x00
-    int field_4;                       // +0x04
-    short enabled;                     // +0x08
-    short peerEnabled;                 // +0x0a
-    int max;                           // +0x0c
+    int fbiChecksum;
+    int field_4;
+    short enabled;
+    short peerEnabled;
+    int max;
 };
 
-struct Info_0044c7e0 {                  // filled by UnitSync::GetUnitEntry
+struct Info_0044c7e0 {
     char unknown_0[0xa];
-    short peerEnabled;                 // +0x0a
-    int max;                           // +0x0c
+    short peerEnabled;
+    int max;
 };
 
 class UnitSync {
@@ -702,21 +638,21 @@ public:
 
 struct Options_00446f50 {
     char unknown_0[0x118];
-    int fixedloc;                      // +0x118
+    int fixedloc;
 };
 
 struct Record_0044c0d0 {
-    unsigned short a;                  // +0x00
-    unsigned short b;                  // +0x02
-    unsigned short e;                  // +0x04
-    unsigned short f;                  // +0x06
-    unsigned char flag8;               // +0x08
-    unsigned char flag9;               // +0x09
-    unsigned char flaga;               // +0x0a
-    unsigned char flagb;               // +0x0b
-    int reserved;                      // +0x0c
-    int d;                             // +0x10
-    int scratch;                       // +0x14
+    unsigned short a;
+    unsigned short b;
+    unsigned short e;
+    unsigned short f;
+    unsigned char flag8;
+    unsigned char flag9;
+    unsigned char flaga;
+    unsigned char flagb;
+    int reserved;
+    int d;
+    int scratch;
 };
 
 #pragma pack(pop)
@@ -730,11 +666,8 @@ class Class_004a1080;
 struct Dialog;
 struct Struct_004c6ac0;
 
-// Unused here: the symbol id this declaration takes keeps the allocation
-// (docs/c2-regalloc.md).
 void EnableAICommands(void);
 
-// Unused here: real functions declared to keep the file's symbol count.
 void RegisterUnitOrders();
 void RegisterGroundOrders();
 void ResetAIPlayers();
@@ -760,12 +693,12 @@ extern int* g_unitRestrictOldCounts;
 // GLOBAL: 0x5129c8
 extern int g_unitRestrictNextPicTick;
 extern unsigned int g_lastPlayerCount;
-extern char* g_savegameDir;            // savegame directory
-extern char g_star[];                  // "*"
-extern char g_lstExtension[];          // "LST"
-extern char g_gamesGadgetName[];       // "GAMES"
-extern char g_savegameNamesName[];     // "SAVEGAME NAMES"
-extern char g_savegameDescsName[];     // "SAVEGAME DESCS"
+extern char* g_savegameDir;
+extern char g_star[];
+extern char g_lstExtension[];
+extern char g_gamesGadgetName[];
+extern char g_savegameNamesName[];
+extern char g_savegameDescsName[];
 extern char* g_hostOnlyGadgets[];
 extern char* g_battleRoomGadgetNames[];
 extern char g_lobbyMapName[];
@@ -799,8 +732,8 @@ extern int g_serialBaudRateTable[];
 extern unsigned int g_reporterCount;
 extern unsigned int g_reporterNames[16];
 extern LinkInfo g_linkInfo[];
-extern char g_okGadgetName[];              // "OK"
-extern char g_multiSoundName[];            // "Multi"
+extern char g_okGadgetName[];
+extern char g_multiSoundName[];
 extern char* g_oldMapName;
 extern int DAT_00512760;
 extern short g_battleRoomBaseGadgetCount;
@@ -861,8 +794,6 @@ unsigned int __stdcall OnlineGetLinkInfo(LinkInfo* links);
 int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int size);
 void OnlineUnload();
 void OpenOptionsPanel();
-// Defined in multi_443ff0.cpp: gathered here, its pointer into the session list
-// lands in ebp, and no symbol count in this file moves it back.
 int __stdcall SelectConnection(int index);
 void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* param_3);
@@ -959,20 +890,12 @@ int __stdcall CreateLocalPlayer(unsigned char player, int state);
 int __stdcall GetFontLineHeight();
 int __stdcall GetTextPixelWidth(char* text);
 
-// Click handler of the "create new game" dialog (NEWMULTI.GUI, opened by
-// OpenNewMultiDialog). Clicking a text field gives it the focus and loads its
-// contents; OK copies the password (bounded to 11 characters) into g_game and
-// the game and player names into two stack buffers, complains if either is
-// empty, then starts the game (InitScoreReporting) and sets the pending front-end
-// state at g_game+0x2bc0 to 17. CANCEL goes back to the previous dialog.
 // FUNCTION: 0x440d70
 void __stdcall HandleNewMultiClick(Gui* gadget)
 {
     Gadget* entries = gadget->layer->entries;
     if (gadget->hotGadgetIndex == -1)
         return;
-    // The three text fields share one tail: the first two hand the next field
-    // the focus, the third one the OK button.
     if (IsCurrentGadgetNamed(gadget, "GAMENAME")) {
         SelectGadgetByIndex(gadget, FindGadgetIndex(entries, "NICKNAME", 3));
         TrySetFocus(gadget, FindGadgetIndex(entries, "NICKNAME", 3));
@@ -994,19 +917,17 @@ void __stdcall HandleNewMultiClick(Gui* gadget)
         return;
     }
     if (FindGadgetIndex(entries, "OK", 0xe) == gadget->hotGadgetIndex) {
-        // 100 bytes each, and the pointer local in front of them, is what
-        // puts them at +0x14 and +0x78 of the 0xcc-byte frame.
         char nickbuf[100];
         char namebuf[100];
         char* dst;
-        int gi;                        // GAMENAME gadget index
-        int ni;                        // NICKNAME gadget index
+        int gi;
+        int ni;
         PlaySoundByName("BigButton", 0);
         char* pw = (char*)FindGadgetChecked_B(entries, "PASSWORD");
         g_game->password[0] = 0;
         strncat(g_game->password, pw + 0xb6, 0xa);
         gi = FindGadgetIndex(entries, "GAMENAME", 3);
-        dst = namebuf;                 // copied through a pointer, as in the original
+        dst = namebuf;
         strcpy(dst, entries[gi].text);
         if (strlen(namebuf) == 0) {
             BeginTextEdit(gadget, gi);
@@ -1040,8 +961,6 @@ void __stdcall HandleNewMultiClick(Gui* gadget)
     ClearSelectedGadget(gadget);
 }
 
-// Opens the new multiplayer game dialog (NEWMULTI.GUI), sets its click
-// handler, fills in the game, player and password fields and shows it.
 // FUNCTION: 0x441080
 void OpenNewMultiDialog()
 {
@@ -1072,9 +991,6 @@ void OpenNewMultiDialog()
     RenderLayer(&g_game->gui, 0x40);
 }
 
-// Returns the local player's name, the byte at g_game+0x2a42 selecting the
-// player record and +0x1b8a (0x1b63 + 0x27) its info block; the name is at
-// +0x80 of that block.
 // FUNCTION: 0x441430
 int __cdecl GetLocalPlayerPassword()
 {
@@ -1089,9 +1005,6 @@ int __cdecl GetLocalPlayerPassword()
     return eax + 0x80;
 }
 
-// Maps the selected DirectPlay service provider GUID to an index:
-// 0 modem, 1 TCP/IP, 2 IPX, 3 serial, 4 anything else. The four globals hold
-// g_dpspGuidModem, g_dpspGuidTcpip, g_dpspGuidIpx and g_dpspGuidSerial.
 // FUNCTION: 0x441bc0
 int GetServiceProviderIndex()
 {
@@ -1111,14 +1024,9 @@ int GetServiceProviderIndex()
     return 4;
 }
 
-// Builds a DirectPlay compound address for the service provider selected in
-// g_game + 0x39201 and hands it to the lobby's CreateCompoundAddress.
-// Returns 0 on success, with the address block and its size in the two out
-// parameters; otherwise the HRESULT from the lobby.
 // FUNCTION: 0x441c30
 int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
 {
-    // block before size, all three buffers at function top: prologue and frame layout.
     void* block = 0;
     unsigned long size = 0;
     Elem_00441c30 elements[3];
@@ -1135,7 +1043,6 @@ int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
         elements[0].guid = DPAID_ServiceProvider;
         elements[0].size = 0x10;
         elements[0].data = &g_dpspGuidModem;
-        // memset, not = "": plain rep stosd.
         memset(buf1, 0, sizeof(buf1));
         char* s = g_modemInfo;
         if (s == 0) {
@@ -1195,7 +1102,6 @@ int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
     }
     result = host_net_create_compound_address((host_net*)((char*)g_game + 0x14), elements, count, block, &size);
     if (result < 0) {
-        // Label inside this body, reached by goto: the shared cleanup block is the true arm.
 cleanup:
         if (block != 0) {
             GameFreeThunk(block);
@@ -1221,17 +1127,6 @@ int __stdcall TryConnect(int unused)
     return result;
 }
 
-// Click handler of the TCP dialog (TCP.GUI, opened by OpenTcpDialog). OK and a
-// direct-connect address both set the multiplayer connection-mode bits of
-// g_game (+0x2aaf) and connect; JOIN sets only the second bit; ADDRESS selects
-// the address gadget; PREV goes back; anything else resets the gadget. The
-// address text is then written to the registry under TCPADDR.
-// The original build called this helper from both connection paths and /Ob2
-// inlined it at each one; 0x442000 is the out-of-line copy of the same body.
-// Writing the two zero stores inside the helper, rather than inline in the
-// caller, is what makes MSVC 5 schedule the first store after the argument
-// push (`mov [esp+0x1c], ebx`), matching the original. Spelling the same
-// statements inline in HandleTcpDialogClick hoists that store one instruction early.
 static int TryConnect_00442050()
 {
     int a = 0;
@@ -1286,10 +1181,6 @@ tcpaddr:
     WriteGameRegistryValue((void*)"TCPADDR", GetGadgetText(gadget, "ADDRESS", 0), 0x80);
 }
 
-// Opens the TCP settings dialog (TCP.GUI) with HandleTcpDialogClick as its handler.
-// The "ADDRESS" setting gets the direct-connect address typed on the command
-// line (g_cmdlineTcpJoinAddress) when there is one, otherwise the "TCPADDR" value; the
-// ADDRESS gadget is then selected in the dialog.
 // FUNCTION: 0x4421f0
 void OpenTcpDialog()
 {
@@ -1323,8 +1214,6 @@ void OpenTcpDialog()
     }
 }
 
-// The original calls these two out of line from OpenSerialDialog; in this file
-// /Ob2 would inline their bodies there.
 #pragma auto_inline(off)
 // FUNCTION: 0x442380
 void __stdcall SetSerialBaudFromGadget(Gui* menu, Gadget* entry)
@@ -1345,11 +1234,6 @@ void __stdcall SetSerialPortFromGadget(Gui* menu, Gadget* entry)
 }
 #pragma auto_inline(on)
 
-// Click handler of the serial-link dialog (SERIAL.GUI, opened by OpenSerialDialog).
-// HOST and JOIN set the multiplayer connection-mode bits of g_game (+0x2aaf)
-// and save the address returned by BuildCompoundAddress; PREV goes back; anything else
-// resets the gadget. The chosen baud rate and COM port are then written back to
-// the registry under SERBAUD and SERPORT.
 // FUNCTION: 0x4423c0
 void __stdcall HandleSerialDialogClick(Gui* gadget)
 {
@@ -1394,8 +1278,6 @@ void __stdcall HandleSerialDialogClick(Gui* gadget)
     WriteGameRegistryValue((void*)"SERPORT", &a, 4);
 }
 
-// Opens the serial link dialog (SERIAL.GUI), gives the "PORTS" and "SPEEDS"
-// menus a single entry each, and restores the saved values from the registry.
 // FUNCTION: 0x442560
 void OpenSerialDialog()
 {
@@ -1427,8 +1309,6 @@ void OpenSerialDialog()
     RenderLayer(&g_game->gui, 0x40);
 }
 
-// Fills the ACCOUNTS menu entry with the 20 account names and restores the
-// selected one.
 // FUNCTION: 0x4426e0
 void FillAccountList(void)
 {
@@ -1444,8 +1324,6 @@ void FillAccountList(void)
     SetListBoxScrollByName((char*)g_game + 0x519, "ACCOUNTS", player);
 }
 
-// Copies the selected account's name and number into the NAME and NUMBER
-// entries and refreshes the ACCOUNTS list.
 // FUNCTION: 0x4427a0
 void RefreshAccountList(void)
 {
@@ -1467,10 +1345,7 @@ void RefreshAccountList(void)
     }
 }
 
-// The original calls this out of line from 0x443100; in this file /Ob2 would
-// inline its body there.
 #pragma auto_inline(off)
-// Shows the account the player entry selected in the NAME and NUMBER entries.
 // FUNCTION: 0x4428f0
 void __stdcall ShowSelectedAccount(Gui* menu, Gadget* player)
 {
@@ -1486,8 +1361,6 @@ void __stdcall ShowSelectedAccount(Gui* menu, Gadget* player)
 }
 #pragma auto_inline(on)
 
-// The last used entry is moved to the front of the modem number list, which is
-// then written to the registry under "MODEMNUMBERS".
 // FUNCTION: 0x442970
 void SaveModemNumbers(void)
 {
@@ -1504,13 +1377,6 @@ void SaveModemNumbers(void)
     }
 }
 
-// Click handler of the modem/phone dialog.
-// NAME/NUMBER select an account; HOST and JOIN move the selected account to the
-// front of the modem number list, save it under MODEMNUMBERS and connect; PREV
-// goes back; anything else resets the gadget.
-// Needed: it flips the shift loop address to lea edi, [ecx+eax].
-// The selected account is copied into the NAME and NUMBER gadgets and the
-// account list is refreshed.
 static inline void LoadAccount_00442a30()
 {
     Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
@@ -1523,8 +1389,6 @@ static inline void LoadAccount_00442a30()
     }
 }
 
-// The last used entry moves to the front of the modem number list, which is
-// then written to the registry under MODEMNUMBERS.
 static inline void SaveModemNumbers_00442a30()
 {
     if (g_modemAccounts != 0) {
@@ -1618,11 +1482,6 @@ void __stdcall HandleModemDialogClick(Gui* gadget)
                  0xfa, 1, 1);
 }
 
-// An IDirectPlayLobby::EnumAddress callback (LPDPENUMADDRESSCALLBACK). When
-// the chunk is DPAID_Modem (DPAID_Modem, {f6dcc200-a2fe-11d0-9c4f-00a0c905425e}),
-// the data is a double-null-terminated list of modem names; each one is
-// copied into the buffer at g_modemInfo and counted in g_modemCount.
-// Where the next name goes: after the first string if the buffer is not empty.
 static inline char* NameSlot(char* buffer)
 {
     if (strlen(buffer) != 0)
@@ -1644,24 +1503,18 @@ BOOL __stdcall EnumModemAddressCallback(const GUID& guidDataType, DWORD dataSize
     return TRUE;
 }
 
-// DirectX 5's DPERR_BUFFERTOOSMALL, MAKE_DPHRESULT(30).
 #define DPERR_BUFFERTOOSMALL_00443100 0x8877001e
 
 struct Len { unsigned int v; };
 
-// Opens the modem/phone dialog (MODEM.GUI), enumerates the machine's modems,
-// loads or initialises the 20 account records and shows the dialog.
 // FUNCTION: 0x443100
 void __stdcall OpenModemDialog()
 {
-    // __stdcall keeps the gadget reload after the push. size is initialised, after addr.
     char* addr = 0;
     unsigned long size = 0;
     Len len;
-    // Each HRESULT goes through r before it is compared.
     int r;
     Layer* gadget;
-    // 8-byte local, not the large Mission type.
     struct { void* dp; void* dp3; } net;
     GUID iid = g_dpspGuidModem;
 
@@ -1707,7 +1560,6 @@ void __stdcall OpenModemDialog()
                         char* buffer = (char*)GameAllocIgnoreTag("ACCOUNTNAMES", 0xa00);
                         g_modemAccountNames = buffer;
                         *buffer = 0;
-                        // Separate p runs the copy loop: keeps eax free until loop entry.
                         char* p = buffer;
                         for (i = 0; i < 20; i++) {
                             strcpy(p, g_modemAccounts[i].name);
@@ -1773,8 +1625,6 @@ void ReportDialogFrame(void)
     SendNetHeartbeat();
 }
 
-// Opens the REPORT.GUI dialog, fills in the "CHK%d" / "SERVICE%d" menu
-// entries from the score report tables, and shows it.
 // FUNCTION: 0x4435a0
 void __stdcall OpenReportDialog(unsigned int* count, char** names)
 {
@@ -1823,14 +1673,6 @@ int InitScoreReporting(void)
     return 0;
 }
 
-// The 0xbc-byte frame is `Msg_004437c0 msg;`: the group of four dwords is
-// copied out of g_game+0x2b6e at msg+0x99, so the leading pad is real and the
-// trailing pad keeps the struct at 0xbc exactly.
-// Handler for the SELGAME (multiplayer game list) screen. Processes the
-// UPDATE / PREVMENU / WATCH / JOINGAME / STARTNEW buttons and the per-entry
-// "compatible version" check. param_1 is &g_game->gui (g_game+0x519); its
-// +0x18 field is the widget created by LoadGuiLayer, whose +4 is the GUI entry
-// table and whose +0x60 is the id of the pressed entry.
 // FUNCTION: 0x4437c0
 void __stdcall HandleSelectGameClick(Gui* param_1)
 {
@@ -1882,7 +1724,6 @@ void __stdcall HandleSelectGameClick(Gui* param_1)
         Gadget* e = FindGadgetChecked(entries, "GAMENAME");
         Msg_004437c0 msg;
         unsigned int flags;
-        // int, not unsigned: keeps the version test a signed compare (jg/jl).
         int ver;
         char* pass;
         unsigned int b;
@@ -1944,16 +1785,6 @@ startnew:
     ClearSelectedGadget(param_1);
 }
 
-// Opens the network game selection dialog (SELGAME.GUI) and sets up the
-// buffers it needs: a 0x690 byte "GAME DESCRIPTIONS" block, a 0xe74 byte
-// "PLAYER SHARED" block and 15 blocks of 0xa00 bytes named "DATA0" .. "DATA14",
-// then a table of (size, offset) pairs (0xb9 bytes each) in the descriptions
-// block pointing into the shared block. Every GUI entry from 1 up whose type
-// byte is 2 gets UpdateGameSelection as its handler and the descriptions block as its
-// data. ConnectToGame then connects; on failure an "Invalid TCP/IP Address"
-// message box is shown, g_game->frontendSubstateRequest is set to 3 and the function
-// returns. On success the game name is put on the menu, and a connection that
-// came back with an error status (neither 0 nor 2) is reported and cleared.
 // FUNCTION: 0x443cb0
 void OpenSelectGameDialog()
 {
@@ -1972,7 +1803,6 @@ void OpenSelectGameDialog()
         sprintf(name, "DATA%d", i);
         g_game->data[i] = GameAllocIgnoreTag(name, 0xa00);
     }
-    // Offset is j * 0xb9, no separate off counter.
     for (j = 0; j < 20; j++) {
         g_game->desc[j].size = 0xb9;
         g_game->desc[j].offset = (int)(g_game->shared + j * 0xb9);
@@ -1983,7 +1813,6 @@ void OpenSelectGameDialog()
     SetGrayedOutByName(&g_game->gui, "WATCH", 1);
     for (i = 1; i < gadget->entries->count; i++) {
         if (gadget->entries[i].type == 2) {
-            // Indexed inline and bound by reference: no named entries pointer local.
             Gadget& e = gadget->entries[i];
             e.handler = UpdateGameSelection;
             e.data = (int)g_game->desc;
@@ -2015,10 +1844,6 @@ void OpenSelectGameDialog()
     }
 }
 
-// Appends a copy of entry `param_2` to the table (count at +0xb6 of entry 0),
-// initialises it through the menu (SetTranslatedText), then sets its name, value,
-// state and flags. The body is inlined at 0x4447d4 by the caller that builds a
-// name with sprintf first.
 // FUNCTION: 0x4444d0
 int __stdcall CloneServiceSlot(Gadget* entries, int param_2, short param_3, int param_4, char* param_5)
 {
@@ -2039,9 +1864,6 @@ void __stdcall CacheLogosGadgetIndex(Gui* param1, int param2)
 {
     param1->hotGadgetIndex = FindGadgetIndex(param1->layer->entries, "LOGOS", 2);
 }
-// Handler for the multiplayer side-selection dialog. When the dialog closes
-// (current gadget -1) it frees the layout data; when the player picks a side
-// (LOGOS/SELECT) it copies that side's byte into the local player's info.
 
 // FUNCTION: 0x444930
 void __stdcall HandleLogoSelectClick(Gui* param_1)
@@ -2115,7 +1937,6 @@ void __stdcall HandleViewMapClick(Gui* param_1)
     }
 }
 
-// Opens the map view dialog (VIEWMAP.GUI) with HandleViewMapClick as its handler.
 // FUNCTION: 0x444be0
 void OpenViewMapDialog()
 {
@@ -2192,19 +2013,6 @@ void __stdcall HandleMapSelectClick(Gui* param_1)
     ClearSelectedGadget(param_1);
 }
 
-// Opens the multiplayer map selector (SELMAP.GUI): saves the map the local
-// player was last on in a global buffer, counts the multiplayer maps, fills
-// the MAPNAMES list with them, selects the saved one, then applies the
-// selection the way the MAPNAMES callback does.
-
-// The call to Mission::RefreshMapList(0) is compiled without its
-// argument push, although the callee ends in "ret 4" (see 0x435d30) and every
-// other call site of it does push (0x430b98, 0x4446d7, 0x44a49e). That leaves
-// the stack 4 bytes short, so this call is kept exactly as the original has
-// it. It is never reached: the only caller (0x4488ea) calls this function
-// precisely when Mission::HasMissionName() is false, and the test at the
-// top of this function then returns early.
-
 // FUNCTION: 0x444ea0
 void OpenMultiMapSelector()
 {
@@ -2259,13 +2067,6 @@ void OpenMultiMapSelector()
     RenderLayer(&g_game->gui, 0x40);
 }
 
-// Sets up the multiplayer "select team logo" dialog (LOGOSEL.GUI). It opens
-// the dialog, allocates a small layout object holding the list of logo
-// pointers and a copy of the logo sequence records, then walks the ten player
-// slots: a slot takes a logo index j when its type byte is neither 0 nor 4
-// and its player data's logo byte is at least j. The pointer list and the
-// byte array are filled in from the slots that no player claimed.
-
 // FUNCTION: 0x445110
 void OpenLogoSelectDialog()
 {
@@ -2279,7 +2080,6 @@ void OpenLogoSelectDialog()
     void** cursor = layout->ptrList;
     int n = 0;
     for (int j = 0; j < count; j++) {
-        // Array indexing (players[k]): strength-reduced to a pointer over the type byte.
         int k;
         for (k = 0; k < 10; k++) {
             if (g_game->players[k].type != 0 && g_game->players[k].type != 4
@@ -2291,7 +2091,6 @@ void OpenLogoSelectDialog()
         if (k == 10) {
             *cursor = &layout->seqs[j];
             ((char*)layout)[n] = (char)j;
-            // n before cursor: sets the eax/ecx roles in this block.
             n++;
             cursor++;
         }
@@ -2323,10 +2122,6 @@ void __stdcall ExpandGadgetTextToType5(Gadget* param_1)
     }
 }
 
-// Swaps two player slots, clears the first one (type 0, not active), then
-// stamps index of every playing slot with its own index, or 10 for the
-// others.
-
 // FUNCTION: 0x4453a0
 void __stdcall SwapPlayerSlots(Player* param_1, Player* param_2)
 {
@@ -2335,11 +2130,6 @@ void __stdcall SwapPlayerSlots(Player* param_1, Player* param_2)
     *param_1 = tmp;
     param_1->SetType(0);
     param_1->active = 0;
-    // The original bound is i <= 10, not i < 10: the offset test is
-    // "cmp eax, 0xcee; jle" (0xcee is 10 * 0x14b, the size of players), so
-    // the last pass reads and writes players[10]. The table really has 11
-    // slots (+0x1b63 to +0x299c), so this is the spare last slot, not an
-    // overrun; this file declares only the first ten.
     for (int i = 0; i <= 10; i++) {
         Player* p = &g_game->players[i];
         if (p->active != 0
@@ -2347,16 +2137,11 @@ void __stdcall SwapPlayerSlots(Player* param_1, Player* param_2)
             && p->index != 10) {
             p->index = i;
         } else {
-            // Re-derived: with the same pointer variable in both arms MSVC
-            // keeps g_game in edx instead of ecx.
             g_game->players[i].index = 10;
         }
     }
 }
 
-// Compacts the player list: finds the first slot the renumbering pass would
-// call dead, moves the next live slot into it, clears the slot it left, then
-// renumbers every slot's index.
 // FUNCTION: 0x445450
 void CompactActivePlayerSlots()
 {
@@ -2366,7 +2151,6 @@ void CompactActivePlayerSlots()
     while (1) {
         if (q >= end && p >= end)
             break;
-        // Step over slots that are in use, and over type 4 slots.
         while ((p->active != 0
                     && (p->type == 1 || p->type == 2 || p->type == 3)
                     && p->index != 10)
@@ -2376,7 +2160,6 @@ void CompactActivePlayerSlots()
             p++;
         }
         q = p + 1;
-        // Find the next slot that is in use.
         for (; q->active == 0
                || (q->type != 1 && q->type != 2 && q->type != 3)
                || q->index == 10;
@@ -2394,9 +2177,7 @@ void CompactActivePlayerSlots()
         q->SetType(0);
         q->active = 0;
         for (int i = 0; i <= 10; i++) {
-            // Global read into a local first: moves the reload into ecx.
             Game* g = g_game;
-            // Through a byte pointer: avoids a reload via an extra lea.
             unsigned char* f = &g->players[i].index;
             if (g->players[i].active != 0
                 && (g->players[i].type == 1 || g->players[i].type == 2
@@ -2465,7 +2246,6 @@ void __cdecl BuildPlayerSlotGadgets(void)
                     break;
                 case 2:
                     {
-                        // Indexed through g_game->players[p], not a byte offset: g_game is the SIB base.
                         Player* pl = &g_game->players[p];
                         if (pl->active == 0 || (pl->type != 1 && pl->type != 2))
                             dst->active = 0;
@@ -2525,11 +2305,6 @@ void __cdecl BuildPlayerSlotGadgets(void)
     g_battleRoomSlotsBuilt = 1;
 }
 
-// GUI callback (see the entry a slider widget stores at +0x144): shows the
-// unit limit of the player being watched, as text, and remembers it on the
-// local player. FindHostSlot picks the watched player, or 10 for "nobody",
-// in which case the value comes from the widget's own slider instead.
-
 // FUNCTION: 0x445b70
 void __stdcall UpdateMaxUnitsText(Gui* gui, int index)
 {
@@ -2555,11 +2330,6 @@ void __stdcall UpdateMaxUnitsText(Gui* gui, int index)
     }
 }
 
-// Writes the local player's stored metal (gadget "METAL") rounded down to
-// hundreds into the "METALTEXT" label, mirrors it into the unit at +0xa3 and,
-// if the unit's flag byte at +0x97 has bit 0, re-sends the player block and the
-// name call. Near-copy of 0x445d60 (the "ENERGY" one) and 0x445b70.
-
 // FUNCTION: 0x445c70
 void __stdcall UpdateMetalText(Gui* sub, int unused)
 {
@@ -2575,8 +2345,6 @@ void __stdcall UpdateMetalText(Gui* sub, int unused)
         SetTranslatedTextByName(sub, "METALTEXT", text, 0);
         hundreds = shown / 100;
         g_game->players[g_game->localPlayer].info->metal = (unsigned short)hundreds;
-        // The original writes the same value to the same field a second time,
-        // through a freshly looked up unit pointer, before testing its flag.
         unit = g_game->players[g_game->localPlayer].info;
         unit->metal = (unsigned short)hundreds;
         if (unit->flags_97 & 1) {
@@ -2585,11 +2353,6 @@ void __stdcall UpdateMetalText(Gui* sub, int unused)
         }
     }
 }
-
-// Shows the local player's stored energy (gadget "ENERGY") rounded down to
-// hundreds in the "ENERGYTEXT" label, mirrors it into the unit at +0xa1 and,
-// if the unit's flag byte at +0x97 has bit 0, re-sends the player block and
-// the name call. Near-copy of 0x445c70 (the "METAL" one).
 
 // FUNCTION: 0x445d60
 void __stdcall UpdateEnergyText(Gui* sub, int unused)
@@ -2612,16 +2375,12 @@ void __stdcall UpdateEnergyText(Gui* sub, int unused)
     }
 }
 
-// Sets the value of the named gadget of a menu (see 0x445e50).
-
 // FUNCTION: 0x445e20
 void __stdcall SetNamedSliderValue(Gui* menu, char* name, int value)
 {
     Gadget* gadget = FindGadgetChecked_D(menu->layer->entries, name);
     SetSliderFromValue(gadget, value);
 }
-// Sets up the gadget with the given name in the game's menu (if it exists),
-// then hands the gadget's index to the callback.
 
 typedef void (__stdcall* Callback_00445e50)(Gui* menu, int index);
 
@@ -2642,10 +2401,6 @@ void __stdcall BindNamedSliderWithCallback(char* name, int param_2, int param_3,
     callback(menu, index);
     MarkChanged(menu);
 }
-
-// Pushes the local player's status flags (commander, mapping, los type,
-// watching, cheating, fixed position, game open) into the GUI by name.
-// SetButtonStageByName's value parameter is widened to an int here, as in 0x446450.
 
 // FUNCTION: 0x445ed0
 void UpdateBattleRoomFlags()
@@ -2671,9 +2426,6 @@ void UpdateBattleRoomFlags()
     SetButtonStageByName((Class_004a1080*)&g_game->gui, "GAMEOPEN", !info->closed);
 }
 
-// Handler for a two-choice dialog gadget: "CHOICE1" acts on the local
-// player, "CHOICE2" does nothing, anything else is passed on.
-
 // FUNCTION: 0x446020
 void __stdcall HandleRejectChoice(Gui* gadget)
 {
@@ -2686,10 +2438,6 @@ void __stdcall HandleRejectChoice(Gui* gadget)
         ClearSelectedGadget(gadget);
     }
 }
-
-// Opens the YESORNO.GUI dialog for player g_rejectPlayer, fills its CHOICE1 /
-// CHOICE2 / TITLE fields and installs HandleRejectChoice as the handler. The title
-// is "Reject <player name>?".
 
 // FUNCTION: 0x446080
 void __stdcall OpenRejectDialog(int player)
@@ -2714,12 +2462,6 @@ void __stdcall OpenRejectDialog(int player)
         RenderLayer(&g_game->gui, 0x40);
     }
 }
-
-// Handler for the "MODES" (display mode) dialog. When a mode gadget is
-// selected (MODES or SELECT), it copies the selected display mode into the
-// game's width/height and the local player's screen size, then applies it.
-// CANCEL exits the game, OK plays the button sound. With no current gadget
-// (-1) it frees the display mode list.
 
 // FUNCTION: 0x4461d0
 void __stdcall HandleDisplayModesClick(Gui* gui)
@@ -2757,9 +2499,6 @@ void __stdcall HandleDisplayModesClick(Gui* gui)
     }
     ClearSelectedGadget(gui);
 }
-
-// Screen resolution selection: builds the display mode list, then advances the
-// local player's mode to the next (or previous) entry.
 
 // FUNCTION: 0x446310
 void CyclePlayerDisplayMode(void)
@@ -2801,10 +2540,6 @@ void CyclePlayerDisplayMode(void)
     GameFreeThunk(obj);
 }
 
-// Sets the GUI's "WATCHING" and "GAMEOPEN" controls from the local player's
-// flags and marks the GUI for redraw. SetButtonStageByName's value is widened as an
-// int here (its own file says char; the checker compares names only).
-
 // FUNCTION: 0x446450
 void UpdateWatchingGadgets()
 {
@@ -2813,11 +2548,6 @@ void UpdateWatchingGadgets()
     SetButtonStageByName((Class_004a1080*)&g_game->gui, "GAMEOPEN", !info->closed);
     MarkChanged((Dialog*)&g_game->gui);
 }
-
-// Handler for the CONTROL.GUI dialog: choosing a "LIVEPLYR%d" entry opens the
-// reject dialog for that player, WATCHING toggles the local player's watching
-// flag and republishes the GUI values, OK kicks every playing player in state
-// 3 without watch permission, and any other gadget clears the current one.
 
 // FUNCTION: 0x4464d0
 void __stdcall HandleControlDialogClick(Gui* gui)
@@ -2856,14 +2586,9 @@ void __stdcall HandleControlDialogClick(Gui* gui)
             }
             return;
         }
-        // Written once after the chain, not in each arm; the OK arm returns early.
         ClearSelectedGadget(gui);
     }
 }
-
-// Opens the CONTROL.GUI dialog (with HandleControlDialogClick as its handler) when the
-// local player's info does not have bit 6 set, then sets the WATCHING and
-// GAMEOPEN controls from that player's flags.
 
 // FUNCTION: 0x4466b0
 void OpenControlDialog()
@@ -2883,8 +2608,6 @@ void OpenControlDialog()
     SetKeyboardInput((Dialog*)&g_game->gui, 1);
     RenderLayer((Dialog*)&g_game->gui, 0x40);
 }
-
-// Returns whether two players are allied: alliance 5 means "no alliance".
 
 // FUNCTION: 0x4467c0
 bool __stdcall ArePlayersAllied(Player* a, Player* b)
@@ -2924,9 +2647,6 @@ static inline int CountAlliance(int alliance)
     return count;
 }
 
-// Counts the players (0..9) that are still in the game and belong to `alliance`
-// when the extra "counted" test applies. Same helper that 0x4468c0 inlines.
-
 // FUNCTION: 0x4467f0
 int __stdcall CountPlayersInAlliance(int alliance)
 {
@@ -2946,10 +2666,6 @@ int __stdcall CountPlayersInAlliance(int alliance)
     return count;
 }
 
-// Returns true if some alliance (0..4) contains every counted player, i.e.
-// the players still in the game are all on one side.
-
-// With both calls in one expression MSVC calls the later-declared one first.
 int CountHumanPlayers();
 int CountComputerPlayers();
 
@@ -2978,10 +2694,6 @@ int __stdcall FindNextAlly(int player, int start)
     return -1;
 }
 
-// Refreshes the "TEAMICONS%d" gadget for every active player: the name uses
-// either the player index or a running icon counter, and the value comes from
-// the player's alliance and how many players are still counted on that side.
-
 // FUNCTION: 0x446a50
 void RefreshTeamIcons()
 {
@@ -3004,7 +2716,6 @@ void RefreshTeamIcons()
             int alliance = p->alliance;
             int count = CountAlliance(alliance);
 
-            // Three separate calls: they tail-merge in the original.
             switch (count) {
             case 0:
                 SetButtonStageByName((Class_004a1080*)&g_game->gui, buffer, 10);
@@ -3021,13 +2732,6 @@ void RefreshTeamIcons()
     g_game->bits_2bee_1.dirty = 1;
 }
 
-// Recomputes the per-player ally marks. For every active player it walks the
-// players that share its alliance colour (FindNextAlly, inlined), sets the
-// corresponding bytes of allied/alliedBy and bit 1 of the player info
-// flags, then keeps that bit only when at least two players share the
-// alliance (CountAlliance, inlined from 0x4468c0).
-
-// The original's out-of-line FindNextAlly, inlined at its only call site.
 static inline int FindNextAlly_00446c70(int player, int start)
 {
     Player* players = g_game->players;
@@ -3041,14 +2745,11 @@ static inline int FindNextAlly_00446c70(int player, int start)
     return -1;
 }
 
-// The original calls this out of line from 0x446f50, 0x447b10 and
-// 0x448c70; in this file /Ob2 would inline it.
 #pragma auto_inline(off)
 // FUNCTION: 0x446c70
 void SyncMutualAlliances()
 {
     for (int i = 0; i < 10; i++) {
-        // j and k before p: puts p in the base slot of the field stores.
         int j;
         int k;
         Player* p = &g_game->players[i];
@@ -3083,13 +2784,6 @@ static inline int IsSelectable(Player* p)
         && p->index != 10;
 }
 
-// For every other player on the same side, marks the relation and clears
-// bit 1 in player->info->flags_9d_wide. The extra "g_game->players[i].type != 4"
-// check is dead: IsSelectable already restricts type to 1, 2 or 3, so the
-// condition can never be false; kept because the compiler emitted it.
-
-// The original calls this out of line from 0x446f50 and 0x447b10;
-// in this file /Ob2 would inline it.
 #pragma auto_inline(off)
 // FUNCTION: 0x446e90
 void __stdcall ClearAlliances(Player* player)
@@ -3128,10 +2822,8 @@ __inline int IsLiveType_00446fb0(Player* p)
     return 1;
 }
 
-// Players are passed by pointer with no local copy: keeps g_game in eax.
 __inline int IsAlly_00446fb0(Player* p)
 {
-    // First active test reads a local, the second reads p->active: keeps both tests.
     int act = p->active;
     if (!act)
         return 0;
@@ -3150,7 +2842,6 @@ __inline int IsAlly_00446fb0(Player* p)
     return 1;
 }
 
-// Separate from IsAlly: runs the type chain once.
 __inline int IsLive_00446fb0(Player* p)
 {
     if (!p->active)
@@ -3169,15 +2860,12 @@ __inline int IsLive_00446fb0(Player* p)
 // FUNCTION: 0x446fb0
 void RebuildAllyList()
 {
-    // 52 bytes, not 44: sets the frame size.
     char text[52];
-    // No lp local: both pointers are built from g_game->players[...] directly.
     unsigned char* a = &g_game->players_1b63[g_game->localPlayer].allied[0];
     unsigned char* b = &g_game->players_1b63[g_game->localPlayer].alliedBy[0];
 
     if (IsScreenNamed(&g_game->gui, "ALLIES.GUI") != 0) {
         int i;
-        // Pointer induction variables, not a[i] / b[i]; i < 10, not i != 10.
         for (i = 0; i < 10; ++i, ++a, ++b) {
             if (IsAlly_00446fb0(&g_game->players_1b63[i]) && i != g_game->localPlayer
                 && IsLive_00446fb0(&g_game->players_1b63[i])) {
@@ -3289,7 +2977,6 @@ void __stdcall RefreshAlliesScreen(int param_1)
         SetGadgetActiveByName((char*)g_game + 0x519, teamicons, 0);
 
         Player* p = &g_game->players[i];
-        // Two helpers, not one: gives the register rotation of the second sprintf group.
         if (!IsWatching_00447380(p) && IsActive_00447380(p)
             && (i != g_game->localPlayer || param_1 == 0)
             && (!(g_game->flags_2a44 & 4) || IsCounted_00447380(p))
@@ -3369,7 +3056,6 @@ static inline int IsPlaying_004478b0(Player* p)
         && p->index != 10;
 }
 
-// Repeats the type test of IsPlaying (dead): must stay.
 static inline int IsCounted_004478b0(Player* p)
 {
     return (p->type == 1 || p->type == 2 || p->type == 3)
@@ -3473,8 +3159,6 @@ static inline int CountAlliance_00447b10(int alliance)
     return count;
 }
 
-// The free slot search at 0x440c10, which has no callers. MSVC inlines it only
-// when it is declared inline (it has two loops).
 inline int FindUnusedLogo()
 {
     int used[10];
@@ -3494,7 +3178,6 @@ inline int FindUnusedLogo()
     return result;
 }
 
-// The map check at 0x440cd0, which has no callers: /Ob2 inlined it.
 int CheckMapCrc_00447b10()
 {
     if (!g_game->net->GetTerrainLength()) {
@@ -3505,7 +3188,6 @@ int CheckMapCrc_00447b10()
     int check = 0;
     if (me != 10) {
         data = g_game->players[me].info;
-        // Version test form must stay: `>= 2`, else `== 1 && minor >= 2`.
         if (data->versionMajor >= 2)
             check = 1;
         else if (data->versionMajor == 1 && data->versionMinor >= 2)
@@ -3519,10 +3201,8 @@ int CheckMapCrc_00447b10()
     return 1;
 }
 
-// The colour cycle at 0x446f50, which has no callers: /Ob2 inlined it.
 void __stdcall CyclePlayerAlliance_00447b10(int index)
 {
-    // Declared before colour.
     Player* player = &g_game->players[index];
     int colour = g_game->players[index].alliance;
     ClearAlliances(player);
@@ -3535,7 +3215,6 @@ void __stdcall CyclePlayerAlliance_00447b10(int index)
 // FUNCTION: 0x447b10
 void __stdcall HandleBattleRoomClick(Gui* gadget)
 {
-    // 249 or 250 bytes: puts used[] of the inlined FindUnusedLogo above the text.
     char text[250];
     Gadget* entries = gadget->layer->entries;
 
@@ -3551,7 +3230,6 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
     Player* me = &g_game->players[lp];
     int canAdd = IsHostLocal();
     int i = 0;
-    // Not a for loop: that gives the tail's registers to the wrong values.
     while (1) {
         Player* p = &g_game->players[i];
 
@@ -3638,9 +3316,6 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
                 me->alliance = 5;
                 BroadcastAllyTeam(me);
             }
-            // Original bug (docs/bugs.md): `<<` binds tighter than `==` and
-            // `==` tighter than `|`, so this is ((ally2 << 1) == 3) | ally,
-            // and the left side is never true.
             if (me->alliedBy[i] << 1 == 3 | me->allied[i])
                 PlaySoundByName("Ally", 0);
             else
@@ -3792,7 +3467,6 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
         if (!g_game->net->HasMissionName()) {
             PlaySoundByName("Multi", 0);
             OpenMultiMapSelector();
-            // Emits no code, but keeps the gadget in esi for the button tests.
             goto done;
         }
         if (!me->info->watching) {
@@ -3824,9 +3498,6 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
         OpenUnitRestrictions();
         ClearSelectedGadget(gadget);
     } else {
-        // MAP and MAPNAME through a local, not `MAP || MAPNAME` in the
-        // else-if: with the `||` the MAP body joins the region where C2 keeps
-        // the constant 1 in ebp, and SetKeyboardInput gets `push ebp`.
         int hit = IsCurrentGadgetNamed(gadget, "MAP");
         if (!hit)
             hit = IsCurrentGadgetNamed(gadget, "MAPNAME");
@@ -3896,7 +3567,6 @@ static inline int IsLocal_00448c70(Player* p)
     return p->active != 0 && (p->type == 1 || p->type == 2);
 }
 
-// The map check at 0x440cd0, which has no callers: /Ob2 inlined it.
 int CheckMapCrc_00448c70()
 {
     if (!g_game->net->GetTerrainLength()) {
@@ -3907,7 +3577,6 @@ int CheckMapCrc_00448c70()
     int check = 0;
     if (me != 10) {
         data = g_game->players[me].info;
-        // Version test form must stay: inlined, it gives the right registers for g_game/check.
         if (data->versionMajor >= 2)
             check = 1;
         else if (data->versionMajor == 1 && data->versionMinor >= 2)
@@ -3921,7 +3590,6 @@ int CheckMapCrc_00448c70()
     return 1;
 }
 
-// The SIDE%d update at 0x448bf0, which has no callers: /Ob2 inlined it.
 void __stdcall UpdateSideGadget_00448c70(int side)
 {
     char name[20];
@@ -3936,7 +3604,6 @@ void __stdcall UpdateSideGadget_00448c70(int side)
 void RefreshBattleRoomRows()
 {
     char name[20];
-    // Shared by the mapname and PING text: one frame slot.
     char* str;
     unsigned int minPing = 0xffffffff;
     int count = 0;
@@ -4028,7 +3695,6 @@ void RefreshBattleRoomRows()
 
     char* entries = (char*)g_game->gui.layer->entries;
     Player* local = &g_game->players[g_game->localPlayer];
-    // Plain unsigned char counter, no int copy.
     for (unsigned char n = 0; n < 10; n++) {
         char text[32];
         char res[52];
@@ -4125,8 +3791,7 @@ void RefreshBattleRoomRows()
             sprintf(name, "TEAMICONS%d", n);
             e = FindGadgetOrNull(entries, name);
             if (e) {
-                // `|| 0` emits no code but gives the 1-before-0 layout.
-                e->visible = (IsWatching_00448c70(p) || 0) ? 0 : 1;  // see the top
+                e->visible = (IsWatching_00448c70(p) || 0) ? 0 : 1;
                 SetGadgetGrayedOutByName(&g_game->gui, name, (IsLocal_00448c70(p) && !ready) ? 0 : 1);
             }
             sprintf(name, "RES%d", n);
@@ -4161,7 +3826,6 @@ void RefreshBattleRoomRows()
             }
             sprintf(name, "MEM%d", n);
             e = FindGadgetChecked_C(entries, name);
-            // Full tail in each arm, not shared: gives p and n their registers.
             if (!IsLocalHuman_00448c70(p) && !IsRemoteHuman_00448c70(p)) {
                 sprintf(e->text, "%s", "n/a");
                 e->colour = p->info->memory < g_game->net->GetTerrainSizeTier() ? 0xc : 0;
@@ -4187,14 +3851,6 @@ void RefreshBattleRoomRows()
         UpdateNetGameInfo();
     }
 }
-
-// 0x449bb0 OpenBattleRoom stays in src/frontend/multi_449bb0.cpp: gathered
-// here, /Ob2 inlines UpdateMetalText (0x445c70) into it through
-// BindNamedSliderWithCallback, where the original calls it.
-
-// 0x44a680 UpdateBattleRoom stays in src/frontend/multi_44a680.cpp: gathered
-// here, /Ob2 inlines UpdateMaxUnitsText (0x445b70) and UpdateMetalText
-// (0x445c70) into it, where the original calls them.
 
 // FUNCTION: 0x44afb0
 void __stdcall HandleEndMultiClick(Gui* obj)
@@ -4243,11 +3899,6 @@ void FreeSaveListBuffers()
     g_saveListFileNames = g_saveListDisplayNames = 0;
 }
 
-// Reads pairs of ints from a binary file given by `name`. For each pair the
-// first int is matched against the field at +0x13e of the 0x249-byte entries
-// at g_game+0x1439b (entries are 1-based here); the second int is then stored
-// in the field at +0x5a of the 0x62-byte entry of the table at g_unitRestrictEntries
-// whose +0x52 field equals the matched index.
 // FUNCTION: 0x44b140
 void __stdcall LoadUnitRestrictListFile(char* name)
 {
@@ -4575,7 +4226,6 @@ void __stdcall HandleUnitCountSlider(void* obj, char* gadget)
 // FUNCTION: 0x44bfd0
 void __stdcall UpdateUnitSliders(Gui* param_1, int unused)
 {
-    // C-style locals, loop counter first: sets the operand order of the flags store.
     int i;
     Gadget* desc;
     int human;
@@ -4623,7 +4273,6 @@ void LoadUnitPortrait()
         int type = g_unitRestrictEntries[i].unitIndex;
         UnitType_00446f50* defs = (UnitType_00446f50 *)g_game->defs.get();
         if (defs[type].name && ((unsigned char)(defs[type].flags2.raw >> 15) & 1) == 0) {
-            // Indexed by the reloaded entry field, not defs[type].name.
             BuildDataPath(path, "unitpics", defs[g_unitRestrictEntries[i].unitIndex].name, "PCX");
             void* img = LoadPcx(path, 0);
             *(void**)g_unitRestrictPicCursor = img;
@@ -4632,7 +4281,6 @@ void LoadUnitPortrait()
                 FrameFromSurface(&rec, img);
                 rec.flag8 = 9;
             } else {
-                // rec.a before rec.b: width is loaded before the 0x20 store.
                 rec.a = pic->width;
                 rec.b = 0x20;
                 rec.d = 0;
@@ -4685,17 +4333,12 @@ void __stdcall ShowSelectedUnitCosts(void* panel, Gadget* unit)
     SetTranslatedTextByName(panel, "METALTEXT", (char*)buf, 0);
 }
 
-// 0x44c420 HandleRestrictionsClick stays in src/frontend/multi_44c420.cpp:
-// gathered here, two address computations swap their operand order, which
-// follows symbol ids that this file cannot give the function.
-
 // FUNCTION: 0x44c7a0
 int __cdecl CompareUnitRestrictEntries(const char* a, const char* b)
 {
     return strcmp(a, b);
 }
 
-// The slider set-up at 0x445e50, which has no callers: /Ob2 inlined it.
 void __stdcall BindNamedSliderWithCallback_0044c7e0(char* name, int max, int value, Callback_0044c7e0 callback)
 {
     Gui* gui = &g_game->gui;
@@ -4765,7 +4408,6 @@ void OpenUnitRestrictions()
 
     n = 0;
     for (i = 1; i < g_game->unitDefCount; i++) {
-        // continue on the bit, an int bitfield tested positively.
         if (((UnitType_00446f50 *)g_game->defs.get())[i].flags2.bits.flag)
             continue;
         if (!((UnitType_00446f50 *)g_game->defs.get())[i].name)
@@ -4779,7 +4421,6 @@ void OpenUnitRestrictions()
                     (int)type->metalCost, (int)type->energyCost);
             g_unitRestrictEntries[n].unitIndex = i;
             ((UnitSync *)g_game->sync)->GetUnitEntry(&((UnitType_00446f50 *)g_game->defs.get())[i], &info);
-            // One ternary: the if-statement form swaps the ebx/ebp registers.
             count = info.max == -1 ? 0x65 : info.max;
             g_unitRestrictEntries[n].max = count;
             g_unitRestrictOldCounts[n] = count;

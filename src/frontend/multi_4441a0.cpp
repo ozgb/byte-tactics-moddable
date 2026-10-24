@@ -1,5 +1,3 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// Stays out of multi.cpp: a gap region (docs/split-modules.md).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,14 +9,14 @@
 #pragma pack(push, 1)
 struct Holder_004441a0 {
     int unknown_0;
-    Gadget* entries;                    // +0x4
+    Gadget* entries;
 };
 
 struct Menu_004441a0 {
     char unknown_0[0x18];
-    Holder_004441a0* holder;            // +0x18
+    Holder_004441a0* holder;
     char unknown_1c[0x60 - 0x1c];
-    int selected;                       // +0x60
+    int selected;
 };
 
 struct Conn_004441a0 {
@@ -28,12 +26,12 @@ struct Conn_004441a0 {
 
 struct Game_004441a0 {
     char unknown_0[0x2a4b];
-    void* descriptions;                 // +0x2a4b
+    void* descriptions;
     char unknown_2a4f[0x2a9f - 0x2a4f];
-    void* guids;                        // +0x2a9f
-    Conn_004441a0* conns;               // +0x2aa3
+    void* guids;
+    Conn_004441a0* conns;
     char unknown_2aa7[0x2bc0 - 0x2aa7];
-    char frontendSubstateRequest;       // +0x2bc0
+    char frontendSubstateRequest;
 };
 #pragma pack(pop)
 
@@ -57,13 +55,11 @@ void __stdcall OpenMessageBox(void* menu, char* text, int size, int param_4, int
 void __stdcall ClearSelectedGadget(void* menu);
 void OpenOptionsPanel();
 
-// The SELPROV.GUI menu's handler.
 // FUNCTION: 0x4441a0
 void __stdcall HandleSelectProviderClick(Menu_004441a0* menu)
 {
     Gadget* entries = menu->holder->entries;
     int i;
-    // Unused id and cur, and the names link/message/result/msg, set the stack slot order.
     int id;
     int cur;
     if (menu->selected == -1) {

@@ -1,10 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, retries by GPT-6.1-sol and space-bunny-free, finished by deepseek-v4.1-flash, improved by claude-sonnet-5-5, matched by Space Bunny Free. Names are provisional.
-//
-// Sends a 10-byte 0x21 message via SendPacketToPlayer for each player slot in state
-// 1, 2 or 3 with f_146 != 10 and lobbyDataSynced == 0 (to = first slot whose data->flags
-// has bit 0, from = first slot in state 1 or 2). State 1 sets the flag byte and
-// arg = -1, state 2 sets the flag byte and arg = the local player's id, state 3
-// clears the flag and arg = -1.
 #include "player.h"
 
 #pragma pack(push, 1)
@@ -13,10 +6,10 @@
 #include "../game/game.h"
 
 struct Msg_00450530 {
-    unsigned char type;                // +0x0
-    unsigned char flag;                // +0x1
-    int id;                            // +0x2
-    int arg;                           // +0x6
+    unsigned char type;
+    unsigned char flag;
+    int id;
+    int arg;
 };
 #pragma pack(pop)
 
@@ -78,11 +71,9 @@ static inline int FindToB_00450530()
     return -1;
 }
 
-// Stays in its own file: the module inlines FindHostSlot here, where the original calls it out of line.
 // FUNCTION: 0x450530
 void SendLobbySyncRequests()
 {
-    // Function scope, before the mode == 6 guard: orders the stores in the three branches.
     Msg_00450530 msg;
     if (g_game->mode_391f1 == 6)
         return;
@@ -104,7 +95,6 @@ void SendLobbySyncRequests()
                 msg.arg = -1;
                 if (FindHostSlot() == 10)
                     continue;
-                // from and to stay call arguments, not locals.
                 SendPacketToPlayer(FindFrom_00450530(), FindTo_00450530(), &msg, 10);
             }
             else if (IsPlaying_00450530(p) && p->type == 2) {
@@ -128,10 +118,6 @@ void SendLobbySyncRequests()
                 msg.arg = -1;
                 if (FindPlayer_00450530() == 10)
                     continue;
-                // Dead branch, not real logic: the `i == 9` test is the only
-                // thing that stops MSVC strength-reducing &players[i], and a
-                // self-assignment is the only body it then deletes. See the
-                // header note; removing these two lines costs the match.
                 if (i == 9)
                     p->lobbyDataSynced = p->lobbyDataSynced;
                 SendPacketToPlayer(FindFrom_00450530(), FindTo_00450530(), &msg, 10);

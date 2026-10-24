@@ -1,7 +1,3 @@
-// Decompiled by Opus, deepseek-v4.1-flash, GPT-6, deepseek-v4.1 and space-bunny-free. Names are provisional.
-
-// Full <windows.h> pulls in <rpc.h>/<ole2.h>, whose declarations flip the
-// base/index order of a SIB address in 0x431740.
 #include "win_types.h"
 #include <stdio.h>
 #include <string.h>
@@ -9,48 +5,48 @@
 
 #pragma pack(push, 1)
 struct SkirmishPlayer {
-    int controller;      // +0x00
-    int side;            // +0x04
-    int allyGroup;       // +0x08
-    int metal;           // +0x0c
-    int energy;          // +0x10
-    int color;           // +0x14
+    int controller;
+    int side;
+    int allyGroup;
+    int metal;
+    int energy;
+    int color;
 };
 
 struct Options {
-    SkirmishPlayer players[10];         // +0x00, 0x18 bytes each
+    SkirmishPlayer players[10];
     char unknown_f0[0x108 - 10 * 0x18];
-    int skirmishCommanderDeath;         // +0x108
-    int skirmishMapping;                // +0x10c
-    int skirmishLineOfSight;            // +0x110
-    int skirmishLOSType;                // +0x114
-    int fixedLocations;                 // +0x118
-    char skirmishMap[0x228 - 0x11c];    // +0x11c
-    int skirmishDifficulty;             // +0x228
+    int skirmishCommanderDeath;
+    int skirmishMapping;
+    int skirmishLineOfSight;
+    int skirmishLOSType;
+    int fixedLocations;
+    char skirmishMap[0x228 - 0x11c];
+    int skirmishDifficulty;
 };
 
 struct Flags_0042f9a0 {
-    unsigned short damagebars : 1;       // bit 0
-    unsigned short antiAlias : 1;        // bit 1
-    unsigned short shadows : 1;          // bit 2
-    unsigned short vehicleShadows : 1;   // bit 3
-    unsigned short featureShadows : 1;   // bit 4
-    unsigned short shading : 1;          // bit 5
-    unsigned short ditheredFog : 1;      // bit 6
-    unsigned short unused7 : 1;          // bit 7
-    unsigned short switchAlt : 1;        // bit 8
+    unsigned short damagebars : 1;
+    unsigned short antiAlias : 1;
+    unsigned short shadows : 1;
+    unsigned short vehicleShadows : 1;
+    unsigned short featureShadows : 1;
+    unsigned short shading : 1;
+    unsigned short ditheredFog : 1;
+    unsigned short unused7 : 1;
+    unsigned short switchAlt : 1;
 };
 
 struct SoundFlags {
-    unsigned short soundMode : 3;        // bits 0..2
-    unsigned short restoreVolume : 1;    // bit 3
-    unsigned short ackfx : 1;            // bit 4
-    unsigned short buildfx : 1;          // bit 5
-    unsigned short speechfx : 1;         // bit 6
+    unsigned short soundMode : 3;
+    unsigned short restoreVolume : 1;
+    unsigned short ackfx : 1;
+    unsigned short buildfx : 1;
+    unsigned short speechfx : 1;
 };
 
 struct MusicFlags_0042f9a0 {
-    unsigned short musicmode : 1;        // bit 0
+    unsigned short musicmode : 1;
 };
 
 #include "game.h"
@@ -84,25 +80,18 @@ void __stdcall SaveTrackSettings(unsigned char* tracks)
     }
 }
 
-// Writes a value under the game's registry key (see WriteRegistryBinary); the
-// sibling of ReadGameRegistryValue.
 // FUNCTION: 0x42f960
 void __stdcall WriteGameRegistryValue(void* key, void* buf, int value)
 {
     SettingSetBlob((void*)"Total Annihilation", key, buf, value);
 }
 
-// Reads a value from the game's registry key (see ReadRegistryValue/0x4b6880).
 // FUNCTION: 0x42f980
 int __stdcall ReadGameRegistryValue(const char* key, void* buf, unsigned int* size)
 {
     return SettingGetBlob("Total Annihilation", key, buf, size);
 }
 
-// Reads a DWORD under the game key into g_game->*field; a missing value stores
-// the default and writes it back. value is the caller's scratch local (one of
-// the helper's own moves the frame), and the named ok keeps the compare against
-// the hoisted zero register.
 static inline void ReadSettingInt(const char* key, int Game::* field, int defaultValue, int& value)
 {
     int ok = SettingGetInt((void*)"Total Annihilation", (void*)key, &value);
@@ -114,7 +103,6 @@ static inline void ReadSettingInt(const char* key, int Game::* field, int defaul
     }
 }
 
-// Same, but a missing value is not written back.
 static inline void ReadSettingIntOr(const char* key, int Game::* field, int defaultValue, int& value)
 {
     if (SettingGetInt((void*)"Total Annihilation", (void*)key, &value) != 0) {
@@ -124,7 +112,6 @@ static inline void ReadSettingIntOr(const char* key, int Game::* field, int defa
     }
 }
 
-// Same for g_game->options.
 static inline void ReadSettingInt(const char* key, int Options::* field, int defaultValue, int& value)
 {
     int ok = SettingGetInt((void*)"Total Annihilation", (void*)key, &value);
@@ -136,7 +123,6 @@ static inline void ReadSettingInt(const char* key, int Options::* field, int def
     }
 }
 
-// Reads one per-player skirmish value; a missing value is not written back.
 static inline void ReadPlayerSetting(const char* key, int SkirmishPlayer::* field, int defaultValue, int& value, int i)
 {
     if (SettingGetInt((void*)"Total Annihilation\\Skirmish", (void*)key, &value) != 0) {
@@ -146,8 +132,6 @@ static inline void ReadPlayerSetting(const char* key, int SkirmishPlayer::* fiel
     }
 }
 
-// Reads up to DitheredFog, PlayMovie and AllMissions go through a named local;
-// every other site compares the call directly.
 // FUNCTION: 0x42f9a0
 void LoadSettings()
 {
@@ -445,10 +429,6 @@ label_430e7f:
     g_game->allMissionsFlags.allMissions = 0;
 }
 
-// Writes every option back out to the config tree: the display, sound and
-// render settings under the "Total Annihilation" section, the strings
-// (password, nickname, game name, image output directory, skirmish map), and
-// the per-player skirmish settings under "Total Annihilation\Skirmish".
 // FUNCTION: 0x430f00
 void SaveSettings()
 {
@@ -546,9 +526,6 @@ void SaveSettings()
     SettingSetInt((void*)"Total Annihilation", (void*)"PlayMovie", g_game->playMovie);
 }
 
-// Applies the unit-type restrictions listed in the embedded list entry that
-// Mission returns for index 6: clears bit 23 (0x800000) on every unit
-// type, then sets it on each type named by the entry.
 // FUNCTION: 0x431740
 void ApplyUseOnlyUnits()
 {

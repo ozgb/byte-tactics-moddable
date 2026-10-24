@@ -1,18 +1,3 @@
-// Decompiled by Opus, deepseek-v4.1-flash, GPT-5.6-Terra, claude-sonnet,
-// Space Bunny Free, GPT-6.1-sol, deepseek-v4.1, space-bunny-free,
-// mimo-v2.6-pro, LongCat 2.5 Preview Free, Claude Opus 5.5, Haiku,
-// Claude Sonnet 5.5 and GPT-6. Names are provisional.
-// The weapons module (0x499a30 to 0x49e630), Cavedog's weapons.cpp: the
-// projectile array, the weapon fire and hit packets, weapon damage and area
-// damage, the ballistic launch-angle solver, the weapon reach tests, the
-// projectile initialiser and the four firing routines, the turret aiming path
-// with its angle helpers, the remote fire packet and its projectile scan, the
-// weapon fire handlers, the unit's weapon slots and the loop that updates
-// them, and the weapon name table. The module's parts joined in address
-// order; 0x49a120 (a gap region) and 0x49b720 keep their own files
-// (docs/split-modules.md). 0x49b090 and 0x49be60 come last, out of address
-// order: their register plans follow their symbol ids (docs/c2-regalloc.md).
-
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
@@ -29,8 +14,6 @@ union Fixed {
 
 #include "../units/cob_script.h"
 
-// Unused here: these headers and forward declarations take the symbol ids that keep
-// WeaponCanReachPos (0x49aa80) and WeaponCanReachUnit (0x49abb0) matching (docs/c2-regalloc.md).
 #include "../files/files_api.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
@@ -61,15 +44,15 @@ struct Unit;
 
 struct Type_0049d270 {
     char unknown_0[0x20];
-    int param;                         // +0x20
+    int param;
 };
 
-struct Entry_0049d270 {                // 0x1c bytes
+struct Entry_0049d270 {
     char unknown_0[0xc];
     Ref<Type_0049d270> type;
     char unknown_10[0x16 - 0x10];
-    short f_16;                        // +0x16
-    short f_18;                        // +0x18
+    short f_16;
+    short f_18;
     char unknown_1a[0x1c - 0x1a];
 };
 
@@ -78,29 +61,29 @@ struct Point_0049e1a0 {
     short z;
 };
 
-struct Entry_0049e1a0 {        // 0x1c bytes
-    Point_0049e1a0 point;      // +0x00
-    char* name;                // +0x04
-    int f_8;                   // +0x08
+struct Entry_0049e1a0 {
+    Point_0049e1a0 point;
+    char* name;
+    int f_8;
     Ref<WeaponDef> attached;
     char unknown_10[0x14 - 0x10];
-    unsigned short f_14; // +0x14, the slot's tick counter
-    short f_16;          // +0x16
-    short f_18;          // +0x18
-    unsigned char f_1a;  // +0x1a
-    unsigned char flags; // +0x1b
+    unsigned short f_14;
+    short f_16;
+    short f_18;
+    unsigned char f_1a;
+    unsigned char flags;
 };
 
 #include "../game/unit_resources.h"
 
 struct Owner_0049dd60 {
     char unknown_0[0x20];
-    int id;                            // +0x20
+    int id;
 };
 
 struct UnitType_0049d000 {
     char unknown_0[0x20];
-    int range;                         // +0x20
+    int range;
 };
 
 #include "weapon_def.h"
@@ -120,9 +103,8 @@ union Fba_0049e1a0 {
     unsigned char b[2];
 };
 
-// 499a30's fixed-point position view (Unit below holds it beside Vec3).
 union Fixed_0049abb0 {
-    int value;                                      // 16.16 fixed point
+    int value;
     struct {
         unsigned short fraction;
         short whole;
@@ -135,36 +117,17 @@ struct Vec3_0049abb0 {
     int z;
 };
 
-// 499a30's views are folded in under the union's other members: its def at
-// +0xc is f_c (a WeaponDef), its weapons[3]
-// are slots[3], its f16/f18/f1b are f_16/f_18/f_1b, its owner is playerIndex,
-// its armour is killCount, its state is flags, its type is utype and its pos is
-// pos_0049abb0.
-// The unit, as the weapon code sees it. The views disagree about the bytes at
-// +0x4 (49e1a0's three weapon entries, 49d270's one, 49d580's fire state and
-// 49c740's and 49e070's weapon slots all overlap there), about +0x0 (49d000's
-// type, 49d270's type and 49dd60's owner), about +0xbc (49e1a0's resources,
-// 49e070's field_e4 and 49c920's and 49c9c0's f_dc and f_e6) and about the flag word (+0x110 in 49c740, 49d880 and 49d270, +0x111 in
-// 49c920 and 49c9c0); the rest keep one name. Size 0x118, the unit array's
-// stride.
 #include "../units/unit.h"
 #include "projectile.h"
 
 struct Unit_0049c880;
 
-
-// Unused here: real functions declared for their symbol ids, which keep
-// 0x49a890 and 0x49aa80 matching, and make up the ids of the bit-field views
-// that weapon_def.h no longer declares (docs/c2-regalloc.md).
 void DrawDashedCircle(void*, int, int, int, int, int, int);
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
 
 struct MapFeature_0049b090;
 
-// The game state, as the weapon code sees it. The time word keeps one name per
-// view (now, frame, gameTick, teamColor); the two tracked-projectile pointers
-// are one union, 499a30's selected and 49c740's tracked.
 struct Net {
     char unknown_0[0xd48];
     int noSeaLevelTrigger;
@@ -188,8 +151,6 @@ struct Cell;
 
 extern Game* g_game;
 
-
-// Allocates and clears the 0x7d64-byte weapon array, then resets its count.
 // FUNCTION: 0x499a30
 void AllocWeaponArray(void)
 {
@@ -218,45 +179,34 @@ struct Vec3_00499ab0 {
 
 struct Kind_00499ab0 {
     char unknown_0[4];
-    int f4;                          // +0x4, the player / "who"
+    int f4;
 };
 
 struct Obj_00499ab0 {
     char unknown_0[0x96];
     Ref<Kind_00499ab0> kind;
     char unknown_9a[0xa8 - 0x9a];
-    unsigned short team;             // +0xa8
+    unsigned short team;
 };
 
-// One view of the 0x24 byte weapon fire packet (type 0xd): the two partial
-// senders at 0x499ba0 and 0x49df10, the four firing routines' views and the
-// receiver at 0x49d270 were folded in. Where their own views were, an unused
-// declaration keeps the file's symbol ids (docs/c2-regalloc.md).
 struct WeaponFirePacket {
-    unsigned char type;              // +0x0
-    Vec3 origin;                     // +0x1
-    Vec3 aimOrVel;                   // +0xd
-    unsigned char weaponDefIndex;    // +0x19
-    unsigned char flag : 1;          // +0x1a, bit 0
+    unsigned char type;
+    Vec3 origin;
+    Vec3 aimOrVel;
+    unsigned char weaponDefIndex;
+    unsigned char flag : 1;
     unsigned char : 7;
-    unsigned short fireHeading;      // +0x1b
-    unsigned short firePitch;        // +0x1d
-    unsigned short targetUnitId;     // +0x1f
-    unsigned short ownerUnitId;      // +0x21
-    unsigned char weaponSlotIndex;   // +0x23
+    unsigned short fireHeading;
+    unsigned short firePitch;
+    unsigned short targetUnitId;
+    unsigned short ownerUnitId;
+    unsigned char weaponSlotIndex;
 };
 
 #pragma pack(pop)
 
 int __stdcall BroadcastPacket(int player, void* data, int size);
 
-// Builds the 0x24 byte "unit status" network message (type 0xd) and hands it
-// to BroadcastPacket. Only sent while g_game's bit 0 flag is set. Sibling of
-// 0x499ba0, which sends the same type and size.
-//
-// The byte at packet +0x1a is a 1 bit bitfield that is only ever read and
-// write back by the assignment at the end, so its upper seven bits are never
-// initialised here; see the note in the bug list.
 // FUNCTION: 0x499ab0
 void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, Obj_00499ab0* source,
                             Obj_00499ab0* target, Vec3_00499ab0* a,
@@ -285,7 +235,6 @@ struct Vec3_00499ba0 {
 };
 
 #pragma pack(push, 1)
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_00499ba0(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
@@ -307,7 +256,7 @@ void __stdcall BroadcastWeaponFire(char param_1, Vec3_00499ba0* a, Vec3_00499ba0
 #pragma pack(push, 2)
 struct Object_00499c10 {
     char unknown_0[0x66];
-    short heading;                     // +0x66
+    short heading;
     char unknown_68[0x9a - 0x68];
     Ref<CobScript> anims;
 };
@@ -315,12 +264,11 @@ struct Object_00499c10 {
 
 struct Source_00499c10 {
     char unknown_0[0x16];
-    short heading;                     // +0x16
+    short heading;
 };
 
 #include "../../interfaces/seams.h"
 
-// Fixed-point trig helpers written in assembly.
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 
@@ -358,8 +306,8 @@ void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target)
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
 struct Pair_00499cd0 {
-    char* name;                     // +0x0
-    int value;                      // +0x4
+    char* name;
+    int value;
 };
 
 struct NameLess_00499cd0 {
@@ -372,8 +320,8 @@ struct NameLess_00499cd0 {
 #pragma pack(push, 1)
 struct Flags_00499cd0 {
     unsigned short bits0_6 : 7;
-    unsigned short flag7 : 1;       // bit 7, 0x80
-    unsigned short flag8 : 1;       // bit 8, 0x100
+    unsigned short flag7 : 1;
+    unsigned short flag8 : 1;
     unsigned short rest : 7;
 };
 #pragma pack(pop)
@@ -399,13 +347,6 @@ static inline int* Find_00499cd0(const Table_00499cd0* table, char* name)
     return &first->value;
 }
 
-// Damage a weapon does to a target. The weapon's def holds a base damage
-// (+0xd4) and a name-keyed damage table (+0x64); the target's unit type name
-// is looked up in it (the same sorted (name, value) array and lower_bound as
-// 0x4c4630). The result is scaled, boosted by the attacker's armour
-// (6% per point, capped at 5 points), doubled or halved by two global flags,
-// and handed to DamageUnit together with the angle from the weapon to the
-// target minus the target's heading.
 // FUNCTION: 0x499cd0
 int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
                            float scale)
@@ -453,7 +394,6 @@ void __stdcall UntrackProjectile(Projectile* projectile)
 
 void __stdcall AccumulateScreenShake(int a, int b, int c);void __stdcall AddExplosionEffect(Vec3* position, void* value, int a, int b);
 void __stdcall EmitWhiteSmoke(Vec3* position, int value);
-// The sound id stays unsigned int: gives the original's zero extension.
 void __stdcall PlaySoundAt(unsigned int sound, Vec3* position, int value);
 void __stdcall ApplyAreaDamage(Projectile* projectile, Vec3* position);
 
@@ -516,9 +456,6 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
     }
 }
 
-// Builds a zeroed 0x6b-byte parameter block (owner, position, kind 10) and
-// hands it to ApplyAreaDamage (an ebp-framed __stdcall routine in a gap).
-
 struct Vec3_0049a0c0 {
     int x;
     int y;
@@ -528,11 +465,11 @@ struct Vec3_0049a0c0 {
 #pragma pack(push, 1)
 struct Params_0049a0c0 {
     Ref<char> owner;
-    Vec3_0049a0c0 pos;                 // +0x4
+    Vec3_0049a0c0 pos;
     char unknown_10[0x42];
-    int ownerUnit;                     // +0x52
+    int ownerUnit;
     char unknown_56[0x10];
-    char kind;                         // +0x66
+    char kind;
     char unknown_67[4];
 };
 #pragma pack(pop)
@@ -551,12 +488,8 @@ void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
     ApplyAreaDamage(&p, pos);
 }
 
-// 0x49a120's views. The function itself is a gap region (one of
-// data/functions.csv's 29 gap rows) and stays in weapons_49a120.cpp; its
-// declarations stay here for the symbol ids the functions after it match at.
 #include <math.h>
 
-// A 16.16 fixed-point value and its whole part.
 union Fixed_0049a120 {
     int raw;
     struct {
@@ -577,27 +510,25 @@ struct CellPos_0049a120 {
 };
 
 #pragma pack(push, 1)
-// Unused here: real functions declared for their symbol ids, which keep
-// 0x49a890 and 0x49aa80 matching (docs/c2-regalloc.md).
 int CloakOnOrder(char*, int, int);
 int GetUnitCount(int, unsigned int);
 
 struct Cell {
-    unsigned short unit;               // +0x0
-    unsigned short unit2;              // +0x2
-    unsigned char height;              // +0x4
-    unsigned char high;                // +0x5, highest floor
-    unsigned char low;                 // +0x6, lowest floor
-    unsigned char metal;               // +0x7
-    unsigned short feature;            // +0x8
+    unsigned short unit;
+    unsigned short unit2;
+    unsigned char height;
+    unsigned char high;
+    unsigned char low;
+    unsigned char metal;
+    unsigned short feature;
     union {
-        unsigned short spot;           // +0xa
+        unsigned short spot;
         struct {
-            unsigned char offsetZ;     // +0xa
-            unsigned char offsetX;     // +0xb
+            unsigned char offsetZ;
+            unsigned char offsetX;
         } origin;
     };
-    unsigned char flags;               // +0xc
+    unsigned char flags;
 };
 
 struct Spot_0049a120 {
@@ -610,25 +541,17 @@ struct FeatureDef_0049a120 {
     char unknown_0[0x100];
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049a120(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
-// <vector> comes after the game's own declarations: the symbol ids it gives
-// cell, feature and g_game decide the spot and feature address arithmetic of
-// the reach tests. The 0x49a120 gap file keeps the lean windows.h its own
-// function was matched with.
 #include <vector>
 
-// What one explosion has already hit, so nothing takes damage twice.
 struct Hits_0049a120 {
     int numUnits;
     int numFeatures;
     Unit* units[20];
     Cell* features[64];
 
-    // Each returns 0 if the thing was hit already, else records it (while
-    // there is room) and returns 1.
     int AddUnit(Unit* unit)
     {
         for (int k = 0; k < numUnits; k++) {
@@ -686,17 +609,13 @@ static inline Vec3 Sub(const Vec3& a, const Vec3& b)
     return r;
 }
 
-// <time.h> and <malloc.h> are here for their symbol ids: they decide
-// SolveLaunchAngle's x87 schedule and the reach tests' register plans.
 #include <time.h>
 #include <malloc.h>
 
-// The length of an integer vector, truncated to an int.
-
 struct Vec3i_0049a850 {
-    int x;                             // +0x0
-    int y;                             // +0x4
-    int z;                             // +0x8
+    int x;
+    int y;
+    int z;
 };
 
 // FUNCTION: 0x49a850
@@ -708,13 +627,8 @@ int __stdcall VectorLength(Vec3i_0049a850* v)
     return (int)sqrt(x * x + y * y + z * z);
 }
 
-// Ballistic launch-angle solver: the two roots
-// of the trajectory quadratic, each turned into a launch angle with
-// acos(sqrt(root) / speed), pi/2 when a root is not positive.
 #include <stdio.h>
 
-// PI stays this literal and `use / PI` a separate statement from
-// `use * 32768.0`: the constant pool depends on it.
 #define PI 3.14159265358979
 
 extern "C" double __cdecl _hypot(double x, double y);
@@ -724,8 +638,6 @@ short __stdcall SolveLaunchAngle(int x, int height, int z, int speed, float angl
 {
     int g = g_game->gravity;
     int gg = g * g;
-    // The redundant parentheses stay, with these exact counts: they steer the
-    // x87 schedule. disc is expanded as (s2 + 2*gh) * s2 + h2 * gg.
     double distance = (((_hypot(x, z))));
     double d = distance * distance;
     double gh = (double)g * (double)height;
@@ -760,8 +672,6 @@ short __stdcall SolveLaunchAngle(int x, int height, int z, int speed, float angl
     return (short)(use / PI);
 }
 
-// Unused here: real functions declared for their symbol ids, which keep
-// 0x49aa80 matching (docs/c2-regalloc.md).
 void RegisterUnitOrders();
 void RegisterGroundOrders();
 void EnableAICommands();
@@ -790,8 +700,6 @@ void EndMouseScroll();
 void UpdateMouseScroll();
 void UpdateEdgeScroll();
 
-// 0x49aa80's file included <windows.h> and <stdio.h> here for the operand
-// order in the height check; both are already included above.
 #pragma pack(push, 1)
 
 union Fixed_0049aa80 {
@@ -800,22 +708,15 @@ union Fixed_0049aa80 {
 };
 
 struct Vec3_0049aa80 {
-    int x;                             // +0x0 (16.16 fixed point)
-    Fixed_0049aa80 y;                  // +0x4
-    int z;                             // +0x8
+    int x;
+    Fixed_0049aa80 y;
+    int z;
 };
 
 #pragma pack(pop)
 
 short __stdcall SolveLaunchAngle(int dx, int dy, int dz, int a, int b);
 
-// The subtraction of two points is a real by-value operator taking both
-// operands by value and returning the point by value, and the line-of-fire test
-// goes through a by-value helper, both exactly as in the matching sibling
-// 0x49abb0 (whose MATCH this idiom produced). Those two boundaries are what put
-// a2 in esi and a3 in edi for the whole function and keep the weapon def in
-// ebx, which is the first block's register allocation (see the pass note at the
-// top of the file).
 inline Vec3_0049aa80 operator-(Vec3_0049aa80 a, Vec3_0049aa80 b)
 {
     Vec3_0049aa80 r;
@@ -836,7 +737,6 @@ int __stdcall WeaponCanReachPos(Unit* a1, Vec3_0049aa80* a2, Vec3_0049aa80* a3, 
 {
     WeaponDef* wdef = a1->weapons[a4 & 0xff].weapon;
 
-    // z difference first, as named int locals: the original's order.
     int dz = a3->z - a2->z;
     int dx = a3->x - a2->x;
     if ((int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32) > wdef->range * wdef->range)
@@ -855,21 +755,12 @@ int __stdcall WeaponCanReachPos(Unit* a1, Vec3_0049aa80* a2, Vec3_0049aa80* a3, 
     return 1;
 }
 
-// Both includes change the register choice in the sea-level tests.
 #include <stdlib.h>
 
 #pragma pack(push, 1)
 
 #pragma pack(pop)
 
-// The vector from point `a` to point `b`. Both operands and the result are by
-// value, which is what makes the line-of-fire block below compile the way the
-// original does: MSVC builds the two 12-byte argument copies as one setup unit
-// instead of turning the first aggregate into a live pointer, so `unit2` stays in
-// ebx across the call and the second distance tail needs no reload. Note the
-// operands are named in the order the callers pass them (shooter, target) while
-// the result is target - shooter, because the copy order, not the arithmetic, is
-// what the register allocation is sensitive to here.
 inline Vec3_0049abb0 operator-(Vec3_0049abb0 a, Vec3_0049abb0 b)
 {
     Vec3_0049abb0 r;
@@ -879,10 +770,6 @@ inline Vec3_0049abb0 operator-(Vec3_0049abb0 a, Vec3_0049abb0 b)
     return r;
 }
 
-// Can the shooter hit the target? Both positions are taken by value, which is
-// what puts the 12-byte copies in the frame while the units themselves are read
-// where they are. The parameters are named for the order the caller passes them
-// in, and the subtraction gives the target relative to the shooter.
 static inline short LineOfFire_0049abb0(Vec3_0049abb0 to, Vec3_0049abb0 from, int s, int f)
 {
     Vec3_0049abb0 d = from - to;
@@ -904,7 +791,6 @@ int __stdcall WeaponCanReachUnit(Unit* unit1, Unit* unit2, unsigned char weapon)
     if (w->flags.b.waterWeapon) {
         if (!(unit2->def->flags1 & 0x80000) && unit2->yWhole > g_game->seaLevel)
             return 0;
-        // Written (height >> 1) + whole: sets the add's operand order.
         if ((unit2->def->flags1 & 0x1000) && (unit2->def->field_170 >> 1) + unit2->yWhole > g_game->seaLevel)
             return 0;
         return Dist2_0049abb0((Vec3_0049abb0*)&unit1->pos, (Vec3_0049abb0*)&unit2->pos) <= w->range * w->range;
@@ -916,7 +802,6 @@ int __stdcall WeaponCanReachUnit(Unit* unit1, Unit* unit2, unsigned char weapon)
         return 0;
     if (w->flags.b.toAirWeapon && (unit2->flags & 3) != 2)
         return 0;
-    // Nested ifs, not one && condition: the flag test codegen differs.
     if (w->flags.b.ballistic) {
         if (LineOfFire_0049abb0(*(Vec3_0049abb0*)&unit1->pos, *(Vec3_0049abb0*)&unit2->pos, w->speed, w->field_c8) == (short)0x8000)
             return 0;
@@ -934,11 +819,6 @@ int __stdcall GetWeaponRange(int param1, unsigned int param2)
     return result;
 }
 
-// Compacts the projectile array: entries whose flags bit 1 is set are dropped
-// and the remaining ones are moved down. Each projectile's own old index is
-// written to compactIndex first, so the pointers held at interceptedProjectile
-// (relinked to the moved targets in the second pass) can be resolved by
-// searching for that index.
 // FUNCTION: 0x49ae20
 void CompactProjectiles()
 {
@@ -995,12 +875,10 @@ done:
 typedef Vec3 Vec3_0049af90;
 
 #pragma pack(push, 1)
-// One view of the 0xe byte projectile detonate packet (type 0xe): the sender
-// at 0x49a120, a view of which is in the gap file, holds the other.
 struct ProjectileDetonatePacket {
-    unsigned char type;                // +0x0
-    Vec3_0049af90 aim;                 // +0x1
-    unsigned char weaponIndex;         // +0xd
+    unsigned char type;
+    Vec3_0049af90 aim;
+    unsigned char weaponIndex;
 };
 #pragma pack(pop)
 
@@ -1009,9 +887,6 @@ static inline int SamePos(const Vec3_0049af90& a, const Vec3_0049af90& b)
     return a.x == b.x && a.z == b.z && a.y == b.y;
 }
 
-// Finds the projectile a network packet refers to (by position and type) and
-// removes it. The position compare is an inlined helper taking references;
-// written inline, MSVC keeps one induction pointer instead of two.
 // FUNCTION: 0x49af90
 void __stdcall ApplyProjectileHitPacket(int unused, ProjectileDetonatePacket* p)
 {
@@ -1024,12 +899,9 @@ void __stdcall ApplyProjectileHitPacket(int unused, ProjectileDetonatePacket* p)
     }
 }
 
-// Fires one of a unit's two weapons (by type) from the unit's position,
-// building the projectile on the stack; see 0x49af90 for the projectile.
 // FUNCTION: 0x49b000
 void __stdcall DetonateUnitWeapon(Unit* unit, int second)
 {
-    // The self-destruct and explosion weapons of the unit's definition.
     WeaponDef* weapon = second ? (WeaponDef*)unit->def->selfdestructas.get()
                                : (WeaponDef*)unit->def->explodeas.get();
     if (weapon) {
@@ -1082,17 +954,10 @@ Vec3* __stdcall GetProjectileAimPoint(Projectile* p)
     return &p->target;
 }
 
-// Aim a unit's two turret angles at a target point. The heading (+0x36) is
-// atan2(dx, dz); the pitch (+0x38) comes from the vertical difference against
-// the horizontal distance. Each angle is then moved towards the wanted one by
-// at most the unit type's turn rate (+0xE8), and if the wanted angle is more
-// than 27000 (about 148 degrees) away while the type's burnBlow flag (bit 23 of
-// +0x111) is set, the function gives up and returns 0. Otherwise it returns 1.
 // FUNCTION: 0x49b520
 int __stdcall TurnUnitTowardsPoint(Projectile* p, Vec3* target)
 {
     WeaponDef* type = p->type;
-    // Declared dx, dy, dz in this order: it decides the stack slot assignment.
     int dx = p->position.x - target->x;
     Fixed dy;
     dy.value = p->position.y - target->y;
@@ -1134,8 +999,6 @@ void __stdcall ComputeVelocityFromAngles(Projectile* obj)
     obj->direction.z = -ScaledCos((short)obj->angles.heading, r);
 }
 
-// Takes the next free entry of the 300-entry projectile array (see
-// 0x499a30), resets two of its fields and returns it, or 0 when full.
 // FUNCTION: 0x49b6e0
 Projectile* AllocProjectile()
 {
@@ -1191,7 +1054,6 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
 
 void CompactProjectiles();
 
-// Same body as the matched 0x499e50, which the original inlined here.
 static inline void Untrack_0049c880(Projectile* proj)
 {
     if (proj == g_game->tracked) {
@@ -1252,7 +1114,7 @@ struct Fire_0049c9c0 {
     char unknown_0[0xc];
     Ref<WeaponDef> shot;
     char unknown_10[0x1b - 0x10];
-    unsigned char f_1b;                // +0x1b
+    unsigned char f_1b;
 };
 
 void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot,
@@ -1277,19 +1139,16 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
     InitProjectile(proj, fire->shot, p3, p4, g_game->ticks, unit);
 
     int dx = p3->x - p4->x;
-    // 4-byte union: only the high half is read, as a 16-bit load from a frame slot.
     union { int value; short halves[2]; } dy;
     dy.value = p3->y - p4->y;
     int dz = p3->z - p4->z;
     short a1 = AngleOfVector(dx, dz);
-    // Unsigned: the >> 16 below is a logical shift.
     unsigned int dist = (int)_hypot(dx, dz);
     proj->range = (int)dist;
     short a2 = AngleOfVector(-(int)dy.halves[1], (short)(dist >> 16));
     proj->angles.heading = a1;
     proj->angles.pitch = a2;
 
-    // The same helper as 0x49c980, inlined here.
     if (fire->shot->startSpeed) {
         proj->speed = fire->shot->startSpeed;
     } else if (!fire->shot->acceleration) {
@@ -1303,7 +1162,6 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
     proj->direction.x = -ScaledSin(a1, t);
     proj->direction.z = -ScaledCos(a1, t);
 
-    // The same helper as 0x49c920, inlined here.
     WeaponDef* u = proj->type;
     if ((unsigned int)u->speed != 0 && !(u->flags.value & 0x8000000))
         proj->time = (u->range << 16) / (unsigned int)u->speed + g_game->ticks;
@@ -1328,10 +1186,10 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
 #pragma pack(push, 1)
 struct Shot_0049cc20 {
     char unknown_0[0x8];
-    int aimCobDone;                    // +0x8, the slot's aimCob.nAimCobDone
+    int aimCobDone;
     Ref<WeaponDef> def;
     char unknown_10[0x1b - 0x10];
-    unsigned char flags;               // +0x1b
+    unsigned char flags;
 };
 
 void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
@@ -1385,12 +1243,12 @@ int __stdcall FireVLaunchProjectile(Shot_0049cc20* shot, Unit* unit, Vec3* pos,
 struct Shot_0049cde0 {
     char unknown_0[0xc];
     Ref<WeaponDef> def;
-    unsigned int muzzleAimFromDeltaZ;  // +0x10
+    unsigned int muzzleAimFromDeltaZ;
     char unknown_14[0x16 - 0x14];
-    short heading;                     // +0x16
-    short pitch;                       // +0x18
+    short heading;
+    short pitch;
     char unknown_1a[0x1b - 0x1a];
-    unsigned char flags;               // +0x1b
+    unsigned char flags;
 };
 
 #pragma pack(pop)
@@ -1412,8 +1270,6 @@ int __stdcall FireBallisticProjectile(Shot_0049cde0* shot, Unit* unit, Vec3* pos
         InitProjectile(proj, shot->def, pos, 0, g_game->ticks, unit);
         proj->angles.heading = shot->heading;
         proj->angles.pitch = shot->pitch;
-        // The whole product is its own statement: inside the assignment the
-        // division and multiply sink after the call.
         int q = (shot->muzzleAimFromDeltaZ / shot->def->speed) * g_game->gravity;
         proj->direction.y = ScaledSin(shot->pitch, shot->def->speed) - q;
         int scale = ScaledCos(shot->pitch, shot->def->speed);
@@ -1425,7 +1281,6 @@ int __stdcall FireBallisticProjectile(Shot_0049cde0* shot, Unit* unit, Vec3* pos
         } else {
             proj->time = g_game->ticks + shot->def->lifetime;
         }
-        // active before targetUnit: the reverse of the natural order is the original's.
         proj->active = shot->def->burst;
         proj->targetUnitPtr = (Unit*)param_5;
         g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
@@ -1484,7 +1339,6 @@ struct Object_0049d0c0 {
 int __stdcall FireLineOfSightProjectile(Object_0049d0c0* obj, int a, int b, int c, int d);
 int __stdcall FireBallisticProjectile(Object_0049d0c0* obj, int a, int b, int c, int d);
 
-// The last two arguments are passed to both callees in swapped order.
 // FUNCTION: 0x49d0c0
 int __stdcall FireWeaponByFlags(Object_0049d0c0* obj, int a, int b, int d, int c)
 {
@@ -1497,23 +1351,21 @@ int __stdcall FireWeaponByFlags(Object_0049d0c0* obj, int a, int b, int d, int c
 }
 
 #pragma pack(push, 1)
-struct Entry_0049d120 {              // 0x1c bytes
+struct Entry_0049d120 {
     char unknown_0[0xc];
     Ref<WeaponDef> def;
     char unknown_10[0x1a - 0x10];
-    unsigned char active;            // +0x1a
+    unsigned char active;
     char unknown_1b;
 };
 
 struct Table_0049d120 {
     char unknown_0[4];
-    // Only three entries are declared: the index is masked to a byte, but the
-    // fields below have to land on 0x6a and 0xff, which fixes the array size.
-    Entry_0049d120 entries[3];       // +0x4
+    Entry_0049d120 entries[3];
     char unknown_58[0x6a - 0x58];
-    Vec3 pos;                        // +0x6a
+    Vec3 pos;
     char unknown_76[0xff - 0x76];
-    char player;                     // +0xff
+    char player;
 };
 
 
@@ -1523,17 +1375,13 @@ struct Table_0049d120 {
 Projectile* __stdcall FindTargetableProjectile(Table_0049d120* table, int index)
 {
     Entry_0049d120* entry = &table->entries[index & 0xff];
-    // Flag read before the radius, shift inside its initialiser: else the flag
-    // load hoists into the prologue.
     if (!entry->active)
         return 0;
     int radius = entry->def->coverage << 16;
-    // projs is read before projCount: keeps g_game in ecx.
     Projectile* proj = g_game->projectiles;
     int count = g_game->projectileCount;
     for (int i = 0; i < count; i++, proj++) {
         if ((char)proj->owner != table->player) {
-            // Nested ifs, not one && chain: else the bitfield test folds into a mem test.
             if (proj->type->flags.b.targetable) {
                 if ((unsigned)(table->pos.x - proj->target.x + radius) <= 2u * radius) {
                     if ((unsigned)(table->pos.z - proj->target.z + radius) <= 2u * radius) {
@@ -1554,11 +1402,11 @@ Projectile* __stdcall FindTargetableProjectile(Table_0049d120* table, int index)
 #pragma pack(push, 1)
 struct Event_0049d1e0 {
     char unknown_0[0xd];
-    Vec3 pos;                          // +0xd
+    Vec3 pos;
     char unknown_19;
-    unsigned char flag : 1;            // +0x1a
+    unsigned char flag : 1;
     char unknown_1b[0x1f - 0x1b];
-    short ownerId;                     // +0x1f
+    short ownerId;
 };
 #pragma pack(pop)
 
@@ -1582,7 +1430,6 @@ Projectile* __stdcall FindRemoteProjectile(Event_0049d1e0* ev)
 }
 
 #pragma pack(push, 1)
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049d270(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
@@ -1591,12 +1438,6 @@ static inline int SamePos_0049d270(Vec3& a, Vec3& b)
     return a.x == b.x && a.z == b.z && a.y == b.y;
 }
 
-// The projectile scan of 0x49d1e0, defined here unannotated so that /Ob2
-// inlines it into ApplyWeaponFirePacket as it did in the original. It has no
-// callers in the exe. Written with the positive `if (ev->flag) { ... } return 0;`
-// test, which also matches 0x49d1e0 on its own; the `if (!ev->flag) return 0;`
-// spelling above compiles to the same standalone bytes but, inlined here,
-// gives the cursor a register and spills `unit`.
 Projectile* __stdcall FindRemoteProjectile_0049d270(WeaponFirePacket* ev)
 {
     if (ev->flag) {
@@ -1678,13 +1519,11 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
 }
 
 #pragma pack(push, 1)
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049d580(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
 void __stdcall GetWeaponPiecePosition(Unit* obj, Vec3* out, unsigned char weapon, int piece);
 short __stdcall SolveLaunchAngle(int dx, int dy, int dz, int speed, float pitch);
-// The weapon parameter must stay an unsigned char.
 int __stdcall CalcAimAngles(Unit* unit, WeaponDef* target, short* out_heading,
                            short* out_pitch, unsigned char weapon, Vec3* point);
 int __stdcall AimWithinTolerance(Unit* unit, Unit* aim, short angle1, short angle2);
@@ -1736,7 +1575,6 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
         if (parts > 1)
             spread = (unsigned short)spread / parts;
         if (spread) {
-            // Keep `range >> 1` inline, no `half` local.
             unsigned short range = spread;
             unit->fireHeading += (short)(RandomInt(range) - (range >> 1));
             unit->firePitch += (short)(RandomInt(range) - (range >> 1));
@@ -1772,17 +1610,6 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
     return 0;
 }
 
-// SUSPECTED ORIGINAL BUG (kept from an earlier pass, still worth reporting):
-// the ballistic path (weapon flag bit 1) stores its heading into argument one's
-// home slot, the shooter's pointer, and that slot is what the call to AimWithinTolerance
-// at 0x49d681 then reads as its angle1 (`mov edx, dword ptr [esp + 0x58]`). The edi
-// register still holds the real shooter pointer, so the first angle checked is the
-// low 16 bits of a pointer. Worse, the third argument, the target unit, is read back
-// at 0x49d745 from that same clobbered slot, so on this path the `target->f_a8` at
-// 0x49d812 and the target handed to FireLineOfSightProjectile at 0x49d77d can both be a pointer's
-// low half. `test al, 1` at 0x49d58e means the path is only taken when f_1b bit 0 is
-// set, so this is the laser (flags bit 1) aiming path.
-
 #include <stdlib.h>
 
 
@@ -1790,13 +1617,10 @@ struct Aim_0049d880 {
     char unknown_0[0xc];
     Ref<WeaponDef> type;
     char unknown_10[0x16 - 0x10];
-    short fireHeading;                 // +0x16
-    short firePitch;                   // +0x18
+    short fireHeading;
+    short firePitch;
 };
 
-// True when both of the aim object's angles are within tolerance of the
-// corresponding unit angles. With no tolerance in the type, a moved unit
-// (flags 0xc) gets a generous one, a still unit a tighter one.
 // FUNCTION: 0x49d880
 int __stdcall AimWithinTolerance(Unit* unit, Aim_0049d880* aim, short angle1, short angle2)
 {
@@ -1813,7 +1637,6 @@ int __stdcall AimWithinTolerance(Unit* unit, Aim_0049d880* aim, short angle1, sh
         }
     } else {
         x = a;
-        // if/else re-reading the field, not a ternary: it swaps the two tolerances.
         if (aim->type->pitchTolerance)
             y = aim->type->pitchTolerance;
         else
@@ -1831,7 +1654,6 @@ int __stdcall CalcAimAngles(Unit* unit, Unit* target, short* out_heading, short*
     Vec3 p;
     g_seams.units->GetAimFromPosition(unit, &p, weapon);
     int dx = p.x - point->x;
-    // Read through the 16.16 union and initialised before the heading: loads only the high word.
     Fixed dy;
     dy.value = p.y - point->y;
     int dz = p.z - point->z;
@@ -1845,13 +1667,12 @@ struct Aim_0049d9c0 {
     char unknown_0[0xc];
     Ref<WeaponDef> type;
     char unknown_10[0x16 - 0x10];
-    short fireHeading;                // +0x16
-    short firePitch;                  // +0x18
+    short fireHeading;
+    short firePitch;
     char unknown_1a;
-    unsigned char weapon;             // +0x1b
+    unsigned char weapon;
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049d9c0(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
@@ -1881,7 +1702,6 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, Aim_0049d9c0* aim,
                 msg.aimOrVel = *point;
                 msg.weaponDefIndex = aim->type->index;
                 msg.weaponSlotIndex = aim->weapon >> 2 & 3;
-                // if/else testing the unit, not a ternary: the ternary flips the branches.
                 if (unit == 0)
                     msg.ownerUnitId = 0;
                 else
@@ -1922,12 +1742,10 @@ struct Object_0049db70 {
     short team;
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049db70(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
 void __stdcall GetWeaponPiecePosition(Object_0049db70* obj, Vec3* out, unsigned char weapon, int piece);
-// The weapon index must stay an unsigned char: it makes the shift use byte registers.
 int* __stdcall FindTargetableProjectile(Object_0049db70* obj, unsigned char weapon);
 int __stdcall FireVLaunchProjectile(Shot_0049db70* shot, Object_0049db70* source, Vec3* pos,
                            Vec3* aim, Object_0049db70* target, int* param_6);
@@ -1942,14 +1760,12 @@ int __stdcall FireVLaunchWeapon(Object_0049db70* source, Shot_0049db70* shot,
     if (shot->piece != 0) {
         GetWeaponPiecePosition(source, &pos, (shot->weapon >> 2) & 3, -1);
         int dx = pos.x - aim->x;
-        // dy must be a 4-byte union read by its high half, not a plain int.
         union { int value; short halves[2]; } dy;
         dy.value = pos.y - aim->y;
         int dz = pos.z - aim->z;
         shot->heading = AngleOfVector(dx, dz);
         int dist = (int)_hypot((double)dx, (double)dz);
         shot->pitch = AngleOfVector(-(int)dy.halves[1], (short)(dist >> 16));
-        // Uninitialised here and zeroed only in the else arm.
         int* p;
         if (shot->def->flags.b.interceptor) {
             p = FindTargetableProjectile(source, (shot->weapon >> 2) & 3);
@@ -1966,7 +1782,6 @@ int __stdcall FireVLaunchWeapon(Object_0049db70* source, Shot_0049db70* shot,
                 packet.aimOrVel = *aim;
                 packet.weaponDefIndex = shot->def->index;
                 packet.weaponSlotIndex = (shot->weapon >> 2) & 3;
-                // Keep the `== 0 ? 0 : team` ternaries: they put the zero store on the fall-through.
                 packet.ownerUnitId = source == 0 ? 0 : source->team;
                 packet.targetUnitId = target == 0 ? 0 : target->team;
                 packet.fireHeading = shot->heading;
@@ -1993,7 +1808,6 @@ struct Aim_0049dd60 {
     unsigned char weapon;
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049dd60(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
@@ -2043,7 +1857,6 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
     return 0;
 }
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049df10(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
@@ -2064,10 +1877,6 @@ int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* a, Vec3* b, int flag)
     InitProjectile(proj, weapon, a, 0, g_game->ticks, 0);
     proj->direction = *b;
     if (flag) {
-        // Read into a local first: only then does MSVC hoist the byte load
-        // above the g_game->netGameFlagsWord test, into the low byte of the register
-        // that held `weapon`, which is what leaves al free for the `lea` and
-        // pushes the +0xd store and the type store in their original places.
         unsigned char team = weapon->index;
         if (g_game->flags_2a44 & 1) {
             WeaponFirePacket packet;
@@ -2088,7 +1897,6 @@ int __stdcall FireVLaunchWeapon(void* unit, void* aim, void* target, void* point
 int __stdcall FireDroppedWeapon(void* unit, void* aim, void* target, void* point);
 int __stdcall FireLineOfSightWeapon(void* unit, void* aim, void* target, void* point);
 
-// Picks the routine for the object's flags.
 // FUNCTION: 0x49e010
 void __stdcall SetWeaponFireHandler(WeaponDef* weapon)
 {
@@ -2106,14 +1914,11 @@ void __stdcall SetWeaponFireHandler(WeaponDef* weapon)
         weapon->fire = (WeaponFireFn)FireDroppedWeapon;
 }
 
-// The loop counter and the reload-time maximum share one 8-byte local; the
-// counter sits at +0x0 and the maximum at +0x4.
 struct Frame_0049e070 {
-    unsigned char i;                  // +0x0
-    int maxTime;                      // +0x4
+    unsigned char i;
+    int maxTime;
 };
 
-// The weapon parameters must stay unsigned char: the loop counter slot is passed unwidened.
 // FUNCTION: 0x49e070
 void __stdcall InitUnitWeaponSlots(Unit* unit)
 {
@@ -2123,7 +1928,6 @@ void __stdcall InitUnitWeaponSlots(Unit* unit)
         s->reloadTimer = 0;
         s->flags = (s->flags & 0xf2) | ((frame.i & 3) << 2);
         s->weapon = unit->def->weapons[frame.i];
-        // Read index inline with no named temporary; stockpile is zeroed after this line.
         s->flags = (s->flags & 0xfd) | (((unit->def->weapons[frame.i]->index != 0) & 1 | 8) * 2);
         s->stockpile = 0;
         Vec3 a;
@@ -2137,9 +1941,6 @@ void __stdcall InitUnitWeaponSlots(Unit* unit)
     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetMaxReloadTime", 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
 }
 
-// The three aim script names. The original's array has three elements, with
-// the string "AimTertiary" right after it, so a weapon index of 3 would read
-// string bytes as a pointer.
 extern char* g_aimScriptNames[3];
 
 void __stdcall SubtractVec3(Vec3* a, Vec3* b, int* dx, int* dy, int* dz);
@@ -2197,7 +1998,6 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     e->f_18 = angle;
                     e->f_16 = heading;
                     e->f_8 = 0;
-                    // Name read afresh for each call, no cached local: lets the two tails merge.
                     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->name, 0, 2,
                                                heading, angle, 0, 0);
                     SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, heading, angle, 0, 0);
@@ -2205,7 +2005,6 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                 }
             }
         } else {
-            // Via a bool local: testing the bitfield in place shifts the register rotation.
             bool armed = attached->flags.b.vLaunch;
             if (armed && (!attached->flags.b.stockpile || e->f_1a) && !(e->flags & 1)) {
                 e->f_8 = 0;
@@ -2276,8 +2075,6 @@ char* __stdcall FindWeaponByName(char* name)
     return 0;
 }
 
-// Unused here: real functions declared for their symbol ids, which keep
-// 0x49b090 and 0x49be60 matching (docs/c2-regalloc.md).
 void DrawTriangleContours(void*, int, int, int, int, int, int);
 void DrawRangeCircle(void*, void*, void*, int, int, const char*, int);
 void AddOrder(int, int, void*, void*, void*, int, int);
@@ -2300,34 +2097,19 @@ void OrderSquad(void*, int, unsigned char, int, void*, int, int, int);
 int AddBlinkWord(void*, const char*, int, int, int, int, float, float);
 void CenterCameraOnRadarClick();
 
-// 0x49b090 and 0x49be60 sit here, after the module's other functions, and
-// 0x49be60 after the TdfFile global below.
 #pragma pack(push, 1)
 
-// The feature records are an array of these, indexed as `features[f * 256]`.
 struct MapFeature_0049b090 {
     char unknown_0[0xfa];
-    unsigned char height;             // +0xfa
+    unsigned char height;
     char unknown_fb[0x100 - 0xfb];
 };
 
 #pragma pack(pop)
 
-// The projectile collision test. It looks up the map cell holding the
-// projectile; with none it drops the camera follow, sets the dead flag and
-// returns. Otherwise it kills a projectile that reaches the one it is chasing,
-// sets the projectile's floor radius, tests the cell's two units against the
-// owner and their height window, resolves the map feature (including the
-// 0xfffe "read the neighbour cell" case), and applies the flag rules, the sea
-// level ceiling and the net game check before the final kill.
-// The 0xfffe reload path re-tests the feature id only against 0xfffb and skips
-// the feature count check, so an id read from the neighbouring cell indexes
-// g_game->features unchecked (an original bug).
 // FUNCTION: 0x49b090
 void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
 {
-    // No `Game* g = g_game` local: g_game is read at each use to stay in edi.
-    // Named pos local, used again after the lookup: gives the original's prologue.
     Vec3* pos = &proj->position;
     Cell* cell = g_seams.los_radar->GetMapCellAtPosition(pos);
 
@@ -2368,8 +2150,6 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
             }
         }
     }
-    // Mask tests (here bit 14, unitsOnly, and bit 16, waterWeapon below), not the
-    // bit-fields: the bit-field form changes the code.
     if (type->flags.value & 0x4000)
         return;
     {
@@ -2377,7 +2157,6 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
         short cz = proj->positionWords.zWhole / 16;
         unsigned short f = cell->feature;
         MapFeature_0049b090* mf;
-        // The `!(f == 0xfffe)` chain shape sets the block order.
         if (f < 0xfffb) {
             if (f < g_game->featureCount)
                 mf = (MapFeature_0049b090 *)g_game->features + f;
@@ -2386,7 +2165,6 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
         } else if (!(f == 0xfffe)) {
             mf = 0;
         } else {
-            // This index spelling and `unsigned short f2` merge the feature tails.
             int n = cell->origin.offsetX + g_game->width * cell->origin.offsetZ;
             unsigned short f2 = (cell - n)->feature;
             if (f2 >= 0xfffb) {
@@ -2396,7 +2174,6 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
             }
         }
         if (mf) {
-            // Positive direction (sum > hi, else mf = 0): sets the compare operand order.
             if (mf->height + cell->low > proj->positionWords.yWhole) {
                 if (proj->cellX == cx && proj->cellZ == cz) {
                     mf = 0;
@@ -2430,21 +2207,16 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
 
 #include "../util/tdf.h"
 
-// A global object of the 12-byte class constructed by 0x4c2ea0 and destroyed
-// by 0x4c2eb0. The compiler generates its initialiser (0x49e610) and the
-// destructor it registers with atexit (0x49e630).
 // FUNCTION: 0x49e610 _$E5
 // FUNCTION: 0x49e630 _$E3
 TdfFile g_tdfGlobalParser;
 
-// 0x49be60 sits after the TdfFile global: its palette and scroll register plan
-// follows the symbol ids.
 #include "../util/angles.h"
 
 #pragma pack(push, 1)
 struct Sprite_0049be60 {
     char unknown_0[0x30];
-    void* child;                       // +0x30
+    void* child;
 };
 
 #pragma pack(pop)
@@ -2460,16 +2232,6 @@ int __stdcall GetGafFrameCount(void* gaf);
 int __stdcall IsPointVisible(Player* pi, Vec3* pos);
 int HarnessViewRand();
 
-// The projectile render pass: it walks the projectile array and draws every
-// live projectile (counter 0) that the local player can see, by the shot kind
-// (0 to 7). With map-flags bit 2 set the visibility test reads the player's
-// explored-cell grid, otherwise it calls IsPointVisible.
-//  - Kind 0's two line arms each make both DrawLine calls (colour2, then
-//    colour1).
-//  - Kinds 1, 3 and 6 pass a 3-short angle struct (the projectile's +0x34);
-//    kind 3 passes its own `rot3`, which is never written (docs/bugs.md).
-//  - Kind 7's jitter is 64-bit, `(rand() * 11) / 0x8000 - 5`, added to the
-//    high shorts of pt.
 // FUNCTION: 0x49be60
 void __stdcall DrawProjectiles(void* surface)
 {
@@ -2523,7 +2285,6 @@ void __stdcall DrawProjectiles(void* surface)
                               - ((int)*(short*)((char*)&p->start + 6) >> 1))
                              - (short)g_game->scrollY + 0x20;
                     if (type->colour2 != 0) {
-                        // Both calls stay in each arm: one shared colour1 call swaps the colour slots.
                         if (abs(x1 - x2) > abs(y1 - y2)) {
                             if (x1 > x2) {
                                 int t = x1; x1 = x2; x2 = t;
@@ -2643,9 +2404,7 @@ void __stdcall DrawProjectiles(void* surface)
                                 if (n > 0) {
                                     int i = n;
                                     do {
-                                        // The unused z stays: it gives pt.z the extra reference
-                                        // that sets the register assignment.
-                                        int z = pt.z;  // unused; needed for the match
+                                        int z = pt.z;
                                         prev = pt;
                                         sp.x += d.x;
                                         sp.y += d.y;

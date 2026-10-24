@@ -1,5 +1,3 @@
-// Decompiled by space-bunny-free, deepseek-v4.1-flash, Opus, Sonnet, GPT-6-Luna, Space Bunny Free and Haiku. Names are provisional.
-// The Smacker movie player.
 #include <stdio.h>
 #include <windows.h>
 #include "../../interfaces/host.h"
@@ -7,30 +5,25 @@
 
 int __stdcall HandleHostEvent(host_event* ev);
 
-// The open Smacker movie (smackw32.dll's SMK struct).
 struct Smk_0047c3a0 {
-    unsigned int version;               // +0x0
-    unsigned int width;                 // +0x4
-    unsigned int height;                // +0x8
-    unsigned int frames;                // +0xc
+    unsigned int version;
+    unsigned int width;
+    unsigned int height;
+    unsigned int frames;
     char unknown_10[0x68 - 0x10];
-    unsigned int newPalette;            // +0x68, the palette changed
-    unsigned char rgb[256][3];          // +0x6c
+    unsigned int newPalette;
+    unsigned char rgb[256][3];
     char unknown_36c[0x370 - 0x36c];
-    unsigned short palType;             // +0x370
+    unsigned short palType;
     char unknown_372[0x374 - 0x372];
-    int frameNum;                       // +0x374
+    int frameNum;
     char unknown_378[0x380 - 0x378];
-    int lastLeft;                       // +0x380
-    int lastTop;                        // +0x384
-    int lastWidth;                      // +0x388
-    int lastHeight;                     // +0x38c
+    int lastLeft;
+    int lastTop;
+    int lastWidth;
+    int lastHeight;
 };
 
-// smackw32.dll, imported by ordinal, so the names are ours: 14 SmackOpen,
-// 15 SmackSoundEnable, 17 SmackSoundOnOff, 19 SmackDoFrame, 21
-// SmackNextFrame, 23 SmackToBuffer, 27 SmackGoto, 28 SmackToBufferRect,
-// 38 SmackSoundUseDirectSound.
 extern "C" __declspec(dllimport) int __stdcall SmackSoundEnable(HWND hwnd);
 extern "C" __declspec(dllimport) int __stdcall SmackSoundUseDirectSound(void* sound);
 extern "C" __declspec(dllimport) Smk_0047c3a0* __stdcall SmackOpen(char* path, unsigned int flags, int extra);
@@ -40,40 +33,34 @@ extern "C" __declspec(dllimport) void __stdcall SmackDoFrame(Smk_0047c3a0* smk);
 extern "C" __declspec(dllimport) void __stdcall SmackNextFrame(Smk_0047c3a0* smk);
 extern "C" __declspec(dllimport) void __stdcall SmackToBuffer(Smk_0047c3a0* smk, unsigned int left, unsigned int top, unsigned int width, unsigned int height, unsigned int bufferHeight, void* buffer);
 extern "C" __declspec(dllimport) int __stdcall SmackToBufferRect(Smk_0047c3a0* smk, int flag);
-// Ordinal 32: SmackWait, the DLL's export name.
 extern "C" __declspec(dllimport) unsigned int __stdcall SmackWait(Smk_0047c3a0* smack);
 
-// smackw32.dll ordinal 18 (SmackClose), called through its import slot.
 extern "C" __declspec(dllimport) void __stdcall SmackClose(void* smack);
 
-// The 0x54 byte statistics block SmackSummary fills in. Six of the twenty-one
-// fields are never printed, and the seven printed before TotalBlitTime are
-// read from further in than the DLL writes.
 struct SmkStats_0047c530 {
-    unsigned int totalTime;            // +0x00 divisor of the frame rate
-    unsigned int unknown_04;           // +0x04
-    unsigned int openTime;             // +0x08 "Time to Open File"
-    unsigned int frames;               // +0x0c "Total Frames Played"
-    unsigned int framesSkipped;        // +0x10 "SkippedFrames"
-    unsigned int unknown_14;           // +0x14
-    unsigned int timeBlit;             // +0x18 "TotalBlitTime"
-    unsigned int readTime;             // +0x1c "TotalReadTime"
-    unsigned int decompTime;           // +0x20 "TotalDecompTime"
-    unsigned int unknown_24;           // +0x24
-    unsigned int readSpeed;            // +0x28 "TotalReadSpeed"
-    unsigned int slowestFrameTime;     // +0x2c "SlowestFrameTime"
-    unsigned int slowest2FrameTime;    // +0x30 "Slowest2FrameTime"
-    unsigned int unknown_34;           // +0x34
-    unsigned int unknown_38;           // +0x38
-    unsigned int averageFrameSize;     // +0x3c "AverageFrameSize"
-    unsigned int highest1SecRate;      // +0x40 "Highest1SecRate"
-    unsigned int unknown_44;           // +0x44
-    unsigned int highestMemAmount;     // +0x48 "HighestMemAmount"
-    unsigned int totalExtraMemory;     // +0x4c "TotalExtraMemory"
-    unsigned int highestExtraUsed;     // +0x50 "HighestExtraUsed"
+    unsigned int totalTime;
+    unsigned int unknown_04;
+    unsigned int openTime;
+    unsigned int frames;
+    unsigned int framesSkipped;
+    unsigned int unknown_14;
+    unsigned int timeBlit;
+    unsigned int readTime;
+    unsigned int decompTime;
+    unsigned int unknown_24;
+    unsigned int readSpeed;
+    unsigned int slowestFrameTime;
+    unsigned int slowest2FrameTime;
+    unsigned int unknown_34;
+    unsigned int unknown_38;
+    unsigned int averageFrameSize;
+    unsigned int highest1SecRate;
+    unsigned int unknown_44;
+    unsigned int highestMemAmount;
+    unsigned int totalExtraMemory;
+    unsigned int highestExtraUsed;
 };
 
-// smackw32.dll ordinal 20, called through its import slot.
 extern "C" __declspec(dllimport) void __stdcall SmackSummary(Smk_0047c3a0* smk, SmkStats_0047c530* stats);
 
 struct Surfaces_0047bdf0 {
@@ -86,20 +73,19 @@ struct Surfaces_0047bdf0 {
 
 struct Display_0047bdf0 {
     char unknown_0[0x24];
-    void* sound;                     // +0x24
+    void* sound;
     char unknown_28[0x40 - 0x28];
-    HWND hwnd;                       // +0x40
+    HWND hwnd;
     char unknown_44[0x84 - 0x44];
-    Surfaces_0047bdf0 surfaces;      // +0x84
+    Surfaces_0047bdf0 surfaces;
     char unknown_98[0xf0 - 0x98];
-    unsigned short flags;            // +0xf0
+    unsigned short flags;
 };
 
-// The offscreen screen the frames are drawn to.
 struct Display_0047c3a0 {
     char unknown_0[8];
-    unsigned int width;                 // +0x8
-    unsigned int height;                // +0xc
+    unsigned int width;
+    unsigned int height;
     void* palette;
 };
 
@@ -108,27 +94,22 @@ struct Display_0047c3a0 {
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-extern Game* g_game;                    // 0x511de8
+extern Game* g_game;
 
 Display_0047bdf0* GetDisplay();
 void __stdcall FatalError(char* message);
 void __stdcall SetOffscreenSurface(Display_0047c3a0* display);
 void FlipScreen();
 
-// The object smackw32.dll ordinal 2 hands back (a SmackBuf); only the colour
-// remap arguments SmackColorRemap takes from it are named.
 struct Smk_0047bf70_b {
     char unknown_0[0x2c];
-    DWORD paletteColors;               // +0x2c
+    DWORD paletteColors;
     char unknown_30[0x3c - 0x30];
-    DWORD palette;                     // +0x3c
+    DWORD palette;
     char unknown_40[0x43c - 0x40];
-    DWORD paletteType;                 // +0x43c
+    DWORD paletteType;
 };
 
-// smackw32.dll's buffer API, imported by ordinal: ordinal 2 opens the decoder
-// state (HWND, HDC, 640, 480, 0, 0), ordinal 5 takes the movie's 256 colour
-// palette, and ordinal 25 is given the movie and three fields of that state.
 extern "C" __declspec(dllimport) Smk_0047bf70_b *__stdcall SmackBufferOpen(HWND hwnd, HDC hdc, int width, int height, int flags, int background);
 extern "C" __declspec(dllimport) void __stdcall SmackBufferNewPalette(Smk_0047bf70_b *smk, unsigned char *rgb, unsigned short flag);
 extern "C" __declspec(dllimport) void __stdcall SmackColorRemap(Smk_0047c3a0 *smk, DWORD *palette, DWORD paletteColors, DWORD paletteType);
@@ -137,13 +118,13 @@ struct SmackerSurface;
 
 class MoviePlayer {
 public:
-    Smk_0047c3a0* smack;               // +0x0
-    unsigned int frame;                // +0x4, the last full frame seen
-    int stopped;                       // +0x8, the movie is done or stopped
-    HWND hwnd;                         // +0xc
-    PALETTEENTRY entries[256];         // +0x10
-    int paletteResult;                 // +0x410
-    int hasSurfaces;                   // +0x414
+    Smk_0047c3a0* smack;
+    unsigned int frame;
+    int stopped;
+    HWND hwnd;
+    PALETTEENTRY entries[256];
+    int paletteResult;
+    int hasSurfaces;
     char unknown_418[0x5b4 - 0x418];
 
     MoviePlayer(char* path, int a, int b, int c, int d, int e);
@@ -157,12 +138,6 @@ public:
     int GetBlitMode(SmackerSurface* unused);
 };
 
-
-
-// The constructor: opens the .smk file, hands the Smack library the game's
-// DirectSound object, then paints a black frame into the surface the player
-// blits through. That surface is the display's own DirectDraw surface when the
-// game has one, otherwise a private one made by SetupDirectDraw.
 // FUNCTION: 0x47bdf0
 MoviePlayer::MoviePlayer(char* path, int a, int b, int c, int d, int e)
 {
@@ -198,10 +173,6 @@ void MoviePlayer::Close()
         host_display_close();
 }
 
-// Sets the movie player up: asks DirectDraw for full screen exclusive on the
-// player window, builds the primary surface and a palette out of the system
-// palette, sizes the window to the movie, and when the movie has a new palette
-// hands it to the Smacker decoder. Returns 1 unless DirectDraw refuses.
 // FUNCTION: 0x47bf70
 int MoviePlayer::SetupDirectDraw()
 {
@@ -236,9 +207,6 @@ fail:
     return 0;
 }
 
-// Asks the movie's output surface for its pixel format and returns the blit
-// mode matching it, or 0 when the format is not one of the four 16-bit RGB
-// layouts Smacker can blit to.
 // FUNCTION: 0x47c150
 int MoviePlayer::GetBlitMode(SmackerSurface* unused)
 {
@@ -258,7 +226,6 @@ int MoviePlayer::GetBlitMode(SmackerSurface* unused)
     return 0;
 }
 
-// Copies the movie's palette into entries[] and the display palette.
 // FUNCTION: 0x47c2a0
 void MoviePlayer::UpdatePalette(void)
 {
@@ -308,10 +275,6 @@ void MoviePlayer::PlayFrame(HWND hwnd)
     SmackNextFrame(smack);
 }
 
-// Dumps the playback statistics smackw32.dll collected for the open movie into
-// stats.txt, one per line. The frame rate and the playback time are worked out
-// in integer arithmetic from the millisecond totals the DLL recorded, and the
-// playback time comes out as 1000 for every movie, the original's arithmetic.
 // FUNCTION: 0x47c530
 void MoviePlayer::WriteSmackStats()
 {
@@ -339,11 +302,6 @@ void MoviePlayer::WriteSmackStats()
     }
 }
 
-// Pumps Windows messages while the Smacker movie plays: every message is
-// translated and dispatched, and two message codes end the movie, one of them
-// with a mouse move that also quits the game. When the queue is empty the
-// player is asked for the next frame, and if there is none yet the frame on
-// screen is redrawn (PlayFrame).
 // FUNCTION: 0x47c6c0
 void MoviePlayer::Play()
 {

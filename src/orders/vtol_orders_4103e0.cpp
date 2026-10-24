@@ -1,4 +1,3 @@
-// Decompiled by GPT-6 Astra. Names are provisional.
 #include <vector>
 struct Unit;
 namespace std {
@@ -24,7 +23,6 @@ struct Order;
 #include "../units/unit_def.h"
 struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index; };
 #include "unit_motion.h"
-// Unused here: real forward declarations whose symbol ids keep 0x4103e0 matching (docs/c2-regalloc.md).
 class BitWriter;
 class OpenHeap;
 class ScoutTimer;
@@ -36,8 +34,6 @@ class SquadManager;
 #include "../../interfaces/seams.h"
 #include "order.h"
 
-// Unused here: forward declarations of real functions; their symbol ids keep
-// VtolSeekAttackOrder matching (docs/c2-regalloc.md).
 void UpdateMouseScroll();
 void UpdateEdgeScroll();
 void CenterCameraOnRadarClick();
@@ -72,10 +68,8 @@ static inline int Contains(unsigned int* bits, unsigned short index) { return bi
 static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
 
 class LandingPadList : public std::vector<Unit*> { public: LandingPadList(); };
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
 int __stdcall GetOrderName(Unit* obj);
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x4103e0
 int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
 {

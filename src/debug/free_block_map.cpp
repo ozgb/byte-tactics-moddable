@@ -1,48 +1,36 @@
-// Decompiled by space-bunny-free, deepseek-v4.1-flash, deepseek-v4.1, Sonnet 5.5 and Claude Opus 5.5. Names are provisional.
-//
-// The debug allocator's free-block set, a std::map<unsigned int, unsigned int>
-// from a block's base offset to its length, walked by hand. DAT_00528a54 is the
-// tree's _Nil node, head->left is begin() and head->parent is the root.
-
 #include "../../interfaces/host.h"
 #include <string>
 #include <yvals.h>
-// Only for their symbol ids: TakeFreeBlock matches only in a window of the
-// symbol count (see its comment).
 #include <map>
 #include <list>
 #include <time.h>
-// Only for its symbol ids: TakeFreeBlock matches only in a window of the
-// symbol count (see its comment).
 #include <malloc.h>
 
 struct Pair_004db000 {
-    unsigned int offset;               // +0x0
-    unsigned int length;               // +0x4
+    unsigned int offset;
+    unsigned int length;
     Pair_004db000() {}
     Pair_004db000(unsigned int o, unsigned int l) : offset(o), length(l) {}
 };
 
 struct Node_004db000 {
-    Node_004db000* left;               // +0x0
-    Node_004db000* parent;             // +0x4
-    Node_004db000* right;              // +0x8
-    Pair_004db000 value;               // +0xc
-    int color;                         // +0x14
+    Node_004db000* left;
+    Node_004db000* parent;
+    Node_004db000* right;
+    Pair_004db000 value;
+    int color;
 };
 
-// The out-of-line _Min, taken on its own opaque node type.
 struct Node_004dd1b0 {
-    Node_004dd1b0* left;               // +0x0
+    Node_004dd1b0* left;
 };
 
 Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p);
 
-extern Node_004db000* DAT_00528a54;    // the tree's _Nil node
-extern unsigned int g_lastAllocOffset;  // the last offset handed out
-extern unsigned int g_freeBlockWraps;  // how often the search wrapped
+extern Node_004db000* DAT_00528a54;
+extern unsigned int g_lastAllocOffset;
+extern unsigned int g_freeBlockWraps;
 
-// The tree's iterator: one pointer. PrevNode is its _Dec().
 class FreeBlockIter {
 public:
     Node_004db000* ptr;
@@ -73,19 +61,14 @@ public:
     }
 };
 
-// A pair-like helper: an iterator and a byte, built by a member function that
-// takes both by reference.
 class MapInsertResult {
 public:
     FreeBlockIter first;
     unsigned char second;
     MapInsertResult() {}
-    // const reference: the hidden return pointer of insert is what gets pushed.
     MapInsertResult* Assign(const FreeBlockIter& first, unsigned char& second);
 };
 
-// Unused here: other entry points of the allocator, declared to keep this
-// file's symbol ids (TakeFreeBlock matches only in a window of them).
 void __cdecl CountAlloc(unsigned int size);
 void __cdecl CountFree(int size);
 char IsMemFussy();
@@ -111,17 +94,15 @@ struct Less_004db000 {
 
 class FreeBlockMap {
 public:
-    Less_004db000 key_compare;         // +0x0
-    Node_004db000* head;               // +0x4
-    unsigned char rebuild;             // +0x8
-    unsigned int count;                // +0xc
-    unsigned int total;                // +0x10
+    Less_004db000 key_compare;
+    Node_004db000* head;
+    unsigned char rebuild;
+    unsigned int count;
+    unsigned int total;
 
     FreeBlockIter begin() { return FreeBlockIter(head->left); }
     FreeBlockIter end() { return FreeBlockIter(head); }
     unsigned int size() const { return count; }
-    // The original tests this as a value (sete; neg; sbb; inc; test), which
-    // MSVC 5 only does for a `!` applied to a bool-returning member.
     bool Neq(FreeBlockIter a, FreeBlockIter b) { return !(a == b); }
     FreeBlockIter upper_bound(const Pair_004db000& k)
     {
@@ -131,19 +112,14 @@ public:
     Node_004db000* LowerBound(const Pair_004db000& k);
     FreeBlockIter Erase(FreeBlockIter it);
     MapInsertResult InsertOrFindInline(const Pair_004db000& v);
-    // Insert is an insert() that returns through a hidden pointer (its
-    // return type has a constructor), so its result arrives in eax as the address
-    // of the caller's temporary.
     FreeBlockIter Insert(Node_004db000* x, Node_004db000* y,
                                  Pair_004db000* v);
 
     void AddFreeBlock(Pair_004db000 p);
     unsigned int TakeFreeBlock(unsigned int bytes);
 
-    // 0x4db450: reserve more address space and add it to the free blocks.
     bool Grow(unsigned int size)
     {
-        // len declared before base: the other order swaps the operands of base + len.
         unsigned int len = 0x10000000;
         unsigned int base;
 
@@ -168,24 +144,13 @@ public:
     }
 };
 
-// 0x4db000 AddFreeBlock is defined in src/debug/debug_lib.cpp; this file
-// keeps only TakeFreeBlock, which matches in its own symbol context.
-
-// The allocator's alloc(): look for a free block of `bytes` in the free-block
-// set, preferring the block the last allocation came from (g_lastAllocOffset),
-// take it out, hand back the leftovers on either side as new free blocks, and
-// if two passes over the set find nothing, reserve more address space (Grow,
-// the out-of-line copy of which is 0x4db450) and try again. g_freeBlockWraps
-// counts the wraps around the set and DAT_00528a54 is the tree's _Nil node.
 // FUNCTION: 0x4db1c0
 unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
 {
-    // Function scope, not inside the if: otherwise the recursive return becomes a jump.
     Pair_004db000 k;
     if (size() > 0) {
         k.offset = g_lastAllocOffset;
         k.length = 0;
-        // STL-style iterator operators (--, ++, ->) throughout: their inlining shapes the code.
         FreeBlockIter lb = upper_bound(k);
         if (lb != begin()) {
             FreeBlockIter it = lb;
@@ -203,7 +168,6 @@ unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
                 tries++;
             }
             if (cur->length >= bytes) {
-                // len declared before base but base read first: sets operand and load order.
                 unsigned int len, base;
                 base = cur->offset;
                 len = cur->length;

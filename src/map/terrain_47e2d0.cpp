@@ -1,5 +1,3 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-
 #include "../util/vec3.h"
 
 struct UnitDef;
@@ -18,15 +16,6 @@ struct UnitDef;
 
 extern Game* g_game;
 
-// Can a unit be placed at pos: the whole footprint must be on the map, clear
-// of features and of terrain steeper than the unit's tolerance, and the
-// footprint centre must be visible to the unit's player (a hidden centre
-// returns true, so unexplored ground is buildable).
-// Suspected original bug: the visibility index's row term shifts footprint.x
-// by 2 where the footprint is a Point16 and the row extent is footprint.y (the
-// loop below counts rows with footprint.y).
-// Stays in a file of its own: in the merged file the symbol ids move the def
-// load and the feature lookup's operand order.
 // FUNCTION: 0x47e2d0
 int __stdcall CanPlaceFootprintAt(Unit* unit, Vec3* pos)
 {

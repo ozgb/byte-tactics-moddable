@@ -1,11 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, finished by claude-opus-5-5. Names are provisional.
-// Stays out of multi.cpp: merged, UpdateMaxUnitsText and UpdateMetalText are inlined into it (docs/split-modules.md).
-// Per-frame update of the multiplayer battle room (LOUNGE2.GUI): checks the
-// map, compacts the player slots when the room is dirty, copies the host's
-// MAXUNITS/METAL/ENERGY sliders (or map) to a client, runs the host's start
-// countdown, draws each player's version under their logo, and refreshes the
-// local player's bit at +0x9d once a minute.
-// RECT comes from windows.h: the rect sums follow the symbol count.
 #include "win_types.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,27 +10,26 @@
 
 #include "../network/player_info.h"
 
-// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int CheckDirectXVersion(int, int, int, int, int);
 int AimCobStub(int, int, int, int);
 
-struct Gadget_0044a680 {                // 0x15b bytes
+struct Gadget_0044a680 {
     char unknown_0[0x1b];
-    int attribs;                        // +0x1b
-    unsigned int colour;                // +0x1f
+    int attribs;
+    unsigned int colour;
     char unknown_23[0xbe - 0x23];
-    unsigned short* frames;             // +0xbe, the frame count first
+    unsigned short* frames;
     char unknown_c2[0xc6 - 0xc2];
-    short frame;                        // +0xc6
-    unsigned int c8_0 : 1;              // +0xc8
+    short frame;
+    unsigned int c8_0 : 1;
     unsigned int c8_rest : 31;
     char unknown_cc[0x15b - 0xcc];
 };
 
 struct Layer {
     int unknown_0;
-    Gadget_0044a680* entries;           // +0x4
+    Gadget_0044a680* entries;
 };
 
 #include "../gui/gui.h"
@@ -52,7 +43,6 @@ struct UnitSync;
 struct UnitSync {
     int AllPlayersSynced();
     void ProcessSync();
-    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
     char* GetSyncStatusText();
     void CheckUnitAvailable(unsigned int, int);
     void SendSyncMessage(unsigned char, int, int, int);
@@ -95,7 +85,6 @@ void __stdcall BroadcastPlayerInfo();
 void __stdcall UpdateNetGameInfo();
 int __stdcall AreAllPlayersReady();
 
-// The map check at 0x440cd0, which has no callers: /Ob2 inlined it.
 int CheckMapCrc()
 {
     if (!g_game->net->GetTerrainLength()) {
@@ -119,8 +108,6 @@ int CheckMapCrc()
     return 1;
 }
 
-// The slot swap at 0x4453a0, which has no callers. MSVC inlines it only when
-// it is declared inline (it has a loop).
 inline void __stdcall SwapPlayerSlots(Player* from, Player* to)
 {
     Player tmp = *to;
@@ -140,8 +127,6 @@ inline void __stdcall SwapPlayerSlots(Player* from, Player* to)
     }
 }
 
-// The slot compaction at 0x445450, which has no callers. Declared inline for
-// its loops, like 0x4453a0.
 inline void CompactActivePlayerSlots()
 {
     Player* p = g_game->players;
@@ -174,7 +159,6 @@ inline void CompactActivePlayerSlots()
     }
 }
 
-// The ENERGY slider handler at 0x445d60, which has no callers: /Ob2 inlined it.
 void __stdcall UpdateEnergyText(Gui* gui, int unused)
 {
     char text[20];
@@ -195,10 +179,8 @@ void __stdcall UpdateEnergyText(Gui* gui, int unused)
     }
 }
 
-// The slider setter at 0x445e20, which has no callers: /Ob2 inlined it.
 void __stdcall SetNamedSliderValue(Gui* gui, char* name, int value)
 {
-    // Gadget kept in a local: holds the value in edi across FindGadgetChecked_D.
     Gadget_0044a680* gadget = FindGadgetChecked_D(gui->layer->entries, name);
     SetSliderFromValue(gadget, value);
 }
@@ -313,7 +295,6 @@ void UpdateBattleRoom()
     if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
         SetCurrentFont(&g_game->gui, 1);
         {
-            // unsigned char counter (a short works too), not int.
             for (unsigned char i = 0; i < 10; i++) {
                 Player* p = &g_game->players[i];
                 if (p->type != 0 && p->type != 4) {

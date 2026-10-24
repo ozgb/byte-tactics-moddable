@@ -1,20 +1,7 @@
-// Decompiled by Claude Opus 5.5, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by Sonnet 5.5, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro, finished by Space Bunny Free, finished by DeepSeek V4.1 Flash, finished by GPT-6, finished by Claude Opus 5.5. Names are provisional.
-// Slot 0 of ScoutTimer (vtable 0x4fc9a8), derived from SquadTimer (family
-// listed in ai_player.cpp, which also holds the class and its
-// constructor).
-// Runs every 90 ticks over the units of this object's group: first gives each
-// unit that ChooseBuildOption picks an item for an order (mode 0xe) at the
-// place FindBuildPosition finds, within a third of the map size of the player's
-// base (GetBasePosition) for flag12 units; then sends the idle units towards
-// the base: flag12 units to the point mirrored through it (a random point 0x280
-// from it when farther), the others to the base itself, or when within 0x140 of
-// it, 0x140 onwards in its direction.
 #include "../state/sim_allocator.h"
 #include "../../interfaces/ref.h"
 #include "win_types.h"
 #include <ta_types.h>
-// The system header set decides operand and load order in the _allmul and
-// MapRange code.
 #include <time.h>
 #include <memory.h>
 #include <math.h>
@@ -22,45 +9,45 @@
 #pragma pack(push, 1)
 struct UnitDef_00408100 {
     char unknown_0[0x152];
-    int count;                         // +0x152
+    int count;
     char unknown_156[0x245 - 0x156];
-    unsigned int unknown_bits0 : 12;   // +0x245
+    unsigned int unknown_bits0 : 12;
     unsigned int flag12 : 1;
     unsigned int unknown_bits13 : 19;
 };
 
 struct Order_00408100 {
     char unknown_0[0x42];
-    unsigned int flags;                // +0x42
+    unsigned int flags;
 };
 
 struct Unit_00408100 {
     char unknown_0[0x5c];
     Ref<Order_00408100> list;
     char unknown_60[0x6a - 0x60];
-    Vec3 pos;                          // +0x6a
+    Vec3 pos;
     char unknown_76[0x92 - 0x76];
     Ref<UnitDef_00408100> def;
 };
 
-struct Item_00408100 {                 // 0x249 bytes
+struct Item_00408100 {
     char unknown_0[0x249];
 };
 
 struct Game_00408100 {
     char unknown_0[0x1422b];
-    int mapPixelWidth;                 // +0x1422b
-    int mapPixelHeight;                // +0x1422f
+    int mapPixelWidth;
+    int mapPixelHeight;
     char unknown_14233[0x1439b - 0x14233];
     Ref<Item_00408100> unitDefs;
     char unknown_1439f[0x38a47 - 0x1439f];
-    unsigned int gameTick;             // +0x38a47
+    unsigned int gameTick;
 };
 #pragma pack(pop)
 
 struct Group_00408100 {
     char unknown_0[0x10];
-    std::vector<Unit_00408100*> units; // +0x10
+    std::vector<Unit_00408100*> units;
 };
 
 
@@ -74,12 +61,9 @@ int __stdcall GetBuilderCount(unsigned int player);
 #include "../../interfaces/seams.h"
 int __stdcall RandomInt(int range);
 
-// Fixed-point trig helpers written in assembly.
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 
-// Takes a const reference and names its sum and result: breaks a register
-// priority tie in the callers.
 static inline int Length(const Vec3& v)
 {
     double x = v.x;
@@ -90,7 +74,6 @@ static inline int Length(const Vec3& v)
     return len;
 }
 
-// Inlined copy of DirectionFromAngle.
 static inline Vec3 Direction(short angle, int scale)
 {
     Vec3 v;
@@ -136,11 +119,9 @@ void ScoutTimer::OnTimer()
                 pos.z = 0;
                 int ok = FindBuildPosition(player, &u->pos, &g_game->unitDefs[idx], &pos);
                 if (u->def->flag12) {
-                    // Assigned to a local first: in the comparison it follows _ftol.
                     int range = MapRange();
                     origin.y = pos.y;
                     int len = Length(pos - origin);
-                    // Second use of range is deliberate: fixes the register order.
                     if (len > range || len > range)
                         ok = 0;
                 }
@@ -153,7 +134,6 @@ void ScoutTimer::OnTimer()
     }
     for (it = ((Group_00408100*)group.get())->units.begin(); it != ((Group_00408100*)group.get())->units.end(); ++it) {
         Unit_00408100* u = *it;
-        // Declared in the loop body: keeps the u->def load below the copy.
         Vec3 target;
         if ((!u->list || (u->list->flags & 0x4000))
             && (!(unsigned char)u->def->flag12 || GetBuilderCount(player) >= 5)) {
@@ -163,7 +143,6 @@ void ScoutTimer::OnTimer()
                 Vec3 d = origin - u->pos;
                 if (Length(d) > 0x2800000)
                     d = Direction(RandomInt(0x10000), 0x2800000);
-                // operator+ builds all three sums before storing; named sums differ.
                 target = origin + d;
                 MissionType kind;
                 kind = g_seams.orders->GetOrderType(2, (Unit*)u, 0, &target);
@@ -175,7 +154,6 @@ void ScoutTimer::OnTimer()
                 int len = Length(d);
                 if (len < 0x1400000) {
                     if (len < 0x100000) {
-                        // Direction(), not written by hand: keeps the direction block small.
                         d = Direction(RandomInt(0x10000), 0x1400000);
                     } else {
                         int s = FixDiv(0x1400000, len);

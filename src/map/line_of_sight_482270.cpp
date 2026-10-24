@@ -1,7 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, deepseek-v4.1-flash, GPT-6, GPT-6.1-sol, deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by mimo-v2.6-pro, finished by Space Bunny Free. Names are provisional.
-// Not gathered into line_of_sight.cpp: merged, the player grid address folds in
-// the other operand order.
-// Unused by the code but needed: it flips the operand order of `i * frame->width`.
 #include <math.h>
 #include "win_types.h"
 
@@ -23,7 +19,6 @@ public:
     LosLine* GetLosLine(short i);
 };
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void CopyDwordIfNonNull(int*, int*);
 int ScanDirectory(char*, char*, char*, int, int, int);
 void RegisterUnitOrders(void);
@@ -38,13 +33,13 @@ void ResetNetStats(void);
 
 
 struct MapSize_482270 {
-    unsigned int width;                // +0x0
-    unsigned int height;               // +0x4
+    unsigned int width;
+    unsigned int height;
 };
 
 struct ByteMap_482270 {
     Ref<unsigned char> data;
-    MapSize_482270 size;               // +0x4
+    MapSize_482270 size;
     unsigned char& at(int x, int y) { return data[y * size.width + x]; }
 };
 
@@ -52,9 +47,9 @@ struct ByteMap_482270 {
 
 struct Player_482270 {
     char unknown_0[0x7c];
-    ByteMap_482270 grid;              // +0x7c
+    ByteMap_482270 grid;
     char unknown_88[0x146 - 0x88];
-    unsigned char playerIndex;         // +0x146
+    unsigned char playerIndex;
 };
 
 #include "sight_query.h"
@@ -87,8 +82,6 @@ void __stdcall AddLineOfSight(SightQuery* params)
             return;
         if ((unsigned)y >= grid->height)
             return;
-        // Clamp written inline as the GetLosTable argument, with no temporary.
-        // One cast stays: without it the register allocation of the loop below moves.
         LosTable* table = (LosTable*)((LosTables*)&g_losTables)->GetLosTable(
             (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32) <
                     (short)g_losTables.GetLosTableCount() - 1
@@ -101,7 +94,6 @@ void __stdcall AddLineOfSight(SightQuery* params)
         for (i = 0; i < count; i++) {
             LosLine* line = table->GetLosLine(i);
             short num = line->GetLosLineStepCount();
-            // Declared in this order: bestIdx, j1, bestDiff, j; dx and dy stay int locals.
             int bestIdx = 0;
             int j1;
             int bestDiff = -1;
@@ -137,7 +129,6 @@ void __stdcall AddLineOfSight(SightQuery* params)
         int ref = *params->frameIdx;
         GafFrame* frame =
             GetGafFrame((unsigned short*)(void *)g_game->losTable, ref);
-        // limitX and limitY are if/else statements, not ?:.
         int limitX;
         if (x + frame->width >= halfW)
             limitX = halfW - x;
@@ -155,11 +146,9 @@ void __stdcall AddLineOfSight(SightQuery* params)
         if (nx >= limitX)
             return;
         for (int i = ny; i < limitY; i++) {
-            // Named ex local: shapes the destination address.
             ByteMap_482270* ex = &((Player_482270*)params->player.get())->grid;
             unsigned char* dst = ex->data + (y + i) * ex->size.width + nx + x;
             unsigned char* src = frame->pixelsOrLayers + i * frame->width + nx;
-            // Counted j loop: lets the compiler turn it into dec/jne.
             for (int j = nx; j < limitX; j++) {
                 if (*src != frame->transparency)
                     (*dst)++;

@@ -1,8 +1,3 @@
-// Decompiled by Opus, DeepSeek V4.1 Flash, Claude Opus 5.5, mimo-v2.6-flash, space-bunny-free, deepseek-v4.1-flash, deepseek-v4.1, Sonnet 5.5, Space Bunny Free, GPT-6, Haiku and Sonnet. Names are provisional.
-// The in-game dialogs: the metal and energy readouts, giving selected units
-// away, the resource sharing screen (SHARE.GUI), the chat target screen
-// (TALK.GUI), the unit info screen, the tab menu (TABMENU.GUI), the frame
-// pacing, the game step loop and the mission-script event dispatcher.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -46,10 +41,10 @@ struct Gui;
 
 #include "../units/unit.h"
 
-struct Saved {                         // 10 bytes
-    int a;                             // +0x00
-    int b;                             // +0x04
-    short c;                           // +0x08
+struct Saved {
+    int a;
+    int b;
+    short c;
 };
 
 struct Flags16 {
@@ -75,14 +70,14 @@ static inline void AccumulateProfileTime(FrameTimers* timers, int i)
 extern int g_shareDialogPlayerNetIds[10];
 extern int g_nonCampaignGame;
 extern char g_chatDraftText[];
-extern char g_livePlayerPrefix[];      // "LIVEPLYR"
-extern char g_smallButtonSoundName[];  // "SmallButton"
-extern char g_sendTypeGadgetName[];    // "SENDTYPE"
-extern char g_sendToGadgetName[];      // "SENDTO"
-extern char g_talkGadgetName[];        // "TALK"
-extern char g_chatTargetSeparators[];  // ",:;"
-extern char g_enemiesChatTarget[];     // "Enemies"
-extern char g_alliesChatTarget[];      // "Allies"
+extern char g_livePlayerPrefix[];
+extern char g_smallButtonSoundName[];
+extern char g_sendTypeGadgetName[];
+extern char g_sendToGadgetName[];
+extern char g_talkGadgetName[];
+extern char g_chatTargetSeparators[];
+extern char g_enemiesChatTarget[];
+extern char g_alliesChatTarget[];
 extern int g_chatDraftInitialized;
 extern unsigned char g_scorePanelKillFlash[10];
 extern unsigned char g_scorePanelLossFlash[10];
@@ -200,25 +195,15 @@ void __stdcall UpdateEnergyReadout(Gui* obj, int unused)
     }
 }
 
-// The same inlined bit-set test as 0x41c310.
 static inline int TestBit(unsigned int* set, unsigned short n)
 {
     return set[n >> 5] & (1 << (n & 0x1f));
 }
 
-// CollectSelectedUnits clears the vector and fills it with the local player's
-// units that have bit 4 of +0x110 set (probably the selected units); each one
-// whose low two flag bits are not 2, with +0x86 and +0x8a clear and whose type
-// is not in the "Commander" set, is handed to the given player with
-// GiveUnitToPlayer.
-// The list is a real std::vector<Unit*> (0x48ca20 calls the vector's _Ucopy,
-// _Ufill and _Destroy).
-
 // FUNCTION: 0x4933e0
 void __stdcall GiveSelectedUnitsToPlayer(unsigned char player)
 {
     extern Game* g_game;
-    // Must be a real std::vector: its constructor leaves the player index in place.
     std::vector<Unit*> list;
     CollectSelectedUnits(&list);
     Player* p = &g_game->players[player];
@@ -298,12 +283,6 @@ void __stdcall HandleShareDialogEvent(Gui* obj)
         ClearSelectedGadget(obj);
 }
 
-// Opens the resource sharing screen (SHARE.GUI): it walks the ten player
-// records, finds the local player's entry (flagged 0x40), points the METAL and
-// ENERGY sliders at the local counts, and finishes with the menu setup calls.
-// A resource's owner is flagged 0x40 in the player record; the two sliders are
-// the "METAL#" and "ENERGY#" texts.
-
 // FUNCTION: 0x4936f0
 void OpenShareDialog()
 {
@@ -361,8 +340,6 @@ void OpenShareDialog()
     }
     ConfigureListBoxByName(&g_game->gui, "PLYRLIST", names, count, 0);
     char text[0x34];
-    // Both tail blocks go through the local menu pointer, menu first, with no
-    // self-comparison: this fixes their register choice.
     Gui* menu = &g_game->gui;
     Layer* lyr = menu->layer;
     Gadget* ents = lyr->entries;
@@ -383,11 +360,6 @@ void OpenShareDialog()
     SetKeyboardInput(&g_game->gui, 1);
     RenderLayer(&g_game->gui, 0x40);
 }
-
-// Resets every player's "PLAYER%d" gadget and publishes a "LIVEPLYR%d" value
-// for each occupied slot except the local player's: 1, whether the local
-// player considers that slot an ally, or the flag at g_game+0x2bf1, depending
-// on the chat mode at g_game+0x2bf0.
 
 // FUNCTION: 0x493ae0
 void ResetPlayerGadgets(void)
@@ -427,16 +399,12 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
 {
     char buf2[0x12c];
     char buf[0x100];
-    // mode and oldmode must both be int.
     int oldmode;
     int mode;
     int n;
     int d;
-    // Declared here, after n and d, not at file scope: g_game's symbol id sets
-    // the base/index order of the byte stores.
     extern Game* g_game;
     Gadget* entries = gadget->layer->entries;
-    // current is read directly, not through an id local.
     if (gadget->hotGadgetIndex == -1) {
         g_game->flags_37ebe &= ~4;
         return;
@@ -446,11 +414,6 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
         g_game->mode_2bf0 = 3;
         SetButtonStageByName(gadget, g_sendTypeGadgetName, g_game->mode_2bf0);
         n = atoi(&entries[gadget->hotGadgetIndex].name[8]);
-        // Kept as the original has it: n is never range checked before it
-        // indexes the 11-byte selection mask, so a "LIVEPLYR42" style name
-        // writes outside chatRecipients. The neighbouring chatMode is clamped
-        // (`if (g_game->chatMode >= 4) g_game->chatMode = 0;`), so the
-        // omission looks like an oversight rather than a deliberate choice.
         unsigned char v = (unsigned char)GetButtonStage(gadget, gadget->hotGadgetIndex);
         g_game->chatRecipients[n] = v;
         MarkChanged(gadget);
@@ -493,8 +456,6 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
             p++;
         if (*p == '+') {
             int flags = 1;
-            // The cast keeps the shift a 16-bit one, which is what stops MSVC
-            // folding this into `test byte ptr [g_game + 0x37f2f], 2`.
             if (flags & (unsigned char)(g_game->uiOptionFlags >> 1))
                 flags = 7;
             if (g_nonCampaignGame)
@@ -505,13 +466,10 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
                 mode = 0;
         }
         if (strlen(p) != 0) {
-            // These four statements stay in this order: oldmode, to, base, saved.
             oldmode = g_game->mode_2bf0;
             char* to = 0;
             Player* base = &g_game->players[g_game->localPlayer];
             Saved saved = *(Saved*)g_game->chatRecipients;
-            // Early out rather than a positive `if`, and the empty statement
-            // at skip0 below is load bearing: either change costs 9 points.
             if (!(' ' < p[1] && strchr(g_chatTargetSeparators, p[1]) != 0)) goto skip0;
             if (isdigit(p[0])) {
                 d = p[0] - '0';
@@ -519,7 +477,6 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
                     goto clear;
                 p += 2;
                 mode = 3;
-                // to is computed before the memset.
                 to = g_game->players[d].name;
                 memset(g_game->chatRecipients, 0, 11);
                 g_game->chatRecipients[d] = 1;
@@ -556,8 +513,6 @@ tail:
     g_game->gui.layer->current = FindGadgetIndex(entries, g_talkGadgetName, 3);
 }
 
-// The functions before 0x493bf0 declare g_game inside their bodies: its symbol
-// id has to come after the locals of 0x493bf0 (the order of its byte stores).
 // GLOBAL: 0x511de8
 extern Game* g_game;
 // FUNCTION: 0x494050
@@ -610,9 +565,6 @@ void __stdcall HandleUnitInfoDialogEvent(Gui* gadget)
     }
     ClearSelectedGadget(&g_game->gui);
 }
-
-// Draws a gadget's image at the gadget's position (GetGadgetRect fills its
-// bounding rectangle).
 
 // FUNCTION: 0x494290
 void __stdcall DrawUnitInfoImage(Gui* gadget, Gadget* entry)
@@ -843,15 +795,12 @@ void __stdcall DrawScorePanel(void* surface)
 
     for (int i = 0; i < (int)g_game->numPlayers; i++) {
         Player* p = g_game->players;
-        // Chained assignments fix the store order; the right edge is
-        // panel.left + maxw.
         Quad dst;
         dst.p[0].x = dst.p[3].x = panel.left + 7;
         dst.p[2].x = dst.p[1].x = panel.left + maxw;
         dst.p[0].y = dst.p[1].y = y + 1;
         dst.p[2].y = dst.p[3].y = y + 0x25;
 
-        // The draw block stays inside the search loop; cleanup follows the loop.
         int n;
         for (n = 0; n < 10; n++, p++) {
             if (p->active == 0)
@@ -867,7 +816,6 @@ void __stdcall DrawScorePanel(void* surface)
                 continue;
             if (p->rank != i)
                 continue;
-            // Assigned in the order left, right, top, bottom.
             Rect hr;
             hr.left = panel.left + 4;
             hr.right = panel.right - 4;
@@ -900,7 +848,6 @@ void __stdcall DrawScorePanel(void* surface)
         }
         if (n == 10) {
             Player* q = g_game->players;
-            // Countdown k = n gives the frame its stack slot.
             for (int k = n; k != 0; k--, q++) {
                 if (q->active == 0)
                     continue;
@@ -919,37 +866,6 @@ void __stdcall DrawScorePanel(void* surface)
         }
     }
 }
-
-// Frame-time / desync watchdog: keeps a 30-entry ring of per-frame counters at
-// g_cdActivitySampleRing, and when the ring total (or the last five entries) grows too
-// large it flips the network state g_lastCdActivityMode between 0 and 1 and resets the
-// counter g_cdActivityStableTicks.
-//
-// Matches with loadingFlags declared `volatile`. Without it, only the two tests
-// on g_game->loadingFlags at 0x494e8b differ. The original emits two memory-operand bit tests
-// (`test byte ptr [eax+0x38d75],1` then `...,2`); this source makes MSVC load
-// the byte once (`mov al,[eax+0x38d75]; test al,1; test al,2`), 4 bytes
-// shorter. The same pair appears in 0x452800 and in 0x453d40 (at 0x4550c2).
-//
-// Notes (#436): the difference is not compiler state. It persists for any
-// number of unused declarations, for every headers.py set and with
-// <windows.h> plus <string>,
-// <vector> + <map>, <iostream>, <list> or the DirectX headers. In scratch
-// tests MSVC 5 shares the load across the two tests for every non-volatile
-// spelling (bitfields, masks, byte/word/dword union views, inline helpers
-// taking the object or a reference, ternaries, switch, separate ifs).
-// Adding `volatile` to the declaration of loadingFlags (a 16-bit flags word)
-// makes this function MATCH with no other change; adding `volatile` to
-// 0x452800's declaration of the field makes that function MATCH as well.
-// Evidence that Cavedog really declared this word volatile: every write to
-// it in the game (0x496861, 0x4975c0 and
-// 0x497c57) is a word read-modify-write through a register
-// (`mov cx,[m]; or ecx,4; mov [m],cx`), which MSVC 5 emits only for a
-// volatile field; every non-volatile form (`w |= 4`, `w = w & ~4`, a 1-bit
-// bitfield store, a struct copy) compiles to `or byte ptr [m],4` or
-// `and word ptr [m],0xfffb` straight to memory. Accepted as the original
-// declaration (network state, likely also touched from DirectPlay's thread);
-// see docs/consolidation.md.
 
 // FUNCTION: 0x494e70
 void UpdateCdCategoryByActivity()
@@ -1006,16 +922,6 @@ void __stdcall AddCdActivitySample(int param_1)
     g_cdActivitySampleRing[g_cdActivityRingWriteIdx] += param_1;
 }
 
-// What the code does: it opens (or closes) the TABMENU.GUI tab menu page. If any
-// of bits 5 to 7 of the flags word at +0x2bee is set the page is being closed:
-// the bits are cleared and the gui is either hidden, or torn down when
-// IsScreenNamed does not find the file. Otherwise the bit 5 "open" flag is set,
-// the gui is fetched through LoadGuiLayer and given a click handler and an owner,
-// and the three ALLIES / SHARE / CONTROL checkboxes are set. The two first ones
-// are enabled when the player count of free, non allied slots is positive and
-// the net mode is 3, CONTROL also needs bit 0 of +0x2c74 clear and IsHostLocal
-// true.
-
 // FUNCTION: 0x495010
 void ToggleTabMenu()
 {
@@ -1033,7 +939,6 @@ void ToggleTabMenu()
     d->data = g_game;
     d->handler = (void (__stdcall*)(void*))HandleTabMenuEvent;
 
-    // Single count++ body, no extra locals: sets the register split of the scan.
     int count = 0;
     Player* p = g_game->players;
     for (int i = 0; i < 10; i++, p++) {
@@ -1043,7 +948,6 @@ void ToggleTabMenu()
             continue;
         count++;
     }
-    // The players[localPlayer] scale by 0x14b is left to the compiler.
     int mode = g_game->net->GetGameType();
     if (mode == 3 && !g_game->players_1b63[g_game->localPlayer].info->bit6) {
         int v = count > 0;
@@ -1061,9 +965,6 @@ void ToggleTabMenu()
     ShowSoftwareCursor();
 }
 
-// Opens a dialog whose GUI file name is kept in the game object, with
-// HandleMain2LayoutEvent as its handler and the game object as its owner.
-
 // FUNCTION: 0x495200
 void OpenMain2Layout()
 {
@@ -1074,14 +975,6 @@ void OpenMain2Layout()
 
 int HarnessTestMode();
 unsigned HarnessStepsPerFrame();
-
-// Frame pacing: measures the time since the last call, finds the slowest
-// active player (the one with the lowest tick counter that still has units),
-// and turns the lag behind the fastest into a speed factor. That factor scales
-// the elapsed time into a whole number of game ticks for this frame (the
-// fraction is carried over in a float), which is clamped to 0..5 and to 0
-// while paused. Too many capped frames in a row lowers the current speed step,
-// a long run of idle ones raises it again.
 
 // FUNCTION: 0x495230
 void UpdateFramePacing()
@@ -1126,7 +1019,6 @@ void UpdateFramePacing()
     double x = g_game->scrollScale * rate + (*(float*)&g_game->carry);
     double whole = floor(x);
     g_game->frames_38a3b = (int)whole;
-    // No (float) cast: with it the fsub moves after the steps store.
     (*(float*)&g_game->carry) = x - whole;
     if (g_game->frames_38a3b < 0)
         g_game->frames_38a3b = 0;
@@ -1155,10 +1047,6 @@ void UpdateFramePacing()
 void HarnessAfterStep();
 void HarnessBeforeStep();
 void HarnessPhase(int phase);
-
-// Runs one game update per pending time step (g_game->simStepsPending), profiling each
-// phase into g_game->profileTimingBars.acc[]; the profile object also lives at +0x38d85 with
-// total at +4, the display copy at +8 and the accumulators at +0x2c.
 
 // FUNCTION: 0x495490
 void __stdcall RunGameSteps(int showStats)
@@ -1221,11 +1109,6 @@ void __stdcall RunGameSteps(int showStats)
     ExpireOldestMessage();
     AccumulateProfileTime(&g_game->timers, 8);
 }
-
-// Mission-script event dispatcher: the argument selects one of six cases out
-// of 0x3d..0x70. The 0x3d walk keeps a byte counter in ebx next to a separate
-// byte-offset induction variable in eax, and the redundant `i < 10` guard
-// inside the do-while is what leaves the preheader test in the binary.
 
 // FUNCTION: 0x4956c0
 void __stdcall HandleDebugHotkey(int eventType)

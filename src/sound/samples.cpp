@@ -1,20 +1,9 @@
-// Decompiled by Haiku, deepseek-v4.1, deepseek-v4.1-flash, space-bunny-free, Opus, Sonnet, GPT-6.1-sol, mimo-v2.6-pro, Claude Opus 5.5 and LongCat 2.5 Preview Free. Names are provisional.
-// The sound object's DirectSound sample and streaming methods and the
-// module's mixer volume, sample file and timer helpers, in address order
-// (the samples module of data/modules.csv). The object's CD audio methods
-// are in cd_audio.cpp; the Sound class below is the view the gathered files
-// shared.
-
 #include "win_types.h"
 #include <stdlib.h>
 #include <string.h>
 #include "../../interfaces/host.h"
-// <stdio.h> must stay: the header state decides StartStream's multiply register.
 #include <stdio.h>
 #include <float.h>
-// Nothing here uses <io.h>: its symbols put InitDirectSound,
-// CreateSampleFromMemory and StartStream in the symbol-id windows they match
-// in (docs/c2-regalloc.md).
 #include <io.h>
 
 
@@ -32,7 +21,7 @@ extern void __stdcall OnCdFadeTimer(void* unused);
 
 struct App_004b6220 {
     char unknown_0[0x40];
-    HWND hwnd;                         // +0x40
+    HWND hwnd;
 };
 
 extern App_004b6220* GetDisplay();
@@ -57,9 +46,6 @@ int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 extern int g_delayedSampleVolume;
 extern char g_delayedSampleName[];
 
-
-// The sound system: the CD audio player, the DirectSound sample channels and
-// the streamed sample, at g_game+0x10.
 #include "sound.h"
 
 static inline int ClampVolume(int v)
@@ -73,8 +59,6 @@ static inline int ClampVolume(int v)
     return v;
 }
 
-// Unused here: forward declarations of real functions; their symbol ids keep
-// the allocation (docs/c2-regalloc.md).
 void EnableAICommands();
 void ResetAIPlayers();
 void StepAllGafSequences();
@@ -94,7 +78,6 @@ struct WaveFormat {
 
 
 static inline unsigned int FindChunk(FileHandle* file, const char* tag) {
-    // Declared in this order, all unsigned: offset before size, and the chunk tests keep jb/jle.
     unsigned int limit, id, offset, size;
     HAPI_SeekFile(file, 4);
     HAPI_readfromfile(file, &limit, 4);
@@ -122,24 +105,22 @@ extern HANDLE g_squashThreadLockEvent;
 extern int g_squashThreadLockTicket;
 
 struct Entry_004d0a10 {
-    short a;                 // +0x0
-    short b;                 // +0x2
-    short c;                 // +0x4
+    short a;
+    short b;
+    short c;
 };
 
 struct Struct_00526ff0 {
     Entry_004d0a10 entries[0x1000];
-    short field_6000;        // +0x6000
-    short field_6002;        // +0x6002
-    short field_6004;        // +0x6004
+    short field_6000;
+    short field_6002;
+    short field_6004;
 };
 
 extern Struct_00526ff0* g_squashDictTree;
 
 extern void* g_squashWindow;
 
-// The constructor of the 0x294-byte sound/volume object (allocated by
-// 0x49ea3d); 0x4cff30 opens the devices and 0x4d0040 reads the aux volume.
 // FUNCTION: 0x4cee50
 Sound::Sound()
 {
@@ -167,10 +148,6 @@ Sound::Sound()
     streamTimer = -1;
 }
 
-// Tears down the sound object: releases every buffer set, disables the sound
-// handle, stops and releases the streamed buffer and closes its file, shuts
-// down the CD audio device, then releases the two remaining DirectSound
-// objects.
 // FUNCTION: 0x4ceee0
 void Sound::ReleaseDirectSound()
 {
@@ -214,7 +191,6 @@ int Sound::InitDirectSound(int rate, int bits, int channels, HWND handle)
     return 1;
 }
 
-// Releases every sound buffer (and buffer set) that has stopped playing.
 // FUNCTION: 0x4cf0b0
 void Sound::ReapFinishedBuffers()
 {
@@ -254,9 +230,6 @@ void Sound::StopAllBuffers()
     }
 }
 
-// Frees a sound channel: picks the first active buffer whose flag bit 0 is
-// clear, then the one of those with the lowest priority, stops it and
-// removes it from the table (layout as in 0x4cee50 and 0x4cf0b0).
 // FUNCTION: 0x4cf180
 void Sound::StopOldestBuffer()
 {
@@ -286,10 +259,6 @@ int Sound::GetMaxBuffers()
     return maxBuffers;
 }
 
-// Creates a DirectSound buffer from a block of raw sample data, locks it,
-// memcpy's the data in and unlocks it, then wraps the buffer in a 4-slot set
-// (only slot 0 is used) allocated with the tagged allocator. Releases the
-// buffer and returns 0 on any failure.
 // FUNCTION: 0x4cf230
 void** Sound::CreateSampleFromMemory(void* src, unsigned long bytes,
                                                   int sampleRate, int bits, int channels)
@@ -324,11 +293,6 @@ error:
     return 0;
 }
 
-// Creates a DirectSound buffer for a block of a sound file. FP exceptions are
-// masked while the buffer is created, the buffer is locked, its contents are
-// read from the file with HAPI_readfromfile, and it is unlocked again. The buffer
-// is then wrapped in a 4-slot set (only slot 0 is used) allocated with the
-// tagged allocator. Releases the buffer and returns 0 on any failure.
 // FUNCTION: 0x4cf370
 void** Sound::CreateSampleFromFile(FileHandle* file, unsigned long bytes,
                                                   int sampleRate, int bits, int channels)
@@ -390,8 +354,6 @@ void Sound::ReleaseSampleSet(void** set)
     GameFreeThunk(set);
 }
 
-// Calls PlaySampleSet on the same object with the global flag at 0x51ff48 set
-// for the duration of the call.
 // FUNCTION: 0x4cf540
 void Sound::PlayLooping(void** set, LONG volume)
 {
@@ -400,11 +362,6 @@ void Sound::PlayLooping(void** set, LONG volume)
     g_playBufferLooping = 0;
 }
 
-// Plays a sample on one of the four DirectSound buffers in `set`: a buffer that
-// has stopped is reused as it is; otherwise a free entry gets a duplicate of
-// set[0], or else the buffer furthest through its playback is restarted. The
-// buffer is then given its 3D settings, volume and play flags and filed in the
-// channel table (count +0x30, sequence +0x34, buffers +0x38, priorities +0xb8,
 // FUNCTION: 0x4cf570
 int Sound::PlaySampleSet(void** set, LONG volume, Pos_004cf570* pos)
 {
@@ -418,7 +375,6 @@ int Sound::PlaySampleSet(void** set, LONG volume, Pos_004cf570* pos)
     }
     while (count >= maxBuffers)
         StopOldestBuffer();
-    // best = 0 stays before the null test; bestidx must be the last variable set to 0.
     unsigned int best = 0;
     if (set == 0)
         return 0;
@@ -477,9 +433,6 @@ int Sound::PlaySampleSet(void** set, LONG volume, Pos_004cf570* pos)
     return 1;
 }
 
-// Sound object (see 0x4cf8a0): releases finished buffers, then creates a new
-// buffer set in the first free slot and starts it; frees the set again if
-// starting fails. Returns 1 on success.
 // FUNCTION: 0x4cf800
 int Sound::PlayMemorySample(void* src, unsigned long bytes, int sampleRate, int bits, int channels, LONG volume, Pos_004cf570* pos)
 {
@@ -500,9 +453,6 @@ int Sound::PlayMemorySample(void* src, unsigned long bytes, int sampleRate, int 
     return 0;
 }
 
-// Sound object (see 0x4cf0b0): releases finished buffers, then creates a new
-// buffer set in the first free slot and starts it; frees the set again if
-// starting fails. Returns 1 on success.
 // FUNCTION: 0x4cf8a0
 int Sound::PlayFileSample(FileHandle* file, unsigned long bytes, int sampleRate, int bits, int channels, LONG volume, Pos_004cf570* pos)
 {
@@ -523,15 +473,10 @@ int Sound::PlayFileSample(FileHandle* file, unsigned long bytes, int sampleRate,
     return 0;
 }
 
-// Streamed sound init (see 0x4cfb40 / 0x4cfbc0 / 0x4cfca0): tears down any
-// previous handle and streaming buffer, then creates a new looping
-// DirectSound buffer twice the size of one block, sets its volume and starts
-// it. On any failure the buffer is stopped, released and its file closed.
 // FUNCTION: 0x4cf940
 void Sound::StartStream(FileHandle* file, int sampleRate, int bits,
                                   int channels, LONG volume)
 {
-    // Signed: unsigned would change the shift.
     int n;
 
     if (streamTimer != -1) {
@@ -587,8 +532,6 @@ void Sound::StartStream(FileHandle* file, int sampleRate, int bits,
     }
 }
 
-// Stops the streamed sound: frees the handle at +0x288, then stops and
-// releases the streaming sound buffer and closes its file.
 // FUNCTION: 0x4cfb40
 void Sound::StopStream()
 {
@@ -613,10 +556,6 @@ int Sound::IsStreamActive(void)
     return 1;
 }
 
-// Polls a streamed sound's DirectSound buffer: reads the current play cursor
-// and, when the buffer is due, either tears the sound down (releasing the
-// handle, stopping and releasing the buffer and closing the file) or loads the
-// next block into the buffer (0x4cfca0).
 // FUNCTION: 0x4cfbc0
 void Sound::UpdateStream()
 {
@@ -664,14 +603,6 @@ void Sound::UpdateStream()
     }
 }
 
-// Streams the next block of a sound file into a DirectSound buffer: Lock the
-// buffer, then either fill it with silence (8-bit PCM is 0x80, 16-bit is 0) or,
-// when the file offset at +0x1f8 is negative, seek the file to where the last
-// block ended, read at most one buffer's worth of bytes into it and pad the
-// rest with silence, then Unlock it. When Lock fails the sound is torn down
-// instead: the sound handle is released and the buffer stopped, released and
-// its file closed. The read offset is then wrapped: at the end of the file it
-// goes back to 0, otherwise it moves on by the buffer size.
 // FUNCTION: 0x4cfca0
 void Sound::FillStreamHalf()
 {
@@ -799,9 +730,6 @@ int Sound::HasNoDriver()
     return noDriver;
 }
 
-// The two volume readers the original inlined into InitMixerVolumes (their
-// out-of-line twins are 0x4cfff0 and 0x4d0040). They stay free helpers because
-// sound.h cannot include <mmsystem.h>.
 static inline int GetWaveOutVolume(Sound* sound)
 {
     unsigned int volume;
@@ -820,9 +748,6 @@ static inline int GetAuxOutVolume(Sound* sound)
     return -1;
 }
 
-// Picks the first CD-audio auxiliary device, then caches the wave-out and
-// auxiliary volumes (-1 when unavailable).
-// The original calls this out of line from the constructor (0x4cee50).
 #pragma auto_inline(off)
 // FUNCTION: 0x4cff30
 void Sound::InitMixerVolumes()
@@ -835,9 +760,6 @@ void Sound::InitMixerVolumes()
 }
 #pragma auto_inline(on)
 
-// Returns the left-channel volume of the first wave-out device that reports
-// one, or -1. The dllimport call is what makes MSVC keep the import address
-// in ebx for the loop.
 // FUNCTION: 0x4cfff0
 int Sound::QueryWaveVolume()
 {
@@ -849,9 +771,6 @@ int Sound::QueryWaveVolume()
     return -1;
 }
 
-// Returns the aux (CD) volume of the left channel, 0..0xffff, or -1 when
-// there is no aux device or its volume cannot be read. The setter is
-// 0x4d00d0. The original calls this out of line from the constructor (0x4cee50).
 #pragma auto_inline(off)
 // FUNCTION: 0x4d0040
 int Sound::QueryAuxVolume()
@@ -864,8 +783,6 @@ int Sound::QueryAuxVolume()
 }
 #pragma auto_inline(on)
 
-// Sets the volume of every wave-out device, clamped to 0..0xffff. Returns
-// nonzero if any device failed.
 // FUNCTION: 0x4d0070
 int Sound::SetWaveVolume(int volume)
 {
@@ -879,8 +796,6 @@ int Sound::SetWaveVolume(int volume)
     return failed;
 }
 
-// Sets the aux (CD) volume, clamped to 0..0xffff; unless `temporary`, it is
-// also remembered. Returns nonzero on success.
 // FUNCTION: 0x4d00d0
 int Sound::SetAuxVolume(int volume, int temporary)
 {
@@ -910,10 +825,6 @@ void Sound::RestoreMixerVolumes()
     }
 }
 
-// Sniffs the head of a sound file: 0x4d01b0 returns 1 for a DIGI/HSHD/SDAT
-// file, 2 for a RIFF/WAVE file and 0 for anything else. The four byte tag is
-// read into one local buffer that MSVC lays over the dead parameter slot.
-// It ignores `this`; the only caller (0x4d02a0) passes its object in ecx.
 // FUNCTION: 0x4d01b0
 int Sound::DetectSampleFormat(void* file)
 {
@@ -1040,8 +951,6 @@ void __stdcall OnStreamTimer(int unused1)
     g_cdPlayer->OpenSample(g_delayedSampleName, 2, g_delayedSampleVolume, 0);
 }
 
-// Remembers a name and a value, then starts a timer whose callback
-// (0x4d0680) hands them back to this object.
 // FUNCTION: 0x4d06c0
 int Sound::StreamSampleDelayed(char* name, int value, int delay)
 {
@@ -1051,11 +960,6 @@ int Sound::StreamSampleDelayed(char* name, int value, int delay)
     return 1;
 }
 
-// Walks a chunked file's marker table: the header holds the table size (plus
-// the 8 bytes of the two header fields) and the first marker, then the table
-// is a run of [4 byte name][4 byte offset] pairs. Returns the offset of the
-// named marker, or 0 when the table runs out.
-// Must stay a class method: the original is a this-less __thiscall.
 // FUNCTION: 0x4d0720
 int Sound::FindChunkSize(void* file, char* target)
 {
@@ -1084,7 +988,6 @@ int Sound::FindChunkSize(void* file, char* target)
     }
 }
 
-// Must stay a class method: the original is a this-less __thiscall.
 // FUNCTION: 0x4d07f0
 int Sound::ReadWaveFormat(void* file, int* sampleRate, int* bitsPerSample, int* channels)
 {
@@ -1101,7 +1004,6 @@ int Sound::ReadWaveFormat(void* file, int* sampleRate, int* bitsPerSample, int* 
     HAPI_SeekFile(file, 0xc);
     HAPI_readfromfile(file, tag, 4);
     HAPI_readfromfile(file, &len, 4);
-    // Set after the len read, just before the loop.
     pos = 0x14;
     for (;;) {
         if (strncmp(tag, "fmt ", 4) == 0) {
@@ -1127,10 +1029,6 @@ int Sound::ReadWaveFormat(void* file, int* sampleRate, int* bitsPerSample, int* 
     return 1;
 }
 
-// Walks a chunked file's marker table looking for the record tagged "data" and
-// returns that record's 4 byte header field (the record length), or 0 when the
-// walk runs past the table.
-// Must stay a class method: the original is a this-less __thiscall.
 // FUNCTION: 0x4d0910
 int Sound::FindDataChunkSize(void* file)
 {
@@ -1145,7 +1043,6 @@ int Sound::FindDataChunkSize(void* file)
     HAPI_SeekFile(file, 0xc);
     HAPI_readfromfile(file, tag, 4);
     HAPI_readfromfile(file, &len, 4);
-    // Set after the len read, just before the loop.
     pos = 0x14;
     for (;;) {
         if (strncmp(tag, "data", 4) == 0)

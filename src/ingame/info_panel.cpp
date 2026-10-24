@@ -1,14 +1,3 @@
-// Decompiled by deepseek-v4.1, deepseek-v4.1-flash, GPT-6.1-sol, mimo-v2.6-pro, DeepSeek V4.1 Flash, GPT-6, space-bunny-free, Haiku, Opus, Sonnet, Space Bunny Free, claude-sonnet-5-5 and Claude Opus 5.5. Names are provisional.
-//
-// The in-game information and status panels: the unit flags pass over the unit
-// array, the radar and sonar jams, the light bars, the kill count, the debug
-// unit and builder probes, the network statistics, the status panel tick, the
-// game view overlays (the resource panel, the fog, the selection box), the hit
-// point bar, the selection box corners, the map cell drawing, the selected
-// unit's info panel, the profile timers, the tile footprint and the message
-// line. The module's files gathered in address order; 0x467440, 0x468cf0,
-// 0x46a610 and 0x46a860 keep their own files (their symbol counts, the include
-// set or /Gi decide their matches).
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 #include <stdio.h>
@@ -26,53 +15,49 @@
 #include "../units/unit_def.h"
 #include "../network/player.h"
 
-// The flags at +0x241 read as the original's bitfield; the header keeps the
-// plain word.
 #pragma pack(push, 1)
 struct UnitDefFlags_00467440 {
     char unknown_0[0x241];
     unsigned int bit0_7 : 8;
-    unsigned int bit8 : 1;         // bit 8
+    unsigned int bit8 : 1;
     unsigned int bit9_31 : 23;
 };
 #pragma pack(pop)
 
-// A partial view of UnitDef (the header's fields at the same offsets); it stays for its symbol ids, which 0x467a50 needs.
 struct UnitType_004685a0 {
-    char name[0x152];                  // +0x0
-    int count;                         // +0x152
+    char name[0x152];
+    int count;
     Ref<unsigned short> ids;
     char unknown_15a[0x22f - 0x15a];
-    unsigned char mobile;              // +0x22f
+    unsigned char mobile;
 };
 
 #include "../network/player_info.h"
 
 struct Owner_00467440 {
-    void* active;                      // +0x0
+    void* active;
     char unknown_4[0x27 - 0x4];
     Ref<PlayerInfo> data;
     char unknown_2b[0x73 - 0x2b];
-    char type;                         // +0x73
+    char type;
     char unknown_74[0x108 - 0x74];
-    unsigned char allied[1];           // +0x108
+    unsigned char allied[1];
 };
 
 struct PlayerInfo_004685a0 {
-    int f_0;                           // +0x0
+    int f_0;
     char unknown_4[0x2b - 4];
-    char name[0x73 - 0x2b];            // +0x2b
-    unsigned char controller;          // +0x73
+    char name[0x73 - 0x2b];
+    unsigned char controller;
     char unknown_74[0x146 - 0x74];
-    unsigned char player;              // +0x146
+    unsigned char player;
     char unknown_147[0x22f - 0x147];
-    unsigned char mobile;              // +0x22f
+    unsigned char mobile;
 };
 
-// Unused here: its symbol ids keep DrawRotatedQuadOutline (0x467a50) matching.
 struct Unit_00467960 {
     char unknown_0[0x110];
-    unsigned int flags;                // +0x110
+    unsigned int flags;
 };
 
 struct Object_004cb650;
@@ -80,8 +65,8 @@ struct Object_004cb650;
 #include "../units/unit.h"
 
 struct MapSize_00467440 {
-    unsigned int width;                // +0x0
-    unsigned int height;               // +0x4
+    unsigned int width;
+    unsigned int height;
 
     int Contains(unsigned int tx, unsigned int ty)
     {
@@ -91,29 +76,29 @@ struct MapSize_00467440 {
 
 struct ByteMap_00467440 {
     Ref<unsigned char> data;
-    MapSize_00467440 size;             // +0x4
+    MapSize_00467440 size;
 
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };
 
 struct PlayerInfo_00467440 {
-    void* active;                      // +0x0
+    void* active;
     char unknown_4[0x27 - 0x4];
     Ref<PlayerInfo> data;
     char unknown_2b[0x67 - 0x2b];
     Ref<Unit> unitsBegin;
     Ref<Unit> unitsEnd;
     char unknown_6f[0x7c - 0x6f];
-    ByteMap_00467440 explored;         // +0x7c
+    ByteMap_00467440 explored;
     char unknown_88[0x144 - 0x88];
-    unsigned short unitCount;          // +0x144
-    unsigned char index;               // +0x146
+    unsigned short unitCount;
+    unsigned char index;
     char unknown_147[0x14b - 0x147];
 };
 
-struct Team_004689c0 {                 // 347 bytes
+struct Team_004689c0 {
     char unknown_0[4];
-    unsigned char* data;               // +0x4
+    unsigned char* data;
     char unknown_8[347 - 8];
 };
 
@@ -121,15 +106,15 @@ struct Team_004689c0 {                 // 347 bytes
 
 struct Feature {
     char name[0x94];
-    Point16 footprint;                 // +0x94
+    Point16 footprint;
     char unknown_98[0xac - 0x98];
-    unsigned short* animTable;         // +0xac
-    unsigned short* shadowTable;       // +0xb0
+    unsigned short* animTable;
+    unsigned short* shadowTable;
     char unknown_b4[0xcc - 0xb4];
-    Handle anim;                       // +0xcc
-    Handle shadowAnim;                 // +0xd8
+    Handle anim;
+    Handle shadowAnim;
     char unknown_e4[0xfe - 0xe4];
-    unsigned short drawn : 1;          // +0xfe
+    unsigned short drawn : 1;
     unsigned short over : 1;
     unsigned short flipAnim : 1;
     unsigned short flipShadow : 1;
@@ -140,7 +125,7 @@ struct Feature {
 
 struct Def_004685a0 {
     char unknown_0[0x20];
-    char name[0x229];                  // +0x20
+    char name[0x229];
 };
 
 #include "../game/game.h"
@@ -148,9 +133,9 @@ struct Def_004685a0 {
 class DetectionVisitor {
 public:
     virtual void MarkUnitsInRadarOrSonarRadius(Unit* unit);
-    int radarRangeSq;                  // +0x4
-    int sonarRangeSq;                  // +0x8
-    Vec3 pos;                          // +0xc
+    int radarRangeSq;
+    int sonarRangeSq;
+    Vec3 pos;
 };
 
 class RadarJamVisitor {
@@ -167,9 +152,9 @@ public:
 
 struct Colors_00467b60 {
     char unknown_0[4];
-    unsigned char empty;               // +0x4
+    unsigned char empty;
     char unknown_5[5];
-    unsigned char full;                // +0xa
+    unsigned char full;
 };
 
 struct Quad_467c00 {
@@ -177,13 +162,13 @@ struct Quad_467c00 {
 };
 
 struct Entry_467c00 {
-    unsigned short w;                  // +0
-    unsigned short h;                  // +2
+    unsigned short w;
+    unsigned short h;
 };
 
 struct Mission_00467e50 {
     char pad_0[5];
-    unsigned char state;               // +0x5
+    unsigned char state;
     char pad_6[0x16 - 0x6];
     Ref<Unit> target;
     char pad_1a[0x4a - 0x1a];
@@ -192,7 +177,7 @@ struct Mission_00467e50 {
 
 struct MissionName_00467e50 {
     char pad_0[0x15];
-    char* name;                        // +0x15
+    char* name;
 };
 
 struct OrderType {
@@ -201,11 +186,8 @@ struct OrderType {
 
 #include "../graphics/surface.h"
 
-// The frame-time profile at g_game+0x38d85: last tick at +0, one accumulator
-// per phase at +0x2c.
 #include "frame_timers.h"
 
-// Bit 2 of the flags word at g_game+0x37f2f (like 0x416e00).
 struct Flags_0046a530 {
     unsigned short low : 2;
     unsigned short flag : 1;
@@ -217,29 +199,28 @@ struct Size_0046b9d0 {
     short h;
 };
 
-class Prim_0046bae0 {                  // a model primitive, 0x20 bytes
+class Prim_0046bae0 {
 public:
-    int colorIndex;                    // +0x00 color
-    int count;                         // +0x04 number of vertices
-    int always0;                       // +0x08
-    unsigned short* indices;           // +0x0c
-    int pic;                           // +0x10 texture pointer or index ref
+    int colorIndex;
+    int count;
+    int always0;
+    unsigned short* indices;
+    int pic;
     char unknown_14[8];
-    // Dword bitfield, not an int tested with >> and &: the read codegen differs.
-    unsigned int flag0 : 1;            // +0x1c bit 0
-    unsigned int texIndexed : 1;       // +0x1c bit 1
-    unsigned int rest : 30;            // +0x1c
+    unsigned int flag0 : 1;
+    unsigned int texIndexed : 1;
+    unsigned int rest : 30;
 };
 
-class Object_0046bae0 {                // the model or piece being drawn
+class Object_0046bae0 {
 public:
-    int version;                       // +0x00
-    int count;                         // +0x04
-    int faceCount;                     // +0x08
-    int firstFace;                     // +0x0c
+    int version;
+    int count;
+    int faceCount;
+    int firstFace;
     char unknown_10[0x24 - 0x10];
-    Vec3* verts;                       // +0x24
-    Prim_0046bae0* prims;              // +0x28
+    Vec3* verts;
+    Prim_0046bae0* prims;
 };
 
 #pragma pack(pop)
@@ -307,10 +288,6 @@ void __stdcall ReportGameEvent(int param_1);
 void __stdcall AddMessage(char* param_1, int param_2, int param_3, int param_4);
 int __stdcall OpenMessageBox(char* dest, char* text, int param_3, int param_4, int param_5);
 
-// Sets flag 0x200 on a unit that lies below the sea level line and flag 0x100
-// on one that reaches it, when it is close enough in the x/z plane to this
-// object. Same unit flag field as the neighbours 0x467960 and 0x467980.
-
 // FUNCTION: 0x467840
 void DetectionVisitor::MarkUnitsInRadarOrSonarRadius(Unit* unit)
 {
@@ -341,8 +318,6 @@ void __stdcall MarkRecentlyDamaged(void* param_1)
 {
     *(char*)((char*)param_1 + 0xfa) = 0xf0;
 }
-
-// Same as ApplySonarJamFlag but clears flag 0x100 instead of 0x200.
 
 // FUNCTION: 0x467960
 void RadarJamVisitor::ApplyRadarJamFlag(Unit* unit)
@@ -376,10 +351,6 @@ void __stdcall BlitGafFrameAtOffset(void* param_1, short* param_2, int param_3, 
     DrawFrame(param_1, param_2, param_2[2] + param_3, param_2[3] + param_4);
 }
 
-// Rotates the four corners of a box by the given angles, projects each rotated
-// corner to screen space (16.16 fixed point down to short) and outlines the
-// resulting quad on the surface.
-
 // FUNCTION: 0x467a50
 void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset,
                             Vec3* corners, short* angles)
@@ -387,13 +358,10 @@ void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset,
     Vec3* scratch = (Vec3 *)g_game->xform;
     Point* points = (Point *)g_game->projected;
     unsigned char color = g_game->field_dd5;
-    // corners is copied to c, which is the loop's induction variable: this
-    // fixes the stack slot of the loop counter.
     Vec3* c = corners;
 
     for (int i = 0; i < 4; i++) {
         RotateByAngles(c, scratch, angles);
-        // Separate int locals, evaluated in the order y, z, x.
         int y = (short)((scratch->y + offset->y) >> 16);
         int z = (short)((offset->z - scratch->z) >> 16);
         int x = (short)((scratch->x + offset->x) >> 16);
@@ -410,9 +378,6 @@ void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset,
     DrawLine(surface, quad[2].x, quad[2].y, quad[3].x, quad[3].y, color);
     DrawLine(surface, quad[3].x, quad[3].y, quad[0].x, quad[0].y, color);
 }
-
-// Draws a horizontal progress bar: the filled part of `rect` (moved down by
-// `dy`) in one colour and, when not full, the rest in another.
 
 // FUNCTION: 0x467b60
 void __stdcall DrawProgressBar(void* surface, int value, int max, Rect* rect, Colors_00467b60* colors, int dy)
@@ -432,10 +397,6 @@ void __stdcall DrawProgressBar(void* surface, int value, int max, Rect* rect, Co
         FillRectangle(surface, &r, colors->empty);
     }
 }
-
-// Blits a player's logo entry (indexed by data->color) from the logos32
-// table onto a destination rectangle shifted down by dy. src is the full
-// texture rectangle, dst the screen rectangle.
 
 // FUNCTION: 0x467c00
 void __stdcall BlitSideLogoToRect(void* surf, Player* player, Rect* rect, int dy)
@@ -466,10 +427,6 @@ void __stdcall BlitSideLogoToRect(void* surf, Player* player, Rect* rect, int dy
     DrawFrameQuad(surf, entry, &dst, &src);
 }
 
-// Draws a kill count ("N kill(s)", plus " - Veteran" past level 4) in the
-// current text colour. The singular/plural ternary sits in both arms, so the
-// > 4 arm keeps a test the level can never satisfy.
-
 // FUNCTION: 0x467cb0
 void __stdcall DrawKillCount(void* surface, Unit* unit, int x, int y)
 {
@@ -486,10 +443,6 @@ void __stdcall DrawKillCount(void* surface, Unit* unit, int x, int y)
     SetTextColors(g_game->colors[15], GetTextKeyColor());
     DrawString(surface, buf, x, y, -1);
 }
-
-// Draws the local player's three light bar frames (one frame table per side)
-// onto the blit surface: the first bar twice, the second copy also shifted
-// down by the status bar height, then the third bar where it sits.
 
 // FUNCTION: 0x467d70
 void DrawLightBars()
@@ -512,12 +465,6 @@ void DrawLightBars()
 
     FlipScreen();
 }
-
-// Debug overlay: dumps the state of the unit selected by the game's "unit
-// probe" cursor. Draws a fading panel, then a column of lines ("Unit State
-// Probe", uid, player, controller, build time left, damage, occupy, autotarget
-// weights and the mission queues) at x 0x86. The running y is also written to
-// g_probePanelBottom so the next overlay stacks below this one.
 
 // FUNCTION: 0x467e50
 int __stdcall DrawUnitStateProbe(void* surface)
@@ -636,10 +583,6 @@ int __stdcall DrawUnitStateProbe(void* surface)
     return 1;
 }
 
-// Draws a percentage bar: DrawRectangle on the whole rectangle, then, when the
-// percentage (capped at 100) is positive, fills that fraction of its width.
-// Both calls take the colour byte at g_game+0xdda through one reference.
-
 // FUNCTION: 0x468310
 void __stdcall DrawPercentBar(void* surface, Rect* rect, int percent)
 {
@@ -653,13 +596,6 @@ void __stdcall DrawPercentBar(void* surface, Rect* rect, int percent)
     }
 }
 
-// Network statistics: two rows, each a "Send"/"Receive" rate label with a
-// 64x8 bar under it. The bar is full at 56 K/s (the rate times 100 over 5600,
-// capped at 100 inside the bar helper).
-// Both rows sit at x 0x81..0xc1; the first row's y comes from the game,
-// the second one starts just under the first bar.
-
-// DrawPercentBar, the out-of-line bar, written here so both calls inline.
 static void Bar(void* surface, Rect* rect, int percent)
 {
     unsigned char& color = g_game->field_dda;
@@ -868,10 +804,6 @@ void FrameTimers::AccumulateProfileTime(int param_1)
     *(int*)((char*)this) = result;
 }
 
-// Hit point bar drawn under a unit: a 34x4 box in the frame colour, then a
-// bar 32 pixels wide at full health, green above two thirds of maxHealth,
-// yellow above one third and red below.
-
 // FUNCTION: 0x46a430
 void __stdcall DrawHitPointBar(void* surface, Unit* unit, int x, int y)
 {
@@ -884,8 +816,6 @@ void __stdcall DrawHitPointBar(void* surface, Unit* unit, int x, int y)
     r.right = x + 17;
     r.bottom = y + 2;
     FillRectangle(surface, &r, colors[0]);
-    // The width has to be a separate local: written inline, MSVC tail merges
-    // the three colour calls below into one.
     int width;
     r.left++;
     r.top++;
@@ -899,10 +829,6 @@ void __stdcall DrawHitPointBar(void* surface, Unit* unit, int x, int y)
     else
         FillRectangle(surface, &r, colors[12]);
 }
-
-// Draws one unit's selection box: the four corners of its model bounding box,
-// projected to the screen. The corners are the box footprint on the ground, so
-// all four take the low y of the box, not the high one.
 
 // FUNCTION: 0x46a530
 void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
@@ -933,10 +859,6 @@ void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
     }
 }
 
-// Draws one labelled bar: GetFontHeight returns the current text line height
-// (c); the empty bar is outlined in white, the label is drawn, then the fill
-// bar for g_game->values[index] is drawn at 100/total scale.
-
 // FUNCTION: 0x46b900
 void __stdcall DrawProfileBarLine(int surface, const char* text, int index)
 {
@@ -950,11 +872,9 @@ void __stdcall DrawProfileBarLine(int surface, const char* text, int index)
     rect.bottom = c * 9 + 0x29;
     DrawRectangle(surface, &rect, 0xff);
 
-    // No named local for c * index + 0x28: it must stay a compiler temp.
     DrawString(surface, text, x + 5, c * index + 0x28, -1);
 
     int w = g_game->values[index] * 100 / g_game->total * 2;
-    // Stored first: any order with rect.right first changes register use.
     rect.left = x - w;
     rect.right = x;
     rect.bottom = c * index + 0x28;
@@ -962,10 +882,6 @@ void __stdcall DrawProfileBarLine(int surface, const char* text, int index)
     rect.bottom = rect.bottom + c;
     FillRectangle(surface, &rect, index + 1);
 }
-
-// Draws the screen-space footprint of a map point: the 16x16 tile position is
-// scaled to pixels, offset by the scroll and the object's height, and kind
-// selects a colour from the table at g_game+0xdcb.
 
 // FUNCTION: 0x46b9d0
 void __stdcall DrawMapTileSelectionOutline(void* surface, short* pos, Size_0046b9d0 size, int kind)
@@ -988,9 +904,6 @@ void __stdcall DrawMapTileSelectionOutline(void* surface, short* pos, Size_0046b
     DrawRectangle(surface, &rect, colors[kind]);
 }
 
-// Draws a closed polygon: a line between each pair of consecutive points,
-// then one from the first point to the last.
-
 // FUNCTION: 0x46ba80
 void __stdcall DrawClosedPolygon(void* surface, Point* points, int count, int color)
 {
@@ -1002,20 +915,9 @@ void __stdcall DrawClosedPolygon(void* surface, Point* points, int count, int co
     DrawLine(surface, points->x, points->y, p->x, p->y, color);
 }
 
-// Unused here: real zero-argument functions whose symbol ids keep
-// DrawModel3doProjected's allocation after the Surface view became surface.h
-// (docs/c2-regalloc.md).
 void ResetCameraState(void);
 void ClampCameraPosition(void);
 void ClampCameraTarget(void);
-
-// Draws a piece of a 3D model: projects obj->count vertices through
-// RotateByAngles (the same rotate/project idiom as the matched 0x467a50) into
-// screen points, then draws each primitive in obj->prims (from index 1 when
-// obj->firstFace is not -1, otherwise from 0). A primitive whose bit 0 is set
-// is a flat filled polygon (FillPolygon); otherwise a 4-vertex textured quad
-// (DrawFrameQuad), whose texture is either the direct pointer at +0x10 or, when
-// bit 1 is set, the entry GetGafSequenceFrame looks up from the reference at +0x10.
 
 // FUNCTION: 0x46bae0
 void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
@@ -1025,7 +927,6 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
     Vec3* scratch = (Vec3 *)g_game->xform;
     Point* points = (Point *)g_game->projected;
     int i = 0;
-    // Every increment of both loops stays in the for header.
     for (; i < obj->count; i++, v++, scratch++, points++) {
         RotateByAngles(v, scratch, angles);
         int y = (short)((scratch->y + offset->y) >> 16);
@@ -1069,9 +970,6 @@ void __stdcall ReportGameEventCallback(int param_1)
 {
     ReportGameEvent(param_1);
 }
-
-// Shows a message: mode 0 through AddMessage (and sets a game flag),
-// mode 1 in the game's message line for half of GetScreenWidth's value.
 
 // FUNCTION: 0x46bc70
 int __stdcall ShowGameMessage(char* text, int mode)

@@ -1,5 +1,3 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// Built without /GX; see 0x45b670.cpp for the online.dll helpers.
 #include <string.h>
 #include "../../interfaces/host.h"
 

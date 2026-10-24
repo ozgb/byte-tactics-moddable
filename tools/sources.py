@@ -43,14 +43,9 @@ SRC = ROOT / "src"
 FUNCTIONS = ROOT / "data/functions.csv"
 ANNOTATION = re.compile(r"^\s*//\s*FUNCTION:\s*(0x[0-9a-fA-F]+)(?:\s+(\S+))?")
 GLOBAL_ANNOTATION = re.compile(r"^\s*//\s*GLOBAL:\s*(0x[0-9a-fA-F]+)")
-# The address at the end of a file name: `0x401070.cpp`, `economy_401070.cpp`.
 NAME_ADDRESS = re.compile(r"(?:^|_)(?:0x)?([0-9a-fA-F]{6,8})$")
-# The order of the kinds in link_order (and of the folders the files had before
-# docs/tidy-up.md: src/data, src/gap, src/lib, src/unsorted).
 KINDS = ("data", "gap", "library", "game")
 
-
-# --- annotations ----------------------------------------------------------------
 
 def annotations(src: Path) -> list[tuple[int, str]]:
     """(address, qualified name) for every // FUNCTION: annotation in a file."""
@@ -60,17 +55,12 @@ def annotations(src: Path) -> list[tuple[int, str]]:
         m = ANNOTATION.match(line)
         if not m:
             continue
-        # The definition follows, possibly after more comments or blank lines.
         following = [l for l in lines[i + 1:i + 12] if l.strip() and not l.strip().startswith("//")]
-        # Only the definition header counts (up to the opening brace), so an
-        # `operator new(` call in the body is not mistaken for the definition.
         text = " ".join(following[:3]).split("{", 1)[0]
         text = re.sub(r"__declspec\s*\(\s*\w+\s*\)", " ", text)
         op = re.search(r"([\w:]*?)operator\s*(new|delete|==|!=|<=|>=|\[\]|\(\)|=|<|>|\+|-|\*|/)\s*\(", text)
         sig = text.split("(", 1)[0]
         names = [op.group(1) + "operator" + op.group(2)] if op else re.findall(r"[A-Za-z_~][\w:~]*", sig)
-        # An explicit symbol after the address (for compiler-generated functions
-        # such as dynamic initialisers, _$E1) is matched exactly, marked with "=".
         name = "=" + m.group(2) if m.group(2) else (names[-1] if names else "")
         out.append((int(m.group(1), 16), name))
     return out
@@ -87,8 +77,6 @@ def global_annotations(src: Path) -> list[tuple[int, str]]:
             continue
         following = [l for l in lines[i + 1:i + 12] if l.strip() and not l.strip().startswith("//")]
         text = " ".join(following[:3])
-        # The declarator ends at its initialiser or at the end of the declaration;
-        # array extents and a function pointer's parameter list are not names.
         head = re.split(r"[=;{]", text, maxsplit=1)[0]
         head = re.sub(r"\[[^\]]*\]", " ", head)
         head = re.sub(r"\)\s*\([^()]*\)\s*$", ")", head)
@@ -108,8 +96,6 @@ def global_addresses(src: Path) -> list[int]:
     return [int(m.group(1), 16) for m in map(GLOBAL_ANNOTATION.match, src.read_text(errors="replace").splitlines())
             if m]
 
-
-# --- what a file is ---------------------------------------------------------------
 
 @lru_cache(maxsize=1)
 def function_kinds() -> tuple[dict[int, str], list[tuple[int, int]]]:
@@ -167,8 +153,6 @@ def is_gap_source(src: Path) -> bool:
 def is_data_source(src: Path) -> bool:
     return kind_of(src) == "data"
 
-
-# --- the files ----------------------------------------------------------------------
 
 def source_files() -> list[Path]:
     """Every source file under src/, in path order."""

@@ -1,25 +1,13 @@
-// Decompiled by Haiku, Opus, DeepSeek V4.1 Flash, Sonnet, space-bunny-free, Space Bunny Free, deepseek-v4.1-flash, deepseek-v4.1, GPT-6, GPT-6.1-sol, Claude Sonnet 5.5, Claude Opus 5.5 and claude-opus-5-5. Names are provisional.
-//
-// The options dialogs and screens of PREFS.GUI: the direct-connect address and
-// flag setters, the menu-entry helpers, the slider readers, the sound, video
-// and game-setting handlers, and the music, sound, visual, speed, controls,
-// help, briefing and in-game options pages with their click handlers
-// (0x45b800 to 0x460cc0). The module's files gathered in address order;
-// 0x45c820 keeps its own file (its own declaration context decides its match).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "../util/tdf.h"
 
-// The original files included <windows.h>; the only thing the code uses from
-// it is wsprintfA, declared here so its many declarations stay out of the file.
 extern "C" __declspec(dllimport) int __cdecl wsprintfA(char* out, const char* format, ...);
 
-// The sound object at g_game+0x10.
 #include "../sound/sound.h"
 
-// The mission or game-mode object at g_game+0x391e9.
 #include "../map/mission.h"
 
 #include "../graphics/memory_cache.h"
@@ -40,87 +28,79 @@ struct Gui;
 struct ModeList_0045b800;
 struct Menu_0045b800;
 
-// The 0x15b-byte menu control record, one type for every view of it below:
-// entry 0 holds the count at +0xb6 and its own fields from +0xbc on, the
-// other entries hold NUL terminated text there, a slider keeps its step
-// count at +0x136, its maximum at +0x13c and its position at +0x140, and a
-// dialog's list entries keep their frames and records in the same bytes.
-struct Gadget {                        // 0x15b bytes
-    union {                            // +0x00
+struct Gadget {
+    union {
         unsigned char type;
         char state;
     };
     char unknown_1;
-    char name[0x11];                   // +0x02
-    short x;                           // +0x13
-    short y;                           // +0x15
-    short width;                       // +0x17
-    short height;                      // +0x19
-    int attribs;                       // +0x1b
+    char name[0x11];
+    short x;
+    short y;
+    short width;
+    short height;
+    int attribs;
     char unknown_1f[0x29 - 0x1f];
-    unsigned char active;              // +0x29
+    unsigned char active;
     char unknown_2a[0xb6 - 0x2a];
-    union {                            // +0xb6
-        short count;                   // entry 0's count
-        char text[0x80];               // the other entries' text
-        struct {                       // a dialog's list entry
+    union {
+        short count;
+        char text[0x80];
+        struct {
             char unknown_b6[0xba - 0xb6];
-            short selected;            // +0xba
+            short selected;
             char unknown_bc[0xbe - 0xbc];
-            void* frames;              // +0xbe
+            void* frames;
             char unknown_c2[0xc6 - 0xc2];
-            unsigned short frame;      // +0xc6
+            unsigned short frame;
             char unknown_c8[0xd2 - 0xc8];
-            void* records;             // +0xd2
+            void* records;
         };
-        struct {                       // entry 0's own fields
+        struct {
             char unknown_b6b[0xbc - 0xb6];
-            Surface* surface;          // +0xbc, the layer's draw surface
+            Surface* surface;
             char unknown_c0[0xc4 - 0xc0];
-            int background;            // +0xc4
+            int background;
         };
     };
-    union {                            // +0x136
+    union {
         short range;
         struct {
-            unsigned char stages;      // +0x136
-            unsigned char stageIndex;  // +0x137
+            unsigned char stages;
+            unsigned char stageIndex;
         };
     };
     char unknown_138[0x13c - 0x138];
-    int max;                           // +0x13c
-    short knobPos;                     // +0x140
-    short knobSize;                    // +0x142
-    void (__stdcall* sliderCallback)(Menu_0045b800* obj, int value); // +0x144
+    int max;
+    short knobPos;
+    short knobSize;
+    void (__stdcall* sliderCallback)(Menu_0045b800* obj, int value);
     char unknown_148[0x14a - 0x148];
-    union {                            // +0x14a
+    union {
         void* sliderUser;
         ModeList_0045b800* list;
     };
     char unknown_14e[0x15b - 0x14e];
 };
 
-// The entry table a menu's +0x18 points at.
 struct Holder_0045b800 {
-    int unknown_0;                      // +0x00
-    Gadget* entries;            // +0x04
+    int unknown_0;
+    Gadget* entries;
 };
 
-// One entry of a video mode list at an entry's +0x14a.
 struct Mode_0045b800 {
-    int width;                          // +0x0
-    int height;                         // +0x4
+    int width;
+    int height;
     char unknown_8[4];
 };
 
 struct ModeList_0045b800 {
-    int count;                          // +0x0
-    Mode_0045b800* modes;               // +0x4
+    int count;
+    Mode_0045b800* modes;
 };
 
-// The flag bits at g_game+0x2a44, an unaligned word in the original.
 union Bits_0045cf60 {
-    unsigned char byte;                // +0x2a44, the whole byte
+    unsigned char byte;
     unsigned short word;
     struct {
         unsigned short bit0 : 1;
@@ -130,25 +110,23 @@ union Bits_0045cf60 {
     } bits;
     struct {
         unsigned short pad : 2;
-        unsigned short flag : 1;       // bit 2
+        unsigned short flag : 1;
         unsigned short rest : 13;
     } flag;
     struct {
         unsigned char b0 : 1;
         unsigned char b1 : 1;
-        unsigned char prefs : 1;       // bit 2
+        unsigned char prefs : 1;
         unsigned char rest : 5;
     } prefsByte;
     struct {
         unsigned short b0 : 1;
         unsigned short b1 : 1;
-        unsigned short prefs : 1;      // bit 2
+        unsigned short prefs : 1;
         unsigned short rest : 13;
     } prefsWord;
 };
 
-// The flag word at g_game+0x37ebe: the loaded bit, the state bytes and the
-// order flags the in-game options clear.
 union Flags37ebe_0045cf60 {
     unsigned char byte;
     unsigned short word;
@@ -162,7 +140,6 @@ union Flags37ebe_0045cf60 {
     } bits;
 };
 
-// The flag word at g_game+0x37f06: the anti-aliasing, shadow and shading bits.
 union Flags37f06_0045cf60 {
     unsigned char byte;
     struct {
@@ -177,8 +154,6 @@ union Flags37f06_0045cf60 {
     } bits;
 };
 
-// The flag word at g_game+0x37f19: the sound mode in bits 0 to 2, the speech
-// bit at 6 and the 3D flags.
 union SoundFlags_0045cf60 {
     unsigned short word;
     unsigned char byte;
@@ -187,13 +162,12 @@ union SoundFlags_0045cf60 {
         unsigned short b3 : 1;
         unsigned short b4 : 1;
         unsigned short b5 : 1;
-        unsigned short speech : 1;     // bit 6
+        unsigned short speech : 1;
         unsigned short b7 : 1;
         unsigned short rest : 8;
     } bits;
 };
 
-// The line-of-sight flags word at g_game+0x14281.
 union Los_0045cf60 {
     unsigned short losFlags;
     struct {
@@ -207,15 +181,13 @@ union Los_0045cf60 {
 
 #include "../gui/gui.h"
 
-// One player's options at the player array's +0x27: the low bits of the word
-// at +0x9b are the player's flags, its high bits the cheat and watch settings.
-struct Opts_0045f1d0 {                 // 0x14b bytes
+struct Opts_0045f1d0 {
     char unknown_0[0x9b];
     union {
-        unsigned short value;          // +0x9b
+        unsigned short value;
         struct {
-            unsigned short unknown_9b_0 : 6;  // +0x9b, bits 0 to 5
-            unsigned short flag_9b_6 : 1;     // bit 6 (mask 0x40)
+            unsigned short unknown_9b_0 : 6;
+            unsigned short flag_9b_6 : 1;
             unsigned short unknown_9b_7 : 9;
         };
         struct {
@@ -225,48 +197,38 @@ struct Opts_0045f1d0 {                 // 0x14b bytes
         } b;
     } u;
     char unknown_9d[0xa1 - 0x9d];
-    unsigned short startEnergy;        // +0xa1
-    unsigned short startMetal;         // +0xa3
+    unsigned short startEnergy;
+    unsigned short startMetal;
     char unknown_a5[0x14b - 0xa5];
 };
 
 #include "../network/player.h"
 
-// Note: Rule_0045f1d0 (24 bytes, startMetal at +0xc, startEnergy at +0x10)
-// and RuleSet_0045f1d0 (startType at +0x118) are the SAME memory: the exe
-// walks g_game->options with a 24-byte stride for metal and energy but reads
-// startType from element 0, i.e. it ignores playerType for that field.
-struct RuleSet_0045f1d0 {              // +0x118 startType, read from element 0
+struct RuleSet_0045f1d0 {
     char unknown_0[0xc];
-    int startMetal;                    // +0xc
-    int startEnergy;                   // +0x10
+    int startMetal;
+    int startEnergy;
     char unknown_14[0x118 - 0x14];
-    int startType;                     // +0x118
+    int startType;
 };
 
 struct Flags_00460680 {
     unsigned short unknown_bit0 : 4;
-    unsigned short flag4 : 1;          // bit 4
+    unsigned short flag4 : 1;
     unsigned short unknown_rest : 11;
 };
 
-// The game state. Every view of it in these files meets here: the fields are
-// at the offsets the functions use, and the differently typed views of the
-// flag words share a union.
 #include "../game/game.h"
 
-// A row of a label table: the format and the largest value it applies to.
 struct Entry_0045c010 {
-    char* format;   // +0x0
-    int min;        // +0x4
+    char* format;
+    int min;
 };
 
-// The saved settings block: 0x53 bytes of state, then bits 0 and 1 of the
-// word at +0x53 (0x512f6b).
 struct Settings_45cde0 {
-    char block[0x53];                  // +0x0
-    unsigned short bit0 : 1;           // +0x53, bit 0
-    unsigned short bit1 : 1;           // +0x53, bit 1
+    char block[0x53];
+    unsigned short bit0 : 1;
+    unsigned short bit1 : 1;
     unsigned short rest : 14;
 };
 
@@ -276,29 +238,28 @@ struct Vtable_0045d280 {
 };
 
 struct Holder_0045d280 {
-    Vtable_0045d280* next;             // +0x00
-    Gadget* entries;           // +0x04
+    Vtable_0045d280* next;
+    Gadget* entries;
 };
 
-// The menu layer object OpenOptionsLayout returns.
 struct Object_0045d280 {
     char unknown_0[0x18];
-    Holder_0045d280* holder;           // +0x18
+    Holder_0045d280* holder;
     char unknown_1c[0x60 - 0x1c];
-    int hotGadgetIndex;                // +0x60
+    int hotGadgetIndex;
 };
 
 struct Holder_0045d7c0 {
     int unknown_0;
-    Gadget* gadgets;          // +0x4
+    Gadget* gadgets;
 };
 
 struct Object_0045d7c0 {
     char unknown_0[4];
-    Gadget* gadgets;           // +0x4
-    void (__stdcall* callback8)(int value); // +0x8
+    Gadget* gadgets;
+    void (__stdcall* callback8)(int value);
     char unknown_c[0x1c - 0xc];
-    void (__stdcall* callback1c)();    // +0x1c
+    void (__stdcall* callback1c)();
 };
 
 struct Vtable_0045da90 {
@@ -307,55 +268,55 @@ struct Vtable_0045da90 {
 };
 
 struct Holder_0045da90 {
-    Vtable_0045da90* next;             // +0x00
-    Gadget* entries;           // +0x04
+    Vtable_0045da90* next;
+    Gadget* entries;
 };
 
 struct Object_0045da90 {
     char unknown_0[0x18];
-    Holder_0045da90* holder;           // +0x18
+    Holder_0045da90* holder;
     char unknown_1c[0x60 - 0x1c];
-    int hotGadgetIndex;                // +0x60
+    int hotGadgetIndex;
 };
 
 struct Object_0045de30 {
     char unknown_0[4];
-    Gadget* entries;           // +0x04
-    void (__stdcall *fn)(void* obj, int arg);   // +0x08
+    Gadget* entries;
+    void (__stdcall *fn)(void* obj, int arg);
 };
 
 struct Menu_0045de30 {
     char unknown_0[0x18];
-    void* holder;                      // +0x18
+    void* holder;
 };
 
-struct List_0045e5e0 {                 // the "SELECT VIDEO MODE" object
-    int count;                         // +0x0
-    Mode_0045e4c0* modes;              // +0x4
+struct List_0045e5e0 {
+    int count;
+    Mode_0045e4c0* modes;
     char unknown_8[0xc];
-    char* buffer;                      // +0x14
+    char* buffer;
 };
 
 struct Holder_0045e5e0 {
     char unknown_0[4];
-    Gadget* entries;           // +0x4
+    Gadget* entries;
 };
 
 struct Menu_0045e5e0 {
     char unknown_0[0x18];
-    Holder_0045e5e0* holder;           // +0x18
+    Holder_0045e5e0* holder;
 };
 
 struct Object_0045ed50 {
     char unknown_0[4];
-    Gadget* entries;           // +0x04
-    void (__stdcall* fn)(void* obj, int arg);   // +0x08
+    Gadget* entries;
+    void (__stdcall* fn)(void* obj, int arg);
 };
 
-struct Rule_0045f1d0 {                 // 0x18 bytes, the record g_game->options is
-    char unknown_0[0xc];               //   walked with (stride 24)
-    int startMetal;                    // +0xc
-    int startEnergy;                   // +0x10
+struct Rule_0045f1d0 {
+    char unknown_0[0xc];
+    int startMetal;
+    int startEnergy;
     char unknown_18[0x18 - 0x14];
 };
 
@@ -379,28 +340,25 @@ struct Sub_00460680 {
 
 struct Sub_0045cf60 {
     char unknown_0[0xcca];
-    int changed;                       // +0xcca
+    int changed;
 };
 
-// The display mode record, shared by the sorter and the video mode page.
 struct Mode_0045e4c0 {
-    int width;                       // +0x0
-    int height;                      // +0x4
-    int refreshRate;                 // +0x8
+    int width;
+    int height;
+    int refreshRate;
 };
 
 struct ModeList_0045e4c0 {
-    int count;                       // +0x0
-    Mode_0045e4c0* modes;            // +0x4
+    int count;
+    Mode_0045e4c0* modes;
 };
 
-// One help page's worth of lines: the strings used when a line has no
-// translation, and the range of line numbers shown.
 struct Page_0045f8c0 {
-    char blank[2];                    // +0x0
-    char blank2[2];                   // +0x2
-    int first;                        // +0x4
-    int last;                         // +0x8
+    char blank[2];
+    char blank2[2];
+    int first;
+    int last;
 };
 
 struct Surface_0045fbc0 {
@@ -417,11 +375,10 @@ struct Quad_45ffb0 {
 };
 
 struct Entry_45ffb0 {
-    unsigned short w;                  // +0
-    unsigned short h;                  // +2
+    unsigned short w;
+    unsigned short h;
 };
 
-// Unused here: real functions declared to keep the file's symbol count.
 void __stdcall AccumulateScreenShake(int dx, int dy, int value);
 void __stdcall ActivatePlayerGadgets(char* prefix);
 void AddDownloadBuildOptions();
@@ -433,14 +390,14 @@ void __stdcall KillFeature(int x, int z, int flag);
 void __stdcall ToggleShareLos(int unused);
 
 struct Link_0045ead0 {
-    void* obj;                                 // +0x0
-    char* data;                                // +0x4
-    void (__stdcall* reselect)(void* gadget);  // +0x8
+    void* obj;
+    char* data;
+    void (__stdcall* reselect)(void* gadget);
 };
 
 struct GadgetOwner_004605c0 {
     int unknown_0;
-    int gadgets;                       // +0x4
+    int gadgets;
 };
 
 #include "../gui/layer.h"
@@ -450,35 +407,33 @@ struct GadgetOwner_004605c0 {
 #include "../graphics/gaf_frame.h"
 #include "../state/sim_globals.h"
 
-// Unused: keeps the symbol ids in line for 0x45e4c0 (docs/c2-regalloc.md).
 struct Unit;
 
 typedef int (__stdcall* Handler_0045e100)(Gui*);
 
 struct Screen_0045e100 {
-    Screen_0045e100* next;             // +0x0
-    Gadget* entries;           // +0x4
-    Handler_0045e100 handler;          // +0x8
-    void* userData;                    // +0xc
-    unsigned int flags;                // +0x10
-    int active;                        // +0x14
+    Screen_0045e100* next;
+    Gadget* entries;
+    Handler_0045e100 handler;
+    void* userData;
+    unsigned int flags;
+    int active;
 };
 
 struct FreeObj_0045e100 {
     char unknown_0[4];
-    void* field_4;                     // +0x4
+    void* field_4;
     char unknown_8[0x14 - 0x8];
-    void* field_14;                    // +0x14
+    void* field_14;
 };
 
-// The GUI system object, at g_game + 0x519.
 struct Menu_004604a0 {
     int unknown_0;
     int unknown_4;
     int field_8;
     int field_c;
     int unknown_10;
-    int language;                     // +0x14
+    int language;
     char unknown_18[0x1c - 0x18];
 };
 
@@ -486,23 +441,23 @@ struct Menu_004604a0 {
 extern Game* g_game;
 
 extern int g_optionsShellClosing;
-extern char g_optionsSoundName[];      // "Options"
-extern char g_bgmSoundName[];          // "BGM"
-extern char g_notrakGadgetName[];      // "NOTRAK"
-extern char g_fxVolGadgetName[];       // "FXVOL"
-extern char g_trackTypeGadgetName[];   // "TRACKTYPE"
-extern char g_cdNextGadgetName[];      // "CDNEXT"
-extern char g_cdPlayGadgetName[];      // "CDPLAY"
-extern char g_cdStopGadgetName[];      // "CDSTOP"
-extern char g_cdPrevGadgetName[];      // "CDPREV"
-extern char g_trackModeGadgetName[];   // "TRACKMODE"
-extern char g_restoreGadgetName[];     // "RESTORE"
-extern char g_undoGadgetName[];        // "UNDO"
-extern char g_speechGadgetName[];      // "SPEECH"
-extern char g_testGadgetName[];        // "TEST"
-extern char g_volTextGadgetName[];     // "VOLTEXT"
-extern char g_modeGadgetName[];        // "MODE"
-extern char g_explodeSoundFile[];      // "sounds\\explode.wav"
+extern char g_optionsSoundName[];
+extern char g_bgmSoundName[];
+extern char g_notrakGadgetName[];
+extern char g_fxVolGadgetName[];
+extern char g_trackTypeGadgetName[];
+extern char g_cdNextGadgetName[];
+extern char g_cdPlayGadgetName[];
+extern char g_cdStopGadgetName[];
+extern char g_cdPrevGadgetName[];
+extern char g_trackModeGadgetName[];
+extern char g_restoreGadgetName[];
+extern char g_undoGadgetName[];
+extern char g_speechGadgetName[];
+extern char g_testGadgetName[];
+extern char g_volTextGadgetName[];
+extern char g_modeGadgetName[];
+extern char g_explodeSoundFile[];
 extern int DAT_00512c80;
 extern int g_cmdlineHostMode;
 extern char g_cmdlineHostGameName[];
@@ -516,7 +471,6 @@ extern int g_optionsBackupVisualFlags;
 extern int g_optionsBackupGamma;
 extern int g_optionsBackupFxVolume;
 extern int g_optionsBackupMusicVolume;
-// The saved flags word: 45d280 reads it as an int, 45fc60 as a short.
 extern union OptionsBackupMusicMode {
     int i;
     unsigned short s;
@@ -524,18 +478,15 @@ extern union OptionsBackupMusicMode {
 extern char g_optionsBackupCdMode;
 extern unsigned char g_optionsBackupUnitChat;
 extern char g_optionsBackupUnitChatText;
-// A byte in the original: declared unsigned int to keep it in bl for the bitfield merge.
 extern unsigned int g_optionsBackupSoundFlags;
 extern int g_optionsBackupDisplayWidth;
 extern int g_optionsBackupDisplayHeight;
 extern int g_optionsBackupTextScroll;
 extern int g_optionsBackupTextLines;
-// The saved game-speed word: 45ead0 reads it as a short, 45fc60 as an int.
 extern union OptionsBackupGameSpeed {
     unsigned short s;
     int i;
 } g_optionsBackupGameSpeed;
-// The saved option byte: 460160 stores it as an int.
 extern union OptionsBackupEdgeScroll {
     unsigned char b;
     int i;
@@ -549,7 +500,6 @@ extern int g_optionsLightbarX;
 extern int g_optionsLightbarAnim;
 extern Surface* g_optionsBackupSurface;
 extern int g_battleQuitIntent;
-// Flags live in this struct, not a standalone global: keeps the load order.
 extern Settings_45cde0 g_optionsPrefsSnapshot;
 
 void __stdcall MarkChanged(Menu_0045b800* menu);
@@ -802,8 +752,6 @@ void __stdcall DeactivateGadgetsByPrefix(char* prefix)
     }
 }
 
-// Sets field_140 (a step index out of field_136 steps) from a value in the
-// range 0..max, rounding up; the inverse of ReadSliderValue.
 // FUNCTION: 0x45b9b0
 void __stdcall SetSliderFromValue(Gadget* param_1, int value)
 {
@@ -832,8 +780,6 @@ void __stdcall SetGadgetStatusAndText(int index, int state, char* offText, char*
     SetGadgetStatus(&g_game->menu_519_1c, index, state);
     GetGadgetName(entries, name, index);
     Gadget* e = FindGadgetOrNull(entries, name);
-    // An if/else of two strcpy calls; a ternary argument places the
-    // destination lea after the branch instead of before it.
     if (!state) {
         strcpy(e->text, offText);
     } else {
@@ -847,11 +793,6 @@ void __stdcall ClearGadgetText(void* param_1, int param_2)
     *(char*)((char*)param_1 + 0xb6) = 0;
 }
 
-// The VIDEOVAL menu entry holds the current resolution text. The mode list
-// is searched for the mode matching the current screen size (width compared
-// against a local read before the loop, height re-read every iteration), and
-// the index of that mode is turned into a step index in knobPos, the same
-// arithmetic as SetSliderFromValue.
 // FUNCTION: 0x45bb00
 void __stdcall UpdateVideoModeLabel(Menu_0045b800* param_1, Gadget* param_2)
 {
@@ -887,15 +828,9 @@ next:
         } while (i < count);    }
 }
 
-// Applies the "VIDSLDR" slider: picks the current resolution entry from the
-// slider's table of 3 dword entries, writes its "%d X %d" text into the
-// "VIDVAL" name, and copies the resolution into the game state.
 // FUNCTION: 0x45bbf0
 void __stdcall HandleVideoModeSlider(Menu_0045b800* obj, int unused)
 {
-    // The original reads e->list before testing e for null, so this load must
-    // stay above the if. If FindGadgetChecked_D ever returned 0 the original would
-    // have read through a null pointer; that is a real bug in the game code.
     Gadget* e = FindGadgetChecked_D(obj->holder->entries, "VIDSLDR");
     ModeList_0045b800* list = e->list;
     if (e != 0) {
@@ -907,8 +842,6 @@ void __stdcall HandleVideoModeSlider(Menu_0045b800* obj, int unused)
     MarkChanged(&g_game->menu_519_1c);
 }
 
-// Applies the brightness value and the two volume levels (scaled by 1024) to
-// the object at g_game+0x10 (same tail as 0x45c630).
 // FUNCTION: 0x45bcc0
 void ApplyBrightnessAndVolume()
 {
@@ -917,8 +850,6 @@ void ApplyBrightnessAndVolume()
     ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
-// Reads the "GAMMA" slider into the brightness setting, then applies the
-// brightness and both volume levels (inlined helpers as in 0x45bea0).
 // FUNCTION: 0x45bd20
 void __stdcall HandleGammaSlider(Menu_0045b800* obj, int unused)
 {
@@ -929,8 +860,6 @@ void __stdcall HandleGammaSlider(Menu_0045b800* obj, int unused)
     }
 }
 
-// Reads the "FXVOL" slider into the effects volume setting, then applies the
-// brightness and both volume levels (same shape as 0x45bea0).
 // FUNCTION: 0x45bde0
 void __stdcall HandleEffectsVolumeSlider(Menu_0045b800* obj, int unused)
 {
@@ -941,8 +870,6 @@ void __stdcall HandleEffectsVolumeSlider(Menu_0045b800* obj, int unused)
     }
 }
 
-// Reads the "MUSICVOL" slider into the music volume setting, then applies the
-// brightness and both volume levels (inlined ReadSliderValue and ApplyBrightnessAndVolume).
 // FUNCTION: 0x45bea0
 void __stdcall HandleMusicVolumeSlider(Menu_0045b800* obj, int unused)
 {
@@ -953,9 +880,6 @@ void __stdcall HandleMusicVolumeSlider(Menu_0045b800* obj, int unused)
     }
 }
 
-// Formats "<label> (<speed>)" for a game-speed setting, then passes the
-// original name and label (not the formatted text) to SetTranslatedTextByName on the
-// settings block at g_game+0x519.
 // FUNCTION: 0x45bf60
 void __stdcall SetGameSpeedLabel(char* name, char* label, int speed, int normal)
 {
@@ -992,10 +916,6 @@ void __stdcall SetGadgetTextFromValueTable(Entry_0045c010* table, char* name, in
     }
 }
 
-// A menu control handler: unless the local player is a connected human
-// player (a non-empty player slot whose info has bit 6 of the byte at +0x9b
-// set), it reads the "GAME" slider, clamps the slider value to at least 1 and
-// pushes it into the game setting at g_game+0x38a4b, then applies the control.
 // FUNCTION: 0x45c070
 void __stdcall HandleGameSpeedSlider(Menu_0045b800* obj, int unused)
 {
@@ -1003,7 +923,6 @@ void __stdcall HandleGameSpeedSlider(Menu_0045b800* obj, int unused)
     if (player->active == 0 || !((Opts_0045f1d0*)player->info.get())->u.flag_9b_6) {
         Gadget* e = FindGadgetChecked_D(obj->holder->entries, "GAME");
         if (e != 0) {
-            // Written twice, as in the original.
             int value = SliderValue(e);
             g_game->gameSpeed = (unsigned short)(value < 1 ? 1 : SliderValue(e));
             SetGameSpeed(g_game->gameSpeed, 1);
@@ -1012,9 +931,6 @@ void __stdcall HandleGameSpeedSlider(Menu_0045b800* obj, int unused)
     }
 }
 
-// Reads the "SCREEN" slider of the menu object and stores its value in
-// g_game->scrollSpeed, writing 1 instead of any value of 1 or less, then
-// marks the object changed (MarkChanged sets the changed flag at +0xcca).
 // FUNCTION: 0x45c170
 void __stdcall HandleScreenSlider(Menu_0045b800* obj, int unused)
 {
@@ -1025,10 +941,6 @@ void __stdcall HandleScreenSlider(Menu_0045b800* obj, int unused)
     }
 }
 
-// Reads the "MAXLINES" slider into the max lines field of g_game and shows it
-// as "<n>", or "None" when it is 0. The slider value is evaluated twice, and
-// only the second result is kept unless the first one was negative (both are
-// identical, so the store is a clamp to 0 either way).
 // FUNCTION: 0x45c220
 void __stdcall HandleMaxLinesSlider(Menu_0045b800* obj, int unused)
 {
@@ -1046,8 +958,6 @@ void __stdcall HandleMaxLinesSlider(Menu_0045b800* obj, int unused)
     SetTranslatedTextByName(obj, "MAXLINESTEXT", text, 0);
 }
 
-// Reads the "TXTSCROL" slider into the text scroll time and shows it as
-// "<n> secs" (the slider value is the inlined ReadSliderValue, as in 0x45bea0).
 // FUNCTION: 0x45c330
 void __stdcall HandleTextScrollSlider(Menu_0045b800* obj, int unused)
 {
@@ -1086,14 +996,11 @@ void UpdateTrackGadgets()
     }
     SetGadgetGrayedOutByName(menu, "TRACKNUM", (char)(~(char)g_game->musicMode) & 1);
     if (g_game->cdMode == 3) {
-        // the track number is re-read from the global here, not taken from disc
         int track = g_musicUiSelectedTrack;
         ((Sound *)g_game->field_10)->SetLockedTrack(track);
     }
 }
 
-// When the game is in state 4, looks up the "TRACKTYPE" gadget in the menu
-// and passes its value byte on to SetCategoryOfTrack.
 // FUNCTION: 0x45c510
 void ApplyTrackType()
 {
@@ -1104,9 +1011,6 @@ void ApplyTrackType()
     }
 }
 
-// Sets up the sound state: volume1, three sound flag bits, a redraw of the
-// sound object, more flag bits, then brightness and the two volume levels
-// scaled by 1024 (same tail as 0x45bcc0).
 // FUNCTION: 0x45c570
 void ApplyDefaultSoundOptions()
 {
@@ -1122,9 +1026,6 @@ void ApplyDefaultSoundOptions()
     ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
-// Resets two settings (0x20 at +0x37f10, 4 at +0x37f16), enables the object at
-// g_game+0x10 once (bit 0 of +0x37f14), then applies the brightness value and
-// the two volume levels (scaled by 1024) to it.
 // FUNCTION: 0x45c630
 void ApplyDefaultMusicOptions()
 {
@@ -1150,10 +1051,6 @@ void ApplyDefaultUiOptions()
     g_game->unitChatText = 5;
 }
 
-// Sets the five share flag bits in the flags word at +0x37f06, sets the
-// brightness at +0x37f08, and (unless bit 2 of +0x2a44 is set) the screen
-// width and height at +0x37f1b/+0x37f1f and clears bit 6 of the flags word.
-// Then applies the brightness and the two volume levels to the sound object.
 // FUNCTION: 0x45c740
 void ApplyDefaultVisualOptions()
 {
@@ -1173,8 +1070,6 @@ void ApplyDefaultVisualOptions()
     ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
-// Loads the saved audio settings (globals around 0x512f42) into the game and
-// applies them to the sound object at g_game+0x10.
 // FUNCTION: 0x45c950
 void LoadSavedAudioSettings()
 {
@@ -1192,7 +1087,6 @@ void LoadSavedAudioSettings()
     ApplyBrightnessAndVolume();
 }
 
-// Copies saved option values (globals around 0x512f2c) into the game.
 // FUNCTION: 0x45ca50
 void RestoreUiOptions()
 {
@@ -1206,10 +1100,6 @@ void RestoreUiOptions()
     g_game->textLines = g_optionsBackupTextLines;
 }
 
-// Copies six flag bits out of the saved settings value into the flags word at
-// +0x37f06, restores the brightness and resolution defaults, then applies the
-// brightness and both volume levels to the object at g_game+0x10 (same tail as
-// 0x45bcc0).
 // FUNCTION: 0x45cae0
 void RestoreVisualOptions()
 {
@@ -1237,9 +1127,6 @@ void RestoreVisualOptions()
     ((Sound *)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
-// Loads the saved game settings (globals around 0x512f42) into the game and
-// applies them to the sound object at g_game+0x10, then copies the remaining
-// saved options (as 0x45ca50 does) and runs the post-load fixups (0x45cae0).
 // FUNCTION: 0x45cc50
 void LoadSavedSettings()
 {
@@ -1268,11 +1155,6 @@ void LoadSavedSettings()
     RestoreVisualOptions();
 }
 
-// Saves the current game settings: copies the 0x53-byte block at
-// g_game+0x37ee6 into the settings block at g_optionsPrefsSnapshot, saves two game
-// flags into bits 0 and 1 of that block's trailing word, then saves the
-// track number, the option byte, the current track index and the 100
-// track-name characters read from the object at g_game+0x10.
 // FUNCTION: 0x45cde0
 void SaveGameSettings()
 {
@@ -1287,11 +1169,6 @@ void SaveGameSettings()
     }
 }
 
-// Looks up the "PANEL" gadget in the menu's entry table (entry 0 holds the
-// count as a short at +0xb6). When the game flag at +0x37ebe is set the panel
-// layout grows by 0x96, and if there is no PANEL entry yet a cleared one is
-// appended: type 0xb, x = 0x80, its width shrunk by x, height copied from the
-// table, named "PANEL", and the table's +0xc4 field copied into it.
 // FUNCTION: 0x45ce80
 void EnsureOptionsPanelGadget()
 {
@@ -1306,7 +1183,6 @@ void EnsureOptionsPanelGadget()
             c++;
             entries->count = c;
             memset(&entries[i], 0, sizeof(Gadget));
-            // Index entries[i] at every field, not a local pointer: keeps the string setup order.
             entries[i].type = 0xb;
             entries[i].x = 0x80;
             entries[i].width = entries->width;
@@ -1333,8 +1209,6 @@ void BlitOptionsPanel()
     FlipScreen();
 }
 
-// The original called this from other translation units; in this file
-// MSVC would inline it into every caller, so keep it out of line.
 #pragma auto_inline(off)
 // FUNCTION: 0x45cfc0
 int __cdecl OpenOptionsLayout()
@@ -1380,8 +1254,6 @@ void UpdateMusicGadgets()
     SetGrayedOutByName((Dialog*)&g_game->gui, "CDPLAY", (char)(~g_game->flags_37f14_37f14.notrak & 1));
     SetGrayedOutByName((Dialog*)&g_game->gui, "CDNEXT", (char)(~g_game->flags_37f14_37f14.notrak & 1));
     SetGrayedOutByName((Dialog*)&g_game->gui, "TRACKMODE", (char)(~g_game->flags_37f14_37f14.notrak & 1));
-    // Spelled as one negated test, not an if/else with a call in each arm:
-    // MSVC then materialises the value in a register instead of pushing 0/1.
     SetGrayedOutByName((Dialog*)&g_game->gui, "TRACKTYPE", !((g_game->flags_37f14_37f14.notrak & 1) && g_game->cdMode == 4));
 }
 
@@ -1400,9 +1272,8 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
         return;
     }
     MarkChanged(obj);
-    // Result kept in a local: testing the call directly is longer.
     int notrak = IsCurrentGadgetNamed(obj, g_notrakGadgetName);
-    if (notrak != 0) {              // "NOTRAK"
+    if (notrak != 0) {
         PlaySoundByName(g_optionsSoundName, 0);
         int v = GetButtonStageByName(obj, g_notrakGadgetName);
         unsigned short f = g_game->flags_37f14_37f14.word;
@@ -1410,7 +1281,7 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
         ((Sound *)g_game->field_10)->EnableCdAudio(g_game->flags_37f14_37f14.word & 1);
         ClearSelectedGadget(obj);
         UpdateMusicGadgets();
-    } else if (IsCurrentGadgetNamed(obj, g_trackModeGadgetName)) {  // "TRACKMODE"
+    } else if (IsCurrentGadgetNamed(obj, g_trackModeGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         g_game->cdMode = GetButtonStageByName(obj, g_trackModeGadgetName) + 1;
         ((Sound *)g_game->field_10)->SetPlaybackOrder(g_game->cdMode);
@@ -1427,21 +1298,20 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
         ClearSelectedGadget(obj);
         UpdateTrackGadgets();
         return;
-    } else if (IsCurrentGadgetNamed(obj, g_trackTypeGadgetName)) {  // "TRACKTYPE"
+    } else if (IsCurrentGadgetNamed(obj, g_trackTypeGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
-        // Index with obj->hotGadgetIndex itself, not the saved copy.
         int i = obj->hotGadgetIndex;
         ((Sound *)g_game->field_10)->SetCategoryOfTrack(g_musicUiSelectedTrack, entries[i].stageIndex);
         UpdateTrackGadgets();
         ClearSelectedGadget(obj);
         return;
     }
-    if (IsCurrentGadgetNamed(obj, g_cdPlayGadgetName)) {  // "CDPLAY"
+    if (IsCurrentGadgetNamed(obj, g_cdPlayGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         ((Sound *)g_game->field_10)->PlayCdTrack(g_musicUiSelectedTrack, 1);
         ClearSelectedGadget(obj);
         return;
-    } else if (IsCurrentGadgetNamed(obj, g_cdNextGadgetName)) {  // "CDNEXT"
+    } else if (IsCurrentGadgetNamed(obj, g_cdNextGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         g_musicUiSelectedTrack = g_musicUiSelectedTrack + 1;
         int n = ((Sound *)g_game->field_10)->GetTrackCount();
@@ -1451,7 +1321,7 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
         UpdateTrackGadgets();
         ClearSelectedGadget(obj);
         return;
-    } else if (IsCurrentGadgetNamed(obj, g_cdPrevGadgetName)) {  // "CDPREV"
+    } else if (IsCurrentGadgetNamed(obj, g_cdPrevGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         g_musicUiSelectedTrack = g_musicUiSelectedTrack - 1;
         if (g_musicUiSelectedTrack < 1)
@@ -1460,7 +1330,7 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
         UpdateTrackGadgets();
         ClearSelectedGadget(obj);
         return;
-    } else if (IsCurrentGadgetNamed(obj, g_cdStopGadgetName)) {  // "CDSTOP"
+    } else if (IsCurrentGadgetNamed(obj, g_cdStopGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         ((Sound *)g_game->field_10)->StopCdAudio();
         g_musicUiSelectedTrack = ((Sound *)g_game->field_10)->SelectTrack(1);
@@ -1468,14 +1338,14 @@ void __stdcall HandleMusicOptionsClick(Object_0045d280* obj)
         ClearSelectedGadget(obj);
         return;
     }
-    if (IsCurrentGadgetNamed(obj, g_undoGadgetName)) {  // "UNDO"
+    if (IsCurrentGadgetNamed(obj, g_undoGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         LoadSavedAudioSettings();
         CloseTopScreen(obj);
         OpenMusicOptions();
         return;
     }
-    if (IsCurrentGadgetNamed(obj, g_restoreGadgetName)) {  // "RESTORE"
+    if (IsCurrentGadgetNamed(obj, g_restoreGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         ApplyDefaultMusicOptions();
         CloseTopScreen(obj);
@@ -1644,7 +1514,6 @@ void OpenSoundOptions()
     obj->fn = HandleSoundOptionsClick;
     EnableKeyCommands(&g_game->gui);
     SetGadgetStatusByName(&g_game->gui, "SOUND", 1);
-    // Result in a local; the call reads obj->entries while later calls use entries.
     int found = FindGadgetIndex(obj->entries, "FXVOL", 0xe);
     if (found != -1) {
         Gadget* e = FindGadgetChecked_D(entries, "FXVOL");
@@ -1779,7 +1648,6 @@ void __stdcall HandleVisualOptionsClick(Gui* gui)
 // FUNCTION: 0x45e4c0
 void __stdcall SortDisplayModes(ModeList_0045e4c0* list)
 {
-    // j first: the merged file's declaration context needs this order.
     int j, i;
     for (i = 0; i < list->count; i++) {
         for (j = list->count - 1; j > i; j--) {
@@ -1807,7 +1675,6 @@ void __stdcall SortDisplayModes(ModeList_0045e4c0* list)
 // FUNCTION: 0x45e5e0
 void __stdcall OpenVisualOptions(int param_1)
 {
-    // Declared up front: esi holds this zero for the later args and stores.
     int i = 0;
     Layer* layer;
     Menu_0045e5e0* menu;
@@ -1843,7 +1710,6 @@ void __stdcall OpenVisualOptions(int param_1)
                 e->sliderUser = list;
                 menu = (Menu_0045e5e0*)&g_game->gui;
                 for (int j = 0; j < list->count; j++) {
-                    // Computed inside the loop body: hoisted after the count guard.
                     int w = g_game->width_37f1b;
                     Mode_0045e4c0* mode = &list->modes[j];
                     if (w == mode->width && g_game->height_37f1f == mode->height) {
@@ -1866,7 +1732,6 @@ void __stdcall OpenVisualOptions(int param_1)
         }
     } else {
         layer->data = (void*)i;
-        // Redundant test: keeps the MAP/VID loops in this shape.
         if ((*(Flags37ebe_0045cf60*)&g_game->ordersPanelFlags_37ebe).byte & 1) {
             for (i = 0; i <= ((Holder_0045e5e0*)g_game->gui.layer)->entries->count; i++) {
                 if (strncmp(((Holder_0045e5e0*)g_game->gui.layer)->entries[i].name, "MAP", strlen("MAP")) == 0) {
@@ -1964,7 +1829,6 @@ void __stdcall HandleSpeedOptionsClick(Gui* gui)
         return;
     }
     int i = gui->hotGadgetIndex;
-    // Index with gui->selected * 347, not the local i: selects the original lea.
     if (data[gui->hotGadgetIndex * 347] != 1) {
         ClearSelectedGadget(gui);
         return;
@@ -2086,8 +1950,6 @@ void ShowGameSettingsDialog()
     layer->handler = HandleGameSettingsDialogClick;
     LoadPictureCached("GameSettings", 0, 0, 0);
     int count = layer->entries->count;
-    // Mask in its own statement, and compute opts before rule: keeps the
-    // global register allocation.
     unsigned int index = FindHostSlot();
     index &= 0xff;
     char num[0x40];
@@ -2199,14 +2061,11 @@ void OpenBriefingDialog()
     RenderLayer((Sub_0045f800*)&g_game->gui, 0x40);
 }
 
-// Emits one help line as its two text fields, left of the '|' and right of it,
-// and marks both entries as used.
 static inline void AddLine(Page_0045f8c0* page, Layer* layer, char* value, int y)
 {
     if (value[0] == '|') {
         strcpy(value, page->blank);
     } else {
-        // Keep the scanned char an expression, not a local.
         char* p = value + 1;
         do {
         } while (*p++ != '|');
@@ -2233,8 +2092,6 @@ void __stdcall FillHelpPage(Gui* sub, int page, int lineCount)
         if ((&parser)->SelectRecord("Help")) {
             Page_0045f8c0 lines;
             Page_0045f8c0* pp = &lines;
-            // Operands read through non-bare-load locals, declared in the opposite
-            // order to the multiply: load order follows declaration order.
             int p2 = (page ? page : page);
             int n = (lineCount ? lineCount : lineCount);
             int first = (n ? n : n) * (p2 ? p2 : p2);
@@ -2313,13 +2170,10 @@ void CloseOptionsPanel()
 // FUNCTION: 0x45fc60
 void __stdcall HandleOptionsPanelClick(Gui* gui)
 {
-    // goto, not a return: the label after the g_optionsShellClosing = 0 store keeps the
-    // teardown tail shared.
     if (gui->hotGadgetIndex == -1)
         goto cleanup;
     {
         SetGadgetStatus(gui, gui->hotGadgetIndex, 1);
-        // Empty then-arm: the positive test alone changes the codegen.
         if ((*(Bits_0045cf60*)&g_game->netGameFlags_2a44).bits.bit2) {
         } else {
             RenderLayer((char*)&g_game->gui, 0x40);
@@ -2410,8 +2264,6 @@ void __stdcall DrawOptionsScrollBar(void* surf)
                 DrawFrame((int)g_optionsFlipSurface, s, s->xOffset, s->yOffset);
             }
         }
-        // Test with `<` so the increase is the fallthrough, and use the global
-        // directly, not a local: keeps the load before the branch.
         if (g_optionsLightbarX < g_optionsLightbarMaxX) {
             g_optionsLightbarAnim += 6;
         } else {
@@ -2462,7 +2314,6 @@ void OpenOptionsPanel()
     if (!(*(Bits_0045cf60*)&g_game->netGameFlags_2a44).bits.bit2) {
         BlankScreen();
     }
-    // Re-read layer->entries at every use; do not cache it in a local.
     g_optionsFlipSurface = AllocSurface("FLIPSURFACE", layer->entries->width, layer->entries->height);
     memcpy(g_optionsFlipSurface->pixels, layer->entries->surface->pixels,
            layer->entries->width * layer->entries->height);
@@ -2590,9 +2441,6 @@ void OpenSurrenderDialog()
     Gadget* entries = layer->entries;
     FindGadgetIndex(entries, "CHOICE1", 1);
     FindGadgetIndex(entries, "CHOICE2", 1);
-    // Suspected original bug: the sibling dialog setup at 0x464e70 copies
-    // "CHOICE1" to entries+0xcc and "CHOICE2" to entries+0xdc, but this
-    // function copies "CHOICE2" (0x503120) into both fields.
     strcpy(entries->text + 0x16, "CHOICE2");
     strcpy(entries->text + 0x26, "CHOICE2");
     SetTranslatedTextByName((Sub_00460680*)&g_game->gui, "CHOICE1", "Yes", 0);
@@ -2649,8 +2497,6 @@ void OpenExitMenu()
         SetTranslatedTextByName(&g_game->gui, "RESTART", Translate((char*)"Restart"), 0x80);
         goto tail;
     }
-    // Restart body written twice on purpose: the compiler merges them and lays
-    // restart out before main-menu.
     if (g_game->net->GetGameType() == 2) {
         SetGadgetActiveByName(&g_game->gui, "RESTART", 1);
         SetTranslatedTextByName(&g_game->gui, "RESTART", Translate((char*)"Restart"), 0x80);

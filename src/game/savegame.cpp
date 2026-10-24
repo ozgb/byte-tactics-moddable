@@ -1,7 +1,3 @@
-// Decompiled by deepseek-v4.1, deepseek-v4.1-flash, Sonnet, Sonnet 5.5, Haiku, space-bunny-free and GPT-6. Names are provisional.
-// The saved game screens: the info panel, the load and save click handlers,
-// the saved-game list and the two screen openers.
-
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -10,61 +6,49 @@ class Mission;
 
 #include "../files/files_api.h"
 
-// Pack 1: the 4-byte pad after the pointer at +0x391e9 would shift later fields.
 #pragma pack(push, 1)
 #include "../gui/gadget.h"
 #include "../gui/gui.h"
 #include "../gui/layer.h"
 #include "../../interfaces/seams.h"
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int DrawTriangleContours(int, int, int, int, int, int, int);
 int DrawRangeCircle(int, int, int, int, int, int, int);
 int UpdatePlayerEconomy(int);
 
-// A player's side block, the SideData behind PlayerState::pSideData (Thaldren
-// SideData); the byte at +0x95 is the side id the campaign setup writes.
 struct SideData {
     char unknown_0[0x95];
-    unsigned char bSideId;               // +0x95
+    unsigned char bSideId;
 };
 
-// The skirmish setup block at g_game+0x29a0 (Thaldren SkirmishInfo, #6518).
 struct SkirmishInfo {
     char unknown_0[0x108];
-    int commanderDeath;                  // +0x108
-    int mapping;                         // +0x10c
-    int lineOfSight;                     // +0x110
-    int losType;                         // +0x114
-    int fixedLocations;                  // +0x118
-    char aMapName[0x100];                // +0x11c
+    int commanderDeath;
+    int mapping;
+    int lineOfSight;
+    int losType;
+    int fixedLocations;
+    char aMapName[0x100];
 };
 
 struct Entry_004931d0 {
     char unknown_0[0xce];
-    void* handler;                     // +0xce
+    void* handler;
 };
 
 struct Gadget_004931d0 {
     char unknown_0[4];
-    Entry_004931d0* info;              // +0x4
-    void (__stdcall* handler)(Gui*);   // +0x8
-    void* context;                     // +0xc
+    Entry_004931d0* info;
+    void (__stdcall* handler)(Gui*);
+    void* context;
 };
 
-// The DELETE block's path buffer and the count it rebuilds the "GAMES" list
-// with, plus the "GAMES" entry the GAMES/LOAD/GAMENAME block looks up and
-// never reads. One local, so that the buffer's address is the aggregate's.
 struct Save_00492df0 {
-    int games;                           // +0, stored, never read
-    int count;                           // +4
-    char path[0x100];                    // +8
+    int games;
+    int count;
+    char path[0x100];
 };
 
-// One view of the game state. The GUI object at +0x519 is read as a Gui
-// (0x491ec0, 0x493060), as a raw byte pointer (0x492b10) and as the message
-// buffer (0x492360, 0x492df0); the flags at +0x2a44 are read both as the
-// b0..b3 bitfield union (0x492360) and as bits0/bit2/bits3 (0x492df0).
 union Flags_2a44 {
     unsigned short value;
     struct {
@@ -101,7 +85,7 @@ extern Game* g_game;
 #include "../state/sim_globals.h"
 
 extern char* g_savegameDir;
-extern const char g_invalidSavegameText[]; // "Invalid savegame file"
+extern const char g_invalidSavegameText[];
 extern char g_savegameRadarFrame[];
 extern char* g_savegameFileNames;
 extern char* g_savegameDescs;
@@ -171,8 +155,6 @@ void __stdcall SavedGameSelectHandler(int a, int b);
 char* __stdcall ListSavedGames(int* count);
 void ShowSavedGameInfo();
 
-// Stays an inline helper, with the field test outside it: gives the original's
-// registers at both delete sites.
 __inline void DeleteSave_00492360(HapiBank* obj)
 {
     if (obj) {
@@ -299,7 +281,6 @@ void __stdcall ShowInvalidSavegameDialog(void* param_1)
     ClearSelectedGadget((Gui*)param_1);
 }
 
-// Load game screen click handler (sibling of 0x492df0, save game screen).
 // FUNCTION: 0x492360
 void __stdcall LoadGameScreenHandler(Gui* gadget)
 {
@@ -450,13 +431,6 @@ invalid:
     ClearSelectedGadget(gadget);
 }
 
-// Lists the saved games: builds the search pattern for the "SAV" files in the
-// save directory, asks how many there are, and fills two tables: the file
-// names (0x100 bytes each) and, packed one after another, each save's
-// "Description" line. A file without a description is dropped by shifting the
-// remaining names down. Publishes the descriptions in the "GAMES" menu and
-// returns the names table (0 when there are no saves); the count goes back
-// through the parameter.
 // FUNCTION: 0x492b10
 char* __stdcall ListSavedGames(int* count)
 {
@@ -515,11 +489,6 @@ void __stdcall SavedGameSelectHandler(int arg1, int arg2)
     ShowSavedGameInfo();
 }
 
-// Click handler of the save game screen. On close (field +0x60 == -1) it
-// frees the four save lists that 0x492b10 built. CANCEL goes back; DELETE
-// removes the chosen save file, rebuilds the list and redraws; GAMES, LOAD and
-// GAMENAME all take the name typed in the GAMENAME box and, when it is not
-// empty, write the save under that name with a timestamp.
 // FUNCTION: 0x492df0
 void __stdcall SaveGameScreenHandler(Gui* gadget)
 {

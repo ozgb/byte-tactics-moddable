@@ -1,9 +1,3 @@
-// TdfFile and TdfRecord as the rest of the game sees them: a TDF text file is
-// loaded into a tree of sections (TdfRecord), and the file keeps a root and a
-// current section. Callers select a section and read its `name = value;`
-// entries by key. The layout of a section and the code that builds the tree
-// stay in tdf.cpp; callers only hold pointers to a
-// TdfRecord, so only its methods are declared here.
 #ifndef TDF_H
 #define TDF_H
 
@@ -80,9 +74,9 @@ public:
 
 class TdfFile {
 public:
-    TdfRecord* root;                   // +0x0
-    TdfRecord* current;                // +0x4
-    int flags;                         // +0x8
+    TdfRecord* root;
+    TdfRecord* current;
+    int flags;
 
     TdfFile();
     ~TdfFile();

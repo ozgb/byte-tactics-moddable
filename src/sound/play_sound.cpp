@@ -1,5 +1,3 @@
-// Decompiled by Haiku, Sonnet and Opus. Names are provisional.
-
 #include "../../interfaces/host.h"
 
 extern char* g_loopingWav;
@@ -33,7 +31,6 @@ void StopWindowsSound()
     g_loopingWav = 0;
 }
 
-// Plays a WAV image held in memory, asynchronously (SND_ASYNC | SND_MEMORY).
 // FUNCTION: 0x49f680
 void __stdcall PlayWavMemory(const char* sound)
 {
@@ -47,8 +44,6 @@ void __stdcall PlayLoopingWavMemory(char* sound)
     host_sound_wav_play(sound, HOST_WAV_LOOP);
 }
 
-// Loads a sound file into memory, plays it asynchronously from memory and
-// frees the previously playing buffer.
 // FUNCTION: 0x49f6c0
 int __stdcall PlayWavFromDisk(char* path)
 {

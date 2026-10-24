@@ -1,52 +1,45 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// <windows.h> is needed for the operand order of the player address
-// ([eax + ebp + 0x1b63], g_game as the base); without it MSVC swaps them.
 #include "win_types.h"
 #include <string.h>
 
-// The aligned frame (`and esp, -8`) comes from the default flags, no /Op: the
-// unsigned-to-float conversion needs an 8-byte stack temporary.
-
-// The campaign object at g_game+0x391e9 (Mission in 0x435da0.cpp).
 #include "../map/mission.h"
 
 #include "../network/player.h"
 #include "../network/player_info.h"
 
 #pragma pack(push, 1)
-struct Stat_0041dc20 {                 // 0x3a bytes
-    char name[30];                     // +0x00
-    int kills;                         // +0x1e
-    int losses;                        // +0x22
-    int energyProduced;                // +0x26
-    int metalProduced;                 // +0x2a
-    int energyWasted;                  // +0x2e
-    int metalWasted;                   // +0x32
-    int score;                         // +0x36
+struct Stat_0041dc20 {
+    char name[30];
+    int kills;
+    int losses;
+    int energyProduced;
+    int metalProduced;
+    int energyWasted;
+    int metalWasted;
+    int score;
 };
 
 struct Game_0041dc20 {
     char unknown_0[0x1b63];
-    Player players[10];                // +0x1b63
+    Player players[10];
     char unknown_2851[0x38a47 - 0x2851];
-    unsigned int gameTick;             // +0x38a47
+    unsigned int gameTick;
     char unknown_38a4b[0x38dd9 - 0x38a4b];
-    Stat_0041dc20 stats[10];           // +0x38dd9
+    Stat_0041dc20 stats[10];
     char unknown_3901d[0x3918f - 0x3901d];
-    int maxKills;                      // +0x3918f
-    int maxLosses;                     // +0x39193
-    int max_26;                        // +0x39197
-    int max_2a;                        // +0x3919b
-    int max_2e;                        // +0x3919f
-    int max_32;                        // +0x391a3
-    int maxScore;                      // +0x391a7
-    int mission;                       // +0x391ab
-    int won;                           // +0x391af
+    int maxKills;
+    int maxLosses;
+    int max_26;
+    int max_2a;
+    int max_2e;
+    int max_32;
+    int maxScore;
+    int mission;
+    int won;
     char unknown_391b3[0x391cf - 0x391b3];
-    char results[0x391e9 - 0x391cf];   // +0x391cf
+    char results[0x391e9 - 0x391cf];
     Ref<Mission> mapInfo;
     char unknown_391ed[0x3923b - 0x391ed];
-    unsigned short bits0_3923b : 2;    // +0x3923b
+    unsigned short bits0_3923b : 2;
     unsigned short bit2_3923b : 1;
     unsigned short bit3_3923b : 1;
     unsigned short bit4_3923b : 1;
@@ -56,9 +49,6 @@ struct Game_0041dc20 {
 
 extern Game_0041dc20* g_game;
 
-// End of a game: records whether it was won (and, in a campaign, the
-// mission's result letter), then fills the per-player statistics table
-// and the column maxima the results screen scales its bars by.
 // FUNCTION: 0x41dc20
 void CollectEndGameStats()
 {

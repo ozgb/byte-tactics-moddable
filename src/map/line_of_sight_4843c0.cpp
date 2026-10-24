@@ -1,29 +1,25 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, finished by deepseek-v4.1-flash. Names are provisional.
-// Stays in its own file: in line_of_sight.cpp it needs many more symbol ids
-// before it than the module provides.
 #include <string.h>
 #include "win_types.h"
 
 #pragma pack(push, 1)
 
-struct FogEdge {                       // 2 bytes per viewport cell: the fog edge masks
-    unsigned char lo;                  // +0x0, edges of unexplored cells
-    unsigned char hi;                  // +0x1, edges of explored cells in no sight
+struct FogEdge {
+    unsigned char lo;
+    unsigned char hi;
 };
 
-// Typed cells: grid.h's byte pointer would need a cast at every use.
 struct FogGrid {
-    FogEdge* cells;                    // +0x0
-    unsigned int width;                // +0x4
-    unsigned int height;               // +0x8
-    int count;                         // +0xc
+    FogEdge* cells;
+    unsigned int width;
+    unsigned int height;
+    int count;
 };
 
 union FlagWord {
     unsigned short raw;
     struct {
         unsigned short bit0 : 1;
-        unsigned short bit1 : 1;       // mask 2
+        unsigned short bit1 : 1;
         unsigned short rest : 14;
     } bits;
 };
@@ -44,7 +40,6 @@ void BuildFogTiles(void)
 
     memset(grid->cells, 0, grid->count * 2);
 
-    // Interleaved: each scroll load is followed by its modulo (y0, ry, x0, rx).
     int y0 = g_game->scrollY;
     int ry = y0 % 32;
     int x0 = g_game->scrollX;
@@ -124,7 +119,6 @@ void BuildFogTiles(void)
     }
 
     if (xEnd > info->width / 2) {
-        // Guarded do-while, not a for: the counter init follows the guard.
         if (grid->height > 0) {
             unsigned int i = 1;
             do {

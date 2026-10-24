@@ -1,5 +1,3 @@
-// Decompiled by Opus. Names are provisional.
-
 #pragma pack(push, 1)
 #include "../game/game.h"
 #pragma pack(pop)
@@ -8,16 +6,16 @@
 
 struct Map_00408090 {
     char unknown_0[0x80];
-    MapSize_00408090 size;              // +0x80
+    MapSize_00408090 size;
 };
 
-struct Position_00408090 {              // 16.16 fixed point; only high words read
+struct Position_00408090 {
     short xFrac;
-    short x;                            // +0x2
+    short x;
     short yFrac;
-    short y;                            // +0x6
+    short y;
     short zFrac;
-    short z;                            // +0xa
+    short z;
 };
 
 extern Game* g_game;

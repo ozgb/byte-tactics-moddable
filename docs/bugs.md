@@ -3,8 +3,8 @@
 Matching means reproducing Cavedog's code exactly, mistakes included. This file
 records the mistakes found along the way: code that compiles to the original
 bytes but almost certainly does not do what its author meant. The source keeps
-the bug (it has to, to match) with a comment; the entry here says what goes
-wrong and how sure we are.
+the bug (it has to, to match); the entry here names the function's address and
+says what goes wrong and how sure we are.
 
 Confidence: **likely** means the code is clearly wrong on its face; **possible**
 means it looks wrong but the intent is not certain from the code seen so far.
@@ -111,7 +111,7 @@ GPT-6 Astra in #38.
 
 **0x407ae0**, slot 0 of `SquadScoutTimer` (an AI unit group). It pushes
 `&target->pos` straight after `Class_004071f0::FindNearestEnemyUnit`, which returns 0
-when it finds no enemy unit (see 0x4071f0.cpp), so with no enemy the group is
+when it finds no enemy unit (in src/ai/ai_player.cpp), so with no enemy the group is
 sent towards address 0x6a. Found by Claude Opus 5.5 in #54.
 
 ## Group centre may drift after moving a unit (possible)
@@ -624,8 +624,8 @@ Things that look wrong in the original but have no effect, kept for the record.
   where the compression buffer could not be allocated reads that local without
   setting it (`mov eax, [esp+0x1c]` at 0x4b3bb2, which holds a leftover spill
   from 0x4b3aba). The result is only tested when the buffer exists, and without
-  it the bank is written unpacked, so nothing goes wrong. Noted in
-  0x4b39c0.cpp by its decompilers.
+  it the bank is written unpacked, so nothing goes wrong. Noted by its
+  decompilers.
 - **0x4bc120** (possible, dead code): `HAPI_LoadFileInto` reads a file into a
   buffer the caller passes in, but when the read returns no bytes it frees
   that buffer (0x4bc26c) as if it had allocated it, as its sibling
@@ -636,6 +636,23 @@ Things that look wrong in the original but have no effect, kept for the record.
   adds 100 before each store of `progress / count`, so after movement class k
   of n it shows (k + 1) * 100 / n: one class ahead, and past 100 on the last
   class until the final store of 100.
+
+- **0x431a60** (`LoadSideData`, possible, src/game/side_data.cpp): stores the
+  loop counter `side` into the side record at +0x22a, so the field is 0 for
+  side 0 and the index otherwise. Nothing seen confirms what the field is meant
+  to hold; 0x476830, 0x476a60 and 0x496ee0 only read the name at +0.
+- **0x472ab0** (`EmitJitteredThrustParticles`, possible, harmless,
+  src/graphics/particles.cpp): passes the same point as both of the first two
+  arguments of virtual slot 6 (0x4742c0), so the particle's `pos0` and `pos1`
+  are equal and `pos2`, the vector between them scaled by 1/b, is always zero.
+- **0x438ea0** (`DrawRangeCircle`, possible, harmless, src/ingame/markers.cpp):
+  `x2` and `y2` are only written inside the segment loop, so a ring with no
+  segments positions its label from their never-written home slots.
+- **0x468cf0** (the in-game view draw, possible, harmless,
+  src/ingame/info_panel_468cf0.cpp): the unit group numbers are let through by
+  an outer test that passes a unit with a group number when the 0x37f06 bit is
+  clear, but the inner test needs that bit for the number too, so the position
+  is computed and nothing is drawn (0x469c4a to 0x469c9a).
 
 ## Possible leaks and unchecked inputs
 
@@ -943,10 +960,9 @@ Things that look wrong in the original but have no effect, kept for the record.
   version with the wanted one field by field, but when the first field differs
   from `want0` (argument 1, tested at 0x4b51fd) it returns `majhi >= want1`
   (`cmp ebx, [esp+0xe4]` at 0x4b5233, argument 2), so a version whose first
-  field differs is judged against the second wanted field. Noted in a comment
-  in 0x4b5070.cpp by ozgb's OpenCode / Space Bunny Free run in #970 but never
-  reported; found again while checking #1940 and confirmed from the
-  disassembly.
+  field differs is judged against the second wanted field. Noted by ozgb's
+  OpenCode / Space Bunny Free run in #970 but never reported; found again while
+  checking #1940 and confirmed from the disassembly.
 - **0x4c0820** (possible): a polygon fill that starts its extremum search
   with sentinels (999999 and -999999 at 0x4c083c). With a vertex count of 0 or
   less the scan is skipped, the degenerate-polygon test (0x4c089a) sees two
@@ -968,7 +984,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   (0x4d18a8) from the data pointer, which is far larger than any output buffer:
   such packs fail with 5 (output too small). Harmless if only methods 1 and 2
   are asked for: SaveBank and SaveAccount pass 1, HAPI_WriteArchiveData the
-  archive's compression type. Noted in 0x4d1820.cpp by deepseek-v4.1-flash.
+  archive's compression type. Noted by deepseek-v4.1-flash.
 - **0x4da8d0** (possible, out of memory only): with no out-of-memory handler
   installed (0x5289bc), a failed GlobalAlloc in the inlined pool carve returns
   0 (`xor eax, eax` at 0x4da987), and the new node is then written through it
@@ -1115,7 +1131,11 @@ Things that look wrong in the original but have no effect, kept for the record.
   `count+1` to `count+lines` (0x4abeb8 walks forward from `count+1`, one
   0x15b step per line), but the text entries it has just added are
   `count-lines+1` to `count`, so it measures one entry past the last line it
-  added. Found by OpenCode / deepseek-v4.1-flash in #6104.
+  added. The two "OK" strings also go to the table base's fields at +0xcc and
+  +0xdc (0x4abfba, 0x4abfd8 address them from the table pointer, not from the
+  entry `FindGadgetIndex` returned, unlike the x and y fields just above), so
+  the OK entry is left unnamed unless those are entry 0's own button-name
+  fields. Found by OpenCode / deepseek-v4.1-flash in #6104.
 - **0x4acae0** (likely): the first `memcpy` copies 0x400 bytes into a
   768-byte stack buffer (the frame reserves 0x320 bytes), overrunning it by
   0x100 bytes into the rest of the frame. Found by OpenCode /
@@ -1204,3 +1224,13 @@ Things that look wrong in the original but have no effect, kept for the record.
   only the flag store), so a second call would register the empty handler
   again; 0x49e830 guards both the store and the call. Found by OpenCode /
   deepseek-v4.1-flash in #6214.
+- **0x493bf0** (chat recipient buttons, likely, src/ingame/dialogs_493340.cpp):
+  the number parsed from a `LIVEPLYR<n>` gadget name indexes the 11-byte
+  `chatRecipients` mask with no range check, so a name such as `LIVEPLYR42`
+  writes outside it. The neighbouring `chatMode` is clamped, which makes the
+  omission look like an oversight.
+- **0x47db20** (`CanBuildAt`, possible, src/map/terrain.cpp): at 0x47dd05 the
+  cell's owner word is compared with the raw low 16 bits of the second
+  argument, and nothing in the function dereferences that argument. Either the
+  parameter really is an owner id passed as a pointer, or the comparison was
+  meant to use the unit it points to.

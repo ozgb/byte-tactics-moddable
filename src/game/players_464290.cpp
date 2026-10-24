@@ -1,7 +1,3 @@
-// Decompiled by space-bunny-free, Sonnet 5.5, deepseek-v4.1-flash, GPT-6.1-sol, deepseek-v4.1, mimo-v2.6-pro, DeepSeek V4.1 Flash, GPT-6, claude-opus-5-5, Opus, Haiku, Space Bunny Free, opus and Claude Opus 5.5. Names are provisional.
-// The player slots (g_game + 0x1b63, 0x14b bytes each): starting, resetting,
-// initialising and freeing them, the metal and energy transfers, the per-tick
-// player update, the unit line-of-sight loop and the camera setup.
 #include <stdio.h>
 #include "../state/block.h"
 #include "../../interfaces/ref.h"
@@ -24,15 +20,12 @@ class Pathfinder;
 
 struct Map {
     char unknown_0[0x620];
-    int field_620;                     // +0x620
+    int field_620;
 };
 
-// The original declares the tag as a struct here (the decorated name of
-// CanPlaceUnitFootprint), so forward-declare it before the header.
 struct UnitDef;
 #include "../units/unit_def.h"
 
-// A unit. Only the fields these functions use are named.
 #include "../units/unit.h"
 
 #include "../network/player_info.h"
@@ -40,33 +33,33 @@ struct UnitDef;
 
 #include "../network/player.h"
 
-struct SkirmishPlayerSlot {            // 0x18 bytes
-    int controller;                    // +0x0
+struct SkirmishPlayerSlot {
+    int controller;
     char unknown_4[0xc - 0x4];
-    int metal;                         // +0xc
-    int energy;                        // +0x10
+    int metal;
+    int energy;
     int unknown_14;
 };
 
 struct Form {
     char unknown_0[0xcc];
-    char choice1[0x10];                // +0xcc
-    char choice2[0x20];                // +0xdc
+    char choice1[0x10];
+    char choice2[0x20];
 };
 
 struct Gadget;
 
 struct Screen {
     char unknown_0[4];
-    Form* form;                        // +0x4
-    void (__stdcall *callback)(Gadget*); // +0x8
+    Form* form;
+    void (__stdcall *callback)(Gadget*);
 };
 
 struct Gadget {
     char unknown_0[0x18];
-    Screen* screen;                    // +0x18
+    Screen* screen;
     char unknown_1c[0x60 - 0x1c];
-    int selected;                      // +0x60
+    int selected;
 };
 
 #include "game.h"
@@ -81,7 +74,6 @@ const char* __stdcall Translate(const char* text);
 void __stdcall SetupPlayerSlot(int player, char type)
 {
     Player* p = &g_game->players[player & 0xff];
-    // Declared after p: puts the pointer in the addressing-mode index slot.
     int idx = player & 0xff;
 
     memset(p->allied, 0, 11);
@@ -115,7 +107,6 @@ void __stdcall SetupPlayerSlot(int player, char type)
         if (type == 1) {
             sprintf(p->name, Translate("Player"));
         } else if (type == 2) {
-            // Tested as `== 0`: keeps the Arm arm inline, matching the block layout.
             if (p->info->side == 0) {
                 sprintf(p->name, "Arm");
             } else {
@@ -165,7 +156,6 @@ void ResetPlayerSlots()
         sprintf(p->fullName, "Player %d Second", i);
         p->allied[i] = 1;
         p->alliedBy[i] = 1;
-        // Inlined helper: separate stores let the reload of p->info be hoisted.
         p->Clear();
         p->info->kind = 0;
         p->info->memory = 0;
@@ -182,7 +172,6 @@ void ResetPlayerSlots()
         p->firstIndex = 0;
         p->lastIndex = 0;
         p->unitCount = 0;
-        // Stays before unitsCreated = 0.
         p->keepaliveFlags &= 0xfe;
         p->unitsCreated = 0;
         p->id = -1;
@@ -203,7 +192,6 @@ void __stdcall InitPlayerSlot(Player* p)
 {
     p->updateTime = (unsigned int)g_game->ticks;
     p->winLoseTime = (unsigned int)g_game->ticks;
-    // The third stamp runs here but is written after the clears: C2 has to number its location after theirs.
     goto stamp;
 back:
     p->totalEnergyProducedLo = 0;
@@ -243,7 +231,6 @@ guard:
     p->commanderKills = 0;
     p->commanderLosses = 0;
     p->unused_102 = p->unused_100 = -1;
-    // w declared first: puts height/2 in edi and width/2 in ebx.
     int w, h;
     h = g_game->height / 2;
     w = g_game->width / 2;
@@ -253,17 +240,9 @@ guard:
     int& sz = p->exploredSize;
     sz = (h * w + 7) & ~7;
     p->explored = sz ? (unsigned char*)SimAlloc(sz) : 0;
-    // Both references are load-bearing (`sz` also for the first block). With `memset(p->buffer, 0, p->exploredSize)`
-    // MSVC propagates the phi and the size into the inlined memset, which puts
-    // the phi in edi and stores it from edi; the original reloads [esi+0x7c]
-    // into edi and keeps the phi in eax. Reading the fields through references
-    // stops that propagation, and it also stops the scheduler from hoisting
-    // the size load `mov ecx, [esi+0x88]` above the phi store (with the size
-    // read directly the load comes first, the original has it second).
     Ref<unsigned char>& bref = p->explored;
     memset(bref, 0, sz);
     g_seams.ai->CreateSquads(p);
-    // Keep `||` with both tests as written: the branch layout depends on it.
     if (!p->active || p->type != 3) {
         p->ai = new (kSim) SquadManager(p);
         g_seams.ai->CreatePlayerAI(p->index);
@@ -304,8 +283,6 @@ void LoadDefaultAIScript()
     }
 }
 
-// A char loop counter gives the separate countdown register (edi = 10), as
-// in 0x403100; the entry pointer is computed before the test.
 // FUNCTION: 0x464990
 void InitPlayers()
 {
@@ -328,15 +305,10 @@ void RebuildAIFeatureCells()
     }
 }
 
-// The loop bound is `p <= g_game->players + 10`, one past the last slot, so
-// the body also runs once on the fields that follow the array (the `ja` guard
-// only skips the loop when the array is empty). The original really does
-// that.
 // FUNCTION: 0x464a00
 void FreePlayers()
 {
     for (Player* p = g_game->players; p <= g_game->players + 10; p++) {
-        // Fields reached as indices off q: keeps two induction variables.
         int* q = (int*)((char*)p + 0x84);
         q[-1] = 0;
         q[0] = 0;
@@ -365,8 +337,6 @@ float __stdcall GetEnergyIncome(void* param_1)
     return *(float*)((char*)param_1 + 0x90);
 }
 
-// Unused here: the symbol ids these declarations take keep the allocation
-// (docs/c2-regalloc.md).
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
 void ResetAIPlayers(void);
@@ -410,12 +380,6 @@ float __stdcall GetNetMetal(Class_464b10* param_1)
 
 void __stdcall SendShareMetal(unsigned char from, unsigned char to, int value);
 
-// Moves `amount` metal from player `from` to player `to`, the metal twin of
-// 0x464c60 (which moves energy). It is clamped to what `from` has stored,
-// taken out of `from`'s economy object (only when `flag` is set) and added to
-// `to`'s economy object. An AI player (type 2) on easy or medium only counts
-// 0.5 or 0.7 of it, and the transfer is announced over the network when `flag`
-// is set. Same shape as 0x464c60, which moves energy with UnitResources.
 // FUNCTION: 0x464b30
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag)
 {
@@ -431,7 +395,6 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
     if (amount == 0.0f)
         return;
     Player* player;
-    // Receiver read inside both arms of the flag test: homes `to` in ebx.
     player = flag ? (g_seams.economy->SpendEnergy(g_game->players[from].econ, amount),
                      g_game->players[to].econ->player)
                   : g_game->players[to].econ->player;
@@ -446,7 +409,6 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
                 = g_game->players[to].econ->energyMake - amount * -0.7;
             break;
         default: {
-            // Add goes through a local float: fixes the x87 operand order.
             float m = g_game->players[to].econ->energyMake;
             m += amount;
             g_game->players[to].econ->energyMake = m;
@@ -454,7 +416,6 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
         }
         }
     } else {
-        // Add goes through a local float: fixes the x87 operand order.
         float m = g_game->players[to].econ->energyMake;
         m += amount;
         g_game->players[to].econ->energyMake = m;
@@ -465,11 +426,6 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
 
 void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value);
 
-// Moves `amount` energy from player `from` to player `to`. The amount is first
-// clamped to what `from` has stored, then (only when `flag` is set) taken out of
-// `from`'s economy object and added to `to`'s. An AI player (type 2) on easy or
-// medium only counts 0.5 or 0.7 of it, and the transfer is announced over the
-// network when `flag` is set (the amount travels as its bit pattern).
 // FUNCTION: 0x464c60
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag)
 {
@@ -485,7 +441,6 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
     if (amount == 0.0f)
         return;
     Player* player;
-    // Receiver read inside both arms of the flag test: homes `to` in ebx.
     player = flag ? (g_seams.economy->SpendMetal(g_game->players[from].econ, amount), g_game->players[to].econ->player)
                   : g_game->players[to].econ->player;
     if (player->active != 0 && player->type == 2) {
@@ -497,8 +452,6 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
             g_game->players[to].econ->metalMake += amount * 0.7;
             break;
         default:
-            // Full `players[to].econ` expression: keeps the store from folding
-            // into the load.
             g_game->players[to].econ->metalMake = amount + g_game->players[to].econ->metalMake;
             break;
         }
@@ -509,8 +462,6 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
         SendShareEnergy(from, to, *(int*)&amount);
 }
 
-
-// Calls UpdateUnitLineOfSight for every unit in the range whose flag 0x10000000 is set.
 // FUNCTION: 0x464da0
 void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
 {
@@ -598,9 +549,6 @@ static int loopCond_00464f80(unsigned char i)
     return 1;
 }
 
-// The loop's latch test. It has to be a second, separately spelled inlined
-// helper: with the same expression at both test sites MSVC folds one of them
-// away, and the original keeps both.
 static int more_00464f80(unsigned char i)
 {
     if (i < 0xa)
@@ -608,12 +556,6 @@ static int more_00464f80(unsigned char i)
     return 0;
 }
 
-// The three scale constants, named so that each lands in .rdata as its own
-// object of exactly the original's width, and in this order: MSVC 5 emits a
-// float LITERAL in an 8-byte slot but a named static const float in 4, and
-// literals come after statics, so with 100.0f spelled as a literal it is the
-// first .rdata object and the checker reads its slot's 4 padding bytes as
-// part of it (the original's next constant is another function's 12700.0f).
 static const double kNegSeven = -0.7;
 static const double kNegHalf = -0.5;
 static const float kHundred = 100.0f;
@@ -627,16 +569,11 @@ void __stdcall UpdatePlayers()
 void __stdcall UpdatePlayersOnStream(RandStream stream)
 {
     g_seams.pathfinding->RunSearches(g_game->pathfinder);
-    // bl is declared before the guard and pi before the first goto, or the jump
-    // is rejected.
     unsigned char bl = 0;
-    // `for (;;)` with loopCond at the top and more() at next_bl: keeps both the
-    // entry guard and the latch test.
     for (;;) {
         if (!loopCond_00464f80(bl))
             goto next_bl;
         Player* pi;
-        // Array form, not through pi: gives the original's load-then-lea order.
         if (g_game->players[bl].active == 0)
             goto next_bl;
         pi = &g_game->players[bl];
@@ -649,8 +586,6 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
         if (pi->index == 0xa)
             goto next_bl;
         {
-            // Fresh pointer for the whole second group: stops it being merged with
-            // the first.
             Player* pi2 = &g_game->players[bl];
             if (pi2->active == 0)
                 goto next_bl;
@@ -698,12 +633,6 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                         }
                     }
                 } else {
-                    // This is a second copy of the countdown_extra block, and
-                    // the duplication is load-bearing: with a `goto` here MSVC
-                    // 5 leaves the `mov eax,[g_game]` reload after the `jne`
-                    // and the jump lands on it, where the original hoists the
-                    // reload above the branch and jumps past it. Written out
-                    // twice, MSVC tail-merges the copies and hoists it.
                     if (g_game->endGameCountdown < 0) {
                         g_game->endGameCountdown = 4;
                     } else {
@@ -727,7 +656,6 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                         if (g_game->commanderDeath == 2) {
                             PlayerInfo* self =
                                 g_game->players[FindHostSlot()].info;
-                            // `unsigned int` with the 0xffff mask: avoids a spilled raw result.
                             unsigned int typeId;
                             typeId = g_seams.units->FindUnitTypeId(
                                 &g_game->startPos[0x232 *
@@ -741,8 +669,6 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                                 pos.x = (RandomInt(g_game->baseX - 2 * cx) + cx) << 16;
                                 pos.y = 0;
                                 pos.z = (RandomInt(g_game->baseY - 2 * cy) + cy) << 16;
-                                // Declared in the order hh, hits, zacc, outer, hw: places the
-                                // `shl` where the original has it.
                                 int hh = g_game->height << 16;
                                 int hits = 0;
                                 unsigned int zacc =
@@ -781,14 +707,6 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                                              self->metal * 100,
                                              self->energy * 100);
                                 {
-                                    // The slot is written through a local
-                                    // pointer because that is what makes MSVC 5
-                                    // re-read unit->owner in the next block:
-                                    // it cannot prove the store disjoint from
-                                    // it. Written as `unit->resourceSlot = f` the
-                                    // pointer is forwarded from the first block
-                                    // instead and the second `mov eax,
-                                    // [esi+0xec]` disappears.
                                     float* slot = &unit->energy;
                                     float f = (float)self->energy * kHundred;
                                     if (unit->owner->active != 0 &&
@@ -941,16 +859,6 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
     }
 }
 
-// 0x4658e0 (players_4658e0.cpp) and 0x465ac0 (players_465ac0.cpp) stay in
-// files of their own: each matches only with that file's header set and
-// symbol count.
-
-// Sets each player's two camera floats (player +0x8c and +0x98) from the game
-// mode: mode 1 copies the net player's stored floats, mode 2 the per-slot
-// integers converted to float, mode 3 the colour-index player's info values
-// times 100 (read from players[index] but stored into players[i], as the
-// original does, so a player with a colour index other than its own slot
-// gets the other player's view position).
 // FUNCTION: 0x465e30
 void InitPlayerResources()
 {
@@ -982,7 +890,6 @@ void InitPlayerResources()
     }
 }
 
-// Reads each player's "Controller" value from its "Player%i" section.
 // FUNCTION: 0x465fb0
 void __stdcall LoadPlayerControllers(HapiBank* file)
 {

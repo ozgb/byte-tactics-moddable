@@ -1,5 +1,3 @@
-// Decompiled by Opus, Space Bunny Free, deepseek-v4.1-flash, deepseek-v4.1, Haiku, DeepSeek V4.1 Flash, Claude Opus 5.5, Sonnet and GPT-6.1-sol. Names are provisional.
-
 #include "win_types.h"
 #include "../state/block.h"
 #include <stdio.h>
@@ -16,7 +14,7 @@ class StringRef;
 
 #pragma pack(push, 1)
 struct Slot_00436860 {
-    int active;                        // +0x0
+    int active;
     char unknown_4[0x14];
 };
 
@@ -50,18 +48,17 @@ int __stdcall LoadMapList(char** out, int param_2, int param_3);
 
 #include "../game/mission_conditions.h"
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 int GetBuildRating(int, unsigned short);
 void RegisterUnitOrders();
 
 class MeteorParams {
 public:
-    char name[0x20];                    // +0x0
-    int radius;                         // +0x20
-    float density;                      // +0x24
-    float duration;                     // +0x28
-    float interval;                     // +0x2c
+    char name[0x20];
+    int radius;
+    float density;
+    float duration;
+    float interval;
     void LoadMeteorDefaults();
 };
 
@@ -73,8 +70,6 @@ void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall SetCursorMode(int n);
 void HandleNetPackets();
 
-// Every float field is read through this: the double result goes into a float
-// local and is returned, which delays the x87 store.
 static inline float GetFloat(TdfRecord* section, const char* key)
 {
     double value = section->GetFieldDouble(key, 0.0);
@@ -84,15 +79,14 @@ static inline float GetFloat(TdfRecord* section, const char* key)
 
 void __stdcall FatalError(char* text);
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void CopyDwordIfNonNull(int*, int*);
 
 struct MissionRule {
-    int type;                          // +0x0
-    int id;                            // +0x4
-    short x;                           // +0x8
-    short z;                           // +0xa
+    int type;
+    int id;
+    short x;
+    short z;
 };
 
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
@@ -103,15 +97,15 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 #include "../state/sim_globals.h"
 
 struct Header_004373a0 {
-    int magic;                         // +0x00
-    int width;                         // +0x04
-    int height;                        // +0x08
-    int unknown_0c;                    // +0x0c
-    int plotOffset;                    // +0x10
-    int unknown_14;                    // +0x14
-    int unknown_18;                    // +0x18
-    int features;                      // +0x1c
-    int featureOffset;                 // +0x20
+    int magic;
+    int width;
+    int height;
+    int unknown_0c;
+    int plotOffset;
+    int unknown_14;
+    int unknown_18;
+    int features;
+    int featureOffset;
     char unknown_24[0x40 - 0x24];
 };
 
@@ -119,8 +113,8 @@ int __stdcall ComputeChecksum(unsigned char* data, int len);
 
 class MapCacheEntry {
 public:
-    StringRef handle;             // +0x0
-    int tntChecksum;                   // +0x4
+    StringRef handle;
+    int tntChecksum;
 
     MapCacheEntry(const StringRef& other) : handle(other) {}
 
@@ -131,8 +125,6 @@ public:
     }
 };
 
-// The vector at 0x5122c0: MSVC 5 puts the empty allocator byte at +0, so
-// _First is g_mapCacheBegin and _Last is g_mapCacheEnd.
 extern MapCacheEntry* g_mapCacheBegin;
 extern MapCacheEntry* g_mapCacheEnd;
 
@@ -141,21 +133,10 @@ public:
     void InsertMapCacheEntry(MapCacheEntry* pos, int count, const MapCacheEntry& val);
 };
 
-
-// A file-local global std::vector: the compiler generates its initialiser
-// (0x434a30) and the destructor it registers with atexit (0x434a60).
-//
-// The element is 8 bytes and its destructor releases the reference-counted
-// string at +0 through ReleaseRef. Must stay file-static: an external global
-// reloads _First after the destroy loop.
 // FUNCTION: 0x434a30 _$E5
 // FUNCTION: 0x434a60 _$E3
 static MapCache s_mapCache;
 
-
-// Replaces the singleton at g_game+0x391e9 with a fresh Mission when the
-// current one belongs to a different owner, then stores it back (NULL when the
-// allocation failed). The constructor body is inlined here.
 // FUNCTION: 0x434ab0
 void __stdcall SetMissionType(int owner)
 {
@@ -163,14 +144,10 @@ void __stdcall SetMissionType(int owner)
         if (g_game->net->type == owner) {
             return;
         }
-        // Re-read the global here, not through a local: keeps the delete's null check.
         delete g_game->net;
     }
     g_game->net = new (kSim) Mission(owner);
 }
-
-// Frees a global buffer, clears three globals and deletes the object at
-// g_game+0x391e9.
 
 // FUNCTION: 0x434b90
 void FreeOtaEnumCacheAndMission()
@@ -204,7 +181,6 @@ int __stdcall LoadMapList(void** out, int param_2, int param_3)
     }
 
     SetCursorMode(0x14);
-    // The scalar locals are members of one struct: frame offsets follow member order.
     struct S { int count; int bFlag; int i; } s;
     
     if (param_2 == 0) {
@@ -225,7 +201,6 @@ int __stdcall LoadMapList(void** out, int param_2, int param_3)
 
     s.count = files.size();
     for (s.i = 0; s.i < s.count; s.i++) {
-        // The buffers are members of one struct, name before lower: same reason.
         struct A { char name[256]; char lower[256]; char path[256]; } a;
         BuildDataPath(a.path, "Maps", files[s.i].data, "OTA");
         TdfFile parser;
@@ -262,8 +237,6 @@ int __stdcall LoadMapList(void** out, int param_2, int param_3)
     return result;
 }
 
-// Constructor: clears the state, stores the type and resets the object with
-// an empty name through LoadCampaign (which copies the name to +0x4).
 // FUNCTION: 0x434f70
 Mission::Mission(int owner_)
 {
@@ -284,12 +257,6 @@ Mission::Mission(int owner_)
     LoadCampaign(DAT_005119b8);
 }
 
-// Destructor of Mission (constructor 0x434f70, sibling 0x437280).
-// Deletes the object at g_game+0x391ed, frees the two-dword buffers at
-// +0xdac/+0xdb4/+0xdbc and the pointers at +0xc14 and +0xd24, then destroys
-// the sub-object at +0xa08. The second round of buffer frees is dead (the
-// first round already zeroed the pointers) but the original emits it anyway,
-// so keep it.
 // FUNCTION: 0x434ff0
 Mission::~Mission()
 {
@@ -332,21 +299,6 @@ int Mission::GetGameType()
     return *(int*)this;
 }
 
-// Loads a campaign (the file name of a .cpf campaign script) into the
-// campaign object: clears the script list, copies the file name into
-// `campaign`, empties all nine name slots (0x4353b0, inlined), builds the
-// path of the campaign file itself into name slot 0 (0x435430), loads the
-// script into the list at +0xa08, and on failure reports it in the message
-// box and retries with the blank name. Then it clears the mission index and
-// loads mission 0, but only when a campaign name was given at all: an empty
-// `file` returns here without touching the state.
-//
-// Two things look like Cavedog's own slips, kept as the original has them:
-// - the second `strlen(file) != 0` test is dead: 0x435430 cannot change the
-//   caller's pointer, and the first test already passed;
-// - the message buffer is 0x80 bytes at the top of a 0x80 frame, while the
-//   name printed into it can be 0xff bytes, so a long campaign path overruns
-//   the frame. 0x435da0.cpp uses 0x100 for the same message.
 // FUNCTION: 0x435110
 void Mission::LoadCampaign(char* file)
 {
@@ -382,9 +334,6 @@ char* Mission::GetCampaignName()
     return 0;
 }
 
-// Reloads the buffer at +0xc14 from the file named by the text at +0x304:
-// frees the old buffer, sizes the file, allocates size+1 bytes and loads it.
-// When the text is empty the buffer is cleared instead.
 // FUNCTION: 0x435320
 void Mission::LoadBriefing()
 {
@@ -409,8 +358,6 @@ char* Mission::GetBriefing()
     return briefing;
 }
 
-// Stores a name in slot `index`; for slot 1 also records whether a file of
-// that name exists (HAPI_FileLengthByName), or 0 when the name is empty.
 // FUNCTION: 0x4353b0
 void Mission::SetNameSlot(int index, char* text)
 {
@@ -423,11 +370,6 @@ void Mission::SetNameSlot(int index, char* text)
     }
 }
 
-// Builds the path of a campaign file and stores it in name slot `index`
-// (an inlined copy of 0x4353b0.cpp). With a side prefix (GetPreferredLanguage) it
-// first tries "<dir>-<side>\<name>.<ext>" and keeps it when that file opens;
-// otherwise it uses "<dir>\<name>.<ext>". An empty name stores the blank
-// string DAT_005119b8.
 // FUNCTION: 0x435430
 void Mission::BuildCampaignFilePath(int index, char* dir, char* name, char* ext)
 {
@@ -465,8 +407,6 @@ char* Mission::GetNameSlot(int index)
     return 0;
 }
 
-// Counts the consecutive "MISSION<n>" rules in the embedded list (from
-// MISSION0 up); a blank name means no missions. See 0x435980.cpp.
 // FUNCTION: 0x4356f0
 int Mission::CountMissions()
 {
@@ -484,8 +424,6 @@ int Mission::CountMissions()
     return n;
 }
 
-// Fills *out with the mission list and returns how many missions there
-// are. Neighbours 0x4356f0 and 0x435980 share the same layout.
 // FUNCTION: 0x435760
 int Mission::BuildMissionList(char** out)
 {
@@ -497,7 +435,6 @@ int Mission::BuildMissionList(char** out)
     if (strlen(&campaign[0]) == 0) {
         n = 0;
     } else {
-        // Counted in `m` and copied to `n` after the loop, not counted on `n`.
         int m = 0;
         while (1) {
             sprintf(buf, "MISSION%d", m);
@@ -561,9 +498,6 @@ int Mission::GetTerrainSizeTier()
     return 0x80;
 }
 
-// Counts the consecutive "MISSION<n>" rules in the embedded list (from
-// MISSION0 up) and returns whether there are more than `index` of them. A
-// blank name means no missions.
 // FUNCTION: 0x435980
 int Mission::MissionExists(int index)
 {
@@ -584,19 +518,9 @@ int Mission::MissionExists(int index)
     return n > index;
 }
 
-// Loads a mission by name. Type 1 walks the mission list built by 0x435760
-// looking for the name and, on a match, resets the mission index and loads
-// that mission. Types 2 and 3 load the map and, when the language is not
-// "english", put the translated name (0x4c5740) into the name slot at +0xb14,
-// keeping the original spelling when the lookup changed nothing. Every other
-// type returns 0.
-//
-// The `tntChecksum = 0` store in the mission-loop branch repeats the one at the
-// top of the function, kept as the original has it.
 // FUNCTION: 0x435a20
 int Mission::LoadMissionByName(char* map)
 {
-    // One local for the load result and the mission list out-parameter.
     int res;
 
     tntChecksum = 0;
@@ -607,7 +531,6 @@ int Mission::LoadMissionByName(char* map)
                 char lower[200];
                 strcpy(lower, map);
                 _strlwr(lower);
-                // Translate gets the buffer, not (char*)this: keeps `lower` live across the call.
                 strncpy(text_b14, Translate(lower), 0xff);
                 if (_strcmpi(text_b14, map) == 0)
                     strcpy(text_b14, map);
@@ -667,11 +590,6 @@ int Mission::GetMissionIndex()
     return missionIndex;
 }
 
-// Advances the current mission index when the embedded list holds more than
-// "current index + 1" consecutive MISSION<n> rules; resets the list cursor
-// first. Same scan and side effects as 0x435980.cpp and 0x435c00.cpp.
-// LoadMission (0x435da0) is a __thiscall method of this class: the original
-// loads ecx = this before the call, which a free declaration would drop.
 // FUNCTION: 0x435c60
 int Mission::AdvanceMission()
 {
@@ -699,8 +617,6 @@ int Mission::AdvanceMission()
     return 0;
 }
 
-// Makes sure the map list at +0xd24 is loaded (dropping it first when the
-// multiplayer flag changes back to 0), then passes it to LoadMissionByName.
 // FUNCTION: 0x435d30
 void Mission::RefreshMapList(int multiplayer)
 {
@@ -715,14 +631,6 @@ void Mission::RefreshMapList(int multiplayer)
     multi = multiplayer;
 }
 
-// Loads the current mission: resets the mission state, finds the
-// mission's OTA file (from the campaign list entry MISSION<n> for type 1, or
-// from the map name for types 2 and 3), reads its GlobalHeader block into the
-// fields and the name slots (0x435430.cpp), and passes the schema to
-// 0x436c30. Returns 1 on success, 0 after reporting an error. 0x435320
-// (LoadBriefing) and 0x4356c0 (GetName) are inlined.
-// The 0x48e010 callee is MissionConditions::RegisterConditions
-// (data/symbols.csv).
 // FUNCTION: 0x435da0
 int Mission::LoadMission(char* map)
 {
@@ -745,7 +653,6 @@ int Mission::LoadMission(char* map)
     noSeaLevelTrigger = 0;
     planet[0] = 0;
     description[0] = 0;
-    // 0x437280 (the buffer reset) is written out here, not called: it is not auto-inlined.
     if (units)
         GameFreeThunk(units);
     units = 0;
@@ -807,7 +714,6 @@ int Mission::LoadMission(char* map)
         exists = 0;
         strcpy(missionName, map);
         BuildDataPath(path, "Maps", map, "OTA");
-        // The found-at-once arm breaks; only the fallback reassigns `map`.
         if (parser.LoadFile(path)) {
             BuildCampaignFilePath(1, "Maps", map, "TNT");
             break;
@@ -901,12 +807,6 @@ int Mission::LoadMission(char* map)
     return 1;
 }
 
-// Picks the mission file's "Schema <n>" block for a game type. Type 1 (a
-// campaign mission) takes the first schema whose type is the current
-// difficulty (then the others); types 2 and 3 (multiplayer) try the network
-// schemas and keep the one whose count of StartPos specials fits the number
-// of players best. The chosen block's name goes to `schema` and its section
-// becomes the parser's current section. Returns 1 when one was found.
 // FUNCTION: 0x436860
 int Mission::SelectSchema(int type, TdfFile* parser, char* schema)
 {
@@ -1023,10 +923,6 @@ int Mission::SelectSchema(int type, TdfFile* parser, char* schema)
     return found;
 }
 
-// Loads a mission's units, special rules and features from the parsed TDF:
-// selects [globalheader] and then the mission's own section, and copies the
-// "units", "specials" and "features" subsections into three tables. The
-// unit strings are packed after the unit records in the same allocation.
 // FUNCTION: 0x436c30
 void Mission::LoadMissionData(char* name, TdfFile* parser)
 {
@@ -1057,7 +953,6 @@ void Mission::LoadMissionData(char* name, TdfFile* parser)
         if (s->GetFieldString(buf, "InitialMission", 0x400, DAT_005119b8))
             total += strlen(buf) + 1;
     }
-    // Own local, computed before unitCount is stored: keeps the count in ecx.
     int unitBytes = count * sizeof(MissionUnit);
     unitCount = count;
     units = (MissionUnit*)SimAllocTagged(
@@ -1153,12 +1048,9 @@ void Mission::LoadMissionData(char* name, TdfFile* parser)
     }
 }
 
-// Frees three buffers (clearing each pointer and its size) and a fourth
-// buffer at +0xc14.
 // FUNCTION: 0x437280
 void Mission::FreeMissionData()
 {
-    // Written out in full, no Free() helper: the two clearing stores stay together.
     if (units)
         GameFreeThunk(units);
     units = 0;
@@ -1177,7 +1069,6 @@ void Mission::FreeMissionData()
     }
 }
 
-// Counts the type-1 rules (see GetStartPosition).
 // FUNCTION: 0x437300
 int Mission::CountStartPositions()
 {
@@ -1190,8 +1081,6 @@ int Mission::CountStartPositions()
     return n;
 }
 
-// Finds the type-1 entry with the given id and returns its position (16.16
-// fixed point, y = 0) in `out`. Returns 0 if there is none.
 // FUNCTION: 0x437320
 int Mission::GetStartPosition(Vec3* out, int id)
 {
@@ -1206,19 +1095,6 @@ int Mission::GetStartPosition(Vec3* out, int id)
     return 0;
 }
 
-// Map cache lookup for the campaign object (`this` is the campaign at
-// g_game+0x391e9, the class 0x435c00.cpp calls Mission). +0xc1c is
-// both the running checksum and the "already loaded" flag, so a second call
-// returns straight away. Otherwise name slot 1 is searched in the file-local
-// vector of {name, checksum} pairs at 0x5122c0 (its initialiser and atexit
-// destructor are map_list.cpp, its out-of-line insert is map_load.cpp): a hit
-// takes the stored checksum, a miss opens the file, checks the 0x2000 magic of
-// its 0x40-byte header and folds the checksums (0x4b6ba0) of the header, of
-// the plot data (width * height * 4 bytes at the offset in +0x10) and of the
-// feature data (features * 0x84 bytes at the offset in +0x20) into +0xc1c,
-// then appends the new pair. The result is +0xc20 xor +0xc1c throughout.
-//
-// SetChecksum is not a real method: it is how the new entry gets +0xc1c.
 // FUNCTION: 0x4373a0
 int Mission::ComputeMapChecksum()
 {
@@ -1227,8 +1103,6 @@ int Mission::ComputeMapChecksum()
     }
     char* name = GetNameSlot(1);
     MapCacheEntry* it;
-    // The two pointers stay separate globals: a single std::vector would
-    // reference s_mapCache with a displacement, the wrong address.
     for (it = g_mapCacheBegin; it != g_mapCacheEnd; it++) {
         if (_strcmpi(it->handle.data, name) == 0) {
             tntChecksum = it->tntChecksum;
@@ -1260,8 +1134,6 @@ int Mission::ComputeMapChecksum()
         GameFreeThunk(data);
     }
     HAPI_CloseFile(file);
-    // The checksum is stored after the copy constructor, not inside it:
-    // a two-argument constructor hoists the +0xc1c load above the call.
     s_mapCache.InsertMapCacheEntry(g_mapCacheEnd, 1, MapCacheEntry(StringRef(name)).SetChecksum(this));
     return headerChecksum ^ tntChecksum;
 }

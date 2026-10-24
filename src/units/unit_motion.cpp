@@ -1,7 +1,3 @@
-// Decompiled by DeepSeek V4.1 Flash, Opus, Haiku, GPT-6-Luna, Space Bunny Free, deepseek-v4.1, Fledge Alpha Free, GPT-6 and claude-opus-5-5. Names are provisional.
-// The memory cache: an arena of chunks {owner handle, size} that hands out
-// bitmaps, and the object pictures built in it.
-// Needed for AllocHandle's operand orders.
 #include "win_types.h"
 #include <string.h>
 #include "../state/block.h"
@@ -21,8 +17,8 @@ struct Point16_437840 {
 #pragma pack(push, 1)
 struct UnitType_437840 {
     char unknown_0[0x1ce];
-    float extractsMetal;               // +0x1ce
-    float windGenerator;               // +0x1d2
+    float extractsMetal;
+    float windGenerator;
 };
 
 #include "unit.h"
@@ -39,8 +35,8 @@ union Fixed_437840 {
 };
 
 struct Chunk_00437a30 {
-    void** owner;                      // +0x0
-    int size;                          // +0x4
+    void** owner;
+    int size;
 };
 
 #include "../graphics/gaf_frame.h"
@@ -55,14 +51,6 @@ int __stdcall CompressFrame(unsigned char* dest, GafFrame* img);
 
 extern Game* g_game;
 
-// Wind/metal picker for a metal extractor: when the unit type extracts metal
-// (+0x1ce > 0), sums the metal byte of every map cell under the unit's
-// footprint and stores the resulting rate at +0x58, then tells the script.
-//
-// The sum is accumulated in 16.16 fixed point: the unity's footprint is a
-// Point16 at +0x7e, the cell is at +0x76, the type pointer at +0x92 and the
-// script at +0x9a. The accumulator keeps the count in the high half of a
-// dword so the final `(float)` conversion and the 2^-16 scale cancel out.
 // FUNCTION: 0x437840
 void __stdcall UpdateMetalExtraction(Unit* unit)
 {
@@ -84,9 +72,6 @@ void __stdcall UpdateMetalExtraction(Unit* unit)
     }
 }
 
-// For a unit whose type has a positive value at +0x1d2 (presumably the wind
-// generator rating), passes the current wind direction and speed to its
-// script's SetDirection and SetSpeed functions when wind is enabled.
 // FUNCTION: 0x437910
 void __stdcall UpdateWindGenerator(Unit* unit)
 {
@@ -105,9 +90,6 @@ CMemoryCache* CMemoryCache::ClearPointers()
     return this;
 }
 
-// Memory cache initialisation: frees any previous block (as 0x437a00 does),
-// allocates a "CMemoryCache CCH" block of the given size and makes it one
-// free chunk covering the whole block.
 // FUNCTION: 0x4379b0
 int CMemoryCache::InitCache(unsigned int newSize)
 {
@@ -167,10 +149,6 @@ static void HandleSet(void** slot, int address, bool ref)
         *slot = (void*)address;
 }
 
-// Memory cache allocation: grows or reuses the handle in *p, splitting the
-// block found at `cur` (or wrapping to the base) into an allocated chunk plus
-// a leftover free chunk. Chunks are {owner handle, size} and the handle points
-// just past the 8-byte header.
 // FUNCTION: 0x437a30
 int CMemoryCache::AllocHandle(void** p, int need, bool ref)
 {
@@ -230,9 +208,6 @@ int CMemoryCache::AllocHandle(void** p, int need, bool ref)
     return 1;
 }
 
-// Allocates a one-plane w*h bitmap from the arena (0x437a30): a 0x18-byte
-// header, then the pixels, filled with 1. One-plane version of 0x437be0.
-// The original calls this from BuildShadow (0x45a790) rather than inlining it.
 #pragma auto_inline(off)
 // FUNCTION: 0x437b50
 int CMemoryCache::AllocBitmap(GafFrame** handle, int w, int h)
@@ -259,8 +234,6 @@ int CMemoryCache::AllocBitmap(GafFrame** handle, int w, int h)
 }
 #pragma auto_inline(on)
 
-// Allocates a two-plane w*h bitmap from the arena (0x437a30): a 0x18-byte
-// header, then a plane filled with 1 and a plane cleared to 0.
 // FUNCTION: 0x437be0
 int CMemoryCache::AllocTwoPlaneBitmap(GafFrame** handle, int w, int h)
 {
@@ -270,7 +243,6 @@ int CMemoryCache::AllocTwoPlaneBitmap(GafFrame** handle, int w, int h)
     GafFrame* b = *handle;
     if (!b)
         return 0;
-    // Plane pointer taken before the header stores: it keeps the zero out of eax.
     unsigned char* p = (unsigned char*)(b + 1);
     b->xOffset = 0;
     b->yOffset = 0;
@@ -288,16 +260,12 @@ int CMemoryCache::AllocTwoPlaneBitmap(GafFrame** handle, int w, int h)
     return 1;
 }
 
-// Hands the whole arena (its length minus the 8-byte record header) to the
-// allocator 0x437a30 as one block, storing the handle at +0xc.
 // FUNCTION: 0x437c80
 void CMemoryCache::FlushCache()
 {
     AllocHandle(&handle, cap - 8);
 }
 
-// Walks a buffer of variable-sized records {owner, size, ...} and clears the owner
-// of every record whose owner is `id`.
 // FUNCTION: 0x437c90
 void CMemoryCache::ReleaseHandle(int id)
 {
@@ -343,10 +311,8 @@ void CMemoryCache::DrawObjectState(Model_459200* list, void* result)
         list->shadow = 0;
     GafFrame* bitmap = list->bitmap;
     if ((owner->flags & 0x20000000) != 0) {
-        // The bitmap-null case is its own `rebuild = 1` statement.
         if (list->bitmap == 0)
             rebuild = 1;
-        // The last conjunct goes through `bitmap`, the one before it through `list->bitmap`.
         else if (owner->buildLeft != 0.0f
                 && (owner->flags & 0x2000) != 0
                 && list->bitmap->scratch == 0
@@ -368,8 +334,6 @@ void CMemoryCache::DrawObjectState(Model_459200* list, void* result)
     list->cacheDrawCount++;
 }
 
-// Copies an image (size, three header fields, pixels and optional mask) into
-// the object's own image, whose buffers are already allocated.
 // FUNCTION: 0x459170
 void CMemoryCache::CopyPicture(GafFrame* source)
 {
@@ -383,11 +347,6 @@ void CMemoryCache::CopyPicture(GafFrame* source)
         memcpy(image->scratch, source->scratch, source->width * source->height);
 }
 
-// Builds the picture of a piece: MeasureShadow measures the piece bounding box
-// of the state, the scratch image at this->image is cleared to its key
-// colour and the pieces are drawn into it (DrawShadowShape), the background image
-// is blitted over it, and the run length compressed result becomes the state's
-// sprite (CompressFrame, then a one plane bitmap from the arena).
 // FUNCTION: 0x45a790
 void CMemoryCache::BuildShadow(Model_459200* obj, GafFrame* dest)
 {

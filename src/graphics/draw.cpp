@@ -1,41 +1,28 @@
-// Decompiled by space-bunny-free, Opus, Sonnet 5.5, LongCat 2.5 Preview Free, deepseek-v4.1-flash, GPT-6.1-sol, mimo-v2.6-pro, claude-opus-5-5, Space Bunny Free, Claude Sonnet 5.5, Haiku, GPT-6, deepseek-v4.1, DeepSeek V4.1 Flash, Claude Opus 5.5, space-bunny-alpha and Sonnet. Names are provisional.
-// The draw module: lines, circles, polygons, fades and scanline fills into a
-// surface or the locked screen. PlotSpanEnds (0x4c0a90) and FillFlatSpan
-// (0x4c06e0), the two span writers the polygon fillers hand their rows to,
-// are joined at the end, in that order. ScanFillPolygon (0x4c0330) stays in
-// draw_4c0330.cpp: merged, its dy local keeps a register where the original
-// spills it, which takes 4 bytes off the frame.
 #include <string.h>
-// The standard headers below only move the symbol counter to the windows the
-// merged functions need (docs/c2-regalloc.md).
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
 #include "rect.h"
 
-// A point of the 2D outlines.
 #include "../util/point.h"
 
-// A vertex of the 3D outlines: the position, with z the 16.16 depth.
 #include "../util/vec3.h"
 
 #include "surface.h"
 
 #include "gaf_frame.h"
 
-// One scanline of a polygon: the two ends, their 16.16 depth and shade.
 struct Span {
-    int x1;                            // +0x0
-    int x2;                            // +0x4
+    int x1;
+    int x2;
     char unknown_8[0x18 - 0x8];
-    int z1;                            // +0x18 (16.16)
-    int z2;                            // +0x1c (16.16)
-    int s1;                            // +0x20 (16.16)
-    int s2;                            // +0x24 (16.16)
+    int z1;
+    int z2;
+    int s1;
+    int s2;
 };
 
-// A shaded polygon vertex: position, depth and shade.
 struct Point_004c0c70 {
     int x;
     int y;
@@ -43,60 +30,52 @@ struct Point_004c0c70 {
     int s;
 };
 
-// The two ends of the segment being drawn.
 struct Segment_004bf060 {
     Point* from;
     Point* to;
 };
 
-// The display object's fade tables at +0xc4 and the screen size at +0xd4.
 struct Engine_004bf4d0 {
     char unknown_0[0xc4];
-    unsigned char* fade_neg;           // +0xc4
-    unsigned char* fade_pos;           // +0xc8
+    unsigned char* fade_neg;
+    unsigned char* fade_pos;
     char unknown_cc[0xd4 - 0xcc];
-    int width;                         // +0xd4
-    int height;                        // +0xd8
+    int width;
+    int height;
 };
 
-// The display object's colour table at +0xc8.
 struct App_004bec70 {
     char unknown_0[0xc8];
-    unsigned int* palette;             // +0xc8
+    unsigned int* palette;
 };
 
-// The display object's colour table at +0xc0.
 struct App_004bed70 {
     char unknown_0[0xc0];
-    unsigned int* palette;             // +0xc0
+    unsigned int* palette;
 };
 
-// The display object's shaded palette table at +0xc4.
 struct App_004c0b10 {
     char unknown_0[0xc4];
-    unsigned char* shade;              // +0xc4
+    unsigned char* shade;
 };
 
-// The display object's grey table at +0xcc and its flags at +0xf1.
 struct Game_004bfe10 {
     char unknown_0[0xcc];
-    int grayTable;                     // +0xcc
+    int grayTable;
     char unknown_d0[0xf1 - 0xd0];
-    unsigned char flags;               // +0xf1
+    unsigned char flags;
 };
 
-// The display object at +0x210.
 struct Obj_004c13d0 {
     char unknown_0[0x210];
-    int keyColor;                      // +0x210
+    int keyColor;
 };
 
-// The display object's text colours at +0x208, +0x20c and +0x210.
 struct Obj {
     char unknown_0[0x208];
-    int foreColor;                     // +0x208
-    int backColor;                     // +0x20c
-    int keyColor;                      // +0x210
+    int foreColor;
+    int backColor;
+    int keyColor;
 };
 
 int __stdcall LockScreen(Surface* out);
@@ -118,20 +97,10 @@ void __stdcall PlotSpanEnds(int row, Span* span, GafFrame* surf,
                             unsigned char color);
 void __stdcall FillFlatSpan(int row, Span* span, GafFrame* surf,
                             unsigned char color);
-// Unused here: real blitter declarations from the gaf module whose symbol ids
-// keep the allocation of the later fills after the Surface view became
-// surface.h and the Vec3 view vec3.h (docs/c2-regalloc.md).
 void __cdecl BlitRectKeyed(Surface* dst, Surface* src, Rect* rect, Rect* pos,
                            int colour);
 void __cdecl BlitRect(Surface* dst, Surface* src, Rect* rect, Rect* pos);
 
-
-// Draws into `surface`, or into the screen (locked with LockScreen and
-// unlocked with UnlockScreen) when `surface` is null. ClipLine clips the
-// rectangle and BlitLine fills it. Returns the lock result on the screen
-// path, so a failed lock returns 0 without ever unlocking.
-// The original calls this out of line from DrawRectangle and DrawPolygon;
-// without this the merged file inlines it into them.
 #pragma auto_inline(off)
 // FUNCTION: 0x4be950
 int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1,
@@ -155,25 +124,12 @@ int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1,
 }
 #pragma auto_inline(on)
 
-
-// Clips the segment (x0, y0) - (x1, y1) to the rect the surface hands back
-// from Surface::GetClipRect (the surface's own copy at +0x1c, fetched
-// into a local), moving each end point in turn against the four edges, and
-// returning 0 when an end point is on the wrong side of an edge or when the
-// delta of the axis being moved is zero.
-//
-// The surface is never dereferenced except as `this`, so nothing in the clip
-// steps comes out of it.
-//
-// Each end point is tested against the four edges in the order left, top,
-// right, bottom, and the axis tested alternates x, y, x, y.
 // FUNCTION: 0x4bea20
 int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1)
 {
     Rect r;
     int to_right = (*x0 <= *x1);
     int downwards = (*y0 <= *y1);
-    // dx is declared before dy.
     int dx = *x1 - *x0;
     int dy = *y1 - *y0;
     dst->GetClipRect(&r);
@@ -236,8 +192,6 @@ int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1)
     if (*y1 > r.bottom) {
         if (downwards == 0)
             return 0;
-        // Last delta test is positive and falls out to `goto fail`: keeps the
-        // block's return 1 from merging with the trailing one.
         if (dy != 0) {
             *x1 += (r.bottom - *y1) * dx / dy;
             *y1 = r.bottom;
@@ -250,15 +204,6 @@ fail:
     return 0;
 }
 
-
-
-// Sibling of 0x4bed70 and 0x4be950: draws into `surface`, or into the screen
-// (locked with LockScreen and unlocked with UnlockScreen) when `surface` is
-// null. The rectangle is handed to ClipLine by address, so it can clip it
-// in place, and the clipped values go to BlitLineRemapped to draw. The state's
-// colour table at +0xc8 is both the guard and the last argument of the draw,
-// and the result is the surface that was drawn on, so a failed lock returns 0
-// without ever unlocking.
 // FUNCTION: 0x4bec70
 Surface* __stdcall DrawLitLine(Surface* surface, int x0, int y0,
                                          int x1, int y1, int color)
@@ -283,13 +228,6 @@ Surface* __stdcall DrawLitLine(Surface* surface, int x0, int y0,
     return ret;
 }
 
-
-
-// Sibling of 0x4be950: draws into `surface`, or into the screen (locked with
-// LockScreen and unlocked with UnlockScreen) when `surface` is null. The
-// extra argument to the draw is the state's colour table at +0xc0, and the
-// result is the surface that was drawn on, so a failed lock returns 0 without
-// ever unlocking.
 // FUNCTION: 0x4bed70
 Surface* __stdcall DrawBlendedLine(Surface* surface, int x0, int y0,
                                          int x1, int y1, int color)
@@ -312,13 +250,6 @@ Surface* __stdcall DrawBlendedLine(Surface* surface, int x0, int y0,
     return ret;
 }
 
-
-// Draws one character of text: ClipLine clamps the position into the
-// surface and BlitLine draws the glyph, taking both the clamped and the
-// original coordinates. When `surface` is null the screen is locked with
-// LockScreen instead, and if that lock fails a second surface is tried.
-// UnlockScreen then unlocks whatever LockScreen left in `screen`, even on
-// the fallback path where the lock failed.
 // FUNCTION: 0x4bee60
 int __stdcall DrawPixel(Surface* surface, int x, int y, int ch)
 {
@@ -327,7 +258,6 @@ int __stdcall DrawPixel(Surface* surface, int x, int y, int ch)
         Surface screen;
         ret = LockScreen(&screen);
         if (ret) {
-            // Declared in this order: it decides each local's stack slot.
             int y1 = y, x1 = x, y0 = y, x0 = x;
             if (&screen == 0) {
                 Surface other;
@@ -351,12 +281,6 @@ int __stdcall DrawPixel(Surface* surface, int x, int y, int ch)
     return ret;
 }
 
-
-// Reads the pixel at (x, y) of a surface, or of the screen (locked with
-// LockScreen and unlocked with UnlockScreen) when `surface` is null.
-//
-// When the screen cannot be locked the colour is returned uninitialised: its
-// stack home is y's slot, which is why that path returns y.
 // FUNCTION: 0x4befe0
 unsigned int __stdcall ReadPixel(Surface* surface, int x, int y)
 {
@@ -373,38 +297,6 @@ unsigned int __stdcall ReadPixel(Surface* surface, int x, int y)
     return color;
 }
 
-
-
-// Draws the polyline points[0..count-1] into `surface`, or into the screen
-// (locked with LockScreen, unlocked with UnlockScreen) when `surface` is
-// null. Every segment is clipped by ClipLine and drawn by BlitLine.
-// Returns the lock result on the screen path, so a failed lock returns 0
-// without ever unlocking; the caller-surface path returns 1.
-//
-// The locked branch carries a copy of the single segment drawer DrawLine
-// per segment, nested lock and all, which is what /Ob2 leaves behind when the
-// source calls it: the callee's own `if (surface == 0)` is the `if (&screen ==
-// 0)` below, tested on an address the compiler knows is not null, so the test
-// survives as `lea eax, [esp+0x14]; test eax, eax; jne` with the locked block
-// as the fall-through. Keeping that test is what puts the second lock call and
-// its unlock in the function at all.
-//
-// check.py prints MATCH (508 bytes). Two source shapes carry the match and
-// both are needed:
-// - the segment ends walk the array through the local Segment_004bf060. With
-//   two plain `Point*` locals (however they are spelled, in either order, or
-//   with an index) MSVC 5 folds them into a single induction variable biased
-//   to a middle field, and then one callee-saved register is free, so the
-//   result stays in ebp: the frame is 0x60, one `add reg, 8` is missing and
-//   the function is 464 bytes (32.1 percent). The struct keeps both pointers
-//   as induction variables (esi and edi) and spills the result to [esp+0x10],
-//   which is what fixes the 0x64 frame and the 25 dwords of locals.
-// - the four coordinates are declared in the order x0, y0, x1, y1 (that order
-//   picks which dead argument slot each one lands in: x0 at [esp+0x78] and
-//   y0 at [esp+0x84] in the locked loop, x0 at [esp+0x10] and y0 at
-//   [esp+0x78] in the caller-surface loop) and assigned in the order y1, x1,
-//   y0, x0, which is the order the original loads them in. The other 23 orders
-//   all score 0.90 to 0.95.
 // FUNCTION: 0x4bf060
 int __stdcall DrawPolyline(Surface* surface, Point* points,
                            int count, int color)
@@ -463,15 +355,6 @@ int __stdcall DrawPolyline(Surface* surface, Point* points,
     return result;
 }
 
-
-//
-// Draws a grid of connected lines into `surface`, or into the screen (locked
-// with LockScreen, unlocked with UnlockScreen) when `surface` is null:
-// `rows` polylines, where counts[r] is the number of vertices of row r and
-// the vertices follow one another in `points`. Every segment is clipped by
-// ClipLine and drawn by BlitLine. Like 0x4bf060 it returns the lock result
-// on the screen path (a failed lock returns 0 without unlocking) and 1 on the
-// caller-surface path.
 // FUNCTION: 0x4bf260
 int __stdcall DrawPolylines(Surface* surface, Point* points, int* counts,
                            int rows, int color)
@@ -481,21 +364,17 @@ int __stdcall DrawPolylines(Surface* surface, Point* points, int* counts,
         Surface screen;
         result = LockScreen(&screen);
         if (result != 0) {
-            // counts is copied before points: the original loads the arguments in that order.
             int r = rows;
             int* c = counts;
             Point* p = points;
             while (r > 0) {
                 int j = 0;
-                // A while loop, not a for: the latch is counter increment, then pointer bump.
                 while (j < *c - 1) {
-                    // Declared x0, y0, x1, y1 but assigned y1, x1, y0, x0: fixes the stack slots.
                     int x0, y0, x1, y1;
                     y1 = p[1].y;
                     x1 = p[1].x;
                     y0 = p[0].y;
                     x0 = p[0].x;
-                    // Kept: the original's inlined segment drawer has its own null-surface lock.
                     if (&screen == 0) {
                         Surface inner;
                         if (LockScreen(&inner)) {
@@ -542,11 +421,6 @@ int __stdcall DrawPolylines(Surface* surface, Point* points, int* counts,
     return result;
 }
 
-
-// Screen fade: applies a 256 entry translate table to every pixel of `rect` in
-// `surface` (or in the locked screen when `surface` is 0). `level` selects one
-// of 32 fade-in tables at +0xc4 (for negative levels, offset by 32) or one of 32
-// fade-out tables at +0xc8.
 // FUNCTION: 0x4bf4d0
 int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
 {
@@ -568,12 +442,10 @@ int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
     }
     int clipped = ClipRectangle(&screen, rect) != 0;
     if (clipped) {
-        // height is computed before p.
         int height = rect->bottom - rect->top + 1;
         char* p = (char*)screen.pixels + (screen.width * rect->top + rect->left);
         unsigned char* table;
         unsigned char* t;
-        // t is computed in each branch, not once after the merge.
         if (level < 0) {
             if (level < -0x20)
                 level = -0x20;
@@ -593,10 +465,8 @@ int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
         if (t == 0)
             return 0;
         while (height--) {
-            // w is declared before next.
             int w = rect->right - rect->left + 1;
             char* next = p + screen.width;
-            // Advances p itself in the body, not in a for header.
             while (w--) {
                 *p = t[*p];
                 p++;
@@ -636,13 +506,6 @@ int __stdcall ClipRectangle(Surface* surface, Rect* r)
     return r->top <= r->bottom;
 }
 
-
-
-// Fills a rectangle of `surface` with a solid `color` (FillSolidRect does the
-// fill). When `surface` is null the screen is locked with LockScreen,
-// drawn on and unlocked with UnlockScreen. The rectangle is copied to a local
-// first, because ClipRectangle clips it in place. Sibling of 0x4bec70 and
-// 0x4bed70.
 // FUNCTION: 0x4bf6f0
 int __stdcall FillRectangle(Surface* surface, Rect* rect, int color)
 {
@@ -665,13 +528,6 @@ int __stdcall FillRectangle(Surface* surface, Rect* rect, int color)
     return result;
 }
 
-
-
-// Outlines a rectangle (four one-pixel edges), drawing into `surface`, or into
-// the screen (locked with LockScreen and unlocked with UnlockScreen) when
-// `surface` is null. Returns the surface that was drawn on, so a failed lock
-// returns 0 without ever unlocking. Called from 0x4a16f0 with a rect and a
-// palette level.
 // FUNCTION: 0x4bf7b0
 Surface* __stdcall DrawLitRectangle(Surface* surface, int* rect,
                                          int color)
@@ -696,15 +552,6 @@ Surface* __stdcall DrawLitRectangle(Surface* surface, int* rect,
     return ret;
 }
 
-
-//
-// Draws the outline of `r` (top, right, bottom, left edges in that order) into
-// `surface`, or into the screen when `surface` is 0 (locked with
-// LockScreen, unlocked with UnlockScreen). Each edge is a segment drawer of the
-// same shape as DrawLine (clip with ClipLine, fill with BlitLine).
-//
-// Suspected original bug: the surface != 0 path returns an uninitialised
-// `result`.
 // FUNCTION: 0x4bf8c0
 int __stdcall DrawRectangle(Surface* surface, Rect* r, int color)
 {
@@ -718,9 +565,7 @@ int __stdcall DrawRectangle(Surface* surface, Rect* r, int color)
         result = LockScreen(&screen);
         if (result != 0) {
             {
-                // Declared first, then assigned y1, x1, y0, x0 as separate statements.
                 int x0, y0, x1, y1; y1 = r->top; x1 = r->right; y0 = r->top; x0 = r->left;
-                // Kept as in the original: the lock arm tests the address of `screen`.
                 if (&screen == 0) {
                     Surface inner;
                     if (LockScreen(&inner)) {
@@ -794,52 +639,6 @@ int __stdcall DrawRectangle(Surface* surface, Rect* r, int color)
     return result;
 }
 
-
-
-// Xor-fills `rect` on `surface` (or on the locked screen when `surface` is 0)
-// with the byte `value`, through XorRect. The rect is copied to a local
-// first because the clip helper ClipRectangle clips it in place. Returns the
-// lock result on the screen path and `value` on the caller-surface path.
-//
-// check.py prints MATCH (167 bytes).
-//
-// WARNING: the `result = ((int*)&surface)[2];` in the else arm is a codegen
-// probe, not a guess at the original's spelling. It reads exactly the same
-// four bytes as `value` (the third parameter's stack slot, at surface+8),
-// but through a syntactically different expression, and that difference is
-// the whole trick: MSVC 5 unifies two reads of the same parameter into one
-// register-allocated value (live across the XorRect call, so it needs a
-// callee-saved register, hence the extra `push edi`/`pop edi` and the two
-// bytes short). A differently spelled read of the same slot stays two
-// separate C1 values, so the else arm reloads it into esi, which is the
-// shared return-value register here. With the natural `result = value;`
-// this function scores 59.0 percent; with `return value;` in an early-return
-// else arm it scores 87.6 percent. The original source most likely used some
-// spelling this session could not guess.
-//
-// What the machine code fixes, and what to attack first in any rewrite:
-// - one saved register only (`push esi`), so the result variable, `surface`
-//   and the lock result all share esi, and the frame is 0x40 with the rect
-//   copy at [esp+4] and the 0x30-byte screen at [esp+0x14];
-// - a single shared tail: both paths reach `mov eax, esi`, which is why the
-//   lock failure branches to 0x4bfdfe and not to its own epilogue, so the
-//   result is one function-level variable assigned in both arms with the
-//   `return` outside them, not an early `return` per arm;
-// - the locked path copies the LockScreen result into esi at once
-//   (`mov esi, eax; test esi, esi`), and the locked path's fill argument is
-//   reloaded from [esp+0x50] even though the value is also read in the else
-//   arm, so a parameter read in two arms is not a register variable.
-//
-// Tried and none of it moved the else arm: shared vs per-arm result
-// variables, per-arm `return`, the value's type (int, unsigned, long, a 4-byte
-// struct), a local copy of the value used for the fill and/or the return, a
-// `static inline` helper for the fill and for the return, an inline helper
-// around the whole else arm, `value` read through its own address
-// (`*(int*)&value`, `*(&value)`), comma-operator and no-op-cast spellings,
-// `+ 0`, the arms swapped, `do`/`goto` forms, a bare `#include <windows.h>`
-// and an unsigned return type. deepseek-v4.1-flash had already established
-// that the locked path, the two exit blocks, the 3-argument __stdcall
-// signature and the 0x30-byte screen match byte for byte.
 // FUNCTION: 0x4bfd60
 int __stdcall XorRectangle(Surface* surface, Rect* rect, int value)
 {
@@ -861,39 +660,6 @@ int __stdcall XorRectangle(Surface* surface, Rect* rect, int value)
     return result;
 }
 
-
-
-// Translates every pixel of `rect` in `surface` through the byte table at
-// g_game+0xcc (RemapRect), or in the locked screen (LockScreen /
-// UnlockScreen) when `surface` is 0. The rect is copied to a local first
-// because the clip helper ClipRectangle clips it in place. The locked path
-// returns the lock result.
-//
-// The locked arm needs MSVC 5 to fold the `screen.pixels` load into the final
-// add (`add eax, dword ptr [esp + 0x34]`) instead of loading it into a
-// register first; that decision moves the whole function's register allocation.
-// Only declaration order decides it: the locked screen local is declared
-// BEFORE the rect copy, at function scope:
-//
-//     Surface screen;
-//     Rect r = *rect;
-//
-// This does not move the frame, because MSVC 5 allocates a local's slot at its
-// first use in the generated code, not at its declaration; it only changes
-// C1's internal local ordering. Moving an unused local, `result`, `status`,
-// `g` or the rect copy instead does not have the same effect, and neither
-// does splitting the copy into four field assignments. The `dst` arithmetic
-// is already in the original's form (MSVC 5 canonicalises `a + b - c`, so
-// the order of its three addends does not matter).
-//
-// Suspected original bug: the caller-surface path returns an uninitialised
-// local (`status`, warning C4700). `rect` is dead after the copy, so MSVC 5
-// puts `status` in rect's parameter slot, which is why the original ends that
-// path with `mov esi, [esp + 0x50]` and in practice returns the rect pointer.
-// The one `return result;` at the end is what the machine code wants: the
-// lock-success path's separate epilogue in the original is MSVC's tail
-// duplication, and writing that `return` explicitly moves `push esi` to the
-// top. See the matched siblings 0x4be950 and 0x4bfd60 for the same idiom.
 // FUNCTION: 0x4bfe10
 int __stdcall GrayRectangle(Surface* surface, Rect* rect)
 {
@@ -927,23 +693,6 @@ int __stdcall GrayRectangle(Surface* surface, Rect* rect)
     return result;
 }
 
-
-
-// Clears a dither pattern inside the clipped rectangle `rect` of `surface`, or
-// of the screen (locked with LockScreen and unlocked with UnlockScreen) when
-// `surface` is null. The rect is copied to a local first because the clip
-// helper ClipRectangle clips it in place. Rows alternate between the two byte
-// masks (which half of each dword is kept) according to the phase parity
-// `(i + phase) & 1`, the aligned middle is done a dword at a time, and the
-// unaligned byte ends are filled by stepping 2 bytes at a time. Returns 1 once
-// the pattern is laid down, 0 when the screen cannot be locked.
-//
-// MATCH. The whole match hinged on giving the trailing byte fill ONE shared
-// loop after the if/else instead of spelling the loop out in both arms: with
-// two copies, `x2` and the loop counter `i` swap their callee-saved registers
-// (edi/ebp instead of ebp/edi) and the function comes out 14 bytes too long.
-// Sharing the loop between the two `pe`/`pb` assignments fixes the register
-// priority as well as the block layout.
 // FUNCTION: 0x4bff20
 int __stdcall DitherRectangle(Surface* surface, Rect* rect, int phase)
 {
@@ -966,8 +715,8 @@ int __stdcall DitherRectangle(Surface* surface, Rect* rect, int phase)
                 *p = 0;
                 p += 2;
             }
-            unsigned char* pe;         // last byte of the trailing fill
-            unsigned char* pb;         // where that fill starts
+            unsigned char* pe;
+            unsigned char* pb;
             if ((i + phase) & 1) {
                 unsigned int* q = (unsigned int*)base;
                 unsigned int* qe = (unsigned int*)end;
@@ -1076,9 +825,6 @@ void __stdcall FillPolygon(Surface* surface, Point* points, int n, unsigned char
     ScanFillPolygon(surface, points, n, color);
 }
 
-
-// Draws a closed polygon outline: a line between each pair of consecutive
-// points, then one from the last point back to the first.
 // FUNCTION: 0x4c07b0
 int __stdcall DrawPolygon(Surface* surface, Vec3* pts, int count, int color)
 {
@@ -1092,7 +838,6 @@ int __stdcall DrawPolygon(Surface* surface, Vec3* pts, int count, int color)
 // FUNCTION: 0x4c0820
 int __stdcall DrawPolygonEdges(GafFrame* surf, Vec3* pts, int count,
                            int color) {
-    // color stays int, not unsigned char: the final call's register pairing.
     Span spans[2048];
     Span* out;
     Vec3* b;
@@ -1110,7 +855,6 @@ int __stdcall DrawPolygonEdges(GafFrame* surf, Vec3* pts, int count,
     if (count > 0) {
         p = pts;
         do {
-            // Only the first test of each pair uses py/px; the second re-reads the field.
             int py = p->y;
             if (py < ymin) {
                 ymin = py;
@@ -1210,56 +954,6 @@ int __stdcall DrawPolygonEdges(GafFrame* surf, Vec3* pts, int count,
     return 1;
 }
 
-
-
-// Sibling of 0x4c0a90 (which plots the two end points). Fills the pixels
-// between the span ends: walks the depth ramp at +0x18 and the shade ramp at
-// +0x20 (both 16.16) one step per pixel, does the depth test against the
-// surface's depth buffer when it exists, and looks the destination colour up
-// in the 32 x 256 shaded palette table at app+0xc4.
-//
-// MATCH, 352 of 352 bytes (was 55.8 percent, 344 bytes). Claude Sonnet 5.5 pass
-// (#694) did four changes:
-//  1. Compiler state: the function is very sensitive to it (with N unused
-//     `extern int` declarations the score runs between 52 and 62 percent and
-//     the size between 334 and 348 bytes, with a period of 32 in N), and
-//     `#include <windows.h>` alone (or `<stdio.h>` with `<math.h>`) reaches the
-//     state that makes the rest work. headers.py reports the same state for many
-//     sets.
-//  2. The span width is a named local, `int w = span->x2 - span->x1;` used by both
-//     divisions (55.8 to 89.3 percent; x1/x2 named locals, the width written out
-//     twice, and reading x2 first all stay at 37 percent). It puts x2 in ebx and
-//     x1 in ebp as the original does.
-//  3. No `color & 0xff` local: the original reloads and masks the colour argument
-//     inside the depth loop (`mov ebx, [esp+0x2c]; and ebx, 0xff`). The old
-//     hoisted `int ci = color & 0xff;` was a hack that flipped the ebx/ebp choice
-//     of the head; with the width local it is not needed and it costs the frame
-//     size (0x10 instead of the original's 0xc).
-//  4. `d++` before `z += dz` in the depth loop (96.1 to 98.4 percent; the other
-//     23 orders of the four increments score 95 to 97.6).
-//
-// Resolved (deepseek-v4.1-flash): the last two instructions, the depth pointer
-// offset. The original does `add edx, ebp; add edi, edx` (row * pitch, shared
-// with the colour pointer, plus start), every spelling that reads the cached
-// `start` local gives `add ebp, edx; add edi, ebp` instead. Writing the offset
-// as `d += row * surf->pitch + span->x1;` (dereferencing the span rather than
-// the cached start, same value because start is span->x1 after the clamp)
-// flips the commutative add destination to edx and matches.
-//
-// Inert: `(app->shade + (si << 8))[color]` and `*(app->shade + (si << 8) + color)`
-// for the shade lookup, do/while for the depth loop (73.2 percent), `for (; count;
-// count--)`, an `int zi`, a `w`-less head with cached z1/s1/x1/x2 locals
-// (47 to 52 percent).
-//
-// deepseek-v4.1-flash pass: not a compiler-state artefact and not operand
-// order. A sweep of 0 to 549 unused `extern int dummyN;` declarations never
-// reaches MATCH (only 0.888 to 0.924, worse). For the depth offset, `d +=
-// row*pitch; d += start;` in either order, `d += row*pitch + start`, `d +=
-// start + row*pitch`, `d = d + row*pitch + start`, `d = (unsigned char*)((int)d
-// + ...)`, `&d[...]` and assigning a fresh `q` local all give `add ebp, edx`.
-// Only reading `span->x1` in place of the cached local moves the destination
-// into edx. An `int off` local changes the frame (4 locals) and drops to 80.8
-// percent.
 // FUNCTION: 0x4c0b10
 void __stdcall FillShadedSpan(int row, Span* span, GafFrame* surf, unsigned char color)
 {
@@ -1311,10 +1005,8 @@ void __stdcall FillShadedSpan(int row, Span* span, GafFrame* surf, unsigned char
 // FUNCTION: 0x4c0c70
 int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
                            unsigned char color) {
-    // Shared by both edge walks; z and shade values stay block-local.
     int y0, y1, x, dx, dz;
     Span spans[2048];
-    // Bounds declared in the order maxX, minY, maxY, minX.
     int maxX = -999999;
     int minY = 999999;
     int maxY = -999999;
@@ -1323,7 +1015,6 @@ int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
     int maxYi;
     int i;
     GafFrame* sf = surf;
-    // Scan index initialised before the n > 0 guard, incremented before p.
     int scanIndex = 0;
     if (n > 0) {
         Point_004c0c70* p = pts;
@@ -1348,7 +1039,6 @@ int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
         return 0;
     if (maxY < 0)
         return 0;
-    // Height tested inline here and reused for maxRow: the two loads must CSE.
     if (minY > (int)sf->height - 1)
         return 0;
     int maxRow = (int)sf->height - 1;
@@ -1463,12 +1153,6 @@ int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
     return 1;
 }
 
-
-// Scanline filler, the sibling of 0x4c0c70 (which also fills a shade channel):
-// it finds the extreme y vertices, then walks the vertex ring from the top one
-// backwards to the bottom one filling the left end of each row, walks it
-// forwards for the right end, and hands every row to FillFlatSpan. The 2048
-// entry span array is what puts the frame at 0x14028.
 // FUNCTION: 0x4c1000
 int __stdcall FillFlatPolygon(GafFrame* surf, Vec3* pts, int n, int color)
 {
@@ -1481,7 +1165,6 @@ int __stdcall FillFlatPolygon(GafFrame* surf, Vec3* pts, int n, int color)
     int minYi;
     int maxYi;
     int i;
-    // One function-scope j shared by both walks; each walk has its own block-scoped i.
     int j;
     GafFrame* sf = surf;
     int scanIndex = 0;
@@ -1508,7 +1191,6 @@ int __stdcall FillFlatPolygon(GafFrame* surf, Vec3* pts, int n, int color)
         return 0;
     if (maxY < 0)
         return 0;
-    // Height tested inline here and reused for maxRow: the two loads must CSE.
     if (minY > (int)sf->height - 1)
         return 0;
     int maxRow = (int)sf->height - 1;
@@ -1526,7 +1208,6 @@ int __stdcall FillFlatPolygon(GafFrame* surf, Vec3* pts, int n, int color)
                 j = i - 1;
                 if (j < 0)
                     j = n - 1;
-                // pts[i] and pts[j] indexed directly: named pointers would re-pack the frame.
                 y0 = pts[i].y;
                 y1 = pts[j].y;
                 if (y0 < y1) {
@@ -1614,11 +1295,6 @@ int __stdcall FillFlatPolygon(GafFrame* surf, Vec3* pts, int n, int color)
     return 1;
 }
 
-
-// Returns 1 if (px, py) lies strictly inside the convex polygon pts[0..n-1]
-// (every edge has the point on the same side), 0 otherwise or if n < 3.
-// Without a header such as <string.h>, MSVC computes the two products in the
-// other order (found with tools/headers.py).
 // FUNCTION: 0x4c1320
 int __stdcall PointInPolygon(Point* pts, int n, int px, int py)
 {
@@ -1646,9 +1322,6 @@ void __stdcall SetTextColors(int param_1, int param_2)
     }
 }
 
-
-// Stores a value at +0x210 of the object GetDisplay returns; the setter
-// for the getter GetTextKeyColor.
 // FUNCTION: 0x4c13d0
 void __stdcall SetTextKeyColor(int value)
 {
@@ -1717,9 +1390,6 @@ unsigned char __stdcall FontHeight(void* ptr)
     return (unsigned char)result;
 }
 
-// The two span writers below are kept after 0x4c1470 and out of address order:
-// at their addresses their bodies' symbol ids would move the register windows
-// the other functions match in (docs/c2-regalloc.md).
 // FUNCTION: 0x4c0a90
 void __stdcall PlotSpanEnds(int row, Span* span, GafFrame* surf, unsigned char color)
 {

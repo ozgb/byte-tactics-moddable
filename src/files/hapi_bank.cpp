@@ -1,49 +1,43 @@
-// Decompiled by Haiku, deepseek-v4.1-flash, GPT-5.6-Terra, GPT-6, GPT-6.1-sol, deepseek-v4.1, space-bunny-free, Claude Opus 5.5, mimo-v2.6-pro, longcat-2.5-preview-free, muse-spark-1.3-free, Sonnet 5.5, Claude Fable 5.1, Opus and Sonnet. Names are provisional.
-
 #include <stdio.h>
 #include <string.h>
 #include <memory.h>
 #include <io.h>
-// Nothing here uses <stdlib.h>: its symbols put SaveAccount, LoadAccount and
-// OpenAccount in the symbol-id windows they match in (docs/c2-regalloc.md).
 #include <stdlib.h>
 
-// A block of bytes an account keeps under a name or a number.
-struct SafeDepositBox {              // 0x14 bytes
-    int named;                       // +0x00
+struct SafeDepositBox {
+    int named;
     union {
-        char* name;                  // +0x04 when named
-        int number;                  // +0x04 when not
+        char* name;
+        int number;
     };
-    int size;                        // +0x08
-    int pos;                         // +0x0c, the read and write position
-    char* data;                      // +0x10
+    int size;
+    int pos;
+    char* data;
 };
 
-// A named value of an account.
-struct BankItem {                    // 0x10 bytes
-    char* name;                      // +0x00
-    int type;                        // +0x04, 1 = integer, 2 = double, 3 = string
+struct BankItem {
+    char* name;
+    int type;
     union {
-        int value;                   // +0x08
-        double real;                 // +0x08
-        char* string;                // +0x08
+        int value;
+        double real;
+        char* string;
     };
 };
 
-struct BankAccount {                 // 0x18 bytes
-    char* name;                      // +0x00
-    int itemCount;                   // +0x04
-    int boxCount;                    // +0x08
-    int currentBox;                  // +0x0c
-    BankItem* items;                 // +0x10
-    SafeDepositBox* boxes;           // +0x14
+struct BankAccount {
+    char* name;
+    int itemCount;
+    int boxCount;
+    int currentBox;
+    BankItem* items;
+    SafeDepositBox* boxes;
 };
 
-struct AccountList {                 // 0x0c bytes
-    int count;                       // +0x00
-    BankAccount* accounts;           // +0x04
-    int current;                     // +0x08
+struct AccountList {
+    int count;
+    BankAccount* accounts;
+    int current;
 };
 
 #include "file_handle.h"
@@ -72,61 +66,56 @@ int __stdcall SquashPack(void* dest, int* destSize, void* src, int srcSize, int 
 void __stdcall FatalError(char* message);
 char* __stdcall StripExtension(char* name);
 
-// The file header. 0x22 bytes of it are read and written.
 #pragma pack(push, 1)
-struct BankFileHeader {              // 0x22 bytes
-    char magic[8];                   // +0x00 "HAPIBANK"
-    int nameOffset;                  // +0x08, of the bank's name in the string pool
-    int poolOffset;                  // +0x0c, of the string pool in the file
-    int headerSize;                  // +0x10, where the first account starts
-    int version;                     // +0x14
-    bool compressed;                 // +0x18, the string pool is squashed
+struct BankFileHeader {
+    char magic[8];
+    int nameOffset;
+    int poolOffset;
+    int headerSize;
+    int version;
+    bool compressed;
     char unused_19[9];
 };
 #pragma pack(pop)
 
-// The string pool as loaded: the original keeps it at the bottom of
-// OpenBank's frame and hands it by address to LoadAccount.
-struct PoolImage {                   // 0x08 bytes
-    void* buf;                       // +0x00
-    int size;                        // +0x04
+struct PoolImage {
+    void* buf;
+    int size;
 };
 
-// The string pool as SaveBank builds it.
 struct StringPool {
-    char* data;                      // +0x00
-    int len;                         // +0x04
-    int csize;                       // +0x08
+    char* data;
+    int len;
+    int csize;
 };
 
-struct AccountHeader {               // 0x20 bytes
-    int size;                        // +0x00, of the whole account
-    char* strOffset;                 // +0x04, of its name in the string pool
-    int nInts;                       // +0x08
-    int nDoubles;                    // +0x0c
-    int nStrings;                    // +0x10
-    int nBlobs;                      // +0x14
-    int compressed;                  // +0x18
-    int unknown_1c;                  // +0x1c
+struct AccountHeader {
+    int size;
+    char* strOffset;
+    int nInts;
+    int nDoubles;
+    int nStrings;
+    int nBlobs;
+    int compressed;
+    int unknown_1c;
 };
 
-// The records of an account's body. The offsets are pointer-typed.
-struct IntRecord {                   // 8 bytes
+struct IntRecord {
     char* name;
     int value;
 };
 
 #pragma pack(push, 4)
-struct DoubleRecord {                // 12 bytes
+struct DoubleRecord {
     char* name;
     double value;
 };
 #pragma pack(pop)
 
-struct BoxRecord {                   // 16 bytes
-    char* name;                      // negative for a numbered box
+struct BoxRecord {
+    char* name;
     int number;
-    int offset;                      // of the bytes in the file
+    int offset;
     int len;
 };
 
@@ -187,10 +176,8 @@ int AccountBank::OpenBank(char* filename, char* name, char* account)
 {
     void* raw;
     BankFileHeader h;
-    // Declared after raw and h: gives the locals the original's stack slots.
     PoolImage img;
     char errmsg[0x80];
-    // Separate from filename and name: reusing one variable changes the register split.
     FileHandle* file;
     long remaining;
     long pos;
@@ -231,7 +218,6 @@ int AccountBank::OpenBank(char* filename, char* name, char* account)
             FatalError(errmsg);
         }
         img.buf = GameReallocIgnoreTag(img.buf, dsize);
-        // Stored before the memcpy: afterwards the frame grows by 4 bytes.
         img.size = dsize;
         memcpy(img.buf, raw, dsize);
         GameFreeThunk(raw);
@@ -280,7 +266,6 @@ int AccountBank::SaveBank(char* filename, char* name, int compress, int audit)
 {
     char path[256];
     BankFileHeader header;
-    // noff stays an unassigned local: the cbuf == 0 arm reads it (as in the original).
     int noff;
     int err;
     StringPool pool;
@@ -316,7 +301,7 @@ int AccountBank::SaveBank(char* filename, char* name, int compress, int audit)
     char* cbuf = (char*)GameAllocShared(pool.csize);
     SetOutOfMemoryHandler(handle);
     if (cbuf != 0) { err = SquashPack(cbuf, &pool.csize, pool.data, dsize, 1, 0); }
-    else { err = noff; }   // noff is never assigned
+    else { err = noff; }
     if (cbuf != 0 && err == 0 && pool.csize < dsize) {
         host_file_write(file, cbuf, pool.csize);
         header.compressed = true;
@@ -393,7 +378,6 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
             strcpy(buf->data + oldlen, name);
             int rec[2];
             rec[0] = oldlen;
-            // Declared before oldlen2.
             char* second = slot->items[i].string;
             int oldlen2 = buf->len;
             buf->len += strlen(second) + 1;
@@ -426,7 +410,6 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
                 rec[0] = -1;
                 rec[1] = slot->boxes[i].number;
             }
-            // dataOffset is updated before the fwrite so it is not live across the call.
             rec[2] = dataOffset;
             int len = slot->boxes[i].size;
             rec[3] = len;
@@ -446,9 +429,6 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
     if (compress != 0) {
         int handle = SetOutOfMemoryHandler(0);
         int len = h.size - 0x20;
-        // A redundant conditional re-assignment of `len`: it mentions `off` once
-        // more and compiles to nothing (both arms store the same value), which
-        // flips the off/raw register tie to the original's. See the note at the top.
         if (off < 0) len = h.size - 0x20;
         char* raw = (char*)GameAllocShared(len);
         if (raw != 0) {
@@ -480,7 +460,6 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
 // FUNCTION: 0x4b4270
 void AccountBank::LoadAccount(FileHandle* fh, int* image, char* name)
 {
-    // The image base is an int and the record offsets are pointer-typed.
     int buf;
     int len;
     int base;
@@ -545,7 +524,6 @@ void AccountBank::LoadAccount(FileHandle* fh, int* image, char* name)
                     OpenNumberedBox(rec.number);
                 else
                     OpenNamedBox(rec.name + *image);
-                // Named local computed before the append: as a direct argument it is evaluated late.
                 char* src = (char*)(buf + (rec.offset - base) - 0x20);
                 WriteBox(src, rec.len);
                 SeekBox(0);
@@ -556,9 +534,6 @@ void AccountBank::LoadAccount(FileHandle* fh, int* image, char* name)
     }
 }
 
-// Finds the account named by the argument, or appends a new empty account
-// when there is none, and makes it the current one; returns 1 when it
-// already existed.
 // FUNCTION: 0x4b4560
 int AccountBank::OpenAccount(char* name)
 {
@@ -579,9 +554,6 @@ int AccountBank::OpenAccount(char* name)
     return 0;
 }
 
-// Stores an integer under a name in the current account (FindItem with 1
-// finds or adds the item), freeing the old value first when it was a string;
-// returns 0 when there is no current account.
 // FUNCTION: 0x4b4630
 int AccountBank::SetIntegerItem(const char* name, int value)
 {
@@ -596,7 +568,6 @@ int AccountBank::SetIntegerItem(const char* name, int value)
     return 0;
 }
 
-// The double counterpart of SetIntegerItem.
 // FUNCTION: 0x4b46c0
 int AccountBank::SetDoubleItem(const char* name, double value)
 {
@@ -611,8 +582,6 @@ int AccountBank::SetDoubleItem(const char* name, double value)
     return 0;
 }
 
-// The string counterpart of SetIntegerItem: stores a copy of the string, and
-// does nothing when it is null.
 // FUNCTION: 0x4b4750
 int AccountBank::SetStringItem(const char* name, char* value)
 {
@@ -627,8 +596,6 @@ int AccountBank::SetStringItem(const char* name, char* value)
     return 0;
 }
 
-// Reads an integer item of the current account; returns `def` when there is
-// no current account, the item is missing, or it is not an integer.
 // FUNCTION: 0x4b4800
 int AccountBank::GetIntegerItem(char* name, int def)
 {
@@ -669,8 +636,6 @@ int AccountBank::HasItem(const char* name)
     return i >= 0 ? 1 : 0;
 }
 
-// Returns the index of the named item of the current account; when it is
-// missing, adds it if `create` is set and returns -1 otherwise.
 // FUNCTION: 0x4b4910
 int AccountBank::FindItem(const char* name, int create)
 {
@@ -736,8 +701,6 @@ int AccountBank::FindNamedBox(char* name, int create)
     return n;
 }
 
-// Makes the numbered box (added when missing) the current one; returns
-// whether it holds any bytes.
 // FUNCTION: 0x4b4b50
 int AccountBank::OpenNumberedBox(int number)
 {
@@ -763,7 +726,6 @@ int AccountBank::GetBoxSize()
     return a->boxes[box].size;
 }
 
-// Sets the current box's position, clamped to 0..size.
 // FUNCTION: 0x4b4c10
 void AccountBank::SeekBox(int pos)
 {
@@ -778,8 +740,6 @@ void AccountBank::SeekBox(int pos)
     c->pos = pos;
 }
 
-// Moves the current box's position to its end and returns it (the returned
-// value is what keeps it in eax).
 // FUNCTION: 0x4b4c50
 int AccountBank::SeekBoxEnd()
 {
@@ -789,8 +749,6 @@ int AccountBank::SeekBoxEnd()
     return it->pos;
 }
 
-// Reads up to len bytes from the current box into dst and advances its
-// position.
 // FUNCTION: 0x4b4c80
 int AccountBank::ReadBox(void* dst, int len)
 {
@@ -807,8 +765,6 @@ int AccountBank::ReadBox(void* dst, int len)
     return len;
 }
 
-// Writes len bytes from src at the current box's position, growing the box
-// as needed, and advances the position.
 // FUNCTION: 0x4b4cf0
 int AccountBank::WriteBox(void* src, int len)
 {

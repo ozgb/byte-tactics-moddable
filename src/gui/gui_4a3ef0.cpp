@@ -1,39 +1,27 @@
-// Decompiled by space-bunny-free, finished by GPT-6, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by claude-opus-5-5. Names are provisional.
-// The list gadget's
-// scroll-up step, the mirror image of 0x4a99c0: find the entry of type 2
-// whose +0x01 byte equals this entry's, then, by the flag bits 0x10, 0x20 and
-// 0x80 of that entry, recompute the size of a line (+0x142) and the scroll
-// position (+0x136), and refresh the gadget with DrawSliderBar.
-//
-// Suspected original bug, reproduced: the 0x20 arm divides by the line total
-// unguarded, so a `lineCount` of zero or less divides by zero (the jle at
-// 0x4a40b2 skips the multiply and 0x4a40d1 does `idiv ecx` with ecx = 0),
-// where the 0x80 arm tests both of its divisors first.
-
 #include "gadget.h"
 
 #include "../graphics/gaf_frame.h"
 
 struct Font_004a3ef0 {
     char unknown_0[0x28];
-    GafFrame* glyph;                   // +0x28
+    GafFrame* glyph;
 };
 
 struct List_004a3ef0 {
     char unknown_0[0x0c];
-    unsigned short* glyphs;            // +0x0c
+    unsigned short* glyphs;
 };
 
 struct Holder_004a3ef0 {
-    int current;                       // +0x00
-    Gadget* entries;                   // +0x04
+    int current;
+    Gadget* entries;
     char unknown_08[0x14 - 0x08];
-    List_004a3ef0* list;               // +0x14
+    List_004a3ef0* list;
 };
 
 struct Dialog {
     char unknown_0[0x18];
-    Holder_004a3ef0* holder;           // +0x18
+    Holder_004a3ef0* holder;
 };
 
 extern Holder_004a3ef0* g_guiContext;
@@ -43,7 +31,6 @@ int __stdcall GetGafFrame(unsigned short* seq, int frame);
 int GetFontHeight();
 void __stdcall DrawSliderBar(Dialog* gui, int gadgetIndex);
 
-// The one helper for every GetGafFrame glyph fetch.
 static inline GafFrame* GetGlyph_004a3ef0(unsigned char c)
 {
     return (GafFrame*)GetGafFrame(g_guiContext->list->glyphs, c);
@@ -58,7 +45,6 @@ static inline int Find_004a3ef0(Gadget* entries, unsigned char kind)
     return 0;
 }
 
-// Reads the count and the font pointer before the count > 0 test.
 static inline int LineSize_004a3ef0(Gadget* e)
 {
     int count = e->u.list.rowCount;
@@ -76,7 +62,6 @@ void __stdcall DrawSlider(Dialog* gui, int gadgetIndex)
     Gadget* me = &entries[gadgetIndex];
     unsigned char kind = me->team;
     int found = Find_004a3ef0(entries, kind);
-    // Must stay a union with both zero stores: a plain int changes the register choices.
     union { int full; short word; } lines;
     lines.full = 0;
     lines.word = 0;

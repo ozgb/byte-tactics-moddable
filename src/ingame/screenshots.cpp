@@ -1,5 +1,3 @@
-// Decompiled by GPT-5.6-Terra, finished by Space Bunny Free. Names are provisional.
-// g_game+0xc is a pointer, the final test reads a byte at +0xf1 through it.
 #include <stdio.h>
 
 #include "../map/mission.h"

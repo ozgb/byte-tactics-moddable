@@ -1,8 +1,3 @@
-// Decompiled by deepseek-v4.1, deepseek-v4.1-flash, GPT-6.1-sol, GPT-6-Luna, mimo-v2.6-pro, longcat-2.5-preview-free, Space Bunny Free, Claude Opus 5.5, Opus, Claude Sonnet 5.5, Sonnet, Haiku, DeepSeek V4.1 Flash, space-bunny-free and opus. Names are provisional.
-//
-// The skirmish setup screen: the per-player rows (name, side, allies, colour,
-// metal, energy), the game-option buttons, the SELMAP.GUI map selector, the
-// click and cheat-text handlers, and the "forces destroyed" announcement.
 #include "win_types.h"
 #include <string.h>
 #include <stdlib.h>
@@ -19,66 +14,66 @@ class Mission;
 
 struct Backdrop {
     char unknown_0[0xc0];
-    Gaf* gaf;                          // +0xc0
+    Gaf* gaf;
 };
 
-struct Gadget {                        // GUI entry, 0x15b bytes
+struct Gadget {
     char unknown_0[0x1b];
-    int attribs;                       // +0x1b
+    int attribs;
     char unknown_1f[0x33 - 0x1f];
-    char text[0xb6 - 0x33];            // +0x33
-    short count;                       // +0xb6
+    char text[0xb6 - 0x33];
+    short count;
     char unknown_b8[2];
-    short selected;                    // +0xba
+    short selected;
     char unknown_bc[2];
-    void* frames;                      // +0xbe
-    char* items;                       // +0xc2
-    unsigned short frame;              // +0xc6
+    void* frames;
+    char* items;
+    unsigned short frame;
     char unknown_c8[6];
-    void (__stdcall* onSelect)(Gui*, int);   // +0xce
-    void* records;                     // +0xd2
+    void (__stdcall* onSelect)(Gui*, int);
+    void* records;
     char unknown_d6[0x136 - 0xd6];
-    union {                            // +0x136
+    union {
         short range;
         struct {
-            unsigned char stages;      // +0x136
-            unsigned char stageIndex;  // +0x137
+            unsigned char stages;
+            unsigned char stageIndex;
         };
     };
     char unknown_138[0x144 - 0x138];
-    void (__stdcall* sliderCallback)(Gui*, int); // +0x144
+    void (__stdcall* sliderCallback)(Gui*, int);
     char unknown_148[0x15b - 0x148];
 };
 
 #include "../gui/gui.h"
 
-struct Data {                          // "SELECT MAP DATA", 0x20 bytes
+struct Data {
     char unknown_0[0x14];
-    char* items;                       // +0x14
+    char* items;
 };
 
 #include "../gui/layer.h"
 
-struct SkirmishPlayerSlot {            // 0x18 bytes
-    int active;                        // +0x00
-    int shade;                         // +0x04
-    int team;                          // +0x08
-    int metal;                         // +0x0c
-    int energy;                        // +0x10
-    int color;                         // +0x14
+struct SkirmishPlayerSlot {
+    int active;
+    int shade;
+    int team;
+    int metal;
+    int energy;
+    int color;
 };
 
 struct Table {
-    SkirmishPlayerSlot players[11];    // +0x00 .. +0x108
-    int commanderDeath;                // +0x108
-    int mapping;                       // +0x10c
-    int lineOfSight;                   // +0x110
-    int losType;                       // +0x114
-    int fixedLocations;                // +0x118
-    char mapName[0x220 - 0x11c];       // +0x11c
-    int baseGadgetCount;               // +0x220
-    int current;                       // +0x224
-    int difficulty;                    // +0x228
+    SkirmishPlayerSlot players[11];
+    int commanderDeath;
+    int mapping;
+    int lineOfSight;
+    int losType;
+    int fixedLocations;
+    char mapName[0x220 - 0x11c];
+    int baseGadgetCount;
+    int current;
+    int difficulty;
 };
 
 #include "../network/player.h"
@@ -132,9 +127,6 @@ void RefreshAllyIcons(void)
     MarkChanged(&g_game->gui);
 }
 
-// Returns 1 when every active player (other than type 5) has the same type
-// and at least one such player exists, else 0.
-// The original calls this out of line from HandleSkirmishClick.
 #pragma auto_inline(off)
 // FUNCTION: 0x479760
 int AreAllPlayersInOneAllyGroup(void)
@@ -159,9 +151,6 @@ void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 void __stdcall SetTranslatedTextByName(Gui* menu, char* key, char* text, int flag);
 char* __stdcall Translate(char* key);
 
-// Copies of the campaign_menu functions at 0x479500, 0x479590 and 0x4795e0:
-// the original inlines them here, so they are defined in this unit.
-// 0x479500: the number of players with controller 1.
 int __cdecl CountHumanSlots()
 {
     int n = 0;
@@ -172,7 +161,6 @@ int __cdecl CountHumanSlots()
     return n;
 }
 
-// 0x479590: whether another active player uses this colour.
 int __stdcall IsColorTaken(int color, int skip)
 {
     for (int i = 0; i < g_game->playerCount; i++) {
@@ -183,11 +171,9 @@ int __stdcall IsColorTaken(int color, int skip)
     return 0;
 }
 
-// 0x4795e0: the first colour no player uses.
 int FindFreeColor()
 {
     int color = 0;
-    // do/while, not for: a for loop moves the return block to the function end.
     do {
         int i;
         for (i = 0; i < g_game->playerCount; i++) {
@@ -201,10 +187,8 @@ int FindFreeColor()
     return -1;
 }
 
-// Gives the player the first free colour and updates the "Color<n>" entry.
 static void NewColour(int playerIndex)
 {
-    // Separate helper with its own name buffer: the players array is re-read.
     char name[64];
     Gadget* entries = g_game->gui.layer->entries;
     ((Table *)g_game->options)->players[playerIndex].color = FindFreeColor();
@@ -219,9 +203,6 @@ static void NewColour(int playerIndex)
     }
 }
 
-// Cycles a player slot's controller (open, computer, player) in the setup
-// screen and refreshes that row's menu entries; a newly occupied slot whose
-// colour clashes with another active player gets the first free colour.
 // FUNCTION: 0x4797e0
 void __stdcall CycleSlotController(int playerIndex)
 {
@@ -282,40 +263,40 @@ void __stdcall CycleSlotController(int playerIndex)
 
 #pragma pack(push, 1)
 struct Header {
-    unsigned char type;                // +0x00
-    unsigned char group;               // +0x01
-    char name[0x11];                   // +0x02
-    short x;                           // +0x13
-    short y;                           // +0x15
-    short w;                           // +0x17
-    short h;                           // +0x19
-    int attribs;                       // +0x1b
-    int color;                         // +0x1f
-    int color2;                        // +0x23
-    char unknown_27[2];                // +0x27
-    unsigned char flag;                // +0x29
+    unsigned char type;
+    unsigned char group;
+    char name[0x11];
+    short x;
+    short y;
+    short w;
+    short h;
+    int attribs;
+    int color;
+    int color2;
+    char unknown_27[2];
+    unsigned char flag;
 };
 
-struct Rec1 {                          // 0x13e bytes
-    Header h;                          // +0x00
+struct Rec1 {
+    Header h;
     char unknown_2a[0x2f - 0x2a];
-    GafEntry* entry;                   // +0x2f
-    char text[0x103];                  // +0x33
-    unsigned char stages;              // +0x136
-    unsigned char stageIndex;          // +0x137
-    short f138;                        // +0x138
+    GafEntry* entry;
+    char text[0x103];
+    unsigned char stages;
+    unsigned char stageIndex;
+    short f138;
     char pad_13a;
-    unsigned char frame;               // +0x13b
+    unsigned char frame;
     char pad_13c[2];
 };
 
-struct Rec2 {                          // 0xcc bytes
-    Header h;                          // +0x00
+struct Rec2 {
+    Header h;
     char unknown_2a[0x33 - 0x2a];
-    char text[0x83];                   // +0x33
-    short count;                       // +0xb6
+    char text[0x83];
+    short count;
     char unknown_b8[0xc8 - 0xb8];
-    int flags;                         // +0xc8
+    int flags;
 };
 #pragma pack(pop)
 
@@ -343,9 +324,6 @@ void __stdcall BindGadgetAnimSequence(Rec1* obj, char* name)
 int __stdcall AddButtonGadget(void* obj, void* record);
 int __stdcall AddHotspotGadget(void* obj, void* record);
 
-// Skirmish setup screen builder: for each player it fills two menu-object
-// templates (rec1 = the name/side/colour/resource buttons, rec2 = the colour
-// and allegiance buttons) and registers them with the menu.
 // FUNCTION: 0x479c50
 void BuildSkirmishPlayerRows(void)
 {
@@ -400,7 +378,6 @@ void BuildSkirmishPlayerRows(void)
         rec1.h.attribs |= 0x10000;
         rec1.stages = 0;
         rec1.f138 = 0;
-        // Explicit store, not redundant: the extra use of the zero keeps it in EBX.
         rec1.entry = 0;
         BindGadgetAnimSequence(&rec1, "skirmmet");
         strcpy(rec1.text, Translate("Left click to increase metal. Right click to decrease metal."));
@@ -419,10 +396,6 @@ void BuildSkirmishPlayerRows(void)
 
 int __stdcall SetButtonStageByName(Gui* menu, char* name, int value);
 
-// Skirmish setup screen refresh: fills every player/game-option gadget with the
-// current lobby state (player name, side, allies, metal, energy, colour, the
-// start-location and commander-death rules, mapping and line of sight), then
-// refreshes the menu and stores the map name.
 // FUNCTION: 0x47a0e0
 void RefreshSkirmishSetup()
 {
@@ -583,9 +556,6 @@ void RefreshSkirmishSetup()
     MarkChanged(&g_game->gui);
 }
 
-// Searches the player table from index `start` for the first active player
-// on the same side as `self` (type 5 excluded), stopping at `self` itself.
-// Returns that index, or -1 when the table ends first.
 // FUNCTION: 0x47a700
 int __stdcall FindNextAllySlot(int self, int start)
 {
@@ -602,9 +572,6 @@ int __stdcall FindNextAllySlot(int self, int start)
     return -1;
 }
 
-
-// Marks, for each active player (active 1 or 2), every player slot that shares
-// its team type (or is the player itself), in the entry's `allied` array.
 // FUNCTION: 0x47a760
 void ApplySlotsToGamePlayers()
 {
@@ -629,7 +596,6 @@ void ApplySlotsToGamePlayers()
                 int n = g_game->playerCount;
                 int k;
                 int ii;
-                // Out-of-line found path via gotos: lays the found block after the ret.
                 if (j != n) {
                     for (ii = j; ii < n; ii++) {
                         if (players[ii].team == players[i].team && players[ii].active != 0 && players[ii].team != 5)
@@ -652,7 +618,6 @@ void ApplySlotsToGamePlayers()
     }
 }
 
-// Advances the current player's cyclic counter: counter = (counter + 1) % n.
 // FUNCTION: 0x47a8e0
 void __cdecl CycleCurrentPlayerSide()
 {
@@ -672,10 +637,6 @@ void __stdcall SetControlTextByName(Gui* menu, char* name, char* value);
 void __stdcall ClearSelectedGadget(Gui* menu);
 char* __stdcall SkipTextLines(char* text, int line);
 
-// Gui gadget callback. With no gadget selected it frees the MAPPIC bitmap and
-// the map list object; for MAPNAMES or LOAD it clicks, copies the picked line
-// out of the MAPNAMES list into the current player and refreshes "MapName".
-// PREVMENU just clicks, anything else clears the selection.
 // FUNCTION: 0x47a910
 void __stdcall HandleSkirmishMapClick(Gui* menu)
 {
@@ -714,7 +675,6 @@ void __stdcall HandleSkirmishMapClick(Gui* menu)
 
 void ShowSelectedMapInfo();
 
-// Like 0x444c40, without the MAPPIC update.
 // FUNCTION: 0x47aaa0
 void __stdcall UpdateSkirmishMapSelection(Gui* menu, int unused)
 {
@@ -736,9 +696,6 @@ void __stdcall SetKeyboardInput(Gui* menu, int value);
 void __stdcall RenderLayer(Gui* menu, int value);
 void __stdcall SetCursorMode(int value);
 
-// Opens the skirmish map selector (SELMAP.GUI): counts the skirmish maps,
-// fills the MAPNAMES list with them, selects the one the current player
-// already has, then applies the selection the way the MAPNAMES callback does.
 // FUNCTION: 0x47aaf0
 void OpenSkirmishMapSelector()
 {
@@ -784,14 +741,6 @@ void __stdcall SelectLogosGadget(Gui* obj, void* unused)
     obj->hotGadgetIndex = result;
 }
 
-// Steps the colour of the current player one step round the colour wheel (a
-// non-zero argument walks backwards, the signed modulo can produce -1 which is
-// then wrapped to the last colour) and keeps stepping while another active
-// player still wears that colour, then refreshes the matching "Color<n>"
-// gadget and marks the menu for redraw.
-//
-// The loop's test: an inlined helper keeps its two results in eax, which is
-// what the original's `xor eax,eax` / `mov eax,1` merge shows.
 static inline int color_taken(int me)
 {
     int j;
@@ -829,7 +778,6 @@ void __stdcall CyclePlayerColor(int reverse)
     MarkChanged(&g_game->gui);
 }
 
-// Advances the current player's cyclic counter (0..5), then refreshes.
 // FUNCTION: 0x47ae30
 void __cdecl CycleCurrentPlayerAllyGroup()
 {
@@ -979,9 +927,6 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         return;
     }
 
-
-    // One if/else-if chain falling through to a single ClearSelectedGadget at the end:
-    // no per-arm return.
     if (strcmp(frame.bf, "Player") == 0) {
         PlaySoundByName("Skirmish", 0);
         CycleSlotController(player);
@@ -1024,7 +969,6 @@ void __stdcall HandleSkirmishClick(Gui* menu)
             PlaySoundByName("Skirmish", 0);
             Table* t = (Table *)g_game->options;
             int* p = &t->players[player].energy;
-            // min()/max() from windef.h on the pointee; down clamp is *p + -0x1f4.
             *p = max(*p + -0x1f4, 0xc8);
             sprintf(frame.sB, "Energy%d", player);
             _itoa(((Table *)g_game->options)->players[player].energy, frame.sA, 10);
@@ -1093,7 +1037,6 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         Table* t = (Table *)g_game->options;
         if (t->lineOfSight == 0) {
             t->lineOfSight = 1;
-            // The losType stores precede the strcpy.
             ((Table *)g_game->options)->losType = 1;
             strcpy(e->text, Translate("Terrain elevations affect a unit's view."));
         } else if (t->losType == 1) {
@@ -1110,7 +1053,6 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         SetCursorMode(0x14);
         OpenSkirmishMapSelector();
     } else if (IsCurrentGadgetNamed(menu, "Difficulty")) {
-        // The original's typo, "SKirmish", not "Skirmish".
         PlaySoundByName("SKirmish", 0);
         int d = g_game->difficulty;
         if (d == 0) {
@@ -1250,8 +1192,6 @@ void __stdcall AddMessage(char* text, int key, int value, unsigned char last);
 
 int HarnessViewRand();
 
-// Announces that a player's forces were destroyed: "<Core|Arm> <random
-// message>", using one of three (translated) messages.
 // FUNCTION: 0x47bd70
 void __stdcall AnnounceForcesDestroyed(Player* player)
 {

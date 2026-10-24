@@ -1,30 +1,3 @@
-// Decompiled by Opus, GPT-6, Claude Opus 5.5, Sonnet, Haiku, GPT-6 Astra, deepseek-v4.1-flash, GPT-6.1-sol, mimo-v2.6-pro, space-bunny-free, deepseek-v4.1, Sonnet 5.5 and DeepSeek V4.1 Flash. Names are provisional.
-// The AI player translation unit, parts 1 and 2 joined in address order: the
-// plan, weight and limit console commands, the SquadManager and its SquadTimer
-// family, the reaction and weapon retarget helpers, the type-table weapon
-// scores, the player AI object's tables, placement helpers and the player dump.
-//
-// Kept in files of their own, each matching only in its old file's compilation
-// context:
-//   0x40c530 to 0x40d5b0  ai_player_40c530.cpp (the out-of-line std::vector
-//     members: their register allocation follows the emissions in that file,
-//     and four of them fall out of their windows next to the functions above)
-//   0x407d40, 0x407e70, 0x407e90  ai_player_407d40.cpp, ai_player_407e70.cpp
-//     (the constructor's vtable stores need the plain and the derived view of
-//     SpatialTimer apart)
-//   0x408090  ai_player_408090.cpp (the joined file folds the cell index's
-//     width load into the imul, so the function is two bytes short)
-//   0x408100  ai_player_408100.cpp (its symbol count comes from ta_types.h)
-//   0x408620  ai_player_408620.cpp (in the joined file the definition's table
-//     access takes the opposite SIB base)
-//   0x408f30  ai_player_408f30.cpp (the vector::insert built with /Gi)
-//   0x409730  ai_player_409730.cpp (ComputeBaseWeights needs that file's
-//     cut-down <vector> and its small symbol count)
-//   0x40aa40  player_ai.cpp
-//   0x40b1c0  ai_player_40b1c0.cpp (in the joined file the compiler encodes its
-//     table access as [pointer + id] instead of the original's [id + pointer])
-//   0x40b530  ai_player_40b530.cpp (its std::_Construct hook, declared before
-//     <vector>, changes every vector<Unit*> copy in the file)
 #include <stdio.h>
 #include "../state/block.h"
 #include "../../interfaces/ref.h"
@@ -39,14 +12,11 @@
 
 #pragma pack(push, 1)
 
-// The AI commands' argument list. 0x406c90 reads count and the Get* helpers;
-// 0x409f80 and 0x40a040 call InitArgs through the same object.
 class CommandArgs {
 public:
     char unknown_0[0xd0];
-    // The union stays for the match: its type ids set GetBuildRating (0x40bb00)'s registers.
     union {
-        int count;                     // +0xd0
+        int count;
     };
     char* GetArg(int index, char* fallback);
     float GetFloatArg(int index, float default_val);
@@ -96,8 +66,6 @@ static inline Vec3 PosMinus(const Vec3& a, const Vec3& b)
     return r;
 }
 
-// The 3-argument constructor, as a helper: the joined file's symbol count
-// needs Vec3 to have no user constructors (0x40bfe0's MoveTowards inlining).
 static inline Vec3 MakeVec3(int x, int y, int z)
 {
     Vec3 v;
@@ -109,14 +77,13 @@ static inline Vec3 MakeVec3(int x, int y, int z)
 
 struct Sub_00409520 {
     char unknown_0[0xd4];
-    unsigned short damage;             // +0xd4
+    unsigned short damage;
     char unknown_d6[6];
-    int range;                         // +0xdc
+    int range;
     char unknown_e0[0x2a];
-    char index;                        // +0x10a
+    char index;
 };
 
-// A 32-bit word of bits, tested by unit type id.
 struct Bits {
     unsigned* words;
     int Test(unsigned short index) const { return (words[index>>5]&(1u<<(index&31)))!=0; }
@@ -124,7 +91,6 @@ struct Bits {
 
 #include "../units/unit_def.h"
 
-// Bit field views of the flag words at +0x241 and +0x245, cast at the use.
 struct Flags241 {
     unsigned int unknown_241 : 5;
     unsigned int downloadable : 1;
@@ -149,7 +115,6 @@ class SquadTimer;
 
 #include "../units/unit.h"
 
-// Unused here: these forward declarations take the symbol ids that keep 0x406f80, 0x408670, 0x4086d0 and 0x4089a0 matching (docs/c2-regalloc.md).
 struct Sound;
 struct HapiBank;
 struct TdfFile;
@@ -162,12 +127,12 @@ struct Pathfinder;
 #include "../network/player.h"
 inline int Unit::Ready() { return (flags & 0x10000000) && !(flags & 0x4000); }
 
-struct Economy {                       // a unit's resources
+struct Economy {
     char unknown_0[0x8c];
-    float energy;                      // +0x8c
-    float energyIncome;                // +0x90
-    float energyUsage;                 // +0x94
-    float cost;                        // +0x98
+    float energy;
+    float energyIncome;
+    float energyUsage;
+    float cost;
 };
 
 #include "group.h"
@@ -178,9 +143,9 @@ void __stdcall OrderSquad(Player*, int, unsigned char, int, Unit*, Vec3*, int, i
 
 struct Target_00406f50 {
     char unknown_0[0xbb];
-    unsigned short bit0_4 : 5;         // +0xbb
-    unsigned short flag5 : 1;          // 0x20
-    unsigned short flag6 : 1;          // 0x40
+    unsigned short bit0_4 : 5;
+    unsigned short flag5 : 1;
+    unsigned short flag6 : 1;
     unsigned short bit7_15 : 9;
 };
 
@@ -188,12 +153,6 @@ struct Target_00406f50 {
 
 #include "squad_timer.h"
 
-// The AI controller (SquadManager) and the assault slot (AssaultTimer) methods
-// that had class views of their own are declared on those classes now, and the
-// placement-grid fields of the old player-AI view sit on PlayerAI.
-//
-// Unused here: the symbol ids these declarations take keep the allocation
-// (docs/c2-regalloc.md); they stand where the removed class views stood.
 int IsLocalPlayerOutOfUnits();
 int AreAllPlayersReady(void);
 int CountActiveAIPlayers(void);
@@ -215,8 +174,6 @@ int GetDebugFillPattern(void);
 char IsBackAlign();
 char IsMemSet();
 
-// Unused here: the symbol ids these declarations take keep GetBuildRating (0x40bb00)
-// matching now that the weapon slot view is one type (docs/c2-regalloc.md).
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
 void RegisterVtolOrders(void);
@@ -225,8 +182,6 @@ void ResetNetStats(void);
 void InitCommands(void);
 int UpdatePlacementGhostValidity(void);
 
-// Unused here: these take the symbol ids of the removed argument-list view, which
-// keep GetBuildRating (0x40bb00) matching (docs/c2-regalloc.md).
 void ResetCameraState(void);
 void FindLocalCommander(void);
 void ClampCameraPosition(void);
@@ -238,17 +193,15 @@ void BeginMouseScroll(void);
 
 struct Feature {
     char unknown_0[0xf0];
-    float value;                       // +0xf0
+    float value;
     char unknown_f4[0xfe - 0xf4];
-    unsigned short flags;              // +0xfe
+    unsigned short flags;
 };
 
 #include "../map/cell.h"
 
 #include "../map/mission.h"
 
-// The players array and its info-array view at +0x1b8e. The union is the
-// compiler's anonymous one, so both names stay reachable.
 #include "../game/game.h"
 
 #include "player_ai.h"
@@ -276,13 +229,12 @@ struct Vec3_0040beb0 {
 
     int Length() const
     {
-        // One double local per component: `(double)x * x` reorders the sum.
         double fx = x;
         double fy = y;
         double fz = z;
         return (int)sqrt(fx * fx + fy * fy + fz * fz);
     }
-    void Scale(int s)                  // s is 16.16 fixed point
+    void Scale(int s)
     {
         x = (int)(((__int64)x * s) >> 16);
         y = (int)(((__int64)y * s) >> 16);
@@ -339,9 +291,6 @@ int __stdcall IsCountBelowAiLimit(int, unsigned short, int);
 int __stdcall GetBuildRating(unsigned int player, unsigned short id);
 void __stdcall GetBasePosition(int index, Struct_0040ba80* out);
 
-// The original keeps the four 0.0f comparisons at 0x4fc968, apart from the
-// file's other 0.0f literal (0x4fc9b8): one constant per site keeps the
-// placed addresses right.
 static const float Zero_004fc968 = 0.0f;
 
 static inline int Contains(unsigned int* bits, unsigned short index)
@@ -349,7 +298,6 @@ static inline int Contains(unsigned int* bits, unsigned short index)
     return bits[index >> 5] & (1 << (index & 31));
 }
 
-// Inlined copy of DirectionFromAngle.
 static inline Vec3 Direction(short angle, int scale)
 {
     Vec3 v;
@@ -374,7 +322,6 @@ static inline int DistSq(const Point16& a, const Point16& b)
     return dx * dx + dy * dy;
 }
 
-// std::pop_heap(f, l) as the inline template expands it.
 static inline void PopHeap(Elem_0040cc40* f, Elem_0040cc40* l)
 {
     PopHeapFirst(f, l - 1, l - 1, Elem_0040cc40(*(l - 1)), (int*)0);
@@ -418,8 +365,6 @@ void __stdcall CmdPlan(CommandArgs* args)
     }
 }
 
-// The original calls it out of line from 0x409f80 and 0x40a040; the joined
-// file would inline the store into them.
 #pragma auto_inline(off)
 // FUNCTION: 0x406da0
 void EnableAICommands()
@@ -428,9 +373,6 @@ void EnableAICommands()
 }
 #pragma auto_inline(on)
 
-// Chat command handler (compare 0x406e40): parses a set from argument 1 and
-// a float from argument 2, then calls ScaleUnitWeights for every player whose
-// field_74 is set.
 // FUNCTION: 0x406db0
 void __stdcall CmdWeight(CommandArgs* args)
 {
@@ -440,8 +382,6 @@ void __stdcall CmdWeight(CommandArgs* args)
         memset(&set, 0, sizeof(set));
         g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, DAT_005119b8), &count);
         float value = args->GetFloatArg(2, 0);
-        // A narrow index, as in 0x406e40: MSVC then counts the loop down in a
-        // separate register.
         for (char i = 0; i < 10; i++) {
             if (g_game->players[i].ai != 0) {
                 ScaleUnitWeights(i, &set, value, count);
@@ -459,8 +399,6 @@ void __stdcall CmdLimit(CommandArgs* args)
         memset(&set, 0, sizeof(set));
         g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, DAT_005119b8), &count);
         int value = args->GetIntArg(2, 0);
-        // A narrow index: MSVC then counts the loop down in a separate
-        // register instead of testing the player offset.
         for (char i = 0; i < 10; i++) {
             if (g_game->players[i].active != 0 && g_game->players[i].type == 2) {
                 SetUnitLimits(i, &set, value, count);
@@ -475,7 +413,6 @@ int __stdcall IsCountBelowAiLimit(unsigned char player, unsigned short id, int v
     return IsUnderLimit(player, id, value);
 }
 
-// Registers the "plan", "weight" and "limit" console commands.
 // FUNCTION: 0x406f00
 void RegisterAICommands()
 {
@@ -541,7 +478,6 @@ Unit* SquadManager::FindNearestEnemyUnit(int x,int y,int z)
     Unit* result=0;
     for(unsigned char i=0;i<10;++i) {
         Player* p=&g_game->players[i];
-        // The original retains the player-index range check inside the loop.
         if(i>=10) continue;
         if(p->active && (p->type==1 || p->type==2 || p->type==3) && p->index!=10 && !player->allied[p->index]) {
             Unit* u=p->unitsBegin;
@@ -559,40 +495,19 @@ Unit* SquadManager::FindNearestEnemyUnit(int x,int y,int z)
     return result;
 }
 
-// Constructor of SquadTimer, the base of a family of small classes with
-// two virtual slots: slot 0 is a method each class overrides, slot 1 the
-// virtual destructor.
-//
-//   class           vtable    constructor  ??_G      slot 0
-//   SquadTimer  0x4fc980  0x407350     0x407390  0x407380 (empty)
-//   AssaultTimer  0x4fc988  0x407930     0x407980  0x4077e0
-//   EscortTimer  0x4fc990  0x4079a0     0x4079d0  0x4079f0
-//   SquadScoutTimer  0x4fc998  0x407a90     0x407ac0  0x407ae0
-//   SpatialTimer  0x4fc9a0  0x407d40     0x407e70  0x407e90
-//   ScoutTimer  0x4fc9a8  0x4085d0     0x408600  0x408100
-//   BuildTimer  0x4fc9b0  0x4087e0     0x408810  0x4086d0
 // FUNCTION: 0x407350
 SquadTimer::SquadTimer(SquadManager* p, Group* q)
     : owner(p), group(q), next(0), player(p->index)
 {
 }
 
-// Slot 0 of SquadTimer (vtable 0x4fc980), empty in the base class; every
-// derived class overrides it (the family is listed at the constructor).
 // FUNCTION: 0x407380
 void SquadTimer::OnTimer()
 {
 }
 
-// The compiler-generated scalar deleting destructor of SquadTimer
-// (vtable 0x4fc980), the base of the family listed at the constructor. Its
-// destructor is empty and inline, so only the vtable store is left.
 // FUNCTION: 0x407390 ??_GSquadTimer@@UAEPAXI@Z
 
-// Asks three of the owner's timers in turn
-// for their average position (0x407410) and returns 1 as soon as one has it.
-// The owner's constructor (0x408cb0) fills an array of ten timer pointers at
-// +0x11, so the three used here are entries 5, 1 and 4.
 // FUNCTION: 0x4073b0
 int SquadTimer::TryGetBaseBuildOrScoutCentroid(Vec3* out)
 {
@@ -603,9 +518,6 @@ int SquadTimer::TryGetBaseBuildOrScoutCentroid(Vec3* out)
     return owner->timers[4]->GetAveragePosition(out) != 0;
 }
 
-// Averages the positions (16.16 fixed point, integer parts at
-// +0x6c/+0x70/+0x74) of the units in the group that `group` points to; returns
-// 0 when the group is empty.
 // FUNCTION: 0x407410
 int SquadTimer::GetAveragePosition(Vec3* out)
 {
@@ -619,7 +531,6 @@ int SquadTimer::GetAveragePosition(Vec3* out)
         y += (*it)->yWhole;
         z += (*it)->zWhole;
     }
-    // Built as a temporary and assigned whole: per-field stores interleave with the divisions.
     *out = MakeVec3(x / n << 16, y / n << 16, z / n << 16);
     return 1;
 }
@@ -643,13 +554,6 @@ int SquadTimer::CountGroupUnitsInRadius(Vec3* pos, int radius)
     return count;
 }
 
-// Method of the SquadTimer family, called by AssaultTimer::OnTimer
-// (0x4077e0) with its kind and limit fields. Balances this object's group
-// against the owner's member of the given kind: takes one unit from it when
-// this group is empty, sends the unit farthest from the group's centre to that
-// kind while its squared distance is at least limit * group size, then takes
-// over every unit of the other group that lies closer than that.
-// SetUnitSquad(unit, id) moves a unit to a group.
 // FUNCTION: 0x407560
 void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
 {
@@ -695,7 +599,6 @@ void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
     for (it = other->group->units.begin(); it != other->group->units.end(); ++it) {
         int dx = (*it)->xWhole - cx;
         int dz = (*it)->zWhole - cz;
-        // Own statement: inside the comparison the size() ternary goes first.
         int d = dx * dx + dz * dz;
         if (d < limit * (int)group->units.size())
             list.push_back(*it);
@@ -704,8 +607,6 @@ void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
         SetUnitSquad(*it, group->id);
 }
 
-// SquadTimer::TryGetBaseBuildOrScoutCentroid, inlined: the position of the first of three of
-// the owner's squads that has one.
 static inline int Rally(Ref<SquadManager>& owner, Vec3* pos)
 {
     if (owner->timers[5]->GetAveragePosition(pos))
@@ -740,23 +641,16 @@ void AssaultTimer::OnTimer()
     }
 }
 
-// Constructor of AssaultTimer (vtable 0x4fc988), derived from SquadTimer
-// (the family is listed at 0x407350). The owner creates two of them, with
-// (3, 20000) and (7, 50000).
 // FUNCTION: 0x407930
 // FUNCTION: 0x407980 ??_GAssaultTimer@@UAEPAXI@Z
 AssaultTimer::AssaultTimer(SquadManager* p, Group* q, int a, int b)
     : SquadTimer(p, q), limit(b), kind(a)
 {
-    // limit and kind stay in the initialiser list, the rest in the body.
     attacking = 0;
     maximum = 6;
     minimum = 3;
 }
 
-// Constructor of EscortTimer (vtable 0x4fc990), derived from SquadTimer
-// (the family is listed at 0x407350). The owner creates two of them, with 2
-// and 6.
 // FUNCTION: 0x4079a0
 // FUNCTION: 0x4079d0 ??_GEscortTimer@@UAEPAXI@Z
 EscortTimer::EscortTimer(SquadManager* p, Group* q, int a)
@@ -764,8 +658,6 @@ EscortTimer::EscortTimer(SquadManager* p, Group* q, int a)
 {
 }
 
-// Slot 0: every 150 ticks, when both this squad and the owner's squad
-// `other` have units, sends this squad to the other's average position.
 // FUNCTION: 0x4079f0
 void EscortTimer::OnTimer()
 {
@@ -781,8 +673,6 @@ void EscortTimer::OnTimer()
     }
 }
 
-// Constructor of SquadScoutTimer (vtable 0x4fc998), derived from SquadTimer
-// (the family is listed at 0x407350) without new fields.
 // FUNCTION: 0x407a90
 // FUNCTION: 0x407ac0 ??_GSquadScoutTimer@@UAEPAXI@Z
 SquadScoutTimer::SquadScoutTimer(SquadManager* p, Group* q)
@@ -808,7 +698,6 @@ static inline Fixed_00407ae0 MakeFixed(int i)
     return f;
 }
 
-// Copies the 12-byte position at +0x35 of g_playerAI[index] into *out.
 void __stdcall GetBasePosition(int index, Vec3* out);
 
 static inline Vec3 GetRallyPoint(int index)
@@ -818,18 +707,13 @@ static inline Vec3 GetRallyPoint(int index)
     return p;
 }
 
-// Slot 0 of SquadScoutTimer (vtable 0x4fc998), derived from SquadTimer
-// (the family is listed at 0x407350).
 // FUNCTION: 0x407ae0
 void SquadScoutTimer::OnTimer()
 {
     Vec3 dest;
-    // Computed first: in one expression with next it folds into a lea.
     int delay = RandomInt(900) + 30;
     next = (unsigned int)g_game->ticks + delay;
     if ((int)group->units.size() < 5) {
-        // Read through an inline returning by value: pos must not be the local
-        // whose address goes to GetBasePosition.
         Vec3 pos = GetRallyPoint(player);
         if ((((Vec3Words*)&pos)->xWhole | ((Vec3Words*)&pos)->zWhole) == 0) {
             GetAveragePosition(&dest);
@@ -841,7 +725,6 @@ void SquadScoutTimer::OnTimer()
             int n = RandomInt(2) + 2;
             int w = g_game->baseX / 8, h = g_game->baseY / 8;
             for (int i = 0; i < n; i++) {
-                // dx and dz stay named: the sum then lands in pos's register.
                 int dx = (RandomInt(w) - w / 2) << 16;
                 dest.x = pos.x + dx;
                 dest.y = pos.y;
@@ -866,9 +749,6 @@ void SquadScoutTimer::OnTimer()
     }
 }
 
-// The constructor. Its vtable reference makes the compiler emit the scalar
-// deleting destructor here too: the destructor is trivial, so only the inlined
-// base destructor's store of 0x4fc980 is left.
 // FUNCTION: 0x4085d0
 // FUNCTION: 0x408600 ??_GScoutTimer@@UAEPAXI@Z
 ScoutTimer::ScoutTimer(SquadManager* p, Group* q)
@@ -890,9 +770,6 @@ void __stdcall UpdateConverter(Unit* unit)
     }
 }
 
-// Slot 0: every 30 ticks, switches each idle converter on when energy is
-// plentiful and off otherwise, and queues a build order for each idle
-// builder.
 // FUNCTION: 0x4086d0
 void BuildTimer::OnTimer()
 {
@@ -915,8 +792,6 @@ void BuildTimer::OnTimer()
     }
 }
 
-// Constructor of BuildTimer (vtable 0x4fc9b0), derived from SquadTimer
-// (the family is listed at 0x407350) without new fields.
 // FUNCTION: 0x4087e0
 // FUNCTION: 0x408810 ??_GBuildTimer@@UAEPAXI@Z
 BuildTimer::BuildTimer(SquadManager* p, Group* q)
@@ -963,9 +838,6 @@ void __stdcall RetargetWeapon(Unit* unit, unsigned int weapon)
     }
 }
 
-// Walks the player's units round-robin through the cursor at +0x39, a slice of
-// them per call, and for each finished unit that has a weapon without a valid
-// target, retargets that weapon with RetargetWeapon.
 // FUNCTION: 0x4089a0
 void SquadManager::RetargetWeapons(int force)
 {
@@ -978,7 +850,6 @@ void SquadManager::RetargetWeapons(int force)
             cursor = player->unitsBegin;
         if (cursor->unitDefIndex != 0 && cursor->buildLeft == Zero_004fc968 && (cursor->flags & 0x80000000)
             && (cursor->flags & 0x300000) == 0x200000) {
-            // The counter stays a byte, and the flag8 test keeps its (unsigned char) cast.
             for (unsigned char w = 0; w < 3; w++) {
                 if ((cursor->weapons[w].flags & 2) && (cursor->weapons[w].flags & 0x10)
                     && !(unsigned char)cursor->weapons[w].weapon->flags.b.dropped
@@ -1029,11 +900,6 @@ void SquadManager::TickIfActive()
     RetargetWeapons(0);
 }
 
-// Constructor of SquadManager, the owner of the SquadTimer family (listed
-// at 0x407350): one per player, it creates a timer object for nine of its
-// ten slots, each given the player's unit group of the same index.
-// The family constructors stay defined in this file before this one, bodies
-// included: the inlining budget depends on it.
 // FUNCTION: 0x408cb0
 SquadManager::SquadManager(Player* p)
 {
@@ -1066,11 +932,6 @@ void SquadManager::DeleteTimers()
     }
 }
 
-// Constructor of a player's AI state object (g_playerAI[player], built by
-// 0x40b320; 0x40b390 destroys it). Its out-of-line STL callees are
-// std::vector<Unit*>::vector(const allocator&) (0x40c510),
-// std::vector<short>::size() (0x40d000) and
-// std::vector<Elem_0040cfb0>::size() (0x40cc80), among others.
 // FUNCTION: 0x409160
 PlayerAI::PlayerAI(unsigned char p)
     : owner(&g_game->players[p]), index(p),
@@ -1082,7 +943,6 @@ PlayerAI::PlayerAI(unsigned char p)
     int n = g_game->unitDefCount;
     weights.resize(n, 0);
     counts.resize(n, 0);
-    // Fill values stay in block scopes so they share the dead parameter slot.
     {
         Elem_0040cfb0 e;
         e.a = 0;
@@ -1107,8 +967,6 @@ PlayerAI::PlayerAI(unsigned char p)
     InitUnitTables();
 }
 
-// Resets the per-unit-type tables: weights start at 40 for immobile types
-// plus 20 for the flagged ones.
 // FUNCTION: 0x409470
 void PlayerAI::InitUnitTables()
 {
@@ -1128,14 +986,8 @@ void PlayerAI::InitUnitTables()
     }
 }
 
-// The weapon-score helpers of the type table, no callers in the exe: both were
-// inlined into 0x409730's loop.
 #define MIN(a, b) (((a) > (b)) ? (b) : (a))
 
-// Sums a score over the three sub-objects at +0x1ee: each live sub-object
-// contributes its +0xdc value / 100 plus its +0xd4 value / 40 plus 5. The
-// seed is 1, or 0xb when bit 4 of the flags at +0x245 is set. The result is
-// clamped to [-100, 100].
 // FUNCTION: 0x409520
 int __stdcall RateWeapons(UnitDef* p)
 {
@@ -1181,19 +1033,12 @@ int __stdcall RateUnitType(UnitDef* p)
     return MIN(result, 100);
 }
 
-// Picks a build cell near a world position: every candidate in `list` (a
-// vector of cells with a score) within `range` cells goes into a max-heap
-// keyed on minus the squared distance, then the cells are popped nearest
-// first and tried with CanBuildAt. The best-scoring cell (GetBuildSiteMetal)
-// wins; once one is found, candidates more than 160 beyond the first hit's
-// squared distance stop the search.
 // FUNCTION: 0x409dc0
 void __stdcall ScaleUnitWeights(int player, unsigned int* mask, float scale, int lock)
 {
     PlayerAI* p = g_playerAI[player];
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
         if (mask[i >> 5] & (1 << (i & 0x1f))) {
-            // Own local: the address is then encoded as [offset + base].
             int off = i * 4;
             if (*(int*)(off + (int)p->vec_bd.begin()) == 0) {
                 p->vec_ad[i].value = (unsigned char)__min(__max((int)(p->vec_ad[i].value * scale), 0), 100);
@@ -1217,8 +1062,6 @@ void __stdcall SetUnitLimits(int player, unsigned int* mask, int value, int lock
     }
 }
 
-// The original calls it out of line from 0x406ee0; the joined file would
-// inline the body into it.
 #pragma auto_inline(off)
 // FUNCTION: 0x409f20
 int __stdcall IsUnderLimit(int player, unsigned short index, int value)
@@ -1273,8 +1116,6 @@ void __stdcall ReparseAiWeightScriptsIfLimitNotSticky(int player)
     }
 }
 
-// For each active player of type 2, calls InitUnitTables on its entry in
-// g_playerAI, then calls LoadDefaultAIScript.
 // FUNCTION: 0x40a100
 void ResetAIPlayers()
 {
@@ -1286,11 +1127,6 @@ void ResetAIPlayers()
     g_seams.players->LoadDefaultAIScript();
 }
 
-// Initialises the two placement-grid blocks of the object: spacing0/offset0
-// with margin0 (+0xf1) and spacing1/offset1 with margin1 (+0xfd). Each
-// spacing component becomes its margin plus 8 plus a random amount, and each
-// offset component a random offset centred on the spacing
-// (rand(spacing) - spacing/2).
 // FUNCTION: 0x40a150
 void PlayerAI::InitPlacementGrid()
 {
@@ -1322,7 +1158,6 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<Elem_004
             heap.back().key = -d;
         }
     }
-    // Written out, not an inline make_heap helper: the inline count sets the budget.
     if (2 <= heap.end() - heap.begin())
         MakeHeap(heap.begin(), heap.end(), (int*)0, (Elem_0040cc40*)0);
     int limit = -1;
@@ -1351,13 +1186,6 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<Elem_004
     return true;
 }
 
-// Picks a random build cell near a world position: up to 30 tries of a
-// random direction and distance (within `range` cells) from `pos`, snapped
-// to the class's placement grid (spacing, offset and a random jitter reduced
-// by a margin; the second grid is used for types whose minwaterdepth is
-// non-negative). A cell is accepted when CanPlaceUnitFootprint allows the type there
-// and the score GetBuildSiteMetal is at most the type's footprint area times
-// twice mapInfo->surfaceMetal.
 // FUNCTION: 0x40a5d0
 bool PlayerAI::FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Point16* out)
 {
@@ -1383,12 +1211,6 @@ bool PlayerAI::FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Poin
     return false;
 }
 
-// Rebuilds the list of candidate cells: clears the vector at +0x4d, then
-// walks every map cell and adds (x, y, feature value) for each cell whose
-// feature (index below 0xfffb) has a non-zero value at +0xf0 and bit 9 of
-// its flags word set. 0x40a260 later sorts these by distance.
-// The feature's flags are the 16-bit word at +0xfe, tested with 0x200, as in
-// 0x422040 (the same test) and 0x423160.
 // FUNCTION: 0x40a7b0
 void PlayerAI::BuildFeatureCells()
 {
@@ -1399,7 +1221,6 @@ void PlayerAI::BuildFeatureCells()
         for (int x = 0; x < w; x++) {
             if (row[x].feature < 0xfffb) {
                 Feature* f = &g_game->features[row[x].feature];
-                // Keep flags a 16-bit word tested with 0x200, not a byte at +0xff.
                 if (f->value != 0.0f && (f->flags & 0x200))
                     cells.push_back(Elem_0040cc40(x, y, f->value));
             }
@@ -1407,7 +1228,6 @@ void PlayerAI::BuildFeatureCells()
     }
 }
 
-// Every 30 ticks refreshes the unit lists, and now and then the base weights.
 // FUNCTION: 0x40ad20
 void PlayerAI::UpdateEveryThirtyTicks()
 {
@@ -1425,10 +1245,6 @@ void __stdcall ProbeUnitDefEnergyRate(int unused1, int unused2, int param_3)
     g_seams.economy->GetEnergyUse((UnitDef*)param_3);
 }
 
-// Both loops push_back into the output vector: the first calls insert
-// (0x408f30) out of line, the second inlines it and calls _Ucopy (0x406c10),
-// _Ufill (0x406c40) and size (0x40c560), all members of std::vector<Unit*>
-// (#135).
 // FUNCTION: 0x40ad80
 void __stdcall GetVisibleEnemiesInRadius(int player,const Vec* pos,int radius,int flags,std::vector<Unit*>* out)
 {
@@ -1475,13 +1291,6 @@ bool __stdcall HasReadyUnitInRange(int player, Vec3_40b0d0* p, int range)
     return false;
 }
 
-// Sums the player's signed byte table (the vector at +0x8d) over the units
-// within `range` of `pos`; the distance is the 64-bit high product (>> 32).
-// 0x40b1c0 (in ai_player_40b1c0.cpp): in this file the compiler encodes the
-// table access as [pointer + id] instead of the original's [id + pointer].
-
-// Runs the periodic update of player `player`'s object (the body of
-// 0x40ad20, inlined): at most once every 30 ticks.
 // FUNCTION: 0x40b2c0
 void __stdcall UpdatePlayerAI(int player)
 {
@@ -1515,9 +1324,6 @@ void __stdcall DestroyPlayerAI(int player)
     delete g_playerAI[player].get();
     g_playerAI[player]=0;
 }
-
-// 0x40b530 (in ai_player_40b530.cpp): its std::_Construct hook, declared
-// before <vector>, changes every vector<Unit*> copy in the file.
 
 // FUNCTION: 0x40b7b0
 Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
@@ -1569,20 +1375,17 @@ void __stdcall GetMirroredBasePosition(int index, int unused, Struct_0040bab0* o
              ((Struct_0040bab0*)((char*)g_playerAI[index].get() + 0x35))->c;
 }
 
-// Both <minmax.h> and <math.h> are needed: together they set the SIB slot of
-// the flags test and the register use.
 // FUNCTION: 0x40bb00
 int __stdcall GetBuildRating(int player,unsigned short type)
 {
-    // The pointers into the vectors' storage, as the original file spells them.
 #pragma pack(push, 1)
     struct Owner_40bb00 {
-        char pad[0x69];                // +0x00
-        Elem_0040cfb0* ratings;        // +0x69
+        char pad[0x69];
+        Elem_0040cfb0* ratings;
         char pad6d[0x81-0x6d];
-        short* counts;                 // +0x81
+        short* counts;
         char pad85[0xb1-0x85];
-        unsigned char* weights;        // +0xb1
+        unsigned char* weights;
     };
 #pragma pack(pop)
     Owner_40bb00* owner=(Owner_40bb00*)g_playerAI[player].get();
@@ -1629,14 +1432,10 @@ unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit* unit)
     return chosen;
 }
 
-// Moves `from` towards `to` by at most maxLen: returns `to` when it is within
-// maxLen, else `from` plus the difference scaled (16.16 fixed point) to length
-// maxLen. Returns the vector by value (hidden return buffer).
 // FUNCTION: 0x40beb0
 Vec3_0040beb0 __stdcall MoveToward(const Vec3_0040beb0* from, const Vec3_0040beb0* to,
                                      int maxLen)
 {
-    // From an inline operator- returning by value: keeps it in memory.
     Vec3_0040beb0 d = *to - *from;
     int len = d.Length();
     if (maxLen >= len)
@@ -1714,7 +1513,6 @@ void __stdcall DumpPlayerAI(int player, _iobuf* file)
         if (ai->values[i].unknown_0<0) FilePrintf(file,"n/a ");
         else FilePrintf(file,"%4d",ai->values[i].unknown_0);
         sprintf(buffer," - %3d : %3d : %3d = %3d - '%s\t\t:%s'\r\n",ai->vec_65[i].a,ai->vec_65[i].b,ai->vec_65[i].c,ai->vec_ad[i].value,type->unitname,type->name);
-        // Original passes the formatted unit text as a format string, so percent signs are interpreted again.
         FilePrintf(file,buffer);
     }
 }
@@ -1725,15 +1523,6 @@ int __stdcall HasSpecialUnit(int param_1)
     return *(int*)((char*)g_playerAI[param_1].get() + 0x79);
 }
 
-// std::vector<Unit*>::vector(const allocator&) from MSVC 5's <vector>, out of
-// line: copies the empty allocator byte and zeroes _First, _Last and _End.
-// It is also the default constructor (the allocator is a default argument,
-// so each caller pushes the address of a temporary allocator). 0x409160
-// calls it for its unit list at +0x25.
-// 0x4152f0 builds a local with it, then calls 0x40c560 (size) and 0x40c530
-// (the destructor) on that same local; 0x410850 also builds a local with it.
-
-// Explicit instantiation of the whole class emits this constructor.
 template class std::vector<Unit*, SimAllocator<Unit*> >;
 
 // FUNCTION: 0x40c510 ??0?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@ABV?$allocator@PAUUnit@@@1@@Z

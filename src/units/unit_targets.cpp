@@ -1,7 +1,3 @@
-// Decompiled by Space Bunny Free, space-bunny-free, Opus, Sonnet, GPT-6.1-sol, DeepSeek V4.1 Flash, deepseek-v4.1-flash, deepseek-v4.1 and muse-spark-1.3-free. Names are provisional.
-// The unit target and link code: the PropList debug string, the unit's
-// weapon target entries (set, clear, query), the links in a unit's owner list
-// (head at +0xa2), and the damage and paralyze events.
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
@@ -16,7 +12,6 @@
 
 class UnitRef;
 
-// One virtual slot, called on the object a link belongs to.
 class Listener_004896f0 {
 public:
     virtual void Notify(int code);
@@ -24,44 +19,40 @@ public:
 
 #pragma pack(push, 1)
 struct Point_004898b0 {
-    short a;                           // +0x0
-    short b;                           // +0x2
+    short a;
+    short b;
 };
 
-// What an entry's pointer at +0xc leads to.
 struct Target_0048a1e0 {
     char unknown_0[0x68];
-    int radius;                        // +0x68
+    int radius;
     char unknown_6c[0x111 - 0x6c];
-    unsigned int field_111;            // +0x111
+    unsigned int field_111;
 };
 
-
-
-// The unit's type.
 struct UnitType {
     char unknown_0[0x152];
-    int count;                         // +0x152, entries of ids
+    int count;
     Ref<short> ids;
     char unknown_15a[0x186 - 0x15a];
-    float energyCost;                  // +0x186
-    float metalCost;                   // +0x18a
+    float energyCost;
+    float metalCost;
     char unknown_18e[0x192 - 0x18e];
-    int sight;                         // +0x192
+    int sight;
     char unknown_196[0x19e - 0x196];
-    int field_19e;                     // +0x19e
+    int field_19e;
     char unknown_1a2[0x1aa - 0x1a2];
-    int f1aa;                          // +0x1aa, damage scale as 16.16 fixed point
+    int f1aa;
     char unknown_1ae[0x1ba - 0x1ae];
-    unsigned short field_1ba;          // +0x1ba
+    unsigned short field_1ba;
     char unknown_1bc[0x1ea - 0x1bc];
-    int field_1ea;                     // +0x1ea
+    int field_1ea;
     char unknown_1ee[0x1fa - 0x1ee];
-    unsigned int maxhp;                // +0x1fa
+    unsigned int maxhp;
     char unknown_1fe[0x22f - 0x1fe];
-    unsigned char mobile;              // +0x22f, zero means it has no speeds
+    unsigned char mobile;
     char unknown_230[0x241 - 0x230];
-    unsigned int f241;                 // +0x241, bits 12 and 26
+    unsigned int f241;
 };
 
 struct Vec3_0048a1e0 {
@@ -70,14 +61,13 @@ struct Vec3_0048a1e0 {
     int z;
 };
 
-// The object at the start of a unit.
 struct Body_0048a1e0 {
     char unknown_0[8];
-    Vec3_0048a1e0 offset;              // +0x8
+    Vec3_0048a1e0 offset;
     char unknown_14[0x20 - 0x14];
-    int sight;                         // +0x20
+    int sight;
     char unknown_24[0x2a - 0x24];
-    int age;                           // +0x2a
+    int age;
 };
 
 #include "../network/player.h"
@@ -95,7 +85,6 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 char* __stdcall Translate(const char* text);
 int GetTickRate();
 
-// A helper, not inline or a float local: the product is spilled before GetTickRate.
 static inline float spd(int v)
 {
     return v * 1.52587890625e-05f;
@@ -108,7 +97,6 @@ char* __stdcall MakePropList(UnitType* obj)
     memset(buf, 0, 0xc0);
     char* p = buf;
 
-    // Every append advances with `p += strlen(p) + 1`, not by wsprintfA's result.
     sprintf(p, "\n");
     p += strlen(p) + 1;
 
@@ -149,7 +137,6 @@ char* __stdcall MakePropList(UnitType* obj)
     return buf;
 }
 
-// Returns 1 when the unit's type lists `id` in its table of shorts.
 // FUNCTION: 0x4894f0
 int __stdcall UnitCanBuild(Unit* unit, short id)
 {
@@ -175,8 +162,6 @@ void UnitRef::LinkToUnit(Unit* o)
     next = 0;
 }
 
-// Unlinks the link from its owner's list (head at +0xa2); the counterpart of
-// 0x489540, which links it in.
 // FUNCTION: 0x489580
 void UnitRef::UnlinkFromUnit()
 {
@@ -192,9 +177,6 @@ void UnitRef::UnlinkFromUnit()
 
 #include "../orders/path_order_attach.h"
 
-// A link that registers itself in its owner's list (head at +0xa2) when the
-// owner is set and its flag at +0xa6 is non-zero. The only vtable slot is
-// the scalar deleting destructor (0x489600), which unlinks it again.
 // FUNCTION: 0x4895c0
 PathOrderAttach::PathOrderAttach(Unit* o, int v)
     : value((void*)v)
@@ -209,16 +191,8 @@ PathOrderAttach::PathOrderAttach(Unit* o, int v)
     next = 0;
 }
 
-// The compiler-generated scalar deleting destructor of PathOrderAttach
-// (vtable 0x4fd754, constructor 0x4895c0). The destructor (out of line at
-// 0x489650) is inlined here: it unlinks the object from its owner's list
-// (head at +0xa2) and clears the link.
 // FUNCTION: 0x489600 ??_GPathOrderAttach@@UAEPAXI@Z
 
-// The out-of-line destructor of PathOrderAttach (vtable 0x4fd754): unlinks
-// the object from its owner's list (head at +0xa2) and clears the link.
-// Callers already call it as UnitRef::Unlink, so it is written as that
-// method, which runs the real destructor non-virtually.
 // FUNCTION: 0x489650
 void UnitRef::Unlink()
 {
@@ -237,9 +211,6 @@ inline PathOrderAttach::~PathOrderAttach()
     }
 }
 
-// Moves the link to a new owner: unlinks it from the current owner's list
-// (as the destructor 0x489650 does), then links it into `o`'s list (as the
-// constructor 0x4895c0 does) when `o` is set and its flag is non-zero.
 // FUNCTION: 0x489690
 void PathOrderAttach::SetUnit(Unit* o)
 {
@@ -277,9 +248,6 @@ void UnitRef::ClearRef(void)
     }
 }
 
-// Detaches every node from an owner's list (head at +0xa2): for each node
-// calls listener slot 0 with 8, then unlinks it from the list when its owner
-// did not change during the notification.
 // FUNCTION: 0x489740
 void __stdcall ClearUnitRefs(Unit* obj)
 {
@@ -298,7 +266,6 @@ void __stdcall ClearUnitRefs(Unit* obj)
     }
 }
 
-// Walks a linked list at +0xa2 and calls slot 0 of each node's object.
 // FUNCTION: 0x4897b0
 void __stdcall NotifyUnitRefs(Unit* obj, int event)
 {
@@ -308,9 +275,6 @@ void __stdcall NotifyUnitRefs(Unit* obj, int event)
     }
 }
 
-// Tests bit 1 of three flag bytes 0x1c apart. A single exit through an
-// unsigned char local keeps the final AND byte-sized (`mov dl, 2` hoisted,
-// `and al, dl`); separate returns widen it to `mov edx, 2` / `and eax, edx`.
 // FUNCTION: 0x4897e0
 unsigned char Unit::ChooseWeapon()
 {
@@ -325,16 +289,13 @@ unsigned char Unit::ChooseWeapon()
 }
 
 #pragma pack(push, 1)
-// The send side's view of the 9 byte damage packet (type 0xb); the receiver's
-// view, UnitDamagePacket, is below. Both stay: two views of one type cannot
-// share a name in one file without moving a declaration.
 struct UnitDamagePacketOut {
-    unsigned char type;            // +0x0, 11 here, never read by that callee
-    short victimId;                // +0x1, the unit that takes the damage
-    short attackerId;              // +0x3, the unit that deals it, 0 for none
-    short amount;                  // +0x5
-    unsigned char headingByte;     // +0x7, high byte of the 16-bit heading
-    unsigned char damageKind;      // +0x8, the damage type
+    unsigned char type;
+    short victimId;
+    short attackerId;
+    short amount;
+    unsigned char headingByte;
+    unsigned char damageKind;
 };
 #pragma pack(pop)
 
@@ -342,15 +303,6 @@ void __stdcall ApplyUnitDamage(UnitDamagePacketOut* dmg);
 void __stdcall BroadcastPacket(int who, UnitDamagePacketOut* dmg, int size);
 int __cdecl GetLocalDpid(void);
 
-// Works out how much damage one unit does to another and hands the result to
-// ApplyUnitDamage as a 9 byte record. Damage type 10 skips the whole calculation
-// and passes the amount through; any other type scales the amount by the
-// target's 16.16 damage scale and then takes off armour, four percent per
-// point of (armour / 5), capped at five points.
-// Afterwards the damage is spread to every unit of the target's kind, but only
-// when the target's kind is flagged (active set, type 3) and the type is not 11.
-// Every caller found fills the low byte, so the record's
-// byte +7 is zero on all of them; see the note in the bug list.
 // FUNCTION: 0x489bb0
 void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra)
 {
@@ -370,12 +322,10 @@ void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsi
     d.victimId = !target ? 0 : target->id;
     d.attackerId = !source ? 0 : source->id;
     d.amount = dmg;
-    // extra is a 16-bit value of which only the high byte reaches the record.
     d.headingByte = (unsigned char)(extra >> 8);
     d.damageKind = type;
     ApplyUnitDamage(&d);
     if (target->player->active != 0 && target->player->type == 3 && type != 11) {
-        // The call is written in both arms: a ternary argument merges the tails.
         if (source)
             BroadcastPacket(source->player->id, &d, 9);
         else
@@ -389,12 +339,12 @@ void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsi
 
 #pragma pack(push, 1)
 struct UnitDamagePacket {
-    unsigned char type;                // +0x0, 0xb, unused here
-    unsigned short victimId;           // +0x1, the unit that takes the damage
-    unsigned short attackerId;         // +0x3, the unit that deals it, 0 for none
-    unsigned short amount;             // +0x5
-    unsigned char headingByte;         // +0x7, high byte of the hit direction
-    unsigned char damageKind;          // +0x8
+    unsigned char type;
+    unsigned short victimId;
+    unsigned short attackerId;
+    unsigned short amount;
+    unsigned char headingByte;
+    unsigned char damageKind;
 };
 #pragma pack(pop)
 
@@ -408,17 +358,6 @@ void __stdcall AddCdActivitySample(int flag);
 int __cdecl ScaledCos(unsigned short idx, int scale);
 int __cdecl ScaledSin(short idx, int scale);
 
-// Applies one damage/heal packet (type 0xb, 9 bytes: the type byte, the victim
-// unit id at +1, the attacker unit id at +3, an amount at +5, the heading byte
-// at +7 and the damage kind at +8) to the victim. Here `unit` is the victim and
-// `target` the attacker, which the victim records as its last attacker.
-// DamageUnit builds the packet, the network handler passes received ones in.
-//
-// The heal branch repeats the sum inside the clamp ternary. With a separate
-// `int v = ...` local MSVC puts the second addend in the accumulator (health in
-// edx, amount in eax); giving the ternary its own copy of `unit->health +
-// ev->amount` makes the original put health in eax and the amount in edx.
-//
 // FUNCTION: 0x489ce0
 void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
 {
@@ -495,12 +434,6 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
     }
 }
 
-// Queues a "paralyze" effect on a unit that is finished being built, not
-// flagged as an old (0x4000) unit, and whose owner is an active human or
-// computer player (types 1 and 2) whose unit definition does not refuse
-// effects (0x4000000 at +0x241). A paralyze effect already on the unit
-// (the pointer at +0x5c) has its remaining time (ticks) extended instead
-// of a second effect being queued.
 // FUNCTION: 0x489fa0
 void __stdcall ParalyzeUnit(Unit* unit, int ticks)
 {
@@ -533,9 +466,6 @@ void __stdcall SetWeaponTargetUnit(char* param_1, char* param_2, int param_3)
     *(unsigned short*)(param_1 + 0xba) &= 0x83ff;
 }
 
-// Sibling of 0x48a060: stores the high words of a fixed-point position's x
-// and z into entry param_3 (0x1c bytes each), keeping z away from 0x8000,
-// then clears bits 10-14 of the flags at +0xba.
 // FUNCTION: 0x48a0a0
 void __stdcall SetWeaponTargetPos(char* param_1, int* param_2, int param_3)
 {
@@ -548,9 +478,6 @@ void __stdcall SetWeaponTargetPos(char* param_1, int* param_2, int param_3)
     *(unsigned short*)(param_1 + 0xba) &= 0x83ff;
 }
 
-// Clears target entry `index` (the same reset as ResetWeaponTarget) unless it is
-// already clear, then tells the unit's script "StartBuilding" and
-// "TargetCleared".
 // FUNCTION: 0x48a0f0
 void __stdcall ClearWeaponTarget(Unit* unit, int index)
 {
@@ -571,8 +498,6 @@ void __stdcall ResetWeaponTarget(Unit* obj, int index)
     p->b = (short)0x8000;
 }
 
-// Returns the unit a target entry (see 0x48a160) points at, or 0 when the
-// entry is not a unit target.
 // FUNCTION: 0x48a190
 Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
 {
@@ -586,12 +511,6 @@ Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
     return &g_game->units[p->a];
 }
 
-
-// The intact tail block: writing the three adds in their natural x,y,z order
-// makes MSVC sink the first product to its use, and z,y,x order orders the
-// adds z,y,x. Passing the three products through a static helper that
-// returns the vector by value makes all three writes land in memory before the
-// adds are read, and the original's x,y,z schedule falls out.
 static Vec3_0048a1e0 offset_0048a1e0(Body_0048a1e0* m, __int64 s)
 {
     Vec3_0048a1e0 d;
@@ -657,23 +576,23 @@ int __stdcall IsTargetingUnit(Unit* list, Unit* obj)
 
 #pragma pack(push, 1)
 struct MapVertex_0048a490 {
-    int x;                              // +0x0
-    int y;                              // +0x4
-    int z;                              // +0x8
+    int x;
+    int y;
+    int z;
 };
 
 struct MapRow_0048a490 {
     char unknown_0[0xc];
-    unsigned short* ids;                // +0xc
+    unsigned short* ids;
     char unknown_10[0x20 - 0x10];
 };
 
 struct MapInfo_0048a490 {
     char unknown_0[0xc];
-    int count;                          // +0xc
+    int count;
     char unknown_10[0x24 - 0x10];
-    MapVertex_0048a490* verts;           // +0x24
-    MapRow_0048a490* rows;               // +0x28
+    MapVertex_0048a490* verts;
+    MapRow_0048a490* rows;
 };
 
 struct Pos2_0048a490 {
@@ -682,9 +601,9 @@ struct Pos2_0048a490 {
 };
 
 struct Hs_0048a490 {
-    int wx;                             // +0x0
-    int h;                              // +0x4
-    int spare;                          // +0x8
+    int wx;
+    int h;
+    int spare;
 };
 #pragma pack(pop)
 
@@ -692,12 +611,6 @@ unsigned int GetTicks();
 int __cdecl AngleOfVector(int x, int y);
 void __cdecl RotatePoint2D(unsigned short deg, Pos2_0048a490* p);
 
-// Samples the ground under a unit at its four surrounding terrain vertices and
-// stores the resulting pitch (0x68) and roll (0x70) on the unit, plus a heading
-// (0x64) from the two side vertices. The 0x11/0x04 bytes of a heightmap tile are
-// the two half heights of its edge pair, and the corner heights are bilinearly
-// interpolated with a plain / 16. The sea-level block then adds a jitter that
-// fades out over 60 frames.
 // FUNCTION: 0x48a490
 void __stdcall AlignUnitToGround(Unit* u)
 {
@@ -706,23 +619,19 @@ void __stdcall AlignUnitToGround(Unit* u)
     if (m->count < 0)
         return;
     {
-        // gw and c0 are declared apart from t, pts, hs and k.
         int gw, c0;
         Pos2_0048a490 t;
         Pos2_0048a490 pts[4];
         Hs_0048a490 hs[4];
         int k;
-        // A for loop: a do/while is rotated the other way.
         for (k = 0; k < 4; k++) {
             MapVertex_0048a490* v = m->verts + row->ids[k];
             int vx = v->x;
-            // Chained: keeps the store order and the corner-array register.
             pts[k].x = t.x = vx;
             int vz = v->z;
             t.z = vz;
             pts[k].z = vz;
             RotatePoint2D(u->angles.heading, &t);
-            // wx before hz, fx before fz, and gz declared before fz.
             int wx = (short)((t.x + u->pos.x) >> 16);
             int hz = (short)((u->pos.z - t.z) >> 16);
             int fx = wx & 0xf;
@@ -736,7 +645,6 @@ void __stdcall AlignUnitToGround(Unit* u)
                 return;
             unsigned char* tb = (unsigned char *)g_game->cells.get() + (gz * gw + gx) * 13;
             int b0 = tb[4];
-            // mapWidthTiles read again, not gw: keeps the allocation.
             unsigned char* tb1 = tb + g_game->width * 13;
             int b1 = tb1[4];
             c0 = tb[0x11];
@@ -746,25 +654,20 @@ void __stdcall AlignUnitToGround(Unit* u)
             hs[k].wx = wx;
             if ((((UnitType*)u->def.get())->f241 & 0x1000) && (u->flags & 0x10000000)
                 && !(u->flags & 0x4000)) {
-                // Stored through the array, then read back into H.
                 hs[k].h = H0 + ((H1 - H0) * fz) / 16;
                 int H = hs[k].h;
                 int sea = g_game->seaLevel;
                 hs[k].h = max(H, sea);
-                // short p and `* 2048`, not `<< 11`: keeps the 0x1f mask and 16-bit add.
                 unsigned int bobClock = g_quirks.hoverBobWallClock ? GetTicks() : g_game->ticks;
                 short p = (short)(((bobClock & 0x1f) + k * 8) * 2048 + u->hoverBobPhase);
                 int s = ((UnitType*)u->def.get())->sight / 2;
-                // Owner kept in a local across the 64-bit helper calls.
                 Body_0048a1e0* o = (Body_0048a1e0*)u->motion.get();
                 int q = o->sight;
                 if (q >= s)
                     q = s;
-                // The 64-bit part is one expression, not an __int64 local.
                 int w = (int)((((__int64)q << 16) / s));
                 int mm = 2 - (int)((((__int64)w * 2) >> 16));
                 unsigned int n = g_game->ticks - o->age;
-                // Clamp inline as a ternary, not a separate if.
                 mm -= (unsigned int)(mm * (n < 60 ? n : 60)) / 60;
                 hs[k].h = ScaledCos(p, mm) + hs[k].h;
             } else {
@@ -772,7 +675,6 @@ void __stdcall AlignUnitToGround(Unit* u)
             }
             hs[k].spare = hz;
         }
-        // hs[1] read before hs[0]; roll and pitch use (h0+h1)/2, not /2/2.
         int h1 = hs[1].h;
         int h0 = hs[0].h;
         int h2 = hs[2].h;

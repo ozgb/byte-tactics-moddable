@@ -7,7 +7,7 @@ struct FileHandle;
 
 class AccountBank {
 public:
-    AccountList* bank;               // +0x00
+    AccountList* bank;
 
     AccountBank* InitBank();
     void CloseBank();

@@ -1,42 +1,27 @@
-// Decompiled by Opus, space-bunny-free, Sonnet, Haiku, DeepSeek V4.1 Flash, Claude Opus 5.5, Space Bunny Free, GPT-6, deepseek-v4.1-flash, deepseek-v4.1, GPT-6 Astra, GPT-6.1-sol, LongCat 2.5 Preview Free and mimo-v2.6-pro. Names are provisional.
-// Kept its own file: in particles.cpp the ParticleSystem constructor,
-// destructor and operator new are defined in the same file, and /Ob2 then
-// inlines the base constructor into the two smoke constructors and the
-// zeroing loop into the emission entry points, where the original calls
-// them out of line.
 #include "win_types.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <vector>
-#include <ctype.h>     // only for its symbol ids, with the block above
+#include <ctype.h>
 
-// The object pool at g_particlePool (see particles.cpp): AllocSlot takes an
-// object from the free list and FreeSlot returns one to it; the inlined
-// operator new and delete need them.
 #include "object_pool.h"
 #include "nano_particle_vector.h"
 
 extern ObjectPool g_particlePool;
 extern char g_fxEventPoolBlocked;
 
-// Vtable 0x4fd5a8, constructor 0x471cc0, destructor 0x471d00, ??_G 0x471cd0.
 class ParticleSystem {
 public:
-    int deadline;                                       // +0x4
+    int deadline;
 
     ParticleSystem();
-    virtual ~ParticleSystem();                          // slot 0
-    virtual void Update() = 0;                          // slot 1
-    virtual void Render(int) = 0;                       // slot 2
-    virtual int IsFinished() = 0;                       // slot 3
+    virtual ~ParticleSystem();
+    virtual void Update() = 0;
+    virtual void Render(int) = 0;
+    virtual int IsFinished() = 0;
 
-    // Not memset: the dword loop plus byte tail is what operator new at
-    // 0x471d10 shows, and the loop's size is what /Ob2 charges this function's
-    // inline budget for, which is what leaves std::vector::insert (0x4732e0)
-    // out of line here. A memset costs one builtin node and the insert gets
-    // inlined instead.
     static void* __stdcall operator new(size_t size)
     {
         if (g_fxEventPoolBlocked)
@@ -64,12 +49,10 @@ public:
     void SetLifetime(int ticks);
 };
 
-// The owner of the per-index lists (see 0x471d90).
 #include "particle_lists.h"
 
 #include "../util/vec3.h"
 
-// The smoke puff's position views and the record.
 #include "smoke_particle.h"
 
 struct Vec3_00473560 {
@@ -104,34 +87,32 @@ struct Vec3_00474580 {
 };
 
 #pragma pack(push, 1)
-// The integer halves of the 16.16 position.
 struct Pos_00473590 {
-    short x;                       // +0x00 (record +0x06)
+    short x;
     char unknown_2[0x4 - 0x2];
-    short h;                       // +0x04 (record +0x0a)
+    short h;
     char unknown_6[0x8 - 0x6];
-    short y;                       // +0x08 (record +0x0e)
+    short y;
 };
 
-// The integer halves of the 16.16 position.
 struct Pos_004739b0 {
     char unknown_0[0x2];
-    short x;                           // +0x2
+    short x;
     char unknown_4[0x2];
-    short height;                      // +0x6
+    short height;
     char unknown_8[0x2];
-    short y;                           // +0xa
+    short y;
 };
 
 #include "rect.h"
 
-struct Position_00475150 {             // 16.16 fixed point; only high words read
+struct Position_00475150 {
     short xFrac;
-    short x;                           // +0x2
+    short x;
     short yFrac;
-    short y;                           // +0x6, the height
+    short y;
     short zFrac;
-    short z;                           // +0xa
+    short z;
 };
 #pragma pack(pop)
 
@@ -151,92 +132,86 @@ int __stdcall GetGroundHeight(void* pos);
 
 #pragma pack(push, 1)
 struct Pos_004745e0 {
-    short x;                        // +0
+    short x;
     char unknown_2[2];
-    short height;                   // +4
+    short height;
     char unknown_6[2];
-    short y;                        // +8
+    short y;
 };
 #pragma pack(pop)
 
-// One particle of TimedSubParticles, 0x20 bytes.
 struct TimedSubParticle {
-    void* data;                        // +0x00, the animation
+    void* data;
     union {
         Vec3 pos;
         Position_00475150 posw;
     };
-    int limit;                         // +0x10, the rounds it lives
-    int count;                         // +0x14, the rounds so far (the frame)
-    int period;                        // +0x18
-    int timer;                         // +0x1c
+    int limit;
+    int count;
+    int period;
+    int timer;
 
     void Step();
     void DrawParticle(void* dest, short px, short py);
     int IsExpired(int unused);
 };
 
-// Vtable 0x4fd618, constructor 0x474cd0, ??_G 0x474d10; 0x38 bytes.
 class SmokeParticles : public ParticleSystem {
 public:
-    int time;                                           // +0x8, the next emit tick
-    std::vector<SmokeParticle> records;                // +0xc (_First +0x10)
-    int emitPeriod;                                     // +0x1c, the emit period
-    int holdPeriod;                                     // +0x20
-    int maxFrame;                                       // +0x24, the frame count - 1
-    int altAnimation;                                   // +0x28, the other animation
+    int time;
+    std::vector<SmokeParticle> records;
+    int emitPeriod;
+    int holdPeriod;
+    int maxFrame;
+    int altAnimation;
     Vec3 pos;
 
     SmokeParticles();
-    virtual void Update();                              // slot 1, 0x475340
-    virtual void Render(int);                           // slot 2, 0x475470
-    virtual int IsFinished();                           // slot 3, 0x474f80
-    virtual void Emit();                                // slot 4, 0x474df0
-    virtual int IsEmitDue();                            // slot 5, 0x475440
+    virtual void Update();
+    virtual void Render(int);
+    virtual int IsFinished();
+    virtual void Emit();
+    virtual int IsEmitDue();
     virtual void Init(Vec3* pos, int limit, int a, int b, int c,
-                              int alt);                 // slot 6, 0x474d50
+                              int alt);
 };
 
-// Vtable 0x4fd638, constructor 0x4750b0, ??_G 0x475110; 0x34 bytes.
 class TimedSubParticles : public ParticleSystem {
 public:
-    int time;                                           // +0x8, the next emit tick
-    std::vector<TimedSubParticle> records;              // +0xc (_First +0x10)
-    int emitPeriod;                                     // +0x1c, the emit period
-    int holdPeriod;                                     // +0x20
-    int maxFrame;                                       // +0x24, the frame count - 1
+    int time;
+    std::vector<TimedSubParticle> records;
+    int emitPeriod;
+    int holdPeriod;
+    int maxFrame;
     Vec3 pos;
 
     TimedSubParticles();
-    virtual void Update();                              // slot 1, 0x475600
-    virtual void Render(int);                           // slot 2, 0x475700
-    virtual int IsFinished();                           // slot 3, 0x475330
-    virtual void Emit();                                // slot 4, 0x4751c0
-    // In particles_4750f0.cpp: it is defined returning bool, and Update tests
-    // its result as an int.
-    virtual int IsEmitDue();                            // slot 5, 0x4750f0
+    virtual void Update();
+    virtual void Render(int);
+    virtual int IsFinished();
+    virtual void Emit();
+    virtual int IsEmitDue();
     virtual void Init(Vec3* pos, int a, int b, int c);
 };
 
-// One teleport spark (the element of TeleportParticles' vector), 0x34 bytes.
 #pragma pack(push, 1)
 class TeleportParticle {
 public:
-    void* data;                    // +0x00, the animation
+    void* data;
     union {
         struct {
-            Vec3_00473560 pos;     // +0x04
-            Vec3_00473560 pos2;    // +0x10
-            Vec3_00473560 vel;     // +0x1c
+            Vec3_00473560 pos;
+            Vec3_00473560 pos2;
+            Vec3_00473560 vel;
         };
         struct {
             char unknown_4[0x6 - 0x4];
-            Pos_00473590 posw;     // +0x06
+            Pos_00473590 posw;
         };
     };
-    int count;                     // +0x28, the frame count
-    int frame;                     // +0x2c, the frame
-    int endTime;                   // +0x30, the tick it expires
+    int count;
+    int frame;
+    int endTime;
 
     void Step();
     void DrawParticle(void* dest, short px, short py);
@@ -244,7 +219,6 @@ public:
 };
 #pragma pack(pop)
 
-// One nano spark (the element of NanoParticles' vector), 0x30 bytes.
 #pragma pack(push, 1)
 struct NanoParticle {
 public:
@@ -255,8 +229,8 @@ public:
     char unknown_c[0xc];
     Vec3 vel;
     char unknown_24[4];
-    int flags;                         // +0x28, low 4 bits: frame; the colour
-    int endTime;                       // +0x2c, the tick it expires
+    int flags;
+    int endTime;
 
     void Step();
     void DrawParticle(int dest, short x, short y);
@@ -264,27 +238,26 @@ public:
 };
 #pragma pack(pop)
 
-// One exhaust puff (the element of ThrustParticles' vector), 0x3c bytes.
 #pragma pack(push, 1)
 class ThrustParticle {
 public:
-    void* data;                    // +0x00, the animation
+    void* data;
     union {
         struct {
-            Vec3i_00474130 pos;    // +0x04
-            Vec3i_00474130 pos1;   // +0x10
-            Vec3i_00474130 vel;    // +0x1c
+            Vec3i_00474130 pos;
+            Vec3i_00474130 pos1;
+            Vec3i_00474130 vel;
         };
         struct {
             char unknown_4[0x6 - 0x4];
-            Pos_00473590 posw;     // +0x06
+            Pos_00473590 posw;
         };
     };
-    int mod2_28;                   // +0x28, the frame count
-    int frame;                     // +0x2c, the frame
-    int val_30;                    // +0x30
-    int mod_34;                    // +0x34
-    int endTime;                   // +0x38, the tick it expires
+    int mod2_28;
+    int frame;
+    int val_30;
+    int mod_34;
+    int endTime;
 
     void Step();
     void DrawParticle(void* dest, short px, short py);
@@ -292,29 +265,28 @@ public:
 };
 #pragma pack(pop)
 
-// One wake spark (the element of WakeParticles' vector), 0x44 bytes.
 #pragma pack(push, 1)
 class WakeParticle {
 public:
-    int data;                          // +0x00
+    int data;
     union {
         struct {
-            Vec3_00474580 pos;         // +0x04
-            Vec3_00474580 pos2;        // +0x10
-            Vec3_00474580 vel;         // +0x1c
+            Vec3_00474580 pos;
+            Vec3_00474580 pos2;
+            Vec3_00474580 vel;
         };
         struct {
             char unknown_4[0x6 - 0x4];
-            Pos_004745e0 posw;         // +0x06
+            Pos_004745e0 posw;
         };
     };
-    int min;                           // +0x28
-    int max;                           // +0x2c
-    int value;                         // +0x30, the colour
-    int step;                          // +0x34
-    int tick;                          // +0x38
-    int period;                        // +0x3c
-    int endTime;                       // +0x40, the tick it expires
+    int min;
+    int max;
+    int value;
+    int step;
+    int tick;
+    int period;
+    int endTime;
 
     void Step();
     void DrawParticle(void* surface, short px, short py);
@@ -324,28 +296,25 @@ public:
 
 struct Shape_00472ab0;
 
-// Vtable 0x4fd5d8, ??_G 0x4716a0; 0x44 bytes.
 class ThrustParticles : public ParticleSystem {
 public:
-    int time;                                           // +0x8
-    std::vector<ThrustParticle> items;                  // +0xc (_First +0x10)
-    int period;                                         // +0x1c
+    int time;
+    std::vector<ThrustParticle> items;
+    int period;
     Vec3 pos0;
     Vec3 pos1;
     Vec3 pos2;
 
     ThrustParticles() {}
-    virtual void Update();                              // slot 1, 0x473010
-    virtual void Render(int);                           // slot 2, 0x4730f0
-    virtual int IsFinished();                           // slot 3, 0x473130
-    virtual void Emit();                                // slot 4, 0x4743a0
-    virtual int IsEmitDue();                            // slot 5, 0x4730c0
+    virtual void Update();
+    virtual void Render(int);
+    virtual int IsFinished();
+    virtual void Emit();
+    virtual int IsEmitDue();
     virtual void Init(Shape_00472ab0* p, Shape_00472ab0* q, int a, int b);
     void Init(Vec3* p, Vec3* q, int a, int b);
 };
 
-// The pool allocator of the vector members below, to call their out-of-line
-// insert under this name.
 class Class_00476210 {
 public:
     void insert(std::vector<SmokeParticle>::iterator p, unsigned int m,
@@ -357,9 +326,6 @@ public:
     void insert(TimedSubParticle* pos, int count, const TimedSubParticle* src);
 };
 
-// std::vector<Elem_00473500> and its out-of-line members: size() (0x472d30),
-// _Destroy (0x4732d0), _Ucopy (0x473500) and _Ufill (0x473530). 0x471820 and
-// 0x471a50 call them.
 struct Elem_00473500 {
     int unknown_0;
 };
@@ -372,20 +338,14 @@ typedef void (Vec_00473500::*UfillFn_00473500)(
     Vec_00473500::iterator, Vec_00473500::size_type, const Elem_00473500&);
 typedef void (Vec_00473500::*DestroyFn_00473500)(Vec_00473500::iterator, Vec_00473500::iterator);
 
-// _Ucopy, _Ufill and _Destroy are protected: a derived class takes their
-// addresses to emit them out of line.
 struct Access_00473500 : Vec_00473500 {
     static UcopyFn_00473500 ucopy;
     static UfillFn_00473500 ufill;
     static DestroyFn_00473500 destroy;
 };
 
-// Taking the member's address emits the out-of-line copy.
 SizeFn_00473500 g_size_00473500 = &Vec_00473500::size;
 
-// std::vector<NanoParticle> (0x30-byte element type) and its out-of-line
-// members: reserve (0x475770), _Destroy (0x475870), _Ucopy (0x475880) and
-// _Ufill (0x476710).
 typedef std::vector<NanoParticle> Vec_004739b0;
 typedef void (Vec_004739b0::*ReserveFn_004739b0)(Vec_004739b0::size_type);
 typedef Vec_004739b0::iterator (Vec_004739b0::*UcopyFn_004739b0)(
@@ -446,9 +406,6 @@ void __stdcall EmitWhiteSmoke(Vec3* pos, short index)
 // FUNCTION: 0x4728f0
 void __stdcall EmitBlackSmoke(Vec3* p, short index)
 {
-    // The list owner is read through a reference before the allocation, so
-    // g_game and its +0x38d77 field are loaded ahead of the pool call and stay
-    // live across it.
     ParticleLists& l = *(ParticleLists *)g_game->lists_38d77;
     SmokeParticles* e = new SmokeParticles;
     if (e) {

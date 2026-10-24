@@ -1,13 +1,3 @@
-// Decompiled by deepseek-v4.1, finished by Sonnet 5.5. Names are provisional.
-// FreeBlockMap is a std::map<unsigned int, int> of free blocks
-// (keyed by base offset, valued by length) whose allocator hands out its 0x18
-// byte nodes from the pool at 0x4ddd70, plus a running total of reserved bytes
-// at +0x10.
-//
-// The constructor body reserves up to four address-space regions of 256 MB,
-// halving the size (down to 64 KB) whenever VirtualAlloc fails or returns a
-// block that ends above 2 GB, and records each one with the map's insert
-// (0x4db000, taking the 8-byte pair by value).
 #include <map>
 #include "../../interfaces/host.h"
 
@@ -16,8 +6,6 @@ public:
     void* Allocate(unsigned int n);
 };
 
-// The map's allocator: std::allocator whose node allocation (_Charalloc, the
-// hook <xtree>'s _Buynode uses) is the pool at 0x4ddd70.
 class PoolAlloc_004db610 : public std::allocator<int> {
 public:
     char* _Charalloc(size_t n)
@@ -27,8 +15,8 @@ public:
 };
 
 struct Pair_004db610 {
-    unsigned int offset;               // +0x0
-    int length;                        // +0x4
+    unsigned int offset;
+    int length;
 };
 
 typedef std::map<unsigned int, int, std::less<unsigned int>, PoolAlloc_004db610>
@@ -36,8 +24,8 @@ typedef std::map<unsigned int, int, std::less<unsigned int>, PoolAlloc_004db610>
 
 class FreeBlockMap {
 public:
-    Map_004db610 freeMap;              // +0x0
-    int total;                         // +0x10
+    Map_004db610 freeMap;
+    int total;
 
     void AddFreeBlock(Pair_004db610 p);
 

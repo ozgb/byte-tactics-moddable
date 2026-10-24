@@ -1,4 +1,3 @@
-// Decompiled by space-bunny-free. Names are provisional.
 #include <vector>
 
 #pragma pack(push, 1)
@@ -23,10 +22,6 @@ public:
 };
 
 // FUNCTION: 0x46cc10
-// The local reference below is load bearing: writing sentQueue.insert(sentQueue.end(), ...)
-// directly makes the front end keep the end() load rooted at ecx+0x14, which
-// blocks the load CSE with the insert's own [esi + 8] read of _Last and costs
-// the original's single `mov edi, ecx` in the capacity block.
 void PacketSequencer::SendSequenced(Elem_0046faf0* to, Elem_0046faf0* packet)
 {
 	packet->id = ++lastSent;

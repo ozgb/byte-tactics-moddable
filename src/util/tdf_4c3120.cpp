@@ -1,10 +1,3 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// Loads a .TDF document from an in-memory buffer: throws away the tree parsed
-// from the previous load and parses the buffer again. The buffer is copied
-// into a fresh "TDF file" block that is NUL terminated, comments are blanked
-// out in that copy (TdfFile::StripComments), and the text is parsed
-// into a new root section named "root" (TdfRecord::TdfRecord). The class holding the
-// tree is the same one 0x4c2f60 loads files into.
 #include <vector>
 #include "../state/block.h"
 #include <string.h>
@@ -19,7 +12,6 @@ void* __cdecl GameAllocIgnoreTag(char* name, int size);
 #include <new>
 #include "tdf.h"
 
-// Own file: needs its own view of TdfRecord (see the note in TdfFile, tdf.cpp).
 // FUNCTION: 0x4c3120
 void TdfFile::LoadBuffer(char* data, int size, int flag, char* path)
 {

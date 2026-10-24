@@ -1,13 +1,5 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/ref.h"
-// Decompiled by Opus, Haiku, deepseek-v4.1, DeepSeek V4.1 Flash, deepseek-v4.1-flash, space-bunny-free, Space Bunny Free and Claude Opus 5.5. Names are provisional.
-// The build-queue object Order and the code around it: the unit's
-// list of orders at +0x5c, the order-type table at g_missionOrderTableBegin, the
-// StartBuilding and StopBuilding script calls and the objects attached to an
-// order. A build-queue object holds a kind from the order-type table, the unit
-// it belongs to, a link into its owner's list and an attached object at +0x52.
-// Its base (vtable 0x4fd2cc, one slot, the empty 0x43a1e0) has no destructor
-// of its own, so the destructor stores only the derived vtable 0x4fd2c8.
 #include <stdio.h>
 #include <string.h>
 
@@ -26,56 +18,56 @@ struct Owner_0043a1f0 {
     Ref<Slot_0043a1f0> slot;
 };
 
-struct UnitType {                      // 0x249 bytes
+struct UnitType {
     char unknown_0[0x20];
-    char name[0x20];                   // +0x20
+    char name[0x20];
     char unknown_40[0x18a - 0x40];
-    float metalCost;                   // +0x18a
+    float metalCost;
     char unknown_18e[0x1fa - 0x18e];
-    unsigned int maxHealth;            // +0x1fa
-    unsigned short field_1fe;          // +0x1fe
+    unsigned int maxHealth;
+    unsigned short field_1fe;
     char unknown_200[0x241 - 0x200];
     union {
-        unsigned char flags;           // +0x241
-        unsigned int flags32;          // +0x241
+        unsigned char flags;
+        unsigned int flags32;
     };
     char unknown_245[0x249 - 0x245];
 };
 
 #include "../units/unit.h"
 
-struct Entry_0043a1f0 {                // 0x19-byte entries at g_missionOrderTableBegin
+struct Entry_0043a1f0 {
     char unknown_0[4];
-    void (__stdcall* notify)(Unit* unit, Order* obj, int code);            // +0x4
+    void (__stdcall* notify)(Unit* unit, Order* obj, int code);
     char unknown_8[0x11 - 0x8];
     union {
-        unsigned int flags;            // +0x11, default flags of the kind
+        unsigned int flags;
         struct {
             char unknown_11[3];
-            unsigned char flag14;      // +0x14
+            unsigned char flag14;
         };
     };
-    char* name;                        // +0x15
+    char* name;
 };
 
 #include "../game/game.h"
 
-struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and written raw
-    unsigned short unitType;           // +0x00
-    unsigned short ownerType;          // +0x02
-    int field_4;                       // +0x04
-    unsigned char kind;                // +0x08
-    unsigned char flag5;               // +0x09
-    unsigned int flags6;               // +0x0a
-    int last_id;                       // +0x0e
-    Vec3_0043a1f0 pos;                 // +0x12
-    int start;                         // +0x1e
-    int cached;                        // +0x22
-    int field_26;                      // +0x26, the order's unitType (+0x36); +0x00 has the name
-    int radius;                        // +0x2a
-    int progress;                      // +0x2e
-    unsigned int flags;                // +0x32
-    int subFlags;                      // +0x36
+struct SaveDesc_0043a1f0 {
+    unsigned short unitType;
+    unsigned short ownerType;
+    int field_4;
+    unsigned char kind;
+    unsigned char flag5;
+    unsigned int flags6;
+    int last_id;
+    Vec3_0043a1f0 pos;
+    int start;
+    int cached;
+    int field_26;
+    int radius;
+    int progress;
+    unsigned int flags;
+    int subFlags;
 };
 #pragma pack(pop)
 
@@ -88,8 +80,6 @@ struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and writt
 #include "air_maneuver_order.h"
 #include "../state/sim_globals.h"
 
-// Unused here: forward declarations of real functions; their symbol ids keep
-// ComputeReclaimDamagePulse (0x438650) matching (docs/c2-regalloc.md).
 void UpdateMouseScroll();
 void UpdateEdgeScroll();
 void CenterCameraOnRadarClick();
@@ -129,16 +119,11 @@ typedef Entry_0043a1f0* SimView_g_missionOrderTableEnd;
 
 #include "path_order_attach.h"
 
-// An order type held as its index in the sorted order-type table. Callers
-// build it from a name as a by-value temporary (0x403260, 0x4118e0, ...), so
-// this is its constructor.
 #include "mission_type.h"
 
 #pragma pack(push, 1)
 #include "path_fx.h"
 
-// Unused here: real functions declared for their symbol ids, which take the
-// place of the Point view this file used to define (docs/c2-regalloc.md).
 int CloakOnOrder(char*, int, int);
 int GetUnitCount(int, unsigned int);
 
@@ -148,7 +133,6 @@ int GetUnitCount(int, unsigned int);
 
 #include "order.h"
 
-// Links `child` into the owner's list in front of `before`.
 static inline void InsertBefore(Unit* p, Order* child, Order* before)
 {
     Ref<Order>* link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
@@ -163,10 +147,6 @@ static inline void InsertBefore(Unit* p, Order* child, Order* before)
     }
 }
 
-// If the owner has a count at +0x86, drop every object without flag 4 from its
-// list at +0x5c (marking all but the head 0x10000 first, as DeleteOrders does),
-// then build a "BECARRIED" object and insert it at the head of the list its
-// own flag 0x40000 selects.
 // FUNCTION: 0x4384a0
 void __stdcall AddBeCarriedOrder(Unit* p)
 {
@@ -216,8 +196,6 @@ int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n)
 {
     UnitType* bt = ((UnitType *)b->def.get());
     float v = bt->metalCost > 10.0f ? bt->metalCost : 10.0f;
-    // The 64-bit numerator is built by hand (signed 32-bit chain in lo, zero hi):
-    // keeps the multiply order and the unsigned fild qword.
     union {
         __int64 q;
         struct {
@@ -313,8 +291,6 @@ void Order::OrStatusFlags(unsigned int param_1)
     subFlags |= param_1;
 }
 
-// Clears flag 0x2000 of an order and, if it was set, posts message kind 5
-// with the given text for the order's unit.
 // FUNCTION: 0x438880
 void Order::AnnounceStatusIfFlagged(const char* text)
 {
@@ -357,9 +333,6 @@ void Order::SetAttachedFx(OrderFx* obj)
     }
 }
 
-// Creates an ApproachRadius from an order position when the unit's definition
-// does not have flag 0x800 set, detaches the current attachment and attaches
-// the new one. Same class as 0x4388d0; the flag test comes first here.
 // FUNCTION: 0x438930
 void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 {
@@ -442,16 +415,10 @@ void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
     }
 }
 
-// Changes the object's kind: stores the new kind and reloads its flags from
-// the kind table (g_missionOrderTableBegin, 0x19-byte entries, default flags at +0x11),
-// keeping the object's own bits 9 and 10 (0x600; the constructor 0x43a0c0
-// clears them individually). The layout (kind at +0x4, flags at +0x42) is
-// Order's.
 // FUNCTION: 0x438b90
 void Order::MergeFlagsFromTable(int k)
 {
     kind.index = k;
-    // The two table index expressions must differ, or the entry load is shared.
     flags_42 = ((g_missionOrderTableBegin[k & 0xff].flags ^ flags_42) & 0x600) ^ g_missionOrderTableBegin[kind.index].flags;
 }
 
@@ -466,10 +433,6 @@ int __stdcall GetOrderFlags(void* param)
 
 #include "../files/files_api.h"
 
-// Destructor (callers do `if (p) { p->~X(); operator delete(p); }`): notifies
-// the owner through a callback table, stops the unit's build animation (the
-// same code as StopBuildingScript), releases the attached object at +0x52 and
-// unlinks the list node at +0x12 (0x489650 is the link's destructor).
 // FUNCTION: 0x43a1f0
 Order::~Order()
 {
@@ -502,8 +465,6 @@ Order::~Order()
     g_seams.units->UnitRefUnlink((UnitRef*)&link);
 }
 
-// The real resolver at 0x43a360 (matched in its own file), defined here without
-// its annotation as in the original file, which /Ob2 inlines into the constructor.
 short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
 {
     char key[0x80];
@@ -532,7 +493,6 @@ static unsigned char KindByName_0043a420(char* s)
 
 static unsigned char KindByIndex_0043a420(unsigned char want)
 {
-    // Stays a helper with idx declared before k: inline, the scan keeps its counter in ECX.
     int idx = 0;
     int k = 0;
     for (Entry_0043a1f0* p = g_missionOrderTableBegin; p <= g_missionOrderTableEnd; p++, idx++) {
@@ -545,20 +505,6 @@ static unsigned char KindByIndex_0043a420(unsigned char want)
     return (unsigned char)idx;
 }
 
-// The constructor of Order that loads the object from the parsed
-// text file (the other one is 0x43a0c0; 0x43a970 is the matching writer).
-// data/symbols.csv still names this address Order::Order
-// (the name its caller 0x487080 uses), but the vtables it stores are
-// Order's, so it is that class's second constructor.
-//
-// The kind is resolved by two helpers, one per branch, each
-// returning an unsigned char: by name through the sorted kind table
-// (lower_bound), or, for files without a "<name>_name" key, by counting the
-// entries without flag bit 0. The real resolver
-// ResolveUnitTypeKey is defined above.
-// The case-3 attachment constructor is AirManeuverOrder's second constructor,
-// 0x44e7d0, which shares its name with 0x44e740; data/aliases.csv has a row
-// for it.
 // FUNCTION: 0x43a420
 Order::Order(Unit* punit, HapiBank* file, char* name)
     : link(0, 0)
@@ -653,10 +599,6 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     }
 }
 
-// Serialises one build-queue object (Order) into the parsed text file
-// under the key `name`: a raw 0x3a-byte snapshot, a "<name>_name" string value
-// pointing at the kind's name, a "UTYPENAME<id>" value when the object is a
-// build kind, and finally "<name>g" handed to the attached object.
 // FUNCTION: 0x43a970
 int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
 {
@@ -666,16 +608,11 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
         return 0;
 
     SaveDesc_0043a1f0 desc;
-    // A local copy of the pointer and the test written as `== 0` is what the
-    // original wants here: the copy stops if-conversion, and the polarity
-    // gives the `jne` over the zero store instead of the `je` after it.
     Unit* u = unit;
     if (u == 0)
         desc.unitType = 0;
     else
         desc.unitType = u->id;
-    // The owner is tested for null twice on purpose: mixing the copy with a
-    // fresh read of link.owner keeps the compiler from dropping the third test.
     Unit* o = link.owner;
     desc.ownerType = (o != 0 && (link.owner->flags & 0x10000000) != 0 && link.owner != 0) ? o->id : 0;
     desc.field_4 = attached ? ((OrderFx*)attached)->GetType() : 0;

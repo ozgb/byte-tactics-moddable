@@ -1,8 +1,3 @@
-// Decompiled by Opus, Haiku, GPT-5.6-Terra, Sonnet 5.5, deepseek-v4.1-flash, GPT-6.1-sol, deepseek-v4.1, Space Bunny Free, claude-sonnet-5-5, GPT-6, claude-opus-5-5, space-bunny-free, Sonnet, DeepSeek V4.1 Flash, mimo-v2.6-pro, muse-spark-1.3-free, fledge-alpha-free and Claude Opus 5.5. Names are provisional.
-// The display object's DirectDraw surfaces, the screen lock stack, the
-// hand-written blitters, the textured span and polygon renderers, and the
-// reference-counted string handle. The module's two files gathered in address
-// order.
 #include <string.h>
 #include "../../interfaces/host.h"
 #include "win_types.h"
@@ -10,7 +5,6 @@
 #include "surface.h"
 #include "gaf_frame.h"
 
-// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
 void StepAllGafSequences(void);
 void StartScreenFade(void);
 void StepScreenFade(void);
@@ -18,8 +12,6 @@ void ScheduleFadeTick(void);
 void StepPaletteFade(void);
 int IsFadeDone(void);
 
-// The display flags word at +0xf0: set through the bitfield, read whole
-// (FlipScreen) or as its low byte (FillSurface).
 union Flags_004c61b0 {
     unsigned short word;
     unsigned char byte;
@@ -30,8 +22,6 @@ union Flags_004c61b0 {
     } bits;
 };
 
-// The display's screen surfaces at +0x80: the primary at +0x8, the locked
-// surface at +0xc.
 struct Screen {
     char unknown_0[0x8];
     void* primary;
@@ -39,58 +29,53 @@ struct Screen {
     char unknown_10[0x18 - 0x10];
 };
 
-// One entry of the screen lock stack: a surface and the flag saying which
-// unlock to use (10 entries at g_screenLocks).
 #pragma pack(push, 1)
 struct LockEntry {
-    Surface* surface;                  // +0x0
-    char flag;                         // +0x4
+    Surface* surface;
+    char flag;
 };
 #pragma pack(pop)
 
 extern int g_screenLockCount;
 extern LockEntry g_screenLocks[];
 
-// The display object GetDisplay returns. Packed: rect_x sits at +0x196,
-// which the compiler would otherwise pad to a dword boundary.
 #pragma pack(push, 1)
 struct Display {
     char unknown_0[0x40];
     void* hwnd;
     int windowed;
     char unknown_48[8];
-    Surface cached;                    // +0x50
-    Screen screen;                     // +0x80
-    Surface* activeSurface;            // +0x98
-    int haveBackBuffer;                // +0x9c
-    Rect vec;                          // +0xa0
+    Surface cached;
+    Screen screen;
+    Surface* activeSurface;
+    int haveBackBuffer;
+    Rect vec;
     char unknown_b0[0xb4 - 0xb0];
     void* lastBackBuffer;
     char unknown_b8[0xbc - 0xb8];
-    Surface* overrideSurface;          // +0xbc
+    Surface* overrideSurface;
     char unknown_c0[0xc4 - 0xc0];
-    unsigned char* palette;            // +0xc4
+    unsigned char* palette;
     char unknown_c8[0xd4 - 0xc8];
-    int width;                         // +0xd4
-    int height;                        // +0xd8
-    int useOverrideSurface;            // +0xdc
+    int width;
+    int height;
+    int useOverrideSurface;
     char unknown_e0[0xe4 - 0xe0];
-    int field_e4;                      // +0xe4
+    int field_e4;
     char unknown_e8[0xf0 - 0xe8];
-    Flags_004c61b0 flags;              // +0xf0
+    Flags_004c61b0 flags;
     char unknown_f2[0x196 - 0xf2];
-    int rect_x;                        // +0x196
-    int rect_y;                        // +0x19a
+    int rect_x;
+    int rect_y;
     char unknown_19e[0x1b2 - 0x19e];
-    GafFrame* bmp;                     // +0x1b2
-    int x;                             // +0x1b6
-    int y;                             // +0x1ba
-    Surface* saveMouse1;               // +0x1be
+    GafFrame* bmp;
+    int x;
+    int y;
+    Surface* saveMouse1;
     char unknown_1c2[0x1ce - 0x1c2];
-    int cursorThreadEnabled;           // +0x1ce
-    int cursorOverlayEnabled;          // +0x1d2
+    int cursorThreadEnabled;
+    int cursorOverlayEnabled;
 
-    // Method of the display object: this is the call result.
     int LockScreen(Surface* out)
     {
         if (useOverrideSurface != 0) {
@@ -121,7 +106,6 @@ struct Display {
         return 1;
     }
 
-    // Method of the display object: this is the call result.
     int LockPrimary(Surface* out)
     {
         if (windowed != 0) {
@@ -147,7 +131,7 @@ struct Display {
 #pragma pack(pop)
 
 struct Arg_004c6210 {
-    int ddraw;                         // +0x0
+    int ddraw;
     void* primary;
     void* back;
 };
@@ -166,8 +150,6 @@ int GetScreenHeight(void);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 
-// Records a surface and flag in the top slot of the screen lock stack
-// (count g_screenLockCount, at most 10 entries at g_screenLocks).
 // FUNCTION: 0x4c5d90
 void __stdcall SetLockEntry(Surface* surface, char flag)
 {
@@ -191,7 +173,6 @@ int GetScreenLockCount(void)
     return g_screenLockCount;
 }
 
-// 0x4c5fa0, inlined here.
 static inline int UnlockScreenInline(Surface* s)
 {
     Display* d = GetDisplay();
@@ -204,9 +185,6 @@ static inline int UnlockScreenInline(Surface* s)
     return 1;
 }
 
-// Pops every entry of the screen lock stack (count g_screenLockCount, entries
-// written by LockScreen at g_screenLocks), unlocking each one. The screen
-// unlock is UnlockScreen inlined.
 // FUNCTION: 0x4c5df0
 void UnlockAllScreens(void)
 {
@@ -221,12 +199,6 @@ void UnlockAllScreens(void)
     }
 }
 
-// Locks the DirectDraw surface and fills a 0x30-byte surface descriptor,
-// registering it in the screen lock stack (g_screenLockCount entries at
-// g_screenLocks) so UnlockAllScreens can unlock it later. When the display is
-// already locked (+0xdc) or using the cached descriptor (+0x44) it copies
-// the cached block instead.
-// The original's callers call this out of line.
 #pragma auto_inline(off)
 // FUNCTION: 0x4c5e70
 int __stdcall LockScreen(Surface* out)
@@ -235,11 +207,6 @@ int __stdcall LockScreen(Surface* out)
 }
 #pragma auto_inline(on)
 
-// Unlocks the screen surface locked by LockScreen. The Unlock call goes
-// through a method of the embedded screen struct, which is why the surface
-// pointer is re-read.
-// The original's callers (Surface::Unlock in DrawFrameQuad) call this out of
-// line.
 #pragma auto_inline(off)
 // FUNCTION: 0x4c5fa0
 int __stdcall UnlockScreen(Surface* s)
@@ -255,20 +222,12 @@ int __stdcall UnlockScreen(Surface* s)
 }
 #pragma auto_inline(on)
 
-// Fills a 0x30-byte surface descriptor. When the GDI offscreen path is active
-// (field 0x44 of the display object is set) it copies the cached descriptor at
-// +0x50; otherwise it locks the primary DirectDraw surface, builds the
-// descriptor from the locked DDSURFACEDESC and from the block at +0xa0, and
-// clears bit 0 of the flag at +0x2c.
 // FUNCTION: 0x4c5ff0
 int __stdcall LockPrimary(Surface* out)
 {
     return GetDisplay()->LockPrimary(out);
 }
 
-// Blits two clip rectangles from the offscreen GDI surface to the window, or,
-// in DirectDraw mode, unlocks the primary surface. The first argument is not
-// used by the body.
 // FUNCTION: 0x4c60d0
 int __stdcall UnlockPrimary(Surface* unused, tagRECT* r1, tagRECT* r2)
 {
@@ -290,8 +249,6 @@ int __stdcall UnlockPrimary(Surface* unused, tagRECT* r1, tagRECT* r2)
     return 1;
 }
 
-// Sets bit 0 of the display flags word at +0xf0; returns 0 only when the
-// bit is set while the field at +0x9c is still zero.
 // FUNCTION: 0x4c61b0
 int __stdcall SetPageFlipping(int enable)
 {
@@ -332,7 +289,6 @@ int __stdcall RestoreSurfaces(Arg_004c6210* arg)
     return r;
 }
 
-// 0x4c5fa0, inlined here.
 static inline int UnlockScreenInline()
 {
     Display* d = GetDisplay();
@@ -392,8 +348,6 @@ static inline void Unlock(long held)
     }
 }
 
-// Restores both surfaces after DDERR_SURFACELOST and redraws the screen.
-// Must stay an inline helper used in both places: gives matching registers.
 static inline int RestoreSurfacesInline(Display* d)
 {
     Display* dd = GetDisplay();
@@ -408,11 +362,6 @@ static inline int RestoreSurfacesInline(Display* d)
     return 0;
 }
 
-// Presents a frame. With flag bit 1 clear it blits the cached bitmap through
-// GDI. Otherwise, when +0xdc is set, it copies the bitmap at +0xbc (if its
-// size matches GetScreenWidth/GetScreenHeight) into the locked primary surface;
-// else it flips, or Blts the back surface to the window's client rect,
-// retrying after DDERR_SURFACELOST.
 // FUNCTION: 0x4c63a0
 void FlipScreen(void)
 {
@@ -476,11 +425,6 @@ void FlipScreen(void)
     }
 }
 
-// Same input/mouse object family as 0x4c2870 (see that file): when the two
-// enable flags at +0x1ce and +0x1d2 are set and a bitmap at +0x1b2 exists,
-// fills the destination rectangle at +0x1be from the bitmap's size, offsets
-// the object by the bitmap's half size, blits it from `dst` and then draws
-// the bitmap at the stored rectangle.
 // FUNCTION: 0x4c67c0
 void __stdcall DrawCursor(Display* obj, Surface* dst)
 {
@@ -495,15 +439,8 @@ void __stdcall DrawCursor(Display* obj, Surface* dst)
     }
 }
 
-// Only for its symbol ids: FillSurface matches only in a window of the
-// symbol count (docs/c2-regalloc.md, "Symbol ids"). It also declares the
-// memset the fills below call.
 #include <memory.h>
 
-// The three fills are written through these little helpers because the order in
-// which the count and the fill value are evaluated decides which of the two
-// count operands the inlined imul takes, and the original has a different
-// order in each of the three branches.
 static void set_mem(unsigned char* p, int count, int colour)
 {
     memset(p, colour, count);
@@ -519,11 +456,6 @@ static void clear_screen(Display* o, int colour)
     memset(o->cached.pixels, colour, o->cached.height * o->cached.pitch);
 }
 
-// Fills a surface with one colour byte. With no surface it uses the one the
-// screen object was given by SetOffscreenSurface (+0xbc, when +0xdc is set), else its
-// own framebuffer, unless bit 1 of the flags byte at +0xf0 sends the work to
-// the driver's function table, which then takes the object as its first
-// argument. Returns 0 only when that call reports a failure.
 // FUNCTION: 0x4c6890
 int __stdcall FillSurface(Surface* surface, int colour)
 {
@@ -568,9 +500,6 @@ void __stdcall ResetClipRect(int* surface)
     *(Rect*)(surface + 7) = q;
 }
 
-// Allocates an image of width x height bytes with its header (pixels follow
-// the 0x30-byte header); the header set-up is the body of InitSurface,
-// inlined.
 static inline void Init(Surface* s, int width, int height, int a, int b)
 {
     s->width = width;
@@ -583,7 +512,6 @@ static inline void Init(Surface* s, int width, int height, int a, int b)
     s->colorKey = -1;
     s->flag0 = 1;
     s->flag1 = 0;
-    // Built in a local and copied: storing into s->clip changes the code.
     Rect r;
     r.left = 0;
     r.top = 0;
@@ -613,7 +541,6 @@ void __stdcall InitSurface(Surface* s, int width, int height, int a, int b)
     s->colorKey = -1;
     s->flag0 = 1;
     s->flag1 = 0;
-    // Built in a local and copied: storing into s->clip changes the code.
     Rect r;
     r.left = 0;
     r.top = 0;
@@ -622,7 +549,6 @@ void __stdcall InitSurface(Surface* s, int width, int height, int a, int b)
     s->clip = r;
 }
 
-// Frees an object if its "owned" flag (bit 0 of +0x2c) is set.
 // FUNCTION: 0x4c6ac0
 void __stdcall FreeSurface(Surface* obj)
 {
@@ -631,7 +557,6 @@ void __stdcall FreeSurface(Surface* obj)
     }
 }
 
-// The original's callers (DrawQuadRow, DrawFrameQuad) call this out of line.
 #pragma auto_inline(off)
 // FUNCTION: 0x4c6ae0
 Rect* Surface::GetClipRect(Rect* out)
@@ -641,7 +566,6 @@ Rect* Surface::GetClipRect(Rect* out)
 }
 #pragma auto_inline(on)
 
-// Stores a 16-byte rectangle passed by value into the object at +0x1c.
 // FUNCTION: 0x4c6b10
 void Surface::SetClipRect(Rect r)
 {
@@ -661,15 +585,9 @@ int GetDisplayFieldE4()
     return GetDisplay()->field_e4;
 }
 
-// Blits a bitmap with the hand-written routine BlitSurface. If `dst` is
-// null the screen is locked with LockScreen and used as the destination;
-// if `bmp` is null the locked screen is used as the source instead. When one
-// of the two pointers is null the blit is offset by the bitmap's half width
-// and half height (the shorts at +0x18 and +0x1a).
 // FUNCTION: 0x4c6b70
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y)
 {
-    // Two flat top-level ifs, each ending in its own unlock and return.
     if (dst == 0) {
         if (bmp == 0)
             return;
@@ -691,9 +609,6 @@ void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y)
     BlitSurface(dst, bmp, x - bmp->x, y - bmp->y);
 }
 
-// Copies `src` to `dst` at (x, y) with a transparent colour through the blitter
-// at 0x4cbcd5, or, when `dst` is null, onto the screen: lock it with
-// LockScreen, blit, then unlock. The unlock is UnlockScreen inlined.
 // FUNCTION: 0x4c6c50
 void __stdcall DrawSurfaceKeyed(Surface* dst, Surface* src, int x, int y, int color)
 {
@@ -708,14 +623,9 @@ void __stdcall DrawSurfaceKeyed(Surface* dst, Surface* src, int x, int y, int co
     }
 }
 
-// The second part of the module (0x4c6d20 and up). Its includes come after the
-// first part's code, not at the top, so the first part's functions keep their
-// symbol ids.
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-// Only for its symbol ids: DrawTexturedSpan and DrawLitTexturedSpan match only
-// in a window of the symbol count (docs/c2-regalloc.md, "Symbol ids").
 #include <malloc.h>
 #include "../files/files_api.h"
 #include "../util/point.h"
@@ -724,9 +634,6 @@ void __cdecl BlitRect(Surface* dst, Surface* src, Rect* rect, Point* pos);
 void __cdecl BlitRectKeyed(Surface* dst, Surface* src, Rect* rect, Point* pos, unsigned char transparent);
 void __cdecl BlitTile32x32(Surface* dst, Surface* src, Rect* rect, Point* pos);
 
-// Draws through the blitter at 0x4cbdd1 (hand-written assembly in a gap
-// region) into `dst`, or, when `dst` is null, into the screen: lock it with
-// LockScreen, draw, then unlock.
 // FUNCTION: 0x4c6d20
 void __stdcall CopySurfaceRect(Surface* dst, Surface* src, Rect* rect, Point* pos)
 {
@@ -741,10 +648,6 @@ void __stdcall CopySurfaceRect(Surface* dst, Surface* src, Rect* rect, Point* po
     }
 }
 
-// Sibling of 0x4c6d20 / 0x4c6e70, drawing with the cdecl blitter at 0x4cbe70
-// (which takes one extra byte argument, the transparent colour). Draws into
-// `dst`, or, when `dst` is null, into the screen: lock it with LockScreen,
-// draw, then unlock.
 // FUNCTION: 0x4c6dc0
 void __stdcall CopySurfaceRectKeyed(Surface* dst, Surface* src, Rect* rect, Point* pos, unsigned char transparent)
 {
@@ -759,9 +662,6 @@ void __stdcall CopySurfaceRectKeyed(Surface* dst, Surface* src, Rect* rect, Poin
     }
 }
 
-// Sibling of 0x4c6d20 using the blitter at 0x4cbef1 (hand-written assembly
-// in the gap region starting at 0x4cbbe0): draws into `dst`, or, when `dst`
-// is null, into the screen: lock it with LockScreen, draw, then unlock.
 // FUNCTION: 0x4c6e70
 void __stdcall DrawTile(Surface* dst, Surface* src, Rect* rect, Point* pos)
 {
@@ -776,10 +676,6 @@ void __stdcall DrawTile(Surface* dst, Surface* src, Rect* rect, Point* pos)
     }
 }
 
-// Writes one radar surface into the chunked file writer: an 8-byte header of
-// width and height, then one row per scan line. The read counterpart is
-// 0x4c6f80, which allocates a surface of width*height and reads the rows back.
-// The surface layout matches the one built by 0x4c69f0.
 // FUNCTION: 0x4c6f10
 void __stdcall SaveSurface(Surface* surface, HapiBank* file)
 {
@@ -796,7 +692,6 @@ void __stdcall SaveSurface(Surface* surface, HapiBank* file)
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* ptr);
 
-// Allocation and header set-up (the body of 0x4c6a60), kept inline.
 static inline Surface* NewSurface(char* name, int w, int h)
 {
     Surface* s = (Surface*)GameAllocIgnoreTag(name, h * w + 0x30);
@@ -810,7 +705,6 @@ static inline Surface* NewSurface(char* name, int w, int h)
     s->y = 0;
     s->zPriority = 10000;
     s->colorKey = -1;
-    // Built in a local and copied: storing into s->clip changes the code.
     Rect r;
     r.left = 0;
     r.top = 0;
@@ -820,8 +714,6 @@ static inline Surface* NewSurface(char* name, int w, int h)
     return s;
 }
 
-// Reads back a surface written by 0x4c6f10: an 8-byte header of width and
-// height, then one row per scan line into a freshly allocated surface.
 // FUNCTION: 0x4c6f80
 Surface* __stdcall LoadSurface(HapiBank* file)
 {
@@ -907,9 +799,6 @@ void __stdcall InterpEdgeUvFromScanline(int value, Range* out, int at_low, int a
     }
     switch (i) {
     case 0: {
-        // The distance is passed through a pointer to a local. It reads like a
-        // leftover from the original, but it is what makes cl 5 schedule case 0
-        // the way the original does.
         int span = size - offset;
         int* spanp = &span;
         out->low = 0;
@@ -966,9 +855,6 @@ void __stdcall InterpEdgeUvFromScanline_B(int value, Range* out, int at_low, int
     case 1:
         out->low = at_low;
         {
-            // The distance is passed through a pointer to a local. It reads
-            // like a leftover from the original, but it is what puts case 1's
-            // global reload in the 5-byte accumulator form.
             int span = size - offset;
             int* spanp = &span;
             out->high = MulDivTrunc(at_high, *spanp, g_edgeSpanB);
@@ -985,13 +871,6 @@ void __stdcall InterpEdgeUvFromScanline_B(int value, Range* out, int at_low, int
     }
 }
 
-// Scales a (possibly skewed) source rect onto a destination surface one column
-// at a time. It asks the surface for its clip rect, moves the left edge of the
-// destination rect forward to it (advancing the two fixed-point source steps by
-// the same amount, so the source follows the clip), clips the right edge, and
-// then blits: 8 bits per pixel is an inline loop, 0x10/0x20/0x40/0x80 go to
-// helpers, and anything else is an inline loop with a per-row byte stride.
-// Unused here: real functions declared to keep the file's symbol count.
 void __stdcall AccumulateScreenShake(int dx, int dy, int value);
 void __stdcall ActivatePlayerGadgets(char* prefix);
 void AddDownloadBuildOptions();
@@ -1014,7 +893,6 @@ void __stdcall DrawQuadRow(int row, int* rect, Surface* surf, GafFrame* info)
     int x;
 
     surf->GetClipRect(&bounds);
-    // bounds.left - rect[0] is repeated inline in both updates, no skip temporary.
     if (rect[0] < bounds.left) {
         rect[2] += rowstep * (bounds.left - rect[0]);
         rect[3] += colstep * (bounds.left - rect[0]);
@@ -1065,16 +943,15 @@ struct Quad_004c7580 {
 };
 
 struct Rec_004c7580 {
-    int left;   // +0x00
-    int right;  // +0x04
-    int tx;     // +0x08
-    int ty;     // +0x0c
-    int trx;    // +0x10
-    int try_;   // +0x14
+    int left;
+    int right;
+    int tx;
+    int ty;
+    int trx;
+    int try_;
     int pad[4];
 };
 
-// Unused here: real functions declared to keep the file's symbol count.
 int __stdcall AssignPlayerColor(int from, int to, int group);
 void __stdcall AddAnimplayPointer(void* item);
 int AllocFeatureSpot();
@@ -1146,7 +1023,6 @@ void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
             xmin = xx;
     }
 
-    // surf is the void* parameter shared with the gui.cpp declarations, so the cast stays.
     ((Surface*)surf)->GetClipRect(&clip);
     if (xmax < clip.left) {
         if (locked) UnlockScreen(&local);
@@ -1169,7 +1045,6 @@ void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
     if (ymax > clip.bottom)
         ymax = clip.bottom;
     if (ymax == ymin) {
-        // Method wrapper, not UnlockScreen(&local): keeps this tail from merging with check 2.
         if (locked) UnlockScreen(&local);
         return;
     }
@@ -1274,13 +1149,10 @@ unlock:
     }
 }
 
-// MATCH. Preserve the native 0x80 case fallthrough into the 0x40 scaler.
-// Unused here: real functions declared to keep the file's symbol count.
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
 void __stdcall AddCdActivitySample(int value);
 int AllocScoreTables();
 
-// Unused here: real functions declared to keep the file's symbol count.
 void __stdcall BuildEntryGuiName(char* dest, unsigned short index, int n);
 int __stdcall AddNetPlayer(int id);
 void ApplyBrightnessAndVolume();
@@ -1433,19 +1305,8 @@ void __stdcall DrawTexturedSpan(int row, int* span, GafFrame* surf, GafFrame* in
     }
 }
 
-// Only for its symbol ids: DrawLitTexturedSpan matches only in a window of
-// the symbol count (docs/c2-regalloc.md, "Symbol ids").
 #include <float.h>
 
-// Blits one textured span with a depth (Z) buffer. For each pixel it compares
-// the interpolated Z against the depth buffer and, when it passes, writes the
-// palette-mapped texel and the new depth value. Source coordinates are 16.16
-// fixed-point; the u/v/z/light steps are the span deltas divided by the span
-// width. The span is clipped to the left edge and to the target surface's
-// width. The texture width selects the texel layout: 8/16/32/64/128 pick the
-// sub-texel mask, anything else uses the width itself as a row stride. With no
-// depth buffer the four power-of-two formats dispatch to the FUN_004cd8xx span
-// helpers and the remaining formats run inline loops.
 // FUNCTION: 0x4c8020
 void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFrame* texture)
 {
@@ -1472,7 +1333,6 @@ void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFram
         int v = span[3];
         int z = span[6];
         int light = span[8];
-        // One temporary shared by every body: keeps the loop counters in the original slots.
         int value;
         dest += target->width * row + span[0];
         if (depth) {
@@ -1609,7 +1469,6 @@ void __stdcall DrawTexturedPolygon(GafFrame* target, GafFrame* texture, int* ver
 {
     int i, defaults[8];
     int spans[800][10];
-    // Declared before the slopes: dx*y0 then loads dx first.
     int y0;
     int dv, dx, du;
     int lowY, highY, highX, lowX;
@@ -1646,7 +1505,6 @@ void __stdcall DrawTexturedPolygon(GafFrame* target, GafFrame* texture, int* ver
                             out=&spans[0][0];
                             int index = lowIndex;
                             do {
-                                // Declared per walk body, not shared: sets the frame slot packing.
                                 int next=index-1;
                                 if (next<0) next=3;
                                 int* currentVertex=vertices+index*3;
@@ -1722,7 +1580,6 @@ void __stdcall DrawTexturedPolygon(GafFrame* target, GafFrame* texture, int* ver
                                         } while(--n);
                                     }
                                 }
-                                // Recomputed, not index=next: a copy changes the compares and loads.
                                 index=(index+1)&3;
                             } while(index!=highIndex);
                         }
@@ -1777,7 +1634,6 @@ void __stdcall DrawLitTexturedPolygon(GafFrame* target, GafFrame* texture, int* 
                         int y1; int x;
                         int* out;
                         int* nextVertex;
-                        // One variable shared by both walks: a per-walk next moves six frame slots.
                         int next;
                         {
                             out=&spans[0][0];
@@ -1787,7 +1643,6 @@ void __stdcall DrawLitTexturedPolygon(GafFrame* target, GafFrame* texture, int* 
                                 if (next<0) next=3;
                                 y0=vertices[index*4+1];
                                 nextVertex=vertices+next*4;
-                                // Read through vertices, not nextVertex: makes the address a shared subexpression.
                                 y1=vertices[next*4+1];
                                 if (y1>0 && y0<y1) {
                                     int dy = y1-y0;
@@ -1864,15 +1719,9 @@ void __stdcall DrawLitTexturedPolygon(GafFrame* target, GafFrame* texture, int* 
         }
 }
 
-// Append of the reference-counted string handle: concatenates other's
-// characters onto this handle's, allocating a new block whose first int is
-// the reference count, then releasing the old block. The handle points at the
-// characters; the count is the int just before them (see 0x4c91a0, 0x4c9290,
-// 0x4c93b0, 0x4c93f0). The class is named after this address because it has
-// no name in data/symbols.csv.
 class Class_004c90b0 {
 public:
-    char* ptr;              // refcount lives in the dword before ptr
+    char* ptr;
 
     bool IsEmpty() const { return *ptr == 0; }
 
@@ -1882,14 +1731,12 @@ public:
 // FUNCTION: 0x4c90b0
 Class_004c90b0* Class_004c90b0::Append(const Class_004c90b0& other)
 {
-    // Bool helper, not a plain pointer test: gives the original emptiness-test code.
     if (!other.IsEmpty()) {
-        // Declared before the strlen locals: sets the second strcpy destination encoding.
         char* chars;
         int n = (int)strlen(ptr);
         int m = (int)strlen(other.ptr);
         int len = n + m + 1;
-        int* lp = &len;                   // opaque store: keeps the +1 and +5 apart
+        int* lp = &len;
         *lp += 5;
         int* block = (int*)malloc(len);
         *block = 1;
@@ -1941,8 +1788,6 @@ StringRef::StringRef(const char* text)
     data = chars;
 }
 
-// The constructor from the first len characters of a string: a null string
-// shares the global empty string, whose count is g_emptyStringRefs.
 // FUNCTION: 0x4c9230 ??0StringRef@@QAE@PBDH@Z
 StringRef::StringRef(const char* text, int len)
 {
@@ -1973,12 +1818,6 @@ StringRef* StringRef::MakeUpper()
     return this;
 }
 
-// The type's reference-count decrement and free, called by every file that
-// spells the handle and by the scalar deleting destructors 0x432c00 and
-// 0x432c20. ReleaseRef is data/symbols.csv's established name for this
-// address; the destructor spelling StringRef::~StringRef in
-// data/aliases.csv is the same function.
-
 extern "C" void __cdecl free(void*);
 
 // FUNCTION: 0x4c9390
@@ -1991,14 +1830,9 @@ void StringRef::ReleaseRef()
     }
 }
 
-// Assignment of a C string to the handle (see 0x4c91b0 for the constructor
-// from a C string and 0x4c93b0 for assignment from another handle): releases
-// the old characters, then shares the global empty string or copies the text
-// into a new block whose first int is the reference count.
 // FUNCTION: 0x4c93f0
 StringRef* StringRef::AssignText(const char* text)
 {
-    // The release, phrased as in the destructor body 0x4c9390.
     ((int*)data)[-1]--;
     int* old = (int*)data - 1;
     if (((int*)data)[-1] == 0)
@@ -2017,8 +1851,6 @@ StringRef* StringRef::AssignText(const char* text)
     return this;
 }
 
-// Substring of the handle: returns a new handle for data[start..end), with
-// start clamped to 0 and end to the string length.
 // FUNCTION: 0x4c9490
 StringRef StringRef::SubString(int start, int end) const
 {

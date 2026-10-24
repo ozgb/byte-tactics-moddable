@@ -1,26 +1,24 @@
-// Decompiled by DeepSeek V4.1 Flash, deepseek-v4.1-flash, Opus, Sonnet and Haiku. Names are provisional.
-
 #include "../../interfaces/ref.h"
 
 #pragma pack(push, 1)
 struct Rect_0041d0f0 {
-    int x;                             // +0x0
-    int y;                             // +0x4
+    int x;
+    int y;
     int unknown_8[4];
 };
 
 struct Entry_0041d1f0 {
-    int type;                          // +0x0
-    int id;                            // +0x4
-    short x;                           // +0x8
-    short z;                           // +0xa
+    int type;
+    int id;
+    short x;
+    short z;
 };
 
 class Class_0041d1f0_net {
 public:
     char unknown_0[0xdb4];
     Ref<Entry_0041d1f0> entries;
-    int entry_count;                   // +0xdb8
+    int entry_count;
 };
 
 #include "../game/game.h"
@@ -31,9 +29,9 @@ public:
 // GLOBAL: 0x511de8
 extern Game* g_game;
 
-extern char g_cameraAccount[]; // "Camera"
-extern char g_cameraZPosition[]; // "Z Position"
-extern char g_cameraXPosition[]; // "X Position"
+extern char g_cameraAccount[];
+extern char g_cameraZPosition[];
+extern char g_cameraXPosition[];
 
 extern int g_commandLineUnusedFlagL;
 extern int g_cdBypassDriveScan;
@@ -46,7 +44,6 @@ static inline void SetPos(int x, int y)
     g_game->scrollY = y;
 }
 
-// Centres the camera on the screen position stored at +0x2c76, then clamps it.
 // FUNCTION: 0x41d0f0
 void CenterCameraOnRadarClick()
 {
@@ -84,8 +81,6 @@ void CenterCameraOnStartPosition()
     }
 }
 
-// Reads the camera X and Z positions from the "Camera" section of a parsed
-// text file (defaults to the current position), then clamps the view.
 // FUNCTION: 0x41d2b0
 void __stdcall ReadCameraPosition(HapiBank* file)
 {
@@ -101,7 +96,6 @@ void __stdcall ReadCameraPosition(HapiBank* file)
     g_game->mapFlags &= 0xfff7;
 }
 
-// Writes the camera position to a section ("Camera", "X Position", "Z Position").
 // FUNCTION: 0x41d360
 void __stdcall WriteCameraPosition(HapiBank* file)
 {

@@ -1,7 +1,6 @@
-// Decompiled by Opus. Names are provisional.
 struct ChatHudEntryView {
     char unknown_0[0x1e];
-    unsigned char flags;   // +0x1e
+    unsigned char flags;
     char unknown_1f[0x29];
 };
 
@@ -10,7 +9,6 @@ struct ChatHudEntryView {
 extern Game* g_game;
 int ScrollToNextMessageUnit(void);
 
-// Stays in its own file: the module's ScrollToNextMessageUnit would be inlined here, where the original calls it out of line.
 // FUNCTION: 0x464000
 void CycleMessageUnits(void)
 {

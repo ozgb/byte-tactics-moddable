@@ -1,13 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, GPT-6.1-sol, deepseek-v4.1, Claude Fable 5.1,
-// GPT-6 Astra, space-bunny-free, Claude Opus 5.5, GPT-6, claude-opus-5-5 and Opus.
-// Names are provisional.
-//
-// One Game from the four views (the menu object at +0x519 and the byte and word
-// forms of the loading flags at +0x38d75 sit in anonymous unions, as do the
-// player records, the loaded/slots block and the map rectangles), one Mission,
-// one PacketManager and the module's classes.
-//
-// <memory.h> stays before <windows.h>: it fixes the map-name block's x87 schedule.
 #include <memory.h>
 #include "win_types.h"
 #include <stdio.h>
@@ -25,7 +15,7 @@
 #include "game.h"
 
 union Fixed_497180 {
-    int i;                              // 16.16
+    int i;
     struct {
         short frac;
         short whole;
@@ -45,7 +35,7 @@ struct RecFlag_497180 {
 
 struct Display_00497f40 {
     char unknown_0[0x40];
-    HWND hwnd;                          // +0x40
+    HWND hwnd;
 };
 
 struct Sub_497180 {
@@ -54,93 +44,87 @@ struct Sub_497180 {
 
 struct Gadget_497180 {
     char unknown_0[0x8];
-    void (__stdcall* handler)(Gadget_497180*);   // +0x8
-    char* owner;                                 // +0xc
+    void (__stdcall* handler)(Gadget_497180*);
+    char* owner;
 };
 
 
 #include "../network/player_info.h"
 
-// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md).
 int CheckDirectXVersion(int, int, int, int, int);
 void EnumPlayersCallback(int, int, int, int, int);
 int AimCobStub(int, int, int, int);
 void EmitBubbles(int, int, int, short);
 void DrawLine(int, int, int, int, int, int);
 
-
-
-// The ten player records at g_game+0x1b63 are 0x14b bytes. Three functions view
-// them under different names; the fields that disagree over the same bytes sit
-// in anonymous unions.
-struct PlayerRec_00497f40 {             // 0x14b bytes, array at g_game+0x1b63
+struct PlayerRec_00497f40 {
     union {
-        int present;                    // +0x0
+        int present;
         int active;
     };
-    unsigned int id;                    // +0x4
+    unsigned int id;
     char unknown_8[0x20 - 0x8];
-    unsigned char percent;              // +0x20
-    unsigned char keepaliveFlags;       // +0x21
+    unsigned char percent;
+    unsigned char keepaliveFlags;
     char unknown_22[0x27 - 0x22];
     Ref<PlayerInfo> data;
-    char name[0x73 - 0x2b];             // +0x2b
+    char name[0x73 - 0x2b];
     union {
-        unsigned char team;             // +0x73
+        unsigned char team;
         unsigned char control;
     };
     char unknown_74[0xdc - 0x74];
-    float size1;                        // +0xdc
-    float size2;                        // +0xe0
+    float size1;
+    float size2;
     char unknown_e4[0x146 - 0xe4];
-    unsigned char kind;                 // +0x146
-    unsigned char startPos;             // +0x147
+    unsigned char kind;
+    unsigned char startPos;
     char unknown_148[0x149 - 0x148];
-    RecFlag_497180 flags_149;           // +0x149
+    RecFlag_497180 flags_149;
 };
 
 typedef PlayerRec_00497f40 PlayerInfo_00497f40;
 typedef PlayerRec_00497f40 PlayerRec_00497ce0;
 
 struct Point_00498cd0 {
-    int x;                              // +0x0
-    int y;                              // +0x4
+    int x;
+    int y;
 };
 
 struct View_00498cd0 {
     char unknown_0[0x2c];
-    int x;                              // +0x2c
-    int y;                              // +0x30
+    int x;
+    int y;
 };
 
 struct Fixed_00498d00 {
-    unsigned short frac;                // +0x0
-    short whole;                        // +0x2
+    unsigned short frac;
+    short whole;
 };
 
 struct Pos_00498d00 {
-    Fixed_00498d00 x;                   // +0x0
-    Fixed_00498d00 y;                   // +0x4
-    Fixed_00498d00 z;                   // +0x8
+    Fixed_00498d00 x;
+    Fixed_00498d00 y;
+    Fixed_00498d00 z;
 };
 
 struct Rect_00498d00 {
-    int x;                              // +0x0
-    int y;                              // +0x4
+    int x;
+    int y;
     int unknown_8[4];
 };
 
 struct Pos_00498da0 {
-    unsigned int x;                     // +0x0
-    unsigned int y;                     // +0x4
-    unsigned int z;                     // +0x8
+    unsigned int x;
+    unsigned int y;
+    unsigned int z;
 };
 
 #include "../graphics/rect.h"
 
 struct Point_00498da0 {
-    short x;                            // +0x0
-    short y;                            // +0x2
+    short x;
+    short y;
 };
 
 struct BitFlags_00498da0 {
@@ -160,29 +144,26 @@ union Flags_00498da0 {
 };
 
 struct View_00498da0 {
-    int x;                              // +0x0
-    int y;                              // +0x4
+    int x;
+    int y;
     char unknown_8[0x18 - 0x8];
 };
 
 #include "../map/cell.h"
 #include "../util/vec3.h"
 
-struct Slot_00497180 {                  // 0x18 bytes
-    int kind;                           // +0x0, 1 or 2 when the slot is in use
+struct Slot_00497180 {
+    int kind;
     char unknown_4[0x18 - 0x4];
 };
 
-struct Options_00497180 {               // at g_game+0x29a0
-    Slot_00497180 slots[10];            // +0x0
+struct Options_00497180 {
+    Slot_00497180 slots[10];
     char unknown_f0[0x108 - 0xf0];
-    Settings_00496e10 settings;         // +0x108
-    int fixedloc;                       // +0x118
+    Settings_00496e10 settings;
+    int fixedloc;
 };
 
-
-// One view of the game state. The ranges two views name differently sit in
-// anonymous unions, so each function keeps the names it matched with.
 class Sound;
 
 
@@ -204,8 +185,6 @@ extern int g_nonCampaignGame;
 
 
 #include "../sound/sound.h"
-// Unused here: the symbol ids these declarations take keep the allocation of LoadMatch,
-// LoadingScreenFrame and OffsetWorldPosFromView (docs/c2-regalloc.md).
 int GetHostDpid();
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
@@ -318,40 +297,6 @@ char* __cdecl GetPreferredLanguage();
 #include "../state/sim_globals.h"
 int __stdcall PointInRect(Rect* r, int x, int y);
 
-
-// Game start: seeds the random generators, loads the match settings for the
-// current network mode (1 = skirmish defaults, 2 = multiplayer host block,
-// 3 = joined game, from the host player's record), runs the between-missions
-// summary, spawns each player's commander and opens the MAIN2 GUI.
-//
-// Kept as written, each for the registers it gives:
-// - Cases 1 and 2 are inlined calls of ApplyMissionOptionFlags (matched on its own in
-//   0x496e10.cpp, zero callers in the exe because /Ob2 inlined every call):
-//   it copies the settings block's first int to +0x37ef6 and three int flags
-//   into bits 2, 0 and 1 of the view-flags word at +0x14281. The inlined
-//   `int -> 1-bit field` assignments are what mask with the CSE'd constant 1
-//   (`mov edi,1` at the switch head, `and ebx,edi`), while the hand-written
-//   `(w & ~M) | (b & M)` lanes narrow to `and bl,1; movzx si,bl`.
-// - Case 3 and the post-wait block copy BITFIELDS of the player's
-//   `unsigned short` flags at +0x9b: bits 8, 9 and 10 sit in the byte at
-//   +0x9c, and `view->bit1 = pf->b9` (same bit position on both sides) is what
-//   MSVC 5 compiles to the zero-extended byte load plus `and ebx,2` with no
-//   shift; the 2-bit field at bits 11-12 and the 1-bit field at 13 give the
-//   `shr ecx,0xb; and ecx,3` and `shr ecx,0xd; and ecx,1` extracts.
-// - Case 2's statement order is copy 0x37eec -> 0x37ee6 first, then
-//   g_nonCampaignGame = 1, then the settings block; the store through g_game makes
-//   MSVC reload g_game for the block, as the original does.
-// - The commander spawn loop is `for (int i = 0; i < 10; i++)` indexing
-//   0x14b-byte records; MSVC strength-reduces it to the byte offset in ebx and
-//   that puts g_game in the SIB base. A hand-written `off += 0x14b` loop swaps
-//   the base and index.
-// Also kept: the loading flags at +0x38d75 written as volatile
-// (the field the guide names); the +0x9b bit-6 test as a 1-bit bitfield; the
-// mission-count loop with `i++` before `def += 6`; the ten-player walks with
-// `(unsigned char)i` so the multiply is not strength-reduced; the
-// std::random_shuffle call; rec+0x149 as a 1-bit bitfield (direct `or byte`);
-// `pos.x.i` before `pos.y.i = 0`.
-// Inlined into cases 1 and 2 below (matched on its own in 0x496e10.cpp).
 inline void __stdcall ApplyMissionOptionFlags(Settings_00496e10* s)
 {
     g_game->commanderDeath = s->value;
@@ -373,9 +318,6 @@ void __cdecl LoadMatch(void*)
     GameSrand(RAND_STREAM_LOAD, HarnessCrtSeed((unsigned)time(NULL)));
     g_game->ticks = 0;
 
-    // Six of these casts stay: taking more than two out in this function moves
-    // the symbol state that LoadingScreenFrame's allocation depends on
-    // (docs/c2-regalloc.md).
     switch (g_seams.map->GetGameType(((Mission*)g_game->net))) {
     case 1:
         g_nonCampaignGame = 0;
@@ -606,23 +548,6 @@ tail:
 
     (*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value |= 2;
 }
-//
-// Kept as written, each for the registers it gives:
-// - Vec3::operator- is the explicit-component form the matched sibling 0x413d80
-//   (same translation unit) uses. That makes the state 3 block byte exact, but
-//   on its own it ties `range` and `order` at priority 130 (c2prio), and range
-//   wins the tie on its +0x40 key, so order and range trade esi and edi.
-// - `int ok = AddBuildProgress(...); if (ok)` adds a candidate to a block that
-//   references order, which raises order to 134 and gives it esi again.
-// - The operand order of the six bounds adds (pos.x + min.x and so on) follows
-//   the symbol ids, so it moves with the headers and with code-neutral
-//   spellings. What puts all six in place (found by the permuter): <memory.h>
-//   plus <windows.h>, the state 0 test written as two nested ifs, and an empty
-//   `do {} while (0);` in UnitRef::Get(), a debug check that compiles to
-//   nothing. Without the do-while, or without the `ok` local, the registers
-//   come out differently.
-// Reading the record address through a named base (a temp_intro the permuter
-// found) is what keeps g_game in the SIB base and the offset in the index.
 static inline char* PlayerRecordAt(Game* game, int off) { return (char*)(*(PlayerRec_00497f40(*)[10])&game->players) + off; }
 
 // FUNCTION: 0x497ce0
@@ -688,9 +613,6 @@ void __stdcall DrawSyncStatus(void* surface)
 
     DrawTextClipped(surface, text, 10, 400, -1, 0);
 }
-// Draws one loading bar: its label, then the filled rect and the lightbar frame.
-// The flash alpha is passed as base plus slot: a pointer already offset by the
-// caller changes the register choice.
 static inline void DrawLoadingBar(void* gadget, void* lightbar, int index, unsigned char* prev, unsigned char* alphas, int slot, char* label, int y, int* rect)
 {
     unsigned int color;
@@ -703,7 +625,6 @@ static inline void DrawLoadingBar(void* gadget, void* lightbar, int index, unsig
     flash = alphas[slot];
     *prev = (*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[index];
     DrawTextClipped(gadget, (char*)Translate(label), 0x5a, y, -1, flash);
-    // Each bar's rect is written left, right, top, bottom.
     rect[0] = 0xcd;
     rect[2] = ((int)(*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[index] * 7) / 2 + 0xcd;
     rect[1] = y;
@@ -711,12 +632,6 @@ static inline void DrawLoadingBar(void* gadget, void* lightbar, int index, unsig
     FillRectangle(gadget, rect, color);
     DrawFrame(gadget, lightbar, rect[0], rect[1]);
 }
-// The loading-screen frame: on the first call it starts the loader thread
-// (LoadThreadMain), once the loader sets the "loaded" bit it restores the game
-// screen and installs the game frame handler (BattleFrame), and otherwise it
-// draws the six progress bars.
-// Unused here: the symbol ids these declarations take keep the allocation
-// (docs/c2-regalloc.md).
 extern int Pad_497f40_e0;
 // FUNCTION: 0x497f40
 void LoadingScreenFrame(void)
@@ -796,7 +711,6 @@ void LoadingScreenFrame(void)
         if (!host_thread_start((void (__cdecl*)(void*))LoadThreadMain, 0, 0)) {
             FatalError("Unable to start the loading thread!");
         }
-        // Four memsets (10, 10, 6, 6 bytes); the stage bytes get one 8-byte memset.
         memset(g_scorePanelKillFlash, 0, 10);
         memset(g_scorePanelLossFlash, 0, 10);
         memset(g_loadingBarFlashAlpha, 0, 6);
@@ -830,9 +744,7 @@ void LoadingScreenFrame(void)
         if (!((Sound*)g_game->field_10)->IsCdPlaying()) {
             ((Sound*)g_game->field_10)->PlayNextTrack();
         }
-        // Index players[i], not explicit offsets: keeps the SIB base and index order.
         for (i = 0; i < 10; i++) {
-            // Store past rect: a byte local would be dead-store eliminated.
             if ((*(PlayerRec_00497f40(*)[10])&g_game->players)[i].active != 0)
                 ((unsigned char*)rect)[19] = (*(PlayerRec_00497f40(*)[10])&g_game->players)[i].control;
         }
@@ -847,7 +759,6 @@ void LoadingScreenFrame(void)
         }
     }
     HandleNetPackets();
-    // Nested, not `b2 && AssignStartPositions()`: that folds to a test on the byte.
     if ((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.b2) {
         if (AssignStartPositions() != 0) {
             (*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.b2 = 0;
@@ -859,7 +770,6 @@ void LoadingScreenFrame(void)
         (&g_packetManager)->SendAllQueued(1);
     }
     SetOffscreenSurface((void*)g_game->screen);
-    // The result stays in a local: it gives the compare against a register.
     int ok = LockScreen(&gadget);
     if (ok != 0) {
         color = g_game->colors[15];
@@ -876,7 +786,6 @@ void LoadingScreenFrame(void)
         DrawSurface(&gadget, (void*)((int)g_game->surface), 0, 0);
         if (g_seams.map->GetGameType(g_game->net) != 1) {
             SetTextColors(color, 0xfe);
-            // Local for the strncpy source: the call comes before the length push.
             char* name = g_seams.map->GetMissionName(g_game->net);
             strncpy(namebuf, name, 100);
             namebuf[99] = 0;
@@ -914,15 +823,11 @@ void LoadingScreenFrame(void)
     }
     host_sleep_ms(200);
 }
-// Converts a point by the view origin at +0x2c/+0x30 (less a 0x80 by 0x20
-// border) and passes it on to ClampWorldPosToTerrain.
 // FUNCTION: 0x498cd0
 void __stdcall OffsetWorldPosFromView(Point_00498cd0* p, View_00498cd0* view, int param_3)
 {
     g_seams.los_radar->ClampWorldPosToTerrain((view->x - 0x80) + p->x, (view->y - 0x20) + p->y, (Vec3*)param_3);
 }
-// Converts the screen position stored at +0x2c76 into a 16.16 world position
-// (scaled from the view origin), with the height taken from the ground there.
 #include <string.h>
 // FUNCTION: 0x498d00
 void __stdcall MinimapCursorToWorldPos(Pos_00498d00* out)
@@ -936,40 +841,6 @@ void __stdcall MinimapCursorToWorldPos(Pos_00498d00* out)
     out->y.whole = g_seams.units->GetGroundHeight((Vec3*)out);
 }
 
-// Turns a screen point into a world position. The caller copies the 24-byte
-// view rectangle at g_game+0x2c76 onto its own stack and passes the address, so
-// this function sees a snapshot of the view.
-//
-// If the point is inside the rect at +0x142bb and bit 3 of the flags byte is
-// clear, the screen offset from the view origin is simply scaled by world size
-// over screen size. Otherwise the point is clamped to the visible limit rect at
-// +0x37e27 and measured from the world origin, which lets the camera sit still
-// at the edge of the map. The three low flag bits record which of the two
-// happened: bit 0 direct, bit 1 inside the limit rect, bit 2 both. Then the
-// point is converted to a map position, the cell it landed in is stored, and
-// that cell's feature id is stored with it.
-//
-// Layout notes, for whoever reads the neighbours of this code:
-// - the view rectangle is 0x18 bytes (int x, int y, then 16 bytes this
-//   function never looks at); only x and y are read.
-// - +0x2caa is the world position, three 20.12 fixed-point values. The
-//   conversion back to a cell is an unsigned `>> 20` into a pair of shorts at
-//   +0x2c8e, written as one 4-byte copy, and the feature id of that cell goes
-//   to +0x2cbc.
-// - +0x2cc6 is one byte of flags reached through a bitfield union. Writing bit
-//   0 hoists the byte into bl and stores it after the arithmetic, while
-//   clearing bit 1 and setting bit 2 are straight-to-memory masks. Reading the
-//   two bits back for bit 2 gives the `test cl, 3` the original does.
-// - +0x37e27 is the visible limit rect (left, top, right, bottom). Its address
-//   is taken once and kept in a register, because the same rect is both the
-//   clamp bounds and the argument of the second PointInRect call.
-// - +0x1422b and +0x1422f are the world size, +0x142e7..+0x142ed the view
-//   origin and screen size as shorts, +0x1431f and +0x14323 the world origin
-//   the clamped point is measured from.
-// - the MIN(MAX()) nesting is not decoration: the original expands the max
-//   twice, once for the comparison and once for the value it keeps.
-// - `Pos v = *p` with only v.x and v.z read is what leaves the store of the
-//   middle word in the frame; MSVC folds the other two into their consumers.
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 

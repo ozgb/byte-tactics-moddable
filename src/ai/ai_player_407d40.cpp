@@ -1,12 +1,10 @@
-// Decompiled by GPT-6, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
-// The rest of the class is in ai_player_407e70.cpp.
 #pragma pack(push, 1)
 #include "../game/game.h"
 #pragma pack(pop)
 
 extern Game* g_game;
 
-struct SquadManager;  // the struct key stays in the mangled name of 0x407d40
+struct SquadManager;
 #include "squad_manager.h"
 
 #include "squad_timer.h"

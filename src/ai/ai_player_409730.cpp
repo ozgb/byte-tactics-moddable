@@ -1,5 +1,3 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro, finished by Space Bunny Free, finished by DeepSeek V4.1 Flash, finished by GPT-6, finished by Claude Opus 5.5. Names are provisional.
-// A method of PlayerAI, whose other methods are in ai_player.cpp.
 #include <stdio.h>
 #include <minmax.h>
 #include <vector>
@@ -8,11 +6,11 @@
 #pragma pack(push, 1)
 struct Weapon_00409730 {
     char unknown_0[0xd4];
-    unsigned short damage;             // +0xd4
+    unsigned short damage;
     char unknown_d6[0xdc - 0xd6];
-    int range;                         // +0xdc
+    int range;
     char unknown_e0[0x10a - 0xe0];
-    char index;                        // +0x10a
+    char index;
 };
 
 #include "../units/unit_def.h"
@@ -26,8 +24,6 @@ extern Game* g_game;
 
 #include "../../interfaces/seams.h"
 
-// 0x409520 and 0x4095d0 (matched in their own files): no callers in the
-// exe, both inlined into the loop below.
 #define MIN(a, b) (((a) > (b)) ? (b) : (a))
 
 int __stdcall RateWeapons_409730(UnitDef* p)
@@ -91,7 +87,6 @@ void PlayerAI::ComputeBaseWeights()
             a += 30;
         if (g_seams.economy->GetEnergyUse(def) < 0.0f)
             a += 50;
-        // Stays a method: the first resize's erase needs its inline budget.
         if (def->HasField1ce())
             a += 50;
         if (def->makesMetal)
@@ -122,7 +117,6 @@ void PlayerAI::ComputeBaseWeights()
         x = min(x, 100);
         e->a = x;
         e->c = (char)max(0.0f, min(100.0f, def->energyCost * -0.0025f - g_seams.economy->GetEnergyUse(def) * 5.0f));
-        // The e->b bonus is a plain conditional: RateWeapons only inlines then.
 #ifdef __clang__
         e->b = (char)max(0.0f, min(100.0f, (double)(float)((double)def->metalCost * -0.02f + (def->makesMetal ? 25 : 0)) + (def->extractsMetal != 0.0f ? 100 : 0)));
 #else

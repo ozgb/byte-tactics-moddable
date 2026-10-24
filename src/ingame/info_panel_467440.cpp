@@ -1,9 +1,3 @@
-// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, GPT-6.1-sol, finished by mimo-v2.6-pro, finished by DeepSeek V4.1 Flash, checked by GPT-6. Names are provisional.
-// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, GPT-6.1-sol. Names are provisional.
-// Kept its own file: in info_panel.cpp the file's total symbol count moves the
-// last loop's player pointer from eax to edx.
-// Five loops over the unit array (stride 0x118).
-
 #include "../util/vec3.h"
 
 #include "../../interfaces/ref.h"
@@ -11,7 +5,7 @@
 
 union UnitPos_00467440 {
     Vec3 vec;
-    short half[6];                     // the words of x, y and z: [1] x whole, [3] y whole, [5] z whole
+    short half[6];
 };
 
 #include "../units/unit_def.h"
@@ -23,8 +17,8 @@ struct PlayerInfo_00467440;
 #include "../units/unit.h"
 
 struct MapSize_00467440 {
-    unsigned int width;                // +0x0
-    unsigned int height;               // +0x4
+    unsigned int width;
+    unsigned int height;
 
     int Contains(unsigned int tx, unsigned int ty)
     {
@@ -34,26 +28,26 @@ struct MapSize_00467440 {
 
 struct ByteMap_00467440 {
     Ref<unsigned char> data;
-    MapSize_00467440 size;             // +0x4
+    MapSize_00467440 size;
 
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };
 
 struct PlayerInfo_00467440 {
-    void* active;                      // +0x0
+    void* active;
     char unknown_4[0x27 - 0x4];
     Ref<PlayerInfo> data;
     char unknown_2b[0x67 - 0x2b];
     Ref<Unit> unitsBegin;
     Ref<Unit> unitsEnd;
     char unknown_6f[0x73 - 0x6f];
-    char type;                         // +0x73
+    char type;
     char unknown_74[0x7c - 0x74];
-    ByteMap_00467440 explored;         // +0x7c
+    ByteMap_00467440 explored;
     char unknown_88[0x108 - 0x88];
-    unsigned char allied[1];           // +0x108
+    unsigned char allied[1];
     char unknown_109[0x146 - 0x109];
-    unsigned char index;               // +0x146
+    unsigned char index;
     char unknown_147[0x14b - 0x147];
 };
 
@@ -63,8 +57,8 @@ struct PlayerInfo_00467440 {
 class DetectionVisitor {
 public:
     virtual void MarkUnitsInRadarOrSonarRadius(Unit* unit);
-    int radarRangeSq;                  // +0x4
-    int sonarRangeSq;                  // +0x8
+    int radarRangeSq;
+    int sonarRangeSq;
     Vec3 pos;
 };
 
@@ -131,7 +125,6 @@ void UpdateSensorRadarAndCloak(void)
     for (u = pl->unitsBegin; u <= pl->unitsEnd; u++) {
         if ((u->flags & 0x10000000) && !(u->flags & 0x4000) && (u->activateFlags & 1)) {
             if (u->def->radardistance != 0 || u->def->sonardistance != 0) {
-                // t is computed before b is loaded, then squared.
                 short a = u->def->radardistance;
                 int t = a + u->yWhole * 2;
                 short b = u->def->sonardistance;
@@ -151,7 +144,6 @@ void UpdateSensorRadarAndCloak(void)
     }
 
     for (u = first; u <= last; u++) {
-        // The ff local and the `, 1` term keep the playerIndex load a separate term.
         unsigned char ff;
         if ((u->flags & 0x10000000) && (ff = u->playerIndex, 1) && ff != pl->index && (u->activateFlags & 1)) {
             if (u->def->radardistancejam != 0) {
@@ -175,7 +167,6 @@ void UpdateSensorRadarAndCloak(void)
             if (c == 1 || c == 2) {
                 if (u->def->flags2 & 0x2000) {
                     if (g_seams.ai->HasReadyUnitInRange(u->playerIndex, (Vec3*)&u->pos, u->def->mincloakdistance)) {
-                        // Written through an int& so the flags load stays after the store.
                         int& b0 = u->workTime;
                         b0 = g_game->ticks + 0x5a;
                         u->flags |= 0x1000;
@@ -186,13 +177,10 @@ void UpdateSensorRadarAndCloak(void)
     }
 
     for (u = first; u <= last; u++) {
-        // Shared temp: using u->flags directly changes the code.
         unsigned int f = u->flags;
         if ((f & 0x10000000) && !(f & 0x100) && !(u->activateFlags & 4)) {
-            // int, not unsigned char: the latter spills playerIndex.
             int pi = g_game->playerIndex;
             PlayerInfo_00467440* p2 = (PlayerInfo_00467440*)g_game->Current();
-            // unsigned int: an int merges the two zero blocks.
             unsigned int vis;
             if ((g_game->mapFlags & 2) == 2) {
                 vis = IsExplored_00467440(p2, (UnitPos_00467440*)&u->pos);

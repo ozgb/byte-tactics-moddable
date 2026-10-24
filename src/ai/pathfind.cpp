@@ -1,9 +1,3 @@
-// Decompiled by DeepSeek V4.1 Flash, Claude Opus 5.5, Opus, space-bunny-free, deepseek-v4.1-flash, Haiku, Sonnet and GPT-6. Names are provisional.
-// The AI's path search (AISearch): an A* over the map's cells with an open
-// heap of nodes (the OpenHeap base, whose sift-up and sift-down are defined
-// here too, at their place in the original file), a per-tick scheduler that
-// shares the search steps among the players, and the trace back from the goal.
-// Needed: without it GetCellState's first argument lands in eax, not edx.
 #include <stdlib.h>
 #include "../state/block.h"
 #include <string.h>
@@ -13,12 +7,11 @@
 void __cdecl operator delete(void* p);
 void __cdecl GameFreeThunk(void* p);
 
-// A min-heap record for MakeHeap and friends (the STL heap the search uses).
 struct Entry_40d670 {
     Entry_40d670() {}
     Entry_40d670(const Entry_40d670& o) : value(o.value), key(o.key) {}
-    int value;                       // +0x0
-    float key;                       // +0x4
+    int value;
+    float key;
 };
 
 static inline bool operator<(const Entry_40d670& a, const Entry_40d670& b)
@@ -29,7 +22,6 @@ static inline bool operator<(const Entry_40d670& a, const Entry_40d670& b)
 void __stdcall AdjustHeap(Entry_40d670* first, int hole, int len, Entry_40d670 val);
 void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d670 val);
 
-// Placement copy of a pair of ints (an STL construct helper), like 0x40d600.
 // FUNCTION: 0x40d5e0
 void __stdcall CopyDwordPair(int* dest, int* src) {
     if (dest != 0) {
@@ -38,7 +30,6 @@ void __stdcall CopyDwordPair(int* dest, int* src) {
     }
 }
 
-// Placement copy of one char (an STL construct helper), like 0x40d600.
 // FUNCTION: 0x40d600
 void __stdcall CopyOneByte(char* dest, char* src)
 {
@@ -47,7 +38,6 @@ void __stdcall CopyOneByte(char* dest, char* src)
     }
 }
 
-// make_heap over [first, last): the STL _Make_heap shape.
 // FUNCTION: 0x40d620
 void __stdcall MakeHeap(Entry_40d670* first, Entry_40d670* last, int*, Entry_40d670*)
 {
@@ -86,8 +76,6 @@ void __stdcall PopHeapFirst(Entry_40d670* first, Entry_40d670* last, Entry_40d67
     AdjustHeap(first, 0, last - first, val);
 }
 
-// push_heap's sift-up (the STL _Push_heap shape) for the heap of
-// AdjustHeap: moves parents down while they are less than val.
 // FUNCTION: 0x40d740
 void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d670 val)
 {
@@ -100,15 +88,15 @@ void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d6
 
 #include "pathfinder.h"
 
-extern signed char g_dirDeltaX[];      // dx per direction
-extern signed char g_dirDeltaZ[];      // dy per direction
+extern signed char g_dirDeltaX[];
+extern signed char g_dirDeltaZ[];
 
 class Planner_0040eb70;
 
 #pragma pack(push, 1)
 struct Owner_0040eb70 {
     Ref<Planner_0040eb70> planner;
-    void* owner;                       // +0x4, the movement class
+    void* owner;
 };
 
 #include "../units/unit.h"
@@ -173,13 +161,8 @@ static int IsPlaying(unsigned char i)
     return 0;
 }
 
-// The original calls every method here out of line; only the helpers defined
-// in the classes above are inlined.
 #pragma auto_inline(off)
 
-// Looks up the 2-bit state of map cell (x, y): 0 when the cell is off the map
-// or its visibility cell is off the game grid, 2 when the player's bit is not
-// set in that visibility cell, else the cell's stored value.
 // FUNCTION: 0x40d7b0
 int Pathfinder::GetCellState(int x, int y)
 {
@@ -187,7 +170,6 @@ int Pathfinder::GetCellState(int x, int y)
         return 0;
     int cx = (x >> 1) + (owner->footprintX >> 2);
     int cy = (y >> 1) + (owner->footprintZ >> 2);
-    // `g_game->mapWidthTiles >> 1` stays written twice, not held in a local.
     if (cx >= (g_game->width >> 1) || cy >= (g_game->height >> 1))
         return 0;
     if (!((1 << player) & g_game->visibilityMask[cy * (g_game->width >> 1) + cx]))
@@ -195,8 +177,6 @@ int Pathfinder::GetCellState(int x, int y)
     return g_seams.units->MovementClassGet(owner, x, y);
 }
 
-// Resets a table of eight bytes {0, 40, 60, 80, 100, 80, 60, 40} copied from
-// a constant, and four byte pairs to {16, 22}.
 // FUNCTION: 0x40d880
 void Pathfinder::InitCostTables()
 {
@@ -205,18 +185,13 @@ void Pathfinder::InitCostTables()
     pairs[0].b = pairs[1].b = pairs[2].b = pairs[3].b = 0x16;
 }
 
-// Marks the cell at (x, y) with kind 4 and sets the dirty
-// bit of the block of eight cells that holds it.
 // FUNCTION: 0x40d8b0
 void Pathfinder::MarkGoalCell(unsigned int x, unsigned int y)
 {
-    // Call the grid methods on the member; writing their bodies here breaks the match.
     if (grid.InBounds(x, y))
         grid.Set(x, y, 4);
 }
 
-// Clears the kind of every cell in the dirty blocks of the grid, and the dirty
-// bits.
 // FUNCTION: 0x40d900
 void Pathfinder::ClearDirtyCells()
 {
@@ -227,7 +202,6 @@ void Pathfinder::ClearDirtyCells()
     grid.ClearLast(i);
 }
 
-// Maps a (dx, dy) step to one of eight directions, or -1.
 // FUNCTION: 0x40d9c0
 int __stdcall DirectionFromStep(int dx, int dy)
 {
@@ -261,9 +235,6 @@ __int64 Pathfinder::Estimate(int param1, int param2)
     return ((__int64)target->Cost(param1, param2) * (__int64)a) >> 0x10;
 }
 
-// Expands one open-list node onto the navigation grid: for each of the
-// directions in [fromCell->dir - range, fromCell->dir + range], update the
-// neighbour cell's cost and push it or sift it up in the open heap.
 // FUNCTION: 0x40da70
 void Pathfinder::ExpandNeighbour(NodeData* from, PathCell* fromCell, int turn)
 {
@@ -320,7 +291,6 @@ void Pathfinder::ExpandNeighbour(NodeData* from, PathCell* fromCell, int turn)
     }
 }
 
-// Pops the best node from an open list and expands it on the navigation grid.
 // FUNCTION: 0x40df00
 int Pathfinder::ExpandBestNode()
 {
@@ -347,10 +317,6 @@ int Pathfinder::ExpandBestNode()
     return 0;
 }
 
-// Traces the path found by the AI search back from the goal cell it reached
-// (+0x34) to the start (+0x30) by following each cell's direction byte, keeps
-// the points where the direction changes (a ring of 64), and hands them to the
-// path object in world coordinates, start first. Called from 0x40eb70.
 // FUNCTION: 0x40e050
 void Pathfinder::TracePath()
 {
@@ -361,10 +327,8 @@ void Pathfinder::TracePath()
     pts[0] = cur;
     int n = 1;
 
-    // Point::operator!= inline, not a plain `||`: sets the cur.x/cur.y load order.
     while (cur != start) {
         PathCell* c = grid.At(cur.x, cur.y);
-        // dir is read twice on purpose: keeps the cell address lea in the loop.
         if ((char)c->dir != dir) {
             dir = (char)c->dir;
             pts[n & 0x3f] = cur;
@@ -386,10 +350,6 @@ void Pathfinder::TracePath()
     g_seams.orders->AiSearchGoalSetWaypoints(path, out, count);
 }
 
-// Bug-style path probe: walks straight towards the goal (x first, then y)
-// until blocked, then follows the obstacle's outline both ways at once until
-// one side reaches the x-then-y line to the goal again. Returns the lowest
-// cost seen, or 0 when the walk reaches a goal cell or a zero-cost cell.
 // FUNCTION: 0x40e160
 int Pathfinder::ProbeStraightPath()
 {
@@ -401,7 +361,6 @@ int Pathfinder::ProbeStraightPath()
     char dir;
     int nx;
     int ny;
-    // The return to the straight walk is a goto; CostFix and Cost must stay two helpers.
 greedy:
         for (;;) {
             steps++;
@@ -485,10 +444,6 @@ greedy:
         }
 }
 
-// Starts a path search for the object at +0x58: marks every goal cell the
-// target reports, picks the goal nearest to the start as the probe's aim,
-// runs the straight-line probe (0x40e160) and, when that did not reach a
-// goal, seeds the open heap with the start cell.
 // FUNCTION: 0x40e630
 void Pathfinder::StartSearch(Target* t)
 {
@@ -514,7 +469,6 @@ void Pathfinder::StartSearch(Target* t)
         }
     }
 
-    // Each early exit is its own `Finish(); return;`, not a goto to a shared block.
     if (target->IsGoal(start.x, start.y)) {
         g_seams.orders->OrderFxAddFlags((OrderFx*)target.get(), 0x100);
         Finish();
@@ -565,9 +519,6 @@ void Pathfinder::AbortIfGoalMatch(int goal)
     }
 }
 
-// AISearch constructor (201-byte object): seeds the per-player search cost
-// table, sizes the map cell array from the game's map dimensions, and builds
-// the "touched" bitmap.
 // FUNCTION: 0x40e9e0
 Pathfinder::Pathfinder()
 {
@@ -581,7 +532,6 @@ Pathfinder::Pathfinder()
     grid.width = 0;
     grid.height = 0;
     grid.count = 0;
-    // memset, not `grid.cells = 0`: an assignment changes the later operator delete call.
     memset(&grid.cells, 0, sizeof(grid.cells));
 
     int w, h;
@@ -596,7 +546,6 @@ Pathfinder::Pathfinder()
     unsigned int m = (grid.count + 0xff) >> 8;
     unsigned int n = m * 4;
     grid.dirty = (unsigned int*)SimAllocTagged("AISearch touched mapentries", n);
-    // Only n - 1 bytes are filled; the last dword is zeroed separately.
     memset(grid.dirty, 0xff, n - 1);
     *(int*)((char*)grid.dirty + n - 4) = 0;
 
@@ -628,10 +577,6 @@ Pathfinder::~Pathfinder()
     operator delete(items);
 }
 
-// Per-tick path search scheduler: shares this tick's step budget among the
-// active players, then spends it on their path requests in turn, starting a
-// new search (0x40e630) for the next unit of the current player or expanding
-// the open heap of the running one until it reaches a goal or runs dry.
 // FUNCTION: 0x40eb70
 void Pathfinder::RunSearches()
 {
@@ -683,11 +628,9 @@ void Pathfinder::RunSearches()
                     object = u;
                     steps += 100;
                     costScale = g_playerBudgetCap[player];
-                    // The redundant ((Pathfinder*)this)-> casts stay; removing them changes ProbeStraightPath.
                     ((Pathfinder*)this)->StartSearch((Target*)path->target.get());
                 }
             }
-        // Loop is `while (1)` with the empty test inside, under this else-if.
         } else if (Size() != 0) {
             while (1) {
                 if (Size() == 0)
@@ -733,9 +676,6 @@ void Pathfinder::RunSearches()
     }
 }
 
-// Removes node `k` from the open heap: puts it back on the free list, shrinks
-// the heap by one, moves the last heap element into the freed slot and sifts it
-// down.
 // FUNCTION: 0x40ef20
 void Pathfinder::RemoveNode(int k)
 {
@@ -749,7 +689,6 @@ void Pathfinder::RemoveNode(int k)
     }
 }
 
-// Sift-down of a binary min-heap of node pointers; each node stores its heap index.
 // FUNCTION: 0x40f060
 void OpenHeap::SiftDown(int i)
 {
@@ -788,7 +727,6 @@ void OpenHeap::SiftDown(int i)
     node->index = i;
 }
 
-// Pushes entry `index` onto the free list threaded through the entries.
 // FUNCTION: 0x40f1e0
 void Pathfinder::FreeNode(int index)
 {

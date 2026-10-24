@@ -1,13 +1,8 @@
-// Decompiled by space-bunny-free. Names are provisional.
-// The object at +0 is a std::vector<std::vector<Elem_00434360> > (the same
-// class as 0x433380), where Elem_00434360 is a struct holding one
-// std::vector<Elem_00434020>; the fill value is a std::vector<Elem_00434360>.
-
 #include <vector>
 
 struct Elem_00434020 {
-    unsigned short a;                  // +0x0
-    unsigned short b;                  // +0x2
+    unsigned short a;
+    unsigned short b;
 };
 
 struct Elem_00434360 {
@@ -32,8 +27,6 @@ void LosTables::LoadLosTables()
         if ((&tdf)->SelectRecord("TABLEINFO") != 0) {
             short numtables = (short)tdf.current->GetFieldInt("numtables", 0);
             {
-                // The vector of tables held at +0, reached through the class's
-                // member-free declaration.
                 W2_00433130& tables = *(W2_00433130*)this;
                 W1_00433130 temp;
                 unsigned n = (unsigned)numtables;

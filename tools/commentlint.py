@@ -73,6 +73,8 @@ class Comment:
     end: int
     body: str
     code_before: bool
+    begin: int = 0
+    stop: int = 0
 
 
 RAW_OPEN = re.compile(r'"([^()\\ ]{0,16})\(')
@@ -97,7 +99,7 @@ def scan_c(text):
                 if text[j] == "\n":
                     line += 1
                 j += 1
-            comments.append(Comment(start, line, text[i + 2:j], start in code_lines))
+            comments.append(Comment(start, line, text[i + 2:j], start in code_lines, i, j))
             i = j
         elif two == "/*":
             j = text.find("*/", i + 2)
@@ -105,7 +107,7 @@ def scan_c(text):
             body = text[i + 2:max(i + 2, j - 2)]
             start = line
             line += text.count("\n", i, j)
-            comments.append(Comment(start, line, body, start in code_lines))
+            comments.append(Comment(start, line, body, start in code_lines, i, j))
             i = j
         elif c == '"' or (c == "'" and not (i and text[i - 1].isdigit())):
             m = RAW_OPEN.match(text, i) if c == '"' and RAW_PREFIX.search(text, max(0, i - 3), i) else None
@@ -151,32 +153,41 @@ def one_line_doc(comment, lines):
     return bool(below) and not below.startswith(("//", "/*", "*/"))
 
 
-def check_c(path, text, added):
-    out, todos = [], []
+def classify_c(path, text):
+    """(comment, status, reason) for every comment: status is "todo", "ok" or "bad"."""
     lines = text.splitlines()
     published = path in PUBLISHED_INTERFACES or path.startswith(PUBLISHED_INTERFACE_DIRS)
+    result = []
     for c in scan_c(text):
+        body = c.body.strip()
+        if TODO.match(body):
+            result.append((c, "todo", ""))
+        elif not c.code_before and any(d.match(body) for _, d, _ in DIRECTIVES):
+            result.append((c, "ok", ""))
+        elif published:
+            if one_line_doc(c, lines):
+                result.append((c, "ok", ""))
+            else:
+                result.append((c, "bad", "doc comment in a published interface must be one line, "
+                                         "directly above a declaration or trailing it"))
+        elif body.startswith("TODO"):
+            result.append((c, "bad", "TODO must read TODO(#n): text"))
+        else:
+            result.append((c, "bad", "comment outside the allowed forms (TODO(#n), "
+                                     "FUNCTION/GLOBAL/ENTRY/FLAGS directive)"))
+    return result
+
+
+def check_c(path, text, added):
+    out, todos = [], []
+    for c, status, reason in classify_c(path, text):
         touched = [ln for ln in range(c.start, c.end + 1) if ln in added]
         if not touched:
             continue
-        where = touched[0]
-        body = c.body.strip()
-        m = TODO.match(body)
-        if m:
-            todos.append((path, where, int(m.group(1))))
-            continue
-        if not c.code_before and any(d.match(body) for _, d, _ in DIRECTIVES):
-            continue
-        if published:
-            if not one_line_doc(c, lines):
-                out.append((where, "doc comment in a published interface must be one line, "
-                                   "directly above a declaration or trailing it"))
-            continue
-        if body.startswith("TODO"):
-            out.append((where, "TODO must read TODO(#n): text"))
-        else:
-            out.append((where, "comment outside the allowed forms (TODO(#n), "
-                               "FUNCTION/GLOBAL/ENTRY/FLAGS directive)"))
+        if status == "todo":
+            todos.append((path, touched[0], int(TODO.match(c.body.strip()).group(1))))
+        elif status == "bad":
+            out.append((touched[0], reason))
     return out, todos
 
 

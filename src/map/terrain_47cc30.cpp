@@ -223,5 +223,5 @@ void __stdcall AddUnitToMap(Obj_0047cc30* obj)
     return;
 
 remove:
-    SetOwner_0047cc30(obj, (*(Owner_0047cc30 **)&g_game->overflowBucket));
+    SetOwner_0047cc30(obj, (Owner_0047cc30*)g_game->overflowBucket.get());
 }

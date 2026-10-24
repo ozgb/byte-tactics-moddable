@@ -38,7 +38,7 @@ extern Game* g_game;
 void BuildFogTiles(void)
 {
     MapInfo* info = &g_game->info_141fb;
-    FogGrid* grid = (FogGrid*)info->grid.get();
+    FogGrid* grid = (FogGrid*)info->grid;
     PlayerGrid* pg = &g_game->players_1bdf[g_game->playerIndex];
     unsigned int bit = 1 << g_game->playerIndex;
 

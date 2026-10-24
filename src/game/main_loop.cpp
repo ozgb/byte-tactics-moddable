@@ -345,7 +345,7 @@ void CampaignSetupFrame()
     g_game->numPlayers = 2;
     g_seams.players->SetupPlayerSlot(0, 1);
     g_seams.players->SetupPlayerSlot(1, 2);
-    ((Sub_00496db0*)g_game->p1cd5.get())->flag_96 = 1;
+    ((Sub_00496db0*)g_game->p1cd5)->flag_96 = 1;
     g_game->mode_391f1 = 5;
     g_game->handler = LoadingScreenFrame;
     SetCloseHandler(LeaveNetGameCallback, 0);

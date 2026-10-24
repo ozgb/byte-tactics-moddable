@@ -141,7 +141,7 @@ struct Game_00449bb0 {
     char unknown_37f1d[2];
     unsigned short height;              // +0x37f1f
     char unknown_37f21[0x391e9 - 0x37f21];
-    void* map;                          // +0x391e9
+    Ref<char> map;
     char unknown_391ed[0x39229 - 0x391ed];
     int commander;                      // +0x39229
     int mapping;                        // +0x3922d
@@ -354,7 +354,7 @@ void OpenBattleRoom()
     *g_game->chatter = 0;
     {
         Gadget_00449bb0* mem = FindGadgetChecked_C(g_game->gui.table->entries, "MEMx");
-        mem->colour = ((PlayerInfo_00449bb0*)player->info)->memory < ((Class_00435920*)g_game->map)->GetTerrainSizeTier() ? 0xc : 0;
+        mem->colour = ((PlayerInfo_00449bb0*)player->info)->memory < ((Class_00435920*)g_game->map.get())->GetTerrainSizeTier() ? 0xc : 0;
         sprintf(mem->text, "%d", ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info)->memory);
     }
     isHost = ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info)->f97_0;
@@ -383,13 +383,13 @@ void OpenBattleRoom()
     }
     BindNamedSliderWithCallback("ENERGY", 0x2711, energy, UpdateEnergyText);
 
-    ((Class_00435d30*)g_game->map)->RefreshMapList(1);
+    ((Class_00435d30*)g_game->map.get())->RefreshMapList(1);
     if (isHost && IsOnlineConfigLoaded() && g_lobbyMapName[0])
-        ((Class_00435a20*)g_game->map)->LoadMissionByName(g_lobbyMapName);
-    if (!((Class_00435c40*)g_game->map)->HasMissionName())
+        ((Class_00435a20*)g_game->map.get())->LoadMissionByName(g_lobbyMapName);
+    if (!((Class_00435c40*)g_game->map.get())->HasMissionName())
         FatalError("Could not find the multiplayer map!!");
-    strcpy(info->map, ((Class_00435c30*)g_game->map)->GetMissionName());
-    info->mapCrc = ((Class_004373a0*)g_game->map)->ComputeMapChecksum();
+    strcpy(info->map, ((Class_00435c30*)g_game->map.get())->GetMissionName());
+    info->mapCrc = ((Class_004373a0*)g_game->map.get())->ComputeMapChecksum();
     BroadcastPlayerInfo();
     BeginTextEdit(&g_game->gui, FindGadgetIndex(g_game->gui.table->entries, "MESSAGE", 0xe));
 

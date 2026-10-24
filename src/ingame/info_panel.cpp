@@ -533,7 +533,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
 
     if (g_game->unitInfoHoverTrack == 0 || g_game->unitInfoHoverUnitId == 0)
         return 0;
-    unit = (Unit*)(*(int*)((char*)g_game + 0x14357)
+    unit = (Unit*)((char*)g_game->units.get()
                             + g_game->unitInfoHoverUnitId * 0x118);
     if ((((int)unit->flags) & 0x10000000) == 0 || (((int)unit->flags) & 0x4000) != 0) {
         g_game->unitInfoHoverTrack = 0;

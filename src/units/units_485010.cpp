@@ -376,13 +376,14 @@ void __stdcall AllocateUnitMemory(void)
     g_game->unitsPerPlayer = g_game->field_37ee6;
     g_game->poolCount = (unsigned short)(g_game->field_37ee6 * 10 + 1);
 
-    unsigned char* pool = (*(unsigned char **)&g_game->units) = (unsigned char*)SimAllocTagged("UNIT MEMORY", g_game->poolCount * 0x118);
+    unsigned char* pool = (unsigned char*)SimAllocTagged("UNIT MEMORY", g_game->poolCount * 0x118);
+    g_game->units = (Unit*)pool;
     memset(pool, 0, g_game->poolCount * 0x118);
 
     unsigned int ten = g_game->field_37ee6 * 10;
     (*(void **)&g_game->list_1435f) = SimAllocTagged("HOT UNITS", ten * 2);
     g_game->hotRadar = SimAllocTagged("HOT RADAR UNITS", ten * 10);
-    (*(unsigned char **)&g_game->unitsEnd) = (unsigned char *)g_game->units.get() + g_game->poolCount * 0x118 - 0x118;
+    g_game->unitsEnd = (Unit*)((unsigned char *)g_game->units.get() + g_game->poolCount * 0x118 - 0x118);
 
     unsigned short n;
     for (n = 0; n < g_game->poolCount; n++) {

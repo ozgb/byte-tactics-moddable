@@ -7,7 +7,6 @@
 #define LOS_TABLES_H
 
 #include "../util/string_ref.h"
-#include "../../interfaces/ref.h"
 
 // The vector type of the member at +0, declared only: the files that build the
 // tables define it.
@@ -51,9 +50,9 @@ public:
     void ResizeTables(short n);
 
     std::allocator<int> allocator;
-    Ref<int> first;
-    Ref<int> last;
-    Ref<int> end;
+    int* first;
+    int* last;
+    int* end;
 };
 
 #endif

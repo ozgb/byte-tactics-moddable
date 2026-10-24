@@ -7,7 +7,7 @@ struct Grid;
 #pragma pack(push, 1)
 struct MapInfo {
     char unknown_0[36];
-    Ref<Grid> grid;
+    Grid* grid;
     char unknown_28[16];
     int width;
     int height;

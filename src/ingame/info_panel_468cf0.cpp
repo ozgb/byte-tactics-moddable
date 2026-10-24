@@ -465,7 +465,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     i = 0;
     while (i < h) {
       x = x0;
-      Tile_00468cf0 *tile = (Tile_00468cf0*)mv->tiles + (mv->width * y + x);
+      Tile_00468cf0 *tile = (Tile_00468cf0*)mv->tiles.get() + (mv->width * y + x);
       int c = 0;
       while (c < w) {
         tile->flags &= 0xfb;
@@ -506,7 +506,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
             DrawUnit((int)&ctx, (int)u);
         }
       }
-      Tile_00468cf0 *tile = (Tile_00468cf0*)mv->tiles + (y * mv->width + x0);
+      Tile_00468cf0 *tile = (Tile_00468cf0*)mv->tiles.get() + (y * mv->width + x0);
       for (int c = 0; c < w; c++, tile++) {
         x = x0 + c;
 

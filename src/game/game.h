@@ -200,9 +200,9 @@ struct Game {
             char unknown_12f3[1868];
             PlayerInfo* infos[11];
             char unknown_1a6b[287];
-            Ref<SideData> p1b8a;
+            SideData* p1b8a;
             char unknown_1b8e[327];
-            Ref<SideData> p1cd5;
+            SideData* p1cd5;
             char unknown_1cd9[281];
             short field_1df2;
             char unknown_1df4[2988];
@@ -417,7 +417,7 @@ struct Game {
             float tidal;
             void* radarFrame;
             Feature* features;
-            unsigned short* visibilityMask;
+            Ref<unsigned short> visibilityMask;
             int count_14277;
             Eye_00482130* eyes;
             unsigned char seaLevel;

@@ -192,7 +192,7 @@ extern Game* g_game;
 // FUNCTION: 0x499a30
 void AllocWeaponArray(void)
 {
-    (*(void **)&g_game->projectiles) = SimAllocTagged("WEAPON ARRAY", 0x7d64);
+    g_game->projectiles = (Projectile*)SimAllocTagged("WEAPON ARRAY", 0x7d64);
     memset((void *)g_game->projectiles, 0, 0x7d64);
     g_game->projectileCount = 0;
 }
@@ -203,7 +203,7 @@ void __cdecl GameFreeThunk(void* p);
 void FreeWeaponArray(void)
 {
     GameFreeThunk((void *)g_game->projectiles);
-    (*(void **)&g_game->projectiles) = 0;
+    g_game->projectiles = 0;
 }
 
 #pragma pack(push, 1)

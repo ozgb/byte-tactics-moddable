@@ -811,7 +811,7 @@ void LoadUnitTypes() {
         } while (c);
     }
 
-    (*(void ***)&g_game->types) = (void**)SimAllocTagged("MODEL PTRS", g_game->unitDefCount * 4);
+    g_game->types = (Class_0045ae80**)SimAllocTagged("MODEL PTRS", g_game->unitDefCount * 4);
 
     // `u` must be an unsigned short: an int counter breaks the loop.
     for (unsigned short u = 1; u < g_game->unitDefCount; u++) {
@@ -964,7 +964,7 @@ void FreeUnitTypes()
     GameFreeThunk((void **)g_game->types.get());
     GameFreeThunk(g_game->defs);
 
-    (*(void ***)&g_game->types) = 0;
+    g_game->types = 0;
     g_game->defs = 0;
 }
 

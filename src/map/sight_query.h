@@ -9,16 +9,17 @@
 #define SIGHT_QUERY_H
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 struct Player;
 
 struct SightQuery {                    // 0x24 bytes
-    Player* player;                    // +0x00
-    short* cacheCell;                  // +0x04
+    Ref<Player> player;
+    Ref<short> cacheCell;
     short sightDistance;               // +0x08
     unsigned char eyeHeight;           // +0x0a
     char unknown_b;                    // +0x0b
-    unsigned char* frameIdx;           // +0x0c
+    Ref<unsigned char> frameIdx;
     Vec3 pos;                          // +0x10
     int unknown_1c;                    // +0x1c
     int unknown_20;                    // +0x20

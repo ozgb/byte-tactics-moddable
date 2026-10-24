@@ -146,6 +146,8 @@ Game,logos32,pointer,src/game/game.h,#353
 Game,moviePlayer,pointer,src/game/game.h,#353
 Game,nuclogo,pointer,src/game/game.h,#353
 Game,nuke1,int-pointer,src/game/game.h,#353
+Game,p1b8a,pointer,src/game/game.h,#351
+Game,p1cd5,pointer,src/game/game.h,#351
 Game,palette_3907f,pointer,src/game/game.h,#353
 Game,pathIcon,int-pointer,src/game/game.h,#353
 Game,pendingSaveStore,pointer,src/game/game.h,#352
@@ -194,10 +196,13 @@ Layer,owner,pointer,src/frontend/multi.cpp,#353
 Layer,surface,pointer,src/frontend/frontend.cpp|src/gui/layer.h,#353
 Layer,textHandler,function-pointer,src/gui/layer.h,#353
 LosTables,allocator,container,src/map/los_tables.h,#350
+LosTables,end,pointer,src/map/los_tables.h,#350
+LosTables,first,pointer,src/map/los_tables.h,#350
+LosTables,last,pointer,src/map/los_tables.h,#350
 MapGrid,buf,pointer,src/ingame/map_grid.h,#353
 MapGrid,count,pointer,src/ingame/map_grid.h,#353
 MapGrid,cursor,pointer,src/ingame/map_grid.h,#353
-MapGrid,tiles,int-pointer,src/ingame/map_grid.h,#353
+MapInfo,grid,pointer,src/map/map_info.h,#22
 Menu_0045b800,holder,pointer,src/frontend/menu_0045b800.h,#353
 Mission,briefing,pointer,src/map/mission.h,#349
 Mission,features,pointer,src/map/mission.h,#349
@@ -272,6 +277,7 @@ PlayerAI,vec_bd,container,src/ai/player_ai.h,#351
 PlayerAI,weights,container,src/ai/player_ai.h,#351
 PlayerEntry_004777a0,info,pointer,src/frontend/player_entry_004777a0.h,#353
 PlayerFrameInfo,frame,pointer,src/network/packet_receiver.h,#351
+PlayerGrid,cells,pointer,src/map/player_grid.h,#351
 Projectile,attacker,pointer,src/weapons/projectile.h,#349
 Projectile,interceptedProjectile,pointer,src/weapons/projectile.h,#349
 Projectile,targetUnitPtr,pointer,src/weapons/projectile.h,#349

@@ -51,7 +51,7 @@ struct Game_00408100 {
     int mapPixelWidth;                 // +0x1422b
     int mapPixelHeight;                // +0x1422f
     char unknown_14233[0x1439b - 0x14233];
-    Item_00408100* unitDefs;           // +0x1439b
+    Ref<Item_00408100> unitDefs;
     char unknown_1439f[0x38a47 - 0x1439f];
     unsigned int gameTick;             // +0x38a47
 };

@@ -49,6 +49,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python3 tools/hostlint.py --open-issues
 
+      - name: Test the rename tool
+        run: python3 tools/test_rename.py
+
   modern-compile:
     name: modern-compile
     runs-on: ubuntu-24.04

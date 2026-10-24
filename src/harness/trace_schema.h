@@ -179,9 +179,9 @@ static const TraceField kProjectileFields[] = {
     { "spawnTick", 0x42, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "time", 0x46, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "nextSmokeTick", 0x4a, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "", 0x4e, 4, TF_POINTER, TT_HEAP, 0x0 },
+    { "", 0x4e, 4, TF_REF, TT_HEAP, 0x0 },
     { "attacker", 0x52, 4, TF_REF, TT_UNIT, 0x0 },
-    { "field_56", 0x56, 4, TF_SCALAR, TT_NONE, 0x0 },
+    { "", 0x56, 4, TF_REF, TT_PROJECTILE, 0x0 },
     { "cellX", 0x5a, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "cellZ", 0x5c, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "radius", 0x5e, 2, TF_SCALAR, TT_NONE, 0x0 },
@@ -196,9 +196,10 @@ static const TraceField kProjectileFields[] = {
 static const TraceField kProjectilePlan[] = {
     { "", 0x0, 4, TF_REF, TT_WEAPONDEF, 0x0 },
     { "", 0x4, 74, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x4e, 4, TF_POINTER, TT_HEAP, 0x0 },
+    { "", 0x4e, 4, TF_REF, TT_HEAP, 0x0 },
     { "", 0x52, 4, TF_REF, TT_UNIT, 0x0 },
-    { "", 0x56, 21, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0x56, 4, TF_REF, TT_PROJECTILE, 0x0 },
+    { "", 0x5a, 17, TF_BYTES, TT_NONE, 0x0 },
 };
 
 static const TraceField kPlayerFields[] = {
@@ -1300,7 +1301,7 @@ static const TraceField kUnitDefDataPlan[] = {
 };
 
 static const TraceTable kUnitTable = { kUnitFields, 87, kUnitPlan, 30, 0x118 };
-static const TraceTable kProjectileTable = { kProjectileFields, 33, kProjectilePlan, 5, 0x6b };
+static const TraceTable kProjectileTable = { kProjectileFields, 33, kProjectilePlan, 6, 0x6b };
 static const TraceTable kPlayerTable = { kPlayerFields, 66, kPlayerPlan, 12, 0x14b };
 static const TraceTable kDebrisTable = { kDebrisFields, 27, kDebrisPlan, 6, 0x54 };
 static const TraceTable kPieceTable = { kPieceFields, 14, kPiecePlan, 8, 0x34 };

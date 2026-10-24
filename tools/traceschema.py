@@ -64,12 +64,13 @@ NAMES: dict[str, dict[int, str]] = {
 POINTERS: dict[str, dict[int, str]] = {
     "Unit": {0x0: "HEAP", 0x4: "HEAP", 0x8: "HEAP", 0xC: "WEAPONDEF", 0x10: "HEAP", 0x24: "HEAP", 0x2C: "HEAP",
              0x40: "HEAP", 0x48: "HEAP", 0x82: "REC", 0x86: "UNIT"},
-    "Projectile": {0x4E: "HEAP"},
+    "Projectile": {0x4E: "HEAP", 0x56: "PROJECTILE"},
     "Debris": {0x0: "PIECE"},
 }
 
 REFS: dict[str, set[int]] = {
     "MoveClass": {0x18},
+    "Projectile": {0x4E, 0x56},
 }
 
 POINTER_NAMES: dict[tuple[str, int], str] = {
@@ -403,7 +404,7 @@ SYNTHETIC.update({
         int arg2;                     // +0x3e
         unsigned int flags;           // +0x42
         unsigned int created;         // +0x46
-        OrderRef* next;               // +0x4a
+        Ref<OrderRef> next;           // +0x4a
         unsigned int subFlags;        // +0x4e
         Ref<OrderFxRef> attached;        // +0x52
     """,
@@ -459,7 +460,7 @@ SYNTHETIC.update({
         Ref<Unit> self;                   // +0x28
     """,
     "UnitMotion": """
-        char* obj;                    // +0x0
+        Ref<Iface_0043dd20> obj;     // +0x0
         MovementClass* movementClass; // +0x4
         Vec3 velocity;                // +0x8
         Vec3 p2;                      // +0x14

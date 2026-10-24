@@ -343,17 +343,17 @@ void FreePlayers()
         q[1] = 0;
         ((Ref<unsigned char>*)q)[-2] = (unsigned char*)0;
         g_seams.ai->FreeSquads(p);
-        if (((SquadManager**)q)[-4]) {
+        if (((Ref<SquadManager>*)q)[-4]) {
             g_seams.ai->DestroyPlayerAI(((unsigned char*)q)[0xc2]);
-            if (SquadManager* u = ((SquadManager**)q)[-4]) {
+            if (SquadManager* u = ((Ref<SquadManager>*)q)[-4].get()) {
                 g_seams.ai->SquadManagerDeleteTimers(u, 0);
                 delete u;
             }
-            ((SquadManager**)q)[-4] = 0;
+            ((Ref<SquadManager>*)q)[-4] = (SquadManager*)0;
         }
-        if (((void**)q)[0x1a]) {
-            delete[] ((void**)q)[0x1a];
-            ((void**)q)[0x1a] = 0;
+        if (((Ref<UnitResources>*)q)[0x1a]) {
+            delete[] ((Ref<UnitResources>*)q)[0x1a].get();
+            ((Ref<UnitResources>*)q)[0x1a] = (UnitResources*)0;
         }
     }
 }

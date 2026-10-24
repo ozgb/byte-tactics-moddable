@@ -2341,7 +2341,7 @@ static void VisitSquadManagers()
     char path[96];
     HashByte(25);
     for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned manager = ReadU32At((unsigned)PlayerAt(i), PLAYER_MANAGER);
+        unsigned manager = ReadRefAt((unsigned)PlayerAt(i), PLAYER_MANAGER);
         HashU32(i);
         HashByte(manager != 0);
         if (manager == 0)
@@ -2366,7 +2366,7 @@ static void VisitSquads()
     char path[96];
     HashByte(26);
     for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned squads = ReadU32At((unsigned)PlayerAt(i), PLAYER_SQUADS);
+        unsigned squads = ReadRefAt((unsigned)PlayerAt(i), PLAYER_SQUADS);
         HashU32(i);
         HashByte(squads != 0);
         if (squads == 0)
@@ -2387,7 +2387,7 @@ static void VisitUnitResources()
     char path[96];
     HashByte(27);
     for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned econ = ReadU32At((unsigned)PlayerAt(i), PLAYER_ECON);
+        unsigned econ = ReadRefAt((unsigned)PlayerAt(i), PLAYER_ECON);
         HashU32(i);
         HashByte(econ != 0);
         if (econ == 0)
@@ -2768,7 +2768,7 @@ static void ReachQuirkGuard()
         for (int slot = 0; slot < MAX_PLAYERS; slot++) {
             if (!s_players[slot].named || s_players[slot].human)
                 continue;
-            unsigned manager = ReadU32At((unsigned)PlayerAt(slot), PLAYER_MANAGER);
+            unsigned manager = ReadRefAt((unsigned)PlayerAt(slot), PLAYER_MANAGER);
             unsigned char* ai = g_playerAI[slot];
             unsigned count = *(unsigned short*)GameAt(GAME_POOL_COUNT);
             if (manager == 0 || ai == 0)

@@ -28,7 +28,7 @@ void __stdcall CreateSquads(Player* owner)
     owner->groups = (Group*)SimAllocTagged("SQUADS", 10 * sizeof(Squad));
     for (int i = 0; i < 10; i++)
     {
-        Squad* squad = &((Squad*)owner->groups)[i];
+        Squad* squad = &((Squad*)owner->groups.get())[i];
         squad->owner = owner;
         squad->index = i;
         squad->field_8 = 0;
@@ -43,8 +43,8 @@ void __stdcall FreeSquads(Player* owner)
 {
     if (owner->groups) {
         for (int i = 0; i < 10; i++)
-            ((Squad*)owner->groups)[i].items.~vector();
-        GameFreeThunk((int*)owner->groups);
+            ((Squad*)owner->groups.get())[i].items.~vector();
+        GameFreeThunk((int*)owner->groups.get());
         owner->groups = 0;
     }
 }
@@ -76,9 +76,9 @@ void __stdcall SetUnitSquad(Unit* unit, int index)
 {
     // RemoveFast stays a separate inline helper: a flat body inlines push_back's size() calls too.
     if (unit->group != -1)
-        RemoveFast((SimVector<Unit*>&)((Squad*)((Player *)unit->player)->groups)[unit->group].items, unit);
+        RemoveFast((SimVector<Unit*>&)((Squad*)((Player *)unit->player)->groups.get())[unit->group].items, unit);
     if (index != -1)
-        ((SimVector<Unit*>&)((Squad*)((Player *)unit->player)->groups)[index].items).push_back(unit);
+        ((SimVector<Unit*>&)((Squad*)((Player *)unit->player)->groups.get())[index].items).push_back(unit);
     unit->group = index;
 }
 

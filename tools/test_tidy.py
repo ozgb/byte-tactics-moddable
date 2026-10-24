@@ -251,9 +251,9 @@ class TidyTest(Repo, unittest.TestCase):
         self.assertGreater(len(rows), 10)
         for row in rows:
             regex = re.compile("^(" + row[row.index(".*_00"):-3] + ")$")
-            for name in ("is_bad", "do_fade", "add_face", "set_dead"):
+            for name in ("is_bad", "do_fade", "add_face", "set_dead", "faded"):
                 self.assertIsNone(regex.match(name), (name, row))
-            for name in ("Class_00463be0", "field_10", "unknown_4", "param_1", "unk_8", "vec_c"):
+            for name in ("Class_00463be0", "field_10", "unknown_4", "param_1", "unk_8", "vec_c", "rest_3923b", "bits0_3923b", "bit11_37ebe"):
                 self.assertIsNotNone(regex.match(name), (name, row))
 
     def test_name_in_comment_or_string_ignored(self):

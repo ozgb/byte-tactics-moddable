@@ -122,7 +122,7 @@ void ScoutTimer::OnTimer()
     Vec3 origin;
     GetBasePosition(player, &origin);
     std::vector<Unit_00408100*>::iterator it;
-    for (it = ((Group_00408100*)group)->units.begin(); it != ((Group_00408100*)group)->units.end(); ++it) {
+    for (it = ((Group_00408100*)group.get())->units.begin(); it != ((Group_00408100*)group.get())->units.end(); ++it) {
         Unit_00408100* u = *it;
         if (u->def->count
             && (!(unsigned char)u->def->flag12
@@ -151,7 +151,7 @@ void ScoutTimer::OnTimer()
             }
         }
     }
-    for (it = ((Group_00408100*)group)->units.begin(); it != ((Group_00408100*)group)->units.end(); ++it) {
+    for (it = ((Group_00408100*)group.get())->units.begin(); it != ((Group_00408100*)group.get())->units.end(); ++it) {
         Unit_00408100* u = *it;
         // Declared in the loop body: keeps the u->def load below the copy.
         Vec3 target;

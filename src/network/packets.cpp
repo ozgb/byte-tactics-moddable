@@ -19,6 +19,8 @@
 #include <signal.h>
 #include <malloc.h>
 
+#include "../../interfaces/ref.h"
+
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* ptr);
 void __cdecl PacketTrace(const char* fmt, ...);
@@ -46,7 +48,7 @@ struct NetPacketPendingEntry {
 
 class PacketBuffer {
 public:
-    PacketChannel* pool;               // +0x00
+    Ref<PacketChannel> pool;
     int start;                         // +0x04, the index of its first packet
     int count;                         // +0x08
     int length;                        // +0x0c
@@ -1241,8 +1243,8 @@ void PacketBuffer::RemovePacket(NetPacketPendingEntry* packet)
 {
     PacketTrace("removing packet (len=%ld, type=%d, data=\"%s\")\n",
                  packet->size,
-                 *(unsigned char*)((char*)packet->offset + (int)packet->owner + 0x14),
-                 (char*)packet->offset + (int)packet->owner + 0x15);
+                 *(unsigned char*)((char*)packet->owner + packet->offset + 0x14),
+                 (char*)packet->owner + packet->offset + 0x15);
 
     if (packet->queued >= 0) {
         PacketTrace("Warning! RemovePacket called for packet in pending queue!\n");
@@ -1299,7 +1301,7 @@ int NetPacketPendingEntry::GetData()
 // The real constructor of PacketReceiver (vtable 0x4fd518, scalar deleting
 // destructor 0x462cc0, destructor 0x462d30).
 // FUNCTION: 0x462c00
-PacketReceiver::PacketReceiver(void* o)
+PacketReceiver::PacketReceiver(PacketManager* o)
     : unused(0), owner(o), fromId(-1), toId(-1), savedFrameEntry(0), buffer(0), spare(0),
       capacity(0), length(0), spareLength(0), spareFromId(-1), spareToId(-1)
 {
@@ -1903,7 +1905,7 @@ Player::Player() : active(0), type(0)
     explored = 0;
     index = 10;
     info = (PlayerInfo*)SimAllocTagged("Player Info", 0xb9);
-    AllocNotifyNop((int)info);
+    AllocNotifyNop((int)info.get());
     memset(info, 0, 0xb9);
 }
 

@@ -201,9 +201,9 @@ struct Game {
             char unknown_12f3[1868];
             PlayerInfo* infos[11];
             char unknown_1a6b[287];
-            SideData* p1b8a;
+            Ref<SideData> p1b8a;
             char unknown_1b8e[327];
-            SideData* p1cd5;
+            Ref<SideData> p1cd5;
             char unknown_1cd9[281];
             short field_1df2;
             char unknown_1df4[2988];

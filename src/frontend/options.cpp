@@ -1000,7 +1000,7 @@ void __stdcall SetGadgetTextFromValueTable(Entry_0045c010* table, char* name, in
 void __stdcall HandleGameSpeedSlider(Menu_0045b800* obj, int unused)
 {
     Player* player = &g_game->players[g_game->localPlayer];
-    if (player->active == 0 || !((Opts_0045f1d0*)player->info)->u.flag_9b_6) {
+    if (player->active == 0 || !((Opts_0045f1d0*)player->info.get())->u.flag_9b_6) {
         Gadget* e = FindGadgetChecked_D(obj->holder->entries, "GAME");
         if (e != 0) {
             // Written twice, as in the original.
@@ -2091,7 +2091,7 @@ void ShowGameSettingsDialog()
     unsigned int index = FindHostSlot();
     index &= 0xff;
     char num[0x40];
-    Opts_0045f1d0* opts = (Opts_0045f1d0*)g_game->players[index].info;
+    Opts_0045f1d0* opts = (Opts_0045f1d0*)g_game->players[index].info.get();
     Rule_0045f1d0* rule = &((Rule_0045f1d0*)(RuleSet_0045f1d0 *)g_game->options)[g_game->localPlayer];
     char* deathStrs[3] = { "Game Continues", "Game Ends", "Deathmatch" };
     char* locStrs[2] = { "Random", "Fixed" };

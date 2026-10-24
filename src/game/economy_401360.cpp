@@ -330,7 +330,7 @@ void __stdcall UpdatePlayerEconomy(Player* p)
         }
 #endif
     }
-    Econ_00401360* e = (Econ_00401360*)p->econ;
+    Econ_00401360* e = (Econ_00401360*)p->econ.get();
 #ifdef __clang__
     double energyProduced = (double)producedA[0] + e->res[0].produced;
     producedA[0] = energyProduced;
@@ -457,6 +457,6 @@ void __stdcall UpdatePlayerEconomy(Player* p)
             SettleResourceAccount(&EconOf(u)->res[1], ratioA[1], demandRatio[1]);
         }
     }
-    SettleResourceAccount(&((Econ_00401360*)p->econ)->res[0], ratioA[0], demandRatio[0]);
-    SettleResourceAccount(&((Econ_00401360*)p->econ)->res[1], ratioA[1], demandRatio[1]);
+    SettleResourceAccount(&((Econ_00401360*)p->econ.get())->res[0], ratioA[0], demandRatio[0]);
+    SettleResourceAccount(&((Econ_00401360*)p->econ.get())->res[1], ratioA[1], demandRatio[1]);
 }

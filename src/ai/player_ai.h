@@ -11,6 +11,7 @@
 #define PLAYER_AI_H
 
 #include "../state/sim_allocator.h"
+#include "../../interfaces/ref.h"
 
 struct Player;
 struct Unit;
@@ -67,7 +68,7 @@ struct Group_00409160 {
 
 class PlayerAI {
 public:
-    Player* owner;                     // +0x00
+    Ref<Player> owner;
     unsigned char index;               // +0x04
     // Wrapper depth decides which vector constructors inline: visible and
     // known are one level deep, factories two.

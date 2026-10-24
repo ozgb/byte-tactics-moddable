@@ -2,6 +2,7 @@
 #define AI_SEARCH_GOAL_H
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 
 struct Vec3;
 struct Point16;
@@ -15,8 +16,8 @@ class AiSearchGoal;
 #pragma pack(push, 1)
 class PathGoal {
 public:
-    OrderFx* target;
-    Unit* owner;
+    Ref<OrderFx> target;
+    Ref<Unit> owner;
 
     PathGoal(Unit* p);
     virtual ~PathGoal() {}

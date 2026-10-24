@@ -1601,13 +1601,15 @@ static void VisitVisibility()
     EndSection();
 }
 
+static unsigned ReadRefAt(unsigned p, unsigned offset);
+
 static void VisitExplored()
 {
     char path[64];
     HashByte(13);
     for (unsigned who = 0; who < MAX_PLAYERS; who++) {
         unsigned char* player = GameAt(GAME_PLAYERS) + who * PLAYER_STRIDE;
-        unsigned char* cells = *(unsigned char**)(player + PLAYER_EXPLORED);
+        unsigned char* cells = (unsigned char*)ReadRefAt((unsigned)player, PLAYER_EXPLORED);
         unsigned size = *(unsigned*)(player + PLAYER_EXPLORED_SIZE);
         if (cells == NULL || size > EXPLORED_LIMIT)
             size = 0;
@@ -1899,7 +1901,7 @@ static void NumberUnitHeap(unsigned char* units, unsigned count)
         }
         unsigned motion = ReadRefAt((unsigned)u, UNIT_MOTION);
         if (motion != 0 && ReadRefAt(motion, 0) != 0)
-            RegisterFx(ReadU32At(ReadRefAt(motion, 0), GOAL_TARGET));
+            RegisterFx(ReadRefAt(ReadRefAt(motion, 0), GOAL_TARGET));
     }
 }
 
@@ -2339,7 +2341,7 @@ static void VisitSquadManagers()
     char path[96];
     HashByte(25);
     for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned manager = ReadU32At((unsigned)PlayerAt(i), PLAYER_MANAGER);
+        unsigned manager = ReadRefAt((unsigned)PlayerAt(i), PLAYER_MANAGER);
         HashU32(i);
         HashByte(manager != 0);
         if (manager == 0)
@@ -2347,7 +2349,7 @@ static void VisitSquadManagers()
         sprintf(path, "players[%u].squadManager", i);
         VisitElement(path, (const unsigned char*)manager, &kSquadManagerTable);
         for (unsigned t = 0; t < SQUAD_TIMERS; t++) {
-            unsigned timer = ReadU32At(manager, MANAGER_TIMERS + t * 4);
+            unsigned timer = ReadRefAt(manager, MANAGER_TIMERS + t * 4);
             HashByte((unsigned char)t);
             HashByte(timer != 0);
             if (timer == 0)
@@ -2364,7 +2366,7 @@ static void VisitSquads()
     char path[96];
     HashByte(26);
     for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned squads = ReadU32At((unsigned)PlayerAt(i), PLAYER_SQUADS);
+        unsigned squads = ReadRefAt((unsigned)PlayerAt(i), PLAYER_SQUADS);
         HashU32(i);
         HashByte(squads != 0);
         if (squads == 0)
@@ -2385,7 +2387,7 @@ static void VisitUnitResources()
     char path[96];
     HashByte(27);
     for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned econ = ReadU32At((unsigned)PlayerAt(i), PLAYER_ECON);
+        unsigned econ = ReadRefAt((unsigned)PlayerAt(i), PLAYER_ECON);
         HashU32(i);
         HashByte(econ != 0);
         if (econ == 0)
@@ -2430,7 +2432,7 @@ static void VisitMissionConditions()
                 count = 0;
             HashByte((unsigned char)(list + 1));
             for (unsigned k = 0; k < count; k++) {
-                unsigned condition = ReadU32At(conditions, base + k * 4);
+                unsigned condition = ReadRefAt(conditions, base + k * 4);
                 HashByte(condition != 0);
                 if (condition == 0)
                     continue;
@@ -2766,7 +2768,7 @@ static void ReachQuirkGuard()
         for (int slot = 0; slot < MAX_PLAYERS; slot++) {
             if (!s_players[slot].named || s_players[slot].human)
                 continue;
-            unsigned manager = ReadU32At((unsigned)PlayerAt(slot), PLAYER_MANAGER);
+            unsigned manager = ReadRefAt((unsigned)PlayerAt(slot), PLAYER_MANAGER);
             unsigned char* ai = g_playerAI[slot];
             unsigned count = *(unsigned short*)GameAt(GAME_POOL_COUNT);
             if (manager == 0 || ai == 0)
@@ -2777,7 +2779,7 @@ static void ReachQuirkGuard()
                     continue;
                 g_seams.ai->SetUnitSquad((Unit*)u, SQUAD_SCOUT);
                 memset(ai + AI_CENTRE, 0, AI_CENTRE_SIZE);
-                void* timer = (void*)ReadU32At(manager, MANAGER_TIMERS + MANAGER_SCOUT_TIMER * 4);
+                void* timer = (void*)ReadRefAt(manager, MANAGER_TIMERS + MANAGER_SCOUT_TIMER * 4);
                 void (__thiscall* onTimer)(void*) = (void (__thiscall*)(void*))(*(void***)timer)[0];
                 unsigned char* allied = PlayerAt(slot) + PLAYER_ALLIED;
                 unsigned char saved[PLAYER_SLOTS];

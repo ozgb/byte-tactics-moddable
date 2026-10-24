@@ -1,5 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
+#include "../../interfaces/ref.h"
 
 struct PlayerInfo;
 struct Unit;
@@ -21,17 +22,17 @@ struct Player {
     unsigned char keepaliveFlags;      // +0x21
     unsigned char rejectReason;        // +0x22
     char unknown_23[4];
-    PlayerInfo* info;                  // +0x27
+    Ref<PlayerInfo> info;
     char name[0x1e];                   // +0x2b
     char fullName[0x1e];               // +0x49
-    Unit* unitsBegin;                  // +0x67
-    Unit* unitsEnd;                    // +0x6b
+    Ref<Unit> unitsBegin;
+    Ref<Unit> unitsEnd;
     unsigned short firstIndex;         // +0x6f
     unsigned short lastIndex;          // +0x71
     unsigned char type;                // +0x73
-    SquadManager* ai;                  // +0x74
-    Group* groups;                     // +0x78
-    unsigned char* explored;           // +0x7c
+    Ref<SquadManager> ai;
+    Ref<Group> groups;
+    Ref<unsigned char> explored;
     int exploredWidth;                 // +0x80
     int exploredHeight;                // +0x84
     int exploredSize;                  // +0x88
@@ -101,7 +102,7 @@ struct Player {
     float metalStorageBonus;           // +0xe0
     float shareMetal;                  // +0xe4
     float shareEnergy;                 // +0xe8
-    UnitResources* econ;               // +0xec
+    Ref<UnitResources> econ;
     int updateTime;                    // +0xf0
     int winLoseTime;                   // +0xf4
     int displayTimer;                  // +0xf8

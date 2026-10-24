@@ -147,7 +147,7 @@ struct SideData_00468cf0 {
 
 struct PlayerState_00468cf0 {
   char unknown_0[0x27];
-  SideData_00468cf0* info;            // +0x27, pSideData
+  Ref<SideData_00468cf0> info;
   char unknown_2b[0x8c - 0x2b];
   float flEnergyAmount;               // +0x8c
   char unknown_90[0x98 - 0x90];

@@ -1,11 +1,13 @@
 #ifndef PLAYER_ENTRY_004777A0_H
 #define PLAYER_ENTRY_004777A0_H
 
+#include "../../interfaces/ref.h"
+
 struct PlayerInfo;
 
 #pragma pack(push, 1)
 struct PlayerEntry_004777a0 {
-    PlayerInfo* info;
+    Ref<PlayerInfo> info;
     char unknown_4[0x14b - 4];
 };
 #pragma pack(pop)

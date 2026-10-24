@@ -51,7 +51,7 @@ struct UnitType_004685a0 {
 struct Owner_00467440 {
     void* active;                      // +0x0
     char unknown_4[0x27 - 0x4];
-    PlayerInfo* data;                  // +0x27
+    Ref<PlayerInfo> data;
     char unknown_2b[0x73 - 0x2b];
     char type;                         // +0x73
     char unknown_74[0x108 - 0x74];
@@ -90,7 +90,7 @@ struct MapSize_00467440 {
 };
 
 struct ByteMap_00467440 {
-    unsigned char* data;               // +0x0
+    Ref<unsigned char> data;
     MapSize_00467440 size;             // +0x4
 
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
@@ -99,10 +99,10 @@ struct ByteMap_00467440 {
 struct PlayerInfo_00467440 {
     void* active;                      // +0x0
     char unknown_4[0x27 - 0x4];
-    PlayerInfo* data;                  // +0x27
+    Ref<PlayerInfo> data;
     char unknown_2b[0x67 - 0x2b];
-    Unit* unitsBegin;                  // +0x67
-    Unit* unitsEnd;                    // +0x6b
+    Ref<Unit> unitsBegin;
+    Ref<Unit> unitsEnd;
     char unknown_6f[0x7c - 0x6f];
     ByteMap_00467440 explored;         // +0x7c
     char unknown_88[0x144 - 0x88];

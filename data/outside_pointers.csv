@@ -60,9 +60,6 @@ Handle,src,AllocZeroedWithTickOffset,0x14939+0xa9*k,1,#350,pointer,"Game.radarFr
 Menu_00497ce0,data,AllocZeroedWithTickOffset,0x52d+0x8*k,1,#392,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
 Object3do,vertices,AllocZeroedWithTickOffset,0x1ac95+0x6275*k,1,#350,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
 PieceFrame,color,AllocZeroedWithTickOffset,0x266a9+0x20*k,1,#350,pointer,"Game.screen (0x37e1b): offscreen surface, presentation"
-Player,ai,AllocZeroedWithTickOffset,0x1d24+0x20*k,1,#350,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
-Player,econ,AllocZeroedWithTickOffset,0x1c51+0x14b*k,1,#350,pointer,"Game.screen (0x37e1b): offscreen surface, presentation"
-Player,groups,AllocZeroedWithTickOffset,0x2254+0x21*k,1,#350,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
 Side_00431a60,font,AllocZeroedWithTickOffset,0x3816b,1,#350,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
 SimGlobals,g_missionOrderTableVec,SimGlobals.g_missionOrderTableVec,0x4+0x4*k,1,#349,container,Mission order table vector first (0x4)
 Sub_004679a0_b,lightbar,AllocZeroedWithTickOffset,0x37e94,1,#350,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"

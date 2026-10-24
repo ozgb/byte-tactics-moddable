@@ -6,6 +6,7 @@
 // keeps the player slots the skirmish setup uses. The module's files gathered
 // in address order.
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -872,7 +873,7 @@ void __stdcall HandleNewGameClick(Gui* menu)
                 Gadget* e = FindGadgetChecked(entries, "Campaign");
                 name = SkipTextLines(e->text, e->selected);
                 g_game->net->LoadCampaign(name);
-            } else if (*(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) == 0) {
+            } else if (*(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1b8a)).get() + 0x95) == 0) {
                 g_game->net->LoadCampaign("Arm Campaign");
             } else {
                 g_game->net->LoadCampaign("Core Campaign");
@@ -884,8 +885,8 @@ void __stdcall HandleNewGameClick(Gui* menu)
         }
         if (g_game->net->SelectMission(index) != 0) {
             SetCursorMode(0x14);
-            *(unsigned char*)(*(int*)((char*)g_game + 0x1b8a) + 0x96) = 0;
-            *(unsigned char*)(*(int*)((char*)g_game + 0x1cd5) + 0x96) = 1;
+            *(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x1b8a)).get() + 0x96) = 0;
+            *(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x1cd5)).get() + 0x96) = 1;
             SaveSettings();
             if (g_anyMissionMode != 0) {
                 *(unsigned char*)((char*)g_game + 0x2bc0) = 0x10;
@@ -929,10 +930,10 @@ void __stdcall HandleNewGameClick(Gui* menu)
         index = FindGadgetIndex(entries, "Side1", 1);
         *(int*)((char*)entries + index * 0x15b + 0x1f) = 0x1f;
         *(int*)((char*)g_game + 0x37ef2) = 1;
-        *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) = 1;
-        *(unsigned char*)(*(int*)(playerInfo + 0x1cd5) + 0x95) = 0;
+        *(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1b8a)).get() + 0x95) = 1;
+        *(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1cd5)).get() + 0x95) = 0;
         if (g_campaignSimplifiedLayout == 0)
-            FillCampaignListInline(*(unsigned char*)(*(int*)((char*)g_game + 0x14b * g_game->localPlayer + 0x1b8a) + 0x95));
+            FillCampaignListInline(*(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x14b * g_game->localPlayer + 0x1b8a)).get() + 0x95));
         if (g_anyMissionMode != 0) {
             FillMissionListInline(&g_game->gui, FindGadgetChecked(entries, "Campaign"));
             ClearSelectedGadget(menu);
@@ -947,9 +948,9 @@ ArmSide:
         index = FindGadgetIndex(entries, "Side0", 1);
         *(int*)((char*)entries + index * 0x15b + 0x1f) = 0x1f;
         *(int*)((char*)g_game + 0x37ef2) = 0;
-        *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) = 0;
-        *(unsigned char*)(*(int*)(playerInfo + 0x1cd5) + 0x95) = 1;
-        FillCampaignListInline(*(unsigned char*)(*(int*)((char*)g_game + 0x14b * g_game->localPlayer + 0x1b8a) + 0x95));
+        *(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1b8a)).get() + 0x95) = 0;
+        *(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1cd5)).get() + 0x95) = 1;
+        FillCampaignListInline(*(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x14b * g_game->localPlayer + 0x1b8a)).get() + 0x95));
         SetGadgetActiveByName(menu, "Campaign", g_campaignSimplifiedLayout == 0);
         if (g_anyMissionMode != 0)
             FillMissionListInline(&g_game->gui, FindGadgetChecked(entries, "Campaign"));

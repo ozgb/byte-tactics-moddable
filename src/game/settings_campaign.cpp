@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "../files/files_api.h"
+#include "../../interfaces/ref.h"
 #include "../../interfaces/seams.h"
 #include "../host/settings_io.h"
 #include "mission_conditions.h"
@@ -16,7 +17,7 @@ class Mission;
 #include "../network/player_info.h"
 
 struct PlayerEntry_004326b0 {
-    PlayerInfo* info;                  // +0x00
+    Ref<PlayerInfo> info;
     char unknown_4[0x14b - 4];
 };
 

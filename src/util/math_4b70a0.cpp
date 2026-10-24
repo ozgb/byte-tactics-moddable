@@ -7,18 +7,6 @@
 // point. Angles are 16-bit (0x10000 is a full turn); the sine table holds
 // 1024 entries of sin * 0x2000 (the cosine table is the same, a quarter turn
 // on), so a lookup is the angle's top 10 bits.
-//
-// int  FixedSine(unsigned short angle)        sine table entry (sin * 0x2000)
-// int  (unsigned short angle)                    cosine table entry (0x4b70c0)
-// int  (int a, int b)                            (a * b) >> 32 (0x4b70e0)
-// int  ScaledSin(short angle, int scale)      scale * sin(angle), rounded
-// int  ScaledCos(short angle, int scale)      scale * cos(angle), rounded
-// int  AngleOfVector(int x, int z)                atan2(z, x) as an angle
-// void RotatePoint2D(short angle, int* xz)        rotate the point xz by angle
-// void (short* angles)                           build the rotation matrix g_rotationMatrix
-//                                                from the angles at +0xc, +0xe, +0x10 (0x4b71a7)
-// void (int* in, int* out)                       out = g_rotationMatrix applied to in (0x4b72e2)
-// int  MulDivTrunc(int a, int b, int c)         a * b / c, or 0 when c is 0
 
 // GLOBAL: 0x509f00
 extern "C" short g_sinTable[128];

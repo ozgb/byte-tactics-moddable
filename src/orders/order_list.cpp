@@ -1613,15 +1613,6 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
         UpdateVelocityFromHeading(unit, -rate);
 }
 
-// Scales the object's second vector (+0x14) by 0.95 (16.16 fixed point), adds the
-// offset `v`, rotates the (x, z) pair by the owner's heading, then derives two
-// short offsets from the rotated components and the owner type's fields at
-// +0x1a2/+0x1a6.
-//
-// Suspected original bug: the second AngleOfVector call reads xz[0] (the rotated
-// x component) instead of xz[1], so pitch (the z offset) is computed from
-// the rotated x.
-// The original calls this from SetFlightMode and SteerAircraft.
 #pragma auto_inline(off)
 // FUNCTION: 0x43d0d0
 void UnitMotion::ApplyBankAndPitch(Unit* owner, Vec3* v)

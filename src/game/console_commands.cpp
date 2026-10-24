@@ -964,7 +964,6 @@ void __stdcall CmdNowISee(void*)
     g_seams.los_radar->RecalculateLineOfSight(1);
 }
 
-// Same reset sequence as InitCommands, run as a callback after SumMessageStats.
 // FUNCTION: 0x417570
 void __stdcall CmdNetStats(int)
 {

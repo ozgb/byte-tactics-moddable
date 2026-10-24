@@ -216,7 +216,6 @@ static inline Vec3 Offset(int angle, int distance)
     Vec3 v;
     v.x = -ScaledSin(angle, distance);
     v.y = 0;
-    // Named before negation: `v.z = -ScaledCos(...)` changes register use.
     int z = ScaledCos(angle, distance);
     v.z = -z;
     return v;

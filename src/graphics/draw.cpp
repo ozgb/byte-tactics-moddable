@@ -1015,17 +1015,6 @@ static inline void Draw_004c0070(Surface* surface, int x0, int y0,
     }
 }
 
-
-// Draws the outline of a circle of `radius` around (xc, yc) as 32 segments,
-// sweeping the angle from 0x800 to 0x10000 in steps of 0x800. The first point
-// is (xc + radius, yc), where the sine/cosine tables are 1 and 0, and each
-// following point comes from ScaledCos (x) and ScaledSin (y). The
-// per-segment draw lives in an inlined helper: it is that helper's parameters
-// that get the four coordinate slots, while the loop keeps the carried point
-// in registers, which is what produces the slot shuffle at the top of the
-// body. When `surface` is null the helper locks the screen with LockScreen
-// and unlocks it with UnlockScreen, once per segment; a failed lock draws
-// nothing but the loop still runs to completion.
 // FUNCTION: 0x4c0070
 void __stdcall DrawCircle(Surface* surface, int xc, int yc, int radius,
                             int color)
@@ -1041,30 +1030,6 @@ void __stdcall DrawCircle(Surface* surface, int xc, int yc, int radius,
     }
 }
 
-
-
-// Draws a dashed circle: sweeps `angle` from `step` to 0x10000 in steps of
-// step = 0x10000 / n and draws the segment from the previous point to the
-// current point only when the counter `start` is odd (the caller passes 0 or
-// 1, see 0x4670fd). ScaledCos / ScaledSin are the sine and cosine table
-// lookups (angle, radius); ClipLine clips the segment and BlitLine
-// draws it. When `surface` is null the screen is locked with LockScreen and
-// unlocked with UnlockScreen.
-//
-// Three things keep this byte-identical:
-// wrong):
-//  - the counter is NOT incremented in the test. The original tests `i & 1`
-//    and increments `i` after the per-iteration stores at the loop tail, which
-//    also puts i in a frame slot (E-0x38) instead of an argument slot.
-//  - `angle` and `step` are both initialised from the division
-//    (`int angle = 0x10000 / n; int step = 0x10000 / n;`); the compiler CSEs
-//    the idiv and emits `mov ebp, eax; mov [step], eax; cmp ebp, 0x10000`.
-//    With `int step = angle` it stores ebp instead and the layout shifts.
-//  - the order of the four per-iteration copies (and of the tail statements)
-//    drives MSVC 5's store scheduling and scratch-register rotation. Copying
-//    y1, x1, y0, x0 (in that order) and writing the tail as px = x; py = y;
-//    i++; angle += step; reproduces the original's `mov [esp+0x68], edi` /
-//    `mov [esp+0x10], eax` order and the tail's `mov ecx,[step]; mov edx,[i]`.
 // FUNCTION: 0x4c01a0
 void __stdcall DrawDashedCircle(Surface* surface, int cx, int cy, int radius,
                             int color, int n, int start)

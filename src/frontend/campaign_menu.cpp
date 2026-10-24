@@ -851,8 +851,8 @@ void __stdcall HandleNewGameClick(Gui* menu)
         }
         if (g_game->net->SelectMission(index) != 0) {
             SetCursorMode(0x14);
-            *(unsigned char*)((int)g_game->p1b8a.get() + 0x96) = 0;
-            *(unsigned char*)((int)g_game->p1cd5.get() + 0x96) = 1;
+            *(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x1b8a)).get() + 0x96) = 0;
+            *(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x1cd5)).get() + 0x96) = 1;
             SaveSettings();
             if (g_anyMissionMode != 0) {
                 g_game->frontendNextSubState = 0x10;

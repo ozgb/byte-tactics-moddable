@@ -201,7 +201,7 @@ class TidyTest(Repo, unittest.TestCase):
 
 
     def test_new_placeholder_names_fail(self):
-        names = ["FUN_00999999", "DAT_00999999", "field_1f4", "unk_8", "unknown_1c", "unkFlags", "param_3", "Thing_00999999"]
+        names = ["FUN_00bad001", "DAT_00bad001", "field_1f4", "unk_8", "unknown_1c", "unkFlags", "param_3", "Thing_00bad001"]
         for name in names:
             with self.subTest(name=name):
                 self.edit("src/c.cpp", "return 0;", f"return {name};")
@@ -221,7 +221,7 @@ class TidyTest(Repo, unittest.TestCase):
         self.assertEqual(self.placeholders(), [])
 
     def test_name_in_comment_or_string_ignored(self):
-        self.edit("src/c.cpp", "return 0;", 'return 0; // FUN_00999999\nconst char *s = "DAT_00999999";')
+        self.edit("src/c.cpp", "return 0;", 'return 0; // FUN_00bad001\nconst char *s = "DAT_00bad001";')
         self.assertEqual(self.placeholders(), [])
 
     def test_ordinary_names_pass(self):
@@ -230,7 +230,7 @@ class TidyTest(Repo, unittest.TestCase):
         self.assertEqual(self.placeholders(), [])
 
     def test_placeholder_failure_without_clang_tidy_findings(self):
-        self.edit("src/c.cpp", "return 0;", "return FUN_00999999();")
+        self.edit("src/c.cpp", "return 0;", "return FUN_00bad001();")
         found, _ = self.lint()
         self.assertEqual([f[:2] for f in found], [("src/c.cpp", 1)])
 
@@ -240,7 +240,7 @@ class TidyTest(Repo, unittest.TestCase):
         self.assertEqual(found, [])
 
     def test_range_base_with_two_dots(self):
-        self.edit("src/c.cpp", "return 0;", "return FUN_00999999();")
+        self.edit("src/c.cpp", "return 0;", "return FUN_00bad001();")
         found = tidy.lint_placeholders(str(self.root), "HEAD~1..HEAD", tidy.added_lines(str(self.root), "HEAD~1..HEAD"))
         self.assertEqual(len(found), 1)
 

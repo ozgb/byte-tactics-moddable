@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 from rwsets import load_sim_map
+from simglobals import REF_FIELDS
 
 ROOT = Path(__file__).resolve().parent.parent
 TRACE_FORMAT = 3
@@ -898,7 +899,7 @@ METEOR_GLOBALS: list[tuple[str, str, int, str | None]] = [
     ("target", "g_meteorTarget", 4, None),
     ("scheduleGap", "g_meteorScheduleGap", 4, None),
 ]
-REF_GLOBALS = {"g_meteorWeapon"}
+REF_GLOBALS = REF_FIELDS
 GLOBAL_DECLS: dict[str, str] = {
     "g_cdMismatchDefeatTick": "unsigned int g_cdMismatchDefeatTick",
     "g_playerTickLoad": "int g_playerTickLoad[10]",

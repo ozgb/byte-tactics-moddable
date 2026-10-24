@@ -305,7 +305,7 @@ SYNTHETIC.update({
         Unit* first;
     """,
     "Eye": """
-        Player* player;
+        Ref<Player> player;
         void* screen;
         short x;
         unsigned char flagA;
@@ -340,8 +340,8 @@ SYNTHETIC.update({
         unsigned int lastTick;
     """,
     "Pathfinder": """
-        void* pool;
-        void* items;
+        Ref<void> pool;
+        Ref<void> items;
         int freeHead;
         int used;
         int capacity;
@@ -364,14 +364,14 @@ SYNTHETIC.update({
         int steps;
         int costScale;
         int baseScale;
-        Unit* object;
-        void* path;
-        void* target;
-        MovementClass* owner;
+        Ref<Unit> object;
+        Ref<void> path;
+        Ref<void> target;
+        Ref<MovementClass> owner;
         unsigned char turnCost[8];
         unsigned char stepCost[8];
         unsigned char player;
-        Unit* cursor[10];
+        Ref<Unit> cursor[10];
         int budget[10];
     """,
 })
@@ -1055,13 +1055,16 @@ class Schema:
         m = re.match(r"^(.*?)(\w+)((?:\[[^\]]+\])*)$", text)
         ctype = " ".join(m.group(1).replace("*", " * ").split())
         dims = [int(x, 0) for x in re.findall(r"\[([^\]]+)\]", m.group(3))]
+        ref = re.fullmatch(r"Ref<\s*([\w ]+?)\s*>", ctype)
+        if ref:
+            ctype = ref.group(1) + "*"
         ptr = "*" in ctype
         elem = 4 if ptr else self.size_of(ctype)
         count = 1
         for n in dims:
             count *= n
         return {"name": m.group(2), "ctype": ctype.replace(" * ", "*").replace(" *", "*"), "ptr": ptr,
-                "dims": dims, "bits": None, "size": elem * count}
+                "ref": bool(ref), "dims": dims, "bits": None, "size": elem * count}
 
     def place(self, tname, leaves, pos, explicit, d):
         if explicit is not None and explicit != pos:
@@ -1080,7 +1083,7 @@ class Schema:
             target = POINTER_TARGETS.get(base, "HEAP")
             for i in range(count):
                 label = name + ("[%d]" % i if d["dims"] else "")
-                leaves.append({"name": label, "offset": pos + 4 * i, "size": 4, "kind": "pointer",
+                leaves.append({"name": label, "offset": pos + 4 * i, "size": 4, "kind": "ref" if d.get("ref") else "pointer",
                                "target": target})
         elif ctype in BASE_SIZES:
             size = d["size"]
@@ -1100,18 +1103,21 @@ def retype_pointer(schema, key, leaves, offset, target):
     """Make bytes offset..offset+4 one pointer leaf; leaves it overlaps are cut to the bytes outside it."""
     end = offset + 4
     out = []
+    kind = "pointer"
     for leaf in leaves:
         lo, hi = leaf["offset"], leaf["offset"] + leaf["size"]
         if hi <= offset or lo >= end:
             out.append(leaf)
             continue
-        if leaf["kind"] == "pointer":
+        if leaf["kind"] == "ref" and lo == offset and hi == end:
+            kind = "ref"
+        elif leaf["kind"] in ("pointer", "ref"):
             schema.errors.append("%s: pointer override at %#x cuts the pointer at %#x" % (key, offset, lo))
         if lo < offset:
             out.append({"name": "", "offset": lo, "size": offset - lo, "kind": "bytes", "target": None})
         if hi > end:
             out.append({"name": "", "offset": end, "size": hi - end, "kind": "bytes", "target": None})
-    out.append({"name": POINTER_NAMES.get((key, offset), ""), "offset": offset, "size": 4, "kind": "pointer",
+    out.append({"name": POINTER_NAMES.get((key, offset), ""), "offset": offset, "size": 4, "kind": kind,
                 "target": target})
     out.sort(key=lambda leaf: leaf["offset"])
     return out
@@ -1149,7 +1155,7 @@ def base_name(leaf):
 def plan_of(fields):
     plan = []
     for f in fields:
-        if f["kind"] == "pointer" or f.get("mask"):
+        if f["kind"] in ("pointer", "ref") or f.get("mask"):
             plan.append(f)
         elif plan and plan[-1]["kind"] == "bytes" and plan[-1]["offset"] + plan[-1]["size"] == f["offset"]:
             plan[-1] = dict(plan[-1], size=plan[-1]["size"] + f["size"])
@@ -1161,7 +1167,7 @@ def plan_of(fields):
 def emit_table(lines, cname, entries, with_name):
     lines.append("static const TraceField %s[] = {" % cname)
     for e in entries:
-        kind = {"scalar": "TF_SCALAR", "bytes": "TF_BYTES", "pointer": "TF_POINTER"}[e["kind"]]
+        kind = {"scalar": "TF_SCALAR", "bytes": "TF_BYTES", "pointer": "TF_POINTER", "ref": "TF_REF"}[e["kind"]]
         target = "TT_" + e["target"] if e["target"] else "TT_NONE"
         name = c_string(e["name"]) if with_name else '""'
         lines.append("    { %s, 0x%x, %d, %s, %s, 0x%x }," % (name, e["offset"], e["size"], kind, target,
@@ -1179,7 +1185,7 @@ def generate():
         "",
         "#define TRACE_FORMAT %d" % TRACE_FORMAT,
         "",
-        "enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER };",
+        "enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF };",
         "enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,",
         "                   TT_FEATURE, TT_PIECE, TT_REC, TT_NODE, TT_MOVECLASS, TT_ORDER, TT_ORDERFX, TT_LINK };",
         "",

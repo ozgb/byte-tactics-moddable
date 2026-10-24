@@ -4,7 +4,7 @@
 
 #define TRACE_FORMAT 3
 
-enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER };
+enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF };
 enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,
                    TT_FEATURE, TT_PIECE, TT_REC, TT_NODE, TT_MOVECLASS, TT_ORDER, TT_ORDERFX, TT_LINK };
 
@@ -495,7 +495,7 @@ static const TraceField kRecPlan[] = {
 };
 
 static const TraceField kEyeFields[] = {
-    { "player", 0x0, 4, TF_POINTER, TT_PLAYER, 0x0 },
+    { "player", 0x0, 4, TF_REF, TT_PLAYER, 0x0 },
     { "x", 0x8, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "flagA", 0xa, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "flagB", 0xb, 1, TF_SCALAR, TT_NONE, 0x0 },
@@ -507,7 +507,7 @@ static const TraceField kEyeFields[] = {
 };
 
 static const TraceField kEyePlan[] = {
-    { "", 0x0, 4, TF_POINTER, TT_PLAYER, 0x0 },
+    { "", 0x0, 4, TF_REF, TT_PLAYER, 0x0 },
     { "", 0x8, 4, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x10, 20, TF_BYTES, TT_NONE, 0x0 },
 };
@@ -550,8 +550,8 @@ static const TraceField kMoveClassPlan[] = {
 };
 
 static const TraceField kPathfinderFields[] = {
-    { "pool", 0x0, 4, TF_POINTER, TT_HEAP, 0x0 },
-    { "items", 0x4, 4, TF_POINTER, TT_HEAP, 0x0 },
+    { "pool", 0x0, 4, TF_REF, TT_HEAP, 0x0 },
+    { "items", 0x4, 4, TF_REF, TT_HEAP, 0x0 },
     { "freeHead", 0x8, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "used", 0xc, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "count", 0x14, 4, TF_SCALAR, TT_NONE, 0x0 },
@@ -565,42 +565,42 @@ static const TraceField kPathfinderFields[] = {
     { "steps", 0x4c, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "costScale", 0x50, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "baseScale", 0x54, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "object", 0x58, 4, TF_POINTER, TT_UNIT, 0x0 },
+    { "object", 0x58, 4, TF_REF, TT_UNIT, 0x0 },
     { "player", 0x78, 1, TF_SCALAR, TT_NONE, 0x0 },
-    { "cursor[0]", 0x79, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "cursor[1]", 0x7d, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "cursor[2]", 0x81, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "cursor[3]", 0x85, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "cursor[4]", 0x89, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "cursor[5]", 0x8d, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "cursor[6]", 0x91, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "cursor[7]", 0x95, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "cursor[8]", 0x99, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "cursor[9]", 0x9d, 4, TF_POINTER, TT_UNIT, 0x0 },
+    { "cursor[0]", 0x79, 4, TF_REF, TT_UNIT, 0x0 },
+    { "cursor[1]", 0x7d, 4, TF_REF, TT_UNIT, 0x0 },
+    { "cursor[2]", 0x81, 4, TF_REF, TT_UNIT, 0x0 },
+    { "cursor[3]", 0x85, 4, TF_REF, TT_UNIT, 0x0 },
+    { "cursor[4]", 0x89, 4, TF_REF, TT_UNIT, 0x0 },
+    { "cursor[5]", 0x8d, 4, TF_REF, TT_UNIT, 0x0 },
+    { "cursor[6]", 0x91, 4, TF_REF, TT_UNIT, 0x0 },
+    { "cursor[7]", 0x95, 4, TF_REF, TT_UNIT, 0x0 },
+    { "cursor[8]", 0x99, 4, TF_REF, TT_UNIT, 0x0 },
+    { "cursor[9]", 0x9d, 4, TF_REF, TT_UNIT, 0x0 },
     { "budget", 0xa1, 40, TF_BYTES, TT_NONE, 0x0 },
 };
 
 static const TraceField kPathfinderPlan[] = {
-    { "", 0x0, 4, TF_POINTER, TT_HEAP, 0x0 },
-    { "", 0x4, 4, TF_POINTER, TT_HEAP, 0x0 },
+    { "", 0x0, 4, TF_REF, TT_HEAP, 0x0 },
+    { "", 0x4, 4, TF_REF, TT_HEAP, 0x0 },
     { "", 0x8, 8, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x14, 8, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x1c, 4, TF_POINTER, TT_HEAP, 0x0 },
     { "", 0x20, 12, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x2c, 4, TF_POINTER, TT_HEAP, 0x0 },
     { "", 0x48, 16, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x58, 4, TF_POINTER, TT_UNIT, 0x0 },
+    { "", 0x58, 4, TF_REF, TT_UNIT, 0x0 },
     { "", 0x78, 1, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x79, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "", 0x7d, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "", 0x81, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "", 0x85, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "", 0x89, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "", 0x8d, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "", 0x91, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "", 0x95, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "", 0x99, 4, TF_POINTER, TT_UNIT, 0x0 },
-    { "", 0x9d, 4, TF_POINTER, TT_UNIT, 0x0 },
+    { "", 0x79, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x7d, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x81, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x85, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x89, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x8d, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x91, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x95, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x99, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x9d, 4, TF_REF, TT_UNIT, 0x0 },
     { "", 0xa1, 40, TF_BYTES, TT_NONE, 0x0 },
 };
 
@@ -611,9 +611,9 @@ static const TraceField kPathfinderSearchFields[] = {
     { "goalY", 0x3c, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "probe", 0x40, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "range", 0x44, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "path", 0x5c, 4, TF_POINTER, TT_HEAP, 0x0 },
-    { "target", 0x60, 4, TF_POINTER, TT_HEAP, 0x0 },
-    { "owner", 0x64, 4, TF_POINTER, TT_MOVECLASS, 0x0 },
+    { "path", 0x5c, 4, TF_REF, TT_HEAP, 0x0 },
+    { "target", 0x60, 4, TF_REF, TT_HEAP, 0x0 },
+    { "owner", 0x64, 4, TF_REF, TT_MOVECLASS, 0x0 },
     { "turnCost", 0x68, 8, TF_BYTES, TT_NONE, 0x0 },
     { "stepCost", 0x70, 8, TF_BYTES, TT_NONE, 0x0 },
 };
@@ -621,9 +621,9 @@ static const TraceField kPathfinderSearchFields[] = {
 static const TraceField kPathfinderSearchPlan[] = {
     { "", 0x30, 4, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x38, 16, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x5c, 4, TF_POINTER, TT_HEAP, 0x0 },
-    { "", 0x60, 4, TF_POINTER, TT_HEAP, 0x0 },
-    { "", 0x64, 4, TF_POINTER, TT_MOVECLASS, 0x0 },
+    { "", 0x5c, 4, TF_REF, TT_HEAP, 0x0 },
+    { "", 0x60, 4, TF_REF, TT_HEAP, 0x0 },
+    { "", 0x64, 4, TF_REF, TT_MOVECLASS, 0x0 },
     { "", 0x68, 16, TF_BYTES, TT_NONE, 0x0 },
 };
 

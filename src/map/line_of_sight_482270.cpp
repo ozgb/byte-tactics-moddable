@@ -43,7 +43,7 @@ struct MapSize_482270 {
 };
 
 struct ByteMap_482270 {
-    Ref<unsigned char> data;               // +0x0
+    Ref<unsigned char> data;
     MapSize_482270 size;               // +0x4
     unsigned char& at(int x, int y) { return data[y * size.width + x]; }
 };

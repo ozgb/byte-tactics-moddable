@@ -600,7 +600,7 @@ struct MapSize_004745e0 {
 };
 
 struct ByteMap_004745e0 {
-    Ref<unsigned char> data;            // +0x7c
+    Ref<unsigned char> data;
     MapSize_004745e0 size;          // +0x80
 
     unsigned char Get(int tx, int ty) { return data[size.width * ty + tx]; }

@@ -17,13 +17,13 @@ class SquadTimer;
 
 class SquadManager {
 public:
-    Ref<Player> player;                    // +0x0
+    Ref<Player> player;
     unsigned char index;               // +0x4, the player's index
     int countdown;                     // +0x5
     int unused_9;                      // +0x9
     int nextAction;                    // +0xd
-    Ref<SquadTimer> timers[10];            // +0x11
-    Ref<Unit> cursor;                      // +0x39
+    Ref<SquadTimer> timers[10];
+    Ref<Unit> cursor;
 
     SquadManager(Player* p);
     void MarkOwnerNetDirtyFromDamageSplit(Projectile* projectile, int a, int b);

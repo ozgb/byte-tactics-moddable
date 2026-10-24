@@ -22,17 +22,17 @@ struct Player {
     unsigned char keepaliveFlags;      // +0x21
     unsigned char rejectReason;        // +0x22
     char unknown_23[4];
-    Ref<PlayerInfo> info;                  // +0x27
+    Ref<PlayerInfo> info;
     char name[0x1e];                   // +0x2b
     char fullName[0x1e];               // +0x49
-    Ref<Unit> unitsBegin;                  // +0x67
-    Ref<Unit> unitsEnd;                    // +0x6b
+    Ref<Unit> unitsBegin;
+    Ref<Unit> unitsEnd;
     unsigned short firstIndex;         // +0x6f
     unsigned short lastIndex;          // +0x71
     unsigned char type;                // +0x73
     SquadManager* ai;                  // +0x74
     Group* groups;                     // +0x78
-    Ref<unsigned char> explored;           // +0x7c
+    Ref<unsigned char> explored;
     int exploredWidth;                 // +0x80
     int exploredHeight;                // +0x84
     int exploredSize;                  // +0x88

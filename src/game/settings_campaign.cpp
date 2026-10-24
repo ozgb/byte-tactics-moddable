@@ -16,7 +16,7 @@ class Mission;
 #include "../network/player_info.h"
 
 struct PlayerEntry_004326b0 {
-    Ref<PlayerInfo> info;                  // +0x00
+    Ref<PlayerInfo> info;
     char unknown_4[0x14b - 4];
 };
 

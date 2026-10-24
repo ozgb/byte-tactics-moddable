@@ -83,7 +83,7 @@ struct PlayerRec_00497f40 {             // 0x14b bytes, array at g_game+0x1b63
     unsigned char percent;              // +0x20
     unsigned char keepaliveFlags;       // +0x21
     char unknown_22[0x27 - 0x22];
-    Ref<PlayerInfo> data;                   // +0x27
+    Ref<PlayerInfo> data;
     char name[0x73 - 0x2b];             // +0x2b
     union {
         unsigned char team;             // +0x73

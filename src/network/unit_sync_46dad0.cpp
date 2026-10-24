@@ -19,7 +19,7 @@ struct PlayerInfo_0046dad0 {
     int active;  // +0x0
     int id;      // +0x4
     char unknown_8[0x27 - 0x8];
-    Ref<Data_0046dad0> data; // +0x27
+    Ref<Data_0046dad0> data;
     char unknown_2b[0x73 - 0x2b];
     unsigned char type; // +0x73
     char unknown_74[0x14b - 0x74]; // the record's stride in g_game->players

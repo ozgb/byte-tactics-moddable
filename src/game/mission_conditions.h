@@ -30,9 +30,9 @@ public:
 
 class MissionConditions {
 public:
-    Ref<MissionCondition> victory[16];       // +0x00
+    Ref<MissionCondition> victory[16];
     int victoryCount;                    // +0x40
-    Ref<MissionCondition> defeat[16];        // +0x44
+    Ref<MissionCondition> defeat[16];
     int defeatCount;                     // +0x84
     int active;                          // +0x88
 

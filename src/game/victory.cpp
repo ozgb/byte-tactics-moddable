@@ -55,14 +55,14 @@ struct Owner_0048ea40 {
 
 struct Link_0048ea40 {
     char unknown_0[0x27];
-    Ref<Owner_0048ea40> owner;             // +0x27
+    Ref<Owner_0048ea40> owner;
 };
 
 #include "../units/unit.h"
 
 struct UnitList {
-    Ref<Unit> first;                       // +0x0
-    Ref<Unit> last;                        // +0x4 (inclusive)
+    Ref<Unit> first;
+    Ref<Unit> last;
 
     void ForEach(Listener_0048ff40* visitor)
     {

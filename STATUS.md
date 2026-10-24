@@ -25,7 +25,11 @@ would replace is deferred to it.
   one shared wasm32 memory. Implementers never see the decompiled code: they
   work from behaviour-only specs, in a sandbox that can't reach this
   repository, and a module is accepted only when its traces equal the
-  reference's.
+  reference's. Milestone 2 issues are filed in ozgb/btm once the sandbox and
+  the oracle kit are done.
+- **Milestone 3** ([ozgb/btm#1](https://github.com/ozgb/btm/issues/1)): the
+  features built on that engine: multiplayer, the native and browser hosts,
+  portable graphics and sound, and mod support.
 
 Why: everything built here is compiled from a decompilation of Cavedog's
 code, so it can only be released as source. A build made entirely of
@@ -78,11 +82,14 @@ away.
   helps the spec writers, and cross-host determinism
   ([#19](https://github.com/ozgb/byte-tactics-moddable/issues/19)).
 
-### Deferred to Milestone 2
+### Deferred to Milestone 3
 
 48 issues, closed as not planned with the
-[`milestone-2`](https://github.com/ozgb/byte-tactics-moddable/issues?q=label%3Amilestone-2)
-label. Their text stays as design input for the specs.
+[`milestone-3`](https://github.com/ozgb/byte-tactics-moddable/issues?q=label%3Amilestone-3)
+label and indexed in
+[#392](https://github.com/ozgb/byte-tactics-moddable/issues/392). Their text
+stays here as design input; they describe the decompiled source, so each is
+rewritten as a clean issue in ozgb/btm when Milestone 3 starts.
 
 - each subsystem as a WASM module
   ([#11](https://github.com/ozgb/byte-tactics-moddable/issues/11) to

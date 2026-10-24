@@ -50,11 +50,11 @@ static int s_weaponTdfAllocCount;
 
 
 #include "../game/cd_check.h"
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-void* __cdecl GameAllocIgnoreTag(char* name, int size);
-void __cdecl GameFreeThunk(void* p);
+#include "../game/data_files.h"
 #include "../debug/debug_lib.h"
-unsigned int __stdcall ComputeChecksum(char* data, int len);
+#include "../graphics/object_pool.h"
+#include "../debug/debug_lib.h"
+#include "../util/math.h"
 void __stdcall ShowErrorBox(const char* text, const char* caption);
 char* __stdcall Translate(char* text);
 void __stdcall GetLocalizedString(void* parser, char* dst, char* key, int size, char* def);
@@ -129,7 +129,7 @@ int LoadUnitInfo()
             int len = HAPI_FileLength(f);
             char* buf = (char*)GameAllocIgnoreTag(path, len);
             HAPI_readfromfile(f, buf, len);
-            u->fbiChecksum = ComputeChecksum(buf, len);
+            u->fbiChecksum = ComputeChecksum((unsigned char *)buf, len);
             OvrFile ovr;
             char ovrpath[256];
             BuildDataPath(ovrpath, "units", files[i - 1], "OVR");

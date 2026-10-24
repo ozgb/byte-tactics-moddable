@@ -454,9 +454,8 @@ public:
     ~SyncChecksumVector();
 };
 
-int __cdecl GetLocalHumanDpid();
+#include "net_game.h"
 unsigned int GetHostDpid();
-void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 #include "net_game.h"
 int __stdcall ComputeUnitScriptChecksum(UnitDef* def);
 #include "../ai/ai_profile.h"
@@ -465,7 +464,7 @@ extern char g_unitSyncStatusText[];
 static inline void SendPacket(unsigned int to, UnitSyncPacket* packet)
 {
     packet->id = 0;
-    SendPacketToPlayer(GetLocalHumanDpid(), to, packet, 0xe);
+    SendPacketToPlayer(GetLocalHumanDpid(), to, (unsigned char *)packet, 0xe);
 }
 
 class UnitSync {
@@ -602,7 +601,7 @@ void PacketSequencer::SendUnsequenced(unsigned int param_1, void* param_2)
 {
     UnitSyncPacket* packet = (UnitSyncPacket*)param_2;
     packet->id = 0;
-    SendPacketToPlayer(GetLocalHumanDpid(), param_1, packet, 0xe);
+    SendPacketToPlayer(GetLocalHumanDpid(), param_1, (unsigned char *)packet, 0xe);
 }
 
 // FUNCTION: 0x46cef0
@@ -611,7 +610,7 @@ void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void
     if (packet->arg == 0x65) {
         for (Elem_0046faf0* p = sentQueue.begin(); p != sentQueue.end(); p++) {
             if (p->packet.id == packet->id) {
-                SendPacketToPlayer(GetLocalHumanDpid(), target, p, 0xe);
+                SendPacketToPlayer(GetLocalHumanDpid(), target, (unsigned char *)p, 0xe);
                 break;
             }
         }
@@ -649,7 +648,7 @@ void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void
             msg.type = 0x1a;
             msg.arg = 0x65;
             msg.id = i;
-            SendPacketToPlayer(GetLocalHumanDpid(), target, &msg, 0xe);
+            SendPacketToPlayer(GetLocalHumanDpid(), target, (unsigned char *)&msg, 0xe);
         }
     }
 }
@@ -717,7 +716,7 @@ void UnitSync::SendSyncPacket(unsigned int* param_1, UnitSyncPacket* param_2, in
         val = GetHostDpid();
 
     param_2->id = 0;
-    SendPacketToPlayer(GetLocalHumanDpid(), val, param_2, 14);
+    SendPacketToPlayer(GetLocalHumanDpid(), val, (unsigned char *)param_2, 14);
 }
 #pragma auto_inline(on)
 

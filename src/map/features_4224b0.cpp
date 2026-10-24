@@ -80,8 +80,8 @@ struct FeatureDef_004224b0 {
 #include "../../link/globals.h"
 extern List_004224b0* s_featureTdfParsers;
 
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall FatalError(char* path);
+#include "../game/data_files.h"
+#include "../graphics/display.h"
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 #include "../game/data_files.h"
 Gaf_004224b0* __stdcall LoadGaf(char* path);

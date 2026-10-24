@@ -1,5 +1,9 @@
 #ifndef NET_GAME_H
 #define NET_GAME_H
+struct Gui;
+struct LatencyPacket;
+struct Player;
+struct PlayerViewStatePacket;
 
 struct Player;
 struct Unit;
@@ -61,5 +65,21 @@ int __stdcall CountActiveHumanOrAiPlayers();
 int __stdcall CountRemotePlayers();
 int __stdcall CountCombatPlayers();
 void __stdcall UpdateResourceSharing(Player* player);
+
+int __stdcall GetLocalDpid();
+int __stdcall GetLocalHumanDpid();
+int __stdcall AddNetPlayer(int id);
+int __stdcall SendPacketToPlayer(int from, int to, unsigned char* packet, int size);
+int __stdcall AssignPlayerColor(int from, int to, int group);
+int __stdcall RequestPlayerColor(int param);
+int __stdcall BroadcastAllyTeam(Player* player);
+char* __stdcall GetRejectReasonText(int reason);
+void __stdcall SendProbe(int from, int to);
+int __stdcall SendChatPacket(char* text);
+void __stdcall HandleTimeoutDialog(Gui* gadget);
+void __stdcall HandlePing(LatencyPacket* p);
+int __stdcall AssignStartPositions();
+void __stdcall SendLoadProgress();
+void __stdcall HandlePlayerEconomy(PlayerViewStatePacket* packet, Player* player);
 
 #endif

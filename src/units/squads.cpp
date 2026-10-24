@@ -15,7 +15,7 @@ struct Unit;
 #include "unit.h"
 #pragma pack(pop)
 
-void __cdecl GameFreeThunk(int* p);
+#include "../graphics/object_pool.h"
 #include "../../interfaces/seams.h"
 
 // FUNCTION: 0x480190

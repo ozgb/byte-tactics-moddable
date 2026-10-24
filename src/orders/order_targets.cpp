@@ -16,8 +16,6 @@ extern void __cdecl operator delete(void* p);
 #include "order_fx.h"
 
 void RegisterUnitOrders();
-int UpdatePlacementGhostValidity();
-void InitMissionStatus();
 
 
 typedef std::vector<Point16> Vec_0044d0e0;
@@ -190,7 +188,6 @@ extern Game* g_game;
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
-void CmdMem(int);
 
 typedef std::vector<Point16> Vec_0044ee60;
 typedef void (Vec_0044ee60::*DestroyFn_0044ee60)(Vec_0044ee60::iterator, Vec_0044ee60::iterator);
@@ -234,11 +231,6 @@ static inline UnitMotion* Motion(Unit* unit)
 
 #include "order_targets.h"
 
-void FreePictureCache();
-int MainLoopContinueStub();
-int MainLoopContinueStub_B();
-int MainLoopContinueStub_C();
-int LoadDefaultPalette();
 extern int Pad6260_01;
 extern int Pad6260_02;
 extern int Pad6260_03;

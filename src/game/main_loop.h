@@ -12,4 +12,6 @@ void __stdcall SetStartingStorageBonus(Player* obj, int height, int width);
 void __stdcall SpawnCommanderAtStartPos(int team, int startpos);
 void __stdcall InitStartingResourcesFromSkirmish();
 
+void __stdcall MainLoopTick();
+
 #endif

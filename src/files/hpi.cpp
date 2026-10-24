@@ -65,8 +65,8 @@ FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
 }
 
 DisplayContext* GetDisplay(void);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
 #include "hpi_4bb4e0.h"
 
 static inline int nblocks(int w)
@@ -225,9 +225,8 @@ long __stdcall HAPI_TellFile(FileHandle* file)
     return host_file_seek(file->fp, 0, HOST_SEEK_CUR);
 }
 
-int __stdcall SquashUnpack(unsigned char* dst, unsigned char* src);
-char* __stdcall SquashErrorString(int code);
-void __stdcall FatalError(char* text);
+#include "sqsh.h"
+#include "../graphics/display.h"
 
 static inline int BlockOffset(FileHandle* file, int& counter, int b, int tableSize)
 {
@@ -284,7 +283,7 @@ int __stdcall HAPI_readfromfile(FileHandle* file, void* out, int size)
                         for (int k = 0; k < got; k++)
                             comp[k] = (unsigned char)(comp[k] ^ 0xff ^ (unsigned char)(k + off) ^ key);
                     }
-                    int err = SquashUnpack(file->buffer2, comp);
+                    int err = SquashUnpack((char *)file->buffer2, (char *)comp);
                     if (err) {
                         char msg[1000];
                         sprintf(msg, "[HAPI_readfromfile] Decompression Error: %s\n", SquashErrorString(err));
@@ -729,8 +728,6 @@ struct FindFiles {
 };
 #pragma pack(pop)
 
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
 #include "files_impl.h"
 
 static char* StripDir(char* path)
@@ -1317,9 +1314,6 @@ struct Node_004bd830 {
 };
 #pragma pack(pop)
 
-int __stdcall SquashPack(void* chunk, int* chunkSize, char* data,
-                           int size, int method, int encrypt);
-unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode);
 void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                             void (__cdecl* cb)(unsigned), unsigned extra,
                             int key, int flags);
@@ -1568,6 +1562,3 @@ void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
     }
 }
 
-char* __stdcall StripExtension(char* name);
-char* __stdcall StripFileName(char* name);
-char* __stdcall StripPath(char* name);

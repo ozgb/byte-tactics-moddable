@@ -18,11 +18,8 @@ public:
 class BlockMap { public: MapInsertResult Insert(const BlockInfo& v); };
 
 #include "debug_lib.h"
-unsigned int __cdecl RoundUpToDoublePage(unsigned int size);
-unsigned int __cdecl RoundUpToPage(unsigned int size);
 #include "debug_lib_4db610.h"
 BlockMap* GetBlockMap();
-void __cdecl FillPattern(void* at, int value, unsigned int count);
 
 inline unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
 {

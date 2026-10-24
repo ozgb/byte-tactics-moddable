@@ -22,4 +22,9 @@ void __stdcall CreateSquad(int);
 int __stdcall SquadHasCtrlFMember(int id);
 int __stdcall SquadHasReadyMember(int);
 
+int __stdcall IsUnitVisible(char* unit);
+void __stdcall SelectUnitsByCategory(char* name, int);
+unsigned short __stdcall PickUnitUnderCursor(void);
+bool __stdcall SelectSquad(int id, int);
+
 #endif

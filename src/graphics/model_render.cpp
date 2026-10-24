@@ -8,8 +8,8 @@
 #include <time.h>
 #include <direct.h>
 
-extern "C" void __cdecl GameFreeThunk(void* p);
-void* __cdecl GameAllocIgnoreTag(char* name, int size);
+#include "object_pool.h"
+#include "../debug/debug_lib.h"
 
 #include "../../link/globals.h"
 
@@ -95,14 +95,11 @@ Vec3f __stdcall NormalizeVector(Vec3f v);
 void* __stdcall GetGafSequenceFrame(void** pic);
 void* __stdcall GetGafFrame(unsigned short* table, int index);
 #include "gaf.h"
-void __stdcall FillFlatPolygon(GafFrame* surface, void* poly, int count, int flag);
-void __stdcall DrawTexturedPolygon(GafFrame* surface, void* pic, void* poly, int flag);
+#include "draw.h"
+#include "surface.h"
 void __stdcall FillShadedPolygon(GafFrame* surface, void* poly, int count, int flag);
-void __stdcall DrawLitTexturedPolygon(GafFrame* surface, void* pic, void* poly, int flag);
 void __stdcall FillPolygon(void* surface, Point* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src);
-void __stdcall DrawPolygonEdges(GafFrame* view, Vec3* points, int count, int color);
-void __stdcall SurfaceFromFrame(Surface_4589c0* dst, GafFrame* src);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
 int __stdcall GetGroundHeight(Pos_459200* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
@@ -305,7 +302,7 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
                             } else {
                                 pic = face->pic;
                             }
-                            DrawTexturedPolygon(bitmap, pic, poly, 0);
+                            DrawTexturedPolygon(bitmap, (GafFrame *)pic, (int *)poly, nullptr);
                         }
                     } else {
                         FillFlatPolygon(bitmap, poly, face->count, face->unknown_0);
@@ -478,7 +475,7 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
         Swap(bmp->xOffset, sdx);
         Swap(bmp->yOffset, sdy);
         Surface_4589c0 surface;
-        SurfaceFromFrame(&surface, this->bitmap);
+        SurfaceFromFrame((Surface *)&surface, this->bitmap);
         memset(this->bitmap->pixelsOrLayers, this->bitmap->transparency,
                this->bitmap->height * this->bitmap->width);
         memset(this->bitmap->scratch, 0, this->bitmap->height * this->bitmap->width);
@@ -1045,7 +1042,7 @@ void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
                 if (flags.bits.shaded) {
                     unit = (int)(*(Ref<char>*)(((char*)g_game + 0x1b8a) + ((palette & 0xff) * 0x14b))).get();
                     pic = GetGafFrame(face->color, *(unsigned char*)(unit + 0x96));
-                } else pic = useColor ? GetGafFrame(face->color, 0) : GetGafSequenceFrame(&face->pic);
+                } else pic = useColor ? GetGafFrame(face->color, 0) : (void*)GetGafSequenceFrame(&face->pic);
             } else pic = face->pic;
             DrawFrameQuad(surface, pic, poly, 0);
 skip0:;

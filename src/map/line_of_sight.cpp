@@ -192,25 +192,20 @@ int ScanDirectory(char*, char*, char*, int, int, int);
 #include "../map/mission.h"
 #include "../state/sim_globals.h"
 
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
-void __stdcall FatalError(char* message);
-int* __stdcall LoadFileWithProgress(int* file);
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
+#include "../graphics/display.h"
+#include "../game/data_files.h"
 GafFrame* __stdcall GetGafFrame(void* table, int index);
 #include "line_of_sight_482270.h"
 #include "line_of_sight_481d50.h"
 #include "radar.h"
 #include "line_of_sight_4843c0.h"
-void* __stdcall AllocFrame(const char* name, int width, int height);
-void __stdcall SurfaceFromFrame(void* dst, void* src);
+#include "../graphics/gaf.h"
 void __stdcall DrawFrame(void* surface, void* header, int x, int y);
-void __stdcall DrawFrameOpaque(void* dst, GafFrame* bmp, int x, int y);
 void __stdcall DrawTile(void* dst, int x, int y, unsigned char* pix);
-void __stdcall DrawFrameGray(void* surface, void* bmp, int x, int y);
-void __stdcall EraseFrameDithered(void* surface, void* bmp, int x, int y, int color);
 void __stdcall FillRectangle(void* surface, Rect* rect, int color);
-void __stdcall GrayRectangle(void* surface, Rect* rect);
-void __stdcall DitherRectangle(void* surface, Rect* rect, int color);
+#include "../graphics/draw.h"
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 
@@ -802,7 +797,7 @@ void LoadTntMap()
     int* tnt;
 
     tnt = (int*)g_seams.map->GetNameSlot(g_game->net, 1);
-    tnt = LoadFileWithProgress(tnt);
+    tnt = (int *)LoadFileWithProgress((char *)tnt);
     info.version = *tnt;
     switch (info.version) {
     case 0x1020:
@@ -886,7 +881,7 @@ void LoadTntMap()
         pic.pixelsOrLayers = (unsigned char*)(info.feature_data + 4);
         pic.scratch = 0;
         g_game->radarFrame = AllocFrame("TED GENERATED PIC", *(int*)info.feature_data, *(int*)(info.feature_data + 2));
-        SurfaceFromFrame(text, g_game->radarFrame);
+        SurfaceFromFrame((Surface *)text, (GafFrame *)g_game->radarFrame);
         DrawFrame(text, &pic, 0, 0);
     } else {
         g_game->radarFrame = 0;
@@ -1132,11 +1127,11 @@ void __stdcall DrawMapTiles(void* surface)
         for (int j = 0; j < tilesY; j++) {
             if (offX != 0) {
                 bmp.pixelsOrLayers = ((IconSet *)g_game->iconSet)->data + *left * 0x400;
-                DrawFrameOpaque(surface, &bmp, screenX - offX, (screenY + j * 32) - offY);
+                DrawFrameOpaque((Surface *)surface, &bmp, screenX - offX, (screenY + j * 32) - offY);
             }
             if (edgeX != 0) {
                 bmp.pixelsOrLayers = ((IconSet *)g_game->iconSet)->data + *right * 0x400;
-                DrawFrameOpaque(surface, &bmp, tilesX * 32 + screenX - offX - 32, (screenY + j * 32) - offY);
+                DrawFrameOpaque((Surface *)surface, &bmp, tilesX * 32 + screenX - offX - 32, (screenY + j * 32) - offY);
             }
             left += stride;
             right += stride;
@@ -1149,11 +1144,11 @@ void __stdcall DrawMapTiles(void* surface)
         for (int i = 0; i < tilesX; i++) {
             if (offY != 0) {
                 bmp.pixelsOrLayers = ((IconSet *)g_game->iconSet)->data + *top * 0x400;
-                DrawFrameOpaque(surface, &bmp, (screenX + i * 32) - offX, screenY - offY);
+                DrawFrameOpaque((Surface *)surface, &bmp, (screenX + i * 32) - offX, screenY - offY);
             }
             if (edgeY != 0) {
                 bmp.pixelsOrLayers = ((IconSet *)g_game->iconSet)->data + *bottom * 0x400;
-                DrawFrameOpaque(surface, &bmp, (screenX + i * 32) - offX, tilesY * 32 + screenY - offY - 32);
+                DrawFrameOpaque((Surface *)surface, &bmp, (screenX + i * 32) - offX, tilesY * 32 + screenY - offY - 32);
             }
             top++;
             bottom++;
@@ -1220,15 +1215,15 @@ void __stdcall DrawFogOfWar(void* surface)
                     if (cell->level1 != 0xf) {
                         void* bmp = GetGafFrame(g_game->gray[(i + j + q) & 3], cell->level1 - 1);
                         if ((*(Flags_004848e0*)&g_game->flags_37f06).ditheredFog) {
-                            EraseFrameDithered(surface, bmp, r.left, r.top, parity);
+                            EraseFrameDithered((Surface *)surface, (GafFrame *)bmp, r.left, r.top, parity);
                         } else {
-                            DrawFrameGray(surface, bmp, r.left, r.top);
+                            DrawFrameGray((Surface *)surface, (GafFrame *)bmp, r.left, r.top);
                         }
                     } else {
                         if ((*(Flags_004848e0*)&g_game->flags_37f06).ditheredFog) {
-                            DitherRectangle(surface, &r, parity);
+                            DitherRectangle((Surface *)surface, &r, parity);
                         } else {
-                            GrayRectangle(surface, &r);
+                            GrayRectangle((Surface *)surface, &r);
                         }
                     }
                 }

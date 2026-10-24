@@ -285,7 +285,7 @@ static_assert(offsetof(SpotState, pos) == 0x18, "pos");
 static_assert(offsetof(SpotState, root) == 0x1e, "root");
 static_assert(offsetof(Piece_459c70, modified) == 0x26, "modified");
 
-void __stdcall UpdateObjectState(Unit* unit);
+#include "../graphics/model_render.h"
 
 void __stdcall PoseUnitModel(Unit* unit)
 {
@@ -295,7 +295,7 @@ void __stdcall PoseUnitModel(Unit* unit)
     memcpy(&state->pos, &unit->angles, 6);
     state->animDirty = 1;
     state->root->modified = 0;
-    UpdateObjectState(unit);
+    UpdateObjectState((Unit_459200 *)unit);
 }
 
 // FUNCTION: 0x43e3c0

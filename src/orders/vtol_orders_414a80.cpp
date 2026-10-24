@@ -29,7 +29,7 @@ struct Unit;
 #include "path_fx.h"
 #pragma pack(pop)
 
-void __stdcall QueueUnitSpeech(Unit* unit, int kind, const char* text);
+#include "../sound/sound.h"
 void __stdcall EmitReverseNanoParticles(Vec3* box, Vec3* from, int count);
 #include "order_queue_4384a0.h"
 #include "../../interfaces/seams.h"

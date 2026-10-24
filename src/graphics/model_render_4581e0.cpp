@@ -35,10 +35,8 @@ Vec3f __stdcall NormalizeVector(Vec3f v);
 void* __stdcall GetGafSequenceFrame(void* pic);
 void* __stdcall GetGafFrame(unsigned short* table, int index);
 #include "gaf.h"
-void __stdcall FillFlatPolygon(GafFrame* surface, void* poly, int count, int flag);
-void __stdcall DrawTexturedPolygon(GafFrame* surface, void* pic, void* poly, int flag);
+#include "surface.h"
 void __stdcall FillShadedPolygon(GafFrame* surface, void* poly, int count, int flag);
-void __stdcall DrawLitTexturedPolygon(GafFrame* surface, void* pic, void* poly, int flag);
 
 #include "gaf_frame.h"
 
@@ -212,7 +210,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                             } else {
                                 pic = face->pic;
                             }
-                            DrawLitTexturedPolygon(bitmap, pic, poly, 0);
+                            DrawLitTexturedPolygon(bitmap, (GafFrame *)pic, (int *)poly, nullptr);
                         }
                     } else {
                         FillShadedPolygon(bitmap, poly, face->count, face->unknown_0);

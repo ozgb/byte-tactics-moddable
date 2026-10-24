@@ -1,5 +1,6 @@
 #ifndef SKIRMISH_MENU_H
 #define SKIRMISH_MENU_H
+struct Player;
 
 struct Cheat;
 struct Gui;
@@ -23,5 +24,7 @@ void __cdecl CycleCurrentPlayerAllyGroup();
 void __stdcall HandleSkirmishClick(Gui* menu);
 void __stdcall HandleSkirmishCheatText(Cheat* cheat);
 void __stdcall OpenSkirmishMenu(void);
+
+void __stdcall AnnounceForcesDestroyed(Player* player);
 
 #endif

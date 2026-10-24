@@ -154,19 +154,17 @@ struct Display_0041ce90 {
 #pragma pack(pop)
 
 Unit* __stdcall FindNextSelectedUnit(Unit*, int);
-unsigned int* __stdcall GetCategoryMask(char* name);
-void __stdcall CalcRadarViewportRect(void* rect);
-int GetScreenWidth();
-int GetScreenHeight();
+#include "../units/unit_commands.h"
+#include "../map/radar.h"
+#include "../graphics/display.h"
 #include "../gui/keyboard.h"
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
-void __stdcall GetCurrentMouseEvent(MouseEvent* mouse);
 Display_0041ce90* GetDisplay();
 
-void __stdcall RegisterCommands(Option_00419560* option);
+#include "../util/commands.h"
 void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mask);
-void __stdcall DefaultCommandHandler(int args);
+#include "../game/console_commands.h"
 
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 void __stdcall IssueOrCancelOrder(MissionType kind, int remove, Unit* owner,
@@ -175,9 +173,7 @@ int __stdcall CanBuildAt(UnitType* type, Point16 cell, int a, Player* player);
 #include "../graphics/movies.h"
 int __stdcall GetFootprintHeight(UnitType* unit, Point16 cell);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
-unsigned short __stdcall FindUnitTypeId(char* name);
-int __stdcall SumQueuedBuildCount(void* owner, int index);
-void __stdcall MarkChanged(void* obj);
+#include "../orders/order_list.h"
 int __stdcall FindGadgetIndexBySubstring(int value, char* name);
 int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name);
 void __stdcall SetGadgetStatus(Gui* menu, int index, int value);
@@ -187,16 +183,13 @@ void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind,
                                      int d, int e, int f);
 void __stdcall SetGrayedOut(Gui* menu, int index, int value);
 void __stdcall SetGadgetActive(Gui* menu, int index, char value);
-void __stdcall RenderLayer(Gui* menu, int value);
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
-void __stdcall ClearSelectedGadget(Gui* menu);
-#include "control_panel.h"
-int __stdcall HandleOrderButtonClick(Gui* menu, Gadget* entries);
 #include "../gui/dialogs.h"
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
+#include "control_panel.h"
+#include "../gui/dialogs.h"
+#include "../game/data_files.h"
 #include "../files/files_api.h"
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-int __stdcall IsScreenNamed(Gui* menu, const char* name);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4);
 #include "../network/net_game.h"
 
@@ -232,10 +225,10 @@ void InitCommands()
     g_packetBytesSent = 0;
     g_packetsReceived = 0;
     g_packetBytesReceived = 0;
-    RegisterCommands(&g_consoleCommands);
-    RegisterCommands(&g_cheatCommands);
-    RegisterCommands(&g_debugCommands);
-    SetDefaultCommandHandler(DefaultCommandHandler, 4);
+    RegisterCommands((ConsoleCommand *)&g_consoleCommands);
+    RegisterCommands((ConsoleCommand *)&g_cheatCommands);
+    RegisterCommands((ConsoleCommand *)&g_debugCommands);
+    SetDefaultCommandHandler((void (__stdcall *)(int))DefaultCommandHandler, 4);
 }
 
 // FUNCTION: 0x4195f0
@@ -344,7 +337,7 @@ void __stdcall RefreshBuildCountTexts(Gui* menu, Unit* unit)
         }
         e++;
     }
-    MarkChanged(&g_game->gui);
+    MarkChanged((Dialog *)&g_game->gui);
 }
 
 // FUNCTION: 0x419ac0
@@ -757,7 +750,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
             g_game->orderMode = 0xe;
             g_game->buildTypeIndex = id;
             PlaySoundByName("addbuild", 0);
-        } else if (!HandleOrdersPanelClick(menu, entries) && !HandleOrderButtonClick(menu, entries)) {
+        } else if (!HandleOrdersPanelClick(menu, entries) && !HandleOrderButtonClick((Gadget *)menu, entries)) {
             if (unit->selected) {
                 char text[256];
                 GetGadgetName(entries, text, menu->hotGadgetIndex);
@@ -775,7 +768,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
                 if (unit->immobile
                     || (((UnitType*)unit->weapons[0].weapon.get())->field_111 & 0x10000000))
                     RefreshBuildCountTexts(menu, unit);
-                MarkChanged(&g_game->gui);
+                MarkChanged((Dialog *)&g_game->gui);
             }
         }
         ClearSelectedGadget(menu);
@@ -942,7 +935,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
             && (target->player->type == 1 || target->player->type == 2)) {
             if (target->flags & 0x20000000) {
                 if (IsScreenNamed(&g_game->gui, "BUILDER.GUI"))
-                    MarkChanged(&g_game->gui);
+                    MarkChanged((Dialog *)&g_game->gui);
             } else {
                 if (target->carrier != 0)
                     AttachUnitToPiece(target, 0, -1, 1);
@@ -1221,7 +1214,7 @@ static inline int TestBit(unsigned int* set, unsigned short n)
 void FindLocalCommander()
 {
     Player* p = &g_game->players[g_game->localPlayer];
-    unsigned int* set = GetCategoryMask("Commander");
+    unsigned int* set = (unsigned int *)GetCategoryMask("Commander");
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
         if (TestBit(set, u->unitDefIndex)) {
             (*(Unit **)&g_game->value_142f3) = u;
@@ -1253,7 +1246,7 @@ void ClampCameraPosition()
     } else if (g_game->scrollY > maxY) {
         g_game->scrollY = maxY;
     }
-    CalcRadarViewportRect(g_game->field_142cb_142cb);
+    CalcRadarViewportRect((int *)g_game->field_142cb_142cb);
 }
 #pragma auto_inline(on)
 

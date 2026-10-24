@@ -27,9 +27,9 @@ extern App_004b6220* GetDisplay();
 
 struct FileHandle;
 
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
 extern int g_playBufferLooping;
 
@@ -58,7 +58,6 @@ static inline int ClampVolume(int v)
     return v;
 }
 
-int UpdatePlacementGhostValidity();
 void RegisterUnitOrders();
 
 struct WaveFormat {

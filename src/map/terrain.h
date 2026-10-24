@@ -1,5 +1,7 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
+class MovementClass;
+struct Cell;
 
 class ClaimFootprintVisitor;
 class DamagedAllyCollector;
@@ -24,5 +26,7 @@ unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj
 int __stdcall IsPadSlotFree(Unit* pad, int id);
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
 void __stdcall VisitObjectsInRange(Vec3* pos, int range, DamagedAllyCollector& visitor);
+
+int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell);
 
 #endif

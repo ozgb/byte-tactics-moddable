@@ -27,7 +27,6 @@ class Class_0044e6c0 { public: void SetAltitude(int); };
 #include "../units/unit_def.h"
 #include "../units/unit.h"
 int __stdcall FindLandingPad(Unit*, int);
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 
 struct UnitRef {
     void* table;
@@ -41,12 +40,11 @@ struct UnitRef {
 #include "../../link/globals.h"
 static inline UnitDef* Definitions() { return g_game->defs; }
 union Fixed { int value; struct { unsigned short fraction; short whole; }; };
-void __stdcall QueueUnitSpeech(Unit*, int, const char*);
+#include "../sound/sound.h"
 #include "../ingame/control_panel.h"
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall StartBuildingScript(Unit*, Order*, short);
-int __stdcall WaitIfNotInBuildStance(Unit*, Order*, int);
 void __stdcall EmitNanoParticles(Vec3*, Vec3*, int);
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {

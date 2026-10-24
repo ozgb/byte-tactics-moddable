@@ -9,4 +9,8 @@ void __stdcall StopBuildingScript(Unit* obj, Order* target);
 int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n);
 int __fastcall GetTableEntryByTypeByte(unsigned char*);
 
+unsigned int __stdcall WaitIfNotInBuildStance(void*, void*, unsigned int);
+int __stdcall WaitIfCobBusy(char*, char*, unsigned int);
+int __stdcall GetOrderFlags(void* param);
+
 #endif

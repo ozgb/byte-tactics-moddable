@@ -1,5 +1,7 @@
 #ifndef UNIT_ORDERS_H
 #define UNIT_ORDERS_H
+struct Order;
+struct Unit;
 
 struct Order;
 struct Unit;
@@ -29,5 +31,18 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags);
 void __stdcall RegisterGroundOrders();
 int __stdcall AttackUTypeOrder(Unit* unit, Order* order, int unused);
 int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags);
+
+int __stdcall WaitForAttackOrder(int unused1, Order* obj, int unused3);
+int __stdcall GetBuiltOrder(Unit* unit, Order* order, unsigned int flags);
+int __stdcall ActivateOrder(Unit* unit, int unused1, int unused2);
+int __stdcall DeactivateOrder(Unit* unit, int unused1, int unused2);
+int __stdcall CloakOnOrder(char* param1, int unused1, int unused2);
+int __stdcall CloakOffOrder(char* unit, int unused1, int unused2);
+int __stdcall QMoveQPatrolOrder(int unused1, void* order, int unused3);
+int __stdcall AttackKamikazeOrder(Unit* unit, Order* order, unsigned flags);
+int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags);
+int __stdcall SuppressOrder(Unit* unit, Order* order, unsigned flags);
+int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags);
+int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags);
 
 #endif

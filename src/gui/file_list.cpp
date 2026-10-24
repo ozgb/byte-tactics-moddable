@@ -2,19 +2,17 @@
 #include <string.h>
 #include <io.h>
 
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
 #include "../util/registry.h"
 int __cdecl _strcmpi(const char* a, const char* b);
 #include "../files/files_api.h"
-char* __stdcall StripExtension(char* name);
+#include "../graphics/palette.h"
 int __stdcall ScanDirectory(char* path, char* list, char* sizes, int mode, int flag, int what);
 void __stdcall ConfigureListBoxByName(void* gui, const char* name, int x, int y, int z);
-void __stdcall StripFileName(char* path);
-void __stdcall StripPath(char* path);
 #include "../graphics/display.h"
 unsigned int GetTicks();
-int GetTextKeyColor();
+#include "../graphics/draw.h"
 
 #pragma pack(push, 1)
 
@@ -90,8 +88,7 @@ Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 int __stdcall IsGadgetNamed(Gadget* entries, int i, char* name);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
-void __stdcall MarkChanged(void* obj);
-void __stdcall ClearSelectedGadget(void* obj);
+#include "dialogs.h"
 #include "file_list.h"
 void* __stdcall LoadGuiLayer(void* param_1, char* param_2, int param_3);
 void __stdcall SelectFontForEntry(Entry_004a1810* entries, int index);
@@ -371,7 +368,7 @@ void __stdcall FileRequesterHandler(Gui* gadget)
         }
     } else {
         RefreshFileList(req);
-        MarkChanged(gadget);
+        MarkChanged((Dialog *)gadget);
         ClearSelectedGadget(gadget);
     }
 }

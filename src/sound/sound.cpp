@@ -92,7 +92,7 @@ struct SpeechEntry {
     unsigned char priority;
 };
 
-void __cdecl GameFreeThunk(void* data);
+#include "../graphics/object_pool.h"
 
 class SpeechQueue {
 public:
@@ -137,23 +137,23 @@ struct Message_0047fad0 {
 extern Message_0047fad0 g_speechTypes[24];
 
 
-unsigned int __stdcall GetPreferenceInt(char* key, int defaultValue);
+#include "../game/main.h"
 #include "play_sound.h"
-void __stdcall FatalError(char* text);
+#include "../graphics/display.h"
 void* __cdecl operator new(size_t size);
 void __cdecl operator delete(void* p);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
+#include "../debug/debug_lib.h"
+#include "../game/data_files.h"
 #include "../files/files_api.h"
 void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, char last);
 int __stdcall PlayWavMemory(int sound);
 int __stdcall PlayLoopingWavMemory(int sound);
-int __cdecl GetLocalDpid();
+#include "../network/net_game.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 struct Cell;
-Cell* __stdcall GetMapCell(int x, int y);
+#include "../map/line_of_sight.h"
 char* __stdcall Translate(char* text);
-int __stdcall IsUnitVisible(Unit* unit);
+#include "../ingame/selection.h"
 
 // FUNCTION: 0x47f960
 SpeechQueue::SpeechQueue(int param_1, int param_2)
@@ -484,7 +484,7 @@ void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text)
 // FUNCTION: 0x47f7e0
 void __stdcall QueueUnitSpeechIfVisible(Unit* unit, int kind, char* text)
 {
-    if (IsUnitVisible(unit) != 0) {
+    if (IsUnitVisible((char *)unit) != 0) {
         QueueUnitSpeech(unit, kind, text);
     }
 }
@@ -492,7 +492,7 @@ void __stdcall QueueUnitSpeechIfVisible(Unit* unit, int kind, char* text)
 // FUNCTION: 0x47f850
 void __stdcall QueueUnitSpeechIfNotVisible(Unit* unit, int kind, char* text)
 {
-    if (IsUnitVisible(unit) == 0) {
+    if (IsUnitVisible((char *)unit) == 0) {
         QueueUnitSpeech(unit, kind, text);
     }
 }

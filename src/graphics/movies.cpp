@@ -97,7 +97,7 @@ struct Display_0047c3a0 {
 #include "../../link/globals.h"
 
 Display_0047bdf0* GetDisplay();
-void __stdcall FatalError(char* message);
+#include "display.h"
 void __stdcall SetOffscreenSurface(Display_0047c3a0* display);
 void FlipScreen();
 

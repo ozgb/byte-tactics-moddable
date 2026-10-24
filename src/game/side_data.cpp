@@ -14,11 +14,11 @@ class TdfFile;
 
 #include "../../link/globals.h"
 
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
+#include "data_files.h"
 void* __stdcall LoadGaf(char* path);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
-void __stdcall FatalError(char* message);
-void __cdecl GameFreeThunk(int* p);
+#include "../graphics/display.h"
+#include "../graphics/object_pool.h"
 #include "side_data.h"
 #include "../files/files_api.h"
 

@@ -125,7 +125,7 @@ void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size)
     return GameAlloc(size);
 }
 
-void* __cdecl AllocDebugBlock(unsigned int size, int flags);
+#include "debug_lib_4dacf0.h"
 extern void (*g_outOfMemoryHandler)();
 
 #pragma auto_inline(off)
@@ -138,7 +138,7 @@ void* __cdecl GameAlloc(unsigned int size)
     void* p;
     do {
         if (IsMemFussy()) {
-            p = AllocDebugBlock(size, 0);
+            p = (void *)AllocDebugBlock(size, 0);
         } else {
             p = malloc(size);
             if (p != 0)
@@ -186,7 +186,6 @@ void* __cdecl GameReallocTagged(void* block, int unused_param_2, unsigned int si
 }
 #pragma auto_inline(on)
 
-void __cdecl CountFree(int size);
 #include "../../interfaces/ref.h"
 
 #pragma auto_inline(off)
@@ -429,8 +428,6 @@ char* __cdecl FindCommandLineSwitch(char* name)
 }
 #pragma auto_inline(on)
 
-char* __cdecl FindCommandLineSwitch(char* name);
-
 #pragma auto_inline(off)
 // FUNCTION: 0x4d9fe0
 CommandLineSwitch::CommandLineSwitch(char* name, int a, char def, char* onSwitch,
@@ -443,8 +440,6 @@ CommandLineSwitch::CommandLineSwitch(char* name, int a, char def, char* onSwitch
         on = 0;
 }
 #pragma auto_inline(on)
-
-char* __cdecl FindCommandLineSwitch(char* name);
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4da040
@@ -1279,12 +1274,6 @@ typedef void (Vec_004dd8c0::*InsertFn_004dd8c0)(
 
 void* GetBlockMap();
 Container_004da9f0<int>* GetFreedBlockRing();
-unsigned int __cdecl RoundUpToPage(unsigned int size);
-unsigned int __cdecl RoundUpToDoublePage(unsigned int size);
-void __cdecl CountFree(int size);
-void __cdecl FillPattern(void* at, int value, unsigned int count);
-void __cdecl CheckFillPattern(void* at, int value, unsigned int count);
-void* __cdecl AllocDebugBlock(unsigned int size, int flags);
 
 // FUNCTION: 0x4db000
 void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
@@ -1406,7 +1395,7 @@ void* __cdecl ReallocDebugBlock(void* p, unsigned int size, int flags)
     if (p)
         old = GetBlockSize(p);
     if (size > 0) {
-        q = AllocDebugBlock(size, flags);
+        q = (void *)AllocDebugBlock(size, flags);
         if (!q) {
             host_mutex_unlock(cs);
             return 0;

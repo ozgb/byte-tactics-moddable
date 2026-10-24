@@ -2,8 +2,8 @@
 #include <string.h>
 #include "../state/block.h"
 
-void __cdecl GameFreeThunk(int* param_1);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
+#include "../graphics/object_pool.h"
+#include "../debug/debug_lib.h"
 
 #include "cob_script.h"
 

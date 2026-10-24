@@ -655,7 +655,7 @@ GafEntry_004b8d40* __stdcall FindGafEntry(Gaf_004b8d40* gaf, const char* name)
     return 0;
 }
 
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 // FUNCTION: 0x4b8da0
 GafFrame* __stdcall AllocFrame(const char* name, int width, int height)
 {
@@ -808,9 +808,6 @@ void* __stdcall BuildLensFrame(int w, int h, int lens)
     return f;
 }
 
-void __stdcall CopySurfaceRect(void* dst, void* src, Rect* rect,
-                               Rect* pos);
-
 static void SwapPtr(unsigned char*& a, unsigned char*& b)
 {
     unsigned char* t = a;
@@ -848,7 +845,7 @@ void __stdcall DrawLens(void* dst, GafFrame* sprite, int x, int y)
     dstRect.top = y - sprite->yOffset;
     dstRect.bottom = y + surface.height - sprite->yOffset - 1;
 
-    CopySurfaceRect(&surface, dst, &dstRect, &srcRect);
+    CopySurfaceRect(&surface, (Surface *)dst, &dstRect, (Point *)&srcRect);
 
     SwapPtr(sprite->pixelsOrLayers, sprite->scratch);
 
@@ -905,7 +902,7 @@ void __stdcall GrabBackground(void* dst, GafFrame* sprite, int x, int y)
     dstRect.top = y - sprite->yOffset;
     dstRect.bottom = surface.height + y - sprite->yOffset - 1;
 
-    CopySurfaceRect(&surface, dst, &dstRect, &srcRect);
+    CopySurfaceRect(&surface, (Surface *)dst, &dstRect, (Point *)&srcRect);
 }
 
 // FUNCTION: 0x4b96a0

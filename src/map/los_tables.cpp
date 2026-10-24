@@ -67,10 +67,8 @@ struct Elem_004336c0 {
     int value;
 };
 
-void CopyDwordIfNonNull(int*, int*);
 #include "../orders/approach_areas.h"
 #include "../state/sim_globals.h"
-int GetBuildRating(int, unsigned short);
 
 extern void __cdecl operator delete(void*);
 

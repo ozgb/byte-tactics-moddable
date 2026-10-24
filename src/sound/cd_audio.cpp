@@ -17,10 +17,6 @@ extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void
 
 struct FileHandle;
 
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-
-void __cdecl GameFreeThunk(void* p);
-
 struct Pos_004cf570 {
     int x, y, z;
 };

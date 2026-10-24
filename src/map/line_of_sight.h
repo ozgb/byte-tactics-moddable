@@ -1,5 +1,6 @@
 #ifndef LINE_OF_SIGHT_H
 #define LINE_OF_SIGHT_H
+struct Cell;
 
 struct Cell;
 struct Eye;
@@ -30,5 +31,7 @@ void __stdcall RecalculateLineOfSight(int arg);
 void __stdcall RevealAroundUnit(SightQuery* params);
 void __stdcall AddEyeball(Vec3* src, int a, int b, int c);
 void __stdcall RevealNewUnit(Unit* unit);
+
+Cell* __stdcall GetMapCell(int x, int y);
 
 #endif

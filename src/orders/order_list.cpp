@@ -197,11 +197,8 @@ void __stdcall DeleteOrder(Unit* owner, Order* node);
 extern int __cdecl _strcmpi(const char*, const char*);
 
 
-void __stdcall DrawBuildFootprint(void* a, void* b, Order* e, Vec3* p, int c);
+#include "../ingame/markers.h"
 void __stdcall DrawUnitRangeRings(void* a, void* b, Order* e, Vec3* p, int c);
-void __stdcall DrawPathAnim(void* a, void* b, Order* e, Vec3* p, int c);
-void __stdcall DrawWeaponCoverage(void* a, void* b, Order* e, Vec3* p, int c);
-void __stdcall DrawOrderRangeRing(void* a, void* b, Order* e, Vec3* p, int c);
 
 // FUNCTION: 0x439b30
 void __stdcall DrawOrderOverlays(Unit* unit, unsigned int mask, void* obj,
@@ -213,19 +210,19 @@ void __stdcall DrawOrderOverlays(Unit* unit, unsigned int mask, void* obj,
     for (Order* e = unit->list; e != 0; e = e->next) {
         if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 1) {
             pos = base;
-            DrawBuildFootprint(obj, sel, e, &pos, flag);
+            DrawBuildFootprint(obj, (View *)sel, e, (Pos *)&pos, flag);
         }
         if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 2) {
             pos = base;
-            DrawPathAnim(obj, sel, e, &pos, flag);
+            DrawPathAnim(obj, (View *)sel, e, (Pos *)&pos, flag);
         }
         if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 4) {
             pos = base;
-            DrawOrderRangeRing(obj, sel, e, &pos, flag);
+            DrawOrderRangeRing(obj, (View *)sel, e, (Pos *)&pos, flag);
         }
         if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 8) {
             pos = base;
-            DrawWeaponCoverage(obj, sel, e, &pos, flag);
+            DrawWeaponCoverage(obj, (View *)sel, e, (Pos *)&pos, flag);
         }
         if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 0x10) {
             if (!done) {
@@ -668,7 +665,6 @@ public:
 };
 
 #include "../network/net_stats.h"
-int UpdatePlacementGhostValidity();
 
 typedef std::vector<Elem_0043c390> Vec_0043c390;
 typedef int(__stdcall* Pred_0043c390)(const Elem_0043c390&, const Elem_0043c390&);

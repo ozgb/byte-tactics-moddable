@@ -24,7 +24,6 @@ struct CalcedExplosion;
 #include "../units/unit_def.h"
 #include "../weapons/weapon_def.h"
 #include "../units/unit.h"
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 void __stdcall DrawUnit(void*, Unit*);
 
 #include "order.h"
@@ -34,7 +33,6 @@ void __stdcall DrawUnit(void*, Unit*);
 #include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
-void __stdcall QueueUnitSpeech(Unit*, int, const char*);
 #include "order_list.h"
 
 static inline Vec3 Offset(short angle, int distance)

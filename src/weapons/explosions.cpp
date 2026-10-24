@@ -207,8 +207,8 @@ struct DebrisView {
 #include "../../link/globals.h"
 extern int g_explosion0Duration, g_explosion0StartSize, g_explosion0EndSize, g_explosion1Duration, g_explosion1StartSize, g_explosion1EndSize, g_explosion2Duration, g_explosion2StartSize, g_explosion2EndSize;
 
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned size);
-void __cdecl GameFreeThunk(void* p);
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
 #include "../graphics/gaf.h"
 void __stdcall InitGafSequence(GafRef* ref, GafSequence* src, int index);
 void __stdcall EmitSmoke(int* pos, int a, int b, int c);
@@ -217,7 +217,6 @@ void __stdcall EmitJitteredThrustParticles(void* buf, int arg);
 int __stdcall PointInRect(void* rect, int x, int y);
 void* __stdcall GetGafSequenceFrame(GafRef* ref);
 void* __stdcall GetGafFrame(GafSequence* table, int index);
-void __stdcall DrawFrameShadow(void* surface, void* frame, int x, int y);
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 void __stdcall DrawModel3doProjected(void* surface, Position* pos, void* model, short* rotation);
 void __stdcall FillPolygon(void* surface, Point* points, int count, int flags);
@@ -232,8 +231,7 @@ Vec3f __stdcall NormalizeVector(Vec3f v);
 #include "../state/sim_globals.h"
 void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int flag);
 #include "explosions.h"
-void* __stdcall BuildExplosionFrame(int size);
-void __stdcall StartExplodePiece(ExplodedPiece* spawn);
+#include "explosions_420d20.h"
 
 inline Explosion* MakeExplosion(int count, int start, int end)
 {
@@ -355,7 +353,7 @@ void __stdcall DrawExplosions(void* surface)
         int x = pos.x.parts.whole + 128;
         int y = pos.z.parts.whole - (pos.y.parts.whole >> 1) + 32;
         if (PointInRect(g_game->viewport, x, y) && d->ref2.src)
-            DrawFrameShadow(surface, GetGafSequenceFrame(&d->ref2), x, y);
+            DrawFrameShadow((Surface *)surface, (GafFrame *)GetGafSequenceFrame(&d->ref2), x, y);
     }
     d = (DebrisView*)(pCount + 1);
     for (i = 0; i < *pCount; ++i, d++) {

@@ -116,8 +116,7 @@ void __stdcall DrawFrameBlended(void* dest, void* bmp, int x, int y);
 int __stdcall IsUnitVisibleToPlayer(Player* owner, Unit* unit);
 void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos,
                             int radius, int color, const char* text, int index);
-void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
-                            Pos* out, int unused);
+#include "markers.h"
 
 static int ScreenX(View* v, int x)
 {

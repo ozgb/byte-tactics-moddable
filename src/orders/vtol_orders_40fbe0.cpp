@@ -26,7 +26,6 @@ static inline Vec3 Direction(short angle, int range) { Fixed distance; distance.
 Vec3 __stdcall AddVec3(const Vec3&, const Vec3&);
 #include "order_list.h"
 
-int __stdcall IssueAttackOrder(Unit*, Unit*, int);
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
 #include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);

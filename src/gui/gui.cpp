@@ -41,7 +41,6 @@ extern Root_004a32a0* g_guiContext;
 #include "../state/sim_globals.h"
 #include "../files/files_api.h"
 
-void LoadDefaultPalette(void);
 class SquadManager;
 
 
@@ -121,7 +120,6 @@ void __stdcall UpdateMenu(Dialog* menu);
 void __stdcall BlitLayers(void* param_1, unsigned int* param_2, int* param_3);
 void ShowSoftwareCursor();
 void FlipScreen();
-void __stdcall FatalError(char* path);
 char* __stdcall Translate(char* text);
 void __stdcall DrawButton(Dialog* param_1, int param_2);
 void __stdcall SelectAdjacentGadget(Dialog* menu, int value);
@@ -624,8 +622,6 @@ struct Gadget {
 
 #pragma pack(push, 1)
 
-int ExpireOldestMessage();
-void DrawLightBars();
 int __cdecl CountHumanSlots();
 
 struct Holder_004a04f0 {
@@ -650,7 +646,6 @@ struct Dialog_004a04f0 {
 void __stdcall SetGadgetActive(Dialog_004a04f0* menu, int index, int value);
 void __stdcall ClearPeerStatus(Dialog_004a04f0* obj, int index);
 char* __stdcall Translate(char* text);
-void __stdcall FatalError(char* path);
 void __stdcall DrawLitRectangle(int surface, Rect* rect, int level);
 void __stdcall SetFont(int id);
 int __cdecl tolower(int c);
@@ -1283,8 +1278,7 @@ int __stdcall FindAssocTextInput(Gadget* entries, int index)
 
 struct Surface_004a1ab0;
 
-void StopAllSounds();
-void* __stdcall DrawBlendedLine(void* surface, int x0, int y0, int x1, int y1, int color);
+#include "../graphics/draw.h"
 
 struct Holder_004a1ab0 {
     char unknown_0[4];
@@ -1296,8 +1290,6 @@ struct Dialog_4a1ab0 {
     Holder_004a1ab0* holder;
 };
 
-void __stdcall GrayRectangle(Surface_004a1ab0* dst, Rect* rect);
-void __stdcall FadeRectangle(Surface_004a1ab0* dst, Rect* rect, int level);
 
 // FUNCTION: 0x4a1ab0
 void __stdcall RedrawGadgetRect(Dialog_4a1ab0* obj, int index)
@@ -1314,8 +1306,8 @@ void __stdcall RedrawGadgetRect(Dialog_4a1ab0* obj, int index)
     }
     rect.right = e->width + rect.left - 1;
     rect.bottom = e->height + rect.top - 1;
-    GrayRectangle((Surface_004a1ab0*)entries->u.assets.surface, &rect);
-    FadeRectangle((Surface_004a1ab0*)entries->u.assets.surface, &rect, -0x14);
+    GrayRectangle((Surface *)(Surface_004a1ab0*)entries->u.assets.surface, &rect);
+    FadeRectangle((Surface *)(Surface_004a1ab0*)entries->u.assets.surface, &rect, -0x14);
 }
 
 #pragma pack(push, 1)
@@ -1370,22 +1362,16 @@ struct Item_004a1b40 {
 
 
 void __stdcall DrawListboxFrame(Dialog_4a1b40* obj, int index, void* bmp);
-void __stdcall CopySurfaceRect(void* dst, void* src, Rect* rect, Rect* pos);
 void __stdcall SetFont(int id);
-int GetFont();
 int __stdcall GetTextWidth(int font, char* text);
-int GetFontHeight();
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall SetTextColors(int colour, int font);
-int GetTextKeyColor();
 #include "../util/registry.h"
-void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw,
-                            int style);
+#include "gui.h"
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw,
                             int rem, int style);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int colour);
-void __stdcall FadeRectangle(void* surface, Rect* rect, int id);
 void __stdcall DrawFrameQuad(void* surface, void* bitmap, Quad_004a1b40* dst,
                             Quad_004a1b40* src);
 
@@ -1445,7 +1431,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
     if (surface == 0 && !(holder->flags & 0x80))
         DrawListboxFrame(obj, index, surface);
     else if (surface != 0)
-        CopySurfaceRect(entries->u.assets.surface, surface, &bounds, &bounds);
+        CopySurfaceRect((Surface *)entries->u.assets.surface, (Surface *)surface, &bounds, (Point *)&bounds);
     int lh = LineHeight_004a1b40();
     int step;
     if (me->u.list.scroll == 0)
@@ -1511,15 +1497,15 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
             q = SkipTextLines(q, 1);
             if (flag) {
                 flag = 0;
-                FadeRectangle(entries->u.assets.surface, &rowRect, -0x13);
-                FadeRectangle(entries->u.assets.surface, &rowRect, -0x14);
-                FadeRectangle(entries->u.assets.surface, &rowRect, -0x15);
-                FadeRectangle(entries->u.assets.surface, &rowRect, -0x16);
+                FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, -0x13);
+                FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, -0x14);
+                FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, -0x15);
+                FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, -0x16);
             } else if (!(me->attribs & 0x100) && me->u.list.selected == line + me->u.list.firstRow && me->u.list.rowCount) {
                 if (obj->holder->current == index)
-                    FadeRectangle(entries->u.assets.surface, &rowRect, 0x1e);
+                    FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, 0x1e);
                 else
-                    FadeRectangle(entries->u.assets.surface, &rowRect, 0x1e);
+                    FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, 0x1e);
             } else {
                 SetTextColors(col, font);
             }
@@ -1587,7 +1573,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
                 cellRect.bottom = dst.points[2].y;
                 unsigned char v = ((char*)me->u.list.filebuf)[k];
                 if (1 & v) {
-                    FadeRectangle(surf, &cellRect, -0x14);
+                    FadeRectangle((Surface *)surf, &cellRect, -0x14);
                 } else if ((2 & v) != 0) {
                     DrawLine(surf, cellRect.left + 1, cellRect.bottom - 1, cellRect.right - 2, 1 + cellRect.top, obj->colour_8be);
                     DrawLine(surf, 2 + cellRect.left, cellRect.bottom - 1, cellRect.right - 1, cellRect.top + 1, obj->colour_8be);
@@ -1601,7 +1587,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
                 hl.top = yy;
                 hl.right = bounds.left + cell->width - 1;
                 hl.bottom = yy + cell->height - 1;
-                FadeRectangle(surf, &hl, 0x14);
+                FadeRectangle((Surface *)surf, &hl, 0x14);
             }
             k++;
             if (!bp)
@@ -1645,8 +1631,6 @@ void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2)
     }
 }
 
-int __stdcall AssignPlayerColor(int from, int to, int group);
-
 struct Player_00463e50;
 struct Player_0047bd70;
 struct Player_0048b920;
@@ -1656,7 +1640,6 @@ struct Point_00480720;
 struct Point_004bf060;
 
 void RegisterUnitOrders();
-int UpdatePlacementGhostValidity();
 
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrame(void* surface, void* image, int x, int y);
@@ -1708,9 +1691,6 @@ void __stdcall DrawGafBar(Dialog_004a04f0* param_1, int index)
 }
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
 
-void __cdecl ClearCameraFollowState();
-void InitMissionStatus();
-void BlankScreen();
 
 struct Holder_004a2580 {
     char unknown_0[4];
@@ -1744,17 +1724,12 @@ struct Dialog_4a2580 {
 void __stdcall SetFont(int id);
 #include "gui.h"
 void __stdcall DrawRaisedBox(void* surface, int* r, int a, int b, int c);
-void __stdcall DrawSunkenBox(void* surface, int* r, int a, int b, int c);
+#include "listbox.h"
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
-int GetTextKeyColor();
 void __stdcall SetTextColors(int a, int b);
-int GetFont();
 void __stdcall GetTextWidth(Font_004a2580* font, char* text);
-int GetFontHeight();
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
-void __stdcall GrayRectangle(void* surface, void* rect);
-void __stdcall FadeRectangle(void* surface, void* rect, int a);
 
 static inline void* Surface_004a2580(Object_004a2580* o)
 {
@@ -1812,7 +1787,7 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
     GafEntry* gl = e->sliderGaf;
     if (gl == 0) {
         DrawRaisedBox(surface, r1, obj->field_8b2, obj->field_8c3, obj->field_8c6);
-        DrawSunkenBox(surface, r2, obj->field_8b2, obj->field_8c3, obj->field_8c6);
+        DrawSunkenBox(surface, (Rect *)r2, obj->field_8b2, obj->field_8c3, obj->field_8c6);
     } else {
         short w = e->width;
         short h = e->height;
@@ -1930,8 +1905,8 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
         }
         rect[2] = e->width + rect[0] - 1;
         rect[3] = e->height + rect[1] - 1;
-        GrayRectangle(entries->u.assets.surface, rect);
-        FadeRectangle(entries->u.assets.surface, rect, -0x14);
+        GrayRectangle((Surface *)entries->u.assets.surface, (Rect *)rect);
+        FadeRectangle((Surface *)entries->u.assets.surface, (Rect *)rect, -0x14);
     }
 }
 #pragma pack(push, 1)
@@ -1950,7 +1925,6 @@ struct Dialog_4a2be0 {
     Holder_004a2be0* holder;
 };
 
-void __stdcall DrawListBox(Dialog_4a2be0* param_1, int param_2);
 void __stdcall DrawSliderBar(Dialog_4a2be0* param_1, int param_2);
 void __stdcall DrawTextInput(Dialog_4a2be0* param_1, int param_2);
 
@@ -1971,7 +1945,7 @@ void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
                     if (type == 2) {
                         *(short*)(entry - 0x84) = *(short*)(me + 0xbc);
                         *(short*)(entry - 0x86) = *(short*)(me + 0xba);
-                        DrawListBox(param_1, i);
+                        DrawListBox((Dialog_4a1b40 *)param_1, i);
                     } else if (type == 4) {
                         int esi_val;
                         if (*(unsigned char*)(entry - 0x125) & 0x20) {
@@ -1993,7 +1967,7 @@ void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
 #endif
                             *(short*)(entry - 0x84) = result;
                         }
-                        DrawListBox(param_1, i);
+                        DrawListBox((Dialog_4a1b40 *)param_1, i);
                     }
                     break;
                 case 3:
@@ -2035,7 +2009,7 @@ void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
 }
 
 #pragma pack(push, 1)
-int OpenInputDialog(int, int, int, int, int, int);
+#include "dialogs.h"
 #pragma pack(pop)
 
 struct List_004a2e40 {
@@ -2061,7 +2035,6 @@ struct Dialog_4a2e40 {
 
 void __stdcall SetFont(int id);
 char* __stdcall GetGafFrame(void* glyphs, int c);
-int GetFontHeight();
 
 static inline int FindEntry_004a2e40(Gadget* entries, char* name) {
     int i;
@@ -2156,7 +2129,6 @@ struct Dialog_4a30c0 {
 
 
 void __stdcall SetFont(int id);
-int GetFontHeight();
 char* __stdcall GetGafFrame(void* glyphs, int c);
 unsigned int __cdecl GetTicks();
 // FUNCTION: 0x4a30c0
@@ -2190,7 +2162,7 @@ void __stdcall ResetListBox(Dialog_004a04f0* obj, int index)
     e->height = h - h % (step + 2);
     e->u.list.sortKey = GetTicks();
 }
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 void __stdcall TruncateTextWithEllipsis(int a1, char* text, int a3, int a4, int a5);
 
 // FUNCTION: 0x4a31c0
@@ -2211,18 +2183,14 @@ void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4)
 }
 
 
-int __stdcall AddNetPlayer(int param_1);
-
 struct Dialog_4a32a0 {
     char unknown_00[0x18];
     Holder_004a32a0* holder;
 };
 
-void __stdcall FatalError(char* msg);
-int GetFontHeight();
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall SetGadgetActive(Root_004a32a0* menu, int index, int value);
-void __stdcall DrawSlider(Root_004a32a0* param_1, int param_2);
+#include "gui_4a3ef0.h"
 
 static inline int FontHeight_004a32a0() {
     if (g_guiContext->language == 0)
@@ -2300,11 +2268,9 @@ void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bi
         }
     }
     if (remain < 0) {
-        DrawSlider(g_guiContext, found);
+        DrawSlider((Dialog *)g_guiContext, found);
     }
 }
-
-void FreePictureCache();
 
 #pragma pack(push, 1)
 struct Row_004a35a0 {
@@ -2318,8 +2284,6 @@ struct Table_004a35a0 {
     Gadget* entries;
 };
 #pragma pack(pop)
-
-void __stdcall FatalError(const char* msg);
 
 static inline int FindEntry_004a35a0(Gadget* entries, char* name)
 {
@@ -2369,8 +2333,6 @@ struct Item_004a36a0 {
     int cell;
 };
 
-void __stdcall FatalError(char* path);
-
 static inline int FindEntry_004a36a0(Gadget* entries, char* name)
 {
     for (int i = 1; i < entries->u.count + 1; i++) {
@@ -2415,7 +2377,6 @@ void __stdcall SetGadgetItems(Table_004a36a0* table, char* name, int* items, int
 }
 #pragma pack(push, 1)
 int DrawTriangleContours(int, int, int, int, int, int, int);
-int DrawLitLine(int, int, int, int, int, int);
 
 struct List_004a3780 {
     char unknown_0[0xc];
@@ -2460,16 +2421,9 @@ struct Object_004a3780 {
 #include "../../link/globals.h"
 
 void __stdcall SetFont(int id);
-int GetFontHeight();
 char* __stdcall GetGafFrame(void* glyphs, int c);
 unsigned int __cdecl GetTicks();
-int __stdcall IsDoubleClickMessage(Object_004a3780* obj, unsigned char buttons);
-int __stdcall IsMouseButtonMessage(Object_004a3780* obj, unsigned char buttons);
-int __stdcall HasMouseKeyFlags(Object_004a3780* obj, unsigned int mask);
-void __stdcall SetClickMode(Object_004a3780* obj, int param_2);
 void __stdcall TrySetFocus(Object_004a3780* obj, int index);
-void __stdcall DrawListBox(Object_004a3780* obj, int index);
-void __stdcall SyncAssocGadgets(Object_004a3780* obj, int index);
 
 int __stdcall AllocAlphaTable(int param_1);
 
@@ -2533,7 +2487,7 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
     int step = (me->height - 2) / span;
     char* s;
 
-    if (IsDoubleClickMessage(obj, 1)) {
+    if (IsDoubleClickMessage((Gui *)obj, 1)) {
         if (PointInListRect(r, point)) {
             if (me->u.list.rowCount == 0) goto skip0;
             if (!(me->attribs & 0x200))
@@ -2552,12 +2506,12 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
             return 0;
 skip0:;
         }
-    } else if (IsMouseButtonMessage(obj, 1)) {
+    } else if (IsMouseButtonMessage((Gui *)obj, 1)) {
         if (PointInListRect(r, point)) {
             TrySetFocus(obj, index);
             SetClickMode(obj, 1);
         }
-    } else if (IsMouseButtonMessage(obj, 2)) {
+    } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
         if (PointInListRect(r, point)) {
             TrySetFocus(obj, index);
             SetClickMode(obj, 2);
@@ -2566,7 +2520,7 @@ skip0:;
 
     if (obj->focus != index)
         goto end;
-    if (!HasMouseKeyFlags(obj, 3))
+    if (!HasMouseKeyFlags((Gui *)obj, 3))
         obj->focus = -1;
     if (PointInListRect(r, point)) {
         obj->holder->selected = index;
@@ -2624,7 +2578,7 @@ skip0:;
             }
         }
         if (orig_sel != me->u.list.selected) {
-            DrawListBox(obj, index);
+            DrawListBox((Dialog_4a1b40 *)obj, index);
             if (me->u.list.callback)
                 me->u.list.callback((Gui*)obj, me);
         }
@@ -2664,16 +2618,14 @@ ret1:
                     me->u.list.selected = orig_sel;
             }
 finish:
-            DrawListBox(obj, index);
-            SyncAssocGadgets(obj, index);
+            DrawListBox((Dialog_4a1b40 *)obj, index);
+            SyncAssocGadgets((Dialog_4a2be0 *)obj, index);
         }
     }
 end:
     return obj->hotGadgetIndex != -1;
 }
 
-int MainLoopContinueStub_B();
-int MainLoopContinueStub_C();
 
 
 struct Table_004a3eb0 {
@@ -2732,10 +2684,6 @@ struct Object_004a4170 {
 
 void __stdcall TrySetFocus(Object_004a4170* obj, int index);
 void __stdcall DrawSliderBar(Object_004a4170* obj, int index);
-void __stdcall SyncAssocGadgets(Object_004a4170* obj, int index);
-int __stdcall IsMouseButtonMessage(Object_004a4170* obj, unsigned char buttons);
-int __stdcall HasMouseKeyFlags(Object_004a4170* obj, unsigned int mask);
-void __stdcall SetClickMode(Object_004a4170* obj, int param_2);
 
 static inline void OffsetChanged_004a4170(Object_004a4170* obj, int index, Gadget* e, int old)
 {
@@ -2748,7 +2696,7 @@ static inline void OffsetChanged_004a4170(Object_004a4170* obj, int index, Gadge
     if (obj->holder)
         obj->holder->dirty = 1;
     DrawSliderBar(obj, index);
-    SyncAssocGadgets(obj, index);
+    SyncAssocGadgets((Dialog_4a2be0 *)obj, index);
     if (e->sliderCallback)
         e->sliderCallback((Gui*)obj, e->sliderUser);
 }
@@ -2771,7 +2719,7 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
     GetSliderRects(entries, index, r1, r2);
 
     if (obj->focus == index) {
-        if (!HasMouseKeyFlags(obj, 3)) {
+        if (!HasMouseKeyFlags((Gui *)obj, 3)) {
             obj->focus = -1;
             obj->knobDragging = 0;
         }
@@ -2802,7 +2750,7 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
 
     if (obj->knobDragging)
         return;
-    if (IsMouseButtonMessage(obj, 1)) {
+    if (IsMouseButtonMessage((Gui *)obj, 1)) {
         obj->knobDragging = 0;
         if (p.x < r1[0] || p.x > r1[2] || p.y < r1[1] || p.y > r1[3])
             return;
@@ -2815,7 +2763,7 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
         obj->dragKnobPos = e->knobPos;
         return;
     }
-    if (IsMouseButtonMessage(obj, 2)) {
+    if (IsMouseButtonMessage((Gui *)obj, 2)) {
         obj->knobDragging = 0;
         if (p.x < r1[0] || p.x > r1[2] || p.y < r1[1] || p.y > r1[3])
             return;
@@ -2857,10 +2805,7 @@ struct Object_0049fc50 {
 #pragma pack(pop)
 
 int __stdcall TrySetFocus(Object_0049fc50* obj, int index);
-int __stdcall IsMouseButtonMessage(Object_0049fc50* obj, unsigned char buttons);
-int __stdcall HasMouseKeyFlags(Object_0049fc50* obj, unsigned int mask);
-void __stdcall SetClickMode(Object_0049fc50* obj, int param_2);
-int PopKey(void);
+#include "keyboard.h"
 #include "keyboard.h"
 
 // FUNCTION: 0x4a4440
@@ -2890,12 +2835,12 @@ int __stdcall HandleLabelInput(Object_0049fc50* obj, int index, char key)
     rel_x = point.x - entries->x;
     rel_y = point.y - entries->y;
 
-    if (IsMouseButtonMessage(obj, 1)) {
+    if (IsMouseButtonMessage((Gui *)obj, 1)) {
         if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
             goto fail;
         TrySetFocus(obj, index);
         SetClickMode(obj, 1);
-    } else if (IsMouseButtonMessage(obj, 2)) {
+    } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
         if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
             goto fail;
         TrySetFocus(obj, index);
@@ -2905,7 +2850,7 @@ int __stdcall HandleLabelInput(Object_0049fc50* obj, int index, char key)
 fail:
     if (obj->focus != index)
         goto check_queue;
-    if (HasMouseKeyFlags(obj, 3))
+    if (HasMouseKeyFlags((Gui *)obj, 3))
         goto check_queue;
     obj->focus = -1;
     if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
@@ -2982,13 +2927,9 @@ struct Language_004a4660 { char unknown_0[0xc]; unsigned short *glyphs; };
 struct LanguageRoot_004a4660 { char unknown_0[0x14]; Language_004a4660 *language; };
 
 void __stdcall LockScreen(void *);
-void __stdcall FillBevelBox(void *, Rect_004a4660 *, unsigned int, unsigned int, unsigned int);
 void __stdcall FillRectangle(void *, Rect_004a4660 *, int);
-void __stdcall DrawTextClipped(void *, char *, int, int, int, int);
 char* __stdcall GetGafFrame(void* glyphs, int c);
-int GetFont();
 int __stdcall GetTextWidth(int, char *);
-int GetFontHeight();
 void __stdcall UnlockScreen(void *);
 
 static inline int Measure_004a4660(char *text)
@@ -3028,7 +2969,7 @@ void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
     rect.top = entry->y;
     rect.right = entry->width + entry->x;
     rect.bottom = entry->height + entry->y;
-    FillBevelBox(surface, &rect, obj->color1, obj->color2, obj->color3);
+    FillBevelBox(surface, (Rect *)&rect, obj->color1, obj->color2, obj->color3);
 
     rect.left += 2;
     rect.top += 2;
@@ -3067,8 +3008,6 @@ void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
 }
 
 
-void __cdecl BuildPlayerSlotGadgets();
-
 struct Table_004a4890 {
     char unknown_0[4];
     Gadget* entries;
@@ -3080,7 +3019,6 @@ struct Dialog_4a4890 {
 };
 
 unsigned int __cdecl GetTicks();
-void __stdcall DrawProgressBarGadget(Dialog_4a4890* obj, int i);
 
 // FUNCTION: 0x4a4890
 void __stdcall TickProgressBar(Dialog_4a4890* obj, int i)
@@ -3095,7 +3033,7 @@ void __stdcall TickProgressBar(Dialog_4a4890* obj, int i)
             }
             e->u.anim.next = GetTicks() + e->u.anim.interval;
         }
-        DrawProgressBarGadget(obj, i);
+        DrawProgressBarGadget((Dialog_4a4660 *)obj, i);
     }
 }
 struct ElemArray_4a4930 {
@@ -3239,9 +3177,6 @@ struct Dialog_4a4b50 {
 };
 #pragma pack(pop)
 
-extern int __stdcall IsMouseButtonMessage(Dialog_4a4b50* obj, unsigned char buttons);
-extern int __stdcall HasMouseKeyFlags(Dialog_4a4b50* obj, unsigned int mask);
-extern void __stdcall SetClickMode(Dialog_4a4b50* obj, int value);
 extern int __stdcall TrySetFocus(Dialog_4a4b50* obj, int index);
 
 struct Rect_004a4b50 { int left, top, right, bottom; };
@@ -3268,20 +3203,20 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
     if (entries[index].u.hotspot.callback)
         entries[index].u.hotspot.callback((Gui*)obj, &entries[index]);
     if (entries[index].u.hotspot.flags & 1) {
-        if (IsMouseButtonMessage(obj, 1)) {
+        if (IsMouseButtonMessage((Gui *)obj, 1)) {
             Point_004a4b50 p = obj->pos;
             if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 1);
             }
-        } else if (IsMouseButtonMessage(obj, 2)) {
+        } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
             Point_004a4b50 p = obj->pos;
             if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 2);
             }
         }
-        if (obj->focus == index && !HasMouseKeyFlags(obj, 3)) {
+        if (obj->focus == index && !HasMouseKeyFlags((Gui *)obj, 3)) {
             obj->focus = -1;
             Point_004a4b50* pp = &obj->pos;
             Point_004a4b50 q;
@@ -3294,10 +3229,7 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
     return 0;
 }
 
-int GetLocalDpid();
-int GetLocalHumanDpid();
 int GetHostDpid();
-void __stdcall DrawDashedCircle(void* surface, int cx, int cy, int radius, int color, int n, int start);
 
 struct Holder_004a4c90 {
     char unknown_0[4];
@@ -3386,16 +3318,11 @@ struct LanguageRoot_004a4d70 {
 #pragma pack(pop)
 
 void __stdcall SetFont(int id);
-int GetFont();
 int __stdcall GetTextWidth(int font, char* text);
-int GetFontHeight();
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall SetTextColors(int colour, int font);
-int GetTextKeyColor();
 int __stdcall DrawListboxFrame(Dialog_4a4d70* obj, int index, void* bmp);
-void __stdcall CopySurfaceRect(void* dst, void* src, Rect_004a4d70* rect, int* pos);
 int __stdcall FillRectangle(void* surface, Rect_004a4d70* rect, int colour);
-void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int colour);
 
@@ -3471,7 +3398,7 @@ void __stdcall DrawTextInput(Dialog_4a4d70* obj, int index)
         if (surface == 0) {
             DrawListboxFrame(obj, index, 0);
         } else {
-            CopySurfaceRect(entries->u.assets.surface, surface, &rect, (int*)&rect);
+            CopySurfaceRect((Surface *)entries->u.assets.surface, (Surface *)surface, (Rect *)&rect, (Point *)((int*)&rect));
         }
     }
 
@@ -3524,7 +3451,6 @@ struct Dialog_4a5030 {
 };
 
 char* __stdcall GetGafFrame(void* glyphs, int c);
-int GetFont();
 int __stdcall GetTextWidth(int param_1, unsigned char* text);
 
 // FUNCTION: 0x4a5030
@@ -3544,8 +3470,6 @@ int __stdcall GetTextPixelWidth(unsigned char* text)
     return width;
 }
 
-void __cdecl CheckFillPattern(unsigned int* block, unsigned int fill, unsigned int size);
-
 struct Font_004a50b0 {
     char unknown_0[0xc];
     void* glyphs;
@@ -3557,7 +3481,6 @@ struct Dialog_4a50b0 {
 };
 
 char* __stdcall GetGafFrame(void* glyphs, int c);
-int GetFontHeight();
 
 // FUNCTION: 0x4a50b0
 int GetFontLineHeight()
@@ -3567,7 +3490,6 @@ int GetFontLineHeight()
     }
     return ((GafFrame*)GetGafFrame(g_guiContext->font->glyphs, 'I'))->height + 2;
 }
-int __stdcall CloakOffOrder(char* unit, int unused1, int unused2);
 
 struct Font_004a50e0 {
     char unknown_0[0xc];
@@ -3581,7 +3503,7 @@ struct Dialog_4a50e0 {
 
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
-void __stdcall DrawFrameLit(void* surface, void* glyph, int x, int y, int style);
+#include "../graphics/gaf.h"
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxWidth);
 
 // FUNCTION: 0x4a50e0
@@ -3603,7 +3525,7 @@ void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw
                     if (style == 0)
                         DrawFrame(surface, g, x, y);
                     else
-                        DrawFrameLit(surface, g, x, y, style);
+                        DrawFrameLit((Surface *)surface, g, x, y, style);
                 }
                 if (maxw != -1) {
                     maxw -= g->width;
@@ -3617,8 +3539,6 @@ void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw
     }
 }
 
-int __stdcall CloakOnOrder(char* param1, int unused1, int unused2);
-void __stdcall CalcRadarViewportRect(int* param_1);
 
 struct Font_004a51d0 {
     char unknown_0[0xc];
@@ -3631,10 +3551,7 @@ struct Dialog_4a51d0 {
 };
 
 char* __stdcall GetGafFrame(void* glyphs, int c);
-int GetFont();
 int __stdcall GetTextWidth(int a, char* text);
-int GetFontHeight();
-void __stdcall DrawTextClipped(char* dest, char* text, int p3, int x, int maxw, int style);
 
 static inline int LineHeight_004a50b0()
 {
@@ -3704,8 +3621,6 @@ done:
 
 #pragma pack(push, 1)
 
-int GetDisplayFieldE4();
-
 struct GafEntry {
     unsigned short count;
     unsigned short unknown_2;
@@ -3743,68 +3658,44 @@ struct Point {
 #pragma pack(pop)
 
 
-int GetScreenWidth();
-int GetScreenHeight();
 unsigned int __cdecl GetTicks();
-int PeekKey();
-int PopKey();
-void ClearKeyQueue();
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
 int __cdecl tolower(int c);
 int __cdecl toupper(int c);
 
 void __stdcall SetFont(int id);
-int GetFont();
 int __stdcall GetTextWidth(int font, char* text);
-int GetFontHeight();
 void __stdcall SetTextColors(int colour, int font);
-int GetTextKeyColor();
 GafFrame* __stdcall GetGafFrame(GafEntry* table, int index);
 GafEntry* __stdcall FindGafEntry(void* gaf, const char* name);
 void* __stdcall LoadGaf(char* path);
-char* __stdcall ChangeExtension(char* out, char* in, const char* ext);
+#include "../graphics/palette.h"
 char* __stdcall Translate(char* key);
 char* __stdcall GetGadgetText(Gui* menu, char* name, char* buf);
 
 void* __stdcall AllocSurface(char* name, int width, int height);
-void __stdcall FreeSurface(void* surface);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
 int __stdcall FillRectangle(void* surface, Rect* rect, int colour);
-void __stdcall GrayRectangle(void* surface, Rect* rect);
-void __stdcall FadeRectangle(void* surface, Rect* rect, int level);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colour);
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
-void __stdcall DrawFrameLit(void* surface, GafFrame* glyph, int x, int y, int style);
-void __stdcall FillBevelBox(void* surface, Rect* rect, unsigned int a, unsigned int b, unsigned int c);
-void __stdcall FillBevelBoxDarkFirst(void* surface, Rect* rect, unsigned int a, unsigned int b, unsigned int c);
-void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw, int rem, int style);
 
 void __stdcall AssignQuickKey(Gui* obj, int index);
 void __stdcall ClearPeerStatus(Gui* obj, int index);
 void __stdcall DrawGadgetSelectionBox(Gui* obj, int index, int param3);
 void __stdcall DrawSliderBar(Gui* obj, int index);
-void __stdcall SyncAssocGadgets(Gui* obj, int index);
-void __stdcall SetListBoxScrollByName(Gui* obj, char* name, int line);
-void __stdcall DrawListBox(Gui* obj, int index);
-void __stdcall DrawSlider(Gui* obj, int index);
 void __stdcall DrawTextInput(Gui* obj, int index);
 void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
-void __stdcall DrawProgressBarGadget(Gui* obj, int index);
-void __stdcall DrawHotspot(Gui* obj, int index);
 void __stdcall DrawLineGadget(Gui* obj, int index, unsigned int param3);
 int __stdcall HandleLabelInput(Gui* obj, int index, int key);
 int __stdcall HandleHotspotInput(Gui* obj, int index);
 int __stdcall TrySetFocus(Gui* obj, int index);
-int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons);
-int __stdcall HasMouseKeyFlags(Gui* obj, unsigned int mask);
-void __stdcall SetClickMode(Gui* obj, int value);
 #include "dialogs.h"
 int __stdcall HandleListBoxInput(Gui* obj, int index, int key);
 void __stdcall HandleSliderInput(Gui* obj, int index);
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 int __stdcall SelectFontForEntry(void* entries, int index);
 
 static inline int GetTextPixelWidth(char* text)
@@ -3970,8 +3861,8 @@ void __stdcall DrawLabel(Gui* obj, int index)
         }
         rect2.right = entries2[index].width + rect2.left - 1;
         rect2.bottom = entries2[index].height + rect2.top - 1;
-        GrayRectangle(entries2->u.assets.surface, &rect2);
-        FadeRectangle(entries2->u.assets.surface, &rect2, -0x14);
+        GrayRectangle((Surface *)entries2->u.assets.surface, &rect2);
+        FadeRectangle((Surface *)entries2->u.assets.surface, &rect2, -0x14);
     } else {
         unsigned char c = entries[index].hotkey;
         if (c != 0) {
@@ -4049,12 +3940,12 @@ void __stdcall DrawGadgetGlyph(Gui* obj, int index)
     rect.bottom = e->height + rect.top - 1;
     int count = e->colours;
     if (count > 0) {
-        DrawFrameLit(entries->u.assets.surface, glyph, glyph->xOffset + rect.left, glyph->yOffset + rect.top, count);
+        DrawFrameLit((Surface *)entries->u.assets.surface, glyph, glyph->xOffset + rect.left, glyph->yOffset + rect.top, count);
     } else {
         DrawFrame(entries->u.assets.surface, glyph, glyph->xOffset + rect.left, glyph->yOffset + rect.top);
     }
     if (e->u.frame.flag & 1) {
-        FadeRectangle(entries->u.assets.surface, &rect, -0x1c);
+        FadeRectangle((Surface *)entries->u.assets.surface, &rect, -0x1c);
     }
 }
 
@@ -4132,7 +4023,7 @@ void __stdcall DrawButton(Gui* menu, int index)
         }
         if (glyph != 0) {
             if (me->colours != 0)
-                DrawFrameLit(surface, glyph, glyph->xOffset + rect.left, glyph->yOffset + rect.top, me->colours);
+                DrawFrameLit((Surface *)surface, glyph, glyph->xOffset + rect.left, glyph->yOffset + rect.top, me->colours);
             else
                 DrawFrame(surface, glyph, glyph->xOffset + rect.left, glyph->yOffset + rect.top);
         }
@@ -4253,8 +4144,8 @@ void __stdcall DrawButton(Gui* menu, int index)
 
     menu->language = menu->values[0];
     if (border) {
-        GrayRectangle(surface, &rect);
-        FadeRectangle(surface, &rect, -0x14);
+        GrayRectangle((Surface *)surface, &rect);
+        FadeRectangle((Surface *)surface, &rect, -0x14);
     }
 }
 
@@ -4464,7 +4355,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
         if (obj->layer)
             obj->layer->dirty = 1;
         DrawSliderBar(obj, found);
-        SyncAssocGadgets(obj, found);
+        SyncAssocGadgets((Dialog_4a2be0 *)obj, found);
         if (f->sliderCallback)
             f->sliderCallback(obj, f->sliderUser);
         return 0;
@@ -5321,7 +5212,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].u.list.sortKey = GetTicks();
                 }
                 if (force || (flags & 0x40))
-                    DrawListBox(menu, i);
+                    DrawListBox((Dialog_4a1b40 *)menu, i);
                 break;
             }
             case 3:
@@ -5336,7 +5227,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].sliderUser = 0;
                 }
                 if (force || (0x40 & flags))
-                    DrawSlider(menu, i);
+                    DrawSlider((Dialog *)menu, i);
                 break;
             case 5:
                 if (force || (flags & 0x40))
@@ -5351,7 +5242,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].u.hotspot.index = 0;
                 }
                 if (force || (flags & 0x40))
-                    DrawHotspot(menu, i);
+                    DrawHotspot((Dialog_4a4980 *)menu, i);
                 break;
             case 13:
                 if (force) {
@@ -5359,7 +5250,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].u.anim.next = GetTicks() + base[i].u.anim.interval;
                 }
                 if (force || (flags & 0x40))
-                    DrawProgressBarGadget(menu, i);
+                    DrawProgressBarGadget((Dialog_4a4660 *)menu, i);
                 break;
             case 10:
                 if (force || (flags & 0x40))
@@ -5381,10 +5272,10 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
     if (flags & 2) {
         if (entries[0].u.assets.saveUnder != 0) {
             DrawSurface(0, entries[0].u.assets.saveUnder, entries[0].x, entries[0].y);
-            FreeSurface(entries[0].u.assets.saveUnder);
+            FreeSurface((Surface *)entries[0].u.assets.saveUnder);
             entries[0].u.assets.saveUnder = 0;
         }
-        FreeSurface(entries[0].u.assets.surface);
+        FreeSurface((Surface *)entries[0].u.assets.surface);
         entries[0].u.assets.surface = 0;
         for (int j = 0; j < 1 + entries[0].u.count; j = j + 1) {
             if ((entries[j].resourceFlags & 1) && entries[j].archive)
@@ -5445,7 +5336,7 @@ void __stdcall DecrementKnobPos(Gui* obj, int index)
     if (e->knobPos != old) {
         obj->changed = 1;
         DrawSliderBar(obj, index);
-        SyncAssocGadgets(obj, index);
+        SyncAssocGadgets((Dialog_4a2be0 *)obj, index);
     }
     if (e->sliderCallback) {
         e->sliderCallback(obj, e->sliderUser);
@@ -5474,7 +5365,7 @@ void __stdcall IncrementKnobPos(Gui* obj, int index)
     if (e->knobPos != old) {
         obj->changed = 1;
         DrawSliderBar(obj, index);
-        SyncAssocGadgets(obj, index);
+        SyncAssocGadgets((Dialog_4a2be0 *)obj, index);
     }
     if (e->sliderCallback) {
         e->sliderCallback(obj, e->sliderUser);
@@ -5544,18 +5435,16 @@ void __stdcall ListBoxSelectUp(Gui* param_1, int index)
                 me->u.list.selected = isel;
             }
         }
-        DrawListBox(param_1, index);
-        SyncAssocGadgets(param_1, index);
+        DrawListBox((Dialog_4a1b40 *)param_1, index);
+        SyncAssocGadgets((Dialog_4a2be0 *)param_1, index);
         return;
     }
     if (me->u.list.rowCount != 0) {
-        SetListBoxScrollByName(param_1, me->name, isel);
+        SetListBoxScrollByName((Dialog_4a2e40 *)param_1, me->name, isel);
     }
 }
 
 int __stdcall UpdateMenu(Gui* menu);
-void __stdcall SetCurrentGuiContext(Gui* ctx);
-void __stdcall SetDefaultFont(int* param_1, int param_2);
 
 // FUNCTION: 0x4a99c0
 void __stdcall ListBoxSelectDown(Gui* param_1, int index)
@@ -5602,13 +5491,13 @@ void __stdcall ListBoxSelectDown(Gui* param_1, int index)
                     me->u.list.selected = isel;
                 }
             }
-            DrawListBox(param_1, index);
-            SyncAssocGadgets(param_1, index);
+            DrawListBox((Dialog_4a1b40 *)param_1, index);
+            SyncAssocGadgets((Dialog_4a2be0 *)param_1, index);
             return;
         }
     }
     if (me->u.list.rowCount != 0) {
-        SetListBoxScrollByName(param_1, me->name, isel);
+        SetListBoxScrollByName((Dialog_4a2e40 *)param_1, me->name, isel);
     }
 }
 
@@ -5765,7 +5654,7 @@ static inline void TickProgressBar(Gui* menu, int i)
             }
             e->u.anim.next = GetTicks() + e->u.anim.interval;
         }
-        DrawProgressBarGadget(menu, i);
+        DrawProgressBarGadget((Dialog_4a4660 *)menu, i);
     }
 }
 

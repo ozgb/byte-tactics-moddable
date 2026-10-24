@@ -14,7 +14,7 @@ struct Item_00408620 {
 
 #include "../../link/globals.h"
 
-unsigned short __stdcall ChooseBuildOption(int player, Unit* unit);
+#include "ai_player.h"
 #include "../ingame/control_panel.h"
 
 #include "group.h"

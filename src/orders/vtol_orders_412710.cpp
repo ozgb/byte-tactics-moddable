@@ -32,7 +32,6 @@ struct Feature;
 
 #include "order.h"
 int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
-int __stdcall GetBuilderCount(int);
 #include "../game/game.h"
 #include "path_fx.h"
 #pragma pack(pop)
@@ -81,7 +80,6 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
 void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount);
-int __stdcall GetOrderName(Unit* obj);
 
 // FUNCTION: 0x412710
 int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)

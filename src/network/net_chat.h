@@ -3,4 +3,6 @@
 
 int __stdcall ScrollToNextMessageUnit(void);
 
+int __stdcall ExpireOldestMessage();
+
 #endif

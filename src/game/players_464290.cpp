@@ -256,8 +256,8 @@ public:
     CommandArgs* InitArgs();
 };
 
-int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int param_4);
-void __cdecl GameFreeThunk(char* text);
+#include "../util/commands.h"
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x4648e0
 void LoadDefaultAIScript()
@@ -467,10 +467,10 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
     }
 }
 
-void __stdcall ReportGameEvent(int param_1);
+#include "../network/unit_sync.h"
 void __stdcall PlaySoundByName(char* str, int flag);
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
-void __stdcall ClearSelectedGadget(void* param_1);
+#include "../gui/dialogs.h"
 
 // FUNCTION: 0x464de0
 void __stdcall ContinueWatchingCallback(Gadget* gadget)
@@ -497,7 +497,7 @@ void __stdcall ContinueWatchingCallback(Gadget* gadget)
 Screen* __stdcall LoadGuiLayer(Menu* menu, char* name, int value);
 void __stdcall SetKeyboardInput(Menu* menu, int flag);
 void __stdcall SetTranslatedTextByName(Menu* menu, char* name, char* text, int value);
-void __stdcall RenderLayer(Menu* menu, int value);
+#include "../gui/gui.h"
 
 // FUNCTION: 0x464e70
 void ShowContinueWatchingDialog()
@@ -513,7 +513,7 @@ void ShowContinueWatchingDialog()
         strcpy(form->choice1, g_choice1GadgetName);
         strcpy(form->choice2, g_choice2GadgetName);
         screen->callback = ContinueWatchingCallback;
-        RenderLayer(&g_game->gui_519, 0x40);
+        RenderLayer((Gui *)&g_game->gui_519, 0x40);
     }
 }
 
@@ -525,7 +525,6 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
 #include "main_loop.h"
 #include "../ingame/selection.h"
 void __stdcall SendPlayerEconomy(Player* player, int a, int b);
-void __stdcall OpenMessageBox(Menu* menu, const char* text, int a, int b, int c);
 
 static int loopCond_00464f80(unsigned char i)
 {
@@ -782,14 +781,14 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                             strcpy(w->choice1, "CHOICE1");
                             strcpy(w->choice2, "CHOICE2");
                             dlg->callback = ContinueWatchingCallback;
-                            RenderLayer(&g_game->gui_519, 0x40);
+                            RenderLayer((Gui *)&g_game->gui_519, 0x40);
                         }
                         goto skip508;
                     }
                     if (CountCombatPlayers() <= 0)
                         goto skip508;
-                    OpenMessageBox(&g_game->gui_519,
-                                 Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
+                    OpenMessageBox((Gui *)&g_game->gui_519,
+                                 (char *)Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
                                  500, 1, 1);
                     g_game->endGameFlags &= 0xffef;
                     goto skip508;

@@ -81,7 +81,7 @@ struct MapInfo_0048a490;
 
 #include "../../link/globals.h"
 
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 char* __stdcall Translate(const char* text);
 #include "../graphics/display.h"
 
@@ -299,9 +299,9 @@ struct UnitDamagePacketOut {
 };
 #pragma pack(pop)
 
-void __stdcall ApplyUnitDamage(UnitDamagePacketOut* dmg);
+#include "unit_targets.h"
 void __stdcall BroadcastPacket(int who, UnitDamagePacketOut* dmg, int size);
-int __cdecl GetLocalDpid(void);
+#include "../network/net_game.h"
 
 // FUNCTION: 0x489bb0
 void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra)
@@ -324,7 +324,7 @@ void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsi
     d.amount = dmg;
     d.headingByte = (unsigned char)(extra >> 8);
     d.damageKind = type;
-    ApplyUnitDamage(&d);
+    ApplyUnitDamage((UnitDamagePacket *)&d);
     if (target->player->active != 0 && target->player->type == 3 && type != 11) {
         if (source)
             BroadcastPacket(source->player->id, &d, 9);

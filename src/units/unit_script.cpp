@@ -54,7 +54,7 @@ struct Header_00481140 {
 
 #include "../../link/globals.h"
 
-Vec3 __stdcall GetPiecePosition(Unit* obj, int param);
+#include "unit_scripts.h"
 int __stdcall GetGroundHeight(Vec3* pos);
 int __cdecl AngleOfVector(int a, int b);
 #include "../../interfaces/seams.h"
@@ -62,7 +62,7 @@ int __cdecl AngleOfVector(int a, int b);
 void __stdcall EmitWhiteSmoke(int, short);
 void __stdcall EmitBlackSmoke(int, short);
 #include "../util/math_4b6c30.h"
-void __stdcall StartExplodePiece(Header_00481140* h);
+#include "../weapons/explosions.h"
 void __stdcall AddExplosionEffect(void* pos, void* src, int index, int flag);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* transporter, int a, int b);
 
@@ -94,12 +94,12 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         return unit->bit1;
     case 7: {
         Vec3 v;
-        v = GetPiecePosition(unit, a);
+        v = GetPiecePosition((Object *)unit, a);
         return (v.x & 0xffff0000) + (v.z >> 16);
     }
     case 8: {
         Vec3 v;
-        v = GetPiecePosition(unit, a);
+        v = GetPiecePosition((Object *)unit, a);
         return v.y;
     }
     case 9: {
@@ -210,7 +210,7 @@ void UnitScript::SetPieceTranslation(int index, int slot, int v)
     }
 }
 
-void __stdcall UpdateObjectState(Unit* unit);
+#include "../graphics/model_render.h"
 
 // FUNCTION: 0x480cb0
 int UnitScript::GetPieceRotation(int index, int slot)
@@ -296,7 +296,7 @@ void UnitScript::EmitSfx(int a, int b)
 {
     if (!g_seams.los_radar->IsUnitVisibleToPlayer(&g_game->players[g_game->playerIndex], state->unit))
         return;
-    UpdateObjectState(state->unit);
+    UpdateObjectState((Unit_459200 *)state->unit);
 
     Vec3 v1;
     Vec3 v2;
@@ -378,7 +378,7 @@ void UnitScript::ExplodePiece(int a, unsigned int b)
         h.bits = (h.bits & ~2) | ((b >> 2) & 2);
         h.bits = (h.bits & ~1) | ((b >> 4) & 1);
         h.bits = (h.bits & ~8) | ((b & 4) << 1);
-        StartExplodePiece(&h);
+        StartExplodePiece((ExplodedPiece *)&h);
     }
     if (b & 0x3f00) {
         Vec3 v;

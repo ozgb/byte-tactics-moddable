@@ -45,4 +45,7 @@ public:
 
 void __stdcall ReportIntervalTimer(void);
 
+int __stdcall ReportGameEvent(int msg);
+void __fastcall DeleteUnitSync();
+
 #endif

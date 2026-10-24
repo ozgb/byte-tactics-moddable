@@ -7,7 +7,7 @@ typedef unsigned short ushort;
 typedef unsigned int uint;
 struct Game;
 #include "../../link/globals.h"
-unsigned long GetMilliseconds();
+#include "../graphics/display.h"
 int __stdcall FormatNetStats(int);
 int __stdcall DrawSelectedGoal(int,int);
 int __stdcall DrawMapDebugOverlay(int);
@@ -41,7 +41,6 @@ int __stdcall DrawScorePanel(int);
 int __stdcall DrawProjectiles(int);
 int __stdcall BlitMenuLayers(int,int,int);
 #include "../graphics/display.h"
-int GetScreenHeight();
 int __stdcall PointInRect(int,int,int);
 int __stdcall GetGafFrame(int,int);
 int __stdcall DrawFrame(int,int,int,int);
@@ -49,9 +48,8 @@ int __stdcall DrawLine(int,int,int,int,int,int);
 int __stdcall FillRectangle(int,int,int);
 int __stdcall DrawRectangle(int,int,int);
 int __stdcall SetTextColors(int,int);
-int GetTextKeyColor();
+#include "../graphics/draw.h"
 int __stdcall SetFont(int);
-int GetFontHeight();
 int __stdcall GetTextWidth(int,int);
 int __stdcall DrawString(int,int,int,int,int);
 #include "../gui/keyboard.h"

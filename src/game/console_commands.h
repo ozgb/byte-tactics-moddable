@@ -1,5 +1,6 @@
 #ifndef CONSOLE_COMMANDS_H
 #define CONSOLE_COMMANDS_H
+class CommandArgs;
 
 class CommandArgs;
 struct Point16;
@@ -40,5 +41,45 @@ void __stdcall WorldToScreenTileOffset(int x, int z, int* screen_x, int* screen_
 void __stdcall DrawWorldSegmentLine(void* surface, Point16 from, short dx, short dz, int color);
 void __stdcall CmdPrintWeights(CommandArgs* args);
 void __stdcall CmdSenderror(CommandArgs* args);
+
+void __stdcall CmdMemDump(char* args);
+void __stdcall CmdMem(int);
+void __stdcall CmdAssert(int);
+void __stdcall CmdDPrint(int);
+void __stdcall CmdBurnAll(int arg1);
+void __stdcall CmdBurnOne(void* args);
+void __stdcall CmdShading(int unused);
+void __stdcall CmdSelectable(int unused);
+void __stdcall CmdZBuffer(int);
+void __stdcall CmdAntiAlias(int unused);
+void __stdcall CmdShadow(int unused);
+void __stdcall CmdDither(int unused);
+void __stdcall CmdTShadow(int unused);
+void __stdcall CmdFShadow(int unused);
+void __stdcall CmdLOSType(int unused);
+void __stdcall CmdRCache(int unused);
+void __stdcall CmdCDStop(int unused);
+void __stdcall CmdSound3D(int unused);
+void __stdcall CmdScrollSpeed(void* args);
+void __stdcall CmdIFace(void* args);
+void __stdcall CmdLOS(int unused);
+void __stdcall CmdMapping(int unused);
+void __stdcall CmdSelBoxes(int unused);
+void __stdcall CmdTreeDeath(int unused);
+void __stdcall CmdNoShake(int unused);
+void __stdcall CmdDoubleShot(int unused);
+void __stdcall CmdHalfShot(int unused);
+void __stdcall CmdRadar(int unused);
+void __stdcall CmdScreenChat(int unused);
+void __stdcall CmdSing(int unused);
+void __stdcall CmdClock(int unused);
+void __stdcall CmdReloadAIProfiles(int arg1);
+void __stdcall CmdBigBrother(int unused);
+void __stdcall CmdProfile(void* args);
+void __stdcall CmdNowISee(void*);
+void __stdcall CmdNetStats(int);
+void __stdcall CmdMusicMode(void* args);
+void __stdcall DefaultCommandHandler(CommandArgs* args);
+void __stdcall CmdShootAll(int unused);
 
 #endif

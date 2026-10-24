@@ -53,4 +53,6 @@ void __stdcall AssignRange(Elem_432cb0* first, Elem_432cb0* last, Elem_432cb0* v
 Elem_432cb0* __stdcall AssignRangeBack(Elem_432cb0*, Elem_432cb0*, Elem_432cb0*);
 void __stdcall DestroyPoint(int);
 
+void __stdcall StoreDwordIfDst(int*, int*);
+
 #endif

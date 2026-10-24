@@ -1,5 +1,8 @@
 #ifndef MODEL_RENDER_H
 #define MODEL_RENDER_H
+struct Model_459200;
+struct Object3do;
+struct Unit_459200;
 
 struct GafFrame;
 struct Model_459200;
@@ -16,5 +19,8 @@ Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj, Pie
 Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent);
 void __fastcall TransformPieces(Model_459200* owner, Piece_459c70* piece, Vector3s* angles, Vec3* delta, int deep);
 void __fastcall PoseModel(Model_459200* model, Piece_459c70* piece, int force);
+
+Model_459200* __stdcall CreateObjectState(Object3do* obj);
+void __stdcall UpdateObjectState(Unit_459200* unit);
 
 #endif

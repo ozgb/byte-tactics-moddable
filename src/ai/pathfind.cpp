@@ -5,7 +5,7 @@
 #include <vector>
 
 void __cdecl operator delete(void* p);
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
 struct Entry_40d670 {
     Entry_40d670() {}

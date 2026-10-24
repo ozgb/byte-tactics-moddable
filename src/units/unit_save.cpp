@@ -121,7 +121,7 @@ struct Struct_00487af0 {
 #include "../../link/globals.h"
 
 #include "unit_save.h"
-unsigned short __stdcall FindUnitTypeId(const char* name);
+#include "unit_commands.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                                       Vec3 pos, int param_5, int mode,
                                       unsigned short id);

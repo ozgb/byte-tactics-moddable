@@ -1,7 +1,7 @@
 struct Unit;
-void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
+#include "../orders/unit_orders_406c70.h"
 namespace std {
-inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
+inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }
 #include <vector>
 #include "../state/sim_allocator.h"

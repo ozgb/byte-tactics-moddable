@@ -1,5 +1,6 @@
 #ifndef EXPLOSIONS_H
 #define EXPLOSIONS_H
+struct ExplodedPiece;
 
 struct ExplodedPiece;
 struct Explosion;
@@ -23,5 +24,7 @@ int __stdcall UpdateExplodedPiece(ExplodedPiece* obj);
 int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj);
 void __stdcall BreakPieceIntoDebris(ExplodedPiece* param);
 unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size);
+
+void __stdcall StartExplodePiece(ExplodedPiece* piece);
 
 #endif

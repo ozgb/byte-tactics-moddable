@@ -1,5 +1,7 @@
 #ifndef UNIT_POSITION_H
 #define UNIT_POSITION_H
+struct OrderView;
+struct Player;
 
 class BitReader;
 class BitWriter;
@@ -15,5 +17,8 @@ void __stdcall UpdateAllUnits(void);
 void __stdcall WriteUnitState(BitWriter* stream, Unit* u);
 void __stdcall ReadUnitState(BitReader* reader, Unit* u);
 void __stdcall SendUnitStates(Player* p);
+
+void __stdcall ApplyAttachUnit(OrderView* order);
+void __stdcall ReceiveUnitStates(Player* p, unsigned int* data);
 
 #endif

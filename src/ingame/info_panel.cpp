@@ -248,33 +248,25 @@ void __stdcall DrawRectangle(int surface, Rect* rect, int color);
 void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_467c00* dst, Quad_467c00* src);
 
 char* __stdcall Translate(char* text);
-int GetTextKeyColor();
+#include "../graphics/draw.h"
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall SetFont(int param_1);
-int GetFontHeight();
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
 void __stdcall DrawString(int surface, const char* text, int x, int y, int maxWidth);
 
-int GetScreenHeight();
-int GetScreenWidth();
+#include "../graphics/display.h"
 void __stdcall SetOffscreenSurface(void* surf);
-void __stdcall FillSurface(void* surf, int mode);
 void FlipScreen();
-void GetDisplayFieldE4();
-unsigned long GetMilliseconds();
 
-void __stdcall FadeRectangle(void* surface, Rect* rect, int level);
-void __stdcall FadeRectangle(void* surface, void* rect, int level);
 #include "../network/net_stats.h"
-int __stdcall GetBuildRating(int player, unsigned short type);
+#include "../ai/ai_player.h"
 
 void __stdcall PlaySoundByName(char* name, int param_2);
 #include "../gui/keyboard.h"
-void __stdcall DrawTextClipped(void* surf, void* text, int x, int y, int color, int just);
+#include "../gui/gui.h"
 
 void __stdcall GetObjectBounds(Object_004cb650* obj, Vec3* lo, Vec3* hi, int arg);
-void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset, Vec3* corners, short* angles);
-void __stdcall DrawRotatedQuadOutline(Vec3* view, Vec3* pos, Vec3* corners, void* unit);
+#include "info_panel.h"
 
 int __stdcall GetGafSequenceFrame(short* ref);
 void __stdcall FillPolygon(void* surface, Point* points, int count, int color);
@@ -282,9 +274,9 @@ void __stdcall DrawFrameQuad(void* surface, void* texture, Point* points, void* 
 
 int __stdcall GetCellHeight(void* p);
 
-void __stdcall ReportGameEvent(int param_1);
+#include "../network/unit_sync.h"
 void __stdcall AddMessage(char* param_1, int param_2, int param_3, int param_4);
-int __stdcall OpenMessageBox(char* dest, char* text, int param_3, int param_4, int param_5);
+#include "../gui/dialogs.h"
 
 // FUNCTION: 0x467840
 void DetectionVisitor::MarkUnitsInRadarOrSonarRadius(Unit* unit)
@@ -447,7 +439,7 @@ void DrawLightBars()
 {
     void* surf = (void *)g_game->screen;
     SetOffscreenSurface(surf);
-    FillSurface(surf, 0);
+    FillSurface((Surface *)surf, 0);
 
     int side = (*(PlayerInfo_00467440 (*)[10])&g_game->players)[g_game->playerIndex].data->side;
 
@@ -496,7 +488,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
     r.right = 0x191;
     r.top = y;
     r.bottom = prev == 0 ? lineH * 20 : prev;
-    FadeRectangle(surface, &r, -0x18);
+    FadeRectangle((Surface *)surface, &r, -0x18);
     r.right++;
     r.bottom++;
     DrawRectangle(surface, &r, colors[5]);
@@ -670,7 +662,7 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
         r.bottom = lineHeight * 20;
     else
         r.bottom = g_probePanelBottom;
-    FadeRectangle(surface, &r, -0x18);
+    FadeRectangle((Surface *)surface, &r, -0x18);
     r.right++;
     r.bottom++;
     DrawRectangle(surface, &r, colors[5]);
@@ -853,7 +845,7 @@ void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
         pos.x = unit->pos.x - (g_game->scrollX << 16);
         pos.y = unit->pos.y;
         pos.z = unit->pos.z - (g_game->scrollY << 16);
-        DrawRotatedQuadOutline(view, &pos, corners, (char*)&unit->angles);
+        DrawRotatedQuadOutline(view, &pos, corners, (short *)((char*)&unit->angles));
     }
 }
 
@@ -977,7 +969,7 @@ int __stdcall ShowGameMessage(char* text, int mode)
     }
     if (mode == 1) {
         int t = GetScreenWidth();
-        result = OpenMessageBox((*(char (*)[4])&g_game->field_519), text, (int)(t * 0.5), 1, 1);
+        result = OpenMessageBox((Gui *)(*(char (*)[4])&g_game->field_519), text, (int)(t * 0.5), 1, 1);
     }
     return result;
 }

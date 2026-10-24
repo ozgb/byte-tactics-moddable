@@ -368,25 +368,24 @@ struct Elem {
 typedef std::vector<TdfFile*> FeatureList;
 static FeatureList* s_featureTdfParsers;
 
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 void __stdcall FreeObjectState(void* obj);
 AnimSrc* __stdcall FindGafEntry(void* list, const char* name);
 void __stdcall InitGafSequence(Anim* ref, AnimSrc* src, int index);
 int __stdcall LoadFeatureType(char* name);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot,
                              unsigned char owner);
-int __stdcall RemoveFeature(Cell* cell, int flag);
+#include "features.h"
 #include "features.h"
 #include "../util/math_4b6c30.h"
 void __stdcall PlaySoundAtByName(char* name, Vec3* pos, int param_3);
-int GetLocalDpid();
+#include "../network/net_game.h"
 int GetHostDpid();
 int __stdcall BroadcastPacket(int player, void* data, int size);
-int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
 int __stdcall StepGafSequence(Anim* anim);
 GafFrame* __stdcall GetGafSequenceFrame(Anim* anim);
 void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
-void* __stdcall CreateObjectState(void* obj);
+#include "../graphics/model_render.h"
 #include "../graphics/particles_472630.h"
 
 // FUNCTION: 0x421e60
@@ -938,7 +937,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
             spot->rot = *rot;
         else
             memset(&spot->rot, 0, sizeof(spot->rot));
-        spot->state = CreateObjectState(f->object);
+        spot->state = CreateObjectState((Object3do *)f->object);
         cell->feature = feature;
         cell->spot = i;
         cell->flag0 = 1;
@@ -1106,7 +1105,7 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon)
             packet.sub = weapon->kind;
             packet.x = x;
             packet.z = z;
-            SendPacketToPlayer(GetLocalDpid(), GetHostDpid(), &packet, 6);
+            SendPacketToPlayer(GetLocalDpid(), GetHostDpid(), (unsigned char *)&packet, 6);
             return;
         }
         send = 1;

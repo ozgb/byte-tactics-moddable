@@ -1,5 +1,6 @@
 #ifndef ORDER_LIST_H
 #define ORDER_LIST_H
+struct Unit;
 
 class HapiBank;
 struct Order;
@@ -22,5 +23,12 @@ void __stdcall RunOrders(Unit* unit);
 void __stdcall RunSecondaryOrders(Unit* p);
 void __stdcall RegisterAllOrderTypes();
 void __stdcall ClearOrderTypeTable();
+
+void __stdcall DrawOrderOverlays(Unit* unit, unsigned int mask, void* obj, void* sel, int flag);
+int __stdcall GetBuildWeaponPercent(Unit* owner);
+int __stdcall SumQueuedBuildCount(Unit* owner, int index);
+int __stdcall GetOrderName(Unit* obj);
+int __stdcall ReadyOrder(int arg1, int arg2, int arg3);
+int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int);
 
 #endif

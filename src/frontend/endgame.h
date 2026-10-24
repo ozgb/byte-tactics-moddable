@@ -28,4 +28,8 @@ int __stdcall DrawEndGameFrame();
 void __stdcall RunEndGameState();
 void __stdcall InitMemoryCache(void);
 
+void __stdcall SetEndGameState(unsigned int state);
+void __stdcall InitMissionStatus(void);
+void __cdecl FreeMemoryCache();
+
 #endif

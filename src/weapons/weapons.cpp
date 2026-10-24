@@ -122,7 +122,6 @@ struct Vec3_0049abb0 {
 
 struct Unit_0049c880;
 
-void DrawDashedCircle(void*, int, int, int, int, int, int);
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
 
@@ -160,7 +159,7 @@ void AllocWeaponArray(void)
     g_game->projectileCount = 0;
 }
 
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x499a80
 void FreeWeaponArray(void)
@@ -238,7 +237,7 @@ struct Vec3_00499ba0 {
 void Unused_00499ba0(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
-int __cdecl GetLocalDpid();
+#include "../network/net_game.h"
 
 // FUNCTION: 0x499ba0
 void __stdcall BroadcastWeaponFire(char param_1, Vec3_00499ba0* a, Vec3_00499ba0* b)
@@ -397,7 +396,7 @@ void __stdcall UntrackProjectile(Projectile* projectile)
 void __stdcall AddExplosionEffect(Vec3* position, void* value, int a, int b);
 void __stdcall EmitWhiteSmoke(Vec3* position, int value);
 void __stdcall PlaySoundAt(unsigned int sound, Vec3* position, int value);
-void __stdcall ApplyAreaDamage(Projectile* projectile, Vec3* position);
+#include "weapons_49a120.h"
 
 // FUNCTION: 0x499eb0
 void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
@@ -476,8 +475,6 @@ struct Params_0049a0c0 {
 };
 #pragma pack(pop)
 
-void __stdcall ApplyAreaDamage(Params_0049a0c0* params, Vec3_0049a0c0* pos);
-
 // FUNCTION: 0x49a0c0
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
 {
@@ -487,7 +484,7 @@ void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
     p.owner = (char*)owner;
     p.kind = 10;
     p.pos = *pos;
-    ApplyAreaDamage(&p, pos);
+    ApplyAreaDamage((Projectile *)&p, (Vec3 *)pos);
 }
 
 #include <math.h>
@@ -512,7 +509,6 @@ struct CellPos_0049a120 {
 };
 
 #pragma pack(push, 1)
-int CloakOnOrder(char*, int, int);
 
 struct Cell {
     unsigned short unit;
@@ -581,8 +577,6 @@ struct Hits_0049a120 {
 
 void __stdcall DetonateProjectile(Projectile* weapon, Unit* unit);
 int __stdcall VectorLength(Vec3* v);
-Vec3 __stdcall GetFootprintCentre(CellPos_0049a120* cell, FeatureDef_0049a120* def);
-void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* def);
 int __stdcall BroadcastPacket(int id, void* data, int size);
 
 static inline int Length(Vec3* v)
@@ -675,7 +669,6 @@ short __stdcall SolveLaunchAngle(int x, int height, int z, int speed, float angl
 void RegisterUnitOrders();
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int AimCobStub(int, int, int, int);
-void ClearCameraFollowState();
 
 #pragma pack(push, 1)
 
@@ -989,7 +982,7 @@ Projectile* AllocProjectile()
 }
 
 
-int __stdcall QueryWeaponPiece(Unit* unit, unsigned char weapon);
+#include "../units/unit_scripts.h"
 void __stdcall PlaySoundAt(int sound, Vec3* pos, int param_3);
 
 // FUNCTION: 0x49c740
@@ -1018,7 +1011,7 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
         for (i = 0; i < 3; i++)
             if (unit->weapons[i].weapon == shot)
                 break;
-        proj->piece = (short)QueryWeaponPiece(unit, i);
+        proj->piece = (short)QueryWeaponPiece((Object *)unit, i);
         unit->workTime = g_game->ticks + 0x258;
     } else {
         proj->owner = 0xa;
@@ -1831,7 +1824,6 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
 void Unused_0049df10(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
-int __cdecl GetLocalDpid();
 void __stdcall InitProjectile(Projectile*, void*, void*, int, int, void*);
 
 // FUNCTION: 0x49df10
@@ -1863,7 +1855,6 @@ int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* a, Vec3* b, int flag)
 
 typedef int (__stdcall* WeaponFireFn)(void* unit, void* aim, void* target, void* point);
 
-int __stdcall FireTurretWeapon(void* unit, void* aim, void* target, void* point);
 int __stdcall FireVLaunchWeapon(void* unit, void* aim, void* target, void* point);
 int __stdcall FireDroppedWeapon(void* unit, void* aim, void* target, void* point);
 int __stdcall FireLineOfSightWeapon(void* unit, void* aim, void* target, void* point);
@@ -1920,7 +1911,6 @@ int __stdcall WeaponCanReachPos(Unit* unit, Vec3* a2, Vec3* a3,
                            unsigned char a4);
 int __stdcall SendScriptCallByName(Unit* obj, char* name, char field_5, int field_6, int field_a,
                            unsigned short field_e, unsigned short field_12);
-void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit);
 
 // FUNCTION: 0x49e1a0
 void __stdcall UpdateUnitWeapons(Unit* unit) {
@@ -2054,13 +2044,8 @@ int IsFootprintVisible(void*, int, int, int, int, short);
 void DrawProgressBar(void*, int, int, void*, void*, int);
 void IssueOrderToSelection(void*, unsigned char, int, int*, int, int);
 void WriteScreenshot(char*, char*, int, int, int, int);
-void DrawTextClipped(void*, char*, int, int, int, int);
-int OpenInputDialog(void*, char*, char*, char*, char*, int);
 int ScanDirectory(char*, char*, char*, int, int, int);
-void DrawFrameScaledBlended(void*, void*, int, int, double, double);
-void DrawFrameScaled(void*, void*, int, int, double, double);
-void* DrawLitLine(void*, int, int, int, int, int);
-void* DrawBlendedLine(void*, int, int, int, int, int);
+#include "../graphics/gaf.h"
 void OrderSquad(void*, int, unsigned char, int, void*, int, int, int);
 int AddBlinkWord(void*, const char*, int, int, int, int, float, float);
 
@@ -2193,7 +2178,6 @@ void __stdcall DrawFrame(void* dest, void* src, int x, int y);
 void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 void __stdcall DrawModel3doProjected(void* dest, Vec3* pos, void* sprite, void* rect);
 int __stdcall PointInRect(void* region, int x, int y);
-void __stdcall DrawLens(void* dest, void* src, int x, int y);
 void __stdcall DrawLine(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
 int __stdcall GetGafFrameCount(void* gaf);
 int __stdcall IsPointVisible(Player* pi, Vec3* pos);
@@ -2297,7 +2281,7 @@ void __stdcall DrawProjectiles(void* surface)
                              - (short)g_game->scrollY + 0x20;
                     if (PointInRect(g_game->region_37e27, sx, sy) == 0)
                         return;
-                    DrawLens(surface, g_game->explosionLensFrame, sx, sy);
+                    DrawLens(surface, (GafFrame *)g_game->explosionLensFrame, sx, sy);
                 } else if (type->shotKind == 3) {
                     sp.x = pos->x - (g_game->scrollX << 16);
                     sp.y = p->position.y;

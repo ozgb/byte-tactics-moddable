@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <ctype.h>
 
-void __cdecl GameFreeThunk(void* p);
+#include "object_pool.h"
 
 #include "../../interfaces/ref.h"
 #pragma pack(push, 2)

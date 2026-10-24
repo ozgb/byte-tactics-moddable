@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "../../interfaces/host.h"
 
-char* __cdecl FindCommandLineSwitch(const char* option);
+#include "debug_lib.h"
 #include "debug_lib.h"
 
 #include "../data/exe_only.h"

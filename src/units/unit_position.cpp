@@ -127,9 +127,9 @@ int __stdcall GetGroundHeight(Vec3* pos);
 #include "unit_targets.h"
 #include "../../interfaces/seams.h"
 int __cdecl AngleOfVector(int x, int z);
-int __cdecl GetLocalDpid();
+#include "../network/net_game.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
-void __stdcall ApplyAttachUnit(OrderView* order);
+#include "unit_position.h"
 #include "../ingame/selection.h"
 #include "unit_motion.h"
 #include "unit_position.h"

@@ -34,8 +34,6 @@ class SquadManager;
 #include "../../interfaces/seams.h"
 #include "order.h"
 
-void InitMissionStatus();
-
 #include "path_fx.h"
 #include "../game/game.h"
 #pragma pack(pop)
@@ -49,8 +47,6 @@ static inline Vec3 Direction(short angle, int range) { Fixed distance; distance.
 Vec3 __stdcall AddVec3(const Vec3&, const Vec3&);
 #include "order_list.h"
 
-int __stdcall IssueAttackOrder(Unit*, Unit*, int);
-void __stdcall SetWeaponTargetUnit(Unit*, Unit*, int);
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
 #include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
@@ -60,7 +56,6 @@ static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(an
 
 class LandingPadList : public std::vector<Unit*> { public: LandingPadList(); };
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
-int __stdcall GetOrderName(Unit* obj);
 // FUNCTION: 0x4103e0
 int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
 {

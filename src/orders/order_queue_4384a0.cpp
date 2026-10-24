@@ -80,8 +80,6 @@ struct SaveDesc_0043a1f0 {
 #include "air_maneuver_order.h"
 #include "../state/sim_globals.h"
 
-void InitMissionStatus();
-
 class Slot_0043a1f0 {
 public:
     virtual void Slot0();
@@ -95,7 +93,7 @@ Entry_0043a1f0* __stdcall LowerBoundOrderTypes(Entry_0043a1f0* first, Entry_0043
                                        int* unused);
 #include "../network/net_game.h"
 void __stdcall SendScriptCall(Unit* obj, int index, int param_3, int param_4, int param_5, int param_6, int param_7);
-void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
+#include "../sound/sound.h"
 
 #include "../../link/globals.h"
 typedef Entry_0043a1f0* SimView_g_missionOrderTableBegin;
@@ -111,8 +109,6 @@ typedef Entry_0043a1f0* SimView_g_missionOrderTableEnd;
 
 #pragma pack(push, 1)
 #include "path_fx.h"
-
-int CloakOnOrder(char*, int, int);
 
 #include "approach_areas.h"
 

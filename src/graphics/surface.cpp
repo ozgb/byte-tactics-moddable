@@ -133,15 +133,13 @@ struct Arg_004c6210 {
 Display* GetDisplay(void);
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
-int __stdcall UnlockPrimary(Surface* unused, tagRECT* r1, tagRECT* r2);
 void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);
 void __cdecl BlitSurfaceKeyed(Surface* dst, Surface* src, int x, int y, int color);
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
-int GetScreenWidth(void);
-int GetScreenHeight(void);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
+#include "display.h"
+#include "../debug/debug_lib.h"
+#include "object_pool.h"
 
 // FUNCTION: 0x4c5d90
 void __stdcall SetLockEntry(Surface* surface, char flag)
@@ -682,8 +680,6 @@ void __stdcall SaveSurface(Surface* surface, HapiBank* file)
     }
 }
 
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* ptr);
 
 static inline Surface* NewSurface(char* name, int w, int h)
 {
@@ -942,10 +938,6 @@ struct Rec_004c7580 {
     int pad[4];
 };
 
-int __stdcall AssignPlayerColor(int from, int to, int group);
-
-void __stdcall DrawQuadRow(int y, int* rect, void* surf, void* info);
-
 // FUNCTION: 0x4c7580
 void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
                             Quad_004c7580* dst, Quad_004c7580* src)
@@ -1127,7 +1119,7 @@ void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
     out = recs;
     for (i = ymin; i < ymax; i++) {
         if (out->right - out->left > 0)
-            DrawQuadRow(i, (int*)out, surf, bmp);
+            DrawQuadRow(i, (int*)out, (Surface *)surf, bmp);
         out++;
     }
 
@@ -1138,8 +1130,6 @@ unlock:
 }
 
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
-
-int __stdcall AddNetPlayer(int id);
 
 // FUNCTION: 0x4c7a20
 void __stdcall DrawTexturedSpan(int row, int* span, GafFrame* surf, GafFrame* info)

@@ -38,4 +38,16 @@ void __stdcall SetFpuFussy();
 void __stdcall FpuFussyAtexitHandler(void);
 int __stdcall StringMaxSize(void);
 
+void __cdecl FillPattern(void* p, unsigned int pattern, unsigned int n);
+void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
+void* __cdecl GameAllocShared(unsigned int size);
+void* __cdecl GameReallocIgnoreTag(int* block, int size);
+char* __cdecl GameStrdup(char* s);
+void __cdecl GameFreeIndirectThunk(int* p);
+int __cdecl SetOutOfMemoryHandler(int handler);
+char* __cdecl FindCommandLineSwitch(char* name);
+void __cdecl CountFree(int size);
+int __cdecl RoundUpToDoublePage(int size);
+unsigned int __cdecl RoundUpToPage(int size);
+
 #endif

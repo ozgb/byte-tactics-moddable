@@ -17,7 +17,7 @@ struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index
 #include "../../interfaces/seams.h"
 
 #pragma pack(pop)
-int __stdcall IssueAttackOrder(Unit*, Unit*, int);
+#include "order_list.h"
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
 #include "order_list.h"
 #include "../util/math_4b6c30.h"

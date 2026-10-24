@@ -19,7 +19,6 @@ public:
     LosLine* GetLosLine(short i);
 };
 
-void CopyDwordIfNonNull(int*, int*);
 int ScanDirectory(char*, char*, char*, int, int, int);
 void RegisterUnitOrders(void);
 

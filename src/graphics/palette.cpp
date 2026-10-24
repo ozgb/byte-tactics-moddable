@@ -40,8 +40,8 @@ struct RGBA {
 };
 
 DisplayContext* GetDisplay(void);
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
+#include "../debug/debug_lib.h"
+#include "object_pool.h"
 #include "palette.h"
 
 #include "../../link/globals.h"

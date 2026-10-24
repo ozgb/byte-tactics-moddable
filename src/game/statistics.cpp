@@ -52,10 +52,10 @@ extern ReportFn_0046bf30 g_riReport;
 extern ChatFn_0046bf30 g_riReportGameChat;
 
 #include "statistics.h"
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 #include "../ingame/info_panel.h"
 #include "../network/online_report.h"
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x46bce0
 int AllocScoreTables()

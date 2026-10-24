@@ -68,12 +68,6 @@ public:
     MapInsertResult* Assign(const FreeBlockIter& first, unsigned char& second);
 };
 
-void __cdecl CountFree(int size);
-void __cdecl FillPattern(void* at, int value, unsigned int count);
-unsigned int __cdecl RoundUpToPage(unsigned int size);
-unsigned int __cdecl RoundUpToDoublePage(unsigned int size);
-int __cdecl SetOutOfMemoryHandler(int handler);
-char* __cdecl GameStrdup(char* s);
 
 struct Less_004db000 {
     bool operator()(const unsigned int& a, const unsigned int& b) const { return a < b; }

@@ -163,55 +163,10 @@ struct Pair_00419560 {
     int b;
 };
 
-void __stdcall CmdMemDump(CommandArgs* args);
-void __stdcall CmdMem(CommandArgs* args);
 #include "console_commands.h"
-void __stdcall CmdAssert(CommandArgs* args);
-void __stdcall CmdDPrint(CommandArgs* args);
-void __stdcall CmdBurnAll(CommandArgs* args);
-void __stdcall CmdBurnOne(CommandArgs* args);
-void __stdcall CmdShading(CommandArgs* args);
-void __stdcall CmdSelectable(CommandArgs* args);
-void __stdcall CmdZBuffer(CommandArgs* args);
-void __stdcall CmdAntiAlias(CommandArgs* args);
-void __stdcall CmdShadow(CommandArgs* args);
-void __stdcall CmdDither(CommandArgs* args);
-void __stdcall CmdTShadow(CommandArgs* args);
-void __stdcall CmdFShadow(CommandArgs* args);
-void __stdcall CmdLOSType(CommandArgs* args);
-void __stdcall CmdRCache(CommandArgs* args);
-void __stdcall CmdCDStop(CommandArgs* args);
-void __stdcall CmdSound3D(CommandArgs* args);
-void __stdcall CmdScrollSpeed(CommandArgs* args);
-void __stdcall CmdIFace(CommandArgs* args);
-void __stdcall CmdLOS(CommandArgs* args);
-void __stdcall CmdMapping(CommandArgs* args);
-void __stdcall CmdSelBoxes(CommandArgs* args);
-void __stdcall CmdTreeDeath(CommandArgs* args);
-void __stdcall CmdNoShake(CommandArgs* args);
-void __stdcall CmdDoubleShot(CommandArgs* args);
-void __stdcall CmdHalfShot(CommandArgs* args);
-void __stdcall CmdRadar(CommandArgs* args);
-void __stdcall CmdScreenChat(CommandArgs* args);
-void __stdcall CmdSing(CommandArgs* args);
-void __stdcall CmdClock(CommandArgs* args);
-void __stdcall CmdReloadAIProfiles(CommandArgs* args);
-void __stdcall CmdBigBrother(CommandArgs* args);
-void __stdcall CmdProfile(CommandArgs* args);
-void __stdcall CmdNowISee(CommandArgs* args);
-void __stdcall CmdNetStats(CommandArgs* args);
-void __stdcall CmdMusicMode(CommandArgs* args);
-void __stdcall CmdShootAll(CommandArgs* args);
-void __stdcall CmdShareMetal(CommandArgs* args);
-void __stdcall CmdShareEnergy(CommandArgs* args);
-void __stdcall CmdShareMapping(CommandArgs* args);
-void __stdcall CmdShareRadar(CommandArgs* args);
-void __stdcall CmdShareAll(CommandArgs* args);
+#include "console_commands.h"
 #include "share_commands.h"
-void __stdcall CmdShowRanges(CommandArgs* args);
-void __stdcall CmdCompression(CommandArgs* args);
-void __stdcall CmdBPS(CommandArgs* args);
-void __stdcall CmdSFX(CommandArgs* args);
+#include "share_commands.h"
 
 // GLOBAL: 0x511de8
 extern Game* g_game;
@@ -234,30 +189,28 @@ extern signed char g_dirDeltaX[], g_dirDeltaZ[];
 
 void __stdcall AddMessage(char* text, int key, int value, int last);
 #include "../map/features.h"
-void __stdcall RemoveFeature(void* target, int flag);
 void* __stdcall PlaceFeature(void* target, unsigned short id, void* pos, void* active,
                              unsigned char owner);
 void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind, int d, int e, int f);
-void SaveSettings();
+#include "settings.h"
 #include "../graphics/model_render.h"
 void __stdcall SetBrightness(float value);
 #include "../files/files_api.h"
-void __stdcall SaveGameFile(char* path, char* description, int gameId);
-extern void ClearCameraFollowState(void);
+#include "settings_campaign.h"
+#include "../ingame/control_panel.h"
 #include "../network/net_stats.h"
 void __stdcall WriteScreenshot(char* name, char* description, int x, int y, int w, int h);
 unsigned int GetTicks();
 #include "../map/meteors.h"
-unsigned int __stdcall ExecuteCommandText(char* text, int size, CommandArgs* vars, unsigned int mask);
-void __cdecl GameFreeThunk(void* data);
+#include "../util/commands.h"
+#include "../graphics/object_pool.h"
 extern Display_00417a60* GetDisplay();
 #include "../graphics/display.h"
-void __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __stdcall ExecuteCommand(void* obj, int mask);
+#include "../debug/debug_lib.h"
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
 void __stdcall DrawMapTileSelectionOutline(void* a, short* b, int c, int d);
 void __stdcall SetFont(int font);
-int __stdcall GetTextKeyColor();
+#include "../graphics/draw.h"
 void __stdcall SetTextColors(int color, int background);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
 void __stdcall FillPolygon(void* surface, Point_00417f60* points, int count, int color);
@@ -330,7 +283,7 @@ void __stdcall CmdBurnOne(void* args)
 {
     if (g_game->cellFeature < 0xfffb) {
         void* target = g_seams.los_radar->GetMapCell(g_game->point.x, g_game->point.y);
-        RemoveFeature(target, 1);
+        RemoveFeature((Cell *)target, 1);
     }
 }
 
@@ -1356,62 +1309,62 @@ void __stdcall CmdShootAll(int unused)
 
 // GLOBAL: 0x501d38
 ConsoleCommand g_consoleCommands[44] = {
-    {"NoShake", CmdNoShake, 1},
+    {"NoShake", (void (__stdcall *)(CommandArgs *))CmdNoShake, 1},
     {"Contour", CmdContour, 1},
-    {"ScrollSpeed", CmdScrollSpeed, 1},
-    {"IFace", CmdIFace, 1},
+    {"ScrollSpeed", (void (__stdcall *)(CommandArgs *))CmdScrollSpeed, 1},
+    {"IFace", (void (__stdcall *)(CommandArgs *))CmdIFace, 1},
     {"Give", CmdGive, 1},
     {"CDPlay", CmdCDPlay, 1},
-    {"CDStop", CmdCDStop, 1},
-    {"Sound3D", CmdSound3D, 1},
-    {"Shading", CmdShading, 1},
-    {"AntiAlias", CmdAntiAlias, 1},
-    {"Shadow", CmdShadow, 1},
-    {"Dither", CmdDither, 1},
+    {"CDStop", (void (__stdcall *)(CommandArgs *))CmdCDStop, 1},
+    {"Sound3D", (void (__stdcall *)(CommandArgs *))CmdSound3D, 1},
+    {"Shading", (void (__stdcall *)(CommandArgs *))CmdShading, 1},
+    {"AntiAlias", (void (__stdcall *)(CommandArgs *))CmdAntiAlias, 1},
+    {"Shadow", (void (__stdcall *)(CommandArgs *))CmdShadow, 1},
+    {"Dither", (void (__stdcall *)(CommandArgs *))CmdDither, 1},
     {"SwitchAlt", CmdSwitchAlt, 1},
-    {"TShadow", CmdTShadow, 1},
-    {"FShadow", CmdFShadow, 1},
-    {"LOSType", CmdLOSType, 1},
+    {"TShadow", (void (__stdcall *)(CommandArgs *))CmdTShadow, 1},
+    {"FShadow", (void (__stdcall *)(CommandArgs *))CmdFShadow, 1},
+    {"LOSType", (void (__stdcall *)(CommandArgs *))CmdLOSType, 1},
     {"Light", CmdLight, 1},
-    {"RCache", CmdRCache, 1},
-    {"Selectable", CmdSelectable, 1},
-    {"MusicMode", CmdMusicMode, 1},
+    {"RCache", (void (__stdcall *)(CommandArgs *))CmdRCache, 1},
+    {"Selectable", (void (__stdcall *)(CommandArgs *))CmdSelectable, 1},
+    {"MusicMode", (void (__stdcall *)(CommandArgs *))CmdMusicMode, 1},
     {"Logo", CmdLogo, 1},
-    {"ScreenChat", CmdScreenChat, 1},
+    {"ScreenChat", (void (__stdcall *)(CommandArgs *))CmdScreenChat, 1},
     {"Gamma", CmdGamma, 1},
-    {"Clock", CmdClock, 1},
-    {"NetStats", CmdNetStats, 1},
-    {"Sing", CmdSing, 1},
+    {"Clock", (void (__stdcall *)(CommandArgs *))CmdClock, 1},
+    {"NetStats", (void (__stdcall *)(CommandArgs *))CmdNetStats, 1},
+    {"Sing", (void (__stdcall *)(CommandArgs *))CmdSing, 1},
     {"NoMetal", CmdNoMetal, 1},
     {"NoEnergy", CmdNoEnergy, 1},
-    {"BigBrother", CmdBigBrother, 1},
+    {"BigBrother", (void (__stdcall *)(CommandArgs *))CmdBigBrother, 1},
     {"Now", CmdNow, 1},
     {"Drop", CmdDrop, 1},
-    {"ShootAll", CmdShootAll, 1},
-    {"ShareMetal", CmdShareMetal, 1},
-    {"ShareEnergy", CmdShareEnergy, 1},
-    {"ShareMapping", CmdShareMapping, 1},
-    {"ShareRadar", CmdShareRadar, 1},
-    {"ShareAll", CmdShareAll, 1},
-    {"ShowRanges", CmdShowRanges, 1},
+    {"ShootAll", (void (__stdcall *)(CommandArgs *))CmdShootAll, 1},
+    {"ShareMetal", (void (__stdcall *)(CommandArgs *))CmdShareMetal, 1},
+    {"ShareEnergy", (void (__stdcall *)(CommandArgs *))CmdShareEnergy, 1},
+    {"ShareMapping", (void (__stdcall *)(CommandArgs *))CmdShareMapping, 1},
+    {"ShareRadar", (void (__stdcall *)(CommandArgs *))CmdShareRadar, 1},
+    {"ShareAll", (void (__stdcall *)(CommandArgs *))CmdShareAll, 1},
+    {"ShowRanges", (void (__stdcall *)(CommandArgs *))CmdShowRanges, 1},
     {"SetShareMetal", CmdSetShareMetal, 1},
     {"SetShareEnergy", CmdSetShareEnergy, 1},
-    {"Compression", CmdCompression, 1},
-    {"BPS", CmdBPS, 1},
-    {"SFX", CmdSFX, 1},
+    {"Compression", (void (__stdcall *)(CommandArgs *))CmdCompression, 1},
+    {"BPS", (void (__stdcall *)(CommandArgs *))CmdBPS, 1},
+    {"SFX", (void (__stdcall *)(CommandArgs *))CmdSFX, 1},
     {0, 0, 0},
 };
 
 // GLOBAL: 0x501f48
 ConsoleCommand g_cheatCommands[11] = {
-    {"Radar", CmdRadar, 2},
+    {"Radar", (void (__stdcall *)(CommandArgs *))CmdRadar, 2},
     {"ATM", CmdATM, 2},
     {"View", CmdView, 2},
-    {"LOS", CmdLOS, 2},
-    {"Mapping", CmdMapping, 2},
-    {"DoubleShot", CmdDoubleShot, 2},
-    {"HalfShot", CmdHalfShot, 2},
-    {"NowISee", CmdNowISee, 2},
+    {"LOS", (void (__stdcall *)(CommandArgs *))CmdLOS, 2},
+    {"Mapping", (void (__stdcall *)(CommandArgs *))CmdMapping, 2},
+    {"DoubleShot", (void (__stdcall *)(CommandArgs *))CmdDoubleShot, 2},
+    {"HalfShot", (void (__stdcall *)(CommandArgs *))CmdHalfShot, 2},
+    {"NowISee", (void (__stdcall *)(CommandArgs *))CmdNowISee, 2},
     {"Meteor", CmdMeteor, 2},
     {"MakePoster", CmdMakePoster, 2},
     {0, 0, 0},
@@ -1429,28 +1382,28 @@ ConsoleCommand g_debugCommands[31] = {
     {"ILose", CmdILose, 4},
     {"Film", CmdFilm, 4},
     {"FilmSpeed", CmdFilmSpeed, 4},
-    {"Assert", CmdAssert, 4},
+    {"Assert", (void (__stdcall *)(CommandArgs *))CmdAssert, 4},
     {"Assign", CmdAssign, 4},
-    {"BurnAll", CmdBurnAll, 4},
-    {"BurnOne", CmdBurnOne, 4},
+    {"BurnAll", (void (__stdcall *)(CommandArgs *))CmdBurnAll, 4},
+    {"BurnOne", (void (__stdcall *)(CommandArgs *))CmdBurnOne, 4},
     {"DebugBreak", CmdDebugBreak, 4},
-    {"DPrint", CmdDPrint, 4},
+    {"DPrint", (void (__stdcall *)(CommandArgs *))CmdDPrint, 4},
     {"Edge", CmdEdge, 4},
     {"Include", CmdInclude, 4},
-    {"Mem", CmdMem, 4},
-    {"MemDump", CmdMemDump, 4},
+    {"Mem", (void (__stdcall *)(CommandArgs *))CmdMem, 4},
+    {"MemDump", (void (__stdcall *)(CommandArgs *))CmdMemDump, 4},
     {"Move", CmdMove, 4},
     {"PrintWeights", CmdPrintWeights, 4},
-    {"Profile", CmdProfile, 4},
+    {"Profile", (void (__stdcall *)(CommandArgs *))CmdProfile, 4},
     {"Reload", CmdReload, 4},
-    {"ReloadAIProfiles", CmdReloadAIProfiles, 4},
+    {"ReloadAIProfiles", (void (__stdcall *)(CommandArgs *))CmdReloadAIProfiles, 4},
     {"Save", CmdSave, 4},
     {"SeaLevel", CmdSeaLevel, 4},
     {"Search", CmdSearch, 4},
-    {"SelBoxes", CmdSelBoxes, 4},
+    {"SelBoxes", (void (__stdcall *)(CommandArgs *))CmdSelBoxes, 4},
     {"Senderror", CmdSenderror, 4},
-    {"TreeDeath", CmdTreeDeath, 4},
+    {"TreeDeath", (void (__stdcall *)(CommandArgs *))CmdTreeDeath, 4},
     {"Feature", CmdFeature, 4},
-    {"ZBuffer", CmdZBuffer, 4},
+    {"ZBuffer", (void (__stdcall *)(CommandArgs *))CmdZBuffer, 4},
     {0, 0, 0},
 };

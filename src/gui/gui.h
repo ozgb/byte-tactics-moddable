@@ -1,6 +1,15 @@
 #ifndef GUI_H
 #define GUI_H
 struct Dialog;
+struct Dialog_4a1b40;
+struct Dialog_4a2be0;
+struct Dialog_4a2e40;
+struct Dialog_4a4660;
+struct Dialog_4a4980;
+struct Gadget;
+struct Rect;
+
+struct Dialog;
 struct Dialog_4a1ab0;
 struct Dialog_4a3eb0;
 struct Dialog_4a4620;
@@ -107,5 +116,36 @@ void __stdcall ListBoxSelectUp(Gui*, int index);
 void __stdcall ListBoxSelectDown(Gui*, int index);
 int __stdcall HandleGuiCommand(Gui* obj, int cmd);
 int __stdcall GetGuiContext(void);
+
+void __stdcall SetGadgetName(Dialog* obj, char* name, char* text);
+void __stdcall RunWhileScreenNamed(Dialog* menu, char* name);
+void __stdcall EnableKeyCommands(Dialog* p);
+void __stdcall DisableKeyCommands(Dialog* obj);
+void __stdcall MarkChanged(Dialog* obj);
+void __stdcall MarkLayerChanged(Dialog* obj);
+void __stdcall SetFontsPath(Dialog* obj, const char* dir);
+void __stdcall SetGuiPath(Dialog* obj, const char* dir);
+void __stdcall SetAnimsPath(Dialog* obj, const char* dir);
+int __stdcall IsCurrentGadgetNamed(Dialog* gui, char* name);
+void __stdcall GetGadgetRectByIndex(char*, int, Rect*);
+void __stdcall GetGadgetScreenRect(char*, int, Rect*);
+int __stdcall FindBackgroundCell(Gadget* entries, int index);
+int __stdcall IsPointInRect(Rect* r, int px, int py);
+void __stdcall DrawListBox(Dialog_4a1b40* obj, int index);
+void __stdcall SyncAssocGadgets(Dialog_4a2be0*, int);
+void __stdcall SetListBoxScrollByName(Dialog_4a2e40*, char*, int);
+void __stdcall DrawProgressBarGadget(Dialog_4a4660 * obj, int index);
+void __stdcall DrawHotspot(Dialog_4a4980* obj, int index);
+void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
+void __stdcall SetCurrentFont(Gui* p, int index);
+int __stdcall TruncateGadgetText(Gui* menu, int index);
+void __stdcall ClearGroupStatus(Gui*, int index);
+void __stdcall BeginTextEdit(Gui* obj, int index);
+void __stdcall SelectGadgetByName(Gui* menu, char* name);
+void __stdcall SelectGadgetByIndex(Gui* menu, int index);
+int __stdcall RenderLayer(Gui* menu, unsigned int flags);
+void __stdcall CloseTopScreen(Gui* gui);
+void __stdcall SetCurrentGuiContext(Gui* ctx);
+void __stdcall SetDefaultFont(int*, int);
 
 #endif

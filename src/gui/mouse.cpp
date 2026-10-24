@@ -55,13 +55,11 @@ Obj_004c2380* GetDisplay(void);
 void __cdecl BlitSurface(void* dst, void* src, int x, int y);
 void __stdcall DrawFrame(void* dst, GafFrame* bmp, int x, int y);
 void __stdcall DrawSurface(Desc_004c25e0* dst, Desc_004c25e0* bmp, int x, int y);
-int __stdcall LockPrimary(void* out);
-int __stdcall UnlockPrimary(void* unused, RECT* r1, RECT* r2);
+#include "../graphics/surface.h"
 void __stdcall ResetClipRect(void* d);
 void* __stdcall AllocSurface(char* name, int width, int height);
-void __stdcall FreeSurface(void* obj);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
 
 void __stdcall RedrawMouseCursor(Obj_004c2380* app);
 #include "mouse.h"
@@ -135,14 +133,14 @@ void __stdcall RestoreCursorBackground(Obj_004c2380* obj)
     if (obj->visible) {
         Desc_004c25e0* bmp = obj->saved;
         Surface_004c23e0 s;
-        if (LockPrimary(&s)) {
+        if (LockPrimary((Surface *)&s)) {
             BlitSurface(&s, bmp, obj->x, obj->y);
             RECT r;
             r.left = obj->x;
             r.top = obj->y;
             r.right = r.left + bmp->width;
             r.bottom = r.top + bmp->height;
-            UnlockPrimary(&s, &r, 0);
+            UnlockPrimary((Surface *)&s, &r, 0);
         }
     }
 }
@@ -160,7 +158,7 @@ void __stdcall CaptureBackgroundAndDrawCursor(Obj_004c2380* obj)
 {
     if (obj->visible) {
         Surface_004c23e0 s;
-        if (LockPrimary(&s)) {
+        if (LockPrimary((Surface *)&s)) {
             RECT r;
             POINT pt;
             host_cursor_get((int*)&pt.x, (int*)&pt.y);
@@ -177,7 +175,7 @@ void __stdcall CaptureBackgroundAndDrawCursor(Obj_004c2380* obj)
             r.top = obj->y;
             r.right = r.left + obj->sprite->width;
             r.bottom = r.top + obj->sprite->height;
-            UnlockPrimary(&s, &r, 0);
+            UnlockPrimary((Surface *)&s, &r, 0);
         }
     }
 }
@@ -191,7 +189,7 @@ void __stdcall RedrawMouseCursor(Obj_004c2380* app)
     POINT pt;
     if (app->visible == 0)
         return;
-    if (LockPrimary(&info) == 0)
+    if (LockPrimary((Surface *)&info) == 0)
         return;
     host_cursor_get((int*)&pt.x, (int*)&pt.y);
     int x = pt.x;
@@ -228,7 +226,7 @@ void __stdcall RedrawMouseCursor(Obj_004c2380* app)
     BlitSurface(app->saved, app->under, 0, 0);
     app->x = x;
     app->y = y;
-    UnlockPrimary(&info, &r1, &r2);
+    UnlockPrimary((Surface *)&info, &r1, &r2);
 }
 
 // FUNCTION: 0x4c2870
@@ -372,9 +370,9 @@ void ShutdownMouse()
                 }
             }
         }
-        FreeSurface(o->work);
-        FreeSurface(o->under);
-        FreeSurface(o->saved);
+        FreeSurface((Surface *)o->work);
+        FreeSurface((Surface *)o->under);
+        FreeSurface((Surface *)o->saved);
         GameFreeThunk(o->entries);
         o->entries = 0;
     }

@@ -2,6 +2,7 @@
 #define MULTI_H
 
 #include "../../include/win_types.h"
+struct Gui;
 
 struct Gadget;
 struct Gui;
@@ -88,5 +89,9 @@ void __stdcall UnitRestrictDialogFrame();
 void __stdcall ShowSelectedUnitCosts(void* panel, Gadget* unit);
 int __cdecl CompareUnitRestrictEntries(const char* a, const char* b);
 void __stdcall OpenUnitRestrictions();
+
+void __cdecl BuildPlayerSlotGadgets(void);
+void __stdcall HandleBattleRoomClick(Gui* gadget);
+void __stdcall UpdateUnitSliders(Gui*, int unused);
 
 #endif

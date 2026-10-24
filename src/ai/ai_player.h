@@ -1,5 +1,9 @@
 #ifndef AI_PLAYER_H
 #define AI_PLAYER_H
+class UnitDef;
+struct Unit;
+struct Vec3;
+struct Vec3_40b0d0;
 
 class CommandArgs;
 class UnitDef;
@@ -29,5 +33,11 @@ void __stdcall DestroyPlayerAI(int player);
 int __stdcall GetUnitCount(int, unsigned int);
 void __stdcall DumpPlayerAI(int player, _iobuf* file);
 int __stdcall HasSpecialUnit(int);
+
+bool __stdcall HasReadyUnitInRange(int player, Vec3_40b0d0* p, int range);
+int __stdcall GetBuildRating(int player, unsigned short type);
+unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit* unit);
+int __stdcall FindBuildPosition(int player, const Vec3* from, UnitDef* type, Vec3* out);
+int __stdcall GetBuilderCount(int);
 
 #endif

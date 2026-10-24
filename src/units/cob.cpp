@@ -37,7 +37,7 @@ struct SavedPiece {
 #include "../files/files_api.h"
 
 #include "../graphics/display.h"
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 int __stdcall GetCobChecksum(void* param);
 #include "../util/math_4b6c30.h"
 

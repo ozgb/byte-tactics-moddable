@@ -54,7 +54,6 @@ public:
 #include "packet_ring.h"
 
 void RegisterUnitOrders();
-int UpdatePlacementGhostValidity();
 
 #pragma pack(push, 1)
 struct Net_00462f30 {

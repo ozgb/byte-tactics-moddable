@@ -188,65 +188,53 @@ int GetHostDpid();
 void RegisterUnitOrders(void);
 #include "../ingame/control_panel.h"
 #include "../ingame/camera.h"
-void InitMissionStatus(void);
 
-void __stdcall SeedRandom(int x);
+#include "../util/math.h"
 #include "../harness/harness.h"
 #include "../util/math_4b6c30.h"
 unsigned char __stdcall FindHostSlot();
 #include "settings.h"
-void HandleNetPackets();
+#include "../network/net_game_453d40.h"
 #include "../frontend/skirmish_menu.h"
 #include "game_state.h"
-void __stdcall LoadSavedGameState(void* mission);
-void CreateMissionUnits();
+#include "settings_campaign.h"
+#include "../units/unit_commands.h"
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-void __stdcall ReportGameEvent(int x);
+#include "../network/unit_sync.h"
 #include "main_loop.h"
 void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedPos_497180 pos, int a,
     int b, int c);
 Gadget_497180* __stdcall LoadGuiLayer(Sub_497180* sub, const char* name, int flags);
-void __stdcall HandleMain2LayoutEvent(Gadget_497180* gadget);
+#include "../ingame/dialogs_493340.h"
 void __cdecl operator delete(void* p);
 
-void __stdcall RenderLayer(Menu_00497ce0* menu, int value);
-void __stdcall MarkLayerChanged(Menu_00497ce0* menu);
+#include "../gui/gui.h"
 void __stdcall BlitMenuLayers(Menu_00497ce0* menu, int a, int b);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
-void __stdcall DrawTextClipped(void* surface, const char* text, int x, int y, int len, int flag);
 char* __stdcall Translate(char* s);
 
 void LoadThreadMain();
 #include "../ingame/build_placement.h"
 #include "../frontend/options.h"
-void __cdecl BlankScreen();
-void __cdecl FreePictureCache();
-void __cdecl SaveSettings();
-void __cdecl SendLoadProgress();
-void __cdecl OnlineUnload();
-void __cdecl DrawLightBars();
-void __cdecl StopAllSounds();
-void __cdecl MainLoopTick();
+#include "../frontend/frontend.h"
+#include "../network/online.h"
+#include "../ingame/info_panel.h"
 void __cdecl ShowSoftwareCursor();
 void __stdcall UnlockScreen(void*);
-void __cdecl RestoreScreen();
+#include "../graphics/surface.h"
 void __cdecl FlipScreen();
 int __cdecl IsCdPlaying();
-void __cdecl GameFreeThunk(void*);
-void __stdcall BuildDataPath(void*, char*, char*, char*);
-void __stdcall SendProbe(unsigned int, int);
+#include "../graphics/object_pool.h"
+#include "data_files.h"
 #include "game_load.h"
-void __stdcall DisableKeyCommands(void*);
 int __stdcall GetTextPixelWidth(char*);
-void __stdcall CloseTopScreen(void*);
 void __stdcall SetCursorAnimation(void*, void*);
 void __stdcall RemapPaletteToClosestIndices(void*, void*, void*);
 void __stdcall SetCloseHandler(void (__cdecl *)(int), int);
-void __stdcall FatalError(char*);
 void* __stdcall GetGafFrame(void*, int);
 void __stdcall DrawFrame(void*, void*, int, int);
 void* __stdcall FindGafEntry(int, char*);
-void __stdcall SetPaletteColors(void*, int, int);
+#include "../graphics/palette.h"
 void __stdcall SetTextColors(int, int);
 void __stdcall SetFont(int);
 int __stdcall LockScreen(void*);
@@ -254,13 +242,9 @@ int __stdcall LockScreen(void*);
 void __stdcall SetOffscreenSurface(void*);
 void* __stdcall AllocSurface(char*, int, int);
 void __stdcall DrawSurface(void*, void*, int, int);
-int __cdecl GetScreenWidth();
-int __cdecl GetScreenHeight();
-int __cdecl GetTextKeyColor();
-int __cdecl GetFontHeight();
-int __cdecl AssignStartPositions();
+#include "../graphics/draw.h"
 unsigned int __cdecl GetTicks();
-char* __cdecl GetPreferredLanguage();
+#include "main.h"
 
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
@@ -497,7 +481,7 @@ tail:
     }
     Gadget_497180* gadget =
         LoadGuiLayer((Sub_497180*)&g_game->menu_519_18, g_game->name, 0x20);
-    gadget->handler = HandleMain2LayoutEvent;
+    gadget->handler = (void (__stdcall *)(Gadget_497180 *))HandleMain2LayoutEvent;
     gadget->owner = (char*)g_game;
 
     PlayerRec_00497f40* currec = &(*(PlayerRec_00497f40(*)[10])&g_game->players)[g_game->localPlayer];
@@ -525,8 +509,8 @@ void __stdcall DrawSyncStatus(void* surface)
     int off;
     extern Game* g_game;
 
-    RenderLayer(&g_game->menu_519_18, 0x40);
-    MarkLayerChanged(&g_game->menu_519_18);
+    RenderLayer((Gui *)&g_game->menu_519_18, 0x40);
+    MarkLayerChanged((Dialog *)&g_game->menu_519_18);
     BlitMenuLayers(&g_game->menu_519_18, 0, 0);
 
     const char* text;
@@ -580,7 +564,7 @@ void __stdcall DrawSyncStatus(void* surface)
         text = buf;
     }
 
-    DrawTextClipped(surface, text, 10, 400, -1, 0);
+    DrawTextClipped(surface, (char *)text, 10, 400, -1, 0);
 }
 static inline void DrawLoadingBar(void* gadget, void* lightbar, int index, unsigned char* prev, unsigned char* alphas, int slot, char* label, int y, int* rect)
 {
@@ -620,20 +604,20 @@ void LoadingScreenFrame(void)
 
     if (!(*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.started) {
         while (((int)g_game->layer) != 0) {
-            CloseTopScreen(&g_game->field_519);
+            CloseTopScreen((Gui *)&g_game->field_519);
         }
-        DisableKeyCommands(&g_game->field_519);
+        DisableKeyCommands((Dialog *)&g_game->field_519);
         if (((unsigned char)g_game->cursorMode) != 0x14) {
             g_game->cursorMode = (char)(0x14);
             SetCursorAnimation(&g_game->field_519, (void*)g_game->cursorHourglass);
         }
         SetFont(g_game->fontComix);
-        SetPaletteColors(g_game->paletteRgba, 0, 0x100);
+        SetPaletteColors((unsigned char *)g_game->paletteRgba, 0, 0x100);
         if (g_seams.map->GetGameType(g_game->net) != 2) {
             SaveSettings();
         }
         while (((int)g_game->layer) != 0) {
-            CloseTopScreen(&g_game->field_519);
+            CloseTopScreen((Gui *)&g_game->field_519);
         }
         BlankScreen();
         g_game->width_37e1f = 0x280;

@@ -1,5 +1,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
+struct Gadget;
+struct Gui;
 
 void __stdcall SetDirectConnectAddress(char*);
 void __stdcall SetHostGameName(int flag, char* text);
@@ -43,5 +45,18 @@ void __stdcall OpenSurrenderDialog();
 void __stdcall OpenExitMenu();
 void __cdecl HandleBattleQuitPrompt(int);
 void __stdcall OpenInGameOptions();
+
+void __stdcall SetSliderFromValue(Gadget*, int value);
+int __stdcall ReadSliderValue(Gadget*);
+void __stdcall HandleVisualOptionsClick(Gui* gui);
+void __stdcall HandleGameSettingsDialogClick(Gui* gui);
+void __stdcall HandleBriefingClick(Gui* gui);
+void __stdcall FillHelpPage(Gui* sub, int page, int lineCount);
+void __stdcall HandleHelpClick(Gui* gui);
+void __stdcall HandleOptionsPanelClick(Gui* gui);
+void __stdcall HandleRestartDialogClick(Gui* gui);
+void __stdcall HandleSurrenderChoice(Gui* gui);
+void __stdcall HandleExitMenuClick(Gui* gui);
+void __stdcall HandleInGameOptionsClick(Gui* gui);
 
 #endif

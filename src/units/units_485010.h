@@ -1,5 +1,6 @@
 #ifndef UNITS_485010_H
 #define UNITS_485010_H
+struct UnitKilledPacket;
 
 struct Player;
 struct Unit;
@@ -19,5 +20,7 @@ void __stdcall KillUnit(Unit* unit, int);
 void __stdcall KillUnitsOfType(short id);
 void __stdcall KillAllUnits(void);
 void __stdcall KillPlayerUnits(unsigned char player);
+
+void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local);
 
 #endif

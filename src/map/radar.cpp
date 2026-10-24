@@ -87,26 +87,21 @@ struct UnitType_00466dc0 {
 
 #include "../../link/globals.h"
 
-void* __stdcall AllocFrame(char* name, int width, int height);
-void __stdcall SurfaceFromFrame(Surface_4665d0* surface, void* pic);
+#include "../graphics/gaf.h"
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
-void __stdcall FillSurface(Surface_4665d0* surface, int mode);
+#include "../graphics/surface.h"
 void __stdcall DrawFrameQuad(Surface_4665d0* surface, void* pic, Quad_4665d0* dst, Quad_4665d0* src);
-void __cdecl GameFreeThunk(void* pic);
+#include "../graphics/object_pool.h"
 
 void __stdcall FrameFromSurface(GafFrame* dst, void* src);
 #include "../graphics/gaf.h"
-void __stdcall DrawPixel(void* picture, int x, int y, int pixel);
+#include "../graphics/draw.h"
 void* __stdcall AllocSurface(char* name, int width, int height);
-void __stdcall FreeSurface(void* picture);
 
 void __stdcall DrawRectangle(void* param_1, void* param_2, int param_3);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
 
 void* __stdcall GetGafFrame(void* a, int index);
-void __stdcall DrawCircle(void* surface, int x, int y, int radius, int color);
-void __stdcall DrawDashedCircle(void* surface, int x, int y, int radius, int color,
-                            int a6, int a7);
 
 // FUNCTION: 0x4665d0
 void __stdcall ResizeRadarPicture(GafFrame* pic, int x, int y, int w, int h)
@@ -141,12 +136,12 @@ void __stdcall ResizeRadarPicture(GafFrame* pic, int x, int y, int w, int h)
         oy = 0;
     }
     void* temp = AllocFrame("TEMP RADAR PIC", pic->width, pic->height);
-    SurfaceFromFrame(&surface, temp);
+    SurfaceFromFrame((Surface *)&surface, (GafFrame *)temp);
     DrawFrame(&surface, (short*)pic, 0, 0);
     pic->width = x;
     pic->height = y;
-    SurfaceFromFrame(&surface, pic);
-    FillSurface(&surface, 0);
+    SurfaceFromFrame((Surface *)&surface, pic);
+    FillSurface((Surface *)&surface, 0);
 
     src.p[0].x = 0;
     src.p[0].y = 0;
@@ -210,13 +205,13 @@ void __stdcall BuildRadarPicture()
                 value = 0;
             }
             int pixel = g_game->iconSet->cell[value][y % 32][x % 32];
-            DrawPixel(temp, i, j, pixel);
+            DrawPixel((Surface *)temp, i, j, pixel);
         }
     }
     GafFrame tempFrame;
     FrameFromSurface(&tempFrame, temp);
     DownsampleFrame(&tempFrame, &frame);
-    FreeSurface(temp);
+    FreeSurface((Surface *)temp);
 }
 
 // FUNCTION: 0x4669b0
@@ -240,9 +235,9 @@ void InitRadar()
 // FUNCTION: 0x466aa0
 void FreeRadar()
 {
-    FreeSurface(g_game->pictureSurface);
-    FreeSurface(g_game->mappedSurface);
-    FreeSurface(g_game->finalSurface);
+    FreeSurface((Surface *)g_game->pictureSurface);
+    FreeSurface((Surface *)g_game->mappedSurface);
+    FreeSurface((Surface *)g_game->finalSurface);
     g_game->pictureSurface = 0;
     g_game->mappedSurface = 0;
     g_game->finalSurface = 0;
@@ -386,19 +381,19 @@ void DrawRadarUnits(void)
                         if ((u->activateFlags & 1) != 0 ||
                             (type->flags2 & 4) == 0) {
                             if (type->radardistance != 0)
-                                DrawCircle(surface, x, y,
+                                DrawCircle((Surface *)surface, x, y,
                                     (int)g_game->width_142eb * type->radardistance /
                                     g_game->mapWidth, base[0xa]);
                             if (type->sonardistance != 0)
-                                DrawCircle(surface, x, y,
+                                DrawCircle((Surface *)surface, x, y,
                                     (int)g_game->width_142eb * type->sonardistance /
                                     g_game->mapWidth, base[0xa]);
                             if (type->radardistancejam != 0)
-                                DrawCircle(surface, x, y,
+                                DrawCircle((Surface *)surface, x, y,
                                     (int)g_game->width_142eb * type->radardistancejam /
                                     g_game->mapWidth, base[0xc]);
                             if (type->sonardistancejam != 0)
-                                DrawCircle(surface, x, y,
+                                DrawCircle((Surface *)surface, x, y,
                                     (int)g_game->width_142eb * type->sonardistancejam /
                                     g_game->mapWidth, base[0xc]);
                         }
@@ -411,11 +406,11 @@ void DrawRadarUnits(void)
                                              (slot->weapon->coverage - 0x200)) /
                                             g_game->mapWidth;
                                     if (slot->stockpile != 0)
-                                        DrawDashedCircle(surface, x, y, r, base[0xf],
+                                        DrawDashedCircle((Surface *)surface, x, y, r, base[0xf],
                                                      0x20,
                                                      g_game->timer.byte.field_142f0.b.hi & 1);
                                     else
-                                        DrawCircle(surface, x, y, r, base[0xf]);
+                                        DrawCircle((Surface *)surface, x, y, r, base[0xf]);
                                 }
                                 slot++;
                                 n--;
@@ -446,7 +441,7 @@ void DrawRadarUnits(void)
                     if (OnRadar_00466dc0(px, py) ||
                         p->owner ==
                             g_game->playerIndex) {
-                        DrawPixel(surface, x, y, base[0xe]);
+                        DrawPixel((Surface *)surface, x, y, base[0xe]);
                     }
                 }
             } else {

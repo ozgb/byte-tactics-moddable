@@ -65,14 +65,12 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
 int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target, Vec3* pos, int param_6, int param_7);
 #include "../orders/order_list.h"
-int __stdcall GetOrderFlags(Unit* unit);
+#include "../orders/order_queue_4384a0.h"
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
-int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3);
 #include "../orders/order_targets.h"
 float __stdcall GetEnergyIncome(Player* player);
 float __stdcall GetMetalIncome(Player* player);
-float __stdcall GetNetEnergy(Player* player);
-float __stdcall GetNetMetal(Player* player);
+#include "../game/players_464290.h"
 #include "../game/players_464290.h"
 #include "../units/unit_targets.h"
 
@@ -82,10 +80,9 @@ int __stdcall WeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags);
 #include "../weapons/explosions.h"
 void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra);
 void __stdcall RemoveUnitProjectiles(Unit* unit);
-void __stdcall GetAimFromPosition(Unit* unit, Vec3* out, unsigned char weapon);
+#include "../units/unit_scripts.h"
 Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
-Vec3 __stdcall GetPiecePosition(Unit* unit, int piece);
-void __stdcall MarkRecentlyDamaged(Unit* unit);
+#include "../ingame/info_panel.h"
 
 #include "../units/unit_commands.h"
 void __stdcall UpdatePlayerEconomy(Player* p);
@@ -94,20 +91,13 @@ void __stdcall UpdatePlayerEconomy(Player* p);
 #include "../map/features_422ea0.h"
 void __stdcall InitFeatureAnimPool(List_00421f20* list);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
-int __stdcall RemoveFeature(Cell* cell, int flag);
-int __stdcall ReclaimFeature(Unit* unit, Vec3* pos);
-void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon);
-Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def);
 #include "../map/features_424c00.h"
 
-void __stdcall SetWeaponTargetUnit(char* param_1, char* param_2, int param_3);
-void __stdcall SetWeaponTargetPos(char* param_1, int* param_2, int param_3);
 int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index);
 Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange);
 
-Cell* __stdcall GetMapCell(int x, int y);
-void __stdcall CmdShareMapping(int unused);
-void __stdcall CmdShareRadar(int unused);
+#include "../map/line_of_sight.h"
+#include "../game/share_commands.h"
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetGroundHeight(Pos_00485070* p);
@@ -116,7 +106,6 @@ int __stdcall GetCellMeanHeight(Pos_00485070* p);
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
-bool __stdcall HasReadyUnitInRange(int player, Vec3* pos, int range);
 int __stdcall IsPointVisible(Player* player, Vec3* pos);
 
 #include "../map/line_of_sight.h"
@@ -136,15 +125,12 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3*
 void __stdcall SetupPlayerSlot(int player, char type);
 #include "../units/units_485010.h"
 struct OwnershipTransferPacket;
-void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPacket* packet);
 #include "../units/unit_types.h"
 #include "../units/unit_save.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int param_4, int mode, int param_6);
 UnitDef* __stdcall FindUnitType(const char* name);
-unsigned short __stdcall FindUnitTypeId(const char* name);
 int __stdcall FindMissionUnit(char* name, std::vector<Unit*>* units, int value);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char piece, char mode);
-void __stdcall GetNanoPiecePosition(Unit* unit, Vec3* out);
 Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../ingame/control_panel.h"
 #include "../units/unit_scripts.h"
@@ -769,7 +755,7 @@ void InstallNativeSeams()
     s_units.MovementClassInBounds = MovementClassInBoundsNative;
     s_units.RefreshMovedUnits = RefreshMovedUnitsNative;
     s_units.RefreshUnitIfStale = RefreshUnitIfStaleNative;
-    s_ai.HasReadyUnitInRange = HasReadyUnitInRange;
+    s_ai.HasReadyUnitInRange = (bool (__stdcall *)(int, Vec3 *, int))HasReadyUnitInRange;
     s_ai.IsPointVisible = IsPointVisible;
     s_map.GetNameSlot = GetNameSlotNative;
     s_map.VisitObjectsInRange = VisitObjectsInRangeNative;
@@ -826,7 +812,7 @@ void InstallNativeSeams()
     s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
     s_orders.AddOrder = AddOrder;
     s_orders.DeleteOrders = DeleteOrders;
-    s_orders.GetOrderFlags = GetOrderFlags;
+    s_orders.GetOrderFlags = (int (__stdcall *)(Unit *))GetOrderFlags;
     s_orders.GetOrderType = GetOrderType;
     s_orders.IssueAttackOrder = IssueAttackOrder;
     s_orders.RegisterAllOrderTypes = RegisterAllOrderTypes;
@@ -835,17 +821,17 @@ void InstallNativeSeams()
     s_orders.DestroyPathfinder = DestroyPathfinder;
     s_players.GetEnergyIncome = GetEnergyIncome;
     s_players.GetMetalIncome = GetMetalIncome;
-    s_players.GetNetEnergy = GetNetEnergy;
-    s_players.GetNetMetal = GetNetMetal;
+    s_players.GetNetEnergy = (float (__stdcall *)(Player *))GetNetEnergy;
+    s_players.GetNetMetal = (float (__stdcall *)(Player *))GetNetMetal;
     s_players.LoadDefaultAIScript = LoadDefaultAIScript;
     s_units.NotifyUnitRefs = NotifyUnitRefs;
     s_units.UnitTypeSetAddTypeOrCategory = UnitTypeSetAddTypeOrCategoryNative;
     s_units.StartScript = StartScriptNative;
     s_units.QueryScript = QueryScriptNative;
-    s_units.GetAimFromPosition = GetAimFromPosition;
+    s_units.GetAimFromPosition = (void (__stdcall *)(Unit *, Vec3 *, unsigned char))GetAimFromPosition;
     s_units.GetPieceOffset = GetPieceOffset;
-    s_units.GetPiecePosition = GetPiecePosition;
-    s_units.MarkRecentlyDamaged = MarkRecentlyDamaged;
+    s_units.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
+    s_units.MarkRecentlyDamaged = (void (__stdcall *)(Unit *))MarkRecentlyDamaged;
     s_map.BuildAllPassMaps = BuildAllPassMaps;
     s_map.FreeOtaEnumCacheAndMission = FreeOtaEnumCacheAndMission;
     s_map.LoadMappingData = LoadMappingData;
@@ -922,7 +908,7 @@ void InstallNativeSeams()
     s_units.FindUnitTypeId = FindUnitTypeId;
     s_units.FindMissionUnit = FindMissionUnit;
     s_units.AttachUnitToPiece = AttachUnitToPiece;
-    s_units.GetNanoPiecePosition = GetNanoPiecePosition;
+    s_units.GetNanoPiecePosition = (void (__stdcall *)(Unit *, Vec3 *))GetNanoPiecePosition;
     s_units.GetPieceAngles = GetPieceAngles;
     s_units.AddBuildProgress = AddBuildProgress;
     s_units.AddRepairProgress = AddRepairProgress;

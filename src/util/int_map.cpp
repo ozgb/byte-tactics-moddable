@@ -20,8 +20,8 @@ struct Pair8_004b2450 {
 };
 
 #include "../files/files_api.h"
-extern int __stdcall ComputeChecksum(unsigned char* data, int len);
-extern void __cdecl GameFreeThunk(void* x);
+#include "math.h"
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x4b2290 _$E6
 // FUNCTION: 0x4b2340 _$E4

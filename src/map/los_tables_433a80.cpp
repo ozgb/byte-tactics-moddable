@@ -6,7 +6,6 @@ struct Elem_00434020 {
 };
 
 #include "los_tables.h"
-void __stdcall StoreDwordIfDst(int* p, const int* q);
 
 namespace std {
 inline void _Destroy(Elem_00434020* p)
@@ -16,7 +15,7 @@ inline void _Destroy(Elem_00434020* p)
 
 inline void _Construct(Elem_00434020* p, const Elem_00434020& v)
 {
-    StoreDwordIfDst((int*)p, (const int*)&v);
+    StoreDwordIfDst((int*)p, (int *)((const int*)&v));
 }
 }
 

@@ -63,8 +63,8 @@ struct MusicFlags_0042f9a0 {
 extern char g_onlineLobbyPlayerName[];
 extern char g_cmdlineHostGameName[];
 
-int __stdcall GetWindowsUserName(void* buf);
-int __cdecl IsOnlineConfigLoaded();
+#include "../util/registry.h"
+#include "../network/online.h"
 #include "../debug/debug_lib.h"
 
 // FUNCTION: 0x42f910

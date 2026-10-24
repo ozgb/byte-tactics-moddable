@@ -26,7 +26,6 @@ int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 #include "order_list.h"
-int __stdcall IssueAttackOrder(Unit*, Unit*, int);
 
 static inline Vec3 Offset(short angle, int distance)
 {

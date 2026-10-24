@@ -15,7 +15,6 @@ struct Unit;
 
 #include "../units/unit.h"
 int __stdcall FindLandingPad(Unit*, int);
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 void __stdcall DrawUnit(void*, Unit*);
 
 #include "order.h"
@@ -27,7 +26,7 @@ void __stdcall DrawUnit(void*, Unit*);
 #include "../../link/globals.h"
 
 #include "../../interfaces/seams.h"
-void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
+#include "../sound/sound.h"
 void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
 
 void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)

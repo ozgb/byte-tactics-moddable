@@ -78,37 +78,31 @@ struct FixedPos_00496ee0 {
 
 #include "../../link/globals.h"
 
-int GetMilliseconds();
+#include "../graphics/display.h"
 #include "../ingame/dialogs_493340.h"
-void MainLoopContinueStub();
-void MainLoopContinueStub_B();
-void MainLoopContinueStub_C();
 #include "../frontend/frontend.h"
-int AssignStartPositions();
-void HandleNetPackets();
+#include "../frontend/frontend.h"
+#include "../network/net_game.h"
+#include "../network/net_game_453d40.h"
 unsigned int GetTicks();
-int GetLocalDpid();
-void __stdcall SendProbe(int a, int b);
 #include "../ingame/keys.h"
 #include "../ingame/control_panel.h"
 #include "../ingame/selection.h"
 #include "../ingame/control_panel_41b2e0.h"
 #include "../ingame/info_panel_468cf0.h"
-void __stdcall SaveScreenshot(char* buf, char* name);
+#include "../graphics/pcx.h"
 void __stdcall SetCursorAnimation(Obj_004ab400* p, Src_004ab400* src);
 void ShowSoftwareCursor();
-void ClearKeyQueue();
+#include "../gui/keyboard.h"
 void __cdecl LeaveNetGameCallback(int param);
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 #include "main_loop.h"
-void __stdcall EnableKeyCommands(Gui* p);
 #include "../harness/harness.h"
 void HideSoftwareCursor();
 #include "game_load.h"
 void __stdcall BlitMenuLayers(Gui* sub, unsigned int* dest, int* clip);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 #include "../network/net_game.h"
-void __stdcall FatalError(char* message);
 void __stdcall CreateUnit(int team, unsigned short id, FixedPos_00496ee0 pos, int a, int b,
     int c);
 
@@ -227,7 +221,7 @@ void ReturnToMainMenuFrame()
     g_game->bits_3923b.flag4_3923b = 0;
     g_game->bits_3923b.flag2_3923b = 0;
     ClearKeyQueue();
-    EnableKeyCommands(&g_game->gui);
+    EnableKeyCommands((Dialog *)&g_game->gui);
     g_game->mode_391f1 = 2;
     g_game->handler = MenuFrame;
     SetCloseHandler(LeaveNetGameCallback, 0);

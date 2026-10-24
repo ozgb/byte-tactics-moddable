@@ -69,44 +69,37 @@ struct SrcHolder_00495a30 {
 #include "../../link/globals.h"
 
 int __stdcall FindGadgetIndexBySubstring(int value, const char* name);
-void __stdcall ClearGroupStatus(Gui* gui, int handle);
 #include "../files/files_api.h"
 #include "keys.h"
-GafFrame* __stdcall AllocFrame(const char* name, int width, int height);
-void __cdecl SetOutOfMemoryHandler(int param);
+#include "../graphics/gaf.h"
+#include "../debug/debug_lib.h"
 #include "../game/main.h"
-void __stdcall SurfaceFromFrame(Surface* dst, void* src);
 void* __stdcall GetDisplay();
 void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src);
 #include "control_panel.h"
 #include "selection.h"
 #include "info_panel_468cf0.h"
 void __stdcall DrawFrame(Surface* surf, GafFrame* pal, int x, int y);
-void __stdcall ClearFrame(void* b, int color);
 #include "../map/line_of_sight.h"
-void __cdecl GameFreeThunk(void* b);
-int PopKey(void);
+#include "../graphics/object_pool.h"
 #include "../gui/keyboard.h"
-void __stdcall PopUntilNamedLayout(int param);
-void __stdcall CloseTopScreen(Gui* gui);
-int __stdcall IsScreenNamed(Gui* gui, char* name);
-void SaveSettings(void);
+#include "../gui/keyboard.h"
+#include "../game/game_state.h"
+#include "../gui/dialogs.h"
+#include "../game/settings.h"
 void __stdcall PlaySoundByName(const char* name, int param);
 #include "dialogs_493340.h"
 #include "control_panel_41bde0.h"
-void __stdcall SelectSquad(int index, int key);
 void __stdcall ExecuteCommandLine(int commandLine, int mask);
-void __stdcall SelectUnitsByCategory(const char* name, int key);
 void __stdcall CollectSelectedUnits(void* param);
 #include "camera.h"
 #include "../network/net_chat_464000.h"
 #include "../network/packets.h"
-void __stdcall SetGameSpeed(int speed, int broadcast);
 void __stdcall SetDescListCleanupFlag(Gui* gui, int param);
-int GetLocalDpid(void);
+#include "../network/net_game.h"
 void __stdcall BroadcastPacket(int id, void* packet, int size);
 #include "../frontend/options.h"
-void __stdcall SaveScreenshot(char* dir, const char* prefix);
+#include "../graphics/pcx.h"
 void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind, int d, int e, int f);
 int __stdcall FindOrderByType(int unit, MissionType kind);
 void __stdcall DeleteOrder(int unit, int arg);
@@ -168,7 +161,6 @@ void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name,
     sprintf(out, "%s%s%s%04i.%s", dir, needSep ? g_pathSepBackslash : DAT_005119b8, name, max + 1, ext);
 }
 
-void UpdateBuildMenuIfFocusUnit(void*);
 // FUNCTION: 0x495a30
 void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h)
 {

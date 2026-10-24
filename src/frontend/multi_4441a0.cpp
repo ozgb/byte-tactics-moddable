@@ -41,18 +41,17 @@ extern Game_004441a0* g_game;
 // GLOBAL: 0x5127c8
 extern LinkInfo g_linkInfo[];
 
-void __cdecl GameFreeThunk(void* p);
-int __stdcall IsCurrentGadgetNamed(void* menu, char* name);
+#include "../graphics/object_pool.h"
+#include "../gui/gui.h"
 Gadget* __stdcall FindGadgetChecked(void* entries, char* name);
 int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
 #include "multi_443ff0.h"
 void __stdcall PlaySoundByName(char* name, int flag);
 void __stdcall SetCursorMode(int value);
 #include "../network/online_45b250.h"
-void OnlineUnload();
+#include "../network/online.h"
 char* __stdcall Translate(char* text);
-void __stdcall OpenMessageBox(void* menu, char* text, int size, int param_4, int param_5);
-void __stdcall ClearSelectedGadget(void* menu);
+#include "../gui/dialogs.h"
 #include "options.h"
 
 // FUNCTION: 0x4441a0
@@ -78,7 +77,7 @@ void __stdcall HandleSelectProviderClick(Menu_004441a0* menu)
         }
         return;
     }
-    if (IsCurrentGadgetNamed(menu, "DPLAY") || IsCurrentGadgetNamed(menu, "SELECT")) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "DPLAY") || IsCurrentGadgetNamed((Dialog *)menu, "SELECT")) {
         SelectConnection(FindGadgetChecked(entries, "DPLAY")->u.list.selected);
         g_game->frontendSubstateRequest = 2;
         PlaySoundByName("BigButton", 0);
@@ -106,7 +105,7 @@ void __stdcall HandleSelectProviderClick(Menu_004441a0* menu)
             sprintf(message, "The %s service failed or took%stoo long. Please see the readme%sfile for more information.",
                     g_linkInfo[link].name, "\n\n", "\n\n");
         char* msg = Translate(message);
-        OpenMessageBox(menu, msg, sizeof(message), 1, 1);
+        OpenMessageBox((Gui *)menu, msg, sizeof(message), 1, 1);
         ClearSelectedGadget(menu);
         return;
     }
@@ -115,7 +114,7 @@ void __stdcall HandleSelectProviderClick(Menu_004441a0* menu)
         PlaySoundByName("Previous", 0);
         return;
     }
-    if (IsCurrentGadgetNamed(menu, "SETTINGS")) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "SETTINGS")) {
         PlaySoundByName("Options", 0);
         ClearSelectedGadget(menu);
         OpenOptionsPanel();

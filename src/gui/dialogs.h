@@ -1,5 +1,6 @@
 #ifndef DIALOGS_H
 #define DIALOGS_H
+struct Gui;
 
 struct FileHandle;
 struct Gui;
@@ -28,5 +29,15 @@ void __stdcall ShowPaletteEntryRgb(Gui* obj, unsigned char* colors, int index);
 void __stdcall LerpPaletteRange(unsigned char* data, int a, int b);
 int __stdcall GetColorCellAt(Gui* obj, int x, int y);
 void __stdcall WriteTabs(FileHandle* file, int depth);
+
+int __stdcall IsScreenNamed(Gui* obj, const char* name);
+void __stdcall ClearSelectedGadget(void* gui);
+int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons);
+int __stdcall IsDoubleClickMessage(Gui* obj, unsigned char buttons);
+int __stdcall HasMouseKeyFlags(Gui* obj, unsigned int mask);
+void __stdcall SetClickMode(void* gui, int mode);
+int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
+int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, char* chc1, int unused);
+char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index);
 
 #endif

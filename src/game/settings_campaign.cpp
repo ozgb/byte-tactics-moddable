@@ -37,8 +37,7 @@ extern char* g_summaryAccountName;
 
 #include "../ingame/camera.h"
 
-void __stdcall SaveSurface(void* surface, void* file);
-void __stdcall WriteCameraPosition(void* file);
+#include "../graphics/surface.h"
 
 // FUNCTION: 0x432520
 HapiBank* __stdcall OpenSummaryBank(char* name)
@@ -155,7 +154,7 @@ int __stdcall SaveGameFile(char* path, char* description, int gameId)
     (&file)->SetIntegerItem(g_gameTimeKey, g_game->ticks);
     if (g_game->mode_391f1 == 6) {
         (&file)->OpenNamedBox(g_radarImageBoxName);
-        SaveSurface(g_game->finalSurface, &file);
+        SaveSurface((Surface *)g_game->finalSurface, &file);
         WriteCameraPosition(&file);
         g_seams.players->SavePlayers(&file);
         g_seams.units->SaveUnits(&file);

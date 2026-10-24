@@ -37,8 +37,7 @@ void CreateOffscreenSurface()
     SetRestoreSurface((int)g_game->screen);
 }
 
-void __cdecl GameFreeThunk(int* p);
-void RestoreScreen();
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x490b00
 void FreeOffscreenSurface()
@@ -142,7 +141,7 @@ void ResetGameSpeed()
 
 
 char* __stdcall Translate(char* text);
-int GetLocalDpid();
+#include "../network/net_game.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall AddMessage(char* text, int key, int value, int last);
 
@@ -200,7 +199,7 @@ struct CdLists_490f80 {
 
 extern CdLists_490f80 g_cdListsDiscEntries;
 
-int __stdcall ReadGameRegistryValue(const char* key, void* buf, unsigned int* size);
+#include "settings.h"
 
 // FUNCTION: 0x490f40
 void LoadCdLists(void)
@@ -226,8 +225,6 @@ public:
     int StopCdAudio();
     void EnableCdAudio(int on);
 };
-
-void __stdcall WriteGameRegistryValue(void* key, void* buf, int value);
 
 // FUNCTION: 0x490f80
 void SaveCdLists()
@@ -311,36 +308,26 @@ extern const char g_hattFont12Name[];
 extern const char g_hattFont11Name[];
 extern const char g_unitLimitKey[];
 
-int GetScreenWidth();
-int GetScreenHeight();
-void __stdcall SetPageFlipping(int enable);
+#include "../graphics/display.h"
 #include "data_files.h"
 void InitSound();
 #include "../frontend/frontend.h"
 void __stdcall InitPacketTables(void* param_1);
-void LoadDefaultPalette();
 #include "../sound/sound_types.h"
-void __stdcall LoadAlphaTable(void* palette);
-void __stdcall LoadShadeTable(void* palette);
-void __stdcall LoadLightTable(void* palette);
+#include "../graphics/palette_tables.h"
 void __stdcall MakeGrayTable(void* palette);
 void __stdcall MakeBlueTable(void* palette);
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 #include "settings.h"
 #include "side_data.h"
 void __stdcall SetBrightness(float brightness);
-void __stdcall SetCurrentGuiContext(void* ctx);
-void __stdcall SetGuiPath(void* obj, const char* name);
-void __stdcall SetAnimsPath(void* obj, const char* name);
-void __stdcall SetFontsPath(void* obj, const char* name);
-void __stdcall SetDefaultFont(void* param_1, int param_2);
 void* __stdcall GetGafFrame(void* gaf, int frame);
 void __stdcall InitCursorFrames(void* p, void* value);
 void __stdcall LoadGafFile(void* obj, const char* name);
 void __stdcall LoadGafIntoSlot(void* obj, const char* name, int index);
 #include "../graphics/draw.h"
 void __stdcall SetFont(int font);
-int __stdcall GetPreferenceInt(const char* name, int defaultValue);
+#include "main.h"
 
 // FUNCTION: 0x491200
 void InitGame()
@@ -401,10 +388,10 @@ void InitGame()
     LoadLogos();
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
     SetCurrentGuiContext(&g_game->gui);
-    SetGuiPath(&g_game->gui, g_guisDirName);
-    SetAnimsPath(&g_game->gui, g_animsDirName);
-    SetFontsPath(&g_game->gui, g_fontsDirName);
-    SetDefaultFont(&g_game->gui, g_game->fontComix);
+    SetGuiPath((Dialog *)&g_game->gui, g_guisDirName);
+    SetAnimsPath((Dialog *)&g_game->gui, g_animsDirName);
+    SetFontsPath((Dialog *)&g_game->gui, g_fontsDirName);
+    SetDefaultFont((int *)&g_game->gui, g_game->fontComix);
     InitCursorFrames(&g_game->gui, GetGafFrame(g_game->cursorNormal, 0));
     LoadGafFile(&g_game->gui, g_commonGuiName);
     LoadGafIntoSlot(&g_game->gui, g_hattFont12Name, 0);
@@ -428,7 +415,7 @@ void InitGame()
     }
     ClearPictureCache();
     g_game->gui.clearQuickKeys = 1;
-    int limit = GetPreferenceInt(g_unitLimitKey, 0xfa);
+    int limit = GetPreferenceInt((char *)g_unitLimitKey, 0xfa);
     if (limit > 500)
         limit = 500;
     else if (limit < 20)
@@ -440,7 +427,6 @@ struct Obj_004aeda0;
 struct Obj_004aef80;
 struct Class_00452370;
 
-void FreePictureCache();
 void __stdcall FreeGafSlot(Obj_004aeda0* obj, int i);
 void __stdcall FreeCommonGuiGaf(Obj_004aef80* obj);
 void ShutdownSound();
@@ -579,7 +565,7 @@ void Force640x480Surfaces()
     }
 }
 
-void __cdecl CollectEndGameStats();
+#include "../frontend/endgame_41dc20.h"
 #include "../graphics/particles_471de0.h"
 #include "../network/net_game.h"
 
@@ -616,8 +602,6 @@ void ShutdownIngameSystems()
     }
 }
 
-void BlankScreen();
-void __stdcall QuitApp(const char*);
 
 // FUNCTION: 0x491c60
 void ShutdownIngameAndQuit()
@@ -641,8 +625,7 @@ void __stdcall SetCursorMode(int n)
     }
 }
 
-int __cdecl UpdatePlacementGhostValidity(void);
-unsigned short __cdecl PickUnitUnderCursor(void);
+#include "../ingame/selection.h"
 int __stdcall ResolveCursorModeForSelection(unsigned char mode);
 
 // FUNCTION: 0x491cc0
@@ -669,8 +652,7 @@ void __stdcall UpdateBattleHoverMode(int unused)
     }
 }
 
-int __stdcall IsScreenNamed(Gui* queue, char* name);
-void __stdcall CloseTopScreen(Gui* queue);
+#include "../gui/dialogs.h"
 
 // FUNCTION: 0x491d70
 int __stdcall PopUntilNamedLayout(int force)

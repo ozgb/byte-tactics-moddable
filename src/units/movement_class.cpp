@@ -6,7 +6,7 @@
 #include "../util/tdf.h"
 #include "../../interfaces/ref.h"
 
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
 void __cdecl operator delete(void* p);
 
@@ -70,8 +70,6 @@ public:
 
     void BuildPassMap();
 };
-
-int __stdcall GetPassMapCellValue(Class_00440500* obj, Cell* cell);
 
 #pragma pack(push, 2)
 struct Struct_00440a70 {
@@ -219,7 +217,7 @@ void Class_00440500::BuildPassMap()
     for (int j = 0; j < height; j++) {
         Cell* c = &g_game->cells[j * width];
         for (n = 0; n < width; n++, c++)
-            v[n] = (unsigned char)GetPassMapCellValue(this, c);
+            v[n] = (unsigned char)GetPassMapCellValue((MovementClass *)this, c);
         v[-2] = 0;
         v[-1] = 0;
         for (n = 0; n <= footprintX; n++)

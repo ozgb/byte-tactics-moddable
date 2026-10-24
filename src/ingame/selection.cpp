@@ -3,9 +3,9 @@
 #include <string.h>
 
 struct Unit;
-void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
+#include "../orders/unit_orders_406c70.h"
 namespace std {
-inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
+inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }
 #include <vector>
 
@@ -55,10 +55,10 @@ struct Name_0048d630 {
 #include "../../link/globals.h"
 
 #include "keys.h"
-int __stdcall PopUntilNamedLayout(int force);
-void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
+#include "../game/game_state.h"
+#include "../sound/sound.h"
 #include "control_panel.h"
-UnitTypeSet* __stdcall GetCategoryMask(char* name);
+#include "../units/unit_commands.h"
 
 #include "../map/cell.h"
 
@@ -477,8 +477,7 @@ void __stdcall CollectSelectedUnits(std::vector<Unit*>* list)
     }
 }
 
-void __stdcall DrawOrderOverlays(Unit* unit, int mask, void* obj,
-                           Unit** sel, int flag);
+#include "../orders/order_list.h"
 
 // FUNCTION: 0x48cc30
 void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Unit** sel)
@@ -680,8 +679,6 @@ void FocusNextLocalUnit(void)
     }
     u->selectState = 1;
 }
-
-void __cdecl ClearCameraFollowState(void);
 
 // FUNCTION: 0x48d630
 void __stdcall FocusCommander(int param_1)

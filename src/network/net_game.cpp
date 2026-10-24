@@ -76,15 +76,15 @@ extern int g_usePacketManager;
 #include "../game/statistics.h"
 #include "net_game.h"
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
-void __stdcall QuitApp(char* message);
+#include "../graphics/display.h"
 char* __stdcall Translate(char* text);
 void __stdcall AddMessage(char* text, int key, int value, char last);
 #include "net_game_450530.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall SetupPlayerSlot(unsigned char player, char type);
 int GetTicks();
-void __stdcall ReportGameEvent(int msg);
-void __stdcall OpenMessageBox(void* menu, const char* text, int a, int b, int c);
+int __stdcall ReportGameEvent(int msg);
+#include "../gui/dialogs.h"
 
 // FUNCTION: 0x44fd40
 int __stdcall DefaultPacketHandler(int arg1)
@@ -763,12 +763,12 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
         unsigned char i = FindPlayerInUse();
         Player* slot = &g_game->players[i];
         if (slot->active != 0 && (slot->type == 1 || slot->type == 2)) {
-            OpenMessageBox(g_game->menu,
+            OpenMessageBox((Gui *)g_game->menu,
                 Translate("Direct Play failed to add new player.\n\nRecommended you go to previous screen and re-create the game session.\n"),
                 500, 1, 1);
         }
         else {
-            OpenMessageBox(g_game->menu,
+            OpenMessageBox((Gui *)g_game->menu,
                 Translate("Direct Play failed to add new player.\n\nRecommended you go to previous screen and re-join the game session.\n"),
                 500, 1, 1);
         }
@@ -920,59 +920,35 @@ typedef EntryFunc SimView_g_packetHandlerType2;
 #undef g_packetHandlerType2
 #define g_packetHandlerType2 (*reinterpret_cast<SimView_g_packetHandlerType2*>(reinterpret_cast<char*>(&g_packetHandlers) + 0x8))
 
-void* __cdecl GameAllocIgnoreTag(char* tag, int size);
+#include "../debug/debug_lib.h"
 int __stdcall InitPacketTables(Class_00451fd0* obj);
 void __stdcall JoinLobbyGameThread(Args_00451640* args);
 unsigned __stdcall JoinLobbyGameThread(void* args);
-int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
-int __stdcall AssignPlayerColor(int from, int to, int group);
-int __stdcall RequestPlayerColor(int param);
 int __stdcall SetAlliance(int from, int to, unsigned char value, int extra);
-int __stdcall BroadcastAllyTeam(Player* player);
 int __stdcall RejectPlayer(int id, unsigned char value);
-void __stdcall HandleTimeoutDialog(void* gadget);
 void __stdcall UpdateTimeoutDialog(void* gadget);
-int IsOnlineConfigLoaded(void);
+#include "online.h"
 void __stdcall SetCursorMode(int n);
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 void* __cdecl GameReallocTagged(void* ptr, const char* name, unsigned int size);
 #include "../game/players_464290.h"
 Obj_00451640* GetDisplay(void);
 #include "../graphics/display.h"
-void __stdcall FatalError(char* msg);
 #include "net_stats.h"
 #include "../units/units_485010.h"
-void __stdcall HandlePing(void* msg);
 void __stdcall CreateUnitFromPacket(unsigned char p, void* packet);
-void __stdcall ReceiveUnitStates(Player* player, void* packet);
-void __stdcall ApplyAttachUnit(void* packet);
-void __stdcall ApplyUnitDamage(void* packet);
-void __stdcall ApplyUnitDeath(void* packet, int local);
 void __stdcall ApplyWeaponFirePacket(Player* player, void* packet);
 void __stdcall ApplyProjectileHitPacket(Player* player, void* packet);
-int __stdcall GetMapCell(int x, int y);
-void __stdcall DamageFeature(int cell, int x, int y, WeaponDef* weapon);
-void __stdcall PlaySoundByIndex(int index, int param_2);
 void __stdcall PlaySoundAt(int index, void* pos, int param_3);
-void __stdcall GiveUnitToPlayer(Unit* unit, Player* player, void* packet);
-void __stdcall HandlePlayerEconomy(void* packet, Player* player);
-void __stdcall SetGameSpeed(int speed, int param_2);
 void __stdcall PlaySoundByName(char* name, int param_2);
-int __stdcall IsCurrentGadgetNamed(Gui* gadget, char* name);
 Entry_004538f0* __stdcall FindGadgetChecked_B(Entry_004538f0* entries, char* name);
 int __stdcall SendChatMessage(Player* from, char* text, int key, char* to);
 int __stdcall FindGadgetIndex(void* gadgets, const char* name, int flag);
-void __stdcall BeginTextEdit(void* menu, int index);
-void __stdcall ClearSelectedGadget(void* gui);
-void __stdcall MarkChanged(void* menu);
-int __stdcall IsScreenNamed(void* obj, const char* name);
 void* __stdcall LoadGuiLayer(void* obj, const char* name, int size);
-void __stdcall CloseTopScreen(void* obj);
 void* __stdcall FindGadgetChecked(void* entries, char* name);
 void __stdcall ConfigureListBoxByName(void* obj, char* name, void* p, int count, int flags);
 void __stdcall SetTranslatedTextByName(void* obj, char* name, void* out, int flag);
 void __stdcall SetKeyboardInput(void* obj, int value);
-void __stdcall RenderLayer(void* obj, int value);
 
 // FUNCTION: 0x451540
 void CreateNetGame(void)
@@ -1741,7 +1717,7 @@ int __stdcall SetAlliance(int from, int to, unsigned char value, int extra)
         msg->fromNetId = from;
         msg->toNetId = to;
         msg->force = extra;
-        int r = SendPacketToPlayer(from, to, msg, 0xe);
+        int r = SendPacketToPlayer(from, to, (unsigned char *)msg, 0xe);
         if (g_usePacketManager != 0)
             g_packetManager.SendAllQueued(1);
         result = r;
@@ -1760,7 +1736,7 @@ int __stdcall SendAlliance(int from, int to, char value, int extra)
     msg->fromNetId = from;
     msg->toNetId = to;
     msg->force = extra;
-    int result = SendPacketToPlayer(from, to, msg, 0xe);
+    int result = SendPacketToPlayer(from, to, (unsigned char *)msg, 0xe);
     if (g_usePacketManager != 0) {
         g_packetManager.SendAllQueued(1);
     }
@@ -2164,7 +2140,7 @@ void UpdateTimeoutDialog()
 
     if (g_loungeRefreshTime < GetTicks()) {
         g_loungeRefreshTime = GetTicks() + 2;
-        MarkChanged(g_game->message);
+        MarkChanged((Dialog *)g_game->message);
     }
 
     memset(g_loungeChatter, 0, 0xa00);
@@ -2204,11 +2180,11 @@ void UpdateTimeoutDialog()
         sprintf(buf, Translate("will be rejected in %d seconds"),
                 g_game->lobbyTimeoutSecs - elapsed + 0x78);
         SetTranslatedTextByName(g_game->message, "TIMETEXT", buf, 0);
-        MarkChanged(g_game->message);
+        MarkChanged((Dialog *)g_game->message);
         if (elapsed < g_game->lobbyTimeoutSecs + 0x78)
             return;
         RejectPlayer(g_timeoutPlayerDpid, 6);
-        CloseTopScreen(g_game->message);
+        CloseTopScreen((Gui *)g_game->message);
     }
 }
 
@@ -2224,19 +2200,19 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
         g_loungeChatter = 0;
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "TALK")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "TALK")) {
         Entry_004538f0* entry = FindGadgetChecked_B(entries, "TALK");
         if (strlen(entry->text)) {
             SendChatMessage(&g_game->players[g_game->localPlayer], entry->text, 4, 0);
             g_game->bits_2bee_1.dirty = 1;
             strcpy(entry->text, DAT_005119b8);
         }
-        BeginTextEdit(g_game->message, FindGadgetIndex(((Layer*)g_game->layer)->entries, "TALK", 3));
+        BeginTextEdit((Gui *)g_game->message, FindGadgetIndex(((Layer*)g_game->layer)->entries, "TALK", 3));
         ClearSelectedGadget(g_game->message);
-        MarkChanged(g_game->message);
+        MarkChanged((Dialog *)g_game->message);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "REJECT")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "REJECT")) {
         RejectPlayer(g_timeoutPlayerDpid, 6);
         return;
     }
@@ -2263,9 +2239,9 @@ static __inline unsigned char FindSlot_00453a50(int id)
 // FUNCTION: 0x453a50
 void __stdcall OpenTimeoutDialog(int id)
 {
-    if (IsScreenNamed(g_game->menu, "TIMEOUT.GUI")) {
+    if (IsScreenNamed((Gui *)g_game->menu, "TIMEOUT.GUI")) {
         if (id == -1) {
-            CloseTopScreen(g_game->menu);
+            CloseTopScreen((Gui *)g_game->menu);
         }
         return;
     }
@@ -2281,7 +2257,7 @@ void __stdcall OpenTimeoutDialog(int id)
     Gui_00453a50* gui = (Gui_00453a50*)LoadGuiLayer(g_game->menu,
                                                     "TIMEOUT.GUI", 0x800);
     void* entries = gui->entries;
-    gui->callback = &HandleTimeoutDialog;
+    gui->callback = (void (__stdcall *)(void *))&HandleTimeoutDialog;
     g_timeoutPlayerDpid = id;
 
     char* p = (char*)GameAllocIgnoreTag("LOUNGE CHATTER", 0xa00);
@@ -2293,12 +2269,12 @@ void __stdcall OpenTimeoutDialog(int id)
                  (int)out->height / (GetFontLineHeight() + 2), 0);
 
     gui->onFrame = &UpdateTimeoutDialog;
-    BeginTextEdit(g_game->menu, FindGadgetIndex(entries, "TALK", 3));
+    BeginTextEdit((Gui *)g_game->menu, FindGadgetIndex(entries, "TALK", 3));
 
     SetTranslatedTextByName(g_game->menu, "NAME",
                  g_game->players[i].name, 0);
     SetKeyboardInput(g_game->menu, 1);
-    RenderLayer(g_game->menu, 0x40);
+    RenderLayer((Gui *)g_game->menu, 0x40);
 }
 
 static inline int IsTimedOut(Player* p, unsigned int now)
@@ -2465,7 +2441,6 @@ void Unused_00457d30(int a, int b, int c, int d, int e, int f);
 extern char g_cmdlineHostGameName[];
 extern char DAT_00512c98[];
 
-int __stdcall RequestPlayerColor(int color);
 void __stdcall SendPlayerEconomy(Player* from, Player* to, unsigned char flag);
 #include "../map/map_list.h"
 
@@ -2654,7 +2629,7 @@ void __stdcall HandlePing(LatencyPacket* p)
         }
         p->echoTick = host_time_ms();
         int packets_were_guaranteed = host_net_guarantee_packets(0);
-        SendPacketToPlayer(g_game->lobby1, p->targetPlayerNetId, p, 0xd);
+        SendPacketToPlayer(g_game->lobby1, p->targetPlayerNetId, (unsigned char *)p, 0xd);
         if (g_usePacketManager != 0) {
             g_packetManager.SendAllQueued(1);
         }
@@ -2908,7 +2883,7 @@ void __stdcall SendShareMetal(unsigned char from, unsigned char to, int amount)
         packet.fromNetId = PlayerDpid(from);
         packet.toNetId = PlayerDpid(to);
         packet.amount = amount;
-        SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), &packet, sizeof(packet));
+        SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), (unsigned char *)&packet, sizeof(packet));
     }
 }
 
@@ -2931,7 +2906,7 @@ void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value)
         packet.fromNetId = PlayerDpid(from);
         packet.toNetId = PlayerDpid(to);
         packet.amount = value;
-        SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), &packet, sizeof(packet));
+        SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), (unsigned char *)&packet, sizeof(packet));
     }
 }
 
@@ -2952,7 +2927,7 @@ void __stdcall SendShareMapInfo(unsigned char from, unsigned char to)
         packet.fromNetId = PlayerDpid_00457d30(from);
         packet.toNetId = PlayerDpid_00457d30(to);
         packet.amount = 0;
-        SendPacketToPlayer(PlayerDpid_00457d30(from), PlayerDpid_00457d30(to), &packet, sizeof(packet));
+        SendPacketToPlayer(PlayerDpid_00457d30(from), PlayerDpid_00457d30(to), (unsigned char *)&packet, sizeof(packet));
     }
 }
 
@@ -3029,7 +3004,7 @@ void __stdcall SendPlayerEconomy(Player* player, Player* target,
 
     if (target != 0) {
         if (target->rejectReason == 0)
-            SendPacketToPlayer(player->id, target->id, &packet, 0x3a);
+            SendPacketToPlayer(player->id, target->id, (unsigned char *)&packet, 0x3a);
         return;
     }
 
@@ -3042,7 +3017,7 @@ void __stdcall SendPlayerEconomy(Player* player, Player* target,
             continue;
         if (g_game->players[i].rejectReason != 0)
             continue;
-        SendPacketToPlayer(player->id, g_game->players[i].id, &packet, 0x3a);
+        SendPacketToPlayer(player->id, g_game->players[i].id, (unsigned char *)&packet, 0x3a);
     }
 }
 
@@ -3100,7 +3075,7 @@ void __stdcall HandlePlayerEconomy(PlayerViewStatePacket* packet, Player* player
             team.ackMapping = 1;
         else
             team.ackMapping = 0;
-        SendPacketToPlayer(p->id, player->id, &team, 3);
+        SendPacketToPlayer(p->id, player->id, (unsigned char *)&team, 3);
         if (g_game->list_391ed->CheckVictory() != 0)
             continue;
         if (p->shareLos[player->index] != 0)
@@ -3410,7 +3385,7 @@ void __stdcall UpdateResourceSharing(Player* player)
                     packet.toNetId = PlayerDpid_00457d30(b);
                     packet.amount = 0;
                     SendPacketToPlayer(PlayerDpid_00457d30(a), PlayerDpid_00457d30(b),
-                                 &packet, sizeof(packet));
+                                 (unsigned char *)&packet, sizeof(packet));
                 }
             }
         }

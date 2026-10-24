@@ -64,20 +64,18 @@ extern Game_00444580* g_game;
 extern LinkInfo g_linkInfo[];
 extern char DAT_004fcfb8[];
 
-void __stdcall CloseTopScreen(void* menu);
-void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
+#include "../graphics/palette.h"
 void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* copy);
 Gadget_00444580* __stdcall LoadGuiLayer(void* menu, char* name, int size);
 void __stdcall HandleSelectProviderClick(void* menu);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
 #include "../network/online_45b490.h"
 void __stdcall SetTranslatedText(void* menu, int index, int source, int value);
 void __stdcall ConfigureListBoxByName(void* menu, char* name, void* items, int count, int flag);
 #include "frontend.h"
 void __stdcall SetKeyboardInput(void* menu, int value);
-void __stdcall RenderLayer(void* menu, int value);
 
 static int __stdcall CloneServiceSlot(Entry_00444580* entries, int from, short y, int source, char* name)
 {

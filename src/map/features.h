@@ -1,5 +1,11 @@
 #ifndef FEATURES_H
 #define FEATURES_H
+struct Cell;
+struct Feature;
+struct Point16;
+struct Unit;
+struct Vec3;
+struct Weapon;
 
 class HapiBank;
 class TdfFile;
@@ -28,5 +34,10 @@ void __stdcall ReplaceFeatureWithBurnt(Obj* obj);
 void __stdcall UpdateFeatures();
 void __stdcall RemoveAllFeatures(void);
 void __stdcall SaveFeatures(HapiBank* file);
+
+Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def);
+int __stdcall ReclaimFeature(Unit* unit, Vec3* pos);
+void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon);
+int __stdcall RemoveFeature(Cell* cell, int flag);
 
 #endif

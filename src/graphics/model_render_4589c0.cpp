@@ -63,7 +63,6 @@ union GameFlags_459200 {
 
 class Surface;
 
-void __stdcall SurfaceFromFrame(Surface_4589c0* dst, GafFrame* src);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
 
 template <class T> inline void Swap(T& a, T& b)

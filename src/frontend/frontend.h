@@ -30,4 +30,10 @@ void __stdcall EmptyMainLoopHook(void);
 void __stdcall EmptyMainLoopHook_B(void);
 void __stdcall EmptyMainLoopHook_C(void);
 
+void __stdcall BlankScreen();
+void __stdcall FreePictureCache();
+int __stdcall MainLoopContinueStub(void);
+int __stdcall MainLoopContinueStub_B(void);
+int __stdcall MainLoopContinueStub_C(void);
+
 #endif

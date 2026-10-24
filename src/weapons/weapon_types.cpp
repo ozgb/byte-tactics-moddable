@@ -46,20 +46,19 @@ inline Entry_00432cf0* Table_00499cd0::LowerBound(const char* key) {
 
 #include "../../link/globals.h"
 
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall FatalError(char* path);
+#include "../game/data_files.h"
+#include "../graphics/display.h"
 #include "../graphics/pcx.h"
 void __stdcall MirrorObject(void* p);
 void __stdcall BindModelTextures(void* a, char* b);
 #include "../game/data_files.h"
 void* __stdcall FindGafEntry(void* a, char* b);
-int __stdcall LoadSoundByName(void* a, char* b);
 
 #include "../files/files_api.h"
 #include "weapon_types.h"
 #include "../game/cd_check.h"
 extern void __cdecl operator delete(void*);
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x42e310
 void LoadWeaponTypes()

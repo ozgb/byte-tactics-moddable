@@ -1,9 +1,9 @@
 #include "win_types.h"
 #include <stdio.h>
 struct Unit;
-void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
+#include "unit_orders_406c70.h"
 namespace std {
-inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
+inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }
 #include <vector>
 #include <list>
@@ -18,7 +18,6 @@ struct Unit;
 struct Order;
 
 #ifndef __clang__
-void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
 namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
 }
@@ -111,7 +110,6 @@ struct Mover {
 #include "air_maneuver_order.h"
 
 #include "../ingame/control_panel.h"
-void InitMissionStatus();
 
 class Class_0044e6c0 { public: void SetAltitude(int); };
 class Class_0044e730 { public: void SetApproachRadius(int); };
@@ -147,21 +145,17 @@ int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 short __cdecl AngleOfVector(int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall QueueUnitSpeech(Unit*, int, const char*);
-int __stdcall IssueAttackOrder(Unit*, Unit*, int);
+#include "order_list.h"
 #include "order_list.h"
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
 #include "../../interfaces/seams.h"
-void __stdcall SetWeaponTargetPos(Unit*, Vec3*, int);
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
 void __stdcall StartBuildingScript(Unit*, Order*, short);
-int __stdcall WaitIfNotInBuildStance(Unit*, Order*, int);
+#include "order_queue_4384a0.h"
 void __stdcall EmitNanoParticles(Vec3*, Box*, int);
 void __stdcall EmitReverseNanoParticles(Box*, Vec3*, int);
-void __stdcall ReclaimFeature(Unit*, Vec3*);
 void __stdcall DamageUnit(Unit*, Unit*, int, int, int);
 int __stdcall SendScriptCallByName(Unit*, char*, char, int, int, int, int);
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 void __stdcall DrawUnit(void*, Unit*);
 
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b);
@@ -749,7 +743,6 @@ void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b)
 #pragma auto_inline(on)
 
 void WriteScreenshot(char*, char*, int, int, int, int);
-void DrawTextClipped(void*, char*, int, int, int, int);
 void SubtractVec3(int*, int*, int*, int*, int*);
 
 // FUNCTION: 0x414e70

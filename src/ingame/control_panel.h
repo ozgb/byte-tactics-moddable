@@ -1,5 +1,7 @@
 #ifndef CONTROL_PANEL_H
 #define CONTROL_PANEL_H
+struct Gadget;
+struct Unit;
 
 struct Gadget;
 struct Gui;
@@ -46,5 +48,12 @@ void __stdcall BeginMouseScroll();
 void __stdcall EndMouseScroll();
 void __stdcall UpdateMouseScroll();
 void __stdcall UpdateEdgeScroll();
+
+int __stdcall UpdatePlacementGhostValidity(void);
+int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries);
+void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page);
+void __stdcall OpenGeneratorDialog(Unit* unit);
+void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit);
+void __cdecl ClearCameraFollowState();
 
 #endif

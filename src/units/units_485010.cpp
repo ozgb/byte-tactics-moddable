@@ -325,7 +325,6 @@ template<class _RI, class _Ty, class _Pr> void __stdcall QuickSort(_RI _F, _RI _
 
 #include <algorithm>
 
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 #include "units_485010.h"
 
 // FUNCTION: 0x4854a0
@@ -387,7 +386,7 @@ int __stdcall ComparePlayers(Player* a, Player* b)
     return a < b;
 }
 
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x485980
 void FreeUnitMemory(void)
@@ -517,7 +516,7 @@ struct BmpInfoHeader;
 
 void* __cdecl operator new(size_t size);
 ObjectState_00485d40* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, int player);
-ObjectState_00485d40* __stdcall CreateObjectState(Object3do* obj);
+#include "../graphics/model_render.h"
 
 // FUNCTION: 0x485d40
 void __stdcall InitUnitScript(Unit* self)
@@ -750,8 +749,7 @@ struct UnitKilledPacket {
 #pragma pack(pop)
 
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
-void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int param);
-void __stdcall PopUntilNamedLayout(int param);
+#include "../game/game_state.h"
 
 // FUNCTION: 0x4864b0
 void __stdcall KillUnit(Unit* unit, int param_2)
@@ -812,10 +810,10 @@ void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
 #include "../ingame/dialogs_493340.h"
 char* __stdcall Translate(char* text);
 void __stdcall AddMessage(char* text, int a, int b, int c);
-void __stdcall ClearUnitRefs(void* unit);
+#include "unit_targets.h"
 void __stdcall FreeObjectState(void* state);
 void __cdecl operator delete(void* p);
-void __stdcall AnnounceForcesDestroyed(void* player);
+#include "../frontend/skirmish_menu.h"
 
 // FUNCTION: 0x4866d0
 void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)

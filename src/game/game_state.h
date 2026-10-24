@@ -24,4 +24,7 @@ void __stdcall UpdateBattleHoverMode(int unused);
 void __stdcall CloseTopScreenIfNotNamed();
 void __stdcall FreePreviewCaches();
 
+void __stdcall SetGameSpeed(int speed, int broadcast);
+int __stdcall PopUntilNamedLayout(int force);
+
 #endif

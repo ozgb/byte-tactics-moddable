@@ -12,8 +12,6 @@
 #include "tdf.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
-void CopyDwordIfNonNull(int*, int*);
-int GetBuildRating(int, unsigned short);
 
 static inline bool operator==(const StringRef& a, const StringRef& b)
 {

@@ -68,7 +68,6 @@ struct ActivateFlagsPacket {
 
 inline unsigned char Unit::GetState() { return activateFlags; }
 
-void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
 #include "../ingame/control_panel.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 

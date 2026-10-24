@@ -1,5 +1,6 @@
 #ifndef DIALOGS_493340_H
 #define DIALOGS_493340_H
+struct Gui;
 
 struct Gadget;
 struct Gui;
@@ -25,5 +26,7 @@ void __stdcall OpenMain2Layout();
 void __stdcall UpdateFramePacing();
 void __stdcall RunGameSteps(int showStats);
 void __stdcall HandleDebugHotkey(int eventType);
+
+void __stdcall HandleMain2LayoutEvent(Gui* gadget);
 
 #endif

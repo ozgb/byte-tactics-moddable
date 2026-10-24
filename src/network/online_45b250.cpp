@@ -3,7 +3,7 @@
 #include "../../interfaces/host.h"
 
 char* __stdcall Translate(char* text);
-void __stdcall OnlineTranslate(char* text);
+#include "online.h"
 
 // FUNCTION: 0x45b250
 int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int size)

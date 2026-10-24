@@ -33,7 +33,7 @@ struct Table_00487bf0 {
 
 #include "../orders/mission_type.h"
 
-unsigned short __stdcall FindUnitTypeId(const char* name);
+#include "unit_commands.h"
 
 union MissionSlot {
     MissionType type;
@@ -237,7 +237,7 @@ struct UnitType_00488b10 {
 UnitType_00488b10* __stdcall FindUnitType(const char* name);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
                                       Vec3_00487bf0 pos, int a, int b, int c);
-void __stdcall FatalError(char* message);
+#include "../graphics/display.h"
 
 #include <math.h>
 #include <memory.h>

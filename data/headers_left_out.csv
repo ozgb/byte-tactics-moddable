@@ -1,0 +1,480 @@
+name,kind,reason
+AddBarGadget,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+AddBlinkWord,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+AddButtonGadget,mismatch,placeholder type Record_004ab2b0: left for the type-naming issues
+AddExplosionEffect,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+AddHotspotGadget,mismatch,placeholder type Record_004ab310: left for the type-naming issues
+AddMessage,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+AddObjectBounds,skip,placeholder type Object_004cb2f0: left for the type-naming issues
+AddOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+AddTextGadget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+AddTimer,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+AddUnitToMap,mismatch,placeholder type Obj_0047cc30: left for the type-naming issues
+AddVec3,ambiguous,several definitions share the name
+AdjustBuildCount,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+AdvanceGafSequence,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+AimCobStub,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+AimWithinTolerance,mismatch,fixing it changes the generated code of a caller
+AllocAlphaTable,mismatch,pointer/int cast: definition's type is likely wrong
+AllocDepthFrame,mismatch,fixing it changes the generated code of a caller
+AllocSurface,mismatch,pointer/int cast: definition's type is likely wrong
+ApplyAreaDamageAt,skip,placeholder type Vec3_0049a0c0: left for the type-naming issues
+ApplyMissionOptionFlags,skip,placeholder type Settings_00496e10: left for the type-naming issues
+ApplyProjectileHitPacket,mismatch,pointer/int cast: definition's type is likely wrong
+ApplySlidersToPaletteEntry,skip,placeholder type PalEntry_004aa8f0: left for the type-naming issues
+ApplyWeaponFirePacket,mismatch,pointer/int cast: definition's type is likely wrong
+AssignQuickKey,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+AttachUnitToPiece,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+AveragePrimitiveY,skip,placeholder type Object_004cb2f0: left for the type-naming issues
+BindModelTextures,mismatch,placeholder type Model_0042a140: left for the type-naming issues
+BlitFeatureGaf,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+BlitGafFrameAtOffset,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+BlitLayers,mismatch,placeholder type Rect_004b6720: left for the type-naming issues
+BlitMenuLayers,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+BlitSideLogoToRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+BroadcastPacket,mismatch,fixing it changes the generated code of a caller
+BroadcastWeaponFire,skip,placeholder type Vec3_00499ba0: left for the type-naming issues
+BuildBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
+BuildColorRemapTable,skip,placeholder type PalEntry_004aa8f0: left for the type-naming issues
+BuildGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
+CalcAimAngles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+CanBuildAt,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+CanPlaceUnitFootprint,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+CaptureBackgroundAndDrawCursor,skip,placeholder type Obj_004c2380: left for the type-naming issues
+CheckAlliedVictory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+CheckMapCrc,ambiguous,several definitions share the name
+ClampPositionToMap,skip,placeholder type Vec3_004853b0: left for the type-naming issues
+ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
+ClickSelectHoverUnit,mismatch,placeholder type Param_0048c7f0: left for the type-naming issues
+CollectSelectedUnits,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+CompareOrderTypeNames,skip,placeholder type Elem_0043c390: left for the type-naming issues
+ComputeUnitScriptChecksum,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+ConfigureListBoxByName,mismatch,fixing it changes the generated code of a caller
+CopyPathLockFields,skip,placeholder type Dst_00440ca0: left for the type-naming issues
+CopyStructRange,skip,placeholder type Elem_00470a40: left for the type-naming issues
+CountHumanSlots,ambiguous,several definitions share the name
+CreatePlayerObjectState,mismatch,placeholder type BuildList_0045a950: left for the type-naming issues
+CreateUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+CreateUnitFromPacket,mismatch,placeholder type Spawn_004861d0: left for the type-naming issues
+CrossProduct,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+CutFrameBelow,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DAT_004fcfb8,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+DAT_00512c80,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+DPAID_ComPort,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+DPAID_INet,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+DPAID_Modem,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+DPAID_Phone,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+DPAID_ServiceProvider,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+DamageUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DecodePcx,skip,placeholder type PCX_004caa40: left for the type-naming issues
+DecrementCountArgument,skip,placeholder type Count_00458d20: left for the type-naming issues
+DeleteOrder,mismatch,pointer/int cast: definition's type is likely wrong
+DestroyLine,skip,placeholder type Elem_00434360: left for the type-naming issues
+DetonateProjectile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+DrawButton,mismatch,fixing it changes the generated code of a caller
+DrawCellContours,skip,placeholder type Point_00417f60: left for the type-naming issues
+DrawColorCellOutline,skip,placeholder type Object_004ac970: left for the type-naming issues
+DrawExplosions,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawFogOfWar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawFrameBlended,mismatch,pointer/int cast: definition's type is likely wrong
+DrawFrameQuad,mismatch,placeholder type Quad_004c7580: left for the type-naming issues
+DrawGadgetSelectionBox,mismatch,fixing it changes the generated code of a caller
+DrawGafBar,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
+DrawHitPointBar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawLineGadget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawListboxFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawLitRectangle,mismatch,pointer/int cast: definition's type is likely wrong
+DrawMapDebugOverlay,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawMapTileSelectionOutline,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawMapTiles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawMessages,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawModel3doProjected,mismatch,placeholder type Object_0046bae0: left for the type-naming issues
+DrawNetworkStats,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawOptionsScrollBar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawParticleList,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawProfileBarLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawProgressBar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawProjectiles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawRadar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawRaisedBox,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawRangeCircle,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawRectangle,mismatch,pointer/int cast: definition's type is likely wrong
+DrawScorePanel,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawSelectedGoal,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawSelectedUnitOrderOverlays,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawSelectionBox,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawSliderBar,mismatch,placeholder type Object_004a2580: left for the type-naming issues
+DrawStatusPanel,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawSurface,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+DrawTextInput,mismatch,fixing it changes the generated code of a caller
+DrawTile,mismatch,pointer/int cast: definition's type is likely wrong
+DrawTriangleContours,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawUnitInfoPanel,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+DrawUnitRangeRings,mismatch,pointer/int cast: definition's type is likely wrong
+DrawWorldDeltaLine,skip,placeholder type Pos_00417bb0: left for the type-naming issues
+DrawWrappedText,mismatch,fixing it changes the generated code of a caller
+EmitBlackSmoke,mismatch,pointer/int cast: definition's type is likely wrong
+EmitJitteredThrustParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+EmitNanoParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+EmitReverseNanoParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+EmitSmoke,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+EmitTeleportParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+EmitWhiteSmoke,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+EmptyPostArchiveMountHook,mismatch,pointer/int cast: definition's type is likely wrong
+EnumModesCallback,skip,unknown name host_display_mode
+ExceptionFilter,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+ExecuteCommandLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FUN_004a14c0,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
+FillMissionList,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FillPolygon,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FillRectangle,mismatch,fixing it changes the generated code of a caller
+FillShadedPolygon,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FindFreeColor,ambiguous,several definitions share the name
+FindGadgetChecked,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
+FindGadgetChecked_B,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
+FindGadgetChecked_C,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+FindGadgetChecked_D,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
+FindGadgetChecked_E,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
+FindGadgetIndex,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
+FindGadgetIndexBySubstring,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+FindGadgetOrNull,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
+FindGafEntry,mismatch,placeholder type GafEntry_004b8d40: left for the type-naming issues
+FindHighestPointOnLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FindHostSlot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FindLandingPad,ambiguous,several definitions share the name
+FindLeftmost,skip,placeholder type Node_004dd1b0: left for the type-naming issues
+FindMissionUnit,mismatch,placeholder type Struct_00487af0: left for the type-naming issues
+FindNextSelectedUnit,mismatch,pointer/int cast: definition's type is likely wrong
+FindOrderByType,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FindRemoteProjectile,skip,placeholder type Event_0049d1e0: left for the type-naming issues
+FindTargetableProjectile,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FindUnitType,mismatch,placeholder type UnitType_00488b10: left for the type-naming issues
+FindWeaponTarget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FinishUnitSync,ambiguous,several definitions share the name
+FireBallisticProjectile,mismatch,placeholder type Shot_0049cde0: left for the type-naming issues
+FireDroppedWeapon,mismatch,placeholder type Aim_0049dd60: left for the type-naming issues
+FireLineOfSightProjectile,mismatch,placeholder type Fire_0049c9c0: left for the type-naming issues
+FireLineOfSightWeapon,mismatch,placeholder type Aim_0049d9c0: left for the type-naming issues
+FireVLaunchProjectile,mismatch,fixing it changes the generated code of a caller
+FireVLaunchWeapon,mismatch,placeholder type Object_0049db70: left for the type-naming issues
+FireWeaponByFlags,skip,placeholder type Object_0049d0c0: left for the type-naming issues
+FlipScreen,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FontHeight,mismatch,pointer/int cast: definition's type is likely wrong
+FormatNetStats,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+FrameFromSurface,mismatch,placeholder type Src_004b8ae0: left for the type-naming issues
+FreeBlinkWords,mismatch,pointer/int cast: definition's type is likely wrong
+FreeCobScript,mismatch,pointer/int cast: definition's type is likely wrong
+FreeCommonGuiGaf,skip,placeholder type Obj_004aef80: left for the type-naming issues
+FreeGafSlot,skip,placeholder type Obj_004aeda0: left for the type-naming issues
+FreeLightTable,mismatch,pointer/int cast: definition's type is likely wrong
+FreeObjectState,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+GameAllocThunk,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+GameReallocTagged,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+GetBasePosition,mismatch,fixing it changes the generated code of a caller
+GetBlockMap,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+GetButtonStage,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+GetButtonStageByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+GetCellHeight,mismatch,placeholder type Point16_00485010: left for the type-naming issues
+GetCellMeanHeight,skip,placeholder type Pos_00485070: left for the type-naming issues
+GetCellPosition,skip,placeholder type Pos_00485070: left for the type-naming issues
+GetCobChecksum,mismatch,pointer/int cast: definition's type is likely wrong
+GetDisplay,mismatch,pointer/int cast: definition's type is likely wrong
+GetDisplayModes,mismatch,placeholder type ModeList_004b5330: left for the type-naming issues
+GetEnergyIncome,mismatch,pointer/int cast: definition's type is likely wrong
+GetEnergyUsage,mismatch,pointer/int cast: definition's type is likely wrong
+GetFactoriesInRadius,skip,qualified name std::vector
+GetFootprintHeight,mismatch,placeholder type Unit_0047d820: left for the type-naming issues
+GetFreedBlockRing,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+GetGadgetActiveByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+GetGadgetName,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
+GetGadgetStatus,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+GetGadgetText,mismatch,fixing it changes the generated code of a caller
+GetGafFrame,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+GetGafFrameCount,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+GetGafFrameDuration,skip,placeholder type Obj_004b7f70: left for the type-naming issues
+GetGafSequenceFrame,mismatch,placeholder type Handle_004b7ee0: left for the type-naming issues
+GetGroundHeight,mismatch,placeholder type Pos_00485070: left for the type-naming issues
+GetHeadingBetween,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+GetHostDpid,ambiguous,several definitions share the name
+GetLocalizedString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+GetMetalIncome,mismatch,pointer/int cast: definition's type is likely wrong
+GetMetalUsage,mismatch,pointer/int cast: definition's type is likely wrong
+GetMirroredBasePosition,skip,placeholder type Struct_0040bab0: left for the type-naming issues
+GetObjectBounds,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
+GetObjectHeight,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
+GetOrderCursor,ambiguous,several definitions share the name
+GetOrderTarget,mismatch,pointer/int cast: definition's type is likely wrong
+GetOrderType,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+GetPieceAngles,mismatch,placeholder type Obj_0043e180: left for the type-naming issues
+GetPieceCenter,skip,placeholder type Obj_0043e0b0: left for the type-naming issues
+GetPieceOffset,mismatch,placeholder type Object_0043def0: left for the type-naming issues
+GetSessionGuidInstance,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+GetSweetSpot,skip,placeholder type Obj_0043e3c0: left for the type-naming issues
+GetTextPixelWidth,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+GetTextWidth,mismatch,pointer/int cast: definition's type is likely wrong
+GetTicks,mismatch,fixing it changes the generated code of a caller
+GetVisibleEnemiesInRadius,skip,qualified name std::vector
+GetWeaponPiecePosition,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+GetWeaponRange,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+GetWeaponTargetPos,skip,placeholder type Vec3_0048a1e0: left for the type-naming issues
+GroundPickupOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+HAPI_FileLength,ambiguous,several definitions share the name
+HAPI_PackDirectory,skip,unknown name cb
+HAPI_RelocateDirectory,mismatch,pointer/int cast: definition's type is likely wrong
+HAPI_WriteArchiveData,skip,unknown name cb
+HandleCloseCdPlayerChoice,skip,placeholder type Gadget_00426190: left for the type-naming issues
+HandleEffectsVolumeSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
+HandleGameSpeedSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
+HandleGammaSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
+HandleHostEvent,skip,unknown name host_event
+HandleHotspotInput,mismatch,fixing it changes the generated code of a caller
+HandleLabelInput,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+HandleListBoxInput,mismatch,fixing it changes the generated code of a caller
+HandleMainMenuClick,skip,placeholder type Gadget_00425d80: left for the type-naming issues
+HandleMaxLinesSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
+HandleMusicOptionsClick,mismatch,placeholder type Object_0045d280: left for the type-naming issues
+HandleMusicVolumeSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
+HandleRestrictionsClick,mismatch,placeholder type Menu_0044c420: left for the type-naming issues
+HandleScreenSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
+HandleSelectProviderClick,mismatch,placeholder type Menu_004441a0: left for the type-naming issues
+HandleSliderInput,mismatch,placeholder type Object_004a4170: left for the type-naming issues
+HandleSoundOptionsClick,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+HandleSpeedOptionsClick,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+HandleTextScrollSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
+HandleVideoModeSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
+HideSoftwareCursor,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+InitCursorFrames,mismatch,pointer/int cast: definition's type is likely wrong
+InitFeatureAnimPool,skip,placeholder type List_00421f20: left for the type-naming issues
+InitGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming issues
+InitNetConnection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+InitPacketTables,mismatch,placeholder type Class_00451fd0: left for the type-naming issues
+InitProjectile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+InsertShift,skip,placeholder type Item_00485940: left for the type-naming issues
+InsertionSortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+IsAboveRectTop,skip,placeholder type Obj_004a1950: left for the type-naming issues
+IsBelowRectBottom,skip,placeholder type Struct_004a1970: left for the type-naming issues
+IsCountBelowAiLimit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+IsFootprintVisible,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+IsGadgetNamed,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
+IsPointVisible,mismatch,placeholder type Map_00408090: left for the type-naming issues
+IsUnitVisibleToPlayer,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+IssueMobileBuildOrders,mismatch,placeholder type Arg_00419670: left for the type-naming issues
+IssueOrCancelOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+IssueOrderToSelection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+JoinLobbyGameThread,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+JoinNetGame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+LeaveNetGameCallback,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+LoadBitmapByName,mismatch,fixing it changes the generated code of a caller
+LoadCobScript,mismatch,placeholder type Data_004b2450: left for the type-naming issues
+LoadFeatureType,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+LoadGaf,mismatch,pointer/int cast: definition's type is likely wrong
+LoadGafFile,mismatch,placeholder type Object_004aeee0: left for the type-naming issues
+LoadGafIntoSlot,mismatch,placeholder type Object_004aedd0: left for the type-naming issues
+LoadGuiLayer,mismatch,pointer/int cast: definition's type is likely wrong
+LoadPcx,mismatch,placeholder type Bitmap_004caec0: left for the type-naming issues
+LoadPictureCached,mismatch,fixing it changes the generated code of a caller
+LoadReporterDll,mismatch,pointer/int cast: definition's type is likely wrong
+LoadThreadMain,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+LockScreen,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+LowerBoundOrderTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+MakeBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
+MakeGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
+MinimapCursorToWorldPos,skip,placeholder type Pos_00498d00: left for the type-naming issues
+MirrorObject,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
+MoveToward,skip,placeholder type Vec3_0040beb0: left for the type-naming issues
+NormalizeVector,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+OffsetWorldPosFromView,skip,placeholder type Point_00498cd0: left for the type-naming issues
+OrderSquad,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+Partition,skip,placeholder type Item_00485940: left for the type-naming issues
+PickRandomReclaimableResourcesInRadius,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+PlaceFeature,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+PlayLoopingWavMemory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+PlaySoundAt,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+PlaySoundAtByName,mismatch,pointer/int cast: definition's type is likely wrong
+PlaySoundByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+PlayWavMemory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+PointInRect,mismatch,pointer/int cast: definition's type is likely wrong
+PopHeapFirst,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+PopMouseEvent,mismatch,fixing it changes the generated code of a caller
+QuickSort,skip,placeholder type Item_00485940: left for the type-naming issues
+RIReport,mismatch,pointer/int cast: definition's type is likely wrong
+ReadButtonFields,skip,placeholder type Obj_004adc70: left for the type-naming issues
+ReadCommonSection,skip,placeholder type Common_004ad350: left for the type-naming issues
+ReadFontFilenameField,skip,placeholder type Obj_004ae4b0: left for the type-naming issues
+ReadGuiFile,mismatch,placeholder type Elem_004aeac0: left for the type-naming issues
+ReadHotOrNotField,skip,placeholder type Obj_004ae410: left for the type-naming issues
+ReadListBoxFields,skip,placeholder type Param2_004addf0: left for the type-naming issues
+ReadNuttinField,skip,placeholder type StructA_004ae610: left for the type-naming issues
+ReadPanelFields,skip,placeholder type Obj_004ad890: left for the type-naming issues
+ReadSliderFields,skip,placeholder type Obj_004ae170: left for the type-naming issues
+ReadSoundEntry,skip,placeholder type Source_0042f450: left for the type-naming issues
+ReadStatusField,skip,placeholder type StructA_004ada10: left for the type-naming issues
+ReadSurfFilenameField,skip,placeholder type Obj_004ae550: left for the type-naming issues
+ReadTextInputFields,skip,placeholder type Obj_004adf10: left for the type-naming issues
+ReadTextLinkFields,skip,placeholder type Obj_004ae300: left for the type-naming issues
+RedrawMouseCursor,skip,placeholder type Obj_004c2380: left for the type-naming issues
+RefreshPassMapsForUnit,mismatch,placeholder type Struct_00440a70: left for the type-naming issues
+RegisterCommand,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+RegisterOrderTypes,mismatch,placeholder type Elem_0043c390: left for the type-naming issues
+RegisterUnitOrders,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+RejectPlayer,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+ReleasePacketData,mismatch,placeholder type Class_00451fd0: left for the type-naming issues
+RelocateObject,skip,placeholder type Object_004cb2f0: left for the type-naming issues
+RemapPaletteToClosestIndices,mismatch,placeholder type Palette_004aa8f0: left for the type-naming issues
+RemoveSpeechOfUnit,mismatch,pointer/int cast: definition's type is likely wrong
+RemoveUnitFromMap,mismatch,placeholder type Obj_0047db20: left for the type-naming issues
+RemoveUnitProjectiles,mismatch,placeholder type Unit_0049c880: left for the type-naming issues
+ReportGameChat,mismatch,pointer/int cast: definition's type is likely wrong
+ResetClipRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+ResetListBox,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
+ResolveCursorModeForSelection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+RestoreCursorBackground,skip,placeholder type Obj_004c2380: left for the type-naming issues
+RestoreSurfaces,skip,placeholder type Arg_004c6210: left for the type-naming issues
+RockUnit,skip,placeholder type Object_00499c10: left for the type-naming issues
+RotateAboutX,skip,placeholder type Vec3_004b6cc0: left for the type-naming issues
+RotateAboutY,skip,placeholder type Vec3_004b6cc0: left for the type-naming issues
+RotateAboutZ,skip,placeholder type Vec3_004b6cc0: left for the type-naming issues
+RotateByAngles,mismatch,placeholder type Vec3_004b6cc0: left for the type-naming issues
+RunInitialMission,skip,placeholder type Table_00487bf0: left for the type-naming issues
+SaveBmp,skip,placeholder type Bitmap_004caec0: left for the type-naming issues
+SaveSurfacePcx,skip,placeholder type Bitmap_004caec0: left for the type-naming issues
+ScaleUnitWeights,mismatch,fixing it changes the generated code of a caller
+ScanDirectory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SelectAdjacentGadget,mismatch,fixing it changes the generated code of a caller
+SelectFontForEntry,mismatch,fixing it changes the generated code of a caller
+SendChatMessage,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SendPlayerEconomy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SendScriptCall,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SendScriptCallByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SendWeaponFirePacket,skip,placeholder type Obj_00499ab0: left for the type-naming issues
+SerializeSave,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetAlliance,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetBackgroundSurface,mismatch,pointer/int cast: definition's type is likely wrong
+SetBrightness,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetButtonStage,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetButtonStageByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetCloseHandler,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetControlTextByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetCursorAnimation,mismatch,placeholder type Src_004ab400: left for the type-naming issues
+SetCursorMode,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetDefaultCommandHandler,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetDescListCleanupFlag,mismatch,pointer/int cast: definition's type is likely wrong
+SetFont,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetFrontendState,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetGadgetActive,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetGadgetActiveByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+SetGadgetColorByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetGadgetGrayedOut,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetGadgetGrayedOutByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetGadgetItems,mismatch,placeholder type Table_004a36a0: left for the type-naming issues
+SetGadgetRows,mismatch,placeholder type Table_004a35a0: left for the type-naming issues
+SetGadgetStatus,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetGadgetStatusByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetGadgetText,mismatch,placeholder type Object_004a0880: left for the type-naming issues
+SetGadgetTextByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetGadgetTextFromValueTable,skip,placeholder type Entry_0045c010: left for the type-naming issues
+SetGafSequenceFrame,skip,placeholder type Obj_004b7f00: left for the type-naming issues
+SetGrayedOut,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetGrayedOutByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetKeyboardInput,mismatch,pointer/int cast: definition's type is likely wrong
+SetMediaNotifyCallback,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetOffscreenSurface,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetQuickKeyByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetTextColors,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SetTranslatedText,mismatch,fixing it changes the generated code of a caller
+SetTranslatedTextByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
+SetUnitLimits,mismatch,fixing it changes the generated code of a caller
+SettleResourceAccount,skip,placeholder type Obj_00401320: left for the type-naming issues
+SetupPlayerSlot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+ShowErrorBox,mismatch,pointer/int cast: definition's type is likely wrong
+ShowSoftwareCursor,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SolveLaunchAngle,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SortDisplayModes,mismatch,placeholder type ModeList_0045e4c0: left for the type-naming issues
+SortPrimitives,skip,placeholder type Object_004cb2f0: left for the type-naming issues
+SortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+SpawnProjectileFromUnitMotion,skip,placeholder type Shot_0049d000: left for the type-naming issues
+StartBuildingScript,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+StartMouseThread,skip,placeholder type Obj_004c2380: left for the type-naming issues
+StepGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming issues
+StopMouseThread,skip,placeholder type Obj_004c2380: left for the type-naming issues
+SubtractVec3,mismatch,fixing it changes the generated code of a caller
+SumUnitRatingsInRange,mismatch,placeholder type Vec_0040b1c0: left for the type-naming issues
+SwapPrimitives,skip,placeholder type Primitive_004cb2f0: left for the type-naming issues
+TickProgressBar,skip,src/gui/gui.cpp defines a static TickProgressBar and sees src/gui/gui.h
+TintFrameBelow,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+ToggleAnyMission,skip,placeholder type Object_00477510: left for the type-naming issues
+TransferEnergy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+TransferMetal,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+Translate,mismatch,pointer/int cast: definition's type is likely wrong
+TranslateGadgetItems,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
+TruncateTextWithEllipsis,mismatch,pointer/int cast: definition's type is likely wrong
+TryGetDesiredHeading,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+TrySetFocus,mismatch,fixing it changes the generated code of a caller
+UnlockScreen,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+UpdateCursorWorldPos,mismatch,placeholder type View_00498da0: left for the type-naming issues
+UpdateHelpText,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
+UpdateMaxUnitsText,mismatch,fixing it changes the generated code of a caller
+UpdateMenu,mismatch,fixing it changes the generated code of a caller
+UpdateMetalText,mismatch,fixing it changes the generated code of a caller
+UpdatePlayerEconomy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+UpdateTimeoutDialog,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+UpdateVideoModeLabel,skip,placeholder type Menu_0045b800: left for the type-naming issues
+VectorFromTo,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+VectorFromToInt,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+VectorLength,mismatch,placeholder type Vec3i_0049a850: left for the type-naming issues
+VisitObjectsInRect,skip,placeholder type Visitor_0047e750: left for the type-naming issues
+WalkFrameChain,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+WalkStack,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+WeaponCanReachPos,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+WorldToScreenWithHeight,skip,placeholder type Pos_00417bb0: left for the type-naming issues
+WriteButtonFields,skip,placeholder type Obj_004ada40: left for the type-naming issues
+WriteCommonFields,skip,placeholder type Common_004ad350: left for the type-naming issues
+WriteFontFilenameField,skip,placeholder type Obj_004ae440: left for the type-naming issues
+WriteHotOrNotField,skip,placeholder type Obj_004ae380: left for the type-naming issues
+WriteListBoxFields,skip,placeholder type Struct_004add60: left for the type-naming issues
+WriteNuttinField,skip,placeholder type Obj_004ae580: left for the type-naming issues
+WritePanelFields,skip,placeholder type Obj_004ad4f0: left for the type-naming issues
+WriteScreenshot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
+WriteSliderFields,skip,placeholder type Obj_004ae170: left for the type-naming issues
+WriteStatusField,skip,placeholder type Struct_004ad980: left for the type-naming issues
+WriteSurfFilenameField,skip,placeholder type Obj_004ae4e0: left for the type-naming issues
+WriteTextInputFields,skip,placeholder type Obj_004ade20: left for the type-naming issues
+WriteTextLinkFields,skip,placeholder type Obj_004ae230: left for the type-naming issues
+g_airManeuverOrderVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_approachRadiusVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_briefingPlanetFrameCursor,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_broadcastPeersSeen,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_cdActivityRingWriteIdx,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_cdListsDiscEntries,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_cheatCommands,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_consoleCommands,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_debugCommands,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_displayContext,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_dpspGuidIpx,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_dpspGuidModem,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_dpspGuidSerial,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_dpspGuidTcpip,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_freedBlockRing,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_game,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_gfxBlitLockHeld,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_linkInfo,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_loadingBarFlashDecayTick,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_optionsFlipFrame,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_optionsPrefsSnapshot,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_particlePool,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_pathOrderVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_pictureCache,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_pointMarkerVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_readyOrder,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_reportPlayerName,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_ringApproachVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_scorePanelSlidePos,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_squashDictTree,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_squashThreadLockTicket,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_timerSlots,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_vtolOrders,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
+g_weaponAimCobVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses

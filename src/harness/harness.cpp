@@ -21,7 +21,7 @@
 #include "../map/map_list.h"
 #include "../game/players_464290.h"
 #include "../frontend/skirmish_menu.h"
-void InitMissionStatus();
+#include "../frontend/endgame.h"
 #include "../debug/debug_lib.h"
 
 enum { MAX_PLAYERS = 10 };
@@ -2618,7 +2618,7 @@ enum {
 
 void __stdcall IssueOrderToSelection(void* mouse, int mode, int kind, int* pos, int typeId, int amount);
 void __stdcall IssueMobileBuildOrders(void* mouse);
-int UpdatePlacementGhostValidity(void);
+#include "../ingame/control_panel.h"
 int __stdcall GetGroundHeight(int* pos);
 
 static unsigned char* PoolUnit(unsigned index)
@@ -2752,7 +2752,7 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
     free(selected);
 }
 
-void __stdcall ApplyUnitDeath(void* cmd, int local);
+#include "../units/units_485010.h"
 
 static void ReachQuirkGuard()
 {
@@ -2760,7 +2760,7 @@ static void ReachQuirkGuard()
         unsigned char cmd[PACKET_UNIT_DEATH_SIZE];
         memset(cmd, 0, sizeof cmd);
         cmd[0] = PACKET_UNIT_DEATH;
-        ApplyUnitDeath(cmd, 0);
+        ApplyUnitDeath((UnitKilledPacket *)cmd, 0);
         return;
     }
     if (s_quirkReach == 2) {

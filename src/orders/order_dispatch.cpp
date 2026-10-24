@@ -199,7 +199,6 @@ struct Thing_0043f0e0 {
 #include "../../interfaces/seams.h"
 #include "../units/unit.h"
 int __stdcall FindLandingPad(Unit*, int);
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 void __stdcall DrawUnit(void*, Unit*);
 
 MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,

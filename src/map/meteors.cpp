@@ -35,8 +35,8 @@ typedef char SimView_g_meteorWeaponName[];
 
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall FatalError(char* text);
+#include "../game/data_files.h"
+#include "../graphics/display.h"
 
 // FUNCTION: 0x437cd0
 void InitMeteors()

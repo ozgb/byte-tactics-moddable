@@ -12,8 +12,8 @@ extern Guid_443ff0 g_dpspGuidTcpip;
 extern Guid_443ff0 g_dpspGuidIpx;
 extern Guid_443ff0 g_dpspGuidModem;
 extern Guid_443ff0 g_dpspGuidSerial;
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-int IsOnlineConfigLoaded();
+#include "../debug/debug_lib.h"
+#include "../network/online.h"
 // FUNCTION: 0x443ff0
 int __stdcall SelectConnection(int index)
 {

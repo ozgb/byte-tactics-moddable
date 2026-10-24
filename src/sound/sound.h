@@ -2,6 +2,8 @@
 #define SOUND_H
 struct Unit;
 
+struct Unit;
+
 struct FileHandle;
 struct Pos_004cf570;
 struct HWND__;
@@ -129,5 +131,12 @@ void __stdcall FreeSoundSet(void** set);
 void __stdcall StreamSoundDelayed(char*, int, int);
 void __stdcall PlayNextSpeech();
 void __stdcall QueueUnitSpeechIfVisible(Unit* unit, int kind, char* text);
+
+int __stdcall PlaySoundByIndex(int index, int);
+void __stdcall PlayLoopingSoundByName(char* name, int);
+int __stdcall PlaySoundFile(char* name);
+void __stdcall StopAllSounds();
+void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
+void __stdcall QueueUnitSpeechIfNotVisible(Unit* unit, int kind, char* text);
 
 #endif

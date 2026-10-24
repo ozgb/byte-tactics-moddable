@@ -22,7 +22,7 @@ extern Game_0049ee30* g_game;
 extern int g_cmdlineDisplaySeed;
 extern char g_preferredLanguage[];
 #include "../debug/debug_lib.h"
-void __stdcall Onl_LoadConfigFile(char* file);
+#include "../network/online_45b670.h"
 #include "../ingame/camera.h"
 #include "../frontend/options.h"
 #include "../network/net_game.h"

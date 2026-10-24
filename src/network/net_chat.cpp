@@ -20,17 +20,15 @@
 #include "../../link/globals.h"
 
 void __stdcall PlaySoundByName(char* name, int param_2);
-int __stdcall IsScreenNamed(void* obj, const char* name);
-void __stdcall MarkChanged(void* obj);
-void __stdcall MarkLayerChanged(void* obj);
-void __stdcall SendChatPacket(char* text);
+#include "../gui/dialogs.h"
+#include "../gui/gui.h"
+#include "net_game.h"
 void __stdcall ReportGameChat(char* msg);
 #include "../ingame/control_panel.h"
 void __stdcall SetFont(int);
 void __stdcall SetTextColors(int, int);
-int GetFontHeight();
+#include "../graphics/draw.h"
 void __stdcall BlitSideLogoToRect(void*, void*, Rect*, int);
-void __stdcall DrawTextClipped(void*, void*, int, int, int, int);
 void __stdcall AddMessage(char* text, int key, int value, int last);
 
 // FUNCTION: 0x463ca0
@@ -57,9 +55,9 @@ void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, c
         g_game->tail = 0;
     if (last != '\n')
         PlaySoundByName("MessageArrived", 0);
-    if (IsScreenNamed((char*)&g_game->menu_519_8b2[0], "TIMEOUT.GUI")) {
-        MarkChanged((char*)&g_game->menu_519_8b2[0]);
-        MarkLayerChanged((char*)&g_game->menu_519_8b2[0]);
+    if (IsScreenNamed((Gui *)((char*)&g_game->menu_519_8b2[0]), "TIMEOUT.GUI")) {
+        MarkChanged((Dialog *)((char*)&g_game->menu_519_8b2[0]));
+        MarkLayerChanged((Dialog *)((char*)&g_game->menu_519_8b2[0]));
     }
 }
 
@@ -189,7 +187,7 @@ void __stdcall DrawMessages(void* surf)
                 height = (int)(138.0 - t * -1.5);
                 BlitSideLogoToRect(surf, &g_game->players_1b63[id], &r, 0);
             }
-            DrawTextClipped(surf, &(*(ChatHudEntry (*)[30])&g_game->entries)[i], height, y, -1, 0);
+            DrawTextClipped(surf, (char *)&(*(ChatHudEntry (*)[30])&g_game->entries)[i], height, y, -1, 0);
             y += start;
         }
         i++;

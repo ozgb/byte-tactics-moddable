@@ -164,11 +164,10 @@ void __stdcall UpdateMaxUnitsText(Gui_00449bb0* gui, int index);
 void __stdcall UpdateMetalText(Gui_00449bb0* gui, int index);
 #include "multi.h"
 #include "../network/net_game.h"
-int IsOnlineConfigLoaded();
-void __stdcall SetSliderFromValue(Gadget_00449bb0* gadget, int value);
-int __stdcall ReadSliderValue(Gadget_00449bb0* gadget);
+#include "../network/online.h"
+#include "options.h"
 void __stdcall CreateUnitSync(int param_1);
-void __stdcall MarkChanged(Gui_00449bb0* gui);
+#include "../gui/gui.h"
 void __stdcall SetKeyboardInput(Gui_00449bb0* gui, int value);
 int __stdcall FindGadgetIndex(Gadget_00449bb0* entries, char* name, int type);
 Gadget_00449bb0* __stdcall FindGadgetChecked(Gadget_00449bb0* entries, char* name);
@@ -180,13 +179,11 @@ void __stdcall SetTranslatedTextByName(Gui_00449bb0* gui, char* name, char* text
 void __stdcall SetGrayedOutByName(Gui_00449bb0* gui, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(Gui_00449bb0* gui, char* name, int value);
 void __stdcall ConfigureListBoxByName(Gui_00449bb0* gui, char* name, char* text, int count, int flag);
-void __stdcall BeginTextEdit(Gui_00449bb0* gui, int index);
-void __stdcall RenderLayer(Gui_00449bb0* gui, int value);
 Layer_00449bb0* __stdcall LoadGuiLayer(Gui_00449bb0* gui, const char* name, int size);
-int __stdcall IsScreenNamed(Gui_00449bb0* gui, char* name);
-void __stdcall FatalError(char* message);
+#include "../gui/dialogs.h"
+#include "../graphics/display.h"
 void* __stdcall FindGafEntry(void* gaf, const char* name);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 
 void __stdcall UpdateEnergyText(Gui_00449bb0* gui, int unused)
 {
@@ -194,7 +191,7 @@ void __stdcall UpdateEnergyText(Gui_00449bb0* gui, int unused)
     Gadget_00449bb0* value = FindGadgetChecked_D(gui->table->entries, "ENERGY");
 
     if (value != 0) {
-        int shown = ReadSliderValue(value) / 100 * 100;
+        int shown = ReadSliderValue((Gadget *)value) / 100 * 100;
         PlayerInfo_00449bb0* info;
 
         _itoa(shown, text, 10);
@@ -218,11 +215,11 @@ void __stdcall BindNamedSliderWithCallback(char* name, int max, int value, Callb
         gadget->max = max;
         gadget->sliderCallback = callback;
         gadget->value = value;
-        SetSliderFromValue(gadget, gadget->value);
+        SetSliderFromValue((Gadget *)gadget, gadget->value);
         gadget->game = g_game;
     }
     callback(gui, index);
-    MarkChanged(gui);
+    MarkChanged((Dialog *)gui);
 }
 
 // FUNCTION: 0x449bb0
@@ -366,7 +363,7 @@ void OpenBattleRoom()
     strcpy(info->map, ((Class_00435c30*)g_game->map.get())->GetMissionName());
     info->mapCrc = ((Class_004373a0*)g_game->map.get())->ComputeMapChecksum();
     BroadcastPlayerInfo();
-    BeginTextEdit(&g_game->gui, FindGadgetIndex(g_game->gui.table->entries, "MESSAGE", 0xe));
+    BeginTextEdit((Gui *)&g_game->gui, FindGadgetIndex(g_game->gui.table->entries, "MESSAGE", 0xe));
 
     for (char** p = g_battleRoomGadgetNames; *p; p++) {
         int k = FindGadgetIndex(layer->entries, *p, 0xe);
@@ -379,7 +376,7 @@ void OpenBattleRoom()
     RefreshBattleRoomRows();
     OrLabelAttribs();
 
-    if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI")) {
+    if (IsScreenNamed((Gui *)&g_game->gui, "LOUNGE2.GUI")) {
         Gadget_00449bb0* start = FindGadgetChecked_E(layer->entries, "battlestart");
         start->anim.frames = FindGafEntry(layer->entries->head.gaf, "battlestart");
         start->frame = 0;
@@ -388,5 +385,5 @@ void OpenBattleRoom()
     }
 
     SetKeyboardInput(&g_game->gui, 1);
-    RenderLayer(&g_game->gui, 0x40);
+    RenderLayer((Gui *)&g_game->gui, 0x40);
 }

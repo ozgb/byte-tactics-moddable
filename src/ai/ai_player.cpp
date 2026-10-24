@@ -153,7 +153,6 @@ struct Target_00406f50 {
 
 #include "squad_timer.h"
 
-int ExpireOldestMessage(void);
 int CheckAlliedVictory(void);
 int CheckMapCrc(void);
 #include "../graphics/movies.h"
@@ -161,7 +160,6 @@ int GetCobChecksum(int);
 
 void RegisterUnitOrders(void);
 #include "../ingame/control_panel.h"
-int UpdatePlacementGhostValidity(void);
 
 
 #include "../orders/mission_type.h"
@@ -245,22 +243,19 @@ void __stdcall RegisterCommand(const char* name, Command_00406f00 fn, int flags)
 #include "../state/sim_globals.h"
 #include "../util/file_printf.h"
 #include "../util/math_4b6c30.h"
-void __stdcall QueueUnitSpeechIfNotVisible(Unit*, int, int);
+#include "../sound/sound.h"
 #include "../units/squads.h"
 void __stdcall GetBasePosition(int index, Vec3* out);
-unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit* unit);
-int __stdcall GetBuilderCount(unsigned int player);
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
-void __stdcall MakeHeap(Elem_0040cc40* first, Elem_0040cc40* last, int*, Elem_0040cc40*);
+#include "pathfind.h"
 void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
                             Elem_0040cc40 val, int*);
 
-int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int param_4);
+#include "../util/commands.h"
 int __stdcall GetWeaponRange(Unit*, unsigned char);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
 int __stdcall IsCountBelowAiLimit(int, unsigned short, int);
-int __stdcall GetBuildRating(unsigned int player, unsigned short id);
 void __stdcall GetBasePosition(int index, Struct_0040ba80* out);
 
 static const float Zero_004fc968 = 0.0f;
@@ -1131,7 +1126,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<Elem_004
         }
     }
     if (2 <= heap.end() - heap.begin())
-        MakeHeap(heap.begin(), heap.end(), (int*)0, (Elem_0040cc40*)0);
+        MakeHeap((Entry_40d670 *)heap.begin(), (Entry_40d670 *)heap.end(), (int*)0, (Entry_40d670 *)(Elem_0040cc40*)0);
     int limit = -1;
     int best = 0;
     Point16 result;

@@ -4,8 +4,8 @@
 
 Prints `<tick> <phase> <hash>` for every phase row and the world row of each dumped tick. With
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
-status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 (which add the
-sections 29 to 31) are not supported.
+status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
+sections 29 to 31 in the world row.
 """
 
 import argparse
@@ -31,9 +31,9 @@ class Error(Exception):
 
 def read_text(path: str) -> str:
     if path.endswith(".xz"):
-        with lzma.open(path, "rt") as f:
+        with lzma.open(path, "rt", encoding="latin-1", newline="\n") as f:
             return f.read()
-    return Path(path).read_text()
+    return Path(path).read_text(encoding="latin-1")
 
 
 class Hasher:
@@ -330,7 +330,7 @@ class Walker:
         self.flat_list(self.schema.data["globals"]["meteors"], "meteors.")
         self.hash.end()
 
-    def world_row(self) -> int:
+    def world_row(self, tick: int = 0) -> int:
         self.hash.reset()
         self.game()
         self.cells()
@@ -349,6 +349,10 @@ class Walker:
         self.squads()
         self.unit_resources()
         self.conditions()
+        if tick == 1:
+            self.unit_definitions()
+            self.weapon_definitions()
+            self.mission()
         if self.pos != len(self.lines):
             raise Error(f"{len(self.lines) - self.pos} dump lines left after section 28, from {self.lines[self.pos][0]}")
         return self.hash.h
@@ -694,19 +698,96 @@ class Walker:
         h.end()
 
 
+    def string(self, path: str) -> None:
+        value = self.take(path)
+        if value == "null":
+            self.hash.h8(0)
+            return
+        if not value.startswith("str:"):
+            raise Error(f"{path}: expected null or str:, found {value!r}")
+        raw = value[4:].encode("latin-1")
+        self.hash.h8(1)
+        self.hash.h32(len(raw))
+        self.hash.run(raw)
+
+    def counted_run(self, path: str) -> None:
+        self.hash.h32(int(self.take(path), 16))
+        self.hash.run(self.hex_run(path))
+
+    def unit_definitions(self) -> None:
+        h = self.hash
+        h.h8(29)
+        h.h32(int(self.take("defs.count"), 16))
+        first = re.escape(field_name(self.schema.fields("UnitDefData")[0]))
+        while (i := self.next_index(rf"defs\[(\d+)\]\.{first}")) is not None:
+            prefix = f"defs[{i}]"
+            self.table("UnitDefData", prefix)
+            self.counted_run(f"{prefix}.yardmap")
+            self.counted_run(f"{prefix}.ids")
+            for m in range(4):
+                present = self.peek() == f"{prefix}.categories[{m}]"
+                h.h8(int(present))
+                if present:
+                    h.run(self.hex_run(f"{prefix}.categories[{m}]"))
+        h.end()
+
+    def weapon_definitions(self) -> None:
+        h = self.hash
+        h.h8(30)
+        for i in range(256):
+            prefix = f"weapons[{i}]"
+            self.table("WeaponDefData", prefix)
+            present = self.peek() == f"{prefix}.damage.entries"
+            h.h8(int(present))
+            if not present:
+                continue
+            h.h32(int(self.take(f"{prefix}.damage.entries"), 16))
+            k = 0
+            while self.peek() == f"{prefix}.damage[{k}].name":
+                self.string(f"{prefix}.damage[{k}].name")
+                h.h32(int(self.take(f"{prefix}.damage[{k}].value"), 16))
+                k += 1
+        h.end()
+
+    def mission(self) -> None:
+        h = self.hash
+        h.h8(31)
+        present = self.present("MissionData", "mission")
+        h.h8(int(present))
+        if present:
+            self.table("MissionData", "mission")
+            if self.present("MissionStartRest", "mission"):
+                self.table("MissionStartRest", "mission")
+            h.h32(int(self.take("mission.units.count"), 16))
+            k = 0
+            while self.peek() == f"mission.units[{k}].name":
+                prefix = f"mission.units[{k}]"
+                for name in ("name", "ident", "initialMission"):
+                    self.string(f"{prefix}.{name}")
+                h.run(self.hex_run(prefix))
+                k += 1
+            h.h32(int(self.take("mission.rules.count"), 16))
+            h.run(self.hex_run("mission.rules"))
+            h.h32(int(self.take("mission.features.count"), 16))
+            k = 0
+            while self.peek() == f"mission.features[{k}].name":
+                self.string(f"mission.features[{k}].name")
+                h.run(self.hex_run(f"mission.features[{k}].pos"))
+                k += 1
+        h.end()
+
+
 def rehash(schema: Schema, blocks: dict[tuple[int, str], list[tuple[str, str]]]) -> list[tuple[int, str, int]]:
     """The (tick, phase, hash) rows a dump gives, phases in order, `world` after `meteors`."""
     rows = []
     for tick in sorted({t for t, _ in blocks}):
-        if tick == 1:
-            raise Error("tick 1 dumps hold sections 29 to 31, which are not supported")
         for phase in PHASES:
             if (tick, phase) not in blocks:
                 continue
             walker = Walker(schema, blocks[(tick, phase)])
             rows.append((tick, phase, walker.phase_row(tick)))
             if phase == "meteors":
-                rows.append((tick, "world", walker.world_row()))
+                rows.append((tick, "world", walker.world_row(tick)))
     return rows
 
 

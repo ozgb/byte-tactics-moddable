@@ -289,10 +289,7 @@ Screen,surface,pointer,src/graphics/surface.cpp,#353
 ScriptTable,code,pointer,src/units/cob_types.h,#349
 ScriptTable,entries,pointer,src/units/cob_types.h,#349
 ScriptTable,names,pointer,src/units/cob_types.h,#349
-SimGlobals,g_explodedPieces,pointer,src/state/sim_globals.h,#350
-SimGlobals,g_meteorWeapon,pointer,src/state/sim_globals.h,#350
 SimGlobals,g_packetHandlers,function-pointer,src/state/sim_globals.h,#350
-SimGlobals,g_playerAI,pointer,src/state/sim_globals.h,#350
 Snapshot_0046a860,orderName,int-pointer,src/ingame/snapshot_0046a860.h,#353
 Spot,state,pointer,src/map/features.cpp,#353
 SpotState,bitmap,pointer,src/graphics/spot_state.h,#353

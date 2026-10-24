@@ -965,7 +965,7 @@ static unsigned char* MoveClasses()
     return (unsigned char*)DAT_00512370 - 0x18;
 }
 
-typedef unsigned char* SimView_g_explodedPieces[EXPLODED_SLOTS];
+typedef Ref<unsigned char> SimView_g_explodedPieces[EXPLODED_SLOTS];
 #undef g_explodedPieces
 #define g_explodedPieces (*reinterpret_cast<SimView_g_explodedPieces*>(&Sim().g_explodedPieces))
 extern void* g_approachRadiusVtable[];
@@ -978,7 +978,7 @@ extern void* g_aiSearchGoalVtable[];
 extern void* g_packedGoalVtable[];
 extern void* g_liteGoalVtable[];
 extern void* g_packedPosGoalVtable[];
-typedef unsigned char* SimView_g_playerAI[MAX_PLAYERS];
+typedef Ref<unsigned char> SimView_g_playerAI[MAX_PLAYERS];
 #undef g_playerAI
 #define g_playerAI (*reinterpret_cast<SimView_g_playerAI*>(&Sim().g_playerAI))
 
@@ -2283,7 +2283,7 @@ static void VisitPlayerAI()
     char path[96];
     HashByte(24);
     for (unsigned i = 0; i < MAX_PLAYERS; i++) {
-        unsigned ai = (unsigned)g_playerAI[i];
+        unsigned ai = (unsigned)g_playerAI[i].get();
         HashU32(i);
         HashByte(ai != 0);
         if (ai == 0)

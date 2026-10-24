@@ -889,6 +889,7 @@ METEOR_GLOBALS: list[tuple[str, str, int, str | None]] = [
     ("target", "g_meteorTarget", 4, None),
     ("scheduleGap", "g_meteorScheduleGap", 4, None),
 ]
+REF_GLOBALS = {"g_meteorWeapon"}
 GLOBAL_DECLS: dict[str, str] = {
     "g_cdMismatchDefeatTick": "unsigned int g_cdMismatchDefeatTick",
     "g_playerTickLoad": "int g_playerTickLoad[10]",
@@ -1298,7 +1299,7 @@ def generate():
                          ("kPathGlobals", PATH_GLOBALS)):
         lines.append("static const TraceGlobal %s[] = {" % cname)
         for name, symbol, size, target in group:
-            kind = "TF_POINTER" if target else ("TF_BYTES" if size > 8 else "TF_SCALAR")
+            kind = "TF_REF" if symbol in REF_GLOBALS else "TF_POINTER" if target else ("TF_BYTES" if size > 8 else "TF_SCALAR")
             tail = "TT_" + target if target else "TT_NONE"
             if symbol in moved:
                 lines.append("    { %s, (const void*)(%s), %d, %s, %s, 1 }," % (

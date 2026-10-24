@@ -1444,7 +1444,7 @@ static const TraceGlobal kMeteorGlobals[] = {
     { "strikeEndTime", (const void*)(offsetof(SimGlobals, g_meteorStrikeEndTime)), 4, TF_SCALAR, TT_NONE, 1 },
     { "origin", (const void*)(offsetof(SimGlobals, g_meteorOrigin)), 4, TF_SCALAR, TT_NONE, 1 },
     { "showerDuration", (const void*)(offsetof(SimGlobals, g_meteorShowerDuration)), 4, TF_SCALAR, TT_NONE, 1 },
-    { "weapon", (const void*)(offsetof(SimGlobals, g_meteorWeapon)), 4, TF_POINTER, TT_WEAPONDEF, 1 },
+    { "weapon", (const void*)(offsetof(SimGlobals, g_meteorWeapon)), 4, TF_REF, TT_WEAPONDEF, 1 },
     { "enabled", (const void*)(offsetof(SimGlobals, g_meteorsEnabled)), 4, TF_SCALAR, TT_NONE, 1 },
     { "nextHitTime", (const void*)(offsetof(SimGlobals, g_meteorNextHitTime)), 4, TF_SCALAR, TT_NONE, 1 },
     { "target", (const void*)(offsetof(SimGlobals, g_meteorTarget)), 4, TF_SCALAR, TT_NONE, 1 },

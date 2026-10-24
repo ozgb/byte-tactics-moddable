@@ -5,8 +5,8 @@
     uv run tools/commentlint.py --all            # every line of every tracked file
 
 Checks the lines RANGE adds in C and C++ (.c .cpp .h .hpp .inc) and Python
-(.py) files, so the matching notes still in the decompiled sources do not
-fail until #35 removes them and switches this to --all. A comment is allowed
+(.py) files, or with --all every line of every tracked file (what CI runs).
+tools/stripcomments.py removes the comments this rejects. A comment is allowed
 when it is:
 
   * a TODO(#n): text, where #n is an open issue (checked when GITHUB_TOKEN and

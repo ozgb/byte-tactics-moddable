@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "../files/files_api.h"
+#include "../../interfaces/ref.h"
 #include "../../interfaces/seams.h"
 #include "../host/settings_io.h"
 #include "mission_conditions.h"

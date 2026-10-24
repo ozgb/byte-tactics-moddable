@@ -4,6 +4,7 @@
 // player update, the unit line-of-sight loop and the camera setup.
 #include <stdio.h>
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
 #include <string.h>
 
 #include "../map/mission.h"

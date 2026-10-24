@@ -20,6 +20,7 @@ extern const float DAT_004fd4cc;
 struct GafFrame;
 
 #include "../util/vec3.h"
+#include "../../interfaces/ref.h"
 #include "model_types.h"
 #include "memory_cache.h"
 

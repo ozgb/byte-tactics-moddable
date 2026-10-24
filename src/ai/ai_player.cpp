@@ -27,6 +27,7 @@
 //     <vector>, changes every vector<Unit*> copy in the file)
 #include <stdio.h>
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
 #include <string.h>
 #include <stdlib.h>
 #include <minmax.h>

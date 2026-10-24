@@ -17,6 +17,7 @@
 // summing loop's lea moves above the fadd; DrawPieceEdges (0x458fa0,
 // model_render_458fa0.cpp) is one load order short of the original.
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include <stdio.h>
 #include <stdlib.h>

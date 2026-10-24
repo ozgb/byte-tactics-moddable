@@ -20,6 +20,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "win_types.h"
+#include "../../interfaces/ref.h"
 #include <math.h>
 #include "../../interfaces/host.h"
 

@@ -1,6 +1,6 @@
 struct Unit;
 
-#include "unit_orders_406c70.h"
+#include "unit_orders.h"
 namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }
@@ -1554,13 +1554,8 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
 }
 
 #include "unit_orders.h"
-#include "unit_orders_403a20.h"
-#include "unit_orders_404ad0.h"
 #include "unit_orders_404db0.h"
-#include "unit_orders_405980.h"
-#include "unit_orders_406300.h"
 int __stdcall GroundPickupOrder(Unit* unit, Order* order, int flags);
-#include "unit_orders_406aa0.h"
 #include "vtol_orders.h"
 #include "vtol_orders_40fbe0.h"
 #include "vtol_orders_4103e0.h"
@@ -1661,3 +1656,452 @@ extern const UnitOrderType g_readyOrder[1] = {
 };
 
 extern const int PadAlign_004fc6d0 = 0;
+
+#include "../../interfaces/seams.h"
+#include "win_types.h"
+#include <math.h>
+#include "../util/vec3.h"
+
+static inline Vec3 PosPlus(const Vec3& a, const Vec3& other)
+{
+    Vec3 r;
+    r.x = a.x + other.x;
+    r.y = a.y + other.y;
+    r.z = a.z + other.z;
+    return r;
+}
+struct Unit;
+#include "mission_type.h"
+
+#include "path_order_attach.h"
+#pragma pack(push, 1)
+#include "../units/unit_def.h"
+#include "../units/unit.h"
+#include "order.h"
+#include "../game/game.h"
+#pragma pack(pop)
+#include "../../link/globals.h"
+#include "../sound/sound.h"
+#include "../ingame/control_panel.h"
+void __stdcall StartBuildingScript(Unit*, Order*, short);
+#include "order_queue_4384a0.h"
+void __stdcall EmitNanoParticles(Vec3*, Vec3*, int);
+static inline Point16 WorldToCell16(Vec3 v, Point16 origin)
+{
+    Point16 c;
+    c.x = (v.x - (origin.x << 19) + 0x80000) >> 20;
+    c.y = (v.z - (origin.y << 19) + 0x80000) >> 20;
+    return c;
+}
+struct Feature;
+// FUNCTION: 0x403a20
+int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
+{
+    if (flags & 8) {
+        QueueUnitSpeech(unit, 7, "Construction terminated");
+        MarkSelectionOrdersDirty(unit);
+        return 8;
+    }
+    if (flags & 2) {
+        MarkSelectionOrdersDirty(unit);
+        return 5;
+    }
+    unsigned int state = 0;
+    state = order->state;
+    switch (state) {
+    case 0: {
+        UnitDef* def = &Definitions()[order->type];
+        Point16 cell = WorldToCell(order->pos, *(Point16*)&def->footprintx);
+        CellToWorld(*(Point16*)&def->footprintx, cell, &order->pos);
+        order->retries = 0;
+        order->AttachBuildFootprintMarker((*(Point16*)&cell), (*(Point16*)&def->footprintx));
+        order->flags = 0xe0;
+        return 1;
+    }
+    case 1: {
+        UnitDef* def = &Definitions()[order->type];
+        if (flags & 0x40) {
+            Fixed distance;
+            distance.value = (int)_hypot(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
+            int gap = distance.whole - (int)(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
+            gap += (int)(_hypot(def->footprintx, def->footprintz) * -8.0);
+            unsigned int range = 0;
+            range = unit->def->buildRange;
+            if (gap > (int)range) {
+                QueueUnitSpeech(unit, 7, "I can't reach the construction site");
+                return 8;
+            }
+        }
+        if (!g_seams.map->CanPlaceUnitFootprint(def, 0, WorldToCell16(order->pos, *(Point16*)&Definitions()[order->type].footprintx), 1)) {
+            if (!order->retries)
+                QueueUnitSpeech(unit, 7, "Waiting for target area to clear");
+            else if (order->retries > 10) {
+                QueueUnitSpeech(unit, 7, "Target area was blocked");
+                return 8;
+            }
+            order->retries++;
+            order->SetDeadlineTicks(30);
+            return 2;
+        }
+        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+        g_seams.map->SnapWorldPosToFootprint(def, &order->pos);
+        ((PathOrderAttach*)((char*)order + 0x12))->SetUnit(
+            g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, order->pos, 0, 1, 0));
+        if (!order->target) {
+            QueueUnitSpeech(unit, 7, "Unable to create any more units");
+            order->SetDeadlineTicks(300);
+            return 2;
+        }
+        QueueUnitSpeech(unit, 9, "Starting construction");
+        MarkSelectionOrdersDirty(unit);
+        AddOrder("getbuilt", 1, order->target, unit, 0, 0, 0);
+        StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &order->target->pos) - unit->heading);
+        return 1;
+    }
+    case 2:
+        return WaitIfNotInBuildStance(unit, order, 10);
+    case 3: {
+        int rate = 0;
+        rate = unit->def->buildRate;
+        if (g_seams.units->AddBuildProgress(unit, order->target, (float)(rate / 30))) {
+            Vec3 start;
+            g_seams.units->GetNanoPiecePosition(unit, &start);
+            Vec3 bounds[2];
+            bounds[0] = PosPlus(order->target->pos, *(Vec3*)&order->target->def->modelMinX);
+            bounds[1] = PosPlus(order->target->pos, *(Vec3*)&order->target->def->modelMaxX);
+            EmitNanoParticles(&start, bounds, 6);
+        }
+        unit->workTime = g_game->ticks + 300;
+        if (order->target->buildLeft != 0.0f) {
+            order->SetDeadlineTicks(1);
+            order->flags |= 0xa;
+            return 2;
+        }
+        return 1;
+    }
+    case 4:
+        QueueUnitSpeech(unit, 8, "Building complete");
+        return 5;
+    }
+    return 7;
+}
+
+#include "win_types.h"
+
+#include "box.h"
+
+#pragma pack(push, 1)
+#include "../map/feature.h"
+
+#include "../units/unit_def.h"
+
+#include "../units/unit.h"
+
+#include "order.h"
+
+#include "../game/game.h"
+
+#include "../../interfaces/seams.h"
+#pragma pack(pop)
+
+#include "../../link/globals.h"
+
+#include "../sound/sound.h"
+#include "../util/math_4b6c30.h"
+void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
+#include "order_queue_4384a0.h"
+void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
+
+// FUNCTION: 0x404ad0
+int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
+{
+    Point16 cell;
+    Point16 size;
+    unsigned short index = g_seams.weapons->FindFeatureAtPos(&order->pos, &cell, &size);
+    if (index == 0xffff) {
+        QueueUnitSpeech(unit, 7, "Reclamation failed");
+        return 8;
+    }
+    Feature* f = &g_game->features[index];
+    if (!(f->flags & 0x80))
+        return 8;
+    switch (order->state) {
+    case 0:
+        if (unit->motion && (unit->def->flags2 & 0x400)) {
+            order->AttachBuildFootprintMarker(cell, size);
+            order->flags = 0xe0;
+            return 1;
+        }
+        break;
+    case 1: {
+        if (flags & 0x40)
+            return 8;
+        order->time = (int)(15.0f - (f->metal + f->value) * -0.5f);
+        Vec3 pos;
+        pos.x = (size.x + cell.x * 2) << 19;
+        pos.z = (size.y + cell.y * 2) << 19;
+        pos.y = (RandomInt(f->height) + g_seams.units->GetGroundHeight(&pos)) << 16;
+        StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &pos) - (unsigned short)unit->heading);
+        return 1;
+    }
+    case 2:
+        return WaitIfNotInBuildStance(unit, order, 0);
+    case 3:
+        QueueUnitSpeech(unit, 11, 0);
+    case 4:
+        order->SetDeadlineTicks(2);
+        order->time -= 2;
+        if (order->time <= 0)
+            return 1;
+        unit->workTime = g_game->ticks + 300;
+        if (order->time > 15) {
+            Vec3 nano;
+            g_seams.units->GetNanoPiecePosition(unit, &nano);
+            Box box;
+            box.lo.x = cell.x << 20;
+            box.lo.z = cell.y << 20;
+            box.lo.y = g_seams.units->GetGroundHeight(&box.lo) << 16;
+            box.hi = box.lo;
+            box.hi.x += f->footprintX << 20;
+            box.hi.z += f->footprintZ << 20;
+            box.hi.y += f->height << 16;
+            EmitReverseNanoParticles(&box, &nano, 6);
+            EmitReverseNanoParticles(&box, &nano, 6);
+        }
+        return 2;
+    case 5:
+        g_seams.features->ReclaimFeature(unit, &order->pos);
+        return 5;
+    }
+    return 7;
+}
+
+#include <vector>
+#include "../state/block.h"
+#include "../util/vec3.h"
+struct Unit;
+#include "mission_type.h"
+
+#pragma pack(push, 1)
+#include "../units/unit_def.h"
+#include "../network/player.h"
+#include "../units/unit.h"
+#include "order.h"
+#pragma pack(pop)
+#include "../../interfaces/seams.h"
+#include "order_list.h"
+#include "../util/math_4b6c30.h"
+MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
+
+// FUNCTION: 0x405980
+int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
+{
+    for (;;) {
+        switch (order->state) {
+        case 0:
+            if (order->target) order->pos = order->target->pos;
+            EnsurePatrolReturnOrder(unit, order);
+            return 1;
+        case 1: {
+            if (flags & 0xe0) return 6;
+            order->AttachApproachRadiusGoal(&order->pos, 16);
+            order->SetDeadlineTicks(60);
+            order->flags |= 0xe0;
+            if (unit->player->energy >= unit->player->energyCapacity * 0.2) {
+                std::vector<Unit*> units;
+                int range = unit->def->range << 16;
+                DamagedAllyCollector collector(unit->player, &units, unit);
+                g_seams.map->VisitObjectsInRange(&unit->pos, range, (UnitVisitor*)&collector);
+                if (!units.empty()) {
+                    Unit* target = units[RandomInt(units.size())];
+                    if (unit->player->allied[target->player->index]) {
+                        MissionType kind = GetOrderType(8, unit, target, 0);
+                        if (kind.index) {
+                            if (IssueRepairOrder(unit, target, 0)) return 6;
+                            return 3;
+                        }
+                    }
+                }
+            }
+            Player* owner = unit->player;
+            if (unit->player->energy < 0.2 * owner->energyCapacity ||
+                unit->player->metal < unit->player->metalCapacity * 0.2) {
+                Vec3 energyPos, metalPos;
+                Vec3* energy = &energyPos;
+                Vec3* metal = &metalPos;
+                int range2 = unit->def->range << 16;
+                do {} while (0);
+                float energyAmount, metalAmount;
+                if (g_seams.map->PickRandomReclaimableResourcesInRadius(&unit->pos, range2, &energy, &energyAmount, &metal, &metalAmount)) {
+                    if (metal && unit->player->metal < unit->player->metalCapacity * 0.2) {
+                        order->SetAttachedFx(0);
+                        AppendOrder(unit, new (kSim) Order("RECLAIM", 0, metal, 0, 0, 0));
+                        order->SetAttachedFx(0);
+                        order->flags = 0;
+                        return 3;
+                    }
+                    if (energy && unit->player->energy < unit->player->energyCapacity * 0.2) {
+                        order->SetAttachedFx(0);
+                        AppendOrder(unit, new (kSim) Order("RECLAIM", 0, energy, 0, 0, 0));
+                        order->flags = 0;
+                        return 3;
+                    }
+                    if (metal && unit->player->metal + metalAmount <= unit->player->metalCapacity) {
+                        order->SetAttachedFx(0);
+                        AppendOrder(unit, new (kSim) Order("RECLAIM", 0, metal, 0, 0, 0));
+                        order->flags = 0;
+                        return 3;
+                    }
+                    if (energy && unit->player->energy + energyAmount <= unit->player->energyCapacity) {
+                        order->SetAttachedFx(0);
+                        AppendOrder(unit, new (kSim) Order("RECLAIM", 0, energy, 0, 0, 0));
+                        order->flags = 0;
+                        return 3;
+                    }
+                }
+            }
+            return 2;
+        }
+        }
+        return 7;
+    }
+}
+
+#include <stdio.h>
+#include "../state/block.h"
+#include "../util/vec3.h"
+class UnitMotion;
+struct Player;
+struct Unit;
+struct Order;
+#include "mission_type.h"
+
+#pragma pack(push, 1)
+#include "../weapons/weapon_def.h"
+#include "../units/unit_def.h"
+struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index; };
+#include "../units/unit.h"
+#include "order.h"
+
+#include "../../interfaces/seams.h"
+
+#pragma pack(pop)
+#include "order_list.h"
+MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
+#include "order_list.h"
+#include "../util/math_4b6c30.h"
+int __cdecl ScaledSin(short, int);
+int __cdecl ScaledCos(short, int);
+int __stdcall GetOrderTarget(int param_1);
+struct Feature;
+// FUNCTION: 0x406300
+int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
+{
+    if (!order->target) return 5;
+    if (unit->carrier) return 7;
+    if ((unsigned char)(order->target->def->flags1 >> 11) & 1) return 8;
+    unsigned int state=0; state=order->state;
+    switch(state) {
+    case 0: {
+        order->AnnounceStatusIfFlagged("Guarding");
+        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        order->approachRadius=(unit->footprint.x + order->target->footprint.x + 2) << 4;
+        int distance=order->approachRadius << 16;
+        short angle=RandomInt(0x10000);
+        order->pos=Offset(angle,distance);
+        return 1;
+    }
+    case 1: {
+        Unit* attacker=order->target->attacker;
+        if (attacker && !((Owner*)attacker->player.get())->allied[((Owner*)unit->player.get())->index] && (flags & 0x10) &&
+            !Contains(unit->def->categories,attacker->unitDefIndex)) {
+            if (IssueAttackOrder(unit,attacker,1)) { order->flags=0; return 3; }
+            if (unit->flags & 0x300000) {
+                for (unsigned char i=0;i<3;++i) {
+                    UnitWeaponSlot* weapon=&unit->weapons[i];
+                    if ((weapon->flags&2) && (weapon->flags&0x10) && !((unsigned char)(((WeaponDef*)weapon->weapon)->flags.value >> 26)&1)) {
+                        Unit* target=g_seams.targeting->GetWeaponTargetUnit(unit,i);
+                        if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || Contains(unit->def->weaponCategories[i],target->unitDefIndex))
+                            g_seams.targeting->SetWeaponTargetUnit(unit,attacker,i);
+                    }
+                }
+            }
+        }
+        if ((unsigned int)order->target->health < order->target->def->maxHealth && (unit->def->flags1&0x40)) {
+            MissionType kind=GetOrderType(8,unit,order->target,0);
+            if(kind.index) {
+                order->SetAttachedFx(0);
+                AppendOrder(unit,new (kSim) Order(kind,order->target,0,0,0,0));
+                order->flags=0; return 3;
+            }
+        }
+        if (order->target->list && order->target->list->kind.index &&
+            (unit->def->flags1&0x40) && (order->target->def->flags1&0x40) &&
+            (order->target->list->flags_42&0x100000) && unit!=order->target->list->Target()) {
+            int building=order->target->list->kind=="MobileBuild" ||
+                         order->target->list->kind=="BuildingBuild";
+            Order* other=order->target->list;
+            int actionable=((other->flags_42&0x200) && other->target) || (other->flags_42&0x400);
+            MissionType kind;
+            if (!building && actionable) {
+                order->SetAttachedFx(0);
+                kind=order->target->list->kind;
+                AppendOrder(unit,new (kSim) Order(kind,order->Target()->list->target,order->Target()->list->Position(),0,0,0));
+                order->flags=0; return 3;
+            }
+            if (building && other->target) {
+                order->SetAttachedFx(0);
+                kind=MissionType("HelpBuild");
+                AppendOrder(unit,new (kSim) Order(kind,order->Target()->list->target,order->Target()->list->Position(),0,0,0));
+                order->flags=0; return 3;
+            }
+        }
+follow:
+        Vec3 pos=order->target->pos+order->pos;
+        order->AttachApproachRadiusGoal(&pos,order->approachRadius/2);
+        order->SetDeadlineTicks(30);
+        order->flags|=0x18;
+        return 2;
+    }
+    }
+    return 7;
+}
+
+#include <string.h>
+#include <math.h>
+#include "../util/vec3.h"
+#include "../../interfaces/seams.h"
+#include "../ai/vec.h"
+static inline Vec Add(const Vec& a,const Vec& b) { Vec r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
+static inline Vec Sub(const Vec& a,const Vec& b) { Vec r; r.x=a.x-b.x; r.y=a.y-b.y; r.z=a.z-b.z; return r; }
+#pragma pack(push,1)
+struct Def { char pad[0x15e]; Vec low, high; };
+
+#include "../units/unit.h"
+#include "order.h"
+#include "../game/game.h"
+#pragma pack(pop)
+#include "../../link/globals.h"
+void __stdcall EmitTeleportParticles(Vec*,Vec*,int,int);
+// FUNCTION: 0x406aa0
+int __stdcall TeleportOrder(Unit* unit,Order* order,int unused)
+{
+    Vec low = Add(*(Vec*)&unit->pos, ((Def*)unit->def.get())->low);
+    Vec high = Add(*(Vec*)&unit->pos, ((Def*)unit->def.get())->high);
+    for(Unit* p=g_game->units;p<=g_game->unitsEnd;++p) {
+        if(p->pos.x >= low.x && p->pos.x <= high.x && p->pos.z >= low.z && p->pos.z <= high.z && p->pos.y >= low.y && p->pos.y <= high.y && unit != p) {
+            Vec dest = Sub(Add(*(Vec*)&order->pos,*(Vec*)&p->pos),*(Vec*)&unit->pos);
+            EmitTeleportParticles((Vec*)&p->pos,&dest,30,5);
+            g_seams.units->SetUnitPosition(p,*(Vec3*)&dest,1);
+        }
+    }
+    return 5;
+}
+
+// FUNCTION: 0x406c70
+void __stdcall CopyDwordIfNonNull(int* dest, int* src)
+{
+    if (dest != 0) {
+        *dest = *src;
+    }
+}

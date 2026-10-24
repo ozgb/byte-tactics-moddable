@@ -3,7 +3,7 @@
 #include <string.h>
 
 struct Unit;
-#include "../orders/unit_orders_406c70.h"
+#include "../orders/unit_orders.h"
 namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }

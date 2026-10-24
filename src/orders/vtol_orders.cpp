@@ -1,7 +1,7 @@
 #include "win_types.h"
 #include <stdio.h>
 struct Unit;
-#include "unit_orders_406c70.h"
+#include "unit_orders.h"
 namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }

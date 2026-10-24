@@ -320,6 +320,8 @@ def lint(root, rev_range, build_dir=DEFAULT_BUILD_DIR, clang_tidy="clang-tidy", 
     findings = list(lint_placeholders(root, rev_range, lines_by_path))
     changed = [p for p, added in lines_by_path.items() if added]
     require_checkout(root, rev_range, changed)
+    if not any(Path(p).suffix in C_SUFFIXES for p in changed):
+        return sorted(set(findings))
     units, missed = targets(root, build_dir, changed)
     for path in missed:
         print(f"note: no translation unit reaches {path}, not checked by clang-tidy", file=sys.stderr)

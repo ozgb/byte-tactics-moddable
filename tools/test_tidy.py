@@ -174,6 +174,13 @@ class TidyTest(Repo, unittest.TestCase):
         with self.assertRaises(tidy.ToolError):
             self.lint()
 
+    def test_missing_compile_commands_is_fine_without_c_changes(self):
+        os.unlink(self.root / "build/modern/compile_commands.json")
+        self.write("notes.txt", "x\n")
+        self.commit()
+        found, stub = self.lint()
+        self.assertEqual((found, stub.calls), ([], []))
+
     def test_main_exits_2_on_parse_failure(self):
         self.edit("src/a.cpp", "    return total;", "    return total + 0;")
         fake = self.root / "fake-tidy"

@@ -80,10 +80,10 @@ holder,offsets,target,scenarios,ticks,target_offsets,class,note
 ??0Pathfinder@@QAE@XZ: AISearch touched mapentries,0xed4,vector::insert #2,1,1,0x10,not-a-pointer,Pathfinder touched map entries: cell indices
 ??0Pathfinder@@QAE@XZ: AISearch touched mapentries,0xed4+0x8*k,vector::insert #3,1,1,0x10,not-a-pointer,Pathfinder touched map entries: cell indices
 ??0PlayerFrameInfo@@QAE@XZ,*,*,0,0,-,outside,"Frame (FrameRing, inlined from the FrameQueue constructor): Frame.data holds received packet buffers that come from outside the block (#21 moves them in)"
-??0Squad@@QAE@HH@Z: SQUADS,*,*,0,0,-,not-a-pointer,words of ??0Squad@@QAE@HH@Z: SQUADS that only look like addresses
-??0Squad@@QAE@HH@Z: SQUADS,0x92,AllocDepthFrame: CompositeBuffer,1,1562,0x9ffe0,not-a-pointer,Squad words that only look like addresses
-??0Squad@@QAE@HH@Z: SQUADS,0x52+0x4*k,CMemoryCache::InitCache: CMemoryCache CCH,1,301,0x6ffe0-0xb0333,not-a-pointer,Squad words that only look like addresses
-??0Squad@@QAE@HH@Z: SQUADS,0x12+0x4*k 0x72+0x4*k 0x96 0x9a 0xb2+0x4*k,HAPI_LoadFile,4,10801,0x1da-0x100267,not-a-pointer,"Squad (stride 0x20): every offset is 2 mod 4, a misaligned word across two in-block items pointers"
+??0Squad@@QAE@PAUPlayer@@H@Z: SQUADS,*,*,0,0,-,not-a-pointer,words of ??0Squad@@QAE@PAUPlayer@@H@Z: SQUADS that only look like addresses
+??0Squad@@QAE@PAUPlayer@@H@Z: SQUADS,0x92,AllocDepthFrame: CompositeBuffer,1,1562,0x9ffe0,not-a-pointer,Squad words that only look like addresses
+??0Squad@@QAE@PAUPlayer@@H@Z: SQUADS,0x52+0x4*k,CMemoryCache::InitCache: CMemoryCache CCH,1,301,0x6ffe0-0xb0333,not-a-pointer,Squad words that only look like addresses
+??0Squad@@QAE@PAUPlayer@@H@Z: SQUADS,0x12+0x4*k 0x72+0x4*k 0x96 0x9a 0xb2+0x4*k,HAPI_LoadFile,4,10801,0x1da-0x100267,not-a-pointer,"Squad (stride 0x20): every offset is 2 mod 4, a misaligned word across two in-block items pointers"
 ??0SquadManager@@QAE@PAUPlayer@@@Z,*,*,0,0,-,not-a-pointer,SquadManager timer state: tick counters and cell words
 ??0SquadManager@@QAE@PAUPlayer@@@Z,0xa,??4?$vector@UElem_00476490@@V?$allocator@UElem_00476490@@@std@@@std@@QAEAAV01@ABV01@@Z,1,30,0x30f-0x314,not-a-pointer,SquadManager timer state: tick counters and cell words
 ??0SquadManager@@QAE@PAUPlayer@@@Z,0xa,AllocDepthFrame: CompositeBuffer,1,30,0x20297-0x2029a,not-a-pointer,SquadManager timer state: tick counters and cell words

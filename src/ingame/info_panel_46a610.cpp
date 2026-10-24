@@ -56,7 +56,7 @@ void __stdcall DrawUnit(void* dest, Unit* unit);
 
 static int DrawFlags()
 {
-    return *(unsigned char*)((char*)g_game + 0x37f06);
+    return g_game->visualFlagsByte;
 }
 
 #define DrawFlip(flip, dest, frame, x, y) \

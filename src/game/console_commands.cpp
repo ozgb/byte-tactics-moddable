@@ -340,7 +340,7 @@ void __stdcall CmdAssign(CommandArgs* args)
     if (kind.index) {
         int a = args->GetIntArg(1, 0);
         int b = args->GetIntArg(2, 0);
-        IssueOrderToSelection((char*)g_game + 0x2c76, 0, kind, 0, a, b);
+        IssueOrderToSelection(g_game->orders_2c76, 0, kind, 0, a, b);
     }
 }
 
@@ -907,7 +907,7 @@ void __stdcall CmdMusicMode(void* args)
 {
     CommandArgs* obj = (CommandArgs*)args;
     int result = obj->GetIntArg(1, 0);
-    void* p = *(void**)((char*)g_game + 0x10);
+    void* p = g_game->field_10;
     ((Sound*)p)->SetTrackCategory(result);
 }
 
@@ -1126,7 +1126,7 @@ void __stdcall DrawWorldSegmentLine(void* surface, Point16 from, short dx, short
 void AiSearchGoal::DrawOnSurface(void* surface)
 {
     DrawMapTileSelectionOutline(surface, (short*)&this->owner->cell, (*(int*)&this->owner->footprint), 0xf);
-    unsigned char color = *(unsigned char*)((char*)g_game + 0xdcb + ((this->active & 1) ? 9 : 12));
+    unsigned char color = g_game->colors[(this->active & 1) ? 9 : 12];
     for (int i = 0; i < this->count - 1; i++) {
         Pos_00417bb0 p1;
         *(int*)&p1.x_frac = this->points[i].x << 16;

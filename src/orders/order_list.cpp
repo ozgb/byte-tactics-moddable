@@ -325,7 +325,7 @@ Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind)
 void Order::SetDeadlineTicks(int param)
 {
     *(unsigned int*)((char*)this + 0x6) |= 1;
-    int val = *(int*)((char*)g_game + 0x38a47);
+    int val = g_game->ticks;
     *(int*)((char*)this + 0xa) = val + param;
 }
 

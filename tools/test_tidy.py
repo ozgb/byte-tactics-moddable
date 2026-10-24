@@ -295,6 +295,31 @@ class TidyTest(Repo, unittest.TestCase):
         found, _ = self.lint({"src/a.cpp": (0, text)})
         self.assertEqual(found, [])
 
+    def test_one_removed_line_excuses_one_added_copy(self):
+        self.write("src/c.cpp", "int C(void) { return 0; }\nint i;\n")
+        self.commit()
+        files = [f"src/f{k}.cpp" for k in range(10)]
+        self.write("src/c.cpp", "int C(void) { return 0; }\n")
+        for f in files:
+            self.write(f, "int i;\n")
+        self.write_db(["src/a.cpp", "src/b.cpp", "src/c.cpp", *files])
+        self.commit()
+        check = "modernize-use-nullptr"
+        found, _ = self.lint({f: (0, finding("ROOT", f, 1, check)) for f in files})
+        self.assertEqual([f[0] for f in found], files[1:])
+
+    def test_added_copy_without_a_finding_uses_up_the_removal(self):
+        self.write("src/c.cpp", "int C(void) { return 0; }\nint i;\n")
+        self.commit()
+        self.write("src/c.cpp", "int C(void) { return 0; }\n")
+        self.write("src/d.cpp", "int i;\n")
+        self.write("src/e.cpp", "int i;\n")
+        self.write_db(["src/a.cpp", "src/b.cpp", "src/c.cpp", "src/d.cpp", "src/e.cpp"])
+        self.commit()
+        check = "modernize-use-nullptr"
+        found, _ = self.lint({"src/d.cpp": (0, ""), "src/e.cpp": (0, finding("ROOT", "src/e.cpp", 1, check))})
+        self.assertEqual([f[0] for f in found], ["src/e.cpp"])
+
     def test_naming_finding_on_a_rewritten_declaration_passes(self):
         self.write("src/c.cpp", "int Old_B(int);\nint C(void) { return 0; }\n")
         self.commit()

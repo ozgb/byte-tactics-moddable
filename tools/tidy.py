@@ -18,7 +18,10 @@ only when needed, and a base that does not parse counts as having no findings.
 Pure additions are always reported, except that a finding on an added line is
 also old when a line with the same text (whitespace trimmed) is removed anywhere
 in the same diff, so a line that only moved (to another file, or to another place
-in its file) keeps the findings it had. A finding of a naming or initialiser check
+in its file) keeps the findings it had. Each removed line excuses one added line: the
+removed and the added texts are counted, and the added lines, in diff order, use up
+the removals, with or without a finding, so ten copies of a line added for one
+removed are one move and nine new lines. A finding of a naming or initialiser check
 (NAME_CHECKS) that quotes a name is old too when a removed line holds that name as
 a word, because a declaration rewritten to carry the convention keeps its name.
 
@@ -41,6 +44,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -115,11 +119,30 @@ def removed_lines(root, rev_range):
     return result
 
 
-def removed_texts(root, rev_range):
-    """The set of whitespace-trimmed texts of the lines the range removes, in any file."""
+def moved_lines(root, rev_range):
+    """The (path, line) of the added lines that are another line of the diff moved.
+
+    The whitespace-trimmed texts of the removed lines, in any file, are counted, and each
+    added line with the same text, in diff order, uses up one of them, whether or not it has
+    a finding. A line added more times than it was removed is a move for that many copies only.
+    """
     diff = git(root, "diff", "-U0", "--no-color", "--no-ext-diff", rev_range, "--")
-    return {row[1:].strip() for row in diff.splitlines()
-            if row.startswith("-") and not row.startswith("---") and row[1:].strip()}
+    budget = Counter(row[1:].strip() for row in diff.splitlines()
+                     if row.startswith("-") and not row.startswith("---") and row[1:].strip())
+    moved, path, line = set(), None, 0
+    for row in diff.splitlines():
+        if row.startswith("+++ "):
+            path = row[6:].split("\t")[0] if row.startswith("+++ b/") else None
+        elif row.startswith("@@"):
+            m = re.match(r"@@ -\S+ \+(\d+)", row)
+            line = int(m.group(1))
+        elif row.startswith("+") and path:
+            text = row[1:].strip()
+            if text and budget[text] > 0:
+                budget[text] -= 1
+                moved.add((path, line))
+            line += 1
+    return moved
 
 
 def removed_words(root, rev_range):
@@ -362,22 +385,14 @@ def lint(root, rev_range, build_dir=DEFAULT_BUILD_DIR, clang_tidy="clang-tidy", 
         print(f"note: no translation unit reaches {path}, not checked by clang-tidy", file=sys.stderr)
     results = tidy_files(root, build_dir, units, clang_tidy, jobs or os.cpu_count() or 1, runner)
     hunks = hunks_of(root, rev_range)
-    moved = removed_texts(root, rev_range)
+    moved = moved_lines(root, rev_range)
     moved_words = removed_words(root, rev_range)
-    texts = {}
-
-    def text_of(path, line):
-        if path not in texts:
-            texts[path] = new_text(root, rev_range, path).splitlines()
-        rows = texts[path]
-        return rows[line - 1].strip() if 1 <= line <= len(rows) else ""
-
     seen, candidates = set(), []
     for unit, diags in results.items():
         for path, line, _, message, check in diags:
             if line not in lines_by_path.get(path, ()) or (path, line, message, check) in seen:
                 continue
-            if text_of(path, line) in moved:
+            if (path, line) in moved:
                 continue
             if check in NAME_CHECKS and any(n in moved_words for n in QUOTED_NAME.findall(message)):
                 continue

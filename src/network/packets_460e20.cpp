@@ -20,7 +20,7 @@ inline PacketRing::PacketRing() { count = 0; readIdx = 0; writeIdx = -1; }
 
 // capacity stays in the initialiser list: the vtable store must come after it.
 inline PacketReceiver::PacketReceiver(void* o)
-    : unused(0), owner(o), fromId(-1), toId(-1), savedFrameEntry(0), buffer(0), spare(0),
+    : unused(0), owner((PacketManager*)o), fromId(-1), toId(-1), savedFrameEntry(0), buffer(0), spare(0),
       capacity(0), length(0), spareLength(0), spareFromId(-1), spareToId(-1)
 {
 }

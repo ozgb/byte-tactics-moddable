@@ -19,6 +19,8 @@
 #include <signal.h>
 #include <malloc.h>
 
+#include "../../interfaces/ref.h"
+
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* ptr);
 void __cdecl PacketTrace(const char* fmt, ...);
@@ -46,7 +48,7 @@ struct NetPacketPendingEntry {
 
 class PacketBuffer {
 public:
-    PacketChannel* pool;               // +0x00
+    Ref<PacketChannel> pool;
     int start;                         // +0x04, the index of its first packet
     int count;                         // +0x08
     int length;                        // +0x0c
@@ -1300,7 +1302,7 @@ int NetPacketPendingEntry::GetData()
 // destructor 0x462cc0, destructor 0x462d30).
 // FUNCTION: 0x462c00
 PacketReceiver::PacketReceiver(void* o)
-    : unused(0), owner(o), fromId(-1), toId(-1), savedFrameEntry(0), buffer(0), spare(0),
+    : unused(0), owner((PacketManager*)o), fromId(-1), toId(-1), savedFrameEntry(0), buffer(0), spare(0),
       capacity(0), length(0), spareLength(0), spareFromId(-1), spareToId(-1)
 {
 }

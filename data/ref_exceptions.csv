@@ -241,15 +241,12 @@ Object3do,sibling,pointer,src/graphics/object3do.h,#353
 OpenHeap,items,pointer,src/ai/pathfinder.h,#350
 OpenHeap,pool,pointer,src/ai/pathfinder.h,#350
 PacketBuffer,first,pointer,src/network/packets.cpp,#21
-PacketBuffer,pool,pointer,src/network/packets.cpp,#351
 PacketChannel,buffers,pointer,src/network/packet_channel.h,#21
 PacketChannel,firstPacket,pointer,src/network/packet_channel.h,#21
 PacketChannel,lastPacket,pointer,src/network/packet_channel.h,#21
 PacketChannel,packets,pointer,src/network/packet_channel.h,#21
 PacketManager,buffer,pointer,src/network/packet_manager.h,#21
 PacketReceiver,buffer,pointer,src/network/packet_receiver.h,#21
-PacketReceiver,owner,pointer,src/network/packet_receiver.h,#351
-PacketReceiver,savedFrameEntry,pointer,src/network/packet_receiver.h,#351
 PacketReceiver,spare,pointer,src/network/packet_receiver.h,#21
 PacketRing,buf,pointer,src/network/packet_ring.h,#21
 PathOrderAttach,value,pointer,src/orders/path_order_attach.h,#349

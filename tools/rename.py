@@ -6,30 +6,42 @@
     uv run tools/rename.py --from FILE --join --keep-going
                                                    # several views to one type, skipping the
                                                    # pairs that are refused
+    uv run tools/test_rename.py                    # tests, on a fixture tree
 
-Phase 2 of docs/tidy-up.md: placeholder names (`Class_<address>`,
-`FUN_<address>`, `DAT_<address>`, the `X_<address>` views) become real ones
-where the evidence gives them, and the several placeholder names one type
-has across the files become that type's one name. A function's or a class's
-name is part of the decorated names the linker matches, so every file that
-spells it changes at once.
+Placeholder names (`Class_<address>`, `FUN_<address>`, `DAT_<address>`, the
+`X_<address>` views, `field_<offset>`) become real ones where the evidence gives
+them, and the several placeholder names one type has across the files become that
+type's one name. A function's or a class's name is part of the decorated names the
+linker matches, so every file that spells it changes at once.
 
 What it rewrites:
 
-  src/**/*.cpp, include/*.h   OLD as a whole word in code and in comments,
-                              never inside a string or character literal; in
-                              the decorated symbol of a `// FUNCTION:` or
-                              `// ENTRY:` annotation too. In the generated
-                              headers only where it merges no two names: files
-                              match only at those headers' exact symbol counts
-                              (docs/c2-regalloc.md), and a second declaration
-                              of one name counts nothing
-  data/aliases.csv            inside the names, decorated or not (the table is
-  data/symbols.csv            kept by hand)
-  docs/*.md, AGENTS.md        OLD as a whole word, but not in a --join: there
-                              the docs keep the view names they tell apart
+  src, include, interfaces,   every .c, .cpp and .h: OLD as a whole word in code
+  lib, cmake, link, tests     and in comments, never inside a string or character
+                              literal; in the decorated symbol of a `// FUNCTION:`
+                              or `// ENTRY:` annotation too. The generated
+                              src/harness/trace_schema.h and
+                              src/state/layout_asserts.cpp are among them.
+                              `bx_OLD`, the name lib/bitexact gives a function
+                              (bx_FUN_004b70ef), becomes `bx_NEW` with it.
+  data/aliases.csv            inside the names, decorated or not
+  data/symbols.csv
+  data/*.csv (CELLS)          the cells that hold a function, global, field or
+                              decorated name, in place: the hand-set columns of
+                              state_classes.csv, trace_coverage.csv, hazards.csv
+                              and the like are keyed by them. Tables a tool
+                              regenerates entirely (rwsets.csv, coupling.csv,
+                              type_dupes.csv, layout_refs.csv, outside_pointers.csv)
+                              are left to it: the commands to run follow a rename.
+  docs/*.md, AGENTS.md,       OLD as a whole word, but not in a --join: there
+  lib/bitexact/README.md      the docs keep the view names they tell apart
 
-What it refuses, pair by pair:
+A gap entry label (`// ENTRY: 0x4b70ef`) has no name of its own: tools/aliases.py makes
+the public symbol `_FUN_004b70ef` from its address at link time. Renaming FUN_004b70ef
+writes the new name into the annotation (`// ENTRY: 0x4b70ef _NEW`), so the link makes
+`_NEW` and the callers still find it.
+
+What it refuses, pair by pair, because the modern build or conformity would break:
 
   - a NEW that is not an identifier, or is a C++ keyword;
   - two names of one file that would become one: a file spelling OLD that
@@ -37,28 +49,27 @@ What it refuses, pair by pair:
     functions of different classes may share a name (data/symbols.csv says
     which class a method belongs to: `Class::FUN_<address>`); two of one
     class would be overloads, and a free function or a type in the way is
-    still refused (merging two types in one file is phase 3, not a rename);
+    still refused (merging two types in one file is not a rename);
   - a NEW that data/symbols.csv gives another address after the rename;
   - a NEW that is already a type in other files, unless --join says OLD's
     views are views of that type;
-  - an OLD declared as a local or a parameter in a function whose frame
-    layout follows its locals' names: one with a `try` or `__try` block, or one
-    built with `/Od`;
-  - an OLD that names a gap entry label (`// ENTRY: 0x...`): its public symbol
-    is made from the address.
 
 Any refusal stops the rename, unless --keep-going, which renames the pairs
-that pass and lists the others.
+that pass and lists the others. A real run ends with the commands that
+regenerate the tables and generated files the rename touched.
 """
 
 import argparse
 import csv
+import io
 import re
 import sys
 from collections import defaultdict
 from pathlib import Path
 
-from sources import ROOT, source_files
+from sources import ROOT
+
+csv.field_size_limit(1 << 28)
 
 WORD = r"[A-Za-z0-9_]"
 IDENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*$")
@@ -71,10 +82,31 @@ KEYWORDS = set("""
     typename union unsigned using virtual void volatile wchar_t while
     __asm __cdecl __stdcall __fastcall __thiscall __declspec __try __except __finally __leave __int64
 """.split())
-TEXT_FILES = ["AGENTS.md", "docs/*.md"]
+CODE_DIRS = ["src", "include", "interfaces", "lib", "cmake", "link", "tests"]
+CODE_SUFFIXES = {".c", ".cpp", ".h"}
+TEXT_FILES = ["AGENTS.md", "docs/*.md", "lib/bitexact/README.md"]
 NAME_TABLES = ["data/aliases.csv", "data/symbols.csv"]
-SYMBOLS = ROOT / "data/symbols.csv"
-ANNOTATED = re.compile(r"(//\s*(?:FUNCTION|ENTRY):\s*0x[0-9a-fA-F]+\s+)(\S+)")
+# The name cells of the tables nothing regenerates whole: table -> (column, "words" | "symbols").
+CELLS = {
+    "data/state_classes.csv": [("name", "words")],
+    "data/trace_coverage.csv": [("name", "words")],
+    "data/globals.csv": [("name", "words")],
+    "data/functions.csv": [("name", "words")],
+    "data/hazards.csv": [("function", "words"), ("target", "words")],
+    "data/hazard_edges.csv": [("caller", "words"), ("target", "words")],
+    "data/subsystems.csv": [("function", "words")],
+    "data/game_logic.csv": [("function", "words")],
+    "data/crt_calls.csv": [("function", "words")],
+    "data/x87_sites.csv": [("function", "words")],
+    "data/quirk_candidates.csv": [("function", "words")],
+    "data/simalloc_allow.csv": [("name", "words")],
+    "data/ref_exceptions.csv": [("struct", "words"), ("field", "words")],
+    "data/initialiser_allow.csv": [("refs", "symbols")],
+    "data/progress.csv": [("symbol", "symbols")],
+    "data/block_pointers.csv": [("holder", "symbols"), ("target", "symbols")],
+}
+ANNOTATED = re.compile(r"(//\s*FUNCTION:\s*0x[0-9a-fA-F]+[ \t]+)(\S+)")
+ENTRY_LABEL = re.compile(r"(//\s*ENTRY:\s*0x([0-9a-fA-F]+))(?:([ \t]+)(\S+))?([ \t]*\r?)$")
 TRAILING = re.compile(r"^(.*?\S)(\s{2,})(//.*?)(\r?)$")
 
 
@@ -142,11 +174,21 @@ class Renamer:
     def symbols(self, text: str) -> str:
         return self.decorated.sub(lambda m: self.table[m.group(0)], text)
 
+    def entry(self, m: re.Match) -> str:
+        """An `// ENTRY:` label with its symbol renamed, or, when it is unnamed and OLD is the
+        FUN_<address> that tools/aliases.py would make its symbol from, named NEW."""
+        head, address, gap, symbol, tail = m.groups()
+        if symbol is None:
+            new = self.table.get(f"FUN_{int(address, 16):08x}")
+            return m.group(0) if new is None else f"{head} _{new}{tail}"
+        return head + gap + "_" * symbol.startswith("_") + self.symbols(symbol.lstrip("_")) + tail
+
     def source(self, text: str) -> str:
         out = []
         for kind, piece in segments(text):
             if kind == "comment":
                 piece = ANNOTATED.sub(lambda m: m.group(1) + self.symbols(m.group(2)), piece)
+                piece = ENTRY_LABEL.sub(self.entry, piece)
             if kind != "literal":
                 piece = self.words(piece)
             out.append(piece)
@@ -167,49 +209,6 @@ class Renamer:
 
 # --- what is refused ------------------------------------------------------------------------
 
-def frame_bodies(text: str, code: str) -> list[str]:
-    """The bodies (with their parameter lists) of the functions in a file whose
-    frame follows their locals' names: every function of a file built with /Od,
-    else those with a try block."""
-    od = re.search(r"^//\s*FLAGS:.*/Od", text, re.M) is not None
-    if not od and not re.search(r"\btry\s*\{|\b__try\b", code):
-        return []
-    bodies = []
-    for m in re.finditer(r"\)\s*(?:const\s*)?\{", code):
-        depth, j = 0, m.end() - 1
-        while j < len(code):
-            depth += {"{": 1, "}": -1}.get(code[j], 0)
-            j += 1
-            if depth == 0:
-                break
-        body = code[code.rfind("(", 0, m.start() + 1):j]
-        if od or re.search(r"\btry\s*\{|\b__try\b", body):
-            bodies.append(body)
-    return bodies
-
-
-def declared_local(name: str, body: str) -> bool:
-    decl = re.compile(rf"(?:[\w>]\s*[*&\s]\s*|[*&]){re.escape(name)}\s*(?:[;=,)\[]|$)", re.M)
-    for m in decl.finditer(body):
-        before = body[:m.start() + 1].rstrip()
-        # `x = name;` or `f(a, name)` uses the name; a declaration has a type
-        # word before it (not an operator, `return` or a comma alone).
-        prev = re.search(r"([A-Za-z_]\w*|[>*&])\s*[*&\s]*$", before + " ")
-        if prev and prev.group(1) not in ("return", "case", "goto", "delete", "throw", "sizeof", "new"):
-            return True
-    return False
-
-
-def entry_names(texts: dict[Path, str]) -> set[str]:
-    out = set()
-    for text in texts.values():
-        for m in re.finditer(r"//\s*ENTRY:\s*0x([0-9a-fA-F]+)(?:\s+(\S+))?", text):
-            out.add(f"FUN_{int(m.group(1), 16):08x}")
-            if m.group(2):
-                out.add(m.group(2).lstrip("_").split("@")[0])
-    return out
-
-
 class Tree:
     """What the refusals need from every source file, read once."""
 
@@ -229,13 +228,16 @@ class Tree:
                 header = ROOT / "include" / m.group(1)
                 if header in self.tokens and header != p:
                     self.included[p] |= self.tokens[header]
-        self.frames = {p: b for p, t in texts.items() if (b := frame_bodies(t, self.codes[p]))}
-        self.entries = entry_names(texts)
         self.types: dict[str, list[Path]] = defaultdict(list)
         for p, c in self.codes.items():
             for m in re.finditer(r"\b(?:struct|class|union|enum)\s+([A-Za-z_]\w*)", c):
                 if p not in self.types[m.group(1)]:
                     self.types[m.group(1)].append(p)
+
+
+def symbols_rows() -> list[dict]:
+    path = ROOT / "data/symbols.csv"
+    return list(csv.DictReader(path.open())) if path.exists() else []
 
 
 def refusals(pairs: list[tuple[str, str]], tree: Tree, join: bool) -> dict[tuple[str, str], list[str]]:
@@ -250,7 +252,7 @@ def refusals(pairs: list[tuple[str, str]], tree: Tree, join: bool) -> dict[tuple
     # rows: the one clash a rename allows below is between methods of different
     # classes. A name the table gives no class is no method (a free function, a
     # type, a global).
-    rows = list(csv.DictReader(SYMBOLS.open())) if SYMBOLS.exists() else []
+    rows = symbols_rows()
     members: dict[str, set[str]] = defaultdict(set)
     plain: set[str] = set()
     for r in rows:
@@ -275,8 +277,6 @@ def refusals(pairs: list[tuple[str, str]], tree: Tree, join: bool) -> dict[tuple
             out[(old, new)].append(f"{new!r} is not a name C++ allows")
         if not IDENT.match(old):
             out[(old, new)].append(f"{old!r} is not an identifier")
-        if old in tree.entries:
-            out[(old, new)].append(f"{old} names a gap entry label (// ENTRY:), whose symbol the annotation makes")
         others = (groups[new] - {old}) | ({new} if new not in olds else set())
         others = {o for o in others if not allowed_clash(old, o)}
         clash = [p for p, toks in tree.tokens.items()
@@ -286,10 +286,6 @@ def refusals(pairs: list[tuple[str, str]], tree: Tree, join: bool) -> dict[tuple
             out[(old, new)].append(f"{old} and {' / '.join(sorted(seen_there))} "
                                    f"would both be {new} in {rel(clash[0])}"
                                    + (f" and {len(clash) - 1} more" if len(clash) > 1 else ""))
-        for p, bodies in tree.frames.items():
-            if old in tree.tokens[p] and any(declared_local(old, b) for b in bodies):
-                out[(old, new)].append(f"{old} is a local in a function whose frame follows its locals' "
-                                       f"names ({rel(p)})")
         types = [p for p in tree.types.get(new, []) if old not in tree.tokens[p]]
         if types and not join and new not in olds:
             out[(old, new)].append(f"{new} is already a type in {len(types)} file(s) ({rel(types[0])}, ...): "
@@ -313,19 +309,28 @@ def refusals(pairs: list[tuple[str, str]], tree: Tree, join: bool) -> dict[tuple
 # --- the rewrite and the checks ------------------------------------------------------------
 
 def sources_and_headers() -> list[Path]:
-    return source_files() + sorted((ROOT / "include").glob("*.h"))
+    return sorted(p for d in CODE_DIRS for p in (ROOT / d).rglob("*") if p.suffix in CODE_SUFFIXES and p.is_file())
 
 
-def header_pairs(pairs: list[tuple[str, str]], tokens: set[str]) -> list[tuple[str, str]]:
-    """The pairs a generated header takes: none that would make two of its
-    names one (that would change its symbol count)."""
-    groups: dict[str, set[str]] = defaultdict(set)
-    for old, new in pairs:
-        if old in tokens:
-            groups[new].add(old)
-    olds = {o for o, _ in pairs}
-    return [(old, new) for old, new in pairs
-            if len(groups[new]) + (new in tokens and new not in olds) <= 1]
+def rename_cells(text: str, columns: list[tuple[str, str]], renamer: "Renamer") -> str:
+    """A CSV with the renamer applied to the cells of some columns, the rest byte for byte."""
+    eol = "\r\n" if "\r\n" in text else "\n"
+    rows = list(csv.reader(io.StringIO(text, newline="")))
+    if not rows:
+        return text
+    header = rows[0]
+    todo = [(header.index(c), renamer.words if mode == "words" else renamer.symbols)
+            for c, mode in columns if c in header]
+    changed = False
+    for row in rows[1:]:
+        for i, convert in todo:
+            if i < len(row) and (new := convert(row[i])) != row[i]:
+                row[i], changed = new, True
+    if not changed:
+        return text
+    out = io.StringIO(newline="")
+    csv.writer(out, lineterminator=eol).writerows(rows)
+    return out.getvalue()
 
 
 def apply(pairs: list[tuple[str, str]], texts: dict[Path, str], dry_run: bool, docs: bool = True) -> list[str]:
@@ -339,16 +344,17 @@ def apply(pairs: list[tuple[str, str]], texts: dict[Path, str], dry_run: bool, d
                 path.write_bytes(after.encode("latin-1"))
 
     for path, text in texts.items():
-        if path.suffix == ".h":
-            own = header_pairs(pairs, set(TOKEN.findall(code_of(text))))
-            save(path, text, Renamer(own).source(text) if own else text)
-            continue
         save(path, text, renamer.source(text))
     for pattern in NAME_TABLES:
         path = ROOT / pattern
         if path.exists():
             text = path.read_bytes().decode("latin-1")
             save(path, text, renamer.symbols(text))
+    for pattern, columns in CELLS.items():
+        path = ROOT / pattern
+        if path.exists():
+            text = path.read_bytes().decode("latin-1")
+            save(path, text, rename_cells(text, columns, renamer))
     for pattern in TEXT_FILES if docs else []:
         for path in sorted(ROOT.glob(pattern)):
             text = path.read_bytes().decode("latin-1")
@@ -356,7 +362,28 @@ def apply(pairs: list[tuple[str, str]], texts: dict[Path, str], dry_run: bool, d
     return changed
 
 
+# The commands that bring the generated files and tables back in step, in order.
+FOLLOW_UP = [
+    "cmake --build build/modern --target game data bitexact",
+    "uv run tools/traceschema.py",
+    "uv run tools/layoutasserts.py --write --build-dir build/modern",
+    "uv run tools/rwsets.py",
+    "uv run tools/hazards.py",
+    "uv run tools/coupling.py",
+    "uv run tools/stateclasses.py",
+    "uv run tools/refcheck.py --write",
+    "uv run tools/typedupes.py",
+]
+
+
+def implied(pairs: list[tuple[str, str]], tree: "Tree") -> dict[tuple[str, str], tuple[str, str]]:
+    """The `bx_OLD` -> `bx_NEW` pairs for the renamed names lib/bitexact spells that way, by their pair."""
+    seen = set().union(*tree.tokens.values()) if tree.tokens else set()
+    return {(f"bx_{o}", f"bx_{n}"): (o, n) for o, n in pairs if f"bx_{o}" in seen}
+
+
 def main() -> None:
+    global ROOT
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("names", nargs="*", help="OLD NEW pairs")
     ap.add_argument("--from", dest="table", type=Path, help="a CSV of old,new[,evidence] rows")
@@ -364,7 +391,9 @@ def main() -> None:
     ap.add_argument("--join", action="store_true",
                     help="allow a NEW that is already a type elsewhere: OLD's views join that type")
     ap.add_argument("--keep-going", action="store_true", help="rename the pairs that pass, list the others")
+    ap.add_argument("--root", type=Path, default=ROOT, help="the tree to rename in (default: this one)")
     args = ap.parse_args()
+    ROOT = args.root.resolve()
     if len(args.names) % 2:
         ap.error("names come in OLD NEW pairs")
     pairs = list(zip(args.names[::2], args.names[1::2]))
@@ -378,23 +407,31 @@ def main() -> None:
     texts = {p: p.read_bytes().decode("latin-1") for p in sources_and_headers()}
     tree = Tree(texts)
     while True:
-        refused = refusals(pairs, tree, args.join)
+        extra = implied(pairs, tree)
+        base_of = {pr: pr for pr in pairs} | extra
+        refused = refusals(pairs + list(extra), tree, args.join)
         if not refused:
             break
-        print(f"refused {len(refused)} of {len(pairs)} pair(s):")
+        print(f"refused {len(refused)} of {len(base_of)} pair(s):")
         for (old, new), why in sorted(refused.items()):
             print(f"  {old} -> {new}: {'; '.join(dict.fromkeys(why))}")
         if not args.keep_going:
             sys.exit(2)
         # Without the refused pairs, others may now pass (or clash): look again.
-        pairs = [p for p in pairs if p not in refused]
+        gone = {base_of[pr] for pr in refused}
+        pairs = [p for p in pairs if p not in gone]
         if not pairs:
             sys.exit(2)
+    pairs += list(extra)
     # A join gives many views one name: the docs keep the names they tell apart.
     changed = apply(pairs, texts, args.dry_run, docs=not args.join)
-    files = [f for f in changed if f.startswith("src/")]
-    print(f"{len(pairs)} pair(s): {'would change' if args.dry_run else 'changed'} {len(changed)} file(s), "
-          f"{len(files)} under src/")
+    for f in changed:
+        print(f)
+    print(f"{len(pairs)} pair(s): {'would change' if args.dry_run else 'changed'} {len(changed)} file(s)")
+    if changed and not args.dry_run:
+        print("Regenerate, in this order, then run the --check of each:")
+        for cmd in FOLLOW_UP:
+            print(f"  {cmd}")
 
 
 if __name__ == "__main__":

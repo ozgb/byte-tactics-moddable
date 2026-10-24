@@ -213,7 +213,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     InitTimers(0x1e);
     RegisterDataArchives();
     EmptyPostArchiveMountHook(DAT_005097f4);
-    g_game->unknown_c = (Ctx_00499890*)(&g_displayContext);
+    g_game->displayContext = (Ctx_00499890*)(&g_displayContext);
     g_game->version = 3;
     g_game->versionMinor = 1;
     g_game->field_3 = 1;
@@ -224,7 +224,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             strcpy(g_preferredLanguage, g_defaultLanguage);
     }
     LoadTranslations((char *)g_translationFile, g_preferredLanguage);
-    g_game->field_10 = (Class_004cdb40*)(new Sound);
+    g_game->sound = (Class_004cdb40*)(new Sound);
     EmptyPreFrontendInitHook();
     InitGame();
 
@@ -250,18 +250,18 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             break;
         if (!DispatchHostEvents())
             break;
-        if (g_displayContext.active == lzero && *(int*)((Sound*)g_game->field_10) != 0) {
+        if (g_displayContext.active == lzero && *(int*)((Sound*)g_game->sound) != 0) {
             SaveCdLists();
-            g_cdTrackCategory = ((Sound*)g_game->field_10)->GetTrackCategory();
-            ((Sound*)g_game->field_10)->CloseCdAudio();
+            g_cdTrackCategory = ((Sound*)g_game->sound)->GetTrackCategory();
+            ((Sound*)g_game->sound)->CloseCdAudio();
             g_cdNeedsReopenAfterFocus = 1;
-        } else if (g_displayContext.active != lzero && *(int*)((Sound*)g_game->field_10) == 0
+        } else if (g_displayContext.active != lzero && *(int*)((Sound*)g_game->sound) == 0
                    && g_cdNeedsReopenAfterFocus != 0) {
-            ((Sound*)g_game->field_10)->OpenCdAudio();
-            ((Sound*)g_game->field_10)->SetCdCallback(ReopenCdAudio);
-            ((Sound*)g_game->field_10)->EnableCdAudio(g_game->musicMode & 1);
-            ((Sound*)g_game->field_10)->SetPlaybackOrder(g_game->cdMode);
-            ((Sound*)g_game->field_10)->SetTrackCategory(g_cdTrackCategory);
+            ((Sound*)g_game->sound)->OpenCdAudio();
+            ((Sound*)g_game->sound)->SetCdCallback(ReopenCdAudio);
+            ((Sound*)g_game->sound)->EnableCdAudio(g_game->musicMode & 1);
+            ((Sound*)g_game->sound)->SetPlaybackOrder(g_game->cdMode);
+            ((Sound*)g_game->sound)->SetTrackCategory(g_cdTrackCategory);
             ReopenCdAudio();
             g_cdNeedsReopenAfterFocus = 0;
         }
@@ -276,7 +276,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         {
             DWORD tick = host_time_ms();
             if ((int)(tick - g_lastSoundReapTick) >= 100) {
-                ((Sound*)g_game->field_10)->ReapFinishedBuffers();
+                ((Sound*)g_game->sound)->ReapFinishedBuffers();
                 g_lastSoundReapTick = tick;
             }
         }

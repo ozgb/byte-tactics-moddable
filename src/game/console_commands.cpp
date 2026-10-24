@@ -256,7 +256,7 @@ void __stdcall CmdAssign(CommandArgs* args)
     if (kind.index) {
         int a = args->GetIntArg(1, 0);
         int b = args->GetIntArg(2, 0);
-        IssueOrderToSelection((char*)g_game + 0x2c76, 0, kind, 0, a, b);
+        IssueOrderToSelection(g_game->orders_2c76, 0, kind, 0, a, b);
     }
 }
 
@@ -418,23 +418,23 @@ void __stdcall CmdSearch(CommandArgs* args)
 // FUNCTION: 0x4167f0
 void __stdcall CmdCDPlay(CommandArgs* args)
 {
-    ((Sound*)g_game->field_10)->PlayCdTrack(args->GetIntArg(1, 0), 1);
+    ((Sound*)g_game->sound)->PlayCdTrack(args->GetIntArg(1, 0), 1);
 }
 
 // FUNCTION: 0x416810
 void __stdcall CmdCDStop(int unused)
 {
-    ((Sound*)g_game->field_10)->StopCdAudio();
+    ((Sound*)g_game->sound)->StopCdAudio();
 }
 
 // FUNCTION: 0x416820
 void __stdcall CmdSound3D(int unused)
 {
-    if (((Sound*)g_game->field_10)->Is3DEnabled()) {
-        ((Sound*)g_game->field_10)->Disable3D();
+    if (((Sound*)g_game->sound)->Is3DEnabled()) {
+        ((Sound*)g_game->sound)->Disable3D();
         SaveSettings();
     } else {
-        ((Sound*)g_game->field_10)->Enable3D();
+        ((Sound*)g_game->sound)->Enable3D();
         SaveSettings();
     }
 }
@@ -1042,7 +1042,7 @@ void __stdcall DrawWorldSegmentLine(void* surface, Point16 from, short dx, short
 void AiSearchGoal::DrawOnSurface(void* surface)
 {
     DrawMapTileSelectionOutline(surface, (short*)&this->owner->cell, (*(int*)&this->owner->footprint), 0xf);
-    unsigned char color = *(unsigned char*)((char*)g_game + 0xdcb + ((this->active & 1) ? 9 : 12));
+    unsigned char color = g_game->colors[(this->active & 1) ? 9 : 12];
     for (int i = 0; i < this->count - 1; i++) {
         Pos_00417bb0 p1;
         *(int*)&p1.x_frac = this->points[i].x << 16;

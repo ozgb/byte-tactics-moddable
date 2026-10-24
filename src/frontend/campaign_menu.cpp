@@ -834,29 +834,29 @@ void __stdcall HandleNewGameClick(Gui* menu)
             *(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x1cd5)).get() + 0x96) = 1;
             SaveSettings();
             if (g_anyMissionMode != 0) {
-                *(unsigned char*)((char*)g_game + 0x2bc0) = 0x10;
+                g_game->frontendNextSubState = 0x10;
                 return;
             }
-            *(unsigned char*)((char*)g_game + 0x2bc0) = 0x0f;
+            g_game->frontendNextSubState = 0x0f;
             return;
         }
         goto End;
     } else {
         if (IsCurrentGadgetNamed((Dialog *)menu, "PrevMenu")) {
             PlaySoundByName("Previous", 0);
-            *(unsigned char*)((char*)g_game + 0x2bc0) = 3;
+            g_game->frontendNextSubState = 3;
             SetCursorMode(0x14);
             return;
         }
         if (IsCurrentGadgetNamed((Dialog *)menu, "Difficulty")) {
             PlaySoundByName("SmlButton", 0);
-            int diff = *(int*)((char*)g_game + 0x37eee);
+            int diff = g_game->difficulty;
             if (diff == 0) {
-                *(int*)((char*)g_game + 0x37eee) = 1;
+                g_game->difficulty = 1;
             } else if (diff == 1) {
-                *(int*)((char*)g_game + 0x37eee) = 2;
+                g_game->difficulty = 2;
             } else if (diff == 2) {
-                *(int*)((char*)g_game + 0x37eee) = 0;
+                g_game->difficulty = 0;
             } else {
                 goto End;
             }
@@ -873,7 +873,7 @@ void __stdcall HandleNewGameClick(Gui* menu)
         PlaySoundByName("SideSelect2", 0);
         index = FindGadgetIndex(entries, "Side1", 1);
         *(int*)((char*)entries + index * 0x15b + 0x1f) = 0x1f;
-        *(int*)((char*)g_game + 0x37ef2) = 1;
+        g_game->flag_37ef2 = 1;
         *(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1b8a)).get() + 0x95) = 1;
         *(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1cd5)).get() + 0x95) = 0;
         if (g_campaignSimplifiedLayout == 0)
@@ -891,7 +891,7 @@ ArmSide:
         PlaySoundByName("SideSelect", 0);
         index = FindGadgetIndex(entries, "Side0", 1);
         *(int*)((char*)entries + index * 0x15b + 0x1f) = 0x1f;
-        *(int*)((char*)g_game + 0x37ef2) = 0;
+        g_game->flag_37ef2 = 0;
         *(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1b8a)).get() + 0x95) = 0;
         *(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1cd5)).get() + 0x95) = 1;
         FillCampaignListInline(*(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x14b * g_game->localPlayer + 0x1b8a)).get() + 0x95));
@@ -1156,7 +1156,7 @@ void __stdcall UpdatePlanet(Gui* arg1, Gadget* arg2)
     void* surface = arg1->layer->entries->surface;
     if (g_briefingPlanetNextTick <= host_time_ms()) {
         g_briefingPlanetNextTick = host_time_ms() + 0x19;
-        if (((Sound *)g_game->field_10)->IsStreamActive() == 0) {
+        if (((Sound *)g_game->sound)->IsStreamActive() == 0) {
             if (GetButtonStageByName(arg1, "SHUTUP")) {
                 SetButtonStageByName(arg1, "SHUTUP", 0);
                 MarkChanged((Dialog *)arg1);
@@ -1210,7 +1210,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
         PlaySoundByName("BigButton", 0);
         RegisterDataArchives();
         SetCursorMode(0x14);
-        ((Sound *)g_game->field_10)->StopStream();
+        ((Sound *)g_game->sound)->StopStream();
         BlankScreen();
         g_game->frontendNextSubState = 2;
         return;
@@ -1218,7 +1218,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
     if (IsCurrentGadgetNamed((Dialog *)menu, "SHUTUP")) {
         PlaySoundByName("Options", 0);
         if (!GetButtonStageByName(menu, "SHUTUP")) {
-            ((Sound *)g_game->field_10)->StopStream();
+            ((Sound *)g_game->sound)->StopStream();
         } else if (g_game->mode_391f1 != 6) {
             char* text = (char*)g_game->net->GetNameSlot(3);
             if (text) {
@@ -1230,7 +1230,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
         return;
     }
     if (IsCurrentGadgetNamed((Dialog *)menu, "PrevMenu")) {
-        ((Sound *)g_game->field_10)->StopStream();
+        ((Sound *)g_game->sound)->StopStream();
         PlaySoundByName("Previous", 0);
         BlankScreen();
         g_game->frontendNextSubState = 3;
@@ -1269,7 +1269,7 @@ void OpenMissionBriefing(void)
     dialog->data = g_game;
 
     LoadPictureCached(buf, 1, 1, 0);
-    RemapPaletteToClosestIndices(&g_game->gui, (char*)g_game + 0x143a7, (char*)g_game + 0x5cb);
+    RemapPaletteToClosestIndices(&g_game->gui, g_game->paletteRgba, (char*)g_game + 0x5cb);
 
     gadgets = g_game->gui.layer->entries;
     strcpy((char*)gadgets + 0xcc, "Start");
@@ -1401,7 +1401,7 @@ void OpenMissionBriefing(void)
 int CountComputerSlots()
 {
     int count = 0;
-    int num_items = *(int*)((char*)g_game + 0x38d81);
+    int num_items = g_game->playerCount;
     if (num_items > 0) {
         Item* ptr = (Item *)g_game->options;
         do {

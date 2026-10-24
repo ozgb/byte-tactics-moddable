@@ -250,7 +250,7 @@ void __stdcall DrawRadar(void* param_1)
     if (g_game->timer.word.flags.pending) {
         g_game->timer.word.flags.pending = 0;
         DrawSurface(param_1, g_game->finalSurface, g_game->posX, g_game->posY);
-        DrawRectangle(param_1, g_game->field_142cb, g_game->unknown_dd9);
+        DrawRectangle(param_1, g_game->radarViewportRect, g_game->colors[14]);
     }
 }
 
@@ -286,7 +286,7 @@ void UpdateRadarMapped()
                 } else if (t->explored[index]) {
                     *dst = *src;
                 } else {
-                    *dst = ((Fx_00466c20 *)g_game->unknown_c)->colorMap[*src];
+                    *dst = ((Fx_00466c20 *)g_game->displayContext)->colorMap[*src];
                 }
                 j++;
                 mapX += halfWidth;

@@ -448,7 +448,7 @@ void UpdateMenuSparks()
             }
             s++;
         } while (--count);
-        MarkLayerChanged((Dialog *)((char*)g_game + 0x519));
+        MarkLayerChanged((Dialog *)&g_game->gui);
     }
 }
 
@@ -550,7 +550,7 @@ void __stdcall HandleCloseCdPlayerChoice(Gadget_00426190* gadget)
         return;
     PlaySoundByName("SmallButton", 0);
     if (IsGadgetNamed(owner, gadget->selected, "CHOICE1")) {
-        ((Sound *)g_game->field_10)->CloseCdPlayerWindow();
+        ((Sound *)g_game->sound)->CloseCdPlayerWindow();
     } else if (!IsGadgetNamed(owner, gadget->selected, "CHOICE2")) {
         ClearSelectedGadget(gadget);
     }
@@ -607,7 +607,7 @@ void __stdcall OpenMainMenu()
 
     LoadPictureCached("FrontendX", 1, 1, 0);
     PlayLoopingSoundByName("BGM", 0);
-    ((Sound *)g_game->field_10)->SetTrackCategory(4);
+    ((Sound *)g_game->sound)->SetTrackCategory(4);
     EnableKeyCommands((Dialog *)&g_game->gui);
 
     char* name = "FrontendX";
@@ -643,7 +643,7 @@ void __stdcall OpenMainMenu()
     memset(g_menuSparks, 0, 0x145 * 4);
 
     if (g_cdPlayerDialogShown == 0) {
-        if (((Sound *)g_game->field_10)->HasCdPlayerWindow()) {
+        if (((Sound *)g_game->sound)->HasCdPlayerWindow()) {
             OpenCloseCdPlayerDialog();
             g_cdPlayerDialogShown = 1;
         }
@@ -660,7 +660,7 @@ void __stdcall OpenMainMenu()
     }
 
     if (g_noSoundDriverShown == 0) {
-        if (((Sound *)g_game->field_10)->HasNoDriver()) {
+        if (((Sound *)g_game->sound)->HasNoDriver()) {
             OpenMessageBox(&g_game->gui, Translate("No sound driver is available for use.\n"), 500, 1, 1);
             g_noSoundDriverShown = 1;
         }
@@ -1174,19 +1174,19 @@ void RunFrontendStateMachine(void)
             PresentFrontendFrame();
             return;
         case 2:
-            if (memcmp((char*)g_game + 0x39201, g_dpspGuidModem, 0x10) == 0) {
+            if (memcmp(g_game->providerGuid, g_dpspGuidModem, 0x10) == 0) {
                 SetState(0x14, 0x547, g_frontendSourceFile);
                 SetSubState(1, 0x548, g_frontendSourceFile);
                 OpenModemDialog();
                 return;
             }
-            if (memcmp((char*)g_game + 0x39201, g_dpspGuidSerial, 0x10) == 0) {
+            if (memcmp(g_game->providerGuid, g_dpspGuidSerial, 0x10) == 0) {
                 SetState(0x14, 0x54e, g_frontendSourceFile);
                 SetSubState(1, 0x54f, g_frontendSourceFile);
                 OpenSerialDialog();
                 return;
             }
-            if (memcmp((char*)g_game + 0x39201, g_dpspGuidTcpip, 0x10) == 0) {
+            if (memcmp(g_game->providerGuid, g_dpspGuidTcpip, 0x10) == 0) {
                 SetState(0x14, 0x555, g_frontendSourceFile);
                 SetSubState(1, 0x556, g_frontendSourceFile);
                 OpenTcpDialog();
@@ -1229,8 +1229,8 @@ void RunFrontendStateMachine(void)
             host_net_guarantee_packets(1);
             SetSubState(1, 0x587, g_frontendSourceFile);
             ResetPlayerSlots();
-            if (memcmp((char*)g_game + 0x39201, g_dpspGuidModem, 0x10) == 0 ||
-                memcmp((char*)g_game + 0x39201, g_dpspGuidSerial, 0x10) == 0) {
+            if (memcmp(g_game->providerGuid, g_dpspGuidModem, 0x10) == 0 ||
+                memcmp(g_game->providerGuid, g_dpspGuidSerial, 0x10) == 0) {
                 if (g_game->dplayAddressDialogFlags.b0) {
                     SetSubState(0x11, 0x58f, g_frontendSourceFile);
                     return;
@@ -1282,7 +1282,7 @@ void RunFrontendStateMachine(void)
             unsigned char* q = (unsigned char*)g_game + 0x14b * (unsigned char)g_game->localPlayer + 0x1b84;
             *q = ((*(Bits_00426e80*)&g_game->flags_2b4c).b4 << 1) | (*q & 0xfd);
             if ((*(Bits_00426e80*)&g_game->flags_2b4c).b4) {
-                g_game->net->LoadMissionByName((char*)g_game + 0x2ab1);
+                g_game->net->LoadMissionByName(g_game->buffer_2ab1);
                 for (int i = 0; i < 10; i++) {
                     if (g_game->players[i].active) {
                         char t = g_game->players[i].type;

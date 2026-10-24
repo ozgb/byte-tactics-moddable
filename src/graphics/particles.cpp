@@ -1356,8 +1356,8 @@ void TeleportParticles::Emit()
         e.pos2 = pos2;
         e.dir = dir;
         e.endTime = g_game->ticks + sparkLifetime;
-        e.data = g_game->unknown_147f3;
-        e.frameCount = GetGafFrameCount(g_game->unknown_147f3) - 1;
+        e.data = g_game->flamestreamGaf;
+        e.frameCount = GetGafFrameCount(g_game->flamestreamGaf) - 1;
         e.frame = (int)(((__int64)HarnessViewRand() * e.frameCount) / 0x8000);
         List_004737c0* v = (List_004737c0*)&items;
         v->insert(v->last, 1, e);
@@ -1473,8 +1473,8 @@ void ThrustParticles::Emit()
         rec.pos0 = *p;
         rec.pos1 = pos1;
         rec.pos2 = pos2;
-        rec.bitmask = (unsigned short *)g_game->unknown_147f3;
-        rec.frameCount = (int)GetGafFrameCount(g_game->unknown_147f3) - 1;
+        rec.bitmask = (unsigned short *)g_game->flamestreamGaf;
+        rec.frameCount = (int)GetGafFrameCount(g_game->flamestreamGaf) - 1;
         rec.frame = 0;
         ((Class_00475bd0*)v)->insert(v->end(), 1, rec);
     }

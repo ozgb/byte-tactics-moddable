@@ -177,15 +177,15 @@ void InitSound(void)
         g_noDirectSound = 1;
     }
     if (!g_noDirectSound) {
-        int hr = ((Sound *)g_game->field_10)->InitDirectSound(0x2b11, 0x10, 2, ((SoundParams_0047ed40 *)g_game->unknown_c)->hwnd);
+        int hr = ((Sound *)g_game->sound)->InitDirectSound(0x2b11, 0x10, 2, ((SoundParams_0047ed40 *)g_game->displayContext)->hwnd);
         if (hr == 0) {
-            if (((Sound *)g_game->field_10)->HasNoDriver())
+            if (((Sound *)g_game->sound)->HasNoDriver())
                 g_noDirectSound = 1;
             else
                 FatalError(g_soundInitError);
         }
     }
-    ((Sound *)g_game->field_10)->OpenCdAudio();
+    ((Sound *)g_game->sound)->OpenCdAudio();
     g_speechQueue = new SpeechQueue(0x1e, 0x96);
 }
 
@@ -239,13 +239,13 @@ void ShutdownSound()
         operator delete(list);
         g_speechQueue = 0;
     }
-    ((Sound *)g_game->field_10)->RestoreMixerVolumes();
-    Sound* sound = (Sound *)g_game->field_10;
+    ((Sound *)g_game->sound)->RestoreMixerVolumes();
+    Sound* sound = (Sound *)g_game->sound;
     if (sound) {
         sound->ReleaseDirectSound();
         operator delete(sound);
     }
-    (*(Sound **)&g_game->field_10) = 0;
+    (*(Sound **)&g_game->sound) = 0;
 }
 
 // FUNCTION: 0x47efc0
@@ -272,7 +272,7 @@ void* __stdcall LoadSoundFile(const char* name)
     if (g_useWindowsSound != 0) {
         return HAPI_LoadFile(path, 0);
     }
-    return ((Sound *)g_game->field_10)->LoadSample(path);
+    return ((Sound *)g_game->sound)->LoadSample(path);
 }
 
 // FUNCTION: 0x47f060
@@ -282,14 +282,14 @@ void __stdcall FreeSoundSet(void** set)
         GameFreeThunk(set);
         return;
     }
-    ((Sound *)g_game->field_10)->ReleaseSampleSet(set);
+    ((Sound *)g_game->sound)->ReleaseSampleSet(set);
 }
 
 // FUNCTION: 0x47f090
 void __stdcall StreamSoundDelayed(char* param_1, int param_2, int param_3)
 {
     if (g_noDirectSound == 0) {
-        ((Sound *)g_game->field_10)->StreamSampleDelayed(param_1, param_2, param_3);
+        ((Sound *)g_game->sound)->StreamSampleDelayed(param_1, param_2, param_3);
     }
 }
 
@@ -313,8 +313,8 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
                 BroadcastPacket(GetLocalDpid(), &packet, sizeof(packet));
             }
             if (g_playLooping)
-                return ((Sound *)g_game->field_10)->PlayLooping(sound, -585);
-            return ((Sound *)g_game->field_10)->PlaySampleSet(sound, -585, 0);
+                return ((Sound *)g_game->sound)->PlayLooping(sound, -585);
+            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, 0);
         }
     }
     return 0;
@@ -349,7 +349,7 @@ int __stdcall PlaySoundFile(char* name)
     if (g_useWindowsSound)
         return PlayWavFromDisk(name);
     if (name && strlen(name) && g_game->volume1 && (g_game->soundFlags_37f19 & 7) && !g_noDirectSound)
-        return ((Sound *)g_game->field_10)->PlaySample(name, -0x249, 0);
+        return ((Sound *)g_game->sound)->PlaySample(name, -0x249, 0);
     return 0;
 }
 
@@ -408,22 +408,22 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
                 & (1 << pi)) ? 1 : 0;
     }
     if (vis != 0) {
-        if (((Sound *)g_game->field_10)->Is3DEnabled()) {
+        if (((Sound *)g_game->sound)->Is3DEnabled()) {
             Vector3_0047f300 p;
             p.x = pos->x - g_game->scrollX - (g_game->screenTilesX / 2) * 16;
             p.z = g_game->scrollY + (g_game->screenTilesY / 2) * 16
                 + (pos->y >> 1) - pos->z;
             p.y = 0;
-            ((Sound *)g_game->field_10)->Set3DDistances(
+            ((Sound *)g_game->sound)->Set3DDistances(
                 (float)(((g_game->screenTilesX + g_game->screenTilesY) / 2) * 16),
                 (float)((g_game->width + g_game->height) * 16));
-            return ((Sound *)g_game->field_10)->PlaySampleSet(sound, -585, &p);
+            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, &p);
         } else {
             if (g_game->scrollX > pos->x || g_game->scrollY > pos->z
                 || g_game->scrollX + g_game->screenTilesX * 16 < pos->x
                 || g_game->scrollY + g_game->screenTilesY * 16 < pos->z)
-                return ((Sound *)g_game->field_10)->PlaySampleSet(sound, -1585, 0);
-            return ((Sound *)g_game->field_10)->PlaySampleSet(sound, -585, 0);
+                return ((Sound *)g_game->sound)->PlaySampleSet(sound, -1585, 0);
+            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, 0);
         }
     }
     return 0;
@@ -463,7 +463,7 @@ void PlayNextSpeech()
 void StopAllSounds()
 {
     if (g_noDirectSound == 0) {
-        ((Sound *)g_game->field_10)->StopAllBuffers();
+        ((Sound *)g_game->sound)->StopAllBuffers();
     }
     if (g_useWindowsSound != 0) {
         StopWindowsSound();
@@ -629,7 +629,7 @@ void SpeechQueue::PlaySpeech(int index, int param_2, int param_3)
             PlayWavFromDisk(path);
         } else if (path && strlen(path) && g_game->volume1
                    && (g_game->soundFlags_37f19 & 7) && g_noDirectSound == 0) {
-            ((Sound *)g_game->field_10)->PlaySample(path, -0x249, 0);
+            ((Sound *)g_game->sound)->PlaySample(path, -0x249, 0);
         }
         g_speechTypes[slot].minFrame =
             (unsigned int)g_game->ticks + g_speechTypes[slot].cooldown * 0x1e;

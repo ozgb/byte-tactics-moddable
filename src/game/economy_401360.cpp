@@ -26,7 +26,7 @@ struct Res_00401360 {
 class Econ_00401360 {
 public:
     Res_00401360 res[2];               // +0x0
-    Ref<Player> owner;                  // +0x30
+    Ref<Player> owner;
     int RequestEnergy(Econ_00401360* e, float amount);
     int RequestEnergyAndMetal(float energy, float metal);
     int SpendEnergy(float amount);

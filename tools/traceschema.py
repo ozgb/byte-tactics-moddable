@@ -64,13 +64,13 @@ NAMES: dict[str, dict[int, str]] = {
 POINTERS: dict[str, dict[int, str]] = {
     "Unit": {0x0: "HEAP", 0x4: "HEAP", 0x8: "HEAP", 0xC: "WEAPONDEF", 0x10: "HEAP", 0x24: "HEAP", 0x2C: "HEAP",
              0x40: "HEAP", 0x48: "HEAP", 0x82: "REC", 0x86: "UNIT"},
-    "Projectile": {0x4E: "HEAP", 0x56: "PROJECTILE"},
+    "Projectile": {0x4E: "HEAP"},
     "Debris": {0x0: "PIECE"},
 }
 
 REFS: dict[str, set[int]] = {
     "MoveClass": {0x18},
-    "Projectile": {0x4E, 0x56},
+    "Projectile": {0x4E},
 }
 
 POINTER_NAMES: dict[tuple[str, int], str] = {

@@ -211,7 +211,7 @@ class ClangTest(unittest.TestCase):
         classes = {"view": "view", "items": "sim"}
         out = rc.outside_rows(self.root, locators, classes)
         keyed = {(r["struct"], r["field"], r["holder"]): r for r in out}
-        self.assertEqual(keyed[("Game", "view", "AllocZeroedWithTickOffset")]["issue"], "#22")
+        self.assertEqual(keyed[("Game", "view", "AllocZeroedWithTickOffset")]["issue"], "#392")
         self.assertEqual(keyed[("Item", "p", "AllocZeroedWithTickOffset")]["issue"], "#350")
         self.assertEqual(keyed[("", "", "UNITINFO")]["words"], 2)
         self.assertEqual(keyed[("", "", "UNITINFO")]["offset"], "0x47a+0x249*k")
@@ -272,13 +272,13 @@ class CheckTest(unittest.TestCase):
         self.assertIn("file is src/old.h, expected src/a.h", problems[0])
 
     def test_outside_field_needs_no_exception_and_blocks_a_row(self):
-        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "#22",
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "#392",
                "kind": "pointer", "note": "n"}
         self.outside([row])
         self.exceptions()
         result = make_result(found_field("Game", "view", files=("src/game/game.h",)), [row])
         self.assertEqual(rc.check(self.root, result), [])
-        self.exceptions(("Game", "view", "pointer", "src/game/game.h", "#22"))
+        self.exceptions(("Game", "view", "pointer", "src/game/game.h", "#392"))
         self.assertIn("the field is on", rc.check(self.root, result)[0])
 
     def test_outside_list_out_of_date_fails(self):
@@ -343,10 +343,10 @@ class IssueTest(unittest.TestCase):
         self.assertEqual(self.issue("Game", "unknown", "src/game/game.h"), "#353")
 
     def test_outside_issue(self):
-        self.assertEqual(rc.outside_issue("", "Game", "view", self.CLASSES), "#22")
-        self.assertEqual(rc.outside_issue("", "Game", "gaf", self.CLASSES), "#22")
+        self.assertEqual(rc.outside_issue("", "Game", "view", self.CLASSES), "#392")
+        self.assertEqual(rc.outside_issue("", "Game", "gaf", self.CLASSES), "#392")
         self.assertEqual(rc.outside_issue("", "Game", "units", self.CLASSES), "#350")
-        self.assertEqual(rc.outside_issue("FeatureAnim.state (0x4)", "", "", self.CLASSES), "#22")
+        self.assertEqual(rc.outside_issue("FeatureAnim.state (0x4)", "", "", self.CLASSES), "#392")
         self.assertEqual(rc.outside_issue("UnitType.data", "", "", self.CLASSES), "#352")
 
 

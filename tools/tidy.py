@@ -19,8 +19,9 @@ Pure additions are always reported.
 
 Also fails an added line that introduces a placeholder name from the
 decompiler: FUN_<addr>, DAT_<addr>, field_<offset>, unk*, unknown_<offset>,
-param_N or <Name>_<addr> (an 8 digit hex address starting 00). A name that
-already occurs anywhere in the tree at the base of RANGE is not new.
+param_N or <Name>_<addr> (an 8 digit hex address starting 00). A name is new when
+the range adds more lines with it than it removes, counted over the whole diff, so a
+move between files passes.
 
 Prints file:line: message [check] for each finding and exits 1 if there are
 any. A translation unit that clang-tidy cannot parse is a tool error, not a
@@ -90,38 +91,47 @@ def placeholder_names(text, lines):
     return found
 
 
-def known_at(root, base, names):
-    """The subset of names that occur as a whole word anywhere in the tree at base."""
-    if not names:
-        return set()
-    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as fh:
-        fh.write("\n".join(sorted(names)) + "\n")
-    try:
-        r = subprocess.run(["git", "-c", "core.quotepath=false", "grep", "-ohwF", "-f", fh.name, base, "--"],
-                           cwd=root, capture_output=True, text=True)
-    finally:
-        os.unlink(fh.name)
-    if r.returncode not in (0, 1):
-        sys.exit(f"git grep: {r.stderr.strip()}")
-    return set(r.stdout.split())
+def removed_lines(root, rev_range):
+    """{old path: set of removed line numbers} from git diff -U0, deleted files included."""
+    diff = git(root, "diff", "-U0", "--no-color", "--no-ext-diff", rev_range, "--")
+    result, path = {}, None
+    for row in diff.splitlines():
+        if row.startswith("--- "):
+            path = row[6:].split("\t")[0] if row.startswith("--- a/") else None
+            if path:
+                result.setdefault(path, set())
+        elif row.startswith("@@") and path:
+            m = re.match(r"@@ -(\d+)(?:,(\d+))? \+\S+ @@", row)
+            start, count = int(m.group(1)), int(m.group(2) or 1)
+            result[path].update(range(start, start + count))
+    return result
 
 
 def lint_placeholders(root, rev_range, lines_by_path):
-    """[(path, line, message)] for each added line that introduces a placeholder name."""
-    found = {}
+    """[(path, line, message)] for each added line with a placeholder name the range adds more than it removes."""
+    found, gained = {}, {}
     for path, added in lines_by_path.items():
         if Path(path).suffix not in C_SUFFIXES or not added:
             continue
         hits = placeholder_names(new_text(root, rev_range, path), added)
         if hits:
             found[path] = hits
-    names = {n for hits in found.values() for row in hits.values() for _, n in row}
-    known = known_at(root, base_of(root, rev_range), names)
+        for row in hits.values():
+            for _, name in row:
+                gained[name] = gained.get(name, 0) + 1
+    base = base_of(root, rev_range)
+    for path, removed in removed_lines(root, rev_range).items():
+        if Path(path).suffix not in C_SUFFIXES or not removed or not found:
+            continue
+        for row in placeholder_names(git(root, "show", f"{base}:{path}"), removed).values():
+            for _, name in row:
+                if name in gained:
+                    gained[name] -= 1
     out = []
     for path, hits in sorted(found.items()):
         for ln, row in sorted(hits.items()):
             for kind, name in row:
-                if name not in known:
+                if gained[name] > 0:
                     out.append((path, ln, f"new placeholder name {name} ({kind}): give it a real name"))
     return out
 

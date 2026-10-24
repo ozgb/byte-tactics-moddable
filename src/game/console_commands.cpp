@@ -310,7 +310,7 @@ void __stdcall SetBrightness(float value);
 #include "../files/files_api.h"
 void __stdcall SaveGameFile(char* path, char* description, int gameId);
 extern void ClearCameraFollowState(void);
-void FUN_004161f0();
+void SumMessageStats();
 void __stdcall WriteScreenshot(char* name, char* description, int x, int y, int w, int h);
 unsigned int GetTicks();
 void EnableMeteors();
@@ -964,11 +964,10 @@ void __stdcall CmdNowISee(void*)
     g_seams.los_radar->RecalculateLineOfSight(1);
 }
 
-// Same reset sequence as InitCommands, run as a callback after FUN_004161f0.
 // FUNCTION: 0x417570
 void __stdcall CmdNetStats(int)
 {
-    FUN_004161f0();
+    SumMessageStats();
     DAT_00511c20 = g_game->ticks;
     g_messageBytesReceived = 0;
     g_messageBytesSent = 0;

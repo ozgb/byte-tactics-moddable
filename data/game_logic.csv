@@ -122,7 +122,7 @@ address,function,file
 0x415f40,CountPacket,src/network/net_stats.cpp
 0x415fa0,FormatNetStats,src/network/net_stats.cpp
 0x416150,GetByteRates,src/network/net_stats.cpp
-0x4161f0,FUN_004161f0,src/network/net_stats.cpp
+0x4161f0,SumMessageStats,src/network/net_stats.cpp
 0x416240,CmdMemDump,src/game/console_commands.cpp
 0x416270,CmdMem,src/game/console_commands.cpp
 0x416280,CmdAI,src/game/console_commands.cpp
@@ -229,7 +229,7 @@ address,function,file
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp
 0x41d2b0,ReadCameraPosition,src/ingame/camera.cpp
 0x41d360,WriteCameraPosition,src/ingame/camera.cpp
-0x41d8a0,FUN_0041d8a0,src/game/cd_check.cpp
+0x41d8a0,UsesDataArchives,src/game/cd_check.cpp
 0x420620,InitExplosions,src/weapons/explosions.cpp
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp
 0x420b00,DrawExplosions,src/weapons/explosions.cpp

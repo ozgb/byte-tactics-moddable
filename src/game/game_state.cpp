@@ -118,8 +118,8 @@ void __stdcall SetGameMode(int param)
 // tick count the wind is switched off instead.
 
 // Fixed-point trig helpers, written in assembly: the angle is a short.
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
 int __stdcall RandomInt(int range);
 
 void __cdecl UpdateWind()
@@ -142,8 +142,8 @@ void __cdecl UpdateWindOnStream(RandStream stream)
         if (g_game->windSpeed != 0)
             g_game->windDirection = RandomInt(0x10000);
 
-        g_game->windX = -FUN_004b70ef(g_game->windDirection, g_game->windSpeed) * 2;
-        g_game->windZ = -FUN_004b7123(g_game->windDirection, g_game->windSpeed) * 2;
+        g_game->windX = -ScaledSin(g_game->windDirection, g_game->windSpeed) * 2;
+        g_game->windZ = -ScaledCos(g_game->windDirection, g_game->windSpeed) * 2;
 
         g_game->windStrength = (float)g_game->windSpeed / (float)g_game->windSpeedDenominator;
         if (1.0 < g_game->windStrength)

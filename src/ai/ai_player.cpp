@@ -194,7 +194,7 @@ struct Target_00406f50 {
 //
 // Unused here: the symbol ids these declarations take keep the allocation
 // (docs/c2-regalloc.md); they stand where the removed class views stood.
-int FUN_00490200();
+int IsLocalPlayerOutOfUnits();
 int AreAllPlayersReady(void);
 int CountActiveAIPlayers(void);
 int CountComputerPlayers(void);
@@ -324,8 +324,8 @@ void __stdcall GetBasePosition(int index, Vec3* out);
 unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit* unit);
 int __stdcall GetBuilderCount(unsigned int player);
 void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
 void __stdcall MakeHeap(Elem_0040cc40* first, Elem_0040cc40* last, int*, Elem_0040cc40*);
 void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
                             Elem_0040cc40 val, int*);
@@ -353,9 +353,9 @@ static inline int Contains(unsigned int* bits, unsigned short index)
 static inline Vec3 Direction(short angle, int scale)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, scale);
+    v.x = -ScaledSin(angle, scale);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, scale);
+    v.z = -ScaledCos(angle, scale);
     return v;
 }
 

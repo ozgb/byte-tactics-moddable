@@ -30,8 +30,8 @@ short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
 void __stdcall AppendOrder(Unit*, Order*);
 int __stdcall RandomInt(int);
-int __cdecl FUN_004b70ef(short, int);
-int __cdecl FUN_004b7123(short, int);
+int __cdecl ScaledSin(short, int);
+int __cdecl ScaledCos(short, int);
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b);
 union Fixed { int value; struct { unsigned short frac; short whole; } parts; };
 Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale);
@@ -39,10 +39,10 @@ static inline Vec3 Direction(short angle, int range) { Fixed distance; distance.
 static inline Vec3 Offset(short angle, int distance)
 {
     Vec3 v;
-    v.x=-FUN_004b70ef(angle,distance);
+    v.x=-ScaledSin(angle,distance);
     v.y=0;
     // Names its result: keeps unit and order in esi and edi.
-    int z=FUN_004b7123(angle,distance);
+    int z=ScaledCos(angle,distance);
     v.z=-z;
     return v;
 }

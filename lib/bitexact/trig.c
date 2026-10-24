@@ -87,14 +87,14 @@ static bx_i32 bx_scaled(bx_i32 entry, bx_i32 scale)
 }
 
 /* FUNCTION: 0x4b70ef */
-bx_i32 bx_FUN_004b70ef(bx_i16 angle, bx_i32 scale)
+bx_i32 bx_ScaledSin(bx_i16 angle, bx_i32 scale)
 {
     bx_u32 index = (((bx_u32)(bx_i32)angle + 0x20) >> 7) & 0x1ff;
     return bx_scaled(bx_sin_table[index], scale);
 }
 
 /* FUNCTION: 0x4b7123 */
-bx_i32 bx_FUN_004b7123(bx_i16 angle, bx_i32 scale)
+bx_i32 bx_ScaledCos(bx_i16 angle, bx_i32 scale)
 {
     bx_u32 index = (((bx_u32)(bx_u16)angle + 0x4020) >> 7) & 0x1ff;
     return bx_scaled(bx_sin_table[index], scale);
@@ -129,7 +129,7 @@ static void bx_dd_const(const bx_u32 *w, double *hi, double *lo)
 }
 
 /* FUNCTION: 0x4b715a */
-bx_i32 bx_FUN_004b715a(bx_i32 x, bx_i32 z)
+bx_i32 bx_AngleOfVector(bx_i32 x, bx_i32 z)
 {
     double n, d, num, den, u1, u2, w, p, pe, rem, poly, tail;
     double ch, cl, ah, ae, al, qh, ql, th, te, tl, k_rad, v;
@@ -236,7 +236,7 @@ static double bx_mul_ext(bx_i32 x, bx_u32 mant_hi, bx_u32 mant_lo, bx_u32 sign_e
 }
 
 /* FUNCTION: 0x4b7173 */
-void bx_FUN_004b7173(bx_i16 angle, bx_i32 *xz)
+void bx_RotatePoint2D(bx_i16 angle, bx_i32 *xz)
 {
     const bx_u32 *e;
     double xc, yc, xs, ys;
@@ -285,7 +285,7 @@ void bx_apply_rotation_matrix(const bx_i32 m[9], const bx_i32 *in, bx_i32 *out)
 }
 
 /* FUNCTION: 0x4b7381 */
-bx_i32 bx_FUN_004b7381(bx_i32 a, bx_i32 b, bx_i32 c)
+bx_i32 bx_MulDivTrunc(bx_i32 a, bx_i32 b, bx_i32 c)
 {
     bx_i64 q;
 

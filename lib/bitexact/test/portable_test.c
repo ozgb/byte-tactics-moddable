@@ -244,15 +244,15 @@ static void run_atan2(void)
     sha256_init(&s);
     for (x = -40; x <= 40; x++)
         for (z = -40; z <= 40; z++)
-            put_i32(&s, bx_FUN_004b715a(x, z));
+            put_i32(&s, bx_AngleOfVector(x, z));
     for (i = 0; i < EDGE_INTS; i++)
         for (j = 0; j < EDGE_INTS; j++)
-            put_i32(&s, bx_FUN_004b715a(edge_ints[i], edge_ints[j]));
+            put_i32(&s, bx_AngleOfVector(edge_ints[i], edge_ints[j]));
     for (i = 0; i < 100000; i++) {
         bx_i32 a = any_int(), b = any_int();
-        put_i32(&s, bx_FUN_004b715a(a, b));
+        put_i32(&s, bx_AngleOfVector(a, b));
     }
-    sha256_print(&s, "bx_FUN_004b715a");
+    sha256_print(&s, "bx_AngleOfVector");
 }
 
 static void run_acos(void)
@@ -287,18 +287,18 @@ static void run_rotate(void)
         for (j = 0; j < 4; j++) {
             xz[0] = j == 0 ? 1000 : j == 1 ? -77777 : any_int();
             xz[1] = j == 0 ? 0 : j == 1 ? 12345 : any_int();
-            bx_FUN_004b7173((bx_i16)a, xz);
+            bx_RotatePoint2D((bx_i16)a, xz);
             put_i32(&s, xz[0]);
             put_i32(&s, xz[1]);
         }
     for (j = 0; j < EDGE_INTS * EDGE_INTS; j++) {
         xz[0] = edge_ints[j / EDGE_INTS];
         xz[1] = edge_ints[j % EDGE_INTS];
-        bx_FUN_004b7173((bx_i16)(j * 977), xz);
+        bx_RotatePoint2D((bx_i16)(j * 977), xz);
         put_i32(&s, xz[0]);
         put_i32(&s, xz[1]);
     }
-    sha256_print(&s, "bx_FUN_004b7173");
+    sha256_print(&s, "bx_RotatePoint2D");
 }
 
 static void run_matrix(void)
@@ -341,12 +341,12 @@ static void run_muldiv(void)
     for (i = 0; i < EDGE_INTS; i++)
         for (j = 0; j < EDGE_INTS; j++)
             for (k = 0; k < EDGE_INTS; k++)
-                put_i32(&s, bx_FUN_004b7381(edge_ints[i], edge_ints[j], edge_ints[k]));
+                put_i32(&s, bx_MulDivTrunc(edge_ints[i], edge_ints[j], edge_ints[k]));
     for (i = 0; i < 100000; i++) {
         bx_i32 a = any_int(), b = any_int(), c = any_int();
-        put_i32(&s, bx_FUN_004b7381(a, b, (i & 15) == 0 ? 0 : c));
+        put_i32(&s, bx_MulDivTrunc(a, b, (i & 15) == 0 ? 0 : c));
     }
-    sha256_print(&s, "bx_FUN_004b7381");
+    sha256_print(&s, "bx_MulDivTrunc");
 }
 
 static double finite_double(int max_exponent_span)
@@ -595,8 +595,8 @@ int main(void)
     run_sine();
     run_cosine();
     run_mul_hi32();
-    run_scaled(bx_FUN_004b70ef, "bx_FUN_004b70ef");
-    run_scaled(bx_FUN_004b7123, "bx_FUN_004b7123");
+    run_scaled(bx_ScaledSin, "bx_ScaledSin");
+    run_scaled(bx_ScaledCos, "bx_ScaledCos");
     run_atan2();
     run_acos();
     run_rotate();

@@ -882,7 +882,7 @@ extern int g_edgeHighIndex;
 // GLOBAL: 0x51ff00
 extern int g_edgeLowIndex;
 
-int __cdecl FUN_004b7381(int a, int b, int c);
+int __cdecl MulDivTrunc(int a, int b, int c);
 
 // FUNCTION: 0x4c70d0
 void __stdcall InterpEdgeUvFromScanline(int value, Range* out, int at_low, int at_high)
@@ -913,18 +913,18 @@ void __stdcall InterpEdgeUvFromScanline(int value, Range* out, int at_low, int a
         int span = size - offset;
         int* spanp = &span;
         out->low = 0;
-        out->high = FUN_004b7381(at_high, *spanp, g_edgeSpan);
+        out->high = MulDivTrunc(at_high, *spanp, g_edgeSpan);
         return; }
     case 1:
-        out->low = FUN_004b7381(at_low, offset, size);
+        out->low = MulDivTrunc(at_low, offset, size);
         out->high = 0;
         return;
     case 2:
         out->low = at_low;
-        out->high = FUN_004b7381(at_high, offset, g_edgeSpan);
+        out->high = MulDivTrunc(at_high, offset, g_edgeSpan);
         return;
     case 3:
-        out->low = FUN_004b7381(at_low, size - offset, size);
+        out->low = MulDivTrunc(at_low, size - offset, size);
         out->high = at_high;
         return;
     }
@@ -960,7 +960,7 @@ void __stdcall InterpEdgeUvFromScanline_B(int value, Range* out, int at_low, int
     }
     switch (i) {
     case 0:
-        out->low = FUN_004b7381(at_low, size - offset, size);
+        out->low = MulDivTrunc(at_low, size - offset, size);
         out->high = 0;
         return;
     case 1:
@@ -971,16 +971,16 @@ void __stdcall InterpEdgeUvFromScanline_B(int value, Range* out, int at_low, int
             // global reload in the 5-byte accumulator form.
             int span = size - offset;
             int* spanp = &span;
-            out->high = FUN_004b7381(at_high, *spanp, g_edgeSpanB);
+            out->high = MulDivTrunc(at_high, *spanp, g_edgeSpanB);
         }
         return;
     case 2:
-        out->low = FUN_004b7381(at_low, offset, size);
+        out->low = MulDivTrunc(at_low, offset, size);
         out->high = at_high;
         return;
     case 3:
         out->low = 0;
-        out->high = FUN_004b7381(at_high, offset, g_edgeSpanB);
+        out->high = MulDivTrunc(at_high, offset, g_edgeSpanB);
         return;
     }
 }

@@ -298,7 +298,7 @@ void __stdcall GetByteRates(unsigned int* sent, unsigned int* received)
 // As in InitCommands, the second field of the second table is read through a
 // walking pointer.
 // FUNCTION: 0x4161f0
-void FUN_004161f0()
+void SumMessageStats()
 {
     int sum3 = 0, sum4 = 0, sum1 = 0, sum2 = 0;
     Pair_00419560* p = (Pair_00419560*)&g_messageBytesByType[1];

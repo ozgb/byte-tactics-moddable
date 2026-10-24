@@ -36,8 +36,8 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 extern Game* g_game;
 
 int __stdcall RandomInt(int range);
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
 int __stdcall CanPlaceUnitFootprint(UnitDef* type, short a, Point16 cell, int b);
 int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, int b);
 int GetBuildSiteMetal(void);
@@ -70,9 +70,9 @@ static inline void PopHeap(Elem_0040cc40* f, Elem_0040cc40* l)
 static inline Vec3 Direction(short angle, int scale)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, scale);
+    v.x = -ScaledSin(angle, scale);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, scale);
+    v.z = -ScaledCos(angle, scale);
     return v;
 }
 

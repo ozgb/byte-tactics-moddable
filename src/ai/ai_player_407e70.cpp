@@ -84,15 +84,15 @@ static inline Vec3 MakeVec3(int ax, int ay, int az)
 }
 
 int __stdcall RandomInt(int range);
-int __cdecl FUN_004b70ef(int angle, int distance);
-int __cdecl FUN_004b7123(int angle, int distance);
+int __cdecl ScaledSin(int angle, int distance);
+int __cdecl ScaledCos(int angle, int distance);
 
 static inline Vec3 Offset(int angle, int distance)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, distance);
+    v.x = -ScaledSin(angle, distance);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, distance);
+    v.z = -ScaledCos(angle, distance);
     return v;
 }
 

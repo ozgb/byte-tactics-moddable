@@ -321,15 +321,15 @@ struct Source_00499c10 {
 #include "../../interfaces/seams.h"
 
 // Fixed-point trig helpers written in assembly.
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
 
 // FUNCTION: 0x499c10
 void __stdcall RockUnit(Object_00499c10* obj, Source_00499c10* src)
 {
     short angle = src->heading - obj->heading;
-    int a = -FUN_004b70ef(angle, 800);
-    int b = -FUN_004b7123(angle, 800);
+    int a = -ScaledSin(angle, 800);
+    int b = -ScaledCos(angle, 800);
     g_seams.units->StartScriptWithArgs(obj->anims, "RockUnit", 0, 0, 2, b, a, 0, 0);
 }
 
@@ -378,7 +378,7 @@ struct Flags_00499cd0 {
 };
 #pragma pack(pop)
 
-short __cdecl FUN_004b715a(int x, int z);
+short __cdecl AngleOfVector(int x, int z);
 void __stdcall DamageUnit(Unit* source, Unit* target,
                             int amount, int type, unsigned short extra);
 
@@ -419,7 +419,7 @@ int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
             damage = *p;
     }
     damage = (int)(damage * scale);
-    short angle = FUN_004b715a(weapon->position.x - target->pos.x,
+    short angle = AngleOfVector(weapon->position.x - target->pos.x,
                                weapon->position.z - target->pos.z) - target->heading;
     Unit* attacker = weapon->attacker;
     if (attacker) {
@@ -1097,9 +1097,9 @@ int __stdcall TurnUnitTowardsPoint(Projectile* p, Vec3* target)
     Fixed dy;
     dy.value = p->position.y - target->y;
     int dz = p->position.z - target->z;
-    short a1 = FUN_004b715a(dx, dz);
+    short a1 = AngleOfVector(dx, dz);
     int dist = (int)_hypot((double)dx, (double)dz);
-    short a2 = FUN_004b715a(-dy.whole, (short)(dist >> 16));
+    short a2 = AngleOfVector(-dy.whole, (short)(dist >> 16));
 
     short diff1 = a1 - (short)p->angles.heading;
     short adiff1 = abs(diff1);
@@ -1128,10 +1128,10 @@ int __stdcall TurnUnitTowardsPoint(Projectile* p, Vec3* target)
 // FUNCTION: 0x49b680
 void __stdcall ComputeVelocityFromAngles(Projectile* obj)
 {
-    obj->direction.y = FUN_004b70ef(obj->angles.pitch, obj->speed);
-    int r = FUN_004b7123(obj->angles.pitch, obj->speed);
-    obj->direction.x = -FUN_004b70ef((short)obj->angles.heading, r);
-    obj->direction.z = -FUN_004b7123((short)obj->angles.heading, r);
+    obj->direction.y = ScaledSin(obj->angles.pitch, obj->speed);
+    int r = ScaledCos(obj->angles.pitch, obj->speed);
+    obj->direction.x = -ScaledSin((short)obj->angles.heading, r);
+    obj->direction.z = -ScaledCos((short)obj->angles.heading, r);
 }
 
 // Takes the next free entry of the 300-entry projectile array (see
@@ -1241,9 +1241,9 @@ void __stdcall CopyWeaponVelocityParam(Projectile* obj, WeaponDef* src)
 
 #include <math.h>
 
-short __cdecl FUN_004b715a(int x, int z);
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
+short __cdecl AngleOfVector(int x, int z);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
 void __stdcall EmitWeaponSmoke(Vec3* p, short index);
 
 extern char* g_fireScriptNames[4];
@@ -1281,11 +1281,11 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
     union { int value; short halves[2]; } dy;
     dy.value = p3->y - p4->y;
     int dz = p3->z - p4->z;
-    short a1 = FUN_004b715a(dx, dz);
+    short a1 = AngleOfVector(dx, dz);
     // Unsigned: the >> 16 below is a logical shift.
     unsigned int dist = (int)_hypot(dx, dz);
     proj->range = (int)dist;
-    short a2 = FUN_004b715a(-(int)dy.halves[1], (short)(dist >> 16));
+    short a2 = AngleOfVector(-(int)dy.halves[1], (short)(dist >> 16));
     proj->angles.heading = a1;
     proj->angles.pitch = a2;
 
@@ -1298,10 +1298,10 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
         proj->speed = 0;
     }
 
-    proj->direction.y = FUN_004b70ef(a2, proj->speed);
-    int t = FUN_004b7123(a2, proj->speed);
-    proj->direction.x = -FUN_004b70ef(a1, t);
-    proj->direction.z = -FUN_004b7123(a1, t);
+    proj->direction.y = ScaledSin(a2, proj->speed);
+    int t = ScaledCos(a2, proj->speed);
+    proj->direction.x = -ScaledSin(a1, t);
+    proj->direction.z = -ScaledCos(a1, t);
 
     // The same helper as 0x49c920, inlined here.
     WeaponDef* u = proj->type;
@@ -1314,8 +1314,8 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
     proj->active = fire->shot->burst;
     g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(fire->f_1b >> 2) & 3], 0, 0);
     short angle = unit->weapons[(fire->f_1b >> 2) & 3].fireHeading - unit->heading;
-    int a = -FUN_004b70ef(angle, 800);
-    int b = -FUN_004b7123(angle, 800);
+    int a = -ScaledSin(angle, 800);
+    int b = -ScaledCos(angle, 800);
     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
 
     if (fire->shot->flags.b.startSmoke)
@@ -1373,8 +1373,8 @@ int __stdcall FireVLaunchProjectile(Shot_0049cc20* shot, Unit* unit, Vec3* pos,
     proj->active = shot->def->burst;
     g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
     short angle = unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
-    int a = -FUN_004b70ef(angle, 800);
-    int b = -FUN_004b7123(angle, 800);
+    int a = -ScaledSin(angle, 800);
+    int b = -ScaledCos(angle, 800);
     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
     if (shot->def->flags.b.startSmoke)
         EmitWeaponSmoke(pos, 9);
@@ -1415,10 +1415,10 @@ int __stdcall FireBallisticProjectile(Shot_0049cde0* shot, Unit* unit, Vec3* pos
         // The whole product is its own statement: inside the assignment the
         // division and multiply sink after the call.
         int q = (shot->muzzleAimFromDeltaZ / shot->def->speed) * g_game->gravity;
-        proj->direction.y = FUN_004b70ef(shot->pitch, shot->def->speed) - q;
-        int scale = FUN_004b7123(shot->pitch, shot->def->speed);
-        proj->direction.x = -FUN_004b70ef(shot->heading, scale);
-        proj->direction.z = -FUN_004b7123(shot->heading, scale);
+        proj->direction.y = ScaledSin(shot->pitch, shot->def->speed) - q;
+        int scale = ScaledCos(shot->pitch, shot->def->speed);
+        proj->direction.x = -ScaledSin(shot->heading, scale);
+        proj->direction.z = -ScaledCos(shot->heading, scale);
         if (shot->def->flags.b.burnBlow) {
             proj->time = (int)_hypot((double)(pos->x - aim->x), (double)(pos->z - aim->z)) / scale
                        + g_game->ticks;
@@ -1430,8 +1430,8 @@ int __stdcall FireBallisticProjectile(Shot_0049cde0* shot, Unit* unit, Vec3* pos
         proj->targetUnitPtr = (Unit*)param_5;
         g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
         short angle = *(int*)&unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
-        int a = -FUN_004b70ef(angle, 800);
-        int b = -FUN_004b7123(angle, 800);
+        int a = -ScaledSin(angle, 800);
+        int b = -ScaledCos(angle, 800);
         g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
         if (shot->def->flags.b.startSmoke)
             EmitWeaponSmoke(pos, 9);
@@ -1469,8 +1469,8 @@ int __stdcall SpawnProjectileFromUnitMotion(Shot_0049d000* shot, Unit* unit, Vec
     if (proj) {
         InitProjectile(proj, shot->weapon, pos, 0, g_game->ticks, unit);
         Setup_0049d000(proj, unit);
-        proj->direction.x = -FUN_004b70ef(proj->angles.heading, ((UnitType_0049d000*)unit->motion.get())->range);
-        proj->direction.z = -FUN_004b7123(proj->angles.heading, ((UnitType_0049d000*)unit->motion.get())->range);
+        proj->direction.x = -ScaledSin(proj->angles.heading, ((UnitType_0049d000*)unit->motion.get())->range);
+        proj->direction.z = -ScaledCos(proj->angles.heading, ((UnitType_0049d000*)unit->motion.get())->range);
         return 1;
     }
     return 0;
@@ -1671,8 +1671,8 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
         proj->angles.heading = unit->heading;
         proj->speed = 0;
         proj->direction.y = 0;
-        proj->direction.x = -FUN_004b70ef(proj->angles.heading, ((Type_0049d270*)unit->motion.get())->param);
-        proj->direction.z = -FUN_004b7123(proj->angles.heading, ((Type_0049d270*)unit->motion.get())->param);
+        proj->direction.x = -ScaledSin(proj->angles.heading, ((Type_0049d270*)unit->motion.get())->param);
+        proj->direction.z = -ScaledCos(proj->angles.heading, ((Type_0049d270*)unit->motion.get())->param);
         return;
     }
 }
@@ -1710,7 +1710,7 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
             int dx = p.x - point->x;
             int dy = p.y - point->y;
             int dz = p.z - point->z;
-            heading = FUN_004b715a(dx, dz) - (unsigned short)fire->heading;
+            heading = AngleOfVector(dx, dz) - (unsigned short)fire->heading;
             pitch = SolveLaunchAngle(dx, dy, dz, def->speed, def->pitch);
             ok = (unsigned short)pitch != 0x8000;
         } else if (def->flags.b.lineOfSight) {
@@ -1835,8 +1835,8 @@ int __stdcall CalcAimAngles(Unit* unit, Unit* target, short* out_heading, short*
     Fixed dy;
     dy.value = p.y - point->y;
     int dz = p.z - point->z;
-    *out_heading = (short)(FUN_004b715a(dx, dz) - unit->heading);
-    *out_pitch = (short)FUN_004b715a(-dy.whole, (short)((int)_hypot((double)dx, (double)dz) >> 16));
+    *out_heading = (short)(AngleOfVector(dx, dz) - unit->heading);
+    *out_pitch = (short)AngleOfVector(-dy.whole, (short)((int)_hypot((double)dx, (double)dz) >> 16));
     return 1;
 }
 
@@ -1869,8 +1869,8 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, Aim_0049d9c0* aim,
     Fixed dy;
     dy.value = p.y - point->y;
     int dz = p.z - point->z;
-    aim->fireHeading = (short)FUN_004b715a(dx, dz);
-    aim->firePitch = (short)FUN_004b715a(-dy.whole,
+    aim->fireHeading = (short)AngleOfVector(dx, dz);
+    aim->firePitch = (short)AngleOfVector(-dy.whole,
                                        (short)((int)_hypot((double)dx, (double)dz) >> 16));
     if (AimWithinTolerance(unit, aim, unit->heading, unit->pitch)) {
         if (FireLineOfSightProjectile(aim, unit, &p, point, target)) {
@@ -1946,9 +1946,9 @@ int __stdcall FireVLaunchWeapon(Object_0049db70* source, Shot_0049db70* shot,
         union { int value; short halves[2]; } dy;
         dy.value = pos.y - aim->y;
         int dz = pos.z - aim->z;
-        shot->heading = FUN_004b715a(dx, dz);
+        shot->heading = AngleOfVector(dx, dz);
         int dist = (int)_hypot((double)dx, (double)dz);
-        shot->pitch = FUN_004b715a(-(int)dy.halves[1], (short)(dist >> 16));
+        shot->pitch = AngleOfVector(-(int)dy.halves[1], (short)(dist >> 16));
         // Uninitialised here and zeroed only in the else arm.
         int* p;
         if (shot->def->flags.b.interceptor) {
@@ -2016,8 +2016,8 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
         projectile->angles.heading = unit->heading;
         projectile->speed = 0;
         projectile->direction.y = 0;
-        projectile->direction.x = -FUN_004b70ef(projectile->angles.heading, ((Owner_0049dd60*)unit->motion.get())->id);
-        projectile->direction.z = -FUN_004b7123(projectile->angles.heading, ((Owner_0049dd60*)unit->motion.get())->id);
+        projectile->direction.x = -ScaledSin(projectile->angles.heading, ((Owner_0049dd60*)unit->motion.get())->id);
+        projectile->direction.z = -ScaledCos(projectile->angles.heading, ((Owner_0049dd60*)unit->motion.get())->id);
         if (g_game->netGameFlags & 1) {
             WeaponFirePacket packet;
             packet.type = 0xd;
@@ -2184,7 +2184,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                 if (t->flags.b.ballistic) {
                     g_seams.units->GetAimFromPosition(unit, &aim, (unsigned char)((e->flags >> 2) & 3));
                     SubtractVec3(&aim, &pos, &dx, &dy, &dz);
-                    heading = (unsigned short)(FUN_004b715a(dx, dz) - unit->heading);
+                    heading = (unsigned short)(AngleOfVector(dx, dz) - unit->heading);
                     angle = SolveLaunchAngle(dx, dy, dz, t->speed, t->pitch);
                     ok = (angle != 0x8000);
                 } else if (t->flags.b.lineOfSight) {

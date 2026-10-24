@@ -66,7 +66,7 @@ void RegisterDataArchives()
 }
 
 // FUNCTION: 0x41d8a0
-int FUN_0041d8a0(void)
+int UsesDataArchives(void)
 {
     return DAT_0050289c;
 }

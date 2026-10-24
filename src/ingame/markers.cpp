@@ -119,8 +119,8 @@ extern double ONE_EIGHTH;                // 0.125
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
 int __stdcall GetGroundHeight(Pos* pos);
-int __cdecl FUN_004b70ef(int angle, int radius);
-int __cdecl FUN_004b7123(int angle, int radius);
+int __cdecl ScaledSin(int angle, int radius);
+int __cdecl ScaledCos(int angle, int radius);
 void __stdcall DrawFrame(void* surface, void* bmp, int x, int y);
 void __stdcall DrawFrameBlended(void* dest, void* bmp, int x, int y);
 int __stdcall IsUnitVisibleToPlayer(Player* owner, Unit* unit);
@@ -214,10 +214,9 @@ void __stdcall DrawBuildFootprint(void* surface, View* view, Order* order,
 static inline Vec3 Offset(int angle, int distance)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, distance);
+    v.x = -ScaledSin(angle, distance);
     v.y = 0;
-    // Named before negation: `v.z = -FUN_004b7123(...)` changes register use.
-    int z = FUN_004b7123(angle, distance);
+    int z = ScaledCos(angle, distance);
     v.z = -z;
     return v;
 }
@@ -545,8 +544,8 @@ void __stdcall DrawOrderRangeRing(void* surface, View* view, Order* order,
     int x1 = xc + height;
     int y1 = yc;
     for (int angle = 0x1000; angle <= 0x10000; angle += 0x1000) {
-        int nx = FUN_004b7123(angle, height) + xc;
-        int ny = FUN_004b70ef(angle, ry) + yc;
+        int nx = ScaledCos(angle, height) + xc;
+        int ny = ScaledSin(angle, ry) + yc;
         DrawLine(surface, x1, y1, nx, ny, g_game->field_dd7);
         x1 = nx;
         y1 = ny;

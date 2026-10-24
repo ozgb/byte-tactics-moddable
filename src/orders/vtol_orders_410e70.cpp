@@ -29,8 +29,8 @@ class Class_0044e730 { public: void SetApproachRadius(short); };
 #pragma pack(pop)
 
 int __stdcall RandomInt(int);
-int __cdecl FUN_004b70ef(short, int);
-int __cdecl FUN_004b7123(short, int);
+int __cdecl ScaledSin(short, int);
+int __cdecl ScaledCos(short, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall AppendOrder(Unit*, Order*);
 void __stdcall EnsurePatrolReturnOrder(Unit*, Order*);
@@ -44,9 +44,9 @@ int __stdcall VtolLandIfCanOrder(Unit*, Order*, int);
 static inline Vec3 Offset(short angle, int distance)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, distance);
+    v.x = -ScaledSin(angle, distance);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, distance);
+    v.z = -ScaledCos(angle, distance);
     return v;
 }
 

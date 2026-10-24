@@ -249,7 +249,7 @@ address,name
 0x415f40,CountPacket
 0x415fa0,FormatNetStats
 0x416150,GetByteRates
-0x4161f0,FUN_004161f0
+0x4161f0,SumMessageStats
 0x416240,CmdMemDump
 0x416270,CmdMem
 0x416280,CmdAI
@@ -405,7 +405,7 @@ address,name
 0x41d4c0,RegisterDataArchives
 0x41d6a0,FindGameCdDrive
 0x41d7b0,BuildCdFilePath
-0x41d8a0,FUN_0041d8a0
+0x41d8a0,UsesDataArchives
 0x41d8b0,GetCdPathMismatch
 0x41d8c0,AllocZeroedWithTickOffset
 0x41d920,CreateGameObject
@@ -1954,7 +1954,7 @@ address,name
 0x48ffd0,AreEnemiesEliminated
 0x490050,IsLocalPlayerEliminated
 0x490080,CheckAlliedVictory
-0x490200,FUN_00490200
+0x490200,IsLocalPlayerOutOfUnits
 0x490230,MissionConditions::CheckVictory
 0x490360,MissionConditions::CheckDefeat
 0x4904b0,MissionConditions::Deactivate
@@ -2188,8 +2188,8 @@ address,name
 0x4a1810,SelectFontForEntry
 0x4a18c0,FindBackgroundCell
 0x4a1920,IsPointInRect
-0x4a1950,FUN_004a1950
-0x4a1970,FUN_004a1970
+0x4a1950,IsAboveRectTop
+0x4a1970,IsBelowRectBottom
 0x4a1990,FindAssocListBox
 0x4a19f0,FindAssocSlider
 0x4a1a50,FindAssocTextInput
@@ -2206,7 +2206,7 @@ address,name
 0x4a35a0,SetGadgetRows
 0x4a36a0,SetGadgetItems
 0x4a3780,HandleListBoxInput
-0x4a3eb0,FUN_004a3eb0
+0x4a3eb0,ResetSliderGadget
 0x4a3ef0,DrawSlider
 0x4a4170,HandleSliderInput
 0x4a4440,HandleLabelInput
@@ -2500,11 +2500,11 @@ address,name
 0x4b6ff0,NormalizeVector
 0x4b7070,VectorLengthFloat
 0x4b70a0,FixedSine
-0x4b70ef,FUN_004b70ef
-0x4b7123,FUN_004b7123
-0x4b715a,FUN_004b715a
-0x4b7173,FUN_004b7173
-0x4b7381,FUN_004b7381
+0x4b70ef,ScaledSin
+0x4b7123,ScaledCos
+0x4b715a,AngleOfVector
+0x4b7173,RotatePoint2D
+0x4b7381,MulDivTrunc
 0x4b73b0,CommandArgs::InitArgs
 0x4b73c0,CommandArgs::GetArg
 0x4b73e0,CommandArgs::GetIntArg

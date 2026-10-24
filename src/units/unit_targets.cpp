@@ -405,8 +405,8 @@ extern char s_TakeDamage_00508d68[];
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
 void __stdcall AddCdActivitySample(int flag);
-int __cdecl FUN_004b7123(unsigned short idx, int scale);
-int __cdecl FUN_004b70ef(short idx, int scale);
+int __cdecl ScaledCos(unsigned short idx, int scale);
+int __cdecl ScaledSin(short idx, int scale);
 
 // Applies one damage/heal packet (type 0xb, 9 bytes: the type byte, the victim
 // unit id at +1, the attacker unit id at +3, an amount at +5, the heading byte
@@ -482,8 +482,8 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
             unit->health = 0;
         }
         if (ev->damageKind == 1) {
-            int a = FUN_004b7123(ev->headingByte << 8, 400);
-            int b = FUN_004b70ef(ev->headingByte << 8, 400);
+            int a = ScaledCos(ev->headingByte << 8, 400);
+            int b = ScaledSin(ev->headingByte << 8, 400);
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), s_HitByWeapon_00508d74, 0, 0, 2, a, b, 0, 0);
             int pct = unit->health * 100 / ((UnitType*)unit->def.get())->maxhp;
             if (pct < 0)
@@ -689,8 +689,8 @@ struct Hs_0048a490 {
 #pragma pack(pop)
 
 unsigned int GetTicks();
-int __cdecl FUN_004b715a(int x, int y);
-void __cdecl FUN_004b7173(unsigned short deg, Pos2_0048a490* p);
+int __cdecl AngleOfVector(int x, int y);
+void __cdecl RotatePoint2D(unsigned short deg, Pos2_0048a490* p);
 
 // Samples the ground under a unit at its four surrounding terrain vertices and
 // stores the resulting pitch (0x68) and roll (0x70) on the unit, plus a heading
@@ -721,7 +721,7 @@ void __stdcall AlignUnitToGround(Unit* u)
             int vz = v->z;
             t.z = vz;
             pts[k].z = vz;
-            FUN_004b7173(u->angles.heading, &t);
+            RotatePoint2D(u->angles.heading, &t);
             // wx before hz, fx before fz, and gz declared before fz.
             int wx = (short)((t.x + u->pos.x) >> 16);
             int hz = (short)((u->pos.z - t.z) >> 16);
@@ -766,7 +766,7 @@ void __stdcall AlignUnitToGround(Unit* u)
                 unsigned int n = g_game->ticks - o->age;
                 // Clamp inline as a ternary, not a separate if.
                 mm -= (unsigned int)(mm * (n < 60 ? n : 60)) / 60;
-                hs[k].h = FUN_004b7123(p, mm) + hs[k].h;
+                hs[k].h = ScaledCos(p, mm) + hs[k].h;
             } else {
                 hs[k].h = H0 + ((H1 - H0) * fz) / 16;
             }
@@ -780,7 +780,7 @@ void __stdcall AlignUnitToGround(Unit* u)
         int a = (h0 + h1) / 2;
         int b = (h2 + h3) / 2;
         u->yWhole = (a + b) / 2;
-        u->angles.pitch = FUN_004b715a(b - a, (short)(abs(pts[0].z - pts[3].z) >> 16));
-        u->angles.bank = FUN_004b715a(h0 - h1, (short)(abs(pts[0].x - pts[1].x) >> 16));
+        u->angles.pitch = AngleOfVector(b - a, (short)(abs(pts[0].z - pts[3].z) >> 16));
+        u->angles.bank = AngleOfVector(h0 - h1, (short)(abs(pts[0].x - pts[1].x) >> 16));
     }
 }

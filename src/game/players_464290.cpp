@@ -370,7 +370,7 @@ float __stdcall GetEnergyIncome(void* param_1)
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
 void ResetAIPlayers(void);
-int FUN_00490200();
+int IsLocalPlayerOutOfUnits();
 
 // FUNCTION: 0x464ac0
 float __stdcall GetEnergyUsage(Player* param_1)

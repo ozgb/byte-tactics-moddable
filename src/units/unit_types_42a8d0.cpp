@@ -85,7 +85,7 @@ static int s_weaponTdfLoadedCount;
 static int s_weaponTdfAllocCount;
 
 
-int FUN_0041d8a0();
+int UsesDataArchives();
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void* __cdecl GameAllocIgnoreTag(char* name, int size);
 void __cdecl GameFreeThunk(void* p);
@@ -113,7 +113,7 @@ static inline void LoadWeaponTDFs()
         TdfFile* tdf = &s_weaponTdfParsers[s_weaponTdfLoadedCount];
         BuildDataPath(path, "Weapons", it->data, "TDF");
         if (tdf->LoadFile(path)) {
-            if (tdf->flags != 0 || FUN_0041d8a0() == 0)
+            if (tdf->flags != 0 || UsesDataArchives() == 0)
                 s_weaponTdfLoadedCount++;
         }
     }
@@ -214,7 +214,7 @@ int LoadUnitInfo()
                 u->flags1 |= 0x800000;
             else
                 u->flags1 &= ~0x800000;
-            if ((HAPI_IsInArchive(f) == 0 && FUN_0041d8a0() != 0)) {
+            if ((HAPI_IsInArchive(f) == 0 && UsesDataArchives() != 0)) {
                 u->flags1 &= ~0x800000;
                 bad = 1;
             }

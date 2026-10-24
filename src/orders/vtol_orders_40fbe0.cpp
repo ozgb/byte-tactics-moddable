@@ -35,10 +35,10 @@ int __stdcall IssueAttackOrder(Unit*, Unit*, int);
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
 void __stdcall AppendOrder(Unit*, Order*);
 int __stdcall RandomInt(int);
-int __cdecl FUN_004b70ef(short, int);
-int __cdecl FUN_004b7123(short, int);
+int __cdecl ScaledSin(short, int);
+int __cdecl ScaledCos(short, int);
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }
-static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-FUN_004b70ef(angle,distance); v.y=0; v.z=-FUN_004b7123(angle,(int)distance); return v; }
+static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,(int)distance); return v; }
 
 // Used on the target argument of the order-steal calls: the plain chain changes codegen.
 static inline Unit* OrderTarget(Order*order) { return order->target; }

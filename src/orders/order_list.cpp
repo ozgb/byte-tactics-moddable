@@ -816,10 +816,10 @@ extern Elem_0043c390 g_readyOrder[];
 extern signed char g_slopeSpeedFactor[];
 
 
-int __cdecl FUN_004b70ef(short angle, int scale);
-int __cdecl FUN_004b7123(short angle, int scale);
-void __cdecl FUN_004b7173(short angle, int* xz);
-int __cdecl FUN_004b715a(int x, int z);
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
+void __cdecl RotatePoint2D(short angle, int* xz);
+int __cdecl AngleOfVector(int x, int z);
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 MissionType __stdcall GetOrderType(unsigned char relation, Unit* unit, Unit* target, Vec3* pos);
 void __stdcall AddOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7);
@@ -1481,9 +1481,9 @@ static inline void AddFixed(int& v, float f)
 static inline Vec3 Offset(short angle, int distance)
 {
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, distance);
+    v.x = -ScaledSin(angle, distance);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, distance);
+    v.z = -ScaledCos(angle, distance);
     return v;
 }
 
@@ -1528,9 +1528,9 @@ void UnitMotion::UpdateVelocityFromHeading(Unit* unit, int amount)
     int dist = speed;
     unsigned short angle = unit->angles.heading;
     Vec3 v;
-    v.x = -FUN_004b70ef(angle, dist);
+    v.x = -ScaledSin(angle, dist);
     v.y = 0;
-    v.z = -FUN_004b7123(angle, dist);
+    v.z = -ScaledCos(angle, dist);
     velocity = v;
 }
 
@@ -1613,15 +1613,6 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
         UpdateVelocityFromHeading(unit, -rate);
 }
 
-// Scales the object's second vector (+0x14) by 0.95 (16.16 fixed point), adds the
-// offset `v`, rotates the (x, z) pair by the owner's heading, then derives two
-// short offsets from the rotated components and the owner type's fields at
-// +0x1a2/+0x1a6.
-//
-// Suspected original bug: the second FUN_004b715a call reads xz[0] (the rotated
-// x component) instead of xz[1], so pitch (the z offset) is computed from
-// the rotated x.
-// The original calls this from SetFlightMode and SteerAircraft.
 #pragma auto_inline(off)
 // FUNCTION: 0x43d0d0
 void UnitMotion::ApplyBankAndPitch(Unit* owner, Vec3* v)
@@ -1633,10 +1624,10 @@ void UnitMotion::ApplyBankAndPitch(Unit* owner, Vec3* v)
     int xz[2];
     xz[0] = p2.x;
     xz[1] = p2.z;
-    FUN_004b7173(owner->angles.heading, xz);
+    RotatePoint2D(owner->angles.heading, xz);
     int n = (int)(((__int64)g_game->gravity << 16) / 0xccd);
-    owner->angles.bank = (short)FUN_004b715a((int)(((__int64)((UnitType_0043cd20*)owner->def.get())->bankscale * -xz[0]) >> 16), n);
-    owner->angles.pitch = (short)FUN_004b715a((int)(((__int64)((UnitType_0043cd20*)owner->def.get())->pitchscale * -xz[0]) >> 16), n);
+    owner->angles.bank = (short)AngleOfVector((int)(((__int64)((UnitType_0043cd20*)owner->def.get())->bankscale * -xz[0]) >> 16), n);
+    owner->angles.pitch = (short)AngleOfVector((int)(((__int64)((UnitType_0043cd20*)owner->def.get())->pitchscale * -xz[0]) >> 16), n);
 }
 #pragma auto_inline(on)
 
@@ -1850,10 +1841,10 @@ void UnitMotion::UpdatePosition(Unit* u)
             speed = half;
             unsigned short angle = u->angles.heading;
             Vec3 vec;
-            vec.x = -FUN_004b70ef(angle, half);
+            vec.x = -ScaledSin(angle, half);
             vec.y = 0;
             // z goes through an int temporary.
-            int z = -FUN_004b7123(angle, half);
+            int z = -ScaledCos(angle, half);
             vec.z = z;
             velocity = vec;
         }

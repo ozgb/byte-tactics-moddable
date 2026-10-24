@@ -1178,7 +1178,7 @@ int CheckAlliedVictory()
 
 // Whether the word at +0x144 of the local player's record is zero.
 // FUNCTION: 0x490200
-int FUN_00490200()
+int IsLocalPlayerOutOfUnits()
 {
     return g_game->players[g_game->localPlayer].unitCount == 0 ? 1 : 0;
 }

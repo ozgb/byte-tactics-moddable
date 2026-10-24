@@ -2,6 +2,7 @@ address,function,file,kind,target
 0x401030,CallOnEachReverse,src/game/economy.cpp,function,
 0x401030,CallOnEachReverse,src/game/economy.cpp,indirect_call,indirect via <bound member function type>
 0x401070,UnitResources::Reset,src/game/economy.cpp,call,memset
+0x401070,UnitResources::Reset,src/game/economy.cpp,call,operator=
 0x401070,UnitResources::Reset,src/game/economy.cpp,field_escape,Game::players
 0x401070,UnitResources::Reset,src/game/economy.cpp,field_write,UnitResources::player
 0x401070,UnitResources::Reset,src/game/economy.cpp,function,
@@ -39,18 +40,21 @@ address,function,file,kind,target
 0x4011c0,UnitResources::RequestEnergyAndMetal,src/game/economy.cpp,field_write,UnitResources::metalUse
 0x4011c0,UnitResources::RequestEnergyAndMetal,src/game/economy.cpp,field_write,UnitResources::metalUsePaid
 0x4011c0,UnitResources::RequestEnergyAndMetal,src/game/economy.cpp,function,
+0x401220,UnitResources::SpendEnergy,src/game/economy.cpp,call,operator->
 0x401220,UnitResources::SpendEnergy,src/game/economy.cpp,field_read,Player::energy
 0x401220,UnitResources::SpendEnergy,src/game/economy.cpp,field_read,UnitResources::energyUse
 0x401220,UnitResources::SpendEnergy,src/game/economy.cpp,field_read,UnitResources::player
 0x401220,UnitResources::SpendEnergy,src/game/economy.cpp,field_write,Player::energy
 0x401220,UnitResources::SpendEnergy,src/game/economy.cpp,field_write,UnitResources::energyUse
 0x401220,UnitResources::SpendEnergy,src/game/economy.cpp,function,
+0x401260,UnitResources::SpendMetal,src/game/economy.cpp,call,operator->
 0x401260,UnitResources::SpendMetal,src/game/economy.cpp,field_read,Player::metal
 0x401260,UnitResources::SpendMetal,src/game/economy.cpp,field_read,UnitResources::metalUse
 0x401260,UnitResources::SpendMetal,src/game/economy.cpp,field_read,UnitResources::player
 0x401260,UnitResources::SpendMetal,src/game/economy.cpp,field_write,Player::metal
 0x401260,UnitResources::SpendMetal,src/game/economy.cpp,field_write,UnitResources::metalUse
 0x401260,UnitResources::SpendMetal,src/game/economy.cpp,function,
+0x4012a0,UnitResources::SpendEnergyAndMetal,src/game/economy.cpp,call,operator->
 0x4012a0,UnitResources::SpendEnergyAndMetal,src/game/economy.cpp,field_read,Player::energy
 0x4012a0,UnitResources::SpendEnergyAndMetal,src/game/economy.cpp,field_read,Player::metal
 0x4012a0,UnitResources::SpendEnergyAndMetal,src/game/economy.cpp,field_read,UnitResources::energyUse
@@ -5714,6 +5718,7 @@ address,function,file,kind,target
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,global_read,g_game
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,FinishConstruction
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,get
+0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,operator->
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,deref_read,*unsigned char
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,deref_write,*unsigned char
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,field_escape,Unit::netDirtyFlags
@@ -7596,6 +7601,7 @@ address,function,file,kind,target
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,KillFeature
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,operator Mission *
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,operator Player *
+0x4237d0,ReclaimFeature,src/map/features.cpp,call,operator->
 0x4237d0,ReclaimFeature,src/map/features.cpp,field_read,Cell::flags
 0x4237d0,ReclaimFeature,src/map/features.cpp,field_read,Feature::energy
 0x4237d0,ReclaimFeature,src/map/features.cpp,field_read,Feature::flags
@@ -20527,6 +20533,7 @@ address,function,file,kind,target
 0x464b10,GetNetMetal,src/game/players_464290.cpp,field_read,Class_464b10::metalUsage
 0x464b10,GetNetMetal,src/game/players_464290.cpp,function,
 0x464b30,TransferMetal,src/game/players_464290.cpp,call,SendShareMetal
+0x464b30,TransferMetal,src/game/players_464290.cpp,call,operator Player *
 0x464b30,TransferMetal,src/game/players_464290.cpp,deref_read,*int
 0x464b30,TransferMetal,src/game/players_464290.cpp,field_read,EconomySeam::SpendEnergy
 0x464b30,TransferMetal,src/game/players_464290.cpp,field_read,Game::difficulty
@@ -20543,6 +20550,7 @@ address,function,file,kind,target
 0x464b30,TransferMetal,src/game/players_464290.cpp,global_read,g_seams
 0x464b30,TransferMetal,src/game/players_464290.cpp,indirect_call,"indirect via int (*)(UnitResources *, float) __attribute__((stdcall)) [EconomySeam::SpendEnergy]"
 0x464c60,TransferEnergy,src/game/players_464290.cpp,call,SendShareEnergy
+0x464c60,TransferEnergy,src/game/players_464290.cpp,call,operator Player *
 0x464c60,TransferEnergy,src/game/players_464290.cpp,deref_read,*int
 0x464c60,TransferEnergy,src/game/players_464290.cpp,field_read,EconomySeam::SpendMetal
 0x464c60,TransferEnergy,src/game/players_464290.cpp,field_read,Game::difficulty
@@ -27189,7 +27197,6 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,call,operator!=
 0x487080,LoadUnit,src/units/unit_save.cpp,call,operator=
 0x487080,LoadUnit,src/units/unit_save.cpp,call,sprintf
-0x487080,LoadUnit,src/units/unit_save.cpp,deref_read,*char
 0x487080,LoadUnit,src/units/unit_save.cpp,deref_write,*Ref<Order>
 0x487080,LoadUnit,src/units/unit_save.cpp,deref_write,*int
 0x487080,LoadUnit,src/units/unit_save.cpp,deref_write,*unsigned char
@@ -27211,6 +27218,7 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::b
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::c
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::e
+0x487080,LoadUnit,src/units/unit_save.cpp,field_read,Game::units
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,MapSeam::ForceNeighborFootprintReclaim
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,Order::flags_42
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,OrdersSeam::LoadMotion
@@ -27323,7 +27331,6 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,call,operator==
 0x4876c0,SaveUnits,src/units/unit_save.cpp,call,sprintf
 0x4876c0,SaveUnits,src/units/unit_save.cpp,call,strcpy
-0x4876c0,SaveUnits,src/units/unit_save.cpp,deref_read,*Unit
 0x4876c0,SaveUnits,src/units/unit_save.cpp,deref_read,*int
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,Unit::cell
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,Unit::footprint
@@ -27331,6 +27338,8 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,UnitWeaponSlot::flags
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_maybe_written,SaveRec::name
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,EconomySeam::SaveUnitAccounts
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Game::units
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Game::unitsEnd
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Obj::f10a
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Order::next
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,OrdersSeam::SaveMotion
@@ -42980,6 +42989,7 @@ address,function,file,kind,target
 ,AddFront,src/orders/order_list.cpp,field_write,Order::next
 ,AddFront,src/orders/order_list.cpp,field_write,Order::unit
 ,AddFront,src/orders/order_list.cpp,function,
+,AddIncome,src/game/economy_401360.cpp,call,operator Player *
 ,AddIncome,src/game/economy_401360.cpp,deref_read,*float
 ,AddIncome,src/game/economy_401360.cpp,deref_write,*float
 ,AddIncome,src/game/economy_401360.cpp,field_read,Game::difficulty
@@ -42988,6 +42998,7 @@ address,function,file,kind,target
 ,AddIncome,src/game/economy_401360.cpp,field_read,UnitResources::player
 ,AddIncome,src/game/economy_401360.cpp,function,
 ,AddIncome,src/game/economy_401360.cpp,global_read,g_game
+,AddIncomeD,src/game/economy_401360.cpp,call,operator Player *
 ,AddIncomeD,src/game/economy_401360.cpp,deref_read,*float
 ,AddIncomeD,src/game/economy_401360.cpp,deref_write,*float
 ,AddIncomeD,src/game/economy_401360.cpp,field_read,Game::difficulty
@@ -42996,6 +43007,7 @@ address,function,file,kind,target
 ,AddIncomeD,src/game/economy_401360.cpp,field_read,UnitResources::player
 ,AddIncomeD,src/game/economy_401360.cpp,function,
 ,AddIncomeD,src/game/economy_401360.cpp,global_read,g_game
+,AddIncomeDB,src/game/economy_401360.cpp,call,operator Player *
 ,AddIncomeDB,src/game/economy_401360.cpp,deref_read,*float
 ,AddIncomeDB,src/game/economy_401360.cpp,deref_write,*float
 ,AddIncomeDB,src/game/economy_401360.cpp,field_read,Game::difficulty
@@ -43004,6 +43016,7 @@ address,function,file,kind,target
 ,AddIncomeDB,src/game/economy_401360.cpp,field_read,UnitResources::player
 ,AddIncomeDB,src/game/economy_401360.cpp,function,
 ,AddIncomeDB,src/game/economy_401360.cpp,global_read,g_game
+,AddIncomeW,src/game/economy_401360.cpp,call,operator Player *
 ,AddIncomeW,src/game/economy_401360.cpp,deref_read,*float
 ,AddIncomeW,src/game/economy_401360.cpp,deref_write,*float
 ,AddIncomeW,src/game/economy_401360.cpp,field_read,Game::difficulty
@@ -43040,6 +43053,7 @@ address,function,file,kind,target
 ,AddPoints,src/map/meteors.cpp,field_write,Point16::x
 ,AddPoints,src/map/meteors.cpp,field_write,Point16::y
 ,AddPoints,src/map/meteors.cpp,function,
+,AddScaled,src/map/features.cpp,call,operator->
 ,AddScaled,src/map/features.cpp,field_read,Game::difficulty
 ,AddScaled,src/map/features.cpp,field_read,Player::active
 ,AddScaled,src/map/features.cpp,field_read,Player::type
@@ -44471,12 +44485,14 @@ address,function,file,kind,target
 ,Econ_00401360::RequestEnergyAndMetal,src/game/economy_401360.cpp,field_write,Res_00401360::demand
 ,Econ_00401360::RequestEnergyAndMetal,src/game/economy_401360.cpp,field_write,Res_00401360::used
 ,Econ_00401360::RequestEnergyAndMetal,src/game/economy_401360.cpp,function,
+,Econ_00401360::SpendEnergy,src/game/economy_401360.cpp,call,operator->
 ,Econ_00401360::SpendEnergy,src/game/economy_401360.cpp,field_read,Econ_00401360::owner
 ,Econ_00401360::SpendEnergy,src/game/economy_401360.cpp,field_read,Player::energy
 ,Econ_00401360::SpendEnergy,src/game/economy_401360.cpp,field_read,Res_00401360::used
 ,Econ_00401360::SpendEnergy,src/game/economy_401360.cpp,field_write,Player::energy
 ,Econ_00401360::SpendEnergy,src/game/economy_401360.cpp,field_write,Res_00401360::used
 ,Econ_00401360::SpendEnergy,src/game/economy_401360.cpp,function,
+,Econ_00401360::SpendEnergyAndMetal,src/game/economy_401360.cpp,call,operator->
 ,Econ_00401360::SpendEnergyAndMetal,src/game/economy_401360.cpp,field_read,Econ_00401360::owner
 ,Econ_00401360::SpendEnergyAndMetal,src/game/economy_401360.cpp,field_read,Player::energy
 ,Econ_00401360::SpendEnergyAndMetal,src/game/economy_401360.cpp,field_read,Player::metal
@@ -44485,6 +44501,7 @@ address,function,file,kind,target
 ,Econ_00401360::SpendEnergyAndMetal,src/game/economy_401360.cpp,field_write,Player::metal
 ,Econ_00401360::SpendEnergyAndMetal,src/game/economy_401360.cpp,field_write,Res_00401360::used
 ,Econ_00401360::SpendEnergyAndMetal,src/game/economy_401360.cpp,function,
+,Econ_00401360::SpendMetal,src/game/economy_401360.cpp,call,operator->
 ,Econ_00401360::SpendMetal,src/game/economy_401360.cpp,field_read,Econ_00401360::owner
 ,Econ_00401360::SpendMetal,src/game/economy_401360.cpp,field_read,Player::metal
 ,Econ_00401360::SpendMetal,src/game/economy_401360.cpp,field_read,Res_00401360::used

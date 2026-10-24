@@ -4,12 +4,13 @@
 
 Prints `<tick> <phase> <hash>` for every phase row and the world row of each dumped tick. With
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
-status is 1 if any row differs or the input cannot be parsed. Dumps of tick 1 (which add the
+status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 (which add the
 sections 29 to 31) are not supported.
 """
 
 import argparse
 import json
+import lzma
 import re
 import sys
 from pathlib import Path
@@ -26,6 +27,13 @@ POS_Y_UNSET_KINDS = ("MobileBuild", "VTOL_MobileBuild", "Reclaim", "VTOL_Reclaim
 
 class Error(Exception):
     pass
+
+
+def read_text(path: str) -> str:
+    if path.endswith(".xz"):
+        with lzma.open(path, "rt") as f:
+            return f.read()
+    return Path(path).read_text()
 
 
 class Hasher:
@@ -704,14 +712,14 @@ def rehash(schema: Schema, blocks: dict[tuple[int, str], list[tuple[str, str]]])
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("dump", help="a dump.txt")
+    ap.add_argument("dump", help="a dump.txt, or a dump.txt.xz")
     ap.add_argument("--schema", default="data/trace_schema.json")
-    ap.add_argument("--trace", help="a trace.txt to compare the rows with")
+    ap.add_argument("--trace", help="a trace.txt (or .xz) to compare the rows with")
     args = ap.parse_args()
     try:
         schema = Schema(json.loads(Path(args.schema).read_text()))
-        rows = rehash(schema, parse_dump(Path(args.dump).read_text()))
-        expected = parse_trace_rows(Path(args.trace).read_text()) if args.trace else None
+        rows = rehash(schema, parse_dump(read_text(args.dump)))
+        expected = parse_trace_rows(read_text(args.trace)) if args.trace else None
     except (Error, OSError, ValueError, KeyError) as e:
         print(f"tracerehash: {e}", file=sys.stderr)
         return 1

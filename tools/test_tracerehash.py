@@ -3,7 +3,10 @@
     uv run tools/test_tracerehash.py
 """
 
+import lzma
+import tempfile
 import unittest
+from pathlib import Path
 
 import tracerehash as tr
 
@@ -115,6 +118,16 @@ class WalkerTest(unittest.TestCase):
         w = self.walker([("t.a", "0x00000000")])
         self.assertTrue(w.present("T", "t"))
         self.assertFalse(w.present("T", "u"))
+
+
+class ReadTextTest(unittest.TestCase):
+    def test_xz_path_is_decompressed(self):
+        with tempfile.TemporaryDirectory() as d:
+            plain, packed = Path(d, "a.txt"), Path(d, "a.txt.xz")
+            plain.write_text("1 units 0123456789abcdef\n")
+            with lzma.open(packed, "wt") as f:
+                f.write("1 units 0123456789abcdef\n")
+            self.assertEqual(tr.read_text(str(packed)), tr.read_text(str(plain)))
 
 
 if __name__ == "__main__":

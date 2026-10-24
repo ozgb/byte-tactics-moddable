@@ -34,6 +34,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 tools/commentlint.py --all
 
+      - name: Test the comment lint and strip tool
+        run: |
+          python3 tools/test_commentlint.py
+          python3 tools/test_stripcomments.py
+
       - name: Determinism lint
         if: github.event_name == 'pull_request'
         env:

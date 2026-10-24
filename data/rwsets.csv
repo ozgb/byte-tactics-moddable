@@ -4543,6 +4543,7 @@ address,function,file,kind,target
 0x416310,CmdAssign,src/game/console_commands.cpp,call,CommandArgs::GetArg
 0x416310,CmdAssign,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x416310,CmdAssign,src/game/console_commands.cpp,call,IssueOrderToSelection
+0x416310,CmdAssign,src/game/console_commands.cpp,field_escape,Game::orders_2c76
 0x416310,CmdAssign,src/game/console_commands.cpp,field_read,MissionType::index
 0x416310,CmdAssign,src/game/console_commands.cpp,function,
 0x416310,CmdAssign,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
@@ -5107,7 +5108,6 @@ address,function,file,kind,target
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,call,GetGroundHeight
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,call,operator->
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,deref_read,*int
-0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,deref_read,*unsigned char
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,deref_write,*int
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,field_escape,Pos_00417bb0::x_frac
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,field_escape,Pos_00417bb0::z_frac
@@ -5115,6 +5115,7 @@ address,function,file,kind,target
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,field_escape,Unit::footprint
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,field_read,AiSearchGoal::active
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,field_read,AiSearchGoal::count
+0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,field_read,Game::colors
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,field_read,Game::scrollX
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,field_read,Game::scrollY
 0x417e00,AiSearchGoal::DrawOnSurface,src/game/console_commands.cpp,field_read,PathGoal::owner
@@ -8142,6 +8143,7 @@ address,function,file,kind,target
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,call,MarkLayerChanged
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,deref_read,*unsigned char
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,deref_write,*unsigned char
+0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,field_maybe_written,Game::gui
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,field_read,Gui::layer
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,field_read,Layer::gadgets
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,field_read,Layer::surface
@@ -8442,6 +8444,8 @@ address,function,file,kind,target
 0x426e80,RunFrontendStateMachine,src/frontend/frontend.cpp,field_escape,Game::flags_2b4c
 0x426e80,RunFrontendStateMachine,src/frontend/frontend.cpp,field_escape,Game::netGameFlags_2a44
 0x426e80,RunFrontendStateMachine,src/frontend/frontend.cpp,field_escape,Game::players
+0x426e80,RunFrontendStateMachine,src/frontend/frontend.cpp,field_escape,Game::providerGuid
+0x426e80,RunFrontendStateMachine,src/frontend/frontend.cpp,field_maybe_written,Game::buffer_2ab1
 0x426e80,RunFrontendStateMachine,src/frontend/frontend.cpp,field_maybe_written,Game::gui
 0x426e80,RunFrontendStateMachine,src/frontend/frontend.cpp,field_read,Bits_00426e80::b0
 0x426e80,RunFrontendStateMachine,src/frontend/frontend.cpp,field_read,Bits_00426e80::b1
@@ -11650,10 +11654,10 @@ address,function,file,kind,target
 0x439e30,FindOrderByType,src/orders/order_list.cpp,field_read,Unit::list2
 0x439e30,FindOrderByType,src/orders/order_list.cpp,function,
 0x439e30,FindOrderByType,src/orders/order_list.cpp,global_read,g_missionOrderTableBegin
-0x439e80,Order::SetDeadlineTicks,src/orders/order_list.cpp,deref_read,*int
 0x439e80,Order::SetDeadlineTicks,src/orders/order_list.cpp,deref_read,*unsigned int
 0x439e80,Order::SetDeadlineTicks,src/orders/order_list.cpp,deref_write,*int
 0x439e80,Order::SetDeadlineTicks,src/orders/order_list.cpp,deref_write,*unsigned int
+0x439e80,Order::SetDeadlineTicks,src/orders/order_list.cpp,field_read,Game::ticks
 0x439e80,Order::SetDeadlineTicks,src/orders/order_list.cpp,function,
 0x439e80,Order::SetDeadlineTicks,src/orders/order_list.cpp,global_read,g_game
 0x439ea0,ReadyOrder,src/orders/order_list.cpp,function,
@@ -12980,6 +12984,7 @@ address,function,file,kind,target
 0x441220,UpdateGameSelection,src/frontend/multi.cpp,deref_read,*unsigned short
 0x441220,UpdateGameSelection,src/frontend/multi.cpp,field_escape,Game::buffer_2ab1
 0x441220,UpdateGameSelection,src/frontend/multi.cpp,field_escape,Msg_00441220::group
+0x441220,UpdateGameSelection,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x441220,UpdateGameSelection,src/frontend/multi.cpp,field_read,Gadget::index
 0x441220,UpdateGameSelection,src/frontend/multi.cpp,field_read,Gadget::records
 0x441220,UpdateGameSelection,src/frontend/multi.cpp,field_read,Game::version
@@ -13201,6 +13206,7 @@ address,function,file,kind,target
 0x4426e0,FillAccountList,src/frontend/multi.cpp,call,strlen
 0x4426e0,FillAccountList,src/frontend/multi.cpp,deref_write,*char
 0x4426e0,FillAccountList,src/frontend/multi.cpp,field_escape,Entry_004426e0::name
+0x4426e0,FillAccountList,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x4426e0,FillAccountList,src/frontend/multi.cpp,field_read,Gadget::index
 0x4426e0,FillAccountList,src/frontend/multi.cpp,field_read,Gui::layer
 0x4426e0,FillAccountList,src/frontend/multi.cpp,field_read,Layer::entries
@@ -13218,6 +13224,7 @@ address,function,file,kind,target
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_escape,Entry_004426e0::name
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_maybe_written,Entry_004426e0::name
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_maybe_written,Entry_004426e0::number
+0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_read,Gadget::index
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_read,Gui::layer
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_read,Layer::entries
@@ -13579,6 +13586,7 @@ address,function,file,kind,target
 0x4444d0,CloneServiceSlot,src/frontend/multi.cpp,deref_read,*Gadget
 0x4444d0,CloneServiceSlot,src/frontend/multi.cpp,deref_write,*Gadget
 0x4444d0,CloneServiceSlot,src/frontend/multi.cpp,field_maybe_written,Gadget::name
+0x4444d0,CloneServiceSlot,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x4444d0,CloneServiceSlot,src/frontend/multi.cpp,field_read,Gadget::count
 0x4444d0,CloneServiceSlot,src/frontend/multi.cpp,field_write,Gadget::active
 0x4444d0,CloneServiceSlot,src/frontend/multi.cpp,field_write,Gadget::colours
@@ -14277,6 +14285,7 @@ address,function,file,kind,target
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,call,strncat
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_escape,Game::players
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_escape,Player::name
+0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_read,Gadget::attribs
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_read,Gadget::hotspotFlags
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_read,Gadget::state
@@ -14885,6 +14894,7 @@ address,function,file,kind,target
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,call,memset
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,deref_read,*int
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,deref_write,*int
+0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,function,
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_gamesGadgetName
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_lstExtension
@@ -23971,18 +23981,21 @@ address,function,file,kind,target
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,call,get
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,call,operator->
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,deref_read,*Ref<char>
-0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,deref_read,*int
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,deref_read,*unsigned char
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,deref_write,*int
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,deref_write,*unsigned char
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_read,Gadget::selected
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_read,Gadget::text
+0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_read,Game::difficulty
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_read,Game::localPlayer
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_read,Game::net
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_read,Gui::hotGadgetIndex
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_read,Layer::entries
+0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_write,Game::difficulty
+0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_write,Game::flag_37ef2
+0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,field_write,Game::frontendNextSubState
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,function,
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,global_read,g_anyMissionMode
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,global_read,g_campaignNameList
@@ -24205,6 +24218,7 @@ address,function,file,kind,target
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,call,strcmp
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,call,strcpy
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,deref_escape,*Gadget
+0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_escape,Game::paletteRgba
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Gadget::attribs
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Gadget::gaf
@@ -24231,8 +24245,8 @@ address,function,file,kind,target
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,global_read,g_game
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,global_write,g_briefingWindSpeed
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,global_write,g_briefingWindTickCountdown
-0x4794d0,CountComputerSlots,src/frontend/campaign_menu.cpp,deref_read,*int
 0x4794d0,CountComputerSlots,src/frontend/campaign_menu.cpp,field_read,Game::options
+0x4794d0,CountComputerSlots,src/frontend/campaign_menu.cpp,field_read,Game::playerCount
 0x4794d0,CountComputerSlots,src/frontend/campaign_menu.cpp,field_read,Item::type
 0x4794d0,CountComputerSlots,src/frontend/campaign_menu.cpp,function,
 0x4794d0,CountComputerSlots,src/frontend/campaign_menu.cpp,global_read,g_game
@@ -44641,7 +44655,7 @@ address,function,file,kind,target
 ,DrawBar_0046a860,src/ingame/info_panel_46a860.cpp,field_write,Rect::right
 ,DrawBar_0046a860,src/ingame/info_panel_46a860.cpp,field_write,Rect::top
 ,DrawBar_0046a860,src/ingame/info_panel_46a860.cpp,function,
-,DrawFlags,src/ingame/info_panel_46a610.cpp,deref_read,*unsigned char
+,DrawFlags,src/ingame/info_panel_46a610.cpp,field_read,Game::visualFlagsByte
 ,DrawFlags,src/ingame/info_panel_46a610.cpp,function,
 ,DrawFlags,src/ingame/info_panel_46a610.cpp,global_read,g_game
 ,DrawLoadingBar,src/game/game_load.cpp,call,DrawFrame
@@ -48369,6 +48383,7 @@ address,function,file,kind,target
 ,LoadAccount_00442a30,src/frontend/multi.cpp,call,GetGadgetText
 ,LoadAccount_00442a30,src/frontend/multi.cpp,field_maybe_written,Entry_004426e0::name
 ,LoadAccount_00442a30,src/frontend/multi.cpp,field_maybe_written,Entry_004426e0::number
+,LoadAccount_00442a30,src/frontend/multi.cpp,field_maybe_written,Game::gui
 ,LoadAccount_00442a30,src/frontend/multi.cpp,field_read,Gadget::index
 ,LoadAccount_00442a30,src/frontend/multi.cpp,field_read,Gui::layer
 ,LoadAccount_00442a30,src/frontend/multi.cpp,field_read,Layer::entries

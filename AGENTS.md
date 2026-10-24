@@ -179,11 +179,8 @@ Code that looks wrong but is deliberate, such as a 3.1c quirk, is documented by
 a quirk flag whose name says what it does (#1), or by a `TODO(#n)` pointing at
 the issue that will add one.
 
-Files from the decompilation still carry its matching notes. Leave them in
-files your issue doesn't otherwise change; #35 removes them all in one
-pass.
-
-`tools/commentlint.py` checks this in CI, on the lines a pull request adds.
+`tools/commentlint.py --all` checks this in CI, on every line of the tree.
+`tools/stripcomments.py` removes every comment the lint rejects.
 
 ## Writing style
 

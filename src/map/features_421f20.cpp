@@ -16,7 +16,7 @@ struct List_00421f20 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 unsigned short __stdcall LoadFeatureType(char* name);
 

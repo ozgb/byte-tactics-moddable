@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "../util/tdf.h"
+#include "features_422ea0.h"
 
 
 struct List_00422ea0 {
@@ -22,7 +23,7 @@ struct FeatureDef_00422ea0 {
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern List_00422ea0* s_featureTdfParsers;
 
 unsigned short __stdcall LoadFeatureType(char* name);

@@ -15,7 +15,7 @@ struct Pos_00485070 {
     Fixed_00485070 z;
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x485070
 int __stdcall GetGroundHeight(Pos_00485070* p)

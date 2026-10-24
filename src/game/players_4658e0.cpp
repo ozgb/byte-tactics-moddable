@@ -17,7 +17,7 @@ struct Map_004658e0 {
 };
 #include "game.h"
 #pragma pack(pop)
-extern Game* g_game;
+#include "../../link/globals.h"
 struct Pos_004658e0 {
     short xFrac;
     short x;

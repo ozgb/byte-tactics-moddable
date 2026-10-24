@@ -3,7 +3,7 @@
 #include "../state/block.h"
 
 void* __cdecl GameAllocThunk(size_t size);
-void __cdecl GameFreeIndirectThunk(void* p);
+#include "../debug/debug_lib.h"
 
 // FUNCTION: 0x4b4f10
 __declspec(noinline) void* __cdecl operator new(size_t size)
@@ -19,7 +19,7 @@ void __cdecl operator delete(void* p)
         SimFree(p);
         return;
     }
-    GameFreeIndirectThunk(p);
+    GameFreeIndirectThunk((int *)p);
 }
 
 // FUNCTION: 0x4b4f30 ??_U@YAPAXI@Z
@@ -36,5 +36,5 @@ void __cdecl operator delete[](void* p)
         SimFree(p);
         return;
     }
-    GameFreeIndirectThunk(p);
+    GameFreeIndirectThunk((int *)p);
 }

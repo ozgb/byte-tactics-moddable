@@ -1,6 +1,8 @@
+#include "campaign.h"
+
 struct FileHandle;
 
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
+#include "data_files.h"
 #include "../files/files_api.h"
 
 // FUNCTION: 0x4352d0

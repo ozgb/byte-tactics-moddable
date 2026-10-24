@@ -1,6 +1,7 @@
 #include <excpt.h>
 #include "win_types.h"
 #include "../../interfaces/host.h"
+#include "main_49e680.h"
 
 // FUNCTION: 0x49e680
 void __stdcall ReportViaException(const char* message)

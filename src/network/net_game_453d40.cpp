@@ -17,6 +17,7 @@
 #include "../units/cob_script.h"
 
 #include "../units/unit.h"
+#include "net_game_453d40.h"
 
 class UnitSync {
 public:
@@ -120,55 +121,34 @@ struct AllyFlagsPacket {
 #include "../network/packet_manager.h"
 #include "../state/sim_globals.h"
 
-extern Game* g_game;
-extern int g_usePacketManager;
-extern char g_allySoundName[];
-extern char g_playerDisconnectedText[];
-extern char g_integrityBreachText[];
-extern char g_playerMessageFormat[];
+#include "../../link/globals.h"
 
-int ReceiveNetPacket();
-void CheckDuplicatePlayerIds();
-void CheckPlayerTimeouts();
+#include "net_game.h"
 int GetTicks();
-void SendLobbySyncRequests();
-void RebuildAllyList();
-int __stdcall GetSlotDpid(unsigned char);
-unsigned char __stdcall FindSlotByDpid(int);
-int __stdcall AddNetPlayer(int);
+#include "net_game_450530.h"
+#include "../frontend/multi.h"
 int __stdcall RejectPlayer(int, int);
-void __stdcall BuildGameInfo(char*, int*, int*, int*, int*);
-void __stdcall HandlePing(void*);
 void __stdcall AddMessage(void*, int, int, unsigned char);
-int __stdcall SendPacketToPlayer(int, int, void*, int);
 int __stdcall BroadcastPacket(int, void*, int);
-void __stdcall BroadcastAllyTeam(Player*);
-void __stdcall RemovePlayer(int);
-int __stdcall IsColorFree(int, int);
-void __stdcall AssignPlayerColor(int, int, int);
 void __stdcall SetAlliance(int, int, unsigned char, int);
 char* __stdcall Translate(char*);
 void __stdcall PlaySoundByName(char*, int);
 void __stdcall CreateUnitFromPacket(unsigned char, void*);
-void __stdcall ReceiveUnitStates(Player*, void*);
-void __stdcall ApplyAttachUnit(void*);
-void __stdcall ApplyUnitDamage(void*);
-void __stdcall ApplyUnitDeath(void*, int);
+#include "../units/unit_position.h"
+#include "../units/unit_targets.h"
+#include "../units/units_485010.h"
 void __stdcall ApplyWeaponFirePacket(Player*, void*);
 void __stdcall ApplyProjectileHitPacket(Player*, void*);
-void __stdcall KillFeature(int, int, int);
-void __stdcall StartFeatureBurning(int, int, int);
-int __stdcall GetMapCell(int, int);
-void __stdcall DamageFeature(int, int, int, WeaponDef*);
-void __stdcall FinishConstruction(Unit*, Unit*);
-void __stdcall PlaySoundByIndex(int, int);
+#include "../map/features.h"
+#include "../map/line_of_sight.h"
+#include "../ingame/control_panel.h"
+#include "../sound/sound.h"
 void __stdcall PlaySoundAt(int, void*, int);
-void __stdcall GiveUnitToPlayer(Unit*, Player*, void*);
+#include "../units/unit_commands.h"
 void __stdcall TransferMetal(unsigned char, unsigned char, int, int);
 void __stdcall TransferEnergy(unsigned char, unsigned char, int, int);
-void __stdcall ShareMapInfo(unsigned char, unsigned char);
-void __stdcall HandlePlayerEconomy(void*, Player*);
-void __stdcall SetGameSpeed(int, int);
+#include "../units/units_485010.h"
+#include "../game/game_state.h"
 
 static inline int GetPlayerId(unsigned char i)
 {
@@ -520,7 +500,7 @@ int HandleNetPackets()
             g_game->bits_2bee_1.dirty = 1;
             break;
         case 2:
-            HandlePing(packet);
+            HandlePing((LatencyPacket *)packet);
             break;
         case 38:
             memcpy(g_game->playerIds, packet + 1, 40);
@@ -624,16 +604,16 @@ int HandleNetPackets()
             CreateUnitFromPacket(from, packet);
             break;
         case 44:
-            ReceiveUnitStates(player, packet);
+            ReceiveUnitStates(player, (unsigned int *)packet);
             break;
         case 10:
-            ApplyAttachUnit(packet);
+            ApplyAttachUnit((OrderView *)packet);
             break;
         case 11:
-            ApplyUnitDamage(packet);
+            ApplyUnitDamage((UnitDamagePacket *)packet);
             break;
         case 12:
-            ApplyUnitDeath(packet, 0);
+            ApplyUnitDeath((UnitKilledPacket *)packet, 0);
             break;
         case 13:
             ApplyWeaponFirePacket(player, packet);
@@ -656,7 +636,7 @@ int HandleNetPackets()
             default:
                 DamageFeature(GetMapCell(damage->x, damage->z),
                              damage->x, damage->z,
-                             &g_game->weapons[damage->sub]);
+                             (Weapon *)&g_game->weapons[damage->sub]);
                 break;
             }
             break;
@@ -703,7 +683,7 @@ int HandleNetPackets()
             else
                 p = &g_game->players[FindPlayerSlot(id)];
             if (IsConnected(p))
-                GiveUnitToPlayer(unit, p, packet);
+                GiveUnitToPlayer(unit, p, (OwnershipTransferPacket *)packet);
             break;
         }
         case 21:
@@ -730,7 +710,7 @@ int HandleNetPackets()
             break;
         }
         case 40:
-            HandlePlayerEconomy(packet, player);
+            HandlePlayerEconomy((PlayerViewStatePacket *)packet, player);
             break;
         case 41:
             if (packet[1]) {

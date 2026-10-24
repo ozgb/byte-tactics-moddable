@@ -1,3 +1,5 @@
+#include "net_chat_464000.h"
+
 struct ChatHudEntryView {
     char unknown_0[0x1e];
     unsigned char flags;
@@ -6,8 +8,8 @@ struct ChatHudEntryView {
 
 #include "../game/game.h"
 
-extern Game* g_game;
-int ScrollToNextMessageUnit(void);
+#include "../../link/globals.h"
+#include "net_chat.h"
 
 // FUNCTION: 0x464000
 void CycleMessageUnits(void)

@@ -53,7 +53,7 @@ OptionChoice DAT_00506738[7] = {
     {0, -2},
 };
 
-extern char g_notrakGadgetName[8];
+#include "../../link/globals.h"
 
 // GLOBAL: 0x506770
 const char* DAT_00506770[6] = {g_notrakGadgetName, "NORMTRAK", "RANDTRAK", "REPTTRAK", "SPECTRAK", 0};

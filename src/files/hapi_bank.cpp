@@ -44,27 +44,16 @@ struct AccountList {
 #include "../util/file_printf.h"
 #include "../../interfaces/host.h"
 
-FileHandle* __stdcall HAPI_OpenFileRead(char* name);
-int __stdcall HAPI_CloseFile(FileHandle* file);
-long __stdcall HAPI_SeekFile(FileHandle* file, long pos);
-long __stdcall HAPI_TellFile(FileHandle* file);
-int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
+#include "files_impl.h"
 long __stdcall HAPI_FileLength(FileHandle* file);
 
-void* __cdecl GameAllocShared(unsigned int size);
-void* __cdecl GameCalloc(unsigned int count, unsigned int size);
-void* __cdecl GameReallocIgnoreTag(void* ptr, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
-char* __cdecl GameStrdup(char* s);
-int __cdecl SetOutOfMemoryHandler(int handle);
+#include "../debug/debug_lib.h"
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
 
-int __stdcall SquashUnpackedSize(unsigned char* src);
-int __stdcall SquashUnpack(void* dest, void* src);
-char* __stdcall SquashErrorString(int code);
-int __stdcall SquashMaxPackedSize(int size, int level);
-int __stdcall SquashPack(void* dest, int* destSize, void* src, int srcSize, int method, int encrypt);
-void __stdcall FatalError(char* message);
-char* __stdcall StripExtension(char* name);
+#include "sqsh.h"
+#include "../graphics/display.h"
+#include "../graphics/palette.h"
 
 #pragma pack(push, 1)
 struct BankFileHeader {
@@ -211,13 +200,13 @@ int AccountBank::OpenBank(char* filename, char* name, char* account)
         HAPI_readfromfile(file, src, remaining);
         dsize = SquashUnpackedSize((unsigned char*)src);
         raw = GameAllocShared(dsize);
-        err = SquashUnpack(raw, src);
+        err = SquashUnpack((char *)raw, (char *)src);
         if (err != 0) {
             sprintf(errmsg, "[AccountBank::OpenBank] Decompression Error: %s",
                     SquashErrorString(err));
             FatalError(errmsg);
         }
-        img.buf = GameReallocIgnoreTag(img.buf, dsize);
+        img.buf = GameReallocIgnoreTag((int *)img.buf, dsize);
         img.size = dsize;
         memcpy(img.buf, raw, dsize);
         GameFreeThunk(raw);
@@ -287,7 +276,7 @@ int AccountBank::SaveBank(char* filename, char* name, int compress, int audit)
     header.version = 1;
     int oldlen = pool.len;
     pool.len = oldlen + strlen(name) + 1;
-    pool.data = (char*)GameReallocIgnoreTag(pool.data, pool.len);
+    pool.data = (char*)GameReallocIgnoreTag((int *)pool.data, pool.len);
     strcpy(pool.data + oldlen, name);
     header.nameOffset = oldlen;
     header.headerSize = sizeof(header);
@@ -300,7 +289,7 @@ int AccountBank::SaveBank(char* filename, char* name, int compress, int audit)
     int handle = SetOutOfMemoryHandler(0);
     char* cbuf = (char*)GameAllocShared(pool.csize);
     SetOutOfMemoryHandler(handle);
-    if (cbuf != 0) { err = SquashPack(cbuf, &pool.csize, pool.data, dsize, 1, 0); }
+    if (cbuf != 0) { err = SquashPack((Chunk_4d1820 *)cbuf, &pool.csize, pool.data, dsize, 1, 0); }
     else { err = noff; }
     if (cbuf != 0 && err == 0 && pool.csize < dsize) {
         host_file_write(file, cbuf, pool.csize);
@@ -333,7 +322,7 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
         char* name = slot->name;
         int oldlen = buf->len;
         buf->len += strlen(name) + 1;
-        buf->data = (char*)GameReallocIgnoreTag(buf->data, buf->len);
+        buf->data = (char*)GameReallocIgnoreTag((int *)buf->data, buf->len);
         strcpy(buf->data + oldlen, name);
         h.strOffset = (char*)oldlen;
     }
@@ -344,7 +333,7 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
             char* name = slot->items[i].name;
             int oldlen = buf->len;
             buf->len += strlen(name) + 1;
-            buf->data = (char*)GameReallocIgnoreTag(buf->data, buf->len);
+            buf->data = (char*)GameReallocIgnoreTag((int *)buf->data, buf->len);
             strcpy(buf->data + oldlen, name);
             int rec[2];
             rec[0] = oldlen;
@@ -359,7 +348,7 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
             char* name = slot->items[i].name;
             int oldlen = buf->len;
             buf->len += strlen(name) + 1;
-            buf->data = (char*)GameReallocIgnoreTag(buf->data, buf->len);
+            buf->data = (char*)GameReallocIgnoreTag((int *)buf->data, buf->len);
             strcpy(buf->data + oldlen, name);
             int rec[3];
             rec[0] = oldlen;
@@ -374,14 +363,14 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
             char* name = slot->items[i].name;
             int oldlen = buf->len;
             buf->len += strlen(name) + 1;
-            buf->data = (char*)GameReallocIgnoreTag(buf->data, buf->len);
+            buf->data = (char*)GameReallocIgnoreTag((int *)buf->data, buf->len);
             strcpy(buf->data + oldlen, name);
             int rec[2];
             rec[0] = oldlen;
             char* second = slot->items[i].string;
             int oldlen2 = buf->len;
             buf->len += strlen(second) + 1;
-            buf->data = (char*)GameReallocIgnoreTag(buf->data, buf->len);
+            buf->data = (char*)GameReallocIgnoreTag((int *)buf->data, buf->len);
             strcpy(buf->data + oldlen2, second);
             rec[1] = oldlen2;
             host_file_write(file, rec, 8);
@@ -403,7 +392,7 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
                 char* nm = slot->boxes[i].name;
                 int oldlen = buf->len;
                 buf->len += strlen(nm) + 1;
-                buf->data = (char*)GameReallocIgnoreTag(buf->data, buf->len);
+                buf->data = (char*)GameReallocIgnoreTag((int *)buf->data, buf->len);
                 strcpy(buf->data + oldlen, nm);
                 rec[0] = oldlen;
             } else {
@@ -437,7 +426,7 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
             int csize = SquashMaxPackedSize(len, 1);
             char* cbuf = (char*)GameAllocShared(csize);
             if (cbuf != 0) {
-                int err = SquashPack(cbuf, &csize, raw, len, 1, 0);
+                int err = SquashPack((Chunk_4d1820 *)cbuf, &csize, raw, len, 1, 0);
                 if (err == 0 && csize < len) {
                     host_file_seek(file, off + 0x20, HOST_SEEK_SET);
                     host_file_write(file, cbuf, csize);
@@ -481,7 +470,7 @@ void AccountBank::LoadAccount(FileHandle* fh, int* image, char* name)
             char* tmp = (char*)GameAllocShared(len);
             HAPI_readfromfile(fh, tmp, len);
             buf = (int)GameAllocShared(SquashUnpackedSize((unsigned char*)tmp));
-            int err = SquashUnpack((void*)buf, tmp);
+            int err = SquashUnpack((char *)buf, tmp);
             if (err != 0) {
                 sprintf(message, "[AccountBank::LoadAccount] Decompression Error: %s\nFile: %s",
                         SquashErrorString(err), fh->name);
@@ -547,7 +536,7 @@ int AccountBank::OpenAccount(char* name)
     bank->current = bank->count;
     bank->count++;
     bank->accounts = (BankAccount*)GameReallocIgnoreTag(
-        bank->accounts, bank->count * sizeof(BankAccount));
+        (int *)bank->accounts, bank->count * sizeof(BankAccount));
     memset(&bank->accounts[bank->current], 0, sizeof(BankAccount));
     bank->accounts[bank->current].name = GameStrdup(name);
     bank->accounts[bank->current].currentBox = -1;
@@ -651,7 +640,7 @@ int AccountBank::FindItem(const char* name, int create)
         return -1;
     int n = s->itemCount;
     s->itemCount = n + 1;
-    s->items = (BankItem*)GameReallocIgnoreTag(s->items, (n + 1) * sizeof(BankItem));
+    s->items = (BankItem*)GameReallocIgnoreTag((int *)s->items, (n + 1) * sizeof(BankItem));
     memset(&s->items[n], 0, sizeof(BankItem));
     s->items[n].name = GameStrdup((char*)name);
     return n;
@@ -672,7 +661,7 @@ int AccountBank::FindNumberedBox(int number, int create)
         return -1;
     int n = s->boxCount;
     s->boxCount = n + 1;
-    s->boxes = (SafeDepositBox*)GameReallocIgnoreTag(s->boxes, (n + 1) * sizeof(SafeDepositBox));
+    s->boxes = (SafeDepositBox*)GameReallocIgnoreTag((int *)s->boxes, (n + 1) * sizeof(SafeDepositBox));
     memset(&s->boxes[n], 0, sizeof(SafeDepositBox));
     s->boxes[n].number = number;
     s->boxes[n].named = 0;
@@ -694,7 +683,7 @@ int AccountBank::FindNamedBox(char* name, int create)
         return -1;
     int n = s->boxCount;
     s->boxCount = n + 1;
-    s->boxes = (SafeDepositBox*)GameReallocIgnoreTag(s->boxes, (n + 1) * sizeof(SafeDepositBox));
+    s->boxes = (SafeDepositBox*)GameReallocIgnoreTag((int *)s->boxes, (n + 1) * sizeof(SafeDepositBox));
     memset(&s->boxes[n], 0, sizeof(SafeDepositBox));
     s->boxes[n].name = GameStrdup(name);
     s->boxes[n].named = 1;
@@ -771,7 +760,7 @@ int AccountBank::WriteBox(void* src, int len)
     SafeDepositBox* c = &bank->accounts[bank->current].boxes[bank->accounts[bank->current].currentBox];
     int need = len + c->pos;
     if (need > c->size) {
-        c->data = (char*)GameReallocIgnoreTag(c->data, need);
+        c->data = (char*)GameReallocIgnoreTag((int *)c->data, need);
         c->size = need;
     }
     memcpy(c->data + c->pos, src, len);

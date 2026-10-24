@@ -28,7 +28,7 @@ extern Holder_004a3ef0* g_guiContext;
 
 void __stdcall SetFont(int id);
 int __stdcall GetGafFrame(unsigned short* seq, int frame);
-int GetFontHeight();
+#include "../graphics/draw.h"
 void __stdcall DrawSliderBar(Dialog* gui, int gadgetIndex);
 
 static inline GafFrame* GetGlyph_004a3ef0(unsigned char c)

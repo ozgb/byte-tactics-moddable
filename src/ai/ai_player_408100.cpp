@@ -55,11 +55,9 @@ struct Group_00408100 {
 extern Game_00408100* g_game;
 
 void __stdcall GetBasePosition(int index, Vec3* out);
-unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit_00408100* unit);
-int __stdcall FindBuildPosition(unsigned int player, Vec3* from, Item_00408100* item, Vec3* out);
-int __stdcall GetBuilderCount(unsigned int player);
+#include "ai_player.h"
 #include "../../interfaces/seams.h"
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
@@ -111,13 +109,13 @@ void ScoutTimer::OnTimer()
             && (!(unsigned char)u->def->flag12
                 || (GetBuilderCount(player) < 5 && g_game->gameTick >= (unsigned int)owner->nextAction))
             && (!u->list || !(u->list->flags & 8))) {
-            unsigned short idx = ChooseBuildOption(player, u);
+            unsigned short idx = ChooseBuildOption(player, (Unit *)u);
             if (idx) {
                 Vec3 pos;
                 pos.x = 0;
                 pos.y = 0;
                 pos.z = 0;
-                int ok = FindBuildPosition(player, &u->pos, &g_game->unitDefs[idx], &pos);
+                int ok = FindBuildPosition(player, &u->pos, (UnitDef *)&g_game->unitDefs[idx], &pos);
                 if (u->def->flag12) {
                     int range = MapRange();
                     origin.y = pos.y;

@@ -4,10 +4,10 @@
 
 #include "string_ref.h"
 
-void __cdecl GameFreeThunk(int* param_1);
+#include "../graphics/object_pool.h"
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
-void* __cdecl GameAllocIgnoreTag(char* name, int size);
+#include "../debug/debug_lib.h"
 
 #include <new>
 #include "tdf.h"

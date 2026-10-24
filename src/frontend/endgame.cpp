@@ -95,8 +95,6 @@ struct Display {
 #include "../network/player_info.h"
 #include "../../interfaces/seams.h"
 
-int StepTowards(int, int, int);
-
 struct EndGamePlayerStat {
     char name[0x1e];
     union {
@@ -160,82 +158,63 @@ struct Options {
 
 // GLOBAL: 0x511de8
 extern Game* g_game;
-extern int g_endGameGlamourSoundStarted;
-extern void __cdecl FreeMemoryCache();
+#include "../../link/globals.h"
+#include "endgame.h"
 
-void __cdecl AllocNotifyNop(int);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
 unsigned int __cdecl GetTicks();
-void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
-void __stdcall FadeRectangle(Surface_0041df20* dst, void* rect, int level);
+#include "../graphics/palette.h"
+#include "../graphics/draw.h"
 Display* GetDisplay();
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
+#include "../game/data_files.h"
 #include "../files/files_api.h"
 void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-void __stdcall FillSurface(void* surface, int colour);
-void BlankScreen();
+#include "../graphics/surface.h"
+#include "frontend.h"
 void FlipScreen();
-void __stdcall FreeSurface(void* image);
-void LeaveNetGame();
-void ShowLoadGameScreen();
-void ShowSaveGameScreen();
-void RegisterDataArchives();
-void EnterMainMenuState();
-void __stdcall SetGameMode(int a);
-void __stdcall SetCursorOverlayEnabled(int param);
+#include "../network/net_game.h"
+#include "../game/savegame.h"
+#include "../game/cd_check.h"
+#include "frontend.h"
+#include "../game/game_state.h"
+#include "../gui/keyboard.h"
 void __stdcall SetFrontendState(int state, int line, const char* file);
-void __stdcall SetMissionType(int param);
+#include "../map/map_list.h"
 void __stdcall SetCursorMode(int n);
-void Force640x480Surfaces();
-void ApplyDifficultyButtons();
-void StartGlamourSound();
+#include "campaign_menu.h"
 const char* __stdcall Translate(const char* text);
-void __stdcall OpenMessageBox(Gui* menu, const char* text, int wrapWidth, int centre, int autoHeight);
+#include "../gui/dialogs.h"
 void __stdcall PlaySoundByName(const char* name, int broadcast);
-int __stdcall IsCurrentGadgetNamed(Gui* gadget, char* name);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
-void __stdcall ClearSelectedGadget(Gui* menu);
 int __stdcall AddHotspotGadget(Gui* menu, Button* record);
 int __stdcall AddBarGadget(Gui* menu, Bar* record);
-int GetFontLineHeight();
 int __stdcall AddTextGadget(Layer* holder, char* type, char* text, int x, int y,
                            int width, int attribs);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-void __stdcall SelectGadgetByName(Gui* menu, const char* name);
-char* __stdcall BuildScrollItems1(char* names, char* flags, int count);
+#include "endgame.h"
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, void* items, int count, int flag);
 Gadget* __stdcall FindGadgetChecked_D(char* entries, char* name);
-void __stdcall SetListBoxScrollByName(Gui* menu, char* name, int index);
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int value);
 void __stdcall SetTranslatedTextByName(Gui* menu, char* name, char* text, int value);
 int __stdcall GetGafFrame(unsigned short* gaf, int frame);
 void __stdcall DrawFrame(void* dst, int bmp, int x, int y);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
-void __stdcall RenderLayer(Gui* menu, int value);
-void __stdcall MarkLayerChanged(Gui* menu);
-void __stdcall MarkChanged(Gui* menu);
-void __stdcall EnableKeyCommands(Gui* menu);
 void __stdcall UpdateMenu(Gui* menu);
 void __stdcall BlitMenuLayers(Gui* menu, void* dest, void* clip);
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 void __stdcall DrawMessages(void* surface);
 void __stdcall SetOffscreenSurface(void* surface);
 void* __stdcall AllocSurface(const char* name, int width, int height);
-void HandleNetPackets();
-void __stdcall ReportGameEvent(int event);
-const char* __stdcall GetRejectReasonText(unsigned reason);
-int GetTickRate();
-void __stdcall GetCurrentMouseEvent(int* event);
-int PopKey();
-void __stdcall DrawOutlinedString(void* surface, const char* text, int color, int color2, int y);
+#include "../network/net_game_453d40.h"
+#include "../network/unit_sync.h"
+#include "../graphics/display.h"
+#include "../graphics/font.h"
 void ShowSoftwareCursor();
 void HideSoftwareCursor();
-void __stdcall StartPaletteFade(unsigned char* target, unsigned char* current, int steps);
 void __stdcall SendPlayerEconomy(Player* player, int a, int b);
-int __stdcall IsScreenNamed(Gui* menu, const char* name);
 
 // FUNCTION: 0x41d920
 void CreateGameObject()
@@ -535,9 +514,9 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
     if (gadget->hotGadgetIndex == -1) {
         BlankScreen();
         if (g_game->lastFrame != 0)
-            FreeSurface(g_game->lastFrame);
+            FreeSurface((Surface *)g_game->lastFrame);
         if (g_game->image_3907b != 0)
-            FreeSurface(g_game->image_3907b);
+            FreeSurface((Surface *)g_game->image_3907b);
         if (g_game->palette_3907f != 0)
             GameFreeThunk(g_game->palette_3907f);
         if (((unsigned char*)g_game->currentPalette) != 0)
@@ -561,21 +540,21 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
         display->paletteBrightness = *(float*)&g_game->savedPaletteBrightness;
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "LoadGame")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "LoadGame")) {
         PlaySoundByName("BigButton", 0);
         ShowLoadGameScreen();
         ClearSelectedGadget(gadget);
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "SaveGame")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "SaveGame")) {
         PlaySoundByName("BigButton", 0);
         ShowSaveGameScreen();
         ClearSelectedGadget(gadget);
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "Start") || IsCurrentGadgetNamed(gadget, "Missions")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "Start") || IsCurrentGadgetNamed((Dialog *)gadget, "Missions")) {
         RegisterDataArchives();
         PlaySoundByName("BigButton", 0);
         g_game->frontendNextSubState = 10;
@@ -593,14 +572,14 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
             SetGameMode(2);
             return;
         }
-    } else if (IsCurrentGadgetNamed(gadget, "MainMenu")) {
+    } else if (IsCurrentGadgetNamed((Dialog *)gadget, "MainMenu")) {
         PlaySoundByName("BigButton", 0);
         SetFrontendState(2, 770, "c:\\cavedog\\wargame\\endgame.cpp");
         SetGameMode(1);
         SetCursorOverlayEnabled(1);
         SetCursorMode(0x14);
         return;
-    } else if (IsCurrentGadgetNamed(gadget, "Difficulty")) {
+    } else if (IsCurrentGadgetNamed((Dialog *)gadget, "Difficulty")) {
         PlaySoundByName("SKirmish", 0);
         if (g_game->difficulty == 0) {
             ((Options*)g_game->options)->difficulty = 1;
@@ -651,7 +630,7 @@ static inline int HasNextMission()
 void __stdcall OpenEndMissionScreen()
 {
     BlankScreen();
-    FillSurface(((void*)g_game->screen), 0);
+    FillSurface((Surface *)((void*)g_game->screen), 0);
     FlipScreen();
     Layer* layer = LoadGuiLayer(&g_game->gui, "ENDMSN.GUI", 0x80);
     layer->handler = (void (__stdcall*)(void*))HandleEndMissionClick;
@@ -680,8 +659,8 @@ void __stdcall OpenEndMissionScreen()
         ConfigureListBoxByName(&g_game->gui, "Missions", data->items, count, 0);
         Gadget* knob = FindGadgetChecked_D(entries, "KNOB");
         knob->range = knob->height - knob->knobSize - 3;
-        SetListBoxScrollByName(&g_game->gui, "Missions", g_game->mission);
-        SetListBoxScrollByName(&g_game->gui, "Missions", g_game->mission + (g_game->won != 0));
+        SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "Missions", g_game->mission);
+        SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "Missions", g_game->mission + (g_game->won != 0));
         ApplyDifficultyButtons();
     }
     Player* player = &g_game->players[g_game->localPlayer];
@@ -718,8 +697,8 @@ void EnableEndMissionButtons()
         entries[FindGadgetIndex(entries, "MainMenu", 1)].y = 0x1a0;
         SelectGadgetByName(&g_game->gui, "MainMenu");
     }
-    MarkLayerChanged(&g_game->gui);
-    MarkChanged(&g_game->gui);
+    MarkLayerChanged((Dialog *)&g_game->gui);
+    MarkChanged((Dialog *)&g_game->gui);
 }
 
 // FUNCTION: 0x41f5c0
@@ -741,8 +720,8 @@ void ShowEndMissionScreen()
     OpenEndMissionScreen();
     FillEndGameStatistics();
     EnableEndMissionButtons();
-    MarkLayerChanged(&g_game->gui);
-    MarkChanged(&g_game->gui);
+    MarkLayerChanged((Dialog *)&g_game->gui);
+    MarkChanged((Dialog *)&g_game->gui);
     SetGameMode(7);
     g_game->endGameState = 7;
 }
@@ -751,7 +730,7 @@ void ShowEndMissionScreen()
 void __stdcall HandleCdCheckClick(Gui* gadget)
 {
     if (gadget->hotGadgetIndex != -1) {
-        if (IsCurrentGadgetNamed(gadget, "OK")) {
+        if (IsCurrentGadgetNamed((Dialog *)gadget, "OK")) {
             PlaySoundByName("Options", 0);
             g_game->endGameState = 5;
             return;
@@ -805,8 +784,6 @@ static inline int StatsComplete()
     return 1;
 }
 
-void __stdcall ClearBorderFeatures();
-
 // FUNCTION: 0x41f7f0
 void __stdcall RunEndGameState()
 {
@@ -826,9 +803,9 @@ void __stdcall RunEndGameState()
             Player* player=&g_game->players[g_game->localPlayer];
             if(player->rejectReason && player->rejectReason!=2) {
                 const char* name=GetRejectReasonText(player->rejectReason);
-                OpenMessageBox(&g_game->gui,Translate(name),320,1,1);
-                MarkChanged(&g_game->gui);
-                MarkLayerChanged(&g_game->gui);
+                OpenMessageBox(&g_game->gui,(char *)Translate(name),320,1,1);
+                MarkChanged((Dialog *)&g_game->gui);
+                MarkLayerChanged((Dialog *)&g_game->gui);
                 player->rejectReason=0;
             }
         } else { g_game->lastFrame=0; g_game->endGameState=2; }
@@ -858,7 +835,7 @@ void __stdcall RunEndGameState()
             event[1]=0; event[0]=0;
             event[2]=g_game->width_37e1f; event[3]=g_game->screenHeight;
             if(g_game->nextTime<GetTicks()) {
-                FadeRectangle(0,event,g_game->steps-29);
+                FadeRectangle(0,(Rect *)event,g_game->steps-29);
                 g_game->nextTime=GetTicks()+1;
                 --g_game->steps;
                 if(!g_game->steps) g_game->done=1;
@@ -888,7 +865,7 @@ void __stdcall RunEndGameState()
             DrawSurface(((void*)g_game->screen),g_game->image_3907b,0,0);
         } else {
             OpenEndMissionScreen(); FillEndGameStatistics(); EnableEndMissionButtons();
-            MarkLayerChanged(&g_game->gui); MarkChanged(&g_game->gui);
+            MarkLayerChanged((Dialog *)&g_game->gui); MarkChanged((Dialog *)&g_game->gui);
             g_game->endGameState=7;
         }
         break;
@@ -903,22 +880,22 @@ void __stdcall RunEndGameState()
         } else {
             if(!g_endGameGlamourSoundStarted) { StartGlamourSound(); g_endGameGlamourSoundStarted=1; }
             if(g_game->deadline<GetTicks()) {
-                GetCurrentMouseEvent(event);
+                GetCurrentMouseEvent((MouseEvent *)event);
                 if(PopKey() || g_game->cursorKeyFlags) {
                     ((Sound*)g_game->sound)->StopStream();
                     OpenEndMissionScreen(); EnableEndMissionButtons(); FillEndGameStatistics();
-                    MarkLayerChanged(&g_game->gui); MarkChanged(&g_game->gui);
+                    MarkLayerChanged((Dialog *)&g_game->gui); MarkChanged((Dialog *)&g_game->gui);
                     g_game->endGameState=7;
                 }
                 unsigned deadline=GetTickRate()*5+g_game->deadline;
                 if(deadline<GetTicks())
-                    DrawOutlinedString(((void*)g_game->screen),Translate("Click to continue."),g_game->gui.colours[0],g_game->gui.colours[0xf],g_game->screenHeight-20);
+                    DrawOutlinedString((Surface *)((void*)g_game->screen),(unsigned char *)Translate("Click to continue."),g_game->gui.colours[0],g_game->gui.colours[0xf],g_game->screenHeight-20);
             }
         }
         break;
     case 7: {
         if(StatsComplete()) {
-            EnableKeyCommands(&g_game->gui);
+            EnableKeyCommands((Dialog *)&g_game->gui);
             g_game->endGameState=8; SetCursorMode(19); SetCursorOverlayEnabled(1);
             break;
         }

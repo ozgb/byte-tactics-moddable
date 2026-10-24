@@ -3,9 +3,9 @@
 #include <string.h>
 
 struct Unit;
-void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
+#include "../orders/unit_orders_406c70.h"
 namespace std {
-inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
+inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }
 #include <vector>
 
@@ -52,17 +52,17 @@ struct Name_0048d630 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-void SelectStopOrder(void);
-int __stdcall PopUntilNamedLayout(int force);
-void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
-void __stdcall CenterCameraOnMapPosition(Vec3* p, int param_2);
-UnitTypeSet* __stdcall GetCategoryMask(char* name);
+#include "keys.h"
+#include "../game/game_state.h"
+#include "../sound/sound.h"
+#include "control_panel.h"
+#include "../units/unit_commands.h"
 
 #include "../map/cell.h"
 
-Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
+#include "../map/line_of_sight.h"
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
 
 // FUNCTION: 0x48bae0
@@ -309,8 +309,6 @@ struct Select_0048c390 {
     unsigned int flags;
 };
 
-extern char s_SelectMultipleUnits_00508d8c[];
-
 int __stdcall PlaySoundByName(char* msg, int a);
 
 // FUNCTION: 0x48c390
@@ -371,7 +369,7 @@ int __stdcall SelectUnitsInBox(void* param_1)
 
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 void __stdcall GetObjectBounds(void* obj, Vec3* lo, Vec3* hi, int arg);
-int __stdcall PointInPolygon(Point* pts, int n, int px, int py);
+#include "../graphics/draw.h"
 
 // FUNCTION: 0x48c6a0
 int __stdcall HitTestUnitScreenHull(Unit* obj, Point* p)
@@ -479,8 +477,7 @@ void __stdcall CollectSelectedUnits(std::vector<Unit*>* list)
     }
 }
 
-void __stdcall DrawOrderOverlays(Unit* unit, int mask, void* obj,
-                           Unit** sel, int flag);
+#include "../orders/order_list.h"
 
 // FUNCTION: 0x48cc30
 void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Unit** sel)
@@ -683,8 +680,6 @@ void FocusNextLocalUnit(void)
     u->selectState = 1;
 }
 
-void __cdecl ClearCameraFollowState(void);
-
 // FUNCTION: 0x48d630
 void __stdcall FocusCommander(int param_1)
 {
@@ -764,7 +759,7 @@ done:
     (*(Orders_37ebe*)&g_game->ordersPanelFlags_37ebe).flags |= flag;
 }
 
-void __stdcall SetUnitSquad(Unit* unit, int arg);
+#include "../units/squads.h"
 
 // FUNCTION: 0x48d920
 void __stdcall CreateSquad(int param_1)

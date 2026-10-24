@@ -1,10 +1,9 @@
 #include "../../interfaces/host.h"
 
-extern char* g_loopingWav;
-extern int* g_diskWav;
+#include "../../link/globals.h"
 
 #include "../files/files_api.h"
-void __cdecl GameFreeThunk(int* p);
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x49f610
 int IsWindowsSoundAvailable(void)

@@ -37,7 +37,7 @@ static inline Econ_00401360* EconOf(Unit* u)
 #include "game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 int Econ_00401360::RequestEnergy(Econ_00401360* e, float amount)
 {

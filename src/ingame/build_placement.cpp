@@ -20,41 +20,34 @@ struct Struct_00499200_531 {
 #include "../orders/mission_type.h"
 #include "../../interfaces/seams.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-void BeginMouseScroll();
-void UpdatePlacementGhostValidity();
-void DispatchOrdersPanelPageFlags();
-void UpdateMouseScroll();
-void CenterCameraOnRadarClick();
-void __stdcall SetEndGameState(int a);
-void BlankScreen();
-int BroadcastPendingViewState();
-void ResetChatHudIndices();
-void ApplySlotsToGamePlayers();
-void ClearSelection();
-int __stdcall SelectUnitsInBox(void* p);
-unsigned short __stdcall PickUnitUnderCursor();
+#include "control_panel.h"
+#include "camera.h"
+#include "../frontend/endgame.h"
+#include "../frontend/frontend.h"
+#include "../network/net_game.h"
+#include "../network/packets.h"
+#include "../frontend/skirmish_menu.h"
+#include "selection.h"
 int __stdcall ResolveCursorModeForSelection(char mode);
-void ShutdownIngameSystems();
-void __stdcall PopUntilNamedLayout(int a);
-void MainLoopTick();
+#include "../game/game_state.h"
+#include "../game/main_loop.h"
 void __stdcall UpdateCursorWorldPos(MouseEvent* p);
 void __stdcall IssueMobileBuildOrders(MouseEvent* arg);
 void __stdcall PlaySoundByName(char* name, int broadcast);
 void __stdcall ClickSelectHoverUnit(MouseEvent* arg);
 void __stdcall IssueOrderToSelection(void* a, unsigned char b, MissionType kind, Vec3* d, int e, int f);
 int __stdcall FindGadgetIndexBySubstring(int value, char* name);
-void __stdcall ClearGroupStatus(void* obj, int index);
-void __stdcall CloseTopScreen(void* a);
+#include "../gui/gui.h"
 void __stdcall SetCursorAnimation(void* a, void* b);
 void __stdcall SetCloseHandler(void* a, int b);
 int GetTicks();
-void ClearKeyQueue();
-int __stdcall IsKeyDown(int a);
-void EndGameFrame();
-void RunEndGameState(void);
-void MenuFrame();
+#include "../gui/keyboard.h"
+#include "../gui/keyboard.h"
+#include "build_placement.h"
+#include "../frontend/endgame.h"
+#include "../game/main_loop.h"
 void __cdecl LeaveNetGameCallback();
 
 // FUNCTION: 0x498f70
@@ -74,7 +67,7 @@ void __stdcall HandleLeftClick(MouseEvent* mouse)
             g_game->inputFlags &= 0xdf;
             index = FindGadgetIndexBySubstring(g_game->layer->entries, "STOP");
             if (index != -1) {
-                ClearGroupStatus(g_game->message, index);
+                ClearGroupStatus((Gui *)g_game->message, index);
             }
         } else {
             PlaySoundByName("notoktobuild", 0);
@@ -105,7 +98,7 @@ void __stdcall HandleLeftClick(MouseEvent* mouse)
     g_game->inputFlags &= 0xdf;
     index = FindGadgetIndexBySubstring(g_game->layer->entries, "STOP");
     if (index != -1) {
-        ClearGroupStatus(g_game->message, index);
+        ClearGroupStatus((Gui *)g_game->message, index);
     }
 }
 
@@ -117,7 +110,7 @@ void __stdcall HandleRightClick(MouseEvent* mouse)
         g_game->inputFlags &= 0xdf;
         int index = FindGadgetIndexBySubstring(g_game->layer->entries, "STOP");
         if (index != -1) {
-            ClearGroupStatus(g_game->message, index);
+            ClearGroupStatus((Gui *)g_game->message, index);
         }
         return;
     }
@@ -177,7 +170,7 @@ void BattleFrame(void)
             g_game->inputFlags &= 0xdf;
             int index = FindGadgetIndexBySubstring(g_game->layer->entries, "STOP");
             if (index != -1) {
-                ClearGroupStatus(g_game->message, index);
+                ClearGroupStatus((Gui *)g_game->message, index);
             }
         }
     }
@@ -259,7 +252,7 @@ void BattleFrame(void)
              BroadcastPendingViewState() != 0)) {
             SetCursor(0x13);
             PopUntilNamedLayout(1);
-            CloseTopScreen(g_game->message);
+            CloseTopScreen((Gui *)g_game->message);
             if (g_seams.map->GetGameType(g_game->net) == 3) {
                 ResetChatHudIndices();
                 MainLoopTick();
@@ -278,7 +271,7 @@ void BattleFrame(void)
         if (g_seams.map->GetGameType(g_game->net) == 1) {
             ShutdownIngameSystems();
             PopUntilNamedLayout(1);
-            CloseTopScreen(g_game->message);
+            CloseTopScreen((Gui *)g_game->message);
             BlankScreen();
             int a = g_seams.map->GetMissionIndex(g_game->net);
             char* b = g_seams.map->GetCampaignName(g_game->net);
@@ -294,7 +287,7 @@ void BattleFrame(void)
             unsigned int saved = g_game->numPlayers;
             ShutdownIngameSystems();
             PopUntilNamedLayout(1);
-            CloseTopScreen(g_game->message);
+            CloseTopScreen((Gui *)g_game->message);
             BlankScreen();
             SetCursor(0x14);
             g_game->numPlayers = saved;

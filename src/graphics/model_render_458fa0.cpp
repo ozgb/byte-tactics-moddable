@@ -19,7 +19,7 @@ struct Map_00458fa0 {
 };
 #pragma pack(pop)
 
-void __stdcall DrawPolygonEdges(GafFrame* view, Vertex_0045a610* points, int count, int color);
+#include "draw.h"
 
 // FUNCTION: 0x458fa0
 void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color)
@@ -61,7 +61,7 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color
                     for (k = 0; k < f->count; k++, ip++)
                         tmp[k] = verts[*ip];
                     tmp[k] = tmp[0];
-                    DrawPolygonEdges(view, tmp, f->count + 1, color);
+                    DrawPolygonEdges(view, (Vec3 *)tmp, f->count + 1, color);
                 }
             }
             piece--;

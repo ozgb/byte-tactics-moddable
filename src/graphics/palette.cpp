@@ -40,16 +40,11 @@ struct RGBA {
 };
 
 DisplayContext* GetDisplay(void);
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
-void __stdcall SortByBrightness(unsigned char* data, int* sums, unsigned char* idx);
-unsigned char __stdcall NearestColorInBand(tagPALETTEENTRY* palette, int* band, unsigned char* order, tagPALETTEENTRY color);
+#include "../debug/debug_lib.h"
+#include "object_pool.h"
+#include "palette.h"
 
-extern long g_gfxBlitLockHeld;
-extern long g_gfxBlitLockOwner;
-extern void* g_gfxBlitLockEvent;
-extern char g_alphaTableName[];
-extern const char g_shadeTableName[];
+#include "../../link/globals.h"
 
 static inline long Lock()
 {
@@ -285,8 +280,6 @@ void __stdcall SortByBrightness(unsigned char* data, int* sums, unsigned char* i
         }
     }
 }
-
-extern double g_shadeStep;
 
 // FUNCTION: 0x4ba9d0
 unsigned char __stdcall NearestColorInBand(tagPALETTEENTRY* palette, int* band, unsigned char* order, tagPALETTEENTRY color)

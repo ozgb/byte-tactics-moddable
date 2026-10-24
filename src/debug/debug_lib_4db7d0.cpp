@@ -2,7 +2,8 @@
 #include <vector>
 #include "free_block_map.h"
 
-extern unsigned int g_committedBytes;
+#include "../../link/globals.h"
+#include "debug_lib_4db7d0.h"
 extern void (*g_outOfMemoryHandler)();
 
 class BlockInfo {
@@ -112,16 +113,11 @@ inline void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
     InsertOrFind(p);
 }
 
-void* GetAllocLock();
+#include "debug_lib.h"
 BlockMap* GetBlockMap();
 Arena_004da9f0* GetFreedBlockRing();
-FreeBlockMap* GetFreeBlockSet();
-char IsBackAlign();
-int GetDebugFillPattern();
-void __cdecl CheckFillPattern(void* at, int value, unsigned int count);
-void __cdecl CountFree(unsigned int size);
-unsigned int __cdecl RoundUpToPage(unsigned int size);
-unsigned int __cdecl RoundUpToDoublePage(unsigned int size);
+#include "debug_lib_4db610.h"
+#include "debug_lib_4d8310.h"
 
 // FUNCTION: 0x4db7d0
 void __cdecl FreeDebugBlock(void* p, int flags)
@@ -140,9 +136,9 @@ void __cdecl FreeDebugBlock(void* p, int flags)
     unsigned int size = it->size;
     unsigned int pad = (0 - (size & 0xfff)) & 0xfff;
     if (IsBackAlign())
-        CheckFillPattern((char*)p - pad, GetDebugFillPattern(), pad);
+        CheckFillPattern((unsigned int *)((char*)p - pad), GetDebugFillPattern(), pad);
     else
-        CheckFillPattern((char*)p + size, GetDebugFillPattern(), pad);
+        CheckFillPattern((unsigned int *)((char*)p + size), GetDebugFillPattern(), pad);
     Elem_004dd8c0* old = (Elem_004dd8c0*)&*it;
     Arena_004da9f0* arena = GetFreedBlockRing();
     if (arena->count < 0x2000)

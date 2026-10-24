@@ -20,7 +20,7 @@ struct Weapon_00409730 {
 #include "player_ai.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../../interfaces/seams.h"
 

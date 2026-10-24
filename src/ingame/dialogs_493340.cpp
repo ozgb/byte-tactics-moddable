@@ -12,7 +12,7 @@
 
 #include "../../interfaces/seams.h"
 
-unsigned int __cdecl GetMilliseconds(void);
+#include "../graphics/display.h"
 
 #include "../network/packet_manager.h"
 
@@ -91,87 +91,59 @@ extern int g_lastCdActivityMode;
 extern int g_usePacketManager;
 
 Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
-int __stdcall ReadSliderValue(Gadget* entry);
+#include "../frontend/options.h"
 void __stdcall SetTranslatedTextByName(Gui* menu, char* name, char* text, int param_4);
 void __stdcall PlaySoundByName(char* name, int flag);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
-int __stdcall IsCurrentGadgetNamed(Gui* menu, char* name);
-void __cdecl GameFreeThunk(void* p);
-void __stdcall MarkChanged(Gui* menu);
-void __stdcall ClearSelectedGadget(Gui* menu);
+#include "../graphics/object_pool.h"
+#include "../gui/dialogs.h"
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetButtonStageByName(Gui* menu, char* name);
-unsigned char __stdcall FindSlotByDpid(int id);
-void __stdcall ShareMapInfo(unsigned char from, unsigned char to);
-void __stdcall SendShareMapInfo(unsigned char from, unsigned char to);
+#include "../network/net_game.h"
+#include "../units/units_485010.h"
 void __stdcall CollectSelectedUnits(std::vector<Unit*>* list);
-unsigned int* __stdcall GetCategoryMask(char* name);
-void __stdcall GiveUnitToPlayer(Unit* unit, Player* player, int arg);
+#include "../units/unit_commands.h"
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-void __stdcall HandleShareDialogEvent(Gui* gadget);
+#include "dialogs_493340.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
-void __stdcall SetSliderFromValue(Gadget* entry, int param_2);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __stdcall CloseTopScreen(Gui* menu);
+#include "../debug/debug_lib.h"
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* text, int count, int flag);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
-void __stdcall RenderLayer(Gui* menu, int value);
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 void __stdcall SetButtonStageByName(Gui* menu, char* name, int value);
 int __stdcall GetButtonStage(Gui* menu, int index);
 Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name);
 void __stdcall GetGadgetText(Gui* menu, char* name, char* text);
-void ResetPlayerGadgets();
-void OpenTalkDialog();
 int __stdcall ExecuteCommandLine(char* cmd, int flags);
 void __stdcall TrySetFocus(Gui* menu, int index);
 void __stdcall SendChatMessage(Player* from, char* text, int param_3, char* to);
-void __stdcall HandleTalkDialogEvent(Gui* gadget);
-void __stdcall RefreshAlliesScreen(int value);
+#include "../frontend/multi.h"
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
-void __stdcall FreeSurface(void* param_1);
-void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
+#include "../graphics/surface.h"
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);
-void __stdcall HandleUnitInfoDialogEvent(Gui* gadget);
-void __stdcall DrawUnitInfoImage(Gui* gadget, Gadget* entry);
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
+#include "../game/data_files.h"
 void* __stdcall LoadPcx(char* path, int param);
-char* __stdcall MakePropList(void* obj);
+#include "../units/unit_targets.h"
 char* __stdcall Translate(char* text);
 void __stdcall AddTextGadget(Layer* obj, char* name, char* text, int x, short y, int w, int flags);
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
-unsigned short __stdcall FindUnitTypeId(char* name);
-void __stdcall DisableKeyCommands(Gui* menu);
-void OpenInGameOptions();
-void OpenShareDialog();
-void OpenControlDialog();
-void OpenAlliesDialog();
-void __stdcall HandleMain2LayoutEvent(Gui* gadget);
+#include "../frontend/options.h"
 unsigned int GetTicks();
-int GetScreenWidth();
-int __stdcall IsKeyDown(int key);
-void __stdcall FadeRectangle(void* surface, Rect* rect, int level);
-void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
+#include "../gui/keyboard.h"
+#include "../graphics/draw.h"
 int __stdcall GetTextPixelWidth(char* text);
 void* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Quad* dst, Quad* src);
-void ReportIntervalTimer();
-int __stdcall IsScreenNamed(Gui* menu, const char* name);
+#include "../network/unit_sync.h"
 void HideSoftwareCursor();
-void __stdcall HandleTabMenuEvent(Gui* gadget);
-int IsHostLocal();
-void __stdcall EnableKeyCommands(Gui* menu);
 void ShowSoftwareCursor();
-void HandleNetPackets(void);
-void StepAllGafSequences(void);
-void UpdateCameraFollow(void);
-void UpdateParticles(void);
-void EmptyPostSimStepHook(void);
-void EmptyPostSimStepHook_B(void);
-void EmptyPostSimStepHook_C(void);
-void ExpireOldestMessage(void);
-int __stdcall SetPageFlipping(int enable);
+#include "../network/net_game_453d40.h"
+#include "../network/net_stats.h"
+#include "control_panel.h"
+#include "../graphics/particles.h"
+#include "../frontend/frontend.h"
+#include "../network/net_chat.h"
 
 // FUNCTION: 0x493340
 void __stdcall UpdateMetalReadout(Gui* obj, int unused)
@@ -207,7 +179,7 @@ void __stdcall GiveSelectedUnitsToPlayer(unsigned char player)
     std::vector<Unit*> list;
     CollectSelectedUnits(&list);
     Player* p = &g_game->players[player];
-    unsigned int* set = GetCategoryMask("Commander");
+    unsigned int* set = (unsigned int *)GetCategoryMask("Commander");
     for (std::vector<Unit*>::iterator it = list.begin(); it != list.end(); it++) {
         Unit* unit = *it;
         if ((unit->flags & 3) != 2 && unit->cargo == 0 && unit->carrier == 0
@@ -241,19 +213,19 @@ void __stdcall HandleShareDialogEvent(Gui* obj)
         g_game->flags_37ebe &= ~0x40;
         return;
     }
-    if (IsCurrentGadgetNamed(obj, "MAPINFO")) {
-        MarkChanged(obj);
+    if (IsCurrentGadgetNamed((Dialog *)obj, "MAPINFO")) {
+        MarkChanged((Dialog *)obj);
         PlaySoundByName("Options", 0);
         ClearSelectedGadget(obj);
         return;
     }
-    if (IsCurrentGadgetNamed(obj, "SHARUNIT")) {
-        MarkChanged(obj);
+    if (IsCurrentGadgetNamed((Dialog *)obj, "SHARUNIT")) {
+        MarkChanged((Dialog *)obj);
         PlaySoundByName("Options", 0);
         ClearSelectedGadget(obj);
         return;
     }
-    if (IsCurrentGadgetNamed(obj, "OK")) {
+    if (IsCurrentGadgetNamed((Dialog *)obj, "OK")) {
         PlaySoundByName("Options", 0);
         Gadget* plyr = FindGadgetChecked(data, "PLYRLIST");
         short idx = plyr->u.list.selected;
@@ -275,7 +247,7 @@ void __stdcall HandleShareDialogEvent(Gui* obj)
         }
         return;
     }
-    if (IsCurrentGadgetNamed(obj, "CANCEL")) {
+    if (IsCurrentGadgetNamed((Dialog *)obj, "CANCEL")) {
         PlaySoundByName("Previous", 0);
         return;
     }
@@ -356,7 +328,7 @@ void OpenShareDialog()
         sprintf(text, "%d", ReadSliderValue(e));
         SetTranslatedTextByName(menu, "ENERGY#", text, 0);
     }
-    MarkChanged(&g_game->gui);
+    MarkChanged((Dialog *)&g_game->gui);
     SetKeyboardInput(&g_game->gui, 1);
     RenderLayer(&g_game->gui, 0x40);
 }
@@ -416,11 +388,11 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
         n = atoi(&entries[gadget->hotGadgetIndex].name[8]);
         unsigned char v = (unsigned char)GetButtonStage(gadget, gadget->hotGadgetIndex);
         g_game->chatRecipients[n] = v;
-        MarkChanged(gadget);
+        MarkChanged((Dialog *)gadget);
         ClearSelectedGadget(gadget);
         goto tail;
     }
-    if (IsCurrentGadgetNamed(gadget, g_sendToGadgetName)) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, g_sendToGadgetName)) {
         PlaySoundByName(g_smallButtonSoundName, 0);
         unsigned char v = (unsigned char)GetButtonStage(gadget, gadget->hotGadgetIndex);
         (*(Flags16*)&g_game->lobbyUiDirtyFlags_2bee).bit8 = v & 1;
@@ -430,7 +402,7 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, g_sendTypeGadgetName)) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, g_sendTypeGadgetName)) {
         PlaySoundByName(g_smallButtonSoundName, 0);
         g_game->mode_2bf0 = (unsigned char)GetButtonStageByName(gadget, g_sendTypeGadgetName);
         if (g_game->mode_2bf0 >= 4)
@@ -439,7 +411,7 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
         ClearSelectedGadget(gadget);
         goto tail;
     }
-    if (IsCurrentGadgetNamed(gadget, g_talkGadgetName)) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, g_talkGadgetName)) {
         Gadget* talk = FindGadgetChecked_B(entries, g_talkGadgetName);
         mode = g_game->mode_2bf0;
         {
@@ -555,11 +527,11 @@ void __stdcall HandleUnitInfoDialogEvent(Gui* gadget)
 {
     if (gadget->hotGadgetIndex == -1) {
         Gadget* e = FindGadgetChecked_E(gadget->layer->entries, "HOTR");
-        FreeSurface((void*)e->u.anim.value);
+        FreeSurface((Surface *)e->u.anim.value);
         g_game->flags_37ebe &= ~0x800;
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "DONE")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "DONE")) {
         PlaySoundByName("smlbutton", 0);
         return;
     }
@@ -616,7 +588,7 @@ void __stdcall OpenUnitInfoDialog(void)
     char* def = (char *)g_game->defs.get() + 0x249 * (unsigned)type;
     BuildDataPath(buf, "unitpics", def + 0x20, "PCX");
     hotr->u.anim.value = (int)LoadPcx(buf, 0);
-    stats = MakePropList(def);
+    stats = MakePropList((UnitType *)def);
     int n = entries->u.count;
 
     AddTextGadget(g_game->gui.layer, "TEXT", Translate("Cost"), 0x82, 0x20, -1, 2);
@@ -658,7 +630,7 @@ void __stdcall OpenUnitInfoDialog(void)
 
     GameFreeThunk(stats);
     SetTranslatedTextByName(&g_game->gui, "NAME", def, 0x80);
-    MarkChanged(&g_game->gui);
+    MarkChanged((Dialog *)&g_game->gui);
 }
 
 // FUNCTION: 0x494740
@@ -666,35 +638,35 @@ void __stdcall HandleTabMenuEvent(Gui* gadget)
 {
     if (gadget->hotGadgetIndex == -1) {
         g_game->lobbyUiDirtyFlags &= 0xff1f;
-        DisableKeyCommands(gadget);
+        DisableKeyCommands((Dialog *)gadget);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "OPTIONS")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "OPTIONS")) {
         g_game->ordersPanelFlags |= 1;
         PlaySoundByName("BigButton", 0);
         OpenInGameOptions();
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "SHARE")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "SHARE")) {
         PlaySoundByName("BigButton", 0);
         OpenShareDialog();
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "CONTROL")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "CONTROL")) {
         PlaySoundByName("BigButton", 0);
         OpenControlDialog();
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "ALLIES")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "ALLIES")) {
         PlaySoundByName("BigButton", 0);
         OpenAlliesDialog();
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "CANCEL")) {
+    if (IsCurrentGadgetNamed((Dialog *)gadget, "CANCEL")) {
         CloseTopScreen(gadget);
         return;
     }
@@ -706,10 +678,10 @@ void __stdcall HandleTabMenuCancel(Gui* gadget)
 {
     if (gadget->hotGadgetIndex == -1) {
         g_game->lobbyUiDirtyFlags &= 0xff1f;
-        DisableKeyCommands(&g_game->gui);
+        DisableKeyCommands((Dialog *)&g_game->gui);
         return;
     }
-    if (!IsCurrentGadgetNamed(gadget, "CANCEL"))
+    if (!IsCurrentGadgetNamed((Dialog *)gadget, "CANCEL"))
         ClearSelectedGadget(gadget);
 }
 
@@ -779,7 +751,7 @@ void __stdcall DrawScorePanel(void* surface)
     panel.top = 0x20;
     panel.right = panel.left + 0x7d;
     panel.bottom = g_game->numPlayers * 0x28 + 0x2e;
-    FadeRectangle(surface, &panel, -0x18);
+    FadeRectangle((Surface *)surface, &panel, -0x18);
 
     panel.right = panel.left + 0x7d;
     int y = panel.top;
@@ -822,8 +794,8 @@ void __stdcall DrawScorePanel(void* surface)
             hr.top = y - 1;
             hr.bottom = y + 0x26;
             if (n == g_game->localPlayer) {
-                FadeRectangle(surface, &hr, 0x1f);
-                FadeRectangle(surface, &hr, 0x14);
+                FadeRectangle((Surface *)surface, &hr, 0x1f);
+                FadeRectangle((Surface *)surface, &hr, 0x14);
             }
             unsigned short* frame = (unsigned short*)GetGafFrame(
                 (void*)(int)g_game->logos32, p->info->color);
@@ -960,7 +932,7 @@ void ToggleTabMenu()
         SetGadgetActiveByName(&g_game->gui, "SHARE", 0);
         SetGadgetActiveByName(&g_game->gui, "CONTROL", 0);
     }
-    EnableKeyCommands(&g_game->gui);
+    EnableKeyCommands((Dialog *)&g_game->gui);
     RenderLayer(&g_game->gui, 0x40);
     ShowSoftwareCursor();
 }
@@ -973,8 +945,8 @@ void OpenMain2Layout()
     gadget->data = g_game;
 }
 
-int HarnessTestMode();
-unsigned HarnessStepsPerFrame();
+#include "../../interfaces/ref.h"
+#include "../harness/harness.h"
 
 // FUNCTION: 0x495230
 void UpdateFramePacing()
@@ -1044,9 +1016,6 @@ void UpdateFramePacing()
     }
 }
 
-void HarnessAfterStep();
-void HarnessBeforeStep();
-void HarnessPhase(int phase);
 
 // FUNCTION: 0x495490
 void __stdcall RunGameSteps(int showStats)

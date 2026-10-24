@@ -1,5 +1,8 @@
 #ifndef SOUND_H
 #define SOUND_H
+struct Unit;
+
+struct Unit;
 
 struct FileHandle;
 struct Pos_004cf570;
@@ -117,5 +120,23 @@ public:
     int FindDataChunkSize(void* file);
     int DetectSampleFormat(void* file);
 };
+
+void __stdcall InitSound(void);
+void __stdcall ResetSpeech();
+void __stdcall ShutdownSound();
+void __stdcall SetNoDirectSound();
+void __stdcall SetUseWindowsSound();
+void* __stdcall LoadSoundFile(const char* name);
+void __stdcall FreeSoundSet(void** set);
+void __stdcall StreamSoundDelayed(char*, int, int);
+void __stdcall PlayNextSpeech();
+void __stdcall QueueUnitSpeechIfVisible(Unit* unit, int kind, char* text);
+
+int __stdcall PlaySoundByIndex(int index, int);
+void __stdcall PlayLoopingSoundByName(char* name, int);
+int __stdcall PlaySoundFile(char* name);
+void __stdcall StopAllSounds();
+void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
+void __stdcall QueueUnitSpeechIfNotVisible(Unit* unit, int kind, char* text);
 
 #endif

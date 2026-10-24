@@ -6,6 +6,7 @@
 #include "squad.h"
 
 #include "../orders/mission_type.h"
+#include "squads.h"
 
 #pragma pack(push, 1)
 struct Unit;
@@ -15,7 +16,7 @@ struct Unit;
 #include "unit.h"
 #pragma pack(pop)
 
-void __cdecl GameFreeThunk(int* p);
+#include "../graphics/object_pool.h"
 #include "../../interfaces/seams.h"
 
 // FUNCTION: 0x480190

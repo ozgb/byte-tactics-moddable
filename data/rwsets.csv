@@ -1831,10 +1831,9 @@ address,function,file,kind,target
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,call,operator-
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,call,operator->
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,call,operator=
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,deref_maybe_written,*Item_00408100
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,deref_escape,*Item_00408100
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,deref_read,*Unit_00408100
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,field_maybe_written,Group_00408100::units
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,field_maybe_written,Unit_00408100::pos
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,field_read,Game_00408100::gameTick
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,field_read,Game_00408100::unitDefs
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,field_read,Order_00408100::flags
@@ -5347,10 +5346,10 @@ address,function,file,kind,target
 0x419560,InitCommands,src/ingame/control_panel.cpp,field_write,Pair_00419560::b
 0x419560,InitCommands,src/ingame/control_panel.cpp,fn_ref,DefaultCommandHandler
 0x419560,InitCommands,src/ingame/control_panel.cpp,function,
+0x419560,InitCommands,src/ingame/control_panel.cpp,global_escape,g_cheatCommands
+0x419560,InitCommands,src/ingame/control_panel.cpp,global_escape,g_consoleCommands
+0x419560,InitCommands,src/ingame/control_panel.cpp,global_escape,g_debugCommands
 0x419560,InitCommands,src/ingame/control_panel.cpp,global_escape,g_messageBytesByType
-0x419560,InitCommands,src/ingame/control_panel.cpp,global_maybe_written,g_cheatCommands
-0x419560,InitCommands,src/ingame/control_panel.cpp,global_maybe_written,g_consoleCommands
-0x419560,InitCommands,src/ingame/control_panel.cpp,global_maybe_written,g_debugCommands
 0x419560,InitCommands,src/ingame/control_panel.cpp,global_read,g_game
 0x419560,InitCommands,src/ingame/control_panel.cpp,global_write,DAT_00511c20
 0x419560,InitCommands,src/ingame/control_panel.cpp,global_write,g_messageBytesByType
@@ -5439,8 +5438,8 @@ address,function,file,kind,target
 0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,call,strlen
 0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,deref_write,*char
 0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,field_escape,<anon>::text
-0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,field_maybe_written,Gadget::name
-0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,field_maybe_written,Game::gui
+0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,field_escape,Gadget::name
+0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,field_escape,Game::gui
 0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,field_read,<anon>::count
 0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,field_read,Gadget::commonAttribs
 0x4199b0,RefreshBuildCountTexts,src/ingame/control_panel.cpp,field_read,Gadget::type
@@ -5562,7 +5561,7 @@ address,function,file,kind,target
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,call,operator Unit *
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,call,strstr
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,deref_escape,*Unit
-0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,field_maybe_written,Game::gui
+0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,field_escape,Game::gui
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,field_read,Game::defs
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,field_read,Game::unitIndex
 0x41aa00,HandleBuildPanelClick,src/ingame/control_panel.cpp,field_read,Game::units
@@ -5688,8 +5687,8 @@ address,function,file,kind,target
 0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,call,sprintf
 0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,call,strncpy
 0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,field_escape,BuildType_0041b2e0::unitname
+0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,field_escape,Game_0041b2e0::menu
 0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,field_escape,Game_0041b2e0::players
-0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,field_maybe_written,Game_0041b2e0::menu
 0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,field_read,Game_0041b2e0::localPlayer
 0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,field_read,Game_0041b2e0::unitDefs
 0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,field_read,Game_0041b2e0::unitIndex
@@ -5750,6 +5749,7 @@ address,function,file,kind,target
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,get
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,operator!=
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,operator->
+0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_escape,Game::gui
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_maybe_written,Game::gui
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Game::unitIndex
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Orders::raw
@@ -6624,6 +6624,7 @@ address,function,file,kind,target
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,call,operator->
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,call,strcpy
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_escape,Data::items
+0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_escape,Game::gui
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_escape,Game::players
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_maybe_written,Gadget::okName
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_maybe_written,Game::campaignMissionStatus
@@ -6659,6 +6660,7 @@ address,function,file,kind,target
 0x41f400,EnableEndMissionButtons,src/frontend/endgame.cpp,call,MarkLayerChanged
 0x41f400,EnableEndMissionButtons,src/frontend/endgame.cpp,call,SelectGadgetByName
 0x41f400,EnableEndMissionButtons,src/frontend/endgame.cpp,call,SetGadgetActiveByName
+0x41f400,EnableEndMissionButtons,src/frontend/endgame.cpp,field_escape,Game::gui
 0x41f400,EnableEndMissionButtons,src/frontend/endgame.cpp,field_maybe_written,Game::gui
 0x41f400,EnableEndMissionButtons,src/frontend/endgame.cpp,field_read,Gui::layer
 0x41f400,EnableEndMissionButtons,src/frontend/endgame.cpp,field_read,Layer::entries
@@ -6678,7 +6680,7 @@ address,function,file,kind,target
 0x41f630,ShowEndMissionScreen,src/frontend/endgame.cpp,call,MarkLayerChanged
 0x41f630,ShowEndMissionScreen,src/frontend/endgame.cpp,call,OpenEndMissionScreen
 0x41f630,ShowEndMissionScreen,src/frontend/endgame.cpp,call,SetGameMode
-0x41f630,ShowEndMissionScreen,src/frontend/endgame.cpp,field_maybe_written,Game::gui
+0x41f630,ShowEndMissionScreen,src/frontend/endgame.cpp,field_escape,Game::gui
 0x41f630,ShowEndMissionScreen,src/frontend/endgame.cpp,field_write,Game::endGameState
 0x41f630,ShowEndMissionScreen,src/frontend/endgame.cpp,function,
 0x41f630,ShowEndMissionScreen,src/frontend/endgame.cpp,global_read,g_game
@@ -6759,6 +6761,7 @@ address,function,file,kind,target
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,call,operator Mission *
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,call,operator->
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,call,sprintf
+0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_escape,Game::gui
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_escape,Game::players
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_maybe_written,Game::gui
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,<anon>::bit4_3923b
@@ -8143,7 +8146,7 @@ address,function,file,kind,target
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,call,MarkLayerChanged
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,deref_read,*unsigned char
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,deref_write,*unsigned char
-0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,field_maybe_written,Game::gui
+0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,field_escape,Game::gui
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,field_read,Gui::layer
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,field_read,Layer::gadgets
 0x425b80,UpdateMenuSparks,src/frontend/frontend.cpp,field_read,Layer::surface
@@ -8264,6 +8267,7 @@ address,function,file,kind,target
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,call,strcpy
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,deref_read,*short
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,deref_write,*short
+0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_escape,Game::gui
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_maybe_written,Game::gui
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_read,Game::fontComix
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,field_read,Game::screen
@@ -8651,7 +8655,7 @@ address,function,file,kind,target
 0x429000,CheckGpfVersion,src/game/data_files.cpp,call,TdfRecord::GetFieldString
 0x429000,CheckGpfVersion,src/game/data_files.cpp,call,Translate
 0x429000,CheckGpfVersion,src/game/data_files.cpp,call,_strcmpi
-0x429000,CheckGpfVersion,src/game/data_files.cpp,field_maybe_written,Game::menu
+0x429000,CheckGpfVersion,src/game/data_files.cpp,field_escape,Game::menu
 0x429000,CheckGpfVersion,src/game/data_files.cpp,field_read,TdfFile::current
 0x429000,CheckGpfVersion,src/game/data_files.cpp,function,
 0x429000,CheckGpfVersion,src/game/data_files.cpp,global_maybe_written,DAT_005119b8
@@ -9343,7 +9347,7 @@ address,function,file,kind,target
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,operator unsigned short *
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,operator!=
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,deref_write,*unsigned short
-0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_maybe_written,BuildEntry_0042dcf0::name
+0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_escape,BuildEntry_0042dcf0::name
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,BuildEntry_0042dcf0::typeId
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,BuildList_0042dcf0::count
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,Game::buildListCount
@@ -10595,7 +10599,7 @@ address,function,file,kind,target
 0x435110,Mission::LoadCampaign,src/map/map_list.cpp,call,sprintf
 0x435110,Mission::LoadCampaign,src/map/map_list.cpp,call,strcpy
 0x435110,Mission::LoadCampaign,src/map/map_list.cpp,call,strlen
-0x435110,Mission::LoadCampaign,src/map/map_list.cpp,field_maybe_written,Game::messages
+0x435110,Mission::LoadCampaign,src/map/map_list.cpp,field_escape,Game::messages
 0x435110,Mission::LoadCampaign,src/map/map_list.cpp,field_maybe_written,Mission::campaign
 0x435110,Mission::LoadCampaign,src/map/map_list.cpp,field_maybe_written,Mission::list
 0x435110,Mission::LoadCampaign,src/map/map_list.cpp,field_write,Mission::missionIndex
@@ -10723,7 +10727,7 @@ address,function,file,kind,target
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,call,GameFreeThunk
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,call,LoadMapList
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,call,Mission::LoadMissionByName
-0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,field_maybe_written,Mission::mapList
+0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,field_escape,Mission::mapList
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,field_read,Mission::mapList
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,field_read,Mission::multi
 0x435d30,Mission::RefreshMapList,src/map/map_list.cpp,field_write,Mission::mapCount
@@ -10765,9 +10769,9 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,deref_read,*int
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,deref_write,*short
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_escape,Game::maxUnitsSetting
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_escape,Game::messages
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_escape,MeteorParams::name
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_escape,Mission::description
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,Game::messages
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,MeteorParams::name
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,Mission::description
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,Mission::list
@@ -13181,6 +13185,7 @@ address,function,file,kind,target
 0x442560,OpenSerialDialog,src/frontend/multi.cpp,call,SetSerialBaudFromGadget
 0x442560,OpenSerialDialog,src/frontend/multi.cpp,call,SetSerialPortFromGadget
 0x442560,OpenSerialDialog,src/frontend/multi.cpp,call,host_net_init_lobbied_connection
+0x442560,OpenSerialDialog,src/frontend/multi.cpp,field_escape,Game::gui
 0x442560,OpenSerialDialog,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x442560,OpenSerialDialog,src/frontend/multi.cpp,field_read,Layer::entries
 0x442560,OpenSerialDialog,src/frontend/multi.cpp,field_write,Gadget::handler
@@ -13199,6 +13204,7 @@ address,function,file,kind,target
 0x4426e0,FillAccountList,src/frontend/multi.cpp,call,strlen
 0x4426e0,FillAccountList,src/frontend/multi.cpp,deref_write,*char
 0x4426e0,FillAccountList,src/frontend/multi.cpp,field_escape,Entry_004426e0::name
+0x4426e0,FillAccountList,src/frontend/multi.cpp,field_escape,Game::gui
 0x4426e0,FillAccountList,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x4426e0,FillAccountList,src/frontend/multi.cpp,field_read,Gadget::index
 0x4426e0,FillAccountList,src/frontend/multi.cpp,field_read,Gui::layer
@@ -13215,6 +13221,7 @@ address,function,file,kind,target
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,call,strlen
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,deref_write,*char
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_escape,Entry_004426e0::name
+0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_escape,Game::gui
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_maybe_written,Entry_004426e0::name
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_maybe_written,Entry_004426e0::number
 0x4427a0,RefreshAccountList,src/frontend/multi.cpp,field_maybe_written,Game::gui
@@ -13311,6 +13318,7 @@ address,function,file,kind,target
 0x443100,OpenModemDialog,src/frontend/multi.cpp,call,strlen
 0x443100,OpenModemDialog,src/frontend/multi.cpp,deref_write,*char
 0x443100,OpenModemDialog,src/frontend/multi.cpp,field_escape,Entry_004426e0::name
+0x443100,OpenModemDialog,src/frontend/multi.cpp,field_escape,Game::gui
 0x443100,OpenModemDialog,src/frontend/multi.cpp,field_maybe_written,Entry_004426e0::name
 0x443100,OpenModemDialog,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x443100,OpenModemDialog,src/frontend/multi.cpp,field_maybe_written,Len::v
@@ -13367,6 +13375,7 @@ address,function,file,kind,target
 0x4435a0,OpenReportDialog,src/frontend/multi.cpp,call,sprintf
 0x4435a0,OpenReportDialog,src/frontend/multi.cpp,deref_read,*char
 0x4435a0,OpenReportDialog,src/frontend/multi.cpp,deref_read,*unsigned int
+0x4435a0,OpenReportDialog,src/frontend/multi.cpp,field_escape,Game::gui
 0x4435a0,OpenReportDialog,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x4435a0,OpenReportDialog,src/frontend/multi.cpp,field_write,Layer::cb1c
 0x4435a0,OpenReportDialog,src/frontend/multi.cpp,field_write,Layer::handler
@@ -13385,6 +13394,7 @@ address,function,file,kind,target
 0x4436e0,InitScoreReporting,src/frontend/multi.cpp,call,SetOffscreenSurface
 0x4436e0,InitScoreReporting,src/frontend/multi.cpp,call,Translate
 0x4436e0,InitScoreReporting,src/frontend/multi.cpp,call,operator->
+0x4436e0,InitScoreReporting,src/frontend/multi.cpp,field_escape,Game::gui
 0x4436e0,InitScoreReporting,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x4436e0,InitScoreReporting,src/frontend/multi.cpp,field_read,Game::cursorMode
 0x4436e0,InitScoreReporting,src/frontend/multi.cpp,field_read,Game::net
@@ -13477,6 +13487,7 @@ address,function,file,kind,target
 0x443cb0,OpenSelectGameDialog,src/frontend/multi.cpp,call,sprintf
 0x443cb0,OpenSelectGameDialog,src/frontend/multi.cpp,call,strlen
 0x443cb0,OpenSelectGameDialog,src/frontend/multi.cpp,deref_read,*Gadget
+0x443cb0,OpenSelectGameDialog,src/frontend/multi.cpp,field_escape,Game::gui
 0x443cb0,OpenSelectGameDialog,src/frontend/multi.cpp,field_escape,Game::nickname
 0x443cb0,OpenSelectGameDialog,src/frontend/multi.cpp,field_escape,Game::players
 0x443cb0,OpenSelectGameDialog,src/frontend/multi.cpp,field_maybe_written,Game::gui
@@ -13681,6 +13692,7 @@ address,function,file,kind,target
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,call,get
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,call,operator->
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,call,sprintf
+0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_escape,Game::gui
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,Gadget::height
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,Gadget::hotspotFrame
@@ -13696,8 +13708,8 @@ address,function,file,kind,target
 0x444ba0,HandleViewMapClick,src/frontend/multi.cpp,call,PlaySoundByName
 0x444ba0,HandleViewMapClick,src/frontend/multi.cpp,field_read,Gui::hotGadgetIndex
 0x444ba0,HandleViewMapClick,src/frontend/multi.cpp,function,
-0x444ba0,HandleViewMapClick,src/frontend/multi.cpp,global_escape,g_okGadgetName
 0x444ba0,HandleViewMapClick,src/frontend/multi.cpp,global_maybe_written,g_multiSoundName
+0x444ba0,HandleViewMapClick,src/frontend/multi.cpp,global_maybe_written,g_okGadgetName
 0x444be0,OpenViewMapDialog,src/frontend/multi.cpp,call,LoadGuiLayer
 0x444be0,OpenViewMapDialog,src/frontend/multi.cpp,call,LoadPictureCached
 0x444be0,OpenViewMapDialog,src/frontend/multi.cpp,call,RenderLayer
@@ -13780,8 +13792,8 @@ address,function,file,kind,target
 0x444ea0,OpenMultiMapSelector,src/frontend/multi.cpp,call,operator->
 0x444ea0,OpenMultiMapSelector,src/frontend/multi.cpp,call,strcmp
 0x444ea0,OpenMultiMapSelector,src/frontend/multi.cpp,call,strcpy
+0x444ea0,OpenMultiMapSelector,src/frontend/multi.cpp,field_escape,Data_00444ea0::items
 0x444ea0,OpenMultiMapSelector,src/frontend/multi.cpp,field_escape,Game::gui
-0x444ea0,OpenMultiMapSelector,src/frontend/multi.cpp,field_maybe_written,Data_00444ea0::items
 0x444ea0,OpenMultiMapSelector,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x444ea0,OpenMultiMapSelector,src/frontend/multi.cpp,field_read,Data_00444ea0::items
 0x444ea0,OpenMultiMapSelector,src/frontend/multi.cpp,field_read,Gadget::selected
@@ -14222,6 +14234,7 @@ address,function,file,kind,target
 0x446fb0,RebuildAllyList,src/frontend/multi.cpp,call,SetButtonStageByName
 0x446fb0,RebuildAllyList,src/frontend/multi.cpp,call,sprintf
 0x446fb0,RebuildAllyList,src/frontend/multi.cpp,deref_read,*unsigned char
+0x446fb0,RebuildAllyList,src/frontend/multi.cpp,field_escape,Game::gui
 0x446fb0,RebuildAllyList,src/frontend/multi.cpp,field_escape,Player::allied
 0x446fb0,RebuildAllyList,src/frontend/multi.cpp,field_escape,Player::alliedBy
 0x446fb0,RebuildAllyList,src/frontend/multi.cpp,field_maybe_written,Game::gui
@@ -14276,6 +14289,7 @@ address,function,file,kind,target
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,call,sprintf
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,call,strcat
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,call,strncat
+0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_escape,Game::gui
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_escape,Game::players
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_escape,Player::name
 0x447380,RefreshAlliesScreen,src/frontend/multi.cpp,field_maybe_written,Game::gui
@@ -14617,6 +14631,7 @@ address,function,file,kind,target
 0x449bb0,OpenBattleRoom,src/frontend/multi_449bb0.cpp,call,strcpy
 0x449bb0,OpenBattleRoom,src/frontend/multi_449bb0.cpp,deref_read,*char
 0x449bb0,OpenBattleRoom,src/frontend/multi_449bb0.cpp,deref_write,*char
+0x449bb0,OpenBattleRoom,src/frontend/multi_449bb0.cpp,field_escape,Game_00449bb0::gui
 0x449bb0,OpenBattleRoom,src/frontend/multi_449bb0.cpp,field_escape,Game_00449bb0::playerIds
 0x449bb0,OpenBattleRoom,src/frontend/multi_449bb0.cpp,field_escape,Game_00449bb0::players
 0x449bb0,OpenBattleRoom,src/frontend/multi_449bb0.cpp,field_maybe_written,Gadget_00449bb0::text
@@ -14734,6 +14749,7 @@ address,function,file,kind,target
 0x44a680,UpdateBattleRoom,src/frontend/multi_44a680.cpp,call,sprintf
 0x44a680,UpdateBattleRoom,src/frontend/multi_44a680.cpp,call,strcmp
 0x44a680,UpdateBattleRoom,src/frontend/multi_44a680.cpp,deref_read,*unsigned short
+0x44a680,UpdateBattleRoom,src/frontend/multi_44a680.cpp,field_escape,Game::gui
 0x44a680,UpdateBattleRoom,src/frontend/multi_44a680.cpp,field_escape,Game::players
 0x44a680,UpdateBattleRoom,src/frontend/multi_44a680.cpp,field_escape,PlayerInfo::map
 0x44a680,UpdateBattleRoom,src/frontend/multi_44a680.cpp,field_maybe_written,Game::gui
@@ -14848,7 +14864,6 @@ address,function,file,kind,target
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,call,SkipTextLines
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,call,strlen
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,field_escape,Game::gui
-0x44b330,CopySelectedGameName,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,field_read,Gadget::selected
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,field_read,Gui::layer
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,field_read,Layer::entries
@@ -14891,10 +14906,10 @@ address,function,file,kind,target
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,function,
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_gamesGadgetName
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_lstExtension
+0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_savegameDescsName
+0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_savegameNamesName
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_star
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_maybe_written,DAT_005119b8
-0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_maybe_written,g_savegameDescsName
-0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_maybe_written,g_savegameNamesName
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_read,g_game
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_read,g_saveListDisplayNames
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_read,g_saveListFileNames
@@ -14908,7 +14923,6 @@ address,function,file,kind,target
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,call,SkipTextLines
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,call,strlen
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,field_escape,Game::gui
-0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,field_read,Gadget::selected
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,field_read,Gui::layer
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,field_read,Layer::entries
@@ -15086,8 +15100,8 @@ address,function,file,kind,target
 0x44c0d0,LoadUnitPortrait,src/frontend/multi.cpp,call,operator=
 0x44c0d0,LoadUnitPortrait,src/frontend/multi.cpp,deref_write,*Record_0044c0d0
 0x44c0d0,LoadUnitPortrait,src/frontend/multi.cpp,deref_write,*void
+0x44c0d0,LoadUnitPortrait,src/frontend/multi.cpp,field_escape,Game::gui
 0x44c0d0,LoadUnitPortrait,src/frontend/multi.cpp,field_escape,UnitType_00446f50::name
-0x44c0d0,LoadUnitPortrait,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x44c0d0,LoadUnitPortrait,src/frontend/multi.cpp,field_read,<anon>::raw
 0x44c0d0,LoadUnitPortrait,src/frontend/multi.cpp,field_read,Gadget::rows
 0x44c0d0,LoadUnitPortrait,src/frontend/multi.cpp,field_read,Gadget::width
@@ -15119,6 +15133,7 @@ address,function,file,kind,target
 0x44c220,UnitRestrictDialogFrame,src/frontend/multi.cpp,call,get
 0x44c220,UnitRestrictDialogFrame,src/frontend/multi.cpp,deref_read,*char
 0x44c220,UnitRestrictDialogFrame,src/frontend/multi.cpp,deref_write,*char
+0x44c220,UnitRestrictDialogFrame,src/frontend/multi.cpp,field_escape,Game::gui
 0x44c220,UnitRestrictDialogFrame,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x44c220,UnitRestrictDialogFrame,src/frontend/multi.cpp,field_read,<anon>::count
 0x44c220,UnitRestrictDialogFrame,src/frontend/multi.cpp,field_read,Event_44c220::fbiChecksum
@@ -16699,8 +16714,8 @@ address,function,file,kind,target
 0x451fd0,InitPacketTables,src/network/net_game.cpp,fn_ref,RejectPacketType7
 0x451fd0,InitPacketTables,src/network/net_game.cpp,fn_ref,RejectPacketType8
 0x451fd0,InitPacketTables,src/network/net_game.cpp,function,
+0x451fd0,InitPacketTables,src/network/net_game.cpp,global_escape,s_PACKET_DATA_00506524
 0x451fd0,InitPacketTables,src/network/net_game.cpp,global_maybe_written,g_packetSizes
-0x451fd0,InitPacketTables,src/network/net_game.cpp,global_maybe_written,s_PACKET_DATA_00506524
 0x451fd0,InitPacketTables,src/network/net_game.cpp,global_write,g_packetHandlerType2
 0x451fd0,InitPacketTables,src/network/net_game.cpp,global_write,g_packetHandlers
 0x451fd0,InitPacketTables,src/network/net_game.cpp,global_write,g_packetModes
@@ -17103,10 +17118,10 @@ address,function,file,kind,target
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_escape,Game::playerIds
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_escape,Game::players
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_escape,Game::session
+0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_escape,Game::weapons
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_escape,PlayerData_004ca6a0::name
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_maybe_written,Game::players
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_maybe_written,Game::settings
-0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_maybe_written,Game::weapons
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_maybe_written,Player::fullName
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_maybe_written,Player::name
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,field_read,<anon>::net_bit2
@@ -18428,6 +18443,7 @@ address,function,file,kind,target
 0x45b880,SetGadgetsDisabledByPrefix,src/frontend/options.cpp,call,strlen
 0x45b880,SetGadgetsDisabledByPrefix,src/frontend/options.cpp,call,strncmp
 0x45b880,SetGadgetsDisabledByPrefix,src/frontend/options.cpp,field_escape,Gadget::name
+0x45b880,SetGadgetsDisabledByPrefix,src/frontend/options.cpp,field_escape,Game::menu_519_1c
 0x45b880,SetGadgetsDisabledByPrefix,src/frontend/options.cpp,field_maybe_written,Game::menu_519_1c
 0x45b880,SetGadgetsDisabledByPrefix,src/frontend/options.cpp,field_read,Gadget::count
 0x45b880,SetGadgetsDisabledByPrefix,src/frontend/options.cpp,field_read,Gadget::type
@@ -18489,7 +18505,7 @@ address,function,file,kind,target
 0x45bbf0,HandleVideoModeSlider,src/frontend/options.cpp,call,SliderValue
 0x45bbf0,HandleVideoModeSlider,src/frontend/options.cpp,call,sprintf
 0x45bbf0,HandleVideoModeSlider,src/frontend/options.cpp,deref_escape,*Mode_0045b800
-0x45bbf0,HandleVideoModeSlider,src/frontend/options.cpp,field_maybe_written,Game::menu_519_1c
+0x45bbf0,HandleVideoModeSlider,src/frontend/options.cpp,field_escape,Game::menu_519_1c
 0x45bbf0,HandleVideoModeSlider,src/frontend/options.cpp,field_read,Gadget::list
 0x45bbf0,HandleVideoModeSlider,src/frontend/options.cpp,field_read,Holder_0045b800::entries
 0x45bbf0,HandleVideoModeSlider,src/frontend/options.cpp,field_read,Menu_0045b800::holder
@@ -18973,6 +18989,7 @@ address,function,file,kind,target
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,call,UpdateMusicGadgets
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,call,UpdateTrackGadgets
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,deref_read,*Flags37ebe_0045cf60
+0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_escape,Game::gui
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_escape,Game::ordersPanelFlags_37ebe
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x45d7c0,OpenMusicOptions,src/frontend/options.cpp,field_read,Flags37ebe_0045cf60::byte
@@ -19242,6 +19259,7 @@ address,function,file,kind,target
 0x45ead0,HandleSpeedOptionsClick,src/frontend/options.cpp,call,PlaySoundByName
 0x45ead0,HandleSpeedOptionsClick,src/frontend/options.cpp,deref_read,*Flags37ebe_0045cf60
 0x45ead0,HandleSpeedOptionsClick,src/frontend/options.cpp,deref_read,*char
+0x45ead0,HandleSpeedOptionsClick,src/frontend/options.cpp,field_escape,Game::gui
 0x45ead0,HandleSpeedOptionsClick,src/frontend/options.cpp,field_escape,Game::ordersPanelFlags_37ebe
 0x45ead0,HandleSpeedOptionsClick,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x45ead0,HandleSpeedOptionsClick,src/frontend/options.cpp,field_read,Flags37ebe_0045cf60::word
@@ -19725,6 +19743,7 @@ address,function,file,kind,target
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,call,operator->
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,deref_read,*Bits_0045cf60
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,deref_read,*Flags37ebe_0045cf60
+0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_escape,Game::gui
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_escape,Game::netGameFlags_2a44
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_escape,Game::ordersPanelFlags_37ebe
 0x4609b0,HandleInGameOptionsClick,src/frontend/options.cpp,field_maybe_written,Game::gui
@@ -19762,6 +19781,7 @@ address,function,file,kind,target
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,call,Sound::PauseCdAudio
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,call,Translate
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,call,operator->
+0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_escape,Game::gui
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_read,Game::net
 0x460cc0,OpenInGameOptions,src/frontend/options.cpp,field_read,Game::pauseFlags
@@ -20776,6 +20796,7 @@ address,function,file,kind,target
 0x464e70,ShowContinueWatchingDialog,src/game/players_464290.cpp,call,SetKeyboardInput
 0x464e70,ShowContinueWatchingDialog,src/game/players_464290.cpp,call,SetTranslatedTextByName
 0x464e70,ShowContinueWatchingDialog,src/game/players_464290.cpp,call,strcpy
+0x464e70,ShowContinueWatchingDialog,src/game/players_464290.cpp,field_escape,Game::gui_519
 0x464e70,ShowContinueWatchingDialog,src/game/players_464290.cpp,field_maybe_written,Form::choice1
 0x464e70,ShowContinueWatchingDialog,src/game/players_464290.cpp,field_maybe_written,Form::choice2
 0x464e70,ShowContinueWatchingDialog,src/game/players_464290.cpp,field_maybe_written,Game::gui_519
@@ -20822,6 +20843,7 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players_464290.cpp,call,strcpy
 0x464f80,UpdatePlayersOnStream,src/game/players_464290.cpp,deref_read,*float
 0x464f80,UpdatePlayersOnStream,src/game/players_464290.cpp,deref_write,*float
+0x464f80,UpdatePlayersOnStream,src/game/players_464290.cpp,field_escape,Game::gui_519
 0x464f80,UpdatePlayersOnStream,src/game/players_464290.cpp,field_escape,Game::players
 0x464f80,UpdatePlayersOnStream,src/game/players_464290.cpp,field_escape,Unit::energy
 0x464f80,UpdatePlayersOnStream,src/game/players_464290.cpp,field_escape,Unit::metal
@@ -22069,7 +22091,7 @@ address,function,file,kind,target
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,call,AddMessage
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,call,GetScreenWidth
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,call,OpenMessageBox
-0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,deref_read,*char
+0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,deref_escape,*char
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,field_escape,Game::gui
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,field_write,<anon>::dirty
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,function,
@@ -23821,6 +23843,7 @@ address,function,file,kind,target
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,deref_read,*char
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,deref_write,*char
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,field_escape,Gadget::text_b6
+0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,field_escape,Game::gui
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,field_read,Gadget::count
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,field_read,Gadget::h
@@ -23856,6 +23879,7 @@ address,function,file,kind,target
 0x477410,ApplyDifficultyButtons,src/frontend/campaign_menu.cpp,call,FindGadgetOrNull
 0x477410,ApplyDifficultyButtons,src/frontend/campaign_menu.cpp,call,MarkChanged
 0x477410,ApplyDifficultyButtons,src/frontend/campaign_menu.cpp,call,SetGadgetStatusByName
+0x477410,ApplyDifficultyButtons,src/frontend/campaign_menu.cpp,field_escape,Game::gui
 0x477410,ApplyDifficultyButtons,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
 0x477410,ApplyDifficultyButtons,src/frontend/campaign_menu.cpp,field_read,Game::difficulty
 0x477410,ApplyDifficultyButtons,src/frontend/campaign_menu.cpp,field_read,Gui::layer
@@ -23873,6 +23897,7 @@ address,function,file,kind,target
 0x477510,ToggleAnyMission,src/frontend/campaign_menu.cpp,call,SaveAllMissionsSetting
 0x477510,ToggleAnyMission,src/frontend/campaign_menu.cpp,call,SetGadgetActiveByName
 0x477510,ToggleAnyMission,src/frontend/campaign_menu.cpp,call,strncmp
+0x477510,ToggleAnyMission,src/frontend/campaign_menu.cpp,field_escape,Game::gui
 0x477510,ToggleAnyMission,src/frontend/campaign_menu.cpp,field_escape,Info_00477510::name
 0x477510,ToggleAnyMission,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
 0x477510,ToggleAnyMission,src/frontend/campaign_menu.cpp,field_read,Game::flags_38d7f
@@ -23925,6 +23950,7 @@ address,function,file,kind,target
 0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,call,MarkChanged
 0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,call,PlaySoundByName
 0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,call,SyncAssocGadgets
+0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,field_escape,Game::gui
 0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
 0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,field_read,Layer::entries
@@ -23943,7 +23969,7 @@ address,function,file,kind,target
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,call,SkipTextLines
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,call,SyncAssocGadgets
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,call,operator->
-0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
+0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_escape,Game::gui
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_read,Gadget::selected
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_read,Gadget::text
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_read,Game::net
@@ -24081,7 +24107,7 @@ address,function,file,kind,target
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,sprintf
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,deref_read,*unsigned char
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,deref_read,*unsigned short
-0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
+0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_escape,Game::gui
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Gadget::colours
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Gadget::frame
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Gadget::gaf
@@ -24211,6 +24237,7 @@ address,function,file,kind,target
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,call,strcmp
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,call,strcpy
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,deref_escape,*Gadget
+0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_escape,Game::gui
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_escape,Game::paletteRgba
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Gadget::attribs
@@ -24277,7 +24304,7 @@ address,function,file,kind,target
 0x479660,RefreshAllyIcons,src/frontend/skirmish_menu.cpp,call,MarkChanged
 0x479660,RefreshAllyIcons,src/frontend/skirmish_menu.cpp,call,sprintf
 0x479660,RefreshAllyIcons,src/frontend/skirmish_menu.cpp,deref_escape,*Gadget
-0x479660,RefreshAllyIcons,src/frontend/skirmish_menu.cpp,field_maybe_written,Game::gui
+0x479660,RefreshAllyIcons,src/frontend/skirmish_menu.cpp,field_escape,Game::gui
 0x479660,RefreshAllyIcons,src/frontend/skirmish_menu.cpp,field_read,Game::options
 0x479660,RefreshAllyIcons,src/frontend/skirmish_menu.cpp,field_read,Game::playerCount
 0x479660,RefreshAllyIcons,src/frontend/skirmish_menu.cpp,field_read,Gui::layer
@@ -24365,6 +24392,7 @@ address,function,file,kind,target
 0x47a0e0,RefreshSkirmishSetup,src/frontend/skirmish_menu.cpp,deref_escape,*Gadget
 0x47a0e0,RefreshSkirmishSetup,src/frontend/skirmish_menu.cpp,deref_read,*unsigned short
 0x47a0e0,RefreshSkirmishSetup,src/frontend/skirmish_menu.cpp,deref_write,*short
+0x47a0e0,RefreshSkirmishSetup,src/frontend/skirmish_menu.cpp,field_escape,Game::gui
 0x47a0e0,RefreshSkirmishSetup,src/frontend/skirmish_menu.cpp,field_escape,Table::players
 0x47a0e0,RefreshSkirmishSetup,src/frontend/skirmish_menu.cpp,field_maybe_written,Gadget::text
 0x47a0e0,RefreshSkirmishSetup,src/frontend/skirmish_menu.cpp,field_maybe_written,Game::gui
@@ -24483,8 +24511,9 @@ address,function,file,kind,target
 0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,call,Translate
 0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,call,operator->
 0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,call,strcmp
+0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,field_escape,Data::items
+0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,field_escape,Game::gui
 0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,field_escape,Table::mapName
-0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,field_maybe_written,Data::items
 0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,field_maybe_written,Game::gui
 0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,field_read,Data::items
 0x47aaf0,OpenSkirmishMapSelector,src/frontend/skirmish_menu.cpp,field_read,Gadget::items
@@ -24511,7 +24540,7 @@ address,function,file,kind,target
 0x47acd0,CyclePlayerColor,src/frontend/skirmish_menu.cpp,call,sprintf
 0x47acd0,CyclePlayerColor,src/frontend/skirmish_menu.cpp,deref_escape,*Gadget
 0x47acd0,CyclePlayerColor,src/frontend/skirmish_menu.cpp,deref_read,*unsigned short
-0x47acd0,CyclePlayerColor,src/frontend/skirmish_menu.cpp,field_maybe_written,Game::gui
+0x47acd0,CyclePlayerColor,src/frontend/skirmish_menu.cpp,field_escape,Game::gui
 0x47acd0,CyclePlayerColor,src/frontend/skirmish_menu.cpp,field_read,Game::logos32
 0x47acd0,CyclePlayerColor,src/frontend/skirmish_menu.cpp,field_read,Game::options
 0x47acd0,CyclePlayerColor,src/frontend/skirmish_menu.cpp,field_read,Gui::layer
@@ -24619,7 +24648,7 @@ address,function,file,kind,target
 0x47b9f0,HandleSkirmishCheatText,src/frontend/skirmish_menu.cpp,call,SelectAdjacentGadget
 0x47b9f0,HandleSkirmishCheatText,src/frontend/skirmish_menu.cpp,call,strncmp
 0x47b9f0,HandleSkirmishCheatText,src/frontend/skirmish_menu.cpp,deref_write,*char
-0x47b9f0,HandleSkirmishCheatText,src/frontend/skirmish_menu.cpp,field_maybe_written,Game::gui
+0x47b9f0,HandleSkirmishCheatText,src/frontend/skirmish_menu.cpp,field_escape,Game::gui
 0x47b9f0,HandleSkirmishCheatText,src/frontend/skirmish_menu.cpp,field_read,Cheat::text
 0x47b9f0,HandleSkirmishCheatText,src/frontend/skirmish_menu.cpp,field_read,CheatText::target
 0x47b9f0,HandleSkirmishCheatText,src/frontend/skirmish_menu.cpp,field_read,Game::options
@@ -24652,6 +24681,7 @@ address,function,file,kind,target
 0x47bbb0,OpenSkirmishMenu,src/frontend/skirmish_menu.cpp,call,SetKeyboardInput
 0x47bbb0,OpenSkirmishMenu,src/frontend/skirmish_menu.cpp,call,operator->
 0x47bbb0,OpenSkirmishMenu,src/frontend/skirmish_menu.cpp,call,strncpy
+0x47bbb0,OpenSkirmishMenu,src/frontend/skirmish_menu.cpp,field_escape,Game::gui
 0x47bbb0,OpenSkirmishMenu,src/frontend/skirmish_menu.cpp,field_maybe_written,Game::gui
 0x47bbb0,OpenSkirmishMenu,src/frontend/skirmish_menu.cpp,field_maybe_written,Table::mapName
 0x47bbb0,OpenSkirmishMenu,src/frontend/skirmish_menu.cpp,field_read,Game::difficulty
@@ -30208,6 +30238,7 @@ address,function,file,kind,target
 0x491200,InitGame,src/game/game_state.cpp,call,memset
 0x491200,InitGame,src/game/game_state.cpp,call,operator Mission *
 0x491200,InitGame,src/game/game_state.cpp,field_escape,Game::chatHudRing
+0x491200,InitGame,src/game/game_state.cpp,field_escape,Game::gui
 0x491200,InitGame,src/game/game_state.cpp,field_escape,Game::paletteRgba
 0x491200,InitGame,src/game/game_state.cpp,field_maybe_written,Game::gui
 0x491200,InitGame,src/game/game_state.cpp,field_read,Game::brightness
@@ -30259,6 +30290,7 @@ address,function,file,kind,target
 0x491200,InitGame,src/game/game_state.cpp,fn_ref,LeaveNetGameCallback
 0x491200,InitGame,src/game/game_state.cpp,fn_ref,ReopenCdAudio
 0x491200,InitGame,src/game/game_state.cpp,function,
+0x491200,InitGame,src/game/game_state.cpp,global_escape,g_unitLimitKey
 0x491200,InitGame,src/game/game_state.cpp,global_maybe_written,g_cdListsDiscEntries
 0x491200,InitGame,src/game/game_state.cpp,global_read,g_animsDirName
 0x491200,InitGame,src/game/game_state.cpp,global_read,g_cdListsKey
@@ -30271,7 +30303,6 @@ address,function,file,kind,target
 0x491200,InitGame,src/game/game_state.cpp,global_read,g_offscreenSurfaceName
 0x491200,InitGame,src/game/game_state.cpp,global_read,g_seams
 0x491200,InitGame,src/game/game_state.cpp,global_read,g_skirmishInfoTag
-0x491200,InitGame,src/game/game_state.cpp,global_read,g_unitLimitKey
 0x491200,InitGame,src/game/game_state.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
 0x491200,InitGame,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [OrdersSeam::RegisterAllOrderTypes]
 0x491200,InitGame,src/game/game_state.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [MapSeam::SetMissionType]
@@ -30507,8 +30538,8 @@ address,function,file,kind,target
 0x491cc0,UpdateBattleHoverMode,src/game/game_state.cpp,global_read,g_game
 0x491d70,PopUntilNamedLayout,src/game/game_state.cpp,call,CloseTopScreen
 0x491d70,PopUntilNamedLayout,src/game/game_state.cpp,call,IsScreenNamed
+0x491d70,PopUntilNamedLayout,src/game/game_state.cpp,field_escape,Game::name
 0x491d70,PopUntilNamedLayout,src/game/game_state.cpp,field_maybe_written,Game::gui
-0x491d70,PopUntilNamedLayout,src/game/game_state.cpp,field_maybe_written,Game::name
 0x491d70,PopUntilNamedLayout,src/game/game_state.cpp,field_read,Game::flags_37ebe
 0x491d70,PopUntilNamedLayout,src/game/game_state.cpp,field_read,Game::lobbyUiDirtyFlags
 0x491d70,PopUntilNamedLayout,src/game/game_state.cpp,field_read,Gui::layer
@@ -30518,8 +30549,8 @@ address,function,file,kind,target
 0x491d70,PopUntilNamedLayout,src/game/game_state.cpp,global_read,g_game
 0x491e10,CloseTopScreenIfNotNamed,src/game/game_state.cpp,call,CloseTopScreen
 0x491e10,CloseTopScreenIfNotNamed,src/game/game_state.cpp,call,IsScreenNamed
+0x491e10,CloseTopScreenIfNotNamed,src/game/game_state.cpp,field_escape,Game::name
 0x491e10,CloseTopScreenIfNotNamed,src/game/game_state.cpp,field_maybe_written,Game::gui
-0x491e10,CloseTopScreenIfNotNamed,src/game/game_state.cpp,field_maybe_written,Game::name
 0x491e10,CloseTopScreenIfNotNamed,src/game/game_state.cpp,field_write,Game::unitIndex
 0x491e10,CloseTopScreenIfNotNamed,src/game/game_state.cpp,function,
 0x491e10,CloseTopScreenIfNotNamed,src/game/game_state.cpp,global_read,g_game
@@ -30554,7 +30585,6 @@ address,function,file,kind,target
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,call,strlen
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,field_escape,Game::gui
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,field_maybe_written,Buf::name
-0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,field_maybe_written,Game::gui
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,field_read,<anon>::selected
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,field_read,Buf::diffs
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,field_read,Buf::gametype
@@ -30756,6 +30786,7 @@ address,function,file,kind,target
 0x493060,ShowSaveGameScreen,src/game/savegame.cpp,call,SetKeyboardInput
 0x493060,ShowSaveGameScreen,src/game/savegame.cpp,call,SetTranslatedTextByName
 0x493060,ShowSaveGameScreen,src/game/savegame.cpp,call,ShowSavedGameInfo
+0x493060,ShowSaveGameScreen,src/game/savegame.cpp,field_escape,Game::gui
 0x493060,ShowSaveGameScreen,src/game/savegame.cpp,field_maybe_written,Game::gui
 0x493060,ShowSaveGameScreen,src/game/savegame.cpp,field_read,<anon>::flag_38a51
 0x493060,ShowSaveGameScreen,src/game/savegame.cpp,field_read,Gadget::attribs
@@ -31059,6 +31090,7 @@ address,function,file,kind,target
 0x4942e0,OpenUnitInfoDialog,src/ingame/dialogs_493340.cpp,deref_escape,*Unit
 0x4942e0,OpenUnitInfoDialog,src/ingame/dialogs_493340.cpp,deref_read,*char
 0x4942e0,OpenUnitInfoDialog,src/ingame/dialogs_493340.cpp,field_escape,Gadget::name
+0x4942e0,OpenUnitInfoDialog,src/ingame/dialogs_493340.cpp,field_escape,Game::gui
 0x4942e0,OpenUnitInfoDialog,src/ingame/dialogs_493340.cpp,field_escape,Game::players
 0x4942e0,OpenUnitInfoDialog,src/ingame/dialogs_493340.cpp,field_maybe_written,Game::gui
 0x4942e0,OpenUnitInfoDialog,src/ingame/dialogs_493340.cpp,field_read,<anon>::bit11_37ebe
@@ -31099,7 +31131,7 @@ address,function,file,kind,target
 0x494840,HandleTabMenuCancel,src/ingame/dialogs_493340.cpp,call,ClearSelectedGadget
 0x494840,HandleTabMenuCancel,src/ingame/dialogs_493340.cpp,call,DisableKeyCommands
 0x494840,HandleTabMenuCancel,src/ingame/dialogs_493340.cpp,call,IsCurrentGadgetNamed
-0x494840,HandleTabMenuCancel,src/ingame/dialogs_493340.cpp,field_maybe_written,Game::gui
+0x494840,HandleTabMenuCancel,src/ingame/dialogs_493340.cpp,field_escape,Game::gui
 0x494840,HandleTabMenuCancel,src/ingame/dialogs_493340.cpp,field_read,Game::lobbyUiDirtyFlags
 0x494840,HandleTabMenuCancel,src/ingame/dialogs_493340.cpp,field_read,Gui::hotGadgetIndex
 0x494840,HandleTabMenuCancel,src/ingame/dialogs_493340.cpp,field_write,Game::lobbyUiDirtyFlags
@@ -31210,6 +31242,7 @@ address,function,file,kind,target
 0x495010,ToggleTabMenu,src/ingame/dialogs_493340.cpp,call,SetGadgetActiveByName
 0x495010,ToggleTabMenu,src/ingame/dialogs_493340.cpp,call,ShowSoftwareCursor
 0x495010,ToggleTabMenu,src/ingame/dialogs_493340.cpp,call,operator->
+0x495010,ToggleTabMenu,src/ingame/dialogs_493340.cpp,field_escape,Game::gui
 0x495010,ToggleTabMenu,src/ingame/dialogs_493340.cpp,field_escape,Game::players
 0x495010,ToggleTabMenu,src/ingame/dialogs_493340.cpp,field_maybe_written,Game::gui
 0x495010,ToggleTabMenu,src/ingame/dialogs_493340.cpp,field_read,Game::lobbyUiDirtyFlags
@@ -31475,13 +31508,13 @@ address,function,file,kind,target
 0x495e90,HandleGameKey,src/ingame/keys.cpp,deref_read,*Flags_00495e90_37f2f
 0x495e90,HandleGameKey,src/ingame/keys.cpp,deref_read,*int
 0x495e90,HandleGameKey,src/ingame/keys.cpp,deref_write,*int
+0x495e90,HandleGameKey,src/ingame/keys.cpp,field_escape,Game::name
 0x495e90,HandleGameKey,src/ingame/keys.cpp,field_escape,Game::nextMovieFrameTick
 0x495e90,HandleGameKey,src/ingame/keys.cpp,field_escape,Game::orders_2c76
 0x495e90,HandleGameKey,src/ingame/keys.cpp,field_escape,Game::players
 0x495e90,HandleGameKey,src/ingame/keys.cpp,field_escape,Game::uiOptionFlags_37f2f
 0x495e90,HandleGameKey,src/ingame/keys.cpp,field_maybe_written,Game::gui
 0x495e90,HandleGameKey,src/ingame/keys.cpp,field_maybe_written,Game::movieCaptureDir
-0x495e90,HandleGameKey,src/ingame/keys.cpp,field_maybe_written,Game::name
 0x495e90,HandleGameKey,src/ingame/keys.cpp,field_maybe_written,Game::text_38b53
 0x495e90,HandleGameKey,src/ingame/keys.cpp,field_read,Flags_00495e90_37ebe::b0
 0x495e90,HandleGameKey,src/ingame/keys.cpp,field_read,Flags_00495e90_37ebe::b2
@@ -31605,7 +31638,7 @@ address,function,file,kind,target
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,call,EnableKeyCommands
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,call,EnterMainMenuState
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,call,SetCloseHandler
-0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_maybe_written,Game::gui
+0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_escape,Game::gui
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_read,MapSeam::SetMissionType
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_read,Seams::map
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_write,<anon>::bit0
@@ -31893,9 +31926,10 @@ address,function,file,kind,target
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,call,Translate
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,call,sprintf
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,deref_read,*PlayerRec_00497f40
+0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_escape,Game::menu_519_18
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_escape,Game::players
-0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_escape,PlayerRec_00497ce0::name
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_maybe_written,Game::menu_519_18
+0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_maybe_written,PlayerRec_00497ce0::name
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,<anon>::synced
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,Game::colors
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,Game::loaded
@@ -31977,6 +32011,7 @@ address,function,file,kind,target
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,deref_read,*short
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,deref_write,*short
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,deref_write,*unsigned char
+0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_escape,Game::gui
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_escape,Game::loadingFlags
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_escape,Game::paletteRgba
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,field_escape,Game::players
@@ -33775,9 +33810,10 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,fn_ref,ReopenCdAudio
 0x49e830,GameMain,src/game/main.cpp,function,
 0x49e830,GameMain,src/game/main.cpp,global_escape,DAT_005119b8
+0x49e830,GameMain,src/game/main.cpp,global_escape,g_cdShellValueName
 0x49e830,GameMain,src/game/main.cpp,global_escape,g_displayContext
 0x49e830,GameMain,src/game/main.cpp,global_escape,g_preferredLanguage
-0x49e830,GameMain,src/game/main.cpp,global_maybe_written,g_displayContext
+0x49e830,GameMain,src/game/main.cpp,global_escape,g_translationFile
 0x49e830,GameMain,src/game/main.cpp,global_maybe_written,g_preferredLanguage
 0x49e830,GameMain,src/game/main.cpp,global_read,DAT_005097f4
 0x49e830,GameMain,src/game/main.cpp,global_read,g_appName
@@ -33793,7 +33829,6 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,global_read,g_languageValueName
 0x49e830,GameMain,src/game/main.cpp,global_read,g_lastSoundReapTick
 0x49e830,GameMain,src/game/main.cpp,global_read,g_preferredLanguage
-0x49e830,GameMain,src/game/main.cpp,global_read,g_translationFile
 0x49e830,GameMain,src/game/main.cpp,global_read,g_windowClassName
 0x49e830,GameMain,src/game/main.cpp,global_write,g_atexitRegistered
 0x49e830,GameMain,src/game/main.cpp,global_write,g_cdNeedsReopenAfterFocus
@@ -37644,7 +37679,6 @@ address,function,file,kind,target
 0x4b5510,SetFullScreen,src/graphics/display.cpp,field_escape,App_4b5980::draw
 0x4b5510,SetFullScreen,src/graphics/display.cpp,field_escape,App_4b5980::entries
 0x4b5510,SetFullScreen,src/graphics/display.cpp,field_escape,App_4b5980::unknown_50
-0x4b5510,SetFullScreen,src/graphics/display.cpp,field_maybe_written,App_4b5980::entries
 0x4b5510,SetFullScreen,src/graphics/display.cpp,field_read,App_4b5980::height
 0x4b5510,SetFullScreen,src/graphics/display.cpp,field_read,App_4b5980::width
 0x4b5510,SetFullScreen,src/graphics/display.cpp,field_read,DirectDrawState::activeSurface
@@ -38038,6 +38072,9 @@ address,function,file,kind,target
 0x4b7590,ClearDefaultCommandHandler,src/util/commands.cpp,function,
 0x4b7590,ClearDefaultCommandHandler,src/util/commands.cpp,global_write,g_defaultCommandHandler
 0x4b7590,ClearDefaultCommandHandler,src/util/commands.cpp,global_write,g_defaultCommandMask
+0x4b75d0,operator==,src/util/commands.cpp,call,strcmp
+0x4b75d0,operator==,src/util/commands.cpp,field_read,StringRef::data
+0x4b75d0,operator==,src/util/commands.cpp,function,
 0x4b7620,RegisterCommand,src/util/commands.cpp,call,CommandEntry::~CommandEntry
 0x4b7620,RegisterCommand,src/util/commands.cpp,call,StringRef::~StringRef
 0x4b7620,RegisterCommand,src/util/commands.cpp,call,begin
@@ -44941,6 +44978,7 @@ address,function,file,kind,target
 ,FillCampaignListInline,src/frontend/campaign_menu.cpp,call,MarkChanged
 ,FillCampaignListInline,src/frontend/campaign_menu.cpp,call,PlaySoundByName
 ,FillCampaignListInline,src/frontend/campaign_menu.cpp,call,SyncAssocGadgets
+,FillCampaignListInline,src/frontend/campaign_menu.cpp,field_escape,Game::gui
 ,FillCampaignListInline,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
 ,FillCampaignListInline,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 ,FillCampaignListInline,src/frontend/campaign_menu.cpp,field_read,Layer::entries
@@ -44978,7 +45016,7 @@ address,function,file,kind,target
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,call,SkipTextLines
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,call,SyncAssocGadgets
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,call,operator->
-,FillMissionListInline,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
+,FillMissionListInline,src/frontend/campaign_menu.cpp,field_escape,Game::gui
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,field_read,Gadget::selected
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,field_read,Gadget::text
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,field_read,Game::net
@@ -53893,9 +53931,6 @@ address,function,file,kind,target
 ,operator-,src/weapons/weapons.cpp,function,
 ,operator<,src/ai/pathfind.cpp,field_read,Entry_40d670::key
 ,operator<,src/ai/pathfind.cpp,function,
-,operator==,src/util/commands.cpp,call,strcmp
-,operator==,src/util/commands.cpp,field_read,StringRef::data
-,operator==,src/util/commands.cpp,function,
 ,operator==,src/util/tdf.cpp,call,strcmp
 ,operator==,src/util/tdf.cpp,field_read,StringRef::ptr
 ,operator==,src/util/tdf.cpp,function,

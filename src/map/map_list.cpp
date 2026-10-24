@@ -21,35 +21,29 @@ struct Slot_00436860 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../network/packet_manager.h"
 
-extern char* g_otaEnumFileList;
-extern int g_otaEnumCacheComplete;
-extern int g_otaEnumFileListBytes;
-extern int g_otaEnumFileCount;
-extern int g_usePacketManager;
 
 #include "../files/files_api.h"
-void __stdcall OpenMessageBox(char* dest, char* text, int wrapWidth, int centre, int autoHeight);
+#include "../gui/dialogs.h"
 
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
-int GetPreferredLanguage(void);
-char* __stdcall StripExtension(char* name);
+#include "../game/main.h"
+#include "../graphics/palette.h"
 
-char* __stdcall SkipTextLines(char* list, int index);
+#include "../util/registry.h"
 int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, int def);
 
 char* __stdcall Translate(char* text);
 
-int __stdcall LoadMapList(char** out, int param_2, int param_3);
+#include "map_list.h"
 
 #include "../game/mission_conditions.h"
 
 void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
-int GetBuildRating(int, unsigned short);
 void RegisterUnitOrders();
 
 class MeteorParams {
@@ -62,13 +56,13 @@ public:
     void LoadMeteorDefaults();
 };
 
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
+#include "../game/data_files.h"
 void __stdcall ShowErrorBox(const char* text, const char* caption);
-char* __stdcall FindTranslation(char* name);
+#include "../util/tdf_4c54f0.h"
 int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, char* def);
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall SetCursorMode(int n);
-void HandleNetPackets();
+#include "../network/net_game_453d40.h"
 
 static inline float GetFloat(TdfRecord* section, const char* key)
 {
@@ -77,10 +71,9 @@ static inline float GetFloat(TdfRecord* section, const char* key)
     return result;
 }
 
-void __stdcall FatalError(char* text);
+#include "../graphics/display.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
-void CopyDwordIfNonNull(int*, int*);
 
 struct MissionRule {
     int type;
@@ -89,7 +82,7 @@ struct MissionRule {
     short z;
 };
 
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 
 #include "../util/vec3.h"
 
@@ -109,7 +102,7 @@ struct Header_004373a0 {
     char unknown_24[0x40 - 0x24];
 };
 
-int __stdcall ComputeChecksum(unsigned char* data, int len);
+#include "../util/math.h"
 
 class MapCacheEntry {
 public:
@@ -313,7 +306,7 @@ void Mission::LoadCampaign(char* file)
         if (strlen(file) != 0) {
             if (!list.LoadFile(GetNameSlot(0))) {
                 sprintf(msg, "The requested campaign file, %s, does not exist.", GetNameSlot(0));
-                OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
+                OpenMessageBox((Gui *)g_game->messages, msg, 0x1e0, 1, 1);
                 LoadCampaign(DAT_005119b8);
                 return;
             }
@@ -625,7 +618,7 @@ void Mission::RefreshMapList(int multiplayer)
         mapList = 0;
     }
     if (mapList == 0) {
-        mapCount = LoadMapList(&mapList, multiplayer, multiplayer);
+        mapCount = LoadMapList((void **)&mapList, multiplayer, multiplayer);
     }
     LoadMissionByName(mapList);
     multi = multiplayer;
@@ -678,7 +671,7 @@ int Mission::LoadMission(char* map)
         if (!list.SelectRecord(key)) {
             char msg[0x100];
             sprintf(msg, "The requested mission file, %s, does not exist.", key);
-            OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
+            OpenMessageBox((Gui *)g_game->messages, msg, 0x1e0, 1, 1);
             return 0;
         }
         GetLocalizedString(&list, missionName, "missionname", 0x100, 0);
@@ -689,7 +682,7 @@ int Mission::LoadMission(char* map)
             if (!parser.LoadFile(file)) {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  There is no mission defintion for this mission: %s", path);
-                OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
+                OpenMessageBox((Gui *)g_game->messages, msg, 0x1e0, 1, 1);
                 return 0;
             }
             parser.ResetCurrentRecord();
@@ -700,11 +693,11 @@ int Mission::LoadMission(char* map)
             } else {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  Mission file %s is corrupt (no header found).", path);
-                OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
+                OpenMessageBox((Gui *)g_game->messages, msg, 0x1e0, 1, 1);
                 return 0;
             }
         } else {
-            OpenMessageBox(g_game->messages, "Old TED format no longer supported!", 0x1e0, 1, 1);
+            OpenMessageBox((Gui *)g_game->messages, "Old TED format no longer supported!", 0x1e0, 1, 1);
             return 0;
         }
         break;
@@ -718,7 +711,7 @@ int Mission::LoadMission(char* map)
             BuildCampaignFilePath(1, "Maps", map, "TNT");
             break;
         }
-        map = FindTranslation(map);
+        map = (char *)FindTranslation(map);
         if (map == 0)
             return 0;
         strcpy(missionName, map);
@@ -734,7 +727,7 @@ int Mission::LoadMission(char* map)
     }
 
     if (!parser.SelectRecord("GlobalHeader")) {
-        OpenMessageBox(g_game->messages, "No GlobalHeader block in mission file!", 0x1e0, 1, 1);
+        OpenMessageBox((Gui *)g_game->messages, "No GlobalHeader block in mission file!", 0x1e0, 1, 1);
         return 0;
     }
     headerChecksum = *(int*)((char*)parser.current + 0x25);

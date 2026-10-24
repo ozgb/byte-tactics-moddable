@@ -4,16 +4,15 @@
 #include <stdio.h>
 #include <new>
 
-extern char g_language[64];
+#include "../../link/globals.h"
 
-void __cdecl AllocNotifyNop(int);
+#include "../debug/debug_lib.h"
 
 #include "string_ref.h"
 #include "tdf.h"
+#include "tdf_4c54f0.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
-void CopyDwordIfNonNull(int*, int*);
-int GetBuildRating(int, unsigned short);
 
 static inline bool operator==(const StringRef& a, const StringRef& b)
 {
@@ -67,8 +66,6 @@ public:
     TdfField* FindLowerBound(const char* key);
 };
 #pragma pack(pop)
-
-extern TranslationTable* g_translations;
 
 static inline StringRef* InsertNew(TranslationTable* s, TdfField* e, const StringRef& key)
 {

@@ -9,15 +9,15 @@
 #include "../files/file_handle.h"
 #include "../state/sim_globals.h"
 
-extern int DAT_0051fba8;
+#include "../../link/globals.h"
 
 #include "../files/files_api.h"
-void __stdcall WriteTabs(FileHandle* out, int indent);
-char* __stdcall ChangeExtension(char* name, char* out, const char* ext);
+#include "dialogs.h"
+#include "../graphics/palette.h"
 char* __stdcall Translate(char* text);
 void* __stdcall LoadGaf(char* path);
 void* __stdcall GetGafFrame(void* table, int index);
-void __cdecl GameFreeThunk(int* p);
+#include "../graphics/object_pool.h"
 
 static inline void WriteTabsInline(FileHandle* file, int depth)
 {

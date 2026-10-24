@@ -5,7 +5,7 @@
 #include <vector>
 
 void __cdecl operator delete(void* p);
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
 struct Entry_40d670 {
     Entry_40d670() {}
@@ -19,8 +19,7 @@ static inline bool operator<(const Entry_40d670& a, const Entry_40d670& b)
     return a.key < b.key;
 }
 
-void __stdcall AdjustHeap(Entry_40d670* first, int hole, int len, Entry_40d670 val);
-void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d670 val);
+#include "pathfind.h"
 
 // FUNCTION: 0x40d5e0
 void __stdcall CopyDwordPair(int* dest, int* src) {

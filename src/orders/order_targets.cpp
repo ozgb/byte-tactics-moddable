@@ -16,44 +16,7 @@ extern void __cdecl operator delete(void* p);
 #include "order_fx.h"
 
 void RegisterUnitOrders();
-void RegisterGroundOrders();
-void EnableAICommands();
-void RegisterAICommands();
-void ResetAIPlayers();
-void RegisterVtolOrders();
-void StepAllGafSequences();
-void ResetNetStats();
-void InitCommands();
-int UpdatePlacementGhostValidity();
-void RefreshSelectionOrders();
-void DispatchOrdersPanelPageFlags();
-void ResetCameraState();
-void FindLocalCommander();
-void ClampCameraPosition();
-void ClampCameraTarget();
-void UpdateScreenShake();
-void UpdateCameraFollow();
-void BeginMouseScroll();
-void EndMouseScroll();
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-void CreateGameObject();
-void InitMissionStatus();
-void SetUpEndMissionScreen();
 
-void StartScreenFade();
-void StepScreenFade();
-void ScheduleFadeTick();
-int IsFadeDone();
-void StepPaletteFade();
-void FillEndGameStatistics();
-int AreStatBarsComplete();
-void EnableEndMissionButtons();
-void ShowEndMissionScreen();
-void OpenCdCheckDialog();
 
 typedef std::vector<Point16> Vec_0044d0e0;
 
@@ -225,7 +188,6 @@ extern Game* g_game;
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
-void CmdMem(int);
 
 typedef std::vector<Point16> Vec_0044ee60;
 typedef void (Vec_0044ee60::*DestroyFn_0044ee60)(Vec_0044ee60::iterator, Vec_0044ee60::iterator);
@@ -267,42 +229,8 @@ static inline UnitMotion* Motion(Unit* unit)
     return unit->motion;
 }
 
-void CreatePathfinder();
+#include "order_targets.h"
 
-void UpdateMenuSparks();
-void OpenCloseCdPlayerDialog();
-void OpenMainMenu();
-void HandleFrontendDebugKey();
-int ConnectToService();
-void RunFrontendStateMachine();
-void FreePictureCache();
-void ClearPictureCache();
-void OrLabelAttribs();
-void EmptyPreFrontendInitHook();
-int CodeChecksumFailed();
-void EmptyPostSimStepHook();
-void EmptyPostSimStepHook_B();
-void EmptyPostSimStepHook_C();
-int MainLoopContinueStub();
-int MainLoopContinueStub_B();
-int MainLoopContinueStub_C();
-void EmptyMainLoopHook();
-void EmptyMainLoopHook_B();
-void EmptyMainLoopHook_C();
-void ProtectUnitDefsReadOnly();
-void ProtectUnitDefsReadWrite();
-void CheckGpfVersion();
-void LoadGameResources();
-void FreeAnimFiles();
-void LoadGameFonts();
-void FreeGameFonts();
-int LoadDefaultPalette();
-void LoadTextureGafs();
-void FreeTextureGafs();
-void CheckDownloadableFlags();
-void AddDownloadBuildOptions();
-void StartScreenFade();
-void StepScreenFade();
 extern int Pad6260_01;
 extern int Pad6260_02;
 extern int Pad6260_03;

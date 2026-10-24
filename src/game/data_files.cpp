@@ -13,18 +13,18 @@ struct AnimEntry {
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-void* __cdecl GameAllocIgnoreTag(const char* name, int size);
+#include "../debug/debug_lib.h"
 void* __cdecl GameReallocTagged(void* block, const char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
-char* __stdcall StripExtension(char* name);
-int GetPreferredLanguage(void);
+#include "../graphics/object_pool.h"
+#include "../graphics/palette.h"
+#include "main.h"
 #include "../files/files_api.h"
-void __stdcall FatalError(char* path);
+#include "../graphics/display.h"
 char* __stdcall Translate(char* text);
-void __stdcall OpenMessageBox(char* dest, char* text, int wrapWidth, int centre, int autoHeight);
-char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
+#include "../gui/dialogs.h"
+#include "data_files.h"
 
 // FUNCTION: 0x429000
 void CheckGpfVersion()
@@ -40,14 +40,14 @@ void CheckGpfVersion()
             if (parser.current->GetFieldString(buf, "GPFVersion", 0x40, DAT_005119b8)) {
                 found = 1;
                 if (_strcmpi("v3.0", buf) != 0) {
-                    OpenMessageBox(g_game->menu,
+                    OpenMessageBox((Gui *)g_game->menu,
                                  Translate("Warning!  Your copy of Revision.GPF is the wrong version for this executable.  You may experience some problems if you continue playing.  Please download the latest version of the TA patch from www.cavedog.com and reinstall the patch."),
                                  0x1e0, 1, 1);
                 }
             }
         }
         if (found == 0) {
-            OpenMessageBox(g_game->menu,
+            OpenMessageBox((Gui *)g_game->menu,
                          Translate("Warning!  Your copy of Revision.GPF is the wrong version for this executable.  You may experience some problems if you continue playing.  Please download the latest version of the TA patch from www.cavedog.com and reinstall the patch."),
                          0x1e0, 1, 1);
         }
@@ -109,7 +109,7 @@ void* __stdcall LoadFontByName(const char* name)
     return font;
 }
 
-int __stdcall LoadPcxPalette(char* path, void* data);
+#include "../graphics/pcx.h"
 
 // FUNCTION: 0x429330
 void* __stdcall LoadPaletteByName(char* name)
@@ -130,7 +130,7 @@ void* __stdcall LoadPaletteByName(char* name)
     else {
         result = GameAllocIgnoreTag("PALETTE", 0x400);
         BuildDataPath(path, "palettes", name, "PCX");
-        if (LoadPcxPalette(path, result) == 0) {
+        if (LoadPcxPalette(path, (unsigned int *)result) == 0) {
             FatalError(path);
         }
         WriteBufferToFile(namepath, result, 0x400);
@@ -144,7 +144,7 @@ void* __stdcall LoadPaletteByName(char* name)
     return result;
 }
 
-void* __stdcall LoadSoundFile(const char* name);
+#include "../sound/sound.h"
 
 // FUNCTION: 0x429470
 int __stdcall LoadSoundByName(char* name, const char* file)
@@ -181,7 +181,7 @@ struct Pic_004295b0 {
     char header[0x40];
 };
 
-GafFrame* __stdcall AllocFrame(char* name, int width, int height);
+#include "../graphics/gaf.h"
 
 // FUNCTION: 0x4295b0
 GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY)
@@ -486,7 +486,7 @@ void __stdcall BindModelTextures(Model_0042a140* model, const char* name)
     }
 }
 
-void* __stdcall Load3do(char* param);
+#include "../graphics/pcx.h"
 void __stdcall MirrorObject(void* data);
 
 // FUNCTION: 0x42a2c0
@@ -590,9 +590,8 @@ void FreeTextureGafs()
 
 #include "../util/string_ref.h"
 
-int __stdcall ComputeChecksum(unsigned char* data, int len);
-void __cdecl ProtectBlockReadWrite(void* p);
-void __cdecl ProtectBlockReadOnly(void* p);
+#include "../util/math.h"
+#include "../debug/debug_lib.h"
 
 // FUNCTION: 0x42a610
 void __stdcall ComputeUnitScriptChecksum(UnitDef* def)

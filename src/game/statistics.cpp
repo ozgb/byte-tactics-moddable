@@ -23,7 +23,7 @@ struct ScoreBoard_0046bce0 {
     void* ppScores;
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern char DAT_00512c98[];
 extern Guid_0046bf30 g_dpspGuidIpx;
 extern Guid_0046bf30 g_dpspGuidSerial;
@@ -31,7 +31,6 @@ extern Guid_0046bf30 g_dpspGuidModem;
 extern PlayerInfo_0046bce0** g_onlineReportPlayers;
 extern ScoreBoard_0046bce0** g_onlineReportScoreBoards;
 extern char** g_onlineReportScores;
-extern int g_hapinetOnlineReport;
 extern int g_reporterDll;
 
 typedef int (__stdcall *EnableFn_0046bf30)(int);
@@ -52,13 +51,11 @@ extern TimerFn_0046bf30 g_riIntervalTimer;
 extern ReportFn_0046bf30 g_riReport;
 extern ChatFn_0046bf30 g_riReportGameChat;
 
-void ShutdownScoreTables();
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-int AllocScoreTables();
-void __stdcall ReportGameEventCallback(int event);
-int __stdcall ShowGameMessage(char* text, int mode);
-void __stdcall RISetCallbacks(int report, int notify);
-void __cdecl GameFreeThunk(void* p);
+#include "statistics.h"
+#include "../debug/debug_lib.h"
+#include "../ingame/info_panel.h"
+#include "../network/online_report.h"
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x46bce0
 int AllocScoreTables()

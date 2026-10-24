@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "unit_orders_406300.h"
 class UnitMotion;
 struct Player;
 struct Unit;
@@ -17,16 +18,15 @@ struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index
 #include "../../interfaces/seams.h"
 
 #pragma pack(pop)
-int __stdcall IssueAttackOrder(Unit*, Unit*, int);
+#include "order_list.h"
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
-void __stdcall AppendOrder(Unit*, Order*);
-int __stdcall RandomInt(int);
+#include "order_list.h"
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }
 static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
 int __stdcall GetOrderTarget(int param_1);
-int CheckDirectXVersion(int, int, int, int, int);
 struct Feature;
 // FUNCTION: 0x406300
 int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)

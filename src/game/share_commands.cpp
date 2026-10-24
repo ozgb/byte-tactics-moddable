@@ -9,7 +9,8 @@
 #include "game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
+#include "share_commands.h"
 
 class CommandArgs {
 public:
@@ -17,9 +18,7 @@ public:
 };
 
 void __stdcall AddMessage(char* text, int key, int value, int last);
-void BroadcastPlayerInfo();
-
-extern char g_fxEventPoolBlocked;
+#include "../network/net_game.h"
 
 // FUNCTION: 0x418cd0
 void __stdcall CmdShareMetal(int unused)

@@ -30,20 +30,12 @@ public:
     void LoadMeteorDefaults();
 };
 
-void __cdecl UpdateWind(void);
-void __cdecl UpdateWindOnStream(RandStream stream);
-void __stdcall UpdateMeteors(void);
-void __stdcall InitMeteors(void);
-void __stdcall EmptyShutdownPreCleanup(void);
-void __stdcall EnableMeteors(void);
-void __stdcall DisableMeteors(void);
-void __stdcall SetMeteorParams(MeteorParams* params);
-void __stdcall SaveMeteors(HapiBank* file);
-void __stdcall LoadMeteors(HapiBank* file);
-void __stdcall CmdMeteor(CommandArgs* args);
-int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* pos, Vec3* vel, int flag);
-void __stdcall UpdateResourceSharing(Player* player);
-void __stdcall UpdateFeatures(void);
+#include "../game/game_state.h"
+#include "../map/meteors.h"
+#include "../game/console_commands.h"
+#include "../weapons/weapons.h"
+#include "../network/net_game.h"
+#include "../map/features.h"
 
 struct Cell;
 struct Point16;
@@ -66,193 +58,86 @@ struct _iobuf;
 struct Los_0047d2e0;
 class MissionType;
 
-void __stdcall DumpPlayerAI(int player, _iobuf* file);
-void __stdcall ResetAIPlayers(void);
+#include "../ai/ai_player.h"
 void __stdcall GetFactoriesInRadius(int player, const Vec* pos, int radius, std::vector<Unit*>* out);
-void __stdcall RegisterAICommands(void);
-void __stdcall CreatePlayerAI(int player);
-void __stdcall DestroyPlayerAI(int player);
-void __stdcall UpdatePlayerAI(int player);
-void __stdcall RebuildFeatureCells(int player);
-void __stdcall ParseDownloadableAiWeightScripts(int player);
-void __stdcall ReparseAiWeightScriptsIfLimitNotSticky(int player);
-void __stdcall CreateSquads(Player* player);
-void __stdcall FreeSquads(Player* player);
-void __stdcall SetUnitSquad(Unit* unit, int index);
+#include "../units/squads.h"
 int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* los);
 int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target, Vec3* pos, int param_6, int param_7);
-void __stdcall DeleteOrders(Unit* owner, int all);
-int __stdcall GetOrderFlags(Unit* unit);
+#include "../orders/order_list.h"
+#include "../orders/order_queue_4384a0.h"
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
-int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3);
-void __stdcall RegisterAllOrderTypes(void);
-void __stdcall ClearOrderTypeTable(void);
-void __stdcall CreatePathfinder(void);
-void __stdcall DestroyPathfinder(void);
+#include "../orders/order_targets.h"
 float __stdcall GetEnergyIncome(Player* player);
 float __stdcall GetMetalIncome(Player* player);
-float __stdcall GetNetEnergy(Player* player);
-float __stdcall GetNetMetal(Player* player);
-void __stdcall LoadDefaultAIScript(void);
-void __stdcall NotifyUnitRefs(Unit* unit, int event);
+#include "../game/players_464290.h"
+#include "../game/players_464290.h"
+#include "../units/unit_targets.h"
 
 Projectile* __stdcall FindTargetableProjectile(Unit* unit, unsigned int weapon);
 int __stdcall WeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags);
-void __stdcall AllocWeaponArray(void);
-void __stdcall FreeWeaponArray(void);
-void __stdcall LoadWeaponTypes(void);
-void __stdcall FreeWeaponTypes(void);
-void __stdcall InitExplosions(void);
-void __stdcall FreeExplosions(void);
+#include "../weapons/weapon_types.h"
+#include "../weapons/explosions.h"
 void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra);
-unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size);
-void __stdcall DetonateUnitWeapon(Unit* unit, int second);
-void __stdcall InitUnitWeaponSlots(Unit* unit);
 void __stdcall RemoveUnitProjectiles(Unit* unit);
-void __stdcall UpdateUnitWeapons(Unit* unit);
-void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int amount);
-void __stdcall AppendOrder(Unit* owner, Order* node);
-void __stdcall GetAimFromPosition(Unit* unit, Vec3* out, unsigned char weapon);
+#include "../units/unit_scripts.h"
 Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
-Vec3 __stdcall GetPiecePosition(Unit* unit, int piece);
-void __stdcall MarkRecentlyDamaged(Unit* unit);
+#include "../ingame/info_panel.h"
 
-float __stdcall GetEnergyUse(UnitDef* def);
+#include "../units/unit_commands.h"
 void __stdcall UpdatePlayerEconomy(Player* p);
-void __stdcall UpdateMetalExtraction(Unit* unit);
+#include "../units/unit_motion.h"
 
-void __stdcall LoadFeatureFileList(void);
-void __stdcall FreeFeatureFileList(void);
-void __stdcall NopAfterFeatureEnum(void);
-void __stdcall ResolveFeatureLinks(void);
+#include "../map/features_422ea0.h"
 void __stdcall InitFeatureAnimPool(List_00421f20* list);
-void __stdcall FreeFeaturePool(void);
-void __stdcall PlaceMissionFeatures(void);
-void __stdcall StampFeatureMetal(void);
-unsigned short __stdcall GetCellFeature(Cell* cell);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
-int __stdcall RemoveFeature(Cell* cell, int flag);
-int __stdcall ReclaimFeature(Unit* unit, Vec3* pos);
-unsigned short __stdcall FindOrLoadFeatureType(char* name);
-void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon);
-Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def);
-void __stdcall SaveFeatures(HapiBank* file);
-void __stdcall LoadFeatures(HapiBank* file);
+#include "../map/features_424c00.h"
 
-void __stdcall SetWeaponTargetUnit(char* param_1, char* param_2, int param_3);
-void __stdcall SetWeaponTargetPos(char* param_1, int* param_2, int param_3);
-void __stdcall ClearWeaponTarget(Unit* unit, int index);
-void __stdcall ResetWeaponTarget(Unit* obj, int index);
-Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index);
 int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index);
 Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange);
-int __stdcall FindBestTargetIfFireAtWill(Unit* unit);
 
-Cell* __stdcall GetMapCell(int x, int y);
-void __stdcall CmdShareMapping(int unused);
-void __stdcall CmdShareRadar(int unused);
+#include "../map/line_of_sight.h"
+#include "../game/share_commands.h"
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetGroundHeight(Pos_00485070* p);
 void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out);
 int __stdcall GetCellMeanHeight(Pos_00485070* p);
-void __stdcall RefreshAllPassMaps(Point16 a, Point16 b);
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos);
-char* __stdcall FindWeaponByName(char* name);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
-int __stdcall WeaponCanReachUnit(Unit* unit1, Unit* unit2, unsigned char weapon);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
-bool __stdcall HasReadyUnitInRange(int player, Vec3* pos, int range);
 int __stdcall IsPointVisible(Player* player, Vec3* pos);
 
-void __stdcall ClampWorldPosToTerrain(int x, int y, Vec3* out);
-void __stdcall ExpireEyeballs(void);
-void __stdcall FreeMapResources(void);
-void __stdcall FreeRadar(void);
-void __stdcall InitRadar(void);
-void __stdcall LoadTntMap(void);
-void __stdcall RecalculateLineOfSight(int flag);
+#include "../map/line_of_sight.h"
+#include "../map/radar.h"
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
-Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
-Cell* __stdcall GetOriginCellAtPosition(Vec3* pos);
-void __stdcall UpdateCellHeightRange(Point16 pos, Point16 size);
-void __stdcall UpdateUnitLineOfSight(Unit* unit);
-void __stdcall RemoveUnitLineOfSight(Unit* unit);
-void __stdcall RevealNewUnit(Unit* unit);
-void __stdcall AddEyeball(Vec3* src, int a, int b, int c);
-void __stdcall DrawRadarUnits(void);
-void __stdcall UpdateRadarMapped(void);
-void __stdcall UpdateSensorRadarAndCloak(void);
+#include "../ingame/info_panel_467440.h"
 
 class HapiBank;
-void __stdcall BuildAllPassMaps(void);
-void __stdcall FreeOtaEnumCacheAndMission(void);
-void __stdcall LoadMappingData(HapiBank* file);
-void __stdcall LoadMetalPlotmap(HapiBank* file);
-void __stdcall LoadPlayerFeaturesPlotmap(HapiBank* file);
-void __stdcall SaveMappingData(HapiBank* file);
-void __stdcall SaveMetalPlotmap(HapiBank* file);
-void __stdcall SavePlayerFeaturesPlotmap(HapiBank* file);
-void __stdcall SetMissionType(int type);
-void __stdcall SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos);
+#include "../map/map_list.h"
+#include "../map/plot_map.h"
+#include "../map/terrain.h"
 void __stdcall AddUnitToMap(Unit* unit);
 void __stdcall RemoveUnitFromMap(Unit* unit);
-int __stdcall CanPlaceFootprintAt(Unit* unit, Vec3* pos);
-int __stdcall IsPadSlotFree(Unit* pad, int id);
+#include "../map/terrain_47e2d0.h"
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
-void __stdcall ClearFootprintAndUnlink(Unit* unit);
-void __stdcall ForceNeighborFootprintReclaim(Unit* unit);
-void __stdcall SetYardOpen(Unit* unit, int open);
-void __stdcall InitPlayers(void);
-void __stdcall FreePlayers(void);
-void __stdcall InitPlayerResources(void);
-void __stdcall LoadPlayerControllers(HapiBank* file);
-void __stdcall LoadPlayers(HapiBank* file);
-void __stdcall SavePlayers(HapiBank* file);
-void __stdcall RebuildAIFeatureCells(void);
+#include "../game/players_466050.h"
 void __stdcall SetupPlayerSlot(int player, char type);
-void __stdcall UpdateBlink(void);
-void __stdcall KillPlayerUnits(unsigned char player);
+#include "../units/units_485010.h"
 struct OwnershipTransferPacket;
-void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPacket* packet);
-void __stdcall AllocateUnitMemory(void);
-void __stdcall FreeUnitMemory(void);
-void __stdcall FreeUnitInfo(void);
-void __stdcall RefreshUnitInfo(void);
-void __stdcall LoadUnitTypes(void);
-void __stdcall FreeUnitTypes(void);
-void __stdcall LoadDownloadMenus(void);
-void __stdcall FreeDownloadMenus(void);
-void __stdcall FreeMovementClasses(void);
-void __stdcall InitUnitCategories(void);
-void __stdcall FreeUnitCategories(void);
-void __stdcall KillAllUnits(void);
-void __stdcall KillUnitsOfType(short id);
-void __stdcall ReloadUnitType(unsigned short id);
-void __stdcall KillUnit(Unit* unit, int cause);
-void __stdcall LoadUnits(HapiBank* file);
-void __stdcall SaveUnits(HapiBank* file);
-Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file);
+#include "../units/unit_types.h"
+#include "../units/unit_save.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int param_4, int mode, int param_6);
 UnitDef* __stdcall FindUnitType(const char* name);
-unsigned short __stdcall FindUnitTypeId(const char* name);
 int __stdcall FindMissionUnit(char* name, std::vector<Unit*>* units, int value);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char piece, char mode);
-void __stdcall GetNanoPiecePosition(Unit* unit, Vec3* out);
 Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
-int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount);
-void __stdcall PoseUnitModel(Unit* unit);
-int __stdcall AddRepairProgress(Unit* builder, Unit* unit, float amount);
-void __stdcall ApplyUnfinishedBuildDecay(Unit* unit, int ticks);
-void __stdcall FinishConstruction(Unit* builder, Unit* unit);
-int __stdcall SetUnitPosition(Unit* unit, Vec3 pos, int param);
-void __stdcall AddBeCarriedOrder(Unit* unit);
-void __stdcall RunOrders(Unit* unit);
-void __stdcall RunSecondaryOrders(Unit* unit);
+#include "../ingame/control_panel.h"
+#include "../units/unit_scripts.h"
+#include "../units/unit_position.h"
+#include "../orders/order_queue_4384a0.h"
 
 struct DamagedAllyCollector;
-void __stdcall VisitObjectsInRange(Vec3* pos, int range, DamagedAllyCollector& visitor);
 
 
 
@@ -356,11 +241,7 @@ static void __stdcall SetStateBitsNative(Unit* unit, int mask, int set)
     unit->SetStateBits(mask, set);
 }
 
-void __stdcall UpdateProjectiles(void);
-void __stdcall UpdateExplosions(void);
-void __stdcall UpdateAllUnits(void);
-void __stdcall UpdatePlayers(void);
-void __stdcall UpdatePlayersOnStream(RandStream stream);
+#include "../weapons/weapons_49b720.h"
 
 static unsigned char __fastcall ChooseWeaponNative(Unit* self)
 {
@@ -874,7 +755,7 @@ void InstallNativeSeams()
     s_units.MovementClassInBounds = MovementClassInBoundsNative;
     s_units.RefreshMovedUnits = RefreshMovedUnitsNative;
     s_units.RefreshUnitIfStale = RefreshUnitIfStaleNative;
-    s_ai.HasReadyUnitInRange = HasReadyUnitInRange;
+    s_ai.HasReadyUnitInRange = (bool (__stdcall *)(int, Vec3 *, int))HasReadyUnitInRange;
     s_ai.IsPointVisible = IsPointVisible;
     s_map.GetNameSlot = GetNameSlotNative;
     s_map.VisitObjectsInRange = VisitObjectsInRangeNative;
@@ -931,7 +812,7 @@ void InstallNativeSeams()
     s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
     s_orders.AddOrder = AddOrder;
     s_orders.DeleteOrders = DeleteOrders;
-    s_orders.GetOrderFlags = GetOrderFlags;
+    s_orders.GetOrderFlags = (int (__stdcall *)(Unit *))GetOrderFlags;
     s_orders.GetOrderType = GetOrderType;
     s_orders.IssueAttackOrder = IssueAttackOrder;
     s_orders.RegisterAllOrderTypes = RegisterAllOrderTypes;
@@ -940,17 +821,17 @@ void InstallNativeSeams()
     s_orders.DestroyPathfinder = DestroyPathfinder;
     s_players.GetEnergyIncome = GetEnergyIncome;
     s_players.GetMetalIncome = GetMetalIncome;
-    s_players.GetNetEnergy = GetNetEnergy;
-    s_players.GetNetMetal = GetNetMetal;
+    s_players.GetNetEnergy = (float (__stdcall *)(Player *))GetNetEnergy;
+    s_players.GetNetMetal = (float (__stdcall *)(Player *))GetNetMetal;
     s_players.LoadDefaultAIScript = LoadDefaultAIScript;
     s_units.NotifyUnitRefs = NotifyUnitRefs;
     s_units.UnitTypeSetAddTypeOrCategory = UnitTypeSetAddTypeOrCategoryNative;
     s_units.StartScript = StartScriptNative;
     s_units.QueryScript = QueryScriptNative;
-    s_units.GetAimFromPosition = GetAimFromPosition;
+    s_units.GetAimFromPosition = (void (__stdcall *)(Unit *, Vec3 *, unsigned char))GetAimFromPosition;
     s_units.GetPieceOffset = GetPieceOffset;
-    s_units.GetPiecePosition = GetPiecePosition;
-    s_units.MarkRecentlyDamaged = MarkRecentlyDamaged;
+    s_units.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
+    s_units.MarkRecentlyDamaged = (void (__stdcall *)(Unit *))MarkRecentlyDamaged;
     s_map.BuildAllPassMaps = BuildAllPassMaps;
     s_map.FreeOtaEnumCacheAndMission = FreeOtaEnumCacheAndMission;
     s_map.LoadMappingData = LoadMappingData;
@@ -1027,7 +908,7 @@ void InstallNativeSeams()
     s_units.FindUnitTypeId = FindUnitTypeId;
     s_units.FindMissionUnit = FindMissionUnit;
     s_units.AttachUnitToPiece = AttachUnitToPiece;
-    s_units.GetNanoPiecePosition = GetNanoPiecePosition;
+    s_units.GetNanoPiecePosition = (void (__stdcall *)(Unit *, Vec3 *))GetNanoPiecePosition;
     s_units.GetPieceAngles = GetPieceAngles;
     s_units.AddBuildProgress = AddBuildProgress;
     s_units.AddRepairProgress = AddRepairProgress;

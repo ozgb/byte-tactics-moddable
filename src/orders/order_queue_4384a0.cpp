@@ -2,6 +2,7 @@
 #include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <string.h>
+#include "order_queue_4384a0.h"
 
 class Order;
 class HapiBank;
@@ -80,20 +81,6 @@ struct SaveDesc_0043a1f0 {
 #include "air_maneuver_order.h"
 #include "../state/sim_globals.h"
 
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-void CreateGameObject();
-void InitMissionStatus();
-void SetUpEndMissionScreen();
-void StartScreenFade();
-void StepScreenFade();
-void ScheduleFadeTick();
-int IsFadeDone();
-void StepPaletteFade();
-
 class Slot_0043a1f0 {
 public:
     virtual void Slot0();
@@ -101,15 +88,15 @@ public:
     Ref<OrderFx> current;
 };
 
-int __stdcall OrderTypeNameLess(int param_1, char* param_2);
+#include "order_list.h"
 Entry_0043a1f0* __stdcall LowerBoundOrderTypes(Entry_0043a1f0* first, Entry_0043a1f0* last,
                                        char* const& value, int(__stdcall* pred)(int, char*),
                                        int* unused);
-int __stdcall SendScriptCallNoArgs(Unit* obj, short index);
+#include "../network/net_game.h"
 void __stdcall SendScriptCall(Unit* obj, int index, int param_3, int param_4, int param_5, int param_6, int param_7);
-void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
+#include "../sound/sound.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 typedef Entry_0043a1f0* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
@@ -123,9 +110,6 @@ typedef Entry_0043a1f0* SimView_g_missionOrderTableEnd;
 
 #pragma pack(push, 1)
 #include "path_fx.h"
-
-int CloakOnOrder(char*, int, int);
-int GetUnitCount(int, unsigned int);
 
 #include "approach_areas.h"
 

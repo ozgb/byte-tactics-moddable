@@ -28,8 +28,7 @@ struct Node_004dd1b0 {
 Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p);
 
 extern Node_004db000* DAT_00528a54;
-extern unsigned int g_lastAllocOffset;
-extern unsigned int g_freeBlockWraps;
+#include "../../link/globals.h"
 
 class FreeBlockIter {
 public:
@@ -69,24 +68,6 @@ public:
     MapInsertResult* Assign(const FreeBlockIter& first, unsigned char& second);
 };
 
-void __cdecl CountAlloc(unsigned int size);
-void __cdecl CountFree(int size);
-char IsMemFussy();
-char IsGonzo();
-char IsMemSet();
-int GetDebugFillPattern();
-char IsBackAlign();
-void __cdecl FillPattern(void* at, int value, unsigned int count);
-unsigned int __cdecl RoundUpToPage(unsigned int size);
-unsigned int __cdecl RoundUpToDoublePage(unsigned int size);
-size_t __cdecl GetBlockSize(void* p);
-void* __cdecl GameAlloc(unsigned int size);
-void __cdecl GameFree(void* p);
-void* __cdecl GameCalloc(unsigned int count, unsigned int size);
-int __cdecl SetOutOfMemoryHandler(int handler);
-void* __cdecl GameRealloc(void* block, unsigned int size);
-char* __cdecl GameStrdup(char* s);
-void __cdecl ProtectBlock(void* p, int protect);
 
 struct Less_004db000 {
     bool operator()(const unsigned int& a, const unsigned int& b) const { return a < b; }

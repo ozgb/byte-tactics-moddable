@@ -33,7 +33,7 @@ struct Table_00487bf0 {
 
 #include "../orders/mission_type.h"
 
-unsigned short __stdcall FindUnitTypeId(const char* name);
+#include "unit_commands.h"
 
 union MissionSlot {
     MissionType type;
@@ -232,12 +232,12 @@ struct UnitType_00488b10 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 UnitType_00488b10* __stdcall FindUnitType(const char* name);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
                                       Vec3_00487bf0 pos, int a, int b, int c);
-void __stdcall FatalError(char* message);
+#include "../graphics/display.h"
 
 #include <math.h>
 #include <memory.h>
@@ -326,7 +326,7 @@ struct OwnershipTransferPacket {
 };
 #pragma pack(pop)
 
-int __stdcall GetPlayerDpid(Player* player);
+#include "../network/net_game.h"
 void __stdcall BroadcastPacket(int who, OwnershipTransferPacket* packet, int size);
 
 // FUNCTION: 0x488570
@@ -498,8 +498,6 @@ public:
     void* AssignCategory(int* other);
 };
 
-void CountPacket(int, int, int);
-void SetMissionStatus(int, int, int);
 
 // FUNCTION: 0x4889d0 _$E5
 // FUNCTION: 0x488a00 _$E3

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "control_panel_41bde0.h"
 
 #pragma pack(push, 1)
 struct Sub_0041bde0 {
@@ -11,7 +12,7 @@ struct Sub_0041bde0 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 void __stdcall PlaySoundByName(char* name, int param);
 
 // FUNCTION: 0x41bde0

@@ -114,7 +114,7 @@ public:
 
 #include "../game/game.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x46ca60
 void __fastcall FinishUnitSync()

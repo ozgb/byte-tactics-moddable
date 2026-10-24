@@ -8,7 +8,7 @@
 #include "../state/block.h"
 #include "../state/sim_globals.h"
 
-void* GetAllocLock();
+#include "../debug/debug_lib.h"
 
 namespace {
 

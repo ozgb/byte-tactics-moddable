@@ -162,30 +162,16 @@ extern long g_gfxBlitLockOwner;
 extern void* g_gfxBlitLockEvent;
 
 #include "../files/files_api.h"
-void __stdcall SetCurrentMouseEvent(int* p);
-void __stdcall InitKeyQueue(int size);
-void __stdcall InitMouse(int count, int start);
-int __stdcall AllocShadeTable(App_4b5980* d);
+#include "../gui/keyboard.h"
+#include "../gui/keyboard.h"
+#include "../gui/mouse.h"
+#include "palette.h"
 int __stdcall AllocAlphaTable(App_4b5980* d);
-int __stdcall AllocLightTable(App_4b5980* d);
-int __stdcall AllocGrayTable(App_4b5980* d);
-int __stdcall AllocBlueTable(App_4b5980* d);
-void __stdcall PushKeyCode(int v);
-void __stdcall HandleVirtualKey(int v, int flag);
-void __stdcall PushMouseEvent(Event_4b5cc0* ev);
-void __stdcall InitSurface(Surface *s, int width, int height, int a, int b);
 int __stdcall LockScreen(Surface *s);
 void __cdecl BlitSurface(Surface *dst, void *src, int x, int y);
 int __stdcall UnlockScreen(Surface *s);
-int __stdcall SetPaletteColors(tagPALETTEENTRY *entries, int start, int count);
-void DestroyPreCleanup(void);
-void ShutdownMouse(void);
-void __stdcall FreeAlphaTable(App_4b5980* obj);
-void __stdcall FreeShadeTable(App_4b5980* obj);
 void __stdcall FreeLightTable(App_4b5980* obj);
-void __stdcall FreeGrayTable(App_4b5980* obj);
-void __stdcall FreeBlueTable(App_4b5980* obj);
-void __cdecl GameFreeThunk(void* p);
+#include "object_pool.h"
 
 // FUNCTION: 0x4b4f50
 int ApplyPalette()
@@ -365,7 +351,7 @@ int __stdcall SetFullScreen(int mode) {
         host_window_set_topmost(0);
     }
 
-    SetPaletteColors(g_display->entries, 0, 0x100);
+    SetPaletteColors((unsigned char *)g_display->entries, 0, 0x100);
     if (lockResult == 0) {
         g_gfxBlitLockOwner = 0;
         host_atomic_exchange((int*)&g_gfxBlitLockHeld, 0);
@@ -430,7 +416,7 @@ int __stdcall InitEnvironment(App_4b5980* d)
     view.buttons = 0;
     d->lastDir = 0;
     SaveStartDirectory();
-    SetCurrentMouseEvent((int *)&view);
+    SetCurrentMouseEvent((MouseEvent *)((int *)&view));
 
     d->items = 0;
     d->itemCount = 0;
@@ -441,7 +427,7 @@ int __stdcall InitEnvironment(App_4b5980* d)
     int subsys = (d->videoFlags & 0x1fe) << 1;
     d->flags.value = (d->flags.value & 0xfc03) | subsys | 1;
     if (d->flags.bits.has_c4) {
-        AllocShadeTable(d);
+        AllocShadeTable((DisplayContext *)d);
     } else {
         d->shadeTable = 0;
     }
@@ -449,15 +435,15 @@ int __stdcall InitEnvironment(App_4b5980* d)
         AllocAlphaTable(d);
     }
     if (d->flags.bits.has_c8) {
-        AllocLightTable(d);
+        AllocLightTable((DisplayContext *)d);
     } else {
         d->lightTable = 0;
     }
     if (d->flags.bits.has_cc) {
-        AllocGrayTable(d);
+        AllocGrayTable((DisplayContext *)d);
     }
     if (d->flags.bits.has_d0) {
-        AllocBlueTable(d);
+        AllocBlueTable((DisplayContext *)d);
     }
     if (d->flags.bits.gdi) {
         d->windowed = 0;
@@ -517,7 +503,7 @@ int __stdcall HandleHostEvent(host_event* ev)
         e.time = ev->time_ms * g_display->tickScale / 1000;
         e.flag = 0;
         e.message = ev->type;
-        SetCurrentMouseEvent((int*)&e);
+        SetCurrentMouseEvent((MouseEvent *)((int*)&e));
         return 1;
     case HOST_EVENT_LBUTTON_DOWN:
     case HOST_EVENT_LBUTTON_UP:
@@ -554,7 +540,7 @@ int __stdcall HandleHostEvent(host_event* ev)
         return 1;
     }
     e.message = ev->type;
-    PushMouseEvent(&e);
+    PushMouseEvent((Event_4c2d60 *)&e);
     return 1;
 }
 
@@ -580,15 +566,15 @@ void __stdcall ShutdownEnvironment(App_4b5980* d)
     if (d->items)
         GameFreeThunk(d->items);
     if (d->flags.bits.has_c4)
-        FreeShadeTable(d);
+        FreeShadeTable((DisplayContext *)d);
     if (d->flags.bits.has_c0)
-        FreeAlphaTable(d);
+        FreeAlphaTable((DisplayContext *)d);
     if (d->flags.bits.has_c8)
         FreeLightTable(d);
     if (d->flags.bits.has_cc)
-        FreeGrayTable(d);
+        FreeGrayTable((DisplayContext *)d);
     if (d->flags.bits.has_d0)
-        FreeBlueTable(d);
+        FreeBlueTable((DisplayContext *)d);
     ReleaseDirectDraw(d);
     d->windowed = 0;
 }

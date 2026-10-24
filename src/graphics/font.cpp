@@ -12,7 +12,7 @@ struct Font {
 #include "../game/game.h"
 
 Game* GetDisplay(void);
-int __stdcall RectInsideRect(Rect* a, Rect* b);
+#include "../util/registry.h"
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
 void __cdecl BlitText(unsigned char* pixels, int pitch, Font* font, unsigned char* text,

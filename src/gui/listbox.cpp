@@ -42,8 +42,7 @@ struct Object_004b0230 {
 
 int __stdcall DrawLine(void* surface, int x0, int y0, int x1, int y1, unsigned char color);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
-void __stdcall GetGadgetRectByIndex(char* entries, int index, Rect* out);
-int __stdcall FindBackgroundCell(char* entries, int index);
+#include "gui.h"
 Bits_004b0230* __stdcall FindGafEntry(Gaf_004b0230* gaf, const char* name);
 void __stdcall DrawSurface(Surface_004b0230* dst, Cell_004b0230* cell, int x, int y);
 GafFrame* __stdcall GetGafFrame(Bits_004b0230* bits, int index);
@@ -113,7 +112,7 @@ void __stdcall DrawListboxFrame(Object_004b0230* obj, int index, Bits_004b0230* 
     }
 
     surface = *(Surface_004b0230**)(obj->holder->entries + 0xbc);
-    cell = (Cell_004b0230*)FindBackgroundCell(entries, index);
+    cell = (Cell_004b0230*)FindBackgroundCell((Gadget *)entries, index);
 
     if (cell != 0) {
         for (x = 0; x < surface->tiles_x; x += cell->step_x) {

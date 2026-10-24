@@ -57,23 +57,18 @@ struct Struct_004c6ac0 {
     unsigned char flags;
 };
 
-extern Game* g_game;
-extern int* g_unitRestrictPics;
-extern Record_005129b4* g_unitRestrictEntries;
-extern int* g_unitRestrictOldCounts;
+#include "../../link/globals.h"
 
 Entry_0044c420* __stdcall FindGadgetChecked(void* gadgets, char* name);
-int __stdcall IsCurrentGadgetNamed(Menu_0044c420* gui, char* name);
-void __stdcall ClearSelectedGadget(Menu_0044c420* obj);
+#include "../gui/gui.h"
+#include "../gui/dialogs.h"
 void __stdcall SetDescListCleanupFlag(int param_1, int param_2);
-void __stdcall MarkChanged(Menu_0044c420* obj);
 void __stdcall PlaySoundByName(char* name, int param_2);
-void __stdcall UpdateUnitSliders(Menu_0044c420* menu, int value);
-void OpenLoadListDialog();
-void OpenSaveGameDialog();
-void __stdcall FreeSurface(Struct_004c6ac0* obj);
-void __cdecl GameFreeThunk(void* p);
-int IsHostLocal();
+#include "multi.h"
+#include "multi.h"
+#include "../graphics/surface.h"
+#include "../graphics/object_pool.h"
+#include "../network/net_game.h"
 
 // FUNCTION: 0x44c420
 void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
@@ -93,7 +88,7 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         if (desc->count > 0) {
             do {
                 if (*p != 0)
-                    FreeSurface((Struct_004c6ac0*)*p);
+                    FreeSurface((Surface *)((Struct_004c6ac0*)*p));
                 p++;
                 i++;
             } while (i < desc->count);
@@ -128,19 +123,19 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         return;
     }
 
-    if (IsCurrentGadgetNamed(menu, "Load") != 0) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "Load") != 0) {
         PlaySoundByName("Options", 0);
         OpenLoadListDialog();
         ClearSelectedGadget(menu);
         return;
     }
-    if (IsCurrentGadgetNamed(menu, "Save") != 0) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "Save") != 0) {
         PlaySoundByName("Options", 0);
         OpenSaveGameDialog();
         ClearSelectedGadget(menu);
         return;
     }
-    if (IsCurrentGadgetNamed(menu, "Reset") != 0) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "Reset") != 0) {
         PlaySoundByName("Options", 0);
         for (i = 0; i < g_game->unitDefCount; i++) {
             type = g_unitRestrictEntries[i].unitIndex;
@@ -156,16 +151,16 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
                 }
             }
         }
-        UpdateUnitSliders(menu, 0);
-        MarkChanged(menu);
+        UpdateUnitSliders((Gui *)menu, 0);
+        MarkChanged((Dialog *)menu);
         ClearSelectedGadget(menu);
         return;
     }
-    if (IsCurrentGadgetNamed(menu, "OK") != 0) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "OK") != 0) {
         PlaySoundByName("Options", 0);
         return;
     }
-    if (IsCurrentGadgetNamed(menu, "Cancel") != 0) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "Cancel") != 0) {
         PlaySoundByName("Previous", 0);
         n = 0;
         for (i = 1; i < g_game->unitDefCount; i++) {

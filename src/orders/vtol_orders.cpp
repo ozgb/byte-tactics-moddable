@@ -1,9 +1,9 @@
 #include "win_types.h"
 #include <stdio.h>
 struct Unit;
-void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
+#include "unit_orders_406c70.h"
 namespace std {
-inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
+inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }
 #include <vector>
 #include <list>
@@ -18,7 +18,6 @@ struct Unit;
 struct Order;
 
 #ifndef __clang__
-void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
 namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
 }
@@ -110,21 +109,7 @@ struct Mover {
 
 #include "air_maneuver_order.h"
 
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-void CreateGameObject();
-void InitMissionStatus();
-void SetUpEndMissionScreen();
-void StartScreenFade();
-void StepScreenFade();
-void ScheduleFadeTick();
-int IsFadeDone();
-void StepPaletteFade();
-void FillEndGameStatistics();
-int AreStatBarsComplete();
+#include "../ingame/control_panel.h"
 
 class Class_0044e6c0 { public: void SetAltitude(int); };
 class Class_0044e730 { public: void SetApproachRadius(int); };
@@ -153,45 +138,29 @@ public:
     LandingPadList();
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 short __cdecl AngleOfVector(int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall QueueUnitSpeech(Unit*, int, const char*);
-int __stdcall IssueAttackOrder(Unit*, Unit*, int);
-int __stdcall IssueRepairOrder(Unit*, Unit*, int);
-void __stdcall AppendOrder(Unit*, Order*);
-void __stdcall AppendOrderToTail(Unit*, Order*);
-void __stdcall EnsurePatrolReturnOrder(Unit*, Order*);
+#include "order_list.h"
+#include "order_list.h"
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
-Unit* __stdcall GetWeaponTargetUnit(Unit*, int);
 #include "../../interfaces/seams.h"
-void __stdcall SetWeaponTargetPos(Unit*, Vec3*, int);
-void __stdcall ClearWeaponTarget(Unit*, int);
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
 void __stdcall StartBuildingScript(Unit*, Order*, short);
-int __stdcall WaitIfNotInBuildStance(Unit*, Order*, int);
+#include "order_queue_4384a0.h"
 void __stdcall EmitNanoParticles(Vec3*, Box*, int);
 void __stdcall EmitReverseNanoParticles(Box*, Vec3*, int);
-void __stdcall ReclaimFeature(Unit*, Vec3*);
-unsigned short __stdcall FindFeatureAtPos(Vec3*, Point16*, Point16*);
-int __stdcall ComputeReclaimDamagePulse(Unit*, Unit*, int);
 void __stdcall DamageUnit(Unit*, Unit*, int, int, int);
-void __stdcall MarkSelectionOrdersDirty(Unit*);
 int __stdcall SendScriptCallByName(Unit*, char*, char, int, int, int, int);
-int __stdcall IsUnitCommander(Unit*);
-void __stdcall AlignUnitToGround(Unit*);
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
-void __stdcall DetonateUnitWeapon(Unit*, int);
 void __stdcall DrawUnit(void*, Unit*);
 
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b);
-Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale);
+#include "vtol_orders.h"
 int __stdcall FindLandingPad(Unit* unit, int pad);
-void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b);
 
 static inline Vec3 Direction(short angle, int range)
 {
@@ -774,9 +743,6 @@ void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b)
 #pragma auto_inline(on)
 
 void WriteScreenshot(char*, char*, int, int, int, int);
-void DrawTextClipped(void*, char*, int, int, int, int);
-int CheckDirectXVersion(int, int, int, int, int);
-void EmitThrustParticles(int, int, int, int, short);
 void SubtractVec3(int*, int*, int*, int*, int*);
 
 // FUNCTION: 0x414e70

@@ -43,4 +43,9 @@ public:
     void SetUnitLimit(Unit_0046e330* unit, int value);
 };
 
+void __stdcall ReportIntervalTimer(void);
+
+int __stdcall ReportGameEvent(int msg);
+void __fastcall DeleteUnitSync();
+
 #endif

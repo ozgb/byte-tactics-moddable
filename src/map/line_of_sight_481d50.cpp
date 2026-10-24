@@ -5,6 +5,7 @@
 #include "los_tables.h"
 
 #include "../../interfaces/ref.h"
+#include "line_of_sight_481d50.h"
 #pragma pack(push, 1)
 
 class LosLine {
@@ -20,12 +21,6 @@ public:
 };
 
 void RegisterUnitOrders(void);
-void RegisterGroundOrders(void);
-void EnableAICommands(void);
-void RegisterAICommands(void);
-void FUN_00406f40(void);
-void ResetAIPlayers(void);
-void RegisterVtolOrders(void);
 
 
 struct MapSize_00481d50 {
@@ -57,7 +52,7 @@ struct Map_00481d50 {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 GafFrame* __stdcall GetGafFrame(unsigned short* table, int index);
 

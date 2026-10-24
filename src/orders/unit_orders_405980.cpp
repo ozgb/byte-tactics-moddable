@@ -1,6 +1,7 @@
 #include <vector>
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "unit_orders_405980.h"
 struct Unit;
 #include "mission_type.h"
 
@@ -19,11 +20,9 @@ public:
     DamagedAllyCollector(Player* o, std::vector<Unit*>* v, Unit* s) : owner(o), units(v), self(s) {}
     virtual void CollectDamagedAlly(Unit*);
 };
-void __stdcall EnsurePatrolReturnOrder(Unit*, Order*);
-int __stdcall RandomInt(int);
+#include "order_list.h"
+#include "../util/math_4b6c30.h"
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
-int __stdcall IssueRepairOrder(Unit*, Unit*, int);
-void __stdcall AppendOrder(Unit*, Order*);
 
 // FUNCTION: 0x405980
 int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)

@@ -10,6 +10,7 @@
 
 
 #include "../units/unit.h"
+#include "weapons_49b720.h"
 
 struct Net_0049b720 {
     char unknown_0[0xd48];
@@ -22,19 +23,16 @@ struct Net_0049b720 {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-void __stdcall CompactProjectiles();
-void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* p);
-Vec3* __stdcall GetProjectileAimPoint(Projectile* p);
-int __stdcall TurnUnitTowardsPoint(Projectile* p, Vec3* target);
+#include "weapons.h"
 void __stdcall DetonateProjectile(Projectile* p, void* unit);
 void __stdcall GetWeaponPiecePosition(Unit* unit, Vec3* out, unsigned char weapon, int piece);
 int __stdcall PlaySoundAt(int sound, Vec3* pos, int flag);
 void __stdcall EmitWhiteSmoke(Vec3* pos, short kind);
 #include "../../interfaces/seams.h"
 void __stdcall AddExplosionEffect(Vec3* pos, void* src, int index, int flag);
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 

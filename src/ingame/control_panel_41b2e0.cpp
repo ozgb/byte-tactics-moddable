@@ -2,6 +2,7 @@
 #include "../../interfaces/ref.h"
 #include <memory.h>
 #include "ta_types.h"
+#include "control_panel_41b2e0.h"
 
 #pragma pack(push, 1)
 struct UnitType_0041b2e0 {
@@ -104,10 +105,9 @@ struct Game_0041b2e0 {
 
 extern Game_0041b2e0* g_game;
 
-int __stdcall PopUntilNamedLayout(int force);
-int __stdcall IsScreenNamed(Menu_0041b2e0* menu, const char* name);
-void __stdcall OpenBuildMenuGui(Unit_0041b2e0* unit, char* guiName, int page);
-void __stdcall OpenGeneratorDialog(Unit_0041b2e0* unit);
+#include "../game/game_state.h"
+#include "../gui/dialogs.h"
+#include "control_panel.h"
 
 static inline Unit_0041b2e0* GetUnit(unsigned short index)
 {
@@ -231,16 +231,16 @@ void RefreshSelectionOrders()
             strncpy(name, g_game->unitDefs[first->unitDefIndex].unitname, 0x20);
             name[0x1f] = 0;
             sprintf(gui, "%s%d.GUI", name, page);
-            if ((IsScreenNamed(&g_game->menu, gui) == 0 || g_game->unitIndex != first->id)
+            if ((IsScreenNamed((Gui *)&g_game->menu, gui) == 0 || g_game->unitIndex != first->id)
                 && PopUntilNamedLayout(0))
-                OpenBuildMenuGui(first, gui, page);
+                OpenBuildMenuGui((Unit *)first, gui, page);
             g_game->orders.refresh = 0;
         }
     }
     if (g_game->orders.refresh) {
         if (PopUntilNamedLayout(0)) {
             if (count == 1) {
-                OpenGeneratorDialog(first);
+                OpenGeneratorDialog((Unit *)first);
                 return;
             }
             OpenGeneratorDialog(0);

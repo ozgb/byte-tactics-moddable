@@ -16,6 +16,7 @@
 #include "../util/tdf.h"
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
+#include "meteors.h"
 
 
 class MeteorParams {
@@ -28,16 +29,15 @@ public:
     void LoadMeteorDefaults();
 };
 
-extern char g_extTdf[];
+#include "../../link/globals.h"
 typedef char SimView_g_meteorWeaponName[];
 #undef g_meteorWeaponName
 #define g_meteorWeaponName (*reinterpret_cast<SimView_g_meteorWeaponName*>(&Sim().g_meteorWeaponName))
-extern Game* g_game;
 
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall FatalError(char* text);
+#include "../game/data_files.h"
+#include "../graphics/display.h"
 
 // FUNCTION: 0x437cd0
 void InitMeteors()

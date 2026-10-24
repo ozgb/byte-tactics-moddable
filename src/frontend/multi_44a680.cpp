@@ -9,9 +9,9 @@
 #include "../network/player.h"
 
 #include "../network/player_info.h"
+#include "multi_44a680.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
-int CheckDirectXVersion(int, int, int, int, int);
 int AimCobStub(int, int, int, int);
 
 struct Gadget_0044a680 {
@@ -48,42 +48,26 @@ struct UnitSync {
     void SendSyncMessage(unsigned char, int, int, int);
 };
 
-extern Game* g_game;
-extern int g_battleRoomSlotsBuilt;
-extern int g_startCountdownNextTick;
-extern unsigned int g_heartbeatNextTick;
-extern unsigned int g_lastPlayerCount;
+#include "../../link/globals.h"
 
-int __stdcall HandleNetPackets();
+#include "../network/net_game_453d40.h"
 unsigned char __stdcall FindHostSlot();
-void __stdcall BuildPlayerSlotGadgets();
-void __stdcall RefreshBattleRoomRows();
-void ShowSelectedMapInfo();
+#include "multi.h"
+#include "multi.h"
 void __stdcall UpdateMaxUnitsText(Gui* gui, int index);
 void __stdcall UpdateMetalText(Gui* gui, int index);
 void __stdcall PlaySoundByName(char* name, int param);
-void __stdcall MarkChanged(Gui* gui);
-void __stdcall MarkLayerChanged(Gui* gui);
 int __stdcall FindGadgetIndex(Gadget_0044a680* entries, char* name, int type);
 void __stdcall SetGadgetActiveByName(Gui* gui, char* name, int param);
 void __stdcall SetTranslatedTextByName(Gui* gui, char* name, char* text, int param);
 void __stdcall SetGrayedOutByName(Gui* gui, char* name, int param);
 Gadget_0044a680* __stdcall FindGadgetChecked_D(Gadget_0044a680* entries, char* name);
 Gadget_0044a680* __stdcall FindGadgetChecked_E(Gadget_0044a680* entries, char* name);
-void __stdcall GetGadgetRectByIndex(Gadget_0044a680* entries, int widget, RECT* rect);
 int __stdcall GetTextPixelWidth(char* text);
-int __stdcall GetFontLineHeight();
-void __stdcall DrawTextClipped(int a, char* text, int x, int y, int w, int h);
-void __stdcall SetCurrentFont(Gui* gui, int flag);
-void __stdcall CloseTopScreen(void* gui);
-int __stdcall IsScreenNamed(Gui* gui, char* name);
-void __stdcall SetSliderFromValue(Gadget_0044a680* gadget, int value);
-int __stdcall ReadSliderValue(Gadget_0044a680* gadget);
+#include "../gui/dialogs.h"
+#include "options.h"
 int __stdcall GetTicks();
-void __stdcall SendNetHeartbeat();
-void __stdcall BroadcastPlayerInfo();
-void __stdcall UpdateNetGameInfo();
-int __stdcall AreAllPlayersReady();
+#include "../network/net_game.h"
 
 int CheckMapCrc()
 {
@@ -165,7 +149,7 @@ void __stdcall UpdateEnergyText(Gui* gui, int unused)
     Gadget_0044a680* value = FindGadgetChecked_D(gui->layer->entries, "ENERGY");
 
     if (value != 0) {
-        int shown = ReadSliderValue(value) / 100 * 100;
+        int shown = ReadSliderValue((Gadget *)value) / 100 * 100;
         PlayerInfo* info;
 
         _itoa(shown, text, 10);
@@ -182,7 +166,7 @@ void __stdcall UpdateEnergyText(Gui* gui, int unused)
 void __stdcall SetNamedSliderValue(Gui* gui, char* name, int value)
 {
     Gadget_0044a680* gadget = FindGadgetChecked_D(gui->layer->entries, name);
-    SetSliderFromValue(gadget, value);
+    SetSliderFromValue((Gadget *)gadget, value);
 }
 
 // FUNCTION: 0x44a680
@@ -240,7 +224,7 @@ void UpdateBattleRoom()
                     if (strcmp(g_seams.map->GetMissionName(g_game->net), info->map) != 0) {
                         g_seams.map->LoadMissionByName(g_game->net, 0, (char*)g_game->players[host].info.get());
                         ShowSelectedMapInfo();
-                        MarkLayerChanged(&g_game->gui);
+                        MarkLayerChanged((Dialog *)&g_game->gui);
                     }
                 }
             }
@@ -257,7 +241,7 @@ void UpdateBattleRoom()
                 if (start->frame > 0 && g_startCountdownNextTick < GetTicks()) {
                     if (start->frame < 8) {
                         start->frame++;
-                        MarkChanged(&g_game->gui);
+                        MarkChanged((Dialog *)&g_game->gui);
                         g_game->bits_2bee_1.dirty = 1;
                     }
                     g_startCountdownNextTick += 4;
@@ -279,7 +263,7 @@ void UpdateBattleRoom()
                         unsigned int colour = GetTicks() & 0x1f;
                         if (colour != entries[idx].colour) {
                             entries[idx].colour = colour;
-                            MarkChanged(&g_game->gui);
+                            MarkChanged((Dialog *)&g_game->gui);
                         }
                     }
                 }
@@ -288,7 +272,7 @@ void UpdateBattleRoom()
                 SetGadgetActiveByName(&g_game->gui, "SYNCHING", synched == 0);
             }
             RefreshBattleRoomRows();
-            MarkChanged(&g_game->gui);
+            MarkChanged((Dialog *)&g_game->gui);
         }
     }
 
@@ -306,7 +290,7 @@ void UpdateBattleRoom()
                     int h;
                     sprintf(buf, "LOGO%i", i);
                     widget = FindGadgetIndex(entries, buf, 0xe);
-                    GetGadgetRectByIndex(entries, widget, &rect);
+                    GetGadgetRectByIndex((char *)entries, widget, (Rect *)&rect);
                     info = p->info;
                     sprintf(buf, "%i.%i", info->versionMajor, info->versionMinor);
                     w = GetTextPixelWidth(buf);

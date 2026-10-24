@@ -9,7 +9,7 @@ struct PCX_004caa40 {
 };
 
 #include "../files/files_api.h"
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 
 static inline void FUN_row(void* file, unsigned char* p, int x)
 {
@@ -238,8 +238,8 @@ void __stdcall SaveSurfacePcx(char* name, Bitmap_004caec0* bitmap)
 }
 
 Bitmap_004caec0* __stdcall AllocSurface(char* name, int width, int height);
-void __stdcall FreeSurface(void* p);
-void __cdecl GameFreeThunk(void* p);
+#include "surface.h"
+#include "object_pool.h"
 
 // FUNCTION: 0x4caf30
 Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
@@ -281,7 +281,7 @@ Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
     GameFreeThunk(pcx.palette);
     GameFreeThunk(pcx.data);
     if (!ok) {
-        FreeSurface(image);
+        FreeSurface((Surface *)image);
     }
     return image;
 }
@@ -329,7 +329,7 @@ struct FindData_004cb170 {
     char name[260];
 };
 
-extern char g_pathSepBackslash[];
+#include "../../link/globals.h"
 
 
 // FUNCTION: 0x4cb170
@@ -753,12 +753,9 @@ done:
     return 1;
 }
 
-extern LONG g_gfxBlitLockHeld;
-extern LONG g_gfxBlitLockOwner;
-extern HANDLE g_gfxBlitLockEvent;
 
-void __stdcall ReleaseDirectDraw(Game_004caec0* app);
-void UnlockAllScreens(void);
+#include "display.h"
+#include "surface.h"
 
 static inline LONG Lock()
 {
@@ -793,7 +790,7 @@ int __stdcall ExceptionFilter(int exception, int thread)
         app->cursorFrame = 0;
         UnlockAllScreens();
         Unlock(held);
-        ReleaseDirectDraw(app);
+        ReleaseDirectDraw((App_4b5980 *)app);
         if (app->hwnd != 0) {
             host_window_set_topmost(0);
         }

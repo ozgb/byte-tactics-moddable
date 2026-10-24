@@ -1,8 +1,7 @@
 #include <stddef.h>
 #include <vector>
 
-void* __cdecl GameAllocShared(int size);
-void* __cdecl GameReallocIgnoreTag(void* table, int size);
+#include "../debug/debug_lib.h"
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 
@@ -27,7 +26,7 @@ int ObjectPool::Grow(int newCapacity, int newSlotSize)
 {
     int result = 0;
     if (newCapacity > capacity) {
-        Elem_00470f00** table = (Elem_00470f00**)GameReallocIgnoreTag(slots, newCapacity * 4);
+        Elem_00470f00** table = (Elem_00470f00**)GameReallocIgnoreTag((int *)slots, newCapacity * 4);
         if (table != 0) {
             Elem_00470f00 block;
             block.p = GameAllocShared((newCapacity - capacity) * newSlotSize);

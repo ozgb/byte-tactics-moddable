@@ -4,7 +4,8 @@
 
 #include "../graphics/gaf_frame.h"
 
-GafFrame* __stdcall AllocFrame(const char* name, int width, int height);
+#include "../graphics/gaf.h"
+#include "explosions_420d20.h"
 
 // FUNCTION: 0x420d20
 GafFrame* BuildExplosionFrame(int size)

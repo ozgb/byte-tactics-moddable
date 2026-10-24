@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include "../../interfaces/host.h"
 
-char* __cdecl FindCommandLineSwitch(const char* option);
-void AbortProgram(void);
-void SetFpuFussy(void);
+#include "debug_lib.h"
+#include "debug_lib.h"
 
-extern unsigned char g_debugSupportInited;
+#include "../data/exe_only.h"
+#include "debug_lib_4da120.h"
 
 // FUNCTION: 0x4da1d0
 void __cdecl InitDebugSupport(unsigned int flags)

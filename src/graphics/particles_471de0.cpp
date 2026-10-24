@@ -1,5 +1,6 @@
 #include "win_types.h"
 #include "ta_types.h"
+#include "particles_471de0.h"
 
 inline ParticleLists::~ParticleLists()
 {
@@ -12,7 +13,7 @@ inline ParticleLists::~ParticleLists()
     }
 }
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x471de0
 void DestroyParticleLists()

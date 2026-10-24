@@ -1,5 +1,24 @@
 #ifndef GUI_H
 #define GUI_H
+struct Dialog;
+struct Dialog_4a1b40;
+struct Dialog_4a2be0;
+struct Dialog_4a2e40;
+struct Dialog_4a4660;
+struct Dialog_4a4980;
+struct Gadget;
+struct Rect;
+
+struct Dialog;
+struct Dialog_4a1ab0;
+struct Dialog_4a3eb0;
+struct Dialog_4a4620;
+struct Gadget;
+struct GameState_4a4930;
+struct Obj1_49fd20;
+struct Obj2_49fd20;
+struct Rect;
+struct Vec6_49fd20;
 
 #pragma pack(push, 1)
 
@@ -58,5 +77,75 @@ struct Gui {
 };
 
 #pragma pack(pop)
+
+int __stdcall HasGadgetNamed(Dialog* obj, char* name, int unused);
+void __stdcall ClearChanged(void*);
+void __stdcall ClearLayerChanged(Dialog* param);
+int __stdcall GetKeyboardInput(Dialog* obj);
+void __stdcall ClearFocus(Dialog*);
+int __stdcall IsFocused(int, int);
+bool __stdcall HasFocus(int);
+void __stdcall FUN_0049fd20(Obj1_49fd20*, Obj2_49fd20*, Vec6_49fd20*);
+void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
+int __stdcall FindAssocListBox(Gadget* entries, int index);
+int __stdcall FindAssocSlider(Gadget* entries, int index);
+int __stdcall FindAssocTextInput(Gadget* entries, int index);
+void __stdcall RedrawGadgetRect(Dialog_4a1ab0* obj, int index);
+void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2);
+void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4);
+void __stdcall ResetSliderGadget(Dialog_4a3eb0* obj, int i);
+void __stdcall ScheduleGadgetEndTick(Dialog_4a4620* obj, int i);
+void __stdcall ResetProgressBar(GameState_4a4930*, int index);
+void* __stdcall GetCharGlyph(unsigned char c);
+int __stdcall GetFontLineHeight();
+void __stdcall LayoutLabelText(Gui* obj, int index);
+void __stdcall DrawLabel(Gui* obj, int index);
+void __stdcall DrawGadgetGlyph(Gui* obj, int index);
+void __stdcall ClearAllStatus(Gui*);
+int __stdcall HandleButtonInput(Gui* obj, int index, int);
+int __stdcall HandleTextInput(Gui* obj, int index, int key);
+int __stdcall FindNextTextInput(Gadget* list, int index);
+int __stdcall LoadScreenGaf(Gui* obj, char* name);
+void __stdcall MoveEntryToFront(Gadget* entries, int index);
+void __stdcall FindButtonGaf(Gui* button, Gadget* obj);
+int __stdcall AddGadgetEntry(Gui* obj, unsigned char type);
+void __stdcall GetAnimsPath(Gui* obj, char* out);
+void __stdcall DecrementKnobPos(Gui* obj, int index);
+void __stdcall IncrementKnobPos(Gui* obj, int index);
+void __stdcall ListBoxSelectUp(Gui*, int index);
+void __stdcall ListBoxSelectDown(Gui*, int index);
+int __stdcall HandleGuiCommand(Gui* obj, int cmd);
+int __stdcall GetGuiContext(void);
+
+void __stdcall SetGadgetName(Dialog* obj, char* name, char* text);
+void __stdcall RunWhileScreenNamed(Dialog* menu, char* name);
+void __stdcall EnableKeyCommands(Dialog* p);
+void __stdcall DisableKeyCommands(Dialog* obj);
+void __stdcall MarkChanged(Dialog* obj);
+void __stdcall MarkLayerChanged(Dialog* obj);
+void __stdcall SetFontsPath(Dialog* obj, const char* dir);
+void __stdcall SetGuiPath(Dialog* obj, const char* dir);
+void __stdcall SetAnimsPath(Dialog* obj, const char* dir);
+int __stdcall IsCurrentGadgetNamed(Dialog* gui, char* name);
+void __stdcall GetGadgetRectByIndex(char*, int, Rect*);
+void __stdcall GetGadgetScreenRect(char*, int, Rect*);
+int __stdcall FindBackgroundCell(Gadget* entries, int index);
+int __stdcall IsPointInRect(Rect* r, int px, int py);
+void __stdcall DrawListBox(Dialog_4a1b40* obj, int index);
+void __stdcall SyncAssocGadgets(Dialog_4a2be0*, int);
+void __stdcall SetListBoxScrollByName(Dialog_4a2e40*, char*, int);
+void __stdcall DrawProgressBarGadget(Dialog_4a4660 * obj, int index);
+void __stdcall DrawHotspot(Dialog_4a4980* obj, int index);
+void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
+void __stdcall SetCurrentFont(Gui* p, int index);
+int __stdcall TruncateGadgetText(Gui* menu, int index);
+void __stdcall ClearGroupStatus(Gui*, int index);
+void __stdcall BeginTextEdit(Gui* obj, int index);
+void __stdcall SelectGadgetByName(Gui* menu, char* name);
+void __stdcall SelectGadgetByIndex(Gui* menu, int index);
+int __stdcall RenderLayer(Gui* menu, unsigned int flags);
+void __stdcall CloseTopScreen(Gui* gui);
+void __stdcall SetCurrentGuiContext(Gui* ctx);
+void __stdcall SetDefaultFont(int*, int);
 
 #endif

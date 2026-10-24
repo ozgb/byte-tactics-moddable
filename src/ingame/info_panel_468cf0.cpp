@@ -6,8 +6,8 @@ typedef unsigned char byte;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 struct Game;
-extern Game* g_game;
-unsigned long GetMilliseconds();
+#include "../../link/globals.h"
+#include "../graphics/display.h"
 int __stdcall FormatNetStats(int);
 int __stdcall DrawSelectedGoal(int,int);
 int __stdcall DrawMapDebugOverlay(int);
@@ -40,8 +40,7 @@ int __stdcall DrawSelectedUnitOrderOverlays(int,int);
 int __stdcall DrawScorePanel(int);
 int __stdcall DrawProjectiles(int);
 int __stdcall BlitMenuLayers(int,int,int);
-int GetFrameRate();
-int GetScreenHeight();
+#include "../graphics/display.h"
 int __stdcall PointInRect(int,int,int);
 int __stdcall GetGafFrame(int,int);
 int __stdcall DrawFrame(int,int,int,int);
@@ -49,12 +48,11 @@ int __stdcall DrawLine(int,int,int,int,int,int);
 int __stdcall FillRectangle(int,int,int);
 int __stdcall DrawRectangle(int,int,int);
 int __stdcall SetTextColors(int,int);
-int GetTextKeyColor();
+#include "../graphics/draw.h"
 int __stdcall SetFont(int);
-int GetFontHeight();
 int __stdcall GetTextWidth(int,int);
 int __stdcall DrawString(int,int,int,int,int);
-int __stdcall IsKeyDown(int);
+#include "../gui/keyboard.h"
 int HideSoftwareCursor();
 int ShowSoftwareCursor();
 int __stdcall Translate(int);
@@ -64,10 +62,6 @@ int __stdcall ResetClipRect(int);
 
 #include "../graphics/surface.h"
 
-void UpdateScreenShake(void);
-void BeginMouseScroll(void);
-void EndMouseScroll(void);
-void UpdateMouseScroll(void);
 
 #include "frame_timers.h"
 static inline void ProfileMark(FrameTimers *p, int i)
@@ -202,8 +196,6 @@ struct SideDef_00468cf0 {
 
 #include "../game/game.h"
 #pragma pack(pop)
-
-extern Game* g_game;
 
 static inline float Approach(float fcur, float ftarget)
 {

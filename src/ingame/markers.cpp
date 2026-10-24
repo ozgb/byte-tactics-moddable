@@ -101,12 +101,10 @@ struct MissionOrderTableEntry {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 typedef MissionOrderTableEntry* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-extern double TWO_PI;
-extern double ONE_EIGHTH;
 
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
@@ -118,8 +116,7 @@ void __stdcall DrawFrameBlended(void* dest, void* bmp, int x, int y);
 int __stdcall IsUnitVisibleToPlayer(Player* owner, Unit* unit);
 void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos,
                             int radius, int color, const char* text, int index);
-void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
-                            Pos* out, int unused);
+#include "markers.h"
 
 static int ScreenX(View* v, int x)
 {

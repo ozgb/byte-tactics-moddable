@@ -6,6 +6,7 @@
 #include "../../interfaces/seams.h"
 #include "../host/settings_io.h"
 #include "mission_conditions.h"
+#include "settings_campaign.h"
 
 class Mission;
 
@@ -31,35 +32,13 @@ struct Options_004326b0 {
 
 #include "../map/mission.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern char* g_saveBankName;
 extern char* g_summaryAccountName;
-extern char g_buildDateFormat[];
-extern char g_buildTimeFormat[];
-extern char g_maxUnitsKey[];
-extern char g_campaignKey[];
-extern char g_missionKey[];
-extern char g_mapKey[];
-extern char g_difficultyKey[];
-extern char g_sideKey[];
-extern char g_playersKey[];
-extern char g_gameTypeKey[];
-extern char g_thumbsKey[];
-extern char g_commanderDeathKey[];
-extern char g_locationKey[];
-extern char g_mappingKey[];
-extern char g_lineOfSightKey[];
-extern char g_lineOfSightTypeKey[];
-extern char g_betweenMissionsKey[];
-extern char g_descriptionKey[];
-extern char g_gameIdKey[];
-extern char g_gameTimeKey[];
-extern char g_radarImageBoxName[];
 
-void __stdcall ReadCameraPosition(HapiBank* file);
+#include "../ingame/camera.h"
 
-void __stdcall SaveSurface(void* surface, void* file);
-void __stdcall WriteCameraPosition(void* file);
+#include "../graphics/surface.h"
 
 // FUNCTION: 0x432520
 HapiBank* __stdcall OpenSummaryBank(char* name)
@@ -176,7 +155,7 @@ int __stdcall SaveGameFile(char* path, char* description, int gameId)
     (&file)->SetIntegerItem(g_gameTimeKey, g_game->ticks);
     if (g_game->mode_391f1 == 6) {
         (&file)->OpenNamedBox(g_radarImageBoxName);
-        SaveSurface(g_game->finalSurface, &file);
+        SaveSurface((Surface *)g_game->finalSurface, &file);
         WriteCameraPosition(&file);
         g_seams.players->SavePlayers(&file);
         g_seams.units->SaveUnits(&file);

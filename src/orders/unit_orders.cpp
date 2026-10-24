@@ -1,8 +1,8 @@
 struct Unit;
 
-void __stdcall CopyDwordIfNonNull(Unit** dest, Unit* const* src);
+#include "unit_orders_406c70.h"
 namespace std {
-inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
+inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }
 
 #include <vector>
@@ -68,16 +68,9 @@ struct Sub_403010 {
 
 #include "order.h"
 int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
-void __stdcall ReactToAttack(Unit*, Unit*, int);
 void __stdcall ScaleUnitWeights(int, unsigned int*, float, int);
 void __stdcall SetUnitLimits(int, unsigned int*, int, int);
-void __stdcall BuildGameInfo(char*, int*, int*, int*, int*);
-void __stdcall BuildEntryGuiName(char*, unsigned short, int);
-char* __stdcall BuildScrollItems1(char*, char*, int);
-char* __stdcall BuildScrollItems2(char*, int, int);
-int __stdcall GetBuilderCount(int);
-int __stdcall GetUnitCount(int, unsigned int);
-int __stdcall DirectionFromStep(int, int);
+#include "../ingame/control_panel.h"
 
 #include "../units/unit.h"
 inline int Unit::Ready() { return (flags & 0x10000000) && !(flags & 0x4000); }
@@ -91,54 +84,19 @@ inline int Order::Advance(int distance) {
 
 #include "../../interfaces/seams.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 void __stdcall RegisterOrderTypes(void* table, int id);
-void __stdcall AppendOrder(Unit* owner, Order* node);
-int __stdcall RandomInt(int range);
+#include "order_list.h"
+#include "../util/math_4b6c30.h"
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, void* flags);
-void __stdcall QueueUnitSpeech(Unit* unit, int kind, const char* text);
-void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit);
-int __stdcall WaitIfNotInBuildStance(Unit* unit, Order* order, int flags);
+#include "order_queue_4384a0.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
                            int a, int b, int c);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* id, void* pos,
                         int typeId, int amount);
 void __stdcall EmitNanoParticles(Vec3* from, Box* to, int count);
-void __stdcall MarkSelectionOrdersDirty(Unit* unit);
-void __stdcall EnsurePatrolReturnOrder(Unit* unit, Order* order);
-int __stdcall IssueAttackOrder(Unit* unit, Order* order, int param);
 
-void EnableAICommands();
-void RegisterAICommands();
-void FUN_00406f40();
-void ResetAIPlayers();
-void RegisterVtolOrders();
-void StepAllGafSequences();
-void ResetNetStats();
-void SumMessageStats();
-void InitCommands();
-int UpdatePlacementGhostValidity();
-void RefreshSelectionOrders();
-void DispatchOrdersPanelPageFlags();
-void ResetCameraState();
-void FindLocalCommander();
-void __cdecl ClearCameraFollowState();
-void ClampCameraPosition();
-void ClampCameraTarget();
-void UpdateScreenShake();
-void UpdateCameraFollow();
-void BeginMouseScroll();
-void EndMouseScroll();
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-int UsesDataArchives();
-void CreateGameObject();
-void InitMissionStatus();
-void SetUpEndMissionScreen();
 
 // FUNCTION: 0x401c20
 int __stdcall StopOrder(Unit* unit, Order* order, int unused)
@@ -365,8 +323,6 @@ static inline Point16 GridCell(Vec3 pos, Point16 size)
     return cell;
 }
 
-void StartScreenFade();
-void StepScreenFade();
 
 // FUNCTION: 0x402640
 int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
@@ -788,7 +744,7 @@ int __stdcall PatrolOrder(Unit* unit, Order* order, int flags)
         if(flags&0xe0) { order->state=1; return 6; }
         {
             Order* next=(Order*)g_seams.targeting->FindBestTargetIfFireAtWill(unit);
-            if(next && IssueAttackOrder(unit,next,0)) { order->flags=0; order->state=1; return 3; }
+            if(next && IssueAttackOrder(unit,(Unit *)next,0)) { order->flags=0; order->state=1; return 3; }
         }
         order->SetDeadlineTicks(RandomInt(30)+30);
         order->state=1; return 4;
@@ -854,36 +810,21 @@ static const float Zero_004fc920 = 0.0f;
 extern char DAT_004fc6e8[];
 extern const float DAT_004fc930, DAT_004fc934, DAT_004fc938, DAT_004fc93c;
 
-unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size);
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
-void __stdcall StopBuildingScript(Unit* unit, Order* order);
-int __stdcall WaitIfCobBusy(Unit* unit, Order* order, int flags);
-int __stdcall ComputeReclaimDamagePulse(Unit* unit, Unit* target, int flags);
-int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param);
+#include "order_queue_4384a0.h"
 void __stdcall EmitNanoParticles(Vec3* from, Vec3* to, int count);
 void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
 void __stdcall EmitReverseNanoParticles(Vec3* from, Vec3* to, int count);
-void __stdcall ReclaimFeature(Unit* unit, Vec3* pos);
-Cell* __stdcall GetOriginCellAtPosition(Vec3* pos);
-unsigned short __stdcall GetCellFeature(Cell* cell);
-Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
-void __stdcall RemoveFeature(void* target, int flag);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount,
                            Vec3** metal, float* metalAmount);
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
 void __stdcall EmitTeleportParticles(Vec3* from, Vec3* to, int count, int param);
-int __stdcall IsUnitCommander(Unit*);
-void __stdcall AlignUnitToGround(Unit*);
 int __stdcall FindLandingPad(Unit*, int);
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
-void __stdcall DetonateUnitWeapon(Unit*, int);
 void WriteScreenshot(char*, char*, int, int, int, int);
-void DrawTextClipped(void*, char*, int, int, int, int);
 int ScanDirectory(char*, char*, char*, int, int, int);
-int CheckDirectXVersion(int, int, int, int, int);
 
 // FUNCTION: 0x4034a0
 int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
@@ -1124,17 +1065,6 @@ float PadConstant_404ad0(float x)
     return x * -0.5f;
 }
 
-void ScheduleFadeTick();
-int IsFadeDone();
-void StepPaletteFade();
-void FillEndGameStatistics();
-int AreStatBarsComplete();
-int ShouldShowNextMission();
-void OpenEndMissionScreen();
-void EnableEndMissionButtons();
-void ShowEndMissionScreen();
-void OpenCdCheckDialog();
-int DrawEndGameFrame();
 
 // FUNCTION: 0x404730
 int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
@@ -1208,8 +1138,6 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     }
     return 7;
 }
-
-void RunEndGameState();
 
 // FUNCTION: 0x405300
 int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
@@ -1359,7 +1287,7 @@ int __stdcall StandbyOrder(Unit* unit,Order* order,int flags)
     case 1:
         {
             Unit* next=g_seams.targeting->FindBestTargetIfFireAtWill(unit);
-            if(next && IssueAttackOrder(unit,(Order*)next,0)) return 5;
+            if(next && IssueAttackOrder(unit,(Unit *)(Order*)next,0)) return 5;
         }
         order->flags|=0x10000;
         order->SetDeadlineTicks(RandomInt(30)+30); return 2;
@@ -1428,8 +1356,6 @@ static inline int Contains(unsigned int* bits, unsigned short index) { return bi
 
 static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
 
-void FreeMemoryCache();
-
 // FUNCTION: 0x406780
 int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
 {
@@ -1443,7 +1369,7 @@ int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
                 QueueUnitSpeech(unit, 7, "Unit is too large to transport"); return 8;
             }
             order->AnnounceStatusIfFlagged("Loading unit"); return 1;
-        case 1: return WaitIfCobBusy(unit, order, 8);
+        case 1: return WaitIfCobBusy((char *)unit, (char *)order, 8);
         case 2:
             {
             int id = target->id;
@@ -1452,7 +1378,7 @@ int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
             ++order->attempts;
             order->SetDeadlineTicks(15); return 1;
             }
-        case 3: return WaitIfCobBusy(unit, order, 8);
+        case 3: return WaitIfCobBusy((char *)unit, (char *)order, 8);
         case 4:
             if (target->carrier) return 5;
             if (order->attempts >= 3) return 9;
@@ -1485,7 +1411,7 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
         ++order->attempts;
         order->SetDeadlineTicks(15);
         return 1;
-    case 1: return WaitIfCobBusy(unit,order,8);
+    case 1: return WaitIfCobBusy((char *)unit,(char *)order,8);
     case 2:
         if (order->target->carrier!=unit) { QueueUnitSpeech(unit,13,0); return 5; }
         if (order->attempts>=3) return 9;
@@ -1502,8 +1428,6 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
 static inline Vec3 Add(const Vec3& a,const Vec3& b) { Vec3 r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
 static inline Vec3 Sub(const Vec3& a,const Vec3& b) { Vec3 r; r.x=a.x-b.x; r.y=a.y-b.y; r.z=a.z-b.z; return r; }
 
-void InitExplosions();
-void FreeExplosions();
 
 // FUNCTION: 0x406bf0
 void RegisterGroundOrders()
@@ -1639,84 +1563,37 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-int __stdcall StopOrder(Unit* unit, Order* order, int flags);
-int __stdcall MakeSelectableOrder(Unit* unit, Order* order, int flags);
-int __stdcall WaitOrder(Unit* unit, Order* order, int flags);
-int __stdcall AttackUTypeOrder(Unit* unit, Order* order, int flags);
-int __stdcall WaitForAttackOrder(Unit* unit, Order* order, int flags);
-int __stdcall SelfDestructOrder(Unit* unit, Order* order, int flags);
-int __stdcall AttackNoMoveOrder(Unit* unit, Order* order, int flags);
-int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags);
-int __stdcall SelfRepairOrder(Unit* unit, Order* order, int flags);
-int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags);
-int __stdcall BuildWeaponOrder(Unit* unit, Order* order, int flags);
-int __stdcall ParalyzeOrder(Unit* unit, Order* order, int flags);
-int __stdcall GetBuiltOrder(Unit* unit, Order* order, int flags);
-int __stdcall BeCarriedOrder(Unit* unit, Order* order, int flags);
-int __stdcall ActivateOrder(Unit* unit, Order* order, int flags);
-int __stdcall DeactivateOrder(Unit* unit, Order* order, int flags);
-int __stdcall CloakOnOrder(Unit* unit, Order* order, int flags);
-int __stdcall CloakOffOrder(Unit* unit, Order* order, int flags);
-int __stdcall StandingMoveOrder(Unit* unit, Order* order, int flags);
-int __stdcall StandingFireOrder(Unit* unit, Order* order, int flags);
-int __stdcall QMoveQPatrolOrder(Unit* unit, Order* order, int flags);
-int __stdcall AttackSpecialOrder(Unit* unit, Order* order, int flags);
-int __stdcall MoveGroundOrder(Unit* unit, Order* order, int flags);
-int __stdcall AttackKamikazeOrder(Unit* unit, Order* order, int flags);
-int __stdcall PatrolOrder(Unit* unit, Order* order, int flags);
-int __stdcall AttackChaseOrder(Unit* unit, Order* order, int flags);
-int __stdcall SuppressOrder(Unit* unit, Order* order, int flags);
-int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags);
-int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags);
-int __stdcall CaptureOrder(Unit* unit, Order* order, int flags);
-int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, int flags);
-int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags);
-int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags);
-int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags);
-int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int flags);
-int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags);
-int __stdcall StandbyOrder(Unit* unit, Order* order, int flags);
-int __stdcall StandbyMineOrder(Unit* unit, Order* order, int flags);
-int __stdcall ParkOrder(Unit* unit, Order* order, int flags);
-int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags);
+#include "unit_orders.h"
+#include "unit_orders_403a20.h"
+#include "unit_orders_404ad0.h"
+#include "unit_orders_404db0.h"
+#include "unit_orders_405980.h"
+#include "unit_orders_406300.h"
 int __stdcall GroundPickupOrder(Unit* unit, Order* order, int flags);
-int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags);
-int __stdcall TeleportOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolStandbyOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolMoveOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolSeekGuardOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags);
-int __stdcall AirStrikeOrder(Unit* unit, Order* order, int flags);
-int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags);
-int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags);
-int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolEvadeOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolMobileBuildOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolHelpBuildOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolGetRepairedOrder(Unit* unit, Order* order, int flags);
-int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, int flags);
-int __stdcall ReadyOrder(Unit* unit, Order* order, int flags);
-void __stdcall DrawBuildFootprint(void* surface, View* view, Order* order, Pos* out, int flag);
-void __stdcall DrawPathAnim(void* surface, View* view, Order* order, Pos* out, int flag);
-void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order, Pos* out, int flag);
+#include "unit_orders_406aa0.h"
+#include "vtol_orders.h"
+#include "vtol_orders_40fbe0.h"
+#include "vtol_orders_4103e0.h"
+#include "vtol_orders_410850.h"
+#include "vtol_orders_410e70.h"
+#include "vtol_orders_4118e0.h"
+#include "vtol_orders_411f50.h"
+#include "vtol_orders_412710.h"
+#include "vtol_orders_412d40.h"
+#include "vtol_orders_414380.h"
+#include "vtol_orders_414770.h"
+#include "vtol_orders_414a80.h"
+#include "vtol_orders_4152f0.h"
+#include "../ingame/markers.h"
 
 // GLOBAL: 0x4fc490
 extern const UnitOrderType g_unitOrders[23] = {
     {"Stopping", StopOrder, 0, 0, 0x13, 0, "Stop"},
     {"Attacking", AttackNoMoveOrder, DrawWeaponCoverage, 8, 0x28001, 0, "Attack_NoMove"},
-    {"Activate", ActivateOrder, 0, 0, 0x1006013, 0, "Activate"},
-    {"Deactivate", DeactivateOrder, 0, 0, 0x1006013, 0, "Deactivate"},
-    {"Cloaking", CloakOnOrder, 0, 0, 0x1006013, 0, "Cloak_On"},
-    {"Decloaking", CloakOffOrder, 0, 0, 0x1006013, 0, "Cloak_Off"},
+    {"Activate", (int (__stdcall *)(Unit *, Order *, int))ActivateOrder, 0, 0, 0x1006013, 0, "Activate"},
+    {"Deactivate", (int (__stdcall *)(Unit *, Order *, int))DeactivateOrder, 0, 0, 0x1006013, 0, "Deactivate"},
+    {"Cloaking", (int (__stdcall *)(Unit *, Order *, int))CloakOnOrder, 0, 0, 0x1006013, 0, "Cloak_On"},
+    {"Decloaking", (int (__stdcall *)(Unit *, Order *, int))CloakOffOrder, 0, 0, 0x1006013, 0, "Cloak_Off"},
     {"Acknowledged", StandingMoveOrder, 0, 0, 0x1006013, 0, "Standing_MoveOrder"},
     {"Acknowledged", StandingFireOrder, 0, 0, 0x1006013, 0, "Standing_FireOrder"},
     {"Nanolathing", BuildingBuildOrder, 0, 0, 0x10010c13, 0, "BuildingBuild"},
@@ -1724,16 +1601,16 @@ extern const UnitOrderType g_unitOrders[23] = {
     {"SELF DESTRUCT ENGAGED", SelfDestructOrder, 0, 0, 0x4004013, 0, "SelfDestruct"},
     {"SELF DESTRUCT ENGAGED", SelfDestructOrder, 0, 0, 0x13, 0, "SelfDestructFG"},
     {"Paralyzed", ParalyzeOrder, 0, 0, 0x2413, 0, "Paralyze"},
-    {"Under construction", GetBuiltOrder, 0, 0, 0x22413, 0, "GetBuilt"},
+    {"Under construction", (int (__stdcall *)(Unit *, Order *, int))GetBuiltOrder, 0, 0, 0x22413, 0, "GetBuilt"},
     {"Being transported", BeCarriedOrder, 0, 0, 0x2413, 0, "BeCarried"},
     {"Unit is available", MakeSelectableOrder, 0, 0, 0x413, 0, "MakeSelectable"},
     {"Waiting", WaitOrder, 0, 0, 0x413, 0, "Wait"},
-    {"Waiting for attack", WaitForAttackOrder, 0, 0, 0x20413, 0, "WaitForAttack"},
+    {"Waiting for attack", (int (__stdcall *)(Unit *, Order *, int))WaitForAttackOrder, 0, 0, 0x20413, 0, "WaitForAttack"},
     {"Attacking", AttackUTypeOrder, 0, 0, 0x413, 0, "AttackUType"},
     {"Ready", GuardNoMoveOrder, 0, 0, 0x2013, 0, "Guard_NoMove"},
     {"Repairing", SelfRepairOrder, 0, 0, 0x20413, 1, "SelfRepair"},
-    {"Ready with orders", QMoveQPatrolOrder, DrawPathAnim, 2, 0x4000e, 0, "QMove"},
-    {"Ready with orders", QMoveQPatrolOrder, DrawPathAnim, 2, 0x40007, 0, "QPatrol"},
+    {"Ready with orders", (int (__stdcall *)(Unit *, Order *, int))QMoveQPatrolOrder, DrawPathAnim, 2, 0x4000e, 0, "QMove"},
+    {"Ready with orders", (int (__stdcall *)(Unit *, Order *, int))QMoveQPatrolOrder, DrawPathAnim, 2, 0x40007, 0, "QPatrol"},
 };
 
 // GLOBAL: 0x4fc6e8
@@ -1742,9 +1619,9 @@ extern const UnitOrderType g_groundOrders[22] = {
     {"Standby", StandbyMineOrder, 0, 0x10, 0x200000f, 1, "Standby_Mine"},
     {"Moving", MoveGroundOrder, DrawPathAnim, 0x12, 0x4020e, 0, "Move_Ground"},
     {"Guarding", FollowGroundOrder, DrawPathAnim, 0x12, 0x20005, 0, "Follow_Ground"},
-    {"Suppressing fire", SuppressOrder, DrawWeaponCoverage, 8, 0x41001, 0, "Suppress"},
-    {"Attacking", AttackChaseOrder, DrawWeaponCoverage, 8, 0x28001, 0, "Attack_Chase"},
-    {"Attacking", AttackKamikazeOrder, DrawWeaponCoverage, 8, 0x60001, 0, "Attack_Kamikaze"},
+    {"Suppressing fire", (int (__stdcall *)(Unit *, Order *, int))SuppressOrder, DrawWeaponCoverage, 8, 0x41001, 0, "Suppress"},
+    {"Attacking", (int (__stdcall *)(Unit *, Order *, int))AttackChaseOrder, DrawWeaponCoverage, 8, 0x28001, 0, "Attack_Chase"},
+    {"Attacking", (int (__stdcall *)(Unit *, Order *, int))AttackKamikazeOrder, DrawWeaponCoverage, 8, 0x60001, 0, "Attack_Kamikaze"},
     {"Annihilating", AttackSpecialOrder, DrawWeaponCoverage, 8, 0x68001, 0, "AttackSpecial"},
     {"Parking", ParkOrder, 0, 0, 0xe, 0, "Park"},
     {"Patrolling", PatrolOrder, DrawPathAnim, 0x12, 0x41207, 0, "Patrol"},
@@ -1755,10 +1632,10 @@ extern const UnitOrderType g_groundOrders[22] = {
     {"Nanolathing", HelpBuildOrder, DrawWeaponCoverage, 0x18, 0x10020806, 0, "HelpBuild"},
     {"Repair patrol", RepairPatrolOrder, DrawPathAnim, 0x12, 0x41207, 0, "RepairPatrol"},
     {"Repairing", RepairUnitOrder, DrawPathAnim, 0x12, 0x10020006, 0, "RepairUnit"},
-    {"Capturing", CaptureOrder, DrawWeaponCoverage, 8, 0x20004, 0, "Capture"},
+    {"Capturing", (int (__stdcall *)(Unit *, Order *, int))CaptureOrder, DrawWeaponCoverage, 8, 0x20004, 0, "Capture"},
     {"Resurrecting", ResurrectOrder, DrawPathAnim, 0x12, 0x2000b, 0, "Resurrect"},
     {"Reclaiming", ReclaimOrder, DrawPathAnim, 0x12, 0x1008000b, 0, "Reclaim"},
-    {"Reclaiming", ReclaimUnitOrder, DrawPathAnim, 0x12, 0x1002000b, 0, "ReclaimUnit"},
+    {"Reclaiming", (int (__stdcall *)(Unit *, Order *, int))ReclaimUnitOrder, DrawPathAnim, 0x12, 0x1002000b, 0, "ReclaimUnit"},
     {"Repairing", RepairUnitNoMoveOrder, DrawWeaponCoverage, 0x18, 0x20006, 0, "RepairUnitNoMove"},
 };
 
@@ -1771,16 +1648,16 @@ extern const UnitOrderType g_vtolOrders[22] = {
     {"Unloading", VtolUnloadOrder, DrawWeaponCoverage, 8, 0x40009, 0, "VTOL_Unload"},
     {"Guarding", VtolFollowOrder, DrawPathAnim, 2, 0x20005, 0, "VTOL_Follow"},
     {"Patrolling", VtolPatrolOrder, DrawPathAnim, 2, 0x41207, 0, "VTOL_Patrol"},
-    {"Airstrike", AirStrikeOrder, DrawWeaponCoverage, 8, 0x60002, 0, "AirStrike"},
+    {"Airstrike", (int (__stdcall *)(Unit *, Order *, int))AirStrikeOrder, DrawWeaponCoverage, 8, 0x60002, 0, "AirStrike"},
     {"Engaging target", AirToAirOrder, DrawWeaponCoverage, 8, 0x20001, 0, "AirToAir"},
     {"Engaging target", AirToGroundOrder, DrawWeaponCoverage, 8, 0x20001, 0, "AirToGround"},
     {"Engaging target", AirToGroundHoverOrder, DrawWeaponCoverage, 8, 0x20001, 0, "AirToGroundHover"},
     {"Nanolathing", VtolMobileBuildOrder, DrawBuildFootprint, 3, 0x10050800, 0, "VTOL_MobileBuild"},
     {"Nanolathing", VtolHelpBuildOrder, DrawWeaponCoverage, 8, 0x10020806, 0, "VTOL_HelpBuild"},
-    {"Repair patrol", VtolRepairPatrolOrder, DrawPathAnim, 2, 0x41207, 0, "VTOL_RepairPatrol"},
+    {"Repair patrol", (int (__stdcall *)(Unit *, Order *, int))VtolRepairPatrolOrder, DrawPathAnim, 2, 0x41207, 0, "VTOL_RepairPatrol"},
     {"Repairing", VtolRepairUnitOrder, DrawPathAnim, 2, 0x10020006, 0, "VTOL_RepairUnit"},
     {"Reclaiming", VtolReclaimOrder, DrawPathAnim, 2, 0x1008000b, 0, "VTOL_Reclaim"},
-    {"Reclaiming", VtolReclaimUnitOrder, DrawPathAnim, 2, 0x1002000b, 0, "VTOL_ReclaimUnit"},
+    {"Reclaiming", (int (__stdcall *)(Unit *, Order *, int))VtolReclaimUnitOrder, DrawPathAnim, 2, 0x1002000b, 0, "VTOL_ReclaimUnit"},
     {"Evading", VtolEvadeOrder, 0, 0, 0x13, 0, "VTOL_Evade"},
     {"Seeking to attack", VtolSeekAttackOrder, 0, 0, 0x60013, 0, "VTOL_SeekAttack"},
     {"Seeking to guard", VtolSeekGuardOrder, 0, 0, 0x60013, 0, "VTOL_SeekGuard"},
@@ -1790,7 +1667,7 @@ extern const UnitOrderType g_vtolOrders[22] = {
 
 // GLOBAL: 0x4fd288
 extern const UnitOrderType g_readyOrder[1] = {
-    {"Ready", ReadyOrder, 0, 0, 0xf, 0, ""},
+    {"Ready", (int (__stdcall *)(Unit *, Order *, int))ReadyOrder, 0, 0, 0xf, 0, ""},
 };
 
 extern const int PadAlign_004fc6d0 = 0;

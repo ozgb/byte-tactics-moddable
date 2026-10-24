@@ -4,6 +4,7 @@
 #include "player_info.h"
 
 #include "../game/game.h"
+#include "net_game_450530.h"
 
 struct Msg_00450530 {
     unsigned char type;
@@ -13,10 +14,9 @@ struct Msg_00450530 {
 };
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-int __stdcall GetSlotDpid(unsigned char index);
-int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
+#include "net_game.h"
 unsigned char FindHostSlot();
 
 static inline int IsPlaying_00450530(Player* player)
@@ -95,7 +95,7 @@ void SendLobbySyncRequests()
                 msg.arg = -1;
                 if (FindHostSlot() == 10)
                     continue;
-                SendPacketToPlayer(FindFrom_00450530(), FindTo_00450530(), &msg, 10);
+                SendPacketToPlayer(FindFrom_00450530(), FindTo_00450530(), (unsigned char *)&msg, 10);
             }
             else if (IsPlaying_00450530(p) && p->type == 2) {
                 Player* q = &g_game->players[FindHostSlot()];
@@ -109,7 +109,7 @@ void SendLobbySyncRequests()
                 msg.arg = g_game->players[g_game->localPlayer].id;
                 if (FindHostSlot() == 10)
                     continue;
-                SendPacketToPlayer(FindFrom_00450530(), FindToB_00450530(), &msg, 10);
+                SendPacketToPlayer(FindFrom_00450530(), FindToB_00450530(), (unsigned char *)&msg, 10);
             }
             else if (p->type == 3) {
                 msg.type = 0x21;
@@ -120,7 +120,7 @@ void SendLobbySyncRequests()
                     continue;
                 if (i == 9)
                     p->lobbyDataSynced = p->lobbyDataSynced;
-                SendPacketToPlayer(FindFrom_00450530(), FindTo_00450530(), &msg, 10);
+                SendPacketToPlayer(FindFrom_00450530(), FindTo_00450530(), (unsigned char *)&msg, 10);
             }
         }
     }

@@ -29,14 +29,10 @@ public:
 // GLOBAL: 0x511de8
 extern Game* g_game;
 
-extern char g_cameraAccount[];
-extern char g_cameraZPosition[];
-extern char g_cameraXPosition[];
+#include "../../link/globals.h"
 
-extern int g_commandLineUnusedFlagL;
-extern int g_cdBypassDriveScan;
 
-void ClampCameraPosition(void);
+#include "control_panel.h"
 
 static inline void SetPos(int x, int y)
 {

@@ -17,7 +17,7 @@ struct Pos_004739b0 {
 
 #include "../game/game.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 static inline int Identity_00473a00(int v) { return v; }
 

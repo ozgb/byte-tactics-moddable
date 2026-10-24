@@ -45,7 +45,7 @@ struct Unit_0047d820 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x47d820
 int __stdcall GetFootprintHeight(Unit_0047d820* unit, Point16 cell)

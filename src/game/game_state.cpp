@@ -7,6 +7,7 @@
 #include "../state/game_rand.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/host.h"
+#include "game_state.h"
 
 struct Display_00491a70;
 struct Src_004ab400;
@@ -28,7 +29,7 @@ extern Game* g_game;
 extern const char g_offscreenSurfaceName[];
 
 int __stdcall AllocSurface(const char* name, int width, int height);
-void __stdcall SetRestoreSurface(int surface);
+#include "../graphics/surface.h"
 
 // FUNCTION: 0x490ac0
 void CreateOffscreenSurface()
@@ -37,8 +38,7 @@ void CreateOffscreenSurface()
     SetRestoreSurface((int)g_game->screen);
 }
 
-void __cdecl GameFreeThunk(int* p);
-void RestoreScreen();
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x490b00
 void FreeOffscreenSurface()
@@ -51,15 +51,10 @@ void FreeOffscreenSurface()
 
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 void __cdecl LeaveNetGameCallback(int param);
-void __cdecl HandleBattleQuitPrompt(int param);
-void InitFrame();
-void ReturnToMainMenuFrame();
-void MenuFrame();
-void PreBattleFrame();
-void CampaignSetupFrame();
-void LoadingScreenFrame();
-void BattleFrame();
-void EndGameFrame();
+#include "../frontend/options.h"
+#include "main_loop.h"
+#include "game_load.h"
+#include "../ingame/build_placement.h"
 
 // FUNCTION: 0x490b30
 void __stdcall SetGameMode(int param)
@@ -103,7 +98,7 @@ void __stdcall SetGameMode(int param)
 
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 
 void __cdecl UpdateWind()
 {
@@ -147,7 +142,7 @@ void ResetGameSpeed()
 
 
 char* __stdcall Translate(char* text);
-int GetLocalDpid();
+#include "../network/net_game.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall AddMessage(char* text, int key, int value, int last);
 
@@ -205,7 +200,7 @@ struct CdLists_490f80 {
 
 extern CdLists_490f80 g_cdListsDiscEntries;
 
-int __stdcall ReadGameRegistryValue(const char* key, void* buf, unsigned int* size);
+#include "settings.h"
 
 // FUNCTION: 0x490f40
 void LoadCdLists(void)
@@ -231,8 +226,6 @@ public:
     int StopCdAudio();
     void EnableCdAudio(int on);
 };
-
-void __stdcall WriteGameRegistryValue(void* key, void* buf, int value);
 
 // FUNCTION: 0x490f80
 void SaveCdLists()
@@ -316,40 +309,26 @@ extern const char g_hattFont12Name[];
 extern const char g_hattFont11Name[];
 extern const char g_unitLimitKey[];
 
-int GetScreenWidth();
-int GetScreenHeight();
-void __stdcall SetPageFlipping(int enable);
-void LoadGameResources();
+#include "../graphics/display.h"
+#include "data_files.h"
 void InitSound();
-void ResetFrontendState();
+#include "../frontend/frontend.h"
 void __stdcall InitPacketTables(void* param_1);
-void LoadGameFonts();
-void LoadDefaultPalette();
-void LoadAllSound();
-void __stdcall LoadAlphaTable(void* palette);
-void __stdcall LoadShadeTable(void* palette);
-void __stdcall LoadLightTable(void* palette);
+#include "../sound/sound_types.h"
+#include "../graphics/palette_tables.h"
 void __stdcall MakeGrayTable(void* palette);
 void __stdcall MakeBlueTable(void* palette);
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-void LoadSettings();
-void ApplyBrightnessAndVolume();
-void LoadSideData();
-void LoadLogos();
+#include "../debug/debug_lib.h"
+#include "settings.h"
+#include "side_data.h"
 void __stdcall SetBrightness(float brightness);
-void __stdcall SetCurrentGuiContext(void* ctx);
-void __stdcall SetGuiPath(void* obj, const char* name);
-void __stdcall SetAnimsPath(void* obj, const char* name);
-void __stdcall SetFontsPath(void* obj, const char* name);
-void __stdcall SetDefaultFont(void* param_1, int param_2);
 void* __stdcall GetGafFrame(void* gaf, int frame);
 void __stdcall InitCursorFrames(void* p, void* value);
 void __stdcall LoadGafFile(void* obj, const char* name);
 void __stdcall LoadGafIntoSlot(void* obj, const char* name, int index);
-void __stdcall SetTextKeyColor(int value);
+#include "../graphics/draw.h"
 void __stdcall SetFont(int font);
-void ClearPictureCache();
-int __stdcall GetPreferenceInt(const char* name, int defaultValue);
+#include "main.h"
 
 // FUNCTION: 0x491200
 void InitGame()
@@ -410,10 +389,10 @@ void InitGame()
     LoadLogos();
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
     SetCurrentGuiContext(&g_game->gui);
-    SetGuiPath(&g_game->gui, g_guisDirName);
-    SetAnimsPath(&g_game->gui, g_animsDirName);
-    SetFontsPath(&g_game->gui, g_fontsDirName);
-    SetDefaultFont(&g_game->gui, g_game->fontComix);
+    SetGuiPath((Dialog *)&g_game->gui, g_guisDirName);
+    SetAnimsPath((Dialog *)&g_game->gui, g_animsDirName);
+    SetFontsPath((Dialog *)&g_game->gui, g_fontsDirName);
+    SetDefaultFont((int *)&g_game->gui, g_game->fontComix);
     InitCursorFrames(&g_game->gui, GetGafFrame(g_game->cursorNormal, 0));
     LoadGafFile(&g_game->gui, g_commonGuiName);
     LoadGafIntoSlot(&g_game->gui, g_hattFont12Name, 0);
@@ -437,7 +416,7 @@ void InitGame()
     }
     ClearPictureCache();
     g_game->gui.clearQuickKeys = 1;
-    int limit = GetPreferenceInt(g_unitLimitKey, 0xfa);
+    int limit = GetPreferenceInt((char *)g_unitLimitKey, 0xfa);
     if (limit > 500)
         limit = 500;
     else if (limit < 20)
@@ -449,15 +428,9 @@ struct Obj_004aeda0;
 struct Obj_004aef80;
 struct Class_00452370;
 
-void FreePictureCache();
 void __stdcall FreeGafSlot(Obj_004aeda0* obj, int i);
 void __stdcall FreeCommonGuiGaf(Obj_004aef80* obj);
-void FreeLogos();
-void FreeSideFonts();
-void FreeSounds();
-void FreeGameFonts();
 void ShutdownSound();
-void FreeAnimFiles();
 void __stdcall ReleasePacketData(Class_00452370* obj);
 
 // FUNCTION: 0x4916a0
@@ -495,13 +468,11 @@ extern unsigned int g_scorePanelSlidePos;
 extern unsigned int g_cdActivityRingWriteIdx;
 extern int g_cdActivitySampleRing[30];
 
-void ResetChatHudIndices();
-void LoadLightBar();
+#include "../network/packets.h"
+#include "../ingame/info_panel.h"
 void ResetSpeech();
-void LoadTextureGafs();
-void CreateParticleLists();
-void ResetCameraState();
-void InitCommands();
+#include "../graphics/particles.h"
+#include "../ingame/control_panel.h"
 unsigned int GetTicks();
 
 // FUNCTION: 0x4917d0
@@ -574,7 +545,7 @@ struct Display_00491a70 {
     HWND hwnd;
 };
 
-void __stdcall SetResolution(int x, int y);
+#include "../graphics/display.h"
 void __stdcall SetOffscreenSurface(int surface);
 
 // FUNCTION: 0x491a70
@@ -595,10 +566,9 @@ void Force640x480Surfaces()
     }
 }
 
-void __cdecl CollectEndGameStats();
-void DestroyParticleLists();
-void FreeTextureGafs();
-void CloseNetSession();
+#include "../frontend/endgame_41dc20.h"
+#include "../graphics/particles_471de0.h"
+#include "../network/net_game.h"
 
 // FUNCTION: 0x491b60
 void ShutdownIngameSystems()
@@ -633,9 +603,6 @@ void ShutdownIngameSystems()
     }
 }
 
-void BlankScreen();
-void RemoveLocalPlayers();
-void __stdcall QuitApp(const char*);
 
 // FUNCTION: 0x491c60
 void ShutdownIngameAndQuit()
@@ -659,8 +626,7 @@ void __stdcall SetCursorMode(int n)
     }
 }
 
-int __cdecl UpdatePlacementGhostValidity(void);
-unsigned short __cdecl PickUnitUnderCursor(void);
+#include "../ingame/selection.h"
 int __stdcall ResolveCursorModeForSelection(unsigned char mode);
 
 // FUNCTION: 0x491cc0
@@ -687,8 +653,7 @@ void __stdcall UpdateBattleHoverMode(int unused)
     }
 }
 
-int __stdcall IsScreenNamed(Gui* queue, char* name);
-void __stdcall CloseTopScreen(Gui* queue);
+#include "../gui/dialogs.h"
 
 // FUNCTION: 0x491d70
 int __stdcall PopUntilNamedLayout(int force)

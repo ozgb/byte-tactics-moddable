@@ -5,7 +5,7 @@
 
 #include "../../../interfaces/host.h"
 
-HWND host_win32_window(void);
+#include "window.h"
 extern const GUID DAT_004fcfb8;
 
 static char g_onlineDllPath[261];

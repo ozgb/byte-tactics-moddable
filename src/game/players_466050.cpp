@@ -4,6 +4,7 @@
 #include "../network/player_info.h"
 
 #include "../network/player.h"
+#include "players_466050.h"
 
 struct Game_00466050 {
     char unknown_0[0x1b63];

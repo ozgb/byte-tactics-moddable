@@ -2,6 +2,7 @@
 #include "win_types.h"
 #include <math.h>
 #include "../util/vec3.h"
+#include "unit_orders_403a20.h"
 
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& other)
 {
@@ -21,15 +22,15 @@ struct Unit;
 #include "order.h"
 #include "../game/game.h"
 #pragma pack(pop)
-extern Game* g_game;
+#include "../../link/globals.h"
 static inline UnitDef* Definitions() { return g_game->defs; }
 union Fixed { int value; struct { unsigned short fraction; short whole; }; };
-void __stdcall QueueUnitSpeech(Unit*, int, const char*);
-void __stdcall MarkSelectionOrdersDirty(Unit*);
+#include "../sound/sound.h"
+#include "../ingame/control_panel.h"
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
 short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall StartBuildingScript(Unit*, Order*, short);
-int __stdcall WaitIfNotInBuildStance(Unit*, Order*, int);
+#include "order_queue_4384a0.h"
 void __stdcall EmitNanoParticles(Vec3*, Vec3*, int);
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {

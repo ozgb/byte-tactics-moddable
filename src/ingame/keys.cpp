@@ -25,8 +25,6 @@ struct Flags_00495e90_37f2f {
 
 #include "../network/player_info.h"
 
-int StepTowards(int, int, int);
-
 #include "../network/player.h"
 
 struct FindData_00495930 {
@@ -68,63 +66,40 @@ struct SrcHolder_00495a30 {
 #include "../orders/mission_type.h"
 #include "../state/sim_globals.h"
 
-extern Game* g_game;
-extern char g_pathSepBackslash[];
+#include "../../link/globals.h"
 
 int __stdcall FindGadgetIndexBySubstring(int value, const char* name);
-void __stdcall ClearGroupStatus(Gui* gui, int handle);
 #include "../files/files_api.h"
-void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name, const char* ext);
-GafFrame* __stdcall AllocFrame(const char* name, int width, int height);
-void __cdecl SetOutOfMemoryHandler(int param);
-void __stdcall InstallOutOfMemoryHandler();
-void __stdcall SurfaceFromFrame(Surface* dst, void* src);
+#include "keys.h"
+#include "../graphics/gaf.h"
+#include "../debug/debug_lib.h"
+#include "../game/main.h"
 void* __stdcall GetDisplay();
 void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src);
-void __stdcall SetCameraPosition(int x, int y, int z);
-void __stdcall CollectVisibleUnitIds();
-void __stdcall DrawBattleFrame(int param_1, int param_2);
+#include "control_panel.h"
+#include "selection.h"
+#include "info_panel_468cf0.h"
 void __stdcall DrawFrame(Surface* surf, GafFrame* pal, int x, int y);
-void __stdcall ClearFrame(void* b, int color);
-void __stdcall RecalculateLineOfSight(int param);
-void __cdecl GameFreeThunk(void* b);
-int PopKey(void);
-int __stdcall IsKeyDown(int key);
-void ClearSelection(void);
-void __stdcall PopUntilNamedLayout(int param);
-void __stdcall CloseTopScreen(Gui* gui);
-int __stdcall IsScreenNamed(Gui* gui, char* name);
-void SaveSettings(void);
+#include "../map/line_of_sight.h"
+#include "../graphics/object_pool.h"
+#include "../gui/keyboard.h"
+#include "../gui/keyboard.h"
+#include "../game/game_state.h"
+#include "../gui/dialogs.h"
+#include "../game/settings.h"
 void __stdcall PlaySoundByName(const char* name, int param);
-void OpenTalkDialog(void);
-void __stdcall StepBuildMenuPageBack(int param);
-void __stdcall StepBuildMenuPage(int param);
-void __stdcall OpenBuildMenuPage(int param);
-void __stdcall SelectSquad(int index, int key);
-void __stdcall CycleCameraFollow(int param);
+#include "dialogs_493340.h"
+#include "control_panel_41bde0.h"
 void __stdcall ExecuteCommandLine(int commandLine, int mask);
-void OpenUnitInfoDialog(void);
-void OpenShareDialog(void);
-void FocusNextLocalUnit(void);
-void SelectAllIdleUnits(void);
-void SelectUnitsOfSameTypes(void);
-void __stdcall SelectUnitsByCategory(const char* name, int key);
-void FindLocalCommander(void);
-void SelectAllVisibleUnits(void);
 void __stdcall CollectSelectedUnits(void* param);
-void __stdcall CreateSquad(int param);
-void __stdcall SaveCameraPosition(int param);
-void __stdcall RestoreCameraPosition(int param);
-void CycleMessageUnits(void);
-void ResetChatHudIndices(void);
-void __stdcall SetGameSpeed(int speed, int broadcast);
+#include "camera.h"
+#include "../network/net_chat_464000.h"
+#include "../network/packets.h"
 void __stdcall SetDescListCleanupFlag(Gui* gui, int param);
-int GetLocalDpid(void);
+#include "../network/net_game.h"
 void __stdcall BroadcastPacket(int id, void* packet, int size);
-void ToggleTabMenu(void);
-void __stdcall HandleDebugHotkey(int eventType);
-void __stdcall OpenInGameOptions(void);
-void __stdcall SaveScreenshot(char* dir, const char* prefix);
+#include "../frontend/options.h"
+#include "../graphics/pcx.h"
 void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind, int d, int e, int f);
 int __stdcall FindOrderByType(int unit, MissionType kind);
 void __stdcall DeleteOrder(int unit, int arg);
@@ -186,14 +161,6 @@ void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name,
     sprintf(out, "%s%s%s%04i.%s", dir, needSep ? g_pathSepBackslash : DAT_005119b8, name, max + 1, ext);
 }
 
-void UpdateBuildMenuIfFocusUnit(void*);
-void ActivatePlayerGadgets(char*);
-void ResetCameraState(void);
-void ClampCameraPosition(void);
-void ClampCameraTarget(void);
-void UpdateScreenShake(void);
-void UpdateCameraFollow(void);
-void BeginMouseScroll(void);
 // FUNCTION: 0x495a30
 void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h)
 {

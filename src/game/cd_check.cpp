@@ -2,6 +2,7 @@
 #include <string.h>
 #include "win_types.h"
 #include "../../interfaces/host.h"
+#include "cd_check.h"
 
 class TdfRecord;
 
@@ -14,11 +15,11 @@ struct FindData_0041d4c0 {
     char name[260];
 };
 
-extern int DAT_0050289c;
+#include "../../link/globals.h"
 
 #include "../files/files_api.h"
-void ChdirToExeDirectory();
-void __cdecl AllocNotifyNop(int);
+#include "main.h"
+#include "../debug/debug_lib.h"
 
 // FUNCTION: 0x41d4c0
 void RegisterDataArchives()

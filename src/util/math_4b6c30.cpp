@@ -1,4 +1,5 @@
 #include "../state/sim_globals.h"
+#include "math_4b6c30.h"
 // FLAGS: /Gi
 
 // FUNCTION: 0x4b6c30

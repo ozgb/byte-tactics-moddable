@@ -15,7 +15,15 @@ because clang-tidy reads the working tree; otherwise it exits 2. When the line r
 finding is old, and not reported, if the base had the same check and message on
 one of the removed lines; the base is checked in a temporary detached worktree,
 only when needed, and a base that does not parse counts as having no findings.
-Pure additions are always reported.
+Pure additions are always reported, except that a finding on an added line is
+also old when a line with the same text (whitespace trimmed) is removed anywhere
+in the same diff, so a line that only moved (to another file, or to another place
+in its file) keeps the findings it had. Each removed line excuses one added line: the
+removed and the added texts are counted, and the added lines, in diff order, use up
+the removals, with or without a finding, so ten copies of a line added for one
+removed are one move and nine new lines. A finding of a naming or initialiser check
+(NAME_CHECKS) that quotes a name is old too when a removed line holds that name as
+a word, because a declaration rewritten to carry the convention keeps its name.
 
 Also fails an added line that introduces a placeholder name from the
 decompiler: FUN_<addr>, DAT_<addr>, field_<offset>, unk*, unknown_<offset>,
@@ -36,6 +44,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -48,6 +57,9 @@ HEADER_SUFFIXES = {".h", ".hpp", ".inc"}
 SOURCE_SUFFIXES = {".c", ".cpp"}
 INCLUDE = re.compile(r'^[ \t]*#[ \t]*include[ \t]*[<"]([^>"]+)[>"]', re.M)
 DIAGNOSTIC = re.compile(r"^(.+?):(\d+):(\d+): (warning|error): (.*?)(?: \[([\w.,-]+)\])?$")
+
+NAME_CHECKS = ("readability-identifier-naming", "bugprone-dynamic-static-initializers")
+QUOTED_NAME = re.compile(r"'([A-Za-z_]\w*)'")
 
 PLACEHOLDER_KINDS = (
     ("FUN_", re.compile(r"\bFUN_[0-9a-fA-F]{6,8}\b")),
@@ -105,6 +117,42 @@ def removed_lines(root, rev_range):
             start, count = int(m.group(1)), int(m.group(2) or 1)
             result[path].update(range(start, start + count))
     return result
+
+
+def moved_lines(root, rev_range):
+    """The (path, line) of the added lines that are another line of the diff moved.
+
+    The whitespace-trimmed texts of the removed lines, in any file, are counted, and each
+    added line with the same text, in diff order, uses up one of them, whether or not it has
+    a finding. A line added more times than it was removed is a move for that many copies only.
+    """
+    diff = git(root, "diff", "-U0", "--no-color", "--no-ext-diff", rev_range, "--")
+    budget = Counter(row[1:].strip() for row in diff.splitlines()
+                     if row.startswith("-") and not row.startswith("---") and row[1:].strip())
+    moved, path, line = set(), None, 0
+    for row in diff.splitlines():
+        if row.startswith("+++ "):
+            path = row[6:].split("\t")[0] if row.startswith("+++ b/") else None
+        elif row.startswith("@@"):
+            m = re.match(r"@@ -\S+ \+(\d+)", row)
+            line = int(m.group(1))
+        elif row.startswith("+") and path:
+            text = row[1:].strip()
+            if text and budget[text] > 0:
+                budget[text] -= 1
+                moved.add((path, line))
+            line += 1
+    return moved
+
+
+def removed_words(root, rev_range):
+    """The set of identifiers on the lines the range removes."""
+    diff = git(root, "diff", "-U0", "--no-color", "--no-ext-diff", rev_range, "--")
+    words = set()
+    for row in diff.splitlines():
+        if row.startswith("-") and not row.startswith("---"):
+            words.update(re.findall(r"[A-Za-z_]\w*", row[1:]))
+    return words
 
 
 def lint_placeholders(root, rev_range, lines_by_path):
@@ -337,10 +385,16 @@ def lint(root, rev_range, build_dir=DEFAULT_BUILD_DIR, clang_tidy="clang-tidy", 
         print(f"note: no translation unit reaches {path}, not checked by clang-tidy", file=sys.stderr)
     results = tidy_files(root, build_dir, units, clang_tidy, jobs or os.cpu_count() or 1, runner)
     hunks = hunks_of(root, rev_range)
+    moved = moved_lines(root, rev_range)
+    moved_words = removed_words(root, rev_range)
     seen, candidates = set(), []
     for unit, diags in results.items():
         for path, line, _, message, check in diags:
             if line not in lines_by_path.get(path, ()) or (path, line, message, check) in seen:
+                continue
+            if (path, line) in moved:
+                continue
+            if check in NAME_CHECKS and any(n in moved_words for n in QUOTED_NAME.findall(message)):
                 continue
             seen.add((path, line, message, check))
             candidates.append((unit, path, line, message, check))

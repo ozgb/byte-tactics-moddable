@@ -11,11 +11,6 @@
 #include "../../interfaces/host.h"
 
 void RegisterUnitOrders(void);
-void RegisterGroundOrders(void);
-void EnableAICommands(void);
-void RegisterAICommands(void);
-void FUN_00406f40(void);
-void ResetAIPlayers(void);
 
 #pragma pack(push, 1)
 struct Info {
@@ -61,7 +56,7 @@ struct DisplayContext {
 
 #include "file_handle.h"
 
-FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
+#include "hpi.h"
 
 // FUNCTION: 0x4bb2c0
 FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
@@ -70,9 +65,9 @@ FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
 }
 
 DisplayContext* GetDisplay(void);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
-ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* path);
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
+#include "hpi_4bb4e0.h"
 
 static inline int nblocks(int w)
 {
@@ -230,9 +225,8 @@ long __stdcall HAPI_TellFile(FileHandle* file)
     return host_file_seek(file->fp, 0, HOST_SEEK_CUR);
 }
 
-int __stdcall SquashUnpack(unsigned char* dst, unsigned char* src);
-char* __stdcall SquashErrorString(int code);
-void __stdcall FatalError(char* text);
+#include "sqsh.h"
+#include "../graphics/display.h"
 
 static inline int BlockOffset(FileHandle* file, int& counter, int b, int tableSize)
 {
@@ -289,7 +283,7 @@ int __stdcall HAPI_readfromfile(FileHandle* file, void* out, int size)
                         for (int k = 0; k < got; k++)
                             comp[k] = (unsigned char)(comp[k] ^ 0xff ^ (unsigned char)(k + off) ^ key);
                     }
-                    int err = SquashUnpack(file->buffer2, comp);
+                    int err = SquashUnpack((char *)file->buffer2, (char *)comp);
                     if (err) {
                         char msg[1000];
                         sprintf(msg, "[HAPI_readfromfile] Decompression Error: %s\n", SquashErrorString(err));
@@ -734,9 +728,7 @@ struct FindFiles {
 };
 #pragma pack(pop)
 
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
-int __stdcall HAPI_FindNext(int handle, void* fd);
+#include "files_impl.h"
 
 static char* StripDir(char* path)
 {
@@ -800,7 +792,7 @@ fail:
 }
 
 
-ArchiveDirectory* __stdcall HAPI_FindDirectory(ArchiveDirectory* list, char* path);
+#include "hpi_4bc800.h"
 
 // FUNCTION: 0x4bc640
 int __stdcall HAPI_FindNext(int handle, void* out)
@@ -1124,7 +1116,6 @@ void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                            void (__cdecl* cb)(unsigned), unsigned extra,
                            int key, int flags);
-unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int* total);
 
 static inline unsigned int Grow(HapiBuf* b, unsigned int n)
 {
@@ -1224,12 +1215,7 @@ struct Node_004bd3b0 {
 };
 #pragma pack(pop)
 
-extern char g_packageDataName[];
-extern char g_dirWildcard[];
-extern char g_star[];
-extern char g_dotDot[];
-extern char g_dotExtSep[];
-extern char g_pathSepBackslash[];
+#include "../../link/globals.h"
 
 // FUNCTION: 0x4bd3b0
 unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int* total)
@@ -1328,15 +1314,10 @@ struct Node_004bd830 {
 };
 #pragma pack(pop)
 
-int __stdcall SquashPack(void* chunk, int* chunkSize, char* data,
-                           int size, int method, int encrypt);
-unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode);
 void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                             void (__cdecl* cb)(unsigned), unsigned extra,
                             int key, int flags);
 
-
-extern char g_hapiCopyright[];
 
 void __stdcall HAPI_RelocateDirectory(ArchiveDirectory* h, int delta);
 void __stdcall HAPI_RelocateDirectory(int name, int base);
@@ -1444,8 +1425,6 @@ void __stdcall HAPI_CloseArchive(OPENHAPIFILE* f)
         GameFreeThunk(f);
     }
 }
-
-extern char g_hapiFileArrayName[];
 
 // FUNCTION: 0x4be0b0
 void* __stdcall HAPI_AddArchive(LPCSTR name, int mode)
@@ -1583,10 +1562,3 @@ void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
     }
 }
 
-int __stdcall HasExtension(char* name);
-char* __stdcall StripExtension(char* name);
-char* __stdcall StripFileName(char* name);
-char* __stdcall StripPath(char* name);
-void RegisterVtolOrders(void);
-void StepAllGafSequences(void);
-void ResetNetStats(void);

@@ -30,13 +30,11 @@ struct Info {
 
 struct ArchiveDirectory;
 
-FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
-int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
-int __stdcall SquashPack(void* chunk, int* chunkSize, char* data,
-                           int size, int method, int encrypt);
-unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __cdecl GameFreeThunk(void* p);
+#include "hpi.h"
+#include "files_impl.h"
+#include "sqsh.h"
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
 void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                             void (__cdecl* cb)(unsigned), unsigned extra,
                             int key, int flags);
@@ -107,7 +105,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                     chunk = remaining >= 0x10000 ? 0x10000 : remaining;
                     HAPI_readfromfile(file, data, chunk);
                     clen = packlen;
-                    SquashPack(pack, &clen, (char*)data, chunk, flags & 0xff, 1);
+                    SquashPack((Chunk_4d1820 *)pack, &clen, (char*)data, chunk, flags & 0xff, 1);
                     table[n] = clen;
                     pos = host_file_seek(f, 0, HOST_SEEK_CUR);
                     len = clen;

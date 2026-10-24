@@ -10,7 +10,7 @@
 #include "game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 int __fastcall CheckAlliedVictory(void* self);
 

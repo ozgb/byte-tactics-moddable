@@ -10,6 +10,7 @@
 #include "../harness/condition_class.h"
 #include "victory_conditions.h"
 #include "../state/sim_globals.h"
+#include "victory.h"
 
 typedef void* SimView_DAT_005119b8;
 #undef DAT_005119b8
@@ -235,9 +236,7 @@ void MissionCondition::OnUnitCreated(Unit*)
 {
 }
 
-extern char g_killEnemyCommanderKey[];
-extern char g_satisfiedKey[];
-extern char g_celebratedKey[];
+#include "../../link/globals.h"
 
 // FUNCTION: 0x48ea40
 void VictoryKillEnemyCommander::OnUnitDied(Unit* unit)
@@ -269,8 +268,6 @@ void VictoryKillEnemyCommander::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem(g_celebratedKey, 0);
 }
 
-extern char g_destroyAllUnitsKey[];
-
 // FUNCTION: 0x48eb40
 int VictoryDestroyAllUnits::IsSatisfied()
 {
@@ -300,8 +297,6 @@ void VictoryDestroyAllUnits::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-extern char g_killAllMobileUnitsKey[];
-extern char g_numUnitsKey[];
 
 // FUNCTION: 0x48ec00
 int VictoryKillAllMobileUnits::VisitUnit(Unit* unit)
@@ -345,8 +340,6 @@ void VictoryKillAllMobileUnits::LoadState(HapiBank* obj)
     satisfied = obj->GetIntegerItem("Satisfied", 0);
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
-
-extern char g_buildUnitTypeKey[];
 
 // FUNCTION: 0x48ed50
 int VictoryBuildUnitType::VisitUnit(Unit* unit)
@@ -460,8 +453,6 @@ void VictoryKillAllOfType::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-extern char g_killUnitTypeKey[];
-extern char g_numLeftToKillKey[];
 
 // FUNCTION: 0x48f0f0
 void VictoryKillUnitType::OnUnitDied(Unit* unit)
@@ -667,8 +658,6 @@ void DefeatCommanderKilled::LoadState(HapiBank* obj)
     satisfied = obj->GetIntegerItem("Satisfied", 0);
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
-
-extern char g_allUnitsKilledKey[];
 
 // FUNCTION: 0x48f790
 int DefeatAllUnitsKilled::VisitUnit(Unit* unit)

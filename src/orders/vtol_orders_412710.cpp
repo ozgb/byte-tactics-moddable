@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../util/vec3.h"
+#include "vtol_orders_412710.h"
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& v) { Vec3 r = a; r.x += v.x; r.y += v.y; r.z += v.z; return r; }
 
 #include "../state/block.h"
@@ -29,28 +30,21 @@ struct Weapon;
 struct Feature;
 #include "../network/player.h"
 #include "../units/unit.h"
-int __stdcall IsUnitCommander(Unit*);
-void __stdcall AlignUnitToGround(Unit*);
 
 #include "order.h"
-int __stdcall DirectionFromStep(int, int);
 int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
-void __stdcall ReactToAttack(Unit*, Unit*, int);
-int __stdcall GetBuilderCount(int);
-int __stdcall GetUnitCount(int, unsigned int);
 #include "../game/game.h"
 #include "path_fx.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 int __cdecl AngleOfVector(int x, int z);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall AppendOrderToTail(Unit*, Order*);
-void __stdcall AppendOrder(Unit*, Order*);
+#include "order_list.h"
 
 class LandingPadList : public std::vector<Unit*> {};
 
@@ -87,7 +81,6 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
 void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount);
-int __stdcall GetOrderName(Unit* obj);
 
 // FUNCTION: 0x412710
 int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)

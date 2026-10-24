@@ -39,15 +39,8 @@ class UnitTable;
 #include "../graphics/memory_cache.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
-void CopyDwordIfNonNull(int*, int*);
 
 int IsCountBelowAiLimit(unsigned char, unsigned short, int);
-int IsUnderLimit(int, unsigned short, int);
-void ProbeUnitDefEnergyRate(int, int, int);
-void CountMessage(unsigned char, int, int);
-void CountPacket(int, int, int);
-void SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
 int RegisterUnitOrders();
 
 class TdfRecord;
@@ -74,34 +67,26 @@ struct MissionHolder {
 
 #pragma pack(pop)
 
-extern Game* g_game;
-extern char g_noneString[];
+#include "../../link/globals.h"
 
-void* __stdcall GetCategoryMask(char* name);
+#include "unit_commands.h"
 void __stdcall GetLocalizedString(void* parser, char* dst, char* key, int size, char* def);
-void __cdecl ProtectBlockReadWrite(void* param_1);
-void __cdecl ProtectBlockReadOnly(void* param_1);
-void __cdecl GameFreeThunk(void* param_1);
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
 void __stdcall FreeCobScript(void* param_1);
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-void* __cdecl GameAllocIgnoreTag(const char* name, int size);
-unsigned short __stdcall FindUnitTypeId(char* name);
-void __stdcall LoadUnitFbi(char* path, UnitDef* type);
-void AddDownloadBuildOptions();
+#include "../game/data_files.h"
+#include "unit_types.h"
 #include "../files/files_api.h"
 void __stdcall InsertionSortUnitTypes(void* start, void* end, void* cmp, int param);
 void __stdcall SortUnitTypes(void* start, void* end, void* cmp, int param);
-int __stdcall CompareUnitTypeNames(const char* a, const char* b);
-int __cdecl GameStrdup(char* name);
-void __stdcall FatalError(const char* msg);
-void* __stdcall Load3do(char* path);
+#include "../graphics/display.h"
+#include "../graphics/pcx.h"
 void __stdcall MirrorObject(void* obj);
 int __stdcall GetObjectHeight(void* obj);
 void* __stdcall LoadCobScript(char* path);
-void __stdcall StripExtension(char* text);
+#include "../graphics/palette.h"
 void __stdcall BindModelTextures(void* obj, char* name);
-MovementClass* __stdcall FindMovementClass(char* name);
-void LoadUnitInfo();
+#include "unit_types_42a8d0.h"
 
 #define GETFLOAT(section, key) ((float)(section)->GetFieldDouble(key, 0.0))
 

@@ -15,7 +15,7 @@ typedef std::vector<W1_00433130> W2_00433130;
 #include "../util/tdf.h"
 #include "los_tables.h"
 
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
+#include "../game/data_files.h"
 
 // FUNCTION: 0x433130
 void LosTables::LoadLosTables()

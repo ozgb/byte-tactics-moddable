@@ -5,6 +5,7 @@
 #include "../quirks/quirks.h"
 #include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
+#include "main_49eda0.h"
 
 #pragma pack(push, 1)
 struct Game_0049ee30 {
@@ -21,17 +22,13 @@ struct Game_0049ee30 {
 extern Game_0049ee30* g_game;
 extern int g_cmdlineDisplaySeed;
 extern char g_preferredLanguage[];
-bool __cdecl IsDebugKeyword(const char* arg);
-void __stdcall Onl_LoadConfigFile(char* file);
-void __stdcall SetBypassDriveScan(int val);
-void __stdcall SetCommandLineUnusedFlagL(int val);
-void __stdcall SetHostGameName(int flag, char* text);
-void __stdcall SetDirectConnectAddress(char* address);
-void __stdcall SetDirectPlayProvider(int provider);
-void __stdcall SetPacketRate(int rate);
+#include "../debug/debug_lib.h"
+#include "../network/online_45b670.h"
+#include "../ingame/camera.h"
+#include "../frontend/options.h"
+#include "../network/net_game.h"
 char* __stdcall Translate(char* text);
-void SetNoDirectSound();
-void SetUseWindowsSound();
+#include "../sound/sound.h"
 
 // FUNCTION: 0x49ee30
 int __stdcall ParseCommandLine(char* cmdLine, char* appName)

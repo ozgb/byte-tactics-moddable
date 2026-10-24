@@ -1,5 +1,6 @@
 #include <string.h>
 #include "win_types.h"
+#include "line_of_sight_4843c0.h"
 
 #pragma pack(push, 1)
 
@@ -28,7 +29,7 @@ union FlagWord {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x4843c0
 void BuildFogTiles(void)

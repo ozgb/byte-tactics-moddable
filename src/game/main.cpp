@@ -23,8 +23,8 @@ void __stdcall AppendToDebugFile(char* text)
     HAPI_CloseFile(file);
 }
 
-void OutOfMemoryHandler();
-int __cdecl SetOutOfMemoryHandler(int param_1);
+#include "main.h"
+#include "../debug/debug_lib.h"
 
 // FUNCTION: 0x49e6f0
 void InstallOutOfMemoryHandler()
@@ -32,8 +32,8 @@ void InstallOutOfMemoryHandler()
     SetOutOfMemoryHandler((int)OutOfMemoryHandler);
 }
 
-void __stdcall ReportViaException(char* text);
-void NopAbortHook(void);
+#include "main_49e680.h"
+#include "../debug/debug_lib.h"
 
 // FUNCTION: 0x49e700
 void OutOfMemoryHandler()
@@ -77,7 +77,7 @@ void __stdcall DrawFrame(void* surface, void* header, int x, int y);
 
 extern Game* g_game;
 
-int DispatchHostEvents();
+#include "../graphics/display.h"
 
 extern unsigned char g_atexitRegistered;
 extern char* g_appName;
@@ -151,29 +151,19 @@ extern const char g_audioCdShellKey[];
 extern const char g_cdShellValueName[];
 extern const char g_defaultLanguage[];
 
-void AtexitNoOp();
-void __cdecl InitDebugSupport(unsigned int param_1);
-void CreateGameObject();
-void RegisterDataArchives();
-void EmptyPreFrontendInitHook();
-void InitGame();
-void __stdcall InitDisplayDefaults(void* param_1);
-int __stdcall InitEnvironment(void* param_1);
-void __stdcall InitTimers(int param_1);
+#include "../debug/debug_lib_4da120.h"
+#include "../frontend/endgame.h"
+#include "cd_check.h"
+#include "../frontend/frontend.h"
+#include "game_state.h"
 void __stdcall EmptyPostArchiveMountHook(const char* param_1);
-void __stdcall ShutdownEnvironment(void* param_1);
-void SaveCdLists();
-void ReopenCdAudio();
-void MainFrameTick();
-void ShutdownMouse();
-void ShutdownGame();
-int __stdcall ParseCommandLine(char* param_1, char* param_2);
-void __stdcall ReadGameRegistryValue(const char* param_1, void* param_2, int* param_3);
-void __stdcall WriteGameRegistryValue(const char* param_1, void* param_2, int param_3);
-void __stdcall LoadTranslations(const char* param_1, char* param_2);
+#include "../ingame/screenshots.h"
+#include "../gui/mouse.h"
+#include "main_49eda0.h"
+#include "settings.h"
+#include "../util/tdf_4c54f0.h"
 
-void HarnessInit(char* cmdLine);
-unsigned HarnessCrtSeed(unsigned live);
+#include "../harness/harness.h"
 
 // FUNCTION: 0x49e830
 int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -201,7 +191,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     GameSrand(RAND_STREAM_MAIN, HarnessCrtSeed(time(0)));
     if (ParseCommandLine(lpCmdLine, g_appName) == 0)
         return 1;
-    InitDisplayDefaults(&g_displayContext);
+    InitDisplayDefaults((App_4b5980 *)&g_displayContext);
     g_displayContext.startWidth = 0x280;
     g_displayContext.video.bits.b0 = ~g_cmdlineDisplaySeed;
     g_displayContext.video.bits.b1 = 1;
@@ -217,7 +207,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     g_displayContext.className = (int)g_windowClassName;
     g_displayContext.title = (int)g_appName;
     g_displayContext.menuId = 0;
-    int bGameOk = InitEnvironment(&g_displayContext);
+    int bGameOk = InitEnvironment((App_4b5980 *)&g_displayContext);
     if (bGameOk == lzero)
         return 0;
     InitTimers(0x1e);
@@ -229,11 +219,11 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     g_game->field_3 = 1;
     if (strlen(g_preferredLanguage) == 0) {
         size1c = 0x40;
-        ReadGameRegistryValue(g_languageValueName, g_preferredLanguage, (int*)&size1c);
+        ReadGameRegistryValue(g_languageValueName, g_preferredLanguage, (unsigned int *)((int*)&size1c));
         if (g_preferredLanguage[0] == 0)
             strcpy(g_preferredLanguage, g_defaultLanguage);
     }
-    LoadTranslations(g_translationFile, g_preferredLanguage);
+    LoadTranslations((char *)g_translationFile, g_preferredLanguage);
     g_game->sound = (Class_004cdb40*)(new Sound);
     EmptyPreFrontendInitHook();
     InitGame();
@@ -248,11 +238,11 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             strcpy(buf40, DAT_005119b8);
         }
         size14 = 0x32;
-        ReadGameRegistryValue(g_cdShellValueName, buf74, (int*)&size14);
+        ReadGameRegistryValue(g_cdShellValueName, buf74, (unsigned int *)((int*)&size14));
         if (strlen(buf74) != 0)
             strcpy(buf40, buf74);
         else
-            WriteGameRegistryValue(g_cdShellValueName, buf40, 0x32);
+            WriteGameRegistryValue((void *)g_cdShellValueName, buf40, 0x32);
     }
 
     for (;;) {
@@ -299,9 +289,9 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (host_setting_set(HOST_SCOPE_SYSTEM, g_audioCdShellKey, NULL, HOST_SETTING_STRING, buf40, 0)
         != HOST_SETTING_NO_ACCESS) {
         strcpy(buf40, DAT_005119b8);
-        WriteGameRegistryValue(g_cdShellValueName, buf40, 0x32);
+        WriteGameRegistryValue((void *)g_cdShellValueName, buf40, 0x32);
     }
-    ShutdownEnvironment(&g_displayContext);
+    ShutdownEnvironment((App_4b5980 *)&g_displayContext);
     return 0;
 }
 
@@ -323,7 +313,7 @@ int __stdcall GameEntry(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return 0;
 }
 
-char* __stdcall StripFileName(char* path);
+#include "../graphics/palette.h"
 
 // FUNCTION: 0x49f540
 void ChdirToExeDirectory()

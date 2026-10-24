@@ -94,10 +94,10 @@ struct Display_0047c3a0 {
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 Display_0047bdf0* GetDisplay();
-void __stdcall FatalError(char* message);
+#include "display.h"
 void __stdcall SetOffscreenSurface(Display_0047c3a0* display);
 void FlipScreen();
 

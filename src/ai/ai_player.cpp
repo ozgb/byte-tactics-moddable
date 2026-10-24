@@ -153,41 +153,14 @@ struct Target_00406f50 {
 
 #include "squad_timer.h"
 
-int IsLocalPlayerOutOfUnits();
-int AreAllPlayersReady(void);
-int CountActiveAIPlayers(void);
-int CountComputerPlayers(void);
-int CountHumanPlayers(void);
-int ExpireOldestMessage(void);
-int AreAllSlotsEmpty(void);
 int CheckAlliedVictory(void);
 int CheckMapCrc(void);
-char IsGonzo();
-int FindFreeSlot(void);
-int FindOpenSlot(void);
-int GetBuildSiteHeight(void);
-int GetCdPosition(void);
+#include "../graphics/movies.h"
 int GetCobChecksum(int);
-char IsMemFussy();
-int GetCursorSprite(void);
-int GetDebugFillPattern(void);
-char IsBackAlign();
-char IsMemSet();
 
 void RegisterUnitOrders(void);
-void RegisterGroundOrders(void);
-void RegisterVtolOrders(void);
-void StepAllGafSequences(void);
-void ResetNetStats(void);
-void InitCommands(void);
-int UpdatePlacementGhostValidity(void);
+#include "../ingame/control_panel.h"
 
-void ResetCameraState(void);
-void FindLocalCommander(void);
-void ClampCameraPosition(void);
-void ClampCameraTarget(void);
-void UpdateScreenShake(void);
-void BeginMouseScroll(void);
 
 #include "../orders/mission_type.h"
 
@@ -258,37 +231,31 @@ public:
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 void __stdcall ScaleUnitWeights(int player, UnitTypeSet* set, float value, int count);
 void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_4);
-int __stdcall IsUnderLimit(int player, unsigned short id, int value);
+#include "ai_player.h"
 typedef void (__stdcall* Command_00406f00)(CommandArgs* args);
 void __stdcall RegisterCommand(const char* name, Command_00406f00 fn, int flags);
 #include "../../interfaces/seams.h"
 #include "../quirks/quirks.h"
 #include "../state/sim_globals.h"
 #include "../util/file_printf.h"
-int __stdcall RandomInt(int);
-void __stdcall QueueUnitSpeechIfNotVisible(Unit*, int, int);
-void __stdcall SetUnitSquad(Unit* unit, int squad);
+#include "../util/math_4b6c30.h"
+#include "../sound/sound.h"
+#include "../units/squads.h"
 void __stdcall GetBasePosition(int index, Vec3* out);
-unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit* unit);
-int __stdcall GetBuilderCount(unsigned int player);
-void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
-void __stdcall MakeHeap(Elem_0040cc40* first, Elem_0040cc40* last, int*, Elem_0040cc40*);
+#include "pathfind.h"
 void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
                             Elem_0040cc40 val, int*);
-int GetBuildSiteMetal(void);
 
-void EnableAICommands();
-int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int param_4);
+#include "../util/commands.h"
 int __stdcall GetWeaponRange(Unit*, unsigned char);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
 int __stdcall IsCountBelowAiLimit(int, unsigned short, int);
-int __stdcall GetBuildRating(unsigned int player, unsigned short id);
 void __stdcall GetBasePosition(int index, Struct_0040ba80* out);
 
 static const float Zero_004fc968 = 0.0f;
@@ -1159,7 +1126,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<Elem_004
         }
     }
     if (2 <= heap.end() - heap.begin())
-        MakeHeap(heap.begin(), heap.end(), (int*)0, (Elem_0040cc40*)0);
+        MakeHeap((Entry_40d670 *)heap.begin(), (Entry_40d670 *)heap.end(), (int*)0, (Entry_40d670 *)(Elem_0040cc40*)0);
     int limit = -1;
     int best = 0;
     Point16 result;

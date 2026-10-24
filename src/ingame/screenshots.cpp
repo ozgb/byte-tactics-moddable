@@ -2,6 +2,7 @@
 
 #include "../map/mission.h"
 #include "../../interfaces/seams.h"
+#include "screenshots.h"
 
 struct Input_00499890 {
     int fields[6];
@@ -16,23 +17,19 @@ struct Ctx_00499890 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
-extern char g_screenshotDirFormat[];
-extern char g_screenshotPrefix[];
+#include "../../link/globals.h"
 
-int PeekKey();
-void PopKey();
-void ToggleFullScreen();
-void __stdcall PopUntilNamedLayout(int);
+#include "../gui/keyboard.h"
+#include "../graphics/display.h"
+#include "../game/game_state.h"
 #include "../files/files_api.h"
 int __stdcall GetTicks();
-void __stdcall PeekMouseEvent(Input_00499890*);
+#include "../gui/mouse.h"
 void __stdcall UpdateMenu(void*);
-void UpdateCdCategoryByActivity();
-void PlayNextSpeech();
+#include "dialogs_493340.h"
+#include "../sound/sound.h"
 void __stdcall PopMouseEvent(int*);
-void UpdateTimers();
-void __stdcall SaveScreenshot(char*, char*);
+#include "../graphics/pcx.h"
 
 // FUNCTION: 0x499890
 void MainFrameTick()
@@ -63,9 +60,9 @@ void MainFrameTick()
         SaveScreenshot(path, g_screenshotPrefix);
         (*(int*)&g_game->lastTick) = GetTicks();
     }
-    PeekMouseEvent(&first);
+    PeekMouseEvent((Event_4c2d60 *)&first);
     UpdateMenu(g_game->menu_519);
-    PeekMouseEvent(&second);
+    PeekMouseEvent((Event_4c2d60 *)&second);
     UpdateCdCategoryByActivity();
     PlayNextSpeech();
     if (first.fields[4] == second.fields[4])

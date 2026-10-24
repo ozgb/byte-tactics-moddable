@@ -7,6 +7,7 @@
 #include "mission_conditions.h"
 #include "../game/unit_resources.h"
 #include "../files/files_api.h"
+#include "players_464290.h"
 
 struct Player;
 struct Unit;
@@ -66,7 +67,7 @@ struct Gadget {
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 const char* __stdcall Translate(const char* text);
 
@@ -256,8 +257,8 @@ public:
     CommandArgs* InitArgs();
 };
 
-int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int param_4);
-void __cdecl GameFreeThunk(char* text);
+#include "../util/commands.h"
+#include "../graphics/object_pool.h"
 
 // FUNCTION: 0x4648e0
 void LoadDefaultAIScript()
@@ -338,9 +339,6 @@ float __stdcall GetEnergyIncome(void* param_1)
 }
 
 void RegisterUnitOrders(void);
-void RegisterGroundOrders(void);
-void ResetAIPlayers(void);
-int IsLocalPlayerOutOfUnits();
 
 // FUNCTION: 0x464ac0
 float __stdcall GetEnergyUsage(Player* param_1)
@@ -378,7 +376,7 @@ float __stdcall GetNetMetal(Class_464b10* param_1)
     return param_1->metalIncome - param_1->metalUsage;
 }
 
-void __stdcall SendShareMetal(unsigned char from, unsigned char to, int value);
+#include "../network/net_game.h"
 
 // FUNCTION: 0x464b30
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag)
@@ -423,8 +421,6 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
     if (flag)
         SendShareMetal(from, to, *(int*)&amount);
 }
-
-void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value);
 
 // FUNCTION: 0x464c60
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag)
@@ -472,11 +468,10 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
     }
 }
 
-void BroadcastPlayerInfo();
-void __stdcall ReportGameEvent(int param_1);
+#include "../network/unit_sync.h"
 void __stdcall PlaySoundByName(char* str, int flag);
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
-void __stdcall ClearSelectedGadget(void* param_1);
+#include "../gui/dialogs.h"
 
 // FUNCTION: 0x464de0
 void __stdcall ContinueWatchingCallback(Gadget* gadget)
@@ -499,18 +494,11 @@ void __stdcall ContinueWatchingCallback(Gadget* gadget)
     g_game->bits.flag4 = 0;
 }
 
-extern char g_choice2GadgetName[];
-extern char g_choice1GadgetName[];
-extern char g_titleGadgetName[];
-extern char g_noText[];
-extern char g_yesText[];
-extern char g_yesNoGuiName[];
-extern char g_continueWatchingTitle[];
 
 Screen* __stdcall LoadGuiLayer(Menu* menu, char* name, int value);
 void __stdcall SetKeyboardInput(Menu* menu, int flag);
 void __stdcall SetTranslatedTextByName(Menu* menu, char* name, char* text, int value);
-void __stdcall RenderLayer(Menu* menu, int value);
+#include "../gui/gui.h"
 
 // FUNCTION: 0x464e70
 void ShowContinueWatchingDialog()
@@ -526,21 +514,18 @@ void ShowContinueWatchingDialog()
         strcpy(form->choice1, g_choice1GadgetName);
         strcpy(form->choice2, g_choice2GadgetName);
         screen->callback = ContinueWatchingCallback;
-        RenderLayer(&g_game->gui_519, 0x40);
+        RenderLayer((Gui *)&g_game->gui_519, 0x40);
     }
 }
 
 
 unsigned char __stdcall FindHostSlot();
-int __stdcall RandomInt(int range);
+#include "../util/math_4b6c30.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                            Vec3 pos, int a, int b, int c);
-void __stdcall SetStartingStorageBonus(Player* player, int height, int width);
-void __stdcall FocusCommander(int on);
+#include "main_loop.h"
+#include "../ingame/selection.h"
 void __stdcall SendPlayerEconomy(Player* player, int a, int b);
-int __stdcall CountCombatPlayers();
-int __stdcall CountActiveAIPlayers();
-void __stdcall OpenMessageBox(Menu* menu, const char* text, int a, int b, int c);
 
 static int loopCond_00464f80(unsigned char i)
 {
@@ -797,14 +782,14 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                             strcpy(w->choice1, "CHOICE1");
                             strcpy(w->choice2, "CHOICE2");
                             dlg->callback = ContinueWatchingCallback;
-                            RenderLayer(&g_game->gui_519, 0x40);
+                            RenderLayer((Gui *)&g_game->gui_519, 0x40);
                         }
                         goto skip508;
                     }
                     if (CountCombatPlayers() <= 0)
                         goto skip508;
-                    OpenMessageBox(&g_game->gui_519,
-                                 Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
+                    OpenMessageBox((Gui *)&g_game->gui_519,
+                                 (char *)Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
                                  500, 1, 1);
                     g_game->endGameFlags &= 0xffef;
                     goto skip508;

@@ -124,26 +124,21 @@ struct Block {
 #pragma pack(pop)
 
 int __stdcall GetGroundHeight(Vec3* pos);
-void __stdcall AlignUnitToGround(Unit* unit);
+#include "unit_targets.h"
 #include "../../interfaces/seams.h"
 int __cdecl AngleOfVector(int x, int z);
-int __cdecl GetLocalDpid();
+#include "../network/net_game.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
-void __stdcall ApplyAttachUnit(OrderView* order);
-void __stdcall DeselectIfIneligible(Unit* u);
-void __stdcall UpdateWindGenerator(Unit* u);
-void __stdcall UpdateUnitHeight(Unit* u);
-void __stdcall KillUnit(Unit* u, int n);
-int __stdcall AddRepairProgress(Unit* u, Unit* u2, float f);
-void __stdcall SendUnitStates(Player* p);
-void __stdcall CycleSelection(void);
-int __stdcall IsKeyDown(int n);
-void __stdcall CycleCameraFollow(int n);
+#include "unit_position.h"
+#include "../ingame/selection.h"
+#include "unit_motion.h"
+#include "unit_position.h"
+#include "units_485010.h"
+#include "../ingame/control_panel.h"
+#include "../gui/keyboard.h"
 Unit* __stdcall CreateUnitFromPacket(unsigned char player, Spawn* spawn);
-void __stdcall WriteUnitState(BitWriter* stream, Unit* u);
-void __stdcall ReadUnitState(BitReader* reader, Unit* u);
 
-extern float g_buildPercentScale;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x48a7f0
 void __stdcall SnapUnitToGround(Unit* unit)

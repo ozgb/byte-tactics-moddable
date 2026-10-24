@@ -20,6 +20,7 @@
 
 #include "../util/string_ref.h"
 #include "../state/sim_globals.h"
+#include "unit_types_42a8d0.h"
 
 struct Elem_00432be0 {
     char* data;
@@ -32,11 +33,6 @@ typedef std::vector<Elem_00432be0> FileList;
 
 #include "../files/files_api.h"
 
-void ProbeUnitDefEnergyRate(int, int, int);
-void CountMessage(unsigned char, int, int);
-void SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
-void AccumulateScreenShake(int, int, int);
 int RegisterUnitOrders();
 
 class OvrFile : public HapiBank {
@@ -46,37 +42,20 @@ public:
     ~OvrFile() { CloseBank(); }
 };
 
-void SetMissionStatus(int, int, int);
-void StartFeatureBurning(int, int, int);
-void KillFeature(int, int, int);
-void ReplaceFeatureWithDead(int, int, int);
 void FillWaypointWorldPos(int, int, int);
-void ResetAIPlayers(void);
-void RegisterGroundOrders(void);
-void EnableAICommands(void);
-void RegisterAICommands(void);
-void InitCommands(void);
-void RegisterVtolOrders(void);
-void StepAllGafSequences(void);
-void ResetNetStats(void);
-void ResetCameraState(void);
-void CountPacket(int, int, int);
-void SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
 
-extern Game* g_game;
+#include "../../link/globals.h"
 static TdfFile* s_weaponTdfParsers;
 static int s_weaponTdfLoadedCount;
 static int s_weaponTdfAllocCount;
 
 
-int UsesDataArchives();
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-void* __cdecl GameAllocIgnoreTag(char* name, int size);
-void __cdecl GameFreeThunk(void* p);
-void __cdecl ProtectBlockReadOnly(void* p);
-void __cdecl ProtectBlockReadWrite(void* p);
-unsigned int __stdcall ComputeChecksum(char* data, int len);
+#include "../game/cd_check.h"
+#include "../game/data_files.h"
+#include "../debug/debug_lib.h"
+#include "../graphics/object_pool.h"
+#include "../debug/debug_lib.h"
+#include "../util/math.h"
 void __stdcall ShowErrorBox(const char* text, const char* caption);
 char* __stdcall Translate(char* text);
 void __stdcall GetLocalizedString(void* parser, char* dst, char* key, int size, char* def);
@@ -151,7 +130,7 @@ int LoadUnitInfo()
             int len = HAPI_FileLength(f);
             char* buf = (char*)GameAllocIgnoreTag(path, len);
             HAPI_readfromfile(f, buf, len);
-            u->fbiChecksum = ComputeChecksum(buf, len);
+            u->fbiChecksum = ComputeChecksum((unsigned char *)buf, len);
             OvrFile ovr;
             char ovrpath[256];
             BuildDataPath(ovrpath, "units", files[i - 1], "OVR");

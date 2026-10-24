@@ -1,11 +1,11 @@
 #include <string.h>
 
 #include "../../interfaces/host.h"
+#include "online_report.h"
 
 struct Net_4c97b0;
 
-extern int g_reporterReport;
-extern int g_reporterNotify;
+#include "../../link/globals.h"
 
 char* __stdcall Translate(char* text);
 

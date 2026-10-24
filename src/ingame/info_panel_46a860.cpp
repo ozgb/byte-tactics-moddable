@@ -4,24 +4,22 @@
 #include <stdio.h>
 
 struct Game;
-extern Game* g_game;
+#include "../../link/globals.h"
 
-int GetScreenHeight();
+#include "../graphics/display.h"
 int __stdcall GetGafFrame(unsigned short* param_1, int param_2);
 void __stdcall DrawFrame(void* dst, void* bmp, int x, int y);
 void __stdcall SetTextColors(int param_1, int param_2);
-int GetTextKeyColor();
+#include "../graphics/draw.h"
 void __stdcall SetFont(int param_1);
-int GetFontHeight();
 int __stdcall GetTextWidth(void* font, unsigned char* text);
 void __stdcall DrawString(void* dst, unsigned char* text, int x, int y, int maxWidth);
 char* __stdcall Translate(char* key);
-int __stdcall GetBuildWeaponPercent(void* owner);
+#include "../orders/order_list.h"
 int __stdcall GetOrderTarget(void* unit);
-int __stdcall GetOrderName(void* obj);
 int __stdcall IsUnitVisibleToPlayer(void* map, void* u);
 void __stdcall BlitSideLogoToRect(void* surf, void* player, void* rect, int dy);
-unsigned short __stdcall FindUnitTypeId(const char* name);
+#include "../units/unit_commands.h"
 int __stdcall FillRectangle(void* surface, void* rect, int color);
 
 #include "../map/mission.h"
@@ -242,7 +240,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         Unit_0046a860* unit = (Unit_0046a860 *)g_game->units.get() + snapshot.selected;
         snapshot.health = unit->healthRaw;
         snapshot.build = unit->killCount;
-        snapshot.orderName = GetOrderName(unit);
+        snapshot.orderName = GetOrderName((Unit *)unit);
         float f0 = unit->energyUsePrev;
         float f1 = unit->energyMakePrev;
         float f2 = unit->metalUsePrev;
@@ -380,7 +378,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                         DrawString(surface, (unsigned char*)amount, orderX, panel->rcMissionText.top + yOffset, -1);
                     }
                 }
-                int progress = GetBuildWeaponPercent(unit);
+                int progress = GetBuildWeaponPercent((Unit *)unit);
                 if (progress) {
                     if (unit->player->index != g_game->playerIndex)
                         return;

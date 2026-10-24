@@ -5,6 +5,7 @@
 
 #include "../network/player.h"
 #include "../network/player_info.h"
+#include "endgame_41dc20.h"
 
 #pragma pack(push, 1)
 struct Stat_0041dc20 {

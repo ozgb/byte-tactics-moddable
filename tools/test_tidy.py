@@ -285,6 +285,60 @@ class TidyTest(Repo, unittest.TestCase):
         self.assertEqual(found, [])
         self.assertIn(("base", "src/a.cpp"), stub.calls)
 
+    def test_finding_on_a_moved_line_passes(self):
+        self.write("src/c.cpp", "int C(void) { return 0; }\n    int t = 1;\n")
+        self.commit()
+        self.write("src/c.cpp", "int C(void) { return 0; }\n")
+        self.write("src/a.cpp", SOURCE.replace("    return total;", "    int t = 1;\n    return total;"))
+        self.commit()
+        text = finding("ROOT", "src/a.cpp", 5, "modernize-use-nullptr")
+        found, _ = self.lint({"src/a.cpp": (0, text)})
+        self.assertEqual(found, [])
+
+    def test_one_removed_line_excuses_one_added_copy(self):
+        self.write("src/c.cpp", "int C(void) { return 0; }\nint i;\n")
+        self.commit()
+        files = [f"src/f{k}.cpp" for k in range(10)]
+        self.write("src/c.cpp", "int C(void) { return 0; }\n")
+        for f in files:
+            self.write(f, "int i;\n")
+        self.write_db(["src/a.cpp", "src/b.cpp", "src/c.cpp", *files])
+        self.commit()
+        check = "modernize-use-nullptr"
+        found, _ = self.lint({f: (0, finding("ROOT", f, 1, check)) for f in files})
+        self.assertEqual([f[0] for f in found], files[1:])
+
+    def test_added_copy_without_a_finding_uses_up_the_removal(self):
+        self.write("src/c.cpp", "int C(void) { return 0; }\nint i;\n")
+        self.commit()
+        self.write("src/c.cpp", "int C(void) { return 0; }\n")
+        self.write("src/d.cpp", "int i;\n")
+        self.write("src/e.cpp", "int i;\n")
+        self.write_db(["src/a.cpp", "src/b.cpp", "src/c.cpp", "src/d.cpp", "src/e.cpp"])
+        self.commit()
+        check = "modernize-use-nullptr"
+        found, _ = self.lint({"src/d.cpp": (0, ""), "src/e.cpp": (0, finding("ROOT", "src/e.cpp", 1, check))})
+        self.assertEqual([f[0] for f in found], ["src/e.cpp"])
+
+    def test_naming_finding_on_a_rewritten_declaration_passes(self):
+        self.write("src/c.cpp", "int Old_B(int);\nint C(void) { return 0; }\n")
+        self.commit()
+        self.write("src/c.cpp", "int C(void) { return 0; }\n")
+        self.write("src/a.h", HEADER.replace("#endif", "int __stdcall Old_B(int x);\n#endif"))
+        self.commit()
+        msg = "ROOT/src/a.h:4:5: warning: invalid case style for function 'Old_B' [readability-identifier-naming]\n"
+        found, _ = self.lint({"src/a.cpp": (0, msg)})
+        self.assertEqual(found, [])
+        msg = msg.replace("Old_B", "New_B")
+        found, _ = self.lint({"src/a.cpp": (0, msg)})
+        self.assertEqual(len(found), 1)
+
+    def test_finding_on_a_new_line_with_no_removed_twin_is_reported(self):
+        self.edit("src/a.cpp", "    return total;", "    int t = 1;\n    return total;")
+        text = finding("ROOT", "src/a.cpp", 5, "modernize-use-nullptr")
+        found, _ = self.lint({"src/a.cpp": (0, text)})
+        self.assertEqual(len(found), 1)
+
     def test_modified_line_adding_a_new_check_fails(self):
         self.edit("src/a.cpp", "    return total;", "    return total;\n    int t = 1;")
         self.edit("src/a.cpp", "    int t = 1;", "    int t = 2;")

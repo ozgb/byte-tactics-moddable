@@ -77,9 +77,8 @@ class SyncChecksumVector {
     ~SyncChecksumVector();
 };
 
-int __cdecl GetLocalHumanDpid();
+#include "net_game.h"
 int __cdecl GetHostDpid();
-void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 
 struct PacketSequencer {
     int lastSent;
@@ -92,7 +91,7 @@ struct PacketSequencer {
     void SendUnsequenced(unsigned int param_1, void* param_2);
     void Inl(unsigned int param_1, UnitSyncPacket* param_2) {
         param_2->id = 0;
-        SendPacketToPlayer(GetLocalHumanDpid(), param_1, param_2, 0xe);
+        SendPacketToPlayer(GetLocalHumanDpid(), param_1, (unsigned char *)param_2, 0xe);
     }
 };
 
@@ -108,7 +107,7 @@ struct SyncPlayerRecord {
     SyncPlayerRecord& operator=(const SyncPlayerRecord& src);
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 extern int DAT_00000000;
 
 int __stdcall ComputeUnitScriptChecksum(UnitDef* def);

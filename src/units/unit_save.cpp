@@ -118,10 +118,10 @@ struct Struct_00487af0 {
 
 #include "../game/unit_resources.h"
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file);
-unsigned short __stdcall FindUnitTypeId(const char* name);
+#include "unit_save.h"
+#include "unit_commands.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                                       Vec3 pos, int param_5, int mode,
                                       unsigned short id);

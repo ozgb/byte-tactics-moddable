@@ -72,7 +72,7 @@ public:
     virtual void ApplySonarJamFlag(Unit* unit);
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 #include "../../interfaces/seams.h"
 

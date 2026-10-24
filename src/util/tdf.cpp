@@ -23,10 +23,10 @@ inline void _Destroy(TdfField* p)
 }
 }
 
-void __cdecl GameFreeThunk(void* p);
-char* __cdecl GameStrdup(char* text);
-char* ComputeChecksum(char* text, int len);
-void FatalError(char* text);
+#include "../graphics/object_pool.h"
+#include "../debug/debug_lib.h"
+#include "math.h"
+#include "../graphics/display.h"
 
 static inline bool operator==(const StringRef& a, const StringRef& b)
 {
@@ -94,17 +94,6 @@ inline TdfRecord* TdfRecord::GetChild(int index)
     return index >= Kids(this).size() ? 0 : Kids(this).at(index);
 }
 
-void EnableAICommands(void);
-
-void CountMessage(unsigned char, int, int);
-void CountPacket(int, int, int);
-void SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
-void AccumulateScreenShake(int, int, int);
-void CenterCameraOnPoint(int, int, int);
-void SetMissionStatus(int, int, int);
-void StartFeatureBurning(int, int, int);
-void SetGameSpeed(int, int);
 // FUNCTION: 0x4c42a0
 TdfRecord::~TdfRecord()
 {
@@ -261,7 +250,7 @@ TdfRecord::TdfRecord(char* name, char* text, char** nextblock, char* filename)
                 *nextblock = current + 1;
             char* end = current - 1;
             if (text <= end)
-                this->text = ComputeChecksum(text, end - text - 1);
+                this->text = (char *)ComputeChecksum((unsigned char *)text, end - text - 1);
             else
                 this->text = 0;
             return;
@@ -273,7 +262,7 @@ TdfRecord::TdfRecord(char* name, char* text, char** nextblock, char* filename)
             }
             char* end = current - 1;
             if (text <= end)
-                this->text = ComputeChecksum(text, end - text - 1);
+                this->text = (char *)ComputeChecksum((unsigned char *)text, end - text - 1);
             else
                 this->text = 0;
             return;
@@ -335,7 +324,7 @@ StringRef TdfRecord::MakeTrimmedString(char* start, char* end)
 void TdfRecord::ComputeRecordChecksum(char* start, char* end)
 {
     if (start <= end) {
-        text = ComputeChecksum(start, end - start - 1);
+        text = (char *)ComputeChecksum((unsigned char *)start, end - start - 1);
     } else {
         text = 0;
     }
@@ -357,15 +346,7 @@ class Class_004c90b0;
 class TranslationTable;
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int WalkFrameChain(int, int, int, int, int, int, int, int, int, int);
-void CopyDwordIfNonNull(int*, int*);
-int GetBuildRating(int, unsigned short);
 void RegisterUnitOrders();
-void EnableMeteors();
-void DisableMeteors();
-void HandleNetPackets();
-void ResetAIPlayers();
-void InitCommands();
-void BlankScreen();
 void FlipScreen();
 void ShowSoftwareCursor();
 

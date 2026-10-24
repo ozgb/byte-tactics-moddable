@@ -10,8 +10,7 @@ struct Elem_0046faf0 {
 };
 #pragma pack(pop)
 
-extern "C" int __cdecl GetLocalHumanDpid();
-extern "C" void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
+#include "net_game.h"
 
 class PacketSequencer {
 public:
@@ -27,5 +26,5 @@ void PacketSequencer::SendSequenced(Elem_0046faf0* to, Elem_0046faf0* packet)
 	packet->id = ++lastSent;
 	std::vector<Elem_0046faf0>& _v = sentQueue;
 	_v.insert(_v.end(), 1, *packet);
-	SendPacketToPlayer(GetLocalHumanDpid(), (unsigned int)to, packet, 0xe);
+	SendPacketToPlayer(GetLocalHumanDpid(), (unsigned int)to, (unsigned char *)packet, 0xe);
 }

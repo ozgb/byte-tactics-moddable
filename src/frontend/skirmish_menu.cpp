@@ -84,10 +84,9 @@ struct Table {
 
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int flag);
-void __stdcall MarkChanged(Gui* menu);
 
 // FUNCTION: 0x479660
 void RefreshAllyIcons(void)
@@ -124,7 +123,7 @@ void RefreshAllyIcons(void)
             }
         }
     }
-    MarkChanged(&g_game->gui);
+    MarkChanged((Dialog *)&g_game->gui);
 }
 
 #pragma auto_inline(off)
@@ -553,7 +552,7 @@ void RefreshSkirmishSetup()
     }
 
     SetTranslatedTextByName(&g_game->gui, "MapName", ((Table *)g_game->options)->mapName, 0);
-    MarkChanged(&g_game->gui);
+    MarkChanged((Dialog *)&g_game->gui);
 }
 
 // FUNCTION: 0x47a700
@@ -628,14 +627,13 @@ void __cdecl CycleCurrentPlayerSide()
 
 #include "../map/mission.h"
 
-void __cdecl GameFreeThunk(void* ptr);
+#include "../graphics/object_pool.h"
 void __stdcall PlaySoundByName(const char* name, int broadcast);
-int __stdcall IsCurrentGadgetNamed(Gui* menu, char* name);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
 void __stdcall SetControlTextByName(Gui* menu, char* name, char* value);
-void __stdcall ClearSelectedGadget(Gui* menu);
-char* __stdcall SkipTextLines(char* text, int line);
+#include "../gui/dialogs.h"
+#include "../util/registry.h"
 
 // FUNCTION: 0x47a910
 void __stdcall HandleSkirmishMapClick(Gui* menu)
@@ -655,15 +653,15 @@ void __stdcall HandleSkirmishMapClick(Gui* menu)
         GameFreeThunk(list);
         return;
     }
-    if (!IsCurrentGadgetNamed(menu, "MAPNAMES") && !IsCurrentGadgetNamed(menu, "LOAD")) {
-        if (IsCurrentGadgetNamed(menu, "PREVMENU")) {
+    if (!IsCurrentGadgetNamed((Dialog *)menu, "MAPNAMES") && !IsCurrentGadgetNamed((Dialog *)menu, "LOAD")) {
+        if (IsCurrentGadgetNamed((Dialog *)menu, "PREVMENU")) {
             PlaySoundByName("Previous", 0);
         } else {
             ClearSelectedGadget(menu);
         }
         return;
     }
-    if (IsCurrentGadgetNamed(menu, "LOAD")) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "LOAD")) {
         PlaySoundByName("SmallButton", 0);
     }
     Gadget* g = FindGadgetChecked(entries, "MAPNAMES");
@@ -673,7 +671,7 @@ void __stdcall HandleSkirmishMapClick(Gui* menu)
     SetControlTextByName(menu, "MapName", buffer);
 }
 
-void ShowSelectedMapInfo();
+#include "multi.h"
 
 // FUNCTION: 0x47aaa0
 void __stdcall UpdateSkirmishMapSelection(Gui* menu, int unused)
@@ -684,16 +682,13 @@ void __stdcall UpdateSkirmishMapSelection(Gui* menu, int unused)
     }
 }
 
-int __stdcall LoadMapList(char** out, int param_2, int param_3);
-void __stdcall OpenMessageBox(Gui* menu, char* text, int width, int a, int b);
+#include "../map/map_list.h"
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
+#include "../debug/debug_lib.h"
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-void __stdcall SortFileList(char* items, int b, int c, int count);
+#include "../gui/file_list.h"
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* items, int count, int flag);
-void __stdcall SetListBoxScrollByName(Gui* menu, char* name, int index);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
-void __stdcall RenderLayer(Gui* menu, int value);
 void __stdcall SetCursorMode(int value);
 
 // FUNCTION: 0x47aaf0
@@ -711,14 +706,14 @@ void OpenSkirmishMapSelector()
     Data* data = (Data*)GameAllocIgnoreTag("SELECT MAP DATA", 0x20);
     layer->data = data;
     LoadPictureCached("DSELECTMAP2", 0, 0, 0);
-    LoadMapList(&data->items, 0, 0);
+    LoadMapList((void **)&data->items, 0, 0);
     SortFileList(data->items, 0, 0, n);
     ConfigureListBoxByName(&g_game->gui, "MAPNAMES", data->items, n, 0);
     FindGadgetChecked(layer->entries, "MAPNAMES")->onSelect = UpdateSkirmishMapSelection;
 
     for (int i = 0; i < n; i++) {
         if (strcmp(((Table *)g_game->options)->mapName, SkipTextLines(data->items, i)) == 0) {
-            SetListBoxScrollByName(&g_game->gui, "MAPNAMES", i);
+            SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "MAPNAMES", i);
             break;
         }
     }
@@ -775,7 +770,7 @@ void __stdcall CyclePlayerColor(int reverse)
             gadget->frame = (unsigned short)((Table *)g_game->options)->players[current].color;
         }
     }
-    MarkChanged(&g_game->gui);
+    MarkChanged((Dialog *)&g_game->gui);
 }
 
 // FUNCTION: 0x47ae30
@@ -799,11 +794,11 @@ struct ClickFrame {
 #pragma pack(pop)
 
 void __stdcall GetGadgetName(Gadget* entries, char* text, int id);
-void RegisterDataArchives();
-void InitMissionStatus();
-void SaveSettings();
+#include "../game/cd_check.h"
+#include "endgame.h"
+#include "../game/settings.h"
 void __stdcall UpdateHelpText(Gui* gui);
-void __stdcall GetCurrentMouseEvent(MouseEvent* out);
+#include "../gui/keyboard.h"
 
 // FUNCTION: 0x47ae60
 void __stdcall HandleSkirmishClick(Gui* menu)
@@ -822,7 +817,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
     table->current = player;
     frame.bf[strlen(frame.bf) - 1] = 0;
 
-    if (IsCurrentGadgetNamed(menu, "Start")) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "Start")) {
         PlaySoundByName("BigButton", 0);
         RegisterDataArchives();
 
@@ -920,7 +915,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         return;
     }
 
-    if (IsCurrentGadgetNamed(menu, "PrevMenu")) {
+    if (IsCurrentGadgetNamed((Dialog *)menu, "PrevMenu")) {
         PlaySoundByName("Previous", 0);
         SetCursorMode(0x14);
         (*(char*)&g_game->frontendNextSubState) = 3;
@@ -997,7 +992,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
             _itoa(((Table *)g_game->options)->players[player].metal, frame.sB, 10);
             SetTranslatedTextByName(menu, frame.sA, frame.sB, 10);
         }
-    } else if (IsCurrentGadgetNamed(menu, "CommanderDeath")) {
+    } else if (IsCurrentGadgetNamed((Dialog *)menu, "CommanderDeath")) {
         PlaySoundByName("Skirmish", 0);
         Table* t = (Table *)g_game->options;
         t->commanderDeath ^= 1;
@@ -1008,7 +1003,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         else
             strcpy(e->text, Translate("Game continues after Commander is destroyed."));
         UpdateHelpText(&g_game->gui);
-    } else if (IsCurrentGadgetNamed(menu, "StartLocation")) {
+    } else if (IsCurrentGadgetNamed((Dialog *)menu, "StartLocation")) {
         PlaySoundByName("Skirmish", 0);
         Table* t = (Table *)g_game->options;
         t->fixedLocations ^= 1;
@@ -1019,7 +1014,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         else
             strcpy(e->text, Translate("Commanders are randomly placed on the battle field."));
         UpdateHelpText(&g_game->gui);
-    } else if (IsCurrentGadgetNamed(menu, "Mapping")) {
+    } else if (IsCurrentGadgetNamed((Dialog *)menu, "Mapping")) {
         PlaySoundByName("Skirmish", 0);
         Table* t = (Table *)g_game->options;
         t->mapping ^= 1;
@@ -1030,7 +1025,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         else
             strcpy(e->text, Translate("Terrain is visible."));
         UpdateHelpText(&g_game->gui);
-    } else if (IsCurrentGadgetNamed(menu, "LineOfSight")) {
+    } else if (IsCurrentGadgetNamed((Dialog *)menu, "LineOfSight")) {
         PlaySoundByName("Skirmish", 0);
         int index = FindGadgetIndex(entries, "LineOfSight", 1);
         Gadget* e = &entries[index];
@@ -1048,11 +1043,11 @@ void __stdcall HandleSkirmishClick(Gui* menu)
             strcpy(e->text, Translate("All mapped terrain is visible."));
         }
         UpdateHelpText(&g_game->gui);
-    } else if (IsCurrentGadgetNamed(menu, "SelectMap")) {
+    } else if (IsCurrentGadgetNamed((Dialog *)menu, "SelectMap")) {
         PlaySoundByName("Skirmish", 0);
         SetCursorMode(0x14);
         OpenSkirmishMapSelector();
-    } else if (IsCurrentGadgetNamed(menu, "Difficulty")) {
+    } else if (IsCurrentGadgetNamed((Dialog *)menu, "Difficulty")) {
         PlaySoundByName("SKirmish", 0);
         int d = g_game->difficulty;
         if (d == 0) {
@@ -1082,18 +1077,9 @@ struct Cheat {
 };
 #pragma pack(pop)
 
-extern const char g_cheatFourPlayers[];
-extern const char g_cheatFivePlayers[];
-extern const char g_cheatSixPlayers[];
-extern const char g_cheatSevenPlayers[];
-extern const char g_cheatEightPlayers[];
-extern const char g_cheatThreePlayers[];
-extern const char g_cheatNinePlayers[];
-extern const char g_cheatTenPlayers[];
-extern const char g_skirmishCheatSoundName[];
 
-void SaveNumSkirmishPlayers();
-void LoadSettings();
+#include "../game/settings_campaign.h"
+#include "../game/settings.h"
 void __stdcall SelectAdjacentGadget(Cheat*, int);
 
 // FUNCTION: 0x47b9f0
@@ -1131,18 +1117,12 @@ void __stdcall HandleSkirmishCheatText(Cheat* cheat)
         RefreshSkirmishSetup();
         PlaySoundByName(g_skirmishCheatSoundName, 0);
         SelectAdjacentGadget(cheat, 1);
-        MarkChanged(&g_game->gui);
+        MarkChanged((Dialog *)&g_game->gui);
     }
 }
 
-extern char g_skirmishGuiName[];
-extern char g_skirmishSetupPictureName[];
-extern char g_difficultyKey[];
-extern char g_easyGadgetName[];
-extern char g_mediumGadgetName[];
-extern char g_hardGadgetName[];
 
-void BlankScreen();
+#include "frontend.h"
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 void __stdcall SetGadgetStatusByName(Gui* menu, char* name, int value);
 
@@ -1172,7 +1152,7 @@ void OpenSkirmishMenu(void)
         difficulty->stageIndex = 2;
         SetGadgetStatusByName(&g_game->gui, g_hardGadgetName, 1);
     }
-    MarkChanged(&g_game->gui);
+    MarkChanged((Dialog *)&g_game->gui);
 
     if (!g_game->net->LoadMissionByName(((Table *)g_game->options)->mapName)) {
         g_game->net->RefreshMapList(0);
@@ -1186,11 +1166,9 @@ void OpenSkirmishMenu(void)
     SetCursorMode(0x13);
 }
 
-extern char* g_forcesDestroyedTexts[];
-
 void __stdcall AddMessage(char* text, int key, int value, unsigned char last);
 
-int HarnessViewRand();
+#include "../harness/harness.h"
 
 // FUNCTION: 0x47bd70
 void __stdcall AnnounceForcesDestroyed(Player* player)

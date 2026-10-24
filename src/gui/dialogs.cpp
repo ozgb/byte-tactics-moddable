@@ -59,8 +59,6 @@ struct Record_004ab2b0 {
 };
 
 int PlaceFeature(int, int, int, int, int);
-void __stdcall UpdateAllCellHeightRanges();
-void __stdcall ClearBorderFeatures();
 
 struct Record_004ab310 {
     unsigned char type;
@@ -97,44 +95,34 @@ struct Entry_004ab3a0 {
 
 extern int* g_guiContext;
 
-extern void __stdcall FadeRectangle(void* surface, int* rect, int mode);
-extern char* __stdcall StripPath(char* path);
-extern char* __stdcall ChangeExtension(char* out, char* in, char* ext);
+#include "../graphics/draw.h"
+#include "../graphics/palette.h"
 #include "../files/files_api.h"
-extern void* __cdecl GameAllocIgnoreTag(const char* path, unsigned int size);
+#include "../debug/debug_lib.h"
 extern int __stdcall ReadGuiFile(void* entry, char* path);
-extern void __cdecl GameFreeThunk(void* p);
-extern int __stdcall RenderLayer(Gui* menu, unsigned int flags);
+#include "../graphics/object_pool.h"
 extern void __cdecl HideSoftwareCursor(void);
 extern void __cdecl ShowSoftwareCursor(void);
 extern void __stdcall SelectAdjacentGadget(Gui* menu, int value);
 extern void __stdcall TrySetFocus(Gui* menu, int value);
-extern int __cdecl GetTextKeyColor(void);
 extern void __stdcall SetTextColors(int a, int b);
 extern void __stdcall SetFont(int a);
-extern void __cdecl ClearKeyQueue(void);
-extern void __stdcall CommitTextEdit(Gui* menu, int index, char* text,
-                                   int maxLength, int clear);
+#include "keyboard.h"
+#include "dialogs.h"
 
 extern int __stdcall PointInRect(Rect_004b6720* r, int x, int y);
-extern int __stdcall RectsOverlap(Rect_004b6720* a, Rect_004b6720* b);
+#include "../util/registry.h"
 extern void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 
 extern void __stdcall InitGafSequence(Ref_004ab400* ref, Src_004ab400* src, int index);
 extern int __stdcall GetGafSequenceFrame(Ref_004ab400* ref);
-extern void __stdcall SetCursorSprite(int handle);
-int GetCursorSprite();
+#include "mouse.h"
 
 extern void __stdcall AdvanceGafSequence(Ref_004ab400* ref, int step);
-extern int __stdcall PeekMouseEvent(MouseEvent* out);
-extern void __stdcall GetCurrentMouseEvent(MouseEvent* out);
 extern void __stdcall PopMouseEvent(MouseEvent* out);
-extern void __stdcall GetGadgetScreenRect(Gadget* table, int index, Rect_004b6720* out);
-extern int __stdcall IsPointInRect(Rect_004b6720* r, int px, int py);
 
 extern void __stdcall DrawTextInput(Gui* control, int index);
 extern int __stdcall GetTextPixelWidth(unsigned char* text);
-int PopKey();
 void* GetDisplay();
 
 static inline int FindPanel_004aa8f0(Layer* layer)
@@ -177,7 +165,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
         Layer* cur = menu->layer;
         if (cur != 0) {
             GetGadgetRect_inlined(cur->entries, (Rect_004b6720*)rect);
-            FadeRectangle(cur->entries->u.assets.surface, rect, -0x18);
+            FadeRectangle((Surface *)cur->entries->u.assets.surface, (Rect *)rect, -0x18);
             if (menu->layer != 0)
                 menu->layer->redraw = 1;
         } else {
@@ -392,7 +380,7 @@ int __stdcall BlitLayers(Layer* node, void* surface, Rect_004b6720* clipRect)
             DrawSurface(surface, g->u.assets.surface, g->x, g->y);
         }
     } else {
-        if (node->redraw != 1 && RectsOverlap(&rect, clipRect) == 0) {
+        if (node->redraw != 1 && RectsOverlap((Rect *)&rect, (Rect *)clipRect) == 0) {
             goto finish;
         }
         node->redraw = 0;
@@ -610,11 +598,11 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
     }
 
     MouseEvent e;
-    if (PeekMouseEvent(&e) != 0) {
+    if (PeekMouseEvent((Event_4c2d60 *)&e) != 0) {
         if (p->layer != 0) {
             Rect_004b6720 r;
-            GetGadgetScreenRect(p->layer->entries, 0, &r);
-            if (IsPointInRect(&r, e.x, e.y) != 0 || e.keyFlags == 0) {
+            GetGadgetScreenRect((char *)p->layer->entries, 0, (Rect *)&r);
+            if (IsPointInRect((Rect *)&r, e.x, e.y) != 0 || e.keyFlags == 0) {
                 PopMouseEvent(&e);
                 p->mouseKeyFlags = e.keyFlags;
                 *(MouseEvent*)&p->pointX = e;
@@ -789,32 +777,21 @@ struct PaletteDialog_004aa8f0 {
 
 #pragma pack(pop)
 
-extern char g_okGadgetName[];
+#include "../../link/globals.h"
 
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
 int __stdcall IsGadgetNamed(Gadget* entries, int index, char* name);
 char* __stdcall Translate(char* text);
-char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index);
-int __stdcall GetFontHeight();
-int GetScreenWidth();
-int GetScreenHeight();
+#include "../graphics/display.h"
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int flag);
 void __stdcall SetKeyboardInput(Gui* menu, int flag);
-void __stdcall MarkChanged(Gui* menu);
 void __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
-int GetFont();
 int __stdcall GetTextWidth(int font, unsigned char* text);
 int __stdcall FillRectangle(void* surface, Rect_004b6720* rect, int color);
-int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 
 struct FileHandle;
 
-void __stdcall YesNoDialogHandler(Gui* menu);
-void __stdcall MessageBoxHandler(Gui* menu);
-void __stdcall NotExistDialogHandler(Gui* menu);
-void __stdcall Choice3DialogHandler(Gui* menu);
-void __stdcall InputDialogHandler(Gui* menu);
 
 // FUNCTION: 0x4abb20
 int __stdcall OpenConfirmDialog(Gui* sub, char* title)
@@ -937,7 +914,7 @@ int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, in
         SetKeyboardInput(gui, 1);
         RenderLayer(gui, 1);
         layer->handler = MessageBoxHandler;
-        MarkChanged(gui);
+        MarkChanged((Dialog *)gui);
         UpdateMenu(gui);
         GameFreeThunk(wrapped);
         return 1;
@@ -1148,7 +1125,6 @@ struct Block_004c5ff0;
 struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;
-void __stdcall CopyPaletteEntries(char* obj, void* dest);
 
 // FUNCTION: 0x4ac710
 void __stdcall BuildColorRemapTable(PalEntry_004aa8f0* src, PalEntry_004aa8f0* dest, unsigned char* table)
@@ -1205,9 +1181,6 @@ void __stdcall CopyPaletteEntries(char* obj, void* dest)
     memcpy(dest, obj + 0xb2, 0x100 * sizeof(int));
 }
 
-void __stdcall ShowPaletteEntryRgb(Gui* obj, unsigned char* colors, int index);
-void __stdcall LerpPaletteRange(unsigned char* data, int a, int b);
-void __stdcall WriteTabs(FileHandle* file, int depth);
 
 // FUNCTION: 0x4ac8c0
 void __stdcall DrawColorGrid(Gui* obj)

@@ -6,12 +6,12 @@
 #include "../util/tdf.h"
 #include "../../interfaces/ref.h"
 
-void __cdecl GameFreeThunk(void* p);
+#include "../graphics/object_pool.h"
 
 void __cdecl operator delete(void* p);
 
 struct MovementClass;
-unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y);
+#include "../map/terrain.h"
 
 struct Source_00440340 {
     char unknown_0[4];
@@ -71,8 +71,6 @@ public:
     void BuildPassMap();
 };
 
-int __stdcall GetPassMapCellValue(Class_00440500* obj, Cell* cell);
-
 #pragma pack(push, 2)
 struct Struct_00440a70 {
     Ref<Unit_00440af0> unit;
@@ -85,8 +83,6 @@ struct Struct_00440a70 {
 
 #include "../network/player.h"
 #include "../../interfaces/seams.h"
-
-void AbortProgram(void);
 
 #include "../map/mission.h"
 
@@ -114,7 +110,7 @@ struct Src_00440ca0 {
     Rect_00440ca0 rect;
 };
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 // FUNCTION: 0x4402e0
 MovementClass::MovementClass()
@@ -221,7 +217,7 @@ void Class_00440500::BuildPassMap()
     for (int j = 0; j < height; j++) {
         Cell* c = &g_game->cells[j * width];
         for (n = 0; n < width; n++, c++)
-            v[n] = (unsigned char)GetPassMapCellValue(this, c);
+            v[n] = (unsigned char)GetPassMapCellValue((MovementClass *)this, c);
         v[-2] = 0;
         v[-1] = 0;
         for (n = 0; n <= footprintX; n++)

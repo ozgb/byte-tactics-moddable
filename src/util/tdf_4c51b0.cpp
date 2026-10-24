@@ -2,8 +2,6 @@
 
 #include "string_ref.h"
 
-void __cdecl GameFreeThunk(int* param_1);
-
 #include <new>
 #include "tdf.h"
 

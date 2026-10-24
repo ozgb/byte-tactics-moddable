@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "multi_443ff0.h"
 extern "C" __declspec(dllimport) char* __stdcall lstrcpynA(char*, const char*, int);
 struct Guid_443ff0 { unsigned long data1; unsigned short data2; unsigned short data3; unsigned char data4[8]; };
 #pragma pack(push,1)
@@ -12,8 +13,8 @@ extern Guid_443ff0 g_dpspGuidTcpip;
 extern Guid_443ff0 g_dpspGuidIpx;
 extern Guid_443ff0 g_dpspGuidModem;
 extern Guid_443ff0 g_dpspGuidSerial;
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-int IsOnlineConfigLoaded();
+#include "../debug/debug_lib.h"
+#include "../network/online.h"
 // FUNCTION: 0x443ff0
 int __stdcall SelectConnection(int index)
 {

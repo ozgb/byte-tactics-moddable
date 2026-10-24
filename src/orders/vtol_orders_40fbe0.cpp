@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "../state/block.h"
 #include "../util/vec3.h"
+#include "vtol_orders_40fbe0.h"
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& b) { Vec3 r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
 struct Unit;
 struct Order;
@@ -18,18 +19,16 @@ struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index
 #include "../../interfaces/seams.h"
 #include "../game/game.h"
 #pragma pack(pop)
-extern Game* g_game;
+#include "../../link/globals.h"
 short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 union Fixed { int value; struct { unsigned short frac; short whole; } parts; };
-Vec3 __stdcall DirectionFromAngle(short, Fixed);
+#include "vtol_orders.h"
 static inline Vec3 Direction(short angle, int range) { Fixed distance; distance.value=range; return DirectionFromAngle(angle,distance); }
 Vec3 __stdcall AddVec3(const Vec3&, const Vec3&);
-void __stdcall AppendOrderToTail(Unit*, Order*);
+#include "order_list.h"
 
-int __stdcall IssueAttackOrder(Unit*, Unit*, int);
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
-void __stdcall AppendOrder(Unit*, Order*);
-int __stdcall RandomInt(int);
+#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }

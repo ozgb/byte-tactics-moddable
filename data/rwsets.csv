@@ -8463,7 +8463,6 @@ address,function,file,kind,target
 0x429870,LoadGameResources,src/game/data_files.cpp,call,TdfFile::~TdfFile
 0x429870,LoadGameResources,src/game/data_files.cpp,call,TdfRecord::GetFieldInt
 0x429870,LoadGameResources,src/game/data_files.cpp,call,TdfRecord::GetFieldString
-0x429870,LoadGameResources,src/game/data_files.cpp,call,operator=
 0x429870,LoadGameResources,src/game/data_files.cpp,call,sprintf
 0x429870,LoadGameResources,src/game/data_files.cpp,deref_read,*int
 0x429870,LoadGameResources,src/game/data_files.cpp,field_escape,Game::sidePanelBotSeq
@@ -25167,12 +25166,10 @@ address,function,file,kind,target
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,UpdateLineOfSight
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,UpdateRadarMapped
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,memset
-0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,operator FrameTable *
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,operator Unit *
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,operator short *
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,operator unsigned short *
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,operator*
-0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,operator->
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,operator=
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,deref_read,*Flags_14281
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,deref_read,*Flags_142f1
@@ -25232,12 +25229,10 @@ address,function,file,kind,target
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosTables::GetLosTable
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosTables::GetLosTableCount
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,get
-0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,operator FrameTable *
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,operator Player *
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,operator short *
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,operator unsigned short *
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,operator*
-0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,operator->
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,deref_escape,*unsigned short
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,deref_read,*Flags_14281
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,deref_read,*Flags_142f1
@@ -25282,7 +25277,6 @@ address,function,file,kind,target
 0x481d50,RemoveLineOfSight,src/map/line_of_sight_481d50.cpp,call,LosTables::GetLosTable
 0x481d50,RemoveLineOfSight,src/map/line_of_sight_481d50.cpp,call,LosTables::GetLosTableCount
 0x481d50,RemoveLineOfSight,src/map/line_of_sight_481d50.cpp,call,get
-0x481d50,RemoveLineOfSight,src/map/line_of_sight_481d50.cpp,call,operator FrameTable *
 0x481d50,RemoveLineOfSight,src/map/line_of_sight_481d50.cpp,call,operator short *
 0x481d50,RemoveLineOfSight,src/map/line_of_sight_481d50.cpp,call,operator unsigned char *
 0x481d50,RemoveLineOfSight,src/map/line_of_sight_481d50.cpp,call,operator*
@@ -25358,7 +25352,6 @@ address,function,file,kind,target
 0x482270,AddLineOfSight,src/map/line_of_sight_482270.cpp,call,LosTables::GetLosTable
 0x482270,AddLineOfSight,src/map/line_of_sight_482270.cpp,call,LosTables::GetLosTableCount
 0x482270,AddLineOfSight,src/map/line_of_sight_482270.cpp,call,get
-0x482270,AddLineOfSight,src/map/line_of_sight_482270.cpp,call,operator FrameTable *
 0x482270,AddLineOfSight,src/map/line_of_sight_482270.cpp,call,operator short *
 0x482270,AddLineOfSight,src/map/line_of_sight_482270.cpp,call,operator unsigned char *
 0x482270,AddLineOfSight,src/map/line_of_sight_482270.cpp,call,operator*
@@ -25398,10 +25391,8 @@ address,function,file,kind,target
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,RemoveLineOfSight
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,abs
-0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,operator FrameTable *
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,operator short *
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,operator*
-0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,operator->
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,deref_read,*Flags_14281
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,deref_read,*short
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,deref_write,*short
@@ -25448,10 +25439,8 @@ address,function,file,kind,target
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,GetGafFrame
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,UpdateLineOfSight
-0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,operator FrameTable *
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,operator short *
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,operator*
-0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,operator->
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,deref_read,*Flags_14281
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,deref_read,*short
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,deref_write,*short
@@ -25473,7 +25462,6 @@ address,function,file,kind,target
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,GetGafFrame
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,UpdateLineOfSight
-0x482910,AddEyeball,src/map/line_of_sight.cpp,call,operator FrameTable *
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,operator*
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,operator->
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,operator=
@@ -25519,10 +25507,8 @@ address,function,file,kind,target
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,GetGafFrame
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,UpdateLineOfSight
-0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,operator FrameTable *
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,operator short *
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,operator*
-0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,operator->
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,operator=
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,deref_read,*Flags_14281
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,deref_read,*short
@@ -25801,8 +25787,8 @@ address,function,file,kind,target
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,call,operator unsigned short *
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,call,operator=
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,deref_read,*void
-0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,deref_write,*FogGrid
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,deref_write,*IconSet
+0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,deref_write,*MapFogGrid
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,deref_write,*int
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,field_escape,Game::field_141fb
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,field_escape,Game::field_141ff
@@ -25903,7 +25889,6 @@ address,function,file,kind,target
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,call,FillRectangle
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,call,GetGafFrame
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,call,GrayRectangle
-0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,call,operator FogCell *
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,deref_escape,*FogCell
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,deref_read,*Flags_004848e0
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,deref_read,*Flags_14281
@@ -25913,15 +25898,15 @@ address,function,file,kind,target
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Flags_14281::raw
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,FogCell::level0
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,FogCell::level1
-0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,FogGrid::cells
-0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,FogGrid::height
-0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,FogGrid::width
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::black
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::colors
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::field_1421f
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::gray
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::scrollX
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::scrollY
+0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,MapFogGrid::cells
+0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,MapFogGrid::height
+0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,MapFogGrid::width
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Rect::left
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Rect::top
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_write,Flags_14281::raw

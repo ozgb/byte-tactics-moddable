@@ -691,7 +691,7 @@ struct Game {
         unsigned short* sidePanelRows[10];
     };
     unsigned short* sidePanelSideSeq[5];
-    Ref<FrameTable> losTable;
+    FrameTable* losTable;
     union {
         void* black[4];
         struct {

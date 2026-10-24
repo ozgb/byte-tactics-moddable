@@ -143,6 +143,7 @@ Game,list,pointer,src/game/game.h,#353
 Game,list_1435f,pointer,src/game/game.h,#353
 Game,logos,pointer,src/game/game.h,#353
 Game,logos32,pointer,src/game/game.h,#353
+Game,losTable,pointer,src/game/game.h,#352
 Game,moviePlayer,pointer,src/game/game.h,#353
 Game,nuclogo,pointer,src/game/game.h,#353
 Game,nuke1,int-pointer,src/game/game.h,#353

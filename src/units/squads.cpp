@@ -29,7 +29,7 @@ void __stdcall CreateSquads(Player* owner)
     for (int i = 0; i < 10; i++)
     {
         Squad* squad = &((Squad*)owner->groups)[i];
-        squad->owner = (int)owner;
+        squad->owner = owner;
         squad->index = i;
         squad->field_8 = 0;
         squad->field_c = 0;

@@ -360,7 +360,7 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
                             void* pic;
                             if (fflags.bits.usePic) {
                                 if (fflags.bits.shaded) {
-                                    int unit = *(int*)((char*)g_game + 0x1b8a + kind * 0x14b);
+                                    int unit = (int)(*(Ref<char>*)((char*)g_game + 0x1b8a + kind * 0x14b)).get();
                                     pic = GetGafFrame(face->color,
                                         *(unsigned char*)(unit + 0x96));
                                 } else if (useColor) {
@@ -1142,7 +1142,7 @@ void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
             if (face->count != 4) goto skip0;
             if (flags.bits.usePic) {
                 if (flags.bits.shaded) {
-                    unit = *(int*)(((char*)g_game + 0x1b8a) + ((palette & 0xff) * 0x14b));
+                    unit = (int)(*(Ref<char>*)(((char*)g_game + 0x1b8a) + ((palette & 0xff) * 0x14b))).get();
                     pic = GetGafFrame(face->color, *(unsigned char*)(unit + 0x96));
                 } else pic = useColor ? GetGafFrame(face->color, 0) : GetGafSequenceFrame(&face->pic);
             } else pic = face->pic;

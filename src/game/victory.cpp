@@ -41,6 +41,7 @@ struct Param_0048e010 {
     TdfRecord* reader;                   // +0x4
 };
 
+#include "../../interfaces/ref.h"
 #pragma pack(push, 1)
 struct UnitType {
     char unknown_0[0x20];
@@ -54,14 +55,14 @@ struct Owner_0048ea40 {
 
 struct Link_0048ea40 {
     char unknown_0[0x27];
-    Owner_0048ea40* owner;             // +0x27
+    Ref<Owner_0048ea40> owner;             // +0x27
 };
 
 #include "../units/unit.h"
 
 struct UnitList {
-    Unit* first;                       // +0x0
-    Unit* last;                        // +0x4 (inclusive)
+    Ref<Unit> first;                       // +0x0
+    Ref<Unit> last;                        // +0x4 (inclusive)
 
     void ForEach(Listener_0048ff40* visitor)
     {

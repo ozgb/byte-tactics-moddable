@@ -1084,7 +1084,7 @@ int __cdecl GetLocalPlayerPassword()
     eax = eax << 5;
     eax = eax + edx;
     eax = eax + eax * 4;
-    eax = *(int*)(ecx + eax * 2 + 0x1b8a);
+    eax = (int)(*(Ref<char>*)(ecx + eax * 2 + 0x1b8a)).get();
     return eax + 0x80;
 }
 

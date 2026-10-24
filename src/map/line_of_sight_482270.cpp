@@ -8,6 +8,7 @@
 #include <memory>
 #include "los_tables.h"
 
+#include "../../interfaces/ref.h"
 #pragma pack(push, 1)
 
 class LosLine {
@@ -42,7 +43,7 @@ struct MapSize_482270 {
 };
 
 struct ByteMap_482270 {
-    unsigned char* data;               // +0x0
+    Ref<unsigned char> data;               // +0x0
     MapSize_482270 size;               // +0x4
     unsigned char& at(int x, int y) { return data[y * size.width + x]; }
 };

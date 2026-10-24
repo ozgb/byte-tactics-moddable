@@ -19,6 +19,7 @@
 #include "../state/game_rand.h"
 #include "../files/files_api.h"
 
+#include "../../interfaces/ref.h"
 #pragma pack(push, 1)
 
 #include "game.h"
@@ -82,7 +83,7 @@ struct PlayerRec_00497f40 {             // 0x14b bytes, array at g_game+0x1b63
     unsigned char percent;              // +0x20
     unsigned char keepaliveFlags;       // +0x21
     char unknown_22[0x27 - 0x22];
-    PlayerInfo* data;                   // +0x27
+    Ref<PlayerInfo> data;                   // +0x27
     char name[0x73 - 0x2b];             // +0x2b
     union {
         unsigned char team;             // +0x73
@@ -412,7 +413,7 @@ void __cdecl LoadMatch(void*)
             host_sleep_ms(0x32);
         }
 
-        g_seams.map->LoadMissionByName(((Mission*)g_game->net), 0, (char*)(*(PlayerRec_00497f40(*)[10])&g_game->players)[sel].data);
+        g_seams.map->LoadMissionByName(((Mission*)g_game->net), 0, (char*)(*(PlayerRec_00497f40(*)[10])&g_game->players)[sel].data.get());
         if (FindHostSlot() == 10)
             break;
 

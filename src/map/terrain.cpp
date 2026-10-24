@@ -31,6 +31,7 @@
 
 struct Unit;
 
+#include "../../interfaces/ref.h"
 #pragma pack(push, 1)
 
 #include "../util/vec3.h"
@@ -103,7 +104,7 @@ struct MapSize_0047d2e0 {
 };
 
 struct ByteMap_0047d2e0 {
-    unsigned char* data;
+    Ref<unsigned char> data;
     MapSize_0047d2e0 size;
     int Contains(int x, int y) { return x < size.width && y < size.height; }
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }

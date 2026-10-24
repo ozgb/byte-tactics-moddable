@@ -817,7 +817,7 @@ int IntDynArray::EraseByValue(int value)
 // The vector's default allocator argument is a temporary copied into the
 // allocator byte; MSVC keeps it in the first parameter's stack slot.
 // FUNCTION: 0x480160
-Squad::Squad(int a, int b)
+Squad::Squad(Player* a, int b)
     : owner(a), index(b), field_8(0), field_c(0)
 {
 }

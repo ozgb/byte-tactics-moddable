@@ -4,6 +4,112 @@ Progress updates, newest first. Each entry is headed by the date and the
 `moddable` commit it describes, and covers what changed since the entry
 before it.
 
+## 2026-10-24 12:40 UTC, [dfc62a0d](https://github.com/ozgb/byte-tactics-moddable/commit/dfc62a0d)
+
+The plan changed. This repository now prepares for a clean-room
+re-implementation of the game in Rust, and the work that re-implementation
+would replace is deferred to it.
+
+### The new plan
+
+- **Milestone 1**
+  ([#2](https://github.com/ozgb/byte-tactics-moddable/issues/2), this
+  repository): the decompiled 3.1c source, made deterministic, traced and cut
+  into subsystems behind seams. It no longer aims to become the moddable
+  engine itself. Its job is to be the oracle and the contract that Milestone 2
+  is judged by.
+- **Milestone 2**
+  ([#180](https://github.com/ozgb/byte-tactics-moddable/issues/180),
+  [ozgb/btm](https://github.com/ozgb/btm)): a clean-room re-implementation in
+  Rust, under the MIT licence, with subsystems and mods as WASM modules over
+  one shared wasm32 memory. Implementers never see the decompiled code: they
+  work from behaviour-only specs, in a sandbox that can't reach this
+  repository, and a module is accepted only when its traces equal the
+  reference's.
+
+Why: everything built here is compiled from a decompilation of Cavedog's
+code, so it can only be released as source. A build made entirely of
+clean-room code can be released as binaries under the project's own licence.
+And the netcode, hosts, renderer and mod features would be written again in
+Rust anyway, so building them on the decompiled code now would be thrown
+away.
+
+### Done
+
+- **clang-tidy on the lines a pull request adds**
+  ([#364](https://github.com/ozgb/byte-tactics-moddable/issues/364)), the first
+  part of readable source
+  ([#363](https://github.com/ozgb/byte-tactics-moddable/issues/363)).
+
+### Up next
+
+- **WASM runtime and the wind and meteors pilot**
+  ([#9](https://github.com/ozgb/byte-tactics-moddable/issues/9)), first. Its
+  loader and module ABI are now also the boundary every Rust module is gated
+  through, so it must load modules rustc emits, and the ABI gets a written
+  spec.
+- **The oracle**, so a trace match proves something without the source:
+  - the trace format as a spec, with a second, independent hasher
+    ([#384](https://github.com/ozgb/byte-tactics-moddable/issues/384));
+  - scenario coverage per subsystem, and scenarios to raise it
+    ([#385](https://github.com/ozgb/byte-tactics-moddable/issues/385));
+  - replay recordings for every subsystem
+    ([#10](https://github.com/ozgb/byte-tactics-moddable/issues/10),
+    [#389](https://github.com/ozgb/byte-tactics-moddable/issues/389));
+  - differential fuzzing against the reference
+    ([#47](https://github.com/ozgb/byte-tactics-moddable/issues/47));
+  - frame dumps and a sound log for presentation
+    ([#339](https://github.com/ozgb/byte-tactics-moddable/issues/339),
+    [#335](https://github.com/ozgb/byte-tactics-moddable/issues/335)).
+- **The contracts:** a link check that each subsystem reaches the rest only
+  through its seams
+  ([#386](https://github.com/ozgb/byte-tactics-moddable/issues/386)), standing
+  in for moving every subsystem to WASM here, and the rest of `Ref<T>`
+  ([#187](https://github.com/ozgb/byte-tactics-moddable/issues/187)).
+- **The clean room:**
+  - a microVM sandbox for implementer agents, with no route to this
+    repository, the original exe or any credential that reaches them
+    ([#387](https://github.com/ozgb/byte-tactics-moddable/issues/387));
+  - the oracle kit that crosses into ozgb/btm, and a gate runner that stays
+    here and grades the modules sent to it
+    ([#388](https://github.com/ozgb/byte-tactics-moddable/issues/388)).
+- **Still going:** readable source
+  ([#363](https://github.com/ozgb/byte-tactics-moddable/issues/363)), which
+  helps the spec writers, and cross-host determinism
+  ([#19](https://github.com/ozgb/byte-tactics-moddable/issues/19)).
+
+### Deferred to Milestone 2
+
+48 issues, closed as not planned with the
+[`milestone-2`](https://github.com/ozgb/byte-tactics-moddable/issues?q=label%3Amilestone-2)
+label. Their text stays as design input for the specs.
+
+- each subsystem as a WASM module
+  ([#11](https://github.com/ozgb/byte-tactics-moddable/issues/11) to
+  [#18](https://github.com/ozgb/byte-tactics-moddable/issues/18));
+- lockstep netcode, server-client mode and the network transport
+  ([#21](https://github.com/ozgb/byte-tactics-moddable/issues/21),
+  [#23](https://github.com/ozgb/byte-tactics-moddable/issues/23),
+  [#28](https://github.com/ozgb/byte-tactics-moddable/issues/28)) and the
+  player view
+  ([#22](https://github.com/ozgb/byte-tactics-moddable/issues/22));
+- game data loading, audio and video, and the OpenGL renderer
+  ([#25](https://github.com/ozgb/byte-tactics-moddable/issues/25) to
+  [#27](https://github.com/ozgb/byte-tactics-moddable/issues/27));
+- the whole game as wasm32, the native and browser hosts, threads, the debug
+  build and releases
+  ([#29](https://github.com/ozgb/byte-tactics-moddable/issues/29) to
+  [#34](https://github.com/ozgb/byte-tactics-moddable/issues/34));
+- mods: manifests, loading, settings, hooks, Lua, COB extensions, Open
+  Annihilation's hacks and UI modules
+  ([#39](https://github.com/ozgb/byte-tactics-moddable/issues/39),
+  [#20](https://github.com/ozgb/byte-tactics-moddable/issues/20),
+  [#41](https://github.com/ozgb/byte-tactics-moddable/issues/41) to
+  [#46](https://github.com/ozgb/byte-tactics-moddable/issues/46));
+- the tree-wide format and lint passes
+  ([#375](https://github.com/ozgb/byte-tactics-moddable/issues/375),
+  [#376](https://github.com/ozgb/byte-tactics-moddable/issues/376)).
+
 ## 2026-10-24 07:17 UTC, [5732ae96](https://github.com/ozgb/byte-tactics-moddable/commit/5732ae96)
 
 First entry, covering everything since the fork started.

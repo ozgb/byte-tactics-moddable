@@ -7,6 +7,7 @@ import contextlib
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -211,15 +212,49 @@ class TidyTest(Repo, unittest.TestCase):
                 self.assertIn(name, found[0][2])
                 self.git("reset", "-q", "--hard", "HEAD~1")
 
-    def test_existing_placeholder_name_passes(self):
+    def test_name_already_in_the_tree_is_new_when_added_again(self):
         self.edit("src/c.cpp", "return 0;", "return FUN_00401000();")
+        found = self.placeholders()
+        self.assertEqual([f[:2] for f in found], [("src/c.cpp", 1)], found)
+
+    def test_new_common_placeholder_member_fails_though_the_tree_has_it(self):
+        self.write("src/d.h", "struct D { int field_10; };\n")
+        self.commit()
+        self.write("src/e.h", "struct E { int field_10; };\n")
+        self.commit()
+        found = self.placeholders()
+        self.assertEqual([f[:2] for f in found], [("src/e.h", 1)], found)
+        self.assertIn("field_10", found[0][2])
+
+    def test_moved_placeholder_name_passes(self):
+        self.write("src/b.cpp", '#include "a.h"\n')
+        self.write("src/c.cpp", LEGACY)
+        self.commit()
         self.assertEqual(self.placeholders(), [])
 
-    def test_existing_name_in_another_file_type_still_known(self):
-        self.write("data/names.csv", "DAT_00512370\n")
+    def test_move_out_of_a_deleted_file_passes(self):
+        self.write("src/c.cpp", LEGACY)
+        self.git("rm", "-q", "src/b.cpp")
         self.commit()
-        self.edit("src/c.cpp", "return 0;", "return DAT_00512370;")
         self.assertEqual(self.placeholders(), [])
+
+    def test_name_added_twice_and_removed_once_fails(self):
+        self.write("src/b.cpp", '#include "a.h"\n')
+        self.write("src/c.cpp", LEGACY + LEGACY)
+        self.commit()
+        found = self.placeholders()
+        self.assertEqual({f[:2] for f in found}, {("src/c.cpp", n) for n in (1, 2, 3, 4)}, found)
+
+    def test_naming_regexes_only_exempt_placeholder_forms(self):
+        text = (Path(__file__).resolve().parent.parent / ".clang-tidy").read_text()
+        rows = re.findall(r"IgnoredRegexp: '(.*)'", text)
+        self.assertGreater(len(rows), 10)
+        for row in rows:
+            regex = re.compile("^(" + row[row.index(".*_00"):-3] + ")$")
+            for name in ("is_bad", "do_fade", "add_face", "set_dead", "faded"):
+                self.assertIsNone(regex.match(name), (name, row))
+            for name in ("Class_00463be0", "field_10", "unknown_4", "param_1", "unk_8", "vec_c", "rest_3923b", "bits0_3923b", "bit11_37ebe"):
+                self.assertIsNotNone(regex.match(name), (name, row))
 
     def test_name_in_comment_or_string_ignored(self):
         self.edit("src/c.cpp", "return 0;", 'return 0; // FUN_00bad001\nconst char *s = "DAT_00bad001";')

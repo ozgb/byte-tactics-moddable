@@ -17,7 +17,7 @@ address,function,callee,kind,file,class,notes
 0x404730,ReclaimUnitOrder,_allmul,call,src/orders/unit_orders.cpp,presentation,sites=2
 0x404730,ReclaimUnitOrder,_allshr,call,src/orders/unit_orders.cpp,presentation,sites=2
 0x404ad0,ReclaimOrder,_ftol,call,src/orders/unit_orders.cpp,presentation,sites=1
-0x404db0,ResurrectOrder,_ftol,call,src/orders/unit_orders_404db0.cpp,presentation,sites=1
+0x404db0,ResurrectOrder,_ftol,call,src/orders/unit_orders.cpp,presentation,sites=1
 0x405300,RepairUnitOrder,_ftol,call,src/orders/unit_orders.cpp,presentation,sites=4
 0x405300,RepairUnitOrder,_hypot,call,src/orders/unit_orders.cpp,presentation,sites=4
 0x406900,GroundUnloadOrder,_ftol,call,src/orders/unit_orders.cpp,presentation,sites=1
@@ -70,8 +70,8 @@ address,function,callee,kind,file,class,notes
 0x411f50,AirStrikeOrder,fsqrt,inline,src/orders/vtol_orders.cpp,presentation,sites=1
 0x412710,AirToGroundOrder,_ftol,call,src/orders/vtol_orders.cpp,presentation,sites=2
 0x412710,AirToGroundOrder,_hypot,call,src/orders/vtol_orders.cpp,presentation,sites=2
-0x412d40,AirToAirOrder,_ftol,call,src/orders/vtol_orders_412d40.cpp,presentation,sites=2
-0x412d40,AirToAirOrder,_hypot,call,src/orders/vtol_orders_412d40.cpp,presentation,sites=2
+0x412d40,AirToAirOrder,_ftol,call,src/orders/vtol_orders.cpp,presentation,sites=2
+0x412d40,AirToAirOrder,_hypot,call,src/orders/vtol_orders.cpp,presentation,sites=2
 0x413470,AirToGroundHoverOrder,_ftol,call,src/orders/vtol_orders.cpp,presentation,sites=2
 0x413470,AirToGroundHoverOrder,_hypot,call,src/orders/vtol_orders.cpp,presentation,sites=2
 0x414770,VtolReclaimOrder,_ftol,call,src/orders/vtol_orders.cpp,presentation,sites=1

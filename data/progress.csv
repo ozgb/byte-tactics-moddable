@@ -44,7 +44,7 @@ address,size,file,symbol,status,similarity
 0x404270,1212,src/orders/unit_orders.cpp,?CaptureOrder@@YGHPAUUnit@@PAUOrder@@I@Z,matched,100.0
 0x404730,920,src/orders/unit_orders.cpp,?ReclaimUnitOrder@@YGHPAUUnit@@PAUOrder@@I@Z,matched,100.0
 0x404ad0,724,src/orders/unit_orders.cpp,?ReclaimOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
-0x404db0,1348,src/orders/unit_orders_404db0.cpp,?ResurrectOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
+0x404db0,1348,src/orders/unit_orders.cpp,?ResurrectOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x405300,1080,src/orders/unit_orders.cpp,?RepairUnitOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x405740,574,src/orders/unit_orders.cpp,?RepairUnitNoMoveOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x405980,1040,src/orders/unit_orders.cpp,?RepairPatrolOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
@@ -205,14 +205,14 @@ address,size,file,symbol,status,similarity
 0x40f1e0,25,src/ai/pathfind.cpp,?FreeNode@Pathfinder@@QAEXH@Z,matched,100.0
 0x40f200,158,src/orders/vtol_orders.cpp,?PrepVtolClimb@@YGXPAUUnit@@PAUOrder@@I@Z,matched,100.0
 0x40f2a0,1260,src/orders/vtol_orders.cpp,?VtolLandIfCanOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
-0x40f790,51,src/orders/vec3_add.cpp,?AddVec3@@YG?AUVec3@@ABU1@0@Z,matched,100.0
+0x40f790,51,src/orders/vtol_orders.cpp,?AddVec3@@YG?AUVec3@@ABU1@0@Z,matched,100.0
 0x40f7d0,590,src/orders/vtol_orders.cpp,?VtolStandbyOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x40fa20,435,src/orders/vtol_orders.cpp,?VtolMoveOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x40fbe0,1976,src/orders/vtol_orders.cpp,?VtolFollowOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x4103a0,63,src/orders/vtol_orders.cpp,?DirectionFromAngle@@YG?AUVec3@@FTFixed@@@Z,matched,100.0
-0x4103e0,1102,src/orders/vtol_orders_4103e0.cpp,?VtolSeekAttackOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
+0x4103e0,1102,src/orders/vtol_orders.cpp,?VtolSeekAttackOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x410830,22,src/orders/vtol_orders.cpp,??0LandingPadList@@QAE@XZ,matched,100.0
-0x410850,1051,src/orders/vtol_orders_410850.cpp,?VtolSeekGuardOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
+0x410850,1051,src/orders/vtol_orders.cpp,?VtolSeekGuardOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x410c70,508,src/orders/vtol_orders.cpp,?CollectGroundAlly@GroundAllyVisitor@@UAEXPAUUnit@@@Z,matched,100.0
 0x410e70,824,src/orders/vtol_orders.cpp,?VtolPatrolOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x4111b0,932,src/orders/vtol_orders.cpp,?VtolPickupOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
@@ -221,7 +221,7 @@ address,size,file,symbol,status,similarity
 0x4118e0,1636,src/orders/vtol_orders.cpp,?VtolLandingOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x411f50,1980,src/orders/vtol_orders.cpp,?AirStrikeOrder@@YGHPAUUnit@@PAUOrder@@I@Z,matched,100.0
 0x412710,1572,src/orders/vtol_orders.cpp,?AirToGroundOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
-0x412d40,1838,src/orders/vtol_orders_412d40.cpp,?AirToAirOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
+0x412d40,1838,src/orders/vtol_orders.cpp,?AirToAirOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x413470,1864,src/orders/vtol_orders.cpp,?AirToGroundHoverOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x413bc0,441,src/orders/vtol_orders.cpp,?VtolEvadeOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x413d80,1480,src/orders/vtol_orders.cpp,?VtolMobileBuildOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
@@ -231,7 +231,7 @@ address,size,file,symbol,status,similarity
 0x414a80,997,src/orders/vtol_orders.cpp,?VtolReclaimUnitOrder@@YGHPAUUnit@@PAUOrder@@I@Z,matched,100.0
 0x414e70,988,src/orders/vtol_orders.cpp,?VtolRepairUnitOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x415250,146,src/orders/vtol_orders.cpp,?VtolGetRepairedOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
-0x4152f0,1504,src/orders/vtol_orders_4152f0.cpp,?VtolRepairPatrolOrder@@YGHPAUUnit@@PAUOrder@@I@Z,matched,100.0
+0x4152f0,1504,src/orders/vtol_orders.cpp,?VtolRepairPatrolOrder@@YGHPAUUnit@@PAUOrder@@I@Z,matched,100.0
 0x4158d0,578,src/orders/vtol_orders.cpp,?CollectRepairableUnit@RepairableUnitVisitor@@UAEXPAUUnit@@@Z,matched,100.0
 0x415b20,13,src/network/net_stats.cpp,?RegisterVtolOrders@@YGXXZ,matched,100.0
 0x415b30,41,src/network/net_stats.cpp,?StepAllGafSequences@@YGXXZ,matched,100.0
@@ -964,7 +964,7 @@ address,size,file,symbol,status,similarity
 0x44d910,32,src/orders/order_targets.cpp,?Destroy@PointMarker@@QAEPAXE@Z,matched,100.0
 0x44d930,102,src/orders/order_targets.cpp,??0PointMarker@@QAE@HPAVHapiBank@@PAD@Z,matched,100.0
 0x44d9a0,83,src/orders/order_targets.cpp,?Serialize@PointMarker@@QAEHHPAVHapiBank@@PAD@Z,matched,100.0
-0x44da00,606,src/orders/order_targets_44da00.cpp,?AppendGoalCell@PointMarker@@QAEXPAV?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@@Z,matched,100.0
+0x44da00,606,src/orders/order_targets.cpp,?AppendGoalCell@PointMarker@@QAEXPAV?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@@Z,matched,100.0
 0x44dc60,75,src/orders/order_targets.cpp,?FillWorldPos@PointMarker@@QAEHPAH@Z,matched,100.0
 0x44dcb0,74,src/orders/order_targets.cpp,?ContainsCell@PointMarker@@QAEHHH@Z,matched,100.0
 0x44dd00,182,src/orders/order_targets.cpp,?ApproxDist@PointMarker@@QAEHHH@Z,matched,100.0

@@ -995,115 +995,116 @@ address,function,file,kind,target
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetGroundHeight]
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,AppendOrder
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,BroadcastPacket
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,EmitNanoParticles
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,GetHeadingBetween
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,GetOrderType
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,MarkSelectionOrdersDirty
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,Order::AttachBuildFootprintMarker
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,Order::SetDeadlineTicks
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,PathOrderAttach::SetUnit
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,QueueUnitSpeech
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,RandomInt
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,StartBuildingScript
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,WaitIfNotInBuildStance
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,operator Cell *
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,operator FeatureSpot *
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,operator Mission *
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,operator Unit *
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,operator UnitDef *
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,operator bool
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,operator new
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,operator->
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,call,operator=
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,deref_escape,*Feature
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,deref_escape,*FeatureSpot
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_maybe_written,Box::lo
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_maybe_written,Order::link
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_maybe_written,Order::pos
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_maybe_written,Unit::pos
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Angles16::heading
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Box::lo
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Cell::spot
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Feature::flags
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Feature::footprintX
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Feature::footprintZ
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Feature::height
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Feature::name
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,FeatureSpot::rot
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,FeaturesSeam::GetCellFeature
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,FeaturesSeam::RemoveFeature
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Game::cells
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Game::defs
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Game::features
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Game::net
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Game::spots
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Game::ticks
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Game::width
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,LosRadarSeam::GetOriginCellAtPosition
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,MapSeam::GetGameType
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,MissionType::index
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Order::countdown
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Order::pos
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Order::state
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Order::target
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Order::unitType
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Player::id
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Point16::x
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Point16::y
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Seams::features
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Seams::los_radar
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Seams::map
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Seams::units
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Seams::weapons
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Unit::def
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Unit::motion
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Unit::player
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Unit::playerIndex
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,UnitDef::buildRate
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,UnitDef::buildtime
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,UnitDef::flags2
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,UnitsSeam::CreateUnit
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,UnitsSeam::FindUnitTypeId
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,UnitsSeam::GetGroundHeight
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,UnitsSeam::GetNanoPiecePosition
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Vec3::x
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Vec3::y
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,Vec3::z
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_read,WeaponsSeam::FindFeatureAtPos
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Box::hi
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,FeatureDamagePacket::sub
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,FeatureDamagePacket::type
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,FeatureDamagePacket::x
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,FeatureDamagePacket::z
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Order::countdown
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Order::flags
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Order::unitType
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Point16::x
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Point16::y
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Unit::angles
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Unit::buildLeft
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Unit::health
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Unit::workTime
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Vec3::x
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Vec3::y
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,field_write,Vec3::z
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,function,
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,global_read,g_game
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,global_read,g_seams
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,global_read,kSim
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,indirect via Cell *(*)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetMapCellAtPosition]
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,indirect via Cell *(*)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetOriginCellAtPosition]
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,"indirect via int (*)(Cell *, int) __attribute__((stdcall)) [FeaturesSeam::RemoveFeature]"
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetGroundHeight]
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,indirect via unsigned short (*)(Cell *) __attribute__((stdcall)) [FeaturesSeam::GetCellFeature]
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
-0x404db0,ResurrectOrder,src/orders/unit_orders_404db0.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,AppendOrder
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,BroadcastPacket
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,GetOrderType
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,MarkSelectionOrdersDirty
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Cell *
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator FeatureSpot *
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Mission *
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Unit *
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator UnitDef *
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator bool
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator new
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator->
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator=
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,deref_escape,*Feature
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,deref_escape,*FeatureSpot
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_maybe_written,Box::lo
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_maybe_written,Order::link
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_maybe_written,Order::pos
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_maybe_written,Unit::pos
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Angles16::heading
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Box::lo
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Cell::offsetX
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Cell::offsetY
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Feature::flags
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Feature::footprintX
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Feature::footprintZ
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Feature::height
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Feature::name
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,FeatureSpot::rot
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,FeaturesSeam::GetCellFeature
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,FeaturesSeam::RemoveFeature
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Game::cells
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Game::defs
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Game::features
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Game::net
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Game::spots
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Game::ticks
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Game::width
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,LosRadarSeam::GetOriginCellAtPosition
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,MapSeam::GetGameType
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,MissionType::index
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Order::countdown
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Order::pos
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Order::state
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Order::target
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Order::unitType
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Player::id
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Point16::x
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Point16::y
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Seams::features
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Seams::los_radar
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Seams::map
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Seams::units
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Unit::def
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Unit::motion
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Unit::player
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Unit::playerIndex
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,UnitDef::buildRate
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,UnitDef::buildtime
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,UnitDef::flags2
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,UnitsSeam::CreateUnit
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,UnitsSeam::FindUnitTypeId
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,UnitsSeam::GetGroundHeight
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,UnitsSeam::GetNanoPiecePosition
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Vec3::x
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Vec3::y
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,Vec3::z
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_read,WeaponsSeam::FindFeatureAtPos
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Box::hi
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,FeatureDamagePacket::sub
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,FeatureDamagePacket::type
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,FeatureDamagePacket::x
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,FeatureDamagePacket::z
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Order::countdown
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Order::flags
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Order::unitType
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Point16::x
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Point16::y
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Unit::angles
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Unit::buildLeft
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Unit::health
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Unit::workTime
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Vec3::x
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Vec3::y
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,field_write,Vec3::z
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,function,
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,global_read,g_game
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,global_read,g_seams
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,global_read,kSim
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,indirect via Cell *(*)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetMapCellAtPosition]
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,indirect via Cell *(*)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetOriginCellAtPosition]
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Cell *, int) __attribute__((stdcall)) [FeaturesSeam::RemoveFeature]"
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetGroundHeight]
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,indirect via unsigned short (*)(Cell *) __attribute__((stdcall)) [FeaturesSeam::GetCellFeature]
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
@@ -3161,13 +3162,13 @@ address,function,file,kind,target
 0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Vec3 *) __attribute__((stdcall)) [MapSeam::CanPlaceFootprintAt]"
 0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetGroundHeight]
 0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
-0x40f790,AddVec3,src/orders/vec3_add.cpp,field_read,Vec3::x
-0x40f790,AddVec3,src/orders/vec3_add.cpp,field_read,Vec3::y
-0x40f790,AddVec3,src/orders/vec3_add.cpp,field_read,Vec3::z
-0x40f790,AddVec3,src/orders/vec3_add.cpp,field_write,Vec3::x
-0x40f790,AddVec3,src/orders/vec3_add.cpp,field_write,Vec3::y
-0x40f790,AddVec3,src/orders/vec3_add.cpp,field_write,Vec3::z
-0x40f790,AddVec3,src/orders/vec3_add.cpp,function,
+0x40f790,AddVec3,src/orders/vtol_orders.cpp,field_read,Vec3::x
+0x40f790,AddVec3,src/orders/vtol_orders.cpp,field_read,Vec3::y
+0x40f790,AddVec3,src/orders/vtol_orders.cpp,field_read,Vec3::z
+0x40f790,AddVec3,src/orders/vtol_orders.cpp,field_write,Vec3::x
+0x40f790,AddVec3,src/orders/vtol_orders.cpp,field_write,Vec3::y
+0x40f790,AddVec3,src/orders/vtol_orders.cpp,field_write,Vec3::z
+0x40f790,AddVec3,src/orders/vtol_orders.cpp,function,
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,AppendOrder
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,Class_0044e6c0::SetAltitude
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,IssueAttackOrder
@@ -3331,122 +3332,122 @@ address,function,file,kind,target
 0x4103a0,DirectionFromAngle,src/orders/vtol_orders.cpp,field_write,Vec3::y
 0x4103a0,DirectionFromAngle,src/orders/vtol_orders.cpp,field_write,Vec3::z
 0x4103a0,DirectionFromAngle,src/orders/vtol_orders.cpp,function,
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,AddVec3
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,AppendOrder
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,Class_0044e6c0::SetAltitude
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,Class_0044e730::SetApproachRadius
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,GetHeadingBetween
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,IssueAttackOrder
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,LandingPadList::~LandingPadList
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,Offset
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,Order::SetAttachedFx
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,Order::SetDeadlineTicks
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,RandomInt
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,UnitMotion::SetFlightMode
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,count
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,empty
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,get
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator Unit *
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator WeaponDef *
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator bool
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator new
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator->
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator=
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,call,operator[]
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_maybe_written,Unit::pos
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,AiSeam::GetFactoriesInRadius
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Game::mapHeight
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Game::mapWidth
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Game::overflowBucket
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Order::angle
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Order::flags
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Order::pos
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Order::state
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Order::target
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Owner::index
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Seams::ai
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Seams::targeting
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Seams::units
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Seams::weapons
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,TargetingSeam::FindBestTargetIfFireAtWill
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Unit::carrier
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Unit::def
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Unit::health
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Unit::motion
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Unit::player
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Unit::pos
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Unit::spatialBucket
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,UnitDef::altitude
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,UnitDef::flags1
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,UnitDef::maxHealth
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,UnitMotion::flags
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,UnitWeaponSlot::weapon
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,UnitsSeam::AttachUnitToPiece
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,UnitsSeam::SetStateBits
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Vec3::x
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Vec3::y
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,Vec3::z
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,WeaponDef::range
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,WeaponsSeam::ClaimWeapons
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_read,WeaponsSeam::ReleaseWeapons
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_write,Order::angle
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_write,Order::flags
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_write,Order::parity
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_write,Order::pos
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_write,Vec3::x
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,field_write,Vec3::z
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,function,
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,global_read,g_game
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,global_read,g_seams
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,global_read,kSim
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,indirect_call,indirect via Unit *(*)(Unit *) __attribute__((stdcall)) [TargetingSeam::FindBestTargetIfFireAtWill]
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders_4103e0.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,AddVec3
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,AppendOrder
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,Class_0044e6c0::SetAltitude
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,Class_0044e730::SetApproachRadius
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,GetHeadingBetween
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,IssueAttackOrder
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,LandingPadList::~LandingPadList
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,Offset
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,empty
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,get
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,operator Unit *
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,operator WeaponDef *
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,operator bool
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,operator new
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,operator->
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,operator=
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,operator[]
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,size
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_maybe_written,Unit::pos
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,AiSeam::GetFactoriesInRadius
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Game::mapHeight
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Game::mapWidth
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Game::overflowBucket
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Order::angle
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Order::flags
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Order::pos
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Order::state
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Order::target
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Owner::index
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::ai
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::units
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::FindBestTargetIfFireAtWill
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::carrier
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::health
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::motion
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::player
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::pos
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::spatialBucket
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::altitude
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::flags1
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::maxHealth
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,UnitMotion::flags
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,UnitWeaponSlot::weapon
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,UnitsSeam::AttachUnitToPiece
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,UnitsSeam::SetStateBits
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Vec3::x
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Vec3::y
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Vec3::z
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,WeaponDef::range
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,WeaponsSeam::ClaimWeapons
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,WeaponsSeam::ReleaseWeapons
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_write,Order::angle
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_write,Order::flags
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_write,Order::parity
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_write,Order::pos
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_write,Vec3::x
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_write,Vec3::z
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,function,
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,global_read,g_game
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,global_read,g_seams
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,global_read,kSim
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,indirect via Unit *(*)(Unit *) __attribute__((stdcall)) [TargetingSeam::FindBestTargetIfFireAtWill]
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
 0x410830,LandingPadList::LandingPadList,src/orders/vtol_orders.cpp,deref_write,*unsigned char
 0x410830,LandingPadList::LandingPadList,src/orders/vtol_orders.cpp,field_write,std::vector<Unit >::_End
 0x410830,LandingPadList::LandingPadList,src/orders/vtol_orders.cpp,field_write,std::vector<Unit >::_First
 0x410830,LandingPadList::LandingPadList,src/orders/vtol_orders.cpp,field_write,std::vector<Unit >::_Last
 0x410830,LandingPadList::LandingPadList,src/orders/vtol_orders.cpp,function,
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,AddVec3
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,Class_0044e2d0::SetApproachRadius
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,Direction
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,GetHeadingBetween
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,Order::SetAttachedFx
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,Patrol
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,RandomInt
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,get
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,operator bool
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,operator new
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,operator->
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,call,operator=
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,deref_write,*Vec3
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_escape,Order::pos
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_maybe_written,Unit::pos
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Game::mapHeight
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Game::mapWidth
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Game::overflowBucket
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Order::angle
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Order::flags
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Order::state
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Unit::def
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Unit::motion
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Unit::pos
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Unit::spatialBucket
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,UnitDef::flags1
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Vec3::x
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Vec3::y
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_read,Vec3::z
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_write,Order::angle
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_write,Order::flags
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_write,Order::parity
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_write,Vec3::x
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,field_write,Vec3::z
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,function,
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,global_read,g_game
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders_410850.cpp,global_read,kSim
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,AddVec3
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,Class_0044e2d0::SetApproachRadius
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,Direction
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,GetHeadingBetween
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,Patrol
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,get
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,operator bool
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,operator new
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,operator->
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,operator=
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,deref_write,*Vec3
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_escape,Order::pos
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_maybe_written,Unit::pos
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Game::mapHeight
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Game::mapWidth
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Game::overflowBucket
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Order::angle
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Order::flags
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Order::state
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Unit::motion
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Unit::pos
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Unit::spatialBucket
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::flags1
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Vec3::x
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Vec3::y
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_read,Vec3::z
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_write,Order::angle
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_write,Order::flags
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_write,Order::parity
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_write,Vec3::x
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,field_write,Vec3::z
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,function,
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,global_read,g_game
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,global_read,kSim
 0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,call,get
 0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,call,operator->
 0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,call,push_back
@@ -3802,77 +3803,77 @@ address,function,file,kind,target
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Add
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,AddVec3
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,AirManeuverOrder::SetAltitude
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,AppendOrder
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,AppendOrderToTail
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Class_0044e2d0::SetApproachRadius
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,GetHeadingBetween
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,IsAhead
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Offset
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Order::AnnounceStatusIfFlagged
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Order::SetAttachedFx
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Order::SetDeadlineTicks
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,PrepVtolClimb
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,RandomInt
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Sum
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,_hypot
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,get
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,operator Unit *
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,operator UnitMotion *
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,operator bool
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,operator new
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,operator->
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,operator==
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,deref_read,*int
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_escape,Order::next
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_escape,Order::pos
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_escape,Unit::pos
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_maybe_written,Unit::pos
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,<anon>::whole
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Game::mapHeight
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Game::mapWidth
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Game::overflowBucket
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Order::flags
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Order::flags_42
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Order::range
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Order::state
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Order::target
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Order::ticks
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Order::x
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Order::z
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Seams::targeting
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Seams::weapons
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Unit::def
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Unit::flags
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Unit::heading
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Unit::motion
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Unit::pos
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Unit::spatialBucket
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Unit::xWhole
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Unit::zWhole
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,UnitDef::altitude
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,UnitDef::flags1
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,UnitDef::maxvelocity
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,UnitMotion::velocity
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::x
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::z
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,WeaponsSeam::ClaimWeapons
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_read,WeaponsSeam::ReleaseWeapons
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_write,Fixed::v
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_write,Order::flags
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_write,Order::ticks
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::x
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::z
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,function,
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,global_read,g_game
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,global_read,g_seams
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,global_read,kSim
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Add
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,AddVec3
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,AirManeuverOrder::SetAltitude
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,AppendOrder
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,AppendOrderToTail
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Class_0044e2d0::SetApproachRadius
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,GetHeadingBetween
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,IsAhead
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Offset
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Sum
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,get
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator Unit *
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator UnitMotion *
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator bool
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator new
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator->
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator==
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,deref_read,*int
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_escape,Order::next
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_escape,Order::pos
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_escape,Unit::pos
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_maybe_written,Unit::pos
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,<anon>::whole
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Game::mapHeight
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Game::mapWidth
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Game::overflowBucket
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::flags
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::flags_42
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::range
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::state
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::target
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::ticks
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::x
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::z
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::flags
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::heading
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::motion
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::pos
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::spatialBucket
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::xWhole
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::zWhole
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::altitude
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::flags1
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::maxvelocity
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,UnitMotion::velocity
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Vec3::x
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Vec3::z
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,WeaponsSeam::ClaimWeapons
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,WeaponsSeam::ReleaseWeapons
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_write,Fixed::value
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_write,Order::flags
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_write,Order::ticks
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_write,Vec3::x
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_write,Vec3::z
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,function,
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,global_read,g_game
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,global_read,g_seams
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,global_read,kSim
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,AddComponentwise
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,AddVec3
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,AppendOrder
@@ -4308,60 +4309,60 @@ address,function,file,kind,target
 0x415250,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::maxHealth
 0x415250,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,field_write,<anon>::started
 0x415250,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,function,
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,AppendOrder
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,Class_0044e2d0::SetAltitude
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,EnsurePatrolReturnOrder
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,IssueRepairOrder
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,Land
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,Order::AnnounceStatusIfFlagged
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,Order::SetAttachedFx
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,Order::SetDeadlineTicks
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,Player::GetEnergy
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,Player::GetMetal
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,PrepVtolClimb
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,RandomInt
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,Total
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,empty
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,operator Player *
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,operator bool
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,operator new
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,operator!=
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,operator->
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,operator=
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,operator[]
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,call,size
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_maybe_written,Unit::pos
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Fixed::v
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,MapSeam::PickRandomReclaimableResourcesInRadius
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,MapSeam::VisitObjectsInRange
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Order::flags
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Order::pos
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Order::state
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Order::target
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Player::energy
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Player::energyCapacity
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Player::metalCapacity
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Seams::map
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Seams::units
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::buildLeft
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::def
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::motion
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::player
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::pos
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,UnitDef::altitude
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,UnitDef::flags1
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,UnitDef::flags2
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,UnitDef::range
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_read,UnitsSeam::CanRepair
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_write,Fixed::v
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_write,Order::flags
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,field_write,Order::pos
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,function,
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,global_read,g_seams
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,global_read,kSim
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanRepair]"
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,indirect_call,"indirect via int (*)(Vec3 *, int, Vec3 **, float *, Vec3 **, float *) __attribute__((stdcall)) [MapSeam::PickRandomReclaimableResourcesInRadius]"
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders_4152f0.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,AppendOrder
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Class_0044e2d0::SetAltitude
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,EnsurePatrolReturnOrder
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,IssueRepairOrder
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Land
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Player::GetEnergy
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Player::GetMetal
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Total
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,empty
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,operator Player *
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,operator bool
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,operator new
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,operator!=
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,operator->
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,operator=
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,operator[]
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,size
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_maybe_written,Unit::pos
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Fixed::value
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,MapSeam::PickRandomReclaimableResourcesInRadius
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,MapSeam::VisitObjectsInRange
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Order::flags
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Order::pos
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Order::state
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Order::target
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Player::energy
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Player::energyCapacity
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Player::metalCapacity
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Seams::map
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Seams::units
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::buildLeft
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::motion
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::player
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::pos
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::altitude
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::flags1
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::flags2
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,UnitDef::range
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,UnitsSeam::CanRepair
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_write,Fixed::value
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_write,Order::flags
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_write,Order::pos
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,function,
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,global_read,g_seams
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,global_read,kSim
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanRepair]"
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Vec3 *, int, Vec3 **, float *, Vec3 **, float *) __attribute__((stdcall)) [MapSeam::PickRandomReclaimableResourcesInRadius]"
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
 0x4158d0,RepairableUnitVisitor::CollectRepairableUnit,src/orders/vtol_orders.cpp,call,operator Player *
 0x4158d0,RepairableUnitVisitor::CollectRepairableUnit,src/orders/vtol_orders.cpp,call,operator->
 0x4158d0,RepairableUnitVisitor::CollectRepairableUnit,src/orders/vtol_orders.cpp,call,push_back
@@ -15527,14 +15528,14 @@ address,function,file,kind,target
 0x44d9a0,PointMarker::Serialize,src/orders/order_targets.cpp,field_write,PointMarkerRecord::y1
 0x44d9a0,PointMarker::Serialize,src/orders/order_targets.cpp,field_write,PointMarkerRecord::y2
 0x44d9a0,PointMarker::Serialize,src/orders/order_targets.cpp,function,
-0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets_44da00.cpp,call,MakePoint_0044da00
-0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets_44da00.cpp,call,clear
-0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets_44da00.cpp,call,push_back
-0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets_44da00.cpp,field_read,PointMarker::x1
-0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets_44da00.cpp,field_read,PointMarker::x2
-0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets_44da00.cpp,field_read,PointMarker::y1
-0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets_44da00.cpp,field_read,PointMarker::y2
-0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets_44da00.cpp,function,
+0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets.cpp,call,MakePoint_0044da00
+0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets.cpp,call,clear
+0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets.cpp,call,push_back
+0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets.cpp,field_read,PointMarker::x1
+0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets.cpp,field_read,PointMarker::x2
+0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets.cpp,field_read,PointMarker::y1
+0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets.cpp,field_read,PointMarker::y2
+0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets.cpp,function,
 0x44dc60,PointMarker::FillWorldPos,src/orders/order_targets.cpp,call,MidX_44dc60
 0x44dc60,PointMarker::FillWorldPos,src/orders/order_targets.cpp,call,operator Order *
 0x44dc60,PointMarker::FillWorldPos,src/orders/order_targets.cpp,call,operator->
@@ -15937,6 +15938,9 @@ address,function,file,kind,target
 0x44ec20,AirManeuverOrder::SetHeading,src/orders/order_targets.cpp,field_write,AirManeuverOrder::heading
 0x44ec20,AirManeuverOrder::SetHeading,src/orders/order_targets.cpp,field_write,AirManeuverOrder::headingSet
 0x44ec20,AirManeuverOrder::SetHeading,src/orders/order_targets.cpp,function,
+0x44ec30,MakePoint_0044da00,src/orders/order_targets.cpp,field_write,Point16::x
+0x44ec30,MakePoint_0044da00,src/orders/order_targets.cpp,field_write,Point16::y
+0x44ec30,MakePoint_0044da00,src/orders/order_targets.cpp,function,
 0x44eef0,CopyDwordRangeUnchecked,src/orders/order_targets.cpp,call,operator=
 0x44eef0,CopyDwordRangeUnchecked,src/orders/order_targets.cpp,deref_read,*Point16
 0x44eef0,CopyDwordRangeUnchecked,src/orders/order_targets.cpp,deref_write,*Point16
@@ -43266,13 +43270,6 @@ address,function,file,kind,target
 ,Add,src/orders/vtol_orders.cpp,field_write,Vec3::y
 ,Add,src/orders/vtol_orders.cpp,field_write,Vec3::z
 ,Add,src/orders/vtol_orders.cpp,function,
-,Add,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::x
-,Add,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::y
-,Add,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::z
-,Add,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::x
-,Add,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::y
-,Add,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::z
-,Add,src/orders/vtol_orders_412d40.cpp,function,
 ,AddComponentwise,src/orders/vtol_orders.cpp,field_read,Vec3::x
 ,AddComponentwise,src/orders/vtol_orders.cpp,field_read,Vec3::y
 ,AddComponentwise,src/orders/vtol_orders.cpp,field_read,Vec3::z
@@ -43373,13 +43370,6 @@ address,function,file,kind,target
 ,AddScaled,src/map/features.cpp,field_read,Unit::owner
 ,AddScaled,src/map/features.cpp,function,
 ,AddScaled,src/map/features.cpp,global_read,g_game
-,AddVec3,src/orders/vtol_orders.cpp,field_read,Vec3::x
-,AddVec3,src/orders/vtol_orders.cpp,field_read,Vec3::y
-,AddVec3,src/orders/vtol_orders.cpp,field_read,Vec3::z
-,AddVec3,src/orders/vtol_orders.cpp,field_write,Vec3::x
-,AddVec3,src/orders/vtol_orders.cpp,field_write,Vec3::y
-,AddVec3,src/orders/vtol_orders.cpp,field_write,Vec3::z
-,AddVec3,src/orders/vtol_orders.cpp,function,
 ,AddVectors,src/orders/vtol_orders.cpp,field_read,Vec3::x
 ,AddVectors,src/orders/vtol_orders.cpp,field_read,Vec3::y
 ,AddVectors,src/orders/vtol_orders.cpp,field_read,Vec3::z
@@ -44364,8 +44354,6 @@ address,function,file,kind,target
 ,Contains,src/orders/unit_orders.cpp,function,
 ,Contains,src/orders/vtol_orders.cpp,deref_read,*unsigned int
 ,Contains,src/orders/vtol_orders.cpp,function,
-,Contains,src/orders/vtol_orders_4103e0.cpp,deref_read,*unsigned int
-,Contains,src/orders/vtol_orders_4103e0.cpp,function,
 ,Convert,src/orders/unit_orders.cpp,field_read,Vec3::x
 ,Convert,src/orders/unit_orders.cpp,field_read,Vec3::z
 ,Convert,src/orders/unit_orders.cpp,field_write,Point16::x
@@ -44542,12 +44530,6 @@ address,function,file,kind,target
 ,Direction,src/orders/vtol_orders.cpp,call,DirectionFromAngle
 ,Direction,src/orders/vtol_orders.cpp,field_write,Fixed::value
 ,Direction,src/orders/vtol_orders.cpp,function,
-,Direction,src/orders/vtol_orders_4103e0.cpp,call,DirectionFromAngle
-,Direction,src/orders/vtol_orders_4103e0.cpp,field_write,Fixed::value
-,Direction,src/orders/vtol_orders_4103e0.cpp,function,
-,Direction,src/orders/vtol_orders_410850.cpp,call,DirectionFromAngle
-,Direction,src/orders/vtol_orders_410850.cpp,field_write,Fixed::value
-,Direction,src/orders/vtol_orders_410850.cpp,function,
 ,Direction_0044e3c0,src/orders/order_targets.cpp,call,ScaledCos
 ,Direction_0044e3c0,src/orders/order_targets.cpp,call,ScaledSin
 ,Direction_0044e3c0,src/orders/order_targets.cpp,field_write,Vec3::x
@@ -45180,15 +45162,6 @@ address,function,file,kind,target
 ,FindPads,src/orders/vtol_orders.cpp,function,
 ,FindPads,src/orders/vtol_orders.cpp,global_read,g_seams
 ,FindPads,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
-,FindPads,src/orders/vtol_orders_410850.cpp,call,get
-,FindPads,src/orders/vtol_orders_410850.cpp,field_read,AiSeam::GetFactoriesInRadius
-,FindPads,src/orders/vtol_orders_410850.cpp,field_read,Owner::index
-,FindPads,src/orders/vtol_orders_410850.cpp,field_read,Seams::ai
-,FindPads,src/orders/vtol_orders_410850.cpp,field_read,Unit::player
-,FindPads,src/orders/vtol_orders_410850.cpp,field_read,Unit::pos
-,FindPads,src/orders/vtol_orders_410850.cpp,function,
-,FindPads,src/orders/vtol_orders_410850.cpp,global_read,g_seams
-,FindPads,src/orders/vtol_orders_410850.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
 ,FindPageStart,src/frontend/campaign_menu.cpp,deref_read,*char
 ,FindPageStart,src/frontend/campaign_menu.cpp,function,
 ,FindPanel_004aa8f0,src/gui/dialogs.cpp,call,strncmp
@@ -46154,7 +46127,6 @@ address,function,file,kind,target
 ,GridCell,src/orders/unit_orders.cpp,field_write,Point16::y
 ,GridCell,src/orders/unit_orders.cpp,function,
 ,GroundAllyVisitor::GroundAllyVisitor,src/orders/vtol_orders.cpp,function,
-,GroundAllyVisitor::GroundAllyVisitor,src/orders/vtol_orders_410850.cpp,function,
 ,Group::Send,src/ai/ai_player.cpp,call,OrderSquad
 ,Group::Send,src/ai/ai_player.cpp,call,operator Player *
 ,Group::Send,src/ai/ai_player.cpp,field_read,Group::id
@@ -47713,18 +47685,6 @@ address,function,file,kind,target
 ,IsAhead,src/orders/vtol_orders.cpp,field_read,Vec3Words::zWhole
 ,IsAhead,src/orders/vtol_orders.cpp,field_write,Fixed::value
 ,IsAhead,src/orders/vtol_orders.cpp,function,
-,IsAhead,src/orders/vtol_orders_412d40.cpp,call,DirectionFromAngle
-,IsAhead,src/orders/vtol_orders_412d40.cpp,call,GetHeadingBetween
-,IsAhead,src/orders/vtol_orders_412d40.cpp,call,Offset
-,IsAhead,src/orders/vtol_orders_412d40.cpp,call,Whole
-,IsAhead,src/orders/vtol_orders_412d40.cpp,call,operator->
-,IsAhead,src/orders/vtol_orders_412d40.cpp,field_maybe_written,Unit::pos
-,IsAhead,src/orders/vtol_orders_412d40.cpp,field_read,Order::target
-,IsAhead,src/orders/vtol_orders_412d40.cpp,field_read,Unit::heading
-,IsAhead,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::x
-,IsAhead,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::z
-,IsAhead,src/orders/vtol_orders_412d40.cpp,field_write,Fixed::v
-,IsAhead,src/orders/vtol_orders_412d40.cpp,function,
 ,IsAlly_00446fb0,src/frontend/multi.cpp,call,IsLiveType_00446fb0
 ,IsAlly_00446fb0,src/frontend/multi.cpp,call,operator->
 ,IsAlly_00446fb0,src/frontend/multi.cpp,field_read,Player::active
@@ -47771,11 +47731,6 @@ address,function,file,kind,target
 ,IsDamaged,src/orders/vtol_orders.cpp,field_read,Unit::health
 ,IsDamaged,src/orders/vtol_orders.cpp,field_read,UnitDef::maxHealth
 ,IsDamaged,src/orders/vtol_orders.cpp,function,
-,IsDamaged,src/orders/vtol_orders_410850.cpp,call,operator->
-,IsDamaged,src/orders/vtol_orders_410850.cpp,field_read,Unit::def
-,IsDamaged,src/orders/vtol_orders_410850.cpp,field_read,Unit::health
-,IsDamaged,src/orders/vtol_orders_410850.cpp,field_read,UnitDef::maxHealth
-,IsDamaged,src/orders/vtol_orders_410850.cpp,function,
 ,IsExplored,src/ai/ai_player_407e70.cpp,call,operator unsigned char *
 ,IsExplored,src/ai/ai_player_407e70.cpp,deref_read,*unsigned char
 ,IsExplored,src/ai/ai_player_407e70.cpp,field_read,Player::explored
@@ -48217,29 +48172,6 @@ address,function,file,kind,target
 ,Land,src/orders/vtol_orders.cpp,global_read,g_seams
 ,Land,src/orders/vtol_orders.cpp,global_read,kSim
 ,Land,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
-,Land,src/orders/vtol_orders_4152f0.cpp,call,AppendOrder
-,Land,src/orders/vtol_orders_4152f0.cpp,call,LandingPadList::~LandingPadList
-,Land,src/orders/vtol_orders_4152f0.cpp,call,Order::SetAttachedFx
-,Land,src/orders/vtol_orders_4152f0.cpp,call,RandomInt
-,Land,src/orders/vtol_orders_4152f0.cpp,call,empty
-,Land,src/orders/vtol_orders_4152f0.cpp,call,operator Player *
-,Land,src/orders/vtol_orders_4152f0.cpp,call,operator new
-,Land,src/orders/vtol_orders_4152f0.cpp,call,operator->
-,Land,src/orders/vtol_orders_4152f0.cpp,call,operator[]
-,Land,src/orders/vtol_orders_4152f0.cpp,call,size
-,Land,src/orders/vtol_orders_4152f0.cpp,field_read,AiSeam::GetFactoriesInRadius
-,Land,src/orders/vtol_orders_4152f0.cpp,field_read,Player::index
-,Land,src/orders/vtol_orders_4152f0.cpp,field_read,Seams::ai
-,Land,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::def
-,Land,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::health
-,Land,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::player
-,Land,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::pos
-,Land,src/orders/vtol_orders_4152f0.cpp,field_read,UnitDef::maxHealth
-,Land,src/orders/vtol_orders_4152f0.cpp,field_write,Order::flags
-,Land,src/orders/vtol_orders_4152f0.cpp,function,
-,Land,src/orders/vtol_orders_4152f0.cpp,global_read,g_seams
-,Land,src/orders/vtol_orders_4152f0.cpp,global_read,kSim
-,Land,src/orders/vtol_orders_4152f0.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
 ,Length,src/ai/ai_player_408100.cpp,call,bx_sqrt
 ,Length,src/ai/ai_player_408100.cpp,field_read,Vec3::x
 ,Length,src/ai/ai_player_408100.cpp,field_read,Vec3::y
@@ -48609,9 +48541,6 @@ address,function,file,kind,target
 ,MakePoint,src/orders/unit_orders.cpp,field_write,Point16::x
 ,MakePoint,src/orders/unit_orders.cpp,field_write,Point16::y
 ,MakePoint,src/orders/unit_orders.cpp,function,
-,MakePoint_0044da00,src/orders/order_targets_44da00.cpp,field_write,Point16::x
-,MakePoint_0044da00,src/orders/order_targets_44da00.cpp,field_write,Point16::y
-,MakePoint_0044da00,src/orders/order_targets_44da00.cpp,function,
 ,MakeVec3,src/ai/ai_player.cpp,field_write,Vec3::x
 ,MakeVec3,src/ai/ai_player.cpp,field_write,Vec3::y
 ,MakeVec3,src/ai/ai_player.cpp,field_write,Vec3::z
@@ -48976,24 +48905,6 @@ address,function,file,kind,target
 ,Offset,src/orders/vtol_orders.cpp,field_write,Vec3::y
 ,Offset,src/orders/vtol_orders.cpp,field_write,Vec3::z
 ,Offset,src/orders/vtol_orders.cpp,function,
-,Offset,src/orders/vtol_orders_4103e0.cpp,call,ScaledCos
-,Offset,src/orders/vtol_orders_4103e0.cpp,call,ScaledSin
-,Offset,src/orders/vtol_orders_4103e0.cpp,field_write,Vec3::x
-,Offset,src/orders/vtol_orders_4103e0.cpp,field_write,Vec3::y
-,Offset,src/orders/vtol_orders_4103e0.cpp,field_write,Vec3::z
-,Offset,src/orders/vtol_orders_4103e0.cpp,function,
-,Offset,src/orders/vtol_orders_410850.cpp,call,ScaledCos
-,Offset,src/orders/vtol_orders_410850.cpp,call,ScaledSin
-,Offset,src/orders/vtol_orders_410850.cpp,field_write,Vec3::x
-,Offset,src/orders/vtol_orders_410850.cpp,field_write,Vec3::y
-,Offset,src/orders/vtol_orders_410850.cpp,field_write,Vec3::z
-,Offset,src/orders/vtol_orders_410850.cpp,function,
-,Offset,src/orders/vtol_orders_412d40.cpp,call,ScaledCos
-,Offset,src/orders/vtol_orders_412d40.cpp,call,ScaledSin
-,Offset,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::x
-,Offset,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::y
-,Offset,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::z
-,Offset,src/orders/vtol_orders_412d40.cpp,function,
 ,OffsetChanged_004a4170,src/gui/gui.cpp,call,DrawSliderBar
 ,OffsetChanged_004a4170,src/gui/gui.cpp,call,SyncAssocGadgets
 ,OffsetChanged_004a4170,src/gui/gui.cpp,field_read,Gadget::knobPos
@@ -49560,40 +49471,6 @@ address,function,file,kind,target
 ,Patrol,src/orders/vtol_orders.cpp,global_read,g_seams
 ,Patrol,src/orders/vtol_orders.cpp,global_read,kSim
 ,Patrol,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
-,Patrol,src/orders/vtol_orders_410850.cpp,call,AppendOrder
-,Patrol,src/orders/vtol_orders_410850.cpp,call,Class_0044e2d0::SetApproachRadius
-,Patrol,src/orders/vtol_orders_410850.cpp,call,FindPads
-,Patrol,src/orders/vtol_orders_410850.cpp,call,GetOrderType
-,Patrol,src/orders/vtol_orders_410850.cpp,call,IsDamaged
-,Patrol,src/orders/vtol_orders_410850.cpp,call,LandingPadList::~LandingPadList
-,Patrol,src/orders/vtol_orders_410850.cpp,call,Offset
-,Patrol,src/orders/vtol_orders_410850.cpp,call,Order::SetAttachedFx
-,Patrol,src/orders/vtol_orders_410850.cpp,call,Order::SetDeadlineTicks
-,Patrol,src/orders/vtol_orders_410850.cpp,call,RandomInt
-,Patrol,src/orders/vtol_orders_410850.cpp,call,SearchRange
-,Patrol,src/orders/vtol_orders_410850.cpp,call,UnitList::~UnitList
-,Patrol,src/orders/vtol_orders_410850.cpp,call,empty
-,Patrol,src/orders/vtol_orders_410850.cpp,call,get
-,Patrol,src/orders/vtol_orders_410850.cpp,call,operator WeaponDef *
-,Patrol,src/orders/vtol_orders_410850.cpp,call,operator new
-,Patrol,src/orders/vtol_orders_410850.cpp,call,operator+
-,Patrol,src/orders/vtol_orders_410850.cpp,call,operator[]
-,Patrol,src/orders/vtol_orders_410850.cpp,call,size
-,Patrol,src/orders/vtol_orders_410850.cpp,field_maybe_written,Unit::pos
-,Patrol,src/orders/vtol_orders_410850.cpp,field_read,MapSeam::VisitObjectsInRange
-,Patrol,src/orders/vtol_orders_410850.cpp,field_read,Order::angle
-,Patrol,src/orders/vtol_orders_410850.cpp,field_read,Order::flags
-,Patrol,src/orders/vtol_orders_410850.cpp,field_read,Order::pos
-,Patrol,src/orders/vtol_orders_410850.cpp,field_read,Seams::map
-,Patrol,src/orders/vtol_orders_410850.cpp,field_read,Unit::player
-,Patrol,src/orders/vtol_orders_410850.cpp,field_read,UnitWeaponSlot::weapon
-,Patrol,src/orders/vtol_orders_410850.cpp,field_read,WeaponDef::range
-,Patrol,src/orders/vtol_orders_410850.cpp,field_write,Order::angle
-,Patrol,src/orders/vtol_orders_410850.cpp,field_write,Order::flags
-,Patrol,src/orders/vtol_orders_410850.cpp,function,
-,Patrol,src/orders/vtol_orders_410850.cpp,global_read,g_seams
-,Patrol,src/orders/vtol_orders_410850.cpp,global_read,kSim
-,Patrol,src/orders/vtol_orders_410850.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
 ,PeekFrame,src/network/packets.cpp,field_escape,FrameRing::frames
 ,PeekFrame,src/network/packets.cpp,field_read,FrameQueue::buffer
 ,PeekFrame,src/network/packets.cpp,field_read,FrameRing::count
@@ -49826,56 +49703,6 @@ address,function,file,kind,target
 ,PoseUnitModel,src/units/unit_scripts.cpp,field_write,SpotState::animDirty
 ,PoseUnitModel,src/units/unit_scripts.cpp,function,
 ,Positive_0046a860,src/ingame/info_panel_46a860.cpp,function,
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,call,Class_0044e2d0::SetAltitude
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,call,Order::SetAttachedFx
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,call,UnitMotion::SetFlightMode
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,call,operator bool
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,call,operator new
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,call,operator->
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,Order::flags
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,Seams::units
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,Seams::weapons
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,Unit::carrier
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,Unit::def
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,Unit::motion
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,Unit::pos
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,UnitDef::altitude
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,UnitMotion::flags
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,UnitsSeam::AttachUnitToPiece
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,UnitsSeam::SetStateBits
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_read,WeaponsSeam::ClaimWeapons
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,field_write,Order::flags
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,function,
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,global_read,g_seams
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,global_read,kSim
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
-,PrepVtolClimb,src/orders/vtol_orders_412d40.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,call,Class_0044e2d0::SetAltitude
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,call,Order::SetAttachedFx
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,call,UnitMotion::SetFlightMode
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,call,operator bool
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,call,operator new
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,call,operator->
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,Order::flags
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,Seams::units
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,Seams::weapons
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::carrier
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::def
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::motion
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,Unit::pos
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,UnitDef::altitude
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,UnitMotion::flags
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,UnitsSeam::AttachUnitToPiece
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,UnitsSeam::SetStateBits
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_read,WeaponsSeam::ClaimWeapons
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,field_write,Order::flags
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,function,
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,global_read,g_seams
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,global_read,kSim
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
-,PrepVtolClimb,src/orders/vtol_orders_4152f0.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 ,Prepare,src/state/block.cpp,call,At
 ,Prepare,src/state/block.cpp,call,Head
 ,Prepare,src/state/block.cpp,call,Reserve
@@ -50340,7 +50167,6 @@ address,function,file,kind,target
 ,RenameFile,src/files/files_api.h,global_read,g_seams
 ,RenameFile,src/files/files_api.h,indirect_call,"indirect via void (*)(const char *, const char *) __attribute__((stdcall)) [FilesSeam::Rename]"
 ,RepairableUnitVisitor::RepairableUnitVisitor,src/orders/vtol_orders.cpp,function,
-,RepairableUnitVisitor::RepairableUnitVisitor,src/orders/vtol_orders_4152f0.cpp,function,
 ,ReplaceFlagField,src/units/unit_types.cpp,function,
 ,ReportTopHolders,src/harness/block_scan.cpp,call,CleanTag
 ,ReportTopHolders,src/harness/block_scan.cpp,call,calloc
@@ -50511,10 +50337,6 @@ address,function,file,kind,target
 ,SearchRange,src/orders/vtol_orders.cpp,field_read,Unit::def
 ,SearchRange,src/orders/vtol_orders.cpp,field_read,UnitDef::range
 ,SearchRange,src/orders/vtol_orders.cpp,function,
-,SearchRange,src/orders/vtol_orders_410850.cpp,call,operator->
-,SearchRange,src/orders/vtol_orders_410850.cpp,field_read,Unit::def
-,SearchRange,src/orders/vtol_orders_410850.cpp,field_read,UnitDef::range
-,SearchRange,src/orders/vtol_orders_410850.cpp,function,
 ,SeedTrackReplies,src/host/win32/music.cpp,call,host_dir_close
 ,SeedTrackReplies,src/host/win32/music.cpp,call,host_dir_first
 ,SeedTrackReplies,src/host/win32/music.cpp,call,host_dir_next
@@ -51134,13 +50956,6 @@ address,function,file,kind,target
 ,Sum,src/orders/vtol_orders.cpp,field_write,Vec3::y
 ,Sum,src/orders/vtol_orders.cpp,field_write,Vec3::z
 ,Sum,src/orders/vtol_orders.cpp,function,
-,Sum,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::x
-,Sum,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::y
-,Sum,src/orders/vtol_orders_412d40.cpp,field_read,Vec3::z
-,Sum,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::x
-,Sum,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::y
-,Sum,src/orders/vtol_orders_412d40.cpp,field_write,Vec3::z
-,Sum,src/orders/vtol_orders_412d40.cpp,function,
 ,SumX,src/map/line_of_sight.cpp,field_read,Point16::x
 ,SumX,src/map/line_of_sight.cpp,function,
 ,SumY,src/map/line_of_sight.cpp,field_read,Point16::y
@@ -51270,7 +51085,6 @@ address,function,file,kind,target
 ,ToWorld,src/orders/order_targets.cpp,field_write,Vec3::z
 ,ToWorld,src/orders/order_targets.cpp,function,
 ,Total,src/orders/vtol_orders.cpp,function,
-,Total,src/orders/vtol_orders_4152f0.cpp,function,
 ,Trail_004394e0::Run,src/ingame/markers.cpp,call,DrawFrame
 ,Trail_004394e0::Run,src/ingame/markers.cpp,call,offset_004394e0
 ,Trail_004394e0::Run,src/ingame/markers.cpp,deref_read,*void
@@ -52561,8 +52375,6 @@ address,function,file,kind,target
 ,Whole,src/orders/unit_orders.cpp,function,
 ,Whole,src/orders/vtol_orders.cpp,deref_read,*short
 ,Whole,src/orders/vtol_orders.cpp,function,
-,Whole,src/orders/vtol_orders_412d40.cpp,deref_read,*short
-,Whole,src/orders/vtol_orders_412d40.cpp,function,
 ,WidthTextCast,src/graphics/font.cpp,deref_read,*unsigned char
 ,WidthTextCast,src/graphics/font.cpp,field_read,Font::first
 ,WidthTextCast,src/graphics/font.cpp,field_read,Font::offsets
@@ -52783,8 +52595,6 @@ address,function,file,kind,target
 ,color_taken,src/frontend/skirmish_menu.cpp,field_read,SkirmishPlayerSlot::color
 ,color_taken,src/frontend/skirmish_menu.cpp,function,
 ,color_taken,src/frontend/skirmish_menu.cpp,global_read,g_game
-,copy,src/orders/order_targets_44da00.cpp,call,CopyDwordRangeUnchecked
-,copy,src/orders/order_targets_44da00.cpp,function,
 ,digger_bias,src/graphics/model_render_4589c0.cpp,call,get
 ,digger_bias,src/graphics/model_render_4589c0.cpp,field_read,<anon>::digger
 ,digger_bias,src/graphics/model_render_4589c0.cpp,field_read,Model_459200::owner

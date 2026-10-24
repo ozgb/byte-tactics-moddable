@@ -467,7 +467,7 @@ address,function,file
 0x44d910,PointMarker::Destroy,src/orders/order_targets.cpp
 0x44d930,PointMarker::PointMarker,src/orders/order_targets.cpp
 0x44d9a0,PointMarker::Serialize,src/orders/order_targets.cpp
-0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets_44da00.cpp
+0x44da00,PointMarker::AppendGoalCell,src/orders/order_targets.cpp
 0x44dc60,PointMarker::FillWorldPos,src/orders/order_targets.cpp
 0x44dcb0,PointMarker::ContainsCell,src/orders/order_targets.cpp
 0x44dd00,PointMarker::ApproxDist,src/orders/order_targets.cpp

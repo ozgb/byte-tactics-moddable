@@ -670,14 +670,14 @@ void __stdcall HandleSingleMenuClick(Gui* gadget)
     if (IsCurrentGadgetNamed(gadget, "NewCamp")) {
         RegisterDataArchives();
         PlaySoundByName("BigButton", 0);
-        g_game->field_2bc0 = 10;
+        g_game->frontendNextSubState = 10;
         SetCursorMode(0x14);
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "Skirmish")) {
         RegisterDataArchives();
         PlaySoundByName("skirmish", 0);
-        g_game->field_2bc0 = 11;
+        g_game->frontendNextSubState = 11;
         SetCursorMode(0x14);
         return;
     }
@@ -698,13 +698,13 @@ void __stdcall HandleSingleMenuClick(Gui* gadget)
     if (IsCurrentGadgetNamed(gadget, "PrevMenu")) {
         PlaySoundByName("Previous", 0);
         SetCursorMode(0x14);
-        g_game->field_2bc0 = 3;
+        g_game->frontendNextSubState = 3;
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "AnyMsn")) {
         RegisterDataArchives();
         PlaySoundByName("bigButton", 0);
-        g_game->field_2bc0 = 14;
+        g_game->frontendNextSubState = 14;
         SetCursorMode(0x14);
         return;
     }
@@ -1233,7 +1233,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
         SetCursorMode(0x14);
         ((Sound *)g_game->field_10)->StopStream();
         BlankScreen();
-        g_game->field_2bc0 = 2;
+        g_game->frontendNextSubState = 2;
         return;
     }
     if (IsCurrentGadgetNamed(menu, "SHUTUP")) {
@@ -1254,7 +1254,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
         ((Sound *)g_game->field_10)->StopStream();
         PlaySoundByName("Previous", 0);
         BlankScreen();
-        g_game->field_2bc0 = 3;
+        g_game->frontendNextSubState = 3;
         SetCursorMode(0x14);
         return;
     }

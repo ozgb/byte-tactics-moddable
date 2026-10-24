@@ -40,7 +40,7 @@ CheckOptions:
   readability-identifier-naming.MethodCase: 'CamelCase'
   readability-identifier-naming.MethodIgnoredRegexp: '^(v[0-9]+|unused[0-9]*|(.*_00[0-9a-fA-F]{6}|(field|unknown|unk|param|vec)_[0-9a-fA-F]+|.*_[0-9a-f]*[0-9][0-9a-f]*|_.*|(FUN|DAT)_.*|field_.*|unk.*|param_.*|SimType_.*))$'
   readability-identifier-naming.MemberCase: 'camelBack'
-  readability-identifier-naming.MemberIgnoredRegexp: '^(g_[A-Za-z0-9_]+|(bits|flags?|arg|b[0-9]|f[0-9a-f]*)_[A-Za-z0-9_]+|[A-Z][A-Za-z0-9_]*|(.*_00[0-9a-fA-F]{6}|(field|unknown|unk|param|vec)_[0-9a-fA-F]+|.*_[0-9a-f]*[0-9][0-9a-f]*|_.*|(FUN|DAT)_.*|field_.*|unk.*|param_.*|SimType_.*))$'
+  readability-identifier-naming.MemberIgnoredRegexp: '^(g_[A-Za-z0-9_]+|pad_[0-9a-f]+(_[a-z])?|(bits|flags?|arg|b[0-9]|f[0-9a-f]*)_[A-Za-z0-9_]+|[A-Z][A-Za-z0-9_]*|(.*_00[0-9a-fA-F]{6}|(field|unknown|unk|param|vec)_[0-9a-fA-F]+|.*_[0-9a-f]*[0-9][0-9a-f]*|_.*|(FUN|DAT)_.*|field_.*|unk.*|param_.*|SimType_.*))$'
   readability-identifier-naming.VariableCase: 'camelBack'
   readability-identifier-naming.VariableIgnoredRegexp: '^((.*_00[0-9a-fA-F]{6}|(field|unknown|unk|param|vec)_[0-9a-fA-F]+|.*_[0-9a-f]*[0-9][0-9a-f]*|_.*|(FUN|DAT)_.*|field_.*|unk.*|param_.*|SimType_.*))$'
   readability-identifier-naming.ParameterCase: 'camelBack'

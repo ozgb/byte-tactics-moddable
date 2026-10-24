@@ -171,9 +171,9 @@ void __stdcall CmdCompression(int unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
-        g_game->field_4ed = (g_game->field_4ed == 0);
+        g_game->compressionDisabled = (g_game->compressionDisabled == 0);
         sprintf(buf, "Ok.  Outgoing packet compression turned %s",
-                g_game->field_4ed ? "OFF" : "ON");
+                g_game->compressionDisabled ? "OFF" : "ON");
         AddMessage(buf, 2, 0, 10);
     }
 }

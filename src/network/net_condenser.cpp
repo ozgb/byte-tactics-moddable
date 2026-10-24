@@ -186,7 +186,7 @@ int NetCondenser::SendPacket(void* session, int from)
 
     unsigned char flag;
     int total;
-    if (compressed + 3 < sendSize && g_game->field_4ed == 0) {
+    if (compressed + 3 < sendSize && g_game->compressionDisabled == 0) {
         flag = 4;
         total = compressed + 3;
     } else {

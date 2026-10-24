@@ -325,12 +325,12 @@ void __cdecl LoadMatch(void*)
         ApplyUseOnlyUnits();
         break;
     case 2:
-        g_game->field_37ee6 = g_game->maxUnits_37eec;
+        g_game->maxUnitsSetting = g_game->maxUnits_37eec;
         g_nonCampaignGame = 1;
         ApplyMissionOptionFlags(&((Options_00497180*)g_game->options)->settings);
         break;
     case 3: {
-        g_game->field_37ee6 = g_game->maxUnits_37eec;
+        g_game->maxUnitsSetting = g_game->maxUnits_37eec;
         g_nonCampaignGame = 1;
         g_game->otherFlags &= 0xfffe;
 
@@ -366,7 +366,7 @@ void __cdecl LoadMatch(void*)
         g_game->mapFlags_14281.bit1 = p2->los;
         g_game->mapFlags_14281.bit2 = p2->losType;
         g_game->mapFlags_14281.bit0 = p2->mapping;
-        g_game->field_37ee6 = p2->maxUnits;
+        g_game->maxUnitsSetting = p2->maxUnits;
         break;
     }
     default:
@@ -668,7 +668,7 @@ void LoadingScreenFrame(void)
         }
         BlankScreen();
         g_game->width_37e1f = 0x280;
-        g_game->field_37e23 = 0x1e0;
+        g_game->screenHeight = 0x1e0;
         if (GetScreenWidth() != 0x280 || GetScreenHeight() != 0x1e0) {
             GameFreeThunk((void*)g_game->screen);
             g_game->screen = 0;
@@ -676,7 +676,7 @@ void LoadingScreenFrame(void)
             RestoreScreen();
             host_window_place(0, 0, 0x280, 0x1e0);
             SetResolution(0x280, 0x1e0);
-            g_game->screen = (void*)AllocSurface("OFFSCREEN", g_game->width_37e1f, g_game->field_37e23);
+            g_game->screen = (void*)AllocSurface("OFFSCREEN", g_game->width_37e1f, g_game->screenHeight);
             SetRestoreSurface((int)g_game->screen);
             SetOffscreenSurface((void*)g_game->screen);
         }
@@ -690,11 +690,11 @@ void LoadingScreenFrame(void)
         g_game->streak = 0;
         g_game->endGameCountdown = (short)0xffff;
         g_game->width_37e1f = g_game->width_37f1b;
-        g_game->field_37e23 = g_game->height_37f1f;
+        g_game->screenHeight = g_game->height_37f1f;
         g_game->viewCullMinX = 0x80;
         g_game->viewCullMinY = 0x20;
         g_game->viewCullMaxX = g_game->width_37e1f - 1;
-        g_game->viewCullMaxY = g_game->field_37e23 - 0x21;
+        g_game->viewCullMaxY = g_game->screenHeight - 0x21;
         g_game->viewWidth = g_game->viewCullMaxX - g_game->viewCullMinX + 1;
         g_game->viewHeight = g_game->viewCullMaxY - g_game->viewCullMinY + 1;
         LoadPictureCached("loadgame2bg", 0, 0, 0);
@@ -729,7 +729,7 @@ void LoadingScreenFrame(void)
             RestoreScreen();
             host_window_place(0, 0, g_game->width_37f1b, g_game->height_37f1f);
             SetResolution(g_game->width_37f1b, g_game->height_37f1f);
-            g_game->screen = (void*)AllocSurface("OFFSCREEN", g_game->width_37e1f, g_game->field_37e23);
+            g_game->screen = (void*)AllocSurface("OFFSCREEN", g_game->width_37e1f, g_game->screenHeight);
             SetRestoreSurface((int)g_game->screen);
         }
         DrawLightBars();

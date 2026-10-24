@@ -908,7 +908,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
                 ApplySlotsToGamePlayers();
                 InitMissionStatus();
                 SaveSettings();
-                (*(char*)&g_game->field_2bc0) = 2;
+                (*(char*)&g_game->frontendNextSubState) = 2;
                 SetCursorMode(0x14);
                 return;
             }
@@ -923,7 +923,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
     if (IsCurrentGadgetNamed(menu, "PrevMenu")) {
         PlaySoundByName("Previous", 0);
         SetCursorMode(0x14);
-        (*(char*)&g_game->field_2bc0) = 3;
+        (*(char*)&g_game->frontendNextSubState) = 3;
         return;
     }
 

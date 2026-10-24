@@ -617,7 +617,7 @@ void __stdcall DrawNetworkStats(void* surface)
     Rect r;
     r.left = 0x81;
     r.right = 0xc1;
-    r.top = g_game->field_37e23 - 0x5f;
+    r.top = g_game->screenHeight - 0x5f;
     r.bottom = r.top + 8;
     int h = GetFontHeight();
     GetByteRates(&sent, &received);
@@ -779,7 +779,7 @@ void __stdcall DrawStatusPanel(Surface* win)
     DrawTextClipped(win, buf, left + 0x19, bottom + 0xa, -1, 0);
     int team = g_game->localPlayer;
     sprintf(buf, "%s : %d  (Max %d)", Translate("Total Units"),
-            (*(PlayerInfo_00467440 (*)[10])&g_game->players)[team].unitCount, g_game->field_37ee6);
+            (*(PlayerInfo_00467440 (*)[10])&g_game->players)[team].unitCount, g_game->maxUnitsSetting);
     DrawTextClipped(win, buf, left + 0xbe, bottom + 0xa, -1, 0);
     if ((unsigned short)g_game->effectiveGameSpeed == 10)
         sprintf(num, Translate("Normal"));

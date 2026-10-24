@@ -260,16 +260,16 @@ void MenuFrame()
         g_game->mode_391f1 = 5;
         g_game->handler = LoadingScreenFrame;
         SetCloseHandler(LeaveNetGameCallback, 0);
-    } else if (g_game->field_2bbe == 0x11) {
+    } else if (g_game->frontendState == 0x11) {
         if (g_game->bits_2a44.bit2) {
             HideSoftwareCursor();
             g_game->mode_391f1 = 3;
             g_game->handler = PreBattleFrame;
             SetCloseHandler(LeaveNetGameCallback, 0);
         }
-    } else if (g_game->field_2bbe == 0x10) {
+    } else if (g_game->frontendState == 0x10) {
         if (g_game->flags_2b4c.flag) {
-            if (g_game->field_2bbf == 0x12 || g_game->field_2bbf == 0x13) {
+            if (g_game->frontendSubState == 0x12 || g_game->frontendSubState == 0x13) {
                 HideSoftwareCursor();
                 g_game->mode_391f1 = 3;
                 g_game->handler = PreBattleFrame;

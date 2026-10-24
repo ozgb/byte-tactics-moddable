@@ -123,70 +123,70 @@ struct Game {
             int colour3;
             char unknown_214[561];
             V4i* guids;
-            char unknown_449[40];
+            char pad_449[40];
             Settings settings;
             char unknown_4c1[8];
             int from_id;
             int lobby1;
-            char unknown_4d1[12];
+            char pad_4d1[12];
         };
         struct {
             char session_14_1[1];
             char unknown_15[1156];
             int field_499;
-            char unknown_49d[64];
+            char pad_49d[64];
         };
         char session_14[1117];
         char net_14[1225];
     };
-    char unknown_4dd[8];
+    char pad_4dd[8];
     Net_4517b0* dplConnection;
-    char unknown_4e9[4];
-    int field_4ed;
+    char pad_4e9[4];
+    int compressionDisabled;
     int netMode;
-    char unknown_4f5[4];
+    char pad_4f5[4];
     int count;
-    int field_4fd;
-    char unknown_501[16];
+    int pad_4fd;
+    char pad_501[16];
     Player* slowest;
     int lag;
     union {
         struct {
             char menu[1];
-            char unknown_51a[3];
+            char pad_51a[3];
             void* gaf;
             int field_521;
             int field_525;
-            char unknown_529[4];
+            char pad_529[4];
             int field_52d;
             Struct_00499200_531* layer;
-            char unknown_535[72];
+            char pad_535[72];
             int team_index;
             int selected;
-            char unknown_585[4];
+            char pad_585[4];
             int field_589;
             char unknown_58d[2110];
             unsigned char textColor;
             unsigned char field_dcc;
-            char unknown_dcd[1];
+            char pad_dcd[1];
             unsigned char field_dce;
             unsigned char field_dcf;
-            char unknown_dd0[3];
+            char pad_dd0[3];
             unsigned char color2;
             unsigned char field_dd4;
             unsigned char field_dd5;
-            char unknown_dd6[1];
+            char pad_dd6[1];
             unsigned char field_dd7;
-            char unknown_dd8[1];
+            char pad_dd8[1];
             unsigned char unknown_dd9;
             unsigned char field_dda;
-            char unknown_ddb[1040];
+            char pad_ddb[1040];
             void* surface;
-            char unknown_11ef[256];
+            char pad_11ef[256];
             Entry_00463ca0 entries[30];
             int lobbySyncTick;
             Player players[10];
-            char unknown_2851[331];
+            char pad_2851[331];
             union {
                 int duplicateIds;
                 int duplicatePlayerTypeFlag;
@@ -196,7 +196,7 @@ struct Game {
             int field_519;
             char unknown_51d[2222];
             unsigned char colors[16];
-            char unknown_ddb_a[1300];
+            char pad_ddb_a[1300];
             char chatHudRing[4];
             char unknown_12f3[1868];
             PlayerInfo* infos[11];
@@ -212,9 +212,9 @@ struct Game {
             char menu_519[16];
             char unknown_529_a[2210];
             unsigned char colors_dcb[42];
-            char unknown_df5[1274];
+            char pad_df5[1274];
             char chatHudRing_12ef[30][72];
-            char unknown_1b5f[4];
+            char pad_1b5f[4];
             Player players_1b63_14b[1];
             char unknown_1cae[3314];
         };
@@ -222,27 +222,27 @@ struct Game {
             char message[24];
             char unknown_531[3559];
             ChatHudEntry entries_1318[30];
-            char unknown_1b88[2];
+            char pad_1b88[2];
             PlayerEntry_004777a0 players_1b8a[10];
-            char unknown_2878[296];
+            char pad_2878[296];
         };
         struct {
             Menu_00497ce0 menu_519_18;
             char unknown_531_a[5686];
             PlayerEntry_0046d6c0 players_1b67[10];
-            char unknown_2855[331];
+            char pad_2855[331];
         };
         struct {
             Menu_0045b800 menu_519_1c;
             char unknown_535_a[5802];
             PlayerGrid players_1bdf[10];
-            char unknown_28cd[211];
+            char pad_28cd[211];
         };
         struct {
             Menu gui_519;
             char unknown_559[5642];
             Player players_1b63[11];
-            char unknown_299c[4];
+            char pad_299c[4];
         };
         char menu_519_8b2[2226];
         Gui gui;
@@ -254,12 +254,12 @@ struct Game {
     union {
         struct {
             int loaded[10];
-            char unknown_29cc[4];
+            char pad_29cc[4];
             int startPosAssignAck[11];
             int startPosShuffle[10];
-            char unknown_2a24[4];
+            char pad_2a24[4];
             int startPosShuffleReady;
-            char unknown_2a2c[4];
+            char pad_2a2c[4];
         };
         int shareVisionReady[11];
         PlayerSlots_00497f40 slots_29a4;
@@ -302,12 +302,12 @@ struct Game {
     unsigned char field_2a46;
     union {
         struct {
-            char unknown_2a47[4];
+            char pad_2a47[4];
             void* data[15];
         };
         void* data16[16];
     };
-    char unknown_2a87[20];
+    char pad_2a87[20];
     void* list;
     V4i* sessions;
     Conn_443ff0* conns;
@@ -328,12 +328,12 @@ struct Game {
             unsigned short low_2b4c : 4;
             unsigned short flag_2b4c : 1;
             unsigned short rest_2b4c : 11;
-            char unknown_2b4e[28];
+            char pad_2b4e[28];
         };
         struct {
             char unknown_2ab1_a[155];
             Flags_00496ce0 flags_2b4c;
-            char unknown_2b4e_a[28];
+            char pad_2b4e_a[28];
         };
         char buffer_2ab1[185];
     };
@@ -341,17 +341,17 @@ struct Game {
         char game_info[84];
         struct {
             char unknown_2b6a[56];
-            V4i field_2ba2;
-            char unknown_2bb2[12];
+            V4i joinGuid;
+            char pad_2bb2[12];
         };
     };
-    unsigned char field_2bbe;
-    unsigned char field_2bbf;
-    unsigned char field_2bc0;
+    unsigned char frontendState;
+    unsigned char frontendSubState;
+    unsigned char frontendNextSubState;
     union {
         struct {
             char gameName[16];
-            char field_2bd1;
+            char pad_2bd1;
         };
         char gameName_2bc1[17];
     };
@@ -362,11 +362,11 @@ struct Game {
             unsigned short lobbyUiDirtyFlags;
             unsigned char mode_2bf0;
             unsigned char chatRecipients[11];
-            char unknown_2bfc[44];
+            char pad_2bfc[44];
             int table_2c28[10];
-            char unknown_2c50[36];
+            char pad_2c50[36];
             unsigned char lockFlags;
-            char unknown_2c75[1];
+            char pad_2c75[1];
             Arg_00419670 view;
             short x;
             short y;
@@ -381,7 +381,7 @@ struct Game {
             unsigned short hoverUnitId;
             unsigned short cellFeature;
             char cursorMode;
-            char unknown_2cbf[4];
+            char pad_2cbf[4];
             unsigned char orderMode;
             unsigned short buildTypeIndex;
             unsigned char pad_2cc6 : 5;
@@ -398,9 +398,9 @@ struct Game {
             Ref<Pathfinder> pathfinder;
             Ref<FeatureSpot> spots;
             Ref<Unit> unit;
-            char unknown_14213[8];
+            char pad_14213[8];
             int list_1421b;
-            void** field_1421f;
+            void** fogGrid;
             int baseX;
             int baseY;
             int mapWidth;
@@ -409,7 +409,7 @@ struct Game {
             int height;
             int screenTilesX;
             int screenTilesY;
-            char unknown_14243[16];
+            char pad_14243[16];
             int featureCount;
             int scanIndex;
             int windSpeedMin;
@@ -431,7 +431,7 @@ struct Game {
             Ref<Class_0047cb00> cells_1429f;
             unsigned int width_142a3;
             unsigned int height_142a7;
-            char unknown_142ab[4];
+            char pad_142ab[4];
             int field_142af;
             int field_142b3;
             Ref<Class_0047cb00> overflowBucket;
@@ -463,16 +463,16 @@ struct Game {
             short value_1434b;
         };
         struct {
-            char unknown_2be3[11];
+            char pad_2be3[11];
             struct {
                 unsigned short dirty : 1;
                 unsigned short bits1 : 15;
             } bits_2bee_1;
-            char unknown_2bf0[1];
+            char pad_2bf0[1];
             unsigned char chatRecipients_2bf1[10];
-            char unknown_2bfb[45];
+            char pad_2bfb[45];
             int playerIds[11];
-            char unknown_2c54[32];
+            char pad_2c54[32];
             struct {
                 unsigned short locked : 1;
                 unsigned short locked_rest : 15;
@@ -480,54 +480,54 @@ struct Game {
             int cursorScreenX;
             int cursorScreenY;
             int cursorKeyFlags;
-            char unknown_2c82[12];
+            char pad_2c82[12];
             Point16 point;
-            char unknown_2c92[26];
+            char pad_2c92[26];
             short xWhole;
-            char unknown_2cae[2];
+            char pad_2cae[2];
             short yWhole;
-            char unknown_2cb2[2];
+            char pad_2cb2[2];
             short zWhole;
-            char unknown_2cb6[16];
+            char pad_2cb6[16];
             unsigned char inputFlags;
-            char unknown_2cc7[24];
+            char pad_2cc7[24];
             int middleScrollActive;
             char unknown_2ce3[70952];
             Pool pool;
-            char unknown_1421f[98];
+            char pad_1421f[98];
             ViewFlags_497180 mapFlags_14281;
-            char unknown_14283[28];
+            char pad_14283[28];
             Grid spatialGrid;
-            char unknown_142af[12];
+            char pad_142af[12];
             int viewLeft;
             int viewTop;
             int viewRight;
             int viewBottom;
-            char unknown_142cb[28];
+            char pad_142cb[28];
             struct {
                 short v[4];
             } dim;
             char unknown_142ef[2];
             unsigned char viewDirtyFlags_142f1;
-            char field_142f2;
-            char unknown_142f3[90];
+            char pad_142f2;
+            char pad_142f3[90];
         };
         struct {
-            char unknown_2be3_a[11];
+            char pad_2be3_a[11];
             struct {
                 unsigned short dirty : 1;
             } bits_2bee_3;
-            char unknown_2bf0_a[1];
+            char pad_2bf0_a[1];
             Zero11_004917d0 chatRecipients_2bf1_b;
-            char unknown_2bfc_a[122];
+            char pad_2bfc_a[122];
             Point view_2c76;
-            char unknown_2c7e[44];
+            char pad_2c7e[44];
             void* pos_2caa;
-            char unknown_2cae_a[24];
+            char pad_2cae_a[24];
             Flags_004197d0 inputFlags_2cc6;
-            char unknown_2cc7_a[70964];
+            char pad_2cc7_a[70964];
             FeatureAnimPool anim;
-            char unknown_14273[14];
+            char pad_14273[14];
             struct {
                 unsigned short bit0 : 1;
                 unsigned short bit1 : 1;
@@ -535,21 +535,21 @@ struct Game {
                 unsigned short flag3 : 1;
                 unsigned short rest : 12;
             } bits_14281_1;
-            char unknown_14283_a[28];
+            char pad_14283_a[28];
             Grid2 spatialGrid_1429f;
-            char unknown_142b7[20];
+            char pad_142b7[20];
             char field_142cb_142cb[38];
             CameraFlags viewDirtyFlags;
-            char unknown_142f3_a[90];
+            char pad_142f3_a[90];
         };
         struct {
-            char unknown_2be3_b[11];
+            char pad_2be3_b[11];
             Bits_00426e80 lobbyUiDirtyFlags_2bee;
-            char unknown_2bf0_b[134];
+            char pad_2bf0_b[134];
             char orders[28];
-            char unknown_2c92_a[71017];
+            char pad_2c92_a[71017];
             MapInfo info_141fb;
-            char unknown_14277[10];
+            char pad_14277[10];
             struct {
                 unsigned short bit0_14281 : 1;
                 unsigned short bit1_14281 : 1;
@@ -561,18 +561,18 @@ struct Game {
                 unsigned short blinkOn : 1;
                 unsigned short rest_142f1 : 15;
             } bits_142f1;
-            char unknown_142f3_b[90];
+            char pad_142f3_b[90];
         };
         struct {
-            char unknown_2be3_c[11];
+            char pad_2be3_c[11];
             struct {
                 unsigned short bits0 : 4;
                 unsigned short flag4 : 1;
                 unsigned short bits5 : 11;
             } bits_2bee;
-            char unknown_2bf0_c[134];
+            char pad_2bf0_c[134];
             char orders_2c76[68];
-            char unknown_2cba[70977];
+            char pad_2cba[70977];
             MapGrid sortUnits;
             char unknown_1428b[102];
             struct {
@@ -581,10 +581,10 @@ struct Game {
                 unsigned short flags_142f1_mapChanged : 1;
                 unsigned short flags_142f1_rest : 13;
             } bits_142f1_1;
-            char unknown_142f3_c[90];
+            char pad_142f3_c[90];
         };
         struct {
-            char unknown_2be3_d[11];
+            char pad_2be3_d[11];
             struct {
                 unsigned short pad_2bee : 5;
                 unsigned short flags_2bee : 3;
@@ -598,13 +598,13 @@ struct Game {
                 unsigned short f3 : 5;
                 unsigned short fhi : 8;
             } bits_142f1_2;
-            char unknown_142f3_d[90];
+            char pad_142f3_d[90];
         };
         struct {
             char password_2be3[17];
             char unknown_2bf4[71419];
             RadarTimer_00466dc0 timer;
-            char unknown_142f3_e[90];
+            char pad_142f3_e[90];
         };
         char name_2be3[64];
         char password_2be3_1176a[71530];
@@ -633,7 +633,7 @@ struct Game {
     };
     Ref<Class_0045ae80*> types;
     Class_00437c80* unitTable;
-    char unknown_1437f[4];
+    char pad_1437f[4];
     void* xform;
     void* projected;
     void* field_1438b;
@@ -641,25 +641,25 @@ struct Game {
     int unitDefCountBits;
     int unitDefEnumDirty;
     Ref<UnitDef> defs;
-    char unknown_1439f[8];
+    char pad_1439f[8];
     union {
         struct {
             char field_143a7[4];
-            char unknown_143ab[1020];
+            char pad_143ab[1020];
         };
         char paletteRgba[1024];
     };
     int baseHeight;
     int count_147ab;
     AnimEntry_00429700* entries_147af;
-    char unknown_147b3[8];
+    char pad_147b3[8];
     void* gaf_147bb;
     void* gaf_147bf;
     void* gaf_147c3;
     void* gaf_147c7;
     void* gaf_147cb;
-    void* unknown_147cf;
-    void* unknown_147d3;
+    void* smoke1;
+    void* smoke2;
     int fire1;
     int alfboom1;
     void* radlogo;
@@ -752,7 +752,7 @@ struct Game {
     union {
         struct {
             int array_14907[1];
-            char unknown_1490b[16];
+            char pad_1490b[16];
         };
         int panelTop[5];
     };
@@ -770,14 +770,14 @@ struct Game {
     union {
         struct {
             int soundIds[1];
-            char unknown_33a17[1020];
+            char pad_33a17[1020];
         };
         int sounds[256];
     };
     union {
         struct {
             char soundNames[1][32];
-            char unknown_33e33[8160];
+            char pad_33e33[8160];
             char soundFiles[256][32];
         };
         char soundNames_33e13[256][32];
@@ -787,7 +787,7 @@ struct Game {
     int entry_count;
     void* screen;
     int width_37e1f;
-    int field_37e23;
+    int screenHeight;
     union {
         struct {
             Rect rect;
@@ -804,7 +804,7 @@ struct Game {
             unsigned short cloak : 2;
             unsigned short activation : 2;
             unsigned short flags_7 : 9;
-            char unknown_37ec2[2];
+            char pad_37ec2[2];
             unsigned int windCounter;
             int windSpeedDenominator;
         };
@@ -813,33 +813,33 @@ struct Game {
             int viewCullMinY;
             int viewCullMaxX;
             int viewCullMaxY;
-            char unknown_37e37[89];
+            char pad_37e37[89];
             int panel;
             void* sprite;
-            char unknown_37e98[38];
+            char pad_37e98[38];
             unsigned char ordersPanelFlags;
-            char unknown_37ebf[13];
+            char pad_37ebf[13];
         };
         struct {
             int viewport[4];
-            char unknown_37e37_a[41];
+            char pad_37e37_a[41];
             Snapshot_0046a860 selectionInfoCache;
-            char unknown_37e9c[34];
+            char pad_37e9c[34];
             Flags_00495e90_37ebe ordersPanelFlags_37ebe;
-            char unknown_37ec0[12];
+            char pad_37ec0[12];
         };
         struct {
-            char unknown_37e27[151];
+            char pad_37e27[151];
             struct {
                 unsigned short bit0_37ebe : 1;
                 unsigned short pad_37ebe : 10;
                 unsigned short bit11_37ebe : 1;
                 unsigned short rest_37ebe : 4;
             } bits_37ebe;
-            char unknown_37ec0_a[12];
+            char pad_37ec0_a[12];
         };
         struct {
-            char unknown_37e27_a[151];
+            char pad_37e27_a[151];
             struct {
                 unsigned short bit0_37ebe : 1;
                 unsigned short bit1_37ebe : 1;
@@ -853,39 +853,39 @@ struct Game {
                 unsigned short bit11_37ebe : 1;
                 unsigned short rest_37ebe : 4;
             } bits_37ebe_1;
-            char unknown_37ec0_b[12];
+            char pad_37ec0_b[12];
         };
         struct {
-            char unknown_37e27_b[151];
+            char pad_37e27_b[151];
             struct {
                 unsigned short flags_0 : 4;
                 unsigned short loaded : 1;
                 unsigned short flags_5 : 11;
             } bits_37ebe_2;
-            char unknown_37ec0_c[12];
+            char pad_37ec0_c[12];
         };
         struct {
-            char unknown_37e27_c[151];
+            char pad_37e27_c[151];
             struct {
                 unsigned short pad_37ebe : 6;
                 unsigned short bit6_37ebe : 1;
                 unsigned short rest_37ebe : 9;
             } bits_37ebe_3;
-            char unknown_37ec0_d[12];
+            char pad_37ec0_d[12];
         };
         struct {
-            char unknown_37e27_d[151];
+            char pad_37e27_d[151];
             struct {
                 unsigned short low_37ebe : 11;
                 unsigned short bit11_37ebe : 1;
                 unsigned short high_37ebe : 4;
             } bits_37ebe_4;
-            char unknown_37ec0_e[12];
+            char pad_37ec0_e[12];
         };
         struct {
-            char unknown_37e27_e[151];
+            char pad_37e27_e[151];
             Orders ordersPanelFlags_37ebe_6;
-            char unknown_37ec4[8];
+            char pad_37ec4[8];
         };
         char region_37e27[165];
     };
@@ -903,7 +903,7 @@ struct Game {
     int windEnabled;
     union {
         struct {
-            unsigned short field_37ee6;
+            unsigned short maxUnitsSetting;
             unsigned short lobbyInitScratch;
             unsigned short maxUnits;
             unsigned short maxUnits_37eec;
@@ -950,25 +950,25 @@ struct Game {
         struct {
             char unknown_37ee6[12];
             unsigned char side;
-            char unknown_37ef3[19];
+            char pad_37ef3[19];
             unsigned char visualFlagsByte;
-            char unknown_37f07[5];
+            char pad_37f07[5];
             short volume1Word;
-            char unknown_37f0e[2];
+            char pad_37f0e[2];
             short volume2Word;
-            char unknown_37f12[2];
+            char pad_37f12[2];
             unsigned char musicMode;
-            unsigned char field_37f15;
-            char unknown_37f16[3];
+            unsigned char pad_37f15;
+            char pad_37f16[3];
             unsigned char soundFlags_37f19;
-            char unknown_37f1a[1];
+            char pad_37f1a[1];
             unsigned short width_37f1b_2;
-            char unknown_37f1d[2];
+            char pad_37f1d[2];
             unsigned short height_37f1f_2;
-            char unknown_37f21[14];
+            char pad_37f21[14];
             unsigned char uiOptionFlags_37f2f_1;
             unsigned char matchFlags;
-            char unknown_37f31[8];
+            char pad_37f31[8];
         };
         struct {
             char unknown_37ee6_a[32];
@@ -987,13 +987,13 @@ struct Game {
                     unsigned short rest : 7;
                 } visualBits;
             };
-            char unknown_37f08[12];
+            char pad_37f08[12];
             Flags37f14_0045cf60 flags_37f14_37f14;
-            char unknown_37f16_a[3];
+            char pad_37f16_a[3];
             unsigned short soundFlags_37f19_2;
-            char unknown_37f1b[20];
+            char pad_37f1b[20];
             ClockFlags_0042f9a0 uiOptionFlags_37f2f;
-            char unknown_37f31_a[8];
+            char pad_37f31_a[8];
         };
         struct {
             char unknown_37ee6_b[32];
@@ -1007,7 +1007,7 @@ struct Game {
                 unsigned short bit6 : 1;
                 unsigned short rest : 9;
             } bits_37f06;
-            char unknown_37f08_a[39];
+            char pad_37f08_a[39];
             struct {
                 unsigned short b0 : 1;
                 unsigned short b1 : 1;
@@ -1022,7 +1022,7 @@ struct Game {
                 unsigned short flag10 : 1;
                 unsigned short rest_37f2f : 5;
             } bits_37f2f;
-            char unknown_37f31_b[8];
+            char pad_37f31_b[8];
         };
         struct {
             char unknown_37ee6_c[32];
@@ -1044,7 +1044,7 @@ struct Game {
                 unsigned short b14 : 1;
                 unsigned short b15 : 1;
             } bits_37f06_1;
-            char unknown_37f08_b[39];
+            char pad_37f08_b[39];
             struct {
                 unsigned short pad_37f2f : 7;
                 unsigned short bit7_37f2f : 1;
@@ -1052,7 +1052,7 @@ struct Game {
                 unsigned short bit9_37f2f : 1;
                 unsigned short rest_37f2f : 6;
             } bits_37f2f_1;
-            char unknown_37f31_c[8];
+            char pad_37f31_c[8];
         };
         struct {
             char unknown_37ee6_d[73];
@@ -1060,7 +1060,7 @@ struct Game {
                 unsigned short screenBitA : 1;
                 unsigned short screenBitB : 1;
             } bits_37f2f_2;
-            char unknown_37f31_d[8];
+            char pad_37f31_d[8];
         };
         char block[83];
     };
@@ -1068,7 +1068,7 @@ struct Game {
     union {
         struct {
             char names[1][562];
-            char unknown_3816f[2248];
+            char pad_3816f[2248];
             unsigned int lastTick;
             int frames_38a3b;
             int scrollScale;
@@ -1079,7 +1079,7 @@ struct Game {
             short streak;
             unsigned short otherFlags;
             char installPath[1];
-            char unknown_38a54[255];
+            char pad_38a54[255];
             char text_38b53[256];
             int movieCaptureIndex;
             int movieOutputRate;
@@ -1088,7 +1088,7 @@ struct Game {
             int valueSet_38c63;
             int unusedAfterMovieOutputRateDirty;
             char saveName[1];
-            char unknown_38c6c[255];
+            char pad_38c6c[255];
             HapiBank* pendingSaveStore;
             char progress;
             unsigned char loadProgress;
@@ -1104,13 +1104,13 @@ struct Game {
             FrameTimers timers;
             int profileBarsEnabled;
             Slot_0041e420 slots_38dd9[10];
-            char unknown_3901d[58];
-            int field_39057;
+            char pad_3901d[58];
+            int endGameState;
             unsigned int deadline;
             unsigned int nextTime;
             int done;
             int steps;
-            int field_3906b;
+            int statBarStep;
             int savedPaletteBrightness;
             int skip;
             void* lastFrame;
@@ -1122,23 +1122,23 @@ struct Game {
             char glamour[256];
         };
         struct {
-            char unknown_37f3d[30];
+            char pad_37f3d[30];
             SideName_00497180 sideNames[2];
             char unknown_383bf[1682];
             unsigned char pauseFlags;
-            char unknown_38a52[1];
-            char field_38a53[256];
-            char unknown_38b53[280];
+            char pad_38a52[1];
+            char movieCaptureDir[256];
+            char pad_38b53[280];
             char saveName_38c6b[256];
-            char unknown_38d6b[4];
+            char pad_38d6b[4];
             unsigned char progress_38d6f[6];
             unsigned char flags_38d75;
-            char unknown_38d76[9];
+            char pad_38d76[9];
             MissionFlags_0042f9a0 allMissionsFlags;
             char unknown_38d81[8];
             int total;
             int values[8];
-            char unknown_38dad[994];
+            char pad_38dad[994];
         };
         struct {
             char unknown_37f3d_a[34];
@@ -1148,7 +1148,7 @@ struct Game {
                 unsigned short bit_38a51 : 1;
             } bits_38a51;
             char imageOutputDirectory[516];
-            char unknown_38c57[286];
+            char pad_38c57[286];
             LoadFlags_00497f40 loadingFlags;
             char unknown_38d77[1048];
         };
@@ -1160,7 +1160,7 @@ struct Game {
                 unsigned short bits_38a51 : 15;
             } bits_38a51_2;
             char path[524];
-            char unknown_38c5f[278];
+            char pad_38c5f[278];
             struct {
                 unsigned short : 2;
                 unsigned short net_bit2 : 1;
@@ -1170,7 +1170,7 @@ struct Game {
         struct {
             char unknown_37f3d_b[2836];
             Flags_00495e90_38a51 flags_38a51;
-            char unknown_38a53[802];
+            char pad_38a53[802];
             struct {
                 unsigned short : 3;
                 unsigned short synced : 1;
@@ -1197,12 +1197,12 @@ struct Game {
         struct {
             char unknown_37f3d_e[34];
             Name_004864b0 names_37f5f[8];
-            char unknown_390ef[160];
+            char pad_390ef[160];
         };
         struct {
-            char unknown_37f3d_f[30];
+            char pad_37f3d_f[30];
             SideName sideNames_37f5b[8];
-            char unknown_390eb[164];
+            char pad_390eb[164];
         };
     };
     union {
@@ -1229,9 +1229,9 @@ struct Game {
     BuildList_0041ace0* buildLists;
     union {
         struct {
-            char field_391cf[24];
-            char field_391e7;
-            char field_391e8;
+            char pad_391cf[24];
+            char pad_391e7;
+            char pad_391e8;
         };
         char campaignMissionStatus_391cf[25];
         char campaignMissionStatus[26];
@@ -1245,9 +1245,9 @@ struct Game {
     union {
         struct {
             char field_39201[1];
-            char unknown_39202[15];
+            char pad_39202[15];
             int connection;
-            int field_39215;
+            int pad_39215;
         };
         char providerGuid[16];
         ConnInfo_443ff0 info;
@@ -1367,7 +1367,7 @@ static_assert(offsetof(Game, dplayAddressDialogFlags_2aaf) == 0x2aaf, "dplayAddr
 static_assert(offsetof(Game, flags_2b4c) == 0x2b4c, "flags_2b4c");
 static_assert(offsetof(Game, buffer_2ab1) == 0x2ab1, "buffer_2ab1");
 static_assert(offsetof(Game, game_info) == 0x2b6a, "game_info");
-static_assert(offsetof(Game, field_2ba2) == 0x2ba2, "field_2ba2");
+static_assert(offsetof(Game, joinGuid) == 0x2ba2, "field_2ba2");
 static_assert(offsetof(Game, gameName) == 0x2bc1, "gameName");
 static_assert(offsetof(Game, gameName_2bc1) == 0x2bc1, "gameName_2bc1");
 static_assert(offsetof(Game, password) == 0x2be3, "password");
@@ -1414,7 +1414,7 @@ static_assert(offsetof(Game, ordersPanelFlags_37ebe_6) == 0x37ebe, "ordersPanelF
 static_assert(offsetof(Game, region_37e27) == 0x37e27, "region_37e27");
 static_assert(offsetof(Game, windX) == 0x37ecc, "windX");
 static_assert(offsetof(Game, wind) == 0x37ecc, "wind");
-static_assert(offsetof(Game, field_37ee6) == 0x37ee6, "field_37ee6");
+static_assert(offsetof(Game, maxUnitsSetting) == 0x37ee6, "field_37ee6");
 static_assert(offsetof(Game, side) == 0x37ef2, "side");
 static_assert(offsetof(Game, visualFlags) == 0x37f06, "visualFlags");
 static_assert(offsetof(Game, bits_37f06) == 0x37f06, "bits_37f06");
@@ -1432,7 +1432,7 @@ static_assert(offsetof(Game, names_37f5f) == 0x37f5f, "names_37f5f");
 static_assert(offsetof(Game, sideNames_37f5b) == 0x37f5b, "sideNames_37f5b");
 static_assert(offsetof(Game, maxStats) == 0x3918f, "maxStats");
 static_assert(offsetof(Game, maxKills) == 0x3918f, "maxKills");
-static_assert(offsetof(Game, field_391cf) == 0x391cf, "field_391cf");
+static_assert(offsetof(Game, pad_391cf) == 0x391cf, "field_391cf");
 static_assert(offsetof(Game, campaignMissionStatus_391cf) == 0x391cf, "campaignMissionStatus_391cf");
 static_assert(offsetof(Game, campaignMissionStatus) == 0x391cf, "campaignMissionStatus");
 static_assert(offsetof(Game, field_39201) == 0x39201, "field_39201");

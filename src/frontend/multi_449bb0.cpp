@@ -98,9 +98,9 @@ struct Options_00449bb0 {
 struct Game_00449bb0 {
     char unknown_0[0x519];
     Gui_00449bb0 gui;
-    char unknown_535[0x1b63 - 0x535];
+    char pad_535[0x1b63 - 0x535];
     Player players[10];
-    char unknown_2851[0x29a0 - 0x2851];
+    char pad_2851[0x29a0 - 0x2851];
     Options_00449bb0* options;
     char unknown_29a4[0x2a30 - 0x29a4];
     UnitSync* net;
@@ -111,9 +111,9 @@ struct Game_00449bb0 {
     char unknown_2a9f[0x2bee - 0x2a9f];
     unsigned short dirty : 1;
     unsigned short dirty_rest : 15;
-    char unknown_2bf0[0x2c28 - 0x2bf0];
+    char pad_2bf0[0x2c28 - 0x2bf0];
     int playerIds[11];
-    char unknown_2c54[0x2c74 - 0x2c54];
+    char pad_2c54[0x2c74 - 0x2c54];
     unsigned short locked : 1;
     unsigned short locked_rest : 15;
     char unknown_2c76[0x37ee8 - 0x2c76];
@@ -124,9 +124,9 @@ struct Game_00449bb0 {
     int commanderDeath;
     char unknown_37efa[0x37f1b - 0x37efa];
     unsigned short width;
-    char unknown_37f1d[2];
+    char pad_37f1d[2];
     unsigned short height;
-    char unknown_37f21[0x391e9 - 0x37f21];
+    char pad_37f21[0x391e9 - 0x37f21];
     Ref<char> map;
     char unknown_391ed[0x39229 - 0x391ed];
     int commander;

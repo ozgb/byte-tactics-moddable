@@ -946,7 +946,7 @@ void __stdcall HandleNewMultiClick(Gui* gadget)
         strcpy(g_game->gameName_2bc1, namebuf);
         strcpy(g_game->nickname, nickbuf);
         if (!InitScoreReporting()) {
-            g_game->field_2bc0 = 0x11;
+            g_game->frontendNextSubState = 0x11;
             return;
         }
         ClearSelectedGadget(gadget);
@@ -1609,10 +1609,10 @@ void __stdcall HandleReportClick(Gui* obj)
 
         SetCursorMode(0x14);
         EnableReporter(acc);
-        if ((g_game->lobbyUiDirtyFlags & 0x10) || g_game->field_2bbf == 0x14) {
-            g_game->field_2bc0 = 0x15;
+        if ((g_game->lobbyUiDirtyFlags & 0x10) || g_game->frontendSubState == 0x14) {
+            g_game->frontendNextSubState = 0x15;
         } else {
-            g_game->field_2bc0 = 0x11;
+            g_game->frontendNextSubState = 0x11;
         }
     } else {
         ClearSelectedGadget(obj);
@@ -1713,7 +1713,7 @@ void __stdcall HandleSelectGameClick(Gui* param_1)
     }
 
     if (FindGadgetIndex(entries, "PREVMENU", 0xe) == param_1->hotGadgetIndex) {
-        g_game->field_2bc0 = 3;
+        g_game->frontendNextSubState = 3;
         PlaySoundByName("Previous", 0);
         return;
     }
@@ -1760,13 +1760,13 @@ void __stdcall HandleSelectGameClick(Gui* param_1)
                 cur = g_game->localPlayer;
                 g_game->players[cur].info->flags |= 0x40;
                 PlaySoundByName("Multi", 0);
-                g_game->field_2bc0 = 0x13;
+                g_game->frontendNextSubState = 0x13;
                 return;
             }
             cur = g_game->localPlayer;
             g_game->players[cur].info->flags &= 0xffbf;
             PlaySoundByName("BigButton", 0);
-            g_game->field_2bc0 = 0x12;
+            g_game->frontendNextSubState = 0x12;
             return;
         }
         SetFrontendErrorText("You do not have a compatible version for this game.");
@@ -1822,7 +1822,7 @@ void OpenSelectGameDialog()
     if (!ConnectToGame(gadget)) {
         CloseTopScreen(&g_game->gui);
         OpenMessageBox(&g_game->gui, Translate("Invalid TCP/IP Address"), 0xc8, 1, 1);
-        g_game->field_2bc0 = 3;
+        g_game->frontendNextSubState = 3;
         return;
     }
     SelectGadgetByIndex(&g_game->gui, FindGadgetIndex(gadget->entries, "GAMENAME", 2));
@@ -3378,7 +3378,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
             if (IsLocal_00447b10(q))
                 RejectPlayer(q->id, 2);
         }
-        (*(char*)&g_game->field_2bc0) = 3;
+        (*(char*)&g_game->frontendNextSubState) = 3;
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "MESSAGE")) {
@@ -3476,7 +3476,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
                     RejectPlayer(q->id, 9);
             }
         }
-        (*(char*)&g_game->field_2bc0) = 0x11;
+        (*(char*)&g_game->frontendNextSubState) = 0x11;
         me->info->started = 1;
         UpdateNetGameInfo();
         g_game->multiLineOfSight = me->info->los;

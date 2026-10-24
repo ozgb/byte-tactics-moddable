@@ -1073,12 +1073,12 @@ void FreeMapResources()
     g_game->cells = 0;
     g_game->mapValues = 0;
 
-    void** p = (void**)(MapFogGrid *)g_game->field_1421f;
+    void** p = (void**)(MapFogGrid *)g_game->fogGrid;
     if (p) {
         operator delete(p[0]);
         operator delete(p);
     }
-    (*(MapFogGrid **)&g_game->field_1421f) = 0;
+    (*(MapFogGrid **)&g_game->fogGrid) = 0;
 
     FogGrid* g1 = (FogGrid*)&g_game->grid1;
     g1->width = 0;
@@ -1199,7 +1199,7 @@ void __stdcall DrawFogOfWar(void* surface)
         (*(Flags_14281*)&g_game->mapFlags_14281).raw |= 8;
     }
 
-    MapFogGrid* grid = (MapFogGrid *)g_game->field_1421f;
+    MapFogGrid* grid = (MapFogGrid *)g_game->fogGrid;
     int scrollY = g_game->scrollY;
     int scrollX = g_game->scrollX;
     int q = (scrollY + 16) / 32 + (scrollX + 16) / 32;

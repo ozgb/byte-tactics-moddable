@@ -667,7 +667,7 @@ void LoadUnitTypes() {
     obj = obj ? obj->Construct() : 0;
     (*(UnitTable **)&g_game->unitTable) = obj;
 
-    int t = g_game->field_37e23 * g_game->width_37e1f * 2;
+    int t = g_game->screenHeight * g_game->width_37e1f * 2;
     int v = (int)(t * 1.3);
 
     int n = *(int*)((char*)(void *)g_game->unknown_c + 0x620) / 0x100000 + 1;

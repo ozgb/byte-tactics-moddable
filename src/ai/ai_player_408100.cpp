@@ -40,7 +40,7 @@ struct Game_00408100 {
     int mapPixelHeight;
     char unknown_14233[0x1439b - 0x14233];
     Ref<Item_00408100> unitDefs;
-    char unknown_1439f[0x38a47 - 0x1439f];
+    char pad_1439f[0x38a47 - 0x1439f];
     unsigned int gameTick;
 };
 #pragma pack(pop)

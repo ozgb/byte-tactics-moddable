@@ -2016,7 +2016,7 @@ void ShowGameSettingsDialog()
     }
     y += 0x12;
     AddTextGadget(layer, "TEXT", Translate((char*)"Max Units:"), 0x12, y, 0x6e, 2);
-    AddTextGadget(layer, "TEXT", _itoa(g_game->field_37ee6, num, 10), 0x8c, y, 0x78, 2);
+    AddTextGadget(layer, "TEXT", _itoa(g_game->maxUnitsSetting, num, 10), 0x8c, y, 0x78, 2);
     int i;
     for (i = count + 1; i <= layer->entries->count; i++)
         entries[i].attribs = 1;
@@ -2164,7 +2164,7 @@ void ClearScreenWithHudPalette()
 void CloseOptionsPanel()
 {
     (*(Flags37ebe_0045cf60*)&g_game->ordersPanelFlags_37ebe).word &= 0xfffe;
-    g_game->field_2bc0 = 3;
+    g_game->frontendNextSubState = 3;
 }
 
 // FUNCTION: 0x45fc60

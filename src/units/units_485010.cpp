@@ -335,14 +335,14 @@ void __stdcall AllocateUnitMemory(void)
 {
     g_game->focusUnitId = 0;
     g_game->autoFollowFlags_14373 &= 0xfffffffd;
-    g_game->unitsPerPlayer = g_game->field_37ee6;
-    g_game->poolCount = (unsigned short)(g_game->field_37ee6 * 10 + 1);
+    g_game->unitsPerPlayer = g_game->maxUnitsSetting;
+    g_game->poolCount = (unsigned short)(g_game->maxUnitsSetting * 10 + 1);
 
     unsigned char* pool = (unsigned char*)SimAllocTagged("UNIT MEMORY", g_game->poolCount * 0x118);
     g_game->units = (Unit*)pool;
     memset(pool, 0, g_game->poolCount * 0x118);
 
-    unsigned int ten = g_game->field_37ee6 * 10;
+    unsigned int ten = g_game->maxUnitsSetting * 10;
     (*(void **)&g_game->list_1435f) = SimAllocTagged("HOT UNITS", ten * 2);
     g_game->hotRadar = SimAllocTagged("HOT RADAR UNITS", ten * 10);
     g_game->unitsEnd = (Unit*)((unsigned char *)g_game->units.get() + g_game->poolCount * 0x118 - 0x118);
@@ -365,9 +365,9 @@ void __stdcall AllocateUnitMemory(void)
     int i;
     for (i = 0; i < 10; i++) {
         Player* item = v[i];
-        int c = g_game->field_37ee6 * i + 1;
+        int c = g_game->maxUnitsSetting * i + 1;
         item->unitsBegin = (Unit*)(pool + c * 0x118);
-        item->unitsEnd = (Unit*)((unsigned char*)item->unitsBegin.get() + g_game->field_37ee6 * 0x118 - 0x118);
+        item->unitsEnd = (Unit*)((unsigned char*)item->unitsBegin.get() + g_game->maxUnitsSetting * 0x118 - 0x118);
         *(unsigned short*)((char*)item + 0x6f) =
             *(unsigned short*)((unsigned char*)item->unitsBegin.get() + 0xa8);
         *(unsigned short*)((char*)item + 0x71) =

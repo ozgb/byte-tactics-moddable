@@ -1565,7 +1565,7 @@ void WakeParticles::Emit()
         e.pos.zp.hi += (int)((__int64)HarnessViewRand() * 7 / 0x8000) - 3;
         e.pos2 = pos_b;
         e.vel = dir;
-        e.data = g_game->unknown_147cf;
+        e.data = g_game->smoke1;
         e.min = 0x61;
         e.max = 0x67;
         if (ascending) {
@@ -1610,9 +1610,9 @@ void SmokeParticles::Init(Vec3* p, int limit, int a, int b, int c,
     emitPeriod = a;
     altAnimation = alt;
     if (alt)
-        maxFrame = GetGafFrameCount(g_game->unknown_147d3) - 1;
+        maxFrame = GetGafFrameCount(g_game->smoke2) - 1;
     else
-        maxFrame = GetGafFrameCount(g_game->unknown_147cf) - 1;
+        maxFrame = GetGafFrameCount(g_game->smoke1) - 1;
     if (limit != 0)
         maxFrame = limit < maxFrame ? limit : maxFrame;
     if (b != 0)
@@ -1636,7 +1636,7 @@ void SmokeParticles::Emit()
         rec.pos = *p;
         rec.period = holdPeriod;
         rec.timer = holdPeriod;
-        rec.data = altAnimation ? g_game->unknown_147d3 : g_game->unknown_147cf;
+        rec.data = altAnimation ? g_game->smoke2 : g_game->smoke1;
         rec.limit = (int)(((__int64)HarnessViewRand() * (maxFrame - 2)) / 0x8000) + 2;
         rec.count = 0;
         ((Class_00476210*)v)->insert(v->end(), 1, rec);
@@ -1694,7 +1694,7 @@ void TimedSubParticles::Init(Vec3* p, int a, int b, int c)
     SetLifetime(c);
     pos = *p;
     emitPeriod = a;
-    maxFrame = GetGafFrameCount(g_game->unknown_147cf) - 1;
+    maxFrame = GetGafFrameCount(g_game->smoke1) - 1;
     if (b != 0)
         holdPeriod = b;
     else
@@ -1716,7 +1716,7 @@ void TimedSubParticles::Emit()
         rec.pos = *p;
         rec.period = holdPeriod;
         rec.timer = holdPeriod;
-        rec.data = g_game->unknown_147cf;
+        rec.data = g_game->smoke1;
         rec.limit = (int)((__int64)HarnessViewRand() * (maxFrame - 2) / 0x8000) + 2;
         rec.count = 0;
         ((Vec_00476490*)v)->insert(v->end(), 1, &rec);

@@ -841,7 +841,7 @@ void __stdcall RetargetWeapon(Unit* unit, unsigned int weapon)
 // FUNCTION: 0x4089a0
 void SquadManager::RetargetWeapons(int force)
 {
-    for (int i = 0; i <= g_game->field_37ee6 / 30; i++) {
+    for (int i = 0; i <= g_game->maxUnitsSetting / 30; i++) {
         if (cursor && cursor != player->unitsEnd) {
             Unit* next = cursor;
             next++;

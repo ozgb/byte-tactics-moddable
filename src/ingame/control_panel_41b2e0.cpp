@@ -87,15 +87,15 @@ struct Menu_0041b2e0 {
 struct Game_0041b2e0 {
     char unknown_0[0x519];
     Menu_0041b2e0 menu;
-    char unknown_529[0x1b63 - 0x529];
+    char pad_529[0x1b63 - 0x529];
     Player players[10];
-    char unknown_2851[0x2a42 - 0x2851];
+    char pad_2851[0x2a42 - 0x2851];
     unsigned char localPlayer;
     char unknown_2a43[0x14357 - 0x2a43];
     Ref<Unit_0041b2e0> units;
     char unknown_1435b[0x1439b - 0x1435b];
     Ref<BuildType_0041b2e0> unitDefs;
-    char unknown_1439f[0x37e9c - 0x1439f];
+    char pad_1439f[0x37e9c - 0x1439f];
     unsigned short unitIndex;
     char unknown_37e9e[0x37ebe - 0x37e9e];
     Orders_0041b2e0 orders;

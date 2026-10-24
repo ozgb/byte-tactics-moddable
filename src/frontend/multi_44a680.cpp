@@ -200,7 +200,7 @@ void UpdateBattleRoom()
 
     pl = &g_game->players[g_game->localPlayer];
     if (pl->rejectReason != 0) {
-        g_game->field_2bc0 = 3;
+        g_game->frontendNextSubState = 3;
         CloseTopScreen(&g_game->gui);
         return;
     }

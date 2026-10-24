@@ -1269,7 +1269,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
             p[3].x = (x + 8) * 16 - g_game->scrollX;
             p[3].y = (y + 2) * 16 - (heights[3] >> 1) - g_game->scrollY;
             tile -= g_game->width; --y;
-            if (p[0].y < g_game->field_37e23) offscreen = 0;
+            if (p[0].y < g_game->screenHeight) offscreen = 0;
             if (g_game->debugMode == 1) {
                 if (movement) {
                     unsigned int state = (movement->states[movement->width * (y >> 4) + x] >> ((y & 15) * 2)) & 3;

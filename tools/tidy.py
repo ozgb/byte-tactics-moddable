@@ -268,6 +268,9 @@ def base_findings(root, build_dir, base, units, clang_tidy, runner):
         subprocess.run(["git", "worktree", "add", "-q", "--detach", str(work), base], cwd=root,
                        capture_output=True, text=True, check=True)
         head = Path(root).resolve()
+        for entry in head.iterdir():
+            if entry.name != ".git" and not (work / entry.name).exists():
+                (work / entry.name).symlink_to(entry)
         db_dir = tmp / "db"
         db_dir.mkdir()
         db = Path(root) / build_dir

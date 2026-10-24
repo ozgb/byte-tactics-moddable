@@ -1501,7 +1501,7 @@ map,units,shared_write,Vec3::z,9
 map,weapons,shared_write,Cell::flags,1
 map,weapons,shared_write,Cell::unit,2
 map,weapons,shared_write,Cell::unit2,2
-map,weapons,shared_write,Game::net,5
+map,weapons,shared_write,Game::net,6
 map,weapons,shared_write,Point16::x,1
 map,weapons,shared_write,Point16::y,1
 map,weapons,shared_write,Unit::flags,6

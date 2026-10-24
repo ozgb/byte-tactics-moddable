@@ -19545,6 +19545,9 @@ address,function,file,kind,target
 0x461020,InitPacketManager,src/network/packets.cpp,call,PacketManager::SetDefaultSendPacing
 0x461020,InitPacketManager,src/network/packets.cpp,call,host_thread_set_priority
 0x461020,InitPacketManager,src/network/packets.cpp,call,operator new
+0x461020,InitPacketManager,src/network/packets.cpp,call,operator!=
+0x461020,InitPacketManager,src/network/packets.cpp,call,operator->
+0x461020,InitPacketManager,src/network/packets.cpp,call,operator=
 0x461020,InitPacketManager,src/network/packets.cpp,field_escape,PacketManager::channels
 0x461020,InitPacketManager,src/network/packets.cpp,field_maybe_written,PacketManager::channels
 0x461020,InitPacketManager,src/network/packets.cpp,field_read,PacketManager::m_defaultSendPacingMs
@@ -19607,6 +19610,9 @@ address,function,file,kind,target
 0x461750,PacketManager::InitChannels,src/network/packets.cpp,call,PacketChannel::InitPools
 0x461750,PacketManager::InitChannels,src/network/packets.cpp,call,host_thread_set_priority
 0x461750,PacketManager::InitChannels,src/network/packets.cpp,call,operator new
+0x461750,PacketManager::InitChannels,src/network/packets.cpp,call,operator!=
+0x461750,PacketManager::InitChannels,src/network/packets.cpp,call,operator->
+0x461750,PacketManager::InitChannels,src/network/packets.cpp,call,operator=
 0x461750,PacketManager::InitChannels,src/network/packets.cpp,field_escape,PacketManager::channels
 0x461750,PacketManager::InitChannels,src/network/packets.cpp,field_maybe_written,PacketManager::channels
 0x461750,PacketManager::InitChannels,src/network/packets.cpp,field_read,PacketManager::m_defaultSendPacingMs
@@ -19900,6 +19906,7 @@ address,function,file,kind,target
 0x4628d0,PacketBuffer::AppendPacket,src/network/packets.cpp,function,
 0x4629b0,PacketBuffer::FreePackets,src/network/packets.cpp,call,PacketBuffer::RemovePacket
 0x4629b0,PacketBuffer::FreePackets,src/network/packets.cpp,call,PacketTrace
+0x4629b0,PacketBuffer::FreePackets,src/network/packets.cpp,call,operator->
 0x4629b0,PacketBuffer::FreePackets,src/network/packets.cpp,deref_escape,*NetPacketPendingEntry
 0x4629b0,PacketBuffer::FreePackets,src/network/packets.cpp,field_read,NetPacketPendingEntry::owner
 0x4629b0,PacketBuffer::FreePackets,src/network/packets.cpp,field_read,PacketBuffer::count
@@ -19931,6 +19938,7 @@ address,function,file,kind,target
 0x462ae0,PacketBuffer::RemovePacket,src/network/packets.cpp,call,PacketRing::PopPacket
 0x462ae0,PacketBuffer::RemovePacket,src/network/packets.cpp,call,PacketRing::PushPacket
 0x462ae0,PacketBuffer::RemovePacket,src/network/packets.cpp,call,PacketTrace
+0x462ae0,PacketBuffer::RemovePacket,src/network/packets.cpp,call,operator PacketChannel *
 0x462ae0,PacketBuffer::RemovePacket,src/network/packets.cpp,deref_read,*unsigned char
 0x462ae0,PacketBuffer::RemovePacket,src/network/packets.cpp,field_maybe_written,PacketChannel::queue
 0x462ae0,PacketBuffer::RemovePacket,src/network/packets.cpp,field_read,NetPacketPendingEntry::next
@@ -19974,6 +19982,9 @@ address,function,file,kind,target
 0x462d90,PacketReceiver::FindPlayerFrameInfo,src/network/packets.cpp,function,
 0x462d90,PacketReceiver::FindPlayerFrameInfo,src/network/packets.cpp,global_read,g_game
 0x462ed0,PacketReceiver::ResetReceiveBuffer,src/network/packets.cpp,call,operator new
+0x462ed0,PacketReceiver::ResetReceiveBuffer,src/network/packets.cpp,call,operator!=
+0x462ed0,PacketReceiver::ResetReceiveBuffer,src/network/packets.cpp,call,operator->
+0x462ed0,PacketReceiver::ResetReceiveBuffer,src/network/packets.cpp,call,operator=
 0x462ed0,PacketReceiver::ResetReceiveBuffer,src/network/packets.cpp,field_read,PacketReceiver::buffer
 0x462ed0,PacketReceiver::ResetReceiveBuffer,src/network/packets.cpp,field_read,PacketReceiver::savedFrameEntry
 0x462ed0,PacketReceiver::ResetReceiveBuffer,src/network/packets.cpp,field_read,PacketReceiver::spare
@@ -19998,6 +20009,10 @@ address,function,file,kind,target
 0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,call,memcpy
 0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,call,operator delete
 0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,call,operator new
+0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,call,operator!=
+0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,call,operator->
+0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,call,operator=
+0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,call,operator==
 0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,deref_read,*int
 0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,deref_write,*int
 0x462f30,PacketReceiver::ReceiveFrame,src/network/packets.cpp,field_escape,Game::session

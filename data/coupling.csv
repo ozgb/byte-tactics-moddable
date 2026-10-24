@@ -1672,7 +1672,7 @@ network,platform,call,host_time_ms,2
 network,platform,call,host_user_name,2
 network,platform,call,operator delete,26
 network,platform,call,operator new,17
-network,platform,call,operator==,6
+network,platform,call,operator==,7
 network,players,call,FillScoreTables,2
 network,players,call,GiveUnitToPlayer,1
 network,players,call,IsReporterDllLoaded,2

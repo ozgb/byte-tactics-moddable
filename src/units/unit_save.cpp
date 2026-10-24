@@ -167,7 +167,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     if (id == 0)
         unit = 0;
     else
-        unit = (Unit*)(*(char**)((char*)g_game + 0x14357) + id * 0x118);
+        unit = (Unit*)((char*)g_game->units.get() + id * 0x118);
     if (unit == 0 || (unit->flags & 0x10000000))
         return unit;
 
@@ -305,8 +305,8 @@ void __stdcall SaveUnits(HapiBank* file)
     Unit* end = 0;
     Unit* unit;
     file->OpenAccount("Units");
-    end = *(Unit**)((char*)g_game + 0x1435b);
-    unit = *(Unit**)((char*)g_game + 0x14357);
+    end = g_game->unitsEnd.get();
+    unit = g_game->units.get();
     for (; unit <= end; unit = (Unit*)((char*)unit + 0x118)) {
         if (unit->flags & 0x10000000) {
             SaveRec rec;

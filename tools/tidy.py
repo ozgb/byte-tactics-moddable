@@ -278,10 +278,12 @@ def base_findings(root, build_dir, base, units, clang_tidy, runner):
         for entry in entries:
             for key in ("command", "file", "output"):
                 if key in entry:
+                    entry[key] = entry[key].replace(str(head / build_dir / "overlay.json"), str(db_dir / "overlay.json"))
                     entry[key] = entry[key].replace(str(head), str(work))
         (db_dir / "compile_commands.json").write_text(json.dumps(entries))
         if (db / "overlay.json").exists():
-            shutil.copy(db / "overlay.json", db_dir / "overlay.json")
+            text = (db / "overlay.json").read_text().replace(str(head), str(work))
+            (db_dir / "overlay.json").write_text(text)
         for unit in units:
             try:
                 found += tidy_files(str(work), str(db_dir), [unit], clang_tidy, 1, runner)[unit]

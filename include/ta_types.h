@@ -3812,7 +3812,7 @@ class Class_00463be0 {  // 0x14b bytes, 3 views
 public:
     int field_0;  // +0x0
     char unknown_4[35];
-    Ref<PlayerInfo> data;  // +0x27
+    Ref<PlayerInfo> data;
     char unknown_2b[72];
     char field_73;  // +0x73
     char unknown_74[8];
@@ -5909,7 +5909,7 @@ struct PlayerData_004437c0 {  // 0xdd bytes, 1 view
 
 struct Player_004437c0 {  // 0x14b bytes, 1 view
     char unknown_0[39];
-    Ref<PlayerInfo> data;  // +0x27
+    Ref<PlayerInfo> data;
     char unknown_2b[288];
 };
 
@@ -8090,7 +8090,7 @@ struct Flags241_00466dc0 {  // 0x4 bytes, 1 view
 
 struct PlayerInfo_00466dc0 {  // 0x14b bytes, 1 view
     char unknown_0[39];
-    Ref<PlayerInfo> data;  // +0x27
+    Ref<PlayerInfo> data;
     char unknown_2b[81];
     ByteMap_00408090 explored;  // +0x7c
     char unknown_88[195];

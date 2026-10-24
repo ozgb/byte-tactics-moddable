@@ -30,8 +30,8 @@ struct Player {
     unsigned short firstIndex;         // +0x6f
     unsigned short lastIndex;          // +0x71
     unsigned char type;                // +0x73
-    Ref<SquadManager> ai;                 // +0x74
-    Ref<Group> groups;                    // +0x78
+    Ref<SquadManager> ai;
+    Ref<Group> groups;
     Ref<unsigned char> explored;
     int exploredWidth;                 // +0x80
     int exploredHeight;                // +0x84
@@ -102,7 +102,7 @@ struct Player {
     float metalStorageBonus;           // +0xe0
     float shareMetal;                  // +0xe4
     float shareEnergy;                 // +0xe8
-    Ref<UnitResources> econ;              // +0xec
+    Ref<UnitResources> econ;
     int updateTime;                    // +0xf0
     int winLoseTime;                   // +0xf4
     int displayTimer;                  // +0xf8

@@ -31,6 +31,12 @@ brings the definition's type; a name is overloaded when several definitions
 share it and the one with the same parameters is chosen, otherwise it is
 reported as ambiguous and left alone.
 
+A declaration already in the file's own header is compared with the definition too (return
+type, convention, parameter types, linkage, qualifier) and rewritten from it when they
+differ, with its default arguments kept; --check fails until it is. The names of a
+data/headers_left_out.csv row are not rewritten, and a rewrite that would name a placeholder
+type is a skip.
+
 The names of its parameters are kept, except placeholder ones (param_N), which are
 dropped. A function or global whose declaration would name a type with a placeholder
 name (<Name>_<addr>) is not declared: it is reported as a skip and its prototypes stay,
@@ -947,7 +953,7 @@ class World:
             cache[header] = [f for f in self.cpps if header in self.closure(f)]
         return cache[header]
 
-    def plan(self, mismatch="skip", protos=True):
+    def plan(self, mismatch="skip", protos=True, left_out=frozenset()):
         plan = Plan()
         decls = []
         for path in self.cpps:
@@ -1065,6 +1071,7 @@ class World:
                     continue
                 homed[(home, name)] = (kind, defn, text, fwd, inc)
         plan.homed = homed
+        self.plan_drift(plan, left_out)
         for (home, name), (kind, defn, text, fwd, inc) in sorted(homed.items()):
             if kind == "func" and text is not None and self.default_arguments([], defn):
                 edits = self.strip_default_edits(defn)
@@ -1086,6 +1093,37 @@ class World:
             plan.stale = stale
         plan.blocked = sorted(blocked)
         return plan
+
+    def plan_drift(self, plan, left_out):
+        """Rewrite the declaration in a home header that no longer agrees with its definition."""
+        for kind, defs in (("func", self.funcdefs), ("var", self.vardefs)):
+            for name, cands in sorted(defs.items()):
+                if len(cands) != 1 or name in left_out or name not in self.hdecls:
+                    continue
+                defn = cands[0]
+                if defn.path == LINK_DATA:
+                    continue
+                home = self.home_of_cpp(defn.path)
+                for h in self.hdecls[name]:
+                    if h.path != home or (kind == "func") != (h.item.kind == "func_proto"):
+                        continue
+                    if kind == "func":
+                        diffs = self.func_diffs(h.path, h.item, defn.path, defn.item)
+                    else:
+                        diffs = self.var_diffs(h.item, defn.item)
+                    if not diffs:
+                        continue
+                    text, idents = self.render(kind, defn, self.default_arguments([h], defn) if kind == "func" else None)
+                    held = sorted(i for i in idents if PLACEHOLDER_TYPE.match(i))
+                    if held:
+                        plan.skipped.append((Decl(h.path, h.item, kind, name, defn=defn), f"placeholder type {held[0]}: left for the type-naming issues"))
+                        continue
+                    fwd, inc, problems = self.resolve_names(idents, defn.path, home)
+                    if problems:
+                        plan.skipped.append((Decl(h.path, h.item, kind, name, defn=defn), "; ".join(problems)))
+                        continue
+                    plan.rewrites.setdefault(home, []).append(((h.item.begin, h.item.end, text), fwd, inc))
+                    plan.header_mismatches.append((h, defn, diffs))
 
     def default_arguments(self, ds, defn):
         """Default arguments by parameter index: the definition's, else a prototype's."""
@@ -1135,12 +1173,12 @@ class World:
         import os
         return os.path.relpath(to, str(Path(frm).parent)).replace(os.sep, "/")
 
-    def write_header(self, home, entries, taken):
+    def write_header(self, home, entries, taken, rewrites=()):
         """The new text of a home header given the declarations to add."""
         entries = sorted(entries, key=lambda e: (e[1].path, e[1].item.begin))
         fresh = home not in self.files
-        incs = set().union(*[e[4] for e in entries]) - {home}
-        fwds = set().union(*[e[3] for e in entries])
+        incs = set().union(*[e[4] for e in entries], *[r[2] for r in rewrites]) - {home}
+        fwds = set().union(*[e[3] for e in entries], *[r[1] for r in rewrites])
         decls = [e[2] for e in entries]
         if fresh:
             guard = self.new_guard(home, taken)
@@ -1152,7 +1190,7 @@ class World:
             lines += decls + ["", "#endif", ""]
             return "\n".join(lines)
         src = self.files[home]
-        text = src.text
+        text = self.apply_edits(src.text, [r[0] for r in rewrites])
         visible = set(self.closure(home))
         incs = {i for i in incs if i not in visible and i != home}
         direct = {self.resolve_include(home, k, n) for _, k, n in src.includes}
@@ -1248,8 +1286,10 @@ class World:
         for (home, name), entry in sorted(plan.homed.items()):
             if entry[2] is not None:
                 by_home.setdefault(home, []).append(entry)
+        for home in plan.rewrites:
+            by_home.setdefault(home, [])
         for home, entries in sorted(by_home.items()):
-            new = self.write_header(home, entries, taken)
+            new = self.write_header(home, entries, taken, plan.rewrites.get(home, ()))
             if home not in self.files or new != self.files[home].text:
                 out[home] = new
         for path in sorted(set(plan.removals) | set(plan.default_edits)):
@@ -1280,6 +1320,7 @@ class Plan:
     protos_report: list = field(default_factory=list)
     default_edits: dict = field(default_factory=dict)
     header_mismatches: list = field(default_factory=list)
+    rewrites: dict = field(default_factory=dict)
 
 
 def decl_line(w, d):
@@ -1351,6 +1392,7 @@ def report(w, plan, outs):
     lines.append(f"names left undeclared because a declaration of them disagrees or is ambiguous: {len(plan.bad_names)}")
     lines.append(f"declarations with no definition in the tree: {len(plan.nodef)}")
     lines.append(f"names declared in headers: {len(plan.homed)}")
+    lines.append(f"home declarations rewritten to their definition: {len(plan.header_mismatches)}")
     lines.append("")
     lines.append("== Headers created")
     for p in created:
@@ -1373,6 +1415,10 @@ def report(w, plan, outs):
         lines.append(f"    declared: {one_line(d.item.text)}")
         lines.append(f"    defined:  {d.defn.path}:{d.defn.item.line} {one_line(d.defn.item.text.split('{')[0])}")
         lines.append(f"    differs:  {'; '.join(d.diffs)}")
+    lines.append("")
+    lines.append("== Home declarations that drifted from their definition (rewritten)")
+    for h, defn, diffs in sorted(plan.header_mismatches, key=lambda x: (x[0].path, x[0].item.line)):
+        lines.append(f"{h.path}:{h.item.line}: {h.item.name}: {'; '.join(diffs)}")
     lines.append("")
     lines.append("== Ambiguities (several definitions; left in place)")
     for d in sorted(plan.ambiguous, key=lambda d: (d.path, d.item.line)):
@@ -1413,7 +1459,8 @@ def main(argv=None):
     ap.add_argument("--root", default=str(ROOT), help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     w = World(args.root)
-    plan = w.plan(protos=not args.keep_ta_protos)
+    left_out = load_left_out(args.root)
+    plan = w.plan(protos=not args.keep_ta_protos, left_out={name for name, _ in left_out})
     outs = w.outputs(plan)
     if args.report or args.dry_run:
         text = report(w, plan, outs)
@@ -1423,7 +1470,7 @@ def main(argv=None):
             sys.stdout.write(text)
         return 0
     if args.check:
-        found = check_left_out(w, plan, load_left_out(args.root))
+        found = check_left_out(w, plan, left_out)
         for loc, msg in found:
             print(f"{loc}: {msg}")
         for p in sorted(outs):

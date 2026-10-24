@@ -326,6 +326,57 @@ class HeadersTest(unittest.TestCase):
         code, out = run(self.tmp, "--check")
         self.assertIn("UseThing cannot be declared in a header: placeholder type Thing_00401000", out)
 
+    def edit(self, name, old, new):
+        text = self.text(name)
+        self.assertIn(old, text)
+        (self.tmp / name).write_text(text.replace(old, new))
+
+    def test_drifted_home_declaration_fails_the_check_and_is_rewritten(self):
+        run(self.tmp)
+        self.edit("src/a.cpp", "int __cdecl Cd(int x)", "char __cdecl Cd(int x)")
+        self.edit("src/a.cpp", "int Plain(int x)", "int Plain(int x, int param_2)")
+        self.edit("src/a.cpp", "extern \"C\" int __cdecl CLink(int x)", "int __cdecl CLink(int x)")
+        code, out = run(self.tmp, "--check")
+        self.assertEqual(code, 1)
+        self.assertIn("would change src/a.h", out)
+        run(self.tmp)
+        header = self.text("src/a.h")
+        self.assertIn("char __cdecl Cd(int x);", header)
+        self.assertIn("int __stdcall Plain(int x, int);", header)
+        self.assertIn("int __cdecl CLink(int x);", header)
+        self.assertNotIn('extern "C"', header)
+        self.assertNotIn("int __cdecl Cd", header)
+        code, out = run(self.tmp, "--check")
+        self.assertNotIn("would change", out)
+        before = self.text("src/a.h")
+        run(self.tmp)
+        self.assertEqual(self.text("src/a.h"), before)
+
+    def test_agreeing_home_declaration_is_not_rewritten(self):
+        run(self.tmp)
+        self.edit("src/a.h", "int __stdcall Plain(int x);", "int __stdcall Plain(int renamed);")
+        before = self.text("src/a.h")
+        run(self.tmp)
+        self.assertEqual(self.text("src/a.h"), before)
+
+    def test_drifted_declaration_naming_a_placeholder_type_is_reported_not_rewritten(self):
+        run(self.tmp)
+        self.edit("src/a.cpp", "int __cdecl Cd(int x)", "int __cdecl Cd(struct Thing_00401000* x)")
+        before = self.text("src/a.h")
+        run(self.tmp)
+        self.assertEqual(self.text("src/a.h"), before)
+        code, out = run(self.tmp, "--check")
+        self.assertEqual(code, 1)
+        self.assertIn("Cd cannot be declared in a header: placeholder type Thing_00401000", out)
+
+    def test_drifted_left_out_name_keeps_its_declaration(self):
+        run(self.tmp)
+        self.left_out("Wrong,mismatch,returns a pointer", "Cd,mismatch,left out")
+        self.edit("src/a.cpp", "int __cdecl Cd(int x)", "char __cdecl Cd(int x)")
+        before = self.text("src/a.h")
+        run(self.tmp)
+        self.assertEqual(self.text("src/a.h"), before)
+
 
 if __name__ == "__main__":
     unittest.main()

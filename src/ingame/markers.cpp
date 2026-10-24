@@ -1,5 +1,3 @@
-// Decompiled by DeepSeek V4.1 Flash, Space Bunny Free, GPT-6.1-sol, deepseek-v4.1, deepseek-v4.1-flash, mimo-v2.6-pro, Claude Sonnet 5.5 and Claude Opus 5.5. Names are provisional.
-// The include set is load-bearing for 0x4399f0: it changes how the compiler reassociates.
 #include "win_types.h"
 #include <stdlib.h>
 #include <math.h>
@@ -7,7 +5,6 @@
 
 #pragma pack(push, 1)
 
-// A 16.16 fixed-point coordinate.
 union Fixed {
     int value;
     struct {
@@ -16,11 +13,10 @@ union Fixed {
     };
 };
 
-// The 16.16 position, the same layout the sibling helpers (0x4399f0) use.
 struct Pos {
-    Fixed x;                          // +0x0
-    Fixed y;                          // +0x4
-    Fixed z;                          // +0x8
+    Fixed x;
+    Fixed y;
+    Fixed z;
 
     Pos operator+(const Pos& other) const
     {
@@ -45,49 +41,47 @@ static inline int Vec3Length(const Vec3* v)
 
 struct View {
     char unknown_0[0x2c];
-    int scroll_x;                     // +0x2c
-    int scroll_y;                     // +0x30
+    int scroll_x;
+    int scroll_y;
 };
 
 struct Weapon {
     char unknown_0[0xd6];
-    unsigned short areaOfEffect;      // +0xd6
+    unsigned short areaOfEffect;
     char unknown_d8[0xdc - 0xd8];
-    int range;                        // +0xdc
-    int coverage;                     // +0xe0
+    int range;
+    int coverage;
 };
 
-// A view of UnitDef (units/unit_def.h); it stays its own type because the
-// header's extra declarations move the symbol ids that 0x438c00 and 0x439740 depend on.
 struct UnitType {
     char unknown_0[0x15e];
-    Pos lo;                           // +0x15e
-    Pos hi;                           // +0x16a
+    Pos lo;
+    Pos hi;
     char unknown_176[0x178 - 0x176];
-    short field_178;                  // +0x178
+    short field_178;
     char unknown_17a[0x202 - 0x17a];
-    short sight;                      // +0x202
-    short radar;                      // +0x204
-    short sonar;                      // +0x206
-    short minCloakDistance;           // +0x208
-    short radarJam;                   // +0x20a
-    short sonarJam;                   // +0x20c
+    short sight;
+    short radar;
+    short sonar;
+    short minCloakDistance;
+    short radarJam;
+    short sonarJam;
     char unknown_20e[0x212 - 0x20e];
-    unsigned short buildDistance;     // +0x212
-    unsigned short maneuver;          // +0x214
-    unsigned short attackLength;      // +0x216
-    unsigned short kamikazeDistance;  // +0x218
+    unsigned short buildDistance;
+    unsigned short maneuver;
+    unsigned short attackLength;
+    unsigned short kamikazeDistance;
     char unknown_21a[0x220 - 0x21a];
     Ref<Weapon> weapon_220;
     char unknown_224[0x241 - 0x224];
-    unsigned int flags;               // +0x241
+    unsigned int flags;
     char unknown_245[0x249 - 0x245];
 };
 
 struct Anim {
-    unsigned short count;             // +0x0
+    unsigned short count;
     char unknown_2[0x2c - 2];
-    unsigned short duration;          // +0x2c
+    unsigned short duration;
 };
 
 struct Player;
@@ -96,14 +90,12 @@ struct Player;
 
 #include "../orders/order.h"
 
-struct MissionOrderTableEntry {       // 0x19-byte entries, table at g_missionOrderTableBegin
+struct MissionOrderTableEntry {
     char unknown_0[0x10];
-    unsigned char markerAnim;         // +0x10
+    unsigned char markerAnim;
     char unknown_11[0x19 - 0x11];
 };
 
-// The hudPalette members are the Gui colours (Thaldren's aHudPaletteIndices,
-// +0x8b2 of the Gui at +0x519) at the index in their name.
 #include "../game/game.h"
 #include "../state/sim_globals.h"
 
@@ -113,8 +105,8 @@ extern Game* g_game;
 typedef MissionOrderTableEntry* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-extern double TWO_PI;                    // 6.28318530717958
-extern double ONE_EIGHTH;                // 0.125
+extern double TWO_PI;
+extern double ONE_EIGHTH;
 
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
@@ -129,40 +121,6 @@ void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos,
 void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
                             Pos* out, int unused);
 
-// MATCH. Draws the footprint box of the unit type an order is about to build
-// (order->type indexes g_game->unitDefs), as two nested "#" shapes whose inner
-// lines slide in by level/10 of the box size, level being the frames since
-// order->timestamp clamped to 0..10. The outer shape is drawn one pixel bigger
-// in color1, the inner one in color2, and the order's position is copied to
-// *out like the other order-drawing callbacks (0x439740, 0x4399f0). The box is
-// flat: both screen corners use the low corner's height.
-//
-// Rebuilt by Claude Opus 5.5 (#4994, 58.3 -> MATCH). The old body (a 28-byte
-// box with a pad field, `char* const` arithmetic for pos.y, the timestamp and
-// the owner, an unsigned cast in the clamp) was replaced by the shapes the
-// sibling callbacks use. Each step, measured with check.py:
-//  * the two corners through a helper, one call per corner (58.3 -> 64.0).
-//    This gives the original's 0x30 frame without a pad field, and it spills
-//    x2 rather than keeping it in a callee-saved register, which frees ebx
-//    for `surface` across the eight calls.
-//  * ScreenX/ScreenY, the projection of 0x439740 and 0x4399f0, called in the
-//    order x1, y1, x2, y2 (-> 76.2). `order` then stops being a register
-//    variable and is reloaded for the timestamp and the owner, as in the
-//    original.
-//  * the owner flag as a 1-bit bitfield (+2.3): `shr ecx,4; test cl,1` is the
-//    bitfield form, while the mask folds to `test byte ptr [..], 0x10`.
-//  * the height passed to ScreenY separately (+2.2), and the corner returned
-//    by value (-> 86.8 once the operands were ordered).
-//  * the four screen coordinates in a Rect struct (-> 92.5). This settled the
-//    frame. The original keeps the spilled x2 in the dead lo.z dword and has
-//    an unused dword between the corners. MSVC 5 never packs a plain local
-//    into a dead struct, but it lays the Rect (an inline-promoted aggregate:
-//    x1, y1 and y2 stay in registers, only x2 lives in memory at r+8) over
-//    the dead `lo` temporary. The 16-byte Rect over the 12-byte corner leaves
-//    the 4-byte hole.
-//  * `operator+` as a const member of Pos taking a const reference, the 0x403a20
-//    Vec3 idiom (-> MATCH). A free operator+ or a free AddPos returning Pos
-//    left the corner loads in the wrong registers.
 static int ScreenX(View* v, int x)
 {
     return x - v->scroll_x + 0x80;
@@ -210,7 +168,6 @@ void __stdcall DrawBuildFootprint(void* surface, View* view, Order* order,
     *out = *(Pos*)&order->pos;
 }
 
-// The offset of the point at this angle and distance from the centre.
 static inline Vec3 Offset(int angle, int distance)
 {
     Vec3 v;
@@ -230,9 +187,6 @@ static inline Pos operator-(const Pos& p, const Vec3& v)
     return r;
 }
 
-// Draws a ring of n + 1 line segments around a 16.16 map position,
-// where n = radius * 2pi / 8, and the label text at the end of segment number
-// index * 3 (or of the last segment when that one ended at 0, 0).
 // FUNCTION: 0x438ea0
 void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos, int radius,
                             int color, const char* text, int index)
@@ -241,12 +195,9 @@ void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos, int radius,
     if (radius) {
         int lx = 0;
         int ly = 0;
-        // Product order d = radius * a, n = d * b: picks the right constants.
         double d = radius * TWO_PI;
         int n = (int)(d * ONE_EIGHTH);
         int i = 0;
-        // Uninitialised on purpose: when the ring has no segments the
-        // original reloads both from their (never written) home slot.
         int x2;
         int y2;
         if (i <= n) {
@@ -260,12 +211,10 @@ void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos, int radius,
                 p2.y.whole = __max(pos->y.whole, GetGroundHeight(&p2));
                 int sx = view->scroll_x;
                 int sy = view->scroll_y;
-                // y2 before x2: orders the two reloads on the n < 0 path.
                 y2 = p2.z.whole - (p2.y.whole >> 1) - sy + 0x20;
                 x2 = p2.x.whole - sx + 0x80;
                 DrawLine(surface, p1.x.whole - sx + 0x80,
                              p1.z.whole - (p1.y.whole >> 1) - sy + 0x20, x2, y2, color);
-                // Compared as i == index * 3, not `index *= 3`: x2 and y2 would take i's slot.
                 if (i == index * 3) {
                     lx = x2;
                     ly = y2;
@@ -283,8 +232,6 @@ void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos, int radius,
     }
 }
 
-// Suspected bug: the weapon3 test reads weapons[0].flags (unit+0x1f) but the
-// range from weapons[2].weapon (unit+0x48); weapons[2].flags is at unit+0x57.
 // FUNCTION: 0x4390a0
 void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
                             int unused1, int unused2)
@@ -301,11 +248,9 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
             int r = def->weapon_220->areaOfEffect;
             r = r >> 1;
             unsigned int t = ((unsigned int)g_game->ticks % 60) * r * 2 / 60;
-            // Single ternary: any if-form spills radius.
             int radius = (t < 8) ? 8 : t;
             if (radius >= r)
                 radius = r;
-            // Read as &order->unit->pos: a unit local would change it to lea.
             DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, radius, g_game->field_dd7, 0, 0);
             if (unit->motion != 0) {
                 DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->kamikazeDistance,
@@ -366,8 +311,6 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
             DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[1].weapon.get())->range, color,
                          "weapon2 range", 1);
         }
-        // Original bug: tests weapons[0].flags (unit+0x1f) but reads weapons[2].weapon
-        // (unit+0x48); weapons[2].flags is at unit+0x57.
         if ((unit->weapons[0].flags & 2) && ((Weapon*)unit->weapons[2].weapon.get())->range != 0) {
             DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[2].weapon.get())->range, color,
                          "weapon3 range", 2);
@@ -375,10 +318,6 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
     }
 }
 
-// The three 16.16 steps of the interpolated position. The original keeps them
-// in memory (the values are stored as each _allmul/_allshr pair finishes and
-// the three adds with `start` happen only after all three), which is what
-// building them in a helper returning a Pos reproduces.
 static Pos offset_004394e0(int dx, int dy, int dz, int f)
 {
     Pos d;
@@ -388,11 +327,6 @@ static Pos offset_004394e0(int dx, int dy, int dz, int f)
     return d;
 }
 
-// The walk itself, as an inline method on a struct that holds the whole loop
-// state. Per the guide, "an inlined function boundary changes the order MSVC
-// evaluates things in and which registers it keeps values in"; moving the loop
-// behind this boundary is what moves `order` out of edi and into ebx (the
-// register the original loads it into).
 struct Trail_004394e0 {
     Pos start;
     Vec3 delta;
@@ -420,12 +354,6 @@ struct Trail_004394e0 {
     }
 };
 
-// Snapshots the position the caller passed in `out`,
-// calls DrawWeaponCoverage (which draws the order's icon and writes the new position
-// to `out`), and when `flag` is set walks the line from the snapshot to the
-// new position in 0x300000 steps, drawing frame `idx` of g_game->cursorPathIconSeq at
-// each step. idx starts at (frames since order->timestamp, clamped at 0) /
-// max(1, anim->duration) % anim->count.
 // FUNCTION: 0x4394e0
 void __stdcall DrawPathAnim(void* surface, View* view,
                             Order* order, Pos* out, int flag)
@@ -435,10 +363,8 @@ void __stdcall DrawPathAnim(void* surface, View* view,
     if (flag == 0)
         return;
 
-    // Order matters: end, then the clamped age, then the deltas; no `int&` for the timestamp.
     Pos end = *out;
     int t = __max((unsigned int)g_game->ticks - order->created, 0);
-    // Plain-int Vec3: Length() converts each component to its own double.
     Vec3 d;
     d.x = end.x.value - start.x.value;
     d.y = end.y.value - start.y.value;
@@ -453,7 +379,6 @@ void __stdcall DrawPathAnim(void* surface, View* view,
     int frames = len < 1 ? 1 : (int)len;
     unsigned int idx = (t / frames) % anim->count;
 
-    // The walk stays behind the inlined Trail::Run(); written inline it changes register use.
     Trail_004394e0 tr;
     tr.start = start;
     tr.delta = d;
@@ -523,8 +448,6 @@ void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
     *out = pos;
 }
 
-// Draws an ellipse (radius `height`, 0.89 of it vertically) of 16 segments
-// around an object's screen position, then copies the position to `out`.
 // FUNCTION: 0x4399f0
 void __stdcall DrawOrderRangeRing(void* surface, View* view, Order* order,
                             Pos* out, int unused)

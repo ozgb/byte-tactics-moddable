@@ -1,18 +1,9 @@
 #include "../../interfaces/seams.h"
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// VTOL strafing attack order handler. With flags 0x10008, or with no target
-// and order flag 0x200, it queues VTOL_SEEKATTACK; on the map-edge player it
-// heads for the map centre. State 0 prepares the order ("Attacking";
-// PrepVtolClimb). State 1 attacks:
-// when the target lies ahead (IsAhead) it makes a strafing run, otherwise it
-// circles, leading the target by its velocity, and after 90 ticks of that
-// it queues VTOL_EVADE.
 #include <math.h>
 
 #include "../state/block.h"
 #include "../util/vec3.h"
 
-// The whole part (high 16 bits) of a 16.16 coordinate.
 static inline short Whole(const int& v) { return ((short*)&v)[1]; }
 
 static inline Vec3 Sum(const Vec3& a, const Vec3& b)
@@ -52,7 +43,6 @@ int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall AppendOrderToTail(Unit*, Order*);
 void __stdcall AppendOrder(Unit*, Order*);
 
-// scale is a by-value 4-byte union: callers load the constant into a register first.
 Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale);
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b);
 
@@ -74,7 +64,6 @@ static inline Vec3 Add(const Vec3& a, const Vec3& b)
     return r;
 }
 
-// 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 {
     g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
@@ -90,7 +79,6 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     }
 }
 
-// Stays an inline helper: its locals then share stack slots with the later ones.
 static inline int IsAhead(Unit* unit, Order* order)
 {
     Vec3 toward = Offset(GetHeadingBetween(&unit->pos, &order->target->pos), 0x140000);
@@ -100,8 +88,6 @@ static inline int IsAhead(Unit* unit, Order* order)
     return (short)(Whole(toward.x) * Whole(facing.x) + Whole(toward.z) * Whole(facing.z)) > 0;
 }
 
-
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x412d40
 int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
 {

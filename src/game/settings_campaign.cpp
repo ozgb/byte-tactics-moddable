@@ -1,7 +1,3 @@
-// Decompiled by Opus, space-bunny-free, DeepSeek V4.1 Flash and Sonnet. Names are provisional.
-// The game file a saved game is written to and read from (a HapiBank named
-// "Total Annihilation 3.0": a game summary plus each subsystem's state), and
-// the campaign name and a few settings saved in the registry.
 #include <stdio.h>
 #include <string.h>
 
@@ -23,11 +19,11 @@ struct PlayerEntry_004326b0 {
 
 struct Options_004326b0 {
     char unknown_0[0x108];
-    int commanderDeath;                // +0x108
-    int mapping;                       // +0x10c
-    int lineOfSight;                   // +0x110
-    int lineOfSightType;               // +0x114
-    int location;                      // +0x118
+    int commanderDeath;
+    int mapping;
+    int lineOfSight;
+    int lineOfSightType;
+    int location;
 };
 
 #include "game.h"
@@ -36,38 +32,35 @@ struct Options_004326b0 {
 #include "../map/mission.h"
 
 extern Game* g_game;
-extern char* g_saveBankName;          // "Total Annihilation 3.0"
-extern char* g_summaryAccountName;    // "Summary"
-extern char g_buildDateFormat[];      // "BUILD DATE: %s"
-extern char g_buildTimeFormat[];      // "BUILD TIME: %s"
-extern char g_maxUnitsKey[];          // "maxunits"
-extern char g_campaignKey[];          // "Campaign"
-extern char g_missionKey[];           // "Mission"
-extern char g_mapKey[];               // "Map"
-extern char g_difficultyKey[];        // "Difficulty"
-extern char g_sideKey[];              // "Side"
-extern char g_playersKey[];           // "Players"
-extern char g_gameTypeKey[];          // "Gametype"
-extern char g_thumbsKey[];            // "Thumbs"
-extern char g_commanderDeathKey[];    // "CommanderDeath"
-extern char g_locationKey[];          // "Location"
-extern char g_mappingKey[];           // "Mapping"
-extern char g_lineOfSightKey[];       // "LineOfSight"
-extern char g_lineOfSightTypeKey[];   // "LineOfSightType"
-extern char g_betweenMissionsKey[];   // "BetweenMissions"
-extern char g_descriptionKey[];       // "Description"
-extern char g_gameIdKey[];            // "Game ID"
-extern char g_gameTimeKey[];          // "Game Time"
-extern char g_radarImageBoxName[];    // "Radar Image"
+extern char* g_saveBankName;
+extern char* g_summaryAccountName;
+extern char g_buildDateFormat[];
+extern char g_buildTimeFormat[];
+extern char g_maxUnitsKey[];
+extern char g_campaignKey[];
+extern char g_missionKey[];
+extern char g_mapKey[];
+extern char g_difficultyKey[];
+extern char g_sideKey[];
+extern char g_playersKey[];
+extern char g_gameTypeKey[];
+extern char g_thumbsKey[];
+extern char g_commanderDeathKey[];
+extern char g_locationKey[];
+extern char g_mappingKey[];
+extern char g_lineOfSightKey[];
+extern char g_lineOfSightTypeKey[];
+extern char g_betweenMissionsKey[];
+extern char g_descriptionKey[];
+extern char g_gameIdKey[];
+extern char g_gameTimeKey[];
+extern char g_radarImageBoxName[];
 
 void __stdcall ReadCameraPosition(HapiBank* file);
 
 void __stdcall SaveSurface(void* surface, void* file);
 void __stdcall WriteCameraPosition(void* file);
 
-
-// Allocates a 4-byte object, initialises it, and opens it with the given
-// name and two global strings; frees it and returns 0 on failure.
 // FUNCTION: 0x432520
 HapiBank* __stdcall OpenSummaryBank(char* name)
 {
@@ -89,7 +82,6 @@ HapiBank* __stdcall OpenSummaryBank(char* name)
     return obj;
 }
 
-// Deletes an object whose (out-of-line) destructor is CloseBank.
 // FUNCTION: 0x432590
 void __stdcall FreeSummaryBank(HapiBank* obj)
 {
@@ -99,9 +91,6 @@ void __stdcall FreeSummaryBank(HapiBank* obj)
     }
 }
 
-// Allocates a 4-byte object, initialises it, and opens it with the given
-// name and a global string; frees it and returns 0 on failure.
-// Sibling of 0x432520.
 // FUNCTION: 0x4325b0
 HapiBank* __stdcall OpenHapiBank(char* name)
 {
@@ -124,7 +113,6 @@ HapiBank* __stdcall OpenHapiBank(char* name)
 
 #include "../../interfaces/seams.h"
 
-// Reads the game summary section and every subsystem's saved state.
 // FUNCTION: 0x432610
 int __stdcall LoadSavedGameState(HapiBank* file)
 {
@@ -144,11 +132,6 @@ int __stdcall LoadSavedGameState(HapiBank* file)
     return 1;
 }
 
-// Writes the game summary file named by argument 1 (the "Summary" section of
-// a freshly built parse tree, plus the radar image and every subsystem's save
-// state when the game is in state 6) and hands it to SaveBank, which
-// writes the save file and returns its result. Argument 2 is an optional
-// description string, argument 3 the game id.
 // FUNCTION: 0x4326b0
 int __stdcall SaveGameFile(char* path, char* description, int gameId)
 {
@@ -217,7 +200,7 @@ void __stdcall LoadCampaignRegistryName(int core, char* name)
         strcpy(key, "CoreCamp");
     else
         strcpy(key, "ArmCamp");
-    core = 26; // the original reuses the dead first argument slot for the size
+    core = 26;
     if (SettingGetString("Total Annihilation", key, name, &core) == 0) {
         memset(name, 0x55, 0x19);
         name[0x19] = 0;
@@ -236,7 +219,6 @@ void __stdcall SaveCampaignRegistryName(int core, char* name)
     SettingSetString("Total Annihilation", key, name);
 }
 
-// Saves the "AllMissions" flag (bit 0 of g_game+0x38d7f) to the registry.
 // FUNCTION: 0x432b60
 void SaveAllMissionsSetting()
 {

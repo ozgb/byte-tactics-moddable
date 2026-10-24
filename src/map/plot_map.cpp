@@ -1,20 +1,12 @@
-// Decompiled by Opus and space-bunny-free. Names are provisional.
-// The map's saved plot maps: the metal byte, the player-feature nibble and the
-// visibility-mask buffer, read from and written to a chunked HapiBank file.
-
-// Both includes stay: they decide whether width or height is loaded first in
-// each multiply.
 #include "win_types.h"
 #include <string.h>
 
 #pragma pack(push, 1)
 struct Cell {
     char unknown_0[0x7];
-    unsigned char metal;                // +0x7
-    char unknown_8[0x4];                // +0x8
+    unsigned char metal;
+    char unknown_8[0x4];
 
-    // The save and load views read the feature nibble with different widths
-    // (five bits against four), so each keeps its own bitfield at +0xc.
     union {
         struct {
             unsigned char low : 3;
@@ -32,11 +24,8 @@ struct Cell {
 
 extern Game* g_game;
 
-// Chunked file reader/writer.
 #include "../files/files_api.h"
 
-// Writes the "Metal" "Plotmap" chunk: the metal byte of every map cell
-// (the save counterpart of 0x484d60).
 // FUNCTION: 0x484ce0
 void __stdcall SaveMetalPlotmap(HapiBank* file)
 {
@@ -52,9 +41,6 @@ void __stdcall SaveMetalPlotmap(HapiBank* file)
     delete[] buf;
 }
 
-// Writes the "PlayerFeatures" "Plotmap" chunk: the low four bits of the
-// feature field of every map cell, two cells packed per byte (the even cell
-// in the high nibble). Compare 0x484d60, which reads the "Metal" plot map.
 // FUNCTION: 0x484df0
 void __stdcall SavePlayerFeaturesPlotmap(HapiBank* file)
 {
@@ -72,9 +58,6 @@ void __stdcall SavePlayerFeaturesPlotmap(HapiBank* file)
     }
 }
 
-// Reads the "Metal" "Plotmap" chunk into the metal byte of every map cell.
-// Defined after SavePlayerFeaturesPlotmap, not in address order: the order
-// decides the base of this cell loop's induction variable.
 // FUNCTION: 0x484d60
 void __stdcall LoadMetalPlotmap(HapiBank* file)
 {
@@ -83,8 +66,6 @@ void __stdcall LoadMetalPlotmap(HapiBank* file)
         if (file->GetBoxSize() == size) {
             unsigned char* buf = new unsigned char[size];
             Cell* cells = g_game->cells;
-            // The (unsigned int) cast keeps the count comparison unsigned, as
-            // in the original.
             if ((unsigned int)file->ReadBox(buf, size) >= size) {
                 for (int i = 0; i < size; i++) {
                     cells[i].metal = buf[i];
@@ -95,8 +76,6 @@ void __stdcall LoadMetalPlotmap(HapiBank* file)
     }
 }
 
-// Reads the "PlayerFeatures" "Plotmap" chunk into the feature field of every
-// map cell, two cells per byte (the reading counterpart of 0x484df0).
 // FUNCTION: 0x484e80
 void __stdcall LoadPlayerFeaturesPlotmap(HapiBank* file)
 {
@@ -106,8 +85,6 @@ void __stdcall LoadPlayerFeaturesPlotmap(HapiBank* file)
             unsigned char* buf = new unsigned char[size];
             if (buf) {
                 Cell* cells = g_game->cells;
-                // The (unsigned int) cast keeps the count comparison unsigned,
-                // as in the original.
                 if ((unsigned int)file->ReadBox(buf, size) >= size) {
                     Cell* c = cells;
                     for (int i = 0; i < size; i++, c += 2) {
@@ -121,8 +98,6 @@ void __stdcall LoadPlayerFeaturesPlotmap(HapiBank* file)
     }
 }
 
-// Writes the "Mapping" "Data" chunk from the map's visibility-mask buffer; the
-// reading counterpart is 0x484fa0.
 // FUNCTION: 0x484f50
 void __stdcall SaveMappingData(HapiBank* file)
 {
@@ -132,7 +107,6 @@ void __stdcall SaveMappingData(HapiBank* file)
     file->WriteBox((void *)g_game->visibilityMask, size);
 }
 
-// Reads the "Mapping" "Data" chunk into the map's visibility-mask buffer.
 // FUNCTION: 0x484fa0
 void __stdcall LoadMappingData(HapiBank* file)
 {

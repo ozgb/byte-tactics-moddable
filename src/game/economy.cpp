@@ -1,12 +1,3 @@
-// Decompiled by Sonnet, Claude Opus 5.5, GPT-6, GPT-6.1-sol, Opus, deepseek-v4.1 and deepseek-v4.1-flash. Names are provisional.
-// The compiler-generated `vector constructor iterator` (??_H), which constructs
-// each element of an array of a class with a constructor.
-//
-// UpdatePlayerEconomy (0x401360) and its income helpers stay in
-// economy_401360.cpp. The resource account's methods below and the
-// end-of-tick update (0x401320) are shared with it by address.
-//
-// The included headers decide which operand of the float adds is loaded first.
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,27 +7,21 @@
 
 #pragma pack(push, 1)
 
-// The end-of-tick update's view of one 0x18-byte account: the same bytes as
-// Res_00401360. Kept a separate name so economy_401360.cpp, which defines the
-// Res_00401360 spelling, and this file do not define one symbol twice.
 struct Obj_00401320 {
-    float x0;                          // +0x00
-    float x1;                          // +0x04
-    float x2;                          // +0x08
-    float x3;                          // +0x0c
-    float prev0;                       // +0x10
-    float prev1;                       // +0x14
+    float x0;
+    float x1;
+    float x2;
+    float x3;
+    float prev0;
+    float prev1;
 };
 
 
 struct UnitInfo {
     char unknown_0[0xa8];
-    unsigned short id;                 // +0xa8
+    unsigned short id;
 };
 
-// A unit's resource accounts; the class is declared in
-// src/game/unit_resources.h. units/unit_save.cpp saves and loads the two
-// 0x18-byte account blocks through SaveUnitAccounts and LoadUnitAccounts.
 #include "unit_resources.h"
 
 #include "../network/player.h"
@@ -51,9 +36,7 @@ struct UnitInfo {
 // GLOBAL: 0x511de8
 extern Game* g_game;
 
-// Calls a destructor-like member function on each of `count` objects of
-// `stride` bytes, last to first (the counterpart of 0x401000).
-class Obj {}; // opaque, non-virtual single-inheritance class
+class Obj {};
 typedef void (Obj::*ThisFn)();
 
 // FUNCTION: 0x401000 ??_H@YGXPAXIHP6EX0@Z@Z
@@ -97,8 +80,6 @@ void UnitResources::SaveUnitAccounts(UnitInfo* info, HapiBank* file)
     file->WriteBox(&metalMake, 0x18);
 }
 
-// Load counterpart of 0x4010b0: reads the two 0x18-byte blocks back from the
-// unit's "u%04xacc" entry, if it exists.
 // FUNCTION: 0x401110
 void UnitResources::LoadUnitAccounts(UnitInfo* info, HapiBank* file)
 {
@@ -145,7 +126,6 @@ int UnitResources::SpendEnergy(float amount)
     return 0;
 }
 
-// Metal counterpart of 0x401220.
 // FUNCTION: 0x401260
 int UnitResources::SpendMetal(float amount)
 {
@@ -177,7 +157,6 @@ void __stdcall SettleResourceAccount(Obj_00401320* p, float a, float b)
 {
     p->prev1 = p->x1;
     p->prev0 = p->x0;
-    // One combined expression: as two statements the demand term is evaluated first.
     p->x3 = p->x3 - a * p->x3 + (p->x2 - b * p->x2);
     p->x1 = 0;
     p->x0 = 0;

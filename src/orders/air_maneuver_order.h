@@ -11,17 +11,17 @@ class BitReader;
 class __declspec(novtable) AirManeuverOrder : public OrderFx {
 public:
     union {
-        unsigned short flags;          // +0x8, bit 0: heading set
+        unsigned short flags;
         struct {
             unsigned short headingSet : 1;
             unsigned short unknown_rest : 15;
         };
     };
-    Vec3 target;                       // +0xa
-    Vec3 other;                        // +0x16
-    short saveOnly22;                  // +0x22
-    unsigned short heading;            // +0x24
-    unsigned short value_26;           // +0x26
+    Vec3 target;
+    Vec3 other;
+    short saveOnly22;
+    unsigned short heading;
+    unsigned short value_26;
     Ref<Unit> self;
 
     AirManeuverOrder(Order* order, const Vec3& a, const Vec3& b);

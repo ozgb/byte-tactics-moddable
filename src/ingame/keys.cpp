@@ -1,15 +1,3 @@
-// Decompiled by Opus, deepseek-v4.1-flash, GPT-6.1-sol, space-bunny-free, deepseek-v4.1 and Claude Fable 5.1. Names are provisional.
-// The in-game keyboard commands (0x495e90) and the screenshot writer
-// (0x495930/0x495a30) plus the STOP-order toggles (0x495860/0x4958c0), one
-// translation unit.
-//
-// The Game views: 0x495860/0x4958c0 read 0x531 as a struct pointer with
-// `value` at +0x4, while 0x495e90 reads the same pointer as an int and then
-// `*(int*)(layer + 4)`. One pointer type covers both. The two byte flags
-// 0x495a30 names as `uiOptionFlags`/`pauseFlags` are anonymous unions with the
-// bitfield views 0x495e90 uses.
-//
-// Needed by 0x495a30: its frame layout depends on this header.
 #include "win_types.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,15 +6,11 @@
 
 #pragma pack(push, 1)
 
-// The layer Gui+0x18 (Game+0x531) points at: the gadget
-// array pointer is read as an int here.
 struct Layer {
     int unknown_0;
-    int value;                       // +0x4
+    int value;
 };
 
-// 0x4958c0's name for the same object. Unused, but keep it: the extra
-// front-end symbol decides 0x495a30's frame layout.
 typedef Layer Struct_004958c0;
 
 class Mission;
@@ -41,28 +25,24 @@ struct Flags_00495e90_37f2f {
 
 #include "../network/player_info.h"
 
-// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
 int StepTowards(int, int, int);
 
 #include "../network/player.h"
 
 struct FindData_00495930 {
     char unknown_0[0x14];
-    char name[260];                    // +0x14
+    char name[260];
 };
 
 struct BmpWriter {
     char unknown_0[0xc];
-    void* file;                             // +0xc
+    void* file;
     BmpWriter* Init();
     bool Open(const char* name, int width, int height);
     bool WriteRows(void* image, int x, int rows, int unused_4, int y, int unused_6, int srcY);
     void Close();
 };
 
-// Unused here: the symbol ids these declarations take keep WriteScreenshot's
-// allocation, standing in for the view classes merged above
-// (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 
@@ -74,7 +54,7 @@ struct Src_004b8ae0 {
 
 struct SrcHolder_00495a30 {
     char unknown_0[0xbc];
-    Src_004b8ae0* frame;                    // +0xbc
+    Src_004b8ae0* frame;
 };
 
 #include "../graphics/surface.h"
@@ -163,7 +143,6 @@ void SelectStopOrder(void)
     }
 }
 
-// The else branch is the body of SelectStopOrder.
 // FUNCTION: 0x4958c0
 void __stdcall SetOrSelectStopOrder(int set)
 {
@@ -207,15 +186,8 @@ void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name,
     sprintf(out, "%s%s%s%04i.%s", dir, needSep ? g_pathSepBackslash : DAT_005119b8, name, max + 1, ext);
 }
 
-// Screenshot writer: renders the map in screen-sized tiles into an offscreen
-// bitmap and appends each band to a .bmp file.
-// Unused here: real declarations from the in-game interface whose symbol ids
-// keep the allocation (docs/c2-regalloc.md).
 void UpdateBuildMenuIfFocusUnit(void*);
 void ActivatePlayerGadgets(char*);
-// Unused here: real zero-argument functions whose symbol ids keep
-// WriteScreenshot's allocation after the Surface view became surface.h
-// (docs/c2-regalloc.md).
 void ResetCameraState(void);
 void ClampCameraPosition(void);
 void ClampCameraTarget(void);
@@ -346,9 +318,6 @@ void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h
     bmp.Close();
 }
 
-// In-game keyboard command dispatcher: PopKey returns the event (0 means
-// return), IsKeyDown(0xf9) the "key down" flag. The switch is value sorted
-// The key == 0 arms are written as `if (key != 0) { ... } else` to stay out of line.
 // FUNCTION: 0x495e90
 void HandleGameKey(void)
 {
@@ -358,7 +327,6 @@ void HandleGameKey(void)
 
     int key = IsKeyDown(0xf9);
 
-    // Case bodies stay in the original physical order: the jump table depends on it.
     switch (event) {
     case 0x1b:
         if (g_game->ordersPanelFlags_37ebe.b0) {
@@ -459,7 +427,6 @@ void HandleGameKey(void)
         data[1] = 0;
         g_game->flags_38a51.b0 = !g_game->flags_38a51.b0;
         data[2] = (unsigned char)(g_game->flags_38a51.b0);
-        // One expression: the literal 3 must be pushed before the toggle.
         BroadcastPacket(GetLocalDpid(), data, 3);
         break;
     }
@@ -483,7 +450,6 @@ void HandleGameKey(void)
                 ToggleTabMenu();
             break;
         }
-        // fall through
     case 0xe3:
         if (key != 0) {
             if (g_game->hoverUnitId != 0) {
@@ -509,9 +475,7 @@ void HandleGameKey(void)
             if (g_game->movieCaptureIndex != 0) {
                 g_game->movieCaptureIndex = 0;
             } else {
-                // Reset in both arms: the compiler hoists the common store.
                 g_game->movieCaptureIndex = 0;
-                // path[0x100] and data[4] (case 0xf8) pin the frame size.
                 char path[0x100];
                 char findData[0x118];
                 sprintf(path, "%s\\MOVIE*", g_game->field_38a53);
@@ -587,7 +551,6 @@ void HandleGameKey(void)
     case 0xc0:
     case 0xc1:
     case 0xc2: {
-        // Exactly 7 bytes: a larger buffer moves the frame layout.
         char buf[7];
         sprintf(buf, "CTRL_%c", event - 0x69);
         SelectUnitsByCategory(buf, key);

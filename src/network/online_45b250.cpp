@@ -1,8 +1,3 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// Built without /GX; see 0x45b670.cpp for the online.dll helpers and what the
-// try block does to the locals. Every local has a slot, ordered by a hash of
-// its name (16 buckets, the later declaration first within a bucket), which is
-// why `text` is declared before `format` here.
 #include <stdio.h>
 #include <string.h>
 #include "../../interfaces/host.h"

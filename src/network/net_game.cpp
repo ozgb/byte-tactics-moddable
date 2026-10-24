@@ -1,22 +1,3 @@
-// Decompiled by Haiku, Sonnet, Opus, deepseek-v4.1-flash, DeepSeek V4.1 Flash,
-// deepseek-v4.1, gpt-6-luna, GPT-6.1-sol, mimo-v2.6-pro, Claude Opus 5.5,
-// space-bunny-free, claude-sonnet-5-5, Space Bunny Free, muse-spark-1.3-free,
-// claude-opus-5-5, GPT-6 and GPT-6-Luna. Names are provisional.
-// The network game module (0x44fd40 to 0x457d30): the player lookups and slot
-// handling, player names and info packets, the session setup, the lobby join,
-// player colours and alliances, packet dispatch, rejection, timeout and chat
-// handling, the script-call packets, heartbeat, ping, load progress, resource
-// sharing and the lobby connection. The module's three parts joined in
-// address order. 0x450530 and 0x453d40 stay in files of their own
-// (net_game_450530.cpp and net_game_453d40.cpp; docs/split-modules.md has the
-// reasons).
-//
-// <stdio.h> and <stdlib.h> carry 0x450380's sprintf and rand, and <string.h>
-// the string copies of 0x450090, 0x450140, 0x450980, 0x451090 and 0x451220.
-// <windows.h> is deliberately absent here: 0x450f90's original file needed it
-// for its loop's base/index order, but in this file's declaration context it
-// matches without it. It arrives with the module's second part, whose files
-// included it.
 #include "win_types.h"
 #include <stdio.h>
 #include <string.h>
@@ -25,7 +6,6 @@
 #include "../state/game_rand.h"
 #include "../state/sim_globals.h"
 
-// DirectPlay 3 DPNAME (the toolchain's DirectX 3 <dplay.h> lacks it).
 struct DPNAME {
     unsigned long dwSize;
     unsigned long dwFlags;
@@ -63,7 +43,6 @@ struct Holder_00453640;
 #include "../gui/gui.h"
 #include "../gui/layer.h"
 struct Net_4517b0;
-// The forward declaration takes one symbol id: Unused_00452960 has one parameter fewer.
 struct ChatPacket;
 class UnitSync;
 
@@ -71,24 +50,19 @@ class UnitSync;
 
 #include "player.h"
 
-// A unit: the player it belongs to, its script and the fields the network
-// game reads. One type for the views of the part files.
 #include "../units/unit.h"
 
 #include "../game/game.h"
 
 struct SideDataPacket {
-    unsigned char type;                // +0x0
-    PlayerInfo data;                   // +0x1
+    unsigned char type;
+    PlayerInfo data;
 };
 
-// The packets that start with a player id at +0x1: reject (0x1b), drop (0x1c)
-// and alliance (0x24). net_game_453d40.cpp reads them with the same layout;
-// reject and alliance carry one more byte at +0x5.
 struct PlayerIdPacket {
-    unsigned char type;                // +0x0
-    int id;                            // +0x1
-    unsigned char value;               // +0x5, the reject reason or the ally team
+    unsigned char type;
+    int id;
+    unsigned char value;
 };
 
 #pragma pack(pop)
@@ -157,7 +131,6 @@ void NetPacket::DispatchPacket()
     g_packetHandlers[idx]((int)this);
 }
 
-// Returns the id of the first active player whose type is 1 or 2, or -1.
 // FUNCTION: 0x44fdb0
 int GetLocalDpid()
 {
@@ -188,8 +161,6 @@ static inline int PlayerId(unsigned char i)
     return g_game->players[i].id;
 }
 
-// The second part's lookups (0x451bc0, 0x453010) call this out of line;
-// the merged file would otherwise inline it into them.
 #pragma auto_inline(off)
 // FUNCTION: 0x44fe40
 unsigned char __stdcall FindSlotByDpid(int id)
@@ -215,7 +186,6 @@ unsigned char __stdcall GetPlayerSlot(Player* player)
 
 static inline int GetPlayerField_0044fed0(unsigned char i)
 {
-    // Redundant i != 10 test must stay: 10 is the not-found index.
     if (i != 10 && g_game->players[i].type)
         return g_game->players[i].id;
     return -1;
@@ -232,8 +202,6 @@ static inline unsigned char FindPlayerIndex_0044fed0(int id)
     return 10;
 }
 
-// Finds the player whose id equals the given id and returns a pointer to
-// it, or null when there is none.
 // FUNCTION: 0x44fed0
 Player* __stdcall FindPlayerByDpid(int id)
 {
@@ -242,10 +210,6 @@ Player* __stdcall FindPlayerByDpid(int id)
     return &g_game->players[FindPlayerIndex_0044fed0(id)];
 }
 
-// Returns the id at +4 of a player slot (index 10 means none), or -1 when
-// the slot is unused; the pointer version is 0x450010.
-// The second part's lookups (0x451bc0, 0x453010) call this out of line;
-// the merged file would otherwise inline it into them.
 #pragma auto_inline(off)
 // FUNCTION: 0x44ffd0
 int __stdcall GetSlotDpid(unsigned char index)
@@ -334,7 +298,6 @@ static inline int GetPlayerField(unsigned char i)
 
 static inline unsigned char FindPlayerIndex_00450240(int id)
 {
-    // Early return, not a loop wrapped in if (id != -1).
     if (id == -1)
         return 10;
     for (unsigned char i = 0; i < 10; i++) {
@@ -351,9 +314,6 @@ static inline Player* FindPlayer(int id)
     return &g_game->players[FindPlayerIndex_00450240(id)];
 }
 
-// Finds the highest id among the active players of type 1 or 3, looks
-// that player up by id and sets bit 0 of its info flags. Nothing in the
-// exe calls it. It returns the constant 10, the "no player" index.
 // FUNCTION: 0x450240
 unsigned char PickNewHost()
 {
@@ -372,7 +332,6 @@ unsigned char PickNewHost()
     Player* q = FindPlayer(max);
     if (q)
         q->info->flags_97 |= 1;
-    // Must return 10, not void.
     return 10;
 }
 
@@ -396,9 +355,6 @@ static inline unsigned char FindPlayerIndex_00450380(int id)
 
 int HarnessViewRand();
 
-// Announces that the player with the given id has left, unless the local
-// player is flagged. The index search was an inlined helper and appears twice
-// in the original (see 0x44fed0, which has the same shape).
 // FUNCTION: 0x450380
 void __stdcall AnnouncePlayerLeft(int id)
 {
@@ -416,8 +372,6 @@ void __stdcall AnnouncePlayerLeft(int id)
     AddMessage(buf, 4, 0, p->index);
 }
 
-// Returns the first player slot that is inactive and not of type 4, or 10
-// when there is none.
 // FUNCTION: 0x4504f0
 int FindFreeSlot()
 {
@@ -457,11 +411,6 @@ char FindFreePlayerId(void)
     return 0;
 }
 
-// Sets the game's flag at +0x299c when two active players (of type 1, 2 or
-// 3, and not in state 10) share an id from 1 to 10 (see 0x450910, which
-// finds the first unused id).
-// Indexing g_game->players[i] in every test (rather than a player pointer
-// local) is what makes MSVC walk the array from the type field.
 // FUNCTION: 0x450980
 void CheckDuplicatePlayerIds(void)
 {
@@ -546,7 +495,6 @@ int __stdcall AddNetPlayer(int id)
     SideDataPacket packet;
     char buf[0x400];
     int result;
-    // Destinations precomputed before the branch: keeps the strcpy source scan canonical.
     char* d_full = p->fullName;
     char* d_name = p->name;
     if (id != -1) {
@@ -695,12 +643,6 @@ static inline int IsPlaying_00450f90(Player* player)
     return 0;
 }
 
-// When the game is networked (flag 1 at +0x2a44), sends every playing
-// player's 0xb9-byte data block (type 0x20) and then its 6-byte message
-// (type 0x24, the same code as BroadcastAllyTeam).
-// The packet is declared at function scope: its address escapes to
-// BroadcastPacket in one iteration, so MSVC re-reads player->id around the
-// stores into it in the next, as the original does.
 // FUNCTION: 0x450f90
 void BroadcastPlayerInfo()
 {
@@ -760,9 +702,6 @@ void __stdcall BuildGameInfo(char* name, int* d, int* c, int* b, int* a)
     name[0x1f] = 0;
 }
 
-// The flag is a bit of an unsigned short bitfield whose storage starts at the
-// odd offset 0x9b (packed struct): that gives the byte load and "shr al, 4;
-// test al, 1". An unsigned char bitfield folds to "test byte ptr".
 // FUNCTION: 0x451180
 void UpdateNetGameInfo(void)
 {
@@ -779,8 +718,6 @@ void UpdateNetGameInfo(void)
     host_net_update_game_info((host_net*)g_game->net_14, name, DAT_005119b8, d, c, b, a);
 }
 
-// The index of the first connected player, or 10 when there is none.
-// Must stay a static inline helper: return i in the loop, return 10 after it.
 static inline unsigned char FindPlayerInUse()
 {
     for (unsigned char i = 0; i < 10; i++) {
@@ -790,11 +727,6 @@ static inline unsigned char FindPlayerInUse()
     return 10;
 }
 
-// Sends the "AI:" or nickname name to DirectPlay for one player slot and
-// fills in that slot's PlayerInfo. The two "is any player connected" searches
-// use the FindPlayerInUse helper above, called once before the name is
-// built and once on the failure path; see 0x4515d0, 0x451bc0 and 0x451df0 for
-// the same helper.
 // FUNCTION: 0x451220
 int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
 {
@@ -803,7 +735,6 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
     Player* player = &g_game->players[playerIndex];
     player->SetType(flag);
 
-    // Parameter on the left of the compare.
     int same = (playerIndex == FindPlayerInUse());
 
     if (flag == 1) {
@@ -846,11 +777,6 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
     return r;
 }
 
-// The module's second part (0x451540 to 0x4560c0): the lobby join,
-// player colours and alliances, packet dispatch, rejection, timeout and
-// chat handling. <windows.h> and <process.h> carry the lobby join and
-// display calls, <string.h> and <stdio.h> the string and printf
-// patterns, and <iostream> 0x453010's shared return block.
 #define WIN32_LEAN_AND_MEAN
 #include "win_types.h"
 #include <string.h>
@@ -870,127 +796,110 @@ struct Guid_4517b0 {
     int data[4];
 };
 
-// The session description behind the connection's +0x8 (DPSESSIONDESC2;
-// hapinet.cpp has the whole record).
 struct SessionDesc_004517b0 {
     char unknown_0[0x30];
-    char* lpszSessionName;             // +0x30
+    char* lpszSessionName;
 };
 
 struct Net_4517b0 {
     char unknown_0[4];
-    unsigned int flags;                // +0x4
-    SessionDesc_004517b0* desc;        // +0x8
-    DPNAME* name;                      // +0xc
+    unsigned int flags;
+    SessionDesc_004517b0* desc;
+    DPNAME* name;
 };
 
-// The display object of 0x451640 and 0x4517b0: one type for both views.
 struct Obj_00451640 {
     char unknown_0[0xf0];
     unsigned short bit0 : 1;
-    unsigned short flag : 1;           // +0xf0, mask 2
+    unsigned short flag : 1;
 };
 
-// The LOBBY JOIN INFO argument block of 0x451640 and 0x451770.
 struct Args_00451640 {
-    char* name;                        // +0x00
-    int arg_4;                         // +0x04
-    int arg_8;                         // +0x08
-    int arg_c;                         // +0x0c
-    int arg_10;                        // +0x10
-    int arg_14;                        // +0x14
-    int result;                        // +0x18
+    char* name;
+    int arg_4;
+    int arg_8;
+    int arg_c;
+    int arg_10;
+    int arg_14;
+    int result;
     void* event;
 };
 
-// The packet data object of 0x451fd0 and 0x452370: one type for both views.
 struct Class_00451fd0 {
     char unknown_0[0x870];
-    unsigned int lobbySyncTick;        // +0x870
+    unsigned int lobbySyncTick;
     char unknown_874[0x1745 - 0x874];
-    int recvPacketSize;                // +0x1745
-    union {                            // one arm, kept: an anonymous union costs symbol ids
-        int* buffer;                   // +0x1749
+    int recvPacketSize;
+    union {
+        int* buffer;
     };
 };
 
-struct Entry_00453640 {                // gadget returned by FindGadgetChecked
+struct Entry_00453640 {
     char unknown_0[0xc0];
-    short count;                       // +0xc0
+    short count;
 };
 
 struct Holder_00453640 {
-    int unknown_0;                     // +0x00
-    Entry_00453640* entries;           // +0x04
+    int unknown_0;
+    Entry_00453640* entries;
 };
 
 struct Entry_004538f0 {
     char unknown_0[0xb6];
-    char text[0x15b - 0xb6];           // +0xb6
+    char text[0x15b - 0xb6];
 };
 
-// The 0x15b-byte entry table returned by FindGadgetChecked.
 struct OutEntry_00453a50 {
     char unknown_0[0x19];
-    short height;                      // +0x19
+    short height;
 };
 
-// The dialog object returned by LoadGuiLayer.
 struct Gui_00453a50 {
     char unknown_0[4];
-    void* entries;                     // +0x04
-    void (__stdcall* callback)(void*); // +0x08
+    void* entries;
+    void (__stdcall* callback)(void*);
     char unknown_c[0x1c - 0xc];
-    void (__stdcall* onFrame)(void*); // +0x1c
+    void (__stdcall* onFrame)(void*);
 };
 
-// The chat message (0x05): the type, then the text. net_game_453d40.cpp
-// reads the text from +0x1 as well.
 struct ChatPacket {
-    unsigned char type;                // +0x0
-    char text[0x40];                   // +0x1
+    unsigned char type;
+    char text[0x40];
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_00452960(int a, int b, int c, int d, int e);
 
 struct AllyFlagsPacket {
-    unsigned char type;                // +0x0
-    int fromNetId;                     // +0x1
-    int toNetId;                       // +0x5
-    char allied;                       // +0x9
-    int force;                         // +0xa
+    unsigned char type;
+    int fromNetId;
+    int toNetId;
+    char allied;
+    int force;
 };
 
 struct UnitCreatePacket {
-    unsigned char type;                // +0x0
-    short defIndex;                    // +0x1
-    short unitId;                      // +0x3
+    unsigned char type;
+    short defIndex;
+    short unitId;
     Vec3 pos;
-    Angles16 angles;               // +0x11
+    Angles16 angles;
 };
 
 struct BuilderLinkPacket {
-    unsigned char type;                // +0x0
-    short constructedUnitId;           // +0x1
-    short builderUnitId;               // +0x3
+    unsigned char type;
+    short constructedUnitId;
+    short builderUnitId;
 };
 
-// The DirectPlay system message HandleNetPackets reads when the sender is 0:
-// +0x00 is its DPSYS_ type (3 create, 5 destroy, 0x102 set data, 0x103 set
-// name, 0x104 set session description). The fields are named for the
-// create-player layout and the set-data layout, which overlay: a create has
-// its data at createData/dataSize, a set-data has it at data, a set-name has
-// its short name at +0x14 and the long name at longName, and a set-session
-// description starts at +0x04.
 struct Packet_00453d40 {
-    unsigned int type;                 // +0x00
-    int playerType;                    // +0x04, 1 is a player
-    int id;                            // +0x08
-    char* data;                        // +0x0c
-    char* createData;                  // +0x10
-    int dataSize;                      // +0x14
-    char* longName;                    // +0x18
+    unsigned int type;
+    int playerType;
+    int id;
+    char* data;
+    char* createData;
+    int dataSize;
+    char* longName;
 };
 
 #pragma pack(pop)
@@ -1079,12 +988,6 @@ void __stdcall SetTranslatedTextByName(void* obj, char* name, void* out, int fla
 void __stdcall SetKeyboardInput(void* obj, int value);
 void __stdcall RenderLayer(void* obj, int value);
 
-// The flag is a bit of an unsigned short bitfield in the packed info struct:
-// that gives "or byte ptr [m], 1"; an unsigned char or a plain byte "|= 1"
-// goes through a register.
-// The flag is a bit of an unsigned short bitfield in the packed info struct:
-// that gives "or byte ptr [m], 1"; an unsigned char or a plain byte "|= 1"
-// goes through a register.
 // FUNCTION: 0x451540
 void CreateNetGame(void)
 {
@@ -1188,8 +1091,6 @@ void __stdcall JoinLobbyGameThread(Args_00451640* args)
 // FUNCTION: 0x4517b0
 int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
 {
-    // The name buffer is never read again and must stay dead; the whole body
-    // stays under the if (an early return would move the epilogues).
     char name[0x100];
     SideDataPacket packet;
 
@@ -1223,9 +1124,7 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
             if (v != 0 && g_onlineLobbyPassword != 0) {
                 p->info->password[0] = 0;
                 strncat(p->info->password, &g_onlineLobbyPassword, 0xa);
-                // hasPassword must be a 16-bit 1-bit field, not a byte field.
                 p->info->hasPassword = 1;
-                // Cast on a reloaded dplConnection, not a cached local.
                 if ((*(unsigned char*)&g_game->dplConnection->flags & 2) != 0) {
                     g_game->password[0] = 0;
                     strncat(g_game->password, &g_onlineLobbyPassword, 0xa);
@@ -1241,7 +1140,6 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
             strcpy(name, g_game->nickname);
         }
 
-        // ready must be a 1-bit field.
         if (g_game->dplConnection != 0) {
             p->info->host = g_game->dplConnection->flags >> 1;
         } else {
@@ -1345,7 +1243,6 @@ static inline unsigned char FindPlayerIndex_00451bc0(int id)
 // FUNCTION: 0x451bc0
 int __stdcall SendPacketToPlayer(int from, int to, unsigned char* packet, int size)
 {
-    // The id != -1 guard stays in the caller, not in the lookup helper.
     unsigned char fi;
     if (from == -1)
         fi = 10;
@@ -1401,7 +1298,6 @@ static inline Player* FindPlayer_00451df0(int id)
 {
     if (FindPlayerIndex_00451df0(id) == 10)
         return 0;
-    // Searched twice: gives the two copies of the id loop.
     return &g_game->players[FindPlayerIndex_00451df0(id)];
 }
 
@@ -1439,7 +1335,6 @@ int __stdcall BroadcastPacket(int id, unsigned char* packet, int size)
                 g_broadcastPeersSeen[c] = 1;
         }
     }
-    // Single shared return: makes the flags_2a44 test a forward je.
     return 1;
 }
 
@@ -1455,7 +1350,6 @@ int __stdcall InitPacketTables(Class_00451fd0* obj)
     g_packetModes[14] = 4;
     g_packetModes[15] = 4;
     g_packetModes[16] = 4;
-    // After nine of the stores of 4: keeps 4 live across the zeroing.
     memset(&g_packetSizes[1], 0, 0xb0);
     g_packetSizes[17] = 4;
     g_packetModes[17] = 4;
@@ -1601,7 +1495,6 @@ static inline int GetPlayerId_004523e0(unsigned char i)
     return -1;
 }
 
-// Early return 10 for id -1, used straight as the index: two separate stores of 10.
 static inline unsigned char FindPlayerIndex_004523e0(int id)
 {
     if (id == -1)
@@ -1644,13 +1537,11 @@ int __stdcall AssignPlayerColor(int from, int to, int group)
     return result;
 }
 
-// Returns the index of the first in-use entry whose id matches, else 10.
 static __inline unsigned char FindSlot_00452570(int id)
 {
     unsigned char i;
     for (i = 0; i < 10; i++) {
         int v;
-        // Redundant guard: kept as in the original.
         if (i == 10) {
             v = -1;
         } else {
@@ -1679,7 +1570,6 @@ int __stdcall IsColorFree(int id, int slot)
     } else {
         found = FindSlot_00452570(id);
     }
-    // Second search, result discarded: kept as in the original.
     if (found != 10 && id != -1) {
         FindSlot_00452570(id);
     }
@@ -1694,7 +1584,6 @@ int __stdcall IsColorFree(int id, int slot)
 
 static inline unsigned char FindReadyPlayer()
 {
-    // Tests the fields directly, not through a per-index helper.
     for (unsigned char i = 0; i < 10; i++) {
         if (g_game->players[i].type && g_game->players[i].info->host)
             return i;
@@ -1706,7 +1595,6 @@ static inline unsigned char FindReadyPlayer()
 int __stdcall RequestPlayerColor(int param)
 {
     Player* p = &g_game->players[g_game->localPlayer];
-    // Widened into an int; localPlayer re-read from g_game, not cached.
     int i = FindReadyPlayer();
     if (i == g_game->localPlayer) {
         if (IsColorFree(p->id, param) == 0) {
@@ -1778,7 +1666,6 @@ static inline unsigned char FindIndex_00452960(int id)
     return 10;
 }
 
-// The state helpers keep one return per outcome and each re-tests active.
 static inline int IsActive12_00452960(Player* p)
 {
     if (p->active == 0)
@@ -1819,7 +1706,6 @@ static inline int IsState3_00452960(Player* p)
 int __stdcall SetAlliance(int from, int to, unsigned char value, int extra)
 {
     unsigned char fi;
-    // -1 handled here, not in the helper: keeps the separate store of 10.
     if (from == -1)
         fi = 10;
     else
@@ -1841,8 +1727,6 @@ int __stdcall SetAlliance(int from, int to, unsigned char value, int extra)
     if (p1 == 0 || p2 == 0)
         return 0;
 
-    // The reference is what makes MSVC keep this byte in its stack slot and
-    // reload it with the `and 0xff` widening the original has.
     unsigned char idx_;
     unsigned char& idx = idx_;
     if (IsActive12_00452960(p1)) {
@@ -1897,8 +1781,6 @@ int __stdcall SendAlliance(int from, int to, char value, int extra)
     return result;
 }
 
-// An inlined helper with one return per outcome: written as a plain
-// condition, MSVC moves the `return 0` path after the body.
 static inline int IsPlaying_00452bd0(Player* player)
 {
     if (player->active == 0)
@@ -1908,7 +1790,6 @@ static inline int IsPlaying_00452bd0(Player* player)
     return 0;
 }
 
-// The original calls this out of line from 0x453d40.
 #pragma auto_inline(off)
 // FUNCTION: 0x452bd0
 int __stdcall BroadcastAllyTeam(Player* player)
@@ -1954,9 +1835,6 @@ char* __stdcall GetRejectReasonText(int reason)
     }
 }
 
-// RemovePlayer inlines the slot lookups the way its original translation unit
-// did; the copies are inline so that the out-of-line definitions above keep
-// their callers. The first lookup calls the out-of-line ones.
 static inline unsigned char FindSlotCall_00452cc0(int id)
 {
     if (id != -1) {
@@ -2035,11 +1913,6 @@ static inline void Remove_00452cc0(Player* p)
     p->lobbyDataSynced = 0;
 }
 
-// Removes the player with the given id: clears its slot in every playing
-// player's two alliance tables, tells KillPlayerUnits, drops it from the
-// session (or only resets it when the 0x2a44 bit 2 mode keeps playing
-// players), and when that player was the host (bit 0 of +0x97) hands the
-// host bit to the type 3 or type 1 player with the highest id.
 // FUNCTION: 0x452cc0
 void __stdcall RemovePlayer(int id)
 {
@@ -2055,8 +1928,7 @@ void __stdcall RemovePlayer(int id)
 
     unsigned char slot = p->index;
     int f = p->info->flags_97;
-    // The no-op |= 0 must stay: without it the zero-extension folds into the mask.
-    p->info->flags_97 |= 0;           // emits no code; needed for the match
+    p->info->flags_97 |= 0;
     int host = f & 1;
 
     for (int i = 0; i < 10; i++) {
@@ -2069,7 +1941,6 @@ void __stdcall RemovePlayer(int id)
 
     KillPlayerUnits(FindSlot_00452cc0(id));
 
-    // Remove stays an inline helper written in both arms.
     if (g_game->bits_2a44.bit2) {
         if (!IsPlaying_00452cc0(p))
             Remove_00452cc0(p);
@@ -2087,7 +1958,6 @@ void __stdcall RemovePlayer(int id)
 
     if ((g_game->flags_2a44 & 4) && host != 0) {
         unsigned int best = 0;
-        // Index g_game->players[j] directly: a q pointer would be rebased.
         for (int j = 0; j < 10; j++) {
             if (IsType3_00452cc0(&g_game->players[j]) || IsType1_00452cc0(&g_game->players[j])) {
                 if (g_game->players[j].id > best)
@@ -2198,7 +2068,6 @@ void __stdcall SendProbe(int from, int to)
     }
 }
 
-// The body of GetLocalHumanDpid, inlined here.
 static inline int FindTarget(Game* game)
 {
     for (int i = 0; i < 10; i++) {
@@ -2211,8 +2080,6 @@ static inline int FindTarget(Game* game)
 // FUNCTION: 0x453360
 int __stdcall SendChatPacket(char* text)
 {
-    // Never initialised: a path with no send returns garbage, as in the
-    // original (the caller ignores it).
     int result;
     int i;
     g_game->chat->type = 5;
@@ -2224,7 +2091,6 @@ int __stdcall SendChatPacket(char* text)
         result = BroadcastPacket(target, g_game->recvPacketPtr, 0x41);
     } else if (g_game->mode_2bf0 == 3) {
         for (i = 0; i < 10; i++) {
-            // A local copy declared after i: symbol order sets the SIB operand order of the 0x2bf1 read.
             Game* const g = g_game;
             if (g->chatRecipients[i] != 0) {
                 int id = g_game->players[i].id;
@@ -2246,7 +2112,6 @@ int __stdcall SendChatPacket(char* text)
     return result;
 }
 
-// Declared __stdcall although it takes no arguments: places the size reload late.
 // FUNCTION: 0x4534e0
 int __stdcall ReceiveNetPacket(void)
 {
@@ -2340,8 +2205,6 @@ void UpdateTimeoutDialog()
         } while (idx != g_game->tail);
     }
 
-    // The original searches for the player twice: once for the == 10 test and
-    // again for the index used to fetch the record. Keep it; the bytes do this.
     unsigned char found = FindPlayerIndex_00453640(g_timeoutPlayerDpid);
     Player* player;
     if (found == 10)
@@ -2478,7 +2341,6 @@ void CheckPlayerTimeouts()
     int team = -1;
     int i;
     Player* p = g_game->players;
-    // Walks a pointer: indexing here would bias the loop pointer to +0xc.
     for (i = 0; i < 10; i++, p++) {
         if (IsTimedOut(p, now)) {
             if (team < 0)
@@ -2497,7 +2359,6 @@ void CheckPlayerTimeouts()
     OpenTimeoutDialog(-1);
 }
 
-// The original calls this out of line from 0x453d40.
 #pragma auto_inline(off)
 // FUNCTION: 0x456030
 int Player::IsPlayableSlot()
@@ -2532,96 +2393,85 @@ void __stdcall BroadcastBuilderLink(Unit* obj, Unit* target)
     BroadcastPacket(obj->player->id, &packet, 5);
 }
 
-// The module's third part (0x456110 to 0x457d30): the script-call packets,
-// heartbeat, ping, load progress, player counts, resource sharing and the
-// lobby connection. <stdio.h> gives 0x456de0's [ecx + esi] order, <string.h>
-// the loop index orders of 0x4572a0, 0x4573d0 and 0x4578f0, <stdlib.h> the
-// first loop's address sums in 0x457540 and <algorithm> 0x4568c0's
-// random_shuffle; <time.h> 0x457710's time and localtime.
 #include <algorithm>
 #include <time.h>
 
 #pragma pack(push, 1)
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_004565a0(int a, int b, int c, int d, int e, int f);
 
 struct UnitScriptCallPacket {
-    unsigned char type;                // +0x0
-    short id;                          // +0x1
-    short index;                       // +0x3
-    char argCount;                     // +0x5
-    int arg0;                          // +0x6
-    int arg1;                          // +0xa
-    int arg2;                          // +0xe
-    int arg3;                          // +0x12
+    unsigned char type;
+    short id;
+    short index;
+    char argCount;
+    int arg0;
+    int arg1;
+    int arg2;
+    int arg3;
 };
 
 struct LatencyPacket {
-    unsigned char type;                // +0x00
-    int sendTick;                      // +0x01
-    int echoTick;                      // +0x05
-    int targetPlayerNetId;             // +0x09
+    unsigned char type;
+    int sendTick;
+    int echoTick;
+    int targetPlayerNetId;
 };
 
 struct Msg26_00456310 {
-    unsigned char type;                // +0x00
-    int table[10];                     // +0x01
+    unsigned char type;
+    int table[10];
 };
 
 struct Msg20_00456310 {
-    unsigned char type;                // +0x00
-    PlayerInfo info;                   // +0x01
+    unsigned char type;
+    PlayerInfo info;
 };
 
 struct Packet_00456de0 {
-    unsigned char type;                 // +0x0
-    unsigned char progress;             // +0x1
+    unsigned char type;
+    unsigned char progress;
 };
 
 struct ResourceSharePacket {
-    unsigned char type;                // +0x0
-    int subtype;                       // +0x1
-    int fromNetId;                     // +0x5
-    int toNetId;                       // +0x9
-    int amount;                        // +0xd
+    unsigned char type;
+    int subtype;
+    int fromNetId;
+    int toNetId;
+    int amount;
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_00457050(int a, int b, int c, int d, int e, int f);
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_004571c0(int a, int b, int c, int d, int e, int f);
 
-struct PlayerViewStatePacket {        // 0x3a bytes
-    unsigned char type;                // +0x0
-    unsigned char shareFlag;           // +0x1
-    int unitsKilled;                   // +0x2
-    int unitsLost;                     // +0x6
-    int commandersKilled;              // +0xa
-    int commandersLost;                // +0xe
-    int metalAmount;                   // +0x12
-    int energyAmount;                  // +0x16
-    int metalStorage;                  // +0x1a
-    int energyStorage;                 // +0x1e
-    float energyProduced;              // +0x22
-    float energyConsumed;              // +0x26
-    float energyWasted;                // +0x2a
-    float metalProduced;               // +0x2e
-    float metalConsumed;               // +0x32
-    float metalWasted;                 // +0x36
+struct PlayerViewStatePacket {
+    unsigned char type;
+    unsigned char shareFlag;
+    int unitsKilled;
+    int unitsLost;
+    int commandersKilled;
+    int commandersLost;
+    int metalAmount;
+    int energyAmount;
+    int metalStorage;
+    int energyStorage;
+    float energyProduced;
+    float energyConsumed;
+    float energyWasted;
+    float metalProduced;
+    float metalConsumed;
+    float metalWasted;
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_00457540(int a, int b, int c, int d, int e, int f);
 
-struct ShareLosAckPacket {             // 3 bytes
-    unsigned char type;                // +0x0
-    unsigned char ackLos;              // +0x1
-    unsigned char ackMapping;          // +0x2
+struct ShareLosAckPacket {
+    unsigned char type;
+    unsigned char ackLos;
+    unsigned char ackMapping;
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_00457d30(int a, int b, int c, int d, int e, int f);
 
 #pragma pack(pop)
@@ -2670,8 +2520,6 @@ int __stdcall SendScriptCallNoArgs(Unit* obj, short index)
     return BroadcastPacket(obj->player->id, &packet, 0x16);
 }
 
-// Sends a 0x16-byte type 0x10 packet for the object, like 0x456290, with the
-// index looked up by name in the object's name table (+0x9a) first.
 // FUNCTION: 0x456200
 int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount,
                            int arg0, int arg1, int arg2, int arg3)
@@ -2692,8 +2540,6 @@ int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount,
     return BroadcastPacket(obj->player->id, &packet, 0x16);
 }
 
-// Sends a 0x16-byte type 0x10 packet for the object (the sibling 0x456110
-// sends the same packet with only the index filled in).
 // FUNCTION: 0x456290
 int __stdcall SendScriptCall(Unit* obj, short index, char argCount,
                            int arg0, int arg1, int arg2, int arg3)
@@ -2713,10 +2559,6 @@ int __stdcall SendScriptCall(Unit* obj, short index, char argCount,
     return BroadcastPacket(obj->player->id, &packet, 0x16);
 }
 
-// Declaring the Msg20 message at function scope (not inside the loop) is what
-// puts its address in eax and fixes the whole send block; the trailing
-// g_game+0x2bee flag is a 1-bit unsigned short bitfield, which is what makes
-// the original emit `or byte ptr [eax+0x2bee], 1` in one instruction.
 // FUNCTION: 0x456310
 void SendNetHeartbeat()
 {
@@ -2808,7 +2650,6 @@ static inline int GetPlayerId_00456de0(unsigned char i)
 
 static inline unsigned char FindPlayerIndex(int id)
 {
-    // Early return 10 for -1, not a guarded loop.
     if (id == -1)
         return 10;
     for (unsigned char i = 0; i < 10; i++) {
@@ -2821,7 +2662,7 @@ static inline unsigned char FindPlayerIndex(int id)
 // FUNCTION: 0x4565a0
 void __stdcall HandlePing(LatencyPacket* p)
 {
-    if (p->echoTick == 0) {                       // not sent yet
+    if (p->echoTick == 0) {
         if (g_usePacketManager != 0) {
             g_packetManager.SendAllQueued(1);
         }
@@ -2831,14 +2672,13 @@ void __stdcall HandlePing(LatencyPacket* p)
         if (g_usePacketManager != 0) {
             g_packetManager.SendAllQueued(1);
         }
-        if (packets_were_guaranteed != 0) {          // hand them back
+        if (packets_were_guaranteed != 0) {
             host_net_guarantee_packets(1);
         }
         return;
     }
 
     unsigned char index = FindPlayerIndex(p->targetPlayerNetId);
-    // Table lookup goes through the pl pointer local.
     Player* pl = &g_game->players[index];
     if (pl->active == 0) {
         return;
@@ -2847,23 +2687,14 @@ void __stdcall HandlePing(LatencyPacket* p)
         return;
     }
     unsigned char other = FindPlayerIndex(g_game->from_id);
-    // No bound check on either index: an id of -1 makes FindPlayerIndex
-    // return 10, the spare eleventh slot (the table has 11, see docs/bugs.md).
     g_game->players[other].ping = host_time_ms() - p->sendTick;
 }
 
-// Returns 0 when no player is in state 3. Otherwise every active player of
-// type 1 or 2, or in state 3, must have bit 0x20 set in its data flags
-// (+0x9b), else it returns 0. Returns 1 when some slot is inactive or lacks
-// bit 0x40, unless numPlayers is 1 (then 0).
 static inline int IsPlaying(unsigned char i)
 {
     return g_game->players[i].active != 0 && g_game->players[i].type == 3;
 }
 
-// The mix of `p->` and `g_game->players[j].` in the second loop is needed:
-// it keeps the later reads of active and data from reusing the first loads,
-// which frees dl for j and bl for the 0x40 mask as in the original.
 // FUNCTION: 0x456760
 int AreAllPlayersReady()
 {
@@ -2928,7 +2759,6 @@ static inline int IsConnected_004568c0(Player* p) {
 }
 
 static inline int PlayerId_004568c0(unsigned char pi) {
-    // Separate pi == 10 test, then a widened copy; no Player* local, no combined test.
     if (pi == 10)
         return -1;
     int i = pi;
@@ -2977,7 +2807,6 @@ int AssignStartPositions() {
                     if (g_game->players[k2].active != 0 && (q2->info->bit6))
                         out[k2] = -1;
                     else
-                        // Candidates read by index, cand[j++].
                         out[k2] = cand[j++];
                 } else {
                     out[k2] = -1;
@@ -3006,7 +2835,6 @@ int AssignStartPositions() {
     }
     if (res != 0) {
         for (int k4 = 0; k4 < 10; k4++) {
-            // Skip with continue; the send stays a plain call.
             if (g_game->startPosAssignAck[k4] != 0)
                 continue;
             unsigned char packet[2];
@@ -3023,7 +2851,6 @@ int AssignStartPositions() {
         }
     }
     unsigned char pkt = 0x15;
-    // Tail shape: if (res == 0) {...} else if (ok) {...}, then return ok.
     if (res == 0) {
         for (int k6 = 0; k6 < 10; k6++) {
             if (IsConnected_004568c0(&g_game->players[k6]))
@@ -3045,16 +2872,11 @@ static inline int PlayerId_00456de0(unsigned char i)
     return -1;
 }
 
-// Sends the average of the six load-stage percentages (g_game+0x38d6f..74)
-// as a two-byte packet (type 0x2a) to every active player of type 1 or 2,
-// and stores it in that player's +0x20.
 // FUNCTION: 0x456de0
 void __stdcall SendLoadProgress()
 {
     Packet_00456de0 packet;
-    // The type store must be the first statement, ahead of the prologue stores.
     packet.type = 0x2a;
-    // Own int total, summed as a += chain in this order: sets the load order.
     int total = (*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[0];
     total += (*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[5];
     total += (*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[4];
@@ -3072,12 +2894,6 @@ void __stdcall SendLoadProgress()
     }
 }
 
-// Sends a 17-byte packet (type 0x16, subtype 1) from player `from` to player
-// `to`, carrying both players' DirectPlay ids plus a dword argument. Slot 10
-// means "no player".
-//
-// Same player layout and packet as 0x4571c0 (type 0x16, subtype 3); see
-// 0x4515d0 for the PlayerDpid helper spelling.
 static inline int PlayerDpid(unsigned char i)
 {
     if (i != 10 && g_game->players[i].type != 0)
@@ -3110,10 +2926,6 @@ void __stdcall SendShareMetal(unsigned char from, unsigned char to, int amount)
     }
 }
 
-// Sends a 17-byte packet (type 0x16, subtype 2) from player `from` to player
-// `to` carrying both players' DirectPlay ids plus a dword, but only when both
-// slots hold a real player of type 1, 2 or 3 (compare 0x4571c0, which is the
-// same packet with subtype 3 and a trailing zero).
 // FUNCTION: 0x457050
 void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value)
 {
@@ -3137,9 +2949,6 @@ void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value)
     }
 }
 
-// Sends a 17-byte packet (type 0x16, subtype 3) from player `from` to
-// player `to`, carrying both players' DirectPlay ids. Slot 10 means "no
-// player".
 static inline int PlayerDpid_00457d30(unsigned char i)
 {
     if (g_game->players[i].type != 0)
@@ -3161,12 +2970,6 @@ void __stdcall SendShareMapInfo(unsigned char from, unsigned char to)
     }
 }
 
-// Scans the ten player slots twice. The outer pass picks every slot that looks
-// like a local player (active, type 1 or 2, unitsCreated set, rejectReason clear); the
-// inner pass then looks for a network slot (active, type 3) whose data->kind
-// is 1 and whose team (index) is still clear in the target's three per-team
-// byte tables, and hands the pair to SendPlayerEconomy, returning 0 in that case.
-// The three tables live at +0x11e, +0x129 and +0x134, eleven bytes each.
 // FUNCTION: 0x4572a0
 int BroadcastPendingViewState()
 {
@@ -3185,8 +2988,6 @@ int BroadcastPendingViewState()
             Player* pj = &g_game->players[j];
             if (pj->active != 0 && pj->type == 3 || pj->unitsCreated == 0
                 || pj->rejectReason != 0) {
-                // Two sibling ifs, each with its own call: the jump layout and
-                // registers follow the original.
                 if (pj->active != 0 && pj->type == 3) {
                     if (pj->info->kind == 1
                         && (pi->shareLos[pj->index] == 0
@@ -3211,11 +3012,6 @@ int BroadcastPendingViewState()
     return result;
 }
 
-// Sends a 0x3a-byte packet (type 0x28) carrying a player's four short angles
-// (+0xfc, +0xfe, +0x104, +0x106), four dwords (+0x98, +0x8c, +0xa8, +0xa4) and
-// six doubles (+0xac, +0xbc, +0xcc, +0xb4, +0xc4, +0xd4) as floats, plus the
-// caller's flag byte. It goes to `target` when there is one, otherwise to
-// every occupied player slot of type 3 whose data->kind is 1.
 // FUNCTION: 0x4573d0
 void __stdcall SendPlayerEconomy(Player* player, Player* target,
                             unsigned char flag)
@@ -3264,16 +3060,6 @@ void __stdcall SendPlayerEconomy(Player* player, Player* target,
     }
 }
 
-// A received 0x3a-byte team packet (the same shape 0x4573d0 sends, the four
-// angles as shorts in the packet dwords, the six doubles as floats) updates one
-// player record, and then, when the packet's flag byte is set, tells the other
-// local players about that player's team.
-//
-// The first pass looks for a local player (active, type 1 or 2) that already
-// has the target player's team in its +0x129 byte table. If there is none, the
-// packet's fields are copied into the player; the +0x146 byte is that player's
-// team number, the two tables at +0x11e and +0x129 are eleven bytes each, one
-// entry per team.
 // FUNCTION: 0x457540
 void __stdcall HandlePlayerEconomy(PlayerViewStatePacket* packet, Player* player)
 {
@@ -3324,8 +3110,6 @@ void __stdcall HandlePlayerEconomy(PlayerViewStatePacket* packet, Player* player
         if (p->rejectReason != 0)
             continue;
         p->shareVision[player->index] = 1;
-        // Must be an if/else of constant stores, not a bool expression, which
-        // adds a 32 bit temporary.
         if (p->shareLos[player->index] != 0)
             team.ackMapping = 1;
         else
@@ -3389,12 +3173,6 @@ void __stdcall SetPacketRate(int rate)
     g_packetManager.SetDefaultSendPacing(rate);
 }
 
-// Leaves the game: if the "leaving game" flag at +0x2a44 is set, drops every
-// connected human or computer player (type 1 or 2) with RemovePlayer and
-// calls ShutdownScoreTables. Then closes the network, installs a null callback, sets
-// the game flag at +0x3923b and quits with the text for the local player's
-// rejection reason (+0x22), the same text GetRejectReasonText returns, and no text at
-// all when the reason is 0.
 // FUNCTION: 0x4578f0
 void __cdecl LeaveNetGameCallback(int)
 {
@@ -3448,9 +3226,6 @@ void __cdecl LeaveNetGameCallback(int)
     QuitApp(text);
 }
 
-// Finds the first player (of 10) with a type set and bit 0 of its info flags
-// (index 10 if none), then returns 1 if that player slot is active with type
-// 1 or 2. Types and layout as in 0x457af0.
 static inline unsigned char FindPlayer_00457a50()
 {
     for (unsigned char i = 0; i < 10; i++) {
@@ -3499,9 +3274,6 @@ int CountComputerPlayers()
     return count;
 }
 
-// Counts the active players of type 2 (compare 0x457b40). The pointer local
-// per iteration keeps the walk at the start of each entry; indexing twice
-// makes MSVC walk the type field instead.
 // FUNCTION: 0x457b90
 int CountLocalComputerPlayers()
 {
@@ -3514,8 +3286,6 @@ int CountLocalComputerPlayers()
     return count;
 }
 
-// Counts active players of type 2 whose index is not 10 (compare
-// 0x457c10).
 // FUNCTION: 0x457bc0
 int CountActiveAIPlayers()
 {
@@ -3545,7 +3315,6 @@ int CountActiveHumanOrAiPlayers()
     return count;
 }
 
-// Counts the active players of type 3 (compare 0x457b90, type 2).
 // FUNCTION: 0x457c80
 int CountRemotePlayers()
 {
@@ -3577,11 +3346,6 @@ int CountCombatPlayers()
 
 #include "../../interfaces/seams.h"
 
-// Shared-resource tick: every 60 game ticks, if the local player is over its
-// energy (or metal) reserve and has the matching flag, give up to a third (a
-// half for metal) of the surplus to the neediest ally that shows up in the
-// per-player array. Every 450 ticks it also sends the subtype-3 share packet
-// (the same one 0x4571c0 sends) to every allied player.
 // FUNCTION: 0x457d30
 void __stdcall UpdateResourceSharing(Player* player)
 {
@@ -3608,7 +3372,6 @@ void __stdcall UpdateResourceSharing(Player* player)
         if (found != player && player->metal > player->shareMetal) {
             float amount = (player->metal - player->shareMetal) * 0.33333334f;
             float limit = found->metalCapacity - found->metal;
-            // The min() must be a ternary into a fresh local, not an if.
             float result = amount < limit ? amount : limit;
             amount = result;
             g_seams.players->TransferEnergy(player->index, found->index, amount, 1);
@@ -3633,7 +3396,6 @@ void __stdcall UpdateResourceSharing(Player* player)
         if (found != player && player->energy > player->shareEnergy) {
             float amount = (player->energy - player->shareEnergy) * 0.5f;
             float limit = found->energyCapacity - found->energy;
-            // The min() must be a ternary into a fresh local, not an if.
             float result = amount < limit ? amount : limit;
             amount = result;
             g_seams.players->TransferMetal(player->index, found->index, amount, 1);
@@ -3641,7 +3403,6 @@ void __stdcall UpdateResourceSharing(Player* player)
     }
 
     if ((unsigned int)g_game->ticks % 450 == 0) {
-        // Must stay a standalone bitfield test, not a mask or shift.
         if (player->info->shareMapping) {
         for (int i = 0; i < 10; i++) {
             Player* p = &g_game->players[i];

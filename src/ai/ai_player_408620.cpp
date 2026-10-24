@@ -1,11 +1,10 @@
-// Decompiled by DeepSeek V4.1 Flash. Names are provisional.
 #include "win_types.h"
 #include <vector>
 
 #pragma pack(push, 1)
-struct Item_00408620 {                 // 0x249 bytes
+struct Item_00408620 {
     char unknown_0[0x20];
-    char name[0x249 - 0x20];           // +0x20
+    char name[0x249 - 0x20];
 };
 
 #include "../game/game.h"

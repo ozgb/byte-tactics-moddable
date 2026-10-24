@@ -1,10 +1,3 @@
-// Decompiled by Opus, space-bunny-free, deepseek-v4.1-flash, Claude Sonnet 5.5, GPT-6.1-sol, deepseek-v4.1, mimo-v2.6-pro, DeepSeek V4.1 Flash, GPT-6, Claude Opus 5.5, mimo-v2.6-flash, MiMo-V2.6-Pro, muse-spark-1.3-free, longcat-2.5-preview-free, Space Bunny Free and Sonnet 5.5. Names are provisional.
-//
-// The unit_position module: a unit's position, height, cell, heading, the
-// attach/detach order (0x48aac0 and 0x48ab70) and the per-unit state packet
-// writer/reader (0x48b200 to 0x48b920). The module's views of Game and Unit are
-// one definition each, with every field at its own offset.
-
 #include <stdio.h>
 
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -21,9 +14,6 @@ union Fixed {
 
 #include "../util/vec3.h"
 #include "../util/angles.h"
-
-// The angle triple at +0x64 (Angles16): 0x48b3f0 and 0x48b200 read it as three
-// shorts, 0x48b920 as an int and a short (Tail32).
 
 struct Tail32 {
     int a;
@@ -46,37 +36,29 @@ struct Player;
 
 #include "../network/player.h"
 
-// A view of UnitDef (units/unit_def.h) whose +0x241 flag word has a bit view the
-// header lacks. +0x241 is the flag word the position code tests: bit 12
-// floats, bit 19 floats on water, bit 20 can leave the water.
 struct UnitType {
     char unknown_0[0x1fa];
-    unsigned int f1fa;                 // +0x1fa
+    unsigned int f1fa;
     char unknown_1fe[0x200 - 0x1fe];
-    unsigned short f200;               // +0x200
+    unsigned short f200;
     char unknown_202[0x22c - 0x202];
-    unsigned char draft;               // +0x22c
+    unsigned char draft;
     char unknown_22d[0x241 - 0x22d];
     union {
         struct {
             unsigned int low : 12;
-            unsigned int floats : 1;   // bit 12
+            unsigned int floats : 1;
             unsigned int unknown_13 : 6;
-            unsigned int on_water : 1; // bit 19
-            unsigned int over_water : 1;// bit 20
+            unsigned int on_water : 1;
+            unsigned int over_water : 1;
             unsigned int unknown_21 : 11;
         } bits;
         unsigned int all;
-    } f241;                            // +0x241
+    } f241;
 };
-
-// The +0x110 flag word, one bit view per function that reads it.
-
 
 #include "../orders/unit_motion.h"
 
-// The serialisation interface behind a unit's owner: the writer 0x48b710 calls
-// slot +0x20, the reader 0x48b920 slot +0x24.
 class PlayerData {
 public:
     virtual void v0();
@@ -86,15 +68,15 @@ public:
     virtual void v4();
     virtual void v5();
     virtual void v6();
-    virtual int v7();                              // +0x1c
-    virtual void WriteTo(BitWriter* stream);       // +0x20
-    virtual void ReadFrom(BitReader* reader);      // +0x24
+    virtual int v7();
+    virtual void WriteTo(BitWriter* stream);
+    virtual void ReadFrom(BitReader* reader);
 };
 
 class SpatialBucket {
 public:
     char unknown_0[6];
-    void* head;                        // +6
+    void* head;
     void UnlinkUnit(void* node);
     void PrependUnit(int node);
 };
@@ -105,37 +87,32 @@ public:
 
 #include "../game/game.h"
 
-// The seven byte order record the caller at 0x48aac0 builds on its stack and
-// 0x48ab70 and 0x48b3f0 read.
 struct OrderView {
-    unsigned char type;                // +0x00
-    unsigned short id1;                // +0x01
-    unsigned short id2;                // +0x03
-    char param;                        // +0x05
-    unsigned char param2;              // +0x06
+    unsigned char type;
+    unsigned short id1;
+    unsigned short id2;
+    char param;
+    unsigned char param2;
 };
 
-// The spawn record 0x48b3f0 and 0x48b920 build for CreateUnitFromPacket.
 struct Spawn {
-    unsigned char player;              // +0x00
-    unsigned short type;               // +0x01
-    unsigned short id;                 // +0x03
+    unsigned char player;
+    unsigned short type;
+    unsigned short id;
     Vec3 pos;
     union {
-        Angles16 words;                // +0x11
-        Tail32 dword;                  // +0x11
+        Angles16 words;
+        Tail32 dword;
     } tail;
 };
 
 struct Block {
     char unknown_0[0x10];
-    int field_10;                      // +0x10
+    int field_10;
 };
 
 #include "cob_script.h"
 
-// Unused here: these headers take the symbol ids that keep
-// SendUnitStates (0x48b710) matching (docs/c2-regalloc.md).
 #include "../sound/sound.h"
 #include "../util/tdf.h"
 
@@ -168,10 +145,6 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u);
 
 extern float g_buildPercentScale;
 
-// Snaps a unit's height (pos.y, 16.16 fixed point) to the ground. Units
-// whose type has the flag at +0x241 bit 12 (floating) stay at least at the
-// sea level minus the type's draft. The ground height is fetched twice on
-// the floating path: the source used a max() macro.
 // FUNCTION: 0x48a7f0
 void __stdcall SnapUnitToGround(Unit* unit)
 {
@@ -183,14 +156,6 @@ void __stdcall SnapUnitToGround(Unit* unit)
     }
 }
 
-// Places a unit's height (pos.y, 16.16 fixed point) on the ground, at the sea
-// level or on the water surface, depending on the flags in the unit's type
-// (+0x241): bit 12 floats, bit 19 floats on water, bit 20 can leave the water.
-// Only runs for a unit that belongs to somebody and whose type can be off the
-// ground; the flag at +0x110 bit 16 asks for this to be redone.
-//
-// The bit 19 branch builds the height in a 16.16 `Fixed` union local and
-// copies the whole union into pos.y (as 0x4589c0 does with its `Fixed yv`).
 // FUNCTION: 0x48a870
 void __stdcall UpdateUnitHeight(Unit* unit)
 {
@@ -205,7 +170,6 @@ void __stdcall UpdateUnitHeight(Unit* unit)
                     unit->pos.y = GetGroundHeight(&unit->pos) << 16;
                 }
             } else if (((UnitType*)unit->def.get())->f241.bits.on_water) {
-                // Union copy: an int would fold the product, sum and shift into (sea - draft) << 16.
                 Fixed h;
                 h.value = ((UnitType*)unit->def.get())->draft * 0xffff + g_game->seaLevel;
                 h.value <<= 16;
@@ -217,15 +181,12 @@ void __stdcall UpdateUnitHeight(Unit* unit)
     }
 }
 
-// Heading from one position to another in the x/z plane.
 // FUNCTION: 0x48a980
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to)
 {
     return AngleOfVector(from->x - to->x, from->z - to->z);
 }
 
-// Heading from one position to another in the x/z plane (like 0x48a980),
-// or `def` when the two positions coincide in that plane.
 // FUNCTION: 0x48a9b0
 unsigned short __stdcall GetHeadingBetweenOrDefault(Vec3* from, Vec3* to, unsigned short def)
 {
@@ -236,18 +197,9 @@ unsigned short __stdcall GetHeadingBetweenOrDefault(Vec3* from, Vec3* to, unsign
     return AngleOfVector(dx, dz);
 }
 
-// Moves a unit to a new position. The cell (the two shorts at +0x76) and the
-// two low bits of the flags at +0x110 only change when the new position falls
-// in a different cell (the fixed-point WorldToCell of the unit type's origin
-// at +0x7e) or the low flag bits differ. Then the unit is detached
-// (RemoveUnitFromMap), the cell and the flags are updated, and it is put back into
-// the map (AddUnitToMap) with its path redone (UpdateUnitLineOfSight). Either way flag
-// 0x10000 (the "position changed" bit UpdateUnitHeight tests) is set, and the new
-// flags value is returned.
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {
     Point16 c;
-    // Multiplication, not a shift: the offset is sign-extended and copied in one go.
     c.x = (v.x - origin.x * 0x80000 + 0x80000) >> 20;
     c.y = (v.z - origin.y * 0x80000 + 0x80000) >> 20;
     return c;
@@ -263,7 +215,6 @@ int __stdcall SetUnitPosition(Unit* unit, Vec3 pos, int param_5)
         g_seams.map->RemoveUnitFromMap(unit);
         unit->pos = pos;
         unit->cell = cell;
-        // The (short) cast gives the in-place two-bit mask.
         unit->flags = (unit->flags & 0xfffffffc) | (short)(param_5 & 3);
         g_seams.map->AddUnitToMap(unit);
         g_seams.los_radar->UpdateUnitLineOfSight(unit);
@@ -295,27 +246,6 @@ void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4)
     }
 }
 
-// The order record handler at 0x48aac0 builds a seven byte record on its stack
-// (type 0x0a, two unit ids, two bytes) and passes it here after it has been
-// through FUN_004fdb0 and BroadcastPacket, so this runs the order on the sending
-// player's own units. The two ids index the unit array at g_game+0x14357
-// (0x118 byte entries) and both index 0 means "no unit".
-//
-// The first unit (esi) must be live (flag 0x10000000 at +0x110), not dying
-// (0x20000000 clear) and not already a container (its first child at +0x8a is
-// null). The second unit (edi), if there is one, must be live, must not be the
-// same unit and must have no attached unit at +0x86. Then the first unit is
-// unlinked from the tree it is in (walking the sibling chain through +0x8a /
-// +0x8e of its owner at +0x86, or asking the owner's list object at +0x82 to
-// unlink it when it is a root), the order byte at +5 is stored at +0xf9, and
-// the unit is either re-attached under the second unit (which then also gets
-// bit 17 of +0x110 when the order byte is 0xff) or detached (bit 17 cleared,
-// the list object's push is run). The byte at +6 is then blended into the two
-// low bits of the type's byte at +0x2e, and a "BECARRIED" child is created when the
-// owner is a human or computer player, its unit list is not empty, a second
-// unit was given, and that unit's type does not have bit 9 of the word at
-// +0x241 set. DeselectIfIneligible then refreshes the order, and it is only reached on
-// the paths that got that far: every test that fails jumps past it.
 // FUNCTION: 0x48ab70
 void __stdcall ApplyAttachUnit(OrderView* order)
 {
@@ -346,7 +276,6 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                             u->carrier = t;
                             u->cargoNext = t->cargo;
                             t->cargo = u;
-                            // Named bool, `char` compared with -1, masked with `& 1`: keeps the field width mask.
                             bool v = ((order->param == -1) & 1);
                             u->carriedNoPiece = v;
                         } else {
@@ -371,7 +300,6 @@ void __stdcall ApplyAttachUnit(OrderView* order)
     }
 }
 
-// A static inline byte counter test: gives the unfolded loop entry test.
 static inline int PlayerMore(unsigned char i)
 {
     if (i >= 10) return 0;
@@ -384,7 +312,6 @@ void __stdcall UpdateAllUnits(void)
     int* cnt;
     unsigned char i;
     int off;
-    // Declared after the locals, not at file scope: its symbol id must follow off's.
     extern Game* g_game;
     cnt = &g_game->f14353;
     *cnt = 0;
@@ -425,7 +352,6 @@ void __stdcall UpdateAllUnits(void)
                                 u->selected = 0;
                             }
                         }
-                        // Unsigned `% 30` (here and below) keeps the original's `div`.
                         if ((unsigned int)g_game->ticks % 30 == 0) {
                             int v = u->health * 100 / ((UnitType*)u->def.get())->f1fa;
                             if (v < 0) {
@@ -488,11 +414,6 @@ void __stdcall UpdateAllUnits(void)
     }
 }
 
-// Writes one unit's state into a bit stream (the writer of 0x415c10, the read
-// counterpart is 0x48b3f0). The unit's type index (+0xa6) goes out in a bit
-// count taken from g_game+0x14393, and a unit with none of that is done.
-// The "advance one bit" tail is the tail of WriteBits's fast path written
-// out by hand, as in the matched 0x44f4a0.
 // FUNCTION: 0x48b200
 void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
 {
@@ -501,12 +422,10 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
     if (u->unitDefIndex == 0)
         return;
     stream->WriteBits(u->health, 0x10);
-    // `!= 0.0f` gives the original's fcomp / C3 test.
     stream->WriteBits((u->buildLeft != 0.0f) ? 1 - (int)(u->buildLeft * -254.0f) : 0, 8);
     stream->WriteBits(u->activateFlags, 8);
     stream->WriteBits(u->flags & 3, 2);
     if (u->carrier) {
-        // Hand-written advance: the store through stream->data reloads and retests the link.
         stream->data[stream->index] |= 1 << stream->bit;
         stream->bit++;
         if (stream->bit == 0x20) {
@@ -517,7 +436,6 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
             }
             stream->data[stream->index] = 0;
         }
-        // `!owner ? 0 : ...` lays the zero arm ahead of the load; keep the redundant `& 0xffff`.
         stream->WriteBits((!u->carrier ? 0 : u->carrier->id) & 0xffff, 0xf);
         stream->WriteBits((signed char)u->transportPiece, 8);
     } else {
@@ -541,33 +459,11 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
     }
 }
 
-// The per unit reader of a player's unit packet (the writer is the matched
-// 0x48b200, the packet builder 0x48b710, the packet reader 0x48b920). The unit's
-// type index comes in first in g_game+0x14393 bits: a type of 0 means "this unit
-// is gone", and the unit is only flagged (0x4000) if it still had one. A type
-// that differs from the unit's own makes it again through 0x4861d0, from a
-// spawn record built on the stack: player 9, the new type, the unit's own id,
-// its position and its tail. Then the block at +0x9e is cleared, and the
-// unit's own state comes in: 16 bits at +0x108, the alpha byte (which also
-// rescale u->f104 when it moved), the state byte at +0x10e (set through
-// 0x48b090 once set and once cleared with its complement), two bits of
-// colour, and then one bit that picks the rest: set, the two ids and one more
-// byte go to 0x48ab70 as a seven byte order record and the function is done.
-// Clear, a unit that already has an owner sends 0xff as the order's parameter,
-// and the position (three 32 bit words) and the tail (three 16 bit words) are
-// read; the position is converted from world units to the unit's 1/16 units
-// against the fixed point pair at +0x7e, and if it, the tail owner and the
-// colour are all unchanged the position is stored as it is, else the unit is
-// unlinked, the position, the 1/16 pair and the colour are stored and the unit
-// is re-registered (0x47cc30 then 0x4827b0). The last word in the packet goes
-// to the int at +0x20 of whatever the unit's own first pointer (at +0x00, not
-// the owner at +0x86 that the order record tests) points at.
 // FUNCTION: 0x48b3f0
 void __stdcall ReadUnitState(BitReader* reader, Unit* u)
 {
     extern Game* g_game;
     unsigned short type = (unsigned short)reader->ReadBits(g_game->unitDefCountBits);
-    // A local declared after the first read: keeps the 0 in ebp, compared as 16 bit.
     int zero = 0;
     if (type == zero) {
         if (u->unitDefIndex != zero)
@@ -585,14 +481,12 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     }
     ((Block*)u->state.get())->field_10 = zero;
     u->health = reader->ReadBits(0x10);
-    // Unsigned into an __int64: gives `fild qword` with no `cdq`.
     __int64 alpha = (unsigned int)reader->ReadBits(8);
     float scale = (float)alpha * g_buildPercentScale;
     if (scale != u->buildLeft) {
         u->buildLeft = scale;
         u->buildLeftChanged = 1;
     }
-    // Byte-typed: SetStateBits takes a byte, spilled with a byte store.
     unsigned char state = (unsigned char)reader->ReadBits(8);
     u->SetStateBits(state, 1);
     u->SetStateBits((unsigned char)~state, zero);
@@ -601,7 +495,6 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
         OrderView order;
         order.id1 = u->id;
         order.id2 = (unsigned short)reader->ReadBits(0xf);
-        // `param` before `param2`: the reverse order hoists the byte store above the reads.
         order.param = (unsigned char)reader->ReadSignedBits(8);
         order.param2 = (unsigned char)colour;
         ApplyAttachUnit(&order);
@@ -623,8 +516,6 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     tail.heading = (unsigned short)reader->ReadBits(0x10);
     tail.pitch = (unsigned short)reader->ReadBits(0x10);
     tail.bank = (unsigned short)reader->ReadBits(0x10);
-    // Named local copy of the +0x7e pair and `* 0x80000` rather than a shift:
-    // both keep the original's frame order.
     Point16 fixed = u->footprint;
     Point16 np;
     np.x = (short)((pos.x - fixed.x * 0x80000 + 0x80000) >> 20);
@@ -635,7 +526,6 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
         g_seams.map->RemoveUnitFromMap(u);
         u->pos = pos;
         u->cell = np;
-        // The (unsigned short) cast stops the int colour getting a frame home.
         u->mode = (unsigned int)(unsigned short)colour;
         g_seams.map->AddUnitToMap(u);
         g_seams.los_radar->UpdateUnitLineOfSight(u);
@@ -646,13 +536,6 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
         u->motion->speed = reader->ReadBits(0x20);
 }
 
-// Builds one player's whole unit list as a single packet and sends it: a
-// header of 0x2c, a 16-bit length (written as zero, patched at the end) and
-// the game's tick counter, which is also stored in the player at +0x18. Then
-// every unit of the player that is live, whose owner exists and whose owner
-// accepts it, until the stream is half full; then a 16-bit -1 end marker, one
-// more bit, the player's own unit (the one at gameTick % the unit count) written
-// in full, the length patched into the header as two bytes, and the packet.
 // FUNCTION: 0x48b710
 void __stdcall SendUnitStates(Player* p)
 {
@@ -672,8 +555,6 @@ void __stdcall SendUnitStates(Player* p)
         stream.WriteBits(u->id - u->player->firstIndex, 0x10);
         stream.WriteBits(u->unitDefIndex, g_game->unitDefCountBits);
         u->motion->player->WriteTo(&stream);
-        // `>> 3`, not `/ 8`: that is the original's `add ecx, 7; sar ecx, 3`
-        // with no sign fix-up.
         if (((stream.bit + 7) >> 3) + stream.index * 4 >= 0x200)
             break;
     }
@@ -689,9 +570,6 @@ void __stdcall SendUnitStates(Player* p)
         stream.data[stream.index] = 0;
     }
     WriteUnitState(&stream, &p->unitsBegin[i]);
-    // The packet's length, little-endian at bytes 1 and 2, is only known here.
-    // The `char` cast is what makes MSVC 5 narrow the first sum to a byte and
-    // push the register unmasked; the second is pushed as a dword.
     stream.SetByteAt(
         1, (char)(((stream.bit + 7) >> 3) + (unsigned char)stream.index * 4));
     stream.SetByteAt(
@@ -700,17 +578,6 @@ void __stdcall SendUnitStates(Player* p)
     stream.FreeBuffer();
 }
 
-// Reads one player's unit packet (the writer is the matched 0x48b710): an 8 bit
-// header byte, a 16 bit length, then the game tick (32 bits), which is stored
-// in the player at +0x18. Then a list of 16 bit unit indices, terminated by
-// -1: for each one the unit's type index is read in g_game+0x14393 bits and,
-// when it differs from the unit's own type at +0xa6, the unit is rebuilt from
-// a spawn record through 0x4861d0 (whose reader 0x48b3f0 builds the same
-// record, byte for byte, at 0x48b44c). Each unit then reads its own state
-// through the virtual reader at its owner's iface vtable +0x24. Afterwards
-// every live owned unit is cleaned up (0x43dd20 and 0x48a870), and one more
-// stream bit picks the unit (tick % unit count) handed to the per unit reader
-// 0x48b3f0.
 // FUNCTION: 0x48b920
 void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
 {
@@ -732,7 +599,6 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
         Unit* unit = &p->unitsBegin[index];
         unsigned short type = (unsigned short)reader.ReadBits(g_game->unitDefCountBits);
         if (unit->unitDefIndex != type) {
-            // Declared inside the `if`: at function scope the two struct copies are not interleaved.
             Spawn spawn;
             spawn.id = unit->id;
             spawn.type = type;

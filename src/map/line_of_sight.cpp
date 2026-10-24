@@ -1,16 +1,3 @@
-// Decompiled by Opus, Sonnet, Haiku, Space Bunny Free, deepseek-v4.1-flash,
-// space-bunny-free, GPT-6, deepseek-v4.1, Sonnet 5.5, GPT-6.1-sol,
-// mimo-v2.6-pro, claude-sonnet-5-5, Claude Sonnet 5.5, DeepSeek V4.1 Flash and
-// opus. Names are provisional.
-// The line-of-sight and map module (0x4814c0 to 0x484b50): the eyeball records,
-// the map cell lookups by grid and world position, line-of-sight add, remove
-// and update, the eye expiry pass, the map grids and fog tiles, the map loader
-// and its shutdown, and the cell height range and terrain lookups. The module's
-// parts joined in address order. 0x4816a0, 0x481930, 0x482910 and 0x482ac0
-// follow 0x484b50, out of address order: at their addresses their
-// bodies' symbol ids would move the register windows the other functions match
-// in. 0x481d50, 0x482270 and 0x4843c0 keep their own files
-// (docs/split-modules.md).
 #include <memory>
 #include "../state/block.h"
 #include <string.h>
@@ -28,46 +15,42 @@
 
 #include "../graphics/rect.h"
 
-// A map cell (13 bytes): the feature at +0x8, its footprint offsets at +0xa,
-// and the ground heights at +0x4 to +0x6.
 struct Cell {
-    unsigned short unit;               // +0x0
+    unsigned short unit;
     char unknown_2[2];
-    unsigned char height;              // +0x4
-    unsigned char high;                // +0x5
-    unsigned char low;                 // +0x6
-    unsigned char metal;               // +0x7
-    unsigned short feature;            // +0x8
+    unsigned char height;
+    unsigned char high;
+    unsigned char low;
+    unsigned char metal;
+    unsigned short feature;
     union {
         struct {
-            unsigned char offsetY;     // +0xa
-            unsigned char offsetX;     // +0xb
+            unsigned char offsetY;
+            unsigned char offsetX;
         };
-        unsigned short spotField;      // +0xa
+        unsigned short spotField;
     } sf;
-    unsigned char flags;               // +0xc
+    unsigned char flags;
 };
 
-// One cell of the two 2-byte fog grids: its low and high sight levels.
 struct FogCell {
     union {
         struct {
-            unsigned char lo;          // +0x0
-            unsigned char hi;          // +0x1
+            unsigned char lo;
+            unsigned char hi;
         };
         struct {
-            unsigned char level0;      // +0x0
-            unsigned char level1;      // +0x1
+            unsigned char level0;
+            unsigned char level1;
         };
     };
 };
 
-// Typed cells: grid.h's byte pointer would need a cast at every use.
 struct FogGrid {
     Ref<FogCell> cells;
-    unsigned int width;                // +0x4
-    unsigned int height;               // +0x8
-    int count;                         // +0xc
+    unsigned int width;
+    unsigned int height;
+    int count;
 };
 
 struct MapFogGrid {
@@ -77,27 +60,22 @@ struct MapFogGrid {
     int count;
 };
 
-// A 10-byte cell of the second fog grid.
 struct Rec {
     Rec() { a = 0; b = 0; flags = 0; field_6 = 0; }
-    unsigned char a;                   // +0x0
-    unsigned char b;                   // +0x1
-    int flags;                         // +0x2
-    int field_6;                       // +0x6
+    unsigned char a;
+    unsigned char b;
+    int flags;
+    int field_6;
 };
 
-// The explored-terrain grid of one player (at +0x7c).
 struct PlayerGridView {
-    unsigned char* cells;              // +0x0
-    unsigned int width;                // +0x4
-    unsigned int height;               // +0x8
-    int size;                          // +0xc
+    unsigned char* cells;
+    unsigned int width;
+    unsigned int height;
+    int size;
     unsigned char& at(int x, int y) { return cells[y * width + x]; }
 };
 
-// Unused here: the symbol ids of these declarations (a forward declaration and
-// real functions) keep 0x4825b0, 0x483210 and 0x4833b0 matching with the
-// GafFrame header (docs/c2-regalloc.md).
 struct Sound;
 struct Weapon;
 struct Feature;
@@ -113,17 +91,16 @@ void RegisterGroundOrders();
 
 #include "../graphics/gaf_frame.h"
 
-// The table GetGafFrame indexes: a count and 8-byte entries at +0x28.
 struct FrameTable {
-    unsigned short count;              // +0x0
+    unsigned short count;
     char unknown_2[0x28 - 2];
-    void* entries;                     // +0x28
+    void* entries;
 };
 
 #include "eye.h"
 
 union Flags_14281 {
-    unsigned short raw;                // +0x0
+    unsigned short raw;
     unsigned char rawByte;
     struct {
         unsigned short bit0 : 1;
@@ -135,7 +112,7 @@ union Flags_14281 {
 };
 
 union Flags_142f1 {
-    unsigned short raw;                // +0x0
+    unsigned short raw;
     unsigned char rawByte;
     struct {
         unsigned short bit0 : 1;
@@ -147,10 +124,9 @@ union Flags_142f1 {
 
 struct IconSet {
     char unknown_0[4];
-    unsigned char* data;               // +0x4, 32x32 icons, 0x400 bytes each
+    unsigned char* data;
 };
 
-// The map state at g_game + 0x141fb.
 struct TntInfo {
     int version;
     int width;
@@ -171,7 +147,6 @@ struct TntInfo {
     unsigned short* feature_data;
 };
 
-// Unused here: real functions declared to keep the file's symbol count.
 void __stdcall SetCameraPosition(int x, int y, int z);
 void __stdcall RecalculateLineOfSight(int param);
 void __stdcall CollectVisibleUnitIds();
@@ -213,7 +188,6 @@ public:
     void GetLosLineStep(short i, int* a, int* b);
 };
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
 void ParseDownloadableAiWeightScripts(int);
@@ -248,7 +222,6 @@ void __stdcall DitherRectangle(void* surface, Rect* rect, int color);
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 
-// Returns int, not bool: a bool return breaks the fused compare.
 struct Expired {
     int operator()(const Eye& e) const { return e.expires < (unsigned int)g_game->ticks; }
 };
@@ -271,8 +244,6 @@ static inline Cell* GetCell(int x, int y)
     return 0;
 }
 
-// Same lookup, but the row's sign is tested on the 16.16 pixel row `py` that
-// the caller keeps in parallel with the cell row `y`.
 static inline Cell* GetCellPixel(int x, int y, int py)
 {
     if (x >= 0 && x < g_game->width && py >= 0 && y < g_game->height)
@@ -384,7 +355,6 @@ int __stdcall IsEyeballExpired(Eye* obj)
 // FUNCTION: 0x482130
 void ExpireEyeballs()
 {
-    // Left uninitialised, as in the original.
     int changed;
     Eye* p = (Eye *)g_game->eyes;
     for (int i = 0; i < g_game->count_14277; i++, p++) {
@@ -400,8 +370,6 @@ void ExpireEyeballs()
     g_game->count_14277 = n - (Eye *)g_game->eyes;
 }
 
-// Needed: their symbols are what 0x4825b0's, 0x482830's and 0x483fa0's
-// register plans match at.
 #include <io.h>
 #include <float.h>
 
@@ -446,7 +414,6 @@ void __stdcall UpdateLineOfSight(SightQuery* params)
         } else if (i >= g_game->losTable->count) {
             i = g_game->losTable->count - 1;
         }
-        // cx before cy: puts its magic multiply ahead of the subtraction.
         int cx = params->pos.x / 0x200000;
         int cy = params->pos.z / 0x200000 - ((short*)&params->pos.y)[1] / 64;
         GafFrame* e = GetGafFrame(g_game->losTable, i);
@@ -499,7 +466,6 @@ void __stdcall InitUnitSightCircleReveal(SightQuery* params)
         UpdateLineOfSight(params);
         return;
     }
-    // Clamp reads g_game->losTable->count twice, not through a local table pointer.
     int lod = params->sightDistance / 32 - 5;
     if (lod < 0) {
         lod = 0;
@@ -586,7 +552,6 @@ void BuildDerivedLayers(void)
             prev = p[0];
             if (prev <= t)
                 prev = t;
-            // Ternary, not an if with a result local.
             p[1] = last > prev ? last : prev;
         }
         p[1] = prev;
@@ -608,7 +573,6 @@ void BuildDerivedLayers(void)
     }
 
     FogGrid* grid1 = (FogGrid*)&g_game->grid1;
-    // Declared apart from the assignments: decides which register each takes.
     int w1, h1;
     h1 = g_game->height / 2;
     w1 = g_game->width / 2;
@@ -630,7 +594,6 @@ void BuildDerivedLayers(void)
         unsigned char* p1 = 0;
         unsigned char* p2 = 0;
         inner = 0;
-        // Guarded do-while: sinks the accum = 0 store below the guard.
         if (inner < g_game->height) {
             accum = 0;
             do {
@@ -801,37 +764,36 @@ void ClearBorderFeatures()
     }
 }
 
-// The map block of Game from +0x141fb, which LoadTntMap fills through one base pointer.
 struct MapSettings {
-    int* sortUnits;                    // +0x00
-    int* sortIndices;                  // +0x04
-    int* sortLineCount;                // +0x08
+    int* sortUnits;
+    int* sortIndices;
+    int* sortLineCount;
     char unknown_c[0x24 - 0xc];
     MapFogGrid* grid;
-    int baseX;                         // +0x28
-    int baseY;                         // +0x2c
+    int baseX;
+    int baseY;
     char unknown_30[0x38 - 0x30];
-    int width;                         // +0x38
-    int height;                        // +0x3c
-    int screenTilesX;                  // +0x40
-    int screenTilesY;                  // +0x44
-    int blocksX;                       // +0x48, map size / 32
-    int blocksY;                       // +0x4c
-    int sortRowWidth;                  // +0x50
-    int sortRowCount;                  // +0x54
+    int width;
+    int height;
+    int screenTilesX;
+    int screenTilesY;
+    int blocksX;
+    int blocksY;
+    int sortRowWidth;
+    int sortRowCount;
     char unknown_58[0x5c - 0x58];
-    int featureReproduceCursor;        // +0x5c
-    int windSpeedMin;                  // +0x60
-    int windSpeedMax;                  // +0x64
-    int rise;                          // +0x68
-    int tidal;                         // +0x6c, a float copied as bits
+    int featureReproduceCursor;
+    int windSpeedMin;
+    int windSpeedMax;
+    int rise;
+    int tidal;
     char unknown_70[0x78 - 0x70];
     Ref<unsigned short> visibilityMask;
     char unknown_7c[0x84 - 0x7c];
-    unsigned char seaLevel;            // +0x84
-    IconSet* iconSet;                  // +0x88
+    unsigned char seaLevel;
+    IconSet* iconSet;
     Ref<Cell> cells;
-    unsigned short* mapValues;         // +0x90
+    unsigned short* mapValues;
 };
 
 #include "../../interfaces/seams.h"
@@ -847,7 +809,6 @@ void LoadTntMap()
     Slot b;
     int* tnt;
 
-    // REGION r1 begin
     tnt = (int*)g_seams.map->GetNameSlot(g_game->net, 1);
     tnt = LoadFileWithProgress(tnt);
     info.version = *tnt;
@@ -893,9 +854,7 @@ void LoadTntMap()
         FatalError(text);
         break;
     }
-    // REGION r1 end
 
-    // REGION r2 begin
     a.n = g_game->net->minWindSpeed;
     if (a.n >= 0 && info.version >= 0x2000)
         mapSettings->windSpeedMin = a.n;
@@ -907,7 +866,6 @@ void LoadTntMap()
     else
         mapSettings->windSpeedMax = info.sea_b;
     a.n = g_game->net->gravity;
-    // Parenthesised so the two constant multiplies are not folded into one.
     if (a.n >= 0 && info.version >= 0x2000)
         mapSettings->rise = (int)((a.n * 65536.0) * 0.0011111111111111111);
     else if (info.sea_d != 0)
@@ -941,9 +899,7 @@ void LoadTntMap()
     } else {
         g_game->radarFrame = 0;
     }
-    // REGION r2 end
 
-    // REGION r3 begin
     a.n = (mapSettings->baseX / 32) * (mapSettings->baseY / 32);
     int* dst = (int*)GameAllocIgnoreTag("TILE MAP", a.n * 2);
     mapSettings->mapValues = (unsigned short*)dst;
@@ -1021,9 +977,7 @@ void LoadTntMap()
             }
         }
     }
-    // REGION r3 end
 
-    // REGION r4 begin
     unsigned int* set = (unsigned int*)GameAllocIgnoreTag("TILE SET", info.tile_set_count * 0x400 + 8);
     mapSettings->iconSet = (IconSet*)set;
     *set = info.tile_set_count;
@@ -1073,9 +1027,7 @@ void LoadTntMap()
     a.p.x = (short)g_game->width;
     a.p.y = (short)g_game->height;
     UpdateCellHeightRange(b.p, a.p);
-    // REGION r4 end
 
-    // REGION r5 begin
     BuildDerivedLayers();
     ClearBorderFeatures();
     unsigned int total2 = (unsigned int)(mapSettings->width * mapSettings->height) * 2;
@@ -1095,7 +1047,6 @@ void LoadTntMap()
     (*(Eye **)&g_game->eyes) = (Eye*)SimAllocTagged("EYEBALL MEMORY", 0x2d0);
     mapSettings->featureReproduceCursor = 0;
     g_game->loadProgress = 100;
-    // REGION r5 end
 }
 
 // FUNCTION: 0x483dd0
@@ -1150,8 +1101,6 @@ void FreeMapResources()
 // FUNCTION: 0x483fa0
 void __stdcall DrawMapTiles(void* surface)
 {
-    // Declared together: tilesX/tilesY before tileX/tileY, offX/offY before
-    // viewW/viewH.
     int tilesX, tilesY;
     int tileX, tileY;
     int screenX, screenY;
@@ -1163,7 +1112,6 @@ void __stdcall DrawMapTiles(void* surface)
     screenY = g_game->rect.top;
     scrollX = g_game->scrollX;
     scrollY = g_game->scrollY;
-    // View size is loaded before the divisions.
     viewW = g_game->viewWidth;
     viewH = g_game->viewHeight;
     tileX = scrollX / 32;
@@ -1186,11 +1134,9 @@ void __stdcall DrawMapTiles(void* surface)
     bmp.compressed = 0;
     bmp.layers = 0;
 
-    // Left and right columns of partial tiles.
     if (offX != 0 || edgeX != 0) {
         unsigned short* left = g_game->mapValues + tileY * stride + tileX;
         unsigned short* right = g_game->mapValues + tileY * stride + tileX + tilesX - 1;
-        // Index loops: screen coordinates are written from the index, no counters.
         for (int j = 0; j < tilesY; j++) {
             if (offX != 0) {
                 bmp.pixelsOrLayers = ((IconSet *)g_game->iconSet)->data + *left * 0x400;
@@ -1205,7 +1151,6 @@ void __stdcall DrawMapTiles(void* surface)
         }
     }
 
-    // Top and bottom rows of partial tiles.
     if (offY != 0 || edgeY != 0) {
         unsigned short* top = g_game->mapValues + tileY * stride + tileX;
         unsigned short* bottom = g_game->mapValues + (tileY + tilesY - 1) * stride + tileX;
@@ -1223,7 +1168,6 @@ void __stdcall DrawMapTiles(void* surface)
         }
     }
 
-    // Leave only the whole tiles for the interior.
     if (offX != 0) {
         tilesX--;
         screenX += 32 - offX;
@@ -1241,7 +1185,6 @@ void __stdcall DrawMapTiles(void* surface)
 
     for (int j = 0; j < tilesY; j++) {
         unsigned short* p = g_game->mapValues + (tileY + j) * (unsigned short)stride + tileX;
-        // Map pointer advanced in the for increment.
         for (int i = 0; i < tilesX; i++, p++) {
             DrawTile(surface, screenX + i * 32, screenY + j * 32, ((IconSet *)g_game->iconSet)->data + *p * 0x400);
         }
@@ -1260,7 +1203,6 @@ void __stdcall DrawFogOfWar(void* surface)
     int scrollY = g_game->scrollY;
     int scrollX = g_game->scrollX;
     int q = (scrollY + 16) / 32 + (scrollX + 16) / 32;
-    // One operand read through g_game, not the local: fixes the LEA operand order.
     int parity = (g_game->scrollX + scrollY) & 1;
     int rX = scrollX % 32;
     int rY = scrollY % 32;
@@ -1326,7 +1268,6 @@ void __stdcall ClampWorldPosToTerrain(int x, int y, Vec3* out)
     int t = y & ~0xf;
     int i;
     for (i = 0x80; i >= 0; i -= 0x10) {
-        // z comes from the counter, not from a variable of its own.
         p.z = (t + i) << 16;
         p.y = max(g_seams.units->GetGroundHeight(&p), g_game->seaLevel) << 16;
         s1 = ((short*)&p.z)[1] - (((short*)&p.y)[1] >> 1);
@@ -1350,10 +1291,6 @@ done:
     *out = p;
 }
 
-
-// The functions below are kept after 0x484b50 and out of address order: at their
-// addresses their bodies' symbol ids would move the register windows the other
-// functions match in (docs/c2-regalloc.md).
 // FUNCTION: 0x4816a0
 void __stdcall RecalculateLineOfSight(int arg)
 {
@@ -1391,14 +1328,10 @@ void __stdcall RecalculateLineOfSight(int arg)
                     i = 0;
                 else if (i >= g_game->losTable->count)
                     i = g_game->losTable->count - 1;
-                // The original reads this as a 16 bit load of the high word of
-                // pos.y, so it is spelled as one here; a plain shift of pos.y
-                // would be a 32 bit load plus `sar`.
                 int y = ((short*)&params.pos.y)[1] / 64;
                 int cx = params.pos.x / 0x200000;
                 int cy = params.pos.z / 0x200000 - y;
                 GafFrame* e = GetGafFrame(g_game->losTable, i);
-                // Full 32 bit subtractions, truncated only at the stores.
                 int vx = cx - e->xOffset;
                 int vz = cy - e->yOffset;
                 params.cacheCell[0] = (short)vx;
@@ -1429,8 +1362,6 @@ inline int Lod(SightQuery* params)
 // FUNCTION: 0x481930
 void __stdcall RevealAroundUnit(SightQuery* params)
 {
-    // Both branches' locals, x and y included, are declared here and assigned
-    // later; frame stays declared after bit.
     int changed = 0;
     int x, y;
     int limitX, limitY, nx, ny;
@@ -1461,7 +1392,6 @@ void __stdcall RevealAroundUnit(SightQuery* params)
             for (short i = 0; (short)i < count; i++) {
                 LosLine* line = (LosLine*)table->GetLosLine(i);
                 short num = line->GetLosLineStepCount();
-                // Declared in this order: bestIdx, j1, bestDiff; j1 is set in the guard.
                 int bestIdx = 0;
                 int j1;
                 int bestDiff = -1;
@@ -1515,7 +1445,6 @@ void __stdcall RevealAroundUnit(SightQuery* params)
             stride = halfW * 2;
             off = ((y + ny) * halfW + nx + x) * 2;
             do {
-                // dst is declared before src, the reverse of the order of use.
                 unsigned short* dst =
                     (unsigned short*)((unsigned char*)g_game->visibilityMask.get() + off);
                 unsigned char* src = frame->pixelsOrLayers + i * frame->width + nx;
@@ -1542,13 +1471,11 @@ void __stdcall RevealAroundUnit(SightQuery* params)
 }
 
 // FUNCTION: 0x482910
-// Plain int parameters: a char or unsigned char one changes the stack frame.
 void __stdcall AddEyeball(Vec3* src, int a, int b, int c)
 {
     if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2) == 2 && g_game->count_14277 < 0x14) {
         Eye* e = &((Eye *)g_game->eyes)[g_game->count_14277];
         e->player = (char*)&g_game->players[g_game->playerIndex];
-        // Assigned before screen: &e->screenPos would clobber ecx, which holds g_game.
         e->screen = &e->screenPos;
         e->x = a;
         e->flagPtr = &e->flagB;
@@ -1612,7 +1539,7 @@ void __stdcall RevealNewUnit(Unit* unit)
                 i = g_game->losTable->count - 1;
             }
             int cell_x = p.pos.x / 0x200000;
-            int cell_y = p.pos.z / 0x200000 - ((short*)&p.pos.y)[1] / 64;   // high half of y
+            int cell_y = p.pos.z / 0x200000 - ((short*)&p.pos.y)[1] / 64;
             GafFrame* e = GetGafFrame(g_game->losTable, i);
             cell_x -= e->xOffset;
             cell_y -= e->yOffset;

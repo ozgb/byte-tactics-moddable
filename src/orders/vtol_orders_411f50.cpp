@@ -1,12 +1,4 @@
 #include "../../interfaces/seams.h"
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6, edited by deepseek-v4.1, finished by GPT-6.1-sol, edited by Claude Opus 5.5, finished by Claude Opus 5.5. re-verified by GPT-6. Names are provisional.
-// "Attacking" order handler of aircraft (VTOL). Interrupts hand over to a
-// "VTOL_SEEKATTACK" order; the order follows its target unit and gives up
-// outside its range. State 0 prepares the order (PrepVtolClimb), states 1 and
-// 2 make attack runs past the target, state 4 turns around after a pause,
-// state 5 aims at the target again and state 6 flies on and, when the unit is
-// below three quarters of its health, sends it to a random repair pad
-// ("VTOL_LANDING").
 #include <list>
 #include "win_types.h"
 #include <math.h>
@@ -28,8 +20,6 @@ struct Unit;
 #include "path_order_attach.h"
 #include "mission_type.h"
 
-// Unused here: forward declarations of real functions; their symbol ids keep the
-// allocation of the functions after the merged views (docs/c2-regalloc.md).
 void UpdateMouseScroll();
 void UpdateEdgeScroll();
 void CenterCameraOnRadarClick();
@@ -66,12 +56,8 @@ static inline Vec3 Offset(short angle, int distance)
     return v;
 }
 
-// Declared here, defined after AirStrikeOrder: the definition's local object
-// is numbered before the function otherwise, which moves its register
-// allocation (docs/c2-regalloc.md).
 static inline void AttachMove(Order* order, const Vec3& dest, short radius);
 
-// 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 {
     g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
@@ -87,8 +73,6 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     }
 }
 
-
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x411f50
 int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
 {
@@ -120,7 +104,6 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
     case 1: {
         g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
-        // Pointer locals declared bare, then &order->pos assigned first: orders the two lea.
         Vec3* op;
         Vec3* up;
         op = &order->pos;
@@ -135,7 +118,6 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         return 1;
     }
     case 2: {
-        // Declared bare and assigned in this order, as in case 1.
         Vec3* op2;
         Vec3* up2;
         op2 = &order->pos;
@@ -154,14 +136,11 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         if (flags & 0xe0)
             return 1;
         UnitDef* def = unit->def;
-        // size and rate are loaded before the !rate test.
         int size = def->altitude;
         int rate = ((Struct_Game391e9 *)g_game->net.get())->gravity;
         if (!rate)
             break;
-        // Float local x: keeps the constant multiply from moving outermost.
         float x = (float)sqrt(size * 2.0 / rate) * 30.0f;
-        // attackrunlength is added in a second statement: one sum changes the x87 order.
         int time = (int)(x * unit->motion->field_22) + 1;
         time += def->attackrunlength;
         Class_0044e2d0* obj;

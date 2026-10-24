@@ -1,15 +1,9 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by Claude Opus 5.5. Names are provisional.
-// Steps the selected unit's build menu to the next page (wrapping to page 1),
-// or closes it after the last page when toggle is set.
-// Needed: without it the sub-object pointer is allocated to edx, not esi.
-// Kept its own file: in control_panel.cpp the include set and prelude move
-// that pointer from esi to edx.
 #include <stdlib.h>
 
 #pragma pack(push, 1)
 struct Sub_0041bde0 {
     char unknown_0[0x22e];
-    unsigned char pageCount;             // +0x22e
+    unsigned char pageCount;
 };
 
 #include "../units/unit.h"
@@ -39,7 +33,6 @@ void __stdcall StepBuildMenuPage(int toggle)
                     unit->menu.page++;
                 }
             } else {
-                // Compared as page == pageCount - 1; keeps the original load order.
                 if (unit->menu.page == ((Sub_0041bde0*)unit->def.get())->pageCount - 1)
                     unit->menu.page = 1;
                 else

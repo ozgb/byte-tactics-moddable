@@ -1,8 +1,4 @@
 #include "../../interfaces/seams.h"
-// Decompiled by GPT-6 Astra, finished by space-bunny-free, finished by deepseek-v4.1-flash,
-// finished by GPT-6.1-sol, finished by Claude Opus 5.5. Names are provisional.
-// Kept: the operand order of the six bounds adds follows symbol ids, so this
-// header set matters.
 #include <memory.h>
 #include "../state/block.h"
 #include "../state/block.h"
@@ -30,19 +26,15 @@ class Class_0044e6c0 { public: void SetAltitude(int); };
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
 #include "../units/unit.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall IsUnitCommander(Unit*);
 int __stdcall FindLandingPad(Unit*, int);
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 void __stdcall ClearWeaponTarget(Unit*, int);
 void __stdcall DetonateUnitWeapon(Unit*, int);
 
-// Keeps its own view: the shared header's extra declarations move this
-// function's bounds-add register allocation.
 struct UnitRef {
     void* table;
     Ref<Unit> ptr;
-    // The empty do-while is a debug check that compiles to nothing.
     Unit* Get() { do {} while (0); return ptr; }
 };
 #include "order.h"
@@ -77,10 +69,8 @@ int __cdecl ScaledCos(short,int);
 short __cdecl AngleOfVector(int,int);
 static inline Vec3 Offset(short angle,int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
 static inline short Angle(Vec3* a,Vec3* b) { return AngleOfVector(a->x-b->x,a->z-b->z); }
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int CheckDirectXVersion(int, int, int, int, int);
 struct Feature;
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x414380
 int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
 {
@@ -89,7 +79,6 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
         unsigned int state=0; state=order->state;
         switch(state) {
         case 0:
-        // Two nested ifs, not one &&: part of what places the bounds adds.
         if (unit->motion) {
             if (unit->def->flags1&0x800) {
                 if (!unit->def->ids) return 7;
@@ -134,7 +123,6 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
             order->SetAttachedFx(move);
         }
         int rate=0; rate=unit->def->buildRate;
-        // The ok local is needed: it adds a register candidate that keeps order in esi.
         int ok=g_seams.units->AddBuildProgress(unit,order->target,(float)(rate/30));
         if (ok) {
             Vec3 start;

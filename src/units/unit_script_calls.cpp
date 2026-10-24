@@ -1,20 +1,13 @@
-// Decompiled by Opus, Sonnet, space-bunny-free, Claude Sonnet 5.5, deepseek-v4.1-flash, deepseek-v4.1, opus and Haiku. Names are provisional.
-
 #include <stdlib.h>
 
 #include "../util/vec3.h"
 
-// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md).
 int __stdcall CheckDirectXVersion(int, int, int, int, int);
 void __stdcall EnumPlayersCallback(int, int, int, int, int);
 void __stdcall EmitBubbles(int, int, int, short);
 
 struct Diff_00480570 { int dx; int dy; };
 
-// Direction (0-7) from one point to another; 0 also when they coincide.
-// The dy < 0 case keeps its own return 0: merged with the fall-through, MSVC
-// makes the last case branchless. <stdlib.h> sets the load order of to.x and
-// from.x.
 // FUNCTION: 0x480720
 char __stdcall OctantBetween(Point16 from, Point16 to)
 {
@@ -41,7 +34,6 @@ char __stdcall OctantBetween(Point16 from, Point16 to)
     return 0;
 }
 
-// Moves `value` towards `target` by `step` without overshooting.
 // FUNCTION: 0x4804e0
 int __stdcall StepTowards(int value, int target, int step)
 {
@@ -59,7 +51,6 @@ int __stdcall StepTowards(int value, int target, int step)
     return value;
 }
 
-// Moves a 16-bit point one step towards a target on each axis.
 // FUNCTION: 0x480510
 Point16 __stdcall StepPointTowards(Point16 p, Point16 target, short step)
 {
@@ -82,8 +73,6 @@ static inline Diff_00480570 Sub(Point16 a, Point16 b)
     return d;
 }
 
-// The max stays a ternary: ClampPointToSegment inlines this body, and the
-// if form does not match there.
 // FUNCTION: 0x480570
 int __stdcall ChebyshevDistance(Point16 a, Point16 b)
 {

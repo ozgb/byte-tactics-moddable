@@ -1,12 +1,3 @@
-// Decompiled by Space Bunny Free, finished by space-bunny-free, confirmed by deepseek-v4.1-flash, re-checked by deepseek-v4.1-flash, second pass by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
-// Ground height under a unit's footprint: walks the rectangle of map cells the
-// unit covers and keeps the lowest cell floor over the cells whose footprint
-// mask has bit 3 set, plus the highest floor over the cells with bit 3 and the
-// highest floor over the cells with bit 4 set. The bit 4 maximum is never read
-// (see the bug note), so the result is the low value, or the water surface
-// minus the type's draft when no mask bit was set at all.
-// The 24 unused extern declarations below stay: the declaration count in front
-// of the function decides the operand order of the footprint mask load.
 extern int pad47d820_0;
 extern int pad47d820_1;
 extern int pad47d820_2;
@@ -38,17 +29,17 @@ extern int pad47d820_23;
 
 struct Cell {
     char unknown_0[0x5];
-    unsigned char high;                 // +0x5, highest floor
-    unsigned char low;                  // +0x6, lowest floor
-    char unknown_7[0xd - 0x7];          // 13 bytes per cell
+    unsigned char high;
+    unsigned char low;
+    char unknown_7[0xd - 0x7];
 };
 
 struct Unit_0047d820 {
     char unknown_0[0x14a];
-    Point16 origin;                     // +0x14a, footprint in map cells
+    Point16 origin;
     Ref<unsigned char> mask;
     char unknown_152[0x22c - 0x152];
-    unsigned char draft;                // +0x22c
+    unsigned char draft;
 };
 
 #include "../game/game.h"
@@ -56,12 +47,9 @@ struct Unit_0047d820 {
 
 extern Game* g_game;
 
-// Stays in a file of its own: in the merged file the symbol count changes the
-// operand order of the footprint mask load.
 // FUNCTION: 0x47d820
 int __stdcall GetFootprintHeight(Unit_0047d820* unit, Point16 cell)
 {
-    // Declared in this order: y before the footprint copy before x.
     short y = cell.y;
     Point16 fp = unit->origin;
     short x = cell.x;

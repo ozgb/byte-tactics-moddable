@@ -1,14 +1,3 @@
-// Decompiled by Space Bunny Free. Names are provisional.
-// Kept its own file: in info_panel.cpp the declaration order swaps the first
-// two shade loads (cell->shade and cell[1].shade).
-// Draws one cell of the map/visibility grid: works out the blit position of
-// the cell (the feature's footprint offset, the smoothed shading of the four
-// cells of the 2x2 block, the cell's screen position and the scroll offset),
-// then either blits the spot's animation, copies the spot's position and
-// rotation into the local unit, or draws the feature's own frames (with the
-// shadow layer when bit 4 of the draw flags is set).
-
-
 #include "../util/vec3.h"
 
 #include "../util/angles.h"
@@ -18,39 +7,35 @@
 #pragma pack(push, 1)
 struct Feature {
     char name[0x94];
-    Point16 footprint;                 // +0x94
+    Point16 footprint;
     char unknown_98[0xac - 0x98];
-    unsigned short* animTable;         // +0xac
-    unsigned short* shadowTable;       // +0xb0
+    unsigned short* animTable;
+    unsigned short* shadowTable;
     char unknown_b4[0xcc - 0xb4];
-    Handle anim;                       // +0xcc
-    Handle shadowAnim;                 // +0xd8
+    Handle anim;
+    Handle shadowAnim;
     char unknown_e4[0xfe - 0xe4];
-    unsigned short drawn : 1;           // +0xfe
+    unsigned short drawn : 1;
     unsigned short over : 1;
     unsigned short flipAnim : 1;
     unsigned short flipShadow : 1;
     unsigned short unknown_bits : 4;
 };
 
-// The unit's model instance state, the pointer at a unit's +0x9e; same view
-// as unit_script.cpp's ObjectState. A live spot carries one at +0x4.
 struct Unit;
 
 struct ObjectState {
     char unknown_0[0xc];
-    Unit* unit;                        // +0xc
+    Unit* unit;
 };
 
-// A cell of the map grid, 13 bytes: which feature stands on it, which spot
-// (for a moving feature) and the four-cell block's shading.
 struct Cell {
     char unknown_0[4];
-    unsigned char shade;               // +0x4
+    unsigned char shade;
     char unknown_5[0x8 - 0x5];
-    unsigned short feature;            // +0x8
-    unsigned short spot;               // +0xa
-    unsigned char flags : 1;           // +0xc
+    unsigned short feature;
+    unsigned short spot;
+    unsigned char flags : 1;
     unsigned char unknown_d : 7;
 };
 
@@ -69,15 +54,11 @@ void __stdcall DrawFrame(void* dest, short* frame, int x, int y);
 void __stdcall DrawFrameBlended(void* dest, short* frame, int x, int y);
 void __stdcall DrawUnit(void* dest, Unit* unit);
 
-// Bit 4 of the draw flags word: shadows may be drawn.
 static int DrawFlags()
 {
     return *(unsigned char*)((char*)g_game + 0x37f06);
 }
 
-// A frame is drawn mirrored when the feature says so. This has to be a macro:
-// the same code as an inlined function allocates the flip test and the two
-// blit arguments to the other registers.
 #define DrawFlip(flip, dest, frame, x, y) \
     do { \
         if (flip) \
@@ -91,7 +72,6 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
 {
     Feature* f = &g_game->features[cell->feature];
     int x = f->footprint.x * 16 / 2 + (ix + 8) * 16 - g_game->scrollX;
-    // Second row indexed as cell[width], not through a next pointer: load order.
     int s = cell->shade;
     s += cell[1].shade;
     s += cell[g_game->width].shade;
@@ -105,7 +85,6 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
                 short* frame = (short*)GetGafSequenceFrame(&spot->shadow);
                 DrawFrame(dest, frame, x, y);
             }
-            // The anim frame draw is written out here, not shared through one tail.
             {
                 short* frame = (short*)GetGafSequenceFrame(&spot->anim);
                 DrawFrame(dest, frame, x, y);

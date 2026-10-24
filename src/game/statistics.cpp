@@ -1,10 +1,7 @@
-// Decompiled by space-bunny-free, Haiku, nemotron-3.5-lightning-free. Names are provisional.
 #include <string.h>
 #include <stdio.h>
 #include "../../interfaces/host.h"
 
-// A DirectPlay service provider GUID, 16 bytes: the IPX, modem and serial
-// providers, none of which can host a remote console.
 struct Guid_0046bf30 {
     unsigned long data1;
     unsigned long data2;
@@ -12,24 +9,22 @@ struct Guid_0046bf30 {
     unsigned long data4;
 };
 
-// The game state LoadReporterDll and ShutdownScoreTables share: the network game
-// at +0x4e5 and the service provider GUID it copies out at +0x39201.
 #pragma pack(push, 1)
 #include "game.h"
 #pragma pack(pop)
 
-struct PlayerInfo_0046bce0 {     // 0x18 bytes
+struct PlayerInfo_0046bce0 {
     char unknown_0[0x14];
-    void* allies;                 // +0x14
+    void* allies;
 };
 
-struct ScoreBoard_0046bce0 {     // 0xc bytes
+struct ScoreBoard_0046bce0 {
     char unknown_0[8];
-    void* ppScores;               // +0x8
+    void* ppScores;
 };
 
-extern Game* g_game;             // 0x511de8
-extern char DAT_00512c98[];      // 0x512c98
+extern Game* g_game;
+extern char DAT_00512c98[];
 extern Guid_0046bf30 g_dpspGuidIpx;
 extern Guid_0046bf30 g_dpspGuidSerial;
 extern Guid_0046bf30 g_dpspGuidModem;
@@ -48,14 +43,14 @@ typedef void (__stdcall *SetCbFn_0046bf30)(void (__stdcall* cb1)(int), int (__st
 typedef int (__stdcall *TimerFn_0046bf30)();
 typedef void (__cdecl *TermFn_0046bf30)();
 
-extern EnableFn_0046bf30 g_riEnable;           // _RIEnable@4
-extern InitFn_0046bf30 g_riInitializeEx;       // _RIInitializeEx@8
-extern VersionFn_0046bf30 g_riGetVersion;      // _RIGetVersion@4
-extern TermFn_0046bf30 g_riTerminate;          // _RITerminate@0
-extern SetCbFn_0046bf30 g_riSetCallbacks;     // _RISetCallbacks@8
-extern TimerFn_0046bf30 g_riIntervalTimer;    // _RIIntervalTimer@0
-extern ReportFn_0046bf30 g_riReport;           // _RIReport@40
-extern ChatFn_0046bf30 g_riReportGameChat;    // _RIReportGameChat@8
+extern EnableFn_0046bf30 g_riEnable;
+extern InitFn_0046bf30 g_riInitializeEx;
+extern VersionFn_0046bf30 g_riGetVersion;
+extern TermFn_0046bf30 g_riTerminate;
+extern SetCbFn_0046bf30 g_riSetCallbacks;
+extern TimerFn_0046bf30 g_riIntervalTimer;
+extern ReportFn_0046bf30 g_riReport;
+extern ChatFn_0046bf30 g_riReportGameChat;
 
 void ShutdownScoreTables();
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
@@ -65,16 +60,6 @@ int __stdcall ShowGameMessage(char* text, int mode);
 void __stdcall RISetCallbacks(int report, int notify);
 void __cdecl GameFreeThunk(void* p);
 
-// Builds the player tables: three arrays of ten, then for each slot its player
-// block, that player's allies block, a scoreboard, the scoreboard's ppScores
-// block and a zeroed scores block, every block allocated through GameAllocIgnoreTag
-// with a name wsprintfA formats from the slot number. Any allocation that
-// comes back null tears the lot down again through ShutdownScoreTables and reports 1,
-// so the slot loop only records the failure in a flag and breaks; the
-// epilogue tests that flag.
-// The inner loop writes 0x48 bytes of pointers into the 0x24 byte ppScores
-// block, the original's bug: 18 pointers of 4 bytes into a 36 byte block, so
-// 36 bytes land past the end of the allocation.
 // FUNCTION: 0x46bce0
 int AllocScoreTables()
 {
@@ -96,8 +81,6 @@ int AllocScoreTables()
     memset(g_onlineReportScores, 0, 0x28);
     failed = 0;
     i = 0;
-    // Both loops are `while (1)` with an early `break`: a `for` is rotated to a
-    // bottom test.
     while (1) {
         if (i >= 10)
             break;
@@ -138,8 +121,6 @@ int AllocScoreTables()
         while (1) {
             if (j >= 0x48)
                 break;
-            // Three separate statements: otherwise the pointer becomes an induction
-            // variable.
             *slot = (int*)(g_onlineReportScores[i] + j);
             j += 8;
             slot++;
@@ -181,7 +162,6 @@ int __stdcall LoadReporterDll(int* count, int names)
     }
 
     if (DAT_00512c98[0] == 0) {
-        // First two jump to the shared return 4, the third returns inline.
         if (memcmp(g_game->providerGuid, &g_dpspGuidIpx, 16) == 0) goto four;
         if (memcmp(g_game->providerGuid, &g_dpspGuidSerial, 16) == 0) goto four;
         if (memcmp(g_game->providerGuid, &g_dpspGuidModem, 16) == 0) {

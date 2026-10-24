@@ -1,23 +1,3 @@
-// Decompiled by Opus, Claude Opus 5.5, GPT-5.6 Astra, deepseek-v4.1-flash, GPT-6, deepseek-v4.1, GPT-6.1-sol, xiaomi/mimo-v2.6-pro, Space Bunny Free, GPT-6 Astra, Sonnet, space-bunny-free and GPT-6.1-Sol. Names are provisional.
-// The VTOL order handlers that share this file's symbol context: landing
-// (0x40f2a0), standby (0x40f7d0), move (0x40fa20), unload (0x411560), landing
-// on a pad (0x411840), mobile build (0x413d80), repair (0x414e70, 0x415250)
-// and the visitor 0x4158d0, with the helpers they share: PrepVtolClimb,
-// DirectionFromAngle, CellToWorldPos, the LandingPadList constructor and the
-// externs below. Evade (0x413bc0) comes first, and pickup (0x4111b0) and the
-// hovering attack (0x413470) last, out of address order: 0x413bc0 holds only
-// while the file's symbol total stays below a limit, which these two nearly
-// use up (about 14 symbol ids are left), so no other handler fits.
-// The module's other handlers (0x40f790, 0x40fbe0, 0x4103e0, 0x410850,
-// 0x410c70, 0x410e70, 0x4118e0, 0x411f50, 0x412710, 0x412d40, 0x414380,
-// 0x414770, 0x414a80 and 0x4152f0) stay in files of their own; the reasons
-// are in docs/split-modules.md.
-// 0x40f790 (AddVec3) merges only with 79 more symbol ids in front of it, and
-// they move 0x413d80 and 0x415250 off their windows. 0x410c70 swaps the base
-// and index of its owner load at any filler count, and its inlined vector
-// code moves 0x413bc0.
-// The helpers below that no handler here calls still count symbols: removing
-// them moves the register allocation of the handlers that do match.
 #include "win_types.h"
 #include <stdio.h>
 struct Unit;
@@ -37,9 +17,6 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest,
 struct Unit;
 struct Order;
 
-// The push_back of the two visitor vectors copies through this helper
-// instead of the generic std::_Construct: it must be declared before
-// <vector> so its inlining is the original's.
 #ifndef __clang__
 void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
 namespace std {
@@ -71,7 +48,6 @@ struct Pair16 { short lo, hi; };
 
 #include "box.h"
 
-// A 16.16 fixed-point number, or its two halves.
 union Fixed {
     int value;
     struct { unsigned short frac; short whole; } parts;
@@ -80,8 +56,6 @@ union Fixed {
 #include "../state/block.h"
 #include "../units/cob_script.h"
 
-// Unused here: these headers and forward declarations take the symbol ids that keep
-// 0x413bc0, 0x413d80, 0x414e70, 0x415250 and 0x4158d0 matching (docs/c2-regalloc.md).
 #include "../files/files_api.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
@@ -97,8 +71,6 @@ class EscortTimer;
 class SquadScoutTimer;
 class SpatialTimer;
 
-
-// The command kind, one byte wide, but not a POD type.
 #include "mission_type.h"
 
 #include "unit_motion.h"
@@ -108,19 +80,17 @@ class SpatialTimer;
 
 struct Weapon {
     char unknown_0[8];
-    WeaponDef* def;                    // +0x8
+    WeaponDef* def;
     char unknown_c[11];
-    unsigned char flags;               // +0x17
+    unsigned char flags;
     char unknown_18[4];
 };
 
-// Unused here: the symbol ids this declaration takes keep 0x415250's allocation.
 struct Mover {
     char unknown_0[0xdc];
-    int speed;                         // +0xdc
+    int speed;
 };
 
-// The player object at the unit's +0x96.
 #include "../network/player.h"
 
 #include "../units/unit_def.h"
@@ -129,7 +99,6 @@ struct Mover {
 
 #include "../game/game.h"
 
-// The link node embedded in an order at +0x12: its +0x4 is the target unit.
 #include "path_order_attach.h"
 
 #include "order.h"
@@ -141,8 +110,6 @@ struct Mover {
 
 #include "air_maneuver_order.h"
 
-// Unused here: forward declarations of real functions; their symbol ids keep
-// the allocation of the functions after the AirManeuverOrder view (docs/c2-regalloc.md).
 void UpdateMouseScroll();
 void UpdateEdgeScroll();
 void CenterCameraOnRadarClick();
@@ -163,8 +130,6 @@ class Class_0044e6c0 { public: void SetAltitude(int); };
 class Class_0044e730 { public: void SetApproachRadius(int); };
 class Class_0044e720 { public: void SetHeading(int); };
 
-// The visitor passed to VisitObjectsInRange by VtolSeekGuardOrder (vtable
-// 0x4fcc60); its constructor is the inline one 0x410850 builds.
 class GroundAllyVisitor {
 public:
     virtual void CollectGroundAlly(Unit*);
@@ -174,8 +139,6 @@ public:
     Unit* self;
 };
 
-// The visitor passed to VisitObjectsInRange by VtolRepairPatrolOrder (vtable
-// 0x4fcc64).
 class RepairableUnitVisitor {
 public:
     virtual void CollectRepairableUnit(Unit*);
@@ -185,8 +148,6 @@ public:
     Unit* self;
 };
 
-// The landing-pad list: a vector<Unit*> whose constructor is 0x410830. It
-// stays out of line (the original calls it) even though it is defined here.
 class LandingPadList : public std::vector<Unit*> {
 public:
     LandingPadList();
@@ -194,7 +155,6 @@ public:
 
 extern Game* g_game;
 
-// External functions the handlers call.
 int __stdcall RandomInt(int);
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
@@ -222,22 +182,17 @@ int __stdcall ComputeReclaimDamagePulse(Unit*, Unit*, int);
 void __stdcall DamageUnit(Unit*, Unit*, int, int, int);
 void __stdcall MarkSelectionOrdersDirty(Unit*);
 int __stdcall SendScriptCallByName(Unit*, char*, char, int, int, int, int);
-// Unused here: the symbol ids these declarations take keep the allocation
-// (docs/c2-regalloc.md).
 int __stdcall IsUnitCommander(Unit*);
 void __stdcall AlignUnitToGround(Unit*);
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 void __stdcall DetonateUnitWeapon(Unit*, int);
 void __stdcall DrawUnit(void*, Unit*);
 
-// The functions of this file that the handlers below call before their
-// definitions.
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b);
 Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale);
 int __stdcall FindLandingPad(Unit* unit, int pad);
 void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b);
 
-// The fixed-point direction of a heading and a distance.
 static inline Vec3 Direction(short angle, int range)
 {
     Fixed distance;
@@ -254,8 +209,6 @@ static inline Vec3 Offset(short angle, int distance)
     return v;
 }
 
-// The body 0x410e70 inlines where the original did (AddVec3 is out of
-// line everywhere else).
 static inline Vec3 AddVectors(const Vec3& a, const Vec3& b)
 {
     Vec3 r;
@@ -274,9 +227,6 @@ static inline Vec3 Add(const Vec3& a, const Vec3& b)
     return r;
 }
 
-// Adds the components one at a time, unlike operator+, which copies the
-// whole vector first. Used at the one site whose original schedule consumes
-// off.x before it loads target->pos.y.
 static inline Vec3 AddComponentwise(const Vec3& a, const Vec3& b)
 {
     Vec3 r;
@@ -305,7 +255,6 @@ static inline Point16 WorldToCell16(Vec3 v, Point16 origin)
     return c;
 }
 
-// The multiply, not a shift by 19: the shift changes the register use.
 static inline Point16 WorldToCellMul(Vec3 v, Point16 origin)
 {
     Point16 c;
@@ -331,8 +280,6 @@ static inline int Contains(unsigned int* bits, unsigned short index)
     return bits[index >> 5] & (1 << (index & 31));
 }
 
-// Empty inline call sites: they use up the inline budget so the vector
-// destructor sites call _Destroy out of line or inline it, as the original.
 static inline void Dummy(void) {}
 
 static inline int IsDamaged(Unit* u)
@@ -345,18 +292,11 @@ static inline int GetSpeed(Unit* unit)
     return ((WeaponDef*)unit->weapons[0].weapon)->range;
 }
 
-// Used on the target argument of the order-steal calls: the plain chain
-// changes codegen.
 static inline Unit* OrderTarget(Order* order)
 {
     return order->target;
 }
 
-// VTOL evade order handler. State 0 and state 1 fly to a point beside the
-// aircraft's heading, one and then two weapon ranges away, on a random side.
-// Defined first in the file: its register allocation follows the file's
-// symbol total and holds only while the total stays below a limit, which the
-// functions after it would otherwise pass (docs/c2-regalloc.md).
 // FUNCTION: 0x413bc0
 int __stdcall VtolEvadeOrder(Unit* unit,Order* order,int flags)
 {
@@ -394,10 +334,6 @@ int __stdcall VtolEvadeOrder(Unit* unit,Order* order,int flags)
     return 5;
 }
 
-// Stops a unit (ClaimWeapons(3), AttachUnitToPiece when +0x86 is set, then
-// SetStateBits(1, 1)); for units whose type has mode 1 in the low bits of
-// +0x2e, also attaches a new Class_0044e2d0 at the unit's position to the
-// order and sets flags on it.
 // FUNCTION: 0x40f200
 void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 {
@@ -414,11 +350,6 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     }
 }
 
-// Order handler that ends a transport (the unit script's "EndTransport").
-// When unit->spatialBucket equals g_game->overflowBucket the unit heads towards the
-// map centre instead. State 0 prepares the order, state 1 tries the unit's
-// own spot, then twelve random nearby cells snapped to the map grid, then a
-// point circling the order's position; state 2 finishes.
 // FUNCTION: 0x40f2a0
 int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
 {
@@ -476,7 +407,6 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
                 return 2;
             }
         }
-        // The (unsigned char) cast selects the original's flags test.
         if ((unsigned char)flags & 0xe0)
             order->angle -= 0x5555;
         Vec3 off = Offset(order->angle, 0xa00000);
@@ -484,7 +414,6 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         sum.x = order->pos.x + off.x;
         sum.y = order->pos.y + off.y;
         sum.z = order->pos.z + off.z;
-        // Summed into a temporary then copied: keeps all three sums live at once.
         Vec3 dest = sum;
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, dest);
         ((Class_0044e730*)obj)->SetApproachRadius(0x40);
@@ -502,16 +431,9 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-
-// Adds two integer 3-vectors and returns the sum by value.
 #pragma auto_inline(off)
 #pragma auto_inline(on)
 
-// Order handler for an aircraft waiting in place: state 0 stops the unit and
-// records the order unit's position in whole map units, state 1 ends the wait
-// when FindBestTargetIfFireAtWill finds a unit that IssueAttackOrder accepts, and state 2 either
-// queues VTOL_LANDIFCAN or moves to a random point near the recorded spot
-// before waiting again.
 // FUNCTION: 0x40f7d0
 int __stdcall VtolStandbyOrder(Unit* unit, Order* order, int flags)
 {
@@ -565,9 +487,6 @@ int __stdcall VtolStandbyOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// Order handler: state 0 prepares the order (PrepVtolClimb), state 1 snaps
-// the order's position to the map grid for the unit's footprint and heads
-// there, state 2 finishes.
 // FUNCTION: 0x40fa20
 int __stdcall VtolMoveOrder(Unit* unit, Order* order, int flags)
 {
@@ -595,12 +514,6 @@ int __stdcall VtolMoveOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// VTOL guard order handler ("Guarding"): the aircraft circles the guarded
-// unit, fights back against its attacker, repairs it, and takes over the
-// guarded unit's own build or reclaim order (as the VTOL_ variant of that
-// order). The ground twin is 0x406300.
-// Builds the horizontal vector (-f1(angle, scale), 0, -f2(angle, scale))
-// from the fixed-point trig helpers. It stays out of line: every site calls it.
 #pragma auto_inline(off)
 // FUNCTION: 0x4103a0
 Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale)
@@ -613,11 +526,6 @@ Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale)
 }
 #pragma auto_inline(on)
 
-// The `push ecx` reserves a 4-byte local (guide: "push ecx as the first
-// instruction usually just reserves stack space"); the compiler never
-// initialises it before its one byte is copied into the vector's allocator
-// byte. It stays out of line: the original calls it from 0x4103e0 and
-// 0x410850.
 #pragma auto_inline(off)
 // FUNCTION: 0x410830
 LandingPadList::LandingPadList()
@@ -630,9 +538,6 @@ LandingPadList::LandingPadList()
 }
 #pragma auto_inline(on)
 
-// VtolSeekGuardOrder and its Patrol helper; the vector calls inline or not
-// according to the original, so IsDamaged, FindPads and SearchRange stay
-// small helpers.
 class UnitList : public std::vector<Unit*> {};
 
 static inline void FindPads(Unit* u, std::vector<Unit*>* pads)
@@ -679,29 +584,12 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     return 2;
 }
 
-// Unit visitor (vtable 0x4fcc60, built on the stack by 0x410850 and passed to
-// VisitObjectsInRange): collects every unit whose owner is allied with this owner,
-// whose def lacks flag 0x800, and that is not the visitor's own unit. The
-// same shape as DamagedAllyCollector (0x405d90), with the vector::push_back inlined.
-// VTOL patrol order handler ("Patrolling"). State 0 prepares the order
-// (PrepVtolClimb), state 1 clears the order's 0xe0 bits, state 2 flies to a
-// point 0x140 units away along the heading to the order's position, lands on a
-// free pad when damaged (VTOL_LANDING, as in 0x412710), or takes the next
-// queued order.
-// Kept: the flags/health block's register allocation depends on this include.
-// The target's top (its def's max.y) is at or below the sea. An inline
-// helper that re-reads order->target: written inline, MSVC keeps target->def
-// in ecx for state 3 and every register choice changes.
 static inline int BelowSeaLevel(Order* order)
 {
     Unit* target = order->target;
     return target->def->modelMaxY + target->pos.y <= g_game->seaLevel << 16;
 }
 
-// Order handler that unloads the unit a transport carries ("Unloading").
-// State 0 targets the cargo and heads for the order's position, state 1
-// checks the cargo fits there and moves on, state 2 checks again, runs the
-// script's "EndTransport" and drops the cargo, state 3 reports and ends.
 // FUNCTION: 0x411560
 int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
 {
@@ -726,7 +614,6 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
         Unit* cargo = order->target;
         if (g_seams.map->CanPlaceUnitFootprint(cargo->def, 0, WorldToCell16(order->pos, *(Point16*)&cargo->footprint), 1)) {
             Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, order->pos);
-            // Through an int local: passing the expression straight sign-extends differently.
             int h = unit->cargo->def->field_170;
             ((Class_0044e6c0*)obj)->SetAltitude(h);
             order->SetAttachedFx(obj);
@@ -759,8 +646,6 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// Returns `pad` if it is usable, otherwise the first usable pad the unit's
-// script reports from QueryLandingPad, or -1.
 // FUNCTION: 0x411840
 int __stdcall FindLandingPad(Unit* unit, int pad)
 {
@@ -781,29 +666,6 @@ int __stdcall FindLandingPad(Unit* unit, int pad)
     return -1;
 }
 
-// "Landing" order handler of air units landing on a pad unit (the order's
-// target). State 0 prepares the order (PrepVtolClimb) and picks a random
-// angle, state 1 looks for a free pad (FindLandingPad) and circles the pad
-// unit until one is free, states 2 to 5 approach the pad and land, and state
-// 6 hands the unit (or its cargo) to the pad and starts a "SELFREPAIR" order
-// when the pad repairs and the unit is damaged.
-// Kept: some header set is needed here or the state 6 health compare changes.
-// "Attacking" order handler of aircraft (VTOL). Interrupts hand over to a
-// "VTOL_SEEKATTACK" order; the order follows its target unit and gives up
-// outside its range. State 0 prepares the order (PrepVtolClimb), states 1 and
-// 2 make attack runs past the target, state 4 turns around after a pause,
-// state 5 aims at the target again and state 6 flies on and, when the unit is
-// below three quarters of its health, sends it to a random repair pad
-// ("VTOL_LANDING").
-// VTOL attack order handler ("Attacking"). With flags 0x1000a, or with no
-// target and order flag 0x200, it queues VTOL_SEEKATTACK instead; when out of
-// the order's range it gives up. State 0 prepares the order (PrepVtolClimb),
-// state 1 flies to a random point halfway to the target, state 2 attacks,
-// state 3 pulls away from the target, state 4 lands on a free pad when damaged
-// (VTOL_LANDING) or circles.
-// Kept: the health test's registers follow the file's symbol count, which the
-// IsDamaged helper and this include set fix.
-// Stays an inline helper: its locals then share stack slots with the later ones.
 static inline int IsAhead(Unit* unit, Order* order)
 {
     Vec3 toward = Offset(GetHeadingBetween(&unit->pos, &order->target->pos), 0x140000);
@@ -813,13 +675,6 @@ static inline int IsAhead(Unit* unit, Order* order)
     return (short)(((Vec3Words*)&toward)->xWhole * ((Vec3Words*)&facing)->xWhole + ((Vec3Words*)&toward)->zWhole * ((Vec3Words*)&facing)->zWhole) > 0;
 }
 
-// VTOL strafing attack order handler. With flags 0x10008, or with no target
-// and order flag 0x200, it queues VTOL_SEEKATTACK; on the map-edge player it
-// heads for the map centre. State 0 prepares the order ("Attacking";
-// PrepVtolClimb). State 1 attacks:
-// when the target lies ahead (IsAhead) it makes a strafing run, otherwise it
-// circles, leading the target by its velocity, and after 90 ticks of that
-// it queues VTOL_EVADE.
 // FUNCTION: 0x413d80
 int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
 {
@@ -909,8 +764,6 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
     return 7;
 }
 
-// Writes the cell corner (b + 2*a) back as a world position. It stays out
-// of line: every site calls it.
 #pragma auto_inline(off)
 // FUNCTION: 0x414350
 void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b)
@@ -920,26 +773,12 @@ void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b)
 }
 #pragma auto_inline(on)
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void WriteScreenshot(char*, char*, int, int, int, int);
 void DrawTextClipped(void*, char*, int, int, int, int);
 int CheckDirectXVersion(int, int, int, int, int);
 void EmitThrustParticles(int, int, int, int, short);
 void SubtractVec3(int*, int*, int*, int*, int*);
 
-// Kept: the operand order of the six bounds adds follows symbol ids, so this
-// header set matters.
-// <stdio.h> (or another header, see tools/headers.py) is needed only for
-// compiler state: without it the energy + metal sum loads metal first.
-// Order handler "Reclaiming" (second variant, driven by a Class_0044e2d0
-// move object rather than the turn/approach states of 0x404ad0).
-// Order handler "Reclaiming" for a unit target (the hovering variant of
-// 0x404730): state 0 checks the builder can reclaim, state 1 snaps the order
-// position to the target's cell and moves over it, state 2 drains the target
-// while it stays in build range.
-// Order handler "Repairing" (the hovering variant of 0x405300): the order
-// position follows the target, state 1 moves over it, state 2 spends worker
-// time on it until its health is full.
 // FUNCTION: 0x414e70
 int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
 {
@@ -953,7 +792,6 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
         QueueUnitSpeech(unit, 7, "Repairs unsuccessful.");
         return 5;
     }
-    // Copied through a pointer local, not `order->pos = ...`: changes what stays in ebx.
     Vec3* dst = &order->pos;
     *dst = order->target->pos;
     switch (order->state) {
@@ -1010,8 +848,6 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// Repair order step: report an aborted or finished repair, or keep repairing
-// while the unit's health is below its type's maximum.
 // FUNCTION: 0x415250
 int __stdcall VtolGetRepairedOrder(Unit* unit, Order* order, int unused)
 {
@@ -1047,7 +883,6 @@ static inline int Land(Unit* unit, Order* order)
             return 1;
         }
     }
-    // Empty statement after the health test folds the landed test away.
     do {} while (0);
     return 0;
 }
@@ -1059,16 +894,6 @@ static inline float Total(float base, float amount)
     return value;
 }
 
-// VTOL patrol order handler for construction aircraft. State 0 starts
-// patrolling ("Patrolling"; PrepVtolClimb). State 1 sets the next waypoint,
-// then lands on a free pad when damaged (VTOL_LANDING), helps build or guards
-// a unit it can see (VTOL_HELPBUILD), or reclaims metal or energy
-// (VTOL_RECLAIM).
-// Visitor used by VtolRepairPatrolOrder (vtable 0x4fcc64): collects allied units
-// whose flags & 3 == 1 that are damaged or still being built and are not
-// already running this player's order kind 5. A near copy of
-// DamagedAllyCollector::CollectDamagedAlly.
-// Some header must be included here: without one the def and health loads swap.
 // FUNCTION: 0x4158d0
 void RepairableUnitVisitor::CollectRepairableUnit(Unit* unit)
 {
@@ -1083,7 +908,6 @@ void RepairableUnitVisitor::CollectRepairableUnit(Unit* unit)
     units->push_back(unit);
 }
 
-// The whole part (high 16 bits) of a 16.16 coordinate.
 static inline short Whole(const int& v) { return ((short*)&v)[1]; }
 
 static inline Vec3 Sum(const Vec3& a, const Vec3& b)
@@ -1100,16 +924,6 @@ static inline Vec3 Diff(const Vec3& a, const Vec3& b)
     return r;
 }
 
-// VTOL attack order handler for a unit target. With flags 0x10008, or with
-// no target and order flag 0x200, it queues VTOL_SEEKATTACK; on the map-edge
-// player it heads for the map centre. State 0 prepares the order
-// ("Attacking"; PrepVtolClimb), state 1 flies to a random point halfway to
-// the target, state 2 attacks, state 3 circles the target, alternating
-// sides, and lands on a free pad when damaged (VTOL_LANDING).
-//
-// Suspected original bug: that same branch builds a Class_0044e2d0 waypoint
-// and sets its speed, but never passes it to the order (no SetAttachedFx
-// call, unlike every other branch), so the object leaks.
 // FUNCTION: 0x413470
 int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
 {
@@ -1135,7 +949,6 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         order->SetAttachedFx(obj);
         return 2;
     }
-    // short& references: they fix the first _hypot's load order.
     short& ox = order->x;
     short& oz = order->z;
     if (order->range && (int)_hypot(unit->xWhole - ox, unit->zWhole - oz) >= order->range)
@@ -1181,7 +994,6 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
             order->misses = 0;
             Vec3 off = Offset(RandomInt(0x10000), range << 16);
             Vec3 p = AddComponentwise(order->target->pos, off);
-            // The new waypoint is never given to the order (see the header).
             Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, p);
             ((Class_0044e730*)obj)->SetApproachRadius(0x80);
             order->flags |= 0x110e8;
@@ -1199,7 +1011,6 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         Vec3 off = Offset(angle, range * 2 / 3 << 16);
         Vec3 p = Diff(order->target->pos, off);
         Class_0044e330* obj = new (kSim) Class_0044e330(order, order->target, p);
-        // The setters live in Class_0044e2d0; obj is another constructor view of the same object.
         ((Class_0044e730*)obj)->SetApproachRadius(0x10);
         ((Class_0044e6c0*)obj)->SetAltitude(unit->def->altitude);
         order->SetAttachedFx(obj);
@@ -1221,12 +1032,6 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// VTOL transport (air lift) order handler. Fails when there is no target,
-// with flags 0x10048, or when the target sits below sea level. State 0
-// prepares the order ("Loading"; PrepVtolClimb), state 1 flies to the target,
-// state 2 asks the script for the attach piece (QueryTransport), state 3
-// starts BeginTransport and hovers down to the piece's height, state 4 ends
-// the pickup (EndTransport when cancelled) and state 5 finishes.
 // FUNCTION: 0x4111b0
 int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
 {
@@ -1252,7 +1057,6 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             break;
         case 1: {
             Class_0044e190* obj = new (kSim) Class_0044e190(order, order->target);
-            // The setters live in Class_0044e2d0; obj is another constructor view of the same object.
             ((Class_0044e6c0*)obj)->SetAltitude(unit->def->altitude);
             ((Class_0044e730*)obj)->SetApproachRadius(0x30);
             order->SetAttachedFx(obj);
@@ -1277,8 +1081,6 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             return 1;
         }
         case 4: {
-            // Suspected original bug: the waypoint built below is never
-            // handed to the order (no SetAttachedFx call), so it leaks.
             if (flags & 0x42) {
                 g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
                 return 8;

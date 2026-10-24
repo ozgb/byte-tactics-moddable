@@ -1,9 +1,3 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// Stays in its own file: in unit_orders.cpp the feature pointer is added up in the other operand order.
-// <windows.h> is needed: without it the feature pointer is loaded straight
-// into esi instead of being added up in eax and copied. The whole-struct
-// copy `box.hi = box.lo` gives the early store of hi.x and puts order in
-// edi and the feature in esi.
 #include "win_types.h"
 
 #include "box.h"
@@ -30,11 +24,8 @@ unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
 int __stdcall WaitIfNotInBuildStance(Unit* unit, Order* order, int flags);
 void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int typeId, int amount);
 
-// Order handler "Reclaiming" for a feature (wreck, tree, rock) at the order
-// position.
 // FUNCTION: 0x404ad0
 int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
 {

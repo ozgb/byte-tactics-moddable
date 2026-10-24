@@ -1,9 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, edited by deepseek-v4.1, re-tried by
-// space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash.
-// Names are provisional.
-// Not gathered into line_of_sight.cpp: merged, the player grid address folds in
-// the other operand order.
-// Required include.
 #include "win_types.h"
 #include <stdio.h>
 
@@ -25,7 +19,6 @@ public:
     LosLine* GetLosLine(short i);
 };
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
 void EnableAICommands(void);
@@ -36,21 +29,21 @@ void RegisterVtolOrders(void);
 
 
 struct MapSize_00481d50 {
-    unsigned int width;                // +0x0
-    unsigned int height;               // +0x4
+    unsigned int width;
+    unsigned int height;
 };
 
 struct ByteMap_00481d50 {
     Ref<unsigned char> data;
-    MapSize_00481d50 size;             // +0x4
+    MapSize_00481d50 size;
     unsigned char& at(int x, int y) { return data[y * size.width + x]; }
 };
 
 struct Map_00481d50 {
     char unknown_0[0x7c];
-    ByteMap_00481d50 explored;         // +0x7c
+    ByteMap_00481d50 explored;
     char unknown_88[0x146 - 0x88];
-    unsigned char playerIndex;         // +0x146
+    unsigned char playerIndex;
 };
 
 #include "sight_query.h"
@@ -99,7 +92,6 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
         for (i = 0; i < count; i++) {
             LosLine* line = table->GetLosLine(i);
             short num = line->GetLosLineStepCount();
-            // Declared in this order: bestIdx, j1, bestDiff, j; j1 is set in the guard.
             int bestIdx = 0;
             int j1;
             int bestDiff = -1;

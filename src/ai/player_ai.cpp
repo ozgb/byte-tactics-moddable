@@ -1,14 +1,7 @@
-// Decompiled by GPT-6, Claude Opus 5.5, space-bunny-free, deepseek-v4.1, deepseek-v4.1-flash and DeepSeek V4.1 Flash. Names are provisional.
-// PlayerAI's RefreshUnitLists, which matches only in a file of its own: the
-// addressing mode of its weight load follows this file's symbol ids. The rest
-// of the class, its constructor and its other methods are in
-// ai_player.cpp.
 #include "win_types.h"
 #include <vector>
 #include "../state/sim_allocator.h"
 #include <math.h>
-// Only for its symbol ids: RefreshUnitLists matches only in a window of the
-// symbol count.
 #include <io.h>
 
 #include "../util/vec3.h"
@@ -61,7 +54,6 @@ static inline int DistSq(const Point16& a, const Point16& b)
     return dx * dx + dy * dy;
 }
 
-// std::pop_heap(f, l) as the inline template expands it.
 static inline void PopHeap(Elem_0040cc40* f, Elem_0040cc40* l)
 {
     PopHeapFirst(f, l - 1, l - 1, Elem_0040cc40(*(l - 1)), (int*)0);
@@ -76,9 +68,6 @@ static inline Vec3 Direction(short angle, int scale)
     return v;
 }
 
-// Clears the three unit lists (+0x05, +0x15, +0x25) through
-// std::vector<Unit*>::erase (0x40c9f0) and refills them with insert
-// (0x408f30).
 // FUNCTION: 0x40aa40
 void PlayerAI::RefreshUnitLists()
 {
@@ -98,7 +87,6 @@ void PlayerAI::RefreshUnitLists()
                 if(((Def*)u->def.get())->builder) ++builders;
                 if((((Def*)u->def.get())->flags&0x40) && (((Def*)u->def.get())->flags&0x200) && (u->activateFlags&1)) factories.list.units.push_back(u);
                 if((((Def*)u->def.get())->flags&0x400) && (u->activateFlags&1)) hasSpecial=1;
-                // The table holds signed bytes: the cast gives the sign-extending load.
                 float weight=(char)weights[u->unitDefIndex];
                 sum.total+=weight;
 #ifdef __clang__

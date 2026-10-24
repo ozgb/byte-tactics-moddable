@@ -1,5 +1,3 @@
-// Decompiled by Opus, Haiku, Claude Opus 5.5 and DeepSeek V4.1 Flash. Names are provisional.
-
 #include <stdlib.h>
 #include <string.h>
 #include <memory>
@@ -9,7 +7,6 @@
 #include "../game/game.h"
 #pragma pack(pop)
 
-// The 0x115-byte weapon definition, its flags read as a byte here.
 #include "../weapons/weapon_def.h"
 
 #include "../util/vec3.h"
@@ -23,11 +20,11 @@
 
 class MeteorParams {
 public:
-    char name[0x20];                    // +0x0
-    int radius;                         // +0x20
-    float density;                      // +0x24
-    float duration;                     // +0x28
-    float interval;                     // +0x2c
+    char name[0x20];
+    int radius;
+    float density;
+    float duration;
+    float interval;
     void LoadMeteorDefaults();
 };
 
@@ -35,8 +32,6 @@ extern char g_extTdf[];
 typedef char SimView_g_meteorWeaponName[];
 #undef g_meteorWeaponName
 #define g_meteorWeaponName (*reinterpret_cast<SimView_g_meteorWeaponName*>(&Sim().g_meteorWeaponName))
-// Declared before g_meteorScheduleGap on purpose: in the sum the operand with the
-// larger symbol id goes first, and the original computes it in edx.
 extern Game* g_game;
 
 int __cdecl ScaledSin(short angle, int scale);
@@ -85,8 +80,6 @@ void __stdcall SetMeteorParams(MeteorParams* p)
     g_meteorScheduleGap = (int)(p->interval * 30.0f);
 }
 
-// C-style helpers returning the struct by value; with a constructor and
-// operator+= the offset's x never goes through the stack slot as it does here.
 static inline Point16 MakePoint(int x, int y)
 {
     Point16 p;
@@ -103,7 +96,6 @@ static inline Point16 AddPoints(Point16 a, Point16 b)
     return r;
 }
 
-// Inline copy of StartMeteorShower (0x438070): starts a shower.
 static inline void StartShower()
 {
     g_meteorActive = 1;
@@ -117,11 +109,6 @@ static inline void StartShower()
                              g_meteorTarget);
 }
 
-// Meteor shower update, run once per game tick: starts a new shower when
-// its time comes (an inline copy of StartMeteorShower), and while one is active
-// drops a meteor every g_meteorSpawnInterval ticks from a random point around the
-// origin, high up, with a velocity that carries it to the target in 90
-// ticks.
 // FUNCTION: 0x437de0
 void UpdateMeteors()
 {
@@ -138,14 +125,12 @@ void UpdateMeteors()
             vel.y = -15 << 16;
             vel.z = ((g_meteorTarget.y - g_meteorOrigin.y) << 20) / 90;
             int r = (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_meteorSpawnMagnitude / 0x8000);
-            // The radius shift is its own statement.
             int radius = r << 16;
             int angle = (int)((__int64)GameRand(RAND_STREAM_MAIN) * 0x10000 / 0x8000);
             Vec3 offset;
             offset.x = -ScaledSin(angle, radius);
             offset.y = 0;
             offset.z = -ScaledCos(angle, radius);
-            // The offset is copied into pos as a struct: keeps the first stores of pos.x, pos.y.
             Vec3 pos = offset;
             pos.x += g_meteorOrigin.x << 20;
             pos.y = -vel.y * 90;
@@ -171,7 +156,6 @@ void StartMeteorShower()
                              g_meteorTarget);
 }
 
-// Writes the meteor shower state to the "Meteor" section of a parsed text file.
 // FUNCTION: 0x438180
 void __stdcall SaveMeteors(HapiBank* file)
 {
@@ -187,7 +171,6 @@ void __stdcall SaveMeteors(HapiBank* file)
     file->SetIntegerItem("Target Z", g_meteorTarget.y);
 }
 
-// Reads the "Meteor" section into the meteor weapon globals.
 // FUNCTION: 0x438250
 void __stdcall LoadMeteors(HapiBank* file)
 {

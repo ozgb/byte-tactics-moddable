@@ -1,4 +1,3 @@
-// Decompiled by Opus, space-bunny-free, Claude Opus 5.5, Haiku, Sonnet 5.5, deepseek-v4.1-flash, GPT-6, GPT-6.1-sol, deepseek-v4.1, GPT-5.6-Terra, muse-spark-1.3-free, Sonnet, Space Bunny Free, mimo-v2.6-pro, DeepSeek V4.1 Flash, claude-sonnet-5-5 and opus. Names are provisional.
 #include "win_types.h"
 #include <stdio.h>
 #include <string.h>
@@ -11,7 +10,6 @@
 
 #include "../../interfaces/host.h"
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
 void EnableAICommands(void);
@@ -19,61 +17,52 @@ void RegisterAICommands(void);
 void FUN_00406f40(void);
 void ResetAIPlayers(void);
 
-// A file's entry data: the block's offset, its size and whether the data is
-// compressed.
 #pragma pack(push, 1)
 struct Info {
-    int offset;                        // +0x0
-    int size;                          // +0x4
-    unsigned char compressed;          // +0x8
+    int offset;
+    int size;
+    unsigned char compressed;
 };
 #pragma pack(pop)
 
 #include "archive_entry.h"
 
 struct ArchiveDirectory {
-    int count;                         // +0x0
-    ArchiveEntry* entries;             // +0x4
+    int count;
+    ArchiveEntry* entries;
 };
 
-// An archive's header: the key at +0xc and the root directory at +0x10.
 struct Header {
-    char magic[4];                     // +0x0
-    unsigned char version[4];          // +0x4
-    unsigned int size;                 // +0x8
-    unsigned char obfuscate;           // +0xc
+    char magic[4];
+    unsigned char version[4];
+    unsigned int size;
+    unsigned char obfuscate;
     char unknown_d[3];
-    ArchiveDirectory* list;            // +0x10
+    ArchiveDirectory* list;
 };
 
-// An open archive: the file, the read position, its header, the open count
-// and the mode it was opened in.
 struct OPENHAPIFILE {
     void* fp;
-    int pos;                           // +0x4, read position
-    Header* node;                      // +0x8
-    int count;                         // +0xc, handles open on this item
-    int mode;                          // +0x10
-    char name[0x104];                  // +0x14
+    int pos;
+    Header* node;
+    int count;
+    int mode;
+    char name[0x104];
 };
 
-// The display context the open archives hang from: the list of open archives
-// at +0x618, the start directory at +0x628 and the last directory set at
-// +0x728.
 struct DisplayContext {
     char unknown_0[0x618];
-    OPENHAPIFILE** files;              // +0x618
-    int count;                         // +0x61c
+    OPENHAPIFILE** files;
+    int count;
     char unknown_620[8];
-    char cwd[0x100];                   // +0x628
-    char lastDir[0x100];               // +0x728
+    char cwd[0x100];
+    char lastDir[0x100];
 };
 
 #include "file_handle.h"
 
 FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
 
-// Opens a file in "a+b" mode through HAPI_OpenFile (sibling of 0x4bb5b0).
 // FUNCTION: 0x4bb2c0
 FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
 {
@@ -83,29 +72,16 @@ FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
 DisplayContext* GetDisplay(void);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
-// HAPI_FindEntry (0x4bb4e0) is gap code and stays in src/util/hpi_4bb4e0.cpp:
-// tools/gapcheck.py sizes a region's functions by the next annotation in the
-// file, so a file that also holds functions outside the region cannot be its
-// source.
 ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* path);
 
-// Whole pixels of a 16.16 size, rounded up.
-// Written as w / 65536 + (w % 65536 != 0) to expand to the original's code.
 static inline int nblocks(int w)
 {
     return w / 65536 + (w % 65536 != 0);
 }
 
-// Opens a file for reading (the mode comes from the caller: "rb" from 0x4bb5b0,
-// "a+b" from 0x4bb2c0). If the file cannot be opened it falls back to the first
-// already loaded item whose name tree has an entry without bit 0 of its flags
-// set, reads that entry's texture block into a fresh "Block Sizes" buffer and
-// un-obfuscates it in place.
-// The block size is the 16.16 field rounded up to whole pixels, times 4.
 // FUNCTION: 0x4bb2e0
 FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode)
 {
-    // Declared here in the order size, off, k, p: it fixes the operand order of the sums.
     int size;
     int off;
     int k;
@@ -201,8 +177,6 @@ void FileHandle::SetFileName(const char* text)
     name[sizeof(name) - 1] = 0;
 }
 
-// Creates a file for writing ("w+b") and wraps it in a zeroed "File Handle"
-// that remembers the file name.
 // FUNCTION: 0x4bb6a0
 FileHandle* __stdcall HAPI_CreateFile(char* path)
 {
@@ -288,7 +262,6 @@ int __stdcall HAPI_readfromfile(FileHandle* file, void* out, int size)
             n = info->size - (int)file->pos;
         if (info->compressed != 0) {
             i = 0;
-            // Statement order i, blocks, tableSize, remaining decides where n is reloaded.
             blocks = (((n + file->pos - 1) & 0xffff0000) - (file->pos & 0xffff0000) >> 16) + 1;
             tableSize = ((info->size % 65536 != 0) + info->size / 65536) * 4;
             remaining = n;
@@ -343,7 +316,6 @@ int __stdcall HAPI_readfromfile(FileHandle* file, void* out, int size)
             }
             goto done;
         }
-        // Read through file->info, not the cached info local.
         int off = file->pos + file->info->offset;
         if (off != item->pos) {
             host_file_seek(item->fp, off, HOST_SEEK_SET);
@@ -380,18 +352,12 @@ void __stdcall RenameFile(const char* oldName, const char* newName)
     rename(oldName, newName);
 }
 
-// __stdcall wrapper around the CRT's remove (delete a file), like its
-// neighbour 0x4bbc10 (rename). remove and _rmdir are the same code apart from
-// the function they import (DeleteFileA, RemoveDirectoryA); the original
-// calls remove at 0x4e7990.
 // FUNCTION: 0x4bbc30
 void __stdcall RemoveFile(const char* path)
 {
     remove(path);
 }
 
-// Closes a file handle opened by HAPI_OpenFile and returns its size.
-// Sibling of 0x4bbd00, which reports the size without closing.
 // FUNCTION: 0x4bbc40
 long __stdcall HAPI_FileLengthByName(char* name)
 {
@@ -436,10 +402,6 @@ long __stdcall HAPI_FileLength(FileHandle* file)
     return 0;
 }
 
-// Opens a file, seeks to an offset and reads a block into the caller's
-// buffer; on success the buffer is returned, otherwise null. The file handle
-// is closed (and its shared refcount dropped) on both paths. The refcount,
-// fclose and buffer-free blocks are the inlined body of 0x4bb5d0.
 // FUNCTION: 0x4bbd30
 void* __stdcall HAPI_ReadFileAt(char* name, void* buffer, long pos, unsigned int size)
 {
@@ -491,16 +453,6 @@ fail:
     return 0;
 }
 
-// Loads a whole file into a named heap block: opens the name (falling back to
-// an already loaded item through HAPI_OpenFile), takes the length from the
-// shared item's info block or from the file descriptor, rewinds, copies the
-// name into a local buffer, strips the directory from it (the same in-place
-// strip as 0x4bb150, so the leaf name is what names the block), allocates the
-// block, reads into it and stores the length through `size`. `size` is set to
-// -1 first, and again after the open, so a caller that only wanted the size
-// sees a failure. The tail is HAPI_CloseFile (close, release the two block
-// pointers, free the handle) written out inline, with its fclose results dead
-// because the return value is the block.
 // FUNCTION: 0x4bbe50
 void* __stdcall HAPI_LoadFile(char* name, int* size)
 {
@@ -526,7 +478,6 @@ void* __stdcall HAPI_LoadFile(char* name, int* size)
     } else {
         len = 0;
     }
-    // An if / else if / else chain with the failure arms first, not gotos or success-first.
     if (len <= 0) {
         data = 0;
     } else if (HAPI_SeekFile(f, 0) == -1) {
@@ -534,7 +485,6 @@ void* __stdcall HAPI_LoadFile(char* name, int* size)
     } else {
         strcpy(buf, name);
         {
-            // Two indices into the same array: pointers would peel the first iteration.
             int n = (int)strlen(buf);
             int i = n - 1;
             while (i >= 0 && buf[i] != '\\') {
@@ -577,13 +527,6 @@ close:
     return data;
 }
 
-// Loads a whole file into a freshly allocated buffer. It takes the length from
-// the file handle (cached size when the handle is shared, else _filelength),
-// rejects an empty file, seeks to the start, copies the path into a local
-// buffer, strips the directory with a backward scan for '\\', allocates that
-// many bytes tagged with the base name, reads the file into them and returns
-// the buffer. The size is written back through the third argument, which is
-// preset to -1 so a failure leaves it at -1.
 // FUNCTION: 0x4bbff0
 void* __stdcall HAPI_LoadOpenFile(char* name, FileHandle* file, unsigned int* outSize)
 {
@@ -619,7 +562,6 @@ void* __stdcall HAPI_LoadOpenFile(char* name, FileHandle* file, unsigned int* ou
     }
     j = i + 1;
     k = 0;
-    // Two indices into the same array, not pointers.
     do {
         buf[k] = buf[j];
         k++;
@@ -635,10 +577,6 @@ void* __stdcall HAPI_LoadOpenFile(char* name, FileHandle* file, unsigned int* ou
     return data;
 }
 
-// Reads a whole file into the caller's buffer: open "rb", take its size, seek
-// to the start and read that many bytes. The buffer is returned when the read
-// succeeds; a read of zero bytes frees it and returns null. On any failure the
-// file is closed and null is returned.
 // FUNCTION: 0x4bc120
 int* __stdcall HAPI_LoadFileInto(char* name, int* buf)
 {
@@ -698,7 +636,6 @@ fail:
     return 0;
 }
 
-// Writes a buffer to a new file; returns the number of bytes written or -1.
 // FUNCTION: 0x4bc290
 int __stdcall WriteBufferToFile(char* filename, void* data, int size)
 {
@@ -711,7 +648,6 @@ int __stdcall WriteBufferToFile(char* filename, void* data, int size)
     return written;
 }
 
-// Writes the current drive letter ("C") into buf as a string.
 // FUNCTION: 0x4bc2e0
 void __stdcall GetCurrentDriveLetter(char* buf)
 {
@@ -728,10 +664,6 @@ int __stdcall ChangeDrive(char* drive)
     return _chdrive(*drive - 0x40);
 }
 
-// Gets the current directory of a drive ("C:..." or the current drive when
-// null) into buf and returns buf. The drive number is computed on each path
-// (`- '@'` in both branches, tail-merged into one `sub`); a single `d - '@'`
-// after the if gives `add eax, -0x40` scheduled after the first push.
 // FUNCTION: 0x4bc320
 char* __stdcall GetDriveDirectory(char* drive, char* buf, int size)
 {
@@ -744,18 +676,12 @@ char* __stdcall GetDriveDirectory(char* drive, char* buf, int size)
     return buf;
 }
 
-// __stdcall wrapper around the CRT's _chdir, like 0x4bbc30 (_rmdir).
 // FUNCTION: 0x4bc360
 void __stdcall ChangeDirectory(const char* path)
 {
     _chdir(path);
 }
 
-// Case-insensitive wildcard match of a string against a pattern that may
-// contain '?' (any one character) and '*' (zero or more characters). The
-// pattern positions still alive after each input character are kept in a
-// stack of at most 100 entries, so a '*' backtracks in linear time.
-// Needed for the operand order of the pat[stack[i]] load.
 // FUNCTION: 0x4bc370
 int __stdcall MatchWildcard(const char* str, const char* pat)
 {
@@ -769,7 +695,6 @@ int __stdcall MatchWildcard(const char* str, const char* pat)
     while ((c = toupper(*str++)) != 0) {
         for (i = 0; i < n; i++) {
             int idx = stack[i];
-            // Subscripted by stack[i], not idx: the element must be read from memory.
             char pc = toupper(pat[stack[i]]);
             if (pc == '?' || pc == c) {
                 stack[i] = idx + 1;
@@ -797,15 +722,15 @@ int __stdcall MatchWildcard(const char* str, const char* pat)
 
 #pragma pack(push, 1)
 struct FindFiles {
-    char dir[0x100];         // +0x000
-    char pattern[0x100];     // +0x100
+    char dir[0x100];
+    char pattern[0x100];
     int state;
-    char recursive;          // +0x204
+    char recursive;
     union {
         void* handle;
         ArchiveDirectory* list;
     };
-    int index;               // +0x209
+    int index;
 };
 #pragma pack(pop)
 
@@ -813,7 +738,6 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 int __stdcall HAPI_FindNext(int handle, void* fd);
 
-// Strips the directory from a path in place ("a\\b\\c.txt" -> "c.txt").
 static char* StripDir(char* path)
 {
     int len = (int)strlen(path);
@@ -898,7 +822,6 @@ int __stdcall HAPI_FindNext(int handle, void* out)
             return -1;
     }
     DisplayContext* g = GetDisplay();
-    // Both latch statements stay in the increment clause.
     for (; f->state < g->count; f->index = -1, f->state++) {
         if (f->index < 0) {
             f->list = HAPI_FindDirectory(g->files[f->state]->node->list, f->dir);
@@ -906,7 +829,6 @@ int __stdcall HAPI_FindNext(int handle, void* out)
                 continue;
         }
         while (++f->index < f->list->count) {
-            // The index sits in a local: read inline, the entry address operands swap.
             int i = f->index;
             ArchiveEntry* e = &f->list->entries[i];
             if (MatchWildcard(e->text, f->pattern) && !(e->flags & 2)) {
@@ -930,7 +852,6 @@ int __stdcall HAPI_FindNext(int handle, void* out)
     return -1;
 }
 
-// Closes the search handle (if open) and frees the search; -1 for no search.
 // FUNCTION: 0x4bc8d0
 int __stdcall HAPI_FindClose(int handle)
 {
@@ -997,11 +918,6 @@ void __stdcall ListDirectory(const char* path, int dirsOnly, FileList* list)
     }
 }
 
-// Recursive directory walk: opens path with the search 0x4bc4b0 and, for every
-// entry whose name is neither "." nor "..", either descends into the
-// subdirectory or, when the name matches the wildcard pattern, appends
-// "path\\name" to the vector passed in. The search handle is closed at the end
-// (the inlined body of 0x4bc8d0).
 // FUNCTION: 0x4bcb50
 void __stdcall FindFilesRecursive(char* path, const char* pat, FileList* tree, int state, int recursive)
 {
@@ -1011,9 +927,7 @@ void __stdcall FindFilesRecursive(char* path, const char* pat, FileList* tree, i
     sprintf(buf, "%s\\*", path);
     int h = HAPI_FindFirst(buf, &fd, state, recursive);
     if (h != -1) {
-        // A second variable, cast from h: the -1 test is dropped if written on h.
         FindFiles* f = (FindFiles*)h;
-        // Never read: the extra live value demotes the handle from ebx to ebp.
         int r;
         do {
             if (strcmp(fd.name, ".") != 0 && strcmp(fd.name, "..") != 0) {
@@ -1035,9 +949,6 @@ void __stdcall FindFilesRecursive(char* path, const char* pat, FileList* tree, i
     }
 }
 
-// Walks the search opened by HAPI_FindFirst and stops on the `index`-th entry
-// that is neither "." nor ".." (skipping entries that fail the flag test when
-// `flag` is set). The close of the search is HAPI_FindClose inlined.
 // FUNCTION: 0x4bcd10
 void __stdcall GetDirectoryEntry(struct _finddata_t* fd, int index, const char* pattern, int flag)
 {
@@ -1061,11 +972,6 @@ void __stdcall GetDirectoryEntry(struct _finddata_t* fd, int index, const char* 
     }
 }
 
-
-// Stores the current directory of the current drive. The drive number is
-// converted on each path separately (`n = d - '@'` in both branches); a
-// single `d - '@'` after the if picks edx and interleaves the subtraction
-// with the argument pushes.
 // FUNCTION: 0x4bce10
 void SaveStartDirectory()
 {
@@ -1113,7 +1019,6 @@ void RestoreStartDirectory() {
     _chdir(p->cwd);
 }
 
-// Creates every directory along a path (like "mkdir -p").
 // FUNCTION: 0x4bcf00
 void __stdcall MakeDirectoryPath(char* path)
 {
@@ -1129,8 +1034,6 @@ void __stdcall MakeDirectoryPath(char* path)
     _mkdir(buf);
 }
 
-
-// Drops one reference on a handle, closing and freeing whatever it still holds.
 static void Close_004bcf80(FileHandle* f)
 {
     if (f->shared) {
@@ -1149,13 +1052,6 @@ static void Close_004bcf80(FileHandle* f)
     GameFreeThunk(f);
 }
 
-// Copies a file into an already open destination handle, 0x19000 bytes at a
-// time, and returns the number of bytes copied (0 on failure). The size to
-// copy comes from the source handle: the cached block size when it is one of
-// the game's packed items, else _filelength of the real file, else 0, and an
-// empty source is a failure. The destination has to be a real file: when it
-// is a packed item itself the write is refused by counting -1 bytes written,
-// which never matches the chunk size.
 // FUNCTION: 0x4bcf80
 int __stdcall HAPI_CopyIntoFile(FileHandle* dst, char* name)
 {
@@ -1192,7 +1088,6 @@ int __stdcall HAPI_CopyIntoFile(FileHandle* dst, char* name)
         left -= got;
     }
     Close_004bcf80(f);
-    // Returns len, kept separate from the loop counter left; not dst.
     return len;
 fail:
     if (buf)
@@ -1207,14 +1102,11 @@ int __stdcall HAPI_PackageBuildNullStub(int, int)
     return 0;
 }
 
-// The package buffer 0x4bd160 and 0x4bd3b0 grow: the current size and the
-// block of data.
 struct HapiBuf {
     unsigned int size;
     char* buf;
 };
 
-// The 20-byte "HAPI" header written at the front of a package.
 struct Hapi_004bd160 {
     char magic[4];
     char a4;
@@ -1242,10 +1134,6 @@ static inline unsigned int Grow(HapiBuf* b, unsigned int n)
     return old;
 }
 
-// Writes an HPI package: a 20-byte "HAPI"
-// header in a growing buffer {size, buf}, the directory built by HAPI_BuildArchiveDirectory,
-// the file data from HAPI_WriteArchiveData, the directory encrypted with the key, and
-// a copyright line at the end.
 #include <time.h>
 
 // FUNCTION: 0x4bd160
@@ -1329,26 +1217,20 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
 }
 
 #pragma pack(push, 1)
-// A file's record in a package directory: the offset of its data and its size.
 struct Node_004bd3b0 {
-    unsigned int offset; // +0
-    unsigned int size;   // +4
-    unsigned char flags; // +8
+    unsigned int offset;
+    unsigned int size;
+    unsigned char flags;
 };
 #pragma pack(pop)
 
-extern char g_packageDataName[];  // "Package Data"
-extern char g_dirWildcard[];  // "\\*"
-extern char g_star[];        // "*"
-extern char g_dotDot[];      // ".."
-extern char g_dotExtSep[];   // "."
-extern char g_pathSepBackslash[];  // "\\"
+extern char g_packageDataName[];
+extern char g_dirWildcard[];
+extern char g_star[];
+extern char g_dotDot[];
+extern char g_dotExtSep[];
+extern char g_pathSepBackslash[];
 
-// Builds one package directory in the growing buffer `out` (size,
-// pointer): a header {count, entries offset}, then one 9-byte entry per file
-// or subdirectory (name offset, data offset, directory bit), recursing into
-// subdirectories and adding a 9-byte file record per file. Returns the
-// header's offset; *total collects the file sizes.
 // FUNCTION: 0x4bd3b0
 unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int* total)
 {
@@ -1361,7 +1243,6 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
     unsigned int entries;
     int k;
 
-    // Written out, not through Grow: Grow loads out->size into the wrong register.
     unsigned int nsize = out->size;
     root = nsize;
     nsize += 8;
@@ -1402,7 +1283,6 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
             if (strcmp(fd.name, g_dotExtSep) != 0 && strcmp(fd.name, g_dotDot) != 0) {
                 unsigned int nameOff = Grow(out, strlen(fd.name) + 1);
                 strcpy(out->buf + nameOff, fd.name);
-                // Two steps: a one-expression pointer gets regrouped as (entries + k) + buf.
                 ArchiveEntry* e = (ArchiveEntry*)(out->buf + entries);
                 e += k;
                 e->name = nameOff;
@@ -1423,7 +1303,6 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
                     e = (ArchiveEntry*)(out->buf + entries);
                     e += k;
                     e->data = nodeOff;
-                    // Addressed through e->data: this second use of e keeps the store unfolded.
                     Node_004bd3b0* node = (Node_004bd3b0*)(out->buf + e->data);
                     node->size = fd.size;
                     node->offset = 0;
@@ -1445,13 +1324,10 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
 #pragma pack(push, 1)
 struct Node_004bd830 {
     char unknown_0[0xc];
-    unsigned char obfuscate;             // +0xc
+    unsigned char obfuscate;
 };
 #pragma pack(pop)
 
-// SquashPack, SquashMaxPackedSize, Node_004bd830 and this second
-// HAPI_WriteArchiveData declaration are kept for their symbol ids: they hold
-// 0x4bb2e0's allocation (docs/c2-regalloc.md).
 int __stdcall SquashPack(void* chunk, int* chunkSize, char* data,
                            int size, int method, int encrypt);
 unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode);
@@ -1460,10 +1336,8 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                             int key, int flags);
 
 
-extern char g_hapiCopyright[];         // "Copyright 0000 Cavedog Entertainment"
+extern char g_hapiCopyright[];
 
-// 4bdd70 passes the entry's data offset to the definition (0x4be010), which
-// takes it as the directory pointer, so it keeps its own declaration.
 void __stdcall HAPI_RelocateDirectory(ArchiveDirectory* h, int delta);
 void __stdcall HAPI_RelocateDirectory(int name, int base);
 
@@ -1507,8 +1381,6 @@ OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
     host_file_read(f, h->node, hdr.size);
     {
         Header* base = h->node;
-        // Key derivation: a byte key for the condition, an unsigned w for the split rotate,
-        // and a second byte local r receiving the result.
         unsigned char key = base->obfuscate;
         unsigned int w = key;
         unsigned char r = key;
@@ -1562,8 +1434,6 @@ void __stdcall HAPI_RelocateDirectory(ArchiveDirectory* h, int delta)
     }
 }
 
-// Closes a file record: closes its FILE (if open), then frees its buffer at
-// +0x8 and the record itself.
 // FUNCTION: 0x4be070
 void __stdcall HAPI_CloseArchive(OPENHAPIFILE* f)
 {
@@ -1575,7 +1445,7 @@ void __stdcall HAPI_CloseArchive(OPENHAPIFILE* f)
     }
 }
 
-extern char g_hapiFileArrayName[];     // "HAPIFILE array"
+extern char g_hapiFileArrayName[];
 
 // FUNCTION: 0x4be0b0
 void* __stdcall HAPI_AddArchive(LPCSTR name, int mode)
@@ -1609,10 +1479,6 @@ static void FreeRecord_004be180(OPENHAPIFILE* p)
     }
 }
 
-// Walks the record list and probes each record whose file is not open yet:
-// opens the record's filename in "rb" and, if it can be opened, closes it
-// again (the record only checks that the file exists). If the open fails the
-// record is freed and removed from the list, shifting the tail down.
 // FUNCTION: 0x4be180
 void HAPI_DropMissingArchives(void)
 {
@@ -1623,7 +1489,6 @@ void HAPI_DropMissingArchives(void)
             state->files[i]->fp = host_file_open_read(state->files[i]->name);
             OPENHAPIFILE* rec = state->files[i];
             if (rec->fp == 0) {
-                // Passed state->files[i], not rec: keeps the redundant file test.
                 FreeRecord_004be180(state->files[i]);
                 state->files[i] = 0;
                 for (int j = i; j < state->count - 1; j++)
@@ -1638,9 +1503,6 @@ void HAPI_DropMissingArchives(void)
     }
 }
 
-// Takes a record out of the state's list: closes the record's file, frees its
-// buffer and the record itself, then shifts the tail of the list down over the
-// hole and shrinks the count. A record that is not in the list is left alone.
 // FUNCTION: 0x4be270
 void __stdcall HAPI_RemoveArchive(OPENHAPIFILE* pRecord)
 {
@@ -1675,13 +1537,6 @@ void __stdcall HAPI_ClearShadowFlags(ArchiveDirectory* list)
     }
 }
 
-
-// Walks a directory tree (the search 0x4bc4b0 allocates, the same one 0x4bcb50
-// uses) and, for every plain file, marks the matching entry of every open
-// HAPI archive: the entry named "path + file name" is looked up with
-// HAPI_FindEntry in each archive's directory (from the search's current archive
-// index on) and gets bit 2 set unless bit 1 is already set. Sub directories
-// other than "." and ".." are entered with the path extended by "name\\".
 // FUNCTION: 0x4be400
 void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
 {
@@ -1695,11 +1550,9 @@ void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
     int h = HAPI_FindFirst(buf, &fd, state, recursive);
     if (h == -1)
         return;
-    // A second variable, cast from h: the -1 test is dropped if written on h.
     FindFiles* f = (FindFiles*)h;
     do {
         if (fd.attrib & 0x10) {
-            // Two nested ifs, not one &&.
             if (strcmp(fd.name, ".") != 0) {
                 if (strcmp(fd.name, "..") != 0) {
                     strcpy(buf, path);
@@ -1730,9 +1583,6 @@ void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
     }
 }
 
-// The path helpers before 0x4bb190 (0x4bb0a0 to 0x4bb150, in their own files),
-// then three more prototypes: the symbol ids these declarations take keep
-// 0x4bb2e0's allocation (docs/c2-regalloc.md).
 int __stdcall HasExtension(char* name);
 char* __stdcall StripExtension(char* name);
 char* __stdcall StripFileName(char* name);

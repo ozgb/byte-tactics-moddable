@@ -1,18 +1,9 @@
-// Decompiled by Opus, space-bunny-free, longcat-2.5-preview-free, GPT-6, GPT-6.1-sol, deepseek-v4.1, deepseek-v4.1-flash and claude-opus-5-5. Names are provisional.
-// The object-picture builder's lit rasteriser: projects the vertices, builds
-// a normal per face and draws each face with a shade from the averaged normal
-// (0x459c70). It stays in its own file: even placed as the first function after
-// the module's own types, the merged context moves the summing loop's store
-// lea above the fadd, one instruction off (docs/c2-regalloc.md).
-// Keep <stdio.h>, <stdlib.h> and <math.h>: without them operand orders change.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
 extern char* g_game;
-// g_lightY is declared before g_lightX: the order decides which product of
-// DrawLitPieces' lighting sum MSVC loads first.
 extern float g_lightY;
 extern float g_lightX;
 extern float g_lightZ;
@@ -53,21 +44,12 @@ void __stdcall DrawLitTexturedPolygon(GafFrame* surface, void* pic, void* poly, 
 
 struct Poly_459c70 { int x; int y; int z; int shade; };
 
-// The 50 or 125 bias the original materialises separately in each arm of the
-// doubled-bitmap test, once per projected vertex.
 static __inline int shade_bias(Model_459200* list)
 {
     bool c = ((*(unsigned int*)((char*)list->owner->def.get() + 0x241) >> 30) & 1) != 0;
     return c ? 125 : 50;
 }
 
-// Draws a unit model with per-vertex lighting: projects the vertices, builds
-// a normal per face and averages them per vertex, then draws each face with
-// a shade from the averaged normal. The anti-aliased path is the same as
-// 0x459830's (draw into the doubled shadow bitmap, then downsample).
-//
-// Must stay the first function in the file: compiled later, a lea in the
-// summing loop moves above the fadd.
 // FUNCTION: 0x459c70
 void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
     int kind, int useColor)
@@ -93,7 +75,6 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
             shadow->yOffset = (short)(bitmap->yOffset << 1);
             memset(shadow->scratch, 0, shadow->width * shadow->height);
             memset(shadow->pixelsOrLayers, 1, shadow->width * shadow->height);
-            // Last in the shadow branch.
             src = bitmap;
             bitmap = shadow;
         } else {
@@ -108,10 +89,8 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
             if (useColor == -1 || useColor == list->pieces[p].flags.bits.colored
                     || list->owner->buildLeft != 0.0f) {
                 Vec3* verts = list->pieces[p].points;
-                // Own read of the vertices, between verts and info: not v = verts.
                 Vec3* v = list->pieces[p].points;
                 info = list->pieces[p].object;
-                // No n local or count guard: the loop runs to info->vertexCount.
                 int k;
                 for (k = 0; k < info->vertexCount; k++, v++) {
                     int x;
@@ -126,8 +105,6 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                         y = (short)(v->y >> 16);
                         z = (short)(-v->z >> 16);
                     }
-                    // Computed right after the coordinate arms, before vertex[k].x = x:
-                    // sets the frame size.
                     int s = (k * 3) & 0x1f;
                     vertex[k].x = x;
                     vertex[k].y = z - (y >> 1);
@@ -137,7 +114,6 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                     vertex[k].x += (short)bitmap->xOffset;
                     vertex[k].y += (short)bitmap->yOffset;
                     accum[k][0] = accum[k][1] = accum[k][2] = 0.0f;
-                    // A store here, not a memset before the loop.
                     weight[k] = 0;
                 }
 
@@ -181,15 +157,13 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                     for (int j = 0; j < face->count; j++, idx++) {
                         accum[*idx][0] += normal[fi].x;
                         accum[*idx][1] += normal[fi].y;
-                        // The empty do-while ends the block: keeps the store lea after the fadd.
                         float t2 = accum[*idx][2];
-                        do {} while (0);    // emits no code; needed for the match
+                        do {} while (0);
                         accum[*idx][2] = t2 + normal[fi].z;
                         weight[*idx]++;
                     }
                 }
 
-                // Divides by weight[k] directly, re-reading the vertex count.
                 for (k = 0; k < list->pieces[p].object->vertexCount; k++) {
                     if (weight[k] != 0) {
                         accum[k][0] /= weight[k];

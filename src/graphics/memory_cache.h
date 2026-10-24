@@ -11,20 +11,20 @@ struct Pos_4589c0;
 
 class CMemoryCache {
 public:
-    int cap;                           // +0x00, the arena's length
+    int cap;
     union {
-        int base;                      // +0x04, the arena
-        int* basePointer;              // +0x04
+        int base;
+        int* basePointer;
     };
-    Chunk_00437a30* cur;               // +0x08, the next chunk to hand out
-    void* handle;                      // +0x0c
+    Chunk_00437a30* cur;
+    void* handle;
     union {
-        GafFrame* image;               // +0x10, the scratch image
-        GafFrame* bitmap;              // +0x10
-        GafFrame* shadow;              // +0x10
-        void* buffer;                  // +0x10
-        void* ptr;                     // +0x10
-        int field_10;                  // +0x10
+        GafFrame* image;
+        GafFrame* bitmap;
+        GafFrame* shadow;
+        void* buffer;
+        void* ptr;
+        int field_10;
     };
 
     CMemoryCache* ClearPointers();

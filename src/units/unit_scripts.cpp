@@ -1,9 +1,5 @@
-// Decompiled by DeepSeek V4.1 Flash, Opus, space-bunny-free, Claude Opus 5.5, deepseek-v4.1, GPT-6, deepseek-v4.1-flash, Space Bunny Free and claude-opus-5-5. Names are provisional.
-
-// Must stay: decides which register GetOrderCursor's GetFeature results use.
 #include "win_types.h"
 #include "../../interfaces/ref.h"
-// Must stay: GetPieceOffset's main path depends on the symbols it declares.
 #include <string.h>
 
 #include "../util/vec3.h"
@@ -11,8 +7,6 @@
 
 #include "cob_script.h"
 
-// Unused here: these headers take the symbol ids that keep
-// GetPieceOffset (0x43def0) and the piece position functions after it matching (docs/c2-regalloc.md).
 #include "../map/mission.h"
 #include "../sound/sound.h"
 
@@ -28,7 +22,7 @@ struct Feature_0043e490;
 
 struct Object {
     char unknown_0[0x6a];
-    Vec3 pos;                          // +0x6a
+    Vec3 pos;
     char unknown_76[0x9a - 0x76];
     Ref<CobScript> script;
 };
@@ -69,53 +63,40 @@ void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 
 struct Ptr_0043def0 {
     char unknown_0[0x10];
-    int f10;                           // +0x10
-    int f14;                           // +0x14
-    int f18;                           // +0x18
+    int f10;
+    int f14;
+    int f18;
 };
 
 #pragma pack(push, 2)
 struct Item_0043def0 {
-    Ptr_0043def0* p;                   // +0x00
-    int x;                             // +0x04
-    int y;                             // +0x08
-    int z;                             // +0x0c
-    short f10;                         // +0x10
-    short f12;                         // +0x12
-    short f14;                         // +0x14
+    Ptr_0043def0* p;
+    int x;
+    int y;
+    int z;
+    short f10;
+    short f12;
+    short f14;
     char unknown_16[0x32 - 0x16];
-    Item_0043def0* next;               // +0x32
+    Item_0043def0* next;
 };
 
 struct Block_0043def0 {
-    int count;                         // +0x00
+    int count;
     char unknown_4[0x22 - 4];
-    Item_0043def0 items[1];            // +0x22
+    Item_0043def0 items[1];
 };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
 struct Object_0043def0 {
     char unknown_0[0x64];
-    Angles16 angles;                   // +0x64
+    Angles16 angles;
     char unknown_6a[0x9e - 0x6a];
     Ref<Block_0043def0> recs;
 };
 #pragma pack(pop)
 
-// Returns the world position of animation piece `index` of `obj` (with z
-// negated, as the callers add it to obj->pos at +0x6a):
-//
-//   obj->recs (+0x9e) points to a table whose count is at +0x00 and whose
-//   pieces start at +0x22, each 0x36 bytes. A piece has an offset pointer at
-//   +0x00, x/y/z at +0x04/+0x08/+0x0c, its three angles at
-//   +0x10/+0x12/+0x14 and a `next` at +0x32. `obj` has three base angles at
-//   +0x64/+0x66/+0x68.
-//
-//   The base piece's offset (p->+0x10/+0x14/+0x18 plus x/y/z) seeds the
-//   result; each node of the `next` chain rotates the result by its angles
-//   (RotateByAngles), adding the object's base angles on the last node, then
-//   adds its own offset.
 // FUNCTION: 0x43def0
 Vec3 __stdcall GetPieceOffset(Object_0043def0* obj, int index)
 {
@@ -127,7 +108,6 @@ Vec3 __stdcall GetPieceOffset(Object_0043def0* obj, int index)
         return v;
     }
     Block_0043def0* block = obj->recs;
-    // One `out` filled in both arms, returned once; `result` outside the else.
     Vec3 out;
     Vec3 result;
     if (index < 0 || index >= block->count) {
@@ -161,7 +141,6 @@ Vec3 __stdcall GetPieceOffset(Object_0043def0* obj, int index)
     return out;
 }
 
-// Must stay: its symbol count sets register allocation from 43e060 on.
 #include <io.h>
 
 // FUNCTION: 0x43e060
@@ -172,41 +151,32 @@ Vec3 __stdcall GetPiecePosition(Object* obj, int param)
 
 struct Geom_0043e0b0 {
     char pad0[4];
-    int count;                         // +0x04
+    int count;
 };
 
 #pragma pack(push, 1)
 struct Piece_0043e0b0 {
-    Geom_0043e0b0* geom;               // +0x00
+    Geom_0043e0b0* geom;
     char pad4[0x22 - 4];
     Ref<Vec3> verts;
 };
 
 struct Obj_0043e0b0 {
     char pad0[0x6a];
-    Vec3 pos;                          // +0x6a
+    Vec3 pos;
     char pad76[0x9e - 0x76];
     Ref<char> table;
 };
 #pragma pack(pop)
 
-// Bounding-box centre of the vertices linked to a piece of the object's piece
-// table (obj + 0x9e). The table holds a count at +0 and 0x36-byte piece
-// records from +0x22; each record has a geometry pointer at +0 (its count is
-// at +4) and a Vec3 vertex array at +0x22. The centre is the average of the
-// per-component minima and maxima, offset by the object's world position at
-// +0x6a. The minima and maxima start at 0, so a piece whose vertices are all
-// positive on an axis keeps 0 as its minimum.
 // FUNCTION: 0x43e0b0
 void __stdcall GetPieceCenter(Obj_0043e0b0* obj, Vec3* out, int value)
 {
-    // Declared before the piece pointer: the register-resident ones zero first.
     int minx = 0, miny = 0, minz = 0;
     int maxx = 0, maxy = 0, maxz = 0;
     Piece_0043e0b0* p = (Piece_0043e0b0*)(obj->table + value * 0x36 + 0x22);
     Vec3* v = p->verts;
     int n = p->geom->count;
-    // Written as while (n > 0) { ...; n--; } so the compiler rotates the loop.
     while (n > 0) {
         int x = v->x;
         if (x < minx) minx = x;
@@ -226,22 +196,21 @@ void __stdcall GetPieceCenter(Obj_0043e0b0* obj, Vec3* out, int value)
 }
 
 struct Rec_0043e180 {
-    short a;                       // +0x00
-    char pad[0x30];                // +0x02
-    short b;                       // +0x32
-    short c;                       // +0x34
+    short a;
+    char pad[0x30];
+    short b;
+    short c;
 };
 
 #pragma pack(push, 2)
 struct Obj_0043e180 {
     char pad0[0x64];
-    Angles16 angles;               // +0x64
+    Angles16 angles;
     char pad1[0x9e - 0x6a];
     Ref<Rec_0043e180> recs;
 };
 #pragma pack(pop)
 
-// Operand order (object field first, record second) must stay in both helpers.
 static inline short SumY_0043e180(Obj_0043e180* obj, Rec_0043e180* q)
 {
     return obj->angles.heading + q->c;
@@ -252,9 +221,6 @@ static inline short SumZ_0043e180(Obj_0043e180* obj, Rec_0043e180* q)
     return obj->angles.pitch + q->b;
 }
 
-// Builds a piece's angles from the object's angles (+0x64, +0x66, +0x68) and
-// the animation record at obj->recs[index] (+0x9e): the record's +0x32/+0x34
-// words pair with heading/pitch and the next record's +0 word with bank.
 // FUNCTION: 0x43e180
 Angles16 __stdcall GetPieceAngles(Obj_0043e180* obj, int index)
 {
@@ -268,8 +234,6 @@ Angles16 __stdcall GetPieceAngles(Obj_0043e180* obj, int index)
 
 #include "../../interfaces/seams.h"
 
-// Asks the unit's script which piece the weapon (0..2) aims from
-// ("QueryPrimary", "QuerySecondary", "QueryTertiary") and returns it.
 // FUNCTION: 0x43e1e0
 int __stdcall QueryWeaponPiece(Object* obj, unsigned char weapon)
 {
@@ -279,9 +243,6 @@ int __stdcall QueryWeaponPiece(Object* obj, unsigned char weapon)
     return piece;
 }
 
-// Returns the world position of a weapon's aim piece (the unit's position
-// plus the piece offset, like 0x43e060); a negative piece is first asked
-// from the unit's script (0x43e1e0, inlined).
 // FUNCTION: 0x43e240
 void __stdcall GetWeaponPiecePosition(Object* obj, Vec3* out, unsigned char weapon, int piece)
 {
@@ -290,17 +251,12 @@ void __stdcall GetWeaponPiecePosition(Object* obj, Vec3* out, unsigned char weap
     *out = obj->pos + g_seams.units->GetPieceOffset((Unit*)obj, piece);
 }
 
-// Returns the world position of a weapon's aim piece: it first asks the
-// unit's script for the "AimFrom" piece, and if the script has none
-// (-1), falls back to the "Query" piece. The unit's position is then
-// added to the piece offset.
 // FUNCTION: 0x43e2e0
 void __stdcall GetAimFromPosition(Object* obj, Vec3* out, unsigned char weapon)
 {
     char* names[3] = { "AimFromPrimary", "AimFromSecondary", "AimFromTertiary" };
     int piece = -1;
     obj->script->QueryScript(names[weapon], &piece, 0, 0, 0);
-    // Each branch builds its own GetPieceOffset call.
     if (piece == -1) {
         char* qnames[3] = { "QueryPrimary", "QuerySecondary", "QueryTertiary" };
         int q = 0;
@@ -342,8 +298,6 @@ void __stdcall PoseUnitModel(Unit* unit)
     UpdateObjectState(unit);
 }
 
-// Looks up the "SweetSpot" entry in the object's name table at +0x9a and
-// passes the value found on to GetPieceCenter.
 // FUNCTION: 0x43e3c0
 void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out)
 {
@@ -354,8 +308,6 @@ void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out)
     GetPieceCenter((Obj_0043e0b0*)obj, (Vec3*)out, value);
 }
 
-// Asks the unit's script for its nano piece and returns that piece's world
-// position (the unit's position plus the piece offset), like 0x43e060.
 // FUNCTION: 0x43e400
 void __stdcall GetNanoPiecePosition(Object* obj, Vec3* out)
 {
@@ -364,7 +316,6 @@ void __stdcall GetNanoPiecePosition(Object* obj, Vec3* out)
     *out = obj->pos + GetPieceOffset((Object_0043def0*)obj, piece);
 }
 
-// Returns 0 for the byte codes 5, 10 and 14, otherwise 1.
 // FUNCTION: 0x43e470
 int __stdcall OrderModeTakesTarget(unsigned char type)
 {
@@ -396,41 +347,40 @@ struct Flags_0043e490 {
     unsigned int b15_31 : 17;
 };
 
-// The flag words at +0x241 and +0x245 read as bit fields; the header keeps plain words.
 struct UnitDefFlags_0043e490 {
     char unknown_0[0x241];
-    Flags_0043e490 f241b;              // +0x241
-    Flags_0043e490 f245b;              // +0x245
+    Flags_0043e490 f241b;
+    Flags_0043e490 f245b;
 };
 
 struct Size_0043e490 {
-    unsigned int width;  // +0x0
-    unsigned int height; // +0x4
+    unsigned int width;
+    unsigned int height;
 };
 
 #include "../network/player.h"
 
 struct Stats_0043e490 {
     char unknown_0[0x8c];
-    float f8c; // +0x8c
+    float f8c;
     char unknown_90[0x98 - 0x90];
-    float f98; // +0x98
+    float f98;
 };
 
 struct Limits_0043e490 {
     char unknown_0[0xc0];
-    float fc0; // +0xc0
-    float fc4; // +0xc4
+    float fc0;
+    float fc4;
 };
 
 struct Unit_0043e490 {
-    int motion; // +0x0
+    int motion;
     char unknown_4[0x10 - 0x4];
     Ref<Node_0043e490> f10;
     char unknown_14[0x48 - 0x14];
     Ref<Limits_0043e490> f48;
     char unknown_4c[0x6a - 0x4c];
-    char f6a[0x86 - 0x6a]; // +0x6a
+    char f6a[0x86 - 0x6a];
     Ref<Unit_0043e490> carrier;
     char unknown_8a[0x92 - 0x8a];
     Ref<UnitDef> def;
@@ -438,12 +388,12 @@ struct Unit_0043e490 {
     char unknown_9a[0xec - 0x9a];
     Ref<Stats_0043e490> fec;
     char unknown_f0[0xfb - 0xf0];
-    int postTransferHoldoff; // +0xfb
-    unsigned char playerIndex; // +0xff
+    int postTransferHoldoff;
+    unsigned char playerIndex;
     char unknown_100[0x104 - 0x100];
-    float buildLeft; // +0x104
+    float buildLeft;
     char unknown_108[0x110 - 0x108];
-    unsigned int flags; // +0x110
+    unsigned int flags;
 };
 
 struct Pos_0043e490 {
@@ -456,16 +406,11 @@ struct Pos_0043e490 {
 
 struct Feature_0043e490 {
     char unknown_0[0xfe];
-    unsigned char flags; // +0xfe
+    unsigned char flags;
     char unknown_ff;
 };
 #pragma pack(pop)
 
-
-// The same test as IsPointVisible: is the map square under pos in sight of the
-// local player? The width is read again through unit->player for the index;
-// MSVC folds it back into the CSE'd load, which it then reloads into edx for
-// the imul as the original does.
 static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
     Player* p = unit->player;
     int y, x;
@@ -475,9 +420,6 @@ static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
            0 != ((1 << g_game->playerIndex) & g_game->visibilityMask[x + y * unit->player->exploredWidth]);
 }
 
-// The feature on a map cell, as GetFeature in 0x4237d0.cpp but with the id in
-// a local: 0xfffe marks a cell covered by a larger feature whose origin cell
-// lies (offsetY, offsetX) cells back.
 static inline Feature_0043e490* GetFeature(Cell* cell) {
     if (cell == 0)
         return 0;
@@ -495,12 +437,6 @@ static inline Feature_0043e490* GetFeature(Cell* cell) {
     return &((Feature_0043e490 *)g_game->features)[id];
 }
 
-// Returns `result` from the calling function when the unit's def has `mask`
-// set and pos holds a visible feature flagged 0x80. A statement macro in the
-// usual do/while(0) form: the loop emits no code, but it is load-bearing for
-// register allocation. Without it (the same if-statement written out at each
-// site) case 2 loads unit into ebx before the target test instead of after it,
-// and the extra reload block adds 20 bytes.
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \
     do {                                                             \
         if (((def)->flags2 & (mask)) && Visible((unit), (pos))) {      \
@@ -515,13 +451,9 @@ static inline int Selectable(Unit_0043e490* t) {
            (t->carrier == 0 || (t->carrier->flags & 0x40000000));
 }
 
-// Returns the cursor/action code for an order of type
-// `mode` given by `unit` on `target` / `pos`; GetOrderType is the sibling that
-// returns the action's name.
 // FUNCTION: 0x43e490
 int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
                            Pos_0043e490* pos) {
-    // Declared friendly, enemy, then def (a real local); g_game read directly.
     UnitDef* def;
     Node_0043e490* node;
     int friendly;
@@ -562,7 +494,6 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
             return 5;
         break;
     case 12:
-        // Every check goes through the macro: an inline helper blows the budget.
         RECLAIM_CHECK(def, unit, pos, 0x400, 0xb);
         if (target && g_seams.units->CanReclaim(((Unit*)unit), 0, (Unit*)target))
             return 0xb;
@@ -583,7 +514,6 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
         return 0x10;
     case 4:
         if (((UnitDefFlags_0043e490*)def)->f245b.b14) {
-            // f48 pointer declared before the fec one.
             Limits_0043e490* l = unit->f48;
             Stats_0043e490* s = unit->fec;
             if (s->f8c < l->fc0 || s->f98 < l->fc4)
@@ -626,7 +556,6 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
             RECLAIM_CHECK(def, unit, pos, 0x400, 0x12);
             break;
         }
-        // Self calls, not a goto loop: they become the original's jump to the top.
         if ((def->flags2 & 0x10) && enemy)
             return GetOrderCursor(3, unit, target, pos);
         if ((def->flags2 & 0x400) && enemy)

@@ -1,13 +1,6 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// <windows.h> is needed for the operand order of the player address
-// ([eax + ebx + 0x1b63], g_game as the base); without it MSVC swaps them.
 #include "win_types.h"
 #include <string.h>
 
-// The aligned frame (`and esp, -8`) comes from the default flags, no /Op: the
-// unsigned-to-float conversion needs an 8-byte stack temporary.
-
-// The campaign object at g_game+0x391e9 (see 0x435da0.cpp).
 #include "../map/mission.h"
 
 #include "../network/player.h"
@@ -17,15 +10,15 @@
 
 struct Game_0046c2a0 {
     char unknown_0[0x1b63];
-    Player players[10];                // +0x1b63
+    Player players[10];
     char unknown_2851[0x2a42 - 0x2851];
-    unsigned char localPlayer;         // +0x2a42
+    unsigned char localPlayer;
     char unknown_2a43[0x38a47 - 0x2a43];
-    unsigned int gameTick;             // +0x38a47
+    unsigned int gameTick;
     char unknown_38a4b[0x391e9 - 0x38a4b];
     Ref<Mission> mapInfo;
     char unknown_391ed[0x3923b - 0x391ed];
-    unsigned short bits0_3923b : 2;    // +0x3923b
+    unsigned short bits0_3923b : 2;
     unsigned short bit2_3923b : 1;
     unsigned short bit3_3923b : 1;
     unsigned short bit4_3923b : 1;
@@ -33,40 +26,35 @@ struct Game_0046c2a0 {
 };
 #pragma pack(pop)
 
-struct PlayerInfo_0046c2a0 {           // 0x18 bytes
-    char* name;                        // +0x00
-    int id;                            // +0x04
-    int flags;                         // +0x08
-    char* side;                        // +0x0c
-    int numAllies;                     // +0x10
-    PlayerInfo_0046c2a0** allies;      // +0x14
+struct PlayerInfo_0046c2a0 {
+    char* name;
+    int id;
+    int flags;
+    char* side;
+    int numAllies;
+    PlayerInfo_0046c2a0** allies;
 };
 
-struct Score_0046c2a0 {                // 8 bytes
-    char* name;                        // +0x0
-    int value;                         // +0x4
+struct Score_0046c2a0 {
+    char* name;
+    int value;
 };
 
-struct ScoreBoard_0046c2a0 {           // 0xc bytes
-    int score;                         // +0x0
-    int count;                         // +0x4
-    Score_0046c2a0** scores;           // +0x8
+struct ScoreBoard_0046c2a0 {
+    int score;
+    int count;
+    Score_0046c2a0** scores;
 };
 
 extern Game_0046c2a0* g_game;
 extern PlayerInfo_0046c2a0** g_onlineReportPlayers;
 extern ScoreBoard_0046c2a0** g_onlineReportScoreBoards;
-extern char* g_sideNames[2];           // "Arm", "Core"
-extern char* g_scoreNames[9];          // "Kills", "Losses", ..., "I am Winner"
+extern char* g_sideNames[2];
+extern char* g_scoreNames[9];
 
-// Fills the player and score-board tables AllocScoreTables allocated (handed to
-// the stats DLL by ReportGameEvent) for every player in the game, and returns
-// how many there are.
 // FUNCTION: 0x46c2a0
 int FillScoreTables()
 {
-    // j declared first, so that p->allied[j] is addressed [p + j], and n
-    // set before the allies pointer is read: both are needed for a match.
     int j;
     int count = 0;
     for (int i = 0; i < 10; i++) {

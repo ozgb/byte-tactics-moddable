@@ -1,13 +1,5 @@
-// Decompiled by Opus, space-bunny-free, LongCat 2.5 Preview Free, deepseek-v4.1-flash, deepseek-v4.1, mimo-v2.6-pro and Sonnet. Names are provisional.
-// Stays in its own file: merged with the module's second part, the fog arm's
-// cell address picks the other SIB base and keeps the fog pointer in a register
-// (particles.cpp).
-// The smoke puff: drifted by Step, drawn by DrawParticle when the local player
-// can see it, and dropped once IsExpired.
 #include <stddef.h>
 #include <stdlib.h>
-// Only for its symbol ids: DrawParticle matches only in a window of the
-// symbol count.
 #include <stdio.h>
 
 void* __stdcall GetGafFrame(void* a, int b);
@@ -15,35 +7,34 @@ void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 
 #pragma pack(push, 1)
 struct Pos_00474b80 {
-    short x;                       // +0x00 (record +0x06)
+    short x;
     char unknown_2[0x4 - 0x2];
-    short h;                       // +0x04 (record +0x0a)
+    short h;
     char unknown_6[0x8 - 0x6];
-    short y;                       // +0x08 (record +0x0e)
+    short y;
 };
 
 #include "../network/player.h"
 
 #include "../game/game.h"
 
-// One smoke puff (the element of SmokeParticles' vector), 0x20 bytes.
 struct SmokeParticle {
-    void* data;                    // +0x00, the animation
+    void* data;
     union {
         struct {
-            int x;                 // +0x04
-            int y;                 // +0x08
-            int z;                 // +0x0c
+            int x;
+            int y;
+            int z;
         };
         struct {
             char unknown_4[0x6 - 0x4];
-            Pos_00474b80 posw;     // +0x06
+            Pos_00474b80 posw;
         };
     };
-    int limit;                     // +0x10
-    int rounds;                    // +0x14, the frame
-    int period;                    // +0x18
-    int countdown;                 // +0x1c
+    int limit;
+    int rounds;
+    int period;
+    int countdown;
 
     void Step();
     void DrawParticle(void* dest, short px, short py);
@@ -53,10 +44,6 @@ struct SmokeParticle {
 
 extern Game* g_game;
 
-// The pin the earlier passes were looking for: a helper that returns its
-// argument. It emits no instruction, but MSVC 5 allocates what it returns as a
-// fresh live range, which is what holds the player pointer in edx across the
-// pre-branch block. Remove it and the whole frame rotates.
 static inline int Identity_00474b80(int v) { return v; }
 
 static inline int IsSeen_00474b80(Player* p, Player* q, int col, int row)
@@ -74,15 +61,11 @@ void SmokeParticle::DrawParticle(void* dest, short px, short py)
     short sx = q->x - px + 0x80;
     short sy = q->y - (q->h >> 1) - py + 0x20;
     Player* p = &g_game->players[g_game->playerIndex];
-    // The second spelling of the same record: the bounds test reads p, the mask
-    // index re-reads the width through p2, which keeps both of the original's
-    // two width loads.
     Player* p2 = &g_game->players[g_game->playerIndex];
     int visible;
     if ((g_game->mapFlags & 2) == 2) {
         int col = posw.x >> 5;
         int row = (posw.y - (posw.h >> 1)) >> 5;
-        // Fog map read through Get(): keeps the fog pointer in a register.
         if ((unsigned int)col < (unsigned int)p->exploredWidth && (unsigned int)row < (unsigned int)p->exploredHeight &&
             p->explored[(unsigned int)p->exploredWidth * row + col] != 0)
             visible = 1;

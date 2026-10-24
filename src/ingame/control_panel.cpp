@@ -1,18 +1,8 @@
-// Decompiled by Opus, DeepSeek V4.1 Flash, Claude Opus 5.5, Haiku, deepseek-v4.1-flash, GPT-6.1-sol, deepseek-v4.1, space-bunny-free, fledge-alpha-free, GPT-6 and Sonnet. Names are provisional.
-// The in-game control panel: the order and build menu handling (the order-mode
-// state, the build menu tables, the order buttons and the build progress), the
-// damage and build progress helpers, the build menu paging, the order-mode key
-// handling, the commander lookup, and the camera position, follow and scroll
-// state. The module's files gathered in address order; 0x41b2e0 and 0x41bde0
-// keep their own files (their own include sets decide their matches).
 #include "win_types.h"
 #include "../../interfaces/host.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// Unused here: the symbol ids <io.h> adds put OpenBuildMenuGui and
-// AddBuildProgress in the symbol-id windows they match in (docs/c2-regalloc.md);
-// the same is true in sound/samples.cpp and sound/cd_audio.cpp.
 #include <io.h>
 
 #pragma pack(push, 1)
@@ -41,19 +31,19 @@ struct BuildList_0041ace0;
 
 struct Nano_0041b8d0 {
     char unknown_0[0x10];
-    int drawFrame;                     // +0x10
+    int drawFrame;
 };
 
 struct UnitTypeFlagsBits {
-    unsigned int unknown_0 : 6;        // +0x241 bits 0-5
-    unsigned int flag_6 : 1;           // bit 6
-    unsigned int unknown_7 : 4;        // bits 7-10
-    unsigned int flag_11 : 1;          // bit 11
-    unsigned int unknown_12 : 6;       // bits 12-17
-    unsigned int flag_18 : 1;          // bit 18
-    unsigned int unknown_19 : 5;       // bits 19-23
-    unsigned int flag_24 : 1;          // bit 24
-    unsigned int unknown_25 : 7;       // bits 25-31
+    unsigned int unknown_0 : 6;
+    unsigned int flag_6 : 1;
+    unsigned int unknown_7 : 4;
+    unsigned int flag_11 : 1;
+    unsigned int unknown_12 : 6;
+    unsigned int flag_18 : 1;
+    unsigned int unknown_19 : 5;
+    unsigned int flag_24 : 1;
+    unsigned int unknown_25 : 7;
 };
 
 union UnitTypeFlags {
@@ -62,57 +52,54 @@ union UnitTypeFlags {
 };
 
 struct UnitTypeFlags2 {
-    unsigned int canMoveOrder : 1;     // +0x245 bit 0
-    unsigned int canFireOrder : 1;     // bit 1
-    unsigned int canOnOff : 1;         // bit 2
-    unsigned int canStop : 1;          // bit 3
-    unsigned int canAttack : 1;        // bit 4
-    unsigned int canDefend : 1;        // bit 5
-    unsigned int canPatrol : 1;        // bit 6
-    unsigned int canMove : 1;          // bit 7
-    unsigned int canLoad : 1;          // bit 8
-    unsigned int canRepair : 1;        // bit 9
-    unsigned int canReclaim : 1;       // bit 10
+    unsigned int canMoveOrder : 1;
+    unsigned int canFireOrder : 1;
+    unsigned int canOnOff : 1;
+    unsigned int canStop : 1;
+    unsigned int canAttack : 1;
+    unsigned int canDefend : 1;
+    unsigned int canPatrol : 1;
+    unsigned int canMove : 1;
+    unsigned int canLoad : 1;
+    unsigned int canRepair : 1;
+    unsigned int canReclaim : 1;
     unsigned int bit11 : 1;
-    unsigned int canCapture : 1;       // bit 12
-    unsigned int canCloak : 1;         // bit 13
-    unsigned int canBlast : 1;         // bit 14
+    unsigned int canCapture : 1;
+    unsigned int canCloak : 1;
+    unsigned int canBlast : 1;
     unsigned int bits15 : 17;
 };
 
-// UnitDef (units/unit_def.h, 0x249 bytes) with its flag words read as bit fields,
-// which the header lacks: the unit's own type and a build menu entry.
 struct UnitType {
     char unknown_0[0x20];
-    char unitname[0x20];               // +0x20
+    char unitname[0x20];
     char unknown_40[0x111 - 0x40];
-    unsigned int field_111;            // +0x111
+    unsigned int field_111;
     char unknown_115[0x14a - 0x115];
-    Point16 origin;                   // +0x14a
+    Point16 origin;
     char unknown_14e[0x156 - 0x14e];
-    int ids;                           // +0x156
+    int ids;
     char unknown_15a[0x186 - 0x15a];
-    float energyCost;                  // +0x186 (TDF buildcostenergy)
-    float metalCost;                   // +0x18a (TDF buildcostmetal)
+    float energyCost;
+    float metalCost;
     char unknown_18e[0x1ea - 0x18e];
-    int buildtime;                     // +0x1ea
+    int buildtime;
     char unknown_1ee[0x1fa - 0x1ee];
-    unsigned int maxHealth;            // +0x1fa
+    unsigned int maxHealth;
     char unknown_1fe[0x21e - 0x1fe];
-    short id;                          // +0x21e
+    short id;
     char unknown_220[0x22e - 0x220];
-    unsigned char buildMenuPageCount;  // +0x22e
-    unsigned char mobile;              // +0x22f
+    unsigned char buildMenuPageCount;
+    unsigned char mobile;
     char unknown_230[0x241 - 0x230];
-    UnitTypeFlags flags;               // +0x241
-    UnitTypeFlags2 flags2;             // +0x245
+    UnitTypeFlags flags;
+    UnitTypeFlags2 flags2;
 };
 
 #include "../gui/gadget.h"
 #include "../gui/layer.h"
 #include "../gui/gui.h"
 
-// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
 void StepAllGafSequences();
 
 #include "../network/player_info.h"
@@ -121,32 +108,30 @@ void StepAllGafSequences();
 
 #include "../units/unit.h"
 
-// A unit type's extra build menu entry (0x25 bytes).
 struct BuildEntry_0041ace0 {
-    short typeId;                      // +0x00
-    unsigned char page;                // +0x02
-    unsigned char slot;                // +0x03
-    char name[0x21];                   // +0x04
+    short typeId;
+    unsigned char page;
+    unsigned char slot;
+    char name[0x21];
 };
 
-struct BuildList_0041ace0 {            // 0xbd bytes
-    int count;                         // +0x00
-    BuildEntry_0041ace0 entries[5];    // +0x04
+struct BuildList_0041ace0 {
+    int count;
+    BuildEntry_0041ace0 entries[5];
 };
 
-// The mouse record at g_game+0x2c76: copied by 0x41cc60, read by 0x41cd50.
 #include "../gui/mouse_event.h"
 
 struct CursorState {
-    MouseEvent start;                 // +0x0, the mouse when the scroll began
-    int flag;                          // +0x18
-    POINT center;                      // +0x1c
-    POINT savedScroll;                 // +0x24
+    MouseEvent start;
+    int flag;
+    POINT center;
+    POINT savedScroll;
 };
 
 struct Follow_0041ca10 {
-    int unknown_0;                     // +0x0
-    Vec3 pos;                          // +0x4
+    int unknown_0;
+    Vec3 pos;
 };
 
 #include "../game/game.h"
@@ -169,13 +154,12 @@ extern Option_00419560 g_consoleCommands;
 extern Option_00419560 g_cheatCommands;
 extern Option_00419560 g_debugCommands;
 
-// The second part's own views and externs: the display its functions read.
 #pragma pack(push, 1)
 struct Display_0041ce90 {
     char unknown_0[0x40];
-    HWND hwnd;                         // +0x40
+    HWND hwnd;
     char unknown_44[0xf0 - 0x44];
-    unsigned char flags_f0;            // +0xf0
+    unsigned char flags_f0;
 };
 #pragma pack(pop)
 
@@ -253,8 +237,6 @@ void InitCommands()
     DAT_00511c20 = g_game->sideNames_37f5b[4].field_224;
     g_messageBytesReceived = 0;
     g_messageBytesSent = 0;
-    // The second field of the second table is cleared through a walking
-    // pointer: the original keeps a separate induction pointer for it.
     Pair_00419560* p = (Pair_00419560*)&g_messageBytesByType[1];
     for (int i = 0; i < 44; i++) {
         g_messageCountByType[i + 1][0] = 0;
@@ -273,9 +255,6 @@ void InitCommands()
     SetDefaultCommandHandler(DefaultCommandHandler, 4);
 }
 
-// Copies the 32-character name of entry `index` of the table at
-// g_game+0x1439b (0x249-byte entries) into `dest`. <windows.h> fixes the
-// operand order of the address lea (tools/headers.py).
 // FUNCTION: 0x4195f0
 void __stdcall CopyMenuEntryName(char* dest, unsigned short index)
 {
@@ -283,7 +262,6 @@ void __stdcall CopyMenuEntryName(char* dest, unsigned short index)
     dest[0x1f] = 0;
 }
 
-// Returns whether the name of menu entry `index` contains `text`.
 // FUNCTION: 0x419630
 int __stdcall MenuEntryNameContains(Gadget* entries, char* text, int index)
 {
@@ -292,11 +270,6 @@ int __stdcall MenuEntryNameContains(Gadget* entries, char* text, int index)
     return strstr(name, text) != 0;
 }
 
-// Snaps the position at +0x2caa to the centre of its cell for the unit
-// type selected at +0x2cc4, then passes it to IssueOrCancelOrder as a
-// "MOBILEBUILD" (def flag bit 11 clear) or "VTOL_MOBILEBUILD" (bit 11 set)
-// order for each of the local player's units with flag 0x10 whose def has
-// flag 0x40. Bit 2 of the argument's keyFlags is passed through.
 // FUNCTION: 0x419670
 void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
 {
@@ -304,7 +277,6 @@ void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
     unsigned short index = g_game->buildTypeIndex;
     UnitType* def = &((UnitType *)g_game->defs.get())[index];
     Vec3 pos = g_game->pos;
-    // origin read once into a local: passing def->origin to each helper changes the frame.
     Point16 origin = def->origin;
     Point16 cell = WorldToCell(pos, origin);
     CellToWorld(origin, cell, &pos);
@@ -347,9 +319,6 @@ int UpdatePlacementGhostValidity(void)
     return (g_game->inputFlags_2cc6.value >> 6) & 1;
 }
 
-// Finds the GUI entry named after list entry `index` of the game's 0x249-byte
-// table at +0x1439b and sets its text at +0xb6 to "+<n>", or clears it
-// when n is 0.
 // FUNCTION: 0x419940
 void __stdcall SetBuildCountText(Gui* obj, unsigned short index, int n)
 {
@@ -362,17 +331,10 @@ void __stdcall SetBuildCountText(Gui* obj, unsigned short index, int n)
     }
 }
 
-// Refreshes the text of the menu entries owned by the unit's owner. The menu
-// keeps a table of 0x15b-byte entries whose first entry stores the entry count
-// as a short at +0xb6 (the same offset entry 1..n use for their text). Entries
-// whose byte at +0 is 1 have either a name at +2 looked up with FindUnitTypeId
-// (printing "+<amount>") or show the unit's own count at +0x1e. Entry 0 holds
-// only the count, so the loop starts at entry 1.
 // FUNCTION: 0x4199b0
 void __stdcall RefreshBuildCountTexts(Gui* menu, Unit* unit)
 {
     Gadget* e = menu->layer->entries;
-    // Read as an int so it is sign-extended once.
     int count = e->u.count;
     e++;
     for (int i = 1; i < count + 1; i++) {
@@ -397,14 +359,11 @@ void __stdcall RefreshBuildCountTexts(Gui* menu, Unit* unit)
                     sprintf(text + strlen(text), " +%d", r);
             }
         }
-        // Incremented after the reads, not before.
         e++;
     }
     MarkChanged(&g_game->gui);
 }
 
-// Sets the "ONOFF" menu entry from bit 0 of the unit's flags at +0x10e
-// (compare 0x495860).
 // FUNCTION: 0x419ac0
 void __stdcall UpdateOnOffButton(Unit* unit)
 {
@@ -442,10 +401,6 @@ void __stdcall SetOrderIntent(unsigned char mode)
     g_game->inputFlags_2cc6.value = g_game->inputFlags_2cc6.value & 0xf7;
 }
 
-// Handles a click on an order button: finds which order the button's name
-// contains and selects that order mode (SetOrderIntent inlined), plays the
-// "immediateorders" or "specialorders" sound and returns 1; returns 0 when the
-// name is no order. STOP issues the stop order at once.
 static inline void SetOrderMode(unsigned char mode)
 {
     g_game->orderMode = mode;
@@ -457,7 +412,6 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
 {
     char name[32];
     void* orders = g_game->orders;
-    // Uninitialised unless the entry is type 1, as in the original: a `: button` fallback changes the code.
     Gadget* e;
     if (entries[button->index].type == 1) e = &entries[button->index];
 
@@ -571,10 +525,6 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     return 0;
 }
 
-// Refreshes the order buttons of the unit menu: the BUILD/ORDERS page toggle
-// for the selected unit, the multi-state CLOAK, ONOFF, MOVEORD and FIREORD
-// buttons from the selection's combined order state, and disables every order
-// button the selection cannot use.
 // FUNCTION: 0x41a120
 void __stdcall RefreshOrderButtons(Unit* unit)
 {
@@ -701,10 +651,6 @@ void __stdcall RefreshOrderButtons(Unit* unit)
     }
 }
 
-// Click handler for the unit orders panel: cycles the move order, fire order,
-// activation or cloak setting named by the clicked entry, sends the matching
-// order and updates the button. Returns 0 when the entry is none of these.
-// Inlined copy of MenuEntryNameContains.
 static inline int Contains(Gadget* entries, char* text, int index)
 {
     char name[32];
@@ -790,8 +736,6 @@ int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
     return 1;
 }
 
-// Builds the "<unit name>PREV" / "<unit name>NEXT" gadget names for the
-// skeleton of the unit's owner and pushes them into the GUI.
 // FUNCTION: 0x41a920
 void __stdcall SetPrevNextGadgetNames(Unit* unit)
 {
@@ -804,17 +748,11 @@ void __stdcall SetPrevNextGadgetNames(Unit* unit)
     }
 }
 
-// Click handler of the unit build/orders panel (installed by 0x41ace0 and
-// 0x41b0f0): PREV/NEXT/ORDERS/BUILD buttons set request flags, a unit-type
-// entry whose type has mobile == 0 switches to mode 0xe with that type,
-// the orders buttons go to HandleOrdersPanelClick, and any other entry adds or removes
-// build queue entries (5 at a time when IsKeyDown(0xf9) is set).
 // FUNCTION: 0x41aa00
 void __stdcall HandleBuildPanelClick(Gui* menu)
 {
     if (menu->hotGadgetIndex != -1) {
         Gadget* entries = menu->layer->entries;
-        // char[17]: a [20] buffer is placed above the name buffer.
         char idName[17];
         GetGadgetName(entries, idName, menu->hotGadgetIndex);
         idName[16] = 0;
@@ -837,7 +775,6 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
             g_game->buildTypeIndex = id;
             PlaySoundByName("addbuild", 0);
         } else if (!HandleOrdersPanelClick(menu, entries) && !HandleOrderButtonClick(menu, entries)) {
-            // Own nested if: inside the && chain the bit test is compiled differently.
             if (unit->selected) {
                 char text[256];
                 GetGadgetName(entries, text, menu->hotGadgetIndex);
@@ -858,7 +795,6 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
                 MarkChanged(&g_game->gui);
             }
         }
-        // One call after the chain, not one per branch.
         ClearSelectedGadget(menu);
     }
 }
@@ -874,15 +810,12 @@ void __stdcall DisableUnavailableBuildMenuEntries(Gui* obj)
     Gadget* t = obj->layer->entries;
     int n = t->u.count;
     for (int i = 0; i < n; i++) {
-        // +0x28 (Gadget::tab) holds the entry flags here: bit 2 marks an entry that
-        // names a unit, which is greyed out when its type id is 0.
         if (Entries(t)[i].tab & 4) {
             SetGrayedOut(obj, i, FindUnitTypeId((char*)&Entries(t)[i]) == 0);
         }
     }
 }
 
-// Inlined copy of SetPrevNextGadgetNames.
 static inline void SetPrevNext(Unit* unit)
 {
     char buf[256];
@@ -894,7 +827,6 @@ static inline void SetPrevNext(Unit* unit)
     }
 }
 
-// Inlined copy of DisableUnavailableBuildMenuEntries.
 static inline void UpdateCounts(Gui* menu)
 {
     Gadget* entry = menu->layer->entries;
@@ -904,15 +836,11 @@ static inline void UpdateCounts(Gui* menu)
         return;
     entry = (Gadget*)((char*)entry + 2);
     do {
-        // +0x28 (Gadget::tab) holds the entry flags here: bit 2 marks an entry that
-        // names a unit, which is greyed out when its type id is 0.
         if (entry[i].tab & 4)
             SetGrayedOut(menu, i, FindUnitTypeId((char*)&entry[i]) == 0);
     } while (++i < n);
 }
 
-// Keep the table pointer in entry form while reading its count. The guarded
-// do/while places the header advance after the empty-list test.
 // FUNCTION: 0x41ace0
 void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
 {
@@ -933,7 +861,6 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
             for (int i = 0; i < g_game->buildListCount; i++) {
                 for (int j = 0; j < g_game->buildLists[i].count; j++) {
                     BuildList_0041ace0* lists = g_game->buildLists;
-                    // The entry in a local: the address lea's base and index order follows it.
                     BuildEntry_0041ace0* entry = &lists[i].entries[j];
                     if (((UnitType*)unit->def.get())->id == entry->typeId
                         && entry->page - 1 == page) {
@@ -968,8 +895,6 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
     }
 }
 
-// Opens the side-specific "GEN.GUI" dialog (ARMGEN.GUI / COREGEN.GUI) with
-// HandleBuildPanelClick as its handler and remembers the selected unit's two ids.
 // FUNCTION: 0x41b0f0
 void __stdcall OpenGeneratorDialog(Unit* unit)
 {
@@ -1001,9 +926,6 @@ int __stdcall GetBuildMenuPage(Unit* obj)
     return 0;
 }
 
-// Builds "<name><n>.GUI" for entry `index` of the table at g_game+0x1439b
-// (0x249-byte entries) into `dest`. <windows.h> fixes the operand order of
-// the address lea (tools/headers.py).
 // FUNCTION: 0x41b230
 void __stdcall BuildEntryGuiName(char* dest, unsigned short index, int n)
 {
@@ -1025,10 +947,6 @@ Unit* GetBuildMenuFocusUnit()
     return 0;
 }
 
-// Finished-construction notification: marks the target as no longer being
-// built (clears its build progress and sets flag 0x2000), updates the
-// BUILDER.GUI panel or starts the builder's nanolathe, syncs two unit-type
-// flag bits and the selection flag.
 // FUNCTION: 0x41b8d0
 void __stdcall FinishConstruction(Unit* unit, Unit* target)
 {
@@ -1036,7 +954,6 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
         && target && (target->flags & 0x10000000)) {
         ((Nano_0041b8d0*)target->state.get())->drawFrame = 0;
         target->buildLeft = 0;
-        // In place, not through a local: the OR result is reused for the 0x20000000 test.
         target->flags |= 0x2000;
         if (target->player->active != 0
             && (target->player->type == 1 || target->player->type == 2)) {
@@ -1066,15 +983,6 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
 
 #include "../../interfaces/seams.h"
 
-// Adds build progress to a unit under construction: `amount` build points
-// (negative when it is being taken apart) move the remaining fraction at
-// +0x104 towards 0 (done) or 1 (nothing built), clamped to [0, 1]. Building
-// charges the builder's resource store (RequestEnergyAndMetal, energy first) for the
-// energy and metal share of the step and only proceeds when the store accepts it.
-// Unbuilding adds the metal share to the unit's float at +0xd4 (times 0.5 or
-// 0.7 for a type 2 player when g_game+0x37eee is 0 or 1) and destroys the
-// unit through DamageUnit once nothing is left. Either way the unit's hit
-// points follow the progress, and a finished unit goes to FinishConstruction.
 // FUNCTION: 0x41ba60
 int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
 {
@@ -1107,7 +1015,6 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
     int hp = (int)(prev * type->maxHealth) - (int)(next * type->maxHealth);
     if (amount < 0.0f) {
         float refund = -metalCharge;
-        // Through a float&: writing unit->resourceSlot.metalMake directly moves the health load and compare.
         float& store = unit->resourceSlot.metalMake;
         if (unit->resourceSlot.player->active != 0 && unit->resourceSlot.player->type == 2) {
             switch (g_game->difficulty) {
@@ -1124,7 +1031,6 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
         } else {
             store += refund;
         }
-        // health is set before remaining; the other order also changes the build path.
         unit->health = max(hp + unit->health, 0);
         unit->buildLeft = next;
         unit->flags |= 0x2000;
@@ -1175,8 +1081,6 @@ int __stdcall AddRepairProgress(Unit* builder, Unit* unit, float f)
     return result;
 }
 
-// The 3-bit page field (bits 23-25) is set from the type's buildMenuPageCount, or
-// stepped down with wraparound when it is already past the first page.
 static inline unsigned int SetPage(Unit* u, unsigned int f)
 {
     return (((((UnitType*)u->def.get())->buildMenuPageCount + 0x1ff) << 23) ^ f) & 0x3800000 ^ f;
@@ -1200,8 +1104,6 @@ void __stdcall StepBuildMenuPageBack(int toggle)
     if (u == 0)
         goto nextbuild;
 
-    // Each branch declares its own f: a single shared local made MSVC put the
-    // field in eax and the unit in ecx, swapping every later operand.
     if (toggle) {
         unsigned int f = u->flags;
         if ((f & 0x400000) == 0) {
@@ -1227,14 +1129,9 @@ nextbuild:
     PlaySoundByName("nextbuildmenu", 0);
 }
 
-// Opens the selected unit's build menu at the given page (closes it for 0),
-// if the unit has that many pages.
-// Needed: without it the page count is loaded before the page.
-
 // FUNCTION: 0x41c060
 void __stdcall OpenBuildMenuPage(int page)
 {
-    // Unit lookup written out in place: a GetSelectedUnit helper changes the code.
     unsigned short index = g_game->unitIndex;
     if (index != 0) {
         Unit* unit = &g_game->units[index];
@@ -1271,12 +1168,8 @@ void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit)
     }
 }
 
-// 0x41bde0 keeps its own file (this file's prelude moves its sub-object
-// pointer from esi to edx); its declaration stands in for the definition.
 void __stdcall StepBuildMenuPage(int toggle);
 
-// The unit at g_game->unitIndex, or 0 when the index is empty or the slot is
-// not live (unitDefIndex == 0). Inlined at both call sites below.
 static Unit* GetSelectedUnit()
 {
     unsigned short index = g_game->unitIndex;
@@ -1336,15 +1229,11 @@ void __stdcall CycleCameraFollow(int param)
     (*(Unit **)&g_game->value_142f3) = result;
 }
 
-// Returns the bit set of the unit types in the named category.
-// The bit test was an inlined helper taking the type as unsigned short.
 static inline int TestBit(unsigned int* set, unsigned short n)
 {
     return set[n >> 5] & (1 << (n & 0x1f));
 }
 
-// Finds the local player's commander: the last of the player's units whose
-// type is in the "Commander" unit-type set.
 // FUNCTION: 0x41c310
 void FindLocalCommander()
 {
@@ -1365,7 +1254,6 @@ void __cdecl ClearCameraFollowState()
     (*(Follow_0041ca10 **)&g_game->tracked) = 0;
 }
 
-// The original calls this out of line from the camera functions.
 #pragma auto_inline(off)
 // FUNCTION: 0x41c3c0
 void ClampCameraPosition()
@@ -1386,7 +1274,6 @@ void ClampCameraPosition()
 }
 #pragma auto_inline(on)
 
-// Same clamp as ClampCameraPosition, on the second position pair.
 // FUNCTION: 0x41c450
 void ClampCameraTarget()
 {
@@ -1469,7 +1356,6 @@ void __stdcall AccumulateScreenShake(int dx, int dy, int value)
     }
 }
 
-// The original calls this out of line from UpdateCameraFollow.
 #pragma auto_inline(off)
 int HarnessViewRand();
 
@@ -1555,7 +1441,6 @@ void __stdcall CenterCameraOnMapPosition(Vec3* p, int param_2)
     g_game->mapFlags &= 0xfff7;
 }
 
-// SetTarget/ClampTarget stay helpers: they give the original's load order.
 static inline void SetTarget(int x, int y)
 {
     g_game->x2 = x;
@@ -1578,7 +1463,6 @@ static inline void ClampTarget()
     }
 }
 
-// Stays an inline helper written as `cur + -320`: other forms change the arithmetic.
 static inline int Approach(int cur, int target)
 {
     int d = cur - target;
@@ -1592,13 +1476,6 @@ static inline int Approach(int cur, int target)
     return cur - d / 2;
 }
 
-// Camera follow: picks a target position (a pending jump at +0x1433f while
-// its counter runs, else the followed object at +0x142f7, else the followed
-// unit at +0x142f3 while it is still alive), centres the scroll target on it
-// and clamps it to the map, then moves the scroll position halfway towards
-// the target (at most 320 pixels per axis) and re-clamps it.
-
-// Needed: without it the view centre x is computed in the wrong order.
 // FUNCTION: 0x41ca10
 void UpdateCameraFollow()
 {
@@ -1654,10 +1531,6 @@ void BeginMouseScroll()
     SetCursorPosition(cursor->center.x, cursor->center.y);
 }
 
-// Clears a flag in the cursor state held in the game object and warps the
-// mouse back to the saved position. The state is reached through a pointer
-// local, which keeps the `add eax, 0x2cc7` the original has.
-
 // FUNCTION: 0x41cd20
 void EndMouseScroll()
 {
@@ -1667,8 +1540,6 @@ void EndMouseScroll()
     ShowSoftwareCursor();
 }
 
-// The same scroll-and-clamp sequence is written out in 0x41c7c0, 0x41c8e0,
-// 0x41d0f0 and 0x41d1f0.
 static inline void ScrollTo(int x, int y)
 {
     g_game->scrollX = x;
@@ -1680,16 +1551,9 @@ static inline void ScrollTo(int x, int y)
     g_game->mapFlags &= 0xfff7;
 }
 
-// Mouse scrolling: moves the view by a quarter of the mouse offset from the
-// centre point, saves the new scroll position (in 16-pixel units), warps the
-// OS cursor back to the centre, and ends the scroll (restoring the cursor to
-// where it started) once the button is released. 0x41cc60 starts it.
-
 // FUNCTION: 0x41cd50
 void UpdateMouseScroll()
 {
-    // All fields go through one pointer c, and the quarter offsets keep their own
-    // locals dx, dy: both fix the load order and register use.
     CursorState* c = &(*(CursorState*)&g_game->cursor);
     MouseEvent r = (*(MouseEvent*)&g_game->view);
     int dx = (r.x - c->center.x) / 4;
@@ -1708,19 +1572,13 @@ void UpdateMouseScroll()
     }
 }
 
-// Unused, but needed: changes how the scroll speed multiply is compiled.
 #include <string>
-
-// Edge and arrow-key scrolling: moves the view by the scroll speed (capped at
-// 0x80) when an arrow key is held (unless the TALK.GUI chat box is open) or
-// the mouse sits on the edge of the screen, then clamps and saves it.
 
 // FUNCTION: 0x41ce90
 void UpdateEdgeScroll()
 {
     MouseEvent mouse;
     POINT pt;
-    // Through a local: the direct spelling loads the scale into ebx.
     Game* g = g_game;
     int speed = g->scrollSpeed * g->scrollScale;
     if (speed > 0x80)

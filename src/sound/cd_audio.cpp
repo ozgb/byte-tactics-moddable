@@ -1,20 +1,9 @@
-// Decompiled by Haiku, deepseek-v4.1-flash, space-bunny-free, Opus, Sonnet, GPT-6.1-sol, mimo-v2.6-pro, Claude Opus 5.5, LongCat 2.5 Preview Free, GPT-6 and DeepSeek V4.1 Flash. Names are provisional.
-// The CD audio player: the methods of the sound object at g_game+0x10 that
-// talk to the MCI cdaudio device, in address order. The object's sample and
-// streaming methods are the samples module (data/modules.csv) and live in
-// samples.cpp; the Sound class and the sample-side declarations here are the
-// view the gathered files shared.
-
 #include "win_types.h"
 #include <stdlib.h>
 #include <string.h>
 #include "../../interfaces/host.h"
-// <stdio.h> must stay: the header state decides StartStream's multiply register.
 #include <stdio.h>
 #include <float.h>
-// Nothing here uses <io.h>: its symbols put InitDirectSound,
-// CreateSampleFromMemory and StartStream in the symbol-id windows they match
-// in (docs/c2-regalloc.md).
 #include <io.h>
 
 
@@ -50,12 +39,8 @@ int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 extern int g_delayedSampleVolume;
 extern char g_delayedSampleName[];
 
-
-// The sound system: the CD audio player, the DirectSound sample channels and
-// the streamed sample, at g_game+0x10.
 #include "sound.h"
 
-// The sound object g_cdPlayer points at: the same object as g_game+0x10.
 extern Sound* g_cdPlayer;
 
 extern void __stdcall SetMediaNotifyCallback(void (__stdcall*)(int, int, int));
@@ -128,7 +113,6 @@ void Sound::PlayNextTrack()
         step = zero;
         RemoveTimer(g_cdNextTrackTimer);
         RemoveTimer(g_cdFadeTimer);
-        // Chained store, as in the original: g_cdNextTrackTimer is written first.
         g_cdNextTrackTimer = g_cdFadeTimer = -1;
         return;
     }
@@ -281,17 +265,12 @@ void Sound::CloseCdPlayerWindow()
     }
 }
 
-// A method of the object at g_game+0x10 (its one caller, 0x4263b0, loads ecx
-// from there) that never uses `this`, like 0x4ce190.
 // FUNCTION: 0x4ce1d0
 bool Sound::HasCdPlayerWindow()
 {
     return g_cdPlayerWindow != 0;
 }
 
-// Initialises the CD player object and opens the MCI cdaudio device.
-// The store to arr_214[0] before the loop is overwritten by the loop's first
-// iteration (0 % 4 + 1 == 1), so it is redundant in the original.
 // FUNCTION: 0x4ce260
 int Sound::OpenCdAudio()
 {
@@ -346,8 +325,6 @@ void Sound::CopyTrackTypeTable(const void* src)
     memcpy(arr_214 + 1, src, trackCount);
 }
 
-// ReleaseDirectSound (0x4ceee0) calls this out of line; in one file /Ob2
-// would inline it into its caller.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ce410
 void Sound::CloseCdAudio()
@@ -403,8 +380,6 @@ void __stdcall OnNextTrackTimer(void*)
     g_cdPlayer->PlayNextTrack();
 }
 
-// Timer callback: steps the level by the object's step; once it reaches zero
-// the timer is killed and either a new one is started or PlayNextTrack runs.
 // FUNCTION: 0x4ce5e0
 void __stdcall OnCdFadeTimer(void*)
 {
@@ -492,9 +467,6 @@ int Sound::GetCurrentTrack()
     return currentTrack;
 }
 
-// Returns 1 when MCI reports the CD audio device as "playing". A method of
-// the object at g_game+0x10 (its one caller, 0x497f40, loads ecx from
-// there) that never uses `this`.
 // FUNCTION: 0x4ce800
 int Sound::IsCdPlaying()
 {
@@ -571,7 +543,6 @@ int Sound::PlayCdTrack(int index, int flag)
     return host_music_play_tracks(index, index < trackCount ? index + 1 : 0);
 }
 
-// Stops CD audio playback; returns 1 when the MCI command succeeded.
 // FUNCTION: 0x4ced40
 int Sound::StopCdAudio()
 {

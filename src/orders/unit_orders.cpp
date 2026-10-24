@@ -1,27 +1,6 @@
-// Decompiled by Claude Opus 5.5, GPT-6, GPT-6 Astra, GPT-6.1-sol, Opus, Sonnet,
-// Claude Sonnet 5.5, claude-sonnet-5-5, space-bunny-free, DeepSeek V4.1 Flash,
-// deepseek-v4.1-flash, deepseek-v4.1 and Haiku. Names are provisional.
-// The ground order handlers the table at 0x4fc490 names, from Stop (0x401c20)
-// to the std::vector<Unit*> destroy member at 0x406c00: the unit's order state
-// machine, the mobile builders, capture, reclaim, resurrect, repair, standby,
-// park, follow, transport and teleport handlers, with the order tables'
-// registrations at the end. The unit's order object (Order) carries the state
-// machine, the target and the position; the unit (Unit) and its type (UnitDef)
-// carry the fields the handlers read and write.
-// The handlers 0x403a20, 0x404ad0, 0x404db0, 0x405980, 0x406300 and 0x406aa0
-// stay in files of their own: their register allocation follows symbol ids and
-// views this file's context cannot give them. 0x401e00 and 0x403f70 are
-// defined after the other handlers, ahead of the order tables. The
-// vector members 0x406c10, 0x406c40 and 0x406c70 stay in theirs: the inline
-// _Construct below makes the repair patrol call 0x406c70, which would then
-// also change their own bytes, and 0x406c70 itself would be inlined into the
-// patrol.
-
 struct Unit;
 
 void __stdcall CopyDwordIfNonNull(Unit** dest, Unit* const* src);
-// The repair patrol's push_back inlines vector::insert, whose _Construct this
-// overload replaces; it must be declared before <vector>.
 namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
 }
@@ -31,8 +10,6 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest,
 #include "../state/block.h"
 #include "../util/vec3.h"
 
-// The whole part (high 16 bits) of a 16.16 coordinate: the fractional half the
-// file's own Vec3 carried before the shared one.
 static inline short Whole(const int& v) { return ((short*)&v)[1]; }
 
 static inline Vec3 Vec3Add(const Vec3& a, const Vec3& b) {
@@ -49,8 +26,6 @@ struct UnitDef;
 
 #include "../units/cob_script.h"
 
-// Unused here: this header and these forward declarations take the symbol ids that keep
-// BuildWeaponOrder (0x402b70) and the order handlers after it matching (docs/c2-regalloc.md).
 #include "../sound/sound.h"
 struct FrameTable;
 struct Chunk;
@@ -69,7 +44,6 @@ class SquadScoutTimer;
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
 
-// Keeps its own view: the declarations of player.h move the symbol ids that 0x402b70, 0x404730 and 0x405d90 match at.
 #include "../network/player.h"
 
 #include "../weapons/weapon_def.h"
@@ -85,17 +59,14 @@ struct CloakDefView {
 struct Sub_403010 {
     char unknown_0[0x245];
     unsigned int unused_bits : 2;
-    unsigned int flag : 1;             // +0x245, bit 2
+    unsigned int flag : 1;
     unsigned int unused_bits2 : 29;
 };
 
 #include "../util/angles.h"
-// This header's symbol ids replace those of the Weapon view and of the
-// declarations dropped above and below (docs/c2-regalloc.md).
 #include "../weapons/unit_weapon_slot.h"
 
 #include "order.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
 void __stdcall ReactToAttack(Unit*, Unit*, int);
 void __stdcall ScaleUnitWeights(int, unsigned int*, float, int);
@@ -113,7 +84,6 @@ inline int Unit::Ready() { return (flags & 0x10000000) && !(flags & 0x4000); }
 #pragma pack(pop)
 
 inline int Order::Advance(int distance) {
-    // The cast stays: without it BuildWeaponOrder (0x402b70) compiles to different code.
     ((Order*)this)->AttachApproachRadiusGoal(&target->pos, distance);
     step++;
     return 1;
@@ -139,8 +109,6 @@ void __stdcall MarkSelectionOrdersDirty(Unit* unit);
 void __stdcall EnsurePatrolReturnOrder(Unit* unit, Order* order);
 int __stdcall IssueAttackOrder(Unit* unit, Order* order, int param);
 
-// Unused here: the symbol ids these declarations take keep the allocation of
-// BuildWeaponOrder (0x402b70) and the handlers after it (docs/c2-regalloc.md).
 void EnableAICommands();
 void RegisterAICommands();
 void FUN_00406f40();
@@ -172,8 +140,6 @@ void CreateGameObject();
 void InitMissionStatus();
 void SetUpEndMissionScreen();
 
-// Handler of the "Stopping" entry in the order table at 0x4fc490: stops the
-// unit and, for a VTOL that is flying, queues a VTOL_LANDIFCAN order.
 // FUNCTION: 0x401c20
 int __stdcall StopOrder(Unit* unit, Order* order, int unused)
 {
@@ -187,8 +153,6 @@ int __stdcall StopOrder(Unit* unit, Order* order, int unused)
     return 5;
 }
 
-// An order handler from the same table as 0x401c20: updates two unit flag
-// bits and returns 5, like its neighbour.
 // FUNCTION: 0x401cc0
 int __stdcall MakeSelectableOrder(Unit* unit, Order* order, int unused)
 {
@@ -218,8 +182,6 @@ int __stdcall WaitOrder(Unit* unit, Order* order, int flags)
     }
 }
 
-// 0x401e00 is defined after the other handlers (its place would move the
-// symbol ids of the ones after it); this declaration keeps their ids.
 struct PadE_00401e00_0 { int field; };
 
 // FUNCTION: 0x401fd0
@@ -292,9 +254,6 @@ int __stdcall AttackNoMoveOrder(Unit* unit, Order* order, int flags)
     }
 }
 
-// Order handler: follows the order's target unit, waits a random number of
-// ticks near it and, when interrupted, picks a random unit around the
-// remembered position (GetVisibleEnemiesInRadius fills a vector) as the new target.
 // FUNCTION: 0x4021f0
 int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
 {
@@ -352,13 +311,8 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
     return 0;
 }
 
-// 0x402430 stays defined before 0x402640: the constant pool order follows it.
-// Keep a header include: without one the register choices change.
 #include <stdio.h>
 
-// Order handler "Repairing": the order's target unit (the builder) repairs
-// `unit`, spending its worker time and drawing nano particles from its nano
-// piece to the unit's bounding box.
 // FUNCTION: 0x402430
 int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
 {
@@ -403,8 +357,6 @@ int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
     }
 }
 
-// World position (16.16 fixed point) to the map cell of the top-left corner
-// of a footprint centred there.
 static inline Point16 GridCell(Vec3 pos, Point16 size)
 {
     Point16 cell;
@@ -413,21 +365,15 @@ static inline Point16 GridCell(Vec3 pos, Point16 size)
     return cell;
 }
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void StartScreenFade();
 void StepScreenFade();
 
-// Order handler "Nanolathing" of a mobile builder: places the unit to build
-// at the script's build piece, then spends worker time on it. When the order
-// is cancelled, the metal already spent is refunded (only half or 70% of it
-// for AI players on some difficulty settings).
 // FUNCTION: 0x402640
 int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 2) {
         if (order->target != 0) {
             float refund = (unsigned int)((1.0f - order->target->buildLeft) * order->target->def->metalCost);
-            // The (double) casts on the full refund stay: they keep refund off the FP stack.
             if (unit->resourceSlot.player->active && unit->resourceSlot.player->type == 2) {
                 switch (g_game->difficulty) {
                 case 1:
@@ -532,16 +478,9 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// Order handler "Nanolathing" of a building that stockpiles weapons (the
-// "BuildingBuild" entry of the order table at 0x4fc490): builds `count`
-// rounds for weapon `weapon`, 5 ticks of build time per step, paying the
-// energy and metal share of each step (energy first, as RequestEnergyAndMetal takes
-// them), up to 200 stockpiled rounds.
 // FUNCTION: 0x402b70
 int __stdcall BuildWeaponOrder(Unit* unit, Order* order, int unused)
 {
-    // energyCharge's declaration stays at function scope: the frame slots of
-    // the locals below follow it.
     int energyCharge;
     WeaponDef* t = unit->weapons[order->weapon].weapon;
     switch (order->state) {
@@ -555,8 +494,6 @@ int __stdcall BuildWeaponOrder(Unit* unit, Order* order, int unused)
         order->progress = 0;
         return 1;
     case 1: {
-        // The float locals declared next, total, prev and the ints after them:
-        // fixes the fild order; total stays after the ternary.
         float fnext, ftotal, fprev;
         int prev = order->progress;
         int next = prev + 5 < t->reloadTime ? prev + 5 : t->reloadTime;
@@ -586,8 +523,6 @@ int __stdcall BuildWeaponOrder(Unit* unit, Order* order, int unused)
     }
 }
 
-// Order handler: waits for the order's time (at most 1800 ticks).
-// A char loop counter gives the separate countdown register (ebx = 3).
 // FUNCTION: 0x402d10
 int __stdcall ParalyzeOrder(Unit* unit, Order* order, int unused)
 {
@@ -607,11 +542,6 @@ int __stdcall ParalyzeOrder(Unit* unit, Order* order, int unused)
     return 1;
 }
 
-// MissionType's operator== compares the index bytes, so the loop head is
-// `cmp cl, dl` and `order` lands in ebp, `queued` in ebx. Order::Target() is
-// a trivial inline accessor: every `order->Target()->X` in the flag-merge
-// tail goes through it, and the temporary it adds shifts the rotation of the
-// scratch registers back into phase.
 // FUNCTION: 0x402da0
 int __stdcall GetBuiltOrder(Unit* unit, Order* order, unsigned int flags)
 {
@@ -671,8 +601,6 @@ int __stdcall GetBuiltOrder(Unit* unit, Order* order, unsigned int flags)
     }
 }
 
-// Order handler: state 0 calls ClaimWeapons(3) on the unit, state 1 waits
-// ten ticks.
 // FUNCTION: 0x402fc0
 int __stdcall BeCarriedOrder(Unit* unit, Order* order, int unused)
 {
@@ -736,7 +664,6 @@ int __stdcall StandingMoveOrder(Unit* unit, Order* order, int unused)
     return 5;
 }
 
-// A char loop counter gives the separate countdown register (ebx = 3).
 // FUNCTION: 0x403100
 int __stdcall StandingFireOrder(Unit* unit, Order* order, int unused)
 {
@@ -775,13 +702,9 @@ struct UnitOrderType {
 };
 #pragma pack(pop)
 
-// Registers a table with RegisterOrderTypes under a numeric id; one of several
-// small functions doing the same for different tables.
 // FUNCTION: 0x403180
 void RegisterUnitOrders()
 {
-    // The name (the definition below spells it too) is what tools/progress.py
-    // learns the table's address from.
 #ifdef __clang__
     extern const UnitOrderType g_unitOrders[23];
     RegisterOrderTypes((void*)g_unitOrders, 0x17);
@@ -791,9 +714,6 @@ void RegisterUnitOrders()
 #endif
 }
 
-// Order handler: asks GetOrderType for the next order kind (returned as a
-// MissionType by value), passes it on by value (the 0x406240 call site
-// builds the same argument in place) and returns state 2.
 // FUNCTION: 0x403190
 int __stdcall AttackSpecialOrder(Unit* unit, Order* order, int unused)
 {
@@ -802,9 +722,6 @@ int __stdcall AttackSpecialOrder(Unit* unit, Order* order, int unused)
     return 2;
 }
 
-// Order handler: state 0 (only when the unit's +0x86 is clear) resets the
-// order and calls AttachApproachRadiusGoal with its position; state 1 posts message 6
-// when bit 0x20 of the third argument is set.
 // FUNCTION: 0x4031d0
 int __stdcall MoveGroundOrder(Unit* unit, Order* order, int flags)
 {
@@ -879,7 +796,6 @@ int __stdcall PatrolOrder(Unit* unit, Order* order, int flags)
     }
 }
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 struct Pad_00400000_0 { int field; };
 struct Pad_00400000_1 { int field; };
 struct Pad_00400000_2 { int field; };
@@ -903,14 +819,13 @@ union Fixed {
     };
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 int DrawWrappedText(char*, char*, int, int, int, int, int);
 
 #include "../map/feature.h"
 
 struct FeatureSpot {
     char unknown_0[0x20];
-    Angles16 rot;                      // +0x20
+    Angles16 rot;
     char unknown_26[0x30 - 0x26];
 };
 
@@ -934,11 +849,8 @@ public:
     virtual void CollectDamagedAlly(Unit*);
 };
 
-// The original keeps part 2's 0.0f at 0x4fc920, after part 1's at 0x4fc6d0;
-// the named constant keeps the two apart (a shared literal would sit at one).
 static const float Zero_004fc920 = 0.0f;
 
-// Unused here: the symbol ids this declaration takes keeps the allocation (docs/c2-regalloc.md).
 extern char DAT_004fc6e8[];
 extern const float DAT_004fc930, DAT_004fc934, DAT_004fc938, DAT_004fc93c;
 
@@ -963,22 +875,16 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3*
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
 void __stdcall EmitTeleportParticles(Vec3* from, Vec3* to, int count, int param);
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall IsUnitCommander(Unit*);
 void __stdcall AlignUnitToGround(Unit*);
 int __stdcall FindLandingPad(Unit*, int);
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 void __stdcall DetonateUnitWeapon(Unit*, int);
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void WriteScreenshot(char*, char*, int, int, int, int);
 void DrawTextClipped(void*, char*, int, int, int, int);
 int ScanDirectory(char*, char*, char*, int, int, int);
 int CheckDirectXVersion(int, int, int, int, int);
 
-// Order handler: attack-move style state machine. The inner step switch
-// advances order->step after cases 6 and 7 in one `order->step++` after the
-// switch; cases 0 and 5 go through the inline Advance(), so MSVC merges only
-// those two (at the pushed distance) and keeps case 6 separate.
 // FUNCTION: 0x4034a0
 int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
 {
@@ -1098,8 +1004,6 @@ int __stdcall SuppressOrder(Unit* unit,Order* order,unsigned flags)
     }
 }
 
-// Unused here (0x403a20 stays in its own file): the symbol ids these helpers
-// take keep the allocation (docs/c2-regalloc.md).
 static inline UnitDef* Definitions() { return g_game->defs; }
 
 static inline Point16 WorldToCell(Vec3 v, Point16 footprint)
@@ -1116,9 +1020,6 @@ static inline void CellToWorld(Point16 footprint, Point16 c, Vec3* v)
     v->z = (footprint.y + c.y * 2) << 19;
 }
 
-// The float constants of the handlers that stay in their own files must come
-// first in this object's constant pool, as in the original translation unit
-// (the copies of 0x403a20 and 0x403f70 in 0x404270's original file).
 int __stdcall PadConstants_403a20(double x)
 {
     if (x == 8.0) return 1;
@@ -1128,7 +1029,6 @@ int __stdcall PadConstants_403a20(double x)
     return 5;
 }
 
-// Capture order handler, a state machine on order->state.
 // FUNCTION: 0x404270
 int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
 {
@@ -1219,13 +1119,11 @@ static inline int SquaredDistance(int dx, int dz)
     return (int)((x * x) >> 32) + (int)((z * z) >> 32);
 }
 
-// The same for 0x404ad0's -0.5f, which follows 0x404270's constants.
 float PadConstant_404ad0(float x)
 {
     return x * -0.5f;
 }
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void ScheduleFadeTick();
 int IsFadeDone();
 void StepPaletteFade();
@@ -1311,11 +1209,8 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     return 7;
 }
 
-// Unused here: the symbol ids this declaration takes keeps the allocation (docs/c2-regalloc.md).
 void RunEndGameState();
 
-// Order handler "Repair" of a builder: walks up to the target unit, then
-// spends worker time on it until its health is full.
 // FUNCTION: 0x405300
 int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
 {
@@ -1529,16 +1424,12 @@ int __stdcall ParkOrder(Unit* unit,Order* order,int flags)
     }
 }
 
-// Unused here (0x406300 stays in its own file): the symbol ids these helpers
-// take keep the allocation (docs/c2-regalloc.md).
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }
 
 static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
 
-// Unused here: the symbol ids this declaration takes keeps the allocation (docs/c2-regalloc.md).
 void FreeMemoryCache();
 
-// Keep cases 1 and 3 separate: MSVC merges their identical bodies.
 // FUNCTION: 0x406780
 int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
 {
@@ -1608,17 +1499,12 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// Unused here (0x406aa0 stays in its own file): the symbol ids these helpers
-// take keep the allocation (docs/c2-regalloc.md).
 static inline Vec3 Add(const Vec3& a,const Vec3& b) { Vec3 r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
 static inline Vec3 Sub(const Vec3& a,const Vec3& b) { Vec3 r; r.x=a.x-b.x; r.y=a.y-b.y; r.z=a.z-b.z; return r; }
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void InitExplosions();
 void FreeExplosions();
 
-// Registers a table with RegisterOrderTypes under a numeric id; one of several
-// small functions doing the same for different tables.
 // FUNCTION: 0x406bf0
 void RegisterGroundOrders()
 {
@@ -1631,30 +1517,15 @@ void RegisterGroundOrders()
 #endif
 }
 
-// std::vector<Unit*>::_Destroy(first, last) from MSVC 5's <vector>: empty,
-// since the element type is trivial.
-// Its callers (0x405d90, 0x40b530, 0x480250 and others) inline
-// vector::insert and call 0x406c40 (_Ufill), 0x406c10 (_Ucopy) and 0x406c00
-// (_Destroy) with ecx set to the vector. 0x40ad80 calls _Ucopy, _Ufill,
-// size (0x40c560) and insert (0x408f30) on one vector of units, and 0x48d220
-// calls _Destroy and erase (0x40c9f0), so all of these are members of the
-// same std::vector<Unit*> (see 0x40c510.cpp).
 typedef std::vector<Unit*> Vec_00406c00;
 typedef void (Vec_00406c00::*DestroyFn_00406c00)(Vec_00406c00::iterator, Vec_00406c00::iterator);
 
-// _Destroy is protected: the derived class takes its address to emit it out of line.
 struct Access_00406c00 : Vec_00406c00 {
     static DestroyFn_00406c00 fn;
 };
 
 // FUNCTION: 0x406c00 ?_Destroy@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@IAEXPAPAUUnit@@0@Z
 DestroyFn_00406c00 Access_00406c00::fn = &Access_00406c00::_Destroy;
-
-// 0x406c10 (_Ucopy), 0x406c40 (_Ufill) and 0x406c70 (_Construct) stay in their
-// own files: the inline _Construct above is what makes the repair patrol's
-// vector insert (0x405d90) call 0x406c70, and with it in this file _Ucopy and
-// _Ufill call it too instead of inlining the placement new, and 0x406c70
-// itself is inlined into insert, so all three change bytes here.
 
 // FUNCTION: 0x401e00
 int __stdcall AttackUTypeOrder(Unit* unit, Order* order, int unused)
@@ -1694,12 +1565,8 @@ int __stdcall AttackUTypeOrder(Unit* unit, Order* order, int unused)
     }
 }
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 struct Projectile;
 
-// A member operator+ on the unit's position: the nano box corners in 0x403f70
-// only compile this way, where the free Vec3Add would load the operands in
-// another order.
 struct Vec3Sum : Vec3 {
     Vec3 operator+(const Vec3& other) const {
         Vec3 r;
@@ -1710,8 +1577,6 @@ struct Vec3Sum : Vec3 {
     }
 };
 
-// The original radius expression adds the second dimension twice rather than
-// squaring it: fld x; fld y; fld st(1); fmul st(2); fadd st(1); fadd st(1).
 // FUNCTION: 0x403f70
 int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
 {
@@ -1844,7 +1709,6 @@ void __stdcall DrawBuildFootprint(void* surface, View* view, Order* order, Pos* 
 void __stdcall DrawPathAnim(void* surface, View* view, Order* order, Pos* out, int flag);
 void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order, Pos* out, int flag);
 
-// every unit's orders, registered by 0x403180.
 // GLOBAL: 0x4fc490
 extern const UnitOrderType g_unitOrders[23] = {
     {"Stopping", StopOrder, 0, 0, 0x13, 0, "Stop"},
@@ -1872,7 +1736,6 @@ extern const UnitOrderType g_unitOrders[23] = {
     {"Ready with orders", QMoveQPatrolOrder, DrawPathAnim, 2, 0x40007, 0, "QPatrol"},
 };
 
-// the orders of units that move on the ground, registered by 0x406bf0.
 // GLOBAL: 0x4fc6e8
 extern const UnitOrderType g_groundOrders[22] = {
     {"Standby", StandbyOrder, 0, 0x10, 0x200000f, 0, "Standby"},
@@ -1899,7 +1762,6 @@ extern const UnitOrderType g_groundOrders[22] = {
     {"Repairing", RepairUnitNoMoveOrder, DrawWeaponCoverage, 0x18, 0x20006, 0, "RepairUnitNoMove"},
 };
 
-// the orders of aircraft, registered by 0x415b20.
 // GLOBAL: 0x4fca18
 extern const UnitOrderType g_vtolOrders[22] = {
     {"Standby", VtolStandbyOrder, 0, 0, 0x200000f, 0, "VTOL_Standby"},
@@ -1926,7 +1788,6 @@ extern const UnitOrderType g_vtolOrders[22] = {
     {"Seeking to land", VtolLandIfCanOrder, 0, 0, 0x40013, 0, "VTOL_LandIfCan"},
 };
 
-// One order, registered on its own by 0x43bc90.
 // GLOBAL: 0x4fd288
 extern const UnitOrderType g_readyOrder[1] = {
     {"Ready", ReadyOrder, 0, 0, 0xf, 0, ""},

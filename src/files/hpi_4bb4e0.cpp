@@ -1,16 +1,13 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
 #include <malloc.h>
 #include <string.h>
 
 #include "archive_entry.h"
 
-// An archive's directory tree (hpi.cpp names the same structs).
 struct ArchiveDirectory {
-    int count;                           // +0x0
-    ArchiveEntry* entries;               // +0x4
+    int count;
+    ArchiveEntry* entries;
 };
 
-// The entry a backslash-separated path names, walking down from `list`, or 0.
 // FUNCTION: 0x4bb4e0
 ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* path)
 {
@@ -22,7 +19,6 @@ ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* path)
         sep = strchr(path, '\\');
         if (sep) {
             len = sep - path;
-            // Copy into its own buf, then into name: copying straight into name swaps registers.
             char* buf = (char*)_alloca(len + 1);
             strncpy(buf, path, len);
             buf[len] = 0;

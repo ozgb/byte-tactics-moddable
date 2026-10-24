@@ -1,19 +1,12 @@
-// Decompiled by Opus. Names are provisional.
-// Stays in its own file: merged with the module's second part, the fog arm's
-// cell address picks the other SIB base (particles.cpp).
-// The nano spark: moved by Step, drawn as one pixel by DrawParticle when the
-// local player can see it, and dropped once IsExpired.
-
 #include "../util/vec3.h"
 
-// The integer halves of the 16.16 position.
 struct Pos_004739b0 {
     char unknown_0[0x2];
-    short x;                           // +0x2
+    short x;
     char unknown_4[0x2];
-    short height;                      // +0x6
+    short height;
     char unknown_8[0x2];
-    short y;                           // +0xa
+    short y;
 };
 
 #pragma pack(push, 1)
@@ -28,9 +21,6 @@ extern Game* g_game;
 
 static inline int Identity_00473a00(int v) { return v; }
 
-// The second arm, inlined. The two player parameters are not a typo: the
-// Contains test through `p` and the width in the index through `q` are what
-// stop the index from folding into the imul.
 static inline int IsSeen_00473a00(Player* p, Player* q, int col, int row)
 {
     if (!((unsigned int)col < (unsigned int)p->exploredWidth && (unsigned int)row < (unsigned int)p->exploredHeight))
@@ -39,7 +29,6 @@ static inline int IsSeen_00473a00(Player* p, Player* q, int col, int row)
             (1 << g_game->playerIndex)) != 0;
 }
 
-// One nano spark (the element of NanoParticles' vector), 0x30 bytes.
 class NanoParticle {
 public:
     union {
@@ -49,8 +38,8 @@ public:
     char unknown_c[0xc];
     Vec3 vel;
     char unknown_24[4];
-    int flags;                         // +0x28, low 4 bits: frame; the colour
-    int endTime;                       // +0x2c, the tick it expires
+    int flags;
+    int endTime;
 
     void Step();
     void DrawParticle(int dest, short x, short y);
@@ -69,10 +58,6 @@ void NanoParticle::DrawParticle(int dest, short x, short y)
     r.right = r.left + 1;
     r.bottom = r.top + 1;
 
-    // Two locals with the same value. The original reads the map width twice
-    // per arm, once for the bounds test and once for the index, and a single
-    // local makes MSVC 5 fold one of the two away. This spelling keeps both
-    // loads and the prologue's register choice.
     Player* p = &g_game->players_1b63[g_game->playerIndex];
     Player* q = &g_game->players_1b63[g_game->playerIndex];
     int visible;

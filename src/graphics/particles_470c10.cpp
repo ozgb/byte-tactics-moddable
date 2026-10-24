@@ -1,9 +1,3 @@
-// Decompiled by space-bunny-free. Names are provisional.
-// Grows the arena ObjectPool (vtable 0x4fd580, see 0x470a90.cpp and
-// 0x470ae0.cpp) to newCapacity slots of newSlotSize bytes. The table of slot
-// pointers is reallocated with GameReallocIgnoreTag, the raw memory for the new
-// slots comes from GameAllocShared, and the base of that block is pushed on
-// the vector of blocks that the destructor frees one by one (0x470e50).
 #include <stddef.h>
 #include <vector>
 
@@ -13,17 +7,17 @@ void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 
 struct Elem_00470f00 {
-    void* p;                            // +0x0, the base of one memory block
+    void* p;
 };
 
 class ObjectPool {
 public:
-    int vtable;                                // +0x0, the vtable pointer
+    int vtable;
     std::vector<Elem_00470f00> items;
-    Elem_00470f00** slots;                     // +0x14, the slot table
-    int slotSize;                              // +0x18, the slot size
-    int capacity;                              // +0x1c, the slot count
-    int used;                                  // +0x20, slots handed out
+    Elem_00470f00** slots;
+    int slotSize;
+    int capacity;
+    int used;
 
     int Grow(int newCapacity, int newSlotSize);
 };

@@ -1,6 +1,3 @@
-// OrderFx: the base of the objects an order carries (vtable 0x4fd2f8, 0x8
-// bytes: the vpointer and, at +0x4, the order the object was built for). Its
-// subclasses are the approach areas, the path orders and the air maneuver.
 #ifndef ORDER_FX_H
 #define ORDER_FX_H
 
@@ -29,18 +26,18 @@ public:
 
     OrderFx(int arg1, int arg2, int arg3);
 
-    virtual ~OrderFx();                                                     // slot 0
-    virtual int SerializeToSave(Order* order, HapiBank* file, char* name);  // slot 1
-    virtual int GetType();                                                  // slot 2
-    virtual int IsFxStyle();                                                // slot 3
-    virtual int ContainsUnit(Unit* unit);                                   // slot 4
-    virtual int ContainsCell(int x, int y);                                 // slot 5
-    virtual void FillGoalCells(void* cells);                                // slot 6
-    virtual int ApproxDist(int x, int y);                                   // slot 7
-    virtual int FillWorldPos(Vec3* out);                                    // slot 8
-    virtual int GetDesiredHeading(unsigned short* out);                     // slot 9
-    virtual void SerializeToBits(BitWriter* stream);                        // slot 10
-    virtual int KeepAfterComplete();                                        // slot 11
+    virtual ~OrderFx();
+    virtual int SerializeToSave(Order* order, HapiBank* file, char* name);
+    virtual int GetType();
+    virtual int IsFxStyle();
+    virtual int ContainsUnit(Unit* unit);
+    virtual int ContainsCell(int x, int y);
+    virtual void FillGoalCells(void* cells);
+    virtual int ApproxDist(int x, int y);
+    virtual int FillWorldPos(Vec3* out);
+    virtual int GetDesiredHeading(unsigned short* out);
+    virtual void SerializeToBits(BitWriter* stream);
+    virtual int KeepAfterComplete();
 
     void AddFlags(int flags);
     void* Destroy(unsigned char flag);

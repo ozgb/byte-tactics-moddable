@@ -1,5 +1,3 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// Stays in its own file: in unit_orders.cpp the feature pointer is added up in the other operand order and lstrcpynA is called directly instead of through the import.
 #include "win_types.h"
 #include <string.h>
 
@@ -21,14 +19,14 @@ struct Unit;
 
 struct FeatureSpot {
     char unknown_0[0x20];
-    Angles16 rot;                         // +0x20
+    Angles16 rot;
     char unknown_26[0x30 - 0x26];
 };
 
 struct Cell {
     char unknown_0[8];
-    unsigned short feature;            // +0x8
-    unsigned short spot;               // +0xa
+    unsigned short feature;
+    unsigned short spot;
     char unknown_c;
 };
 
@@ -65,15 +63,11 @@ void __stdcall MarkSelectionOrdersDirty(Unit* unit);
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, int flags);
 void __stdcall AppendOrder(Unit* owner, Order* node);
 
-// Order handler "Resurrecting": raises the unit a wreck (feature) came from.
 // FUNCTION: 0x404db0
 int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
 {
-    // Point16, not a short or int: a plain local changes how x is moved.
     Point16 cell;
     Point16 size;
-    // Set before the state test although no path reads it: the original
-    // computes it there.
     Feature* f = &g_game->features[0xffff];
     if (order->state <= 5) {
         unsigned short index = g_seams.weapons->FindFeatureAtPos(&order->pos, &cell, &size);

@@ -1,58 +1,50 @@
-// Decompiled by DeepSeek V4.1 Flash. Names are provisional.
-// Stays out of multi.cpp: its operand order needs symbol ids the module cannot give it (docs/split-modules.md).
-// Handler/teardown for the "Options" menu. When the menu closes (its current
-// gadget is -1) it frees the DESCLIST/PICLIST scratch globals (0x5129b4,
-// 0x5129b8, 0x5129c4) and unregisters the queued unit rectangles; otherwise it
-// dispatches the gadget named Load/Save/Reset/OK/Cancel.
-
-// <stdio.h>, not <windows.h>: fixes the operand order and scheduling.
 #include <stdio.h>
 
 #pragma pack(push, 1)
-struct Entry_0044c420 {                // DESCLIST / PICLIST gadget
+struct Entry_0044c420 {
     char unknown_0[0xbc];
-    short firstRow;                    // +0xbc
+    short firstRow;
     char unknown_be[0xc0 - 0xbe];
-    short count;                       // +0xc0 picture slot count
-    void* field_c2;                    // +0xc2 freed scratch
-    void* rows;                        // +0xc6 freed scratch
+    short count;
+    void* field_c2;
+    void* rows;
     char unknown_ca[0xd6 - 0xca];
-    char* flags;                       // +0xd6 per-item flags, freed
+    char* flags;
 };
 
-struct Record_005129b4 {               // 0x62-byte slider/picture record
+struct Record_005129b4 {
     char unknown_0[0x52];
-    int unitIndex;                     // +0x52 unit type index
-    int previousMax;                   // +0x56 previous value
-    int max;                           // +0x5a current value
-    int peerEnabled;                   // +0x5e
+    int unitIndex;
+    int previousMax;
+    int max;
+    int peerEnabled;
 };
 
-union Flags_0044c420 {                 // the dword at +0x245
+union Flags_0044c420 {
     unsigned int raw;
     struct {
         unsigned int low : 15;
-        unsigned int flag : 1;         // bit 15
+        unsigned int flag : 1;
         unsigned int high : 16;
     } bits;
 };
 
-struct Item_0044c420 {                 // 0x249-byte unit type instance
+struct Item_0044c420 {
     char unknown_0[0x20];
-    char name[0x225];                  // +0x20
-    Flags_0044c420 flags2;             // +0x245
+    char name[0x225];
+    Flags_0044c420 flags2;
 };
 
 struct Inner_0044c420 {
     int unknown_0;
-    void* gadgets;                     // +0x4
+    void* gadgets;
 };
 
 struct Menu_0044c420 {
     char unknown_0[0x18];
-    Inner_0044c420* inner;             // +0x18
+    Inner_0044c420* inner;
     char unknown_1c[0x60 - 0x1c];
-    int current;                       // +0x60 current gadget, -1 for none
+    int current;
 };
 
 #include "../network/unit_sync.h"
@@ -62,7 +54,7 @@ struct Menu_0044c420 {
 
 struct Struct_004c6ac0 {
     char unknown_0[0x2c];
-    unsigned char flags;               // +0x2c
+    unsigned char flags;
 };
 
 extern Game* g_game;
@@ -177,8 +169,6 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         PlaySoundByName("Previous", 0);
         n = 0;
         for (i = 1; i < g_game->unitDefCount; i++) {
-            // The original also tests the address of items[i].name (an array at
-            // +0x20, so its address can never be null); kept for byte fidelity.
             if (((Item_0044c420 *)g_game->defs.get())[i].flags2.bits.flag) {
             } else if (((Item_0044c420 *)g_game->defs.get())[i].name != 0) {
                 ((UnitSync *)g_game->sync)->SetUnitLimit(

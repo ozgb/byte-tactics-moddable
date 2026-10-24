@@ -1,4 +1,3 @@
-// Decompiled by GPT-6. Names are provisional.
 struct Unit;
 void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
 namespace std {

@@ -1,15 +1,3 @@
-// Decompiled by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, ninth pass by space-bunny-free, finished by opus. Names are provisional.
-//
-// What the function does: a visibility test for one unit. It returns 1 at once
-// What the function does: a visibility test for one unit. It returns 1 at once
-// if the unit's player pointer (player) is the map asked about, or 0 if flag 4
-// of the unit's activateFlags is set. Otherwise it builds a 16.16 position from
-// the unit's position plus the def's offsets, bails out when the position is
-// below the game-wide limit, and then asks "is this point visible" four times:
-// at p, at p + (def->modelSizeX,0,0), at p + (modelSizeX,-modelSizeY,
-// modelSizeZ), and finally at p again. The first three go through IsPointVisible unless the player's map
-// flags say to use the explored byte map instead; the fourth inlines the shared
-// visibility bit mask.
 #include "../../interfaces/ref.h"
 #pragma pack(push, 1)
 struct MapSize_00465ac0 {
@@ -24,20 +12,20 @@ struct ByteMap_00465ac0 {
 };
 struct Map_00465ac0 {
     char unknown_0[0x7c];
-    ByteMap_00465ac0 explored;           // +0x7c
+    ByteMap_00465ac0 explored;
 };
 #include "game.h"
 #include "../units/unit_def.h"
 #include "../units/unit.h"
-struct Position_00465ac0 {              // 16.16 fixed point; only high words read
+struct Position_00465ac0 {
     short xFrac;
-    short x;                            // +0x2
+    short x;
     short yFrac;
-    short y;                            // +0x6
+    short y;
     short zFrac;
-    short z;                            // +0xa
+    short z;
 };
-struct Pos_00465ac0 {                   // 16.16 fixed point
+struct Pos_00465ac0 {
     int x, y, z;
 };
 #pragma pack(pop)
@@ -46,7 +34,6 @@ extern Game* g_game;
 
 #include "../../interfaces/seams.h"
 
-// the player's explored byte map, inlined where the game map flags ask for it
 static inline int IsExplored(Map_00465ac0* map, Position_00465ac0* pos)
 {
     int tx = pos->x >> 5;
@@ -67,8 +54,6 @@ static inline int IsSeen(Map_00465ac0* map, Position_00465ac0* pos)
             (1 << g_game->playerIndex)) != 0;
 }
 
-// Plain index here, Get method in IsExplored: one helper for tests 1 to 3
-// does not match.
 static inline int IsExplored2(Map_00465ac0* map, Position_00465ac0* pos)
 {
     int tx = pos->x >> 5;
@@ -79,7 +64,6 @@ static inline int IsExplored2(Map_00465ac0* map, Position_00465ac0* pos)
     }
     return 0;
 }
-// IsVisible and IsVisible2 stay single ternaries, not an if with two returns.
 static inline int IsVisible(Map_00465ac0* map, Position_00465ac0* pos)
 {
     return (g_game->mapFlags & 2) == 2 ? IsExplored(map, pos) : g_seams.ai->IsPointVisible((Player*)map, (Vec3*)pos);
@@ -88,7 +72,6 @@ static inline int IsVisible2(Map_00465ac0* map, Position_00465ac0* pos)
 {
     return (g_game->mapFlags & 2) == 2 ? IsExplored2(map, pos) : g_seams.ai->IsPointVisible((Player*)map, (Vec3*)pos);
 }
-// Branchy shape stays: lets nothing range-track the value.
 static inline int IsExplored3(Map_00465ac0* map, Position_00465ac0* pos)
 {
     int tx = pos->x >> 5;
@@ -101,8 +84,6 @@ static inline int IsExplored3(Map_00465ac0* map, Position_00465ac0* pos)
     return 0;
 }
 
-
-// Stays an if: gives the normalisation on all four exits.
 static inline int IsVisible3(Map_00465ac0* map, Position_00465ac0* pos)
 {
     if ((g_game->mapFlags & 2) == 2)

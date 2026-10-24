@@ -1,11 +1,3 @@
-// Decompiled by Opus, Sonnet, space-bunny-free, deepseek-v4.1-flash, GPT-6.1-sol, deepseek-v4.1, Haiku and Claude Sonnet 5.5. Names are provisional.
-// The SQSH compression module: the LZSS sliding window and its binary tree
-// (the classic Okumura compressor's contract, replace, find-next, delete and
-// insert operations), the compress and expand entry points with the preset
-// window they share, the SQSH chunk packer and unpacker, and the header,
-// size, checksum and encryption helpers around them (0x4d0ab0 to 0x4d1c60).
-// The module's files gathered in address order; the tree is the flat 0x1001
-// node array of the classic LZSS source, with node 0x1000 as its root.
 #include "win_types.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,7 +9,6 @@ struct Node_004d0b10;
 extern Node_004d0b10* g_squashDictTree;
 extern char* g_squashWindow;
 
-// Frees the window buffer allocated by 0x4d0a70.
 // FUNCTION: 0x4d0ab0
 int __cdecl LzssFreeWindow(void)
 {
@@ -30,7 +21,6 @@ int __cdecl LzssFreeWindow(void)
     return 0;
 }
 
-// Frees the tree allocated by 0x4d0a70.
 // FUNCTION: 0x4d0ae0
 int LzssFreeTree()
 {
@@ -43,15 +33,12 @@ int LzssFreeTree()
     return 0;
 }
 
-// The LZSS binary-tree node; the array holds 0x1000 nodes and the root.
 struct Node_004d0b10 {
-    unsigned short parent;           // +0x0
-    unsigned short smaller;          // +0x2
-    unsigned short larger;           // +0x4
+    unsigned short parent;
+    unsigned short smaller;
+    unsigned short larger;
 };
 
-// Looks like ContractNode() from the classic LZSS binary-tree compressor:
-// the node's only child takes its place under the node's parent.
 // FUNCTION: 0x4d0b10
 void __stdcall LzssContractNode(int oldNode, int newNode)
 {
@@ -63,14 +50,8 @@ void __stdcall LzssContractNode(int oldNode, int newNode)
     g_squashDictTree[oldNode].parent = 0;
 }
 
-// The original calls these four out of line from LzssCompress; in one file
-// /Ob2 would inline them, so the pragmas hold it back.
 #pragma auto_inline(off)
 
-// Looks like ReplaceNode() from the classic LZSS binary-tree compressor:
-// newNode takes oldNode's place in the tree, and oldNode is unlinked.
-// Keep the headers above: without any header MSVC swaps base and index in the
-// two child loads.
 // FUNCTION: 0x4d0b80
 void __stdcall LzssReplaceNode(int oldNode, int newNode)
 {
@@ -85,9 +66,6 @@ void __stdcall LzssReplaceNode(int oldNode, int newNode)
     g_squashDictTree[oldNode].parent = 0;
 }
 
-// Follows the chain from entry index's smaller child to the last record.
-// The caller at 0x4d12eb uses the result (mov edi, eax); without the return
-// value MSVC is free to keep the index out of eax.
 // FUNCTION: 0x4d0c10
 int __stdcall LzssFindNextNode(int index)
 {
@@ -98,13 +76,6 @@ int __stdcall LzssFindNextNode(int index)
     return cur;
 }
 
-// DeleteNode() of the classic LZSS binary-tree window: unlinks node t from
-// the tree, promoting its only child, or its in-order successor when it has
-// two children. The node fields are those of 0x4d0b80 (parent, smaller,
-// larger).
-
-// Keep <stdio.h> and <stdlib.h>, and read the parent from the array on each
-// use (no local): the register allocation depends on both.
 void __stdcall LzssDeleteString(int t);
 
 // FUNCTION: 0x4d0c50
@@ -151,12 +122,6 @@ void __stdcall LzssDeleteString(int t)
     g_squashDictTree[t].parent = 0;
 }
 
-// LZSS tree walk (the same node layout as 0x4d0b80 and 0x4d0c50): walks the
-// 6 byte node array of g_squashDictTree (parent, smaller, larger) from the root
-// node at 0x1000, comparing 17 window bytes at cur + n against pos + n and
-// keeping the longest run, then inserts or replaces a node. The window is the
-// 0x1011 byte buffer g_squashWindow and every index is masked with 0xfff.
-// Keep <stdio.h> (or <windows.h>): it decides the tree addressing modes.
 // FUNCTION: 0x4d0de0
 int __stdcall LzssAddString(int pos, int* out)
 {
@@ -167,7 +132,6 @@ int __stdcall LzssAddString(int pos, int* out)
     for (;;) {
         int n, j, diff;
         for (n = 0, j = pos; n < 0x11; n++, j++) {
-            // Index is (cur + n), not (cur - pos) + j: it fixes the registers.
             diff = g_squashWindow[j & 0xfff] - g_squashWindow[(cur + n) & 0xfff];
             if (diff != 0)
                 break;
@@ -206,11 +170,6 @@ int __stdcall LzssAddString(int pos, int* out)
 
 #pragma auto_inline(on)
 
-// <io.h> and <malloc.h> are here only for their declaration count: without
-// them the operand order of 0x4d0f60's bit pack and 0x4d1480's flag test
-// flips. <process.h> <time.h>, <io.h> <time.h>, <mbstring.h> <time.h>,
-// <process.h> <malloc.h>, <process.h> <float.h> and <io.h> <direct.h> also
-// land in the window.
 #include <io.h>
 #include <malloc.h>
 
@@ -288,7 +247,6 @@ int __stdcall LzssCompress(unsigned char *dest, unsigned char *src, int len) {
     }
     {
         int n0 = 0;
-        // Plain while with the src check inside: a do-while gets rotated.
         while (n0 < 0x11) {
             if (src >= end)
                 break;
@@ -303,7 +261,6 @@ int __stdcall LzssCompress(unsigned char *dest, unsigned char *src, int len) {
     flags = 0;
     while (state.count > 0) {
         int j;
-        // n is assigned inside each branch below, not before the if.
         int n;
         if (state.cur > state.count)
             state.cur = state.count;
@@ -395,21 +352,6 @@ int __stdcall LzssCompress(unsigned char *dest, unsigned char *src, int len) {
     return written;
 }
 
-// LZ decompressor. It first takes the window lock: a spinlock on g_squashThreadLockTicket
-// holding the owning thread id, with g_lzssLockOwner naming the owner and
-// g_squashThreadLockEvent the event that releases the waiters. Then it allocates the
-// 0x1011 byte sliding window, and reloads it from the template at g_lzssPresetWindow
-// when the template was set up (g_lzssPresetReady) and the caller switched it on
-// (g_lzssUsePreset, set around each call by the net condenser through
-// LzssEnablePreset / LzssDisablePreset). The bit stream that follows is read
-// through a mask that counts 1, 2, 4 ... 0x80 and then reloads a fresh flag
-// byte: a clear bit is a literal byte, a set bit is a 16 bit word whose high
-// 12 bits are the distance back into the window and whose low four bits are
-// the length minus two, and a distance of zero ends the stream. Every output
-// byte also goes into the window at the current position, which starts at 1
-// and wraps at 0xfff. The window is freed at the end, the lock released if
-// this thread took it, and the number of bytes written returned.
-// Unused but kept: the declaration count sets the loop test's operand order.
 // FUNCTION: 0x4d1480
 int __stdcall LzssExpand(unsigned char* dest, unsigned char* src)
 {
@@ -491,10 +433,6 @@ int __stdcall LzssExpand(unsigned char* dest, unsigned char* src)
     return n;
 }
 
-// LZSS compressor start-up: allocate the window and tree, seed the root and one
-// node, copy the first len bytes into the window, insert each of them in the
-// tree, then publish the state in the static buffers. Sibling of the already
-// matched 0x4d0a10 (same root/node store order) and 0x4d0de0 (InsertNode).
 // FUNCTION: 0x4d1670
 int __stdcall LzssSetPreset(unsigned char* src, int len)
 {
@@ -556,20 +494,15 @@ int LzssEnablePreset()
     return 0;
 }
 
-// BUG: `length` is uninitialized for method 0 and 3 (the switch only sets it for
-// cases 1 and 2), yet `total = length + 0x13` uses it, so a valid method < 4 can
-// compute a bogus compressed size from stack garbage.
-// Builds a "SQSH" compressed chunk: header, then the (optionally
-// compressed and encrypted) data.
 #pragma pack(push, 1)
 struct Chunk_4d1820 {
-    int marker;                      // +0x00 "SQSH"
-    unsigned char version;           // +0x04
-    unsigned char method;            // +0x05
-    unsigned char encrypt;           // +0x06
-    int compressedSize;              // +0x07
-    int size;                        // +0x0b
-    int checksum;                    // +0x0f
+    int marker;
+    unsigned char version;
+    unsigned char method;
+    unsigned char encrypt;
+    int compressedSize;
+    int size;
+    int checksum;
 };
 #pragma pack(pop)
 
@@ -594,7 +527,6 @@ int __stdcall SquashPack(Chunk_4d1820* chunk, int* chunkSize, char* data, int si
     if (method >= 4) {
         return 4;
     }
-    // Left uninitialised: the original has no zeroing store here.
     int length;
     switch (method) {
     case 1:
@@ -605,13 +537,11 @@ int __stdcall SquashPack(Chunk_4d1820* chunk, int* chunkSize, char* data, int si
         _compress(out, &length, data, size);
         break;
     }
-    // total unsigned, test spelled (length + 0x13): sets the XOR operand order.
     unsigned int total = length + 0x13;
     if ((length + 0x13) > *chunkSize) {
         return 5;
     }
     if (encrypt) {
-        // Helper call, index copies and do-while wrappers all stay: XOR operand order.
         do {
             do {
                 for (unsigned int i = 0; i < length; i++) {
@@ -639,7 +569,6 @@ int __stdcall SquashPack(Chunk_4d1820* chunk, int* chunkSize, char* data, int si
     return 0;
 }
 
-// Unpacks a "SQSH" chunk (see SquashPack for the packer).
 int __stdcall LzssExpand(unsigned char* dest, unsigned char* src);
 int __stdcall _uncompress(unsigned char* dest, unsigned long* destLen, unsigned char* source, unsigned long sourceLen);
 
@@ -647,7 +576,6 @@ int __stdcall _uncompress(unsigned char* dest, unsigned long* destLen, unsigned 
 int __stdcall SquashUnpack(char* dest, char* data)
 {
     Chunk_4d1820 header;
-    // Separate from data, which is advanced past the header: keeps the address.
     Chunk_4d1820* chunk = (Chunk_4d1820*)data;
     memcpy(&header, data, 0x13);
     if (memcmp(&header, "SQSH", 4) != 0) {
@@ -676,7 +604,6 @@ int __stdcall SquashUnpack(char* dest, char* data)
         length = LzssExpand((unsigned char*)dest, (unsigned char*)data);
         break;
     case 2:
-        // Through a temporary: the `== 0 ? size : 0` form adds a jmp.
         { int t = memcmp(chunk, "SQSH", 4) ? 0 : chunk->size;
         length = t; }
         _uncompress((unsigned char*)dest, (unsigned long*)&length, (unsigned char*)data, header.compressedSize);
@@ -685,8 +612,6 @@ int __stdcall SquashUnpack(char* dest, char* data)
     return (header.size - length) ? 3 : 0;
 }
 
-// Scales a value by 120% (mode 1) or 110% (mode 2) and adds 119; any other
-// mode gives 0.
 // FUNCTION: 0x4d1aa0
 unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode)
 {
@@ -704,8 +629,6 @@ unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode)
     return result;
 }
 
-// Checks a "SQSH" header: 1 if the magic is wrong, otherwise the byte at +5
-// clamped to at most 4.
 // FUNCTION: 0x4d1b00
 int __stdcall SquashGetPackType(unsigned char* header)
 {
@@ -718,8 +641,6 @@ int __stdcall SquashGetPackType(unsigned char* header)
     return header[5];
 }
 
-// Returns the dword at +0xb of a "SQSH" header (see SquashGetPackType), or 0 when
-// the magic is wrong.
 // FUNCTION: 0x4d1b40
 int __stdcall SquashUnpackedSize(unsigned char* header)
 {

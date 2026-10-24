@@ -1,6 +1,3 @@
-// Decompiled by Space Bunny Free, space-bunny-free, deepseek-v4.1-flash, Claude Sonnet 5.5, GPT-6.1-sol, Haiku, Opus, Sonnet, DeepSeek V4.1 Flash and deepseek-v4.1. Names are provisional.
-// Sound start-up and shutdown, the sound-name tables and the queue of unit speech.
-
 #include "win_types.h"
 #include <stddef.h>
 #include <string.h>
@@ -25,7 +22,6 @@ public:
     void StopAllBuffers();
     void OpenCdAudio();
     void RestoreMixerVolumes();
-    // Unused here: the symbol ids this declaration takes keep PlaySoundAt's allocation (docs/c2-regalloc.md).
     void SetMaxBuffers(int count);
 };
 
@@ -36,17 +32,17 @@ struct SoundParams_0047ed40 {
 
 union Pos_0047f300 {
     struct {
-        short xFrac;                   // +0x0
-        short x;                       // +0x2
-        short yFrac;                   // +0x4
-        short y;                       // +0x6
-        short zFrac;                   // +0x8
-        short z;                       // +0xa
+        short xFrac;
+        short x;
+        short yFrac;
+        short y;
+        short zFrac;
+        short z;
     };
     struct {
-        int xVal;                      // +0x0
-        int yVal;                      // +0x4
-        int zVal;                      // +0x8
+        int xVal;
+        int yVal;
+        int zVal;
     };
 };
 
@@ -56,57 +52,55 @@ struct Vector3_0047f300 {
 
 #pragma pack(push, 1)
 struct Packet_0047f0c0 {
-    unsigned char type;                // +0x0
-    unsigned char flag;                // +0x1
-    int index;                         // +0x2
-    int unknown_6[3];                  // +0x6
+    unsigned char type;
+    unsigned char flag;
+    int index;
+    int unknown_6[3];
 };
 
 struct Packet_0047f300 {
-    unsigned char type;                // +0x0
-    unsigned char flag;                // +0x1
-    int index;                         // +0x2
-    Pos_0047f300 pos;                  // +0x6
+    unsigned char type;
+    unsigned char flag;
+    int index;
+    Pos_0047f300 pos;
 };
 
-// The unit type at a unit's +0x92.
 #include "../units/unit_def.h"
 
 #include "../units/unit.h"
 
 struct Slot_0047fd70 {
-    int count;                         // +0x0
-    char* table1;                      // +0x4
-    char* table2;                      // +0x8
+    int count;
+    char* table1;
+    char* table2;
 };
 
 struct SoundCat_0047fd70 {
     char unknown_0[0x40];
-    Slot_0047fd70 slots[24];           // +0x40
+    Slot_0047fd70 slots[24];
 };
 
 #include "../network/player.h"
 
 #include "../game/game.h"
 
-// One queued speech (0x11 bytes).
 struct SpeechEntry {
-    int kind;                          // +0x0
-    int frame;                         // +0x4, when it was queued
-    Unit* unit;                        // +0x8
-    char* data;                        // +0xc
-    unsigned char priority;            // +0x10
+    int kind;
+    int frame;
+    Unit* unit;
+    char* data;
+    unsigned char priority;
 };
 
 void __cdecl GameFreeThunk(void* data);
 
 class SpeechQueue {
 public:
-    SpeechEntry entries[9];            // +0x00
-    int count;                         // +0x99
-    unsigned int lastFrame;            // +0x9d, when the last speech played
-    unsigned int interval;             // +0xa1
-    int field_a5;                      // +0xa5
+    SpeechEntry entries[9];
+    int count;
+    unsigned int lastFrame;
+    unsigned int interval;
+    int field_a5;
 
     void Remove(int i)
     {
@@ -129,13 +123,12 @@ public:
     void RemoveSpeechOfId(Unit* unit);
 };
 
-// One of the 24 sound messages: priority, repeat delay, text and the frame it is next allowed.
 struct Message_0047fad0 {
-    int priority;                      // +0x0
-    int cooldown;                      // +0x4
+    int priority;
+    int cooldown;
     int unknown_8;
-    char* text;                        // +0xc
-    unsigned int minFrame;             // +0x10
+    char* text;
+    unsigned int minFrame;
     int unknown_14;
 };
 #pragma pack(pop)
@@ -143,14 +136,14 @@ struct Message_0047fad0 {
 extern Game* g_game;
 extern SpeechQueue* g_speechQueue;
 extern Message_0047fad0 g_speechTypes[24];
-extern int g_noDirectSound;            // NoDirectSound
-extern int g_useWindowsSound;          // UseWindowsSound
+extern int g_noDirectSound;
+extern int g_useWindowsSound;
 extern int g_playLooping;
 extern int g_cmdSingEnabled;
 
-extern char g_noDirectSoundKey[]; // "NoDirectSound"
-extern char g_useWindowsSoundKey[]; // "UseWindowsSound"
-extern char g_soundInitError[]; // "Error:  Sound system initialization failed."
+extern char g_noDirectSoundKey[];
+extern char g_useWindowsSoundKey[];
+extern char g_soundInitError[];
 
 unsigned int __stdcall GetPreferenceInt(char* key, int defaultValue);
 int IsWindowsSoundAvailable(void);
@@ -173,7 +166,6 @@ Cell* __stdcall GetMapCell(int x, int y);
 char* __stdcall Translate(char* text);
 int __stdcall IsUnitVisible(Unit* unit);
 
-// Defined ahead of InitSound so that its allocation inlines the constructor.
 // FUNCTION: 0x47f960
 SpeechQueue::SpeechQueue(int param_1, int param_2)
 {
@@ -183,9 +175,6 @@ SpeechQueue::SpeechQueue(int param_1, int param_2)
     field_a5 = param_2;
 }
 
-// The direct sound buffer's result goes into a local: comparing the call
-// directly with 0 gives `test eax, eax`, the original compares with the
-// zero register instead.
 // FUNCTION: 0x47ed40
 void InitSound(void)
 {
@@ -219,24 +208,18 @@ void ResetSpeech()
         int* count = &list->count;
         do {
             int i = *count - 1;
-            // Entries reached through list->entries, no separate entries local.
             SpeechEntry* last = &list->entries[i];
             if (last->data) {
                 GameFreeThunk(last->data);
                 last->data = 0;
             }
             for (int j = i; j < *count; j++) {
-                // Re-taken at the top of the body: this is what stops MSVC 5
-                // folding &list->count into [ebp+0x99], and because the
-                // assignment is loop invariant the lea is hoisted into the
-                // shift loop's preheader, which is where the original has it.
                 count = &list->count;
                 list->entries[j] = list->entries[j + 1];
             }
             (*count)--;
         } while (*count > 0);
     }
-    // Must go through list, not the global.
     list->lastFrame = 0;
     for (int k = 0; k < 24; k++)
         g_speechTypes[k].minFrame = 0;
@@ -257,10 +240,6 @@ void ShutdownSound()
                     last->data = 0;
                 }
                 for (int j = i; j < *count; j++) {
-                    // Re-taken at the top of the body: this is what stops MSVC 5
-                    // folding &list->count into [ebp+0x99]. The assignment is
-                    // loop invariant, so the lea is hoisted into the shift loop's
-                    // preheader, which is exactly where the original has it.
                     count = &list->count;
                     list->entries[j] = list->entries[j + 1];
                 }
@@ -293,7 +272,6 @@ void SetUseWindowsSound()
     g_noDirectSound = 1;
 }
 
-// Loads sounds/<name>.WAV, either as a plain file or through the sound system.
 // FUNCTION: 0x47efe0
 void* __stdcall LoadSoundFile(const char* name)
 {
@@ -308,8 +286,6 @@ void* __stdcall LoadSoundFile(const char* name)
     return ((Sound *)g_game->field_10)->LoadSample(path);
 }
 
-// Releases a set of sound buffers: frees the set directly when
-// g_useWindowsSound is set, otherwise through the sound object's ReleaseSampleSet.
 // FUNCTION: 0x47f060
 void __stdcall FreeSoundSet(void** set)
 {
@@ -328,9 +304,6 @@ void __stdcall StreamSoundDelayed(char* param_1, int param_2, int param_3)
     }
 }
 
-// Plays the sound of a unit-type index (0xffff means "none"): directly through
-// the sound object, or, in a network game, by sending the 0x13 message to the
-// other players first.
 // FUNCTION: 0x47f0c0
 int __stdcall PlaySoundByIndex(int index, int param_2)
 {
@@ -358,8 +331,6 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
     return 0;
 }
 
-// Index of a sound in the game's 32-byte sound name table, case-insensitive;
-// 0xffff when not found.
 static inline int FindSound(char* name)
 {
     for (int i = 0; i < g_game->soundCount; i++) {
@@ -369,14 +340,12 @@ static inline int FindSound(char* name)
     return 0xffff;
 }
 
-// Looks up a sound by name and passes its index to PlaySoundByIndex.
 // FUNCTION: 0x47f1a0
 void __stdcall PlaySoundByName(char* name, int param_2)
 {
     PlaySoundByIndex(FindSound(name), param_2);
 }
 
-// The same with g_playLooping set for the duration of the call.
 // FUNCTION: 0x47f210
 void __stdcall PlayLoopingSoundByName(char* name, int param_2)
 {
@@ -385,8 +354,6 @@ void __stdcall PlayLoopingSoundByName(char* name, int param_2)
     g_playLooping = 0;
 }
 
-// Plays a sound by name: through PlayWavFromDisk when g_useWindowsSound is set,
-// otherwise through the game's sound object when sound is enabled.
 // FUNCTION: 0x47f290
 int __stdcall PlaySoundFile(char* name)
 {
@@ -402,11 +369,6 @@ static inline int MapContains(unsigned int w, unsigned int h, int tx, int ty)
     return tx < w && ty < h;
 }
 
-// Plays the sound at sounds[index] when the position is visible to the local
-// player: explored (fog) map when g_game->mapFlags has bit 1 set, the shared
-// per-player visibility mask otherwise. Sends the 0x13 packet first when
-// param_3 is set, and picks the near (-585) or far (-1585) variant depending on
-// whether the position is inside the screen rectangle.
 // FUNCTION: 0x47f300
 int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
 {
@@ -435,11 +397,9 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
     if (GetMapCell(pos->xVal / (1 << 20), pos->zVal / (1 << 20)) == 0)
         return 0;
 
-    // pi stays an int; the player address goes through the inline Current() to get the original's lea.
     int pi = g_game->playerIndex;
     Player* player = g_game->Current();
     Player* player2 = g_game->Current();
-    // vis stays an int (char or bool changes the 1/0 pair); the flag is compared to 2 explicitly.
     int vis;
     if ((g_game->mapFlags & 2) == 2) {
         int tx = pos->x >> 5;
@@ -464,7 +424,6 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
             p.x = pos->x - g_game->scrollX - (g_game->screenTilesX / 2) * 16;
             p.z = g_game->scrollY + (g_game->screenTilesY / 2) * 16
                 + (pos->y >> 1) - pos->z;
-            // p.z is written before p.y: the store order follows the original.
             p.y = 0;
             ((Sound *)g_game->field_10)->Set3DDistances(
                 (float)(((g_game->screenTilesX + g_game->screenTilesY) / 2) * 16),
@@ -481,21 +440,12 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
     return 0;
 }
 
-// Plays a sound by name: looks the name up and passes its index (0xffff when
-// not found) to PlaySoundAt.
 // FUNCTION: 0x47f610
 void __stdcall PlaySoundAtByName(char* name, int param_2, int param_3)
 {
     PlaySoundAt(FindSound(name), (Pos_0047f300*)param_2, param_3);
 }
 
-// Ages the sound driver held in g_speechQueue: if the list is not empty, and
-// the game frame has reached the driver's next expiry, it refreshes that
-// expiry and plays the entry's sound. Either way it then drops the head entry
-// of the nine-entry list and frees its data.
-// The count is reached through a reference and the entries through the local
-// pointer, the fields through the global: that mix is what keeps the driver's
-// value in ecx for the two calls and copies it to ebx for the rest.
 // FUNCTION: 0x47f680
 void PlayNextSpeech()
 {
@@ -542,8 +492,6 @@ void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text)
     }
 }
 
-// QueueUnitSpeech is inlined here: the text argument is loaded early because it
-// crosses the inline boundary.
 // FUNCTION: 0x47f7e0
 void __stdcall QueueUnitSpeechIfVisible(Unit* unit, int kind, char* text)
 {
@@ -560,10 +508,6 @@ void __stdcall QueueUnitSpeechIfNotVisible(Unit* unit, int kind, char* text)
     }
 }
 
-// Removes every entry whose unit field equals id from the list at g_speechQueue,
-// freeing its data and shifting the later entries down.
-// The count is used through its own pointer: accessed as list->count, MSVC
-// keeps the list pointer live instead of reusing its register for the entries.
 // FUNCTION: 0x47f8c0
 void __stdcall RemoveSpeechOfUnit(int id)
 {
@@ -601,9 +545,6 @@ void SpeechQueue::ClearSpeechEntries(void)
     lastFrame = 0;
 }
 
-// Queues a speech message for a unit: drops it if the message is not due yet or
-// already queued, makes room by playing the last entry when the list already
-// holds eight, then inserts the new entry in priority order.
 // FUNCTION: 0x47fad0
 void SpeechQueue::EnqueueSpeech(Unit* unit, int kind, char* text)
 {
@@ -650,8 +591,6 @@ void SpeechQueue::EnqueueSpeech(Unit* unit, int kind, char* text)
     count++;
 }
 
-// Pops the front entry of the list: fires the sound for entry 0 (re-arming the
-// repeat timer when it is due), frees its data, shifts the rest down.
 // FUNCTION: 0x47fca0
 void SpeechQueue::PlayNextSpeechEntry()
 {
@@ -676,18 +615,10 @@ void SpeechQueue::PlayNextSpeechEntry()
 
 int HarnessViewRand();
 
-// Handles one entry of the nine-entry sound request list: picks a random
-// sample from the entry's sound category slot, plays "sounds/<name>.WAV" when
-// the entry is due, re-arms the repeat timer, and (when logging is enabled)
-// appends "<unit name>: <sound text>" to the message log.
-//
-// The structs are packed: pointer fields sit at odd offsets in the original
-// (entry +0x8/+0xc, unit +0x92, game +0x37e13).
 // FUNCTION: 0x47fd70
 void SpeechQueue::PlaySpeech(int index, int param_2, int param_3)
 {
     SpeechEntry* e = &entries[index];
-    // The first two accesses use entries[index], not e: the entry address then forms as one lea.
     int slot = entries[index].kind;
     unsigned int catIndex = 0;
     catIndex = (unsigned short)entries[index].unit->def->soundcategory;
@@ -772,15 +703,11 @@ void SpeechQueue::RemoveSpeechOfId(Unit* unit)
 class Class_004800c0 {
 public:
     typedef std::vector<Unit*> UnitVector;
-    UnitVector units;       // allocator +0x0, _First +0x4, _Last +0x8, _End +0xc
+    UnitVector units;
 
     UnitVector::iterator EraseSwapBack(UnitVector::iterator where);
 };
 
-// Unordered erase: overwrites *where with the last element, drops the last
-// element (erase(end() - 1), whose inlined copy loop and _Destroy dead store
-// remain) and returns where, which now holds the moved element. The only
-// caller (0x40b8b2) passes a slot of this same vector.
 // FUNCTION: 0x4800c0
 Class_004800c0::UnitVector::iterator Class_004800c0::EraseSwapBack(UnitVector::iterator where)
 {
@@ -792,13 +719,11 @@ Class_004800c0::UnitVector::iterator Class_004800c0::EraseSwapBack(UnitVector::i
 
 class IntDynArray {
 public:
-    std::vector<int> items;            // +0x0 (_First +0x4, _Last +0x8)
+    std::vector<int> items;
 
     int EraseByValue(int value);
 };
 
-// Removes the first occurrence of a value from a std::vector by moving the
-// last element into its slot and erasing the last element.
 // FUNCTION: 0x480100
 int IntDynArray::EraseByValue(int value)
 {
@@ -812,10 +737,6 @@ int IntDynArray::EraseByValue(int value)
     return 1;
 }
 
-// Constructor of a class with two values, two zeroed fields and a
-// std::vector (allocator byte +0x10, _First +0x14, _Last +0x18, _End +0x1c).
-// The vector's default allocator argument is a temporary copied into the
-// allocator byte; MSVC keeps it in the first parameter's stack slot.
 // FUNCTION: 0x480160
 Squad::Squad(Player* a, int b)
     : owner(a), index(b), field_8(0), field_c(0)

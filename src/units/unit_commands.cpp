@@ -1,7 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, edited by deepseek-v4.1, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by claude-sonnet-5-5, finished by Space Bunny Free, finished by mimo-v2.6-flash, finished by Sonnet 5.5, Opus and Haiku. Names are provisional.
-// The unit commands: the initial mission string of a unit (RunInitialMission),
-// the units of a recorded game, handing a unit to another player, the unit
-// type tables and the unit category sets.
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,7 +19,7 @@ struct Vec3_00487bf0 {
 
 struct Def_00488310 {
     char unknown_0[0x1fa];
-    int f1fa;                          // +0x1fa
+    int f1fa;
 };
 
 #include "unit.h"
@@ -31,7 +27,7 @@ struct Def_00488310 {
 struct Table_00487bf0 {
     char allocator_byte;
     char pad[3];
-    Unit** ids;                        // +0x4
+    Unit** ids;
 };
 #pragma pack(pop)
 
@@ -53,7 +49,6 @@ struct Outs_t {
 void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
 {
     int count;
-    // Locals stay grouped in small structs: loose scalars get a different frame order.
     struct { float f1, f2; int n; Vec3_00487bf0 pos; int move; } L;
     Outs_t out;
     char buf[256];
@@ -76,10 +71,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
         switch (buf[0]) {
         case 'O':
         case 'o': {
-            // One of the two reads of unit->flags goes through this pointer: stops the load CSE.
             unsigned int* flags = &unit->flags;
-            // Frame 0x28 holds (flags>>18)&3, is the first %d and is read back for the combine,
-            // so nothing uninitialised is combined.
             L.move = (unit->flags >> 0x12) & 3;
             M2.fire = (int)((*flags >> 0x14) & 3);
             sscanf(buf + 1, " %d %d", &L.move, &M2.fire);
@@ -128,7 +120,6 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
             L.pos.y = 0;
             L.pos.z = (int)(L.f2 * 65536.0);
             out.p.type = g_seams.orders->GetOrderType(9, unit, 0, (Vec3*)&L.pos);
-            // The (int)(f * 30.0f) goes straight into AddOrder: no float local.
             g_seams.orders->AddOrder(out.p.type, 1, unit, 0, (Vec3*)&L.pos, (int)(M2.pf * 30.0f), 0);
             processed = 1;
             selected = 1;
@@ -148,7 +139,6 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
                 sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
                 unsigned short id = g_seams.units->FindUnitTypeId(buf);
                 if (id != 0) {
-                    // String kinds are implicit conversions in the argument, never a named temporary.
                     g_seams.orders->AddOrder("ATTACKUTYPE", 1, unit, 0, 0, id, 0);
                     processed = 1;
                 }
@@ -182,7 +172,6 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
         case 'W':
         case 'w':
             if (buf[1] == 'a' || buf[1] == 'A') {
-                // count and target are separate locals: leaves target in eax.
                 count = sscanf(buf + 2, " %[a-zA-Z0-9.]", buf);
                 int target = 0;
                 if (count == 1)
@@ -203,7 +192,6 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
         case 'D':
         case 'd':
             g_seams.orders->AddOrder("SELFDESTRUCTFG", 1, unit, 0, 0, 1, 0);
-            // After the AddOrder call, not before it.
             processed = 1;
             selected = 1;
             break;
@@ -231,10 +219,10 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
 }
 
 #pragma pack(push, 1)
-struct UnitType_00488b10 {              // 0x249 bytes
+struct UnitType_00488b10 {
     char unknown_0[0x20];
-    char name[0x21e - 0x20];            // +0x20
-    unsigned short id;                  // +0x21e
+    char name[0x21e - 0x20];
+    unsigned short id;
     char unknown_220[0x249 - 0x220];
 };
 
@@ -251,18 +239,10 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
                                       Vec3_00487bf0 pos, int a, int b, int c);
 void __stdcall FatalError(char* message);
 
-// Needed though unused: dropping it moves the f108 multiply onto the other register.
 #include <math.h>
-// Included only for its declarations, which the symbol counter of CreateMissionUnits needs.
 #include <memory.h>
 #include <vector>
 
-// std::vector<Unit*> is specialised here rather than taken from <vector>
-// because MSVC 5 inlines _Ufill's body into the real (count, value)
-// constructor, while the original calls the out-of-line copy (0x406c40) that
-// the game's own vector object holds. Everything else is the real container:
-// allocator::allocate gives the `if (_N < 0) _N = 0` clamp and operator new
-// (not new[]), and ~vector's deallocate is the operator delete at the end.
 namespace std {
 template<> class vector<Unit*, allocator<Unit*> > {
 public:
@@ -284,10 +264,10 @@ public:
         { return (*(_First + _P)); }
 
 protected:
-    A allocator;                       // +0x0
-    T* _First;                         // +0x4
-    T* _Last;                          // +0x8
-    T* _End;                           // +0xc
+    A allocator;
+    T* _First;
+    T* _Last;
+    T* _End;
     void _Ufill(T* _F, size_type _N, const T& _X);
 };
 }
@@ -317,7 +297,6 @@ void __cdecl CreateMissionUnits()
         g_seams.map->SnapWorldPosToFootprint((UnitDef*)item, (Vec3*)&e->x);
         Unit* u = g_seams.units->CreateUnit((unsigned char)(e->player - 1), item->id, *(Vec3*)&e->x, 1, 1, 0);
         if (u) {
-            // The mask is 0xffffff80, not 0x80: keeps the byte zero-extension.
             u->flags = (u->flags & ~0x8000) | ((e->flags & 0xffffff80) << 8);
             u->health = (unsigned short)((unsigned)(((Def_00488310*)u->def.get())->f1fa * e->health) / 100);
             u->angles.heading = e->angle;
@@ -333,25 +312,17 @@ void __cdecl CreateMissionUnits()
         g_seams.players->DeactivateConditions(g_game->list_391ed);
 }
 
-// Moves a unit to another player. Does nothing when the unit already belongs
-// to that player, is not live (0x10000000) or is flagged 0x4000. When the
-// current owner is a real player (state 1 or 2) and the new owner is in state
-// 3, the unit is instead handed over in place: it is marked (+0xfb = 0x96),
-// a 0x18 byte record describing it is sent to the new owner with 0x451df0 and
-// it is damaged for the full 30000 (0x489bb0). Otherwise a copy is created
-// for the new owner with 0x485f50 and filled either from the record passed in
-// or from the old unit, and the old unit's state bits are moved across.
 #pragma pack(push, 1)
-struct OwnershipTransferPacket {       // 0x18 bytes
-    unsigned char type;                // +0x0
-    short unitId;                      // +0x1
-    int newOwnerNetId;                 // +0x3
-    int buildPercent;                  // +0x7
-    int hitPoints;                     // +0xb
-    Angles16 angles;               // +0xf
-    unsigned char stockpile0;          // +0x15
-    unsigned char stockpile1;          // +0x16
-    unsigned char stockpile2;          // +0x17
+struct OwnershipTransferPacket {
+    unsigned char type;
+    short unitId;
+    int newOwnerNetId;
+    int buildPercent;
+    int hitPoints;
+    Angles16 angles;
+    unsigned char stockpile0;
+    unsigned char stockpile1;
+    unsigned char stockpile2;
 };
 #pragma pack(pop)
 
@@ -427,17 +398,8 @@ void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPack
     g_seams.units->SetStateBits(n, ~unit->activateFlags, 0);
 }
 
-// A quicksort of a range of item pointers ordered by ComparePlayers through a
-// __stdcall function pointer (the same family as 0x488920 and 0x488960). It
-// takes the median of the first, middle and last element, partitions the range
-// in place around it, then recurses on the smaller half only and loops on the
-// larger one. The fourth parameter is never read: both call sites (0x48576d
-// and 0x485778, which pass the first level of this sort inline) and the
-// recursive calls pass 0.
 typedef int (__stdcall* Pred_00488810)(Item_00485940*, Item_00485940*);
 
-// The byte count of a range, rounded down to a whole number of pointers.
-// Stays a helper: the left size is only kept in eax through inlined calls.
 static inline int RangeSize_00488810(Item_00485940** low, Item_00485940** high)
 {
     return (int)((char*)high - (char*)low) & ~3;
@@ -493,9 +455,6 @@ void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, Pred_00488
     }
 }
 
-// std::sort's _Unguarded_insert for a vector of item pointers ordered by
-// ComparePlayers, from a file compiled with __stdcall as the default
-// (compare 0x488960).
 // FUNCTION: 0x488920
 void __stdcall InsertShift(Item_00485940** last, Item_00485940* value, Pred_00488810 pred)
 {
@@ -504,8 +463,6 @@ void __stdcall InsertShift(Item_00485940** last, Item_00485940* value, Pred_0048
     *last = value;
 }
 
-// std::sort's _Unguarded_partition for a vector of item pointers ordered by
-// ComparePlayers, from a file compiled with __stdcall as the default.
 // FUNCTION: 0x488960
 Item_00485940** __stdcall Partition(Item_00485940** first, Item_00485940** last,
                                         Item_00485940* pivot, Pred_00488810 pred)
@@ -526,13 +483,10 @@ Item_00485940** __stdcall Partition(Item_00485940** first, Item_00485940** last,
 #include "../util/string_ref.h"
 #include "../state/sim_globals.h"
 
-// No explicit destructor: the implicit one destroys name through
-// StringRef's destructor (an explicit name.ReleaseRef() would release it
-// twice).
 class UnitCategory {
 public:
-    StringRef name;                    // +0x0
-    void* value;                       // +0x4
+    StringRef name;
+    void* value;
 
     UnitCategory(const StringRef& n, void* v) : name(n) { value = v; }
     UnitCategory(const UnitCategory& other);
@@ -544,8 +498,6 @@ public:
     void* AssignCategory(int* other);
 };
 
-// Unused here: the symbol ids these declarations take keep the static's $S
-// suffix, standing in for the UnitCategory view merged above (docs/c2-regalloc.md).
 void CountPacket(int, int, int);
 void SetMissionStatus(int, int, int);
 
@@ -560,15 +512,10 @@ static inline int Less_00488a50(const char* a, const char* b)
     return _strcmpi(a, b) < 0;
 }
 
-// Out of line: the original calls it from CreateMissionUnits.
 #pragma auto_inline(off)
-// Binary search over the 0x249-byte item table at g_game+0x1439b, comparing
-// the name at +0x20 case-insensitively, returning the entry whose name matches
-// exactly (0 when there is none).
 // FUNCTION: 0x488a50
 UnitType_00488b10* __stdcall FindUnitType(const char* name)
 {
-    // `end` before `lo`: the order decides which registers the base loads use.
     UnitType_00488b10* end = (UnitType_00488b10 *)g_game->defs.get() + g_game->unitDefCount;
     UnitType_00488b10* lo = (UnitType_00488b10 *)g_game->defs.get() + 1;
     int n = (int)(end - lo);
@@ -588,14 +535,9 @@ UnitType_00488b10* __stdcall FindUnitType(const char* name)
 }
 #pragma auto_inline(on)
 
-// Binary search of the game's 0x249-byte table at g_game+0x1439b, starting past
-// entry 0, for an entry whose name at +0x20 matches case-insensitively. Returns
-// the entry's index at +0x21e, or 0 when there is no such entry (callers mask
-// the result with 0xffff, so the return type is unsigned short).
 // FUNCTION: 0x488b10
 unsigned short __stdcall FindUnitTypeId(const char* name)
 {
-    // `last` before `first`: the order decides the register of the table base.
     UnitType_00488b10* last = (UnitType_00488b10 *)g_game->defs.get() + g_game->unitDefCount;
     UnitType_00488b10* first = (UnitType_00488b10 *)g_game->defs.get() + 1;
     int n = ((char*)last - (char*)first) / 0x249;
@@ -623,9 +565,6 @@ void InitUnitCategories()
     g_mapLoadFlag = 1;
 }
 
-// Empties the file-local global vector: frees each element's value, then
-// clears the vector, which releases each element's reference-counted name
-// through ReleaseRef.
 // FUNCTION: 0x488bf0
 void FreeUnitCategories()
 {
@@ -637,10 +576,6 @@ void FreeUnitCategories()
 
 #include "unit_type_set.h"
 
-// Looks a name up in the global vector of unit categories and, if the name is
-// not there, allocates a zeroed 0x40-byte object and inserts a (name, object)
-// pair at the position the sorted search ended on. The search loop is the same
-// shape as 0x438760.cpp.
 // FUNCTION: 0x488c50
 UnitTypeSet* __stdcall GetCategoryMask(char* name)
 {
@@ -662,13 +597,6 @@ UnitTypeSet* __stdcall GetCategoryMask(char* name)
     return p;
 }
 
-// Parses a player list: binary searches the sorted item table (g_game->types,
-// 0x249 bytes per item, name at +0x20, id at +0x21e) and, on a hit, sets that
-// id's bit in the 0x40-byte set; on a miss it merges the mask that GetCategoryMask
-// returns for an alias name. *out is 1 for a single item, 0 for an alias.
-
-// Search and final comparison stay one inlined helper: it fixes the register
-// use and the opposite strcmpi argument orders.
 static inline UnitType_00488b10* FindByName(UnitType_00488b10* first, UnitType_00488b10* last, char* text)
 {
     int n = (int)((char*)last - (char*)first) / 0x249;
@@ -705,9 +633,6 @@ void UnitTypeSet::AddTypeOrCategory(char* text, int* out)
     *out = 0;
 }
 
-// The original declares the tag as a struct here (the decorated name of
-// GetEnergyUse), so forward-declare it before the header: the key of the first
-// declaration decorates the name.
 struct UnitDef;
 #include "../units/unit_def.h"
 
@@ -726,10 +651,6 @@ float __stdcall GetEnergyUse(UnitDef* def)
     return 0.0f;
 }
 
-// std::vector<UnitCategory>::insert(iterator, size_type, const T&), out of
-// line, for the global vector above. The copy constructor is 0x489260 and the
-// assignment 0x489240; the destructor releases the handle through 0x4c9390.
-// Taking insert's address is what makes the compiler emit the instantiation.
 typedef std::vector<UnitCategory> Vec_00488fb0;
 typedef void (Vec_00488fb0::*InsertFn_00488fb0)(
     Vec_00488fb0::iterator, Vec_00488fb0::size_type, const UnitCategory&);
@@ -737,10 +658,7 @@ typedef void (Vec_00488fb0::*InsertFn_00488fb0)(
 // FUNCTION: 0x488fb0 ?insert@?$vector@VUnitCategory@@V?$allocator@VUnitCategory@@@std@@@std@@QAEXPAVUnitCategory@@IABV3@@Z
 InsertFn_00488fb0 g_insert_00488fb0 = &Vec_00488fb0::insert;
 
-// Out of line: the instantiation of insert above comes after this definition and would inline it.
 #pragma auto_inline(off)
-// Assignment of a record holding a reference-counted string handle (assigned
-// by 0x4c93b0) and a value.
 // FUNCTION: 0x489240
 void* UnitCategory::AssignCategory(int* other)
 {
@@ -751,7 +669,6 @@ void* UnitCategory::AssignCategory(int* other)
 
 #pragma auto_inline(on)
 
-// Copy constructor of a {string handle, int} record.
 // FUNCTION: 0x489260
 UnitCategory::UnitCategory(const UnitCategory& other)
     : name(other.name), value(other.value)

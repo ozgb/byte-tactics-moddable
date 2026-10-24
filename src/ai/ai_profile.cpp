@@ -1,6 +1,3 @@
-// Decompiled by Opus, Sonnet, Space Bunny Free and Haiku. Names are provisional.
-// Both toggle protection on the same game field, one read-only and one read-write.
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -20,13 +17,13 @@ void __cdecl ProtectBlockReadWrite(void* p);
 
 class AIProfileParser {
 public:
-    char token[0x80];                   // +0
-    char* bufferStart;                  // +0x80
-    char* bufferEnd;                    // +0x84
-    char* cursor;                       // +0x88
-    int errorReported;                  // +0x8c
-    int tokenPending;                   // +0x90
-    int tokenType;                      // +0x94
+    char token[0x80];
+    char* bufferStart;
+    char* bufferEnd;
+    char* cursor;
+    int errorReported;
+    int tokenPending;
+    int tokenType;
 
     AIProfileParser();
     void SetBuffer(char* buffer, int size);
@@ -37,7 +34,6 @@ public:
     void ReportParseError(char* text);
 };
 
-// The AI profile parser: reads values and keys out of an AI profile buffer.
 // FUNCTION: 0x428c60
 AIProfileParser::AIProfileParser()
 {
@@ -75,7 +71,6 @@ int AIProfileParser::NextToken()
     return tokenType;
 }
 
-// AI profile tokenizer.
 // FUNCTION: 0x428d10
 int AIProfileParser::ScanToken()
 {
@@ -107,7 +102,6 @@ int AIProfileParser::ScanToken()
     token[0] = *cursor;
     int i = 1;
     for (;;) {
-        // Increment through a local, not `++cursor`: the stores differ.
         char* q = cursor;
         cursor = q + 1;
         if (!(isdigit(*cursor) || *cursor == '.'))
@@ -150,9 +144,6 @@ bool AIProfileParser::TokenEquals(char* text)
     return _strcmpi(text, (const char*)this) == 0;
 }
 
-// Reports (once) a parse error in an AI profile: formats the message into a
-// local buffer that is never used (the output call was compiled out), then
-// sets the "error reported" flag.
 // FUNCTION: 0x428f60
 void AIProfileParser::ReportParseError(char* text)
 {

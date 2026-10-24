@@ -39,43 +39,43 @@ struct MissionFeature {
 
 class Mission {
 public:
-    int type;                          // +0x000
-    char campaign[0x100];              // +0x004
-    char names[9][0x100];              // +0x104
-    int exists;                        // +0xa04
-    TdfFile list;                      // +0xa08, the campaign file
-    char missionName[0x100];           // +0xa14
-    char text_b14[0x100];              // +0xb14
+    int type;
+    char campaign[0x100];
+    char names[9][0x100];
+    int exists;
+    TdfFile list;
+    char missionName[0x100];
+    char text_b14[0x100];
     Ref<char> briefing;
-    int missionIndex;                  // +0xc18
-    int tntChecksum;                   // +0xc1c
-    int headerChecksum;                // +0xc20
-    char description[0x80];            // +0xc24
-    char planet[0x80];                 // +0xca4
+    int missionIndex;
+    int tntChecksum;
+    int headerChecksum;
+    char description[0x80];
+    char planet[0x80];
     char* mapList;
-    int mapCount;                      // +0xd28
-    int multi;                         // +0xd2c
-    int surfaceMetal;                  // +0xd30
-    int minWindSpeed;                  // +0xd34
-    int maxWindSpeed;                  // +0xd38
-    int gravity;                       // +0xd3c
-    float tidalStrength;               // +0xd40
-    int lavaWorld;                     // +0xd44
-    int noSeaLevelTrigger;             // +0xd48
-    int waterDoesDamage;               // +0xd4c
-    int waterDamage;                   // +0xd50
-    float killMul;                     // +0xd54
-    float timeMul;                     // +0xd58
-    float startMetal[10];              // +0xd5c, per player
-    float startEnergy[10];             // +0xd84, per player
+    int mapCount;
+    int multi;
+    int surfaceMetal;
+    int minWindSpeed;
+    int maxWindSpeed;
+    int gravity;
+    float tidalStrength;
+    int lavaWorld;
+    int noSeaLevelTrigger;
+    int waterDoesDamage;
+    int waterDamage;
+    float killMul;
+    float timeMul;
+    float startMetal[10];
+    float startEnergy[10];
     Ref<MissionUnit> units;
-    int unitCount;                     // +0xdb0
+    int unitCount;
     Ref<MissionRule> rules;
-    int ruleCount;                     // +0xdb8
+    int ruleCount;
     Ref<MissionFeature> features;
-    int featureCount;                  // +0xdc0
-    char memory[0x80];                 // +0xdc4
-    char numPlayers[0x80];             // +0xe44
+    int featureCount;
+    char memory[0x80];
+    char numPlayers[0x80];
 
     Mission(int owner_);
     ~Mission();

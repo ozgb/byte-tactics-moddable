@@ -1,5 +1,3 @@
-// Decompiled by Claude Opus 5.5, deepseek-v4.1-flash, Haiku and Opus. Names are provisional.
-
 #include <stdio.h>
 #include <string.h>
 #include "win_types.h"
@@ -13,7 +11,7 @@ class TdfRecord;
 
 struct FindData_0041d4c0 {
     char unknown_0[0x14];
-    char name[260];                    // +0x14
+    char name[260];
 };
 
 extern int DAT_0050289c;

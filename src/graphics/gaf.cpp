@@ -1,21 +1,9 @@
-// Decompiled by Opus, Sonnet, space-bunny-free, mimo-v2.6-pro, deepseek-v4.1-flash,
-// Claude Sonnet 5.5, GPT-6.1-sol, GPT-6, Claude Opus 5.5, Space Bunny Free,
-// claude-opus-5-5, Sonnet 5.5 and claude-sonnet-5-5. Names are provisional.
-
-// The gaf module: the GAF frame trees and their drawing (keyed, opaque, lit,
-// blended, grey, shadowed, dithered, depth and scaled), the frame allocators,
-// the sequence references, the lens and depth frames, the image helpers and
-// the row compression. DrawFrameLit (0x4b8310), DrawFrameDepth (0x4b90a0) and
-// DownsampleFrame (0x4b95a0) are joined at the end, out of address order.
-// <windows.h> is needed even though no function here calls it: its
-// declaration count sets the register windows of 0x4b9360 and 0x4b9740.
 #include "win_types.h"
 #include <string.h>
 #include <math.h>
 
 #include "rect.h"
 
-// Clips `rect` to `bounds`, moving `other` by the same amounts.
 // FUNCTION: 0x4b7e60
 void __stdcall ClipRects(Rect* other, Rect* rect, Rect* bounds)
 {
@@ -43,24 +31,22 @@ void __stdcall ClipRects(Rect* other, Rect* rect, Rect* bounds)
 }
 
 struct Entry_004b7ee0 {
-    int value;                         // +0x0
+    int value;
     int unknown_4;
 };
 
 struct Table_004b7ee0 {
-    unsigned short count;              // +0x0
+    unsigned short count;
     char unknown_2[0x26];
-    Entry_004b7ee0 entries[1];         // +0x28
+    Entry_004b7ee0 entries[1];
 };
 
 struct Handle_004b7ee0 {
-    unsigned short index;              // +0x0
+    unsigned short index;
     char unknown_2[6];
-    Table_004b7ee0* table;             // +0x8
+    Table_004b7ee0* table;
 };
 
-// Looks up an entry of the table that GetGafFrame indexes (count at +0,
-// 8-byte entries from +0x28) through a handle holding an index and the table.
 // FUNCTION: 0x4b7ee0
 int __stdcall GetGafSequenceFrame(Handle_004b7ee0* h)
 {
@@ -71,9 +57,9 @@ int __stdcall GetGafSequenceFrame(Handle_004b7ee0* h)
 }
 
 struct Obj_004b7f00 {
-    unsigned short index;              // +0x0
+    unsigned short index;
     char unknown_2[6];
-    unsigned short* table;             // +0x8, starts with the entry count
+    unsigned short* table;
 };
 // FUNCTION: 0x4b7f00
 int __stdcall SetGafSequenceFrame(Obj_004b7f00* obj, int index)
@@ -143,16 +129,6 @@ void __cdecl BlitCompressed(unsigned char* pixels, int pitch, Rect* rect,
                             void* plane, Rect* other);
 void __stdcall DrawFrameBlended(Surface* dst, GafFrame* bmp, int x, int y);
 
-// Draws a bitmap (or a list of nested bitmaps) into `dst`, or into the screen
-// when `dst` is null: the screen is then locked with LockScreen and unlocked
-// with UnlockScreen at the end (which is why the unlock is guarded by a
-// comparison of `dst` with the address of the local surface).
-// A record with a child count draws each child, through DrawFrameBlended when the
-// child's kind byte is set and through this function (recursion) otherwise.
-// A leaf builds the source rect (0, 0, w - 1, h - 1) and the destination rect
-// (x - dx, y - dy, ...), clips the destination to the destination's own clip
-// rect with ClipRects and blits through BlitRectKeyed, or, when the mode
-// byte at +9 is set, through BlitCompressed.
 // FUNCTION: 0x4b7f90
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y)
 {
@@ -204,17 +180,6 @@ void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y)
         UnlockScreen(&screen);
 }
 
-// Draws a bitmap (or a list of nested bitmaps) into `dst`, or into the screen
-// when `dst` is null: the screen is then locked with LockScreen and unlocked
-// with UnlockScreen at the end (which is why the unlock is guarded by a
-// comparison of `dst` with the address of the local surface).
-// A record with a child count draws each child, through DrawFrameBlended when the
-// child's kind byte is set and through DrawFrame otherwise (the same code as
-// here, but the one that blits with BlitRectKeyed).
-// A leaf builds the source rect (0, 0, w - 1, h - 1) and the destination rect
-// (x - dx, y - dy, ...), clips the destination to the destination's own clip
-// rect with ClipRects and blits through the hand-written BlitRect, or,
-// when the mode byte at +9 is set, through BlitCompressed.
 // FUNCTION: 0x4b8150
 void __stdcall DrawFrameOpaque(Surface* dst, GafFrame* bmp, int x, int y)
 {
@@ -266,47 +231,38 @@ void __stdcall DrawFrameOpaque(Surface* dst, GafFrame* bmp, int x, int y)
         UnlockScreen(&screen);
 }
 
-// +0xf0: the display object's state flags, read as a byte, a word or a
-// bitfield. Bit 7 (has_c8) is the cached object the shadow draw needs.
 union Flags_004b8310 {
-    unsigned short word;               // +0xf0
-    unsigned char byte;                // +0xf0
+    unsigned short word;
+    unsigned char byte;
     struct {
         unsigned short bit0 : 1;
         unsigned short bit1 : 1;
         unsigned short bit2 : 1;
         unsigned short bit3 : 1;
         unsigned short bit4 : 1;
-        unsigned short has_obj_c0 : 1; // bit 5
-        unsigned short has_obj_c4 : 1; // bit 6
-        unsigned short has_obj_c8 : 1; // bit 7
+        unsigned short has_obj_c0 : 1;
+        unsigned short has_obj_c4 : 1;
+        unsigned short has_obj_c8 : 1;
         unsigned short bit8_15 : 8;
     } bits;
 };
 
-// The display object GetDisplay returns. Only the fields the gaf drawing
-// reads are named: the alpha, shade, light, gray and blue tables at +0xc0 to
-// +0xd0, and the flag word at +0xf0.
 struct Display_004b8310 {
     char unknown_0[0xc0];
-    unsigned char* alphaTable;         // +0xc0
-    unsigned char* shadeTable;         // +0xc4
-    unsigned char* lightTable;         // +0xc8
-    unsigned char* grayTable;          // +0xcc
-    unsigned char* blueTable;          // +0xd0
+    unsigned char* alphaTable;
+    unsigned char* shadeTable;
+    unsigned char* lightTable;
+    unsigned char* grayTable;
+    unsigned char* blueTable;
     char unknown_d4[0xf0 - 0xd4];
-    Flags_004b8310 flags;              // +0xf0
+    Flags_004b8310 flags;
 };
 
-// The locked screen as a member at +0x20 of a bigger local: sets the frame
-// layout of the functions that lock the screen.
 struct Screen_004b8310 {
     char unknown_0[0x20];
-    Surface surf;                      // +0x20
+    Surface surf;
 };
 
-// The 0x10-byte source descriptor the blended blitters read: width, height,
-// pitch and the bits pointer.
 struct Src_004b8310 {
     int width;
     int height;
@@ -314,7 +270,6 @@ struct Src_004b8310 {
     GafFrame** pixels;
 };
 
-// The clip rect and the source descriptor DrawFrameBlended builds together.
 struct Bounds_src_004b8310 {
     Rect bounds;
     Src_004b8310 src;
@@ -330,16 +285,6 @@ void __cdecl BlitCompressedBlended(unsigned char* pixels, int pitch, Rect* drect
                                    GafFrame** src, Rect* srect,
                                    unsigned char* palette);
 
-// Draws one bitmap (`frame`, a BITMAPINFO: width/height shorts, x/y origin
-// shorts, two flag bytes, a texture count and a texture array) at x, y, either
-// into `surface` or, when that is null, into the screen locked with
-// LockScreen and unlocked with UnlockScreen at the end (which is why the
-// unlock is guarded by a comparison of `surface` with the address of the local
-// surface). A record with a child count draws each child through this same
-// function (recursion). A leaf builds the source rect (0, 0, w - 1, h - 1) and
-// the destination rect (x - dx, y - dy, ...), clips the destination to the
-// destination's own clip rect with ClipRects and blits through
-// BlitRectBlended, or, when the mode byte at +9 is set, through BlitCompressedBlended.
 // FUNCTION: 0x4b8500
 void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y)
 {
@@ -395,22 +340,10 @@ void __cdecl BlitRectRemapDest(Surface* dst, Surface* src, Rect* rect,
                                Rect* pos, int colour, unsigned char* table);
 void __stdcall ResetClipRect(int* surface);
 
-// Recursively draws a bitmap tree (`frame`) at x, y into `surface`, or into
-// the locked screen when `surface` is null. Runs only when the display flag
-// word at +0xf0 has bit 0x100 set (which is byte +0xf1 bit 0) and the record's
-// byte at +9 is clear (note the record is tested for null only after that byte
-// is read). A record with a child count
-// draws every child through this same function; a leaf builds the source rect
-// (0, 0, w - 1, h - 1) and the dest rect (x - dx, y - dy, ...), clips them with
-// ClipRects, and when nothing is clipped off builds a 0x30-byte surface
-// description from the record (width, height, pitch = width, bits, 10000, -1,
-// dx, dy, flag bits), resets its clip rect with ResetClipRect and blits with
-// BlitRectRemapDest using the palette at display +0xcc.
 // FUNCTION: 0x4b86e0
 void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
 {
     Display_004b8310* d = GetDisplay();
-    // Flag tested as bit 0x100 of the word: fuses into a byte test at +0xf1.
     if ((d->flags.word & 0x100) != 0 && frame->compressed == 0) {
         Surface screen;
         if (surface == 0) {
@@ -459,22 +392,6 @@ void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
     }
 }
 
-// Checkerboard eraser: clears destination pixels to 0 where a bitmap's
-// pixels differ from its transparent colour, stepping by two so only one
-// parity of the checkerboard is touched (parity comes from the last
-// argument). Like 0x4b7f90 it draws a bitmap (or a list of nested
-// bitmaps) into `dst`, or into the screen when `dst` is null: the screen
-// is then locked with LockScreen and unlocked with UnlockScreen at the
-// end (which is why the unlock is guarded by a comparison of `dst` with
-// the address of the local surface). The whole body is skipped when the
-// byte at +9 is set. Suspected original bug: that test dereferences the
-// record (byte at +9) before the later `bmp != 0` check on the same
-// pointer, so a null record would crash before the null check. A record
-// with a child count draws each child through this function (recursion).
-// A leaf builds the source rect (0, 0, w - 1, h - 1) and the destination
-// rect (x - dx, y - dy, ...), clips the destination to the destination's
-// own clip rect with ClipRects, then walks the clipped rows and
-// columns.
 // FUNCTION: 0x4b88d0
 void __stdcall EraseFrameDithered(Surface* dst, GafFrame* bmp, int x, int y, int parity)
 {
@@ -507,7 +424,6 @@ void __stdcall EraseFrameDithered(Surface* dst, GafFrame* bmp, int x, int y, int
                 ClipRects(&other, &rect, &bounds);
                 if (rect.right >= rect.left && rect.bottom >= rect.top &&
                     other.right >= other.left && other.bottom >= other.top) {
-                    // `sy` must be a plain local here, not other.top++: pins stack slots and loop order.
                     for (int yy = rect.top, sy = other.top; yy <= rect.bottom; yy++, sy++) {
                         unsigned char* s = (unsigned char*)bmp->pixelsOrLayers
                             + sy * bmp->width + other.left;
@@ -533,9 +449,6 @@ void __stdcall EraseFrameDithered(Surface* dst, GafFrame* bmp, int x, int y, int
     }
 }
 
-// Initialises a drawing surface description from a frame: width, height,
-// pitch (= width) and pixels, then resets its clip rectangle through
-// ResetClipRect.
 // FUNCTION: 0x4b8a80
 void __stdcall SurfaceFromFrame(Surface* dst, GafFrame* src)
 {
@@ -552,27 +465,22 @@ void __stdcall SurfaceFromFrame(Surface* dst, GafFrame* src)
     ResetClipRect((int*)dst);
 }
 
-// A 0x14-byte surface as 0x4b8ae0 reads it: size, pitch, bits and the two
-// origin words.
 struct Src_004b8ae0 {
-    unsigned short a;               // +0x0
+    unsigned short a;
     char unknown_2[2];
-    unsigned short b;               // +0x4
+    unsigned short b;
     char unknown_6[2];
-    unsigned short c;               // +0x8
+    unsigned short c;
     char unknown_a[2];
-    int d;                          // +0xc
+    int d;
     char unknown_10[8];
-    unsigned short e;               // +0x18
-    unsigned short f;               // +0x1a
+    unsigned short e;
+    unsigned short f;
 };
 
-// Unused here: real functions declared to keep the file's symbol count.
 void __stdcall DrawBattleFrame(int param_1, int param_2);
 #include "../files/files_api.h"
 
-// Initialises a frame from a surface description. The width is written
-// twice in the original (first the surface's width, then its pitch).
 // FUNCTION: 0x4b8ae0
 void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src)
 {
@@ -588,28 +496,24 @@ void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src)
     dst->blend = 0;
 }
 
-// One 8-byte entry of a GAF sequence: the frame's timer value.
 struct Entry_004b8b30 {
     unsigned short value;
     char unknown_2[6];
 };
 
-// A GAF sequence: its entry count, the loop flag and the 8-byte entries.
 struct Src_004b8b30 {
-    unsigned short count;           // +0x0
-    unsigned char kind;             // +0x2
+    unsigned short count;
+    unsigned char kind;
     char unknown_3[0x2c - 3];
-    Entry_004b8b30 entries[1];      // +0x2c
+    Entry_004b8b30 entries[1];
 };
 
-// A reference into a sequence: the current entry, its timer value, the loop
-// flag and the sequence itself.
 struct Ref_004b8b30 {
-    unsigned short index;           // +0x0
-    unsigned short value;           // +0x2
-    unsigned char kind;             // +0x4
+    unsigned short index;
+    unsigned short value;
+    unsigned char kind;
     char unknown_5[3];
-    Src_004b8b30* src;              // +0x8
+    Src_004b8b30* src;
 };
 
 static inline unsigned short Value_004b8b30(Src_004b8b30* s, unsigned short i)
@@ -627,10 +531,6 @@ void __stdcall InitGafSequence(Ref_004b8b30* ref, Src_004b8b30* src, int index)
     ref->kind = src->kind;
 }
 
-// Same frame-sequence layout as 0x4b8b30: counts the current entry's timer
-// down, and when it runs out moves to the next entry (wrapping around, or
-// dropping the sequence when it doesn't loop). Returns 1 when the entry
-// changed.
 // FUNCTION: 0x4b8b90
 int __stdcall StepGafSequence(Ref_004b8b30* ref)
 {
@@ -654,14 +554,12 @@ int __stdcall StepGafSequence(Ref_004b8b30* ref)
     return 0;
 }
 
-// The advancing view of a sequence reference: the timer value is signed here,
-// so a step can take it below zero.
 struct Ref_004b8bf0 {
-    unsigned short index;           // +0x0
-    short value;                    // +0x2
-    unsigned char kind;             // +0x4
+    unsigned short index;
+    short value;
+    unsigned char kind;
     char unknown_5[3];
-    Src_004b8b30* src;              // +0x8
+    Src_004b8b30* src;
 };
 
 static inline unsigned short Value_004b8bf0(Ref_004b8bf0* r)
@@ -671,9 +569,6 @@ static inline unsigned short Value_004b8bf0(Ref_004b8bf0* r)
     return 0xffff;
 }
 
-// Same frame-sequence layout as 0x4b8b30: advances the reference by `step`
-// time units, moving to the next entry whenever its countdown runs out and
-// wrapping around (or dropping the sequence when it doesn't loop).
 // FUNCTION: 0x4b8bf0
 void __stdcall AdvanceGafSequence(Ref_004b8bf0* ref, short step)
 {
@@ -695,9 +590,6 @@ void __stdcall AdvanceGafSequence(Ref_004b8bf0* ref, short step)
     }
 }
 
-
-// A block of the root object: a count, a sub-count, then a run of 8-byte
-// entries whose first int is an offset that is rebased in place.
 struct Entry_004b8c60 {
     int off;
     int pad;
@@ -739,22 +631,18 @@ void* __stdcall LoadGaf(char* name)
     return base;
 }
 
-// A GAF entry as FindGafEntry reads it: its name follows the 8-byte header.
 struct GafEntry_004b8d40 {
     char unknown_0[8];
-    char name[1];                      // +0x8
+    char name[1];
 };
 
-// The loaded GAF file: its entry count and the entry pointers.
 struct Gaf_004b8d40 {
     char unknown_0[4];
-    short count;                       // +0x4
+    short count;
     char unknown_6[6];
-    GafEntry_004b8d40* entries[1];     // +0xc
+    GafEntry_004b8d40* entries[1];
 };
 
-// Looks up a GAF entry by name (case-insensitive); returns 0 when the file is
-// missing or no entry has that name.
 // FUNCTION: 0x4b8d40
 GafEntry_004b8d40* __stdcall FindGafEntry(Gaf_004b8d40* gaf, const char* name)
 {
@@ -821,19 +709,6 @@ void __cdecl BlitRectShadow(Surface* dst, Surface* src, Rect* rect,
 void __cdecl BlitCompressedShadow(unsigned char* pixels, int pitch, Rect* rect,
                                   void* plane, Rect* other, unsigned char* table);
 
-// Draws a shadow bitmap (or a list of nested shadow bitmaps) into `dst`, or
-// into the screen when `dst` is null: the screen is then locked with
-// LockScreen and unlocked with UnlockScreen at the end (which is why the
-// unlock is guarded by a comparison of `dst` with the address of the local
-// surface). The whole draw only happens when bit 7 of the display's byte at
-// +0xf0 is set (the cached object at +0xc8 exists). A record with a child
-// count draws each child by recursion. A leaf with a data pointer builds the
-// source rect (0, 0, w - 1, h - 1) and the destination rect (x - dx, y - dy,
-// ...), clips the destination to the destination's own clip rect with
-// ClipRects and blits through BlitRectShadow (a byte run shadow blitter), or,
-// when the mode byte at +9 is set, through BlitCompressedShadow (a word run shadow
-// blitter). Both blitters are hand-written assembly and take the display's
-// cached object at +0xc8 as their last argument.
 // FUNCTION: 0x4b8ec0
 void __stdcall DrawFrameShadow(Surface* dst, GafFrame* bmp, int x, int y)
 {
@@ -885,11 +760,6 @@ void __stdcall DrawFrameShadow(Surface* dst, GafFrame* bmp, int x, int y)
     }
 }
 
-// Builds the "lens" displacement frame that 0x420620 asks for with
-// (22, 22, 8): a GAF-style frame header with two w*h buffers of 16-bit cells.
-// Each cell inside radius w/4 of the centre holds the offset (in cells) to
-// the source pixel of a magnifying lens; the others hold 0x7d00 (no
-// displacement).
 GafFrame* __stdcall AllocDepthFrame(const char* name, int width, int height)
 {
     int size = height * width;
@@ -917,7 +787,6 @@ void* __stdcall BuildLensFrame(int w, int h, int lens)
         return 0;
     f->width /= 2;
     unsigned short* p = (unsigned short*)f->pixelsOrLayers;
-    // hw and hh stay short: the int w / 2 lives in the dead lens slot.
     short hw = w / 2;
     f->xOffset = hw;
     short hh = h / 2;
@@ -930,9 +799,7 @@ void* __stdcall BuildLensFrame(int w, int h, int lens)
             if ((int)dist >= w / 4) {
                 p[y * w + x] = 0x7d00;
             } else {
-                // Computed before the gain: keeps the index one shared value.
                 int i = y * w + x;
-                // The gain is written out at both uses, not named.
                 int v = (int)(dx / ((w / 2 - dist) / scale))
                         + (w * ((int)(dy / ((w / 2 - dist) / scale)) + hh) + hw);
                 p[i] = v - i;
@@ -945,7 +812,6 @@ void* __stdcall BuildLensFrame(int w, int h, int lens)
 void __stdcall CopySurfaceRect(void* dst, void* src, Rect* rect,
                                Rect* pos);
 
-// The swap must go through a reference helper: inline, stores get forwarded.
 static void SwapPtr(unsigned char*& a, unsigned char*& b)
 {
     unsigned char* t = a;
@@ -953,12 +819,6 @@ static void SwapPtr(unsigned char*& a, unsigned char*& b)
     b = t;
 }
 
-// Draws a sprite with a colour-remap effect: the destination surface is blitted
-// into the sprite's scratch buffer, the sprite's index table is remapped through
-// that buffer (32000 uses the sprite's flat colour), and the result is drawn
-// with DrawFrame.
-//
-// The two scratch buffers are swapped twice around the blit.
 // FUNCTION: 0x4b9360
 void __stdcall DrawLens(void* dst, GafFrame* sprite, int x, int y)
 {
@@ -1049,7 +909,6 @@ void __stdcall GrabBackground(void* dst, GafFrame* sprite, int x, int y)
     CopySurfaceRect(&surface, dst, &dstRect, &srcRect);
 }
 
-// Clears every pixel of an 8-bit image that is not the colour key.
 // FUNCTION: 0x4b96a0
 void __stdcall ZeroFramePixels(GafFrame* image)
 {
@@ -1063,8 +922,6 @@ void __stdcall ZeroFramePixels(GafFrame* image)
     }
 }
 
-// Remaps every pixel of an 8-bit image whose mask value is at most `level`
-// (and that is not the colour key) through a table of the current palette.
 // FUNCTION: 0x4b96e0
 void __stdcall TintFrameBelow(GafFrame* image, unsigned char level)
 {
@@ -1081,14 +938,6 @@ void __stdcall TintFrameBelow(GafFrame* image, unsigned char level)
     }
 }
 
-// Draws a bitmap tree scaled by (sx, sy) at x, y into `dst`, or into the
-// locked screen when `dst` is null. A record with a child count draws every
-// child by recursion. A leaf scales its size and origin, clips the
-// destination rectangle to the surface's clip rect with ClipRects, maps
-// the clipped source rectangle back to bitmap pixels and then walks the
-// destination pixels with 16.16 steps through the bitmap, blending every
-// pixel that is not the transparent colour through the display's 256x256
-// table at +0xc0.
 // FUNCTION: 0x4b9740
 void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y, double sx, double sy)
 {
@@ -1103,7 +952,6 @@ void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y,
         for (int i = 0; i < (int)bmp->layers; i++)
             DrawFrameScaledBlended(dst, ((GafFrame**)bmp->pixelsOrLayers)[i], x, y, sx, sy);
     } else {
-        // The rects are declared before w and h: sets the order of the edge leas.
         Rect src;
         Rect dest;
         Rect bounds;
@@ -1130,10 +978,8 @@ void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y,
                 src.top = (int)(src.top / sy);
                 src.right = (int)(src.right / sx);
                 src.bottom = (int)(src.bottom / sy);
-                // row and fy are declared together and advanced in the for header.
                 int fy, row;
                 for (row = dest.top, fy = src.top << 16; row <= dest.bottom; row++, fy += stepY) {
-                    // col is declared before rowBase: sets the pixel address add order.
                     int srcRow = (fy >> 16) * bmp->width;
                     int col = dest.left;
                     int rowBase = row * dst->pitch;
@@ -1152,11 +998,6 @@ void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y,
         UnlockScreen(&screen);
 }
 
-// The opaque twin of 0x4b9740: draws a bitmap tree scaled by (sx, sy) at
-// x, y into `dst` (or the locked screen when null) and copies every pixel that
-// is not the transparent colour straight into the surface. A child whose kind
-// byte (+0xb) is set is drawn by the blending version 0x4b9740, any other by
-// this function again.
 // FUNCTION: 0x4b9a50
 void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double sx, double sy)
 {
@@ -1175,7 +1016,6 @@ void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double
                 DrawFrameScaled(dst, e, x, y, sx, sy);
         }
     } else {
-        // The rects are declared before w and h: sets the order of the edge leas.
         Rect src;
         Rect dest;
         Rect bounds;
@@ -1202,13 +1042,7 @@ void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double
                 src.top = (int)(src.top / sy);
                 src.right = (int)(src.right / sx);
                 src.bottom = (int)(src.bottom / sy);
-                // The original keeps the two outer loop variables in the dead
-                // argument slots of x and y, so they are the parameters
-                // themselves, reused once dest.left / dest.top are computed
-                // from them. Both 16.16 accumulators live in the increment.
                 for (x = dest.top, y = src.top << 16; x <= dest.bottom; x++, y += stepY) {
-                    // col first: declaring it here is what puts rowBase in the
-                    // add and col in the SIB index of the pixel store.
                     int col = dest.left;
                     int srcRow = (y >> 16) * bmp->width;
                     int rowBase = x * dst->pitch;
@@ -1226,25 +1060,12 @@ void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double
         UnlockScreen(&screen);
 }
 
-// Suspected bugs:
-//  - The horizontal copy count `n` is clamped to dst->width but dstCol is not
-//    subtracted from it, so when dstCol > 0 the inner loop writes up to dstCol
-//    bytes past the end of the destination row. The vertical clip does account
-//    for dstRow. Kept as the original does.
-//  - The inner loop guards on `n == 0` and not on `n <= 0`, so a negative n
-//    (possible when srcCol > src->width, i.e. when x is large) counts down to
-//    zero and wraps round, overwriting the row about 2^32 times.
-//
-// Clipped 8-bit sprite blit: copies the part of `src` that overlaps `dst`,
-// skipping source pixels equal to the source colour key and writing the
-// destination colour key.
 // FUNCTION: 0x4b9d70
 void __stdcall CutOutFrame(GafFrame* src, GafFrame* dst, int x, int y)
 {
     int srcCol, dstCol, srcRow, dstRow;
     x += src->xOffset - dst->xOffset;
     y = (dst->yOffset - src->yOffset) - y;
-    // Plain if/else, not an initialisation plus override: fixes the clip block.
     if (y < 0) {
         srcRow = -y;
         dstRow = 0;
@@ -1257,7 +1078,6 @@ void __stdcall CutOutFrame(GafFrame* src, GafFrame* dst, int x, int y)
     if (dstCol < 0) { srcCol = -dstCol; dstCol = 0; } else { srcCol = 0; }
 
     int n;
-    // Clamp stays an if/else with these arms: fixes the register allocation.
     if (src->width - srcCol > dst->width)
         n = dst->width;
     else
@@ -1281,9 +1101,6 @@ void __stdcall CutOutFrame(GafFrame* src, GafFrame* dst, int x, int y)
 
 int __stdcall CompressRow(char* dest, char* src, int width, unsigned char key);
 
-// Compresses an image row by row with CompressRow (which skips runs of the
-// transparent key colour). Each row is preceded by its 16-bit compressed
-// length; with a null destination it only measures. Returns the total size.
 // FUNCTION: 0x4b9e60
 int __stdcall CompressFrame(unsigned char* dest, GafFrame* img)
 {
@@ -1384,14 +1201,6 @@ char* __stdcall EmitRepeatRun(char* out, int count, unsigned char a, unsigned ch
     return out;
 }
 
-// Compresses one row of an 8-bit sprite (called by CompressFrame). The first
-// loop only tests whether the whole row is the colour key; the body then
-// re-reads the row from its first pixel. Bytes go into the history array
-// g_gafEncodeLiteralBuffer[0..0x7f], and runs are emitted through EmitCopyRun (copy the
-// buffered bytes) and EmitRepeatRun (a repeated value, or a count-only run of
-// the key). The return value is the global byte counter g_gafEncodeOutputSize, so a
-// null `out` only measures the row, which is how CompressFrame asks for the
-// size before compressing.
 // FUNCTION: 0x4ba000
 int __stdcall CompressRow(char* dest, char* src, int width, unsigned char key)
 {
@@ -1419,7 +1228,6 @@ int __stdcall CompressRow(char* dest, char* src, int width, unsigned char key)
     int state = (c == key);
     while (width) {
         width--;
-        // One statement: a separate increment moves the history store.
         g_gafEncodeLiteralBuffer[n++] = c = *p++;
         value = c;
         switch (state) {
@@ -1478,8 +1286,6 @@ int __stdcall CompressRow(char* dest, char* src, int width, unsigned char key)
     return g_gafEncodeOutputSize;
 }
 
-// Fills every pixel of an 8-bit image whose mask value is at most `level`
-// with the image's colour key.
 // FUNCTION: 0x4ba1b0
 void __stdcall CutFrameBelow(GafFrame* image, unsigned char level)
 {
@@ -1496,9 +1302,6 @@ void __stdcall CutFrameBelow(GafFrame* image, unsigned char level)
     }
 }
 
-// The three functions below are kept after 0x4ba1b0 and out of address order:
-// at their addresses their bodies' symbol ids would move the register windows
-// the other functions match in (docs/c2-regalloc.md).
 // FUNCTION: 0x4b8310
 void __stdcall DrawFrameLit(Surface* surface, GafFrame* frame, int x, int y, int paletteRow)
 {
@@ -1579,8 +1382,6 @@ void __stdcall DrawFrameDepth(GafFrame* src, GafFrame* dst, int x, int y, int le
     }
 }
 
-// Declared ahead of the definition, as the other files declare it: these
-// symbol ids put the registers on the window DownsampleFrame matches in.
 void __stdcall DownsampleFrame(GafFrame* src, GafFrame* dst);
 // FUNCTION: 0x4b95a0
 void __stdcall DownsampleFrame(GafFrame* src, GafFrame* dst)

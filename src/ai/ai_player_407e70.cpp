@@ -1,17 +1,3 @@
-// Decompiled by Claude Opus 5.5, deepseek-v4.1-flash and Opus. Names are
-// provisional.
-// Slot 0 of SpatialTimer (vtable 0x4fc9a0), derived from SquadTimer
-// (the family is listed in ai_player.cpp, whose declarations this copies).
-// Sets next to 30..179 ticks from now. When the group has units, moves the
-// probe point by the step (one time in ten it restarts from best with a new
-// random direction of length 0x140 map units), and when the owner can see or
-// has explored the probe point, keeps it as the new best if a random roll
-// favours its SumUnitRatingsInRange score. Then orders every unit whose def has
-// flag4 set, and that is active or can reach best (WeaponCanReachPos), to move to
-// best with the order GetOrderType picks.
-//
-// The explored-map test is the inlined player method 0x475470 describes: a
-// {data, width, height} ByteMap at +0x7c.
 #include <vector>
 #include "../state/sim_allocator.h"
 
@@ -21,13 +7,13 @@
 
 extern Game* g_game;
 
-struct Position_00408090 {              // 16.16 fixed point; only high words read
+struct Position_00408090 {
     short xFrac;
-    short x;                            // +0x2
+    short x;
     short yFrac;
-    short y;                            // +0x6
+    short y;
     short zFrac;
-    short z;                            // +0xa
+    short z;
 };
 
 #include "../network/player.h"
@@ -36,7 +22,6 @@ int __stdcall IsPointVisible(Player* player, Position_00408090* pos);
 
 static inline int IsExplored(Player* player, Position_00408090* pos)
 {
-    // Plain int: an unsigned tx shortens the shift to 16 bits.
     int tx = pos->x >> 5;
     int ty = (pos->z - (pos->y >> 1)) >> 5;
     if ((unsigned int)tx < (unsigned int)player->exploredWidth && (unsigned int)ty < (unsigned int)player->exploredHeight &&
@@ -54,13 +39,11 @@ static inline int IsVisible(Player* player, Position_00408090* pos)
 
 #include "../units/unit_def.h"
 
-// The flags at +0x245 read as the original's bitfield; the header keeps the
-// plain word.
 #pragma pack(push, 1)
 struct UnitDefFlags_00407e90 {
     char unknown_0[0x245];
     unsigned int unknown_bits : 4;
-    unsigned int flag4 : 1;             // +0x245 bit 4
+    unsigned int flag4 : 1;
 };
 
 #pragma pack(pop)
@@ -102,23 +85,19 @@ int __stdcall SumUnitRatingsInRange(int index, Vec3* pos, int range);
 // FUNCTION: 0x407e90
 void SpatialTimer::OnTimer()
 {
-    // Computed first or the sum folds into one lea.
     int delay = RandomInt(150) + 30;
     next = g_game->ticks + delay;
     if (group->units.empty())
         return;
-    // Unused on purpose: it emits the operator delete call after the loop.
     std::vector<Unit*> unused;
     if (RandomInt(10) == 0) {
         probe = best;
         int angle = RandomInt(0x10000);
-        // Offset() keeps the call order and the zero y.
         step = Offset(angle, 0x1400000);
     }
     probe += step;
     if (IsVisible((Player*)group->player, (Position_00408090*)&probe)) {
         int r = SumUnitRatingsInRange(player, &probe, 0xa0);
-        // Operand order: the bestRating roll is called first.
         if (RandomInt(r) > RandomInt(bestRating)) {
             bestRating = r;
             best = probe;

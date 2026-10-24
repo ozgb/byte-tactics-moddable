@@ -1,48 +1,33 @@
-// Decompiled by deepseek-v4.1-flash, Opus, space-bunny-free, GPT-6, Sonnet and Claude Opus 5.5, finished by deepseek-v4.1-flash. Names are provisional.
-// The unit type registry: one UnitDef per unit, its FBI / COB data, the
-// movement classes, and the downloadable build menu tables. UnitDef, TdfFile,
-// TdfRecord, MovementClass and Game each have one definition; the views the
-// functions used sit in unions where they disagree.
 #include <stdio.h>
 #include "../state/block.h"
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
 #include <list>
-// Included only for its symbols: it puts LoadUnitFbi's yardmap stores back
-// in the original's base/index order (docs/c2-regalloc.md).
 #include <malloc.h>
 
 #pragma pack(push, 1)
 
 #include "../util/vec3.h"
 
-// The game's 16.16 fixed-point value. GetFieldFixed returns it by value (through
-// a hidden pointer, since it has a constructor) and takes the default by value.
 class Fixed {
 public:
     int value;
     Fixed(int v) { value = v; }
 };
 
-// Keeps its own class: it defines the methods, and its loader names and bit groupings are not unit_def.h's.
-// One unit type, 0x249 bytes. The field names are 0x42bf40's; the two flag
-// words keep 0x42b370's bit groupings so its hand-written operator= still sees
-// them (bit 5 downloadable, bit 6 canbuild, bit 31 gui of flags1; bits 20..22
-// selfdestructcountdown of flags2).
 #include "unit_def.h"
 
-// One 0xbd-byte downloadable build list: a count and five entries.
 struct BuildEntry_0042dcf0 {
-    unsigned short typeId;             // +0x00
-    unsigned char page;                // +0x02
-    unsigned char slot;                // +0x03
-    char name[0x21];                   // +0x04
+    unsigned short typeId;
+    unsigned char page;
+    unsigned char slot;
+    char name[0x21];
 };
 
 struct BuildList_0042dcf0 {
-    int count;                         // +0x00
-    BuildEntry_0042dcf0 entries[5];    // +0x04
+    int count;
+    BuildEntry_0042dcf0 entries[5];
 };
 
 class UnitTable;
@@ -53,15 +38,9 @@ class UnitTable;
 
 #include "../graphics/memory_cache.h"
 
-// Unused here: the symbol ids these declarations take keep LoadUnitTypes'
-// allocation, standing in for the two view classes merged above
-// (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void CopyDwordIfNonNull(int*, int*);
 
-// Unused here: the symbol ids these declarations take keep the allocation,
-// standing in for the three TdfRecord views merged into the class below
-// (docs/c2-regalloc.md).
 int IsCountBelowAiLimit(unsigned char, unsigned short, int);
 int IsUnderLimit(int, unsigned short, int);
 void ProbeUnitDefEnergyRate(int, int, int);
@@ -71,10 +50,6 @@ void SetCameraPosition(int, int, int);
 void StartScreenShake(int, int, int);
 int RegisterUnitOrders();
 
-// A parsed TDF file; the getters read the current section.
-// Keeps its own view of the parser classes: the header's GetFieldFixed takes
-// the result pointer first, while these calls pass and return a Fixed by value,
-// and spelling them with the header's form changes the frame and the pushes.
 class TdfRecord;
 
 
@@ -91,9 +66,6 @@ static inline int FixedField(TdfRecord* record, char* key, Fixed def)
 
 #include "../orders/mission_type.h"
 
-// Puts the one-byte MissionType temporary at [esp+0x23], the top byte of
-// its slot, where the original builds it; a plain named local lands at the
-// bottom of the slot.
 struct MissionHolder {
     char pad[3];
     MissionType mission;
@@ -131,12 +103,8 @@ void __stdcall BindModelTextures(void* obj, char* name);
 MovementClass* __stdcall FindMovementClass(char* name);
 void LoadUnitInfo();
 
-// The float fields' getter. The outer parentheses matter (note 7 of 0x42bf40).
 #define GETFLOAT(section, key) ((float)(section)->GetFieldDouble(key, 0.0))
 
-// UnitDef::operator= for the 0x249-byte UnitDef element. Hand-written:
-// char arrays are copied with byte loops, plain ints/shorts/structs member by
-// member, and the two flag words at +0x241/+0x245 bit by bit.
 // FUNCTION: 0x42b370 ??4UnitDef@@QAEAAV0@ABV0@@Z
 UnitDef& UnitDef::operator=(const UnitDef& src)
 {
@@ -240,15 +208,10 @@ void RefreshUnitInfo()
     }
 }
 
-// Walks the unit definition table at g_game+0x1439b (0x249-byte entries) and
-// the table at g_game+0x391cb (0xbd-byte entries). For every pair that shares a
-// name, if the def's bit 5 at +0x241 is clear it prints a warning and sets the
-// "downloadable" bit (the table's lock is taken around the update).
 // FUNCTION: 0x42bd40
 void CheckDownloadableFlags()
 {
     UnitDef* def = g_game->defs;
-    // One for statement with `i++, def += 0x249`; no source guard on the first test.
     for (int i = 0; i < g_game->unitDefCount;
          i++, def = (UnitDef*)((char*)def + 0x249)) {
         for (int j = 0; j < g_game->buildListCount; j++) {
@@ -266,9 +229,6 @@ void CheckDownloadableFlags()
     }
 }
 
-// Makes the game's entry table writable, then fills each entry's short list
-// (max 30) with the type ids whose element rows match the entry index, and
-// finally restores the table to read-only.
 // FUNCTION: 0x42be30
 void AddDownloadBuildOptions()
 {
@@ -292,15 +252,11 @@ void AddDownloadBuildOptions()
     ProtectBlockReadOnly(g_game->defs);
 }
 
-// Stores the low bits of value, masked, into the flag word at the given shift.
-// The xor and value2 spellings, candgun, kamikaze and norestrict stay written
-// out in LoadUnitFbi: expanding the helpers there changes the later code.
 static inline unsigned int SetFlagField(unsigned int flags, unsigned int value, int shift, unsigned int mask)
 {
     return (value & mask) << shift | flags & ~(mask << shift);
 }
 
-// The same store, spelled with the old bits first.
 static inline unsigned int ReplaceFlagField(unsigned int flags, unsigned int value, int shift, unsigned int mask)
 {
     return flags & ~(mask << shift) | (value & mask) << shift;
@@ -308,16 +264,9 @@ static inline unsigned int ReplaceFlagField(unsigned int flags, unsigned int val
 
 #include "../../interfaces/seams.h"
 
-// Included only for its symbols, here so the functions above keep their own
-// numbers: with <malloc.h> it puts LoadUnitFbi's yardmap stores back in the
-// original's base/index order (docs/c2-regalloc.md).
 #include <conio.h>
 #include "../state/sim_globals.h"
 
-// Reads a unit's FBI file (the UNITINFO section of a TDF) into its 0x249-byte
-// unit definition: names, costs, movement, energy, the two flag words, the
-// self-destruct countdown, the sound category, corpse, movement class,
-// weapons, the yard map and the footprint extents.
 // FUNCTION: 0x42bf40
 void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
     TdfFile parser;
@@ -528,11 +477,9 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
                 unitdef->selfdestructcountdown = 5;
             parser.current->GetFieldString(buf, "category", 100, DAT_005119b8);
             unitdef->AddToCategories(buf);
-            // The test goes through an int local, and default arguments are literal 0.
             int found = parser.current
                     ->GetFieldString(buf, "soundcategory", 100, DAT_005119b8);
             if (found) {
-                // Own loop counter, with the store and goto on a hit.
                 int sound;
                 for (sound = 0; sound < g_game->entry_count; sound++) {
                     if (_strcmpi((char *)g_game->entries_37e13 + sound * 0x160, buf) == 0) {
@@ -589,7 +536,6 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
                 unitdef->flags1 &= ~0x10000;
             else
                 unitdef->flags1 |= 0x10000;
-            // Cleared here and again in the else branch: the original has both stores.
             unitdef->yardmap = 0;
             if (unitdef->mobile == 0) {
                 parser.current
@@ -600,7 +546,6 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
                 int cell = 0;
                 char* cursor = yard;
                 int y = 0;
-                // Declared after the loop locals: its larger symbol id makes it the base.
                 Ref<char>& map = unitdef->yardmap;
                 while (y < unitdef->footprintz) {
                     for (int x = 0; x < unitdef->footprintx;) {
@@ -649,16 +594,13 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             } else {
                 unitdef->yardmap = 0;
             }
-            // Footprint fields read directly, no w/h locals.
             unitdef->modelMinX = (unitdef->footprintx * -0x100000) / 2;
             unitdef->modelMinZ = (unitdef->footprintz * -0x100000) / 2;
             unitdef->modelMaxX = (unitdef->footprintx << 20) / 2;
             unitdef->modelMaxZ = (unitdef->footprintz << 20) / 2;
-            // Inline Vec3 operator- returning by value.
             *(Vec3*)&unitdef->modelSizeX = *(Vec3*)&unitdef->modelMaxX - *(Vec3*)&unitdef->modelMinX;
             unitdef->radius = (unitdef->modelSizeZ + unitdef->modelSizeX) / 3;
             parser.Unload();
-            // cancloak with no mincloakdistance: default to 80
             if ((unitdef->flags2 & 0x2000) && unitdef->mincloakdistance == 0)
                 unitdef->mincloakdistance = 80;
         }
@@ -666,11 +608,6 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
 FINISH:;
 }
 
-// Reads the unit definition and script of a unit type from disk, both under
-// "units/<TypeName>/", and stores the script at UnitDef+0x18e: first the
-// definition file ("FBI") when it exists, then the script file ("COB").
-// The whole table at g_game+0x1439b (0x249-byte entries) is locked while the
-// files are read.
 // FUNCTION: 0x42d1f0
 void __stdcall ReloadUnitType(unsigned short index)
 {
@@ -726,7 +663,6 @@ void LoadUnitTypes() {
         parser.Unload();
     }
 
-    // operator new plus Construct(), not `new`: the symbol table has no constructor here.
     UnitTable* obj = (UnitTable*)operator new(0x14);
     obj = obj ? obj->Construct() : 0;
     (*(UnitTable **)&g_game->unitTable) = obj;
@@ -753,7 +689,6 @@ void LoadUnitTypes() {
 
     UnitDef* p = start;
     UnitDef* d;
-    // This guard shape (if p != end, then if p == end) gives the original's branch layout.
     if (p != end) {
         while (p != end && !(~(p->flags1) & 0x800000))
             p++;
@@ -764,7 +699,6 @@ void LoadUnitTypes() {
         UnitDef* w = p;
         for (UnitDef* s = p + 1; s != end; s++) {
             if (!(~(s->flags1) & 0x800000)) {
-                // Must be `*w++ = *s`, not a separate increment.
                 *w++ = *s;
             }
         }
@@ -814,10 +748,8 @@ void LoadUnitTypes() {
     void** models = (void**)SimAllocTagged("MODEL PTRS", g_game->unitDefCount * 4);
     g_game->types = (Class_0045ae80**)models;
 
-    // `u` must be an unsigned short: an int counter breaks the loop.
     for (unsigned short u = 1; u < g_game->unitDefCount; u++) {
         UnitDef* type = &g_game->defs[u];
-        // Divisor read through this body-local pointer: g_game then takes ecx.
         Game* gp = g_game;
         g_game->loadPctUnits = (unsigned char)((u * 100) / gp->unitDefCount);
         type->id = u;
@@ -850,7 +782,6 @@ void LoadUnitTypes() {
         int suffix = 1;
         int found = 0;
         int more;
-        // Condition-tested do-while on a `more` local, with `else break;`.
         do {
             sprintf(section, "%s%d", namebuf, suffix);
             BuildDataPath(path, "guis", section, "GUI");
@@ -894,7 +825,6 @@ void LoadUnitTypes() {
                     while (parser2.current->GetFieldString(valbuf, objpath, 0x20, DAT_005119b8)) {
                         short val = FindUnitTypeId(valbuf);
                         if (val != 0) {
-                            // Index store, not a walking `*out = val; out++;`.
                             list[count] = val;
                             count++;
                         }
@@ -923,10 +853,6 @@ int __stdcall CompareUnitTypeNames(const char* param_1, const char* param_2)
     return _strcmpi(param_1 + 0x20, param_2 + 0x20) < 0;
 }
 
-// Releases the per-unit-type data tables: the array at g_game+0x14377, the
-// 0x249-byte entries of g_game+0x1439b (with their script and file members),
-// and the object at g_game+0x1437b. The loop starts at index 1 because entry 0
-// is not a real unit type.
 // FUNCTION: 0x42db90
 void FreeUnitTypes()
 {
@@ -969,29 +895,6 @@ void FreeUnitTypes()
     g_game->defs = 0;
 }
 
-// Edited by deepseek-v4.1: MATCH. Fixes this round:
-// 1. `int c; int i;` are declared at the top of the body, before `int n = files.size();`,
-//    and the last two loops reuse that one counter `c`. A group of scalar locals gets
-//    its esp slots in reverse declaration order, so with the counters declared after n
-//    the file count n landed in [esp+0x18]/EBP instead of the original [esp+0x10]/EBX;
-//    declaring them first moved n to 0x10/EBX and cascaded the whole group (the max-page
-//    scan and the downloadable scan, g_game into EDI, the lea esi,[ebx+eax] addressing),
-//    lifting 77.6 -> 97.3.
-// 2. The downloadable scan (0x42e037-0x42e0bf) kept coming out with the build-list
-//    counter in EBX and the i*0xbd byte offset in EBP, the exact inverse of the
-//    original (counter EBP, offset EBX, `inc ebp`; `add ebx,0xbd`; `cmp ebp,[eax+..]`).
-//    The register assignment follows the order the loop variables are created, mapped
-//    onto ESI, EDI, EBX, EBP (the four callee-saved registers live across the _strcmpi
-//    call here), so the offset has to be a real source variable created before the
-//    counter. Declaring `int off = 0;` and walking with it (`i++, off += 0xbd`,
-//    `((char*)g_game->buildLists + off)->entries[0].name`)
-//    makes the strength-reduction temp disappear and gives offset EBX / counter EBP.
-// 3. `defs[c].name` is used directly at both call sites instead of a `char* name`
-//    local: that drops one live-across-call variable, so the hoisted name temp lands
-//    in EDI (the `lea edi,[esi-0x221]` in the preheader) instead of competing for EBX.
-// Note 0x4c48c0 and 0x4c46c0 are two different classes in data/symbols.csv
-// (TdfRecord::GetFieldString and TdfRecord::GetFieldInt), so `current`
-// is a TdfRecord* and the int-arg calls cast it to TdfRecord*.
 // FUNCTION: 0x42dcf0
 void LoadDownloadMenus()
 {
@@ -1070,18 +973,12 @@ void FreeDownloadMenus()
     GameFreeThunk((BuildList_0042dcf0 *)g_game->buildLists);
 }
 
-// Walks the whitespace separated names in the argument string. Each name is
-// looked up in the name to mask table (GetCategoryMask) and this object's team bit
-// is set in the mask that name maps to, then the same is done for "ALL", so the
-// team always ends up in the ALL mask.
-// Must stay out of line: inlining the body into LoadUnitFbi breaks the match.
 #pragma auto_inline(off)
 // FUNCTION: 0x488e70
 void UnitDef::AddToCategories(char* names)
 {
     int n;
     char buf[256];
-    // First test outside the loop (a do/while): it decides the register save and `this`.
     if (sscanf(names, " %s %n", buf, &n) == 1) {
         do {
             names += n;

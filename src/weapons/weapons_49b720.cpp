@@ -1,13 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by claude-opus-5-5. Names are provisional.
-//
-// The projectile update loop. One if/else-if chain over the type's flag
-// bits (selfProp guided, lineOfSight straight, ballistic timed drift, dropped
-// drift, meteor tumbling), with
-// a burst-fire branch for projectiles whose counter is not 0.
-// Remove() is the inlined "deselect and mark dead" block that 0x49b090 also
-// writes out.
-
-// Needed: without <stdio.h> the b0 arm loads g_game first and gets a 5-byte mov.
 #include <stdio.h>
 
 #pragma pack(push, 1)
@@ -48,8 +38,6 @@ int __stdcall RandomInt(int range);
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 
-// A copy of AllocProjectile (matched in its own file), the function just before
-// this one in the original source; defined here so that /Ob2 inlines it.
 static Projectile* AllocProjectile()
 {
     Projectile* p = 0;
@@ -61,8 +49,6 @@ static Projectile* AllocProjectile()
     return p;
 }
 
-// Gravity goes through this pointer store, not `p->vel.y -= ...`: it makes
-// p->type get reloaded, so `type` is not propagated.
 static inline void Fall(Vec3* v)
 {
     v->y -= g_game->gravity;
@@ -78,15 +64,12 @@ static inline void Remove(Projectile* p)
     p->flagBits.dead = 1;
 }
 
-// Stays in its own file: the b0 arm's register tie follows this file's symbol
-// ids, which the joined weapons.cpp moves.
 // FUNCTION: 0x49b720
 void UpdateProjectiles()
 {
     int n = g_game->projectileCount;
     for (int i = 0; i < n; i++) {
         Projectile* p = &g_game->projectiles[i];
-        // type is read before oldY: orders the two spill stores.
         WeaponDef* type = p->type;
         int oldY = p->positionWords.yWhole;
 

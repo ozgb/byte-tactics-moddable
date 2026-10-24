@@ -1,31 +1,20 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by Claude Opus 5.5, matched by Claude Opus 5.5. Names are provisional.
-// Per-tick economy update for one player: every unit's energy/metal use and
-// production is summed, the player's totals and storage are updated, and the
-// share of the demand that could be met is fed back into every account.
-//
-// The unit's resource account is a class at +0xbc whose owner pointer is at
-// +0x30 (unit+0xec); 0x401180..0x4012a0 are its methods and 0x401320 is the
-// end-of-tick update, all defined above without FUNCTION lines.
 #include <float.h>
 #include "../../interfaces/ref.h"
-// Load-bearing: the symbol id this forward declaration takes keeps UseEnergy's
-// x87 code; the header's own declaration of Player comes later.
 struct Player;
 
 #pragma pack(push, 1)
 struct Res_00401360 {
-    float produced;                    // +0x0
-    float used;                        // +0x4
-    float demand;                      // +0x8
-    float backlog;                     // +0xc
-    float lastProduced;                // +0x10
-    float lastUsed;                    // +0x14
+    float produced;
+    float used;
+    float demand;
+    float backlog;
+    float lastProduced;
+    float lastUsed;
 };
 
-// The unit's (and the player's) resource accounts: energy, then metal.
 class Econ_00401360 {
 public:
-    Res_00401360 res[2];               // +0x0
+    Res_00401360 res[2];
     Ref<Player> owner;
     int RequestEnergy(Econ_00401360* e, float amount);
     int RequestEnergyAndMetal(float energy, float metal);
@@ -50,8 +39,6 @@ static inline Econ_00401360* EconOf(Unit* u)
 
 extern Game* g_game;
 
-// The functions before 0x401360 in the original file (each matched in its own
-// file under another class name), defined here without FUNCTION lines.
 int Econ_00401360::RequestEnergy(Econ_00401360* e, float amount)
 {
     e->res[0].used += amount;
@@ -160,8 +147,6 @@ static inline void AddIncomeD(Unit* u, float* dst, double v)
     *dst += v;
 }
 
-// The 0x4237d0 layout (break and else) with a double amount: tidal and the
-// else branch (see the top).
 static inline void AddIncomeDB(Unit* u, float* dst, double v)
 {
     Player* o = u->resourceSlot.player;
@@ -186,7 +171,6 @@ static inline void AddIncomeDB(Unit* u, float* dst, double v)
 #else
 #define WIND_ADD(v) ((float)(v))
 #endif
-// Takes a double but adds (float)v: its case blocks merge into the else branch's.
 static inline void AddIncomeW(Unit* u, float* dst, double v)
 {
     Player* o = u->resourceSlot.player;
@@ -210,7 +194,6 @@ static inline void AddIncomeW(Unit* u, float* dst, double v)
 
 static int Use_00401180(Unit* u, float amount)
 {
-    // The used store goes through a float*: else the backlog compare is scheduled above it.
     float* used = &EconOf(u)->res[0].used;
     *used += amount;
     if (EconOf(u)->res[0].backlog > 0.0f)
@@ -227,8 +210,6 @@ static int UseEnergy(Unit* u, float v)
     return 0;
 }
 
-// The demand add goes through a double copy of the amount: it makes the
-// backlog > 0 pop shared with the default add's.
 static int UseEnergyD(Unit* u, float v)
 {
     if (v >= 0) {
@@ -249,7 +230,6 @@ static int UseEnergyD(Unit* u, float v)
 // FUNCTION: 0x401360
 void __stdcall UpdatePlayerEconomy(Player* p)
 {
-    // Separate float[2] arrays, with avail and demandRatio split off: sets the frame order.
     float usedA[2];
     float backlogA[2];
     float demandA[2];
@@ -418,7 +398,6 @@ void __stdcall UpdatePlayerEconomy(Player* p)
             ratioA[i] = avail[i] / backlogA[i];
         }
         avail[i] -= take;
-        // Local copy keeps the remaining amount on the x87 stack.
         float left = avail[i];
         if (demandA[i] <= left) {
             take = demandA[i];

@@ -1,5 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, edited by deepseek-v4.1-flash, finished by claude-opus-5.5, space-bunny-free. Names are provisional.
-
 #include <string.h>
 #include "../state/block.h"
 #include <vector>
@@ -8,7 +6,6 @@
 #include "weapon_def.h"
 #include "damage_table.h"
 
-// 3.14159265358979 / 180 is exactly the exe's 0.017453292519943278.
 #define PI 3.14159265358979
 
 #include "../util/string_ref.h"
@@ -64,8 +61,6 @@ int UsesDataArchives(void);
 extern void __cdecl operator delete(void*);
 void __cdecl GameFreeThunk(void* p);
 
-// Loads every "Weapons\\*.tdf" file, parses each with the TDF parser, and
-// calls LoadWeaponType once per top level section found in it.
 // FUNCTION: 0x42e310
 void LoadWeaponTypes()
 {
@@ -97,9 +92,6 @@ void LoadWeaponTypes()
     }
 }
 
-// Loads one weapon from a .TDF section: the numbers and flags, the model, the
-// explosion animations, the sounds and the DAMAGE sub-section, which goes into
-// a table sorted by unit name (w->table).
 // FUNCTION: 0x42e440
 void __stdcall LoadWeaponType(TdfRecord* parser) {
     char* id = (char*)parser->GetRecordName();
@@ -114,8 +106,6 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
     w->acceleration =
         (int)(parser->GetFieldDouble("weaponacceleration", 0.0) *
               72.81777777777778);
-    // The short fields are unsigned short, so the casts are too: a (short) cast
-    // stored to one changes the inlining further down.
     w->range = parser->GetFieldInt("range", 0x7fff);
     w->coverage = parser->GetFieldInt("coverage", 0);
     w->reloadTime = (unsigned short)(parser->GetFieldDouble("reloadtime", 0.0) * 30.0);
@@ -134,9 +124,7 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
     w->lifeRand = (unsigned short)(parser->GetFieldDouble("randomdecay", 0.0) * 30.0);
     w->smokeRate = (unsigned short)(parser->GetFieldDouble("smokedelay", 0.0) * 30.0);
     w->flightTime = (unsigned short)(parser->GetFieldDouble("flighttime", 0.0) * 30.0);
-    // +0xfe is the TDF holdtime in ticks; the blast code copies it to cameraSnapTicks.
     w->holdTime = (unsigned short)(parser->GetFieldDouble("holdtime", 0.0) * 30.0);
-    // No (float) cast: it costs the scheduler one unit and shifts later bitfield stores.
     w->pitch =
         parser->GetFieldDouble("minbarrelangle", -11.25) * (PI / 180);
     w->fireStarter = (unsigned char)parser->GetFieldInt("firestarter", 0);
@@ -147,7 +135,6 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
     w->flags.b.guidance = parser->GetFieldInt("guidance", 0);
     w->flags.b.tracks = parser->GetFieldInt("tracks", 0);
     w->flags.b.lineOfSight = parser->GetFieldInt("lineofsight", 0);
-    // Named local: makes the bitfield `or` take the shifted value as destination.
     int ballistic = parser->GetFieldInt("ballistic", 0);
     w->flags.b.ballistic = ballistic;
     w->flags.b.unitsOnly = parser->GetFieldInt("unitsonly", 0);
@@ -168,7 +155,6 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
     w->flags.b.interceptor = parser->GetFieldInt("interceptor", 0);
     w->flags.b.beamWeapon = parser->GetFieldInt("beamweapon", 0);
     w->flags.b.shellWeapon = parser->GetFieldInt("shellweapon", 0);
-    // Named local, as for ballistic.
     int dropped = parser->GetFieldInt("dropped", 0);
     w->flags.b.dropped = dropped;
     w->flags.b.vLaunch = parser->GetFieldInt("vlaunch", 0);
@@ -262,8 +248,6 @@ model_done:
                 StringRef name(key);
                 Table_00499cd0* m = w->table;
                 Entry_00432cf0* e = m->LowerBound(name.ptr);
-                // insert called here, not in a helper (inline depth); e assigned
-                // first, then &e->value taken in each arm.
                 int* r;
                 if (e == m->v.end() || Ne(e->name, name)) {
                     e = m->v.insert(e, Entry_00432cf0(name, 0));

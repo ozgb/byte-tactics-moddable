@@ -1,7 +1,3 @@
-// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by claude-sonnet-5-5. Names are provisional.
-// A method of UnitSync, whose other methods are in unit_sync.cpp.
-// Stays in its own file: its PacketSequencer holds SyncChecksumVector members, so
-// its element view cannot share unit_sync.cpp's PacketSequencer.
 #include <list>
 #include <map>
 #include <vector>
@@ -10,33 +6,32 @@
 
 struct Data_0046dad0 {
     char unknown_0[0x94];
-    unsigned char kind;     // +0x94
+    unsigned char kind;
 };
 
 #include "../../interfaces/ref.h"
 #pragma pack(push, 1)
 struct PlayerInfo_0046dad0 {
-    int active;  // +0x0
-    int id;      // +0x4
+    int active;
+    int id;
     char unknown_8[0x27 - 0x8];
     Ref<Data_0046dad0> data;
     char unknown_2b[0x73 - 0x2b];
-    unsigned char type; // +0x73
-    char unknown_74[0x14b - 0x74]; // the record's stride in g_game->players
+    unsigned char type;
+    char unknown_74[0x14b - 0x74];
 };
 
-struct UnitSyncPacket { // 0xe bytes
-    unsigned char type;  // +0x0
-    unsigned char arg;   // +0x1
-    int id;              // +0x2
-    int key;             // +0x6
-    int value;           // +0xa
+struct UnitSyncPacket {
+    unsigned char type;
+    unsigned char arg;
+    int id;
+    int key;
+    int value;
 };
 
 #include "../game/game.h"
 #pragma pack(pop)
 
-// Inline-budget filler, see the header.
 inline int Pass(int v) { return v; }
 
 struct UnitSyncEntry {
@@ -45,11 +40,7 @@ struct UnitSyncEntry {
     int limit;
 };
 
-// The vector members are modelled by the classes data/symbols.csv names
-// for their out-of-line pieces: 0x46e5c0 is the vector constructor body
-// (inlined for ids, a call for pairs), 0x46e5e0 and 0x46e610 are the
-// destructors of vectors of 4 and 14 byte elements.
-struct Alloc_0046e5c0 {}; // the empty std::allocator temporary
+struct Alloc_0046e5c0 {};
 
 struct SyncTaggedVector {
     char allocator;
@@ -90,12 +81,12 @@ int __cdecl GetLocalHumanDpid();
 int __cdecl GetHostDpid();
 void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 
-struct PacketSequencer { // 0x2c bytes, the entry's +0x30 member
+struct PacketSequencer {
     int lastSent;
     int cur;
     int max;
-    SyncChecksumVector sentQueue; // +0xc
-    SyncChecksumVector heldQueue; // +0x1c
+    SyncChecksumVector sentQueue;
+    SyncChecksumVector heldQueue;
 
     PacketSequencer();
     void SendUnsequenced(unsigned int param_1, void* param_2);
@@ -105,14 +96,14 @@ struct PacketSequencer { // 0x2c bytes, the entry's +0x30 member
     }
 };
 
-struct SyncPlayerRecord {  // 0x5c bytes, one vector element
-    int id;                // +0x0
-    SyncTempTaggedVector ids;    // +0x4
-    Wrap_0046e5e0 pairs;   // +0x14
-    int expected;          // +0x24
-    int sent;              // +0x28
-    int ackd;              // +0x2c
-    PacketSequencer sub;   // +0x30
+struct SyncPlayerRecord {
+    int id;
+    SyncTempTaggedVector ids;
+    Wrap_0046e5e0 pairs;
+    int expected;
+    int sent;
+    int ackd;
+    PacketSequencer sub;
 
     SyncPlayerRecord& operator=(const SyncPlayerRecord& src);
 };
@@ -122,9 +113,6 @@ extern int DAT_00000000;
 
 int __stdcall ComputeUnitScriptChecksum(UnitDef* def);
 
-// 0x46f7a0 has no name in the exe, so it is modelled as a method of a
-// vector subclass to keep the call out of line (it is the out-of-line
-// vector<SyncPlayerRecord>::insert).
 class Vec_0046d860 : public std::vector<SyncPlayerRecord> {
   public:
     void InsertPlayerRecord(iterator where, size_type n, const SyncPlayerRecord& x);
@@ -133,14 +121,14 @@ class Vec_0046d860 : public std::vector<SyncPlayerRecord> {
 
 class UnitSync {
   public:
-    std::map<unsigned int, UnitSyncEntry> map; // +0x00
-    Vec_0046d860 players;                      // +0x10
-    std::list<unsigned int> queue;             // +0x20
-    PacketSequencer sequencer;                 // +0x2c
-    int direct;   // +0x58
-    int pendingPlayerCount; // +0x5c
-    int checksumProgress; // +0x60
-    int disabled; // +0x64
+    std::map<unsigned int, UnitSyncEntry> map;
+    Vec_0046d860 players;
+    std::list<unsigned int> queue;
+    PacketSequencer sequencer;
+    int direct;
+    int pendingPlayerCount;
+    int checksumProgress;
+    int disabled;
 
     void ProcessSync();
     void CheckUnitAvailable(unsigned int key, int y);
@@ -189,12 +177,9 @@ void UnitSync::ProcessSync() {
                 if (found == 0) {
                     SyncPlayerRecord entry;
                     entry.id = p->id;
-                    // expected/28/2c are zeroed by assignments after id.
                     entry.expected = 0;
                     entry.sent = 0;
                     entry.ackd = 0;
-                    // Push models the inlined push_back: the lea of this+0x10
-                    // comes before the end() load.
                     players.Push(entry);
                     SyncPlayerRecord* e = &players.back();
                     if (disabled == 0) {
@@ -215,8 +200,6 @@ void UnitSync::ProcessSync() {
             typedef std::map<unsigned int, UnitSyncEntry>::_Imp Tree;
             typedef void (Tree::iterator::*Increment)();
             Increment increment = &Tree::iterator::_Inc;
-            // Exactly ten Pass calls spend the inline budget: 9 or fewer inlines
-            // vector::_Destroy, 11 or more also un-inlines the pairs wrapper.
             for (std::map<unsigned int, UnitSyncEntry>::iterator k = map.begin(); k != map.end();
                  (k.*increment)()) {
                 CheckUnitAvailable(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(k->second.x)))))))))), 0);
@@ -248,15 +231,12 @@ void UnitSync::ProcessSync() {
                 return;
             }
 
-            // Nested if/else with this loop: it re-reads g_game first and returns
-            // when checksumProgress >= unitDefCount.
             for (int n = 0; n < 4;) {
                 Game* game = g_game;
                 if (checksumProgress >= game->unitDefCount)
                     return;
                 UnitDef* def = &game->defs[checksumProgress];
                 ComputeUnitScriptChecksum(def);
-                // y then key, read into locals before the disabled test.
                 int y = def->scriptChecksum;
                 unsigned int key = def->fbiChecksum;
                 if (disabled == 0) {
@@ -265,8 +245,6 @@ void UnitSync::ProcessSync() {
                     packet.arg = 2;
                     packet.key = key;
                     packet.value = y;
-                    // Only this send is the inlined copy (Inl); all others are real
-                    // SendUnsequenced calls with the id read into a local first.
                     if (direct != 0) {
                         (&this->sequencer)->Inl(DAT_00000000, &packet);
                     } else {

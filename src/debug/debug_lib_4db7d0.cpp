@@ -1,36 +1,26 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by deepseek-v4.1, finished by Sonnet 5.5, finished by deepseek-v4.1-flash, finished by Claude Opus 5.5. Names are provisional.
-// The game's free() for its own heap, the partner of malloc() at 0x4dacf0:
-// under the allocator lock it finds the block's record in the live-block map,
-// fills the slack after (or before) the block with the debug pattern, keeps a
-// copy of the record in the debug ring (the last 0x2000 freed blocks), drops
-// it from the live map, decommits the pages and gives the reserved range back
-// to the free-block set.
 #include "../../interfaces/host.h"
 #include <vector>
 #include "free_block_map.h"
 
-extern unsigned int g_committedBytes; // bytes committed
+extern unsigned int g_committedBytes;
 extern void (*g_outOfMemoryHandler)();
 
-// ---- the live-block map ----------------------------------------------------
-
-// The per-block record; its first dword is the map's key.
 class BlockInfo {
 public:
-    unsigned int base;    // +0x0
-    unsigned int size;    // +0x4
-    unsigned int count;   // +0x8
-    char unknown_c[0x20]; // +0xc
-    unsigned int tag;     // +0x2c
+    unsigned int base;
+    unsigned int size;
+    unsigned int count;
+    char unknown_c[0x20];
+    unsigned int tag;
 
     BlockInfo(int a, int b, int c, int d, const char* e);
 };
 
 struct LiveNode {
-    LiveNode* left;        // +0x0
-    LiveNode* parent;      // +0x4
-    LiveNode* right;       // +0x8
-    BlockInfo value;       // +0xc
+    LiveNode* left;
+    LiveNode* parent;
+    LiveNode* right;
+    BlockInfo value;
 };
 
 class BlockMapIter {
@@ -47,19 +37,16 @@ public:
 class BlockMap {
 public:
     char unknown_0[4];
-    LiveNode* head;        // +0x4
+    LiveNode* head;
 
     BlockMapIter end() { return BlockMapIter(head); }
-    BlockMapIter Find(const unsigned int& key); // find
+    BlockMapIter Find(const unsigned int& key);
     BlockMapIter erase(BlockMapIter it);
-    // An inline front for erase, as the original map called the tree's erase.
     BlockMapIter Remove(BlockMapIter it) { return erase(it); }
 };
 
-// ---- the debug arena: a ring of the last 0x2000 freed records ---------------
-
 struct Elem_004dd8c0 {
-    unsigned int w[0xc];               // +0x0, 0x30 bytes
+    unsigned int w[0xc];
 };
 
 class Alloc_004dd8c0 {
@@ -96,14 +83,10 @@ public:
 };
 
 struct Arena_004da9f0 {
-    std::vector<Elem_004dd8c0, Alloc_004dd8c0> ring; // +0x0
-    unsigned int count;                              // +0x10
+    std::vector<Elem_004dd8c0, Alloc_004dd8c0> ring;
+    unsigned int count;
 };
 
-// ---- the allocator's free-block set -----------------------------------------
-
-// 0x4db000: add a free block, merged with the free blocks on either side. The
-// original inlines this into FreeDebugBlock, so the definition stays here.
 inline void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
 {
     FreeBlockIter it;

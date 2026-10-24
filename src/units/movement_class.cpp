@@ -1,16 +1,6 @@
-// Decompiled by Opus, space-bunny-free, Sonnet, Space Bunny Free, Haiku and deepseek-v4.1-flash. Names are provisional.
-// The units/movement_class module: the 32-entry movement class table at
-// 0x512358, the passability maps it owns and the helpers that keep them
-// current. One Game, one MovementClass, one MovementClassTable and one
-// Class_00440500 cover the module's views (Class_00440500 keeps its own
-// 32-byte view of MovementClass).
-//
-// Nothing here uses <windows.h>: its symbols put RefreshPassMap and
-// SetPassMapCell in the symbol-id windows they match in (docs/c2-regalloc.md).
 #include "win_types.h"
 #include "../state/block.h"
 #include <string.h>
-// Unused by the code, but it puts the pointer first in v[n] in BuildPassMap.
 #include <stdio.h>
 
 #include "../util/tdf.h"
@@ -25,7 +15,7 @@ unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj
 
 struct Source_00440340 {
     char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
+    TdfRecord* tdf;
 };
 
 #include "../util/vec3.h"
@@ -33,15 +23,15 @@ struct Source_00440340 {
 #pragma pack(push, 2)
 struct Unit_00440af0 {
     char unknown_0[0x26];
-    unsigned int lastTick;             // +0x26
+    unsigned int lastTick;
 };
 
 struct Object_00440af0 {
     Ref<Unit_00440af0> unit;
     char unknown_4[0x76 - 0x4];
-    Point16 a;               // +0x76
+    Point16 a;
     char unknown_7a[0x7e - 0x7a];
-    Point16 b;               // +0x7e
+    Point16 b;
 };
 #pragma pack(pop)
 
@@ -49,35 +39,32 @@ struct Object_00440af0 {
 struct Record_00440af0 {
     Ref<Unit_00440af0> unit;
     char unknown_4[0x76 - 0x4];
-    Point16 a;               // +0x76
+    Point16 a;
     char unknown_7a[0x7e - 0x7a];
-    Point16 b;               // +0x7e
+    Point16 b;
     char unknown_82[0x110 - 0x82];
-    unsigned int flags;                // +0x110
+    unsigned int flags;
     char unknown_114[0x118 - 0x114];
 };
 
-// One terrain cell as 0x440500 reads it.
 #include "../map/cell.h"
 #pragma pack(pop)
 
 #include "movement_class.h"
 
-// The same 32 bytes as MovementClass under the view 0x440500 builds the map
-// with (the BuildPassMap method).
 class Class_00440500 {
 public:
-    int* name;                         // +0x0
-    short footprintX;                  // +0x4
-    short footprintZ;                  // +0x6
+    int* name;
+    short footprintX;
+    short footprintZ;
     short maxWaterDepth;
     short minWaterDepth;
     unsigned char maxSlope;
     unsigned char badSlope;
     unsigned char maxWaterSlope;
     unsigned char badWaterSlope;
-    unsigned int width;                // +0x10
-    unsigned int height;               // +0x14
+    unsigned int width;
+    unsigned int height;
     Ref<unsigned int> cells;
     int lastTick;
 
@@ -86,23 +73,19 @@ public:
 
 int __stdcall GetPassMapCellValue(Class_00440500* obj, Cell* cell);
 
-// The pathfinder's dirty-list view of the unit object 0x440a70 refreshes from
-// (0x440af0 / 0x440be0 declare the same bytes as Object_00440af0).
 #pragma pack(push, 2)
 struct Struct_00440a70 {
     Ref<Unit_00440af0> unit;
     char unknown_4[0x76 - 0x4];
-    Point16 a;               // +0x76
+    Point16 a;
     char unknown_7a[0x7e - 0x7a];
-    Point16 b;               // +0x7e
+    Point16 b;
 };
 #pragma pack(pop)
 
 #include "../network/player.h"
 #include "../../interfaces/seams.h"
 
-// Unused here: real functions declared to keep the symbol ids RefreshPassMap and
-// SetPassMapCell match in (docs/c2-regalloc.md).
 void AbortProgram(void);
 
 #include "../map/mission.h"
@@ -112,32 +95,27 @@ void AbortProgram(void);
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-// Four dwords of the path lock (0x440ca0 only copies them), not known to be a
-// rectangle, so it stays off rect.h.
 struct Rect_00440ca0 {
-    int a;                             // +0x0
-    int b;                             // +0x4
-    int c;                             // +0x8
-    int d;                             // +0xc
+    int a;
+    int b;
+    int c;
+    int d;
 };
 
 #pragma pack(push, 1)
 struct Dst_00440ca0 {
     char unknown_0[0x99];
-    Rect_00440ca0 rect;                // +0x99
+    Rect_00440ca0 rect;
 };
 #pragma pack(pop)
 
 struct Src_00440ca0 {
     int unknown_0;
-    Rect_00440ca0 rect;                // +0x4
+    Rect_00440ca0 rect;
 };
 
 extern Game* g_game;
 
-
-// Out-of-line constructor of the 32-byte entry that the table's compiler-
-// generated initialiser (0x440230) declares with the same inline body.
 // FUNCTION: 0x4402e0
 MovementClass::MovementClass()
 {
@@ -156,10 +134,6 @@ MovementClass::MovementClass()
     lastTick = 0;
 }
 
-// Destructor of the 32-byte entry whose out-of-line constructor is 0x4402e0
-// (the table's initialiser inlines both for its array of entries). Its one
-// caller (0x42bf40) constructs a local entry with 0x4402e0 and calls this on
-// it (ecx) when the local goes out of scope.
 // FUNCTION: 0x440320
 MovementClass::~MovementClass()
 {
@@ -167,9 +141,6 @@ MovementClass::~MovementClass()
     operator delete(cells);
 }
 
-// Reads the movement fields from a TDF section (the object at src+4) into the
-// 32-byte entry. The four slope fields are clamped so that each is never larger
-// than its limit.
 // FUNCTION: 0x440340
 void MovementClass::ReadMoveInfo(Source_00440340* src)
 {
@@ -189,8 +160,6 @@ void MovementClass::ReadMoveInfo(Source_00440340* src)
         badWaterSlope = maxWaterSlope;
 }
 
-// Looks an entry up by name in the 32-entry table that the table's definition
-// owns (the class declarations are shared with it; name holds the name).
 // FUNCTION: 0x440420
 MovementClass* __stdcall FindMovementClass(char* name)
 {
@@ -231,12 +200,6 @@ static inline void setcell(unsigned int* q, int sh, unsigned int val)
     *q = (*q & ~(3 << sh)) | (val << sh);
 }
 
-// Builds the 2-bit-per-cell passability map (cells) for one footprint.
-// Pass 1 walks the map row by row, filling one scratch row with the raw cost
-// of every cell and marking 1 on the outer edge of the usable (3) area; pass 2
-// reads the map back column by column and marks 1 on the inner edge. Each pass
-// works on a scratch row whose two bytes in front and footprintX/footprintZ cells
-// past the end are zeroed.
 // FUNCTION: 0x440500
 void Class_00440500::BuildPassMap()
 {
@@ -254,7 +217,6 @@ void Class_00440500::BuildPassMap()
     buf = (unsigned char*)SimAlloc(size + 3);
     v = buf + 2;
 
-    // Braces keep the two int j apart: MSVC 5 leaks a for-init variable into the enclosing scope.
     {
     for (int j = 0; j < height; j++) {
         Cell* c = &g_game->cells[j * width];
@@ -317,8 +279,6 @@ void Class_00440500::BuildPassMap()
     operator delete(buf);
 }
 
-// Writes a rectangle of 2-bit cells into the transposed bitmap whose dword at
-// column x of row band (y>>4) holds 16 cells stacked down the column.
 // FUNCTION: 0x440830
 void MovementClass::RefreshPassMap(Point16 a, Point16 b)
 {
@@ -342,7 +302,6 @@ void MovementClass::RefreshPassMap(Point16 a, Point16 b)
         for (int y = top; y < bottom; y++) {
             for (int x = left; x < right; x++) {
                 unsigned int v = GetPassMapFootprintValueWithEdgeStrips(this, x, y);
-                // m holds only 3 << shift; the ~ stays at the use (a whole-mask local changes the frame).
                 unsigned int m = 3 << ((y & 0xf) * 2);
                 unsigned int* p = &cells[(y >> 4) * width + x];
                 *p = (*p & ~m) | (v << ((y & 0xf) * 2));
@@ -356,8 +315,6 @@ void NopAfterFeatureEnum(void)
 {
 }
 
-// Rebuilds every in-use entry of the 32-entry table at 0x512358 for the
-// current map size and tracks the progress percentage in g_game+0x38d73.
 // FUNCTION: 0x440940
 void BuildAllPassMaps(void)
 {
@@ -379,7 +336,6 @@ void BuildAllPassMaps(void)
             unsigned int w = (unsigned int)g_game->width;
             q[-2] = w;
             q[-1] = h;
-            // Size from the stored entry fields q[-1], q[-2], not the w/h locals.
             n = ((unsigned)(q[-1] + 0xf) >> 4) * q[-2];
             Ref<unsigned int>* slot = (Ref<unsigned int>*)q;
             operator delete((void*)slot->get());
@@ -424,8 +380,6 @@ void FreeMovementClasses(void)
     } while (p < (int)DAT_00512370 + (int)sizeof(MovementClassTable));
 }
 
-// Refreshes every entry in use of the table at 0x512358 (the loop that 0x440a70
-// inlines as its UpdateAll helper).
 // FUNCTION: 0x440a40
 void __stdcall RefreshAllPassMaps(Point16 a, Point16 b)
 {
@@ -445,9 +399,6 @@ static inline void UpdateAll(Point16 a, Point16 b)
     }
 }
 
-// Refreshes the entries of the table at 0x512358 for an object: entries newer
-// than the object's last update if it has a unit, otherwise every entry in use
-// (an inlined helper taking the two points by value, so they stay in registers).
 // FUNCTION: 0x440a70
 void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
 {
@@ -464,9 +415,6 @@ void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
     UpdateAll(p->a, p->b);
 }
 
-// Refreshes one entry of a pathfinder's dirty list for the object at p (see
-// 0x440a70 / 0x440be0): every unit in the unit table that moved in the window
-// since the last refresh gets the new dirty rectangle drawn.
 // FUNCTION: 0x440af0
 void MovementClass::RefreshMovedUnits(Object_00440af0* p)
 {
@@ -495,8 +443,6 @@ void MovementClass::RefreshMovedUnits(Object_00440af0* p)
     p->unit->lastTick = prev;
 }
 
-// One entry of the table at 0x512358 (see 0x440a70): refreshes it for an
-// object whose unit was last updated before the entry changed.
 // FUNCTION: 0x440be0
 void MovementClass::RefreshUnitIfStale(Object_00440af0* p)
 {
@@ -505,12 +451,8 @@ void MovementClass::RefreshUnitIfStale(Object_00440af0* p)
     }
 }
 
-// Included here, not at the top: the ids it adds would move RefreshPassMap and
-// SetPassMapCell out of the windows they match in.
 #include "../network/player_info.h"
 
-// Returns the lowest of ten slot numbers (0..9) not taken by any active player
-// of type 1-3 (side 10 excluded), or 0 when all are taken.
 // FUNCTION: 0x440c10
 int FindUnusedLogo()
 {

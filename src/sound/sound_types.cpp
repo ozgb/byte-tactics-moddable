@@ -1,5 +1,3 @@
-// Decompiled by space-bunny-free, deepseek-v4.1-flash, Opus and Haiku. Names are provisional.
-
 #include <stdio.h>
 #include <string.h>
 
@@ -7,23 +5,23 @@
 
 struct Source_0042f450 {
     char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
+    TdfRecord* tdf;
 };
 
 struct SoundInfo_005086fc {
-    char* name;                         // +0x0
-    int unknown_4[5];                   // +0x4
+    char* name;
+    int unknown_4[5];
 };
 
 struct Slot_0042f740 {
-    int count;                         // +0x00
-    int* a;                            // +0x04
-    int* b;                            // +0x08
+    int count;
+    int* a;
+    int* b;
 };
 
 struct Entry_0042f740 {
     char unknown_0[0x40];
-    Slot_0042f740 slots[0x18];         // +0x40
+    Slot_0042f740 slots[0x18];
 };
 
 
@@ -67,13 +65,6 @@ int __stdcall ReadSoundEntry(Source_0042f450* source, char* key, int* out)
     return 0;
 }
 
-// Loads gamedata\sound.TDF and fills the global "Sound Categories" table at
-// g_game+0x37e13 (count at g_game+0x37e17). Each of the top level .TDF
-// sections becomes one 0x160 byte record: its name is copied into the first
-// 0x3f bytes and, at +0x4c, 23 groups of three dwords are filled from the
-// entries named after the rows of the global table g_speechCategories ("select",
-// "select1", "select2", ...); the second and third dwords of each group are
-// allocated by ReadSoundEntry as the values are added.
 // FUNCTION: 0x42f580
 void LoadSoundCategories()
 {
@@ -97,7 +88,6 @@ void LoadSoundCategories()
                 obj.current->CopyRecordName(rec, 0x3f);
                 p = g_speechCategories;
                 int* vals = (int*)(rec + 0x4c);
-                // Compared as signed ints, not pointers: keeps jl instead of jb.
                 while ((int)p < (int)(g_speechCategories + 23)) {
                     ReadSoundEntry((Source_0042f450*)&obj, p->name, vals);
                     for (int n = 1; ; n++) {
@@ -133,8 +123,6 @@ void FreeSoundCategories()
     g_game->entries_37e13 = 0;
 }
 
-// Loads gamedata\allsound.TDF and registers every "sound" entry found in it
-// through LoadSoundByName, then runs the general sound loader LoadSoundCategories.
 // FUNCTION: 0x42f7e0
 void LoadAllSound()
 {
@@ -161,7 +149,6 @@ void LoadAllSound()
     LoadSoundCategories();
 }
 
-// Releases every loaded sound set, then empties the list.
 // FUNCTION: 0x42f8c0
 void FreeSounds()
 {

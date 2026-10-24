@@ -1,12 +1,5 @@
-// Decompiled by Opus, Sonnet, Haiku, deepseek-v4.1-flash and Claude Opus 5.5. Names are provisional.
-// The network statistics module: a bit writer and reader, and the counters and
-// text that report packet and byte rates.
-
-// This header set must stay: FormatNetStats needs it.
 #include "win_types.h"
 #include <stdio.h>
-// Included only for its symbol ids: FormatNetStats matches at this count with
-// the BitReader header's inline ReadBit (see bit_reader.h).
 #include <io.h>
 
 #pragma pack(push, 1)
@@ -18,9 +11,6 @@ struct Pair_00419560 {
     int b;
 };
 
-// Declared this early for symbol ids: GetByteRates (0x416150) needs these two
-// counters before everything else, and CountPacket's prototype keeps
-// FormatNetStats at its count.
 void __stdcall CountPacket(int, int, int);
 extern int g_byteRatesLastSent;
 extern int g_byteRatesLastReceived;
@@ -63,8 +53,6 @@ extern unsigned int g_packetBytesReceivedRate;
 extern unsigned int g_packetsSentRate;
 extern unsigned int g_packetsReceivedRate;
 
-// Registers a table with RegisterOrderTypes under a numeric id; one of several
-// small functions doing the same for different tables.
 // FUNCTION: 0x415b20
 void RegisterVtolOrders()
 {
@@ -104,9 +92,6 @@ static inline void CopyWords(unsigned int* first, unsigned int* last, unsigned i
     }
 }
 
-// The original allocates with `new unsigned int(n)` (one dword holding n)
-// instead of `new unsigned int[n]`, and frees with `delete` rather than
-// `delete[]` (docs/bugs.md).
 // FUNCTION: 0x415bb0
 void BitWriter::GrowBuffer()
 {
@@ -120,8 +105,6 @@ void BitWriter::GrowBuffer()
     data = grown;
 }
 
-// Appends the low `bits` bits of `value`, lowest bits first. When the word is
-// full it may spill into the next word and double the buffer.
 // FUNCTION: 0x415c10
 void BitWriter::WriteBits(int value, int bits)
 {
@@ -174,7 +157,6 @@ int BitReader::ReadBits(int bits)
     return r;
 }
 
-// Reads a signed bit field: ReadBits's value, sign-extended from `bits`.
 // FUNCTION: 0x415e60
 int BitReader::ReadSignedBits(int bits)
 {
@@ -185,7 +167,6 @@ int BitReader::ReadSignedBits(int bits)
     return r;
 }
 
-// Same reset sequence as InitCommands and CmdNetStats.
 // FUNCTION: 0x415e90
 void ResetNetStats()
 {
@@ -206,9 +187,6 @@ void ResetNetStats()
     g_packetBytesReceived = 0;
 }
 
-// Adds an amount to the player's total (g_messageBytesReceived) and, for kinds 2..44,
-// bumps the per-kind count and total (the tables ResetNetStats resets from
-// kind 1, g_messageCountByType and g_messageBytesByType).
 // FUNCTION: 0x415ef0
 void __stdcall CountMessage(unsigned char kind, int amount, int player)
 {
@@ -219,8 +197,6 @@ void __stdcall CountMessage(unsigned char kind, int amount, int player)
     }
 }
 
-// Network statistics: counts a packet of `size` bytes as sent or received
-// (the counters reset by 0x415e90) and adds any positive overhead.
 // FUNCTION: 0x415f40
 void __stdcall CountPacket(int size, int overhead, int sent)
 {
@@ -236,9 +212,6 @@ void __stdcall CountPacket(int size, int overhead, int sent)
     }
 }
 
-// Network statistics text: about once a second (more than 30 ticks), turns
-// the packet and byte counters (see 0x415f40 and 0x416150) into per-second
-// rates and a compression percentage, then prints the latest values.
 // FUNCTION: 0x415fa0
 void __stdcall FormatNetStats(char* text)
 {
@@ -249,7 +222,6 @@ void __stdcall FormatNetStats(char* text)
         g_messageBytesReceivedRate = (g_messageBytesReceived * 30 - g_lastMessageBytesReceived * 30) / elapsed;
         int packets = g_messageBytesSent - g_lastMessageBytesSent;
         g_messageBytesSentRate = packets * 30 / elapsed;
-        // The previous counters are updated only after the rates are computed.
         g_lastMessageBytesReceived = g_messageBytesReceived;
         g_lastMessageBytesSent = g_messageBytesSent;
         if (packets > 0)
@@ -294,9 +266,6 @@ void __stdcall GetByteRates(unsigned int* sent, unsigned int* received)
     *received = g_bytesReceivedPerSecond;
 }
 
-// The sums are never used (their consumer was presumably compiled out).
-// As in InitCommands, the second field of the second table is read through a
-// walking pointer.
 // FUNCTION: 0x4161f0
 void SumMessageStats()
 {

@@ -1,35 +1,6 @@
-// Decompiled by Opus, Haiku, Sonnet, space-bunny-free, Space Bunny Free,
-// deepseek-v4.1, deepseek-v4.1-flash, GPT-5.6-Terra, GPT-6.1-sol, GPT-6,
-// DeepSeek V4.1 Flash, Claude Opus 5.5, Sonnet 5.5 and claude-sonnet-5-5.
-// Names are provisional.
-// The unit synchronisation module: the game-event reporting the statistics DLL
-// calls, PacketSequencer (the sequenced 0xe-byte command packets), UnitSync
-// (the shared unit list every player is checked against) and the out-of-line
-// std::map<unsigned int, UnitSyncEntry>, std::vector and std::list members
-// with the hand-written _Tree helpers, from 0x46c620 to 0x4707a0. Files that
-// stay apart, and the constraint that keeps each there:
-// - unit_sync_46ca60.cpp: FinishUnitSync calls the out-of-line _Destroy of the
-//   Elem_0046faf0 vector (0x46e870), where the real <vector> inlines its empty
-//   body; it needs a hand-written std::vector.
-// - unit_sync_46cc10.cpp: SendSequenced inlines vector::insert but calls the
-//   out-of-line _Destroy, _Ucopy and _Ufill, which the real <vector> inlines
-//   too (832 bytes against 678); it needs a hand-written std::vector.
-// - unit_sync_46d1a0.cpp: ~UnitSync needs real std::map, std::list and
-//   std::vector members, where UnitSync here holds the hand-written
-//   UnitSyncMap and element views.
-// - unit_sync_46dad0.cpp: ProcessSync needs UnitSync's player list as a
-//   vector of SyncPlayerRecord and the real std::map, which UnitSync here
-//   spells as the hand-written views.
-// - unit_sync_46e640.cpp, unit_sync_46eba0.cpp and unit_sync_46f7a0.cpp: the
-//   out-of-line vector::insert instances are built with /Gi, which this file
-//   cannot carry (unit_sync_46f7a0.cpp also needs a hand-written std::vector).
-// - unit_sync_player.cpp: the ??_GUnitSyncPlayer COMDAT is emitted with
-//   ~UnitSyncPlayer inlined, while 0x46c920 calls that destructor out of line.
 #include <stdio.h>
 #include <utility>
 
-// This block must stay: it stands in for <xutility> with __stdcall templates,
-// and _XUTILITY_ keeps out the header's __cdecl ones.
 #define _XUTILITY_
 namespace std {
 template <class _II, class _OI>
@@ -137,26 +108,22 @@ inline void __stdcall swap(_Ty& _X, _Ty& _Y)
 #include <list>
 #include <yvals.h>
 
-// --- the game-event reporting the statistics DLL calls -----------------------
-
-// Four ints, but the session GUID instance GetSessionGuidInstance returns at
-// net+0x465, not a rectangle, so it stays off rect.h.
-struct Rect_0046c620 {                  // 16 bytes
+struct Rect_0046c620 {
     int x0;
     int y0;
     int x1;
     int y1;
 };
 
-struct Name_0046c620 {                  // 17 bytes, the player's name
+struct Name_0046c620 {
     char text[16];
     char flag;
 };
 
-struct Net_4c97b0 {                     // the object at g_game+0x14
-    Name_0046c620 name;                 // +0x00
+struct Net_4c97b0 {
+    Name_0046c620 name;
     char unknown_11[0x4c9 - 0x11];
-    int created;                        // +0x4c9
+    int created;
     char unknown_4cd[4];
 };
 
@@ -164,10 +131,9 @@ struct Net_4c97b0 {                     // the object at g_game+0x14
 #include "../units/unit_def.h"
 
 #pragma pack(push, 1)
-// UnitDef::flags1 (+0x241) read as bit fields.
 struct UnitDefFlags_0046e160 {
     unsigned int bits_0 : 23;
-    unsigned int flag_23 : 1;           // bit 23
+    unsigned int flag_23 : 1;
     unsigned int bits_24 : 8;
 };
 #pragma pack(pop)
@@ -226,8 +192,6 @@ int __stdcall ReportGameEvent(int msg)
         if (msg == 1 || msg == 6 || msg == 7)
             g_reportFlags = QueryOnlineFlags(msg == 1 ? 1 : 2 + (msg != 6));
         if (g_reportFlags & 3) {
-            // its own statement, not an argument: the call has to be emitted
-            // ahead of the other nine arguments being set up
             int team = (int)g_game->net->GetMissionName();
             if (RIReport(msg, &rect, (char*)&g_game->field_39201, thing, &g_reportPlayerName,
                              team, g_game->localPlayer,
@@ -280,25 +244,21 @@ void FUN_0046c8d0(void)
 {
 }
 
-// --- UnitSync: the shared unit list ------------------------------------------
-
-struct UnitSyncEntry {                 // the map's mapped type, 0x10 bytes
-    int x;                             // +0x0
-    int y;                             // +0x4
-    short w;                           // +0x8
-    short h;                           // +0xa
-    int limit;                         // +0xc
+struct UnitSyncEntry {
+    int x;
+    int y;
+    short w;
+    short h;
+    int limit;
 };
 
-// A node of the std::map<unsigned int, UnitSyncEntry> tree (MSVC 5 xtree's
-// _Node): the links, the pair (key at +0xc, entry at +0x10) and the colour.
 struct UnitSyncNode {
-    UnitSyncNode* left;                // +0x0
-    UnitSyncNode* parent;              // +0x4
-    UnitSyncNode* right;               // +0x8
-    unsigned int key;                  // +0xc
-    UnitSyncEntry value;               // +0x10
-    int color;                         // +0x20 (0 red, 1 black)
+    UnitSyncNode* left;
+    UnitSyncNode* parent;
+    UnitSyncNode* right;
+    unsigned int key;
+    UnitSyncEntry value;
+    int color;
 };
 
 class UnitSyncIter {
@@ -312,7 +272,7 @@ public:
 #pragma pack(push, 1)
 struct Unit_0046e330 {
     char unknown_0[0x13e];
-    unsigned int key;                  // +0x13e
+    unsigned int key;
 };
 
 #pragma pack(pop)
@@ -321,60 +281,53 @@ struct Unit_0046e330 {
 #include "player_info.h"
 
 #pragma pack(push, 1)
-// The 0xe-byte command packet of type 0x1a that UnitSync sends and
-// PacketSequencer queues: a sub-type, a sequence number (0 when it is sent
-// without one), the key of the unit it is about, and one payload word or the
-// unit's permission bytes.
-struct UnitSyncPacket {                // 0xe bytes
-    unsigned char type;                // +0x0
-    unsigned char arg;                 // +0x1
-    unsigned int id;                   // +0x2
-    int key;                           // +0x6
+struct UnitSyncPacket {
+    unsigned char type;
+    unsigned char arg;
+    unsigned int id;
+    int key;
     union {
-        int value;                     // +0xa
+        int value;
         struct {
-            unsigned char enabled;     // +0xa
-            unsigned char match;       // +0xb
-            short limit;               // +0xc
+            unsigned char enabled;
+            unsigned char match;
+            short limit;
         };
     };
 };
 
-// A player's slot in the sync: its id and how many packets were sent to it.
 struct Target_0046d530 {
-    unsigned int id;                   // +0x0
+    unsigned int id;
     char unknown_4[0x24];
-    int sent;                          // +0x28
+    int sent;
 };
 
 struct Source_0046d630 {
-    int key;                           // +0x0
+    int key;
     char unknown_4[4];
-    unsigned char enabled;             // +0x8
+    unsigned char enabled;
     char unknown_9;
-    unsigned char match;               // +0xa
+    unsigned char match;
     char unknown_b;
-    short limit;                       // +0xc
+    short limit;
 };
 
 #pragma pack(pop)
 
-struct Cmp_0046d040 {                  // the map's empty key_compare
+struct Cmp_0046d040 {
     char x;
 };
 
-struct Alloc_0046d040 {                // the map's empty allocator
+struct Alloc_0046d040 {
     char x;
 };
 
-// A std::vector<int>, whose insert() is the out-of-line 0x46e640. Leaving the
-// method undefined here is what keeps the call out of line.
-class Vec_0046d6c0 {                  // 0x10 bytes
+class Vec_0046d6c0 {
 public:
-    int pad;                          // +0x0
-    int* first;                       // +0x4
-    int* last;                        // +0x8
-    int* cap;                         // +0xc
+    int pad;
+    int* first;
+    int* last;
+    int* cap;
 
     int* begin() { return first; }
     int* end() { return last; }
@@ -382,23 +335,16 @@ public:
     void insert(int* pos, int n, int const& val);
 };
 
-// One player's record in the vector at UnitSync+0x10: the ids of the units the
-// player listed, their pairs (parallel to ids), and the packet counters.
-struct PlayerSync_0046e0b0 {            // 0x5c bytes
-    unsigned int id;                     // +0x0
-    Vec_0046d6c0 ids;                    // +0x4
-    Vec_0046d6c0 pairs;                  // +0x14
-    int expected;                        // +0x24
-    int sent;                            // +0x28
-    unsigned int ackd;                   // +0x2c
+struct PlayerSync_0046e0b0 {
+    unsigned int id;
+    Vec_0046d6c0 ids;
+    Vec_0046d6c0 pairs;
+    int expected;
+    int sent;
+    unsigned int ackd;
     char unknown_30[0x5c - 0x30];
 };
 
-// The tree behind a std::map<unsigned int, UnitSyncEntry> (MSVC 5's <xtree>
-// layout: empty allocator and key_compare at +0 and +1, _Head, _Multi, _Size).
-// It is declared by hand, as a template with <xtree>'s own name and first two
-// arguments, because the real tree's insert is 0x46ef50 and <xtree>'s inline
-// insert would otherwise be expanded here (the real map gives 700 bytes).
 struct Kfn_0046d6c0 {};
 struct Alloc_0046d6c0 {};
 
@@ -411,39 +357,31 @@ class _Tree {
 public:
     typedef UnitSyncNode _Node;
     struct _Pairib {
-        _Node* first;                 // the iterator
+        _Node* first;
         bool second;
         _Pairib() {}
     };
 
-    char _Alloc;                      // +0x0
+    char _Alloc;
     union {
-        char _Pred;                   // +0x1
+        char _Pred;
         _Pr key_compare;
     };
-    _Node* _Head;                     // +0x4
-    bool _Multi;                      // +0x8
-    int _Size;                        // +0xc
+    _Node* _Head;
+    bool _Multi;
+    int _Size;
 
-    _Pairib insert(const _Ty& _V);    // 0x46ef50
+    _Pairib insert(const _Ty& _V);
 };
 
 typedef std::pair<const unsigned int, UnitSyncEntry> Value_0046d6c0;
 
-// std::_Tree<...>::_Init() from MSVC 5's <xtree>, written out by hand:
-// DAT_0051e598 is the tree's shared _Nil node and DAT_0051e59c its
-// reference count (_Nilrefs). Nodes are 0x24 bytes (a 0x14-byte value).
 extern UnitSyncNode* DAT_0051e598;
 extern int DAT_0051e59c;
 
-// The tree header of UnitSync::map, the std::map<unsigned int, UnitSyncEntry>
-// at +0x00, with the members the file calls out of line: _Init (0x46f720),
-// begin (0x46e880), find (0x46e9b0), insert (0x46ef50) and lower_bound
-// (0x46fe60).
 class UnitSyncMap : public _Tree<unsigned int, Value_0046d6c0, Kfn_0046d6c0,
                                   Less_0046d6c0, Alloc_0046d6c0> {
 public:
-    // Empty classes taken by value: the prologue copies them from the param slot.
     UnitSyncMap(Cmp_0046d040 c, Alloc_0046d040 a)
     {
         _Alloc = c.x;
@@ -467,11 +405,6 @@ public:
 
     void Init();
 
-    // std::map<unsigned int, UnitSyncEntry>::operator[] from MSVC 5's <map>:
-    // insert a default value if the key is new, then hand back the mapped
-    // value. The default `UnitSyncEntry()` is an uninitialised temporary in
-    // this compiler, which is where the copies of uninitialised stack words in
-    // the original come from.
     UnitSyncEntry& operator[](const unsigned int& k)
     {
         _Pairib p = insert(Value_0046d6c0(k, UnitSyncEntry()));
@@ -479,40 +412,38 @@ public:
     }
 };
 
-class Sub_0046d040 {                   // the object at +0x2c
+class Sub_0046d040 {
 public:
-    int seqSent;                       // +0x0
-    int seqCur;                        // +0x4
-    int seqMax;                        // +0x8
+    int seqSent;
+    int seqCur;
+    int seqMax;
 
     void SendUnsequenced(void* packet, int to);
 };
 
-class Sub2_0046d040 {                  // the object at +0x58
+class Sub2_0046d040 {
 public:
-    int direct;                        // +0x0
-    int* pendingPlayerCount;           // +0x4
-    int* checksumProgress;             // +0x8
-    int* disabled;                     // +0xc
+    int direct;
+    int* pendingPlayerCount;
+    int* checksumProgress;
+    int* disabled;
 };
 
-// UnitSyncPlayer (0x5c bytes): one player's unit-sync state, with four
-// std::vector members.
 #pragma pack(push, 2)
-struct Elem_0046faf0 {                 // 14 bytes, a queued sync packet
+struct Elem_0046faf0 {
     union {
         struct {
-            int a;                     // +0x0
-            int b;                     // +0x4
-            int c;                     // +0x8
-            short d;                   // +0xc
+            int a;
+            int b;
+            int c;
+            short d;
         };
         UnitSyncPacket packet;
     };
 };
 #pragma pack(pop)
 
-class UnitSyncPlayer {                 // the vector's element, 0x5c bytes
+class UnitSyncPlayer {
 public:
     char unknown_0[0x5c];
 
@@ -534,7 +465,6 @@ void ProtectUnitDefsReadWrite();
 void ProtectUnitDefsReadOnly();
 extern char g_unitSyncStatusText[];
 
-// Inlined copy of PacketSequencer::SendUnsequenced (a method that ignores this).
 static inline void SendPacket(unsigned int to, UnitSyncPacket* packet)
 {
     packet->id = 0;
@@ -543,22 +473,22 @@ static inline void SendPacket(unsigned int to, UnitSyncPacket* packet)
 
 class UnitSync {
 public:
-    UnitSyncMap map;                           // +0x00
-    std::vector<PlayerSync_0046e0b0> players;  // +0x10
-    std::list<int> ids;                        // +0x20
-    Sub_0046d040 sub;                          // +0x2c
-    std::vector<int> seqSentQueue;             // +0x38
-    std::vector<int> seqHeldQueue;             // +0x48
+    UnitSyncMap map;
+    std::vector<PlayerSync_0046e0b0> players;
+    std::list<int> ids;
+    Sub_0046d040 sub;
+    std::vector<int> seqSentQueue;
+    std::vector<int> seqHeldQueue;
     union {
-        Sub2_0046d040 sub2;                    // +0x58
+        Sub2_0046d040 sub2;
         struct {
-            int direct;                        // +0x58
+            int direct;
             union {
-                int* first;                    // +0x5c
+                int* first;
                 int pendingPlayerCount;
             };
-            int* checksumProgress;             // +0x60
-            int disabled;                      // +0x64
+            int* checksumProgress;
+            int disabled;
         };
     };
 
@@ -605,31 +535,26 @@ static inline UnitDef* Defs_0046d040()
     return g_game->defs;
 }
 
-// The flag expression in its own small inline helper.
 static inline bool FlagOf_0046d040(UnitDef* d)
 {
     return (d->flags2 >> 16) & 1;
 }
 
-// The delete in 0x46c920 expands this view of the object, whose members are
-// the real std::map, std::vector and std::list instantiations.
 class UnitSyncDel_0046c920 {
 public:
-    std::map<unsigned int, UnitSyncEntry> map;     // +0x00
-    std::vector<UnitSyncPlayer> elems;             // +0x10
-    std::list<int> ids;                            // +0x20
-    Sub_0046d040 sub;                              // +0x2c
-    SyncChecksumVector seqSentQueue;               // +0x38
-    std::vector<int> seqHeldQueue;                 // +0x48
-    int direct;                                    // +0x58
-    int pendingPlayerCount;                        // +0x5c
-    int checksumProgress;                          // +0x60
-    int disabled;                                  // +0x64
+    std::map<unsigned int, UnitSyncEntry> map;
+    std::vector<UnitSyncPlayer> elems;
+    std::list<int> ids;
+    Sub_0046d040 sub;
+    SyncChecksumVector seqSentQueue;
+    std::vector<int> seqHeldQueue;
+    int direct;
+    int pendingPlayerCount;
+    int checksumProgress;
+    int disabled;
 
     ~UnitSyncDel_0046c920() {}
 };
-
-// --- the unit-sync object's lifecycle ----------------------------------------
 
 // FUNCTION: 0x46c8e0
 void __stdcall CreateUnitSync(int param_1)
@@ -637,11 +562,7 @@ void __stdcall CreateUnitSync(int param_1)
     (*(UnitSync **)&g_game->sync) = new UnitSync(param_1);
 }
 
-// Releases the overlay object at g_game+0x2a30 (UnitSync, built by 0x46c8e0
-// and its constructor 0x46d040): `if (obj) delete obj;` with the whole
-// ~UnitSync inlined here.
 // FUNCTION: 0x46c920
-// __fastcall: keeps the erase loop comparing the iterator slot directly.
 void __fastcall DeleteUnitSync()
 {
     if ((UnitSync *)g_game->sync)
@@ -649,40 +570,28 @@ void __fastcall DeleteUnitSync()
     (*(UnitSync **)&g_game->sync) = 0;
 }
 
-// --- PacketSequencer ---------------------------------------------------------
-
-// A list seen as a std::vector of packets (allocator byte, _First, _Last,
-// _End): ReceiveSequenced reads the lists through it, and InsertPacket is that
-// vector's insert(end(), count, val), out of line.
 class Class_0046eba0 {
 public:
     char unknown_0[4];
-    UnitSyncPacket* first;       // +0x4
-    UnitSyncPacket* last;        // +0x8
-    UnitSyncPacket* end;         // +0xc
+    UnitSyncPacket* first;
+    UnitSyncPacket* last;
+    UnitSyncPacket* end;
     void InsertPacket(UnitSyncPacket* where, int count, UnitSyncPacket* val);
 };
 
 struct PacketSequencer {
-    int lastSent;                      // +0x00
-    unsigned int cur;                  // +0x04
-    unsigned int max;                  // +0x08
-    // Nested struct with its own out-of-line operator=: sets the inline depth
-    // that keeps sentQueue's _Destroy out of line and heldQueue's inlined.
-    std::vector<Elem_0046faf0> sentQueue; // +0x0c (16 bytes, _First at +0x10)
-    std::vector<Elem_0046faf0> heldQueue; // +0x1c (operator= is 0x4707a0)
+    int lastSent;
+    unsigned int cur;
+    unsigned int max;
+    std::vector<Elem_0046faf0> sentQueue;
+    std::vector<Elem_0046faf0> heldQueue;
     PacketSequencer();
     PacketSequencer& operator=(const PacketSequencer& rhs);
-    // A method that ignores `this`: see its definition.
     void SendUnsequenced(unsigned int param_1, void* param_2);
-    // In unit_sync_46cc10.cpp: it needs a hand-written std::vector, which
-    // cannot share a file with <vector>.
     void SendSequenced(Elem_0046faf0* param_1, Elem_0046faf0* param_2);
     void ReceiveSequenced(UnitSyncPacket* packet, int param_2, void* param_3, unsigned int target);
 };
 
-// The constructor: two empty vectors (the allocator bytes are copied from an
-// uninitialised temporary) and three dwords zeroed in the body.
 // FUNCTION: 0x46cbe0
 PacketSequencer::PacketSequencer()
 {
@@ -691,10 +600,6 @@ PacketSequencer::PacketSequencer()
     max = 0;
 }
 
-// A method that ignores `this`: its callers (0x46dad0) set ecx to the
-// PacketSequencer at +0x2c of UnitSync before each call. Clears the packet's
-// +2 field and sends the 0xe-byte packet. 0x46d530, 0x46d5b0 and 0x46d630
-// inline a copy of it.
 // FUNCTION: 0x46cec0
 void PacketSequencer::SendUnsequenced(unsigned int param_1, void* param_2)
 {
@@ -703,11 +608,6 @@ void PacketSequencer::SendUnsequenced(unsigned int param_1, void* param_2)
     SendPacketToPlayer(GetLocalHumanDpid(), param_1, packet, 0xe);
 }
 
-// Dispatches a 0xe-byte command packet. arg 0x65 re-sends the stored copy that
-// has the same id; any other id widens the range and, when it is the one right
-// after cur, runs cur and then every queued entry that follows it,
-// asking the sender for the next one (packet 0x1a 0x65) whenever the queue runs
-// dry.
 // FUNCTION: 0x46cef0
 void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void* param_3, unsigned int target)
 {
@@ -740,8 +640,6 @@ void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void
     if (packet->id <= cur) {
         return;
     }
-    // Through a reference, so the call sets up ecx before evaluating its
-    // arguments, as the original does.
     Class_0046eba0& v = *(Class_0046eba0*)&heldQueue;
     v.InsertPacket(v.last, 1, packet);
     for (unsigned int i = cur + 1; i <= max; i++) {
@@ -759,7 +657,6 @@ void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void
     }
 }
 
-// The original calls this out of line from 0x470040.
 #pragma auto_inline(off)
 // FUNCTION: 0x470560 ??4PacketSequencer@@QAEAAU0@ABU0@@Z
 PacketSequencer& PacketSequencer::operator=(const PacketSequencer& rhs)
@@ -773,10 +670,6 @@ PacketSequencer& PacketSequencer::operator=(const PacketSequencer& rhs)
 }
 #pragma auto_inline(on)
 
-// The constructor of the 0x68-byte object held at g_game+0x2a30: the map
-// header at +0x00 (UnitSyncMap), the player vector, the id list and the
-// three sub-objects. The map at +0x00 is the std::map<unsigned int,
-// UnitSyncEntry> whose tree header lives at 0x46f720.
 // FUNCTION: 0x46d040
 UnitSync::UnitSync(int param)
     : map(Cmp_0046d040(), Alloc_0046d040())
@@ -802,14 +695,12 @@ UnitSync::UnitSync(int param)
     }
 }
 
-// Resets every unit type's entry in the map.
 // FUNCTION: 0x46d2e0
 void UnitSync::ResetEntries()
 {
     UnitSyncEntry v;
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
         v.x = g_game->defs[i].fbiChecksum;
-        // Dead store that must stay: the uninitialised slot is what the insert copies.
         v.y = 0;
         v.w = 1;
         v.h = (short)direct;
@@ -818,10 +709,6 @@ void UnitSync::ResetEntries()
     }
 }
 
-// --- the sync packets the object sends ---------------------------------------
-
-// Sends a sync packet to the given player in direct mode, else to the host.
-// The original calls this from 0x46d860 rather than inlining it.
 #pragma auto_inline(off)
 // FUNCTION: 0x46d4c0
 void UnitSync::SendSyncPacket(unsigned int* param_1, UnitSyncPacket* param_2, int unused)
@@ -837,10 +724,6 @@ void UnitSync::SendSyncPacket(unsigned int* param_1, UnitSyncPacket* param_2, in
 }
 #pragma auto_inline(on)
 
-// HandleSyncPacket reads fields of the same object (offsets +0x14, +0x58, +0x5c,
-// +0x64) that this function's "this" belongs to; no `mov ecx` appears before
-// the call, so ecx (this) flows through unchanged from ReceiveSyncPacket's own
-// thiscall "this" into HandleSyncPacket's.
 // FUNCTION: 0x46d500
 void UnitSync::ReceiveSyncPacket(void* param_1, int param_2)
 {
@@ -852,9 +735,6 @@ void UnitSync::ReceiveSyncPacket(void* param_1, int param_2)
     }
 }
 
-// Builds a 0xe-byte packet of type 0x1a and sends it, unless sending is
-// disabled. Sibling of SendEntryTo (same object, same packet type).
-
 // FUNCTION: 0x46d530
 void UnitSync::SendSyncMessage(unsigned char arg, int a, int b, int unused)
 {
@@ -864,14 +744,9 @@ void UnitSync::SendSyncMessage(unsigned char arg, int a, int b, int unused)
         packet.arg = arg;
         packet.key = a;
         packet.value = b;
-        // Send takes a target and is called with none: direct mode reads the id through it.
         Send(0, &packet);
     }
 }
-
-// Builds a 0xe-byte packet of type 0x1a and sends it to the target, unless
-// sending is disabled, then counts it on the target. Sibling of 0x46d530
-// (same object and packet) and 0x46d630.
 
 // FUNCTION: 0x46d5b0
 void UnitSync::SendSyncMessageTo(Target_0046d530* target, unsigned char arg, int a, int b, int unused)
@@ -891,7 +766,6 @@ void UnitSync::SendSyncMessageTo(Target_0046d530* target, unsigned char arg, int
     }
 }
 
-// Sends an entry of the unit list, like SendSyncMessageTo.
 // FUNCTION: 0x46d630
 void UnitSync::SendEntryTo(Target_0046d530* target, unsigned char arg, Source_0046d630* src, int unused)
 {
@@ -912,16 +786,6 @@ void UnitSync::SendEntryTo(Target_0046d530* target, unsigned char arg, Source_00
     }
 }
 
-// Handles one player-list packet. With `direct` set, the packet updates the
-// player's entry in the vector at +0x10 (arg 1 stores a word, arg 2 appends to
-// the entry's two std::vector<int> members through the out-of-line
-// vector::insert at 0x46e640 and then calls 0x46d970, arg 4 raises a
-// maximum). Otherwise an arg 3 packet stores a rectangle in the
-// std::map<unsigned int, UnitSyncEntry> at +0x0 and calls 0x46d860.
-//
-// The map store is `map[key] = r` with the tree header's operator[] (see
-// UnitSyncMap): it inserts a default-constructed value, then the locally
-// built rectangle is copied over the mapped value.
 // FUNCTION: 0x46d6c0
 void UnitSync::HandleSyncPacket(UnitSyncPacket* packet, unsigned char player)
 {
@@ -995,9 +859,6 @@ void UnitSync::HandleSyncPacket(UnitSyncPacket* packet, unsigned char player)
     }
 }
 
-// Sends the "units expected" (packet type 0x1a, sub-type 3) notice to every
-// player whose sync record this object holds, then queues the player's id on
-// the insertion-ordered list at +0x20 unless it is already there.
 // FUNCTION: 0x46d860
 void UnitSync::NotifyEntryChanged(unsigned int param_1)
 {
@@ -1008,8 +869,6 @@ void UnitSync::NotifyEntryChanged(unsigned int param_1)
     if (direct != 0) {
         UnitSyncIter it = map.FindExact(param_1);
         for (std::vector<PlayerSync_0046e0b0>::iterator i = ps.begin(); i != ps.end(); ++i) {
-            // v is taken before the disabled check: MSVC then keeps it.ptr in eax
-            // across the loop. The check stays a positive block, not a continue.
             UnitSyncEntry* v = &it.ptr->value;
             if (disabled == 0) {
                 UnitSyncPacket packet;
@@ -1029,14 +888,8 @@ void UnitSync::NotifyEntryChanged(unsigned int param_1)
             return;
         }
     }
-    // push_back takes the parameter itself, not a temporary int copy of it.
     ids.push_back((int&)param_1);
 }
-
-// Given the unit's key and a y value, makes sure the entry has that y (looking
-// the unit type up in g_game when it has none), checks that every player
-// lists the key, and then sets the entry's height to whether all of that held
-// before letting NotifyEntryChanged recompute the entry.
 
 // FUNCTION: 0x46d970
 void UnitSync::CheckUnitAvailable(unsigned int key, int y)
@@ -1085,13 +938,11 @@ void UnitSync::CheckUnitAvailable(unsigned int key, int y)
                 if (*p1 == key) {
                     if (flag && *p2 != y)
                         break;
-                    // the entry lists the key, so go on with the next one
                     goto next_entry;
                 }
                 p1++;
                 p2++;
             }
-            // the key is missing, or its pair disagrees with y
             h = 0;
             break;
         next_entry:
@@ -1103,10 +954,6 @@ void UnitSync::CheckUnitAvailable(unsigned int key, int y)
     NotifyEntryChanged(key);
 }
 
-// --- UnitSyncPlayer ----------------------------------------------------------
-
-// The sync status line: the first player whose units or packets are not
-// all accounted for, or "OK".
 // FUNCTION: 0x46df40
 char* UnitSync::GetSyncStatusText()
 {
@@ -1129,13 +976,6 @@ char* UnitSync::GetSyncStatusText()
     return "OK";
 }
 
-// Checks every 0x5c-byte entry of the player vector at +0x10. An entry passes when its
-// owner is still a live player of a type that needs no bookkeeping (type 2, or
-// type 3 whose team data->kind is 2) and, otherwise, when its cached count
-// is not zero, matches the size of its id vector, and its two counters agree.
-// Returns 1 when nothing needs checking (disabled set, direct clear, no
-// entries) or when every entry passes, 0 on the first entry that does not.
-
 // FUNCTION: 0x46e000
 int UnitSync::AllPlayersSynced()
 {
@@ -1149,8 +989,6 @@ int UnitSync::AllPlayersSynced()
     for (; p != players.end(); p++) {
         Player* pl = FindPlayerByDpid(p->id);
         if (pl != 0) {
-            // pl->active is tested again in the second test: the original
-            // reloads it rather than reusing the first test's result.
             if (pl->active != 0 && pl->type == 3 && pl->info->kind == 2)
                 continue;
             if (pl->active != 0 && pl->type == 2)
@@ -1166,10 +1004,6 @@ int UnitSync::AllPlayersSynced()
     return 1;
 }
 
-// Reports whether one player's copy of the shared unit list has caught up. The
-// player whose id matches is looked up with FindPlayerByDpid, and the entry's
-// std::vector of 0x5c-byte per-player records (the same records 0x46df40
-// reports on) is scanned for the id.
 // FUNCTION: 0x46e0b0
 int UnitSync::IsPlayerSynced(int id)
 {
@@ -1186,7 +1020,6 @@ int UnitSync::IsPlayerSynced(int id)
             continue;
         if (it->expected == 0 || it->ids.size() != it->expected)
             return 0;
-        // Written as return 1; break;: keeps the shared return-0 block as the fallthrough.
         if (it->sent == it->ackd)
             return 1;
         break;
@@ -1194,10 +1027,6 @@ int UnitSync::IsPlayerSynced(int id)
     return 0;
 }
 
-// Refreshes the map entry of every unit type: the 0x249-byte unitDefs at
-// g_game+0x1439b are looked up in the same std::map<unsigned int, Rect> that
-// 0x46e330 uses (its find() is inlined here), the entry's bit 23 becomes "the
-// rect has a non-empty size", and def+0x15a takes the rect's last field.
 // FUNCTION: 0x46e160
 void UnitSync::ApplyToUnitTypes()
 {
@@ -1219,25 +1048,17 @@ void UnitSync::ApplyToUnitTypes()
     }
 }
 
-// Dequeues the front event of an insertion-ordered queue: the class holds a
-// std::map<unsigned int, UnitSyncEntry> (key at map node +0xc, entry at +0x10)
-// for lookup and a std::list at +0x20 (_Head +0x24, _Size +0x28) for the
-// order. The list front is the map key. The inlined find() is copied from
-// 0x46e330 (LowerBound is the tree's lower_bound(); a missing key yields the
-// head node, end()).
 // FUNCTION: 0x46e280
 int UnitSync::PopChangedEntry(UnitSyncEntry* out)
 {
     if (ids.empty())
         return 0;
-    // The queue holds the keys as ints; find() takes them as unsigned.
     UnitSyncIter p = Find((unsigned int*)&ids.front());
     *out = p.ptr->value;
     ids.pop_front();
     return 1;
 }
 
-// Copies out the unit's entry and returns whether it has a non-empty size.
 // FUNCTION: 0x46e330
 int UnitSync::GetUnitEntry(Unit_0046e330* unit, UnitSyncEntry* out)
 {
@@ -1245,8 +1066,6 @@ int UnitSync::GetUnitEntry(Unit_0046e330* unit, UnitSyncEntry* out)
     return out->w != 0 && out->h != 0;
 }
 
-// Toggles the entry's width; returns whether the entry now has a non-empty
-// size.
 // FUNCTION: 0x46e3c0
 int UnitSync::ToggleUnitAllowed(Unit_0046e330* unit)
 {
@@ -1256,8 +1075,6 @@ int UnitSync::ToggleUnitAllowed(Unit_0046e330* unit)
     return n->value.w != 0 && n->value.h != 0;
 }
 
-// Clears the entry's width; returns whether the entry now has a non-empty
-// size.
 // FUNCTION: 0x46e450
 int UnitSync::DisallowUnit(Unit_0046e330* unit)
 {
@@ -1267,8 +1084,6 @@ int UnitSync::DisallowUnit(Unit_0046e330* unit)
     return n->value.w != 0 && n->value.h != 0;
 }
 
-// Sets the entry's width to 1; returns whether the entry now has a non-empty
-// size.
 // FUNCTION: 0x46e4d0
 int UnitSync::AllowUnit(Unit_0046e330* unit)
 {
@@ -1278,7 +1093,6 @@ int UnitSync::AllowUnit(Unit_0046e330* unit)
     return n->value.w != 0 && n->value.h != 0;
 }
 
-// Sets the last field of the unit's entry and has NotifyEntryChanged look at it.
 // FUNCTION: 0x46e550
 void UnitSync::SetUnitLimit(Unit_0046e330* unit, int value)
 {
@@ -1309,12 +1123,8 @@ SyncTaggedVector* SyncTaggedVector::InitTaggedVector(char* param_1)
     return this;
 }
 
-// Out-of-line destructor of a class whose only member is a std::vector of a
-// trivial type: the storage is freed and {_First,_Last,_End} zeroed.
-// Same as 0x46e610, which is called on other locals of the same caller
-// (0x46dxxx).
 struct Elem_0046e5e0 {
-    int value;                         // +0x0
+    int value;
 };
 
 class SyncTempTaggedVector {
@@ -1329,9 +1139,6 @@ SyncTempTaggedVector::~SyncTempTaggedVector()
 {
 }
 
-// A std::vector<int> member's destructor: frees the storage and zeroes the
-// {_First,_Last,_End} triple.
-// The original calls this from 0x46c920 rather than inlining it.
 #pragma auto_inline(off)
 // FUNCTION: 0x46e610
 SyncChecksumVector::~SyncChecksumVector()
@@ -1339,15 +1146,9 @@ SyncChecksumVector::~SyncChecksumVector()
 }
 #pragma auto_inline(on)
 
-// std::vector<Elem_0046faf0>::_Destroy(first, last) from MSVC 5's <vector>:
-// empty, since the element type is trivial.
-// A 14-byte element type (its layout is a guess). Its callers (0x46cc10,
-// 0x470390, 0x470560, 0x46ca60 and others) call 0x46fb40 (_Ufill), 0x46faf0
-// (_Ucopy) and 0x46e870 (_Destroy) with ecx set to the vector.
 typedef std::vector<Elem_0046faf0> Vec_0046e870;
 typedef void (Vec_0046e870::*DestroyFn_0046e870)(Vec_0046e870::iterator, Vec_0046e870::iterator);
 
-// _Destroy is protected: a derived class takes its address to emit it out of line.
 struct Access_0046e870 : Vec_0046e870 {
     static DestroyFn_0046e870 fn;
 };
@@ -1355,8 +1156,6 @@ struct Access_0046e870 : Vec_0046e870 {
 // FUNCTION: 0x46e870 ?_Destroy@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEXPAUElem_0046faf0@@0@Z
 DestroyFn_0046e870 Access_0046e870::fn = &Access_0046e870::_Destroy;
 
-// The tree's begin(): stores the leftmost node (the head's left link) through the
-// out parameter.
 // FUNCTION: 0x46e880
 int* UnitSyncMap::Begin(int* param_1)
 {
@@ -1364,14 +1163,6 @@ int* UnitSyncMap::Begin(int* param_1)
     return param_1;
 }
 
-// std::_Tree<...>::erase(iterator first, iterator last) from MSVC 5's <xtree>
-// for the std::map<unsigned int, UnitSyncEntry> tree (_Nil is DAT_0051e598,
-// _Nilrefs DAT_0051e59c), emitted out of line. Its three callers (0x46c920,
-// 0x46ca60, 0x46d1a0) inline ~_Tree(): erase(begin(), end()), free the head,
-// then drop _Nilrefs under a lock. The real template reproduces every call:
-// _Erase() is inlined once and its recursion calls 0x46f6d0, erase(_F++)
-// calls iterator::_Inc() (0x46ea10) and then erase(iterator) (0x46f1e0).
-// The reference to erase(iterator) needs an entry in data/aliases.csv.
 typedef std::map<unsigned int, UnitSyncEntry>::_Imp Tree_0046e890;
 typedef Tree_0046e890::iterator (Tree_0046e890::*EraseFn_0046e890)(
     Tree_0046e890::iterator, Tree_0046e890::iterator);
@@ -1379,9 +1170,6 @@ typedef Tree_0046e890::iterator (Tree_0046e890::*EraseFn_0046e890)(
 // FUNCTION: 0x46e890 ?erase@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@QAE?AViterator@12@V312@0@Z
 EraseFn_0046e890 g_erase_0046e890 = &Tree_0046e890::erase;
 
-// An out-of-line std::map<unsigned int, ...>::find(): LowerBound is the
-// tree's lower_bound(), and a missing key yields the head node (end()).
-// The original calls this from 0x46d860 and 0x46d970 rather than inlining it.
 #pragma auto_inline(off)
 // FUNCTION: 0x46e9b0
 UnitSyncIter UnitSyncMap::FindExact(const unsigned int& key)
@@ -1390,8 +1178,6 @@ UnitSyncIter UnitSyncMap::FindExact(const unsigned int& key)
     return (p == End() || key_compare(key, p.ptr->key)) ? End() : p;
 }
 #pragma auto_inline(on)
-
-// --- the std::map<unsigned int, UnitSyncEntry> members -----------------------
 
 // FUNCTION: 0x46ea10 ?_Inc@iterator@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@QAEXXZ
 // FUNCTION: 0x46ef50 ?insert@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@QAE?AU?$pair@Viterator@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@_N@2@ABU?$pair@IUUnitSyncEntry@@@2@@Z
@@ -1402,19 +1188,13 @@ UnitSyncIter UnitSyncMap::FindExact(const unsigned int& key)
 // FUNCTION: 0x46ff10 ?_Rrotate@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@IAEXPAU_Node@12@@Z
 // FUNCTION: 0x46ff70 ?_Buynode@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@IAEPAU_Node@12@PAU312@W4_Redbl@12@@Z
 // FUNCTION: 0x46ff90 ?_Dec@iterator@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@QAEXXZ
-// The tree's protected members come out of an explicit instantiation: the
-// protected ones (the rotations) cannot be reached by a member pointer.
 template class std::_Tree<unsigned int, std::pair<const unsigned int, UnitSyncEntry>, std::map<unsigned int, UnitSyncEntry>::_Kfn, std::less<unsigned int>, std::allocator<UnitSyncEntry> >;
-
-// --- vector<SyncPlayerRecord>::_Destroy (0x46eaa0) -----------------------------
 
 void __stdcall NopChecksumEntryDtor(int);
 
 namespace std {
 template<> inline void allocator<Elem_0046faf0>::destroy(Elem_0046faf0* p)
 {
-    // Direct call: an inline std::_Destroy overload would be one inline
-    // level too deep.
     NopChecksumEntryDtor((int)p);
 }
 }
@@ -1446,9 +1226,6 @@ public:
     __inline const Elem_004702a0* begin() const { return _First; }
     __inline const Elem_004702a0* end() const { return _Last; }
 
-    // Three dead one-statement calls standing in for whatever the original
-    // spent its inline budget on: /Ob2 inlines _Ucopy and _Destroy here only
-    // as deep as this budget allows.
     static __inline void burn(int a)
     {
         int t = a;
@@ -1456,8 +1233,6 @@ public:
         (void)t;
     }
 
-    // Separate from assign_second: ids inlines size(), pairs does not.
-    // the first list
     void __inline assign_first(Class_00470270* d, const Class_00470270* s)
     {
         if (d == s)
@@ -1480,7 +1255,6 @@ public:
                 d->_Last = d->_First + s->Size();
             } else {
                 d->_Destroy(d->_First, d->_Last);
-                // begin()/end() here, raw fields in assign_second: sets the register split.
                 operator delete(d->begin());
                 int n = (int)s->Size();
                 if (n < 0)
@@ -1494,7 +1268,6 @@ public:
         }
     }
 
-    // the second list
     void __inline assign_second(Class_00470270* d, const Class_00470270* s)
     {
         if (d == s)
@@ -1529,14 +1302,14 @@ public:
     }
 };
 
-struct SyncPlayerRecord {              // 0x5c bytes, one vector element
-    int id;                            // +0x00
-    std::vector<Elem_004702a0> ids;    // +0x04
-    std::vector<Elem_004702a0> pairs;  // +0x14
-    int expected;                      // +0x24
-    int sent;                          // +0x28
-    int ackd;                          // +0x2c
-    PacketSequencer sub;               // +0x30
+struct SyncPlayerRecord {
+    int id;
+    std::vector<Elem_004702a0> ids;
+    std::vector<Elem_004702a0> pairs;
+    int expected;
+    int sent;
+    int ackd;
+    PacketSequencer sub;
 
     SyncPlayerRecord& operator=(const SyncPlayerRecord& src);
 };
@@ -1548,27 +1321,15 @@ struct Access_0046eaa0 : Vec_0046eaa0 {
     static DestroyFn_0046eaa0 fn;
 };
 
-// std::vector<SyncPlayerRecord>::_Destroy(first, last) from MSVC 5's <vector>,
-// called from the inlined erase at 0x46db82 (0x46dad0) with ecx set to the
-// vector. It runs each 0x5c-byte element's implicit destructor, which frees
-// the element's four std::vector members last-first.
 // FUNCTION: 0x46eaa0 ?_Destroy@?$vector@USyncPlayerRecord@@V?$allocator@USyncPlayerRecord@@@std@@@std@@IAEXPAUSyncPlayerRecord@@0@Z
 DestroyFn_0046eaa0 Access_0046eaa0::fn = &Access_0046eaa0::_Destroy;
-
-// --- std::list<int> members (0x46eb60, 0x46fac0) -----------------------------
 
 typedef std::list<int> List_0046eb60;
 typedef List_0046eb60::iterator (List_0046eb60::*EraseFn_0046eb60)(List_0046eb60::iterator);
 
-// std::list<int>::erase(iterator), out of line: its callers (0x46c920,
-// 0x46ca60, 0x46d040's neighbours) call it as `erase(_F++)` with the
-// iterator post-increment at 0x46fac0, on the list at +0x20 of
-// UnitSync.
 // FUNCTION: 0x46eb60 ?erase@?$list@HV?$allocator@H@std@@@std@@QAE?AViterator@12@V312@@Z
 EraseFn_0046eb60 g_erase_0046eb60 = &List_0046eb60::erase;
 
-// The tree's _Init: DAT_0051e598 is the shared _Nil node and DAT_0051e59c its
-// reference count (_Nilrefs).
 // FUNCTION: 0x46f720
 void UnitSyncMap::Init()
 {
@@ -1582,31 +1343,18 @@ void UnitSyncMap::Init()
     _Head->left = _Head, _Head->right = _Head;
 }
 
-// --- the iterator's post-increment (0x46fac0) --------------------------------
-
 typedef std::list<int> List_0046fac0;
 typedef List_0046fac0::iterator (List_0046fac0::iterator::*PostIncFn_0046fac0)(int);
 
-// std::list<int>::iterator::operator++(int), out of line: return the old
-// position and step to the next node. Its callers (e.g. 0x46c920) use it in
-// the inlined list::erase(first, last) loop, `erase(_F++)`, on the list at
-// +0x20 of the object 0x46d040 builds. The node is 0xc bytes (the constructor
-// allocates the head with `new(0xc)`), so the element is a 4-byte value
-// compared against an id (0x46d860); int is a guess.
 // FUNCTION: 0x46fac0 ??Eiterator@?$list@HV?$allocator@H@std@@@std@@QAE?AV012@H@Z
 PostIncFn_0046fac0 g_postinc_0046fac0 = &List_0046fac0::iterator::operator++;
 
-// --- std::pair<map::iterator, bool> (0x46fad0) -------------------------------
-
-// Probably std::pair<map::iterator, bool>::pair(const iterator&, const bool&),
-// out of line: its one caller (0x46d2e0) is an inlined map::insert that
-// builds the result from the node found (or inserted) and whether it is new.
 struct Node_0046fad0;
 
 class InsertResult {
 public:
-    Node_0046fad0* first;              // +0x0 (the iterator's node)
-    bool second;                       // +0x4
+    Node_0046fad0* first;
+    bool second;
 
     InsertResult(Node_0046fad0* const& f, const bool& s);
 };
@@ -1617,8 +1365,6 @@ InsertResult::InsertResult(Node_0046fad0* const& f, const bool& s)
 {
 }
 
-// --- vector<Elem_0046faf0> members (0x46faf0, 0x46fb40, 0x470770, 0x4707a0) --
-
 typedef std::vector<Elem_0046faf0> Vec_0046faf0;
 typedef Vec_0046faf0::iterator (Vec_0046faf0::*UcopyFn_0046faf0)(
     Vec_0046faf0::const_iterator, Vec_0046faf0::const_iterator, Vec_0046faf0::iterator);
@@ -1627,12 +1373,6 @@ struct Access_0046faf0 : Vec_0046faf0 {
     static UcopyFn_0046faf0 fn;
 };
 
-// std::vector<Elem_0046faf0>::_Ucopy(first, last, dest) from MSVC 5's
-// <vector>: copies [first, last) into raw storage at dest and returns the
-// end of the copies.
-// A 14-byte element type (its layout is a guess). Its callers (0x46cc10,
-// 0x470390, 0x470560, 0x46ca60 and others) call 0x46fb40 (_Ufill), 0x46faf0
-// (_Ucopy) and 0x46e870 (_Destroy) with ecx set to the vector.
 // FUNCTION: 0x46faf0 ?_Ucopy@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEPAUElem_0046faf0@@PBU3@0PAU3@@Z
 UcopyFn_0046faf0 Access_0046faf0::fn = &Access_0046faf0::_Ucopy;
 
@@ -1643,17 +1383,9 @@ struct Access_0046fb40 : Vec_0046faf0 {
     static UfillFn_0046faf0 fn;
 };
 
-// std::vector<Elem_0046faf0>::_Ufill(first, n, value) from MSVC 5's <vector>:
-// copy-constructs n copies of value into raw storage at first.
 // FUNCTION: 0x46fb40 ?_Ufill@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEXPAUElem_0046faf0@@IABU3@@Z
 UfillFn_0046faf0 Access_0046fb40::fn = &Access_0046fb40::_Ufill;
 
-// --- the map's lower_bound (0x46fe60) ----------------------------------------
-
-// Shaped like std::_Tree<...>::_Lbound(const _K&) from MSVC 5's <xtree> for a
-// tree keyed by unsigned int, under a lock object; DAT_0051e598 is the tree's
-// _Nil node and _Head->parent is the root.
-// The original calls this from 0x46e9b0 rather than inlining it.
 #pragma auto_inline(off)
 // FUNCTION: 0x46fe60
 UnitSyncNode* UnitSyncMap::LowerBound(const unsigned int* key)
@@ -1670,8 +1402,6 @@ UnitSyncNode* UnitSyncMap::LowerBound(const unsigned int* key)
 }
 #pragma auto_inline(on)
 
-// --- vector<Elem_004702a0> members (0x470290, 0x4702a0) ----------------------
-
 typedef std::vector<Elem_004702a0> Vec_00470290;
 typedef void (Vec_00470290::*DestroyFn_00470290)(Vec_00470290::iterator, Vec_00470290::iterator);
 
@@ -1679,9 +1409,6 @@ struct Access_00470290 : Vec_00470290 {
     static DestroyFn_00470290 fn;
 };
 
-// std::vector<Elem_004702a0>::_Destroy(first, last) from MSVC 5's <vector>:
-// empty, since the element type is trivial. Its caller 0x470040 calls
-// 0x4702a0 (_Ucopy) and 0x470290 (_Destroy) with ecx set to the vector.
 // FUNCTION: 0x470290 ?_Destroy@?$vector@UElem_004702a0@@V?$allocator@UElem_004702a0@@@std@@@std@@IAEXPAUElem_004702a0@@0@Z
 DestroyFn_00470290 Access_00470290::fn = &Access_00470290::_Destroy;
 
@@ -1693,28 +1420,14 @@ struct Access_004702a0 : Vec_004702a0 {
     static UcopyFn_004702a0 fn;
 };
 
-// std::vector<Elem_004702a0>::_Ucopy(first, last, dest) from MSVC 5's
-// <vector>: copies [first, last) into raw storage at dest and returns the
-// end of the copies. Its caller 0x470040 calls 0x4702a0 (_Ucopy) and
-// 0x470290 (_Destroy) with ecx set to the vector.
 // FUNCTION: 0x4702a0 ?_Ucopy@?$vector@UElem_004702a0@@V?$allocator@UElem_004702a0@@@std@@@std@@IAEPAUElem_004702a0@@PBU3@0PAU3@@Z
 UcopyFn_004702a0 Access_004702a0::fn = &Access_004702a0::_Ucopy;
-
-// --- the empty function 0x470030 ---------------------------------------------
 
 // FUNCTION: 0x470030
 void __stdcall NopChecksumEntryDtor(int)
 {
 }
 
-// SyncPlayerRecord::operator=. ids and pairs are two vectors of 4-byte
-// elements, each with an out-of-line capacity() (0x470250) and size()
-// (0x470270) that both return the element count, i.e. a byte difference
-// shifted right by 2. The first list inlines its size() for the first
-// comparison, the second does not.
-// The members stay plain std::vector for the element destructor (0x46eaa0): a
-// vector subclass as the member type changes how deep that inlines, so the
-// assign helpers are reached through casts.
 // FUNCTION: 0x470040
 SyncPlayerRecord& SyncPlayerRecord::operator=(const SyncPlayerRecord& src)
 {
@@ -1734,8 +1447,6 @@ SyncPlayerRecord& SyncPlayerRecord::operator=(const SyncPlayerRecord& src)
     return *this;
 }
 
-// --- Class_00470250's and Class_00470270's counts (0x470250, 0x470270) --------
-
 // FUNCTION: 0x470250
 unsigned int Class_00470250::Capacity() const
 {
@@ -1754,11 +1465,6 @@ unsigned int Class_00470270::Size() const
     return _Last - _First;
 }
 
-// --- std::copy for 4-byte elements (0x4702d0) --------------------------------
-
-// std::copy for 4-byte elements, compiled with __stdcall as the default
-// convention (same shape as 0x44eef0). Its one caller copies one vector's
-// elements into another.
 // FUNCTION: 0x4702d0
 int* __stdcall CopyDwordRangeOverwrite(int* first, int* last, int* dest)
 {
@@ -1767,21 +1473,12 @@ int* __stdcall CopyDwordRangeOverwrite(int* first, int* last, int* dest)
     return dest;
 }
 
-// --- vector<Elem_0046faf0>::size and operator= (0x470770, 0x4707a0) ----------
-
 typedef Vec_0046faf0::size_type (Vec_0046faf0::*SizeFn_00470770)() const;
 
-// std::vector<Elem_0046faf0>::size() for the 14-byte element (three ints and
-// a short, packed to 2 bytes), the same vector as _Ucopy (0x46faf0) and the
-// operator= at 0x4707a0. Its callers are in 0x470560.
 // FUNCTION: 0x470770 ?size@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@QBEIXZ
 SizeFn_00470770 g_size_00470770 = &Vec_0046faf0::size;
 
 typedef Vec_0046faf0& (Vec_0046faf0::*AssignFn_0046faf0)(const Vec_0046faf0&);
 
-// std::vector<Elem_0046faf0>::operator= from MSVC 5's <vector>. The element
-// type is 14 bytes (three ints and a short, packed to 2), the same vector as
-// _Ucopy (0x46faf0), _Destroy (0x46e870), _Ufill (0x46fb40) and size (0x470770).
-// Its one caller is PacketSequencer::operator= (0x470560).
 // FUNCTION: 0x4707a0 ??4?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@QAEAAV01@ABV01@@Z
 AssignFn_0046faf0 g_assign_0046faf0 = &Vec_0046faf0::operator=;

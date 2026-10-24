@@ -1,5 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, space-bunny-free, LongCat 2.5 Preview Free, GPT-6, GPT-6.1-sol, deepseek-v4.1 and claude-opus-5-5. Names are provisional.
-
 #include <string.h>
 #include <stdio.h>
 
@@ -15,16 +13,16 @@ struct Pos_4589c0 {
 #include "gaf_frame.h"
 
 struct Surface_4589c0 {
-    int width;                      // +0x00
-    int height;                     // +0x04
-    int pitch;                      // +0x08
-    void* bits;                     // +0x0c
-    int field_10;                   // +0x10
-    int field_14;                   // +0x14
-    unsigned short x;               // +0x18
-    unsigned short y;               // +0x1a
+    int width;
+    int height;
+    int pitch;
+    void* bits;
+    int field_10;
+    int field_14;
+    unsigned short x;
+    unsigned short y;
     char unknown_1c[0x10];
-    unsigned int flag0 : 1;         // +0x2c
+    unsigned int flag0 : 1;
     unsigned int flag1 : 1;
 };
 
@@ -33,8 +31,6 @@ struct Surface_4589c0 {
 
 #include "../units/unit_def.h"
 
-// The unit def's type flags at +0x241 (Thaldren's UnitTypeFlags): bit 25 is noshadow and
-// bit 30 is digger.
 #pragma pack(push, 1)
 union UnitTypeFlags_459200 {
     unsigned int word;
@@ -45,10 +41,9 @@ union UnitTypeFlags_459200 {
     } bits;
 };
 
-// A view of UnitDef (units/unit_def.h) whose +0x241 flag word has bit fields.
 struct UnitDefFlags_459200 {
     char unknown_0[0x241];
-    UnitTypeFlags_459200 flags;        // +0x241
+    UnitTypeFlags_459200 flags;
 };
 
 union GameFlags_459200 {
@@ -87,7 +82,6 @@ void __stdcall DrawFrameDepth(GafFrame* bmp, GafFrame* param_2, int x, int y, in
 void __stdcall TintFrameBelow(GafFrame* param_1, int value);
 void __stdcall CutFrameBelow(GafFrame* param_1, int value);
 
-// digger_bias (if/return) is used only in the digger arm; other sites keep shade_bias.
 static inline int digger_bias(Model_459200* model)
 {
     if (((UnitDefFlags_459200*)model->owner->def.get())->flags.bits.digger)
@@ -101,19 +95,6 @@ static inline int shade_bias(Model_459200* model)
     return c ? 125 : 50;
 }
 
-// Draws a model relative to the camera position `v` (the 16.16 vector the
-// callers pass by value), then its attached units. It stays in its own file:
-// it calls BuildObjectPicture and DrawPieces on CMemoryCache, so it needs the
-// class to derive from UnitTable, where the merged file makes CMemoryCache the
-// base.
-//
-// BUG/ODDITY (kept as found): the far-sprite test is `unitDefIndex != 0 || dx >=
-//   seaLevel`, so the shadow is drawn for every unit whose def index is not
-//   0, whatever dx is, which reads as if it should be AND. Both halves have it.
-//   Also `v.v[1] = pos_y` is a plain copy where x and z are deltas.
-//
-// Must stay before MergeIntoComposite (0x4589c0): compiled after it, the sum in
-// the b3 arm goes into the wrong register.
 // FUNCTION: 0x459200
 void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_459200 v, int useColor)
 {
@@ -208,8 +189,7 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
                                 int diff = g_game->seaLevel - dx;
                                 if (diff > 0) {
                                     diff += shade_bias(model);
-                                    // The empty do-while ends the block: keeps the sum in diff's register.
-                                    do {} while (0);    // emits no code; needed for the match
+                                    do {} while (0);
                                     CutFrameBelow(this->bitmap, diff);
                                 }
                                 DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
@@ -232,7 +212,6 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
                 ((UnitTable*)this)->BuildObjectPicture(unit->state,1,-1);
                 if (unit->state->bitmap) {
                     ShadeByIntensity(unit->state->bitmap,unit->state);
-                    // Owner position read through int* op.
                     int* op = &model->owner->pos_x;
                     d.v[0] = unit->pos_x - op[0];
                     d.v[1] = unit->pos_y - op[1];

@@ -1,22 +1,8 @@
-// Decompiled by space-bunny-free, deepseek-v4.1-flash, Haiku, Opus, LongCat 2.5 Preview Free, Space Bunny Free, Sonnet 5.5, Sonnet, GPT-6.1-sol, deepseek-v4.1, claude-sonnet-5-5, mimo-v2.6-pro, DeepSeek V4.1 Flash, GPT-6 and Claude Opus 5.5. Names are provisional.
-//
-// TDF files: a text file is loaded into a tree of sections (TdfRecord), each
-// with its `name = value;` entries kept sorted by name, and the file object
-// (TdfFile) keeps a root and a current section. The std::string, logic_error,
-// out_of_range and vector members the compiler emitted for the unit follow
-// the code that uses them. The translation tables built on these files
-// (0x4c54f0 to 0x4c5d60) are a unit of their own: tdf_4c54f0.cpp. The paths
-// that delete the root section (LoadFile, LoadBuffer, and the destructor with
-// ??_GTdfField) and the field-vector insert stay in files of their own
-// (tdf_4c2f60.cpp, tdf_4c3120.cpp, tdf_4c51b0.cpp and tdf_4c59d0.cpp): no one
-// view of TdfRecord, and not the real <vector>, gives all of them.
-
 #include <string>
 #include <vector>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-// Included only for its symbol count: the std::string members below match at one window of it.
 #include <float.h>
 
 #include "string_ref.h"
@@ -30,7 +16,6 @@ __attribute__((optnone)) void __stdcall EmitTdfFieldDestructor(TdfField* field)
 }
 #endif
 
-// The vector's destroy loop calls the pair's destructor directly.
 namespace std {
 inline void _Destroy(TdfField* p)
 {
@@ -109,15 +94,8 @@ inline TdfRecord* TdfRecord::GetChild(int index)
     return index >= Kids(this).size() ? 0 : Kids(this).at(index);
 }
 
-// Defined ahead of its place in the address order so that the deleting
-// destructor in Unload can inline it.
-// Unused here: the symbol ids these declarations take keep the allocation,
-// standing in for the TdfRecord view merged into TdfRecord above
-// (docs/c2-regalloc.md).
 void EnableAICommands(void);
 
-// Unused here: the symbol ids these declarations take keep the allocation
-// after the TdfField join (docs/c2-regalloc.md).
 void CountMessage(unsigned char, int, int);
 void CountPacket(int, int, int);
 void SetCameraPosition(int, int, int);
@@ -138,8 +116,6 @@ TdfRecord::~TdfRecord()
     Kids(this).~vector();
 }
 
-// Handles the text at p (a // comment, a /* */ comment, or one ordinary
-// character) and returns where to continue.
 static inline char* SkipComment(char* p)
 {
     if (p[0] == '/' && p[1] == '/') {
@@ -171,7 +147,6 @@ static inline char* SkipComment(char* p)
     return p;
 }
 
-// Default constructor of a 12-byte class; its destructor is 0x4c2eb0.
 // FUNCTION: 0x4c2ea0
 TdfFile::TdfFile()
 {
@@ -180,16 +155,10 @@ TdfFile::TdfFile()
     flags = 0;
 }
 
-// Frees the TDF section tree hanging off root and zeroes the 12-byte object,
-// like TdfFile's destructor (0x4c2eb0, in tdf_4c51b0.cpp), except that the
-// entries are destroyed by the element destructor (0x4c5190). The delete
-// emits the scalar deleting destructor of TdfRecord (0x4c32f0), which
-// inlines the destructor again with the entries' handles released inline.
 // FUNCTION: 0x4c32f0 ??_GTdfRecord@@QAEPAXI@Z
 // FUNCTION: 0x4c3240
 void TdfFile::Unload()
 {
-    // Explicit null test kept: it gives root the original's register.
     if (root)
         delete root;
     root = 0;
@@ -197,9 +166,6 @@ void TdfFile::Unload()
     flags = 0;
 }
 
-// Blanks out C and C++ style comments in a text buffer, in place. A method
-// that ignores `this`: its callers (0x4c2f60, 0x4c3120) pass their own
-// `this` through in ecx.
 // FUNCTION: 0x4c33a0
 void TdfFile::StripComments(char* p)
 {
@@ -207,9 +173,6 @@ void TdfFile::StripComments(char* p)
         p = SkipComment(p);
 }
 
-// Moves the cursor to the child of the current node (or of the root when
-// there is none) whose name matches case-insensitively; returns whether
-// one was found.
 // FUNCTION: 0x4c3410
 int TdfFile::SelectRecord(char* name)
 {
@@ -220,12 +183,6 @@ int TdfFile::SelectRecord(char* name)
     return current != 0;
 }
 
-// Moves the cursor to the child of the current TDF node (or of the root when
-// there is none) at the given index. The node's child vector is a
-// std::vector<TdfRecord*> at +4 (_First at +8, _Last at +0xc), and the
-// out-of-range case throws out_of_range through vector::at() (the literal
-// "invalid vector<T> subscript"), calling the logic_error constructor
-// (0x4c35c0).
 // FUNCTION: 0x4c3490
 int TdfFile::SelectRecordAt(int index)
 {
@@ -235,8 +192,6 @@ int TdfFile::SelectRecordAt(int index)
     return node != 0;
 }
 
-// The std::logic_error and std::out_of_range members the compiler emits out
-// of line from <stdexcept>, for the std::out_of_range that vector::at() throws.
 // FUNCTION: 0x4c35c0 ??0logic_error@std@@QAE@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z
 // FUNCTION: 0x4c3730 ?what@logic_error@std@@UBEPBDXZ
 // FUNCTION: 0x4c3740 ?_Doraise@logic_error@std@@MBEXXZ
@@ -270,31 +225,6 @@ static inline char* SkipSpace(char* p)
         p++;
     return p;
 }
-
-// The constructor of a .TDF section: copies the name, then parses the text
-// into `name = value;` entries and `[name] { ... }` sub-sections until the
-// closing '}' (nextblock gets the position after it) or the end of the text.
-//
-// The file is written on the real <vector> instead of a hand-made one:
-// rewritten on the real <vector> instead of a hand-made one.
-//  * Both vectors are constructed by the header's own constructor, which is
-//    the hoisted `mov al, [esp+7]` copy of the allocator temporary, and the
-//    sub-section is added with children.push_back(), whose inlined
-//    insert(end(), x) keeps &children in ebx for the whole function.
-//  * The entries are a sorted vector of key/value handle pairs behind a byte
-//    at +0x14 (the same shape as the global map in 0x4c54f0, whose lookup is
-//    0x4c5c60). The binary search takes the key's char* by value (so it sits
-//    in ebx), and its comparison must be a bool-returning helper,
-//    `if (Less(mid->key.ptr, key))`: a plain `_strcmpi(...) < 0` loses the
-//    `setl dl`, and a named bool local puts lo, hi and mid in the
-//    wrong registers.
-//  * The lookup is written in the body with InsertNew as a member, as in
-//    0x4c54f0: `e == end || Ne(e->key, key)` puts the found arm first, and
-//    InsertNew's vector::insert(it, x) inlines down to the out-of-line
-//    insert(it, 1, x) with the index arithmetic around it. An inline
-//    operator[] doing the same is one inline level too deep.
-//  * `strchr(eq + 1, ';')` rather than `strchr(current, ';')` after
-//    `current = eq + 1` is the original's `lea eax, [esi+1]`.
 
 // FUNCTION: 0x4c3e40
 TdfRecord::TdfRecord(char* name, char* text, char** nextblock, char* filename)
@@ -380,11 +310,6 @@ fail:
     FatalError(error);
 }
 
-// Builds a reference-counted string handle (see 0x4c91b0 for the constructor
-// from a C string, 0x4c91a0 for the copy constructor, 0x4c9390 for the
-// destructor) out of the text between start and end, with leading and trailing
-// whitespace trimmed.
-
 // FUNCTION: 0x4c4340
 StringRef TdfRecord::MakeTrimmedString(char* start, char* end)
 {
@@ -428,9 +353,6 @@ int TdfRecord::GetRecordName()
     return (int)name;
 }
 
-// Unused here: classes and prototypes of the neighbouring files, declared for
-// the symbol ids that GetRecordName's own class took before it joined TdfRecord
-// and that the string handle's views took before they became one class.
 class Class_004c90b0;
 class TranslationTable;
 int RIReport(int, int, int, int, int, int, int, int, int, int);
@@ -447,8 +369,6 @@ void BlankScreen();
 void FlipScreen();
 void ShowSoftwareCursor();
 
-// size() of the std::vector of pointers held at +4 (_First at +8), TdfRecord's
-// children.
 // FUNCTION: 0x4c4450
 int TdfRecord::GetSubRecordCount()
 {
@@ -465,9 +385,6 @@ TdfRecord* TdfRecord::FindSubRecord(const char* name)
     return 0;
 }
 
-// Bounds-checked accessor into the vector of pointers held at +4 (_First at
-// +8). The index is checked against size() and 0 is returned when it is out
-// of range; otherwise std::vector::at returns the element.
 // FUNCTION: 0x4c44c0
 TdfRecord* TdfRecord::GetSubRecord(int index)
 {
@@ -541,7 +458,6 @@ int TdfRecord::FindFieldValue(char* name)
     return 0;
 }
 
-// Returns the named field as an int, or a default.
 // FUNCTION: 0x4c46c0
 int TdfRecord::GetFieldInt(const char* name, int def)
 {
@@ -551,7 +467,6 @@ int TdfRecord::GetFieldInt(const char* name, int def)
     return def;
 }
 
-// Returns the named field as a double, or a default.
 // FUNCTION: 0x4c4760
 double TdfRecord::GetFieldDouble(const char* name, double def)
 {
@@ -620,21 +535,12 @@ int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
     return 0;
 }
 
-// The std::basic_string<char> members the compiler's own <xstring> emits for
-// this unit. The copy constructor is a game row; the other members
-// (0x4c4ac0 to 0x4c50a0) are library rows annotated in
-// src/runtime/basic_string.cpp, and _Copy (0x4c4fa0) is the gap region
-// src/runtime/basic_string_4c4fa0.cpp.
 // FUNCTION: 0x4c49a0 ??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@ABV01@@Z
 template class std::basic_string<char, std::char_traits<char>, std::allocator<char> >;
 
-// The out-of-line vector::insert(iterator, size_type, const T&) that the
-// section parser's push_back (children, 0x4c4d70) and entry insert (entries,
-// 0x4c51e0) call.
 // FUNCTION: 0x4c4d70 ?insert@?$vector@PAVTdfRecord@@V?$allocator@PAVTdfRecord@@@std@@@std@@QAEXPAPAVTdfRecord@@IABQAV3@@Z
 // FUNCTION: 0x4c51e0 ?insert@?$vector@UTdfField@@V?$allocator@UTdfField@@@std@@@std@@QAEXPAUTdfField@@IABU3@@Z
 
-// Releases the key and the value of an entry.
 // FUNCTION: 0x4c5170
 void __stdcall ReleasePair(char* param_1)
 {
@@ -642,8 +548,6 @@ void __stdcall ReleasePair(char* param_1)
     ((StringRef*)(param_1))->ReleaseRef();
 }
 
-// Unused here: the symbol id this forward declaration takes keeps the std::logic_error
-// constructor (0x4c35c0) matching (docs/c2-regalloc.md).
 struct HapiBank;
 
 // FUNCTION: 0x4c5190 ??1TdfField@@QAE@XZ

@@ -9,48 +9,44 @@ class MovementClass;
 
 class UnitDef {
 public:
-    char name[0x20];                   // +0x000
-    char unitname[0x20];               // +0x020
-    char description[0x40];            // +0x040
-    char objectname[0x20];             // +0x080
-    char side[0x1e];                   // +0x0a0
-    char aiWeight[0x40];               // +0x0be, the FBI's ai_weight
-    char aiLimit[0x40];                // +0x0fe, the FBI's ai_limit
-    unsigned int fbiChecksum;          // +0x13e
-    int scriptChecksum;                // +0x142
-    int weaponHashXor;                 // +0x146
+    char name[0x20];
+    char unitname[0x20];
+    char description[0x40];
+    char objectname[0x20];
+    char side[0x1e];
+    char aiWeight[0x40];
+    char aiLimit[0x40];
+    unsigned int fbiChecksum;
+    int scriptChecksum;
+    int weaponHashXor;
     union {
-        int f14a;                      // +0x14a
+        int f14a;
         struct {
-            short footprintx;          // +0x14a
-            short footprintz;          // +0x14c
+            short footprintx;
+            short footprintz;
         };
     };
     union {
-        int f14e;                      // +0x14e
+        int f14e;
         Ref<char> yardmap;
     };
-    int count;                         // +0x152
-    // The unit type ids it can build; vtol_orders_414380.cpp tests it as
-    // canBuild, but every indexing read is unsigned short.
+    int count;
     Ref<unsigned short> ids;
-    int maxThisUnit;                   // +0x15a
-    // The model bounding box (nModelMinX..nModelSizeZ in Thaldren's UnitDef);
-    // each file that reads it as a Vec3 casts at the use.
-    int modelMinX;                     // +0x15e
-    int modelMinY;                     // +0x162
-    int modelMinZ;                     // +0x166
-    int modelMaxX;                     // +0x16a
+    int maxThisUnit;
+    int modelMinX;
+    int modelMinY;
+    int modelMinZ;
+    int modelMaxX;
     union {
-        int modelMaxY;                 // +0x16e
+        int modelMaxY;
         struct {
             short unknown_16e;
-            short field_170;           // +0x170
+            short field_170;
         };
     };
-    int modelMaxZ;                     // +0x172
-    int modelSizeX;                    // +0x176
-    int modelSizeY;                    // +0x17a
+    int modelMaxZ;
+    int modelSizeX;
+    int modelSizeY;
     union {
         int modelSizeZ;
         struct {
@@ -65,68 +61,66 @@ public:
             short radius184;
         };
     };
-    float energyCost;                  // +0x186
-    float metalCost;                   // +0x18a
-    void* data;                        // +0x18e
-    int maxvelocity;                   // +0x192
-    int maxslopevelocity;              // +0x196
-    int brakerate;                     // +0x19a
-    int acceleration;                  // +0x19e
-    int bankscale;                     // +0x1a2
-    int pitchscale;                    // +0x1a6
-    int damagemodifier;                // +0x1aa
-    int moverate1;                     // +0x1ae
-    int moverate2;                     // +0x1b2
+    float energyCost;
+    float metalCost;
+    void* data;
+    int maxvelocity;
+    int maxslopevelocity;
+    int brakerate;
+    int acceleration;
+    int bankscale;
+    int pitchscale;
+    int damagemodifier;
+    int moverate1;
+    int moverate2;
     Ref<MovementClass> movementclass;
-    short turnrate;                    // +0x1ba
-    short corpse;                      // +0x1bc
-    short maxwaterdepth;               // +0x1be
-    short minwaterdepth;               // +0x1c0
-    float energymake;                  // +0x1c2
-    float energyuse;                   // +0x1c6
-    float metalmake;                   // +0x1ca
-    float extractsMetal;               // +0x1ce
-    float windgenerator;               // +0x1d2
-    float tidalgenerator;              // +0x1d6
-    float cloakcost;                   // +0x1da
-    float cloakcostmoving;             // +0x1de
-    float energystorage;               // +0x1e2
-    float metalstorage;                // +0x1e6
-    int buildtime;                     // +0x1ea
-    // The three weapon type pointers (0x115 bytes each); the loader stores what
-    // FindWeaponByName returns.
+    short turnrate;
+    short corpse;
+    short maxwaterdepth;
+    short minwaterdepth;
+    float energymake;
+    float energyuse;
+    float metalmake;
+    float extractsMetal;
+    float windgenerator;
+    float tidalgenerator;
+    float cloakcost;
+    float cloakcostmoving;
+    float energystorage;
+    float metalstorage;
+    int buildtime;
     Ref<WeaponDef> weapons[3];
-    unsigned int maxHealth;            // +0x1fa
-    unsigned short buildRate;          // +0x1fe
-    short healtime;                    // +0x200
-    short range;                       // +0x202
-    short radardistance;               // +0x204
-    short sonardistance;               // +0x206
-    short mincloakdistance;            // +0x208
-    short radardistancejam;            // +0x20a
-    short sonardistancejam;            // +0x20c
-    short soundcategory;               // +0x20e
-    short buildangle;                  // +0x210
-    unsigned short buildRange;         // +0x212
-    short maneuverleashlength;         // +0x214
-    unsigned short attackrunlength;    // +0x216
-    short kamikazedistance;            // +0x218
-    short sortbias;                    // +0x21a
-    short altitude;                    // +0x21c
-    unsigned short id;                 // +0x21e
+    unsigned int maxHealth;
+    unsigned short buildRate;
+    short healtime;
+    short range;
+    short radardistance;
+    short sonardistance;
+    short mincloakdistance;
+    short radardistancejam;
+    short sonardistancejam;
+    short soundcategory;
+    short buildangle;
+    unsigned short buildRange;
+    short maneuverleashlength;
+    unsigned short attackrunlength;
+    short kamikazedistance;
+    short sortbias;
+    short altitude;
+    unsigned short id;
     Ref<char> explodeas;
     Ref<char> selfdestructas;
-    unsigned char maxslope;            // +0x228
-    unsigned char maxwaterslope;       // +0x229
-    unsigned char capacity;            // +0x22a
-    char transportcapacity;            // +0x22b
-    unsigned char draft;               // +0x22c
-    unsigned char makesMetal;          // +0x22d
-    unsigned char buildMenuPageCount;  // +0x22e
-    unsigned char mobile;              // +0x22f
-    char defaultmissiontype;           // +0x230
-    unsigned int* weaponCategories[3]; // +0x231
-    unsigned int* categories;          // +0x23d
+    unsigned char maxslope;
+    unsigned char maxwaterslope;
+    unsigned char capacity;
+    char transportcapacity;
+    unsigned char draft;
+    unsigned char makesMetal;
+    unsigned char buildMenuPageCount;
+    unsigned char mobile;
+    char defaultmissiontype;
+    unsigned int* weaponCategories[3];
+    unsigned int* categories;
     union {
         unsigned int flags1;
         unsigned char flags1Byte;

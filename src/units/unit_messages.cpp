@@ -1,17 +1,10 @@
-// What a unit says: one entry per kind of report ("select", "underattack",
-// "count5"), with the sound.tdf entry it plays and the text it shows. The
-// code indexes it by kind from 1 and entry 0 is empty, so its references
-// point into it: 0x5086dc (+0x4, 0x47fad0), 0x5086e0 (+0x8, 0x47ee30 and
-// 0x47fd70), 0x5086e8 (+0x10, 0x47f780, 0x47f7e0, 0x47f850), 0x5086ec (+0x14)
-// and 0x5086fc (entry 1's sound, 0x42f580).
-
 struct UnitMessage {
-    int kind;                       // +0x00 its own index
-    int priority;                   // +0x04 a higher one replaces a report on screen
-    int delay;                      // +0x08 seconds before it may play again
-    const char* sound;              // +0x0c its entry in sound.tdf
-    const char* text;               // +0x10 shown on screen, or null
-    unsigned int nextFrame;         // +0x14 the frame it may play again (set at run time)
+    int kind;
+    int priority;
+    int delay;
+    const char* sound;
+    const char* text;
+    unsigned int nextFrame;
 };
 
 // GLOBAL: 0x5086d8

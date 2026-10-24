@@ -1,5 +1,3 @@
-// Decompiled by Opus, Haiku, space-bunny-free. Names are provisional.
-
 #include <stdio.h>
 #include <string.h>
 
@@ -41,8 +39,6 @@ void FreeLogos(void)
     g_game->logos = (void*)(0);
 }
 
-// Parses the x1/y1/x2/y2 fields of the current TDF node into four ints.
-// On a missing node it reports a fatal error and restores the cursor.
 // FUNCTION: 0x431950
 void __stdcall ReadSideRect(TdfFile* obj, int* out, char* name, char* side)
 {
@@ -61,13 +57,10 @@ void __stdcall ReadSideRect(TdfFile* obj, int* out, char* name, char* side)
     obj->SetCurrentRecord(saved);
 }
 
-// Frees the font of each of the five sides at g_game+0x37f3d and clears the
-// pointers.
 // FUNCTION: 0x431a20
 void FreeSideFonts()
 {
     for (int i = 0; i < 5; i++) {
-        // The reference is load-bearing: it keeps FreeSideFonts at 59 bytes.
         int*& buffer = (int*&)g_game->sideDefs[i].font;
         if (buffer) {
             GameFreeThunk(buffer);
@@ -76,8 +69,6 @@ void FreeSideFonts()
     }
 }
 
-// The x1/y1/x2/y2 block of one section; msg is the caller's buffer, which
-// keeps each inlined expansion's string on its own stack slot.
 static inline void LoadSideRect(TdfFile* parser, int* out, char* name, char* side, char* msg)
 {
     int saved = parser->GetCurrentRecord();
@@ -93,19 +84,6 @@ static inline void LoadSideRect(TdfFile* parser, int* out, char* name, char* sid
     parser->SetCurrentRecord(saved);
 }
 
-// Loads gamedata\sidedata.tdf. For every SIDE<n> section, n counting from 0
-// until the section is missing, it reads the side's name, name prefix,
-// commander name and font file (LoadFontByName's body inlined), its two colours
-// and eleven x1/y1/x2/y2 rectangles, then hands sixteen more rectangles and
-// the three RELOAD<n> rectangles to the shared reader ReadSideRect. The
-// number of sections found is left in g_game+0x37f39.
-//
-// Suspected original bug, unconfirmed: the store `s->sideNumber = side` at
-// +0x22a writes the loop counter, so the field is 0 for side 0 and the index
-// otherwise. If that field is meant to hold something else, this is where the
-// source is wrong. I could not confirm its meaning from the rest of the repo;
-// 0x476830, 0x476a60 and 0x496ee0 only read the name at +0.
-// __stdcall because the original file was built with /Gz.
 // FUNCTION: 0x431a60
 void __stdcall LoadSideData(void)
 {
@@ -113,8 +91,6 @@ void __stdcall LoadSideData(void)
     int side;
     char name[0x100];
     char fontPath[0x100];
-    // Declaration order is deliberate and differs from the frame order: do not
-    // reorder.
     char msgEnergynum[0x100];
     char msgTotalunits[0x100];
     char msgTotaltime[0x100];
@@ -132,7 +108,6 @@ void __stdcall LoadSideData(void)
     parser.LoadFile(name);
     s = g_game->sideDefs;
     side = 0;
-    // `while (1)`, not `for (;; side++)`: a for loop is rotated and peeled.
     while (1) {
         s->sideNumber = side;
         sprintf(name, "SIDE%d", side);

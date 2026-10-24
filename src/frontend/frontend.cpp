@@ -1,9 +1,3 @@
-// Decompiled by DeepSeek V4.1 Flash, Haiku, Opus, deepseek-v4.1-flash, space-bunny-free, Space Bunny Free, longcat-2.5-preview-free and Claude Opus 5.5. Names are provisional.
-//
-// The frontend module (frontend.cpp): the front-end state machine and the
-// state helpers it logs through, the main menu and its click handlers, the
-// movie player, the warp-level loader, the picture cache and the debug key
-// handler, in address order.
 #include <string>
 #include "../../interfaces/host.h"
 #include <string.h>
@@ -40,92 +34,79 @@ public:
 #pragma pack(push, 1)
 #include "../network/player_info.h"
 
-// 13-byte smoke puff record: the loop steps the pointer by 13.
 struct Smoke_00425b80 {
-    short x;                           // +0x0
-    short y;                           // +0x2
-    unsigned char active;              // +0x4
-    char dx;                           // +0x5
-    char dy;                           // +0x6
-    unsigned char life;                // +0x7
-    unsigned char fuel;                // +0x8
-    int pos;                           // +0x9
+    short x;
+    short y;
+    unsigned char active;
+    char dx;
+    char dy;
+    unsigned char life;
+    unsigned char fuel;
+    int pos;
 };
 
-// The cell map, a byte per cell whose low nibble is the feature there.
 struct Map_00425b80 {
     char unknown_0[0xc];
-    unsigned char* cells;              // +0xc
+    unsigned char* cells;
 };
 
 struct World_00425b80 {
     char unknown_0[0xbc];
-    Map_00425b80* map;                 // +0xbc
+    Map_00425b80* map;
 };
 
-// The front-end's current screen layer, the object at g_game+0x531: the
-// gadget records at +0x4 (Layer.gadgets, Holder_428b60.entries,
-// Terrain_00425b80.world), the handler at +0x8 and the per-tick callback at
-// +0x1c, and the picture surface at +0x24 (Owner_00428730.surface,
-// Terrain_00425b80.smoke).
 struct Layer {
     char unknown_0[4];
-    char* gadgets;                     // +0x4
-    void (__stdcall* handler)(void*);  // +0x8
-    int data;                          // +0xc
+    char* gadgets;
+    void (__stdcall* handler)(void*);
+    int data;
     char unknown_10[0x1c - 0x10];
-    void (__stdcall* cb1c)();          // +0x1c
+    void (__stdcall* cb1c)();
     char unknown_20[0x24 - 0x20];
-    void* surface;                     // +0x24
+    void* surface;
 };
 
 #include "../gui/gui.h"
 
-// One gadget record (0x15b bytes each) of a layer; the first record is the
-// header with the count.
 struct Entry_428b60 {
-    unsigned char type;                // +0x00
+    unsigned char type;
     char unknown_1[0x1b - 1];
-    int attribs;                       // +0x1b
+    int attribs;
     char unknown_1f[0xb6 - 0x1f];
-    short count;                       // +0xb6
+    short count;
     char unknown_b8[0x15b - 0xb8];
 };
 
-// One picture-cache record (0x28 bytes each) of g_pictureCache.
 struct Entry_00428730 {
-    void* surface;                     // +0x00
-    int* data;                         // +0x04
-    char name[0x20];                   // +0x08
+    void* surface;
+    int* data;
+    char name[0x20];
 };
 
-// The gadget record a click handler is called with.
 struct Gadget_00425d80 {
     char unknown_0[0x60];
-    int selected;                      // +0x60
+    int selected;
 };
 
 struct GadgetOwner_00426190 {
     int unknown_0;
-    int gadgets;                       // +0x4
+    int gadgets;
 };
 
 struct Gadget_00426190 {
     char unknown_0[0x18];
-    GadgetOwner_00426190* owner;       // +0x18
+    GadgetOwner_00426190* owner;
     char unknown_1c[0x60 - 0x1c];
-    int selected;                      // +0x60
+    int selected;
 };
 
-// The display object GetDisplay returns: bit 1 at +0xf0 is fullscreen.
 struct Display_00425d80 {
     char unknown_0[0xf0];
-    unsigned short bit0 : 1;           // +0xf0
+    unsigned short bit0 : 1;
     unsigned short fullscreen : 1;
     unsigned short rest : 14;
 };
 
-// The game object.
 #include "../game/game.h"
 #pragma pack(pop)
 
@@ -285,8 +266,6 @@ void* __stdcall LoadBitmapByName(const char* name, int param_2);
 int __stdcall SetBackgroundSurface(int param_1, int param_2);
 int __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 
-// The original calls this out of line from the state helpers; with the whole
-// module in one file the compiler would inline it into them, so keep it out.
 #pragma auto_inline(off)
 // FUNCTION: 0x4256d0
 void __stdcall CheckFrontendStateChange(int line, char* file)
@@ -322,7 +301,6 @@ void BlankScreen()
     FlipScreen();
 }
 
-// Drains the ring buffer that PopKey pops from (0 when empty).
 // FUNCTION: 0x4257c0
 void FlushKeyQueue(void)
 {
@@ -330,8 +308,6 @@ void FlushKeyQueue(void)
     }
 }
 
-// The state machine helpers call this out of line where the original did; with
-// the definition in this file the compiler would inline it into them.
 #pragma auto_inline(off)
 // FUNCTION: 0x4257e0
 void __stdcall SetFrontendSubState(char state, int line, char* file)
@@ -346,7 +322,6 @@ void __stdcall SetFrontendSubState(char state, int line, char* file)
 }
 #pragma auto_inline(on)
 
-// Same: the state machine's UseServiceCalls calls this out of line.
 #pragma auto_inline(off)
 // FUNCTION: 0x425860
 void __stdcall SetFrontendState(char state, int line, char* file)
@@ -366,9 +341,6 @@ void __stdcall SetFrontendState(char state, int line, char* file)
 }
 #pragma auto_inline(on)
 
-// Applies a pending front-end state change (+0x2bc0) to the current state
-// (+0x2bbf). A debug check (CodeChecksumFailed, compiled to return 0) would report
-// a code segment checksum error, with the line and file of the change.
 // FUNCTION: 0x425930
 void ApplyPendingSubState()
 {
@@ -405,9 +377,6 @@ void ResetFrontendState()
     g_frontendErrorText[0] = 0;
 }
 
-// Resets front-end state (state 2) and clears the pending state-change markers
-// (+0x2bbf, +0x2bc0). Two debug checks (CodeChecksumFailed, compiled to return 0)
-// would report a code segment checksum error with the line and file.
 // FUNCTION: 0x425a90
 void EnterMainMenuState()
 {
@@ -439,19 +408,6 @@ void PresentFrontendFrame()
 
 int HarnessViewRand();
 
-// Per-tick update of the smoke layer: a hundred live smoke puffs walking the
-// 640x480 cell map, one cell per tick. A puff that is not running is dropped
-// at a random cell that still holds a burnt feature (low nibble > 12); from
-// then on it steps one cell per tick, is killed by leaving the map, by running
-// out of life, or by meeting a cell that is not burnt, and on every hit it
-// paints 0xaa and burns one unit of fuel. When the fuel runs out it turns:
-// a puff drifting vertically starts drifting horizontally, and the other way
-// round, three cells a tick in the direction its (parity) cell suggests, and
-// refills its fuel.
-// Suspected original bug: a running puff writes the smoke template byte over
-// the feature nibble of the cell it stands on (`dest[s->pos] = src[s->pos]`,
-// and 0xaa, whose low nibble is 10) instead of only setting a smoke bit, so
-// burnt features under a puff stop looking burnt and later puffs die there.
 // FUNCTION: 0x425b80
 void UpdateMenuSparks()
 {
@@ -481,11 +437,9 @@ void UpdateMenuSparks()
                         if (s->fuel == 0) {
                             if (s->dy != 0) {
                                 s->dy = 0;
-                                // Char-typed arms keep the computation in 8-bit registers.
                                 s->dx = (s->x & 1) ? (char)-3 : (char)3;
                                 s->fuel = (HarnessViewRand() & 0xf) + 1;
                             } else {
-                                // if/else, not a conditional: stops the dx = 0 store hoisting above.
                                 if (s->y & 1) {
                                     s->dy = 3;
                                 } else {
@@ -503,7 +457,6 @@ void UpdateMenuSparks()
                 s->x = HarnessViewRand() % 640;
                 s->y = HarnessViewRand() % 220;
                 s->pos = s->x + s->y * 640;
-                // `> 12`, not `<= 12` with continue: every path must reach the s++ below.
                 if ((dest[s->pos] & 0xf) > 12) {
                     s->active = 1;
                     s->life = HarnessViewRand() + 1;
@@ -532,10 +485,6 @@ void UpdateMenuSparks()
     }
 }
 
-// Title-screen click handler: dispatches on the gadget name, SINGLE/MULTI
-// set the front-end state (+0x2bc0) to 5/6, INTRO checks the CD and starts
-// the movie state (clearing +0x2bbe/+0x2bbf/+0x2bc0), EXIT goes to 8 and
-// Credits to 9; unknown gadgets just release themselves.
 // FUNCTION: 0x425d80
 void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
 {
@@ -626,9 +575,6 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
     ClearSelectedGadget(gadget);
 }
 
-// Handler for a two-choice dialog gadget (same shape as 0x446020): plays
-// the button sound, "CHOICE1" closes the game window, "CHOICE2" does
-// nothing, anything else is passed on.
 // FUNCTION: 0x426190
 void __stdcall HandleCloseCdPlayerChoice(Gadget_00426190* gadget)
 {
@@ -643,10 +589,6 @@ void __stdcall HandleCloseCdPlayerChoice(Gadget_00426190* gadget)
     }
 }
 
-// Opens the YESORNO.GUI dialog asking "Close Windows CD Player?", relabels
-// the CHOICE1 / CHOICE2 gadgets, puts the localised "Yes" and "No" on the two
-// gadgets the lookups found, and installs HandleCloseCdPlayerChoice as the
-// gadget handler. SelectGadgetByName is then told about "CHOICE1".
 // FUNCTION: 0x426200
 void __stdcall OpenCloseCdPlayerDialog()
 {
@@ -667,7 +609,6 @@ void __stdcall OpenCloseCdPlayerDialog()
     }
 }
 
-// Looks a picture-cache entry up by name and returns its palette data.
 static char* Lookup_004263b0(const char* name)
 {
     if (name != 0) {
@@ -918,8 +859,6 @@ int ConnectToService(void)
     return 0;
 }
 
-// Inlined copies of the front-end state helpers, one per inlining outcome in
-// the original code. LogStateChange is CheckFrontendStateChange.
 static void LogStateChange(int line, char* file)
 {
     char buf[256];
@@ -929,7 +868,6 @@ static void LogStateChange(int line, char* file)
     }
 }
 
-// SetFrontendSubState with its log call left out of line.
 static void SetSubState(char state, int line, char* file)
 {
     CheckFrontendStateChange(line, file);
@@ -944,7 +882,6 @@ static void SetSubStateLogged(char state, int line, char* file)
     (*(char*)&g_game->field_2bc0) = state;
 }
 
-// SetFrontendState with the sub-state change inlined too.
 static void SetState(char state, int line, char* file)
 {
     CheckFrontendStateChange(line, file);
@@ -952,7 +889,6 @@ static void SetState(char state, int line, char* file)
     SetSubState(0, 0x9b, g_frontendSourceFile);
 }
 
-// SetFrontendState with the sub-state change left out of line.
 static void SetStateSubCall(char state, int line, char* file)
 {
     CheckFrontendStateChange(line, file);
@@ -967,7 +903,6 @@ static void SetStateLogged(char state, int line, char* file)
     SetFrontendSubState(0, 0x9b, g_frontendSourceFile);
 }
 
-// ApplyPendingSubState.
 static void UpdateSubState()
 {
     char next = (char)g_game->field_2bc0;
@@ -975,7 +910,6 @@ static void UpdateSubState()
         SetSubState(next, 0xa3, g_frontendSourceFile);
 }
 
-// ConnectToService, as inlined in case 15 and in case 20.
 static int UseService(void)
 {
     if (InitNetConnection()) {
@@ -1000,8 +934,6 @@ static int UseServiceCalls(void)
     return 0;
 }
 
-// The front-end state machine of frontend.cpp (line numbers in the
-// CheckFrontendStateChange calls are the original __LINE__ values).
 // FUNCTION: 0x426e80
 void RunFrontendStateMachine(void)
 {
@@ -1271,7 +1203,6 @@ void RunFrontendStateMachine(void)
             OpenOptionsPanel();
             SetSubState(1, 0x53d, g_frontendSourceFile);
             return;
-        // Stays between cases 13 and 2: its position decides case 20 registers.
         case 1:
             PresentFrontendFrame();
             return;
@@ -1301,7 +1232,6 @@ void RunFrontendStateMachine(void)
             return;
         case 3:
             SetState(2, 0x564, g_frontendSourceFile);
-            // break, not return: lets case 7:11 cross-jump into case 16:17.
             break;
         }
         break;
@@ -1493,7 +1423,6 @@ void ClearPictureCache()
     memset(g_pictureCache, 0, 0x64 * 4);
 }
 
-// Looks an entry of the table cleared by FreePictureCache up by name.
 // FUNCTION: 0x4287d0
 int* __stdcall FindCachedPicturePalette(const char* name)
 {
@@ -1518,10 +1447,6 @@ int __stdcall FindCachedPicture(char* name)
     return 0;
 }
 
-// PALETTE CACHE.
-// Suspected original bug: the name search matches a cached entry whose surface
-// is already 0, moves it to the front, then the alloc path shifts and inserts a
-// second entry with the same name at index 0, leaving a duplicate at index 1.
 // FUNCTION: 0x4288d0
 int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4)
 {
@@ -1565,12 +1490,10 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
         }
     } else {
         surface = 0;
-        // Shared tail via goto: places that block after the return.
         goto after;
     }
 
 after:
-    // Nested if, one trailing return 0: both failure exits share one return block.
     if (param_4 == 0) {
         if (g_game->gui.layer != 0) {
             SetBackgroundSurface((int)&g_game->gui, (int)surface);
@@ -1608,10 +1531,6 @@ void OrLabelAttribs(void)
 void EmptyPreFrontendInitHook(void)
 {
 }
-
-// 0x428bc0 (CodeChecksumFailed) stays in frontend_428bc0.cpp: it must not be
-// visible to its callers or the compiler inlines its `return 0` into every
-// checksum check and deletes the branch.
 
 // FUNCTION: 0x428bd0
 void EmptyPostSimStepHook(void)

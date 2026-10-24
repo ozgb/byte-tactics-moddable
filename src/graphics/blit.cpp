@@ -1,37 +1,3 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-//
-// Surface drawing, hand-written in assembly: blitters, run-length sprite
-// blitters, lines, rectangle fills and a glyph blitter, all __cdecl with
-// MASM-style frames (`push ebp / mov ebp, esp / add esp, -N ... leave / ret`)
-// that save every register they use.
-//
-// 0x4cbbe0  BlitSurface(dst, src, x, y)                            blit a bitmap at (x, y), clipped
-// 0x4cbcd5  BlitSurfaceKeyed(dst, src, x, y, key)                  the same, skipping the key colour
-// 0x4cbdd1  BlitRect(dst, src, rect, pos)                          copy a rectangle
-// 0x4cbe70  BlitRectKeyed(dst, src, rect, pos, key)                copy a rectangle, skipping the key colour
-// 0x4cbef1  BlitTile32x32(dst, x, y, tile)                         copy a 32 x 32 tile to (x, y)
-// 0x4cbf2c  BlitRectBlended(dst, src, rect, pos, key, table)       dst = table[src][dst], skipping the key
-// 0x4cbfc4  BlitRectRemapDest(dst, src, rect, pos, key, table)     dst = table[dst] under each non-key pixel
-// 0x4cc057, 0x4cc1bf, 0x4cc3d0, 0x4cc51d                         run-length sprite blitters
-//           (pixels, pitch, drect, runs, srect[, table]): each row of runs follows
-//           its byte length (a word); a run's count byte says skip, copy or repeat
-// 0x4cc332  BlitRectShadow(dst, src, rect, pos, key, table)        dst = table[src - 0x4f][dst],
-//                                                                  skipping the key
-// 0x4cc650  IsLineVisible(surface, x0, y0, x1, y1)                 0 when the segment misses the surface
-// 0x4cc7ab  BlitLine(surface, x0, y0, x1, y1, color)               draw a line
-// 0x4cc8df  BlitLineRemapped(surface, x0, y0, x1, y1, ..., table)  draw a line through a table
-// 0x4cca33  (x0, y0, x1, y1, color)                                16-bit line; no callers, and it
-//                                                                  hands IsLineVisible no surface
-// 0x4ccb65  (surface in esi)                                       no callers
-// 0x4ccd1c  (surface, rect, color)                                 rectangle outline, four BlitLine
-// 0x4ccd85  (rect, color)                                          the same through 0x4cca33; no callers
-// 0x4ccdea  FillSolidRect(surface, rect, color)                    fill a rectangle
-// 0x4cce87  XorRect(surface, rect, value)                          xor a rectangle with a byte
-// 0x4cced5  RemapRect(pixels, pitch, w, h, table)                  translate pixels through a table
-// 0x4ccf60  BlitText(pixels, pitch, font, text, x, y, c1, c2, c3)  glyph blitter
-// 0x4cd010  SampleBresenhamLine(dst, src, x0, y0, x1, y1, step)    no callers
-// 0x4cd896..0x4cd962  (dest, src, width, y, x, rowstep, colstep)   sample a span of src into dest
-
 // FUNCTION: 0x4cbbe0
 extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int x, int y)
 {
@@ -244,7 +210,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         mov ecx, dword ptr [ebp - 0x24]
     L004cbdb0:
         mov al, byte ptr [esi]
-        _emit 0x38      // cmp al, dl, as r/m8, r8 (the inline assembler only encodes r8, r/m8)
+        _emit 0x38
         _emit 0xd0
         je L004cbdb8
         mov byte ptr [edi], al
@@ -397,7 +363,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         mov ecx, dword ptr [ebp - 0xc]
     L004cbed5:
         mov al, byte ptr [esi]
-        _emit 0x38      // cmp al, ah, as r/m8, r8 (the inline assembler only encodes r8, r/m8)
+        _emit 0x38
         _emit 0xe0
         je L004cbedd
         mov byte ptr [edi], al
@@ -580,7 +546,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         mov ecx, dword ptr [ebp - 0xc]
     L004cc034:
         mov al, byte ptr [esi]
-        _emit 0x38      // cmp al, bh, as r/m8, r8 (the inline assembler only encodes r8, r/m8)
+        _emit 0x38
         _emit 0xf8
         je L004cc041
         mov al, byte ptr [edi]
@@ -789,7 +755,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         inc edi
         sub ecx, 1
         jne L004cc17b
-        _emit 0xe9      // jmp L004cc114: near jump (the inline assembler leaves the ALIGN padding out when it sizes it)
+        _emit 0xe9
         _emit 0x7a
         _emit 0xff
         _emit 0xff
@@ -2730,7 +2696,7 @@ extern "C" __declspec(naked) void __cdecl BlitText(unsigned char* pixels, int pi
         jb L004ccfe2
         mov al, byte ptr [ebp + 0x24]
     L004ccfe2:
-        _emit 0x38      // cmp al, ah, as r/m8, r8 (the inline assembler only encodes r8, r/m8)
+        _emit 0x38
         _emit 0xe0
         je L004ccfe8
         mov byte ptr [edi], al

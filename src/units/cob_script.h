@@ -7,7 +7,6 @@ struct Piece;
 struct Callback;
 class HapiBank;
 
-// One script thread (0xa4 bytes): an operand stack of 32 words.
 struct Channel
 {
     unsigned int state;
@@ -38,38 +37,38 @@ struct Channel
 class CobScript
 {
   public:
-    int scale;                         // +0x004
-    ScriptTable *table;                // +0x008
-    int unknown_c;                     // +0x00c, the script's checksum
+    int scale;
+    ScriptTable *table;
+    int unknown_c;
     Ref<int> statics;
     Ref<Piece> pieces;
-    int changed;                       // +0x018, a piece is still moving
-    Channel channels[8];               // +0x01c
-    int activeCount;                   // +0x53c
+    int changed;
+    Channel channels[8];
+    int activeCount;
 
     CobScript();
 
-    virtual void SetPieceTranslation(int, int, int) = 0;  // slot 0
-    virtual void SetPieceRotation(int, int, int) = 0;  // slot 1
-    virtual void SetPieceVisible(int, int) = 0;       // slot 2
-    virtual void SetPieceCached(int, int) = 0;        // slot 3
-    virtual void SetPieceShaded(int, int) = 0;        // slot 4
-    virtual int GetPieceTranslation(int, int) = 0;    // slot 5
-    virtual int GetPieceRotation(int, int) = 0;       // slot 6
-    virtual int IsPieceVisible(int);                  // slot 7
-    virtual int IsPieceCached(int);                   // slot 8
-    virtual int IsPieceShaded(int);                   // slot 9
-    virtual void ExplodeLegacy(int, int, int);        // slot 10
-    virtual void PlaySoundNoop(int);                  // slot 11
-    virtual void EmitSfx(int, int);                   // slot 12
-    virtual void ExplodePiece(int, unsigned int);     // slot 13
-    virtual void AttachUnit(unsigned short, int, int); // slot 14
-    virtual void DropUnit(unsigned short);            // slot 15
-    virtual void SetUnitValue(int, int);              // slot 16
-    virtual int GetUnitValue(int, int, int, int, int); // slot 17
-    virtual int IsCarryingUnit(int);                  // slot 18
-    virtual int GetTransporterId();                   // slot 19
-    virtual ~CobScript();                             // slot 20
+    virtual void SetPieceTranslation(int, int, int) = 0;
+    virtual void SetPieceRotation(int, int, int) = 0;
+    virtual void SetPieceVisible(int, int) = 0;
+    virtual void SetPieceCached(int, int) = 0;
+    virtual void SetPieceShaded(int, int) = 0;
+    virtual int GetPieceTranslation(int, int) = 0;
+    virtual int GetPieceRotation(int, int) = 0;
+    virtual int IsPieceVisible(int);
+    virtual int IsPieceCached(int);
+    virtual int IsPieceShaded(int);
+    virtual void ExplodeLegacy(int, int, int);
+    virtual void PlaySoundNoop(int);
+    virtual void EmitSfx(int, int);
+    virtual void ExplodePiece(int, unsigned int);
+    virtual void AttachUnit(unsigned short, int, int);
+    virtual void DropUnit(unsigned short);
+    virtual void SetUnitValue(int, int);
+    virtual int GetUnitValue(int, int, int, int, int);
+    virtual int IsCarryingUnit(int);
+    virtual int GetTransporterId();
+    virtual ~CobScript();
 
     void SetCob(ScriptTable* data);
     ScriptTable* GetCob();
@@ -82,8 +81,6 @@ class CobScript
     int StartScriptWithArgs(char* name, Callback* callback, int update, int count, int a, int b, int c, int d);
     int StartScriptWithArgsByIndex(int index, Callback* callback, int update, int count, int a, int b, int c, int d);
     int QueryScript(char* name, int* p2, int* p3, int* p4, int* p5);
-    // 0x4b0c40: it matches only through the Channel_004b0c40 view, addressing
-    // the channels from `this + i * 0xa4`.
     int QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5);
     void RemoveCallback(Callback* callback);
     void RunScripts(int elapsed);
@@ -94,8 +91,6 @@ class CobScript
             if ((channels[i].state & 0xfff00000) == 0x2800000 && channels[i].waiting == index)
                 channels[i].state = 0x1000000;
     }
-    // 0x4b1c00: it matches only indexing the piece record through Piece's
-    // e[6][3] view (see the note at its definition).
     void AnimatePieces(int elapsed);
     void SaveScriptState(HapiBank* file);
     int LoadScriptState(HapiBank* file);

@@ -1,10 +1,7 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// The online.dll glue (0x45b250, 0x45b490, 0x45b670 share these inline
-// helpers).
 #include <string.h>
 #include "../../interfaces/host.h"
 
-extern int DAT_00512c80[0x54];      // the online configuration, 0x150 bytes
+extern int DAT_00512c80[0x54];
 extern int g_onlineConfigLoaded;
 
 // FUNCTION: 0x45b670

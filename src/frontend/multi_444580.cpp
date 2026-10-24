@@ -1,38 +1,36 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// Stays out of multi.cpp: a gap region (docs/split-modules.md).
 #include <stdio.h>
 #include <string.h>
 #include "../../interfaces/host.h"
 
 #pragma pack(push, 1)
-struct Entry_00444580 {                 // a gadget of the menu, 0x15b bytes
+struct Entry_00444580 {
     short unknown_0;
-    char name[0x13];                    // +0x02
-    short y;                            // +0x15
+    char name[0x13];
+    short y;
     char unknown_17[0x19 - 0x17];
-    short height;                       // +0x19
-    int attribs;                        // +0x1b
-    int colours;                        // +0x1f
+    short height;
+    int attribs;
+    int colours;
     char unknown_23[0x29 - 0x23];
-    char active;                        // +0x29
+    char active;
     char unknown_2a[0xb6 - 0x2a];
-    short count;                        // +0xb6 (entry 0 only)
+    short count;
     char unknown_b8[0xcc - 0xb8];
-    char choice[0x15b - 0xcc];          // +0xcc (entry 0 only)
+    char choice[0x15b - 0xcc];
 };
 
 struct Layer {
     int unknown_0;
-    Entry_00444580* entries;            // +0x4
+    Entry_00444580* entries;
 };
 
 #include "../gui/gui.h"
 
 struct Gadget_00444580 {
     int unknown_0;
-    Entry_00444580* entries;            // +0x4
-    void (__stdcall* handler)(void*);   // +0x8
-    int userData;                       // +0xc
+    Entry_00444580* entries;
+    void (__stdcall* handler)(void*);
+    int userData;
 };
 
 struct Conn_00444580 {
@@ -44,17 +42,17 @@ struct Conn_00444580 {
 
 struct Game_00444580 {
     char unknown_0[0x14];
-    char net[0x4f9 - 0x14];             // +0x14
-    int count;                          // +0x4f9
+    char net[0x4f9 - 0x14];
+    int count;
     char unknown_4fd[0x519 - 0x4fd];
-    Gui gui;                            // +0x519
+    Gui gui;
     char unknown_120f[0x2a4b - 0x120f];
-    void* descriptions;                 // +0x2a4b
+    void* descriptions;
     char unknown_2a4f[0x2a9f - 0x2a4f];
-    void* guids;                        // +0x2a9f
-    Conn_00444580* conns;               // +0x2aa3
+    void* guids;
+    Conn_00444580* conns;
     char unknown_2aa7[0x143a7 - 0x2aa7];
-    unsigned char paletteRgba[0x391e9 - 0x143a7];  // +0x143a7
+    unsigned char paletteRgba[0x391e9 - 0x143a7];
     Ref<Mission> mapInfo;
 };
 #pragma pack(pop)
@@ -81,11 +79,6 @@ void OrLabelAttribs();
 void __stdcall SetKeyboardInput(void* menu, int value);
 void __stdcall RenderLayer(void* menu, int value);
 
-// Appends a copy of entry `from` under a new name. This is 0x4444d0, which the
-// original defines between the two functions of this file and inlines here;
-// this spelling (one local, `index`) also matches 0x4444d0 itself, and it is
-// the one that gives this function's frame (two more locals add two slots).
-// It is static here so that the object does not define 0x4444d0 a second time.
 static int __stdcall CloneServiceSlot(Entry_00444580* entries, int from, short y, int source, char* name)
 {
     int index = ++entries[0].count;
@@ -98,10 +91,6 @@ static int __stdcall CloneServiceSlot(Entry_00444580* entries, int from, short y
     return index;
 }
 
-// Opens the SELPROV.GUI menu (choose a connection provider) and adds a button
-// for each online service online.dll reports, copied from the SERVICEX one.
-// Unused here: the real declaration from the frontend GUI code whose symbol
-// ids keep the allocation (docs/c2-regalloc.md).
 void ActivatePlayerGadgets(char*);
 // FUNCTION: 0x444580
 void FillProviderList()
@@ -123,11 +112,9 @@ void FillProviderList()
     host_net_uninit((host_net*)g_game->net);
     host_net_get_connections((host_net*)g_game->net, g_game->guids, g_game->conns, g_game->descriptions, (const host_guid*)DAT_004fcfb8);
     Entry_00444580* entries = menu->entries;
-    // The names tmpl, y, k and n, at function scope, set the stack slot order.
     int tmpl = FindGadgetIndex(entries, "SERVICEX", 1);
     int y;
     int k;
-    // n = 0 is a dead store: makes n the first loop variable seen, fixing the reload order.
     int n = 0;
     int count = 0;
     try {

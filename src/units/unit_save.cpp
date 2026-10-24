@@ -1,21 +1,18 @@
-// Decompiled by space-bunny-free, DeepSeek V4.1 Flash, GPT-6, GPT-6.1-sol, deepseek-v4.1, claude-sonnet-5-5, claude-opus-5-5, Space Bunny Free and Haiku. Names are provisional.
-
 #include <stdio.h>
 #include "../state/block.h"
 #include <string.h>
 #include <stdlib.h>
-// Must stay, though unused: LoadUnit's flag chain registers depend on it.
 #include <math.h>
 
 struct FlagBits {
-    unsigned int a0 : 1;                // bits 0-3: unit+0x10f bits 0-3
+    unsigned int a0 : 1;
     unsigned int a1 : 1;
     unsigned int a2 : 1;
     unsigned int a3 : 1;
-    unsigned int b : 12;                // bits 4-15: unit+0x110 bits 0-11
-    unsigned int c : 1;                 // bit 16: unit+0x110 bit 13
-    unsigned int d : 3;                 // bits 17-19 (unused)
-    unsigned int e : 12;                // bits 20-31: unit+0x110 bits 14-25
+    unsigned int b : 12;
+    unsigned int c : 1;
+    unsigned int d : 3;
+    unsigned int e : 12;
 };
 
 
@@ -34,64 +31,64 @@ struct PieceBits {
 
 #pragma pack(push, 1)
 
-struct SrcPiece {                       // 0x18 bytes at +0x41 + i*0x18
-    int f0;                             // +0x0
-    int f4;                             // +0x4
+struct SrcPiece {
+    int f0;
+    int f4;
     union {
-        int f8;                         // +0x8
+        int f8;
         unsigned char f8b;
     };
-    int fc;                             // +0xc
-    short f10;                          // +0x10
-    short f12;                          // +0x12
-    short f14;                          // +0x14
-    unsigned char f16;                  // +0x16
-    PieceBits fl;                       // +0x17
+    int fc;
+    short f10;
+    short f12;
+    short f14;
+    unsigned char f16;
+    PieceBits fl;
 };
 
-struct SaveRec {                        // 0xb8 bytes, one saved unit
+struct SaveRec {
     char name[0x20];
-    unsigned char player;               // +0x20
-    unsigned short id;                  // +0x21
-    int f23;                            // +0x23
-    int f27;                            // +0x27
-    Vec3 pos;                           // +0x2b
-    Angles16 angles;                    // +0x37
-    short f3d;                          // +0x3d
-    short f3f;                          // +0x3f
-    SrcPiece pieces[3];                 // +0x41
-    short childA;                       // +0x89
-    short childB;                       // +0x8b
-    char b8d;                           // +0x8d
-    unsigned char b8e;                  // +0x8e
-    int f8f;                            // +0x8f
-    int f93;                            // +0x93
-    int f97;                            // +0x97
-    int f9b;                            // +0x9b
-    int f9f;                            // +0x9f
-    int fa3;                            // +0xa3
-    int fa7;                            // +0xa7
-    unsigned char bab;                  // +0xab
-    unsigned char bac;                  // +0xac
-    unsigned char bad;                  // +0xad
-    short bae;                          // +0xae
-    unsigned char bb0;                  // +0xb0
-    unsigned char bb1;                  // +0xb1
+    unsigned char player;
+    unsigned short id;
+    int f23;
+    int f27;
+    Vec3 pos;
+    Angles16 angles;
+    short f3d;
+    short f3f;
+    SrcPiece pieces[3];
+    short childA;
+    short childB;
+    char b8d;
+    unsigned char b8e;
+    int f8f;
+    int f93;
+    int f97;
+    int f9b;
+    int f9f;
+    int fa3;
+    int fa7;
+    unsigned char bab;
+    unsigned char bac;
+    unsigned char bad;
+    short bae;
+    unsigned char bb0;
+    unsigned char bb1;
     union {
-        unsigned short fb2;             // +0xb2
+        unsigned short fb2;
         struct {
             unsigned char bb2;
-            unsigned char b3;           // (unused padding)
+            unsigned char b3;
         };
     };
-    FlagBits flags;                     // +0xb4
+    FlagBits flags;
 };
 
 
 
 struct Obj {
     char gap_0[0x10a];
-    unsigned char f10a;                 // +0x10a
+    unsigned char f10a;
 };
 
 #include "unit.h"
@@ -104,7 +101,7 @@ struct Mission;
 
 struct Struct_00487af0 {
     char unknown_0[4];
-    int* field_4;                      // +0x4
+    int* field_4;
 };
 #pragma pack(pop)
 
@@ -155,11 +152,6 @@ void __stdcall LoadUnits(HapiBank* file)
 
 #include "../../interfaces/seams.h"
 
-// Loads one unit (and, recursively, the units it carries or is built by) from the "Units"
-// section of a saved game: finds its 0xb8-byte record by id, creates the unit and copies the
-// record into it.
-// 0x43a420 runs on the result of operator new and stores vtables, so it is written as a
-// constructor, `new Order(unit, file, name)`, as the naming rule asks.
 // FUNCTION: 0x487080
 Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
 {
@@ -226,7 +218,6 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     unit->bit1 = rec.flags.a1;
     unit->bit2 = rec.flags.a2;
     unit->bit3 = rec.flags.a3;
-    // Direct merges into unit->flags, no `u` local and no reload.
     unit->flags = (unit->flags & ~0xc) | (rec.flags.b & 0xc);
     unit->flags = (unit->flags & ~0x10) | (rec.flags.b & 0x10);
     unit->flags = (unit->flags & ~0x20) | (rec.flags.b & 0x20);
@@ -273,7 +264,6 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     file->OpenNamedBox(script);
     ((CobScript*)unit->script.get())->LoadScriptState(file);
 
-    // Plain array indexing in this field order: it anchors the loop pointer.
     for (int j = 0; j < 3; j++) {
         *(int*)&unit->weapons[j] = rec.pieces[j].f0;
         unit->weapons[j].aimCob.nAimCobDone = rec.pieces[j].f4;
@@ -296,8 +286,6 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     return 0;
 }
 
-// Saves every live unit (g_game+0x14357..+0x1435b, stride 0x118) as a 0xb8
-// byte record; inverse of the 0x487080 loader, whose field map it shares.
 // FUNCTION: 0x4876c0
 void __stdcall SaveUnits(HapiBank* file)
 {
@@ -348,7 +336,6 @@ void __stdcall SaveUnits(HapiBank* file)
             rec.f3f = unit->killCount;
             rec.f27 = unit->motion != 0;
 
-            // Plain short local assigned in the nested if, not a pointer.
             short id8b = 0;
             Unit* a = unit->carrier;
             if (a != 0 && (a->flags & 0x10000000)) {
@@ -364,7 +351,6 @@ void __stdcall SaveUnits(HapiBank* file)
                     id8b = unit->attacker == 0 ? 0 : a2->id;
             }
             rec.childB = id8b;
-            // Keep this statement order: it decides the scratch register chains.
             rec.f93 = *(int*)&unit->cell;
             rec.b8e = unit->lastAttackerSlot;
             rec.f8f = unit->extraction;
@@ -381,7 +367,6 @@ void __stdcall SaveUnits(HapiBank* file)
             rec.bb1 = unit->recentlyDamagedTimer;
             rec.fb2 = unit->activateFlags;
             unsigned int u = unit->flags;
-            // Four 1-bit copies: a 4-bit field or `& 0xf` loses the zero extension.
             rec.flags.a0 = unit->bit0;
             rec.flags.a1 = unit->bit1;
             rec.flags.a2 = unit->bit2;
@@ -390,7 +375,6 @@ void __stdcall SaveUnits(HapiBank* file)
             rec.flags.c = (u >> 13) & 1;
             rec.flags.e = (u >> 14) & 0xfff;
 
-            // Plain array indexing in this field order: it anchors the loop pointer.
             for (int k = 0; k < 3; k++) {
                 rec.pieces[k].f0 = *(int*)&unit->weapons[k];
                 rec.pieces[k].f4 = unit->weapons[k].aimCob.nAimCobDone;
@@ -417,23 +401,11 @@ void __stdcall SaveUnits(HapiBank* file)
     }
 }
 
-// The element address has to go through this helper: written inline as
-// param_2->field_4[i++] the strength reducer turns the loop into a pointer
-// walk (add eax, 4 plus the loaded value in a register), while the original
-// recomputes esi*4 with a lea and compares straight from memory.
 static inline int* Elem_00487af0(int* arr, int i)
 {
     return arr + i;
 }
 
-// Looks a name up in the class-name list at Mission+0xdac (one entry
-// per team, each entry holding two names at +0 and +4) and returns the caller's
-// parallel int array (param_2+4) at the same index, skipping entries whose int
-// is 0. When the caller passes a nonzero value the search for the entry
-// carrying that value starts at index 1 and the result is the match index
-// plus one, so index 0 of the array is never returned: the original's
-// `i++` sits inside the subscript, so the first test is array[0] with i
-// already 1, and a match on array[0] leaves i = 1.
 // FUNCTION: 0x487af0
 int __stdcall FindMissionUnit(char* name, Struct_00487af0* param_2, int value)
 {

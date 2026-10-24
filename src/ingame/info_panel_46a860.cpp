@@ -1,8 +1,4 @@
-// Decompiled by deepseek-v4.1, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, edited by claude-sonnet-5-5, finished by Space Bunny Free, finished by DeepSeek V4.1 Flash, finished by Claude Opus 5.5. Names are provisional.
 // FLAGS: /Gi
-// Kept its own file: it matches only under /Gi, which the other functions do
-// not use.
-// Draws the selected unit / feature info panel (and the PFSTATE debug overlay).
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 #include <stdio.h>
@@ -42,74 +38,66 @@ struct Unit_0046a860;
 #include "../units/unit_def.h"
 
 #pragma pack(push, 1)
-// A weapon type (Thaldren: WeaponDef); only the reload time is read here.
 struct WeaponDef_0046a860 {
     char unknown_0[0xe4];
-    unsigned short reloadTime;        // +0xe4
+    unsigned short reloadTime;
 };
 
-// A unit, 0x118 bytes, the elements of the array at g_game+0x14357. The two
-// signednesses of +0x108 both appear in this file, so the field is a union.
 struct Unit_0046a860 {
     char unknown_0[0x92];
     Ref<UnitDef> def;
     Ref<Player> player;
     char unknown_9a[0xa6 - 0x9a];
-    unsigned short unitDefIndex;      // +0xa6
-    unsigned short id;                // +0xa8
+    unsigned short unitDefIndex;
+    unsigned short id;
     char unknown_aa[0xb8 - 0xaa];
-    unsigned short killCount;         // +0xb8
+    unsigned short killCount;
     char unknown_ba[0xcc - 0xba];
-    float energyMakePrev;             // +0xcc
-    float energyUsePrev;              // +0xd0
+    float energyMakePrev;
+    float energyUsePrev;
     char unknown_d4[0xe4 - 0xd4];
-    float metalMakePrev;              // +0xe4
-    float metalUsePrev;               // +0xe8
+    float metalMakePrev;
+    float metalUsePrev;
     char unknown_ec[0xff - 0xec];
-    unsigned char playerIndex;        // +0xff
+    unsigned char playerIndex;
     char unknown_100[0x108 - 0x100];
     union {
-        short health;                 // +0x108
-        unsigned short healthRaw;     // +0x108, the unsigned reads
+        short health;
+        unsigned short healthRaw;
     };
     char unknown_10a[0x110 - 0x10a];
-    unsigned int flags;               // +0x110
+    unsigned int flags;
     char unknown_114[0x118 - 0x114];
 };
 
-// A feature's 0x100-byte record, the elements of the table at g_game+0x1426f
-// (Thaldren: FeatureDef).
 struct Feature_0046a860 {
-    char name[0x80];                  // +0x000
-    char description[0x14];           // +0x080
+    char name[0x80];
+    char description[0x14];
     char unknown_94[0xec - 0x94];
-    float energy;                     // +0x0ec
-    float metal;                      // +0x0f0
+    float energy;
+    float metal;
     char unknown_f4[0xff - 0xf4];
-    unsigned char flags;              // +0x0ff
+    unsigned char flags;
 };
 
-// One map cell, 13 bytes, the elements of the table at g_game+0x14287.
 struct Cell_0046a860 {
     char unknown_0[4];
-    unsigned char shade;              // +0x04
+    unsigned char shade;
     char unknown_5[0x0d - 0x5];
 };
 
 #include "../graphics/gaf_frame.h"
 
-// The display context at g_game+0xc; only two fields are read here.
 struct Display_0046a860 {
     char unknown_0[0x9c];
-    int haveBackBuffer;               // +0x09c
+    int haveBackBuffer;
     char unknown_a0[0xf0 - 0xa0];
-    unsigned char flags;              // +0x0f0, low byte of the state flags word
+    unsigned char flags;
 };
 
-// The object g_game+0x531 points at (0x495860's shape).
 struct Struct_0046a860 {
     int unknown_0;
-    int value;                        // +0x4
+    int value;
 };
 #pragma pack(pop)
 
@@ -138,46 +126,43 @@ static float Positive_0046a860(float value) {
 
 struct Flags46b_3923b { unsigned short b0:1; unsigned short b1:1; };
 
-// The game state this file reads, with the member names the other Game views
-// use. The bit word shares a union with this view's bitfield type.
 #pragma pack(push, 1)
-// A side's panel layout at g_game+0x37f3d, stride 0x232 (Thaldren: SideDef).
 struct SideDef_0046a860 {
-    char aName[0x1e];                   // +0x000
-    char aNamePrefix[4];                // +0x01e
-    char aCommander[0x20];              // +0x022
-    Rect rcLogo;               // +0x042
-    Rect rcEnergyBar;          // +0x052
-    Rect rcEnergyNum;          // +0x062
-    Rect rcMetalBar;           // +0x072
-    Rect rcMetalNum;           // +0x082
-    Rect rcTotalUnits;         // +0x092
-    Rect rcTotalTime;          // +0x0a2
-    Rect rcEnergyMax;          // +0x0b2
-    Rect rcMetalMax;           // +0x0c2
-    Rect rcEnergy0;            // +0x0d2
-    Rect rcMetal0;             // +0x0e2
-    Rect rcEnergyProduced;     // +0x0f2
-    Rect rcEnergyConsumed;     // +0x102
-    Rect rcMetalProduced;      // +0x112
-    Rect rcMetalConsumed;      // +0x122
-    Rect rcLogo2;              // +0x132
-    Rect rcUnitName;           // +0x142
-    Rect rcDamageBar;          // +0x152
-    Rect rcUnitEnergyMake;     // +0x162
-    Rect rcUnitEnergyUse;      // +0x172
-    Rect rcUnitMetalMake;      // +0x182
-    Rect rcUnitMetalUse;       // +0x192
-    Rect rcMissionText;        // +0x1a2
-    Rect rcUnitName2;          // +0x1b2
-    Rect rcDamageBar2;         // +0x1c2
-    Rect rcName;               // +0x1d2
-    Rect rcDescription;        // +0x1e2
-    Rect aReloadRects[3];      // +0x1f2
-    int nEnergyColor;                   // +0x222
-    int nMetalColor;                    // +0x226
-    int nSideIndex;                     // +0x22a
-    char* pFontData;                    // +0x22e
+    char aName[0x1e];
+    char aNamePrefix[4];
+    char aCommander[0x20];
+    Rect rcLogo;
+    Rect rcEnergyBar;
+    Rect rcEnergyNum;
+    Rect rcMetalBar;
+    Rect rcMetalNum;
+    Rect rcTotalUnits;
+    Rect rcTotalTime;
+    Rect rcEnergyMax;
+    Rect rcMetalMax;
+    Rect rcEnergy0;
+    Rect rcMetal0;
+    Rect rcEnergyProduced;
+    Rect rcEnergyConsumed;
+    Rect rcMetalProduced;
+    Rect rcMetalConsumed;
+    Rect rcLogo2;
+    Rect rcUnitName;
+    Rect rcDamageBar;
+    Rect rcUnitEnergyMake;
+    Rect rcUnitEnergyUse;
+    Rect rcUnitMetalMake;
+    Rect rcUnitMetalUse;
+    Rect rcMissionText;
+    Rect rcUnitName2;
+    Rect rcDamageBar2;
+    Rect rcName;
+    Rect rcDescription;
+    Rect aReloadRects[3];
+    int nEnergyColor;
+    int nMetalColor;
+    int nSideIndex;
+    char* pFontData;
 };
 
 #include "../game/game.h"
@@ -207,7 +192,6 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
 
         SetFont(g_game->fontComix);
         SetTextColors(0x53, GetTextKeyColor());
-        // No pfable or field_c locals: the PFSTATE sprintf re-reads g_game->displayContext per argument.
         int pfstate = g_game->field_37e23 - GetFontHeight() - 1;
         sprintf(text, "PFSTATE %d, PFABLE %d\n", ((Display_0046a860 *)g_game->unknown_c)->flags & 1,
                 ((Display_0046a860 *)g_game->unknown_c)->haveBackBuffer);
@@ -259,7 +243,6 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         snapshot.health = unit->healthRaw;
         snapshot.build = unit->killCount;
         snapshot.orderName = GetOrderName(unit);
-        // Copied through float temporaries; direct assignment gives integer moves.
         float f0 = unit->energyUsePrev;
         float f1 = unit->energyMakePrev;
         float f2 = unit->metalUsePrev;
@@ -270,7 +253,6 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         snapshot.values[3] = f3;
         char* slot = (char*)unit + 0x1f;
         int* out = snapshot.weapons;
-        // Keep both `*out = -1` stores (nested ifs): the extra use sets the register of out.
         for (int i = 0; i < 3; i++, out++, slot += 0x1c) {
             WeaponDef_0046a860* weapon = *(WeaponDef_0046a860**)(slot - 0xf);
             if (weapon->reloadTime > 0x1e) {
@@ -360,7 +342,6 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                 BlitSideLogoToRect(surface, unit->player, &panel->rcLogo2, yOffset);
                 if (unit->playerIndex == g_game->playerIndex ||
                     (g_game->flagsByte_3923b & 2)) {
-                    // Declared in this block, not at function scope: affects load scheduling.
                     char amount[100];
                     char killsText[100];
                     SetTextColors((unsigned char)palette[10], GetTextKeyColor());

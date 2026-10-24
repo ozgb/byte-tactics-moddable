@@ -10,44 +10,44 @@ struct UnitResources;
 
 #pragma pack(push, 1)
 struct Player {
-    int active;                        // +0x00, zero when the slot is unused
-    unsigned int id;                   // +0x04
-    int joinTime;                      // +0x08
-    int lobbyDataSynced;                       // +0x0c, a team or a 1 to 10 id: the views disagree
-    int messages;                      // +0x10
-    int ping;                          // +0x14
-    int syncTick;                      // +0x18
-    int lastHeard;                     // +0x1c
-    unsigned char progress;            // +0x20
-    unsigned char keepaliveFlags;      // +0x21
-    unsigned char rejectReason;        // +0x22
+    int active;
+    unsigned int id;
+    int joinTime;
+    int lobbyDataSynced;
+    int messages;
+    int ping;
+    int syncTick;
+    int lastHeard;
+    unsigned char progress;
+    unsigned char keepaliveFlags;
+    unsigned char rejectReason;
     char unknown_23[4];
     Ref<PlayerInfo> info;
-    char name[0x1e];                   // +0x2b
-    char fullName[0x1e];               // +0x49
+    char name[0x1e];
+    char fullName[0x1e];
     Ref<Unit> unitsBegin;
     Ref<Unit> unitsEnd;
-    unsigned short firstIndex;         // +0x6f
-    unsigned short lastIndex;          // +0x71
-    unsigned char type;                // +0x73
+    unsigned short firstIndex;
+    unsigned short lastIndex;
+    unsigned char type;
     Ref<SquadManager> ai;
     Ref<Group> groups;
     Ref<unsigned char> explored;
-    int exploredWidth;                 // +0x80
-    int exploredHeight;                // +0x84
-    int exploredSize;                  // +0x88
+    int exploredWidth;
+    int exploredHeight;
+    int exploredSize;
     union {
         float energy;
         int energyBits;
     };
-    float energyIncome;                // +0x90
-    float energyUsage;                 // +0x94
+    float energyIncome;
+    float energyUsage;
     union {
         float metal;
         int metalBits;
     };
-    float metalIncome;                 // +0x9c
-    float metalUsage;                  // +0xa0
+    float metalIncome;
+    float metalUsage;
     union {
         float energyCapacity;
         int energyCapacityBits;
@@ -98,30 +98,30 @@ struct Player {
             int metalWastedHi;
         };
     };
-    float energyStorageBonus;          // +0xdc
-    float metalStorageBonus;           // +0xe0
-    float shareMetal;                  // +0xe4
-    float shareEnergy;                 // +0xe8
+    float energyStorageBonus;
+    float metalStorageBonus;
+    float shareMetal;
+    float shareEnergy;
     Ref<UnitResources> econ;
-    int updateTime;                    // +0xf0
-    int winLoseTime;                   // +0xf4
-    int displayTimer;                  // +0xf8
-    short kills;                       // +0xfc
-    short losses;                      // +0xfe
-    unsigned short unused_100;         // +0x100, set to 0xffff when the slot is reset, never read
-    unsigned short unused_102;         // +0x102, same
-    short commanderKills;              // +0x104
-    short commanderLosses;             // +0x106
-    unsigned char allied[11];          // +0x108
-    unsigned char alliedBy[11];        // +0x113
-    unsigned char shareLos[11];        // +0x11e
-    unsigned char shareVision[11];     // +0x129
-    unsigned char shareMapping[11];    // +0x134
-    unsigned char alliance;            // +0x13f
-    int unitsCreated;                  // +0x140
-    unsigned short unitCount;          // +0x144
-    unsigned char index;               // +0x146
-    unsigned char startPos;            // +0x147
+    int updateTime;
+    int winLoseTime;
+    int displayTimer;
+    short kills;
+    short losses;
+    unsigned short unused_100;
+    unsigned short unused_102;
+    short commanderKills;
+    short commanderLosses;
+    unsigned char allied[11];
+    unsigned char alliedBy[11];
+    unsigned char shareLos[11];
+    unsigned char shareVision[11];
+    unsigned char shareMapping[11];
+    unsigned char alliance;
+    int unitsCreated;
+    unsigned short unitCount;
+    unsigned char index;
+    unsigned char startPos;
     union {
         struct {
             unsigned char rank;

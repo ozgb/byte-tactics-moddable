@@ -1,11 +1,3 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// Applies saved option values to the game: the volume at +0x37f0c, the sound
-// flag word at +0x37f19 (bits 4, 5 and 6 copied from g_optionsBackupSoundFlags, bits 0-2
-// after the sound object is switched by the low three bits), the byte at
-// +0x37f17, then the gamma and both volume levels (same tail as
-// 0x45c630 and 0x45bcc0).
-
-// A view of Sound, not sound/sound.h: with the header the global byte lands in dl instead of bl.
 class Sound {
 public:
     char unknown_0[4];
@@ -24,13 +16,10 @@ public:
 extern Game* g_game;
 extern int g_optionsBackupFxVolume;
 extern unsigned char g_optionsBackupUnitChat;
-// A byte in the original: declared unsigned int to keep it in bl for the bitfield merge.
 extern unsigned int g_optionsBackupSoundFlags;
 
 void __stdcall SetBrightness(float value);
 
-// Stays in its own file: in options.cpp's declaration context the global byte
-// at g_optionsBackupSoundFlags lands in dl instead of bl.
 // FUNCTION: 0x45c820
 void RestoreSoundOptions()
 {

@@ -1,5 +1,3 @@
-// Decompiled by GPT-6. Names are provisional.
-// Stays in its own file: it needs this file's Vec with a constructor, where unit_orders.cpp's Vec3 shares one load of the unit position between both corners.
 #include <string.h>
 #include <math.h>
 #include "../util/vec3.h"

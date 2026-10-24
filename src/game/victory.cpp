@@ -1,5 +1,3 @@
-// Decompiled by Opus, space-bunny-free, deepseek-v4.1-flash, Haiku, Space Bunny Free, Sonnet and GPT-6. Names are provisional.
-
 #include <string.h>
 #include "../state/block.h"
 #include "../state/game_rand.h"
@@ -22,7 +20,6 @@ class HapiBank;
 
 #include "../util/vec3.h"
 
-// Builds the zero velocity through a temporary, as the original constructor did.
 static inline Vec3 MakeVec3(int ax, int ay, int az)
 {
     Vec3 r;
@@ -34,23 +31,21 @@ static inline Vec3 MakeVec3(int ax, int ay, int az)
 
 class TdfRecord;
 
-// The registration parameter: the reader, a TdfFile's current record, lives at
-// +0x4. The placeholder is the type the original's decorated name carries.
 struct Param_0048e010 {
     char unknown_0[4];
-    TdfRecord* reader;                   // +0x4
+    TdfRecord* reader;
 };
 
 #include "../../interfaces/ref.h"
 #pragma pack(push, 1)
 struct UnitType {
     char unknown_0[0x20];
-    char name[0x20];                   // +0x20
+    char name[0x20];
 };
 
 struct Owner_0048ea40 {
     char unknown_0[0x95];
-    unsigned char side;                // +0x95
+    unsigned char side;
 };
 
 struct Link_0048ea40 {
@@ -80,11 +75,9 @@ struct UnitList {
 #include "../network/player.h"
 #include "../network/player_info.h"
 
-// One side's SideDef record (0x232 bytes, Thaldren): the commander name at
-// +0x22 is what the victory conditions match against a unit type name.
 struct PlayerName {
-    char unknown_0[0x22];              // +0x00
-    char commander[0x20];              // +0x22
+    char unknown_0[0x22];
+    char commander[0x20];
     char unknown_42[0x232 - 0x42];
 };
 
@@ -99,10 +92,6 @@ extern Game* g_game;
 void __stdcall PlaySoundByName(char* str, int flag);
 #include "../../interfaces/seams.h"
 
-
-
-
-// Appends a condition to one of the two lists, at the caller's count.
 static inline void AddCondition(Ref<MissionCondition>* list, int* count, MissionCondition* value)
 {
     list[*count] = value;
@@ -121,17 +110,12 @@ void MissionConditions::FreeConditions()
     }
 }
 
-// MissionConditions::RegisterConditions, the victory/defeat condition registration
-// function (counterpart of 0x48ff40). All ~18 registration blocks plus the two
-// "if none registered" defaults are here.
 // FUNCTION: 0x48e010
 void MissionConditions::RegisterConditions(Param_0048e010* p)
 {
     char buf[0x100];
     char stype[0x100];
 
-    // Every reader result goes into a named int before the != 0 test: a bare
-    // call folds to test instead of cmp against the zero register.
     int r1 = p->reader->GetFieldInt("KillEnemyCommander", 0);
     if (r1 != 0) {
         AddCondition(victory, &victoryCount, new (kSim) VictoryKillEnemyCommander);
@@ -230,42 +214,31 @@ void MissionConditions::RegisterConditions(Param_0048e010* p)
     }
 }
 
-// The victory/defeat condition base's IsSatisfied (slot 0 of the condition
-// vtables whose class does not override it).
 // FUNCTION: 0x48ea00
 int MissionCondition::IsSatisfied()
 {
     return satisfied;
 }
 
-// The victory/defeat condition base's slot 1, called with a unit: does
-// nothing unless a condition overrides it.
 // FUNCTION: 0x48ea10
 void MissionCondition::OnUnitDied(Unit*)
 {
 }
 
-// The victory/defeat condition base's slot 2, called with a unit: does
-// nothing unless a condition overrides it.
 // FUNCTION: 0x48ea20
 void MissionCondition::OnUnitCaptured(Unit*)
 {
 }
 
-// The victory/defeat condition base's slot 3, which takes one pointer (taken
-// to be a unit, like slots 1 and 2): no condition overrides it.
 // FUNCTION: 0x48ea30
 void MissionCondition::OnUnitCreated(Unit*)
 {
 }
 
-extern char g_killEnemyCommanderKey[]; // "VictoryCondition_KillEnemyCommander"
-extern char g_satisfiedKey[]; // "Satisfied"
-extern char g_celebratedKey[]; // "Celebrated"
+extern char g_killEnemyCommanderKey[];
+extern char g_satisfiedKey[];
+extern char g_celebratedKey[];
 
-// Slot 1 of the "kill enemy commander" victory condition (vtable 0x4fd960,
-// compare 0x48f6b0 and 0x48ec20): when a unit of player index 1 is named after its
-// owner, marks the condition met and announces it once.
 // FUNCTION: 0x48ea40
 void VictoryKillEnemyCommander::OnUnitDied(Unit* unit)
 {
@@ -280,8 +253,6 @@ void VictoryKillEnemyCommander::OnUnitDied(Unit* unit)
     }
 }
 
-// Same shape as 0x48f160: writes the "kill enemy commander" victory
-// condition's state to a section.
 // FUNCTION: 0x48eac0
 void VictoryKillEnemyCommander::SaveState(HapiBank* obj)
 {
@@ -290,8 +261,6 @@ void VictoryKillEnemyCommander::SaveState(HapiBank* obj)
     obj->SetIntegerItem(g_celebratedKey, celebrated);
 }
 
-// Reads the "kill enemy commander" victory condition's state from a section;
-// the writing counterpart is 0x48eac0, compare 0x48f880.
 // FUNCTION: 0x48eb00
 void VictoryKillEnemyCommander::LoadState(HapiBank* obj)
 {
@@ -300,11 +269,8 @@ void VictoryKillEnemyCommander::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem(g_celebratedKey, 0);
 }
 
-extern char g_destroyAllUnitsKey[]; // "VictoryCondition_DestroyAllUnits"
+extern char g_destroyAllUnitsKey[];
 
-// Slot 0 (IsSatisfied) of the "destroy all units" victory condition (vtable
-// 0x4fd948, state saved by 0x48eb80): satisfied while the game field at
-// +0x1df2 is zero, announcing "Victory Condition" once.
 // FUNCTION: 0x48eb40
 int VictoryDestroyAllUnits::IsSatisfied()
 {
@@ -318,8 +284,6 @@ int VictoryDestroyAllUnits::IsSatisfied()
     return 0;
 }
 
-// Same shape as 0x48eac0: writes the "destroy all units" victory condition's
-// state to a section.
 // FUNCTION: 0x48eb80
 void VictoryDestroyAllUnits::SaveState(HapiBank* obj)
 {
@@ -328,8 +292,6 @@ void VictoryDestroyAllUnits::SaveState(HapiBank* obj)
     obj->SetIntegerItem(g_celebratedKey, celebrated);
 }
 
-// Same shape as 0x48faf0: reads the "destroy all units" victory condition's
-// state from a section.
 // FUNCTION: 0x48ebc0
 void VictoryDestroyAllUnits::LoadState(HapiBank* obj)
 {
@@ -338,14 +300,9 @@ void VictoryDestroyAllUnits::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-extern char g_killAllMobileUnitsKey[]; // "VictoryCondition_KillAllMobileUnits"
-extern char g_numUnitsKey[]; // "NumUnits"
+extern char g_killAllMobileUnitsKey[];
+extern char g_numUnitsKey[];
 
-// Slot 0 of the unit visitor at +0xc of the "kill all mobile units" victory
-// condition (visitor vtable 0x4fd920, driven by 0x48ec20): counts the units
-// whose first field is set and returns whether at most one has been seen.
-// VisitUnit overrides the visitor's slot, so its `this` is the visitor
-// subobject (+0xc) and numUnits sits at +0x4 from it.
 // FUNCTION: 0x48ec00
 int VictoryKillAllMobileUnits::VisitUnit(Unit* unit)
 {
@@ -355,10 +312,6 @@ int VictoryKillAllMobileUnits::VisitUnit(Unit* unit)
     return numUnits <= 1;
 }
 
-// Slot 1 of the "kill all mobile units" victory condition (vtable 0x4fd928,
-// visitor vtable 0x4fd920 holding 0x48ec00; state saved by 0x48ecb0): counts
-// the live units through the visitor and announces the victory condition
-// when at most one is left.
 // FUNCTION: 0x48ec20
 void VictoryKillAllMobileUnits::OnUnitDied(Unit* unit)
 {
@@ -384,7 +337,6 @@ void VictoryKillAllMobileUnits::SaveState(HapiBank* obj)
     obj->SetIntegerItem(g_celebratedKey, celebrated);
 }
 
-// The load counterpart of 0x48ecb0.
 // FUNCTION: 0x48ed00
 void VictoryKillAllMobileUnits::LoadState(HapiBank* obj)
 {
@@ -394,12 +346,8 @@ void VictoryKillAllMobileUnits::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-extern char g_buildUnitTypeKey[]; // "VictoryCondition_BuildUnitType"
+extern char g_buildUnitTypeKey[];
 
-// Slot 0 of the unit visitor at +0xc of the "build unit type" victory
-// condition (visitor vtable 0x4fd900, driven by 0x48edb0). VisitUnit overrides
-// the visitor's slot, so MSVC passes `this` as the visitor subobject (+0xc)
-// and the other fields appear at negative offsets.
 // FUNCTION: 0x48ed50
 int VictoryBuildUnitType::VisitUnit(Unit* unit)
 {
@@ -426,8 +374,6 @@ int VictoryBuildUnitType::IsSatisfied()
     return satisfied;
 }
 
-// Same shape as 0x48eb80: writes the "build unit type" victory condition's
-// state to a section.
 // FUNCTION: 0x48ee30
 void VictoryBuildUnitType::SaveState(HapiBank* obj)
 {
@@ -436,8 +382,6 @@ void VictoryBuildUnitType::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Reads the "build unit type" victory condition's state from a section; the
-// writing counterpart is 0x48ee30, same shape as 0x48eb00.
 // FUNCTION: 0x48ee70
 void VictoryBuildUnitType::LoadState(HapiBank* obj)
 {
@@ -446,7 +390,6 @@ void VictoryBuildUnitType::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem(g_celebratedKey, 0);
 }
 
-// Slot 2 of the condition (state saved by 0x48ef00).
 // FUNCTION: 0x48eeb0
 void VictoryCaptureUnitType::OnUnitCaptured(Unit* unit)
 {
@@ -459,8 +402,6 @@ void VictoryCaptureUnitType::OnUnitCaptured(Unit* unit)
     }
 }
 
-// Writes the "capture unit type" victory condition's state to a section;
-// the reading counterpart is 0x48ef40, compare 0x48f840.
 // FUNCTION: 0x48ef00
 void VictoryCaptureUnitType::SaveState(HapiBank* obj)
 {
@@ -477,9 +418,6 @@ void VictoryCaptureUnitType::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 0 of the unit visitor at +0xc of the "kill all of type" victory
-// condition (visitor vtable 0x4fd8c8, driven by 0x48efb0): counts the units
-// of the condition's type and returns whether at most one has been seen.
 // FUNCTION: 0x48ef80
 int VictoryKillAllOfType::VisitUnit(Unit* unit)
 {
@@ -489,8 +427,6 @@ int VictoryKillAllOfType::VisitUnit(Unit* unit)
     return count <= 1;
 }
 
-// Slot 1 of the "kill all of type" victory condition (vtable 0x4fd8d0,
-// visitor vtable 0x4fd8c8 holding 0x48ef80; state saved by 0x48f070).
 // FUNCTION: 0x48efb0
 void VictoryKillAllOfType::OnUnitDied(Unit* unit)
 {
@@ -508,8 +444,6 @@ void VictoryKillAllOfType::OnUnitDied(Unit* unit)
     }
 }
 
-// Writes the "kill all of type" victory condition's state to a section;
-// the reading counterpart is 0x48f0b0, compare 0x48ef00.
 // FUNCTION: 0x48f070
 void VictoryKillAllOfType::SaveState(HapiBank* obj)
 {
@@ -518,7 +452,6 @@ void VictoryKillAllOfType::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Same shape as 0x48ef40.
 // FUNCTION: 0x48f0b0
 void VictoryKillAllOfType::LoadState(HapiBank* obj)
 {
@@ -527,12 +460,9 @@ void VictoryKillAllOfType::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-extern char g_killUnitTypeKey[]; // "VictoryCondition_KillUnitType"
-extern char g_numLeftToKillKey[]; // "NumLeftToKill"
+extern char g_killUnitTypeKey[];
+extern char g_numLeftToKillKey[];
 
-// Slot 1 of the "kill unit type" victory condition (vtable 0x4fd8b0, state
-// saved by 0x48f160): called with a unit; counts the named unit type down and
-// announces the victory condition when the count runs out.
 // FUNCTION: 0x48f0f0
 void VictoryKillUnitType::OnUnitDied(Unit* unit)
 {
@@ -556,7 +486,6 @@ void VictoryKillUnitType::SaveState(HapiBank* obj)
     obj->SetIntegerItem(g_celebratedKey, celebrated);
 }
 
-// Load counterpart of 0x48f160 (the "kill unit type" victory condition).
 // FUNCTION: 0x48f1b0
 void VictoryKillUnitType::LoadState(HapiBank* obj)
 {
@@ -566,10 +495,6 @@ void VictoryKillUnitType::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem(g_celebratedKey, 0);
 }
 
-// The "move unit to radius" victory condition (vtable 0x4fd890, visitor
-// vtable 0x4fd888): slot 0 fills in the target height on first use
-// (0x12345678 marks it unset), visits the units within the radius and
-// returns whether the condition is met.
 // FUNCTION: 0x48f200
 int VictoryMoveUnitToRadius::IsSatisfied()
 {
@@ -580,8 +505,6 @@ int VictoryMoveUnitToRadius::IsSatisfied()
     return satisfied;
 }
 
-// Slot 0 of the unit visitor at +0xc of the "move unit to radius" victory
-// condition (visitor vtable 0x4fd888, driven by 0x48f200).
 // FUNCTION: 0x48f250
 void VictoryMoveUnitToRadius::VisitUnit(Unit* unit)
 {
@@ -600,8 +523,6 @@ void VictoryMoveUnitToRadius::VisitUnit(Unit* unit)
     }
 }
 
-// Writes the "move unit to radius" victory condition's state to a section
-// (same shape as 0x48f070).
 // FUNCTION: 0x48f2f0
 void VictoryMoveUnitToRadius::SaveState(HapiBank* obj)
 {
@@ -610,7 +531,6 @@ void VictoryMoveUnitToRadius::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Same shape as 0x48f0b0.
 // FUNCTION: 0x48f330
 void VictoryMoveUnitToRadius::LoadState(HapiBank* obj)
 {
@@ -619,8 +539,6 @@ void VictoryMoveUnitToRadius::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 0 of the unit visitor at +0xc of the "unit type passes X" victory
-// condition (visitor vtable 0x4fd868, driven by 0x48f3e0).
 // FUNCTION: 0x48f370
 int VictoryUnitTypePassesX::VisitUnit(Unit* unit)
 {
@@ -636,9 +554,6 @@ int VictoryUnitTypePassesX::VisitUnit(Unit* unit)
     return satisfied == 0;
 }
 
-// Slot 0 of the "unit type passes X" victory condition (vtable 0x4fd870,
-// visitor vtable 0x4fd868 holding 0x48f370; state saved by 0x48f440): until
-// the condition is met, visits every live unit and returns whether it is met.
 // FUNCTION: 0x48f3e0
 int VictoryUnitTypePassesX::IsSatisfied()
 {
@@ -648,8 +563,6 @@ int VictoryUnitTypePassesX::IsSatisfied()
     return satisfied;
 }
 
-// Writes the "unit type passes X" victory condition's state to a section;
-// the reading counterpart is 0x48f480 (compare 0x48ee30).
 // FUNCTION: 0x48f440
 void VictoryUnitTypePassesX::SaveState(HapiBank* obj)
 {
@@ -658,8 +571,6 @@ void VictoryUnitTypePassesX::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Same shape as 0x48f330: reads the "unit type passes X" victory condition's
-// state from a section.
 // FUNCTION: 0x48f480
 void VictoryUnitTypePassesX::LoadState(HapiBank* obj)
 {
@@ -668,8 +579,6 @@ void VictoryUnitTypePassesX::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 0 of the unit visitor at +0xc of the "unit type passes Z" victory
-// condition (visitor vtable 0x4fd848, driven by 0x48f530).
 // FUNCTION: 0x48f4c0
 int VictoryUnitTypePassesZ::VisitUnit(Unit* unit)
 {
@@ -685,9 +594,6 @@ int VictoryUnitTypePassesZ::VisitUnit(Unit* unit)
     return satisfied == 0;
 }
 
-// Slot 0 of the "unit type passes Z" victory condition (vtable 0x4fd850,
-// visitor vtable 0x4fd848 holding 0x48f4c0; state saved by 0x48f590): until
-// the condition is met, visits every live unit and returns whether it is met.
 // FUNCTION: 0x48f530
 int VictoryUnitTypePassesZ::IsSatisfied()
 {
@@ -697,8 +603,6 @@ int VictoryUnitTypePassesZ::IsSatisfied()
     return satisfied;
 }
 
-// Writes the "unit type passes Z" victory condition's state to a section;
-// the reading counterpart is 0x48f5d0 (compare 0x48f440).
 // FUNCTION: 0x48f590
 void VictoryUnitTypePassesZ::SaveState(HapiBank* obj)
 {
@@ -707,8 +611,6 @@ void VictoryUnitTypePassesZ::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Same shape as 0x48f480: reads the "unit type passes Z" victory condition's
-// state from a section.
 // FUNCTION: 0x48f5d0
 void VictoryUnitTypePassesZ::LoadState(HapiBank* obj)
 {
@@ -717,8 +619,6 @@ void VictoryUnitTypePassesZ::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 0 (IsSatisfied) of the "victory timer runs out" victory condition
-// (vtable 0x4fd830): met once the game's tick count reaches the limit.
 // FUNCTION: 0x48f610
 int VictoryTimerRunsOut::IsSatisfied()
 {
@@ -726,8 +626,6 @@ int VictoryTimerRunsOut::IsSatisfied()
     return game_val >= endTick;
 }
 
-// Same shape as 0x48fd70: writes the "victory timer runs out" victory
-// condition's state to a section (its reader is 0x48f670).
 // FUNCTION: 0x48f630
 void VictoryTimerRunsOut::SaveState(HapiBank* obj)
 {
@@ -736,8 +634,6 @@ void VictoryTimerRunsOut::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Same shape as 0x48f480: reads the "victory timer runs out" victory
-// condition's state from a section.
 // FUNCTION: 0x48f670
 void VictoryTimerRunsOut::LoadState(HapiBank* obj)
 {
@@ -746,8 +642,6 @@ void VictoryTimerRunsOut::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 1 of the "commander killed" defeat condition (vtable 0x4fd818, state
-// saved by 0x48f710).
 // FUNCTION: 0x48f6b0
 void DefeatCommanderKilled::OnUnitDied(Unit* unit)
 {
@@ -758,8 +652,6 @@ void DefeatCommanderKilled::OnUnitDied(Unit* unit)
     }
 }
 
-// Writes the "commander killed" defeat condition's state to a section; the
-// reading counterpart is 0x48f750, compare 0x48ef00.
 // FUNCTION: 0x48f710
 void DefeatCommanderKilled::SaveState(HapiBank* obj)
 {
@@ -768,8 +660,6 @@ void DefeatCommanderKilled::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Same shape as 0x48ef40: reads the "commander killed" defeat condition's
-// state from a section.
 // FUNCTION: 0x48f750
 void DefeatCommanderKilled::LoadState(HapiBank* obj)
 {
@@ -778,12 +668,8 @@ void DefeatCommanderKilled::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-extern char g_allUnitsKilledKey[]; // "DefeatCondition_AllUnitsKilled"
+extern char g_allUnitsKilledKey[];
 
-// Slot 0 of the unit visitor at +0xc of the "all units killed" defeat
-// condition (vtable 0x4fd7f8, stored by the constructors inlined at 0x48e6e5
-// and friends). Clears the condition when it meets a live, finished unit.
-// VisitUnit's `this` is the visitor subobject (+0xc), so satisfied sits at -8.
 // FUNCTION: 0x48f790
 int DefeatAllUnitsKilled::VisitUnit(Unit* unit)
 {
@@ -794,9 +680,6 @@ int DefeatAllUnitsKilled::VisitUnit(Unit* unit)
     return satisfied;
 }
 
-// Slot 0 of the defeat condition with vtable 0x4fd800 (state saved by
-// 0x48f840): assumes the condition is met and offers every live unit to the
-// visitor at +0xc, which can clear it.
 // FUNCTION: 0x48f7e0
 int DefeatAllUnitsKilled::IsSatisfied()
 {
@@ -813,8 +696,6 @@ void DefeatAllUnitsKilled::SaveState(HapiBank* obj)
     obj->SetIntegerItem(g_celebratedKey, celebrated);
 }
 
-// Reads the "all units killed" defeat condition's state from a section;
-// the writing counterpart is 0x48f840, compare 0x48ef40.
 // FUNCTION: 0x48f880
 void DefeatAllUnitsKilled::LoadState(HapiBank* obj)
 {
@@ -823,9 +704,6 @@ void DefeatAllUnitsKilled::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 1 of the "unit type killed" defeat condition (vtable 0x4fd7c0, state
-// saved by 0x48f900): when a unit of the named type dies, counts it down and
-// marks the condition satisfied once none are left.
 // FUNCTION: 0x48f8c0
 void DefeatUnitTypeKilled::OnUnitDied(Unit* unit)
 {
@@ -845,8 +723,6 @@ void DefeatUnitTypeKilled::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Reads the "unit type killed" defeat condition's state from a section;
-// the writing counterpart is 0x48f900, compare 0x48f880.
 // FUNCTION: 0x48f950
 void DefeatUnitTypeKilled::LoadState(HapiBank* obj)
 {
@@ -856,10 +732,6 @@ void DefeatUnitTypeKilled::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 0 of the unit visitor at +0xc of the "all units killed of type"
-// defeat condition (visitor vtable 0x4fd7d8, driven by 0x48f9d0): counts
-// the units of the condition's type and returns whether at most one has
-// been seen.
 // FUNCTION: 0x48f9a0
 int DefeatAllUnitsKilledOfType::VisitUnit(Unit* unit)
 {
@@ -869,10 +741,6 @@ int DefeatAllUnitsKilledOfType::VisitUnit(Unit* unit)
     return count <= 1;
 }
 
-// Slot 1 of the "all units killed of type" defeat condition (vtable
-// 0x4fd7e0, visitor vtable 0x4fd7d8 holding 0x48f9a0; state saved by
-// 0x48fab0). Like 0x48efb0, but it counts the live units of the two lists in
-// g_game (the ones at +0x1bca and +0x1d15) and only then decides.
 // FUNCTION: 0x48f9d0
 void DefeatAllUnitsKilledOfType::OnUnitDied(Unit* unit)
 {
@@ -887,8 +755,6 @@ void DefeatAllUnitsKilledOfType::OnUnitDied(Unit* unit)
     }
 }
 
-// Same shape as 0x48eb80: writes the "all units killed of type" defeat
-// condition's state to a section.
 // FUNCTION: 0x48fab0
 void DefeatAllUnitsKilledOfType::SaveState(HapiBank* obj)
 {
@@ -897,7 +763,6 @@ void DefeatAllUnitsKilledOfType::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Same shape as 0x48ef40.
 // FUNCTION: 0x48faf0
 void DefeatAllUnitsKilledOfType::LoadState(HapiBank* obj)
 {
@@ -906,10 +771,6 @@ void DefeatAllUnitsKilledOfType::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 0 of the unit visitor at +0xc of the "any unit passes X" defeat
-// condition (visitor vtable 0x4fd788): marks the condition met when a unit
-// is within 2 of the target X, and returns whether to keep visiting.
-// VisitUnit's `this` is the visitor subobject (+0xc) and satisfied sits at -8.
 // FUNCTION: 0x48fb30
 int DefeatAnyUnitPassesX::VisitUnit(Unit* unit)
 {
@@ -921,9 +782,6 @@ int DefeatAnyUnitPassesX::VisitUnit(Unit* unit)
     return satisfied == 0;
 }
 
-// Slot 0 of the "any unit passes X" defeat condition (vtable 0x4fd790,
-// visitor vtable 0x4fd788 holding 0x48fb30; state saved by 0x48fbc0): until
-// the condition is met, visits every live unit and returns whether it is.
 // FUNCTION: 0x48fb60
 int DefeatAnyUnitPassesX::IsSatisfied()
 {
@@ -933,8 +791,6 @@ int DefeatAnyUnitPassesX::IsSatisfied()
     return satisfied;
 }
 
-// Same shape as 0x48ee30: writes the "any unit passes X" defeat condition's
-// state to a section.
 // FUNCTION: 0x48fbc0
 void DefeatAnyUnitPassesX::SaveState(HapiBank* obj)
 {
@@ -943,8 +799,6 @@ void DefeatAnyUnitPassesX::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Reads the "any unit passes X" defeat condition's state from a section
-// (same shape as 0x48f0b0).
 // FUNCTION: 0x48fc00
 void DefeatAnyUnitPassesX::LoadState(HapiBank* obj)
 {
@@ -953,10 +807,6 @@ void DefeatAnyUnitPassesX::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 0 of the unit visitor at +0xc of the "any unit passes Z" defeat
-// condition (visitor vtable 0x4fd768): marks the condition met when a unit
-// is within 2 of the target Z, and returns whether to keep visiting.
-// VisitUnit's `this` is the visitor subobject (+0xc) and satisfied sits at -8.
 // FUNCTION: 0x48fc40
 int DefeatAnyUnitPassesZ::VisitUnit(Unit* unit)
 {
@@ -968,9 +818,6 @@ int DefeatAnyUnitPassesZ::VisitUnit(Unit* unit)
     return satisfied == 0;
 }
 
-// Slot 0 of the "any unit passes Z" defeat condition (vtable 0x4fd770,
-// visitor vtable 0x4fd768 holding 0x48fc40; state saved by 0x48fcd0): until
-// the condition is met, visits every live unit and returns whether it is.
 // FUNCTION: 0x48fc70
 int DefeatAnyUnitPassesZ::IsSatisfied()
 {
@@ -980,8 +827,6 @@ int DefeatAnyUnitPassesZ::IsSatisfied()
     return satisfied;
 }
 
-// Same shape as 0x48fbc0: writes the "any unit passes Z" defeat condition's
-// state to a section.
 // FUNCTION: 0x48fcd0
 void DefeatAnyUnitPassesZ::SaveState(HapiBank* obj)
 {
@@ -990,8 +835,6 @@ void DefeatAnyUnitPassesZ::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Reads the "any unit passes Z" defeat condition's state from a section
-// (same shape as 0x48f480).
 // FUNCTION: 0x48fd10
 void DefeatAnyUnitPassesZ::LoadState(HapiBank* obj)
 {
@@ -1000,8 +843,6 @@ void DefeatAnyUnitPassesZ::LoadState(HapiBank* obj)
     celebrated = obj->GetIntegerItem("Celebrated", 0);
 }
 
-// Slot 0 (IsSatisfied) of the "death timer runs out" defeat condition
-// (vtable 0x4fd7a8): met once the game's tick count reaches the limit.
 // FUNCTION: 0x48fd50
 int DefeatDeathTimerRunsOut::IsSatisfied()
 {
@@ -1017,8 +858,6 @@ void DefeatDeathTimerRunsOut::SaveState(HapiBank* obj)
     obj->SetIntegerItem("Celebrated", celebrated);
 }
 
-// Same shape as 0x48f670: reads the "death timer runs out" defeat
-// condition's state from a section (its writer is 0x48fd70).
 // FUNCTION: 0x48fdb0
 void DefeatDeathTimerRunsOut::LoadState(HapiBank* obj)
 {
@@ -1055,9 +894,6 @@ void MissionConditions::LoadConditions(HapiBank* file)
     }
 }
 
-// Victory counterpart of 0x48ff40: with no victory condition set, adds the
-// default "destroy all units" condition (vtable 0x4fd948), then reports
-// whether every victory condition is satisfied.
 // FUNCTION: 0x48fed0
 int MissionConditions::AllVictoryConditionsMet()
 {
@@ -1086,8 +922,6 @@ int MissionConditions::AnyDefeatConditionMet()
     return 0;
 }
 
-// Returns 1 when every other player is either allied with the local player
-// or has nothing left (the short at player +0x144 is zero).
 // FUNCTION: 0x48ffd0
 int AreEnemiesEliminated()
 {
@@ -1099,8 +933,6 @@ int AreEnemiesEliminated()
     return 1;
 }
 
-// Returns 1 when the local player has nothing left (the short at player
-// +0x144 is zero; compare 0x48ffd0).
 // FUNCTION: 0x490050
 int IsLocalPlayerEliminated()
 {
@@ -1110,8 +942,6 @@ int IsLocalPlayerEliminated()
 // FUNCTION: 0x490080
 int CheckAlliedVictory()
 {
-    // declared before the loop counters on purpose: that is what puts `other`
-    // in the index slot of the inner load
     Player* mine;
     Player* other;
     unsigned char i;
@@ -1130,8 +960,6 @@ int CheckAlliedVictory()
         if (other->active == 0) {
             continue;
         }
-        // state is a local because the original tests it twice, the second
-        // time still in al, without reloading it.
         state = other->type;
         if (state == 1 || state == 2 || state == 3) {
             if (other->index == 0xa) {
@@ -1176,7 +1004,6 @@ int CheckAlliedVictory()
     return 1;
 }
 
-// Whether the word at +0x144 of the local player's record is zero.
 // FUNCTION: 0x490200
 int IsLocalPlayerOutOfUnits()
 {
@@ -1187,8 +1014,6 @@ int IsLocalPlayerOutOfUnits()
 int MissionConditions::CheckDefeat(RandStream stream)
 {
     if (active) {
-        // The two mode cases share one body, but writing them out separately
-        // is what makes MSVC lower the switch to the dec/je chain.
         switch (g_seams.map->GetGameType(g_game->net)) {
         case 1:
             return AnyDefeatConditionMet();
@@ -1229,7 +1054,6 @@ void MissionConditions::NotifyUnitCaptured(Unit* unit)
     }
 }
 
-// The conditions object is g_game+0x391ed.
 // FUNCTION: 0x490580
 void MissionConditions::NotifyUnitCreated(Unit* unit)
 {
@@ -1244,13 +1068,11 @@ void MissionConditions::NotifyUnitCreated(Unit* unit)
 
 #include "../units/unit_def.h"
 
-// The flags at +0x241 read as the original's bitfield; the header keeps the
-// plain word.
 #pragma pack(push, 1)
 struct UnitDefFlags_0048dfb0 {
     char unknown_0[0x241];
     unsigned int unknown_241_0 : 22;
-    unsigned int seaUnit : 1;          // bit 22
+    unsigned int seaUnit : 1;
     unsigned int unknown_241_1 : 9;
 };
 #pragma pack(pop)
@@ -1264,7 +1086,7 @@ struct Struct_004907e0;
 #include "../orders/unit_motion.h"
 #include "../util/angles.h"
 
-class AiSearchGoal;                    // slot 6's result
+class AiSearchGoal;
 
 #include "../orders/air_maneuver_order.h"
 
@@ -1273,10 +1095,6 @@ class AiSearchGoal;                    // slot 6's result
 
 unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 
-// The constructor (0x4905e0) and, emitted with the vtable it stores, the
-// compiler-generated scalar deleting destructor: the destructor is trivial,
-// so only the inlined base destructor's store of 0x4fd428 is left. 0x4907e0
-// inlines the same constructor.
 // FUNCTION: 0x4905e0
 // FUNCTION: 0x490630 ??_GPackedGoal@@UAEPAXI@Z
 PackedGoal::PackedGoal(Struct_004907e0* p)
@@ -1287,10 +1105,6 @@ PackedGoal::PackedGoal(Struct_004907e0* p)
     heading = p->angles.heading;
 }
 
-// PackedGoal's override of slot 4 (vtable 0x4fd980, inherited by
-// LiteGoal and PackedPosGoal; the class family is listed in
-// order_targets_44ef20.cpp): copies out the position, the velocity and heading
-// (the heading 0x490690 turns towards the owner).
 // FUNCTION: 0x490650
 void PackedGoal::ExportGoalPose(Vec3* outPos, Vec3* outVel,
                                   short* outHeading)
@@ -1300,17 +1114,6 @@ void PackedGoal::ExportGoalPose(Vec3* outPos, Vec3* outVel,
     *outHeading = heading;
 }
 
-// PackedGoal's override of slot 2 (vtable 0x4fd980, inherited by
-// PackedPosGoal and called directly by LiteGoal's own override,
-// 0x490880; the class family is listed in order_targets_44ef20.cpp): one update
-// step of a moving object. The object at +0x4 moves this object's position (its
-// slot 8) and the difference goes into vel. When the object has drifted further
-// than 0xa00000 from its owner, its height is snapped to the ground under it,
-// the sea level for a unit whose def has the flag at +0x241 bit 22 set, the
-// owner's spatialBucket byte 1 otherwise, plus the def's altitude, and past
-// 0x1400000 (or 0x100000 with slot 9 refusing) it turns to face the owner. Then
-// the object at +0x4 gets the last word: slot 4 saying it is done, plus slot
-// 11, means slot 1 with 0.
 // FUNCTION: 0x490690
 void PackedGoal::TickTowardGoal()
 {
@@ -1324,8 +1127,6 @@ void PackedGoal::TickTowardGoal()
         if (((UnitDefFlags_0048dfb0*)owner->def.get())->seaUnit)
             pos.y = (g_game->seaLevel + owner->def->altitude) << 16;
         else
-            // altitude via owner->def-> and first in the add: keeps the two
-            // branches from being tail-merged.
             pos.y = (owner->def->altitude + ((unsigned char*)owner->spatialBucket.get())[1]) << 16;
     }
     if (dist > 0x1400000 || (!((OrderFx*)target)->GetDesiredHeading((unsigned short*)&heading) && dist > 0x100000))
@@ -1337,16 +1138,6 @@ void PackedGoal::TickTowardGoal()
     }
 }
 
-// LiteGoal (vtable 0x4fd9b0), derived from PackedGoal and
-// PathGoal (see order_targets_44ef20.cpp for the family): the moving
-// object that also sends its state, with a dirty bit and the owner's mode.
-// Vtable 0x4fd9b0, constructor 0x4907e0, ??_G 0x490840.
-// The constructor: the base constructor (0x44ef20) is out of line, the middle
-// class's (out-of-line copy at 0x4905e0) is inlined. The middle class assigns
-// its members in the body. Its vtable reference makes the
-// compiler emit the scalar deleting destructor here too; both derived
-// destructors are trivial, so only the inlined base destructor's store of
-// 0x4fd428 is left in it.
 // FUNCTION: 0x4907e0
 // FUNCTION: 0x490840 ??_GLiteGoal@@UAEPAXI@Z
 LiteGoal::LiteGoal(Unit* p)
@@ -1356,7 +1147,6 @@ LiteGoal::LiteGoal(Unit* p)
     mode = 0;
 }
 
-// Slot 1: the base's (0x44ef90) and then the dirty bit.
 // FUNCTION: 0x490860
 void LiteGoal::SetPathOrder(void* param)
 {
@@ -1364,8 +1154,6 @@ void LiteGoal::SetPathOrder(void* param)
     dirty = 1;
 }
 
-// Slot 2: sets the dirty bit when the mode differs from the owner's, then runs
-// the middle class's own slot 2 (0x490690).
 // FUNCTION: 0x490880
 void LiteGoal::TickTowardGoal()
 {
@@ -1374,16 +1162,12 @@ void LiteGoal::TickTowardGoal()
     PackedGoal::TickTowardGoal();
 }
 
-// Slot 7: the dirty bit.
 // FUNCTION: 0x4908b0
 int LiteGoal::HasNetUnitState()
 {
     return netDirtyFlags & 1;
 }
 
-// Slot 8: writes the object at +0x4 (a 2-bit kind, then its own data) and the
-// owner's mode to the stream, then takes that mode as its own and clears the
-// dirty bit. The matching reader looks like 0x490a10 (PackedPosGoal's slot 9).
 // FUNCTION: 0x4908c0
 void LiteGoal::SerializeNetUnitState(BitWriter* stream)
 {
@@ -1400,23 +1184,12 @@ void LiteGoal::SerializeNetUnitState(BitWriter* stream)
     state = ((Target_00490880*)owner->motion.get())->mode << 1;
 }
 
-// PackedPosGoal (vtable 0x4fd9e0), derived from PackedGoal and
-// PathGoal (see order_targets_44ef20.cpp for the family): the moving
-// object that reads its state from the stream.
-// Vtable 0x4fd9e0, constructor 0x490940, destructor 0x4909e0, ??_G 0x4909a0.
-// Slots 2 and 4 are inherited from PackedGoal.
-// The constructor: the base constructor (0x44ef20) is out of line, the middle
-// class's constructor is inlined, as in LiteGoal's.
 // FUNCTION: 0x490940
 PackedPosGoal::PackedPosGoal(Unit* p)
     : PackedGoal((Struct_004907e0*)p)
 {
 }
 
-// The destructor frees the object at +0x4 through its virtual destructor. Its
-// scalar deleting destructor inlines the same body; in both, the middle
-// class's vtable store is dead, and the empty inline base destructor leaves
-// only the base vtable store of 0x4fd428.
 // FUNCTION: 0x4909a0 ??_GPackedPosGoal@@UAEPAXI@Z
 // FUNCTION: 0x4909e0
 PackedPosGoal::~PackedPosGoal()
@@ -1425,9 +1198,6 @@ PackedPosGoal::~PackedPosGoal()
     target = 0;
 }
 
-// Slot 9: rebuilds the object at +0x4 from the bit stream (a 2-bit kind: 1 and
-// 2 pick its class, anything else leaves none), then passes a 2-bit state read
-// after it to the owner.
 // FUNCTION: 0x490a10
 void PackedPosGoal::DeserializeNetUnitState(BitReader* reader)
 {

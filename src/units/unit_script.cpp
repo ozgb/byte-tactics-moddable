@@ -1,11 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, Space Bunny Free, Opus, Haiku and Sonnet. Names are provisional.
-// UnitScript: the COB script of a unit, the one class derived from CobScript
-// (vtable 0x4fd698; its scalar deleting destructor is in units_485e30.cpp).
-// Its slots move and query the pieces of the unit's model and read and set
-// the unit's properties for the script.
-
-// Unused, but <windows.h> and <string> must stay: they change register use
-// in GetUnitValue and ExplodePiece.
 #include "win_types.h"
 #include <string>
 #include <math.h>
@@ -17,48 +9,45 @@
 #pragma pack(push, 1)
 #include "unit.h"
 
-// The animation state of one piece of a unit's model.
-struct PieceState {                     // 0x36 bytes
-    int object;                         // +0x00
-    int translation[3];                 // +0x04
-    unsigned short rotation[3];         // +0x10
-    Vec3 pos;                           // +0x16
+struct PieceState {
+    int object;
+    int translation[3];
+    unsigned short rotation[3];
+    Vec3 pos;
     Ref<int> sfxOffset;
-    short value;                        // +0x26, cleared when the piece changes
-    unsigned short visible : 1;         // +0x28 bit 0
-    unsigned short cached : 1;          // +0x28 bit 1
-    unsigned short shaded : 1;          // +0x28 bit 2
+    short value;
+    unsigned short visible : 1;
+    unsigned short cached : 1;
+    unsigned short shaded : 1;
     char unknown_2a[0x36 - 0x2a];
 };
 
-// A unit's model instance: the pieces its script moves.
 struct ObjectState {
-    int unknown_0;                      // +0x00
-    int unknown_4;                      // +0x04, cleared when a cached piece changes
-    int dirty;                          // +0x08
-    Unit* unit;                         // +0x0c
-    int field_10;                       // +0x10
+    int unknown_0;
+    int unknown_4;
+    int dirty;
+    Unit* unit;
+    int field_10;
     char unknown_14[0x22 - 0x14];
-    PieceState pieces[1];               // +0x22
+    PieceState pieces[1];
 };
 
 #include "../network/player.h"
 
 #include "../game/game.h"
 
-// The 0x30-byte record StartExplodePiece consumes.
 struct Header_00481140 {
     Ref<Unit> obj;
-    int index;                         // +0x04
-    int r1;                            // +0x08
-    int r2;                            // +0x0c
-    int r3;                            // +0x10
-    int x;                             // +0x14
-    int y;                             // +0x18
-    int z;                             // +0x1c
-    int f20;                           // +0x20
-    int f24;                           // +0x24
-    unsigned int bits;                 // +0x28
+    int index;
+    int r1;
+    int r2;
+    int r3;
+    int x;
+    int y;
+    int z;
+    int f20;
+    int f24;
+    unsigned int bits;
     Ref<char> rec;
 };
 #pragma pack(pop)
@@ -86,11 +75,6 @@ static inline Unit* GetUnit(unsigned short id)
 }
 
 #include "unit_script.h"
-
-// Slot 17 of UnitScript (vtable 0x4fd698). The switch over the property id
-// 1 to 20 matches the COB script "get" list (ACTIVATION, STANDINGMOVEORDERS,
-// ..., ARMORED), with the property argument in the first stack parameter. The base class slot (0x4b0680)
-// returns 0.
 
 // FUNCTION: 0x480770
 int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
@@ -181,8 +165,6 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
     return 0;
 }
 
-// Slot 16 of UnitScript (vtable 0x4fd698); see src/units/units_485e30.cpp
-// and the sibling slots 0x480ce0, 0x480d50, 0x480db0, 0x480df0.
 // FUNCTION: 0x480b20
 void UnitScript::SetUnitValue(int which, int value)
 {
@@ -207,11 +189,9 @@ void UnitScript::SetUnitValue(int which, int value)
         unit->SetStateBits(2, value);
         break;
     }
-    // After the switch, not inside the cases.
     unit->dirty = true;
 }
 
-// The piece array starts at +0x22 of the object state.
 // FUNCTION: 0x480c30
 int UnitScript::GetPieceTranslation(int index, int slot)
 {
@@ -231,8 +211,6 @@ void UnitScript::SetPieceTranslation(int index, int slot, int v)
     }
 }
 
-// Declared here: the shared vec3.h header takes the ids these two had above, so
-// SetPieceTranslation keeps its allocation (docs/c2-regalloc.md).
 void __stdcall UpdateObjectState(Unit* unit);
 void __stdcall EmitBubbles(int, int, int, short);
 
@@ -242,7 +220,6 @@ int UnitScript::GetPieceRotation(int index, int slot)
     return state->pieces[index].rotation[slot];
 }
 
-// Slot 1 of UnitScript (vtable 0x4fd698).
 // FUNCTION: 0x480ce0
 void UnitScript::SetPieceRotation(int index, int slot, int v)
 {
@@ -274,8 +251,6 @@ void UnitScript::SetPieceVisible(int index, int flag)
     }
 }
 
-// Slot 3 of UnitScript (see 0x485e30.cpp); the same as 0x480df0 (slot 4)
-// but for bit 1 of the entry flags.
 // FUNCTION: 0x480db0
 void UnitScript::SetPieceCached(int index, int flag)
 {
@@ -283,7 +258,6 @@ void UnitScript::SetPieceCached(int index, int flag)
     state->field_10 = 0;
 }
 
-// Slot 4 of UnitScript (see 0x485e30.cpp); compare 0x480d50.
 // FUNCTION: 0x480df0
 void UnitScript::SetPieceShaded(int index, int flag)
 {
@@ -291,52 +265,34 @@ void UnitScript::SetPieceShaded(int index, int flag)
     state->field_10 = 0;
 }
 
-// Slot 7 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::IsPieceVisible.
 // FUNCTION: 0x480e30
 int UnitScript::IsPieceVisible(int index)
 {
     return state->pieces[index].visible;
 }
 
-// Slot 8 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::IsPieceCached.
 // FUNCTION: 0x480e50
 int UnitScript::IsPieceCached(int index)
 {
     return state->pieces[index].cached;
 }
 
-// Slot 9 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::IsPieceShaded.
 // FUNCTION: 0x480e70
 int UnitScript::IsPieceShaded(int index)
 {
     return state->pieces[index].shaded;
 }
 
-// Slot 10 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::ExplodeLegacy.
 // FUNCTION: 0x480e90
 void UnitScript::ExplodeLegacy(int, int, int)
 {
 }
 
-// Slot 11 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::PlaySoundNoop.
 // FUNCTION: 0x480ea0
 void UnitScript::PlaySoundNoop(int)
 {
 }
 
-// Slot 12 of UnitScript (vtable 0x4fd698).
-//
-// First the unit's visibility against the local player's map is tested; if the
-// unit is not visible nothing happens. Otherwise the unit's state is snapped
-// (UpdateObjectState) and a two-position record is built: with bit 0x100 of `b`
-// set, only one position is needed, otherwise two (the second from the six
-// dwords the piece's sfxOffset points at). The message id `b` then selects
-// which list-append helper receives the pair.
 // FUNCTION: 0x480eb0
 void UnitScript::EmitSfx(int a, int b)
 {
@@ -353,8 +309,6 @@ void UnitScript::EmitSfx(int a, int b)
         v1.y += state->pieces[a].pos.y;
         v1.z -= state->pieces[a].pos.z;
     } else {
-        // Binding the unit once is load bearing: without it MSVC reloads
-        // state->unit for the second copy and the whole allocation shifts.
         Unit* u = state->unit;
         v2 = u->pos;
         v1 = u->pos;
@@ -401,24 +355,6 @@ void UnitScript::EmitSfx(int a, int b)
     }
 }
 
-// Slot 13 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::ExplodePiece.
-//
-// Two independent blocks selected by bits of the second argument `b`:
-//  - !(b & 0x20): builds a 0x30-byte header on the stack (the same record
-//    StartExplodePiece consumes) from the state->unit pointer at +0x0c, the first
-//    argument and six RandomInt random draws, then hands it to
-//    StartExplodePiece.
-//  - (b & 0x3f00): computes the unit's position with GetPiecePosition and appends
-//    it to up to six tables in g_game (+0x147f7, a six-pointer array) with
-//    AddExplosionEffect(&v, table, 2, 0).
-//
-// Suspected original bug: h.bits is read before it is ever written (the
-// first `h.bits & ~0x30` in each arm, and the three merge assignments, all
-// load the uninitialised local). Only bits 6 and up survive the masks, so
-// whatever the stack held leaks into the record StartExplodePiece copies.
-// `b` must stay unsigned (shr, not sar) and the header's flag dword a plain
-// unsigned int: a 1-bit field would truncate `(b & 2) << 4`.
 // FUNCTION: 0x481140
 void UnitScript::ExplodePiece(int a, unsigned int b)
 {
@@ -433,7 +369,6 @@ void UnitScript::ExplodePiece(int a, unsigned int b)
         h.y = RandomInt(10) << 16;
         h.z = (0x14 - RandomInt(0x28)) << 14;
         h.f20 = 900;
-        // h.f24 is stored after the OR in this arm and before it in the else arm.
         if (b & 1) {
             h.bits = (h.bits & ~0x30) | ((b & 2) << 4);
             h.f24 = 1;
@@ -465,8 +400,6 @@ void UnitScript::ExplodePiece(int a, unsigned int b)
     }
 }
 
-// Slot 14 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::AttachUnit.
 // FUNCTION: 0x481340
 void UnitScript::AttachUnit(unsigned short id, int a, int b)
 {
@@ -477,8 +410,6 @@ void UnitScript::AttachUnit(unsigned short id, int a, int b)
     }
 }
 
-// Slot 15 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::DropUnit.
 // FUNCTION: 0x4813b0
 void UnitScript::DropUnit(unsigned short id)
 {
@@ -490,10 +421,6 @@ void UnitScript::DropUnit(unsigned short id)
     }
 }
 
-// Slot 18 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::IsCarryingUnit.
-// Returns whether the list at +0x8a of the object two links down holds an
-// item with the given id.
 // FUNCTION: 0x481430
 int UnitScript::IsCarryingUnit(int id)
 {
@@ -506,8 +433,6 @@ int UnitScript::IsCarryingUnit(int id)
     return 0;
 }
 
-// Slot 19 of UnitScript (vtable 0x4fd698), overriding
-// CobScript::GetTransporterId.
 // FUNCTION: 0x481470
 int UnitScript::GetTransporterId()
 {

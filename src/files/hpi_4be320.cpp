@@ -1,30 +1,25 @@
-// Decompiled by Opus. Names are provisional.
-// Stays in its own file: HAPI_ClearShadowFlags (0x4be3b0, now in hpi.cpp)
-// would be inlined into the recursive call below, but the original calls it
-// out of line.
-
 #include "archive_entry.h"
 #include "../state/sim_globals.h"
 
 struct ArchiveDirectory {
     int count;
-    ArchiveEntry* entries;          // +0x4
+    ArchiveEntry* entries;
 };
 
 struct Node_004be320 {
     char unknown_0[0x10];
-    ArchiveDirectory* list;         // +0x10
+    ArchiveDirectory* list;
 };
 
 struct Item_004be320 {
     char unknown_0[8];
-    Node_004be320* node;            // +0x8
+    Node_004be320* node;
 };
 
 struct State_004be320 {
     char unknown_0[0x618];
-    Item_004be320** items;          // +0x618
-    int itemCount;                  // +0x61c
+    Item_004be320** items;
+    int itemCount;
 };
 
 

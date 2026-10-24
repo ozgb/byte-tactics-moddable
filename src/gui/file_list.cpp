@@ -1,4 +1,3 @@
-// Decompiled by space-bunny-free, deepseek-v4.1, deepseek-v4.1-flash, GPT-6.1-sol, Space Bunny Free, DeepSeek V4.1 Flash, Sonnet 5.5, muse-spark-1.3-free, LongCat 2.5 Preview Free, Opus and Haiku. Names are provisional.
 #include <stdlib.h>
 #include <string.h>
 #include <io.h>
@@ -19,50 +18,46 @@ int GetTextKeyColor();
 
 #pragma pack(push, 1)
 
-// The 0xa4-byte element shared by every blink-word view: the drawing views
-// split the first 0xa0 bytes into text and fields, the allocation view sees
-// the whole 0xa0 as text, and both put the value at +0xa0.
 struct BlinkWord {
-    char text[0x80];                 // +0x0
-    int x;                           // +0x80
-    int y;                           // +0x84
-    int colourA;                     // +0x88
-    float periodA;                   // +0x8c
-    int colourB;                     // +0x90
-    float periodB;                   // +0x94
-    int phase;                       // +0x98
-    float nextToggle;                // +0x9c
-    int value;                       // +0xa0
+    char text[0x80];
+    int x;
+    int y;
+    int colourA;
+    float periodA;
+    int colourB;
+    float periodB;
+    int phase;
+    float nextToggle;
+    int value;
 };
 
 #include "gadget.h"
 
 struct Obj18 {
     char unknown_0[4];
-    char* entries;                   // +0x4
+    char* entries;
 };
 
-// The slider gadget behind FileRequester::slider.
 struct ReqSub {
     char unknown_0[0x140];
-    short knobPos;                   // +0x140
+    short knobPos;
 };
 
 struct FileRequester {
-    void* gui;                       // +0x00
-    ReqSub* slider;                  // +0x04 (the SLID gadget)
-    char* nameGadget;                // +0x08 (NAME)
-    char* maskGadget;                // +0x0c (MASK)
-    char* pathGadget;                // +0x10 (PATH)
-    char drive[0x10];                // +0x14
-    char cwd[0x100];                 // +0x24
-    char save_drive[0x10];           // +0x124
-    char save_cwd[0x100];            // +0x134
-    char* names;                     // +0x234
-    char* sizes;                     // +0x238
-    char* selected;                  // +0x23c
-    int mask;                        // +0x240 (the mask text passed to OpenFileRequester)
-    void (__stdcall* callback)(void*);   // +0x244
+    void* gui;
+    ReqSub* slider;
+    char* nameGadget;
+    char* maskGadget;
+    char* pathGadget;
+    char drive[0x10];
+    char cwd[0x100];
+    char save_drive[0x10];
+    char save_cwd[0x100];
+    char* names;
+    char* sizes;
+    char* selected;
+    int mask;
+    void (__stdcall* callback)(void*);
 };
 
 #include "layer.h"
@@ -70,18 +65,17 @@ struct FileRequester {
 #include "gui.h"
 
 struct Dialog {
-    char path[0x13];                 // +0x00
-    short field_13;                  // +0x13
-    char unknown_15[0x18 - 0x15];    // +0x15
-    Obj18* holder;                   // +0x18
+    char path[0x13];
+    short field_13;
+    char unknown_15[0x18 - 0x15];
+    Obj18* holder;
     char unknown_1c[0xa6 - 0x1c];
-    BlinkWord* words;                // +0xa6
-    int count;                       // +0xaa
-    int active;                      // +0xae
+    BlinkWord* words;
+    int count;
+    int active;
     char unknown_b2[0xcca - 0xb2];
-    int changed;                     // +0xcca
+    int changed;
 
-    // self is really the first stack argument, not `this`.
     FileRequester* OpenFileRequester(Dialog* self, char* arg2, char* arg3, char* arg4);
 };
 
@@ -104,13 +98,6 @@ void __stdcall SelectFontForEntry(Entry_004a1810* entries, int index);
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
 
-// Only the first pass (over 0..n) sits inside `if (n != -1)`; start = n + 1,
-// end = count - 1 and the second pass always run, which sorts the whole list
-// when no line starts with a backslash.
-// The second pass compares keys the other way round, keys[i+1] - keys[i], so
-// with keys the part after the split sorts descending while the part before
-// it sorts ascending; both _strcmpi calls compare ptr1[i] with ptr1[i+1]. n
-// records the LAST line starting with a backslash.
 // FUNCTION: 0x4aefa0
 void __stdcall SortFileList(char* list1, char* list2, int* keys, int count)
 {
@@ -213,8 +200,6 @@ void __stdcall SortFileList(char* list1, char* list2, int* keys, int count)
     GameFreeThunk(buf1);
 }
 
-// The file walk runs in every case and continues the sizes list of the
-// directory walk.
 // FUNCTION: 0x4af320
 int __stdcall ScanDirectory(char* path, char* list, char* sizes, int mode, int flag, int what)
 {
@@ -293,11 +278,6 @@ void __stdcall RefreshFileList(FileRequester* obj)
     strcpy(obj->pathGadget + 0xb6, obj->cwd);
 }
 
-// Click handler of the file requester (FILEREQ.GUI, opened by 0x4afa30).
-// On close (selected == -1) it restores the saved drive and directory and
-// frees the request data. Otherwise it acts on the entry the user clicked:
-// LOAD/SWIN enter a directory, CANC accepts, NAME takes the highlighted file,
-// PATH walks one level up and the *DRV entries pick a drive letter.
 // FUNCTION: 0x4af670
 void __stdcall FileRequesterHandler(Gui* gadget)
 {
@@ -306,7 +286,6 @@ void __stdcall FileRequesterHandler(Gui* gadget)
     int result;
     int i;
     int n;
-    // Declared after n: the operand order of the cwd[] accesses follows it.
     FileRequester* req;
     req = (FileRequester*)gadget->layer->data;
     if (gadget->hotGadgetIndex == -1) {
@@ -397,8 +376,6 @@ void __stdcall FileRequesterHandler(Gui* gadget)
     }
 }
 
-// The result of LoadGuiLayer is the object that gets the vtable slot at +8, not
-// the argument.
 // FUNCTION: 0x4afa30
 FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, char* arg4)
 {
@@ -412,7 +389,6 @@ FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, c
     strcpy(obj->cwd, arg2);
     StripFileName(obj->cwd);
 
-    // Must stay strlen(...) == 0: other spellings change the compare.
     if (strlen(obj->cwd) == 0) {
         strcpy(obj->cwd, "NO PATH");
     }
@@ -543,8 +519,8 @@ void __stdcall ClearBlinkWord(void* param1, int param2)
     int max = *(int*)((char*)param1 + 0xaa);
     if (param2 <= max) {
         void* ptr = *(void**)((char*)param1 + 0xa6);
-        int calc = param2 + param2 * 4;  // param2 * 5
-        int offset = (param2 + calc * 8) * 4;  // (param2 * 41) * 4 = param2 * 0xa4
+        int calc = param2 + param2 * 4;
+        int offset = (param2 + calc * 8) * 4;
         *(unsigned char*)((char*)ptr + offset) = 0;
     }
 }
@@ -559,7 +535,6 @@ void __stdcall ClearBlinkWords(Dialog* obj)
     }
 }
 
-// The object at obj+0x18; +4 points at the entry array.
 // FUNCTION: 0x4aff00
 void __stdcall DrawBlinkWords(Dialog* obj)
 {

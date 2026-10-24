@@ -1,27 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, deepseek-v4.1, DeepSeek V4.1 Flash, Opus, opus, claude-opus-5-5, Claude Sonnet 5.5, claude-sonnet-5-5, Sonnet, Sonnet 5.5, Haiku, space-bunny-free, Space Bunny Free, GPT-6, GPT-6-Luna, GPT-6.1-sol, mimo-v2.6-pro and mimo-v2.6-flash. Names are provisional.
-//
-// The terrain module: the map cells and their ground heights and features,
-// whether a unit can sit at a position, adding units to and removing them from
-// the map, the object grid and its visitors, and the feature picker for the
-// build-site scan.
-//
-// Four of the module's functions match only in their own file's symbol
-// context, so they stay in files of their own, each for a different reason:
-// 0x47cc30 AddUnitToMap: the symbol count moves the owner index multiply onto
-// the other operand.
-// 0x47d0e0 RemoveUnitFromMap: the count clears bit 14 of g_game's id, which
-// decides how the cell index multiply folds.
-// 0x47d820 GetFootprintHeight: the count changes the operand order of the
-// footprint mask load.
-// 0x47e2d0 CanPlaceFootprintAt: the symbol ids move the def load and the
-// feature lookup's operand order.
-//
-// The full windows.h stays: its declaration count decides how the cell index
-// multiply folds.
-// <stdlib.h>, <string.h> and <math.h> stay: their symbol ids decide operand
-// orders in the cell multiply, the bounds guard and the explored arm.
-// <vector> and <shlobj.h> stay for their symbol ids too: without them the
-// register allocation of the grid visitors and of 0x47db70 changes.
 #include "win_types.h"
 #include "../state/block.h"
 #include <stdlib.h>
@@ -37,13 +13,9 @@ struct Unit;
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
 
-// Unused here: the forward declaration takes the symbol id replacing the
-// removed Cell view, keeping CanBuildAt in its register window (docs/c2-regalloc.md).
 struct Point;
 #include "../map/cell.h"
 
-// Unused here: the symbol ids this union takes keep CanBuildAt's allocation
-// (docs/c2-regalloc.md).
 union Flags {
     struct {
         unsigned int unknown_0 : 26;
@@ -56,35 +28,34 @@ union Flags {
 
 #include "../network/player.h"
 
-struct UnitBucket {                     // 10 bytes: a spatial bucket, the head of its unit list
+struct UnitBucket {
     char unknown_0[6];
-    Unit* first;                        // +0x6
+    Unit* first;
 };
 
 #include "../units/unit_def.h"
 
 struct Feature {
     char unknown_0[0xec];
-    float weightA;                      // +0xec
-    float weightB;                      // +0xf0
+    float weightA;
+    float weightB;
     char unknown_f4[0xfe - 0xf4];
     union {
-        unsigned char flags;            // +0xfe
-        unsigned short flags16;         // +0xfe
+        unsigned char flags;
+        unsigned short flags16;
         struct {
             unsigned char unknown_6 : 6;
-            unsigned char steep : 1;    // +0xfe, bit 6
+            unsigned char steep : 1;
         };
     };
 };
 
 #include "../units/unit.h"
 
-// Typed cells and no count: grid.h's Grid is 0x10 bytes with a byte pointer.
 struct BucketGrid {
     Ref<UnitBucket> cells;
-    unsigned int width;                 // +0x4
-    unsigned int height;                // +0x8
+    unsigned int width;
+    unsigned int height;
 };
 
 #include "../game/game.h"
@@ -125,8 +96,8 @@ class SpatialBucket {
 public:
     char unknown_0[6];
     union {
-        Node_0047cb00* head;            // +6
-        int field_6;                    // +6
+        Node_0047cb00* head;
+        int field_6;
     };
     void UnlinkUnit(Node_0047cb00* node);
     void PrependUnit(int node);
@@ -148,8 +119,8 @@ public:
 };
 
 struct Entry_0047ea40 {
-    Vec3 pos;                          // +0x0
-    float val;                         // +0xc
+    Vec3 pos;
+    float val;
 };
 
 #pragma pack(pop)
@@ -157,7 +128,6 @@ struct Entry_0047ea40 {
 extern Game* g_game;
 extern ClaimFootprintVisitor g_claimFootprintVtable[];
 void __stdcall RefreshAllPassMaps(Point16 pos, Point16 size);
-// Stays in a file of its own: see the note at its definition.
 void __stdcall RemoveUnitFromMap(Unit* unit);
 
 #include "../../interfaces/seams.h"
@@ -260,8 +230,6 @@ void __stdcall ClaimFootprintCells(Unit* obj)
     }
 }
 
-// Runs VisitObjectsInArea over an area with a stack visitor of ClaimFootprintVisitor, as
-// ForceNeighborFootprintReclaim does for an object's area.
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
 
 // FUNCTION: 0x47cac0
@@ -328,9 +296,6 @@ void __stdcall SetOwner(Unit* unit, UnitBucket* bucket)
     }
 }
 
-// Detaches a unit from its bucket: RemoveUnitFromMap first, then (unless +0x86 is
-// set) unlinks it from the bucket's list (head at bucket +0x6, link at unit
-// +0x8e) and clears the bucket. The reverse of 0x47cb60.
 void __stdcall RemoveUnitFromMap(Unit* unit);
 
 // FUNCTION: 0x47cbd0
@@ -347,20 +312,13 @@ void __stdcall ClearFootprintAndUnlink(Unit* unit)
     unit->spatialBucket = 0;
 }
 
-// Can a unit's footprint stand on the map cell `cell`? The guards are the map
-// bounds, then the line-of-sight tests (the player's bit in the shared
-// visibility mask, then either the explored byte map or the mask again,
-// depending on flag 2 of g_game+0x14281), then a walk of the footprint cells
-// that accumulates the build cost into g_lastPlaceMetalSum and the height envelope
-// into the returned g_lastPlaceHeight.
-
 int __stdcall GetCellHeight(Point16* p);
 
 struct Pos_0047d2e0 {
     Fixed x, y, z;
 };
 
-struct Position_0047d2e0 {              // 16.16 fixed point, only high words read
+struct Position_0047d2e0 {
     short xFrac;
     short x;
     short yFrac;
@@ -369,7 +327,6 @@ struct Position_0047d2e0 {              // 16.16 fixed point, only high words re
     short z;
 };
 
-// The helpers read the position through the six-short Position cast.
 static inline int IsExplored_0047d2e0(Los_0047d2e0* los, Position_0047d2e0* pos,
     Fixed* hgt)
 {
@@ -385,7 +342,6 @@ static inline int IsSeen_0047d2e0(Los_0047d2e0* los, Position_0047d2e0* pos,
 {
     int tx = pos->x >> 5;
     int ty = (pos->z - (hgt->p.hi >> 1)) >> 5;
-    // Declared after tx/ty: makes the multiply width-first.
     unsigned int w = los->explored.size.width;
     int r;
     if (!los->explored.size.Contains(tx, ty))
@@ -395,8 +351,6 @@ static inline int IsSeen_0047d2e0(Los_0047d2e0* los, Position_0047d2e0* pos,
     return r;
 }
 
-// Takes the caller's x but derives ty and the width itself: no spelling in
-// the caller gives the original's width-first multiply.
 static inline unsigned short VisWord_0047d2e0(Los_0047d2e0* los, int tx,
     Position_0047d2e0* pos, Fixed* hgt)
 {
@@ -405,7 +359,6 @@ static inline unsigned short VisWord_0047d2e0(Los_0047d2e0* los, int tx,
     return g_game->visibilityMask[w * ty + tx];
 }
 
-// Blocked_ and Terrain_ stay early-return helpers.
 static int Blocked_0047d2e0(Cell* c)
 {
     unsigned short v = c->feature;
@@ -452,7 +405,6 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
     g_lastPlaceHeight = 0;
     g_lastPlaceMetalSum = 0;
     Point16 origin = *(Point16*)&unit->footprintx;
-    // The guard reads cell.x and cell.y directly.
     if (cell.x < 1 || cell.y < 1 || cell.x + origin.x >= g_game->width ||
         cell.y + origin.y >= g_game->height)
         return 0;
@@ -462,7 +414,6 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
     ok = 1;
     if (los != 0) {
         Pos_0047d2e0 pos;
-        // A separate Fix local: it shares the dead los argument slot with the bit spill.
         Fixed hgt;
         pos.x.v = (origin.x + cell.x * 2) << 19;
         pos.z.v = (origin.y + cell.y * 2) << 19;
@@ -471,7 +422,6 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
         y = (pos.z.p.hi - (hgt.p.hi >> 1)) >> 5;
         if (!los->explored.size.Contains(x, y))
             return 0;
-        // Computed after the first Contains test.
         unsigned int bit = 1 << g_game->playerIndex;
         if ((VisWord_0047d2e0(los, x, (Position_0047d2e0*)&pos, &hgt) & bit) == 0)
             return 0;
@@ -480,7 +430,6 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
         else
             ok = IsSeen_0047d2e0(los, (Position_0047d2e0*)&pos, &hgt, bit);
     }
-    // The cell pointer is computed before the min6/max5 initialisers.
     Cell* c = &g_game->cells[cell.y * g_game->width + cell.x];
     unsigned char min6 = 0xff;
     unsigned char max5 = 0;
@@ -492,7 +441,6 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
     int col;
     row = 0;
     if (origin.y > row) {
-        // Rotated do/while with a positive bottom test.
         do {
             for (col = 0; col < cols; col++) {
                 g_lastPlaceMetalSum += c->metal;
@@ -550,15 +498,6 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
     return 1;
 }
 
-// Caller, for whoever names this: the only caller is the thunk 0x47dac0, which
-// forwards its own two arguments unchanged (`push arg2; push arg1; call`, so the
-// last push is the callee's first parameter) and, when the scan succeeds, clears
-// bit 2 of the byte at obj+0x10f, sets it from `flag & 1`, sets
-// obj->[0x110] |= 0x8000000, calls 0x47c790(obj) and then 0x440a40 with the
-// object's point at +0x76 and its point at +0x7e pushed by value. So arg1 is the
-// object being placed and arg2 is a flag, as declared here.
-//
-// The windows.h include stays: without it both sums change operand order.
 // FUNCTION: 0x47d970
 int __stdcall IsFootprintClear(Unit* obj, int flag)
 {
@@ -567,7 +506,6 @@ int __stdcall IsFootprintClear(Unit* obj, int flag)
     Point16* r = &obj->footprint;
     short xend = pp[0] + obj->footprint.x;
     short yend = q->y + r->y;
-    // Stays a 4-byte Point16 copy, not two short locals.
     Point16 p = obj->cell;
     if (p.x < 1 || p.y < 1 || xend >= g_game->width || yend >= g_game->height)
         return 0;
@@ -577,7 +515,6 @@ int __stdcall IsFootprintClear(Unit* obj, int flag)
     for (int y = p.y; y < yend; y++) {
         Cell* c = g_game->cells + y * width;
         for (int x = p.x; x < xend; x++) {
-            // The post-increment stays inside the mask read, not at the loop bottom.
             if ((((unsigned char*)obj->def->yardmap.get())[n++] & bit) && c[x].unit != 0 && c[x].unit != obj->id)
                 return 0;
         }
@@ -605,9 +542,6 @@ void __stdcall SetYardOpen(Unit* obj, int flag)
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
 void __stdcall RefreshAllPassMaps(Point16 pos, Point16 size);
 
-// The visitor is declared after the flag update so that it reuses obj's
-// stack slot; size and pos go through locals (in that order) so that pos is
-// loaded early, as in the original.
 // FUNCTION: 0x47db20
 void __stdcall ForceNeighborFootprintReclaim(Unit* obj)
 {
@@ -619,14 +553,8 @@ void __stdcall ForceNeighborFootprintReclaim(Unit* obj)
     RefreshAllPassMaps(obj->cell, obj->footprint);
 }
 
-// Suspected original bug, 0x47dd05: the cell's owner word is compared against
-// the raw low 16 bits of the second argument, and that argument is never
-// dereferenced anywhere in the function. So either the parameter really is an
-// owner id dressed up as a pointer, or the original meant other->unit.
 int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* los);
 
-// Returns non-zero when the cell's ground does not take a unit: water, a cliff
-// edge, or a feature type whose name entry has the "steep" bit set.
 static inline int SteepCell(Cell* c)
 {
     unsigned short f = c->feature;
@@ -660,7 +588,6 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
     if (!unit->mobile)
         return CanBuildAt(unit, cell, 0, 0);
     Cell* c = &g_game->cells[cell.y * g_game->width + cell.x];
-    // Declared ahead of the assignments: places the tolerance load.
     int minHeight, maxHeight, stride;
     stride = g_game->width - fx;
     unsigned char tolerance = unit->maxslope;
@@ -668,7 +595,6 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
     maxHeight = g_game->seaLevel - unit->minwaterdepth;
     if (flags != 1)
         return 1;
-    // `c += stride` stays in the increment expression: places `row++`.
     for (int row = 0; row < fp.y; row++, c += stride) {
         for (int col = 0; col < fx; col++, c++) {
             if (SteepCell(c))
@@ -690,14 +616,8 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
     return 1;
 }
 
-// Snaps a 16.16 fixed-point world position to the centre of its grid cell
-// (cells are 16 units, relative to the unit's origin in 8-unit steps), then
-// sets the height from the cell. The two conversions are inlined helpers that
-// take the origin and the position by value.
-// GetFootprintHeight stays in a file of its own: see the note at its definition.
 int __stdcall GetFootprintHeight(UnitDef* unit, Point16 cell);
 
-// The origin stays the last parameter: it is read before the position.
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {
     Point16 c;
@@ -722,11 +642,6 @@ void __stdcall SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos)
     pos->y = GetFootprintHeight(unit, cell) << 16;
 }
 
-// Decides whether a unit with the given footprint can stand on one map cell:
-// the cell's feature must not block it, a unit already standing there must not
-// have moved more recently than the mover, and the cell's ground height and
-// slope must be inside the unit's limits. Returns 0 when the cell is unusable,
-// 1 when it is usable but the slope is a near miss, 3 when it is fully usable.
 // FUNCTION: 0x47de60
 int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell)
 {
@@ -743,13 +658,6 @@ int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell)
     } else if (feature != 0xfffe) {
         blocked = 1;
     } else {
-        // The width stays an lvalue: a pointer to the field, not a copy of it.
-        // A copy has two uses, so it must live in a register, and the one it
-        // wins is ecx, which the original uses for spotX; that costs the
-        // `mov ecx,[edx+0x14233]` and the register-to-register imul. As a
-        // pointer the width folds into `imul eax,[edx+0x14233]` exactly as the
-        // original has it, and the two spelled index uses still share one
-        // block, which is the other half the original wants.
         int* width = &g_game->width;
         unsigned short f2 =
             (cell - (cell->offsetY * *width + cell->offsetX))->feature;
@@ -762,7 +670,6 @@ int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell)
     if (blocked)
         return 0;
     if (cell->unit != 0) {
-        // A reference, not a pointer: gives the original's two-step unit load.
         Ref<Unit>& unit = (*(Ref<Unit>*)&g_game->units[cell->unit].motion);
         if (!unit || ((unsigned int)unit->lastTick) < obj->lastTick)
             return 0;
@@ -784,8 +691,6 @@ int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell)
     return 3;
 }
 
-// This is the pathfinder's "can this rectangle be crossed" scan.
-// Kept only for its effect on compiler state: without a header the match breaks.
 // FUNCTION: 0x47dfc0
 int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, int h)
 {
@@ -802,7 +707,6 @@ int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, 
     int rowStep = g_game->width - w;
     int minHeight = g_game->seaLevel - obj->maxWaterDepth;
     int maxHeight = g_game->seaLevel - obj->minWaterDepth;
-    // Increments live in the for headers: schedules the pointer advance.
     for (row = 0; row < h; row++, cell += rowStep) {
         for (int col = 0; col < w; col++, cell++) {
             unsigned short feature = cell->feature;
@@ -829,12 +733,10 @@ int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, 
             if (blocked)
                 return 0;
             if (cell->unit != 0) {
-                // A reference, not a pointer: gives the original's two-step load.
                 Ref<Unit>& unit = (*(Ref<Unit>*)&g_game->units[cell->unit].motion);
                 if (!unit || ((unsigned int)unit->lastTick) < obj->lastTick)
                     return 0;
             }
-            // Compared inline via the cast: a named local adds spill/reload pairs.
             if ((int)cell->low < minHeight)
                 return 0;
             if ((int)cell->high > maxHeight)
@@ -860,19 +762,8 @@ int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, 
     return result;
 }
 
-// Tests whether a unit whose footprint is footprintX x footprintZ cells can sit
-// at cell (x, y): its own rectangle plus the four strips that touch it (row
-// above, column right, row below, column left), each one cell wider or taller so
-// the corners are covered too. GetPassMapFootprintValue returns 3 for a rectangle that is
-// completely free, 1 when something is in the way and 0 when the rectangle
-// leaves the map, so the first failure is passed straight back to the caller
-// while any later failure is reported as a plain 1.
 int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, int h);
 
-// The two footprint fields are copied into locals before the first call: that
-// keeps them in registers across the five calls instead of loading each field
-// again, and it is what puts the `h + 1` and `x - 1` values of the third and
-// second calls into the two stack slots the last call reads back.
 // FUNCTION: 0x47e1f0
 unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y)
 {
@@ -904,21 +795,16 @@ int __stdcall IsPadSlotFree(Unit* pad, int id)
     return 1;
 }
 
-// Scans every grid cell overlapping the rectangle [pos, pos+size), calling
-// visitor->ClaimFootprint for each object (and child) whose own rectangle overlaps.
 // FUNCTION: 0x47e5c0
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor)
 {
-    // Declared apart from its assignment: keeps the sum from fusing.
     int sumy;
     BucketGrid* grid = &(*(BucketGrid*)((char*)g_game + 0x1429f));
-    // Declaration order of the bounds is fixed: other orders change allocation.
     int xstart = -1 + (pos.x >> 3);
     int ystart = -1 + (pos.y >> 3);
     int sumx = pos.x + size.x;
     sumy = pos.y + size.y;
     int xend = (sumx >> 3) + 1;
-    // Recomputed from pos.y + size.y, not shifted from sumy.
     int ye = ((pos.y + size.y) >> 3) + 1;
     for (int x = xstart; x <= xend; x++) {
         for (int y = ystart; y <= ye; y++) {
@@ -975,12 +861,6 @@ void __stdcall VisitObjectsInRect(int x1, int y1, int x2, int y2, Visitor_0047e7
     }
 }
 
-// Sibling of 0x47e750, but the query is a point with a range instead of a
-// rectangle: the cells the circle covers are walked and every object in them
-// whose distance from the point is within the range is handed to the visitor
-// (the one in 0x405d90 and its two siblings). The distance test is the fixed
-// point one the game uses everywhere: only the high dword of each 64 bit product
-// is kept, so the 32 bit add of the two terms can never overflow.
 static inline int Clamp_0047e890(int v, unsigned int size)
 {
     if (v < size) {
@@ -992,7 +872,6 @@ static inline int Clamp_0047e890(int v, unsigned int size)
     return size - 1;
 }
 
-// Four separate one-line helpers taking the point pointer: keeps x outranking pos.
 static inline int ClampX_0047e890(Vec3* p, int range, unsigned int size)
 {
     return Clamp_0047e890((p->x - range) >> 23, size);
@@ -1013,7 +892,6 @@ static inline int ClampZ2_0047e890(Vec3* p, int range, unsigned int size)
     return Clamp_0047e890((p->z + range) >> 23, size);
 }
 
-// Pointer arguments, z difference first: written inline the code changes.
 static inline int Dist2_0047e890(Vec3* b, Vec3* a)
 {
     int dz = a->z - b->z;
@@ -1123,8 +1001,6 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* center, Fixed radius,
 
 void __stdcall ClaimFootprintCells(Unit* obj);
 
-// The visitor's slot: the class's virtual method, defined out of line (the
-// vtable needs it under the class's own name).
 // FUNCTION: 0x47ed30
 void ClaimFootprintVisitor::ClaimFootprint(Unit* obj)
 {

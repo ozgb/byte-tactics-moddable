@@ -1,12 +1,3 @@
-// PlayerAI: the per-player AI state (g_playerAI[player], built by CreatePlayerAI
-// at 0x40b320): the owner and its index, the visible, known and factory unit
-// lists, the base centre, the placement cells, and the per-unit-type rating,
-// count and weight tables. The one declaration of the class, for ai_player.cpp
-// and the files that hold its other methods; the types behind the pointers
-// stay private to their own files.
-//
-// Declare Point16 (src/util/vec3.h, or a view of it) and include <vector>
-// before this header: the members hold both by value.
 #ifndef PLAYER_AI_H
 #define PLAYER_AI_H
 
@@ -18,14 +9,12 @@ struct Unit;
 struct UnitDef;
 struct Vec3;
 
-// A map cell and its sort key, the element of the player AI's cell vector.
 struct Elem_0040cc40 {
-    Point16 pos;                       // +0x0
-    float key;                         // +0x4
+    Point16 pos;
+    float key;
     Elem_0040cc40() {}
     // FUNCTION: 0x40a5b0
     Elem_0040cc40(const Elem_0040cc40& o) : pos(o.pos), key(o.key) {}
-    // The value is taken as a float parameter: gives the original's fld/fstp copy.
     Elem_0040cc40(short x, short y, float k) { pos.x = x; pos.y = y; key = k; }
     bool operator<(const Elem_0040cc40& o) const { return key < o.key; }
 };
@@ -69,19 +58,17 @@ struct Group_00409160 {
 class PlayerAI {
 public:
     Ref<Player> owner;
-    unsigned char index;               // +0x04
-    // Wrapper depth decides which vector constructors inline: visible and
-    // known are one level deep, factories two.
-    UnitList_00409160 visible;         // +0x05
-    UnitList_00409160 known;           // +0x15
-    Group_00409160 factories;          // +0x25
-    Vec3_00409160 centre;              // +0x35
-    Vec3_00409160 pos_41;              // +0x41
+    unsigned char index;
+    UnitList_00409160 visible;
+    UnitList_00409160 known;
+    Group_00409160 factories;
+    Vec3_00409160 centre;
+    Vec3_00409160 pos_41;
     SimVector<Elem_0040cc40> cells;
-    Pos_00409160 center;               // +0x5d
+    Pos_00409160 center;
     SimVector<Elem_0040cfb0> vec_65;
-    int builders;                      // +0x75
-    int hasSpecial;                    // +0x79
+    int builders;
+    int hasSpecial;
     SimVector<short> counts;
     SimVector<unsigned char> vec_8d;
     SimVector<unsigned char> weights;
@@ -89,14 +76,14 @@ public:
     SimVector<Elem_0040d550> vec_bd;
     SimVector<Elem_0040d550> values;
     SimVector<Elem_0040d550> locked;
-    unsigned int lastTick;             // +0xed
-    Point16 spacing0;                  // +0xf1
-    Point16 offset0;                   // +0xf5
-    int margin0;                       // +0xf9
-    Point16 spacing1;                  // +0xfd
-    Point16 offset1;                   // +0x101
-    int margin1;                       // +0x105
-    int searchRadius;                  // +0x109
+    unsigned int lastTick;
+    Point16 spacing0;
+    Point16 offset0;
+    int margin0;
+    Point16 spacing1;
+    Point16 offset1;
+    int margin1;
+    int searchRadius;
 
     PlayerAI(unsigned char player);
     void InitUnitTables();

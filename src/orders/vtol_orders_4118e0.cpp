@@ -1,12 +1,4 @@
 #include "../../interfaces/seams.h"
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// "Landing" order handler of air units landing on a pad unit (the order's
-// target). State 0 prepares the order (PrepVtolClimb) and picks a random
-// angle, state 1 looks for a free pad (FindLandingPad) and circles the pad
-// unit until one is free, states 2 to 5 approach the pad and land, and state
-// 6 hands the unit (or its cargo) to the pad and starts a "SELFREPAIR" order
-// when the pad repairs and the unit is damaged.
-// Kept: some header set is needed here or the state 6 health compare changes.
 #include "win_types.h"
 #include <math.h>
 
@@ -19,15 +11,11 @@ struct Unit;
 #include "path_order_attach.h"
 #include "mission_type.h"
 
-// Unused here: forward declarations of real functions; their symbol ids keep the
-// allocation of the functions after the merged views (docs/c2-regalloc.md).
 void UpdateMouseScroll();
 void UpdateEdgeScroll();
 void CenterCameraOnRadarClick();
 #include "../units/cob_script.h"
 
-// Unused here: these headers and forward declarations take the symbol ids that keep
-// VtolLandingOrder (0x4118e0) matching (docs/c2-regalloc.md).
 #include "../files/files_api.h"
 #include "../sound/sound.h"
 struct BmpFileHeader;
@@ -39,14 +27,12 @@ struct CalcedExplosion;
 #include "../units/unit_def.h"
 #include "../weapons/weapon_def.h"
 #include "../units/unit.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 void __stdcall ClearWeaponTarget(Unit*, int);
 void __stdcall DetonateUnitWeapon(Unit*, int);
 void __stdcall DrawUnit(void*, Unit*);
 
 #include "order.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall DirectionFromStep(int, int);
 #include "path_fx.h"
 #pragma pack(pop)
@@ -75,7 +61,6 @@ static inline Vec3 Add(const Vec3& a, const Vec3& b)
     return r;
 }
 
-// 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 {
     g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
@@ -91,7 +76,6 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     }
 }
 
-// 0x411840, matched in 0x411840.cpp; inlined into the cases below.
 int __stdcall FindLandingPad(Unit* unit, int pad)
 {
     if (pad != -1 && g_seams.map->IsPadSlotFree(unit, pad)) {
@@ -111,7 +95,6 @@ int __stdcall FindLandingPad(Unit* unit, int pad)
     return -1;
 }
 
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x4118e0
 int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
 {
@@ -148,7 +131,6 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
     }
     case 2: {
         Class_0044e250* obj = new (kSim) Class_0044e250(order, order->target, -1);
-        // The setters live in Class_0044e2d0; obj is another constructor view of the same object.
         ((Class_0044e2d0*)obj)->SetApproachRadius(0xa0);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;

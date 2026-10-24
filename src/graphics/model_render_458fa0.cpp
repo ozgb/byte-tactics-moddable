@@ -1,6 +1,3 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by Space Bunny Free, verified by GPT-6., retried by Claude Opus 5.5, matched by claude-opus-5-5. Names are provisional.
-// Keep <windows.h> and fewer than 58 symbols after it: the symbol count sets
-// the register choice.
 #include "win_types.h"
 
 struct Vertex_0045a610 {
@@ -17,7 +14,7 @@ struct Vertex_0045a610 {
 struct Map_00458fa0 {
     char unknown_0[0x241];
     unsigned int unknown_241 : 30;
-    unsigned int brightFaces : 1;    // +0x241 bit 30, the wider field
+    unsigned int brightFaces : 1;
     unsigned int unknown_242 : 1;
 };
 #pragma pack(pop)
@@ -34,9 +31,8 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color
     if (i >= 0) {
         Piece_459c70* piece = &model->pieces[i];
         while (i >= 0) {
-            // Byte flags local plus the empty do-while set the reload order after the copy loop.
             unsigned char flags = piece->flags.word;
-            do {} while (0);  // emits no code; the match needs it (header note 2)
+            do {} while (0);
             if (flags & 1) {
                 Object3do* info = piece->object;
                 Vertex_0045a610* v = (Vertex_0045a610*)piece->points.get();
@@ -51,7 +47,6 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color
                     verts[j].x += view->xOffset;
                     verts[j].y += view->yOffset;
                 }
-                // f is assigned in both arms, not set before the if.
                 Face_459c70* f;
                 if (info->firstFace != -1) {
                     f = (Face_459c70*)info->faces + 1;

@@ -1,11 +1,4 @@
 #include "../../interfaces/seams.h"
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash. Names are provisional.
-// VTOL patrol order handler ("Patrolling"). State 0 prepares the order
-// (PrepVtolClimb), state 1 clears the order's 0xe0 bits, state 2 flies to a
-// point 0x140 units away along the heading to the order's position, lands on a
-// free pad when damaged (VTOL_LANDING, as in 0x412710), or takes the next
-// queued order.
-// Kept: the flags/health block's register allocation depends on this include.
 #include "win_types.h"
 #include <vector>
 
@@ -35,7 +28,6 @@ int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall AppendOrder(Unit*, Order*);
 void __stdcall EnsurePatrolReturnOrder(Unit*, Order*);
 int __stdcall IssueAttackOrder(Unit*, Unit*, int);
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall VtolMoveOrder(Unit*, Order*, int);
 int __stdcall VtolFollowOrder(Unit*, Order*, int);
 int __stdcall VtolStandbyOrder(Unit*, Order*, int);
@@ -50,7 +42,6 @@ static inline Vec3 Offset(short angle, int distance)
     return v;
 }
 
-// 0x40f790, matched in 0x40f790.cpp; /Ob2 inlines it into state 2.
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b)
 {
     Vec3 r;
@@ -60,7 +51,6 @@ Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b)
     return r;
 }
 
-// 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 {
     g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
@@ -78,7 +68,6 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 
 
 static inline void Dummy(void) {}
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x410e70
 int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
 {
@@ -94,8 +83,6 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
         ((Class_0044e730*)obj)->SetApproachRadius(0x150);
         order->SetAttachedFx(obj);
         order->flags |= 0xe0;
-        // Landing block stays inline, no helper: the landed path returns 0
-        // through the plain scope-exit destructor.
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
             std::vector<Unit*> v;
             g_seams.ai->GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
@@ -107,8 +94,6 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
                 return 0;
             }
         }
-        // Empty Dummy() calls use up the inline budget so both vector
-        // destructor sites call _Destroy out of line.
         Dummy();
         Dummy();
         Dummy();

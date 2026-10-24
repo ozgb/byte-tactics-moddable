@@ -1,5 +1,3 @@
-// Decompiled by deepseek-v4.1-flash, space-bunny-free, GPT-6.1-sol and Haiku. Names are provisional.
-
 #include <stdlib.h>
 
 #pragma pack(push, 1)
@@ -8,8 +6,8 @@
 #include "../util/vec3.h"
 
 struct Struct_00499200_531 {
-    int next;                          // +0x0, the previous layer
-    int entries;                       // +0x4, the layer's gadget array
+    int next;
+    int entries;
 };
 
 #include "../map/mission.h"
@@ -111,11 +109,6 @@ void __stdcall HandleLeftClick(MouseEvent* mouse)
     }
 }
 
-
-// Order-button handler: when the game is not in order mode, selects the STOP
-// order (inlined body of 0x495860); otherwise dispatches on the order flags
-// (+0x2cc6): bit 1 cancels the current order, bit 0 switches to the 0x13
-// (STOP) selection, bit 2 hands a zero order kind to IssueOrderToSelection.
 // FUNCTION: 0x499100
 void __stdcall HandleRightClick(MouseEvent* mouse)
 {
@@ -161,11 +154,6 @@ static inline void SetCursor(int n)
     }
 }
 
-// Main-loop frame handler. Copies the 24-byte mouse record off g_game,
-// feeds it to the camera update, then runs the order/selection state machine
-// off the flags byte at +0x2cc6 and the mouse message stored in the block.
-// Advances the frame queues and, on the network/skirmish paths, flips the
-// end-of-frame hooks.
 // FUNCTION: 0x499200
 void BattleFrame(void)
 {
@@ -287,7 +275,6 @@ void BattleFrame(void)
     }
 
     if (g_game->restartMissionRequest != 0) {
-        // Each arm keeps its own copy of the hook stores, and `|= 4` in both: the compiler merges them.
         if (g_seams.map->GetGameType(g_game->net) == 1) {
             ShutdownIngameSystems();
             PopUntilNamedLayout(1);

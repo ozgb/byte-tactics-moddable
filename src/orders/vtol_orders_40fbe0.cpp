@@ -1,8 +1,3 @@
-// Decompiled by GPT-5.6 Astra, finished by deepseek-v4.1-flash and GPT-6, edited by deepseek-v4.1, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, finished by xiaomi/mimo-v2.6-pro, finished by Space Bunny Free, finished by Claude Opus 5.5. Names are provisional.
-// VTOL guard order handler ("Guarding"): the aircraft circles the guarded
-// unit, fights back against its attacker, repairs it, and takes over the
-// guarded unit's own build or reclaim order (as the VTOL_ variant of that
-// order). The ground twin is 0x406300.
 #include <stdio.h>
 #include "../state/block.h"
 #include "../util/vec3.h"
@@ -40,10 +35,8 @@ int __cdecl ScaledCos(short, int);
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }
 static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,(int)distance); return v; }
 
-// Used on the target argument of the order-steal calls: the plain chain changes codegen.
 static inline Unit* OrderTarget(Order*order) { return order->target; }
 
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x40fbe0
 int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
 {
@@ -60,7 +53,6 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             order->SetAttachedFx(move);
             return 2;
         }
-        // Copied through a pointer: assigning order->pos directly changes codegen.
         Vec3* dst=&order->pos;
         *dst=order->target->pos;
         switch(order->state) {
@@ -95,9 +87,6 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                             unsigned char i=0;
                             UnitWeaponSlot* weapon=unit->weapons;
                             do {
-                                // the test is in this sense on purpose: it is what
-                                // gives the loop the original's jump polarity, its
-                                // register for the pointer and its stack slots
                                 if (!((weapon->flags&2) && weapon->flags&0x10 && ((unsigned char)(((WeaponDef*)weapon->weapon)->flags.value >> 26)&1) == 0)) {
                                 } else {
                                     Unit* target=g_seams.targeting->GetWeaponTargetUnit(unit,i);
@@ -119,10 +108,6 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                     order->flags=0; return 3;
                 }
             }
-            // `order->target->list` is spelled out at every use, with no
-            // local for it: that is what makes MSVC reload it after each
-            // MissionType constructor call, and what frees the callee-saved
-            // register the block's zero constant ends up in.
             if (order->target->list && order->target->list->kind.index && (unit->def->flags1&0x40) &&
                 g_seams.units->CanRepair(unit, 0, order->target->list->target) &&
                 (order->target->def->flags1&0x40) && order->target->list &&

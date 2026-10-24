@@ -1,6 +1,3 @@
-// Decompiled by Opus, Sonnet, Haiku, space-bunny-free, GPT-6.1-sol, DeepSeek V4.1 Flash. Names are provisional.
-// The GUI library's key ring buffer, the virtual-key translation and the
-// cursor helpers.
 #include "win_types.h"
 #include <string.h>
 #include "../../interfaces/host.h"
@@ -8,10 +5,10 @@
 #pragma pack(push, 2)
 struct Queue_004c1ab0 {
     char unknown_0[0xf2];
-    int size;                          // +0xf2
-    int entries[30];                   // +0xf6
-    int head;                          // +0x16e
-    int tail;                          // +0x172
+    int size;
+    int entries[30];
+    int head;
+    int tail;
 };
 #pragma pack(pop)
 
@@ -28,7 +25,6 @@ Queue_004c1ab0* GetDisplay(void);
 extern int g_gfxBlitLockHeld;
 extern HANDLE g_gfxBlitLockEvent;
 
-// Empties the ring buffer (sibling of 0x4c1a60, which also resets head/tail).
 // FUNCTION: 0x4c1a40
 void ClearKeyQueue(void)
 {
@@ -37,8 +33,6 @@ void ClearKeyQueue(void)
     q->tail = 0;
 }
 
-// Sibling of 0x4c1ab0/0x4c1b00/0x4c1b20: (re)initialises the ring buffer,
-// clamping the requested size to the buffer's capacity (30 entries).
 // FUNCTION: 0x4c1a60
 void __stdcall InitKeyQueue(int size)
 {
@@ -58,8 +52,6 @@ void DestroyPreCleanup(void)
 {
 }
 
-// Pops the next entry from a small ring buffer (0 when empty); 0x4c1b00
-// peeks at it and 0x4c1b20 pushes.
 // FUNCTION: 0x4c1ab0
 int PopKey(void)
 {
@@ -68,7 +60,6 @@ int PopKey(void)
     if (q->head == q->tail) {
         v = 0;
     } else {
-        // Next index in a local, entry read as entries[next - 1]: sets the load order.
         int next = q->tail + 1;
         v = q->entries[next - 1];
         q->tail++;
@@ -90,17 +81,11 @@ int __cdecl PeekKey()
     return q->entries[tail];
 }
 
-// Pushes an entry onto the small ring buffer that 0x4c1ab0 pops and 0x4c1b00
-// peeks at; the entry is dropped when the buffer is full.
-// 0x4c1d50 calls this out of line at the variable-key sites; only its own
-// static inline clone (PushKey) is expanded, for the constant-key cases.
-// Must not be auto-inlined: 0x4c1d50 calls it out of line.
 #pragma auto_inline(off)
 // FUNCTION: 0x4c1b20
 void __stdcall PushKeyCode(int v)
 {
     Queue_004c1ab0* q = GetDisplay();
-    // Store indexes with `next`, but the full test recomputes q->head + 1 itself.
     int next = q->head + 1;
     if ((q->head + 1) % q->size != q->tail) {
         q->entries[next - 1] = v;
@@ -133,13 +118,6 @@ int __stdcall IsKeyDown(int key)
     return 0;
 }
 
-// Key handler: translates a virtual key to the game's internal key code and
-// pushes it onto the small ring buffer (0x4c1ab0/0x4c1b00/0x4c1b20). Cases
-// 0x21..0x2e push a constant, so MSVC inlines the push helper there and tail
-// merges the identical head-adjust blocks; the remaining sites call it out of
-// line.
-
-// PushKeyCode, inlined at the constant-key cases.
 static inline void PushKey(int v)
 {
     Queue_004c1ab0* q = GetDisplay();

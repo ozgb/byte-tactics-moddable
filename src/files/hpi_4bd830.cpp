@@ -1,12 +1,3 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro, finished by Space Bunny Free, finished by claude-sonnet-5-5, finished by DeepSeek V4.1 Flash, finished by opus. Names are provisional.
-// Stays in its own file: joined into hpi.cpp, its register allocation changes
-// (the entry-name strlen takes another register with the join's symbol ids),
-// and the bytes only match with this file's declarations.
-// Writes the file data of one package directory, recursing into
-// subdirectories. For each file entry it records the data offset, size and
-// compression flag in the directory buffer, then copies the file, either as
-// 64K blocks packed by SquashPack behind a table of block sizes, or raw in
-// 4K pieces, scrambling the bytes when a key is set.
 #include <stdio.h>
 #include <string.h>
 #include <io.h>
@@ -16,22 +7,22 @@
 #pragma pack(push, 1)
 struct Node_004bd830 {
     char unknown_0[0xc];
-    unsigned char obfuscate;             // +0xc
+    unsigned char obfuscate;
 };
 
 struct OPENHAPIFILE {
     void* fp;
-    int pos;                             // +0x4
-    Node_004bd830* node;                 // +0x8
-    int count;                           // +0xc
-    int unknown_10;                      // +0x10
-    char name[0x100];                    // +0x14
+    int pos;
+    Node_004bd830* node;
+    int count;
+    int unknown_10;
+    char name[0x100];
 };
 
 struct Info {
-    long offset;                         // +0x0
-    unsigned int size;                   // +0x4
-    unsigned char compressed;            // +0x8
+    long offset;
+    unsigned int size;
+    unsigned char compressed;
 };
 #pragma pack(pop)
 
@@ -46,13 +37,10 @@ int __stdcall SquashPack(void* chunk, int* chunkSize, char* data,
 unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
-// This forward declaration, Node_004bd830 and the casts in nblocks all stay.
 void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                             void (__cdecl* cb)(unsigned), unsigned extra,
                             int key, int flags);
 
-// The handle's file size, copied from hpi.cpp (0x4bbd00) so it is inlined
-// below.
 long __stdcall HAPI_FileLength(FileHandle* file)
 {
     if (file->shared != 0)
@@ -62,7 +50,6 @@ long __stdcall HAPI_FileLength(FileHandle* file)
     return 0;
 }
 
-// Whole 64K blocks of a byte size, rounded up.
 static inline int nblocks(unsigned w)
 {
     return (0 != (int)w % 65536) + (int)w / 65536;
@@ -115,7 +102,6 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                 pack = (unsigned char*)GameAllocIgnoreTag("Pack Buffer", packlen);
                 data = (unsigned char*)GameAllocIgnoreTag("Data Buffer", 0x10000);
                 remaining = info->size;
-                // remaining is decremented in the for-increment, not as the last body statement.
                 for (n = 0; n < blocks; n++, remaining -= 0x10000) {
                     int chunk;
                     chunk = remaining >= 0x10000 ? 0x10000 : remaining;

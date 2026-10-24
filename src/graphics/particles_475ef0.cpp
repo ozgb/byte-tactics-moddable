@@ -1,8 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by Space Bunny Free, finished by DeepSeek V4.1 Flash, finished by Space Bunny Free, finished by Claude Opus 5.5. Names are provisional.
 // FLAGS: /Gi
-// std::vector<Element_00475ef0>::insert(iterator, size_type, const _Ty&),
-// stock MSVC 5 <vector>, emitted out of line through a member pointer. The
-// caller (0x474880) grows the vector with reserve and fills it with insert.
 #include <vector>
 
 struct Element_00475ef0 {
@@ -13,8 +9,6 @@ typedef std::vector<Element_00475ef0> Vec_00475ef0;
 typedef void (Vec_00475ef0::*InsertFn_00475ef0)(
     Vec_00475ef0::iterator, Vec_00475ef0::size_type, Element_00475ef0 const&);
 
-// A use of operator= on this vector type, standing in for the original TU's
-// own; the insert's bytes need the TU to instantiate it.
 void __stdcall Assign_00475ef0(Vec_00475ef0* to, const Vec_00475ef0* from)
 {
     *to = *from;

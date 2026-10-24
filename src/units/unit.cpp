@@ -1,13 +1,8 @@
-// Decompiled by space-bunny-free, Haiku, deepseek-v4.1-flash, Claude Sonnet 5.5, GPT-6.1-sol, deepseek-v4.1 and mimo-v2.6-pro. Names are provisional.
-
-// <windows.h> is needed for CanRepair's operand order (see there).
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 
 #include "cob_script.h"
 
-// Unused here: the symbol ids these declarations take keep SetStateBits (0x48b090)
-// matching (docs/c2-regalloc.md).
 char IsMemFussy();
 char IsGonzo();
 char IsMemSet();
@@ -15,8 +10,6 @@ int GetMemSetValue();
 
 #include "unit_def.h"
 
-// Unused here: these headers and forward declarations take the symbol ids that keep
-// CanLoad (0x489a90) and SetStateBits (0x48b090) matching (docs/c2-regalloc.md).
 #include "../files/files_api.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
@@ -26,28 +19,26 @@ struct Unit;
 
 #pragma pack(push, 1)
 struct Point_004898b0 {
-    short a;                           // +0x0
-    short b;                           // +0x2
+    short a;
+    short b;
 };
 
 union Flags_004898b0 {
     struct {
         unsigned char bit0 : 1;
-        unsigned char bit1 : 1;        // tested with test al, 2
+        unsigned char bit1 : 1;
         unsigned char bit2 : 1;
         unsigned char bit3 : 1;
-        unsigned char bit4 : 1;        // tested with test al, 0x10
+        unsigned char bit4 : 1;
         unsigned char rest : 3;
     } bits;
     unsigned char all;
 };
 
-// Bit 19 is a one-bit bitfield (MSVC shifts it down to test it), while bit 8
-// of the same word is tested as a plain mask.
 union Flags_00489a90 {
     struct {
         unsigned int unknown_0 : 19;
-        unsigned int flag19 : 1;       // bit 19, tested with shr eax, 0x13
+        unsigned int flag19 : 1;
         unsigned int unknown_1 : 12;
     } bits;
     int all;
@@ -65,9 +56,9 @@ struct Node_00489a90 {
 #include "../network/player.h"
 
 struct ActivateFlagsPacket {
-    unsigned char type;                // +0x0
-    short unitId;                      // +0x1, the unit id
-    unsigned char activateFlags;       // +0x3, the new state
+    unsigned char type;
+    short unitId;
+    unsigned char activateFlags;
 };
 #pragma pack(pop)
 
@@ -87,8 +78,6 @@ int __stdcall BroadcastPacket(int player, void* data, int size);
 
 #include "../../interfaces/seams.h"
 
-// The twin of ClaimWeapons (0x4898b0) with bit 4 the other way round: it
-// requires bit 4 clear and then sets it.
 // FUNCTION: 0x489800
 void Unit::ReleaseWeapons(unsigned char index)
 {
@@ -111,13 +100,6 @@ void Unit::ReleaseWeapons(unsigned char index)
     }
 }
 
-// Clears the unit's target entry `index` (the same reset as ClearWeaponTarget) and
-// tells the unit's script "StartBuilding" and "TargetCleared", but only when
-// the entry's flag byte at +0x1b has bit 1 and bit 4 both set, and the entry
-// is not already clear. Note that bit 4 is *cleared* again on entry, so a set
-// bit 4 makes the test pass and then gets turned off: see the note at the end.
-// Index 3 is not an entry of its own: it recurses into 0 and 1 and then works
-// on entry 2, so the byte parameter is a plain unsigned char.
 // FUNCTION: 0x4898b0
 void Unit::ClaimWeapons(unsigned char index)
 {
@@ -128,7 +110,6 @@ void Unit::ClaimWeapons(unsigned char index)
     }
     UnitWeaponSlot* e = &weapons[index];
     if (((Flags_004898b0*)&e->flags)->bits.bit1 != 0 && ((Flags_004898b0*)&e->flags)->bits.bit4 != 0) {
-        // Bitfield view, not a byte mask: a mask folds the element offset into the address.
         ((Flags_004898b0*)&e->flags)->bits.bit4 = 0;
         int i = index;
         Point_004898b0* p = (Point_004898b0*)&weapons[i];
@@ -139,11 +120,6 @@ void Unit::ClaimWeapons(unsigned char index)
             g_seams.units->StartScriptWithArgs((CobScript*)script.get(), "TargetCleared", 0, 0, 1, i, 0, 0, 0);
         }
     }
-    // The guard only fires when bit 4 is *set* and then clears it, so this
-    // entry clears its target exactly once per set of bit 4 and never sets
-    // it. The twin at 0x489800 is the other way round (it requires bit 4 to be
-    // clear and then sets it), so this looks like the two halves of one
-    // "toggle the target flag" that was written twice instead of once.
 }
 
 // FUNCTION: 0x489960
@@ -168,10 +144,6 @@ int Unit::CanReclaim(void *param_1)
     return 0;
 }
 
-// Same class as 0x489a90: a `[ecx+0x92]` def pointer, the def flags word at
-// +0x245 and the def word at +0x241, and the g_game byte at +0x1427f.
-//
-// A yes/no test between two units of that class.
 // FUNCTION: 0x4899b0
 int Unit::CanRepair(Unit* other)
 {
@@ -183,14 +155,12 @@ int Unit::CanRepair(Unit* other)
             if (!(def->flags1 & 0x200000) && other->yWhole + other->def->field_170 < g_game->seaLevel)
                 goto fail;
         }
-        // Tests the same condition again, not an else.
         if (!(def->flags1 & 0x800)) {
             if (other->yWhole + other->def->field_170 < g_game->seaLevel - def->maxwaterdepth)
                 goto fail;
         }
         return 1;
     }
-    // Failures are a goto to this shared return 0, placed after the return 1.
 fail:
     return 0;
 }
@@ -208,8 +178,6 @@ int Unit::CountCargo()
     return count;
 }
 
-// A yes/no test between two units of that class: it returns 1 only when every
-// check below passes, and 0 from eight separate early returns.
 // FUNCTION: 0x489a90
 int Unit::CanLoad(Unit* other)
 {
@@ -231,17 +199,11 @@ int Unit::CanLoad(Unit* other)
         return 0;
     if (other->pos.y + theirDef->modelMaxY <= (g_game->seaLevel << 16))
         return 0;
-    if (other->buildLeft != 0.0f)           // the fcomp tests equality, not a range
+    if (other->buildLeft != 0.0f)
         return 0;
     return 1;
 }
 
-// Sets or clears bits of the unit's state byte at +0x10e and reacts to the three
-// bits that mean active (1), building (8) and working (4). The gained and the
-// lost bits are tested separately: each gained bit plays its script event and
-// its message, and losing the working bit (4) tells every object linked to this
-// unit (the list head at +0xa2) to update, then a network packet (0x11) tells
-// the owner when the owner is a real player (1 or 2).
 static inline int HasBit(unsigned char bits) { return 1 & bits; }
 
 static inline int LostBits(unsigned char was, int is) { return (unsigned char)was & ~is; }
@@ -250,14 +212,11 @@ static inline unsigned char GainedBits(unsigned char was, int is) { return (unsi
 
 static inline unsigned char AsByte(unsigned char bits) { return (unsigned char)bits; }
 
-// Unused here: a real declaration from the neighbouring COB code, kept
-// because its symbol ids are what SetStateBits matches at (docs/c2-regalloc.md).
 void FreeCobScript(int);
 
 // FUNCTION: 0x48b090
 void Unit::SetStateBits(int mask, int set)
 {
-    // Old state read through the in-class accessor: it fixes the set arm's load order.
     unsigned char lost, gained, old = GetState();
     int isOne, active;
     PathOrderAttach* link;
@@ -269,11 +228,6 @@ void Unit::SetStateBits(int mask, int set)
     activateFlags = (unsigned char)now;
     {
         if ((unsigned char)now != old) {
-            // LostBits returns int and narrows its first operand, and lost then
-            // goes round AsByte: that pair is what makes MSVC 5 compute `lost`
-            // into cl, the original's register, instead of into al. isOne and
-            // active are unused, and so are HasBit and GainedBits above; all
-            // four are dead weight the bytes need.
             lost = LostBits(old, now);
             unsigned char newLost = AsByte(lost);
             gained = ~old & now;

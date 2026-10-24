@@ -1,6 +1,3 @@
-// Decompiled by Opus. Names are provisional.
-// Returns 1 when camps\<name>.TDF can be opened (the file is closed again).
-
 struct FileHandle;
 
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);

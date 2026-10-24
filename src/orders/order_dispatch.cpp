@@ -1,9 +1,3 @@
-// Decompiled by Claude Sonnet 5.5, finished by DeepSeek V4.1 Flash and GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by claude-sonnet-5-5, finished by claude-opus-5-5. Names are provisional.
-//
-// Returns the order type (MissionType, built from its name) for an order of
-// type `mode` given by `unit` on `target` / `pos`. GetOrderCursor, the function just before this one
-// in the exe, is its sibling that returns the cursor code.
-// Keep the headers and the unused declarations below: their count before the function matters.
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 #include <stdio.h>
@@ -13,7 +7,7 @@
 
 struct Feature_0043e490 {
     char unknown_0[0xfe];
-    unsigned char flags; // +0xfe
+    unsigned char flags;
     char unknown_ff;
 };
 
@@ -22,33 +16,33 @@ struct Feature_0043e490 {
 #include "../units/unit_def.h"
 
 struct Size_0043e490 {
-    unsigned int width;  // +0x0
-    unsigned int height; // +0x4
+    unsigned int width;
+    unsigned int height;
 };
 
 #include "../network/player.h"
 
 struct Stats_0043e490 {
     char unknown_0[0x8c];
-    float f8c; // +0x8c
+    float f8c;
     char unknown_90[0x98 - 0x90];
-    float f98; // +0x98
+    float f98;
 };
 
 struct Limits_0043e490 {
     char unknown_0[0xc0];
-    float fc0; // +0xc0
-    float fc4; // +0xc4
+    float fc0;
+    float fc4;
 };
 
 struct Unit_0043e490 {
-    int motion; // +0x0
+    int motion;
     char unknown_4[0x10 - 0x4];
     Ref<Node_0043e490> f10;
     char unknown_14[0x48 - 0x14];
     Ref<Limits_0043e490> f48;
     char unknown_4c[0x6a - 0x4c];
-    char f6a[0x86 - 0x6a]; // +0x6a
+    char f6a[0x86 - 0x6a];
     Ref<Unit_0043e490> carrier;
     char unknown_8a[0x92 - 0x8a];
     Ref<UnitDef> def;
@@ -56,12 +50,12 @@ struct Unit_0043e490 {
     char unknown_9a[0xec - 0x9a];
     Ref<Stats_0043e490> fec;
     char unknown_f0[0xfb - 0xf0];
-    int postTransferHoldoff; // +0xfb
-    unsigned char playerIndex; // +0xff
+    int postTransferHoldoff;
+    unsigned char playerIndex;
     char unknown_100[0x104 - 0x100];
-    float buildLeft; // +0x104
+    float buildLeft;
     char unknown_108[0x110 - 0x108];
-    unsigned int flags; // +0x110
+    unsigned int flags;
 };
 
 struct Pos_0043e490 {
@@ -127,7 +121,7 @@ union Flags245_0043f0e0 {
 struct Node_0043f0e0 {
     char unknown_0[0x111];
     union {
-        unsigned int f111; // +0x111
+        unsigned int f111;
         Flags111_0043f0e0 f111bits;
     };
 };
@@ -135,53 +129,53 @@ struct Node_0043f0e0 {
 struct Def_0043f0e0 {
     char unknown_0[0x146];
     char unknown_146[0x156 - 0x146];
-    int f156; // +0x156
+    int f156;
     char unknown_15a[0x170 - 0x15a];
-    short f170; // +0x170
+    short f170;
     char unknown_172[0x1ee - 0x172];
     Ref<Node_0043f0e0> f1ee;
     char unknown_1f2[0x1fa - 0x1f2];
-    unsigned int f1fa; // +0x1fa
+    unsigned int f1fa;
     char unknown_1fe[0x241 - 0x1fe];
     union {
-        unsigned int f241; // +0x241
+        unsigned int f241;
         Flags241_0043f0e0 f241bits;
     };
     union {
-        unsigned int f245; // +0x245
+        unsigned int f245;
         Flags245_0043f0e0 f245bits;
     };
 };
 
 struct Size_0043f0e0 {
-    unsigned int width;  // +0x0
-    unsigned int height; // +0x4
+    unsigned int width;
+    unsigned int height;
 };
 
 struct Unit_0043f0e0 {
-    int motion; // +0x0
+    int motion;
     char unknown_4[0x10 - 0x4];
     Ref<Node_0043f0e0> f10;
     char unknown_14[0x2c - 0x14];
     Ref<Node_0043f0e0> f2c;
     char unknown_30[0x3b - 0x30];
-    unsigned char f3b; // +0x3b
+    unsigned char f3b;
     char unknown_3c[0x70 - 0x3c];
-    short f70; // +0x70
+    short f70;
     char unknown_72[0x86 - 0x72];
     Ref<Unit_0043f0e0> carrier;
     char unknown_8a[0x92 - 0x8a];
     Ref<Def_0043f0e0> def;
     Ref<Player> player;
     char unknown_9a[0xfb - 0x9a];
-    int postTransferHoldoff; // +0xfb
+    int postTransferHoldoff;
     unsigned char unknown_ff[1];
     char unknown_100[0x104 - 0x100];
-    float buildLeft; // +0x104
-    short health; // +0x108
+    float buildLeft;
+    short health;
     char unknown_10a[0x110 - 0x10a];
     union {
-        unsigned int flags; // +0x110
+        unsigned int flags;
         Flags110_0043f0e0 f110bits;
     };
 };
@@ -192,8 +186,6 @@ struct Pos_0043f0e0 {
     short zf, z;
 };
 
-// Unused here: these real declarations take the symbol ids of the removed
-// second Cell view (docs/c2-regalloc.md).
 void RegisterUnitOrders();
 void RegisterGroundOrders();
 void EnableAICommands();
@@ -204,7 +196,7 @@ void RegisterVtolOrders();
 
 struct Thing_0043f0e0 {
     char unknown_0[0xfe];
-    unsigned char ffe; // +0xfe
+    unsigned char ffe;
 };
 #pragma pack(pop)
 
@@ -212,7 +204,6 @@ extern Game* g_game;
 
 #include "../../interfaces/seams.h"
 #include "../units/unit.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall IsUnitCommander(Unit*);
 int __stdcall FindLandingPad(Unit*, int);
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
@@ -223,15 +214,9 @@ void __stdcall DrawUnit(void*, Unit*);
 MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
                                       Unit_0043f0e0* target, Pos_0043f0e0* pos);
 
-// GetOrderCursor as in 0x43e490.cpp (the annotated copy). It precedes GetOrderType in the
-// original file and is compiled first here for the compiler state it leaves; see the top.
 int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
                            Pos_0043e490* pos);
 
-// The same test as IsPointVisible: is the map square under pos in sight of the
-// local player? The width is read again through unit->player for the index;
-// MSVC folds it back into the CSE'd load, which it then reloads into edx for
-// the imul as the original does.
 static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
     Player* p = unit->player;
     int y, x;
@@ -241,9 +226,6 @@ static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
            0 != ((1 << g_game->playerIndex) & g_game->visibilityMask[x + y * unit->player->exploredWidth]);
 }
 
-// The feature on a map cell, as GetFeature in 0x4237d0.cpp but with the id in
-// a local: 0xfffe marks a cell covered by a larger feature whose origin cell
-// lies (offsetY, offsetX) cells back.
 static inline Feature_0043e490* GetFeature(Cell* cell) {
     if (cell == 0)
         return 0;
@@ -261,12 +243,6 @@ static inline Feature_0043e490* GetFeature(Cell* cell) {
     return &((struct Feature_0043e490 *)g_game->features)[id];
 }
 
-// Returns `result` from the calling function when the unit's def has `mask`
-// set and pos holds a visible feature flagged 0x80. A statement macro in the
-// usual do/while(0) form: the loop emits no code, but it is load-bearing for
-// register allocation. Without it (the same if-statement written out at each
-// site) case 2 loads unit into ebx before the target test instead of after it,
-// and an extra reload block of 20 bytes appears.
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \
     do {                                                             \
         if (((def)->flags2 & (mask)) && Visible((unit), (pos))) {      \
@@ -400,7 +376,6 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
     return 0x13;
 }
 
-// A ternary: the flag is tested before the name is loaded.
 static inline MissionType Pick(Def_0043f0e0* def, const char* vtol, const char* ground) {
     return MissionType(def->f241bits.flag_11 ? vtol : ground);
 }
@@ -541,10 +516,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
     case 12: {
         if (!(def->f245 & 0x400))
             break;
-        // Suspected original bug: the lookup runs before pos is tested, and GetMapCellAtPosition reads
-        // [pos] unchecked (0x4815a5), so a null pos crashes here although the tests below allow it.
         Thing_0043f0e0* t = Lookup(pos);
-        // RESURRECT check stays nested, with pos tested again for RECLAIM.
         if (pos && (def->f245 & 0x800)) {
             if (Visible(unit, pos) && t && (t->ffe & 0x80))
                 return MissionType("RESURRECT");
@@ -606,7 +578,6 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
         return Pick(def, "VTOL_MOVE", "MOVE_GROUND");
     case 1: {
         if (g_game->interfaceType == 1) {
-            // Both arms write out their recursive calls; a shared goto breaks register use.
             if ((def->f245 & 0x10) && enemy)
                 return GetOrderType(3, unit, target, pos);
             if ((def->f245 & 0x400) && enemy)

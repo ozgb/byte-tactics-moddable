@@ -1,4 +1,3 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -10,12 +9,12 @@
 #pragma pack(push, 1)
 struct Game_0049ee30 {
     char unknown_0[0x2c74];
-    unsigned short lockFlags;                // +0x2c74
+    unsigned short lockFlags;
     char unknown_2c76[0x37f31 - 0x2c76];
-    int lobbyTimeoutSecs;                    // +0x37f31
-    int netSendDropPct;                      // +0x37f35
+    int lobbyTimeoutSecs;
+    int netSendDropPct;
     char unknown_37f39[0x39245 - 0x37f39];
-    int cmdlineSkipIntroMovie;               // +0x39245
+    int cmdlineSkipIntroMovie;
 };
 #pragma pack(pop)
 
@@ -34,8 +33,6 @@ char* __stdcall Translate(char* text);
 void SetNoDirectSound();
 void SetUseWindowsSound();
 
-// Parses the command line. Returns 0 when the game should quit at once
-// (after -r registered it with DirectPlay), 1 otherwise.
 // FUNCTION: 0x49ee30
 int __stdcall ParseCommandLine(char* cmdLine, char* appName)
 {
@@ -169,7 +166,6 @@ int __stdcall ParseCommandLine(char* cmdLine, char* appName)
                 break;
             case 'R':
             case 'r': {
-                // Register with DirectPlay as a lobbyable application and quit.
                 char* args = cmdLine + (p - copy) + 2;
                 while (isspace(*args))
                     args++;

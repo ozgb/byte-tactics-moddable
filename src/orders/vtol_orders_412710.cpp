@@ -1,13 +1,4 @@
 #include "../../interfaces/seams.h"
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6.1-sol, edited by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, matched by Claude Opus 5.5. Names are provisional.
-// VTOL attack order handler ("Attacking"). With flags 0x1000a, or with no
-// target and order flag 0x200, it queues VTOL_SEEKATTACK instead; when out of
-// the order's range it gives up. State 0 prepares the order (PrepVtolClimb),
-// state 1 flies to a random point halfway to the target, state 2 attacks,
-// state 3 pulls away from the target, state 4 lands on a free pad when damaged
-// (VTOL_LANDING) or circles.
-// Kept: the health test's registers follow the file's symbol count, which the
-// IsDamaged helper and this include set fix.
 
 #include <math.h>
 #include <vector>
@@ -27,7 +18,6 @@ class Class_0044e730 { public: void SetApproachRadius(short); };
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
 #include "../weapons/weapon_def.h"
-// Unused here: these forward declarations take the symbol ids that keep 0x412710 matching (docs/c2-regalloc.md).
 struct Sound;
 struct HapiBank;
 struct TdfFile;
@@ -39,12 +29,10 @@ struct Weapon;
 struct Feature;
 #include "../network/player.h"
 #include "../units/unit.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall IsUnitCommander(Unit*);
 void __stdcall AlignUnitToGround(Unit*);
 
 #include "order.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall DirectionFromStep(int, int);
 int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
 void __stdcall ReactToAttack(Unit*, Unit*, int);
@@ -64,8 +52,6 @@ int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall AppendOrderToTail(Unit*, Order*);
 void __stdcall AppendOrder(Unit*, Order*);
 
-// The landing pad list. 0x410830 is its constructor; its implicit destructor
-// is an inline candidate under 41 IL, so ~vector sits one level down.
 class LandingPadList : public std::vector<Unit*> {};
 
 static inline Vec3 Offset(short angle, int distance)
@@ -77,7 +63,6 @@ static inline Vec3 Offset(short angle, int distance)
     return v;
 }
 
-// Empty inline call sites: see the header.
 static inline void Dummy(void) {}
 static inline int IsDamaged(Unit* u) { return (unsigned int)u->health < (u->def->maxHealth >> 2) * 3; }
 static inline int GetSpeed(Unit* unit)
@@ -100,13 +85,10 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     }
 }
 
-
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
 void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount);
 int __stdcall GetOrderName(Unit* obj);
 
-// Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x412710
 int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
 {
@@ -196,8 +178,6 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         ((Class_0044e730*)obj)->SetApproachRadius(0x80);
         order->SetAttachedFx(obj);
         order->flags = 0x100ea;
-        // The empty Dummy() calls make the landed ~vector call _Destroy out of
-        // line and the empty one inline it.
         Dummy();
         Dummy();
         Dummy();

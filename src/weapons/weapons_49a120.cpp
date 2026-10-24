@@ -1,8 +1,6 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
 #include <math.h>
 #include <string.h>
 
-// A 16.16 fixed-point value and its whole part.
 union Fixed_0049a120 {
     int raw;
     struct {
@@ -33,18 +31,18 @@ struct CellPos_0049a120 {
 #include "../network/player.h"
 
 struct Cell {
-    unsigned short unit;               // +0x0
-    unsigned short unit2;              // +0x2
+    unsigned short unit;
+    unsigned short unit2;
     char unknown_4[4];
-    unsigned short feature;            // +0x8
+    unsigned short feature;
     union {
-        unsigned short spot;           // +0xa
+        unsigned short spot;
         struct {
-            unsigned char offsetZ;     // +0xa
-            unsigned char offsetX;     // +0xb
+            unsigned char offsetZ;
+            unsigned char offsetX;
         } origin;
     };
-    unsigned char flags;               // +0xc
+    unsigned char flags;
 };
 
 struct Spot_0049a120 {
@@ -57,25 +55,23 @@ struct FeatureDef_0049a120 {
     char unknown_0[0x100];
 };
 
-// One view of the 0xe byte projectile detonate packet (type 0xe): the
-// receiver at 0x49af90 in the weapons file holds the other.
 struct ProjectileDetonatePacket {
-    unsigned char type;                // +0x0
+    unsigned char type;
     Vec3 aim;
-    unsigned char weaponIndex;         // +0xd
+    unsigned char weaponIndex;
 };
 
 struct Game_0049a120 {
     char unknown_0[0x141f3];
-    int projectileCount;               // +0x141f3
+    int projectileCount;
     Ref<Projectile> projectiles;
     char unknown_141fb[0x1420b - 0x141fb];
     Ref<Spot_0049a120> spots;
     char unknown_1420f[0x14233 - 0x1420f];
-    int mapWidthTiles;                 // +0x14233
-    int mapHeightTiles;                // +0x14237
+    int mapWidthTiles;
+    int mapHeightTiles;
     char unknown_1423b[0x1426f - 0x1423b];
-    FeatureDef_0049a120* features;     // +0x1426f
+    FeatureDef_0049a120* features;
     char unknown_14273[0x14287 - 0x14273];
     Ref<Cell> heightMap;
     char unknown_1428b[0x14357 - 0x1428b];
@@ -85,22 +81,16 @@ struct Game_0049a120 {
 
 extern Game_0049a120* g_game;
 
-// The system headers come after the game's own declarations, and only these
-// (lean windows.h, vector): the symbol ids they give cell, feature and g_game
-// decide the spot and feature address arithmetic.
 #define WIN32_LEAN_AND_MEAN
 #include "win_types.h"
 #include <vector>
 
-// What one explosion has already hit, so nothing takes damage twice.
 struct Hits_0049a120 {
     int numUnits;
     int numFeatures;
     Unit* units[20];
     Cell* features[64];
 
-    // Each returns 0 if the thing was hit already, else records it (while
-    // there is room) and returns 1.
     int AddUnit(Unit* unit)
     {
         for (int k = 0; k < numUnits; k++) {
@@ -158,13 +148,6 @@ static inline Vec3 Sub(const Vec3& a, const Vec3& b)
 
 #include "../../interfaces/seams.h"
 
-// Splash damage: every unit and feature within the weapon's radius of `pos`
-// takes damage that falls off from the centre, and weapons in flight close
-// enough are detonated too.
-// Stays in its own file: it is a gap region (one of data/functions.csv's 29
-// gap rows), and a file holding both a gap function and game functions is
-// classified gap by tools/sources.py, so the game build would leave the
-// other functions out.
 // FUNCTION: 0x49a120
 void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
 {
@@ -203,8 +186,6 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 UnitDef* def = unit->def;
                 Vec3 d;
                 {
-                    // The upper-bound sum is written in the test and again in the
-                    // block local `hi`, used once: the two sums become one temporary.
                     int p = pos->x;
                     if (p < unit->pos.x + def->modelMinX) {
                         int lo = unit->pos.x + def->modelMinX;
@@ -252,8 +233,6 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
 #else
                         float t = (float)distance / radius - 1.0f;
 #endif
-                        // Square t in place and assign the whole falloff back to t
-                        // before `scale = t`: sets the x87 stack lifetimes.
                         t *= t;
 #ifdef __clang__
                         t = (1.0f - (double)edge) * t + edge;
@@ -271,7 +250,6 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                         enemyDamage += damage;
                 }
             }
-            // A mask test (bit 14, unitsOnly): the bit-field form changes the code.
             if (weapon->type->flags.value & 0x4000)
                 continue;
             Cell* origin = cell;
@@ -314,8 +292,6 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
     }
 
     if (weapon->type->flags.b.interceptor) {
-        // Every field is read through `other` (no projectiles[j]): the derived
-        // pointer is stepped after it.
         Projectile* other = g_game->projectiles;
         for (int j = 0; j < g_game->projectileCount; j++, other++) {
             if ((other->flags & 2) || other == weapon)

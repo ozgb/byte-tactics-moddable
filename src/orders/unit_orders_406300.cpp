@@ -1,10 +1,6 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
-// Stays in its own file: in unit_orders.cpp the weapon slot loop keeps its counter in a register, where the original keeps it in memory.
-
 #include <stdio.h>
 #include "../state/block.h"
 #include "../util/vec3.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 class UnitMotion;
 struct Player;
 struct Unit;
@@ -29,9 +25,7 @@ int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }
 static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall GetOrderTarget(int param_1);
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int CheckDirectXVersion(int, int, int, int, int);
 struct Feature;
 // FUNCTION: 0x406300
@@ -86,7 +80,6 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
             if (!building && actionable) {
                 order->SetAttachedFx(0);
                 kind=order->target->list->kind;
-                // Target() and Position() on the base: keeps the two order->order loads from merging.
                 AppendOrder(unit,new (kSim) Order(kind,order->Target()->list->target,order->Target()->list->Position(),0,0,0));
                 order->flags=0; return 3;
             }

@@ -1,5 +1,3 @@
-// Decompiled by Opus, DeepSeek V4.1 Flash and Space Bunny Free. Names are provisional.
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -8,7 +6,7 @@
 #pragma pack(push, 1)
 struct Net_0044f9c0 {
     char unknown_0[0x4b5];
-    int from;                        // +0x4b5
+    int from;
 };
 #pragma pack(pop)
 
@@ -16,11 +14,9 @@ void __stdcall CountPacket(int size, int overhead, int sent);
 #include "../files/files_api.h"
 
 #pragma pack(push, 1)
-// The three byte header of a condensed packet: the kind (3 stored, 4
-// compressed) and the checksum of the data that follows.
 struct CondensedHeader {
-    unsigned char kind;                // +0x0
-    unsigned short sum;                // +0x1
+    unsigned char kind;
+    unsigned short sum;
 };
 
 #include "../game/game.h"
@@ -34,33 +30,29 @@ int HarnessViewRand();
 #pragma pack(push, 1)
 class NetCondenser {
 public:
-    char* buffer;                    // +0x0
-    int unknown_4;                   // +0x4
-    int unpackedCached;              // +0x8
-    int unpackedSize;                // +0xc
-    char* sendBuffer;                // +0x10
-    char* buffer_14;                 // +0x14
+    char* buffer;
+    int unknown_4;
+    int unpackedCached;
+    int unpackedSize;
+    char* sendBuffer;
+    char* buffer_14;
     union {
-        char* packet;                // +0x18
+        char* packet;
         CondensedHeader* header;
     };
-    unsigned char sendCount;         // +0x1c
-    int sendSize;                    // +0x1d
-    int to;                          // +0x21
+    unsigned char sendCount;
+    int sendSize;
+    int to;
 
     NetCondenser();
     ~NetCondenser();
     void Accumulate(void* data, int size);
     int ReceivePacket(void* net, char* data, int* size);
     int SendPacket(void* session, int from);
-    // 0x4626e0, in packets_4626e0.cpp: it was compiled with the packet code,
-    // which calls SendPacket where this file would inline it.
     void SendPacketTo(void* session, int from, int value, void* data, int size);
 };
 #pragma pack(pop)
 
-// Two global instances, with initialisers (0x44f720, 0x44f7e0) and atexit
-// destructors (0x44f7a0, 0x44f860).
 // FUNCTION: 0x44f720 _$E4
 // FUNCTION: 0x44f7a0 _$E2
 NetCondenser g_receiveCondenser;
@@ -84,8 +76,6 @@ NetCondenser::NetCondenser()
     to = 0;
 }
 
-// The out-of-line destructor of the net condenser class whose constructor is
-// 0x44f8a0 (the global copies at 0x44f720/0x44f7e0 inline the same body).
 // FUNCTION: 0x44f900
 NetCondenser::~NetCondenser()
 {
@@ -95,8 +85,6 @@ NetCondenser::~NetCondenser()
     delete[] buffer_14;
 }
 
-// Net condenser: copies an outgoing packet into the send buffer, growing it
-// past its default BUFFER_ACC_SIZE (0xaf0) when needed.
 // FUNCTION: 0x44f940
 void NetCondenser::Accumulate(void* data, int size)
 {
@@ -112,11 +100,6 @@ void NetCondenser::Accumulate(void* data, int size)
     sendCount++;
 }
 
-// A method of the net condenser (class layout from 0x44f8a0.cpp and
-// 0x44f940.cpp): finishes receiving a packet. If a decompressed buffer is
-// still pending it is copied out first; otherwise a DirectPlay packet is
-// received, its header and XOR checksum are verified and the payload is
-// decompressed (kind 4) or copied (kind 3).
 // FUNCTION: 0x44f9c0
 int NetCondenser::ReceivePacket(void* net, char* data, int* size)
 {
@@ -178,7 +161,6 @@ int NetCondenser::ReceivePacket(void* net, char* data, int* size)
             if (result != 0x8877001e)
                 return result;
         } else {
-            // Not dead: gives the shared error test two predecessors, so the compare is kept.
             goto common_check;
         }
 common_check:
@@ -190,10 +172,6 @@ common_check:
     return result;
 }
 
-// A method of the net condenser (class layout from 0x44f940.cpp and
-// 0x44f8a0.cpp): builds the outgoing packet in packet, a 3 byte header
-// (kind byte, 16 bit checksum) followed by the data XORed with its index,
-// then hands it to DirectPlay, or drops it to simulate packet loss.
 // FUNCTION: 0x44fc10
 int NetCondenser::SendPacket(void* session, int from)
 {
@@ -217,9 +195,6 @@ int NetCondenser::SendPacket(void* session, int from)
         memcpy(packet + 3, sendBuffer, sendSize);
     }
 
-    // Suspected original bug: the data spans packet[3 .. total-1], so this
-    // stops three bytes early. The last three data bytes go out unencrypted
-    // and are left out of the checksum. Kept as the original has it.
     unsigned short sum = 0;
     for (int i = 3; i < total - 3; i++) {
         packet[i] ^= (unsigned char)i;
@@ -228,7 +203,6 @@ int NetCondenser::SendPacket(void* session, int from)
     header->kind = flag;
     header->sum = sum;
 
-    // A simulated packet loss: the packet is thrown away unless the dice say so.
     int result;
     if (g_game->netSendDropPct != 0 && (int)((__int64)HarnessViewRand() * 101 / 32768) <= g_game->netSendDropPct)
         result = 0;

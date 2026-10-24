@@ -1,32 +1,4 @@
-// Decompiled by Haiku, Opus, Sonnet, DeepSeek V4.1 Flash, deepseek-v4.1, Claude Opus 5.5, claude-opus-5-5, Claude Sonnet 5.5, claude-sonnet-5-5, Sonnet 5.5, deepseek-v4.1-flash, space-bunny-free, Space Bunny Free, muse-spark-1.3-free, mimo-v2.6-pro, GPT-6 and GPT-6.1-sol. Names are provisional.
-//
-// The debug library (0x4d80b0 to 0x4e42a0) in address order: the
-// memfussy, gonzo and setmemory command-line switches, the game's
-// allocator and page protection, the debug fill pattern, the
-// allocator statistics, the free-block and file-record red-black
-// trees, the ErrorLog.txt crash reports with their stack traces and
-// symbol lookup (imagehlp, psapi), the unhandled exception filter and
-// debug thread, the memory status dialog, the performance status
-// dialog and its GDPERF counters, the Cavedog registry key and the
-// name table.
-//
-// The files the gathers left in their own places stay there: 0x4d8310,
-// 0x4d8870, 0x4d8d70, 0x4d9ab0, 0x4da120, 0x4da2c0, 0x4e16b0, 0x4e1e50
-// (with 0x4e20a0) and 0x4e35b0 are gap regions; 0x4dacf0, 0x4db610,
-// 0x4db7d0, 0x4dfd10, 0x4dfd50, 0x4e1990, 0x4e21f0, 0x4e2580 and
-// 0x4e2620 each match only in their own file (see the notes where the
-// rest of their part's functions sit).
-//
-// The join left four more functions in files of their own, because in
-// this file's symbol context their register allocation lands differently
-// (docs/c2-regalloc.md): 0x4da3f0 (debug_lib_4da3f0.cpp), 0x4db1c0
-// (free_block_map.cpp), 0x4e0b90 (memory_status_dialog.cpp) and
-// 0x4e3750 (debug_lib_4e3750.cpp).
 #define NOMINMAX
-// The debug library's allocator and page protection: the memfussy, gonzo and
-// setmemory command-line switches, the debug fill pattern, and the game's
-// malloc wrappers around them.
-// Renames the allocator's _Charalloc so the call carries the symbol name Allocate.
 #define _Charalloc Allocate
 #include <stdlib.h>
 #include <string.h>
@@ -40,9 +12,6 @@
 extern char g_memFussyQueried;
 extern char g_memFussyDefault;
 
-
-// The original calls this out of line from GetBlockSize, the allocator and
-// the page protection.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d80d0
 char IsMemFussy()
@@ -58,9 +27,6 @@ void MemFussyAtexitHandler(void)
 {
 }
 
-// The "gonzo" command-line switch, held in a function-local static
-// (see 0x4d80d0 for the "memfussy" twin).
-// The original calls this out of line from ProtectPages.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8140
 char IsGonzo()
@@ -78,8 +44,6 @@ void GonzoAtexitHandler(void)
 char IsMemSet();
 int GetMemSetValue();
 
-
-// The "setmemory" command-line switch, held in a function-local static.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8200
 char IsMemSet()
@@ -94,11 +58,9 @@ void MemSetAtexitHandler(void)
 {
 }
 
-// The "-memset" fill value, a hex or decimal command-line setting that
-// defaults to 0xdeadbeef (see 0x4d8200 for the "setmemory" switch).
 class CommandLineNumber {
 public:
-    int value;                         // +0x0
+    int value;
     CommandLineNumber(char* name, int a, int def, char* sw);
     ~CommandLineNumber() {}
 };
@@ -117,8 +79,6 @@ void SetValueAtexitHandler(void)
 {
 }
 
-// Fills n bytes at p with a repeating 4-byte pattern (a debug-heap fill; its
-// checking counterpart follows at 0x4d8310).
 #pragma auto_inline(off)
 // FUNCTION: 0x4d82c0
 void __cdecl FillPattern(void* p, unsigned int pattern, unsigned int n)
@@ -133,15 +93,8 @@ void __cdecl FillPattern(void* p, unsigned int pattern, unsigned int n)
 }
 #pragma auto_inline(on)
 
-// CheckFillPattern (0x4d8310) is gap code and stays in
-// src/debug/debug_lib_4d8310.cpp: tools/gapcheck.py sizes a region's functions
-// by the next annotation in the file, so a file that also holds functions
-// outside the region cannot be its source.
-
 unsigned int __cdecl LookupBlockSize(unsigned int key);
 
-// The original calls this out of line from GameRealloc, GameFree and
-// ProtectBlock.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8360
 size_t __cdecl GetBlockSize(void* p)
@@ -156,7 +109,6 @@ size_t __cdecl GetBlockSize(void* p)
 }
 #pragma auto_inline(on)
 
-// The original calls this out of line from AbortProgram.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8390
 void NopAbortHook(void)
@@ -183,8 +135,6 @@ void* __cdecl AllocDebugBlock(unsigned int size, int flags);
 void __cdecl CountAlloc(unsigned int size);
 extern void (*g_outOfMemoryHandler)();
 
-// The original calls this out of line from GameAllocIgnoreTag, GameAllocShared,
-// GameCalloc, GameStrdup and GameAllocThunk.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d83c0
 void* __cdecl GameAlloc(unsigned int size)
@@ -222,7 +172,6 @@ void* __cdecl GameAllocShared(unsigned int size)
     return GameAlloc(size);
 }
 
-// calloc-style allocation: count * size bytes from GameAlloc, zeroed.
 // FUNCTION: 0x4d8460
 void* __cdecl GameCalloc(unsigned int count, unsigned int size)
 {
@@ -237,7 +186,6 @@ void* __cdecl GameCalloc(unsigned int count, unsigned int size)
 
 void* __cdecl GameRealloc(void* block, unsigned int size);
 
-// The original calls this out of line from GameReallocIgnoreTag.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d84a0
 void* __cdecl GameReallocTagged(void* block, int unused_param_2, unsigned int size)
@@ -251,7 +199,6 @@ void* __cdecl ReallocDebugBlock(void* p, unsigned int size, int flags);
 void __cdecl CountFree(int size);
 int HarnessTestMode();
 
-// The original calls this out of line from GameReallocTagged.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d84c0
 void* __cdecl GameRealloc(void* block, unsigned int size)
@@ -306,7 +253,6 @@ void* __cdecl GameReallocIgnoreTag(int* block, int size)
 
 void __cdecl GameFree(void* p);
 
-// The original calls this out of line from GameFreeIndirectThunk.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d85a0
 void __cdecl GameFreeThunk(int* p)
@@ -317,9 +263,6 @@ void __cdecl GameFreeThunk(int* p)
 
 void __cdecl FreeDebugBlock(void* p, int flags);
 
-// The game's free(): under the allocator lock, either hands the block to the
-// "memfussy" debug heap or updates the allocation counters and frees it.
-// The original calls this out of line from GameFreeThunk.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d85b0
 void __cdecl GameFree(void* p)
@@ -344,7 +287,6 @@ void __cdecl GameFree(void* p)
 }
 #pragma auto_inline(on)
 
-// strdup() through the game's allocator.
 // FUNCTION: 0x4d8610
 char* __cdecl GameStrdup(char* s)
 {
@@ -370,7 +312,6 @@ void __cdecl GameFreeIndirectThunk(int* p)
     GameFreeThunk(p);
 }
 
-// The original calls this through a cast function pointer from ReportException.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8680
 char __cdecl AvWriteDetectStub(unsigned long)
@@ -381,10 +322,6 @@ char __cdecl AvWriteDetectStub(unsigned long)
 
 void __cdecl ProtectPages(int addr, int size, int protect);
 
-
-// Changes the protection of the whole pages inside [addr, addr + size),
-// only when IsGonzo (the "gonzo" switch) is on.
-// The original calls this out of line from the page protection wrappers.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d86b0
 void __cdecl ProtectPages(int addr, int size, int protect)
@@ -409,10 +346,6 @@ void __cdecl ProtectBlockReadOnly(void* p)
 
 void __cdecl RoundRangeToPages(unsigned int* start, unsigned int* end);
 
-// Changes the protection of a heap block, widened to whole pages when the
-// "memfussy" switch (IsMemFussy) is on.
-// The original calls this out of line from ProtectBlockReadOnly and
-// ProtectBlockReadWrite.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8720
 void __cdecl ProtectBlock(void* p, int protect)
@@ -434,20 +367,17 @@ void __cdecl ProtectBlockReadWrite(void* p)
 
 class BlockInfo {
 public:
-    unsigned int address;              // +0x00
-    long size;                         // +0x04
-    int allocNumber;                   // +0x08
-    char name[0x20];                   // +0x0c
-    unsigned int tag;                  // +0x2c
+    unsigned int address;
+    long size;
+    int allocNumber;
+    char name[0x20];
+    unsigned int tag;
 
     BlockInfo(void);
     BlockInfo(int p1, int p2, int p3, int p4, const char* p5);
     void SetName(char* newName);
 };
 
-
-
-// The original calls this out of line from the block-map lookups and the tree inserts.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8820 ??0BlockInfo@@QAE@HHHHPBD@Z
 BlockInfo::BlockInfo(int p1, int p2, int p3, int p4, const char* p5)
@@ -460,7 +390,6 @@ BlockInfo::BlockInfo(int p1, int p2, int p3, int p4, const char* p5)
 }
 #pragma auto_inline(on)
 
-// The original calls this out of line from the BlockInfo constructors.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8850
 void BlockInfo::SetName(char* newName)
@@ -476,12 +405,6 @@ void BlockInfo::SetName(char* newName)
 }
 #pragma auto_inline(on)
 
-// The debug library's crash reporting and command-line settings: the
-// ErrorLog.txt reports and stack traces, the fatal error handler, the
-// unhandled exception filter, the debug thread, DebugHelper.dll, the dialog
-// templates, the allocator statistics and the file-record map singleton.
-// The gap functions (0x4d8d70, 0x4d9ab0, 0x4da120, 0x4da2c0) stay in their
-// own files.
 #define NOMINMAX
 #include <stdio.h>
 #include <string.h>
@@ -491,29 +414,8 @@ void BlockInfo::SetName(char* newName)
 #include <math.h>
 #include <yvals.h>
 #include <memory>
-// Nothing here uses <io.h>: its symbols put NormalizeLineEndings in the
-// symbol-id window it matches in (docs/c2-regalloc.md).
 #include <io.h>
 
-
-
-
-
-// The fields are called min and max.
-
-
-
-
-
-
-
-
-
-
-
-
-
-// The out-of-memory handler, seen as a function pointer here and at 0x4da8d0.
 extern void (*g_outOfMemoryHandler)();
 
 // FUNCTION: 0x4d8e50
@@ -524,15 +426,6 @@ int __cdecl SetOutOfMemoryHandler(int handler)
     return temp;
 }
 
-// FatalError (0x4d9ab0) stays in src/debug/debug_lib_4d9ab0.cpp: it is the
-// source of a gap region (its __try/__except and `int 3` have no FPO record).
-
-
-// Finds a switch on the command line (case-insensitively) that ends at the
-// end of the line, a space or '=', and returns the text just after it, or 0.
-
-// The original calls this out of line from the CommandLineSwitch and
-// CommandLineNumber constructors.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d9f60
 char* __cdecl FindCommandLineSwitch(char* name)
@@ -554,12 +447,8 @@ char* __cdecl FindCommandLineSwitch(char* name)
 }
 #pragma auto_inline(on)
 
-// A command-line switch: `on` is set from the default, then forced on by
-// either on-switch and off by either off-switch (off wins).
-
 char* __cdecl FindCommandLineSwitch(char* name);
 
-// The original calls this out of line from IsMemFussy, IsGonzo and 0x4df160.
 #pragma auto_inline(off)
 // FUNCTION: 0x4d9fe0
 CommandLineSwitch::CommandLineSwitch(char* name, int a, char def, char* onSwitch,
@@ -573,13 +462,8 @@ CommandLineSwitch::CommandLineSwitch(char* name, int a, char def, char* onSwitch
 }
 #pragma auto_inline(on)
 
-// An integer command-line setting (e.g. "setvalue" / "-memset" in 0x4d8260):
-// starts at the default, then parses the text after the switch as hex
-// ("0x...") or decimal.
-
 char* __cdecl FindCommandLineSwitch(char* name);
 
-// The original calls this out of line from the setmemory switch and the fpufussy twin.
 #pragma auto_inline(off)
 // FUNCTION: 0x4da040
 CommandLineNumber::CommandLineNumber(char* name, int a, int def, char* sw)
@@ -598,9 +482,6 @@ CommandLineNumber::CommandLineNumber(char* name, int a, int def, char* sw)
 }
 #pragma auto_inline(on)
 
-
-// Same shape as the C runtime's abort(): report, raise SIGABRT, exit code 3.
-
 void NopAbortHook(void);
 
 // FUNCTION: 0x4da0c0
@@ -610,9 +491,6 @@ void AbortProgram(void)
     raise(SIGABRT);
     _exit(3);
 }
-
-// Returns whether arg starts (case-insensitively) with one of the 19 option
-// names in the table at 0x50c908 ("memfussy" ... "saveresources").
 
 extern char* g_debugKeywords[19];
 
@@ -626,30 +504,8 @@ bool __cdecl IsDebugKeyword(const char* arg)
     return false;
 }
 
-// The debug helpers ShowDebugMessage, CallDebugHelperDll and InitDebugSupport
-// (0x4da120) stay in src/debug/debug_lib_4da120.cpp: they are the source of a
-// gap region and are compiled with /Od (see the file's `// FLAGS:` line).
-
-
-
-
-
-
-
 extern char* __cdecl strrchr(const char*, int);
 
-
-// Opens a URL in the browser. It tries ShellExecuteA on the URL first; when
-// that fails (result <= 31) it looks the file association for the extension up
-// under HKEY_CLASSES_ROOT, reads the key's default value into buf1, builds
-// "<default>\shell\open\command" in the shared `sub` buffer, reads that
-// key's default value into buf2, trims the program path out of the command
-// line and finally runs that program with the URL as its parameter. If any of
-// that fails, the message box at the end reports the last ShellExecute result.
-// Callers pass a http:// URL and the extension to look up (".htm").
-
-
-// The original calls this out of line from the allocator, the block map and the trees.
 #pragma auto_inline(off)
 // FUNCTION: 0x4da780
 void* GetAllocLock()
@@ -677,7 +533,6 @@ extern unsigned int g_committedBytesPeak;
 extern unsigned int g_committedBytes;
 extern unsigned int g_freeBlockWraps;
 
-// The original calls this out of line from the allocator and the page protection.
 #pragma auto_inline(off)
 // FUNCTION: 0x4da7d0
 void __cdecl CountAlloc(unsigned int size)
@@ -697,7 +552,6 @@ void __cdecl CountAlloc(unsigned int size)
 }
 #pragma auto_inline(on)
 
-// The original calls this out of line from the allocator and the page protection.
 #pragma auto_inline(off)
 // FUNCTION: 0x4da840
 void __cdecl CountFree(int size) {
@@ -719,28 +573,21 @@ unsigned int __cdecl RoundUpToPage(int size)
     return (size + 0xfff) & 0xfffff000;
 }
 
-// Lazily built singleton for the game's file-record map (the std::_Tree whose
-// insert is 0x4dc680 and whose erase is 0x4dc910): allocate the 0x10-byte tree
-// object, make the _Nil node g_blockMapNil (black, self-null children) and the
-// head node (red, parent _Nil, both children itself), both carved from the
-// pooled free list at g_blockMapFreeList.
-
-extern void* g_blockMapFreeList;       // free list of 0x40-byte nodes
-extern void (*g_outOfMemoryHandler)();  // out-of-memory handler
-extern int g_blockMapLiveCount;        // bumped on every node carved here
-extern void* g_blockMap;               // the tree singleton
+extern void* g_blockMapFreeList;
+extern void (*g_outOfMemoryHandler)();
+extern int g_blockMapLiveCount;
+extern void* g_blockMap;
 
 struct Node_004da8d0 {
-    Node_004da8d0* left;               // +0x0
-    Node_004da8d0* parent;             // +0x4
-    Node_004da8d0* right;              // +0x8
-    char value[0x30];                  // +0xc
-    int color;                         // +0x3c (0 = red)
+    Node_004da8d0* left;
+    Node_004da8d0* parent;
+    Node_004da8d0* right;
+    char value[0x30];
+    int color;
 };
 
-extern void* g_blockMapNil;            // the tree's _Nil node
+extern void* g_blockMapNil;
 
-// The pool allocator that sits at +0 of the tree; its method ignores `this`.
 class BlockMapAllocator {
 public:
     void* Allocate(unsigned int n);
@@ -748,11 +595,11 @@ public:
 
 class Tree_004da8d0 {
 public:
-    char allocator;                    // +0x0
-    char key_compare;                  // +0x1
-    Node_004da8d0* head;               // +0x4
-    unsigned char multi;               // +0x8
-    int size;                          // +0xc
+    char allocator;
+    char key_compare;
+    Node_004da8d0* head;
+    unsigned char multi;
+    int size;
     void* operator new(unsigned int n) { return host_mem_alloc(n); }
     Tree_004da8d0(const char& a, const char& b);
     void Init();
@@ -788,14 +635,12 @@ void Tree_004da8d0::Init()
 {
     std::_Lockit lock;
     if (g_blockMapNil == 0) {
-        // The allocator is the tree's +0 member, which this view types as char.
         Node_004da8d0* nil =
             (Node_004da8d0*)((BlockMapAllocator*)this)->Allocate(0x40);
         nil->parent = 0;
         nil->color = 1;
         g_blockMapNil = nil;
         nil->left = 0;
-        // Reads the global back: nil->right would reuse the register.
         ((Node_004da8d0*)g_blockMapNil)->right = 0;
     }
     Node_004da8d0* nil = (Node_004da8d0*)g_blockMapNil;
@@ -817,7 +662,6 @@ inline Tree_004da8d0::Tree_004da8d0(const char& a, const char& b)
     Init();
 }
 
-// The original calls this out of line from the block-map lookups and the trees.
 #pragma auto_inline(off)
 // FUNCTION: 0x4da8d0
 void* GetBlockMap()
@@ -830,10 +674,6 @@ void* GetBlockMap()
 }
 #pragma auto_inline(on)
 
-// A lazily created singleton: a vector-like container (an empty allocator,
-// copied from an uninitialised default-argument temporary, then four zeroed
-// dwords) allocated with a class operator new that calls GlobalAlloc.
-
 template <class T, class A = std::allocator<T> >
 class Container_004da9f0 {
 public:
@@ -841,11 +681,11 @@ public:
         : allocator(al), field_4(0), field_8(0), field_c(0), field_10(0) {}
     static void* operator new(size_t size) { return host_mem_alloc(size); }
 
-    A allocator;       // +0x0
-    int field_4;       // +0x4
-    int field_8;       // +0x8
-    int field_c;       // +0xc
-    int field_10;      // +0x10
+    A allocator;
+    int field_4;
+    int field_8;
+    int field_c;
+    int field_10;
 };
 
 extern Container_004da9f0<int>* g_freedBlockRing;
@@ -860,84 +700,63 @@ Container_004da9f0<int>* GetFreedBlockRing()
     return g_freedBlockRing;
 }
 #pragma auto_inline(on)
-// The debug library's allocators: the free-block set (std::map<unsigned int,
-// unsigned int> as hand-walked red-black trees, GetFreeBlockSet 0x4db610)
-// and the game's file-record map (0x4dc680 insert, 0x4dc910 erase, 0x4dce00
-// find_, GetBlockMap 0x4da8d0), plus the single copies of the tree helpers
-// the linker folded together, the memfussy command-line switches, the debug
-// fill pattern and the block descriptions. AllocDebugBlock (0x4dacf0),
-// GetFreeBlockSet (0x4db610) and FreeDebugBlock (0x4db7d0) stay in their own
-// files: each inlines a tree helper (or constructs the std::map member) from
-// that file's own view of the types, which cannot agree with the gathered
-// file's one view of each class.
 #include <string.h>
 #include <set>
 #include <yvals.h>
 #include <map>
 #include <list>
 #include <time.h>
-// The real <vector> header must supply the body; a hand-rolled copy does not match.
 #include <vector>
 #include <algorithm>
-// ---- the types the gathered files share, unified ---------------------------
-
-// The debug allocator keeps its free blocks and the game its 0x30-byte file
-// records in hand-walked red-black trees. Each matched file named the nodes
-// and iterators in its own view; a name a symbol pins (data/progress.csv) is
-// kept, and the rest of a tree's views share the fullest one.
 
 class FreeBlockMap;
 
-extern void* DAT_00528a54;             // the free-block tree's _Nil node
-extern void* g_blockMapNil;            // the file-record tree's _Nil node
-extern void* g_freeBlockFreeList;      // the free-block tree's node free list
-extern void* g_blockMapFreeList;       // the file-record tree's node free list
-extern void (*g_outOfMemoryHandler)();  // out-of-memory handler
-extern unsigned int g_lastAllocOffset;  // offset the last block was handed out at
-extern unsigned int g_freeBlockWraps;  // how often the search wrapped around
-extern unsigned int g_committedBytes;  // bytes committed
-extern unsigned int g_committedBytesPeak;      // high-water mark of g_committedBytes
+extern void* DAT_00528a54;
+extern void* g_blockMapNil;
+extern void* g_freeBlockFreeList;
+extern void* g_blockMapFreeList;
+extern void (*g_outOfMemoryHandler)();
+extern unsigned int g_lastAllocOffset;
+extern unsigned int g_freeBlockWraps;
+extern unsigned int g_committedBytes;
+extern unsigned int g_committedBytesPeak;
 extern unsigned int g_allocSerial;
-extern FreeBlockMap* g_freeBlockSet;   // the free-block set singleton
+extern FreeBlockMap* g_freeBlockSet;
 
-// The file-record tree's node, the fullest of its views.
 struct Node_004daa30 {
-    Node_004daa30* left;           // +0x0
-    Node_004daa30* parent;         // +0x4
-    Node_004daa30* right;          // +0x8
-    BlockInfo value;              // +0xc
-    unsigned int color;            // +0x3c
+    Node_004daa30* left;
+    Node_004daa30* parent;
+    Node_004daa30* right;
+    BlockInfo value;
+    unsigned int color;
 };
 
-// size; each carves nodes from its own free list.
 class FreeBlockAllocator {
 public:
     void* Allocate(unsigned int n);
 };
 
 struct Pair_004db000 {
-    unsigned int offset;               // +0x0
-    unsigned int length;               // +0x4
+    unsigned int offset;
+    unsigned int length;
     Pair_004db000() {}
     Pair_004db000(unsigned int o, unsigned int l) : offset(o), length(l) {}
 };
 
 struct Node_004db000 {
-    Node_004db000* left;               // +0x0
-    Node_004db000* parent;             // +0x4
-    Node_004db000* right;              // +0x8
-    Pair_004db000 value;               // +0xc
-    int color;                         // +0x14
+    Node_004db000* left;
+    Node_004db000* parent;
+    Node_004db000* right;
+    Pair_004db000 value;
+    int color;
 };
 
-// The out-of-line _Min, taken on its own opaque node type.
 struct Node_004dd1b0 {
-    Node_004dd1b0* left;               // +0x0
+    Node_004dd1b0* left;
 };
 
 Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p);
 
-// The other out-of-line moves, on the shared node type.
 static inline Node_004db000* Max_004dd2a0(Node_004db000* p)
 {
     std::_Lockit lock;
@@ -973,8 +792,6 @@ static inline Node_004db000* Max_004dbd80(Node_004db000* p)
     return p;
 }
 
-// The free-block tree's iterator: one pointer. PrevNode is its _Dec(); Next
-// and Previous are its out-of-line operator++(int) and operator--(int).
 class FreeBlockIter {
 public:
     Node_004db000* ptr;
@@ -992,9 +809,9 @@ public:
     Node_004db000* Mynode() const { return ptr; }
     Node_004db000* _Mynode() const { return ptr; }
     void PrevNode();
-    void NextNode();                   // _Inc, out of line at 0x4dd340
-    FreeBlockIter Previous(int); // operator--(int)
-    FreeBlockIter Next(int); // operator++(int)
+    void NextNode();
+    FreeBlockIter Previous(int);
+    FreeBlockIter Next(int);
 
     void Inc()
     {
@@ -1029,18 +846,15 @@ public:
     }
 };
 
-// The file-record tree's iterator: one node pointer. PrevNode is its _Dec and
-// NextNode its _Inc.
 class BlockMapIter {
 public:
-    Node_004daa30* ptr;                // +0x0
+    Node_004daa30* ptr;
 
     BlockMapIter() {}
     BlockMapIter(Node_004daa30* q) : ptr(q) {}
     bool operator==(const BlockMapIter& o) const { return ptr == o.ptr; }
     BlockInfo& operator*() const { return ptr->value; }
     BlockInfo* operator->() const { return &ptr->value; }
-    // Calls NextNode (the _Inc at 0x4dde70) by that exact name.
     BlockMapIter operator++(int)
     {
         BlockMapIter _Tmp = *this;
@@ -1052,18 +866,14 @@ public:
     void NextNode();
 };
 
-// The (iterator, inserted) pair the trees' insert functions return: an
-// iterator then a byte. 0x4ddbe0 is its out-of-line constructor.
 class MapInsertResult {
 public:
-    FreeBlockIter first;              // +0x0
-    unsigned char second;             // +0x4
+    FreeBlockIter first;
+    unsigned char second;
 
     MapInsertResult() {}
     MapInsertResult(const FreeBlockIter& i, const unsigned char& b) : first(i), second(b) {}
     MapInsertResult(const BlockMapIter& i, unsigned char b) : first((Node_004db000*)i.ptr), second(b) {}
-    // The byte is copied before the iterator on purpose: 0x4dbbc0 needs the
-    // byte in cl and the dword in edx at every return.
     inline MapInsertResult(const MapInsertResult& o)
     {
         second = o.second;
@@ -1083,7 +893,6 @@ static inline Node_004daa30* Max_004dd820(Node_004daa30* p)
     return p;
 }
 
-// std::_Tree<...>::upper_bound returns this; the out-of-line copy is 0x4dbd20.
 class Iter_004dbd20 {
 public:
     Node_004db000* ptr;
@@ -1093,7 +902,7 @@ public:
 
 class Iter_004dbd00 {
 public:
-    Node_004db000* ptr;                // +0x0
+    Node_004db000* ptr;
 
     Iter_004dbd00() {}
     Iter_004dbd00(Node_004db000* p) : ptr(p) {}
@@ -1106,20 +915,17 @@ public:
     ConstIter_004dbd00(const Iter_004dbd00& x) : Iter_004dbd00(x) {}
 };
 
-// The game's file-record tree: a std::map keyed on the block address, as
-// hand-walked red-black tree code. The nodes are 0x40 bytes, carved from the
-// pool at g_blockMapFreeList; g_blockMapNil is its _Nil node.
 struct Less_004dd3d0 {
     bool operator()(const unsigned int& a, const unsigned int& b) const { return a < b; }
 };
 
 class BlockMap {
 public:
-    BlockMapAllocator allocator;       // +0x0
-    Less_004dd3d0 key_compare;         // +0x1
-    Node_004daa30* head;               // +0x4
-    unsigned char multi;             // +0x8
-    int size;                          // +0xc
+    BlockMapAllocator allocator;
+    Less_004dd3d0 key_compare;
+    Node_004daa30* head;
+    unsigned char multi;
+    int size;
 
     BlockMapIter Begin() { return BlockMapIter(head->left); }
     BlockMapIter End() { return BlockMapIter(head); }
@@ -1253,12 +1059,11 @@ struct Less_004db000 {
 };
 
 struct Pair_004db450 {
-    unsigned int offset;               // +0x0
-    int length;                        // +0x4
+    unsigned int offset;
+    int length;
 };
 
 struct InsertResult_004db450 { FreeBlockIter first; int second; };
-// The helper's one frame object: the pair, then the value_type.
 
 struct Frame_004db450 { InsertResult_004db450 r; Pair_004db450 p; };
 
@@ -1270,12 +1075,12 @@ class FreeBlockMap {
 public:
     enum Redbl { _Red, _Black };
 
-    FreeBlockAllocator allocator;      // +0x0
-    Less_004db000 key_compare;         // +0x1
-    Node_004db000* head;               // +0x4
-    bool multi;                        // +0x8
-    unsigned int count;                // +0xc
-    unsigned int total;                // +0x10
+    FreeBlockAllocator allocator;
+    Less_004db000 key_compare;
+    Node_004db000* head;
+    bool multi;
+    unsigned int count;
+    unsigned int total;
 
     static Node_004db000*& Left(Node_004db000* p) { return p->left; }
     static Node_004db000*& Parent(Node_004db000* p) { return p->parent; }
@@ -1350,21 +1155,15 @@ public:
         }
     }
 
-    // The constructor (0x4db610) stays in its own file: it is the one function
-    // that constructs the std::map member, whose _Init allocates the two
-    // sentinel nodes; the walkers below use the same bytes as raw fields.
     FreeBlockIter begin() { return FreeBlockIter(head->left); }
     FreeBlockIter end() { return FreeBlockIter(head); }
     unsigned int size() const { return count; }
-    // The original tests this as a value (sete; neg; sbb; inc; test), which
-    // MSVC 5 only does for a `!` applied to a bool-returning member.
     bool Neq(FreeBlockIter a, FreeBlockIter b) { return !(a == b); }
     FreeBlockIter upper_bound(const Pair_004db000& k)
     {
         return FreeBlockIter(LowerBound(k));
     }
 
-    // Inlined std::_Tree<...>::_Ubound(const _K&): its own lock scope.
     Node_004db000* Ubound(const unsigned int& kv)
     {
         std::_Lockit lock;
@@ -1378,12 +1177,9 @@ public:
         return y;
     }
 
-    // The original tests the iterators as a value (sete; neg; sbb; inc; test),
-    // which MSVC 5 only does for a `!` applied to a bool-returning member.
     inline void Tail(unsigned base, unsigned len, FreeBlockIter& it) {
     total += len;
     FreeBlockIter n;
-    // One frame object (pair, then value_type): separate locals move the stack slots.
     Frame_004db450 f;
     f.p.offset = base;
     f.p.length = len;
@@ -1414,10 +1210,8 @@ public:
     unsigned int TakeFreeBlock(unsigned int bytes);
     bool GrowReservation(unsigned int size);
 
-    // 0x4db450: reserve more address space and add it to the free blocks.
     bool Grow(unsigned int size)
     {
-        // len declared before base: the other order swaps the operands of base + len.
         unsigned int len = 0x10000000;
         unsigned int base;
 
@@ -1443,9 +1237,6 @@ public:
 
     FreeBlockIter Begin() { return FreeBlockIter(head->left); }
     int* Begin(int* out);
-    // A method that ignores `this`: its caller (0x4dbec0, an inlined tree insert
-    // after its std::_Lockit) sets ecx to the tree. Shaped like
-    // std::_Tree<...>::_Buynode(parent, colour) with a pooled allocator.
     Node_004db000* CreateNode(int parent, int color);
     MapInsertResult TreeInsert(const Pair_004db000& V);
     MapInsertResult InsertOrFind(const Pair_004db000& V);
@@ -1459,7 +1250,6 @@ public:
     Iter_004dbd20 UpperBound(const unsigned int& kv);
     Iter_004dc620 lower_bound(const unsigned int& kv);
     void lower_bound(FreeBlockIter* out, const unsigned int& kv);
-    // Takes the pair; the out-of-line function reads only its first dword.
     Node_004db000* LowerBound(const Pair_004db000& k);
     Node_004db000* LowerBound(const unsigned int& kv);
     void RotateLeft(Node_004db000* x);
@@ -1468,9 +1258,8 @@ public:
 
 FreeBlockMap* GetFreeBlockSet();
 
-// The <vector> the freed-block ring is (the real header supplies insert).
 struct Elem_004dd8c0 {
-    unsigned int w[0xc];               // +0x0, 0x30 bytes
+    unsigned int w[0xc];
 };
 
 class Alloc_004dd8c0 {
@@ -1495,7 +1284,6 @@ public:
     }
     void deallocate(pointer _P, size_type)
     {
-        // Must test the pointer before freeing.
         if (_P != 0)
             host_mem_free(_P);
     }
@@ -1511,13 +1299,6 @@ typedef std::vector<Elem_004dd8c0, Alloc_004dd8c0> Vec_004dd8c0;
 typedef void (Vec_004dd8c0::*InsertFn_004dd8c0)(
     Vec_004dd8c0::iterator, Vec_004dd8c0::size_type, const Elem_004dd8c0&);
 
-// The free functions the gathered functions call.
-// AllocDebugBlock (0x4dacf0), GetFreeBlockSet (0x4db610) and FreeDebugBlock
-// (0x4db7d0) stay in their own files: each inlines a tree helper written
-// against that file's own view of the classes (FreeBlockIter's begin/end in
-// 0x4dacf0, the std::map member's _Init in 0x4db610, the FreeBlockMap
-// upper_bound stub in 0x4db7d0), and the gathered file holds only one view
-// of each class.
 char IsMemFussy();
 char IsBackAlign();
 int GetDebugFillPattern();
@@ -1537,23 +1318,11 @@ void __cdecl FreeDebugBlock(void* p, int flags);
 void* __cdecl ReallocDebugBlock(void* p, unsigned int size, int flags);
 size_t __cdecl GetBlockSize(void* p);
 
-// ---- from src/debug/debug_lib_4daa30.cpp --------------------
-
-
-// ---- from src/debug/debug_lib_4dab10.cpp --------------------
-
-
-// ---- from src/debug/debug_lib_4dabb0.cpp --------------------
-
-
-// ---- from src/debug/free_block_map.cpp --------------------
-
 // FUNCTION: 0x4db000
 void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
 {
     FreeBlockIter it;
     FreeBlockIter it2;
-    // One function-scope object for all three calls: lets their identical endings merge.
     MapInsertResult result;
     unsigned char inserted;
 
@@ -1599,7 +1368,6 @@ void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
     if (less) {
         if (FreeBlockIter(y) == begin()) {
             inserted = 1;
-            // Insert call passed straight in, not via a local: fixes the argument push order.
             result.Assign(Insert(x, y, &p), inserted);
             goto done;
         }
@@ -1615,25 +1383,11 @@ void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
 done: ;
 }
 
-// The allocator's alloc(): look for a free block of `bytes` in the free-block
-// set, preferring the block the last allocation came from (g_lastAllocOffset),
-// take it out, hand back the leftovers on either side as new free blocks, and
-// if two passes over the set find nothing, reserve more address space (Grow,
-// the out-of-line copy of which is 0x4db450) and try again. g_freeBlockWraps
-// counts the wraps around the set and DAT_00528a54 is the tree's _Nil node.
-// 0x4db1c0 FreeBlockMap::TakeFreeBlock stays in src/debug/free_block_map.cpp: joined into
-// this file its register allocation lands differently
-// (docs/c2-regalloc.md).
-
-// ---- from src/debug/debug_lib_4db450.cpp --------------------
-
 // FUNCTION: 0x4db450
 bool FreeBlockMap::GrowReservation(unsigned int size)
 {
     unsigned int len = 0x10000000;
     unsigned int base;
-    // Once the reservation loop is done the parameter is dead, and the original
-    // reuses its stack slot for the map iterator.
     FreeBlockIter& it = *(FreeBlockIter*)&size;
 
     if (2 * size > len && size < 0x40000000u)
@@ -1654,7 +1408,6 @@ bool FreeBlockMap::GrowReservation(unsigned int size)
     Tail(base, len, *(FreeBlockIter*)&size);
     return true;
 }
-// ---- from src/debug/debug_lib_4db760.cpp --------------------
 
 // FUNCTION: 0x4db760
 char IsBackAlign(void)
@@ -1663,14 +1416,10 @@ char IsBackAlign(void)
     return g_backAlign.on;
 }
 
-// ---- from src/debug/debug_lib_4db7b0.cpp --------------------
-
 // FUNCTION: 0x4db7b0
 void BackAlignAtexitHandler(void)
 {
 }
-
-// ---- from src/debug/debug_lib_4db7c0.cpp --------------------
 
 // FUNCTION: 0x4db7c0
 int GetDebugFillPattern(void)
@@ -1678,9 +1427,6 @@ int GetDebugFillPattern(void)
     return 0xcccccccc;
 }
 
-// ---- from src/debug/debug_lib_4dba40.cpp --------------------
-
-// The original calls this out of line from GameRealloc.
 #pragma auto_inline(off)
 // FUNCTION: 0x4dba40
 void* __cdecl ReallocDebugBlock(void* p, unsigned int size, int flags)
@@ -1708,16 +1454,12 @@ void* __cdecl ReallocDebugBlock(void* p, unsigned int size, int flags)
 }
 #pragma auto_inline(on)
 
-// ---- from src/debug/debug_lib_4dbae0.cpp --------------------
-
-// The original calls this out of line from GetBlockSize.
 #pragma auto_inline(off)
 // FUNCTION: 0x4dbae0
 unsigned int __cdecl LookupBlockSize(unsigned int key)
 {
     void* cs = GetAllocLock();
     host_mutex_lock(cs);
-    // Named local fetched before rec is built: GetBlockMap must be called first.
     BlockMap* tree = (BlockMap*)GetBlockMap();
     BlockInfo rec(key, 0, 0, 0, 0);
     BlockMapIter it = tree->find(rec.address);
@@ -1731,9 +1473,6 @@ unsigned int __cdecl LookupBlockSize(unsigned int key)
 }
 #pragma auto_inline(on)
 
-// ---- from src/debug/debug_lib_4dbb90.cpp --------------------
-
-// The original calls this out of line from ProtectBlock.
 #pragma auto_inline(off)
 // FUNCTION: 0x4dbb90
 void __cdecl RoundRangeToPages(unsigned int* start, unsigned int* end)
@@ -1742,8 +1481,6 @@ void __cdecl RoundRangeToPages(unsigned int* start, unsigned int* end)
     *end = (*end + 0xfff) & 0xfffff000;
 }
 #pragma auto_inline(on)
-
-// ---- from src/debug/debug_lib_4dbbc0.cpp --------------------
 
 inline MapInsertResult FreeBlockMap::TreeInsert(const Pair_004db000& V)
 {
@@ -1781,14 +1518,6 @@ MapInsertResult FreeBlockMap::InsertOrFind(const Pair_004db000& V)
     return MapInsertResult(ans.first, ans.second);
 }
 
-// The out-of-line tree insert for the allocator's free-block map, shaped like
-// std::_Tree<...>::_Insert from MSVC 5's <xtree> but written out by hand.
-//
-// Under the outer std::_Lockit a 0x18-byte node is carved from the pool
-// (0x4ddd70), the pair is placement-new'd into it, the map's size is bumped and
-// the node is linked in. Then the red-black fixup walks up from the new node
-// with a cursor z, colouring and rotating until z's parent is black or the root
-// is reached, and finally blackens the root.
 // FUNCTION: 0x4dce60 ?Insert@FreeBlockMap@@QAE?AVFreeBlockIter@@PAUNode_004db000@@0PBUPair_004db000@@@Z
 FreeBlockIter FreeBlockMap::Insert(Node_004db000* x, Node_004db000* y,
                                          const Pair_004db000* v)
@@ -1796,21 +1525,19 @@ FreeBlockIter FreeBlockMap::Insert(Node_004db000* x, Node_004db000* y,
     std::_Lockit lock;
     Node_004db000* p = (Node_004db000*)allocator.Allocate(0x18);
     p->parent = y;
-    p->color = 0;                      // red
+    p->color = 0;
     p->left = (Node_004db000*)DAT_00528a54;
     p->right = (Node_004db000*)DAT_00528a54;
     new (&p->value) Pair_004db000(*v);
     ++count;
 
-    // A positive disjunction through the bool comparator: keeps the left-child block as the then-part.
     if (y == head || x != DAT_00528a54 || key_compare(v->offset, y->value.offset)) {
         y->left = p;
-        // The empty-tree case comes first and updates head->right, not head->left.
         if (y == head) {
-            head->parent = p;          // the root
-            head->right = p;           // the rightmost node
+            head->parent = p;
+            head->right = p;
         } else if (y == head->left) {
-            head->left = p;            // the leftmost node
+            head->left = p;
         }
     } else {
         y->right = p;
@@ -1819,7 +1546,6 @@ FreeBlockIter FreeBlockMap::Insert(Node_004db000* x, Node_004db000* y,
     }
 
     Node_004db000* z = p;
-    // Explicit break, and z->parent->... re-read from the cursor: parent/grandparent locals cost a register.
     while (z != head->parent) {
         if (z->parent->color != 0)
             break;
@@ -1827,7 +1553,6 @@ FreeBlockIter FreeBlockMap::Insert(Node_004db000* x, Node_004db000* y,
         if (z->parent == z->parent->parent->left) {
             Node_004db000* u = z->parent->parent->right;
             if (u->color == 0) {
-                // Red uncle: recolour and carry on two levels up.
                 z->parent->color = 1;
                 u->color = 1;
                 z->parent->parent->color = 0;
@@ -1863,23 +1588,17 @@ FreeBlockIter FreeBlockMap::Insert(Node_004db000* x, Node_004db000* y,
     return FreeBlockIter(p);
 }
 
-// ---- from src/debug/debug_lib_4dbd00.cpp --------------------
-
 // FUNCTION: 0x4dbd00
 ConstIter_004dbd00 FreeBlockMap::EraseCopyIter(ConstIter_004dbd00 it)
 {
     return Erase((Iter_004dbd00&)it);
 }
 
-// ---- from src/debug/debug_lib_4dbd20.cpp --------------------
-
 // FUNCTION: 0x4dbd20
 Iter_004dbd20 FreeBlockMap::UpperBound(const unsigned int& kv)
 {
     return Iter_004dbd20(Ubound(kv));
 }
-
-// ---- from src/debug/debug_lib_4dbd80.cpp --------------------
 
 // FUNCTION: 0x4dbd80
 FreeBlockIter FreeBlockIter::Next(int)
@@ -1889,8 +1608,6 @@ FreeBlockIter FreeBlockIter::Next(int)
     return tmp;
 }
 
-// Tree iterator operator--(int): copy the iterator, step it to the in-order
-// predecessor and return the copy. DAT_00528a54 is the tree's _Nil node.
 // FUNCTION: 0x4dbe10
 FreeBlockIter FreeBlockIter::Previous(int)
 {
@@ -1899,9 +1616,6 @@ FreeBlockIter FreeBlockIter::Previous(int)
     return tmp;
 }
 
-// ---- from src/debug/debug_lib_4dbeb0.cpp --------------------
-
-// 0x4db450's inlined Tail calls this out of line in the original.
 #pragma auto_inline(off)
 // FUNCTION: 0x4dbeb0
 int* FreeBlockMap::Begin(int* out)
@@ -1911,13 +1625,9 @@ int* FreeBlockMap::Begin(int* out)
 }
 #pragma auto_inline(on)
 
-// ---- from src/debug/debug_lib_4dbec0.cpp --------------------
-
 // FUNCTION: 0x4dbec0
 MapInsertResult FreeBlockMap::InsertOrFindInline(Pair_004db000* p)
 {
-    // The pair is returned by value (no out parameter) and _Insert returns its
-    // iterator by value too; a &p result slot would make p address-taken.
     Node_004db000* y = head;
     bool less = true;
     Node_004db000* x = y->parent;
@@ -2003,8 +1713,6 @@ MapInsertResult FreeBlockMap::InsertOrFindInline(Pair_004db000* p)
         return MapInsertResult(Insert(x, y, p), 1);
     return MapInsertResult(it2, 0);
 }
-
-// ---- from src/debug/debug_lib_4dc130.cpp --------------------
 
 // FUNCTION: 0x4dc130 ?Erase@FreeBlockMap@@QAE?AVFreeBlockIter@@V2@@Z
 FreeBlockIter FreeBlockMap::Erase(FreeBlockIter _P)
@@ -2119,8 +1827,6 @@ FreeBlockIter FreeBlockMap::Erase(FreeBlockIter _P)
     return (_P);
 }
 
-// ---- from src/debug/debug_lib_4dc620.cpp --------------------
-
 // FUNCTION: 0x4dc620
 Iter_004dc620 FreeBlockMap::lower_bound(const unsigned int& kv)
 {
@@ -2138,14 +1844,11 @@ Iter_004dc620 FreeBlockMap::lower_bound(const unsigned int& kv)
     return y;
 }
 
-// ---- from src/debug/debug_lib_4dc680.cpp --------------------
-
 // FUNCTION: 0x4dc680 ?Insert@BlockMap@@QAE?AVMapInsertResult@@PAVBlockInfo@@@Z
 MapInsertResult BlockMap::Insert(BlockInfo* p)
 {
     Node_004daa30* y = head;
     bool less = true;
-    // Read before the first _Lockit.
     Node_004daa30* x = y->parent;
     BlockMapIter it2;
     BlockMapIter it;
@@ -2217,7 +1920,6 @@ MapInsertResult BlockMap::Insert(BlockInfo* p)
             }
             head->parent->color = 1;
         }
-        // Outside the _Lockit scope: the pair is built after ~_Lockit.
         return MapInsertResult(it, 1);
     }
     it2 = BlockMapIter(y);
@@ -2230,8 +1932,6 @@ MapInsertResult BlockMap::Insert(BlockInfo* p)
         return MapInsertResult(*InsertHinted((BlockMapIter*)&p, x, y, p), 1);
     return MapInsertResult(it2, 0);
 }
-
-// ---- from src/debug/debug_lib_4dc910.cpp --------------------
 
 // FUNCTION: 0x4dc910
 BlockMapIter BlockMap::erase(BlockMapIter _P)
@@ -2367,16 +2067,12 @@ BlockMapIter BlockMap::erase(BlockMapIter _P)
     return (_P);
 }
 
-// ---- from src/debug/debug_lib_4dce00.cpp --------------------
-
 // FUNCTION: 0x4dce00
 BlockMapIter BlockMap::Find(const unsigned int& key)
 {
     BlockMapIter p = BlockMapIter(LowerBound(key));
     return (p == End() || key_compare(key, p.ptr->value.address)) ? End() : p;
 }
-
-// ---- from src/debug/debug_lib_4dd150.cpp --------------------
 
 // FUNCTION: 0x4dd150
 void FreeBlockMap::RotateLeft(Node_004db000* x)
@@ -2397,10 +2093,6 @@ void FreeBlockMap::RotateLeft(Node_004db000* x)
     x->parent = y;
 }
 
-// ---- from src/debug/debug_lib_4dd1b0.cpp --------------------
-
-// 0x4db1c0 calls this out of line in the original (Inc repeats the loop
-// inline only where the original did).
 #pragma auto_inline(off)
 // FUNCTION: 0x4dd1b0
 Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p)
@@ -2411,8 +2103,6 @@ Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p)
     return p;
 }
 #pragma auto_inline(on)
-
-// ---- from src/debug/debug_lib_4dd1f0.cpp --------------------
 
 // FUNCTION: 0x4dd1f0
 void FreeBlockMap::RotateRight(Node_004db000* x)
@@ -2433,8 +2123,6 @@ void FreeBlockMap::RotateRight(Node_004db000* x)
     x->parent = y;
 }
 
-// ---- from src/debug/debug_lib_4dd250.cpp --------------------
-
 // FUNCTION: 0x4dd250
 Node_004db000* FreeBlockMap::LowerBound(const unsigned int& kv)
 {
@@ -2449,10 +2137,6 @@ Node_004db000* FreeBlockMap::LowerBound(const unsigned int& kv)
     return y;
 }
 
-// ---- from src/debug/debug_lib_4dd2a0.cpp --------------------
-
-// The original calls this out of line from 0x4daa30 and 0x4db1c0;
-// their files had no definition to inline.
 #pragma auto_inline(off)
 // FUNCTION: 0x4dd2a0
 void FreeBlockIter::PrevNode()
@@ -2472,8 +2156,6 @@ void FreeBlockIter::PrevNode()
 }
 #pragma auto_inline(on)
 
-// ---- from src/debug/debug_lib_4dd340.cpp --------------------
-
 // FUNCTION: 0x4dd340
 void FreeBlockIter::NextNode()
 {
@@ -2489,10 +2171,6 @@ void FreeBlockIter::NextNode()
     }
 }
 
-// ---- from src/debug/debug_lib_4dd3d0.cpp --------------------
-
-// 0x4dbae0's inlined find calls this out of line in the original; its
-// file had no definition to inline.
 #pragma auto_inline(off)
 // FUNCTION: 0x4dd3d0
 BlockMapIter BlockMap::lower_bound(const unsigned int& key)
@@ -2500,8 +2178,6 @@ BlockMapIter BlockMap::lower_bound(const unsigned int& key)
     return BlockMapIter(Lbound(key));
 }
 #pragma auto_inline(on)
-
-// ---- from src/debug/debug_lib_4dd430.cpp --------------------
 
 // FUNCTION: 0x4dd430
 BlockMapIter BlockMap::InsertHinted(Node_004daa30* x, Node_004daa30* y,
@@ -2568,8 +2244,6 @@ BlockMapIter BlockMap::InsertHinted(Node_004daa30* x, Node_004daa30* y,
     return BlockMapIter(z);
 }
 
-// ---- from src/debug/debug_lib_4dd710.cpp --------------------
-
 // FUNCTION: 0x4dd710
 void BlockMap::RotateLeft(Node_004daa30* x)
 {
@@ -2588,8 +2262,6 @@ void BlockMap::RotateLeft(Node_004daa30* x)
     y->left = x;
     x->parent = y;
 }
-
-// ---- from src/debug/debug_lib_4dd770.cpp --------------------
 
 // FUNCTION: 0x4dd770
 void BlockMap::RotateRight(Node_004daa30* x)
@@ -2610,11 +2282,6 @@ void BlockMap::RotateRight(Node_004daa30* x)
     x->parent = y;
 }
 
-// ---- from src/debug/debug_lib_4dd7d0.cpp --------------------
-
-
-// ---- from src/debug/debug_lib_4dd820.cpp --------------------
-
 // FUNCTION: 0x4dd820
 void BlockMapIter::PrevNode()
 {
@@ -2632,12 +2299,8 @@ void BlockMapIter::PrevNode()
     }
 }
 
-// ---- from src/debug/debug_lib_4dd8c0.cpp --------------------
-
 // FUNCTION: 0x4dd8c0 ?insert@?$vector@UElem_004dd8c0@@VAlloc_004dd8c0@@@std@@QAEXPAUElem_004dd8c0@@IABU3@@Z
 InsertFn_004dd8c0 g_insert_004dd8c0 = &Vec_004dd8c0::insert;
-
-// ---- from src/debug/debug_lib_4ddbe0.cpp --------------------
 
 // FUNCTION: 0x4ddbe0
 MapInsertResult* MapInsertResult::Assign(int* iter, unsigned char* inserted)
@@ -2651,13 +2314,6 @@ MapInsertResult* MapInsertResult::Assign(int* iter, unsigned char* inserted)
     eax->second = dl;
     return eax;
 }
-// The debug library's image and symbol handling, and the performance status
-// dialog: the pooled tree-node allocators, the loaded-image reader (the FPO
-// records and the imagehlp symbol handler), the stack walkers and the
-// call-stack formatter, the system information dump, and the performance
-// window's settings and dialog procedure. The files of the module's fourth
-// part, gathered in address order.
-// Included only for its symbol count: the functions below match at this count.
 #include <math.h>
 #include <yvals.h>
 #include <stdio.h>
@@ -2670,9 +2326,8 @@ MapInsertResult* MapInsertResult::Assign(int* iter, unsigned char* inserted)
 #include <algorithm>
 #include "../state/sim_globals.h"
 
-// A 0x18-byte pooled node, allocated 0x155 at a time (one 0x2000 block).
-extern void* g_freeBlockFreeList;      // free list
-extern void (*g_outOfMemoryHandler)();  // out-of-memory handler
+extern void* g_freeBlockFreeList;
+extern void (*g_outOfMemoryHandler)();
 
 static inline Node_004db000* AllocNode_004db000()
 {
@@ -2700,11 +2355,6 @@ static inline Node_004db000* AllocNode_004db000()
     return node;
 }
 
-// A method that ignores `this`: its caller (0x4dbec0, an inlined tree insert
-// after its std::_Lockit) sets ecx to the tree. Shaped like
-// std::_Tree<...>::_Buynode(parent, colour) with a pooled allocator.
-
-// The original calls this out of line from the file-record tree insert.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddc00
 Node_004db000* FreeBlockMap::CreateNode(int parent, int color)
@@ -2716,13 +2366,8 @@ Node_004db000* FreeBlockMap::CreateNode(int parent, int color)
 }
 #pragma auto_inline(on)
 
-// std::_Tree<unsigned int, ...>::_Lbound(const key&) from MSVC 5's <xtree>,
-// written out by hand: g_blockMapNil is the tree's _Nil node, keys are
-// unsigned ints compared with less<>.
+extern void* g_blockMapNil;
 
-extern void* g_blockMapNil;            // the tree's _Nil node
-
-// The original calls this out of line from BlockMap::Find.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddc90
 Node_004daa30* BlockMap::LowerBound(const unsigned int& key)
@@ -2740,8 +2385,7 @@ Node_004daa30* BlockMap::LowerBound(const unsigned int& key)
 }
 #pragma auto_inline(on)
 
-// A 0x40-byte pooled node, allocated 0x80 at a time.
-extern void* g_blockMapFreeList;       // free list
+extern void* g_blockMapFreeList;
 
 static inline Node_004daa30* AllocNode_004daa30()
 {
@@ -2769,11 +2413,6 @@ static inline Node_004daa30* AllocNode_004daa30()
     return node;
 }
 
-// A method that ignores `this`: its caller (0x4dc680, an inlined tree insert
-// after its std::_Lockit) sets ecx to the tree. Shaped like
-// std::_Tree<...>::_Buynode(parent, colour) with a pooled allocator.
-
-// The original calls this out of line from the file-record tree insert.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddce0
 Node_004daa30* BlockMap::CreateNode(int parent, int color)
@@ -2785,15 +2424,6 @@ Node_004daa30* BlockMap::CreateNode(int parent, int color)
 }
 #pragma auto_inline(on)
 
-// Pool allocator for the g_freeBlockFreeList free list: refills it 0x2000 bytes at a
-// time (GlobalAlloc, retrying through the out-of-memory handler) by carving
-// n-byte pieces, then pops one piece. Identical to 0x4dddf0 apart from the
-// free list.
-
-// A method that ignores `this`: its callers (0x4db610, 0x4dce60) set ecx
-// to the tree whose nodes it allocates (the allocator sits at +0),
-// pushing the node size (0x18).
-// The original calls this out of line from the free-block tree.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddd70
 void* FreeBlockAllocator::Allocate(unsigned int n)
@@ -2822,15 +2452,6 @@ void* FreeBlockAllocator::Allocate(unsigned int n)
 }
 #pragma auto_inline(on)
 
-// Pool allocator for the g_blockMapFreeList free list: refills it 0x2000 bytes at a
-// time (GlobalAlloc, retrying through the out-of-memory handler) by carving
-// n-byte pieces, then pops one piece. Same shape as 0x4e2b60; 0x4ddce0 has
-// an inlined copy for 0x40-byte nodes.
-
-// A method that ignores `this`: its callers (0x4da8d0, 0x4dd430) set ecx
-// to the tree whose nodes it allocates (the allocator sits at +0),
-// pushing the node size (0x40).
-// The original calls this out of line from the file-record tree.
 #pragma auto_inline(off)
 // FUNCTION: 0x4dddf0
 void* BlockMapAllocator::Allocate(unsigned int n)
@@ -2859,10 +2480,6 @@ void* BlockMapAllocator::Allocate(unsigned int n)
 }
 #pragma auto_inline(on)
 
-// Shaped like std::_Tree<...>::const_iterator::_Inc() from MSVC 5's <xtree>
-// (step an iterator to the in-order successor) under a lock object;
-// g_blockMapNil is the tree's _Nil node. Compare 0x4dd710 and 0x4ddc90.
-
 static inline Node_004daa30* Min_004dde70(Node_004daa30* p)
 {
     std::_Lockit lock;
@@ -2871,7 +2488,6 @@ static inline Node_004daa30* Min_004dde70(Node_004daa30* p)
     return p;
 }
 
-// The original calls this out of line from the const_iterator increment.
 #pragma auto_inline(off)
 // FUNCTION: 0x4dde70
 void BlockMapIter::NextNode()

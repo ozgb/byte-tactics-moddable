@@ -1,21 +1,9 @@
-// Decompiled by Haiku, space-bunny-free, Opus, deepseek-v4.1-flash, GPT-6.1-sol, mimo-v2.6-pro and Sonnet 5.5. Names are provisional.
-//
-// Command arguments (%N), the named command handler table and the command
-// dispatch. The static vector's symbol id (the $S suffix of
-// s_commandTable$S4554, the name data/symbols.csv records for it) counts the
-// declarations before it: <vector>, the forward declaration and the three
-// declarations below put it at 4554, and the other headers go after it so
-// they do not move that id.
-
 #include <vector>
 
 class CommandEntry;
 
 class StringRef;
 
-// Unused here: the symbol ids these declarations take keep the file-local
-// s_commandTable's id (data/symbols.csv's s_commandTable$S4554) at 4554; the
-// handle itself is declared where its first methods were (docs/c2-regalloc.md).
 int GetLocalizedString(void*, char*, const char*, int, char*, char*);
 
 struct Pair_004b7620 {
@@ -26,10 +14,6 @@ struct Pair_004b7620 {
 
 int __cdecl atoi(const char* str);
 
-// The file-local sorted handler table. An element is 12 bytes: a
-// reference-counted string handle and two ints; its destructor releases the
-// handle through ReleaseRef. The compiler generates the initialiser
-// (0x4b75a0) and the destructor it registers with atexit (0x4b75d0).
 // FUNCTION: 0x4b75a0 _$E5
 // FUNCTION: 0x4b75d0 _$E3
 static std::vector<CommandEntry> s_commandTable;
@@ -68,19 +52,16 @@ struct NameNe_004b7620 {
 typedef void (__stdcall *Handler_004b7620)(void*);
 
 struct ConsoleCommand {
-    const char* name;                  // +0x0
-    Handler_004b7620 fn;               // +0x4
-    int mask;                          // +0x8
+    const char* name;
+    Handler_004b7620 fn;
+    int mask;
 };
 
-// No explicit destructor: the implicit one destroys handle through
-// StringRef's destructor (an explicit handle.ReleaseRef() would release it
-// twice).
 class CommandEntry {
 public:
-    StringRef handle;             // +0x0
-    int value1;                        // +0x4
-    int value2;                        // +0x8
+    StringRef handle;
+    int value1;
+    int value2;
 
     CommandEntry(const StringRef& h, Pair_004b7620 pp);
     CommandEntry(const CommandEntry& other);
@@ -99,10 +80,10 @@ CommandEntry::CommandEntry(const StringRef& h, Pair_004b7620 pp) : handle(h)
 
 class CommandArgs {
 public:
-    char* args[0x14];                  // +0x00 token pointers
-    char buffer[0x7e];                 // +0x50 the tokens' text
+    char* args[0x14];
+    char buffer[0x7e];
     char unknown_ce[2];
-    int count;                         // +0xd0 token count
+    int count;
 
     void Tokenize(char* text, char* end);
     CommandArgs* InitArgs();
@@ -111,21 +92,15 @@ public:
     float GetFloatArg(int index, float default_val);
     void ShiftArgs(int n);
 
-    // Inline copy of the range-checked getter at 0x4b73c0; its redundant
-    // range check folds away but the extra use of `other` decides registers.
     char* GetArgPtr(int index, char* def)
     {
         if (index < 0 || index >= count) return def;
         return args[index];
     }
 
-    // Replaces each "%N" argument with argument N of another list.
     void SubstituteArgs(CommandArgs* other);
 };
 
-// The original calls these out of line from ExecuteCommand (GetArg) and
-// ExecuteCommandText (InitArgs, Tokenize); in this file /Ob2 would inline
-// them into the callers.
 #pragma auto_inline(off)
 
 // FUNCTION: 0x4b73b0
@@ -221,7 +196,6 @@ void CommandArgs::ShiftArgs(int n)
     count -= n;
 }
 
-// The original calls this out of line from ExecuteCommandText.
 #pragma auto_inline(off)
 // FUNCTION: 0x4b74f0
 void CommandArgs::SubstituteArgs(CommandArgs* other)
@@ -245,16 +219,9 @@ void ClearDefaultCommandHandler()
     g_defaultCommandMask = 0;
 }
 
-// Registers one named handler in the file-local sorted handler table. It
-// binary-searches the table case-insensitively with _strcmpi for the name, and
-// if the exact-case name is not present (a plain strcmp of the element tells)
-// inserts a new 12-byte element, then stores the handler pointer and its mask
-// into the element. Called by 0x406f00 with "plan", "weight" and "limit". This
-// is the out-of-line form of the inner body of 0x4b7760.
 // FUNCTION: 0x4b7620
 void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
 {
-    // Built before key: the tail copies the pair from this local.
     Pair_004b7620 p((int)fn, mask);
     StringRef key(name);
     CommandEntry* first = s_commandTable.begin();
@@ -268,7 +235,6 @@ void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
         else
             last = mid;
     }
-    // int* slot: the original stores through [esi]/[esi+4].
     int* slot;
     if (first == s_commandTable.end() || NameNe_004b7620()(first->handle, key)) {
         CommandEntry e(key, Pair_004b7620(0, 0));
@@ -284,7 +250,6 @@ void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
 // FUNCTION: 0x4b7760
 void __stdcall RegisterCommands(ConsoleCommand* rec)
 {
-    // for, not while: puts the record increment after the key destructor.
     for (; rec->name; rec++) {
         int mask = rec->mask;
         Handler_004b7620 fn = rec->fn;
@@ -300,7 +265,6 @@ void __stdcall RegisterCommands(ConsoleCommand* rec)
             else
                 last = mid;
         }
-        // int* slot: the original stores through [esi]/[esi+4].
         int* slot;
         if (first == s_commandTable.end() || NameNe_004b7620()(first->handle, key)) {
             CommandEntry e(key, Pair_004b7620(0, 0));
@@ -323,8 +287,8 @@ void __stdcall SetDefaultCommandHandler(int callback, int mask)
 }
 
 struct HandlerSlot_004b7900 {
-    Handler_004b7620 fn;               // +0x4
-    int mask;                          // +0x8
+    Handler_004b7620 fn;
+    int mask;
 };
 
 static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
@@ -344,14 +308,6 @@ static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
     return (HandlerSlot_004b7900*)&first->value1;
 }
 
-// Runs the command in obj: takes its first argument, lowercases it, looks the
-// name up in the file-local sorted handler table and calls the handler whose
-// mask matches the given mask, or else the global default handler registered by
-// 0x4b78e0. Returns the mask of the handler that ran, or 0.
-//
-// The handler is called through a reinterpreted HandlerSlot view of the two
-// ints at +4/+8 of the element.
-// The original calls this out of line from ExecuteCommandText.
 #pragma auto_inline(off)
 // FUNCTION: 0x4b7900
 int __stdcall ExecuteCommand(CommandArgs* obj, int mask)
@@ -374,8 +330,6 @@ int __stdcall ExecuteCommand(CommandArgs* obj, int mask)
 
 #pragma auto_inline(on)
 
-// The newline search at 0x4b7a10 (the function just before this one in the
-// original file), defined here so /Ob2 inlines it as the original did.
 // FUNCTION: 0x4b7a10
 int __stdcall FindLineEnd(char* text, int length)
 {
@@ -387,9 +341,6 @@ int __stdcall FindLineEnd(char* text, int length)
     return length;
 }
 
-// Runs a block of command lines: splits the text at newlines, parses each line
-// into a command object (Tokenize), substitutes "%N" arguments from vars
-// (SubstituteArgs) and executes it (ExecuteCommand); returns the OR of the results.
 // FUNCTION: 0x4b7a30
 int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask)
 {
@@ -415,23 +366,16 @@ void NopRet(void)
 {
 }
 
-// Empties the file-local global vector created by 0x4b75a0 (destroyed by
-// 0x4b75d0): the inlined vector::clear() runs each element's destructor.
 // FUNCTION: 0x4b7ad0
 void ClearCommandTable()
 {
     s_commandTable.clear();
 }
 
-// std::vector<CommandEntry>::insert(iterator, size_type, const T&), out of
-// line: 12-byte elements holding a reference-counted string handle and two
-// ints. The copy constructor is 0x4b7e30 and the assignment 0x4b7e00; the
-// destructor releases the handle through 0x4c9390.
 typedef std::vector<CommandEntry> Vec_004b7b00;
 typedef void (Vec_004b7b00::*InsertFn_004b7b00)(
     Vec_004b7b00::iterator, Vec_004b7b00::size_type, const CommandEntry&);
 
-// Taking insert's address is what emits the template instantiation.
 // FUNCTION: 0x4b7b00 ?insert@?$vector@VCommandEntry@@V?$allocator@VCommandEntry@@@std@@@std@@QAEXPAVCommandEntry@@IABV3@@Z
 InsertFn_004b7b00 g_insert_004b7b00 = &Vec_004b7b00::insert;
 
@@ -444,7 +388,6 @@ void* CommandEntry::AssignEntry(int* source)
     return this;
 }
 
-// Copy constructor of a {string handle, int, int} record.
 // FUNCTION: 0x4b7e30 ??0CommandEntry@@QAE@ABV0@@Z
 CommandEntry::CommandEntry(const CommandEntry& other)
     : handle(other.handle), value1(other.value1), value2(other.value2)

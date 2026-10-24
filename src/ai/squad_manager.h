@@ -1,11 +1,4 @@
 #include "../../interfaces/ref.h"
-// SquadManager: the AI controller behind Player::ai, 0x3d bytes, one per
-// player (the constructor at 0x408cb0 is called from the player setup). It owns
-// ten SquadTimer slots, one per unit group of the player, ticks them and
-// retargets the player's weapons round-robin through a unit cursor. The one
-// declaration of the class, for ai_player.cpp and every file that reaches it
-// through a Player; the types behind the pointers stay private to their own
-// files.
 #ifndef SQUAD_MANAGER_H
 #define SQUAD_MANAGER_H
 
@@ -18,10 +11,10 @@ class SquadTimer;
 class SquadManager {
 public:
     Ref<Player> player;
-    unsigned char index;               // +0x4, the player's index
-    int countdown;                     // +0x5
-    int unused_9;                      // +0x9
-    int nextAction;                    // +0xd
+    unsigned char index;
+    int countdown;
+    int unused_9;
+    int nextAction;
     Ref<SquadTimer> timers[10];
     Ref<Unit> cursor;
 

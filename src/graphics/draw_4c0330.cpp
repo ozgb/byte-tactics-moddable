@@ -1,37 +1,21 @@
-// Decompiled by Sonnet 5.5, finished by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
-//
-// Fills a convex polygon with one colour, into `surface` or into the locked
-// screen when `surface` is null. It finds the top and bottom vertices and the
-// horizontal extent, rejects the polygon when it lies wholly outside the
-// surface's clip rect, then walks the left edges (backwards from the top
-// vertex to the bottom one) and the right edges (forwards) into a table of
-// per-scanline x positions with 16.16 steps, and finally fills each scanline
-// span clipped to the rect. Returns 1 when something was drawn.
-// memset is the only call; the smaller header keeps the symbol ids in range
-// after the Surface view became surface.h (docs/c2-regalloc.md).
 #include <memory.h>
 
 #include "surface.h"
 #include "../util/point.h"
 
 struct Span_004c0330 {
-    int left;                          // +0x0
-    int right;                         // +0x4
+    int left;
+    int right;
     int unknown_8[8];
 };
 
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
 
-// Unused here: real declarations from the draw module whose symbol ids keep
-// ScanFillPolygon's allocation after the Surface view became surface.h
-// (docs/c2-regalloc.md).
 int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl BlitLine(Surface* dst, int x0, int y0, int x1, int y1, int color);
 int __stdcall ClipRectangle(Surface* surface, Rect* r);
 
-// Not gathered into draw.cpp: merged, dy stays in a register where the original
-// spills it, which takes 4 bytes off the frame and moves the block codegen.
 // FUNCTION: 0x4c0330
 int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned char color)
 {
@@ -46,7 +30,6 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
     int minIdx;
     int maxIdx;
     int i;
-    // j stays at function scope.
     int j;
     int dy;
 
@@ -64,7 +47,6 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
     minX = 999999;
     maxX = -999999;
     for (i = 0; i < n; i++) {
-        // Test order y min, y max, x max, x min fixes the register homes.
         int y = points[i].y;
         if (y < minY) {
             minY = y;
@@ -137,7 +119,6 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
                 sp++;
             }
         }
-        // Wrap recomputed from the raw i - 1 here, not copied from j.
         i = i - 1;
         if (i < 0)
             i = n - 1;
@@ -181,8 +162,6 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
         if (s->left < clip.left)
             s->left = clip.left;
         int w = s->right - s->left;
-        // Fill value read through an int lvalue; the parameter stays unsigned char
-        // (the mangled name depends on it).
         if (w > 0)
             memset(surface->pixels + surface->pitch * i + s->left, *(int *)&color, w);
         s++;

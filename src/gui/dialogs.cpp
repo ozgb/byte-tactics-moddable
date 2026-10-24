@@ -1,10 +1,3 @@
-// Decompiled by deepseek-v4.1, deepseek-v4.1-flash, Opus, Haiku, Sonnet, space-bunny-free, LongCat 2.5 Preview Free, GPT-6.1-sol, mimo-v2.6-pro, claude-opus-5-5, GPT-6, Claude Opus 5.5, DeepSeek V4.1 Flash and Space Bunny Free. Names are provisional.
-//
-// The dialog's GUI layer loader, the entry-list operations that add and find
-// entries, the animation reference and mouse-message helpers, the text-edit
-// key handler, the dialog creators and handlers (CONFIRM.GUI, YESORNO.GUI,
-// MSGBOX.GUI, NOTEXIST.GUI, CHOICE3.GUI, INPUT.GUI), the word-wrap and
-// text-fit helpers, and the 16x16 "COLS" colour grid of the palette editor.
 #include <string.h>
 #include <ctype.h>
 #include "win_types.h"
@@ -14,48 +7,39 @@
 
 struct Layer;
 
-// 0x15b-byte GUI control record: entry 0 holds the count at +0xb6 and the
-// dialog's own fields from +0xbc on, the other entries hold NUL terminated
-// text there.
 #include "gadget.h"
 
-// The layer a dialog's +0x18 points at: its entry table at +4 and the
-// installed handler at +8.
 struct Layer {
-    Layer* next;                   // +0x00
-    Gadget* entries;               // +0x04
-    void (__stdcall* handler)(Gui*); // +0x08
-    int data;                      // +0x0c
-    int flags;                     // +0x10
-    int redraw;                    // +0x14
-    int keyboardInput;             // +0x18
-    int cb1c;                      // +0x1c
-    int current;                   // +0x20
-    int surface;                   // +0x24
+    Layer* next;
+    Gadget* entries;
+    void (__stdcall* handler)(Gui*);
+    int data;
+    int flags;
+    int redraw;
+    int keyboardInput;
+    int cb1c;
+    int current;
+    int surface;
     char unknown_28[0x13];
-    int textHandler;               // +0x3b
-    Gadget gadgets[200];           // +0x3f, the entry table the +4 pointer addresses
+    int textHandler;
+    Gadget gadgets[200];
 };
 
 struct Src_004ab400;
 
-// The animation reference at +0x30 of a dialog (gui.h's cursorIndex to cursorSrc).
 struct Ref_004ab400 {
-    unsigned short index;          // +0x0
-    unsigned short value;          // +0x2
-    unsigned char kind;            // +0x4
+    unsigned short index;
+    unsigned short value;
+    unsigned char kind;
     char unknown_5[3];
-    Src_004ab400* src;             // +0x8
+    Src_004ab400* src;
 };
 
-// Unused here: the bitfield view of gui.h's cursorFlags; its symbol ids keep
-// the allocation (docs/c2-regalloc.md).
 struct Flags_004ab400 {
     unsigned int active : 1;
     unsigned int rest : 31;
 };
 
-// A mouse event, 0x18 bytes (gui.h's pointX to pointDoubleClick).
 #include "mouse_event.h"
 
 struct Rect_004b6720 {
@@ -67,48 +51,45 @@ struct Rect_004b6720 {
 
 #include "gui.h"
 
-// The records AddButtonGadget, AddHotspotGadget and AddBarGadget copy into an
-// entry slot: the slot's first bytes viewed as the control's definition.
 struct Record_004ab2b0 {
-    unsigned char type;            // +0x0
+    unsigned char type;
     char unknown_1[0xb6 - 0x1];
-    short count;                   // +0xb6 (only meaningful in entry 0)
+    short count;
     char unknown_b8[0x13e - 0xb8];
 };
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int PlaceFeature(int, int, int, int, int);
 void __stdcall UpdateAllCellHeightRanges();
 void __stdcall ClearBorderFeatures();
 
 struct Record_004ab310 {
-    unsigned char type;            // +0x0
+    unsigned char type;
     char unknown_1[0xb6 - 0x1];
     union {
-        short count;               // +0xb6 (only meaningful in entry 0)
-        int callback;              // +0xb6 (the optional hotspot function)
+        short count;
+        int callback;
     };
     char unknown_ba[0xbe - 0xba];
-    int image;                     // +0xbe (the image pointer a caller sets)
-    int frame;                     // +0xc2 (the hotspot frame pointer)
-    short index;                   // +0xc6 (the hotspot image index)
+    int image;
+    int frame;
+    short index;
     char unknown_c8[0xcc - 0xc8];
 };
 
 struct Entry_004ab310 {
-    Record_004ab310 record;        // +0x0
+    Record_004ab310 record;
     char unknown_cc[0x15b - 0xcc];
 };
 
 struct Record_004ab3a0 {
-    unsigned char type;            // +0x0
+    unsigned char type;
     char unknown_1[0xb6 - 0x1];
-    short count;                   // +0xb6 (only meaningful in entry 0)
+    short count;
     char unknown_b8[0xd6 - 0xb8];
 };
 
 struct Entry_004ab3a0 {
-    Record_004ab3a0 record;        // +0x0
+    Record_004ab3a0 record;
     char unknown_d6[0x15b - 0xd6];
 };
 
@@ -156,8 +137,6 @@ extern int __stdcall GetTextPixelWidth(unsigned char* text);
 int PopKey();
 void* GetDisplay();
 
-
-// Must stay an inline helper returning an index or -1: sets the search's registers.
 static inline int FindPanel_004aa8f0(Layer* layer)
 {
     Gadget* base = layer->entries;
@@ -169,8 +148,6 @@ static inline int FindPanel_004aa8f0(Layer* layer)
     return -1;
 }
 
-// Fills the bounding rectangle of a gadget entry (the body of GetGadgetRect at
-// 0x4a1630, which the compiler inlined into LoadGuiLayer).
 static inline void GetGadgetRect_inlined(Gadget* entry, Rect_004b6720* rect)
 {
     if (entry->type == 0) {
@@ -184,13 +161,6 @@ static inline void GetGadgetRect_inlined(Gadget* entry, Rect_004b6720* rect)
     rect->bottom = entry->height + rect->top - 1;
 }
 
-// GUI layer loader.
-//
-// Suspected original bug: when HAPI_FileLengthByName(layerName) returns 0 (GUI file
-// missing) the code jumps to 0x4aac2d, which loads `layer` from [S+0x10]
-// before it was ever stored (the only store is the mask-path one at
-// 0x4aaa3b) and then writes layer->entries/cb1c/surface/textHandler
-// through it and returns the garbage pointer.
 // FUNCTION: 0x4aa8f0
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
                                        unsigned int flags)
@@ -220,7 +190,6 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
     StripPath(guiName);
     ChangeExtension(layerName, layerName, "GUI");
     if (HAPI_FileLengthByName(layerName) != 0) {
-        // Declared here with its initializer: it spills to the +0x18 slot and keeps the frame.
         int mask = flags & 0x200;
         if (mask != 0) {
             layer = menu->layer;
@@ -236,7 +205,6 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
             if (idx != -1) {
                 layer->entries[idx].active = 0;
                 flags |= 0x20;
-                // Index layer->entries at each use, no local base: gives the reloads.
                 int dx = (layer->entries[idx].width - entry->width) / 2 + layer->entries[idx].x;
                 int dy = (layer->entries[idx].height - entry->height) / 2 + layer->entries[idx].y;
                 int j = 1;
@@ -308,7 +276,6 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
         dst = entry->u.names.choice2;
         if (strlen(dst) == 0) {
             int i = 1;
-            // while, not do/while, as for okName; names indexed as entry[i].name.
             while (i <= entry->u.count) {
                 if (entry[i].type == 1 && (_strnicmp(entry[i].name, "PREV", 4) == 0
                         || _strnicmp(entry[i].name, "Cancel", 6) == 0)) {
@@ -322,7 +289,6 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
         if (strlen(dst) != 0) {
             int i = 1;
             Gadget* e = &entry[1];
-            // A while over i < count + 1.
             while (i < entry->u.count + 1) {
                 if (strncmp(e->name, dst, 0x10) == 0)
                     goto focusFound;
@@ -338,19 +304,16 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
         }
     }
     menu->hotGadgetIndex = -1;
-    // The free path stays last.
     if (ret == 1) {
         if (entry->u.count == 1 && ((char*)entry)[0x15b] == 3) {
         Gadget* base = menu->layer->entries;
         Gadget* sub = &base[1];
         int r = GetTextKeyColor();
-        // Zeroed before the byte load; SetTextColors stays declared (int, int).
         unsigned int v = 0;
         v = menu->colours[sub->colours];
         SetTextColors(v, r);
         int i = 0;
         int j;
-        // Array indexing, not a walking pointer: a pointer spills i to memory.
         int n = base->u.count + 1;
         for (j = 1; j < n; j++) {
             if (base[j].type != 7) {
@@ -376,8 +339,6 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
     return 0;
 }
 
-// Returns whether the point stored at +0x3c/+0x40 lies inside the rectangle
-// (x, y, width, height) of the object's entry; 0 when there is no entry.
 // FUNCTION: 0x4aafe0
 int __stdcall IsPointInEntryRect(Gui* obj)
 {
@@ -398,12 +359,9 @@ int __stdcall HasLayer(Gui* obj)
     return obj->layer != 0;
 }
 
-// Returns 1 when the object's entry has a name (after a two-character
-// prefix) equal to `name`, ignoring case, over at most 16 characters.
 // FUNCTION: 0x4ab060
 int __stdcall IsScreenNamed(Gui* obj, const char* name)
 {
-    // The entries pointer, two bytes in, is the first entry's name.
     if (obj->layer && _strnicmp((char*)&obj->layer->entries->name[0], name, 0x10) == 0)
         return 1;
     return 0;
@@ -456,15 +414,6 @@ void __stdcall SetDescListCleanupFlag(int gui, int flag)
     *(int*)(gui + 0xcc6) = flag;
 }
 
-// Appends a type-5 GUI entry to the holder's 0x15b-byte entry table and fills
-// it in: type 5, the unbounded name at +2, x/y at +0x13/+0x15, the width at
-// +0x17 (defaults to entry 0's width minus x minus 5), flags at +0x1b, the
-// text via strncpy(0x7f) at +0xb6, and assorted small fields.
-//
-// Suspected original bug: the entry name is only 0x10 bytes (+0x02..+0x11)
-// but it is filled with an unbounded strcpy, and the caller at 0x4abe6b
-// passes the literal "Player%dController" (0x5029f8, 18 characters plus the
-// terminator), which spills past the name into the x field at +0x13.
 // FUNCTION: 0x4ab1b0
 void __stdcall AddTextGadget(Layer* obj, char* name, char* text,
                             int x, short y, int w, int flags)
@@ -504,8 +453,6 @@ int __stdcall SetBackgroundSurface(Gui* menu, int value)
     return 1;
 }
 
-// Appends a copy of a 0x13e-byte record to the entry list (at most 200
-// entries; entry 0 holds the count) and marks the new entry as type 1.
 // FUNCTION: 0x4ab2b0
 int __stdcall AddButtonGadget(Gui* obj, Record_004ab2b0* record)
 {
@@ -520,9 +467,6 @@ int __stdcall AddButtonGadget(Gui* obj, Record_004ab2b0* record)
     return 1;
 }
 
-// Appends a copy of a 0xcc-byte record to the entry list (at most 200
-// entries; entry 0 holds the count) and marks the new entry as type 6.
-// Same shape as 0x4ab2b0 (type 1) and 0x4ab3a0 (type 0xd).
 // FUNCTION: 0x4ab310
 int __stdcall AddHotspotGadget(Gui* obj, Record_004ab310* record)
 {
@@ -541,9 +485,6 @@ int __stdcall AddHotspotGadget(Gui* obj, Record_004ab310* record)
     return 1;
 }
 
-// Appends a copy of a 0xd6-byte record to the entry list (at most 200
-// entries; entry 0 holds the count) and marks the new entry as type 0xd.
-// Same shape as 0x4ab2b0, which appends a 0x13e-byte type 1 record.
 // FUNCTION: 0x4ab3a0
 int __stdcall AddBarGadget(Gui* obj, Record_004ab3a0* record)
 {
@@ -557,9 +498,6 @@ int __stdcall AddBarGadget(Gui* obj, Record_004ab3a0* record)
     return 1;
 }
 
-// Compare 0x4ab4e0: stores the source, points the reference at +0x30 at its
-// first entry, sets the active flag and passes the entry's value on to
-// SetCursorSprite.
 // FUNCTION: 0x4ab400
 void __stdcall SetCursorAnimation(Gui* p, Src_004ab400* src)
 {
@@ -569,11 +507,6 @@ void __stdcall SetCursorAnimation(Gui* p, Src_004ab400* src)
     SetCursorSprite(GetGafSequenceFrame((Ref_004ab400*)&p->cursorIndex));
 }
 
-// Picks the source at +0x28 (alt) or +0x2c; with a source, points the
-// reference at +0x30 at it (compare 0x4ab400) and sets the active flag,
-// otherwise passes the plain value at +0x24 or +0x20 on to SetCursorSprite
-// (compare 0x4ab4e0) and clears the flag. Nothing happens when the source
-// or value is already current.
 static inline void SetSource(Gui* p, Src_004ab400* src)
 {
     if ((Src_004ab400*)p->cursorSrc == src)
@@ -608,10 +541,6 @@ void __stdcall SetCursorHover(Gui* p, int alt)
     }
 }
 
-// A free __stdcall function (param comes off the stack, ecx unused): waits
-// on a handle then clears a 1-bit flag inside a dword bitfield (the load of
-// the whole dword but an `and al, 0xfe` on just the low byte is the
-// dword-bitfield clear idiom from the guide).
 // FUNCTION: 0x4ab4c0
 void __stdcall ApplySharedCursorFrame(Gui* p)
 {
@@ -619,8 +548,6 @@ void __stdcall ApplySharedCursorFrame(Gui* p)
     p->cursorFlags &= ~1;
 }
 
-// Compare 0x4ab4c0 and 0x4ab400: sets the three values at +0x1c..+0x24,
-// passes the value on to SetCursorSprite and clears the active flag.
 // FUNCTION: 0x4ab4e0
 void __stdcall InitCursorFrames(Gui* p, int value)
 {
@@ -634,10 +561,6 @@ void __stdcall InitCursorFrames(Gui* p, int value)
     p->src_2c = 0;
 }
 
-// Returns 1 when the object's message is a button-down or double-click of a
-// button selected by the mask (1 = left, 2 = right). The message is read
-// through a reference taken up front, which is why the object pointer is
-// loaded before the first test.
 // FUNCTION: 0x4ab510
 int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons)
 {
@@ -656,8 +579,6 @@ int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons)
     return 0;
 }
 
-// Returns 1 when the object's message is a double-click of a button
-// selected by the mask (1 = left, 2 = right); compare 0x4ab510.
 // FUNCTION: 0x4ab570
 int __stdcall IsDoubleClickMessage(Gui* obj, unsigned char buttons)
 {
@@ -672,17 +593,12 @@ int __stdcall IsDoubleClickMessage(Gui* obj, unsigned char buttons)
     return 0;
 }
 
-// Returns 1 when any of the mask bits are set in the object's field at +0x54.
 // FUNCTION: 0x4ab5b0
 int __stdcall HasMouseKeyFlags(Gui* obj, unsigned int mask)
 {
     return (obj->mouseKeyFlags & mask) != 0;
 }
 
-// One tick of a UI element: advances the reference at +0x30 when the active
-// flag is set and forwards the entry it lands on, then peeks the next event,
-// tests its point against the element's rectangle (from the entry at +0x18)
-// and, on a hit or a plain code, pops the event into the element at +0x3c.
 // FUNCTION: 0x4ab5d0
 void __stdcall UpdateCursorAndMouse(Gui* p)
 {
@@ -722,11 +638,6 @@ int __stdcall GetClickMode(Gui* obj)
     return obj->clickMode;
 }
 
-// Stores the length of a text in a control (or empties the text when it is
-// too long or the flag is set), then refreshes the control. MSVC duplicates
-// the shared call into both branches itself.
-// The original calls this from LoadGuiLayer (0x4aa8f0), so it must not be
-// inlined into it now that both live in one file.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ab6c0
 void __stdcall CommitTextEdit(Gui* control, int index, char* text,
@@ -743,17 +654,11 @@ void __stdcall CommitTextEdit(Gui* control, int index, char* text,
 }
 #pragma auto_inline(on)
 
-// Text-edit key handler for one GUI entry (stride 0x15b, text at +0xb6).
-// __stdcall(control, entryIndex, key): when the holder has no pending
-// event source it pulls keys from PopKey. Handles backspace, escape,
-// delete, home, end, left, right, clipboard paste and plain character
-// insertion, then saves the text back through DrawTextInput.
 // FUNCTION: 0x4ab720
 int __stdcall HandleTextEditKey(Gui* control, int index, int key)
 {
     Layer* holder = control->layer;
     Gadget* entry = &holder->entries[index];
-    // Declared before text: makes the subscript the addressing-mode index.
     int i;
     char* text = entry->u.text;
     int changed = 0;
@@ -826,11 +731,9 @@ int __stdcall HandleTextEditKey(Gui* control, int index, int key)
                     if (!isalnum(key) && key != '_' && key != ' ' && key != '\'')
                         break;
                 }
-                // A plain char c[2]: it shares the dead key parameter's slot.
                 char c[2];
                 c[0] = (char)key;
                 c[1] = 0;
-                // entry->text, not the text local: sets the evaluation order of the two calls.
                 int width = GetTextPixelWidth((unsigned char*)entry->u.text) + GetTextPixelWidth((unsigned char*)c);
                 if (width > entry->width - 4)
                     break;
@@ -851,16 +754,11 @@ done:
     return last;
 }
 
-// The headers and types of the dialog creators sit here, after the text-edit
-// handler: 0x4ab720 only matches with the symbol ids it had before them.
-// stdio.h and math.h are included for their symbol counts, not for their
-// declarations (docs/c2-regalloc.md).
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
 #pragma pack(push, 1)
-// One palette entry.
 struct PalEntry_004aa8f0 {
     unsigned char r;
     unsigned char g;
@@ -868,34 +766,30 @@ struct PalEntry_004aa8f0 {
     unsigned char flags;
 };
 
-// The palette copy and the remap table built from it.
 struct Palette_004aa8f0 {
     char unknown_0[0xb2];
-    PalEntry_004aa8f0 dest[256];   // +0xb2
+    PalEntry_004aa8f0 dest[256];
     char unknown_4b2[0x400];
-    unsigned char table[256];      // +0x8b2
+    unsigned char table[256];
 };
 
-// One channel slider: its value byte at +0x140.
 struct Slider_004aa8f0 {
     char unknown_0[0x140];
-    unsigned char value;           // +0x140
+    unsigned char value;
 };
 
-// The palette editor dialog: the selected entry at +0x9b2 and the three
-// sliders at +0xcb6.
 struct PaletteDialog_004aa8f0 {
     char unknown_0[0x9b2];
-    int index;                     // +0x9b2
+    int index;
     char unknown_9b6[0xcb6 - 0x9b6];
-    Slider_004aa8f0* red;          // +0xcb6
-    Slider_004aa8f0* green;        // +0xcba
-    Slider_004aa8f0* blue;         // +0xcbe
+    Slider_004aa8f0* red;
+    Slider_004aa8f0* green;
+    Slider_004aa8f0* blue;
 };
 
 #pragma pack(pop)
 
-extern char g_okGadgetName[];      // "OK"
+extern char g_okGadgetName[];
 
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
 int __stdcall IsGadgetNamed(Gadget* entries, int index, char* name);
@@ -922,7 +816,6 @@ void __stdcall NotExistDialogHandler(Gui* menu);
 void __stdcall Choice3DialogHandler(Gui* menu);
 void __stdcall InputDialogHandler(Gui* menu);
 
-// Opens the confirmation dialog (CONFIRM.GUI) and sets its title text.
 // FUNCTION: 0x4abb20
 int __stdcall OpenConfirmDialog(Gui* sub, char* title)
 {
@@ -937,8 +830,6 @@ int __stdcall OpenConfirmDialog(Gui* sub, char* title)
     return 0;
 }
 
-// Same shape as 0x4ac300: tests the current GUI entry against "CHC1" and
-// "CHC2".
 // FUNCTION: 0x4abba0
 void __stdcall YesNoDialogHandler(Gui* gadget)
 {
@@ -948,8 +839,6 @@ void __stdcall YesNoDialogHandler(Gui* gadget)
     IsGadgetNamed(entries, index, "CHC2");
 }
 
-// Opens the YESORNO.GUI dialog, fills its CHC1 / CHC2 / TITL text fields and
-// installs YesNoDialogHandler as the handler. Same shape as 0x4abb20 / 0x4ac130.
 // FUNCTION: 0x4abbd0
 int __stdcall OpenYesNoDialog(Gui* sub, char* title, char* chc2, char* chc1)
 {
@@ -975,8 +864,6 @@ void __stdcall MessageBoxHandler(Gui* menu)
     IsGadgetNamed(layer->entries, menu->hotGadgetIndex, g_okGadgetName);
 }
 
-// Returns 1 when the object's entry is named "MSGBOX.GUI" (after a
-// two-character prefix); 0 when it has no entry.
 // FUNCTION: 0x4abd20
 int __stdcall IsMessageBoxScreen(Gui* obj)
 {
@@ -985,21 +872,6 @@ int __stdcall IsMessageBoxScreen(Gui* obj)
     return strcmp((char*)&obj->layer->entries->name[0], "MSGBOX.GUI") == 0;
 }
 
-// Builds the MSGBOX.GUI dialog: word-wraps the (translated) message text, adds
-// one TEXT entry per line, sizes the dialog from the longest line, centres it
-// on the screen, stretches every text entry to the dialog width, positions the
-// OK button and installs MessageBoxHandler as the handler.
-//
-// Suspected original bug: the max-line-width loop measures the entries at
-// entries[count+1] .. entries[count+lines] (0x4abeb8 walks forward from
-// count+1, one 0x15b step per line), while the text entries just added live at
-// entries[count-lines+1] .. entries[count], so it measures one entry past the
-// last line it added.
-// Note: the two "OK" strings go to the table base's fields at +0xcc and +0xdc
-// (0x4abfba, 0x4abfd8 address them from the table pointer, not from the entry
-// that FindGadgetIndex returned, unlike the x/y fields just above them). If those
-// are entry 0's own button-name fields that is deliberate, otherwise the OK
-// entry is left unnamed.
 // FUNCTION: 0x4abd90
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight)
 {
@@ -1079,8 +951,6 @@ void __stdcall NotExistDialogHandler(Gui* obj)
     IsGadgetNamed(obj->layer->entries, obj->hotGadgetIndex, g_okGadgetName);
 }
 
-// Opens the "file does not exist" dialog (NOTEXIST.GUI), puts the name in
-// its NAME gadget and installs NotExistDialogHandler as its handler; compare 0x4abb20.
 // FUNCTION: 0x4ac0a0
 int __stdcall OpenNotExistDialog(Gui* sub, char* name)
 {
@@ -1105,10 +975,6 @@ void __stdcall Choice3DialogHandler(Gui* gui)
     FindGadgetIndex(p, "CHC3", 0xe);
 }
 
-// Creates the CHOICE3.GUI dialog, copies the title and three choice strings
-// into the CHC1 / CHC2 / CHC3 / TITL gadget entries (each 0x15b bytes, text
-// at +0xb6), clears the TITL entry's +0x13 field and installs Choice3DialogHandler
-// as the dialog handler. Returns 1 if the dialog was created, else 0.
 // FUNCTION: 0x4ac170
 int __stdcall OpenChoice3Dialog(Gui* menu, const char* title, const char* choice1,
                            const char* choice2, const char* choice3)
@@ -1142,9 +1008,6 @@ void __stdcall InputDialogHandler(Gui* gui)
     IsGadgetNamed(esi, edi, "INPT");
 }
 
-// Opens the player setup dialog (INPUT.GUI), fills the TITL / INPT / CHC1 /
-// CHC2 gadget texts and installs InputDialogHandler as its handler. Returns 1 if the
-// dialog was created, else 0.
 // FUNCTION: 0x4ac340
 int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, char* chc1, int unused)
 {
@@ -1166,21 +1029,10 @@ int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, ch
     return 0;
 }
 
-// Builds a word-wrapped copy of `text` in a buffer allocated from
-// the pool: the number of characters per line is width / (width of one
-// digit), and a line is broken at a space, newline or '-' when the measured
-// line would exceed `width` pixels. `index` selects the current font entry
-// (SelectFontForEntry) when it is not -1; measurements go through the same
-// GetTextPixelWidth / GetFont+GetTextWidth pair the sibling text fitter
-// 0x4ac610 uses.
-// The preheader size estimate `len + 3 * (len / (width / w)) + 2` allocates
-// room for the CRLF pairs; the wrap-back loop overwrites the break character
-// with the CR, so `s` is only advanced past it once.
 // FUNCTION: 0x4ac4c0
 char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index)
 {
     Gadget* gadgets = menu->layer->entries;
-    // Net-zero update: makes the allocator count an early use of text.
     text += 1; text -= 1;
     int len = strlen(text);
     if (index != -1)
@@ -1202,7 +1054,6 @@ char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index)
             break;
         buf[i] = *s;
         char next = s[1];
-        // i is incremented before s: the source order sets the instruction order.
         i++;
         s++;
         if (next == ' ' || next == '\n' || next == '-') {
@@ -1219,7 +1070,6 @@ char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index)
                 i--;
                 s--;
                 while (ch != ' ' && ch != '-') {
-                    // Net-zero update: makes the allocator count an extra use of i.
                     i += 1; i -= 1;
                     buf[i] = 0;
                     ch = s[-1];
@@ -1243,10 +1093,6 @@ char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index)
     return buf;
 }
 
-// Fit `text` into `limit` pixels: if it is too wide, chop characters off the
-// end until it (plus the "..." marker, when flag is set) fits, then append the
-// marker. Charset -1 means the default font (GetTextPixelWidth), anything else
-// selects the holder entry (SelectFontForEntry) and measures with GetTextWidth.
 static inline int Measure_004ac610(unsigned char* text, int charset)
 {
     if (charset == -1)
@@ -1262,7 +1108,6 @@ void __stdcall TruncateTextWithEllipsis(Gui* obj, unsigned char* text, int limit
     if (charset != -1)
         SelectFontForEntry(entries, charset);
 
-    // Declared before width: the allocator then knows width is dead at the truncation test.
     int dots;
     int width;
     if (charset == -1) {
@@ -1293,10 +1138,6 @@ void __stdcall TruncateTextWithEllipsis(Gui* obj, unsigned char* text, int limit
         strcpy((char*)end, "...");
 }
 
-// Unused here: real forward declarations that keep the symbol ids the palette
-// helpers (here and before 0x4ac7d0, 0x4ac8c0 and 0x4acbe0) match at
-// (docs/c2-regalloc.md), and the forward declaration of a later function of
-// this file.
 struct Bitmap_004cb170;
 struct Blk;
 struct Blob32_4cb330;
@@ -1309,9 +1150,6 @@ struct BmpInfo;
 struct BmpInfoHeader;
 void __stdcall CopyPaletteEntries(char* obj, void* dest);
 
-// Builds a 256-entry remap table: for each colour of the source palette,
-// the index of the closest colour (sum of absolute RGB differences) in the
-// destination palette.
 // FUNCTION: 0x4ac710
 void __stdcall BuildColorRemapTable(PalEntry_004aa8f0* src, PalEntry_004aa8f0* dest, unsigned char* table)
 {
@@ -1337,9 +1175,6 @@ void __stdcall BuildColorRemapTable(PalEntry_004aa8f0* src, PalEntry_004aa8f0* d
 
 void __stdcall ApplySlidersToPaletteEntry(PaletteDialog_004aa8f0* obj, PalEntry_004aa8f0* palette);
 
-// Copies a 256-entry palette into the object and then builds a 256-byte remap
-// table: for each colour of the copied palette, the index of the closest
-// colour (sum of absolute RGB differences) in the source palette.
 // FUNCTION: 0x4ac7d0
 void __stdcall RemapPaletteToClosestIndices(Palette_004aa8f0* pal, PalEntry_004aa8f0* src, PalEntry_004aa8f0* copy)
 {
@@ -1374,12 +1209,9 @@ void __stdcall ShowPaletteEntryRgb(Gui* obj, unsigned char* colors, int index);
 void __stdcall LerpPaletteRange(unsigned char* data, int a, int b);
 void __stdcall WriteTabs(FileHandle* file, int depth);
 
-// Draws the 16 x 16 palette grid: one 8 x 8 cell per colour, at the "COLS"
-// gadget's position.
 // FUNCTION: 0x4ac8c0
 void __stdcall DrawColorGrid(Gui* obj)
 {
-    // grid before gadgets: operand order of the prologue sums follows symbol order.
     Gadget *grid, *gadgets;
     gadgets = obj->layer->entries;
     int index = FindGadgetIndex(gadgets, "COLS", 6);
@@ -1399,14 +1231,10 @@ void __stdcall DrawColorGrid(Gui* obj)
     }
 }
 
-// Writes the red, green and blue bytes of one entry of a palette (4 bytes per
-// entry) into the knobPos word of the "RED", "GREN" and "BLUE" GUI entries,
-// then refreshes the object's gadget state.
 // FUNCTION: 0x4aca20
 void __stdcall ShowPaletteEntryRgb(Gui* obj, unsigned char* colors, int index)
 {
     Gadget* entries = obj->layer->entries;
-    // Entry via a local: addressing entries[i] directly changes the allocation.
     Gadget* e;
     e = &entries[FindGadgetIndex(entries, "RED", 4)];
     e->knobPos = colors[index * 4];
@@ -1417,9 +1245,6 @@ void __stdcall ShowPaletteEntryRgb(Gui* obj, unsigned char* colors, int index)
     RenderLayer(obj, 4);
 }
 
-// Interpolates the 256-entry RGB palette between entry `lo` and entry `hi`.
-// Note: the two 0x400-byte copies run on a 768-byte stack buffer (see the bug
-// note in the pull request); the original really does emit them, so they stay.
 // FUNCTION: 0x4acae0
 void __stdcall LerpPaletteRange(unsigned char* data, int a, int b)
 {
@@ -1452,12 +1277,8 @@ void __stdcall LerpPaletteRange(unsigned char* data, int a, int b)
     memcpy(data, buf, 0x400);
 }
 
-
-// Unused here: the type of the neighbour 0x4ac970, which has a file of its own.
 struct Object_004ac970;
 
-// Converts a screen position to the index of a cell in the 16x16 "COLS"
-// colour grid gadget (row * 16 + column, each cell 8 pixels).
 // FUNCTION: 0x4acbe0
 int __stdcall GetColorCellAt(Gui* obj, int x, int y)
 {
@@ -1481,7 +1302,6 @@ int __stdcall GetColorCellAt(Gui* obj, int x, int y)
     return row * 16 + col;
 }
 
-// Copies three slider values into one palette entry and applies it.
 // FUNCTION: 0x4acc70
 void __stdcall ApplySlidersToPaletteEntry(PaletteDialog_004aa8f0* obj, PalEntry_004aa8f0* palette)
 {
@@ -1493,7 +1313,6 @@ void __stdcall ApplySlidersToPaletteEntry(PaletteDialog_004aa8f0* obj, PalEntry_
     SetPaletteColors((unsigned char*)&c, obj->index, 1);
 }
 
-// Writes `depth` tab characters to a file (sibling of 0x4acda0).
 // FUNCTION: 0x4accd0
 void __stdcall WriteTabs(FileHandle* file, int depth)
 {

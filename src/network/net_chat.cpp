@@ -1,5 +1,3 @@
-// Decompiled by space-bunny-free, Opus, DeepSeek V4.1 Flash, deepseek-v4.1-flash, GPT-6.1-sol, deepseek-v4.1, mimo-v2.6-pro and space-bunny-alpha. Names are provisional.
-
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -33,21 +31,11 @@ void __stdcall SetTextColors(int, int);
 int GetFontHeight();
 void __stdcall BlitSideLogoToRect(void*, void*, Rect*, int);
 void __stdcall DrawTextClipped(void*, void*, int, int, int, int);
-// SendChatMessage's original translation unit declared AddMessage with int
-// arguments while the function itself takes narrower widths. Keeping the int
-// overload declared (it is not defined here) makes the call at 0x463e50 push
-// its third argument as a full int, as the original does; without it the
-// visible byte-wide definition would truncate the argument first.
 void __stdcall AddMessage(char* text, int key, int value, int last);
 
-// Appends a line to the ring buffer of 0x48-byte entries at g_game+0x12ef,
-// indexed by the short at g_game+0x2a3e (wrapped at 30). If the divisor at
-// g_game+0x37f27 says the head is one behind the tail, the head is advanced so
-// the oldest entry is dropped.
 // FUNCTION: 0x463ca0
 void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, char last)
 {
-    // Keep g_game, tail and the g_game+0x519 object written out at each use (no locals).
     if (!*text)
         return;
     if (g_game->textLines == 0)
@@ -132,7 +120,6 @@ int ScrollToNextMessageUnit(void)
 void __stdcall DrawMessages(void* surf)
 {
     int max_lines = g_game->textLines;
-    // Function scope, not inside the if (id != 10) body: orders the r.top store first.
     int t;
     if (max_lines == 0)
         return;
@@ -153,8 +140,6 @@ void __stdcall DrawMessages(void* surf)
         int show;
         switch (g_game->mode) {
         case 1:
-            // Cavedog never assigns show in this arm when the team field is 2,
-            // so the test below reads the previous iteration's value. Kept.
             if (((*(ChatHudEntry (*)[30])&g_game->entries)[i].flags & 0xf) != 2)
                 show = 0;
             break;

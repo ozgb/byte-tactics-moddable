@@ -1,13 +1,6 @@
 #include "../state/sim_globals.h"
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by Claude Opus 5.5, finished by space-bunny-free, finished by DeepSeek V4.1 Flash. Names are provisional.
 // FLAGS: /Gi
-// A Park-Miller random number generator (seed * 16807 mod 2^31 - 1, with
-// q = seed / 127773 to avoid overflow), then seed % range.
 
-// No <windows.h>: with it the two divisions below merge into one.
-
-// Stays in its own file: it matches only with /Gi, and that per-file flag
-// moves DotProduct and CrossProduct in src/util/math.cpp.
 // FUNCTION: 0x4b6c30
 int __stdcall RandomInt(int range)
 {
@@ -16,7 +9,6 @@ int __stdcall RandomInt(int range)
 
     unsigned int seed = g_randomSeed;
     unsigned int q = seed / 127773;
-    // Divides seed a second time instead of reusing q.
     unsigned int correction = (q << 31) - seed / 127773;
     seed = seed * 16807 - correction;
     if ((int)seed <= 0)
@@ -24,4 +16,3 @@ int __stdcall RandomInt(int range)
     g_randomSeed = seed;
     return seed % range;
 }
-// The shift form is kept; only the quotient correction sequence differs from the original.

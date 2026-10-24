@@ -119,7 +119,7 @@ struct Unit {
             unsigned short field_e4;
             unsigned short f_e6;
             char unknown_e8[4];
-            Player* owner;
+            Ref<Player> owner;
         };
         UnitResources resourceSlot;
     };

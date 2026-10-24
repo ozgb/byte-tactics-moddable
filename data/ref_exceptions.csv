@@ -288,10 +288,8 @@ TdfRecord,text,pointer,src/util/tdf.h,#353
 TdfRecordList,end,pointer,src/util/tdf.h,#353
 TdfRecordList,first,pointer,src/util/tdf.h,#353
 TdfRecordList,last,pointer,src/util/tdf.h,#353
-Unit,owner,pointer,src/units/unit.h,#350
 UnitDef,categories,pointer,src/units/unit_def.h,#352
 UnitDef,data,pointer,src/units/unit_def.h,#352
 UnitDef,weaponCategories,pointer,src/units/unit_def.h,#352
 UnitList_00409160,units,container,src/ai/player_ai.h,#351
-UnitResources,player,pointer,src/game/unit_resources.h,#350
 WeaponDef,fire,pointer,src/weapons/weapon_def.h,#352

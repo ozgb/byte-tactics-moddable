@@ -56,9 +56,30 @@ class Coverage(unittest.TestCase):
         fn = cov.parse_function(EXPORT["data"][0]["functions"][2])[1]
         self.assertEqual(cov.subsystem_of(fn, KEY, NAME), "units")
 
-    def test_unassigned(self):
-        self.assertEqual(self.unassigned, 1)
-        self.assertEqual(self.totals[cov.UNASSIGNED].functions, 1)
+    def test_unlisted_function_takes_the_rule_of_its_file(self):
+        self.assertEqual(self.unassigned, 0)
+        self.assertEqual(self.totals["game"].functions, 1)
+        fn = cov.Function("Unlisted", "src/ai/pathfind.cpp", True, 0, 0, 0, 0)
+        self.assertEqual(cov.subsystem_of(fn, KEY, NAME), "pathfinding")
+
+    def test_state_files_without_a_row(self):
+        for file in ("interfaces/ref.h", "src/state/sim_allocator.h", "src/state/block.cpp"):
+            fn = cov.Function("Ref::operator?C", file, True, 0, 0, 0, 0)
+            self.assertEqual(cov.subsystem_of(fn, KEY, NAME), "state")
+
+    def test_plain_names_of_special_members(self):
+        self.assertEqual(cov.plain_name("??0Pathfinder@@QAE@XZ"), "Pathfinder::Pathfinder")
+        self.assertEqual(cov.plain_name("??1TdfRecord@@QAE@XZ"), "TdfRecord::~TdfRecord")
+        self.assertEqual(cov.plain_name("??C?$Ref@VMission@@@@QBEPAVMission@@XZ"), "Ref::operator?C")
+        self.assertEqual(cov.plain_name("??HVec3@@QBE?AV0@ABV0@@Z"), "Vec3::operator?H")
+        self.assertEqual(cov.plain_name("?Reset@UnitResources@@QAEXXZ"), "UnitResources::Reset")
+
+    def test_constructor_matched_after_renaming(self):
+        export = {"data": [{"functions": [entry("??0Pathfinder@@QAE@XZ", "src/ai/pathfind.cpp", 1, [region(1, 1, 2, 2, 1)])]}]}
+        key = {("src/ai/pathfind.cpp", "Pathfinder::Pathfinder"): "units"}
+        totals, _, unassigned = cov.summarize(export, key, {})
+        self.assertEqual(list(totals), ["units"])
+        self.assertEqual(unassigned, 0)
 
     def test_exclusions(self):
         self.assertEqual(self.excluded, 2)

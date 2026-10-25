@@ -15,10 +15,14 @@ or writes no profile exits 1: the coverage of a partial suite is not a baseline.
 `llvm-cov show <exe> -instr-profile=<it>` can show the source, and `llvm-cov export -format=text` gives
 the mapping and counts that this tool reads.
 
-Assignment. data/subsystems.csv keys a function by (name, file). A function of the export is matched by
-its demangled name (tools/blockpointers.py demangle) and its primary file, relative to the repository;
-when no row has that file, by name alone if every row of that name is in one subsystem. The rest are
-`unassigned` (counted and printed). Functions in src/harness/, build/, toolchain/ or outside the repository are
+Assignment. data/subsystems.csv keys a function by (name, file). A function of the export gets a plain
+name (tools/blockpointers.py demangle, and `X::X`, `X::~X`, `X::operator<code>` for the decorated
+constructors, destructors and operators it leaves alone). It is matched by that name and its primary file,
+relative to the repository; when no row has that file, by name alone if every row of that name is in one
+subsystem. A function still without a row is `state` when its file is under interfaces/ or src/state/ (the
+shared state block, #7: Ref<T>, SimAllocator, the block heap), else the subsystem coupling.rule_of gives
+its name and file (the rule that built subsystems.csv, without phase reachability). `unassigned` (counted
+and printed) is left for a function that nothing resolves. Functions in src/harness/, build/, toolchain/ or outside the repository are
 excluded (counted and printed).
 
 Counting, per function and then summed per subsystem. Functions: entered when the execution count is
@@ -38,6 +42,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -46,6 +51,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import blockpointers
+import coupling
 import reference
 import tracediff
 
@@ -55,6 +61,8 @@ OUT = ROOT / "data/coverage.csv"
 RUN_DIR = ROOT / "build/coverage-run"
 DEFAULT_EXE = ROOT / "build/coverage/TotalA.exe"
 UNASSIGNED = "unassigned"
+STATE_PREFIXES = ("interfaces/", "src/state/")
+STATE = "state"
 EXCLUDED_PREFIXES = ("src/harness/", "build/", "toolchain/")
 COLUMNS = ["subsystem", "function", "file", "functions", "functions_entered", "lines", "lines_hit",
            "branches", "branches_covered"]
@@ -120,6 +128,11 @@ def plain_name(name: str) -> str:
     """The function's name without MSVC decoration or the `file.cpp:` prefix llvm-cov gives static functions."""
     if not name.startswith("?") and ":" in name:
         name = name.split(":", 1)[1]
+    special = re.match(r"\?\?(_?[0-9A-Z])(?:\?\$([^@]+)@|([^@?]+)@)", name)
+    if special:
+        code, owner = special.group(1), special.group(2) or special.group(3)
+        member = owner if code == "0" else "~" + owner if code == "1" else "operator?" + code
+        return "%s::%s" % (owner, member)
     return blockpointers.demangle(name)
 
 
@@ -170,12 +183,16 @@ def read_subsystems(path: Path = SUBSYSTEMS) -> tuple[dict[tuple[str, str], str]
 
 
 def subsystem_of(fn: Function, by_key: dict[tuple[str, str], str], by_name: dict[str, set[str]]) -> str:
-    """The subsystem of the (file, name) row, else of the name when all its rows agree, else `unassigned`."""
+    """The subsystem of the (file, name) row, else of the name when all its rows agree, else `state` under interfaces/ or src/state/, else coupling.rule_of's, else `unassigned`."""
     found = by_key.get((fn.file, fn.name))
     if found:
         return found
     owners = by_name.get(fn.name, set())
-    return next(iter(owners)) if len(owners) == 1 else UNASSIGNED
+    if len(owners) == 1:
+        return next(iter(owners))
+    if fn.file.startswith(STATE_PREFIXES):
+        return STATE
+    return coupling.rule_of(fn.name, fn.file, {})[0] or UNASSIGNED
 
 
 def summarize(export: dict, by_key: dict[tuple[str, str], str],

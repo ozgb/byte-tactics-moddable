@@ -1,10 +1,11 @@
-# Two computer players on The Pass, saved to disk halfway through a minute of game time.
+# Two computer players on The Pass with the 3.1c quirk preset named, saved to disk halfway through a minute of game time.
 game_seed 1
 crt_seed 1
 view_seed 1
 map The Pass
 start_positions fixed
 ticks 1800
+quirks 3.1c
 player0.side Arm
 player1.side Core
 save 900

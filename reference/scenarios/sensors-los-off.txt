@@ -1,0 +1,44 @@
+# Two human slots on The Pass, map unmapped and line of sight off: a dragon's teeth build order, a Core radar jammer, and an Arm aircraft landing on an air repair pad; 7200 ticks.
+game_seed 407
+crt_seed 1407
+view_seed 2407
+map The Pass
+start_positions fixed
+ticks 7200
+mapping 0
+line_of_sight 0
+local_player 0
+player0.controller human
+player0.side Arm
+player0.metal 30000
+player0.energy 60000
+player1.controller human
+player1.side Core
+player1.metal 20000
+player1.energy 20000
+order 5 0:ARMCOM:1 build ARMLAB 640 260
+order 5 1:CORCOM:1 build CORLAB 3280 1388
+order 800 0:ARMLAB:1 qbuild ARMCK
+order 801 0:ARMCOM:1 guard 0:ARMLAB:1
+order 800 1:CORLAB:1 qbuild CORCK
+order 801 1:CORCOM:1 guard 1:CORLAB:1
+order 1400 0:ARMCK:1 build ARMDRAG 600 350
+order 1401 0:ARMCK:1 +build ARMALAB 470 200
+order 1402 0:ARMCOM:1 guard 0:ARMCK:1
+order 1400 1:CORCK:1 build CORALAB 3100 1250
+order 1401 1:CORCOM:1 guard 1:CORCK:1
+order 3000 0:ARMALAB:1 qbuild ARMACK
+order 3001 0:ARMCOM:1 guard 0:ARMALAB:1
+order 3002 0:ARMCK:1 guard 0:ARMALAB:1
+order 3000 1:CORALAB:1 qbuild CORSPEC
+order 3001 1:CORCOM:1 guard 1:CORALAB:1
+order 3002 1:CORCK:1 guard 1:CORALAB:1
+order 3900 0:ARMACK:1 build ARMASP 460 340
+order 3901 0:ARMCOM:1 guard 0:ARMACK:1
+order 3902 0:ARMCK:1 guard 0:ARMACK:1
+order 5500 0:ARMCOM:1 build ARMAP 680 430
+order 5501 0:ARMCK:1 guard 0:ARMCOM:1
+order 5502 0:ARMACK:1 guard 0:ARMCOM:1
+order 6200 0:ARMAP:1 qbuild ARMATLAS
+order 6201 0:ARMCOM:1 guard 0:ARMAP:1
+order 7000 0:ARMATLAS:1 move 0:ARMASP:1

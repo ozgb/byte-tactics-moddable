@@ -1,0 +1,11 @@
+# Two computer players on The Pass with line of sight off and the map starting blacked out (mapping 1), one minute: the AI's visibility scan finds nothing seen.
+game_seed 408
+crt_seed 1408
+view_seed 2408
+map The Pass
+start_positions fixed
+ticks 1800
+mapping 1
+line_of_sight 0
+player0.side Arm
+player1.side Core

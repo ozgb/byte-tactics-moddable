@@ -1109,6 +1109,8 @@ harness,map,shared_write,Game::playerIndex,1
 harness,map,shared_write,g_quirks,1
 harness,network,shared_write,Game::localPlayer,19
 harness,network,shared_write,Game::numPlayers,6
+harness,orders,call,DeleteOrder,1
+harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,Game::difficulty,1
 harness,orders,shared_write,Game::localPlayer,2
 harness,orders,shared_write,Game::playerIndex,1
@@ -1136,6 +1138,7 @@ harness,players,shared_write,Game::playerIndex,2
 harness,presentation,call,InitMissionStatus,1
 harness,presentation,call,IssueMobileBuildOrders,1
 harness,presentation,call,IssueOrderToSelection,1
+harness,presentation,call,QueueBuildOrder,1
 harness,presentation,call,UpdatePlacementGhostValidity,1
 harness,presentation,shared_write,Game::difficulty,10
 harness,presentation,shared_write,Game::localPlayer,68
@@ -1873,6 +1876,7 @@ orders,game,shared_write,Unit::flags,3
 orders,game,shared_write,Unit::health,1
 orders,game,shared_write,Vec3::x,2
 orders,game,shared_write,Vec3::z,2
+orders,harness,shared_write,MissionType::index,1
 orders,los_radar,indirect,GetMapCellAtPosition,2
 orders,los_radar,indirect,GetOriginCellAtPosition,1
 orders,los_radar,indirect,UpdateUnitLineOfSight,1
@@ -2960,6 +2964,7 @@ presentation,game,shared_write,Vec3::z,2
 presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,Game::difficulty,1
 presentation,harness,shared_write,Game::numPlayers,1
+presentation,harness,shared_write,MissionType::index,1
 presentation,harness,shared_write,g_explodedPieces,1
 presentation,los_radar,call,BuildFogTiles,1
 presentation,los_radar,call,CalcRadarViewportRect,1

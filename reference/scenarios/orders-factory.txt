@@ -1,0 +1,19 @@
+# Human Arm commander on The Pass builds a kbot lab, sends the lab's orders to its units, then patrols one; fifty seconds.
+game_seed 302
+crt_seed 1302
+view_seed 2302
+map The Pass
+start_positions fixed
+ticks 1500
+player0.controller human
+player0.side Arm
+player0.metal 5000
+player0.energy 5000
+player1.controller ai
+player1.side Core
+order 5 0:ARMCOM:1 build ARMLAB 640 260
+order 600 0:ARMLAB:1 move 700 330
+order 605 0:ARMLAB:1 patrol 720 340
+order 610 0:ARMLAB:1 qbuild ARMPW 2
+order 1100 0:ARMPW:1 patrol 700 300
+order 1110 0:ARMPW:1 +patrol 640 330

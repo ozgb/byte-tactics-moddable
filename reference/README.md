@@ -131,11 +131,26 @@ order 150 0:ARMCOM:1 reclaim 0:ARMSOLAR:1
   issued as if the cursor were over that unit.
 - Kinds: `move`, `attack`, `patrol`, `guard` and `reclaim` take a target.
   `build <unit type> x z` takes the unit type before the position.
+- More kinds that take a target, as the order buttons and the cursor modes do:
+  `dgun` (special attack), `unload` (position), `load` (unit), `repair` (unit),
+  `teleport` (position) and `capture` (unit).
+- Kinds that take no target, as the order panel buttons and the self-destruct
+  key do: `stop`, `activate`, `deactivate`, `selfdestruct` (a toggle: it cancels
+  the order if a selected unit already has one), `cloak on` and `cloak off`, and
+  `movestate <n>` and `firestate <n>`, where n is 0, 1 or 2, the value the
+  button passes to the standing order.
+- `qbuild <unit type> [n]` adds n (default 1, at most 99) of a unit type to the
+  build queue of each unit the selector names, as a click in a factory's build
+  menu does. The selector names the factory; the order has no target.
+- A `+` before the kind (`+move 700 300`) is the shift key: the order joins the
+  queue instead of replacing the orders, and repeating an identical queued
+  order cancels it.
 
 Each order is issued as a mouse click does: the harness selects the named
 units, sets the order mode and cursor position, and calls the game's
 `IssueOrderToSelection` (`build` calls `IssueMobileBuildOrders`, as a click on a
-build site does). The selection is put back afterwards.
+build site does, and `qbuild` calls `QueueBuildOrder`). The kinds without a
+target call it with the order's mission type, as the buttons do. The selection is put back afterwards.
 
 A bad selector, kind or position, a slot that is not `human`, a tick after the
 last tick, an unknown unit type, a build site the game rejects, or a selector

@@ -48090,15 +48090,19 @@ address,function,file,kind,target
 ,IsWatching_00448c70,src/frontend/multi.cpp,field_read,Player::info
 ,IsWatching_00448c70,src/frontend/multi.cpp,field_read,PlayerInfo::flags_9b
 ,IsWatching_00448c70,src/frontend/multi.cpp,function,
+,IssueScriptedOrder,src/harness/harness.cpp,call,DeleteOrder
 ,IssueScriptedOrder,src/harness/harness.cpp,call,FailLine
 ,IssueScriptedOrder,src/harness/harness.cpp,call,FindDefIndex
 ,IssueScriptedOrder,src/harness/harness.cpp,call,FindNth
+,IssueScriptedOrder,src/harness/harness.cpp,call,FindOrderByType
 ,IssueScriptedOrder,src/harness/harness.cpp,call,GameAt
 ,IssueScriptedOrder,src/harness/harness.cpp,call,GameU32
 ,IssueScriptedOrder,src/harness/harness.cpp,call,GetGroundHeight
 ,IssueScriptedOrder,src/harness/harness.cpp,call,IssueMobileBuildOrders
 ,IssueScriptedOrder,src/harness/harness.cpp,call,IssueOrderToSelection
+,IssueScriptedOrder,src/harness/harness.cpp,call,OrderTakesNoTarget
 ,IssueScriptedOrder,src/harness/harness.cpp,call,PoolUnit
+,IssueScriptedOrder,src/harness/harness.cpp,call,QueueBuildOrder
 ,IssueScriptedOrder,src/harness/harness.cpp,call,SelectorMatches
 ,IssueScriptedOrder,src/harness/harness.cpp,call,UnitIsSlot
 ,IssueScriptedOrder,src/harness/harness.cpp,call,UpdatePlacementGhostValidity
@@ -48109,14 +48113,21 @@ address,function,file,kind,target
 ,IssueScriptedOrder,src/harness/harness.cpp,call,sprintf
 ,IssueScriptedOrder,src/harness/harness.cpp,deref_read,*int
 ,IssueScriptedOrder,src/harness/harness.cpp,deref_read,*unsigned char
+,IssueScriptedOrder,src/harness/harness.cpp,deref_read,*unsigned int
 ,IssueScriptedOrder,src/harness/harness.cpp,deref_read,*unsigned short
 ,IssueScriptedOrder,src/harness/harness.cpp,deref_write,*unsigned char
+,IssueScriptedOrder,src/harness/harness.cpp,deref_write,*unsigned int
 ,IssueScriptedOrder,src/harness/harness.cpp,deref_write,*unsigned short
+,IssueScriptedOrder,src/harness/harness.cpp,field_escape,ScriptedOrder::buildType
+,IssueScriptedOrder,src/harness/harness.cpp,field_read,MissionType::index
+,IssueScriptedOrder,src/harness/harness.cpp,field_read,OrderMode::mission
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,OrderMode::mode
+,IssueScriptedOrder,src/harness/harness.cpp,field_read,ScriptedOrder::argument
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,ScriptedOrder::buildType
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,ScriptedOrder::hasUnitTarget
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,ScriptedOrder::kind
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,ScriptedOrder::lineNo
+,IssueScriptedOrder,src/harness/harness.cpp,field_read,ScriptedOrder::queue
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,ScriptedOrder::targetUnit
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,ScriptedOrder::who
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,ScriptedOrder::x
@@ -48126,6 +48137,7 @@ address,function,file,kind,target
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,UnitSelector::slot
 ,IssueScriptedOrder,src/harness/harness.cpp,field_read,UnitSelector::type
 ,IssueScriptedOrder,src/harness/harness.cpp,function,
+,IssueScriptedOrder,src/harness/harness.cpp,global_read,s_noPosition@src/harness/harness.cpp
 ,IssueScriptedOrder,src/harness/harness.cpp,global_read,s_orderModes@src/harness/harness.cpp
 ,Iter_004dbd00::Iter_004dbd00,src/debug/debug_lib.cpp,function,
 ,Iter_004dbd20::Iter_004dbd20,src/debug/debug_lib.cpp,function,
@@ -49098,6 +49110,7 @@ address,function,file,kind,target
 ,OrderPosYUnset,src/harness/harness.cpp,call,strcmp
 ,OrderPosYUnset,src/harness/harness.cpp,function,
 ,OrderPosYUnset,src/harness/harness.cpp,global_read,kinds@OrderPosYUnset
+,OrderTakesNoTarget,src/harness/harness.cpp,function,
 ,OrderTarget,src/orders/vtol_orders.cpp,call,operator Unit *
 ,OrderTarget,src/orders/vtol_orders.cpp,field_read,Order::target
 ,OrderTarget,src/orders/vtol_orders.cpp,function,
@@ -49930,6 +49943,7 @@ address,function,file,kind,target
 ,ReadMasked,src/harness/harness.cpp,function,
 ,ReadOrder,src/harness/harness.cpp,call,FailLine
 ,ReadOrder,src/harness/harness.cpp,call,NextToken
+,ReadOrder,src/harness/harness.cpp,call,OrderTakesNoTarget
 ,ReadOrder,src/harness/harness.cpp,call,ParseCoordinate
 ,ReadOrder,src/harness/harness.cpp,call,ParseNumber
 ,ReadOrder,src/harness/harness.cpp,call,ParseSelector
@@ -49939,16 +49953,20 @@ address,function,file,kind,target
 ,ReadOrder,src/harness/harness.cpp,call,strcmp
 ,ReadOrder,src/harness/harness.cpp,call,strcpy
 ,ReadOrder,src/harness/harness.cpp,call,strlen
+,ReadOrder,src/harness/harness.cpp,deref_read,*char
 ,ReadOrder,src/harness/harness.cpp,field_maybe_written,ScriptedOrder::buildType
 ,ReadOrder,src/harness/harness.cpp,field_maybe_written,ScriptedOrder::targetUnit
 ,ReadOrder,src/harness/harness.cpp,field_maybe_written,ScriptedOrder::who
 ,ReadOrder,src/harness/harness.cpp,field_read,OrderMode::name
+,ReadOrder,src/harness/harness.cpp,field_read,ScriptedOrder::argument
 ,ReadOrder,src/harness/harness.cpp,field_read,ScriptedOrder::kind
 ,ReadOrder,src/harness/harness.cpp,field_read,ScriptedOrder::tick
 ,ReadOrder,src/harness/harness.cpp,field_read,UnitSelector::all
+,ReadOrder,src/harness/harness.cpp,field_write,ScriptedOrder::argument
 ,ReadOrder,src/harness/harness.cpp,field_write,ScriptedOrder::hasUnitTarget
 ,ReadOrder,src/harness/harness.cpp,field_write,ScriptedOrder::kind
 ,ReadOrder,src/harness/harness.cpp,field_write,ScriptedOrder::lineNo
+,ReadOrder,src/harness/harness.cpp,field_write,ScriptedOrder::queue
 ,ReadOrder,src/harness/harness.cpp,field_write,ScriptedOrder::tick
 ,ReadOrder,src/harness/harness.cpp,field_write,ScriptedOrder::x
 ,ReadOrder,src/harness/harness.cpp,field_write,ScriptedOrder::z

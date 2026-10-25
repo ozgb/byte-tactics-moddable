@@ -79,6 +79,31 @@ union Flags_37f06 {
 #include "memory_cache.h"
 
 #pragma pack(push, 1)
+union UnitTypeFlags_459200 {
+    unsigned int word;
+    struct {
+        unsigned int hi : 30;
+        unsigned int digger : 1;
+        unsigned int lo : 1;
+    } bits;
+};
+
+struct UnitDefFlags_459200 {
+    char unknown_0[0x241];
+    UnitTypeFlags_459200 flags;
+};
+
+union GameFlags_459200 {
+    unsigned short whole;
+    struct {
+        unsigned short b0 : 1;
+        unsigned short b1 : 1;
+        unsigned short b2 : 1;
+        unsigned short b3 : 1;
+        unsigned short rest : 12;
+    } bits;
+};
+
 #include "../game/game.h"
 #pragma pack(pop)
 
@@ -107,6 +132,12 @@ void __stdcall TintFrameBelow(GafFrame* param_1, int value);
 void __stdcall CutFrameBelow(GafFrame* param_1, int value);
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 #include "model_render.h"
+
+struct Vertex_0045a610 {
+    int x;
+    int y;
+    int z;
+};
 
 // FUNCTION: 0x458160
 UnitTable* UnitTable::Construct(void)
@@ -1051,4 +1082,404 @@ skip0:;
         }
         i++, face++;
     } while (i < info->faceCount);
+}
+
+// FUNCTION: 0x458fa0
+void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color)
+{
+    Vertex_0045a610 verts[2000];
+    Vertex_0045a610 tmp[25];
+    int faceno = 0;
+    int i = model->count - 1;
+    if (i >= 0) {
+        Piece_459c70* piece = &model->pieces[i];
+        while (i >= 0) {
+            unsigned char flags = piece->flags.word;
+            do {} while (0);
+            if (flags & 1) {
+                Object3do* info = piece->object;
+                Vertex_0045a610* v = (Vertex_0045a610*)piece->points.get();
+                for (int j = 0; j < info->vertexCount; j++, v++) {
+                    int bright = shade_bias(model->owner);
+                    int x = (short)(v->x >> 16);
+                    int y = (short)(v->y >> 16);
+                    int z = (short)(-v->z >> 16);
+                    verts[j].x = x;
+                    verts[j].y = z - (y >> 1);
+                    verts[j].z = y + bright;
+                    verts[j].x += view->xOffset;
+                    verts[j].y += view->yOffset;
+                }
+                Face_459c70* f;
+                if (info->firstFace != -1) {
+                    f = (Face_459c70*)info->faces + 1;
+                    faceno = 1;
+                } else {
+                    f = (Face_459c70*)info->faces;
+                    faceno = 0;
+                }
+                for (; faceno < info->faceCount; faceno++, f++) {
+                    unsigned short* ip = f->indices;
+                    int k;
+                    for (k = 0; k < f->count; k++, ip++)
+                        tmp[k] = verts[*ip];
+                    tmp[k] = tmp[0];
+                    DrawPolygonEdges(view, (Vec3 *)tmp, f->count + 1, color);
+                }
+            }
+            piece--;
+            i--;
+        }
+    }
+}
+
+static inline int digger_bias(Model_459200* model)
+{
+    if (((UnitDefFlags_459200*)model->owner->def.get())->flags.bits.digger)
+        return 125;
+    return 50;
+}
+
+static inline int shade_bias(Model_459200* model)
+{
+    bool c = ((((UnitDefFlags_459200*)model->owner->def.get())->flags.word >> 30) & 1) != 0;
+    return c ? 125 : 50;
+}
+
+// FUNCTION: 0x459200
+void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_459200 v, int useColor)
+{
+    GafFrame* bmp = model->bitmap;
+    UnitTypeFlags_459200 f;
+    if (bmp == 0)
+        return;
+
+    Vec3_459200 cv;
+    Vec3_459200 d;
+    cv = v;
+    v.v[0] = model->owner->pos_x - v.v[0];
+    v.v[1] = model->owner->pos_y;
+    v.v[2] = model->owner->pos_z - cv.v[2];
+    int altitude = GetGroundHeight((Pos_459200*)&model->owner->pos_x);
+    int z = v.p.z.whole - (v.p.y.whole >> 1) + 0x20;
+    int y = v.p.z.whole - (altitude >> 1) + 0x20;
+    short dx = v.p.y.whole;
+
+    if (bmp->scratch == 0) {
+        GameFlags_459200 gameFlags = (*(GameFlags_459200*)&g_game->flags_37f06);
+        if (gameFlags.whole & 4) {
+            f = ((UnitDefFlags_459200*)model->owner->def.get())->flags;
+            if ((f.word & 0x2000000) == 0) {
+                if ((model->owner->flags & 0x20000000)
+                    && (f.word & 0x40000000) == 0) {
+                    if (model->owner->unitDefIndex != 0 || dx >= g_game->seaLevel) {
+                        if (model->shadow == 0)
+                            BuildShadow(model,bmp);
+                        DrawFrameBlended(param_2, model->shadow, v.p.x.whole + 0x85, y);
+                    }
+                } else {
+                    if (gameFlags.bits.b3) {
+                        if ((f.word & 0x81000) == 0) {
+                            MakeSilhouette(bmp);
+                            DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
+                        }
+                    }
+                }
+            }
+        }
+        if (model->bitmap == 0) {
+            ((UnitTable*)this)->BuildObjectPicture(model, 0, 1);
+            bmp = model->bitmap;
+        }
+        if (!(model->owner->activateFlags & 4) && g_game->debugMode == 0)
+            DrawFrame((Surface*)param_2, bmp, v.p.x.whole + 0x80, z);
+        else
+            DrawFrameBlended(param_2, bmp, v.p.x.whole + 0x80, z);
+        for (int i = model->count - 1; i >= 0; i--) {
+            if ((1 & model->pieces[i].flags.word) && !(model->pieces[i].flags.word & 2)) {
+                    DrawPiece(model, (void*)param_2, (Vec3*)&cv, model->pieces[i].object,
+                                 model->pieces[i].points, model->owner->playerIndex, useColor);
+                }
+        }
+        Unit_459200* unit = model->owner->cargo;
+        while (unit) {
+            if (!(unit->flags & 0x20000)) {
+                for (int i = unit->state->count - 1; i >= 0; i--) {
+                    Piece_459c70* piece = &unit->state->pieces[i];
+                    if (piece->flags.word & 1) {
+                        DrawPiece(unit->state, (void*)param_2, (Vec3*)&cv, piece->object, piece->points,
+                                     unit->state->owner->playerIndex, useColor);
+                    }
+                }
+            }
+            unit = unit->cargoNext;
+        }
+        return;
+    }
+
+    {
+        GameFlags_459200 gameFlags = (*(GameFlags_459200*)&g_game->flags_37f06);
+        if (gameFlags.whole & 4) {
+            f = ((UnitDefFlags_459200*)model->owner->def.get())->flags;
+            if ((f.word & 0x2000000) == 0) {
+                if (f.bits.digger) {
+                    MakeSilhouette(bmp);
+                    CutFrameBelow(this->bitmap, digger_bias(model));
+                    DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
+                } else {
+                    if (model->owner->flags & 0x20000000) {
+                        if (model->owner->unitDefIndex != 0 || dx >= g_game->seaLevel) {
+                            if (model->shadow == 0)
+                                BuildShadow(model,bmp);
+                            DrawFrameBlended(param_2, model->shadow, v.p.x.whole + 0x85, y);
+                        }
+                    } else {
+                        if (gameFlags.bits.b3) {
+                            if ((f.word & 0x81000) == 0) {
+                                MakeSilhouette(bmp);
+                                int diff = g_game->seaLevel - dx;
+                                if (diff > 0) {
+                                    diff += shade_bias(model);
+                                    do {} while (0);
+                                    CutFrameBelow(this->bitmap, diff);
+                                }
+                                DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (model->bitmap == 0) {
+            ((UnitTable*)this)->BuildObjectPicture(model, 0, 1);
+            bmp = model->bitmap;
+        }
+        MergeIntoComposite(bmp, model);
+        if ((model->owner->flags & 0x20000000) == 0 || model->owner->buildLeft == DAT_004fd4c0)
+            ((UnitTable*)this)->DrawPieces(this->bitmap,model,model->owner->playerIndex,0);
+        Unit_459200* unit = model->owner->cargo;
+        while (unit) {
+            if (!(unit->flags & 0x20000)) {
+                ((UnitTable*)this)->BuildObjectPicture(unit->state,1,-1);
+                if (unit->state->bitmap) {
+                    ShadeByIntensity(unit->state->bitmap,unit->state);
+                    int* op = &model->owner->pos_x;
+                    d.v[0] = unit->pos_x - op[0];
+                    d.v[1] = unit->pos_y - op[1];
+                    d.v[2] = unit->pos_z - op[2];
+                    int ddy = d.p.y.whole;
+                    int ddz = d.p.z.whole;
+                    DrawFrameDepth(unit->state->bitmap, this->bitmap, d.p.x.whole, ddz - (ddy >> 1), ddy);
+                }
+            }
+            unit = unit->cargoNext;
+        }
+        int diff = g_game->seaLevel - dx;
+        if (diff > 0) {
+            diff += shade_bias(model);
+            if ((model->owner->flags & 0x200) == 0 && model->owner->playerIndex != g_game->playerIndex) {
+                CutFrameBelow(this->bitmap, diff);
+            } else {
+                TintFrameBelow(this->bitmap, diff);
+            }
+        }
+        if (((UnitDefFlags_459200*)model->owner->def.get())->flags.bits.digger)
+            CutFrameBelow(this->bitmap, 0x7d);
+        if (!(model->owner->activateFlags & 4) && g_game->debugMode == 0)
+            DrawFrame((Surface*)param_2, this->bitmap, v.p.x.whole + 0x80, z);
+        else
+            DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x80, z);
+    }
+}
+
+// FUNCTION: 0x459c70
+void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
+    int kind, int useColor)
+{
+    Object3do* info;
+    Poly_459c70 poly[25];
+    float accum[2000][3];
+    Vec3f normal[2000];
+    int weight[2000];
+    Poly_459c70 vertex[2000];
+
+    int mode;
+    GafFrame* src;
+    if (((Flags_37f06*)&g_game->flags_37f06)->bits.antiAlias) {
+        if ((list->owner->flags & 0x20000000) != 0 && useColor != 0) {
+            GafFrame* shadow = this->shadow;
+            mode = 1;
+            shadow->width = (unsigned short)(bitmap->width << 1);
+            shadow->height = (unsigned short)(bitmap->height << 1);
+            shadow->compressed = 0;
+            shadow->transparency = 1;
+            shadow->xOffset = (short)(bitmap->xOffset << 1);
+            shadow->yOffset = (short)(bitmap->yOffset << 1);
+            memset(shadow->scratch, 0, shadow->width * shadow->height);
+            memset(shadow->pixelsOrLayers, 1, shadow->width * shadow->height);
+            src = bitmap;
+            bitmap = shadow;
+        } else {
+            mode = 0;
+        }
+    } else {
+        mode = 0;
+    }
+
+    for (int p = list->count - 1; p >= 0; p--) {
+        if (list->pieces[p].flags.bits.visible) {
+            if (useColor == -1 || useColor == list->pieces[p].flags.bits.colored
+                    || list->owner->buildLeft != 0.0f) {
+                Vec3* verts = list->pieces[p].points;
+                Vec3* v = list->pieces[p].points;
+                info = list->pieces[p].object;
+                int k;
+                for (k = 0; k < info->vertexCount; k++, v++) {
+                    int x;
+                    int y;
+                    int z;
+                    if (mode) {
+                        x = (short)(v->x >> 16) << 1;
+                        y = (short)(v->y >> 16) << 1;
+                        z = (short)(-v->z >> 16) << 1;
+                    } else {
+                        x = (short)(v->x >> 16);
+                        y = (short)(v->y >> 16);
+                        z = (short)(-v->z >> 16);
+                    }
+                    int s = (k * 3) & 0x1f;
+                    vertex[k].x = x;
+                    vertex[k].y = z - (y >> 1);
+                    if (mode) vertex[k].z = y/2 + shade_bias(list);
+                    else vertex[k].z = y + shade_bias(list);
+                    vertex[k].shade = s;
+                    vertex[k].x += (short)bitmap->xOffset;
+                    vertex[k].y += (short)bitmap->yOffset;
+                    accum[k][0] = accum[k][1] = accum[k][2] = 0.0f;
+                    weight[k] = 0;
+                }
+
+                Face_459c70* face;
+                int fi;
+                if (info->firstFace != -1) {
+                    face = (Face_459c70*)info->faces + 1;
+                    fi = 1;
+                } else {
+                    face = (Face_459c70*)info->faces;
+                    fi = 0;
+                }
+                for (; fi < info->faceCount; fi++, face++) {
+                    unsigned short* idx = face->indices;
+                    if (!(idx[0] == idx[1] || idx[1] == idx[2] || idx[2] == idx[0])) {
+                        Vec3 p0 = verts[idx[1]];
+                        Vec3 p1 = verts[idx[0]];
+                        Vec3 p2 = verts[idx[2]];
+                        Vec3f a = VectorFromToInt(p0, p1);
+                        Vec3f b = VectorFromToInt(p0, p2);
+                        Vec3f c = CrossProduct(a, b);
+                        normal[fi] = c;
+                        c = NormalizeVector(c);
+                        normal[fi] = c;
+                    } else {
+                        normal[fi].x = 0.0f;
+                        normal[fi].y = 1.0f;
+                        normal[fi].z = 0.0f;
+                    }
+                }
+
+                if (info->firstFace != -1) {
+                    face = (Face_459c70*)info->faces + 1;
+                    fi = 1;
+                } else {
+                    face = (Face_459c70*)info->faces;
+                    fi = 0;
+                }
+                for (; fi < info->faceCount; fi++, face++) {
+                    unsigned short* idx = face->indices;
+                    for (int j = 0; j < face->count; j++, idx++) {
+                        accum[*idx][0] += normal[fi].x;
+                        accum[*idx][1] += normal[fi].y;
+                        float t2 = accum[*idx][2];
+                        do {} while (0);
+                        accum[*idx][2] = t2 + normal[fi].z;
+                        weight[*idx]++;
+                    }
+                }
+
+                for (k = 0; k < list->pieces[p].object->vertexCount; k++) {
+                    if (weight[k] != 0) {
+                        accum[k][0] /= weight[k];
+                        accum[k][1] /= weight[k];
+                        accum[k][2] /= weight[k];
+                    }
+                }
+
+                if (info->firstFace != -1) {
+                    face = (Face_459c70*)info->faces + 1;
+                    fi = 1;
+                } else {
+                    face = (Face_459c70*)info->faces;
+                    fi = 0;
+                }
+                for (; fi < info->faceCount; fi++, face++) {
+                    unsigned short* idx = face->indices;
+                    for (int j = 0; j < face->count; j++, idx++) {
+                        poly[j] = vertex[*idx];
+                        if (list->pieces[p].flags.bits.lit) {
+#ifdef __clang__
+                            double light = (double)accum[*idx][0] * g_lightX + (double)accum[*idx][1] * g_lightY;
+                            light += (double)accum[*idx][2] * g_lightZ;
+#else
+                            float light = accum[*idx][0] * g_lightX + accum[*idx][1] * g_lightY;
+                            light += accum[*idx][2] * g_lightZ;
+#endif
+                            poly[j].shade = 0x1f & ((int)(DAT_004fd4cc * light));
+                        } else {
+                            poly[j].shade = 0xf;
+                        }
+                    }
+                    if (!face->flags.bits.textured) {
+                        if (face->count == 4) {
+                            void* pic;
+                            if (face->flags.bits.usePic) {
+                                if (face->flags.bits.shaded) {
+                                    int unit = (int)(*(Ref<char>*)((char*)g_game + 0x1b8a + kind * 0x14b)).get();
+                                    pic = GetGafFrame(face->color,
+                                        *(unsigned char*)(unit + 0x96));
+                                } else if (useColor) {
+                                    pic = GetGafFrame(face->color, 0);
+                                } else {
+                                    pic = GetGafSequenceFrame(&face->pic);
+                                }
+                            } else {
+                                pic = face->pic;
+                            }
+                            DrawLitTexturedPolygon(bitmap, (GafFrame *)pic, (int *)poly, nullptr);
+                        }
+                    } else {
+                        FillShadedPolygon(bitmap, poly, face->count, face->unknown_0);
+                    }
+                }
+            }
+        }
+    }
+
+    if (((Flags_37f06*)&g_game->flags_37f06)->bits.antiAlias) {
+        if (mode != 0) {
+            DownsampleFrame(bitmap, src);
+            unsigned char* s = (unsigned char*)src->scratch;
+            if (s != 0) {
+                unsigned char* d = (unsigned char*)bitmap->scratch;
+                for (int y = 0; y < src->height; y++) {
+                    int x = src->width;
+                    while (x--) {
+                        unsigned int c = *d;
+                        *s++ = c;
+                        d += 2;
+                    }
+                    d += bitmap->width;
+                }
+            }
+        }
+    }
 }

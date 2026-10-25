@@ -14,6 +14,7 @@ struct Vec3;
 
 int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
 unsigned int __stdcall ReadPixel(Surface* surface, int x, int y);
+int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned char color);
 int __stdcall DrawPolyline(Surface* surface, Point* points, int count, int color);
 int __stdcall DrawPolylines(Surface* surface, Point* points, int* counts, int rows, int color);
 int __stdcall ClipRectangle(Surface* surface, Rect* r);

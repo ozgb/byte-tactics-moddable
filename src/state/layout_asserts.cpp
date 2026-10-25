@@ -42,7 +42,6 @@
 #include "../game/victory_conditions.h"
 #include "../game/view_flags_497180.h"
 #include "../game/zero11_004917d0.h"
-#include "../graphics/face_flags_459830.h"
 #include "../graphics/gaf_frame.h"
 #include "../graphics/memory_cache.h"
 #include "../graphics/model_types.h"
@@ -327,7 +326,7 @@ static_assert(offsetof(Eye, screenPos) == 32, "");
 static_assert(sizeof(F14373) == 4, "");
 static_assert(offsetof(F14373, bits) == 0, "");
 static_assert(offsetof(F14373, all) == 0, "");
-static_assert(sizeof(FaceFlags_459830) == 4, "");
+static_assert(sizeof(PieceFrameFlags) == 4, "");
 static_assert(sizeof(FeatureAnimPool) == 120, "");
 static_assert(offsetof(FeatureAnimPool, unknown_0) == 0, "");
 static_assert(offsetof(FeatureAnimPool, anim) == 16, "");

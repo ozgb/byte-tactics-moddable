@@ -1,0 +1,15 @@
+# Arm commander on Shore to Shore builds a solar collector and self-destructs it; enters the commander-killed condition.
+game_seed 406
+crt_seed 1406
+view_seed 2406
+map Shore to Shore
+start_positions fixed
+ticks 700
+player0.controller human
+player0.side Arm
+player0.metal 5000
+player0.energy 5000
+player1.controller ai
+player1.side Core
+order 5 0:ARMCOM:1 build ARMSOLAR 330 640
+order 300 0:ARMSOLAR:1 selfdestruct

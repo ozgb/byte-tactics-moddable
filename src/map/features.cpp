@@ -386,7 +386,7 @@ int __stdcall StepGafSequence(Anim* anim);
 GafFrame* __stdcall GetGafSequenceFrame(Anim* anim);
 void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
 #include "../graphics/model_render.h"
-#include "../graphics/particles_472630.h"
+#include "../graphics/particles.h"
 
 // FUNCTION: 0x421e60
 unsigned short __stdcall GetCellFeature(Cell* cell)

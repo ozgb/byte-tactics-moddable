@@ -4,6 +4,7 @@
 #include <vector>
 
 class ParticleSystem;
+struct Vec3;
 
 class ParticleLists {
 public:
@@ -23,6 +24,9 @@ public:
     void UpdateAll();
     void DrawAll(void* param);
     void DrawList(void* param, short index);
+    void AddToList(ParticleSystem* x, short index);
+    void AddSmoke(Vec3* pos, int limit, int emitPeriod, int holdPeriod, int lifetime, short index, int alt);
+    void AddTimedSubParticles(Vec3* pos, int emitPeriod, int holdPeriod, int lifetime, short index);
     void AddTeleportParticles(int posA, int posB, int lifetime, short index);
     void AddNanoParticles(int posA, int posB, int lifetime, short index);
     void AddThrustParticles(int posA, int posB, int period, int lifetime, short index);

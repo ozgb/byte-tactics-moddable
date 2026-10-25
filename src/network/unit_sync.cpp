@@ -445,7 +445,9 @@ class UnitSyncPlayer {
 public:
     char unknown_0[0x5c];
 
+    UnitSyncPlayer(const UnitSyncPlayer& other);
     ~UnitSyncPlayer();
+    UnitSyncPlayer& operator=(const UnitSyncPlayer& rhs);
 };
 
 class SyncChecksumVector {
@@ -536,7 +538,7 @@ static inline bool FlagOf_0046d040(UnitDef* d)
     return (d->flags2 >> 16) & 1;
 }
 
-class UnitSyncDel_0046c920 {
+class UnitSyncDeleter {
 public:
     std::map<unsigned int, UnitSyncEntry> map;
     std::vector<UnitSyncPlayer> elems;
@@ -549,7 +551,7 @@ public:
     int checksumProgress;
     int disabled;
 
-    ~UnitSyncDel_0046c920() {}
+    ~UnitSyncDeleter() {}
 };
 
 // FUNCTION: 0x46c8e0
@@ -562,7 +564,7 @@ void __stdcall CreateUnitSync(int param_1)
 void __fastcall DeleteUnitSync()
 {
     if ((UnitSync *)g_game->sync)
-        delete (UnitSyncDel_0046c920*)(UnitSync *)g_game->sync;
+        delete (UnitSyncDeleter*)(UnitSync *)g_game->sync;
     (*(UnitSync **)&g_game->sync) = 0;
 }
 
@@ -1478,3 +1480,57 @@ typedef Vec_0046faf0& (Vec_0046faf0::*AssignFn_0046faf0)(const Vec_0046faf0&);
 
 // FUNCTION: 0x4707a0 ??4?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@QAEAAV01@ABV01@@Z
 AssignFn_0046faf0 g_assign_0046faf0 = &Vec_0046faf0::operator=;
+
+// FUNCTION: 0x46ca60
+void __fastcall FinishUnitSync()
+{
+    ((UnitSync *)g_game->sync)->ApplyToUnitTypes();
+    delete (UnitSyncDeleter *)(UnitSync *)g_game->sync;
+    (*(UnitSync **)&g_game->sync) = 0;
+}
+
+// FUNCTION: 0x46cc10
+void PacketSequencer::SendSequenced(Elem_0046faf0* to, Elem_0046faf0* packet)
+{
+    packet->packet.id = ++lastSent;
+    sentQueue.insert(sentQueue.end(), 1, *packet);
+    SendPacketToPlayer(GetLocalHumanDpid(), (unsigned int)to, (unsigned char *)packet, 0xe);
+}
+
+typedef std::vector<int> IntVector;
+typedef void (IntVector::*IntVectorInsertFn)(
+    IntVector::iterator, IntVector::size_type, int const&);
+
+void __stdcall GrowIntVector(IntVector* v, int extra)
+{
+    v->reserve(extra + v->size());
+}
+
+// FUNCTION: 0x46e640 ?insert@?$vector@HV?$allocator@H@std@@@std@@QAEXPAHIABH@Z
+IntVectorInsertFn g_intVectorInsert = &IntVector::insert;
+
+typedef std::vector<UnitSyncPacket> SyncPacketVector;
+typedef void (SyncPacketVector::*SyncPacketInsertFn)(
+    SyncPacketVector::iterator, SyncPacketVector::size_type,
+    const UnitSyncPacket&);
+
+void __stdcall PushSyncPacket(SyncPacketVector* v, const UnitSyncPacket& x)
+{
+    v->push_back(x);
+}
+
+// FUNCTION: 0x46eba0 ?insert@?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@QAEXPAUUnitSyncPacket@@IABU3@@Z
+SyncPacketInsertFn g_syncPacketInsert = &SyncPacketVector::insert;
+
+inline UnitSyncPlayer& UnitSyncPlayer::operator=(const UnitSyncPlayer& rhs)
+{
+    return (UnitSyncPlayer&)((SyncPlayerRecord*)this)->operator=(*(const SyncPlayerRecord*)&rhs);
+}
+
+typedef std::vector<UnitSyncPlayer> SyncPlayerVector;
+typedef void (SyncPlayerVector::*SyncPlayerInsertFn)(
+    SyncPlayerVector::iterator, SyncPlayerVector::size_type,
+    const UnitSyncPlayer&);
+
+// FUNCTION: 0x46f7a0 ?insert@?$vector@VUnitSyncPlayer@@V?$allocator@VUnitSyncPlayer@@@std@@@std@@QAEXPAVUnitSyncPlayer@@IABV3@@Z
+SyncPlayerInsertFn g_syncPlayerInsert = &SyncPlayerVector::insert;

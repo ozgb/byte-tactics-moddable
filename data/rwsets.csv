@@ -44113,6 +44113,7 @@ address,function,file,kind,target
 ,CheckScenario,src/harness/harness.cpp,call,CheckOrders
 ,CheckScenario,src/harness/harness.cpp,call,CheckSpawns
 ,CheckScenario,src/harness/harness.cpp,call,Fail
+,CheckScenario,src/harness/harness.cpp,call,FailLine
 ,CheckScenario,src/harness/harness.cpp,call,sprintf
 ,CheckScenario,src/harness/harness.cpp,field_read,PlayerSpec::named
 ,CheckScenario,src/harness/harness.cpp,function,
@@ -44120,6 +44121,8 @@ address,function,file,kind,target
 ,CheckScenario,src/harness/harness.cpp,global_read,s_localPlayerLine@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_map@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
+,CheckScenario,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
+,CheckScenario,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,CheckSpawns,src/harness/harness.cpp,call,FailLine
 ,CheckSpawns,src/harness/harness.cpp,call,sprintf
@@ -46437,6 +46440,8 @@ address,function,file,kind,target
 ,HapiBank::WriteBox,src/files/files_bank.h,indirect_call,"indirect via int (*)(HapiBank *, void *, int) __attribute__((stdcall)) [FilesSeam::BankWriteBox]"
 ,HarnessAfterStep,src/harness/harness.cpp,call,BlockScanTick
 ,HarnessAfterStep,src/harness/harness.cpp,call,BlockScanWrite
+,HarnessAfterStep,src/harness/harness.cpp,call,MakeDirectoryPath
+,HarnessAfterStep,src/harness/harness.cpp,call,SaveGameFile
 ,HarnessAfterStep,src/harness/harness.cpp,call,fclose
 ,HarnessAfterStep,src/harness/harness.cpp,call,host_exit
 ,HarnessAfterStep,src/harness/harness.cpp,call,host_log
@@ -46448,6 +46453,8 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,g_game
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_blockScan@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
@@ -49956,6 +49963,8 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_maybe_written,s_scenarioQuirks@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,reachFlags@ReadKey
 ,ReadKey,src/harness/harness.cpp,global_read,s_quirkReach@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_stepsPerFrame@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_commanderDeath@src/harness/harness.cpp
@@ -49974,6 +49983,8 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkReachTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkTamper@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkTamperTick@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_saveLine@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_saveTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_stepsPerFrame@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_ticks@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_viewSeed@src/harness/harness.cpp

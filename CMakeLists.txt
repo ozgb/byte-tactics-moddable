@@ -57,6 +57,9 @@ target_compile_options(bitexact PRIVATE
   -fno-strict-aliasing -fwrapv -Wno-nonportable-include-path -Wno-microsoft -Wno-comment
   -vfsoverlay "${CMAKE_BINARY_DIR}/overlay.json")
 
+option(BT_COVERAGE "Build the game with clang source-based coverage" OFF)
+set(COMPILER_RT_DIR "${CMAKE_SOURCE_DIR}/build/compiler-rt" CACHE PATH "compiler-rt checkout for the coverage runtime")
+
 add_library(game OBJECT ${SOURCES})
 add_library(data OBJECT link/data.cpp)
 set(GAME_COMPILE_OPTIONS
@@ -69,6 +72,31 @@ foreach(target game data)
   target_include_directories(${target} SYSTEM PRIVATE "${MSVC5_INCLUDE}")
   target_compile_options(${target} PRIVATE ${GAME_COMPILE_OPTIONS})
 endforeach()
+
+if(BT_COVERAGE)
+  set(PROFILE_DIR "${COMPILER_RT_DIR}/compiler-rt/lib/profile")
+  if(NOT EXISTS "${PROFILE_DIR}/InstrProfiling.c")
+    message(FATAL_ERROR "The coverage runtime sources are missing: ${PROFILE_DIR}\nRun tools/coverage_runtime.sh, or set COMPILER_RT_DIR")
+  endif()
+  set(PROFILE_SOURCES "")
+  foreach(name InstrProfiling InstrProfilingBuffer InstrProfilingFile InstrProfilingInternal InstrProfilingMerge InstrProfilingMergeFile
+               InstrProfilingNameVar InstrProfilingPlatformWindows InstrProfilingUtil InstrProfilingValue InstrProfilingVersionVar
+               InstrProfilingWriter WindowsMMap)
+    list(APPEND PROFILE_SOURCES "${PROFILE_DIR}/${name}.c")
+  endforeach()
+  list(APPEND PROFILE_SOURCES "${PROFILE_DIR}/InstrProfilingRuntime.cpp")
+  add_library(clang_rt.profile STATIC ${PROFILE_SOURCES})
+  target_include_directories(clang_rt.profile PRIVATE "${CMAKE_SOURCE_DIR}/cmake/coverage" "${COMPILER_RT_DIR}/compiler-rt/include" "${PROFILE_DIR}")
+  target_include_directories(clang_rt.profile SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+  target_compile_options(clang_rt.profile PRIVATE
+    -fms-compatibility -fms-extensions -fms-compatibility-version=11.00 -fno-strict-aliasing -fwrapv -mno-sse
+    /GR- /GS- /Gw -w -vfsoverlay "${CMAKE_BINARY_DIR}/overlay.json" "/FI${CMAKE_SOURCE_DIR}/cmake/coverage/prelude.h")
+  set_source_files_properties("${PROFILE_DIR}/InstrProfilingRuntime.cpp" PROPERTIES COMPILE_OPTIONS "/GX-")
+  foreach(target game data)
+    target_compile_options(${target} PRIVATE -fprofile-instr-generate -fcoverage-mapping)
+  endforeach()
+  target_compile_definitions(game PRIVATE BT_COVERAGE=1)
+endif()
 
 foreach(source IN LISTS SOURCES)
   file(STRINGS "${source}" flags_line REGEX "^//[ \t]*FLAGS:" LIMIT_COUNT 1)
@@ -125,6 +153,12 @@ foreach(lib IN LISTS MSVC5_LIBS)
 endforeach()
 
 set(SYSTEM_LIBS "$<TARGET_FILE:bitexact>")
+if(BT_COVERAGE)
+  list(APPEND SYSTEM_LIBS "$<TARGET_FILE:clang_rt.profile>")
+  set(PROFILE_TARGETS clang_rt.profile)
+else()
+  set(PROFILE_TARGETS "")
+endif()
 foreach(lib LIBCMT LIBCPMT OLDNAMES DPLAY)
   list(APPEND SYSTEM_LIBS "${MSVC5_LIB}/${lib}.LIB")
 endforeach()
@@ -195,7 +229,7 @@ add_custom_command(
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/aliases.py"
           --objects "@${CMAKE_BINARY_DIR}/alias_objects.rsp" --libs ${SYSTEM_LIBS} ${IMPORT_LIBS} ${ZLIB_OBJECTS}
           --winmain 0x49e830 ${DATA_ORDER_FLAG} --patch-dir "${CMAKE_BINARY_DIR}/objs" --out "${CMAKE_BINARY_DIR}/aliases.obj"
-  DEPENDS game data extra bitexact ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> ${IMPORT_LIBS}
+  DEPENDS game data extra bitexact ${PROFILE_TARGETS} ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> ${IMPORT_LIBS}
           "${CMAKE_SOURCE_DIR}/tools/aliases.py"
   VERBATIM COMMAND_EXPAND_LISTS)
 
@@ -205,7 +239,7 @@ add_custom_command(
           /libpath:${CMAKE_BINARY_DIR}/lib /opt:noref,noicf /incremental:no /safeseh:no /force:multiple /map:${CMAKE_BINARY_DIR}/TotalA.map
           "@${CMAKE_BINARY_DIR}/objs/objects.rsp" "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res"
           ${ZLIB_OBJECTS} ${IMPORT_LIBS} ${SYSTEM_LIBS}
-  DEPENDS game data extra ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res" ${IMPORT_LIBS}
+  DEPENDS game data extra ${PROFILE_TARGETS} ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res" ${IMPORT_LIBS}
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(TotalA ALL DEPENDS "${CMAKE_BINARY_DIR}/TotalA.exe")
 

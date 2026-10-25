@@ -213,7 +213,7 @@ Coverage: 75.5% of functions (40 of 53), 68.5% of lines, 60.3% of branches; 13 l
 
 Issue #13. 160 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
-Coverage: 88.6% of functions (93 of 105), 87.5% of lines, 80.0% of branches; 12 live functions no scenario enters, and 37 more are dead (data/coverage.csv).
+Coverage: 88.6% of functions (93 of 105), 87.6% of lines, 80.5% of branches; 12 live functions no scenario enters, and 37 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (12 of 105, #420), by reason:
 
@@ -273,6 +273,11 @@ Coverage: 88.6% of functions (93 of 105), 87.5% of lines, 80.0% of branches; 12 
 Issue #14. 59 functions. The search in `src/ai/pathfind*.cpp`: per-player cost tables, the node budget, the open heap and the grid.
 
 Coverage: 93.8% of functions (45 of 48), 92.4% of lines, 85.4% of branches; 3 live functions no scenario enters, and 10 more are dead (data/coverage.csv).
+
+**Live functions no scenario enters** (3 of 48, #421; 45 are entered, 93.8%), by reason:
+
+- Unreachable (2): `Pathfinder::RemoveNode` and `OpenHeap::SiftDownInline`. `RunSearches` is the only caller of `RemoveNode`, and it zeroes `topPopped` just before the `if (!topPopped)` that guards the call, so the call is dead code in 3.1c. `SiftDownInline` is called only by `RemoveNode`.
+- Shutdown only (1): `Pathfinder::~Pathfinder`, called from `DestroyPathfinder` in `ShutdownIngameSystems`. Test mode ends with `host_exit(0)` right after the last tick, so no scenario runs the shutdown.
 
 **Entry points.** Phase roots: none. `Pathfinder::RunSearches` is called by `UpdatePlayers` (players).
 
@@ -417,7 +422,17 @@ none
 
 Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 69.7% of functions (62 of 89), 77.3% of lines, 67.6% of branches; 27 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
+Coverage: 73.0% of functions (65 of 89), 78.6% of lines, 68.5% of branches; 24 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
+
+**Live functions no scenario enters** (24 of 89 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421); 65 are entered, 73.0%), by reason:
+
+- Shutdown only (4): `FreeRadar`, `FreeMapResources`, `LosTables::FreeTables` and `LosTables::~LosTables`. `FreeRadar` and `FreeMapResources` are called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick. `FreeTables` has no caller but `FreeLosTables`, which nothing calls, and the destructor is that of the static table, which never runs, because `host_exit` ends the process with `TerminateProcess`.
+- Element destruction of the LOS table vectors (4): `DestroyPoint`, `DestroyLine` and `std::_Destroy` (both overloads). The vector code calls them when it destroys its elements, which only `FreeTables` and the destructor do.
+- Element construction of the LOS table vectors (2): `StoreDwordIfDst` and `std::_Construct`. The tables are filled by `resize` in `LoadLosLine`, and no scenario enters these two; not explained further.
+- Console command only (3): `CmdLOS`, `CmdLOSType` and `CmdRadar`. The game has no console in test mode (#432 adds a console key).
+- Network only (2): `CmdShareMapping` and `CmdShareRadar`, the share commands, which all check `netGameFlags & 1` (a network game); test mode runs a skirmish.
+- Menu and cursor only (2): `ResizeRadarPicture` (the multiplayer lobby map preview) and `Visible` (the mouse hover cursor of `GetOrderCursor`).
+- Needs a case no scenario sets up yet (7): `ByteMap_004658e0::Get`, `MapSize_004658e0::Contains`, `IsExplored`, `IsSeen` and `IsFootprintVisible` (the `nodrawundergray` feature checks of `DrawBattleFrame`, which only the FloatingTeeth feature, a destroyed ARMFDRAG in the local camera view, reaches), `SonarJamVisitor::ApplySonarJamFlag` (the sonar jammer ARMSCRAM of Core Contingency, which needs a naval build chain) and `GetOriginCellAtPosition` (called only from `ResurrectOrder`, which needs CORNECRO and a wreck).
 
 **Entry points.** Phase roots: none. `UpdatePlayers` (players) calls `RecalculateLineOfSight`, `UpdateUnitLineOfSight` and `UpdateSensorRadarAndCloak`, so LOS runs inside the players phase.
 
@@ -469,16 +484,16 @@ Coverage: 69.7% of functions (62 of 89), 77.3% of lines, 67.6% of branches; 27 l
 
 Issue #18. 468 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`, 14,000 lines). The largest subsystem.
 
-Coverage: 72.0% of functions (268 of 372), 64.8% of lines, 49.2% of branches; 104 live functions no scenario enters, and 28 more are dead (data/coverage.csv).
+Coverage: 72.8% of functions (271 of 372), 66.2% of lines, 50.6% of branches; 101 live functions no scenario enters, and 28 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (104 of 372 after `orders-immediate`, `orders-factory` and `orders-air` (#418) and the three scenarios of #419; 268 are entered, 72.0%), by reason:
+**Live functions no scenario enters** (101 of 372 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419 and the three of #421; 271 are entered, 72.8%), by reason:
 
 - Network only (23): the net-state methods of the goal objects and the bit writers: `LiteGoal::HasNetUnitState`, `LiteGoal::SerializeNetUnitState`, `AiSearchGoal::HasNetUnitState`, `AiSearchGoal::SerializeNetUnitState`, `PackedPosGoal` (constructor, destructor, `DeserializeNetUnitState`), `PathGoal` (8: `DeserializeNetUnitState`, `HasNetUnitState`, `SerializeNetUnitState`, `ExportGoalPose`, `FillWaypointWorldPos`, `HasReadyWaypoints`, `TickTowardGoal`, `TryClaimRepath`), `PatrolGoal` (4: constructor, `DeserializeNetUnitState`, `FillWaypointWorldPos`, `HasReadyWaypoints`), `BitReader::ReadBit`, `OrderFx::WriteBits`, `AirManeuverOrder::SerializeToBits`, `PathOrder::SerializeToBits`. `PatrolGoal` and `PackedPosGoal` are made only for a player of type 3 (a remote human), and the `PathGoal` methods only run through them.
 - Save and load only (31): `LowerBoundOrderTypes`, `OrderTypeNameLess`, `KindByIndex_0043a420`, `KindByName_0043a420`, `ResolveUnitTypeKey`, `UnitMotion::LoadMotion`, `UnitMotion::SaveMotion`, `Order::Order` (load constructor), `Order::ReattachFxToUnit`, `Order::SerializeToSave`, `SerializeSave`, `OrderFx::OrderFx`, `OrderFx::GetType`, and the load constructors, `GetType` and `Serialize` or `SerializeToSave` of `AirManeuverOrder`, `ApproachRadius`, `PathOrder`, `PointMarker` and `RingApproach`.
 - Info panel, cursor, build menu and shutdown only (8): `GetOrderName`, `GetOrderTarget`, `GetBuildWeaponPercent` (info panel), `SumQueuedBuildCount` (build menu count text), `GetOrderCursor` (cursor), `ClearOrderTypeTable` and `DestroyPathfinder` (shutdown), and `Marked` (the smart right-click order, mode 1, which the scenario `order` line has no verb for).
 - Campaign mission script only (4): `AttackUTypeOrder`, `WaitOrder`, `WaitForAttackOrder`, `MakeSelectableOrder`.
 - No caller in the game (11): `RepairUnitNoMoveOrder`, `ReadyOrder`, `ClearTargets_0043b7c0`, `TryGetDesiredHeading`, and the base-class slots `OrderFx::ApproxDist`, `ContainsCell`, `Destroy`, `FillGoalCells` and `IsFxStyle` (also of `AirManeuverOrder` and `PathOrder`).
-- Needs a unit or place the suite does not build (11): `AttackKamikazeOrder` (CORROACH or ARMVADER, tier 2 kbot lab), `ParalyzeOrder` (ARMSPID, tier 2), `ResurrectOrder` (CORNECRO, tier 3 chain and a wreck), `BuildWeaponOrder` (a missile silo or anti-missile launcher), `StandbyMineOrder` (a mine, which no build menu offers), `SelfRepairOrder`, `VtolLandingOrder`, `VtolGetRepairedOrder`, `FindLandingPad` and `FindPads` (an air repair pad), and `Direction_0044e3c0` (a fx attached to a piece of another unit, which landing on a pad and following do).
+- Needs a unit or place the suite does not build (9): `AttackKamikazeOrder` (CORROACH or ARMVADER, tier 2 kbot lab), `ParalyzeOrder` (ARMSPID, tier 2), `ResurrectOrder` (CORNECRO, tier 3 chain and a wreck), `BuildWeaponOrder` (a missile silo or anti-missile launcher), `StandbyMineOrder` (a mine, which no build menu offers), `SelfRepairOrder`, `VtolGetRepairedOrder` and `FindPads` (an air repair pad), and `Direction_0044e3c0` (a fx attached to a piece of another unit, which landing on a pad and following do).
 - Transport load and unload only (3): `GroundPickupOrder`, `GroundUnloadOrder` and `WaitIfCobBusy` (called only by those two). No scenario carries a unit: a transport's script attaches its cargo at piece -1, and each tick 3.1c then reads the cargo's heading and pitch from the bytes before the carrier's piece block (`GetPieceAngles` with index -1); #428 defines those and brings the transport scenario back.
 - Needs a fight the scenarios do not set up (13): `VtolSeekGuardOrder` (the guarded unit dies), `VtolSeekAttackOrder` (an air attack ends), `AppendOrderToTail` (both of them), the helpers of those air orders (`GroundAllyVisitor::GroundAllyVisitor`, `GroundAllyVisitor::CollectGroundAlly`, `OrderTarget`, `Patrol`, `SearchRange`, `Contains` in vtol_orders.cpp), `AddComponentwise` (a hover attack that misses twice), `Contains` and `Sub` in unit_orders.cpp (a guarded unit under attack, and the matching cancel path), and `AttackNoMoveOrder` (the scripted LLT attack on the Core commander issues the order, but the function was never entered; not explained yet).
 
@@ -561,7 +576,15 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Needs a case no scenario sets up yet (2): `MissionConditions::~MissionConditions` (runs only when a second map is loaded over the first, from `Mission::LoadMission`); `MissionConditions::Deactivate` (the console `Kill` command, or a map with no starting units).
 
-**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 69.4% of functions (68 of 98), 75.0% of lines, 66.7% of branches; 30 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
+**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 72.4% of functions (71 of 98), 76.3% of lines, 67.6% of branches; 27 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
+
+**map, functions no scenario enters** (27 of 98 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421); 71 are entered, 72.4%), by reason:
+
+- Save and load only (7): `ForceNeighborFootprintReclaim` (called from `LoadUnit`), `LoadMetalPlotmap`, `LoadPlayerFeaturesPlotmap`, `LoadMappingData`, `SaveMetalPlotmap`, `SavePlayerFeaturesPlotmap` and `SaveMappingData` (the saved game files). No scenario saves or loads a game.
+- Shutdown only (2): `FreeOtaEnumCacheAndMission`, called at the end of `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick, and `Vector_00438480::~Vector_00438480`, the destructor of the static `g_missionOrderTableVec`, which never runs, because `host_exit` ends the process with `TerminateProcess`.
+- Network lobby and map check only (6): `Mission::ComputeMapChecksum`, `MapCacheEntry::MapCacheEntry` (both constructors), `MapCacheEntry::operator?4`, `MapCacheEntry::SetChecksum` (all four only from `ComputeMapChecksum`) and `Mission::GetTerrainLength` (the map check of a joining player).
+- Multiplayer lobby and menus only (5): `Mission::GetTerrainSizeTier` (the lobby colour), `Mission::GetDescription`, `Mission::GetPlanet`, `Mission::GetTranslatedName` and `Mission::HasMissionName` (the map list and mission menus). Test mode calls only `LoadMissionByName`.
+- Campaign menu, end screen and restart only (7): `Mission::BuildMissionList`, `Mission::GetBriefing`, `Mission::SelectMission`, `Mission::MissionExists`, `Mission::AdvanceMission`, `Mission::GetMissionIndex` and `Mission::GetCampaignName`.
 
 **network** (450 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 103 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 86 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (250 in all).
 
@@ -575,7 +598,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 ## Coverage
 
-`data/coverage.csv` is the baseline of how much of each subsystem the 35 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions and its dead functions. Raising it is #405.
+`data/coverage.csv` is the baseline of how much of each subsystem the 38 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions and its dead functions. Raising it is #405.
 
 ```sh
 tools/coverage_runtime.sh                     # fetch the profile runtime sources of compiler-rt
@@ -595,20 +618,20 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | **wind_meteors** | 11 of 16 | 68.8% | 69.8% | 63.2% | 5 | 0 |
 | **economy** | 17 of 32 | 53.1% | 62.6% | 37.2% | 15 | 7 |
 | **features** | 40 of 53 | 75.5% | 68.5% | 60.3% | 13 | 7 |
-| **ai** | 93 of 105 | 88.6% | 87.5% | 80.0% | 12 | 37 |
+| **ai** | 93 of 105 | 88.6% | 87.6% | 80.5% | 12 | 37 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 85.4% | 3 | 10 |
 | **weapons** | 73 of 88 | 83.0% | 83.0% | 66.9% | 15 | 20 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 62 of 89 | 69.7% | 77.3% | 67.6% | 27 | 20 |
-| **orders** | 268 of 372 | 72.0% | 64.8% | 49.2% | 104 | 28 |
-| **units** | 112 of 167 | 67.1% | 70.3% | 59.6% | 55 | 34 |
+| **los_radar** | 65 of 89 | 73.0% | 78.6% | 68.5% | 24 | 20 |
+| **orders** | 271 of 372 | 72.8% | 66.2% | 50.6% | 101 | 28 |
+| **units** | 112 of 167 | 67.1% | 70.3% | 59.8% | 55 | 34 |
 | **players** | 50 of 143 | 35.0% | 33.2% | 24.3% | 93 | 11 |
-| **map** | 68 of 98 | 69.4% | 75.0% | 66.7% | 30 | 12 |
+| **map** | 71 of 98 | 72.4% | 76.3% | 67.6% | 27 | 12 |
 | files | 60 of 142 | 42.3% | 39.8% | 33.9% | 82 | 36 |
 | game | 73 of 183 | 39.9% | 35.4% | 20.5% | 110 | 25 |
 | network | 40 of 333 | 12.0% | 7.2% | 2.2% | 293 | 81 |
 | platform | 310 of 646 | 48.0% | 34.1% | 22.2% | 336 | 82 |
-| presentation | 441 of 1143 | 38.6% | 30.2% | 21.1% | 702 | 329 |
+| presentation | 444 of 1143 | 38.8% | 30.3% | 21.2% | 699 | 329 |
 | seams | 65 of 103 | 63.1% | 82.2% | - | 38 | 0 |
 | state | 314 of 386 | 81.3% | 78.9% | 49.4% | 72 | 22 |
 

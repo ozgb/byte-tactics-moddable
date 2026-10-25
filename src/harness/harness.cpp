@@ -205,6 +205,18 @@ struct ScriptedOrder {
 static ScriptedOrder s_orders[MAX_ORDERS];
 static int s_orderCount = 0;
 
+struct ScriptedSpawn {
+    int lineNo;
+    unsigned tick;
+    int slot;
+    int x;
+    int z;
+    char unit[40];
+};
+
+static ScriptedSpawn s_spawns[MAX_ORDERS];
+static int s_spawnCount = 0;
+
 static char* NextToken(char** cursor)
 {
     char* s = *cursor;
@@ -349,6 +361,51 @@ static void ReadOrder(int lineNo, char* value)
         FailLine(lineNo, "has extra words after the target", "order", "");
 }
 
+static void ReadSpawn(int lineNo, char* value)
+{
+    char* cursor = value;
+    char* tickText = NextToken(&cursor);
+    char* slotText = NextToken(&cursor);
+    char* unitText = NextToken(&cursor);
+    char* xText = NextToken(&cursor);
+    char* zText = NextToken(&cursor);
+    if (zText == NULL || NextToken(&cursor) != NULL)
+        FailLine(lineNo, "needs <tick> <slot> <unit> <x> <z>", "spawn", "");
+    if (s_spawnCount >= MAX_ORDERS)
+        FailLine(lineNo, "is past the limit of 256 spawn lines", "spawn", "");
+    ScriptedSpawn* sp = &s_spawns[s_spawnCount++];
+    memset(sp, 0, sizeof *sp);
+    sp->lineNo = lineNo;
+    sp->tick = ParseNumber(lineNo, "spawn", tickText);
+    if (sp->tick == 0)
+        FailLine(lineNo, "needs a tick of at least 1", "spawn", "");
+    if (slotText[0] < '0' || slotText[0] > '9' || slotText[1] != '\0') {
+        char detail[100];
+        sprintf(detail, ", \"%.40s\" is not a slot from 0 to 9", slotText);
+        FailLine(lineNo, "has a bad slot", "spawn", detail);
+    }
+    sp->slot = slotText[0] - '0';
+    if (strlen(unitText) >= sizeof sp->unit)
+        FailLine(lineNo, "has a unit type name that is too long", "spawn", "");
+    strcpy(sp->unit, unitText);
+    sp->x = ParseCoordinate(lineNo, xText);
+    sp->z = ParseCoordinate(lineNo, zText);
+}
+
+static void CheckSpawns()
+{
+    for (int i = 0; i < s_spawnCount; i++) {
+        ScriptedSpawn* sp = &s_spawns[i];
+        if (!s_players[sp->slot].named) {
+            char detail[100];
+            sprintf(detail, ", slot %d is not a player the scenario names", sp->slot);
+            FailLine(sp->lineNo, "names a bad slot", "spawn", detail);
+        }
+        if (sp->tick > s_ticks)
+            FailLine(sp->lineNo, "has a tick after the last tick", "spawn", "");
+    }
+}
+
 static void CheckOrders()
 {
     for (int i = 0; i < s_orderCount; i++) {
@@ -420,6 +477,8 @@ static void ReadKey(int lineNo, const char* key, char* value)
         s_saveLine = lineNo;
     } else if (strcmp(key, "order") == 0)
         ReadOrder(lineNo, value);
+    else if (strcmp(key, "spawn") == 0)
+        ReadSpawn(lineNo, value);
     else if (strncmp(key, "player", 6) == 0 && isdigit((unsigned char)key[6]) && key[7] == '.')
         ReadPlayerKey(lineNo, key, value);
     else
@@ -438,6 +497,7 @@ static void CheckScenario()
     if (s_map[0] == '\0')
         Fail("testmode: scenario needs a map line\n");
     CheckOrders();
+    CheckSpawns();
     if (s_saveLine != 0 && s_saveTick > s_ticks)
         FailLine(s_saveLine, "has a tick after the last tick", "save", "");
     if (s_localPlayer >= 0 && !s_players[s_localPlayer].named) {
@@ -2545,6 +2605,12 @@ int __stdcall FindOrderByType(int unit, MissionType kind);
 void __stdcall DeleteOrder(int unit, int arg);
 int UpdatePlacementGhostValidity(void);
 int __stdcall GetGroundHeight(int* pos);
+struct Pos_00485a40 {
+    int x, y, z;
+};
+Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Pos_00485a40 pos, int param_5, int mode,
+                           unsigned short id);
+void __stdcall SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos);
 void __stdcall UpdateObjectState(void* unit);
 
 void HarnessPoseObject(void* unit)
@@ -2564,7 +2630,7 @@ static unsigned char* PoolUnit(unsigned index)
     return (unsigned char*)GameU32(GAME_UNITS) + index * UNIT_STRIDE;
 }
 
-static int FindDefIndex(const ScriptedOrder* o, const char* name)
+static int FindDefIndexAt(int lineNo, const char* key, const char* name)
 {
     unsigned char* defs = (unsigned char*)GameU32(GAME_DEFS);
     unsigned count = GameU32(GAME_DEF_COUNT);
@@ -2574,8 +2640,28 @@ static int FindDefIndex(const ScriptedOrder* o, const char* name)
     }
     char detail[100];
     sprintf(detail, ", the game has no unit type \"%.40s\"", name);
-    FailLine(o->lineNo, "names an unknown unit type", "order", detail);
+    FailLine(lineNo, "names an unknown unit type", key, detail);
     return 0;
+}
+
+static int FindDefIndex(const ScriptedOrder* o, const char* name)
+{
+    return FindDefIndexAt(o->lineNo, "order", name);
+}
+
+static int IsWeaponBuildName(const char* name)
+{
+    return strcmp(name, "MAKENUKE") == 0 || strcmp(name, "MAKEANTI") == 0;
+}
+
+static void WorldPosition(int x, int z, int* pos)
+{
+    pos[0] = x << 16;
+    pos[2] = z << 16;
+    pos[1] = GetGroundHeight(pos);
+    if (pos[1] < *GameAt(0x1427f))
+        pos[1] = *GameAt(0x1427f);
+    pos[1] <<= 16;
 }
 
 static int UnitIsSlot(const unsigned char* u, int slot)
@@ -2610,7 +2696,9 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
     unsigned count = *(unsigned short*)GameAt(GAME_POOL_COUNT);
     unsigned i;
     int defIndex = o->who.all ? 0 : FindDefIndex(o, o->who.type);
-    int buildType = o->kind == ORDER_BUILD || o->kind == ORDER_QBUILD ? FindDefIndex(o, o->buildType) : 0;
+    int buildType = 0;
+    if (o->kind == ORDER_BUILD || (o->kind == ORDER_QBUILD && !IsWeaponBuildName(o->buildType)))
+        buildType = FindDefIndex(o, o->buildType);
     int target = 0;
     int pos[3];
 
@@ -2646,12 +2734,7 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
     if (x >= (int)GameU32(0x1422b) || z >= (int)GameU32(0x1422f)) {
         FailLine(o->lineNo, "has a position outside the map", "order", "");
     }
-    pos[0] = x << 16;
-    pos[2] = z << 16;
-    pos[1] = GetGroundHeight(pos);
-    if (pos[1] < *GameAt(0x1427f))
-        pos[1] = *GameAt(0x1427f);
-    pos[1] <<= 16;
+    WorldPosition(x, z, pos);
 
     unsigned char savedLocal = *GameAt(GAME_LOCAL_PLAYER);
     unsigned char savedIndex = *GameAt(GAME_PLAYER_INDEX);
@@ -2724,12 +2807,29 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
     free(selected);
 }
 
+static void IssueScriptedSpawn(const ScriptedSpawn* sp)
+{
+    int defIndex = FindDefIndexAt(sp->lineNo, "spawn", sp->unit);
+    if (sp->x >= (int)GameU32(0x1422b) || sp->z >= (int)GameU32(0x1422f))
+        FailLine(sp->lineNo, "has a position outside the map", "spawn", "");
+    Pos_00485a40 pos;
+    WorldPosition(sp->x, sp->z, (int*)&pos);
+    UnitDef* def = (UnitDef*)((unsigned char*)GameU32(GAME_DEFS) + defIndex * UNITDEF_STRIDE);
+    SnapWorldPosToFootprint(def, (Vec3*)&pos);
+    CreateUnit((unsigned char)sp->slot, (unsigned short)defIndex, pos, 1, 1, 0);
+}
+
 void HarnessBeforeStep()
 {
     if (!s_testMode)
         return;
     unsigned tick = GameU32(GAME_TICK);
-    for (int i = 0; i < s_orderCount; i++) {
+    int i;
+    for (i = 0; i < s_spawnCount; i++) {
+        if (s_spawns[i].tick == tick)
+            IssueScriptedSpawn(&s_spawns[i]);
+    }
+    for (i = 0; i < s_orderCount; i++) {
         if (s_orders[i].tick == tick)
             IssueScriptedOrder(&s_orders[i]);
     }

@@ -126,8 +126,8 @@ class Coverage(unittest.TestCase):
             cov.write_csv(self.totals, out)
             lines = out.read_text().splitlines()
             self.assertEqual(lines[0], ",".join(cov.COLUMNS))
-            self.assertEqual(lines[1], "economy,*,,2,1,7,5,4,1,")
-            self.assertEqual(lines[2], "economy,Never,src/game/economy.cpp,1,0,0,0,0,0,?Never@@YAXXZ")
+            self.assertEqual(lines[1], "economy,*,,2,1,7,5,4,1,,0")
+            self.assertEqual(lines[2], "economy,Never,src/game/economy.cpp,1,0,0,0,0,0,?Never@@YAXXZ,0")
             back = cov.read_csv(out)
         self.assertEqual(back.keys(), self.totals.keys())
         for name, t in self.totals.items():
@@ -222,6 +222,97 @@ class MergeTest(unittest.TestCase):
             self.assertEqual(t.functions - t.functions_entered, len(t.never_entered))
 
 
+def inlined_export():
+    return {"data": [{"functions": [
+        entry("?Caller@@YAXXZ", "src/game/dead.cpp", 0, [region(1, 1, 3, 2, 0)], [[2, 3, 2, 7, 0, 0, 0, 0, 4]]),
+        entry("?Inlined@@YAXXZ", "src/game/dead.cpp", 0, [region(5, 1, 6, 2, 0)], [[5, 3, 5, 7, 0, 0, 0, 0, 4]]),
+        entry("?Orphan@@YAXXZ", "src/game/dead.cpp", 0, [region(8, 1, 9, 2, 0), region(9, 1, 9, 5, 0)],
+              [[8, 3, 8, 7, 0, 0, 0, 0, 4]]),
+        entry("dead.cpp:?Static@@YAXXZ", "src/game/dead.cpp", 0, [region(11, 1, 12, 2, 0)]),
+        entry("?Ran@@YAXXZ", "src/game/dead.cpp", 3, [region(14, 1, 15, 2, 3)]),
+    ]}]}
+
+
+class DeadTest(unittest.TestCase):
+    KEY = {("src/game/dead.cpp", name): "game" for name in ("Caller", "Inlined", "Orphan", "Static", "Ran")}
+    LIVE = {"?Caller@@YAXXZ", "?Inlined@@YAXXZ", "dead.cpp_?Static@@YAXXZ"}
+
+    def totals(self, live):
+        return cov.summarize(inlined_export(), self.KEY, {}, live)[0]["game"]
+
+    def test_counter_names(self):
+        self.assertEqual(cov.counter_name("?Inlined@@YAXXZ"), "?Inlined@@YAXXZ")
+        self.assertEqual(cov.counter_name("dead.cpp:?Static@@YAXXZ"), "dead.cpp_?Static@@YAXXZ")
+        self.assertEqual(cov.counter_name("host_exit"), "host_exit")
+
+    def test_function_inlined_into_a_live_one_is_live(self):
+        t = self.totals({"?Caller@@YAXXZ", "?Inlined@@YAXXZ"})
+        names = [n for n, _, _ in t.never_entered]
+        self.assertIn("Inlined", names)
+        self.assertNotIn("Inlined", [n for n, _, _ in t.dead_functions])
+
+    def test_function_neither_linked_nor_inlined_is_dead(self):
+        t = self.totals({"?Caller@@YAXXZ", "?Inlined@@YAXXZ"})
+        self.assertEqual([n for n, _, _ in t.dead_functions], ["Orphan", "Static"])
+        self.assertEqual(t.dead, 2)
+
+    def test_static_copy_is_live_by_its_prefixed_counter(self):
+        t = self.totals(self.LIVE)
+        self.assertEqual([n for n, _, _ in t.dead_functions], ["Orphan"])
+        self.assertIn("Static", [n for n, _, _ in t.never_entered])
+
+    def test_entered_function_is_never_dead(self):
+        t = self.totals(set())
+        self.assertNotIn("Ran", [n for n, _, _ in t.dead_functions])
+        self.assertEqual((t.functions, t.functions_entered), (1, 1))
+
+    def test_dead_functions_are_left_out_of_the_totals(self):
+        t = self.totals({"?Caller@@YAXXZ", "?Inlined@@YAXXZ"})
+        self.assertEqual((t.functions, t.functions_entered), (3, 1))
+        self.assertEqual((t.lines, t.lines_hit), (7, 2))
+        self.assertEqual((t.branches, t.branches_covered), (4, 0))
+
+    def test_without_live_counters_nothing_is_dead(self):
+        t = cov.summarize(inlined_export(), self.KEY, {})[0]["game"]
+        self.assertEqual((t.dead, t.functions), (0, 5))
+
+    def test_copies_are_dead_only_when_all_are(self):
+        export = {"data": [{"functions": [
+            entry("a.cpp:?F@@YAXXZ", "src/game/dead.cpp", 0, [region(1, 1, 1, 9, 0)]),
+            entry("b.cpp:?F@@YAXXZ", "src/game/dead.cpp", 0, [region(1, 1, 1, 9, 0)])]}]}
+        key = {("src/game/dead.cpp", "F"): "game"}
+        self.assertEqual(cov.summarize(export, key, {}, {"b.cpp_?F@@YAXXZ"})[0]["game"].dead, 0)
+        self.assertEqual(cov.summarize(export, key, {}, set())[0]["game"].dead, 1)
+
+    def test_csv_round_trip_with_dead_rows(self):
+        totals = {"game": self.totals({"?Caller@@YAXXZ", "?Inlined@@YAXXZ"})}
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "coverage.csv"
+            cov.write_csv(totals, out)
+            lines = out.read_text().splitlines()
+            self.assertEqual(lines[1], "game,*,,3,1,7,2,4,0,,2")
+            self.assertEqual(lines[-2], "game,Orphan,src/game/dead.cpp,0,0,0,0,0,0,?Orphan@@YAXXZ,1")
+            self.assertEqual(lines[-1], "game,Static,src/game/dead.cpp,0,0,0,0,0,0,?Static@@YAXXZ,1")
+            self.assertEqual(cov.read_csv(out), totals)
+
+    def test_reading_a_file_without_the_dead_column(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "coverage.csv"
+            out.write_text("subsystem,function,file,functions,functions_entered,lines,lines_hit,branches,"
+                           "branches_covered,decorated\ngame,*,,1,0,0,0,0,0,\n")
+            self.assertEqual(cov.read_csv(out)["game"].dead, 0)
+
+    def test_table_has_a_dead_column(self):
+        text = cov.table({"game": self.totals({"?Caller@@YAXXZ"})})
+        self.assertEqual(text.splitlines()[0].split()[-1], "dead")
+
+    def test_live_counters_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / cov.LIVE_COUNTERS
+            out.write_text("?A@@YAXXZ\nfile.cpp_?B@@YAXXZ\n")
+            self.assertEqual(cov.read_live_counters(out), {"?A@@YAXXZ", "file.cpp_?B@@YAXXZ"})
+
+
 class PlaySuiteTest(unittest.TestCase):
     def test_attempt_clears_the_scenarios_old_profiles(self):
         seen = []
@@ -295,6 +386,7 @@ class WriteNothingTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             exe = Path(d) / "TotalA.exe"
             exe.write_bytes(b"")
+            (Path(d) / cov.LIVE_COUNTERS).write_text("")
             saved = (cov.export, cov.read_subsystems, cov.OUT, sys.argv)
             cov.export = lambda exe, profdata: {"data": [{"functions": []}]}
             cov.read_subsystems = lambda: ({}, {})

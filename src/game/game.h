@@ -11,7 +11,7 @@
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
 #include "../frontend/bits_00426e80.h"
-#include "../frontend/conn_info_443ff0.h"
+#include "../frontend/connection_info.h"
 #include "../frontend/flags37f14_0045cf60.h"
 #include "../frontend/menu_0045b800.h"
 #include "../frontend/player_entry_004777a0.h"

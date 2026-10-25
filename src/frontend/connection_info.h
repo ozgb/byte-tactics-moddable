@@ -1,7 +1,7 @@
-#ifndef CONN_INFO_443FF0_H
-#define CONN_INFO_443FF0_H
+#ifndef CONNECTION_INFO_H
+#define CONNECTION_INFO_H
 
-#include "conn_443ff0.h"
+#include "connection_blob.h"
 #include "v4i.h"
 
 #pragma pack(push, 1)

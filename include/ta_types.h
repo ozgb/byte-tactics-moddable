@@ -5912,9 +5912,9 @@ struct Conn_00443cb0 {
     char unknown_23[296];
 };
 
-#include "../src/frontend/conn_443ff0.h"
+#include "../src/frontend/connection_blob.h"
 
-#include "../src/frontend/conn_info_443ff0.h"
+#include "../src/frontend/connection_info.h"
 
 struct Inner_00444910 {
     char unknown_0[4];

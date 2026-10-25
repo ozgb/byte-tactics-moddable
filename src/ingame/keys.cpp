@@ -93,7 +93,7 @@ void __stdcall PlaySoundByName(const char* name, int param);
 void __stdcall ExecuteCommandLine(int commandLine, int mask);
 void __stdcall CollectSelectedUnits(void* param);
 #include "camera.h"
-#include "../network/net_chat_464000.h"
+#include "../network/net_chat.h"
 #include "../network/packets.h"
 void __stdcall SetDescListCleanupFlag(Gui* gui, int param);
 #include "../network/net_game.h"

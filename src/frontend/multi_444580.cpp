@@ -72,7 +72,7 @@ void __stdcall HandleSelectProviderClick(void* menu);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "../debug/debug_lib.h"
 int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
-#include "../network/online_45b490.h"
+#include "../network/online.h"
 void __stdcall SetTranslatedText(void* menu, int index, int source, int value);
 void __stdcall ConfigureListBoxByName(void* menu, char* name, void* items, int count, int flag);
 #include "frontend.h"

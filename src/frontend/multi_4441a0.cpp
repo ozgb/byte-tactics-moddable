@@ -48,7 +48,7 @@ int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
 #include "multi_443ff0.h"
 void __stdcall PlaySoundByName(char* name, int flag);
 void __stdcall SetCursorMode(int value);
-#include "../network/online_45b250.h"
+#include "../network/online.h"
 #include "../network/online.h"
 char* __stdcall Translate(char* text);
 #include "../gui/dialogs.h"

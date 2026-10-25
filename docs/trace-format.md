@@ -842,15 +842,36 @@ for i in 0 .. count-1:
     yardSize = (u32)(i16 at d+0x14a) * (u32)(i16 at d+0x14c)     # mod 2^32
     HT(UnitDefData, d)                                  # dump: defs[i].<field>
     if yardmap == null or yardSize > 65536: yardSize = 0
-    H32(yardSize);  HB(yardSize bytes at yardmap)       # dump: defs[i].yardmap, then its hex:
+    H32(yardSize);  HB(yardSize bytes at yardmap)       # dump: defs[i].yardmap (count), defs[i].yardmap (hex:)
     if ids == null or idCount > 30: idCount = 0
-    H32(idCount);   HB(idCount*2 bytes at ids)          # dump: defs[i].ids, then its hex:
+    H32(idCount);   HB(idCount*2 bytes at ids)          # dump: defs[i].ids (count), defs[i].ids (hex:)
     for m in 0 .. 3:
         mask = u32 (plain address) at d+0x231+m*4 for m < 3, at d+0x23d for m == 3
         H8(mask != 0)
-        if mask != 0: HB(0x40 bytes at mask)            # dump: defs[i].categories[m] (hex:)
+            if mask != 0: HB(0x40 bytes at mask)            # dump: defs[i].categories[m] (hex:)
 END
 ```
+The dumped `defs.count` is the count after the clamp (0 when the definitions are null or the raw
+count is above 2^14), written as 8 hex digits; the definitions that follow are `defs[0]` to
+`defs[count-1]`, each with the lines of its `UnitDefData` fields.
+
+`yardmap` and `ids` each have two lines at the same path, in this order: a count line, the
+`H32` value written as 8 hex digits (`yardSize`, `idCount`, after the clamps above), then a `hex:`
+line with the bytes that follow it in the hash (an empty `hex:` when the count is 0). The count
+line is always present, so a reader reads the count from it and need not recompute it from the
+definition's fields. The bytes are hashed as read, not written as hex numbers: `ids` is `idCount`
+little-endian 16-bit values in memory order.
+
+`defs[i].categories[m]` has a line (`hex:` and the 0x40 bytes) only when the mask address is not
+zero. When the line is absent the presence byte is 0 and nothing else is hashed; the mask `m` is
+present exactly when its line is. Mask 3 is the one at 0x23d; masks 0 to 2 are the ones at 0x231,
+0x235 and 0x239.
+
+`UnitDefData` has pointer fields (`movementclass`, `weapons[0]` to `weapons[2]`, `explodeas`,
+`selfdestructas`). They are `ref` fields of the schema, so they are hashed and dumped as IDs by
+section 5: `null` for 0, `weapondef:<n>` or `moveclass:<n>` for a ref that falls on an element of
+that table, `heap` for any other non-zero ref. Nothing in sections 29 to 31 is hashed as an
+address.
 
 ### 8.19 weapon definitions (section 30, tick 1 only)
 
@@ -865,17 +886,41 @@ for i in 0 .. 255:
         first = u32 at table+5;  last = u32 at table+9           # unaligned
         n = (first != 0 and last >= first and (last-first) mod 8 == 0) ? (last-first)/8 : 0
         if n > 2^20: n = 0
-        H32(n)                                          # dump: weapons[i].damage.entries
+        H32(n)                                          # dump: weapons[i].damage.entries (always present)
         for k in 0 .. n-1:
             e = first + k*8
             string(u32 at e)                            # dump: weapons[i].damage[k].name
             H32(u32 at e+4)                             # dump: weapons[i].damage[k].value
 END
 ```
+`WeaponDefData` has no pointer fields: the table address at 0x64 is not one of its schema fields (the
+field named `damage`, a 16-bit number, is an ordinary scalar with the path `weapons[i].damage`, and
+is not the table). The table's lines are `weapons[i].damage.entries`, then for each entry `k` the
+lines `weapons[i].damage[k].name` and `weapons[i].damage[k].value`. All of them are present exactly
+when the table address is not zero; the `entries` line is then present even when `n` is 0 (it
+holds the `n` after the clamps above, as 8 hex digits). The `name` line is `null` (when the entry's
+string address is 0) or a `str:` value, and the `value` line is the entry's second word as 8 hex
+digits (the `H32` value).
+
 `string(p)`: `H8(p != null)`; if not null, `len` is the number of bytes before the first 0 byte, at most
 255; `H32(len)`; `HB(len bytes at p)`. Dump: `null` or `str:` followed by the `len` bytes.
+The bytes are written as they are: no quoting and no escaping, any byte value other than 0 as that
+byte (bytes of 0x80 and above are not translated), and the line ends at the next newline. The
+length is not written; it is the number of bytes after `str:` up to the end of the line (an empty
+string is `str:` alone and is not `null`). A string of 255 or more bytes is cut at 255. A string
+cannot hold a 0 byte, since that ends it. A string that holds a newline byte (0x0a) cannot be read
+back from the dump, because its line ends there; take such a block from the trace instead.
+(No string in the scenarios so far holds one.) Read the dump
+as bytes (for instance as Latin-1) and split lines at 0x0a only, so that a carriage return or a
+byte of 0x80 or above stays in the value.
 
 ### 8.20 mission (section 31, tick 1 only)
+
+The mission record is present when `game+0x391e9` is not zero. When it is, the lines
+`mission.<field>` of `MissionData` are in the dump and the presence byte is 1; when it is zero
+there are no `mission.*` lines, the presence byte is 0 and the section is only `H8(31)`, `H8(0)`,
+`END`. A scenario that is not a mission (a skirmish) can still have a record, so decide from the
+lines, not from the scenario.
 
 ```
 H8(31)
@@ -903,7 +948,28 @@ if m != null:
         HB(8 bytes at f+0x80)                           # dump: mission.features[kf].pos (hex:)
 END
 ```
-A `ref` that is zero gives a null string pointer.
+A `ref` that is zero gives a null string pointer. `MissionData` and `MissionStartRest` have no
+pointer fields.
+
+The three counts are written after the clamp: a count is 0 when its array is null or the raw
+count is above 65536, and `mission.units.count`, `mission.rules.count` and
+`mission.features.count` hold that clamped value as 8 hex digits (always present when the record is).
+`MissionStartRest` follows `MissionData` (its lines `mission.startMetalRest` and
+`mission.startEnergyRest`) exactly when the mission type is 1, and so exactly when those lines are
+present.
+
+Line forms, for `ku` in `0 .. unitCount-1` and `kf` in `0 .. featureCount-1`:
+
+| Path | Value |
+| --- | --- |
+| `mission.units[ku].name`, `.ident`, `.initialMission` | `null` or `str:` (three lines, in this order) |
+| `mission.units[ku]` | `hex:` and the 0x18 bytes at offset 0xc of the unit entry |
+| `mission.rules.count` | 8 hex digits |
+| `mission.rules` | `hex:` and `ruleCount*12` bytes (an empty `hex:` when 0) |
+| `mission.features[kf].name` | `str:` (read from the 0x80 inline bytes, and on past them into the next bytes of the entry if none of the 0x80 is zero, at most 255 bytes in all) |
+| `mission.features[kf].pos` | `hex:` and 8 bytes |
+
+The string refs of a unit entry are relative to the start of the state block, as every ref is.
 
 ## 9. The per-tick digest
 
@@ -950,7 +1016,8 @@ with single spaces between the first three fields and the value, which runs to t
 **Order.** For each phase of the tick that runs (`units` to `meteors`; `net` first if it runs) the
 dump has, in order: the lines of the phase row (`gameTick`, `rng.parkMiller`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
-tick is 1; sections 29 to 31 appear only at tick 1). The lines come in exactly the order the hash consumes them, so reading the lines of one
+tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
+lines of section 28; in the `meteors` block they end the block). The lines come in exactly the order the hash consumes them, so reading the lines of one
 (phase, part) block in order and applying the rules of sections 6 to 8 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.

@@ -28,8 +28,15 @@ extern "C" void HOST_CALL host_fatal(void* owner, const char* title, const char*
     exit(1);
 }
 
+#if BT_COVERAGE
+extern "C" int __cdecl __llvm_profile_write_file(void);
+#endif
+
 extern "C" void HOST_CALL host_exit(int code)
 {
+#if BT_COVERAGE
+    __llvm_profile_write_file();
+#endif
     TerminateProcess(GetCurrentProcess(), (UINT)code);
 }
 

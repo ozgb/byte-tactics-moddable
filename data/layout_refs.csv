@@ -38,12 +38,12 @@ GetServiceProviderIndex,0x441bc0,src/frontend/multi.cpp,end-of,g_dpspGuidTcpip,0
 BuildCompoundAddress,0x441c30,src/frontend/multi.cpp,end-of,g_dpspGuidModem,0,g_dpspGuidSerial,,none
 BuildCompoundAddress,0x441c30,src/frontend/multi.cpp,end-of,g_dpspGuidSerial,0,g_dpspGuidTcpip,,none
 BuildCompoundAddress,0x441c30,src/frontend/multi.cpp,end-of,g_dpspGuidTcpip,0,g_dpspGuidIpx,,none
-FillProviderList,0x444580,src/frontend/multi_444580.cpp,past-end,g_linkInfo,-4,g_linkInfo,DAT_0051278c+0x38,none
+FillProviderList,0x444580,src/frontend/multi.cpp,past-end,g_linkInfo,-4,g_linkInfo,DAT_0051278c+0x38,none
 ListSaveGameFiles,0x44b4e0,src/frontend/multi.cpp,end-of,g_lstExtension,0,g_savegameNamesName,,none
 ListSaveGameFiles,0x44b4e0,src/frontend/multi.cpp,end-of,g_savegameDescsName,0,g_gamesGadgetName,,none
 ListSaveGameFiles,0x44b4e0,src/frontend/multi.cpp,end-of,g_savegameNamesName,0,g_savegameDescsName,,none
 JoinNetGame,0x4517b0,src/network/net_game.cpp,end-of,g_onlineLobbyPlayerName,0,g_onlineLobbyPassword,,none
-HandleNetPackets,0x453d40,src/network/net_game_453d40.cpp,end-of,g_playerDisconnectedText,0,g_integrityBreachText,,none
+HandleNetPackets,0x453d40,src/network/net_game.cpp,end-of,g_playerDisconnectedText,0,g_integrityBreachText,,none
 InitLobbiedConnection,0x457710,src/network/net_game.cpp,end-of,g_cmdlineHostGameName,0,DAT_00512c98,,none
 SetHostGameName,0x45b820,src/frontend/options.cpp,end-of,g_cmdlineHostGameName,0,g_cmdlineHostMode,,none
 LoadSavedSettings,0x45cc50,src/frontend/options.cpp,end-of,g_optionsBackupTrackTypes,0,g_optionsBackupEdgeScroll,,none
@@ -139,8 +139,6 @@ LzssCompress,0x4d0f60,src/files/sqsh.cpp,end-of,g_lzssPresetTree,0,g_lzssPresetW
 LzssCompress,0x4d0f60,src/files/sqsh.cpp,end-of,g_squashThreadLockTicket,0,g_squashThreadLockEvent,,none
 LzssExpand,0x4d1480,src/files/sqsh.cpp,end-of,g_squashThreadLockTicket,0,g_squashThreadLockEvent,,none
 LzssSetPreset,0x4d1670,src/files/sqsh.cpp,end-of,g_lzssPresetTree,0,g_lzssPresetWindow,,none
-SetStateLogged,,src/frontend/frontend.cpp,end-of,g_frontendSourceFile,0,g_frontendStateChangeFormat,,none
-SetSubStateLogged,,src/frontend/frontend.cpp,end-of,g_frontendSourceFile,0,g_frontendStateChangeFormat,,none
 VisitWorld,,src/harness/harness.cpp,end-of,g_liteGoalVtable,0,g_packedGoalVtable,,none
 VisitWorld,,src/harness/harness.cpp,end-of,g_packedPosGoalVtable,0,g_liteGoalVtable,,none
 VisitWorld,,src/harness/harness.cpp,end-of,g_patrolGoalVtable,0,g_aiSearchGoalVtable,,none

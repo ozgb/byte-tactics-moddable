@@ -30,11 +30,13 @@ extern "C" void HOST_CALL host_fatal(void* owner, const char* title, const char*
 
 #if BT_COVERAGE
 extern "C" int __cdecl __llvm_profile_write_file(void);
+extern "C" void __cdecl __llvm_profile_initialize_file(void);
 #endif
 
 extern "C" void HOST_CALL host_exit(int code)
 {
 #if BT_COVERAGE
+    __llvm_profile_initialize_file();
     __llvm_profile_write_file();
 #endif
     TerminateProcess(GetCurrentProcess(), (UINT)code);

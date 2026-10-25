@@ -65,7 +65,7 @@ struct Vec3_004736e0 {
     }
 };
 
-union Fix_004736e0 {
+union Fixed16 {
     int whole;
     short half[2];
 };
@@ -640,7 +640,7 @@ void ObjectPool::FreeBlocks()
     if (slots != 0) {
         GameFreeThunk(slots);
     }
-    std::vector<Item_00470ae0*>::iterator it = items.begin();
+    std::vector<PoolBlock*>::iterator it = items.begin();
     while (it != items.end()) {
         GameFreeThunk(*it);
         items.erase(it);
@@ -1193,7 +1193,7 @@ void TeleportParticles::Init(Vec3_004736e0* a, Vec3_004736e0* b, int c)
     pos2 = *b;
     dir = pos2 - pos1;
     int dist = dir.Length();
-    Fix_004736e0 scale;
+    Fixed16 scale;
     scale.whole = (int)(((__int64)dist << 16) / 327680);
     int step = scale.half[1];
     sparkLifetime = step;
@@ -1670,9 +1670,9 @@ __declspec(noinline) int ObjectPool::Grow(int newCapacity, int newSlotSize)
     if (newCapacity > capacity) {
         void** table = (void**)GameReallocIgnoreTag((int*)slots, newCapacity * 4);
         if (table != 0) {
-            Item_00470ae0* block = (Item_00470ae0*)GameAllocShared((newCapacity - capacity) * newSlotSize);
+            PoolBlock* block = (PoolBlock*)GameAllocShared((newCapacity - capacity) * newSlotSize);
             slots = table;
-            if (block != 0) {
+            if (block != nullptr) {
                 int i = capacity;
                 if (i < newCapacity) {
                     int offset = 0;
@@ -1862,7 +1862,7 @@ void NanoParticles::Emit()
 
         e.vel = e.tgt - e.pos;
         int len = LengthFloat(e.vel);
-        Fix_004736e0 step;
+        Fixed16 step;
         step.whole = (int)(((__int64)len << 16) / 0x40000);
         short s = step.half[1];
         if (s != 0) {
@@ -1982,11 +1982,11 @@ void TimedSubParticles::Render(int dest)
     }
 }
 
-typedef void (std::vector<TeleportParticle>::*InsertFn_004758c0)(
+typedef void (std::vector<TeleportParticle>::*TeleportParticleInsertFn)(
     std::vector<TeleportParticle>::iterator, std::vector<TeleportParticle>::size_type, const TeleportParticle&);
 
 // FUNCTION: 0x4758c0 ?insert@?$vector@UTeleportParticle@@V?$allocator@UTeleportParticle@@@std@@@std@@QAEXPAUTeleportParticle@@IABU3@@Z
-InsertFn_004758c0 g_insert_004758c0 = &std::vector<TeleportParticle>::insert;
+TeleportParticleInsertFn g_teleportParticleInsert = &std::vector<TeleportParticle>::insert;
 
 typedef void (std::vector<ThrustParticle>::*InsertFn_00475bd0)(
     std::vector<ThrustParticle>::iterator, std::vector<ThrustParticle>::size_type, const ThrustParticle&);

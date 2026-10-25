@@ -124,7 +124,6 @@ FindData_0041d4c0,no,2,include/ta_types.h:3791|src/game/cd_check.cpp:13,same-lay
 FindData_0042a440,no,2,include/ta_types.h:4560|src/game/data_files.cpp:531,same-layout,include/ta_types.h
 FindData_00495930,no,2,include/ta_types.h:11825|src/ingame/keys.cpp:30,same-layout,include/ta_types.h
 FindData_004cb170,no,2,include/ta_types.h:16146|src/graphics/pcx.cpp:327,same-layout,include/ta_types.h
-Fix_004736e0,no,2,include/ta_types.h:9363|src/graphics/particles.cpp:68,differs,src/graphics/particles.cpp
 Fixed,no,11,include/ta_types.h:2508|src/graphics/model_render.cpp:19|src/ingame/markers.cpp:8|src/map/features.cpp:52|src/map/terrain.cpp:66|src/orders/unit_orders.cpp:788|src/orders/vtol_orders.cpp:49|src/units/unit_position.cpp:7|src/units/unit_types.cpp:13|src/weapons/explosions.cpp:26|src/weapons/weapons.cpp:7,differs,src/map/terrain.cpp
 FixedParts_00407ae0,no,2,include/ta_types.h:17816|src/ai/ai_player.cpp:650,differs,include/ta_types.h
 FixedParts_004853b0,no,2,include/ta_types.h:10576|src/units/units_485010.cpp:124,differs,include/ta_types.h
@@ -186,7 +185,6 @@ Info_00477510,no,2,include/ta_types.h:9652|src/frontend/campaign_menu.cpp:19,sam
 InsertResult,no,2,include/ta_types.h:8390|src/network/unit_sync.cpp:1350,differs,include/ta_types.h
 InsertResult_004db450,no,2,include/ta_types.h:16745|src/debug/debug_lib.cpp:1041,identical,include/ta_types.h
 IntDynArray,no,3,include/ta_types.h:10264|src/ingame/selection.cpp:556|src/sound/sound.cpp:709,differs,include/ta_types.h
-Item_00470ae0,no,2,include/ta_types.h:8893|src/graphics/object_pool.h:6,identical,src/graphics/object_pool.h
 Item_004a1b40,no,2,include/ta_types.h:12374|src/gui/gui.cpp:1374,differs,include/ta_types.h
 Item_004a36a0,no,2,include/ta_types.h:12395|src/gui/gui.cpp:2350,differs,include/ta_types.h
 Item_004a3780,no,2,include/ta_types.h:12400|src/gui/gui.cpp:2449,differs,include/ta_types.h
@@ -277,7 +275,7 @@ Obj_004b7f00,no,2,include/ta_types.h:13876|src/graphics/gaf.cpp:59,identical,inc
 Obj_004b7f70,no,2,include/ta_types.h:13887|src/graphics/gaf.cpp:96,identical,include/ta_types.h
 Obj_004c13d0,no,2,include/ta_types.h:14400|src/graphics/draw.cpp:75,same-layout,include/ta_types.h
 Obj_004c2380,no,2,include/ta_types.h:14484|src/gui/mouse.cpp:25,differs,src/gui/mouse.cpp
-ObjectPool,no,2,include/ta_types.h:8881|src/graphics/object_pool.h:11,same-layout,src/graphics/object_pool.h
+ObjectPool,no,2,include/ta_types.h:8881|src/graphics/object_pool.h:11,differs,src/graphics/object_pool.h
 ObjectState,no,2,src/ingame/info_panel_46a610.cpp:27|src/units/unit_script.cpp:25,differs,src/units/unit_script.cpp
 Object_00477510,no,2,include/ta_types.h:9657|src/frontend/campaign_menu.cpp:24,same-layout,include/ta_types.h
 Object_00499c10,no,2,include/ta_types.h:11943|src/weapons/weapons.cpp:256,differs,include/ta_types.h

@@ -1743,7 +1743,7 @@ presentation,GetFrameRate,src/graphics/display.cpp,1,0,0,0,0,0,?GetFrameRate@@YG
 presentation,GetGadgetActiveByName,src/gui/gui.cpp,1,0,0,0,0,0,?GetGadgetActiveByName@@YGDPAUDialog_004a04f0@@PAD@Z,0,
 presentation,GetGadgetName,src/gui/gui.cpp,1,0,0,0,0,0,?GetGadgetName@@YGXPAUEntry_0049f8c0@@PADH@Z,0,
 presentation,GetGadgetRect,src/gui/gui.cpp,1,0,0,0,0,0,?GetGadgetRect@@YGXPAUGadget@@PAURect@@@Z,0,
-presentation,GetGadgetRect_inlined,src/gui/dialogs.cpp,1,0,0,0,0,0,?GetGadgetRect_inlined@@YGXPAUGadget@@PAURect_004b6720@@@Z,0,
+presentation,GetGadgetRect_inlined,src/gui/dialogs.cpp,1,0,0,0,0,0,?GetGadgetRect_inlined@@YGXPAUGadget@@PAUDialogRect@@@Z,0,
 presentation,GetGadgetScreenRect,src/gui/gui.cpp,1,0,0,0,0,0,?GetGadgetScreenRect@@YGXPADHPAURect@@@Z,0,
 presentation,GetGadgetStatus,src/gui/gui.cpp,1,0,0,0,0,0,?GetGadgetStatus@@YGHPAUDialog_004a04f0@@H@Z,0,
 presentation,GetGadgetText,src/gui/gui.cpp,1,0,0,0,0,0,?GetGadgetText@@YGPADPAUDialog_004a04f0@@PAD1@Z,0,

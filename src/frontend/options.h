@@ -20,6 +20,7 @@ void __stdcall ApplyDefaultMusicOptions();
 void __stdcall ApplyDefaultUiOptions();
 void __stdcall ApplyDefaultVisualOptions();
 void __stdcall LoadSavedAudioSettings();
+void __stdcall RestoreSoundOptions();
 void __stdcall RestoreUiOptions();
 void __stdcall RestoreVisualOptions();
 void __stdcall LoadSavedSettings();

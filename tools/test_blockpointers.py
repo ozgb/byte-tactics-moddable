@@ -87,8 +87,8 @@ class NamingTest(unittest.TestCase):
     def test_map_names(self):
         self.assertEqual(self.code.function(0x401010), "Alias")
         self.assertEqual(self.code.function(0x401030), "Setup")
-        self.assertEqual(self.code.function(0x401120), "Vec::Make")
-        self.assertEqual(self.code.function(0x401160), "Vec::Make")
+        self.assertEqual(self.code.function(0x401120), "?Make@?$Vec@H@@QAEXXZ")
+        self.assertEqual(self.code.function(0x401160), "?Make@?$Vec@H@@QAEXXZ")
         self.assertEqual(self.code.function(0x401201), "Other")
 
     def test_dead_names_leave_the_address(self):
@@ -98,6 +98,28 @@ class NamingTest(unittest.TestCase):
         self.assertEqual(code.function(0x401030), "Setup")
         both = bp.parse_map(MAP, {"?Alias@@YAXXZ", "?Load@Loader@@QAEXXZ"})
         self.assertEqual(both.function(0x401010), "Alias")
+
+    def test_instantiations_are_named_by_their_own_symbol(self):
+        lines = [" 0001:00001000       ?insert@?$vector@H@std@@QAEXXZ   0000000000401000   a.obj",
+                 " 0001:00001100       ?insert@?$vector@G@std@@QAEXXZ   0000000000401100   a.obj"]
+        before = bp.parse_map("\n".join(lines))
+        added = bp.parse_map("\n".join([" 0001:00000f00       ?insert@?$vector@F@std@@QAEXXZ   0000000000400f00   a.obj"]
+                                       + lines))
+        for code in (before, added):
+            self.assertEqual(code.function(0x401010), "?insert@?$vector@H@std@@QAEXXZ")
+            self.assertEqual(code.function(0x401110), "?insert@?$vector@G@std@@QAEXXZ")
+        self.assertEqual(added.function(0x400f10), "?insert@?$vector@F@std@@QAEXXZ")
+        namer = bp.Namer(added, [(0x401010, "T"), (0x401110, "T")])
+        self.assertEqual(namer.name("0x00401110", "T"), "?insert@?$vector@G@std@@QAEXXZ: T")
+
+    def test_shared_plain_names_use_the_decorated_name(self):
+        lines = [" 0001:00001000       ?Run@@YAXH@Z   0000000000401000   a.obj",
+                 " 0001:00001100       ?Run@@YAXF@Z   0000000000401100   a.obj",
+                 " 0001:00001200       ?Once@@YAXF@Z  0000000000401200   a.obj"]
+        code = bp.parse_map("\n".join(lines))
+        self.assertEqual(code.function(0x401010), "?Run@@YAXH@Z")
+        self.assertEqual(code.function(0x401110), "?Run@@YAXF@Z")
+        self.assertEqual(code.function(0x401210), "Once")
 
     def test_names_and_numbers(self):
         sites = [(0x401010, ""), (0x401018, ""), (0x401012, "T"), (0x401014, "T"), (0x401030, "")]
@@ -117,6 +139,42 @@ class NamingTest(unittest.TestCase):
         self.assertEqual((out[1].holder, out[1].offset), ("SimGlobals.table", 0x10))
         out = bp.resolve([bp.parse_scan(SCAN, "s")], self.code, None)
         self.assertEqual((out[1].holder, out[1].offset), ("SimGlobals+0x14", 0))
+
+
+class LinkedObjectsTest(unittest.TestCase):
+    class Obj:
+        def __init__(self, dead):
+            sym = type("Sym", (), {"is_func": True, "section": 1})
+            self.externals = {name: sym for name in dead}
+            self.secs = [type("Sec", (), {"data": b""})]
+
+    def fake_parse(self, path):
+        return self.Obj(["?Dead@@YAXXZ"] if Path(path).name == "stale.obj" else ["?Gone@@YAXXZ"])
+
+    def test_only_listed_objects_count(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            objs = Path(tmp) / "objs"
+            objs.mkdir()
+            (objs / "0000_a.obj").write_bytes(b"")
+            (objs / "stale.obj").write_bytes(b"")
+            (objs / "objects.rsp").write_text('"%s"\n0000_a.obj\n\n' % (objs / "0000_a.obj"))
+            with mock.patch("objread.parse", self.fake_parse):
+                self.assertEqual(bp.empty_functions(objs), {"?Gone@@YAXXZ"})
+
+    def test_missing_list_is_an_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(ValueError) as cm:
+                bp.empty_functions(Path(tmp) / "objs")
+            self.assertIn("no objs/objects.rsp beside", str(cm.exception))
+            self.assertIn("block pointer holders need the linked objects", str(cm.exception))
+
+    def test_check_scans_reports_the_missing_list(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            map_path = Path(tmp) / "TotalA.map"
+            map_path.write_text(MAP)
+            problems = bp.check_scans({"eight": SCAN}, map_path, bp.ROOT, [])
+            self.assertEqual(len(problems), 1)
+            self.assertIn("no objs/objects.rsp beside", problems[0])
 
 
 class FoldTest(unittest.TestCase):

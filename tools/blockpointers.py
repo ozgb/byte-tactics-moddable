@@ -24,7 +24,11 @@ the allocation sites with the linker map and merges the results. It accepts vers
 
 Names. A site is a return address in the exe. The map (build/modern/TotalA.map) gives the function
 that contains it, and the tag the caller passed adds `: <tag>`. A function with several sites of one
-tag has them numbered `#2`, `#3` in address order. Address 0 is `unknown`. The holder `SimGlobals`
+tag has them numbered `#2`, `#3` in address order. The function is named by its plain name
+(`Class::method`), except a member of a class template and a plain name that two functions in the map
+share, which take their decorated name (`?insert@?$vector@...`), so that a row moves only when its own
+function does. The objects listed in objs/objects.rsp beside the map say which functions are empty
+(see parse_map); the tool stops when that file is missing. Address 0 is `unknown`. The holder `SimGlobals`
 is named `SimGlobals.<field>`, the field of src/state/sim_globals.h that holds the word (from the
 record layout clang prints for a probe that includes the header), and the offset is then inside that
 field; with no layout the holder is `SimGlobals` and the offset is the struct's.
@@ -186,14 +190,32 @@ def demangle(name: str) -> str:
     return re.sub(r"@\d+$", "", name[1:] if name.startswith("_") else name)
 
 
-def empty_functions(objs_dir: Path) -> set[str] | None:
-    """The decorated names of functions whose code the link left out (empty sections in the post-prune objects), or
-    None if the directory is missing. The linker puts such a name at the next live function's address."""
-    if not objs_dir.is_dir():
-        return None
+def is_instantiation(name: str) -> bool:
+    """Whether a decorated name is a member of a class template (`?insert@?$vector@...`)."""
+    return re.match(r"\?[^@?]+@\?\$", name) is not None
+
+
+def objects_listed(objs_dir: Path) -> list[Path]:
+    """The objects the link took, from objs/objects.rsp (one path per line, quoted or not)."""
+    rsp = objs_dir / "objects.rsp"
+    if not rsp.is_file():
+        raise ValueError("no objs/objects.rsp beside the map (%s): the block pointer holders need the linked objects"
+                         % rsp.parent.parent)
+    paths = []
+    for line in rsp.read_text().splitlines():
+        line = line.strip().strip('"')
+        if line:
+            path = Path(line)
+            paths.append(path if path.is_absolute() else objs_dir / path)
+    return paths
+
+
+def empty_functions(objs_dir: Path) -> set[str]:
+    """The decorated names of functions whose code the link left out (empty sections in the objects listed in
+    objs/objects.rsp). The linker puts such a name at the next live function's address."""
     import objread
     dead: set[str] = set()
-    for path in sorted(objs_dir.glob("*.obj")):
+    for path in objects_listed(objs_dir):
         obj = objread.parse(path)
         dead.update(name for name, sym in obj.externals.items()
                     if sym.is_func and sym.section > 0 and not obj.secs[sym.section - 1].data)
@@ -202,7 +224,12 @@ def empty_functions(objs_dir: Path) -> set[str] | None:
 
 def parse_map(text: str, dead: set[str] | None = None) -> CodeMap:
     """The code symbols of a linker map. Of several names at one address the first by (FUN_ last, name) wins,
-    leaving out the names in `dead` (functions with no code) unless every name there is dead."""
+    leaving out the names in `dead` (functions with no code) unless every name there is dead.
+
+    A function named by its plain name keeps that name only while no other function in the map has it; a
+    member of a class template, or a plain name that two functions share, is named by its decorated name,
+    which belongs to that function alone.
+    """
     by_address: dict[int, list[str]] = {}
     for line in text.splitlines():
         m = MAP_LINE.match(line)
@@ -210,19 +237,20 @@ def parse_map(text: str, dead: set[str] | None = None) -> CodeMap:
             continue
         by_address.setdefault(int(m.group(2), 16), []).append(m.group(1))
     addresses = sorted(by_address)
-    names = []
+    chosen = []
     for a in addresses:
         live = [n for n in by_address[a] if not dead or n not in dead] or by_address[a]
-        names.append(min((demangle(n) for n in live), key=lambda n: (n.startswith("FUN_"), n)))
+        chosen.append(min(live, key=lambda n: (demangle(n).startswith("FUN_"), demangle(n))))
+    shared: dict[str, int] = {}
+    for n in chosen:
+        shared[demangle(n)] = shared.get(demangle(n), 0) + 1
+    names = [n if is_instantiation(n) or shared[demangle(n)] > 1 else demangle(n) for n in chosen]
     return CodeMap(addresses, names)
 
 
 def load_code_map(map_path: Path) -> CodeMap:
-    """The map's code symbols, named by live code when the objects beside the map (objs/) are there."""
-    dead = empty_functions(map_path.parent / "objs")
-    if dead is None:
-        print("warning: no objs/ beside %s; sites are named without knowing which functions are empty" % map_path)
-    return parse_map(map_path.read_text(errors="replace"), dead)
+    """The map's code symbols, named by live code from the objects listed beside the map (objs/objects.rsp)."""
+    return parse_map(map_path.read_text(errors="replace"), empty_functions(map_path.parent / "objs"))
 
 
 class Namer:
@@ -541,7 +569,10 @@ def check_scans(texts: dict[str, str | None], map_path: Path, build_dir: Path,
         return problems
     if not map_path.is_file():
         return problems + ["%s: no linker map to name the sites with" % map_path]
-    code = load_code_map(map_path)
+    try:
+        code = load_code_map(map_path)
+    except ValueError as e:
+        return problems + [str(e)]
     needs_layout = any(r.holder == SIM_GLOBALS for s in scans for r in s.rows)
     members = load_members(build_dir) if needs_layout else []
     listed = read_rows() if rows is None else rows
@@ -663,7 +694,10 @@ def main() -> None:
         print("warning: the scans come from different commits: " + ", ".join(sorted(commits)))
     members = load_members(args.build_dir or default_build_dir()) \
         if any(r.holder == SIM_GLOBALS for s in scans for r in s.rows) else []
-    code = load_code_map(map_path)
+    try:
+        code = load_code_map(map_path)
+    except ValueError as e:
+        sys.exit("blockpointers: %s" % e)
     merged = merge_kept(with_wild(merge(resolve(scans, code, members)), old), old)
     now = {row_key(r) for r in merged}
     lost = [r for r in old if (r["class"] or r["note"]) and row_key(r) not in now]

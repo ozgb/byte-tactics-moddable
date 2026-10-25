@@ -171,13 +171,15 @@ struct OrderMode {
 };
 
 static const OrderMode s_orderModes[ORDER_KINDS] = {
-    { "move", 2, NULL }, { "attack", 3, NULL }, { "build", 0xe, NULL }, { "patrol", 9, NULL },
-    { "guard", 7, NULL }, { "reclaim", 0xc, NULL }, { "dgun", 4, NULL }, { "unload", 5, NULL },
-    { "load", 6, NULL }, { "repair", 8, NULL }, { "teleport", 0xb, NULL }, { "capture", 0xd, NULL },
+    { "move", 2, "" }, { "attack", 3, "" }, { "build", 0xe, "" }, { "patrol", 9, "" },
+    { "guard", 7, "" }, { "reclaim", 0xc, "" }, { "dgun", 4, "" }, { "unload", 5, "" },
+    { "load", 6, "" }, { "repair", 8, "" }, { "teleport", 0xb, "" }, { "capture", 0xd, "" },
     { "stop", 0, "STOP" }, { "cloak", 0, "CLOAK_ON" }, { "activate", 0, "ACTIVATE" },
     { "deactivate", 0, "DEACTIVATE" }, { "movestate", 0, "STANDING_MOVEORDER" },
-    { "firestate", 0, "STANDING_FIREORDER" }, { "selfdestruct", 0, "SELFDESTRUCT" }, { "qbuild", 0, NULL }
+    { "firestate", 0, "STANDING_FIREORDER" }, { "selfdestruct", 0, "SELFDESTRUCT" }, { "qbuild", 0, "" }
 };
+
+static int* s_noPosition;
 
 static int OrderTakesNoTarget(int kind)
 {
@@ -285,7 +287,7 @@ static void ReadOrder(int lineNo, char* value)
         FailLine(lineNo, "needs a tick of at least 1", "order", "");
     ParseSelector(lineNo, whoText, &o->who);
     o->kind = -1;
-    if (kindText[0] == '+') {
+    if (kindText && kindText[0] == '+') {
         o->queue = 1;
         kindText++;
     }
@@ -301,29 +303,29 @@ static void ReadOrder(int lineNo, char* value)
     if (OrderTakesNoTarget(o->kind)) {
         if (o->kind == ORDER_CLOAK) {
             char* state = NextToken(&cursor);
-            if (state == NULL || (strcmp(state, "on") != 0 && strcmp(state, "off") != 0))
+            if (!state || (strcmp(state, "on") != 0 && strcmp(state, "off") != 0))
                 FailLine(lineNo, "needs on or off after cloak", "order", "");
             o->argument = strcmp(state, "on") == 0;
         } else if (o->kind == ORDER_MOVESTATE || o->kind == ORDER_FIRESTATE) {
             char* state = NextToken(&cursor);
-            if (state == NULL || state[0] < '0' || state[0] > '2' || state[1] != '\0')
+            if (!state || state[0] < '0' || state[0] > '2' || state[1] != '\0')
                 FailLine(lineNo, "needs a state of 0, 1 or 2", "order", "");
             o->argument = state[0] - '0';
         }
-        if (NextToken(&cursor) != NULL)
+        if (NextToken(&cursor))
             FailLine(lineNo, "has extra words after the target", "order", "");
         return;
     }
     if (o->kind == ORDER_QBUILD) {
         char* type = NextToken(&cursor);
-        if (type == NULL || strlen(type) >= sizeof o->buildType)
+        if (!type || strlen(type) >= sizeof o->buildType)
             FailLine(lineNo, "needs a unit type to queue", "order", "");
         strcpy(o->buildType, type);
         char* countText = NextToken(&cursor);
-        o->argument = countText == NULL ? 1 : (int)ParseNumber(lineNo, "order", countText);
+        o->argument = !countText ? 1 : (int)ParseNumber(lineNo, "order", countText);
         if (o->argument < 1 || o->argument > 99)
             FailLine(lineNo, "needs a queue count of 1 to 99", "order", "");
-        if (NextToken(&cursor) != NULL)
+        if (NextToken(&cursor))
             FailLine(lineNo, "has extra words after the target", "order", "");
         return;
     }
@@ -2798,21 +2800,21 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
             if (selected[i] == 0 || !(u[UNIT_FLAGS] & UNIT_SELECTED))
                 continue;
             Order* existing = FindOrderByType((Unit*)u, order.index);
-            if (existing != NULL) {
+            if (existing) {
                 found = 1;
                 DeleteOrder((Unit*)u, existing);
             }
         }
         if (found == 0)
-            IssueOrderToSelection(GameAt(0x2c76), 0, order.index, NULL, 0, 0);
+            IssueOrderToSelection(GameAt(0x2c76), 0, order.index, s_noPosition, 0, 0);
     } else if (OrderTakesNoTarget(o->kind)) {
         const char* mission = s_orderModes[o->kind].mission;
         if (o->kind == ORDER_CLOAK && !o->argument)
             mission = "CLOAK_OFF";
         if (o->kind == ORDER_ACTIVATE || o->kind == ORDER_DEACTIVATE || o->kind == ORDER_STOP || o->kind == ORDER_CLOAK)
-            IssueOrderToSelection(GameAt(0x2c76), 0, MissionType(mission).index, NULL, 0, 0);
+            IssueOrderToSelection(GameAt(0x2c76), 0, MissionType(mission).index, s_noPosition, 0, 0);
         else
-            IssueOrderToSelection(GameAt(0x2c76), 0, MissionType(mission).index, NULL, o->argument, 0);
+            IssueOrderToSelection(GameAt(0x2c76), 0, MissionType(mission).index, s_noPosition, o->argument, 0);
     } else if (o->kind == ORDER_BUILD) {
         *(unsigned short*)GameAt(GAME_BUILD_TYPE) = (unsigned short)buildType;
         if (!UpdatePlacementGhostValidity()) {

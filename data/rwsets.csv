@@ -50340,6 +50340,7 @@ address,function,file,kind,target
 ,SearchRange,src/orders/vtol_orders.cpp,field_read,Unit::def
 ,SearchRange,src/orders/vtol_orders.cpp,field_read,UnitDef::range
 ,SearchRange,src/orders/vtol_orders.cpp,function,
+,SeedNetworkHost,src/harness/harness.cpp,call,Fail
 ,SeedNetworkHost,src/harness/harness.cpp,call,memset
 ,SeedNetworkHost,src/harness/harness.cpp,call,operator PlayerInfo *
 ,SeedNetworkHost,src/harness/harness.cpp,call,strcpy

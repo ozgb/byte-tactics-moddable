@@ -440,7 +440,7 @@ Coverage: 69.7% of functions (62 of 89), 77.3% of lines, 67.3% of branches; 27 l
 
 Issue #18. 468 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`, 14,000 lines). The largest subsystem.
 
-Coverage: 63.7% of functions (237 of 372), 56.4% of lines, 41.1% of branches; 135 live functions no scenario enters, and 28 more are dead (data/coverage.csv).
+Coverage: 71.8% of functions (267 of 372), 63.6% of lines, 48.4% of branches; 105 live functions no scenario enters, and 28 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (105 of 372 after `orders-immediate`, `orders-factory` and `orders-air`, #418; 267 are entered, 71.8%), by reason:
 
@@ -520,7 +520,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 ## Coverage
 
-`data/coverage.csv` is the baseline of how much of each subsystem the 27 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions and its dead functions. Raising it is #405.
+`data/coverage.csv` is the baseline of how much of each subsystem the 30 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions and its dead functions. Raising it is #405.
 
 ```sh
 tools/coverage_runtime.sh                     # fetch the profile runtime sources of compiler-rt
@@ -538,24 +538,24 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | subsystem | functions entered | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
 | **wind_meteors** | 10 of 16 | 62.5% | 55.0% | 50.0% | 6 | 0 |
-| **economy** | 16 of 32 | 50.0% | 60.4% | 34.7% | 16 | 7 |
+| **economy** | 16 of 32 | 50.0% | 60.9% | 35.6% | 16 | 7 |
 | **features** | 40 of 53 | 75.5% | 68.5% | 59.9% | 13 | 7 |
-| **ai** | 92 of 105 | 87.6% | 87.4% | 79.7% | 13 | 37 |
+| **ai** | 93 of 105 | 88.6% | 87.5% | 79.9% | 12 | 37 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 85.4% | 3 | 10 |
 | **weapons** | 72 of 88 | 81.8% | 81.7% | 64.6% | 16 | 20 |
-| **targeting** | 10 of 10 | 100.0% | 96.2% | 69.7% | 0 | 1 |
+| **targeting** | 10 of 10 | 100.0% | 96.2% | 71.1% | 0 | 1 |
 | **los_radar** | 62 of 89 | 69.7% | 77.3% | 67.3% | 27 | 20 |
-| **orders** | 237 of 372 | 63.7% | 56.4% | 41.1% | 135 | 28 |
-| **units** | 110 of 167 | 65.9% | 69.3% | 58.4% | 57 | 34 |
+| **orders** | 267 of 372 | 71.8% | 63.6% | 48.4% | 105 | 28 |
+| **units** | 112 of 167 | 67.1% | 70.3% | 59.2% | 55 | 34 |
 | **players** | 45 of 143 | 31.5% | 30.0% | 21.4% | 98 | 11 |
-| **map** | 68 of 98 | 69.4% | 74.2% | 65.7% | 30 | 12 |
+| **map** | 68 of 98 | 69.4% | 74.2% | 65.9% | 30 | 12 |
 | files | 60 of 142 | 42.3% | 39.8% | 33.9% | 82 | 36 |
 | game | 73 of 183 | 39.9% | 35.4% | 20.5% | 110 | 25 |
 | network | 40 of 333 | 12.0% | 7.1% | 2.1% | 293 | 81 |
 | platform | 307 of 646 | 47.5% | 34.0% | 22.2% | 339 | 82 |
-| presentation | 440 of 1143 | 38.5% | 30.1% | 20.9% | 703 | 329 |
-| seams | 64 of 103 | 62.1% | 81.7% | - | 39 | 0 |
-| state | 309 of 386 | 80.1% | 78.2% | 49.3% | 77 | 22 |
+| presentation | 441 of 1143 | 38.6% | 30.2% | 21.0% | 702 | 329 |
+| seams | 65 of 103 | 63.1% | 82.2% | - | 38 | 0 |
+| state | 310 of 386 | 80.3% | 78.3% | 49.3% | 76 | 22 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
 

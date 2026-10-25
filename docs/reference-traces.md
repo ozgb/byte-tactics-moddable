@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v3` is the fixed target for anyone writing a new
+The git tag `reference-traces-v4` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v3`**.
+code as a base. This page names the current tag: **`reference-traces-v4`**.
 
 ## What the tag holds
 
@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v3`**.
   format is in `reference/README.md`, the hashed fields in
   `src/harness/trace_schema.h`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 27 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 30 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest per tick
   for each scenario.
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v3`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v3
+git checkout reference-traces-v4
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -128,7 +128,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v3
+git checkout reference-traces-v4
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -154,9 +154,9 @@ default is Steam's.
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v4`
+the digests that should become a target gets a new tag (`reference-traces-v5`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v3`.
+`reference-traces-v4`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -168,9 +168,12 @@ and so on), and this page is updated to name it. The current tag is
   only the class of Packed, Lite and PackedPos goals, because the harness
   classed goals by their distance from the patrol vtable, which the carve link
   does not keep; v3 classes them by vtable symbol.
+- `reference-traces-v4`: three more scenarios, `orders-immediate`,
+  `orders-factory` and `orders-air`, for the orders the earlier 27 never gave
+  (#418). The 27 earlier digests and the hashed fields are those of v3.
 
-`bt-trace N` does not name which fields are hashed. v1, v2 and v3 are
-all `bt-trace 3`, but they hash different fields, so their digests are not
+`bt-trace N` does not name which fields are hashed. v1 to v4 are
+all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` (and
 `src/harness/trace_schema.h`) at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

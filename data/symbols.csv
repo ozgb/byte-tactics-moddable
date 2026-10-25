@@ -1455,9 +1455,9 @@ address,name
 0x470e50,ObjectPool::FreeBlocks
 0x470eb0,ObjectPool::AllocSlot
 0x470ed0,ObjectPool::FreeSlot
-0x470ef0,UElem_00470f00::?$vector::_Destroy
-0x470f00,UElem_00470f00::?$vector::_Ucopy
-0x470f30,UElem_00470f00::?$vector::_Ufill
+0x470ef0,PAUPoolBlock::?$vector::_Destroy
+0x470f00,PAUPoolBlock::?$vector::_Ucopy
+0x470f30,PAUPoolBlock::?$vector::_Ufill
 0x470f60,CopyPointer
 0x470f80,ParticleLists::ParticleLists
 0x470fb0,ParticleLists::~ParticleLists
@@ -1501,7 +1501,7 @@ address,name
 0x4729d0,EmitWeaponSmoke
 0x472ab0,EmitJitteredThrustParticles
 0x472c50,EmitTimedSubParticles
-0x472d30,UElem_00473500::?$vector::size
+0x472d30,PAVParticleSystem::?$vector::size
 0x472d50,TeleportParticles::Update
 0x472e00,TeleportParticles::IsEmitDue
 0x472e30,TeleportParticles::Render
@@ -1518,10 +1518,10 @@ address,name
 0x473220,WakeParticles::IsEmitDue
 0x473250,WakeParticles::Render
 0x473290,WakeParticles::IsFinished
-0x4732d0,UElem_00473500::?$vector::_Destroy
+0x4732d0,PAVParticleSystem::?$vector::_Destroy
 0x4732e0,PAVParticleSystem::?$vector::insert
-0x473500,UElem_00473500::?$vector::_Ucopy
-0x473530,UElem_00473500::?$vector::_Ufill
+0x473500,PAVParticleSystem::?$vector::_Ucopy
+0x473530,PAVParticleSystem::?$vector::_Ufill
 0x473560,TeleportParticle::Step
 0x473590,TeleportParticle::DrawParticle
 0x4736c0,TeleportParticle::IsExpired

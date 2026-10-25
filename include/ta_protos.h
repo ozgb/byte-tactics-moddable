@@ -541,7 +541,6 @@ struct Object_004ab570;
 struct Object_004ab5b0;
 struct Object_004abd20;
 struct Object_004ac8c0;
-struct Object_004ac970;
 struct Object_004aca20;
 struct Object_004acbe0;
 struct Object_004aedd0;

@@ -967,7 +967,7 @@ game,presentation,shared_write,Player::energy,2
 game,presentation,shared_write,Player::metal,2
 game,presentation,shared_write,Player::rejectReason,2
 game,presentation,shared_write,Player::unitsCreated,11
-game,presentation,shared_write,PlayerInfo::color,12
+game,presentation,shared_write,PlayerInfo::color,15
 game,presentation,shared_write,PlayerInfo::flags_9b,10
 game,presentation,shared_write,PlayerInfo::side,18
 game,presentation,shared_write,Ref_004b8b30::index,1
@@ -975,7 +975,7 @@ game,presentation,shared_write,Ref_004b8b30::src,1
 game,presentation,shared_write,Ref_004b8b30::value,1
 game,presentation,shared_write,Unit::flags,28
 game,presentation,shared_write,Unit::health,2
-game,presentation,shared_write,UnitDef::flags1,2
+game,presentation,shared_write,UnitDef::flags1,3
 game,presentation,shared_write,Vec3::x,37
 game,presentation,shared_write,Vec3::z,36
 game,seams,indirect,AdvanceMissionNative,1
@@ -1767,7 +1767,7 @@ network,presentation,shared_write,Player::exploredHeight,7
 network,presentation,shared_write,Player::exploredWidth,14
 network,presentation,shared_write,Player::id,8
 network,presentation,shared_write,Player::index,24
-network,presentation,shared_write,Player::info,61
+network,presentation,shared_write,Player::info,64
 network,presentation,shared_write,Player::kills,2
 network,presentation,shared_write,Player::losses,2
 network,presentation,shared_write,Player::messages,1
@@ -1779,7 +1779,7 @@ network,presentation,shared_write,Player::totalMetalProduced,1
 network,presentation,shared_write,Player::type,46
 network,presentation,shared_write,Player::unitCount,11
 network,presentation,shared_write,Player::unitsCreated,11
-network,presentation,shared_write,PlayerInfo::color,12
+network,presentation,shared_write,PlayerInfo::color,15
 network,presentation,shared_write,PlayerInfo::flags_97,4
 network,presentation,shared_write,PlayerInfo::flags_9d_wide,4
 network,presentation,shared_write,PlayerInfo::kind,4
@@ -2713,7 +2713,7 @@ players,presentation,shared_write,Player::exploredWidth,14
 players,presentation,shared_write,Player::firstIndex,1
 players,presentation,shared_write,Player::id,8
 players,presentation,shared_write,Player::index,24
-players,presentation,shared_write,Player::info,61
+players,presentation,shared_write,Player::info,64
 players,presentation,shared_write,Player::kills,2
 players,presentation,shared_write,Player::losses,2
 players,presentation,shared_write,Player::metal,2
@@ -2730,7 +2730,7 @@ players,presentation,shared_write,Player::unitsCreated,11
 players,presentation,shared_write,Player::unitsEnd,19
 players,presentation,shared_write,PlayerInfo::bit5,2
 players,presentation,shared_write,PlayerInfo::bit6,9
-players,presentation,shared_write,PlayerInfo::color,12
+players,presentation,shared_write,PlayerInfo::color,15
 players,presentation,shared_write,PlayerInfo::kind,4
 players,presentation,shared_write,PlayerInfo::memory,1
 players,presentation,shared_write,PlayerInfo::side,18
@@ -4413,7 +4413,7 @@ units,presentation,shared_write,Unit::state,1
 units,presentation,shared_write,Unit::unitDefIndex,22
 units,presentation,shared_write,Unit::yWhole,2
 units,presentation,shared_write,UnitDef::energyCost,1
-units,presentation,shared_write,UnitDef::flags1,2
+units,presentation,shared_write,UnitDef::flags1,3
 units,presentation,shared_write,UnitDef::flags2,1
 units,presentation,shared_write,UnitDef::ids,1
 units,presentation,shared_write,UnitDef::maxHealth,2

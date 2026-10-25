@@ -17770,8 +17770,6 @@ address,function,file,kind,target
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,GetGafSequenceFrame
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,get
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,operator=
-0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,deref_read,*Ref<char>
-0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,deref_read,*unsigned char
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,deref_read,*unsigned short
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_maybe_written,Face_459c70::pic
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,<anon>::shaded
@@ -17791,6 +17789,8 @@ address,function,file,kind,target
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Off_4584d0::a
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Off_4584d0::b
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Off_4584d0::y
+0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Player::info
+0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,PlayerInfo::color
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Unit_459200::pos_x
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Unit_459200::pos_y
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Unit_459200::pos_z
@@ -17967,28 +17967,25 @@ address,function,file,kind,target
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,TintFrameBelow
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,UnitTable::BuildObjectPicture
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,UnitTable::DrawPieces
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,digger_bias
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,get
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator Model_459200 *
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator Unit_459200 *
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator Vec3 *
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator->
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator=
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,shade_bias
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,deref_read,*GameFlags_459200
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,deref_read,*Flags_37f06
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,deref_read,*int
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_escape,Game::flags_37f06
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_escape,Model_459200::pieces
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_escape,Unit_459200::pos_x
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,<anon>::b3
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,<anon>::digger
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,<anon>::vehicleShadows
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,CMemoryCache::bitmap
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Fixed_459200::whole
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Flags_37f06::whole
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,GafFrame::scratch
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Game::debugMode
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Game::playerIndex
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Game::seaLevel
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,GameFlags_459200::whole
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Model_459200::bitmap
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Model_459200::count
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Model_459200::owner
@@ -17996,8 +17993,7 @@ address,function,file,kind,target
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,PieceFlags_459c70::word
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Piece_459c70::object
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Piece_459c70::points
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,UnitDefFlags_459200::flags
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,UnitTypeFlags_459200::word
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,UnitDef::flags1
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::activateFlags
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::buildLeft
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::cargo
@@ -18030,7 +18026,6 @@ address,function,file,kind,target
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,call,operator=
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,call,shade_bias
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,deref_read,*Flags_37f06
-0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,deref_read,*Ref<char>
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,deref_read,*unsigned char
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,deref_read,*unsigned short
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,deref_write,*unsigned char
@@ -18063,6 +18058,8 @@ address,function,file,kind,target
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Object3do::vertexCount
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Piece_459c70::object
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Piece_459c70::points
+0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Player::info
+0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,PlayerInfo::color
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Unit_459200::buildLeft
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Unit_459200::flags
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Vec3::x
@@ -18092,7 +18089,6 @@ address,function,file,kind,target
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,operator Vec3 *
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,operator=
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,shade_bias
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,deref_read,*Ref<char>
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,deref_read,*Vec3
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,deref_read,*unsigned char
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,deref_read,*unsigned short
@@ -18126,6 +18122,8 @@ address,function,file,kind,target
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Object3do::vertexCount
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Piece_459c70::object
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Piece_459c70::points
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Player::info
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,PlayerInfo::color
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Poly_459c70::x
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Poly_459c70::y
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Unit_459200::buildLeft
@@ -34107,10 +34105,10 @@ address,function,file,kind,target
 0x4a0880,SetGadgetText,src/gui/gui.cpp,call,strcpy
 0x4a0880,SetGadgetText,src/gui/gui.cpp,call,strlen
 0x4a0880,SetGadgetText,src/gui/gui.cpp,field_maybe_written,<anon>::text
-0x4a0880,SetGadgetText,src/gui/gui.cpp,field_read,Data_004a0880::entries
-0x4a0880,SetGadgetText,src/gui/gui.cpp,field_read,Object_004a0880::current
-0x4a0880,SetGadgetText,src/gui/gui.cpp,field_read,Object_004a0880::data
-0x4a0880,SetGadgetText,src/gui/gui.cpp,field_write,Object_004a0880::length
+0x4a0880,SetGadgetText,src/gui/gui.cpp,field_read,Dialog::focus
+0x4a0880,SetGadgetText,src/gui/gui.cpp,field_read,Dialog::holder
+0x4a0880,SetGadgetText,src/gui/gui.cpp,field_read,Layer::entries
+0x4a0880,SetGadgetText,src/gui/gui.cpp,field_write,Dialog::length
 0x4a0880,SetGadgetText,src/gui/gui.cpp,function,
 0x4a08f0,TranslateGadgetItems,src/gui/gui.cpp,call,GetEntry
 0x4a08f0,TranslateGadgetItems,src/gui/gui.cpp,call,Translate
@@ -52541,11 +52539,6 @@ address,function,file,kind,target
 ,color_taken,src/frontend/skirmish_menu.cpp,field_read,SkirmishPlayerSlot::color
 ,color_taken,src/frontend/skirmish_menu.cpp,function,
 ,color_taken,src/frontend/skirmish_menu.cpp,global_read,g_game
-,digger_bias,src/graphics/model_render.cpp,call,get
-,digger_bias,src/graphics/model_render.cpp,field_read,<anon>::digger
-,digger_bias,src/graphics/model_render.cpp,field_read,Model_459200::owner
-,digger_bias,src/graphics/model_render.cpp,field_read,Unit_459200::def
-,digger_bias,src/graphics/model_render.cpp,function,
 ,encryptByte,src/files/sqsh.cpp,deref_read,*char
 ,encryptByte,src/files/sqsh.cpp,function,
 ,entry_at,src/gui/gui.cpp,deref_escape,*Gadget
@@ -53395,11 +53388,8 @@ address,function,file,kind,target
 ,setcell,src/units/movement_class.cpp,deref_read,*unsigned int
 ,setcell,src/units/movement_class.cpp,deref_write,*unsigned int
 ,setcell,src/units/movement_class.cpp,function,
-,shade_bias,src/graphics/model_render.cpp,call,get
 ,shade_bias,src/graphics/model_render.cpp,call,operator->
-,shade_bias,src/graphics/model_render.cpp,field_read,Model_459200::owner
 ,shade_bias,src/graphics/model_render.cpp,field_read,UnitDef::flags1
-,shade_bias,src/graphics/model_render.cpp,field_read,UnitTypeFlags_459200::word
 ,shade_bias,src/graphics/model_render.cpp,field_read,Unit_459200::def
 ,shade_bias,src/graphics/model_render.cpp,function,
 ,sort_0043bc90,src/orders/order_list.cpp,call,_Sort_0_0043bc90

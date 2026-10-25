@@ -322,7 +322,7 @@ seeds) and runs deterministically: two runs give identical traces.
 | quad-king-of-the-hill | King of the Hill | 4 | 9000 | Four players on King of the Hill in two allied teams of two, five minutes |
 | quad-lava-highground | Lava Highground | 4 | 5400 | Four Arm players on Lava Highground, random start positions, three minutes |
 | quad-two-continents | Two Continents | 4 | 6000 | Four players on Two Continents in teams of players 0 and 3 against 1 and 2, random start positions, 100 metal and energy |
-| sensors-floating-teeth | Hundred Isles | 2 | 400 | Human Arm commander with a spawned floating dragon's teeth in its camera view, which self-destructs (`spawn`, `selfdestruct`, the feature draw) |
+| sensors-floating-teeth | Hundred Isles | 2 | 400 | Human Arm commander with a spawned floating dragon's teeth in its camera view, which turns into its feature at once (`spawn`, the unit turning into its feature, the feature draw) |
 | six-hundred-isles | Hundred Isles | 6 | 9000 | Six players on Hundred Isles, alternating sides, five minutes |
 | six-painted-desert | Painted Desert | 6 | 12600 | Six Core players on Painted Desert, random start positions, seven minutes |
 | six-yerrot-mountains | Yerrot Mountains | 6 | 7200 | Six players on Yerrot Mountains in two allied teams of three, four minutes |

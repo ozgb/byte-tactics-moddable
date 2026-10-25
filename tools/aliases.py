@@ -732,7 +732,7 @@ def initialiser_refs(data: bytes) -> dict[str, list[str]]:
         found: set[str] = set()
         for r in secs[section - 1].relocs:
             sym = by_index.get(r[1])
-            if sym is None or sym.name.startswith("."):
+            if sym is None or sym.name.startswith(".") or sym.name.startswith(("___profc_", "___profd_")):
                 continue
             if depth and sym.name.startswith("__cxx_global_var_init") and sym.section > 0:
                 found |= targets(sym.section, depth - 1)
@@ -1343,7 +1343,7 @@ def prune_dead(paths: list[Path], aliases: dict[str, str], roots: tuple[str, ...
         for si, sec in enumerate(secs, start=1):
             if sec.chars & IMAGE_SCN_LNK_REMOVE or sec.name == ".llvm_addrsig":
                 continue
-            if not sec.chars & IMAGE_SCN_LNK_COMDAT or sec.name.startswith((".CRT$", ".tls")):
+            if not sec.chars & IMAGE_SCN_LNK_COMDAT or sec.name.startswith((".CRT$", ".tls", ".lcov", ".lprf")):
                 reach((oi, si))
     for name in roots:
         reach_name(name)

@@ -1365,8 +1365,8 @@ address,function,file,kind,target
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Order::pos
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Order::state
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Order::target
-0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Owner::allied
-0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Owner::index
+0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Player::allied
+0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Player::index
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Point16::x
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
@@ -3277,8 +3277,8 @@ address,function,file,kind,target
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Order::next
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Order::state
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Order::target
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Owner::allied
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Owner::index
+0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Player::allied
+0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Player::index
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Seams::units
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
@@ -3364,7 +3364,7 @@ address,function,file,kind,target
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Order::pos
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Order::state
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Order::target
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Owner::index
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Player::index
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::ai
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::units
@@ -3454,7 +3454,7 @@ address,function,file,kind,target
 0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,field_read,GroundAllyVisitor::owner
 0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,field_read,GroundAllyVisitor::self
 0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,field_read,GroundAllyVisitor::units
-0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,field_read,Owner::allied
+0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,field_read,Player::allied
 0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,field_read,Player::index
 0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,field_read,Unit::def
 0x410c70,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,field_read,Unit::player

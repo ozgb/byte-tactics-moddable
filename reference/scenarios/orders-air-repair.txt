@@ -1,0 +1,25 @@
+# Human Arm commander on The Pass has a spawned air repair pad and laser tower; the tower shoots a spawned friendly aircraft, which then guards the tower, loses it and lands on the pad; 900 ticks.
+game_seed 417
+crt_seed 1417
+view_seed 2417
+map The Pass
+start_positions fixed
+ticks 900
+commander_death 0
+local_player 1
+player0.controller human
+player0.side Arm
+player0.metal 30000
+player0.energy 60000
+player1.controller human
+player1.side Core
+spawn 10 0 ARMASP 460 340
+spawn 10 0 ARMLLT 620 400
+spawn 10 0 ARMCA 560 360
+spawn 10 1 CORRL 520 420
+order 15 0:all firestate 0
+order 20 1:CORRL:1 attack 0:ARMCA:1
+order 80 1:CORRL:1 stop
+order 81 1:CORRL:1 firestate 0
+order 140 0:ARMCA:1 guard 0:ARMLLT:1
+order 230 0:ARMLLT:1 selfdestruct

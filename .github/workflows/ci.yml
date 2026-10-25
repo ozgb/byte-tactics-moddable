@@ -196,6 +196,10 @@ jobs:
         if: steps.changed.outputs.run == 'true'
         run: uv run tools/test_aliases.py
 
+      - name: Test the coverage report
+        if: steps.changed.outputs.run == 'true'
+        run: uv run tools/test_coverage.py
+
       - name: Test the playtest dialog handling
         if: steps.changed.outputs.run == 'true'
         run: |

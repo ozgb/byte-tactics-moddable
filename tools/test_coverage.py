@@ -53,7 +53,7 @@ class Coverage(unittest.TestCase):
 
     def test_name_alone_when_the_file_has_no_row(self):
         self.assertIn("units", self.totals)
-        fn = cov.parse_function(EXPORT["data"][0]["functions"][2])[1]
+        fn = cov.parse_function(EXPORT["data"][0]["functions"][2])
         self.assertEqual(cov.subsystem_of(fn, KEY, NAME), "units")
 
     def test_unlisted_function_takes_the_rule_of_its_file(self):
@@ -99,11 +99,11 @@ class Coverage(unittest.TestCase):
 
     def test_never_entered(self):
         self.assertEqual(self.totals["economy"].never_entered, [("Never", "src/game/economy.cpp")])
-        self.assertEqual(self.totals["units"].never_entered, [])
+        self.assertEqual(self.totals["units"].never_entered, [("Unit::Move", "src/units/unit.cpp")])
 
-    def test_overload_entered_counts_as_entered(self):
+    def test_overloads_count_separately(self):
         self.assertEqual(self.totals["units"].functions_entered, 2)
-        self.assertEqual(self.totals["units"].never_entered, [])
+        self.assertEqual(self.totals["units"].functions, 3)
 
     def test_csv_round_trip(self):
         with tempfile.TemporaryDirectory() as d:
@@ -146,6 +146,53 @@ class Coverage(unittest.TestCase):
         text = cov.table(self.totals)
         self.assertIn("economy", text)
         self.assertIn("50.0%", text)
+
+
+def static_copy(tu, count, regions, branches=()):
+    name = "%s:?HAPI_Length@@YGJPAX@Z" % tu
+    return entry(name, "src/files/files_api.h", count, regions, branches)
+
+
+class MergeTest(unittest.TestCase):
+    def merged(self, functions):
+        key = {("src/files/files_api.h", "HAPI_Length"): "files"}
+        return cov.summarize({"data": [{"functions": functions}]}, key, {})[0]["files"]
+
+    def test_two_copies_of_a_static_function_are_one(self):
+        t = self.merged([
+            static_copy("a.cpp", 0, [region(1, 1, 3, 2, 0), region(2, 1, 2, 9, 4)], [[2, 3, 2, 7, 0, 0, 0, 0, 4], [3, 3, 3, 7, 0, 0, 0, 0, 4]]),
+            static_copy("b.cpp", 5, [region(1, 1, 3, 2, 5), region(2, 1, 2, 9, 0)],
+                        [[2, 3, 2, 7, 5, 0, 0, 0, 4]])])
+        self.assertEqual((t.functions, t.functions_entered), (1, 1))
+        self.assertEqual((t.lines, t.lines_hit), (3, 3))
+        self.assertEqual((t.branches, t.branches_covered), (4, 1))
+        self.assertEqual(t.never_entered, [])
+
+    def test_branch_sides_merge_by_position(self):
+        t = self.merged([
+            static_copy("a.cpp", 1, [region(1, 1, 1, 9, 1)], [[2, 3, 2, 7, 1, 0, 0, 0, 4]]),
+            static_copy("b.cpp", 1, [region(1, 1, 1, 9, 1)], [[2, 3, 2, 7, 0, 2, 0, 0, 4]])])
+        self.assertEqual((t.branches, t.branches_covered), (2, 2))
+
+    def test_copies_never_entered_give_one_row(self):
+        t = self.merged([static_copy("a.cpp", 0, [region(1, 1, 1, 9, 0)]),
+                         static_copy("b.cpp", 0, [region(1, 1, 1, 9, 0)])])
+        self.assertEqual((t.functions, t.functions_entered), (1, 0))
+        self.assertEqual(t.never_entered, [("HAPI_Length", "src/files/files_api.h")])
+
+    def test_overloads_stay_separate(self):
+        t = self.merged([
+            entry("a.cpp:?HAPI_Length@@YGJPAX@Z", "src/files/files_api.h", 1, [region(1, 1, 1, 9, 1)]),
+            entry("a.cpp:?HAPI_Length@@YGJPAUFileHandle@@@Z", "src/files/files_api.h", 0, [region(5, 1, 5, 9, 0)])])
+        self.assertEqual((t.functions, t.functions_entered), (2, 1))
+        self.assertEqual(len(t.never_entered), 1)
+
+    def test_functions_less_entered_is_the_never_entered_rows(self):
+        totals = cov.summarize(EXPORT, KEY, NAME)[0]
+        totals["files"] = self.merged([static_copy("a.cpp", 0, [region(1, 1, 1, 9, 0)]),
+                                       static_copy("b.cpp", 3, [region(1, 1, 1, 9, 3)])])
+        for t in totals.values():
+            self.assertEqual(t.functions - t.functions_entered, len(t.never_entered))
 
 
 class PlaySuiteTest(unittest.TestCase):

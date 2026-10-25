@@ -25,7 +25,10 @@ its name and file (the rule that built subsystems.csv, without phase reachabilit
 and printed) is left for a function that nothing resolves. Functions in src/harness/, build/, toolchain/ or outside the repository are
 excluded (counted and printed).
 
-Counting, per function and then summed per subsystem. Functions: entered when the execution count is
+Counting, per function and then summed per subsystem. Copies of one source function (a header function
+`static` in every translation unit that includes it, named `<tu>.cpp:<decorated>`) are merged first, keyed by
+(file, decorated name): entered if any copy is, a line hit if any copy hit it, a branch side covered if any
+copy covered it, branches counted once per position. Functions: entered when the execution count is
 above 0. Lines: the lines of the function's code regions in its primary file; a line's count is the
 largest count of the regions that start on it, or else of the innermost region that covers it; the line
 is hit when that count is above 0. Branches: each branch condition has a true and a false side, both
@@ -34,7 +37,7 @@ counted in the total, and each side taken at least once is covered.
 data/coverage.csv: columns subsystem, function, file, functions, functions_entered, lines, lines_hit,
 branches, branches_covered. One totals row per subsystem (function `*`, file empty) and one row per
 function no scenario enters (functions 1, every other count 0), sorted by
-subsystem, totals first. Percentages are derived. `--check` fails when a subsystem's function, line or
+subsystem, totals first, then by name, file and decorated name. Percentages are derived. `--check` fails when a subsystem's function, line or
 branch fraction is below the file's, or the file is missing; rises and new functions only print a note.
 """
 
@@ -76,7 +79,7 @@ BRANCH_FILE_ID = 7
 
 @dataclass
 class Function:
-    """One function of the export: its place, whether it was entered, and its line and branch counts."""
+    """One source function: its place, whether it was entered, and its line and branch counts."""
     name: str
     file: str
     entered: bool
@@ -84,6 +87,17 @@ class Function:
     lines_hit: int
     branches: int
     branches_covered: int
+
+
+@dataclass
+class Copy:
+    """One export entry: a function's decorated name and place, its entry, per-line counts and per-position branch sides."""
+    decorated: str
+    name: str
+    file: str
+    entered: bool
+    line_counts: dict[int, int]
+    branch_sides: dict[tuple[int, int, int, int], tuple[bool, bool]]
 
 
 @dataclass
@@ -124,10 +138,16 @@ def repo_path(filename: str) -> str | None:
     return None if rel.startswith(EXCLUDED_PREFIXES) else rel
 
 
+def decorated_name(name: str) -> str:
+    """The export name without the `file.cpp:` prefix llvm-cov gives static functions."""
+    if not name.startswith("?") and ":" in name:
+        return name.split(":", 1)[1]
+    return name
+
+
 def plain_name(name: str) -> str:
     """The function's name without MSVC decoration or the `file.cpp:` prefix llvm-cov gives static functions."""
-    if not name.startswith("?") and ":" in name:
-        name = name.split(":", 1)[1]
+    name = decorated_name(name)
     special = re.match(r"\?\?(_?[0-9A-Z])(?:\?\$([^@]+)@|([^@?]+)@)", name)
     if special:
         code, owner = special.group(1), special.group(2) or special.group(3)
@@ -155,8 +175,8 @@ def region_lines(regions: list[list[int]], primary: set[int]) -> dict[int, int]:
     return counts
 
 
-def parse_function(entry: dict) -> tuple[str, Function] | None:
-    """(repository file, Function) of an export entry, or None when it is not game code (the file is outside the repository, in the harness or build)."""
+def parse_function(entry: dict) -> Copy | None:
+    """The Copy of an export entry, or None when it is not game code (the file is outside the repository, in the harness or build)."""
     names = entry.get("filenames") or []
     if not names:
         return None
@@ -164,11 +184,25 @@ def parse_function(entry: dict) -> tuple[str, Function] | None:
     if rel is None:
         return None
     primary = {i for i, n in enumerate(names) if n == names[0]}
-    counts = region_lines(entry.get("regions", []), primary)
-    branches = [b for b in entry.get("branches", []) if b[BRANCH_FILE_ID] in primary]
-    return rel, Function(plain_name(entry["name"]), rel, entry.get("count", 0) > 0, len(counts),
-                         sum(1 for c in counts.values() if c > 0), 2 * len(branches),
-                         sum((b[4] > 0) + (b[5] > 0) for b in branches))
+    sides = {tuple(b[:4]): (b[4] > 0, b[5] > 0) for b in entry.get("branches", []) if b[BRANCH_FILE_ID] in primary}
+    return Copy(decorated_name(entry["name"]), plain_name(entry["name"]), rel, entry.get("count", 0) > 0,
+                region_lines(entry.get("regions", []), primary), sides)
+
+
+def merge_copies(copies: list[Copy]) -> Function:
+    """One Function from the copies of a source function: entered if any copy is, per line the largest count, per branch position either copy's covered sides."""
+    lines: dict[int, int] = {}
+    sides: dict[tuple[int, int, int, int], tuple[bool, bool]] = {}
+    for c in copies:
+        for line, count in c.line_counts.items():
+            lines[line] = max(lines.get(line, 0), count)
+        for pos, (taken, other) in c.branch_sides.items():
+            old = sides.get(pos, (False, False))
+            sides[pos] = (old[0] or taken, old[1] or other)
+    first = copies[0]
+    return Function(first.name, first.file, any(c.entered for c in copies), len(lines),
+                    sum(1 for n in lines.values() if n > 0), 2 * len(sides),
+                    sum(a + b for a, b in sides.values()))
 
 
 def read_subsystems(path: Path = SUBSYSTEMS) -> tuple[dict[tuple[str, str], str], dict[str, set[str]]]:
@@ -197,27 +231,28 @@ def subsystem_of(fn: Function, by_key: dict[tuple[str, str], str], by_name: dict
 
 def summarize(export: dict, by_key: dict[tuple[str, str], str],
               by_name: dict[str, set[str]]) -> tuple[dict[str, Totals], int, int]:
-    """(subsystem -> Totals, functions excluded, functions unassigned) of an llvm-cov export."""
-    entered: dict[tuple[str, str, str], bool] = {}
+    """(subsystem -> Totals, entries excluded, functions unassigned) of an llvm-cov export, counting each (file, decorated name) once."""
+    groups: dict[tuple[str, str], list[Copy]] = {}
+    missed: dict[str, list[tuple[str, str, str]]] = {}
     totals: dict[str, Totals] = {}
     excluded = unassigned = 0
     for data in export.get("data", []):
         for entry in data.get("functions", []):
-            parsed = parse_function(entry)
-            if parsed is None:
+            copy = parse_function(entry)
+            if copy is None:
                 excluded += 1
                 continue
-            _, fn = parsed
-            subsystem = subsystem_of(fn, by_key, by_name)
-            unassigned += subsystem == UNASSIGNED
-            totals.setdefault(subsystem, Totals()).add(fn)
-            key = (subsystem, fn.name, fn.file)
-            entered[key] = entered.get(key, False) or fn.entered
-    for (subsystem, name, file), was_entered in entered.items():
-        if not was_entered:
-            totals[subsystem].never_entered.append((name, file))
-    for t in totals.values():
-        t.never_entered.sort()
+            groups.setdefault((copy.file, copy.decorated), []).append(copy)
+    for (_, decorated), copies in groups.items():
+        fn = merge_copies(copies)
+        subsystem = subsystem_of(fn, by_key, by_name)
+        unassigned += subsystem == UNASSIGNED
+        t = totals.setdefault(subsystem, Totals())
+        t.add(fn)
+        if not fn.entered:
+            missed.setdefault(subsystem, []).append((fn.name, fn.file, decorated))
+    for subsystem, rows in missed.items():
+        totals[subsystem].never_entered = [(name, file) for name, file, _ in sorted(rows)]
     return totals, excluded, unassigned
 
 

@@ -339,7 +339,7 @@ void Mission::LoadBriefing()
     }
     int size = HAPI_FileLengthByName(name);
     if (size != 0) {
-        briefing = (char*)GameAllocIgnoreTag("Briefing", size + 1);
+        briefing = (char*)SimAllocTagged("Briefing", size + 1);
         HAPI_ReadFileAt(name, briefing, 0, size);
         briefing[size] = 0;
     }

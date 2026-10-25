@@ -1595,6 +1595,8 @@ void DestroyPathfinder()
     g_game->pathfinder = 0;
 }
 
+#pragma pack(pop)
+
 #include <vector>
 
 #include "../util/vec3.h"

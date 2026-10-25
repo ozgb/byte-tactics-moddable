@@ -91,6 +91,11 @@ int __cdecl CompareUnitRestrictEntries(const char* a, const char* b);
 void __stdcall OpenUnitRestrictions();
 
 void __cdecl BuildPlayerSlotGadgets(void);
+int __stdcall SelectConnection(int index);
+void __stdcall HandleSelectProviderClick(Gui* menu);
+void __stdcall FillProviderList();
+void __stdcall OpenBattleRoom();
+void __stdcall UpdateBattleRoom();
 void __stdcall HandleBattleRoomClick(Gui* gadget);
 void __stdcall UpdateUnitSliders(Gui*, int unused);
 

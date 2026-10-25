@@ -209,7 +209,6 @@ int GetTicks(void);
 int __stdcall InitNetConnection(void);
 #include "campaign_menu.h"
 #include "endgame.h"
-#include "multi_443ff0.h"
 #include "../network/net_game.h"
 int __stdcall JoinNetGame(V4i v, int idx);
 #include "../network/packets.h"
@@ -217,12 +216,9 @@ int __stdcall JoinNetGame(V4i v, int idx);
 #include "../game/players_464290.h"
 #include "../game/settings.h"
 #include "skirmish_menu.h"
-#include "multi_444580.h"
 #include "multi.h"
 #include "options.h"
 void __stdcall FinishUnitSync(void);
-#include "multi_449bb0.h"
-#include "multi_44a680.h"
 #include "../network/unit_sync.h"
 #include "../game/statistics.h"
 #include "endgame.h"

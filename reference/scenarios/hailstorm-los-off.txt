@@ -1,0 +1,10 @@
+# Hailstorm meteors on Flooded Glaciers with line of sight off: meteor projectiles are drawn on the radar with the visibility mask test (DrawRadarUnits); 150 ticks.
+game_seed 409
+crt_seed 1409
+view_seed 2409
+map Flooded Glaciers
+start_positions fixed
+ticks 150
+line_of_sight 0
+player0.side Arm
+player1.side Core

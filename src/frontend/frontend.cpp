@@ -164,7 +164,6 @@ extern int g_directXCheckDone;
 extern int g_cdPlayerDialogShown;
 extern Entry_00428730 g_pictureCache[10];
 
-#include "frontend_428bc0.h"
 #include "../gui/dialogs.h"
 int __stdcall GetTextPixelWidth(char* text);
 void __stdcall SetOffscreenSurface(int param_1);
@@ -1497,6 +1496,12 @@ void OrLabelAttribs(void)
 // FUNCTION: 0x428bb0
 void EmptyPreFrontendInitHook(void)
 {
+}
+
+// FUNCTION: 0x428bc0
+int CodeChecksumFailed(void)
+{
+    return 0;
 }
 
 // FUNCTION: 0x428bd0

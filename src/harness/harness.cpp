@@ -22,6 +22,8 @@
 #include "../game/players_464290.h"
 #include "../frontend/skirmish_menu.h"
 #include "../frontend/endgame.h"
+#include "../game/settings_campaign.h"
+#include "../files/files_api.h"
 #include "../debug/debug_lib.h"
 #include "harness.h"
 
@@ -74,6 +76,8 @@ static unsigned s_quirkTamperTick = 0;
 static int s_quirkTamper = 0;
 static unsigned s_quirkReachTick = 0;
 static int s_quirkReach = 0;
+static unsigned s_saveTick = 0;
+static int s_saveLine = 0;
 
 static void Fail(const char* text)
 {
@@ -503,6 +507,13 @@ static void ReadKey(int lineNo, const char* key, char* value)
         }
         if (s_quirkReach == 0)
             FailLine(lineNo, "names a flag with no guard to reach", key, "");
+    } else if (strcmp(key, "save") == 0) {
+        if (s_saveLine != 0)
+            FailLine(lineNo, "is a second save line", key, "");
+        s_saveTick = ParseNumber(lineNo, key, value);
+        if (s_saveTick == 0)
+            FailLine(lineNo, "needs a tick of at least 1", key, "");
+        s_saveLine = lineNo;
     } else if (strcmp(key, "order") == 0)
         ReadOrder(lineNo, value);
     else if (strcmp(key, "spawn") == 0)
@@ -526,6 +537,8 @@ static void CheckScenario()
         Fail("testmode: scenario needs a map line\n");
     CheckOrders();
     CheckSpawns();
+    if (s_saveLine != 0 && s_saveTick > s_ticks)
+        FailLine(s_saveLine, "has a tick after the last tick", "save", "");
     if (s_localPlayer >= 0 && !s_players[s_localPlayer].named) {
         char msg[128];
         sprintf(msg, "testmode: scenario line %d: local_player %d is not a player the scenario names\n",
@@ -866,6 +879,13 @@ void HarnessAfterStep()
 {
     if (s_testMode && s_blockScan)
         BlockScanTick((unsigned)g_game->ticks, s_ticks);
+    if (s_testMode && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
+        char directory[] = "savegame";
+        char path[] = "savegame\\harness.sav";
+        char description[] = "Harness save";
+        MakeDirectoryPath(directory);
+        SaveGameFile(path, description, 0x29a);
+    }
     if (!s_testMode || (unsigned)g_game->ticks < s_ticks)
         return;
     char msg[64];

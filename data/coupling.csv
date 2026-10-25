@@ -1082,6 +1082,7 @@ harness,economy,shared_write,Game::difficulty,4
 harness,economy,shared_write,Game::localPlayer,8
 harness,features,shared_write,Game::difficulty,2
 harness,features,shared_write,Game::playerIndex,1
+harness,files,call,MakeDirectoryPath,1
 harness,game,call,ApplySlotsToGamePlayers,1
 harness,game,call,GameHoldrand,1
 harness,game,call,QuirksAllOff,1
@@ -1089,6 +1090,7 @@ harness,game,call,QuirksFlipFirstSim,1
 harness,game,call,QuirksHash,2
 harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
+harness,game,call,SaveGameFile,1
 harness,game,call,SimBlockBase,4
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimOwns,1

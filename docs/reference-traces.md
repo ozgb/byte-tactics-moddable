@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v5`**.
   format is in `reference/README.md`, the hashed fields in
   `src/harness/trace_schema.h`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 34 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 33 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest per tick
   for each scenario.
@@ -171,10 +171,9 @@ and so on), and this page is updated to name it. The current tag is
 - `reference-traces-v4`: three more scenarios, `orders-immediate`,
   `orders-factory` and `orders-air`, for the orders the earlier 27 never gave
   (#418). The 27 earlier digests and the hashed fields are those of v3.
-- `reference-traces-v5`: four more scenarios, `combat-deaths`,
-  `units-transport`, `meteors-earthquake` and `meteors-hailstorm`, for unit
-  deaths (eyes, debris and exploded pieces), transport loading and meteors
-  (#419). The 30 earlier digests and the hashed fields are those of v4.
+- `reference-traces-v5`: three more scenarios, `combat-deaths`,
+  `meteors-earthquake` and `meteors-hailstorm`, for unit deaths (eyes, debris
+  and exploded pieces) and meteors (#419). The 30 earlier digests and the hashed fields are those of v4.
 
 `bt-trace N` does not name which fields are hashed. v1 to v5 are
 all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not

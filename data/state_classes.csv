@@ -1723,8 +1723,8 @@ s_fxList@src/harness/harness.cpp,,static,platform,platform,platform: only the de
 s_fxUsed@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:RegisterFx?,1:NumberUnitHeap,Test harness state (src/harness/harness.cpp).
 s_fxUsedCount@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,2:NumberUnitHeap|RegisterFx?,1:NumberUnitHeap,Test harness state (src/harness/harness.cpp).
 s_gameSeed@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:ReadKey,2:HarnessGameSeed|OpenTrace,"Harness seed setting (harness.cpp): scenario input, kept outside the block."
-s_gameType@src/harness/harness.cpp,,static,platform,,platform: only the debug library or the test harness touches it,,,r,,1:ReadKey,3:SetUpSkirmish|HarnessBeforeStep|ReadKey,
-s_gameTypeLine@src/harness/harness.cpp,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:ReadKey,1:ReadKey,
+s_gameType@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,r,,1:ReadKey,3:SetUpSkirmish|HarnessBeforeStep|ReadKey,Test harness state (src/harness/harness.cpp).
+s_gameTypeLine@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:ReadKey,1:ReadKey,Test harness state (src/harness/harness.cpp).
 s_hashHi@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,2:HarnessPhase|HashBuf,2:HarnessPhase|HashBuf,Test harness state (src/harness/harness.cpp).
 s_hashLo@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,2:HarnessPhase|HashBuf,2:HarnessPhase|HashBuf,Test harness state (src/harness/harness.cpp).
 s_lineOfSight@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,r,,1:ReadKey,2:SeedNetworkHost|SetUpSkirmish,Test harness state (src/harness/harness.cpp).

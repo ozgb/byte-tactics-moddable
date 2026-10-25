@@ -1388,6 +1388,8 @@ SimGlobals.g_randomSeed,0x0,LoadTntMap: TILE MAP,1,8,0x105e5-0x11b8d,not-a-point
 SimGlobals.g_randomSeed,0x0,LoadTntMap: TILE SET,16,380,0x26dd-0x986caa,not-a-pointer,"g_randomSeed: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_randomSeed,0x0,NanoParticles::Emit,1,9,0x23-0x12c,not-a-pointer,"g_randomSeed: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_randomSeed,0x0,allocator::deallocate,1,4,0x12f,not-a-pointer,"g_randomSeed: integers (ticks, counts, seed) that only look like addresses"
+VtolFollowOrder,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
+VtolFollowOrder #2,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolHelpBuildOrder,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolHelpBuildOrder,0x2e,AllocDepthFrame: CompositeBuffer,1,1869,0x20b20-0x6ffe0,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolHelpBuildOrder,0x26,AllocSurface: OFFSCREEN,1,900,0x2a7a0-0x46c20,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"

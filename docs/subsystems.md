@@ -422,9 +422,9 @@ none
 
 Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 73.0% of functions (65 of 89), 78.6% of lines, 68.5% of branches; 24 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
+Coverage: 75.3% of functions (67 of 89), 79.8% of lines, 69.7% of branches; 22 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (24 of 89 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421); 65 are entered, 73.0%), by reason:
+**Live functions no scenario enters** (22 of 89 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `sensors-sonar-jam` and `orders-tier2-core` (#426); 67 are entered, 75.3%), by reason:
 
 - Shutdown only (4): `FreeRadar`, `FreeMapResources`, `LosTables::FreeTables` and `LosTables::~LosTables`. `FreeRadar` and `FreeMapResources` are called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick. `FreeTables` has no caller but `FreeLosTables`, which nothing calls, and the destructor is that of the static table, which never runs, because `host_exit` ends the process with `TerminateProcess`.
 - Element destruction of the LOS table vectors (4): `DestroyPoint`, `DestroyLine` and `std::_Destroy` (both overloads). The vector code calls them when it destroys its elements, which only `FreeTables` and the destructor do.
@@ -432,7 +432,7 @@ Coverage: 73.0% of functions (65 of 89), 78.6% of lines, 68.5% of branches; 24 l
 - Console command only (3): `CmdLOS`, `CmdLOSType` and `CmdRadar`. The game has no console in test mode (#432 adds a console key).
 - Network only (2): `CmdShareMapping` and `CmdShareRadar`, the share commands, which all check `netGameFlags & 1` (a network game); test mode runs a skirmish.
 - Menu and cursor only (2): `ResizeRadarPicture` (the multiplayer lobby map preview) and `Visible` (the mouse hover cursor of `GetOrderCursor`).
-- Needs a case no scenario sets up yet (7): `ByteMap_004658e0::Get`, `MapSize_004658e0::Contains`, `IsExplored`, `IsSeen` and `IsFootprintVisible` (the `nodrawundergray` feature checks of `DrawBattleFrame`, which only the FloatingTeeth feature, a destroyed ARMFDRAG in the local camera view, reaches), `SonarJamVisitor::ApplySonarJamFlag` (the sonar jammer ARMSCRAM of Core Contingency, which needs a naval build chain) and `GetOriginCellAtPosition` (called only from `ResurrectOrder`, which needs CORNECRO and a wreck).
+- Needs a case no scenario can set up yet (5): `ByteMap_004658e0::Get`, `MapSize_004658e0::Contains`, `IsExplored`, `IsSeen` and `IsFootprintVisible`, the five `nodrawundergray` feature checks of `DrawBattleFrame` in `players_4658e0.cpp`. A 3D feature drawn in the local camera view makes the test-mode build exit 1 (#437), so no scenario can enter them until #437 is fixed.
 
 **Entry points.** Phase roots: none. `UpdatePlayers` (players) calls `RecalculateLineOfSight`, `UpdateUnitLineOfSight` and `UpdateSensorRadarAndCloak`, so LOS runs inside the players phase.
 
@@ -484,18 +484,17 @@ Coverage: 73.0% of functions (65 of 89), 78.6% of lines, 68.5% of branches; 24 l
 
 Issue #18. 468 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`, 14,000 lines). The largest subsystem.
 
-Coverage: 72.8% of functions (271 of 372), 66.2% of lines, 50.6% of branches; 101 live functions no scenario enters, and 28 more are dead (data/coverage.csv).
+Coverage: 78.0% of functions (290 of 372), 73.5% of lines, 57.6% of branches; 82 live functions no scenario enters, and 28 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (101 of 372 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419 and the three of #421; 271 are entered, 72.8%), by reason:
+**Live functions no scenario enters** (82 of 372 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421 and the ten of #426; 290 are entered, 78.0%), by reason:
 
 - Network only (23): the net-state methods of the goal objects and the bit writers: `LiteGoal::HasNetUnitState`, `LiteGoal::SerializeNetUnitState`, `AiSearchGoal::HasNetUnitState`, `AiSearchGoal::SerializeNetUnitState`, `PackedPosGoal` (constructor, destructor, `DeserializeNetUnitState`), `PathGoal` (8: `DeserializeNetUnitState`, `HasNetUnitState`, `SerializeNetUnitState`, `ExportGoalPose`, `FillWaypointWorldPos`, `HasReadyWaypoints`, `TickTowardGoal`, `TryClaimRepath`), `PatrolGoal` (4: constructor, `DeserializeNetUnitState`, `FillWaypointWorldPos`, `HasReadyWaypoints`), `BitReader::ReadBit`, `OrderFx::WriteBits`, `AirManeuverOrder::SerializeToBits`, `PathOrder::SerializeToBits`. `PatrolGoal` and `PackedPosGoal` are made only for a player of type 3 (a remote human), and the `PathGoal` methods only run through them.
 - Save and load only (31): `LowerBoundOrderTypes`, `OrderTypeNameLess`, `KindByIndex_0043a420`, `KindByName_0043a420`, `ResolveUnitTypeKey`, `UnitMotion::LoadMotion`, `UnitMotion::SaveMotion`, `Order::Order` (load constructor), `Order::ReattachFxToUnit`, `Order::SerializeToSave`, `SerializeSave`, `OrderFx::OrderFx`, `OrderFx::GetType`, and the load constructors, `GetType` and `Serialize` or `SerializeToSave` of `AirManeuverOrder`, `ApproachRadius`, `PathOrder`, `PointMarker` and `RingApproach`.
 - Info panel, cursor, build menu and shutdown only (8): `GetOrderName`, `GetOrderTarget`, `GetBuildWeaponPercent` (info panel), `SumQueuedBuildCount` (build menu count text), `GetOrderCursor` (cursor), `ClearOrderTypeTable` and `DestroyPathfinder` (shutdown), and `Marked` (the smart right-click order, mode 1, which the scenario `order` line has no verb for).
 - Campaign mission script only (4): `AttackUTypeOrder`, `WaitOrder`, `WaitForAttackOrder`, `MakeSelectableOrder`.
-- No caller in the game (11): `RepairUnitNoMoveOrder`, `ReadyOrder`, `ClearTargets_0043b7c0`, `TryGetDesiredHeading`, and the base-class slots `OrderFx::ApproxDist`, `ContainsCell`, `Destroy`, `FillGoalCells` and `IsFxStyle` (also of `AirManeuverOrder` and `PathOrder`).
-- Needs a unit or place the suite does not build (9): `AttackKamikazeOrder` (CORROACH or ARMVADER, tier 2 kbot lab), `ParalyzeOrder` (ARMSPID, tier 2), `ResurrectOrder` (CORNECRO, tier 3 chain and a wreck), `BuildWeaponOrder` (a missile silo or anti-missile launcher), `StandbyMineOrder` (a mine, which no build menu offers), `SelfRepairOrder`, `VtolGetRepairedOrder` and `FindPads` (an air repair pad), and `Direction_0044e3c0` (a fx attached to a piece of another unit, which landing on a pad and following do).
+- No caller in the game (13): `RepairUnitNoMoveOrder`, `ReadyOrder`, `ClearTargets_0043b7c0`, `TryGetDesiredHeading`, `VtolGetRepairedOrder` (nothing creates the order: only its definition and table row name it), the `Sub` of `unit_orders.cpp` at about line 1433 (the one at about line 1989 is `TeleportOrder`'s helper and is entered), and the base-class slots `OrderFx::ApproxDist`, `ContainsCell`, `Destroy`, `FillGoalCells` and `IsFxStyle` (also of `AirManeuverOrder` and `PathOrder`).
 - Transport load and unload only (3): `GroundPickupOrder`, `GroundUnloadOrder` and `WaitIfCobBusy` (called only by those two). No scenario carries a unit: a transport's script attaches its cargo at piece -1, and each tick 3.1c then reads the cargo's heading and pitch from the bytes before the carrier's piece block (`GetPieceAngles` with index -1); #428 defines those and brings the transport scenario back.
-- Needs a fight the scenarios do not set up (13): `VtolSeekGuardOrder` (the guarded unit dies), `VtolSeekAttackOrder` (an air attack ends), `AppendOrderToTail` (both of them), the helpers of those air orders (`GroundAllyVisitor::GroundAllyVisitor`, `GroundAllyVisitor::CollectGroundAlly`, `OrderTarget`, `Patrol`, `SearchRange`, `Contains` in vtol_orders.cpp), `AddComponentwise` (a hover attack that misses twice), `Contains` and `Sub` in unit_orders.cpp (a guarded unit under attack, and the matching cancel path), and `AttackNoMoveOrder` (the scripted LLT attack on the Core commander issues the order, but the function was never entered; not explained yet).
+- Needs a fight the scenarios do not set up (1): `AddComponentwise`, which runs only when `WeaponCanReachUnit` fails twice in `AirToGroundHoverOrder`. Neither gunship's weapon (ARMBRAWL `VTOL_EMG`, CORAPE `VTOL_rocket`) is toair or ballistic, and the trials could not make it fail (out of range targets, a submarine, a wading unit).
 
 **Entry points.** Phase roots: none. `UpdateAllUnits` (units) calls `RunOrders`; units also call `UnitMotion::UpdateMotion`.
 
@@ -622,8 +621,8 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 85.4% | 3 | 10 |
 | **weapons** | 73 of 88 | 83.0% | 83.0% | 66.9% | 15 | 20 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 65 of 89 | 73.0% | 78.6% | 68.5% | 24 | 20 |
-| **orders** | 271 of 372 | 72.8% | 66.2% | 50.6% | 101 | 28 |
+| **los_radar** | 67 of 89 | 75.3% | 79.8% | 69.7% | 22 | 20 |
+| **orders** | 290 of 372 | 78.0% | 73.5% | 57.6% | 82 | 28 |
 | **units** | 112 of 167 | 67.1% | 70.3% | 59.8% | 55 | 34 |
 | **players** | 50 of 143 | 35.0% | 33.2% | 24.3% | 93 | 11 |
 | **map** | 71 of 98 | 72.4% | 76.3% | 67.6% | 27 | 12 |

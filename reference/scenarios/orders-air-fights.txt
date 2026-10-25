@@ -1,0 +1,28 @@
+# Human Arm commander on The Pass has spawned aircraft; an aircraft helps the commander build, a fighter guards a unit that dies, and a bomber attacks a friendly fighter; 1500 ticks.
+game_seed 416
+crt_seed 1416
+view_seed 2416
+map The Pass
+start_positions fixed
+ticks 1500
+commander_death 0
+local_player 1
+player0.controller human
+player0.side Arm
+player0.metal 30000
+player0.energy 60000
+player1.controller human
+player1.side Core
+spawn 10 0 ARMFIG 600 300
+spawn 10 0 ARMFIG 640 300
+spawn 10 0 ARMTHUND 600 340
+spawn 10 0 ARMCA 640 340
+spawn 10 1 CORAK 770 340
+order 15 0:ARMCOM:1 firestate 0
+order 20 0:ARMCOM:1 build ARMSOLAR 700 340
+order 30 0:ARMCA:1 guard 0:ARMCOM:1
+order 450 0:ARMFIG:1 guard 0:ARMSOLAR:1
+order 455 1:CORAK:1 attack 0:ARMSOLAR:1
+order 520 0:ARMTHUND:1 attack 0:ARMSOLAR:1
+order 550 0:ARMSOLAR:1 selfdestruct
+order 1000 0:ARMTHUND:1 attack 0:ARMFIG:1

@@ -1,0 +1,18 @@
+# Human Arm commander on The Pass has a spawned solar collector and a spawned spider, which paralyzes the solar collector; 700 ticks.
+game_seed 414
+crt_seed 1414
+view_seed 2414
+map The Pass
+start_positions fixed
+ticks 700
+commander_death 0
+player0.controller human
+player0.side Arm
+player0.metal 30000
+player0.energy 60000
+player1.controller ai
+player1.side Core
+spawn 10 0 ARMSOLAR 640 260
+spawn 10 0 ARMSPID 680 430
+order 20 0:ARMSPID:1 attack 0:ARMSOLAR:1
+order 120 0:ARMSPID:1 stop

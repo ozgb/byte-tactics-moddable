@@ -34,6 +34,7 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `view_seed` | 1 | Seed of the presentation random generator (screen shake, particles, menu effects) |
 | `fpu_control_word` | `0x9001F` | Expected `_control87` value, ignoring the infinity-control bit; the run exits 2 if it differs |
 | `ticks` | required | Game ticks to play (30 per second of game time) |
+| `save` | none | Saves the game with `SaveGameFile` to `savegame\harness.sav` in the run's game directory after the step of this tick, 1 to `ticks`; one line only |
 | `map` | required | Map name, the rest of the line (names have spaces) |
 | `difficulty` | 1 | AI difficulty 0 to 2, one value for all computer players |
 | `commander_death` | 1 | 1: the game ends when a commander dies |

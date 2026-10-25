@@ -958,6 +958,7 @@ harness,economy,shared_write,Game::localPlayer,8
 harness,features,shared_write,Game::difficulty,2
 harness,features,shared_write,Game::playerIndex,1
 harness,game,call,ApplySlotsToGamePlayers,1
+harness,game,call,SaveGameFile,1
 harness,game,shared_write,Game::difficulty,4
 harness,game,shared_write,Game::localPlayer,13
 harness,game,shared_write,Game::playerIndex,5
@@ -977,6 +978,7 @@ harness,orders,shared_write,Game::localPlayer,2
 harness,orders,shared_write,Game::playerIndex,1
 harness,platform,call,GetMemSetValue,1
 harness,platform,call,IsMemSet,1
+harness,platform,call,MakeDirectoryPath,1
 harness,players,call,HarnessConditionClass,1
 harness,players,call,ResetPlayerSlots,1
 harness,players,shared_write,Game::difficulty,3

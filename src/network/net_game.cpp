@@ -69,8 +69,7 @@ struct PlayerIdPacket {
 
 // GLOBAL: 0x511de8
 extern Game* g_game;
-extern char* g_leftGameTexts[8];
-extern int g_usePacketManager;
+#include "../../link/globals.h"
 
 #include "packets.h"
 #include "../game/statistics.h"
@@ -1082,15 +1081,6 @@ struct ResourceSharePacket {
 extern int DAT_00512c8c;
 extern char g_onlineLobbyPlayerName;
 extern char g_onlineLobbyPassword;
-extern char* g_loungeChatter;
-extern int g_loungeRefreshTime;
-extern int g_timeoutPlayerDpid;
-extern unsigned int g_timeoutTimerStart;
-extern char g_allySoundName[];
-extern char g_playerDisconnectedText[];
-extern char g_integrityBreachText[];
-extern char g_playerMessageFormat[];
-extern char s_PACKET_DATA_00506524[];
 typedef EntryFunc SimView_g_packetHandlerType2;
 #undef g_packetHandlerType2
 #define g_packetHandlerType2 (*reinterpret_cast<SimView_g_packetHandlerType2*>(reinterpret_cast<char*>(&g_packetHandlers) + 0x8))

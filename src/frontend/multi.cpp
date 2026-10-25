@@ -793,11 +793,8 @@ void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 void ShowSoftwareCursor();
 #include "../files/files_api.h"
 int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
-void __stdcall HandleRestrictionsClick(Gui* menu);
 extern "C" __declspec(dllimport) char* __stdcall lstrcpynA(char*, const char*, int);
-int CheckMapCrc();
-void __stdcall UpdateMaxUnitsText(Gui* gui, int index);
-void __stdcall UpdateMetalText(Gui* gui, int index);
+#include "../units/movement_class.h"
 void __stdcall CreateUnitSync(int param_1);
 void* __stdcall LoadPcx(char* path, int param_2);
 void __stdcall FrameFromSurface(void* dst, void* src);

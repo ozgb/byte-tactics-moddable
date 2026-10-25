@@ -4,6 +4,8 @@
 #include "../../include/win_types.h"
 struct Gui;
 
+struct Gui;
+
 struct Gadget;
 struct Gui;
 struct Layer;
@@ -98,5 +100,11 @@ void __stdcall OpenBattleRoom();
 void __stdcall UpdateBattleRoom();
 void __stdcall HandleBattleRoomClick(Gui* gadget);
 void __stdcall UpdateUnitSliders(Gui*, int unused);
+
+void __stdcall UpdateMaxUnitsText(Gui* gui, int index);
+void __stdcall UpdateMetalText(Gui* sub, int unused);
+void __stdcall UpdateEnergyText(Gui* sub, int unused);
+void __stdcall SetNamedSliderValue(Gui* menu, char* name, int value);
+void __stdcall HandleRestrictionsClick(Gui* menu);
 
 #endif

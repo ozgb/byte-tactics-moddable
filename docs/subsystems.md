@@ -521,7 +521,7 @@ uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir ~/.ta --chec
 uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir ~/.ta --write   # replace the baseline
 ```
 
-The simulation subsystems are in bold. `state` is the shared state block code (`interfaces/ref.h`, `src/state/`), not a simulation subsystem. A function counts as entered when its execution count is above 0; a line is hit when its count is above 0; each branch condition has a true and a false side, and each side taken at least once is covered. Branches are `-` where the subsystem has none. The function counts are the compiler's: they include inline and compiler-generated functions and leave out ones the build drops, so they differ from the counts above (`orders` has 400 here and 468 there).
+The simulation subsystems are in bold. `state` is the shared state block code (`interfaces/ref.h`, `src/state/`), not a simulation subsystem. A function counts as entered when its execution count is above 0; a line is hit when its count is above 0; each branch condition has a true and a false side, and each side taken at least once is covered. Branches are `-` where the subsystem has none. The function counts are the compiler's: they include inline and compiler-generated functions, so they differ from the counts above (`orders` has 400 here and 468 there).
 
 | subsystem | functions entered | functions | lines | branches | never entered |
 |---|---|---|---|---|---|

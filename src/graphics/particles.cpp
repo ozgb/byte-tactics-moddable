@@ -14,7 +14,6 @@
 #include "../harness/harness.h"
 #include "../util/vec3.h"
 #include "rect.h"
-#include "object_pool.h"
 #include "nano_particle_vector.h"
 #include "particle_system.h"
 #include "particle_lists.h"
@@ -1802,11 +1801,11 @@ void __stdcall EmitTimedSubParticles(Vec3* p, short index)
     }
 }
 
-typedef void (std::vector<ParticleSystem*>::*InsertFn_004732e0)(
+typedef void (std::vector<ParticleSystem*>::*ParticleSystemPtrInsertFn)(
     std::vector<ParticleSystem*>::iterator, std::vector<ParticleSystem*>::size_type, ParticleSystem* const&);
 
 // FUNCTION: 0x4732e0 ?insert@?$vector@PAVParticleSystem@@V?$allocator@PAVParticleSystem@@@std@@@std@@QAEXPAPAVParticleSystem@@IABQAV3@@Z
-InsertFn_004732e0 g_insert_004732e0 = &std::vector<ParticleSystem*>::insert;
+ParticleSystemPtrInsertFn g_particleSystemPtrInsert = &std::vector<ParticleSystem*>::insert;
 
 // FUNCTION: 0x473a00
 void NanoParticle::DrawParticle(int dest, short x, short y)
@@ -1988,26 +1987,26 @@ typedef void (std::vector<TeleportParticle>::*TeleportParticleInsertFn)(
 // FUNCTION: 0x4758c0 ?insert@?$vector@UTeleportParticle@@V?$allocator@UTeleportParticle@@@std@@@std@@QAEXPAUTeleportParticle@@IABU3@@Z
 TeleportParticleInsertFn g_teleportParticleInsert = &std::vector<TeleportParticle>::insert;
 
-typedef void (std::vector<ThrustParticle>::*InsertFn_00475bd0)(
+typedef void (std::vector<ThrustParticle>::*ThrustParticleInsertFn)(
     std::vector<ThrustParticle>::iterator, std::vector<ThrustParticle>::size_type, const ThrustParticle&);
 
 // FUNCTION: 0x475bd0 ?insert@?$vector@UThrustParticle@@V?$allocator@UThrustParticle@@@std@@@std@@QAEXPAUThrustParticle@@IABU3@@Z
-InsertFn_00475bd0 g_insert_00475bd0 = &std::vector<ThrustParticle>::insert;
+ThrustParticleInsertFn g_thrustParticleInsert = &std::vector<ThrustParticle>::insert;
 
-typedef void (std::vector<WakeParticle>::*InsertFn_00475ef0)(
+typedef void (std::vector<WakeParticle>::*WakeParticleInsertFn)(
     std::vector<WakeParticle>::iterator, std::vector<WakeParticle>::size_type, const WakeParticle&);
 
 // FUNCTION: 0x475ef0 ?insert@?$vector@UWakeParticle@@V?$allocator@UWakeParticle@@@std@@@std@@QAEXPAUWakeParticle@@IABU3@@Z
-InsertFn_00475ef0 g_insert_00475ef0 = &std::vector<WakeParticle>::insert;
+WakeParticleInsertFn g_wakeParticleInsert = &std::vector<WakeParticle>::insert;
 
-typedef void (std::vector<SmokeParticle>::*InsertFn_00476210)(
+typedef void (std::vector<SmokeParticle>::*SmokeParticleInsertFn)(
     std::vector<SmokeParticle>::iterator, std::vector<SmokeParticle>::size_type, const SmokeParticle&);
 
 // FUNCTION: 0x476210 ?insert@?$vector@USmokeParticle@@V?$allocator@USmokeParticle@@@std@@@std@@QAEXPAUSmokeParticle@@IABU3@@Z
-InsertFn_00476210 g_insert_00476210 = &std::vector<SmokeParticle>::insert;
+SmokeParticleInsertFn g_smokeParticleInsert = &std::vector<SmokeParticle>::insert;
 
-typedef void (std::vector<TimedSubParticle>::*InsertFn_00476490)(
+typedef void (std::vector<TimedSubParticle>::*TimedSubParticleInsertFn)(
     std::vector<TimedSubParticle>::iterator, std::vector<TimedSubParticle>::size_type, const TimedSubParticle&);
 
 // FUNCTION: 0x476490 ?insert@?$vector@UTimedSubParticle@@V?$allocator@UTimedSubParticle@@@std@@@std@@QAEXPAUTimedSubParticle@@IABU3@@Z
-InsertFn_00476490 g_insert_00476490 = &std::vector<TimedSubParticle>::insert;
+TimedSubParticleInsertFn g_timedSubParticleInsert = &std::vector<TimedSubParticle>::insert;

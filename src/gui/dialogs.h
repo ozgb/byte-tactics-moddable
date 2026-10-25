@@ -2,10 +2,7 @@
 #define DIALOGS_H
 struct Gui;
 
-struct Gui;
-
 struct FileHandle;
-struct Gui;
 
 int __stdcall IsPointInEntryRect(Gui* obj);
 int __stdcall HasLayer(Gui* obj);

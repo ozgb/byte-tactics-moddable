@@ -622,6 +622,10 @@ static void SeedNetworkHost(int host)
         if (!s_players[i].named)
             continue;
         PlayerInfo* info = g_game->players[i].info;
+        if (info == nullptr) {
+            Fail("testmode: game_type 3 found a player without a PlayerInfo\n");
+            continue;
+        }
         memset(info->map, 0, sizeof info->map);
         strcpy(info->map, s_map);
         info->host = i == host;

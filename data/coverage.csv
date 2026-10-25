@@ -397,7 +397,7 @@ los_radar,Visible,src/units/unit_scripts.cpp,1,0,0,0,0,0,?Visible@@YGHPAUUnit_00
 los_radar,std::_Construct,src/map/los_tables_433a80.cpp,1,0,0,0,0,0,?_Construct@std@@YGXPAUElem_00434020@@ABU2@@Z,0
 los_radar,std::_Destroy,src/map/los_tables_433a80.cpp,1,0,0,0,0,0,?_Destroy@std@@YGXPAUElem_00434020@@@Z,0
 los_radar,std::_Destroy,src/map/los_tables_433a80.cpp,1,0,0,0,0,0,?_Destroy@std@@YGXPAUElem_00434360@@@Z,0
-map,*,,98,68,2149,1601,1022,682,,12
+map,*,,98,68,2149,1601,1022,679,,12
 map,ByteMap_0047d2e0::Contains,src/map/terrain.cpp,0,0,0,0,0,0,?Contains@ByteMap_0047d2e0@@QAEHHH@Z,1
 map,ClaimFootprintsInArea,src/map/terrain.cpp,0,0,0,0,0,0,?ClaimFootprintsInArea@@YGXUPoint16@@0@Z,1
 map,Clamp_0047e750,src/map/terrain.cpp,0,0,0,0,0,0,?Clamp_0047e750@@YGHHI@Z,1
@@ -815,7 +815,7 @@ network,Vec_0046d6c0::size,src/network/unit_sync.cpp,1,0,0,0,0,0,?size@Vec_0046d
 network,Vec_0046d860::Push,src/network/unit_sync_46dad0.cpp,1,0,0,0,0,0,?Push@Vec_0046d860@@QAEXABUSyncPlayerRecord@@@Z,0
 network,Wrap_0046e5e0::Wrap_0046e5e0,src/network/unit_sync_46dad0.cpp,1,0,0,0,0,0,??0Wrap_0046e5e0@@QAE@ABUAlloc_0046e5c0@@@Z,0
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UElem_0046faf0@@@std@@QAEXPAUElem_0046faf0@@@Z,0
-orders,*,,372,271,6481,4224,3188,1600,,28
+orders,*,,372,268,6481,4148,3188,1553,,28
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1
 orders,AddComponentwise,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?AddComponentwise@@YG?AUVec3@@ABU1@0@Z,0
 orders,AddVectors,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?AddVectors@@YG?AUVec3@@ABU1@0@Z,1
@@ -862,6 +862,8 @@ orders,GetOrderTargetIfFlagged,src/orders/order_list.cpp,0,0,0,0,0,0,?GetOrderTa
 orders,GetTableEntryByTypeByte,src/orders/order_queue.cpp,0,0,0,0,0,0,?GetTableEntryByTypeByte@@YIHPAE@Z,1
 orders,GroundAllyVisitor::CollectGroundAlly,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?CollectGroundAlly@GroundAllyVisitor@@UAEXPAUUnit@@@Z,0
 orders,GroundAllyVisitor::GroundAllyVisitor,src/orders/vtol_orders.cpp,1,0,0,0,0,0,??0GroundAllyVisitor@@QAE@PAUPlayer@@PAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@PAUUnit@@@Z,0
+orders,GroundPickupOrder,src/orders/unit_orders.cpp,1,0,0,0,0,0,?GroundPickupOrder@@YGHPAUUnit@@PAUOrder@@E@Z,0
+orders,GroundUnloadOrder,src/orders/unit_orders.cpp,1,0,0,0,0,0,?GroundUnloadOrder@@YGHPAUUnit@@PAUOrder@@H@Z,0
 orders,Grow_0044ec30,src/orders/order_targets.cpp,0,0,0,0,0,0,?Grow_0044ec30@@YGXPAV?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@H@Z,1
 orders,InsertOrderAfterMarked,src/orders/order_list.cpp,0,0,0,0,0,0,?InsertOrderAfterMarked@@YGXPAUUnit@@PAUOrder@@@Z,1
 orders,KindByIndex_0043a420,src/orders/order_queue.cpp,1,0,0,0,0,0,?KindByIndex_0043a420@@YGEE@Z,0
@@ -942,6 +944,7 @@ orders,VtolLandingOrder,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?VtolLandingOrder
 orders,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?VtolSeekAttackOrder@@YGHPAUUnit@@PAUOrder@@H@Z,0
 orders,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?VtolSeekGuardOrder@@YGHPAUUnit@@PAUOrder@@H@Z,0
 orders,WaitForAttackOrder,src/orders/unit_orders.cpp,1,0,0,0,0,0,?WaitForAttackOrder@@YGHHPAUOrder@@H@Z,0
+orders,WaitIfCobBusy,src/orders/order_queue.cpp,1,0,0,0,0,0,?WaitIfCobBusy@@YGHPAD0I@Z,0
 orders,WaitOrder,src/orders/unit_orders.cpp,1,0,0,0,0,0,?WaitOrder@@YGHPAUUnit@@PAUOrder@@H@Z,0
 orders,Whole,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Whole@@YGFABH@Z,1
 orders,WriteUnitTypeNameKey,src/orders/order_list.cpp,0,0,0,0,0,0,?WriteUnitTypeNameKey@@YGXPAVHapiBank@@G@Z,1
@@ -1491,8 +1494,9 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0
-presentation,*,,1143,456,32083,9802,11968,2544,,329
+presentation,*,,1143,441,32083,9683,11968,2523,,329
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0
+presentation,??G@YG?AUVec3_00474760@@ABU0@0@Z,src/graphics/particles.cpp,1,0,0,0,0,0,??G@YG?AUVec3_00474760@@ABU0@0@Z,0
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1
 presentation,Add,src/graphics/particles.cpp,1,0,0,0,0,0,?Add@@YGXPAULists_00471fd0@@FPAVParticleSystem@@@Z,0
@@ -1728,6 +1732,7 @@ presentation,Dummy,src/ingame/selection.cpp,1,0,0,0,0,0,?Dummy@@YGXXZ,0
 presentation,EmitBubbles,src/graphics/particles.cpp,1,0,0,0,0,0,?EmitBubbles@@YGXHHHF@Z,0
 presentation,EmitTeleportParticles,src/graphics/particles.cpp,1,0,0,0,0,0,?EmitTeleportParticles@@YGXHHHF@Z,0
 presentation,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,0,0,0,0,0,0,?EmitTimedBlackSmoke@@YGXPAUVec3@@HHF@Z,1
+presentation,EmitWakeParticles,src/graphics/particles.cpp,1,0,0,0,0,0,?EmitWakeParticles@@YGXHHHF@Z,0
 presentation,EmptyMainLoopHook,src/frontend/frontend.cpp,1,0,0,0,0,0,?EmptyMainLoopHook@@YGXXZ,0
 presentation,EnableBlinkWords,src/gui/file_list.cpp,0,0,0,0,0,0,?EnableBlinkWords@@YGXH@Z,1
 presentation,EnableEndMissionButtons,src/frontend/endgame.cpp,1,0,0,0,0,0,?EnableEndMissionButtons@@YGXXZ,0
@@ -2020,6 +2025,7 @@ presentation,ListBoxSelectDown,src/gui/gui.cpp,1,0,0,0,0,0,?ListBoxSelectDown@@Y
 presentation,ListBoxSelectUp,src/gui/gui.cpp,1,0,0,0,0,0,?ListBoxSelectUp@@YGXPAUGui@@H@Z,0
 presentation,ListCampaignFiles,src/frontend/campaign_menu.cpp,0,0,0,0,0,0,?ListCampaignFiles@@YGHPAPAX@Z,1
 presentation,ListSaveGameFiles,src/frontend/multi.cpp,1,0,0,0,0,0,?ListSaveGameFiles@@YGPAXPAH@Z,0
+presentation,Lists_00472430::Add,src/graphics/particles.cpp,1,0,0,0,0,0,?Add@Lists_00472430@@QAEXFPAVParticleSystem@@@Z,0
 presentation,Lists_00472530::Add,src/graphics/particles.cpp,1,0,0,0,0,0,?Add@Lists_00472530@@QAEXFPAVParticleSystem@@@Z,0
 presentation,LoadAccount_00442a30,src/frontend/multi.cpp,1,0,0,0,0,0,?LoadAccount_00442a30@@YGXXZ,0
 presentation,LoadPcxPalette,src/graphics/pcx.cpp,1,0,0,0,0,0,?LoadPcxPalette@@YGHPADPAI@Z,0
@@ -2473,8 +2479,20 @@ presentation,Vec3_004736e0::Length,src/graphics/particles.cpp,1,0,0,0,0,0,?Lengt
 presentation,Vec3_004736e0::operator?G,src/graphics/particles.cpp,1,0,0,0,0,0,??GVec3_004736e0@@QBE?AU0@ABU0@@Z,0
 presentation,Vec3_004736e0::operator?Y,src/graphics/particles.cpp,1,0,0,0,0,0,??YVec3_004736e0@@QAEAAU0@ABU0@@Z,0
 presentation,Vec3_00474580::operator?Y,src/graphics/particles_472630.cpp,0,0,0,0,0,0,??YVec3_00474580@@QAEXABU0@@Z,1
+presentation,Vec3_00474760::Length,src/graphics/particles.cpp,1,0,0,0,0,0,?Length@Vec3_00474760@@QBEHXZ,0
+presentation,Vec3_00474760::Scale,src/graphics/particles.cpp,1,0,0,0,0,0,?Scale@Vec3_00474760@@QAEXH@Z,0
+presentation,Vec3_00474760::operator?Y,src/graphics/particles.cpp,1,0,0,0,0,0,??YVec3_00474760@@QAEAAU0@ABU0@@Z,0
 presentation,Vec3i_00474130::operator?Y,src/graphics/particles_472630.cpp,0,0,0,0,0,0,??YVec3i_00474130@@QAEAAU0@ABU0@@Z,1
 presentation,WakeParticle::DrawParticle,src/graphics/particles.cpp,1,0,0,0,0,0,?DrawParticle@WakeParticle@@QAEXPAXFF@Z,0
+presentation,WakeParticle::IsExpired,src/graphics/particles.cpp,1,0,0,0,0,0,?IsExpired@WakeParticle@@QAEHH@Z,0
+presentation,WakeParticle::Step,src/graphics/particles.cpp,1,0,0,0,0,0,?Step@WakeParticle@@QAEXXZ,0
+presentation,WakeParticles::Emit,src/graphics/particles.cpp,1,0,0,0,0,0,?Emit@WakeParticles@@UAEXXZ,0
+presentation,WakeParticles::Init,src/graphics/particles.cpp,1,0,0,0,0,0,?Init@WakeParticles@@UAEXPAUVec3_00474760@@0HHH@Z,0
+presentation,WakeParticles::IsEmitDue,src/graphics/particles.cpp,1,0,0,0,0,0,?IsEmitDue@WakeParticles@@UAEHXZ,0
+presentation,WakeParticles::IsFinished,src/graphics/particles.cpp,1,0,0,0,0,0,?IsFinished@WakeParticles@@UAEHXZ,0
+presentation,WakeParticles::Render,src/graphics/particles.cpp,1,0,0,0,0,0,?Render@WakeParticles@@UAEXH@Z,0
+presentation,WakeParticles::Update,src/graphics/particles.cpp,1,0,0,0,0,0,?Update@WakeParticles@@UAEXXZ,0
+presentation,WakeParticles::WakeParticles,src/graphics/particles.cpp,1,0,0,0,0,0,??0WakeParticles@@QAE@XZ,0
 presentation,WidthTextCast,src/graphics/font.cpp,0,0,0,0,0,0,?WidthTextCast@@YGHPAUFont@@PAE@Z,1
 presentation,WordWrapText,src/gui/dialogs.cpp,1,0,0,0,0,0,?WordWrapText@@YGPADPAUGui@@PADHH@Z,0
 presentation,WorldToScreen,src/game/console_commands.cpp,0,0,0,0,0,0,?WorldToScreen@@YGXPAUPos_00417bb0@@PAH1@Z,1
@@ -2547,7 +2565,7 @@ seams,SerializeOrderToSaveNative,src/seams/native.cpp,1,0,0,0,0,0,?SerializeOrde
 seams,SpendEnergyNative,src/seams/native.cpp,1,0,0,0,0,0,?SpendEnergyNative@@YGHPAVUnitResources@@M@Z,0
 seams,SpendMetalNative,src/seams/native.cpp,1,0,0,0,0,0,?SpendMetalNative@@YGHPAVUnitResources@@M@Z,0
 seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadManagerDeleteTimersNative@@YIXPAVSquadManager@@H@Z,0
-state,*,,386,311,697,547,670,331,,22
+state,*,,386,310,697,546,670,330,,22
 state,??$?8PAUUnit@@PAU0@@@YG_NABV?$SimAllocator@PAUUnit@@@@0@Z,src/state/sim_allocator.h,0,0,0,0,0,0,??$?8PAUUnit@@PAU0@@@YG_NABV?$SimAllocator@PAUUnit@@@@0@Z,1
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0
@@ -2613,6 +2631,7 @@ state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UPlayerState_00468cf
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UProjectile@@@@QBEPAUProjectile@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UScreenPos@@@@QBEPAUScreenPos@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@USideData@@@@QBEPAUSideData@@XZ,0
+state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UTargetData_0043d6d0@@@@QBEPAUTargetData_0043d6d0@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UUnitType_0041b2e0@@@@QBEPAUUnitType_0041b2e0@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UUnit_0043e490@@@@QBEPAUUnit_0043e490@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UUnit_0043f0e0@@@@QBEPAUUnit_0043f0e0@@XZ,0
@@ -2647,7 +2666,7 @@ state,SimAllocator::destroy,src/state/sim_allocator.h,0,0,0,0,0,0,?destroy@?$Sim
 state,SimAllocator::max_size,src/state/sim_allocator.h,0,0,0,0,0,0,?max_size@?$SimAllocator@PAUUnit@@@@QBEIXZ,1
 targeting,*,,10,10,131,126,76,54,,1
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1
-units,*,,167,115,4127,3019,1730,1070,,34
+units,*,,167,112,4127,2900,1730,1026,,34
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1
@@ -2691,6 +2710,7 @@ units,FreeUnitTypes,src/units/unit_types.cpp,1,0,0,0,0,0,?FreeUnitTypes@@YGXXZ,0
 units,GainedBits,src/units/unit.cpp,0,0,0,0,0,0,?GainedBits@@YGEEH@Z,1
 units,GetHandleSize,src/units/unit_motion.cpp,0,0,0,0,0,0,?GetHandleSize@@YGHH@Z,1
 units,GetHeadingBetweenOrDefault,src/units/unit_position.cpp,0,0,0,0,0,0,?GetHeadingBetweenOrDefault@@YGGPAUVec3@@0G@Z,1
+units,GetUnit,src/units/unit_script.cpp,1,0,0,0,0,0,?GetUnit@@YGPAUUnit@@G@Z,0
 units,HasBit,src/units/unit.cpp,0,0,0,0,0,0,?HasBit@@YGHE@Z,1
 units,InitUnit,src/units/units_485010.cpp,0,0,0,0,0,0,?InitUnit@@YGXHUVec3@@HPAUUnit@@@Z,1
 units,InsertShift,src/units/unit_commands.cpp,0,0,0,0,0,0,?InsertShift@@YGXPAPAUItem_00485940@@PAU1@P6GH11@Z@Z,1
@@ -2722,6 +2742,8 @@ units,UnitRef::ClearRef,src/units/unit_targets.cpp,0,0,0,0,0,0,?ClearRef@UnitRef
 units,UnitRef::Get,src/units/unit_ref.h,0,0,0,0,0,0,?Get@UnitRef@@QAEPAUUnit@@XZ,1
 units,UnitRef::LinkToUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?LinkToUnit@UnitRef@@QAEXPAUUnit@@@Z,1
 units,UnitRef::UnlinkFromUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?UnlinkFromUnit@UnitRef@@QAEXXZ,1
+units,UnitScript::AttachUnit,src/units/unit_script.cpp,1,0,0,0,0,0,?AttachUnit@UnitScript@@UAEXGHH@Z,0
+units,UnitScript::DropUnit,src/units/unit_script.cpp,1,0,0,0,0,0,?DropUnit@UnitScript@@UAEXG@Z,0
 units,UnitScript::GetTransporterId,src/units/unit_script.cpp,1,0,0,0,0,0,?GetTransporterId@UnitScript@@UAEHXZ,0
 units,UnitScript::IsCarryingUnit,src/units/unit_script.cpp,1,0,0,0,0,0,?IsCarryingUnit@UnitScript@@UAEHH@Z,0
 units,UnitScript::IsPieceCached,src/units/unit_script.cpp,1,0,0,0,0,0,?IsPieceCached@UnitScript@@UAEHH@Z,0

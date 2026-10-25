@@ -1076,7 +1076,6 @@ struct Order;
 #pragma pack(push, 1)
 #include "../weapons/weapon_def.h"
 #include "../units/unit_def.h"
-struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index; };
 #include "unit_motion.h"
 #include "../units/unit.h"
 #include "order.h"
@@ -1137,7 +1136,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             return 1;
         case 2: {
             Unit* attacker=order->target->attacker;
-            if (attacker && !((Owner*)attacker->player.get())->allied[((Owner*)unit->player.get())->index]) {
+            if (attacker && !attacker->player.get()->allied[unit->player.get()->index]) {
                 if (flags & 0x10) {
                     if (!Contains(unit->def->categories,attacker->unitDefIndex)) {
                         if (IssueAttackOrder(unit,attacker,1)) { order->flags=0; return 3; }
@@ -1213,7 +1212,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
 // FUNCTION: 0x410c70
 void GroundAllyVisitor::CollectGroundAlly(Unit* unit)
 {
-    if (((Owner*)unit->player.get())->allied[owner->index] && !(unit->def->flags1 & 0x800) && unit != self)
+    if (unit->player.get()->allied[owner->index] && !(unit->def->flags1 & 0x800) && unit != self)
         units->push_back(unit);
 }
 
@@ -2124,7 +2123,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
         if ((unsigned int)unit->health < (unit->def->maxHealth>>2)*3) {
             LandingPadList pads;
-            g_seams.ai->GetFactoriesInRadius(((Owner*)unit->player.get())->index,&unit->pos,0xf00,&pads);
+            g_seams.ai->GetFactoriesInRadius(unit->player.get()->index,&unit->pos,0xf00,&pads);
             if (!pads.empty()) {
                 order->SetAttachedFx(0);
                 Unit* pad=pads[RandomInt(pads.size())];

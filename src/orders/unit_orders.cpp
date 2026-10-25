@@ -1965,7 +1965,6 @@ struct Order;
 #pragma pack(push, 1)
 #include "../weapons/weapon_def.h"
 #include "../units/unit_def.h"
-struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index; };
 #include "../units/unit.h"
 #include "order.h"
 
@@ -1999,7 +1998,7 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
     }
     case 1: {
         Unit* attacker=order->target->attacker;
-        if (attacker && !((Owner*)attacker->player.get())->allied[((Owner*)unit->player.get())->index] && (flags & 0x10) &&
+        if (attacker && !attacker->player.get()->allied[unit->player.get()->index] && (flags & 0x10) &&
             !Contains(unit->def->categories,attacker->unitDefIndex)) {
             if (IssueAttackOrder(unit,attacker,1)) { order->flags=0; return 3; }
             if (unit->flags & 0x300000) {

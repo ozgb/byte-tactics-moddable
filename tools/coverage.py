@@ -294,6 +294,11 @@ def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[st
     return totals, excluded, unassigned
 
 
+def path_free(decorated: str) -> str:
+    """The decorated name without the path hash of an anonymous namespace (`?A0x` plus 8 hex digits)."""
+    return re.sub(r"\?A0x[0-9A-Fa-f]{8}", "?A0x", decorated)
+
+
 def csv_rows(totals: dict[str, Totals]) -> list[list[str]]:
     """The rows of data/coverage.csv: per subsystem a totals row, then a row per never-entered live function and per dead function."""
     rows = []
@@ -302,8 +307,8 @@ def csv_rows(totals: dict[str, Totals]) -> list[list[str]]:
         first = len(rows)
         rows.append([subsystem, "*", "", t.functions, t.functions_entered, t.lines, t.lines_hit,
                      t.branches, t.branches_covered, "", t.dead])
-        rows += [[subsystem, name, file, 1, 0, 0, 0, 0, 0, decorated, 0] for name, file, decorated in t.never_entered]
-        rows += [[subsystem, name, file, 0, 0, 0, 0, 0, 0, decorated, 1] for name, file, decorated in t.dead_functions]
+        rows += [[subsystem, name, file, 1, 0, 0, 0, 0, 0, path_free(decorated), 0] for name, file, decorated in t.never_entered]
+        rows += [[subsystem, name, file, 0, 0, 0, 0, 0, 0, path_free(decorated), 1] for name, file, decorated in t.dead_functions]
         rows[first:] = sorted(rows[first:], key=lambda r: (r[1] != "*", r[1], r[2], r[9]))
     return [[str(c) for c in r] for r in rows]
 

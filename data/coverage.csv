@@ -315,7 +315,7 @@ game,OutOfBlock,src/state/block.cpp,1,0,0,0,0,0,?OutOfBlock@?A0x@@YGXXZ,0,error-
 game,OutOfMemoryHandler,src/game/main.cpp,1,0,0,0,0,0,?OutOfMemoryHandler@@YGXXZ,0,error-path
 game,PreBattleFrame,src/game/main_loop.cpp,1,0,0,0,0,0,?PreBattleFrame@@YGXXZ,0,network
 game,QuirksFlipFirstSim,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksFlipFirstSim@@YG_NPAUQuirks@@@Z,0,test-only
-game,QuirksNormalise,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksNormalise@@YG_NPBDPADH@Z,0,
+game,QuirksNormalise,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksNormalise@@YG_NPBDPADH@Z,0,moddable-only
 game,ReportViaException,src/game/main_49e680.cpp,1,0,0,0,0,0,?ReportViaException@@YGXPBD@Z,0,error-path
 game,ResetGameSpeed,src/game/game_state.cpp,0,0,0,0,0,0,?ResetGameSpeed@@YGXXZ,1,
 game,ReturnToMainMenuFrame,src/game/main_loop.cpp,1,0,0,0,0,0,?ReturnToMainMenuFrame@@YGXXZ,0,menu

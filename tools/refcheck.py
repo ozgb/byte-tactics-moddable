@@ -69,7 +69,7 @@ EXCEPTION_COLUMNS = ["struct", "field", "kind", "file", "issue"]
 OUTSIDE_COLUMNS = ["struct", "field", "holder", "offset", "words", "issue", "kind", "note"]
 KINDS = ("pointer", "function-pointer", "container", "int-pointer")
 DEFAULT_BUILD_DIR = ROOT / "build/modern"
-HOLDERS = {"Game": "AllocZeroedWithTickOffset"}
+HOLDERS = {"Game": "CreateGameObject"}
 EXTRA_BLOCK = ("Game", "SimGlobals")
 CONTAINERS = ("Vector_00438480", "SimVector", "SyncTaggedVector")
 RECORD_KINDS = ("RecordDecl", "CXXRecordDecl")
@@ -663,6 +663,9 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
     """The rows of data/outside_pointers.csv from the `outside` rows of data/block_pointers.csv."""
     with (root / BLOCK_POINTERS).open(newline="") as f:
         source = [r for r in csv.DictReader(f) if r["class"] == "outside" and r["offsets"] != "*"]
+    if GAME in locators and not any(r["holder"].split(": ")[-1] == HOLDERS[GAME] for r in source):
+        sys.exit("refcheck: %s has no outside rows for the Game holder %s: it was renamed, set HOLDERS in "
+                 "tools/refcheck.py to its new name" % (BLOCK_POINTERS, HOLDERS[GAME]))
     rows: dict[tuple, dict] = {}
 
     def add(struct, name, holder, token, words, issue, kind, note):

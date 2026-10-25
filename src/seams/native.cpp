@@ -65,7 +65,7 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
 int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target, Vec3* pos, int param_6, int param_7);
 #include "../orders/order_list.h"
-#include "../orders/order_queue_4384a0.h"
+#include "../orders/order_queue.h"
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
 #include "../orders/order_targets.h"
 float __stdcall GetEnergyIncome(Player* player);
@@ -135,7 +135,7 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../ingame/control_panel.h"
 #include "../units/unit_scripts.h"
 #include "../units/unit_position.h"
-#include "../orders/order_queue_4384a0.h"
+#include "../orders/order_queue.h"
 
 struct DamagedAllyCollector;
 

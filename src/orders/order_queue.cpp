@@ -2,7 +2,7 @@
 #include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <string.h>
-#include "order_queue_4384a0.h"
+#include "order_queue.h"
 
 class Order;
 class HapiBank;
@@ -71,6 +71,7 @@ struct SaveDesc_0043a1f0 {
     int subFlags;
 };
 #pragma pack(pop)
+#include "../files/files_api.h"
 
 #include "../state/block.h"
 #include "../units/cob_script.h"
@@ -116,6 +117,7 @@ typedef Entry_0043a1f0* SimView_g_missionOrderTableEnd;
 #pragma pack(pop)
 
 #include "order.h"
+extern int __cdecl _strcmpi(const char*, const char*);
 
 static inline void InsertBefore(Unit* p, Order* child, Order* before)
 {
@@ -216,7 +218,6 @@ int __stdcall WaitIfCobBusy(char* param_1, char* param_2, unsigned int param_3)
     return 1;
 }
 
-extern int __cdecl _strcmpi(const char*, const char*);
 
 // FUNCTION: 0x438760
 MissionType::MissionType(const char* name)
@@ -415,7 +416,6 @@ int __stdcall GetOrderFlags(void* param)
     return *(int*)((char*)ptr1 + 0x42);
 }
 
-#include "../files/files_api.h"
 
 // FUNCTION: 0x43a1f0
 Order::~Order()

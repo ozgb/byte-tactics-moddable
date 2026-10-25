@@ -379,7 +379,7 @@ src/network/net_game_453d40.cpp,src/ingame/control_panel.h,#392
 src/network/net_game_453d40.cpp,src/sound/sound.h,#392
 src/network/packets.cpp,interfaces/host.h,#392
 src/orders/order_list.cpp,src/ingame/markers.h,#392
-src/orders/order_queue_4384a0.cpp,src/sound/sound.h,#392
+src/orders/order_queue.cpp,src/sound/sound.h,#392
 src/orders/unit_orders.cpp,src/ingame/control_panel.h,#392
 src/orders/unit_orders.cpp,src/ingame/markers.h,#392
 src/orders/unit_orders.cpp,src/sound/sound.h,#392

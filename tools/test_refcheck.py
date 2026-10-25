@@ -202,8 +202,8 @@ class ClangTest(unittest.TestCase):
         data = self.root / "data"
         data.mkdir(exist_ok=True)
         header = "holder,offsets,target,scenarios,ticks,target_offsets,class,note\n"
-        rows = ['AllocZeroedWithTickOffset,0x4 0xc+0x8*k 0x0,T,1,1,-,outside,"Game.view"',
-                'AllocZeroedWithTickOffset,0x14,T,1,1,-,not-a-pointer,skip',
+        rows = ['CreateGameObject,0x4 0xc+0x8*k 0x0,T,1,1,-,outside,"Game.view"',
+                'CreateGameObject,0x14,T,1,1,-,not-a-pointer,skip',
                 '"LoadUnitInfo: UNITINFO",0x47a+0x249*k 0x191c,T,1,1,-,outside,"UnitType.data"',
                 'SimGlobals.list,0x0,T,1,1,-,outside,"LOS table vector"']
         (data / "block_pointers.csv").write_text(header + "\n".join(rows) + "\n")
@@ -211,12 +211,23 @@ class ClangTest(unittest.TestCase):
         classes = {"view": "view", "items": "sim"}
         out = rc.outside_rows(self.root, locators, classes)
         keyed = {(r["struct"], r["field"], r["holder"]): r for r in out}
-        self.assertEqual(keyed[("Game", "view", "AllocZeroedWithTickOffset")]["issue"], "#392")
-        self.assertEqual(keyed[("Item", "p", "AllocZeroedWithTickOffset")]["issue"], "#350")
+        self.assertEqual(keyed[("Game", "view", "CreateGameObject")]["issue"], "#392")
+        self.assertEqual(keyed[("Item", "p", "CreateGameObject")]["issue"], "#350")
         self.assertEqual(keyed[("", "", "UNITINFO")]["words"], 2)
         self.assertEqual(keyed[("", "", "UNITINFO")]["offset"], "0x47a+0x249*k")
         self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "#350")
         self.assertEqual(len(out), 4)
+
+    def test_outside_rows_fail_when_the_game_holder_is_gone(self):
+        data = self.root / "data"
+        data.mkdir(exist_ok=True)
+        header = "holder,offsets,target,scenarios,ticks,target_offsets,class,note\n"
+        (data / "block_pointers.csv").write_text(
+            header + 'CreateGame,0x4,T,1,1,-,outside,"Game.view"\nCreateGameObject,0x14,T,1,1,-,not-a-pointer,skip\n')
+        with self.assertRaises(SystemExit) as cm:
+            rc.outside_rows(self.root, {"Game": rc.Locator(self.scan)}, {})
+        self.assertIn("no outside rows for the Game holder CreateGameObject", str(cm.exception))
+        self.assertEqual([r["holder"] for r in rc.outside_rows(self.root, {}, {})], ["CreateGame"])
 
 
 def make_result(found, outside=()):

@@ -1,0 +1,19 @@
+# Two human slots on The Pass: a spawned Arm sonar jammer of the second slot, activated, jams the first slot's sonar (ApplySonarJamFlag); 150 ticks.
+game_seed 421
+crt_seed 1421
+view_seed 2421
+map The Pass
+start_positions fixed
+ticks 150
+commander_death 0
+local_player 0
+player0.controller human
+player0.side Arm
+player0.metal 30000
+player0.energy 60000
+player1.controller human
+player1.side Arm
+player1.metal 30000
+player1.energy 60000
+spawn 10 1 ARMSCRAM 640 300
+order 20 1:ARMSCRAM:1 activate

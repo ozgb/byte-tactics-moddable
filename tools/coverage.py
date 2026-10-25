@@ -295,8 +295,8 @@ def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[st
 
 
 def path_free(decorated: str) -> str:
-    """The decorated name without the path hash of an anonymous namespace (`?A0x` plus 8 hex digits)."""
-    return re.sub(r"\?A0x[0-9A-Fa-f]{8}", "?A0x", decorated)
+    """The decorated name without the path hash of an anonymous namespace (`?A0x` plus its hex digits, however many)."""
+    return re.sub(r"\?A0x[0-9A-Fa-f]+@", "?A0x@", decorated)
 
 
 def csv_rows(totals: dict[str, Totals]) -> list[list[str]]:

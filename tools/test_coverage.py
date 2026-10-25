@@ -225,6 +225,16 @@ class MergeTest(unittest.TestCase):
         self.assertIn("?Reset@?A0x@@YAXXZ", text)
         self.assertNotIn("FF389A01", text)
 
+    def test_short_anonymous_namespace_hash_is_left_out_of_the_csv(self):
+        t = self.merged([
+            entry("a.cpp:?Reset@?A0xF0F62@@YAXXZ", "src/files/files_api.h", 0, [region(1, 1, 1, 9, 0)])])
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "coverage.csv"
+            cov.write_csv({"files": t}, out)
+            text = out.read_text()
+        self.assertIn("?Reset@?A0x@@YAXXZ", text)
+        self.assertNotIn("F0F62", text)
+
     def test_functions_less_entered_is_the_never_entered_rows(self):
         totals = cov.summarize(EXPORT, KEY, NAME)[0]
         totals["files"] = self.merged([static_copy("a.cpp", 0, [region(1, 1, 1, 9, 0)]),

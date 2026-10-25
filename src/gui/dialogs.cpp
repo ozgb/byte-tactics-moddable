@@ -1204,6 +1204,23 @@ void __stdcall DrawColorGrid(Gui* obj)
     }
 }
 
+void __stdcall DrawRectangle(void* surface, void* rect, int color);
+
+// FUNCTION: 0x4ac970
+void __stdcall DrawColorCellOutline(Gui* obj, int cell, int color)
+{
+    Gadget* gadgets = obj->layer->entries;
+    int index = FindGadgetIndex(gadgets, "COLS", 6);
+    void* surface = gadgets->u.assets.surface;
+    int y = gadgets->y + gadgets[index].y;
+    Rect_004b6720 rect;
+    rect.left = gadgets[index].x + gadgets->x + (cell % 16) * 8;
+    rect.top = y + (cell / 16) * 8;
+    rect.right = rect.left + 7;
+    rect.bottom = rect.top + 7;
+    DrawRectangle(surface, &rect, color);
+}
+
 // FUNCTION: 0x4aca20
 void __stdcall ShowPaletteEntryRgb(Gui* obj, unsigned char* colors, int index)
 {
@@ -1249,8 +1266,6 @@ void __stdcall LerpPaletteRange(unsigned char* data, int a, int b)
 
     memcpy(data, buf, 0x400);
 }
-
-struct Object_004ac970;
 
 // FUNCTION: 0x4acbe0
 int __stdcall GetColorCellAt(Gui* obj, int x, int y)

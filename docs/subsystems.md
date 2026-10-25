@@ -43,6 +43,8 @@ How to read a section. **Entry points** are the phase roots the subsystem holds 
 
 Issue #9. 15 functions. `UpdateWind`, `UpdateMeteors`, the meteor parameters and their save and load (`src/map/meteors.cpp`, plus `UpdateWind` in `src/game/game_state.cpp`).
 
+Coverage: 62.5% of functions (10 of 16), 53.8% of lines, 50.0% of branches; 6 functions no scenario enters (data/coverage.csv).
+
 **Entry points.** Phase roots: `UpdateWind` and `UpdateMeteors`, both called from `RunGameSteps`. `UpdateWind` is also called from `LoadBattleAssets` (game).
 
 11 functions are called from other subsystems. The most called, with their callers:
@@ -86,6 +88,8 @@ Issue #9. 15 functions. `UpdateWind`, `UpdateMeteors`, the meteor parameters and
 ## economy
 
 Issue #11. 38 functions. The resource accounts (`UnitResources`), `UpdatePlayerEconomy`, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`, `UpdateResourceSharing` in `src/network/net_game.cpp`).
+
+Coverage: 41.0% of functions (16 of 39), 53.9% of lines, 32.3% of branches; 23 functions no scenario enters (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateResourceSharing`, called from `RunGameSteps`. The per-tick income step `UpdatePlayerEconomy` is not a root: `UpdatePlayers` (players) calls it, so most of the economy runs inside the players phase.
 
@@ -134,6 +138,8 @@ Issue #11. 38 functions. The resource accounts (`UnitResources`), `UpdatePlayerE
 ## features
 
 Issue #12. 62 functions. `UpdateFeatures` and feature loading, spreading, burning, reclaim and wreckage (`src/map/features*.cpp`).
+
+Coverage: 66.7% of functions (40 of 60), 62.5% of lines, 58.2% of branches; 20 functions no scenario enters (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateFeatures`, called from `RunGameSteps`.
 
@@ -185,6 +191,8 @@ Issue #12. 62 functions. `UpdateFeatures` and feature loading, spreading, burnin
 
 Issue #13. 160 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
+Coverage: 64.8% of functions (92 of 142), 70.7% of lines, 69.7% of branches; 50 functions no scenario enters (data/coverage.csv).
+
 **Entry points.** Phase roots: none. `UpdatePlayerAI` and `SquadManager::TickIfActive` are called by `UpdatePlayers` (players), so the AI runs inside the players phase.
 
 32 functions are called from other subsystems. The most called, with their callers:
@@ -235,6 +243,8 @@ Issue #13. 160 functions. The computer player: `UpdatePlayerAI`, build ratings, 
 
 Issue #14. 59 functions. The search in `src/ai/pathfind*.cpp`: per-player cost tables, the node budget, the open heap and the grid.
 
+Coverage: 72.6% of functions (45 of 62), 80.4% of lines, 76.1% of branches; 17 functions no scenario enters (data/coverage.csv).
+
 **Entry points.** Phase roots: none. `Pathfinder::RunSearches` is called by `UpdatePlayers` (players).
 
 4 functions are called from other subsystems. The most called, with their callers:
@@ -276,6 +286,8 @@ Issue #14. 59 functions. The search in `src/ai/pathfind*.cpp`: per-player cost t
 ## weapons
 
 Issue #15. 118 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
+
+Coverage: 66.7% of functions (72 of 108), 73.0% of lines, 60.1% of branches; 36 functions no scenario enters (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateProjectiles` and `UpdateExplosions`, called from `RunGameSteps`. `UpdateUnitWeapons` is not a root: `UpdateAllUnits` (units) calls it.
 
@@ -327,6 +339,8 @@ Issue #15. 118 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWe
 
 Issue #16. 10 functions. Target choice and the weapon target setters and getters (`FindWeaponTarget`, `FindBestTargetIfFireAtWill`, `SetWeaponTargetUnit`). It is small because the file rules put the order goal objects in orders; see the notes.
 
+Coverage: 90.9% of functions (10 of 11), 89.2% of lines, 64.3% of branches; 1 function no scenario enters (data/coverage.csv).
+
 **Entry points.** Phase roots: none. Order handlers (orders) and the AI call it.
 
 9 functions are called from other subsystems. The most called, with their callers:
@@ -373,6 +387,8 @@ none
 ## los_radar
 
 Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
+
+Coverage: 56.9% of functions (62 of 109), 70.5% of lines, 66.8% of branches; 47 functions no scenario enters (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `UpdatePlayers` (players) calls `RecalculateLineOfSight`, `UpdateUnitLineOfSight` and `UpdateSensorRadarAndCloak`, so LOS runs inside the players phase.
 
@@ -424,6 +440,8 @@ Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the ma
 
 Issue #18. 468 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`, 14,000 lines). The largest subsystem.
 
+Coverage: 59.2% of functions (237 of 400), 52.9% of lines, 39.3% of branches; 163 functions no scenario enters (data/coverage.csv).
+
 **Entry points.** Phase roots: none. `UpdateAllUnits` (units) calls `RunOrders`; units also call `UnitMotion::UpdateMotion`.
 
 62 functions are called from other subsystems. The most called, with their callers:
@@ -474,11 +492,11 @@ Issue #18. 468 functions. The order state machines, VTOL orders, order lists, un
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes.
+**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 54.7% of functions (110 of 201), 61.9% of lines, 54.0% of branches; 91 functions no scenario enters (data/coverage.csv).
 
-**players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions.
+**players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions. Coverage: 29.2% of functions (45 of 154), 27.5% of lines, 21.5% of branches; 109 functions no scenario enters (data/coverage.csv).
 
-**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints.
+**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 61.8% of functions (68 of 110), 67.7% of lines, 63.1% of branches; 42 functions no scenario enters (data/coverage.csv).
 
 **network** (450 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 103 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 86 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (250 in all).
 
@@ -489,6 +507,47 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 **presentation** (1514 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 310 functions are called from outside, mostly by game (215 distinct functions); the busiest are `QueueUnitSpeech` (27), `PlaySoundByName` (18), `GetDisplay` (17). It imports 247 functions: platform 85, network 65, game 24, map 24, players 14. The reverse direction is the one to remove: 53 imports from presentation in the nine module subsystems, the largest in los_radar (18), weapons (16) and features (9).
 
 **platform** (838 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (24 functions, set by `override`). No phase root. 178 functions are called from outside, by game (88 distinct functions), presentation (85), units (56) and map (36); the busiest are `operator new` (138), `GameFreeThunk` (134), `operator delete` (104), then `Translate` (84) and `RandomInt` (60). It imports 138 functions: game 67, presentation 44.
+
+## Coverage
+
+`data/coverage.csv` is the baseline of how much of each subsystem the 27 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions. Raising it is #405.
+
+```sh
+tools/coverage_runtime.sh                     # fetch the profile runtime sources of compiler-rt
+cmake -S . -B build/coverage -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake -DBT_COVERAGE=ON
+cmake --build build/coverage
+uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir ~/.ta           # play the suite, print the table
+uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir ~/.ta --check   # fail if a subsystem's coverage fell
+uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir ~/.ta --write   # replace the baseline
+```
+
+The simulation subsystems are in bold. `state` is the shared state block code (`interfaces/ref.h`, `src/state/`), not a simulation subsystem. A function counts as entered when its execution count is above 0; a line is hit when its count is above 0; each branch condition has a true and a false side, and each side taken at least once is covered. Branches are `-` where the subsystem has none. The function counts are the compiler's, so they differ a little from the counts above.
+
+| subsystem | functions entered | functions | lines | branches | never entered |
+|---|---|---|---|---|---|
+| **wind_meteors** | 10 of 16 | 62.5% | 53.8% | 50.0% | 6 |
+| **economy** | 16 of 39 | 41.0% | 53.9% | 32.3% | 23 |
+| **features** | 40 of 60 | 66.7% | 62.5% | 58.2% | 20 |
+| **ai** | 92 of 142 | 64.8% | 70.7% | 69.7% | 50 |
+| **pathfinding** | 45 of 62 | 72.6% | 80.4% | 76.1% | 17 |
+| **weapons** | 72 of 108 | 66.7% | 73.0% | 60.1% | 36 |
+| **targeting** | 10 of 11 | 90.9% | 89.2% | 64.3% | 1 |
+| **los_radar** | 62 of 109 | 56.9% | 70.5% | 66.8% | 47 |
+| **orders** | 237 of 400 | 59.2% | 52.9% | 39.3% | 163 |
+| **units** | 110 of 201 | 54.7% | 61.9% | 54.0% | 91 |
+| **players** | 45 of 154 | 29.2% | 27.5% | 21.5% | 109 |
+| **map** | 68 of 110 | 61.8% | 67.7% | 63.1% | 42 |
+| files | 102 of 2622 | 3.9% | 9.8% | 27.1% | 2520 |
+| game | 73 of 208 | 35.1% | 33.1% | 19.0% | 135 |
+| network | 40 of 414 | 9.7% | 6.1% | 1.9% | 374 |
+| platform | 307 of 734 | 41.8% | 30.6% | 21.3% | 427 |
+| presentation | 440 of 1472 | 29.9% | 25.7% | 18.7% | 1032 |
+| seams | 64 of 103 | 62.1% | 81.7% | - | 39 |
+| state | 309 of 408 | 75.7% | 67.0% | 48.7% | 99 |
+
+Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
+
+The runtime is clang's profile runtime (`lib/profile` of compiler-rt), built from source for i686 against the MSVC 5 C runtime in `CMakeLists.txt`. It works under Wine, so the fallback of clang's trace-pc-guard instrumentation was not needed. The game ends with `TerminateProcess`, and the runtime's own initialiser is not linked, so `host_exit` writes the profile itself (`__llvm_profile_initialize_file`, then `__llvm_profile_write_file`). `LLVM_PROFILE_FILE` takes a `Z:\` path.
 
 ## Notes from the data
 

@@ -1,0 +1,29 @@
+# Human Arm commander on The Pass builds an aircraft plant, then orders aircraft to guard, attack, carry and reclaim; two minutes and a half.
+game_seed 303
+crt_seed 1303
+view_seed 2303
+map The Pass
+start_positions fixed
+ticks 4600
+player0.controller human
+player0.side Arm
+player0.metal 9000
+player0.energy 9000
+player1.controller ai
+player1.side Core
+order 5 0:ARMCOM:1 build ARMAP 700 300
+order 899 0:ARMAP:1 qbuild ARMATLAS
+order 900 0:ARMAP:1 qbuild ARMCA
+order 901 0:ARMAP:1 qbuild ARMFIG
+order 902 0:ARMAP:1 qbuild ARMTHUND
+order 910 0:ARMCOM:1 guard 0:ARMAP:1
+order 3600 0:ARMCOM:1 build ARMSOLAR 560 260
+order 3700 0:ARMFIG:1 guard 0:ARMCOM:1
+order 4000 0:ARMCA:1 reclaim 0:ARMSOLAR:1
+order 4010 0:ARMTHUND:1 attack 1:CORCOM:1
+order 4050 0:ARMATLAS:1 load 0:ARMCOM:1
+order 4100 0:ARMFIG:1 patrol 700 400
+order 4250 0:ARMATLAS:1 unload 720 340
+order 4300 0:ARMFIG:1 attack 1:CORCOM:1
+order 4350 0:ARMTHUND:1 patrol 640 360
+order 4360 0:ARMCA:1 patrol 600 330

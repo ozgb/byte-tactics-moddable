@@ -1,0 +1,36 @@
+# Human Arm commander on The Pass builds a solar collector and a light laser tower, then gives immediate, special and queued orders; forty seconds.
+game_seed 301
+crt_seed 1301
+view_seed 2301
+map The Pass
+start_positions fixed
+ticks 1000
+player0.controller human
+player0.side Arm
+player0.metal 5000
+player0.energy 5000
+player1.controller ai
+player1.side Core
+order 5 0:ARMCOM:1 build ARMSOLAR 640 260
+order 300 0:ARMCOM:1 build ARMLLT 700 300
+order 700 0:ARMSOLAR:1 deactivate
+order 702 0:ARMSOLAR:1 activate
+order 704 0:ARMSOLAR:1 selfdestruct
+order 706 0:ARMSOLAR:1 selfdestruct
+order 710 0:ARMLLT:1 attack 1:CORCOM:1
+order 720 0:ARMCOM:1 cloak on
+order 725 0:ARMCOM:1 cloak off
+order 730 0:ARMCOM:1 stop
+order 735 0:ARMCOM:1 movestate 1
+order 740 0:ARMCOM:1 movestate 2
+order 745 0:ARMCOM:1 movestate 0
+order 750 0:ARMCOM:1 firestate 1
+order 755 0:ARMCOM:1 firestate 2
+order 760 0:ARMCOM:1 firestate 0
+order 770 0:ARMCOM:1 capture 1:CORCOM:1
+order 780 0:ARMCOM:1 dgun 1:CORCOM:1
+order 790 0:ARMCOM:1 attack 700 300
+order 810 0:ARMCOM:1 teleport 650 280
+order 820 0:ARMCOM:1 +move 700 300
+order 830 0:ARMCOM:1 +move 700 300
+order 860 0:ARMCOM:1 move 1:CORCOM:1

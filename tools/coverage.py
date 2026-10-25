@@ -30,13 +30,14 @@ Counting, per function and then summed per subsystem. Copies of one source funct
 (file, decorated name): entered if any copy is, a line hit if any copy hit it, a branch side covered if any
 copy covered it, branches counted once per position. Functions: entered when the execution count is
 above 0. Lines: the lines of the function's code regions in its primary file; a line's count is the
-largest count of the regions that start on it, or else of the innermost region that covers it; the line
-is hit when that count is above 0. Branches: each branch condition has a true and a false side, both
+largest of the innermost covering region's count and the counts of the regions that start on it, as
+llvm-cov show counts it; the line is hit when that count is above 0. Branches: each branch condition has a true and a false side, both
 counted in the total, and each side taken at least once is covered.
 
 data/coverage.csv: columns subsystem, function, file, functions, functions_entered, lines, lines_hit,
-branches, branches_covered. One totals row per subsystem (function `*`, file empty) and one row per
-function no scenario enters (functions 1, every other count 0), sorted by
+branches, branches_covered, decorated. One totals row per subsystem (function `*`, file and decorated
+empty) and one row per function no scenario enters (functions 1, every other count 0, decorated the export
+name that tells overloads apart), sorted by
 subsystem, totals first, then by name, file and decorated name. Percentages are derived. `--check` fails when a subsystem's function, line or
 branch fraction is below the file's, or the file is missing; rises and new functions only print a note.
 """
@@ -68,13 +69,13 @@ STATE_PREFIXES = ("interfaces/", "src/state/")
 STATE = "state"
 EXCLUDED_PREFIXES = ("src/harness/", "build/", "toolchain/")
 COLUMNS = ["subsystem", "function", "file", "functions", "functions_entered", "lines", "lines_hit",
-           "branches", "branches_covered"]
+           "branches", "branches_covered", "decorated"]
 METRICS = (("functions", "functions", "functions_entered"), ("lines", "lines", "lines_hit"),
            ("branches", "branches", "branches_covered"))
 CODE_REGION = 0
 REGION_FILE_ID = 5
 REGION_KIND = 7
-BRANCH_FILE_ID = 7
+BRANCH_FILE_ID = 6
 
 
 @dataclass
@@ -109,7 +110,7 @@ class Totals:
     lines_hit: int = 0
     branches: int = 0
     branches_covered: int = 0
-    never_entered: list[tuple[str, str]] = field(default_factory=list)
+    never_entered: list[tuple[str, str, str]] = field(default_factory=list)
 
     def add(self, fn: Function) -> None:
         """Add one function to the sums."""
@@ -157,7 +158,7 @@ def plain_name(name: str) -> str:
 
 
 def region_lines(regions: list[list[int]], primary: set[int]) -> dict[int, int]:
-    """Line -> count over the code regions in the primary file: the largest count of the regions starting on the line, else the innermost covering region's."""
+    """Line -> count over the code regions in the primary file: the larger of the innermost covering region's count and the largest count of the regions starting on the line."""
     starts: dict[int, int] = {}
     wrapped: dict[int, tuple[tuple[int, int], int]] = {}
     for r in regions:
@@ -171,7 +172,8 @@ def region_lines(regions: list[list[int]], primary: set[int]) -> dict[int, int]:
             if (first, col) >= wrapped.get(line, ((0, 0), 0))[0]:
                 wrapped[line] = ((first, col), count)
     counts = {line: count for line, (_, count) in wrapped.items()}
-    counts.update(starts)
+    for line, count in starts.items():
+        counts[line] = max(counts.get(line, 0), count)
     return counts
 
 
@@ -252,7 +254,7 @@ def summarize(export: dict, by_key: dict[tuple[str, str], str],
         if not fn.entered:
             missed.setdefault(subsystem, []).append((fn.name, fn.file, decorated))
     for subsystem, rows in missed.items():
-        totals[subsystem].never_entered = [(name, file) for name, file, _ in sorted(rows)]
+        totals[subsystem].never_entered = sorted(rows)
     return totals, excluded, unassigned
 
 
@@ -262,8 +264,8 @@ def csv_rows(totals: dict[str, Totals]) -> list[list[str]]:
     for subsystem in sorted(totals):
         t = totals[subsystem]
         rows.append([subsystem, "*", "", t.functions, t.functions_entered, t.lines, t.lines_hit,
-                     t.branches, t.branches_covered])
-        rows += [[subsystem, name, file, 1, 0, 0, 0, 0, 0] for name, file in t.never_entered]
+                     t.branches, t.branches_covered, ""])
+        rows += [[subsystem, name, file, 1, 0, 0, 0, 0, 0, decorated] for name, file, decorated in t.never_entered]
     return [[str(c) for c in r] for r in rows]
 
 
@@ -287,7 +289,7 @@ def read_csv(path: Path) -> dict[str, Totals]:
                     setattr(t, attr, int(row[attr]))
                     setattr(t, hit, int(row[hit]))
             else:
-                t.never_entered.append((row["function"], row["file"]))
+                t.never_entered.append((row["function"], row["file"], row["decorated"]))
     return totals
 
 
@@ -345,6 +347,8 @@ def play_suite(exe: Path, game_dir: str | None, parallel: int, names: list[str] 
     def tracediff_play(*args, **kwargs):
         name = getattr(local, "scenario", None)
         if name:
+            for stale in (RUN_DIR / name).glob("*.profraw"):
+                stale.unlink()
             profile = windows_path(RUN_DIR / name) + "\\cov-%p.profraw"
             kwargs["env"] = {**os.environ, "LLVM_PROFILE_FILE": profile}
         return original_tracediff_play(*args, **kwargs)
@@ -410,6 +414,8 @@ def main() -> None:
     by_key, by_name = read_subsystems()
     totals, excluded, unassigned = summarize(export(args.exe, profdata), by_key, by_name)
     print(table(totals))
+    if args.write and not totals:
+        sys.exit("coverage: no game function in the export; not writing an empty baseline")
     print(f"excluded (harness, build, outside the repository): {excluded} functions")
     print(f"unassigned: {unassigned} functions")
     if args.write:

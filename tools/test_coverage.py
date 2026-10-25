@@ -3,6 +3,9 @@
     uv run tools/test_coverage.py
 """
 
+import contextlib
+import io
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -26,7 +29,7 @@ def entry(name, rel, count, regions, branches=()):
 
 EXPORT = {"data": [{"functions": [
     entry("?Reset@UnitResources@@QAEXXZ", "src/game/economy.cpp", 4, [
-        region(10, 1, 14, 2, 4), region(12, 5, 12, 20, 0)], [[11, 5, 11, 9, 3, 0, 0, 0, 4]]),
+        region(10, 1, 14, 2, 4), region(12, 5, 12, 20, 0)], [[11, 5, 11, 9, 3, 0, 0, 9, 4]]),
     entry("?Never@@YAXXZ", "src/game/economy.cpp", 0, [region(20, 1, 21, 2, 0)], [[20, 3, 20, 7, 0, 0, 0, 0, 4]]),
     entry("?Moved@@YAXXZ", "src/other/elsewhere.cpp", 2, [region(1, 1, 2, 2, 2)]),
     entry("?Lost@@YAXXZ", "src/other/lost.cpp", 1, [region(1, 1, 1, 9, 1)]),
@@ -90,16 +93,28 @@ class Coverage(unittest.TestCase):
     def test_sums(self):
         t = self.totals["economy"]
         self.assertEqual((t.functions, t.functions_entered), (2, 1))
-        self.assertEqual((t.lines, t.lines_hit), (7, 4))
+        self.assertEqual((t.lines, t.lines_hit), (7, 5))
         self.assertEqual((t.branches, t.branches_covered), (4, 1))
 
-    def test_line_counts_use_the_innermost_region(self):
+    def test_branch_of_another_file_is_left_out(self):
+        function = entry("?Reset@UnitResources@@QAEXXZ", "src/game/economy.cpp", 1, [region(1, 1, 2, 2, 1)],
+                         [[1, 1, 1, 2, 1, 1, 3, 0, 4], [1, 3, 1, 4, 1, 0, 0, 3, 4]])
+        self.assertEqual(cov.parse_function(function).branch_sides, {(1, 3, 1, 4): (True, False)})
+
+    def test_line_counts_take_the_larger_count(self):
         counts = cov.region_lines([region(10, 1, 14, 2, 4), region(12, 5, 12, 20, 0)], {0})
-        self.assertEqual(counts, {10: 4, 11: 4, 12: 0, 13: 4, 14: 4})
+        self.assertEqual(counts, {10: 4, 11: 4, 12: 4, 13: 4, 14: 4})
+
+    def test_rare_branch_on_one_line_of_an_executed_body(self):
+        counts = cov.region_lines([region(1, 1, 5, 2, 4), region(3, 5, 3, 20, 0)], {0})
+        self.assertEqual(counts[3], 4)
+        counts = cov.region_lines([region(1, 1, 5, 2, 0), region(3, 5, 3, 20, 2)], {0})
+        self.assertEqual(counts[3], 2)
 
     def test_never_entered(self):
-        self.assertEqual(self.totals["economy"].never_entered, [("Never", "src/game/economy.cpp")])
-        self.assertEqual(self.totals["units"].never_entered, [("Unit::Move", "src/units/unit.cpp")])
+        self.assertEqual(self.totals["economy"].never_entered, [("Never", "src/game/economy.cpp", "?Never@@YAXXZ")])
+        self.assertEqual(self.totals["units"].never_entered,
+                         [("Unit::Move", "src/units/unit.cpp", "?Move@Unit@@QAEXXZ")])
 
     def test_overloads_count_separately(self):
         self.assertEqual(self.totals["units"].functions_entered, 2)
@@ -111,8 +126,8 @@ class Coverage(unittest.TestCase):
             cov.write_csv(self.totals, out)
             lines = out.read_text().splitlines()
             self.assertEqual(lines[0], ",".join(cov.COLUMNS))
-            self.assertEqual(lines[1], "economy,*,,2,1,7,4,4,1")
-            self.assertEqual(lines[2], "economy,Never,src/game/economy.cpp,1,0,0,0,0,0")
+            self.assertEqual(lines[1], "economy,*,,2,1,7,5,4,1,")
+            self.assertEqual(lines[2], "economy,Never,src/game/economy.cpp,1,0,0,0,0,0,?Never@@YAXXZ")
             back = cov.read_csv(out)
         self.assertEqual(back.keys(), self.totals.keys())
         for name, t in self.totals.items():
@@ -178,7 +193,7 @@ class MergeTest(unittest.TestCase):
         t = self.merged([static_copy("a.cpp", 0, [region(1, 1, 1, 9, 0)]),
                          static_copy("b.cpp", 0, [region(1, 1, 1, 9, 0)])])
         self.assertEqual((t.functions, t.functions_entered), (1, 0))
-        self.assertEqual(t.never_entered, [("HAPI_Length", "src/files/files_api.h")])
+        self.assertEqual(t.never_entered, [("HAPI_Length", "src/files/files_api.h", "?HAPI_Length@@YGJPAX@Z")])
 
     def test_overloads_stay_separate(self):
         t = self.merged([
@@ -186,6 +201,18 @@ class MergeTest(unittest.TestCase):
             entry("a.cpp:?HAPI_Length@@YGJPAUFileHandle@@@Z", "src/files/files_api.h", 0, [region(5, 1, 5, 9, 0)])])
         self.assertEqual((t.functions, t.functions_entered), (2, 1))
         self.assertEqual(len(t.never_entered), 1)
+
+    def test_never_entered_overloads_give_two_distinguishable_rows(self):
+        t = self.merged([
+            entry("a.cpp:?HAPI_Length@@YGJPAX@Z", "src/files/files_api.h", 0, [region(1, 1, 1, 9, 0)]),
+            entry("a.cpp:?HAPI_Length@@YGJPAUFileHandle@@@Z", "src/files/files_api.h", 0, [region(5, 1, 5, 9, 0)])])
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "coverage.csv"
+            cov.write_csv({"files": t}, out)
+            rows = out.read_text().splitlines()[2:]
+            self.assertEqual(len(rows), 2)
+            self.assertEqual(len(set(rows)), 2)
+            self.assertEqual(cov.read_csv(out)["files"], t)
 
     def test_functions_less_entered_is_the_never_entered_rows(self):
         totals = cov.summarize(EXPORT, KEY, NAME)[0]
@@ -196,6 +223,38 @@ class MergeTest(unittest.TestCase):
 
 
 class PlaySuiteTest(unittest.TestCase):
+    def test_attempt_clears_the_scenarios_old_profiles(self):
+        seen = []
+
+        def fake_play(exe, scenario, game_dir, dump, timeout=None, poison=False, blockscan=0, env=None):
+            seen.append(sorted(p.name for p in (run_dir / scenario.stem).glob("*.profraw")))
+            (run_dir / scenario.stem / ("cov-%d.profraw" % len(seen))).write_bytes(b"x")
+            return Path()
+
+        def fake_play_all(exe, scenarios, game_dir, parallel, failed=None, retry_any=False):
+            for name, path in scenarios.items():
+                cov.reference.play_scenario(exe, path, game_dir)
+                cov.tracediff.play(exe, path, game_dir, None)
+
+        merged = []
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp) / "run"
+            saved = (cov.RUN_DIR, cov.tracediff.play, cov.reference.play_scenario, cov.reference.play_all,
+                     cov.reference.scenario_files, cov.subprocess.run)
+            cov.RUN_DIR = run_dir
+            cov.tracediff.play = fake_play
+            cov.reference.play_all = fake_play_all
+            cov.reference.scenario_files = lambda: {"alpha": Path("alpha.txt")}
+            cov.subprocess.run = lambda cmd, **k: merged.append(cmd)
+            try:
+                cov.reference.play_scenario = lambda exe, scenario, *a, **k: cov.tracediff.play(exe, scenario, None, None)
+                cov.play_suite(Path("TotalA.exe"), None, 1, None)
+            finally:
+                (cov.RUN_DIR, cov.tracediff.play, cov.reference.play_scenario, cov.reference.play_all,
+                 cov.reference.scenario_files, cov.subprocess.run) = saved
+        self.assertEqual(seen, [[], []])
+        self.assertEqual([Path(p).name for p in merged[0][5:]], ["cov-2.profraw"])
+
     def test_profile_path_reaches_tracediff_play(self):
         seen = {}
 
@@ -229,6 +288,25 @@ class PlaySuiteTest(unittest.TestCase):
                  cov.reference.scenario_files, cov.subprocess.run) = saved
                 cov.reference.play_scenario = original_play_scenario
         self.assertEqual(seen["alpha"]["LLVM_PROFILE_FILE"], cov.windows_path(run_dir / "alpha") + "\\cov-%p.profraw")
+
+
+class WriteNothingTest(unittest.TestCase):
+    def test_write_refuses_an_export_without_game_functions(self):
+        with tempfile.TemporaryDirectory() as d:
+            exe = Path(d) / "TotalA.exe"
+            exe.write_bytes(b"")
+            saved = (cov.export, cov.read_subsystems, cov.OUT, sys.argv)
+            cov.export = lambda exe, profdata: {"data": [{"functions": []}]}
+            cov.read_subsystems = lambda: ({}, {})
+            cov.OUT = Path(d) / "coverage.csv"
+            sys.argv = ["coverage.py", "--exe", str(exe), "--from", "x.profdata", "--write"]
+            try:
+                with contextlib.redirect_stdout(io.StringIO()), self.assertRaises(SystemExit) as raised:
+                    cov.main()
+            finally:
+                cov.export, cov.read_subsystems, cov.OUT, sys.argv = saved
+            self.assertIn("empty baseline", str(raised.exception))
+            self.assertFalse((Path(d) / "coverage.csv").exists())
 
 
 if __name__ == "__main__":

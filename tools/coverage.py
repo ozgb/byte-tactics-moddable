@@ -45,11 +45,15 @@ counter of a function in a section nothing reaches is not. A function that is ne
 dead. Of the copies of a source function, it is dead when all are.
 
 data/coverage.csv: columns subsystem, function, file, functions, functions_entered, lines, lines_hit,
-branches, branches_covered, decorated, dead. One totals row per subsystem (function `*`, file and decorated
+branches, branches_covered, decorated, dead, reason. One totals row per subsystem (function `*`, file and decorated
 empty, dead the number of dead functions, every other count over live functions only), one row per live
 function no scenario enters (functions 1, every other count 0, decorated the export name that tells overloads
-apart, dead 0) and one row per dead function (every count 0, dead 1), sorted by
-subsystem, totals first, then by name, file and decorated name. Percentages are derived. `--check` fails when a subsystem's function, line or
+apart, dead 0, reason why test mode never enters it, a short word such as `network` or `menu`) and one row per dead
+function (every count 0, dead 1), sorted by subsystem, totals first, then by name, file and decorated name; the reason
+of a totals or dead row is empty. `--write` reads the old file first and carries each never-entered row's reason to
+the row with the same subsystem, function, file and decorated name; a new row has none. In the subsystems of SORTED
+(files, game and network) every never-entered row needs a reason: `--write` (after writing) and `--check` fail
+and list the rows without. Percentages are derived. `--check` fails when a subsystem's function, line or
 branch fraction is below the file's, or the file is missing; rises and new functions only print a note.
 """
 
@@ -81,7 +85,8 @@ STATE_PREFIXES = ("interfaces/", "src/state/")
 STATE = "state"
 EXCLUDED_PREFIXES = ("src/harness/", "build/", "toolchain/")
 COLUMNS = ["subsystem", "function", "file", "functions", "functions_entered", "lines", "lines_hit",
-           "branches", "branches_covered", "decorated", "dead"]
+           "branches", "branches_covered", "decorated", "dead", "reason"]
+SORTED = ("files", "game", "network")
 METRICS = (("functions", "functions", "functions_entered"), ("lines", "lines", "lines_hit"),
            ("branches", "branches", "branches_covered"))
 CODE_REGION = 0
@@ -127,6 +132,7 @@ class Totals:
     dead: int = 0
     never_entered: list[tuple[str, str, str]] = field(default_factory=list)
     dead_functions: list[tuple[str, str, str]] = field(default_factory=list)
+    reasons: dict[tuple[str, str, str], str] = field(default_factory=dict)
 
     def add(self, fn: Function) -> None:
         """Add one function to the sums."""
@@ -306,9 +312,10 @@ def csv_rows(totals: dict[str, Totals]) -> list[list[str]]:
         t = totals[subsystem]
         first = len(rows)
         rows.append([subsystem, "*", "", t.functions, t.functions_entered, t.lines, t.lines_hit,
-                     t.branches, t.branches_covered, "", t.dead])
-        rows += [[subsystem, name, file, 1, 0, 0, 0, 0, 0, path_free(decorated), 0] for name, file, decorated in t.never_entered]
-        rows += [[subsystem, name, file, 0, 0, 0, 0, 0, 0, path_free(decorated), 1] for name, file, decorated in t.dead_functions]
+                     t.branches, t.branches_covered, "", t.dead, ""])
+        rows += [[subsystem, name, file, 1, 0, 0, 0, 0, 0, path_free(decorated), 0, t.reasons.get((name, file, decorated), "")]
+                 for name, file, decorated in t.never_entered]
+        rows += [[subsystem, name, file, 0, 0, 0, 0, 0, 0, path_free(decorated), 1, ""] for name, file, decorated in t.dead_functions]
         rows[first:] = sorted(rows[first:], key=lambda r: (r[1] != "*", r[1], r[2], r[9]))
     return [[str(c) for c in r] for r in rows]
 
@@ -336,8 +343,32 @@ def read_csv(path: Path) -> dict[str, Totals]:
             elif int(row.get("dead") or 0):
                 t.dead_functions.append((row["function"], row["file"], row["decorated"]))
             else:
-                t.never_entered.append((row["function"], row["file"], row["decorated"]))
+                key = (row["function"], row["file"], row["decorated"])
+                t.never_entered.append(key)
+                if row.get("reason"):
+                    t.reasons[key] = row["reason"]
     return totals
+
+
+def carry_reasons(totals: dict[str, Totals], old: dict[str, Totals]) -> None:
+    """Give each never-entered row the reason the old file has for the same subsystem, function, file and decorated name."""
+    for subsystem, t in totals.items():
+        before = old[subsystem].reasons if subsystem in old else {}
+        for name, file, decorated in t.never_entered:
+            reason = before.get((name, file, path_free(decorated)))
+            if reason:
+                t.reasons[(name, file, decorated)] = reason
+
+
+def unreasoned(totals: dict[str, Totals]) -> str:
+    """The failure text listing the never-entered rows of the SORTED subsystems that have no reason, or an empty string."""
+    rows = [f"{subsystem} {name} ({file})" for subsystem in sorted(SORTED) if subsystem in totals
+            for name, file, decorated in totals[subsystem].never_entered
+            if not totals[subsystem].reasons.get((name, file, decorated))]
+    if not rows:
+        return ""
+    return (f"coverage: {len(rows)} never-entered functions of {', '.join(SORTED[:-1])} and {SORTED[-1]} "
+            f"have no reason in data/coverage.csv:\n" + "\n".join(rows))
 
 
 def compare(want: dict[str, Totals], got: dict[str, Totals]) -> tuple[list[str], list[str]]:
@@ -472,16 +503,24 @@ def main() -> None:
     print(f"excluded (harness, build, outside the repository): {excluded} functions")
     print(f"unassigned: {unassigned} functions")
     if args.write:
+        if OUT.is_file():
+            carry_reasons(totals, read_csv(OUT))
         write_csv(totals, OUT)
         print(f"wrote {OUT.relative_to(ROOT)}")
+        if unreasoned(totals):
+            sys.exit(unreasoned(totals))
     if args.check:
-        falls, notes = compare(read_csv(OUT), totals)
+        old = read_csv(OUT)
+        carry_reasons(totals, old)
+        falls, notes = compare(old, totals)
         for note in notes:
             print(f"note: {note}")
         if notes:
             print("coverage rose or is new: run with --write to update the baseline")
         if falls:
-            sys.exit("coverage fell:\n" + "\n".join(falls))
+            sys.exit("\n".join(filter(None, ["coverage fell:\n" + "\n".join(falls), unreasoned(totals)])))
+        if unreasoned(totals):
+            sys.exit(unreasoned(totals))
         print("coverage: no subsystem fell")
 
 

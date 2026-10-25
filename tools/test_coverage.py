@@ -126,8 +126,8 @@ class Coverage(unittest.TestCase):
             cov.write_csv(self.totals, out)
             lines = out.read_text().splitlines()
             self.assertEqual(lines[0], ",".join(cov.COLUMNS))
-            self.assertEqual(lines[1], "economy,*,,2,1,7,5,4,1,,0")
-            self.assertEqual(lines[2], "economy,Never,src/game/economy.cpp,1,0,0,0,0,0,?Never@@YAXXZ,0")
+            self.assertEqual(lines[1], "economy,*,,2,1,7,5,4,1,,0,")
+            self.assertEqual(lines[2], "economy,Never,src/game/economy.cpp,1,0,0,0,0,0,?Never@@YAXXZ,0,")
             back = cov.read_csv(out)
         self.assertEqual(back.keys(), self.totals.keys())
         for name, t in self.totals.items():
@@ -166,6 +166,63 @@ class Coverage(unittest.TestCase):
 def static_copy(tu, count, regions, branches=()):
     name = "%s:?HAPI_Length@@YGJPAX@Z" % tu
     return entry(name, "src/files/files_api.h", count, regions, branches)
+
+
+class ReasonTest(unittest.TestCase):
+    NEVER = ("Never", "src/game/economy.cpp", "?Never@@YAXXZ")
+
+    def totals(self):
+        return cov.summarize(EXPORT, KEY, NAME)[0]
+
+    def written(self, totals):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "coverage.csv"
+            cov.write_csv(totals, out)
+            return out.read_text().splitlines(), cov.read_csv(out)
+
+    def test_reason_is_carried_over_a_write(self):
+        _, old = self.written({"economy": self.totals()["economy"]})
+        old["economy"].reasons[self.NEVER] = "menu"
+        with tempfile.TemporaryDirectory() as d:
+            before = Path(d) / "old.csv"
+            cov.write_csv(old, before)
+            new = self.totals()
+            cov.carry_reasons(new, cov.read_csv(before))
+        lines, back = self.written(new)
+        self.assertEqual(lines[2], "economy,Never,src/game/economy.cpp,1,0,0,0,0,0,?Never@@YAXXZ,0,menu")
+        self.assertEqual(back["economy"].reasons, {self.NEVER: "menu"})
+
+    def test_new_row_has_an_empty_reason(self):
+        new = self.totals()
+        cov.carry_reasons(new, {"economy": cov.Totals()})
+        lines, back = self.written(new)
+        self.assertEqual(lines[2], "economy,Never,src/game/economy.cpp,1,0,0,0,0,0,?Never@@YAXXZ,0,")
+        self.assertEqual(back["economy"].reasons, {})
+
+    def test_totals_and_dead_rows_have_no_reason(self):
+        lines, _ = self.written(self.totals())
+        self.assertTrue(lines[1].endswith(",0,"))
+
+    def test_sorted_subsystem_row_without_a_reason_fails(self):
+        t = cov.Totals(functions=1, never_entered=[("Send", "src/network/net.cpp", "?Send@@YAXXZ")])
+        text = cov.unreasoned({"network": t})
+        self.assertEqual(text, "coverage: 1 never-entered functions of files, game and network have no reason "
+                               "in data/coverage.csv:\nnetwork Send (src/network/net.cpp)")
+        t.reasons[t.never_entered[0]] = "network"
+        self.assertEqual(cov.unreasoned({"network": t}), "")
+
+    def test_unsorted_subsystem_without_a_reason_passes(self):
+        self.assertEqual(cov.unreasoned(self.totals()), "")
+
+    def test_reading_a_file_without_the_reason_column(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "coverage.csv"
+            out.write_text("subsystem,function,file,functions,functions_entered,lines,lines_hit,branches,"
+                           "branches_covered,decorated,dead\ngame,*,,1,0,0,0,0,0,,0\n"
+                           "game,F,src/game/a.cpp,1,0,0,0,0,0,?F@@YAXXZ,0\n")
+            t = cov.read_csv(out)["game"]
+        self.assertEqual(t.never_entered, [("F", "src/game/a.cpp", "?F@@YAXXZ")])
+        self.assertEqual(t.reasons, {})
 
 
 class MergeTest(unittest.TestCase):
@@ -311,9 +368,9 @@ class DeadTest(unittest.TestCase):
             out = Path(d) / "coverage.csv"
             cov.write_csv(totals, out)
             lines = out.read_text().splitlines()
-            self.assertEqual(lines[1], "game,*,,3,1,7,2,4,0,,2")
-            self.assertEqual(lines[-2], "game,Orphan,src/game/dead.cpp,0,0,0,0,0,0,?Orphan@@YAXXZ,1")
-            self.assertEqual(lines[-1], "game,Static,src/game/dead.cpp,0,0,0,0,0,0,?Static@@YAXXZ,1")
+            self.assertEqual(lines[1], "game,*,,3,1,7,2,4,0,,2,")
+            self.assertEqual(lines[-2], "game,Orphan,src/game/dead.cpp,0,0,0,0,0,0,?Orphan@@YAXXZ,1,")
+            self.assertEqual(lines[-1], "game,Static,src/game/dead.cpp,0,0,0,0,0,0,?Static@@YAXXZ,1,")
             self.assertEqual(cov.read_csv(out), totals)
 
     def test_reading_a_file_without_the_dead_column(self):

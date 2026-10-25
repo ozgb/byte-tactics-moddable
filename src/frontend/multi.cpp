@@ -4722,7 +4722,7 @@ void UpdateBattleRoom()
 
     if (HandleNetPackets())
         g_game->bits_2bee_1.dirty = 1;
-    else if (!CheckMapCrc())
+    else if (!CheckMapCrc_00447b10())
         g_game->bits_2bee_1.dirty = 1;
 
     pl = &g_game->players[g_game->localPlayer];

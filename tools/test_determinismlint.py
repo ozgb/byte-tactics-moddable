@@ -10,7 +10,7 @@ from pathlib import Path
 
 import determinismlint
 
-GIT = ["git", "-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false"]
+GIT = ["git", "-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false", "-c", "gc.auto=0", "-c", "maintenance.auto=false"]
 
 CSV = "address,function,file\n0x490c40,UpdateWind,src/game/a.cpp\n0x48a490,AlignUnitToGround,src/game/a.cpp\n"
 

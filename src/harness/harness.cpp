@@ -2804,11 +2804,12 @@ void HarnessBeforeStep()
     if (!s_testMode)
         return;
     unsigned tick = GameU32(GAME_TICK);
-    for (int i = 0; i < s_spawnCount; i++) {
+    int i;
+    for (i = 0; i < s_spawnCount; i++) {
         if (s_spawns[i].tick == tick)
             IssueScriptedSpawn(&s_spawns[i]);
     }
-    for (int i = 0; i < s_orderCount; i++) {
+    for (i = 0; i < s_orderCount; i++) {
         if (s_orders[i].tick == tick)
             IssueScriptedOrder(&s_orders[i]);
     }

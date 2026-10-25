@@ -62,7 +62,7 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `map` | required | Map name, the rest of the line (names have spaces) |
 | `difficulty` | 1 | AI difficulty 0 to 2, one value for all computer players |
 | `commander_death` | 1 | 1: the game ends when a commander dies |
-| `mapping` | 1 | 1: the whole map starts mapped |
+| `mapping` | 1 | 1: terrain is blacked out until explored (the skirmish menu's "Terrain is blacked out until explored"); 0: the whole map is shown |
 | `line_of_sight` | 1 | 1: line of sight is on |
 | `los_type` | 1 | Line of sight type, 0 or 1 |
 | `start_positions` | `fixed` | `fixed`: player N starts at position N; `random`: shuffled |

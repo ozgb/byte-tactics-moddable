@@ -191,7 +191,7 @@ Coverage: 66.7% of functions (40 of 60), 62.5% of lines, 58.2% of branches; 20 f
 
 Issue #13. 160 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
-Coverage: 64.8% of functions (92 of 142), 70.7% of lines, 69.7% of branches; 50 functions no scenario enters (data/coverage.csv).
+Coverage: 64.8% of functions (92 of 142), 70.7% of lines, 69.0% of branches; 50 functions no scenario enters (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `UpdatePlayerAI` and `SquadManager::TickIfActive` are called by `UpdatePlayers` (players), so the AI runs inside the players phase.
 
@@ -243,7 +243,7 @@ Coverage: 64.8% of functions (92 of 142), 70.7% of lines, 69.7% of branches; 50 
 
 Issue #14. 59 functions. The search in `src/ai/pathfind*.cpp`: per-player cost tables, the node budget, the open heap and the grid.
 
-Coverage: 72.6% of functions (45 of 62), 80.4% of lines, 76.1% of branches; 17 functions no scenario enters (data/coverage.csv).
+Coverage: 77.6% of functions (45 of 58), 81.5% of lines, 76.1% of branches; 13 functions no scenario enters (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `Pathfinder::RunSearches` is called by `UpdatePlayers` (players).
 
@@ -388,7 +388,7 @@ none
 
 Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 56.9% of functions (62 of 109), 70.5% of lines, 66.8% of branches; 47 functions no scenario enters (data/coverage.csv).
+Coverage: 56.9% of functions (62 of 109), 70.5% of lines, 65.9% of branches; 47 functions no scenario enters (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `UpdatePlayers` (players) calls `RecalculateLineOfSight`, `UpdateUnitLineOfSight` and `UpdateSensorRadarAndCloak`, so LOS runs inside the players phase.
 
@@ -440,7 +440,7 @@ Coverage: 56.9% of functions (62 of 109), 70.5% of lines, 66.8% of branches; 47 
 
 Issue #18. 468 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`, 14,000 lines). The largest subsystem.
 
-Coverage: 59.2% of functions (237 of 400), 52.9% of lines, 39.3% of branches; 163 functions no scenario enters (data/coverage.csv).
+Coverage: 59.2% of functions (237 of 400), 52.9% of lines, 40.2% of branches; 163 functions no scenario enters (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `UpdateAllUnits` (units) calls `RunOrders`; units also call `UnitMotion::UpdateMotion`.
 
@@ -494,7 +494,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 54.7% of functions (110 of 201), 61.9% of lines, 54.0% of branches; 91 functions no scenario enters (data/coverage.csv).
 
-**players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions. Coverage: 29.2% of functions (45 of 154), 27.5% of lines, 21.5% of branches; 109 functions no scenario enters (data/coverage.csv).
+**players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions. Coverage: 29.2% of functions (45 of 154), 27.5% of lines, 20.4% of branches; 109 functions no scenario enters (data/coverage.csv).
 
 **map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 61.8% of functions (68 of 110), 67.7% of lines, 63.1% of branches; 42 functions no scenario enters (data/coverage.csv).
 
@@ -528,20 +528,20 @@ The simulation subsystems are in bold. `state` is the shared state block code (`
 | **wind_meteors** | 10 of 16 | 62.5% | 53.8% | 50.0% | 6 |
 | **economy** | 16 of 39 | 41.0% | 53.9% | 32.3% | 23 |
 | **features** | 40 of 60 | 66.7% | 62.5% | 58.2% | 20 |
-| **ai** | 92 of 142 | 64.8% | 70.7% | 69.7% | 50 |
-| **pathfinding** | 45 of 62 | 72.6% | 80.4% | 76.1% | 17 |
+| **ai** | 92 of 142 | 64.8% | 70.7% | 69.0% | 50 |
+| **pathfinding** | 45 of 58 | 77.6% | 81.5% | 76.1% | 13 |
 | **weapons** | 72 of 108 | 66.7% | 73.0% | 60.1% | 36 |
 | **targeting** | 10 of 11 | 90.9% | 89.2% | 64.3% | 1 |
-| **los_radar** | 62 of 109 | 56.9% | 70.5% | 66.8% | 47 |
-| **orders** | 237 of 400 | 59.2% | 52.9% | 39.3% | 163 |
+| **los_radar** | 62 of 109 | 56.9% | 70.5% | 65.9% | 47 |
+| **orders** | 237 of 400 | 59.2% | 52.9% | 40.2% | 163 |
 | **units** | 110 of 201 | 54.7% | 61.9% | 54.0% | 91 |
-| **players** | 45 of 154 | 29.2% | 27.5% | 21.5% | 109 |
+| **players** | 45 of 154 | 29.2% | 27.5% | 20.4% | 109 |
 | **map** | 68 of 110 | 61.8% | 67.7% | 63.1% | 42 |
-| files | 102 of 2622 | 3.9% | 9.8% | 27.1% | 2520 |
-| game | 73 of 208 | 35.1% | 33.1% | 19.0% | 135 |
+| files | 60 of 178 | 33.7% | 30.4% | 27.1% | 118 |
+| game | 73 of 208 | 35.1% | 33.1% | 19.6% | 135 |
 | network | 40 of 414 | 9.7% | 6.1% | 1.9% | 374 |
-| platform | 307 of 734 | 41.8% | 30.6% | 21.3% | 427 |
-| presentation | 440 of 1472 | 29.9% | 25.7% | 18.7% | 1032 |
+| platform | 307 of 728 | 42.2% | 30.7% | 21.3% | 421 |
+| presentation | 440 of 1472 | 29.9% | 25.7% | 18.8% | 1032 |
 | seams | 64 of 103 | 62.1% | 81.7% | - | 39 |
 | state | 309 of 408 | 75.7% | 67.0% | 48.7% | 99 |
 

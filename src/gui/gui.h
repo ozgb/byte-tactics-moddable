@@ -123,6 +123,7 @@ void __stdcall EnableKeyCommands(Dialog* p);
 void __stdcall DisableKeyCommands(Dialog* obj);
 void __stdcall MarkChanged(Dialog* obj);
 void __stdcall MarkLayerChanged(Dialog* obj);
+void __stdcall DrawSlider(Dialog* gui, int gadgetIndex);
 void __stdcall SetFontsPath(Dialog* obj, const char* dir);
 void __stdcall SetGuiPath(Dialog* obj, const char* dir);
 void __stdcall SetAnimsPath(Dialog* obj, const char* dir);

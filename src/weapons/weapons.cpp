@@ -1072,7 +1072,7 @@ void __stdcall CopyWeaponVelocityParam(Projectile* obj, WeaponDef* src)
 short __cdecl AngleOfVector(int x, int z);
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
-#include "../graphics/particles_472630.h"
+#include "../graphics/particles.h"
 
 struct Fire_0049c9c0 {
     char unknown_0[0xc];

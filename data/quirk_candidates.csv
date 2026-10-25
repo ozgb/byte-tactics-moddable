@@ -37,7 +37,6 @@ src/graphics/draw.cpp,752,tautological-pointer-compare,DrawRectangle (0x4bf8c0),
 src/graphics/draw.cpp,766,tautological-pointer-compare,DrawRectangle (0x4bf8c0),not-a-bug,,dead branch kept from the original: the address of a global is never null; drawing only
 src/graphics/particles.cpp,1086,cast-calling-convention,InitParticlePool (0x471c80),not-a-bug,,"atexit calls the handler with no arguments, so stdcall and cdecl behave the same"
 src/graphics/particles.cpp,1138,new-returns-null,??2ParticleSystem@@SGPAXI@Z (0x471d10),not-a-bug,,class operator new returns null on purpose; the build passes -fno-assume-sane-operator-new so the callers keep their null checks
-src/graphics/particles_472630.cpp,43,new-returns-null,ParticleSystem::operator new,not-a-bug,,class operator new returns null on purpose; the build passes -fno-assume-sane-operator-new so the callers keep their null checks
 src/gui/dialogs.cpp,1434,fortify-source,LerpPaletteRange (0x4acae0),bug-harmless,,"LerpPaletteRange copies 0x400 bytes through a 768-byte buffer, but nothing calls the function"
 src/ingame/camera.cpp,122,tautological-pointer-compare,RestoreCameraPosition (0x41d3f0),not-a-bug,,"valid is an inline array, so the test is always true as in the original; camera presentation"
 src/ingame/info_panel.cpp,766,format-extra-args,DrawUnitBuilderProbe (0x4685a0),bug-harmless,,"extra sprintf arguments are ignored; debug text drawn on the panel, no game state"

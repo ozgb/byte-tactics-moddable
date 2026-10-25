@@ -10,6 +10,22 @@
 #include "object_pool.h"
 
 #include "../../interfaces/ref.h"
+#include "../debug/debug_lib.h"
+#include "../harness/harness.h"
+#include "../util/vec3.h"
+#include "rect.h"
+#include "nano_particle_vector.h"
+#include "particle_system.h"
+#include "particle_lists.h"
+#include "smoke_particle.h"
+#include "timed_sub_particles.h"
+#include "particles.h"
+#include "../network/player.h"
+
+#pragma pack(push, 1)
+#include "../game/game.h"
+#pragma pack(pop)
+
 #pragma pack(push, 2)
 struct Elem_00470a40 {
     int a;
@@ -18,13 +34,6 @@ struct Elem_00470a40 {
     short d;
 };
 #pragma pack(pop)
-
-struct Elem_00470f00 {
-    int unknown_0;
-};
-
-#include "object_pool.h"
-#include "nano_particle_vector.h"
 
 #pragma pack(push, 1)
 struct Vec3_004736e0 {
@@ -55,7 +64,7 @@ struct Vec3_004736e0 {
     }
 };
 
-union Fix_004736e0 {
+union Fixed16 {
     int whole;
     short half[2];
 };
@@ -78,8 +87,7 @@ struct Pos_004745e0 {
     int Visible();
 };
 
-class TeleportParticle {
-public:
+struct TeleportParticle {
     void* data;
     union {
         struct {
@@ -101,17 +109,6 @@ public:
     int IsExpired(int currentTick);
 };
 
-class List_004737c0 {
-public:
-    char* head;
-    char* first;
-    char* last;
-    char* end;
-    void insert(char* where, int count, const TeleportParticle& val);
-};
-
-#include "../util/vec3.h"
-
 struct Pos_004739b0 {
     char unknown_0[0x2];
     short x;
@@ -127,9 +124,9 @@ public:
         Vec3 pos;
         Pos_004739b0 posw;
     };
-    char unknown_c[0xc];
+    Vec3 tgt;
     Vec3 vel;
-    char unknown_24[4];
+    int unused;
     int flags;
     int endTime;
 
@@ -169,8 +166,7 @@ struct Seg_00473b50 {
         (g).end.z -= (g).start.z;            \
     }
 
-class ThrustParticle {
-public:
+struct ThrustParticle {
     unsigned short* bitmask;
     union {
         struct {
@@ -192,13 +188,6 @@ public:
     void Step();
     void DrawParticle(void* dest, short px, short py);
     int IsExpired(int currentTick);
-};
-
-typedef std::vector<ThrustParticle> Vec_004743a0;
-
-class Class_00475bd0 {
-public:
-    void* insert(ThrustParticle* at, unsigned int n, const ThrustParticle& x);
 };
 
 struct Pair_00474880 {
@@ -250,8 +239,7 @@ static inline Vec3_00474760 operator-(const Vec3_00474760& p, const Vec3_0047476
     return r;
 }
 
-class WakeParticle {
-public:
+struct WakeParticle {
     void* data;
     union {
         struct {
@@ -276,17 +264,6 @@ public:
     void DrawParticle(void* surface, short px, short py);
     int IsExpired(int currentTick);
 };
-
-class List_00474880 {
-public:
-    char* head;
-    char* first;
-    char* last;
-    char* end;
-    void insert(char* where, int count, const WakeParticle& val);
-};
-
-#include "particle_system.h"
 
 class TeleportParticles : public ParticleSystem {
 public:
@@ -327,7 +304,7 @@ struct Shape_00472ab0;
 class ThrustParticles : public ParticleSystem {
 public:
     int time;
-    Vec_004743a0 items;
+    std::vector<ThrustParticle> items;
     int period;
     Vec3 pos0;
     Vec3 pos1;
@@ -362,8 +339,6 @@ public:
     virtual void Init(Vec3_00474760* a, Vec3_00474760* b, int newPeriod,
                               int lifetime, int isAscending);
 };
-
-#include "particle_lists.h"
 
 class Listener_00471d90 {
 public:
@@ -473,10 +448,6 @@ struct Lists_00472530 {
     }
 };
 
-#include "smoke_particle.h"
-
-#include "timed_sub_particles.h"
-
 struct Position_00475150 {
     short xFrac;
     short x;
@@ -485,8 +456,6 @@ struct Position_00475150 {
     short zFrac;
     short z;
 };
-
-#include "rect.h"
 
 struct TimedSubParticle {
     void* data;
@@ -549,19 +518,10 @@ struct Map_004745e0 {
 
 #pragma pack(pop)
 
-#include "../network/player.h"
-
-
-#pragma pack(push, 1)
-#include "../game/game.h"
-#pragma pack(pop)
-
 extern Game* g_game;
 extern ObjectPool g_particlePool;
 extern char g_fxEventPoolBlocked;
 extern unsigned char g_particlePoolDestroyed;
-#include "particles.h"
-
 void* __stdcall GetGafFrame(void* a, int b);
 void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 int __stdcall GetGafFrameCount(void* ptr);
@@ -645,59 +605,6 @@ inline int Pos_004745e0::Visible()
     return visible;
 }
 
-struct Elem_00473500 {
-    int unknown_0;
-};
-
-typedef std::vector<Elem_00473500> Vec_00473500;
-typedef Vec_00473500::size_type (Vec_00473500::*SizeFn_00473500)() const;
-typedef Vec_00473500::iterator (Vec_00473500::*UcopyFn_00473500)(
-    Vec_00473500::const_iterator, Vec_00473500::const_iterator, Vec_00473500::iterator);
-typedef void (Vec_00473500::*UfillFn_00473500)(
-    Vec_00473500::iterator, Vec_00473500::size_type, const Elem_00473500&);
-typedef void (Vec_00473500::*DestroyFn_00473500)(Vec_00473500::iterator, Vec_00473500::iterator);
-
-struct Access_00473500 : Vec_00473500 {
-    static UcopyFn_00473500 ucopy;
-    static UfillFn_00473500 ufill;
-    static DestroyFn_00473500 destroy;
-};
-
-typedef std::vector<NanoParticle> Vec_004739b0;
-typedef void (Vec_004739b0::*ReserveFn_004739b0)(Vec_004739b0::size_type);
-typedef Vec_004739b0::iterator (Vec_004739b0::*UcopyFn_004739b0)(
-    Vec_004739b0::const_iterator, Vec_004739b0::const_iterator, Vec_004739b0::iterator);
-typedef void (Vec_004739b0::*UfillFn_004739b0)(
-    Vec_004739b0::iterator, Vec_004739b0::size_type, const NanoParticle&);
-typedef void (Vec_004739b0::*DestroyFn_004739b0)(Vec_004739b0::iterator, Vec_004739b0::iterator);
-
-struct Access_00475770 : Vec_004739b0 {
-    static ReserveFn_004739b0 fn;
-};
-
-struct Access_00475870 : Vec_004739b0 {
-    static DestroyFn_004739b0 fn;
-};
-
-struct Access_00475880 : Vec_004739b0 {
-    static UcopyFn_004739b0 fn;
-};
-
-struct Access_00476710 : Vec_004739b0 {
-    static UfillFn_004739b0 fn;
-};
-
-class Class_00476210 {
-public:
-    void insert(std::vector<SmokeParticle>::iterator p, unsigned int m,
-                const SmokeParticle& x);
-};
-
-class Vec_00476490 {
-public:
-    void insert(TimedSubParticle* pos, int count, const TimedSubParticle* src);
-};
-
 // FUNCTION: 0x470a40
 Elem_00470a40* __stdcall CopyStructRange(Elem_00470a40* first, Elem_00470a40* last, Elem_00470a40* dest)
 {
@@ -732,7 +639,7 @@ void ObjectPool::FreeBlocks()
     if (slots != 0) {
         GameFreeThunk(slots);
     }
-    std::vector<Item_00470ae0*>::iterator it = items.begin();
+    std::vector<PoolBlock*>::iterator it = items.begin();
     while (it != items.end()) {
         GameFreeThunk(*it);
         items.erase(it);
@@ -765,38 +672,6 @@ void ObjectPool::FreeSlot(int slot)
     ((int*)slots)[eax] = slot;
 }
 #pragma auto_inline(on)
-
-typedef std::vector<Elem_00470f00> Vec_00470ef0;
-typedef void (Vec_00470ef0::*DestroyFn_00470ef0)(Vec_00470ef0::iterator, Vec_00470ef0::iterator);
-
-struct Access_00470ef0 : Vec_00470ef0 {
-    static DestroyFn_00470ef0 fn;
-};
-
-// FUNCTION: 0x470ef0 ?_Destroy@?$vector@UElem_00470f00@@V?$allocator@UElem_00470f00@@@std@@@std@@IAEXPAUElem_00470f00@@0@Z
-DestroyFn_00470ef0 Access_00470ef0::fn = &Access_00470ef0::_Destroy;
-
-typedef std::vector<Elem_00470f00> Vec_00470f00;
-typedef Vec_00470f00::iterator (Vec_00470f00::*UcopyFn_00470f00)(
-    Vec_00470f00::const_iterator, Vec_00470f00::const_iterator, Vec_00470f00::iterator);
-
-struct Access_00470f00 : Vec_00470f00 {
-    static UcopyFn_00470f00 fn;
-};
-
-// FUNCTION: 0x470f00 ?_Ucopy@?$vector@UElem_00470f00@@V?$allocator@UElem_00470f00@@@std@@@std@@IAEPAUElem_00470f00@@PBU3@0PAU3@@Z
-UcopyFn_00470f00 Access_00470f00::fn = &Access_00470f00::_Ucopy;
-
-typedef std::vector<Elem_00470f00> Vec_00470f30;
-typedef void (Vec_00470f30::*UfillFn_00470f30)(
-    Vec_00470f30::iterator, Vec_00470f30::size_type, const Elem_00470f00&);
-
-struct Access_00470f30 : Vec_00470f30 {
-    static UfillFn_00470f30 fn;
-};
-
-// FUNCTION: 0x470f30 ?_Ufill@?$vector@UElem_00470f00@@V?$allocator@UElem_00470f00@@@std@@@std@@IAEXPAUElem_00470f00@@IABU3@@Z
-UfillFn_00470f30 Access_00470f30::fn = &Access_00470f30::_Ufill;
 
 // FUNCTION: 0x470f60
 void __stdcall CopyPointer(int* dest, int* src)
@@ -1101,9 +976,6 @@ void __stdcall EmitBubbles(int posA, int posB, int period, short index)
     }
 }
 
-// FUNCTION: 0x472d30 ?size@?$vector@UElem_00473500@@V?$allocator@UElem_00473500@@@std@@@std@@QBEIXZ
-SizeFn_00473500 g_size_00472d30 = &Vec_00473500::size;
-
 // FUNCTION: 0x472d50
 void TeleportParticles::Update()
 {
@@ -1269,15 +1141,6 @@ int WakeParticles::IsFinished()
     return items.empty();
 }
 
-// FUNCTION: 0x4732d0 ?_Destroy@?$vector@UElem_00473500@@V?$allocator@UElem_00473500@@@std@@@std@@IAEXPAUElem_00473500@@0@Z
-DestroyFn_00473500 Access_00473500::destroy = &Access_00473500::_Destroy;
-
-// FUNCTION: 0x473500 ?_Ucopy@?$vector@UElem_00473500@@V?$allocator@UElem_00473500@@@std@@@std@@IAEPAUElem_00473500@@PBU3@0PAU3@@Z
-UcopyFn_00473500 Access_00473500::ucopy = &Access_00473500::_Ucopy;
-
-// FUNCTION: 0x473530 ?_Ufill@?$vector@UElem_00473500@@V?$allocator@UElem_00473500@@@std@@@std@@IAEXPAUElem_00473500@@IABU3@@Z
-UfillFn_00473500 Access_00473500::ufill = &Access_00473500::_Ufill;
-
 #pragma auto_inline(off)
 // FUNCTION: 0x473560
 void TeleportParticle::Step()
@@ -1329,7 +1192,7 @@ void TeleportParticles::Init(Vec3_004736e0* a, Vec3_004736e0* b, int c)
     pos2 = *b;
     dir = pos2 - pos1;
     int dist = dir.Length();
-    Fix_004736e0 scale;
+    Fixed16 scale;
     scale.whole = (int)(((__int64)dist << 16) / 327680);
     int step = scale.half[1];
     sparkLifetime = step;
@@ -1338,8 +1201,6 @@ void TeleportParticles::Init(Vec3_004736e0* a, Vec3_004736e0* b, int c)
     dir.z /= step;
     Emit();
 }
-
-#include "../harness/harness.h"
 
 // FUNCTION: 0x4737c0
 void TeleportParticles::Emit()
@@ -1359,8 +1220,7 @@ void TeleportParticles::Emit()
         e.data = g_game->flamestreamGaf;
         e.frameCount = GetGafFrameCount(g_game->flamestreamGaf) - 1;
         e.frame = (int)(((__int64)HarnessViewRand() * e.frameCount) / 0x8000);
-        List_004737c0* v = (List_004737c0*)&items;
-        v->insert(v->last, 1, e);
+        items.insert(items.end(), 1, e);
     }
 
     time = g_game->ticks + 10;
@@ -1464,7 +1324,6 @@ void ThrustParticles::Emit()
         items.reserve(extra + items.size());
     }
     Vec3* p = &pos0;
-    Vec_004743a0* v = &items;
     for (int i = 1; i != 0; i--) {
         ThrustParticle rec;
         rec.period = period;
@@ -1476,7 +1335,7 @@ void ThrustParticles::Emit()
         rec.bitmask = (unsigned short *)g_game->flamestreamGaf;
         rec.frameCount = (int)GetGafFrameCount(g_game->flamestreamGaf) - 1;
         rec.frame = 0;
-        ((Class_00475bd0*)v)->insert(v->end(), 1, rec);
+        items.insert(items.end(), 1, rec);
     }
     time = g_game->ticks + 1;
 }
@@ -1570,8 +1429,7 @@ void WakeParticles::Emit()
             e.value = 0x67;
             e.step = -1;
         }
-        List_00474880* v = (List_00474880*)&items;
-        v->insert(v->last, 1, e);
+        items.insert(items.end(), 1, e);
     } while (--i);
 
     time = g_game->ticks + 1;
@@ -1625,7 +1483,6 @@ void SmokeParticles::Emit()
         records.reserve(periods + records.size());
     }
     Vec3* p = &pos;
-    std::vector<SmokeParticle>* v = &records;
     for (int i = 1; i != 0; i--) {
         SmokeParticle rec;
         rec.pos = *p;
@@ -1634,7 +1491,7 @@ void SmokeParticles::Emit()
         rec.data = altAnimation ? g_game->smoke2 : g_game->smoke1;
         rec.limit = (int)(((__int64)HarnessViewRand() * (maxFrame - 2)) / 0x8000) + 2;
         rec.count = 0;
-        ((Class_00476210*)v)->insert(v->end(), 1, rec);
+        records.insert(records.end(), 1, rec);
     }
     time = g_game->ticks + emitPeriod;
 }
@@ -1704,7 +1561,6 @@ void TimedSubParticles::Emit()
     if (missed > 0)
         records.reserve(records.size() + missed);
     Vec3* p = &pos;
-    std::vector<TimedSubParticle>* v = &records;
     int i = 1;
     do {
         TimedSubParticle rec;
@@ -1714,7 +1570,7 @@ void TimedSubParticles::Emit()
         rec.data = g_game->smoke1;
         rec.limit = (int)((__int64)HarnessViewRand() * (maxFrame - 2) / 0x8000) + 2;
         rec.count = 0;
-        ((Vec_00476490*)v)->insert(v->end(), 1, &rec);
+        records.insert(records.end(), 1, rec);
     } while (--i);
     time = g_game->ticks + emitPeriod;
 }
@@ -1780,24 +1636,11 @@ void TimedSubParticles::Update()
         Emit();
 }
 
-// FUNCTION: 0x475770 ?reserve@?$vector@UNanoParticle@@V?$allocator@UNanoParticle@@@std@@@std@@QAEXI@Z
-ReserveFn_004739b0 Access_00475770::fn = &Access_00475770::reserve;
-
 // FUNCTION: 0x475840
 int NanoParticleVector::GetCount()
 {
     return _First == 0 ? 0 : (_Last - _First) / 48;
 }
-
-// FUNCTION: 0x475870 ?_Destroy@?$vector@UNanoParticle@@V?$allocator@UNanoParticle@@@std@@@std@@IAEXPAUNanoParticle@@0@Z
-DestroyFn_004739b0 Access_00475870::fn = &Access_00475870::_Destroy;
-
-// FUNCTION: 0x475880 ?_Ucopy@?$vector@UNanoParticle@@V?$allocator@UNanoParticle@@@std@@@std@@IAEPAUNanoParticle@@PBU3@0PAU3@@Z
-UcopyFn_004739b0 Access_00475880::fn = &Access_00475880::_Ucopy;
-
-// FUNCTION: 0x476710 ?_Ufill@?$vector@UNanoParticle@@V?$allocator@UNanoParticle@@@std@@@std@@IAEXPAUNanoParticle@@IABU3@@Z
-UfillFn_004739b0 Access_00476710::fn = &Access_00476710::_Ufill;
-
 
 struct Shape_00472ab0 {
     Pair_00474880 v[3];
@@ -1818,3 +1661,352 @@ void __stdcall EmitJitteredThrustParticles(Shape_00472ab0* pos, short index)
         lists->Add(index, p);
     }
 }
+
+// FUNCTION: 0x470c10
+__declspec(noinline) int ObjectPool::Grow(int newCapacity, int newSlotSize)
+{
+    int result = 0;
+    if (newCapacity > capacity) {
+        void** table = (void**)GameReallocIgnoreTag((int*)slots, newCapacity * 4);
+        if (table != 0) {
+            PoolBlock* block = (PoolBlock*)GameAllocShared((newCapacity - capacity) * newSlotSize);
+            slots = table;
+            if (block != nullptr) {
+                int i = capacity;
+                if (i < newCapacity) {
+                    int offset = 0;
+                    do {
+                        ((void**)slots)[i] = (char*)block + offset;
+                        offset += newSlotSize;
+                        i++;
+                    } while (i < newCapacity);
+                }
+                items.push_back(block);
+                capacity = newCapacity;
+                slotSize = newSlotSize;
+                result = 1;
+            }
+        }
+    }
+    else {
+        result = 1;
+    }
+    return result;
+}
+
+// FUNCTION: 0x471160
+void ParticleLists::AddToList(ParticleSystem* x, short index)
+{
+    if (lists[index].size() > 400) {
+        delete lists[index][0];
+        lists[index].erase(lists[index].begin());
+    }
+    lists[index].push_back(x);
+}
+
+// FUNCTION: 0x471820
+void ParticleLists::AddSmoke(Vec3* pos, int limit, int emitPeriod,
+                             int holdPeriod, int lifetime, short index, int alt)
+{
+    SmokeParticles* p = new SmokeParticles;
+    if (p) {
+        p->Init(pos, limit, emitPeriod, holdPeriod, lifetime, alt);
+        Add(index, p);
+    }
+}
+
+// FUNCTION: 0x471a50
+void ParticleLists::AddTimedSubParticles(Vec3* pos, int emitPeriod,
+                                         int holdPeriod, int lifetime, short index)
+{
+    TimedSubParticles* e = new TimedSubParticles;
+    if (e) {
+        e->Init(pos, emitPeriod, holdPeriod, lifetime);
+        Add(index, e);
+    }
+}
+
+// FUNCTION: 0x471de0
+void __stdcall DestroyParticleLists()
+{
+    if (g_game->lists_38d77) {
+        delete (ParticleLists*)g_game->lists_38d77;
+        g_game->lists_38d77 = 0;
+    }
+}
+
+// FUNCTION: 0x472630
+void __stdcall EmitSmoke(Vec3* pos, int emitPeriod, int lifetime, short index)
+{
+    ParticleLists* owner = (ParticleLists *)g_game->lists_38d77;
+    SmokeParticles* e = new SmokeParticles;
+    if (e) {
+        e->Init((Vec3*)pos, 0, emitPeriod, 0, lifetime, 0);
+        owner->Add(index, e);
+    }
+}
+
+// FUNCTION: 0x472720
+void __stdcall EmitTimedBlackSmoke(Vec3* pos, int emitPeriod, int lifetime, short index)
+{
+    ParticleLists* owner = (ParticleLists *)g_game->lists_38d77;
+    SmokeParticles* e = new SmokeParticles;
+    if (e) {
+        e->Init((Vec3*)pos, 0, emitPeriod, 0, lifetime, 1);
+        owner->Add(index, e);
+    }
+}
+
+// FUNCTION: 0x472810
+void __stdcall EmitWhiteSmoke(Vec3* pos, short index)
+{
+    ParticleLists* owner = (ParticleLists *)g_game->lists_38d77;
+    SmokeParticles* e = new SmokeParticles;
+    if (e) {
+        e->Init((Vec3*)pos, 0, 1, 0, 0, 0);
+        owner->Add(index, e);
+    }
+}
+
+// FUNCTION: 0x4728f0
+void __stdcall EmitBlackSmoke(Vec3* p, short index)
+{
+    ParticleLists& l = *(ParticleLists *)g_game->lists_38d77;
+    SmokeParticles* e = new SmokeParticles;
+    if (e) {
+        e->Init((Vec3*)p, 0, 1, 0, 0, 1);
+        l.Add(index, e);
+    }
+}
+
+// FUNCTION: 0x4729d0
+void __stdcall EmitWeaponSmoke(Vec3* p, short index)
+{
+    ParticleLists& l = *(ParticleLists *)g_game->lists_38d77;
+    SmokeParticles* e = new SmokeParticles;
+    if (e) {
+        e->Init((Vec3*)p, 3, 1, 0x1e, 0, 0);
+        l.Add(index, e);
+    }
+}
+
+// FUNCTION: 0x472c50
+void __stdcall EmitTimedSubParticles(Vec3* p, short index)
+{
+    ParticleLists& l = *(ParticleLists *)g_game->lists_38d77;
+    TimedSubParticles* e = new TimedSubParticles;
+    if (e) {
+        e->Init(p, 5, 0, 0x96);
+        l.Add(index, e);
+    }
+}
+
+typedef void (std::vector<ParticleSystem*>::*ParticleSystemPtrInsertFn)(
+    std::vector<ParticleSystem*>::iterator, std::vector<ParticleSystem*>::size_type, ParticleSystem* const&);
+
+// FUNCTION: 0x4732e0 ?insert@?$vector@PAVParticleSystem@@V?$allocator@PAVParticleSystem@@@std@@@std@@QAEXPAPAVParticleSystem@@IABQAV3@@Z
+ParticleSystemPtrInsertFn g_particleSystemPtrInsert = &std::vector<ParticleSystem*>::insert;
+
+// FUNCTION: 0x473a00
+void NanoParticle::DrawParticle(int dest, short x, short y)
+{
+    Rect r;
+    r.left = (short)(posw.x - x) + 0x80;
+    r.top = (short)(posw.y - y) - (posw.height >> 1) + 0x20;
+    r.right = r.left + 1;
+    r.bottom = r.top + 1;
+
+    Player* p = &g_game->players_1b63[g_game->playerIndex];
+    Player* q = &g_game->players_1b63[g_game->playerIndex];
+    int visible;
+    if ((g_game->mapFlags & 2) == 2) {
+        int col = posw.x >> 5;
+        int row = (posw.y - (posw.height >> 1)) >> 5;
+        visible = (unsigned int)col < (unsigned int)p->exploredWidth && (unsigned int)row < (unsigned int)p->exploredHeight &&
+                  p->explored[(unsigned int)p->exploredWidth * row + col] != 0;
+    } else {
+        int col = posw.x >> 5;
+        int row = (posw.y - (posw.height >> 1)) >> 5;
+        visible = Identity_00473a00(IsSeen_00473a00(p, q, col, row));
+    }
+
+    if (visible)
+        FillRectangle((void*)dest, &r, flags);
+}
+
+static inline int LengthFloat(const Vec3& v)
+{
+    float fx = v.x;
+    float fy = v.y;
+    float fz = v.z;
+    return (int)sqrt(fx * fx + fy * fy + fz * fz);
+}
+
+// FUNCTION: 0x473d50
+void NanoParticles::Emit()
+{
+    int grow = deadline - g_game->ticks + 1;
+    if (grow > 0)
+        items.reserve(items.size() + grow * 5);
+
+    int i = 0;
+    for (int n = 5; n != 0; n--) {
+        NanoParticle e;
+        e.pos.x = (int)(((__int64)HarnessViewRand() * seg_1c.end.x) / 0x8000) + seg_1c.start.x;
+        e.pos.y = (int)(((__int64)HarnessViewRand() * seg_1c.end.y) / 0x8000) + seg_1c.start.y;
+        e.pos.z = (int)(((__int64)HarnessViewRand() * seg_1c.end.z) / 0x8000) + seg_1c.start.z;
+        e.tgt.x = (int)(((__int64)HarnessViewRand() * seg_34.end.x) / 0x8000) + seg_34.start.x;
+        e.tgt.y = (int)(((__int64)HarnessViewRand() * seg_34.end.y) / 0x8000) + seg_34.start.y;
+        e.tgt.z = (int)(((__int64)HarnessViewRand() * seg_34.end.z) / 0x8000) + seg_34.start.z;
+
+        e.vel = e.tgt - e.pos;
+        int len = LengthFloat(e.vel);
+        Fixed16 step;
+        step.whole = (int)(((__int64)len << 16) / 0x40000);
+        short s = step.half[1];
+        if (s != 0) {
+            e.vel.x = e.vel.x / s;
+            e.vel.y = e.vel.y / s;
+            e.vel.z = e.vel.z / s;
+            e.endTime = g_game->ticks + s;
+            e.unused = 0x100;
+            e.flags = i % 7 + 0xa1;
+            items.push_back(e);
+        }
+        i++;
+    }
+    time = g_game->ticks + 1;
+}
+
+// FUNCTION: 0x474b80
+void SmokeParticle::DrawParticle(void* dest, short px, short py)
+{
+    short sx = posw.x - px + 0x80;
+    short sy = posw.z - (posw.y >> 1) - py + 0x20;
+    Player* p = &g_game->players[g_game->playerIndex];
+    Player* p2 = &g_game->players[g_game->playerIndex];
+    int visible;
+    if ((g_game->mapFlags & 2) == 2) {
+        int col = posw.x >> 5;
+        int row = (posw.z - (posw.y >> 1)) >> 5;
+        if ((unsigned int)col < (unsigned int)p->exploredWidth && (unsigned int)row < (unsigned int)p->exploredHeight &&
+            p->explored[(unsigned int)p->exploredWidth * row + col] != 0)
+            visible = 1;
+        else
+            visible = 0;
+    } else {
+        int col = posw.x >> 5;
+        int row = (posw.z - (posw.y >> 1)) >> 5;
+        visible = Identity_00474b80(IsSeen_00474b80(p, p2, col, row));
+    }
+    if (visible)
+        DrawFrameBlended(dest, GetGafFrame(data, count), sx, sy);
+}
+
+#pragma auto_inline(off)
+// FUNCTION: 0x474cd0
+// FUNCTION: 0x474d10 ??_GSmokeParticles@@UAEPAXI@Z
+SmokeParticles::SmokeParticles()
+{
+    time = g_game->ticks;
+}
+#pragma auto_inline(on)
+
+#pragma auto_inline(off)
+// FUNCTION: 0x4750b0
+// FUNCTION: 0x475110 ??_GTimedSubParticles@@UAEPAXI@Z
+TimedSubParticles::TimedSubParticles()
+{
+    time = g_game->ticks;
+}
+#pragma auto_inline(on)
+
+// FUNCTION: 0x4750f0
+int TimedSubParticles::IsEmitDue()
+{
+    return (unsigned int)time <= (unsigned int)g_game->ticks;
+}
+
+static inline int IsExplored(Player* map, Position_00475470* pos)
+{
+    int tx = pos->x >> 5;
+    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    if ((unsigned int)tx < (unsigned int)map->exploredWidth && (unsigned int)ty < (unsigned int)map->exploredHeight &&
+        map->explored[(unsigned int)map->exploredWidth * ty + tx])
+        return 1;
+    return 0;
+}
+
+static inline int IsSeen(Player* map, Position_00475470* pos)
+{
+    int tx = pos->x >> 5;
+    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    if (!((unsigned int)tx < (unsigned int)map->exploredWidth && (unsigned int)ty < (unsigned int)map->exploredHeight)) {
+        return 0;
+    }
+    Player* b = map;
+    return (g_game->visibilityMask[(unsigned int)b->exploredWidth * ty + tx] &
+            (1 << g_game->playerIndex)) != 0;
+}
+
+static inline int IsVisible(Player* map, Position_00475470* pos)
+{
+    if ((g_game->mapFlags & 2) == 2)
+        return IsExplored(map, pos);
+    return IsSeen(map, pos);
+}
+
+static inline void DrawIfVisible(SmokeParticle* s, void* dest, short px, short py)
+{
+    short sx = s->posw.x - px + 0x80;
+    short sy = s->posw.z - (s->posw.y >> 1) - py + 0x20;
+    if (IsVisible(&g_game->players[g_game->playerIndex], &s->posw))
+        DrawFrameBlended(dest, GetGafFrame(s->data, s->count), sx, sy);
+}
+
+// FUNCTION: 0x475470
+void SmokeParticles::Render(int dest)
+{
+    for (std::vector<SmokeParticle>::iterator it = records.begin(); it != records.end();
+         ++it) {
+        DrawIfVisible(&*it, (void*)dest, g_game->scrollX, g_game->scrollY);
+    }
+}
+
+// FUNCTION: 0x475700
+void TimedSubParticles::Render(int dest)
+{
+    for (std::vector<TimedSubParticle>::iterator it = records.begin(); it != records.end(); ++it) {
+        it->DrawParticle((void*)dest, g_game->scrollX, g_game->scrollY);
+    }
+}
+
+typedef void (std::vector<TeleportParticle>::*TeleportParticleInsertFn)(
+    std::vector<TeleportParticle>::iterator, std::vector<TeleportParticle>::size_type, const TeleportParticle&);
+
+// FUNCTION: 0x4758c0 ?insert@?$vector@UTeleportParticle@@V?$allocator@UTeleportParticle@@@std@@@std@@QAEXPAUTeleportParticle@@IABU3@@Z
+TeleportParticleInsertFn g_teleportParticleInsert = &std::vector<TeleportParticle>::insert;
+
+typedef void (std::vector<ThrustParticle>::*ThrustParticleInsertFn)(
+    std::vector<ThrustParticle>::iterator, std::vector<ThrustParticle>::size_type, const ThrustParticle&);
+
+// FUNCTION: 0x475bd0 ?insert@?$vector@UThrustParticle@@V?$allocator@UThrustParticle@@@std@@@std@@QAEXPAUThrustParticle@@IABU3@@Z
+ThrustParticleInsertFn g_thrustParticleInsert = &std::vector<ThrustParticle>::insert;
+
+typedef void (std::vector<WakeParticle>::*WakeParticleInsertFn)(
+    std::vector<WakeParticle>::iterator, std::vector<WakeParticle>::size_type, const WakeParticle&);
+
+// FUNCTION: 0x475ef0 ?insert@?$vector@UWakeParticle@@V?$allocator@UWakeParticle@@@std@@@std@@QAEXPAUWakeParticle@@IABU3@@Z
+WakeParticleInsertFn g_wakeParticleInsert = &std::vector<WakeParticle>::insert;
+
+typedef void (std::vector<SmokeParticle>::*SmokeParticleInsertFn)(
+    std::vector<SmokeParticle>::iterator, std::vector<SmokeParticle>::size_type, const SmokeParticle&);
+
+// FUNCTION: 0x476210 ?insert@?$vector@USmokeParticle@@V?$allocator@USmokeParticle@@@std@@@std@@QAEXPAUSmokeParticle@@IABU3@@Z
+SmokeParticleInsertFn g_smokeParticleInsert = &std::vector<SmokeParticle>::insert;
+
+typedef void (std::vector<TimedSubParticle>::*TimedSubParticleInsertFn)(
+    std::vector<TimedSubParticle>::iterator, std::vector<TimedSubParticle>::size_type, const TimedSubParticle&);
+
+// FUNCTION: 0x476490 ?insert@?$vector@UTimedSubParticle@@V?$allocator@UTimedSubParticle@@@std@@@std@@QAEXPAUTimedSubParticle@@IABU3@@Z
+TimedSubParticleInsertFn g_timedSubParticleInsert = &std::vector<TimedSubParticle>::insert;

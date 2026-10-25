@@ -42,7 +42,7 @@ struct Flags_004ab400 {
 
 #include "mouse_event.h"
 
-struct Rect_004b6720 {
+struct DialogRect {
     int left;
     int top;
     int right;
@@ -110,7 +110,7 @@ extern void __stdcall SetFont(int a);
 #include "keyboard.h"
 #include "dialogs.h"
 
-extern int __stdcall PointInRect(Rect_004b6720* r, int x, int y);
+extern int __stdcall PointInRect(DialogRect* r, int x, int y);
 #include "../util/registry.h"
 extern void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 
@@ -136,7 +136,7 @@ static inline int FindPanel_004aa8f0(Layer* layer)
     return -1;
 }
 
-static inline void GetGadgetRect_inlined(Gadget* entry, Rect_004b6720* rect)
+static inline void GetGadgetRect_inlined(Gadget* entry, DialogRect* rect)
 {
     if (entry->type == 0) {
         rect->left = 0;
@@ -164,7 +164,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
     if (flags & 0x800) {
         Layer* cur = menu->layer;
         if (cur != 0) {
-            GetGadgetRect_inlined(cur->entries, (Rect_004b6720*)rect);
+            GetGadgetRect_inlined(cur->entries, (DialogRect*)rect);
             FadeRectangle((Surface *)cur->entries->u.assets.surface, (Rect *)rect, -0x18);
             if (menu->layer != 0)
                 menu->layer->redraw = 1;
@@ -333,7 +333,7 @@ int __stdcall IsPointInEntryRect(Gui* obj)
     if (!obj->layer)
         return 0;
     Gadget* info = obj->layer->entries;
-    Rect_004b6720 r;
+    DialogRect r;
     r.left = info->x;
     r.top = info->y;
     r.right = r.left + info->width - 1;
@@ -362,9 +362,9 @@ void __stdcall ClearSelectedGadget(void* gui)
 }
 
 // FUNCTION: 0x4ab0b0
-int __stdcall BlitLayers(Layer* node, void* surface, Rect_004b6720* clipRect)
+int __stdcall BlitLayers(Layer* node, void* surface, DialogRect* clipRect)
 {
-    Rect_004b6720 rect;
+    DialogRect rect;
     if (node == 0) {
         return 0;
     }
@@ -393,7 +393,7 @@ finish:
 // FUNCTION: 0x4ab170
 void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect)
 {
-    BlitLayers(gui->layer, surface, (Rect_004b6720*)rect);
+    BlitLayers(gui->layer, surface, (DialogRect*)rect);
 }
 
 // FUNCTION: 0x4ab190
@@ -600,7 +600,7 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
     MouseEvent e;
     if (PeekMouseEvent((Event_4c2d60 *)&e) != 0) {
         if (p->layer != 0) {
-            Rect_004b6720 r;
+            DialogRect r;
             GetGadgetScreenRect((char *)p->layer->entries, 0, (Rect *)&r);
             if (IsPointInRect((Rect *)&r, e.x, e.y) != 0 || e.keyFlags == 0) {
                 PopMouseEvent(&e);
@@ -788,7 +788,7 @@ void __stdcall SetKeyboardInput(Gui* menu, int flag);
 void __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
 int __stdcall GetTextWidth(int font, unsigned char* text);
-int __stdcall FillRectangle(void* surface, Rect_004b6720* rect, int color);
+int __stdcall FillRectangle(void* surface, DialogRect* rect, int color);
 
 struct FileHandle;
 
@@ -1192,7 +1192,7 @@ void __stdcall DrawColorGrid(Gui* obj)
     void* surface = gadgets->u.assets.surface;
     int x0 = grid->x + gadgets->x;
     int y = gadgets->y + grid->y;
-    Rect_004b6720 rect;
+    DialogRect rect;
     for (int row = 0; row < 16; row++) {
         for (int col = 0; col < 16; col++) {
             rect.left = x0 + col * 8;
@@ -1202,6 +1202,23 @@ void __stdcall DrawColorGrid(Gui* obj)
             FillRectangle(surface, &rect, row * 16 + col);
         }
     }
+}
+
+void __stdcall DrawRectangle(void* surface, void* rect, int color);
+
+// FUNCTION: 0x4ac970
+void __stdcall DrawColorCellOutline(Gui* obj, int cell, int color)
+{
+    Gadget* gadgets = obj->layer->entries;
+    int index = FindGadgetIndex(gadgets, "COLS", 6);
+    void* surface = gadgets->u.assets.surface;
+    int y = gadgets->y + gadgets[index].y;
+    DialogRect rect;
+    rect.left = gadgets[index].x + gadgets->x + (cell % 16) * 8;
+    rect.top = y + (cell / 16) * 8;
+    rect.right = rect.left + 7;
+    rect.bottom = rect.top + 7;
+    DrawRectangle(surface, &rect, color);
 }
 
 // FUNCTION: 0x4aca20
@@ -1249,8 +1266,6 @@ void __stdcall LerpPaletteRange(unsigned char* data, int a, int b)
 
     memcpy(data, buf, 0x400);
 }
-
-struct Object_004ac970;
 
 // FUNCTION: 0x4acbe0
 int __stdcall GetColorCellAt(Gui* obj, int x, int y)

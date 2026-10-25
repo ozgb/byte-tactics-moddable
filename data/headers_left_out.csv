@@ -72,7 +72,6 @@ DestroyLine,skip,placeholder type Elem_00434360: left for the type-naming issues
 DetonateProjectile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 DrawButton,mismatch,fixing it changes the generated code of a caller
 DrawCellContours,skip,placeholder type Point_00417f60: left for the type-naming issues
-DrawColorCellOutline,skip,placeholder type Object_004ac970: left for the type-naming issues
 DrawExplosions,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawFogOfWar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

@@ -1018,11 +1018,9 @@ struct Elem_0046faf0;
 struct Elem_004702a0;
 struct Elem_004702a0_2;
 struct Elem_00470a40;
-struct Elem_00470f00;
 struct Elem_00472e70;
 struct Elem_00473130;
 struct Elem_00473290;
-struct Elem_00473500;
 class Elem_00475880;
 struct Elem_00476210;
 struct Elem_00476490;
@@ -1120,7 +1118,6 @@ struct F0_00462d30;
 struct F0_00462d30_2;
 union F110_0048ad30;
 struct FP_0043d6d0;
-struct FaceFlags_459830;
 struct Fade_004c6890;
 struct Feature;
 struct FeatureDef_00421eb0;
@@ -4091,8 +4088,6 @@ struct Arr_00421550 {
     Vec3* items;
     PieceFrame* faces;
 };
-
-#include "../src/graphics/face_flags_459830.h"
 
 #include "../src/graphics/piece_frame.h"
 

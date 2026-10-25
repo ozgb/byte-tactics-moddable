@@ -3,14 +3,14 @@
 
 #include <vector>
 
-struct Item_00470ae0 {
+struct PoolBlock {
     int unknown_0;
 };
 void __cdecl GameFreeThunk(void* p);
 
 class ObjectPool {
 public:
-    std::vector<Item_00470ae0*> items;
+    std::vector<PoolBlock*> items;
     void* slots;
     int slotSize;
     int capacity;
@@ -29,7 +29,7 @@ public:
     {
         if (slots != 0)
             GameFreeThunk(slots);
-        std::vector<Item_00470ae0*>::iterator it = items.begin();
+        std::vector<PoolBlock*>::iterator it = items.begin();
         while (it != items.end()) {
             GameFreeThunk(*it);
             items.erase(it);

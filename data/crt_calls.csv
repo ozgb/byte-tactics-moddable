@@ -387,10 +387,10 @@ address,function,callee,kind,file,class,notes
 0x457710,InitLobbiedConnection,time,call,src/network/net_game.cpp,presentation,sites=1
 0x4584d0,CMemoryCache::DrawPiece,_chkstk,call,src/graphics/model_render.cpp,game,sites=1; via console commands only
 0x458dd0,CMemoryCache::ShadeByIntensity,_ftol,call,src/graphics/model_render.cpp,game,sites=1; via console commands only
-0x458fa0,CMemoryCache::DrawPieceEdges,_chkstk,call,src/graphics/model_render_458fa0.cpp,game,sites=1; via console commands only
+0x458fa0,CMemoryCache::DrawPieceEdges,_chkstk,call,src/graphics/model_render.cpp,game,sites=1; via console commands only
 0x459830,UnitTable::DrawPieces,_chkstk,call,src/graphics/model_render.cpp,game,sites=1; via console commands only
-0x459c70,UnitTable::DrawLitPieces,_chkstk,call,src/graphics/model_render_4581e0.cpp,game,sites=1; via console commands only
-0x459c70,UnitTable::DrawLitPieces,_ftol,call,src/graphics/model_render_4581e0.cpp,game,sites=1; via console commands only
+0x459c70,UnitTable::DrawLitPieces,_chkstk,call,src/graphics/model_render.cpp,game,sites=1; via console commands only
+0x459c70,UnitTable::DrawLitPieces,_ftol,call,src/graphics/model_render.cpp,game,sites=1; via console commands only
 0x45a610,CMemoryCache::DrawShadowShape,_chkstk,call,src/graphics/model_render.cpp,game,sites=1; via console commands only
 0x45a950,CreatePlayerObjectState,_strcmpi,call,src/graphics/model_render.cpp,game,sites=1
 0x45b250,OnlineProcessButtonCommand,_snprintf,call,src/network/online_45b250.cpp,presentation,sites=1
@@ -503,10 +503,10 @@ address,function,callee,kind,file,class,notes
 0x4736e0,TeleportParticles::Init,_ftol,call,src/graphics/particles.cpp,presentation,sites=1
 0x4736e0,TeleportParticles::Init,fsqrt,inline,src/graphics/particles.cpp,presentation,sites=1
 0x4737c0,TeleportParticles::Emit,_alldiv,call,src/graphics/particles.cpp,presentation,sites=1
-0x473d50,NanoParticles::Emit,_alldiv,call,src/graphics/particles_473d50.cpp,presentation,sites=7
-0x473d50,NanoParticles::Emit,_allshl,call,src/graphics/particles_473d50.cpp,presentation,sites=1
-0x473d50,NanoParticles::Emit,_ftol,call,src/graphics/particles_473d50.cpp,presentation,sites=1
-0x473d50,NanoParticles::Emit,fsqrt,inline,src/graphics/particles_473d50.cpp,presentation,sites=1
+0x473d50,NanoParticles::Emit,_alldiv,call,src/graphics/particles.cpp,presentation,sites=7
+0x473d50,NanoParticles::Emit,_allshl,call,src/graphics/particles.cpp,presentation,sites=1
+0x473d50,NanoParticles::Emit,_ftol,call,src/graphics/particles.cpp,presentation,sites=1
+0x473d50,NanoParticles::Emit,fsqrt,inline,src/graphics/particles.cpp,presentation,sites=1
 0x4742c0,ThrustParticles::Init,_alldiv,call,src/graphics/particles.cpp,game,sites=1
 0x4742c0,ThrustParticles::Init,_allmul,call,src/graphics/particles.cpp,game,sites=3
 0x4742c0,ThrustParticles::Init,_allshr,call,src/graphics/particles.cpp,game,sites=3
@@ -751,7 +751,7 @@ address,function,callee,kind,file,class,notes
 0x4a35a0,SetGadgetRows,strncmp,call,src/gui/gui.cpp,presentation,sites=1
 0x4a36a0,SetGadgetItems,strncmp,call,src/gui/gui.cpp,presentation,sites=1
 0x4a3780,HandleListBoxInput,strncmp,call,src/gui/gui.cpp,game,sites=4
-0x4a3ef0,DrawSlider,_ftol,call,src/gui/gui_4a3ef0.cpp,game,sites=1
+0x4a3ef0,DrawSlider,_ftol,call,src/gui/gui.cpp,game,sites=1
 0x4a4440,HandleLabelInput,tolower,call,src/gui/gui.cpp,game,sites=1
 0x4a4440,HandleLabelInput,toupper,call,src/gui/gui.cpp,game,sites=1
 0x4a4660,DrawProgressBarGadget,_ftol,call,src/gui/gui.cpp,game,sites=1
@@ -1004,7 +1004,7 @@ address,function,callee,kind,file,class,notes
 0x4be180,HAPI_DropMissingArchives,fopen,call,src/files/hpi.cpp,presentation,sites=1
 0x4be270,HAPI_RemoveArchive,fclose,call,src/files/hpi.cpp,presentation,sites=1
 0x4be400,HAPI_MarkShadowedFiles,_findclose,call,src/files/hpi.cpp,presentation,sites=1
-0x4c0330,ScanFillPolygon,_chkstk,call,src/graphics/draw_4c0330.cpp,game,sites=1; via console commands only
+0x4c0330,ScanFillPolygon,_chkstk,call,src/graphics/draw.cpp,game,sites=1; via console commands only
 0x4c0820,DrawPolygonEdges,_chkstk,call,src/graphics/draw.cpp,game,sites=1; via console commands only
 0x4c0c70,FillShadedPolygon,_chkstk,call,src/graphics/draw.cpp,game,sites=1; via console commands only
 0x4c1000,FillFlatPolygon,_chkstk,call,src/graphics/draw.cpp,game,sites=1; via console commands only

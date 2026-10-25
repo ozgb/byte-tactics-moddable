@@ -3,7 +3,6 @@
 struct Gui;
 
 struct FileHandle;
-struct Gui;
 
 int __stdcall IsPointInEntryRect(Gui* obj);
 int __stdcall HasLayer(Gui* obj);
@@ -39,5 +38,7 @@ void __stdcall SetClickMode(void* gui, int mode);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, char* chc1, int unused);
 char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index);
+
+void __stdcall DrawColorCellOutline(Gui* obj, int cell, int color);
 
 #endif

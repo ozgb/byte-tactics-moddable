@@ -208,7 +208,6 @@ void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 void __stdcall DrawMessages(void* surface);
 void __stdcall SetOffscreenSurface(void* surface);
 void* __stdcall AllocSurface(const char* name, int width, int height);
-#include "../network/net_game_453d40.h"
 #include "../network/unit_sync.h"
 #include "../graphics/display.h"
 #include "../graphics/font.h"

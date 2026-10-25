@@ -138,7 +138,6 @@ void __stdcall DrawFrameQuad(void* surface, void* pic, Quad* dst, Quad* src);
 #include "../network/unit_sync.h"
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
-#include "../network/net_game_453d40.h"
 #include "../network/net_stats.h"
 #include "control_panel.h"
 #include "../graphics/particles.h"

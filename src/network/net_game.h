@@ -81,5 +81,7 @@ void __stdcall HandlePing(LatencyPacket* p);
 int __stdcall AssignStartPositions();
 void __stdcall SendLoadProgress();
 void __stdcall HandlePlayerEconomy(PlayerViewStatePacket* packet, Player* player);
+void __stdcall SendLobbySyncRequests();
+int __stdcall HandleNetPackets();
 
 #endif

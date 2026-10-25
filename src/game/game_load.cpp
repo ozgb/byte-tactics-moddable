@@ -194,7 +194,6 @@ void RegisterUnitOrders(void);
 #include "../util/math_4b6c30.h"
 unsigned char __stdcall FindHostSlot();
 #include "settings.h"
-#include "../network/net_game_453d40.h"
 #include "../frontend/skirmish_menu.h"
 #include "game_state.h"
 #include "settings_campaign.h"

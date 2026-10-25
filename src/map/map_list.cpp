@@ -62,7 +62,7 @@ void __stdcall ShowErrorBox(const char* text, const char* caption);
 int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, char* def);
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall SetCursorMode(int n);
-#include "../network/net_game_453d40.h"
+#include "../network/net_game.h"
 
 static inline float GetFloat(TdfRecord* section, const char* key)
 {

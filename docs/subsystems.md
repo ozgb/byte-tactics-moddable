@@ -424,7 +424,7 @@ Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the ma
 
 Coverage: 75.3% of functions (67 of 89), 79.8% of lines, 69.7% of branches; 22 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (22 of 89 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `sensors-sonar-jam` and `orders-tier2-vader` (#426); 67 are entered, 75.3%), by reason:
+**Live functions no scenario enters** (22 of 89 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `sensors-sonar-jam` and `orders-tier2-core` (#426); 67 are entered, 75.3%), by reason:
 
 - Shutdown only (4): `FreeRadar`, `FreeMapResources`, `LosTables::FreeTables` and `LosTables::~LosTables`. `FreeRadar` and `FreeMapResources` are called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick. `FreeTables` has no caller but `FreeLosTables`, which nothing calls, and the destructor is that of the static table, which never runs, because `host_exit` ends the process with `TerminateProcess`.
 - Element destruction of the LOS table vectors (4): `DestroyPoint`, `DestroyLine` and `std::_Destroy` (both overloads). The vector code calls them when it destroys its elements, which only `FreeTables` and the destructor do.

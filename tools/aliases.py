@@ -1294,15 +1294,15 @@ def drop_duplicates(paths: list[Path]) -> dict[str, tuple[Path, list[Path]]]:
     return {name: (paths[winners[name]], [paths[oi] for oi in ois]) for name, ois in losers.items()}
 
 
-def prune_dead(paths: list[Path], aliases: dict[str, str], roots: tuple[str, ...]) -> int:
-    """Mark every COMDAT section no live section reaches as removed from the
-    link, so the references it holds (explicit instantiations of every member
-    of a class, the dynamic initialiser of a global whose initialiser the
-    original does not run) are not reported as unresolved: LINK reports an
-    undefined name even when only dead code uses it. Roots are the sections
-    that are not COMDAT and the names in roots (what the C runtime calls).
-    Returns the number of sections removed."""
-    objs = [read(p.read_bytes()) for p in paths]
+COUNTER_PREFIX = "___profc_"
+PROFILE_SECTIONS = (".lcov", ".lprf")
+
+
+def reachable_sections(objs: list, aliases: dict[str, str], roots: tuple[str, ...],
+                       profile_roots: bool = True) -> tuple[set[tuple[int, int]], list[dict]]:
+    """The (object, section) pairs the link keeps, and each object's symbols by raw index. Roots are the
+    sections that are not COMDAT and the names in roots (what the C runtime calls); the profile-data
+    sections (.lcov, .lprf) are roots only when profile_roots is true, and are never followed."""
     raws = []
     for _, _, syms in objs:
         raw, index = {}, 0
@@ -1343,12 +1343,16 @@ def prune_dead(paths: list[Path], aliases: dict[str, str], roots: tuple[str, ...
         for si, sec in enumerate(secs, start=1):
             if sec.chars & IMAGE_SCN_LNK_REMOVE or sec.name == ".llvm_addrsig":
                 continue
-            if not sec.chars & IMAGE_SCN_LNK_COMDAT or sec.name.startswith((".CRT$", ".tls", ".lcov", ".lprf")):
+            if not profile_roots and sec.name.startswith(PROFILE_SECTIONS):
+                continue
+            if not sec.chars & IMAGE_SCN_LNK_COMDAT or sec.name.startswith((".CRT$", ".tls") + PROFILE_SECTIONS):
                 reach((oi, si))
     for name in roots:
         reach_name(name)
     while work:
         oi, si = work.pop()
+        if not profile_roots and objs[oi][1][si - 1].name.startswith(PROFILE_SECTIONS):
+            continue
         for key in follows.get((oi, si), ()):
             reach(key)
         for name in names_in.get((oi, si), ()):
@@ -1366,6 +1370,18 @@ def prune_dead(paths: list[Path], aliases: dict[str, str], roots: tuple[str, ...
                     fallback = raws[oi].get(struct.unpack_from("<I", sym.aux[0], 0)[0])
                     if fallback is not None and fallback.section > 0:
                         reach((oi, fallback.section))
+    return live, raws
+
+
+def prune_dead(paths: list[Path], aliases: dict[str, str], roots: tuple[str, ...]) -> int:
+    """Mark every COMDAT section no live section reaches as removed from the
+    link, so the references it holds (explicit instantiations of every member
+    of a class, the dynamic initialiser of a global whose initialiser the
+    original does not run) are not reported as unresolved: LINK reports an
+    undefined name even when only dead code uses it.
+    Returns the number of sections removed."""
+    objs = [read(p.read_bytes()) for p in paths]
+    live, raws = reachable_sections(objs, aliases, roots)
     removed = 0
     for oi, path in enumerate(paths):
         chars, secs, syms = objs[oi]
@@ -1397,6 +1413,24 @@ def prune_dead(paths: list[Path], aliases: dict[str, str], roots: tuple[str, ...
     return removed
 
 
+def live_counters(paths: list[Path], aliases: dict[str, str], roots: tuple[str, ...]) -> list[str]:
+    """The profile counters (`___profc_` names, without the prefix) that code the link keeps increments,
+    found without treating the profile data as a root: a function whose own code or inlined copy lives in
+    a section the link keeps has its counter named there."""
+    objs = [read(p.read_bytes()) for p in paths]
+    live, raws = reachable_sections(objs, aliases, roots, profile_roots=False)
+    names = set()
+    for oi, si in live:
+        sec = objs[oi][1][si - 1]
+        if sec.name.startswith(PROFILE_SECTIONS):
+            continue
+        for _, symidx, _ in sec.relocs:
+            sym = raws[oi].get(symidx)
+            if sym is not None and sym.name.startswith(COUNTER_PREFIX):
+                names.add(sym.name[len(COUNTER_PREFIX):])
+    return sorted(names)
+
+
 def response(arg: str) -> list[Path]:
     """The paths in @file (one per line), or the single path arg."""
     if arg.startswith("@"):
@@ -1414,6 +1448,9 @@ def main() -> None:
     ap.add_argument("--patch-dir", type=Path, default=None,
                     help="first copy the objects here with interior globals pointed at their containers, "
                          "and write the copies' paths to DIR/objects.rsp")
+    ap.add_argument("--live-counters", type=Path, default=None, metavar="FILE",
+                    help="with --patch-dir, write the profile counters live code increments, one per line, "
+                         "before dead sections are removed (the coverage build)")
     ap.add_argument("--import-def", type=Path, default=None, metavar="LIB",
                     help="instead write the module-definition file of an old-style import library (its "
                          "__imp_ names), for llvm-dlltool -k; WINMM.LIB is named WIN32.dll, as in GOG's exe; "
@@ -1467,6 +1504,10 @@ def main() -> None:
     if args.patch_dir is not None:
         dropped = drop_duplicates([p for p in objects if p.name != "layout.obj"])
         print(f"aliases: {len(dropped)} names defined in more than one object kept from the first", file=sys.stderr)
+        if args.live_counters is not None:
+            counters = live_counters([p for p in objects if p.name != "layout.obj"], aliases, ("_WinMain@16",))
+            args.live_counters.write_text("".join(c + "\n" for c in counters))
+            print(f"aliases: {len(counters):,} live profile counters written to {args.live_counters}", file=sys.stderr)
         removed = prune_dead([p for p in objects if p.name != "layout.obj"], aliases, ("_WinMain@16",))
         print(f"aliases: {removed:,} sections no live section reaches left out of the link", file=sys.stderr)
 

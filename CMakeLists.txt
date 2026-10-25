@@ -224,11 +224,18 @@ if(BT_DATA_ORDER)
 else()
   set(DATA_ORDER_FLAG --no-data-order)
 endif()
+if(BT_COVERAGE)
+  set(LIVE_COUNTERS_OUTPUT "${CMAKE_BINARY_DIR}/live_counters.txt")
+  set(LIVE_COUNTERS_FLAG --live-counters "${CMAKE_BINARY_DIR}/live_counters.txt")
+else()
+  set(LIVE_COUNTERS_OUTPUT "")
+  set(LIVE_COUNTERS_FLAG "")
+endif()
 add_custom_command(
-  OUTPUT "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/objs/objects.rsp"
+  OUTPUT "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/objs/objects.rsp" ${LIVE_COUNTERS_OUTPUT}
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/aliases.py"
           --objects "@${CMAKE_BINARY_DIR}/alias_objects.rsp" --libs ${SYSTEM_LIBS} ${IMPORT_LIBS} ${ZLIB_OBJECTS}
-          --winmain 0x49e830 ${DATA_ORDER_FLAG} --patch-dir "${CMAKE_BINARY_DIR}/objs" --out "${CMAKE_BINARY_DIR}/aliases.obj"
+          --winmain 0x49e830 ${DATA_ORDER_FLAG} --patch-dir "${CMAKE_BINARY_DIR}/objs" ${LIVE_COUNTERS_FLAG} --out "${CMAKE_BINARY_DIR}/aliases.obj"
   DEPENDS game data extra bitexact ${PROFILE_TARGETS} ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> ${IMPORT_LIBS}
           "${CMAKE_SOURCE_DIR}/tools/aliases.py"
   VERBATIM COMMAND_EXPAND_LISTS)

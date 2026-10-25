@@ -100,5 +100,49 @@ class InitialiserRefsTest(unittest.TestCase):
         self.assertEqual(refs, {"__GLOBAL__sub_I_x.cpp": ["?probe@@3_NB", "_rand"]})
 
 
+COMDAT_CODE = CODE | aliases.IMAGE_SCN_LNK_COMDAT
+DATA = 0xC0400040
+
+
+def coverage_object(tmp: str) -> list[Path]:
+    ext = aliases.IMAGE_SYM_CLASS_EXTERNAL
+    secs = [Section(".text", CODE, b"\xc3", 1, [[0, 1, 0x06]]),
+            Section(".text", COMDAT_CODE, b"\xc3", 1, [[0, 3, 0x06], [0, 4, 0x06]]),
+            Section(".text", COMDAT_CODE, b"\xc3", 1, [[0, 5, 0x06]]),
+            Section(".lprfc$M", DATA, b"\0" * 32, 32),
+            Section(".lprfd$M", DATA, b"\0" * 4, 4, [[0, 2, 0x06]])]
+    syms = [Symbol("_root", 0, 1, 0x20, ext),
+            Symbol("_live", 0, 2, 0x20, ext),
+            Symbol("_orphan", 0, 3, 0x20, ext),
+            Symbol("___profc__live", 0, 4, 0, ext),
+            Symbol("___profc__inlined", 8, 4, 0, ext),
+            Symbol("___profc__orphan", 16, 4, 0, ext)]
+    path = Path(tmp) / "c.obj"
+    aliases.write(0, secs, syms, path)
+    return [path]
+
+
+class LiveCountersTest(unittest.TestCase):
+    def test_counters_of_kept_and_inlined_code_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            counters = aliases.live_counters(coverage_object(tmp), {}, ())
+        self.assertEqual(counters, ["_inlined", "_live"])
+
+    def test_profile_data_is_a_root_only_when_asked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            objs = [aliases.read(p.read_bytes()) for p in coverage_object(tmp)]
+        rooted, _ = aliases.reachable_sections(objs, {}, ())
+        unrooted, _ = aliases.reachable_sections(objs, {}, (), profile_roots=False)
+        self.assertIn((0, 3), rooted)
+        self.assertNotIn((0, 3), unrooted)
+        self.assertNotIn((0, 5), unrooted)
+        self.assertIn((0, 2), unrooted)
+
+    def test_a_named_root_keeps_its_counter(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            counters = aliases.live_counters(coverage_object(tmp), {}, ("_orphan",))
+        self.assertEqual(counters, ["_inlined", "_live", "_orphan"])
+
+
 if __name__ == "__main__":
     unittest.main()

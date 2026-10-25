@@ -43,7 +43,7 @@ How to read a section. **Entry points** are the phase roots the subsystem holds 
 
 Issue #9. 15 functions. `UpdateWind`, `UpdateMeteors`, the meteor parameters and their save and load (`src/map/meteors.cpp`, plus `UpdateWind` in `src/game/game_state.cpp`).
 
-Coverage: 62.5% of functions (10 of 16), 53.8% of lines, 50.0% of branches; 6 functions no scenario enters (data/coverage.csv).
+Coverage: 62.5% of functions (10 of 16), 55.0% of lines, 50.0% of branches; 6 live functions no scenario enters, and 0 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateWind` and `UpdateMeteors`, both called from `RunGameSteps`. `UpdateWind` is also called from `LoadBattleAssets` (game).
 
@@ -89,7 +89,7 @@ Coverage: 62.5% of functions (10 of 16), 53.8% of lines, 50.0% of branches; 6 fu
 
 Issue #11. 38 functions. The resource accounts (`UnitResources`), `UpdatePlayerEconomy`, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`, `UpdateResourceSharing` in `src/network/net_game.cpp`).
 
-Coverage: 41.0% of functions (16 of 39), 53.9% of lines, 32.3% of branches; 23 functions no scenario enters (data/coverage.csv).
+Coverage: 50.0% of functions (16 of 32), 60.4% of lines, 34.7% of branches; 16 live functions no scenario enters, and 7 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateResourceSharing`, called from `RunGameSteps`. The per-tick income step `UpdatePlayerEconomy` is not a root: `UpdatePlayers` (players) calls it, so most of the economy runs inside the players phase.
 
@@ -139,7 +139,7 @@ Coverage: 41.0% of functions (16 of 39), 53.9% of lines, 32.3% of branches; 23 f
 
 Issue #12. 62 functions. `UpdateFeatures` and feature loading, spreading, burning, reclaim and wreckage (`src/map/features*.cpp`).
 
-Coverage: 66.7% of functions (40 of 60), 62.5% of lines, 58.2% of branches; 20 functions no scenario enters (data/coverage.csv).
+Coverage: 75.5% of functions (40 of 53), 68.5% of lines, 59.9% of branches; 13 live functions no scenario enters, and 7 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateFeatures`, called from `RunGameSteps`.
 
@@ -191,7 +191,7 @@ Coverage: 66.7% of functions (40 of 60), 62.5% of lines, 58.2% of branches; 20 f
 
 Issue #13. 160 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
-Coverage: 64.8% of functions (92 of 142), 70.7% of lines, 69.0% of branches; 50 functions no scenario enters (data/coverage.csv).
+Coverage: 87.6% of functions (92 of 105), 87.4% of lines, 79.7% of branches; 13 live functions no scenario enters, and 37 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `UpdatePlayerAI` and `SquadManager::TickIfActive` are called by `UpdatePlayers` (players), so the AI runs inside the players phase.
 
@@ -243,7 +243,7 @@ Coverage: 64.8% of functions (92 of 142), 70.7% of lines, 69.0% of branches; 50 
 
 Issue #14. 59 functions. The search in `src/ai/pathfind*.cpp`: per-player cost tables, the node budget, the open heap and the grid.
 
-Coverage: 77.6% of functions (45 of 58), 81.5% of lines, 76.1% of branches; 13 functions no scenario enters (data/coverage.csv).
+Coverage: 93.8% of functions (45 of 48), 92.4% of lines, 85.4% of branches; 3 live functions no scenario enters, and 10 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `Pathfinder::RunSearches` is called by `UpdatePlayers` (players).
 
@@ -287,7 +287,7 @@ Coverage: 77.6% of functions (45 of 58), 81.5% of lines, 76.1% of branches; 13 f
 
 Issue #15. 118 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
 
-Coverage: 66.7% of functions (72 of 108), 73.0% of lines, 60.1% of branches; 36 functions no scenario enters (data/coverage.csv).
+Coverage: 81.8% of functions (72 of 88), 81.7% of lines, 64.6% of branches; 16 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateProjectiles` and `UpdateExplosions`, called from `RunGameSteps`. `UpdateUnitWeapons` is not a root: `UpdateAllUnits` (units) calls it.
 
@@ -339,7 +339,7 @@ Coverage: 66.7% of functions (72 of 108), 73.0% of lines, 60.1% of branches; 36 
 
 Issue #16. 10 functions. Target choice and the weapon target setters and getters (`FindWeaponTarget`, `FindBestTargetIfFireAtWill`, `SetWeaponTargetUnit`). It is small because the file rules put the order goal objects in orders; see the notes.
 
-Coverage: 90.9% of functions (10 of 11), 89.2% of lines, 64.3% of branches; 1 function no scenario enters (data/coverage.csv).
+Coverage: 100.0% of functions (10 of 10), 96.2% of lines, 69.7% of branches; 0 live functions no scenario enters, and 1 more is dead (data/coverage.csv).
 
 **Entry points.** Phase roots: none. Order handlers (orders) and the AI call it.
 
@@ -388,7 +388,7 @@ none
 
 Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 56.9% of functions (62 of 109), 70.5% of lines, 65.9% of branches; 47 functions no scenario enters (data/coverage.csv).
+Coverage: 69.7% of functions (62 of 89), 77.3% of lines, 67.3% of branches; 27 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `UpdatePlayers` (players) calls `RecalculateLineOfSight`, `UpdateUnitLineOfSight` and `UpdateSensorRadarAndCloak`, so LOS runs inside the players phase.
 
@@ -440,7 +440,7 @@ Coverage: 56.9% of functions (62 of 109), 70.5% of lines, 65.9% of branches; 47 
 
 Issue #18. 468 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`, 14,000 lines). The largest subsystem.
 
-Coverage: 59.2% of functions (237 of 400), 52.9% of lines, 40.2% of branches; 163 functions no scenario enters (data/coverage.csv).
+Coverage: 63.7% of functions (237 of 372), 56.4% of lines, 41.1% of branches; 135 live functions no scenario enters, and 28 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `UpdateAllUnits` (units) calls `RunOrders`; units also call `UnitMotion::UpdateMotion`.
 
@@ -492,11 +492,11 @@ Coverage: 59.2% of functions (237 of 400), 52.9% of lines, 40.2% of branches; 16
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 54.7% of functions (110 of 201), 64.1% of lines, 53.8% of branches; 91 functions no scenario enters (data/coverage.csv).
+**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 65.9% of functions (110 of 167), 69.3% of lines, 58.4% of branches; 57 live functions no scenario enters, and 34 more are dead (data/coverage.csv).
 
-**players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions. Coverage: 29.2% of functions (45 of 154), 29.1% of lines, 20.4% of branches; 109 functions no scenario enters (data/coverage.csv).
+**players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions. Coverage: 31.5% of functions (45 of 143), 30.0% of lines, 21.4% of branches; 98 live functions no scenario enters, and 11 more are dead (data/coverage.csv).
 
-**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 61.8% of functions (68 of 110), 70.8% of lines, 63.1% of branches; 42 functions no scenario enters (data/coverage.csv).
+**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 69.4% of functions (68 of 98), 74.2% of lines, 65.7% of branches; 30 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
 
 **network** (450 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 103 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 86 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (250 in all).
 
@@ -510,7 +510,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 ## Coverage
 
-`data/coverage.csv` is the baseline of how much of each subsystem the 27 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions. Raising it is #405.
+`data/coverage.csv` is the baseline of how much of each subsystem the 27 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions and its dead functions. Raising it is #405.
 
 ```sh
 tools/coverage_runtime.sh                     # fetch the profile runtime sources of compiler-rt
@@ -521,29 +521,31 @@ uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir ~/.ta --chec
 uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir ~/.ta --write   # replace the baseline
 ```
 
-The simulation subsystems are in bold. `state` is the shared state block code (`interfaces/ref.h`, `src/state/`), not a simulation subsystem. A function counts as entered when its execution count is above 0; a line is hit when its count is above 0; each branch condition has a true and a false side, and each side taken at least once is covered. Branches are `-` where the subsystem has none. The function counts are the compiler's: they include inline and compiler-generated functions, so they differ from the counts above (`orders` has 400 here and 468 there).
+The simulation subsystems are in bold. `state` is the shared state block code (`interfaces/ref.h`, `src/state/`), not a simulation subsystem. A function counts as entered when its execution count is above 0; a line is hit when its count is above 0; each branch condition has a true and a false side, and each side taken at least once is covered. Branches are `-` where the subsystem has none. The function counts are the compiler's: they include inline and compiler-generated functions, so they differ from the counts above (`orders` has 372 here and 468 there).
 
-| subsystem | functions entered | functions | lines | branches | never entered |
-|---|---|---|---|---|---|
-| **wind_meteors** | 10 of 16 | 62.5% | 55.0% | 50.0% | 6 |
-| **economy** | 16 of 39 | 41.0% | 54.6% | 32.3% | 23 |
-| **features** | 40 of 60 | 66.7% | 65.9% | 58.2% | 20 |
-| **ai** | 92 of 142 | 64.8% | 71.3% | 69.0% | 50 |
-| **pathfinding** | 45 of 58 | 77.6% | 82.7% | 76.1% | 13 |
-| **weapons** | 72 of 108 | 66.7% | 75.3% | 60.1% | 36 |
-| **targeting** | 10 of 11 | 90.9% | 90.6% | 64.6% | 1 |
-| **los_radar** | 62 of 109 | 56.9% | 72.9% | 65.7% | 47 |
-| **orders** | 237 of 400 | 59.2% | 55.0% | 40.2% | 163 |
-| **units** | 110 of 201 | 54.7% | 64.1% | 53.8% | 91 |
-| **players** | 45 of 154 | 29.2% | 29.1% | 20.4% | 109 |
-| **map** | 68 of 110 | 61.8% | 70.8% | 63.1% | 42 |
-| files | 60 of 178 | 33.7% | 31.4% | 27.1% | 118 |
-| game | 73 of 208 | 35.1% | 33.9% | 19.7% | 135 |
-| network | 40 of 414 | 9.7% | 6.4% | 1.9% | 374 |
-| platform | 307 of 728 | 42.2% | 32.0% | 21.3% | 421 |
-| presentation | 440 of 1472 | 29.9% | 26.6% | 18.8% | 1032 |
-| seams | 64 of 103 | 62.1% | 81.7% | - | 39 |
-| state | 309 of 408 | 75.7% | 74.9% | 48.7% | 99 |
+A dead function is one that 3.1c's code cannot reach: the modern link drops it, and no function the link keeps has it inlined. The coverage link keeps every function, because the profile data names each one, so `tools/aliases.py` walks the sections again without the profile data as a root and writes `live_counters.txt` beside the exe; a function that was not entered and whose profile counter is not in that file is dead. A function inlined into a kept function is live, though it has no symbol of its own. Dead functions have their own rows in `data/coverage.csv` (`dead` 1) and are left out of the function, line and branch counts and out of the never-entered column; the dead column gives their number. A static function's profile counter is named by the file's basename and the function (`file.cpp_<name>`), and `display.cpp`, `settings.cpp` and `sound.cpp` each occur twice in the tree, so a static with the same decorated name in both files of such a pair would share a counter name and a dead one could read as live; the baseline shows no such case.
+
+| subsystem | functions entered | functions | lines | branches | never entered | dead |
+|---|---|---|---|---|---|---|
+| **wind_meteors** | 10 of 16 | 62.5% | 55.0% | 50.0% | 6 | 0 |
+| **economy** | 16 of 32 | 50.0% | 60.4% | 34.7% | 16 | 7 |
+| **features** | 40 of 53 | 75.5% | 68.5% | 59.9% | 13 | 7 |
+| **ai** | 92 of 105 | 87.6% | 87.4% | 79.7% | 13 | 37 |
+| **pathfinding** | 45 of 48 | 93.8% | 92.4% | 85.4% | 3 | 10 |
+| **weapons** | 72 of 88 | 81.8% | 81.7% | 64.6% | 16 | 20 |
+| **targeting** | 10 of 10 | 100.0% | 96.2% | 69.7% | 0 | 1 |
+| **los_radar** | 62 of 89 | 69.7% | 77.3% | 67.3% | 27 | 20 |
+| **orders** | 237 of 372 | 63.7% | 56.4% | 41.1% | 135 | 28 |
+| **units** | 110 of 167 | 65.9% | 69.3% | 58.4% | 57 | 34 |
+| **players** | 45 of 143 | 31.5% | 30.0% | 21.4% | 98 | 11 |
+| **map** | 68 of 98 | 69.4% | 74.2% | 65.7% | 30 | 12 |
+| files | 60 of 142 | 42.3% | 39.8% | 33.9% | 82 | 36 |
+| game | 73 of 183 | 39.9% | 35.4% | 20.5% | 110 | 25 |
+| network | 40 of 333 | 12.0% | 7.1% | 2.1% | 293 | 81 |
+| platform | 307 of 646 | 47.5% | 34.0% | 22.2% | 339 | 82 |
+| presentation | 440 of 1143 | 38.5% | 30.1% | 20.9% | 703 | 329 |
+| seams | 64 of 103 | 62.1% | 81.7% | - | 39 | 0 |
+| state | 309 of 386 | 80.1% | 78.2% | 49.3% | 77 | 22 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
 

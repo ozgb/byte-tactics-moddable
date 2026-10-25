@@ -1664,7 +1664,7 @@ void __stdcall EmitJitteredThrustParticles(Shape_00472ab0* pos, short index)
 }
 
 // FUNCTION: 0x470c10
-int ObjectPool::Grow(int newCapacity, int newSlotSize)
+__declspec(noinline) int ObjectPool::Grow(int newCapacity, int newSlotSize)
 {
     int result = 0;
     if (newCapacity > capacity) {

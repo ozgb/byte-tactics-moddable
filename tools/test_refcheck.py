@@ -218,6 +218,17 @@ class ClangTest(unittest.TestCase):
         self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "#350")
         self.assertEqual(len(out), 4)
 
+    def test_outside_rows_fail_when_the_game_holder_is_gone(self):
+        data = self.root / "data"
+        data.mkdir(exist_ok=True)
+        header = "holder,offsets,target,scenarios,ticks,target_offsets,class,note\n"
+        (data / "block_pointers.csv").write_text(
+            header + 'CreateGame,0x4,T,1,1,-,outside,"Game.view"\nCreateGameObject,0x14,T,1,1,-,not-a-pointer,skip\n')
+        with self.assertRaises(SystemExit) as cm:
+            rc.outside_rows(self.root, {"Game": rc.Locator(self.scan)}, {})
+        self.assertIn("no outside rows for the Game holder CreateGameObject", str(cm.exception))
+        self.assertEqual([r["holder"] for r in rc.outside_rows(self.root, {}, {})], ["CreateGame"])
+
 
 def make_result(found, outside=()):
     return rc.Result(set(), [], found, list(outside), [], 0, [], {}, {})

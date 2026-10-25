@@ -663,6 +663,9 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
     """The rows of data/outside_pointers.csv from the `outside` rows of data/block_pointers.csv."""
     with (root / BLOCK_POINTERS).open(newline="") as f:
         source = [r for r in csv.DictReader(f) if r["class"] == "outside" and r["offsets"] != "*"]
+    if GAME in locators and not any(r["holder"].split(": ")[-1] == HOLDERS[GAME] for r in source):
+        sys.exit("refcheck: %s has no outside rows for the Game holder %s: it was renamed, set HOLDERS in "
+                 "tools/refcheck.py to its new name" % (BLOCK_POINTERS, HOLDERS[GAME]))
     rows: dict[tuple, dict] = {}
 
     def add(struct, name, holder, token, words, issue, kind, note):

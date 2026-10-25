@@ -299,7 +299,7 @@ game,ShutdownGame,src/game/game_state.cpp,1,0,0,0,0,0,?ShutdownGame@@YGXXZ,0,shu
 game,ShutdownIngameAndQuit,src/game/game_state.cpp,1,0,0,0,0,0,?ShutdownIngameAndQuit@@YGXXZ,0,shutdown
 game,ShutdownIngameSystems,src/game/game_state.cpp,1,0,0,0,0,0,?ShutdownIngameSystems@@YGXXZ,0,shutdown
 game,SimBlockAttach,src/state/block.cpp,0,0,0,0,0,0,?SimBlockAttach@@YAXPAX@Z,1,
-game,SimBlockForEach,src/state/block.cpp,1,0,0,0,0,0,?SimBlockForEach@@YAXP6AXPAXI0@Z0@Z,0,command-line
+game,SimBlockForEach,src/state/block.cpp,1,0,0,0,0,0,?SimBlockForEach@@YAXP6AXPAXI0@Z0@Z,0,test-only
 game,SimBlockInit,src/state/block.cpp,0,0,0,0,0,0,?SimBlockInit@@YAXXZ,1,
 game,SimBlockReset,src/state/block.cpp,0,0,0,0,0,0,?SimBlockReset@@YAXXZ,1,
 game,SimHighWater,src/state/block.cpp,0,0,0,0,0,0,?SimHighWater@@YAIXZ,1,

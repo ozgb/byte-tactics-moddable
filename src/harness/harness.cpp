@@ -2520,7 +2520,6 @@ enum {
 void __stdcall IssueOrderToSelection(void* mouse, int mode, int kind, int* pos, int typeId, int amount);
 void __stdcall IssueMobileBuildOrders(void* mouse);
 struct Unit;
-#include "../orders/mission_type.h"
 void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
 int __stdcall FindOrderByType(int unit, MissionType kind);
 void __stdcall DeleteOrder(int unit, int arg);
@@ -2655,7 +2654,7 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
                 QueueBuildOrder((char*)o->buildType, (Unit*)u, o->argument);
         }
     } else if (o->kind == ORDER_SELFDESTRUCT) {
-        MissionType order(s_orderModes[o->kind].mission);
+        MissionType order((char*)s_orderModes[o->kind].mission);
         int found = 0;
         for (i = 0; i < count; i++) {
             unsigned char* u = PoolUnit(i);
@@ -2674,9 +2673,9 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
         if (o->kind == ORDER_CLOAK && !o->argument)
             mission = "CLOAK_OFF";
         if (o->kind == ORDER_ACTIVATE || o->kind == ORDER_DEACTIVATE || o->kind == ORDER_STOP || o->kind == ORDER_CLOAK)
-            IssueOrderToSelection(GameAt(0x2c76), 0, MissionType(mission).index, s_noPosition, 0, 0);
+            IssueOrderToSelection(GameAt(0x2c76), 0, MissionType((char*)mission).index, s_noPosition, 0, 0);
         else
-            IssueOrderToSelection(GameAt(0x2c76), 0, MissionType(mission).index, s_noPosition, o->argument, 0);
+            IssueOrderToSelection(GameAt(0x2c76), 0, MissionType((char*)mission).index, s_noPosition, o->argument, 0);
     } else if (o->kind == ORDER_BUILD) {
         *(unsigned short*)GameAt(GAME_BUILD_TYPE) = (unsigned short)buildType;
         if (!UpdatePlacementGhostValidity()) {

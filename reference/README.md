@@ -60,6 +60,7 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `quirks_tamper` | none | Test only: flips a quirk flag at this tick, so the freeze check exits 2 (see Quirk flags) |
 | `quirks_reach` | none | Test only: `<tick> <flag name>`, at that tick makes the game reach the guard of `units.ignore-null-death-record`, `ai.patrol-null-enemy-skip` or `units.skip-empty-yardmap` (see Quirk flags) |
 | `save` | none | Saves the game with `SaveGameFile` to `savegame\harness.sav` in the run's game directory after the step of this tick, 1 to `ticks`; one line only |
+| `game_type` | 2 | 2: skirmish, 3: multiplayer without a network; one line only (see Game types). Type 1, a campaign mission, needs the `campaign` key and comes with #444 |
 | `map` | required | Map name, the rest of the line (names have spaces) |
 | `difficulty` | 1 | AI difficulty 0 to 2, one value for all computer players |
 | `commander_death` | 1 | 1: the game ends when a commander dies |
@@ -78,6 +79,37 @@ Defaults are the ones in `LoadSettings`, never the registry.
 `player<N>.*` keys take N from 0 to 9. A slot exists when any key names it,
 slots no key names are open, and at least 2 slots must exist. The game's player
 count is the highest named slot plus one.
+
+## Game types
+
+`game_type` is the number the game keeps as `Mission::type`. With 2, the default,
+a scenario is a skirmish and nothing below applies.
+
+**Game type 1**, a mission of a campaign, is not accepted yet: it needs the `campaign` key, which comes with #444.
+
+**Game type 3** runs the multiplayer rules without a network: the harness fills in
+the lobby state the exe expects (every named slot is a connected player, the
+local slot is the host, `player<N>.team` makes the alliances and both sides of
+each alliance agree to it) and starts the loading screen itself, so the lobby is
+skipped. `commander_death`, `mapping`, `line_of_sight`, `los_type`, `start_positions`
+and the `metal` and `energy` of the local slot (which sets every player's start) come
+from the scenario as in a skirmish.
+
+## Game over
+
+A run ends at its last tick, or earlier at game over. When 3.1c sets
+`endGameFlags` to 4 or 0x10 (a victory or defeat after its countdown, a
+commander's death, the last enemy gone) the harness ends the run at the end of
+that tick's step, as at the last tick: it closes `trace.txt`, writes the block
+scan, logs `testmode: game over at tick <n>` and exits 0. `ticks` stays the
+upper bound. The trace holds no marker: it is shorter than `ticks`, and a build
+that ends the game on another tick differs from the reference in length, which
+the comparison reports as a divergence at the first missing row.
+
+The run ends before 3.1c's own frame code sees the flag, which would shut the
+game's systems down and switch to the end-of-game screen. That way every tick that
+ran is traced, and the run never reaches the statistics screen (the
+presentation, not game logic).
 
 ## Quirk flags
 
@@ -248,6 +280,8 @@ seeds) and runs deterministically: two runs give identical traces.
 
 | Name | Map | Players | Ticks | Covers |
 | --- | --- | ---: | ---: | --- |
+| allied-victory | Metal Heck | 4 | 2400 | Game type 3: players 0 and 1 allied against players 2 and 3, whose commanders self-destruct, so allied victory ends the run early |
+| commander-death | The Pass | 2 | 1800 | The human Arm commander self-destructs, so commander death ends the run about 150 ticks later |
 | duel-coast-to-coast | Coast To Coast | 2 | 5400 | Two Core players on Coast To Coast, three minutes, difficulty 2 |
 | duel-great-divide | Great Divide | 2 | 3600 | Two Arm players on Great Divide, random start positions, two minutes |
 | duel-pass-dark | The Pass | 2 | 2700 | Two players on The Pass with the map unmapped and line of sight off, ninety seconds |

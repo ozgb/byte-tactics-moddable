@@ -43,7 +43,13 @@ How to read a section. **Entry points** are the phase roots the subsystem holds 
 
 Issue #9. 15 functions. `UpdateWind`, `UpdateMeteors`, the meteor parameters and their save and load (`src/map/meteors.cpp`, plus `UpdateWind` in `src/game/game_state.cpp`).
 
-Coverage: 62.5% of functions (10 of 16), 55.0% of lines, 50.0% of branches; 6 live functions no scenario enters, and 0 more are dead (data/coverage.csv).
+Coverage: 68.8% of functions (11 of 16), 69.8% of lines, 63.2% of branches; 5 live functions no scenario enters, and 0 more are dead (data/coverage.csv).
+
+**Live functions no scenario enters** (5 of 16 after `combat-deaths`, `units-transport`, `meteors-earthquake` and `meteors-hailstorm`, #419; 11 are entered, 68.8%), by reason:
+
+- Console command only (2): `CmdMeteor` and `StartMeteorShower` (only `CmdMeteor` calls it; the scenario file has no console key).
+- Save and load only (2): `LoadMeteors`, `SaveMeteors`.
+- Shutdown only (1): `EmptyShutdownPreCleanup`.
 
 **Entry points.** Phase roots: `UpdateWind` and `UpdateMeteors`, both called from `RunGameSteps`. `UpdateWind` is also called from `LoadBattleAssets` (game).
 
@@ -139,7 +145,15 @@ Coverage: 50.0% of functions (16 of 32), 60.4% of lines, 34.7% of branches; 16 l
 
 Issue #12. 62 functions. `UpdateFeatures` and feature loading, spreading, burning, reclaim and wreckage (`src/map/features*.cpp`).
 
-Coverage: 75.5% of functions (40 of 53), 68.5% of lines, 59.9% of branches; 13 live functions no scenario enters, and 7 more are dead (data/coverage.csv).
+Coverage: 75.5% of functions (40 of 53), 68.5% of lines, 60.3% of branches; 13 live functions no scenario enters, and 7 more are dead (data/coverage.csv).
+
+**Live functions no scenario enters** (13 of 53 after `combat-deaths`, `units-transport`, `meteors-earthquake` and `meteors-hailstorm`, #419; 40 are entered, 75.5%), by reason:
+
+- Console command only (5): `CmdBurnAll`, `CmdBurnOne`, `CmdFeature`, `FindFeatureType`, `RemoveAllFeatures`.
+- Save and load only (5): `SaveFeatures`, `LoadFeatures`, and the statics only `LoadFeatures` calls: `FeatureIndex`, `FindName`, `FreeFeatureList` (all in `features_424c00.cpp`).
+- Shutdown only (1): `FreeFeaturePool` (called from the line-of-sight teardown).
+- Cursor only (1): `GetFeature` (the static in `unit_scripts.cpp`, used by the reclaim checks of `GetOrderCursor`, which no scenario enters).
+- Needs a case the scenarios do not set up (1): `FeatureVec3` (its one call site zeroes the velocity of a debris spot when it lands, `features.cpp:1054`).
 
 **Entry points.** Phase roots: `UpdateFeatures`, called from `RunGameSteps`.
 
@@ -287,7 +301,7 @@ Coverage: 93.8% of functions (45 of 48), 92.4% of lines, 85.4% of branches; 3 li
 
 Issue #15. 118 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
 
-Coverage: 81.8% of functions (72 of 88), 81.7% of lines, 64.6% of branches; 16 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
+Coverage: 83.0% of functions (73 of 88), 83.0% of lines, 66.8% of branches; 15 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateProjectiles` and `UpdateExplosions`, called from `RunGameSteps`. `UpdateUnitWeapons` is not a root: `UpdateAllUnits` (units) calls it.
 
@@ -502,7 +516,19 @@ Coverage: 71.8% of functions (267 of 372), 63.6% of lines, 48.4% of branches; 10
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 65.9% of functions (110 of 167), 69.3% of lines, 58.4% of branches; 57 live functions no scenario enters, and 34 more are dead (data/coverage.csv).
+**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 68.9% of functions (115 of 167), 73.2% of lines, 61.8% of branches; 52 live functions no scenario enters, and 34 more are dead (data/coverage.csv). The list of those 52 is under **units, functions no scenario enters** below.
+
+**units, functions no scenario enters** (52 of 167 after `combat-deaths`, `units-transport`, `meteors-earthquake` and `meteors-hailstorm`, #419; 115 are entered, 68.9%), by reason:
+
+- Base-class slots of `CobScript` that `UnitScript` overrides (11): `CobScript::AttachUnit`, `CobScript::DropUnit`, `CobScript::EmitSfx`, `CobScript::GetTransporterId`, `CobScript::GetUnitValue`, `CobScript::IsCarryingUnit`, `CobScript::IsPieceCached`, `CobScript::IsPieceShaded`, `CobScript::IsPieceVisible`, `CobScript::PlaySoundNoop`, `CobScript::SetUnitValue`. Every unit's script is a `UnitScript`, so the base bodies are never called.
+- COB opcodes that no script of the game data uses (4): `UnitScript::IsCarryingUnit`, `UnitScript::GetTransporterId`, `UnitScript::PlaySoundNoop`, `Channel::XorOp`. No unit can reach them.
+- Save and load only (9): `SaveUnits`, `LoadUnits`, `LoadUnit`, `Elem_00487af0` (a sort helper of the save), `CobScript::SaveScriptState`, `CobScript::LoadScriptState`, and `UnitScript::IsPieceCached`, `UnitScript::IsPieceShaded`, `UnitScript::IsPieceVisible` (called only from `SaveScriptState`).
+- Network only (6): `SendUnitStates`, `WriteUnitState`, `ReceiveUnitStates`, `ReadUnitState`, `CheckMapCrc` (multiplayer map check), `FindUnusedLogo` (multiplayer lobby).
+- Shutdown only (8): `FreeUnitMemory`, `FreeUnitTypes`, `FreeUnitInfo`, `FreeUnitCategories`, `FreeDownloadMenus`, `FreeMovementClasses` and the two statics only it calls, `FreeA` and `FreeC`.
+- Console command only (4): `KillAllUnits`, `KillUnitsOfType`, `ReloadUnitType`, `Selectable` (the console table entry; the orders path has its own static).
+- Unit info dialog only (2): `MakePropList` and its static `spd`.
+- Campaign mission load and script only (7): `FindUnitType`, `Less_00488a50` (its binary-search comparator) and `vector::vector`, `vector::~vector`, `vector::operator?A` (the `std::vector<Unit*>` of `CreateMissionUnits`), which are all used by `CreateMissionUnits`; `FindMissionUnit` (the `G` and similar verbs of `RunInitialMission`); and `MissionSlot::MissionSlot` (the locals of `RunInitialMission`). Neither `CreateMissionUnits` nor `RunInitialMission` is entered.
+- Slot no code calls (1): `AimCobStub`, slot 1 of `g_weaponAimCobVtable`. It returns 0; not explained further.
 
 **players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions. Coverage: 31.5% of functions (45 of 143), 30.0% of lines, 21.4% of branches; 98 live functions no scenario enters, and 11 more are dead (data/coverage.csv).
 
@@ -520,7 +546,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 ## Coverage
 
-`data/coverage.csv` is the baseline of how much of each subsystem the 30 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions and its dead functions. Raising it is #405.
+`data/coverage.csv` is the baseline of how much of each subsystem the 34 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions and its dead functions. Raising it is #405.
 
 ```sh
 tools/coverage_runtime.sh                     # fetch the profile runtime sources of compiler-rt
@@ -537,16 +563,16 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 
 | subsystem | functions entered | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
-| **wind_meteors** | 10 of 16 | 62.5% | 55.0% | 50.0% | 6 | 0 |
+| **wind_meteors** | 11 of 16 | 68.8% | 69.8% | 63.2% | 5 | 0 |
 | **economy** | 16 of 32 | 50.0% | 60.9% | 35.6% | 16 | 7 |
-| **features** | 40 of 53 | 75.5% | 68.5% | 59.9% | 13 | 7 |
+| **features** | 40 of 53 | 75.5% | 68.5% | 60.3% | 13 | 7 |
 | **ai** | 93 of 105 | 88.6% | 87.5% | 79.9% | 12 | 37 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 85.4% | 3 | 10 |
-| **weapons** | 72 of 88 | 81.8% | 81.7% | 64.6% | 16 | 20 |
+| **weapons** | 73 of 88 | 83.0% | 83.0% | 66.8% | 15 | 20 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 71.1% | 0 | 1 |
 | **los_radar** | 62 of 89 | 69.7% | 77.3% | 67.3% | 27 | 20 |
 | **orders** | 267 of 372 | 71.8% | 63.6% | 48.4% | 105 | 28 |
-| **units** | 112 of 167 | 67.1% | 70.3% | 59.2% | 55 | 34 |
+| **units** | 115 of 167 | 68.9% | 73.2% | 61.8% | 52 | 34 |
 | **players** | 45 of 143 | 31.5% | 30.0% | 21.4% | 98 | 11 |
 | **map** | 68 of 98 | 69.4% | 74.2% | 65.9% | 30 | 12 |
 | files | 60 of 142 | 42.3% | 39.8% | 33.9% | 82 | 36 |

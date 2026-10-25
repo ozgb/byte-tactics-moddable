@@ -25,6 +25,8 @@ void ApplySlotsToGamePlayers();
 void InitMissionStatus();
 char IsMemSet();
 int GetMemSetValue();
+void __stdcall MakeDirectoryPath(char* path);
+int __stdcall SaveGameFile(char* path, char* description, int gameId);
 
 enum { MAX_PLAYERS = 10 };
 
@@ -57,6 +59,8 @@ static unsigned s_fixedLocations = 1;
 static int s_localPlayer = -1;
 static int s_localPlayerLine = 0;
 static unsigned s_ticks = 0;
+static unsigned s_saveTick = 0;
+static int s_saveLine = 0;
 static int s_started = 0;
 static int s_dumpEnabled = 0;
 static char s_scenarioPath[512];
@@ -407,6 +411,13 @@ static void ReadKey(int lineNo, const char* key, char* value)
         s_ticks = ParseNumber(lineNo, key, value);
         if (s_ticks == 0)
             FailLine(lineNo, "must be at least 1", key, "");
+    } else if (strcmp(key, "save") == 0) {
+        if (s_saveLine != 0)
+            FailLine(lineNo, "is a second save line", key, "");
+        s_saveTick = ParseNumber(lineNo, key, value);
+        if (s_saveTick == 0)
+            FailLine(lineNo, "needs a tick of at least 1", key, "");
+        s_saveLine = lineNo;
     } else if (strcmp(key, "order") == 0)
         ReadOrder(lineNo, value);
     else if (strncmp(key, "player", 6) == 0 && isdigit((unsigned char)key[6]) && key[7] == '.')
@@ -427,6 +438,8 @@ static void CheckScenario()
     if (s_map[0] == '\0')
         Fail("testmode: scenario needs a map line\n");
     CheckOrders();
+    if (s_saveLine != 0 && s_saveTick > s_ticks)
+        FailLine(s_saveLine, "has a tick after the last tick", "save", "");
     if (s_localPlayer >= 0 && !s_players[s_localPlayer].named) {
         char msg[128];
         sprintf(msg, "testmode: scenario line %d: local_player %d is not a player the scenario names\n",
@@ -690,6 +703,13 @@ void HarnessStartSkirmish()
 
 void HarnessAfterStep()
 {
+    if (s_testMode && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
+        char directory[] = "savegame";
+        char path[] = "savegame\\harness.sav";
+        char description[] = "Harness save";
+        MakeDirectoryPath(directory);
+        SaveGameFile(path, description, 0x29a);
+    }
     if (!s_testMode || (unsigned)g_game->ticks < s_ticks)
         return;
     char msg[64];

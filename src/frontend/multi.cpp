@@ -3090,7 +3090,7 @@ inline int FindUnusedLogo()
     return result;
 }
 
-int CheckMapCrc_00447b10()
+int LobbyMapCrcMatches()
 {
     if (!g_game->net->GetTerrainLength()) {
         return 0;
@@ -3259,7 +3259,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
         sprintf(text, "READY%d", i);
         if (IsCurrentGadgetNamed((Dialog *)gadget, text) && IsLocalHuman_00447b10(p)) {
             PlaySoundByName("Multi", 0);
-            if (CheckMapCrc_00447b10()) {
+            if (LobbyMapCrcMatches()) {
                 p->info->bit5 = GetGadgetStatus(&g_game->gui, FindGadgetIndex(entries, text, 1));
                 if (p->info->host) {
                     strcpy(entries->label, "START");
@@ -3479,29 +3479,6 @@ static inline int IsLocal_00448c70(Player* p)
     return p->active != 0 && (p->type == 1 || p->type == 2);
 }
 
-int CheckMapCrc_00448c70()
-{
-    if (!g_game->net->GetTerrainLength()) {
-        return 0;
-    }
-    unsigned char me = FindHostSlot();
-    PlayerInfo* data = 0;
-    int check = 0;
-    if (me != 10) {
-        data = g_game->players[me].info;
-        if (data->versionMajor >= 2)
-            check = 1;
-        else if (data->versionMajor == 1 && data->versionMinor >= 2)
-            check = 1;
-    }
-    if (!check) {
-        return 1;
-    }
-    if (g_game->net->ComputeMapChecksum() != data->mapCrc)
-        return 0;
-    return 1;
-}
-
 void __stdcall UpdateSideGadget_00448c70(int side)
 {
     char name[20];
@@ -3560,7 +3537,7 @@ void RefreshBattleRoomRows()
             else
                 g_game->net->LoadMissionByName(map);
         }
-        if (!CheckMapCrc_00448c70()) {
+        if (!LobbyMapCrcMatches()) {
             mapname->colour = ((int)GetTicks() / 30 & 1) ? 0xc : 0;
             if (differs) {
                 SendChatMessage(me, Translate("does not have this map"), 4, 0);
@@ -4722,7 +4699,7 @@ void UpdateBattleRoom()
 
     if (HandleNetPackets())
         g_game->bits_2bee_1.dirty = 1;
-    else if (!CheckMapCrc_00447b10())
+    else if (!LobbyMapCrcMatches())
         g_game->bits_2bee_1.dirty = 1;
 
     pl = &g_game->players[g_game->localPlayer];

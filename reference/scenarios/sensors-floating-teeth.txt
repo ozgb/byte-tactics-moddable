@@ -1,4 +1,4 @@
-# Human Arm commander on Hundred Isles has a spawned floating dragon's teeth on the water in its camera view, which turns into its feature at once (isfeature) and is drawn by BlitFeatureGaf; 400 ticks.
+# Human Arm commander on Hundred Isles has dragon's teeth owned by the AI player in its camera view, so the feature draw takes the IsFootprintVisible path (IsExplored with line of sight on); 400 ticks.
 game_seed 422
 crt_seed 1422
 view_seed 2422
@@ -14,3 +14,6 @@ player0.energy 60000
 player1.controller ai
 player1.side Core
 spawn 10 0 ARMFDRAG 612 2292
+spawn 10 1 ARMFDRAG 712 2292
+spawn 10 1 ARMDRAG 512 2342
+spawn 10 1 ARMDRAG 662 2192

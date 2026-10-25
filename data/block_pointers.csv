@@ -892,6 +892,7 @@ EnsurePatrolReturnOrder,0x2a,ThrustParticles::Emit,1,35,0x15-0xc5,not-a-pointer,
 FollowGroundOrder,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 FollowGroundOrder,0x3,HAPI_LoadFile,1,96,0x8c18,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 FollowGroundOrder,0x40,LoadSoundCategories #2,1,100,0x40,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
+FollowGroundOrder #2,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 InitFeatureAnimPool: FEATURE ANIM DATA,*,*,0,0,-,not-a-pointer,words of ??$copy@PAGPAG@std@@YGPAGPAG00@Z: FEATURE ANIM DATA that only look like addresses
 InitFeatureAnimPool: FEATURE ANIM DATA,*,*,0,0,-,outside,"the 2 outside pair rows of ??$copy@PAGPAG@std@@YGPAGPAG00@Z: FEATURE ANIM DATA, which follow"
 InitFeatureAnimPool: FEATURE ANIM DATA,0x6660,?_Insert@?$_Tree@HU?$pair@$$CBHH@std@@U_Kfn@?$map@HHU?$less@H@std@@V?$allocator@H@2@@2@U?$less@H@2@V?$allocator@H@2@@std@@IAE?AViterator@12@PAU_Node@12@0ABU?$pair@$$CBHH@2@@Z,2,14400,0x3,not-a-pointer,"FeatureAnim (0x30) words other than state (0x4) and src (0xc): next and prev links, flags and counters that only look like addresses, and words that straddle fields"

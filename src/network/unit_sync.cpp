@@ -1144,16 +1144,6 @@ SyncChecksumVector::~SyncChecksumVector()
 }
 #pragma auto_inline(on)
 
-typedef std::vector<Elem_0046faf0> Vec_0046e870;
-typedef void (Vec_0046e870::*DestroyFn_0046e870)(Vec_0046e870::iterator, Vec_0046e870::iterator);
-
-struct Access_0046e870 : Vec_0046e870 {
-    static DestroyFn_0046e870 fn;
-};
-
-// FUNCTION: 0x46e870 ?_Destroy@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEXPAUElem_0046faf0@@0@Z
-DestroyFn_0046e870 Access_0046e870::fn = &Access_0046e870::_Destroy;
-
 // FUNCTION: 0x46e880
 int* UnitSyncMap::Begin(int* param_1)
 {
@@ -1312,16 +1302,6 @@ struct SyncPlayerRecord {
     SyncPlayerRecord& operator=(const SyncPlayerRecord& src);
 };
 
-typedef std::vector<SyncPlayerRecord> Vec_0046eaa0;
-typedef void (Vec_0046eaa0::*DestroyFn_0046eaa0)(Vec_0046eaa0::iterator, Vec_0046eaa0::iterator);
-
-struct Access_0046eaa0 : Vec_0046eaa0 {
-    static DestroyFn_0046eaa0 fn;
-};
-
-// FUNCTION: 0x46eaa0 ?_Destroy@?$vector@USyncPlayerRecord@@V?$allocator@USyncPlayerRecord@@@std@@@std@@IAEXPAUSyncPlayerRecord@@0@Z
-DestroyFn_0046eaa0 Access_0046eaa0::fn = &Access_0046eaa0::_Destroy;
-
 typedef std::list<int> List_0046eb60;
 typedef List_0046eb60::iterator (List_0046eb60::*EraseFn_0046eb60)(List_0046eb60::iterator);
 
@@ -1364,25 +1344,6 @@ InsertResult::InsertResult(Node_0046fad0* const& f, const bool& s)
 }
 
 typedef std::vector<Elem_0046faf0> Vec_0046faf0;
-typedef Vec_0046faf0::iterator (Vec_0046faf0::*UcopyFn_0046faf0)(
-    Vec_0046faf0::const_iterator, Vec_0046faf0::const_iterator, Vec_0046faf0::iterator);
-
-struct Access_0046faf0 : Vec_0046faf0 {
-    static UcopyFn_0046faf0 fn;
-};
-
-// FUNCTION: 0x46faf0 ?_Ucopy@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEPAUElem_0046faf0@@PBU3@0PAU3@@Z
-UcopyFn_0046faf0 Access_0046faf0::fn = &Access_0046faf0::_Ucopy;
-
-typedef void (Vec_0046faf0::*UfillFn_0046faf0)(
-    Vec_0046faf0::iterator, Vec_0046faf0::size_type, const Elem_0046faf0&);
-
-struct Access_0046fb40 : Vec_0046faf0 {
-    static UfillFn_0046faf0 fn;
-};
-
-// FUNCTION: 0x46fb40 ?_Ufill@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEXPAUElem_0046faf0@@IABU3@@Z
-UfillFn_0046faf0 Access_0046fb40::fn = &Access_0046fb40::_Ufill;
 
 #pragma auto_inline(off)
 // FUNCTION: 0x46fe60
@@ -1399,27 +1360,6 @@ UnitSyncNode* UnitSyncMap::LowerBound(const unsigned int* key)
     return y;
 }
 #pragma auto_inline(on)
-
-typedef std::vector<Elem_004702a0> Vec_00470290;
-typedef void (Vec_00470290::*DestroyFn_00470290)(Vec_00470290::iterator, Vec_00470290::iterator);
-
-struct Access_00470290 : Vec_00470290 {
-    static DestroyFn_00470290 fn;
-};
-
-// FUNCTION: 0x470290 ?_Destroy@?$vector@UElem_004702a0@@V?$allocator@UElem_004702a0@@@std@@@std@@IAEXPAUElem_004702a0@@0@Z
-DestroyFn_00470290 Access_00470290::fn = &Access_00470290::_Destroy;
-
-typedef std::vector<Elem_004702a0> Vec_004702a0;
-typedef Vec_004702a0::iterator (Vec_004702a0::*UcopyFn_004702a0)(
-    Vec_004702a0::const_iterator, Vec_004702a0::const_iterator, Vec_004702a0::iterator);
-
-struct Access_004702a0 : Vec_004702a0 {
-    static UcopyFn_004702a0 fn;
-};
-
-// FUNCTION: 0x4702a0 ?_Ucopy@?$vector@UElem_004702a0@@V?$allocator@UElem_004702a0@@@std@@@std@@IAEPAUElem_004702a0@@PBU3@0PAU3@@Z
-UcopyFn_004702a0 Access_004702a0::fn = &Access_004702a0::_Ucopy;
 
 // FUNCTION: 0x470030
 void __stdcall NopChecksumEntryDtor(int)

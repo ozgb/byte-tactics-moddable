@@ -50,6 +50,8 @@ static unsigned s_fpuControlWord = 0x9001F;
 static PlayerSpec s_players[MAX_PLAYERS];
 static char s_map[0x104];
 static int s_mapLine = 0;
+static unsigned s_gameType = 2;
+static int s_gameTypeLine = 0;
 static unsigned s_difficulty = 1;
 static unsigned s_commanderDeath = 1;
 static unsigned s_mapping = 1;
@@ -442,6 +444,15 @@ static void ReadKey(int lineNo, const char* key, char* value)
             FailLine(lineNo, "is too long", key, "");
         strcpy(s_map, value);
         s_mapLine = lineNo;
+    } else if (strcmp(key, "game_type") == 0) {
+        if (s_gameTypeLine != 0)
+            FailLine(lineNo, "is a second game_type line", key, "");
+        s_gameType = ParseNumber(lineNo, key, value);
+        if (s_gameType == 1)
+            FailLine(lineNo, "needs the campaign key, which comes with issue 444", key, "");
+        if (s_gameType < 2 || s_gameType > 3)
+            FailLine(lineNo, "must be 2 or 3", key, "");
+        s_gameTypeLine = lineNo;
     } else if (strcmp(key, "difficulty") == 0)
         s_difficulty = ParseRange(lineNo, key, value, 2);
     else if (strcmp(key, "commander_death") == 0)
@@ -555,6 +566,57 @@ static int FindSide(const char* name)
     return -1;
 }
 
+void HideSoftwareCursor();
+void LoadingScreenFrame(void);
+
+enum {
+    PLAYER_INFO_PTR = 0x27,
+    PLAYER_ALLIED = 0x108,
+    PLAYER_ALLIED_BY = 0x113,
+    INFO_FLAGS_97 = 0x97,
+    INFO_FLAGS_9B = 0x9b,
+    INFO_FLAGS_9D = 0x9d,
+    INFO_ENERGY = 0xa1,
+    INFO_METAL = 0xa3,
+    INFO_MAX_UNITS = 0xa5
+};
+
+static void SeedNetworkTable()
+{
+    for (int i = 0; i < MAX_PLAYERS; i++)
+        g_game->table_2c28[i] = s_players[i].named ? i + 1 : -1;
+}
+
+static void SeedNetworkHost(int host)
+{
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (!s_players[i].named)
+            continue;
+        unsigned char* info = *(unsigned char**)((unsigned char*)&g_game->players[i] + PLAYER_INFO_PTR);
+        memset(info, 0, 0x80);
+        strcpy((char*)info, s_map);
+        if (i == host)
+            info[INFO_FLAGS_97] |= 1;
+        else
+            info[INFO_FLAGS_97] &= ~1;
+        info[INFO_FLAGS_9D] |= 2;
+        unsigned short* flags = (unsigned short*)(info + INFO_FLAGS_9B);
+        *flags = (unsigned short)((*flags & ~0x7f00) | (s_mapping << 8) | (s_lineOfSight << 9)
+                                  | (s_losType << 10) | ((s_commanderDeath & 3) << 11)
+                                  | (s_fixedLocations << 14));
+        *(unsigned short*)(info + INFO_MAX_UNITS) = g_game->maxUnits_37eec;
+        *(unsigned short*)(info + INFO_METAL) = (unsigned short)s_players[i].metal;
+        *(unsigned short*)(info + INFO_ENERGY) = (unsigned short)s_players[i].energy;
+    }
+    for (int from = 0; from < MAX_PLAYERS; from++) {
+        for (int to = 0; to < MAX_PLAYERS; to++) {
+            if (*((unsigned char*)&g_game->players[from] + PLAYER_ALLIED + to) != 0)
+                *((unsigned char*)&g_game->players[to] + PLAYER_ALLIED_BY + from) = 1;
+        }
+    }
+    g_game->net_flags |= 8;
+}
+
 static void SetUpSkirmish()
 {
     Table_0047ae60* t = (Table_0047ae60*)g_game->options;
@@ -591,7 +653,9 @@ static void SetUpSkirmish()
             active++;
     }
 
-    SetMissionType(2);
+    SetMissionType(s_gameType);
+    if (s_gameType == 3)
+        SeedNetworkTable();
     Mission* mission = (Mission*)g_game->net;
     strcpy(t->mapName, s_map);
     t->difficulty = s_difficulty;
@@ -630,10 +694,17 @@ static void SetUpSkirmish()
     }
     g_game->localPlayer = (unsigned char)local;
     g_game->playerIndex = (unsigned char)local;
+    if (s_gameType == 3)
+        SeedNetworkHost(local);
 
     g_game->field_2bbe = 9;
     g_game->field_2bbf = 2;
     g_game->field_2bc0 = 2;
+    if (s_gameType == 3) {
+        HideSoftwareCursor();
+        g_game->mode_391f1 = 5;
+        g_game->handler = LoadingScreenFrame;
+    }
 }
 
 static void OpenTrace(unsigned controlWord);
@@ -770,7 +841,10 @@ void HarnessAfterStep()
         MakeDirectoryPath(directory);
         SaveGameFile(path, description, 0x29a);
     }
-    if (!s_testMode || (unsigned)g_game->ticks < s_ticks)
+    if (!s_testMode)
+        return;
+    int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
+    if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;
     char msg[64];
     DWORD written;
@@ -780,7 +854,10 @@ void HarnessAfterStep()
         fclose(s_dump);
     s_trace = NULL;
     s_dump = NULL;
-    sprintf(msg, "testmode: reached tick %u\n", s_ticks);
+    if (gameOver && (unsigned)g_game->ticks < s_ticks)
+        sprintf(msg, "testmode: game over at tick %u\n", (unsigned)g_game->ticks);
+    else
+        sprintf(msg, "testmode: reached tick %u\n", s_ticks);
     WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg, (DWORD)strlen(msg), &written, NULL);
     TerminateProcess(GetCurrentProcess(), 0);
 }
@@ -2825,6 +2902,10 @@ void HarnessBeforeStep()
         return;
     unsigned tick = GameU32(GAME_TICK);
     int i;
+    if (s_gameType == 3) {
+        for (i = 0; i < MAX_PLAYERS; i++)
+            g_game->players[i].progress = 100;
+    }
     for (i = 0; i < s_spawnCount; i++) {
         if (s_spawns[i].tick == tick)
             IssueScriptedSpawn(&s_spawns[i]);

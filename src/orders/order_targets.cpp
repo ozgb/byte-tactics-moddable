@@ -114,7 +114,6 @@ public:
 
 class PathOrderAttach;
 
-#include "path_order_attach.h"
 
 class UnitRef {
 public:
@@ -1597,9 +1596,7 @@ void DestroyPathfinder()
 
 #pragma pack(pop)
 
-#include <vector>
 
-#include "../util/vec3.h"
 
 typedef std::vector<Point16> Vec_0044ec30;
 typedef void (Vec_0044ec30::*InsertFn_0044ec30)(

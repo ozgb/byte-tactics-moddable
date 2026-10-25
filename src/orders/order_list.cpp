@@ -185,7 +185,14 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 #include "../state/sim_globals.h"
 
 
+#include "../network/net_stats.h"
+#include "order_goals.h"
+#include "../ai/ai_search_goal.h"
+#include "unit_motion.h"
 #pragma pack(pop)
+#include "../util/math_4b6c30.h"
+#include "unit_orders.h"
+#include "order_list.h"
 
 #include "../../link/globals.h"
 typedef Elem_0043c390* SimView_g_missionOrderTableBegin;
@@ -199,6 +206,19 @@ extern int __cdecl _strcmpi(const char*, const char*);
 
 #include "../ingame/markers.h"
 void __stdcall DrawUnitRangeRings(void* a, void* b, Order* e, Vec3* p, int c);
+extern Elem_0043c390 g_readyOrder[];
+extern signed char g_slopeSpeedFactor[];
+int __cdecl ScaledSin(short angle, int scale);
+int __cdecl ScaledCos(short angle, int scale);
+void __cdecl RotatePoint2D(short angle, int* xz);
+int __cdecl AngleOfVector(int x, int z);
+int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
+MissionType __stdcall GetOrderType(unsigned char relation, Unit* unit, Unit* target, Vec3* pos);
+void __stdcall AddOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7);
+int __stdcall FindWeaponTarget(Unit* unit, int a, int b);
+int __stdcall CompareOrderTypeNames(const Elem_0043c390& a, const Elem_0043c390& b);
+void RegisterUnitOrders();
+extern int DAT_0051234c;
 
 // FUNCTION: 0x439b30
 void __stdcall DrawOrderOverlays(Unit* unit, unsigned int mask, void* obj,
@@ -664,7 +684,6 @@ public:
     int GetCount(void);
 };
 
-#include "../network/net_stats.h"
 
 typedef std::vector<Elem_0043c390> Vec_0043c390;
 typedef int(__stdcall* Pred_0043c390)(const Elem_0043c390&, const Elem_0043c390&);
@@ -689,34 +708,15 @@ public:
     virtual int v5();
 };
 
-#include "order_goals.h"
-#include "../ai/ai_search_goal.h"
 class Class_0043db50 { public: void UpdateSfxOccupy(Unit* u); };
 
-#include "unit_motion.h"
 #pragma pack(pop)
 
 typedef Elem_0043c390* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-extern Elem_0043c390 g_readyOrder[];
-extern signed char g_slopeSpeedFactor[];
 
 
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
-void __cdecl RotatePoint2D(short angle, int* xz);
-int __cdecl AngleOfVector(int x, int z);
-int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
-MissionType __stdcall GetOrderType(unsigned char relation, Unit* unit, Unit* target, Vec3* pos);
-void __stdcall AddOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7);
-int __stdcall FindWeaponTarget(Unit* unit, int a, int b);
-#include "../util/math_4b6c30.h"
-int __stdcall CompareOrderTypeNames(const Elem_0043c390& a, const Elem_0043c390& b);
-#include "unit_orders.h"
-void RegisterUnitOrders();
-void __stdcall DeleteOrder(Unit* owner, Order* node);
-#include "order_list.h"
 
 static inline int InRange(int d)
 {
@@ -1164,7 +1164,6 @@ inline void sort_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P
     _Sort_0_0043bc90(_F, _L, _P, std::_Val_type(_F));
 }
 
-extern int DAT_0051234c;
 
 // FUNCTION: 0x43bc90
 void __stdcall RegisterOrderTypes(Elem_0043c390* from, int count)

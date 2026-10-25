@@ -22,7 +22,6 @@ namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
 }
 #endif
-#include <vector>
 
 #include "../util/vec3.h"
 
@@ -103,6 +102,7 @@ struct Mover {
 #include "order.h"
 
 #include "../units/unit.h"
+#include "../units/unit_ref.h"
 #pragma pack(pop)
 
 #include "path_fx.h"
@@ -146,7 +146,6 @@ int __cdecl ScaledCos(short, int);
 short __cdecl AngleOfVector(int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 #include "order_list.h"
-#include "order_list.h"
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
 #include "../../interfaces/seams.h"
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
@@ -159,7 +158,10 @@ int __stdcall SendScriptCallByName(Unit*, char*, char, int, int, int, int);
 void __stdcall DrawUnit(void*, Unit*);
 
 #include "vtol_orders.h"
-#include "vtol_orders.h"
+void WriteScreenshot(char*, char*, int, int, int, int);
+void SubtractVec3(int*, int*, int*, int*, int*);
+int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
+void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount);
 
 static inline Vec3 Direction(short angle, int range)
 {
@@ -741,8 +743,6 @@ void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b)
 }
 #pragma auto_inline(on)
 
-void WriteScreenshot(char*, char*, int, int, int, int);
-void SubtractVec3(int*, int*, int*, int*, int*);
 
 // FUNCTION: 0x414e70
 int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
@@ -1066,32 +1066,10 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
     return 8;
 }
 
-#include <stdio.h>
-#include "../state/block.h"
-#include "../util/vec3.h"
 struct Unit;
 struct Order;
-#include "mission_type.h"
 
-#pragma pack(push, 1)
-#include "../weapons/weapon_def.h"
-#include "../units/unit_def.h"
-#include "unit_motion.h"
-#include "../units/unit.h"
-#include "order.h"
 
-#include "path_fx.h"
-#include "../../interfaces/seams.h"
-#include "../game/game.h"
-#pragma pack(pop)
-#include "../../link/globals.h"
-#include "vtol_orders.h"
-#include "order_list.h"
-
-MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
-#include "../util/math_4b6c30.h"
-int __cdecl ScaledSin(short, int);
-int __cdecl ScaledCos(short, int);
 
 
 // FUNCTION: 0x40fbe0
@@ -1216,32 +1194,13 @@ void GroundAllyVisitor::CollectGroundAlly(Unit* unit)
         units->push_back(unit);
 }
 
-#include "../../interfaces/seams.h"
-#include "win_types.h"
-#include <vector>
 
-#include "../util/vec3.h"
 
-#include "../state/block.h"
-#include "mission_type.h"
 
 struct Unit;
-#include "unit_motion.h"
 
 
-#pragma pack(push, 1)
-#include "../units/unit_def.h"
-#include "../network/player.h"
-#include "../units/unit.h"
-#include "order.h"
-#include "path_fx.h"
-#pragma pack(pop)
 
-#include "../util/math_4b6c30.h"
-int __cdecl ScaledSin(short, int);
-int __cdecl ScaledCos(short, int);
-int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-#include "order_list.h"
 
 // FUNCTION: 0x40f790
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b)
@@ -1319,41 +1278,17 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-#include "../../interfaces/seams.h"
-#include "win_types.h"
-#include <math.h>
 
-#include "../state/block.h"
-#include "../util/vec3.h"
 
 struct Unit;
-#include "unit_motion.h"
-#include "path_order_attach.h"
-#include "mission_type.h"
 
-#include "../units/cob_script.h"
 
-#include "../files/files_api.h"
-#include "../sound/sound.h"
 struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;
 struct CalcedExplosion;
 
-#pragma pack(push, 1)
-#include "../units/unit_def.h"
-#include "../weapons/weapon_def.h"
-#include "../units/unit.h"
-void __stdcall DrawUnit(void*, Unit*);
 
-#include "order.h"
-#include "path_fx.h"
-#pragma pack(pop)
-
-#include "../util/math_4b6c30.h"
-int __cdecl ScaledSin(short, int);
-int __cdecl ScaledCos(short, int);
-#include "order_list.h"
 
 // FUNCTION: 0x4118e0
 int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
@@ -1460,40 +1395,19 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-#include "../../interfaces/seams.h"
-#include <list>
-#include "win_types.h"
-#include <math.h>
-#include <vector>
 
-#include "../util/vec3.h"
 struct Unit;
-#include "unit_motion.h"
-#include "../state/block.h"
-#include "path_order_attach.h"
-#include "mission_type.h"
 
 #pragma pack(push, 1)
-#include "../units/unit_def.h"
 struct Struct_Unit96 {
     char pad0[0x146]; unsigned char slotIndex;
 };
-#include "../units/unit.h"
-#include "order.h"
 struct Struct_Game391e9 {
     char pad0[0xd3c]; int gravity;
 };
-#include "../game/game.h"
-#include "path_fx.h"
 #pragma pack(pop)
 
-#include "../../link/globals.h"
 
-#include "../util/math_4b6c30.h"
-int __cdecl ScaledSin(short, int);
-int __cdecl ScaledCos(short, int);
-int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-#include "order_list.h"
 
 static inline void AttachMove(Order* order, const Vec3& dest, short radius);
 
@@ -1618,23 +1532,14 @@ static inline void AttachMove(Order* order, const Vec3& dest, short radius)
     order->SetAttachedFx(obj);
 }
 
-#include "../../interfaces/seams.h"
 
-#include <math.h>
-#include <vector>
 
-#include "../util/vec3.h"
 
-#include "../state/block.h"
-#include "mission_type.h"
 
 struct Unit;
-#include "unit_motion.h"
 
 
 #pragma pack(push, 1)
-#include "../units/unit_def.h"
-#include "../weapons/weapon_def.h"
 struct Sound;
 struct HapiBank;
 struct TdfFile;
@@ -1644,25 +1549,12 @@ struct Gadget;
 struct Layer;
 struct Weapon;
 struct Feature;
-#include "../network/player.h"
-#include "../units/unit.h"
 
-#include "order.h"
-int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
-#include "../game/game.h"
-#include "path_fx.h"
 #pragma pack(pop)
 
-#include "../../link/globals.h"
 
-#include "../util/math_4b6c30.h"
-int __cdecl ScaledSin(short, int);
-int __cdecl ScaledCos(short, int);
-int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-#include "order_list.h"
 
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
-void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount);
 
 // FUNCTION: 0x412710
 int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
@@ -1773,37 +1665,11 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-#include "../../interfaces/seams.h"
-#include <memory.h>
-#include "../state/block.h"
-#include "../state/block.h"
-#include "win_types.h"
-#include "../util/vec3.h"
 struct Unit;
-#include "unit_motion.h"
 
-#include "mission_type.h"
 
-#include "path_order_attach.h"
-#pragma pack(push, 1)
-#include "../units/unit_def.h"
-#include "../units/unit.h"
-
-#include "order.h"
-#include "../game/game.h"
-#include "path_fx.h"
-#pragma pack(pop)
-#include "../../link/globals.h"
 static inline UnitDef* Definitions() { return g_game->defs; }
-#include "../sound/sound.h"
-#include "../ingame/control_panel.h"
-void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
-int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall StartBuildingScript(Unit*, Order*, short);
 void __stdcall EmitNanoParticles(Vec3*, Vec3*, int);
-int __cdecl ScaledSin(short,int);
-int __cdecl ScaledCos(short,int);
-short __cdecl AngleOfVector(int,int);
 static inline short Angle(Vec3* a,Vec3* b) { return AngleOfVector(a->x-b->x,a->z-b->z); }
 struct Feature;
 // FUNCTION: 0x414380
@@ -1882,34 +1748,14 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
     return 8;
 }
 
-#include <stdio.h>
 
-#include "../state/block.h"
-#include "box.h"
 
 struct Unit;
 
-#include "unit_motion.h"
 
 
-#pragma pack(push, 1)
-#include "../map/feature.h"
 
-#include "../units/unit_def.h"
 
-#include "../units/unit.h"
-void __stdcall DrawUnit(void*, Unit*);
-
-#include "order.h"
-
-#include "path_fx.h"
-#include "../game/game.h"
-#pragma pack(pop)
-
-#include "../../link/globals.h"
-
-#include "../../interfaces/seams.h"
-#include "../sound/sound.h"
 void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
 
 // FUNCTION: 0x414770
@@ -1973,8 +1819,6 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-#include "../state/block.h"
-#include "../util/vec3.h"
 
 static inline Vec3 Sub(const Vec3& a, const Vec3& b)
 {
@@ -1989,26 +1833,10 @@ static inline int Square(const Vec3& v)
 
 struct Unit;
 
-#include "unit_motion.h"
 
 
-#pragma pack(push, 1)
-#include "../units/unit_def.h"
 
-#include "../units/unit.h"
-
-#include "../units/unit_ref.h"
-
-#include "order.h"
-
-#include "path_fx.h"
-#pragma pack(pop)
-
-#include "../sound/sound.h"
 void __stdcall EmitReverseNanoParticles(Vec3* box, Vec3* from, int count);
-#include "order_queue.h"
-#include "../../interfaces/seams.h"
-#include "vtol_orders.h"
 
 // FUNCTION: 0x414a80
 int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)

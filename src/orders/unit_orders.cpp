@@ -6,6 +6,11 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int 
 }
 
 #include <vector>
+#include <stdio.h>
+#include <math.h>
+#include <memory.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "../state/block.h"
 #include "../util/vec3.h"
@@ -75,6 +80,13 @@ void __stdcall SetUnitLimits(int, unsigned int*, int, int);
 #include "../units/unit.h"
 inline int Unit::Ready() { return (flags & 0x10000000) && !(flags & 0x4000); }
 #pragma pack(pop)
+#include "../map/feature.h"
+#include "../map/cell.h"
+#include "../map/mission.h"
+#include "vtol_orders.h"
+#include "../ingame/markers.h"
+#include "win_types.h"
+#include "../ai/vec.h"
 
 inline int Order::Advance(int distance) {
     ((Order*)this)->AttachApproachRadiusGoal(&target->pos, distance);
@@ -96,6 +108,18 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* id, void* pos,
                         int typeId, int amount);
 void __stdcall EmitNanoParticles(Vec3* from, Box* to, int count);
+char* __stdcall lstrcpynA(char* dest, const char* src, int count);
+int DrawWrappedText(char*, char*, int, int, int, int, int);
+extern char DAT_004fc6e8[];
+extern const float DAT_004fc930, DAT_004fc934, DAT_004fc938, DAT_004fc93c;
+int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
+int __stdcall BroadcastPacket(int player, void* data, int size);
+int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount,
+                           Vec3** metal, float* metalAmount);
+void WriteScreenshot(char*, char*, int, int, int, int);
+int ScanDirectory(char*, char*, char*, int, int, int);
+int __stdcall GroundPickupOrder(Unit* unit, Order* order, int flags);
+int __stdcall GetOrderTarget(int param_1);
 
 
 // FUNCTION: 0x401c20
@@ -269,7 +293,6 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
     return 0;
 }
 
-#include <stdio.h>
 
 // FUNCTION: 0x402430
 int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
@@ -761,11 +784,6 @@ struct Pad_00400000_5 { int field; };
 struct Pad_00400000_6 { int field; };
 struct Pad_00400000_7 { int field; };
 
-char* __stdcall lstrcpynA(char* dest, const char* src, int count);
-#include <math.h>
-#include <memory.h>
-#include <stdlib.h>
-#include <string.h>
 
 union Fixed {
     int value;
@@ -775,9 +793,7 @@ union Fixed {
     };
 };
 
-int DrawWrappedText(char*, char*, int, int, int, int, int);
 
-#include "../map/feature.h"
 
 struct FeatureSpot {
     char unknown_0[0x20];
@@ -785,9 +801,7 @@ struct FeatureSpot {
     char unknown_26[0x30 - 0x26];
 };
 
-#include "../map/cell.h"
 
-#include "../map/mission.h"
 
 struct FeatureDamagePacket {
     unsigned char type;
@@ -807,23 +821,14 @@ public:
 
 static const float Zero_004fc920 = 0.0f;
 
-extern char DAT_004fc6e8[];
-extern const float DAT_004fc930, DAT_004fc934, DAT_004fc938, DAT_004fc93c;
 
-int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
-#include "order_queue.h"
 void __stdcall EmitNanoParticles(Vec3* from, Vec3* to, int count);
 void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
 void __stdcall EmitReverseNanoParticles(Vec3* from, Vec3* to, int count);
-int __stdcall BroadcastPacket(int player, void* data, int size);
-int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount,
-                           Vec3** metal, float* metalAmount);
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
 void __stdcall EmitTeleportParticles(Vec3* from, Vec3* to, int count, int param);
-void WriteScreenshot(char*, char*, int, int, int, int);
-int ScanDirectory(char*, char*, char*, int, int, int);
 
 // FUNCTION: 0x4034a0
 int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
@@ -1552,10 +1557,6 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-#include "unit_orders.h"
-int __stdcall GroundPickupOrder(Unit* unit, Order* order, int flags);
-#include "vtol_orders.h"
-#include "../ingame/markers.h"
 
 // GLOBAL: 0x4fc490
 extern const UnitOrderType g_unitOrders[23] = {
@@ -1643,10 +1644,6 @@ extern const UnitOrderType g_readyOrder[1] = {
 
 extern const int PadAlign_004fc6d0 = 0;
 
-#include "../../interfaces/seams.h"
-#include "win_types.h"
-#include <math.h>
-#include "../util/vec3.h"
 
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& other)
 {
@@ -1657,20 +1654,8 @@ static inline Vec3 PosPlus(const Vec3& a, const Vec3& other)
     return r;
 }
 struct Unit;
-#include "mission_type.h"
 
-#include "path_order_attach.h"
-#pragma pack(push, 1)
-#include "../units/unit_def.h"
-#include "../units/unit.h"
-#include "order.h"
-#include "../game/game.h"
-#pragma pack(pop)
-#include "../../link/globals.h"
-#include "../sound/sound.h"
-#include "../ingame/control_panel.h"
 void __stdcall StartBuildingScript(Unit*, Order*, short);
-#include "order_queue.h"
 void __stdcall EmitNanoParticles(Vec3*, Vec3*, int);
 static inline Point16 WorldToCell16(Vec3 v, Point16 origin)
 {
@@ -1772,31 +1757,10 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-#include "win_types.h"
 
-#include "box.h"
 
-#pragma pack(push, 1)
-#include "../map/feature.h"
 
-#include "../units/unit_def.h"
 
-#include "../units/unit.h"
-
-#include "order.h"
-
-#include "../game/game.h"
-
-#include "../../interfaces/seams.h"
-#pragma pack(pop)
-
-#include "../../link/globals.h"
-
-#include "../sound/sound.h"
-#include "../util/math_4b6c30.h"
-void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
-#include "order_queue.h"
-void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
 
 // FUNCTION: 0x404ad0
 int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
@@ -1862,21 +1826,8 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-#include <vector>
-#include "../state/block.h"
-#include "../util/vec3.h"
 struct Unit;
-#include "mission_type.h"
 
-#pragma pack(push, 1)
-#include "../units/unit_def.h"
-#include "../network/player.h"
-#include "../units/unit.h"
-#include "order.h"
-#pragma pack(pop)
-#include "../../interfaces/seams.h"
-#include "order_list.h"
-#include "../util/math_4b6c30.h"
 MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
 
 // FUNCTION: 0x405980
@@ -1953,31 +1904,13 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
     }
 }
 
-#include <stdio.h>
-#include "../state/block.h"
-#include "../util/vec3.h"
 class UnitMotion;
 struct Player;
 struct Unit;
 struct Order;
-#include "mission_type.h"
 
-#pragma pack(push, 1)
-#include "../weapons/weapon_def.h"
-#include "../units/unit_def.h"
-#include "../units/unit.h"
-#include "order.h"
-
-#include "../../interfaces/seams.h"
-
-#pragma pack(pop)
-#include "order_list.h"
-MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
-#include "order_list.h"
-#include "../util/math_4b6c30.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
-int __stdcall GetOrderTarget(int param_1);
 struct Feature;
 // FUNCTION: 0x406300
 int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
@@ -2052,21 +1985,12 @@ follow:
     return 7;
 }
 
-#include <string.h>
-#include <math.h>
-#include "../util/vec3.h"
-#include "../../interfaces/seams.h"
-#include "../ai/vec.h"
 static inline Vec Add(const Vec& a,const Vec& b) { Vec r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
 static inline Vec Sub(const Vec& a,const Vec& b) { Vec r; r.x=a.x-b.x; r.y=a.y-b.y; r.z=a.z-b.z; return r; }
 #pragma pack(push,1)
 struct Def { char pad[0x15e]; Vec low, high; };
 
-#include "../units/unit.h"
-#include "order.h"
-#include "../game/game.h"
 #pragma pack(pop)
-#include "../../link/globals.h"
 void __stdcall EmitTeleportParticles(Vec*,Vec*,int,int);
 // FUNCTION: 0x406aa0
 int __stdcall TeleportOrder(Unit* unit,Order* order,int unused)

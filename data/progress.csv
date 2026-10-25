@@ -57,9 +57,6 @@ address,size,file,symbol,status,similarity
 0x406900,408,src/orders/unit_orders.cpp,?GroundUnloadOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x406aa0,331,src/orders/unit_orders.cpp,?TeleportOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x406bf0,13,src/orders/unit_orders.cpp,?RegisterGroundOrders@@YGXXZ,matched,100.0
-0x406c00,3,src/orders/unit_orders.cpp,?_Destroy@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@IAEXPAPAUUnit@@0@Z,matched,100.0
-0x406c10,46,src/orders/unit_orders.cpp,?_Ucopy@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@IAEPAPAUUnit@@PBQAU3@0PAPAU3@@Z,matched,100.0
-0x406c40,35,src/orders/unit_orders.cpp,?_Ufill@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@IAEXPAPAUUnit@@IABQAU3@@Z,matched,100.0
 0x406c70,19,src/orders/unit_orders.cpp,?CopyDwordIfNonNull@@YGXPAH0@Z,matched,100.0
 0x406c90,257,src/ai/ai_player.cpp,?CmdPlan@@YGXPAVCommandArgs@@@Z,matched,100.0
 0x406da0,11,src/ai/ai_player.cpp,?EnableAICommands@@YGXXZ,matched,100.0
@@ -779,7 +776,6 @@ address,size,file,symbol,status,similarity
 0x43c050,753,src/orders/order_list.cpp,?RegisterAllOrderTypes@@YGXXZ,matched,100.0
 0x43c350,11,src/orders/order_list.cpp,?ClearOrderTypeTable@@YGXXZ,matched,100.0
 0x43c360,33,src/orders/order_list.cpp,?GetCount@MissionOrderTable@@QAEHXZ,matched,100.0
-0x43c390,3,src/orders/order_list.cpp,?_Destroy@?$vector@UElem_0043c390@@V?$allocator@UElem_0043c390@@@std@@@std@@IAEXPAUElem_0043c390@@0@Z,matched,100.0
 0x43c3a0,773,src/orders/order_list.cpp,?insert@?$vector@UElem_0043c390@@V?$allocator@UElem_0043c390@@@std@@@std@@QAEXPAUElem_0043c390@@IABU3@@Z,matched,100.0
 0x43c6b0,100,src/orders/order_list.cpp,?LowerBoundOrderTypes@@YGPAUElem_0043c390@@PAU1@0ABQADP6GHABU1@PAD@ZPAH@Z,matched,100.0
 0x43c720,534,src/orders/order_list.cpp,?SortOrderTypes@@YGXPAUElem_0043c390@@0P6GHABU1@1@Z0@Z,matched,100.0

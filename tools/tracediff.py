@@ -364,8 +364,8 @@ def print_divergence(tick: int, phase: str) -> None:
 
 
 def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
-         poison: bool = False, blockscan: int = 0) -> Path:
-    """Run the exe on the scenario with playtest.py; the run's directory."""
+         poison: bool = False, blockscan: int = 0, env: dict[str, str] | None = None) -> Path:
+    """Run the exe on the scenario with playtest.py, in `env` (default: this process's); the run's directory."""
     cmd = [sys.executable, str(ROOT / "tools/playtest.py"), "--exe", str(exe), "--testmode", str(scenario)]
     if game_dir:
         cmd += ["--game-dir", game_dir]
@@ -377,7 +377,7 @@ def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, time
         cmd.append("--poison")
     if blockscan:
         cmd += ["--blockscan-every", str(blockscan)]
-    r = subprocess.run(cmd, capture_output=True, text=True)
+    r = subprocess.run(cmd, capture_output=True, text=True, env=env)
     sys.stderr.write(r.stderr)
     m = re.search(r"^logs and screenshots: (.+)/$", r.stdout, re.M)
     if r.returncode != 0 or not m:

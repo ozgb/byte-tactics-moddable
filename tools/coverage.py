@@ -37,6 +37,7 @@ branch fraction is below the file's, or the file is missing; rises and new funct
 import argparse
 import csv
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -45,8 +46,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import blockpointers
-import playtest
 import reference
+import tracediff
 
 ROOT = Path(__file__).resolve().parent.parent
 SUBSYSTEMS = ROOT / "data/subsystems.csv"
@@ -286,15 +287,15 @@ def play_suite(exe: Path, game_dir: str | None, parallel: int, names: list[str] 
     if RUN_DIR.exists():
         sys.exit("coverage: %s exists from an earlier run; remove it first" % RUN_DIR.relative_to(ROOT))
     local = threading.local()
-    original_env = playtest.wine_env
     original_play = reference.play_scenario
+    original_tracediff_play = tracediff.play
 
-    def wine_env(*args, **kwargs):
-        env = original_env(*args, **kwargs)
+    def tracediff_play(*args, **kwargs):
         name = getattr(local, "scenario", None)
         if name:
-            env["LLVM_PROFILE_FILE"] = windows_path(RUN_DIR / name) + "\\cov-%p.profraw"
-        return env
+            profile = windows_path(RUN_DIR / name) + "\\cov-%p.profraw"
+            kwargs["env"] = {**os.environ, "LLVM_PROFILE_FILE": profile}
+        return original_tracediff_play(*args, **kwargs)
 
     def play_scenario(exe, scenario, *args, **kwargs):
         local.scenario = scenario.stem
@@ -302,12 +303,12 @@ def play_suite(exe: Path, game_dir: str | None, parallel: int, names: list[str] 
         return original_play(exe, scenario, *args, **kwargs)
 
     failed: dict[str, str] = {}
-    playtest.wine_env = wine_env
+    tracediff.play = tracediff_play
     reference.play_scenario = play_scenario
     try:
         reference.play_all(exe, scenarios, game_dir, parallel, failed=failed, retry_any=True)
     finally:
-        playtest.wine_env = original_env
+        tracediff.play = original_tracediff_play
         reference.play_scenario = original_play
     problems = [f"{n}: failed to run: {m}" for n, m in sorted(failed.items())]
     profiles = []

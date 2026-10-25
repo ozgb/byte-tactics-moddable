@@ -127,5 +127,41 @@ class Coverage(unittest.TestCase):
         self.assertIn("50.0%", text)
 
 
+class PlaySuiteTest(unittest.TestCase):
+    def test_profile_path_reaches_tracediff_play(self):
+        seen = {}
+
+        def fake_play(exe, scenario, game_dir, dump, timeout=None, poison=False, blockscan=0, env=None):
+            seen[scenario.stem] = env
+            (run_dir / scenario.stem / "cov-1.profraw").write_bytes(b"x")
+            return Path()
+
+        def fake_play_all(exe, scenarios, game_dir, parallel, failed=None, retry_any=False):
+            for name, path in scenarios.items():
+                cov.reference.play_scenario(exe, path, game_dir)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp) / "run"
+            saved = (cov.RUN_DIR, cov.tracediff.play, cov.reference.play_scenario, cov.reference.play_all,
+                     cov.reference.scenario_files, cov.subprocess.run)
+            cov.RUN_DIR = run_dir
+            cov.tracediff.play = fake_play
+            cov.reference.play_all = fake_play_all
+            cov.reference.scenario_files = lambda: {"alpha": Path("alpha.txt")}
+            cov.subprocess.run = lambda *a, **k: None
+            original_play_scenario = cov.reference.play_scenario
+            try:
+                cov.reference.play_scenario = lambda exe, scenario, *a, **k: cov.tracediff.play(exe, scenario, None, None)
+                wrapped_target = cov.reference.play_scenario
+                cov.play_suite(Path("TotalA.exe"), None, 1, None)
+                self.assertIs(cov.reference.play_scenario, wrapped_target)
+                self.assertIs(cov.tracediff.play, fake_play)
+            finally:
+                (cov.RUN_DIR, cov.tracediff.play, cov.reference.play_scenario, cov.reference.play_all,
+                 cov.reference.scenario_files, cov.subprocess.run) = saved
+                cov.reference.play_scenario = original_play_scenario
+        self.assertEqual(seen["alpha"]["LLVM_PROFILE_FILE"], cov.windows_path(run_dir / "alpha") + "\\cov-%p.profraw")
+
+
 if __name__ == "__main__":
     unittest.main()

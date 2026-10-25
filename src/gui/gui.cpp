@@ -781,8 +781,28 @@ void __stdcall SetGadgetTextByName(Dialog_004a04f0* obj, char* name, char* text)
     }
 }
 
-struct Object_004a0880;
-void __stdcall SetGadgetText(Object_004a0880* obj, int index, char* text);
+struct Data_004a0880 {
+    int next;
+    Gadget* entries;
+};
+
+struct Object_004a0880 {
+    char unknown_0[0x18];
+    Data_004a0880* data;
+    char unknown_1c[0x64 - 0x1c];
+    int current;
+    char unknown_68[0x74 - 0x68];
+    int length;
+};
+
+// FUNCTION: 0x4a0880
+void __stdcall SetGadgetText(Object_004a0880* obj, int index, char* text)
+{
+    strcpy(obj->data->entries[index].u.text, text);
+    if (obj->current == index) {
+        obj->length = strlen(text);
+    }
+}
 
 // FUNCTION: 0x4a08f0
 void __stdcall TranslateGadgetItems(Dialog_004a04f0* obj, int index)
@@ -2190,7 +2210,6 @@ struct Dialog_4a32a0 {
 
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall SetGadgetActive(Root_004a32a0* menu, int index, int value);
-#include "gui_4a3ef0.h"
 
 static inline int FontHeight_004a32a0() {
     if (g_guiContext->language == 0)
@@ -2653,6 +2672,111 @@ struct Pad_a3eb0_2 { int field; };
 void __stdcall ResetSliderGadget(Dialog_4a3eb0* obj, int i)
 {
     ClearEntry(&obj->table->entries[i]);
+}
+
+
+struct Font_004a3ef0 {
+    char unknown_0[0x28];
+    GafFrame* glyph;
+};
+
+void __stdcall DrawSliderBar(Dialog* gui, int gadgetIndex);
+
+static inline GafFrame* GetGlyph_004a3ef0(unsigned char c)
+{
+    return (GafFrame*)GetGafFrame(g_guiContext->list->glyphs, c);
+}
+
+static inline int Find_004a3ef0(Gadget* entries, unsigned char kind)
+{
+    for (int i = 1; i < entries->u.count + 1; i++) {
+        if (entries[i].type == 2 && entries[i].team == kind)
+            return i;
+    }
+    return 0;
+}
+
+static inline int LineSize_004a3ef0(Gadget* e)
+{
+    int count = e->u.list.rowCount;
+    Font_004a3ef0** font = (Font_004a3ef0**)e->u.list.rows;
+    int lines = 0;
+    if (count > 0)
+        lines = (*font)->glyph->height * count;
+    return lines;
+}
+
+// FUNCTION: 0x4a3ef0
+void __stdcall DrawSlider(Dialog* gui, int gadgetIndex)
+{
+    Gadget* entries = (Gadget*)gui->holder->entries;
+    Gadget* me = &entries[gadgetIndex];
+    unsigned char kind = me->team;
+    int found = Find_004a3ef0(entries, kind);
+    union { int full; short word; } lines;
+    lines.full = 0;
+    lines.word = 0;
+    if (found != 0) {
+        Gadget* e = &entries[found];
+        if (e->type == 2) {
+            if (e->attribs & 0x10) {
+                int i = 1;
+                int n = 0;
+                for (; i < entries->u.count + 1; i++) {
+                    if (entries[i].type == 7) {
+                        if (n == e->tab) {
+                            SetFont(entries[i].u.list.language);
+                            break;
+                        }
+                        n++;
+                    }
+                }
+                if (i == entries->u.count + 1) {
+                    SetFont(g_guiContext->current);
+                }
+                int size = (g_guiContext->list == 0) ? GetFontHeight()
+                    : GetGlyph_004a3ef0(0x49)->height + 2;
+                int numerator = e->height - 2;
+                int denominator = (e->u.list.scroll > size + 1) ? e->u.list.scroll : size + 1;
+                int step = numerator / denominator;
+                int last = e->u.list.rowCount;
+#ifdef __clang__
+                int rows = (int)((double)step / last * (me->height - 3));
+#else
+                int rows = (int)((float)step / last * (me->height - 3));
+#endif
+                me->knobSize = rows;
+                if (me->knobSize < 10) {
+                    me->knobSize = 10;
+                }
+                if (last <= step) {
+                    me->range = 0;
+                } else {
+                    me->range = me->height - me->knobSize - 3;
+                }
+            } else if (e->attribs & 0x20) {
+                lines.full = LineSize_004a3ef0(e);
+                int s = e->height * me->height / lines.full;
+                me->knobSize = s;
+                if (me->attribs & 1) {
+                    me->range = me->width - s;
+                } else {
+                    me->range = me->height - s;
+                }
+            } else if (e->attribs & 0x80) {
+                if (e->u.list.scroll != 0 && e->u.list.rowCount != 0) {
+                    int s = e->height / e->u.list.scroll * me->height / e->u.list.rowCount;
+                    me->knobSize = s;
+                    if (me->attribs & 1) {
+                        me->range = me->width - s;
+                    } else {
+                        me->range = me->height - s;
+                    }
+                }
+            }
+        }
+    }
+    DrawSliderBar(gui, gadgetIndex);
 }
 
 

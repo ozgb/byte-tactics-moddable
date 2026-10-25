@@ -492,11 +492,11 @@ Coverage: 59.2% of functions (237 of 400), 52.9% of lines, 40.2% of branches; 16
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 54.7% of functions (110 of 201), 61.9% of lines, 54.0% of branches; 91 functions no scenario enters (data/coverage.csv).
+**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 54.7% of functions (110 of 201), 64.1% of lines, 53.8% of branches; 91 functions no scenario enters (data/coverage.csv).
 
-**players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions. Coverage: 29.2% of functions (45 of 154), 27.5% of lines, 20.4% of branches; 109 functions no scenario enters (data/coverage.csv).
+**players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions. Coverage: 29.2% of functions (45 of 154), 29.1% of lines, 20.4% of branches; 109 functions no scenario enters (data/coverage.csv).
 
-**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 61.8% of functions (68 of 110), 67.7% of lines, 63.1% of branches; 42 functions no scenario enters (data/coverage.csv).
+**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 61.8% of functions (68 of 110), 70.8% of lines, 63.1% of branches; 42 functions no scenario enters (data/coverage.csv).
 
 **network** (450 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 103 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 86 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (250 in all).
 
@@ -525,25 +525,25 @@ The simulation subsystems are in bold. `state` is the shared state block code (`
 
 | subsystem | functions entered | functions | lines | branches | never entered |
 |---|---|---|---|---|---|
-| **wind_meteors** | 10 of 16 | 62.5% | 53.8% | 50.0% | 6 |
-| **economy** | 16 of 39 | 41.0% | 53.9% | 32.3% | 23 |
-| **features** | 40 of 60 | 66.7% | 62.5% | 58.2% | 20 |
-| **ai** | 92 of 142 | 64.8% | 70.7% | 69.0% | 50 |
-| **pathfinding** | 45 of 58 | 77.6% | 81.5% | 76.1% | 13 |
-| **weapons** | 72 of 108 | 66.7% | 73.0% | 60.1% | 36 |
-| **targeting** | 10 of 11 | 90.9% | 89.2% | 64.3% | 1 |
-| **los_radar** | 62 of 109 | 56.9% | 70.5% | 65.9% | 47 |
-| **orders** | 237 of 400 | 59.2% | 52.9% | 40.2% | 163 |
-| **units** | 110 of 201 | 54.7% | 61.9% | 54.0% | 91 |
-| **players** | 45 of 154 | 29.2% | 27.5% | 20.4% | 109 |
-| **map** | 68 of 110 | 61.8% | 67.7% | 63.1% | 42 |
-| files | 60 of 178 | 33.7% | 30.4% | 27.1% | 118 |
-| game | 73 of 208 | 35.1% | 33.1% | 19.6% | 135 |
-| network | 40 of 414 | 9.7% | 6.1% | 1.9% | 374 |
-| platform | 307 of 728 | 42.2% | 30.7% | 21.3% | 421 |
-| presentation | 440 of 1472 | 29.9% | 25.7% | 18.8% | 1032 |
+| **wind_meteors** | 10 of 16 | 62.5% | 55.0% | 50.0% | 6 |
+| **economy** | 16 of 39 | 41.0% | 54.6% | 32.3% | 23 |
+| **features** | 40 of 60 | 66.7% | 65.9% | 58.2% | 20 |
+| **ai** | 92 of 142 | 64.8% | 71.3% | 69.0% | 50 |
+| **pathfinding** | 45 of 58 | 77.6% | 82.7% | 76.1% | 13 |
+| **weapons** | 72 of 108 | 66.7% | 75.3% | 60.1% | 36 |
+| **targeting** | 10 of 11 | 90.9% | 90.6% | 64.6% | 1 |
+| **los_radar** | 62 of 109 | 56.9% | 72.9% | 65.7% | 47 |
+| **orders** | 237 of 400 | 59.2% | 55.0% | 40.2% | 163 |
+| **units** | 110 of 201 | 54.7% | 64.1% | 53.8% | 91 |
+| **players** | 45 of 154 | 29.2% | 29.1% | 20.4% | 109 |
+| **map** | 68 of 110 | 61.8% | 70.8% | 63.1% | 42 |
+| files | 60 of 178 | 33.7% | 31.4% | 27.1% | 118 |
+| game | 73 of 208 | 35.1% | 33.9% | 19.7% | 135 |
+| network | 40 of 414 | 9.7% | 6.4% | 1.9% | 374 |
+| platform | 307 of 728 | 42.2% | 32.0% | 21.3% | 421 |
+| presentation | 440 of 1472 | 29.9% | 26.6% | 18.8% | 1032 |
 | seams | 64 of 103 | 62.1% | 81.7% | - | 39 |
-| state | 309 of 408 | 75.7% | 67.0% | 48.7% | 99 |
+| state | 309 of 408 | 75.7% | 74.9% | 48.7% | 99 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
 

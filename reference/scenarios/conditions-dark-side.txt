@@ -1,0 +1,20 @@
+# Arm commander on Dark Side cloaks, captures a Core solar collector and self-destructs its own; enters capture, the cloak energy spend and the kill-commander condition.
+game_seed 405
+crt_seed 1405
+view_seed 2405
+map Dark Side
+start_positions fixed
+ticks 3200
+player0.controller human
+player0.side Arm
+player0.metal 5000
+player0.energy 5000
+player1.controller human
+player1.side Core
+player1.metal 5000
+player1.energy 5000
+order 5 1:CORCOM:1 build CORSOLAR 2540 1180
+order 5 0:ARMCOM:1 build ARMSOLAR 960 2200
+order 300 0:ARMSOLAR:1 selfdestruct
+order 340 0:ARMCOM:1 cloak on
+order 720 0:ARMCOM:1 capture 1:CORSOLAR:1

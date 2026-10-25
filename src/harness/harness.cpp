@@ -374,7 +374,7 @@ static void ReadSpawn(int lineNo, char* value)
     char* unitText = NextToken(&cursor);
     char* xText = NextToken(&cursor);
     char* zText = NextToken(&cursor);
-    if (zText == NULL || NextToken(&cursor) != NULL)
+    if (zText == nullptr || NextToken(&cursor) != nullptr)
         FailLine(lineNo, "needs <tick> <slot> <unit> <x> <z>", "spawn", "");
     if (s_spawnCount >= MAX_ORDERS)
         FailLine(lineNo, "is past the limit of 256 spawn lines", "spawn", "");

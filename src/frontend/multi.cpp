@@ -13,9 +13,9 @@ struct Layer;
 struct Gui;
 struct Game;
 struct Record_00446f50;
-struct Options_00446f50;
+struct GameOptionsView;
 struct PlayerInfo;
-struct UnitType_00446f50;
+struct UnitDefView;
 struct Logos_00445110;
 class UnitSync;
 
@@ -45,7 +45,7 @@ struct Gadget {
         char text[0x138 - 0xb6];
         short count;
         struct {
-            char unknown_b6g[0xc0 - 0xb6];
+            char headPad[0xc0 - 0xb6];
             void* gaf;
         } head;
         char entry_text[0xcc - 0xb6];
@@ -573,7 +573,7 @@ struct Record_00446f50 {
     int peerEnabled;
 };
 
-struct UnitType_00446f50 {
+struct UnitDefView {
     char unitName[0x20];
     union {
         char name[0x225];
@@ -627,13 +627,13 @@ public:
     char* GetSyncStatusText();
     void CheckUnitAvailable(unsigned int, int);
     int PopChangedEntry(Event_44c220* event);
-    void SetUnitLimit(UnitType_00446f50* unit, int value);
-    int DisallowUnit(UnitType_00446f50* unit);
-    int AllowUnit(UnitType_00446f50* unit);
-    int GetUnitEntry(UnitType_00446f50* type, Info_0044c7e0* out);
+    void SetUnitLimit(UnitDefView* unit, int value);
+    int DisallowUnit(UnitDefView* unit);
+    int AllowUnit(UnitDefView* unit);
+    int GetUnitEntry(UnitDefView* type, Info_0044c7e0* out);
 };
 
-struct Options_00446f50 {
+struct GameOptionsView {
     char unknown_0[0x118];
     int fixedloc;
 };
@@ -3394,7 +3394,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
         g_game->multiLineOfSight = me->info->los;
         g_game->multiLOSType = me->info->losType;
         g_game->multiCommanderDeath = me->info->commander;
-        ((Options_00446f50 *)g_game->options)->fixedloc = me->info->fixedloc;
+        ((GameOptionsView *)g_game->options)->fixedloc = me->info->fixedloc;
         g_game->multiMapping = me->info->mapping;
         SaveSettings();
         g_game->difficulty = 2;
@@ -3823,7 +3823,7 @@ void __stdcall LoadUnitRestrictListFile(char* name)
         host_file_read(f, &b, 4);
         int n = g_game->unitDefCount;
         for (int idx = 1; idx < n; idx++) {
-            if (((UnitType_00446f50 *)g_game->defs.get())[idx].fbiChecksum == a) {
+            if (((UnitDefView *)g_game->defs.get())[idx].fbiChecksum == a) {
                 for (int j = 0; j < n; j++) {
                     if (g_unitRestrictEntries[j].unitIndex == idx) {
                         g_unitRestrictEntries[j].max = b;
@@ -3849,7 +3849,7 @@ void __stdcall SaveUnitRestrictListFile(char* filename)
     for (int i = 1; i < count; i++) {
         for (int j = 0; j < g_game->unitDefCount; j++) {
             if (*(int*)((char*)g_unitRestrictEntries + 0x52 + j * 0x62) == i) {
-                int v = ((UnitType_00446f50 *)g_game->defs.get())[i].fbiChecksum;
+                int v = ((UnitDefView *)g_game->defs.get())[i].fbiChecksum;
                 host_file_write(f, &v, 4);
                 v = *(int*)((char*)g_unitRestrictEntries + 0x5a + j * 0x62);
                 host_file_write(f, &v, 4);
@@ -4129,7 +4129,7 @@ void __stdcall HandleUnitCountSlider(void* obj, char* gadget)
     }
     g_unitRestrictEntries[n + desc->firstRow].max = value;
     ((UnitSync *)g_game->sync)->SetUnitLimit(
-        &((UnitType_00446f50 *)g_game->defs.get())[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
+        &((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
     desc->flags[n + desc->firstRow] = g_unitRestrictEntries[n + desc->firstRow].peerEnabled == 0;
     desc->flags[n + desc->firstRow] |= g_unitRestrictEntries[n + desc->firstRow].max == 0 ? 2 : 0;
     SetTranslatedTextByName(obj, count, (char*)buf, 0);
@@ -4183,7 +4183,7 @@ void LoadUnitPortrait()
     int i = g_unitRestrictPicLoadIndex++;
     if (i < g_game->unitDefCount) {
         int type = g_unitRestrictEntries[i].unitIndex;
-        UnitType_00446f50* defs = (UnitType_00446f50 *)g_game->defs.get();
+        UnitDefView* defs = (UnitDefView *)g_game->defs.get();
         if (defs[type].name && ((unsigned char)(defs[type].flags2.raw >> 15) & 1) == 0) {
             BuildDataPath(path, "unitpics", defs[g_unitRestrictEntries[i].unitIndex].name, "PCX");
             void* img = LoadPcx(path, 0);
@@ -4219,7 +4219,7 @@ void UnitRestrictDialogFrame()
     while (((UnitSync *)g_game->sync)->PopChangedEntry(&event) != 0) {
         n++;
         for (int i = 0; i < entry->list.count; i++) {
-            if (event.fbiChecksum == ((UnitType_00446f50 *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
+            if (event.fbiChecksum == ((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
                 entry->flags[i] = (event.peerEnabled == 0);
                 g_unitRestrictEntries[i].peerEnabled = event.peerEnabled;
                 g_unitRestrictEntries[i].max = event.max;
@@ -4238,7 +4238,7 @@ void UnitRestrictDialogFrame()
 void __stdcall ShowSelectedUnitCosts(void* panel, Gadget* unit)
 {
     char buf[20];
-    UnitType_00446f50* def = &((UnitType_00446f50 *)g_game->defs.get())[unit->records[unit->field_ba].unitIndex];
+    UnitDefView* def = &((UnitDefView *)g_game->defs.get())[unit->records[unit->field_ba].unitIndex];
     sprintf(buf, "%d", (int)def->energyCost);
     SetTranslatedTextByName(panel, "ENERGYTEXT", (char*)buf, 0);
     sprintf(buf, "%d", (int)def->metalCost);
@@ -4320,19 +4320,19 @@ void OpenUnitRestrictions()
 
     n = 0;
     for (i = 1; i < g_game->unitDefCount; i++) {
-        if (((UnitType_00446f50 *)g_game->defs.get())[i].flags2.bits.flag)
+        if (((UnitDefView *)g_game->defs.get())[i].flags2.bits.flag)
             continue;
-        if (!((UnitType_00446f50 *)g_game->defs.get())[i].name)
+        if (!((UnitDefView *)g_game->defs.get())[i].name)
             continue;
         {
-            UnitType_00446f50* type = &((UnitType_00446f50 *)g_game->defs.get())[i];
+            UnitDefView* type = &((UnitDefView *)g_game->defs.get())[i];
             Info_0044c7e0 info;
             int count;
             sprintf(g_unitRestrictEntries[n].name, "%s\r%s %dM  %dE",
-                    ((UnitType_00446f50 *)g_game->defs.get())[i].unitName, Translate(type->description),
+                    ((UnitDefView *)g_game->defs.get())[i].unitName, Translate(type->description),
                     (int)type->metalCost, (int)type->energyCost);
             g_unitRestrictEntries[n].unitIndex = i;
-            ((UnitSync *)g_game->sync)->GetUnitEntry(&((UnitType_00446f50 *)g_game->defs.get())[i], &info);
+            ((UnitSync *)g_game->sync)->GetUnitEntry(&((UnitDefView *)g_game->defs.get())[i], &info);
             count = info.max == -1 ? 0x65 : info.max;
             g_unitRestrictEntries[n].max = count;
             g_unitRestrictOldCounts[n] = count;
@@ -4367,7 +4367,7 @@ void OpenUnitRestrictions()
 
     {
         Gui* gui = &g_game->gui;
-        UnitType_00446f50* type = &((UnitType_00446f50 *)g_game->defs.get())[desc->records[desc->field_ba].unitIndex];
+        UnitDefView* type = &((UnitDefView *)g_game->defs.get())[desc->records[desc->field_ba].unitIndex];
         char buf[0x14];
         sprintf(buf, "%d", (int)type->energyCost);
         SetTranslatedTextByName(gui, "ENERGYTEXT", buf, 0);
@@ -4637,7 +4637,7 @@ void OpenBattleRoom()
         info->mapping = g_game->multiMapping;
         info->los = g_game->multiLineOfSight;
         info->losType = g_game->multiLOSType;
-        info->fixedloc = ((Options_00446f50 *)g_game->options)->fixedloc;
+        info->fixedloc = ((GameOptionsView *)g_game->options)->fixedloc;
         info->commander = g_game->multiCommanderDeath;
     }
 
@@ -4865,7 +4865,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
     int n;
     int type;
     int* p;
-    UnitType_00446f50* item;
+    UnitDefView* item;
     Gadget* desc;
     Gadget* pic;
 
@@ -4890,7 +4890,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
             for (i = 0; i < g_game->unitDefCount; i++) {
                 type = g_unitRestrictEntries[i].unitIndex;
                 if (type != 0) {
-                    item = &((UnitType_00446f50 *)g_game->defs.get())[type];
+                    item = &((UnitDefView *)g_game->defs.get())[type];
                     if (item->flags2.bits.flag) {
                     } else {
                         if (g_unitRestrictEntries[i].max == 0)
@@ -4928,13 +4928,13 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
         for (i = 0; i < g_game->unitDefCount; i++) {
             type = g_unitRestrictEntries[i].unitIndex;
             if (type != 0) {
-                if ((((UnitType_00446f50 *)g_game->defs.get())[type].flags2.raw & 0x10000) == 0)
+                if ((((UnitDefView *)g_game->defs.get())[type].flags2.raw & 0x10000) == 0)
                     g_unitRestrictEntries[i].max = 100;
                 else
                     g_unitRestrictEntries[i].max = 0;
                 if (g_unitRestrictEntries[i].max != g_unitRestrictEntries[i].previousMax) {
                     ((UnitSync *)g_game->sync)->SetUnitLimit(
-                        &((UnitType_00446f50 *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex],
+                        &((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex],
                         g_unitRestrictEntries[i].max);
                 }
             }
@@ -4952,10 +4952,10 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
         PlaySoundByName("Previous", 0);
         n = 0;
         for (i = 1; i < g_game->unitDefCount; i++) {
-            if (((UnitType_00446f50 *)g_game->defs.get())[i].flags2.bits.flag) {
-            } else if (((UnitType_00446f50 *)g_game->defs.get())[i].name != 0) {
+            if (((UnitDefView *)g_game->defs.get())[i].flags2.bits.flag) {
+            } else if (((UnitDefView *)g_game->defs.get())[i].name != 0) {
                 ((UnitSync *)g_game->sync)->SetUnitLimit(
-                    &((UnitType_00446f50 *)g_game->defs.get())[i], g_unitRestrictOldCounts[n]);
+                    &((UnitDefView *)g_game->defs.get())[i], g_unitRestrictOldCounts[n]);
                 n++;
             }
         }

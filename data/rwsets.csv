@@ -14351,7 +14351,6 @@ address,function,file,kind,target
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,BeginTextEdit
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,BroadcastAllyTeam
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,BroadcastPlayerInfo
-0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,CheckMapCrc_00447b10
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,ClearAlliances
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,ClearSelectedGadget
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,CountAlliance_00447b10
@@ -14377,6 +14376,7 @@ address,function,file,kind,target
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,IsRemoteHuman_00447b10
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,LoadGuiLayer
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,LoadPictureCached
+0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,LobbyMapCrcMatches
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,Mission::HasMissionName
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,OpenMessageBox
 0x447b10,HandleBattleRoomClick,src/frontend/multi.cpp,call,OpenMultiMapSelector
@@ -14491,7 +14491,6 @@ address,function,file,kind,target
 0x448bf0,UpdateSideGadget,src/frontend/multi.cpp,function,
 0x448bf0,UpdateSideGadget,src/frontend/multi.cpp,global_read,g_game
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,BroadcastPlayerInfo
-0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,CheckMapCrc_00448c70
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,FindGadgetChecked
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,FindGadgetChecked_C
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,FindGadgetChecked_E
@@ -14510,6 +14509,7 @@ address,function,file,kind,target
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,IsRemoteHuman_00448c70
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,IsScreenNamed
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,IsWatching_00448c70
+0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,LobbyMapCrcMatches
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,MarkChanged
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,Mission::GetMissionName
 0x448c70,RefreshBattleRoomRows,src/frontend/multi.cpp,call,Mission::GetTerrainSizeTier
@@ -14716,7 +14716,6 @@ address,function,file,kind,target
 0x449bb0,OpenBattleRoom,src/frontend/multi.cpp,global_write,g_lastPlayerCount
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,AreAllPlayersReady
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,BuildPlayerSlotGadgets
-0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,CheckMapCrc
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,CloseTopScreen
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,CompactActivePlayerSlots
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,DrawTextClipped
@@ -14729,6 +14728,7 @@ address,function,file,kind,target
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,GetTicks
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,HandleNetPackets
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,IsScreenNamed
+0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,LobbyMapCrcMatches
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,MarkChanged
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,MarkLayerChanged
 0x44a680,UpdateBattleRoom,src/frontend/multi.cpp,call,PlaySoundByName
@@ -44027,30 +44027,6 @@ address,function,file,kind,target
 ,Charge,src/game/main_loop.cpp,field_write,FrameTimers::last
 ,Charge,src/game/main_loop.cpp,function,
 ,Charge,src/game/main_loop.cpp,global_read,g_game
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,call,FindHostSlot
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,call,Mission::ComputeMapChecksum
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,call,Mission::GetTerrainLength
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,call,operator PlayerInfo *
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,call,operator->
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,field_read,Game::net
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,field_read,Player::info
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,field_read,PlayerInfo::mapCrc
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,field_read,PlayerInfo::versionMajor
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,field_read,PlayerInfo::versionMinor
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,function,
-,CheckMapCrc_00447b10,src/frontend/multi.cpp,global_read,g_game
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,call,FindHostSlot
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,call,Mission::ComputeMapChecksum
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,call,Mission::GetTerrainLength
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,call,operator PlayerInfo *
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,call,operator->
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,field_read,Game::net
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,field_read,Player::info
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,field_read,PlayerInfo::mapCrc
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,field_read,PlayerInfo::versionMajor
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,field_read,PlayerInfo::versionMinor
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,function,
-,CheckMapCrc_00448c70,src/frontend/multi.cpp,global_read,g_game
 ,CheckOnlineVersion,src/host/win32/net.cpp,call,GetProcAddress
 ,CheckOnlineVersion,src/host/win32/net.cpp,function,
 ,CheckOnlineVersion,src/host/win32/net.cpp,global_read,g_onlineDll@src/host/win32/net.cpp
@@ -48327,6 +48303,18 @@ address,function,file,kind,target
 ,LoadWeaponTDFs,src/units/unit_types_42a8d0.cpp,global_write,s_weaponTdfAllocCount@src/units/unit_types_42a8d0.cpp
 ,LoadWeaponTDFs,src/units/unit_types_42a8d0.cpp,global_write,s_weaponTdfLoadedCount@src/units/unit_types_42a8d0.cpp
 ,LoadWeaponTDFs,src/units/unit_types_42a8d0.cpp,global_write,s_weaponTdfParsers@src/units/unit_types_42a8d0.cpp
+,LobbyMapCrcMatches,src/frontend/multi.cpp,call,FindHostSlot
+,LobbyMapCrcMatches,src/frontend/multi.cpp,call,Mission::ComputeMapChecksum
+,LobbyMapCrcMatches,src/frontend/multi.cpp,call,Mission::GetTerrainLength
+,LobbyMapCrcMatches,src/frontend/multi.cpp,call,operator PlayerInfo *
+,LobbyMapCrcMatches,src/frontend/multi.cpp,call,operator->
+,LobbyMapCrcMatches,src/frontend/multi.cpp,field_read,Game::net
+,LobbyMapCrcMatches,src/frontend/multi.cpp,field_read,Player::info
+,LobbyMapCrcMatches,src/frontend/multi.cpp,field_read,PlayerInfo::mapCrc
+,LobbyMapCrcMatches,src/frontend/multi.cpp,field_read,PlayerInfo::versionMajor
+,LobbyMapCrcMatches,src/frontend/multi.cpp,field_read,PlayerInfo::versionMinor
+,LobbyMapCrcMatches,src/frontend/multi.cpp,function,
+,LobbyMapCrcMatches,src/frontend/multi.cpp,global_read,g_game
 ,LocalPlayer,src/network/net_game.cpp,field_escape,Game::players
 ,LocalPlayer,src/network/net_game.cpp,field_read,Game::localPlayer
 ,LocalPlayer,src/network/net_game.cpp,function,

@@ -1311,6 +1311,7 @@ SimGlobals.g_meteorStrikeEndTime,0x3,HAPI_LoadFile,1,1486,0xe270,not-a-pointer,"
 SimGlobals.g_meteorStrikeEndTime,0x2,LoadSoundCategories #2,1,1950,0x40,not-a-pointer,"g_meteorStrikeEndTime: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_meteorTarget,*,*,0,0,-,not-a-pointer,"g_meteorTarget: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_meteorTarget,0x0,LoadSoundCategories #2,1,1950,0x3b,not-a-pointer,"g_meteorTarget: integers (ticks, counts, seed) that only look like addresses"
+SimGlobals.g_meteorWeaponName,*,*,0,0,-,not-a-pointer,"g_meteorWeaponName: the bytes of the meteor weapon's name, which only look like an address"
 SimGlobals.g_missionOrderTableVec,*,*,0,0,-,not-a-pointer,words of SimGlobals.g_missionOrderTableVec that only look like addresses
 SimGlobals.g_missionOrderTableVec,*,*,0,0,-,outside,"the 1 outside pair rows of SimGlobals.g_missionOrderTableVec, which follow"
 SimGlobals.g_missionOrderTableVec,0x4+0x4*k,RegisterOrderTypes,27,277800,0x0-0x6a4,outside,Mission order table vector first (0x4)

@@ -1,0 +1,9 @@
+# Earthquake meteors on Slated Fate: a short shower spawns meteor projectiles at a 74 tick interval (UpdateMeteors) and ends by tick 194.
+game_seed 403
+crt_seed 1403
+view_seed 2403
+map Slated Fate
+start_positions fixed
+ticks 170
+player0.side Arm
+player1.side Core

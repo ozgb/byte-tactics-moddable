@@ -1,7 +1,11 @@
-"""Generate src/harness/trace_schema.h, the field tables the test harness hashes and dumps.
+"""Generate src/harness/trace_schema.h and data/trace_schema.json, the field tables the test harness hashes and dumps.
 
-    uv run tools/traceschema.py          # rewrite the header; a second run leaves it unchanged
-    uv run tools/traceschema.py --check  # exit 1 when the committed header is out of date
+    uv run tools/traceschema.py          # rewrite both files; a second run leaves them unchanged
+    uv run tools/traceschema.py --check  # exit 1 when either committed file is out of date
+
+The JSON is the same tables as data, for a re-implementation that has no use for the header:
+per table the fields in hash order and the plan the hash walks, the masks with their reasons,
+and the fields left out of the hash with their reasons.
 
 Layouts are read from include/ta_types.h (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -11,6 +15,7 @@ their reasons, structs ta_types.h has no single view of) are the data at the top
 """
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -42,6 +47,13 @@ def moved_types(types=None):
 
 MOVED_TYPES = moved_types()
 OUT = ROOT / "src/harness/trace_schema.h"
+JSON_OUT = ROOT / "data/trace_schema.json"
+TARGET_NAMES = ["", "heap", "unit", "player", "unitdef", "weapondef", "projectile", "feature", "piece", "rec",
+                "node", "moveclass", "order", "orderfx", "link"]
+GAME_MASK_REASONS: dict[str, str] = {
+    "mapFlags": "bit 3 is cleared by the camera, which is presentation",
+    "uiOptionFlags": "only bits 3 and 7 to 10, the treedeath and cheat toggles the simulation reads, are kept",
+}
 
 BASE_SIZES: dict[str, int] = {
     "char": 1, "signed char": 1, "unsigned char": 1, "short": 2, "unsigned short": 2,
@@ -1190,8 +1202,77 @@ def emit_table(lines, cname, entries, with_name):
     lines.append("")
 
 
+KIND_NAMES = {"TF_SCALAR": "scalar", "TF_BYTES": "bytes", "TF_POINTER": "pointer", "TF_REF": "ref"}
+
+
+def model_field(entry, mask_reason=None):
+    """One field or plan entry as the JSON holds it."""
+    out = {"name": entry["name"], "offset": entry["offset"], "size": entry["size"], "kind": entry["kind"],
+           "target": entry["target"].lower() if entry["target"] else None}
+    if entry.get("mask"):
+        out["mask"] = entry["mask"]
+        if mask_reason:
+            out["mask_reason"] = mask_reason
+    return out
+
+
+def mask_reason_of(key, entry):
+    found = MASKS.get((key, entry["offset"]))
+    return found[1] if found and entry.get("mask") else None
+
+
+def model_table(key, size, fields, plan, split_of):
+    """A table as the JSON holds it: size, fields in hash order, the hash plan, the exclusions."""
+    owner = split_of or key
+    table = {"size": size}
+    if split_of:
+        table["split_of"] = split_of
+    table["fields"] = [model_field(f, mask_reason_of(owner, f)) for f in fields]
+    table["plan"] = [model_field(f) for f in plan]
+    if not split_of:
+        table["excluded"] = [{"field": f, "reason": r} for t, f, r in EXCLUSIONS if t == key]
+    return table
+
+
+def render_json(model):
+    """Deterministic text: two-space indent, one field or plan entry a line, keys in a fixed order."""
+    def one(value):
+        return json.dumps(value, separators=(", ", ": "))
+
+    def many(items, pad):
+        return "[\n" + ",\n".join(pad + "  " + one(i) for i in items) + "\n" + pad + "]"
+
+    out = ["{", '  "trace_format": %d,' % TRACE_FORMAT, '  "targets": %s,' % one(
+        [{"tag": n, "name": name} for n, name in enumerate(TARGET_NAMES) if n])]
+    out.append('  "tables": {')
+    names = list(model["tables"])
+    for n, name in enumerate(names):
+        t = model["tables"][name]
+        out.append("    %s: {" % one(name))
+        out.append('      "size": %d,' % t["size"])
+        if "split_of" in t:
+            out.append('      "split_of": %s,' % one(t["split_of"]))
+        out.append('      "fields": %s,' % many(t["fields"], "      "))
+        tail = "," if "excluded" in t else ""
+        out.append('      "plan": %s%s' % (many(t["plan"], "      "), tail))
+        if "excluded" in t:
+            out.append('      "excluded": %s' % many(t["excluded"], "      "))
+        out.append("    }" + ("," if n + 1 < len(names) else ""))
+    out.append("  },")
+    out.append('  "game_scalars": %s,' % many(model["game_scalars"], "  "))
+    out.append('  "wind": %s,' % many(model["wind"], "  "))
+    out.append('  "globals": {')
+    groups = list(model["globals"])
+    for n, g in enumerate(groups):
+        out.append('    %s: %s%s' % (one(g), many(model["globals"][g], "    "), "," if n + 1 < len(groups) else ""))
+    out.append("  }")
+    out.append("}")
+    return "\n".join(out) + "\n"
+
+
 def generate():
     schema = Schema()
+    model = {}
     lines = [
         "// Generated by tools/traceschema.py from include/ta_types.h. Do not edit.",
         "#ifndef TRACE_SCHEMA_H",
@@ -1231,12 +1312,14 @@ def generate():
         "",
     ]
     tables = []
+    model_tables = {}
     for ctype, key in TYPE_ORDER:
         fields, size = finish(schema, ctype, key)
         plan = plan_of(fields)
         emit_table(lines, "k%sFields" % key, fields, True)
         emit_table(lines, "k%sPlan" % key, plan, False)
         tables.append((key, len(fields), len(plan), size))
+        model_tables[key] = model_table(key, size, fields, plan, None)
     for ctype, key in [("Pathfinder", "Pathfinder")] + HEAP_TYPES:
         fields, size = finish(schema, ctype, key)
         parts = SPLITS.get(key, [])
@@ -1248,6 +1331,7 @@ def generate():
             emit_table(lines, "k%sFields" % part_key, part, True)
             emit_table(lines, "k%sPlan" % part_key, plan, False)
             tables.append((part_key, len(part), len(plan), size))
+            model_tables[part_key] = model_table(part_key, size, part, plan, None if part_key == key else key)
     for key, nf, npl, size in tables:
         lines.append("static const TraceTable k%sTable = { k%sFields, %d, k%sPlan, %d, 0x%x };"
                      % (key, key, nf, key, npl, size))
@@ -1263,6 +1347,7 @@ def generate():
         wind.append({"name": name, "offset": m["offset"], "size": schema.size_of(ctype),
                      "kind": "scalar", "target": None})
     emit_table(lines, "kWindFields", wind, True)
+    model["wind"] = [model_field(e) for e in wind]
     lines.append("static const unsigned kWindFieldCount = %d;" % len(wind))
     lines.append("")
 
@@ -1278,6 +1363,7 @@ def generate():
             entry["mask"] = mask
         scalars.append(entry)
     emit_table(lines, "kGameScalarFields", scalars, True)
+    model["game_scalars"] = [model_field(e, GAME_MASK_REASONS.get(e["name"])) for e in scalars]
     lines.append("static const unsigned kGameScalarFieldCount = %d;" % len(scalars))
     lines.append("")
 
@@ -1308,11 +1394,15 @@ def generate():
             decl = METEOR_DECLS.get(symbol) or GLOBAL_DECLS.get(symbol) or "int %s" % symbol
             lines.append("extern %s;" % decl)
     lines.append("")
-    for cname, group in (("kMeteorGlobals", METEOR_GLOBALS), ("kScalarGlobals", SCALAR_GLOBALS),
-                         ("kPathGlobals", PATH_GLOBALS)):
+    model["globals"] = {}
+    for cname, gkey, group in (("kMeteorGlobals", "meteors", METEOR_GLOBALS), ("kScalarGlobals", "game", SCALAR_GLOBALS),
+                               ("kPathGlobals", "pathfinder", PATH_GLOBALS)):
+        model["globals"][gkey] = []
         lines.append("static const TraceGlobal %s[] = {" % cname)
         for name, symbol, size, target in group:
             kind = "TF_REF" if symbol in REF_GLOBALS else "TF_POINTER" if target else ("TF_BYTES" if size > 8 else "TF_SCALAR")
+            model["globals"][gkey].append({"name": name, "size": size, "kind": KIND_NAMES[kind],
+                                           "target": target.lower() if target else None})
             tail = "TT_" + target if target else "TT_NONE"
             if symbol in moved:
                 lines.append("    { %s, (const void*)(%s), %d, %s, %s, 1 }," % (
@@ -1328,24 +1418,30 @@ def generate():
         lines.append("#pragma clang diagnostic pop")
         lines.append("")
     lines.append("#endif")
-    return "\n".join(lines) + "\n", schema.errors
+    model["tables"] = dict(sorted(model_tables.items()))
+    return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    text, errors = generate()
+    text, errors, schema_json = generate()
     for e in errors:
         print("layout: " + e, file=sys.stderr)
+    files = [(OUT, text), (JSON_OUT, schema_json)]
     if args.check:
-        sys.exit(0 if OUT.exists() and OUT.read_text() == text else 1)
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    if not OUT.exists() or OUT.read_text() != text:
-        OUT.write_text(text, newline="\n")
-        print("wrote %s" % OUT.relative_to(ROOT))
-    else:
-        print("unchanged %s" % OUT.relative_to(ROOT))
+        stale = [path for path, want in files if not path.exists() or path.read_text() != want]
+        for path in stale:
+            print("stale %s" % path.relative_to(ROOT), file=sys.stderr)
+        sys.exit(1 if stale else 0)
+    for path, want in files:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if not path.exists() or path.read_text() != want:
+            path.write_text(want, newline="\n")
+            print("wrote %s" % path.relative_to(ROOT))
+        else:
+            print("unchanged %s" % path.relative_to(ROOT))
 
 
 if __name__ == "__main__":

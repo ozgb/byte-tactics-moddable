@@ -169,7 +169,8 @@ and so on), and this page is updated to name it. The current tag is
   classed goals by their distance from the patrol vtable, which the carve link
   does not keep; v3 classes them by vtable symbol.
 
-`bt-trace N` names the file layout only, not what is hashed. v1, v2 and v3 are
+`bt-trace N` does not name which fields are hashed. v1, v2 and v3 are
 all `bt-trace 3`, but they hash different fields, so their digests are not
-comparable. The hashed fields are those of `src/harness/trace_schema.h` at the
-tag. The format number changes only when the line layout changes.
+comparable. The hashed fields are those of `data/trace_schema.json` (and
+`src/harness/trace_schema.h`) at the tag. What makes a new format number is in
+`docs/trace-format.md`, "Format numbers".

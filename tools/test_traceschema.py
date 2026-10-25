@@ -3,6 +3,10 @@
     uv run tools/test_traceschema.py
 """
 
+import io
+import json
+import re
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -159,6 +163,104 @@ class MovedGlobalsTest(unittest.TestCase):
         self.assertEqual(names(plain), names(moved))
         self.assertIn('{ "weapon", (const void*)(offsetof(SimGlobals, g_meteorWeapon)), 4, TF_REF, TT_WEAPONDEF, 1 },',
                       moved)
+
+
+class SchemaJsonTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.header, cls.errors, cls.text = ts.generate()
+        cls.model = json.loads(cls.text)
+
+    def test_text_is_deterministic_and_ends_in_a_newline(self):
+        self.assertEqual(ts.generate()[2], self.text)
+        self.assertTrue(self.text.endswith("}\n"))
+        self.assertEqual(self.model["trace_format"], ts.TRACE_FORMAT)
+
+    def test_every_table_of_the_header_is_in_the_json_with_its_counts(self):
+        found = re.findall(r"static const TraceTable k(\w+)Table = \{ k\w+, (\d+), k\w+, (\d+), 0x([0-9a-f]+) \};",
+                           self.header)
+        self.assertGreater(len(found), 40)
+        self.assertEqual(sorted(name for name, *_ in found), list(self.model["tables"]))
+        for name, nfields, nplan, size in found:
+            table = self.model["tables"][name]
+            self.assertEqual((len(table["fields"]), len(table["plan"]), table["size"]),
+                             (int(nfields), int(nplan), int(size, 16)), name)
+
+    def test_the_plan_covers_the_bytes_of_the_fields(self):
+        for name, table in self.model["tables"].items():
+            def covered(entries):
+                return {o for e in entries for o in range(e["offset"], e["offset"] + e["size"])}
+            self.assertEqual(covered(table["fields"]), covered(table["plan"]), name)
+            for e in table["plan"]:
+                if e["kind"] == "bytes":
+                    self.assertEqual(e["name"], "")
+
+    def test_fields_are_in_offset_order_and_pointers_name_a_target(self):
+        targets = {t["name"] for t in self.model["targets"]}
+        for name, table in self.model["tables"].items():
+            offsets = [f["offset"] for f in table["fields"]]
+            self.assertEqual(offsets, sorted(offsets), name)
+            for f in table["fields"]:
+                if f["kind"] in ("pointer", "ref"):
+                    self.assertIn(f["target"], targets, name)
+                else:
+                    self.assertIsNone(f["target"], name)
+
+    def test_order_flags_mask_carries_its_reason(self):
+        flags = next(f for f in self.model["tables"]["Order"]["fields"] if f["offset"] == 0x42)
+        self.assertEqual(flags["mask"], 0xFFDFFFFF)
+        self.assertIn("0x200000", flags["mask_reason"])
+
+    def test_every_mask_has_a_reason(self):
+        masked = [f for t in self.model["tables"].values() for f in t["fields"] if "mask" in f]
+        masked += [f for f in self.model["game_scalars"] if "mask" in f]
+        self.assertGreaterEqual(len(masked), len(ts.MASKS) + len(ts.GAME_MASK_REASONS))
+        for f in masked:
+            self.assertTrue(f.get("mask_reason"), f)
+
+    def test_split_tables_name_their_parent_and_exclusions_are_listed_once(self):
+        tables = self.model["tables"]
+        self.assertEqual(tables["OrderPosY"]["split_of"], "Order")
+        self.assertNotIn("excluded", tables["OrderPosY"])
+        self.assertEqual([e["field"] for e in tables["Order"]["excluded"]],
+                         [f for t, f, _ in ts.EXCLUSIONS if t == "Order"])
+
+    def test_globals_hold_name_size_and_kind(self):
+        self.assertEqual(set(self.model["globals"]), {"meteors", "game", "pathfinder"})
+        weapon = next(g for g in self.model["globals"]["meteors"] if g["name"] == "weapon")
+        self.assertEqual((weapon["size"], weapon["kind"], weapon["target"]), (4, "ref", "weapondef"))
+        self.assertEqual(self.model["wind"][0]["name"], "windCounter")
+
+
+class CheckTest(unittest.TestCase):
+    def run_main(self, header_text, json_text, *args):
+        with tempfile.TemporaryDirectory() as tmp:
+            out, js = Path(tmp) / "trace_schema.h", Path(tmp) / "trace_schema.json"
+            if header_text is not None:
+                out.write_text(header_text)
+            if json_text is not None:
+                js.write_text(json_text)
+            with mock.patch.object(ts, "OUT", out), mock.patch.object(ts, "JSON_OUT", js), \
+                    mock.patch.object(ts, "ROOT", Path(tmp)), mock.patch.object(sys, "argv", ["traceschema", *args]), \
+                    mock.patch("sys.stdout", io.StringIO()), mock.patch("sys.stderr", io.StringIO()):
+                try:
+                    ts.main()
+                    code = 0
+                except SystemExit as e:
+                    code = e.code
+            return code, out.read_text(), js.read_text() if js.exists() else None
+
+    def test_check_passes_on_fresh_files_and_fails_when_either_is_stale(self):
+        header, _, text = ts.generate()
+        self.assertEqual(self.run_main(header, text, "--check")[0], 0)
+        self.assertEqual(self.run_main(header, text.replace('"size": 4', '"size": 5', 1), "--check")[0], 1)
+        self.assertEqual(self.run_main(header + "x", text, "--check")[0], 1)
+        self.assertEqual(self.run_main(header, None, "--check")[0], 1)
+
+    def test_write_repairs_a_stale_json_and_leaves_the_header(self):
+        header, _, text = ts.generate()
+        code, out, js = self.run_main(header, "{}", )
+        self.assertEqual((code, out, js), (0, header, text))
 
 
 if __name__ == "__main__":

@@ -910,7 +910,7 @@ length is not written; it is the number of bytes after `str:` up to the end of t
 string is `str:` alone and is not `null`). A string of 255 or more bytes is cut at 255. A string
 cannot hold a 0 byte, since that ends it. A string that holds a newline byte (0x0a) cannot be read
 back from the dump, because its line ends there; take such a block from the trace instead.
-(No string in the scenarios so far holds one.) Read the dump
+Read the dump
 as bytes (for instance as Latin-1) and split lines at 0x0a only, so that a carriage return or a
 byte of 0x80 or above stays in the value.
 

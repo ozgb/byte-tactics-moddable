@@ -10,6 +10,7 @@
 #include "../../include/ta_types.h"
 #include "../map/mission.h"
 #include "../network/player_info.h"
+#include "../game/game_load.h"
 #include "condition_class.h"
 #include "../../interfaces/seams.h"
 #include "../quirks/quirks.h"
@@ -654,6 +655,8 @@ static int FindSide(const char* name)
     return -1;
 }
 
+void HideSoftwareCursor();
+
 static void SeedNetworkTable()
 {
     for (int i = 0; i < MAX_PLAYERS; i++)
@@ -679,6 +682,12 @@ static void SeedNetworkHost(int host)
         info->maxUnits = g_game->maxUnits_37eec;
         info->metal = (unsigned short)s_players[i].metal;
         info->energy = (unsigned short)s_players[i].energy;
+    }
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        for (int k = 0; k < MAX_PLAYERS; k++) {
+            if (g_game->players[i].allied[k] != 0)
+                g_game->players[k].alliedBy[i] = 1;
+        }
     }
     g_game->loadingFlags.value |= 8;
 }
@@ -775,6 +784,11 @@ static void SetUpSkirmish()
     g_game->frontendState = 9;
     g_game->frontendSubState = 2;
     g_game->frontendNextSubState = 2;
+    if (s_gameType == 3) {
+        HideSoftwareCursor();
+        g_game->mode_391f1 = 5;
+        g_game->handler = LoadingScreenFrame;
+    }
 }
 
 static void OpenTrace(unsigned controlWord);
@@ -3120,6 +3134,10 @@ void HarnessBeforeStep()
     if (!s_testMode)
         return;
     unsigned tick = GameU32(GAME_TICK);
+    if (s_gameType == 3) {
+        for (int i = 0; i < MAX_PLAYERS; i++)
+            g_game->players[i].progress = 100;
+    }
     if (s_quirkTamper && tick == s_quirkTamperTick)
         QuirksFlipFirstSim(&g_quirks);
     if (s_quirkReach && tick == s_quirkReachTick)

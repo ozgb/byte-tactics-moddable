@@ -49,7 +49,7 @@ ai,Vec3_0040beb0::Scale,src/ai/ai_player.cpp,0,0,0,0,0,0,?Scale@Vec3_0040beb0@@Q
 ai,Vec::Vec,src/ai/vec.h,0,0,0,0,0,0,??0Vec@@QAE@HHH@Z,1
 ai,std::_Construct,src/ai/ai_player_40c530.cpp,0,0,0,0,0,0,?_Construct@std@@YGXPAUElem_0040cc40@@ABU2@@Z,1
 ai,std::_Construct,src/ai/ai_player_40c530.cpp,0,0,0,0,0,0,?_Construct@std@@YGXPAUElem_0040d4f0@@ABU2@@Z,1
-economy,*,,32,16,621,378,320,114,,7
+economy,*,,32,17,621,389,320,119,,7
 economy,CallOnEachReverse,src/game/economy.cpp,0,0,0,0,0,0,?CallOnEachReverse@@YGXPAVObj@@HHP81@AEXXZ@Z,1
 economy,CmdNoEnergy,src/game/console_commands.cpp,1,0,0,0,0,0,?CmdNoEnergy@@YGXPAVCommandArgs@@@Z,0
 economy,CmdNoMetal,src/game/console_commands.cpp,1,0,0,0,0,0,?CmdNoMetal@@YGXPAVCommandArgs@@@Z,0
@@ -60,7 +60,6 @@ economy,CmdShareEnergy,src/game/share_commands.cpp,1,0,0,0,0,0,?CmdShareEnergy@@
 economy,CmdShareMetal,src/game/share_commands.cpp,1,0,0,0,0,0,?CmdShareMetal@@YGXH@Z,0
 economy,Econ_00401360::RequestEnergy,src/game/economy_401360.cpp,0,0,0,0,0,0,?RequestEnergy@Econ_00401360@@QAEHPAV1@M@Z,1
 economy,Econ_00401360::RequestEnergyAndMetal,src/game/economy_401360.cpp,0,0,0,0,0,0,?RequestEnergyAndMetal@Econ_00401360@@QAEHMM@Z,1
-economy,Econ_00401360::SpendEnergy,src/game/economy_401360.cpp,1,0,0,0,0,0,?SpendEnergy@Econ_00401360@@QAEHM@Z,0
 economy,Econ_00401360::SpendEnergyAndMetal,src/game/economy_401360.cpp,0,0,0,0,0,0,?SpendEnergyAndMetal@Econ_00401360@@QAEHMM@Z,1
 economy,Econ_00401360::SpendMetal,src/game/economy_401360.cpp,0,0,0,0,0,0,?SpendMetal@Econ_00401360@@QAEHM@Z,1
 economy,InitStartingResourcesFromSkirmish,src/game/main_loop.cpp,0,0,0,0,0,0,?InitStartingResourcesFromSkirmish@@YGXXZ,1
@@ -349,7 +348,7 @@ game,UpdateBattleHoverMode,src/game/game_state.cpp,0,0,0,0,0,0,?UpdateBattleHove
 game,UpdateBattleRoom,src/frontend/multi_44a680.cpp,1,0,0,0,0,0,?UpdateBattleRoom@@YGXXZ,0
 game,WriteGameRegistryValue,src/game/settings.cpp,1,0,0,0,0,0,?WriteGameRegistryValue@@YGXPAX0H@Z,0
 game,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,0,0,0,0,0,0,?Clear@Zero11_004917d0@@QAEXXZ,1
-los_radar,*,,89,62,2018,1560,920,621,,20
+los_radar,*,,89,62,2018,1560,920,622,,20
 los_radar,AssignRange,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRange@@YGXPAUElem_432cb0@@00@Z,1
 los_radar,AssignRangeBack,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRangeBack@@YGPAUElem_432cb0@@PAU1@00@Z,1
 los_radar,ByteMap_004658e0::Get,src/game/players_4658e0.cpp,1,0,0,0,0,0,?Get@ByteMap_004658e0@@QAEEHH@Z,0
@@ -397,7 +396,7 @@ los_radar,Visible,src/units/unit_scripts.cpp,1,0,0,0,0,0,?Visible@@YGHPAUUnit_00
 los_radar,std::_Construct,src/map/los_tables_433a80.cpp,1,0,0,0,0,0,?_Construct@std@@YGXPAUElem_00434020@@ABU2@@Z,0
 los_radar,std::_Destroy,src/map/los_tables_433a80.cpp,1,0,0,0,0,0,?_Destroy@std@@YGXPAUElem_00434020@@@Z,0
 los_radar,std::_Destroy,src/map/los_tables_433a80.cpp,1,0,0,0,0,0,?_Destroy@std@@YGXPAUElem_00434360@@@Z,0
-map,*,,98,68,2149,1601,1022,679,,12
+map,*,,98,68,2149,1612,1022,682,,12
 map,ByteMap_0047d2e0::Contains,src/map/terrain.cpp,0,0,0,0,0,0,?Contains@ByteMap_0047d2e0@@QAEHHH@Z,1
 map,ClaimFootprintsInArea,src/map/terrain.cpp,0,0,0,0,0,0,?ClaimFootprintsInArea@@YGXUPoint16@@0@Z,1
 map,Clamp_0047e750,src/map/terrain.cpp,0,0,0,0,0,0,?Clamp_0047e750@@YGHHI@Z,1
@@ -815,7 +814,7 @@ network,Vec_0046d6c0::size,src/network/unit_sync.cpp,1,0,0,0,0,0,?size@Vec_0046d
 network,Vec_0046d860::Push,src/network/unit_sync_46dad0.cpp,1,0,0,0,0,0,?Push@Vec_0046d860@@QAEXABUSyncPlayerRecord@@@Z,0
 network,Wrap_0046e5e0::Wrap_0046e5e0,src/network/unit_sync_46dad0.cpp,1,0,0,0,0,0,??0Wrap_0046e5e0@@QAE@ABUAlloc_0046e5c0@@@Z,0
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UElem_0046faf0@@@std@@QAEXPAUElem_0046faf0@@@Z,0
-orders,*,,372,268,6481,4148,3188,1553,,28
+orders,*,,372,268,6481,4201,3188,1569,,28
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1
 orders,AddComponentwise,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?AddComponentwise@@YG?AUVec3@@ABU1@0@Z,0
 orders,AddVectors,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?AddVectors@@YG?AUVec3@@ABU1@0@Z,1
@@ -962,7 +961,7 @@ pathfinding,Pathfinder::MarkGoalCell,src/ai/pathfind.cpp,0,0,0,0,0,0,?MarkGoalCe
 pathfinding,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,0,0,0,0,0,0,?ReleaseHeldPathLock@Pathfinder@@QAEXXZ,1
 pathfinding,Pathfinder::RemoveNode,src/ai/pathfind.cpp,1,0,0,0,0,0,?RemoveNode@Pathfinder@@QAEXH@Z,0
 pathfinding,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,1,0,0,0,0,0,??1Pathfinder@@QAE@XZ,0
-platform,*,,646,307,7246,2467,2840,631,,82
+platform,*,,646,310,7246,2470,2840,631,,82
 platform,??8@YG_NABVStringRef@@0@Z,src/util/tdf_4c54f0.cpp,1,0,0,0,0,0,??8@YG_NABVStringRef@@0@Z,0
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1
@@ -1268,9 +1267,6 @@ platform,Tree_004da8d0::Init,src/debug/debug_lib.cpp,1,0,0,0,0,0,?Init@Tree_004d
 platform,Tree_004da8d0::Tree_004da8d0,src/debug/debug_lib.cpp,1,0,0,0,0,0,??0Tree_004da8d0@@QAE@ABD0@Z,0
 platform,Tree_004da8d0::operator?2,src/debug/debug_lib.cpp,1,0,0,0,0,0,??2Tree_004da8d0@@SGPAXI@Z,0
 platform,UnhandledExceptionHandler,src/host/win32/crash.cpp,1,0,0,0,0,0,?UnhandledExceptionHandler@@YGXH@Z,0
-platform,UnitDef::EnergyCost,src/units/unit_def.h,1,0,0,0,0,0,?EnergyCost@UnitDef@@QAEMXZ,0
-platform,UnitDef::MaxHealth,src/units/unit_def.h,1,0,0,0,0,0,?MaxHealth@UnitDef@@QAEIXZ,0
-platform,UnitDef::MetalCost,src/units/unit_def.h,1,0,0,0,0,0,?MetalCost@UnitDef@@QAEMXZ,0
 platform,UnloadImageHelp,src/host/win32/crash.cpp,1,0,0,0,0,0,?UnloadImageHelp@@YGXXZ,0
 platform,UsesDataArchives,src/game/cd_check.cpp,1,0,0,0,0,0,?UsesDataArchives@@YGHXZ,0
 platform,Vec3::SquareXZ,src/util/vec3.h,0,0,0,0,0,0,?SquareXZ@Vec3@@QBEHXZ,1
@@ -1384,7 +1380,7 @@ platform,host_window_post,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_post
 platform,host_window_raise,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_raise,0
 platform,host_window_set_topmost,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_set_topmost,0
 platform,std::_Destroy,src/util/tdf_4c2f60.cpp,0,0,0,0,0,0,?_Destroy@std@@YGXPAUElem_004c2f60@@@Z,1
-players,*,,143,45,1913,574,804,172,,11
+players,*,,143,50,1913,635,804,195,,11
 players,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,src/units/units_485010.cpp,0,0,0,0,0,0,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,1
 players,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,src/units/units_485010.cpp,0,0,0,0,0,0,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,1
 players,??$_Iter_swap@PAPAUPlayer@@PAPAU1@PAU1@@std@@YGXPAPAUPlayer@@00@Z,src/units/units_485010.cpp,0,0,0,0,0,0,??$_Iter_swap@PAPAUPlayer@@PAPAU1@PAU1@@std@@YGXPAPAUPlayer@@00@Z,1
@@ -1415,7 +1411,6 @@ players,DefeatAnyUnitPassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadSt
 players,DefeatAnyUnitPassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@DefeatAnyUnitPassesZ@@UAEXPAVHapiBank@@@Z,0
 players,DefeatAnyUnitPassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@DefeatAnyUnitPassesZ@@UAEHPAUUnit@@@Z,0
 players,DefeatCommanderKilled::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@DefeatCommanderKilled@@UAEXPAVHapiBank@@@Z,0
-players,DefeatCommanderKilled::OnUnitDied,src/game/victory.cpp,1,0,0,0,0,0,?OnUnitDied@DefeatCommanderKilled@@UAEXPAUUnit@@@Z,0
 players,DefeatCommanderKilled::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@DefeatCommanderKilled@@UAEXPAVHapiBank@@@Z,0
 players,DefeatDeathTimerRunsOut::DefeatDeathTimerRunsOut,src/game/victory_conditions.h,1,0,0,0,0,0,??0DefeatDeathTimerRunsOut@@QAE@H@Z,0
 players,DefeatDeathTimerRunsOut::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?IsSatisfied@DefeatDeathTimerRunsOut@@UAEHXZ,0
@@ -1428,7 +1423,6 @@ players,DefeatUnitTypeKilled::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveSt
 players,EnableReporter,src/game/statistics.cpp,1,0,0,0,0,0,?EnableReporter@@YGHH@Z,0
 players,FillScoreTables,src/game/statistics_46c2a0.cpp,1,0,0,0,0,0,?FillScoreTables@@YGHXZ,0
 players,FreePlayers,src/game/players_464290.cpp,1,0,0,0,0,0,?FreePlayers@@YGXXZ,0
-players,GiveUnitToPlayer,src/units/unit_commands.cpp,1,0,0,0,0,0,?GiveUnitToPlayer@@YGXPAUUnit@@PAUPlayer@@PAUOwnershipTransferPacket@@@Z,0
 players,IsLocalPlayerEliminated,src/game/victory.cpp,0,0,0,0,0,0,?IsLocalPlayerEliminated@@YGHXZ,1
 players,IsLocalPlayerOutOfUnits,src/game/victory.cpp,0,0,0,0,0,0,?IsLocalPlayerOutOfUnits@@YGHXZ,1
 players,IsReporterDllLoaded,src/game/statistics.cpp,1,0,0,0,0,0,?IsReporterDllLoaded@@YG_NXZ,0
@@ -1436,12 +1430,10 @@ players,LoadPlayerControllers,src/game/players_464290.cpp,1,0,0,0,0,0,?LoadPlaye
 players,LoadPlayers,src/game/players_466050.cpp,1,0,0,0,0,0,?LoadPlayers@@YGXPAVHapiBank@@@Z,0
 players,LoadReporterDll,src/game/statistics.cpp,1,0,0,0,0,0,?LoadReporterDll@@YGHPAHH@Z,0
 players,MissionCondition::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?IsSatisfied@MissionCondition@@UAEHXZ,0
-players,MissionCondition::OnUnitCaptured,src/game/victory.cpp,1,0,0,0,0,0,?OnUnitCaptured@MissionCondition@@UAEXPAUUnit@@@Z,0
 players,MissionConditions::AllVictoryConditionsMet,src/game/victory.cpp,1,0,0,0,0,0,?AllVictoryConditionsMet@MissionConditions@@QAEHXZ,0
 players,MissionConditions::AnyDefeatConditionMet,src/game/victory.cpp,1,0,0,0,0,0,?AnyDefeatConditionMet@MissionConditions@@QAEHXZ,0
 players,MissionConditions::Deactivate,src/game/victory.cpp,1,0,0,0,0,0,?Deactivate@MissionConditions@@QAEXXZ,0
 players,MissionConditions::LoadConditions,src/game/victory.cpp,1,0,0,0,0,0,?LoadConditions@MissionConditions@@QAEXPAVHapiBank@@@Z,0
-players,MissionConditions::NotifyUnitCaptured,src/game/victory.cpp,1,0,0,0,0,0,?NotifyUnitCaptured@MissionConditions@@QAEXPAUUnit@@@Z,0
 players,MissionConditions::SaveConditions,src/game/victory.cpp,1,0,0,0,0,0,?SaveConditions@MissionConditions@@QAEXPAVHapiBank@@@Z,0
 players,MissionConditions::~MissionConditions,src/game/mission_conditions.h,1,0,0,0,0,0,??1MissionConditions@@QAE@XZ,0
 players,PlayerRecordAt,src/game/game_load.cpp,1,0,0,0,0,0,?PlayerRecordAt@@YGPADPAUGame@@H@Z,0
@@ -1474,7 +1466,6 @@ players,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,1,0,0,0,0,0,?OnUni
 players,VictoryKillAllOfType::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryKillAllOfType@@UAEXPAVHapiBank@@@Z,0
 players,VictoryKillAllOfType::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryKillAllOfType@@UAEHPAUUnit@@@Z,0
 players,VictoryKillEnemyCommander::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryKillEnemyCommander@@UAEXPAVHapiBank@@@Z,0
-players,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,1,0,0,0,0,0,?OnUnitDied@VictoryKillEnemyCommander@@UAEXPAUUnit@@@Z,0
 players,VictoryKillEnemyCommander::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryKillEnemyCommander@@UAEXPAVHapiBank@@@Z,0
 players,VictoryKillUnitType::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryKillUnitType@@UAEXPAVHapiBank@@@Z,0
 players,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,1,0,0,0,0,0,?OnUnitDied@VictoryKillUnitType@@UAEXPAUUnit@@@Z,0
@@ -1494,7 +1485,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0
-presentation,*,,1143,441,32083,9683,11968,2522,,329
+presentation,*,,1143,441,32083,9691,11968,2530,,329
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0
 presentation,??G@YG?AUVec3_00474760@@ABU0@0@Z,src/graphics/particles.cpp,1,0,0,0,0,0,??G@YG?AUVec3_00474760@@ABU0@0@Z,0
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0
@@ -2565,13 +2556,12 @@ seams,SerializeOrderToSaveNative,src/seams/native.cpp,1,0,0,0,0,0,?SerializeOrde
 seams,SpendEnergyNative,src/seams/native.cpp,1,0,0,0,0,0,?SpendEnergyNative@@YGHPAVUnitResources@@M@Z,0
 seams,SpendMetalNative,src/seams/native.cpp,1,0,0,0,0,0,?SpendMetalNative@@YGHPAVUnitResources@@M@Z,0
 seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadManagerDeleteTimersNative@@YIXPAVSquadManager@@H@Z,0
-state,*,,386,310,697,546,670,330,,22
+state,*,,386,314,697,550,670,331,,22
 state,??$?8PAUUnit@@PAU0@@@YG_NABV?$SimAllocator@PAUUnit@@@@0@Z,src/state/sim_allocator.h,0,0,0,0,0,0,??$?8PAUUnit@@PAU0@@@YG_NABV?$SimAllocator@PAUUnit@@@@0@Z,1
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0
 state,??8@YG_NABU?$Ref@G@@PAG@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@G@@PAG@Z,0
 state,??8@YG_NABU?$Ref@UCallback@@@@PAUCallback@@@Z,interfaces/ref.h,0,0,0,0,0,0,??8@YG_NABU?$Ref@UCallback@@@@PAUCallback@@@Z,1
-state,??8@YG_NABU?$Ref@UPlayer@@@@PAUPlayer@@@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@UPlayer@@@@PAUPlayer@@@Z,0
 state,??8@YG_NABU?$Ref@UProjectile@@@@PAUProjectile@@@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@UProjectile@@@@PAUProjectile@@@Z,0
 state,??8@YG_NABU?$Ref@UUnit_0043e490@@@@PAUUnit_0043e490@@@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@UUnit_0043e490@@@@PAUUnit_0043e490@@@Z,0
 state,??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z,0
@@ -2593,7 +2583,6 @@ state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@ULimits_0043e490@@@@QBEPA
 state,Ref::get,interfaces/ref.h,0,0,0,0,0,0,?get@?$Ref@UMission_00467e50@@@@QBEPAUMission_00467e50@@XZ,1
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UNode_0043e490@@@@QBEPAUNode_0043e490@@XZ,0
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UNode_00489a90@@@@QBEPAUNode_00489a90@@XZ,0
-state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UOwner_0048ea40@@@@QBEPAUOwner_0048ea40@@XZ,0
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UPlayerState_00468cf0@@@@QBEPAUPlayerState_00468cf0@@XZ,0
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UScreenPos@@@@QBEPAUScreenPos@@XZ,0
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@USideData@@@@QBEPAUSideData@@XZ,0
@@ -2621,12 +2610,10 @@ state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@UUnitType_0041b2e0@@
 state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@UUnit_0041b2e0@@@@QBEPAUUnit_0041b2e0@@XZ,0
 state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@UUnit_0043f0e0@@@@QBE_NXZ,0
 state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@VPacketChannel@@@@QBEPAVPacketChannel@@XZ,0
-state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@VPathOrderAttach@@@@QBEPAVPathOrderAttach@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UData_0046dad0@@@@QBEPAUData_0046dad0@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,0,0,0,0,0,0,??C?$Ref@UKind_00499ab0@@@@QBEPAUKind_00499ab0@@XZ,1
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UKind_0049db70@@@@QBEPAUKind_0049db70@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UNode_0047cb00@@@@QBEPAUNode_0047cb00@@XZ,0
-state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UOwner_0048ea40@@@@QBEPAUOwner_0048ea40@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UPlayerState_00468cf0@@@@QBEPAUPlayerState_00468cf0@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UProjectile@@@@QBEPAUProjectile@@XZ,0
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UScreenPos@@@@QBEPAUScreenPos@@XZ,0
@@ -2664,9 +2651,9 @@ state,SimAllocator::destroy,src/state/sim_allocator.h,0,0,0,0,0,0,?destroy@?$Sim
 state,SimAllocator::destroy,src/state/sim_allocator.h,0,0,0,0,0,0,?destroy@?$SimAllocator@V?$vector@UElem_0040cc40@@V?$SimAllocator@UElem_0040cc40@@@@@std@@@@QAEXPAV?$vector@UElem_0040cc40@@V?$SimAllocator@UElem_0040cc40@@@@@std@@@Z,1
 state,SimAllocator::destroy,src/state/sim_allocator.h,0,0,0,0,0,0,?destroy@?$SimAllocator@V?$vector@UElem_0040cfb0@@V?$SimAllocator@UElem_0040cfb0@@@@@std@@@@QAEXPAV?$vector@UElem_0040cfb0@@V?$SimAllocator@UElem_0040cfb0@@@@@std@@@Z,1
 state,SimAllocator::max_size,src/state/sim_allocator.h,0,0,0,0,0,0,?max_size@?$SimAllocator@PAUUnit@@@@QBEIXZ,1
-targeting,*,,10,10,131,126,76,54,,1
+targeting,*,,10,10,131,126,76,56,,1
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1
-units,*,,167,112,4127,2900,1730,1026,,34
+units,*,,167,112,4127,2903,1730,1031,,34
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1
@@ -2756,7 +2743,7 @@ units,spd,src/units/unit_targets.cpp,1,0,0,0,0,0,?spd@@YGMH@Z,0
 units,vector::operator?A,src/units/unit_commands.cpp,1,0,0,0,0,0,??A?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEAAPAUUnit@@I@Z,0
 units,vector::vector,src/units/unit_commands.cpp,1,0,0,0,0,0,??0?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@IABQAUUnit@@ABV?$allocator@PAUUnit@@@1@@Z,0
 units,vector::~vector,src/units/unit_commands.cpp,1,0,0,0,0,0,??1?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@XZ,0
-weapons,*,,88,73,2369,1966,1010,675,,20
+weapons,*,,88,73,2369,1966,1010,676,,20
 weapons,??8@YG_NABVStringRef@@0@Z,src/weapons/weapon_types.cpp,1,0,0,0,0,0,??8@YG_NABVStringRef@@0@Z,0
 weapons,ApplyProjectileHitPacket,src/weapons/weapons.cpp,1,0,0,0,0,0,?ApplyProjectileHitPacket@@YGXHPAUProjectileDetonatePacket@@@Z,0
 weapons,ApplyWeaponFirePacket,src/weapons/weapons.cpp,1,0,0,0,0,0,?ApplyWeaponFirePacket@@YGXHPAUWeaponFirePacket@@@Z,0

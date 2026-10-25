@@ -1,0 +1,19 @@
+# Human Arm commander on The Pass has a spawned solar collector, mine and advanced kbot lab, and a spawned kamikaze kbot attacks the solar collector; 420 ticks.
+game_seed 413
+crt_seed 1413
+view_seed 2413
+map The Pass
+start_positions fixed
+ticks 420
+commander_death 0
+player0.controller human
+player0.side Arm
+player0.metal 30000
+player0.energy 60000
+player1.controller ai
+player1.side Core
+spawn 10 0 ARMSOLAR 640 260
+spawn 10 0 ARMMINE1 600 330
+spawn 10 0 ARMALAB 470 200
+spawn 10 0 ARMVADER 540 300
+order 20 0:ARMVADER:1 attack 0:ARMSOLAR:1

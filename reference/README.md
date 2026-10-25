@@ -62,7 +62,7 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `map` | required | Map name, the rest of the line (names have spaces) |
 | `difficulty` | 1 | AI difficulty 0 to 2, one value for all computer players |
 | `commander_death` | 1 | 1: the game ends when a commander dies |
-| `mapping` | 1 | 1: the whole map starts mapped |
+| `mapping` | 1 | 1: terrain is blacked out until explored |
 | `line_of_sight` | 1 | 1: line of sight is on |
 | `los_type` | 1 | Line of sight type, 0 or 1 |
 | `start_positions` | `fixed` | `fixed`: player N starts at position N; `random`: shuffled |
@@ -142,6 +142,8 @@ order 150 0:ARMCOM:1 reclaim 0:ARMSOLAR:1
 - `qbuild <unit type> [n]` adds n (default 1, at most 99) of a unit type to the
   build queue of each unit the selector names, as a click in a factory's build
   menu does. The selector names the factory; the order has no target.
+  `qbuild MAKENUKE` and `qbuild MAKEANTI` queue a missile, as the weapon-build
+  button does; the name goes to the game as written, with no unit type lookup.
 - A `+` before the kind (`+move 700 300`) is the shift key: the order joins the
   queue instead of replacing the orders, and repeating an identical queued
   order cancels it.
@@ -152,7 +154,24 @@ units, sets the order mode and cursor position, and calls the game's
 build site does, and `qbuild` calls `QueueBuildOrder`). The kinds without a
 target call it with the order's mission type, as the buttons do. The selection is put back afterwards.
 
-A bad selector, kind or position, a slot that is not `human`, a tick after the
+A scenario can also create units. One `spawn` line per unit:
+
+```
+spawn <tick> <slot> <unit type> <x> <z>
+spawn 10 1 ARMLAB 640 260
+```
+
+- The unit is created at the start of `<tick>`, before that tick's orders, so an
+  `order` on the same tick can select it. `<slot>` is a player the scenario
+  names (it need not be `human`), `<unit type>` is one exact unit type name (no
+  wildcard) and `x z` is a world position, with the height of the ground there.
+- It is what the console cheat does for one unit: the position is snapped to
+  the unit's footprint, then the unit is created for the slot. A spawned unit is
+  created finished, as the console cheat makes it, so a scenario that spawns
+  tests what the unit does, not how it was built. The tech chain is tested by
+  the scenarios that build.
+
+A bad selector, kind or position, a slot that is not `human` (a `spawn` needs only a named slot), a tick after the
 last tick, an unknown unit type, a build site the game rejects, or a selector
 that names no live unit at its tick exits with status 2 and a message that
 names the line.

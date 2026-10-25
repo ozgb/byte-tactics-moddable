@@ -966,6 +966,7 @@ harness,los_radar,shared_write,Game::playerIndex,14
 harness,map,call,Mission::CountStartPositions,1
 harness,map,call,Mission::LoadMissionByName,1
 harness,map,call,SetMissionType,1
+harness,map,call,SnapWorldPosToFootprint,1
 harness,map,shared_write,Game::difficulty,1
 harness,map,shared_write,Game::playerIndex,1
 harness,network,shared_write,Game::localPlayer,19
@@ -991,6 +992,7 @@ harness,presentation,shared_write,Game::difficulty,9
 harness,presentation,shared_write,Game::localPlayer,67
 harness,presentation,shared_write,Game::playerIndex,32
 harness,seams,call,InstallNativeSeams,1
+harness,units,call,CreateUnit,1
 harness,units,call,GetGroundHeight,1
 harness,units,shared_write,Game::difficulty,2
 harness,units,shared_write,Game::localPlayer,2

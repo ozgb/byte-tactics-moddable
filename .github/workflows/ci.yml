@@ -212,7 +212,8 @@ jobs:
         if: steps.changed.outputs.run == 'true'
         run: |
           uv run tools/test_tracerehash.py
-          uv run tools/tracerehash.py tools/testdata/tracerehash/orders-build-patrol-400.dump.txt.xz --trace tools/testdata/tracerehash/orders-build-patrol-400.trace.txt
+          uv run tools/tracerehash.py tools/testdata/tracerehash/orders-build-patrol-1.dump.txt.xz --trace tools/testdata/tracerehash/orders-build-patrol-1.trace.txt
+          uv run tools/tracerehash.py tools/testdata/tracerehash/orders-build-patrol-24.dump.txt.xz --trace tools/testdata/tracerehash/orders-build-patrol-24.trace.txt
 
       - name: Check data/coupling.csv is current
         if: steps.changed.outputs.run == 'true'

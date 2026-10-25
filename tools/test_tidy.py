@@ -16,7 +16,7 @@ from pathlib import Path
 
 import tidy
 
-GIT = ["git", "-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false"]
+GIT = ["git", "-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false", "-c", "gc.auto=0", "-c", "maintenance.auto=false"]
 
 SOURCE = """#include "a.h"
 int Add(int a, int b)

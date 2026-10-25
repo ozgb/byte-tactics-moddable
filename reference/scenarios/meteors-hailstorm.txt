@@ -1,0 +1,9 @@
+# Hailstorm meteors on Flooded Glaciers: the spawn interval truncates to 0, so a meteor projectile spawns every tick (UpdateMeteors).
+game_seed 404
+crt_seed 1404
+view_seed 2404
+map Flooded Glaciers
+start_positions fixed
+ticks 150
+player0.side Arm
+player1.side Core

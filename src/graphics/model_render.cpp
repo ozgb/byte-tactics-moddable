@@ -60,6 +60,7 @@ class Surface;
 #include "model_types.h"
 
 #include "../units/unit_def.h"
+#include "../network/player_info.h"
 
 union Flags_37f06 {
     unsigned short whole;
@@ -79,31 +80,6 @@ union Flags_37f06 {
 #include "memory_cache.h"
 
 #pragma pack(push, 1)
-union UnitTypeFlags_459200 {
-    unsigned int word;
-    struct {
-        unsigned int hi : 30;
-        unsigned int digger : 1;
-        unsigned int lo : 1;
-    } bits;
-};
-
-struct UnitDefFlags_459200 {
-    char unknown_0[0x241];
-    UnitTypeFlags_459200 flags;
-};
-
-union GameFlags_459200 {
-    unsigned short whole;
-    struct {
-        unsigned short b0 : 1;
-        unsigned short b1 : 1;
-        unsigned short b2 : 1;
-        unsigned short b3 : 1;
-        unsigned short rest : 12;
-    } bits;
-};
-
 #include "../game/game.h"
 #pragma pack(pop)
 
@@ -322,9 +298,8 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
                             void* pic;
                             if (fflags.bits.usePic) {
                                 if (fflags.bits.shaded) {
-                                    int unit = (int)(*(Ref<char>*)((char*)g_game + 0x1b8a + kind * 0x14b)).get();
-                                    pic = GetGafFrame(face->color,
-                                        *(unsigned char*)(unit + 0x96));
+                                    int unit = g_game->players_1b63[kind].info.get()->color;
+                                    pic = GetGafFrame(face->color, unit);
                                 } else if (useColor) {
                                     pic = GetGafFrame(face->color, 0);
                                 } else {
@@ -1071,8 +1046,8 @@ void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
             if (face->count != 4) goto skip0;
             if (flags.bits.usePic) {
                 if (flags.bits.shaded) {
-                    unit = (int)(*(Ref<char>*)(((char*)g_game + 0x1b8a) + ((palette & 0xff) * 0x14b))).get();
-                    pic = GetGafFrame(face->color, *(unsigned char*)(unit + 0x96));
+                    unit = g_game->players_1b63[palette & 0xff].info.get()->color;
+                    pic = GetGafFrame(face->color, unit);
                 } else pic = useColor ? GetGafFrame(face->color, 0) : (void*)GetGafSequenceFrame(&face->pic);
             } else pic = face->pic;
             DrawFrameQuad(surface, pic, poly, 0);
@@ -1133,24 +1108,11 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color
     }
 }
 
-static inline int digger_bias(Model_459200* model)
-{
-    if (((UnitDefFlags_459200*)model->owner->def.get())->flags.bits.digger)
-        return 125;
-    return 50;
-}
-
-static inline int shade_bias(Model_459200* model)
-{
-    bool c = ((((UnitDefFlags_459200*)model->owner->def.get())->flags.word >> 30) & 1) != 0;
-    return c ? 125 : 50;
-}
-
 // FUNCTION: 0x459200
 void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_459200 v, int useColor)
 {
     GafFrame* bmp = model->bitmap;
-    UnitTypeFlags_459200 f;
+    unsigned int f;
     if (bmp == 0)
         return;
 
@@ -1166,20 +1128,20 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
     short dx = v.p.y.whole;
 
     if (bmp->scratch == 0) {
-        GameFlags_459200 gameFlags = (*(GameFlags_459200*)&g_game->flags_37f06);
+        Flags_37f06 gameFlags = (*(Flags_37f06*)&g_game->flags_37f06);
         if (gameFlags.whole & 4) {
-            f = ((UnitDefFlags_459200*)model->owner->def.get())->flags;
-            if ((f.word & 0x2000000) == 0) {
+            f = model->owner->def->flags1;
+            if ((f & 0x2000000) == 0) {
                 if ((model->owner->flags & 0x20000000)
-                    && (f.word & 0x40000000) == 0) {
+                    && (f & 0x40000000) == 0) {
                     if (model->owner->unitDefIndex != 0 || dx >= g_game->seaLevel) {
                         if (model->shadow == 0)
                             BuildShadow(model,bmp);
                         DrawFrameBlended(param_2, model->shadow, v.p.x.whole + 0x85, y);
                     }
                 } else {
-                    if (gameFlags.bits.b3) {
-                        if ((f.word & 0x81000) == 0) {
+                    if (gameFlags.bits.vehicleShadows) {
+                        if ((f & 0x81000) == 0) {
                             MakeSilhouette(bmp);
                             DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
                         }
@@ -1218,13 +1180,13 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
     }
 
     {
-        GameFlags_459200 gameFlags = (*(GameFlags_459200*)&g_game->flags_37f06);
+        Flags_37f06 gameFlags = (*(Flags_37f06*)&g_game->flags_37f06);
         if (gameFlags.whole & 4) {
-            f = ((UnitDefFlags_459200*)model->owner->def.get())->flags;
-            if ((f.word & 0x2000000) == 0) {
-                if (f.bits.digger) {
+            f = model->owner->def->flags1;
+            if ((f & 0x2000000) == 0) {
+                if ((f >> 30) & 1) {
                     MakeSilhouette(bmp);
-                    CutFrameBelow(this->bitmap, digger_bias(model));
+                    CutFrameBelow(this->bitmap, shade_bias(model->owner));
                     DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
                 } else {
                     if (model->owner->flags & 0x20000000) {
@@ -1234,12 +1196,12 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
                             DrawFrameBlended(param_2, model->shadow, v.p.x.whole + 0x85, y);
                         }
                     } else {
-                        if (gameFlags.bits.b3) {
-                            if ((f.word & 0x81000) == 0) {
+                        if (gameFlags.bits.vehicleShadows) {
+                            if ((f & 0x81000) == 0) {
                                 MakeSilhouette(bmp);
                                 int diff = g_game->seaLevel - dx;
                                 if (diff > 0) {
-                                    diff += shade_bias(model);
+                                    diff += shade_bias(model->owner);
                                     do {} while (0);
                                     CutFrameBelow(this->bitmap, diff);
                                 }
@@ -1276,14 +1238,14 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
         }
         int diff = g_game->seaLevel - dx;
         if (diff > 0) {
-            diff += shade_bias(model);
+            diff += shade_bias(model->owner);
             if ((model->owner->flags & 0x200) == 0 && model->owner->playerIndex != g_game->playerIndex) {
                 CutFrameBelow(this->bitmap, diff);
             } else {
                 TintFrameBelow(this->bitmap, diff);
             }
         }
-        if (((UnitDefFlags_459200*)model->owner->def.get())->flags.bits.digger)
+        if ((model->owner->def->flags1 >> 30) & 1)
             CutFrameBelow(this->bitmap, 0x7d);
         if (!(model->owner->activateFlags & 4) && g_game->debugMode == 0)
             DrawFrame((Surface*)param_2, this->bitmap, v.p.x.whole + 0x80, z);
@@ -1350,8 +1312,8 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                     int s = (k * 3) & 0x1f;
                     vertex[k].x = x;
                     vertex[k].y = z - (y >> 1);
-                    if (mode) vertex[k].z = y/2 + shade_bias(list);
-                    else vertex[k].z = y + shade_bias(list);
+                    if (mode) vertex[k].z = y/2 + shade_bias(list->owner);
+                    else vertex[k].z = y + shade_bias(list->owner);
                     vertex[k].shade = s;
                     vertex[k].x += (short)bitmap->xOffset;
                     vertex[k].y += (short)bitmap->yOffset;
@@ -1443,9 +1405,8 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                             void* pic;
                             if (face->flags.bits.usePic) {
                                 if (face->flags.bits.shaded) {
-                                    int unit = (int)(*(Ref<char>*)((char*)g_game + 0x1b8a + kind * 0x14b)).get();
-                                    pic = GetGafFrame(face->color,
-                                        *(unsigned char*)(unit + 0x96));
+                                    int unit = g_game->players_1b63[kind].info.get()->color;
+                                    pic = GetGafFrame(face->color, unit);
                                 } else if (useColor) {
                                     pic = GetGafFrame(face->color, 0);
                                 } else {

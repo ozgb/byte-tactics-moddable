@@ -40,6 +40,18 @@ extern Root_004a32a0* g_guiContext;
 #include "../graphics/rect.h"
 #include "../state/sim_globals.h"
 #include "../files/files_api.h"
+#include "layer.h"
+
+void ShowSoftwareCursor();
+char* __stdcall Translate(char* text);
+void __stdcall SetFont(int id);
+int __cdecl tolower(int c);
+int __stdcall GetTextWidth(int font, char* text);
+char* __stdcall GetGafFrame(void* glyphs, int c);
+void __stdcall SetTextColors(int colour, int font);
+void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
+void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
+unsigned int __cdecl GetTicks();
 
 class SquadManager;
 
@@ -118,9 +130,7 @@ struct Obj2_49fd20 {
 
 void __stdcall UpdateMenu(Dialog* menu);
 void __stdcall BlitLayers(void* param_1, unsigned int* param_2, int* param_3);
-void ShowSoftwareCursor();
 void FlipScreen();
-char* __stdcall Translate(char* text);
 void __stdcall DrawButton(Dialog* param_1, int param_2);
 void __stdcall SelectAdjacentGadget(Dialog* menu, int value);
 
@@ -645,10 +655,7 @@ struct Dialog_004a04f0 {
 
 void __stdcall SetGadgetActive(Dialog_004a04f0* menu, int index, int value);
 void __stdcall ClearPeerStatus(Dialog_004a04f0* obj, int index);
-char* __stdcall Translate(char* text);
 void __stdcall DrawLitRectangle(int surface, Rect* rect, int level);
-void __stdcall SetFont(int id);
-int __cdecl tolower(int c);
 
 
 static inline int FindEntry_004a04f0(Gadget* entries, char* name)
@@ -781,25 +788,11 @@ void __stdcall SetGadgetTextByName(Dialog_004a04f0* obj, char* name, char* text)
     }
 }
 
-struct Data_004a0880 {
-    int next;
-    Gadget* entries;
-};
-
-struct Object_004a0880 {
-    char unknown_0[0x18];
-    Data_004a0880* data;
-    char unknown_1c[0x64 - 0x1c];
-    int current;
-    char unknown_68[0x74 - 0x68];
-    int length;
-};
-
 // FUNCTION: 0x4a0880
-void __stdcall SetGadgetText(Object_004a0880* obj, int index, char* text)
+void __stdcall SetGadgetText(Dialog* obj, int index, char* text)
 {
-    strcpy(obj->data->entries[index].u.text, text);
-    if (obj->current == index) {
+    strcpy(((Layer*)obj->holder)->entries[index].u.text, text);
+    if (obj->focus == index) {
         obj->length = strlen(text);
     }
 }
@@ -1382,10 +1375,6 @@ struct Item_004a1b40 {
 
 
 void __stdcall DrawListboxFrame(Dialog_4a1b40* obj, int index, void* bmp);
-void __stdcall SetFont(int id);
-int __stdcall GetTextWidth(int font, char* text);
-char* __stdcall GetGafFrame(void* glyphs, int c);
-void __stdcall SetTextColors(int colour, int font);
 #include "../util/registry.h"
 #include "gui.h"
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw,
@@ -1661,7 +1650,6 @@ struct Point_004bf060;
 
 void RegisterUnitOrders();
 
-char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrame(void* surface, void* image, int x, int y);
 
 struct Pad_a2480_0 { int field; };
@@ -1741,15 +1729,10 @@ struct Dialog_4a2580 {
     Font_004a2580* font;
 };
 
-void __stdcall SetFont(int id);
-#include "gui.h"
 void __stdcall DrawRaisedBox(void* surface, int* r, int a, int b, int c);
 #include "listbox.h"
-char* __stdcall GetGafFrame(void* glyphs, int c);
-void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
 void __stdcall SetTextColors(int a, int b);
 void __stdcall GetTextWidth(Font_004a2580* font, char* text);
-void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
 
 static inline void* Surface_004a2580(Object_004a2580* o)
 {
@@ -2053,8 +2036,6 @@ struct Dialog_4a2e40 {
 };
 #pragma pack(pop)
 
-void __stdcall SetFont(int id);
-char* __stdcall GetGafFrame(void* glyphs, int c);
 
 static inline int FindEntry_004a2e40(Gadget* entries, char* name) {
     int i;
@@ -2148,9 +2129,6 @@ struct Dialog_4a30c0 {
 };
 
 
-void __stdcall SetFont(int id);
-char* __stdcall GetGafFrame(void* glyphs, int c);
-unsigned int __cdecl GetTicks();
 // FUNCTION: 0x4a30c0
 void __stdcall ResetListBox(Dialog_004a04f0* obj, int index)
 {
@@ -2208,7 +2186,6 @@ struct Dialog_4a32a0 {
     Holder_004a32a0* holder;
 };
 
-char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall SetGadgetActive(Root_004a32a0* menu, int index, int value);
 
 static inline int FontHeight_004a32a0() {
@@ -2439,9 +2416,6 @@ struct Object_004a3780 {
 
 #include "../../link/globals.h"
 
-void __stdcall SetFont(int id);
-char* __stdcall GetGafFrame(void* glyphs, int c);
-unsigned int __cdecl GetTicks();
 void __stdcall TrySetFocus(Object_004a3780* obj, int index);
 
 int __stdcall AllocAlphaTable(int param_1);
@@ -2930,7 +2904,6 @@ struct Object_0049fc50 {
 
 int __stdcall TrySetFocus(Object_0049fc50* obj, int index);
 #include "keyboard.h"
-#include "keyboard.h"
 
 // FUNCTION: 0x4a4440
 int __stdcall HandleLabelInput(Object_0049fc50* obj, int index, char key)
@@ -3009,7 +2982,6 @@ struct Dialog_4a4620 {
     Table_004a4620* table;
 };
 
-unsigned int __cdecl GetTicks();
 
 #include <time.h>
 
@@ -3052,7 +3024,6 @@ struct LanguageRoot_004a4660 { char unknown_0[0x14]; Language_004a4660 *language
 
 void __stdcall LockScreen(void *);
 void __stdcall FillRectangle(void *, Rect_004a4660 *, int);
-char* __stdcall GetGafFrame(void* glyphs, int c);
 int __stdcall GetTextWidth(int, char *);
 void __stdcall UnlockScreen(void *);
 
@@ -3142,7 +3113,6 @@ struct Dialog_4a4890 {
     Table_004a4890* table;
 };
 
-unsigned int __cdecl GetTicks();
 
 // FUNCTION: 0x4a4890
 void __stdcall TickProgressBar(Dialog_4a4890* obj, int i)
@@ -3205,7 +3175,6 @@ struct Quad_004a4980 {
 };
 
 
-char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 int __stdcall FillRectangle(void* surface, Rect* rect, int color);
 void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_004a4980* dst, Quad_004a4980* src);
@@ -3441,10 +3410,6 @@ struct LanguageRoot_004a4d70 {
 };
 #pragma pack(pop)
 
-void __stdcall SetFont(int id);
-int __stdcall GetTextWidth(int font, char* text);
-char* __stdcall GetGafFrame(void* glyphs, int c);
-void __stdcall SetTextColors(int colour, int font);
 int __stdcall DrawListboxFrame(Dialog_4a4d70* obj, int index, void* bmp);
 int __stdcall FillRectangle(void* surface, Rect_004a4d70* rect, int colour);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
@@ -3557,7 +3522,6 @@ struct Dialog_4a5010 {
     Font_004a5010* font;
 };
 
-char* __stdcall GetGafFrame(void* glyphs, int c);
 // FUNCTION: 0x4a5010
 void* __stdcall GetCharGlyph(unsigned char c)
 {
@@ -3574,7 +3538,6 @@ struct Dialog_4a5030 {
     Font_004a5030* font;
 };
 
-char* __stdcall GetGafFrame(void* glyphs, int c);
 int __stdcall GetTextWidth(int param_1, unsigned char* text);
 
 // FUNCTION: 0x4a5030
@@ -3604,7 +3567,6 @@ struct Dialog_4a50b0 {
     Font_004a50b0* font;
 };
 
-char* __stdcall GetGafFrame(void* glyphs, int c);
 
 // FUNCTION: 0x4a50b0
 int GetFontLineHeight()
@@ -3625,8 +3587,6 @@ struct Dialog_4a50e0 {
     Font_004a50e0* font;
 };
 
-char* __stdcall GetGafFrame(void* glyphs, int c);
-void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
 #include "../graphics/gaf.h"
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxWidth);
 
@@ -3674,7 +3634,6 @@ struct Dialog_4a51d0 {
     Font_004a51d0* font;
 };
 
-char* __stdcall GetGafFrame(void* glyphs, int c);
 int __stdcall GetTextWidth(int a, char* text);
 
 static inline int LineHeight_004a50b0()
@@ -3764,7 +3723,6 @@ int IsFootprintVisible(int, int, int, int, int, int);
 int DrawProgressBar(int, int, int, int, int, int);
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
-#include "layer.h"
 
 struct Language {
     char unknown_0[0xc];
@@ -3777,20 +3735,13 @@ struct Point {
     int unknown_08[4];
 };
 
-#include "gui.h"
 
 #pragma pack(pop)
 
 
-unsigned int __cdecl GetTicks();
 void HideSoftwareCursor();
-void ShowSoftwareCursor();
-int __cdecl tolower(int c);
 int __cdecl toupper(int c);
 
-void __stdcall SetFont(int id);
-int __stdcall GetTextWidth(int font, char* text);
-void __stdcall SetTextColors(int colour, int font);
 GafFrame* __stdcall GetGafFrame(GafEntry* table, int index);
 GafEntry* __stdcall FindGafEntry(void* gaf, const char* name);
 void* __stdcall LoadGaf(char* path);
@@ -3800,7 +3751,6 @@ char* __stdcall GetGadgetText(Gui* menu, char* name, char* buf);
 
 void* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
-void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
 int __stdcall FillRectangle(void* surface, Rect* rect, int colour);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colour);
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
@@ -3816,7 +3766,6 @@ void __stdcall DrawLineGadget(Gui* obj, int index, unsigned int param3);
 int __stdcall HandleLabelInput(Gui* obj, int index, int key);
 int __stdcall HandleHotspotInput(Gui* obj, int index);
 int __stdcall TrySetFocus(Gui* obj, int index);
-#include "dialogs.h"
 int __stdcall HandleListBoxInput(Gui* obj, int index, int key);
 void __stdcall HandleSliderInput(Gui* obj, int index);
 #include "../graphics/object_pool.h"

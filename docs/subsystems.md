@@ -95,7 +95,7 @@ Coverage: 68.8% of functions (11 of 16), 69.8% of lines, 63.2% of branches; 5 li
 
 Issue #11. 38 functions. The resource accounts (`UnitResources`), `UpdatePlayerEconomy`, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`, `UpdateResourceSharing` in `src/network/net_game.cpp`).
 
-Coverage: 50.0% of functions (16 of 32), 60.4% of lines, 34.7% of branches; 16 live functions no scenario enters, and 7 more are dead (data/coverage.csv).
+Coverage: 50.0% of functions (16 of 32), 60.9% of lines, 35.6% of branches; 16 live functions no scenario enters, and 7 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateResourceSharing`, called from `RunGameSteps`. The per-tick income step `UpdatePlayerEconomy` is not a root: `UpdatePlayers` (players) calls it, so most of the economy runs inside the players phase.
 
@@ -205,7 +205,7 @@ Coverage: 75.5% of functions (40 of 53), 68.5% of lines, 60.3% of branches; 13 l
 
 Issue #13. 160 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
-Coverage: 87.6% of functions (92 of 105), 87.4% of lines, 79.7% of branches; 13 live functions no scenario enters, and 37 more are dead (data/coverage.csv).
+Coverage: 88.6% of functions (93 of 105), 87.5% of lines, 80.0% of branches; 12 live functions no scenario enters, and 37 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `UpdatePlayerAI` and `SquadManager::TickIfActive` are called by `UpdatePlayers` (players), so the AI runs inside the players phase.
 
@@ -353,7 +353,7 @@ Coverage: 83.0% of functions (73 of 88), 83.0% of lines, 66.8% of branches; 15 l
 
 Issue #16. 10 functions. Target choice and the weapon target setters and getters (`FindWeaponTarget`, `FindBestTargetIfFireAtWill`, `SetWeaponTargetUnit`). It is small because the file rules put the order goal objects in orders; see the notes.
 
-Coverage: 100.0% of functions (10 of 10), 96.2% of lines, 69.7% of branches; 0 live functions no scenario enters, and 1 more is dead (data/coverage.csv).
+Coverage: 100.0% of functions (10 of 10), 96.2% of lines, 71.1% of branches; 0 live functions no scenario enters, and 1 more is dead (data/coverage.csv).
 
 **Entry points.** Phase roots: none. Order handlers (orders) and the AI call it.
 
@@ -402,7 +402,7 @@ none
 
 Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 69.7% of functions (62 of 89), 77.3% of lines, 67.3% of branches; 27 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
+Coverage: 69.7% of functions (62 of 89), 77.3% of lines, 67.5% of branches; 27 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: none. `UpdatePlayers` (players) calls `RecalculateLineOfSight`, `UpdateUnitLineOfSight` and `UpdateSensorRadarAndCloak`, so LOS runs inside the players phase.
 
@@ -454,16 +454,16 @@ Coverage: 69.7% of functions (62 of 89), 77.3% of lines, 67.3% of branches; 27 l
 
 Issue #18. 468 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`, 14,000 lines). The largest subsystem.
 
-Coverage: 71.8% of functions (267 of 372), 63.6% of lines, 48.4% of branches; 105 live functions no scenario enters, and 28 more are dead (data/coverage.csv).
+Coverage: 72.8% of functions (271 of 372), 65.2% of lines, 50.2% of branches; 101 live functions no scenario enters, and 28 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (105 of 372 after `orders-immediate`, `orders-factory` and `orders-air`, #418; 267 are entered, 71.8%), by reason:
+**Live functions no scenario enters** (101 of 372 after `orders-immediate`, `orders-factory` and `orders-air` (#418) and the four scenarios of #419; 271 are entered, 72.8%), by reason:
 
 - Network only (23): the net-state methods of the goal objects and the bit writers: `LiteGoal::HasNetUnitState`, `LiteGoal::SerializeNetUnitState`, `AiSearchGoal::HasNetUnitState`, `AiSearchGoal::SerializeNetUnitState`, `PackedPosGoal` (constructor, destructor, `DeserializeNetUnitState`), `PathGoal` (8: `DeserializeNetUnitState`, `HasNetUnitState`, `SerializeNetUnitState`, `ExportGoalPose`, `FillWaypointWorldPos`, `HasReadyWaypoints`, `TickTowardGoal`, `TryClaimRepath`), `PatrolGoal` (4: constructor, `DeserializeNetUnitState`, `FillWaypointWorldPos`, `HasReadyWaypoints`), `BitReader::ReadBit`, `OrderFx::WriteBits`, `AirManeuverOrder::SerializeToBits`, `PathOrder::SerializeToBits`. `PatrolGoal` and `PackedPosGoal` are made only for a player of type 3 (a remote human), and the `PathGoal` methods only run through them.
 - Save and load only (31): `LowerBoundOrderTypes`, `OrderTypeNameLess`, `KindByIndex_0043a420`, `KindByName_0043a420`, `ResolveUnitTypeKey`, `UnitMotion::LoadMotion`, `UnitMotion::SaveMotion`, `Order::Order` (load constructor), `Order::ReattachFxToUnit`, `Order::SerializeToSave`, `SerializeSave`, `OrderFx::OrderFx`, `OrderFx::GetType`, and the load constructors, `GetType` and `Serialize` or `SerializeToSave` of `AirManeuverOrder`, `ApproachRadius`, `PathOrder`, `PointMarker` and `RingApproach`.
 - Info panel, cursor, build menu and shutdown only (8): `GetOrderName`, `GetOrderTarget`, `GetBuildWeaponPercent` (info panel), `SumQueuedBuildCount` (build menu count text), `GetOrderCursor` (cursor), `ClearOrderTypeTable` and `DestroyPathfinder` (shutdown), and `Marked` (the smart right-click order, mode 1, which the scenario `order` line has no verb for).
 - Campaign mission script only (4): `AttackUTypeOrder`, `WaitOrder`, `WaitForAttackOrder`, `MakeSelectableOrder`.
-- No caller in the game (12): `RepairUnitNoMoveOrder`, `ReadyOrder`, `RemoveAndDelete`, `ClearTargets_0043b7c0`, `TryGetDesiredHeading`, and the base-class slots `OrderFx::ApproxDist`, `ContainsCell`, `Destroy`, `FillGoalCells` and `IsFxStyle` (also of `AirManeuverOrder` and `PathOrder`).
-- Needs a unit or place the suite does not build (14): `AttackKamikazeOrder` (CORROACH or ARMVADER, tier 2 kbot lab), `ParalyzeOrder` (ARMSPID, tier 2), `ResurrectOrder` (CORNECRO, tier 3 chain and a wreck), `BuildWeaponOrder` (a missile silo or anti-missile launcher), `StandbyMineOrder` (a mine, which no build menu offers), `GroundPickupOrder`, `GroundUnloadOrder` and `WaitIfCobBusy` (a ship transport on a water map), `SelfRepairOrder`, `VtolLandingOrder`, `VtolGetRepairedOrder`, `FindLandingPad` and `FindPads` (an air repair pad), and `Direction_0044e3c0` (a fx attached to a piece of another unit, which landing on a pad and following do).
+- No caller in the game (11): `RepairUnitNoMoveOrder`, `ReadyOrder`, `ClearTargets_0043b7c0`, `TryGetDesiredHeading`, and the base-class slots `OrderFx::ApproxDist`, `ContainsCell`, `Destroy`, `FillGoalCells` and `IsFxStyle` (also of `AirManeuverOrder` and `PathOrder`).
+- Needs a unit or place the suite does not build (11): `AttackKamikazeOrder` (CORROACH or ARMVADER, tier 2 kbot lab), `ParalyzeOrder` (ARMSPID, tier 2), `ResurrectOrder` (CORNECRO, tier 3 chain and a wreck), `BuildWeaponOrder` (a missile silo or anti-missile launcher), `StandbyMineOrder` (a mine, which no build menu offers), `SelfRepairOrder`, `VtolLandingOrder`, `VtolGetRepairedOrder`, `FindLandingPad` and `FindPads` (an air repair pad), and `Direction_0044e3c0` (a fx attached to a piece of another unit, which landing on a pad and following do).
 - Needs a fight the scenarios do not set up (13): `VtolSeekGuardOrder` (the guarded unit dies), `VtolSeekAttackOrder` (an air attack ends), `AppendOrderToTail` (both of them), the helpers of those air orders (`GroundAllyVisitor::GroundAllyVisitor`, `GroundAllyVisitor::CollectGroundAlly`, `OrderTarget`, `Patrol`, `SearchRange`, `Contains` in vtol_orders.cpp), `AddComponentwise` (a hover attack that misses twice), `Contains` and `Sub` in unit_orders.cpp (a guarded unit under attack, and the matching cancel path), and `AttackNoMoveOrder` (the scripted LLT attack on the Core commander issues the order, but the function was never entered; not explained yet).
 
 **Entry points.** Phase roots: none. `UpdateAllUnits` (units) calls `RunOrders`; units also call `UnitMotion::UpdateMotion`.
@@ -532,7 +532,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **players** (149 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (three LOS calls) in turn. 41 functions are called from outside, mostly by game (17) and presentation (14); the busiest are `KillPlayerUnits` (5), `ShutdownScoreTables` (4), `TransferEnergy` (4). It imports 77 functions: platform 23, network 12, ai 10, presentation 9, los_radar 6. It holds the per-player state and victory conditions. Coverage: 31.5% of functions (45 of 143), 30.0% of lines, 21.4% of branches; 98 live functions no scenario enters, and 11 more are dead (data/coverage.csv).
 
-**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 69.4% of functions (68 of 98), 74.2% of lines, 65.7% of branches; 30 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
+**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 69.4% of functions (68 of 98), 74.5% of lines, 66.7% of branches; 30 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
 
 **network** (450 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 103 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 86 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (250 in all).
 
@@ -566,22 +566,22 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | **wind_meteors** | 11 of 16 | 68.8% | 69.8% | 63.2% | 5 | 0 |
 | **economy** | 16 of 32 | 50.0% | 60.9% | 35.6% | 16 | 7 |
 | **features** | 40 of 53 | 75.5% | 68.5% | 60.3% | 13 | 7 |
-| **ai** | 93 of 105 | 88.6% | 87.5% | 79.9% | 12 | 37 |
+| **ai** | 93 of 105 | 88.6% | 87.5% | 80.0% | 12 | 37 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 85.4% | 3 | 10 |
 | **weapons** | 73 of 88 | 83.0% | 83.0% | 66.8% | 15 | 20 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 71.1% | 0 | 1 |
-| **los_radar** | 62 of 89 | 69.7% | 77.3% | 67.3% | 27 | 20 |
-| **orders** | 267 of 372 | 71.8% | 63.6% | 48.4% | 105 | 28 |
+| **los_radar** | 62 of 89 | 69.7% | 77.3% | 67.5% | 27 | 20 |
+| **orders** | 271 of 372 | 72.8% | 65.2% | 50.2% | 101 | 28 |
 | **units** | 115 of 167 | 68.9% | 73.2% | 61.8% | 52 | 34 |
 | **players** | 45 of 143 | 31.5% | 30.0% | 21.4% | 98 | 11 |
-| **map** | 68 of 98 | 69.4% | 74.2% | 65.9% | 30 | 12 |
+| **map** | 68 of 98 | 69.4% | 74.5% | 66.7% | 30 | 12 |
 | files | 60 of 142 | 42.3% | 39.8% | 33.9% | 82 | 36 |
 | game | 73 of 183 | 39.9% | 35.4% | 20.5% | 110 | 25 |
-| network | 40 of 333 | 12.0% | 7.1% | 2.1% | 293 | 81 |
+| network | 40 of 333 | 12.0% | 7.2% | 2.2% | 293 | 81 |
 | platform | 307 of 646 | 47.5% | 34.0% | 22.2% | 339 | 82 |
-| presentation | 441 of 1143 | 38.6% | 30.2% | 21.0% | 702 | 329 |
+| presentation | 456 of 1143 | 39.9% | 30.6% | 21.3% | 687 | 329 |
 | seams | 65 of 103 | 63.1% | 82.2% | - | 38 | 0 |
-| state | 310 of 386 | 80.3% | 78.3% | 49.3% | 76 | 22 |
+| state | 311 of 386 | 80.6% | 78.5% | 49.4% | 75 | 22 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
 

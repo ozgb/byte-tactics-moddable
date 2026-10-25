@@ -1,0 +1,13 @@
+# The human Arm commander self-destructs on The Pass, so commander death ends the run at game over, about 150 ticks after the death.
+game_seed 434
+crt_seed 1434
+view_seed 2434
+map The Pass
+start_positions fixed
+commander_death 1
+ticks 1800
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+order 30 0:ARMCOM:1 selfdestruct

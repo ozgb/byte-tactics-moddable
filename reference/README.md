@@ -60,7 +60,9 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `quirks_tamper` | none | Test only: flips a quirk flag at this tick, so the freeze check exits 2 (see Quirk flags) |
 | `quirks_reach` | none | Test only: `<tick> <flag name>`, at that tick makes the game reach the guard of `units.ignore-null-death-record`, `ai.patrol-null-enemy-skip` or `units.skip-empty-yardmap` (see Quirk flags) |
 | `save` | none | Saves the game with `SaveGameFile` to `savegame\harness.sav` in the run's game directory after the step of this tick, 1 to `ticks`; one line only |
-| `map` | required | Map name, the rest of the line (names have spaces) |
+| `game_type` | 2 | 1: a mission of a campaign, 2: skirmish, 3: multiplayer; one line only (see Game types) |
+| `campaign` | none | Game type 1 only, and required there: the campaign file `camps/<name>.tdf`, the rest of the line (names have spaces) |
+| `map` | required | Map name, the rest of the line (names have spaces); under game type 1 the mission's name in the campaign |
 | `difficulty` | 1 | AI difficulty 0 to 2, one value for all computer players |
 | `commander_death` | 1 | 1: the game ends when a commander dies |
 | `mapping` | 1 | 1: terrain is blacked out until explored (the skirmish menu's "Terrain is blacked out until explored"); 0: the whole map is shown |
@@ -78,6 +80,48 @@ Defaults are the ones in `LoadSettings`, never the registry.
 `player<N>.*` keys take N from 0 to 9. A slot exists when any key names it,
 slots no key names are open, and at least 2 slots must exist. The game's player
 count is the highest named slot plus one.
+
+## Game types
+
+`game_type` is the number the game keeps as `Mission::type`. With 2, the default,
+a scenario is a skirmish and nothing below applies.
+
+**Game type 1** loads one mission of a campaign, as the campaign menu does.
+`campaign` names the campaign file in `camps/` without `.tdf` (`Battle Tactics -
+Arm Very Short`, `Arm Campaign`) and `map` the mission's `missionname` in that
+file (`Sub Hunting`, `1: A Hero Returns`), as the mission list shows it. The
+mission's own file gives the units, their owners (`Player=1` is slot 0) and the
+victory and defeat conditions, so a scenario names a slot for every owner the
+mission uses, or the exe stops with `Player number N invalid`. The schema is the
+one 3.1c picks for the campaign difficulty: `difficulty` 0 prefers `Easy`, 1
+`Medium`, 2 `Hard`, and each falls back to the others. The keys the mission
+decides (`commander_death`, `mapping`, `line_of_sight`, `los_type`,
+`start_positions`, `player<N>.metal` and `player<N>.energy`) are errors under
+game type 1, and so is `game_type 1` without `campaign`, or `campaign` without
+`game_type 1`. A campaign or mission name the game does not find exits with
+status 2. Any mission map of `totala4.hpi`, `ccmiss.ccx` and `tactics1.hpi` to
+`tactics8.hpi` can be used, each with the conditions its map file names. The
+conditions are checked for the human slot named by `local_player`.
+
+**Game type 3** runs the multiplayer rules without a network: the harness fills in
+the lobby state the exe expects (every named slot is a connected player, the
+lowest human slot is the host, `player<N>.team` makes the alliances).
+
+## Game over
+
+A run ends at its last tick, or earlier at game over. When 3.1c sets
+`endGameFlags` to 4 or 0x10 (a victory or defeat after its countdown, a
+commander's death, the last enemy gone) the harness ends the run at the end of
+that tick's step, as at the last tick: it closes `trace.txt`, writes the block
+scan, logs `testmode: game over at tick <n>` and exits 0. `ticks` stays the
+upper bound. The trace holds no marker: it is shorter than `ticks`, and a build
+that ends the game on another tick differs from the reference in length, which
+the comparison reports as a divergence at the first missing row.
+
+The run ends before 3.1c's own frame code sees the flag, which would shut the
+game's systems down and switch to the end-of-game screen. That way every tick that
+ran is traced, and the run never reaches the statistics screen (the
+presentation, not game logic).
 
 ## Quirk flags
 
@@ -248,6 +292,8 @@ seeds) and runs deterministically: two runs give identical traces.
 
 | Name | Map | Players | Ticks | Covers |
 | --- | --- | ---: | ---: | --- |
+| allied-victory | Metal Heck | 4 | 2400 | Game type 3: players 0 and 1 allied against players 2 and 3, whose commanders self-destruct, so allied victory ends the run early |
+| commander-death | The Pass | 2 | 1800 | The human Arm commander self-destructs, so commander death ends the run about 150 ticks later |
 | duel-coast-to-coast | Coast To Coast | 2 | 5400 | Two Core players on Coast To Coast, three minutes, difficulty 2 |
 | duel-great-divide | Great Divide | 2 | 3600 | Two Arm players on Great Divide, random start positions, two minutes |
 | duel-pass-dark | The Pass | 2 | 2700 | Two players on The Pass with the map unmapped and line of sight off, ninety seconds |
@@ -257,6 +303,8 @@ seeds) and runs deterministically: two runs give identical traces.
 | eight-pincushion-teams | Pincushion | 8 | 12600 | Eight players on Pincushion in four allied pairs, seven minutes |
 | long-great-divide-2p | Great Divide | 2 | 54000 | Two players on Great Divide for 54000 ticks (thirty minutes), a long run that no commander death ends |
 | long-greenhaven-8p | Greenhaven | 8 | 54000 | Eight players on Greenhaven in two allied teams of four for 54000 ticks (thirty minutes), a long run |
+| mission-defeat | Sub Hunting | 2 | 2400 | Game type 1, the Arm Very Short campaign on Easy: the human sonar buoy self-destructs, so a defeat condition ends the run early |
+| mission-victory | Sub Hunting | 2 | 2400 | Game type 1 on Hard: the second player's subs self-destruct, so a victory condition ends the run early |
 | orders-build-patrol | The Pass | 2 | 600 | Human Arm commander builds a solar collector, then patrols (`build`, `patrol`) |
 | orders-guard-reclaim | The Pass | 2 | 600 | Human Arm commander builds a solar collector, guards it, then reclaims it (`build`, `guard`, `reclaim`) |
 | orders-move-attack | The Pass | 2 | 600 | Human Arm commander moves, attacks the Core commander, then the whole slot moves (`move`, `attack`, `<slot>:all`) |

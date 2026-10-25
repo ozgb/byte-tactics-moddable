@@ -1,0 +1,22 @@
+# Game type 3: players 0 and 1 are allied against allied players 2 and 3 on Metal Heck, the two enemy commanders self-destruct, so allied victory ends the run at game over.
+game_seed 435
+crt_seed 1435
+view_seed 2435
+game_type 3
+map Metal Heck
+start_positions fixed
+ticks 2400
+player0.controller human
+player0.side Arm
+player0.team 0
+player1.controller human
+player1.side Arm
+player1.team 0
+player2.controller human
+player2.side Core
+player2.team 1
+player3.controller human
+player3.side Core
+player3.team 1
+order 30 2:CORCOM:1 selfdestruct
+order 30 3:CORCOM:1 selfdestruct

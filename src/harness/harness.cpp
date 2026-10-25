@@ -9,6 +9,7 @@
 
 #include "../../include/ta_types.h"
 #include "../map/mission.h"
+#include "../network/player_info.h"
 #include "condition_class.h"
 #include "../../interfaces/seams.h"
 #include "../quirks/quirks.h"
@@ -38,6 +39,8 @@ struct PlayerSpec {
     int color;
     int metal;
     int energy;
+    int metalLine;
+    int energyLine;
 };
 
 static int s_testMode = 0;
@@ -49,6 +52,15 @@ static unsigned s_fpuControlWord = 0x9001F;
 static PlayerSpec s_players[MAX_PLAYERS];
 static char s_map[0x104];
 static int s_mapLine = 0;
+static unsigned s_gameType = 2;
+static int s_gameTypeLine = 0;
+static char s_campaign[0x104];
+static int s_campaignLine = 0;
+static int s_commanderDeathLine = 0;
+static int s_mappingLine = 0;
+static int s_lineOfSightLine = 0;
+static int s_losTypeLine = 0;
+static int s_startPositionsLine = 0;
 static unsigned s_difficulty = 1;
 static unsigned s_commanderDeath = 1;
 static unsigned s_mapping = 1;
@@ -151,8 +163,10 @@ static void ReadPlayerKey(int lineNo, const char* key, const char* value)
         p->color = ParseRange(lineNo, key, value, 9);
     } else if (strcmp(field, "metal") == 0) {
         p->metal = ParseNumber(lineNo, key, value);
+        p->metalLine = lineNo;
     } else if (strcmp(field, "energy") == 0) {
         p->energy = ParseNumber(lineNo, key, value);
+        p->energyLine = lineNo;
     } else {
         FailLine(lineNo, "is not a known key", key, "");
     }
@@ -451,17 +465,34 @@ static void ReadKey(int lineNo, const char* key, char* value)
             FailLine(lineNo, "is too long", key, "");
         strcpy(s_map, value);
         s_mapLine = lineNo;
+    } else if (strcmp(key, "game_type") == 0) {
+        if (s_gameTypeLine != 0)
+            FailLine(lineNo, "is a second game_type line", key, "");
+        s_gameType = ParseNumber(lineNo, key, value);
+        if (s_gameType < 1 || s_gameType > 3)
+            FailLine(lineNo, "must be from 1 to 3", key, "");
+        s_gameTypeLine = lineNo;
+    } else if (strcmp(key, "campaign") == 0) {
+        if (strlen(value) >= 0x100)
+            FailLine(lineNo, "is too long", key, "");
+        strcpy(s_campaign, value);
+        s_campaignLine = lineNo;
     } else if (strcmp(key, "difficulty") == 0)
         s_difficulty = ParseRange(lineNo, key, value, 2);
-    else if (strcmp(key, "commander_death") == 0)
+    else if (strcmp(key, "commander_death") == 0) {
         s_commanderDeath = ParseRange(lineNo, key, value, 1);
-    else if (strcmp(key, "mapping") == 0)
+        s_commanderDeathLine = lineNo;
+    } else if (strcmp(key, "mapping") == 0) {
         s_mapping = ParseRange(lineNo, key, value, 1);
-    else if (strcmp(key, "line_of_sight") == 0)
+        s_mappingLine = lineNo;
+    } else if (strcmp(key, "line_of_sight") == 0) {
         s_lineOfSight = ParseRange(lineNo, key, value, 1);
-    else if (strcmp(key, "los_type") == 0)
+        s_lineOfSightLine = lineNo;
+    } else if (strcmp(key, "los_type") == 0) {
         s_losType = ParseRange(lineNo, key, value, 1);
-    else if (strcmp(key, "start_positions") == 0) {
+        s_losTypeLine = lineNo;
+    } else if (strcmp(key, "start_positions") == 0) {
+        s_startPositionsLine = lineNo;
         if (strcmp(value, "fixed") == 0)
             s_fixedLocations = 1;
         else if (strcmp(value, "random") == 0)
@@ -524,6 +555,34 @@ static void ReadKey(int lineNo, const char* key, char* value)
         FailLine(lineNo, "is not a known key", key, "");
 }
 
+static void RejectUnderMission(int lineNo, const char* key)
+{
+    if (lineNo != 0)
+        FailLine(lineNo, "is decided by the mission under game_type 1", key, "");
+}
+
+static void CheckGameType()
+{
+    if (s_gameType == 1) {
+        if (s_campaignLine == 0)
+            Fail("testmode: game_type 1 needs a campaign line\n");
+        RejectUnderMission(s_commanderDeathLine, "commander_death");
+        RejectUnderMission(s_mappingLine, "mapping");
+        RejectUnderMission(s_lineOfSightLine, "line_of_sight");
+        RejectUnderMission(s_losTypeLine, "los_type");
+        RejectUnderMission(s_startPositionsLine, "start_positions");
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            char key[32];
+            sprintf(key, "player%d.metal", i);
+            RejectUnderMission(s_players[i].metalLine, key);
+            sprintf(key, "player%d.energy", i);
+            RejectUnderMission(s_players[i].energyLine, key);
+        }
+    } else if (s_campaignLine != 0) {
+        FailLine(s_campaignLine, "needs game_type 1", "campaign", "");
+    }
+}
+
 static void CheckScenario()
 {
     int named = 0;
@@ -535,6 +594,7 @@ static void CheckScenario()
         Fail("testmode: scenario needs a ticks line\n");
     if (s_map[0] == '\0')
         Fail("testmode: scenario needs a map line\n");
+    CheckGameType();
     CheckOrders();
     CheckSpawns();
     if (s_saveLine != 0 && s_saveTick > s_ticks)
@@ -594,6 +654,35 @@ static int FindSide(const char* name)
     return -1;
 }
 
+static void SeedNetworkTable()
+{
+    for (int i = 0; i < MAX_PLAYERS; i++)
+        g_game->table_2c28[i] = s_players[i].named ? i + 1 : -1;
+}
+
+static void SeedNetworkHost(int host)
+{
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (!s_players[i].named)
+            continue;
+        PlayerInfo* info = g_game->players[i].info;
+        memset(info->map, 0, sizeof info->map);
+        strcpy(info->map, s_map);
+        info->host = i == host;
+        info->f9d_1 = 1;
+        info->mapping = s_mapping;
+        info->los = s_lineOfSight;
+        info->losType = s_losType;
+        info->commander = s_commanderDeath;
+        info->cheating = 0;
+        info->fixedloc = s_fixedLocations;
+        info->maxUnits = g_game->maxUnits_37eec;
+        info->metal = (unsigned short)s_players[i].metal;
+        info->energy = (unsigned short)s_players[i].energy;
+    }
+    g_game->loadingFlags.value |= 8;
+}
+
 static void SetUpSkirmish()
 {
     Table_0047ae60* t = (Table_0047ae60*)g_game->options;
@@ -630,7 +719,7 @@ static void SetUpSkirmish()
             active++;
     }
 
-    SetMissionType(2);
+    SetMissionType(s_gameType);
     Mission* mission = (Mission*)g_game->net;
     strcpy(t->mapName, s_map);
     t->difficulty = s_difficulty;
@@ -641,12 +730,23 @@ static void SetUpSkirmish()
     t->fixedLocations = s_fixedLocations;
     g_game->difficulty = t->difficulty;
 
+    if (s_gameType == 3)
+        SeedNetworkTable();
+    if (s_gameType == 1) {
+        mission->LoadCampaign(s_campaign);
+        if (mission->GetCampaignName() == nullptr) {
+            char msg[600];
+            sprintf(msg, "testmode: scenario line %d: no campaign named \"%s\"\n", s_campaignLine, s_campaign);
+            Fail(msg);
+        }
+    }
     if (mission->LoadMissionByName(t->mapName) == 0) {
         char msg[600];
-        sprintf(msg, "testmode: scenario line %d: no map named \"%s\"\n", s_mapLine, t->mapName);
+        sprintf(msg, "testmode: scenario line %d: no %s named \"%s\"\n", s_mapLine,
+                s_gameType == 1 ? "mission" : "map", t->mapName);
         Fail(msg);
     }
-    if (mission->CountStartPositions() < active) {
+    if (s_gameType != 1 && mission->CountStartPositions() < active) {
         char msg[200];
         sprintf(msg, "testmode: map \"%s\" has fewer start positions than the scenario's %d players\n",
                 t->mapName, active);
@@ -669,6 +769,8 @@ static void SetUpSkirmish()
     }
     g_game->localPlayer = (unsigned char)local;
     g_game->playerIndex = (unsigned char)local;
+    if (s_gameType == 3)
+        SeedNetworkHost(local);
 
     g_game->frontendState = 9;
     g_game->frontendSubState = 2;
@@ -886,7 +988,10 @@ void HarnessAfterStep()
         MakeDirectoryPath(directory);
         SaveGameFile(path, description, 0x29a);
     }
-    if (!s_testMode || (unsigned)g_game->ticks < s_ticks)
+    if (!s_testMode)
+        return;
+    int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
+    if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;
     char msg[64];
     if (s_trace != NULL)
@@ -897,7 +1002,10 @@ void HarnessAfterStep()
     s_dump = NULL;
     if (s_blockScan)
         BlockScanWrite(strcmp(s_commit, "unknown") == 0 ? "-" : s_commit);
-    sprintf(msg, "testmode: reached tick %u\n", s_ticks);
+    if (gameOver && (unsigned)g_game->ticks < s_ticks)
+        sprintf(msg, "testmode: game over at tick %u\n", (unsigned)g_game->ticks);
+    else
+        sprintf(msg, "testmode: reached tick %u\n", s_ticks);
     host_log(msg);
     host_exit(0);
 }

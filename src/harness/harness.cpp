@@ -608,10 +608,10 @@ static void SeedNetworkHost(int host)
         *(unsigned short*)(info + INFO_METAL) = (unsigned short)s_players[i].metal;
         *(unsigned short*)(info + INFO_ENERGY) = (unsigned short)s_players[i].energy;
     }
-    for (int i = 0; i < MAX_PLAYERS; i++) {
-        for (int k = 0; k < MAX_PLAYERS; k++) {
-            if (*((unsigned char*)&g_game->players[i] + PLAYER_ALLIED + k) != 0)
-                *((unsigned char*)&g_game->players[k] + PLAYER_ALLIED_BY + i) = 1;
+    for (int from = 0; from < MAX_PLAYERS; from++) {
+        for (int to = 0; to < MAX_PLAYERS; to++) {
+            if (*((unsigned char*)&g_game->players[from] + PLAYER_ALLIED + to) != 0)
+                *((unsigned char*)&g_game->players[to] + PLAYER_ALLIED_BY + from) = 1;
         }
     }
     g_game->net_flags |= 8;

@@ -75,14 +75,6 @@ LoadReporterDll,0x46bf30,src/game/statistics.cpp,end-of,g_dpspGuidModem,0,g_dpsp
 LoadReporterDll,0x46bf30,src/game/statistics.cpp,end-of,g_dpspGuidModem,0,g_dpspGuidSerial,,none
 LoadReporterDll,0x46bf30,src/game/statistics.cpp,end-of,g_dpspGuidSerial,0,g_dpspGuidIpx,,none
 ReportGameEvent,0x46c620,src/network/unit_sync.cpp,end-of,g_reportPlayerName,0,g_onlineReportScores,,none
-ParticleLists::AddSmoke,0x471820,src/graphics/particles_471820.cpp,end-of,g_particlePool,0,g_fxEventPoolBlocked,,none
-ParticleLists::AddTimedSubParticles,0x471a50,src/graphics/particles_471a50.cpp,end-of,g_particlePool,0,g_fxEventPoolBlocked,,none
-EmitSmoke,0x472630,src/graphics/particles_472630.cpp,end-of,g_particlePool,0,g_fxEventPoolBlocked,,none
-EmitTimedBlackSmoke,0x472720,src/graphics/particles_472630.cpp,end-of,g_particlePool,0,g_fxEventPoolBlocked,,none
-EmitWhiteSmoke,0x472810,src/graphics/particles_472630.cpp,end-of,g_particlePool,0,g_fxEventPoolBlocked,,none
-EmitBlackSmoke,0x4728f0,src/graphics/particles_472630.cpp,end-of,g_particlePool,0,g_fxEventPoolBlocked,,none
-EmitWeaponSmoke,0x4729d0,src/graphics/particles_472630.cpp,end-of,g_particlePool,0,g_fxEventPoolBlocked,,none
-EmitTimedSubParticles,0x472c50,src/graphics/particles_472630.cpp,end-of,g_particlePool,0,g_fxEventPoolBlocked,,none
 OpenNewGameMenu,0x478240,src/frontend/campaign_menu.cpp,end-of,g_missionNameList,0,g_campaignNameList,,none
 HandleSkirmishCheatText,0x47b9f0,src/frontend/skirmish_menu.cpp,end-of,g_cheatEightPlayers,0,g_cheatThreePlayers,,none
 HandleSkirmishCheatText,0x47b9f0,src/frontend/skirmish_menu.cpp,end-of,g_cheatFivePlayers,0,g_cheatSixPlayers,,none

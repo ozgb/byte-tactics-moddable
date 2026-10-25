@@ -1339,7 +1339,6 @@ void InitCursorFrames(Obj_004ab4e0*, int);
 void TruncateTextWithEllipsis(Class_004ac610*, unsigned char*, int, int, int);
 void BuildColorRemapTable(PalEntry_004ac710*, PalEntry_004ac710*, unsigned char*);
 void RemapPaletteToClosestIndices(Palette_004ac7d0*, PalEntry_004ac7d0*, PalEntry_004ac7d0*);
-void DrawColorCellOutline(Object_004ac970*, int, int);
 void ApplySlidersToPaletteEntry(Class_004acc70*, Color_004acc70*);
 void WriteCommonFields(Common_004ad350*, Class_004bbbe0*, int);
 void ReadCommonSection(Common_004ad350*, Tree_004ad350*);

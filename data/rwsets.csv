@@ -17913,33 +17913,32 @@ address,function,file,kind,target
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,field_read,Unit_459200::id
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,function,
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,global_read,g_game
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,call,DrawPolygonEdges
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,call,get
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,call,operator=
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,deref_read,*unsigned short
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_escape,Model_459200::pieces
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Face_459c70::count
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Face_459c70::indices
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,GafFrame::xOffset
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,GafFrame::yOffset
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Map_00458fa0::brightFaces
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Model_459200::count
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Model_459200::owner
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Object3do::faceCount
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Object3do::faces
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Object3do::firstFace
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Object3do::vertexCount
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,PieceFlags_459c70::word
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Piece_459c70::object
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Piece_459c70::points
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Unit_459200::def
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Vertex_0045a610::x
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Vertex_0045a610::y
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_read,Vertex_0045a610::z
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_write,Vertex_0045a610::x
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_write,Vertex_0045a610::y
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,field_write,Vertex_0045a610::z
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render_458fa0.cpp,function,
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,call,DrawPolygonEdges
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,call,get
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,call,operator=
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,call,shade_bias
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,deref_read,*unsigned short
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_escape,Model_459200::pieces
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Face_459c70::count
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Face_459c70::indices
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,GafFrame::xOffset
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,GafFrame::yOffset
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Model_459200::count
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Model_459200::owner
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Object3do::faceCount
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Object3do::faces
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Object3do::firstFace
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Object3do::vertexCount
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,PieceFlags_459c70::word
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Piece_459c70::object
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Piece_459c70::points
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Vertex_0045a610::x
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Vertex_0045a610::y
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Vertex_0045a610::z
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_write,Vertex_0045a610::x
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_write,Vertex_0045a610::y
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_write,Vertex_0045a610::z
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,function,
 0x459170,CMemoryCache::CopyPicture,src/units/unit_motion.cpp,call,memcpy
 0x459170,CMemoryCache::CopyPicture,src/units/unit_motion.cpp,field_read,CMemoryCache::image
 0x459170,CMemoryCache::CopyPicture,src/units/unit_motion.cpp,field_read,GafFrame::height
@@ -17955,67 +17954,67 @@ address,function,file,kind,target
 0x459170,CMemoryCache::CopyPicture,src/units/unit_motion.cpp,field_write,GafFrame::xOffset
 0x459170,CMemoryCache::CopyPicture,src/units/unit_motion.cpp,field_write,GafFrame::yOffset
 0x459170,CMemoryCache::CopyPicture,src/units/unit_motion.cpp,function,
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,CMemoryCache::BuildShadow
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,CMemoryCache::DrawPiece
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,CMemoryCache::MakeSilhouette
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,CMemoryCache::MergeIntoComposite
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,CMemoryCache::ShadeByIntensity
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,CutFrameBelow
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,DrawFrame
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,DrawFrameBlended
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,DrawFrameDepth
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,GetGroundHeight
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,TintFrameBelow
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,UnitTable::BuildObjectPicture
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,UnitTable::DrawPieces
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,digger_bias
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,get
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,operator Model_459200 *
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,operator Unit_459200 *
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,operator Vec3 *
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,operator->
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,operator=
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,call,shade_bias
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,deref_read,*GameFlags_459200
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,deref_read,*int
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_escape,Game::flags_37f06
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_escape,Model_459200::pieces
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_escape,Unit_459200::pos_x
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,<anon>::b3
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,<anon>::digger
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,CMemoryCache::bitmap
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Fixed_459200::whole
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,GafFrame::scratch
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Game::debugMode
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Game::playerIndex
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Game::seaLevel
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,GameFlags_459200::whole
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Model_459200::bitmap
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Model_459200::count
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Model_459200::owner
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Model_459200::shadow
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,PieceFlags_459c70::word
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Piece_459c70::object
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Piece_459c70::points
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,UnitDefFlags_459200::flags
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,UnitTypeFlags_459200::word
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::activateFlags
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::buildLeft
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::cargo
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::cargoNext
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::def
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::flags
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::playerIndex
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::pos_x
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::pos_y
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::pos_z
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::state
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::unitDefIndex
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_read,Vec3_459200::v
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,field_write,Vec3_459200::v
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,function,
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,global_read,DAT_004fd4c0
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render_4589c0.cpp,global_read,g_game
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,CMemoryCache::BuildShadow
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,CMemoryCache::DrawPiece
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,CMemoryCache::MakeSilhouette
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,CMemoryCache::MergeIntoComposite
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,CMemoryCache::ShadeByIntensity
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,CutFrameBelow
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,DrawFrame
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,DrawFrameBlended
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,DrawFrameDepth
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,GetGroundHeight
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,TintFrameBelow
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,UnitTable::BuildObjectPicture
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,UnitTable::DrawPieces
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,digger_bias
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,get
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator Model_459200 *
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator Unit_459200 *
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator Vec3 *
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator->
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,operator=
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,shade_bias
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,deref_read,*GameFlags_459200
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,deref_read,*int
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_escape,Game::flags_37f06
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_escape,Model_459200::pieces
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_escape,Unit_459200::pos_x
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,<anon>::b3
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,<anon>::digger
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,CMemoryCache::bitmap
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Fixed_459200::whole
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,GafFrame::scratch
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Game::debugMode
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Game::playerIndex
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Game::seaLevel
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,GameFlags_459200::whole
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Model_459200::bitmap
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Model_459200::count
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Model_459200::owner
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Model_459200::shadow
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,PieceFlags_459c70::word
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Piece_459c70::object
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Piece_459c70::points
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,UnitDefFlags_459200::flags
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,UnitTypeFlags_459200::word
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::activateFlags
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::buildLeft
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::cargo
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::cargoNext
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::def
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::flags
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::playerIndex
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::pos_x
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::pos_y
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::pos_z
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::state
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Unit_459200::unitDefIndex
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,Vec3_459200::v
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_write,Vec3_459200::v
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,function,
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,global_read,DAT_004fd4c0
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,global_read,g_game
 0x4597f0,SetLightVector,src/graphics/model_render.cpp,function,
 0x4597f0,SetLightVector,src/graphics/model_render.cpp,global_write,g_lightX
 0x4597f0,SetLightVector,src/graphics/model_render.cpp,global_write,g_lightY
@@ -18080,81 +18079,82 @@ address,function,file,kind,target
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_write,Vec3::z
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,function,
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,global_read,g_game
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,CrossProduct
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,DownsampleFrame
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,DrawLitTexturedPolygon
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,FillShadedPolygon
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,GetGafFrame
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,GetGafSequenceFrame
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,NormalizeVector
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,VectorFromToInt
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,get
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,memset
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,operator Vec3 *
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,operator=
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,call,shade_bias
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,deref_read,*Ref<char>
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,deref_read,*Vec3
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,deref_read,*unsigned char
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,deref_read,*unsigned short
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,deref_write,*unsigned char
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_maybe_written,Face_459c70::pic
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,<anon>::colored
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,<anon>::lit
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,<anon>::shaded
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,<anon>::textured
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,<anon>::usePic
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,<anon>::visible
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,CMemoryCache::shadow
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Face_459c70::color
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Face_459c70::count
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Face_459c70::indices
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Face_459c70::pic
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Face_459c70::unknown_0
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Flags_37f06::antiAlias
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,GafFrame::height
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,GafFrame::pixelsOrLayers
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,GafFrame::scratch
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,GafFrame::width
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,GafFrame::xOffset
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,GafFrame::yOffset
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Model_459200::count
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Model_459200::owner
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Object3do::faceCount
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Object3do::faces
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Object3do::firstFace
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Object3do::vertexCount
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Piece_459c70::object
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Piece_459c70::points
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Poly_459c70::x
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Poly_459c70::y
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Unit_459200::buildLeft
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Unit_459200::flags
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Vec3::x
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Vec3::y
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Vec3::z
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Vec3f::x
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Vec3f::y
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_read,Vec3f::z
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,GafFrame::compressed
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,GafFrame::height
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,GafFrame::transparency
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,GafFrame::width
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,GafFrame::xOffset
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,GafFrame::yOffset
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,Poly_459c70::shade
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,Poly_459c70::x
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,Poly_459c70::y
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,Poly_459c70::z
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,Vec3f::x
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,Vec3f::y
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,field_write,Vec3f::z
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,function,
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,global_read,DAT_004fd4cc
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,global_read,g_game
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,global_read,g_lightX
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,global_read,g_lightY
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,global_read,g_lightZ
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,CrossProduct
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,DownsampleFrame
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,DrawLitTexturedPolygon
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,FillShadedPolygon
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,GetGafFrame
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,GetGafSequenceFrame
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,NormalizeVector
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,VectorFromToInt
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,get
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,memset
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,operator Vec3 *
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,operator=
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,shade_bias
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,deref_read,*Ref<char>
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,deref_read,*Vec3
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,deref_read,*unsigned char
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,deref_read,*unsigned short
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,deref_write,*unsigned char
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_escape,Game::flags_37f06
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_maybe_written,Face_459c70::pic
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,<anon>::antiAlias
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,<anon>::colored
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,<anon>::lit
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,<anon>::shaded
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,<anon>::textured
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,<anon>::usePic
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,<anon>::visible
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,CMemoryCache::shadow
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Face_459c70::color
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Face_459c70::count
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Face_459c70::indices
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Face_459c70::pic
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Face_459c70::unknown_0
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,GafFrame::height
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,GafFrame::pixelsOrLayers
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,GafFrame::scratch
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,GafFrame::width
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,GafFrame::xOffset
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,GafFrame::yOffset
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Model_459200::count
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Model_459200::owner
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Object3do::faceCount
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Object3do::faces
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Object3do::firstFace
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Object3do::vertexCount
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Piece_459c70::object
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Piece_459c70::points
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Poly_459c70::x
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Poly_459c70::y
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Unit_459200::buildLeft
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Unit_459200::flags
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Vec3::x
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Vec3::y
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Vec3::z
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Vec3f::x
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Vec3f::y
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Vec3f::z
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,GafFrame::compressed
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,GafFrame::height
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,GafFrame::transparency
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,GafFrame::width
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,GafFrame::xOffset
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,GafFrame::yOffset
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,Poly_459c70::shade
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,Poly_459c70::x
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,Poly_459c70::y
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,Poly_459c70::z
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,Vec3f::x
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,Vec3f::y
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_write,Vec3f::z
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,function,
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,global_read,DAT_004fd4cc
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,global_read,g_game
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,global_read,g_lightX
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,global_read,g_lightY
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,global_read,g_lightZ
 0x45a470,CMemoryCache::MakeSilhouette,src/graphics/model_render.cpp,call,ZeroFramePixels
 0x45a470,CMemoryCache::MakeSilhouette,src/graphics/model_render.cpp,call,memcpy
 0x45a470,CMemoryCache::MakeSilhouette,src/graphics/model_render.cpp,field_read,CMemoryCache::bitmap
@@ -22804,19 +22804,17 @@ address,function,file,kind,target
 0x470a90,ObjectPool::Construct,src/graphics/particles.cpp,function,
 0x470b80,ObjectPool::Destroy,src/graphics/particles.cpp,function,
 0x470b80,ObjectPool::Destroy,src/graphics/particles.cpp,indirect_call,virtual ObjectPool::~ObjectPool
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,call,GameAllocShared
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,call,GameReallocIgnoreTag
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,call,push_back
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,deref_write,*Elem_00470f00
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,field_maybe_written,ObjectPool::items
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,field_read,Elem_00470f00::p
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,field_read,ObjectPool::capacity
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,field_read,ObjectPool::slots
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,field_write,Elem_00470f00::p
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,field_write,ObjectPool::capacity
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,field_write,ObjectPool::slotSize
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,field_write,ObjectPool::slots
-0x470c10,ObjectPool::Grow,src/graphics/particles_470c10.cpp,function,
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,call,GameAllocShared
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,call,GameReallocIgnoreTag
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,call,push_back
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,deref_write,*void
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,field_maybe_written,ObjectPool::items
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,field_read,ObjectPool::capacity
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,field_read,ObjectPool::slots
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,field_write,ObjectPool::capacity
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,field_write,ObjectPool::slotSize
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,field_write,ObjectPool::slots
+0x470c10,ObjectPool::Grow,src/graphics/particles.cpp,function,
 0x470e50,ObjectPool::FreeBlocks,src/graphics/particles.cpp,call,GameFreeThunk
 0x470e50,ObjectPool::FreeBlocks,src/graphics/particles.cpp,call,begin
 0x470e50,ObjectPool::FreeBlocks,src/graphics/particles.cpp,call,end
@@ -22872,18 +22870,17 @@ address,function,file,kind,target
 0x471120,ParticleLists::DrawList,src/graphics/particles.cpp,field_escape,ParticleLists::lists
 0x471120,ParticleLists::DrawList,src/graphics/particles.cpp,function,
 0x471120,ParticleLists::DrawList,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::Render
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,call,Listener_00471120::~Listener_00471120
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,call,begin
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,call,erase
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,call,operator delete
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,call,operator[]
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,call,push_back
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,call,size
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,field_maybe_written,ParticleLists::lists
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,field_read,Elem_00473500::p
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,field_read,ParticleLists::lists
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,function,
-0x471160,ParticleLists::AddToList,src/graphics/particles_471160.cpp,indirect_call,virtual Listener_00471120::~Listener_00471120
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,call,ParticleSystem::~ParticleSystem
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,call,begin
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,call,erase
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,call,operator delete
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,call,operator[]
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,call,push_back
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,call,size
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,field_maybe_written,ParticleLists::lists
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,field_read,ParticleLists::lists
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,function,
+0x471160,ParticleLists::AddToList,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::~ParticleSystem
 0x471340,ParticleLists::AddTeleportParticles,src/graphics/particles.cpp,call,ParticleLists::Add
 0x471340,ParticleLists::AddTeleportParticles,src/graphics/particles.cpp,call,operator new
 0x471340,ParticleLists::AddTeleportParticles,src/graphics/particles.cpp,function,
@@ -22900,14 +22897,14 @@ address,function,file,kind,target
 0x4716e0,ParticleLists::AddWakeParticles,src/graphics/particles.cpp,call,operator new
 0x4716e0,ParticleLists::AddWakeParticles,src/graphics/particles.cpp,function,
 0x4716e0,ParticleLists::AddWakeParticles,src/graphics/particles.cpp,indirect_call,virtual WakeParticles::Init
-0x471820,ParticleLists::AddSmoke,src/graphics/particles_471820.cpp,call,ParticleLists::Add
-0x471820,ParticleLists::AddSmoke,src/graphics/particles_471820.cpp,call,operator new
-0x471820,ParticleLists::AddSmoke,src/graphics/particles_471820.cpp,function,
-0x471820,ParticleLists::AddSmoke,src/graphics/particles_471820.cpp,indirect_call,virtual SmokeParticles::Init
-0x471a50,ParticleLists::AddTimedSubParticles,src/graphics/particles_471a50.cpp,call,ParticleLists::Add
-0x471a50,ParticleLists::AddTimedSubParticles,src/graphics/particles_471a50.cpp,call,operator new
-0x471a50,ParticleLists::AddTimedSubParticles,src/graphics/particles_471a50.cpp,function,
-0x471a50,ParticleLists::AddTimedSubParticles,src/graphics/particles_471a50.cpp,indirect_call,virtual TimedSubParticles::Init
+0x471820,ParticleLists::AddSmoke,src/graphics/particles.cpp,call,ParticleLists::Add
+0x471820,ParticleLists::AddSmoke,src/graphics/particles.cpp,call,SmokeParticles::Init
+0x471820,ParticleLists::AddSmoke,src/graphics/particles.cpp,call,operator new
+0x471820,ParticleLists::AddSmoke,src/graphics/particles.cpp,function,
+0x471a50,ParticleLists::AddTimedSubParticles,src/graphics/particles.cpp,call,ParticleLists::Add
+0x471a50,ParticleLists::AddTimedSubParticles,src/graphics/particles.cpp,call,TimedSubParticles::Init
+0x471a50,ParticleLists::AddTimedSubParticles,src/graphics/particles.cpp,call,operator new
+0x471a50,ParticleLists::AddTimedSubParticles,src/graphics/particles.cpp,function,
 0x471c80,InitParticlePool,src/graphics/particles.cpp,call,ObjectPool::Construct
 0x471c80,InitParticlePool,src/graphics/particles.cpp,call,atexit
 0x471c80,InitParticlePool,src/graphics/particles.cpp,fn_ref,ExitParticlePool
@@ -22938,12 +22935,12 @@ address,function,file,kind,target
 0x471d90,CreateParticleLists,src/graphics/particles.cpp,field_escape,Game::lists_38d77
 0x471d90,CreateParticleLists,src/graphics/particles.cpp,function,
 0x471d90,CreateParticleLists,src/graphics/particles.cpp,global_read,g_game
-0x471de0,DestroyParticleLists,src/graphics/particles_471de0.cpp,call,ParticleLists::~ParticleLists
-0x471de0,DestroyParticleLists,src/graphics/particles_471de0.cpp,call,operator delete
-0x471de0,DestroyParticleLists,src/graphics/particles_471de0.cpp,field_read,Game::lists_38d77
-0x471de0,DestroyParticleLists,src/graphics/particles_471de0.cpp,field_write,Game::lists_38d77
-0x471de0,DestroyParticleLists,src/graphics/particles_471de0.cpp,function,
-0x471de0,DestroyParticleLists,src/graphics/particles_471de0.cpp,global_read,g_game
+0x471de0,DestroyParticleLists,src/graphics/particles.cpp,call,ParticleLists::~ParticleLists
+0x471de0,DestroyParticleLists,src/graphics/particles.cpp,call,operator delete
+0x471de0,DestroyParticleLists,src/graphics/particles.cpp,field_read,Game::lists_38d77
+0x471de0,DestroyParticleLists,src/graphics/particles.cpp,field_write,Game::lists_38d77
+0x471de0,DestroyParticleLists,src/graphics/particles.cpp,function,
+0x471de0,DestroyParticleLists,src/graphics/particles.cpp,global_read,g_game
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,call,Listener_00471eb0::~Listener_00471eb0
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,call,begin
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,call,end
@@ -23018,38 +23015,38 @@ address,function,file,kind,target
 0x472530,EmitBubbles,src/graphics/particles.cpp,function,
 0x472530,EmitBubbles,src/graphics/particles.cpp,global_read,g_game
 0x472530,EmitBubbles,src/graphics/particles.cpp,indirect_call,virtual WakeParticles::Init
-0x472630,EmitSmoke,src/graphics/particles_472630.cpp,call,ParticleLists::Add
-0x472630,EmitSmoke,src/graphics/particles_472630.cpp,call,operator new
-0x472630,EmitSmoke,src/graphics/particles_472630.cpp,field_read,Game::lists_38d77
-0x472630,EmitSmoke,src/graphics/particles_472630.cpp,function,
-0x472630,EmitSmoke,src/graphics/particles_472630.cpp,global_read,g_game
-0x472630,EmitSmoke,src/graphics/particles_472630.cpp,indirect_call,virtual SmokeParticles::Init
-0x472720,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,call,ParticleLists::Add
-0x472720,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,call,operator new
-0x472720,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,field_read,Game::lists_38d77
-0x472720,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,function,
-0x472720,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,global_read,g_game
-0x472720,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,indirect_call,virtual SmokeParticles::Init
-0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,call,ParticleLists::Add
-0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,call,operator new
-0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,field_read,Game::lists_38d77
-0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,function,
-0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,global_read,g_game
-0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,indirect_call,virtual SmokeParticles::Init
-0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,call,ParticleLists::Add
-0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,call,operator new
-0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,deref_read,*ParticleLists
-0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,field_read,Game::lists_38d77
-0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,function,
-0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,global_read,g_game
-0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,indirect_call,virtual SmokeParticles::Init
-0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,call,ParticleLists::Add
-0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,call,operator new
-0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,deref_read,*ParticleLists
-0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,field_read,Game::lists_38d77
-0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,function,
-0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,global_read,g_game
-0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,indirect_call,virtual SmokeParticles::Init
+0x472630,EmitSmoke,src/graphics/particles.cpp,call,ParticleLists::Add
+0x472630,EmitSmoke,src/graphics/particles.cpp,call,SmokeParticles::Init
+0x472630,EmitSmoke,src/graphics/particles.cpp,call,operator new
+0x472630,EmitSmoke,src/graphics/particles.cpp,field_read,Game::lists_38d77
+0x472630,EmitSmoke,src/graphics/particles.cpp,function,
+0x472630,EmitSmoke,src/graphics/particles.cpp,global_read,g_game
+0x472720,EmitTimedBlackSmoke,src/graphics/particles.cpp,call,ParticleLists::Add
+0x472720,EmitTimedBlackSmoke,src/graphics/particles.cpp,call,SmokeParticles::Init
+0x472720,EmitTimedBlackSmoke,src/graphics/particles.cpp,call,operator new
+0x472720,EmitTimedBlackSmoke,src/graphics/particles.cpp,field_read,Game::lists_38d77
+0x472720,EmitTimedBlackSmoke,src/graphics/particles.cpp,function,
+0x472720,EmitTimedBlackSmoke,src/graphics/particles.cpp,global_read,g_game
+0x472810,EmitWhiteSmoke,src/graphics/particles.cpp,call,ParticleLists::Add
+0x472810,EmitWhiteSmoke,src/graphics/particles.cpp,call,SmokeParticles::Init
+0x472810,EmitWhiteSmoke,src/graphics/particles.cpp,call,operator new
+0x472810,EmitWhiteSmoke,src/graphics/particles.cpp,field_read,Game::lists_38d77
+0x472810,EmitWhiteSmoke,src/graphics/particles.cpp,function,
+0x472810,EmitWhiteSmoke,src/graphics/particles.cpp,global_read,g_game
+0x4728f0,EmitBlackSmoke,src/graphics/particles.cpp,call,ParticleLists::Add
+0x4728f0,EmitBlackSmoke,src/graphics/particles.cpp,call,SmokeParticles::Init
+0x4728f0,EmitBlackSmoke,src/graphics/particles.cpp,call,operator new
+0x4728f0,EmitBlackSmoke,src/graphics/particles.cpp,deref_read,*ParticleLists
+0x4728f0,EmitBlackSmoke,src/graphics/particles.cpp,field_read,Game::lists_38d77
+0x4728f0,EmitBlackSmoke,src/graphics/particles.cpp,function,
+0x4728f0,EmitBlackSmoke,src/graphics/particles.cpp,global_read,g_game
+0x4729d0,EmitWeaponSmoke,src/graphics/particles.cpp,call,ParticleLists::Add
+0x4729d0,EmitWeaponSmoke,src/graphics/particles.cpp,call,SmokeParticles::Init
+0x4729d0,EmitWeaponSmoke,src/graphics/particles.cpp,call,operator new
+0x4729d0,EmitWeaponSmoke,src/graphics/particles.cpp,deref_read,*ParticleLists
+0x4729d0,EmitWeaponSmoke,src/graphics/particles.cpp,field_read,Game::lists_38d77
+0x4729d0,EmitWeaponSmoke,src/graphics/particles.cpp,function,
+0x4729d0,EmitWeaponSmoke,src/graphics/particles.cpp,global_read,g_game
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,call,HarnessViewRand
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,call,Lists_00472330::Add
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,call,operator new
@@ -23060,13 +23057,13 @@ address,function,file,kind,target
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,function,
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,global_read,g_game
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,indirect_call,virtual ThrustParticles::Init
-0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,call,ParticleLists::Add
-0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,call,operator new
-0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,deref_read,*ParticleLists
-0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,field_read,Game::lists_38d77
-0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,function,
-0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,global_read,g_game
-0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,indirect_call,virtual TimedSubParticles::Init
+0x472c50,EmitTimedSubParticles,src/graphics/particles.cpp,call,ParticleLists::Add
+0x472c50,EmitTimedSubParticles,src/graphics/particles.cpp,call,TimedSubParticles::Init
+0x472c50,EmitTimedSubParticles,src/graphics/particles.cpp,call,operator new
+0x472c50,EmitTimedSubParticles,src/graphics/particles.cpp,deref_read,*ParticleLists
+0x472c50,EmitTimedSubParticles,src/graphics/particles.cpp,field_read,Game::lists_38d77
+0x472c50,EmitTimedSubParticles,src/graphics/particles.cpp,function,
+0x472c50,EmitTimedSubParticles,src/graphics/particles.cpp,global_read,g_game
 0x472d50,TeleportParticles::Update,src/graphics/particles.cpp,call,TeleportParticle::IsExpired
 0x472d50,TeleportParticles::Update,src/graphics/particles.cpp,call,TeleportParticle::Step
 0x472d50,TeleportParticles::Update,src/graphics/particles.cpp,call,begin
@@ -23228,15 +23225,14 @@ address,function,file,kind,target
 0x4736e0,TeleportParticles::Init,src/graphics/particles.cpp,indirect_call,virtual TeleportParticles::Emit
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,call,GetGafFrameCount
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,call,HarnessViewRand
-0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,call,List_004737c0::insert
+0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,call,end
+0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,call,insert
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,call,operator=
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,call,reserve
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,call,size
-0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_escape,TeleportParticles::items
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_maybe_written,TeleportParticles::items
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,Game::flamestreamGaf
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,Game::ticks
-0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,List_004737c0::last
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,ParticleSystem::deadline
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,TeleportParticle::frameCount
 0x4737c0,TeleportParticles::Emit,src/graphics/particles.cpp,field_read,TeleportParticles::dir
@@ -23260,29 +23256,29 @@ address,function,file,kind,target
 0x4739b0,NanoParticle::Step,src/graphics/particles.cpp,field_read,NanoParticle::vel
 0x4739b0,NanoParticle::Step,src/graphics/particles.cpp,field_write,NanoParticle::flags
 0x4739b0,NanoParticle::Step,src/graphics/particles.cpp,function,
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,call,FillRectangle
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,call,Identity_00473a00
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,call,IsSeen_00473a00
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,call,operator unsigned char *
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,deref_read,*unsigned char
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_escape,Game::players_1b63
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Game::mapFlags
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Game::playerIndex
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,NanoParticle::flags
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Player::explored
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Player::exploredHeight
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Player::exploredWidth
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Pos_004739b0::height
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Pos_004739b0::x
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Pos_004739b0::y
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Rect::left
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_read,Rect::top
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_write,Rect::bottom
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_write,Rect::left
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_write,Rect::right
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,field_write,Rect::top
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,function,
-0x473a00,NanoParticle::DrawParticle,src/graphics/particles_473a00.cpp,global_read,g_game
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,call,FillRectangle
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,call,Identity_00473a00
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,call,IsSeen_00473a00
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,call,operator unsigned char *
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,deref_read,*unsigned char
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_escape,Game::players_1b63
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Game::mapFlags
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Game::playerIndex
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,NanoParticle::flags
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Player::explored
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Player::exploredHeight
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Player::exploredWidth
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Pos_004739b0::height
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Pos_004739b0::x
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Pos_004739b0::y
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Rect::left
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_read,Rect::top
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_write,Rect::bottom
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_write,Rect::left
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_write,Rect::right
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,field_write,Rect::top
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,function,
+0x473a00,NanoParticle::DrawParticle,src/graphics/particles.cpp,global_read,g_game
 0x473b30,NanoParticle::IsExpired,src/graphics/particles.cpp,field_read,NanoParticle::endTime
 0x473b30,NanoParticle::IsExpired,src/graphics/particles.cpp,function,
 0x473b50,NanoParticles::Init,src/graphics/particles.cpp,call,ParticleSystem::SetLifetime
@@ -23298,35 +23294,38 @@ address,function,file,kind,target
 0x473b50,NanoParticles::Init,src/graphics/particles.cpp,field_write,Vec3_00473b50::z
 0x473b50,NanoParticles::Init,src/graphics/particles.cpp,function,
 0x473b50,NanoParticles::Init,src/graphics/particles.cpp,indirect_call,virtual NanoParticles::Emit
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,call,HarnessViewRand
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,call,Vec3_00473d50::Length
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,call,operator-
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,call,operator=
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,call,push_back
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,call,reserve
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,call,size
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,deref_read,*int
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_maybe_written,NanoParticles::records
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_read,Fix_00473d50::half
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_read,NanoParticle::pos
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_read,NanoParticle::tgt
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_read,NanoParticle::vel
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_read,NanoParticles::deadline
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_read,NanoParticles::records
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::x
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::y
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::z
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_write,Fix_00473d50::whole
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_write,NanoParticle::endTime
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_write,NanoParticle::flags
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_write,NanoParticle::unused
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_write,NanoParticle::vel
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_write,NanoParticles::time
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_write,Vec3_00473d50::x
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_write,Vec3_00473d50::y
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,field_write,Vec3_00473d50::z
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,function,
-0x473d50,NanoParticles::Emit,src/graphics/particles_473d50.cpp,global_read,g_game
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,call,HarnessViewRand
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,call,LengthFloat
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,call,operator-
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,call,operator=
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,call,push_back
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,call,reserve
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,call,size
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_maybe_written,NanoParticles::items
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,Fix_004736e0::half
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,Game::ticks
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,NanoParticle::pos
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,NanoParticle::tgt
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,NanoParticle::vel
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,NanoParticles::items
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,ParticleSystem::deadline
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,Vec3::x
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,Vec3::y
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,Vec3::z
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,Vec3_00473b50::x
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,Vec3_00473b50::y
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_read,Vec3_00473b50::z
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_write,Fix_004736e0::whole
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_write,NanoParticle::endTime
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_write,NanoParticle::flags
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_write,NanoParticle::unused
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_write,NanoParticle::vel
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_write,NanoParticles::time
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_write,Vec3::x
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_write,Vec3::y
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,field_write,Vec3::z
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,function,
+0x473d50,NanoParticles::Emit,src/graphics/particles.cpp,global_read,g_game
 0x474130,ThrustParticle::Step,src/graphics/particles.cpp,call,operator+=
 0x474130,ThrustParticle::Step,src/graphics/particles.cpp,field_read,ThrustParticle::frame
 0x474130,ThrustParticle::Step,src/graphics/particles.cpp,field_read,ThrustParticle::frameCount
@@ -23373,14 +23372,13 @@ address,function,file,kind,target
 0x4742c0,ThrustParticles::Init,src/graphics/particles.cpp,field_write,ThrustParticles::pos2
 0x4742c0,ThrustParticles::Init,src/graphics/particles.cpp,function,
 0x4742c0,ThrustParticles::Init,src/graphics/particles.cpp,indirect_call,virtual ThrustParticles::Emit
-0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,call,Class_00475bd0::insert
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,call,GetGafFrameCount
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,call,end
+0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,call,insert
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,call,operator=
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,call,reserve
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,call,size
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,deref_read,*Vec3
-0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_escape,ThrustParticles::items
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_escape,ThrustParticles::pos0
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_maybe_written,ThrustParticles::items
 0x4743a0,ThrustParticles::Emit,src/graphics/particles.cpp,field_read,Game::flamestreamGaf
@@ -23452,15 +23450,14 @@ address,function,file,kind,target
 0x474760,WakeParticles::Init,src/graphics/particles.cpp,function,
 0x474760,WakeParticles::Init,src/graphics/particles.cpp,indirect_call,virtual WakeParticles::Emit
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,call,HarnessViewRand
-0x474880,WakeParticles::Emit,src/graphics/particles.cpp,call,List_00474880::insert
+0x474880,WakeParticles::Emit,src/graphics/particles.cpp,call,end
+0x474880,WakeParticles::Emit,src/graphics/particles.cpp,call,insert
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,call,operator=
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,call,reserve
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,call,size
-0x474880,WakeParticles::Emit,src/graphics/particles.cpp,field_escape,WakeParticles::items
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,field_maybe_written,WakeParticles::items
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,field_read,Game::smoke1
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,field_read,Game::ticks
-0x474880,WakeParticles::Emit,src/graphics/particles.cpp,field_read,List_00474880::last
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,field_read,Pair_00474880::hi
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,field_read,ParticleSystem::deadline
 0x474880,WakeParticles::Emit,src/graphics/particles.cpp,field_read,WakeParticles::ascending
@@ -23501,33 +23498,32 @@ address,function,file,kind,target
 0x474b00,SmokeParticle::Step,src/graphics/particles.cpp,field_write,Vec3::z
 0x474b00,SmokeParticle::Step,src/graphics/particles.cpp,function,
 0x474b00,SmokeParticle::Step,src/graphics/particles.cpp,global_read,g_game
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,call,DrawFrameBlended
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,call,GetGafFrame
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,call,Identity_00474b80
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,call,IsSeen_00474b80
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,call,operator unsigned char *
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,deref_read,*unsigned char
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_escape,Game::players
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_escape,SmokeParticle::posw
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,Game::mapFlags
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,Game::playerIndex
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,Player::explored
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,Player::exploredHeight
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,Player::exploredWidth
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,Pos_00474b80::h
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,Pos_00474b80::x
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,Pos_00474b80::y
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,SmokeParticle::data
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,field_read,SmokeParticle::rounds
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,function,
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles_474b80.cpp,global_read,g_game
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,call,DrawFrameBlended
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,call,GetGafFrame
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,call,Identity_00474b80
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,call,IsSeen_00474b80
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,call,operator unsigned char *
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,deref_read,*unsigned char
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_escape,Game::players
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Game::mapFlags
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Game::playerIndex
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Player::explored
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Player::exploredHeight
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Player::exploredWidth
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Position_00475470::x
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Position_00475470::y
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Position_00475470::z
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,SmokeParticle::count
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,SmokeParticle::data
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,function,
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,global_read,g_game
 0x474cb0,SmokeParticle::IsExpired,src/graphics/particles.cpp,field_read,SmokeParticle::count
 0x474cb0,SmokeParticle::IsExpired,src/graphics/particles.cpp,field_read,SmokeParticle::limit
 0x474cb0,SmokeParticle::IsExpired,src/graphics/particles.cpp,function,
-0x474d10,SmokeParticles::SmokeParticles,src/graphics/particles_472630.cpp,field_read,Game::ticks
-0x474d10,SmokeParticles::SmokeParticles,src/graphics/particles_472630.cpp,field_write,SmokeParticles::time
-0x474d10,SmokeParticles::SmokeParticles,src/graphics/particles_472630.cpp,function,
-0x474d10,SmokeParticles::SmokeParticles,src/graphics/particles_472630.cpp,global_read,g_game
+0x474d10,SmokeParticles::SmokeParticles,src/graphics/particles.cpp,field_read,Game::ticks
+0x474d10,SmokeParticles::SmokeParticles,src/graphics/particles.cpp,field_write,SmokeParticles::time
+0x474d10,SmokeParticles::SmokeParticles,src/graphics/particles.cpp,function,
+0x474d10,SmokeParticles::SmokeParticles,src/graphics/particles.cpp,global_read,g_game
 0x474d50,SmokeParticles::Init,src/graphics/particles.cpp,call,GetGafFrameCount
 0x474d50,SmokeParticles::Init,src/graphics/particles.cpp,call,ParticleSystem::SetLifetime
 0x474d50,SmokeParticles::Init,src/graphics/particles.cpp,call,operator=
@@ -23543,15 +23539,14 @@ address,function,file,kind,target
 0x474d50,SmokeParticles::Init,src/graphics/particles.cpp,function,
 0x474d50,SmokeParticles::Init,src/graphics/particles.cpp,global_read,g_game
 0x474d50,SmokeParticles::Init,src/graphics/particles.cpp,indirect_call,virtual SmokeParticles::Emit
-0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,call,Class_00476210::insert
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,call,HarnessViewRand
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,call,end
+0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,call,insert
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,call,operator=
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,call,reserve
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,call,size
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,deref_read,*Vec3
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,field_escape,SmokeParticles::pos
-0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,field_escape,SmokeParticles::records
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,field_maybe_written,SmokeParticles::records
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,field_read,Game::smoke1
 0x474df0,SmokeParticles::Emit,src/graphics/particles.cpp,field_read,Game::smoke2
@@ -23605,14 +23600,14 @@ address,function,file,kind,target
 0x475090,TimedSubParticle::IsExpired,src/graphics/particles.cpp,field_read,TimedSubParticle::count
 0x475090,TimedSubParticle::IsExpired,src/graphics/particles.cpp,field_read,TimedSubParticle::limit
 0x475090,TimedSubParticle::IsExpired,src/graphics/particles.cpp,function,
-0x4750f0,TimedSubParticles::IsEmitDue,src/graphics/particles_4750f0.cpp,deref_read,*unsigned int
-0x4750f0,TimedSubParticles::IsEmitDue,src/graphics/particles_4750f0.cpp,field_read,TimedSubParticles::emitTime
-0x4750f0,TimedSubParticles::IsEmitDue,src/graphics/particles_4750f0.cpp,function,
-0x4750f0,TimedSubParticles::IsEmitDue,src/graphics/particles_4750f0.cpp,global_read,g_game
-0x475110,TimedSubParticles::TimedSubParticles,src/graphics/particles_472630.cpp,field_read,Game::ticks
-0x475110,TimedSubParticles::TimedSubParticles,src/graphics/particles_472630.cpp,field_write,TimedSubParticles::time
-0x475110,TimedSubParticles::TimedSubParticles,src/graphics/particles_472630.cpp,function,
-0x475110,TimedSubParticles::TimedSubParticles,src/graphics/particles_472630.cpp,global_read,g_game
+0x4750f0,TimedSubParticles::IsEmitDue,src/graphics/particles.cpp,field_read,Game::ticks
+0x4750f0,TimedSubParticles::IsEmitDue,src/graphics/particles.cpp,field_read,TimedSubParticles::time
+0x4750f0,TimedSubParticles::IsEmitDue,src/graphics/particles.cpp,function,
+0x4750f0,TimedSubParticles::IsEmitDue,src/graphics/particles.cpp,global_read,g_game
+0x475110,TimedSubParticles::TimedSubParticles,src/graphics/particles.cpp,field_read,Game::ticks
+0x475110,TimedSubParticles::TimedSubParticles,src/graphics/particles.cpp,field_write,TimedSubParticles::time
+0x475110,TimedSubParticles::TimedSubParticles,src/graphics/particles.cpp,function,
+0x475110,TimedSubParticles::TimedSubParticles,src/graphics/particles.cpp,global_read,g_game
 0x475150,TimedSubParticles::Init,src/graphics/particles.cpp,call,GetGafFrameCount
 0x475150,TimedSubParticles::Init,src/graphics/particles.cpp,call,ParticleSystem::SetLifetime
 0x475150,TimedSubParticles::Init,src/graphics/particles.cpp,call,operator=
@@ -23626,14 +23621,13 @@ address,function,file,kind,target
 0x475150,TimedSubParticles::Init,src/graphics/particles.cpp,global_read,g_game
 0x475150,TimedSubParticles::Init,src/graphics/particles.cpp,indirect_call,virtual TimedSubParticles::Emit
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,call,HarnessViewRand
-0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,call,Vec_00476490::insert
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,call,end
+0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,call,insert
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,call,operator=
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,call,reserve
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,call,size
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,deref_read,*Vec3
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,field_escape,TimedSubParticles::pos
-0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,field_escape,TimedSubParticles::records
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,field_maybe_written,TimedSubParticles::records
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,field_read,Game::smoke1
 0x4751c0,TimedSubParticles::Emit,src/graphics/particles.cpp,field_read,Game::ticks
@@ -23681,14 +23675,15 @@ address,function,file,kind,target
 0x475440,SmokeParticles::IsEmitDue,src/graphics/particles.cpp,field_read,SmokeParticles::time
 0x475440,SmokeParticles::IsEmitDue,src/graphics/particles.cpp,function,
 0x475440,SmokeParticles::IsEmitDue,src/graphics/particles.cpp,global_read,g_game
-0x475470,SmokeParticles::Render,src/graphics/particles_475470.cpp,call,SmokeParticle::DrawIfVisible
-0x475470,SmokeParticles::Render,src/graphics/particles_475470.cpp,call,begin
-0x475470,SmokeParticles::Render,src/graphics/particles_475470.cpp,call,end
-0x475470,SmokeParticles::Render,src/graphics/particles_475470.cpp,field_maybe_written,SmokeParticles::records
-0x475470,SmokeParticles::Render,src/graphics/particles_475470.cpp,field_read,Game::scrollX
-0x475470,SmokeParticles::Render,src/graphics/particles_475470.cpp,field_read,Game::scrollY
-0x475470,SmokeParticles::Render,src/graphics/particles_475470.cpp,function,
-0x475470,SmokeParticles::Render,src/graphics/particles_475470.cpp,global_read,g_game
+0x475470,SmokeParticles::Render,src/graphics/particles.cpp,call,DrawIfVisible
+0x475470,SmokeParticles::Render,src/graphics/particles.cpp,call,begin
+0x475470,SmokeParticles::Render,src/graphics/particles.cpp,call,end
+0x475470,SmokeParticles::Render,src/graphics/particles.cpp,deref_read,*SmokeParticle
+0x475470,SmokeParticles::Render,src/graphics/particles.cpp,field_maybe_written,SmokeParticles::records
+0x475470,SmokeParticles::Render,src/graphics/particles.cpp,field_read,Game::scrollX
+0x475470,SmokeParticles::Render,src/graphics/particles.cpp,field_read,Game::scrollY
+0x475470,SmokeParticles::Render,src/graphics/particles.cpp,function,
+0x475470,SmokeParticles::Render,src/graphics/particles.cpp,global_read,g_game
 0x475600,TimedSubParticles::Update,src/graphics/particles.cpp,call,HarnessViewRand
 0x475600,TimedSubParticles::Update,src/graphics/particles.cpp,call,TimedSubParticles::Emit
 0x475600,TimedSubParticles::Update,src/graphics/particles.cpp,call,begin
@@ -23713,14 +23708,14 @@ address,function,file,kind,target
 0x475600,TimedSubParticles::Update,src/graphics/particles.cpp,function,
 0x475600,TimedSubParticles::Update,src/graphics/particles.cpp,global_read,g_game
 0x475600,TimedSubParticles::Update,src/graphics/particles.cpp,indirect_call,virtual TimedSubParticles::IsEmitDue
-0x475700,TimedSubParticles::Render,src/graphics/particles_475700.cpp,call,TimedSubParticle::Draw
-0x475700,TimedSubParticles::Render,src/graphics/particles_475700.cpp,call,begin
-0x475700,TimedSubParticles::Render,src/graphics/particles_475700.cpp,call,end
-0x475700,TimedSubParticles::Render,src/graphics/particles_475700.cpp,field_maybe_written,TimedSubParticles::records
-0x475700,TimedSubParticles::Render,src/graphics/particles_475700.cpp,field_read,Game::scrollX
-0x475700,TimedSubParticles::Render,src/graphics/particles_475700.cpp,field_read,Game::scrollY
-0x475700,TimedSubParticles::Render,src/graphics/particles_475700.cpp,function,
-0x475700,TimedSubParticles::Render,src/graphics/particles_475700.cpp,global_read,g_game
+0x475700,TimedSubParticles::Render,src/graphics/particles.cpp,call,TimedSubParticle::DrawParticle
+0x475700,TimedSubParticles::Render,src/graphics/particles.cpp,call,begin
+0x475700,TimedSubParticles::Render,src/graphics/particles.cpp,call,end
+0x475700,TimedSubParticles::Render,src/graphics/particles.cpp,field_maybe_written,TimedSubParticles::records
+0x475700,TimedSubParticles::Render,src/graphics/particles.cpp,field_read,Game::scrollX
+0x475700,TimedSubParticles::Render,src/graphics/particles.cpp,field_read,Game::scrollY
+0x475700,TimedSubParticles::Render,src/graphics/particles.cpp,function,
+0x475700,TimedSubParticles::Render,src/graphics/particles.cpp,global_read,g_game
 0x475840,NanoParticleVector::GetCount,src/graphics/particles.cpp,field_read,NanoParticleVector::_First
 0x475840,NanoParticleVector::GetCount,src/graphics/particles.cpp,field_read,NanoParticleVector::_Last
 0x475840,NanoParticleVector::GetCount,src/graphics/particles.cpp,function,
@@ -34109,14 +34104,14 @@ address,function,file,kind,target
 0x4a07d0,SetGadgetTextByName,src/gui/gui.cpp,field_read,Holder_004a04f0::entries
 0x4a07d0,SetGadgetTextByName,src/gui/gui.cpp,field_write,Dialog_004a04f0::changed
 0x4a07d0,SetGadgetTextByName,src/gui/gui.cpp,function,
-0x4a0880,SetGadgetText,src/gui/gui_4a0880.cpp,call,strcpy
-0x4a0880,SetGadgetText,src/gui/gui_4a0880.cpp,call,strlen
-0x4a0880,SetGadgetText,src/gui/gui_4a0880.cpp,field_maybe_written,<anon>::text
-0x4a0880,SetGadgetText,src/gui/gui_4a0880.cpp,field_read,Data_004a0880::entries
-0x4a0880,SetGadgetText,src/gui/gui_4a0880.cpp,field_read,Object_004a0880::current
-0x4a0880,SetGadgetText,src/gui/gui_4a0880.cpp,field_read,Object_004a0880::data
-0x4a0880,SetGadgetText,src/gui/gui_4a0880.cpp,field_write,Object_004a0880::length
-0x4a0880,SetGadgetText,src/gui/gui_4a0880.cpp,function,
+0x4a0880,SetGadgetText,src/gui/gui.cpp,call,strcpy
+0x4a0880,SetGadgetText,src/gui/gui.cpp,call,strlen
+0x4a0880,SetGadgetText,src/gui/gui.cpp,field_maybe_written,<anon>::text
+0x4a0880,SetGadgetText,src/gui/gui.cpp,field_read,Data_004a0880::entries
+0x4a0880,SetGadgetText,src/gui/gui.cpp,field_read,Object_004a0880::current
+0x4a0880,SetGadgetText,src/gui/gui.cpp,field_read,Object_004a0880::data
+0x4a0880,SetGadgetText,src/gui/gui.cpp,field_write,Object_004a0880::length
+0x4a0880,SetGadgetText,src/gui/gui.cpp,function,
 0x4a08f0,TranslateGadgetItems,src/gui/gui.cpp,call,GetEntry
 0x4a08f0,TranslateGadgetItems,src/gui/gui.cpp,call,Translate
 0x4a08f0,TranslateGadgetItems,src/gui/gui.cpp,call,memcpy
@@ -34694,36 +34689,36 @@ address,function,file,kind,target
 0x4a3eb0,ResetSliderGadget,src/gui/gui.cpp,field_read,Dialog_4a3eb0::table
 0x4a3eb0,ResetSliderGadget,src/gui/gui.cpp,field_read,Table_004a3eb0::entries
 0x4a3eb0,ResetSliderGadget,src/gui/gui.cpp,function,
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,call,DrawSliderBar
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,call,Find_004a3ef0
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,call,GetFontHeight
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,call,GetGlyph_004a3ef0
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,call,LineSize_004a3ef0
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,call,SetFont
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,deref_escape,*Gadget
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,<anon>::count
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,<anon>::full
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,<anon>::rowCount
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,<anon>::scroll
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Dialog::holder
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Gadget::attribs
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Gadget::height
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Gadget::knobSize
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Gadget::language
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Gadget::tab
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Gadget::team
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Gadget::type
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Gadget::width
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,GafFrame::height
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Holder_004a3ef0::current
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Holder_004a3ef0::entries
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_read,Holder_004a3ef0::list
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_write,<anon>::full
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_write,<anon>::word
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_write,Gadget::knobSize
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,field_write,Gadget::range
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,function,
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,global_read,g_guiContext
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,DrawSliderBar
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,Find_004a3ef0
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,GetFontHeight
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,GetGlyph_004a3ef0
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,LineSize_004a3ef0
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,SetFont
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,deref_escape,*Gadget
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,<anon>::count
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,<anon>::full
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,<anon>::rowCount
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,<anon>::scroll
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Dialog::holder
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Gadget::attribs
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Gadget::height
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Gadget::knobSize
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Gadget::language
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Gadget::tab
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Gadget::team
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Gadget::type
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Gadget::width
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,GafFrame::height
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Holder_0049f8c0::entries
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Root_004a32a0::current
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,Root_004a32a0::list
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_write,<anon>::full
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_write,<anon>::word
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_write,Gadget::knobSize
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_write,Gadget::range
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,function,
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,global_read,g_guiContext
 0x4a4170,HandleSliderInput,src/gui/gui.cpp,call,GetSliderRects
 0x4a4170,HandleSliderInput,src/gui/gui.cpp,call,HasMouseKeyFlags
 0x4a4170,HandleSliderInput,src/gui/gui.cpp,call,IsMouseButtonMessage
@@ -36231,20 +36226,20 @@ address,function,file,kind,target
 0x4ac8c0,DrawColorGrid,src/gui/dialogs.cpp,field_write,Rect_004b6720::right
 0x4ac8c0,DrawColorGrid,src/gui/dialogs.cpp,field_write,Rect_004b6720::top
 0x4ac8c0,DrawColorGrid,src/gui/dialogs.cpp,function,
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,call,CellX
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,call,DrawRectangle
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,call,FindGadgetIndex
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_read,Gadget_004ac970::surface
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_read,Gadget_004ac970::y
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_read,Holder_004ac970::gadgets
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_read,Object_004ac970::holder
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_read,Rect::left
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_read,Rect::top
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_write,Rect::bottom
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_write,Rect::left
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_write,Rect::right
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,field_write,Rect::top
-0x4ac970,DrawColorCellOutline,src/gui/dialogs_4ac970.cpp,function,
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,call,DrawRectangle
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,call,FindGadgetIndex
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_read,<anon>::surface
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_read,Gadget::x
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_read,Gadget::y
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_read,Gui::layer
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_read,Layer::entries
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_read,Rect_004b6720::left
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_read,Rect_004b6720::top
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_write,Rect_004b6720::bottom
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_write,Rect_004b6720::left
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_write,Rect_004b6720::right
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,field_write,Rect_004b6720::top
+0x4ac970,DrawColorCellOutline,src/gui/dialogs.cpp,function,
 0x4aca20,ShowPaletteEntryRgb,src/gui/dialogs.cpp,call,FindGadgetIndex
 0x4aca20,ShowPaletteEntryRgb,src/gui/dialogs.cpp,call,RenderLayer
 0x4aca20,ShowPaletteEntryRgb,src/gui/dialogs.cpp,deref_escape,*Gadget
@@ -39728,24 +39723,24 @@ address,function,file,kind,target
 0x4c01a0,DrawDashedCircle,src/graphics/draw.cpp,function,
 0x4c0310,FillPolygon,src/graphics/draw.cpp,call,ScanFillPolygon
 0x4c0310,FillPolygon,src/graphics/draw.cpp,function,
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,call,LockScreen
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,call,Surface::GetClipRect
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,call,UnlockScreen
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,call,memset
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,deref_read,*int
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Point::x
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Point::y
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Rect::bottom
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Rect::left
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Rect::right
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Rect::top
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Span_004c0330::left
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Span_004c0330::right
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Surface::pitch
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_read,Surface::pixels
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_write,Span_004c0330::left
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,field_write,Span_004c0330::right
-0x4c0330,ScanFillPolygon,src/graphics/draw_4c0330.cpp,function,
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,call,LockScreen
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,call,Surface::GetClipRect
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,call,UnlockScreen
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,call,memset
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,deref_read,*int
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Point::x
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Point::y
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Rect::bottom
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Rect::left
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Rect::right
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Rect::top
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Span_004c0330::left
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Span_004c0330::right
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Surface::pitch
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_read,Surface::pixels
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_write,Span_004c0330::left
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,field_write,Span_004c0330::right
+0x4c0330,ScanFillPolygon,src/graphics/draw.cpp,function,
 0x4c06e0,FillFlatSpan,src/graphics/draw.cpp,deref_read,*unsigned char
 0x4c06e0,FillFlatSpan,src/graphics/draw.cpp,deref_write,*unsigned char
 0x4c06e0,FillFlatSpan,src/graphics/draw.cpp,field_read,GafFrame::pixelsOrLayers
@@ -43535,22 +43530,6 @@ address,function,file,kind,target
 ,Approach,src/ingame/control_panel.cpp,function,
 ,Approach,src/ingame/info_panel_468cf0.cpp,function,
 ,AsByte,src/units/unit.cpp,function,
-,Assign_004732e0,src/graphics/particles_4732e0.cpp,call,operator=
-,Assign_004732e0,src/graphics/particles_4732e0.cpp,deref_read,*std::vector<ParticleSystem >
-,Assign_004732e0,src/graphics/particles_4732e0.cpp,deref_write,*std::vector<ParticleSystem >
-,Assign_004732e0,src/graphics/particles_4732e0.cpp,function,
-,Assign_00473590,src/graphics/particles_4758c0.cpp,call,operator=
-,Assign_00473590,src/graphics/particles_4758c0.cpp,deref_read,*std::vector<TeleportParticle>
-,Assign_00473590,src/graphics/particles_4758c0.cpp,deref_write,*std::vector<TeleportParticle>
-,Assign_00473590,src/graphics/particles_4758c0.cpp,function,
-,Assign_00475ef0,src/graphics/particles_475ef0.cpp,call,operator=
-,Assign_00475ef0,src/graphics/particles_475ef0.cpp,deref_read,*std::vector<Element_00475ef0>
-,Assign_00475ef0,src/graphics/particles_475ef0.cpp,deref_write,*std::vector<Element_00475ef0>
-,Assign_00475ef0,src/graphics/particles_475ef0.cpp,function,
-,Assign_00476490,src/graphics/particles_476490.cpp,call,operator=
-,Assign_00476490,src/graphics/particles_476490.cpp,deref_read,*std::vector<Elem_00476490>
-,Assign_00476490,src/graphics/particles_476490.cpp,deref_write,*std::vector<Elem_00476490>
-,Assign_00476490,src/graphics/particles_476490.cpp,function,
 ,At,src/state/block.cpp,function,
 ,At,src/state/block.cpp,global_read,g_base
 ,AtLeast200,src/game/main_loop.cpp,function,
@@ -44024,8 +44003,6 @@ address,function,file,kind,target
 ,CellToWorld,src/orders/vtol_orders.cpp,field_write,Vec3::x
 ,CellToWorld,src/orders/vtol_orders.cpp,field_write,Vec3::z
 ,CellToWorld,src/orders/vtol_orders.cpp,function,
-,CellX,src/gui/dialogs_4ac970.cpp,field_read,Gadget_004ac970::x
-,CellX,src/gui/dialogs_4ac970.cpp,function,
 ,ChangeDirectory,src/files/files_api.h,field_read,FilesSeam::ChangeDirectory
 ,ChangeDirectory,src/files/files_api.h,field_read,Seams::files
 ,ChangeDirectory,src/files/files_api.h,function,
@@ -44654,6 +44631,19 @@ address,function,file,kind,target
 ,DrawFlags,src/ingame/info_panel_46a610.cpp,field_read,Game::visualFlagsByte
 ,DrawFlags,src/ingame/info_panel_46a610.cpp,function,
 ,DrawFlags,src/ingame/info_panel_46a610.cpp,global_read,g_game
+,DrawIfVisible,src/graphics/particles.cpp,call,DrawFrameBlended
+,DrawIfVisible,src/graphics/particles.cpp,call,GetGafFrame
+,DrawIfVisible,src/graphics/particles.cpp,call,IsVisible
+,DrawIfVisible,src/graphics/particles.cpp,field_maybe_written,Game::players
+,DrawIfVisible,src/graphics/particles.cpp,field_maybe_written,SmokeParticle::posw
+,DrawIfVisible,src/graphics/particles.cpp,field_read,Game::playerIndex
+,DrawIfVisible,src/graphics/particles.cpp,field_read,Position_00475470::x
+,DrawIfVisible,src/graphics/particles.cpp,field_read,Position_00475470::y
+,DrawIfVisible,src/graphics/particles.cpp,field_read,Position_00475470::z
+,DrawIfVisible,src/graphics/particles.cpp,field_read,SmokeParticle::count
+,DrawIfVisible,src/graphics/particles.cpp,field_read,SmokeParticle::data
+,DrawIfVisible,src/graphics/particles.cpp,function,
+,DrawIfVisible,src/graphics/particles.cpp,global_read,g_game
 ,DrawLoadingBar,src/game/game_load.cpp,call,DrawFrame
 ,DrawLoadingBar,src/game/game_load.cpp,call,DrawTextClipped
 ,DrawLoadingBar,src/game/game_load.cpp,call,FillRectangle
@@ -45337,10 +45327,10 @@ address,function,file,kind,target
 ,Find_00499cd0,src/weapons/weapons.cpp,field_read,Pair_00499cd0::name
 ,Find_00499cd0,src/weapons/weapons.cpp,field_read,Table_00499cd0::v
 ,Find_00499cd0,src/weapons/weapons.cpp,function,
-,Find_004a3ef0,src/gui/gui_4a3ef0.cpp,field_read,<anon>::count
-,Find_004a3ef0,src/gui/gui_4a3ef0.cpp,field_read,Gadget::team
-,Find_004a3ef0,src/gui/gui_4a3ef0.cpp,field_read,Gadget::type
-,Find_004a3ef0,src/gui/gui_4a3ef0.cpp,function,
+,Find_004a3ef0,src/gui/gui.cpp,field_read,<anon>::count
+,Find_004a3ef0,src/gui/gui.cpp,field_read,Gadget::team
+,Find_004a3ef0,src/gui/gui.cpp,field_read,Gadget::type
+,Find_004a3ef0,src/gui/gui.cpp,function,
 ,Find_004b7900,src/util/commands.cpp,call,begin
 ,Find_004b7900,src/util/commands.cpp,call,end
 ,Find_004b7900,src/util/commands.cpp,call,operator()
@@ -45932,11 +45922,11 @@ address,function,file,kind,target
 ,GetGadgetRect_inlined,src/gui/gui.cpp,function,
 ,GetGameTypeNative,src/seams/native.cpp,call,Mission::GetGameType
 ,GetGameTypeNative,src/seams/native.cpp,function,
-,GetGlyph_004a3ef0,src/gui/gui_4a3ef0.cpp,call,GetGafFrame
-,GetGlyph_004a3ef0,src/gui/gui_4a3ef0.cpp,field_read,Holder_004a3ef0::list
-,GetGlyph_004a3ef0,src/gui/gui_4a3ef0.cpp,field_read,List_004a3ef0::glyphs
-,GetGlyph_004a3ef0,src/gui/gui_4a3ef0.cpp,function,
-,GetGlyph_004a3ef0,src/gui/gui_4a3ef0.cpp,global_read,g_guiContext
+,GetGlyph_004a3ef0,src/gui/gui.cpp,call,GetGafFrame
+,GetGlyph_004a3ef0,src/gui/gui.cpp,field_read,List_004a32a0::glyphs
+,GetGlyph_004a3ef0,src/gui/gui.cpp,field_read,Root_004a32a0::list
+,GetGlyph_004a3ef0,src/gui/gui.cpp,function,
+,GetGlyph_004a3ef0,src/gui/gui.cpp,global_read,g_guiContext
 ,GetGlyph_004a4d70,src/gui/gui.cpp,call,GetGafFrame
 ,GetGlyph_004a4d70,src/gui/gui.cpp,field_read,List_004a32a0::glyphs
 ,GetGlyph_004a4d70,src/gui/gui.cpp,field_read,Root_004a32a0::language
@@ -46167,12 +46157,6 @@ address,function,file,kind,target
 ,Grow_0046e640,src/network/unit_sync_46e640.cpp,call,reserve
 ,Grow_0046e640,src/network/unit_sync_46e640.cpp,call,size
 ,Grow_0046e640,src/network/unit_sync_46e640.cpp,function,
-,Grow_00475bd0,src/graphics/particles_475bd0.cpp,call,reserve
-,Grow_00475bd0,src/graphics/particles_475bd0.cpp,call,size
-,Grow_00475bd0,src/graphics/particles_475bd0.cpp,function,
-,Grow_00476210,src/graphics/particles_476210.cpp,call,reserve
-,Grow_00476210,src/graphics/particles_476210.cpp,call,size
-,Grow_00476210,src/graphics/particles_476210.cpp,function,
 ,Guard::Guard,src/state/block.cpp,call,Fatal
 ,Guard::Guard,src/state/block.cpp,call,Prepare
 ,Guard::Guard,src/state/block.cpp,call,host_mutex_lock
@@ -46880,11 +46864,9 @@ address,function,file,kind,target
 ,HostHeadless,src/host/win32/headless.cpp,function,
 ,Identity_00473590,src/graphics/particles.cpp,function,
 ,Identity_00473a00,src/graphics/particles.cpp,function,
-,Identity_00473a00,src/graphics/particles_473a00.cpp,function,
 ,Identity_00474170,src/graphics/particles.cpp,function,
 ,Identity_004745e0,src/graphics/particles.cpp,function,
 ,Identity_00474b80,src/graphics/particles.cpp,function,
-,Identity_00474b80,src/graphics/particles_474b80.cpp,function,
 ,ImageHelpEnabled,src/host/win32/crash.cpp,call,HasCommandLineSwitch
 ,ImageHelpEnabled,src/host/win32/crash.cpp,function,
 ,InGame,src/network/net_game_453d40.cpp,call,IsValid
@@ -47781,15 +47763,15 @@ address,function,file,kind,target
 ,IsExplored,src/game/players_465ac0.cpp,field_read,Position_00465ac0::y
 ,IsExplored,src/game/players_465ac0.cpp,field_read,Position_00465ac0::z
 ,IsExplored,src/game/players_465ac0.cpp,function,
-,IsExplored,src/graphics/particles_475470.cpp,call,operator unsigned char *
-,IsExplored,src/graphics/particles_475470.cpp,deref_read,*unsigned char
-,IsExplored,src/graphics/particles_475470.cpp,field_read,Player::explored
-,IsExplored,src/graphics/particles_475470.cpp,field_read,Player::exploredHeight
-,IsExplored,src/graphics/particles_475470.cpp,field_read,Player::exploredWidth
-,IsExplored,src/graphics/particles_475470.cpp,field_read,Position_00475470::x
-,IsExplored,src/graphics/particles_475470.cpp,field_read,Position_00475470::y
-,IsExplored,src/graphics/particles_475470.cpp,field_read,Position_00475470::z
-,IsExplored,src/graphics/particles_475470.cpp,function,
+,IsExplored,src/graphics/particles.cpp,call,operator unsigned char *
+,IsExplored,src/graphics/particles.cpp,deref_read,*unsigned char
+,IsExplored,src/graphics/particles.cpp,field_read,Player::explored
+,IsExplored,src/graphics/particles.cpp,field_read,Player::exploredHeight
+,IsExplored,src/graphics/particles.cpp,field_read,Player::exploredWidth
+,IsExplored,src/graphics/particles.cpp,field_read,Position_00475470::x
+,IsExplored,src/graphics/particles.cpp,field_read,Position_00475470::y
+,IsExplored,src/graphics/particles.cpp,field_read,Position_00475470::z
+,IsExplored,src/graphics/particles.cpp,function,
 ,IsExplored2,src/game/players_465ac0.cpp,call,MapSize_00465ac0::Contains
 ,IsExplored2,src/game/players_465ac0.cpp,call,operator unsigned char *
 ,IsExplored2,src/game/players_465ac0.cpp,deref_read,*unsigned char
@@ -47955,17 +47937,17 @@ address,function,file,kind,target
 ,IsSeen,src/game/players_465ac0.cpp,field_read,Position_00465ac0::z
 ,IsSeen,src/game/players_465ac0.cpp,function,
 ,IsSeen,src/game/players_465ac0.cpp,global_read,g_game
-,IsSeen,src/graphics/particles_475470.cpp,call,operator unsigned short *
-,IsSeen,src/graphics/particles_475470.cpp,deref_read,*unsigned short
-,IsSeen,src/graphics/particles_475470.cpp,field_read,Game::playerIndex
-,IsSeen,src/graphics/particles_475470.cpp,field_read,Game::visibilityMask
-,IsSeen,src/graphics/particles_475470.cpp,field_read,Player::exploredHeight
-,IsSeen,src/graphics/particles_475470.cpp,field_read,Player::exploredWidth
-,IsSeen,src/graphics/particles_475470.cpp,field_read,Position_00475470::x
-,IsSeen,src/graphics/particles_475470.cpp,field_read,Position_00475470::y
-,IsSeen,src/graphics/particles_475470.cpp,field_read,Position_00475470::z
-,IsSeen,src/graphics/particles_475470.cpp,function,
-,IsSeen,src/graphics/particles_475470.cpp,global_read,g_game
+,IsSeen,src/graphics/particles.cpp,call,operator unsigned short *
+,IsSeen,src/graphics/particles.cpp,deref_read,*unsigned short
+,IsSeen,src/graphics/particles.cpp,field_read,Game::playerIndex
+,IsSeen,src/graphics/particles.cpp,field_read,Game::visibilityMask
+,IsSeen,src/graphics/particles.cpp,field_read,Player::exploredHeight
+,IsSeen,src/graphics/particles.cpp,field_read,Player::exploredWidth
+,IsSeen,src/graphics/particles.cpp,field_read,Position_00475470::x
+,IsSeen,src/graphics/particles.cpp,field_read,Position_00475470::y
+,IsSeen,src/graphics/particles.cpp,field_read,Position_00475470::z
+,IsSeen,src/graphics/particles.cpp,function,
+,IsSeen,src/graphics/particles.cpp,global_read,g_game
 ,IsSeen_00467440,src/ingame/info_panel_467440.cpp,call,MapSize_00467440::Contains
 ,IsSeen_00467440,src/ingame/info_panel_467440.cpp,call,operator unsigned short *
 ,IsSeen_00467440,src/ingame/info_panel_467440.cpp,deref_read,*unsigned short
@@ -47992,14 +47974,6 @@ address,function,file,kind,target
 ,IsSeen_00473a00,src/graphics/particles.cpp,field_read,Player::exploredWidth
 ,IsSeen_00473a00,src/graphics/particles.cpp,function,
 ,IsSeen_00473a00,src/graphics/particles.cpp,global_read,g_game
-,IsSeen_00473a00,src/graphics/particles_473a00.cpp,call,operator unsigned short *
-,IsSeen_00473a00,src/graphics/particles_473a00.cpp,deref_read,*unsigned short
-,IsSeen_00473a00,src/graphics/particles_473a00.cpp,field_read,Game::playerIndex
-,IsSeen_00473a00,src/graphics/particles_473a00.cpp,field_read,Game::visibilityMask
-,IsSeen_00473a00,src/graphics/particles_473a00.cpp,field_read,Player::exploredHeight
-,IsSeen_00473a00,src/graphics/particles_473a00.cpp,field_read,Player::exploredWidth
-,IsSeen_00473a00,src/graphics/particles_473a00.cpp,function,
-,IsSeen_00473a00,src/graphics/particles_473a00.cpp,global_read,g_game
 ,IsSeen_00474170,src/graphics/particles.cpp,call,InsideExplored
 ,IsSeen_00474170,src/graphics/particles.cpp,call,operator unsigned short *
 ,IsSeen_00474170,src/graphics/particles.cpp,deref_read,*unsigned short
@@ -48025,14 +47999,6 @@ address,function,file,kind,target
 ,IsSeen_00474b80,src/graphics/particles.cpp,field_read,Player::exploredWidth
 ,IsSeen_00474b80,src/graphics/particles.cpp,function,
 ,IsSeen_00474b80,src/graphics/particles.cpp,global_read,g_game
-,IsSeen_00474b80,src/graphics/particles_474b80.cpp,call,operator unsigned short *
-,IsSeen_00474b80,src/graphics/particles_474b80.cpp,deref_read,*unsigned short
-,IsSeen_00474b80,src/graphics/particles_474b80.cpp,field_read,Game::playerIndex
-,IsSeen_00474b80,src/graphics/particles_474b80.cpp,field_read,Game::visibilityMask
-,IsSeen_00474b80,src/graphics/particles_474b80.cpp,field_read,Player::exploredHeight
-,IsSeen_00474b80,src/graphics/particles_474b80.cpp,field_read,Player::exploredWidth
-,IsSeen_00474b80,src/graphics/particles_474b80.cpp,function,
-,IsSeen_00474b80,src/graphics/particles_474b80.cpp,global_read,g_game
 ,IsSeen_0047d2e0,src/map/terrain.cpp,call,MapSize_0047d2e0::Contains
 ,IsSeen_0047d2e0,src/map/terrain.cpp,call,operator unsigned short *
 ,IsSeen_0047d2e0,src/map/terrain.cpp,deref_read,*unsigned short
@@ -48087,11 +48053,11 @@ address,function,file,kind,target
 ,IsVisible,src/game/players_465ac0.cpp,global_read,g_game
 ,IsVisible,src/game/players_465ac0.cpp,global_read,g_seams
 ,IsVisible,src/game/players_465ac0.cpp,indirect_call,"indirect via int (*)(Player *, Vec3 *) __attribute__((stdcall)) [AiSeam::IsPointVisible]"
-,IsVisible,src/graphics/particles_475470.cpp,call,IsExplored
-,IsVisible,src/graphics/particles_475470.cpp,call,IsSeen
-,IsVisible,src/graphics/particles_475470.cpp,field_read,Game::mapFlags
-,IsVisible,src/graphics/particles_475470.cpp,function,
-,IsVisible,src/graphics/particles_475470.cpp,global_read,g_game
+,IsVisible,src/graphics/particles.cpp,call,IsExplored
+,IsVisible,src/graphics/particles.cpp,call,IsSeen
+,IsVisible,src/graphics/particles.cpp,field_read,Game::mapFlags
+,IsVisible,src/graphics/particles.cpp,function,
+,IsVisible,src/graphics/particles.cpp,global_read,g_game
 ,IsVisible2,src/game/players_465ac0.cpp,call,IsExplored2
 ,IsVisible2,src/game/players_465ac0.cpp,field_read,AiSeam::IsPointVisible
 ,IsVisible2,src/game/players_465ac0.cpp,field_read,Game::mapFlags
@@ -48246,6 +48212,11 @@ address,function,file,kind,target
 ,Length,src/weapons/weapons_49a120.cpp,field_read,Vec3::y
 ,Length,src/weapons/weapons_49a120.cpp,field_read,Vec3::z
 ,Length,src/weapons/weapons_49a120.cpp,function,
+,LengthFloat,src/graphics/particles.cpp,call,bx_sqrt
+,LengthFloat,src/graphics/particles.cpp,field_read,Vec3::x
+,LengthFloat,src/graphics/particles.cpp,field_read,Vec3::y
+,LengthFloat,src/graphics/particles.cpp,field_read,Vec3::z
+,LengthFloat,src/graphics/particles.cpp,function,
 ,Less,src/util/tdf.cpp,call,_strcmpi
 ,Less,src/util/tdf.cpp,function,
 ,Less,src/weapons/weapon_types.cpp,call,_strcmpi
@@ -48301,12 +48272,12 @@ address,function,file,kind,target
 ,LineOfFire_0049abb0,src/weapons/weapons.cpp,field_read,Vec3_0049abb0::x
 ,LineOfFire_0049abb0,src/weapons/weapons.cpp,field_read,Vec3_0049abb0::z
 ,LineOfFire_0049abb0,src/weapons/weapons.cpp,function,
-,LineSize_004a3ef0,src/gui/gui_4a3ef0.cpp,deref_read,*Font_004a3ef0
-,LineSize_004a3ef0,src/gui/gui_4a3ef0.cpp,field_read,<anon>::rowCount
-,LineSize_004a3ef0,src/gui/gui_4a3ef0.cpp,field_read,<anon>::rows
-,LineSize_004a3ef0,src/gui/gui_4a3ef0.cpp,field_read,Font_004a3ef0::glyph
-,LineSize_004a3ef0,src/gui/gui_4a3ef0.cpp,field_read,GafFrame::height
-,LineSize_004a3ef0,src/gui/gui_4a3ef0.cpp,function,
+,LineSize_004a3ef0,src/gui/gui.cpp,deref_read,*Font_004a3ef0
+,LineSize_004a3ef0,src/gui/gui.cpp,field_read,<anon>::rowCount
+,LineSize_004a3ef0,src/gui/gui.cpp,field_read,<anon>::rows
+,LineSize_004a3ef0,src/gui/gui.cpp,field_read,Font_004a3ef0::glyph
+,LineSize_004a3ef0,src/gui/gui.cpp,field_read,GafFrame::height
+,LineSize_004a3ef0,src/gui/gui.cpp,function,
 ,ListDirectory,src/files/files_api.h,field_read,FilesSeam::ListDirectory
 ,ListDirectory,src/files/files_api.h,field_read,Seams::files
 ,ListDirectory,src/files/files_api.h,function,
@@ -49297,65 +49268,6 @@ address,function,file,kind,target
 ,ParticleLists::Add,src/graphics/particle_lists.h,field_read,ParticleLists::lists
 ,ParticleLists::Add,src/graphics/particle_lists.h,function,
 ,ParticleLists::Add,src/graphics/particle_lists.h,indirect_call,virtual ParticleSystem::~ParticleSystem
-,ParticleLists::Add,src/graphics/particles_471820.cpp,call,SmokeParticles::~SmokeParticles
-,ParticleLists::Add,src/graphics/particles_471820.cpp,call,begin
-,ParticleLists::Add,src/graphics/particles_471820.cpp,call,erase
-,ParticleLists::Add,src/graphics/particles_471820.cpp,call,operator delete
-,ParticleLists::Add,src/graphics/particles_471820.cpp,call,operator[]
-,ParticleLists::Add,src/graphics/particles_471820.cpp,call,push_back
-,ParticleLists::Add,src/graphics/particles_471820.cpp,call,size
-,ParticleLists::Add,src/graphics/particles_471820.cpp,deref_read,*Elem_00473500
-,ParticleLists::Add,src/graphics/particles_471820.cpp,field_maybe_written,ParticleLists::lists
-,ParticleLists::Add,src/graphics/particles_471820.cpp,field_read,Elem_00473500::p
-,ParticleLists::Add,src/graphics/particles_471820.cpp,field_read,ParticleLists::lists
-,ParticleLists::Add,src/graphics/particles_471820.cpp,function,
-,ParticleLists::Add,src/graphics/particles_471820.cpp,indirect_call,virtual SmokeParticles::~SmokeParticles
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,call,TimedSubParticles::~TimedSubParticles
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,call,begin
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,call,erase
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,call,operator delete
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,call,operator[]
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,call,push_back
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,call,size
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,deref_read,*Elem_00473500
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,field_maybe_written,ParticleLists::lists
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,field_read,Elem_00473500::p
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,field_read,ParticleLists::lists
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,function,
-,ParticleLists::Add,src/graphics/particles_471a50.cpp,indirect_call,virtual TimedSubParticles::~TimedSubParticles
-,ParticleLists::~ParticleLists,src/graphics/particles_471de0.cpp,call,Listener_00470fb0::~Listener_00470fb0
-,ParticleLists::~ParticleLists,src/graphics/particles_471de0.cpp,call,begin
-,ParticleLists::~ParticleLists,src/graphics/particles_471de0.cpp,call,end
-,ParticleLists::~ParticleLists,src/graphics/particles_471de0.cpp,call,erase
-,ParticleLists::~ParticleLists,src/graphics/particles_471de0.cpp,call,operator delete
-,ParticleLists::~ParticleLists,src/graphics/particles_471de0.cpp,deref_read,*Listener_00470fb0
-,ParticleLists::~ParticleLists,src/graphics/particles_471de0.cpp,field_maybe_written,ParticleLists::lists
-,ParticleLists::~ParticleLists,src/graphics/particles_471de0.cpp,function,
-,ParticleLists::~ParticleLists,src/graphics/particles_471de0.cpp,indirect_call,virtual Listener_00470fb0::~Listener_00470fb0
-,ParticleSystem::ParticleSystem,src/graphics/particles_471820.cpp,field_write,ParticleSystem::deadline
-,ParticleSystem::ParticleSystem,src/graphics/particles_471820.cpp,function,
-,ParticleSystem::operator delete,src/graphics/particles_471820.cpp,call,ObjectPool::FreeSlot
-,ParticleSystem::operator delete,src/graphics/particles_471820.cpp,function,
-,ParticleSystem::operator delete,src/graphics/particles_471820.cpp,global_maybe_written,g_particlePool
-,ParticleSystem::operator delete,src/graphics/particles_471a50.cpp,call,ObjectPool::FreeSlot
-,ParticleSystem::operator delete,src/graphics/particles_471a50.cpp,function,
-,ParticleSystem::operator delete,src/graphics/particles_471a50.cpp,global_maybe_written,g_particlePool
-,ParticleSystem::operator new,src/graphics/particles_471820.cpp,call,ObjectPool::AllocSlot
-,ParticleSystem::operator new,src/graphics/particles_471820.cpp,call,memset
-,ParticleSystem::operator new,src/graphics/particles_471820.cpp,function,
-,ParticleSystem::operator new,src/graphics/particles_471820.cpp,global_maybe_written,g_particlePool
-,ParticleSystem::operator new,src/graphics/particles_471820.cpp,global_read,g_fxEventPoolBlocked
-,ParticleSystem::operator new,src/graphics/particles_471a50.cpp,call,ObjectPool::AllocSlot
-,ParticleSystem::operator new,src/graphics/particles_471a50.cpp,call,memset
-,ParticleSystem::operator new,src/graphics/particles_471a50.cpp,function,
-,ParticleSystem::operator new,src/graphics/particles_471a50.cpp,global_maybe_written,g_particlePool
-,ParticleSystem::operator new,src/graphics/particles_471a50.cpp,global_read,g_fxEventPoolBlocked
-,ParticleSystem::operator new,src/graphics/particles_472630.cpp,call,ObjectPool::AllocSlot
-,ParticleSystem::operator new,src/graphics/particles_472630.cpp,deref_write,*char
-,ParticleSystem::operator new,src/graphics/particles_472630.cpp,deref_write,*int
-,ParticleSystem::operator new,src/graphics/particles_472630.cpp,function,
-,ParticleSystem::operator new,src/graphics/particles_472630.cpp,global_maybe_written,g_particlePool
-,ParticleSystem::operator new,src/graphics/particles_472630.cpp,global_read,g_fxEventPoolBlocked
 ,Pass,src/network/unit_sync_46dad0.cpp,function,
 ,PathGoal::~PathGoal,src/ai/ai_search_goal.h,function,
 ,PathGrid::At,src/ai/pathfinder.h,deref_escape,*PathCell
@@ -49747,10 +49659,6 @@ address,function,file,kind,target
 ,Pos_4589c0::Pos_4589c0,src/graphics/model_render.cpp,field_write,Pos_4589c0::y
 ,Pos_4589c0::Pos_4589c0,src/graphics/model_render.cpp,field_write,Pos_4589c0::z
 ,Pos_4589c0::Pos_4589c0,src/graphics/model_render.cpp,function,
-,Pos_4589c0::Pos_4589c0,src/graphics/model_render_4589c0.cpp,field_write,Pos_4589c0::x
-,Pos_4589c0::Pos_4589c0,src/graphics/model_render_4589c0.cpp,field_write,Pos_4589c0::y
-,Pos_4589c0::Pos_4589c0,src/graphics/model_render_4589c0.cpp,field_write,Pos_4589c0::z
-,Pos_4589c0::Pos_4589c0,src/graphics/model_render_4589c0.cpp,function,
 ,PoseUnitModel,src/units/unit_scripts.cpp,call,UpdateObjectState
 ,PoseUnitModel,src/units/unit_scripts.cpp,call,memcpy
 ,PoseUnitModel,src/units/unit_scripts.cpp,call,operator SpotState *
@@ -50885,19 +50793,6 @@ address,function,file,kind,target
 ,SmokeAt,src/map/features.cpp,field_read,GafFrame::yOffset
 ,SmokeAt,src/map/features.cpp,field_write,Fixed::whole
 ,SmokeAt,src/map/features.cpp,function,
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,call,DrawFrameBlended
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,call,GetGafFrame
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,call,IsVisible
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,field_maybe_written,Game::players
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,field_maybe_written,SmokeParticle::posw
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,field_read,Game::playerIndex
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,field_read,Position_00475470::x
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,field_read,Position_00475470::y
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,field_read,Position_00475470::z
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,field_read,SmokeParticle::count
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,field_read,SmokeParticle::data
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,function,
-,SmokeParticle::DrawIfVisible,src/graphics/particles_475470.cpp,global_read,g_game
 ,Snap,src/orders/vtol_orders.cpp,call,CellToWorld
 ,Snap,src/orders/vtol_orders.cpp,call,WorldToCellMul
 ,Snap,src/orders/vtol_orders.cpp,deref_read,*Vec3
@@ -51141,7 +51036,6 @@ address,function,file,kind,target
 ,TestBit,src/ingame/selection.cpp,field_read,UnitTypeSet::bits
 ,TestBit,src/ingame/selection.cpp,function,
 ,ThrustParticles::ThrustParticles,src/graphics/particles.cpp,function,
-,ThrustParticles::ThrustParticles,src/graphics/particles_472630.cpp,function,
 ,TickProgressBar,src/gui/gui.cpp,call,DrawProgressBarGadget
 ,TickProgressBar,src/gui/gui.cpp,call,GetTicks
 ,TickProgressBar,src/gui/gui.cpp,deref_escape,*Gadget
@@ -51157,14 +51051,6 @@ address,function,file,kind,target
 ,TickProgressBar,src/gui/gui.cpp,field_write,<anon>::next
 ,TickProgressBar,src/gui/gui.cpp,field_write,<anon>::value
 ,TickProgressBar,src/gui/gui.cpp,function,
-,TimedSubParticle::Draw,src/graphics/particles_475700.cpp,call,DrawFrameBlended
-,TimedSubParticle::Draw,src/graphics/particles_475700.cpp,call,GetGafFrame
-,TimedSubParticle::Draw,src/graphics/particles_475700.cpp,field_read,Position_00475150::x
-,TimedSubParticle::Draw,src/graphics/particles_475700.cpp,field_read,Position_00475150::y
-,TimedSubParticle::Draw,src/graphics/particles_475700.cpp,field_read,Position_00475150::z
-,TimedSubParticle::Draw,src/graphics/particles_475700.cpp,field_read,TimedSubParticle::count
-,TimedSubParticle::Draw,src/graphics/particles_475700.cpp,field_read,TimedSubParticle::data
-,TimedSubParticle::Draw,src/graphics/particles_475700.cpp,function,
 ,TimerClassOf,src/harness/harness.cpp,function,
 ,TimerClassOf,src/harness/harness.cpp,global_read,classes@TimerClassOf
 ,ToWorld,src/orders/order_targets.cpp,deref_write,*int
@@ -51670,14 +51556,6 @@ address,function,file,kind,target
 ,Vec3_0040beb0::Scale,src/ai/ai_player.cpp,field_write,Vec3_0040beb0::y
 ,Vec3_0040beb0::Scale,src/ai/ai_player.cpp,field_write,Vec3_0040beb0::z
 ,Vec3_0040beb0::Scale,src/ai/ai_player.cpp,function,
-,Vec3_00473560::operator+=,src/graphics/particles_472630.cpp,deref_read,*Vec3_00473560
-,Vec3_00473560::operator+=,src/graphics/particles_472630.cpp,field_read,Vec3_00473560::x
-,Vec3_00473560::operator+=,src/graphics/particles_472630.cpp,field_read,Vec3_00473560::y
-,Vec3_00473560::operator+=,src/graphics/particles_472630.cpp,field_read,Vec3_00473560::z
-,Vec3_00473560::operator+=,src/graphics/particles_472630.cpp,field_write,Vec3_00473560::x
-,Vec3_00473560::operator+=,src/graphics/particles_472630.cpp,field_write,Vec3_00473560::y
-,Vec3_00473560::operator+=,src/graphics/particles_472630.cpp,field_write,Vec3_00473560::z
-,Vec3_00473560::operator+=,src/graphics/particles_472630.cpp,function,
 ,Vec3_004736e0::Length,src/graphics/particles.cpp,call,bx_sqrt
 ,Vec3_004736e0::Length,src/graphics/particles.cpp,field_read,Vec3_004736e0::x
 ,Vec3_004736e0::Length,src/graphics/particles.cpp,field_read,Vec3_004736e0::y
@@ -51698,25 +51576,6 @@ address,function,file,kind,target
 ,Vec3_004736e0::operator-,src/graphics/particles.cpp,field_write,Vec3_004736e0::y
 ,Vec3_004736e0::operator-,src/graphics/particles.cpp,field_write,Vec3_004736e0::z
 ,Vec3_004736e0::operator-,src/graphics/particles.cpp,function,
-,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,call,sqrt
-,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::x
-,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::y
-,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::z
-,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,function,
-,Vec3_00473d50::operator-,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::x
-,Vec3_00473d50::operator-,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::y
-,Vec3_00473d50::operator-,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::z
-,Vec3_00473d50::operator-,src/graphics/particles_473d50.cpp,field_write,Vec3_00473d50::x
-,Vec3_00473d50::operator-,src/graphics/particles_473d50.cpp,field_write,Vec3_00473d50::y
-,Vec3_00473d50::operator-,src/graphics/particles_473d50.cpp,field_write,Vec3_00473d50::z
-,Vec3_00473d50::operator-,src/graphics/particles_473d50.cpp,function,
-,Vec3_00474580::operator+=,src/graphics/particles_472630.cpp,field_read,Vec3_00474580::x
-,Vec3_00474580::operator+=,src/graphics/particles_472630.cpp,field_read,Vec3_00474580::y
-,Vec3_00474580::operator+=,src/graphics/particles_472630.cpp,field_read,Vec3_00474580::z
-,Vec3_00474580::operator+=,src/graphics/particles_472630.cpp,field_write,Vec3_00474580::x
-,Vec3_00474580::operator+=,src/graphics/particles_472630.cpp,field_write,Vec3_00474580::y
-,Vec3_00474580::operator+=,src/graphics/particles_472630.cpp,field_write,Vec3_00474580::z
-,Vec3_00474580::operator+=,src/graphics/particles_472630.cpp,function,
 ,Vec3_00474760::Length,src/graphics/particles.cpp,call,bx_sqrt
 ,Vec3_00474760::Length,src/graphics/particles.cpp,field_read,Vec3_00474760::x
 ,Vec3_00474760::Length,src/graphics/particles.cpp,field_read,Vec3_00474760::y
@@ -51737,14 +51596,6 @@ address,function,file,kind,target
 ,Vec3_00474760::operator+=,src/graphics/particles.cpp,field_write,Vec3_00474760::y
 ,Vec3_00474760::operator+=,src/graphics/particles.cpp,field_write,Vec3_00474760::z
 ,Vec3_00474760::operator+=,src/graphics/particles.cpp,function,
-,Vec3i_00474130::operator+=,src/graphics/particles_472630.cpp,deref_read,*Vec3i_00474130
-,Vec3i_00474130::operator+=,src/graphics/particles_472630.cpp,field_read,Vec3i_00474130::x
-,Vec3i_00474130::operator+=,src/graphics/particles_472630.cpp,field_read,Vec3i_00474130::y
-,Vec3i_00474130::operator+=,src/graphics/particles_472630.cpp,field_read,Vec3i_00474130::z
-,Vec3i_00474130::operator+=,src/graphics/particles_472630.cpp,field_write,Vec3i_00474130::x
-,Vec3i_00474130::operator+=,src/graphics/particles_472630.cpp,field_write,Vec3i_00474130::y
-,Vec3i_00474130::operator+=,src/graphics/particles_472630.cpp,field_write,Vec3i_00474130::z
-,Vec3i_00474130::operator+=,src/graphics/particles_472630.cpp,function,
 ,Vec::Vec,src/ai/vec.h,function,
 ,VecElems_0046ca60::_Destroy,src/network/unit_sync_46ca60.cpp,call,destroy
 ,VecElems_0046ca60::_Destroy,src/network/unit_sync_46ca60.cpp,field_maybe_written,VecElems_0046ca60::alloc
@@ -52690,11 +52541,11 @@ address,function,file,kind,target
 ,color_taken,src/frontend/skirmish_menu.cpp,field_read,SkirmishPlayerSlot::color
 ,color_taken,src/frontend/skirmish_menu.cpp,function,
 ,color_taken,src/frontend/skirmish_menu.cpp,global_read,g_game
-,digger_bias,src/graphics/model_render_4589c0.cpp,call,get
-,digger_bias,src/graphics/model_render_4589c0.cpp,field_read,<anon>::digger
-,digger_bias,src/graphics/model_render_4589c0.cpp,field_read,Model_459200::owner
-,digger_bias,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::def
-,digger_bias,src/graphics/model_render_4589c0.cpp,function,
+,digger_bias,src/graphics/model_render.cpp,call,get
+,digger_bias,src/graphics/model_render.cpp,field_read,<anon>::digger
+,digger_bias,src/graphics/model_render.cpp,field_read,Model_459200::owner
+,digger_bias,src/graphics/model_render.cpp,field_read,Unit_459200::def
+,digger_bias,src/graphics/model_render.cpp,function,
 ,encryptByte,src/files/sqsh.cpp,deref_read,*char
 ,encryptByte,src/files/sqsh.cpp,function,
 ,entry_at,src/gui/gui.cpp,deref_escape,*Gadget
@@ -53544,20 +53395,13 @@ address,function,file,kind,target
 ,setcell,src/units/movement_class.cpp,deref_read,*unsigned int
 ,setcell,src/units/movement_class.cpp,deref_write,*unsigned int
 ,setcell,src/units/movement_class.cpp,function,
+,shade_bias,src/graphics/model_render.cpp,call,get
 ,shade_bias,src/graphics/model_render.cpp,call,operator->
+,shade_bias,src/graphics/model_render.cpp,field_read,Model_459200::owner
 ,shade_bias,src/graphics/model_render.cpp,field_read,UnitDef::flags1
+,shade_bias,src/graphics/model_render.cpp,field_read,UnitTypeFlags_459200::word
 ,shade_bias,src/graphics/model_render.cpp,field_read,Unit_459200::def
 ,shade_bias,src/graphics/model_render.cpp,function,
-,shade_bias,src/graphics/model_render_4581e0.cpp,call,get
-,shade_bias,src/graphics/model_render_4581e0.cpp,deref_read,*unsigned int
-,shade_bias,src/graphics/model_render_4581e0.cpp,field_read,Model_459200::owner
-,shade_bias,src/graphics/model_render_4581e0.cpp,field_read,Unit_459200::def
-,shade_bias,src/graphics/model_render_4581e0.cpp,function,
-,shade_bias,src/graphics/model_render_4589c0.cpp,call,get
-,shade_bias,src/graphics/model_render_4589c0.cpp,field_read,Model_459200::owner
-,shade_bias,src/graphics/model_render_4589c0.cpp,field_read,UnitTypeFlags_459200::word
-,shade_bias,src/graphics/model_render_4589c0.cpp,field_read,Unit_459200::def
-,shade_bias,src/graphics/model_render_4589c0.cpp,function,
 ,sort_0043bc90,src/orders/order_list.cpp,call,_Sort_0_0043bc90
 ,sort_0043bc90,src/orders/order_list.cpp,call,_Val_type
 ,sort_0043bc90,src/orders/order_list.cpp,function,

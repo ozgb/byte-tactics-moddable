@@ -33,7 +33,7 @@ address,function,file,line,offset,chain,result,class,disposition
 0x43d290,UnitMotion::SteerAircraft,src/orders/order_list.cpp,1937,0x372,(((-sqrt(((f[esp+0x18] + f[esp+0x18]) / f[0]/$T39060)) * i[esp+0x1c]) * f[0]/$T39058) - (i[esp+0x50] * f[0]/$T39058)),double-store,float-chain,modern
 0x43d290,UnitMotion::SteerAircraft,src/orders/order_list.cpp,1940,0x39e,(f[esp+0x5c] * (f[esp+0x18] / hypot())),float-store,safe,n/a
 0x43d290,UnitMotion::SteerAircraft,src/orders/order_list.cpp,1947,0x3e7,sqrt((((i[esi] * i[esi]) + (i[esi+4] * i[esi+4])) + (i[esi+8] * i[esi+8]))),ftol,safe,n/a
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render_4581e0.cpp,315,0x677,((((f[esp+eax+0x224] * f[0]/g_lightX) + (f[esp+eax+0x228] * f[0]/g_lightY)) + (f[esp+eax+0x22c] * f[0]/g_lightZ)) * f[0]/DAT_004fd4cc),ftol,float-chain,modern
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,315,0x677,((((f[esp+eax+0x224] * f[0]/g_lightX) + (f[esp+eax+0x228] * f[0]/g_lightY)) + (f[esp+eax+0x22c] * f[0]/g_lightZ)) * f[0]/DAT_004fd4cc),ftol,float-chain,modern
 0x464060,DrawMessages,src/network/net_chat.cpp,259,0x181,(d[0]/$T1428 - (i[esp+0x18] * d[0]/$T1427)),ftol,safe,n/a
 0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,513,0x41e,(((i[esp+0x10] * f[esp+0x79]) / f[ebp+0xa4]) + i[esp+0x9c]),ftol,safe,rewritten
 0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,513,0x49e,(((i[esp+0x10] * f[ebp+0xe8]) / f[ebp+0xa4]) + i[esp+0x24]),ftol,safe,rewritten
@@ -55,7 +55,7 @@ address,function,file,line,offset,chain,result,class,disposition
 0x4a2be0,SyncAssocGadgets,src/gui/gui.cpp,2276,0xe3,((i[esp+0x10] * i[esp+0x10]) / i[esp+0x10]),ftol,float-chain,modern
 0x4a2be0,SyncAssocGadgets,src/gui/gui.cpp,2248,0x211,((i[esp+0x10] * i[esp+0x10]) / i[esp+0x10]),ftol,float-chain,modern
 0x4a2e40,SetListBoxScrollByName,src/gui/gui.cpp,2402,0x254,((i[esp+0x18] * i[esp+0x18]) / i[esp+0x18]),ftol,float-chain,modern
-0x4a3ef0,DrawSlider,src/gui/gui_4a3ef0.cpp,110,0x173,((i[esp+0x10] / i[esp+0x14]) * i[esp+0x14]),ftol,float-chain,modern
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,110,0x173,((i[esp+0x10] / i[esp+0x14]) * i[esp+0x14]),ftol,float-chain,modern
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,3479,0xf3,((i[esi+0xba] / i[esi+0xb6]) * i[esp+0x38]),ftol,float-chain,modern
 0x4b6f70,CrossProduct,src/util/math.cpp,184,0x47,((f[esp+0x18] * f[esp+8]) - (f[esp+0x14] * f[esp+0xc])),float-store,float-chain,modern
 0x4b6f70,CrossProduct,src/util/math.cpp,184,0x4d,((f[esp+0x1c] * f[esp+0xc]) - (f[esp+0x18] * f[esp+0x10])),float-store,float-chain,modern

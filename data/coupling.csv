@@ -78,9 +78,9 @@ ai,presentation,shared_write,Point16::x,6
 ai,presentation,shared_write,Point16::y,6
 ai,presentation,shared_write,Unit::flags,28
 ai,presentation,shared_write,Unit::group,4
-ai,presentation,shared_write,Vec3::x,35
-ai,presentation,shared_write,Vec3::y,34
-ai,presentation,shared_write,Vec3::z,34
+ai,presentation,shared_write,Vec3::x,37
+ai,presentation,shared_write,Vec3::y,36
+ai,presentation,shared_write,Vec3::z,36
 ai,seams,indirect,GetNameSlotNative,1
 ai,seams,indirect,SetWeaponTargetPosNative,1
 ai,seams,indirect,SetWeaponTargetUnitNative,2
@@ -295,9 +295,9 @@ features,presentation,shared_write,Fixed::whole,5
 features,presentation,shared_write,Game::features,3
 features,presentation,shared_write,Point16::x,6
 features,presentation,shared_write,Point16::y,6
-features,presentation,shared_write,Vec3::x,35
-features,presentation,shared_write,Vec3::y,34
-features,presentation,shared_write,Vec3::z,34
+features,presentation,shared_write,Vec3::x,37
+features,presentation,shared_write,Vec3::y,36
+features,presentation,shared_write,Vec3::z,36
 features,seams,indirect,ApplyAreaDamageAtNative,1
 features,seams,indirect,FindWeaponByNameNative,1
 features,seams,indirect,GetCellMeanHeightNative,1
@@ -956,9 +956,9 @@ game,presentation,shared_write,Game::mapWidth,7
 game,presentation,shared_write,Game::maxUnitsSetting,2
 game,presentation,shared_write,Game::mode_391f1,5
 game,presentation,shared_write,Game::numPlayers,4
-game,presentation,shared_write,Game::playerIndex,28
+game,presentation,shared_write,Game::playerIndex,26
 game,presentation,shared_write,Game::seaLevel,4
-game,presentation,shared_write,Game::ticks,32
+game,presentation,shared_write,Game::ticks,34
 game,presentation,shared_write,Game::uiOptionFlags,2
 game,presentation,shared_write,Game::unitIndex,22
 game,presentation,shared_write,Game::version,3
@@ -976,8 +976,8 @@ game,presentation,shared_write,Ref_004b8b30::value,1
 game,presentation,shared_write,Unit::flags,28
 game,presentation,shared_write,Unit::health,2
 game,presentation,shared_write,UnitDef::flags1,2
-game,presentation,shared_write,Vec3::x,35
-game,presentation,shared_write,Vec3::z,34
+game,presentation,shared_write,Vec3::x,37
+game,presentation,shared_write,Vec3::z,36
 game,seams,indirect,AdvanceMissionNative,1
 game,seams,indirect,DeactivateConditionsNative,2
 game,seams,indirect,GetCampaignNameNative,2
@@ -1145,7 +1145,7 @@ harness,presentation,call,UpdatePlacementGhostValidity,1
 harness,presentation,shared_write,Game::difficulty,10
 harness,presentation,shared_write,Game::localPlayer,68
 harness,presentation,shared_write,Game::numPlayers,4
-harness,presentation,shared_write,Game::playerIndex,28
+harness,presentation,shared_write,Game::playerIndex,26
 harness,seams,call,InstallNativeSeams,1
 harness,units,call,ApplyUnitDeath,1
 harness,units,call,GetGroundHeight,1
@@ -1291,14 +1291,14 @@ los_radar,presentation,shared_write,Game::mapWidth,7
 los_radar,presentation,shared_write,Game::posX,2
 los_radar,presentation,shared_write,Game::posY,2
 los_radar,presentation,shared_write,Game::screen_h,1
-los_radar,presentation,shared_write,Game::visibilityMask,10
+los_radar,presentation,shared_write,Game::visibilityMask,8
 los_radar,presentation,shared_write,Game::width_142eb,1
 los_radar,presentation,shared_write,Point16::x,6
 los_radar,presentation,shared_write,Point16::y,6
 los_radar,presentation,shared_write,Unit::flags,28
-los_radar,presentation,shared_write,Vec3::x,35
-los_radar,presentation,shared_write,Vec3::y,34
-los_radar,presentation,shared_write,Vec3::z,34
+los_radar,presentation,shared_write,Vec3::x,37
+los_radar,presentation,shared_write,Vec3::y,36
+los_radar,presentation,shared_write,Vec3::z,36
 los_radar,seams,indirect,GetGroundHeightNative,1
 los_radar,seams,indirect,GetNameSlotNative,1
 los_radar,seams,indirect,VisitObjectsInRangeNative,1
@@ -1469,9 +1469,9 @@ map,presentation,shared_write,Mission::timeMul,1
 map,presentation,shared_write,Point16::x,6
 map,presentation,shared_write,Point16::y,6
 map,presentation,shared_write,Unit::flags,28
-map,presentation,shared_write,Vec3::x,35
-map,presentation,shared_write,Vec3::y,34
-map,presentation,shared_write,Vec3::z,34
+map,presentation,shared_write,Vec3::x,37
+map,presentation,shared_write,Vec3::y,36
+map,presentation,shared_write,Vec3::z,36
 map,presentation,shared_write,g_lastPlaceHeight,1
 map,presentation,shared_write,g_lastPlaceMetalSum,1
 map,seams,indirect,DeleteConditionsNative,1
@@ -1763,8 +1763,8 @@ network,presentation,shared_write,Player::commanderKills,1
 network,presentation,shared_write,Player::commanderLosses,1
 network,presentation,shared_write,Player::energyWasted,1
 network,presentation,shared_write,Player::explored,8
-network,presentation,shared_write,Player::exploredHeight,9
-network,presentation,shared_write,Player::exploredWidth,16
+network,presentation,shared_write,Player::exploredHeight,7
+network,presentation,shared_write,Player::exploredWidth,14
 network,presentation,shared_write,Player::id,8
 network,presentation,shared_write,Player::index,24
 network,presentation,shared_write,Player::info,61
@@ -1989,9 +1989,9 @@ orders,presentation,shared_write,Unit::group,4
 orders,presentation,shared_write,Unit::health,2
 orders,presentation,shared_write,Unit::pos,9
 orders,presentation,shared_write,UnitWeaponSlot::stockpile,1
-orders,presentation,shared_write,Vec3::x,35
-orders,presentation,shared_write,Vec3::y,34
-orders,presentation,shared_write,Vec3::z,34
+orders,presentation,shared_write,Vec3::x,37
+orders,presentation,shared_write,Vec3::y,36
+orders,presentation,shared_write,Vec3::z,36
 orders,seams,indirect,AbortIfGoalMatchNative,2
 orders,seams,indirect,CanLoadNative,3
 orders,seams,indirect,CanReclaimNative,4
@@ -2380,9 +2380,9 @@ platform,presentation,shared_write,Fixed::value,7
 platform,presentation,shared_write,Point16::x,6
 platform,presentation,shared_write,Point16::y,6
 platform,presentation,shared_write,StringRef::data,4
-platform,presentation,shared_write,Vec3::x,35
-platform,presentation,shared_write,Vec3::y,34
-platform,presentation,shared_write,Vec3::z,34
+platform,presentation,shared_write,Vec3::x,37
+platform,presentation,shared_write,Vec3::y,36
+platform,presentation,shared_write,Vec3::z,36
 platform,seams,shared_write,Vec3::x,1
 platform,targeting,shared_write,Vec3::x,2
 platform,targeting,shared_write,Vec3::y,1
@@ -2693,7 +2693,7 @@ players,presentation,shared_write,Game::endGameFlags,2
 players,presentation,shared_write,Game::head,2
 players,presentation,shared_write,Game::localPlayer,68
 players,presentation,shared_write,Game::mapFlags,19
-players,presentation,shared_write,Game::playerIndex,28
+players,presentation,shared_write,Game::playerIndex,26
 players,presentation,shared_write,Game::tail,2
 players,presentation,shared_write,MissionConditions::active,1
 players,presentation,shared_write,MissionConditions::defeatCount,1
@@ -2708,8 +2708,8 @@ players,presentation,shared_write,Player::energy,2
 players,presentation,shared_write,Player::energyCapacity,1
 players,presentation,shared_write,Player::energyWasted,1
 players,presentation,shared_write,Player::explored,8
-players,presentation,shared_write,Player::exploredHeight,9
-players,presentation,shared_write,Player::exploredWidth,16
+players,presentation,shared_write,Player::exploredHeight,7
+players,presentation,shared_write,Player::exploredWidth,14
 players,presentation,shared_write,Player::firstIndex,1
 players,presentation,shared_write,Player::id,8
 players,presentation,shared_write,Player::index,24
@@ -2743,9 +2743,9 @@ players,presentation,shared_write,Unit::flags,28
 players,presentation,shared_write,Unit::health,2
 players,presentation,shared_write,Unit::postTransferHoldoff,13
 players,presentation,shared_write,UnitWeaponSlot::stockpile,1
-players,presentation,shared_write,Vec3::x,35
-players,presentation,shared_write,Vec3::y,34
-players,presentation,shared_write,Vec3::z,34
+players,presentation,shared_write,Vec3::x,37
+players,presentation,shared_write,Vec3::y,36
+players,presentation,shared_write,Vec3::z,36
 players,seams,indirect,GetCellMeanHeightNative,1
 players,seams,indirect,GetGameTypeNative,8
 players,seams,indirect,GetNameSlotNative,1
@@ -3310,7 +3310,7 @@ presentation,platform,call,host_window_has_focus,2
 presentation,platform,call,host_window_raise,1
 presentation,platform,call,host_window_resize,1
 presentation,platform,call,host_window_set_topmost,1
-presentation,platform,call,operator delete,16
+presentation,platform,call,operator delete,13
 presentation,platform,call,operator new,23
 presentation,platform,call,operator-,5
 presentation,platform,call,operator==,10
@@ -4426,9 +4426,9 @@ units,presentation,shared_write,UnitDef::modelMinZ,1
 units,presentation,shared_write,UnitDef::modelSizeY,1
 units,presentation,shared_write,UnitDef::unitname,1
 units,presentation,shared_write,UnitWeaponSlot::stockpile,1
-units,presentation,shared_write,Vec3::x,35
-units,presentation,shared_write,Vec3::y,34
-units,presentation,shared_write,Vec3::z,34
+units,presentation,shared_write,Vec3::x,37
+units,presentation,shared_write,Vec3::y,36
+units,presentation,shared_write,Vec3::z,36
 units,seams,indirect,ComputeMapChecksumNative,1
 units,seams,indirect,DestroyMotionObjectNative,1
 units,seams,indirect,FindWeaponByNameNative,1
@@ -4729,9 +4729,9 @@ weapons,presentation,shared_write,Unit::lastAttackerSlot,1
 weapons,presentation,shared_write,UnitWeaponSlot::flags,2
 weapons,presentation,shared_write,UnitWeaponSlot::stockpile,1
 weapons,presentation,shared_write,UnitWeaponSlot::weapon,3
-weapons,presentation,shared_write,Vec3::x,35
-weapons,presentation,shared_write,Vec3::y,34
-weapons,presentation,shared_write,Vec3::z,34
+weapons,presentation,shared_write,Vec3::x,37
+weapons,presentation,shared_write,Vec3::y,36
+weapons,presentation,shared_write,Vec3::z,36
 weapons,presentation,shared_write,Vec3Words::yWhole,1
 weapons,presentation,shared_write,Vec3f::x,1
 weapons,presentation,shared_write,Vec3f::y,1
@@ -4852,9 +4852,9 @@ wind_meteors,presentation,shared_write,Game::windX,4
 wind_meteors,presentation,shared_write,Game::windZ,4
 wind_meteors,presentation,shared_write,Point16::x,6
 wind_meteors,presentation,shared_write,Point16::y,6
-wind_meteors,presentation,shared_write,Vec3::x,35
-wind_meteors,presentation,shared_write,Vec3::y,34
-wind_meteors,presentation,shared_write,Vec3::z,34
+wind_meteors,presentation,shared_write,Vec3::x,37
+wind_meteors,presentation,shared_write,Vec3::y,36
+wind_meteors,presentation,shared_write,Vec3::z,36
 wind_meteors,seams,indirect,FindWeaponByNameNative,1
 wind_meteors,seams,shared_write,Vec3::x,1
 wind_meteors,targeting,shared_write,Vec3::x,2

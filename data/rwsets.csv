@@ -3876,7 +3876,6 @@ address,function,file,kind,target
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
-0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,AddComponentwise
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,AddVec3
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,AppendOrder
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,AppendOrderToTail
@@ -5294,7 +5293,7 @@ address,function,file,kind,target
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,function,
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,global_read,g_game
 0x419090,CmdShareAll,src/game/share_commands.cpp,call,CmdShareEnergy
-0x419090,CmdShareAll,src/game/share_commands.cpp,call,ShareMetal
+0x419090,CmdShareAll,src/game/share_commands.cpp,call,CmdShareMetal
 0x419090,CmdShareAll,src/game/share_commands.cpp,field_read,Game::netGameFlags
 0x419090,CmdShareAll,src/game/share_commands.cpp,field_read,LosRadarSeam::CmdShareMapping
 0x419090,CmdShareAll,src/game/share_commands.cpp,field_read,LosRadarSeam::CmdShareRadar
@@ -13221,10 +13220,10 @@ address,function,file,kind,target
 0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,FindGadgetIndex
 0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,GameFreeThunk
 0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,IsCurrentGadgetNamed
-0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,LoadAccount_00442a30
 0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,MarkChanged
 0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,OpenMessageBox
 0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,PlaySoundByName
+0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,RefreshAccountList
 0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,SaveModemNumbers
 0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,SelectGadgetByIndex
 0x442a30,HandleModemDialogClick,src/frontend/multi.cpp,call,SetFrontendState
@@ -16217,7 +16216,7 @@ address,function,file,kind,target
 0x450030,GetHostDpid,src/network/net_game.cpp,field_read,PlayerInfo::flags_97
 0x450030,GetHostDpid,src/network/net_game.cpp,function,
 0x450030,GetHostDpid,src/network/net_game.cpp,global_read,g_game
-0x450090,SetPlayerName,src/network/net_game.cpp,call,PlayerDpid
+0x450090,SetPlayerName,src/network/net_game.cpp,call,GetPlayerDpid
 0x450090,SetPlayerName,src/network/net_game.cpp,call,host_net_set_player_name
 0x450090,SetPlayerName,src/network/net_game.cpp,call,strncpy
 0x450090,SetPlayerName,src/network/net_game.cpp,field_escape,Game::net_14
@@ -16740,7 +16739,7 @@ address,function,file,kind,target
 0x4526c0,RequestPlayerColor,src/network/net_game.cpp,global_read,g_game
 0x4526c0,RequestPlayerColor,src/network/net_game.cpp,global_read,g_usePacketManager
 0x452800,BroadcastPlayerLeft,src/network/net_game.cpp,call,BroadcastPacket
-0x452800,BroadcastPlayerLeft,src/network/net_game.cpp,call,LookupPlayer
+0x452800,BroadcastPlayerLeft,src/network/net_game.cpp,call,FindSlotByDpid
 0x452800,BroadcastPlayerLeft,src/network/net_game.cpp,call,RemovePlayer
 0x452800,BroadcastPlayerLeft,src/network/net_game.cpp,deref_read,*unsigned char
 0x452800,BroadcastPlayerLeft,src/network/net_game.cpp,field_escape,Game::flags_38d75
@@ -17357,9 +17356,9 @@ address,function,file,kind,target
 0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,FindOccupied_004568c0
 0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,FirstJoinedId_004568c0
 0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,GameRand
+0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,GetSlotDpid
 0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,IsConnected
 0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,Player::IsPlayableSlot
-0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,PlayerId_004568c0
 0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,SendPacketToPlayer
 0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,operator->
 0x4568c0,AssignStartPositions,src/network/net_game.cpp,call,random_shuffle
@@ -35634,7 +35633,7 @@ address,function,file,kind,target
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,PopKey
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,RenderLayer
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,SelectCurrentByName
-0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,SelectGadgetByIndex_inlined
+0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,SelectGadgetByIndex
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,SetCursorHover
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,TickProgressBar
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,UpdateCursorAndMouse
@@ -39806,11 +39805,11 @@ address,function,file,kind,target
 0x4c1480,GetTextWidth,src/graphics/font.cpp,function,
 0x4c14f0,DrawString,src/graphics/font.cpp,call,BlitText
 0x4c14f0,DrawString,src/graphics/font.cpp,call,GetDisplay
+0x4c14f0,DrawString,src/graphics/font.cpp,call,GetTextWidth
 0x4c14f0,DrawString,src/graphics/font.cpp,call,LockScreen
 0x4c14f0,DrawString,src/graphics/font.cpp,call,RectInsideRect
 0x4c14f0,DrawString,src/graphics/font.cpp,call,Surface::GetClipRect
 0x4c14f0,DrawString,src/graphics/font.cpp,call,UnlockScreen
-0x4c14f0,DrawString,src/graphics/font.cpp,call,WidthTextGlyphs
 0x4c14f0,DrawString,src/graphics/font.cpp,call,strlen
 0x4c14f0,DrawString,src/graphics/font.cpp,call,strncpy
 0x4c14f0,DrawString,src/graphics/font.cpp,deref_write,*unsigned char
@@ -39838,10 +39837,10 @@ address,function,file,kind,target
 0x4c1830,DrawOutlinedString,src/graphics/font.cpp,call,CurrentColour
 0x4c1830,DrawOutlinedString,src/graphics/font.cpp,call,DrawString
 0x4c1830,DrawOutlinedString,src/graphics/font.cpp,call,GetDisplay
+0x4c1830,DrawOutlinedString,src/graphics/font.cpp,call,GetTextWidth
 0x4c1830,DrawOutlinedString,src/graphics/font.cpp,call,LockScreen
 0x4c1830,DrawOutlinedString,src/graphics/font.cpp,call,SetColour
 0x4c1830,DrawOutlinedString,src/graphics/font.cpp,call,UnlockScreen
-0x4c1830,DrawOutlinedString,src/graphics/font.cpp,call,WidthTextGlyphs
 0x4c1830,DrawOutlinedString,src/graphics/font.cpp,field_read,Game::font
 0x4c1830,DrawOutlinedString,src/graphics/font.cpp,field_read,Surface::width
 0x4c1830,DrawOutlinedString,src/graphics/font.cpp,function,
@@ -43198,13 +43197,6 @@ address,function,file,kind,target
 ,Add,src/orders/unit_orders.cpp,field_write,Vec::y
 ,Add,src/orders/unit_orders.cpp,field_write,Vec::z
 ,Add,src/orders/unit_orders.cpp,function,
-,AddComponentwise,src/orders/vtol_orders.cpp,field_read,Vec3::x
-,AddComponentwise,src/orders/vtol_orders.cpp,field_read,Vec3::y
-,AddComponentwise,src/orders/vtol_orders.cpp,field_read,Vec3::z
-,AddComponentwise,src/orders/vtol_orders.cpp,field_write,Vec3::x
-,AddComponentwise,src/orders/vtol_orders.cpp,field_write,Vec3::y
-,AddComponentwise,src/orders/vtol_orders.cpp,field_write,Vec3::z
-,AddComponentwise,src/orders/vtol_orders.cpp,function,
 ,AddCondition,src/game/victory.cpp,call,operator=
 ,AddCondition,src/game/victory.cpp,deref_read,*int
 ,AddCondition,src/game/victory.cpp,deref_write,*Ref<MissionCondition>
@@ -47638,18 +47630,6 @@ address,function,file,kind,target
 ,Lists_00472530::Add,src/graphics/particles.cpp,field_read,Lists_00472530::lists
 ,Lists_00472530::Add,src/graphics/particles.cpp,function,
 ,Lists_00472530::Add,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::~ParticleSystem
-,LoadAccount_00442a30,src/frontend/multi.cpp,call,FillAccountList
-,LoadAccount_00442a30,src/frontend/multi.cpp,call,FindGadgetChecked
-,LoadAccount_00442a30,src/frontend/multi.cpp,call,GetGadgetText
-,LoadAccount_00442a30,src/frontend/multi.cpp,field_maybe_written,Entry_004426e0::name
-,LoadAccount_00442a30,src/frontend/multi.cpp,field_maybe_written,Entry_004426e0::number
-,LoadAccount_00442a30,src/frontend/multi.cpp,field_maybe_written,Game::gui
-,LoadAccount_00442a30,src/frontend/multi.cpp,field_read,Gadget::index
-,LoadAccount_00442a30,src/frontend/multi.cpp,field_read,Gui::layer
-,LoadAccount_00442a30,src/frontend/multi.cpp,field_read,Layer::entries
-,LoadAccount_00442a30,src/frontend/multi.cpp,function,
-,LoadAccount_00442a30,src/frontend/multi.cpp,global_read,g_game
-,LoadAccount_00442a30,src/frontend/multi.cpp,global_read,g_modemAccounts
 ,LoadCampaignNative,src/seams/native.cpp,call,Mission::LoadCampaign
 ,LoadCampaignNative,src/seams/native.cpp,function,
 ,LoadConditionsNative,src/seams/native.cpp,call,MissionConditions::LoadConditions
@@ -47816,8 +47796,6 @@ address,function,file,kind,target
 ,Lookup,src/state/block.cpp,global_read,kFirstChunk
 ,Lookup,src/state/block.cpp,global_read,kFreeBit
 ,Lookup,src/state/block.cpp,global_read,kSimBlockBytes
-,LookupPlayer,src/network/net_game.cpp,call,GetSlotDpid
-,LookupPlayer,src/network/net_game.cpp,function,
 ,Lookup_004263b0,src/frontend/frontend.cpp,call,strcmp
 ,Lookup_004263b0,src/frontend/frontend.cpp,field_escape,Entry_00428730::name
 ,Lookup_004263b0,src/frontend/frontend.cpp,field_read,Entry_00428730::data
@@ -48742,9 +48720,6 @@ address,function,file,kind,target
 ,Player::GetMetal,src/network/player.h,function,
 ,PlayerAt,src/harness/harness.cpp,call,GameAt
 ,PlayerAt,src/harness/harness.cpp,function,
-,PlayerDpid,src/network/net_game.cpp,field_read,Player::id
-,PlayerDpid,src/network/net_game.cpp,field_read,Player::type
-,PlayerDpid,src/network/net_game.cpp,function,
 ,PlayerDpid_00457d30,src/network/net_game.cpp,field_read,Player::id
 ,PlayerDpid_00457d30,src/network/net_game.cpp,field_read,Player::type
 ,PlayerDpid_00457d30,src/network/net_game.cpp,function,
@@ -48753,10 +48728,6 @@ address,function,file,kind,target
 ,PlayerGridView::at,src/map/line_of_sight.cpp,field_read,PlayerGridView::cells
 ,PlayerGridView::at,src/map/line_of_sight.cpp,field_read,PlayerGridView::width
 ,PlayerGridView::at,src/map/line_of_sight.cpp,function,
-,PlayerId_004568c0,src/network/net_game.cpp,field_read,Player::id
-,PlayerId_004568c0,src/network/net_game.cpp,field_read,Player::type
-,PlayerId_004568c0,src/network/net_game.cpp,function,
-,PlayerId_004568c0,src/network/net_game.cpp,global_read,g_game
 ,PlayerMore,src/units/unit_position.cpp,function,
 ,PlayerReady,src/network/net_game.cpp,field_read,Player::active
 ,PlayerReady,src/network/net_game.cpp,field_read,Player::index
@@ -49619,14 +49590,6 @@ address,function,file,kind,target
 ,SelectFontForEntry_inlined,src/gui/gui.cpp,field_read,Root_004a32a0::fontId
 ,SelectFontForEntry_inlined,src/gui/gui.cpp,function,
 ,SelectFontForEntry_inlined,src/gui/gui.cpp,global_read,g_guiContext
-,SelectGadgetByIndex_inlined,src/gui/gui.cpp,call,BeginTextEdit
-,SelectGadgetByIndex_inlined,src/gui/gui.cpp,field_read,Gadget::type
-,SelectGadgetByIndex_inlined,src/gui/gui.cpp,field_read,Gui::layer
-,SelectGadgetByIndex_inlined,src/gui/gui.cpp,field_read,Layer::current
-,SelectGadgetByIndex_inlined,src/gui/gui.cpp,field_read,Layer::entries
-,SelectGadgetByIndex_inlined,src/gui/gui.cpp,field_write,Gui::focus
-,SelectGadgetByIndex_inlined,src/gui/gui.cpp,field_write,Layer::current
-,SelectGadgetByIndex_inlined,src/gui/gui.cpp,function,
 ,SelectLabelFont,src/gui/gui.cpp,call,SetFont
 ,SelectLabelFont,src/gui/gui.cpp,field_read,<anon>::count
 ,SelectLabelFont,src/gui/gui.cpp,field_read,Gadget::language
@@ -49914,18 +49877,6 @@ address,function,file,kind,target
 ,Setup_0049d000,src/weapons/weapons.cpp,field_write,Projectile::speed
 ,Setup_0049d000,src/weapons/weapons.cpp,field_write,Vec3::y
 ,Setup_0049d000,src/weapons/weapons.cpp,function,
-,ShareMetal,src/game/share_commands.cpp,call,AddMessage
-,ShareMetal,src/game/share_commands.cpp,call,BroadcastPlayerInfo
-,ShareMetal,src/game/share_commands.cpp,call,operator PlayerInfo *
-,ShareMetal,src/game/share_commands.cpp,call,operator->
-,ShareMetal,src/game/share_commands.cpp,call,sprintf
-,ShareMetal,src/game/share_commands.cpp,field_read,Game::localPlayer
-,ShareMetal,src/game/share_commands.cpp,field_read,Game::netGameFlags
-,ShareMetal,src/game/share_commands.cpp,field_read,Player::info
-,ShareMetal,src/game/share_commands.cpp,field_read,PlayerInfo::flags_97_wide
-,ShareMetal,src/game/share_commands.cpp,field_write,PlayerInfo::flags_97_wide
-,ShareMetal,src/game/share_commands.cpp,function,
-,ShareMetal,src/game/share_commands.cpp,global_read,g_game
 ,ShowSelectBox,src/ingame/info_panel.cpp,call,PointInRect
 ,ShowSelectBox,src/ingame/info_panel.cpp,field_escape,Game::rect
 ,ShowSelectBox,src/ingame/info_panel.cpp,field_read,Game::cursorScreenX
@@ -51461,11 +51412,6 @@ address,function,file,kind,target
 ,Whole,src/orders/vtol_orders.cpp,deref_read,*short
 ,Whole,src/orders/vtol_orders.cpp,function,
 ,WholePart,src/map/terrain.cpp,function,
-,WidthTextGlyphs,src/graphics/font.cpp,deref_read,*unsigned char
-,WidthTextGlyphs,src/graphics/font.cpp,field_read,Font::first
-,WidthTextGlyphs,src/graphics/font.cpp,field_read,Font::glyphs
-,WidthTextGlyphs,src/graphics/font.cpp,field_read,Font::offsets
-,WidthTextGlyphs,src/graphics/font.cpp,function,
 ,WinMain,src/host/win32/process.cpp,call,GameEntry
 ,WinMain,src/host/win32/process.cpp,function,
 ,WindowProc,src/host/win32/window.cpp,call,DefWindowProcA

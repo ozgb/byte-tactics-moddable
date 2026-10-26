@@ -1291,18 +1291,6 @@ void SaveModemNumbers(void)
     }
 }
 
-static inline void LoadAccount_00442a30()
-{
-    Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
-    if (entry != 0 && g_modemAccounts != 0) {
-        GetGadgetText(&g_game->gui, "NAME",
-                     g_modemAccounts[entry->index].name);
-        GetGadgetText(&g_game->gui, "NUMBER",
-                     g_modemAccounts[entry->index].number);
-        FillAccountList();
-    }
-}
-
 static inline int TryConnect_00442a30()
 {
     int a = 0;
@@ -1335,14 +1323,14 @@ void __stdcall HandleModemDialogClick(Gui* gadget)
         return;
     }
     if (IsCurrentGadgetNamed((Dialog *)gadget, "NAME")) {
-        LoadAccount_00442a30();
+        RefreshAccountList();
         TrySetFocus(gadget, FindGadgetIndex(entries, "NUMBER", 3));
         MarkChanged((Dialog *)gadget);
         ClearSelectedGadget(gadget);
         return;
     }
     if (IsCurrentGadgetNamed((Dialog *)gadget, "NUMBER")) {
-        LoadAccount_00442a30();
+        RefreshAccountList();
         SelectGadgetByIndex(gadget, FindGadgetIndex(entries, "JOIN", 1));
         TrySetFocus(gadget, FindGadgetIndex(entries, "JOIN", 1));
         strcpy((char*)entries + 0xcc, "JOIN");
@@ -1351,7 +1339,7 @@ void __stdcall HandleModemDialogClick(Gui* gadget)
         return;
     }
     if (FindGadgetIndex(entries, "HOST", 0xe) == gadget->hotGadgetIndex) {
-        LoadAccount_00442a30();
+        RefreshAccountList();
         SaveModemNumbers();
         g_game->bit0 = 1;
         g_game->bit1 = 1;
@@ -1371,7 +1359,7 @@ void __stdcall HandleModemDialogClick(Gui* gadget)
             return;
         }
     }
-    LoadAccount_00442a30();
+    RefreshAccountList();
     SaveModemNumbers();
     g_game->bit1 = 1;
     g_game->bit0 = 0;

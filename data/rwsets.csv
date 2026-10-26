@@ -46059,9 +46059,12 @@ address,function,file,kind,target
 ,HapiBank::WriteBox,src/files/files_bank.h,indirect_call,"indirect via int (*)(HapiBank *, void *, int) __attribute__((stdcall)) [FilesSeam::BankWriteBox]"
 ,HarnessAfterStep,src/harness/harness.cpp,call,BlockScanTick
 ,HarnessAfterStep,src/harness/harness.cpp,call,BlockScanWrite
+,HarnessAfterStep,src/harness/harness.cpp,call,Fail
 ,HarnessAfterStep,src/harness/harness.cpp,call,MakeDirectoryPath
 ,HarnessAfterStep,src/harness/harness.cpp,call,SaveGameFile
 ,HarnessAfterStep,src/harness/harness.cpp,call,fclose
+,HarnessAfterStep,src/harness/harness.cpp,call,fopen
+,HarnessAfterStep,src/harness/harness.cpp,call,fwrite
 ,HarnessAfterStep,src/harness/harness.cpp,call,host_exit
 ,HarnessAfterStep,src/harness/harness.cpp,call,host_log
 ,HarnessAfterStep,src/harness/harness.cpp,call,sprintf
@@ -46073,8 +46076,10 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,g_game
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_blockScan@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_read,s_optionsPath@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_read,s_savedOptions@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
@@ -50092,7 +50097,11 @@ address,function,file,kind,target
 ,SetUpLoadedGame,src/harness/harness.cpp,call,OpenSummaryBank
 ,SetUpLoadedGame,src/harness/harness.cpp,call,ScenarioTable
 ,SetUpLoadedGame,src/harness/harness.cpp,call,SetMissionType
-,SetUpLoadedGame,src/harness/harness.cpp,call,memset
+,SetUpLoadedGame,src/harness/harness.cpp,call,fclose
+,SetUpLoadedGame,src/harness/harness.cpp,call,fopen
+,SetUpLoadedGame,src/harness/harness.cpp,call,fread
+,SetUpLoadedGame,src/harness/harness.cpp,call,fseek
+,SetUpLoadedGame,src/harness/harness.cpp,call,ftell
 ,SetUpLoadedGame,src/harness/harness.cpp,call,operator Mission *
 ,SetUpLoadedGame,src/harness/harness.cpp,call,sprintf
 ,SetUpLoadedGame,src/harness/harness.cpp,call,strcpy
@@ -50118,6 +50127,11 @@ address,function,file,kind,target
 ,SetUpLoadedGame,src/harness/harness.cpp,field_write,Table_0047ae60::mapping
 ,SetUpLoadedGame,src/harness/harness.cpp,function,
 ,SetUpLoadedGame,src/harness/harness.cpp,global_read,g_game
+,SetUpLoadedGame,src/harness/harness.cpp,global_read,s_optionsPath@src/harness/harness.cpp
+,SetUpLoadedGame,src/harness/harness.cpp,global_read,s_quirkReach@src/harness/harness.cpp
+,SetUpLoadedGame,src/harness/harness.cpp,global_read,s_quirkReachTick@src/harness/harness.cpp
+,SetUpLoadedGame,src/harness/harness.cpp,global_read,s_quirkTamper@src/harness/harness.cpp
+,SetUpLoadedGame,src/harness/harness.cpp,global_read,s_quirkTamperTick@src/harness/harness.cpp
 ,SetUpLoadedGame,src/harness/harness.cpp,global_read,s_savePath@src/harness/harness.cpp
 ,SetUpLoadedGame,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,call,ApplySlotsToGamePlayers
@@ -50135,8 +50149,10 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,call,SetMissionType
 ,SetUpSkirmish,src/harness/harness.cpp,call,memset
 ,SetUpSkirmish,src/harness/harness.cpp,call,operator Mission *
+,SetUpSkirmish,src/harness/harness.cpp,call,operator=
 ,SetUpSkirmish,src/harness/harness.cpp,call,sprintf
 ,SetUpSkirmish,src/harness/harness.cpp,call,strcpy
+,SetUpSkirmish,src/harness/harness.cpp,deref_read,*Table_0047ae60
 ,SetUpSkirmish,src/harness/harness.cpp,field_escape,PlayerSpec::side
 ,SetUpSkirmish,src/harness/harness.cpp,field_escape,Table_0047ae60::players
 ,SetUpSkirmish,src/harness/harness.cpp,field_maybe_written,PlayerSpec::side
@@ -50190,6 +50206,7 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_losType@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_mapLine@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_mapping@src/harness/harness.cpp
+,SetUpSkirmish,src/harness/harness.cpp,global_write,s_savedOptions@src/harness/harness.cpp
 ,SetValue,src/gui/dialogs.cpp,call,GetCursorSprite
 ,SetValue,src/gui/dialogs.cpp,call,SetCursorSprite
 ,SetValue,src/gui/dialogs.cpp,field_read,Gui::cursorFlags

@@ -37,7 +37,7 @@ BuildList_0041ace0,no,2,include/ta_types.h:3729|src/ingame/control_panel.cpp:116
 BuilderLinkPacket,no,2,include/ta_types.h:6889|src/network/net_game.cpp:1010,differs,include/ta_types.h
 ByteMap_00467440,no,2,src/ingame/info_panel.cpp:77|src/ingame/info_panel_467440.cpp:29,identical,src/ingame/info_panel.cpp
 CdLists_490f80,no,2,include/ta_types.h:11766|src/game/game_state.cpp:196,same-layout,include/ta_types.h
-Cell,no,12,include/ta_types.h:2522|src/ingame/info_panel_46a610.cpp:32|src/map/cell.h:6|src/map/features.cpp:273|src/map/line_of_sight.cpp:18|src/map/plot_map.cpp:6|src/map/terrain_47d0e0.cpp:8|src/map/terrain_47d820.cpp:30|src/units/units_485010.cpp:17|src/weapons/explosions.cpp:120|src/weapons/weapons.cpp:513|src/weapons/weapons_49a120.cpp:34,differs,src/map/cell.h
+Cell,no,12,include/ta_types.h:2522|src/ingame/info_panel_46a610.cpp:32|src/map/cell.h:6|src/map/features.cpp:274|src/map/line_of_sight.cpp:18|src/map/plot_map.cpp:6|src/map/terrain_47d0e0.cpp:8|src/map/terrain_47d820.cpp:30|src/units/units_485010.cpp:17|src/weapons/explosions.cpp:120|src/weapons/weapons.cpp:513|src/weapons/weapons_49a120.cpp:34,differs,src/map/cell.h
 CellPos_0049a120,no,2,src/weapons/weapons.cpp:506|src/weapons/weapons_49a120.cpp:19,identical,src/weapons/weapons.cpp
 Cell_004b0230,no,2,include/ta_types.h:13138|src/gui/listbox.cpp:14,identical,include/ta_types.h
 Channel_004b0c40,no,2,include/ta_types.h:13281|src/units/cob.cpp:8,same-layout,include/ta_types.h
@@ -113,10 +113,10 @@ ExceptionName,no,2,include/ta_types.h:16605|src/host/win32/crash.cpp:191,identic
 Expired,no,2,include/ta_types.h:10483|src/map/line_of_sight.cpp:212,differs,include/ta_types.h
 Explosion,no,2,include/ta_types.h:3965|src/weapons/explosions.cpp:46,differs,include/ta_types.h
 FP_0043d6d0,no,2,include/ta_types.h:5605|src/orders/order_list.cpp:40,differs,include/ta_types.h
-Feature,no,8,include/ta_types.h:3992|src/ai/ai_player.cpp:166|src/ingame/info_panel.cpp:107|src/ingame/info_panel_46a610.cpp:8|src/map/feature.h:8|src/map/features.cpp:176|src/map/terrain.cpp:38|src/weapons/explosions.cpp:128,differs,src/map/feature.h
+Feature,no,8,include/ta_types.h:3992|src/ai/ai_player.cpp:166|src/ingame/info_panel.cpp:107|src/ingame/info_panel_46a610.cpp:8|src/map/feature.h:8|src/map/features.cpp:177|src/map/terrain.cpp:38|src/weapons/explosions.cpp:128,differs,src/map/feature.h
 FeatureDamagePacket,no,3,src/map/features.cpp:68|src/network/net_game.cpp:1038|src/orders/unit_orders.cpp:806,differs,src/map/features.cpp
 FeatureDef_0049a120,no,2,src/weapons/weapons.cpp:537|src/weapons/weapons_49a120.cpp:55,identical,src/weapons/weapons.cpp
-FeatureSpot,no,3,include/ta_types.h:2546|src/ingame/feature_spot.h:10|src/orders/unit_orders.cpp:798,differs,src/ingame/feature_spot.h
+FeatureSpot,no,3,include/ta_types.h:2546|src/ingame/feature_spot.h:13|src/orders/unit_orders.cpp:798,differs,src/ingame/feature_spot.h
 Feature_0043e490,no,2,src/orders/order_dispatch.cpp:8|src/units/unit_scripts.cpp:408,identical,src/orders/order_dispatch.cpp
 FileRequester,no,2,include/ta_types.h:3859|src/gui/file_list.cpp:44,differs,include/ta_types.h
 FindData_0041d4c0,no,2,include/ta_types.h:3789|src/game/cd_check.cpp:13,same-layout,include/ta_types.h
@@ -246,7 +246,7 @@ Node_004d0b10,no,2,include/ta_types.h:16412|src/files/sqsh.cpp:36,differs,includ
 Node_004db000,no,3,src/debug/debug_lib.cpp:721|src/debug/free_block_map.cpp:16|src/debug/free_block_map.h:11,identical,src/debug/free_block_map.h
 Node_004dd1b0,no,2,src/debug/debug_lib.cpp:729|src/debug/free_block_map.cpp:24,identical,src/debug/debug_lib.cpp
 OPENHAPIFILE,no,2,src/files/hpi.cpp:39|src/files/hpi_4bd830.cpp:13,differs,src/files/hpi.cpp
-Obj,no,5,include/ta_types.h:13674|src/game/economy.cpp:39|src/graphics/draw.cpp:80|src/map/features.cpp:318|src/units/unit_save.cpp:89,differs,include/ta_types.h
+Obj,no,5,include/ta_types.h:13674|src/game/economy.cpp:39|src/graphics/draw.cpp:80|src/map/features.cpp:319|src/units/unit_save.cpp:89,differs,include/ta_types.h
 Obj1_49fd20,no,2,include/ta_types.h:12306|src/gui/gui.cpp:118,same-layout,include/ta_types.h
 Obj2_49fd20,no,2,include/ta_types.h:12294|src/gui/gui.cpp:123,same-layout,include/ta_types.h
 Obj_00401320,no,2,include/ta_types.h:2182|src/game/economy.cpp:10,identical,include/ta_types.h
@@ -446,7 +446,7 @@ Visitor_0047e750,no,2,include/ta_types.h:10038|src/map/terrain.cpp:111,same-layo
 WakeParticle,no,2,include/ta_types.h:9275|src/graphics/particles.cpp:242,differs,include/ta_types.h
 WakeParticles,no,2,include/ta_types.h:9103|src/graphics/particles.cpp:323,differs,include/ta_types.h
 WaveFormat,no,2,include/ta_types.h:16373|src/sound/samples.cpp:63,identical,include/ta_types.h
-Weapon,no,4,include/ta_types.h:2597|src/ingame/markers.cpp:48|src/map/features.cpp:310|src/orders/vtol_orders.cpp:79,differs,include/ta_types.h
+Weapon,no,4,include/ta_types.h:2597|src/ingame/markers.cpp:48|src/map/features.cpp:311|src/orders/vtol_orders.cpp:79,differs,include/ta_types.h
 WeaponFirePacket,no,2,include/ta_types.h:11919|src/weapons/weapons.cpp:191,differs,include/ta_types.h
 Word_0051f522,no,2,include/ta_types.h:12237|src/game/main.cpp:91,differs,src/game/main.cpp
 Wrap_00433270,no,2,include/ta_types.h:4924|src/map/los_tables_433270.cpp:9,identical,include/ta_types.h

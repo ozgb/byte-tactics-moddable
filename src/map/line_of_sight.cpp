@@ -221,13 +221,6 @@ static inline Point16 MakePoint(int x, int y)
     return p;
 }
 
-static inline Cell* GetCell(int x, int y)
-{
-    if (x >= 0 && x < g_game->width && y >= 0 && y < g_game->height)
-        return &g_game->cells[y * g_game->width + x];
-    return 0;
-}
-
 static inline Cell* GetCellPixel(int x, int y, int py)
 {
     if (x >= 0 && x < g_game->width && py >= 0 && y < g_game->height)
@@ -709,7 +702,7 @@ void ClearBorderFeatures()
 
     int col = g_game->width - 2;
     for (int row = 0; row < g_game->height; row++) {
-        Cell* c = GetCell(col, row);
+        Cell* c = GetMapCell(col, row);
         ClearFeature(c);
         ClearFeature(c + 1);
     }
@@ -729,7 +722,7 @@ void ClearBorderFeatures()
         int y2 = g_game->height - 1;
         int y16b = y2 * 16;
         for (;; y2--, y16b -= 16) {
-            Cell* c = GetCell(x2, y2);
+            Cell* c = GetMapCell(x2, y2);
             if (y16b - (c->height >> 1) <= g_game->mapHeight)
                 break;
             Cell* prev = c - g_game->width;

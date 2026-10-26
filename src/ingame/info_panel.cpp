@@ -778,18 +778,6 @@ void __stdcall DrawPercentBar(void* surface, Rect* rect, int percent)
     }
 }
 
-static void Bar(void* surface, Rect* rect, int percent)
-{
-    unsigned char& color = g_game->colors[15];
-    DrawRectangle(surface, rect, color);
-    if (percent >= 100)
-        percent = 100;
-    if (percent > 0) {
-        rect->right = (rect->right - rect->left) * percent / 100 + rect->left;
-        FillRectangle(surface, rect, color);
-    }
-}
-
 // FUNCTION: 0x468380
 void __stdcall DrawNetworkStats(void* surface)
 {
@@ -807,7 +795,7 @@ void __stdcall DrawNetworkStats(void* surface)
     DrawString(surface, buf, r.left, r.top, -1);
     r.top += h;
     r.bottom = r.top + 8;
-    Bar(surface, &r, sent * 100 / 5600);
+    DrawPercentBar(surface, &r, sent * 100 / 5600);
     r.left = 0x81;
     r.right = 0xc1;
     r.top = r.bottom + 1;
@@ -815,7 +803,7 @@ void __stdcall DrawNetworkStats(void* surface)
     DrawString(surface, buf, r.left, r.top, -1);
     r.top += h;
     r.bottom = r.top + 8;
-    Bar(surface, &r, received * 100 / 5600);
+    DrawPercentBar(surface, &r, received * 100 / 5600);
 }
 
 static void Bar_004685a0(void* surface, Rect* rect, int percent)

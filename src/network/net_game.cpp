@@ -165,20 +165,13 @@ int GetLocalHumanDpid()
     return -1;
 }
 
-static inline int PlayerId(unsigned char i)
-{
-    if (i == 10 || !g_game->players[i].type)
-        return -1;
-    return g_game->players[i].id;
-}
-
 #pragma auto_inline(off)
 // FUNCTION: 0x44fe40
 unsigned char __stdcall FindSlotByDpid(int id)
 {
     if (id != -1) {
         for (unsigned char i = 0; i < 10; i++) {
-            if (PlayerId(i) == id)
+            if (GetSlotDpid(i) == id)
                 return i;
         }
     }
@@ -195,30 +188,12 @@ unsigned char __stdcall GetPlayerSlot(Player* player)
     return player->index;
 }
 
-static inline int GetPlayerField_0044fed0(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type)
-        return g_game->players[i].id;
-    return -1;
-}
-
-static inline unsigned char FindPlayerIndex_0044fed0(int id)
-{
-    if (id != -1) {
-        for (unsigned char i = 0; i < 10; i++) {
-            if (GetPlayerField_0044fed0(i) == id)
-                return i;
-        }
-    }
-    return 10;
-}
-
 // FUNCTION: 0x44fed0
 Player* __stdcall FindPlayerByDpid(int id)
 {
-    if (FindPlayerIndex_0044fed0(id) == 10)
+    if (FindSlotByDpid(id) == 10)
         return 0;
-    return &g_game->players[FindPlayerIndex_0044fed0(id)];
+    return &g_game->players[FindSlotByDpid(id)];
 }
 
 #pragma auto_inline(off)
@@ -240,20 +215,13 @@ int __stdcall GetPlayerDpid(Player* obj)
     return -1;
 }
 
-static inline int PlayerField(unsigned char index)
-{
-    if (index != 10 && g_game->players[index].type != 0)
-        return g_game->players[index].id;
-    return -1;
-}
-
 // FUNCTION: 0x450030
 int GetHostDpid()
 {
     int i;
     for (i = 0; i < 10; i++) {
         if (g_game->players[i].info->flags_97 & 1)
-            return PlayerField(i);
+            return GetSlotDpid(i);
     }
     return -1;
 }
@@ -300,31 +268,6 @@ int __stdcall GetPlayerName(int dpid, char* shortName, char* longName)
     return r == 0;
 }
 
-static inline int GetPlayerField(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type)
-        return g_game->players[i].id;
-    return -1;
-}
-
-static inline unsigned char FindPlayerIndex_00450240(int id)
-{
-    if (id == -1)
-        return 10;
-    for (unsigned char i = 0; i < 10; i++) {
-        if (GetPlayerField(i) == id)
-            return i;
-    }
-    return 10;
-}
-
-static inline Player* FindPlayer(int id)
-{
-    if (FindPlayerIndex_00450240(id) == 10)
-        return 0;
-    return &g_game->players[FindPlayerIndex_00450240(id)];
-}
-
 // FUNCTION: 0x450240
 unsigned char PickNewHost()
 {
@@ -340,27 +283,9 @@ unsigned char PickNewHost()
         p++;
     } while (--n);
 
-    Player* q = FindPlayer(max);
+    Player* q = FindPlayerByDpid(max);
     if (q)
         q->info->flags_97 |= 1;
-    return 10;
-}
-
-static inline int GetPlayerField_00450380(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type)
-        return g_game->players[i].id;
-    return -1;
-}
-
-static inline unsigned char FindPlayerIndex_00450380(int id)
-{
-    if (id != -1) {
-        for (unsigned char i = 0; i < 10; i++) {
-            if (GetPlayerField_00450380(i) == id)
-                return i;
-        }
-    }
     return 10;
 }
 
@@ -373,10 +298,10 @@ void __stdcall AnnouncePlayerLeft(int id)
     if (g_game->players[g_game->localPlayer].rejectReason == 1)
         return;
     Player* p;
-    if (FindPlayerIndex_00450380(id) == 10)
+    if (FindSlotByDpid(id) == 10)
         p = 0;
     else
-        p = &g_game->players[FindPlayerIndex_00450380(id)];
+        p = &g_game->players[FindSlotByDpid(id)];
     if (p == 0)
         return;
     sprintf(buf, "%s %s", p->name, Translate(g_leftGameTexts[HarnessViewRand() & 7]));
@@ -449,7 +374,7 @@ static inline int FindLobbyHostPlayerId()
 {
     for (int j = 0; j < 10; j++) {
         if (g_game->players[j].info->flags_97 & 1)
-            return PlayerId(j);
+            return GetSlotDpid(j);
     }
     return -1;
 }
@@ -1110,19 +1035,12 @@ void CreateNetGame(void)
     host_net_create_new_game((host_net*)g_game->session, name, DAT_005119b8, d, c, b, a);
 }
 
-static inline int PlayerId_004515d0(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type)
-        return g_game->players[i].id;
-    return -1;
-}
-
 // FUNCTION: 0x4515d0
 void __stdcall EnumPlayersCallback(int id, int unused1, int unused2, int unused3, int unused4)
 {
     if (id != -1) {
         for (unsigned char i = 0; i < 10; i++) {
-            if (PlayerId_004515d0(i) == id)
+            if (GetSlotDpid(i) == id)
                 break;
         }
     }
@@ -1329,24 +1247,6 @@ static inline unsigned char FindIndex_00451bc0(int id)
     return 10;
 }
 
-static inline int GetPlayerId_00451bc0(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type != 0)
-        return g_game->players[i].id;
-    return -1;
-}
-
-static inline unsigned char FindPlayerIndex_00451bc0(int id)
-{
-    if (id != -1) {
-        for (unsigned char i = 0; i < 10; i++) {
-            if (GetPlayerId_00451bc0(i) == id)
-                return i;
-        }
-    }
-    return 10;
-}
-
 // FUNCTION: 0x451bc0
 int __stdcall SendPacketToPlayer(int from, int to, unsigned char* packet, int size)
 {
@@ -1376,7 +1276,7 @@ int __stdcall SendPacketToPlayer(int from, int to, unsigned char* packet, int si
         (fromPlayer->type == 1 || fromPlayer->type == 2) &&
         fromPlayer->rejectReason == 0 && toPlayer != 0 && toPlayer->active != 0 &&
         toPlayer->type == 3 && toPlayer->rejectReason == 0) {
-        Player* target = &g_game->players[FindPlayerIndex_00451bc0(to)];
+        Player* target = &g_game->players[FindSlotByDpid(to)];
         if (target->active == 0 || (target->type != 1 && target->type != 2)) {
             if (g_usePacketManager != 0)
                 return g_packetManager.QueuePacket(from, to, packet, size);
@@ -1390,28 +1290,10 @@ int __stdcall SendPacketToPlayer(int from, int to, unsigned char* packet, int si
     return 0;
 }
 
-static inline unsigned char FindPlayerIndex_00451df0(int id)
-{
-    if (id != -1) {
-        for (unsigned char i = 0; i < 10; i++) {
-            if (GetSlotDpid(i) == id)
-                return i;
-        }
-    }
-    return 10;
-}
-
-static inline Player* FindPlayer_00451df0(int id)
-{
-    if (FindPlayerIndex_00451df0(id) == 10)
-        return 0;
-    return &g_game->players[FindPlayerIndex_00451df0(id)];
-}
-
 // FUNCTION: 0x451df0
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size)
 {
-    Player* p = FindPlayer_00451df0(id);
+    Player* p = FindPlayerByDpid(id);
     if (p == 0 || p->active == 0)
         return 0;
     if (p->type != 1 && p->type != 2)
@@ -1595,24 +1477,6 @@ void __stdcall ReleasePacketData(Class_00451fd0* obj)
     }
 }
 
-static inline int GetPlayerId_004523e0(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type)
-        return g_game->players[i].id;
-    return -1;
-}
-
-static inline unsigned char FindPlayerIndex_004523e0(int id)
-{
-    if (id == -1)
-        return 10;
-    for (unsigned char i = 0; i < 10; i++) {
-        if (GetPlayerId_004523e0(i) == id)
-            return i;
-    }
-    return 10;
-}
-
 // FUNCTION: 0x4523e0
 int __stdcall AssignPlayerColor(int from, int to, int group)
 {
@@ -1638,7 +1502,7 @@ int __stdcall AssignPlayerColor(int from, int to, int group)
     packet[2] = 0x18;
     int result = SendPacketToPlayer(from, to, packet + 2, 2);
     if (result != 0 && g_usePacketManager != 0) {
-        g_game->players[FindPlayerIndex_004523e0(to)].info->color = group;
+        g_game->players[FindSlotByDpid(to)].info->color = group;
         g_packetManager.SendAllQueued(1);
     }
     return result;
@@ -1727,20 +1591,13 @@ int __stdcall RequestPlayerColor(int param)
     return result;
 }
 
-static inline int PlayerId_00452800(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type)
-        return g_game->players[i].id;
-    return -1;
-}
-
 static unsigned char LookupPlayer(int id)
 {
     if (id == -1)
         return 10;
     unsigned char i;
     for (i = 0; i < 10; i++) {
-        if (PlayerId_00452800(i) == id)
+        if (GetSlotDpid(i) == id)
             return i;
     }
     return 10;
@@ -1933,49 +1790,6 @@ char* __stdcall GetRejectReasonText(int reason)
     }
 }
 
-static inline unsigned char FindSlotCall_00452cc0(int id)
-{
-    if (id != -1) {
-        for (unsigned char i = 0; i < 10; i++) {
-            if (GetSlotDpid(i) == id)
-                return i;
-        }
-    }
-    return 10;
-}
-
-static inline Player* FindPlayerCall_00452cc0(int id)
-{
-    if (FindSlotCall_00452cc0(id) == 10)
-        return 0;
-    return &g_game->players[FindSlotByDpid(id)];
-}
-
-static inline int GetSlotDpid_00452cc0(unsigned char index)
-{
-    if (index != 10 && g_game->players[index].type != 0)
-        return g_game->players[index].id;
-    return -1;
-}
-
-static inline unsigned char FindSlot_00452cc0(int id)
-{
-    if (id != -1) {
-        for (unsigned char i = 0; i < 10; i++) {
-            if (GetSlotDpid_00452cc0(i) == id)
-                return i;
-        }
-    }
-    return 10;
-}
-
-static inline Player* FindPlayer_00452cc0(int id)
-{
-    if (FindSlot_00452cc0(id) == 10)
-        return 0;
-    return &g_game->players[FindSlot_00452cc0(id)];
-}
-
 static inline int IsType1_00452cc0(Player* p)
 {
     if (p->active == 0)
@@ -2005,7 +1819,7 @@ static inline void Remove_00452cc0(Player* p)
 // FUNCTION: 0x452cc0
 void __stdcall RemovePlayer(int id)
 {
-    Player* p = FindPlayerCall_00452cc0(id);
+    Player* p = FindPlayerByDpid(id);
     if (p == 0)
         return;
     if (p->active == 0)
@@ -2028,7 +1842,7 @@ void __stdcall RemovePlayer(int id)
         }
     }
 
-    KillPlayerUnits(FindSlot_00452cc0(id));
+    KillPlayerUnits(FindSlotByDpid(id));
 
     if (g_game->bits_2a44.bit2) {
         if (!IsConnected(p))
@@ -2053,7 +1867,7 @@ void __stdcall RemovePlayer(int id)
                     best = g_game->players[j].id;
             }
         }
-        Player* r = FindPlayer_00452cc0(best);
+        Player* r = FindPlayerByDpid(best);
         if (r != 0)
             r->info->flags_97 |= 1;
     }
@@ -2242,24 +2056,6 @@ int __stdcall ReceiveNetPacket(void)
     }
 }
 
-static inline int GetPlayerId_00453640(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type)
-        return g_game->players[i].id;
-    return -1;
-}
-
-static inline unsigned char FindPlayerIndex_00453640(int id)
-{
-    if (id == -1)
-        return 10;
-    for (unsigned char i = 0; i < 10; i++) {
-        if (GetPlayerId_00453640(i) == id)
-            return i;
-    }
-    return 10;
-}
-
 // FUNCTION: 0x453640
 void UpdateTimeoutDialog()
 {
@@ -2294,12 +2090,12 @@ void UpdateTimeoutDialog()
         } while (idx != g_game->tail);
     }
 
-    unsigned char found = FindPlayerIndex_00453640(g_timeoutPlayerDpid);
+    unsigned char found = FindSlotByDpid(g_timeoutPlayerDpid);
     Player* player;
     if (found == 10)
         player = 0;
     else
-        player = &g_game->players[FindPlayerIndex_00453640(g_timeoutPlayerDpid)];
+        player = &g_game->players[FindSlotByDpid(g_timeoutPlayerDpid)];
 
     if (player != 0 && player->active != 0 && player->type == 3) {
         int elapsed = (GetTicks() - player->lastHeard) / 30;
@@ -2448,49 +2244,6 @@ void CheckPlayerTimeouts()
     OpenTimeoutDialog(-1);
 }
 
-static inline unsigned char FindPlayerIndex(int id)
-{
-    if (id == -1)
-        return 10;
-    for (unsigned char i = 0; i < 10; i++) {
-        if (PlayerId(i) == id)
-            return i;
-    }
-    return 10;
-}
-
-static inline unsigned char FindPlayerSlot(int id)
-{
-    if (id == -1)
-        return 10;
-    for (unsigned char i = 0; i < 10; i++) {
-        if (GetSlotDpid(i) == id)
-            return i;
-    }
-    return 10;
-}
-
-static inline Player* PlayerById(int id)
-{
-    if (FindPlayerSlot(id) == 10)
-        return 0;
-    return &g_game->players[FindSlotByDpid(id)];
-}
-
-static inline Player* PlayerBySlot(int id)
-{
-    if (FindPlayerSlot(id) == 10)
-        return 0;
-    return &g_game->players[FindPlayerSlot(id)];
-}
-
-static inline Player* PlayerByIndex(int id)
-{
-    if (FindPlayerIndex(id) == 10)
-        return 0;
-    return &g_game->players[FindPlayerIndex(id)];
-}
-
 static inline int FirstJoinedId()
 {
     for (int i = 0; i < 10; i++) {
@@ -2548,12 +2301,12 @@ static inline unsigned char FreeTeam()
 
 static inline void DropPlayer(int id)
 {
-    if (FindPlayerSlot(id) == 10)
+    if (FindSlotByDpid(id) == 10)
         return;
     PlayerIdPacket* out = (PlayerIdPacket*)g_game->recvPacketPtr;
     out->type = 0x1c;
     out->id = id;
-    Player* p = &g_game->players[FindPlayerSlot(id)];
+    Player* p = &g_game->players[FindSlotByDpid(id)];
     if ((p->active && p->type == 3) || !((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value & 1) || ((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value & 2))
         RemovePlayer(id);
     BroadcastPacket(LocalPlayer()->id, out, 5);
@@ -2586,8 +2339,8 @@ int HandleNetPackets()
         if (!more)
             continue;
         int sender = g_game->from_id;
-        unsigned char from = FindPlayerIndex(sender);
-        unsigned char to = FindPlayerIndex(g_game->lobby1);
+        unsigned char from = FindSlotByDpid(sender);
+        unsigned char to = FindSlotByDpid(g_game->lobby1);
         Player* player = &g_game->players[from];
         Player* recipient = &g_game->players[to];
         messages++;
@@ -2601,7 +2354,7 @@ int HandleNetPackets()
             case 5: {
                 if (msg->playerType != 1)
                     break;
-                Player* p = PlayerById(msg->id);
+                Player* p = FindPlayerByDpid(msg->id);
                 if (!p)
                     break;
                 if (!InGame(p))
@@ -2629,38 +2382,38 @@ int HandleNetPackets()
             case 3: {
                 if (!AddNetPlayer(msg->id))
                     break;
-                PlayerById(msg->id);
-                int target = FindPlayerIndex(msg->id);
+                FindPlayerByDpid(msg->id);
+                int target = FindSlotByDpid(msg->id);
                 if (!g_game->players[FindLobbyHostPlayer()].IsPlayableSlot())
                     break;
                 PlayerInfo* info = LocalPlayer()->info;
                 JoinRequestData* payload = msg->createData;
                 if (info->closed) {
-                    RejectPlayer(PlayerId(target), 3);
+                    RejectPlayer(GetSlotDpid(target), 3);
                     break;
                 }
                 if (msg->dataSize != 0x15) {
-                    RejectPlayer(PlayerId(target), 8);
+                    RejectPlayer(GetSlotDpid(target), 8);
                     break;
                 }
                 if (payload->versionMajor != 0 || payload->versionMinor != 0x50) {
-                    RejectPlayer(PlayerId(target), 8);
+                    RejectPlayer(GetSlotDpid(target), 8);
                     break;
                 }
                 if (!(info->flags_9d & 1))
                     break;
                 if (payload && !_strcmpi(g_game->password, payload->name))
                     break;
-                RejectPlayer(PlayerId(target), 4);
+                RejectPlayer(GetSlotDpid(target), 4);
                 break;
             }
             case 0x102: {
                 if (msg->playerType != 1)
                     break;
                 Player temp;
-                Player* p = PlayerById(msg->id);
+                Player* p = FindPlayerByDpid(msg->id);
                 if (p) {
-                    int target = FindPlayerIndex(msg->id);
+                    int target = FindSlotByDpid(msg->id);
                     if (target == 10) {
                         temp.FreeSideDataAndFogSightCounts();
                         continue;
@@ -2681,7 +2434,7 @@ int HandleNetPackets()
             case 0x103: {
                 if (msg->playerType != 1)
                     break;
-                Player* p = PlayerById(msg->id);
+                Player* p = FindPlayerByDpid(msg->id);
                 if (p) {
                     strncpy(p->name, msg->longName, 0x1e);
                     strncpy(p->fullName, (char*)msg->dataSize, 0x1e);
@@ -2712,7 +2465,7 @@ int HandleNetPackets()
         switch (packet[0]) {
         case 32: {
             SideDataPacket* infoPacket = (SideDataPacket*)packet;
-            int target = FindPlayerIndex(infoPacket->data.id);
+            int target = FindSlotByDpid(infoPacket->data.id);
             if (target == 10)
                 break;
             if (g_game->players[target].active && g_game->players[target].type == 3) {
@@ -2760,8 +2513,8 @@ int HandleNetPackets()
             break;
         case 35: {
             AllyFlagsPacket* ally = (AllyFlagsPacket*)packet;
-            Player* a = PlayerBySlot(ally->fromNetId);
-            Player* b = PlayerBySlot(ally->toNetId);
+            Player* a = FindPlayerByDpid(ally->fromNetId);
+            Player* b = FindPlayerByDpid(ally->toNetId);
             if (!a || !b)
                 break;
             if (ally->allied)
@@ -2779,7 +2532,7 @@ int HandleNetPackets()
         }
         case 36: {
             PlayerIdPacket* allyTeam = (PlayerIdPacket*)packet;
-            Player* p = PlayerBySlot(allyTeam->id);
+            Player* p = FindPlayerByDpid(allyTeam->id);
             if (p)
                 p->alliance = packet[5];
             if (!(g_game->netGameFlags & 4))
@@ -2788,7 +2541,7 @@ int HandleNetPackets()
         }
         case 27: {
             PlayerIdPacket* reject = (PlayerIdPacket*)packet;
-            Player* p = PlayerBySlot(reject->id);
+            Player* p = FindPlayerByDpid(reject->id);
             if (p)
                 RejectPlayer(p->id, packet[5]);
             break;
@@ -2796,10 +2549,10 @@ int HandleNetPackets()
         case 28: {
             PlayerIdPacket* drop = (PlayerIdPacket*)packet;
             int id = drop->id;
-            if (FindPlayerIndex(id) == 10)
+            if (FindSlotByDpid(id) == 10)
                 break;
             char text[200];
-            sprintf(text, Translate(g_playerDisconnectedText), PlayerBySlot(id)->name);
+            sprintf(text, Translate(g_playerDisconnectedText), FindPlayerByDpid(id)->name);
             AddMessage(text, 4, 0, from);
             DropPlayer(drop->id);
             if (drop->id == FirstJoinedId()) {
@@ -2819,7 +2572,7 @@ int HandleNetPackets()
         }
         case 31: {
             PlayerIdPacket* ack = (PlayerIdPacket*)packet;
-            int target = FindPlayerIndex(ack->id);
+            int target = FindSlotByDpid(ack->id);
             if (target != 10)
                 g_game->startPosAssignAck[target] = 1;
             break;
@@ -2830,7 +2583,7 @@ int HandleNetPackets()
             break;
         case 39: {
             PlayerIdPacket* breach = (PlayerIdPacket*)packet;
-            Player* p = PlayerBySlot(breach->id);
+            Player* p = FindPlayerByDpid(breach->id);
             if (!p)
                 break;
             from = p->index;
@@ -2930,10 +2683,10 @@ int HandleNetPackets()
                 break;
             int id = transfer->newOwnerNetId;
             Player* p;
-            if (FindPlayerIndex(id) == 10)
+            if (FindSlotByDpid(id) == 10)
                 p = 0;
             else
-                p = &g_game->players[FindPlayerSlot(id)];
+                p = &g_game->players[FindSlotByDpid(id)];
             if (IsConnected(p))
                 GiveUnitToPlayer(unit, p, (OwnershipTransferPacket *)packet);
             break;
@@ -2944,8 +2697,8 @@ int HandleNetPackets()
             break;
         case 22: {
             ResourceSharePacket* share = (ResourceSharePacket*)packet;
-            unsigned char a = FindPlayerIndex(share->fromNetId);
-            unsigned char b = FindPlayerIndex(share->toNetId);
+            unsigned char a = FindSlotByDpid(share->fromNetId);
+            unsigned char b = FindSlotByDpid(share->toNetId);
             if (a == 10 || b == 10)
                 break;
             switch (share->subtype) {
@@ -2990,8 +2743,8 @@ int HandleNetPackets()
         }
         case 33: {
             LobbySyncMessage* request = (LobbySyncMessage*)packet;
-            Player* a = PlayerByIndex(request->id);
-            Player* b = PlayerByIndex(request->arg);
+            Player* a = FindPlayerByDpid(request->id);
+            Player* b = FindPlayerByDpid(request->arg);
             if (!IsConnected(&g_game->players[FindLobbyHostPlayer()]))
                 break;
             if (!a)
@@ -3026,7 +2779,7 @@ int HandleNetPackets()
         }
         case 34: {
             PlayerIdPacket* team = (PlayerIdPacket*)packet;
-            Player* p = PlayerByIndex(team->id);
+            Player* p = FindPlayerByDpid(team->id);
             if (p)
                 p->lobbyDataSynced = packet[5];
             break;
@@ -3333,7 +3086,7 @@ void __stdcall HandlePing(LatencyPacket* p)
         return;
     }
 
-    unsigned char index = FindPlayerIndex(p->targetPlayerNetId);
+    unsigned char index = FindSlotByDpid(p->targetPlayerNetId);
     Player* pl = &g_game->players[index];
     if (pl->active == 0) {
         return;
@@ -3341,7 +3094,7 @@ void __stdcall HandlePing(LatencyPacket* p)
     if (pl->type != 1 && pl->type != 2) {
         return;
     }
-    unsigned char other = FindPlayerIndex(g_game->from_id);
+    unsigned char other = FindSlotByDpid(g_game->from_id);
     g_game->players[other].ping = host_time_ms() - p->sendTick;
 }
 
@@ -3516,13 +3269,6 @@ int AssignStartPositions() {
     return ok;
 }
 
-static inline int PlayerId_00456de0(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type)
-        return g_game->players[i].id;
-    return -1;
-}
-
 // FUNCTION: 0x456de0
 void __stdcall SendLoadProgress()
 {
@@ -3540,16 +3286,9 @@ void __stdcall SendLoadProgress()
         if (g_game->players[i].active != 0
             && (g_game->players[i].type == 1 || g_game->players[i].type == 2)) {
             g_game->players[i].progress = packet.progress;
-            BroadcastPacket(PlayerId_00456de0(i), &packet, 2);
+            BroadcastPacket(GetSlotDpid(i), &packet, 2);
         }
     }
-}
-
-static inline int PlayerDpid(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type != 0)
-        return g_game->players[i].id;
-    return -1;
 }
 
 static inline int PlayerReady(Player* p)
@@ -3570,10 +3309,10 @@ void __stdcall SendShareMetal(unsigned char from, unsigned char to, int amount)
         ResourceSharePacket packet;
         packet.type = 0x16;
         packet.subtype = 1;
-        packet.fromNetId = PlayerDpid(from);
-        packet.toNetId = PlayerDpid(to);
+        packet.fromNetId = GetSlotDpid(from);
+        packet.toNetId = GetSlotDpid(to);
         packet.amount = amount;
-        SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), (unsigned char *)&packet, sizeof(packet));
+        SendPacketToPlayer(GetSlotDpid(from), GetSlotDpid(to), (unsigned char *)&packet, sizeof(packet));
     }
 }
 
@@ -3593,10 +3332,10 @@ void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value)
         ResourceSharePacket packet;
         packet.type = 0x16;
         packet.subtype = 2;
-        packet.fromNetId = PlayerDpid(from);
-        packet.toNetId = PlayerDpid(to);
+        packet.fromNetId = GetSlotDpid(from);
+        packet.toNetId = GetSlotDpid(to);
         packet.amount = value;
-        SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), (unsigned char *)&packet, sizeof(packet));
+        SendPacketToPlayer(GetSlotDpid(from), GetSlotDpid(to), (unsigned char *)&packet, sizeof(packet));
     }
 }
 

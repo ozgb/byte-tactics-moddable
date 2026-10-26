@@ -1303,21 +1303,6 @@ static inline void LoadAccount_00442a30()
     }
 }
 
-static inline void SaveModemNumbers_00442a30()
-{
-    if (g_modemAccounts != 0) {
-        short count = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->index;
-        if (count > 0) {
-            Entry_004426e0 temp;
-            memcpy(&temp, &g_modemAccounts[count], 0x102);
-            for (int i = count; i > 0; i--)
-                memcpy(&g_modemAccounts[i], &g_modemAccounts[i - 1], 0x102);
-            memcpy(&g_modemAccounts[0], &temp, 0x102);
-        }
-        WriteGameRegistryValue((void*)"MODEMNUMBERS", g_modemAccounts, 0x1428);
-    }
-}
-
 static inline int TryConnect_00442a30()
 {
     int a = 0;
@@ -1367,7 +1352,7 @@ void __stdcall HandleModemDialogClick(Gui* gadget)
     }
     if (FindGadgetIndex(entries, "HOST", 0xe) == gadget->hotGadgetIndex) {
         LoadAccount_00442a30();
-        SaveModemNumbers_00442a30();
+        SaveModemNumbers();
         g_game->bit0 = 1;
         g_game->bit1 = 1;
         TryConnect_00442a30();
@@ -1387,7 +1372,7 @@ void __stdcall HandleModemDialogClick(Gui* gadget)
         }
     }
     LoadAccount_00442a30();
-    SaveModemNumbers_00442a30();
+    SaveModemNumbers();
     g_game->bit1 = 1;
     g_game->bit0 = 0;
     TryConnect_00442a30();
@@ -2543,24 +2528,6 @@ static inline int IsCounted(Player* p)
         && (p->unitCount != 0 || p->unitsCreated == 0);
 }
 
-static inline int CountAlliance(int alliance)
-{
-    if (alliance == 5)
-        return 0;
-    int count = 0;
-    for (int i = 0; i < 10; i++) {
-        Player* p = &g_game->players[i];
-        if (g_game->bits_2a44_1.bit2) {
-            if (p->alliance == alliance && IsPlaying(p) && IsCounted(p))
-                count++;
-        } else {
-            if (p->alliance == alliance && IsPlaying(p))
-                count++;
-        }
-    }
-    return count;
-}
-
 // FUNCTION: 0x4467f0
 int __stdcall CountPlayersInAlliance(int alliance)
 {
@@ -2586,7 +2553,7 @@ char AreAllPlayersInOneAlliance()
 {
     int total = CountComputerPlayers() + CountHumanPlayers();
     for (int alliance = 0; alliance < 5; alliance++) {
-        if (CountAlliance(alliance) == total)
+        if (CountPlayersInAlliance(alliance) == total)
             return 1;
     }
     return 0;
@@ -2626,7 +2593,7 @@ void RefreshTeamIcons()
             }
 
             int alliance = p->alliance;
-            int count = CountAlliance(alliance);
+            int count = CountPlayersInAlliance(alliance);
 
             switch (count) {
             case 0:
@@ -2642,19 +2609,6 @@ void RefreshTeamIcons()
         }
     }
     g_game->bits_2bee_1.dirty = 1;
-}
-
-static inline int FindNextAlly_00446c70(int player, int start)
-{
-    Player* players = g_game->players;
-    if (start == 10)
-        return -1;
-    for (int i = start; i < 10; i++) {
-        if ((players[i].alliance == players[player].alliance && players[i].type != 0
-             && players[i].alliance != 5) || i == player)
-            return i;
-    }
-    return -1;
 }
 
 #pragma auto_inline(off)
@@ -2675,7 +2629,7 @@ void SyncMutualAlliances()
         if (type == 4)
             continue;
         j = 0;
-        while ((k = FindNextAlly_00446c70(i, j)) != -1) {
+        while ((k = FindNextAlly(i, j)) != -1) {
             j = k + 1;
             p->alliedBy[k] = 1;
             p->allied[k] = 1;
@@ -2683,7 +2637,7 @@ void SyncMutualAlliances()
             q->info->flags_9d_wide |= 2;
             p->info->flags_9d_wide |= 2;
         }
-        if (CountAlliance(p->alliance) < 2)
+        if (CountPlayersInAlliance(p->alliance) < 2)
             p->info->flags_9d_wide &= 0xfffd;
     }
 }
@@ -3479,16 +3433,6 @@ static inline int IsLocal_00448c70(Player* p)
     return p->active != 0 && (p->type == 1 || p->type == 2);
 }
 
-void __stdcall UpdateSideGadget_00448c70(int side)
-{
-    char name[20];
-    Player* p = &g_game->players[side];
-
-    sprintf(name, "SIDE%d", side);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, name,
-                 (p->active != 0 && (p->info->flags_9b & 0x40)) ? 2 : p->info->side);
-}
-
 // FUNCTION: 0x448c70
 void RefreshBattleRoomRows()
 {
@@ -3663,7 +3607,7 @@ void RefreshBattleRoomRows()
             sprintf(name, "SIDE%d", n);
             e = FindGadgetOrNull(entries, name);
             if (e) {
-                UpdateSideGadget_00448c70(n);
+                UpdateSideGadget(n);
                 e->visible = 1;
                 SetGadgetGrayedOutByName(&g_game->gui, name, (IsLocal_00448c70(p) && !ready) ? 0 : 1);
             }

@@ -88,10 +88,8 @@ Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 void __stdcall UpdatePlayerEconomy(Player* p);
 #include "../units/unit_motion.h"
 
-#include "../map/features_422ea0.h"
 void __stdcall InitFeatureAnimPool(List_00421f20* list);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
-#include "../map/features_424c00.h"
 
 int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index);
 Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange);

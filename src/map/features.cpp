@@ -1,9 +1,9 @@
-// FLAGS: /Gi
 #include "win_types.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
+#include "../state/block.h"
 #include "../state/game_rand.h"
 
 #include "../util/tdf.h"
@@ -106,7 +106,7 @@ struct AnimManager {
     char (*names)[0x100];
 };
 
-struct List {
+struct List_00421f20 {
     char unknown_0[0x1c];
     int count;
     NameEntry* entries;
@@ -356,6 +356,7 @@ struct Model {
 #include "../map/mission.h"
 
 #include "../game/game.h"
+#include "../state/sim_globals.h"
 #pragma pack(pop)
 
 #include "class_004c9390.h"
@@ -370,13 +371,16 @@ typedef std::vector<TdfFile*> FeatureList;
 static FeatureList* s_featureTdfParsers;
 
 #include "../graphics/object_pool.h"
+#include "../game/data_files.h"
+#include "../graphics/display.h"
+void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
+Gaf* __stdcall LoadGaf(char* path);
 void __stdcall FreeObjectState(void* obj);
 AnimSrc* __stdcall FindGafEntry(void* list, const char* name);
 void __stdcall InitGafSequence(Anim* ref, AnimSrc* src, int index);
 int __stdcall LoadFeatureType(char* name);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot,
                              unsigned char owner);
-#include "features.h"
 #include "features.h"
 #include "../util/math_4b6c30.h"
 void __stdcall PlaySoundAtByName(char* name, Vec3* pos, int param_3);
@@ -412,6 +416,40 @@ Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def)
     p.z = (f.y + c.y * 2) << 19;
     p.y = g_seams.units->GetGroundHeight(&p) << 16;
     return p;
+}
+
+// FUNCTION: 0x421f20
+void __stdcall InitFeatureAnimPool(List_00421f20* list)
+{
+    FeatureAnimPool* m = &g_game->anim;
+
+    m->anim = (AnimEntry_00421f20*)SimAllocTagged("FEATURE ANIM DATA", 0x18000);
+    memset(m->anim, 0, 0x18000);
+    m->activeHead = -1;
+    m->idleHead = -1;
+    m->freeHead = 0;
+    for (int i = 0; i < 0x800; i++) {
+        m->anim[i].next = i + 1;
+        m->anim[i].prev = i - 1;
+    }
+    m->anim[0].prev = -1;
+    m->anim[0x7ff].next = -1;
+
+    m->featureUnit = (FeatureUnit_00421f20*)SimAllocTagged("Feature Unit", 0x118);
+    memset(m->featureUnit, 0, 0x118);
+    m->featureUnit->flags_110 |= 0x200;
+    m->featureUnit->flags_110 |= 0x20000000;
+    m->featureUnit->unitDefIndex = 0;
+    m->featureUnit->flags_114 |= 1;
+    m->featureUnit->def = g_game->defs;
+    m->names = nullptr;
+    m->nameCount = 0;
+
+    NameEntry*& entries = list->entries;
+
+    for (int j = 0; j < list->count; j++) {
+        LoadFeatureType(entries[j].name);
+    }
 }
 
 // FUNCTION: 0x422040
@@ -520,6 +558,124 @@ TdfFile* __stdcall FindFeatureFile(char* name)
     return 0;
 }
 
+static inline void LoadFeatureSeq(TdfRecord* rec, char* key, char* seqname, Gaf* anims, AnimSrc** out)
+{
+    int ok = rec->GetFieldString(seqname, key, 0x100, DAT_005119b8);
+    if (ok)
+        *out = (AnimSrc*)FindOptionalGafEntry(anims, 0, seqname);
+    else
+        *out = nullptr;
+}
+
+static inline void LoadFeatureSeqOnce(TdfRecord* rec, char* key, char* seqname, Gaf* anims, AnimSrc** out)
+{
+    int ok = rec->GetFieldString(seqname, key, 0x100, DAT_005119b8);
+    if (ok) {
+        *out = (AnimSrc*)FindOptionalGafEntry(anims, 0, seqname);
+        if (*out)
+            (*out)->kind = 0;
+    } else {
+        *out = nullptr;
+    }
+}
+
+// FUNCTION: 0x4224b0
+int __stdcall LoadFeatureType(char* name)
+{
+    Gaf* anims;
+    int j;
+    int ok;
+    char seqname[0x100];
+    char file[0x100];
+    char path[0x100];
+
+    TdfFile* entry = FindFeatureFile(name);
+    if (entry == nullptr) {
+        sprintf(path, "Record \"%s\" missing from feature files", name);
+        FatalError(path);
+    }
+    g_game->features = (Feature*)GameReallocTagged(g_game->features, "FEATURES", (g_game->featureCount + 1) * 0x100);
+    Feature* def = &g_game->features[g_game->featureCount];
+    strncpy(def->name, name, 0x80);
+    entry->current->GetFieldString(def->description, "Description", 0x14, DAT_005119b8);
+    def->footprintx = entry->current->GetFieldInt("footprintx", 0);
+    def->footprintz = entry->current->GetFieldInt("footprintz", 0);
+    def->height = entry->current->GetFieldInt("height", 0);
+    ok = entry->current->GetFieldString(file, "object", 0x100, DAT_005119b8);
+    if (ok) {
+        def->noobject = 0;
+        def->object = LoadObject3d(file);
+    } else {
+        def->noobject = 1;
+        entry->current->GetFieldString(file, "filename", 0x100, DAT_005119b8);
+        for (j = 0; j < g_game->featureCount; j++) {
+            if (strncmp(g_game->features[j].filename, file, 0x10) == 0) {
+                def->anims = nullptr;
+                anims = g_game->features[j].anims;
+                strcpy(def->filename, "REUSE");
+                break;
+            }
+        }
+        if (j == g_game->featureCount) {
+            BuildDataPath(path, "anims", file, "GAF");
+            def->anims = LoadGaf(path);
+            strncpy(def->filename, file, 0x10);
+            anims = def->anims;
+        }
+        LoadFeatureSeq(entry->current, "seqname", seqname, anims, &def->seq);
+        LoadFeatureSeq(entry->current, "seqnameshad", seqname, anims, &def->seqshad);
+        LoadFeatureSeqOnce(entry->current, "seqnameburn", seqname, anims, &def->seqburn);
+        LoadFeatureSeqOnce(entry->current, "seqnameburnshad", seqname, anims, &def->seqburnshad);
+        LoadFeatureSeqOnce(entry->current, "seqnamedie", seqname, anims, &def->seqdie);
+        LoadFeatureSeqOnce(entry->current, "seqnamedieshad", seqname, anims, &def->seqdieshad);
+        LoadFeatureSeqOnce(entry->current, "seqnamereclamate", seqname, anims, &def->seqreclamate);
+        LoadFeatureSeqOnce(entry->current, "seqnamereclamateshad", seqname, anims, &def->seqreclamateshad);
+    }
+    def->spreadchance = entry->current->GetFieldInt("spreadchance", 0);
+    def->reproduce = entry->current->GetFieldInt("reproduce", 0);
+    def->reproducearea = entry->current->GetFieldInt("reproducearea", 0);
+    def->metal = (unsigned short)entry->current->GetFieldInt("metal", 0);
+    def->energy = (unsigned short)entry->current->GetFieldInt("energy", 0);
+    def->damage = entry->current->GetFieldInt("damage", 0);
+    def->animating = entry->current->GetFieldInt("animating", 0);
+    def->animtrans = entry->current->GetFieldInt("animtrans", 0);
+    def->shadtrans = entry->current->GetFieldInt("shadtrans", 0);
+    def->flamable = entry->current->GetFieldInt("flamable", 0);
+    def->geothermal = entry->current->GetFieldInt("geothermal", 0);
+    def->blocking = entry->current->GetFieldInt("blocking", 0);
+    def->reclaimable = entry->current->GetFieldInt("reclaimable", 0);
+    def->autoreclaimable = entry->current->GetFieldInt("autoreclaimable", 1);
+    def->indestructible = entry->current->GetFieldInt("indestructible", 0);
+    def->nodisplayinfo = entry->current->GetFieldInt("nodisplayinfo", 0);
+    def->nodrawundergray = entry->current->GetFieldInt("nodrawundergray", 0);
+    if (_strcmpi(name, "DragonsTeeth") == 0)
+        def->nodrawundergray = 1;
+    if (_strcmpi(name, "DragonsTeeth_Core") == 0)
+        def->nodrawundergray = 1;
+    if (_strcmpi(name, "Fortification") == 0)
+        def->nodrawundergray = 1;
+    if (_strcmpi(name, "Fortification_Core") == 0)
+        def->nodrawundergray = 1;
+    def->sparktime = (short)(entry->current->GetFieldDouble("sparktime", 0.0) * 30.0);
+    entry->current->GetFieldString(seqname, "burnweapon", 0x100, DAT_005119b8);
+    def->burnweapon = (char*)g_seams.weapons->FindWeaponByName(seqname);
+    def->ref.index = 0;
+    def->ref.value = 0;
+    def->ref.kind = 0;
+    def->ref.src = nullptr;
+    def->refshad.index = 0;
+    def->refshad.value = 0;
+    def->refshad.kind = 0;
+    def->refshad.src = nullptr;
+    if (def->animating) {
+        if (def->seq)
+            InitGafSequence(&def->ref, def->seq, 0);
+        if (def->seqshad)
+            InitGafSequence(&def->refshad, def->seqshad, 0);
+    }
+    return g_game->featureCount++;
+}
+
 // FUNCTION: 0x422dd0
 short __stdcall FindFeatureType(char* name)
 {
@@ -557,6 +713,35 @@ static inline int FindFeature(char* name)
     }
     return 0xffff;
 }
+// FUNCTION: 0x422ea0
+void ResolveFeatureLinks()
+{
+    char buf[0x100];
+    Feature** features;
+    int i = 0;
+    int* count = &g_game->featureCount;
+    if (*count > 0) {
+        features = &g_game->features;
+        do {
+            TdfRecord* parser = (TdfRecord*)FindFeatureFile((*features)[i].name)->current;
+            if (parser->GetFieldString(buf, "featuredead", 0x100, DAT_005119b8))
+                (*features)[i].dead = FindOrLoadFeatureType(buf);
+            else
+                (*features)[i].dead = 0xffff;
+            if (parser->GetFieldString(buf, "featurereclamate", 0x100, DAT_005119b8))
+                (*features)[i].reclamate = FindOrLoadFeatureType(buf);
+            else
+                (*features)[i].reclamate = 0xffff;
+            if (parser->GetFieldString(buf, "featureburnt", 0x100, DAT_005119b8))
+                (*features)[i].burnt = FindOrLoadFeatureType(buf);
+            else
+                (*features)[i].burnt = 0xffff;
+            g_game->loadPercent = (unsigned char)((i + 1) * 100 / *count);
+            i++;
+        } while (i < *count);
+    }
+}
+
 // FUNCTION: 0x423160
 void PlaceMissionFeatures(void)
 {
@@ -1277,15 +1462,99 @@ void __stdcall SaveFeatures(HapiBank* file)
     file->SetIntegerItem("Number of Animating Features", animCount);
 }
 
-typedef std::vector<TdfFile*> Vec_004251e0;
-typedef void (Vec_004251e0::*DestroyFn_004251e0)(Vec_004251e0::iterator, Vec_004251e0::iterator);
+// FUNCTION: 0x424c00
+void __stdcall LoadFeatures(HapiBank* file)
+{
+    int j;
+    file->OpenAccount("Features");
+    std::vector<unsigned short> remap;
+    LoadFeatureFileList();
+    if (file->OpenNamedBox("Feature Type Names")) {
+        int count = file->GetBoxSize() / sizeof(FeatureName);
+        remap.resize(count);
+        std::vector<FeatureName> names(count);
+        file->ReadBox(names.begin(), count * (int)sizeof(FeatureName));
+        for (int i = 0; i < count; i++) {
+            if (i < g_game->featureCount && _strcmpi(names[i].name, g_game->features[i].name) == 0) {
+                remap[i] = i;
+                continue;
+            }
+            for (j = 0; j < g_game->featureCount; j++) {
+                if (_strcmpi(names[i].name, g_game->features[j].name) == 0) {
+                    remap[i] = j;
+                    goto next;
+                }
+            }
+            remap[i] = FindOrLoadFeatureType(names[i].name);
+        next:;
+        }
+    } else {
+        remap.resize(g_game->featureCount);
+        int i = 0;
+        for (; i < g_game->featureCount; i++)
+            remap[i] = i;
+    }
+    ResolveFeatureLinks();
+    FreeFeatureFileList();
 
-struct Access_004251e0 : Vec_004251e0 {
-    static DestroyFn_004251e0 fn;
-};
+    int k, n;
+    n = file->GetIntegerItem("Number of Normal Features", 0);
+    file->OpenNamedBox("Normal Features");
+    for (k = 0; k < n; k++) {
+        Normal rec;
+        file->SeekBox(k * sizeof(Normal));
+        int got = file->ReadBox(&rec, sizeof(Normal));
+        if (got >= sizeof(Normal)) {
+            Cell* c = g_seams.los_radar->GetMapCell((unsigned short)rec.x, (unsigned short)rec.y);
+            unsigned short type = remap[rec.feature];
+            PlaceFeature(c, type, nullptr, nullptr, 10);
+            c->spot = rec.spot;
+        }
+    }
 
-// FUNCTION: 0x4251e0 ?_Destroy@?$vector@PAVTdfFile@@V?$allocator@PAVTdfFile@@@std@@@std@@IAEXPAPAVTdfFile@@0@Z
-DestroyFn_004251e0 Access_004251e0::fn = &Access_004251e0::_Destroy;
+    n = file->GetIntegerItem("Number of Animating Features", 0);
+    file->OpenNamedBox("Animating Features");
+    for (k = 0; k < n; k++) {
+        AnimRecord rec;
+        file->SeekBox(k * sizeof(AnimRecord));
+        int got = file->ReadBox(&rec, sizeof(AnimRecord));
+        if (got >= sizeof(AnimRecord)) {
+            Cell* c = g_seams.los_radar->GetMapCell((unsigned short)rec.x, (unsigned short)rec.y);
+            unsigned short type = remap[rec.feature];
+            PlaceFeature(c, type, nullptr, nullptr, 10);
+            switch (rec.anim) {
+            case 0:
+                StartFeatureBurning((unsigned short)rec.x, (unsigned short)rec.y, 0);
+                break;
+            case 1:
+                KillFeature((unsigned short)rec.x, (unsigned short)rec.y, 0);
+                break;
+            case 2:
+                KillFeature((unsigned short)rec.x, (unsigned short)rec.y, 1);
+                break;
+            }
+            Spot* s = &((Spot*)g_game->spots.get())[c->spot];
+
+            s->damage = rec.damage;
+            *(unsigned short*)&s->frame = rec.frame;
+            s->animBits = (unsigned char)(rec.animHi << 4);
+        }
+    }
+
+    n = file->GetIntegerItem("Number of 3D Features", 0);
+    file->OpenNamedBox("3D Features");
+    for (k = 0; k < n; k++) {
+        Model rec;
+        file->SeekBox(k * sizeof(Model));
+        int got = file->ReadBox(&rec, sizeof(Model));
+        if (got >= sizeof(Model)) {
+            Cell* c = g_seams.los_radar->GetMapCell((unsigned short)rec.x, (unsigned short)rec.y);
+            unsigned short type = remap[rec.feature];
+            PlaceFeature(c, type, &rec.pos, &rec.rot, 10);
+            ((Spot*)g_game->spots.get())[c->spot].damage = rec.damage;
+        }
+    }
+}
 
 typedef std::vector<unsigned short> Vec_004251f0;
 typedef Vec_004251f0::size_type (Vec_004251f0::*SizeFn_004251f0)() const;
@@ -1311,16 +1580,6 @@ typedef Vec_00425430::iterator (Vec_00425430::*EraseFn_00425430)(
 
 // FUNCTION: 0x425430 ?erase@?$vector@GV?$allocator@G@std@@@std@@QAEPAGPAG0@Z
 EraseFn_00425430 g_erase_00425430 = &Vec_00425430::erase;
-
-typedef std::vector<unsigned short> Vec_00425470;
-typedef void (Vec_00425470::*DestroyFn_00425470)(Vec_00425470::iterator, Vec_00425470::iterator);
-
-struct Access_00425470 : Vec_00425470 {
-    static DestroyFn_00425470 fn;
-};
-
-// FUNCTION: 0x425470 ?_Destroy@?$vector@GV?$allocator@G@std@@@std@@IAEXPAG0@Z
-DestroyFn_00425470 Access_00425470::fn = &Access_00425470::_Destroy;
 
 typedef std::vector<TdfFile*> Vec_00425480;
 typedef void (Vec_00425480::*InsertFn_00425480)(

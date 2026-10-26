@@ -2528,7 +2528,7 @@ presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,MissionType::index,1
 presentation,harness,shared_write,g_explodedPieces,1
-presentation,harness,shared_write,g_game,9
+presentation,harness,shared_write,g_game,10
 presentation,los_radar,call,BuildFogTiles,1
 presentation,los_radar,call,CalcRadarViewportRect,1
 presentation,los_radar,call,GetMapCell,1

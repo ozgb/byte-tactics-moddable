@@ -92,7 +92,7 @@ int __stdcall ReportGameEvent(int msg);
 #include "../ingame/control_panel.h"
 #include "../sound/sound.h"
 #include "../units/unit_commands.h"
-#include "../units/units_485010.h"
+#include "../units/units.h"
 #include "../game/game_state.h"
 unsigned char FindHostSlot();
 void __stdcall TransferMetal(unsigned char, unsigned char, int, int);
@@ -1081,7 +1081,6 @@ void* __cdecl GameReallocTagged(void* ptr, const char* name, unsigned int size);
 Obj_00451640* GetDisplay(void);
 #include "../graphics/display.h"
 #include "net_stats.h"
-#include "../units/units_485010.h"
 void __stdcall CreateUnitFromPacket(unsigned char p, void* packet);
 void __stdcall ApplyWeaponFirePacket(Player* player, void* packet);
 void __stdcall ApplyProjectileHitPacket(Player* player, void* packet);

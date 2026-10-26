@@ -115,7 +115,7 @@ class HapiBank;
 #include "../map/terrain.h"
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
 void __stdcall SetupPlayerSlot(int player, char type);
-#include "../units/units_485010.h"
+#include "../units/units.h"
 struct OwnershipTransferPacket;
 #include "../units/unit_types.h"
 #include "../units/unit_save.h"

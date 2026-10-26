@@ -1,5 +1,5 @@
-#ifndef UNITS_485010_H
-#define UNITS_485010_H
+#ifndef UNITS_H
+#define UNITS_H
 struct UnitKilledPacket;
 
 struct Player;

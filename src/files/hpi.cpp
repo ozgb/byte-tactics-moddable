@@ -1607,6 +1607,16 @@ void* __stdcall HAPI_AddArchive(LPCSTR name, int mode)
     return file;
 }
 
+static void FreeRecord_004be180(OPENHAPIFILE* p)
+{
+    if (p != 0) {
+        if (p->fp != 0)
+            host_file_close(p->fp);
+        GameFreeThunk(p->node);
+        GameFreeThunk(p);
+    }
+}
+
 // FUNCTION: 0x4be180
 void HAPI_DropMissingArchives(void)
 {
@@ -1617,7 +1627,7 @@ void HAPI_DropMissingArchives(void)
             state->files[i]->fp = host_file_open_read(state->files[i]->name);
             OPENHAPIFILE* rec = state->files[i];
             if (rec->fp == 0) {
-                HAPI_CloseArchive(state->files[i]);
+                FreeRecord_004be180(state->files[i]);
                 state->files[i] = 0;
                 for (int j = i; j < state->count - 1; j++)
                     state->files[j] = state->files[j + 1];

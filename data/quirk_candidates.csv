@@ -21,12 +21,12 @@ src/game/game_load.cpp,847,array-bounds,LoadingScreenFrame (0x497f40),not-a-bug,
 src/game/game_state.cpp,726,array-bounds,UpdateBattleHoverMode (0x491cc0),not-a-bug,,g_game->table is a larger table typed as one element; index 0x13 is the cursor animation as in the original
 src/game/main.cpp,233,cast-calling-convention,GameMain (0x49e830),not-a-bug,,"atexit calls the handler with no arguments, so stdcall and cdecl behave the same for AtexitNoOp"
 src/game/main_loop.cpp,244,array-bounds,InitFrame (0x496a60),not-a-bug,,g_game->table is a larger table typed as one element; index 0x13 is the cursor animation as in the original
-src/game/players_464290.cpp,113,format-security,SetupPlayerSlot (0x464290),not-a-bug,,sprintf of a translated name as the format: the strings have no percent sign
-src/game/players_464290.cpp,127,format-security,SetupPlayerSlot (0x464290),not-a-bug,,sprintf of a translated name as the format: the strings have no percent sign
-src/game/players_464290.cpp,130,format-security,SetupPlayerSlot (0x464290),not-a-bug,,sprintf of a translated name as the format: the strings have no percent sign
-src/game/players_464290.cpp,132,format-security,SetupPlayerSlot (0x464290),not-a-bug,,sprintf of a translated name as the format: the strings have no percent sign
-src/game/players_464290.cpp,342,delete-incomplete,FreePlayers (0x464a00),not-a-bug,,"delete of a void pointer calls operator delete(void*) with no destructor, as MSVC 5 does"
-src/game/players_464290.cpp,355,delete-incomplete,FreePlayers (0x464a00),not-a-bug,,"delete of a void pointer calls operator delete(void*) with no destructor, as MSVC 5 does"
+src/game/players.cpp,113,format-security,SetupPlayerSlot (0x464290),not-a-bug,,sprintf of a translated name as the format: the strings have no percent sign
+src/game/players.cpp,127,format-security,SetupPlayerSlot (0x464290),not-a-bug,,sprintf of a translated name as the format: the strings have no percent sign
+src/game/players.cpp,130,format-security,SetupPlayerSlot (0x464290),not-a-bug,,sprintf of a translated name as the format: the strings have no percent sign
+src/game/players.cpp,132,format-security,SetupPlayerSlot (0x464290),not-a-bug,,sprintf of a translated name as the format: the strings have no percent sign
+src/game/players.cpp,342,delete-incomplete,FreePlayers (0x464a00),not-a-bug,,"delete of a void pointer calls operator delete(void*) with no destructor, as MSVC 5 does"
+src/game/players.cpp,355,delete-incomplete,FreePlayers (0x464a00),not-a-bug,,"delete of a void pointer calls operator delete(void*) with no destructor, as MSVC 5 does"
 src/graphics/display.cpp,722,int-to-pointer-cast,InitEnvironment (0x4b5980),not-a-bug,,resource id 103 passed as a pointer to LoadCursorA (MAKEINTRESOURCE form); window setup only
 src/graphics/draw.cpp,332,tautological-pointer-compare,DrawPixel (0x4bee60),not-a-bug,,dead branch kept from the original: the address of a global is never null; drawing only
 src/graphics/draw.cpp,427,tautological-pointer-compare,DrawPolyline (0x4bf060),not-a-bug,,dead branch kept from the original: the address of a global is never null; drawing only
@@ -41,8 +41,8 @@ src/gui/dialogs.cpp,1434,fortify-source,LerpPaletteRange (0x4acae0),bug-harmless
 src/ingame/camera.cpp,122,tautological-pointer-compare,RestoreCameraPosition (0x41d3f0),not-a-bug,,"valid is an inline array, so the test is always true as in the original; camera presentation"
 src/ingame/info_panel.cpp,766,format-extra-args,DrawUnitBuilderProbe (0x4685a0),bug-harmless,,"extra sprintf arguments are ignored; debug text drawn on the panel, no game state"
 src/ingame/info_panel.cpp,860,format-security,DrawStatusPanel (0x4689c0),not-a-bug,,"sprintf of the translated text ""Normal"" as the format: the string has no percent sign"
-src/ingame/info_panel_46a860.cpp,340,format,DrawUnitInfoPanel (0x46a860),not-a-bug,,"name is the first field of UnitDef (offset 0), so %s of the pointer prints the name"
-src/ingame/selection_48cf30.cpp,12,pragma-pack,file scope,not-a-bug,,the pack(1) push covers the rest of the file by design; nothing follows the end of the file
+src/ingame/info_panel.cpp,340,format,DrawUnitInfoPanel (0x46a860),not-a-bug,,"name is the first field of UnitDef (offset 0), so %s of the pointer prints the name"
+src/ingame/selection.cpp,12,pragma-pack,file scope,not-a-bug,,the pack(1) push covers the rest of the file by design; nothing follows the end of the file
 src/map/plot_map.cpp,71,mismatched-new-delete,SavePlayerFeaturesPlotmap (0x484df0),bug-harmless,,delete on a new[] buffer of bytes: the CRT delete[] is delete for a type with no destructor; fixed with delete[]
 src/network/net_condenser.cpp,114,format,NetCondenser::Accumulate (0x44f940),not-a-bug,,"format width mismatch only: int, long, unsigned and pointers are all 32 bits on the i686 target, so the output is identical; log line only"
 src/network/net_condenser.cpp,136,format,NetCondenser::ReceivePacket (0x44f9c0),not-a-bug,,"format width mismatch only: int, long, unsigned and pointers are all 32 bits on the i686 target, so the output is identical; log line only"

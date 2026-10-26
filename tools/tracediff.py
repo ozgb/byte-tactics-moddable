@@ -339,7 +339,7 @@ def load_maps(ref: str) -> dict[str, TableMap]:
 
 
 def describe_phase(phase: str) -> str:
-    """The function a phase's hash follows, from RunGameSteps (src/ingame/dialogs_493340.cpp)."""
+    """The function a phase's hash follows, from RunGameSteps (src/ingame/game_dialogs.cpp)."""
     if phase not in PHASE_FUNCTIONS:
         return "none (the once-per-tick tables, hashed after UpdateMeteors)"
     name, address = PHASE_FUNCTIONS[phase]

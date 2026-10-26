@@ -25,7 +25,7 @@ Entry,glyphs,pointer,include/ta_types.h,#353
 Entry,handler,function-pointer,include/ta_types.h,#353
 Entry,text,pointer,include/ta_types.h,#353
 Face,vindex,pointer,src/weapons/explosions.cpp,#352
-Feature,animTable,pointer,include/ta_types.h|src/ingame/info_panel.cpp|src/ingame/info_panel_46a610.cpp,#353
+Feature,animTable,pointer,include/ta_types.h|src/ingame/info_panel.cpp|src/ingame/info_panel.cpp,#353
 Feature,anims,pointer,src/map/features.cpp,#353
 Feature,burnt,pointer,include/ta_types.h,#353
 Feature,field_a8,pointer,include/ta_types.h,#353
@@ -38,7 +38,7 @@ Feature,seqdieshad,pointer,include/ta_types.h|src/map/features.cpp,#353
 Feature,seqreclamate,pointer,src/map/features.cpp,#353
 Feature,seqreclamateshad,pointer,include/ta_types.h|src/map/features.cpp,#353
 Feature,seqshad,pointer,src/map/features.cpp,#353
-Feature,shadowTable,pointer,include/ta_types.h|src/ingame/info_panel.cpp|src/ingame/info_panel_46a610.cpp,#353
+Feature,shadowTable,pointer,include/ta_types.h|src/ingame/info_panel.cpp|src/ingame/info_panel.cpp,#353
 Frame,data,pointer,src/network/packets.cpp,#353
 FrameQueue,buffer,pointer,src/network/packet_receiver.h,#353
 FrameQueue,recvBuffer,pointer,src/network/packet_receiver.h,#353
@@ -64,7 +64,7 @@ Gadget,list,pointer,src/frontend/options.cpp,#353
 Gadget,onSelect,function-pointer,src/frontend/multi.cpp|src/frontend/skirmish_menu.cpp,#353
 Gadget,records,pointer,src/frontend/multi.cpp|src/frontend/options.cpp|src/frontend/skirmish_menu.cpp,#353
 Gadget,rows,pointer,src/frontend/multi.cpp,#353
-Gadget,screen,pointer,src/game/players_464290.cpp,#353
+Gadget,screen,pointer,src/game/players.cpp,#353
 Gadget,sliderCallback,function-pointer,src/frontend/campaign_menu.cpp|src/frontend/endgame.cpp|src/frontend/multi.cpp|src/frontend/options.cpp|src/frontend/skirmish_menu.cpp|src/gui/gadget.h|src/gui/gui.cpp,#353
 Gadget,sliderGaf,pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
 Gadget,sliderUser,pointer,src/frontend/multi.cpp|src/frontend/options.cpp,#353
@@ -237,8 +237,8 @@ PlayerAI,vec_ad,container,src/ai/player_ai.h,#361
 PlayerAI,vec_bd,container,src/ai/player_ai.h,#361
 PlayerAI,weights,container,src/ai/player_ai.h,#361
 PlayerFrameInfo,frame,pointer,src/network/packet_receiver.h,#353
-Screen,callback,function-pointer,src/game/players_464290.cpp,#353
-Screen,form,pointer,src/game/players_464290.cpp,#353
+Screen,callback,function-pointer,src/game/players.cpp,#353
+Screen,form,pointer,src/game/players.cpp,#353
 Screen,primary,pointer,src/graphics/surface.cpp,#353
 Screen,surface,pointer,src/graphics/surface.cpp,#353
 ScriptTable,code,pointer,src/units/cob_types.h,#352

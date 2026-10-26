@@ -3142,7 +3142,6 @@ static inline int FirstJoinedId_004568c0() {
     return -1;
 }
 
-
 // FUNCTION: 0x4568c0
 int AssignStartPositions() {
     unsigned char idx = FindOccupied_004568c0();

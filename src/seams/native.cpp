@@ -102,7 +102,6 @@ void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out);
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
-int __stdcall IsPointVisible(Player* player, Vec3* pos);
 
 #include "../map/line_of_sight.h"
 #include "../map/radar.h"

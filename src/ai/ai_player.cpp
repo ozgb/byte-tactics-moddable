@@ -250,8 +250,6 @@ int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
-int __stdcall IsPointVisible(Player* player, Vec3* pos);
-int __stdcall SumUnitRatingsInRange(int index, Vec3* pos, int range);
 #include "pathfind.h"
 void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
                             Elem_0040cc40 val, int*);

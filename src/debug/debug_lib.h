@@ -62,4 +62,6 @@ FreeBlockMap* __stdcall GetFreeBlockSet();
 FreedBlockRing<int>* GetFreedBlockRing();
 void __cdecl FreeDebugBlock(void* p, int flags);
 
+void* __stdcall GetBlockMap();
+
 #endif

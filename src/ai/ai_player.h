@@ -1,5 +1,8 @@
 #ifndef AI_PLAYER_H
 #define AI_PLAYER_H
+struct Player;
+struct Vec3;
+
 class UnitDef;
 struct Unit;
 struct Vec3;
@@ -39,5 +42,8 @@ int __stdcall GetBuildRating(int player, unsigned short type);
 unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit* unit);
 int __stdcall FindBuildPosition(int player, const Vec3* from, UnitDef* type, Vec3* out);
 int __stdcall GetBuilderCount(int);
+
+int __stdcall IsPointVisible(Player* player, Vec3* point);
+int __stdcall SumUnitRatingsInRange(int player, Vec3* pos, int range);
 
 #endif

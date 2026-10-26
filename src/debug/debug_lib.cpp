@@ -1274,8 +1274,6 @@ typedef std::vector<Elem_004dd8c0, Alloc_004dd8c0> FreedBlockVector;
 typedef void (FreedBlockVector::*InsertFn_004dd8c0)(
     FreedBlockVector::iterator, FreedBlockVector::size_type, const Elem_004dd8c0&);
 
-void* GetBlockMap();
-FreedBlockRing<int>* GetFreedBlockRing();
 
 // FUNCTION: 0x4db000
 void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
@@ -2485,7 +2483,7 @@ int StringMaxSize(void)
     return 0xfffffffd;
 }
 
-extern unsigned char g_debugSupportInited;
+#include "../data/exe_only.h"
 
 // FUNCTION: 0x4d8310
 void __cdecl CheckFillPattern(unsigned int* block, unsigned int fill, unsigned int size)

@@ -1,5 +1,8 @@
 #ifndef WEAPONS_H
 #define WEAPONS_H
+struct Projectile;
+struct Unit;
+
 struct Unit;
 struct UnitWeaponSlot;
 struct Vec3;
@@ -33,5 +36,7 @@ char* __stdcall FindWeaponByName(char* name);
 void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj);
 
 int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit, Unit* target, Vec3* point);
+
+void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit);
 
 #endif

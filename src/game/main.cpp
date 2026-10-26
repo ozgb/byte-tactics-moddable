@@ -6,12 +6,23 @@
 #include <signal.h>
 #include <time.h>
 #include <new>
+#include <ctype.h>
+#include <malloc.h>
+#include "../quirks/quirks.h"
+#include "../network/online.h"
+#include "../ingame/camera.h"
+#include "../frontend/options.h"
+#include "../network/net_game.h"
 #include "../state/game_rand.h"
 #include "../../interfaces/host.h"
 
 struct FileHandle;
 
 #include "../files/files_api.h"
+
+char* __stdcall Translate(char* text);
+void __stdcall SetNoDirectSound();
+void __stdcall SetUseWindowsSound();
 
 // FUNCTION: 0x49e640
 void __stdcall AppendToDebugFile(char* text)
@@ -26,13 +37,28 @@ void __stdcall AppendToDebugFile(char* text)
 #include "main.h"
 #include "../debug/debug_lib.h"
 
+// FUNCTION: 0x49e680
+void __stdcall ReportViaException(const char* message)
+{
+    int zero = 0;
+    __try {
+        __asm {
+            push eax
+            push edx
+            div zero
+            pop edx
+            pop eax
+        }
+    } __except (host_crash_report(GetExceptionInformation(), message), EXCEPTION_EXECUTE_HANDLER) {
+    }
+}
+
 // FUNCTION: 0x49e6f0
 void InstallOutOfMemoryHandler()
 {
     SetOutOfMemoryHandler((int)OutOfMemoryHandler);
 }
 
-#include "main_49e680.h"
 #include "../debug/debug_lib.h"
 
 // FUNCTION: 0x49e700
@@ -159,7 +185,6 @@ extern const char g_defaultLanguage[];
 void __stdcall EmptyPostArchiveMountHook(const char* param_1);
 #include "../ingame/screenshots.h"
 #include "../gui/mouse.h"
-#include "main_49eda0.h"
 #include "settings.h"
 #include "../util/tdf_4c54f0.h"
 
@@ -311,6 +336,198 @@ int __stdcall GameEntry(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     } __except (ExceptionFilter(GetExceptionInformation(), "Main Thread")) {
     }
     return 0;
+}
+
+// FUNCTION: 0x49ee30
+int __stdcall ParseCommandLine(char* cmdLine, char* appName)
+{
+    char* copy = (char*)_alloca(strlen(cmdLine) + 1);
+    strcpy(copy, cmdLine);
+    g_game->lobbyTimeoutSecs = 30;
+    g_game->netSendDropPct = 0;
+    g_game->cmdlineSkipIntroMovie = 0;
+
+    char* p = strtok(copy, " \t");
+    while (p) {
+        if (*p != '-' && *p != '/') {
+            if (g_quirks.boundLanguageCopy) {
+                strncpy(g_preferredLanguage, p, 0x3f);
+                g_preferredLanguage[0x3f] = 0;
+            } else {
+                strcpy(g_preferredLanguage, p);
+            }
+        } else if (!IsDebugKeyword(p)) {
+            switch (p[1]) {
+            case 'B':
+            case 'b':
+                if (!*p)
+                    p = strtok(NULL, " \t");
+                if (p && *p) {
+                    if (!_strcmpi(p, "lock"))
+                        *(unsigned short*)&g_game->lockFlags |= 1;
+                    else if (!_strcmpi(p, "deathends"))
+                        ;
+                    else if (!_strcmpi(p, "deathplays"))
+                        ;
+                    else if (!_strcmpi(p, "deathmatch"))
+                        ;
+                    else if (!_strcmpi(p, "fixedloc"))
+                        ;
+                    else if (!_strcmpi(p, "mapping"))
+                        ;
+                    else if (!_strcmpi(p, "circlos"))
+                        ;
+                    else if (!_strcmpi(p, "truelos"))
+                        ;
+                    else if (!_strcmpi(p, "permlos"))
+                        ;
+                    else if (!_strcmpi(p, "cheating"))
+                        ;
+                    else if (!_strcmpi(p, "watching"))
+                        ;
+                }
+                break;
+            case 'C':
+            case 'c':
+                p += 2;
+                if (!*p)
+                    p = strtok(NULL, " \t");
+                if (p && *p) {
+                    try {
+                        Onl_LoadConfigFile(p);
+                    } catch (...) {
+                    }
+                }
+                g_game->cmdlineSkipIntroMovie = 1;
+                break;
+            case 'D':
+            case 'd':
+            {
+                char mode = p[2];
+                g_cmdlineDisplaySeed = 2;
+                if (mode != 'f' && mode != 'F')
+                    g_cmdlineDisplaySeed = 3;
+                break;
+            }
+            case 'E':
+            case 'e': {
+                p += 2;
+                if (!*p)
+                    p = strtok(NULL, " \t");
+                if (p && *p) {
+                    int v = -1;
+                    if (*p != '-')
+                        v = atoi(p);
+                    if (v < 0 || v > 100)
+                        v = 0;
+                    g_game->netSendDropPct = v;
+                }
+                break;
+            }
+            case 'F':
+            case 'f':
+                SetBypassDriveScan(1);
+                break;
+            case 'H':
+            case 'h':
+                p += 2;
+                if (*p) {
+                    SetHostGameName(1, p);
+                } else {
+                    char* q = strtok(NULL, " \t");
+                    if (q && *q && *q != '-')
+                        SetHostGameName(1, q);
+                }
+                break;
+            case 'L':
+            case 'l':
+                SetCommandLineUnusedFlagL(0);
+                break;
+            case 'N':
+            case 'n':
+                p += 2;
+                if (!*p)
+                    p = strtok(NULL, " \t");
+                if (p && *p && *p != '-') {
+                    char* colon = strchr(p, ':');
+                    int n = atoi(p);
+                    if (n == 1 && colon)
+                        SetDirectConnectAddress(colon + 1);
+                    SetDirectPlayProvider(n);
+                }
+                g_game->cmdlineSkipIntroMovie = 1;
+                break;
+            case 'P':
+            case 'p':
+                p += 2;
+                if (!*p)
+                    p = strtok(NULL, " \t");
+                if (p && *p) {
+                    int v = -1;
+                    if (*p != '-')
+                        v = atoi(p);
+                    SetPacketRate(v);
+                }
+                break;
+            case 'R':
+            case 'r': {
+                char* args = cmdLine + (p - copy) + 2;
+                while (isspace(*args))
+                    args++;
+                char moduleName[_MAX_PATH];
+                unsigned int len = host_file_exe_path(moduleName, _MAX_PATH);
+                int registered = 0;
+                if (len > 0) {
+                    char drive[_MAX_DRIVE];
+                    char ext[_MAX_EXT];
+                    char folder[_MAX_DIR + 2];
+                    char fname[_MAX_FNAME + _MAX_EXT];
+                    char* lastChar;
+                    fname[0] = 0;
+                    ext[0] = 0;
+                    _splitpath(moduleName, drive, folder + 2, fname, ext);
+                    strcat(fname, ext);
+                    folder[0] = drive[0];
+                    folder[1] = drive[1];
+                    lastChar = &folder[strlen(folder) - 1];
+                    if (strchr("/\\", *lastChar))
+                        *lastChar = 0;
+                    registered = host_net_register_application(appName, fname, args, folder);
+                }
+                if (!registered) {
+                    host_alert();
+                    p = Translate("DirectPlay registration failed.");
+                    host_message(NULL, appName, p, HOST_MESSAGE_ERROR);
+                }
+                return 0;
+            }
+            case 'S':
+            case 's':
+                SetNoDirectSound();
+                break;
+            case 'T':
+            case 't':
+                p += 2;
+                if (!*p)
+                    p = strtok(NULL, " \t");
+                if (p && *p) {
+                    int v = -1;
+                    if (*p != '-')
+                        v = atoi(p);
+                    if (v < 30 || v > 300)
+                        v = 30;
+                    g_game->lobbyTimeoutSecs = v;
+                }
+                break;
+            case 'W':
+            case 'w':
+                SetUseWindowsSound();
+                break;
+            }
+        }
+        p = strtok(NULL, " \t");
+    }
+    return 1;
 }
 
 #include "../graphics/palette.h"

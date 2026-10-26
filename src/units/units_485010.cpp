@@ -807,7 +807,7 @@ void __stdcall KillUnit(Unit* unit, int param_2)
 
 void __stdcall RemoveSpeechOfUnit(void* unit);
 void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
-#include "../ingame/dialogs_493340.h"
+#include "../ingame/game_dialogs.h"
 char* __stdcall Translate(char* text);
 void __stdcall AddMessage(char* text, int a, int b, int c);
 #include "unit_targets.h"

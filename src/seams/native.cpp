@@ -70,8 +70,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target,
 #include "../orders/order_targets.h"
 float __stdcall GetEnergyIncome(Player* player);
 float __stdcall GetMetalIncome(Player* player);
-#include "../game/players_464290.h"
-#include "../game/players_464290.h"
+#include "../game/players.h"
 #include "../units/unit_targets.h"
 
 Projectile* __stdcall FindTargetableProjectile(Unit* unit, unsigned int weapon);
@@ -109,7 +108,6 @@ int __stdcall IsPointVisible(Player* player, Vec3* pos);
 #include "../map/line_of_sight.h"
 #include "../map/radar.h"
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
-#include "../ingame/info_panel_467440.h"
 
 class HapiBank;
 #include "../map/map_list.h"
@@ -118,7 +116,6 @@ class HapiBank;
 void __stdcall AddUnitToMap(Unit* unit);
 void __stdcall RemoveUnitFromMap(Unit* unit);
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
-#include "../game/players_466050.h"
 void __stdcall SetupPlayerSlot(int player, char type);
 #include "../units/units_485010.h"
 struct OwnershipTransferPacket;

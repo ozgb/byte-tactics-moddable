@@ -1,5 +1,5 @@
-#ifndef DIALOGS_493340_H
-#define DIALOGS_493340_H
+#ifndef GAME_DIALOGS_H
+#define GAME_DIALOGS_H
 struct Gui;
 
 struct Gadget;

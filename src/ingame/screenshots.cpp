@@ -26,7 +26,7 @@ struct Ctx_00499890 {
 int __stdcall GetTicks();
 #include "../gui/mouse.h"
 void __stdcall UpdateMenu(void*);
-#include "dialogs_493340.h"
+#include "game_dialogs.h"
 #include "../sound/sound.h"
 void __stdcall PopMouseEvent(int*);
 #include "../graphics/pcx.h"

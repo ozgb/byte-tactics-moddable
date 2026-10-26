@@ -60,7 +60,7 @@
 #include "side_00431a60.h"
 #include "side_name_00497180.h"
 #include "slot_0041e420.h"
-#include "view_flags_497180.h"
+#include "view_flags.h"
 #include "zero11_004917d0.h"
 
 struct AnimEntry_00429700;
@@ -495,7 +495,7 @@ struct Game {
             char unknown_2ce3[70952];
             Pool pool;
             char pad_1421f[98];
-            ViewFlags_497180 mapFlags_14281;
+            MapViewFlags mapFlags_14281;
             char pad_14283[28];
             Grid spatialGrid;
             char pad_142af[12];

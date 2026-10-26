@@ -2096,7 +2096,7 @@ class Vec_0046d860;
 struct Vector3;
 struct Vector3s;
 struct Video_0045bb00;
-struct ViewFlags_497180;
+struct MapViewFlags;
 struct View_00438c00;
 struct View_0044d8a0;
 struct View_4b5980;
@@ -11883,7 +11883,7 @@ struct Settings_00496e10_2 {
     int flag_c;
 };
 
-#include "../src/game/view_flags_497180.h"
+#include "../src/game/view_flags.h"
 
 class Class_004ce800 {
 public:

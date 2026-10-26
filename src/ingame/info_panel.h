@@ -18,5 +18,7 @@ int __stdcall ShowGameMessage(char* text, int mode);
 void __stdcall MarkRecentlyDamaged(void*);
 void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset, Vec3* corners, short* angles);
 void __stdcall DrawLightBars();
+void __stdcall UpdateSensorRadarAndCloak(void);
+void __stdcall DrawBattleFrame(int, int);
 
 #endif

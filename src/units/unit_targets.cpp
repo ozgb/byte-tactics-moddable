@@ -351,7 +351,7 @@ struct UnitDamagePacket {
 
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
-#include "../ingame/dialogs_493340.h"
+#include "../ingame/game_dialogs.h"
 int __cdecl ScaledCos(unsigned short idx, int scale);
 int __cdecl ScaledSin(short idx, int scale);
 

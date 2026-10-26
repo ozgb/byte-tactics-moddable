@@ -1077,7 +1077,7 @@ void __stdcall UpdateTimeoutDialog(void* gadget);
 void __stdcall SetCursorMode(int n);
 #include "../graphics/object_pool.h"
 void* __cdecl GameReallocTagged(void* ptr, const char* name, unsigned int size);
-#include "../game/players_464290.h"
+#include "../game/players.h"
 Obj_00451640* GetDisplay(void);
 #include "../graphics/display.h"
 #include "net_stats.h"

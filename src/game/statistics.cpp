@@ -13,14 +13,24 @@ struct Guid_0046bf30 {
 #include "game.h"
 #pragma pack(pop)
 
-struct PlayerInfo_0046bce0 {
-    char unknown_0[0x14];
-    void* allies;
+struct OnlineReportPlayer {
+    char* name;
+    int id;
+    int flags;
+    char* side;
+    int numAllies;
+    OnlineReportPlayer** allies;
 };
 
-struct ScoreBoard_0046bce0 {
-    char unknown_0[8];
-    void* ppScores;
+struct OnlineReportScore {
+    char* name;
+    int value;
+};
+
+struct OnlineReportScoreBoard {
+    int score;
+    int count;
+    OnlineReportScore** scores;
 };
 
 #include "../../link/globals.h"
@@ -28,8 +38,8 @@ extern char DAT_00512c98[];
 extern Guid_0046bf30 g_dpspGuidIpx;
 extern Guid_0046bf30 g_dpspGuidSerial;
 extern Guid_0046bf30 g_dpspGuidModem;
-extern PlayerInfo_0046bce0** g_onlineReportPlayers;
-extern ScoreBoard_0046bce0** g_onlineReportScoreBoards;
+extern OnlineReportPlayer** g_onlineReportPlayers;
+extern OnlineReportScoreBoard** g_onlineReportScoreBoards;
 extern char** g_onlineReportScores;
 extern int g_reporterDll;
 
@@ -56,6 +66,9 @@ extern ChatFn_0046bf30 g_riReportGameChat;
 #include "../ingame/info_panel.h"
 #include "../network/online_report.h"
 #include "../graphics/object_pool.h"
+#include "../map/mission.h"
+#include "../network/player_info.h"
+#include "../data/exe_only.h"
 
 // FUNCTION: 0x46bce0
 int AllocScoreTables()
@@ -64,8 +77,8 @@ int AllocScoreTables()
     int failed;
     int i;
 
-    g_onlineReportPlayers = (PlayerInfo_0046bce0**)GameAllocIgnoreTag("PlayersArray", 0x28);
-    g_onlineReportScoreBoards = (ScoreBoard_0046bce0**)GameAllocIgnoreTag("ScoreBoardsArray", 0x28);
+    g_onlineReportPlayers = (OnlineReportPlayer**)GameAllocIgnoreTag("PlayersArray", 0x28);
+    g_onlineReportScoreBoards = (OnlineReportScoreBoard**)GameAllocIgnoreTag("ScoreBoardsArray", 0x28);
     g_onlineReportScores = (char**)GameAllocIgnoreTag("ScoresArray", 0x28);
     if (g_onlineReportPlayers == 0)
         goto failed;
@@ -82,30 +95,30 @@ int AllocScoreTables()
         if (i >= 10)
             break;
         sprintf(name, "PlayerInfo%d", i);
-        g_onlineReportPlayers[i] = (PlayerInfo_0046bce0*)GameAllocIgnoreTag(name, 0x18);
+        g_onlineReportPlayers[i] = (OnlineReportPlayer*)GameAllocIgnoreTag(name, 0x18);
         if (g_onlineReportPlayers[i] == 0) {
             failed = 1;
             break;
         }
         sprintf(name, "Allies%d", i);
-        g_onlineReportPlayers[i]->allies = GameAllocIgnoreTag(name, 0x28);
+        g_onlineReportPlayers[i]->allies = (OnlineReportPlayer**)GameAllocIgnoreTag(name, 0x28);
         if (g_onlineReportPlayers[i]->allies == 0) {
             failed = 1;
             break;
         }
         sprintf(name, "ScoreBoard%d", i);
-        g_onlineReportScoreBoards[i] = (ScoreBoard_0046bce0*)GameAllocIgnoreTag(name, 0xc);
+        g_onlineReportScoreBoards[i] = (OnlineReportScoreBoard*)GameAllocIgnoreTag(name, 0xc);
         if (g_onlineReportScoreBoards[i] == 0) {
             failed = 1;
             break;
         }
         sprintf(name, "ppScores%d", i);
-        g_onlineReportScoreBoards[i]->ppScores = GameAllocIgnoreTag(name, 0x24);
-        if (g_onlineReportScoreBoards[i]->ppScores == 0) {
+        g_onlineReportScoreBoards[i]->scores = (OnlineReportScore**)GameAllocIgnoreTag(name, 0x24);
+        if (g_onlineReportScoreBoards[i]->scores == 0) {
             failed = 1;
             break;
         }
-        memset(g_onlineReportScoreBoards[i]->ppScores, 0, 0x24);
+        memset(g_onlineReportScoreBoards[i]->scores, 0, 0x24);
         sprintf(name, "Scores%d", i);
         g_onlineReportScores[i] = (char*)GameAllocIgnoreTag(name, 0x48);
         if (g_onlineReportScores[i] == 0) {
@@ -113,7 +126,7 @@ int AllocScoreTables()
             break;
         }
         memset(g_onlineReportScores[i], 0, 0x48);
-        int** slot = (int**)g_onlineReportScoreBoards[i]->ppScores;
+        int** slot = (int**)g_onlineReportScoreBoards[i]->scores;
         int j = 0;
         while (1) {
             if (j >= 0x48)
@@ -198,7 +211,7 @@ void ShutdownScoreTables()
             GameFreeThunk(g_onlineReportPlayers[i]);
         }
         if (g_onlineReportScoreBoards != 0) {
-            GameFreeThunk(g_onlineReportScoreBoards[i]->ppScores);
+            GameFreeThunk(g_onlineReportScoreBoards[i]->scores);
             GameFreeThunk(g_onlineReportScoreBoards[i]);
         }
         if (g_onlineReportScores != 0) {
@@ -217,4 +230,73 @@ void ShutdownScoreTables()
         GameFreeThunk(g_onlineReportScores);
         g_onlineReportScores = 0;
     }
+}
+
+// FUNCTION: 0x46c2a0
+int FillScoreTables()
+{
+    int j;
+    int count = 0;
+    for (int i = 0; i < 10; i++) {
+        Player* p = &g_game->players[i];
+        if ((p->active && (p->type == 1 || p->type == 2 || p->type == 3) && p->index != 10) || p->unitsCreated || p->active) {
+            count++;
+            g_onlineReportPlayers[i]->name = p->name;
+            g_onlineReportPlayers[i]->id = p->id;
+            g_onlineReportPlayers[i]->flags = 1;
+            if ((p->active && p->type == 2) || (p->active && p->type == 3 && p->info->kind == 2))
+                g_onlineReportPlayers[i]->flags |= 2;
+            if (p->active && p->info->bit6)
+                g_onlineReportPlayers[i]->flags |= 4;
+            if (p->active && (p->info->flags_97 & 1))
+                g_onlineReportPlayers[i]->flags |= 8;
+            g_onlineReportPlayers[i]->side = g_sideNames[p->info->side];
+            int n = 0;
+            OnlineReportPlayer** allies = g_onlineReportPlayers[i]->allies;
+            OnlineReportPlayer** a = allies;
+            for (j = 0; j < 10; j++) {
+                if (j != i && p->allied[j]) {
+                    n++;
+                    *a++ = g_onlineReportPlayers[j];
+                }
+            }
+            g_onlineReportPlayers[i]->numAllies = n;
+            for (; n < 10; n++)
+                allies[n] = 0;
+            Mission* c = g_game->net;
+            int score = (int)((unsigned int)g_game->ticks / 60 * c->timeMul);
+            score += (int)(p->kills * c->killMul);
+            g_onlineReportScoreBoards[i]->score = score;
+            g_onlineReportScoreBoards[i]->count = 9;
+            OnlineReportScore* s;
+            s = g_onlineReportScoreBoards[i]->scores[0];
+            s->name = g_scoreNames[0];
+            s->value = p->kills;
+            s = g_onlineReportScoreBoards[i]->scores[1];
+            s->name = g_scoreNames[1];
+            s->value = p->losses;
+            s = g_onlineReportScoreBoards[i]->scores[2];
+            s->name = g_scoreNames[2];
+            s->value = (int)p->totalEnergyProduced;
+            s = g_onlineReportScoreBoards[i]->scores[3];
+            s->name = g_scoreNames[3];
+            s->value = (int)p->totalMetalProduced;
+            s = g_onlineReportScoreBoards[i]->scores[4];
+            s->name = g_scoreNames[4];
+            s->value = (int)p->energyWasted;
+            s = g_onlineReportScoreBoards[i]->scores[5];
+            s->name = g_scoreNames[5];
+            s->value = (int)p->metalWasted;
+            s = g_onlineReportScoreBoards[i]->scores[6];
+            s->name = g_scoreNames[6];
+            s->value = p->commanderKills;
+            s = g_onlineReportScoreBoards[i]->scores[7];
+            s->name = g_scoreNames[7];
+            s->value = p->commanderLosses;
+            s = g_onlineReportScoreBoards[i]->scores[8];
+            s->name = g_scoreNames[8];
+            s->value = (i == g_game->localPlayer || (p->active && p->type == 2)) ? g_game->bits_3923b_2.bit4_3923b : 0;
+        }
+    }
+    return count;
 }

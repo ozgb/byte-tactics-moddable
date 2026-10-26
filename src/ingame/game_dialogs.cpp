@@ -105,7 +105,7 @@ int __stdcall GetButtonStageByName(Gui* menu, char* name);
 void __stdcall CollectSelectedUnits(std::vector<Unit*>* list);
 #include "../units/unit_commands.h"
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-#include "dialogs_493340.h"
+#include "game_dialogs.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 #include "../debug/debug_lib.h"
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* text, int count, int flag);

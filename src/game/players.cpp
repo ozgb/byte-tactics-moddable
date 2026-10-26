@@ -7,7 +7,7 @@
 #include "mission_conditions.h"
 #include "../game/unit_resources.h"
 #include "../files/files_api.h"
-#include "players_464290.h"
+#include "players.h"
 
 struct Player;
 struct Unit;
@@ -844,6 +844,90 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
     }
 }
 
+static inline int IsExplored(Player* player, Vec3Words* pos)
+{
+    int tx = pos->xWhole >> 5;
+    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
+    if ((unsigned int)tx < (unsigned int)player->exploredWidth && (unsigned int)ty < (unsigned int)player->exploredHeight &&
+        player->explored[(unsigned int)player->exploredWidth * ty + tx] != 0)
+        return 1;
+    return 0;
+}
+
+static inline int IsSeen(Player* player, Vec3Words* pos)
+{
+    int tx = pos->xWhole >> 5;
+    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
+    if (!((unsigned int)tx < (unsigned int)player->exploredWidth && (unsigned int)ty < (unsigned int)player->exploredHeight))
+        return 0;
+    return (g_game->visibilityMask[(unsigned int)player->exploredWidth * ty + tx] &
+            (1 << g_game->playerIndex)) != 0;
+}
+
+static inline int IsVisible(Player* player, Vec3Words* pos)
+{
+    return (g_game->mapFlags & 2) == 2 ? IsExplored(player, pos) : g_seams.ai->IsPointVisible(player, (Vec3*)pos);
+}
+
+static inline int IsVisibleByMask(Player* player, Vec3Words* pos)
+{
+    if ((g_game->mapFlags & 2) == 2)
+        return IsExplored(player, pos);
+    return IsSeen(player, pos);
+}
+
+// FUNCTION: 0x4658e0
+int __stdcall IsFootprintVisible(Player* player, int x, int y, int dx, int dy, short size)
+{
+    unsigned int vis;
+    Vec3Words pos;
+    memset(&pos, 0, sizeof(pos));
+    pos.xWhole = (short)(x << 4);
+    pos.yWhole = size;
+    pos.zWhole = (short)(y << 4);
+    if ((g_game->mapFlags & 2) == 2)
+        vis = IsExplored(player, &pos);
+    else
+        vis = IsSeen(player, &pos);
+    if ((int)vis)
+        return 1;
+    pos.xWhole = (short)(pos.xWhole + (dx << 4));
+    pos.zWhole = (short)(pos.zWhole + (dy << 4));
+    if ((g_game->mapFlags & 2) == 2)
+        return IsExplored(player, &pos);
+    return IsSeen(player, &pos);
+}
+
+// FUNCTION: 0x465ac0
+int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* u)
+{
+    if (u->player.get() == player)
+        return 1;
+    if (u->activateFlags & 4)
+        return 0;
+    Vec3 p;
+    p.x = u->def->modelMinX + u->pos.x;
+    p.y = u->def->modelMaxY + u->pos.y;
+    p.z = u->def->modelMinZ + u->pos.z;
+    if (!(u->flags & 0x200)) {
+        if (p.y < (g_game->seaLevel << 16))
+            return 0;
+    }
+    if (IsVisible(player, (Vec3Words*)&p))
+        return 1;
+    p.x += u->def->modelSizeX;
+    if (IsVisible(player, (Vec3Words*)&p))
+        return 1;
+    p.z += u->def->modelSizeZ;
+    p.y -= u->def->modelSizeY;
+    if (IsVisible(player, (Vec3Words*)&p))
+        return 1;
+    p.x -= u->def->modelSizeX;
+    if (IsVisibleByMask(player, (Vec3Words*)&p))
+        return 1;
+    return 0;
+}
+
 // FUNCTION: 0x465e30
 void InitPlayerResources()
 {
@@ -889,6 +973,86 @@ void __stdcall LoadPlayerControllers(HapiBank* file)
         } else {
             *slot = 0;
             player->type = 0;
+        }
+    }
+}
+
+// FUNCTION: 0x466050
+void __stdcall LoadPlayers(HapiBank* file)
+{
+    char name[16];
+    file->OpenAccount("Players");
+    g_game->localPlayer = file->GetIntegerItem("Human Player", 10);
+    g_game->playerIndex = g_game->localPlayer;
+    file->OpenNamedBox("GameTime");
+    if (file->ReadBox((char*)&g_game->lastTick, 0x1c) != 0x1c)
+        return;
+    for (int i = 0; i < 10; i++) {
+        Player* p = &g_game->players[i];
+        sprintf(name, "Player%i", i);
+        if (file->OpenAccount(name)) {
+            p->energy = file->GetDoubleItem("Energy", 0);
+            p->metal = file->GetDoubleItem("Metal", 0);
+            p->totalEnergyProduced = file->GetDoubleItem("TotalEnergyProduced", 0);
+            p->totalMetalProduced = file->GetDoubleItem("TotalMetalProduced", 0);
+            p->totalEnergyConsumed = file->GetDoubleItem("TotalEnergyConsumed", 0);
+            p->totalMetalConsumed = file->GetDoubleItem("TotalMetalConsumed", 0);
+            p->energyWasted = file->GetDoubleItem("EnergyWasted", 0);
+            p->metalWasted = file->GetDoubleItem("MetalWasted", 0);
+            p->energyStorageBonus = file->GetDoubleItem("PlayerEnergyStorage", 0);
+            p->metalStorageBonus = file->GetDoubleItem("PlayerMetalStorage", 0);
+            p->bits_149.storage = file->GetIntegerItem("AddPlayerStorage", 0);
+            p->kills = file->GetIntegerItem("Kills", 0);
+            p->losses = file->GetIntegerItem("Losses", 0);
+            p->updateTime = file->GetIntegerItem("UpdateTime", 0);
+            p->winLoseTime = file->GetIntegerItem("WinLoseTime", 0);
+            p->displayTimer = file->GetIntegerItem("DisplayTimer", 0);
+            p->info->color = file->GetIntegerItem("Logo", 0);
+            p->info->side = file->GetIntegerItem("Side", 0);
+            file->OpenNamedBox("Alliances");
+            if (file->GetBoxSize() == 11)
+                file->ReadBox(p->allied, 11);
+            p->allied[i] = 1;
+        } else {
+            p->type = 0;
+        }
+    }
+}
+
+// FUNCTION: 0x4662f0
+void __stdcall SavePlayers(HapiBank* file)
+{
+    char name[16];
+    file->OpenAccount("Players");
+    file->SetIntegerItem("Human Player", g_game->localPlayer);
+    file->OpenNamedBox("GameTime");
+    file->WriteBox((char*)&g_game->lastTick, 0x1c);
+    for (int i = 0; i < 10; i++) {
+        Player* p = &g_game->players[i];
+        if (p->type) {
+            sprintf(name, "Player%i", i);
+            file->OpenAccount(name);
+            file->SetDoubleItem("Energy", p->energy);
+            file->SetDoubleItem("Metal", p->metal);
+            file->SetDoubleItem("TotalEnergyProduced", p->totalEnergyProduced);
+            file->SetDoubleItem("TotalMetalProduced", p->totalMetalProduced);
+            file->SetDoubleItem("TotalEnergyConsumed", p->totalEnergyConsumed);
+            file->SetDoubleItem("TotalMetalConsumed", p->totalMetalConsumed);
+            file->SetDoubleItem("EnergyWasted", p->energyWasted);
+            file->SetDoubleItem("MetalWasted", p->metalWasted);
+            file->SetDoubleItem("PlayerEnergyStorage", p->energyStorageBonus);
+            file->SetDoubleItem("PlayerMetalStorage", p->metalStorageBonus);
+            file->SetIntegerItem("AddPlayerStorage", p->bits_149.storage);
+            file->SetIntegerItem("Kills", p->kills);
+            file->SetIntegerItem("Losses", p->losses);
+            file->SetIntegerItem("UpdateTime", p->updateTime);
+            file->SetIntegerItem("WinLoseTime", p->winLoseTime);
+            file->SetIntegerItem("DisplayTimer", p->displayTimer);
+            file->SetIntegerItem("Controller", p->type);
+            file->SetIntegerItem("Logo", p->info->color);
+            file->SetIntegerItem("Side", p->info->side);
+            file->OpenNamedBox("Alliances");
+            file->WriteBox(p->allied, 11);
         }
     }
 }

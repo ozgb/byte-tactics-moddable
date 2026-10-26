@@ -87,26 +87,6 @@ typedef Vec_00432be0::size_type (Vec_00432be0::*SizeFn_00432be0)() const;
 // FUNCTION: 0x432be0 ?size@?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@QBEIXZ
 SizeFn_00432be0 g_size_00432be0 = &Vec_00432be0::size;
 
-// FUNCTION: 0x432c00
-void* StringRef::FUN_00432c00(unsigned char param_1)
-{
-    ReleaseRef();
-    if ((param_1 & 1) != 0) {
-        operator delete(this);
-    }
-    return this;
-}
-
-// FUNCTION: 0x432c20
-void* StringRef::FUN_00432c20(unsigned char param_1)
-{
-    ReleaseRef();
-    if ((param_1 & 1) != 0) {
-        operator delete(this);
-    }
-    return this;
-}
-
 // FUNCTION: 0x432c80
 void __stdcall AssignRange(Elem_432cb0* first, Elem_432cb0* last, Elem_432cb0* value)
 {

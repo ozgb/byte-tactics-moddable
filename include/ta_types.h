@@ -4864,13 +4864,11 @@ struct Elem_00432be0_2 {
 class Class_00432c00 {
 public:
     char unknown_0[1];
-    void* FUN_00432c00(unsigned char);
 };
 
 class Class_00432c20 {
 public:
     char unknown_0[1];
-    void* FUN_00432c20(unsigned char);
 };
 
 struct Elem_432cb0 {

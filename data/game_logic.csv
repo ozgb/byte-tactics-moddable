@@ -279,7 +279,6 @@ address,function,file
 0x431740,ApplyUseOnlyUnits,src/game/settings.cpp
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp
-0x432c20,StringRef::FUN_00432c20,src/map/los_tables.cpp
 0x432c80,AssignRange,src/map/los_tables.cpp
 0x432cb0,AssignRangeBack,src/map/los_tables.cpp
 0x432cf0,UEntry_00432cf0::?$allocator::construct,src/map/los_tables.cpp

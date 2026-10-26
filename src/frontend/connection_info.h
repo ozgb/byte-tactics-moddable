@@ -2,7 +2,7 @@
 #define CONNECTION_INFO_H
 
 #include "connection_blob.h"
-#include "v4i.h"
+#include "../../include/v4i.h"
 
 #pragma pack(push, 1)
 struct ConnInfo_443ff0 {

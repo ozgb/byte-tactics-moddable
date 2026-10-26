@@ -4460,7 +4460,7 @@ struct Obj_00426e80 {
     unsigned short : 14;
 };
 
-#include "../src/frontend/v4i.h"
+#include "v4i.h"
 
 class AIProfileParser {
 public:

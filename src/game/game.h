@@ -15,7 +15,7 @@
 #include "../frontend/flags37f14_0045cf60.h"
 #include "../frontend/menu_0045b800.h"
 #include "../frontend/player_entry_004777a0.h"
-#include "../frontend/v4i.h"
+#include "../../include/v4i.h"
 #include "../graphics/object3do.h"
 #include "../graphics/piece_frame.h"
 #include "../gui/gui.h"

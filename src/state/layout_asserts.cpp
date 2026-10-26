@@ -11,6 +11,7 @@
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma pack(push, 1)
 #include "../util/vec3.h"
+#include "../../include/v4i.h"
 #include "../ai/ai_search_goal.h"
 #include "../ai/group.h"
 #include "../ai/pathfinder.h"
@@ -23,7 +24,6 @@
 #include "../frontend/flags37f14_0045cf60.h"
 #include "../frontend/menu_0045b800.h"
 #include "../frontend/player_entry_004777a0.h"
-#include "../frontend/v4i.h"
 #include "../game/clock_flags_0042f9a0.h"
 #include "../game/flags_00496ce0.h"
 #include "../game/game.h"

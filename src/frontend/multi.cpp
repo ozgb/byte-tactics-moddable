@@ -273,7 +273,7 @@ char* __stdcall Translate(const char* text);
 void __stdcall SetOffscreenSurface(int a);
 void FlipScreen();
 #include "../gui/keyboard.h"
-#include "v4i.h"
+#include "../../include/v4i.h"
 #include "../graphics/display.h"
 #include "../debug/debug_lib.h"
 #include "../network/online.h"

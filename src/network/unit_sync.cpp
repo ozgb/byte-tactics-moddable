@@ -1441,11 +1441,6 @@ typedef std::vector<int> IntVector;
 typedef void (IntVector::*IntVectorInsertFn)(
     IntVector::iterator, IntVector::size_type, int const&);
 
-void __stdcall GrowIntVector(IntVector* v, int extra)
-{
-    v->reserve(extra + v->size());
-}
-
 // FUNCTION: 0x46e640 ?insert@?$vector@HV?$allocator@H@std@@@std@@QAEXPAHIABH@Z
 IntVectorInsertFn g_intVectorInsert = &IntVector::insert;
 
@@ -1453,11 +1448,6 @@ typedef std::vector<UnitSyncPacket> SyncPacketVector;
 typedef void (SyncPacketVector::*SyncPacketInsertFn)(
     SyncPacketVector::iterator, SyncPacketVector::size_type,
     const UnitSyncPacket&);
-
-void __stdcall PushSyncPacket(SyncPacketVector* v, const UnitSyncPacket& x)
-{
-    v->push_back(x);
-}
 
 // FUNCTION: 0x46eba0 ?insert@?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@QAEXPAUUnitSyncPacket@@IABU3@@Z
 SyncPacketInsertFn g_syncPacketInsert = &SyncPacketVector::insert;

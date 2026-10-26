@@ -4,6 +4,7 @@ struct ExplodedPiece;
 
 struct ExplodedPiece;
 struct Explosion;
+struct GafFrame;
 struct Object3D;
 struct PieceRec;
 struct Point16;
@@ -25,6 +26,7 @@ int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj);
 void __stdcall BreakPieceIntoDebris(ExplodedPiece* param);
 unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size);
 
+GafFrame* __stdcall BuildExplosionFrame(int size);
 void __stdcall StartExplodePiece(ExplodedPiece* piece);
 
 #endif

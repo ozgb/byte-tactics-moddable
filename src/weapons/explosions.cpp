@@ -1,4 +1,5 @@
 #include "win_types.h"
+#include <math.h>
 #include <string.h>
 #include <minmax.h>
 #include <setjmp.h>
@@ -210,6 +211,8 @@ extern int g_explosion0Duration, g_explosion0StartSize, g_explosion0EndSize, g_e
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
 #include "../graphics/gaf.h"
+#include "../graphics/gaf_frame.h"
+#include "../state/game_rand.h"
 void __stdcall InitGafSequence(GafRef* ref, GafSequence* src, int index);
 void __stdcall EmitSmoke(int* pos, int a, int b, int c);
 void __stdcall EmitWhiteSmoke(void* buf, int arg);
@@ -231,7 +234,6 @@ Vec3f __stdcall NormalizeVector(Vec3f v);
 #include "../state/sim_globals.h"
 void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int flag);
 #include "explosions.h"
-#include "explosions_420d20.h"
 
 inline Explosion* MakeExplosion(int count, int start, int end)
 {
@@ -383,6 +385,31 @@ Explosion* __stdcall BuildCalcedExplosion(int n, int from, int to)
         radius += step;
     }
     return e;
+}
+
+// FUNCTION: 0x420d20
+GafFrame* __stdcall BuildExplosionFrame(int size)
+{
+    double half = size / 2;
+    GafFrame* img = AllocFrame("ExplosionFrame", size, size);
+    img->yOffset = img->xOffset = (short)half;
+    for (int y = 0; y < size; y++) {
+        double dy = half - y;
+        double dy2 = dy * dy * 1.33;
+        for (int x = 0; x < size; x++) {
+            double dx = half - x;
+            double d = (double)(int)(GameRand(RAND_STREAM_LOAD) * (__int64)10 / 0x8000) + sqrt(dx * dx + dy2);
+            unsigned char c = 32 - (unsigned char)(int)(d / half * 32.0);
+            if (c >= 0x22)
+                img->pixelsOrLayers[y * size + x] = 0xff;
+            else if (c >= 0x20)
+                img->pixelsOrLayers[y * size + x] = 0x6e;
+            else
+                img->pixelsOrLayers[y * size + x] = c + 0x4f;
+        }
+    }
+    img->transparency = 0xff;
+    return img;
 }
 
 // FUNCTION: 0x420e50

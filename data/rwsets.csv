@@ -49993,6 +49993,9 @@ address,function,file,kind,target
 ,ScanCommandLine,src/host/win32/headless.cpp,call,_wcsnicmp
 ,ScanCommandLine,src/host/win32/headless.cpp,deref_read,*wchar_t
 ,ScanCommandLine,src/host/win32/headless.cpp,function,
+,ScenarioTable,src/harness/harness.cpp,field_read,Game::options
+,ScenarioTable,src/harness/harness.cpp,function,
+,ScenarioTable,src/harness/harness.cpp,global_read,g_game
 ,ScreenX,src/ingame/markers.cpp,field_read,View::scroll_x
 ,ScreenX,src/ingame/markers.cpp,function,
 ,ScreenY,src/ingame/markers.cpp,field_read,View::scroll_y
@@ -50252,6 +50255,7 @@ address,function,file,kind,target
 ,SetUpLoadedGame,src/harness/harness.cpp,call,Mission::LoadMissionByName
 ,SetUpLoadedGame,src/harness/harness.cpp,call,OpenHapiBank
 ,SetUpLoadedGame,src/harness/harness.cpp,call,OpenSummaryBank
+,SetUpLoadedGame,src/harness/harness.cpp,call,ScenarioTable
 ,SetUpLoadedGame,src/harness/harness.cpp,call,SetMissionType
 ,SetUpLoadedGame,src/harness/harness.cpp,call,memset
 ,SetUpLoadedGame,src/harness/harness.cpp,call,operator Mission *
@@ -50264,7 +50268,6 @@ address,function,file,kind,target
 ,SetUpLoadedGame,src/harness/harness.cpp,field_maybe_written,Game::saveName_38c6b
 ,SetUpLoadedGame,src/harness/harness.cpp,field_maybe_written,Table_0047ae60::mapName
 ,SetUpLoadedGame,src/harness/harness.cpp,field_read,Game::net
-,SetUpLoadedGame,src/harness/harness.cpp,field_read,Game::options
 ,SetUpLoadedGame,src/harness/harness.cpp,field_read,Game::pendingSaveStore
 ,SetUpLoadedGame,src/harness/harness.cpp,field_write,Game::difficulty
 ,SetUpLoadedGame,src/harness/harness.cpp,field_write,Game::flag_37ef2
@@ -50291,6 +50294,7 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,call,Mission::CountStartPositions
 ,SetUpSkirmish,src/harness/harness.cpp,call,Mission::LoadMissionByName
 ,SetUpSkirmish,src/harness/harness.cpp,call,ResetPlayerSlots
+,SetUpSkirmish,src/harness/harness.cpp,call,ScenarioTable
 ,SetUpSkirmish,src/harness/harness.cpp,call,SeedNetworkHost
 ,SetUpSkirmish,src/harness/harness.cpp,call,SeedNetworkTable
 ,SetUpSkirmish,src/harness/harness.cpp,call,SetMissionType
@@ -50303,7 +50307,6 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,field_maybe_written,PlayerSpec::side
 ,SetUpSkirmish,src/harness/harness.cpp,field_maybe_written,Table_0047ae60::mapName
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,Game::net
-,SetUpSkirmish,src/harness/harness.cpp,field_read,Game::options
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,Game::sides
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,PlayerSpec::color
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,PlayerSpec::energy

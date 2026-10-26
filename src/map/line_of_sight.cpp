@@ -197,10 +197,7 @@ int ScanDirectory(char*, char*, char*, int, int, int);
 #include "../graphics/display.h"
 #include "../game/data_files.h"
 GafFrame* __stdcall GetGafFrame(void* table, int index);
-#include "line_of_sight_482270.h"
-#include "line_of_sight_481d50.h"
 #include "radar.h"
-#include "line_of_sight_4843c0.h"
 #include "../graphics/gaf.h"
 void __stdcall DrawFrame(void* surface, void* header, int x, int y);
 void __stdcall DrawTile(void* dst, int x, int y, unsigned char* pix);
@@ -1535,6 +1532,304 @@ void __stdcall RevealNewUnit(Unit* unit)
             *p.frameIdx = i;
             AddLineOfSight(&p);
             RevealAroundUnit(&p);
+        }
+    }
+}
+
+static __inline unsigned char* ExploredCell(Player* player, int x, int y)
+{
+    return &player->explored[(unsigned int)y * (unsigned int)player->exploredWidth + (unsigned int)x];
+}
+
+// FUNCTION: 0x481d50
+void __stdcall RemoveLineOfSight(SightQuery* params)
+{
+    Player* player = params->player.get();
+    if (player->index == g_game->playerIndex) {
+        g_game->bits_14281_1.flag3 = 0;
+        g_game->bits_142f1_1.flags_142f1_mapChanged = 1;
+    }
+    int halfW = g_game->width / 2;
+    int halfH = g_game->height / 2;
+    int x = params->cacheCell[0];
+    int y = params->cacheCell[1];
+    if (g_game->bits_14281_1.flag2 == 1) {
+        Grid* grid = &g_game->grid1;
+        if ((unsigned)x >= grid->width)
+            return;
+        if ((unsigned)y >= grid->height)
+            return;
+        LosTable* table = (LosTable*)g_losTables.GetLosTable(
+            (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32) <
+                    (short)g_losTables.GetLosTableCount() - 1
+                ? (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32)
+                : (short)g_losTables.GetLosTableCount() - 1);
+        short count = table->GetLosLineCount();
+        short i = 0;
+        (*ExploredCell(player, x, y))--;
+        int ref = *params->frameIdx;
+        for (i = 0; i < count; i++) {
+            LosLine* line = (LosLine*)table->GetLosLine(i);
+            short num = line->GetLosLineStepCount();
+            int bestIdx = 0;
+            int j1;
+            int bestDiff = -1;
+            short j = 0;
+            if ((short)num > 0) {
+                j1 = 1;
+                do {
+                    int dx;
+                    int dy;
+                    line->GetLosLineStep(j, &dx, &dy);
+                    dx += x;
+                    dy += y;
+                    if ((unsigned)(short)dx >= grid->width)
+                        continue;
+                    if ((unsigned)(short)dy >= grid->height)
+                        continue;
+                    unsigned char* cell =
+                        grid->cells + ((short)dy * grid->width + (short)dx) * 2;
+                    int d1 = cell[1] - ref;
+                    int d0 = cell[0] - ref;
+                    if (d0 * bestIdx > bestDiff * j1) {
+                        (*ExploredCell(player, (short)dx, (short)dy))--;
+                        if (d1 * bestIdx > bestDiff * j1) {
+                            bestIdx = j1;
+                            bestDiff = d1;
+                        }
+                    }
+                } while (j++, j1++, (short)j < (short)num);
+            }
+        }
+    } else {
+        int ref = *params->frameIdx;
+        GafFrame* frame = GetGafFrame(g_game->losTable, ref);
+        int limitX;
+        if (x + frame->width >= halfW)
+            limitX = halfW - x;
+        else
+            limitX = frame->width;
+        int limitY;
+        if (y + frame->height >= halfH)
+            limitY = halfH - y;
+        else
+            limitY = frame->height;
+        int nx = x < 0 ? -x : 0;
+        int ny = y < 0 ? -y : 0;
+        if (ny >= limitY)
+            return;
+        if (nx >= limitX)
+            return;
+        for (int i = ny; i < limitY; i++) {
+            unsigned char* dst = player->explored + ((unsigned int)(y + i) * (unsigned int)player->exploredWidth + nx + x);
+            unsigned char* src = frame->pixelsOrLayers + i * frame->width + nx;
+            for (int j = nx; j < limitX; j++) {
+                if (*src != frame->transparency)
+                    (*dst)--;
+                dst++;
+                src++;
+            }
+        }
+    }
+}
+
+// FUNCTION: 0x482270
+void __stdcall AddLineOfSight(SightQuery* params)
+{
+    Player* player = params->player.get();
+    if (player->index == g_game->playerIndex) {
+        g_game->bits_14281_1.flag3 = 0;
+        g_game->bits_142f1_2.flagA = 1;
+    }
+    int halfW = g_game->width / 2;
+    int halfH = g_game->height / 2;
+    int x = params->cacheCell[0];
+    int y = params->cacheCell[1];
+    if (g_game->bits_14281_1.flag2 == 1) {
+        Grid* grid = &g_game->grid1;
+        if ((unsigned)x >= grid->width)
+            return;
+        if ((unsigned)y >= grid->height)
+            return;
+        LosTable* table = (LosTable*)g_losTables.GetLosTable(
+            (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32) <
+                    (short)g_losTables.GetLosTableCount() - 1
+                ? (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32)
+                : (short)g_losTables.GetLosTableCount() - 1);
+        short count = table->GetLosLineCount();
+        short i = 0;
+        (*ExploredCell(player, x, y))++;
+        int ref = *params->frameIdx;
+        for (i = 0; i < count; i++) {
+            LosLine* line = (LosLine*)table->GetLosLine(i);
+            short num = line->GetLosLineStepCount();
+            int bestIdx = 0;
+            int j1;
+            int bestDiff = -1;
+            short j = 0;
+            if ((short)num > 0) {
+                j1 = 1;
+                do {
+                    int dx;
+                    int dy;
+                    line->GetLosLineStep(j, &dx, &dy);
+                    dx += x;
+                    dy += y;
+                    if ((unsigned)(short)dx >= grid->width)
+                        continue;
+                    if ((unsigned)(short)dy >= grid->height)
+                        continue;
+                    unsigned char* cell =
+                        grid->cells + ((short)dy * grid->width + (short)dx) * 2;
+                    int d1 = cell[1] - ref;
+                    int d0 = cell[0] - ref;
+                    if (d0 * bestIdx > bestDiff * j1) {
+                        (*ExploredCell(player, (short)dx, (short)dy))++;
+                        if (d1 * bestIdx > bestDiff * j1) {
+                            bestIdx = j1;
+                            bestDiff = d1;
+                        }
+                    }
+                } while (j++, j1++, (short)j < (short)num);
+            }
+        }
+    } else {
+        int ref = *params->frameIdx;
+        GafFrame* frame = GetGafFrame(g_game->losTable, ref);
+        int limitX;
+        if (x + frame->width >= halfW)
+            limitX = halfW - x;
+        else
+            limitX = frame->width;
+        int limitY;
+        if (y + frame->height >= halfH)
+            limitY = halfH - y;
+        else
+            limitY = frame->height;
+        int nx = x < 0 ? -x : 0;
+        int ny = y < 0 ? -y : 0;
+        if (ny >= limitY)
+            return;
+        if (nx >= limitX)
+            return;
+        for (int i = ny; i < limitY; i++) {
+            unsigned char* dst = player->explored + ((unsigned int)(y + i) * (unsigned int)player->exploredWidth + nx + x);
+            unsigned char* src = frame->pixelsOrLayers + i * frame->width + nx;
+            for (int j = nx; j < limitX; j++) {
+                if (*src != frame->transparency)
+                    (*dst)++;
+                dst++;
+                src++;
+            }
+        }
+    }
+}
+
+
+// FUNCTION: 0x4843c0
+void BuildFogTiles(void)
+{
+    MapInfo* info = &g_game->info_141fb;
+    MapFogGrid* grid = (MapFogGrid*)info->grid;
+    PlayerGrid* pg = &g_game->players_1bdf[g_game->playerIndex];
+    unsigned int bit = 1 << g_game->playerIndex;
+
+    memset(grid->cells, 0, grid->count * 2);
+
+    int y0 = g_game->scrollY;
+    int ry = y0 % 32;
+    int x0 = g_game->scrollX;
+    int rx = x0 % 32;
+    if (rx < 16) x0 = x0 / 32 - 1; else x0 = x0 / 32;
+    if (ry < 16) y0 = y0 / 32 - 1; else y0 = y0 / 32;
+
+    int xEnd = x0 + grid->width;
+    int yEnd = y0 + grid->height;
+
+    for (int y = y0; y < yEnd; y++) {
+        for (int x = x0; x < xEnd; x++) {
+            if (x < pg->width && y < pg->height) {
+                if (pg->cells[y * pg->width + x] == 0 && ((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2)) {
+                    if (x - x0 < grid->width && y - y0 < grid->height)
+                        grid->cells[(y - y0) * grid->width + x - x0].hi |= 1;
+                    if (x - x0 - 1 < grid->width && y - y0 < grid->height)
+                        grid->cells[(y - y0) * grid->width + x - x0 - 1].hi |= 2;
+                    if (x - x0 < grid->width && y - y0 - 1 < grid->height)
+                        grid->cells[(y - y0 - 1) * grid->width + x - x0].hi |= 4;
+                    if (x - x0 - 1 < grid->width && y - y0 - 1 < grid->height)
+                        grid->cells[(y - y0 - 1) * grid->width + x - x0 - 1].hi |= 8;
+                }
+                if ((unsigned short)(bit & info->visibilityMask[info->width * y / 2 + x]) == 0) {
+                    if (x - x0 < grid->width && y - y0 < grid->height)
+                        grid->cells[(y - y0) * grid->width + x - x0].lo |= 1;
+                    if (x - x0 - 1 < grid->width && y - y0 < grid->height)
+                        grid->cells[(y - y0) * grid->width + x - x0 - 1].lo |= 2;
+                    if (x - x0 < grid->width && y - y0 - 1 < grid->height)
+                        grid->cells[(y - y0 - 1) * grid->width + x - x0].lo |= 4;
+                    if (x - x0 - 1 < grid->width && y - y0 - 1 < grid->height)
+                        grid->cells[(y - y0 - 1) * grid->width + x - x0 - 1].lo |= 8;
+                }
+            }
+        }
+    }
+
+    if (y0 < 0) {
+        for (unsigned int i = 0; i < grid->width; i++) {
+            if ((*(Flags_14281*)&g_game->mapFlags_14281).bit1) {
+                if (grid->cells[i].hi & 4) grid->cells[i].hi |= 1;
+                if (grid->cells[i].hi & 8) grid->cells[i].hi |= 2;
+            }
+            if (grid->cells[i].lo & 4) grid->cells[i].lo |= 1;
+            if (grid->cells[i].lo & 8) grid->cells[i].lo |= 2;
+        }
+    }
+
+    if (yEnd > info->height / 2) {
+        for (unsigned int i = 0; i < grid->width; i++) {
+            if ((*(Flags_14281*)&g_game->mapFlags_14281).bit1) {
+                if (grid->cells[(grid->height - 2) * grid->width + i].hi & 1)
+                    grid->cells[(grid->height - 2) * grid->width + i].hi |= 4;
+                if (grid->cells[(grid->height - 2) * grid->width + i].hi & 2)
+                    grid->cells[(grid->height - 2) * grid->width + i].hi |= 8;
+            }
+            if (grid->cells[(grid->height - 2) * grid->width + i].lo & 1)
+                grid->cells[(grid->height - 2) * grid->width + i].lo |= 4;
+            if (grid->cells[(grid->height - 2) * grid->width + i].lo & 2)
+                grid->cells[(grid->height - 2) * grid->width + i].lo |= 8;
+        }
+    }
+
+    if (x0 < 0) {
+        for (unsigned int i = 0; i < grid->height; i++) {
+            if ((*(Flags_14281*)&g_game->mapFlags_14281).bit1) {
+                if (grid->cells[i * grid->width].hi & 8)
+                    grid->cells[i * grid->width].hi |= 4;
+                if (grid->cells[i * grid->width].hi & 2)
+                    grid->cells[i * grid->width].hi |= 1;
+            }
+            if (grid->cells[i * grid->width].lo & 8)
+                grid->cells[i * grid->width].lo |= 4;
+            if (grid->cells[i * grid->width].lo & 2)
+                grid->cells[i * grid->width].lo |= 1;
+        }
+    }
+
+    if (xEnd > info->width / 2) {
+        if (grid->height > 0) {
+            unsigned int i = 1;
+            do {
+                if ((*(Flags_14281*)&g_game->mapFlags_14281).bit1) {
+                    if (grid->cells[i * grid->width - 2].hi & 4)
+                        grid->cells[i * grid->width - 2].hi |= 8;
+                    if (grid->cells[i * grid->width - 2].hi & 1)
+                        grid->cells[i * grid->width - 2].hi |= 2;
+                }
+                if (grid->cells[i * grid->width - 2].lo & 4)
+                    grid->cells[i * grid->width - 2].lo |= 8;
+                if (grid->cells[i * grid->width - 2].lo & 1)
+                    grid->cells[i * grid->width - 2].lo |= 2;
+                i++;
+            } while (i - 1 < grid->height);
         }
     }
 }

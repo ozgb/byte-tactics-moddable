@@ -33,5 +33,8 @@ void __stdcall AddEyeball(Vec3* src, int a, int b, int c);
 void __stdcall RevealNewUnit(Unit* unit);
 
 Cell* __stdcall GetMapCell(int x, int y);
+void __stdcall AddLineOfSight(SightQuery* params);
+void __stdcall RemoveLineOfSight(SightQuery* params);
+void __stdcall BuildFogTiles(void);
 
 #endif

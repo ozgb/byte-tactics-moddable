@@ -632,25 +632,6 @@ static inline void AddFront(Unit* owner, Order* node)
     }
 }
 
-static inline void AddMarked(Unit* owner, Order* node)
-{
-    Ref<Order>* link = &owner->list;
-    node->unit = owner;
-    node->flags_42 |= 0x1000;
-    for (Order* n = *link; n != 0; n = n->next) {
-        if (n->flags_42 & 0x1000) {
-            n->flags_42 &= ~0x1000;
-            node->unit = owner;
-            node->next = n->next;
-            n->next = node;
-            return;
-        }
-        link = &n->next;
-    }
-    node->next = 0;
-    *link = node;
-}
-
 // FUNCTION: 0x43adc0
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id,
                             Vec3* pos, int param_6, int param_7)
@@ -670,7 +651,7 @@ void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id,
     if (obj->flags_42 & 0x40020)
         AddFront(owner, obj);
     else
-        AddMarked(owner, obj);
+        InsertOrderAfterMarked(owner, obj);
 }
 
 #pragma pack(push, 1)

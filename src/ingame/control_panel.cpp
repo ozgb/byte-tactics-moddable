@@ -379,12 +379,6 @@ void __stdcall SetOrderIntent(unsigned char mode)
     g_game->inputFlags_2cc6.value = g_game->inputFlags_2cc6.value & 0xf7;
 }
 
-static inline void SetOrderMode(unsigned char mode)
-{
-    g_game->orderMode = mode;
-    g_game->inputFlags_2cc6.value = g_game->inputFlags_2cc6.value & 0xf7;
-}
-
 // FUNCTION: 0x419be0
 int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
 {
@@ -396,16 +390,16 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "MOVE")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(2);
+            SetOrderIntent(2);
         }
         PlaySoundByName("immediateorders", 0);
         return 1;
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "STOP")) {
-        SetOrderMode(1);
+        SetOrderIntent(1);
         IssueOrderToSelection(orders, 0, "STOP", 0, 0, 0);
         PlaySoundByName("immediateorders", 0);
         return 1;
@@ -413,9 +407,9 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "ATTACK")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(3);
+            SetOrderIntent(3);
         }
         PlaySoundByName("immediateorders", 0);
         return 1;
@@ -423,9 +417,9 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "BLAST")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(4);
+            SetOrderIntent(4);
         }
         PlaySoundByName("immediateorders", 0);
         return 1;
@@ -433,9 +427,9 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "DEFEND")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(7);
+            SetOrderIntent(7);
         }
         PlaySoundByName("immediateorders", 0);
         return 1;
@@ -443,9 +437,9 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "REPAIR")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(8);
+            SetOrderIntent(8);
         }
         PlaySoundByName("specialorders", 0);
         return 1;
@@ -453,9 +447,9 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "PATROL")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(9);
+            SetOrderIntent(9);
         }
         PlaySoundByName("immediateorders", 0);
         return 1;
@@ -463,9 +457,9 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "RECLAIM")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(0xc);
+            SetOrderIntent(0xc);
         }
         PlaySoundByName("specialorders", 0);
         return 1;
@@ -473,9 +467,9 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "CAPTURE")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(0xd);
+            SetOrderIntent(0xd);
         }
         PlaySoundByName("specialorders", 0);
         return 1;
@@ -483,9 +477,9 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "UNLOAD")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(5);
+            SetOrderIntent(5);
         }
         PlaySoundByName("specialorders", 0);
         return 1;
@@ -493,9 +487,9 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "LOAD")) {
         if (e->status == 0) {
-            SetOrderMode(1);
+            SetOrderIntent(1);
         } else {
-            SetOrderMode(6);
+            SetOrderIntent(6);
         }
         PlaySoundByName("immediateorders", 0);
         return 1;
@@ -629,13 +623,6 @@ void __stdcall RefreshOrderButtons(Unit* unit)
     }
 }
 
-static inline int Contains(Gadget* entries, char* text, int index)
-{
-    char name[32];
-    GetGadgetName(entries, name, index);
-    return strstr(name, text) != 0;
-}
-
 // FUNCTION: 0x41a490
 int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
 {
@@ -643,7 +630,7 @@ int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
     void* orders = g_game->orders;
     int index = menu->hotGadgetIndex;
 
-    if (Contains(entries, "MOVEORD", index)) {
+    if (MenuEntryNameContains(entries, "MOVEORD", index)) {
         switch (g_game->ordersPanelFlags_37ebe_6.bits.moveOrder) {
         case 0:
             IssueOrderToSelection(orders, 0, "STANDING_MOVEORDER", 0, 1, 0);
@@ -661,7 +648,7 @@ int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
         }
         PlaySoundByName("setmoveorders", 0);
         SetGadgetStatus(&g_game->gui, index, g_game->ordersPanelFlags_37ebe_6.bits.moveOrder);
-    } else if (Contains(entries, "FIREORD", index)) {
+    } else if (MenuEntryNameContains(entries, "FIREORD", index)) {
         switch (g_game->ordersPanelFlags_37ebe_6.bits.fireOrder) {
         case 0:
             IssueOrderToSelection(orders, 0, "STANDING_FIREORDER", 0, 1, 0);
@@ -679,7 +666,7 @@ int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
         }
         PlaySoundByName("setfireorders", 0);
         SetGadgetStatus(&g_game->gui, index, g_game->ordersPanelFlags_37ebe_6.bits.fireOrder);
-    } else if (Contains(entries, "STATUS", index) || Contains(entries, "ONOFF", index)) {
+    } else if (MenuEntryNameContains(entries, "STATUS", index) || MenuEntryNameContains(entries, "ONOFF", index)) {
         switch (g_game->ordersPanelFlags_37ebe_6.bits.onOff) {
         case 0:
             IssueOrderToSelection(orders, 0, "ACTIVATE", 0, 0, 0);
@@ -696,7 +683,7 @@ int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
         }
         PlaySoundByName("specialorders", 0);
         SetGadgetStatus(&g_game->gui, index, g_game->ordersPanelFlags_37ebe_6.bits.onOff);
-    } else if (Contains(entries, "CLOAK", index)) {
+    } else if (MenuEntryNameContains(entries, "CLOAK", index)) {
         if (g_game->ordersPanelFlags_37ebe_6.bits.cloak) {
             IssueOrderToSelection(orders, 0, "CLOAK_OFF", 0, 0, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.cloak = 0;
@@ -794,17 +781,6 @@ void __stdcall DisableUnavailableBuildMenuEntries(Gui* obj)
     }
 }
 
-static inline void SetPrevNext(Unit* unit)
-{
-    char buf[256];
-    if (((UnitType*)unit->def.get())->buildMenuPageCount < 2) {
-        sprintf(buf, "%sPREV", g_game->sideNames_37f5b[unit->player->info->side].name);
-        SetGadgetActiveByName(&g_game->gui, buf, 0);
-        sprintf(buf, "%sNEXT", g_game->sideNames_37f5b[unit->player->info->side].name);
-        SetGadgetActiveByName(&g_game->gui, buf, 0);
-    }
-}
-
 static inline void UpdateCounts(Gui* menu)
 {
     Gadget* entry = menu->layer->entries;
@@ -856,7 +832,7 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
                 RenderLayer(&g_game->gui, 2);
                 RenderLayer(&g_game->gui, 1);
             }
-            SetPrevNext(unit);
+            SetPrevNextGadgetNames(unit);
             RefreshOrderButtons(unit);
             RefreshBuildCountTexts(&g_game->gui, unit);
             if (unit->flags & 0x20000000) {
@@ -1327,17 +1303,6 @@ void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit)
     }
 }
 
-static Unit* GetSelectedUnit()
-{
-    unsigned short index = g_game->unitIndex;
-    if (index) {
-        Unit* unit = &g_game->units[index];
-        if (unit->unitDefIndex)
-            return unit;
-    }
-    return 0;
-}
-
 // FUNCTION: 0x41c180
 void DispatchOrdersPanelPageFlags()
 {
@@ -1353,7 +1318,7 @@ void DispatchOrdersPanelPageFlags()
     }
     if (g_game->ordersPanelFlags_37ebe_6.bits.build) {
         g_game->ordersPanelFlags_37ebe_6.bits.build = 0;
-        Unit* unit = GetSelectedUnit();
+        Unit* unit = GetBuildMenuFocusUnit();
         if (unit) {
             unit->flags |= 0x400000;
             g_game->ordersPanelFlags_37ebe_6.bits.flag_4 = 1;
@@ -1362,7 +1327,7 @@ void DispatchOrdersPanelPageFlags()
     }
     if (g_game->ordersPanelFlags_37ebe_6.bits.orders) {
         g_game->ordersPanelFlags_37ebe_6.bits.orders = 0;
-        Unit* unit = GetSelectedUnit();
+        Unit* unit = GetBuildMenuFocusUnit();
         if (unit) {
             unit->flags &= ~0x400000;
             g_game->ordersPanelFlags_37ebe_6.bits.flag_4 = 1;
@@ -1604,22 +1569,6 @@ static inline void SetTarget(int x, int y)
     g_game->y2 = y;
 }
 
-static inline void ClampTarget()
-{
-    int maxX = g_game->mapWidth - g_game->viewWidth;
-    int maxY = g_game->mapHeight - g_game->viewHeight;
-    if (g_game->x2 < 0) {
-        g_game->x2 = 0;
-    } else if (g_game->x2 > maxX) {
-        g_game->x2 = maxX;
-    }
-    if (g_game->y2 < 0) {
-        g_game->y2 = 0;
-    } else if (g_game->y2 > maxY) {
-        g_game->y2 = maxY;
-    }
-}
-
 static inline int Approach(int cur, int target)
 {
     int d = cur - target;
@@ -1654,7 +1603,7 @@ void UpdateCameraFollow()
     if (p != 0) {
         SetTarget((short)(p->x >> 16) - g_game->viewWidth / 2,
                   (short)((p->z - (p->y >> 1)) >> 16) - g_game->viewHeight / 2);
-        ClampTarget();
+        ClampCameraTarget();
         g_game->mapFlags &= 0xfff7;
     }
     if (g_game->scrollX != g_game->x2) {

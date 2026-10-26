@@ -101,29 +101,11 @@ void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int m
     }
 }
 
-static inline int WidthTextCast(Font* font, unsigned char* text)
-{
-    int width = 0;
-    if (text && font) {
-        for (; *text && *text != '\n'; text++) {
-            unsigned char c = *text;
-            if (c >= font->first) {
-                int d = c - font->first;
-                unsigned int off = 0;
-                off = font->offsets[(unsigned short)d];
-                if (off)
-                    width += ((unsigned char*)font)[off];
-            }
-        }
-    }
-    return width;
-}
-
 // FUNCTION: 0x4c1760
 void __stdcall DrawStringCentered(Surface* dst, unsigned char* text, int flag)
 {
     char* single = (char*)GetDisplay();
-    int width = WidthTextCast(*(Font**)(single + 0x204), text);
+    int width = GetTextWidth(*(Font**)(single + 0x204), text);
     if (dst == 0) {
         Surface r;
         if (LockScreen(&r) != 0) {

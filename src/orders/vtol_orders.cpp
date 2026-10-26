@@ -25,14 +25,6 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest,
 
 #include "../util/vec3.h"
 
-static inline Vec3 PosPlus(const Vec3& a, const Vec3& b)
-{
-    Vec3 r;
-    r.x = a.x + b.x;
-    r.y = a.y + b.y;
-    r.z = a.z + b.z;
-    return r;
-}
 static inline Vec3 PosMinus(const Vec3& a, const Vec3& b)
 {
     Vec3 r;
@@ -179,24 +171,6 @@ static inline Vec3 Offset(short angle, int distance)
     return v;
 }
 
-static inline Vec3 AddVectors(const Vec3& a, const Vec3& b)
-{
-    Vec3 r;
-    r.x = a.x + b.x;
-    r.y = a.y + b.y;
-    r.z = a.z + b.z;
-    return r;
-}
-
-static inline Vec3 Add(const Vec3& a, const Vec3& b)
-{
-    Vec3 r;
-    r.x = a.x + b.x;
-    r.y = a.y + b.y;
-    r.z = a.z + b.z;
-    return r;
-}
-
 static inline Vec3 AddComponentwise(const Vec3& a, const Vec3& b)
 {
     Vec3 r;
@@ -278,8 +252,8 @@ int __stdcall VtolEvadeOrder(Unit* unit,Order* order,int flags)
         if (unit->motion && (unit->def->flags1&0x800)) {
             order->side=RandomInt(2);
             Vec3 pos;
-        if (order->side) pos=PosPlus(unit->pos,Offset(unit->heading-0x4000,range<<16));
-        else pos=PosPlus(unit->pos,Offset(unit->heading+0x4000,range<<16));
+        if (order->side) pos=AddVec3(unit->pos,Offset(unit->heading-0x4000,range<<16));
+        else pos=AddVec3(unit->pos,Offset(unit->heading+0x4000,range<<16));
             Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,pos);
             ((Class_0044e730*)move)->SetApproachRadius(128);
             order->SetAttachedFx(move);
@@ -289,8 +263,8 @@ int __stdcall VtolEvadeOrder(Unit* unit,Order* order,int flags)
         goto invalid;
     case 1: {
         Vec3 pos;
-        if (order->side) pos=PosPlus(unit->pos,Offset(unit->heading-0x4000,range<<17));
-        else pos=PosPlus(unit->pos,Offset(unit->heading+0x4000,range<<17));
+        if (order->side) pos=AddVec3(unit->pos,Offset(unit->heading-0x4000,range<<17));
+        else pos=AddVec3(unit->pos,Offset(unit->heading+0x4000,range<<17));
         Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,pos);
         ((Class_0044e730*)move)->SetApproachRadius(128);
         order->SetAttachedFx(move);
@@ -545,7 +519,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
         return 3;
     }
     if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x4000;
-    Vec3 pos=Add(order->pos,Offset((short)order->angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
+    Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
     Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,pos);
     ((Class_0044e730*)move)->SetApproachRadius(128);
     order->SetAttachedFx(move);
@@ -716,8 +690,8 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
             Vec3 start;
             g_seams.units->GetNanoPiecePosition(unit,&start);
             Vec3 bounds[2];
-            bounds[0]=PosPlus(order->target->pos,*(Vec3*)&order->target->def->modelMinX);
-            bounds[1]=PosPlus(order->target->pos,*(Vec3*)&order->target->def->modelMaxX);
+            bounds[0]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMinX);
+            bounds[1]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMaxX);
             EmitNanoParticles(&start,(Box*)bounds,6);
         }
         if (order->target->buildLeft!=0.0f) {
@@ -1171,8 +1145,8 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             short angle=order->angle;
             Vec3 pos;
             if ((unsigned char)(unit->flags>>31)&1)
-                pos=PosPlus(order->target->pos,Offset(angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
-            else pos=PosPlus(order->target->pos,Offset(angle,0x1400000));
+                pos=AddVec3(order->target->pos,Offset(angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
+            else pos=AddVec3(order->target->pos,Offset(angle,0x1400000));
             Class_0044e2d0* move=new (kSim) Class_0044e2d0(order,pos);
             move->SetApproachRadius(128);
             order->SetAttachedFx(move);
@@ -1315,7 +1289,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             order->state = 2;
             return 2;
         }
-        Vec3 dest = Add(order->target->pos, Offset(order->angle, radius << 16));
+        Vec3 dest = AddVec3(order->target->pos, Offset(order->angle, radius << 16));
         order->angle += 0x4000;
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, dest);
         obj->SetApproachRadius(0x80);
@@ -1448,7 +1422,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         up = &unit->pos;
         if ((int)_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z) < 0x1e00000) {
             int angle = GetHeadingBetween(up, op);
-            Vec3 dest = PosPlus(unit->pos, Offset(angle, 0x8c00000));
+            Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x8c00000));
             AttachMove(order, dest, 0x3c0);
             order->flags |= 0xe2;
             return 1;
@@ -1463,7 +1437,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         int dist = (int)_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z);
         int angle = GetHeadingBetween(up2, op2);
         int radius = dist / 2;
-        Vec3 dest = PosPlus(unit->pos, Offset(RandomInt(0x4000) + angle - 0x2000, radius));
+        Vec3 dest = AddVec3(unit->pos, Offset(RandomInt(0x4000) + angle - 0x2000, radius));
         AttachMove(order, dest, 0x1e0);
         order->flags = 0x100e8;
         return 1;
@@ -1496,14 +1470,14 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
         g_seams.targeting->SetWeaponTargetPos(unit, &order->pos, 0);
         int angle = GetHeadingBetween(&unit->pos, &order->pos);
-        Vec3 dest = PosPlus(unit->pos, Offset(angle, (unit->def->attackrunlength + 0x3c0) << 16));
+        Vec3 dest = AddVec3(unit->pos, Offset(angle, (unit->def->attackrunlength + 0x3c0) << 16));
         AttachMove(order, dest, 0x3c0);
         order->flags = 0xe2;
         return 1;
     }
     case 6: {
         g_seams.targeting->ClearWeaponTarget(unit, 0);
-        Vec3 dest = PosPlus(unit->pos, Offset(unit->heading, 0x5a00000));
+        Vec3 dest = AddVec3(unit->pos, Offset(unit->heading, 0x5a00000));
         AttachMove(order, dest, 0x80);
         order->flags = 0xe2;
         if (unit->health < unit->def->maxHealth / 4 * 3) {
@@ -1593,7 +1567,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         int dist = (int)_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z);
         int angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
-        Vec3 p = PosPlus(unit->pos, off);
+        Vec3 p = AddVec3(unit->pos, off);
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, p);
         ((Class_0044e730*)obj)->SetApproachRadius(0x80);
         order->SetAttachedFx(obj);
@@ -1615,7 +1589,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
     case 3: {
         short angle = AngleOfVector(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
         Vec3 off = Offset(angle, speed * 0x30000);
-        Vec3 p = PosPlus(order->pos, off);
+        Vec3 p = AddVec3(order->pos, off);
         Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, p);
         ((Class_0044e730*)obj)->SetApproachRadius(RandomInt(0x80) + 0x80);
         order->SetAttachedFx(obj);
@@ -1729,8 +1703,8 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
             Vec3 start;
             g_seams.units->GetNanoPiecePosition(unit,&start);
             Vec3 bounds[2];
-            bounds[0]=PosPlus(order->target->pos,*(Vec3*)&order->target->def->modelMinX);
-            bounds[1]=PosPlus(order->target->pos,*(Vec3*)&order->target->def->modelMaxX);
+            bounds[0]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMinX);
+            bounds[1]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMaxX);
             EmitNanoParticles(&start,bounds,6);
         }
         if (order->target->buildLeft!=0.0f) {
@@ -2051,7 +2025,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
         g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
         if (flags & 0xe0) {
             if (IsAhead(unit, order)) {
-                Vec3 from = Add(unit->pos, Offset(unit->heading, unit->def->maxvelocity * 30));
+                Vec3 from = AddVec3(unit->pos, Offset(unit->heading, unit->def->maxvelocity * 30));
                 Vec3 to = Offset(unit->heading, unit->def->maxvelocity);
                 AirManeuverOrder* obj = new (kSim) AirManeuverOrder(order, from, to);
                 obj->SetAltitude(unit->def->altitude);

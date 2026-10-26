@@ -386,15 +386,6 @@ void __stdcall RefreshAllPassMaps(Point16 a, Point16 b)
     }
 }
 
-static inline void UpdateAll(Point16 a, Point16 b)
-{
-    for (int i = 0; i < 32; i++) {
-        if (g_movementClasses.entries[i].name != 0) {
-            ((MovementClass*)&g_movementClasses.entries[i])->RefreshPassMap(a, b);
-        }
-    }
-}
-
 // FUNCTION: 0x440a70
 void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
 {
@@ -408,7 +399,7 @@ void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
         }
         return;
     }
-    UpdateAll(p->a, p->b);
+    RefreshAllPassMaps(p->a, p->b);
 }
 
 // FUNCTION: 0x440af0

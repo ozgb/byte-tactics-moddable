@@ -331,9 +331,6 @@ src/network/net_game.cpp,src/sound/sound.h,#392
 src/network/packets.cpp,interfaces/host.h,#392
 src/orders/order_list.cpp,src/ingame/markers.h,#392
 src/orders/order_queue.cpp,src/sound/sound.h,#392
-src/orders/unit_orders.cpp,src/ingame/control_panel.h,#392
-src/orders/unit_orders.cpp,src/ingame/markers.h,#392
-src/orders/unit_orders.cpp,src/sound/sound.h,#392
 src/sound/cd_audio.cpp,interfaces/host.h,#392
 src/sound/cd_audio.cpp,src/graphics/display.h,#392
 src/sound/cd_audio.cpp,src/sound/cd_audio.h,#392

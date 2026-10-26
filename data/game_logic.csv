@@ -7,9 +7,6 @@ address,function,file
 0x401260,UnitResources::SpendMetal,src/game/economy.cpp
 0x4012a0,UnitResources::SpendEnergyAndMetal,src/game/economy.cpp
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp
-0x406c00,PAUUnit::?$vector::_Destroy,src/orders/unit_orders.cpp
-0x406c10,PAUUnit::?$vector::_Ucopy,src/orders/unit_orders.cpp
-0x406c40,PAUUnit::?$vector::_Ufill,src/orders/unit_orders.cpp
 0x406da0,EnableAICommands,src/ai/ai_player.cpp
 0x406ee0,IsCountBelowAiLimit,src/ai/ai_player.cpp
 0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp
@@ -73,8 +70,6 @@ address,function,file
 0x40c9f0,PAUUnit::?$vector::erase,src/ai/ai_player.cpp
 0x40ca30,UElem_0040cc40::?$vector::capacity,src/ai/ai_player.cpp
 0x40ca50,UElem_0040cc40::?$vector::insert,src/ai/ai_player.cpp
-0x40cc30,UElem_0040cc40::?$vector::_Destroy,src/ai/ai_player.cpp
-0x40cc40,UElem_0040cc40::?$vector::_Ucopy,src/ai/ai_player.cpp
 0x40cc80,UElem_0040cfb0::?$vector::size,src/ai/ai_player.cpp
 0x40cca0,UElem_0040cfb0::?$vector::insert,src/ai/ai_player.cpp
 0x40cfb0,UElem_0040cfb0::?$vector::erase,src/ai/ai_player.cpp
@@ -83,14 +78,7 @@ address,function,file
 0x40d240,std::F::FV?$allocator::?$vector::erase,src/ai/ai_player.cpp
 0x40d290,std::E::EV?$allocator::?$vector::insert,src/ai/ai_player.cpp
 0x40d470,std::E::EV?$allocator::?$vector::erase,src/ai/ai_player.cpp
-0x40d4b0,UElem_0040d4f0::?$vector::_Destroy,src/ai/ai_player.cpp
 0x40d4c0,UElem_0040d550::?$vector::size,src/ai/ai_player.cpp
-0x40d4e0,UElem_0040d550::?$vector::_Destroy,src/ai/ai_player.cpp
-0x40d4f0,UElem_0040d4f0::?$vector::_Ucopy,src/ai/ai_player.cpp
-0x40d520,UElem_0040d4f0::?$vector::_Ufill,src/ai/ai_player.cpp
-0x40d550,UElem_0040d550::?$vector::_Ucopy,src/ai/ai_player.cpp
-0x40d580,UElem_0040d550::?$vector::_Ufill,src/ai/ai_player.cpp
-0x40d5b0,UElem_0040cc40::?$vector::_Ufill,src/ai/ai_player.cpp
 0x40d5e0,CopyDwordPair,src/ai/pathfind.cpp
 0x40d600,CopyOneByte,src/ai/pathfind.cpp
 0x40d620,MakeHeap,src/ai/pathfind.cpp
@@ -263,11 +251,9 @@ address,function,file
 0x424840,RemoveAllFeatures,src/map/features.cpp
 0x424890,SaveFeatures,src/map/features.cpp
 0x424c00,LoadFeatures,src/map/features.cpp
-0x4251e0,PAVTdfFile::?$vector::_Destroy,src/map/features.cpp
 0x4251f0,std::G::GV?$allocator::?$vector::size,src/map/features.cpp
 0x425210,std::G::GV?$allocator::?$vector::insert,src/map/features.cpp
 0x425430,std::G::GV?$allocator::?$vector::erase,src/map/features.cpp
-0x425470,std::G::GV?$allocator::?$vector::_Destroy,src/map/features.cpp
 0x425480,PAVTdfFile::?$vector::insert,src/map/features.cpp
 0x4256a0,std::copy,src/map/features.cpp
 0x4288d0,LoadPictureCached,src/frontend/frontend.cpp
@@ -294,7 +280,6 @@ address,function,file
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp
 0x432c20,StringRef::FUN_00432c20,src/map/los_tables.cpp
-0x432c40,UEntry_00432cf0::?$vector::_Ucopy,src/map/los_tables.cpp
 0x432c80,AssignRange,src/map/los_tables.cpp
 0x432cb0,AssignRangeBack,src/map/los_tables.cpp
 0x432cf0,UEntry_00432cf0::?$allocator::construct,src/map/los_tables.cpp
@@ -317,10 +302,8 @@ address,function,file
 0x433b00,UElem_00434360::?$vector::size,src/map/los_tables.cpp
 0x433b20,UElem_00434020::?$vector::insert,src/map/los_tables.cpp
 0x433d50,UElem_00434020::?$vector::erase,src/map/los_tables.cpp
-0x433d90,UElem_00434020::?$vector::_Destroy,src/map/los_tables.cpp
 0x433db0,UElem_00434360::?$vector::insert,src/map/los_tables.cpp
 0x434020,UElem_00434360::?$vector::erase,src/map/los_tables.cpp
-0x4340b0,UElem_00434360::?$vector::_Destroy,src/map/los_tables.cpp
 0x4340f0,UElem_00434360::V?$vector::?$vector::insert,src/map/los_tables.cpp
 0x434360,UElem_00434360::V?$vector::?$vector::erase,src/map/los_tables.cpp
 0x434430,DestroyPoint,src/map/los_tables.cpp
@@ -330,7 +313,6 @@ address,function,file
 0x4345c0,StoreDwordIfDst,src/map/los_tables.cpp
 0x4345e0,??4?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@QAEAAV01@ABV01@@Z,src/map/los_tables.cpp
 0x434770,??4?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAEAAV01@ABV01@@Z,src/map/los_tables.cpp
-0x4349c0,UElem_00434020::?$vector::_Ucopy,src/map/los_tables.cpp
 0x4349f0,??_GElem_00434360@@QAEPAXI@Z,src/map/los_tables.cpp
 0x435100,Mission::GetGameType,src/map/map_list.cpp
 0x4352b0,Mission::GetCampaignName,src/map/map_list.cpp

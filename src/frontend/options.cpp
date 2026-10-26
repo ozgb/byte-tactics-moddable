@@ -621,20 +621,6 @@ void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_45ffb0* dst, Quad_45f
 #include "frontend.h"
 #include "../game/settings.h"
 
-static inline int SliderValue(Gadget* e)
-{
-    if (e->range <= 1)
-        return 0;
-    return (int)((float)e->knobPos / (e->range - 1) * e->max);
-}
-
-static inline void ApplySound()
-{
-    SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-    ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
-    ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
-}
-
 // FUNCTION: 0x45b800
 void __stdcall SetDirectConnectAddress(char* param_1)
 {
@@ -764,7 +750,7 @@ void __stdcall HandleVideoModeSlider(Menu_0045b800* obj, int unused)
     Gadget* e = FindGadgetChecked_D(obj->holder->entries, "VIDSLDR");
     ModeList_0045b800* list = e->list;
     if (e != 0) {
-        Mode_0045b800* r = &list->modes[SliderValue(e)];
+        Mode_0045b800* r = &list->modes[ReadSliderValue(e)];
         sprintf(FindGadgetChecked_C(obj->holder->entries, "VIDVAL") + 0xb6, "%d X %d", r->width, r->height);
         g_game->width_37f1b = r->width;
         g_game->height_37f1f = r->height;
@@ -785,8 +771,8 @@ void __stdcall HandleGammaSlider(Menu_0045b800* obj, int unused)
 {
     Gadget* e = FindGadgetChecked_D(obj->holder->entries, "GAMMA");
     if (e != 0) {
-        g_game->brightness = SliderValue(e);
-        ApplySound();
+        g_game->brightness = ReadSliderValue(e);
+        ApplyBrightnessAndVolume();
     }
 }
 
@@ -795,8 +781,8 @@ void __stdcall HandleEffectsVolumeSlider(Menu_0045b800* obj, int unused)
 {
     Gadget* e = FindGadgetChecked_D(obj->holder->entries, "FXVOL");
     if (e != 0) {
-        g_game->volume1 = SliderValue(e);
-        ApplySound();
+        g_game->volume1 = ReadSliderValue(e);
+        ApplyBrightnessAndVolume();
     }
 }
 
@@ -805,8 +791,8 @@ void __stdcall HandleMusicVolumeSlider(Menu_0045b800* obj, int unused)
 {
     Gadget* e = FindGadgetChecked_D(obj->holder->entries, "MUSICVOL");
     if (e != 0) {
-        g_game->volume2 = SliderValue(e);
-        ApplySound();
+        g_game->volume2 = ReadSliderValue(e);
+        ApplyBrightnessAndVolume();
     }
 }
 
@@ -853,8 +839,8 @@ void __stdcall HandleGameSpeedSlider(Menu_0045b800* obj, int unused)
     if (player->active == 0 || !((Opts_0045f1d0*)player->info.get())->u.flag_9b_6) {
         Gadget* e = FindGadgetChecked_D(obj->holder->entries, "GAME");
         if (e != 0) {
-            int value = SliderValue(e);
-            g_game->gameSpeed = (unsigned short)(value < 1 ? 1 : SliderValue(e));
+            int value = ReadSliderValue(e);
+            g_game->gameSpeed = (unsigned short)(value < 1 ? 1 : ReadSliderValue(e));
             SetGameSpeed(g_game->gameSpeed, 1);
             MarkChanged((Dialog *)obj);
         }
@@ -866,7 +852,7 @@ void __stdcall HandleScreenSlider(Menu_0045b800* obj, int unused)
 {
     Gadget* e = FindGadgetChecked_D(obj->holder->entries, "SCREEN");
     if (e != 0) {
-        g_game->scrollSpeed = SliderValue(e) > 1 ? SliderValue(e) : 1;
+        g_game->scrollSpeed = ReadSliderValue(e) > 1 ? ReadSliderValue(e) : 1;
         MarkChanged((Dialog *)obj);
     }
 }
@@ -877,8 +863,8 @@ void __stdcall HandleMaxLinesSlider(Menu_0045b800* obj, int unused)
     char text[20];
     Gadget* e = FindGadgetChecked_D(obj->holder->entries, "MAXLINES");
     if (e != 0) {
-        int v = SliderValue(e);
-        g_game->textLines = v < 0 ? 0 : SliderValue(e);
+        int v = ReadSliderValue(e);
+        g_game->textLines = v < 0 ? 0 : ReadSliderValue(e);
         MarkChanged((Dialog *)obj);
     }
     if (g_game->textLines != 0)
@@ -894,7 +880,7 @@ void __stdcall HandleTextScrollSlider(Menu_0045b800* obj, int unused)
     char text[20];
     Gadget* e = FindGadgetChecked_D(obj->holder->entries, "TXTSCROL");
     if (e != 0) {
-        g_game->textScroll = SliderValue(e);
+        g_game->textScroll = ReadSliderValue(e);
         sprintf(text, "%d secs", g_game->textScroll);
         SetTranslatedTextByName(obj, "TEXTSCROLLTEXT", text, 0);
         MarkChanged((Dialog *)obj);

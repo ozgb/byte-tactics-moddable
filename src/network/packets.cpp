@@ -237,16 +237,6 @@ PacketManager::~PacketManager()
 {
 }
 
-static inline int SendTo(int from, int to, void* data, int size)
-{
-    PacketTrace("bytes to send to (DPID)(%ld): %ld\n", to, size);
-    void* session = g_game->session;
-    g_sendCondenser.to = to;
-    g_sendCondenser.Accumulate(data, size);
-    int result = ((NetCondenser*)&g_sendCondenser)->SendPacket(session, from);
-    return result == 0 ? 1 : 0;
-}
-
 static inline void Reset(PacketChannel* e)
 {
     e->InitPools(-1, 0xc8, 2, 0x64);
@@ -411,7 +401,7 @@ int PacketManager::SendAllQueued(int force)
 int PacketManager::SendFrameState(int from, Msg_00461900* msg)
 {
     *(int*)buffer = msg->field_14 ? -1 : msg->field_10;
-    SendTo(from, msg->field_14, buffer, size);
+    SendToDPID(from, msg->field_14, buffer, size);
     size = buffer ? 4 : 0;
     return 1;
 }

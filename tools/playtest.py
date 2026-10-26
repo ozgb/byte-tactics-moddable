@@ -451,7 +451,6 @@ class Instance:
             env["PULSE_SINK"] = self.sink
         return env
 
-
     def wrap(self, cmd: list[str]) -> list[str]:
         return self.run.netns.wrap(cmd) if self.run.netns else cmd
 

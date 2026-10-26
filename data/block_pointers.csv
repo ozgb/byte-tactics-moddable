@@ -1330,6 +1330,7 @@ SimGlobals.g_movementClasses,0x59 0x5a 0x99 0x116 0x157 0x1a9 0x1c9,LoadTntMap: 
 SimGlobals.g_movementClasses,0x0+0x20*k,LoadUnitTypes,27,277800,0x0,outside,"MovementClass.name (0x0, stride 0x20): name string loaded with the unit types; target names change with the heap layout"
 SimGlobals.g_movementClasses,0x0,SmokeParticles::Emit,1,6,0x20,outside,"MovementClass.name (0x0, stride 0x20): name string loaded with the unit types; target names change with the heap layout"
 SimGlobals.g_movementClasses,0x20 0xa0 0x180,Sound::CreateSampleFromFile: Digital Audio Sample,4,8400,0x10,outside,"MovementClass.name (0x0, stride 0x20): name string loaded with the unit types; target names change with the heap layout"
+SimGlobals.g_packetHandlers,*,*,0,0,-,not-a-pointer,"g_packetHandlers: function pointers into the exe; the unaligned words that straddle two entries only look like addresses"
 SimGlobals.g_packetManager,*,*,0,0,-,outside,"PacketManager and the PacketChannel, PacketRing, PacketReceiver, PlayerFrameInfo and FrameQueue it holds by value: their packet and frame buffers come from outside the block (#21 moves them in)"
 SimGlobals.g_packetSizes,*,*,0,0,-,not-a-pointer,"g_packetSizes: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_packetSizes,0x5,LoadTntMap: TILE SET,6,46800,0xaffe0-0x57ffe0,not-a-pointer,"g_packetSizes: integers (ticks, counts, seed) that only look like addresses"

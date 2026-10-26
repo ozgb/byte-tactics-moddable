@@ -39,6 +39,7 @@ struct Elem_00434360 {
 typedef std::vector<Elem_00434360> Column_00433270;
 
 #include "../util/tdf.h"
+#include "../game/data_files.h"
 
 typedef std::vector<Elem_00434020> Vec_004336f0;
 
@@ -105,17 +106,6 @@ void* StringRef::FUN_00432c20(unsigned char param_1)
     }
     return this;
 }
-
-typedef std::vector<Entry_00432cf0> Vec_00432c40;
-typedef Vec_00432c40::iterator (Vec_00432c40::*UcopyFn_00432c40)(
-    Vec_00432c40::const_iterator, Vec_00432c40::const_iterator, Vec_00432c40::iterator);
-
-struct Access_00432c40 : Vec_00432c40 {
-    static UcopyFn_00432c40 fn;
-};
-
-// FUNCTION: 0x432c40 ?_Ucopy@?$vector@UEntry_00432cf0@@V?$allocator@UEntry_00432cf0@@@std@@@std@@IAEPAUEntry_00432cf0@@PBU3@0PAU3@@Z
-UcopyFn_00432c40 Access_00432c40::fn = &Access_00432c40::_Ucopy;
 
 // FUNCTION: 0x432c80
 void __stdcall AssignRange(Elem_432cb0* first, Elem_432cb0* last, Elem_432cb0* value)
@@ -381,16 +371,6 @@ typedef Vec_00433d50::iterator (Vec_00433d50::*EraseFn_00433d50)(
 // FUNCTION: 0x433d50 ?erase@?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@QAEPAUElem_00434020@@PAU3@0@Z
 EraseFn_00433d50 g_erase_00433d50 = &Vec_00433d50::erase;
 
-typedef std::vector<Elem_00434020> Vec_00433d90;
-typedef void (Vec_00433d90::*DestroyFn_00433d90)(Vec_00433d90::iterator, Vec_00433d90::iterator);
-
-struct Access_00433d90 : Vec_00433d90 {
-    static DestroyFn_00433d90 fn;
-};
-
-// FUNCTION: 0x433d90 ?_Destroy@?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@IAEXPAUElem_00434020@@0@Z
-DestroyFn_00433d90 Access_00433d90::fn = &Access_00433d90::_Destroy;
-
 typedef std::allocator<Elem_00434020> Alloc_00433da0;
 typedef void (Alloc_00433da0::*DeallocateFn_00433da0)(void*, Alloc_00433da0::size_type);
 
@@ -403,16 +383,6 @@ typedef void (Vec_00433db0::*InsertFn_00433db0)(
 
 // FUNCTION: 0x433db0 ?insert@?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAEXPAUElem_00434360@@IABU3@@Z
 InsertFn_00433db0 g_insert_00433db0 = &Vec_00433db0::insert;
-
-typedef std::vector<Elem_00434360> Vec_004340b0;
-typedef void (Vec_004340b0::*DestroyFn_004340b0)(Vec_004340b0::iterator, Vec_004340b0::iterator);
-
-struct Access_004340b0 : Vec_004340b0 {
-    static DestroyFn_004340b0 fn;
-};
-
-// FUNCTION: 0x4340b0 ?_Destroy@?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@IAEXPAUElem_00434360@@0@Z
-DestroyFn_004340b0 Access_004340b0::fn = &Access_004340b0::_Destroy;
 
 typedef std::vector<Elem_00434360> Inner_004340f0;
 typedef std::vector<Inner_004340f0> Outer_004340f0;
@@ -478,17 +448,6 @@ typedef Vec_00434770& (Vec_00434770::*AssignFn_00434770)(const Vec_00434770&);
 // FUNCTION: 0x434770 ??4?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAEAAV01@ABV01@@Z
 AssignFn_00434770 g_assign_00434770 = &Vec_00434770::operator=;
 
-typedef std::vector<Elem_00434020> Vec_004349c0;
-typedef Vec_004349c0::iterator (Vec_004349c0::*UcopyFn_004349c0)(
-    Vec_004349c0::const_iterator, Vec_004349c0::const_iterator, Vec_004349c0::iterator);
-
-struct Access_004349c0 : Vec_004349c0 {
-    static UcopyFn_004349c0 fn;
-};
-
-// FUNCTION: 0x4349c0 ?_Ucopy@?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@IAEPAUElem_00434020@@PBU3@0PAU3@@Z
-UcopyFn_004349c0 Access_004349c0::fn = &Access_004349c0::_Ucopy;
-
 // FUNCTION: 0x433500
 Inner_00433500* LosTables::GetLosTable(int n)
 {
@@ -510,3 +469,56 @@ void __stdcall SortUnitTypes(UnitDef* first, UnitDef* last,
             SortUnitTypes(first, _M, comp, 0), first = _M;
     }
 }
+
+// FUNCTION: 0x433130
+void LosTables::LoadLosTables()
+{
+    TdfFile tdf;
+    char path[256];
+    BuildDataPath(path, "gamedata", "los", "TDF");
+    if ((&tdf)->LoadFile(path) != 0) {
+        if ((&tdf)->SelectRecord("TABLEINFO") != 0) {
+            short numtables = (short)tdf.current->GetFieldInt("numtables", 0);
+            {
+                Outer_004330b0& tables = *(Outer_004330b0*)this;
+                Column_00433270 temp;
+                unsigned n = (unsigned)numtables;
+                if (tables.size() < n)
+                    tables.insert(tables.end(), n - tables.size(), temp);
+                else if (n < tables.size())
+                    tables.erase(tables.begin() + n, tables.end());
+            }
+            for (short i = 0; i < numtables; i++)
+                LoadLosTable(&tdf, i);
+        }
+        (&tdf)->Unload();
+    }
+}
+
+// FUNCTION: 0x433270
+void LosTables::ResizeTables(short n)
+{
+    Column_00433270 x;
+    ((Outer_004330b0*)this)->resize(n, x);
+}
+
+typedef Outer_004330b0& (Outer_004330b0::*AssignFn_00433a80)(const Outer_004330b0&);
+
+AssignFn_00433a80 g_assign_00433a80 = &Outer_004330b0::operator=;
+
+// FUNCTION: 0x433a80 ??1?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAE@XZ
+
+typedef Outer_00433a30::iterator (Outer_00433a30::*EraseFn_00434020)(
+    Outer_00433a30::iterator, Outer_00433a30::iterator);
+
+// FUNCTION: 0x434020 ?erase@?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAEPAUElem_00434360@@PAU3@0@Z
+EraseFn_00434020 g_erase_00434020 = &Outer_00433a30::erase;
+
+// FUNCTION: 0x4344e0 ??0?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAE@ABV01@@Z
+InsertFn_004340f0 g_insert_004344e0 = &Outer_004340f0::insert;
+
+typedef Outer_004330b0::iterator (Outer_004330b0::*EraseFn_00434360)(
+    Outer_004330b0::iterator, Outer_004330b0::iterator);
+
+// FUNCTION: 0x434360 ?erase@?$vector@V?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@V?$allocator@V?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@@2@@std@@QAEPAV?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@2@PAV32@0@Z
+EraseFn_00434360 g_erase_00434360 = &Outer_004330b0::erase;

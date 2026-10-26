@@ -795,7 +795,6 @@ void ShowSoftwareCursor();
 #include "../files/files_api.h"
 int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
 extern "C" __declspec(dllimport) char* __stdcall lstrcpynA(char*, const char*, int);
-#include "../units/movement_class.h"
 void __stdcall CreateUnitSync(int param_1);
 void* __stdcall LoadPcx(char* path, int param_2);
 void __stdcall FrameFromSurface(void* dst, void* src);
@@ -3072,7 +3071,7 @@ static inline int CountAlliance_00447b10(int alliance)
     return count;
 }
 
-inline int FindUnusedLogo()
+inline int FindFreeLobbyLogo()
 {
     int used[10];
     memset(used, 0, sizeof(used));
@@ -3183,7 +3182,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
                 }
                 if (g_game->players[FindHostSlot()].info->commander != 2 && !CountLocalComputerPlayers()) {
                     CreateLocalPlayer(i, 2);
-                    p->info->color = FindUnusedLogo();
+                    p->info->color = FindFreeLobbyLogo();
                 }
             }
             g_game->bits_2bee_1.dirty = 1;

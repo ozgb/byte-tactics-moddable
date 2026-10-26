@@ -4,10 +4,7 @@
 #include "../../include/win_types.h"
 struct Gui;
 
-struct Gui;
-
 struct Gadget;
-struct Gui;
 struct Layer;
 struct Player;
 

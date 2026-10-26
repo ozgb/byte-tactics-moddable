@@ -186,7 +186,7 @@ void __stdcall EmptyPostArchiveMountHook(const char* param_1);
 #include "../ingame/screenshots.h"
 #include "../gui/mouse.h"
 #include "settings.h"
-#include "../util/tdf_4c54f0.h"
+#include "../util/tdf.h"
 
 #include "../harness/harness.h"
 

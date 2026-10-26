@@ -4674,8 +4674,8 @@ address,name
 0x528a48,g_freedBlockRing
 0x528a4c,g_blockMapLiveCount
 0x528a50,g_blockMapNil
-0x528a54,std::IH::IU?$pair::?$_Tree::_Nil
-0x528a58,std::IH::IU?$pair::?$_Tree::_Nilrefs
+0x528a54,std::$$CBIH::IU?$pair::?$_Tree::_Nil
+0x528a58,std::$$CBIH::IU?$pair::?$_Tree::_Nilrefs
 0x528a78,g_loadedImage
 0x528aa4,g_lineProcessHandle
 0x528aa8,g_stackProcessHandleRead

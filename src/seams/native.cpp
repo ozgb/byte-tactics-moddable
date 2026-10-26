@@ -113,8 +113,6 @@ class HapiBank;
 #include "../map/map_list.h"
 #include "../map/plot_map.h"
 #include "../map/terrain.h"
-void __stdcall AddUnitToMap(Unit* unit);
-void __stdcall RemoveUnitFromMap(Unit* unit);
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
 void __stdcall SetupPlayerSlot(int player, char type);
 #include "../units/units_485010.h"

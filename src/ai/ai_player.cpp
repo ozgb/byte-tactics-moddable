@@ -153,7 +153,6 @@ struct Target_00406f50 {
 
 #include "squad_timer.h"
 
-int CheckAlliedVictory(void);
 #include "../graphics/movies.h"
 int GetCobChecksum(int);
 

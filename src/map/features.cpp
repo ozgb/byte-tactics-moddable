@@ -378,7 +378,6 @@ Gaf* __stdcall LoadGaf(char* path);
 void __stdcall FreeObjectState(void* obj);
 AnimSrc* __stdcall FindGafEntry(void* list, const char* name);
 void __stdcall InitGafSequence(Anim* ref, AnimSrc* src, int index);
-int __stdcall LoadFeatureType(char* name);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot,
                              unsigned char owner);
 #include "features.h"

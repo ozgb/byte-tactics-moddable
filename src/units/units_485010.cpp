@@ -574,7 +574,7 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
 #include "../state/sim_globals.h"
 
 #include "unit_position.h"
-void __stdcall AddUnitToMap(Unit* unit);
+#include "../map/terrain.h"
 #include "../network/net_game.h"
 
 static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Vec3 pos,

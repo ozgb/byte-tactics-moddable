@@ -42,4 +42,6 @@ int __stdcall RemoveFeature(Cell* cell, int flag);
 void __stdcall ResolveFeatureLinks();
 void __stdcall LoadFeatures(HapiBank* file);
 
+int __stdcall LoadFeatureType(char* name);
+
 #endif

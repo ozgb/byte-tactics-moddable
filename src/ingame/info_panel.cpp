@@ -349,13 +349,6 @@ int HideSoftwareCursor();
 int ShowSoftwareCursor();
 int __stdcall GetOrderTarget(void* unit);
 int __stdcall GetGafSequenceFrame(Handle* h);
-void __stdcall DrawUnitInfoPanel(void* surface);
-void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy);
-void __stdcall DrawSelectionBox(Vec3* view, Unit* unit);
-void __stdcall DrawHitPointBar(void* surface, Unit* unit, int x, int y);
-void __stdcall DrawProfileBarLine(int surface, const char* text, int index);
-void __stdcall DrawStatusPanel(Surface* win);
-void __stdcall DrawNetworkStats(void* surface);
 int __stdcall IsUnitVisibleToPlayer(void* map, void* u);
 void __stdcall DrawFrameBlended(void* dest, short* frame, int x, int y);
 

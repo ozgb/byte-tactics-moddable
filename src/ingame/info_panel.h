@@ -1,5 +1,10 @@
 #ifndef INFO_PANEL_H
 #define INFO_PANEL_H
+struct Cell;
+struct Surface;
+struct Unit;
+struct Vec3;
+
 struct Vec3;
 
 struct Point;
@@ -20,5 +25,14 @@ void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset, Vec3* corners
 void __stdcall DrawLightBars();
 void __stdcall UpdateSensorRadarAndCloak(void);
 void __stdcall DrawBattleFrame(int, int);
+
+void __stdcall BlitGafFrameAtOffset(void*, short*, int, int);
+void __stdcall DrawNetworkStats(void* surface);
+void __stdcall DrawStatusPanel(Surface* win);
+void __stdcall DrawHitPointBar(void* surface, Unit* unit, int x, int y);
+void __stdcall DrawSelectionBox(Vec3* view, Unit* unit);
+void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy);
+void __stdcall DrawUnitInfoPanel(void* surface);
+void __stdcall DrawProfileBarLine(int surface, const char* text, int index);
 
 #endif

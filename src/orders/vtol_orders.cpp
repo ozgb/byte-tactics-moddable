@@ -171,18 +171,6 @@ static inline Vec3 Offset(short angle, int distance)
     return v;
 }
 
-static inline Vec3 AddComponentwise(const Vec3& a, const Vec3& b)
-{
-    Vec3 r;
-    r.x = a.x;
-    r.x += b.x;
-    r.y = a.y;
-    r.y += b.y;
-    r.z = a.z;
-    r.z += b.z;
-    return r;
-}
-
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {
     Point16 c;
@@ -932,7 +920,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         if (order->misses >= 2) {
             order->misses = 0;
             Vec3 off = Offset(RandomInt(0x10000), range << 16);
-            Vec3 p = AddComponentwise(order->target->pos, off);
+            Vec3 p = AddVec3(order->target->pos, off);
             Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, p);
             ((Class_0044e730*)obj)->SetApproachRadius(0x80);
             order->flags |= 0x110e8;

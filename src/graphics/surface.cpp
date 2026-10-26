@@ -542,7 +542,7 @@ void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y)
         if (LockScreen(&screen) == 0)
             return;
         BlitSurface(&screen, bmp, x - bmp->x, y - bmp->y);
-        UnlockScreen(0);
+        UnlockScreen(nullptr);
         return;
     }
     if (bmp == 0) {
@@ -550,7 +550,7 @@ void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y)
         if (LockScreen(&screen) == 0)
             return;
         BlitSurface(dst, &screen, x, y);
-        UnlockScreen(0);
+        UnlockScreen(nullptr);
         return;
     }
     BlitSurface(dst, bmp, x - bmp->x, y - bmp->y);

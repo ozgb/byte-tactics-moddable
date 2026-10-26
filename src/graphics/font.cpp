@@ -38,29 +38,11 @@ int __stdcall GetTextWidth(Font* font, unsigned char* text)
     return width;
 }
 
-static inline int WidthTextGlyphs(Font* font, unsigned char* text)
-{
-    int width = 0;
-    if (text && font) {
-        for (; *text && *text != '\n'; text++) {
-            unsigned char c = *text;
-            if (c >= font->first) {
-                int d = c - font->first;
-                unsigned int off = 0;
-                off = font->offsets[(unsigned short)d];
-                if (off)
-                    width += font->glyphs[off];
-            }
-        }
-    }
-    return width;
-}
-
 // FUNCTION: 0x4c14f0
 void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int maxWidth)
 {
     Game* game = GetDisplay();
-    int width = WidthTextGlyphs(game->font, text);
+    int width = GetTextWidth(game->font, text);
     if (maxWidth != -1 && width > maxWidth) {
         unsigned char buf[0x12c];
         strncpy((char*)buf, (char*)text, 0x12b);
@@ -72,7 +54,7 @@ void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int m
             if (end == buf)
                 break;
             end--;
-            width = WidthTextGlyphs(game->font, text);
+            width = GetTextWidth(game->font, text);
             if (width <= maxWidth)
                 break;
         }
@@ -138,7 +120,7 @@ void __stdcall DrawOutlinedString(Surface* dst, unsigned char* text, int fore,
                             int back, int y)
 {
     Game* game = (Game*)GetDisplay();
-    int width = WidthTextGlyphs(game->font, text);
+    int width = GetTextWidth(game->font, text);
     if (dst == 0) {
         Surface r;
         if (LockScreen(&r) != 0) {

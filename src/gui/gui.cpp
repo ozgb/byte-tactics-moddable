@@ -5688,15 +5688,6 @@ static inline void TickProgressBar(Gui* menu, int i)
     }
 }
 
-static inline void SelectGadgetByIndex_inlined(Gui* menu, int index)
-{
-    Gadget* first = menu->layer->entries;
-    menu->focus = -1;
-    menu->layer->current = index;
-    if (first[menu->layer->current].type == 3)
-        BeginTextEdit(menu, menu->layer->current);
-}
-
 // FUNCTION: 0x4a9fd0
 int __stdcall UpdateMenu(Gui* menu)
 {
@@ -5885,7 +5876,7 @@ int __stdcall UpdateMenu(Gui* menu)
 
     if (sel != -1) {
         menu->hotGadgetIndex = sel;
-        SelectGadgetByIndex_inlined(menu, sel);
+        SelectGadgetByIndex(menu, sel);
         if (menu->layer->handler != 0)
             menu->layer->handler(menu);
         if (menu->hotGadgetIndex != -1)

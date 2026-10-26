@@ -619,7 +619,6 @@ InitUnit_00485e90,InitUnitWeaponSlots,"seam slot filled by InstallNativeSeams, W
 InitUnit_00485e90,UpdateMetalExtraction,"seam slot filled by InstallNativeSeams, EconomySeam::UpdateMetalExtraction, src/units/units_485010.cpp:844,880, src/seams/native.cpp"
 InsertionSortUnitTypes,CompareUnitTypeNames,"the comparator passed by LoadUnitTypes, src/units/unit_types.cpp:1039,1043"
 IsVisible,IsPointVisible,"seam slot filled by InstallNativeSeams, AiSeam::IsPointVisible, src/game/players.cpp:106, src/seams/native.cpp"
-IsVisible2,IsPointVisible,"seam slot filled by InstallNativeSeams, AiSeam::IsPointVisible, src/game/players.cpp:110, src/seams/native.cpp"
 KillFeature,GetMapCell,"seam slot filled by InstallNativeSeams, LosRadarSeam::GetMapCell, src/map/features.cpp:567,719,721,778,824,828,873,937,938,994,1019,1040,1155,1212, src/seams/native.cpp"
 KillPlayerUnits,DamageUnit,"seam slot filled by InstallNativeSeams, WeaponsSeam::DamageUnit, src/units/units_485010.cpp:1372, src/seams/native.cpp"
 KillPlayerUnits,DetonateUnitWeapon,"seam slot filled by InstallNativeSeams, WeaponsSeam::DetonateUnitWeapon, src/units/units_485010.cpp:1374, src/seams/native.cpp"

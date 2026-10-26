@@ -25,7 +25,7 @@ Entry,glyphs,pointer,include/ta_types.h,#353
 Entry,handler,function-pointer,include/ta_types.h,#353
 Entry,text,pointer,include/ta_types.h,#353
 Face,vindex,pointer,src/weapons/explosions.cpp,#352
-Feature,animTable,pointer,include/ta_types.h|src/ingame/info_panel.cpp|src/ingame/info_panel.cpp,#353
+Feature,animTable,pointer,include/ta_types.h|src/ingame/info_panel.cpp,#353
 Feature,anims,pointer,src/map/features.cpp,#353
 Feature,burnt,pointer,include/ta_types.h,#353
 Feature,field_a8,pointer,include/ta_types.h,#353
@@ -38,7 +38,7 @@ Feature,seqdieshad,pointer,include/ta_types.h|src/map/features.cpp,#353
 Feature,seqreclamate,pointer,src/map/features.cpp,#353
 Feature,seqreclamateshad,pointer,include/ta_types.h|src/map/features.cpp,#353
 Feature,seqshad,pointer,src/map/features.cpp,#353
-Feature,shadowTable,pointer,include/ta_types.h|src/ingame/info_panel.cpp|src/ingame/info_panel.cpp,#353
+Feature,shadowTable,pointer,include/ta_types.h|src/ingame/info_panel.cpp,#353
 Frame,data,pointer,src/network/packets.cpp,#353
 FrameQueue,buffer,pointer,src/network/packet_receiver.h,#353
 FrameQueue,recvBuffer,pointer,src/network/packet_receiver.h,#353
@@ -128,6 +128,7 @@ Game,guids,pointer,src/game/game.h,#353
 Game,handler,function-pointer,src/game/game.h,#353
 Game,hotRadar,pointer,src/game/game.h,#353
 Game,igTitles,int-pointer,src/game/game.h,#353
+Game,igpaused,int-pointer,src/game/game.h,#353
 Game,image_14817,pointer,src/game/game.h,#353
 Game,image_3907b,pointer,src/game/game.h,#353
 Game,infos,pointer,src/game/game.h,#353

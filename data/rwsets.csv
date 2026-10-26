@@ -22719,6 +22719,7 @@ address,function,file,kind,target
 0x46e9b0,UnitSyncMap::FindExact,src/network/unit_sync.cpp,function,
 0x46eba0,UnitSyncPlayer::operator=,src/network/unit_sync.cpp,call,SyncPlayerRecord::operator=
 0x46eba0,UnitSyncPlayer::operator=,src/network/unit_sync.cpp,deref_read,*SyncPlayerRecord
+0x46eba0,UnitSyncPlayer::operator=,src/network/unit_sync.cpp,deref_read,*UnitSyncPlayer
 0x46eba0,UnitSyncPlayer::operator=,src/network/unit_sync.cpp,function,
 0x46f720,UnitSyncMap::Init,src/network/unit_sync.cpp,call,UnitSyncMap::Buynode
 0x46f720,UnitSyncMap::Init,src/network/unit_sync.cpp,field_read,"_Tree<unsigned int, std::pair< unsigned int, UnitSyncEntry>, Kfn_0046d6c0, Less_0046d6c0, Alloc_0046d6c0>::_Head"

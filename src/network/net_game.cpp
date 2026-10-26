@@ -226,13 +226,6 @@ int GetHostDpid()
     return -1;
 }
 
-static inline int PlayerDpid(Player* p)
-{
-    if (p != 0 && p->type != 0)
-        return p->id;
-    return -1;
-}
-
 // FUNCTION: 0x450090
 int __stdcall SetPlayerName(unsigned char index, char* shortName, char* longName)
 {
@@ -244,7 +237,7 @@ int __stdcall SetPlayerName(unsigned char index, char* shortName, char* longName
     name.dwFlags = 0;
     name.lpszShortNameA = shortName;
     name.lpszLongNameA = longName;
-    int r = host_net_set_player_name((host_net*)g_game->net_14, PlayerDpid(p), &name, 2);
+    int r = host_net_set_player_name((host_net*)g_game->net_14, GetPlayerDpid(p), &name, 2);
     return r == 0 ? 1 : 0;
 }
 
@@ -1591,27 +1584,15 @@ int __stdcall RequestPlayerColor(int param)
     return result;
 }
 
-static unsigned char LookupPlayer(int id)
-{
-    if (id == -1)
-        return 10;
-    unsigned char i;
-    for (i = 0; i < 10; i++) {
-        if (GetSlotDpid(i) == id)
-            return i;
-    }
-    return 10;
-}
-
 // FUNCTION: 0x452800
 int __stdcall BroadcastPlayerLeft(int id)
 {
-    if (LookupPlayer(id) == 10)
+    if (FindSlotByDpid(id) == 10)
         return 0;
     PlayerIdPacket* msg = (PlayerIdPacket*)g_game->recvPacketPtr;
     msg->type = 0x1c;
     msg->id = id;
-    unsigned char index = LookupPlayer(id);
+    unsigned char index = FindSlotByDpid(id);
     Player* player = &g_game->players[index];
     if ((player->active != 0 && player->type == 3)
         || !((*(volatile unsigned char*)&g_game->flags_38d75) & 1)
@@ -3162,14 +3143,6 @@ static inline int FirstJoinedId_004568c0() {
     return -1;
 }
 
-static inline int PlayerId_004568c0(unsigned char pi) {
-    if (pi == 10)
-        return -1;
-    int i = pi;
-    if (g_game->players[i].type != 0)
-        return g_game->players[i].id;
-    return -1;
-}
 
 // FUNCTION: 0x4568c0
 int AssignStartPositions() {
@@ -3246,7 +3219,7 @@ int AssignStartPositions() {
             packet[1] = (unsigned char)g_game->startPosShuffle[k4];
             if (g_game->players[k4].active != 0) {
                 if (g_game->players[k4].type == 3) {
-                    SendPacketToPlayer(FirstJoinedId_004568c0(), PlayerId_004568c0(k4), packet, 2);
+                    SendPacketToPlayer(FirstJoinedId_004568c0(), GetSlotDpid(k4), packet, 2);
                 } else if (IsConnected(&g_game->players[k4])) {
                     g_game->players[k4].startPos = packet[1];
                     g_game->startPosAssignAck[k4] = 1;
@@ -3258,12 +3231,12 @@ int AssignStartPositions() {
     if (res == 0) {
         for (int k6 = 0; k6 < 10; k6++) {
             if (IsConnected(&g_game->players[k6]))
-                BroadcastPacket(PlayerId_004568c0(k6), &pkt, 1);
+                BroadcastPacket(GetSlotDpid(k6), &pkt, 1);
         }
     } else if (ok) {
         for (int k5 = 0; k5 < 10; k5++) {
             if (IsConnected(&g_game->players[k5]))
-                BroadcastPacket(PlayerId_004568c0(k5), &pkt, 1);
+                BroadcastPacket(GetSlotDpid(k5), &pkt, 1);
         }
     }
     return ok;

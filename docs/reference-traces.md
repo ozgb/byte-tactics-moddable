@@ -154,27 +154,49 @@ default is Steam's.
 ## A loaded game's trace
 
 `load-midgame` starts from the save that `save-midgame` makes in the same run of the suite (the save is
-made each run and never committed). Its trace starts at tick 901 and ends at 1800.
+made each run and never committed), and from the options table the saver writes beside it
+(`savegame\harness.opt`, see reference/README.md, "Loading a saved game"). Its trace starts at tick 901 and
+ends at 1800.
 
 It does not match the uninterrupted game (`save-midgame`, the same as `skirmish2`) from the saved tick on:
-every row from tick 901 differs. Do not compare the two. Compare a loaded game with the digests of
-`load-midgame`.
+every row from tick 901 differs, all 7200 of them (900 ticks, 8 rows each). Do not compare the two. Compare a
+loaded game with the digests of `load-midgame`.
 
-- At tick 901, phase `units`, the first differing field is `rng.parkMiller`, then `rng.crtHoldrand`: the save
-  does not hold the random streams, and the load reseeds them.
-- At tick 901 the players table differs too: the names (`name` and `fullName`), `active` of slot 2, and
-  `metalCapacity` and `energyCapacity`.
+- At tick 901, phase `units` (the first row), the first differing field is `rng.parkMiller`, then
+  `rng.crtHoldrand`: the save does not hold the random streams, and the load reseeds them. 854 fields differ in
+  that dump.
+- The players table still differs at tick 901, in these fields:
+  - `name` and `fullName` of slots 0 and 1: both hold the same string in the two games (`Arm` and `Core`); the
+    bytes after its terminating zero differ (the saving game's slot holds the rest of the default name, `Player N
+    First`, and the loaded game's holds zeros).
+  - `energyIncome`, `energyUsage`, `metalIncome`, `energyCapacity` and `metalCapacity` of slots 0 and 1, zero in
+    the loaded game.
+  - Slots 2 and 3: `active` is 1 in the loaded game and 0 in the saving game, and `id`, `index`, `startPos`,
+    `rank`, `name`, `fullName`, `energy` and `metal` differ with it.
+  - Slots 4 to 9: `id`, `name`, `fullName`, `energy` and `metal` differ, and `alliance` and `alliedBy` of
+    slots 4 to 9 do too (the saving game's slots hold the default names, 1000 metal and energy, alliance 5 and `id` -1, the loaded game's hold zeros).
+  - The AI state of slots 0 and 1 (`squadManager` cursor and timers, `squads`, `ai.vec_65`, `ai.vec_8d`).
+- Outside the players table, the same dump differs in the pathfinder's cells, pool and heap, the wind
+  fields, `game.scanIndex`, `hoverBobPhase` of three units, and the `created`, `subFlags` and goal fields of a
+  few units.
 
-What the code shows about those fields (`LoadPlayers` and `SavePlayers`, src/game/players.cpp:984-1066):
+`active` of slots 0 and 1 and the slots' sides, colours and teams no longer differ: with the options table filled,
+`ApplySlotsToGamePlayers` (src/frontend/skirmish_menu.cpp:575) sets the two players as it does in a skirmish.
 
-- `name`, `fullName` and `active` are not saved and not read back by `LoadPlayers`. `SetupPlayerSlot`
-  (players.cpp:71-130) is the code that sets them (`active` at line 95, the names at lines 103-128); the
-  `LoadPlayers` does not call it.
-- `metalCapacity` and `energyCapacity` are not saved either. `UpdatePlayerEconomy` (economy.cpp:311) sets both to
-  zero and recomputes them every tick from the units' storage, plus the player's storage bonus, which is
-  saved (`PlayerEnergyStorage`, `PlayerMetalStorage`).
+What the code shows about the players fields (`LoadPlayers` and `SavePlayers`, src/game/players.cpp:984-1066):
+
+- `LoadPlayers` reads energy, metal, the totals, the storage bonuses, kills, losses, the timers, `Logo` and
+  `Side`. It does not read `name`, `fullName`, the incomes, the usage or the capacities.
+- `UpdatePlayerEconomy` (economy.cpp:311) sets the capacities to zero and recomputes them every tick, so
+  they differ only until the first economy update.
+- `LoadMatch` (src/game/game_load.cpp:334-346) takes `g_game->playerCount` as the larger of its current
+  value and the highest slot of the options table with kind 1 or 2 plus one. The loaded run's `playerCount` is not set by
+  the save or the harness; `LoadSettings` (src/game/settings.cpp:357-362) sets it to the setting
+  `NumSkirmishPlayers`, or to 4 when there is none. `ApplySlotsToGamePlayers` then calls `SetupPlayerSlot`
+  (src/game/players.cpp:71-130) for every slot below that count, kind 0 included, and that sets `active` to 1. This
+  is what the trace shows for slots 2 and 3 (the options table's kind is 0 for them).
 - This page does not say which phase of a later tick those fields first agree with the uninterrupted game:
-  the code read here does not show it.
+  the dumps read here are those of tick 901.
 
 ## Later versions
 

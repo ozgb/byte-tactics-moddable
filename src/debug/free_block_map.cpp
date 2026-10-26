@@ -6,24 +6,7 @@
 #include <time.h>
 #include <malloc.h>
 
-struct Pair_004db000 {
-    unsigned int offset;
-    unsigned int length;
-    Pair_004db000() {}
-    Pair_004db000(unsigned int o, unsigned int l) : offset(o), length(l) {}
-};
-
-struct Node_004db000 {
-    Node_004db000* left;
-    Node_004db000* parent;
-    Node_004db000* right;
-    Pair_004db000 value;
-    int color;
-};
-
-struct Node_004dd1b0 {
-    Node_004dd1b0* left;
-};
+#include "debug_lib.h"
 
 Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p);
 

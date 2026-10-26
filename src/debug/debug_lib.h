@@ -8,6 +8,25 @@ class FreeBlockMap;
 template <class T, class A = std::allocator<T> >
 class FreedBlockRing;
 
+struct Pair_004db000 {
+    unsigned int offset;
+    unsigned int length;
+    Pair_004db000() {}
+    Pair_004db000(unsigned int o, unsigned int l) : offset(o), length(l) {}
+};
+
+struct Node_004db000 {
+    Node_004db000* left;
+    Node_004db000* parent;
+    Node_004db000* right;
+    Pair_004db000 value;
+    int color;
+};
+
+struct Node_004dd1b0 {
+    Node_004dd1b0* left;
+};
+
 char __stdcall IsMemFussy();
 void __stdcall MemFussyAtexitHandler(void);
 char __stdcall IsGonzo();

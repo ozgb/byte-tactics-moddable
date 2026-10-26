@@ -647,7 +647,7 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 86.1% | 3 | 10 |
 | **weapons** | 75 of 89 | 84.3% | 84.2% | 68.5% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 61 of 72 | 84.7% | 82.2% | 71.7% | 11 | 24 |
+| **los_radar** | 61 of 72 | 84.7% | 82.2% | 71.7% | 11 |22 |
 | **orders** | 303 of 369 | 82.1% | 78.4% | 60.7% | 66 | 26 |
 | **units** | 122 of 164 | 74.4% | 82.0% | 68.7% | 42 | 33 |
 | **players** | 57 of 143 | 39.9% | 42.9% | 34.3% | 86 | 11 |

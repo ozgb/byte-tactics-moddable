@@ -2,6 +2,7 @@
 #define HPI_H
 
 struct ArchiveDirectory;
+struct ArchiveEntry;
 struct FileHandle;
 struct HapiBuf;
 struct OPENHAPIFILE;
@@ -18,6 +19,8 @@ int __stdcall HAPI_PackageBuildNullStub(int, int);
 unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int* total);
 OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode);
 void __stdcall HAPI_RemoveArchive(OPENHAPIFILE* pRecord);
+ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* path);
+ArchiveDirectory* __stdcall HAPI_FindDirectory(ArchiveDirectory* list, char* path);
 void __stdcall HAPI_ClearShadowFlags(ArchiveDirectory* list);
 void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive);
 

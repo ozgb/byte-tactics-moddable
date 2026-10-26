@@ -1127,7 +1127,8 @@ harness,los_radar,shared_write,Game::localPlayer,3
 harness,los_radar,shared_write,Game::numPlayers,1
 harness,los_radar,shared_write,Game::playerIndex,13
 harness,map,call,Mission::CountStartPositions,1
-harness,map,call,Mission::LoadCampaign,1
+harness,map,call,Mission::GetCampaignName,1
+harness,map,call,Mission::LoadCampaign,2
 harness,map,call,Mission::LoadMissionByName,2
 harness,map,call,SetMissionType,2
 harness,map,shared_write,Game::difficulty,1

@@ -7354,6 +7354,7 @@ address,function,file,kind,target
 0x422170,FreeFeaturePool,src/map/features.cpp,call,FreeObjectState
 0x422170,FreeFeaturePool,src/map/features.cpp,call,GameFreeThunk
 0x422170,FreeFeaturePool,src/map/features.cpp,call,operator Spot *
+0x422170,FreeFeaturePool,src/map/features.cpp,call,operator SpotState *
 0x422170,FreeFeaturePool,src/map/features.cpp,call,operator char *
 0x422170,FreeFeaturePool,src/map/features.cpp,call,operator=
 0x422170,FreeFeaturePool,src/map/features.cpp,deref_escape,*Spot
@@ -7900,6 +7901,8 @@ address,function,file,kind,target
 0x4246b0,RemoveFeature,src/map/features.cpp,call,MoveFeatureSpot
 0x4246b0,RemoveFeature,src/map/features.cpp,call,get
 0x4246b0,RemoveFeature,src/map/features.cpp,call,operator Cell *
+0x4246b0,RemoveFeature,src/map/features.cpp,call,operator SpotState *
+0x4246b0,RemoveFeature,src/map/features.cpp,call,operator=
 0x4246b0,RemoveFeature,src/map/features.cpp,deref_escape,*Cell
 0x4246b0,RemoveFeature,src/map/features.cpp,deref_escape,*Feature
 0x4246b0,RemoveFeature,src/map/features.cpp,deref_escape,*Spot
@@ -10615,10 +10618,10 @@ address,function,file,kind,target
 0x4352d0,CampaignFileExists,src/game/campaign.cpp,call,HAPI_CloseFile
 0x4352d0,CampaignFileExists,src/game/campaign.cpp,call,HAPI_OpenFileAppend
 0x4352d0,CampaignFileExists,src/game/campaign.cpp,function,
-0x435320,Mission::LoadBriefing,src/map/map_list.cpp,call,GameAllocIgnoreTag
 0x435320,Mission::LoadBriefing,src/map/map_list.cpp,call,GameFreeThunk
 0x435320,Mission::LoadBriefing,src/map/map_list.cpp,call,HAPI_FileLengthByName
 0x435320,Mission::LoadBriefing,src/map/map_list.cpp,call,HAPI_ReadFileAt
+0x435320,Mission::LoadBriefing,src/map/map_list.cpp,call,SimAllocTagged
 0x435320,Mission::LoadBriefing,src/map/map_list.cpp,call,operator bool
 0x435320,Mission::LoadBriefing,src/map/map_list.cpp,call,operator char *
 0x435320,Mission::LoadBriefing,src/map/map_list.cpp,call,operator=
@@ -18230,7 +18233,7 @@ address,function,file,kind,target
 0x45a790,CMemoryCache::BuildShadow,src/units/unit_motion.cpp,function,
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,call,AddStateEntries
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,call,CountObjects
-0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,call,GameAllocIgnoreTag
+0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,call,SimAllocTagged
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,call,memset
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,field_read,Object3do::child
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,field_read,Object3do::sibling
@@ -21848,6 +21851,7 @@ address,function,file,kind,target
 0x46a610,BlitFeatureGaf,src/ingame/info_panel_46a610.cpp,call,DrawUnit
 0x46a610,BlitFeatureGaf,src/ingame/info_panel_46a610.cpp,call,GetGafFrame
 0x46a610,BlitFeatureGaf,src/ingame/info_panel_46a610.cpp,call,GetGafSequenceFrame
+0x46a610,BlitFeatureGaf,src/ingame/info_panel_46a610.cpp,call,get
 0x46a610,BlitFeatureGaf,src/ingame/info_panel_46a610.cpp,call,operator FeatureSpot *
 0x46a610,BlitFeatureGaf,src/ingame/info_panel_46a610.cpp,call,operator Unit *
 0x46a610,BlitFeatureGaf,src/ingame/info_panel_46a610.cpp,call,operator=

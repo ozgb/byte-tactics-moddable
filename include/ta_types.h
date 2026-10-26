@@ -2546,7 +2546,7 @@ struct Packet_2 {
 struct FeatureSpot {
     short prev;
     short next;
-    void* state;
+    Ref<SpotState> state;
     Vec3 pos;
     Vec3 vel;
     Rot16 rot;

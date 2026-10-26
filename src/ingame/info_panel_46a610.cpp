@@ -91,7 +91,7 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
             }
         } else {
             Unit* unit = g_game->unit;
-            ObjectState* st = (ObjectState*)spot->state;
+            ObjectState* st = (ObjectState*)spot->state.get();
             unit->state = (SpotState*)st;
             st->unit = unit;
             unit->angles = spot->rot;

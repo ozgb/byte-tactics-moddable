@@ -422,9 +422,9 @@ none
 
 Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 75.3% of functions (67 of 89), 79.8% of lines, 69.7% of branches; 22 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
+Coverage: 80.9% of functions (72 of 89), 81.9% of lines, 71.3% of branches; 17 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (22 of 89 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `sensors-sonar-jam` and `orders-tier2-core` (#426); 67 are entered, 75.3%), by reason:
+**Live functions no scenario enters** (17 of 89 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437); 72 are entered, 80.9%), by reason:
 
 - Shutdown only (4): `FreeRadar`, `FreeMapResources`, `LosTables::FreeTables` and `LosTables::~LosTables`. `FreeRadar` and `FreeMapResources` are called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick. `FreeTables` has no caller but `FreeLosTables`, which nothing calls, and the destructor is that of the static table, which never runs, because `host_exit` ends the process with `TerminateProcess`.
 - Element destruction of the LOS table vectors (4): `DestroyPoint`, `DestroyLine` and `std::_Destroy` (both overloads). The vector code calls them when it destroys its elements, which only `FreeTables` and the destructor do.
@@ -432,7 +432,6 @@ Coverage: 75.3% of functions (67 of 89), 79.8% of lines, 69.7% of branches; 22 l
 - Console command only (3): `CmdLOS`, `CmdLOSType` and `CmdRadar`. The game has no console in test mode (#432 adds a console key).
 - Network only (2): `CmdShareMapping` and `CmdShareRadar`, the share commands, which all check `netGameFlags & 1` (a network game); test mode runs a skirmish.
 - Menu and cursor only (2): `ResizeRadarPicture` (the multiplayer lobby map preview) and `Visible` (the mouse hover cursor of `GetOrderCursor`).
-- Needs a case no scenario can set up yet (5): `ByteMap_004658e0::Get`, `MapSize_004658e0::Contains`, `IsExplored`, `IsSeen` and `IsFootprintVisible`, the five `nodrawundergray` feature checks of `DrawBattleFrame` in `players_4658e0.cpp`. A 3D feature drawn in the local camera view makes the test-mode build exit 1 (#437), so no scenario can enter them until #437 is fixed.
 
 **Entry points.** Phase roots: none. `UpdatePlayers` (players) calls `RecalculateLineOfSight`, `UpdateUnitLineOfSight` and `UpdateSensorRadarAndCloak`, so LOS runs inside the players phase.
 
@@ -546,7 +545,7 @@ Coverage: 79.0% of functions (294 of 372), 74.8% of lines, 58.2% of branches; 78
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 70.1% of functions (117 of 167), 74.0% of lines, 61.4% of branches; 50 live functions no scenario enters, and 34 more are dead (data/coverage.csv). The list of those 50 is under **units, functions no scenario enters** below.
+**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 70.1% of functions (117 of 167), 74.2% of lines, 62.1% of branches; 50 live functions no scenario enters, and 34 more are dead (data/coverage.csv). The list of those 50 is under **units, functions no scenario enters** below.
 
 **units, functions no scenario enters** (50 of 167 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422); 117 are entered, 70.1%), by reason:
 
@@ -632,7 +631,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 ## Coverage
 
-`data/coverage.csv` is the baseline of how much of each subsystem the 51 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions and its dead functions. Raising it is #405.
+`data/coverage.csv` is the baseline of how much of each subsystem the 53 scenarios of `reference/scenarios/` run, measured with clang source-based coverage of the coverage build (#385). Besides one totals row per subsystem it lists each subsystem's never-entered functions and its dead functions. Raising it is #405.
 
 ```sh
 tools/coverage_runtime.sh                     # fetch the profile runtime sources of compiler-rt
@@ -656,16 +655,16 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 85.4% | 3 | 10 |
 | **weapons** | 74 of 88 | 84.1% | 84.2% | 68.5% | 14 | 20 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 67 of 89 | 75.3% | 79.8% | 69.7% | 22 | 20 |
+| **los_radar** | 72 of 89 | 80.9% | 81.9% | 71.3% | 17 | 20 |
 | **orders** | 294 of 372 | 79.0% | 74.8% | 58.2% | 78 | 28 |
-| **units** | 117 of 167 | 70.1% | 74.0% | 61.7% | 50 | 34 |
+| **units** | 117 of 167 | 70.1% | 74.2% | 62.1% | 50 | 34 |
 | **players** | 54 of 143 | 37.8% | 40.0% | 32.3% | 89 | 11 |
 | **map** | 75 of 98 | 76.5% | 78.0% | 69.4% | 23 | 12 |
 | files | 98 of 142 | 69.0% | 69.7% | 56.7% | 44 | 36 |
 | game | 75 of 183 | 41.0% | 40.3% | 22.4% | 108 | 25 |
 | network | 49 of 333 | 14.7% | 9.2% | 3.7% | 284 | 81 |
 | platform | 314 of 646 | 48.6% | 34.3% | 22.3% | 332 | 82 |
-| presentation | 445 of 1138 | 39.1% | 30.4% | 21.4% | 693 | 313 |
+| presentation | 445 of 1138 | 39.1% | 30.5% | 21.4% | 693 | 313 |
 | seams | 83 of 103 | 80.6% | 90.6% | - | 20 | 0 |
 | state | 315 of 386 | 81.6% | 79.1% | 49.4% | 71 | 22 |
 

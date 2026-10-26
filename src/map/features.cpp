@@ -113,6 +113,7 @@ struct List {
 };
 
 struct Feature;
+struct SpotState;
 
 struct Spot {
     short prev;
@@ -123,7 +124,7 @@ struct Spot {
             Anim shadow;
         };
         struct {
-            void* state;
+            Ref<SpotState> state;
             Vec3 pos;
             Vec3 vel;
         };
@@ -937,7 +938,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
             spot->rot = *rot;
         else
             memset(&spot->rot, 0, sizeof(spot->rot));
-        spot->state = CreateObjectState((Object3do *)f->object);
+        spot->state = (SpotState*)CreateObjectState((Object3do *)f->object);
         cell->feature = feature;
         cell->spot = i;
         cell->flag0 = 1;

@@ -39,7 +39,6 @@ Feature,seqreclamate,pointer,src/map/features.cpp,#353
 Feature,seqreclamateshad,pointer,include/ta_types.h|src/map/features.cpp,#353
 Feature,seqshad,pointer,src/map/features.cpp,#353
 Feature,shadowTable,pointer,include/ta_types.h|src/ingame/info_panel.cpp|src/ingame/info_panel_46a610.cpp,#353
-FeatureSpot,state,pointer,include/ta_types.h|src/ingame/feature_spot.h,#353
 Frame,data,pointer,src/network/packets.cpp,#353
 FrameQueue,buffer,pointer,src/network/packet_receiver.h,#353
 FrameQueue,recvBuffer,pointer,src/network/packet_receiver.h,#353
@@ -246,7 +245,6 @@ ScriptTable,entries,pointer,src/units/cob_types.h,#352
 ScriptTable,names,pointer,src/units/cob_types.h,#352
 SimGlobals,g_packetHandlers,function-pointer,src/state/sim_globals.h,#352
 Snapshot_0046a860,orderName,int-pointer,src/ingame/snapshot_0046a860.h,#353
-Spot,state,pointer,src/map/features.cpp,#353
 SpotState,bitmap,pointer,src/graphics/spot_state.h,#353
 SpotState,owner,pointer,src/graphics/spot_state.h,#353
 SpotState,ownerPointer,pointer,src/graphics/spot_state.h,#353

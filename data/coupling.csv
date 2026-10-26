@@ -1389,7 +1389,7 @@ map,files,call,ListDirectory,1
 map,game,call,GetPreferredLanguage,2
 map,game,call,SetCursorMode,1
 map,game,call,SimAlloc,3
-map,game,call,SimAllocTagged,1
+map,game,call,SimAllocTagged,2
 map,game,shared_write,Game::list_391ed,4
 map,game,shared_write,Game::net,17
 map,game,shared_write,Grid::cells,1
@@ -1438,7 +1438,7 @@ map,platform,call,BuildDataPath,2
 map,platform,call,ComputeChecksum,1
 map,platform,call,FatalError,1
 map,platform,call,FindTranslation,1
-map,platform,call,GameAllocIgnoreTag,4
+map,platform,call,GameAllocIgnoreTag,3
 map,platform,call,GameFreeThunk,9
 map,platform,call,GameReallocTagged,1
 map,platform,call,GetLocalizedString,2
@@ -2952,7 +2952,7 @@ presentation,game,call,ShowSaveGameScreen,2
 presentation,game,call,ShutdownIngameAndQuit,1
 presentation,game,call,ShutdownIngameSystems,1
 presentation,game,call,SimAlloc,1
-presentation,game,call,SimAllocTagged,3
+presentation,game,call,SimAllocTagged,4
 presentation,game,call,StepGafSequence,1
 presentation,game,call,UpdateBattleRoom,1
 presentation,game,call,WriteGameRegistryValue,4
@@ -3201,7 +3201,7 @@ presentation,platform,call,CrossProduct,1
 presentation,platform,call,DispatchHostEvents,2
 presentation,platform,call,FatalError,15
 presentation,platform,call,FilePrintf,1
-presentation,platform,call,GameAllocIgnoreTag,51
+presentation,platform,call,GameAllocIgnoreTag,50
 presentation,platform,call,GameAllocShared,1
 presentation,platform,call,GameFreeThunk,85
 presentation,platform,call,GameReallocIgnoreTag,1

@@ -706,7 +706,7 @@ Model_459200* __stdcall CreateObjectState(Object3do* obj)
         count += CountObjects(obj->sibling);
     }
     int size = count * 0x36 + 0x22;
-    Model_459200* state = (Model_459200*)GameAllocIgnoreTag("Object State", size);
+    Model_459200* state = (Model_459200*)SimAllocTagged("Object State", size);
     memset(state, 0, size);
     state->root = AddStateEntries(state, obj, 0);
     state->animDirty = 1;

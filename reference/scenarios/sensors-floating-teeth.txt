@@ -1,0 +1,19 @@
+# Human Arm commander on Hundred Isles has dragon's teeth owned by the AI player in its camera view, so the feature draw takes the IsFootprintVisible path (IsExplored with line of sight on); 400 ticks.
+game_seed 422
+crt_seed 1422
+view_seed 2422
+map Hundred Isles
+start_positions fixed
+ticks 400
+commander_death 0
+local_player 0
+player0.controller human
+player0.side Arm
+player0.metal 30000
+player0.energy 60000
+player1.controller ai
+player1.side Core
+spawn 10 0 ARMFDRAG 612 2292
+spawn 10 1 ARMFDRAG 712 2292
+spawn 10 1 ARMDRAG 512 2342
+spawn 10 1 ARMDRAG 662 2192

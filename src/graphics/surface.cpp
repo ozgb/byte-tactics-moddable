@@ -280,7 +280,7 @@ void RestoreScreen(void)
                     Surface screen;
                     LockScreen(&screen);
                     BlitSurface(&screen, d2->activeSurface, 0, 0);
-                    UnlockScreen(0);
+                    UnlockScreen(nullptr);
                 }
             }
         }
@@ -325,7 +325,7 @@ static inline int RestoreSurfacesInline(Display* d)
     Surface screen;
     LockScreen(&screen);
     BlitSurface(&screen, dd->activeSurface, 0, 0);
-    UnlockScreen(0);
+    UnlockScreen(nullptr);
     return 0;
 }
 

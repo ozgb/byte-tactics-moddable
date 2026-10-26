@@ -667,9 +667,11 @@ static void SeedNetworkHost(int host)
     g_game->net_flags |= 8;
 }
 
+static Table_0047ae60* ScenarioTable() { return (Table_0047ae60*)g_game->options; }
+
 static void SetUpSkirmish()
 {
-    Table_0047ae60* t = (Table_0047ae60*)g_game->options;
+    Table_0047ae60* t = ScenarioTable();
     int sideCount = g_game->sides;
     int highest = 0;
     int active = 0;
@@ -769,8 +771,10 @@ static void SetUpLoadedGame()
     char path[sizeof s_savePath];
     strcpy(path, s_savePath);
     HapiBank* summary = OpenSummaryBank(path);
-    if (summary == NULL)
+    if (summary == NULL) {
         FailLoad("cannot read the save ", s_savePath);
+        return;
+    }
     int type = summary->GetIntegerItem("Gametype", 0);
     int savedTick = summary->GetIntegerItem("Game Time", 0);
     FreeSummaryBank(summary);
@@ -782,13 +786,15 @@ static void SetUpLoadedGame()
         FailLoad("", detail);
     }
 
-    Table_0047ae60* t = (Table_0047ae60*)g_game->options;
+    Table_0047ae60* t = ScenarioTable();
     memset(t, 0, sizeof *t);
     char* saveName = (char*)g_game + 0x38c6b;
     strcpy(saveName, s_savePath);
     g_game->pendingSaveStore = (int)OpenHapiBank(saveName);
-    if (g_game->pendingSaveStore == 0)
+    if (g_game->pendingSaveStore == 0) {
         FailLoad("cannot read the save ", s_savePath);
+        return;
+    }
     HapiBank* bank = (HapiBank*)g_game->pendingSaveStore;
     bank->OpenAccount("summary");
     SetMissionType(bank->GetIntegerItem("Gametype", 0));
@@ -799,8 +805,10 @@ static void SetUpLoadedGame()
     g_game->flag_37ef2 = bank->GetIntegerItem("Side", 0);
     g_game->difficulty = bank->GetIntegerItem("Difficulty", 0);
     char* name = HarnessBankString(bank, "Mission", 0);
-    if (name == NULL || strlen(name) == 0 || mission->LoadMissionByName(name) == 0)
+    if (name == NULL || strlen(name) == 0 || mission->LoadMissionByName(name) == 0) {
         FailLoad("the save names a map the game cannot load: ", s_savePath);
+        return;
+    }
     strcpy(t->mapName, name);
     char* thumbs = HarnessBankString(bank, "Thumbs", 0);
     if (thumbs != NULL)

@@ -190,6 +190,7 @@ holder,offsets,target,scenarios,ticks,target_offsets,class,note
 ?insert@?$vector@PAUUnit@@V?$SimAllocator@PAUUnit@@@@@std@@QAEXPAPAUUnit@@IABQAU3@@Z,0x2+0x4*k 0x16 0x1a 0x22,HAPI_LoadFile,2,59734,0x1257-0xa0279,not-a-pointer,SimVector<Unit*> copies: the Unit* elements point into the block; these are misaligned reads (offset 2 mod 4) of them
 ?insert@?$vector@UElem_0040cfb0@@V?$SimAllocator@UElem_0040cfb0@@@@@std@@QAEXPAUElem_0040cfb0@@IABU3@@Z,*,*,0,0,-,not-a-pointer,words of the SimVector insert allocation that only look like addresses
 ?insert@?$vector@UElem_0040cfb0@@V?$SimAllocator@UElem_0040cfb0@@@@@std@@QAEXPAUElem_0040cfb0@@IABU3@@Z,0x194,LoadTntMap: TILE SET,1,150,0xaffe0,not-a-pointer,"SimVector buffer grown by insert: element words (coordinates, ids) that only look like addresses"
+?insert@?$vector@UElem_0040d4f0@@V?$SimAllocator@UElem_0040d4f0@@@@@std@@QAEXPAUElem_0040d4f0@@IABU3@@Z,*,*,0,0,-,not-a-pointer,AI weight bytes inside the PlayerAI element vector that only look like addresses when a host heap block covers them
 ?insert@?$vector@UElem_0040d550@@V?$SimAllocator@UElem_0040d550@@@@@std@@QAEXPAUElem_0040d550@@IABU3@@Z,*,*,0,0,-,not-a-pointer,"words of the SimVector<Elem_0040d550> insert allocation (int elements, at unaligned offsets) that only look like addresses"
 AddBeCarriedOrder,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 AddBeCarriedOrder,0xc,AllocDepthFrame: CompositeBuffer,1,2576,0x7ffdf,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"

@@ -905,25 +905,28 @@ int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* u)
         return 1;
     if (u->activateFlags & 4)
         return 0;
-    Vec3 p;
-    p.x = u->def->modelMinX + u->pos.x;
-    p.y = u->def->modelMaxY + u->pos.y;
-    p.z = u->def->modelMinZ + u->pos.z;
+    union {
+        Vec3 vec;
+        Vec3Words words;
+    } p;
+    p.vec.x = u->def->modelMinX + u->pos.x;
+    p.vec.y = u->def->modelMaxY + u->pos.y;
+    p.vec.z = u->def->modelMinZ + u->pos.z;
     if (!(u->flags & 0x200)) {
-        if (p.y < (g_game->seaLevel << 16))
+        if (p.vec.y < (g_game->seaLevel << 16))
             return 0;
     }
-    if (IsVisible(player, (Vec3Words*)&p))
+    if (IsVisible(player, &p.words))
         return 1;
-    p.x += u->def->modelSizeX;
-    if (IsVisible(player, (Vec3Words*)&p))
+    p.vec.x += u->def->modelSizeX;
+    if (IsVisible(player, &p.words))
         return 1;
-    p.z += u->def->modelSizeZ;
-    p.y -= u->def->modelSizeY;
-    if (IsVisible(player, (Vec3Words*)&p))
+    p.vec.z += u->def->modelSizeZ;
+    p.vec.y -= u->def->modelSizeY;
+    if (IsVisible(player, &p.words))
         return 1;
-    p.x -= u->def->modelSizeX;
-    if (IsVisibleByMask(player, (Vec3Words*)&p))
+    p.vec.x -= u->def->modelSizeX;
+    if (IsVisibleByMask(player, &p.words))
         return 1;
     return 0;
 }

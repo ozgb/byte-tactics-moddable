@@ -926,20 +926,20 @@ Unit* GetBuildMenuFocusUnit()
 }
 
 enum UnitAbility {
-    kAbilityMoveOrder = 0,
-    kAbilityFireOrder = 1,
-    kAbilityOnOff = 2,
-    kAbilityStop = 3,
-    kAbilityAttack = 4,
-    kAbilityDefend = 5,
-    kAbilityPatrol = 6,
-    kAbilityMove = 7,
-    kAbilityLoad = 8,
-    kAbilityRepair = 9,
-    kAbilityReclaim = 10,
-    kAbilityCapture = 12,
-    kAbilityCloak = 13,
-    kAbilityBlast = 14
+    AbilityMoveOrder = 0,
+    AbilityFireOrder = 1,
+    AbilityOnOff = 2,
+    AbilityStop = 3,
+    AbilityAttack = 4,
+    AbilityDefend = 5,
+    AbilityPatrol = 6,
+    AbilityMove = 7,
+    AbilityLoad = 8,
+    AbilityRepair = 9,
+    AbilityReclaim = 10,
+    AbilityCapture = 12,
+    AbilityCloak = 13,
+    AbilityBlast = 14
 };
 
 static inline int HasAbility(const UnitDef* def, int ability)
@@ -989,49 +989,49 @@ void RefreshSelectionOrders()
             if (first == 0)
                 first = u;
             UnitDef* type = u->def;
-            if (HasAbility(type, kAbilityFireOrder)) {
+            if (HasAbility(type, AbilityFireOrder)) {
                 if (fireOrder == 4)
                     fireOrder = u->fireOrder;
                 else if (fireOrder != u->fireOrder)
                     fireOrder = 3;
             }
-            if (HasAbility(type, kAbilityMoveOrder)) {
+            if (HasAbility(type, AbilityMoveOrder)) {
                 if (moveOrder == 4)
                     moveOrder = u->moveOrder;
                 else if (moveOrder != u->moveOrder)
                     moveOrder = 3;
             }
-            if (HasAbility(type, kAbilityOnOff)) {
+            if (HasAbility(type, AbilityOnOff)) {
                 if (onOff == 3)
                     onOff = u->activateFlags & 1;
                 else if (onOff != (u->activateFlags & 1))
                     onOff = 2;
             }
-            if (HasAbility(type, kAbilityCloak)) {
+            if (HasAbility(type, AbilityCloak)) {
                 if (cloak == 3)
                     cloak = u->cloakOn;
                 else
                     cloak = 2;
             }
-            if (HasAbility(type, kAbilityMove))
+            if (HasAbility(type, AbilityMove))
                 canMove = 1;
-            if (HasAbility(type, kAbilityStop))
+            if (HasAbility(type, AbilityStop))
                 canStop = 1;
-            if (HasAbility(type, kAbilityAttack))
+            if (HasAbility(type, AbilityAttack))
                 canAttack = 1;
-            if (HasAbility(type, kAbilityDefend))
+            if (HasAbility(type, AbilityDefend))
                 canDefend = 1;
-            if (HasAbility(type, kAbilityPatrol))
+            if (HasAbility(type, AbilityPatrol))
                 canPatrol = 1;
-            if (HasAbility(type, kAbilityLoad))
+            if (HasAbility(type, AbilityLoad))
                 canLoad = 1;
-            if (HasAbility(type, kAbilityRepair))
+            if (HasAbility(type, AbilityRepair))
                 canRepair = 1;
-            if (HasAbility(type, kAbilityCapture))
+            if (HasAbility(type, AbilityCapture))
                 canCapture = 1;
-            if (HasAbility(type, kAbilityReclaim))
+            if (HasAbility(type, AbilityReclaim))
                 canReclaim = 1;
-            if (HasAbility(type, kAbilityBlast))
+            if (HasAbility(type, AbilityBlast))
                 canBlast = 1;
             count++;
         }
@@ -1056,11 +1056,8 @@ void RefreshSelectionOrders()
     } else if (count == 1 && first->def->buildMenuPageCount) {
         int page = first->menu.menuOpen ? first->menu.page : 0;
         if (page > 0 || (first->def->flags1 & 0x80000000)) {
-            char name[256];
             char gui[256];
-            strncpy(name, g_game->defs[first->unitDefIndex].unitname, 0x20);
-            name[0x1f] = 0;
-            sprintf(gui, "%s%d.GUI", name, page);
+            BuildEntryGuiName(gui, first->unitDefIndex, page);
             if ((IsScreenNamed((Gui *)&g_game->menu, gui) == 0 || g_game->unitIndex != first->id)
                 && PopUntilNamedLayout(0))
                 OpenBuildMenuGui(first, gui, page);

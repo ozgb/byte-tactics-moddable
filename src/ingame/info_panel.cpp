@@ -66,6 +66,7 @@ struct Object_004cb650;
 #include "../units/unit.h"
 #include "../weapons/weapon_def.h"
 #include "../map/cell.h"
+#include "map_grid.h"
 #include "../map/mission.h"
 #include "../orders/order_list.h"
 #include "../units/unit_commands.h"
@@ -136,7 +137,7 @@ struct Feature {
             unsigned short unknown_bits : 4;
         };
         struct {
-            char unknown_fe;
+            char bitsLow;
             unsigned char flags;
         };
     };
@@ -1016,7 +1017,7 @@ static void DrawResourcePanel(Surface* ctx, Player* pl, Resources* res)
     Rect bar, box;
     char text[32];
     int side = pl->info->side;
-    Side_00431a60* sideDef = &g_game->sideDefs[side];
+    auto* sideDef = &g_game->sideDefs[side];
     SetFont((int)sideDef->font);
     GetFontHeight();
     unsigned char* pal = &g_game->colors[0];
@@ -1702,7 +1703,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
     Player* playerInfo = &g_game->players[player];
     PlayerInfo* info = playerInfo->info;
     int side = info->side;
-    Side_00431a60* panel = &g_game->sideDefs[side];
+    auto* panel = &g_game->sideDefs[side];
     SetFont((int)panel->font);
     int y = 0x81;
     do {

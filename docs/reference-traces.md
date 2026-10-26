@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v12` is the fixed target for anyone writing a new
+The git tag `reference-traces-v13` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v12`**.
+code as a base. This page names the current tag: **`reference-traces-v13`**.
 
 ## What the tag holds
 
@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v12`**.
   format is in `reference/README.md`, the hashed fields in
   `src/harness/trace_schema.h`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 54 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 56 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest per tick
   for each scenario.
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v12`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v12
+git checkout reference-traces-v13
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -134,7 +134,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v12
+git checkout reference-traces-v13
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -207,9 +207,9 @@ What the code shows about the players fields (`LoadPlayers` and `SavePlayers`, s
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v12`
+the digests that should become a target gets a new tag (`reference-traces-v13`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v12`.
+`reference-traces-v13`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -258,8 +258,12 @@ and so on), and this page is updated to name it. The current tag is
   options table it writes beside it (`savegame\harness.opt`), for loading a
   saved game (#442). The 53 earlier digests and the hashed fields are those of
   v11.
+- `reference-traces-v13`: two more scenarios, `units-transport` and
+  `units-transport-ship`, in which a hover transport and a transport ship load and
+  unload the Arm commander, for the transport code (#428). The 54 earlier
+  digests are those of v12, and the hashed fields are unchanged.
 
-`bt-trace N` does not name which fields are hashed. v1 to v12 are
+`bt-trace N` does not name which fields are hashed. v1 to v13 are
 all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` (and
 `src/harness/trace_schema.h`) at the tag. What makes a new format number is in

@@ -148,7 +148,7 @@ def print_divergence(tick: int, phase: str) -> None:
     print(f"  phase function: {describe_phase(phase)}")
 
 
-SAVE_PATH = "savegame/harness.sav"
+SAVE_FILES = ("savegame/harness.sav", "savegame/harness.opt")
 
 
 def scenario_load(scenario: Path) -> str | None:
@@ -209,17 +209,17 @@ def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | No
     (ROOT / "build/scratch").mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="save-", dir=ROOT / "build/scratch") as scratch:
         try:
-            run = play(exe, saver_path, game_dir, None, timeout, poison, collect=(SAVE_PATH,))
+            run = play(exe, saver_path, game_dir, None, timeout, poison, collect=SAVE_FILES)
         except Error as e:
             raise Error(f"{scenario.stem}: load {saver}: {saver} failed to run:\n{e}") from None
         try:
-            kept = run / SAVE_PATH
-            if not kept.is_file():
-                raise Error(f"{scenario.stem}: load {saver}: {saver} wrote no {SAVE_PATH}")
-            shutil.copyfile(kept, Path(scratch) / "harness.sav")
+            for path in SAVE_FILES:
+                if not (run / path).is_file():
+                    raise Error(f"{scenario.stem}: load {saver}: {saver} wrote no {path}")
+                shutil.copyfile(run / path, Path(scratch) / Path(path).name)
         finally:
             shutil.rmtree(run.parent, ignore_errors=True)
-        return play(exe, scenario, game_dir, dump, timeout, poison, put={SAVE_PATH: Path(scratch) / "harness.sav"})
+        return play(exe, scenario, game_dir, dump, timeout, poison, put={path: Path(scratch) / Path(path).name for path in SAVE_FILES})
 
 
 def compare(args: argparse.Namespace) -> int:

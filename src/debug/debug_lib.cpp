@@ -4,6 +4,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <stddef.h>
+#include <new>
 #include <stdio.h>
 #include "../state/block.h"
 #include "../../interfaces/host.h"
@@ -125,7 +126,6 @@ void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size)
     return GameAlloc(size);
 }
 
-#include "debug_lib_4dacf0.h"
 extern void (*g_outOfMemoryHandler)();
 
 #pragma auto_inline(off)
@@ -247,8 +247,6 @@ void __cdecl GameFreeThunk(int* p)
     GameFree(p);
 }
 #pragma auto_inline(on)
-
-#include "debug_lib_4db7d0.h"
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4d85b0
@@ -1180,6 +1178,9 @@ public:
     }
     InsertOrFindInline(&f.r, &f.p);
     }
+
+    void* operator new(size_t n) { return host_mem_alloc(n); }
+    FreeBlockMap();
 
     void AddFreeBlock(Pair_004db000 p);
     unsigned int TakeFreeBlock(unsigned int bytes);
@@ -2481,4 +2482,178 @@ void FpuFussyAtexitHandler(void)
 int StringMaxSize(void)
 {
     return 0xfffffffd;
+}
+
+extern unsigned char g_debugSupportInited;
+
+// FUNCTION: 0x4d8310
+void __cdecl CheckFillPattern(unsigned int* block, unsigned int fill, unsigned int size)
+{
+    unsigned int* p = block;
+    while (size >= 4) {
+        if (*p != fill)
+            __asm int 3
+        p++;
+        size -= 4;
+    }
+    unsigned char* bytes = (unsigned char*)p;
+    unsigned char* pattern = (unsigned char*)&fill;
+    for (unsigned int n = size; n > 0; n--, bytes++, pattern++)
+        if (*bytes != *pattern)
+            __asm int 3
+}
+
+// FUNCTION: 0x4da1d0
+void __cdecl InitDebugSupport(unsigned int flags)
+{
+    if (g_debugSupportInited)
+        return;
+    g_debugSupportInited = 1;
+    char* option = FindCommandLineSwitch("-debughelper");
+    if (option) {
+        int value = 0;
+        sscanf(option, "=%d", &value);
+        host_debug_helper(value);
+        AbortProgram();
+    }
+    getenv("windir");
+    if (!(flags & 2))
+        host_crash_install();
+    if (!(flags & 4))
+        SetFpuFussy();
+}
+
+// FUNCTION: 0x4dacf0
+unsigned int __cdecl AllocDebugBlock(unsigned int n, unsigned int arg2)
+{
+    void* lock = GetAllocLock();
+    host_mutex_lock(lock);
+    unsigned int size = n;
+    unsigned int res = 0;
+    if (size == 0)
+        size = 1;
+    unsigned int need = RoundUpToPage(size);
+    unsigned int want = RoundUpToDoublePage(size);
+    if (want < need) {
+        host_mutex_unlock(lock);
+        return 0;
+    }
+    unsigned int base = GetFreeBlockSet()->TakeFreeBlock(want);
+    if (base != 0) {
+        res = (unsigned int)host_mem_commit((void*)base, need);
+        if (res == 0) {
+            FreeBlockMap* pool = GetFreeBlockSet();
+            pool->AddFreeBlock(Pair_004db000(base, want));
+        }
+    }
+    if (res == 0) {
+        host_mutex_unlock(lock);
+        return 0;
+    }
+    unsigned int pad = (0 - (n & 0xfff)) & 0xfff;
+    if (IsBackAlign()) {
+        FillPattern((void*)res, GetDebugFillPattern(), pad);
+        res += pad;
+    } else {
+        FillPattern((void*)(res + n), GetDebugFillPattern(), pad);
+    }
+    BlockInfo rec(res, n, g_allocSerial, arg2, nullptr);
+    BlockMap* blocks = (BlockMap*)GetBlockMap();
+    blocks->Insert(&rec);
+    CountAlloc(n);
+    g_committedBytes += (n + 0xfff) & 0xfffff000;
+    if (g_committedBytes > g_committedBytesPeak)
+        g_committedBytesPeak = g_committedBytes;
+    host_mutex_unlock(lock);
+    return res;
+}
+
+class FreeBlockPoolAllocator : public std::allocator<int> {
+public:
+    char* _Charalloc(size_t n)
+    {
+        return (char*)((FreeBlockAllocator*)this)->Allocate(n);
+    }
+};
+
+typedef std::map<unsigned int, int, std::less<unsigned int>, FreeBlockPoolAllocator> FreeBlockStdMap;
+
+FreeBlockMap::FreeBlockMap() : total(0)
+{
+    new (this) FreeBlockStdMap;
+    int n = 4;
+    do {
+        unsigned int len = 0x10000000;
+        void* m = host_mem_reserve(len + 0x2000);
+        bool reserved = true;
+        for (;;) {
+            if (m != nullptr && (unsigned int)m + len <= 0x80000000u)
+                break;
+            if (m != nullptr)
+                host_mem_release(m);
+            len = (len >> 1) & 0x7fffe000;
+            if (len < 0x10000) {
+                reserved = false;
+                break;
+            }
+            m = host_mem_reserve(len + 0x2000);
+        }
+        if (reserved) {
+            total = total + len;
+            Pair_004db000 pair;
+            pair.offset = (unsigned int)m;
+            pair.length = len;
+            AddFreeBlock(pair);
+        }
+    } while (--n);
+}
+
+// FUNCTION: 0x4db610
+FreeBlockMap* __stdcall GetFreeBlockSet()
+{
+    if (g_freeBlockSet == nullptr)
+        g_freeBlockSet = new FreeBlockMap;
+    return g_freeBlockSet;
+}
+
+// FUNCTION: 0x4db7d0
+void __cdecl FreeDebugBlock(void* p, int flags)
+{
+    if (p == nullptr)
+        return;
+    void* lock = GetAllocLock();
+    host_mutex_lock(lock);
+    BlockMap* live = (BlockMap*)GetBlockMap();
+    BlockInfo rec((unsigned int)p, 0, 0, 0, nullptr);
+    BlockMapIter it = live->Find(rec.address);
+    if (it == ((BlockMap*)GetBlockMap())->end()) {
+        host_mutex_unlock(lock);
+        return;
+    }
+    unsigned int size = (unsigned int)it->size;
+    unsigned int pad = (0 - (size & 0xfff)) & 0xfff;
+    if (IsBackAlign())
+        CheckFillPattern((unsigned int *)((char*)p - pad), GetDebugFillPattern(), pad);
+    else
+        CheckFillPattern((unsigned int *)((char*)p + size), GetDebugFillPattern(), pad);
+    Elem_004dd8c0* old = (Elem_004dd8c0*)&*it;
+    Container_004da9f0<int>* arena = GetFreedBlockRing();
+    Vec_004dd8c0& ring = *(Vec_004dd8c0*)arena;
+    if ((unsigned int)arena->field_10 < 0x2000)
+        ring.push_back(*old);
+    else
+        ring[(unsigned int)arena->field_10 & 0x1fff] = *old;
+    arena->field_10++;
+    ((BlockMap*)GetBlockMap())->erase(it);
+    CountFree(size);
+    g_committedBytes -= (size + 0xfff) & 0xfffff000;
+    p = (void*)((unsigned int)p & 0xfffff000);
+    if (size == 0)
+        size = 1;
+    unsigned int commit = RoundUpToPage(size);
+    host_mem_decommit(p, commit);
+    unsigned int reserve = RoundUpToDoublePage(size);
+    FreeBlockMap* blocks = GetFreeBlockSet();
+    blocks->AddFreeBlock(Pair_004db000((unsigned int)p, reserve));
+    host_mutex_unlock(lock);
 }

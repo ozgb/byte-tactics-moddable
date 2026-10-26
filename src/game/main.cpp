@@ -177,7 +177,6 @@ extern const char g_audioCdShellKey[];
 extern const char g_cdShellValueName[];
 extern const char g_defaultLanguage[];
 
-#include "../debug/debug_lib_4da120.h"
 #include "../frontend/endgame.h"
 #include "cd_check.h"
 #include "../frontend/frontend.h"

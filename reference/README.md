@@ -155,8 +155,9 @@ conditions are checked for the human slot named by `local_player`.
 **Game type 3** runs the multiplayer rules without a network: the harness fills in
 the lobby state the exe expects (every named slot is a connected player, the
 local slot is the host, `player<N>.team` makes the alliances and both sides of
-each alliance agree to it) and starts the loading screen itself, so the lobby is
-skipped. `commander_death`, `mapping`, `line_of_sight`, `los_type`, `start_positions`
+each alliance agree to it), sets `loadingFlags |= 8` and starts the loading screen
+itself, so the lobby is skipped. Before every step (`HarnessBeforeStep`) it also sets
+every player's load progress to 100. `commander_death`, `mapping`, `line_of_sight`, `los_type`, `start_positions`
 and the `metal` and `energy` of the local slot (which sets every player's start) come
 from the scenario as in a skirmish.
 

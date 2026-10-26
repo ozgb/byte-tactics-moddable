@@ -6,6 +6,8 @@
 #include <minmax.h>
 #include <math.h>
 #include <vector>
+#include <new>
+#include <memory.h>
 #include "../state/sim_allocator.h"
 #include "win_types.h"
 
@@ -240,12 +242,17 @@ void __stdcall RegisterCommand(const char* name, Command_00406f00 fn, int flags)
 #include "../quirks/quirks.h"
 #include "../state/sim_globals.h"
 #include "../util/file_printf.h"
+#include "../orders/unit_orders.h"
 #include "../util/math.h"
 #include "../sound/sound.h"
 #include "../units/squads.h"
 void __stdcall GetBasePosition(int index, Vec3* out);
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
+int __cdecl ScaledSin(int angle, int distance);
+int __cdecl ScaledCos(int angle, int distance);
+int __stdcall IsPointVisible(Player* player, Vec3Words* pos);
+int __stdcall SumUnitRatingsInRange(int index, Vec3* pos, int range);
 #include "pathfind.h"
 void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
                             Elem_0040cc40 val, int*);
@@ -714,6 +721,184 @@ void SquadScoutTimer::OnTimer()
     }
 }
 
+// FUNCTION: 0x407d40
+// FUNCTION: 0x407e70 ??_GSpatialTimer@@UAEPAXI@Z
+SpatialTimer::SpatialTimer(SquadManager* p, void* q)
+    : SquadTimer(p, (Group*)q)
+{
+    int x = (int)(g_game->baseX / 2 * 65536.0);
+    best = MakeVec3(x, 0, (int)(g_game->baseY / 2 * 65536.0));
+    x = (int)(g_game->baseX / 2 * 65536.0);
+    probe = MakeVec3(x, 0, (int)(g_game->baseY / 2 * 65536.0));
+    x = (int)(g_game->baseX / 2 * 65536.0);
+    step = MakeVec3(x, 0, (int)(g_game->baseY / 2 * 65536.0));
+    bestRating = 0;
+}
+
+static inline int IsExplored(Player* player, Vec3Words* pos)
+{
+    int tx = pos->xWhole >> 5;
+    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
+    if ((unsigned int)tx < (unsigned int)player->exploredWidth && (unsigned int)ty < (unsigned int)player->exploredHeight &&
+        player->explored[(unsigned int)player->exploredWidth * ty + tx])
+        return 1;
+    return 0;
+}
+
+static inline int IsVisible(Player* player, Vec3Words* pos)
+{
+    if ((g_game->mapFlags & 2) == 2)
+        return IsExplored(player, pos);
+    return IsPointVisible(player, pos);
+}
+
+static inline Vec3 Offset(int angle, int distance)
+{
+    Vec3 v;
+    v.x = -ScaledSin(angle, distance);
+    v.y = 0;
+    v.z = -ScaledCos(angle, distance);
+    return v;
+}
+
+// FUNCTION: 0x407e90
+void SpatialTimer::OnTimer()
+{
+    int delay = RandomInt(150) + 30;
+    next = g_game->ticks + delay;
+    if (group->units.empty())
+        return;
+    std::vector<Unit*> unused;
+    if (RandomInt(10) == 0) {
+        probe = best;
+        int angle = RandomInt(0x10000);
+        step = Offset(angle, 0x1400000);
+    }
+    probe += step;
+    if (IsVisible((Player*)group->player, (Vec3Words*)&probe)) {
+        int r = SumUnitRatingsInRange(player, &probe, 0xa0);
+        if (RandomInt(r) > RandomInt(bestRating)) {
+            bestRating = r;
+            best = probe;
+        }
+    }
+    for (SimVector<Unit*>::iterator it = group->units.begin();
+         it != group->units.end(); ++it) {
+        Unit* u = *it;
+        if (u->def->c04) {
+            if (u->motion || g_seams.weapons->WeaponCanReachPos(u, (Vec3*)&u->pos, (Vec3*)&best, 0)) {
+                MissionType kind = g_seams.orders->GetOrderType(3, u, 0, (Vec3*)&best);
+                if (kind.index)
+                    g_seams.orders->AddOrder(kind, 0, u, 0, (Vec3*)&best, 0, 0);
+            }
+        }
+    }
+}
+
+// FUNCTION: 0x408090
+int __stdcall IsPointVisible(Player* player, Vec3Words* pos)
+{
+    int tx = pos->xWhole >> 5;
+    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
+    if (!((unsigned int)tx < (unsigned int)player->exploredWidth && (unsigned int)ty < (unsigned int)player->exploredHeight)) {
+        return 0;
+    }
+    return (g_game->visibilityMask[(unsigned int)player->exploredWidth * ty + tx] & (1 << g_game->playerIndex)) != 0;
+}
+
+static inline int FixMul(int a, int b)
+{
+    return (int)(((__int64)a * b) >> 16);
+}
+
+static inline int FixDiv(int a, int b)
+{
+    return (int)(((__int64)a << 16) / b);
+}
+
+static inline int MapRange()
+{
+    return (g_game->mapWidth + g_game->mapHeight) / 3 << 16;
+}
+
+static inline int IsFlag12(const UnitDef* def)
+{
+    return def->flags2 & 0x1000;
+}
+
+// FUNCTION: 0x408100
+void ScoutTimer::OnTimer()
+{
+    next = (unsigned int)g_game->ticks + 90;
+    Vec3 origin;
+    GetBasePosition(player, &origin);
+    SimVector<Unit*>::iterator it;
+    for (it = group->units.begin(); it != group->units.end(); ++it) {
+        Unit* u = *it;
+        if (u->def->count
+            && (!IsFlag12(u->def.get())
+                || (GetBuilderCount(player) < 5 && (unsigned int)g_game->ticks >= (unsigned int)owner->nextAction))
+            && (!u->list || !(u->list->flags_42 & 8))) {
+            unsigned short idx = ChooseBuildOption(player, u);
+            if (idx) {
+                Vec3 pos;
+                pos.x = 0;
+                pos.y = 0;
+                pos.z = 0;
+                int ok = FindBuildPosition(player, &u->pos, &g_game->defs[idx], &pos);
+                if (IsFlag12(u->def.get())) {
+                    int range = MapRange();
+                    origin.y = pos.y;
+                    Vec3 offset = pos - origin;
+                    int len = Vec3Length(&offset);
+                    if (len > range || len > range)
+                        ok = 0;
+                }
+                if (ok) {
+                    MissionType kind = g_seams.orders->GetOrderType(0xe, u, 0, &pos);
+                    g_seams.orders->AddOrder(kind, 0, u, 0, &pos, idx, 1);
+                }
+            }
+        }
+    }
+    for (it = group->units.begin(); it != group->units.end(); ++it) {
+        Unit* u = *it;
+        Vec3 target;
+        if ((!u->list || (u->list->flags_42 & 0x4000))
+            && (!IsFlag12(u->def.get()) || GetBuilderCount(player) >= 5)) {
+            target = origin;
+            if (IsFlag12(u->def.get())) {
+                origin.y = u->pos.y;
+                Vec3 d = origin - u->pos;
+                if (Vec3Length(&d) > 0x2800000)
+                    d = Direction(RandomInt(0x10000), 0x2800000);
+                target = origin + d;
+                MissionType kind;
+                kind = g_seams.orders->GetOrderType(2, u, 0, &target);
+                g_seams.orders->AddOrder(kind, 0, u, 0, &target, 0, 0);
+                kind = g_seams.orders->GetOrderType(9, u, 0, &origin);
+                g_seams.orders->AddOrder(kind, 1, u, 0, &origin, 0, 0);
+            } else {
+                Vec3 d = origin - u->pos;
+                int len = Vec3Length(&d);
+                if (len < 0x1400000) {
+                    if (len < 0x100000) {
+                        d = Direction(RandomInt(0x10000), 0x1400000);
+                    } else {
+                        int s = FixDiv(0x1400000, len);
+                        d.x = FixMul(s, d.x);
+                        d.y = FixMul(d.y, s);
+                        d.z = FixMul(d.z, s);
+                    }
+                    target = u->pos + d;
+                }
+                MissionType kind = g_seams.orders->GetOrderType(9, u, 0, &target);
+                g_seams.orders->AddOrder(kind, 0, u, 0, &target, 0, 0);
+            }
+        }
+    }
+}
+
 // FUNCTION: 0x4085d0
 // FUNCTION: 0x408600 ??_GScoutTimer@@UAEPAXI@Z
 ScoutTimer::ScoutTimer(SquadManager* p, Group* q)
@@ -721,6 +906,16 @@ ScoutTimer::ScoutTimer(SquadManager* p, Group* q)
 {
 }
 
+
+// FUNCTION: 0x408620
+void BuildTimer::TryIssueIdleFactoryBuildOrder(Unit* unit)
+{
+    if (unit->list != 0)
+        return;
+    unsigned short idx = ChooseBuildOption(player, unit);
+    if (idx != 0)
+        QueueBuildOrder((char*)&g_game->defs[idx].unitname[0], unit, 1);
+}
 
 // FUNCTION: 0x408670
 void __stdcall UpdateConverter(Unit* unit)
@@ -897,6 +1092,18 @@ void SquadManager::DeleteTimers()
     }
 }
 
+typedef SimVector<Unit*> Vec_00408f30;
+typedef void (Vec_00408f30::*InsertFn_00408f30)(
+    Vec_00408f30::iterator, Vec_00408f30::size_type, Unit* const&);
+
+void __stdcall Grow_00408f30(Vec_00408f30* units, int extra)
+{
+    units->reserve(extra + units->size());
+}
+
+// FUNCTION: 0x408f30 ?insert@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEXPAPAUUnit@@IABQAU3@@Z
+InsertFn_00408f30 g_insert_00408f30 = &Vec_00408f30::insert;
+
 // FUNCTION: 0x409160
 PlayerAI::PlayerAI(unsigned char p)
     : owner(&g_game->players[p]), index(p),
@@ -996,6 +1203,88 @@ int __stdcall RateUnitType(UnitDef* p)
     if (MIN(result, 100) < -100)
         return -100;
     return MIN(result, 100);
+}
+
+int __stdcall RateUnitTypeForWeights(UnitDef* p)
+{
+    int result = 1;
+    if (p->extractsMetal != 0.0f)
+        result = 0xb;
+    if (p->makesMetal != 0)
+        result += 10;
+    if (g_seams.economy->GetEnergyUse(p) < 0.0f)
+        result += 10;
+#ifdef __clang__
+    result = (int)((int)((double)result - (double)p->metalCost * -0.01f) - (double)p->energyCost * -0.002f);
+#else
+    result = (int)((int)(result - p->metalCost * -0.01f) - p->energyCost * -0.002f);
+#endif
+    result += (signed char)RateWeapons(p);
+    if (MIN(result, 100) < -100)
+        return -100;
+    return MIN(result, 100);
+}
+
+// FUNCTION: 0x409730
+void PlayerAI::ComputeBaseWeights()
+{
+    vec_8d.resize(g_game->unitDefCount, 0);
+    {
+        Elem_0040cfb0 e;
+        e.a = 0;
+        e.b = 0;
+        e.c = 0;
+        vec_65.resize(g_game->unitDefCount, e);
+    }
+    for (int i = 1; i < g_game->unitDefCount; i++) {
+        UnitDef* def = &g_game->defs[(unsigned short)i];
+        vec_8d[i] = RateUnitTypeForWeights(def);
+
+        int a = 1;
+        Elem_0040cfb0* e = &vec_65[i];
+        int n = (short)counts[i];
+        if (def->c04)
+            a = 21;
+        if (def->canbuild && n < 3)
+            a += 30;
+        if (g_seams.economy->GetEnergyUse(def) < 0.0f)
+            a += 50;
+        if (def->HasField1ce())
+            a += 50;
+        if (def->makesMetal)
+            a += 25;
+        unsigned int flags = def->flags1;
+        if ((flags >> 11) & 1)
+            a += 40;
+        if (def->sonardistance)
+            a += 15;
+        if (def->radardistance)
+            a += 5;
+        int x = (int)(a + min(max(def->energymake, 0.0f), 30.0f));
+        if (n == 0)
+            x *= 4;
+        if (n == 1)
+            x *= 2;
+        if (def->minwaterdepth >= 0)
+            x *= 3;
+        if (owner->unitCount > (unsigned short)(g_game->unitsPerPlayer / 2)) {
+            x += (char)vec_8d[i] / 2;
+        }
+        if (def->c08)
+            x = 0;
+        if ((flags >> 24) & 1)
+            x = 0;
+        if (def->windgenerator != 0.0f && g_game->windSpeedMax < g_game->windSpeedDenominator / 2)
+            x = 0;
+        x = min(x, 100);
+        e->a = x;
+        e->c = (char)max(0.0f, min(100.0f, def->energyCost * -0.0025f - g_seams.economy->GetEnergyUse(def) * 5.0f));
+#ifdef __clang__
+        e->b = (char)max(0.0f, min(100.0f, (double)(float)((double)def->metalCost * -0.02f + (def->makesMetal ? 25 : 0)) + (def->extractsMetal != 0.0f ? 100 : 0)));
+#else
+        e->b = (char)max(0.0f, min(100.0f, (float)(def->metalCost * -0.02f) + (def->makesMetal ? 25 : 0) + (def->extractsMetal != 0.0f ? 100 : 0)));
+#endif
+    }
 }
 
 // FUNCTION: 0x409dc0
@@ -1256,6 +1545,24 @@ bool __stdcall HasReadyUnitInRange(int player, Vec3_40b0d0* p, int range)
     return false;
 }
 
+// FUNCTION: 0x40b1c0
+int __stdcall SumUnitRatingsInRange(int player, Vec3* pos, int range)
+{
+    int total = 0;
+    PlayerAI* p = g_playerAI[player];
+    int r2 = range * range;
+    SimVector<Unit*>& units = p->visible.units;
+    for (SimVector<Unit*>::iterator it = units.begin(); it != units.end(); it++) {
+        Unit* u = *it;
+        int dz = pos->z - u->pos.z;
+        int dx = pos->x - u->pos.x;
+        int d = (int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32);
+        if (d <= r2)
+            total += (signed char)p->vec_8d[u->unitDefIndex];
+    }
+    return total;
+}
+
 // FUNCTION: 0x40b2c0
 void __stdcall UpdatePlayerAI(int player)
 {
@@ -1288,6 +1595,26 @@ void __stdcall DestroyPlayerAI(int player)
 {
     delete g_playerAI[player].get();
     g_playerAI[player]=0;
+}
+
+namespace std {
+inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
+}
+
+// FUNCTION: 0x40b530
+void __stdcall GetFactoriesInRadius(int player,const Vec* pos,int radius,std::vector<Unit*>* out)
+{
+    SimVector<Unit*>& list=g_playerAI[player]->factories.list.units;
+    radius*=radius;
+    for(SimVector<Unit*>::iterator it=list.begin();it!=list.end();++it) {
+        Unit* unit=*it;
+        if((unit->def->flags1&0x40) && (unit->def->flags1&0x200) && (unit->activateFlags&1)) {
+            int dz=pos->z-unit->pos.z;
+            int dx=pos->x-unit->pos.x;
+            int d=(int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32);
+            if(d<=radius) out->push_back(*it);
+        }
+    }
 }
 
 // FUNCTION: 0x40b7b0
@@ -1491,3 +1818,108 @@ int __stdcall HasSpecialUnit(int param_1)
 template class std::vector<Unit*, SimAllocator<Unit*> >;
 
 // FUNCTION: 0x40c510 ??0?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@ABV?$allocator@PAUUnit@@@1@@Z
+
+inline void __stdcall CopyOneByte(Elem_0040d4f0* dest, const Elem_0040d4f0* src) { new (dest) Elem_0040d4f0(*src); }
+inline void __stdcall CopyDwordPair(Elem_0040cc40* dest, const Elem_0040cc40* src) { new (dest) Elem_0040cc40(*src); }
+namespace std {
+inline void _Construct(Elem_0040d4f0* dest, const Elem_0040d4f0& src) { CopyOneByte(dest, &src); }
+inline void _Construct(Elem_0040cc40* dest, const Elem_0040cc40& src) { CopyDwordPair(dest, &src); }
+}
+
+typedef SimVector<Unit*> Vec_0040c530;
+typedef SimVector<Elem_0040cc40> Vec_0040c580;
+typedef SimVector<Elem_0040cfb0> Vec_0040c5d0;
+typedef SimVector<Elem_0040d4f0> Vec_0040c600;
+typedef SimVector<Elem_0040d550> Vec_0040c7f0;
+typedef SimVector<short> Vec_0040d000;
+typedef SimVector<unsigned char> Vec_0040d290;
+
+typedef SimVector<Vec_0040c530> Outer_0040c530;
+typedef Outer_0040c530& (Outer_0040c530::*AssignFn_0040c530)(const Outer_0040c530&);
+// FUNCTION: 0x40c530 ??1?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@XZ
+AssignFn_0040c530 g_assign_0040c530 = &Outer_0040c530::operator=;
+
+typedef Vec_0040c530::size_type (Vec_0040c530::*SizeFn_0040c560)() const;
+// FUNCTION: 0x40c560 ?size@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QBEIXZ
+SizeFn_0040c560 g_size_0040c560 = &Vec_0040c530::size;
+
+typedef SimVector<Vec_0040c580> Outer_0040c580;
+typedef Outer_0040c580& (Outer_0040c580::*AssignFn_0040c580)(const Outer_0040c580&);
+// FUNCTION: 0x40c580 ??1?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QAE@XZ
+AssignFn_0040c580 g_assign_0040c580 = &Outer_0040c580::operator=;
+
+typedef Vec_0040c580::size_type (Vec_0040c580::*SizeFn_0040c5b0)() const;
+// FUNCTION: 0x40c5b0 ?size@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QBEIXZ
+SizeFn_0040c5b0 g_size_0040c5b0 = &Vec_0040c580::size;
+
+typedef SimVector<Vec_0040c5d0> Outer_0040c5d0;
+typedef Outer_0040c5d0& (Outer_0040c5d0::*AssignFn_0040c5d0)(const Outer_0040c5d0&);
+// FUNCTION: 0x40c5d0 ??1?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QAE@XZ
+AssignFn_0040c5d0 g_assign_0040c5d0 = &Outer_0040c5d0::operator=;
+
+typedef void (Vec_0040c600::*ResizeFn_0040c600)(unsigned int, const Elem_0040d4f0&);
+// FUNCTION: 0x40c600 ?resize@?$vector@UElem_0040d4f0@@V?$allocator@UElem_0040d4f0@@@std@@@std@@QAEXIABUElem_0040d4f0@@@Z
+ResizeFn_0040c600 g_resize_0040c600 = &Vec_0040c600::resize;
+
+typedef void (Vec_0040c7f0::*ResizeFn_0040c7f0)(unsigned int, const Elem_0040d550&);
+// FUNCTION: 0x40c7f0 ?resize@?$vector@UElem_0040d550@@V?$allocator@UElem_0040d550@@@std@@@std@@QAEXIABUElem_0040d550@@@Z
+ResizeFn_0040c7f0 g_resize_0040c7f0 = &Vec_0040c7f0::resize;
+
+typedef Vec_0040c530::iterator (Vec_0040c530::*EraseFn_0040c9f0)(
+    Vec_0040c530::iterator, Vec_0040c530::iterator);
+// FUNCTION: 0x40c9f0 ?erase@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEPAPAUUnit@@PAPAU3@0@Z
+EraseFn_0040c9f0 g_erase_0040c9f0 = &Vec_0040c530::erase;
+
+typedef Vec_0040c580::size_type (Vec_0040c580::*CapacityFn_0040ca30)() const;
+// FUNCTION: 0x40ca30 ?capacity@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QBEIXZ
+CapacityFn_0040ca30 g_capacity_0040ca30 = &Vec_0040c580::capacity;
+
+typedef Vec_0040c580::iterator (Vec_0040c580::*InsertFn_0040ca50)(Vec_0040c580::iterator, const Elem_0040cc40&);
+// FUNCTION: 0x40ca50 ?insert@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QAEPAUElem_0040cc40@@PAU3@ABU3@@Z
+InsertFn_0040ca50 g_insert_0040ca50 = &Vec_0040c580::insert;
+
+typedef Vec_0040c5d0::size_type (Vec_0040c5d0::*SizeFn_0040cc80)() const;
+// FUNCTION: 0x40cc80 ?size@?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QBEIXZ
+SizeFn_0040cc80 g_size_0040cc80 = &Vec_0040c5d0::size;
+
+typedef void (Vec_0040c5d0::*InsertFn_0040cca0)(Vec_0040c5d0::iterator, unsigned int, const Elem_0040cfb0&);
+
+void __stdcall Grow_0040cca0(Vec_0040c5d0* v, int extra)
+{
+    v->reserve(extra + v->size());
+}
+
+// FUNCTION: 0x40cca0 ?insert@?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QAEXPAUElem_0040cfb0@@IABU3@@Z
+InsertFn_0040cca0 g_insert_0040cca0 = &Vec_0040c5d0::insert;
+
+typedef Vec_0040c5d0::iterator (Vec_0040c5d0::*EraseFn_0040cfb0)(
+    Vec_0040c5d0::iterator, Vec_0040c5d0::iterator);
+// FUNCTION: 0x40cfb0 ?erase@?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QAEPAUElem_0040cfb0@@PAU3@0@Z
+EraseFn_0040cfb0 g_erase_0040cfb0 = &Vec_0040c5d0::erase;
+
+typedef Vec_0040d000::size_type (Vec_0040d000::*SizeFn_0040d000)() const;
+// FUNCTION: 0x40d000 ?size@?$vector@FV?$allocator@F@std@@@std@@QBEIXZ
+SizeFn_0040d000 g_size_0040d000 = &Vec_0040d000::size;
+
+typedef void (Vec_0040d000::*InsertFn_0040d020)(
+    Vec_0040d000::iterator, Vec_0040d000::size_type, const short&);
+// FUNCTION: 0x40d020 ?insert@?$vector@FV?$allocator@F@std@@@std@@QAEXPAFIABF@Z
+InsertFn_0040d020 g_insert_0040d020 = &Vec_0040d000::insert;
+
+typedef Vec_0040d000::iterator (Vec_0040d000::*EraseFn_0040d240)(
+    Vec_0040d000::iterator, Vec_0040d000::iterator);
+// FUNCTION: 0x40d240 ?erase@?$vector@FV?$allocator@F@std@@@std@@QAEPAFPAF0@Z
+EraseFn_0040d240 g_erase_0040d240 = &Vec_0040d000::erase;
+
+// FUNCTION: 0x40d290 ?insert@?$vector@EV?$allocator@E@std@@@std@@QAEXPAEIABE@Z
+void (SimVector<unsigned char>::*g_insert_0040d290)(unsigned char*, unsigned int,
+                                                      const unsigned char&) = &SimVector<unsigned char>::insert;
+
+typedef Vec_0040d290::iterator (Vec_0040d290::*EraseFn_0040d470)(
+    Vec_0040d290::iterator, Vec_0040d290::iterator);
+// FUNCTION: 0x40d470 ?erase@?$vector@EV?$allocator@E@std@@@std@@QAEPAEPAE0@Z
+EraseFn_0040d470 g_erase_0040d470 = &Vec_0040d290::erase;
+
+typedef Vec_0040c7f0::size_type (Vec_0040c7f0::*SizeFn_0040d4c0)() const;
+// FUNCTION: 0x40d4c0 ?size@?$vector@UElem_0040d550@@V?$allocator@UElem_0040d550@@@std@@@std@@QBEIXZ
+SizeFn_0040d4c0 g_size_0040d4c0 = &Vec_0040c7f0::size;

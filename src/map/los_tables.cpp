@@ -36,7 +36,7 @@ struct Elem_00434360 {
     std::vector<Elem_00434020> v;
 };
 
-typedef std::vector<Elem_00434360> Column_00433270;
+typedef std::vector<Elem_00434360> LineList;
 
 #include "../util/tdf.h"
 #include "../game/data_files.h"
@@ -185,7 +185,7 @@ void __stdcall InsertionSortUnitTypes(UnitDef* first, UnitDef* last, Compare com
         }
 }
 
-typedef std::vector<Column_00433270> TableList;
+typedef std::vector<LineList> TableList;
 
 // FUNCTION: 0x4330b0
 void LosTables::FreeTables()
@@ -481,7 +481,7 @@ void LosTables::LoadLosTables()
             short numtables = (short)tdf.current->GetFieldInt("numtables", 0);
             {
                 TableList& tables = *(TableList*)this;
-                Column_00433270 temp;
+                LineList temp;
                 unsigned n = (unsigned)numtables;
                 if (tables.size() < n)
                     tables.insert(tables.end(), n - tables.size(), temp);
@@ -498,7 +498,7 @@ void LosTables::LoadLosTables()
 // FUNCTION: 0x433270
 void LosTables::ResizeTables(short n)
 {
-    Column_00433270 x;
+    LineList x;
     ((TableList*)this)->resize(n, x);
 }
 
@@ -508,13 +508,13 @@ AssignFn_00433a80 g_assign_00433a80 = &TableList::operator=;
 
 // FUNCTION: 0x433a80 ??1?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAE@XZ
 
-typedef Column_00433270::iterator (Column_00433270::*EraseFn_00434020)(
-    Column_00433270::iterator, Column_00433270::iterator);
+typedef LineList::iterator (LineList::*EraseFn_00434020)(
+    LineList::iterator, LineList::iterator);
 
 // FUNCTION: 0x434020 ?erase@?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAEPAUElem_00434360@@PAU3@0@Z
-EraseFn_00434020 g_erase_00434020 = &Column_00433270::erase;
+EraseFn_00434020 g_erase_00434020 = &LineList::erase;
 
-typedef void (TableList::*InsertFn_004344e0)(TableList::iterator, TableList::size_type, const Column_00433270&);
+typedef void (TableList::*InsertFn_004344e0)(TableList::iterator, TableList::size_type, const LineList&);
 
 // FUNCTION: 0x4344e0 ??0?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAE@ABV01@@Z
 InsertFn_004344e0 g_insert_004344e0 = &TableList::insert;

@@ -9,6 +9,7 @@
 0x435da0 Mission::LoadMission
 0x437cd0 InitMeteors
 0x437de0 UpdateMeteors
+0x43e180 GetPieceAngles
 0x43e3c0 GetSweetSpot
 0x44fc10 NetCondenser::SendPacket
 0x450380 AnnouncePlayerLeft

@@ -61,8 +61,9 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `quirks_reach` | none | Test only: `<tick> <flag name>`, at that tick makes the game reach the guard of `units.ignore-null-death-record`, `ai.patrol-null-enemy-skip` or `units.skip-empty-yardmap` (see Quirk flags) |
 | `save` | none | Saves the game with `SaveGameFile` to `savegame\harness.sav` in the run's game directory after the step of this tick, 1 to `ticks`; one line only |
 | `load` | none | Starts from the game another scenario of the suite saved, by file stem (`load save-midgame`), instead of from the scenario's own map and players; one line only (see Loading a saved game) |
-| `game_type` | 2 | 2: skirmish, 3: multiplayer without a network; one line only (see Game types). Type 1, a campaign mission, needs the `campaign` key and comes with #444 |
-| `map` | required | Map name, the rest of the line (names have spaces) |
+| `game_type` | 2 | 1: a mission of a campaign, 2: skirmish, 3: multiplayer without a network; one line only (see Game types) |
+| `campaign` | none | Game type 1 only, and required there: the campaign file `camps/<name>.tdf`, the rest of the line (names have spaces) |
+| `map` | required | Map name, the rest of the line (names have spaces); under game type 1 the mission's name in the campaign |
 | `difficulty` | 1 | AI difficulty 0 to 2, one value for all computer players |
 | `commander_death` | 1 | 1: the game ends when a commander dies |
 | `mapping` | 1 | 1: terrain is blacked out until explored (the skirmish menu's "Terrain is blacked out until explored"); 0: the whole map is shown |
@@ -101,7 +102,7 @@ menu's table, and never clears it; the summary items above then overwrite the fi
   `steps_per_frame`, `quirks`, `quirks_tamper` and `quirks_reach`. The seeds take effect at load, as in any
   run (`LoadMatch` reseeds the generators).
 - **Keys it may not set:** the save decides them, so a scenario with a `load` line that sets one exits 2 and
-  names it: `game_type`, `map`, `difficulty`, `commander_death`, `mapping`, `line_of_sight`, `los_type`,
+  names it: `game_type`, `campaign`, `map`, `difficulty`, `commander_death`, `mapping`, `line_of_sight`, `los_type`,
   `start_positions`, every `player<N>.*` key (the controllers, sides, colours, resources and alliances),
   `local_player` (the save keeps the human player). `spawn` and `order` are not accepted either (the
   scenario has no players of its own to name), and neither is `save`. `map` and the `player<N>.*` keys are
@@ -134,7 +135,22 @@ WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode
 `game_type` is the number the game keeps as `Mission::type`. With 2, the default,
 a scenario is a skirmish and nothing below applies.
 
-**Game type 1**, a mission of a campaign, is not accepted yet: it needs the `campaign` key, which comes with #444.
+**Game type 1** loads one mission of a campaign, as the campaign menu does.
+`campaign` names the campaign file in `camps/` without `.tdf` (`Battle Tactics -
+Arm Very Short`, `Arm Campaign`) and `map` the mission's `missionname` in that
+file (`Sub Hunting`, `1: A Hero Returns`), as the mission list shows it. The
+mission's own file gives the units, their owners (`Player=1` is slot 0) and the
+victory and defeat conditions, so a scenario names a slot for every owner the
+mission uses, or the exe stops with `Player number N invalid`. The schema is the
+one 3.1c picks for the campaign difficulty: `difficulty` 0 prefers `Easy`, 1
+`Medium`, 2 `Hard`, and each falls back to the others. The keys the mission
+decides (`commander_death`, `mapping`, `line_of_sight`, `los_type`,
+`start_positions`, `player<N>.metal` and `player<N>.energy`) are errors under
+game type 1, and so is `game_type 1` without `campaign`, or `campaign` without
+`game_type 1`. A campaign or mission name the game does not find exits with
+status 2. Any mission map of `totala4.hpi`, `ccmiss.ccx` and `tactics1.hpi` to
+`tactics8.hpi` can be used, each with the conditions its map file names. The
+conditions are checked for the human slot named by `local_player`.
 
 **Game type 3** runs the multiplayer rules without a network: the harness fills in
 the lobby state the exe expects (every named slot is a connected player, the

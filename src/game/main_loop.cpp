@@ -83,7 +83,6 @@ struct FixedPos_00496ee0 {
 #include "../frontend/frontend.h"
 #include "../frontend/frontend.h"
 #include "../network/net_game.h"
-#include "../network/net_game_453d40.h"
 unsigned int GetTicks();
 #include "../ingame/keys.h"
 #include "../ingame/control_panel.h"

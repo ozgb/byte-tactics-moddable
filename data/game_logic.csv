@@ -538,7 +538,7 @@ address,function,file
 0x450010,GetPlayerDpid,src/network/net_game.cpp
 0x450030,GetHostDpid,src/network/net_game.cpp
 0x450380,AnnouncePlayerLeft,src/network/net_game.cpp
-0x450530,SendLobbySyncRequests,src/network/net_game_450530.cpp
+0x450530,SendLobbySyncRequests,src/network/net_game.cpp
 0x450980,CheckDuplicatePlayerIds,src/network/net_game.cpp
 0x450a10,AddNetPlayer,src/network/net_game.cpp
 0x450f90,BroadcastPlayerInfo,src/network/net_game.cpp
@@ -558,7 +558,7 @@ address,function,file
 0x4538f0,HandleTimeoutDialog,src/network/net_game.cpp
 0x453a50,OpenTimeoutDialog,src/network/net_game.cpp
 0x453c20,CheckPlayerTimeouts,src/network/net_game.cpp
-0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp
+0x453d40,HandleNetPackets,src/network/net_game.cpp
 0x456030,Player::IsPlayableSlot,src/network/net_game.cpp
 0x456050,SendNewUnit,src/network/net_game.cpp
 0x4560c0,BroadcastBuilderLink,src/network/net_game.cpp
@@ -689,7 +689,7 @@ address,function,file
 0x46d6c0,UnitSync::HandleSyncPacket,src/network/unit_sync.cpp
 0x46d860,UnitSync::NotifyEntryChanged,src/network/unit_sync.cpp
 0x46d970,UnitSync::CheckUnitAvailable,src/network/unit_sync.cpp
-0x46e640,std::H::HV?$allocator::?$vector::insert,src/network/unit_sync_46e640.cpp
+0x46e640,std::H::HV?$allocator::?$vector::insert,src/network/unit_sync.cpp
 0x46e9b0,UnitSyncMap::FindExact,src/network/unit_sync.cpp
 0x46ef50,IUUnitSyncEntry::IU?$pair::?$_Tree::insert,src/network/unit_sync.cpp
 0x46fb80,IUUnitSyncEntry::IU?$pair::?$_Tree::_Insert,src/network/unit_sync.cpp

@@ -18,7 +18,7 @@ Class_0045ae80,unknown_30,pointer,include/ta_types.h,#353
 Class_0047cb00,head,pointer,include/ta_types.h,#353
 Class_004b0a70,table,pointer,include/ta_types.h,#353
 CobScript,table,pointer,src/units/cob_script.h,#352
-Conn_443ff0,data,pointer,src/frontend/conn_443ff0.h,#353
+Conn_443ff0,data,pointer,src/frontend/connection_blob.h,#353
 Entry,field_ce,pointer,include/ta_types.h,#353
 Entry,gaf,pointer,include/ta_types.h,#353
 Entry,glyphs,pointer,include/ta_types.h,#353
@@ -52,8 +52,10 @@ Gadget,flags,pointer,src/frontend/multi.cpp,#353
 Gadget,frames,pointer,src/frontend/options.cpp|src/frontend/skirmish_menu.cpp,#353
 Gadget,gaf,pointer,src/frontend/campaign_menu.cpp|src/gui/gadget.h|src/gui/gui.cpp,#353
 Gadget,handler,function-pointer,src/frontend/multi.cpp,#353
+Gadget,head.gaf,pointer,src/frontend/multi.cpp,#353
 Gadget,hotspotCallback,pointer,src/frontend/campaign_menu.cpp,#353
 Gadget,hotspotFrame,pointer,src/frontend/multi.cpp,#353
+Gadget,hotspotGaf,int-pointer,src/frontend/multi.cpp,#353
 Gadget,hotspotGaf,pointer,src/frontend/campaign_menu.cpp,#353
 Gadget,image,pointer,src/frontend/endgame.cpp,#353
 Gadget,inputGaf,pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
@@ -84,7 +86,6 @@ Gadget,u.list.filebuf,pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
 Gadget,u.list.gaf,pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
 Gadget,u.list.records,pointer,src/gui/gadget.h,#353
 Gadget,u.list.rows,pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
-Gadget_0044a680,frames,pointer,src/frontend/multi_44a680.cpp,#353
 GafEntry_004b8d40,child,pointer,include/ta_types.h,#353
 GafFrame,pixelsOrLayers,pointer,src/graphics/gaf_frame.h,#353
 GafFrame,scratch,pointer,src/graphics/gaf_frame.h,#353
@@ -174,7 +175,7 @@ Holder_0045b800,entries,pointer,src/frontend/options.cpp,#353
 Layer,cb1c,function-pointer,src/frontend/frontend.cpp|src/gui/layer.h,#353
 Layer,cb1c,pointer,src/frontend/multi.cpp,#353
 Layer,data,pointer,src/frontend/multi.cpp|src/gui/layer.h,#353
-Layer,entries,pointer,src/frontend/multi.cpp|src/frontend/multi_444580.cpp|src/frontend/multi_44a680.cpp|src/gui/dialogs.cpp|src/gui/layer.h,#353
+Layer,entries,pointer,src/frontend/multi.cpp|src/gui/dialogs.cpp|src/gui/layer.h,#353
 Layer,gadgets,pointer,src/frontend/frontend.cpp,#353
 Layer,handler,function-pointer,src/frontend/frontend.cpp|src/gui/dialogs.cpp|src/gui/layer.h,#353
 Layer,handler,pointer,src/frontend/multi.cpp,#353

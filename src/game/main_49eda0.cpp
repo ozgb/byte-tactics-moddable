@@ -23,7 +23,7 @@ extern Game_0049ee30* g_game;
 extern int g_cmdlineDisplaySeed;
 extern char g_preferredLanguage[];
 #include "../debug/debug_lib.h"
-#include "../network/online_45b670.h"
+#include "../network/online.h"
 #include "../ingame/camera.h"
 #include "../frontend/options.h"
 #include "../network/net_game.h"

@@ -1,5 +1,5 @@
-#ifndef CONN_443FF0_H
-#define CONN_443FF0_H
+#ifndef CONNECTION_BLOB_H
+#define CONNECTION_BLOB_H
 
 #pragma pack(push, 1)
 struct Conn_443ff0 {

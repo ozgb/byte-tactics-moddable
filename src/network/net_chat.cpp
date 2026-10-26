@@ -115,6 +115,19 @@ int ScrollToNextMessageUnit(void)
     return 0;
 }
 
+// FUNCTION: 0x464000
+void CycleMessageUnits(void)
+{
+    int i;
+    for (i = 0; i < 30; i++)
+        (*(ChatHudEntry (*)[30])&g_game->entries)[i].flags &= ~0x20;
+    if (ScrollToNextMessageUnit() == 0) {
+        for (i = 0; i < 30; i++)
+            (*(ChatHudEntry (*)[30])&g_game->entries)[i].flags &= ~0x10;
+        ScrollToNextMessageUnit();
+    }
+}
+
 // FUNCTION: 0x464060
 void __stdcall DrawMessages(void* surf)
 {

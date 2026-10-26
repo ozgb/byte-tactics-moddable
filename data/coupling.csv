@@ -736,7 +736,6 @@ game,presentation,call,BuildSideList,2
 game,presentation,call,CMemoryCache::FlushCache,6
 game,presentation,call,CenterCameraOnRadarClick,1
 game,presentation,call,CenterCameraOnStartPosition,1
-game,presentation,call,CheckMapCrc,1
 game,presentation,call,ClearCameraFollowState,1
 game,presentation,call,ClearGroupStatus,1
 game,presentation,call,ClearKeyQueue,3
@@ -820,6 +819,7 @@ game,presentation,call,LoadLightTable,1
 game,presentation,call,LoadPictureCached,4
 game,presentation,call,LoadShadeTable,1
 game,presentation,call,LoadSurface,1
+game,presentation,call,LobbyMapCrcMatches,1
 game,presentation,call,LockScreen,1
 game,presentation,call,MainLoopContinueStub,1
 game,presentation,call,MainLoopContinueStub_B,1
@@ -942,7 +942,7 @@ game,presentation,call,UpdatePlacementGhostValidity,2
 game,presentation,call,WriteCameraPosition,1
 game,presentation,call,WriteScreenshot,1
 game,presentation,shared_write,Angles16::heading,1
-game,presentation,shared_write,Game::commanderDeath,2
+game,presentation,shared_write,Game::commanderDeath,3
 game,presentation,shared_write,Game::difficulty,10
 game,presentation,shared_write,Game::displayContext,2
 game,presentation,shared_write,Game::effectiveGameSpeed,6
@@ -962,7 +962,7 @@ game,presentation,shared_write,Game::mode_391f1,5
 game,presentation,shared_write,Game::numPlayers,4
 game,presentation,shared_write,Game::playerIndex,26
 game,presentation,shared_write,Game::seaLevel,4
-game,presentation,shared_write,Game::ticks,34
+game,presentation,shared_write,Game::ticks,35
 game,presentation,shared_write,Game::uiOptionFlags,2
 game,presentation,shared_write,Game::unitIndex,22
 game,presentation,shared_write,Game::version,3
@@ -1164,7 +1164,7 @@ harness,presentation,shared_write,Game::mode_391f1,5
 harness,presentation,shared_write,Game::numPlayers,4
 harness,presentation,shared_write,Game::playerIndex,26
 harness,presentation,shared_write,Player::alliedBy,4
-harness,presentation,shared_write,PlayerInfo::energy,2
+harness,presentation,shared_write,PlayerInfo::energy,1
 harness,presentation,shared_write,PlayerInfo::metal,1
 harness,seams,call,InstallNativeSeams,1
 harness,units,call,ApplyUnitDeath,1
@@ -1483,7 +1483,7 @@ map,players,shared_write,Vec3::z,3
 map,presentation,call,OpenMessageBox,2
 map,presentation,call,StripExtension,2
 map,presentation,shared_write,Cell::flags,1
-map,presentation,shared_write,Game::net,46
+map,presentation,shared_write,Game::net,47
 map,presentation,shared_write,Mission::killMul,1
 map,presentation,shared_write,Mission::timeMul,1
 map,presentation,shared_write,Point16::x,6
@@ -1697,7 +1697,7 @@ network,platform,call,host_thread_set_priority,2
 network,platform,call,host_thread_start,1
 network,platform,call,host_time_ms,2
 network,platform,call,host_user_name,2
-network,platform,call,operator delete,26
+network,platform,call,operator delete,18
 network,platform,call,operator new,17
 network,platform,call,operator==,7
 network,players,call,FillScoreTables,2
@@ -1780,7 +1780,7 @@ network,presentation,shared_write,Game::netGameFlags,4
 network,presentation,shared_write,Game::numPlayers,4
 network,presentation,shared_write,Game::password,4
 network,presentation,shared_write,Game::tail,2
-network,presentation,shared_write,Player::active,43
+network,presentation,shared_write,Player::active,41
 network,presentation,shared_write,Player::alliance,15
 network,presentation,shared_write,Player::allied,6
 network,presentation,shared_write,Player::alliedBy,4
@@ -1791,8 +1791,8 @@ network,presentation,shared_write,Player::explored,8
 network,presentation,shared_write,Player::exploredHeight,7
 network,presentation,shared_write,Player::exploredWidth,14
 network,presentation,shared_write,Player::id,8
-network,presentation,shared_write,Player::index,24
-network,presentation,shared_write,Player::info,64
+network,presentation,shared_write,Player::index,22
+network,presentation,shared_write,Player::info,60
 network,presentation,shared_write,Player::kills,2
 network,presentation,shared_write,Player::losses,2
 network,presentation,shared_write,Player::messages,1
@@ -1801,15 +1801,15 @@ network,presentation,shared_write,Player::ping,1
 network,presentation,shared_write,Player::rejectReason,2
 network,presentation,shared_write,Player::totalEnergyProduced,1
 network,presentation,shared_write,Player::totalMetalProduced,1
-network,presentation,shared_write,Player::type,46
+network,presentation,shared_write,Player::type,44
 network,presentation,shared_write,Player::unitCount,11
 network,presentation,shared_write,Player::unitsCreated,11
 network,presentation,shared_write,PlayerInfo::color,15
-network,presentation,shared_write,PlayerInfo::flags_97,4
+network,presentation,shared_write,PlayerInfo::flags_97,3
 network,presentation,shared_write,PlayerInfo::flags_9d_wide,4
 network,presentation,shared_write,PlayerInfo::kind,4
-network,presentation,shared_write,PlayerInfo::versionMajor,3
-network,presentation,shared_write,PlayerInfo::versionMinor,3
+network,presentation,shared_write,PlayerInfo::versionMajor,1
+network,presentation,shared_write,PlayerInfo::versionMinor,1
 network,presentation,shared_write,g_packetManager,1
 network,targeting,shared_write,Player::active,1
 network,targeting,shared_write,Player::type,1
@@ -2622,7 +2622,7 @@ players,network,shared_write,Game::localPlayer,19
 players,network,shared_write,Game::tail,5
 players,network,shared_write,OwnershipTransferPacket::newOwnerNetId,1
 players,network,shared_write,OwnershipTransferPacket::unitId,1
-players,network,shared_write,Player::active,61
+players,network,shared_write,Player::active,54
 players,network,shared_write,Player::alliance,6
 players,network,shared_write,Player::allied,4
 players,network,shared_write,Player::alliedBy,2
@@ -2633,9 +2633,9 @@ players,network,shared_write,Player::energyWasted,2
 players,network,shared_write,Player::explored,2
 players,network,shared_write,Player::exploredHeight,1
 players,network,shared_write,Player::exploredWidth,1
-players,network,shared_write,Player::id,65
+players,network,shared_write,Player::id,61
 players,network,shared_write,Player::index,19
-players,network,shared_write,Player::info,42
+players,network,shared_write,Player::info,40
 players,network,shared_write,Player::keepaliveFlags,2
 players,network,shared_write,Player::kills,2
 players,network,shared_write,Player::lobbyDataSynced,9
@@ -2648,7 +2648,7 @@ players,network,shared_write,Player::totalEnergyConsumed,2
 players,network,shared_write,Player::totalEnergyProduced,2
 players,network,shared_write,Player::totalMetalConsumed,2
 players,network,shared_write,Player::totalMetalProduced,2
-players,network,shared_write,Player::type,97
+players,network,shared_write,Player::type,86
 players,network,shared_write,Player::unitCount,6
 players,network,shared_write,Player::unitsBegin,1
 players,network,shared_write,Player::unitsCreated,7
@@ -2727,7 +2727,7 @@ players,presentation,shared_write,Game::tail,2
 players,presentation,shared_write,MissionConditions::active,1
 players,presentation,shared_write,MissionConditions::defeatCount,1
 players,presentation,shared_write,MissionConditions::victoryCount,1
-players,presentation,shared_write,Player::active,43
+players,presentation,shared_write,Player::active,41
 players,presentation,shared_write,Player::alliance,15
 players,presentation,shared_write,Player::allied,6
 players,presentation,shared_write,Player::alliedBy,4
@@ -2741,8 +2741,8 @@ players,presentation,shared_write,Player::exploredHeight,7
 players,presentation,shared_write,Player::exploredWidth,14
 players,presentation,shared_write,Player::firstIndex,1
 players,presentation,shared_write,Player::id,8
-players,presentation,shared_write,Player::index,24
-players,presentation,shared_write,Player::info,64
+players,presentation,shared_write,Player::index,22
+players,presentation,shared_write,Player::info,60
 players,presentation,shared_write,Player::kills,2
 players,presentation,shared_write,Player::losses,2
 players,presentation,shared_write,Player::metal,2
@@ -2752,7 +2752,7 @@ players,presentation,shared_write,Player::rank,1
 players,presentation,shared_write,Player::rejectReason,2
 players,presentation,shared_write,Player::totalEnergyProduced,1
 players,presentation,shared_write,Player::totalMetalProduced,1
-players,presentation,shared_write,Player::type,46
+players,presentation,shared_write,Player::type,44
 players,presentation,shared_write,Player::unitCount,11
 players,presentation,shared_write,Player::unitsBegin,19
 players,presentation,shared_write,Player::unitsCreated,11
@@ -2761,7 +2761,7 @@ players,presentation,shared_write,PlayerInfo::bit5,2
 players,presentation,shared_write,PlayerInfo::bit6,9
 players,presentation,shared_write,PlayerInfo::color,15
 players,presentation,shared_write,PlayerInfo::kind,4
-players,presentation,shared_write,PlayerInfo::memory,1
+players,presentation,shared_write,PlayerInfo::memory,2
 players,presentation,shared_write,PlayerInfo::side,18
 players,presentation,shared_write,PlayerInfo::started,1
 players,presentation,shared_write,Point16::x,6
@@ -2960,6 +2960,7 @@ presentation,game,indirect,LoadGameScreenHandler,4
 presentation,game,indirect,SaveGameScreenHandler,4
 presentation,game,indirect,SavedGameSelectHandler,7
 presentation,game,shared_write,Angles16::heading,1
+presentation,game,shared_write,Game::commanderDeath,3
 presentation,game,shared_write,Game::difficulty,4
 presentation,game,shared_write,Game::effectiveGameSpeed,6
 presentation,game,shared_write,Game::flags_37ebe,2
@@ -3035,23 +3036,23 @@ presentation,map,call,GetCellHeight,1
 presentation,map,call,GetFootprintHeight,1
 presentation,map,call,LoadMapList,2
 presentation,map,call,Mission::BuildMissionList,4
-presentation,map,call,Mission::ComputeMapChecksum,4
+presentation,map,call,Mission::ComputeMapChecksum,3
 presentation,map,call,Mission::CountStartPositions,1
 presentation,map,call,Mission::GetBriefing,1
 presentation,map,call,Mission::GetDescription,1
 presentation,map,call,Mission::GetGameType,16
 presentation,map,call,Mission::GetMissionIndex,1
-presentation,map,call,Mission::GetMissionName,6
+presentation,map,call,Mission::GetMissionName,7
 presentation,map,call,Mission::GetNameSlot,6
 presentation,map,call,Mission::GetPlanet,1
-presentation,map,call,Mission::GetTerrainLength,3
-presentation,map,call,Mission::GetTerrainSizeTier,1
+presentation,map,call,Mission::GetTerrainLength,1
+presentation,map,call,Mission::GetTerrainSizeTier,2
 presentation,map,call,Mission::GetTranslatedName,2
-presentation,map,call,Mission::HasMissionName,3
+presentation,map,call,Mission::HasMissionName,4
 presentation,map,call,Mission::LoadCampaign,6
-presentation,map,call,Mission::LoadMissionByName,10
+presentation,map,call,Mission::LoadMissionByName,11
 presentation,map,call,Mission::MissionExists,2
-presentation,map,call,Mission::RefreshMapList,3
+presentation,map,call,Mission::RefreshMapList,4
 presentation,map,call,Mission::SelectMission,5
 presentation,map,call,SetMissionType,5
 presentation,map,shared_write,Fixed::value,1
@@ -3072,7 +3073,7 @@ presentation,network,call,AddNetPlayer,1
 presentation,network,call,AreAllPlayersReady,1
 presentation,network,call,BroadcastAllyTeam,3
 presentation,network,call,BroadcastPacket,3
-presentation,network,call,BroadcastPlayerInfo,14
+presentation,network,call,BroadcastPlayerInfo,12
 presentation,network,call,CloseNetSession,1
 presentation,network,call,CountComputerPlayers,2
 presentation,network,call,CountHumanPlayers,2
@@ -3082,7 +3083,7 @@ presentation,network,call,CreateNetGame,1
 presentation,network,call,CreateUnitSync,1
 presentation,network,call,CycleMessageUnits,1
 presentation,network,call,DeleteUnitSync,1
-presentation,network,call,FindHostSlot,9
+presentation,network,call,FindHostSlot,7
 presentation,network,call,FindSlotByDpid,1
 presentation,network,call,FinishUnitSync,1
 presentation,network,call,FormatNetStats,1
@@ -3101,7 +3102,7 @@ presentation,network,call,OnlineGetLinkInfo,1
 presentation,network,call,OnlineProcessButtonCommand,1
 presentation,network,call,OnlineUnload,1
 presentation,network,call,PacketManager::SendAllQueued,1
-presentation,network,call,Player::SetType,5
+presentation,network,call,Player::SetType,4
 presentation,network,call,RejectPlayer,4
 presentation,network,call,ReportGameEvent,4
 presentation,network,call,ReportIntervalTimer,1
@@ -3119,7 +3120,7 @@ presentation,network,call,UnitSync::GetUnitEntry,1
 presentation,network,call,UnitSync::IsPlayerSynced,1
 presentation,network,call,UnitSync::PopChangedEntry,1
 presentation,network,call,UnitSync::SetUnitLimit,2
-presentation,network,call,UpdateNetGameInfo,8
+presentation,network,call,UpdateNetGameInfo,6
 presentation,network,indirect,HandleTimeoutDialog,3
 presentation,network,shared_write,Game::head,5
 presentation,network,shared_write,Game::netGameFlags,12
@@ -3129,14 +3130,12 @@ presentation,network,shared_write,Game::pauseFlags,1
 presentation,network,shared_write,Game::textLines,1
 presentation,network,shared_write,Game::uiOptionFlags,1
 presentation,network,shared_write,Gui::layer,1
-presentation,network,shared_write,Packet_0047f0c0::flag,1
-presentation,network,shared_write,Packet_0047f0c0::index,1
-presentation,network,shared_write,Player::active,61
+presentation,network,shared_write,Player::active,54
 presentation,network,shared_write,Player::alliance,6
 presentation,network,shared_write,Player::allied,4
 presentation,network,shared_write,Player::alliedBy,2
 presentation,network,shared_write,Player::energy,1
-presentation,network,shared_write,Player::id,65
+presentation,network,shared_write,Player::id,61
 presentation,network,shared_write,Player::index,19
 presentation,network,shared_write,Player::metal,1
 presentation,network,shared_write,Player::rejectReason,10
@@ -3374,6 +3373,7 @@ presentation,players,call,ShutdownScoreTables,1
 presentation,players,call,TransferEnergy,1
 presentation,players,call,TransferMetal,1
 presentation,players,indirect,ContinueWatchingCallback,3
+presentation,players,shared_write,Game::commanderDeath,2
 presentation,players,shared_write,Game::difficulty,3
 presentation,players,shared_write,Game::head,1
 presentation,players,shared_write,Game::mapFlags,1
@@ -3405,8 +3405,6 @@ presentation,players,shared_write,Unit::pos,1
 presentation,players,shared_write,Vec3::x,3
 presentation,players,shared_write,Vec3::y,3
 presentation,players,shared_write,Vec3::z,3
-presentation,seams,indirect,ComputeMapChecksumNative,1
-presentation,seams,indirect,GetTerrainLengthNative,1
 presentation,seams,shared_write,Vec3::x,1
 presentation,targeting,shared_write,Player::active,1
 presentation,targeting,shared_write,Unit::flags,1
@@ -3422,6 +3420,7 @@ presentation,units,shared_write,Angles16::bank,6
 presentation,units,shared_write,Angles16::heading,10
 presentation,units,shared_write,Angles16::pitch,7
 presentation,units,shared_write,Fixed::value,3
+presentation,units,shared_write,Game::commanderDeath,2
 presentation,units,shared_write,Game::difficulty,2
 presentation,units,shared_write,Game::mapFlags,1
 presentation,units,shared_write,Game::netGameFlags,1

@@ -13,6 +13,7 @@ void __stdcall ScheduleFadeTick(void);
 int __stdcall IsFadeDone();
 void __stdcall StepPaletteFade(void);
 void __stdcall FillEndGameStatistics(void);
+void __stdcall CollectEndGameStats();
 int __stdcall AreStatBarsComplete(void);
 char* __stdcall BuildScrollItems1(char* names, char* flags, int count);
 char* __stdcall BuildScrollItems2(char* names, int a, int b);

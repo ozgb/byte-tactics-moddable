@@ -445,7 +445,9 @@ class UnitSyncPlayer {
 public:
     char unknown_0[0x5c];
 
+    UnitSyncPlayer(const UnitSyncPlayer& other);
     ~UnitSyncPlayer();
+    UnitSyncPlayer& operator=(const UnitSyncPlayer& rhs);
 };
 
 class SyncChecksumVector {
@@ -536,7 +538,7 @@ static inline bool FlagOf_0046d040(UnitDef* d)
     return (d->flags2 >> 16) & 1;
 }
 
-class UnitSyncDel_0046c920 {
+class UnitSyncDeleter {
 public:
     std::map<unsigned int, UnitSyncEntry> map;
     std::vector<UnitSyncPlayer> elems;
@@ -549,7 +551,7 @@ public:
     int checksumProgress;
     int disabled;
 
-    ~UnitSyncDel_0046c920() {}
+    ~UnitSyncDeleter() {}
 };
 
 // FUNCTION: 0x46c8e0
@@ -562,7 +564,7 @@ void __stdcall CreateUnitSync(int param_1)
 void __fastcall DeleteUnitSync()
 {
     if ((UnitSync *)g_game->sync)
-        delete (UnitSyncDel_0046c920*)(UnitSync *)g_game->sync;
+        delete (UnitSyncDeleter*)(UnitSync *)g_game->sync;
     (*(UnitSync **)&g_game->sync) = 0;
 }
 
@@ -1142,16 +1144,6 @@ SyncChecksumVector::~SyncChecksumVector()
 }
 #pragma auto_inline(on)
 
-typedef std::vector<Elem_0046faf0> Vec_0046e870;
-typedef void (Vec_0046e870::*DestroyFn_0046e870)(Vec_0046e870::iterator, Vec_0046e870::iterator);
-
-struct Access_0046e870 : Vec_0046e870 {
-    static DestroyFn_0046e870 fn;
-};
-
-// FUNCTION: 0x46e870 ?_Destroy@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEXPAUElem_0046faf0@@0@Z
-DestroyFn_0046e870 Access_0046e870::fn = &Access_0046e870::_Destroy;
-
 // FUNCTION: 0x46e880
 int* UnitSyncMap::Begin(int* param_1)
 {
@@ -1310,16 +1302,6 @@ struct SyncPlayerRecord {
     SyncPlayerRecord& operator=(const SyncPlayerRecord& src);
 };
 
-typedef std::vector<SyncPlayerRecord> Vec_0046eaa0;
-typedef void (Vec_0046eaa0::*DestroyFn_0046eaa0)(Vec_0046eaa0::iterator, Vec_0046eaa0::iterator);
-
-struct Access_0046eaa0 : Vec_0046eaa0 {
-    static DestroyFn_0046eaa0 fn;
-};
-
-// FUNCTION: 0x46eaa0 ?_Destroy@?$vector@USyncPlayerRecord@@V?$allocator@USyncPlayerRecord@@@std@@@std@@IAEXPAUSyncPlayerRecord@@0@Z
-DestroyFn_0046eaa0 Access_0046eaa0::fn = &Access_0046eaa0::_Destroy;
-
 typedef std::list<int> List_0046eb60;
 typedef List_0046eb60::iterator (List_0046eb60::*EraseFn_0046eb60)(List_0046eb60::iterator);
 
@@ -1362,25 +1344,6 @@ InsertResult::InsertResult(Node_0046fad0* const& f, const bool& s)
 }
 
 typedef std::vector<Elem_0046faf0> Vec_0046faf0;
-typedef Vec_0046faf0::iterator (Vec_0046faf0::*UcopyFn_0046faf0)(
-    Vec_0046faf0::const_iterator, Vec_0046faf0::const_iterator, Vec_0046faf0::iterator);
-
-struct Access_0046faf0 : Vec_0046faf0 {
-    static UcopyFn_0046faf0 fn;
-};
-
-// FUNCTION: 0x46faf0 ?_Ucopy@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEPAUElem_0046faf0@@PBU3@0PAU3@@Z
-UcopyFn_0046faf0 Access_0046faf0::fn = &Access_0046faf0::_Ucopy;
-
-typedef void (Vec_0046faf0::*UfillFn_0046faf0)(
-    Vec_0046faf0::iterator, Vec_0046faf0::size_type, const Elem_0046faf0&);
-
-struct Access_0046fb40 : Vec_0046faf0 {
-    static UfillFn_0046faf0 fn;
-};
-
-// FUNCTION: 0x46fb40 ?_Ufill@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEXPAUElem_0046faf0@@IABU3@@Z
-UfillFn_0046faf0 Access_0046fb40::fn = &Access_0046fb40::_Ufill;
 
 #pragma auto_inline(off)
 // FUNCTION: 0x46fe60
@@ -1397,27 +1360,6 @@ UnitSyncNode* UnitSyncMap::LowerBound(const unsigned int* key)
     return y;
 }
 #pragma auto_inline(on)
-
-typedef std::vector<Elem_004702a0> Vec_00470290;
-typedef void (Vec_00470290::*DestroyFn_00470290)(Vec_00470290::iterator, Vec_00470290::iterator);
-
-struct Access_00470290 : Vec_00470290 {
-    static DestroyFn_00470290 fn;
-};
-
-// FUNCTION: 0x470290 ?_Destroy@?$vector@UElem_004702a0@@V?$allocator@UElem_004702a0@@@std@@@std@@IAEXPAUElem_004702a0@@0@Z
-DestroyFn_00470290 Access_00470290::fn = &Access_00470290::_Destroy;
-
-typedef std::vector<Elem_004702a0> Vec_004702a0;
-typedef Vec_004702a0::iterator (Vec_004702a0::*UcopyFn_004702a0)(
-    Vec_004702a0::const_iterator, Vec_004702a0::const_iterator, Vec_004702a0::iterator);
-
-struct Access_004702a0 : Vec_004702a0 {
-    static UcopyFn_004702a0 fn;
-};
-
-// FUNCTION: 0x4702a0 ?_Ucopy@?$vector@UElem_004702a0@@V?$allocator@UElem_004702a0@@@std@@@std@@IAEPAUElem_004702a0@@PBU3@0PAU3@@Z
-UcopyFn_004702a0 Access_004702a0::fn = &Access_004702a0::_Ucopy;
 
 // FUNCTION: 0x470030
 void __stdcall NopChecksumEntryDtor(int)
@@ -1478,3 +1420,49 @@ typedef Vec_0046faf0& (Vec_0046faf0::*AssignFn_0046faf0)(const Vec_0046faf0&);
 
 // FUNCTION: 0x4707a0 ??4?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@QAEAAV01@ABV01@@Z
 AssignFn_0046faf0 g_assign_0046faf0 = &Vec_0046faf0::operator=;
+
+// FUNCTION: 0x46ca60
+void __fastcall FinishUnitSync()
+{
+    ((UnitSync *)g_game->sync)->ApplyToUnitTypes();
+    delete (UnitSyncDeleter *)(UnitSync *)g_game->sync;
+    (*(UnitSync **)&g_game->sync) = 0;
+}
+
+// FUNCTION: 0x46cc10
+void PacketSequencer::SendSequenced(Elem_0046faf0* to, Elem_0046faf0* packet)
+{
+    packet->packet.id = ++lastSent;
+    sentQueue.insert(sentQueue.end(), 1, *packet);
+    SendPacketToPlayer(GetLocalHumanDpid(), (unsigned int)to, (unsigned char *)packet, 0xe);
+}
+
+typedef std::vector<int> IntVector;
+typedef void (IntVector::*IntVectorInsertFn)(
+    IntVector::iterator, IntVector::size_type, int const&);
+
+// FUNCTION: 0x46e640 ?insert@?$vector@HV?$allocator@H@std@@@std@@QAEXPAHIABH@Z
+IntVectorInsertFn g_intVectorInsert = &IntVector::insert;
+
+typedef std::vector<UnitSyncPacket> SyncPacketVector;
+typedef void (SyncPacketVector::*SyncPacketInsertFn)(
+    SyncPacketVector::iterator, SyncPacketVector::size_type,
+    const UnitSyncPacket&);
+
+// FUNCTION: 0x46eba0 ?insert@?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@QAEXPAUUnitSyncPacket@@IABU3@@Z
+SyncPacketInsertFn g_syncPacketInsert = &SyncPacketVector::insert;
+
+inline UnitSyncPlayer& UnitSyncPlayer::operator=(const UnitSyncPlayer& rhs)
+{
+    if (this == &rhs)
+        return *this;
+    return (UnitSyncPlayer&)((SyncPlayerRecord*)this)->operator=(*(const SyncPlayerRecord*)&rhs);
+}
+
+typedef std::vector<UnitSyncPlayer> SyncPlayerVector;
+typedef void (SyncPlayerVector::*SyncPlayerInsertFn)(
+    SyncPlayerVector::iterator, SyncPlayerVector::size_type,
+    const UnitSyncPlayer&);
+
+// FUNCTION: 0x46f7a0 ?insert@?$vector@VUnitSyncPlayer@@V?$allocator@VUnitSyncPlayer@@@std@@@std@@QAEXPAVUnitSyncPlayer@@IABV3@@Z
+SyncPlayerInsertFn g_syncPlayerInsert = &SyncPlayerVector::insert;

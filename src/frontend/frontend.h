@@ -30,6 +30,7 @@ void __stdcall EmptyMainLoopHook(void);
 void __stdcall EmptyMainLoopHook_B(void);
 void __stdcall EmptyMainLoopHook_C(void);
 
+int __stdcall CodeChecksumFailed(void);
 void __stdcall BlankScreen();
 void __stdcall FreePictureCache();
 int __stdcall MainLoopContinueStub(void);

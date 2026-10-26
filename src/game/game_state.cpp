@@ -566,7 +566,7 @@ void Force640x480Surfaces()
     }
 }
 
-#include "../frontend/endgame_41dc20.h"
+#include "../frontend/endgame.h"
 #include "../network/net_game.h"
 
 // FUNCTION: 0x491b60

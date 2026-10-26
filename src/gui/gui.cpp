@@ -2994,8 +2994,6 @@ void __stdcall ScheduleGadgetEndTick(Dialog_4a4620* obj, int i)
     e->u.anim.next = GetTicks() + e->u.anim.interval;
 }
 
-int CheckMapCrc();
-
 struct Holder_004a4660 {
     char unknown_0[4];
     Gadget *entries;

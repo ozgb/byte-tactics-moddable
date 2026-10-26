@@ -53,4 +53,6 @@ void __stdcall FreeMovementClasses(void);
 void __stdcall RefreshAllPassMaps(Point16 a, Point16 b);
 int __stdcall FindUnusedLogo();
 
+int __stdcall CheckMapCrc();
+
 #endif

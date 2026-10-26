@@ -26,6 +26,7 @@ AssignQuickKey,mismatch,placeholder type Dialog_004a04f0: left for the type-nami
 AttachUnitToPiece,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AveragePrimitiveY,skip,placeholder type Object_004cb2f0: left for the type-naming issues
 BindModelTextures,mismatch,placeholder type Model_0042a140: left for the type-naming issues
+BindNamedSliderWithCallback,skip,placeholder type Callback_00445e50: left for the type-naming issues
 BlitFeatureGaf,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BlitGafFrameAtOffset,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BlitLayers,mismatch,placeholder type Rect_004b6720: left for the type-naming issues
@@ -41,7 +42,6 @@ CanBuildAt,mismatch,"static risk rule: a convention, parameter count, or non-poi
 CanPlaceUnitFootprint,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 CaptureBackgroundAndDrawCursor,skip,placeholder type Obj_004c2380: left for the type-naming issues
 CheckAlliedVictory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-CheckMapCrc,ambiguous,several definitions share the name
 ClampPositionToMap,skip,placeholder type Vec3_004853b0: left for the type-naming issues
 ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
 ClickSelectHoverUnit,mismatch,placeholder type Param_0048c7f0: left for the type-naming issues
@@ -196,7 +196,7 @@ GetGafFrameDuration,skip,placeholder type Obj_004b7f70: left for the type-naming
 GetGafSequenceFrame,mismatch,placeholder type Handle_004b7ee0: left for the type-naming issues
 GetGroundHeight,mismatch,placeholder type Pos_00485070: left for the type-naming issues
 GetHeadingBetween,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-GetHostDpid,ambiguous,several definitions share the name
+GetHostDpid,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetLocalizedString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetMetalIncome,mismatch,pointer/int cast: definition's type is likely wrong
 GetMetalUsage,mismatch,pointer/int cast: definition's type is likely wrong
@@ -235,9 +235,7 @@ HandleMainMenuClick,skip,placeholder type Gadget_00425d80: left for the type-nam
 HandleMaxLinesSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
 HandleMusicOptionsClick,mismatch,placeholder type Object_0045d280: left for the type-naming issues
 HandleMusicVolumeSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
-HandleRestrictionsClick,mismatch,placeholder type Menu_0044c420: left for the type-naming issues
 HandleScreenSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
-HandleSelectProviderClick,mismatch,placeholder type Menu_004441a0: left for the type-naming issues
 HandleSliderInput,mismatch,placeholder type Object_004a4170: left for the type-naming issues
 HandleSoundOptionsClick,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 HandleSpeedOptionsClick,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -414,9 +412,7 @@ TrySetFocus,mismatch,fixing it changes the generated code of a caller
 UnlockScreen,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 UpdateCursorWorldPos,mismatch,placeholder type View_00498da0: left for the type-naming issues
 UpdateHelpText,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-UpdateMaxUnitsText,mismatch,fixing it changes the generated code of a caller
 UpdateMenu,mismatch,fixing it changes the generated code of a caller
-UpdateMetalText,mismatch,fixing it changes the generated code of a caller
 UpdatePlayerEconomy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 UpdateTimeoutDialog,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 UpdateVideoModeLabel,skip,placeholder type Menu_0045b800: left for the type-naming issues
@@ -444,7 +440,6 @@ WriteTextLinkFields,skip,placeholder type Obj_004ae230: left for the type-naming
 g_airManeuverOrderVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_approachRadiusVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_briefingPlanetFrameCursor,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
-g_broadcastPeersSeen,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_cdActivityRingWriteIdx,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_cdListsDiscEntries,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_cheatCommands,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses

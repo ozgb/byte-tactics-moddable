@@ -1,8 +1,8 @@
-#ifndef CONN_INFO_443FF0_H
-#define CONN_INFO_443FF0_H
+#ifndef CONNECTION_INFO_H
+#define CONNECTION_INFO_H
 
-#include "conn_443ff0.h"
-#include "v4i.h"
+#include "connection_blob.h"
+#include "../../include/v4i.h"
 
 #pragma pack(push, 1)
 struct ConnInfo_443ff0 {

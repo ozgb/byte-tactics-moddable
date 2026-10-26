@@ -5,4 +5,6 @@ int __stdcall ScrollToNextMessageUnit(void);
 
 int __stdcall ExpireOldestMessage();
 
+void __stdcall CycleMessageUnits(void);
+
 #endif

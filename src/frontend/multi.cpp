@@ -6,15 +6,16 @@
 #include "../../interfaces/ref.h"
 #include <math.h>
 #include "../../interfaces/host.h"
+#include "../../interfaces/seams.h"
 
 struct Gadget;
 struct Layer;
 struct Gui;
 struct Game;
 struct Record_00446f50;
-struct Options_00446f50;
+struct GameOptionsView;
 struct PlayerInfo;
-struct UnitType_00446f50;
+struct UnitDefView;
 struct Logos_00445110;
 class UnitSync;
 
@@ -43,6 +44,10 @@ struct Gadget {
     union {
         char text[0x138 - 0xb6];
         short count;
+        struct {
+            char headPad[0xc0 - 0xb6];
+            void* gaf;
+        } head;
         char entry_text[0xcc - 0xb6];
         struct {
             char unknown_b6l[0xcc - 0xb6];
@@ -268,6 +273,7 @@ char* __stdcall Translate(const char* text);
 void __stdcall SetOffscreenSurface(int a);
 void FlipScreen();
 #include "../gui/keyboard.h"
+#include "../../include/v4i.h"
 #include "../graphics/display.h"
 #include "../debug/debug_lib.h"
 #include "../network/online.h"
@@ -568,7 +574,7 @@ struct Record_00446f50 {
     int peerEnabled;
 };
 
-struct UnitType_00446f50 {
+struct UnitDefView {
     char unitName[0x20];
     union {
         char name[0x225];
@@ -622,13 +628,13 @@ public:
     char* GetSyncStatusText();
     void CheckUnitAvailable(unsigned int, int);
     int PopChangedEntry(Event_44c220* event);
-    void SetUnitLimit(UnitType_00446f50* unit, int value);
-    int DisallowUnit(UnitType_00446f50* unit);
-    int AllowUnit(UnitType_00446f50* unit);
-    int GetUnitEntry(UnitType_00446f50* type, Info_0044c7e0* out);
+    void SetUnitLimit(UnitDefView* unit, int value);
+    int DisallowUnit(UnitDefView* unit);
+    int AllowUnit(UnitDefView* unit);
+    int GetUnitEntry(UnitDefView* type, Info_0044c7e0* out);
 };
 
-struct Options_00446f50 {
+struct GameOptionsView {
     char unknown_0[0x118];
     int fixedloc;
 };
@@ -723,7 +729,7 @@ extern char g_okGadgetName[];
 extern char g_multiSoundName[];
 extern char* g_oldMapName;
 extern int DAT_00512760;
-extern short g_battleRoomBaseGadgetCount;
+extern int g_battleRoomBaseGadgetCount;
 extern int DAT_0051276c;
 extern int g_battleRoomSlotsBuilt;
 extern int g_rejectPlayer;
@@ -788,9 +794,7 @@ void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 void ShowSoftwareCursor();
 #include "../files/files_api.h"
 int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
-void __stdcall HandleRestrictionsClick(Gui* menu);
-void __stdcall UpdateMaxUnitsText(Gui* gui, int index);
-void __stdcall UpdateMetalText(Gui* gui, int index);
+extern "C" __declspec(dllimport) char* __stdcall lstrcpynA(char*, const char*, int);
 void __stdcall CreateUnitSync(int param_1);
 void* __stdcall LoadPcx(char* path, int param_2);
 void __stdcall FrameFromSurface(void* dst, void* src);
@@ -3067,7 +3071,7 @@ static inline int CountAlliance_00447b10(int alliance)
     return count;
 }
 
-inline int FindUnusedLogo()
+inline int FindFreeLobbyLogo()
 {
     int used[10];
     memset(used, 0, sizeof(used));
@@ -3086,7 +3090,7 @@ inline int FindUnusedLogo()
     return result;
 }
 
-int CheckMapCrc_00447b10()
+int LobbyMapCrcMatches()
 {
     if (!g_game->net->GetTerrainLength()) {
         return 0;
@@ -3178,7 +3182,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
                 }
                 if (g_game->players[FindHostSlot()].info->commander != 2 && !CountLocalComputerPlayers()) {
                     CreateLocalPlayer(i, 2);
-                    p->info->color = FindUnusedLogo();
+                    p->info->color = FindFreeLobbyLogo();
                 }
             }
             g_game->bits_2bee_1.dirty = 1;
@@ -3255,7 +3259,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
         sprintf(text, "READY%d", i);
         if (IsCurrentGadgetNamed((Dialog *)gadget, text) && IsLocalHuman_00447b10(p)) {
             PlaySoundByName("Multi", 0);
-            if (CheckMapCrc_00447b10()) {
+            if (LobbyMapCrcMatches()) {
                 p->info->bit5 = GetGadgetStatus(&g_game->gui, FindGadgetIndex(entries, text, 1));
                 if (p->info->host) {
                     strcpy(entries->label, "START");
@@ -3390,7 +3394,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
         g_game->multiLineOfSight = me->info->los;
         g_game->multiLOSType = me->info->losType;
         g_game->multiCommanderDeath = me->info->commander;
-        ((Options_00446f50 *)g_game->options)->fixedloc = me->info->fixedloc;
+        ((GameOptionsView *)g_game->options)->fixedloc = me->info->fixedloc;
         g_game->multiMapping = me->info->mapping;
         SaveSettings();
         g_game->difficulty = 2;
@@ -3475,29 +3479,6 @@ static inline int IsLocal_00448c70(Player* p)
     return p->active != 0 && (p->type == 1 || p->type == 2);
 }
 
-int CheckMapCrc_00448c70()
-{
-    if (!g_game->net->GetTerrainLength()) {
-        return 0;
-    }
-    unsigned char me = FindHostSlot();
-    PlayerInfo* data = 0;
-    int check = 0;
-    if (me != 10) {
-        data = g_game->players[me].info;
-        if (data->versionMajor >= 2)
-            check = 1;
-        else if (data->versionMajor == 1 && data->versionMinor >= 2)
-            check = 1;
-    }
-    if (!check) {
-        return 1;
-    }
-    if (g_game->net->ComputeMapChecksum() != data->mapCrc)
-        return 0;
-    return 1;
-}
-
 void __stdcall UpdateSideGadget_00448c70(int side)
 {
     char name[20];
@@ -3556,7 +3537,7 @@ void RefreshBattleRoomRows()
             else
                 g_game->net->LoadMissionByName(map);
         }
-        if (!CheckMapCrc_00448c70()) {
+        if (!LobbyMapCrcMatches()) {
             mapname->colour = ((int)GetTicks() / 30 & 1) ? 0xc : 0;
             if (differs) {
                 SendChatMessage(me, Translate("does not have this map"), 4, 0);
@@ -3819,7 +3800,7 @@ void __stdcall LoadUnitRestrictListFile(char* name)
         host_file_read(f, &b, 4);
         int n = g_game->unitDefCount;
         for (int idx = 1; idx < n; idx++) {
-            if (((UnitType_00446f50 *)g_game->defs.get())[idx].fbiChecksum == a) {
+            if (((UnitDefView *)g_game->defs.get())[idx].fbiChecksum == a) {
                 for (int j = 0; j < n; j++) {
                     if (g_unitRestrictEntries[j].unitIndex == idx) {
                         g_unitRestrictEntries[j].max = b;
@@ -3845,7 +3826,7 @@ void __stdcall SaveUnitRestrictListFile(char* filename)
     for (int i = 1; i < count; i++) {
         for (int j = 0; j < g_game->unitDefCount; j++) {
             if (*(int*)((char*)g_unitRestrictEntries + 0x52 + j * 0x62) == i) {
-                int v = ((UnitType_00446f50 *)g_game->defs.get())[i].fbiChecksum;
+                int v = ((UnitDefView *)g_game->defs.get())[i].fbiChecksum;
                 host_file_write(f, &v, 4);
                 v = *(int*)((char*)g_unitRestrictEntries + 0x5a + j * 0x62);
                 host_file_write(f, &v, 4);
@@ -4125,7 +4106,7 @@ void __stdcall HandleUnitCountSlider(void* obj, char* gadget)
     }
     g_unitRestrictEntries[n + desc->firstRow].max = value;
     ((UnitSync *)g_game->sync)->SetUnitLimit(
-        &((UnitType_00446f50 *)g_game->defs.get())[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
+        &((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
     desc->flags[n + desc->firstRow] = g_unitRestrictEntries[n + desc->firstRow].peerEnabled == 0;
     desc->flags[n + desc->firstRow] |= g_unitRestrictEntries[n + desc->firstRow].max == 0 ? 2 : 0;
     SetTranslatedTextByName(obj, count, (char*)buf, 0);
@@ -4179,7 +4160,7 @@ void LoadUnitPortrait()
     int i = g_unitRestrictPicLoadIndex++;
     if (i < g_game->unitDefCount) {
         int type = g_unitRestrictEntries[i].unitIndex;
-        UnitType_00446f50* defs = (UnitType_00446f50 *)g_game->defs.get();
+        UnitDefView* defs = (UnitDefView *)g_game->defs.get();
         if (defs[type].name && ((unsigned char)(defs[type].flags2.raw >> 15) & 1) == 0) {
             BuildDataPath(path, "unitpics", defs[g_unitRestrictEntries[i].unitIndex].name, "PCX");
             void* img = LoadPcx(path, 0);
@@ -4215,7 +4196,7 @@ void UnitRestrictDialogFrame()
     while (((UnitSync *)g_game->sync)->PopChangedEntry(&event) != 0) {
         n++;
         for (int i = 0; i < entry->list.count; i++) {
-            if (event.fbiChecksum == ((UnitType_00446f50 *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
+            if (event.fbiChecksum == ((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
                 entry->flags[i] = (event.peerEnabled == 0);
                 g_unitRestrictEntries[i].peerEnabled = event.peerEnabled;
                 g_unitRestrictEntries[i].max = event.max;
@@ -4234,7 +4215,7 @@ void UnitRestrictDialogFrame()
 void __stdcall ShowSelectedUnitCosts(void* panel, Gadget* unit)
 {
     char buf[20];
-    UnitType_00446f50* def = &((UnitType_00446f50 *)g_game->defs.get())[unit->records[unit->field_ba].unitIndex];
+    UnitDefView* def = &((UnitDefView *)g_game->defs.get())[unit->records[unit->field_ba].unitIndex];
     sprintf(buf, "%d", (int)def->energyCost);
     SetTranslatedTextByName(panel, "ENERGYTEXT", (char*)buf, 0);
     sprintf(buf, "%d", (int)def->metalCost);
@@ -4316,19 +4297,19 @@ void OpenUnitRestrictions()
 
     n = 0;
     for (i = 1; i < g_game->unitDefCount; i++) {
-        if (((UnitType_00446f50 *)g_game->defs.get())[i].flags2.bits.flag)
+        if (((UnitDefView *)g_game->defs.get())[i].flags2.bits.flag)
             continue;
-        if (!((UnitType_00446f50 *)g_game->defs.get())[i].name)
+        if (!((UnitDefView *)g_game->defs.get())[i].name)
             continue;
         {
-            UnitType_00446f50* type = &((UnitType_00446f50 *)g_game->defs.get())[i];
+            UnitDefView* type = &((UnitDefView *)g_game->defs.get())[i];
             Info_0044c7e0 info;
             int count;
             sprintf(g_unitRestrictEntries[n].name, "%s\r%s %dM  %dE",
-                    ((UnitType_00446f50 *)g_game->defs.get())[i].unitName, Translate(type->description),
+                    ((UnitDefView *)g_game->defs.get())[i].unitName, Translate(type->description),
                     (int)type->metalCost, (int)type->energyCost);
             g_unitRestrictEntries[n].unitIndex = i;
-            ((UnitSync *)g_game->sync)->GetUnitEntry(&((UnitType_00446f50 *)g_game->defs.get())[i], &info);
+            ((UnitSync *)g_game->sync)->GetUnitEntry(&((UnitDefView *)g_game->defs.get())[i], &info);
             count = info.max == -1 ? 0x65 : info.max;
             g_unitRestrictEntries[n].max = count;
             g_unitRestrictOldCounts[n] = count;
@@ -4363,7 +4344,7 @@ void OpenUnitRestrictions()
 
     {
         Gui* gui = &g_game->gui;
-        UnitType_00446f50* type = &((UnitType_00446f50 *)g_game->defs.get())[desc->records[desc->field_ba].unitIndex];
+        UnitDefView* type = &((UnitDefView *)g_game->defs.get())[desc->records[desc->field_ba].unitIndex];
         char buf[0x14];
         sprintf(buf, "%d", (int)type->energyCost);
         SetTranslatedTextByName(gui, "ENERGYTEXT", buf, 0);
@@ -4382,3 +4363,581 @@ void OpenUnitRestrictions()
     DAT_005129c0 = 0;
 }
 
+
+// FUNCTION: 0x443ff0
+int __stdcall SelectConnection(int index)
+{
+    if (index < 0) {
+        GUID* guid = nullptr;
+        switch (DAT_00512c80) {
+        case 0: break;
+        case 1: guid = &g_dpspGuidTcpip; break;
+        case 2: guid = &g_dpspGuidIpx; break;
+        case 3: guid = &g_dpspGuidModem; break;
+        case 4: guid = &g_dpspGuidSerial; break;
+        }
+        DAT_00512c80 = 0;
+        if (guid != nullptr) {
+            int i = 0;
+            for (; i < g_game->count; i++) {
+                if (memcmp(&((GUID *)g_game->guids)[i], guid, sizeof(GUID)) == 0)
+                    break;
+            }
+            if (i < g_game->count)
+                index = i;
+        }
+    }
+    if (index >= 0) {
+        (*(GUID*)&g_game->info.guid) = ((GUID *)g_game->sessions)[index];
+        g_game->info.conn = g_game->conns[index];
+        int size = g_game->conns[index].size;
+        g_game->info.conn.data = GameAllocIgnoreTag("DPLAY CONNECTION INFO", size);
+        if (g_game->info.conn.data != nullptr) {
+            memcpy(g_game->info.conn.data, g_game->conns[index].data, size);
+        } else {
+            g_game->info.conn.size = 0;
+        }
+        if (IsOnlineConfigLoaded() && g_onlineLobbyPassword != 0) {
+            lstrcpynA(g_game->name_2be3, &g_onlineLobbyPassword, 0xb);
+        }
+        return 1;
+    }
+    return 0;
+}
+
+// FUNCTION: 0x4441a0
+void __stdcall HandleSelectProviderClick(Gui* menu)
+{
+    Gadget* entries = menu->layer->entries;
+    int i;
+    int id;
+    int cur;
+    if (menu->hotGadgetIndex == -1) {
+        if (g_game->sessions != nullptr) {
+            GameFreeThunk(g_game->sessions);
+            for (i = 0; i < 10; i++) {
+                if (g_game->conns[i].data != nullptr) {
+                    host_net_free(g_game->conns[i].data);
+                    g_game->conns[i].data = nullptr;
+                }
+            }
+            GameFreeThunk(g_game->conns);
+            GameFreeThunk(g_game->data[0]);
+            g_game->sessions = nullptr;
+            g_game->data[0] = nullptr;
+        }
+        return;
+    }
+    if (IsCurrentGadgetNamed((Dialog *)menu, "DPLAY") || IsCurrentGadgetNamed((Dialog *)menu, "SELECT")) {
+        SelectConnection(FindGadgetChecked(entries, "DPLAY")->selected);
+        g_game->frontendNextSubState = 2;
+        PlaySoundByName("BigButton", 0);
+        return;
+    }
+    if (_strnicmp(entries[menu->hotGadgetIndex].name, "SERVICE", 7) == 0) {
+        PlaySoundByName("BigButton", 0);
+        int link = atoi(entries[menu->hotGadgetIndex].name + 7);
+        char message[0x140];
+        message[0] = 0;
+        int result = 2;
+        try {
+            SetCursorMode(0x14);
+            result = OnlineProcessButtonCommand(g_linkInfo[link].id, message, sizeof(message));
+            SetCursorMode(0x13);
+        } catch (...) {
+            SetCursorMode(0x13);
+        }
+        if (result == 0) {
+            OnlineUnload();
+            exit(0);
+            return;
+        }
+        if (message[0] == 0)
+            sprintf(message, "The %s service failed or took%stoo long. Please see the readme%sfile for more information.",
+                    g_linkInfo[link].name, "\n\n", "\n\n");
+        char* msg = Translate(message);
+        OpenMessageBox((Gui *)menu, msg, sizeof(message), 1, 1);
+        ClearSelectedGadget(menu);
+        return;
+    }
+    if (FindGadgetIndex(entries, "PREVMENU", 0xe) == menu->hotGadgetIndex) {
+        g_game->frontendNextSubState = 3;
+        PlaySoundByName("Previous", 0);
+        return;
+    }
+    if (IsCurrentGadgetNamed((Dialog *)menu, "SETTINGS")) {
+        PlaySoundByName("Options", 0);
+        ClearSelectedGadget(menu);
+        OpenOptionsPanel();
+        return;
+    }
+    ClearSelectedGadget(menu);
+}
+
+// FUNCTION: 0x444580
+void FillProviderList()
+{
+    if (g_game->gui.layer != nullptr && strcmp(g_game->gui.layer->entries->name, "SELPROV.GUI") == 0)
+        CloseTopScreen(&g_game->gui);
+    SetPaletteColors((unsigned char*)g_game->paletteRgba, 0, 0x100);
+    RemapPaletteToClosestIndices(&g_game->gui, g_game->paletteRgba, g_game->gui.palette);
+    Layer* menu = LoadGuiLayer(&g_game->gui, "SELPROV.GUI", 0x80);
+    menu->handler = HandleSelectProviderClick;
+    menu->owner = g_game;
+    LoadPictureCached("selconnect2", 1, 0, 0);
+    g_game->data[0] = GameAllocIgnoreTag("PROVIDER DESCRIPTIONS", 0x500);
+    g_game->sessions = (V4i*)GameAllocIgnoreTag("PROVIDER GUIDS", 0xa0);
+    g_game->conns = (Conn_443ff0*)GameAllocIgnoreTag("DPLAY CONNECTIONS", 0x50);
+    if (g_game->conns != nullptr)
+        memset(g_game->conns, 0, 0x50);
+    g_game->net->RefreshMapList(1);
+    host_net_uninit((host_net*)g_game->net_14);
+    host_net_get_connections((host_net*)g_game->net_14, g_game->sessions, g_game->conns, g_game->data[0], (const host_guid*)DAT_004fcfb8);
+    Gadget* entries = menu->entries;
+    int tmpl = FindGadgetIndex(entries, "SERVICEX", 1);
+    int y;
+    int k;
+    int n = 0;
+    int count = 0;
+    try {
+        count = OnlineGetLinkInfo(g_linkInfo);
+    } catch (...) {
+    }
+    if (count != 0 && tmpl != -1) {
+        y = entries[tmpl].y;
+        k = 0;
+        for (n = 0; n < count; k++) {
+            if (g_linkInfo[k].id != -1) {
+                n++;
+                char name[0x1c];
+                sprintf(name, "SERVICE%d", k);
+                CloneServiceSlot(entries, tmpl, y, (int)g_linkInfo[k].name, name);
+                y += entries[tmpl].height + 1;
+            }
+        }
+    }
+    strcpy(entries->label, "SELECT");
+    ConfigureListBoxByName(&g_game->gui, "DPLAY", (char*)g_game->data[0], g_game->count, 0);
+    OrLabelAttribs();
+    SetKeyboardInput(&g_game->gui, 1);
+    RenderLayer(&g_game->gui, 0x40);
+}
+
+// FUNCTION: 0x449bb0
+void OpenBattleRoom()
+{
+    int energy = 1000;
+    int metal = 1000;
+    Layer* layer;
+    Player* player;
+    PlayerInfo* info;
+    Gadget* entries;
+    short host;
+    short isHost;
+    int i;
+
+    g_battleRoomSlotsBuilt = 0;
+    g_lastPlayerCount = -1;
+    g_game->bits_2bee_1.dirty = 1;
+    memset(g_game->playerIds, 0, sizeof(g_game->playerIds));
+    info = g_game->players[g_game->localPlayer].info.get();
+    player = &g_game->players[g_game->localPlayer];
+    host = info->host;
+    g_game->lobbyInitScratch = 0;
+    if (host)
+        g_game->maxUnits = g_game->maxUnits_37eec;
+    info->width = g_game->width_37f1b_2;
+    info->height = g_game->height_37f1f_2;
+    info->f9d_2 = 1;
+
+    layer = LoadGuiLayer(&g_game->gui, "LOUNGE2.GUI", 0);
+    layer->handler = HandleBattleRoomClick;
+    layer->owner = g_game;
+    LoadPictureCached("battleroom", 0, 1, 0);
+    entries = g_game->gui.layer->entries;
+    g_battleRoomBaseGadgetCount = layer->entries->count;
+
+    i = FindGadgetIndex(entries, "MESSAGE", 3);
+    if (i != -1)
+        entries[i].status = 0x7f;
+    if (!IsHostLocal()) {
+        i = FindGadgetIndex(entries, "MAP", 1);
+        if (i != -1) {
+            entries[i].attribs = 2;
+            SetTranslatedTextByName(&g_game->gui, "MAP", "View Map", 0);
+        }
+    }
+
+    if (IsOnlineConfigLoaded()) {
+        if (g_lobbyMaxUnits) {
+            info->maxUnits = g_lobbyMaxUnits;
+            g_game->maxUnits = g_lobbyMaxUnits;
+        }
+        g_game->bits_2c74.locked = g_lobbyLock != 0;
+        if (g_lobbyCommander) {
+            int commander = g_lobbyCommander - 1;
+            if (commander >= 0 && commander <= 2) {
+                g_game->multiCommanderDeath = commander;
+                g_game->commanderDeath = commander;
+                Player* p = &g_game->players[g_game->localPlayer];
+                p->info.get()->commander = commander;
+            }
+        }
+        if (g_lobbyEnergy)
+            energy = g_lobbyEnergy;
+        if (g_lobbyMetal)
+            metal = g_lobbyMetal;
+        if (g_lobbyLineOfSight) {
+            switch (g_lobbyLineOfSight) {
+            case 1:
+                info->los = 1;
+                info->losType = 1;
+                break;
+            case 2:
+                info->los = 1;
+                info->losType = 0;
+                break;
+            case 3:
+                info->los = 0;
+                break;
+            }
+        }
+        if (g_lobbyCheating)
+            info->cheating = g_lobbyCheating == 2;
+        if (g_lobbyFixedLoc)
+            info->fixedloc = g_lobbyFixedLoc == 1;
+        if (g_lobbyMapping)
+            info->mapping = g_lobbyMapping == 1;
+        if (g_lobbyWatching)
+            info->watching = g_lobbyWatching == 2;
+    } else if (host) {
+        info->mapping = g_game->multiMapping;
+        info->los = g_game->multiLineOfSight;
+        info->losType = g_game->multiLOSType;
+        info->fixedloc = ((GameOptionsView *)g_game->options)->fixedloc;
+        info->commander = g_game->multiCommanderDeath;
+    }
+
+    if (!host || g_game->bits_2c74.locked) {
+        for (char** p = g_hostOnlyGadgets; *p; p++)
+            SetGrayedOutByName(&g_game->gui, *p, 1);
+    }
+
+    UpdateBattleRoomFlags();
+    g_game->list = GameAllocIgnoreTag("LOUNGE CHATTER", 0xa00);
+    *(char*)g_game->list = 0;
+    {
+        Gadget* mem = FindGadgetChecked_C(g_game->gui.layer->entries, "MEMx");
+        mem->colour = player->info.get()->memory < g_game->net->GetTerrainSizeTier() ? 0xc : 0;
+        sprintf(mem->text, "%d", g_game->players[g_game->localPlayer].info.get()->memory);
+    }
+    isHost = g_game->players[g_game->localPlayer].info.get()->host;
+    CreateUnitSync(isHost);
+    SetGadgetActiveByName(&g_game->gui, "START", ((UnitSync *)g_game->sync)->AllPlayersSynced());
+    SetGrayedOutByName(&g_game->gui, "START",
+                 host && AreAllPlayersReady() && ((UnitSync *)g_game->sync)->AllPlayersSynced() ? 0 : 1);
+    SetGrayedOutByName(&g_game->gui, "RESTRICTIONS", 0);
+    ConfigureListBoxByName(&g_game->gui, "OUTPUT", (char*)g_game->list, 0, 0);
+    {
+        Gadget* output = FindGadgetChecked(entries, "OUTPUT");
+        output->attribs |= 0x100;
+    }
+    SetTranslatedTextByName(&g_game->gui, "METALTEXT", "0", 0);
+    SetTranslatedTextByName(&g_game->gui, "ENERGYTEXT", "0", 0);
+
+    BindNamedSliderWithCallback("METAL", 0x2711, metal, UpdateMetalText);
+    {
+        BindNamedSliderWithCallback("MAXUNITS", g_game->maxUnits - 20, g_game->maxUnits - 20, UpdateMaxUnitsText);
+    }
+    if (!isHost || g_game->bits_2c74.locked) {
+        SetGadgetGrayedOutByName(&g_game->gui, "MAXUNITS", 1);
+        SetGadgetGrayedOutByName(&g_game->gui, "ENERGY", 1);
+        SetGadgetGrayedOutByName(&g_game->gui, "METAL", 1);
+    }
+    BindNamedSliderWithCallback("ENERGY", 0x2711, energy, UpdateEnergyText);
+
+    g_game->net->RefreshMapList(1);
+    if (isHost && IsOnlineConfigLoaded() && g_lobbyMapName[0])
+        g_game->net->LoadMissionByName(g_lobbyMapName);
+    if (!g_game->net->HasMissionName())
+        FatalError("Could not find the multiplayer map!!");
+    strcpy(info->map, g_game->net->GetMissionName());
+    info->mapCrc = g_game->net->ComputeMapChecksum();
+    BroadcastPlayerInfo();
+    BeginTextEdit((Gui *)&g_game->gui, FindGadgetIndex(g_game->gui.layer->entries, "MESSAGE", 0xe));
+
+    for (char** p = g_battleRoomGadgetNames; *p; p++) {
+        int k = FindGadgetIndex(layer->entries, *p, 0xe);
+        if (k != -1)
+            layer->entries[k].visible = 0;
+    }
+
+    BuildPlayerSlotGadgets();
+    RefreshTeamIcons();
+    RefreshBattleRoomRows();
+    OrLabelAttribs();
+
+    if (IsScreenNamed((Gui *)&g_game->gui, "LOUNGE2.GUI")) {
+        Gadget* start = FindGadgetChecked_E(layer->entries, "battlestart");
+        start->hotspotGaf = (int)FindGafEntry(layer->entries->head.gaf, "battlestart");
+        start->frame = 0;
+        start->c8_0 = 1;
+        SetGadgetActiveByName(&g_game->gui, "battlestart", 1);
+    }
+
+    SetKeyboardInput(&g_game->gui, 1);
+    RenderLayer((Gui *)&g_game->gui, 0x40);
+}
+
+// FUNCTION: 0x44a680
+void UpdateBattleRoom()
+{
+    Player* pl;
+    Gadget* entries;
+
+    g_game->ticks++;
+
+    if (HandleNetPackets())
+        g_game->bits_2bee_1.dirty = 1;
+    else if (!LobbyMapCrcMatches())
+        g_game->bits_2bee_1.dirty = 1;
+
+    pl = &g_game->players[g_game->localPlayer];
+    if (pl->rejectReason != 0) {
+        g_game->frontendNextSubState = 3;
+        CloseTopScreen(&g_game->gui);
+        return;
+    }
+
+    entries = g_game->gui.layer->entries;
+    if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
+        int idx = FindGadgetIndex(entries, "PLAYER0", 0xe);
+        entries[idx].colours = 0x18;
+    }
+
+    if (g_game->bits_2bee_1.dirty) {
+        if (g_battleRoomSlotsBuilt == 0) {
+            BuildPlayerSlotGadgets();
+        } else {
+            CompactActivePlayerSlots();
+        }
+
+        if ((unsigned int)g_game->numPlayers != g_lastPlayerCount) {
+            g_lastPlayerCount = g_game->numPlayers;
+            UpdateNetGameInfo();
+        }
+
+        if ((pl->info->flags_97 & 1) == 0) {
+            unsigned char host = FindHostSlot();
+            if (host != 10) {
+                if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
+                    PlayerInfo* info = g_game->players[host].info;
+                    g_seams.map->LoadMissionByName(g_game->net, 0, (char*)info);
+                    SetNamedSliderValue(&g_game->gui, "MAXUNITS", g_game->players[host].info->maxUnits - 0x14);
+                    SetNamedSliderValue(&g_game->gui, "METAL", g_game->players[host].info->metal * 100);
+                    SetNamedSliderValue(&g_game->gui, "ENERGY", g_game->players[host].info->energy * 100);
+                    UpdateMaxUnitsText(&g_game->gui, 0);
+                    UpdateEnergyText(&g_game->gui, 0);
+                    UpdateMetalText(&g_game->gui, 0);
+                } else if (IsScreenNamed(&g_game->gui, "viewmap.gui") != 0) {
+                    PlayerInfo* info = g_game->players[host].info;
+                    if (strcmp(g_seams.map->GetMissionName(g_game->net), info->map) != 0) {
+                        g_seams.map->LoadMissionByName(g_game->net, 0, (char*)g_game->players[host].info.get());
+                        ShowSelectedMapInfo();
+                        MarkLayerChanged((Dialog *)&g_game->gui);
+                    }
+                }
+            }
+        }
+        g_game->bits_2bee_1.dirty = 0;
+        if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
+            if (pl->info->flags_97 & 1) {
+                int synched = ((UnitSync *)g_game->sync)->AllPlayersSynced();
+                int ready = AreAllPlayersReady();
+                Gadget* start;
+
+                SetGrayedOutByName(&g_game->gui, "SYNCHING", 1);
+                start = FindGadgetChecked_E(g_game->gui.layer->entries, "battlestart");
+                if (start->frame > 0 && g_startCountdownNextTick < (int)GetTicks()) {
+                    if (start->frame < 8) {
+                        start->frame++;
+                        MarkChanged((Dialog *)&g_game->gui);
+                        g_game->bits_2bee_1.dirty = 1;
+                    }
+                    g_startCountdownNextTick += 4;
+                    if (start->frame == 4)
+                        PlaySoundByName("Panel", 0);
+                }
+                if (start->frame != 0 && start->frame < *(unsigned short*)start->hotspotGaf - 1)
+                    g_game->bits_2bee_1.dirty = 1;
+                if (ready != 0) {
+                    g_game->bits_2bee_1.dirty = 1;
+                    if (start->frame == 0) {
+                        start->frame = 1;
+                        g_startCountdownNextTick = GetTicks();
+                        PlaySoundByName("Options", 0);
+                    }
+                    start->c8_0 = 0;
+                    {
+                        int idx = FindGadgetIndex(entries, "START", 1);
+                        unsigned int colour = GetTicks() & 0x1f;
+                        if (colour != (unsigned int)entries[idx].colours) {
+                            entries[idx].colours = colour;
+                            MarkChanged((Dialog *)&g_game->gui);
+                        }
+                    }
+                }
+                SetGrayedOutByName(&g_game->gui, "START", ready == 0);
+                SetGadgetActiveByName(&g_game->gui, "START", synched);
+                SetGadgetActiveByName(&g_game->gui, "SYNCHING", synched == 0);
+            }
+            RefreshBattleRoomRows();
+            MarkChanged((Dialog *)&g_game->gui);
+        }
+    }
+
+    if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
+        SetCurrentFont(&g_game->gui, 1);
+        {
+            for (unsigned char i = 0; i < 10; i++) {
+                Player* p = &g_game->players[i];
+                if (p->type != 0 && p->type != 4) {
+                    RECT rect;
+                    char buf[20];
+                    int widget;
+                    PlayerInfo* info;
+                    int w;
+                    int h;
+                    sprintf(buf, "LOGO%i", i);
+                    widget = FindGadgetIndex(entries, buf, 0xe);
+                    GetGadgetRectByIndex((char *)entries, widget, (Rect *)&rect);
+                    info = p->info;
+                    sprintf(buf, "%i.%i", info->versionMajor, info->versionMinor);
+                    w = GetTextPixelWidth(buf);
+                    h = GetFontLineHeight();
+                    DrawTextClipped(0, buf,
+                                 (rect.left + rect.right - w) / 2,
+                                 (rect.top + rect.bottom - h) / 2,
+                                 w, 0);
+                }
+            }
+        }
+        SetCurrentFont(&g_game->gui, 0);
+    }
+
+    ((UnitSync *)g_game->sync)->ProcessSync();
+    if (g_heartbeatNextTick < (unsigned int)GetTicks()) {
+        PlayerInfo* info;
+        g_heartbeatNextTick = GetTicks() + 0x3c;
+        info = pl->info;
+        info->f9d_2 = 1;
+        SendNetHeartbeat();
+    }
+}
+
+// FUNCTION: 0x44c420
+void __stdcall HandleRestrictionsClick(Gui* menu)
+{
+    int i;
+    int n;
+    int type;
+    int* p;
+    UnitDefView* item;
+    Gadget* desc;
+    Gadget* pic;
+
+    desc = FindGadgetChecked(menu->layer->entries, "DESCLIST");
+    if (menu->hotGadgetIndex == -1) {
+        i = 0;
+        p = g_unitRestrictPics;
+        if ((short)desc->rowCount > 0) {
+            do {
+                if (*p != 0)
+                    FreeSurface((Surface *)((Struct_004c6ac0*)*p));
+                p++;
+                i++;
+            } while (i < (short)desc->rowCount);
+        }
+        GameFreeThunk(desc->rows);
+        GameFreeThunk(g_unitRestrictPics);
+        g_unitRestrictPics = nullptr;
+        GameFreeThunk(desc->text_c2);
+        SetDescListCleanupFlag(menu, 1);
+        if (IsHostLocal() != 0) {
+            for (i = 0; i < g_game->unitDefCount; i++) {
+                type = g_unitRestrictEntries[i].unitIndex;
+                if (type != 0) {
+                    item = &((UnitDefView *)g_game->defs.get())[type];
+                    if (item->flags2.bits.flag) {
+                    } else {
+                        if (g_unitRestrictEntries[i].max == 0)
+                            ((UnitSync *)g_game->sync)->DisallowUnit(item);
+                        else
+                            ((UnitSync *)g_game->sync)->AllowUnit(item);
+                    }
+                }
+            }
+        }
+        GameFreeThunk(g_unitRestrictEntries);
+        GameFreeThunk(g_unitRestrictOldCounts);
+        GameFreeThunk(desc->flags);
+        pic = FindGadgetChecked(menu->layer->entries, "PICLIST");
+        if (pic != nullptr && pic->rows != nullptr)
+            GameFreeThunk(pic->rows);
+        g_unitRestrictEntries = nullptr;
+        return;
+    }
+
+    if (IsCurrentGadgetNamed((Dialog *)menu, "Load") != 0) {
+        PlaySoundByName("Options", 0);
+        OpenLoadListDialog();
+        ClearSelectedGadget(menu);
+        return;
+    }
+    if (IsCurrentGadgetNamed((Dialog *)menu, "Save") != 0) {
+        PlaySoundByName("Options", 0);
+        OpenSaveGameDialog();
+        ClearSelectedGadget(menu);
+        return;
+    }
+    if (IsCurrentGadgetNamed((Dialog *)menu, "Reset") != 0) {
+        PlaySoundByName("Options", 0);
+        for (i = 0; i < g_game->unitDefCount; i++) {
+            type = g_unitRestrictEntries[i].unitIndex;
+            if (type != 0) {
+                if ((((UnitDefView *)g_game->defs.get())[type].flags2.raw & 0x10000) == 0)
+                    g_unitRestrictEntries[i].max = 100;
+                else
+                    g_unitRestrictEntries[i].max = 0;
+                if (g_unitRestrictEntries[i].max != g_unitRestrictEntries[i].previousMax) {
+                    ((UnitSync *)g_game->sync)->SetUnitLimit(
+                        &((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex],
+                        g_unitRestrictEntries[i].max);
+                }
+            }
+        }
+        UpdateUnitSliders((Gui *)menu, 0);
+        MarkChanged((Dialog *)menu);
+        ClearSelectedGadget(menu);
+        return;
+    }
+    if (IsCurrentGadgetNamed((Dialog *)menu, "OK") != 0) {
+        PlaySoundByName("Options", 0);
+        return;
+    }
+    if (IsCurrentGadgetNamed((Dialog *)menu, "Cancel") != 0) {
+        PlaySoundByName("Previous", 0);
+        n = 0;
+        for (i = 1; i < g_game->unitDefCount; i++) {
+            if (((UnitDefView *)g_game->defs.get())[i].flags2.bits.flag) {
+            } else if (((UnitDefView *)g_game->defs.get())[i].name != nullptr) {
+                ((UnitSync *)g_game->sync)->SetUnitLimit(
+                    &((UnitDefView *)g_game->defs.get())[i], g_unitRestrictOldCounts[n]);
+                n++;
+            }
+        }
+        return;
+    }
+    if (menu->hotGadgetIndex != -1)
+        ClearSelectedGadget(menu);
+}

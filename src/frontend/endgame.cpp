@@ -208,7 +208,6 @@ void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 void __stdcall DrawMessages(void* surface);
 void __stdcall SetOffscreenSurface(void* surface);
 void* __stdcall AllocSurface(const char* name, int width, int height);
-#include "../network/net_game_453d40.h"
 #include "../network/unit_sync.h"
 #include "../graphics/display.h"
 #include "../graphics/font.h"
@@ -279,6 +278,58 @@ void SetUpEndMissionScreen()
         LoadPictureCached("Outcome1", 0, 0, 1);
     else
         LoadPictureCached("Outcome0", 0, 0, 1);
+}
+
+// FUNCTION: 0x41dc20
+void CollectEndGameStats()
+{
+    EndGamePlayerStat* stats = (EndGamePlayerStat*)g_game->slots_38dd9;
+    g_game->won = g_game->bits_3923b_2.bit4_3923b;
+    if (g_game->net->GetGameType() == 1) {
+        g_game->mission = g_game->net->GetMissionIndex();
+        g_game->campaignMissionStatus[g_game->mission] = g_game->won ? 'W' : 'L';
+    }
+    g_game->maxKills = 10;
+    g_game->maxLosses = 10;
+    g_game->max_26 = 100;
+    g_game->max_2a = 100;
+    g_game->max_2e = 100;
+    g_game->max_32 = 100;
+    g_game->maxScore = 100;
+    memset(stats, 0, sizeof g_game->slots_38dd9);
+    for (int i = 0; i < 10; i++) {
+        Player* p = &g_game->players[i];
+        if ((p->active && (p->type == 1 || p->type == 2 || p->type == 3) && p->index != 10 && !p->info->bit6) || p->unitsCreated) {
+            if (p->rejectReason == 0) {
+                strncpy(stats[i].name, p->name, 30);
+                stats[i].kills = p->kills;
+                stats[i].losses = p->losses;
+                stats[i].energyProduced = (int)p->totalEnergyProduced;
+                stats[i].metalProduced = (int)p->totalMetalProduced;
+                stats[i].energyWasted = (int)p->energyWasted;
+                stats[i].metalWasted = (int)p->metalWasted;
+                Mission* c = g_game->net;
+                int t = (int)((unsigned int)g_game->ticks / 60 * c->timeMul);
+                stats[i].score = t + (int)(stats[i].kills * c->killMul);
+                if (stats[i].score < 0)
+                    stats[i].score = 0;
+                if (stats[i].kills > g_game->maxKills)
+                    g_game->maxKills = stats[i].kills;
+                if (stats[i].losses > g_game->maxLosses)
+                    g_game->maxLosses = stats[i].losses;
+                if (stats[i].energyProduced > g_game->max_26)
+                    g_game->max_26 = stats[i].energyProduced;
+                if (stats[i].metalProduced > g_game->max_2a)
+                    g_game->max_2a = stats[i].metalProduced;
+                if (stats[i].energyWasted > g_game->max_2e)
+                    g_game->max_2e = stats[i].energyWasted;
+                if (stats[i].metalWasted > g_game->max_32)
+                    g_game->max_32 = stats[i].metalWasted;
+                if (stats[i].score > g_game->maxScore)
+                    g_game->maxScore = stats[i].score;
+            }
+        }
+    }
 }
 
 // FUNCTION: 0x41dee0

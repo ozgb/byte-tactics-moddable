@@ -69,8 +69,7 @@ struct PlayerIdPacket {
 
 // GLOBAL: 0x511de8
 extern Game* g_game;
-extern char* g_leftGameTexts[8];
-extern int g_usePacketManager;
+#include "../../link/globals.h"
 
 #include "packets.h"
 #include "../game/statistics.h"
@@ -79,12 +78,25 @@ void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 #include "../graphics/display.h"
 char* __stdcall Translate(char* text);
 void __stdcall AddMessage(char* text, int key, int value, char last);
-#include "net_game_450530.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall SetupPlayerSlot(unsigned char player, char type);
 int GetTicks();
 int __stdcall ReportGameEvent(int msg);
 #include "../gui/dialogs.h"
+#include <memory.h>
+#include "../frontend/multi.h"
+#include "../units/unit_position.h"
+#include "../units/unit_targets.h"
+#include "../map/features.h"
+#include "../map/line_of_sight.h"
+#include "../ingame/control_panel.h"
+#include "../sound/sound.h"
+#include "../units/unit_commands.h"
+#include "../units/units_485010.h"
+#include "../game/game_state.h"
+unsigned char FindHostSlot();
+void __stdcall TransferMetal(unsigned char, unsigned char, int, int);
+void __stdcall TransferEnergy(unsigned char, unsigned char, int, int);
 
 // FUNCTION: 0x44fd40
 int __stdcall DefaultPacketHandler(int arg1)
@@ -388,6 +400,115 @@ int FindFreeSlot()
     return i;
 }
 
+#pragma pack(push, 1)
+struct LobbySyncMessage {
+    unsigned char type;
+    unsigned char flag;
+    int id;
+    int arg;
+};
+#pragma pack(pop)
+
+static inline int IsConnected(Player* player)
+{
+    if (player->active == 0)
+        return 0;
+    if (player->type == 1 || player->type == 2)
+        return 1;
+    return 0;
+}
+
+static inline unsigned char FindLobbyHostPlayer()
+{
+    for (unsigned char i = 0; i < 10; i++) {
+        if (g_game->players[i].type != 0 && (g_game->players[i].info->flags_97 & 1))
+            return i;
+    }
+    return 10;
+}
+
+static inline int FindConnectedPlayerId()
+{
+    for (int k = 0; k < 10; k++) {
+        if (IsConnected(&g_game->players[k]))
+            return g_game->players[k].id;
+    }
+    return -1;
+}
+
+static inline int FindLobbyHostDpid()
+{
+    for (int j = 0; j < 10; j++) {
+        if (g_game->players[j].info->flags_97 & 1)
+            return GetSlotDpid(j);
+    }
+    return -1;
+}
+
+static inline int FindLobbyHostPlayerId()
+{
+    for (int j = 0; j < 10; j++) {
+        if (g_game->players[j].info->flags_97 & 1)
+            return PlayerId(j);
+    }
+    return -1;
+}
+
+// FUNCTION: 0x450530
+void SendLobbySyncRequests()
+{
+    LobbySyncMessage msg;
+    if (g_game->mode_391f1 == 6)
+        return;
+    for (int i = 0; i < 10; i++) {
+        Player* p = &g_game->players[i];
+        if (p->active != 0
+            && (p->type == 1 || p->type == 2 || p->type == 3)
+            && p->index != 10
+            && p->lobbyDataSynced == 0) {
+            if (IsConnected(p) && p->type == 1) {
+                Player* q = &g_game->players[FindHostSlot()];
+                if (IsConnected(q)) {
+                    p->lobbyDataSynced = 1;
+                    continue;
+                }
+                msg.type = 0x21;
+                msg.flag = 1;
+                msg.id = p->id;
+                msg.arg = -1;
+                if (FindHostSlot() == 10)
+                    continue;
+                SendPacketToPlayer(FindConnectedPlayerId(), FindLobbyHostDpid(), (unsigned char *)&msg, 10);
+            }
+            else if (IsConnected(p) && p->type == 2) {
+                Player* q = &g_game->players[FindHostSlot()];
+                if (IsConnected(q)) {
+                    p->lobbyDataSynced = 1;
+                    continue;
+                }
+                msg.type = 0x21;
+                msg.flag = 1;
+                msg.id = p->id;
+                msg.arg = g_game->players[g_game->localPlayer].id;
+                if (FindHostSlot() == 10)
+                    continue;
+                SendPacketToPlayer(FindConnectedPlayerId(), FindLobbyHostPlayerId(), (unsigned char *)&msg, 10);
+            }
+            else if (p->type == 3) {
+                msg.type = 0x21;
+                msg.flag = 0;
+                msg.id = p->id;
+                msg.arg = -1;
+                if (FindLobbyHostPlayer() == 10)
+                    continue;
+                if (i == 9)
+                    p->lobbyDataSynced = p->lobbyDataSynced;
+                SendPacketToPlayer(FindConnectedPlayerId(), FindLobbyHostDpid(), (unsigned char *)&msg, 10);
+            }
+        }
+    }
+}
+
 // FUNCTION: 0x450910
 char FindFreePlayerId(void)
 {
@@ -569,15 +690,6 @@ void CloseNetSession()
     }
 }
 
-static inline int IsPlaying_00450e20(Player* player)
-{
-    if (player->active == 0)
-        return 0;
-    if (player->type == 1 || player->type == 2)
-        return 1;
-    return 0;
-}
-
 // FUNCTION: 0x450e20
 void LeaveNetGame()
 {
@@ -586,7 +698,7 @@ void LeaveNetGame()
     }
     if (g_game->flags_2a44 & 1) {
         for (int i = 0; i < 10; i++) {
-            if (IsPlaying_00450e20(&g_game->players[i])) {
+            if (IsConnected(&g_game->players[i])) {
                 RemovePlayer(g_game->players[i].id);
             }
         }
@@ -633,15 +745,6 @@ void LeaveNetGame()
     QuitApp(text);
 }
 
-static inline int IsPlaying_00450f90(Player* player)
-{
-    if (player->active == 0)
-        return 0;
-    if (player->type == 1 || player->type == 2)
-        return 1;
-    return 0;
-}
-
 // FUNCTION: 0x450f90
 void BroadcastPlayerInfo()
 {
@@ -649,12 +752,12 @@ void BroadcastPlayerInfo()
     if (g_game->flags_2a44 & 1) {
         for (int i = 0; i < 10; i++) {
             Player* player = &g_game->players[i];
-            if (IsPlaying_00450f90(player)) {
+            if (IsConnected(player)) {
                 packet.data = *player->info;
                 packet.data.id = player->id;
                 packet.type = 0x20;
                 BroadcastPacket(player->id, &packet, sizeof(packet));
-                if (IsPlaying_00450f90(player)) {
+                if (IsConnected(player)) {
                     PlayerIdPacket* msg = (PlayerIdPacket*)g_game->recvPacketPtr;
                     msg->type = 0x24;
                     msg->id = player->id;
@@ -891,31 +994,74 @@ struct BuilderLinkPacket {
     short builderUnitId;
 };
 
+struct JoinRequestData {
+    char name[17];
+    short versionMajor;
+    short versionMinor;
+};
+
 struct Packet_00453d40 {
     unsigned int type;
     int playerType;
     int id;
     char* data;
-    char* createData;
+    JoinRequestData* createData;
     int dataSize;
     char* longName;
 };
 
+struct PlayerIdIntPacket {
+    unsigned char type;
+    int id;
+    int value;
+};
+
+struct FeatureDamagePacket {
+    unsigned char type;
+    unsigned char sub;
+    unsigned short x;
+    unsigned short z;
+};
+
+struct UnitScriptCallRecv {
+    unsigned char type;
+    unsigned short id;
+    short index;
+    unsigned char argCount;
+    int arg0;
+    int arg1;
+    int arg2;
+    int arg3;
+};
+
+struct PlaySoundPacket {
+    unsigned char type;
+    unsigned char flag;
+    int index;
+    int pos[3];
+};
+
+struct OwnershipTransferPacket {
+    unsigned char type;
+    short unitId;
+    int newOwnerNetId;
+    char unknown_7[0x18 - 7];
+};
+
+struct ResourceSharePacket {
+    unsigned char type;
+    int subtype;
+    int fromNetId;
+    int toNetId;
+    int amount;
+};
+
+
 #pragma pack(pop)
 
-extern int g_broadcastPeersSeen[11];
 extern int DAT_00512c8c;
 extern char g_onlineLobbyPlayerName;
 extern char g_onlineLobbyPassword;
-extern char* g_loungeChatter;
-extern int g_loungeRefreshTime;
-extern int g_timeoutPlayerDpid;
-extern unsigned int g_timeoutTimerStart;
-extern char g_allySoundName[];
-extern char g_playerDisconnectedText[];
-extern char g_integrityBreachText[];
-extern char g_playerMessageFormat[];
-extern char s_PACKET_DATA_00506524[];
 typedef EntryFunc SimView_g_packetHandlerType2;
 #undef g_packetHandlerType2
 #define g_packetHandlerType2 (*reinterpret_cast<SimView_g_packetHandlerType2*>(reinterpret_cast<char*>(&g_packetHandlers) + 0x8))
@@ -1743,20 +1889,11 @@ int __stdcall SendAlliance(int from, int to, char value, int extra)
     return result;
 }
 
-static inline int IsPlaying_00452bd0(Player* player)
-{
-    if (player->active == 0)
-        return 0;
-    if (player->type == 1 || player->type == 2)
-        return 1;
-    return 0;
-}
-
 #pragma auto_inline(off)
 // FUNCTION: 0x452bd0
 int __stdcall BroadcastAllyTeam(Player* player)
 {
-    if (!IsPlaying_00452bd0(player)) {
+    if (!IsConnected(player)) {
         return 0;
     }
     PlayerIdPacket* msg = (PlayerIdPacket*)g_game->recvPacketPtr;
@@ -1840,15 +1977,6 @@ static inline Player* FindPlayer_00452cc0(int id)
     return &g_game->players[FindSlot_00452cc0(id)];
 }
 
-static inline int IsPlaying_00452cc0(Player* p)
-{
-    if (p->active == 0)
-        return 0;
-    if (p->type == 1 || p->type == 2)
-        return 1;
-    return 0;
-}
-
 static inline int IsType1_00452cc0(Player* p)
 {
     if (p->active == 0)
@@ -1895,7 +2023,7 @@ void __stdcall RemovePlayer(int id)
 
     for (int i = 0; i < 10; i++) {
         Player* q = &g_game->players[i];
-        if (IsPlaying_00452cc0(q)) {
+        if (IsConnected(q)) {
             q->alliedBy[slot] = 0;
             q->allied[slot] = 0;
         }
@@ -1904,10 +2032,10 @@ void __stdcall RemovePlayer(int id)
     KillPlayerUnits(FindSlot_00452cc0(id));
 
     if (g_game->bits_2a44.bit2) {
-        if (!IsPlaying_00452cc0(p))
+        if (!IsConnected(p))
             Remove_00452cc0(p);
     } else {
-        if (IsPlaying_00452cc0(p))
+        if (IsConnected(p))
             host_net_remove_player((host_net*)g_game->net_14, p->id);
         Remove_00452cc0(p);
     }
@@ -2321,6 +2449,599 @@ void CheckPlayerTimeouts()
     OpenTimeoutDialog(-1);
 }
 
+static inline unsigned char FindPlayerIndex(int id)
+{
+    if (id == -1)
+        return 10;
+    for (unsigned char i = 0; i < 10; i++) {
+        if (PlayerId(i) == id)
+            return i;
+    }
+    return 10;
+}
+
+static inline unsigned char FindPlayerSlot(int id)
+{
+    if (id == -1)
+        return 10;
+    for (unsigned char i = 0; i < 10; i++) {
+        if (GetSlotDpid(i) == id)
+            return i;
+    }
+    return 10;
+}
+
+static inline Player* PlayerById(int id)
+{
+    if (FindPlayerSlot(id) == 10)
+        return 0;
+    return &g_game->players[FindSlotByDpid(id)];
+}
+
+static inline Player* PlayerBySlot(int id)
+{
+    if (FindPlayerSlot(id) == 10)
+        return 0;
+    return &g_game->players[FindPlayerSlot(id)];
+}
+
+static inline Player* PlayerByIndex(int id)
+{
+    if (FindPlayerIndex(id) == 10)
+        return 0;
+    return &g_game->players[FindPlayerIndex(id)];
+}
+
+static inline int FirstJoinedId()
+{
+    for (int i = 0; i < 10; i++) {
+        if (g_game->players[i].type == 1)
+            return g_game->players[i].id;
+    }
+    return -1;
+}
+
+static inline unsigned char* InfoPacket(unsigned char* buf, Player* p)
+{
+    SideDataPacket* pkt = (SideDataPacket*)buf;
+    memcpy(&pkt->data, p->info, 0xb9);
+    pkt->data.id = p->id;
+    pkt->type = 0x20;
+    return buf;
+}
+
+static inline int IsValid(Player* p)
+{
+    return p->active && (p->type == 1 || p->type == 2 || p->type == 3);
+}
+
+static inline int InGame(Player* p)
+{
+    return IsValid(p) && p->index != 10;
+}
+
+static inline Player* LocalPlayer()
+{
+    return &g_game->players[g_game->localPlayer];
+}
+
+static inline Unit* UnitAt(unsigned short index)
+{
+    if (index == 0)
+        return 0;
+    return &g_game->units[index];
+}
+
+static inline unsigned char FreeTeam()
+{
+    for (int team = 1; team <= 10; team++) {
+        int used = 0;
+        for (int i = 0; i < 10; i++) {
+            Player* p = &g_game->players[i];
+            if (IsValid(p) && p->index != 10 && p->lobbyDataSynced == team)
+                used = 1;
+        }
+        if (!used)
+            return team;
+    }
+    return 0;
+}
+
+static inline void DropPlayer(int id)
+{
+    if (FindPlayerSlot(id) == 10)
+        return;
+    PlayerIdPacket* out = (PlayerIdPacket*)g_game->recvPacketPtr;
+    out->type = 0x1c;
+    out->id = id;
+    Player* p = &g_game->players[FindPlayerSlot(id)];
+    if ((p->active && p->type == 3) || !((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value & 1) || ((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value & 2))
+        RemovePlayer(id);
+    BroadcastPacket(LocalPlayer()->id, out, 5);
+}
+
+static inline int CommandAllowed(unsigned char* bytes)
+{
+    int mode = g_game->mode_391f1;
+    if (mode == 5 && (g_packetModes[bytes[0]] & 2))
+        return 1;
+    if (mode == 6 && (g_packetModes[bytes[0]] & 4))
+        return 1;
+    if (mode != 5 && mode != 6 && (g_packetModes[bytes[0]] & 1))
+        return 1;
+    return 0;
+}
+
+// FUNCTION: 0x453d40
+int HandleNetPackets()
+{
+    if (!(g_game->netGameFlags & 1))
+        return 0;
+    int messages = 0;
+    for (unsigned char i = 0; i < 10; i++)
+        g_game->players[i].messages = 0;
+    unsigned char* packet = g_game->recvPacketPtr;
+    int more = 1;
+    while (more) {
+        more = ReceiveNetPacket();
+        if (!more)
+            continue;
+        int sender = g_game->from_id;
+        unsigned char from = FindPlayerIndex(sender);
+        unsigned char to = FindPlayerIndex(g_game->lobby1);
+        Player* player = &g_game->players[from];
+        Player* recipient = &g_game->players[to];
+        messages++;
+        if (sender == 0) {
+            if (!IsConnected(recipient))
+                continue;
+            if (recipient->type != 1)
+                continue;
+            Packet_00453d40* msg = (Packet_00453d40*)packet;
+            switch (msg->type) {
+            case 5: {
+                if (msg->playerType != 1)
+                    break;
+                Player* p = PlayerById(msg->id);
+                if (!p)
+                    break;
+                if (!InGame(p))
+                    break;
+                if (!(g_game->netGameFlags & 4) && (p->info->flags_97 & 1) && p->type == 3) {
+                    RejectPlayer(p->id, 1);
+                    RejectPlayer(LocalPlayer()->id, 10);
+                    p->SetType(0);
+                    LocalPlayer()->SetType(0);
+                } else {
+                    RejectPlayer(p->id, 1);
+                    p->SetType(0);
+                }
+                g_game->bits_2bee_1.dirty = 1;
+                if (LocalPlayer()->info->flags_97 & 1) {
+                    char name[32];
+                    int a, b, c, d;
+                    BuildGameInfo(name, &d, &c, &b, &a);
+                    if (LocalPlayer()->info->started)
+                        g_game->settings.flags_475 |= 0x20;
+                    host_net_update_game_info((host_net*)g_game->session, name, DAT_005119b8, d, c, b, a);
+                }
+                break;
+            }
+            case 3: {
+                if (!AddNetPlayer(msg->id))
+                    break;
+                PlayerById(msg->id);
+                int target = FindPlayerIndex(msg->id);
+                if (!g_game->players[FindLobbyHostPlayer()].IsPlayableSlot())
+                    break;
+                PlayerInfo* info = LocalPlayer()->info;
+                JoinRequestData* payload = msg->createData;
+                if (info->closed) {
+                    RejectPlayer(PlayerId(target), 3);
+                    break;
+                }
+                if (msg->dataSize != 0x15) {
+                    RejectPlayer(PlayerId(target), 8);
+                    break;
+                }
+                if (payload->versionMajor != 0 || payload->versionMinor != 0x50) {
+                    RejectPlayer(PlayerId(target), 8);
+                    break;
+                }
+                if (!(info->flags_9d & 1))
+                    break;
+                if (payload && !_strcmpi(g_game->password, payload->name))
+                    break;
+                RejectPlayer(PlayerId(target), 4);
+                break;
+            }
+            case 0x102: {
+                if (msg->playerType != 1)
+                    break;
+                Player temp;
+                Player* p = PlayerById(msg->id);
+                if (p) {
+                    int target = FindPlayerIndex(msg->id);
+                    if (target == 10) {
+                        temp.FreeSideDataAndFogSightCounts();
+                        continue;
+                    }
+                    char* payload = msg->data;
+                    memcpy(g_game->players[target].info, payload, 0xb9);
+                    if (FindLobbyHostPlayer() == g_game->localPlayer && !(LocalPlayer()->info->flags_9b & 0x80)
+                        && (payload[0x9b] & 0x40))
+                        RejectPlayer(p->id, 9);
+                }
+                temp.FreeSideDataAndFogSightCounts();
+                break;
+            }
+            case 0x104:
+                if (FindLobbyHostPlayer() != g_game->localPlayer)
+                    memcpy(&g_game->settings, &msg->playerType, sizeof(Settings));
+                break;
+            case 0x103: {
+                if (msg->playerType != 1)
+                    break;
+                Player* p = PlayerById(msg->id);
+                if (p) {
+                    strncpy(p->name, msg->longName, 0x1e);
+                    strncpy(p->fullName, (char*)msg->dataSize, 0x1e);
+                }
+                break;
+            }
+            }
+            continue;
+        }
+        if (!CommandAllowed(packet))
+            continue;
+        if (IsConnected(player))
+            continue;
+        if (!InGame(player)) {
+            RejectPlayer(sender, 6);
+            continue;
+        }
+        if (packet[0] <= 1 && packet[0] >= 0x2d) {
+            RejectPlayer(sender, 6);
+            continue;
+        }
+        if (player->type != 1 && player->type != 2 && player->type != 3)
+            continue;
+        if (!InGame(recipient))
+            continue;
+        player->lastHeard = GetTicks();
+        player->messages++;
+        switch (packet[0]) {
+        case 32: {
+            SideDataPacket* infoPacket = (SideDataPacket*)packet;
+            int target = FindPlayerIndex(infoPacket->data.id);
+            if (target == 10)
+                break;
+            if (g_game->players[target].active && g_game->players[target].type == 3) {
+                memcpy(g_game->players[target].info, &infoPacket->data, 0xb9);
+                CheckDuplicatePlayerIds();
+            }
+            break;
+        }
+        case 23:
+            if (LocalPlayer()->info->flags_97 & 1) {
+                if (!IsColorFree(g_game->from_id, (signed char)packet[1])) {
+                    AssignPlayerColor(FirstJoinedId(), g_game->from_id, (signed char)packet[1]);
+                } else {
+                    unsigned char reply[2];
+                    reply[0] = 0x18;
+                    reply[1] = packet[1];
+                    SendPacketToPlayer(FirstJoinedId(), g_game->from_id, reply, 2);
+                    if (g_usePacketManager)
+                        g_packetManager.SendAllQueued(1);
+                }
+            }
+            break;
+        case 24:
+            g_game->players[to].info->color = packet[1];
+            if (to == g_game->localPlayer && (g_game->netGameFlags & 1)) {
+                for (int i = 0; i < 10; i++) {
+                    Player* p = &g_game->players[i];
+                    unsigned char reply[0xba];
+                    if (IsConnected(p)) {
+                        BroadcastPacket(p->id, InfoPacket(reply, p), 0xba);
+                        BroadcastAllyTeam(p);
+                    }
+                }
+                SendLobbySyncRequests();
+                g_packetManager.SendAllQueued(1);
+            }
+            g_game->bits_2bee_1.dirty = 1;
+            break;
+        case 2:
+            HandlePing((LatencyPacket *)packet);
+            break;
+        case 38:
+            memcpy(g_game->playerIds, packet + 1, 40);
+            g_game->bits_2bee_1.dirty = 1;
+            break;
+        case 35: {
+            AllyFlagsPacket* ally = (AllyFlagsPacket*)packet;
+            Player* a = PlayerBySlot(ally->fromNetId);
+            Player* b = PlayerBySlot(ally->toNetId);
+            if (!a || !b)
+                break;
+            if (ally->allied)
+                PlaySoundByName(g_allySoundName, 0);
+            if (IsConnected(b)) {
+                SetAlliance(ally->fromNetId, ally->toNetId, ally->allied,
+                             ally->force);
+                if (!(g_game->netGameFlags & 4))
+                    g_game->bits_2bee_1.dirty = 1;
+                else
+                    RebuildAllyList();
+            }
+            g_game->players[a->index].allied[b->index] = ally->allied;
+            break;
+        }
+        case 36: {
+            PlayerIdPacket* allyTeam = (PlayerIdPacket*)packet;
+            Player* p = PlayerBySlot(allyTeam->id);
+            if (p)
+                p->alliance = packet[5];
+            if (!(g_game->netGameFlags & 4))
+                g_game->bits_2bee_1.dirty = 1;
+            break;
+        }
+        case 27: {
+            PlayerIdPacket* reject = (PlayerIdPacket*)packet;
+            Player* p = PlayerBySlot(reject->id);
+            if (p)
+                RejectPlayer(p->id, packet[5]);
+            break;
+        }
+        case 28: {
+            PlayerIdPacket* drop = (PlayerIdPacket*)packet;
+            int id = drop->id;
+            if (FindPlayerIndex(id) == 10)
+                break;
+            char text[200];
+            sprintf(text, Translate(g_playerDisconnectedText), PlayerBySlot(id)->name);
+            AddMessage(text, 4, 0, from);
+            DropPlayer(drop->id);
+            if (drop->id == FirstJoinedId()) {
+                g_game->bits_3923b_2.bit2_3923b = 1;
+                g_game->bits_3923b_2.bit4_3923b = 0;
+            }
+            break;
+        }
+        case 30: {
+            unsigned char reply[5];
+            PlayerIdPacket* replyPacket = (PlayerIdPacket*)reply;
+            replyPacket->type = 0x1f;
+            recipient->startPos = packet[1];
+            replyPacket->id = recipient->id;
+            SendPacketToPlayer(recipient->id, player->id, reply, 5);
+            break;
+        }
+        case 31: {
+            PlayerIdPacket* ack = (PlayerIdPacket*)packet;
+            int target = FindPlayerIndex(ack->id);
+            if (target != 10)
+                g_game->startPosAssignAck[target] = 1;
+            break;
+        }
+        case 5:
+            if (recipient->active && recipient->type == 1)
+                AddMessage((char*)(packet + 1), 8, 0, from);
+            break;
+        case 39: {
+            PlayerIdPacket* breach = (PlayerIdPacket*)packet;
+            Player* p = PlayerBySlot(breach->id);
+            if (!p)
+                break;
+            from = p->index;
+            char text[256];
+            sprintf(text, g_playerMessageFormat, p->name, Translate(g_integrityBreachText));
+            for (int i = 0; i < 12; i++)
+                AddMessage(text, 8, 0, from);
+            break;
+        }
+        case 6: {
+            unsigned char reply = 7;
+            SendPacketToPlayer(FindConnectedPlayerId(), g_game->from_id, &reply, 1);
+            break;
+        }
+        case 7:
+            player->keepaliveFlags |= 1;
+            break;
+        case 8:
+            more = 0;
+            g_game->netGameFlags |= 4;
+            break;
+        case 9:
+            CreateUnitFromPacket(from, packet);
+            break;
+        case 44:
+            ReceiveUnitStates(player, (unsigned int *)packet);
+            break;
+        case 10:
+            ApplyAttachUnit((OrderView *)packet);
+            break;
+        case 11:
+            ApplyUnitDamage((UnitDamagePacket *)packet);
+            break;
+        case 12:
+            ApplyUnitDeath((UnitKilledPacket *)packet, 0);
+            break;
+        case 13:
+            ApplyWeaponFirePacket(player, packet);
+            break;
+        case 14:
+            ApplyProjectileHitPacket(player, packet);
+            break;
+        case 15: {
+            FeatureDamagePacket* damage = (FeatureDamagePacket*)packet;
+            switch (damage->sub) {
+            case 0xfd:
+                KillFeature(damage->x, damage->z, 0);
+                break;
+            case 0xfe:
+                StartFeatureBurning(damage->x, damage->z, 1);
+                break;
+            case 0xff:
+                KillFeature(damage->x, damage->z, 1);
+                break;
+            default:
+                DamageFeature(GetMapCell(damage->x, damage->z),
+                             damage->x, damage->z,
+                             (Weapon *)&g_game->weapons[damage->sub]);
+                break;
+            }
+            break;
+        }
+        case 16: {
+            UnitScriptCallRecv* call = (UnitScriptCallRecv*)packet;
+            Unit* unit = UnitAt(call->id);
+            if (unit->flags & 0x10000000)
+                ((CobScript*)unit->script.get())->StartScriptWithArgsByIndex(call->index, 0, 0, call->argCount,
+                                             call->arg0, call->arg1, call->arg2, call->arg3);
+            break;
+        }
+        case 17: {
+            Unit* unit = UnitAt(*(unsigned short*)(packet + 1));
+            if (unit->flags & 0x10000000) {
+                unit->SetStateBits(packet[3], 1);
+                unit->SetStateBits((unsigned char)~packet[3], 0);
+            }
+            break;
+        }
+        case 18: {
+            BuilderLinkPacket* link = (BuilderLinkPacket*)packet;
+            Unit* a = UnitAt(link->constructedUnitId);
+            FinishConstruction(UnitAt(link->builderUnitId), a);
+            break;
+        }
+        case 19: {
+            PlaySoundPacket* sound = (PlaySoundPacket*)packet;
+            if (sound->flag)
+                PlaySoundByIndex(sound->index, 0);
+            else
+                PlaySoundAt(sound->index, packet + 6, 0);
+            break;
+        }
+        case 20: {
+            OwnershipTransferPacket* transfer = (OwnershipTransferPacket*)packet;
+            Unit* unit = UnitAt(transfer->unitId);
+            if (!unit || !(unit->flags & 0x10000000))
+                break;
+            int id = transfer->newOwnerNetId;
+            Player* p;
+            if (FindPlayerIndex(id) == 10)
+                p = 0;
+            else
+                p = &g_game->players[FindPlayerSlot(id)];
+            if (IsConnected(p))
+                GiveUnitToPlayer(unit, p, (OwnershipTransferPacket *)packet);
+            break;
+        }
+        case 21:
+            if (g_game->net_bits.net_bit2)
+                g_game->shareVisionReady[from] = 1;
+            break;
+        case 22: {
+            ResourceSharePacket* share = (ResourceSharePacket*)packet;
+            unsigned char a = FindPlayerIndex(share->fromNetId);
+            unsigned char b = FindPlayerIndex(share->toNetId);
+            if (a == 10 || b == 10)
+                break;
+            switch (share->subtype) {
+            case 1:
+                TransferMetal(a, b, share->amount, 0);
+                break;
+            case 2:
+                TransferEnergy(a, b, share->amount, 0);
+                break;
+            case 3:
+                ShareMapInfo(a, b);
+                break;
+            }
+            break;
+        }
+        case 40:
+            HandlePlayerEconomy((PlayerViewStatePacket *)packet, player);
+            break;
+        case 41:
+            if (packet[1]) {
+                recipient->shareLos[from] = 1;
+                if (packet[2])
+                    recipient->shareMapping[from] = 1;
+            }
+            break;
+        case 25:
+            if (packet[1])
+                SetGameSpeed(packet[2], 0);
+            else
+                g_game->bits_38a51.bit_38a51 = packet[2];
+            break;
+        case 26:
+            if (g_game->sync && recipient->active && recipient->type == 1)
+                ((UnitSync*)g_game->sync)->ReceiveSyncPacket(packet, from);
+            break;
+        case 29: {
+            PlayerIdIntPacket* integrity = (PlayerIdIntPacket*)packet;
+            if (g_usePacketManager)
+                g_packetManager.HandleIntegrityNop(g_game->from_id, integrity->id,
+                                                   integrity->value);
+            break;
+        }
+        case 33: {
+            LobbySyncMessage* request = (LobbySyncMessage*)packet;
+            Player* a = PlayerByIndex(request->id);
+            Player* b = PlayerByIndex(request->arg);
+            if (!IsConnected(&g_game->players[FindLobbyHostPlayer()]))
+                break;
+            if (!a)
+                break;
+            unsigned char reply[6];
+            PlayerIdPacket* replyPacket = (PlayerIdPacket*)reply;
+            replyPacket->type = 0x22;
+            replyPacket->id = -1;
+            reply[5] = 0;
+            if (!request->flag) {
+                replyPacket->id = a->id;
+                reply[5] = a->lobbyDataSynced;
+                if (!reply[5])
+                    break;
+                BroadcastPacket(GetHostDpid(), reply, 6);
+            } else {
+                if (b) {
+                    replyPacket->id = a->id;
+                    if (InGame(b))
+                        reply[5] = b->lobbyDataSynced;
+                } else {
+                    replyPacket->id = a->id;
+                    if (!a->lobbyDataSynced)
+                        reply[5] = FreeTeam();
+                }
+                if (!reply[5])
+                    break;
+                a->lobbyDataSynced = reply[5];
+                BroadcastPacket(GetHostDpid(), reply, 6);
+            }
+            break;
+        }
+        case 34: {
+            PlayerIdPacket* team = (PlayerIdPacket*)packet;
+            Player* p = PlayerByIndex(team->id);
+            if (p)
+                p->lobbyDataSynced = packet[5];
+            break;
+        }
+        case 42:
+            player->progress = packet[1];
+            break;
+        }
+    }
+    CheckDuplicatePlayerIds();
+    CheckPlayerTimeouts();
+    return messages;
+}
+
 #pragma auto_inline(off)
 // FUNCTION: 0x456030
 int Player::IsPlayableSlot()
@@ -2393,14 +3114,6 @@ struct Msg20_00456310 {
 struct Packet_00456de0 {
     unsigned char type;
     unsigned char progress;
-};
-
-struct ResourceSharePacket {
-    unsigned char type;
-    int subtype;
-    int fromNetId;
-    int toNetId;
-    int amount;
 };
 
 void Unused_00457050(int a, int b, int c, int d, int e, int f);
@@ -2602,24 +3315,6 @@ void SendNetHeartbeat()
     g_game->bits_2bee_1.dirty = 1;
 }
 
-static inline int GetPlayerId_00456de0(unsigned char i)
-{
-    if (i != 10 && g_game->players[i].type)
-        return g_game->players[i].id;
-    return -1;
-}
-
-static inline unsigned char FindPlayerIndex(int id)
-{
-    if (id == -1)
-        return 10;
-    for (unsigned char i = 0; i < 10; i++) {
-        if (GetPlayerId_00456de0(i) == id)
-            return i;
-    }
-    return 10;
-}
-
 // FUNCTION: 0x4565a0
 void __stdcall HandlePing(LatencyPacket* p)
 {
@@ -2715,10 +3410,6 @@ static inline int FirstJoinedId_004568c0() {
     return -1;
 }
 
-static inline int IsConnected_004568c0(Player* p) {
-    return p->active != 0 && (p->type == 1 || p->type == 2);
-}
-
 static inline int PlayerId_004568c0(unsigned char pi) {
     if (pi == 10)
         return -1;
@@ -2804,7 +3495,7 @@ int AssignStartPositions() {
             if (g_game->players[k4].active != 0) {
                 if (g_game->players[k4].type == 3) {
                     SendPacketToPlayer(FirstJoinedId_004568c0(), PlayerId_004568c0(k4), packet, 2);
-                } else if (IsConnected_004568c0(&g_game->players[k4])) {
+                } else if (IsConnected(&g_game->players[k4])) {
                     g_game->players[k4].startPos = packet[1];
                     g_game->startPosAssignAck[k4] = 1;
                 }
@@ -2814,12 +3505,12 @@ int AssignStartPositions() {
     unsigned char pkt = 0x15;
     if (res == 0) {
         for (int k6 = 0; k6 < 10; k6++) {
-            if (IsConnected_004568c0(&g_game->players[k6]))
+            if (IsConnected(&g_game->players[k6]))
                 BroadcastPacket(PlayerId_004568c0(k6), &pkt, 1);
         }
     } else if (ok) {
         for (int k5 = 0; k5 < 10; k5++) {
-            if (IsConnected_004568c0(&g_game->players[k5]))
+            if (IsConnected(&g_game->players[k5]))
                 BroadcastPacket(PlayerId_004568c0(k5), &pkt, 1);
         }
     }

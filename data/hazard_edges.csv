@@ -131,7 +131,7 @@ ClearWeaponTarget,FindScriptNative,"seam slot filled by InstallNativeSeams, Unit
 ClearWeaponTarget,StartScriptWithArgsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::StartScriptWithArgs, src/units/unit_targets.cpp:645, src/seams/native.cpp"
 CloseTopScreen,Choice3DialogHandler,Layer::handler assigned at src/gui/dialogs.cpp:1136
 CloseTopScreen,HandleAlliesClick,Layer::handler assigned at src/frontend/multi.cpp:3579
-CloseTopScreen,HandleBattleRoomClick,Layer::handler assigned at src/frontend/multi_449bb0.cpp:280
+CloseTopScreen,HandleBattleRoomClick,Layer::handler assigned at src/frontend/multi.cpp:280
 CloseTopScreen,HandleBriefingClick,Layer::handler assigned at src/frontend/options.cpp:2329
 CloseTopScreen,HandleBuildPanelClick,Layer::handler assigned at src/ingame/control_panel.cpp:1155
 CloseTopScreen,HandleCdCheckClick,Layer::handler assigned at src/frontend/endgame.cpp:984
@@ -158,7 +158,7 @@ CloseTopScreen,HandleRestartDialogClick,Layer::handler assigned at src/frontend/
 CloseTopScreen,HandleRestrictionsClick,Layer::handler assigned at src/frontend/multi.cpp:4910
 CloseTopScreen,HandleSaveGameClick,Layer::handler assigned at src/frontend/multi.cpp:4635
 CloseTopScreen,HandleSelectGameClick,Layer::handler assigned at src/frontend/multi.cpp:2145
-CloseTopScreen,HandleSelectProviderClick,Layer::handler assigned at src/frontend/multi_444580.cpp:115
+CloseTopScreen,HandleSelectProviderClick,Layer::handler assigned at src/frontend/multi.cpp:115
 CloseTopScreen,HandleSerialDialogClick,Layer::handler assigned at src/frontend/multi.cpp:1584
 CloseTopScreen,HandleShareDialogEvent,Layer::handler assigned at src/ingame/dialogs_493340.cpp:427
 CloseTopScreen,HandleSingleMenuClick,Layer::handler assigned at src/frontend/campaign_menu.cpp:801
@@ -184,7 +184,7 @@ CloseTopScreen,UpdateGameSelection,Layer::handler assigned at src/frontend/multi
 CloseTopScreen,YesNoDialogHandler,Layer::handler assigned at src/gui/dialogs.cpp:972
 CloseTopScreen_inlined,Choice3DialogHandler,Layer::handler assigned at src/gui/dialogs.cpp:1136
 CloseTopScreen_inlined,HandleAlliesClick,Layer::handler assigned at src/frontend/multi.cpp:3579
-CloseTopScreen_inlined,HandleBattleRoomClick,Layer::handler assigned at src/frontend/multi_449bb0.cpp:280
+CloseTopScreen_inlined,HandleBattleRoomClick,Layer::handler assigned at src/frontend/multi.cpp:280
 CloseTopScreen_inlined,HandleBriefingClick,Layer::handler assigned at src/frontend/options.cpp:2329
 CloseTopScreen_inlined,HandleBuildPanelClick,Layer::handler assigned at src/ingame/control_panel.cpp:1155
 CloseTopScreen_inlined,HandleCdCheckClick,Layer::handler assigned at src/frontend/endgame.cpp:984
@@ -211,7 +211,7 @@ CloseTopScreen_inlined,HandleRestartDialogClick,Layer::handler assigned at src/f
 CloseTopScreen_inlined,HandleRestrictionsClick,Layer::handler assigned at src/frontend/multi.cpp:4910
 CloseTopScreen_inlined,HandleSaveGameClick,Layer::handler assigned at src/frontend/multi.cpp:4635
 CloseTopScreen_inlined,HandleSelectGameClick,Layer::handler assigned at src/frontend/multi.cpp:2145
-CloseTopScreen_inlined,HandleSelectProviderClick,Layer::handler assigned at src/frontend/multi_444580.cpp:115
+CloseTopScreen_inlined,HandleSelectProviderClick,Layer::handler assigned at src/frontend/multi.cpp:115
 CloseTopScreen_inlined,HandleSerialDialogClick,Layer::handler assigned at src/frontend/multi.cpp:1584
 CloseTopScreen_inlined,HandleShareDialogEvent,Layer::handler assigned at src/ingame/dialogs_493340.cpp:427
 CloseTopScreen_inlined,HandleSingleMenuClick,Layer::handler assigned at src/frontend/campaign_menu.cpp:801
@@ -1354,8 +1354,8 @@ UpdateAllUnits,RunOrders,"seam slot filled by InstallNativeSeams, OrdersSeam::Ru
 UpdateAllUnits,RunSecondaryOrders,"seam slot filled by InstallNativeSeams, OrdersSeam::RunSecondaryOrders, src/units/unit_position.cpp:572, src/seams/native.cpp"
 UpdateAllUnits,UpdateMotionNative,"seam slot filled by InstallNativeSeams, OrdersSeam::UpdateMotion, src/units/unit_position.cpp:574, src/seams/native.cpp"
 UpdateAllUnits,UpdateUnitWeapons,"seam slot filled by InstallNativeSeams, WeaponsSeam::UpdateUnitWeapons, src/units/unit_position.cpp:531, src/seams/native.cpp"
-UpdateBattleRoom,GetMissionNameNative,"seam slot filled by InstallNativeSeams, MapSeam::GetMissionName, src/frontend/multi_44a680.cpp:279, src/seams/native.cpp"
-UpdateBattleRoom,LoadMissionByNameNative,"seam slot filled by InstallNativeSeams, MapSeam::LoadMissionByName, src/frontend/multi_44a680.cpp:270,280, src/seams/native.cpp"
+UpdateBattleRoom,GetMissionNameNative,"seam slot filled by InstallNativeSeams, MapSeam::GetMissionName, src/frontend/multi.cpp:279, src/seams/native.cpp"
+UpdateBattleRoom,LoadMissionByNameNative,"seam slot filled by InstallNativeSeams, MapSeam::LoadMissionByName, src/frontend/multi.cpp:270,280, src/seams/native.cpp"
 UpdateCursorWorldPos,GetCellFeature,"seam slot filled by InstallNativeSeams, FeaturesSeam::GetCellFeature, src/game/game_load.cpp:1208, src/seams/native.cpp"
 UpdateExplodedPiece,GetCellMeanHeightNative,"seam slot filled by InstallNativeSeams, MapSeam::GetCellMeanHeight, src/weapons/explosions.cpp:721, src/seams/native.cpp"
 UpdateExplosions,GetCellMeanHeightNative,"seam slot filled by InstallNativeSeams, MapSeam::GetCellMeanHeight, src/weapons/explosions.cpp:526, src/seams/native.cpp"
@@ -1363,7 +1363,7 @@ UpdateFeatures,GetCellMeanHeightNative,"seam slot filled by InstallNativeSeams, 
 UpdateFeatures,GetMapCell,"seam slot filled by InstallNativeSeams, LosRadarSeam::GetMapCell, src/map/features.cpp:567,719,721,778,824,828,873,937,938,994,1019,1040,1155,1212, src/seams/native.cpp"
 UpdateMenu,Choice3DialogHandler,Layer::handler assigned at src/gui/dialogs.cpp:1136
 UpdateMenu,HandleAlliesClick,Layer::handler assigned at src/frontend/multi.cpp:3579
-UpdateMenu,HandleBattleRoomClick,Layer::handler assigned at src/frontend/multi_449bb0.cpp:280
+UpdateMenu,HandleBattleRoomClick,Layer::handler assigned at src/frontend/multi.cpp:280
 UpdateMenu,HandleBriefingClick,Layer::handler assigned at src/frontend/options.cpp:2329
 UpdateMenu,HandleBuildPanelClick,Layer::handler assigned at src/ingame/control_panel.cpp:1155
 UpdateMenu,HandleCdCheckClick,Layer::handler assigned at src/frontend/endgame.cpp:984
@@ -1390,7 +1390,7 @@ UpdateMenu,HandleRestartDialogClick,Layer::handler assigned at src/frontend/opti
 UpdateMenu,HandleRestrictionsClick,Layer::handler assigned at src/frontend/multi.cpp:4910
 UpdateMenu,HandleSaveGameClick,Layer::handler assigned at src/frontend/multi.cpp:4635
 UpdateMenu,HandleSelectGameClick,Layer::handler assigned at src/frontend/multi.cpp:2145
-UpdateMenu,HandleSelectProviderClick,Layer::handler assigned at src/frontend/multi_444580.cpp:115
+UpdateMenu,HandleSelectProviderClick,Layer::handler assigned at src/frontend/multi.cpp:115
 UpdateMenu,HandleSerialDialogClick,Layer::handler assigned at src/frontend/multi.cpp:1584
 UpdateMenu,HandleShareDialogEvent,Layer::handler assigned at src/ingame/dialogs_493340.cpp:427
 UpdateMenu,HandleSingleMenuClick,Layer::handler assigned at src/frontend/campaign_menu.cpp:801

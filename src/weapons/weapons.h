@@ -1,5 +1,8 @@
 #ifndef WEAPONS_H
 #define WEAPONS_H
+struct Projectile;
+struct Unit;
+
 struct Unit;
 struct UnitWeaponSlot;
 struct Vec3;
@@ -9,6 +12,8 @@ struct Unit;
 struct Vec3;
 struct WeaponDef;
 
+void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos);
+void __stdcall UpdateProjectiles();
 void __stdcall AllocWeaponArray(void);
 void __stdcall FreeWeaponArray(void);
 void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target);
@@ -31,5 +36,7 @@ char* __stdcall FindWeaponByName(char* name);
 void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj);
 
 int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit, Unit* target, Vec3* point);
+
+void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit);
 
 #endif

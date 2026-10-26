@@ -65,7 +65,6 @@ DecodePcx,skip,placeholder type PCX_004caa40: left for the type-naming issues
 DecrementCountArgument,skip,placeholder type Count_00458d20: left for the type-naming issues
 DeleteOrder,mismatch,pointer/int cast: definition's type is likely wrong
 DestroyLine,skip,placeholder type Elem_00434360: left for the type-naming issues
-DetonateProjectile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 DrawButton,mismatch,fixing it changes the generated code of a caller
 DrawCellContours,skip,placeholder type Point_00417f60: left for the type-naming issues
 DrawExplosions,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -131,7 +130,6 @@ FindGadgetIndex,mismatch,placeholder type Entry_0049f8c0: left for the type-nami
 FindGadgetIndexBySubstring,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 FindGadgetOrNull,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
 FindGafEntry,mismatch,placeholder type GafEntry_004b8d40: left for the type-naming issues
-FindHighestPointOnLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FindHostSlot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FindLeftmost,skip,placeholder type Node_004dd1b0: left for the type-naming issues
 FindMissionUnit,mismatch,placeholder type Struct_00487af0: left for the type-naming issues
@@ -162,12 +160,9 @@ FreeObjectState,mismatch,"definition type not nameable in a header, or no clean 
 GameAllocThunk,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GameReallocTagged,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetBasePosition,mismatch,fixing it changes the generated code of a caller
-GetBlockMap,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetButtonStage,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 GetButtonStageByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 GetCellHeight,mismatch,placeholder type Point16_00485010: left for the type-naming issues
-GetCellMeanHeight,skip,placeholder type Pos_00485070: left for the type-naming issues
-GetCellPosition,skip,placeholder type Pos_00485070: left for the type-naming issues
 GetCobChecksum,mismatch,pointer/int cast: definition's type is likely wrong
 GetDisplay,mismatch,pointer/int cast: definition's type is likely wrong
 GetDisplayModes,mismatch,placeholder type ModeList_004b5330: left for the type-naming issues
@@ -175,7 +170,6 @@ GetEnergyIncome,mismatch,pointer/int cast: definition's type is likely wrong
 GetEnergyUsage,mismatch,pointer/int cast: definition's type is likely wrong
 GetFactoriesInRadius,skip,qualified name std::vector
 GetFootprintHeight,mismatch,placeholder type Unit_0047d820: left for the type-naming issues
-GetFreedBlockRing,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetGadgetActiveByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 GetGadgetName,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
 GetGadgetStatus,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
@@ -209,7 +203,6 @@ GetWeaponPiecePosition,mismatch,"definition type not nameable in a header, or no
 GetWeaponRange,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetWeaponTargetPos,skip,placeholder type Vec3_0048a1e0: left for the type-naming issues
 GroundPickupOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-HAPI_FileLength,ambiguous,several definitions share the name
 HAPI_PackDirectory,skip,unknown name cb
 HAPI_RelocateDirectory,mismatch,pointer/int cast: definition's type is likely wrong
 HAPI_WriteArchiveData,skip,unknown name cb
@@ -245,7 +238,6 @@ IsBelowRectBottom,skip,placeholder type Struct_004a1970: left for the type-namin
 IsCountBelowAiLimit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsFootprintVisible,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsGadgetNamed,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
-IsPointVisible,mismatch,placeholder type Map_00408090: left for the type-naming issues
 IsUnitVisibleToPlayer,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 IssueMobileBuildOrders,mismatch,placeholder type Arg_00419670: left for the type-naming issues
 IssueOrCancelOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -384,7 +376,6 @@ StartMouseThread,skip,placeholder type Obj_004c2380: left for the type-naming is
 StepGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming issues
 StopMouseThread,skip,placeholder type Obj_004c2380: left for the type-naming issues
 SubtractVec3,mismatch,fixing it changes the generated code of a caller
-SumUnitRatingsInRange,mismatch,placeholder type Vec_0040b1c0: left for the type-naming issues
 SwapPrimitives,skip,placeholder type Primitive_004cb2f0: left for the type-naming issues
 TickProgressBar,skip,src/gui/gui.cpp defines a static TickProgressBar and sees src/gui/gui.h
 TintFrameBelow,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -438,7 +429,6 @@ g_dpspGuidModem,mismatch,variable declared with a view type that differs from it
 g_dpspGuidSerial,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_dpspGuidTcpip,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_freedBlockRing,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
-g_game,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_gfxBlitLockHeld,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_linkInfo,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_loadingBarFlashDecayTick,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses

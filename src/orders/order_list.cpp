@@ -190,7 +190,7 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 #include "../ai/ai_search_goal.h"
 #include "unit_motion.h"
 #pragma pack(pop)
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 #include "unit_orders.h"
 #include "order_list.h"
 

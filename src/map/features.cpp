@@ -381,7 +381,7 @@ void __stdcall InitGafSequence(Anim* ref, AnimSrc* src, int index);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot,
                              unsigned char owner);
 #include "features.h"
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 void __stdcall PlaySoundAtByName(char* name, Vec3* pos, int param_3);
 #include "../network/net_game.h"
 int GetHostDpid();

@@ -85,7 +85,7 @@ Found during review. Each needs an order, a message to the driver, or a split of
   - The cheat toggles write `uiOptionFlags` bits.
   - `CmdILose` and `CmdIWin` write `endGameFlags`.
   - `CmdMeteor` writes the meteor globals.
-  - `HandleDebugHotkey` (dialogs_493340.cpp:1364-1365) writes `Player.metal` and `Player.energy`.
+  - `HandleDebugHotkey` (game_dialogs.cpp:1117-1118) writes `Player.metal` and `Player.energy`.
 - `HandleSurrenderChoice` writes `endGameFlags`.
 - The options and keys pause bit is `otherFlags`.
 - The camera clears a `mapFlags` bit that line of sight uses.

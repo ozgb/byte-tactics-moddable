@@ -90,7 +90,7 @@ one can diverge without a logic bug.
   - `Mission.startMetal` and `startEnergy` for players 3 to 10 (slots 2 to 9),
     unless the mission is a campaign mission (`Mission.type` is 1). Only
     `LoadMission` writes them, and only slots 0 and 1 (map_list.cpp:963-966);
-    the only reader is `InitPlayerResources` (players_464290.cpp:1131-1134),
+    the only reader is `InitPlayerResources` (players.cpp:942-945),
     which reads them only for game type 1.
 
   The code is `OrderPosYUnset`, `FxPosYUnset`, the `PathOrderFollow` visit and

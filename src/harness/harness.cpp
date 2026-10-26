@@ -3140,7 +3140,7 @@ static void IssueScriptedSpawn(const ScriptedSpawn* sp)
     g_seams.units->CreateUnit((unsigned char)sp->slot, (unsigned short)defIndex, pos, 1, 1, 0);
 }
 
-#include "../units/units_485010.h"
+#include "../units/units.h"
 
 static void ReachQuirkGuard()
 {

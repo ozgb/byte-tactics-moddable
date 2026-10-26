@@ -140,7 +140,7 @@ public:
 
 #include "../../link/globals.h"
 
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 int __cdecl ScaledSin(short, int);
 int __cdecl ScaledCos(short, int);
 short __cdecl AngleOfVector(int, int);

@@ -3,7 +3,7 @@
     uv run tools/bitexact_tables.py [output.c]
 
 The default output is build/bitexact/bx_tables.c. The tables are computed:
-the sine table the hand-written trig in src/util/math_4b70a0.cpp reads
+the sine table the hand-written trig in src/util/fixed_trig.cpp reads
 (0x509f00, 640 entries, the cosine a quarter turn on) is
 round(sin(i * 2 * pi / 512) * 0x2000), and the doubles at 0x509ef0 and
 0x509ef8 are the decimal constants 10430.37835047 and 9.587379924285e-05

@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "../../interfaces/host.h"
+#include "../state/sim_globals.h"
 
 void RegisterUnitOrders(void);
 
@@ -67,7 +68,6 @@ FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
 DisplayContext* GetDisplay(void);
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
-#include "hpi_4bb4e0.h"
 
 static inline int nblocks(int w)
 {
@@ -125,6 +125,43 @@ FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode)
     }
     GameFreeThunk(h);
     return 0;
+}
+
+// FUNCTION: 0x4bb4e0
+ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* path)
+{
+    int len;
+    char* name;
+    int last;
+    char* sep;
+    for (;;) {
+        sep = strchr(path, '\\');
+        if (sep) {
+            len = sep - path;
+            char* buf = (char*)_alloca(len + 1);
+            strncpy(buf, path, len);
+            buf[len] = 0;
+            name = buf;
+            last = 0;
+        } else {
+            name = path;
+            last = 1;
+        }
+        int i = list->count - 1;
+        for (;;) {
+            if (i < 0)
+                return nullptr;
+            if (_strcmpi(name, list->entries[i].text) == 0)
+                break;
+            i--;
+        }
+        if (last)
+            return &list->entries[i];
+        if (!(list->entries[i].flags & 1))
+            return nullptr;
+        path = sep + 1;
+        list = list->entries[i].dir;
+    }
 }
 
 // FUNCTION: 0x4bb5b0
@@ -792,8 +829,6 @@ fail:
 }
 
 
-#include "hpi_4bc800.h"
-
 // FUNCTION: 0x4bc640
 int __stdcall HAPI_FindNext(int handle, void* out)
 {
@@ -842,6 +877,32 @@ int __stdcall HAPI_FindNext(int handle, void* out)
             return -1;
     }
     return -1;
+}
+
+// FUNCTION: 0x4bc800
+ArchiveDirectory* __stdcall HAPI_FindDirectory(ArchiveDirectory* list, char* path)
+{
+    char* sep;
+    while ((sep = strchr(path, '\\')) != nullptr) {
+        char* name;
+        int len = sep - path;
+        name = (char*)_alloca(len + 1);
+        strncpy(name, path, len);
+        name[len] = 0;
+        int i = list->count - 1;
+        for (;;) {
+            if (i < 0)
+                return nullptr;
+            if (_strcmpi(name, list->entries[i].text) == 0)
+                break;
+            i--;
+        }
+        if (!(list->entries[i].flags & 1))
+            return nullptr;
+        path = sep + 1;
+        list = list->entries[i].dir;
+    }
+    return list;
 }
 
 // FUNCTION: 0x4bc8d0
@@ -1307,16 +1368,114 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
     return root;
 }
 
-#pragma pack(push, 1)
-struct Node_004bd830 {
-    char unknown_0[0xc];
-    unsigned char obfuscate;
-};
-#pragma pack(pop)
-
+// FUNCTION: 0x4bd830
 void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                             void (__cdecl* cb)(unsigned), unsigned extra,
-                            int key, int flags);
+                            int key, int flags)
+{
+    Info* info;
+    int len;
+    ArchiveEntry* e;
+    unsigned size;
+    char name[260];
+    char full[260];
+    unsigned char buffer[0x1000];
+    int n, * table;
+    int clen;
+    unsigned remaining, i;
+    FileHandle* file;
+    unsigned char* pack;
+    int j;
+    unsigned char* data;
+    unsigned packlen;
+
+    strcpy(name, path);
+    if (name[strlen(name) - 1] != '\\')
+        strcat(name, "\\");
+
+    long pos2;
+    long pos;
+    for (i = 0; i < *(unsigned*)(off + base); i++) {
+        e = (ArchiveEntry*)(base + *(int*)(off + base + 4)) + i;
+        strcpy(full, name);
+        strcat(full, base + e->name);
+        if ((e->flags & 1) != 0) {
+            HAPI_WriteArchiveData(full, base, e->data, f, cb, extra, key, flags);
+        } else {
+            file = HAPI_OpenFile(full, "rb");
+            info = (Info*)(base + e->data);
+            info->offset = host_file_seek(f, 0, HOST_SEEK_CUR);
+            info->size = HAPI_FileLength(file);
+            info->compressed = (char)flags;
+            if ((char)flags) {
+                int blocks = nblocks(info->size);
+                table = (int*)GameAllocIgnoreTag("Block Sizes", blocks * 4);
+                host_file_write(f, table, blocks * 4);
+                packlen = SquashMaxPackedSize(0x10000, flags & 0xff);
+                pack = (unsigned char*)GameAllocIgnoreTag("Pack Buffer", packlen);
+                data = (unsigned char*)GameAllocIgnoreTag("Data Buffer", 0x10000);
+                remaining = info->size;
+                for (n = 0; n < blocks; n++, remaining -= 0x10000) {
+                    int chunk;
+                    chunk = remaining >= 0x10000 ? 0x10000 : remaining;
+                    HAPI_readfromfile(file, data, chunk);
+                    clen = packlen;
+                    SquashPack((Chunk_4d1820 *)pack, &clen, (char*)data, chunk, flags & 0xff, 1);
+                    table[n] = clen;
+                    pos = host_file_seek(f, 0, HOST_SEEK_CUR);
+                    len = clen;
+                    if ((char)key) {
+                        for (j = 0; j < len; j++)
+                            pack[j] = (unsigned char)~((char)j + (char)pos ^ (char)key ^ pack[j]);
+                    }
+                    host_file_write(f, pack, len);
+                }
+                host_file_seek(f, info->offset, HOST_SEEK_SET);
+                pos2 = host_file_seek(f, 0, HOST_SEEK_CUR);
+                if ((char)key) {
+                    for (j = 0; j < blocks * 4; j++)
+                        ((unsigned char*)table)[j] = (unsigned char)~((char)j
+                            + ((char)pos2) ^ (char)key ^ ((unsigned char*)table)[j]);
+                }
+                host_file_write(f, table, blocks * 4);
+                host_file_seek(f, 0, HOST_SEEK_END);
+                GameFreeThunk(table);
+                GameFreeThunk(pack);
+                GameFreeThunk(data);
+            } else {
+                size = info->size;
+                while (size > 0) {
+                    int chunk = size >= 0x1000 ? 0x1000 : size;
+                    HAPI_readfromfile(file, buffer, chunk);
+                    pos = host_file_seek(f, 0, HOST_SEEK_CUR);
+                    if ((char)key) {
+                        for (j = 0; j < chunk; j++)
+                            buffer[j] = (unsigned char)~(buffer[j] ^ ((char)pos + (char)j
+                                            ^ ((char)key)));
+                    }
+                    host_file_write(f, buffer, chunk);
+                    size -= chunk;
+                }
+            }
+            if (file->shared != nullptr) {
+                --file->shared->count;
+                if (file->shared->count == 0 && file->shared->mode == 0) {
+                    host_file_close(file->shared->fp);
+                    file->shared->fp = nullptr;
+                }
+            } else {
+                host_file_close(file->fp);
+            }
+            if (file->buffer != nullptr)
+                GameFreeThunk(file->buffer);
+            if (file->buffer2 != nullptr)
+                GameFreeThunk(file->buffer2);
+            GameFreeThunk(file);
+            if (cb != nullptr)
+                cb(5 + (unsigned)(90 * info->offset - *(int*)(8 + base) * 90) / extra);
+        }
+    }
+}
 
 
 void __stdcall HAPI_RelocateDirectory(ArchiveDirectory* h, int delta);
@@ -1506,6 +1665,23 @@ void __stdcall HAPI_RemoveArchive(OPENHAPIFILE* pRecord)
     }
 }
 
+// FUNCTION: 0x4be320
+void __stdcall HAPI_ResolveShadowedFiles(void)
+{
+    DisplayContext* state = GetDisplay();
+    if (state->count > 0) {
+        for (int i = 0; i < state->count; i++) {
+            ArchiveDirectory* list = state->files[i]->node->list;
+            for (int j = list->count - 1; j >= 0; j--) {
+                list->entries[j].flags &= ~2;
+                if (list->entries[j].flags & 1)
+                    HAPI_ClearShadowFlags(list->entries[j].dir);
+            }
+        }
+        HAPI_MarkShadowedFiles(DAT_005119b8, -1, 1);
+    }
+}
+
 // FUNCTION: 0x4be3b0
 void __stdcall HAPI_ClearShadowFlags(ArchiveDirectory* list)
 {
@@ -1562,3 +1738,7 @@ void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
     }
 }
 
+typedef void (FileList::*FileListInsertFillFn)(FileList::iterator, FileList::size_type, const StringRef&);
+
+// FUNCTION: 0x4be6c0 ?insert@?$vector@VStringRef@@V?$allocator@VStringRef@@@std@@@std@@QAEXPAVStringRef@@IABV3@@Z
+FileListInsertFillFn g_fileListInsertFill = &FileList::insert;

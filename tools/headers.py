@@ -53,7 +53,7 @@ data/headers_no_self_include.csv (columns path, reason) lists the file because t
 does not build or hostlint refuses it; --check fails on a listed file that already includes
 its header or has none. The report names each file left out and why.
 
-Running it twice changes nothing. Generated files, src/util/math_4b70a0.cpp
+Running it twice changes nothing. Generated files, src/util/fixed_trig.cpp
 (left out of the build) and src/state/layout_asserts.cpp are skipped.
 Standard library only.
 """
@@ -68,7 +68,7 @@ import commentlint
 import sources
 
 ROOT = sources.ROOT
-SKIP_FILES = {"src/harness/trace_schema.h", "src/state/layout_asserts.cpp", "src/util/math_4b70a0.cpp"}
+SKIP_FILES = {"src/harness/trace_schema.h", "src/state/layout_asserts.cpp", "src/util/fixed_trig.cpp"}
 LINK_DATA = "link/data.cpp"
 LINK_HEADER = "link/globals.h"
 PROTOS_HEADER = "include/ta_protos.h"

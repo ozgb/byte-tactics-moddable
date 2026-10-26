@@ -926,20 +926,20 @@ Unit* GetBuildMenuFocusUnit()
 }
 
 enum UnitAbility {
-    AbilityMoveOrder = 0,
-    AbilityFireOrder = 1,
-    AbilityOnOff = 2,
-    AbilityStop = 3,
-    AbilityAttack = 4,
-    AbilityDefend = 5,
-    AbilityPatrol = 6,
-    AbilityMove = 7,
-    AbilityLoad = 8,
-    AbilityRepair = 9,
-    AbilityReclaim = 10,
-    AbilityCapture = 12,
-    AbilityCloak = 13,
-    AbilityBlast = 14
+    ABILITY_MOVE_ORDER = 0,
+    ABILITY_FIRE_ORDER = 1,
+    ABILITY_ON_OFF = 2,
+    ABILITY_STOP = 3,
+    ABILITY_ATTACK = 4,
+    ABILITY_DEFEND = 5,
+    ABILITY_PATROL = 6,
+    ABILITY_MOVE = 7,
+    ABILITY_LOAD = 8,
+    ABILITY_REPAIR = 9,
+    ABILITY_RECLAIM = 10,
+    ABILITY_CAPTURE = 12,
+    ABILITY_CLOAK = 13,
+    ABILITY_BLAST = 14
 };
 
 static inline int HasAbility(const UnitDef* def, int ability)
@@ -989,49 +989,49 @@ void RefreshSelectionOrders()
             if (first == 0)
                 first = u;
             UnitDef* type = u->def;
-            if (HasAbility(type, AbilityFireOrder)) {
+            if (HasAbility(type, ABILITY_FIRE_ORDER)) {
                 if (fireOrder == 4)
                     fireOrder = u->fireOrder;
                 else if (fireOrder != u->fireOrder)
                     fireOrder = 3;
             }
-            if (HasAbility(type, AbilityMoveOrder)) {
+            if (HasAbility(type, ABILITY_MOVE_ORDER)) {
                 if (moveOrder == 4)
                     moveOrder = u->moveOrder;
                 else if (moveOrder != u->moveOrder)
                     moveOrder = 3;
             }
-            if (HasAbility(type, AbilityOnOff)) {
+            if (HasAbility(type, ABILITY_ON_OFF)) {
                 if (onOff == 3)
                     onOff = u->activateFlags & 1;
                 else if (onOff != (u->activateFlags & 1))
                     onOff = 2;
             }
-            if (HasAbility(type, AbilityCloak)) {
+            if (HasAbility(type, ABILITY_CLOAK)) {
                 if (cloak == 3)
                     cloak = u->cloakOn;
                 else
                     cloak = 2;
             }
-            if (HasAbility(type, AbilityMove))
+            if (HasAbility(type, ABILITY_MOVE))
                 canMove = 1;
-            if (HasAbility(type, AbilityStop))
+            if (HasAbility(type, ABILITY_STOP))
                 canStop = 1;
-            if (HasAbility(type, AbilityAttack))
+            if (HasAbility(type, ABILITY_ATTACK))
                 canAttack = 1;
-            if (HasAbility(type, AbilityDefend))
+            if (HasAbility(type, ABILITY_DEFEND))
                 canDefend = 1;
-            if (HasAbility(type, AbilityPatrol))
+            if (HasAbility(type, ABILITY_PATROL))
                 canPatrol = 1;
-            if (HasAbility(type, AbilityLoad))
+            if (HasAbility(type, ABILITY_LOAD))
                 canLoad = 1;
-            if (HasAbility(type, AbilityRepair))
+            if (HasAbility(type, ABILITY_REPAIR))
                 canRepair = 1;
-            if (HasAbility(type, AbilityCapture))
+            if (HasAbility(type, ABILITY_CAPTURE))
                 canCapture = 1;
-            if (HasAbility(type, AbilityReclaim))
+            if (HasAbility(type, ABILITY_RECLAIM))
                 canReclaim = 1;
-            if (HasAbility(type, AbilityBlast))
+            if (HasAbility(type, ABILITY_BLAST))
                 canBlast = 1;
             count++;
         }

@@ -14,6 +14,9 @@ template void String::_Eos(String::size_type);
 // FUNCTION: 0x4c4c50 ?_Grow@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AAE_NI_N@Z
 template bool String::_Grow(String::size_type, bool);
 
+// FUNCTION: 0x4c4fa0 ?_Copy@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AAEXI@Z
+template void String::_Copy(String::size_type);
+
 // FUNCTION: 0x4c50a0 ?_Split@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AAEXXZ
 template void String::_Split();
 

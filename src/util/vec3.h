@@ -69,4 +69,10 @@ struct Point16 {
     }
 };
 
+struct Vec3f {
+    float x;
+    float y;
+    float z;
+};
+
 #endif

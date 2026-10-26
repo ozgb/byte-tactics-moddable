@@ -89,7 +89,7 @@ GPL, #45).
 
 - **Scope:** view.
 - **Where:** `ParseCommandLine` (`src/game/main.cpp`) into
-  `g_preferredLanguage`, and `LoadTranslations` (`src/util/tdf_4c54f0.cpp`)
+  `g_preferredLanguage`, and `LoadTranslations` (`src/util/tdf.cpp`)
   into `g_language`.
 - **3.1c:** both copy a language name into a 64-byte buffer with no bound,
   so a long name on the command line or in the translation file overflows it.

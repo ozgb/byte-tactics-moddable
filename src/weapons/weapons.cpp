@@ -1493,7 +1493,7 @@ int __stdcall FireLineOfSightProjectile(Unit* fire, Unit* unit, Vec3* p3,
                            Vec3* point, Unit* target);
 int __stdcall FireBallisticProjectile(Unit* shot, Unit* unit, Vec3* pos,
                            Vec3* aim, Unit* target);
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // FUNCTION: 0x49d580

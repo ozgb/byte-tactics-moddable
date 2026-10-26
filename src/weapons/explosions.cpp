@@ -224,7 +224,7 @@ void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 void __stdcall DrawModel3doProjected(void* surface, Position* pos, void* model, short* rotation);
 void __stdcall FillPolygon(void* surface, Point* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src);
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 int __stdcall StepGafSequence(GafRef* ref);
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 Vec3f __stdcall VectorFromTo(Vec3f from, Vec3f to);

@@ -39,7 +39,7 @@ struct SavedPiece {
 #include "../graphics/display.h"
 #include "../graphics/object_pool.h"
 int __stdcall GetCobChecksum(void* param);
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 
 // FUNCTION: 0x4b0610
 CobScript::CobScript()

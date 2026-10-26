@@ -648,7 +648,7 @@ void* GetBlockMap()
 }
 #pragma auto_inline(on)
 
-template <class T, class A = std::allocator<T> >
+template <class T, class A>
 class FreedBlockRing {
 public:
     explicit FreedBlockRing(const A& al = A())

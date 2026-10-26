@@ -379,7 +379,7 @@ void FreeUnitMemory(void)
 }
 
 
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 
 // FUNCTION: 0x485a40
 void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)

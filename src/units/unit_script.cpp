@@ -61,7 +61,7 @@ int __cdecl AngleOfVector(int a, int b);
 #include "../graphics/particles.h"
 void __stdcall EmitWhiteSmoke(int, short);
 void __stdcall EmitBlackSmoke(int, short);
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 #include "../weapons/explosions.h"
 void __stdcall AddExplosionEffect(void* pos, void* src, int index, int flag);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* transporter, int a, int b);

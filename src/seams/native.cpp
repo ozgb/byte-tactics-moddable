@@ -99,7 +99,6 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetGroundHeight(Pos_00485070* p);
 void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out);
-int __stdcall GetCellMeanHeight(Pos_00485070* p);
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
@@ -280,7 +279,7 @@ static void __stdcall GetSweetSpotNative(Unit* unit, Vec3* out)
 
 static int __stdcall GetCellMeanHeightNative(Vec3* pos)
 {
-    return GetCellMeanHeight((Pos_00485070*)pos);
+    return GetCellMeanHeight(pos);
 }
 
 static void __stdcall ApplyAreaDamageAtNative(WeaponDef* weapon, Vec3* pos)

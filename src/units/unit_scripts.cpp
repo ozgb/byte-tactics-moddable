@@ -301,8 +301,12 @@ Angles16 __stdcall GetPieceAngles(Obj_0043e180* obj, int index)
 {
     Rec_0043e180* r = obj->recs;
     Angles16 p;
-    p.pitch = SumZ_0043e180(obj, &r[index]);
-    p.heading = SumY_0043e180(obj, &r[index]);
+    p.pitch = obj->angles.pitch;
+    p.heading = obj->angles.heading;
+    if (index >= 0) {
+        p.pitch = SumZ_0043e180(obj, &r[index]);
+        p.heading = SumY_0043e180(obj, &r[index]);
+    }
     p.bank = obj->angles.bank + r[index + 1].a;
     return p;
 }

@@ -100,6 +100,10 @@ one can diverge without a logic bug.
 - These stack locals are zero in test mode, because 3.1c reads them before it
   writes them and the digests keep the result:
   - `pos` in `ScoutTimer::OnTimer` (0x408100).
+- `GetPieceAngles` (0x43e180) counts the two angle halves it would read before
+  the piece block as 0 when `index < 0`: 3.1c reads the allocator's chunk
+  header there, and the digests keep the result. The source does this itself,
+  so the digests are the same in every mode.
 - `PlayerAI.hasSpecial` is zero until the first unit list refresh, because the
   constructor never sets it. `FindCellNearFeatures` can read it in the tick that
   first assigns the squads, before that tick's refresh, so it is hashed from

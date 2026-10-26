@@ -11015,6 +11015,8 @@ address,function,file,kind,target
 0x43e180,GetPieceAngles,src/units/unit_scripts.cpp,call,SumZ_0043e180
 0x43e180,GetPieceAngles,src/units/unit_scripts.cpp,deref_maybe_written,*Rec_0043e180
 0x43e180,GetPieceAngles,src/units/unit_scripts.cpp,field_read,Angles16::bank
+0x43e180,GetPieceAngles,src/units/unit_scripts.cpp,field_read,Angles16::heading
+0x43e180,GetPieceAngles,src/units/unit_scripts.cpp,field_read,Angles16::pitch
 0x43e180,GetPieceAngles,src/units/unit_scripts.cpp,field_read,Obj_0043e180::recs
 0x43e180,GetPieceAngles,src/units/unit_scripts.cpp,field_read,Rec_0043e180::a
 0x43e180,GetPieceAngles,src/units/unit_scripts.cpp,field_write,Angles16::bank

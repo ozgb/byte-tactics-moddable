@@ -9,6 +9,8 @@ struct Unit;
 struct Vec3;
 struct WeaponDef;
 
+void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos);
+void __stdcall UpdateProjectiles();
 void __stdcall AllocWeaponArray(void);
 void __stdcall FreeWeaponArray(void);
 void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target);

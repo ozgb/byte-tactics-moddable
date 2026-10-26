@@ -233,8 +233,6 @@ static void __stdcall SetStateBitsNative(Unit* unit, int mask, int set)
     unit->SetStateBits(mask, set);
 }
 
-#include "../weapons/weapons_49b720.h"
-
 static unsigned char __fastcall ChooseWeaponNative(Unit* self)
 {
     return self->ChooseWeapon();

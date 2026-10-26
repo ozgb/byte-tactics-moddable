@@ -396,8 +396,6 @@ void __stdcall UntrackProjectile(Projectile* projectile)
 void __stdcall AddExplosionEffect(Vec3* position, void* value, int a, int b);
 void __stdcall EmitWhiteSmoke(Vec3* position, int value);
 void __stdcall PlaySoundAt(unsigned int sound, Vec3* position, int value);
-#include "weapons_49a120.h"
-
 // FUNCTION: 0x499eb0
 void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
 {
@@ -2391,4 +2389,353 @@ void __stdcall DrawProjectiles(void* surface)
         if (index >= g_game->projectileCount)
             break;
     }
+}
+
+static inline Spot_0049a120* SpotAt(unsigned short index)
+{
+    Ref<Spot_0049a120> spots;
+    spots.offset = g_game->spots.offset;
+    return &spots[index];
+}
+
+// FUNCTION: 0x49a120
+void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
+{
+    Hits_0049a120 hits;
+    memset(&hits, 0, 8);
+    int radius = weapon->type->areaOfEffect >> 1;
+    int r = radius / 16 + 1;
+    int cx = ((FixedVec3*)pos)->x.part.whole;
+    int x0 = cx / 16 - r;
+    int x1 = cx / 16 + r;
+    int cz = ((FixedVec3*)pos)->z.part.whole;
+    int z0 = cz / 16 - r;
+    int z1 = cz / 16 + r;
+    if (x0 < 0)
+        x0 = 0;
+    if (x1 > g_game->width)
+        x1 = g_game->width;
+    if (z0 < 0)
+        z0 = 0;
+    if (z1 > g_game->height)
+        z1 = g_game->height;
+    int enemyDamage = 0;
+    int friendlyDamage = 0;
+
+    for (int z = z0; z < z1; z++) {
+        Cell* cell = g_seams.los_radar->GetMapCell(x0, z);
+        for (int x = x0; x < x1; x++, cell++) {
+            if (!cell)
+                continue;
+            for (int i = 0; i <= 1; i++) {
+                Unit* unit = i ? UnitFromId(cell->unit2) : UnitFromId(cell->unit);
+                if (!unit || unit == weapon->attacker)
+                    continue;
+                if (!hits.AddUnit(unit))
+                    continue;
+                UnitDef* def = unit->def;
+                Vec3 d;
+                {
+                    int p = pos->x;
+                    if (p < unit->pos.x + def->modelMinX) {
+                        int lo = unit->pos.x + def->modelMinX;
+                        d.x = lo - p;
+                    } else if (p > unit->pos.x + def->modelMaxX) {
+                        int hi = unit->pos.x + def->modelMaxX;
+                        d.x = p - hi;
+                    } else {
+                        d.x = 0;
+                    }
+                }
+                {
+                    int p = pos->y;
+                    if (p < unit->pos.y + def->modelMinY) {
+                        int lo = unit->pos.y + def->modelMinY;
+                        d.y = lo - p;
+                    } else if (p > unit->pos.y + def->modelMaxY) {
+                        int hi = unit->pos.y + def->modelMaxY;
+                        d.y = p - hi;
+                    } else {
+                        d.y = 0;
+                    }
+                }
+                {
+                    int p = pos->z;
+                    if (p < unit->pos.z + def->modelMinZ) {
+                        int lo = unit->pos.z + def->modelMinZ;
+                        d.z = lo - p;
+                    } else if (p > unit->pos.z + def->modelMaxZ) {
+                        int hi = unit->pos.z + def->modelMaxZ;
+                        d.z = p - hi;
+                    } else {
+                        d.z = 0;
+                    }
+                }
+                Fixed_0049a120 dist;
+                dist.raw = Length(&d);
+                int distance = dist.part.whole;
+                if (distance < radius) {
+                    float edge = weapon->type->edgeDamage;
+                    float scale;
+                    if (distance) {
+#ifdef __clang__
+                        double t = (double)distance / radius - 1.0f;
+#else
+                        float t = (float)distance / radius - 1.0f;
+#endif
+                        t *= t;
+#ifdef __clang__
+                        t = (1.0f - (double)edge) * t + edge;
+#else
+                        t = (1.0f - edge) * t + edge;
+#endif
+                        scale = t;
+                    } else {
+                        scale = 1.0f;
+                    }
+                    int damage = ApplyWeaponDamage(weapon, unit, scale);
+                    if (weapon->owner == unit->playerIndex)
+                        friendlyDamage += damage;
+                    else
+                        enemyDamage += damage;
+                }
+            }
+            if (weapon->type->flags.value & 0x4000)
+                continue;
+            Cell* origin = cell;
+            int fx = x;
+            int fz = z;
+            if (cell->feature == 0xfffe) {
+                fx -= cell->origin.offsetX;
+                fz -= cell->origin.offsetZ;
+                origin = g_seams.los_radar->GetMapCell(fx, fz);
+            }
+            unsigned short feature = origin->feature;
+            if (feature >= 0xfffb)
+                continue;
+            int index = cell - g_game->cells;
+            CellPos_0049a120 cp;
+            cp.x = index % g_game->width;
+            cp.z = index / g_game->width;
+            CellPos_0049a120 at = cp;
+            Spot_0049a120* spot = SpotAt(cell->spot);
+            int distance;
+            if ((cell->flags & 1) && spot) {
+                Vec3 v = Sub(*pos, spot->pos);
+                Fixed_0049a120 dist;
+                dist.raw = VectorLength(&v);
+                distance = dist.part.whole;
+            } else {
+                Vec3 centre = g_seams.features->GetFootprintCentre((Point16*)&at, (Feature*)&((FeatureDef_0049a120*)g_game->features)[feature]);
+                Vec3 p = *(Vec3*)&centre;
+                Vec3 v = Sub(*pos, p);
+                Fixed_0049a120 dist;
+                dist.raw = (int)sqrt((double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z);
+                distance = dist.part.whole;
+            }
+            if (distance >= radius)
+                continue;
+            if (!hits.AddFeature(origin))
+                continue;
+            g_seams.features->DamageFeature(origin, fx, fz, weapon->type);
+        }
+    }
+
+    if (weapon->type->flags.b.interceptor) {
+        Projectile* other = g_game->projectiles;
+        for (int j = 0; j < g_game->projectileCount; j++, other++) {
+            if ((other->flags & 2) || other == weapon)
+                continue;
+            Vec3* p = &other->position;
+            int dx = weapon->position.x - p->x;
+            int dy = weapon->position.y - p->y;
+            int dz = weapon->position.z - p->z;
+            int reach = weapon->type->areaOfEffect;
+            if ((int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dy * dy) >> 32) + (int)(((__int64)dz * dz) >> 32)
+                < reach * reach) {
+                DetonateProjectile(other, nullptr);
+                ProjectileDetonatePacket packet;
+                packet.type = 0xe;
+                packet.aim = other->target;
+                packet.weaponIndex = other->type->index;
+                BroadcastPacket(weapon->attacker->player->id, &packet, sizeof(packet));
+                packet.type = 0xe;
+                packet.aim = weapon->target;
+                packet.weaponIndex = weapon->type->index;
+                BroadcastPacket(weapon->attacker->player->id, &packet, sizeof(packet));
+            }
+        }
+    }
+
+    if (weapon->attacker)
+        g_seams.ai->MarkOwnerNetDirtyFromDamageSplit(weapon->attacker->player->ai, 0, weapon, enemyDamage, friendlyDamage);
+}
+
+static inline void Fall(Vec3* v)
+{
+    v->y -= g_game->gravity;
+}
+
+static inline void Remove(Projectile* p)
+{
+    if (p == g_game->tracked) {
+        g_game->trackedPos = g_game->tracked->position;
+        (*(unsigned short*)&g_game->value_1434b) = p->type->holdTime;
+        g_game->tracked = 0;
+    }
+    p->flagBits.dead = 1;
+}
+
+// FUNCTION: 0x49b720
+void UpdateProjectiles()
+{
+    int n = g_game->projectileCount;
+    for (int i = 0; i < n; i++) {
+        Projectile* p = &g_game->projectiles[i];
+        WeaponDef* type = p->type;
+        int oldY = p->positionWords.yWhole;
+
+        if (p->active != 0) {
+            if ((unsigned int)g_game->ticks >= p->spawnTick + type->burstRate) {
+                if (type->burstRate >= 5 || (p->active & 1)) {
+                    unsigned char w;
+                    for (w = 0; w < 3; w++) {
+                        if (p->attacker->weapons[w].weapon == type)
+                            break;
+                    }
+                    GetWeaponPiecePosition(p->attacker, &p->position, w, p->piece);
+                }
+                p->active--;
+                p->spawnTick += type->burstRate;
+                Projectile* q = AllocProjectile();
+                if (q) {
+                    *q = *p;
+                    q->spawnTick = (unsigned int)g_game->ticks;
+                    if (type->flags.b.soundTrigger)
+                        PlaySoundAt(type->sound, &p->position, 0);
+                    if (type->lifetime != 0)
+                        q->time = (unsigned int)g_game->ticks + type->lifetime;
+                    else
+                        q->time = (p->range + 0x100000) / (unsigned int)p->speed + (unsigned int)g_game->ticks;
+                    if (type->lifeRand != 0)
+                        q->time += RandomInt(type->lifeRand) - (type->lifeRand >> 1);
+                    q->active = 0;
+                    if (type->spread != 0) {
+                        short ang = RandomInt(type->spread) + (short)(p->angles.heading - (type->spread >> 1));
+                        int t = ScaledCos(p->angles.pitch, type->speed);
+                        p->direction.x = -ScaledSin(ang, t);
+                        p->direction.z = -ScaledCos(ang, t);
+                    }
+                }
+                if (p->active == 0)
+                    Remove(p);
+            }
+            continue;
+        }
+
+        if (type->flags.b.propeller)
+            p->propellerSpin += 0x400;
+
+        if (type->flags.b.selfProp) {
+            if (p->time > (unsigned int)g_game->ticks) {
+                if (type->flags.b.waterWeapon && p->positionWords.yWhole >= g_game->seaLevel) {
+                    Fall(&p->direction);
+                    p->angles.pitch = 0;
+                } else {
+                    int seek = 0;
+                    if ((unsigned int)p->speed < type->speed) {
+                        p->speed += type->acceleration;
+                        if ((unsigned int)p->speed > type->speed)
+                            p->speed = type->speed;
+                    }
+                    if (type->flags.b.twoPhase) {
+                        if (p->flagBits.state > 0)
+                            seek = 1;
+                    } else if (type->flags.b.guidance) {
+                        seek = 1;
+                    }
+                    if (seek) {
+                        Vec3* target = GetProjectileAimPoint(p);
+                        if (TurnUnitTowardsPoint(p, target) == 0)
+                            DetonateProjectile(p, nullptr);
+                    }
+                    p->direction.y = ScaledSin(p->angles.pitch, p->speed);
+                    int t = ScaledCos(p->angles.pitch, p->speed);
+                    p->direction.x = -ScaledSin(p->angles.heading, t);
+                    p->direction.z = -ScaledCos(p->angles.heading, t);
+                }
+            } else if (type->flags.b.burnBlow) {
+                DetonateProjectile(p, nullptr);
+            } else {
+                Fall(&p->direction);
+                if (type->flags.b.twoPhase) {
+                    if (p->flagBits.state == 0) {
+                        p->time = (unsigned int)g_game->ticks + p->type->flightTime;
+                        p->flagBits.state++;
+                        if (!p->type->flags.b.tracks) {
+                            p->interceptedProjectile = 0;
+                            p->targetUnit = 0;
+                        }
+                    }
+                }
+            }
+            p->position += p->direction;
+            CheckProjectileCollision(type, p);
+        } else if (type->flags.b.lineOfSight) {
+            if (p->time > (unsigned int)g_game->ticks) {
+                p->position += p->direction;
+                if (type->flags.b.beamWeapon) {
+                    if (p->flagBits.b0)
+                        p->start += p->direction;
+                    else if ((unsigned int)g_game->ticks > p->spawnTick + type->duration)
+                        p->flagBits.b0 = 1;
+                }
+                CheckProjectileCollision(type, p);
+            } else {
+                Remove(p);
+            }
+        } else if (type->flags.b.ballistic) {
+            if (type->lifetime != 0) {
+                if (p->time > (unsigned int)g_game->ticks) {
+                    p->position += p->direction;
+                    p->position += (*(Vec3*)&g_game->wind);
+                    p->direction.y -= g_game->gravity;
+                    CheckProjectileCollision(type, p);
+                } else if (type->flags.b.burnBlow) {
+                    DetonateProjectile(p, nullptr);
+                } else {
+                    EmitWhiteSmoke(&p->position, 9);
+                    Remove(p);
+                }
+            } else {
+                p->position += p->direction;
+                p->position += (*(Vec3*)&g_game->wind);
+                p->direction.y -= g_game->gravity;
+                CheckProjectileCollision(type, p);
+            }
+        } else if (type->flags.b.dropped) {
+            p->position += p->direction;
+            p->position += (*(Vec3*)&g_game->wind);
+            p->direction.y -= g_game->gravity;
+            CheckProjectileCollision(type, p);
+        } else if (type->flags.b.meteor) {
+            p->position += p->direction;
+            p->angles.bank += ((short*)&p->direction.x)[1] << 8;
+            p->angles.pitch += ((short*)&p->direction.z)[1] << 8;
+            CheckProjectileCollision(type, p);
+        }
+
+        if (!p->flagBits.dead) {
+            if (type->flags.b.smokeTrail && p->time > (unsigned int)g_game->ticks && p->nextSmokeTick < (unsigned int)g_game->ticks) {
+                EmitWhiteSmoke(&p->position, 9);
+                p->nextSmokeTick += type->smokeRate;
+            }
+            if (oldY > g_game->seaLevel && p->positionWords.yWhole <= g_game->seaLevel) {
+                Cell* cell = g_seams.los_radar->GetMapCellAtPosition((Vec3*)&p->position);
+                if (cell && cell->high < g_game->seaLevel && ((Net*)g_game->net.get())->noSeaLevelTrigger == 0)
+                    AddExplosionEffect(&p->position, type->splash, 0, 1);
+            }
+        }
+    }
+    CompactProjectiles();
 }

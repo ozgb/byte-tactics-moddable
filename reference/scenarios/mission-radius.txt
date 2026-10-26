@@ -1,0 +1,12 @@
+# Game type 1: Battle of Ansapp Sea on Easy, the human carrier is ordered into the target radius, so the victory condition MoveUnitToRadius fires and the run ends at game over.
+game_seed 445
+crt_seed 1445
+view_seed 2445
+game_type 1
+campaign Battle Tactics - Arm Very Short
+map Battle of Ansapp Sea
+difficulty 0
+ticks 12000
+player0.controller human
+player1.controller ai
+order 5 0:ARMCARRY:1 move 1520 3600

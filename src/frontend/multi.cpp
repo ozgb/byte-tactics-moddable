@@ -729,7 +729,7 @@ extern char g_okGadgetName[];
 extern char g_multiSoundName[];
 extern char* g_oldMapName;
 extern int DAT_00512760;
-extern short g_battleRoomBaseGadgetCount;
+extern int g_battleRoomBaseGadgetCount;
 extern int DAT_0051276c;
 extern int g_battleRoomSlotsBuilt;
 extern int g_rejectPlayer;
@@ -4851,13 +4851,13 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
     if (menu->hotGadgetIndex == -1) {
         i = 0;
         p = g_unitRestrictPics;
-        if (desc->rowCount > 0) {
+        if ((short)desc->rowCount > 0) {
             do {
                 if (*p != 0)
                     FreeSurface((Surface *)((Struct_004c6ac0*)*p));
                 p++;
                 i++;
-            } while (i < desc->rowCount);
+            } while (i < (short)desc->rowCount);
         }
         GameFreeThunk(desc->rows);
         GameFreeThunk(g_unitRestrictPics);

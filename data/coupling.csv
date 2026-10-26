@@ -355,7 +355,7 @@ game,harness,call,HarnessInit,1
 game,harness,call,HarnessPhase,1
 game,harness,call,HarnessStartSkirmish,1
 game,harness,call,HarnessTestMode,1
-game,harness,shared_write,Game::difficulty,1
+game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::localPlayer,1
 game,harness,shared_write,Game::playerIndex,1
 game,los_radar,call,ClampWorldPosToTerrain,2
@@ -958,6 +958,9 @@ harness,economy,shared_write,Game::localPlayer,8
 harness,features,shared_write,Game::difficulty,2
 harness,features,shared_write,Game::playerIndex,1
 harness,game,call,ApplySlotsToGamePlayers,1
+harness,game,call,FreeSummaryBank,1
+harness,game,call,OpenHapiBank,1
+harness,game,call,OpenSummaryBank,1
 harness,game,call,SaveGameFile,1
 harness,game,shared_write,Game::difficulty,4
 harness,game,shared_write,Game::localPlayer,13
@@ -965,8 +968,9 @@ harness,game,shared_write,Game::playerIndex,5
 harness,los_radar,shared_write,Game::localPlayer,5
 harness,los_radar,shared_write,Game::playerIndex,14
 harness,map,call,Mission::CountStartPositions,1
-harness,map,call,Mission::LoadMissionByName,1
-harness,map,call,SetMissionType,1
+harness,map,call,Mission::LoadCampaign,1
+harness,map,call,Mission::LoadMissionByName,2
+harness,map,call,SetMissionType,2
 harness,map,call,SnapWorldPosToFootprint,1
 harness,map,shared_write,Game::difficulty,1
 harness,map,shared_write,Game::playerIndex,1
@@ -978,6 +982,9 @@ harness,orders,shared_write,Game::difficulty,1
 harness,orders,shared_write,Game::localPlayer,2
 harness,orders,shared_write,Game::playerIndex,1
 harness,platform,call,GetMemSetValue,1
+harness,platform,call,HapiBank::GetIntegerItem,1
+harness,platform,call,HapiBank::GetStringItem,1
+harness,platform,call,HapiBank::OpenAccount,1
 harness,platform,call,IsMemSet,1
 harness,platform,call,MakeDirectoryPath,1
 harness,players,call,HarnessConditionClass,1
@@ -986,7 +993,7 @@ harness,players,shared_write,Game::difficulty,3
 harness,players,shared_write,Game::localPlayer,8
 harness,players,shared_write,Game::playerIndex,2
 harness,presentation,call,HideSoftwareCursor,1
-harness,presentation,call,InitMissionStatus,1
+harness,presentation,call,InitMissionStatus,2
 harness,presentation,call,IssueMobileBuildOrders,1
 harness,presentation,call,IssueOrderToSelection,1
 harness,presentation,call,QueueBuildOrder,1
@@ -2518,10 +2525,10 @@ presentation,game,shared_write,Vec3::x,2
 presentation,game,shared_write,Vec3::z,2
 presentation,game,shared_write,g_game,115
 presentation,harness,call,HarnessViewRand,19
-presentation,harness,shared_write,Game::difficulty,1
+presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,MissionType::index,1
 presentation,harness,shared_write,g_explodedPieces,1
-presentation,harness,shared_write,g_game,8
+presentation,harness,shared_write,g_game,9
 presentation,los_radar,call,BuildFogTiles,1
 presentation,los_radar,call,CalcRadarViewportRect,1
 presentation,los_radar,call,GetMapCell,1

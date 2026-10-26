@@ -488,8 +488,6 @@ void __stdcall RemoveUnitFromMap(Unit* obj)
     RefreshPassMapsForUnit(obj);
 }
 
-int __stdcall GetCellHeight(Point16* p);
-
 struct Pos_0047d2e0 {
     Fixed x, y, z;
 };
@@ -1280,4 +1278,96 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* center, Fixed radius,
 void ClaimFootprintVisitor::ClaimFootprint(Unit* obj)
 {
     ClaimFootprintCells(obj);
+}
+
+static inline Cell* CellAt(int x, int y)
+{
+    if (x >= 0 && x < g_game->width && y >= 0 && y < g_game->height)
+        return &g_game->cells[y * g_game->width + x];
+    return nullptr;
+}
+
+static inline int WholePart(int fixed)
+{
+    return (short)(fixed >> 16);
+}
+
+static inline void SetWholePart(int* fixed, int whole)
+{
+    ((short*)fixed)[1] = (short)whole;
+}
+
+// FUNCTION: 0x485010
+int __stdcall GetCellHeight(Point16* p)
+{
+    Cell* cell = CellAt(p->x, p->y);
+    if (cell)
+        return cell->height;
+    return 0;
+}
+
+static inline Cell* GetCellCachedWidth(int x, int y)
+{
+    if (x >= 0) {
+        int w = g_game->width;
+        if (x < w && y >= 0 && y < g_game->height)
+            return &g_game->cells[w * y + x];
+    }
+    return nullptr;
+}
+
+// FUNCTION: 0x485140
+int __stdcall GetCellMeanHeight(Vec3* p)
+{
+    int x = WholePart(p->x) / 16, y = WholePart(p->z) / 16;
+    Cell* cell = GetCellCachedWidth(x, y);
+    if (cell)
+        return (cell->low + cell->high) >> 1;
+    return -1;
+}
+
+// FUNCTION: 0x4851c0
+int __stdcall FindHighestPointOnLine(Vec3 a, Vec3 b)
+{
+    int dz = b.z - a.z;
+    b.z = dz;
+    b.y -= a.y;
+    int dx = b.x - a.x;
+    b.x = dx;
+    Vec3 d = b;
+    int n;
+    if (abs(dx) < abs(dz))
+        n = abs(dz) / 0x100000;
+    else
+        n = abs(dx) / 0x100000;
+    n++;
+    d.x /= n;
+    d.z /= n;
+    short best = 0;
+    for (int i = 0; i <= n; i++) {
+        Cell* c = CellAt(a.x / 0x100000, a.z / 0x100000);
+        if (c) {
+            short v = ((unsigned char*)g_game->features)[c->feature * 256 + 0xfa] + c->height;
+            if (best < v) best = v;
+            if (c->unit) {
+                Unit* o = &g_game->units[c->unit];
+                short w = (o->def.get()->modelMaxY + o->pos.y) >> 16;
+                if (best < w) best = w;
+            }
+        }
+        a.x += d.x; a.y += d.y; a.z += d.z;
+    }
+    return best;
+}
+
+// FUNCTION: 0x485330
+void __stdcall GetCellPosition(int x, int y, Vec3* out)
+{
+    Cell* cell = CellAt(x, y);
+    if (cell) {
+        memset(out, 0, sizeof(*out));
+        SetWholePart(&out->x, x << 4);
+        SetWholePart(&out->y, cell->height);
+        SetWholePart(&out->z, y << 4);
+    }
 }

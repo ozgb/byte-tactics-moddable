@@ -464,7 +464,6 @@ network,FindActiveId_00453010,src/network/net_game.cpp,1,0,0,0,0,0,?FindActiveId
 network,FindConnectedPlayerId,src/network/net_game.cpp,1,0,0,0,0,0,?FindConnectedPlayerId@@YGHXZ,0,network
 network,FindFreePlayerId,src/network/net_game.cpp,0,0,0,0,0,0,?FindFreePlayerId@@YGDXZ,1,
 network,FindFreeSlot,src/network/net_game.cpp,0,0,0,0,0,0,?FindFreeSlot@@YGHXZ,1,
-network,FindHost,src/network/net_game.cpp,1,0,0,0,0,0,?FindHost@@YGEXZ,0,network
 network,FindIndex_00451bc0,src/network/net_game.cpp,1,0,0,0,0,0,?FindIndex_00451bc0@@YGEH@Z,0,network
 network,FindIndex_00452960,src/network/net_game.cpp,1,0,0,0,0,0,?FindIndex_00452960@@YGEH@Z,0,network
 network,FindIndex_00453010,src/network/net_game.cpp,1,0,0,0,0,0,?FindIndex_00453010@@YGEH@Z,0,network
@@ -494,7 +493,6 @@ network,FindSlot_00453a50,src/network/net_game.cpp,1,0,0,0,0,0,?FindSlot_00453a5
 network,FindTarget,src/network/net_game.cpp,1,0,0,0,0,0,?FindTarget@@YGHPAUGame@@@Z,0,menu
 network,FinishUnitSync,src/network/unit_sync.cpp,0,0,0,0,0,0,?FinishUnitSync@@YIXXZ,1,
 network,FinishUnitSync,src/network/unit_sync_player.cpp,1,0,0,0,0,0,?FinishUnitSync@@YGXXZ,0,menu
-network,FirstConnectedId,src/network/net_game.cpp,1,0,0,0,0,0,?FirstConnectedId@@YGHXZ,0,network
 network,FirstJoinedId,src/network/net_game.cpp,1,0,0,0,0,0,?FirstJoinedId@@YGHXZ,0,network
 network,FirstJoinedId_004568c0,src/network/net_game.cpp,1,0,0,0,0,0,?FirstJoinedId_004568c0@@YGHXZ,0,network
 network,FlagOf_0046d040,src/network/unit_sync.cpp,1,0,0,0,0,0,?FlagOf_0046d040@@YG_NPAVUnitDef@@@Z,0,menu
@@ -523,7 +521,6 @@ network,GetPlayerSlot,src/network/net_game.cpp,0,0,0,0,0,0,?GetPlayerSlot@@YGEPA
 network,GetRejectReasonText,src/network/net_game.cpp,1,0,0,0,0,0,?GetRejectReasonText@@YGPADH@Z,0,menu
 network,GetSessionGuidInstance,src/network/online_report.cpp,1,0,0,0,0,0,?GetSessionGuidInstance@@YGHH@Z,0,network
 network,GetSlotDpid_00452cc0,src/network/net_game.cpp,1,0,0,0,0,0,?GetSlotDpid_00452cc0@@YGHE@Z,0,network
-network,GrowIntVector,src/network/unit_sync.cpp,0,0,0,0,0,0,?GrowIntVector@@YGXPAV?$vector@HV?$allocator@H@std@@@std@@H@Z,1,
 network,HandlePing,src/network/net_game.cpp,1,0,0,0,0,0,?HandlePing@@YGXPAULatencyPacket@@@Z,0,network
 network,HandlePlayerEconomy,src/network/net_game.cpp,1,0,0,0,0,0,?HandlePlayerEconomy@@YGXPAUPlayerViewStatePacket@@PAUPlayer@@@Z,0,network
 network,HandleTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?HandleTimeoutDialog@@YGXPAUGui@@@Z,0,network
@@ -536,14 +533,9 @@ network,InsertResult::InsertResult,src/network/unit_sync.cpp,0,0,0,0,0,0,??0Inse
 network,IsActive12_00452960,src/network/net_game.cpp,1,0,0,0,0,0,?IsActive12_00452960@@YGHPAUPlayer@@@Z,0,network
 network,IsColorFree,src/network/net_game.cpp,1,0,0,0,0,0,?IsColorFree@@YGHHH@Z,0,network
 network,IsConnected,src/network/net_game.cpp,1,0,0,0,0,0,?IsConnected@@YGHPAUPlayer@@@Z,0,network
-network,IsConnected_004568c0,src/network/net_game.cpp,1,0,0,0,0,0,?IsConnected_004568c0@@YGHPAUPlayer@@@Z,0,network
 network,IsHostLocal,src/network/net_game.cpp,1,0,0,0,0,0,?IsHostLocal@@YGHXZ,0,menu
 network,IsHuman,src/network/net_game.cpp,1,0,0,0,0,0,?IsHuman@@YGHPAUPlayer@@@Z,0,menu
 network,IsPlaying,src/network/net_game.cpp,1,0,0,0,0,0,?IsPlaying@@YGHE@Z,0,menu
-network,IsPlaying_00450e20,src/network/net_game.cpp,1,0,0,0,0,0,?IsPlaying_00450e20@@YGHPAUPlayer@@@Z,0,network
-network,IsPlaying_00450f90,src/network/net_game.cpp,1,0,0,0,0,0,?IsPlaying_00450f90@@YGHPAUPlayer@@@Z,0,network
-network,IsPlaying_00452bd0,src/network/net_game.cpp,1,0,0,0,0,0,?IsPlaying_00452bd0@@YGHPAUPlayer@@@Z,0,network
-network,IsPlaying_00452cc0,src/network/net_game.cpp,1,0,0,0,0,0,?IsPlaying_00452cc0@@YGHPAUPlayer@@@Z,0,network
 network,IsReusable,src/network/packets.cpp,1,0,0,0,0,0,?IsReusable@@YGHPAVPacketBuffer@@H@Z,0,network
 network,IsState2_00452960,src/network/net_game.cpp,1,0,0,0,0,0,?IsState2_00452960@@YGHPAUPlayer@@@Z,0,network
 network,IsState3_00452960,src/network/net_game.cpp,1,0,0,0,0,0,?IsState3_00452960@@YGHPAUPlayer@@@Z,0,network
@@ -645,7 +637,6 @@ network,PlayerId_00452800,src/network/net_game.cpp,0,0,0,0,0,0,?PlayerId_0045280
 network,PlayerId_004568c0,src/network/net_game.cpp,1,0,0,0,0,0,?PlayerId_004568c0@@YGHE@Z,0,network
 network,PlayerReady,src/network/net_game.cpp,1,0,0,0,0,0,?PlayerReady@@YGHPAUPlayer@@@Z,0,menu
 network,Prev_00462f30,src/network/packets.cpp,1,0,0,0,0,0,?Prev_00462f30@@YGHH@Z,0,network
-network,PushSyncPacket,src/network/unit_sync.cpp,0,0,0,0,0,0,?PushSyncPacket@@YGXPAV?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@ABUUnitSyncPacket@@@Z,1,
 network,QueryOnlineFlags,src/network/online_report.cpp,1,0,0,0,0,0,?QueryOnlineFlags@@YGHH@Z,0,network
 network,QueueCount,src/network/packets.cpp,1,0,0,0,0,0,?QueueCount@@YGHPAVFrameQueue@@@Z,0,network
 network,RIReport,src/network/online_report.cpp,1,0,0,0,0,0,?RIReport@@YGHHHHHHHHHHH@Z,0,network
@@ -1674,7 +1665,7 @@ presentation,FindOpenSlot,src/frontend/campaign_menu.cpp,0,0,0,0,0,0,?FindOpenSl
 presentation,FindPageStart,src/frontend/campaign_menu.cpp,1,0,0,0,0,0,?FindPageStart@@YGPADPADHH@Z,0,
 presentation,FindPanel_004aa8f0,src/gui/dialogs.cpp,1,0,0,0,0,0,?FindPanel_004aa8f0@@YGHPAULayer@@@Z,0,
 presentation,FindType_004a32a0,src/gui/gui.cpp,1,0,0,0,0,0,?FindType_004a32a0@@YGHPAUGadget@@E@Z,0,
-presentation,FindUnusedLogo,src/frontend/multi.cpp,1,0,0,0,0,0,?FindUnusedLogo@@YGHXZ,0,
+presentation,FindFreeLobbyLogo,src/frontend/multi.cpp,1,0,0,0,0,0,?FindFreeLobbyLogo@@YGHXZ,0,
 presentation,Find_004a3ef0,src/gui/gui.cpp,1,0,0,0,0,0,?Find_004a3ef0@@YGHPAUGadget@@E@Z,0,
 presentation,FixMul,src/ingame/selection.cpp,1,0,0,0,0,0,?FixMul@@YGHHH@Z,0,
 presentation,FlagsPtr,src/ingame/selection.cpp,1,0,0,0,0,0,?FlagsPtr@@YGPAIPAUUnit@@@Z,0,

@@ -2622,7 +2622,7 @@ players,network,shared_write,Game::localPlayer,19
 players,network,shared_write,Game::tail,5
 players,network,shared_write,OwnershipTransferPacket::newOwnerNetId,1
 players,network,shared_write,OwnershipTransferPacket::unitId,1
-players,network,shared_write,Player::active,60
+players,network,shared_write,Player::active,54
 players,network,shared_write,Player::alliance,6
 players,network,shared_write,Player::allied,4
 players,network,shared_write,Player::alliedBy,2
@@ -2633,9 +2633,9 @@ players,network,shared_write,Player::energyWasted,2
 players,network,shared_write,Player::explored,2
 players,network,shared_write,Player::exploredHeight,1
 players,network,shared_write,Player::exploredWidth,1
-players,network,shared_write,Player::id,62
+players,network,shared_write,Player::id,61
 players,network,shared_write,Player::index,19
-players,network,shared_write,Player::info,41
+players,network,shared_write,Player::info,40
 players,network,shared_write,Player::keepaliveFlags,2
 players,network,shared_write,Player::kills,2
 players,network,shared_write,Player::lobbyDataSynced,9
@@ -2648,7 +2648,7 @@ players,network,shared_write,Player::totalEnergyConsumed,2
 players,network,shared_write,Player::totalEnergyProduced,2
 players,network,shared_write,Player::totalMetalConsumed,2
 players,network,shared_write,Player::totalMetalProduced,2
-players,network,shared_write,Player::type,93
+players,network,shared_write,Player::type,86
 players,network,shared_write,Player::unitCount,6
 players,network,shared_write,Player::unitsBegin,1
 players,network,shared_write,Player::unitsCreated,7
@@ -3130,12 +3130,12 @@ presentation,network,shared_write,Game::pauseFlags,1
 presentation,network,shared_write,Game::textLines,1
 presentation,network,shared_write,Game::uiOptionFlags,1
 presentation,network,shared_write,Gui::layer,1
-presentation,network,shared_write,Player::active,60
+presentation,network,shared_write,Player::active,54
 presentation,network,shared_write,Player::alliance,6
 presentation,network,shared_write,Player::allied,4
 presentation,network,shared_write,Player::alliedBy,2
 presentation,network,shared_write,Player::energy,1
-presentation,network,shared_write,Player::id,62
+presentation,network,shared_write,Player::id,61
 presentation,network,shared_write,Player::index,19
 presentation,network,shared_write,Player::metal,1
 presentation,network,shared_write,Player::rejectReason,10

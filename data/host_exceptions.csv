@@ -38,6 +38,7 @@ src/frontend/multi.cpp,interfaces/host.h,#392
 src/frontend/multi.cpp,src/frontend/frontend.h,#392
 src/frontend/multi.cpp,src/frontend/multi.h,#392
 src/frontend/multi.cpp,src/frontend/options.h,#392
+src/frontend/multi.cpp,src/frontend/v4i.h,#392
 src/frontend/multi.cpp,src/graphics/display.h,#392
 src/frontend/multi.cpp,src/graphics/object_pool.h,#392
 src/frontend/multi.cpp,src/graphics/palette.h,#392

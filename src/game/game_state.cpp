@@ -98,7 +98,7 @@ void __stdcall SetGameMode(int param)
 
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 
 void __cdecl UpdateWind()
 {

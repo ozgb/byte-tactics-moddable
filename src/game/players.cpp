@@ -520,7 +520,7 @@ void ShowContinueWatchingDialog()
 
 
 unsigned char __stdcall FindHostSlot();
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                            Vec3 pos, int a, int b, int c);
 #include "main_loop.h"

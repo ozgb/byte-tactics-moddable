@@ -240,7 +240,7 @@ void __stdcall RegisterCommand(const char* name, Command_00406f00 fn, int flags)
 #include "../quirks/quirks.h"
 #include "../state/sim_globals.h"
 #include "../util/file_printf.h"
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 #include "../sound/sound.h"
 #include "../units/squads.h"
 void __stdcall GetBasePosition(int index, Vec3* out);

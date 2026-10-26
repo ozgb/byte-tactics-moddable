@@ -57,7 +57,7 @@ extern Game_00408100* g_game;
 void __stdcall GetBasePosition(int index, Vec3* out);
 #include "ai_player.h"
 #include "../../interfaces/seams.h"
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);

@@ -66,7 +66,7 @@ static inline Vec3 MakeVec3(int ax, int ay, int az)
     return v;
 }
 
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
 

@@ -1199,7 +1199,7 @@ void __stdcall VisitObjectsInRange(Vec3* pos, int range, DamagedAllyCollector& v
 
 void __cdecl operator delete(void* p);
 
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 
 // FUNCTION: 0x47ea40
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* center, Fixed radius, Vec3** out1, float* val1, Vec3** out2, float* val2)

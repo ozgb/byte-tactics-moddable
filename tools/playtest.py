@@ -35,7 +35,12 @@ Each run has its own (except that a `--testmode` run has no X server or audio si
 - game directory: the game's small files copied from the Steam (or GOG)
   install, its large archives linked;
 - audio sink: a PulseAudio null sink, so the game is silent on the desktop
-  and the run can measure what it plays.
+  and the run can measure what it plays;
+- network: a run of two instances or with DirectPlay (`mp`) has its own
+  network namespace (see NetNamespace), so its fixed DirectPlay ports never
+  meet another run's and any number of play-tests and gates may run at once on
+  one machine. This needs `unshare`, `nsenter` and `ip` (util-linux, iproute2)
+  and unprivileged user namespaces.
 
 The run's logs and screenshots go to build/playtest/<session>/<run>/:
 steps.log (each step with its time), wine.log, audio.log (the sink's level
@@ -51,7 +56,6 @@ compares with the original exe's.
 import argparse
 import atexit
 import datetime
-import fcntl
 import json
 import os
 import re
@@ -59,7 +63,6 @@ import shutil
 import signal
 import subprocess
 import sys
-import tempfile
 import threading
 import time
 from dataclasses import dataclass, field
@@ -90,7 +93,14 @@ SOUND_LEVEL = 200
 PREFIX_WRITTEN = ("system.reg", "user.reg", "userdef.reg", ".update-timestamp")
 TEMPLATE_REVISION = 2
 
+NETNS_SCRIPT = (
+    "ip link set lo up; ip link add dummy0 type dummy; ip addr add 10.77.0.1/24 dev dummy0; "
+    "ip link set dummy0 up; ip route add default dev dummy0; echo ready; exec cat"
+)
+NETNS_TOOLS = ("unshare", "nsenter", "ip")
+
 _live: list["Instance"] = []
+_holders: list["NetNamespace"] = []
 _live_lock = threading.Lock()
 _interrupted = threading.Event()
 
@@ -256,6 +266,63 @@ def find_game_dir(arg: str | None) -> Path:
     raise SystemExit("no Total Annihilation install found: pass --game-dir")
 
 
+class NetNamespace:
+    """A private network namespace, kept alive by a holder process until stop()."""
+
+    def __init__(self) -> None:
+        self.proc: subprocess.Popen | None = None
+        self.pid = 0
+        self.lock = threading.Lock()
+
+    def start(self) -> None:
+        missing = [t for t in NETNS_TOOLS if not shutil.which(t)]
+        if missing:
+            raise RuntimeError(f"{', '.join(missing)} not installed: a multiplayer run needs {', '.join(NETNS_TOOLS)}")
+        self.proc = subprocess.Popen(["unshare", "-rn", "sh", "-c", NETNS_SCRIPT], stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                                     start_new_session=True)
+        self.pid = self.proc.pid
+        with _live_lock:
+            _holders.append(self)
+        line = self.proc.stdout.readline().strip()
+        if line != "ready":
+            self.proc.poll()
+            try:
+                err = self.proc.stderr.read() if self.proc.poll() is not None else ""
+            except OSError:
+                err = ""
+            self.stop()
+            raise RuntimeError(f"the network namespace holder did not start ({err.strip() or 'no ready line'}): "
+                               "unprivileged user namespaces must be enabled")
+
+    def wrap(self, cmd: list[str]) -> list[str]:
+        return ["nsenter", "-t", str(self.pid), "-U", "-n", "--preserve-credentials", "--", *cmd]
+
+    def stop(self) -> None:
+        with self.lock:
+            proc, self.proc = self.proc, None
+        with _live_lock:
+            if self in _holders:
+                _holders.remove(self)
+        if proc is None:
+            return
+        try:
+            proc.stdin.close()
+        except OSError:
+            pass
+        try:
+            proc.wait(5)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except OSError:
+                pass
+            proc.wait()
+        for f in (proc.stdout, proc.stderr):
+            if f:
+                f.close()
+
+
 def wine_env(prefix: Path, display: str = "") -> dict[str, str]:
     env = dict(os.environ)
     env.update(WINEPREFIX=str(prefix), WINEARCH=os.environ.get("WINEARCH", "win32"), WINEDLLOVERRIDES="mscoree,mshtml=", WINEDEBUG="-all")
@@ -385,6 +452,9 @@ class Instance:
         return env
 
 
+    def wrap(self, cmd: list[str]) -> list[str]:
+        return self.run.netns.wrap(cmd) if self.run.netns else cmd
+
     def prepare(self, template: Path, game_src: Path, reg: list[str], files: dict[str, str]) -> None:
         self.base.mkdir(parents=True, exist_ok=True)
         link_prefix(template, self.prefix)
@@ -410,9 +480,9 @@ class Instance:
             regfile = self.base / "settings.reg"
             regfile.write_text("REGEDIT4\r\n\r\n" + "\r\n".join(reg) + "\r\n")
             env = wine_env(self.prefix)
-            subprocess.run(["wine", "regedit", "/S", "Z:" + str(regfile).replace("/", "\\")], env=env,
+            subprocess.run(self.wrap(["wine", "regedit", "/S", "Z:" + str(regfile).replace("/", "\\")]), env=env,
                            capture_output=True)
-            subprocess.run(["wineserver", "-w"], env=env)
+            subprocess.run(self.wrap(["wineserver", "-w"]), env=env)
 
     def start_x(self) -> None:
         r, w = os.pipe()
@@ -474,7 +544,7 @@ class Instance:
             args += ["-d"]
         if self.run.testmode and self.run.blockscan:
             args += ["-blockscan" if self.run.blockscan == 1 else f"-blockscan={self.run.blockscan}"]
-        self.wine = subprocess.Popen(["wine", exe, *args], cwd=self.game, env=env, start_new_session=True,
+        self.wine = subprocess.Popen(self.wrap(["wine", exe, *args]), cwd=self.game, env=env, start_new_session=True,
                                      stdout=(self.run.out / f"wine{self.suffix}.log").open("w"),
                                      stderr=subprocess.STDOUT)
         if self.run.testmode:
@@ -631,7 +701,7 @@ class Instance:
         self.shot_event.set()
         if self.prefix.exists():
             try:
-                subprocess.run(["wineserver", "-k"], env=wine_env(self.prefix), capture_output=True, timeout=30)
+                subprocess.run(self.wrap(["wineserver", "-k"]), env=wine_env(self.prefix), capture_output=True, timeout=30)
             except subprocess.TimeoutExpired:
                 pass
         for p in (self.wine, self.parec, self.xserver):
@@ -700,11 +770,14 @@ def prefix_pids(prefix: str) -> list[int]:
 def stop_all(*_args) -> None:
     with _live_lock:
         live = list(_live)
+        holders = list(_holders)
     for inst in live:
         try:
             inst.stop()
         except Exception:
             pass
+    for holder in holders:
+        holder.stop()
 
 
 @dataclass
@@ -873,6 +946,7 @@ class Run:
         self.put = put or []
         self.collect = collect or []
         self.instances = [Instance(self, i + 1) for i in range(scenario.instances)]
+        self.netns: NetNamespace | None = None
         self.t0 = time.time()
         self.log = None
         self.watch: dict[str, str] = {}
@@ -883,6 +957,9 @@ class Run:
         self.events: list[str] = []
         self.started = False
         self.duration = 0.0
+
+    def needs_netns(self) -> bool:
+        return self.scenario.instances > 1 or self.scenario.directplay
 
     def note(self, text: str) -> None:
         line = f"{log_time(self.t0)} {text}"
@@ -1101,18 +1178,10 @@ class Run:
         self.log = (self.out / "steps.log").open("w")
         self.note(f"run {self.name}: {', '.join(map(str, self.exes))} ({self.exe_tag}), "
                   f"scenario {self.scenario.name}")
-        lock = None
-        if self.scenario.directplay:
-            lock = (Path(tempfile.gettempdir()) / f"byte-tactics-playtest-{os.getuid()}.lock").open("w")
-            self.note("  waiting for the network (one DirectPlay game at a time)")
-            while True:
-                try:
-                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    break
-                except BlockingIOError:
-                    if _interrupted.wait(2):
-                        break
         try:
+            if self.needs_netns():
+                self.netns = NetNamespace()
+                self.netns.start()
             for inst in self.instances:
                 inst.prepare(template, game_src, self.scenario.reg, self.scenario.files)
             self.t0 = time.time()
@@ -1150,12 +1219,12 @@ class Run:
                 inst.alive()
                 inst.stop()
                 inst.collect_traces()
+            if self.netns:
+                self.netns.stop()
             self.check_wine_logs()
             self.note(f"result: {self.result} {self.reason}")
             self.log.close()
             self.write_result()
-            if lock:
-                lock.close()
 
     def check_wine_logs(self) -> None:
         for inst in self.instances:
@@ -1416,6 +1485,10 @@ def main() -> None:
         scenarios.append(testmode)
     for sc in scenarios:
         check_scenario(sc, screens)
+    if any(sc.instances > 1 or sc.directplay for sc in scenarios):
+        for tool in NETNS_TOOLS:
+            if not shutil.which(tool):
+                raise SystemExit(f"{tool} is not installed: a multiplayer run needs {', '.join(NETNS_TOOLS)}")
     game_src = find_game_dir(args.game_dir)
 
     session = OUT / (datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + f"-{os.getpid()}")

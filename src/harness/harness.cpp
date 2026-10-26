@@ -87,8 +87,9 @@ static int s_loadLine = 0;
 static char s_decidedKey[32];
 static int s_decidedLine = 0;
 static const char s_savePath[] = "savegame\\harness.sav";
+using OptionsTable = Table_0047ae60;
 static const char s_optionsPath[] = "savegame\\harness.opt";
-static Table_0047ae60 s_savedOptions;
+static OptionsTable s_savedOptions;
 
 static void Fail(const char* text)
 {
@@ -697,7 +698,7 @@ static void SeedNetworkHost(int host)
     g_game->loadingFlags.value |= 8;
 }
 
-static Table_0047ae60* ScenarioTable() { return (Table_0047ae60*)g_game->options; }
+static OptionsTable* ScenarioTable() { return (OptionsTable*)g_game->options; }
 
 static void SetUpSkirmish()
 {

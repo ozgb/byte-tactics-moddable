@@ -250,7 +250,7 @@ int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
-int __stdcall IsPointVisible(Player* player, Vec3Words* pos);
+int __stdcall IsPointVisible(Player* player, Vec3* pos);
 int __stdcall SumUnitRatingsInRange(int index, Vec3* pos, int range);
 #include "pathfind.h"
 void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
@@ -748,7 +748,7 @@ static inline int IsVisible(Player* player, Vec3Words* pos)
 {
     if ((g_game->mapFlags & 2) == 2)
         return IsExplored(player, pos);
-    return IsPointVisible(player, pos);
+    return IsPointVisible(player, (Vec3*)pos);
 }
 
 static inline Vec3 Offset(int angle, int distance)
@@ -795,8 +795,9 @@ void SpatialTimer::OnTimer()
 }
 
 // FUNCTION: 0x408090
-int __stdcall IsPointVisible(Player* player, Vec3Words* pos)
+int __stdcall IsPointVisible(Player* player, Vec3* point)
 {
+    Vec3Words* pos = (Vec3Words*)point;
     int tx = pos->xWhole >> 5;
     int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
     if (!((unsigned int)tx < (unsigned int)player->exploredWidth && (unsigned int)ty < (unsigned int)player->exploredHeight)) {

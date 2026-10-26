@@ -89,7 +89,7 @@ OpenSkirmishMenu,0x47bbb0,src/frontend/skirmish_menu.cpp,end-of,g_mediumGadgetNa
 OpenSkirmishMenu,0x47bbb0,src/frontend/skirmish_menu.cpp,end-of,g_skirmishGuiName,0,g_skirmishSetupPictureName,,none
 InitSound,0x47ed40,src/sound/sound.cpp,end-of,g_noDirectSoundKey,0,g_useWindowsSoundKey,,none
 InitSound,0x47ed40,src/sound/sound.cpp,end-of,g_useWindowsSoundKey,0,g_soundInitError,,none
-ApplyUnitDeath,0x4866d0,src/units/units_485010.cpp,end-of,g_takenLeadFormat,0,g_killedScriptName,,none
+ApplyUnitDeath,0x4866d0,src/units/units.cpp,end-of,g_takenLeadFormat,0,g_killedScriptName,,none
 ApplyUnitDamage,0x489ce0,src/units/unit_targets.cpp,end-of,s_HitByWeapon_00508d74,0,s_TakeDamage_00508d68,,none
 ApplyUnitDamage,0x489ce0,src/units/unit_targets.cpp,end-of,s_paralyze_00508d80,0,s_HitByWeapon_00508d74,,none
 VictoryKillEnemyCommander::SaveState,0x48eac0,src/game/victory.cpp,end-of,g_killEnemyCommanderKey,0,g_satisfiedKey,,none
@@ -130,7 +130,7 @@ ParseCommandLine,0x49ee30,src/game/main.cpp,end-of,g_preferredLanguage,0,g_cmdli
 AddTimer,0x4b63f0,src/graphics/display.cpp,end-of,g_timerSlots,0,g_display,,none
 HAPI_BuildArchiveDirectory,0x4bd3b0,src/files/hpi.cpp,end-of,g_dirWildcard,0,g_packageDataName,,none
 HAPI_BuildArchiveDirectory,0x4bd3b0,src/files/hpi.cpp,end-of,g_packageDataName,0,g_dotDot,,none
-LoadTranslations,0x4c54f0,src/util/tdf_4c54f0.cpp,end-of,g_language,0,g_translations,,none
+LoadTranslations,0x4c54f0,src/util/tdf.cpp,end-of,g_language,0,g_translations,,none
 InitSurfaceIndexFreeList,0x4c7080,src/graphics/surface.cpp,past-end,g_edgeListNext,-4,g_edgeListNext,g_edgeLowIndexB+0x4,none
 InitSurfaceIndexFreeList,0x4c7080,src/graphics/surface.cpp,past-end,g_edgeListPrev,-4,g_edgeListPrev,g_edgeSpanB+0x4,none
 OnStreamTimer,0x4d0680,src/sound/samples.cpp,end-of,g_delayedSampleName,0,g_delayedSampleVolume,,none

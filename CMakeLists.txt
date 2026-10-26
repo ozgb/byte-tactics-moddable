@@ -32,7 +32,7 @@ string(REPLACE "\n" ";" SOURCES "${LINK_ORDER}")
 option(BT_DATA_ORDER "Lay the game's data out in 3.1c's order" OFF)
 option(BITEXACT_ROUTE "Route the game logic's CRT calls to lib/bitexact" ON)
 if(BITEXACT_ROUTE)
-  list(REMOVE_ITEM SOURCES "${CMAKE_SOURCE_DIR}/src/util/math_4b70a0.cpp")
+  list(REMOVE_ITEM SOURCES "${CMAKE_SOURCE_DIR}/src/util/fixed_trig.cpp")
 endif()
 
 set(BITEXACT_DIR "${CMAKE_SOURCE_DIR}/lib/bitexact")

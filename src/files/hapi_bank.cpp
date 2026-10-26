@@ -45,7 +45,6 @@ struct AccountList {
 #include "../../interfaces/host.h"
 
 #include "files_impl.h"
-long __stdcall HAPI_FileLength(FileHandle* file);
 
 #include "../debug/debug_lib.h"
 #include "../debug/debug_lib.h"

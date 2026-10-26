@@ -449,51 +449,9 @@ void MovementClass::RefreshUnitIfStale(Object_00440af0* p)
 
 #include "../network/player_info.h"
 
-// FUNCTION: 0x440c10
-int FindUnusedLogo()
-{
-    int used[10];
-    memset(used, 0, sizeof(used));
-    for (int i = 0; i < 10; i++) {
-        Player* p = &g_game->players[i];
-        if (p->active && (p->type == 1 || p->type == 2 || p->type == 3) && p->index != 10)
-            used[p->info->color < 9 ? p->info->color : 9] = 1;
-    }
-    int result = 0;
-    for (int j = 0; j < 10; j++) {
-        if (!used[j]) {
-            result = j;
-            break;
-        }
-    }
-    return result;
-}
-
 // FUNCTION: 0x440ca0
 void __stdcall CopyPathLockFields(Dst_00440ca0* dst, Src_00440ca0* src)
 {
     dst->rect = src->rect;
 }
 
-unsigned char FindHostSlot();
-
-// FUNCTION: 0x440cd0
-int CheckMapCrc()
-{
-    if (!g_seams.map->GetTerrainLength(g_game->net)) {
-        return 0;
-    }
-    unsigned char me = FindHostSlot();
-    PlayerInfo* data = 0;
-    int check = 0;
-    if (me != 10) {
-        data = g_game->players[me].info;
-        if (data->versionMajor >= 2 || (data->versionMajor == 1 && data->versionMinor >= 2)) {
-            check = 1;
-        }
-    }
-    if (!check) {
-        return 1;
-    }
-    return g_seams.map->ComputeMapChecksum(g_game->net) == data->mapCrc;
-}

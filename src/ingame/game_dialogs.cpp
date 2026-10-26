@@ -101,7 +101,7 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetButtonStageByName(Gui* menu, char* name);
 #include "../network/net_game.h"
-#include "../units/units_485010.h"
+#include "../units/units.h"
 void __stdcall CollectSelectedUnits(std::vector<Unit*>* list);
 #include "../units/unit_commands.h"
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);

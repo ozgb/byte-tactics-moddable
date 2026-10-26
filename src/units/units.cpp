@@ -163,57 +163,25 @@ public:
 // GLOBAL: 0x511de8
 extern Game* g_game;
 
-struct Point16_00485010 {
-    short x;
-    short y;
-};
-
-static inline Cell* CellAt(int x, int y)
+// FUNCTION: 0x485070
+int __stdcall GetGroundHeight(Pos_00485070* p)
 {
-    if (x >= 0 && x < g_game->width && y >= 0 && y < g_game->height)
-        return &g_game->cells[y * g_game->width + x];
-    return 0;
-}
-
-// FUNCTION: 0x485010
-int __stdcall GetCellHeight(Point16_00485010* p)
-{
-    Cell* cell = CellAt(p->x, p->y);
-    if (cell)
-        return cell->height;
-    return 0;
-}
-
-static inline Cell* GetCellCachedWidth(int x, int y)
-{
-    if (x >= 0) {
-        int w = g_game->width;
-        if (x < w && y >= 0 && y < g_game->height)
-            return &g_game->cells[w * y + x];
-    }
-    return 0;
-}
-
-// FUNCTION: 0x485140
-int __stdcall GetCellMeanHeight(Pos_00485070* p)
-{
-    int x = p->x.whole / 16, y = p->z.whole / 16;
-    Cell* cell = GetCellCachedWidth(x, y);
-    if (cell)
-        return (cell->low + cell->high) >> 1;
-    return -1;
-}
-
-// FUNCTION: 0x485330
-void __stdcall GetCellPosition(int x, int y, Pos_00485070* out)
-{
-    Cell* cell = CellAt(x, y);
-    if (cell) {
-        memset(out, 0, sizeof(*out));
-        out->x.whole = x << 4;
-        out->y.whole = cell->height;
-        out->z.whole = y << 4;
-    }
+    int x = p->x.whole;
+    int z = p->z.whole;
+    int xc = x >> 4;
+    int zc = z >> 4;
+    int xf = x & 15;
+    int zf = z & 15;
+    if (xc < 0 || xc + 1 >= g_game->width || zc < 0 || zc + 1 >= g_game->height)
+        return -1;
+    Cell* c = &g_game->cells[zc * g_game->width + xc];
+    int a = c->height;
+    int b = c[1].height;
+    c += g_game->width;
+    int e = c->height;
+    int f = c[1].height;
+    int r1 = a + (b - a) * xf / 16;
+    return r1 + ((e + (f - e) * xf / 16) - r1) * zf / 16;
 }
 
 static inline Fixed_004853b0 MakeFixed(int i)
@@ -325,7 +293,7 @@ template<class _RI, class _Ty, class _Pr> void __stdcall QuickSort(_RI _F, _RI _
 
 #include <algorithm>
 
-#include "units_485010.h"
+#include "units.h"
 
 // FUNCTION: 0x4854a0
 void __stdcall AllocateUnitMemory(void)
@@ -411,7 +379,7 @@ void FreeUnitMemory(void)
 }
 
 
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 
 // FUNCTION: 0x485a40
 void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
@@ -693,8 +661,6 @@ struct Result_486360 {
     int velZ;
 };
 
-int __stdcall GetGroundHeight(Pos_00485070* pos);
-int __stdcall FindHighestPointOnLine(Vec3 a, Vec3 b);
 void __stdcall EmitSmoke(Pos_00485070* pos, int a, int b, int c);
 
 // FUNCTION: 0x486360
@@ -1054,44 +1020,4 @@ void __stdcall KillPlayerUnits(unsigned char player)
             }
         }
     }
-}
-
-struct Vec3_004851c0 {
-    int x;
-    int y;
-    int z;
-};
-
-// FUNCTION: 0x4851c0
-int __stdcall FindHighestPointOnLine(Vec3_004851c0 a, Vec3_004851c0 b)
-{
-    int dz = b.z - a.z;
-    b.z = dz;
-    b.y -= a.y;
-    int dx = b.x - a.x;
-    b.x = dx;
-    Vec3_004851c0 d = b;
-    int n;
-    if (abs(dx) < abs(dz))
-        n = abs(dz) / 0x100000;
-    else
-        n = abs(dx) / 0x100000;
-    n++;
-    d.x /= n;
-    d.z /= n;
-    short best = 0;
-    for (int i = 0; i <= n; i++) {
-        Cell* c = CellAt(a.x / 0x100000, a.z / 0x100000);
-        if (c) {
-            short v = ((unsigned char*)(Entry_486360 *)g_game->features)[c->feature * 256 + 0xfa] + c->height;
-            if (best < v) best = v;
-            if (c->unit) {
-                Unit* o = &g_game->units[c->unit];
-                short w = (((UnitType*)o->def.get())->modelMaxY + o->pos.y) >> 16;
-                if (best < w) best = w;
-            }
-        }
-        a.x += d.x; a.y += d.y; a.z += d.z;
-    }
-    return best;
 }

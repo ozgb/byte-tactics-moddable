@@ -65,7 +65,7 @@ that a global's size or place might cause; by default the linker places each
 global itself.
 
 The build also compiles `lib/bitexact` and routes the game logic's `rand`,
-`srand`, `sqrt`, `_hypot`, `acos`, the `%f` form of `sscanf` and the trig entry points of `src/util/math_4b70a0.cpp` to it
+`srand`, `sqrt`, `_hypot`, `acos`, the `%f` form of `sscanf` and the trig entry points of `src/util/fixed_trig.cpp` to it
 (see "In the modern build" in `lib/bitexact/README.md`); `src/` is untouched, so
 the matching build is not affected. `uv run tools/bitexact.py` tests the library
 with clang-cl against the vectors the reference branch's MSVC 5 build wrote.

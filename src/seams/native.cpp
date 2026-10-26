@@ -99,11 +99,9 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetGroundHeight(Pos_00485070* p);
 void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out);
-int __stdcall GetCellMeanHeight(Pos_00485070* p);
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
-int __stdcall IsPointVisible(Player* player, Vec3* pos);
 
 #include "../map/line_of_sight.h"
 #include "../map/radar.h"
@@ -115,7 +113,7 @@ class HapiBank;
 #include "../map/terrain.h"
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
 void __stdcall SetupPlayerSlot(int player, char type);
-#include "../units/units_485010.h"
+#include "../units/units.h"
 struct OwnershipTransferPacket;
 #include "../units/unit_types.h"
 #include "../units/unit_save.h"
@@ -233,8 +231,6 @@ static void __stdcall SetStateBitsNative(Unit* unit, int mask, int set)
     unit->SetStateBits(mask, set);
 }
 
-#include "../weapons/weapons_49b720.h"
-
 static unsigned char __fastcall ChooseWeaponNative(Unit* self)
 {
     return self->ChooseWeapon();
@@ -282,7 +278,7 @@ static void __stdcall GetSweetSpotNative(Unit* unit, Vec3* out)
 
 static int __stdcall GetCellMeanHeightNative(Vec3* pos)
 {
-    return GetCellMeanHeight((Pos_00485070*)pos);
+    return GetCellMeanHeight(pos);
 }
 
 static void __stdcall ApplyAreaDamageAtNative(WeaponDef* weapon, Vec3* pos)

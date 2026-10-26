@@ -2,6 +2,11 @@
 #define DEBUG_LIB_H
 
 #include <stddef.h>
+#include <memory>
+
+class FreeBlockMap;
+template <class T, class A = std::allocator<T> >
+class FreedBlockRing;
 
 char __stdcall IsMemFussy();
 void __stdcall MemFussyAtexitHandler(void);
@@ -49,5 +54,14 @@ char* __cdecl FindCommandLineSwitch(char* name);
 void __cdecl CountFree(int size);
 int __cdecl RoundUpToDoublePage(int size);
 unsigned int __cdecl RoundUpToPage(int size);
+
+void __cdecl CheckFillPattern(unsigned int* block, unsigned int fill, unsigned int size);
+void __cdecl InitDebugSupport(unsigned int flags);
+unsigned int __cdecl AllocDebugBlock(unsigned int n, unsigned int arg2);
+FreeBlockMap* __stdcall GetFreeBlockSet();
+FreedBlockRing<int>* GetFreedBlockRing();
+void __cdecl FreeDebugBlock(void* p, int flags);
+
+void* __stdcall GetBlockMap();
 
 #endif

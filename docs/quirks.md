@@ -47,7 +47,7 @@ GPL, #45).
 ### `units.ignore-null-death-record`
 
 - **Scope:** sim.
-- **Where:** `ApplyUnitDeath` (0x4866d0), `src/units/units_485010.cpp`.
+- **Where:** `ApplyUnitDeath` (0x4866d0), `src/units/units.cpp`.
 - **3.1c:** a unit-killed record with unit id 0 resolves to a null unit, and
   the game reads through it and crashes.
 - **On:** the record is ignored.
@@ -89,7 +89,7 @@ GPL, #45).
 
 - **Scope:** view.
 - **Where:** `ParseCommandLine` (`src/game/main.cpp`) into
-  `g_preferredLanguage`, and `LoadTranslations` (`src/util/tdf_4c54f0.cpp`)
+  `g_preferredLanguage`, and `LoadTranslations` (`src/util/tdf.cpp`)
   into `g_language`.
 - **3.1c:** both copy a language name into a 64-byte buffer with no bound,
   so a long name on the command line or in the translation file overflows it.

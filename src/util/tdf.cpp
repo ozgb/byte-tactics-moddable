@@ -4,10 +4,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
+#include <stddef.h>
+#include <new>
 
+#include "../../link/globals.h"
 #include "string_ref.h"
 #include "tdf.h"
+#include "../state/block.h"
 #include "../state/sim_globals.h"
+#include "../quirks/quirks.h"
+#include "../files/file_handle.h"
+#include "../files/files_api.h"
 
 #ifdef __clang__
 __attribute__((optnone)) void __stdcall EmitTdfFieldDestructor(TdfField* field)
@@ -548,4 +555,272 @@ void* TdfField::AssignPair(int* param_1)
 TdfField::TdfField(const StringRef& a, const StringRef& b)
     : key(a), value(b)
 {
+}
+
+// FUNCTION: 0x4c2f60
+int TdfFile::LoadFile(char* path)
+{
+    FileHandle* file = HAPI_OpenFileRead(path);
+    if (!file)
+        return 0;
+    int size = HAPI_FileLength(file);
+    int result = 0;
+    if (size > 0) {
+        char* buf = (char*)GameAllocIgnoreTag(path, size);
+        HAPI_SeekFile(file, 0);
+        int got = HAPI_readfromfile(file, buf, size);
+        if (got >= 0) {
+            int flag = HAPI_IsInArchive(file);
+            result = flag;
+            if (root)
+                delete root;
+            root = nullptr;
+            current = nullptr;
+            flags = result;
+            char* text = (char*)GameAllocIgnoreTag("TDF file", size + 1);
+            memcpy(text, buf, size);
+            text[size] = 0;
+            this->StripComments(text);
+            TdfRecord* node = (TdfRecord*)operator new(0x29);
+            root = node ? new (node) TdfRecord("root", text, nullptr, path) : nullptr;
+            GameFreeThunk((int*)text);
+            result = 1;
+        }
+        GameFreeThunk((int*)buf);
+    }
+    HAPI_CloseFile(file);
+    return result;
+}
+
+// FUNCTION: 0x4c3120
+void TdfFile::LoadBuffer(char* data, int size, int flag, char* path)
+{
+    delete root;
+    root = nullptr;
+    current = nullptr;
+    flags = flag;
+    char* text = (char*)GameAllocIgnoreTag("TDF file", size + 1);
+    memcpy(text, data, size);
+    text[size] = 0;
+    this->StripComments(text);
+    TdfRecord* node = (TdfRecord*)SimAlloc(0x29);
+    root = node ? new (node) TdfRecord("root", text, nullptr, path) : nullptr;
+    GameFreeThunk((int*)text);
+}
+
+// FUNCTION: 0x4c2eb0
+// FUNCTION: 0x4c51b0 ??_GTdfField@@QAEPAXI@Z
+TdfFile::~TdfFile()
+{
+    delete root;
+    root = nullptr;
+    current = nullptr;
+    flags = 0;
+}
+
+class TdfFieldVector : public std::vector<TdfField> {
+public:
+    int GetPairCount(void);
+
+    iterator Insert(iterator p, const TdfField& x);
+
+    void DestroyAll()
+    {
+        TdfField* e = _Last;
+        TdfField* p = _First;
+        while (p != e) {
+            p->~TdfField();
+            p++;
+        }
+        ::operator delete(_First);
+        _First = nullptr;
+        _Last = nullptr;
+        _End = nullptr;
+    }
+};
+
+#pragma pack(push, 1)
+class TranslationTable {
+public:
+    char unknown_0;
+    std::vector<TdfField> v;
+
+    TranslationTable(const std::allocator<TdfField>& a) : v(a) {}
+    TdfField* FindLowerBound(const char* key);
+};
+#pragma pack(pop)
+
+static inline StringRef* InsertNew(TranslationTable* s, TdfField* e, const StringRef& key)
+{
+    return (StringRef*)&((TdfFieldVector*)&s->v)->Insert(e, MakePair(key, StringRef()))->value;
+}
+
+// FUNCTION: 0x4c54f0
+void __stdcall LoadTranslations(char* filename, char* section)
+{
+    std::allocator<TdfField> alloc;
+    TranslationTable* s;
+
+    if (_strcmpi(section, g_language) == 0)
+        return;
+    if (g_translations) {
+        TranslationTable* old = g_translations;
+        ((TdfFieldVector*)&g_translations->v)->DestroyAll();
+        ::operator delete(old);
+    }
+    g_translations = new TranslationTable(alloc);
+    AllocNotifyNop((int)g_translations);
+    if (g_quirks.boundLanguageCopy) {
+        strncpy(g_language, section, 0x3f);
+        g_language[0x3f] = 0;
+    } else {
+        strcpy(g_language, section);
+    }
+    {
+        TdfFile f;
+        char value[256];
+        char name[256];
+        if (f.LoadFile(filename)) {
+            int index;
+            index = 0;
+            while (f.SelectRecordAt(index)) {
+                f.current->CopyRecordName(name, 0xff);
+                f.current->GetFieldString(value, g_language, 0xff, DAT_005119b8);
+                if (strlen(value) != 0) {
+                    StringRef key(name);
+                    TdfField* e;
+                    s = g_translations;
+                    e = g_translations->FindLowerBound(key.ptr);
+                    StringRef* r;
+                    if (e == s->v.end() || Ne(e->key, key)) {
+                        r = InsertNew(s, e, key);
+                    } else {
+                        r = (StringRef*)&e->value;
+                    }
+                    r->AssignText(value);
+                }
+                f.ResetCurrentRecord();
+                index++;
+            }
+            f.Unload();
+        }
+    }
+}
+
+// FUNCTION: 0x4c5740
+char* __stdcall Translate(char* key)
+{
+    if (key == nullptr)
+        return nullptr;
+    TranslationTable* c = g_translations;
+    if (c == nullptr)
+        return key;
+
+    TdfField* first = c->v.begin();
+    TdfField* last = c->v.end();
+    TdfField* end = c->v.end();
+
+    while (first != last) {
+        TdfField* mid = first + (last - first) / 2;
+        bool less = strcmp(mid->key.ptr, key) < 0;
+        if (less)
+            first = mid + 1;
+        else
+            last = mid;
+    }
+
+    char** found;
+    if (first != end) {
+        bool before = strcmp(key, first->key.ptr) < 0;
+        found = before ? nullptr : &first->value.ptr;
+    } else {
+        found = nullptr;
+    }
+    if (found != nullptr)
+        return *found;
+    return key;
+}
+
+// FUNCTION: 0x4c5840
+int __stdcall FindTranslation(char* name)
+{
+    if (name == nullptr || g_translations == nullptr)
+        return 0;
+    for (std::vector<TdfField>::iterator p = g_translations->v.begin(); p < g_translations->v.end(); p++) {
+        if (_strcmpi(p->value.ptr, name) == 0)
+            return (int)p->key.ptr;
+    }
+    return 0;
+}
+
+// FUNCTION: 0x4c58a0
+int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, size_t size,
+                           char* def)
+{
+    char full[256];
+    strcpy(full, g_language);
+    strcat(full, key);
+    int r;
+    if (def) {
+        r = file->current->GetFieldString(dst, full, size, def);
+        if (r) return 1;
+        return file->current->GetFieldString(dst, key, size, def);
+    }
+    r = file->current->GetFieldString(dst, full, size, DAT_005119b8);
+    if (r) return 1;
+    return file->current->GetFieldString(dst, key, size, DAT_005119b8);
+}
+
+// FUNCTION: 0x4c59d0
+TdfField* TdfFieldVector::Insert(iterator p, const TdfField& x)
+{
+    return insert(p, x);
+}
+
+#pragma auto_inline(off)
+// FUNCTION: 0x4c5ba0
+int TdfFieldVector::GetPairCount(void)
+{
+    return size();
+}
+#pragma auto_inline(on)
+
+#pragma auto_inline(off)
+// FUNCTION: 0x4c5c60
+TdfField* TranslationTable::FindLowerBound(const char* key)
+{
+    TdfField* first = v.begin();
+    TdfField* last = v.end();
+
+    while (first != last) {
+        TdfField* mid = first + (last - first) / 2;
+        bool less = strcmp(mid->key.ptr, key) < 0;
+        if (less)
+            first = mid + 1;
+        else
+            last = mid;
+    }
+    return first;
+}
+#pragma auto_inline(on)
+
+// FUNCTION: 0x4c5cd0
+void __stdcall AssignPairRange(TdfField* first, TdfField* last, const TdfField& x)
+{
+    for (; first != last; ++first)
+        *first = x;
+}
+
+// FUNCTION: 0x4c5d10
+TdfField* __stdcall AssignPairRangeBack(TdfField* first, TdfField* last, TdfField* dest)
+{
+    while (first != last)
+        *--dest = *--last;
+    return dest;
+}
+
+// FUNCTION: 0x4c5d60
+void __stdcall ConstructPair(TdfField* p, const TdfField& value)
+{
+    new ((void*)p) TdfField(value);
 }

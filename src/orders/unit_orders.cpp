@@ -100,7 +100,7 @@ inline int Order::Advance(int distance) {
 
 void __stdcall RegisterOrderTypes(void* table, int id);
 #include "order_list.h"
-#include "../util/math_4b6c30.h"
+#include "../util/math.h"
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, void* flags);
 #include "order_queue.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,

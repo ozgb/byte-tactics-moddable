@@ -213,14 +213,14 @@ Coverage: 80.9% of functions (38 of 47), 73.7% of lines, 63.8% of branches; 9 li
 
 Issue #13. 160 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
-Coverage: 88.6% of functions (93 of 105), 88.7% of lines, 81.9% of branches; 12 live functions no scenario enters, and 37 more are dead (data/coverage.csv).
+Coverage: 88.5% of functions (92 of 104), 88.5% of lines, 81.8% of branches; 12 live functions no scenario enters, and 35 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (12 of 105, #420), by reason:
+**Live functions no scenario enters** (12 of 104, #420), by reason:
 
 - Shutdown only (4): `DestroyPlayerAI`, `FreeSquads`, `SquadManager::DeleteTimers` and `SquadTimer::~SquadTimer`, all called from `FreePlayers`, which `ShutdownIngameSystems` calls and no scenario runs.
 - Console command only (2): `DumpPlayerAI` (console `PrintWeights`) and `ResetAIPlayers` (console `ReloadAIProfiles`). #432 adds a `console` verb.
 - Network only (2): `ProtectUnitDefsReadOnly` and `ProtectUnitDefsReadWrite`, called only from `UnitSync::ApplyToUnitTypes`.
-- Needs a case no scenario sets up yet (4): `SumUnitRatingsInRange` (the AI scout probe rating, `SpatialTimer::OnTimer` calls it only when its probe point is visible) and the three statics only `SpatialTimer::OnTimer` calls: `IsExplored`, `IsVisible` and `Offset` in `ai_player_407e70.cpp`. These are not inlined copies of a function that is entered elsewhere: the other `IsExplored`, `IsVisible` and `Offset` statics in the tree take other argument types and are other functions, and coverage counts an inlined body at its source. `OnTimer` returns before them when the spatial group (group 9) holds no unit, so a scenario needs an AI whose script gives that group units.
+- Needs a case no scenario sets up yet (4): `SumUnitRatingsInRange` (the AI scout probe rating, `SpatialTimer::OnTimer` calls it only when its probe point is visible) and the three statics only `SpatialTimer::OnTimer` calls: `IsExplored`, `IsVisible` and `Offset` in `ai_player.cpp`. These are not inlined copies of a function that is entered elsewhere: the other `IsExplored`, `IsVisible` and `Offset` statics in the tree take other argument types and are other functions, and coverage counts an inlined body at its source. `OnTimer` returns before them when the spatial group (group 9) holds no unit, so a scenario needs an AI whose script gives that group units.
 
 **Entry points.** Phase roots: none. `UpdatePlayerAI` and `SquadManager::TickIfActive` are called by `UpdatePlayers` (players), so the AI runs inside the players phase.
 
@@ -321,7 +321,7 @@ Coverage: 93.8% of functions (45 of 48), 92.4% of lines, 85.4% of branches; 3 li
 
 Issue #15. 118 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
 
-Coverage: 84.1% of functions (74 of 88), 84.2% of lines, 68.5% of branches; 14 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
+Coverage: 84.3% of functions (75 of 89), 84.2% of lines, 68.5% of branches; 14 live functions no scenario enters, and 17 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateProjectiles` and `UpdateExplosions`, called from `RunGameSteps`. `UpdateUnitWeapons` is not a root: `UpdateAllUnits` (units) calls it.
 
@@ -422,7 +422,7 @@ none
 
 Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 84.9% of functions (62 of 73), 82.3% of lines, 71.2% of branches; 11 live functions no scenario enters, and 23 more are dead (data/coverage.csv).
+Coverage: 84.9% of functions (62 of 73), 82.3% of lines, 71.2% of branches; 11 live functions no scenario enters, and 24 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (11 of 73 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437); 62 are entered, 84.9%), by reason:
 
@@ -543,7 +543,7 @@ Coverage: 79.0% of functions (294 of 372), 74.8% of lines, 58.2% of branches; 78
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 70.7% of functions (116 of 164), 74.8% of lines, 63.2% of branches; 48 live functions no scenario enters, and 35 more are dead (data/coverage.csv). The list of those 48 is under **units, functions no scenario enters** below.
+**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 70.7% of functions (116 of 164), 74.8% of lines, 63.2% of branches; 48 live functions no scenario enters, and 33 more are dead (data/coverage.csv). The list of those 48 is under **units, functions no scenario enters** below.
 
 **units, functions no scenario enters** (48 of 164 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422); 116 are entered, 70.7%), by reason:
 
@@ -571,9 +571,9 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Needs a case no scenario sets up yet (1): `MissionConditions::Deactivate` (the console `Kill` command, or a map with no starting units).
 
-**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 76.5% of functions (75 of 98), 78.0% of lines, 69.1% of branches; 23 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
+**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 76.8% of functions (76 of 99), 78.0% of lines, 69.1% of branches; 23 live functions no scenario enters, and 13 more are dead (data/coverage.csv).
 
-**map, functions no scenario enters** (23 of 98 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422); 75 are entered, 76.5%), by reason:
+**map, functions no scenario enters** (23 of 99 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422); 76 are entered, 76.8%), by reason:
 
 - Load only (4): `ForceNeighborFootprintReclaim` (called from `LoadUnit`), `LoadMetalPlotmap`, `LoadPlayerFeaturesPlotmap` and `LoadMappingData` (the saved game files). `save-midgame` (#422) enters the save side; no scenario loads a game.
 - Shutdown only (2): `FreeOtaEnumCacheAndMission`, called at the end of `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick, and `Vector_00438480::~Vector_00438480`, the destructor of the static `g_missionOrderTableVec`, which never runs, because `host_exit` ends the process with `TerminateProcess`.
@@ -649,22 +649,22 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | **wind_meteors** | 12 of 16 | 75.0% | 76.9% | 63.2% | 4 | 0 |
 | **economy** | 18 of 31 | 58.1% | 64.5% | 37.0% | 13 | 3 |
 | **features** | 38 of 47 | 80.9% | 73.7% | 63.8% | 9 | 5 |
-| **ai** | 93 of 105 | 88.6% | 88.7% | 81.9% | 12 | 37 |
+| **ai** | 92 of 104 | 88.5% | 88.5% | 81.8% | 12 | 35 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 85.4% | 3 | 10 |
-| **weapons** | 74 of 88 | 84.1% | 84.2% | 68.5% | 14 | 20 |
+| **weapons** | 75 of 89 | 84.3% | 84.2% | 68.5% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 62 of 73 | 84.9% | 82.3% | 71.2% | 11 | 23 |
+| **los_radar** | 62 of 73 | 84.9% | 82.3% | 71.2% | 11 | 24 |
 | **orders** | 294 of 372 | 79.0% | 74.8% | 58.2% | 78 | 28 |
-| **units** | 116 of 164 | 70.7% | 74.8% | 63.2% | 48 | 35 |
+| **units** | 116 of 164 | 70.7% | 74.8% | 63.2% | 48 | 33 |
 | **players** | 54 of 143 | 37.8% | 40.0% | 32.3% | 89 | 11 |
-| **map** | 75 of 98 | 76.5% | 78.0% | 69.1% | 23 | 12 |
-| files | 98 of 142 | 69.0% | 69.7% | 56.7% | 44 | 36 |
+| **map** | 76 of 99 | 76.8% | 78.0% | 69.1% | 23 | 13 |
+| files | 98 of 142 | 69.0% | 69.7% | 56.7% | 44 | 35 |
 | game | 75 of 183 | 41.0% | 40.3% | 22.4% | 108 | 25 |
 | network | 49 of 325 | 15.1% | 9.4% | 3.8% | 276 | 77 |
-| platform | 314 of 646 | 48.6% | 34.3% | 22.3% | 332 | 82 |
+| platform | 314 of 641 | 49.0% | 34.4% | 22.3% | 327 | 80 |
 | presentation | 442 of 1136 | 38.9% | 30.4% | 21.4% | 694 | 311 |
 | seams | 83 of 103 | 80.6% | 90.6% | - | 20 | 0 |
-| state | 298 of 361 | 82.5% | 79.5% | 49.8% | 63 | 22 |
+| state | 289 of 352 | 82.1% | 79.2% | 49.8% | 63 | 21 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
 

@@ -58,7 +58,7 @@ public:
 
 #include "../game/data_files.h"
 void __stdcall ShowErrorBox(const char* text, const char* caption);
-#include "../util/tdf_4c54f0.h"
+#include "../util/tdf.h"
 int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, char* def);
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall SetCursorMode(int n);

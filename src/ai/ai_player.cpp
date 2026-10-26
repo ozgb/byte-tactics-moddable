@@ -7,7 +7,6 @@
 #include <math.h>
 #include <vector>
 #include <new>
-#include <memory.h>
 #include "../state/sim_allocator.h"
 #include "win_types.h"
 
@@ -787,9 +786,9 @@ void SpatialTimer::OnTimer()
         Unit* u = *it;
         if (u->def->c04) {
             if (u->motion || g_seams.weapons->WeaponCanReachPos(u, (Vec3*)&u->pos, (Vec3*)&best, 0)) {
-                MissionType kind = g_seams.orders->GetOrderType(3, u, 0, (Vec3*)&best);
+                MissionType kind = g_seams.orders->GetOrderType(3, u, nullptr, (Vec3*)&best);
                 if (kind.index)
-                    g_seams.orders->AddOrder(kind, 0, u, 0, (Vec3*)&best, 0, 0);
+                    g_seams.orders->AddOrder(kind, 0, u, nullptr, (Vec3*)&best, 0, 0);
             }
         }
     }
@@ -855,8 +854,8 @@ void ScoutTimer::OnTimer()
                         ok = 0;
                 }
                 if (ok) {
-                    MissionType kind = g_seams.orders->GetOrderType(0xe, u, 0, &pos);
-                    g_seams.orders->AddOrder(kind, 0, u, 0, &pos, idx, 1);
+                    MissionType kind = g_seams.orders->GetOrderType(0xe, u, nullptr, &pos);
+                    g_seams.orders->AddOrder(kind, 0, u, nullptr, &pos, idx, 1);
                 }
             }
         }
@@ -874,10 +873,10 @@ void ScoutTimer::OnTimer()
                     d = Direction(RandomInt(0x10000), 0x2800000);
                 target = origin + d;
                 MissionType kind;
-                kind = g_seams.orders->GetOrderType(2, u, 0, &target);
-                g_seams.orders->AddOrder(kind, 0, u, 0, &target, 0, 0);
-                kind = g_seams.orders->GetOrderType(9, u, 0, &origin);
-                g_seams.orders->AddOrder(kind, 1, u, 0, &origin, 0, 0);
+                kind = g_seams.orders->GetOrderType(2, u, nullptr, &target);
+                g_seams.orders->AddOrder(kind, 0, u, nullptr, &target, 0, 0);
+                kind = g_seams.orders->GetOrderType(9, u, nullptr, &origin);
+                g_seams.orders->AddOrder(kind, 1, u, nullptr, &origin, 0, 0);
             } else {
                 Vec3 d = origin - u->pos;
                 int len = Vec3Length(&d);
@@ -892,8 +891,8 @@ void ScoutTimer::OnTimer()
                     }
                     target = u->pos + d;
                 }
-                MissionType kind = g_seams.orders->GetOrderType(9, u, 0, &target);
-                g_seams.orders->AddOrder(kind, 0, u, 0, &target, 0, 0);
+                MissionType kind = g_seams.orders->GetOrderType(9, u, nullptr, &target);
+                g_seams.orders->AddOrder(kind, 0, u, nullptr, &target, 0, 0);
             }
         }
     }
@@ -910,7 +909,7 @@ ScoutTimer::ScoutTimer(SquadManager* p, Group* q)
 // FUNCTION: 0x408620
 void BuildTimer::TryIssueIdleFactoryBuildOrder(Unit* unit)
 {
-    if (unit->list != 0)
+    if (unit->list != nullptr)
         return;
     unsigned short idx = ChooseBuildOption(player, unit);
     if (idx != 0)

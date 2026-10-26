@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
-#include <memory.h>
 #include <stddef.h>
 #include <new>
 
@@ -14,6 +13,7 @@
 #include "../state/block.h"
 #include "../state/sim_globals.h"
 #include "../quirks/quirks.h"
+#include "../files/file_handle.h"
 #include "../files/files_api.h"
 
 #ifdef __clang__
@@ -574,15 +574,15 @@ int TdfFile::LoadFile(char* path)
             result = flag;
             if (root)
                 delete root;
-            root = 0;
-            current = 0;
+            root = nullptr;
+            current = nullptr;
             flags = result;
             char* text = (char*)GameAllocIgnoreTag("TDF file", size + 1);
             memcpy(text, buf, size);
             text[size] = 0;
             this->StripComments(text);
             TdfRecord* node = (TdfRecord*)operator new(0x29);
-            root = node ? new (node) TdfRecord("root", text, 0, path) : 0;
+            root = node ? new (node) TdfRecord("root", text, nullptr, path) : nullptr;
             GameFreeThunk((int*)text);
             result = 1;
         }
@@ -596,15 +596,15 @@ int TdfFile::LoadFile(char* path)
 void TdfFile::LoadBuffer(char* data, int size, int flag, char* path)
 {
     delete root;
-    root = 0;
-    current = 0;
+    root = nullptr;
+    current = nullptr;
     flags = flag;
     char* text = (char*)GameAllocIgnoreTag("TDF file", size + 1);
     memcpy(text, data, size);
     text[size] = 0;
     this->StripComments(text);
     TdfRecord* node = (TdfRecord*)SimAlloc(0x29);
-    root = node ? new (node) TdfRecord("root", text, 0, path) : 0;
+    root = node ? new (node) TdfRecord("root", text, nullptr, path) : nullptr;
     GameFreeThunk((int*)text);
 }
 
@@ -613,8 +613,8 @@ void TdfFile::LoadBuffer(char* data, int size, int flag, char* path)
 TdfFile::~TdfFile()
 {
     delete root;
-    root = 0;
-    current = 0;
+    root = nullptr;
+    current = nullptr;
     flags = 0;
 }
 
@@ -633,9 +633,9 @@ public:
             p++;
         }
         ::operator delete(_First);
-        _First = 0;
-        _Last = 0;
-        _End = 0;
+        _First = nullptr;
+        _Last = nullptr;
+        _End = nullptr;
     }
 };
 
@@ -710,10 +710,10 @@ void __stdcall LoadTranslations(char* filename, char* section)
 // FUNCTION: 0x4c5740
 char* __stdcall Translate(char* key)
 {
-    if (key == 0)
-        return 0;
+    if (key == nullptr)
+        return nullptr;
     TranslationTable* c = g_translations;
-    if (c == 0)
+    if (c == nullptr)
         return key;
 
     TdfField* first = c->v.begin();
@@ -732,11 +732,11 @@ char* __stdcall Translate(char* key)
     char** found;
     if (first != end) {
         bool before = strcmp(key, first->key.ptr) < 0;
-        found = before ? 0 : &first->value.ptr;
+        found = before ? nullptr : &first->value.ptr;
     } else {
-        found = 0;
+        found = nullptr;
     }
-    if (found != 0)
+    if (found != nullptr)
         return *found;
     return key;
 }
@@ -744,7 +744,7 @@ char* __stdcall Translate(char* key)
 // FUNCTION: 0x4c5840
 int __stdcall FindTranslation(char* name)
 {
-    if (name == 0 || g_translations == 0)
+    if (name == nullptr || g_translations == nullptr)
         return 0;
     for (std::vector<TdfField>::iterator p = g_translations->v.begin(); p < g_translations->v.end(); p++) {
         if (_strcmpi(p->value.ptr, name) == 0)

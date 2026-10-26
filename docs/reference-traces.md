@@ -151,6 +151,31 @@ the first difference prints the `tracediff` report. Add `--quick` for a fixed
 subset of five scenarios (not the gate). `--game-dir` names the install; the
 default is Steam's.
 
+## A loaded game's trace
+
+`load-midgame` starts from the save that `save-midgame` makes in the same run of the suite (the save is
+made each run and never committed). Its trace starts at tick 901 and ends at 1800.
+
+It does not match the uninterrupted game (`save-midgame`, the same as `skirmish2`) from the saved tick on:
+every row from tick 901 differs. Do not compare the two. Compare a loaded game with the digests of
+`load-midgame`.
+
+- At tick 901, phase `units`, the first differing field is `rng.parkMiller`, then `rng.crtHoldrand`: the save
+  does not hold the random streams, and the load reseeds them.
+- At tick 901 the players table differs too: the names (`name` and `fullName`), `active` of slot 2, and
+  `metalCapacity` and `energyCapacity`.
+
+What the code shows about those fields (`LoadPlayers` and `SavePlayers`, src/game/players.cpp:984-1066):
+
+- `name`, `fullName` and `active` are not saved and not read back by `LoadPlayers`. `SetupPlayerSlot`
+  (players.cpp:71-130) is the code that sets them (`active` at line 95, the names at lines 103-128); the
+  `LoadPlayers` does not call it.
+- `metalCapacity` and `energyCapacity` are not saved either. `UpdatePlayerEconomy` (economy.cpp:311) sets both to
+  zero and recomputes them every tick from the units' storage, plus the player's storage bonus, which is
+  saved (`PlayerEnergyStorage`, `PlayerMetalStorage`).
+- This page does not say which phase of a later tick those fields first agree with the uninterrupted game:
+  the code read here does not show it.
+
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or

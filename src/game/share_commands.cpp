@@ -109,26 +109,12 @@ static inline void ShareMetal(int unused)
     }
 }
 
-static inline void ShareEnergy(int unused)
-{
-    char buf[256];
-    if (g_game->netGameFlags & 1) {
-        PlayerInfo* data = g_game->players[g_game->localPlayer].info;
-        data->flags_97_wide = (data->flags_97_wide & ~4) | (~data->flags_97_wide & 4);
-        sprintf(buf, "Toggled ShareEnergy to: %s",
-                (g_game->players[g_game->localPlayer].info->flags_97_wide & 4)
-                    ? "ON" : "OFF");
-        AddMessage(buf, 2, 0, 10);
-        BroadcastPlayerInfo();
-    }
-}
-
 // FUNCTION: 0x419090
 void __stdcall CmdShareAll(int unused)
 {
     if (g_game->netGameFlags & 1) {
         ShareMetal(unused);
-        ShareEnergy(unused);
+        CmdShareEnergy(unused);
         g_seams.los_radar->CmdShareMapping(unused);
         g_seams.los_radar->CmdShareRadar(unused);
     }

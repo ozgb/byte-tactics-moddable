@@ -989,20 +989,13 @@ void __stdcall WorldToScreenWithHeight(Pos_00417bb0* pos, int* screen_x, int* sc
     *screen_y = pos->z - g_game->scrollY - (height >> 1) + 0x20;
 }
 
-static inline void WorldToScreen(Pos_00417bb0* pos, int* screen_x, int* screen_y)
-{
-    int height = GetGroundHeight(pos);
-    *screen_x = pos->x - g_game->scrollX + 0x80;
-    *screen_y = pos->z - g_game->scrollY - (height >> 1) + 0x20;
-}
-
 // FUNCTION: 0x417c00
 void __stdcall WorldToScreenTileOffset(int x, int z, int* screen_x, int* screen_y)
 {
     Pos_00417bb0 pos;
     *(int*)&pos.x_frac = x << 16;
     *(int*)&pos.z_frac = z << 16;
-    WorldToScreen(&pos, screen_x, screen_y);
+    WorldToScreenWithHeight(&pos, screen_x, screen_y);
 }
 
 // FUNCTION: 0x417c70
@@ -1033,8 +1026,8 @@ void __stdcall DrawWorldSegmentLine(void* surface, Point16 from, short dx, short
     *(int*)&pos2.x_frac = x1 + (dx << 16);
     *(int*)&pos2.z_frac = z1 + (dz << 16);
     int sx1, sy1, sx2, sy2;
-    WorldToScreen(&pos1, &sx1, &sy1);
-    WorldToScreen(&pos2, &sx2, &sy2);
+    WorldToScreenWithHeight(&pos1, &sx1, &sy1);
+    WorldToScreenWithHeight(&pos2, &sx2, &sy2);
     DrawLine(surface, sx1, sy1, sx2, sy2, color & 0xff);
 }
 

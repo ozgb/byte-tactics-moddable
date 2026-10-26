@@ -3858,19 +3858,6 @@ void __stdcall LayoutLabelText(Gui* obj, int index)
     entry->height = (short)lh;
 }
 
-static inline void GetGadgetRect_inlined(Gadget* entry, Rect* rect)
-{
-    if (entry->type == 0) {
-        rect->left = 0;
-        rect->top = 0;
-    } else {
-        rect->left = entry->x;
-        rect->top = entry->y;
-    }
-    rect->right = entry->width + rect->left - 1;
-    rect->bottom = entry->height + rect->top - 1;
-}
-
 // FUNCTION: 0x4a56b0
 void __stdcall DrawLabel(Gui* obj, int index)
 {
@@ -3884,7 +3871,7 @@ void __stdcall DrawLabel(Gui* obj, int index)
         entries[index].x = (short)((entries[0].width - GetTextPixelWidth(entries[index].u.text)) / 2);
 
     Rect rect;
-    GetGadgetRect_inlined(&entries[index], &rect);
+    GetGadgetRect(&entries[index], &rect);
 
     if (entries[index].image != 0)
         FillRectangle(entries->u.assets.surface, &rect, obj->colours[entries[index].image]);
@@ -4272,7 +4259,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
         goto fail;
 
     Rect r;
-    GetGadgetRect_inlined(entry, &r);
+    GetGadgetRect(entry, &r);
 
     Point point = *(Point*)&obj->pointX;
     point.x -= entries->x;
@@ -4647,34 +4634,6 @@ void __stdcall SelectGadgetByIndex(Gui* menu, int index)
     }
 }
 
-static inline void FUN_004a7190_inlined(Gui* obj, int index)
-{
-    Gadget* entries = obj->layer->entries;
-    Gadget* target = &entries[index];
-
-    SetTextColors(obj->colours[target->colours], GetTextKeyColor());
-
-    int n = 0;
-    int i = 1;
-    for (; i < entries->u.count + 1; i++) {
-        if (entries[i].type == 7) {
-            if (n == target->tab) {
-                SetFont(entries[i].u.list.language);
-                break;
-            }
-            n++;
-        }
-    }
-    if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
-    }
-
-    TrySetFocus(obj, index);
-    obj->layer->current = index;
-    CommitTextEdit(obj, index, target->u.text, target->status, 0);
-    ClearKeyQueue();
-}
-
 // FUNCTION: 0x4a7960
 void __stdcall SelectAdjacentGadget(Gui* menu, int dir)
 {
@@ -4782,9 +4741,9 @@ void __stdcall SelectAdjacentGadget(Gui* menu, int dir)
     menu->focus = -1;
     layer->current = index;
     if (entries[menu->layer->current].type == 3)
-        FUN_004a7190_inlined(menu, menu->layer->current);
+        BeginTextEdit(menu, menu->layer->current);
     if (entries[menu->layer->current].type == 3)
-        FUN_004a7190_inlined(menu, menu->layer->current);
+        BeginTextEdit(menu, menu->layer->current);
 }
 
 // FUNCTION: 0x4a7ee0
@@ -5735,27 +5694,7 @@ static inline void SelectGadgetByIndex_inlined(Gui* menu, int index)
     menu->focus = -1;
     menu->layer->current = index;
     if (first[menu->layer->current].type == 3)
-        FUN_004a7190_inlined(menu, menu->layer->current);
-}
-
-static inline void CloseTopScreen_inlined(Gui* gui)
-{
-    if (gui->layer) {
-        unsigned int flags = gui->layer->flags;
-        gui->hoverGadgetIndex = gui->hotGadgetIndex = gui->focus = -1;
-        if (gui->layer->handler)
-            gui->layer->handler(gui);
-        HideSoftwareCursor();
-        RenderLayer(gui, 2);
-        ShowSoftwareCursor();
-        Layer* old = gui->layer;
-        gui->layer = old->next;
-        if (gui->layer)
-            gui->layer->dirty = 1;
-        GameFreeThunk(old);
-        if (flags & 0x800)
-            RenderLayer(gui, 0x40);
-    }
+        BeginTextEdit(menu, menu->layer->current);
 }
 
 // FUNCTION: 0x4a9fd0
@@ -5950,7 +5889,7 @@ int __stdcall UpdateMenu(Gui* menu)
         if (menu->layer->handler != 0)
             menu->layer->handler(menu);
         if (menu->hotGadgetIndex != -1)
-            CloseTopScreen_inlined(menu);
+            CloseTopScreen(menu);
     }
     return 1;
 }

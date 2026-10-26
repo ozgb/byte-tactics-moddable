@@ -686,32 +686,15 @@ short __stdcall FindFeatureType(char* name)
     return -1;
 }
 
-static inline unsigned short FindName(char* name)
-{
-    for (int i = 0; i < g_game->featureCount; i++) {
-        if (_strcmpi(name, g_game->features[i].name) == 0) {
-            return (unsigned short)i;
-        }
-    }
-    return 0xffff;
-}
 // FUNCTION: 0x422e40
 unsigned short __stdcall FindOrLoadFeatureType(char* name)
 {
-    unsigned short i = FindName(name);
+    unsigned short i = (unsigned short)FindFeatureType(name);
     if (i == 0xffff)
         i = LoadFeatureType(name);
     return i;
 }
 
-static inline int FindFeature(char* name)
-{
-    for (int i = 0; i < g_game->featureCount; i++) {
-        if (_strcmpi(name, g_game->features[i].name) == 0)
-            return i;
-    }
-    return 0xffff;
-}
 // FUNCTION: 0x422ea0
 void ResolveFeatureLinks()
 {
@@ -748,7 +731,7 @@ void PlaceMissionFeatures(void)
         MissionFeature* p = &g_game->net->features[i];
         if (p->name[0] == 0)
             continue;
-        unsigned short id = (unsigned short)FindFeature(p->name);
+        unsigned short id = (unsigned short)FindFeatureType(p->name);
         if (id == 0xffff) {
             id = LoadFeatureType(p->name);
             if (id == 0xffff)
@@ -802,17 +785,6 @@ void __stdcall MoveFeatureSpot(int index, int* head)
         p->entries[e->prev].next = index;
 }
 
-static inline int AllocSpot()
-{
-    Pool* p = &g_game->pool;
-    int i = p->freeHead;
-    if (i == -1) {
-        return 0x800;
-    }
-    MoveFeatureSpot(i, &p->usedHead);
-    p->entries[i].used = 0;
-    return i;
-}
 // FUNCTION: 0x4233a0
 void __stdcall StartFeatureBurning(int x, int z, int flag)
 {
@@ -826,7 +798,7 @@ void __stdcall StartFeatureBurning(int x, int z, int flag)
         return;
     if (cell->flags & 1)
         return;
-    int i = AllocSpot();
+    int i = AllocFeatureSpot();
     if (i >= 0x800)
         return;
     Spot* s = &g_game->pool.entries[i];
@@ -883,7 +855,7 @@ void __stdcall KillFeature(int x, int z, int flag)
     if (pair.anim != 0) {
         if (cell->flags & 1)
             return;
-        int i = AllocSpot();
+        int i = AllocFeatureSpot();
         if (i >= 0x800)
             return;
         Spot* s = &g_game->pool.entries[i];
@@ -1007,16 +979,6 @@ int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
     return 1;
 }
 
-static inline Vec3 FootprintCentre(Point16* cell, Feature* def)
-{
-    Point16 f = def->footprint;
-    Point16 c = *cell;
-    Vec3 p;
-    p.x = (f.x + c.x * 2) << 19;
-    p.z = (f.y + c.y * 2) << 19;
-    p.y = g_seams.units->GetGroundHeight(&p) << 16;
-    return p;
-}
 // FUNCTION: 0x4239c0
 void __stdcall SpreadFire(Feature* f, Point16* cell)
 {
@@ -1059,7 +1021,7 @@ void __stdcall SpreadFire(Feature* f, Point16* cell)
         }
     }
     if (f->burnweapon) {
-        Vec3 pos = FootprintCentre(cell, f);
+        Vec3 pos = GetFootprintCentre(cell, f);
         g_seams.weapons->ApplyAreaDamageAt((WeaponDef*)f->burnweapon.get(), &pos);
     }
 }
@@ -1107,7 +1069,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
         }
     }
     if (!f->noobject) {
-        int i = AllocSpot();
+        int i = AllocFeatureSpot();
         if (i >= 0x800)
             return 0;
         spot = &g_game->pool.entries[i];
@@ -1117,7 +1079,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
         if (pos)
             spot->pos = *pos;
         else
-            spot->pos = FootprintCentre(&at, f);
+            spot->pos = GetFootprintCentre(&at, f);
         if (rot)
             spot->rot = *rot;
         else
@@ -1147,7 +1109,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
         if (pos) {
             EmitTimedSubParticles(pos, 4);
         } else {
-            Vec3 p = FootprintCentre(&at, f);
+            Vec3 p = GetFootprintCentre(&at, f);
             EmitTimedSubParticles(&p, 4);
         }
     }

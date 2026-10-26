@@ -164,18 +164,6 @@ int GetScreenLockCount(void)
     return g_screenLockCount;
 }
 
-static inline int UnlockScreenInline(Surface* s)
-{
-    Display* d = GetDisplay();
-    if (d->windowed == 0 && d->useOverrideSurface == 0) {
-        if (!host_frame_unlock(HOST_FRAME_BACK))
-            return 0;
-        if (g_screenLockCount > 0)
-            g_screenLockCount--;
-    }
-    return 1;
-}
-
 // FUNCTION: 0x4c5df0
 void UnlockAllScreens(void)
 {
@@ -184,7 +172,7 @@ void UnlockAllScreens(void)
         if (g_screenLocks[g_screenLockCount].flag)
             UnlockPrimary(g_screenLocks[g_screenLockCount - 1].surface, 0, 0);
         else
-            UnlockScreenInline(g_screenLocks[g_screenLockCount - 1].surface);
+            UnlockScreen(g_screenLocks[g_screenLockCount - 1].surface);
         if (i == g_screenLockCount)
             g_screenLockCount--;
     }
@@ -280,18 +268,6 @@ int __stdcall RestoreSurfaces(Arg_004c6210* arg)
     return r;
 }
 
-static inline int UnlockScreenInline()
-{
-    Display* d = GetDisplay();
-    if (d->windowed == 0 && d->useOverrideSurface == 0) {
-        if (!host_frame_unlock(HOST_FRAME_BACK))
-            return 0;
-        if (g_screenLockCount > 0)
-            g_screenLockCount--;
-    }
-    return 1;
-}
-
 // FUNCTION: 0x4c62c0
 void RestoreScreen(void)
 {
@@ -304,7 +280,7 @@ void RestoreScreen(void)
                     Surface screen;
                     LockScreen(&screen);
                     BlitSurface(&screen, d2->activeSurface, 0, 0);
-                    UnlockScreenInline();
+                    UnlockScreen(nullptr);
                 }
             }
         }
@@ -349,7 +325,7 @@ static inline int RestoreSurfacesInline(Display* d)
     Surface screen;
     LockScreen(&screen);
     BlitSurface(&screen, dd->activeSurface, 0, 0);
-    UnlockScreenInline();
+    UnlockScreen(nullptr);
     return 0;
 }
 
@@ -491,31 +467,11 @@ void __stdcall ResetClipRect(int* surface)
     *(Rect*)(surface + 7) = q;
 }
 
-static inline void Init(Surface* s, int width, int height, int a, int b)
-{
-    s->width = width;
-    s->height = height;
-    s->pitch = a;
-    s->pixels = (unsigned char*)b;
-    s->x = 0;
-    s->y = 0;
-    s->zPriority = 10000;
-    s->colorKey = -1;
-    s->flag0 = 1;
-    s->flag1 = 0;
-    Rect r;
-    r.left = 0;
-    r.top = 0;
-    r.right = width - 1;
-    r.bottom = height - 1;
-    s->clip = r;
-}
-
 // FUNCTION: 0x4c69f0
 Surface* __stdcall AllocSurface(char* name, int width, int height)
 {
     Surface* s = (Surface*)GameAllocIgnoreTag(name, height * width + 0x30);
-    Init(s, width, height, width, (int)(s + 1));
+    InitSurface(s, width, height, width, (int)(s + 1));
     return s;
 }
 
@@ -586,7 +542,7 @@ void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y)
         if (LockScreen(&screen) == 0)
             return;
         BlitSurface(&screen, bmp, x - bmp->x, y - bmp->y);
-        UnlockScreenInline(0);
+        UnlockScreen(0);
         return;
     }
     if (bmp == 0) {
@@ -594,7 +550,7 @@ void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y)
         if (LockScreen(&screen) == 0)
             return;
         BlitSurface(dst, &screen, x, y);
-        UnlockScreenInline(0);
+        UnlockScreen(0);
         return;
     }
     BlitSurface(dst, bmp, x - bmp->x, y - bmp->y);
@@ -607,7 +563,7 @@ void __stdcall DrawSurfaceKeyed(Surface* dst, Surface* src, int x, int y, int co
         Surface screen;
         if (LockScreen(&screen)) {
             BlitSurfaceKeyed(&screen, src, x - src->x, y - src->y, color);
-            UnlockScreenInline(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         BlitSurfaceKeyed(dst, src, x - src->x, y - src->y, color);
@@ -632,7 +588,7 @@ void __stdcall CopySurfaceRect(Surface* dst, Surface* src, Rect* rect, Point* po
         Surface screen;
         if (LockScreen(&screen)) {
             BlitRect(&screen, src, rect, pos);
-            UnlockScreenInline(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         BlitRect(dst, src, rect, pos);
@@ -646,7 +602,7 @@ void __stdcall CopySurfaceRectKeyed(Surface* dst, Surface* src, Rect* rect, Poin
         Surface screen;
         if (LockScreen(&screen)) {
             BlitRectKeyed(&screen, src, rect, pos, transparent);
-            UnlockScreenInline(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         BlitRectKeyed(dst, src, rect, pos, transparent);
@@ -660,7 +616,7 @@ void __stdcall DrawTile(Surface* dst, Surface* src, Rect* rect, Point* pos)
         Surface screen;
         if (LockScreen(&screen)) {
             BlitTile32x32(&screen, src, rect, pos);
-            UnlockScreenInline(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         BlitTile32x32(dst, src, rect, pos);

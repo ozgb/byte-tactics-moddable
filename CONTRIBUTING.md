@@ -41,6 +41,12 @@ WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe \
     --testmode reference/scenarios/skirmish2.txt --game-dir ~/.ta
 ```
 
+Every play-test run is private: its own Xvfb display, Wine prefix, game copy
+and audio sink. The `mp` scenario (two instances, DirectPlay over TCP/IP) also
+runs in its own network namespace, so any number of play-tests and gates may
+run at once on one machine. That needs `unshare`, `nsenter` and `ip`
+(util-linux, iproute2) and unprivileged user namespaces.
+
 Configuring runs `tools/modern_headers.py`, which writes patched copies of the
 nine STL headers clang-cl cannot parse, and a case-insensitive overlay for
 MSVC 5's upper-case `INCLUDE`, under `build/modern/`. The toolchain itself is

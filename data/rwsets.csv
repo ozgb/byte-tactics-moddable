@@ -1749,7 +1749,7 @@ address,function,file,kind,target
 0x407ae0,SquadScoutTimer::OnTimer,src/ai/ai_player.cpp,function,
 0x407ae0,SquadScoutTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_game
 0x407ae0,SquadScoutTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_quirks
-0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,call,Vec3At
+0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,call,MakeVec3
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,call,operator=
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,field_read,Game::baseX
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,field_read,Game::baseY
@@ -1766,7 +1766,6 @@ address,function,file,kind,target
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,begin
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,empty
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,end
-0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,get
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,operator Player *
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,operator bool
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,operator+=
@@ -1794,7 +1793,7 @@ address,function,file,kind,target
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,SquadTimer::player
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::def
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::motion
-0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitDefFlags_00407e90::flag4
+0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitDef::c04
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,WeaponsSeam::WeaponCanReachPos
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_write,SpatialTimer::best
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_write,SpatialTimer::bestRating
@@ -1807,16 +1806,15 @@ address,function,file,kind,target
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via MissionType (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, Vec3 *, Vec3 *, int) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachPos]"
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(MissionType, int, Unit *, Unit *, Vec3 *, int, int) __attribute__((stdcall)) [OrdersSeam::AddOrder]"
-0x408090,IsPointVisible,src/ai/ai_player.cpp,call,MapSize_00408090::Contains
 0x408090,IsPointVisible,src/ai/ai_player.cpp,call,operator unsigned short *
 0x408090,IsPointVisible,src/ai/ai_player.cpp,deref_read,*unsigned short
-0x408090,IsPointVisible,src/ai/ai_player.cpp,field_maybe_written,Map_00408090::size
 0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Game::playerIndex
 0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Game::visibilityMask
-0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,MapSize_00408090::width
-0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Position_00408090::x
-0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Position_00408090::y
-0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Position_00408090::z
+0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Player::exploredHeight
+0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Player::exploredWidth
+0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Vec3Words::xWhole
+0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Vec3Words::yWhole
+0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Vec3Words::zWhole
 0x408090,IsPointVisible,src/ai/ai_player.cpp,function,
 0x408090,IsPointVisible,src/ai/ai_player.cpp,global_read,g_game
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,ChooseBuildOption
@@ -1826,24 +1824,25 @@ address,function,file,kind,target
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,FixMul
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,GetBasePosition
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,GetBuilderCount
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,Length
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,IsFlag12
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,MapRange
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,RandomInt
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,Vec3Length
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,begin
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,end
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,get
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,operator Item_00408100 *
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,operator UnitDef *
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,operator bool
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,operator+
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,operator-
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,operator->
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,operator=
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,deref_escape,*Item_00408100
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,deref_read,*Unit_00408100
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_maybe_written,Group_00408100::units
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Game_00408100::gameTick
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Game_00408100::unitDefs
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Order_00408100::flags
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,deref_maybe_written,*UnitDef
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,deref_read,*Unit
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_maybe_written,Group::units
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Game::defs
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Game::ticks
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Order::flags_42
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,OrdersSeam::AddOrder
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,OrdersSeam::GetOrderType
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Seams::orders
@@ -1851,11 +1850,10 @@ address,function,file,kind,target
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,SquadTimer::group
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,SquadTimer::owner
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,SquadTimer::player
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitDef_00408100::count
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitDef_00408100::flag12
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit_00408100::def
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit_00408100::list
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit_00408100::pos
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::def
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::list
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::pos
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitDef::count
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Vec3::x
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Vec3::y
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Vec3::z
@@ -1871,9 +1869,9 @@ address,function,file,kind,target
 0x408600,ScoutTimer::ScoutTimer,src/ai/ai_player.cpp,function,
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,ChooseBuildOption
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,QueueBuildOrder
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,get
+0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,operator UnitDef *
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,operator!=
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_maybe_written,Item_00408620::name
+0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_escape,UnitDef::unitname
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_read,Game::defs
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_read,SquadTimer::player
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_read,Unit::list
@@ -2437,8 +2435,6 @@ address,function,file,kind,target
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player.cpp,field_read,UnitList_00409160::units
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player.cpp,field_read,Vec3::x
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player.cpp,field_read,Vec3::z
-0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player.cpp,field_read,Vec_0040b1c0::x
-0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player.cpp,field_read,Vec_0040b1c0::z
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player.cpp,function,
 0x40b1c0,SumUnitRatingsInRange,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp,call,PlayerAI::ComputeBaseWeights
@@ -2471,14 +2467,13 @@ address,function,file,kind,target
 0x40b390,DestroyPlayerAI,src/ai/ai_player.cpp,global_write,g_playerAI
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,call,begin
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,call,end
-0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,call,get
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,call,operator->
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,call,push_back
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,deref_read,*Unit
-0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,Def::flags
-0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,Owner::factories
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,Unit::activateFlags
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,Unit::def
+0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,UnitDef::flags1
+0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,UnitList_00409160::units
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,Vec3::x
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,Vec3::z
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,Vec::x
@@ -2667,6 +2662,9 @@ address,function,file,kind,target
 0x40c4f0,HasSpecialUnit,src/ai/ai_player.cpp,deref_read,*int
 0x40c4f0,HasSpecialUnit,src/ai/ai_player.cpp,function,
 0x40c4f0,HasSpecialUnit,src/ai/ai_player.cpp,global_read,g_playerAI
+0x40c510,CopyOneByte,src/ai/ai_player.cpp,call,operator new
+0x40c510,CopyOneByte,src/ai/ai_player.cpp,deref_read,*Elem_0040d4f0
+0x40c510,CopyOneByte,src/ai/ai_player.cpp,function,
 0x40cc80,Grow_0040cca0,src/ai/ai_player.cpp,call,reserve
 0x40cc80,Grow_0040cca0,src/ai/ai_player.cpp,call,size
 0x40cc80,Grow_0040cca0,src/ai/ai_player.cpp,function,
@@ -8958,7 +8956,7 @@ address,function,file,kind,target
 0x42a610,ComputeUnitScriptChecksum,src/game/data_files.cpp,global_read,g_game
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,BuildDataPath
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,ComputeChecksum
-0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,Elem_00432be0::operator char *
+0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,FileNameEntry::operator char *
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,FindWeapon
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,GameAllocIgnoreTag
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,GameFreeThunk
@@ -12874,36 +12872,10 @@ address,function,file,kind,target
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,function,
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,global_read,g_seams
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(MovementClass *, int, Point16, Point16) __attribute__((fastcall)) [MapSeam::RefreshPassMap]"
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,call,memset
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,call,operator->
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,field_escape,Game::players
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,field_read,Player::active
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,field_read,Player::index
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,field_read,Player::info
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,field_read,Player::type
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,field_read,PlayerInfo::color
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,function,
-0x440c10,FindUnusedLogo,src/units/movement_class.cpp,global_read,g_game
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,call,operator=
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,field_read,Src_00440ca0::rect
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,field_write,Dst_00440ca0::rect
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,function,
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,call,FindHostSlot
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,call,operator Mission *
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,call,operator PlayerInfo *
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,field_read,Game::net
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,field_read,MapSeam::ComputeMapChecksum
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,field_read,MapSeam::GetTerrainLength
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,field_read,Player::info
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,field_read,PlayerInfo::mapCrc
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,field_read,PlayerInfo::versionMajor
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,field_read,PlayerInfo::versionMinor
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,field_read,Seams::map
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,function,
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,global_read,g_game
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,global_read,g_seams
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::ComputeMapChecksum]
-0x440cd0,CheckMapCrc,src/units/movement_class.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetTerrainLength]
 0x440d70,HandleNewMultiClick,src/frontend/multi.cpp,call,BeginTextEdit
 0x440d70,HandleNewMultiClick,src/frontend/multi.cpp,call,ClearSelectedGadget
 0x440d70,HandleNewMultiClick,src/frontend/multi.cpp,call,CloseTopScreen
@@ -26807,8 +26779,8 @@ address,function,file,kind,target
 0x484fa0,LoadMappingData,src/map/plot_map.cpp,global_read,g_game
 0x485010,GetCellHeight,src/map/terrain.cpp,call,CellAt
 0x485010,GetCellHeight,src/map/terrain.cpp,field_read,Cell::height
-0x485010,GetCellHeight,src/map/terrain.cpp,field_read,Point16_00485010::x
-0x485010,GetCellHeight,src/map/terrain.cpp,field_read,Point16_00485010::y
+0x485010,GetCellHeight,src/map/terrain.cpp,field_read,Point16::x
+0x485010,GetCellHeight,src/map/terrain.cpp,field_read,Point16::y
 0x485010,GetCellHeight,src/map/terrain.cpp,function,
 0x485070,GetGroundHeight,src/units/units.cpp,call,operator Cell *
 0x485070,GetGroundHeight,src/units/units.cpp,deref_escape,*Cell
@@ -26820,9 +26792,11 @@ address,function,file,kind,target
 0x485070,GetGroundHeight,src/units/units.cpp,function,
 0x485070,GetGroundHeight,src/units/units.cpp,global_read,g_game
 0x485140,GetCellMeanHeight,src/map/terrain.cpp,call,GetCellCachedWidth
+0x485140,GetCellMeanHeight,src/map/terrain.cpp,call,WholePart
 0x485140,GetCellMeanHeight,src/map/terrain.cpp,field_read,Cell::high
 0x485140,GetCellMeanHeight,src/map/terrain.cpp,field_read,Cell::low
-0x485140,GetCellMeanHeight,src/map/terrain.cpp,field_read,Fixed_00485070::whole
+0x485140,GetCellMeanHeight,src/map/terrain.cpp,field_read,Vec3::x
+0x485140,GetCellMeanHeight,src/map/terrain.cpp,field_read,Vec3::z
 0x485140,GetCellMeanHeight,src/map/terrain.cpp,function,
 0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,call,CellAt
 0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,call,abs
@@ -26836,20 +26810,22 @@ address,function,file,kind,target
 0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,Game::features
 0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,Game::units
 0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,Unit::def
-0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,UnitType::modelMaxY
+0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,UnitDef::modelMaxY
+0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,Vec3::x
 0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,Vec3::y
-0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,Vec3_004851c0::x
-0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,Vec3_004851c0::y
-0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,Vec3_004851c0::z
-0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_write,Vec3_004851c0::x
-0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_write,Vec3_004851c0::y
-0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_write,Vec3_004851c0::z
+0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_read,Vec3::z
+0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_write,Vec3::x
+0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_write,Vec3::y
+0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,field_write,Vec3::z
 0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,function,
 0x4851c0,FindHighestPointOnLine,src/map/terrain.cpp,global_read,g_game
 0x485330,GetCellPosition,src/map/terrain.cpp,call,CellAt
+0x485330,GetCellPosition,src/map/terrain.cpp,call,SetWholePart
 0x485330,GetCellPosition,src/map/terrain.cpp,call,memset
+0x485330,GetCellPosition,src/map/terrain.cpp,field_maybe_written,Vec3::x
+0x485330,GetCellPosition,src/map/terrain.cpp,field_maybe_written,Vec3::y
+0x485330,GetCellPosition,src/map/terrain.cpp,field_maybe_written,Vec3::z
 0x485330,GetCellPosition,src/map/terrain.cpp,field_read,Cell::height
-0x485330,GetCellPosition,src/map/terrain.cpp,field_write,Fixed_00485070::whole
 0x485330,GetCellPosition,src/map/terrain.cpp,function,
 0x4853b0,ClampPositionToMap,src/units/units.cpp,call,MakeFixed
 0x4853b0,ClampPositionToMap,src/units/units.cpp,call,operator=
@@ -32509,6 +32485,7 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,Hits_0049a120::AddFeature
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,Hits_0049a120::AddUnit
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,Length
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,SpotAt
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,Sub
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,UnitFromId
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,VectorLength
@@ -32516,7 +32493,6 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,memset
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator Cell *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator Projectile *
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator Spot_0049a120 *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator SquadManager *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator UnitDef *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator WeaponDef *
@@ -32525,7 +32501,6 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator=
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator==
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,deref_escape,*FeatureDef_0049a120
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,deref_escape,*Spot_0049a120
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,deref_read,*Vec3
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_escape,Projectile::position
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,<anon>::interceptor
@@ -32541,13 +32516,12 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Cell::unit2
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,FeaturesSeam::DamageFeature
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,FeaturesSeam::GetFootprintCentre
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game_0049a120::features
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game_0049a120::heightMap
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game_0049a120::mapHeightTiles
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game_0049a120::mapWidthTiles
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game_0049a120::projectileCount
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game_0049a120::projectiles
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game_0049a120::spots
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game::cells
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game::features
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game::height
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game::projectileCount
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game::projectiles
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game::width
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCell
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Player::ai
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Player::id
@@ -32875,7 +32849,7 @@ address,function,file,kind,target
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::seaLevel
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::ticks
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
-0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Net_0049b720::noSeaLevelTrigger
+0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Net::noSeaLevelTrigger
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Projectile::active
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Projectile::attacker
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Projectile::direction
@@ -39398,7 +39372,7 @@ address,function,file,kind,target
 0x4bd830,HAPI_WriteArchiveData,src/files/hpi.cpp,field_read,Info::size
 0x4bd830,HAPI_WriteArchiveData,src/files/hpi.cpp,field_read,OPENHAPIFILE::count
 0x4bd830,HAPI_WriteArchiveData,src/files/hpi.cpp,field_read,OPENHAPIFILE::fp
-0x4bd830,HAPI_WriteArchiveData,src/files/hpi.cpp,field_read,OPENHAPIFILE::unknown_10
+0x4bd830,HAPI_WriteArchiveData,src/files/hpi.cpp,field_read,OPENHAPIFILE::mode
 0x4bd830,HAPI_WriteArchiveData,src/files/hpi.cpp,field_write,Info::compressed
 0x4bd830,HAPI_WriteArchiveData,src/files/hpi.cpp,field_write,Info::offset
 0x4bd830,HAPI_WriteArchiveData,src/files/hpi.cpp,field_write,Info::size
@@ -39496,15 +39470,15 @@ address,function,file,kind,target
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,call,GetDisplay
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,call,HAPI_ClearShadowFlags
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,call,HAPI_MarkShadowedFiles
-0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,deref_read,*Item_004be320
+0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,deref_read,*OPENHAPIFILE
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,ArchiveDirectory::count
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,ArchiveDirectory::entries
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,ArchiveEntry::dir
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,ArchiveEntry::flags
-0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,Item_004be320::node
-0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,Node_004be320::list
-0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,State_004be320::itemCount
-0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,State_004be320::items
+0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,DisplayContext::count
+0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,DisplayContext::files
+0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,Header::list
+0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,OPENHAPIFILE::node
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_write,ArchiveEntry::flags
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,function,
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,global_maybe_written,DAT_005119b8
@@ -42490,10 +42464,10 @@ address,function,file,kind,target
 0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,call,AbortProgram
 0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,call,FindCommandLineSwitch
 0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,call,SetFpuFussy
+0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,call,bx_sscanf
 0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,call,getenv
 0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,call,host_crash_install
 0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,call,host_debug_helper
-0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,call,sscanf
 0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,function,
 0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,global_read,g_debugSupportInited
 0x4da1d0,InitDebugSupport,src/debug/debug_lib.cpp,global_write,g_debugSupportInited
@@ -42631,8 +42605,8 @@ address,function,file,kind,target
 0x4db7b0,BackAlignAtexitHandler,src/debug/debug_lib.cpp,function,
 0x4db7c0,GetDebugFillPattern,src/debug/debug_lib.cpp,function,
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,call,BlockMap::Find
-0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,call,BlockMap::Remove
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,call,BlockMap::end
+0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,call,BlockMap::erase
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,call,CheckFillPattern
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,call,CountFree
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::AddFreeBlock
@@ -42654,12 +42628,11 @@ address,function,file,kind,target
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,call,operator[]
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,call,push_back
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,deref_read,*Elem_004dd8c0
-0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,field_maybe_written,Arena_004da9f0::ring
-0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,field_read,Arena_004da9f0::count
-0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,field_read,Arena_004da9f0::ring
-0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,field_read,BlockInfo::base
+0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,deref_read,"*std::vector<Elem_004dd8c0, Alloc_004dd8c0>"
+0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,field_read,BlockInfo::address
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,field_read,BlockInfo::size
-0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,field_write,Arena_004da9f0::count
+0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,field_read,FreedBlockRing<int>::count
+0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,field_write,FreedBlockRing<int>::count
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,function,
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,global_read,g_committedBytes
 0x4db7d0,FreeDebugBlock,src/debug/debug_lib.cpp,global_write,g_committedBytes
@@ -43416,15 +43389,6 @@ address,function,file,kind,target
 ,AllocNode_004db000,src/debug/debug_lib.cpp,global_read,g_outOfMemoryHandler
 ,AllocNode_004db000,src/debug/debug_lib.cpp,global_write,g_freeBlockFreeList
 ,AllocNode_004db000,src/debug/debug_lib.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [g_outOfMemoryHandler]
-,AllocProjectile,src/weapons/weapons.cpp,call,operator Projectile *
-,AllocProjectile,src/weapons/weapons.cpp,deref_escape,*Projectile
-,AllocProjectile,src/weapons/weapons.cpp,field_read,Game::projectileCount
-,AllocProjectile,src/weapons/weapons.cpp,field_read,Game::projectiles
-,AllocProjectile,src/weapons/weapons.cpp,field_write,<anon>::dead
-,AllocProjectile,src/weapons/weapons.cpp,field_write,Game::projectileCount
-,AllocProjectile,src/weapons/weapons.cpp,field_write,Projectile::targetUnit
-,AllocProjectile,src/weapons/weapons.cpp,function,
-,AllocProjectile,src/weapons/weapons.cpp,global_read,g_game
 ,AllocSite::AllocSite,src/state/alloc_hooks.h,field_read,AllocHooks::enter
 ,AllocSite::AllocSite,src/state/alloc_hooks.h,field_read,AllocSite::on
 ,AllocSite::AllocSite,src/state/alloc_hooks.h,field_write,AllocSite::on
@@ -43453,21 +43417,11 @@ address,function,file,kind,target
 ,Alloc_004dd8c0::allocate,src/debug/debug_lib.cpp,function,
 ,Alloc_004dd8c0::allocate,src/debug/debug_lib.cpp,global_read,g_outOfMemoryHandler
 ,Alloc_004dd8c0::allocate,src/debug/debug_lib.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [g_outOfMemoryHandler]
-,Alloc_004dd8c0::allocate,src/debug/debug_lib.cpp,call,host_mem_alloc
-,Alloc_004dd8c0::allocate,src/debug/debug_lib.cpp,function,
-,Alloc_004dd8c0::allocate,src/debug/debug_lib.cpp,global_read,g_outOfMemoryHandler
-,Alloc_004dd8c0::allocate,src/debug/debug_lib.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [g_outOfMemoryHandler]
-,Alloc_004dd8c0::construct,src/debug/debug_lib.cpp,call,_Construct
-,Alloc_004dd8c0::construct,src/debug/debug_lib.cpp,function,
 ,Alloc_004dd8c0::construct,src/debug/debug_lib.cpp,call,_Construct
 ,Alloc_004dd8c0::construct,src/debug/debug_lib.cpp,function,
 ,Alloc_004dd8c0::deallocate,src/debug/debug_lib.cpp,call,host_mem_free
 ,Alloc_004dd8c0::deallocate,src/debug/debug_lib.cpp,function,
-,Alloc_004dd8c0::deallocate,src/debug/debug_lib.cpp,call,host_mem_free
-,Alloc_004dd8c0::deallocate,src/debug/debug_lib.cpp,function,
 ,Alloc_004dd8c0::destroy,src/debug/debug_lib.cpp,function,
-,Alloc_004dd8c0::destroy,src/debug/debug_lib.cpp,function,
-,Alloc_004dd8c0::max_size,src/debug/debug_lib.cpp,function,
 ,Alloc_004dd8c0::max_size,src/debug/debug_lib.cpp,function,
 ,Angle,src/orders/vtol_orders.cpp,call,AngleOfVector
 ,Angle,src/orders/vtol_orders.cpp,field_read,Vec3::x
@@ -43642,8 +43596,6 @@ address,function,file,kind,target
 ,BlockMap::Lrotate,src/debug/debug_lib.cpp,field_write,Node_004daa30::right
 ,BlockMap::Lrotate,src/debug/debug_lib.cpp,function,
 ,BlockMap::Lrotate,src/debug/debug_lib.cpp,global_read,g_blockMapNil
-,BlockMap::Remove,src/debug/debug_lib.cpp,call,BlockMap::erase
-,BlockMap::Remove,src/debug/debug_lib.cpp,function,
 ,BlockMap::Rrotate,src/debug/debug_lib.cpp,field_read,BlockMap::head
 ,BlockMap::Rrotate,src/debug/debug_lib.cpp,field_read,Node_004daa30::left
 ,BlockMap::Rrotate,src/debug/debug_lib.cpp,field_read,Node_004daa30::parent
@@ -43688,8 +43640,6 @@ address,function,file,kind,target
 ,BlockMap::_Rrotate,src/debug/debug_lib.cpp,global_read,g_blockMapNil
 ,BlockMap::end,src/debug/debug_lib.cpp,field_read,BlockMap::head
 ,BlockMap::end,src/debug/debug_lib.cpp,function,
-,BlockMap::end,src/debug/debug_lib.cpp,field_read,BlockMap::head
-,BlockMap::end,src/debug/debug_lib.cpp,function,
 ,BlockMap::find,src/debug/debug_lib.cpp,call,BlockMap::End
 ,BlockMap::find,src/debug/debug_lib.cpp,call,lower_bound
 ,BlockMap::find,src/debug/debug_lib.cpp,call,operator()
@@ -43699,14 +43649,10 @@ address,function,file,kind,target
 ,BlockMap::find,src/debug/debug_lib.cpp,field_read,BlockMapIter::ptr
 ,BlockMap::find,src/debug/debug_lib.cpp,function,
 ,BlockMapIter::BlockMapIter,src/debug/debug_lib.cpp,function,
-,BlockMapIter::BlockMapIter,src/debug/debug_lib.cpp,function,
 ,BlockMapIter::_Mynode,src/debug/debug_lib.cpp,field_read,BlockMapIter::ptr
 ,BlockMapIter::_Mynode,src/debug/debug_lib.cpp,function,
 ,BlockMapIter::operator*,src/debug/debug_lib.cpp,field_read,BlockMapIter::ptr
 ,BlockMapIter::operator*,src/debug/debug_lib.cpp,field_read,Node_004daa30::value
-,BlockMapIter::operator*,src/debug/debug_lib.cpp,function,
-,BlockMapIter::operator*,src/debug/debug_lib.cpp,field_read,BlockMapIter::ptr
-,BlockMapIter::operator*,src/debug/debug_lib.cpp,field_read,LiveNode::value
 ,BlockMapIter::operator*,src/debug/debug_lib.cpp,function,
 ,BlockMapIter::operator++,src/debug/debug_lib.cpp,call,NextNode
 ,BlockMapIter::operator++,src/debug/debug_lib.cpp,deref_read,*BlockMapIter
@@ -43714,11 +43660,6 @@ address,function,file,kind,target
 ,BlockMapIter::operator->,src/debug/debug_lib.cpp,field_escape,Node_004daa30::value
 ,BlockMapIter::operator->,src/debug/debug_lib.cpp,field_read,BlockMapIter::ptr
 ,BlockMapIter::operator->,src/debug/debug_lib.cpp,function,
-,BlockMapIter::operator->,src/debug/debug_lib.cpp,field_escape,LiveNode::value
-,BlockMapIter::operator->,src/debug/debug_lib.cpp,field_read,BlockMapIter::ptr
-,BlockMapIter::operator->,src/debug/debug_lib.cpp,function,
-,BlockMapIter::operator==,src/debug/debug_lib.cpp,field_read,BlockMapIter::ptr
-,BlockMapIter::operator==,src/debug/debug_lib.cpp,function,
 ,BlockMapIter::operator==,src/debug/debug_lib.cpp,field_read,BlockMapIter::ptr
 ,BlockMapIter::operator==,src/debug/debug_lib.cpp,function,
 ,BlockOffset,src/files/hpi.cpp,deref_read,*int
@@ -44235,9 +44176,6 @@ address,function,file,kind,target
 ,CopyDwordPair,src/ai/ai_player.cpp,call,operator new
 ,CopyDwordPair,src/ai/ai_player.cpp,deref_read,*Elem_0040cc40
 ,CopyDwordPair,src/ai/ai_player.cpp,function,
-,CopyOneByte,src/ai/ai_player.cpp,call,operator new
-,CopyOneByte,src/ai/ai_player.cpp,deref_read,*Elem_0040d4f0
-,CopyOneByte,src/ai/ai_player.cpp,function,
 ,CopyWords,src/network/net_stats.cpp,deref_read,*unsigned int
 ,CopyWords,src/network/net_stats.cpp,deref_write,*unsigned int
 ,CopyWords,src/network/net_stats.cpp,function,
@@ -44358,12 +44296,6 @@ address,function,file,kind,target
 ,Diff,src/orders/vtol_orders.cpp,field_write,Vec3::y
 ,Diff,src/orders/vtol_orders.cpp,field_write,Vec3::z
 ,Diff,src/orders/vtol_orders.cpp,function,
-,Direction,src/ai/ai_player.cpp,call,ScaledCos
-,Direction,src/ai/ai_player.cpp,call,ScaledSin
-,Direction,src/ai/ai_player.cpp,field_write,Vec3::x
-,Direction,src/ai/ai_player.cpp,field_write,Vec3::y
-,Direction,src/ai/ai_player.cpp,field_write,Vec3::z
-,Direction,src/ai/ai_player.cpp,function,
 ,Direction,src/ai/ai_player.cpp,call,ScaledCos
 ,Direction,src/ai/ai_player.cpp,call,ScaledSin
 ,Direction,src/ai/ai_player.cpp,field_write,Vec3::x
@@ -44628,12 +44560,8 @@ address,function,file,kind,target
 ,Elem_0040cc40::Elem_0040cc40,src/ai/player_ai.h,function,
 ,Elem_0040cc40::operator<,src/ai/player_ai.h,field_read,Elem_0040cc40::key
 ,Elem_0040cc40::operator<,src/ai/player_ai.h,function,
-,Elem_00432be0::operator char *,src/units/unit_types.cpp,field_read,Elem_00432be0::data
-,Elem_00432be0::operator char *,src/units/unit_types.cpp,function,
 ,Elem_00432be0::~Elem_00432be0,src/map/los_tables.cpp,call,StringRef::ReleaseRef
 ,Elem_00432be0::~Elem_00432be0,src/map/los_tables.cpp,function,
-,Elem_00432be0::~Elem_00432be0,src/units/unit_types.cpp,call,StringRef::ReleaseRef
-,Elem_00432be0::~Elem_00432be0,src/units/unit_types.cpp,function,
 ,Elem_0043c390::operator!=,src/orders/order_type_entry.h,function,
 ,Elem_0043c390::operator<,src/orders/order_type_entry.h,function,
 ,Elem_0043c390::operator==,src/orders/order_type_entry.h,function,
@@ -44745,6 +44673,10 @@ address,function,file,kind,target
 ,FeatureVec3,src/map/features.cpp,field_write,Vec3::y
 ,FeatureVec3,src/map/features.cpp,field_write,Vec3::z
 ,FeatureVec3,src/map/features.cpp,function,
+,FileNameEntry::operator char *,src/units/unit_types.cpp,field_read,FileNameEntry::data
+,FileNameEntry::operator char *,src/units/unit_types.cpp,function,
+,FileNameEntry::~FileNameEntry,src/units/unit_types.cpp,call,StringRef::ReleaseRef
+,FileNameEntry::~FileNameEntry,src/units/unit_types.cpp,function,
 ,FilePrintf,src/util/file_printf.cpp,call,__builtin_va_end
 ,FilePrintf,src/util/file_printf.cpp,call,__builtin_va_start
 ,FilePrintf,src/util/file_printf.cpp,call,_vsnprintf
@@ -45229,7 +45161,6 @@ address,function,file,kind,target
 ,FreeBlockIter::Dec,src/debug/debug_lib.cpp,global_read,DAT_00528a54
 ,FreeBlockIter::FreeBlockIter,src/debug/debug_lib.cpp,function,
 ,FreeBlockIter::FreeBlockIter,src/debug/free_block_map.cpp,function,
-,FreeBlockIter::FreeBlockIter,src/debug/free_block_map.h,function,
 ,FreeBlockIter::Inc,src/debug/debug_lib.cpp,call,Min_004dbd80
 ,FreeBlockIter::Inc,src/debug/debug_lib.cpp,field_read,FreeBlockIter::ptr
 ,FreeBlockIter::Inc,src/debug/debug_lib.cpp,field_read,Node_004db000::parent
@@ -45254,18 +45185,12 @@ address,function,file,kind,target
 ,FreeBlockIter::operator!=,src/debug/free_block_map.cpp,call,operator==
 ,FreeBlockIter::operator!=,src/debug/free_block_map.cpp,deref_read,*FreeBlockIter
 ,FreeBlockIter::operator!=,src/debug/free_block_map.cpp,function,
-,FreeBlockIter::operator!=,src/debug/free_block_map.h,call,operator==
-,FreeBlockIter::operator!=,src/debug/free_block_map.h,deref_read,*FreeBlockIter
-,FreeBlockIter::operator!=,src/debug/free_block_map.h,function,
 ,FreeBlockIter::operator*,src/debug/debug_lib.cpp,field_read,FreeBlockIter::ptr
 ,FreeBlockIter::operator*,src/debug/debug_lib.cpp,field_read,Node_004db000::value
 ,FreeBlockIter::operator*,src/debug/debug_lib.cpp,function,
 ,FreeBlockIter::operator*,src/debug/free_block_map.cpp,field_read,FreeBlockIter::ptr
 ,FreeBlockIter::operator*,src/debug/free_block_map.cpp,field_read,Node_004db000::value
 ,FreeBlockIter::operator*,src/debug/free_block_map.cpp,function,
-,FreeBlockIter::operator*,src/debug/free_block_map.h,field_read,FreeBlockIter::ptr
-,FreeBlockIter::operator*,src/debug/free_block_map.h,field_read,Node_004db000::value
-,FreeBlockIter::operator*,src/debug/free_block_map.h,function,
 ,FreeBlockIter::operator++,src/debug/debug_lib.cpp,call,NextNode
 ,FreeBlockIter::operator++,src/debug/debug_lib.cpp,call,operator++
 ,FreeBlockIter::operator++,src/debug/debug_lib.cpp,deref_read,*FreeBlockIter
@@ -45288,30 +45213,10 @@ address,function,file,kind,target
 ,FreeBlockIter::operator->,src/debug/free_block_map.cpp,field_escape,Node_004db000::value
 ,FreeBlockIter::operator->,src/debug/free_block_map.cpp,field_read,FreeBlockIter::ptr
 ,FreeBlockIter::operator->,src/debug/free_block_map.cpp,function,
-,FreeBlockIter::operator->,src/debug/free_block_map.h,field_escape,Node_004db000::value
-,FreeBlockIter::operator->,src/debug/free_block_map.h,field_read,FreeBlockIter::ptr
-,FreeBlockIter::operator->,src/debug/free_block_map.h,function,
 ,FreeBlockIter::operator==,src/debug/debug_lib.cpp,field_read,FreeBlockIter::ptr
 ,FreeBlockIter::operator==,src/debug/debug_lib.cpp,function,
 ,FreeBlockIter::operator==,src/debug/free_block_map.cpp,field_read,FreeBlockIter::ptr
 ,FreeBlockIter::operator==,src/debug/free_block_map.cpp,function,
-,FreeBlockIter::operator==,src/debug/free_block_map.h,field_read,FreeBlockIter::ptr
-,FreeBlockIter::operator==,src/debug/free_block_map.h,function,
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockIter::Previous
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::EraseCopyIter
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::InsertOrFind
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::UpperBound
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::begin
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::end
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,operator!=
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,operator->
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,operator=
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,call,operator==
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,field_read,Pair_004db000::length
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,field_read,Pair_004db000::offset
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,field_write,Pair_004db000::length
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,field_write,Pair_004db000::offset
-,FreeBlockMap::AddFreeBlock,src/debug/debug_lib.cpp,function,
 ,FreeBlockMap::Begin,src/debug/debug_lib.cpp,field_read,FreeBlockMap::head
 ,FreeBlockMap::Begin,src/debug/debug_lib.cpp,field_read,Node_004db000::left
 ,FreeBlockMap::Begin,src/debug/debug_lib.cpp,function,
@@ -45321,10 +45226,11 @@ address,function,file,kind,target
 ,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,call,FreeBlockMap::AddFreeBlock
 ,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,call,host_mem_release
 ,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,call,host_mem_reserve
+,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,call,operator new
 ,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,field_read,FreeBlockMap::total
 ,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,field_write,FreeBlockMap::total
-,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,field_write,Pair_004db610::length
-,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,field_write,Pair_004db610::offset
+,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,field_write,Pair_004db000::length
+,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,field_write,Pair_004db000::offset
 ,FreeBlockMap::FreeBlockMap,src/debug/debug_lib.cpp,function,
 ,FreeBlockMap::Freenode,src/debug/debug_lib.cpp,deref_write,*void
 ,FreeBlockMap::Freenode,src/debug/debug_lib.cpp,function,
@@ -45407,30 +45313,6 @@ address,function,file,kind,target
 ,FreeBlockMap::Tail,src/debug/debug_lib.cpp,field_write,Pair_004db450::length
 ,FreeBlockMap::Tail,src/debug/debug_lib.cpp,field_write,Pair_004db450::offset
 ,FreeBlockMap::Tail,src/debug/debug_lib.cpp,function,
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockIter::Next
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockIter::Previous
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::EraseCopyIter
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::GrowReservation
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::InsertOrFind
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::TakeFreeBlock
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::begin
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::end
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::lower_bound
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,FreeBlockMap::size
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,operator!=
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,operator*
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,operator->
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,operator=
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,call,operator==
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,field_read,Pair_004db000::length
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,field_read,Pair_004db000::offset
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,field_write,Pair_004db000::length
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,field_write,Pair_004db000::offset
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,function,
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,global_read,g_freeBlockWraps
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,global_read,g_lastAllocOffset
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,global_write,g_freeBlockWraps
-,FreeBlockMap::TakeFreeBlock,src/debug/debug_lib.cpp,global_write,g_lastAllocOffset
 ,FreeBlockMap::TreeInsert,src/debug/debug_lib.cpp,call,FreeBlockIter::Mynode
 ,FreeBlockMap::TreeInsert,src/debug/debug_lib.cpp,call,FreeBlockIter::PrevNode
 ,FreeBlockMap::TreeInsert,src/debug/debug_lib.cpp,call,FreeBlockMap::Insert
@@ -45464,26 +45346,22 @@ address,function,file,kind,target
 ,FreeBlockMap::begin,src/debug/free_block_map.cpp,field_read,FreeBlockMap::head
 ,FreeBlockMap::begin,src/debug/free_block_map.cpp,field_read,Node_004db000::left
 ,FreeBlockMap::begin,src/debug/free_block_map.cpp,function,
-,FreeBlockMap::begin,src/debug/free_block_map.h,call,Begin
-,FreeBlockMap::begin,src/debug/free_block_map.h,function,
 ,FreeBlockMap::end,src/debug/debug_lib.cpp,field_read,FreeBlockMap::head
 ,FreeBlockMap::end,src/debug/debug_lib.cpp,function,
 ,FreeBlockMap::end,src/debug/free_block_map.cpp,field_read,FreeBlockMap::head
 ,FreeBlockMap::end,src/debug/free_block_map.cpp,function,
-,FreeBlockMap::end,src/debug/free_block_map.h,field_read,FreeBlockMap::head
-,FreeBlockMap::end,src/debug/free_block_map.h,function,
 ,FreeBlockMap::operator new,src/debug/debug_lib.cpp,call,host_mem_alloc
 ,FreeBlockMap::operator new,src/debug/debug_lib.cpp,function,
 ,FreeBlockMap::size,src/debug/debug_lib.cpp,field_read,FreeBlockMap::count
 ,FreeBlockMap::size,src/debug/debug_lib.cpp,function,
 ,FreeBlockMap::size,src/debug/free_block_map.cpp,field_read,FreeBlockMap::count
 ,FreeBlockMap::size,src/debug/free_block_map.cpp,function,
-,FreeBlockMap::size,src/debug/free_block_map.h,field_read,FreeBlockMap::count
-,FreeBlockMap::size,src/debug/free_block_map.h,function,
 ,FreeBlockMap::upper_bound,src/debug/debug_lib.cpp,call,LowerBound
 ,FreeBlockMap::upper_bound,src/debug/debug_lib.cpp,function,
 ,FreeBlockMap::upper_bound,src/debug/free_block_map.cpp,call,LowerBound
 ,FreeBlockMap::upper_bound,src/debug/free_block_map.cpp,function,
+,FreeBlockPoolAllocator::Allocate,src/debug/debug_lib.cpp,call,FreeBlockAllocator::Allocate
+,FreeBlockPoolAllocator::Allocate,src/debug/debug_lib.cpp,function,
 ,FreeC,src/units/movement_class.cpp,call,get
 ,FreeC,src/units/movement_class.cpp,call,operator delete
 ,FreeC,src/units/movement_class.cpp,deref_write,*void
@@ -45949,12 +45827,6 @@ address,function,file,kind,target
 ,HAPI_FileLength,src/files/files_api.h,function,
 ,HAPI_FileLength,src/files/files_api.h,global_read,g_seams
 ,HAPI_FileLength,src/files/files_api.h,indirect_call,indirect via long (*)(FileHandle *) __attribute__((stdcall)) [FilesSeam::Length]
-,HAPI_FileLength,src/files/hpi.cpp,call,host_file_size
-,HAPI_FileLength,src/files/hpi.cpp,field_read,FileHandle::fp
-,HAPI_FileLength,src/files/hpi.cpp,field_read,FileHandle::info
-,HAPI_FileLength,src/files/hpi.cpp,field_read,FileHandle::shared
-,HAPI_FileLength,src/files/hpi.cpp,field_read,Info::size
-,HAPI_FileLength,src/files/hpi.cpp,function,
 ,HAPI_FileLengthByName,src/files/files_api.h,field_read,FilesSeam::LengthByName
 ,HAPI_FileLengthByName,src/files/files_api.h,field_read,Seams::files
 ,HAPI_FileLengthByName,src/files/files_api.h,function,
@@ -46599,16 +46471,6 @@ address,function,file,kind,target
 ,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_write,Hits_0049a120::features
 ,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_write,Hits_0049a120::numFeatures
 ,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,function,
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_read,Hits_0049a120::features
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_read,Hits_0049a120::numFeatures
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_write,Hits_0049a120::features
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_write,Hits_0049a120::numFeatures
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,function,
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_read,Hits_0049a120::numUnits
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_read,Hits_0049a120::units
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_write,Hits_0049a120::numUnits
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_write,Hits_0049a120::units
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,function,
 ,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_read,Hits_0049a120::numUnits
 ,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_read,Hits_0049a120::units
 ,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_write,Hits_0049a120::numUnits
@@ -46735,7 +46597,7 @@ address,function,file,kind,target
 ,InsertCommand,src/orders/order_list.cpp,field_write,Order::flags_42
 ,InsertCommand,src/orders/order_list.cpp,function,
 ,InsertCommand,src/orders/order_list.cpp,global_read,kSim
-,InsertNew,src/util/tdf.cpp,call,MakeElem
+,InsertNew,src/util/tdf.cpp,call,MakePair
 ,InsertNew,src/util/tdf.cpp,call,StringRef::~StringRef
 ,InsertNew,src/util/tdf.cpp,call,TdfField::~TdfField
 ,InsertNew,src/util/tdf.cpp,call,TdfFieldVector::Insert
@@ -47494,9 +47356,9 @@ address,function,file,kind,target
 ,IsExplored,src/ai/ai_player.cpp,field_read,Player::explored
 ,IsExplored,src/ai/ai_player.cpp,field_read,Player::exploredHeight
 ,IsExplored,src/ai/ai_player.cpp,field_read,Player::exploredWidth
-,IsExplored,src/ai/ai_player.cpp,field_read,Position_00408090::x
-,IsExplored,src/ai/ai_player.cpp,field_read,Position_00408090::y
-,IsExplored,src/ai/ai_player.cpp,field_read,Position_00408090::z
+,IsExplored,src/ai/ai_player.cpp,field_read,Vec3Words::xWhole
+,IsExplored,src/ai/ai_player.cpp,field_read,Vec3Words::yWhole
+,IsExplored,src/ai/ai_player.cpp,field_read,Vec3Words::zWhole
 ,IsExplored,src/ai/ai_player.cpp,function,
 ,IsExplored,src/game/players.cpp,call,operator unsigned char *
 ,IsExplored,src/game/players.cpp,deref_read,*unsigned char
@@ -47533,6 +47395,8 @@ address,function,file,kind,target
 ,IsExplored_0047d2e0,src/map/terrain.cpp,field_read,Position_0047d2e0::x
 ,IsExplored_0047d2e0,src/map/terrain.cpp,field_read,Position_0047d2e0::z
 ,IsExplored_0047d2e0,src/map/terrain.cpp,function,
+,IsFlag12,src/ai/ai_player.cpp,field_read,UnitDef::flags2
+,IsFlag12,src/ai/ai_player.cpp,function,
 ,IsHuman,src/network/net_game.cpp,field_read,Player::active
 ,IsHuman,src/network/net_game.cpp,field_read,Player::type
 ,IsHuman,src/network/net_game.cpp,function,
@@ -47888,21 +47752,11 @@ address,function,file,kind,target
 ,Land,src/orders/vtol_orders.cpp,global_read,g_seams
 ,Land,src/orders/vtol_orders.cpp,global_read,kSim
 ,Land,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
-,Length,src/ai/ai_player.cpp,call,bx_sqrt
-,Length,src/ai/ai_player.cpp,field_read,Vec3::x
-,Length,src/ai/ai_player.cpp,field_read,Vec3::y
-,Length,src/ai/ai_player.cpp,field_read,Vec3::z
-,Length,src/ai/ai_player.cpp,function,
 ,Length,src/weapons/weapons.cpp,call,bx_sqrt
 ,Length,src/weapons/weapons.cpp,field_read,Vec3::x
 ,Length,src/weapons/weapons.cpp,field_read,Vec3::y
 ,Length,src/weapons/weapons.cpp,field_read,Vec3::z
 ,Length,src/weapons/weapons.cpp,field_write,Fixed::value
-,Length,src/weapons/weapons.cpp,function,
-,Length,src/weapons/weapons.cpp,call,bx_sqrt
-,Length,src/weapons/weapons.cpp,field_read,Vec3::x
-,Length,src/weapons/weapons.cpp,field_read,Vec3::y
-,Length,src/weapons/weapons.cpp,field_read,Vec3::z
 ,Length,src/weapons/weapons.cpp,function,
 ,LengthFloat,src/graphics/particles.cpp,call,bx_sqrt
 ,LengthFloat,src/graphics/particles.cpp,field_read,Vec3::x
@@ -48076,7 +47930,7 @@ address,function,file,kind,target
 ,LoadWeaponTDFs,src/units/unit_types.cpp,call,operator new
 ,LoadWeaponTDFs,src/units/unit_types.cpp,call,size
 ,LoadWeaponTDFs,src/units/unit_types.cpp,deref_escape,*TdfFile
-,LoadWeaponTDFs,src/units/unit_types.cpp,field_read,Elem_00432be0::data
+,LoadWeaponTDFs,src/units/unit_types.cpp,field_read,FileNameEntry::data
 ,LoadWeaponTDFs,src/units/unit_types.cpp,field_read,TdfFile::flags
 ,LoadWeaponTDFs,src/units/unit_types.cpp,function,
 ,LoadWeaponTDFs,src/units/unit_types.cpp,global_read,kSim
@@ -48245,8 +48099,6 @@ address,function,file,kind,target
 ,MakeDirectoryPath,src/files/files_api.h,function,
 ,MakeDirectoryPath,src/files/files_api.h,global_read,g_seams
 ,MakeDirectoryPath,src/files/files_api.h,indirect_call,indirect via void (*)(char *) __attribute__((stdcall)) [FilesSeam::MakeDirectoryPath]
-,MakeElem,src/util/tdf.cpp,call,TdfField::~TdfField
-,MakeElem,src/util/tdf.cpp,function,
 ,MakeExplosion,src/weapons/explosions.cpp,call,BuildExplosionFrame
 ,MakeExplosion,src/weapons/explosions.cpp,call,GameAllocIgnoreTag
 ,MakeExplosion,src/weapons/explosions.cpp,field_write,Explosion::count
@@ -48274,10 +48126,6 @@ address,function,file,kind,target
 ,MakePoint,src/orders/unit_orders.cpp,field_write,Point16::x
 ,MakePoint,src/orders/unit_orders.cpp,field_write,Point16::y
 ,MakePoint,src/orders/unit_orders.cpp,function,
-,MakeVec3,src/ai/ai_player.cpp,field_write,Vec3::x
-,MakeVec3,src/ai/ai_player.cpp,field_write,Vec3::y
-,MakeVec3,src/ai/ai_player.cpp,field_write,Vec3::z
-,MakeVec3,src/ai/ai_player.cpp,function,
 ,MakeVec3,src/ai/ai_player.cpp,field_write,Vec3::x
 ,MakeVec3,src/ai/ai_player.cpp,field_write,Vec3::y
 ,MakeVec3,src/ai/ai_player.cpp,field_write,Vec3::z
@@ -48310,9 +48158,8 @@ address,function,file,kind,target
 ,MapInsertResult::MapInsertResult,src/debug/debug_lib.cpp,field_write,MapInsertResult::second
 ,MapInsertResult::MapInsertResult,src/debug/debug_lib.cpp,function,
 ,MapInsertResult::MapInsertResult,src/debug/free_block_map.cpp,function,
-,MapInsertResult::MapInsertResult,src/debug/free_block_map.h,function,
-,MapRange,src/ai/ai_player.cpp,field_read,Game_00408100::mapPixelHeight
-,MapRange,src/ai/ai_player.cpp,field_read,Game_00408100::mapPixelWidth
+,MapRange,src/ai/ai_player.cpp,field_read,Game::mapHeight
+,MapRange,src/ai/ai_player.cpp,field_read,Game::mapWidth
 ,MapRange,src/ai/ai_player.cpp,function,
 ,MapRange,src/ai/ai_player.cpp,global_read,g_game
 ,MapSize_00408090::Contains,src/ai/byte_map.h,field_read,MapSize_00408090::height
@@ -48475,8 +48322,6 @@ address,function,file,kind,target
 ,NameSlot,src/frontend/multi.cpp,call,strlen
 ,NameSlot,src/frontend/multi.cpp,function,
 ,NanoParticles::NanoParticles,src/graphics/particles.cpp,function,
-,Ne,src/util/tdf.cpp,call,operator==
-,Ne,src/util/tdf.cpp,function,
 ,Ne,src/util/tdf.cpp,call,operator==
 ,Ne,src/util/tdf.cpp,function,
 ,Ne,src/weapons/weapon_types.cpp,call,operator==
@@ -48858,7 +48703,6 @@ address,function,file,kind,target
 ,Pair_004b7620::Pair_004b7620,src/util/commands.cpp,function,
 ,Pair_004db000::Pair_004db000,src/debug/debug_lib.cpp,function,
 ,Pair_004db000::Pair_004db000,src/debug/free_block_map.cpp,function,
-,Pair_004db000::Pair_004db000,src/debug/free_block_map.h,function,
 ,ParseBlockScan,src/harness/harness.cpp,call,_strnicmp
 ,ParseBlockScan,src/harness/harness.cpp,call,isdigit
 ,ParseBlockScan,src/harness/harness.cpp,call,isspace
@@ -49215,8 +49059,6 @@ address,function,file,kind,target
 ,PollGetGames,src/frontend/multi.cpp,call,PeekKey
 ,PollGetGames,src/frontend/multi.cpp,call,PopKey
 ,PollGetGames,src/frontend/multi.cpp,function,
-,FreeBlockPoolAllocator::_Charalloc,src/debug/debug_lib.cpp,call,FreeBlockAllocator::Allocate
-,FreeBlockPoolAllocator::_Charalloc,src/debug/debug_lib.cpp,function,
 ,PoolUnit,src/harness/harness.cpp,call,GameRef
 ,PoolUnit,src/harness/harness.cpp,function,
 ,PopHeap,src/ai/ai_player.cpp,call,PopHeapFirst
@@ -49453,7 +49295,7 @@ address,function,file,kind,target
 ,Rand,src/map/features.cpp,call,GameRand
 ,Rand,src/map/features.cpp,function,
 ,RangeSize_00488810,src/units/unit_commands.cpp,function,
-,RateUnitTypeForWeights,src/ai/ai_player.cpp,call,RateWeapons_409730
+,RateUnitTypeForWeights,src/ai/ai_player.cpp,call,RateWeapons
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,field_read,EconomySeam::GetEnergyUse
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,field_read,Seams::economy
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,field_read,UnitDef::energyCost
@@ -49463,13 +49305,6 @@ address,function,file,kind,target
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,function,
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,global_read,g_seams
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,indirect_call,indirect via float (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
-,RateWeapons_409730,src/ai/ai_player.cpp,call,get
-,RateWeapons_409730,src/ai/ai_player.cpp,field_escape,UnitDef::weapons
-,RateWeapons_409730,src/ai/ai_player.cpp,field_read,UnitDef::c04
-,RateWeapons_409730,src/ai/ai_player.cpp,field_read,Weapon_00409730::damage
-,RateWeapons_409730,src/ai/ai_player.cpp,field_read,Weapon_00409730::index
-,RateWeapons_409730,src/ai/ai_player.cpp,field_read,Weapon_00409730::range
-,RateWeapons_409730,src/ai/ai_player.cpp,function,
 ,ReachQuirkGuard,src/harness/harness.cpp,call,ApplyUnitDeath
 ,ReachQuirkGuard,src/harness/harness.cpp,call,Fail
 ,ReachQuirkGuard,src/harness/harness.cpp,call,GameAt
@@ -50292,6 +50127,8 @@ address,function,file,kind,target
 ,SetWeaponTargetPosNative,src/seams/native.cpp,function,
 ,SetWeaponTargetUnitNative,src/seams/native.cpp,call,SetWeaponTargetUnit
 ,SetWeaponTargetUnitNative,src/seams/native.cpp,function,
+,SetWholePart,src/map/terrain.cpp,deref_write,*short
+,SetWholePart,src/map/terrain.cpp,function,
 ,SettingGetBlob,src/host/settings_io.h,call,host_setting_get
 ,SettingGetBlob,src/host/settings_io.h,function,
 ,SettingGetInt,src/host/settings_io.h,call,host_setting_get
@@ -50488,6 +50325,12 @@ address,function,file,kind,target
 ,SpendEnergyNative,src/seams/native.cpp,function,
 ,SpendMetalNative,src/seams/native.cpp,call,UnitResources::SpendMetal
 ,SpendMetalNative,src/seams/native.cpp,function,
+,SpotAt,src/weapons/weapons.cpp,call,operator Spot_0049a120 *
+,SpotAt,src/weapons/weapons.cpp,deref_escape,*Spot_0049a120
+,SpotAt,src/weapons/weapons.cpp,field_read,Ref<FeatureSpot>::offset
+,SpotAt,src/weapons/weapons.cpp,field_write,Ref<Spot_0049a120>::offset
+,SpotAt,src/weapons/weapons.cpp,function,
+,SpotAt,src/weapons/weapons.cpp,global_read,g_game
 ,SquadManagerDeleteTimersNative,src/seams/native.cpp,call,SquadManager::DeleteTimers
 ,SquadManagerDeleteTimersNative,src/seams/native.cpp,function,
 ,SquadManagerTickIfActiveNative,src/seams/native.cpp,call,SquadManager::TickIfActive
@@ -50586,13 +50429,6 @@ address,function,file,kind,target
 ,Sub,src/units/unit_script_calls.cpp,field_write,Diff_00480570::dx
 ,Sub,src/units/unit_script_calls.cpp,field_write,Diff_00480570::dy
 ,Sub,src/units/unit_script_calls.cpp,function,
-,Sub,src/weapons/weapons.cpp,field_read,Vec3::x
-,Sub,src/weapons/weapons.cpp,field_read,Vec3::y
-,Sub,src/weapons/weapons.cpp,field_read,Vec3::z
-,Sub,src/weapons/weapons.cpp,field_write,Vec3::x
-,Sub,src/weapons/weapons.cpp,field_write,Vec3::y
-,Sub,src/weapons/weapons.cpp,field_write,Vec3::z
-,Sub,src/weapons/weapons.cpp,function,
 ,Sub,src/weapons/weapons.cpp,field_read,Vec3::x
 ,Sub,src/weapons/weapons.cpp,field_read,Vec3::y
 ,Sub,src/weapons/weapons.cpp,field_read,Vec3::z
@@ -50811,11 +50647,6 @@ address,function,file,kind,target
 ,UnitFromId,src/weapons/weapons.cpp,call,operator Unit *
 ,UnitFromId,src/weapons/weapons.cpp,deref_escape,*Unit
 ,UnitFromId,src/weapons/weapons.cpp,field_read,Game::units
-,UnitFromId,src/weapons/weapons.cpp,function,
-,UnitFromId,src/weapons/weapons.cpp,global_read,g_game
-,UnitFromId,src/weapons/weapons.cpp,call,operator Unit *
-,UnitFromId,src/weapons/weapons.cpp,deref_escape,*Unit
-,UnitFromId,src/weapons/weapons.cpp,field_read,Game_0049a120::units
 ,UnitFromId,src/weapons/weapons.cpp,function,
 ,UnitFromId,src/weapons/weapons.cpp,global_read,g_game
 ,UnitIsLive,src/harness/harness.cpp,deref_read,*unsigned short
@@ -51104,10 +50935,6 @@ address,function,file,kind,target
 ,Vec3Add,src/orders/unit_orders.cpp,field_write,Vec3::y
 ,Vec3Add,src/orders/unit_orders.cpp,field_write,Vec3::z
 ,Vec3Add,src/orders/unit_orders.cpp,function,
-,Vec3At,src/ai/ai_player.cpp,field_write,Vec3::x
-,Vec3At,src/ai/ai_player.cpp,field_write,Vec3::y
-,Vec3At,src/ai/ai_player.cpp,field_write,Vec3::z
-,Vec3At,src/ai/ai_player.cpp,function,
 ,Vec3Init_0043a1f0::Vec3Init_0043a1f0,src/orders/order_list.cpp,field_write,Vec3::x
 ,Vec3Init_0043a1f0::Vec3Init_0043a1f0,src/orders/order_list.cpp,field_write,Vec3::y
 ,Vec3Init_0043a1f0::Vec3Init_0043a1f0,src/orders/order_list.cpp,field_write,Vec3::z
@@ -51916,6 +51743,7 @@ address,function,file,kind,target
 ,Whole,src/orders/unit_orders.cpp,function,
 ,Whole,src/orders/vtol_orders.cpp,deref_read,*short
 ,Whole,src/orders/vtol_orders.cpp,function,
+,WholePart,src/map/terrain.cpp,function,
 ,WidthTextCast,src/graphics/font.cpp,deref_read,*unsigned char
 ,WidthTextCast,src/graphics/font.cpp,field_read,Font::first
 ,WidthTextCast,src/graphics/font.cpp,field_read,Font::offsets
@@ -52087,7 +51915,6 @@ address,function,file,kind,target
 ,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,field_write,Zero11_004917d0::d
 ,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,function,
 ,_Construct,src/ai/ai_player.cpp,call,CopyDwordIfNonNull
-,_Construct,src/ai/ai_player.cpp,function,
 ,_Construct,src/ai/ai_player.cpp,call,CopyDwordPair
 ,_Construct,src/ai/ai_player.cpp,call,CopyOneByte
 ,_Construct,src/ai/ai_player.cpp,function,
@@ -52098,16 +51925,6 @@ address,function,file,kind,target
 ,_Construct,src/orders/vtol_orders.cpp,call,CopyDwordIfNonNull
 ,_Construct,src/orders/vtol_orders.cpp,function,
 ,_Destroy,src/util/tdf.cpp,call,TdfField::~TdfField
-,_Destroy,src/util/tdf.cpp,function,
-,_Destroy,src/util/tdf.cpp,call,ReleasePair
-,_Destroy,src/util/tdf.cpp,function,
-,_Destroy,src/util/tdf.cpp,call,StringRef::ReleaseRef
-,_Destroy,src/util/tdf.cpp,field_escape,TdfField::key
-,_Destroy,src/util/tdf.cpp,field_escape,TdfField::value
-,_Destroy,src/util/tdf.cpp,function,
-,_Destroy,src/util/tdf.cpp,call,StringRef::ReleaseRef
-,_Destroy,src/util/tdf.cpp,field_escape,TdfField::key
-,_Destroy,src/util/tdf.cpp,field_escape,TdfField::value
 ,_Destroy,src/util/tdf.cpp,function,
 ,_Insertion_sort_0043bc90,src/orders/order_list.cpp,call,InsertionSortOrderTypes
 ,_Insertion_sort_0043bc90,src/orders/order_list.cpp,call,_Val_type
@@ -52910,7 +52727,6 @@ address,function,file,kind,target
 ,loopCond_00464f80,src/game/players.cpp,function,
 ,more_00464f80,src/game/players.cpp,function,
 ,nblocks,src/files/hpi.cpp,function,
-,nblocks,src/files/hpi.cpp,function,
 ,offset_004394e0,src/ingame/markers.cpp,field_write,Fixed::value
 ,offset_004394e0,src/ingame/markers.cpp,function,
 ,offset_0048a1e0,src/units/unit_targets.cpp,field_read,Vec3_0048a1e0::x
@@ -52967,9 +52783,6 @@ address,function,file,kind,target
 ,operator-,src/weapons/weapons.cpp,function,
 ,operator<,src/ai/pathfind.cpp,field_read,Entry_40d670::key
 ,operator<,src/ai/pathfind.cpp,function,
-,operator==,src/util/tdf.cpp,call,strcmp
-,operator==,src/util/tdf.cpp,field_read,StringRef::ptr
-,operator==,src/util/tdf.cpp,function,
 ,operator==,src/util/tdf.cpp,call,strcmp
 ,operator==,src/util/tdf.cpp,field_read,StringRef::ptr
 ,operator==,src/util/tdf.cpp,function,

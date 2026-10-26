@@ -117,8 +117,6 @@ CampaignSetupFrame,SetupPlayerSlot,"seam slot filled by InstallNativeSeams, Play
 CaptureOrder,ClaimWeaponsNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::ClaimWeapons, src/orders/unit_orders.cpp:1429, src/seams/native.cpp"
 CaptureOrder,GetNanoPiecePosition,"seam slot filled by InstallNativeSeams, UnitsSeam::GetNanoPiecePosition, src/orders/unit_orders.cpp:1444, src/seams/native.cpp"
 CaptureOrder,GiveUnitToPlayer,"seam slot filled by InstallNativeSeams, PlayersSeam::GiveUnitToPlayer, src/orders/unit_orders.cpp:1460, src/seams/native.cpp"
-CheckMapCrc,ComputeMapChecksumNative,"seam slot filled by InstallNativeSeams, MapSeam::ComputeMapChecksum, src/units/movement_class.cpp:594, src/seams/native.cpp"
-CheckMapCrc,GetTerrainLengthNative,"seam slot filled by InstallNativeSeams, MapSeam::GetTerrainLength, src/units/movement_class.cpp:579, src/seams/native.cpp"
 CheckProjectileCollision,GetMapCellAtPosition,"seam slot filled by InstallNativeSeams, LosRadarSeam::GetMapCellAtPosition, src/weapons/weapons.cpp:2953, src/seams/native.cpp"
 ClaimFootprintCells,GetMapCell,"seam slot filled by InstallNativeSeams, LosRadarSeam::GetMapCell, src/map/terrain.cpp:266,298,324, src/seams/native.cpp"
 ClampWorldPosToTerrain,GetGroundHeightNative,"seam slot filled by InstallNativeSeams, UnitsSeam::GetGroundHeight, src/map/line_of_sight.cpp:1466,1477,1481, src/seams/native.cpp"

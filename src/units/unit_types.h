@@ -3,6 +3,7 @@
 
 class UnitDef;
 
+int __stdcall LoadUnitInfo();
 void __stdcall FreeUnitInfo();
 void __stdcall RefreshUnitInfo();
 void __stdcall CheckDownloadableFlags();

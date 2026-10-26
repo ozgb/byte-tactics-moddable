@@ -203,7 +203,7 @@ class PlayLoadingTest(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def fake_play(self, writes_save=True, fails=False):
+    def fake_play(self, writes_save=True, fails=False, writes=("harness.sav", "harness.opt")):
         def play(exe, scenario, game_dir, dump, timeout=None, poison=False, blockscan=0, env=None, put=None, collect=()):
             run = self.dir / "session" / f"run-{scenario.stem}" / "run"
             run.mkdir(parents=True)
@@ -213,7 +213,8 @@ class PlayLoadingTest(unittest.TestCase):
                 raise td.Error("exited with 2")
             if collect and writes_save:
                 (run / "savegame").mkdir()
-                (run / "savegame/harness.sav").write_bytes(b"the save")
+                for file in writes:
+                    (run / "savegame" / file).write_bytes(b"the " + file.encode())
             self.runs.append(seen)
             return run
         return play
@@ -232,9 +233,10 @@ class PlayLoadingTest(unittest.TestCase):
         with mock.patch.object(td, "play", self.fake_play()), mock.patch.object(td, "ROOT", self.dir):
             td.play_loading(Path("a.exe"), self.dir / "loader.txt", None, 7)
         self.assertEqual([r["scenario"] for r in self.runs], ["saver", "loader"])
-        self.assertEqual(self.runs[0]["collect"], ("savegame/harness.sav",))
+        self.assertEqual(self.runs[0]["collect"], ("savegame/harness.sav", "savegame/harness.opt"))
         self.assertIsNone(self.runs[0]["dump"])
-        self.assertEqual(self.runs[1]["put"], {"savegame/harness.sav": b"the save"})
+        self.assertEqual(self.runs[1]["put"], {"savegame/harness.sav": b"the harness.sav",
+                                               "savegame/harness.opt": b"the harness.opt"})
         self.assertEqual(self.runs[1]["dump"], 7)
         self.assertFalse((self.dir / "session" / "run-saver").exists())
 
@@ -244,6 +246,15 @@ class PlayLoadingTest(unittest.TestCase):
                 td.play_loading(Path("a.exe"), self.dir / "loader.txt", None, None)
         self.assertIn("loader: load saver: saver wrote no savegame/harness.sav", str(raised.exception))
         self.assertEqual([r["scenario"] for r in self.runs], ["saver"])
+
+    def test_a_saver_that_wrote_only_one_file_is_named_for_the_other(self):
+        for written, missing in (("harness.sav", "harness.opt"), ("harness.opt", "harness.sav")):
+            self.runs.clear()
+            with mock.patch.object(td, "play", self.fake_play(writes=(written,))), mock.patch.object(td, "ROOT", self.dir):
+                with self.assertRaises(td.Error) as raised:
+                    td.play_loading(Path("a.exe"), self.dir / "loader.txt", None, None)
+            self.assertIn(f"loader: load saver: saver wrote no savegame/{missing}", str(raised.exception))
+            self.assertEqual([r["scenario"] for r in self.runs], ["saver"])
 
     def test_a_saver_that_failed_is_named(self):
         with mock.patch.object(td, "play", self.fake_play(fails=True)), mock.patch.object(td, "ROOT", self.dir):

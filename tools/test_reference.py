@@ -249,7 +249,7 @@ class LoadOrderTest(unittest.TestCase):
             (tmp / f"{name}.txt").write_text(text)
         return {name: tmp / f"{name}.txt" for name in texts}
 
-    def play(self, scenarios, parallel, writes_save=True, fail=()):
+    def play(self, scenarios, parallel, writes_save=True, fail=(), writes=("harness.sav", "harness.opt")):
         order, loaded = [], {}
         lock = threading.Lock()
 
@@ -261,9 +261,11 @@ class LoadOrderTest(unittest.TestCase):
             if name in fail:
                 raise reference.tracediff.Error("boom")
             if load_from is not None:
-                loaded[name] = load_from.read_bytes()
+                loaded[name] = {f.name: f.read_bytes() for f in load_from.iterdir()}
             if save_to is not None and writes_save:
-                save_to.write_bytes(b"save of " + name.encode())
+                save_to.mkdir(parents=True, exist_ok=True)
+                for file in writes:
+                    (save_to / file).write_bytes(file.encode() + b" of " + name.encode())
             return {}, [], 0.0, None
 
         failed: dict[str, str] = {}
@@ -279,7 +281,7 @@ class LoadOrderTest(unittest.TestCase):
             self.assertEqual(order[-1], "loader", parallel)
             self.assertEqual(sorted(order), ["loader", "longer", "plain", "saver"])
             self.assertEqual(failed, {})
-            self.assertEqual(loaded, {"loader": b"save of saver"})
+            self.assertEqual(loaded, {"loader": {"harness.sav": b"harness.sav of saver", "harness.opt": b"harness.opt of saver"}})
             self.assertIn("loader", results)
 
     def test_only_a_saver_collects_a_save_and_only_a_loader_gets_one(self):
@@ -288,7 +290,9 @@ class LoadOrderTest(unittest.TestCase):
 
             def spy(*args, save_to=None, load_from=None, **kw):
                 if save_to is not None:
-                    save_to.write_bytes(b"x")
+                    save_to.mkdir()
+                    (save_to / "harness.sav").write_bytes(b"x")
+                    (save_to / "harness.opt").write_bytes(b"x")
                 saves.append((args[1].stem, save_to is not None, load_from is not None))
                 return {}, [], 0.0, None
 
@@ -311,6 +315,13 @@ class LoadOrderTest(unittest.TestCase):
         self.assertNotIn("loader", order)
         self.assertIn("loader: load saver: saver wrote no savegame/harness.sav", failed["loader"])
         self.assertNotIn("saver", failed)
+
+    def test_saver_that_wrote_only_one_file_fails_the_loader_naming_the_missing_one(self):
+        for written, missing in (("harness.sav", "harness.opt"), ("harness.opt", "harness.sav")):
+            with tempfile.TemporaryDirectory() as tmp:
+                order, loaded, failed, results = self.play(self.scenarios(Path(tmp)), 1, writes=(written,))
+            self.assertNotIn("loader", order)
+            self.assertIn(f"loader: load saver: saver wrote no savegame/{missing}", failed["loader"])
 
     def test_saver_outside_the_set_fails_the_loader_naming_both(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -337,6 +348,7 @@ class LoadOrderTest(unittest.TestCase):
             run = Path(tmp) / "session" / "run"
             (run / "savegame").mkdir(parents=True)
             (run / "savegame/harness.sav").write_bytes(b"data")
+            (run / "savegame/harness.opt").write_bytes(b"options")
             (run / "trace.txt").write_text("")
             seen = {}
 
@@ -344,14 +356,15 @@ class LoadOrderTest(unittest.TestCase):
                 seen.update(put=put, collect=collect)
                 return run
 
-            target = Path(tmp) / "kept.sav"
+            target = Path(tmp) / "kept"
             with mock.patch.object(reference.tracediff, "play", fake_play), \
                     mock.patch.object(reference.tracediff, "parse_trace", lambda p: ({"game_seed": "1", "crt_seed": "1", "view_seed": "1"}, [])), \
                     mock.patch.object(reference.tracedigest, "digests", lambda rows: []):
                 (Path(tmp) / "s.txt").write_text("ticks 5\n")
                 reference.play_scenario(Path("x.exe"), Path(tmp) / "s.txt", None, save_to=target)
-            self.assertEqual(target.read_bytes(), b"data")
-            self.assertEqual(seen["collect"], ("savegame/harness.sav",))
+            self.assertEqual((target / "harness.sav").read_bytes(), b"data")
+            self.assertEqual((target / "harness.opt").read_bytes(), b"options")
+            self.assertEqual(seen["collect"], ("savegame/harness.sav", "savegame/harness.opt"))
             self.assertFalse(run.parent.exists())
 
 

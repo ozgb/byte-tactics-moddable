@@ -208,9 +208,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     tick is slow (about 20 ticks a second at the end of a long run), so its timeout uses
     RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK. With `retry_any` a failed run is tried once more whatever the failure.
 
-    With `save_to`, the savegame/harness.sav the run wrote in its game copy is copied there before the run's
-    directory is removed (nothing is copied when the run wrote none). With `load_from`, that file is
-    placed in the run's game copy at savegame/harness.sav before the exe starts.
+    With `save_to` (a directory), each of tracediff.SAVE_FILES the run wrote in its game copy is copied there by its
+    file name before the run's directory is removed (nothing is copied for a file the run wrote none of). With
+    `load_from` (a directory), its files are placed in the run's game copy at those paths before the exe starts.
     """
     ticks = scenario_ticks(scenario)
     rate = RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK if scans is not None and scan_every == 1 else RUN_TICKS_PER_SECOND
@@ -220,9 +220,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         try:
             extra: dict = {}
             if load_from is not None:
-                extra["put"] = {tracediff.SAVE_PATH: load_from}
+                extra["put"] = {path: load_from / Path(path).name for path in tracediff.SAVE_FILES}
             if save_to is not None:
-                extra["collect"] = (tracediff.SAVE_PATH,)
+                extra["collect"] = tracediff.SAVE_FILES
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, scan_every if scans is not None else 0, **extra)
             break
         except tracediff.Error as e:
@@ -232,8 +232,11 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     elapsed = time.time() - t0
     kept = None
     try:
-        if save_to is not None and (run / tracediff.SAVE_PATH).is_file():
-            shutil.copyfile(run / tracediff.SAVE_PATH, save_to)
+        if save_to is not None:
+            save_to.mkdir(parents=True, exist_ok=True)
+            for path in tracediff.SAVE_FILES:
+                if (run / path).is_file():
+                    shutil.copyfile(run / path, save_to / Path(path).name)
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
         for key in ("game_seed", "crt_seed", "view_seed"):
             if key not in header:
@@ -281,7 +284,7 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
     which they only hardlink. With `expected`, a scenario that differs keeps its trace (see play_scenario).
 
     A scenario with a `load` line runs after every scenario that has none, in any mode and with any `parallel`:
-    the scenario it names saves a game (the `save` key), the run's savegame/harness.sav is copied out of its game
+    the scenario it names saves a game (the `save` key), the run's savegame/harness.sav and savegame/harness.opt are copied out of its game
     copy into a temporary directory, and put into the loading run's own game copy. A loader whose saver is not among
     `scenarios` (see with_savers), failed to run, or wrote no save fails without running, with a message naming both.
     """
@@ -301,8 +304,9 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
             return f"{name}: load {saver}: {saver} is not among the scenarios played"
         if saver in errors:
             return f"{name}: load {saver}: {saver} failed to run"
-        if not (saves / f"{saver}.sav").is_file():
-            return f"{name}: load {saver}: {saver} wrote no {tracediff.SAVE_PATH}"
+        for path in tracediff.SAVE_FILES:
+            if not (saves / saver / Path(path).name).is_file():
+                return f"{name}: load {saver}: {saver} wrote no {path}"
         return None
 
     def one(name: str) -> None:
@@ -312,8 +316,8 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
                 raise tracediff.Error(problem)
             saver = loads[name]
             results[name] = play_scenario(exe, scenarios[name], game_dir, (expected or {}).get(name), poison, keep_always, scans, scan_every, retry_any,
-                                          save_to=saves / f"{name}.sav" if name in loads.values() else None,
-                                          load_from=saves / f"{saver}.sav" if saver else None)
+                                          save_to=saves / name if name in loads.values() else None,
+                                          load_from=saves / saver if saver else None)
         except (tracediff.Error, OSError) as e:
             errors[name] = last_lines(e, 5)
             if failed is not None:

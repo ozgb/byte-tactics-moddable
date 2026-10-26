@@ -27,6 +27,10 @@ char IsMemSet();
 int GetMemSetValue();
 void __stdcall MakeDirectoryPath(char* path);
 int __stdcall SaveGameFile(char* path, char* description, int gameId);
+HapiBank* __stdcall OpenSummaryBank(char* name);
+void __stdcall FreeSummaryBank(void* handle);
+HapiBank* __stdcall OpenHapiBank(char* path);
+char* HarnessBankString(HapiBank* bank, char* item, char* def);
 
 enum { MAX_PLAYERS = 10 };
 
@@ -69,6 +73,14 @@ static char s_scenarioPath[512];
 static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
 static unsigned s_dumpTick = 0;
+static char s_loadName[64];
+static int s_loadLine = 0;
+static char s_decidedKey[32];
+static int s_decidedLine = 0;
+static const char s_savePath[] = "savegame\\harness.sav";
+typedef Table_0047ae60 OptionsTable;
+static const char s_optionsPath[] = "savegame\\harness.opt";
+static OptionsTable s_savedOptions;
 
 static void Fail(const char* text)
 {
@@ -429,8 +441,23 @@ static void CheckOrders()
     }
 }
 
+static int KeyIsDecidedByLoad(const char* key)
+{
+    static const char* const keys[] = { "game_type", "map", "difficulty", "commander_death", "mapping",
+        "line_of_sight", "los_type", "start_positions", "local_player", "spawn", "order", "save" };
+    for (unsigned i = 0; i < sizeof keys / sizeof keys[0]; i++) {
+        if (strcmp(key, keys[i]) == 0)
+            return 1;
+    }
+    return strncmp(key, "player", 6) == 0 && isdigit((unsigned char)key[6]) && key[7] == '.';
+}
+
 static void ReadKey(int lineNo, const char* key, char* value)
 {
+    if (s_decidedLine == 0 && KeyIsDecidedByLoad(key) && strlen(key) < sizeof s_decidedKey) {
+        strcpy(s_decidedKey, key);
+        s_decidedLine = lineNo;
+    }
     if (strcmp(key, "game_seed") == 0)
         s_gameSeed = ParseNumber(lineNo, key, value);
     else if (strcmp(key, "crt_seed") == 0)
@@ -486,6 +513,17 @@ static void ReadKey(int lineNo, const char* key, char* value)
         if (s_saveTick == 0)
             FailLine(lineNo, "needs a tick of at least 1", key, "");
         s_saveLine = lineNo;
+    } else if (strcmp(key, "load") == 0) {
+        if (s_loadLine != 0)
+            FailLine(lineNo, "is a second load line", key, "");
+        if (strlen(value) >= sizeof s_loadName)
+            FailLine(lineNo, "is too long", key, "");
+        for (const char* c = value; *c != '\0'; c++) {
+            if (!isalnum((unsigned char)*c) && *c != '-' && *c != '_')
+                FailLine(lineNo, "needs a scenario file name without its extension", key, "");
+        }
+        strcpy(s_loadName, value);
+        s_loadLine = lineNo;
     } else if (strcmp(key, "order") == 0)
         ReadOrder(lineNo, value);
     else if (strcmp(key, "spawn") == 0)
@@ -496,8 +534,23 @@ static void ReadKey(int lineNo, const char* key, char* value)
         FailLine(lineNo, "is not a known key", key, "");
 }
 
+static void CheckLoadScenario()
+{
+    if (s_decidedLine != 0) {
+        char detail[100];
+        sprintf(detail, ", the save of \"%.40s\" decides it", s_loadName);
+        FailLine(s_decidedLine, "cannot be set by a scenario with a load line", s_decidedKey, detail);
+    }
+    if (s_ticks == 0)
+        Fail("testmode: scenario needs a ticks line\n");
+}
+
 static void CheckScenario()
 {
+    if (s_loadLine != 0) {
+        CheckLoadScenario();
+        return;
+    }
     int named = 0;
     for (int i = 0; i < MAX_PLAYERS; i++)
         named += s_players[i].named;
@@ -617,9 +670,11 @@ static void SeedNetworkHost(int host)
     g_game->net_flags |= 8;
 }
 
+static OptionsTable* ScenarioTable() { return (OptionsTable*)g_game->options; }
+
 static void SetUpSkirmish()
 {
-    Table_0047ae60* t = (Table_0047ae60*)g_game->options;
+    Table_0047ae60* t = ScenarioTable();
     int sideCount = g_game->sides;
     int highest = 0;
     int active = 0;
@@ -705,6 +760,86 @@ static void SetUpSkirmish()
         g_game->mode_391f1 = 5;
         g_game->handler = LoadingScreenFrame;
     }
+    s_savedOptions = *t;
+}
+
+static void FailLoad(const char* what, const char* detail)
+{
+    char msg[600];
+    sprintf(msg, "testmode: scenario line %d: load %s: %s%s\n", s_loadLine, s_loadName, what, detail);
+    Fail(msg);
+}
+
+static void SetUpLoadedGame()
+{
+    char path[sizeof s_savePath];
+    strcpy(path, s_savePath);
+    HapiBank* summary = OpenSummaryBank(path);
+    if (summary == NULL) {
+        FailLoad("cannot read the save ", s_savePath);
+        return;
+    }
+    int type = summary->GetIntegerItem("Gametype", 0);
+    int savedTick = summary->GetIntegerItem("Game Time", 0);
+    FreeSummaryBank(summary);
+    if (type != 2)
+        FailLoad("the save is not a skirmish, the load key takes game type 2 only: ", s_savePath);
+    if (s_ticks <= (unsigned)savedTick) {
+        char detail[100];
+        sprintf(detail, "ticks must be after the saved tick %d", savedTick);
+        FailLoad("", detail);
+    }
+
+    OptionsTable* t = ScenarioTable();
+    FILE* options = fopen(s_optionsPath, "rb");
+    if (options == NULL) {
+        FailLoad("cannot read the options ", s_optionsPath);
+        return;
+    }
+    long optionsSize = fseek(options, 0, SEEK_END) == 0 ? ftell(options) : -1;
+    if (optionsSize != (long)sizeof *t || fseek(options, 0, SEEK_SET) != 0 || fread(t, sizeof *t, 1, options) != 1) {
+        fclose(options);
+        FailLoad("cannot read the options ", s_optionsPath);
+        return;
+    }
+    fclose(options);
+    char* saveName = (char*)g_game + 0x38c6b;
+    strcpy(saveName, s_savePath);
+    g_game->pendingSaveStore = (int)OpenHapiBank(saveName);
+    if (g_game->pendingSaveStore == 0) {
+        FailLoad("cannot read the save ", s_savePath);
+        return;
+    }
+    HapiBank* bank = (HapiBank*)g_game->pendingSaveStore;
+    bank->OpenAccount("summary");
+    SetMissionType(bank->GetIntegerItem("Gametype", 0));
+    char* campaign = HarnessBankString(bank, "Campaign", 0);
+    Mission* mission = (Mission*)g_game->net;
+    if (campaign != NULL)
+        mission->LoadCampaign(campaign);
+    g_game->flag_37ef2 = bank->GetIntegerItem("Side", 0);
+    g_game->difficulty = bank->GetIntegerItem("Difficulty", 0);
+    char* name = HarnessBankString(bank, "Mission", 0);
+    if (name == NULL || strlen(name) == 0 || mission->LoadMissionByName(name) == 0) {
+        FailLoad("the save names a map the game cannot load: ", s_savePath);
+        return;
+    }
+    strcpy(t->mapName, name);
+    char* thumbs = HarnessBankString(bank, "Thumbs", 0);
+    if (thumbs != NULL)
+        strncpy((char*)g_game->field_391cf, thumbs, 0x19);
+    if (strlen((char*)g_game->field_391cf) != 0x19)
+        InitMissionStatus();
+    bank->OpenAccount("summary");
+    g_game->field_2a3c = (unsigned short)((short)bank->GetIntegerItem("Players", 0));
+    t->commanderDeath = bank->GetIntegerItem("CommanderDeath", 1);
+    t->fixedLocations = bank->GetIntegerItem("Location", 1);
+    t->mapping = bank->GetIntegerItem("Mapping", 1);
+    t->lineOfSight = bank->GetIntegerItem("LineOfSight", 1);
+    t->losType = bank->GetIntegerItem("LineOfSightType", 1);
+    g_game->field_2bbe = 9;
+    g_game->field_2bbf = 2;
+    g_game->field_2bc0 = 2;
 }
 
 static void OpenTrace(unsigned controlWord);
@@ -828,7 +963,10 @@ void HarnessStartSkirmish()
     if (!s_testMode || s_started)
         return;
     s_started = 1;
-    SetUpSkirmish();
+    if (s_loadLine != 0)
+        SetUpLoadedGame();
+    else
+        SetUpSkirmish();
     *(int*)((char*)g_game + 0x579) = -1;
 }
 
@@ -840,6 +978,15 @@ void HarnessAfterStep()
         char description[] = "Harness save";
         MakeDirectoryPath(directory);
         SaveGameFile(path, description, 0x29a);
+        FILE* options = fopen(s_optionsPath, "wb");
+        int written = options != NULL && fwrite(&s_savedOptions, sizeof s_savedOptions, 1, options) == 1;
+        if (options != NULL && fclose(options) != 0)
+            written = 0;
+        if (!written) {
+            char msg[100];
+            sprintf(msg, "testmode: cannot write %s\n", s_optionsPath);
+            Fail(msg);
+        }
     }
     if (!s_testMode)
         return;

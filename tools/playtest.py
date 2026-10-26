@@ -18,7 +18,9 @@ a copy of an ordinary link whose stubs fault when reached (see stub_traps).
 `--testmode <file>` instead runs each exe with `-testmode <file>` (a scenario of
 reference/README.md) and passes when it exits with status 0 within
 `--testmode-timeout` seconds. The trace the exe writes (trace.txt, and dump.txt
-with `--testdump <tick>`) is copied to the run's directory. Every `--testmode` run passes the game's
+with `--testdump <tick>`) is copied to the run's directory. `--put DEST SRC` places a file in the run's game copy
+before the exe starts, and `--collect PATH` copies a file the game wrote there (the `save` key's
+`savegame/harness.sav`) to the run's directory, both with `--testmode`. Every `--testmode` run passes the game's
 own `-memset=0` switch, which makes GameAlloc (and so operator new) zero new memory. `--poison` passes
 `-memset=0xcdcdcdcd` instead, which fills it with 0xCD.
 
@@ -401,12 +403,19 @@ class Instance:
         copy_game(game_src, self.game)
         for stale in ("trace.txt", "dump.txt"):
             (self.game / stale).unlink(missing_ok=True)
+        for dest, _ in self.run.put:
+            (self.game / dest).unlink(missing_ok=True)
+        for path in self.run.collect:
+            (self.game / path).unlink(missing_ok=True)
         shutil.copy2(self.run.exes[min(self.index, len(self.run.exes)) - 1], self.game / "TotalA.exe")
         if self.run.testmode:
             shutil.copyfile(self.run.testmode, self.game / "testmode.txt")
             commit = self.run.exes[min(self.index, len(self.run.exes)) - 1].parent / "commit.txt"
             if commit.is_file():
                 shutil.copyfile(commit, self.game / "commit.txt")
+            for dest, src in self.run.put:
+                (self.game / dest).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(src, self.game / dest)
         for name, text in files.items():
             (self.game / name).write_text(text.replace("\\n", "\r\n"))
         if reg:
@@ -668,6 +677,11 @@ class Instance:
             if (self.game / name).is_file():
                 shutil.copyfile(self.game / name, self.run.out / name)
                 self.run.notes.append(f"{name}: {self.run.out / name}")
+        for name in self.run.collect:
+            if (self.game / name).is_file():
+                (self.run.out / name).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(self.game / name, self.run.out / name)
+                self.run.notes.append(f"{name}: {self.run.out / name}")
 
     def clean(self) -> None:
         shutil.rmtree(self.base, ignore_errors=True)
@@ -849,7 +863,8 @@ class GotoLabel(Exception):
 class Run:
     def __init__(self, number: int, name: str, scenario: Scenario, exes: list[Path], exe_tag: str, session: Path,
                  screens: dict[str, Screen], debug: str, window: bool = False, testmode: Path | None = None,
-                 testdump: int | None = None, poison: bool = False):
+                 testdump: int | None = None, poison: bool = False, put: list[tuple[str, Path]] | None = None,
+                 collect: list[str] | None = None):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -863,6 +878,8 @@ class Run:
         self.testmode = testmode     # a reference/ scenario file to run the exe on
         self.testdump = testdump     # the tick to dump the state of, with testmode
         self.poison = poison
+        self.put = put or []
+        self.collect = collect or []
         self.instances = [Instance(self, i + 1) for i in range(scenario.instances)]
         self.t0 = time.time()
         self.log = None
@@ -1337,6 +1354,10 @@ def main() -> None:
                     help="--testmode: also run with -testdump TICK, which writes dump.txt")
     ap.add_argument("--poison", action="store_true",
                     help="--testmode: fill new game allocations with 0xCD (the game's -memset switch)")
+    ap.add_argument("--put", nargs=2, action="append", default=[], metavar=("DEST", "SRC"),
+                    help="--testmode: copy the file SRC into the run's game copy at DEST (relative to the game directory) before the exe starts; repeatable")
+    ap.add_argument("--collect", action="append", default=[], metavar="PATH",
+                    help="--testmode: copy the file PATH of the run's game copy (relative to the game directory) to the same path in the run's directory when the run ends, if it exists; repeatable")
     ap.add_argument("--list", action="store_true", help="list the scenarios")
     ap.add_argument("--signature", nargs="+", metavar="NAME GEOMETRY IMAGE",
                     help="print a screens.txt line for an area of screenshots of one screen")
@@ -1369,6 +1390,16 @@ def main() -> None:
         ap.error("--testdump needs --testmode")
     if args.poison and not args.testmode:
         ap.error("--poison needs --testmode")
+    if (args.put or args.collect) and not args.testmode:
+        ap.error("--put and --collect need --testmode")
+    put = []
+    for dest, src in args.put:
+        if not Path(src).is_file():
+            ap.error(f"--put: {src} is not a file")
+        put.append((dest, Path(src).resolve()))
+    for path in [d for d, _ in put] + args.collect:
+        if Path(path).is_absolute() or ".." in Path(path).parts:
+            ap.error(f"{path} must be a path inside the game directory")
     if args.testdump is not None and args.testdump < 0:
         ap.error("--testdump takes a tick of 0 or more")
     if args.testmode and not Path(args.testmode).is_file():
@@ -1418,7 +1449,8 @@ def main() -> None:
                                 args.debug, args.window,
                                 Path(args.testmode).resolve() if sc is testmode else None,
                                 args.testdump if sc is testmode else None,
-                                args.poison and sc is testmode))
+                                args.poison and sc is testmode, put if sc is testmode else None,
+                                args.collect if sc is testmode else None))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None

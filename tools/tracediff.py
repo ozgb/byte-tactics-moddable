@@ -35,8 +35,10 @@ scenario).
 
 import argparse
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from traceschema import TRACE_FORMAT
@@ -146,10 +148,30 @@ def print_divergence(tick: int, phase: str) -> None:
     print(f"  phase function: {describe_phase(phase)}")
 
 
+SAVE_FILES = ("savegame/harness.sav", "savegame/harness.opt")
+
+
+def scenario_load(scenario: Path) -> str | None:
+    """The scenario named by the file's `load` line, or None when it has none."""
+    for line in scenario.read_text().splitlines():
+        words = line.split()
+        if words and words[0] == "load":
+            return words[1] if len(words) > 1 else None
+    return None
+
+
 def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
-         poison: bool = False) -> Path:
-    """Run the exe on the scenario with playtest.py; the run's directory."""
+         poison: bool = False, put: dict[str, Path] | None = None, collect: tuple[str, ...] = ()) -> Path:
+    """Run the exe on the scenario with playtest.py; the run's directory.
+
+    `put` maps a path in the run's game copy to a file placed there before the exe starts, and each path of
+    `collect` that the game writes in its copy is kept at the same path in the run's directory.
+    """
     cmd = [sys.executable, str(ROOT / "tools/playtest.py"), "--exe", str(exe), "--testmode", str(scenario)]
+    for dest, src in (put or {}).items():
+        cmd += ["--put", dest, str(src)]
+    for path in collect:
+        cmd += ["--collect", path]
     if game_dir:
         cmd += ["--game-dir", game_dir]
     if dump is not None:
@@ -175,12 +197,37 @@ def need(run: Path, name: str) -> Path:
     return run / name
 
 
+def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
+                 poison: bool = False) -> Path:
+    """`play`, but a scenario with a `load` line first plays the scenario it names, from the same directory, and gets its save."""
+    saver = scenario_load(scenario)
+    if saver is None:
+        return play(exe, scenario, game_dir, dump, timeout, poison)
+    saver_path = scenario.parent / f"{saver}.txt"
+    if not saver_path.is_file():
+        raise Error(f"{scenario.stem}: load {saver}: there is no scenario {saver_path}")
+    (ROOT / "build/scratch").mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="save-", dir=ROOT / "build/scratch") as scratch:
+        try:
+            run = play(exe, saver_path, game_dir, None, timeout, poison, collect=SAVE_FILES)
+        except Error as e:
+            raise Error(f"{scenario.stem}: load {saver}: {saver} failed to run:\n{e}") from None
+        try:
+            for path in SAVE_FILES:
+                if not (run / path).is_file():
+                    raise Error(f"{scenario.stem}: load {saver}: {saver} wrote no {path}")
+                shutil.copyfile(run / path, Path(scratch) / Path(path).name)
+        finally:
+            shutil.rmtree(run.parent, ignore_errors=True)
+        return play(exe, scenario, game_dir, dump, timeout, poison, put={path: Path(scratch) / Path(path).name for path in SAVE_FILES})
+
+
 def compare(args: argparse.Namespace) -> int:
     exes = [Path(e).resolve() for e in args.exe]
     scenarios = [Path(s).resolve() for s in args.scenario]
     scenarios *= 2 if len(scenarios) == 1 else 1
     poison = [False, args.poison_b]
-    runs = [play(e, s, args.game_dir, None, None, p) for e, s, p in zip(exes, scenarios, poison)]
+    runs = [play_loading(e, s, args.game_dir, None, None, p) for e, s, p in zip(exes, scenarios, poison)]
     (ha, ra), (hb, rb) = (parse_trace(need(r, "trace.txt")) for r in runs)
     check_headers(ha, hb, args.ignore_view_seed)
     div = first_divergence(ra, rb)
@@ -189,7 +236,7 @@ def compare(args: argparse.Namespace) -> int:
         return 0
     tick, phase = div
     print_divergence(tick, phase)
-    runs = [play(e, s, args.game_dir, tick, None, p) for e, s, p in zip(exes, scenarios, poison)]
+    runs = [play_loading(e, s, args.game_dir, tick, None, p) for e, s, p in zip(exes, scenarios, poison)]
     print_diff(diff_dumps(need(runs[0], "dump.txt"), need(runs[1], "dump.txt"), tick, phase))
     return 1
 

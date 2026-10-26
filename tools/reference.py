@@ -36,6 +36,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -213,6 +214,7 @@ def should_retry(message: str) -> bool:
 
 def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                   want: tuple[dict[str, str], list[tuple[int, str]]] | None = None, poison: bool = False,
+                  save_to: Path | None = None, load_from: Path | None = None,
                   ) -> tuple[dict[str, str], list[tuple[int, str]], float, Path | None]:
     """Run the scenario under Wine: the trace header, the digest of each tick, the seconds taken.
 
@@ -223,13 +225,22 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     was seen in 1 of 300 runs, and so is one that stopped on the DirectX initialisation dialog before
     tick 1 (startup under load). A run that is still going at the timeout is a hang, and a run that
     stopped on any other error dialog (R6025 and the like) is a game fault: both fail at once.
+
+    With `save_to` (a directory), each of tracediff.SAVE_FILES the run wrote in its game copy is copied there by its
+    file name before the run's directory is removed (nothing is copied for a file the run wrote none of). With
+    `load_from` (a directory), its files are placed in the run's game copy at those paths before the exe starts.
     """
     ticks = scenario_ticks(scenario)
     timeout = RUN_SECONDS_BASE + ticks / RUN_TICKS_PER_SECOND
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            run = tracediff.play(exe, scenario, game_dir, None, timeout, poison)
+            extra: dict = {}
+            if load_from is not None:
+                extra["put"] = {path: load_from / Path(path).name for path in tracediff.SAVE_FILES}
+            if save_to is not None:
+                extra["collect"] = tracediff.SAVE_FILES
+            run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, **extra)
             break
         except tracediff.Error as e:
             if attempt == RUN_ATTEMPTS - 1 or not should_retry(str(e)):
@@ -238,6 +249,11 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     elapsed = time.time() - t0
     kept = None
     try:
+        if save_to is not None:
+            save_to.mkdir(parents=True, exist_ok=True)
+            for path in tracediff.SAVE_FILES:
+                if (run / path).is_file():
+                    shutil.copyfile(run / path, save_to / Path(path).name)
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
         for key in ("game_seed", "crt_seed", "view_seed"):
             if key not in header:
@@ -263,15 +279,44 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
     Each run has its own session directory, Wine prefix, game directory, X display and audio sink
     (tools/playtest.py names them by its pid), so runs share nothing but the template prefix,
     which they only hardlink. With `expected`, a scenario that differs keeps its trace (see play_scenario).
+
+    A scenario with a `load` line runs after every scenario that has none, with any `parallel`: the scenario
+    it names saves a game (the `save` key), the run's savegame/harness.sav and savegame/harness.opt are copied out of its game copy into
+    a temporary directory, and put into the loading run's own game copy. A loader whose saver is not among
+    `scenarios`, failed to run, or wrote no save fails without running, with a message naming both.
     """
     playtest.template_prefix()
     results: dict[str, tuple] = {}
     failures: list[str] = []
+    errors: dict[str, str] = {}
+    loads = {name: tracediff.scenario_load(path) for name, path in scenarios.items()}
+    (ROOT / "build/scratch").mkdir(parents=True, exist_ok=True)
+    saves = Path(tempfile.mkdtemp(prefix="saves-", dir=ROOT / "build/scratch"))
+
+    def load_problem(name: str) -> str | None:
+        saver = loads[name]
+        if saver is None:
+            return None
+        if saver not in scenarios:
+            return f"{name}: load {saver}: {saver} is not among the scenarios played"
+        if saver in errors:
+            return f"{name}: load {saver}: {saver} failed to run"
+        for path in tracediff.SAVE_FILES:
+            if not (saves / saver / Path(path).name).is_file():
+                return f"{name}: load {saver}: {saver} wrote no {path}"
+        return None
 
     def one(name: str) -> None:
         try:
-            results[name] = play_scenario(exe, scenarios[name], game_dir, (expected or {}).get(name), poison)
+            problem = load_problem(name)
+            if problem:
+                raise tracediff.Error(problem)
+            saver = loads[name]
+            results[name] = play_scenario(exe, scenarios[name], game_dir, (expected or {}).get(name), poison,
+                                          save_to=saves / name if name in loads.values() else None,
+                                          load_from=saves / saver if saver else None)
         except (tracediff.Error, OSError) as e:
+            errors[name] = last_lines(e, 5)
             failures.append(f"{name}: failed to run, playtest.py ended with:\n    {last_lines(e, 5)}")
 
     def longest_first(name: str) -> int:
@@ -280,8 +325,13 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
         except tracediff.Error:
             return 0
 
-    with ThreadPoolExecutor(parallel) as pool:
-        list(pool.map(one, sorted(scenarios, key=longest_first)))
+    ordered = sorted(scenarios, key=longest_first)
+    try:
+        with ThreadPoolExecutor(parallel) as pool:
+            list(pool.map(one, [n for n in ordered if loads[n] is None]))
+            list(pool.map(one, [n for n in ordered if loads[n] is not None]))
+    finally:
+        shutil.rmtree(saves, ignore_errors=True)
     if failures:
         fail("scenarios failed to run:\n" + "\n".join(failures))
     return results

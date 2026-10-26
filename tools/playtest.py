@@ -403,6 +403,10 @@ class Instance:
         copy_game(game_src, self.game)
         for stale in ("trace.txt", "dump.txt"):
             (self.game / stale).unlink(missing_ok=True)
+        for dest, _ in self.run.put:
+            (self.game / dest).unlink(missing_ok=True)
+        for path in self.run.collect:
+            (self.game / path).unlink(missing_ok=True)
         shutil.copy2(self.run.exes[min(self.index, len(self.run.exes)) - 1], self.game / "TotalA.exe")
         if self.run.testmode:
             shutil.copyfile(self.run.testmode, self.game / "testmode.txt")

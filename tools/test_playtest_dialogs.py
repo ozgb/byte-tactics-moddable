@@ -91,6 +91,48 @@ def test_put_places_a_file_in_the_game_copy() -> None:
         assert (inst.game / "savegame/harness.sav").read_bytes() == b"save data"
 
 
+def test_prepare_removes_a_stale_put_and_collect_path() -> None:
+    from unittest import mock
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        src = tmp / "put.opt"
+        src.write_bytes(b"put")
+        run = fake_run(tmp, put=[("savegame/harness.opt", src)], collect=["savegame/harness.sav"])
+        inst = playtest.Instance(run, 1)
+
+        def stale_copy_game(src_dir, dst):
+            (dst / "savegame").mkdir(parents=True, exist_ok=True)
+            (dst / "savegame/harness.sav").write_bytes(b"stale save")
+            (dst / "savegame/harness.opt").write_bytes(b"stale options")
+
+        with mock.patch.object(playtest, "link_prefix"), mock.patch.object(playtest, "copy_game", stale_copy_game):
+            inst.prepare(tmp / "template", tmp / "game_src", [], {})
+        assert not (inst.game / "savegame/harness.sav").exists()
+        assert (inst.game / "savegame/harness.opt").read_bytes() == b"put"
+
+
+def test_put_does_not_write_through_a_symlink() -> None:
+    from unittest import mock
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        install = tmp / "install.opt"
+        install.write_bytes(b"install file")
+        src = tmp / "put.opt"
+        src.write_bytes(b"put")
+        run = fake_run(tmp, put=[("savegame/harness.opt", src)])
+        inst = playtest.Instance(run, 1)
+
+        def linking_copy_game(src_dir, dst):
+            (dst / "savegame").mkdir(parents=True, exist_ok=True)
+            (dst / "savegame/harness.opt").symlink_to(install)
+
+        with mock.patch.object(playtest, "link_prefix"), mock.patch.object(playtest, "copy_game", linking_copy_game):
+            inst.prepare(tmp / "template", tmp / "game_src", [], {})
+        assert install.read_bytes() == b"install file"
+        assert not (inst.game / "savegame/harness.opt").is_symlink()
+        assert (inst.game / "savegame/harness.opt").read_bytes() == b"put"
+
+
 def test_collect_keeps_a_file_of_the_game_copy() -> None:
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d)

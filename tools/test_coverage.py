@@ -459,6 +459,31 @@ class PlaySuiteTest(unittest.TestCase):
         self.assertEqual(seen["alpha"]["LLVM_PROFILE_FILE"], cov.windows_path(run_dir / "alpha") + "\\cov-%p.profraw")
 
 
+class PlaySuiteSaverTest(unittest.TestCase):
+    def test_a_named_loader_is_played_with_its_saver(self):
+        played = {}
+
+        def fake_play_all(exe, scenarios, game_dir, parallel, failed=None, retry_any=False):
+            played.update(scenarios)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            every = {n: Path(tmp) / f"{n}.txt" for n in ("plain", "saver", "loader")}
+            every["plain"].write_text("ticks 5\n")
+            every["saver"].write_text("ticks 5\nsave 2\n")
+            every["loader"].write_text("ticks 5\nload saver\n")
+            saved = (cov.RUN_DIR, cov.reference.play_all, cov.reference.scenario_files, cov.subprocess.run)
+            cov.RUN_DIR = Path(tmp) / "run"
+            cov.reference.play_all = fake_play_all
+            cov.reference.scenario_files = lambda: every
+            cov.subprocess.run = lambda *a, **k: None
+            try:
+                with self.assertRaises(SystemExit):
+                    cov.play_suite(Path("TotalA.exe"), None, 1, ["loader"])
+            finally:
+                cov.RUN_DIR, cov.reference.play_all, cov.reference.scenario_files, cov.subprocess.run = saved
+        self.assertEqual(sorted(played), ["loader", "saver"])
+
+
 class WriteNothingTest(unittest.TestCase):
     def test_write_refuses_an_export_without_game_functions(self):
         with tempfile.TemporaryDirectory() as d:

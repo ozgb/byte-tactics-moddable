@@ -60,6 +60,7 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `quirks_tamper` | none | Test only: flips a quirk flag at this tick, so the freeze check exits 2 (see Quirk flags) |
 | `quirks_reach` | none | Test only: `<tick> <flag name>`, at that tick makes the game reach the guard of `units.ignore-null-death-record`, `ai.patrol-null-enemy-skip` or `units.skip-empty-yardmap` (see Quirk flags) |
 | `save` | none | Saves the game with `SaveGameFile` to `savegame\harness.sav` in the run's game directory after the step of this tick, 1 to `ticks`; one line only |
+| `load` | none | Starts from the game another scenario of the suite saved, by file stem (`load save-midgame`), instead of from the scenario's own map and players; one line only (see Loading a saved game) |
 | `game_type` | 2 | 2: skirmish, 3: multiplayer without a network; one line only (see Game types). Type 1, a campaign mission, needs the `campaign` key and comes with #444 |
 | `map` | required | Map name, the rest of the line (names have spaces) |
 | `difficulty` | 1 | AI difficulty 0 to 2, one value for all computer players |
@@ -79,6 +80,54 @@ Defaults are the ones in `LoadSettings`, never the registry.
 `player<N>.*` keys take N from 0 to 9. A slot exists when any key names it,
 slots no key names are open, and at least 2 slots must exist. The game's player
 count is the highest named slot plus one.
+
+## Loading a saved game
+
+`load <scenario>` names a scenario of the suite by its file stem, one whose `save` line writes the save
+(`reference/scenarios/load-midgame.txt` loads `save-midgame`). The exe reads `savegame\harness.sav` from its
+own game directory and starts the match as the game's load screen does: it sets `pendingSaveStore` and the
+summary items (`Gametype`, `Campaign`, `Side`, `Difficulty`, `Mission`, `Thumbs`, `Players`, `CommanderDeath`,
+`Location`, `Mapping`, `LineOfSight`, `LineOfSightType`) as `SavedGameSelectHandler` does, then the game's own
+`LoadMatch` loads the rest (`LoadPlayerControllers`, `LoadPlayers`, `LoadSavedGameState` and the load side of
+each subsystem). A save that is missing or unreadable, that is not a skirmish (game type 2 only), or whose map
+the game cannot load, exits 2 with a message that names `savegame\harness.sav`. No message box opens.
+
+The saving run also writes `savegame\harness.opt`, the scenario's options table (`g_game->options`) as
+`SetUpSkirmish` filled it for the saver's players. The loading run starts from that table, as a player starts from the
+menu's table, and never clears it; the summary items above then overwrite the fields the save decides. A missing
+`harness.opt`, or one of the wrong size, exits 2 with a message that names `savegame\harness.opt`.
+
+- **Keys it may still set:** `game_seed`, `crt_seed`, `view_seed`, `fpu_control_word`, `ticks`,
+  `steps_per_frame`, `quirks`, `quirks_tamper` and `quirks_reach`. The seeds take effect at load, as in any
+  run (`LoadMatch` reseeds the generators).
+- **Keys it may not set:** the save decides them, so a scenario with a `load` line that sets one exits 2 and
+  names it: `game_type`, `map`, `difficulty`, `commander_death`, `mapping`, `line_of_sight`, `los_type`,
+  `start_positions`, every `player<N>.*` key (the controllers, sides, colours, resources and alliances),
+  `local_player` (the save keeps the human player). `spawn` and `order` are not accepted either (the
+  scenario has no players of its own to name), and neither is `save`. `map` and the `player<N>.*` keys are
+  not required.
+- **The tick:** the save holds the game's tick counter (`ticks`, in the `GameTime` box that `SavePlayers`
+  writes), so the loaded game continues from the saved tick. The save is made after the step of its tick, so
+  the first row of the trace is tick `saved tick + 1` (901 for `save-midgame`), and the trace has no rows for the ticks before it.
+  `ticks` is the last tick traced, as in every scenario, counted from the start of the game and not from the
+  save: `load-midgame` has `ticks 1800`, like `save-midgame`. The run exits 2 if `ticks` is not greater
+  than the saved tick. The same holds for the tick of `quirks_tamper` and of `quirks_reach`: a tick at or before the
+  saved tick never fires, so the run exits 2.
+- **The save:** it is made by every run of the saving scenario and never committed. `tools/reference.py`
+  (`--check`, `--traces`, and the tools that play the suite) plays every scenario with no `load` line first, then
+  the loading ones; it copies the saving run's `savegame/harness.sav` and `savegame/harness.opt` out of its game copy and places it in the
+  loading run's own game copy before that exe starts (both files are removed from a game copy first, so a file of the install never stands in). The two runs are separate processes. A loading scenario
+  whose saving scenario is not played, fails, or writes no save or no options file fails, with a message that names both.
+
+By hand, play the saving scenario with `--collect savegame/harness.sav --collect savegame/harness.opt` (the files land
+in the run's directory), then the loading one with `--put savegame/harness.sav <that file> --put savegame/harness.opt <that file>`:
+
+```sh
+WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/scenarios/save-midgame.txt --collect savegame/harness.sav --collect savegame/harness.opt
+WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/scenarios/load-midgame.txt --put savegame/harness.sav <run directory>/savegame/harness.sav --put savegame/harness.opt <run directory>/savegame/harness.opt
+```
+
+`tools/tracediff.py` does both steps for a scenario with a `load` line.
 
 ## Game types
 

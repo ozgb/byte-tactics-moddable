@@ -1,0 +1,6 @@
+# The game saved by save-midgame at tick 900, loaded and played on to tick 1800.
+game_seed 1
+crt_seed 1
+view_seed 1
+ticks 1800
+load save-midgame

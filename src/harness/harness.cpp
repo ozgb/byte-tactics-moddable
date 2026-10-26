@@ -87,6 +87,8 @@ static int s_loadLine = 0;
 static char s_decidedKey[32];
 static int s_decidedLine = 0;
 static const char s_savePath[] = "savegame\\harness.sav";
+static const char s_optionsPath[] = "savegame\\harness.opt";
+static Table_0047ae60 s_savedOptions;
 
 static void Fail(const char* text)
 {
@@ -785,6 +787,7 @@ static void SetUpSkirmish()
         g_game->mode_391f1 = 5;
         g_game->handler = LoadingScreenFrame;
     }
+    s_savedOptions = *t;
 }
 
 static void FailLoad(const char* what, const char* detail)
@@ -814,8 +817,30 @@ static void SetUpLoadedGame()
         FailLoad("", detail);
     }
 
+    if (s_quirkTamper && s_quirkTamperTick <= (unsigned)savedTick) {
+        char detail[100];
+        sprintf(detail, "quirks_tamper must be after the saved tick %d", savedTick);
+        FailLoad("", detail);
+    }
+    if (s_quirkReach && s_quirkReachTick <= (unsigned)savedTick) {
+        char detail[100];
+        sprintf(detail, "quirks_reach must be after the saved tick %d", savedTick);
+        FailLoad("", detail);
+    }
+
     auto* t = ScenarioTable();
-    memset(t, 0, sizeof *t);
+    FILE* options = fopen(s_optionsPath, "rb");
+    if (options == nullptr) {
+        FailLoad("cannot read the options ", s_optionsPath);
+        return;
+    }
+    long optionsSize = fseek(options, 0, SEEK_END) == 0 ? ftell(options) : -1;
+    if (optionsSize != (long)sizeof *t || fseek(options, 0, SEEK_SET) != 0 || fread(t, sizeof *t, 1, options) != 1) {
+        fclose(options);
+        FailLoad("cannot read the options ", s_optionsPath);
+        return;
+    }
+    fclose(options);
     strcpy(g_game->saveName_38c6b, s_savePath);
     g_game->pendingSaveStore = OpenHapiBank(g_game->saveName_38c6b);
     if (g_game->pendingSaveStore == nullptr) {
@@ -1067,6 +1092,15 @@ void HarnessAfterStep()
         char description[] = "Harness save";
         MakeDirectoryPath(directory);
         SaveGameFile(path, description, 0x29a);
+        FILE* options = fopen(s_optionsPath, "wb");
+        int written = options != nullptr && fwrite(&s_savedOptions, sizeof s_savedOptions, 1, options) == 1;
+        if (options != nullptr && fclose(options) != 0)
+            written = 0;
+        if (!written) {
+            char msg[100];
+            sprintf(msg, "testmode: cannot write %s\n", s_optionsPath);
+            Fail(msg);
+        }
     }
     if (!s_testMode)
         return;

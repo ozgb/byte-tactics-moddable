@@ -92,6 +92,11 @@ summary items (`Gametype`, `Campaign`, `Side`, `Difficulty`, `Mission`, `Thumbs`
 each subsystem). A save that is missing or unreadable, that is not a skirmish (game type 2 only), or whose map
 the game cannot load, exits 2 with a message that names `savegame\harness.sav`. No message box opens.
 
+The saving run also writes `savegame\harness.opt`, the scenario's options table (`g_game->options`) as
+`SetUpSkirmish` filled it for the saver's players. The loading run starts from that table, as a player starts from the
+menu's table, and never clears it; the summary items above then overwrite the fields the save decides. A missing
+`harness.opt`, or one of the wrong size, exits 2 with a message that names `savegame\harness.opt`.
+
 - **Keys it may still set:** `game_seed`, `crt_seed`, `view_seed`, `fpu_control_word`, `ticks`,
   `steps_per_frame`, `quirks`, `quirks_tamper` and `quirks_reach`. The seeds take effect at load, as in any
   run (`LoadMatch` reseeds the generators).
@@ -106,19 +111,20 @@ the game cannot load, exits 2 with a message that names `savegame\harness.sav`. 
   the first row of the trace is tick `saved tick + 1` (901 for `save-midgame`), and the trace has no rows for the ticks before it.
   `ticks` is the last tick traced, as in every scenario, counted from the start of the game and not from the
   save: `load-midgame` has `ticks 1800`, like `save-midgame`. The run exits 2 if `ticks` is not greater
-  than the saved tick.
+  than the saved tick. The same holds for the tick of `quirks_tamper` and of `quirks_reach`: a tick at or before the
+  saved tick never fires, so the run exits 2.
 - **The save:** it is made by every run of the saving scenario and never committed. `tools/reference.py`
   (`--check`, `--traces`, and the tools that play the suite) plays every scenario with no `load` line first, then
-  the loading ones; it copies the saving run's `savegame/harness.sav` out of its game copy and places it in the
-  loading run's own game copy before that exe starts. The two runs are separate processes. A loading scenario
-  whose saving scenario is not played, fails, or writes no save fails, with a message that names both.
+  the loading ones; it copies the saving run's `savegame/harness.sav` and `savegame/harness.opt` out of its game copy and places it in the
+  loading run's own game copy before that exe starts (both files are removed from a game copy first, so a file of the install never stands in). The two runs are separate processes. A loading scenario
+  whose saving scenario is not played, fails, or writes no save or no options file fails, with a message that names both.
 
-By hand, play the saving scenario with `--collect savegame/harness.sav` (the file lands in the run's
-directory), then the loading one with `--put savegame/harness.sav <that file>`:
+By hand, play the saving scenario with `--collect savegame/harness.sav --collect savegame/harness.opt` (the files land
+in the run's directory), then the loading one with `--put savegame/harness.sav <that file> --put savegame/harness.opt <that file>`:
 
 ```sh
-WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/scenarios/save-midgame.txt --collect savegame/harness.sav
-WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/scenarios/load-midgame.txt --put savegame/harness.sav <run directory>/savegame/harness.sav
+WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/scenarios/save-midgame.txt --collect savegame/harness.sav --collect savegame/harness.opt
+WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/scenarios/load-midgame.txt --put savegame/harness.sav <run directory>/savegame/harness.sav --put savegame/harness.opt <run directory>/savegame/harness.opt
 ```
 
 `tools/tracediff.py` does both steps for a scenario with a `load` line.

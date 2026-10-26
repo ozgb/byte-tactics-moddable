@@ -1,4 +1,3 @@
-// FLAGS: /Gi
 #include <vector>
 
 #include "../util/string_ref.h"

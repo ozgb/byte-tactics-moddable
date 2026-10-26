@@ -213,7 +213,7 @@ int __stdcall InitNetConnection(void);
 int __stdcall JoinNetGame(V4i v, int idx);
 #include "../network/packets.h"
 #include "../game/settings.h"
-#include "../game/players_464290.h"
+#include "../game/players.h"
 #include "../game/settings.h"
 #include "skirmish_menu.h"
 #include "multi.h"

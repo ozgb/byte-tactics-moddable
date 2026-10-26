@@ -49,6 +49,20 @@ struct Name_0048d630 {
     char unknown_42[0x232 - 0x42];
 };
 
+struct OrderTypeEntry {
+    unsigned char index;
+    char unknown_1[0x8 - 0x1];
+    unsigned int flags_a;
+    char unknown_c[0x11 - 0xc];
+    unsigned int flags;
+};
+
+class OrderType {
+public:
+    unsigned char index;
+    OrderTypeEntry* GetTableEntry();
+};
+
 #include "../game/game.h"
 #pragma pack(pop)
 
@@ -59,6 +73,8 @@ struct Name_0048d630 {
 #include "../sound/sound.h"
 #include "control_panel.h"
 #include "../units/unit_commands.h"
+#include "../orders/mission_type.h"
+#include "../units/unit_scripts.h"
 
 #include "../map/cell.h"
 
@@ -557,6 +573,80 @@ class IntDynArray {
 public:
     int EraseByValue(int value);
 };
+
+MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit,
+                                       Unit* target, void* pos);
+void __stdcall IssueOrCancelOrder(OrderType kind, int flag, Unit* unit,
+                            Unit* target, int* pos, int typeId, int amount);
+
+static inline MissionType Order(const char* name) { return MissionType(name); }
+
+// FUNCTION: 0x48cf30
+void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
+                            OrderType kind, int* pos, int typeId, int amount)
+{
+    int flag_a = (entry->flags_a >> 2) & 1;
+    Unit* except = 0;
+    int flag_b;
+    if (mode)
+        flag_b = OrderModeTakesTarget(mode);
+    else
+        flag_b = (kind.GetTableEntry()->flags >> 9) & 1;
+    if (flag_b) {
+        if (!g_game->hoverUnitId)
+            except = 0;
+        else
+            except = (Unit*)((char*)g_game->units.get() + 280 * g_game->hoverUnitId);
+    }
+    Player* p = &g_game->players[g_game->localPlayer];
+    int count = 0;
+    int sum_x = 0;
+    int sum_z = 0;
+    Unit* u;
+    for (u = p->unitsBegin; u <= p->unitsEnd; u++) {
+        if ((((unsigned char)u->flags) & 0x10) && u != except) {
+            count++;
+            sum_x += (short)(u->pos.x >> 16);
+            sum_z += (short)(u->pos.z >> 16);
+        }
+    }
+    if (!count)
+        return;
+    int avg[3];
+    avg[0] = (sum_x / count) * 65536.0;
+    avg[2] = (sum_z / count) * 65536.0;
+    int range = count * 3000;
+    for (u = p->unitsBegin; u <= p->unitsEnd; u++) {
+        if (!(((unsigned char)u->flags) & 0x10) || u == except)
+            continue;
+        if (mode)
+            kind.index = GetOrderType(mode, u, except, &g_game->pos_2caa).index;
+        if (!kind.index)
+            continue;
+        MissionType fire = Order("Standing_FireOrder");
+        if (kind.index != fire.index || (u->def->flags2Byte & 2)) {
+            MissionType move = Order("Standing_MoveOrder");
+            if (kind.index != move.index || (u->def->flags2Byte & 1)) {
+                if (pos && (kind.GetTableEntry()->flags & 2)) {
+                    int dz = u->pos.z;
+                    dz -= avg[2];
+                    int dx = u->pos.x;
+                    dx -= avg[0];
+                    if ((int)(((__int64)dx * dx) >> 32)
+                        + (int)(((__int64)dz * dz) >> 32) <= range) {
+                        int here[3];
+                        here[0] = pos[0] + u->pos.x - avg[0];
+                        here[1] = pos[1];
+                        here[2] = pos[2] + u->pos.z - avg[2];
+                        IssueOrCancelOrder(kind, flag_a, u, except, here, typeId, amount);
+                        continue;
+                    }
+                }
+                IssueOrCancelOrder(kind, flag_a, u, except, pos, typeId, amount);
+            }
+        }
+    }
+}
 
 // FUNCTION: 0x48d220
 int __stdcall ResolveCursorModeForSelection(char arg)

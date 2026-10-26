@@ -649,7 +649,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   `x2` and `y2` are only written inside the segment loop, so a ring with no
   segments positions its label from their never-written home slots.
 - **0x468cf0** (the in-game view draw, possible, harmless,
-  src/ingame/info_panel_468cf0.cpp): the unit group numbers are let through by
+  src/ingame/info_panel.cpp): the unit group numbers are let through by
   an outer test that passes a unit with a group number when the 0x37f06 bit is
   clear, but the inner test needs that bit for the number too, so the position
   is computed and nothing is drawn (0x469c4a to 0x469c9a).
@@ -1224,7 +1224,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   only the flag store), so a second call would register the empty handler
   again; 0x49e830 guards both the store and the call. Found by OpenCode /
   deepseek-v4.1-flash in #6214.
-- **0x493bf0** (chat recipient buttons, likely, src/ingame/dialogs_493340.cpp):
+- **0x493bf0** (chat recipient buttons, likely, src/ingame/game_dialogs.cpp):
   the number parsed from a `LIVEPLYR<n>` gadget name indexes the 11-byte
   `chatRecipients` mask with no range check, so a name such as `LIVEPLYR42`
   writes outside it. The neighbouring `chatMode` is clamped, which makes the

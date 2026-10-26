@@ -9,7 +9,5 @@ src/gui/gui_file.cpp,"own header is a presentation or host header that game logi
 src/gui/keyboard.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/gui/listbox.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/ingame/camera.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
-src/ingame/info_panel_467440.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
-src/ingame/info_panel_468cf0.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/ingame/selection.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/sound/play_sound.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"

@@ -88,7 +88,7 @@ GPL, #45).
 ### `util.bound-language-copy`
 
 - **Scope:** view.
-- **Where:** `ParseCommandLine` (`src/game/main_49eda0.cpp`) into
+- **Where:** `ParseCommandLine` (`src/game/main.cpp`) into
   `g_preferredLanguage`, and `LoadTranslations` (`src/util/tdf_4c54f0.cpp`)
   into `g_language`.
 - **3.1c:** both copy a language name into a 64-byte buffer with no bound,

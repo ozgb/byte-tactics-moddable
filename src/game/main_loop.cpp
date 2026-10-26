@@ -79,7 +79,7 @@ struct FixedPos_00496ee0 {
 #include "../../link/globals.h"
 
 #include "../graphics/display.h"
-#include "../ingame/dialogs_493340.h"
+#include "../ingame/game_dialogs.h"
 #include "../frontend/frontend.h"
 #include "../frontend/frontend.h"
 #include "../network/net_game.h"
@@ -87,8 +87,7 @@ unsigned int GetTicks();
 #include "../ingame/keys.h"
 #include "../ingame/control_panel.h"
 #include "../ingame/selection.h"
-#include "../ingame/control_panel_41b2e0.h"
-#include "../ingame/info_panel_468cf0.h"
+#include "../ingame/info_panel.h"
 #include "../graphics/pcx.h"
 void __stdcall SetCursorAnimation(Obj_004ab400* p, Src_004ab400* src);
 void ShowSoftwareCursor();

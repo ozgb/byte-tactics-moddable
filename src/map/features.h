@@ -39,5 +39,9 @@ Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def);
 int __stdcall ReclaimFeature(Unit* unit, Vec3* pos);
 void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon);
 int __stdcall RemoveFeature(Cell* cell, int flag);
+void __stdcall ResolveFeatureLinks();
+void __stdcall LoadFeatures(HapiBank* file);
+
+int __stdcall LoadFeatureType(char* name);
 
 #endif

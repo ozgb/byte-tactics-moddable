@@ -1,3 +1,4 @@
+#include <excpt.h>
 #include <memory.h>
 #include "win_types.h"
 #include <stdio.h>
@@ -204,7 +205,7 @@ void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedPos_497180 pos, int a,
     int b, int c);
 Gadget_497180* __stdcall LoadGuiLayer(Sub_497180* sub, const char* name, int flags);
-#include "../ingame/dialogs_493340.h"
+#include "../ingame/game_dialogs.h"
 void __cdecl operator delete(void* p);
 
 #include "../gui/gui.h"
@@ -212,7 +213,7 @@ void __stdcall BlitMenuLayers(Menu_00497ce0* menu, int a, int b);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
 char* __stdcall Translate(char* s);
 
-void LoadThreadMain();
+int __stdcall ExceptionFilter(EXCEPTION_POINTERS* exception, const char* thread);
 #include "../ingame/build_placement.h"
 #include "../frontend/options.h"
 #include "../frontend/frontend.h"
@@ -502,6 +503,15 @@ tail:
 }
 static inline char* PlayerRecordAt(Game* game, int off) { return (char*)(*(PlayerRec_00497f40(*)[10])&game->players) + off; }
 
+// FUNCTION: 0x497c70
+void __cdecl LoadThreadMain(void* param)
+{
+    __try {
+        LoadMatch(param);
+    } __except (ExceptionFilter(GetExceptionInformation(), "Load Thread")) {
+    }
+}
+
 // FUNCTION: 0x497ce0
 void __stdcall DrawSyncStatus(void* surface)
 {
@@ -660,7 +670,7 @@ void LoadingScreenFrame(void)
             }
             g_game->slots_29a4.flag40[i] = (pi->active != 0 && (pi->data->flags_9b & 0x40) != 0) ? 1 : 0;
         }
-        if (!host_thread_start((void (__cdecl*)(void*))LoadThreadMain, 0, 0)) {
+        if (!host_thread_start(LoadThreadMain, 0, 0)) {
             FatalError("Unable to start the loading thread!");
         }
         memset(g_scorePanelKillFlash, 0, 10);

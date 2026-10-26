@@ -21,7 +21,7 @@
 #include "../../link/globals.h"
 
 #include "../map/map_list.h"
-#include "../game/players_464290.h"
+#include "../game/players.h"
 #include "../frontend/skirmish_menu.h"
 #include "../frontend/endgame.h"
 #include "../game/settings_campaign.h"

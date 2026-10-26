@@ -7,4 +7,6 @@ int __stdcall IsLocalPlayerOutOfUnits();
 void __stdcall QueryGlobalMemoryStatus(void);
 int __stdcall HarnessConditionClass(void* condition);
 
+int __stdcall CheckAlliedVictory();
+
 #endif

@@ -78,7 +78,7 @@ void* __stdcall GetDisplay();
 void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src);
 #include "control_panel.h"
 #include "selection.h"
-#include "info_panel_468cf0.h"
+#include "info_panel.h"
 void __stdcall DrawFrame(Surface* surf, GafFrame* pal, int x, int y);
 #include "../map/line_of_sight.h"
 #include "../graphics/object_pool.h"
@@ -88,8 +88,7 @@ void __stdcall DrawFrame(Surface* surf, GafFrame* pal, int x, int y);
 #include "../gui/dialogs.h"
 #include "../game/settings.h"
 void __stdcall PlaySoundByName(const char* name, int param);
-#include "dialogs_493340.h"
-#include "control_panel_41bde0.h"
+#include "game_dialogs.h"
 void __stdcall ExecuteCommandLine(int commandLine, int mask);
 void __stdcall CollectSelectedUnits(void* param);
 #include "camera.h"

@@ -40,7 +40,7 @@
 #include "../game/slot_0041e420.h"
 #include "../game/unit_resources.h"
 #include "../game/victory_conditions.h"
-#include "../game/view_flags_497180.h"
+#include "../game/view_flags.h"
 #include "../game/zero11_004917d0.h"
 #include "../graphics/gaf_frame.h"
 #include "../graphics/memory_cache.h"
@@ -1333,6 +1333,7 @@ static_assert(offsetof(MapInfo, width) == 56, "");
 static_assert(offsetof(MapInfo, height) == 60, "");
 static_assert(offsetof(MapInfo, unknown_40) == 64, "");
 static_assert(offsetof(MapInfo, visibilityMask) == 120, "");
+static_assert(sizeof(MapViewFlags) == 2, "");
 static_assert(sizeof(Menu) == 64, "");
 static_assert(offsetof(Menu, unknown_0) == 0, "");
 static_assert(sizeof(Menu_0045b800) == 28, "");
@@ -2350,7 +2351,6 @@ static_assert(offsetof(VictoryUnitTypePassesX, x) == 48, "");
 static_assert(sizeof(VictoryUnitTypePassesZ) == 52, "");
 static_assert(offsetof(VictoryUnitTypePassesZ, name) == 16, "");
 static_assert(offsetof(VictoryUnitTypePassesZ, z) == 48, "");
-static_assert(sizeof(ViewFlags_497180) == 2, "");
 static_assert(sizeof(WeaponDef) == 277, "");
 static_assert(offsetof(WeaponDef, name) == 0, "");
 static_assert(offsetof(WeaponDef, description) == 32, "");

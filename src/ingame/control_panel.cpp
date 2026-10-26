@@ -104,6 +104,7 @@ struct UnitType {
 
 #include "../network/player.h"
 
+#include "../units/unit_def.h"
 #include "../units/unit.h"
 
 struct BuildEntry_0041ace0 {
@@ -133,6 +134,7 @@ struct Follow_0041ca10 {
 };
 
 #include "../game/game.h"
+#include "../game/game_state.h"
 
 #pragma pack(pop)
 
@@ -923,6 +925,156 @@ Unit* GetBuildMenuFocusUnit()
     return 0;
 }
 
+enum UnitAbility {
+    ABILITY_MOVE_ORDER = 0,
+    ABILITY_FIRE_ORDER = 1,
+    ABILITY_ON_OFF = 2,
+    ABILITY_STOP = 3,
+    ABILITY_ATTACK = 4,
+    ABILITY_DEFEND = 5,
+    ABILITY_PATROL = 6,
+    ABILITY_MOVE = 7,
+    ABILITY_LOAD = 8,
+    ABILITY_REPAIR = 9,
+    ABILITY_RECLAIM = 10,
+    ABILITY_CAPTURE = 12,
+    ABILITY_CLOAK = 13,
+    ABILITY_BLAST = 14
+};
+
+static inline int HasAbility(const UnitDef* def, int ability)
+{
+    return (def->flags2 >> ability) & 1;
+}
+
+// FUNCTION: 0x41b2e0
+void RefreshSelectionOrders()
+{
+    OrdersBits& orders = g_game->ordersPanelFlags_37ebe_6.bits;
+    orders.refresh = 1;
+    int fireOrder = 4;
+    int moveOrder = 4;
+    int cloak = 3;
+    Unit* u;
+    int onOff = 3;
+    Unit* first;
+    int count;
+    int canMove = 0;
+    int canAttack = 0;
+    int canDefend = 0;
+    int canPatrol = 0;
+    int canLoad = 0;
+    int canCapture = 0;
+    int canReclaim = 0;
+    int canBlast = 0;
+    int canStop = 0;
+    int canRepair = 0;
+    Player* player = &g_game->players[g_game->localPlayer];
+    if (g_game->unitIndex != 0) {
+        count = 1;
+        first = GetBuildMenuFocusUnit();
+        if (first == 0) {
+            g_game->unitIndex = 0;
+            return;
+        }
+    } else {
+        first = 0;
+        count = 0;
+        Unit* last = player->unitsEnd.get();
+        for (u = player->unitsBegin.get(); u <= last; u++) {
+            if (u->unitDefIndex == 0)
+                continue;
+            if (!u->selected)
+                continue;
+            if (first == 0)
+                first = u;
+            UnitDef* type = u->def;
+            if (HasAbility(type, ABILITY_FIRE_ORDER)) {
+                if (fireOrder == 4)
+                    fireOrder = u->fireOrder;
+                else if (fireOrder != u->fireOrder)
+                    fireOrder = 3;
+            }
+            if (HasAbility(type, ABILITY_MOVE_ORDER)) {
+                if (moveOrder == 4)
+                    moveOrder = u->moveOrder;
+                else if (moveOrder != u->moveOrder)
+                    moveOrder = 3;
+            }
+            if (HasAbility(type, ABILITY_ON_OFF)) {
+                if (onOff == 3)
+                    onOff = u->activateFlags & 1;
+                else if (onOff != (u->activateFlags & 1))
+                    onOff = 2;
+            }
+            if (HasAbility(type, ABILITY_CLOAK)) {
+                if (cloak == 3)
+                    cloak = u->cloakOn;
+                else
+                    cloak = 2;
+            }
+            if (HasAbility(type, ABILITY_MOVE))
+                canMove = 1;
+            if (HasAbility(type, ABILITY_STOP))
+                canStop = 1;
+            if (HasAbility(type, ABILITY_ATTACK))
+                canAttack = 1;
+            if (HasAbility(type, ABILITY_DEFEND))
+                canDefend = 1;
+            if (HasAbility(type, ABILITY_PATROL))
+                canPatrol = 1;
+            if (HasAbility(type, ABILITY_LOAD))
+                canLoad = 1;
+            if (HasAbility(type, ABILITY_REPAIR))
+                canRepair = 1;
+            if (HasAbility(type, ABILITY_CAPTURE))
+                canCapture = 1;
+            if (HasAbility(type, ABILITY_RECLAIM))
+                canReclaim = 1;
+            if (HasAbility(type, ABILITY_BLAST))
+                canBlast = 1;
+            count++;
+        }
+        orders.fireOrder = fireOrder;
+        orders.moveOrder = moveOrder;
+        orders.cloak = cloak;
+        orders.onOff = onOff;
+        orders.canStop = canStop;
+        orders.canAttack = canAttack;
+        orders.canMove = canMove;
+        orders.canDefend = canDefend;
+        orders.canPatrol = canPatrol;
+        orders.canLoad = canLoad;
+        orders.canRepair = canRepair;
+        orders.canReclaim = canReclaim;
+        orders.canCapture = canCapture;
+        orders.canBlast = canBlast;
+    }
+    if (count == 0) {
+        PopUntilNamedLayout(0);
+        orders.refresh = 0;
+    } else if (count == 1 && first->def->buildMenuPageCount) {
+        int page = first->menu.menuOpen ? first->menu.page : 0;
+        if (page > 0 || (first->def->flags1 & 0x80000000)) {
+            char gui[256];
+            BuildEntryGuiName(gui, first->unitDefIndex, page);
+            if ((IsScreenNamed((Gui *)&g_game->menu, gui) == 0 || g_game->unitIndex != first->id)
+                && PopUntilNamedLayout(0))
+                OpenBuildMenuGui(first, gui, page);
+            orders.refresh = 0;
+        }
+    }
+    if (orders.refresh) {
+        if (PopUntilNamedLayout(0)) {
+            if (count == 1) {
+                OpenGeneratorDialog(first);
+                return;
+            }
+            OpenGeneratorDialog(0);
+        }
+    }
+}
+
 // FUNCTION: 0x41b8d0
 void __stdcall FinishConstruction(Unit* unit, Unit* target)
 {
@@ -1057,6 +1209,37 @@ int __stdcall AddRepairProgress(Unit* builder, Unit* unit, float f)
     return result;
 }
 
+// FUNCTION: 0x41bde0
+void __stdcall StepBuildMenuPage(int toggle)
+{
+    unsigned short index = g_game->unitIndex;
+    if (index != 0) {
+        Unit* unit = &g_game->units[index];
+        if (unit->unitDefIndex == 0)
+            unit = 0;
+        if (unit != 0) {
+            if (toggle != 0) {
+                if (!unit->menu.menuOpen) {
+                    unit->menu.menuOpen = 1;
+                    unit->menu.page = 1;
+                } else if (unit->menu.page == unit->def->buildMenuPageCount - 1) {
+                    unit->menu.menuOpen = 0;
+                } else {
+                    unit->menu.page++;
+                }
+            } else {
+                if (unit->menu.page == unit->def->buildMenuPageCount - 1)
+                    unit->menu.page = 1;
+                else
+                    unit->menu.page++;
+                unit->menu.menuOpen = 1;
+            }
+            g_game->ordersPanelFlags |= 0x10;
+        }
+    }
+    PlaySoundByName("nextbuildmenu", 0);
+}
+
 static inline unsigned int SetPage(Unit* u, unsigned int f)
 {
     return (((((UnitType*)u->def.get())->buildMenuPageCount + 0x1ff) << 23) ^ f) & 0x3800000 ^ f;
@@ -1143,8 +1326,6 @@ void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit)
         RefreshBuildCountTexts(&g->gui, unit);
     }
 }
-
-#include "control_panel_41bde0.h"
 
 static Unit* GetSelectedUnit()
 {

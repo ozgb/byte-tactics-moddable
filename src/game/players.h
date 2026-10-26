@@ -1,5 +1,5 @@
-#ifndef PLAYERS_464290_H
-#define PLAYERS_464290_H
+#ifndef PLAYERS_H
+#define PLAYERS_H
 
 #include "../../interfaces/rand_stream.h"
 struct Class_464b10;
@@ -22,6 +22,9 @@ void __stdcall UpdatePlayersOnStream(RandStream stream);
 void __stdcall InitPlayerResources();
 void __stdcall LoadPlayerControllers(HapiBank* file);
 void __stdcall UpdateBlink();
+
+void __stdcall LoadPlayers(HapiBank* file);
+void __stdcall SavePlayers(HapiBank* file);
 
 float __stdcall GetNetEnergy(void*);
 float __stdcall GetNetMetal(Class_464b10*);

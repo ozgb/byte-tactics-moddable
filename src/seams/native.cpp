@@ -70,8 +70,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target,
 #include "../orders/order_targets.h"
 float __stdcall GetEnergyIncome(Player* player);
 float __stdcall GetMetalIncome(Player* player);
-#include "../game/players_464290.h"
-#include "../game/players_464290.h"
+#include "../game/players.h"
 #include "../units/unit_targets.h"
 
 Projectile* __stdcall FindTargetableProjectile(Unit* unit, unsigned int weapon);
@@ -88,10 +87,8 @@ Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 void __stdcall UpdatePlayerEconomy(Player* p);
 #include "../units/unit_motion.h"
 
-#include "../map/features_422ea0.h"
 void __stdcall InitFeatureAnimPool(List_00421f20* list);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
-#include "../map/features_424c00.h"
 
 int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index);
 Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange);
@@ -111,17 +108,12 @@ int __stdcall IsPointVisible(Player* player, Vec3* pos);
 #include "../map/line_of_sight.h"
 #include "../map/radar.h"
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
-#include "../ingame/info_panel_467440.h"
 
 class HapiBank;
 #include "../map/map_list.h"
 #include "../map/plot_map.h"
 #include "../map/terrain.h"
-void __stdcall AddUnitToMap(Unit* unit);
-void __stdcall RemoveUnitFromMap(Unit* unit);
-#include "../map/terrain_47e2d0.h"
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
-#include "../game/players_466050.h"
 void __stdcall SetupPlayerSlot(int player, char type);
 #include "../units/units_485010.h"
 struct OwnershipTransferPacket;

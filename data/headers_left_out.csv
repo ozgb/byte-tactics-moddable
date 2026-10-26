@@ -9,7 +9,6 @@ AddObjectBounds,skip,placeholder type Object_004cb2f0: left for the type-naming 
 AddOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AddTextGadget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AddTimer,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-AddUnitToMap,mismatch,placeholder type Obj_0047cc30: left for the type-naming issues
 AdjustBuildCount,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AdvanceGafSequence,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AimCobStub,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -27,8 +26,6 @@ AttachUnitToPiece,mismatch,"static risk rule: a convention, parameter count, or 
 AveragePrimitiveY,skip,placeholder type Object_004cb2f0: left for the type-naming issues
 BindModelTextures,mismatch,placeholder type Model_0042a140: left for the type-naming issues
 BindNamedSliderWithCallback,skip,placeholder type Callback_00445e50: left for the type-naming issues
-BlitFeatureGaf,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-BlitGafFrameAtOffset,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BlitLayers,mismatch,placeholder type Rect_004b6720: left for the type-naming issues
 BlitMenuLayers,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BlitSideLogoToRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -41,7 +38,6 @@ CalcAimAngles,mismatch,"static risk rule: a convention, parameter count, or non-
 CanBuildAt,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 CanPlaceUnitFootprint,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 CaptureBackgroundAndDrawCursor,skip,placeholder type Obj_004c2380: left for the type-naming issues
-CheckAlliedVictory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ClampPositionToMap,skip,placeholder type Vec3_004853b0: left for the type-naming issues
 ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
 ClickSelectHoverUnit,mismatch,placeholder type Param_0048c7f0: left for the type-naming issues
@@ -79,7 +75,6 @@ DrawFrameBlended,mismatch,pointer/int cast: definition's type is likely wrong
 DrawFrameQuad,mismatch,placeholder type Quad_004c7580: left for the type-naming issues
 DrawGadgetSelectionBox,mismatch,fixing it changes the generated code of a caller
 DrawGafBar,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
-DrawHitPointBar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawLineGadget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawListboxFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -89,10 +84,8 @@ DrawMapTileSelectionOutline,mismatch,"static risk rule: a convention, parameter 
 DrawMapTiles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawMessages,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawModel3doProjected,mismatch,placeholder type Object_0046bae0: left for the type-naming issues
-DrawNetworkStats,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawOptionsScrollBar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawParticleList,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawProfileBarLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawProgressBar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawProjectiles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawRadar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -102,16 +95,13 @@ DrawRectangle,mismatch,pointer/int cast: definition's type is likely wrong
 DrawScorePanel,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawSelectedGoal,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawSelectedUnitOrderOverlays,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawSelectionBox,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawSliderBar,mismatch,placeholder type Object_004a2580: left for the type-naming issues
-DrawStatusPanel,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawSurface,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 DrawTextInput,mismatch,fixing it changes the generated code of a caller
 DrawTile,mismatch,pointer/int cast: definition's type is likely wrong
 DrawTriangleContours,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawUnitInfoPanel,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawUnitRangeRings,mismatch,pointer/int cast: definition's type is likely wrong
 DrawWorldDeltaLine,skip,placeholder type Pos_00417bb0: left for the type-naming issues
 DrawWrappedText,mismatch,fixing it changes the generated code of a caller
@@ -265,7 +255,6 @@ JoinNetGame,mismatch,"static risk rule: a convention, parameter count, or non-po
 LeaveNetGameCallback,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 LoadBitmapByName,mismatch,fixing it changes the generated code of a caller
 LoadCobScript,mismatch,placeholder type Data_004b2450: left for the type-naming issues
-LoadFeatureType,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 LoadGaf,mismatch,pointer/int cast: definition's type is likely wrong
 LoadGafFile,mismatch,placeholder type Object_004aeee0: left for the type-naming issues
 LoadGafIntoSlot,mismatch,placeholder type Object_004aedd0: left for the type-naming issues
@@ -273,7 +262,6 @@ LoadGuiLayer,mismatch,pointer/int cast: definition's type is likely wrong
 LoadPcx,mismatch,placeholder type Bitmap_004caec0: left for the type-naming issues
 LoadPictureCached,mismatch,fixing it changes the generated code of a caller
 LoadReporterDll,mismatch,pointer/int cast: definition's type is likely wrong
-LoadThreadMain,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 LockScreen,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 LowerBoundOrderTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 MakeBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
@@ -321,7 +309,6 @@ ReleasePacketData,mismatch,placeholder type Class_00451fd0: left for the type-na
 RelocateObject,skip,placeholder type Object_004cb2f0: left for the type-naming issues
 RemapPaletteToClosestIndices,mismatch,placeholder type Palette_004aa8f0: left for the type-naming issues
 RemoveSpeechOfUnit,mismatch,pointer/int cast: definition's type is likely wrong
-RemoveUnitFromMap,mismatch,placeholder type Obj_0047db20: left for the type-naming issues
 RemoveUnitProjectiles,mismatch,placeholder type Unit_0049c880: left for the type-naming issues
 ReportGameChat,mismatch,pointer/int cast: definition's type is likely wrong
 ResetClipRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

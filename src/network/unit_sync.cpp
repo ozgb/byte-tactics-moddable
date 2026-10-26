@@ -164,7 +164,7 @@ Rect_0046c620* __stdcall GetSessionGuidInstance(Net_4c97b0* p);
 #include "online_report.h"
 int __stdcall RIReport(int, Rect_0046c620*, void*, int, Name_0046c620*, int,
                            int, int, void*, void*);
-#include "../game/statistics_46c2a0.h"
+#include "../game/statistics.h"
 
 // FUNCTION: 0x46c620
 int __stdcall ReportGameEvent(int msg)

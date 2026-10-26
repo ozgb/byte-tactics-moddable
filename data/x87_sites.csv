@@ -1,13 +1,13 @@
 address,function,file,line,offset,chain,result,class,disposition
-0x401360,UpdatePlayerEconomy,src/game/economy_401360.cpp,318,0x240,((f[edx+0x37ede] * f[ecx+0x1d2]) + f[esi+0xbc]),float-store,float-chain,modern
-0x401360,UpdatePlayerEconomy,src/game/economy_401360.cpp,470,0x685,((f[eax] + f[esp+0x28]) + d[edi+0xac]),double-store,float-chain,modern
-0x401360,UpdatePlayerEconomy,src/game/economy_401360.cpp,470,0x6e5,((f[eax] + f[esp+0x28]) + f[edi+0x8c]),float-store,float-chain,modern
-0x401360,UpdatePlayerEconomy,src/game/economy_401360.cpp,457,0x78a,((f[esp+0x28] - f[edi+0xa4]) + d[edi+0xcc]),double-store,safe,rewritten
-0x401360,UpdatePlayerEconomy,src/game/economy_401360.cpp,462,0x7c7,((f[esp+0x2c] - f[edi+0xa8]) + d[edi+0xd4]),double-store,safe,rewritten
-0x401360,UpdatePlayerEconomy,src/game/economy_401360.cpp,466,0x80b,((f[eax+4] - (f[esp+0x10] * f[eax+4])) + (f[eax+8] - (f[esp+0x30] * f[eax+8]))),float-store,float-chain,modern
-0x401360,UpdatePlayerEconomy,src/game/economy_401360.cpp,467,0x839,((f[eax+0x1c] - (f[esp+0x14] * f[eax+0x1c])) + (f[eax+0x20] - (f[esp+0x34] * f[eax+0x20]))),float-store,float-chain,modern
-0x401360,UpdatePlayerEconomy,src/game/economy_401360.cpp,470,0x87d,((f[eax+8] - (f[esp+0x10] * f[eax+8])) + (f[eax+0xc] - (f[esp+0x30] * f[eax+0xc]))),float-store,float-chain,modern
-0x401360,UpdatePlayerEconomy,src/game/economy_401360.cpp,472,0x8b6,((f[eax+8] - (f[esp+0x10] * f[eax+0x20])) + (f[eax+0xc] - (f[esp+0x28] * f[eax+0xc]))),float-store,float-chain,modern
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,318,0x240,((f[edx+0x37ede] * f[ecx+0x1d2]) + f[esi+0xbc]),float-store,float-chain,modern
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,470,0x685,((f[eax] + f[esp+0x28]) + d[edi+0xac]),double-store,float-chain,modern
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,470,0x6e5,((f[eax] + f[esp+0x28]) + f[edi+0x8c]),float-store,float-chain,modern
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,457,0x78a,((f[esp+0x28] - f[edi+0xa4]) + d[edi+0xcc]),double-store,safe,rewritten
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,462,0x7c7,((f[esp+0x2c] - f[edi+0xa8]) + d[edi+0xd4]),double-store,safe,rewritten
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,466,0x80b,((f[eax+4] - (f[esp+0x10] * f[eax+4])) + (f[eax+8] - (f[esp+0x30] * f[eax+8]))),float-store,float-chain,modern
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,467,0x839,((f[eax+0x1c] - (f[esp+0x14] * f[eax+0x1c])) + (f[eax+0x20] - (f[esp+0x34] * f[eax+0x20]))),float-store,float-chain,modern
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,470,0x87d,((f[eax+8] - (f[esp+0x10] * f[eax+8])) + (f[eax+0xc] - (f[esp+0x30] * f[eax+0xc]))),float-store,float-chain,modern
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,472,0x8b6,((f[eax+8] - (f[esp+0x10] * f[eax+0x20])) + (f[eax+0xc] - (f[esp+0x28] * f[eax+0xc]))),float-store,float-chain,modern
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,145,0x171,sqrt((((i[esp+0x3c] * i[esp+0x3c]) + (i[esp+0x40] * i[esp+0x40])) + (i[esp+0x44] * i[esp+0x44]))),ftol,safe,rewritten
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,167,0x292,sqrt((((i[esp+0x48] * i[esp+0x48]) + (i[esp+0x4c] * i[esp+0x4c])) + (i[esp+0x50] * i[esp+0x50]))),ftol,safe,rewritten
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,178,0x3a8,sqrt((((i[esp+0x54] * i[esp+0x54]) + (i[esp+0x58] * i[esp+0x58])) + (i[esp+0x5c] * i[esp+0x5c]))),ftol,safe,rewritten
@@ -35,10 +35,10 @@ address,function,file,line,offset,chain,result,class,disposition
 0x43d290,UnitMotion::SteerAircraft,src/orders/order_list.cpp,1947,0x3e7,sqrt((((i[esi] * i[esi]) + (i[esi+4] * i[esi+4])) + (i[esi+8] * i[esi+8]))),ftol,safe,n/a
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,315,0x677,((((f[esp+eax+0x224] * f[0]/g_lightX) + (f[esp+eax+0x228] * f[0]/g_lightY)) + (f[esp+eax+0x22c] * f[0]/g_lightZ)) * f[0]/DAT_004fd4cc),ftol,float-chain,modern
 0x464060,DrawMessages,src/network/net_chat.cpp,259,0x181,(d[0]/$T1428 - (i[esp+0x18] * d[0]/$T1427)),ftol,safe,n/a
-0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,513,0x41e,(((i[esp+0x10] * f[esp+0x79]) / f[ebp+0xa4]) + i[esp+0x9c]),ftol,safe,rewritten
-0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,513,0x49e,(((i[esp+0x10] * f[ebp+0xe8]) / f[ebp+0xa4]) + i[esp+0x24]),ftol,safe,rewritten
-0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,513,0x702,(((i[esp+0x10] * f[esp+0x85]) / f[ebp+0xa8]) + i[esp+0x9c]),ftol,safe,rewritten
-0x468cf0,DrawBattleFrame,src/ingame/info_panel_468cf0.cpp,513,0x782,(((i[esp+0x10] * f[ebp+0xe4]) / f[ebp+0xa8]) + i[esp+0x24]),ftol,safe,rewritten
+0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,513,0x41e,(((i[esp+0x10] * f[esp+0x79]) / f[ebp+0xa4]) + i[esp+0x9c]),ftol,safe,rewritten
+0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,513,0x49e,(((i[esp+0x10] * f[ebp+0xe8]) / f[ebp+0xa4]) + i[esp+0x24]),ftol,safe,rewritten
+0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,513,0x702,(((i[esp+0x10] * f[esp+0x85]) / f[ebp+0xa8]) + i[esp+0x9c]),ftol,safe,rewritten
+0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,513,0x782,(((i[esp+0x10] * f[ebp+0xe4]) / f[ebp+0xa8]) + i[esp+0x24]),ftol,safe,rewritten
 0x474760,WakeParticles::Init,src/graphics/particles.cpp,2020,0x86,sqrt((((i[esi] * i[esi]) + (i[esi+4] * i[esi+4])) + (i[esi+8] * i[esi+8]))),ftol,safe,n/a
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,1050,0x201,((i[esp+0x10] * d[0]/$T33766) * d[0]/$T33767),ftol,safe,n/a
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,1052,0x221,((i[esp+0x30] * d[0]/$T33766) * d[0]/$T33767),ftol,safe,n/a

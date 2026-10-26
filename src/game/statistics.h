@@ -6,5 +6,6 @@ bool __stdcall IsReporterDllLoaded();
 void __stdcall ShutdownScoreTables();
 
 int __stdcall EnableReporter(int enable);
+int __stdcall FillScoreTables();
 
 #endif

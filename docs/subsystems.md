@@ -95,12 +95,12 @@ Coverage: 75.0% of functions (12 of 16), 76.9% of lines, 63.2% of branches; 4 li
 
 Issue #11. 38 functions. The resource accounts (`UnitResources`), `UpdatePlayerEconomy`, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`, `UpdateResourceSharing` in `src/network/net_game.cpp`).
 
-Coverage: 56.2% of functions (18 of 32), 63.9% of lines, 37.2% of branches; 14 live functions no scenario enters, and 7 more are dead (data/coverage.csv).
+Coverage: 58.1% of functions (18 of 31), 64.5% of lines, 37.0% of branches; 13 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (14 of 32 after `conditions-dark-side` and `conditions-shore-to-shore` (#420) and `save-midgame` (#422); 18 are entered, 56.2%), by reason:
+**Live functions no scenario enters** (13 of 31 after `conditions-dark-side` and `conditions-shore-to-shore` (#420) and `save-midgame` (#422); 18 are entered, 58.1%), by reason:
 
 - Console command only (9): `CmdNoEnergy`, `CmdNoMetal`, `CmdSetShareEnergy`, `CmdSetShareMetal`, `CmdShareAll`, `CmdShareEnergy`, `CmdShareMetal`, and the statics `ShareEnergy` and `ShareMetal` (called only by `CmdShareAll`). #432 adds a `console` verb.
-- Console command, share dialog or network only (2): `UnitResources::SpendEnergy` and `UnitResources::SpendMetal`, reached only through `TransferEnergy` and `TransferMetal` (console `Give`, the ally share dialog, share packets). #432 adds a `console` verb.
+- Console command, share dialog or network only (1): `UnitResources::SpendMetal`, reached only through `TransferMetal` (console `Give`, the ally share dialog, share packets). #432 adds a `console` verb.
 - Share dialog or network only (1): `ShareMapInfo` (the map-share button of the ally share dialog, or a share packet).
 - Network game only (1): `UpdateResourceSharing`. `RunGameSteps` calls it only when `showStats` is set and the packet manager is in use, and it returns at once unless `netGameFlags & 1`.
 - Load only (1): `UnitResources::LoadUnitAccounts`.
@@ -153,12 +153,12 @@ Coverage: 56.2% of functions (18 of 32), 63.9% of lines, 37.2% of branches; 14 l
 
 Issue #12. 62 functions. `UpdateFeatures` and feature loading, spreading, burning, reclaim and wreckage (`src/map/features*.cpp`).
 
-Coverage: 77.4% of functions (41 of 53), 73.3% of lines, 63.3% of branches; 12 live functions no scenario enters, and 7 more are dead (data/coverage.csv).
+Coverage: 80.9% of functions (38 of 47), 73.7% of lines, 63.8% of branches; 9 live functions no scenario enters, and 5 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (12 of 53 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422); 41 are entered, 77.4%), by reason:
+**Live functions no scenario enters** (9 of 47 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422); 38 are entered, 80.9%), by reason:
 
 - Console command only (5): `CmdBurnAll`, `CmdBurnOne`, `CmdFeature`, `FindFeatureType`, `RemoveAllFeatures`.
-- Load only (4): `LoadFeatures` and the statics only it calls: `FeatureIndex`, `FindName`, `FreeFeatureList` (all in `features_424c00.cpp`).
+- Load only (1): `LoadFeatures`.
 - Shutdown only (1): `FreeFeaturePool` (called from the line-of-sight teardown).
 - Cursor only (1): `GetFeature` (the static in `unit_scripts.cpp`, used by the reclaim checks of `GetOrderCursor`, which no scenario enters).
 - Needs a case the scenarios do not set up (1): `FeatureVec3` (its one call site zeroes the velocity of a debris spot when it lands, `features.cpp:1054`).
@@ -422,13 +422,11 @@ none
 
 Issue #17. 118 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 80.9% of functions (72 of 89), 81.9% of lines, 71.3% of branches; 17 live functions no scenario enters, and 20 more are dead (data/coverage.csv).
+Coverage: 84.9% of functions (62 of 73), 82.3% of lines, 71.2% of branches; 11 live functions no scenario enters, and 23 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (17 of 89 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437); 72 are entered, 80.9%), by reason:
+**Live functions no scenario enters** (11 of 73 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437); 62 are entered, 84.9%), by reason:
 
 - Shutdown only (4): `FreeRadar`, `FreeMapResources`, `LosTables::FreeTables` and `LosTables::~LosTables`. `FreeRadar` and `FreeMapResources` are called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick. `FreeTables` has no caller but `FreeLosTables`, which nothing calls, and the destructor is that of the static table, which never runs, because `host_exit` ends the process with `TerminateProcess`.
-- Element destruction of the LOS table vectors (4): `DestroyPoint`, `DestroyLine` and `std::_Destroy` (both overloads). The vector code calls them when it destroys its elements, which only `FreeTables` and the destructor do.
-- Element construction of the LOS table vectors (2): `StoreDwordIfDst` and `std::_Construct`. The tables are filled by `resize` in `LoadLosLine`, and no scenario enters these two; not explained further.
 - Console command only (3): `CmdLOS`, `CmdLOSType` and `CmdRadar`. The game has no console in test mode (#432 adds a console key).
 - Network only (2): `CmdShareMapping` and `CmdShareRadar`, the share commands, which all check `netGameFlags & 1` (a network game); test mode runs a skirmish.
 - Menu and cursor only (2): `ResizeRadarPicture` (the multiplayer lobby map preview) and `Visible` (the mouse hover cursor of `GetOrderCursor`).
@@ -545,9 +543,9 @@ Coverage: 79.0% of functions (294 of 372), 74.8% of lines, 58.2% of branches; 78
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 70.9% of functions (117 of 165), 74.9% of lines, 63.2% of branches; 48 live functions no scenario enters, and 35 more are dead (data/coverage.csv). The list of those 48 is under **units, functions no scenario enters** below.
+**units** (193 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 68 functions are called from outside; the busiest are `GetHeadingBetween` (28), `Unit::SetStateBits` (24), `GetGroundHeight` (20). It is called most by orders (26 distinct functions) and game (24). It imports 179 functions, mostly platform (56), presentation (32), orders (21) and network (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 70.7% of functions (116 of 164), 74.8% of lines, 63.2% of branches; 48 live functions no scenario enters, and 35 more are dead (data/coverage.csv). The list of those 48 is under **units, functions no scenario enters** below.
 
-**units, functions no scenario enters** (48 of 165 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422); 117 are entered, 70.9%), by reason:
+**units, functions no scenario enters** (48 of 164 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422); 116 are entered, 70.7%), by reason:
 
 - Base-class slots of `CobScript` that `UnitScript` overrides (11): `CobScript::AttachUnit`, `CobScript::DropUnit`, `CobScript::EmitSfx`, `CobScript::GetTransporterId`, `CobScript::GetUnitValue`, `CobScript::IsCarryingUnit`, `CobScript::IsPieceCached`, `CobScript::IsPieceShaded`, `CobScript::IsPieceVisible`, `CobScript::PlaySoundNoop`, `CobScript::SetUnitValue`. Every unit's script is a `UnitScript`, so the base bodies are never called.
 - COB opcodes that no script of the game data uses (4): `UnitScript::IsCarryingUnit`, `UnitScript::GetTransporterId`, `UnitScript::PlaySoundNoop`, `Channel::XorOp`. No unit can reach them.
@@ -573,7 +571,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Needs a case no scenario sets up yet (1): `MissionConditions::Deactivate` (the console `Kill` command, or a map with no starting units).
 
-**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 76.5% of functions (75 of 98), 78.0% of lines, 68.6% of branches; 23 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
+**map** (109 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 62 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 76.5% of functions (75 of 98), 78.0% of lines, 69.1% of branches; 23 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
 
 **map, functions no scenario enters** (23 of 98 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422); 75 are entered, 76.5%), by reason:
 
@@ -585,7 +583,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **network** (450 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 103 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 86 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (250 in all).
 
-**network, functions no scenario enters** (283 of 332 after `save-midgame` (#422) and `allied-victory` (#432); 49 are entered, 14.8%), by reason:
+**network, functions no scenario enters** (276 of 325 after `save-midgame` (#422) and `allied-victory` (#432); 49 are entered, 15.1%), by reason:
 
 - Network only (184): `AddNetPlayer`, `AssignPlayerColor`, `AssignStartPositions`, `BitReader::ReadBits`, `BitReader::ReadSignedBits`, `BitWriter::BitWriter`, `BitWriter::FreeBuffer`, `BitWriter::GrowBuffer`, `BitWriter::SetByteAt`, `BitWriter::WriteBits`, `BroadcastAllyTeam`, `BroadcastPendingViewState`, `CheckDuplicatePlayerIds`, `CheckPlayerTimeouts`, `CloseNetSession`, `CommandAllowed`, `CopyWords`, `CountActiveAIPlayers`, `CountMessage`, `CountPacket`, `CreateNetGame`, `CreateUnitFromPacket`, `DefaultPacketHandler`, `DequeueByCalls`, `DropPlayer`, `EnumPlayersCallback`, `FindActiveId_00453010`, `FindConnectedPlayerId`, `FindHost`, `FindIndex_00451bc0`, `FindIndex_00452960`, `FindIndex_00453010`, `FindLobbyHostDpid`, `FindLobbyHostPlayer`, `FindLobbyHostPlayerId`, `FindOccupied_004568c0`, `FindPlayerByDpid`, `FindPlayerCall_00452cc0`, `FindPlayerIndex`, `FindPlayerIndex_0044fed0`, `FindPlayerIndex_00451bc0`, `FindPlayerIndex_004523e0`, `FindPlayerIndex_00453640`, `FindPlayerSlot`, `FindPlayer_00452cc0`, `FindSlotCall_00452cc0`, `FindSlot_00450a10`, `FindSlot_00452570`, `FindSlot_00452cc0`, `FindSlot_00453a50`, `FirstConnectedId`, `FirstJoinedId`, `FirstJoinedId_004568c0`, `FormatNetStats`, `FrameQueue::QueueFrames`, `FrameQueue::ResetFrames`, `FrameQueue::~FrameQueue`, `FrameRing::Pop`, `FrameRing::Push`, `FreeTeam`, `GetCreatedLobbyInterface`, `GetFrame`, `GetHostDpid`, `GetLocalHumanDpid`, `GetPlayerDpid`, `GetPlayerField_0044fed0`, `GetPlayerId_00451bc0`, `GetPlayerId_004523e0`, `GetPlayerId_00453640`, `GetSessionGuidInstance`, `GetSlotDpid_00452cc0`, `HandlePing`, `HandlePlayerEconomy`, `HandleTimeoutDialog`, `InGame`, `InfoPacket`, `InitLobbiedConnection`, `InitNetConnection`, `InitPacketManager`, `IsActive12_00452960`, `IsColorFree`, `IsConnected`, `IsConnected_004568c0`, `IsPlaying_00450e20`, `IsPlaying_00450f90`, `IsPlaying_00452bd0`, `IsPlaying_00452cc0`, `IsReusable`, `IsState2_00452960`, `IsState3_00452960`, `IsTimedOut`, `IsType1_00452cc0`, `IsType3_00452960`, `IsType3_00452cc0`, `IsValid`, `JoinLobbyGame`, `JoinLobbyGameEntry`, `JoinLobbyGameThread`, `JoinNetGame`, `LeaveNetGame`, `Less_0046d6c0::operator?R`, `LocalPlayer`, `NetCondenser::Accumulate`, `NetCondenser::ReceivePacket`, `NetCondenser::SendPacket`, `NetCondenser::SendPacketTo`, `Next_00462f30`, `OpenTimeoutDialog`, `PacketBuffer::AppendPacket`, `PacketBuffer::FreePackets`, `PacketBuffer::RemovePacket`, `PacketChannel::AddPacket`, `PacketChannel::AllocBuffer`, `PacketChannel::AllocPacket`, `PacketChannel::EnqueuePacket`, `PacketChannel::GrowPools`, `PacketChannel::InitPools`, `PacketChannel::SendQueued`, `PacketChannel::~PacketChannel`, `PacketManager::AppendToSendBuffer`, `PacketManager::FindChannel`, `PacketManager::HandleIntegrityNop`, `PacketManager::QueueOnChannel`, `PacketManager::QueuePacket`, `PacketManager::SetDefaultSendPacing`, `PacketReceiver::FindPlayerFrameInfo`, `PacketReceiver::ReceiveFrame`, `PacketReceiver::~PacketReceiver`, `PacketRing::Peek`, `PacketRing::Pop`, `PacketRing::PopPacket`, `PacketRing::Push`, `PacketRing::PushPacket`, `PacketTrace`, `PeekFrame`, `Player::FreeSideDataAndFogSightCounts`, `Player::IsPlayableSlot`, `Player::SetType`, `PlayerById`, `PlayerByIndex`, `PlayerBySlot`, `PlayerDpid_00457d30`, `PlayerField`, `PlayerFrameInfo::Initialize`, `PlayerFrameInfo::~PlayerFrameInfo`, `PlayerId_004515d0`, `PlayerId_004568c0`, `Prev_00462f30`, `QueryOnlineFlags`, `QueueCount`, `RIReport`, `RIReportGameChat`, `RISetCallbacks`, `ReceiveNetPacket`, `RejectPacketType2`, `RejectPacketType5`, `RejectPacketType6`, `RejectPacketType7`, `RejectPacketType8`, `RejectPlayer`, `RemovePlayer`, `Remove_00452cc0`, `ReportGameChat`, `ReportPacketGap`, `SendLobbySyncRequests`, `SendPacketToPlayer`, `SetAlliance`, `TakeFrame`, `UnitAt`, `UnitSync::CheckUnitAvailable`, `UnitSync::End`, `UnitSync::Find`, `UnitSync::HandleSyncPacket`, `UnitSync::NotifyEntryChanged`, `UnitSync::ReceiveSyncPacket`, `UnitSync::SendSyncPacket`, `UnitSyncIter::UnitSyncIter`, `UnitSyncIter::operator?8`, `UnitSyncMap::End`, `UnitSyncMap::FindExact`, `UnitSyncMap::LowerBound`, `UpdateTimeoutDialog`, `Vec_0046d6c0::begin`, `Vec_0046d6c0::end`. Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
 - Menu or front end only (80): `??$copy@PBUElem_0046faf0@@PAU1@@std@@YGPAUElem_0046faf0@@PBU1@0PAU1@@Z`, `??$swap@W4_Redbl@?$_Tree@IU?$pair@$$CBIUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@@std@@YGXAAW4_Redbl@?$_Tree@IU?$pair@$$CBIUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@0@0@Z`, `AreAllPlayersReady`, `Class_00470250::Capacity`, `Class_00470250::count`, `Class_00470270::Size`, `Class_00470270::assign_first`, `Class_00470270::assign_second`, `Class_00470270::begin`, `Class_00470270::burn`, `Class_00470270::end`, `CopyDwordRangeOverwrite`, `CountComputerPlayers`, `CountHumanPlayers`, `CountLocalComputerPlayers`, `CreateLocalPlayer`, `CreateUnitSync`, `DeleteUnitSync`, `FindPlayerInUse`, `FindPlayer_00457a50`, `FindReadyPlayer`, `FindTarget`, `FinishUnitSync`, `FlagOf_0046d040`, `GetRejectReasonText`, `IsHostLocal`, `IsHuman`, `IsPlaying`, `NopChecksumEntryDtor`, `OnlineGetLinkInfo`, `OnlineProcessButtonCommand`, `OnlineTranslate`, `PacketSequencer::Inl`, `PacketSequencer::PacketSequencer`, `PacketSequencer::SendUnsequenced`, `PacketSequencer::operator?4`, `Pair_0046faf0::Pair_0046faf0`, `Pass`, `PlayerDpid`, `PlayerReady`, `RequestPlayerColor`, `SendChatMessage`, `SendChatPacket`, `SendNetHeartbeat`, `SendShareEnergy`, `SendShareMapInfo`, `SendShareMetal`, `SyncChecksumVector::~SyncChecksumVector`, `SyncPlayerRecord::operator?4`, `SyncTaggedVector::InitTaggedVector`, `SyncTempTaggedVector::SyncTempTaggedVector`, `SyncTempTaggedVector::~SyncTempTaggedVector`, `UnitSync::AllPlayersSynced`, `UnitSync::AllowUnit`, `UnitSync::ApplyToUnitTypes`, `UnitSync::DisallowUnit`, `UnitSync::GetSyncStatusText`, `UnitSync::GetUnitEntry`, `UnitSync::IsPlayerSynced`, `UnitSync::PopChangedEntry`, `UnitSync::ProcessSync`, `UnitSync::SetUnitLimit`, `UnitSync::UnitSync`, `UnitSync::~UnitSync`, `UnitSyncDeleter::~UnitSyncDeleter`, `UnitSyncMap::Buynode`, `UnitSyncMap::Init`, `UnitSyncMap::UnitSyncMap`, `UnitSyncMap::operator?A`, `UnitSyncPlayer::UnitSyncPlayer`, `UnitSyncPlayer::operator?4`, `UnitSyncPlayer::~UnitSyncPlayer`, `VecElems_0046d1a0::_Destroy`, `VecElems_0046d1a0::~VecElems_0046d1a0`, `Vec_0046d1a0::_Destroy`, `Vec_0046d1a0::~Vec_0046d1a0`, `Vec_0046d6c0::size`, `Vec_0046d860::Push`, `Wrap_0046e5e0::Wrap_0046e5e0`, `allocator::destroy`. The lobby, menus and dialogs, which test mode skips. Covered by #398's UI log.
@@ -649,24 +647,24 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | subsystem | functions entered | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
 | **wind_meteors** | 12 of 16 | 75.0% | 76.9% | 63.2% | 4 | 0 |
-| **economy** | 18 of 32 | 56.2% | 63.9% | 37.2% | 14 | 7 |
-| **features** | 41 of 53 | 77.4% | 73.3% | 63.3% | 12 | 7 |
+| **economy** | 18 of 31 | 58.1% | 64.5% | 37.0% | 13 | 3 |
+| **features** | 38 of 47 | 80.9% | 73.7% | 63.8% | 9 | 5 |
 | **ai** | 93 of 105 | 88.6% | 88.7% | 81.9% | 12 | 37 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 85.4% | 3 | 10 |
 | **weapons** | 74 of 88 | 84.1% | 84.2% | 68.5% | 14 | 20 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 72 of 89 | 80.9% | 81.9% | 71.3% | 17 | 20 |
+| **los_radar** | 62 of 73 | 84.9% | 82.3% | 71.2% | 11 | 23 |
 | **orders** | 294 of 372 | 79.0% | 74.8% | 58.2% | 78 | 28 |
-| **units** | 117 of 165 | 70.9% | 74.9% | 63.2% | 48 | 35 |
+| **units** | 116 of 164 | 70.7% | 74.8% | 63.2% | 48 | 35 |
 | **players** | 54 of 143 | 37.8% | 40.0% | 32.3% | 89 | 11 |
-| **map** | 75 of 98 | 76.5% | 78.0% | 69.4% | 23 | 12 |
+| **map** | 75 of 98 | 76.5% | 78.0% | 69.1% | 23 | 12 |
 | files | 98 of 142 | 69.0% | 69.7% | 56.7% | 44 | 36 |
 | game | 75 of 183 | 41.0% | 40.3% | 22.4% | 108 | 25 |
-| network | 49 of 332 | 14.8% | 9.3% | 3.7% | 283 | 79 |
+| network | 49 of 325 | 15.1% | 9.4% | 3.8% | 276 | 77 |
 | platform | 314 of 646 | 48.6% | 34.3% | 22.3% | 332 | 82 |
-| presentation | 445 of 1137 | 39.1% | 30.5% | 21.5% | 692 | 311 |
+| presentation | 442 of 1136 | 38.9% | 30.4% | 21.4% | 694 | 311 |
 | seams | 83 of 103 | 80.6% | 90.6% | - | 20 | 0 |
-| state | 315 of 386 | 81.6% | 79.1% | 49.4% | 71 | 22 |
+| state | 298 of 361 | 82.5% | 79.5% | 49.8% | 63 | 22 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
 

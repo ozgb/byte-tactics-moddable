@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4449 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4447 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -23,7 +23,7 @@ The subsystems and the issue each maps to:
 | [pathfinding](#pathfinding) | 56 | #14 |
 | [weapons](#weapons) | 102 | #15 |
 | [targeting](#targeting) | 11 | #16 |
-| [los_radar](#los_radar) | 97 | #17 |
+| [los_radar](#los_radar) | 95 | #17 |
 | [orders](#orders) | 379 | #18 |
 | [units](#the-remaining-subsystems) | 193 | none yet |
 | [players](#the-remaining-subsystems) | 144 | none yet |
@@ -417,9 +417,9 @@ none
 
 ## los_radar
 
-Issue #17. 97 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
+Issue #17. 95 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 84.7% of functions (61 of 72), 82.2% of lines, 71.7% of branches; 11 live functions no scenario enters, and 24 more are dead (data/coverage.csv).
+Coverage: 84.7% of functions (61 of 72), 82.2% of lines, 71.7% of branches; 11 live functions no scenario enters, and 22 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (11 of 72 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437); 61 are entered, 84.7%), by reason:
 
@@ -466,7 +466,7 @@ Coverage: 84.7% of functions (61 of 72), 82.2% of lines, 71.7% of branches; 11 l
 - Needs from seams: 47 functions in presentation, platform, features, ai, map, network, game, units.
 - Owns: 85 named sim items that only this subsystem writes, for example `SightQuery::sightDistance`, `Game::heightMap`, `SightQuery::cacheCell`, `SightQuery::frameIdx`, `Game::visibilityMask`.
 - Shares: 18 named sim items that other subsystems also write, for example `Grid::height`, `Grid::width`, `GafFrame::xOffset`, `GafFrame::yOffset`, `Grid::cells`.
-- 18 imports are presentation (`AllocSurface`, `DrawCircle`, `DrawFrame`, `DownsampleFrame`) and 16 platform. The file rules put the radar picture and minimap code here (`DrawRadarUnits`, `ResizeRadarPicture`, the `Game::minimapGadget*` writes), so most of the 97 functions are likely view code. This is the boundary #17 asks to keep clear.
+- 18 imports are presentation (`AllocSurface`, `DrawCircle`, `DrawFrame`, `DownsampleFrame`) and 16 platform. The file rules put the radar picture and minimap code here (`DrawRadarUnits`, `ResizeRadarPicture`, the `Game::minimapGadget*` writes), so most of the 95 functions are likely view code. This is the boundary #17 asks to keep clear.
 - The result is `Game::visibilityMask`, which ai, economy, map, orders, pathfinding and presentation read. `Player::explored` is read here and written elsewhere.
 
 **Open questions.**
@@ -647,7 +647,7 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 86.1% | 3 | 10 |
 | **weapons** | 75 of 89 | 84.3% | 84.2% | 68.5% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 61 of 72 | 84.7% | 82.2% | 71.7% | 11 | 24 |
+| **los_radar** | 61 of 72 | 84.7% | 82.2% | 71.7% | 11 |22 |
 | **orders** | 303 of 369 | 82.1% | 78.4% | 60.7% | 66 | 26 |
 | **units** | 122 of 164 | 74.4% | 82.0% | 68.7% | 42 | 33 |
 | **players** | 57 of 143 | 39.9% | 42.9% | 34.3% | 86 | 11 |

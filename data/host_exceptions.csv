@@ -17,11 +17,6 @@ src/frontend/frontend.cpp,interfaces/host.h,#392
 src/frontend/frontend.cpp,src/frontend/campaign_menu.h,#392
 src/frontend/frontend.cpp,src/frontend/endgame.h,#392
 src/frontend/frontend.cpp,src/frontend/frontend.h,#392
-src/frontend/frontend.cpp,src/frontend/frontend.h,#392
-src/frontend/frontend.cpp,src/frontend/multi.h,#392
-src/frontend/frontend.cpp,src/frontend/multi.h,#392
-src/frontend/frontend.cpp,src/frontend/multi.h,#392
-src/frontend/frontend.cpp,src/frontend/multi.h,#392
 src/frontend/frontend.cpp,src/frontend/multi.h,#392
 src/frontend/frontend.cpp,src/frontend/options.h,#392
 src/frontend/frontend.cpp,src/frontend/skirmish_menu.h,#392
@@ -38,7 +33,6 @@ src/frontend/multi.cpp,interfaces/host.h,#392
 src/frontend/multi.cpp,src/frontend/frontend.h,#392
 src/frontend/multi.cpp,src/frontend/multi.h,#392
 src/frontend/multi.cpp,src/frontend/options.h,#392
-src/frontend/multi.cpp,src/frontend/v4i.h,#392
 src/frontend/multi.cpp,src/graphics/display.h,#392
 src/frontend/multi.cpp,src/graphics/object_pool.h,#392
 src/frontend/multi.cpp,src/graphics/palette.h,#392
@@ -49,7 +43,6 @@ src/frontend/multi.cpp,src/gui/gui.h,#392
 src/frontend/multi.cpp,src/gui/keyboard.h,#392
 src/frontend/options.cpp,src/frontend/campaign_menu.h,#392
 src/frontend/options.cpp,src/frontend/frontend.h,#392
-src/frontend/options.cpp,src/frontend/options.h,#392
 src/frontend/options.cpp,src/frontend/options.h,#392
 src/frontend/options.cpp,src/graphics/gaf_frame.h,#392
 src/frontend/options.cpp,src/graphics/memory_cache.h,#392
@@ -340,13 +333,12 @@ src/network/net_chat.cpp,src/gui/gui.h,#392
 src/network/net_chat.cpp,src/ingame/control_panel.h,#392
 src/network/net_condenser.cpp,interfaces/host.h,#392
 src/network/net_game.cpp,interfaces/host.h,#392
+src/network/net_game.cpp,src/frontend/multi.h,#392
 src/network/net_game.cpp,src/graphics/display.h,#392
 src/network/net_game.cpp,src/graphics/object_pool.h,#392
 src/network/net_game.cpp,src/gui/dialogs.h,#392
 src/network/net_game.cpp,src/gui/gui.h,#392
 src/network/net_game.cpp,src/gui/layer.h,#392
-src/network/net_game.cpp,interfaces/host.h,#392
-src/network/net_game.cpp,src/frontend/multi.h,#392
 src/network/net_game.cpp,src/ingame/control_panel.h,#392
 src/network/net_game.cpp,src/sound/sound.h,#392
 src/network/packets.cpp,interfaces/host.h,#392

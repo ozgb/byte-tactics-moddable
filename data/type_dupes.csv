@@ -111,7 +111,7 @@ FP_0043d6d0,no,2,include/ta_types.h:5605|src/orders/order_list.cpp:40,differs,in
 Feature,no,7,include/ta_types.h:3992|src/ai/ai_player.cpp:166|src/ingame/info_panel.cpp:115|src/map/feature.h:8|src/map/features.cpp:177|src/map/terrain.cpp:38|src/weapons/explosions.cpp:129,differs,src/map/feature.h
 FeatureDamagePacket,no,3,src/map/features.cpp:68|src/network/net_game.cpp:944|src/orders/unit_orders.cpp:806,differs,src/map/features.cpp
 FeatureSpot,no,3,include/ta_types.h:2546|src/ingame/feature_spot.h:13|src/orders/unit_orders.cpp:798,differs,src/ingame/feature_spot.h
-Feature_0043e490,no,2,src/orders/order_dispatch.cpp:8|src/units/unit_scripts.cpp:408,identical,src/orders/order_dispatch.cpp
+Feature_0043e490,no,2,src/orders/order_dispatch.cpp:8|src/units/unit_scripts.cpp:412,identical,src/orders/order_dispatch.cpp
 FileRequester,no,2,include/ta_types.h:3859|src/gui/file_list.cpp:44,differs,include/ta_types.h
 FindData_0041d4c0,no,2,include/ta_types.h:3789|src/game/cd_check.cpp:13,same-layout,include/ta_types.h
 FindData_0042a440,no,2,include/ta_types.h:4558|src/game/data_files.cpp:531,same-layout,include/ta_types.h
@@ -128,7 +128,7 @@ Fixed_497180,no,2,include/ta_types.h:11865|src/game/game_load.cpp:18,differs,src
 Flags110_0043f0e0,no,2,include/ta_types.h:5738|src/orders/order_dispatch.cpp:70,differs,include/ta_types.h
 Flags111_0043f0e0,no,2,include/ta_types.h:5743|src/orders/order_dispatch.cpp:89,differs,include/ta_types.h
 Flags241_00466dc0,no,2,include/ta_types.h:8078|src/map/radar.cpp:45,identical,include/ta_types.h
-Flags_0043e490,no,2,include/ta_types.h:5697|src/units/unit_scripts.cpp:332,identical,include/ta_types.h
+Flags_0043e490,no,2,include/ta_types.h:5697|src/units/unit_scripts.cpp:336,identical,include/ta_types.h
 Flags_0046a530,no,2,include/ta_types.h:8200|src/ingame/info_panel.cpp:230,identical,include/ta_types.h
 Flags_004898b0,no,2,include/ta_types.h:10940|src/units/unit.cpp:22,differs,src/units/unit.cpp
 Flags_00499cd0,no,2,include/ta_types.h:11953|src/weapons/weapons.cpp:320,identical,include/ta_types.h
@@ -179,7 +179,7 @@ Layer,no,5,src/frontend/frontend.cpp:58|src/frontend/multi.cpp:233|src/gui/dialo
 Len,no,2,include/ta_types.h:5865|src/frontend/multi.cpp:1407,identical,include/ta_types.h
 Less_004db000,no,3,include/ta_types.h:16712|src/debug/debug_lib.cpp:1031|src/debug/free_block_map.cpp:72,differs,include/ta_types.h
 Less_004dd3d0,no,2,include/ta_types.h:16801|src/debug/debug_lib.cpp:892,differs,include/ta_types.h
-Limits_0043e490,no,3,include/ta_types.h:5716|src/orders/order_dispatch.cpp:32|src/units/unit_scripts.cpp:371,same-layout,include/ta_types.h
+Limits_0043e490,no,3,include/ta_types.h:5716|src/orders/order_dispatch.cpp:32|src/units/unit_scripts.cpp:375,same-layout,include/ta_types.h
 ListWrap_0046d1a0,no,2,include/ta_types.h:8365|src/network/unit_sync_46d1a0.cpp:77,differs,include/ta_types.h
 List_00421f20,no,2,include/ta_types.h:4187|src/map/features.cpp:109,differs,include/ta_types.h
 Listener_004896f0,no,2,include/ta_types.h:10912|src/units/unit_targets.cpp:15,same-layout,include/ta_types.h
@@ -289,7 +289,7 @@ Point_004a4b50,no,2,include/ta_types.h:12491|src/gui/gui.cpp:3247,same-layout,in
 Point_004c0c70,no,2,include/ta_types.h:14391|src/graphics/draw.cpp:32,identical,include/ta_types.h
 Poly_459c70,no,2,include/ta_types.h:7195|src/graphics/model_render.cpp:31,identical,include/ta_types.h
 Pos2_0048a490,no,2,include/ta_types.h:11067|src/units/unit_targets.cpp:595,identical,include/ta_types.h
-Pos_0043e490,no,2,src/orders/order_dispatch.cpp:61|src/units/unit_scripts.cpp:400,identical,src/orders/order_dispatch.cpp
+Pos_0043e490,no,2,src/orders/order_dispatch.cpp:61|src/units/unit_scripts.cpp:404,identical,src/orders/order_dispatch.cpp
 Pos_00473590,no,2,include/ta_types.h:9337|src/graphics/particles.cpp:72,differs,include/ta_types.h
 Pos_004745e0,no,2,include/ta_types.h:9469|src/graphics/particles.cpp:80,same-layout,include/ta_types.h
 Pos_0047d2e0,no,2,include/ta_types.h:10011|src/map/terrain.cpp:491,differs,include/ta_types.h
@@ -323,7 +323,7 @@ Shape_00472ab0,no,2,include/ta_types.h:9179|src/graphics/particles.cpp:1645,diff
 ShareLosAckPacket,no,2,include/ta_types.h:7034|src/network/net_game.cpp:2896,differs,include/ta_types.h
 Shot_0049cc20,no,2,include/ta_types.h:12013|src/weapons/weapons.cpp:1148,differs,include/ta_types.h
 Shot_0049d000,no,2,include/ta_types.h:12029|src/weapons/weapons.cpp:1260,differs,include/ta_types.h
-Size_0043e490,no,2,src/orders/order_dispatch.cpp:18|src/units/unit_scripts.cpp:357,identical,src/orders/order_dispatch.cpp
+Size_0043e490,no,2,src/orders/order_dispatch.cpp:18|src/units/unit_scripts.cpp:361,identical,src/orders/order_dispatch.cpp
 Size_0046b9d0,no,2,include/ta_types.h:8208|src/ingame/info_panel.cpp:236,identical,include/ta_types.h
 SkirmishPlayer,no,2,include/ta_types.h:4755|src/game/settings.cpp:8,identical,include/ta_types.h
 SkirmishPlayerSlot,no,2,src/frontend/skirmish_menu.cpp:57|src/game/players.cpp:37,differs,src/frontend/skirmish_menu.cpp
@@ -357,7 +357,7 @@ Src_00440ca0,no,2,include/ta_types.h:5819|src/units/movement_class.cpp:108,diffe
 Src_004b8310,no,2,include/ta_types.h:13904|src/graphics/gaf.cpp:266,differs,include/ta_types.h
 Src_004b8ae0,no,2,src/graphics/gaf.cpp:468|src/ingame/keys.cpp:49,differs,src/graphics/gaf.cpp
 StackTrace,no,2,include/ta_types.h:16582|src/host/win32/crash.cpp:49,differs,include/ta_types.h
-Stats_0043e490,no,2,src/orders/order_dispatch.cpp:25|src/units/unit_scripts.cpp:364,identical,src/orders/order_dispatch.cpp
+Stats_0043e490,no,2,src/orders/order_dispatch.cpp:25|src/units/unit_scripts.cpp:368,identical,src/orders/order_dispatch.cpp
 StructA_004ada10,no,2,include/ta_types.h:12832|src/gui/gui_file.cpp:340,same-layout,include/ta_types.h
 StructA_004ae610,no,2,include/ta_types.h:12986|src/gui/gui_file.cpp:777,same-layout,include/ta_types.h
 StructB_004ada10,no,2,include/ta_types.h:12837|src/gui/gui_file.cpp:345,identical,include/ta_types.h
@@ -406,7 +406,7 @@ UnitSyncPacket,no,2,src/network/unit_sync.cpp:282|src/network/unit_sync_46dad0.c
 UnitSyncPlayer,no,4,include/ta_types.h:8782|src/network/unit_sync.cpp:444|src/network/unit_sync_46d1a0.cpp:22|src/network/unit_sync_player.cpp:31,differs,src/network/unit_sync_player.cpp
 UnitType,no,8,include/ta_types.h:4583|src/game/victory.cpp:42|src/ingame/control_panel.cpp:73|src/ingame/markers.cpp:56|src/orders/order_queue.cpp:22|src/units/unit_position.cpp:39|src/units/unit_targets.cpp:33|src/units/units.cpp:74,differs,src/ingame/control_panel.cpp
 UnitTypeSet,no,3,include/ta_types.h:2642|src/ingame/selection.cpp:22|src/units/unit_type_set.h:6,same-layout,src/units/unit_type_set.h
-Unit_0043e490,no,2,src/orders/order_dispatch.cpp:38|src/units/unit_scripts.cpp:377,identical,src/orders/order_dispatch.cpp
+Unit_0043e490,no,2,src/orders/order_dispatch.cpp:38|src/units/unit_scripts.cpp:381,identical,src/orders/order_dispatch.cpp
 Unit_00467960,no,2,include/ta_types.h:8115|src/ingame/info_panel.cpp:59,same-layout,include/ta_types.h
 Vec3Init_0043a1f0,no,2,include/ta_types.h:5470|src/orders/order_list.cpp:93,same-layout,include/ta_types.h
 Vec3f,no,3,include/ta_types.h:4169|src/graphics/model_render.cpp:29|src/weapons/explosions.cpp:19,identical,include/ta_types.h

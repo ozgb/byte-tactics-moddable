@@ -4713,7 +4713,7 @@ void UpdateBattleRoom()
     entries = g_game->gui.layer->entries;
     if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
         int idx = FindGadgetIndex(entries, "PLAYER0", 0xe);
-        entries[idx].colour = 0x18;
+        entries[idx].colours = 0x18;
     }
 
     if (g_game->bits_2bee_1.dirty) {
@@ -4782,8 +4782,8 @@ void UpdateBattleRoom()
                     {
                         int idx = FindGadgetIndex(entries, "START", 1);
                         unsigned int colour = GetTicks() & 0x1f;
-                        if (colour != entries[idx].colour) {
-                            entries[idx].colour = colour;
+                        if (colour != (unsigned int)entries[idx].colours) {
+                            entries[idx].colours = colour;
                             MarkChanged((Dialog *)&g_game->gui);
                         }
                     }

@@ -2363,7 +2363,6 @@ int HandleNetPackets()
             case 3: {
                 if (!AddNetPlayer(msg->id))
                     break;
-                FindPlayerByDpid(msg->id);
                 int target = FindSlotByDpid(msg->id);
                 if (!g_game->players[FindLobbyHostPlayer()].IsPlayableSlot())
                     break;

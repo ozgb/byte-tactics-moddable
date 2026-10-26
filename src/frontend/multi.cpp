@@ -273,6 +273,7 @@ char* __stdcall Translate(const char* text);
 void __stdcall SetOffscreenSurface(int a);
 void FlipScreen();
 #include "../gui/keyboard.h"
+#include "v4i.h"
 #include "../graphics/display.h"
 #include "../debug/debug_lib.h"
 #include "../network/online.h"
@@ -4368,7 +4369,7 @@ void OpenUnitRestrictions()
 int __stdcall SelectConnection(int index)
 {
     if (index < 0) {
-        GUID* guid = 0;
+        GUID* guid = nullptr;
         switch (DAT_00512c80) {
         case 0: break;
         case 1: guid = &g_dpspGuidTcpip; break;
@@ -4377,7 +4378,7 @@ int __stdcall SelectConnection(int index)
         case 4: guid = &g_dpspGuidSerial; break;
         }
         DAT_00512c80 = 0;
-        if (guid != 0) {
+        if (guid != nullptr) {
             int i = 0;
             for (; i < g_game->count; i++) {
                 if (memcmp(&((GUID *)g_game->guids)[i], guid, sizeof(GUID)) == 0)
@@ -4392,7 +4393,7 @@ int __stdcall SelectConnection(int index)
         g_game->info.conn = g_game->conns[index];
         int size = g_game->conns[index].size;
         g_game->info.conn.data = GameAllocIgnoreTag("DPLAY CONNECTION INFO", size);
-        if (g_game->info.conn.data != 0) {
+        if (g_game->info.conn.data != nullptr) {
             memcpy(g_game->info.conn.data, g_game->conns[index].data, size);
         } else {
             g_game->info.conn.size = 0;
@@ -4413,18 +4414,18 @@ void __stdcall HandleSelectProviderClick(Gui* menu)
     int id;
     int cur;
     if (menu->hotGadgetIndex == -1) {
-        if (g_game->sessions != 0) {
+        if (g_game->sessions != nullptr) {
             GameFreeThunk(g_game->sessions);
             for (i = 0; i < 10; i++) {
-                if (g_game->conns[i].data != 0) {
+                if (g_game->conns[i].data != nullptr) {
                     host_net_free(g_game->conns[i].data);
-                    g_game->conns[i].data = 0;
+                    g_game->conns[i].data = nullptr;
                 }
             }
             GameFreeThunk(g_game->conns);
             GameFreeThunk(g_game->data[0]);
-            g_game->sessions = 0;
-            g_game->data[0] = 0;
+            g_game->sessions = nullptr;
+            g_game->data[0] = nullptr;
         }
         return;
     }
@@ -4477,7 +4478,7 @@ void __stdcall HandleSelectProviderClick(Gui* menu)
 // FUNCTION: 0x444580
 void FillProviderList()
 {
-    if (g_game->gui.layer != 0 && strcmp(g_game->gui.layer->entries->name, "SELPROV.GUI") == 0)
+    if (g_game->gui.layer != nullptr && strcmp(g_game->gui.layer->entries->name, "SELPROV.GUI") == 0)
         CloseTopScreen(&g_game->gui);
     SetPaletteColors((unsigned char*)g_game->paletteRgba, 0, 0x100);
     RemapPaletteToClosestIndices(&g_game->gui, g_game->paletteRgba, g_game->gui.palette);
@@ -4488,7 +4489,7 @@ void FillProviderList()
     g_game->data[0] = GameAllocIgnoreTag("PROVIDER DESCRIPTIONS", 0x500);
     g_game->sessions = (V4i*)GameAllocIgnoreTag("PROVIDER GUIDS", 0xa0);
     g_game->conns = (Conn_443ff0*)GameAllocIgnoreTag("DPLAY CONNECTIONS", 0x50);
-    if (g_game->conns != 0)
+    if (g_game->conns != nullptr)
         memset(g_game->conns, 0, 0x50);
     g_game->net->RefreshMapList(1);
     host_net_uninit((host_net*)g_game->net_14);
@@ -4860,7 +4861,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
         }
         GameFreeThunk(desc->rows);
         GameFreeThunk(g_unitRestrictPics);
-        g_unitRestrictPics = 0;
+        g_unitRestrictPics = nullptr;
         GameFreeThunk(desc->text_c2);
         SetDescListCleanupFlag(menu, 1);
         if (IsHostLocal() != 0) {
@@ -4882,9 +4883,9 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
         GameFreeThunk(g_unitRestrictOldCounts);
         GameFreeThunk(desc->flags);
         pic = FindGadgetChecked(menu->layer->entries, "PICLIST");
-        if (pic != 0 && pic->rows != 0)
+        if (pic != nullptr && pic->rows != nullptr)
             GameFreeThunk(pic->rows);
-        g_unitRestrictEntries = 0;
+        g_unitRestrictEntries = nullptr;
         return;
     }
 
@@ -4930,7 +4931,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
         n = 0;
         for (i = 1; i < g_game->unitDefCount; i++) {
             if (((UnitDefView *)g_game->defs.get())[i].flags2.bits.flag) {
-            } else if (((UnitDefView *)g_game->defs.get())[i].name != 0) {
+            } else if (((UnitDefView *)g_game->defs.get())[i].name != nullptr) {
                 ((UnitSync *)g_game->sync)->SetUnitLimit(
                     &((UnitDefView *)g_game->defs.get())[i], g_unitRestrictOldCounts[n]);
                 n++;

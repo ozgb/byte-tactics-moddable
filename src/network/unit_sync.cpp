@@ -1464,6 +1464,8 @@ SyncPacketInsertFn g_syncPacketInsert = &SyncPacketVector::insert;
 
 inline UnitSyncPlayer& UnitSyncPlayer::operator=(const UnitSyncPlayer& rhs)
 {
+    if (this == &rhs)
+        return *this;
     return (UnitSyncPlayer&)((SyncPlayerRecord*)this)->operator=(*(const SyncPlayerRecord*)&rhs);
 }
 

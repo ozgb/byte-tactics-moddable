@@ -1327,17 +1327,6 @@ void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit)
     }
 }
 
-static Unit* GetSelectedUnit()
-{
-    unsigned short index = g_game->unitIndex;
-    if (index) {
-        Unit* unit = &g_game->units[index];
-        if (unit->unitDefIndex)
-            return unit;
-    }
-    return 0;
-}
-
 // FUNCTION: 0x41c180
 void DispatchOrdersPanelPageFlags()
 {
@@ -1353,7 +1342,7 @@ void DispatchOrdersPanelPageFlags()
     }
     if (g_game->ordersPanelFlags_37ebe_6.bits.build) {
         g_game->ordersPanelFlags_37ebe_6.bits.build = 0;
-        Unit* unit = GetSelectedUnit();
+        Unit* unit = GetBuildMenuFocusUnit();
         if (unit) {
             unit->flags |= 0x400000;
             g_game->ordersPanelFlags_37ebe_6.bits.flag_4 = 1;
@@ -1362,7 +1351,7 @@ void DispatchOrdersPanelPageFlags()
     }
     if (g_game->ordersPanelFlags_37ebe_6.bits.orders) {
         g_game->ordersPanelFlags_37ebe_6.bits.orders = 0;
-        Unit* unit = GetSelectedUnit();
+        Unit* unit = GetBuildMenuFocusUnit();
         if (unit) {
             unit->flags &= ~0x400000;
             g_game->ordersPanelFlags_37ebe_6.bits.flag_4 = 1;

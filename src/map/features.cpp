@@ -686,32 +686,15 @@ short __stdcall FindFeatureType(char* name)
     return -1;
 }
 
-static inline unsigned short FindName(char* name)
-{
-    for (int i = 0; i < g_game->featureCount; i++) {
-        if (_strcmpi(name, g_game->features[i].name) == 0) {
-            return (unsigned short)i;
-        }
-    }
-    return 0xffff;
-}
 // FUNCTION: 0x422e40
 unsigned short __stdcall FindOrLoadFeatureType(char* name)
 {
-    unsigned short i = FindName(name);
+    unsigned short i = (unsigned short)FindFeatureType(name);
     if (i == 0xffff)
         i = LoadFeatureType(name);
     return i;
 }
 
-static inline int FindFeature(char* name)
-{
-    for (int i = 0; i < g_game->featureCount; i++) {
-        if (_strcmpi(name, g_game->features[i].name) == 0)
-            return i;
-    }
-    return 0xffff;
-}
 // FUNCTION: 0x422ea0
 void ResolveFeatureLinks()
 {
@@ -748,7 +731,7 @@ void PlaceMissionFeatures(void)
         MissionFeature* p = &g_game->net->features[i];
         if (p->name[0] == 0)
             continue;
-        unsigned short id = (unsigned short)FindFeature(p->name);
+        unsigned short id = (unsigned short)FindFeatureType(p->name);
         if (id == 0xffff) {
             id = LoadFeatureType(p->name);
             if (id == 0xffff)

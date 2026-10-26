@@ -47,7 +47,7 @@ ai,Vec3_0040beb0::Length,src/ai/ai_player.cpp,0,0,0,0,0,0,?Length@Vec3_0040beb0@
 ai,Vec3_0040beb0::Scale,src/ai/ai_player.cpp,0,0,0,0,0,0,?Scale@Vec3_0040beb0@@QAEXH@Z,1,
 ai,Vec::Vec,src/ai/vec.h,0,0,0,0,0,0,??0Vec@@QAE@HHH@Z,1,
 ai,std::_Construct,src/ai/ai_player.cpp,0,0,0,0,0,0,?_Construct@std@@YGXPAUElem_0040d4f0@@ABU2@@Z,1,
-economy,*,,30,19,596,401,312,118,,3,
+economy,*,,29,19,584,401,308,118,,3,
 economy,CallOnEachReverse,src/game/economy.cpp,0,0,0,0,0,0,?CallOnEachReverse@@YGXPAVObj@@HHP81@AEXXZ@Z,1,
 economy,CmdNoEnergy,src/game/console_commands.cpp,1,0,0,0,0,0,?CmdNoEnergy@@YGXPAVCommandArgs@@@Z,0,
 economy,CmdNoMetal,src/game/console_commands.cpp,1,0,0,0,0,0,?CmdNoMetal@@YGXPAVCommandArgs@@@Z,0,
@@ -59,7 +59,6 @@ economy,CmdShareMetal,src/game/share_commands.cpp,1,0,0,0,0,0,?CmdShareMetal@@YG
 economy,InitStartingResourcesFromSkirmish,src/game/main_loop.cpp,0,0,0,0,0,0,?InitStartingResourcesFromSkirmish@@YGXXZ,1,
 economy,SettleResourceAccount,src/game/economy.cpp,0,0,0,0,0,0,?SettleResourceAccount@@YGXPAUObj_00401320@@MM@Z,1,
 economy,ShareMapInfo,src/units/units.cpp,1,0,0,0,0,0,?ShareMapInfo@@YGXEE@Z,0,
-economy,ShareMetal,src/game/share_commands.cpp,1,0,0,0,0,0,?ShareMetal@@YGXH@Z,0,
 economy,UnitResources::SpendMetal,src/game/economy.cpp,1,0,0,0,0,0,?SpendMetal@UnitResources@@QAEHM@Z,0,
 economy,UpdateResourceSharing,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateResourceSharing@@YGXPAUPlayer@@@Z,0,
 features,*,,44,37,1053,821,448,299,,4,
@@ -343,7 +342,7 @@ map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetP
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
 map,Vector_00438480::~Vector_00438480,src/map/vector_00438480.h,1,0,0,0,0,0,??1?$Vector_00438480@HV?$allocator@H@std@@@@QAE@XZ,0,
 map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVVisitor_0047e750@@@Z,1,
-network,*,,298,44,5320,485,2590,88,,72,
+network,*,,297,44,5311,485,2586,88,,70,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,1,
 network,??$copy@PBUElem_0046faf0@@PAU1@@std@@YGPAUElem_0046faf0@@PBU1@0PAU1@@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PBUElem_0046faf0@@PAU1@@std@@YGPAUElem_0046faf0@@PBU1@0PAU1@@Z,0,menu
@@ -496,7 +495,6 @@ network,LeaveNetGame,src/network/net_game.cpp,1,0,0,0,0,0,?LeaveNetGame@@YGXXZ,0
 network,LeaveNetGameCallback,src/network/net_game.cpp,1,0,0,0,0,0,?LeaveNetGameCallback@@YAXH@Z,0,shutdown
 network,Less_0046d6c0::operator?R,src/network/unit_sync.cpp,1,0,0,0,0,0,??RLess_0046d6c0@@QBE_NABI0@Z,0,network
 network,LocalPlayer,src/network/net_game.cpp,1,0,0,0,0,0,?LocalPlayer@@YGPAUPlayer@@XZ,0,network
-network,LookupPlayer,src/network/net_game.cpp,0,0,0,0,0,0,?LookupPlayer@@YGEH@Z,1,
 network,NetCondenser::Accumulate,src/network/net_condenser.cpp,1,0,0,0,0,0,?Accumulate@NetCondenser@@QAEXPAXH@Z,0,network
 network,NetCondenser::ReceivePacket,src/network/net_condenser.cpp,1,0,0,0,0,0,?ReceivePacket@NetCondenser@@QAEHPAXPADPAH@Z,0,network
 network,NetCondenser::SendPacket,src/network/net_condenser.cpp,1,0,0,0,0,0,?SendPacket@NetCondenser@@QAEHPAXH@Z,0,network
@@ -567,11 +565,9 @@ network,PickNewHost,src/network/net_game.cpp,0,0,0,0,0,0,?PickNewHost@@YGEXZ,1,
 network,Player::FreeSideDataAndFogSightCounts,src/network/packets.cpp,1,0,0,0,0,0,?FreeSideDataAndFogSightCounts@Player@@QAEXXZ,0,network
 network,Player::IsPlayableSlot,src/network/net_game.cpp,1,0,0,0,0,0,?IsPlayableSlot@Player@@QAEHXZ,0,network
 network,Player::SetType,src/network/packets.cpp,1,0,0,0,0,0,?SetType@Player@@QAEXH@Z,0,network
-network,PlayerDpid,src/network/net_game.cpp,0,0,0,0,0,0,?PlayerDpid@@YGHPAUPlayer@@@Z,1,
 network,PlayerDpid_00457d30,src/network/net_game.cpp,1,0,0,0,0,0,?PlayerDpid_00457d30@@YGHE@Z,0,network
 network,PlayerFrameInfo::Initialize,src/network/packets.cpp,1,0,0,0,0,0,?Initialize@PlayerFrameInfo@@QAEXJ@Z,0,network
 network,PlayerFrameInfo::~PlayerFrameInfo,src/network/packets.cpp,1,0,0,0,0,0,??1PlayerFrameInfo@@QAE@XZ,0,network
-network,PlayerId_004568c0,src/network/net_game.cpp,1,0,0,0,0,0,?PlayerId_004568c0@@YGHE@Z,0,network
 network,PlayerReady,src/network/net_game.cpp,1,0,0,0,0,0,?PlayerReady@@YGHPAUPlayer@@@Z,0,menu
 network,Prev_00462f30,src/network/packets.cpp,1,0,0,0,0,0,?Prev_00462f30@@YGHH@Z,0,network
 network,QueryOnlineFlags,src/network/online_report.cpp,1,0,0,0,0,0,?QueryOnlineFlags@@YGHH@Z,0,network
@@ -670,9 +666,8 @@ network,Vec_0046d6c0::size,src/network/unit_sync.cpp,1,0,0,0,0,0,?size@Vec_0046d
 network,Vec_0046d860::Push,src/network/unit_sync_46dad0.cpp,1,0,0,0,0,0,?Push@Vec_0046d860@@QAEXABUSyncPlayerRecord@@@Z,0,menu
 network,Wrap_0046e5e0::Wrap_0046e5e0,src/network/unit_sync_46dad0.cpp,1,0,0,0,0,0,??0Wrap_0046e5e0@@QAE@ABUAlloc_0046e5c0@@@Z,0,menu
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UElem_0046faf0@@@std@@QAEXPAUElem_0046faf0@@@Z,0,menu
-orders,*,,370,300,6467,4988,3188,1888,,26,
+orders,*,,369,300,6457,4988,3188,1888,,26,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
-orders,AddComponentwise,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?AddComponentwise@@YG?AUVec3@@ABU1@0@Z,0,
 orders,AiSearchGoal::HasNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,
 orders,AiSearchGoal::SerializeNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,
 orders,AiSearchGoal::TruncateWaypointsFrom,src/orders/order_targets.cpp,0,0,0,0,0,0,?TruncateWaypointsFrom@AiSearchGoal@@QAEXH@Z,1,
@@ -1286,7 +1281,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,
-presentation,*,,1127,442,31909,9750,11918,2562,,300,
+presentation,*,,1124,441,31882,9734,11904,2556,,300,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,??G@YG?AUVec3_00474760@@ABU0@0@Z,src/graphics/particles.cpp,1,0,0,0,0,0,??G@YG?AUVec3_00474760@@ABU0@0@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
@@ -1528,7 +1523,7 @@ presentation,FUN_0049fd20,src/gui/gui.cpp,0,0,0,0,0,0,?FUN_0049fd20@@YGXPAUObj1_
 presentation,FUN_004a14c0,src/gui/gui.cpp,0,0,0,0,0,0,?FUN_004a14c0@@YGXPAUDialog_004a04f0@@PADH@Z,1,
 presentation,FadeRectangle,src/graphics/draw.cpp,1,0,0,0,0,0,?FadeRectangle@@YGHPAUSurface@@PAURect@@H@Z,0,
 presentation,FileRequesterHandler,src/gui/file_list.cpp,0,0,0,0,0,0,?FileRequesterHandler@@YGXPAUGui@@@Z,1,
-presentation,FillAccountList,src/frontend/multi.cpp,1,0,0,0,0,0,?FillAccountList@@YGXXZ,0,
+presentation,FillAccountList,src/frontend/multi.cpp,0,0,0,0,0,0,?FillAccountList@@YGXXZ,1,
 presentation,FillBevelBox,src/gui/listbox.cpp,1,0,0,0,0,0,?FillBevelBox@@YGXPAXPAURect@@HHH@Z,0,
 presentation,FillBevelBoxDarkFirst,src/gui/listbox.cpp,1,0,0,0,0,0,?FillBevelBoxDarkFirst@@YGXPAXPAURect@@HHH@Z,0,
 presentation,FillCampaignList,src/frontend/campaign_menu.cpp,0,0,0,0,0,0,?FillCampaignList@@YGXPAD@Z,1,
@@ -1792,7 +1787,6 @@ presentation,ListCampaignFiles,src/frontend/campaign_menu.cpp,0,0,0,0,0,0,?ListC
 presentation,ListSaveGameFiles,src/frontend/multi.cpp,1,0,0,0,0,0,?ListSaveGameFiles@@YGPAXPAH@Z,0,
 presentation,Lists_00472430::Add,src/graphics/particles.cpp,1,0,0,0,0,0,?Add@Lists_00472430@@QAEXFPAVParticleSystem@@@Z,0,
 presentation,Lists_00472530::Add,src/graphics/particles.cpp,1,0,0,0,0,0,?Add@Lists_00472530@@QAEXFPAVParticleSystem@@@Z,0,
-presentation,LoadAccount_00442a30,src/frontend/multi.cpp,1,0,0,0,0,0,?LoadAccount_00442a30@@YGXXZ,0,
 presentation,LoadPcxPalette,src/graphics/pcx.cpp,1,0,0,0,0,0,?LoadPcxPalette@@YGHPADPAI@Z,0,
 presentation,LoadSavedAudioSettings,src/frontend/options.cpp,1,0,0,0,0,0,?LoadSavedAudioSettings@@YGXXZ,0,
 presentation,LoadSavedSettings,src/frontend/options.cpp,0,0,0,0,0,0,?LoadSavedSettings@@YGXXZ,1,
@@ -1953,7 +1947,7 @@ presentation,ReadTextInputFields,src/gui/gui_file.cpp,0,0,0,0,0,0,?ReadTextInput
 presentation,ReadTextLinkFields,src/gui/gui_file.cpp,0,0,0,0,0,0,?ReadTextLinkFields@@YGXPAUObj_004ae300@@PAUSource_004ae300@@@Z,1,
 presentation,RebuildAllyList,src/frontend/multi.cpp,1,0,0,0,0,0,?RebuildAllyList@@YGXXZ,0,
 presentation,RedrawGadgetRect,src/gui/gui.cpp,0,0,0,0,0,0,?RedrawGadgetRect@@YGXPAUDialog_4a1ab0@@H@Z,1,
-presentation,RefreshAccountList,src/frontend/multi.cpp,0,0,0,0,0,0,?RefreshAccountList@@YGXXZ,1,
+presentation,RefreshAccountList,src/frontend/multi.cpp,1,0,0,0,0,0,?RefreshAccountList@@YGXXZ,0,
 presentation,RefreshAlliesScreen,src/frontend/multi.cpp,1,0,0,0,0,0,?RefreshAlliesScreen@@YGXH@Z,0,
 presentation,RefreshAllyIcons,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?RefreshAllyIcons@@YGXXZ,0,
 presentation,RefreshBattleRoomRows,src/frontend/multi.cpp,1,0,0,0,0,0,?RefreshBattleRoomRows@@YGXXZ,0,
@@ -1998,7 +1992,6 @@ presentation,SelectConnection,src/frontend/multi.cpp,1,0,0,0,0,0,?SelectConnecti
 presentation,SelectCurrentByName,src/gui/gui.cpp,1,0,0,0,0,0,?SelectCurrentByName@@YGXPAUGui@@PAUGadget@@H@Z,0,
 presentation,SelectFontForEntry,src/gui/gui.cpp,1,0,0,0,0,0,?SelectFontForEntry@@YGHPAUGadget@@H@Z,0,
 presentation,SelectGadgetByIndex,src/gui/gui.cpp,1,0,0,0,0,0,?SelectGadgetByIndex@@YGXPAUGui@@H@Z,0,
-presentation,SelectGadgetByIndex_inlined,src/gui/gui.cpp,1,0,0,0,0,0,?SelectGadgetByIndex_inlined@@YGXPAUGui@@H@Z,0,
 presentation,SelectGadgetByName,src/gui/gui.cpp,1,0,0,0,0,0,?SelectGadgetByName@@YGXPAUGui@@PAD@Z,0,
 presentation,SelectLabelFont,src/gui/gui.cpp,0,0,0,0,0,0,?SelectLabelFont@@YGHPAUGadget@@H@Z,1,
 presentation,SelectLogosGadget,src/frontend/skirmish_menu.cpp,0,0,0,0,0,0,?SelectLogosGadget@@YGXPAUGui@@PAX@Z,1,

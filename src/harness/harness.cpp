@@ -695,10 +695,7 @@ static void SeedNetworkHost(int host)
     g_game->loadingFlags.value |= 8;
 }
 
-static Table_0047ae60* ScenarioTable()
-{
-    return (Table_0047ae60*)g_game->options;
-}
+static Table_0047ae60* ScenarioTable() { return (Table_0047ae60*)g_game->options; }
 
 static void SetUpSkirmish()
 {

@@ -695,9 +695,14 @@ static void SeedNetworkHost(int host)
     g_game->loadingFlags.value |= 8;
 }
 
+static Table_0047ae60* ScenarioTable()
+{
+    return (Table_0047ae60*)g_game->options;
+}
+
 static void SetUpSkirmish()
 {
-    Table_0047ae60* t = (Table_0047ae60*)g_game->options;
+    auto* t = ScenarioTable();
     int sideCount = g_game->sides;
     int highest = 0;
     int active = 0;
@@ -797,8 +802,10 @@ static void SetUpLoadedGame()
     char path[sizeof s_savePath];
     strcpy(path, s_savePath);
     HapiBank* summary = OpenSummaryBank(path);
-    if (summary == nullptr)
+    if (summary == nullptr) {
         FailLoad("cannot read the save ", s_savePath);
+        return;
+    }
     int type = summary->GetIntegerItem("Gametype", 0);
     int savedTick = summary->GetIntegerItem("Game Time", 0);
     FreeSummaryBank(summary);
@@ -810,26 +817,30 @@ static void SetUpLoadedGame()
         FailLoad("", detail);
     }
 
-    Table_0047ae60* t = (Table_0047ae60*)g_game->options;
+    auto* t = ScenarioTable();
     memset(t, 0, sizeof *t);
     strcpy(g_game->saveName_38c6b, s_savePath);
     g_game->pendingSaveStore = OpenHapiBank(g_game->saveName_38c6b);
-    if (g_game->pendingSaveStore == nullptr)
+    if (g_game->pendingSaveStore == nullptr) {
         FailLoad("cannot read the save ", s_savePath);
+        return;
+    }
     HapiBank* bank = g_game->pendingSaveStore;
     bank->OpenAccount("summary");
     SetMissionType(bank->GetIntegerItem("Gametype", 0));
-    char* campaign = bank->GetStringItem("Campaign", 0);
+    char* campaign = bank->GetStringItem("Campaign", nullptr);
     Mission* mission = (Mission*)g_game->net;
     if (campaign != nullptr)
         mission->LoadCampaign(campaign);
     g_game->flag_37ef2 = bank->GetIntegerItem("Side", 0);
     g_game->difficulty = bank->GetIntegerItem("Difficulty", 0);
-    char* name = bank->GetStringItem("Mission", 0);
-    if (name == nullptr || strlen(name) == 0 || mission->LoadMissionByName(name) == 0)
+    char* name = bank->GetStringItem("Mission", nullptr);
+    if (name == nullptr || strlen(name) == 0 || mission->LoadMissionByName(name) == 0) {
         FailLoad("the save names a map the game cannot load: ", s_savePath);
+        return;
+    }
     strcpy(t->mapName, name);
-    char* thumbs = bank->GetStringItem("Thumbs", 0);
+    char* thumbs = bank->GetStringItem("Thumbs", nullptr);
     if (thumbs != nullptr)
         strncpy(g_game->campaignMissionStatus, thumbs, 0x19);
     if (strlen(g_game->campaignMissionStatus) != 0x19)

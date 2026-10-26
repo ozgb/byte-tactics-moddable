@@ -27,6 +27,10 @@ char IsMemSet();
 int GetMemSetValue();
 void __stdcall MakeDirectoryPath(char* path);
 int __stdcall SaveGameFile(char* path, char* description, int gameId);
+HapiBank* __stdcall OpenSummaryBank(char* name);
+void __stdcall FreeSummaryBank(void* handle);
+HapiBank* __stdcall OpenHapiBank(char* path);
+char* HarnessBankString(HapiBank* bank, char* item, char* def);
 
 enum { MAX_PLAYERS = 10 };
 
@@ -765,7 +769,7 @@ static void SetUpLoadedGame()
     char path[sizeof s_savePath];
     strcpy(path, s_savePath);
     HapiBank* summary = OpenSummaryBank(path);
-    if (summary == nullptr)
+    if (summary == NULL)
         FailLoad("cannot read the save ", s_savePath);
     int type = summary->GetIntegerItem("Gametype", 0);
     int savedTick = summary->GetIntegerItem("Game Time", 0);
@@ -780,38 +784,39 @@ static void SetUpLoadedGame()
 
     Table_0047ae60* t = (Table_0047ae60*)g_game->options;
     memset(t, 0, sizeof *t);
-    strcpy(g_game->saveName_38c6b, s_savePath);
-    g_game->pendingSaveStore = OpenHapiBank(g_game->saveName_38c6b);
-    if (g_game->pendingSaveStore == nullptr)
+    char* saveName = (char*)g_game + 0x38c6b;
+    strcpy(saveName, s_savePath);
+    g_game->pendingSaveStore = (int)OpenHapiBank(saveName);
+    if (g_game->pendingSaveStore == 0)
         FailLoad("cannot read the save ", s_savePath);
-    HapiBank* bank = g_game->pendingSaveStore;
+    HapiBank* bank = (HapiBank*)g_game->pendingSaveStore;
     bank->OpenAccount("summary");
     SetMissionType(bank->GetIntegerItem("Gametype", 0));
-    char* campaign = bank->GetStringItem("Campaign", 0);
+    char* campaign = HarnessBankString(bank, "Campaign", 0);
     Mission* mission = (Mission*)g_game->net;
-    if (campaign != nullptr)
+    if (campaign != NULL)
         mission->LoadCampaign(campaign);
     g_game->flag_37ef2 = bank->GetIntegerItem("Side", 0);
     g_game->difficulty = bank->GetIntegerItem("Difficulty", 0);
-    char* name = bank->GetStringItem("Mission", 0);
-    if (name == nullptr || strlen(name) == 0 || mission->LoadMissionByName(name) == 0)
+    char* name = HarnessBankString(bank, "Mission", 0);
+    if (name == NULL || strlen(name) == 0 || mission->LoadMissionByName(name) == 0)
         FailLoad("the save names a map the game cannot load: ", s_savePath);
     strcpy(t->mapName, name);
-    char* thumbs = bank->GetStringItem("Thumbs", 0);
-    if (thumbs != nullptr)
-        strncpy(g_game->campaignMissionStatus, thumbs, 0x19);
-    if (strlen(g_game->campaignMissionStatus) != 0x19)
+    char* thumbs = HarnessBankString(bank, "Thumbs", 0);
+    if (thumbs != NULL)
+        strncpy((char*)g_game->field_391cf, thumbs, 0x19);
+    if (strlen((char*)g_game->field_391cf) != 0x19)
         InitMissionStatus();
     bank->OpenAccount("summary");
-    g_game->numPlayers = (unsigned short)((short)bank->GetIntegerItem("Players", 0));
+    g_game->field_2a3c = (unsigned short)((short)bank->GetIntegerItem("Players", 0));
     t->commanderDeath = bank->GetIntegerItem("CommanderDeath", 1);
     t->fixedLocations = bank->GetIntegerItem("Location", 1);
     t->mapping = bank->GetIntegerItem("Mapping", 1);
     t->lineOfSight = bank->GetIntegerItem("LineOfSight", 1);
     t->losType = bank->GetIntegerItem("LineOfSightType", 1);
-    g_game->frontendState = 9;
-    g_game->frontendSubState = 2;
-    g_game->frontendNextSubState = 2;
+    g_game->field_2bbe = 9;
+    g_game->field_2bbf = 2;
+    g_game->field_2bc0 = 2;
 }
 
 static void OpenTrace(unsigned controlWord);

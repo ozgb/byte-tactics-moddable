@@ -415,7 +415,7 @@ def play_suite(exe: Path, game_dir: str | None, parallel: int, names: list[str] 
     if unknown:
         sys.exit("coverage: no such scenario: %s" % ", ".join(unknown))
     if names:
-        scenarios = {n: scenarios[n] for n in names}
+        scenarios = reference.with_savers({n: scenarios[n] for n in names}, scenarios)
     if RUN_DIR.exists():
         sys.exit("coverage: %s exists from an earlier run; remove it first" % RUN_DIR.relative_to(ROOT))
     local = threading.local()

@@ -605,7 +605,11 @@ def play_suite(exe: Path, game_dir: str | None, parallel: int, names: list[str] 
     """
     import reference
     scans: dict[str, str | None] = {}
-    reference.play_all(exe, select_scenarios(reference.scenario_files(), names), game_dir, parallel,
+    available = reference.scenario_files()
+    selected = select_scenarios(available, names)
+    if names:
+        selected = reference.with_savers(selected, available)
+    reference.play_all(exe, selected, game_dir, parallel,
                        failed=failed if failed is not None else {}, scans=scans, retry_any=True)
     return scans
 

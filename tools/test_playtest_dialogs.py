@@ -4,6 +4,7 @@ Pure functions only; no game, display or Wine is run.
 """
 
 import argparse
+import tempfile
 from pathlib import Path
 
 import playtest
@@ -47,7 +48,9 @@ def test_tracediff_poisons_only_b() -> None:
         return Path(exe.name)
 
     saved = tracediff.play, tracediff.need, tracediff.parse_trace, tracediff.diff_dumps, tracediff.print_diff
+    saved_load = tracediff.scenario_load
     tracediff.play = fake_play
+    tracediff.scenario_load = lambda scenario: None
     tracediff.need = lambda run, name: run / name
     tracediff.parse_trace = lambda path: ({}, [(1, "units", "aa")] if path.parent.name == "a.exe" else [(1, "units", "bb")])
     tracediff.diff_dumps = lambda *a: []
@@ -58,7 +61,89 @@ def test_tracediff_poisons_only_b() -> None:
         assert tracediff.compare(args) == 1
     finally:
         tracediff.play, tracediff.need, tracediff.parse_trace, tracediff.diff_dumps, tracediff.print_diff = saved
+        tracediff.scenario_load = saved_load
     assert calls == [("a.exe", None, False), ("b.exe", None, True), ("a.exe", 1, False), ("b.exe", 1, True)], calls
+
+
+def fake_run(tmp: Path, put=None, collect=None) -> argparse.Namespace:
+    exe = tmp / "TotalA.exe"
+    exe.write_bytes(b"exe")
+    scenario = tmp / "scenario.txt"
+    scenario.write_text("ticks 1\n")
+    return argparse.Namespace(work=tmp / "work", out=tmp / "out", exes=[exe], testmode=scenario, put=put or [],
+                              collect=collect or [], notes=[])
+
+
+def test_put_places_a_file_in_the_game_copy() -> None:
+    from unittest import mock
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        src = tmp / "harness.sav"
+        src.write_bytes(b"save data")
+        run = fake_run(tmp, put=[("savegame/harness.sav", src)])
+        inst = playtest.Instance(run, 1)
+
+        def fake_copy_game(src_dir, dst):
+            dst.mkdir(parents=True, exist_ok=True)
+
+        with mock.patch.object(playtest, "link_prefix"), mock.patch.object(playtest, "copy_game", fake_copy_game):
+            inst.prepare(tmp / "template", tmp / "game_src", [], {})
+        assert (inst.game / "savegame/harness.sav").read_bytes() == b"save data"
+
+
+def test_prepare_removes_a_stale_put_and_collect_path() -> None:
+    from unittest import mock
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        src = tmp / "put.opt"
+        src.write_bytes(b"put")
+        run = fake_run(tmp, put=[("savegame/harness.opt", src)], collect=["savegame/harness.sav"])
+        inst = playtest.Instance(run, 1)
+
+        def stale_copy_game(src_dir, dst):
+            (dst / "savegame").mkdir(parents=True, exist_ok=True)
+            (dst / "savegame/harness.sav").write_bytes(b"stale save")
+            (dst / "savegame/harness.opt").write_bytes(b"stale options")
+
+        with mock.patch.object(playtest, "link_prefix"), mock.patch.object(playtest, "copy_game", stale_copy_game):
+            inst.prepare(tmp / "template", tmp / "game_src", [], {})
+        assert not (inst.game / "savegame/harness.sav").exists()
+        assert (inst.game / "savegame/harness.opt").read_bytes() == b"put"
+
+
+def test_put_does_not_write_through_a_symlink() -> None:
+    from unittest import mock
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        install = tmp / "install.opt"
+        install.write_bytes(b"install file")
+        src = tmp / "put.opt"
+        src.write_bytes(b"put")
+        run = fake_run(tmp, put=[("savegame/harness.opt", src)])
+        inst = playtest.Instance(run, 1)
+
+        def linking_copy_game(src_dir, dst):
+            (dst / "savegame").mkdir(parents=True, exist_ok=True)
+            (dst / "savegame/harness.opt").symlink_to(install)
+
+        with mock.patch.object(playtest, "link_prefix"), mock.patch.object(playtest, "copy_game", linking_copy_game):
+            inst.prepare(tmp / "template", tmp / "game_src", [], {})
+        assert install.read_bytes() == b"install file"
+        assert not (inst.game / "savegame/harness.opt").is_symlink()
+        assert (inst.game / "savegame/harness.opt").read_bytes() == b"put"
+
+
+def test_collect_keeps_a_file_of_the_game_copy() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        run = fake_run(tmp, collect=["savegame/harness.sav", "savegame/absent.sav"])
+        inst = playtest.Instance(run, 1)
+        (inst.game / "savegame").mkdir(parents=True)
+        (inst.game / "savegame/harness.sav").write_bytes(b"written by the game")
+        run.out.mkdir(parents=True)
+        inst.collect_traces()
+        assert (run.out / "savegame/harness.sav").read_bytes() == b"written by the game"
+        assert not (run.out / "savegame/absent.sav").exists()
 
 
 if __name__ == "__main__":

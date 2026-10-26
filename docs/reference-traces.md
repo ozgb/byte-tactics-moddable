@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v11` is the fixed target for anyone writing a new
+The git tag `reference-traces-v12` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v11`**.
+code as a base. This page names the current tag: **`reference-traces-v12`**.
 
 ## What the tag holds
 
@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v11`**.
   format is in `reference/README.md`, the hashed fields in
   `src/harness/trace_schema.h`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 53 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 54 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest per tick
   for each scenario.
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v11`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v11
+git checkout reference-traces-v12
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -128,7 +128,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v11
+git checkout reference-traces-v12
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -151,12 +151,59 @@ the first difference prints the `tracediff` report. Add `--quick` for a fixed
 subset of five scenarios (not the gate). `--game-dir` names the install; the
 default is Steam's.
 
+## A loaded game's trace
+
+`load-midgame` starts from the save that `save-midgame` makes in the same run of the suite (the save is
+made each run and never committed), and from the options table the saver writes beside it
+(`savegame\harness.opt`, see reference/README.md, "Loading a saved game"). Its trace starts at tick 901 and
+ends at 1800.
+
+It does not match the uninterrupted game (`save-midgame`, the same as `skirmish2`) from the saved tick on:
+every row from tick 901 differs, all 7200 of them (900 ticks, 8 rows each). Do not compare the two. Compare a
+loaded game with the digests of `load-midgame`.
+
+- At tick 901, phase `units` (the first row), the first differing field is `rng.parkMiller`, then
+  `rng.crtHoldrand`: the save does not hold the random streams, and the load reseeds them. 854 fields differ in
+  that dump.
+- The players table still differs at tick 901, in these fields:
+  - `name` and `fullName` of slots 0 and 1: both hold the same string in the two games (`Arm` and `Core`); the
+    bytes after its terminating zero differ (the saving game's slot holds the rest of the default name, `Player N
+    First`, and the loaded game's holds zeros).
+  - `energyIncome`, `energyUsage`, `metalIncome`, `energyCapacity` and `metalCapacity` of slots 0 and 1, zero in
+    the loaded game.
+  - Slots 2 and 3: `active` is 1 in the loaded game and 0 in the saving game, and `id`, `index`, `startPos`,
+    `rank`, `name`, `fullName`, `energy` and `metal` differ with it.
+  - Slots 4 to 9: `id`, `name`, `fullName`, `energy` and `metal` differ, and `alliance` and `alliedBy` of
+    slots 4 to 9 do too (the saving game's slots hold the default names, 1000 metal and energy, alliance 5 and `id` -1, the loaded game's hold zeros).
+  - The AI state of slots 0 and 1 (`squadManager` cursor and timers, `squads`, `ai.vec_65`, `ai.vec_8d`).
+- Outside the players table, the same dump differs in the pathfinder's cells, pool and heap, the wind
+  fields, `game.scanIndex`, `hoverBobPhase` of three units, and the `created`, `subFlags` and goal fields of a
+  few units.
+
+`active` of slots 0 and 1 and the slots' sides, colours and teams no longer differ: with the options table filled,
+`ApplySlotsToGamePlayers` (src/frontend/skirmish_menu.cpp:575) sets the two players as it does in a skirmish.
+
+What the code shows about the players fields (`LoadPlayers` and `SavePlayers`, src/game/players.cpp:984-1066):
+
+- `LoadPlayers` reads energy, metal, the totals, the storage bonuses, kills, losses, the timers, `Logo` and
+  `Side`. It does not read `name`, `fullName`, the incomes, the usage or the capacities.
+- `UpdatePlayerEconomy` (economy.cpp:311) sets the capacities to zero and recomputes them every tick, so
+  they differ only until the first economy update.
+- `LoadMatch` (src/game/game_load.cpp:334-346) takes `g_game->playerCount` as the larger of its current
+  value and the highest slot of the options table with kind 1 or 2 plus one. The loaded run's `playerCount` is not set by
+  the save or the harness; `LoadSettings` (src/game/settings.cpp:357-362) sets it to the setting
+  `NumSkirmishPlayers`, or to 4 when there is none. `ApplySlotsToGamePlayers` then calls `SetupPlayerSlot`
+  (src/game/players.cpp:71-130) for every slot below that count, kind 0 included, and that sets `active` to 1. This
+  is what the trace shows for slots 2 and 3 (the options table's kind is 0 for them).
+- This page does not say which phase of a later tick those fields first agree with the uninterrupted game:
+  the dumps read here are those of tick 901.
+
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v11`
+the digests that should become a target gets a new tag (`reference-traces-v12`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v11`.
+`reference-traces-v12`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -200,8 +247,13 @@ and so on), and this page is updated to name it. The current tag is
   `sensors-floating-teeth-los-off`, with the AI's dragon's teeth in the local
   view, line of sight on and off, for the feature draw's visibility checks
   (#437). The 51 earlier digests and the hashed fields are those of v10.
+- `reference-traces-v12`: one more scenario, `load-midgame`, with the new `load`
+  key, that starts from the save `save-midgame` makes in the same run plus the
+  options table it writes beside it (`savegame\harness.opt`), for loading a
+  saved game (#442). The 53 earlier digests and the hashed fields are those of
+  v11.
 
-`bt-trace N` does not name which fields are hashed. v1 to v11 are
+`bt-trace N` does not name which fields are hashed. v1 to v12 are
 all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` (and
 `src/harness/trace_schema.h`) at the tag. What makes a new format number is in

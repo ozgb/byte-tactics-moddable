@@ -191,5 +191,73 @@ class CommandLineTest(unittest.TestCase):
             self.assertIn("players[1].metal", out)
 
 
+class PlayLoadingTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        (self.dir / "loader.txt").write_text("ticks 9\nload saver\n")
+        (self.dir / "saver.txt").write_text("ticks 9\nsave 4\n")
+        (self.dir / "plain.txt").write_text("ticks 9\n")
+        self.runs = []
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def fake_play(self, writes_save=True, fails=False):
+        def play(exe, scenario, game_dir, dump, timeout=None, poison=False, blockscan=0, env=None, put=None, collect=()):
+            run = self.dir / "session" / f"run-{scenario.stem}" / "run"
+            run.mkdir(parents=True)
+            seen = {"scenario": scenario.stem, "put": {k: v.read_bytes() for k, v in (put or {}).items()},
+                    "collect": collect, "dump": dump}
+            if fails and scenario.stem == "saver":
+                raise td.Error("exited with 2")
+            if collect and writes_save:
+                (run / "savegame").mkdir()
+                (run / "savegame/harness.sav").write_bytes(b"the save")
+            self.runs.append(seen)
+            return run
+        return play
+
+    def test_scenario_load_reads_the_line(self):
+        self.assertEqual(td.scenario_load(self.dir / "loader.txt"), "saver")
+        self.assertIsNone(td.scenario_load(self.dir / "plain.txt"))
+
+    def test_a_plain_scenario_is_played_once(self):
+        with mock.patch.object(td, "play", self.fake_play()):
+            td.play_loading(Path("a.exe"), self.dir / "plain.txt", None, 7)
+        self.assertEqual([r["scenario"] for r in self.runs], ["plain"])
+        self.assertEqual(self.runs[0]["put"], {})
+
+    def test_a_loader_plays_its_saver_first_and_gets_the_save(self):
+        with mock.patch.object(td, "play", self.fake_play()), mock.patch.object(td, "ROOT", self.dir):
+            td.play_loading(Path("a.exe"), self.dir / "loader.txt", None, 7)
+        self.assertEqual([r["scenario"] for r in self.runs], ["saver", "loader"])
+        self.assertEqual(self.runs[0]["collect"], ("savegame/harness.sav",))
+        self.assertIsNone(self.runs[0]["dump"])
+        self.assertEqual(self.runs[1]["put"], {"savegame/harness.sav": b"the save"})
+        self.assertEqual(self.runs[1]["dump"], 7)
+        self.assertFalse((self.dir / "session" / "run-saver").exists())
+
+    def test_a_saver_that_wrote_no_save_is_named(self):
+        with mock.patch.object(td, "play", self.fake_play(writes_save=False)), mock.patch.object(td, "ROOT", self.dir):
+            with self.assertRaises(td.Error) as raised:
+                td.play_loading(Path("a.exe"), self.dir / "loader.txt", None, None)
+        self.assertIn("loader: load saver: saver wrote no savegame/harness.sav", str(raised.exception))
+        self.assertEqual([r["scenario"] for r in self.runs], ["saver"])
+
+    def test_a_saver_that_failed_is_named(self):
+        with mock.patch.object(td, "play", self.fake_play(fails=True)), mock.patch.object(td, "ROOT", self.dir):
+            with self.assertRaises(td.Error) as raised:
+                td.play_loading(Path("a.exe"), self.dir / "loader.txt", None, None)
+        self.assertIn("loader: load saver: saver failed to run", str(raised.exception))
+
+    def test_a_missing_saver_scenario_is_named(self):
+        (self.dir / "saver.txt").unlink()
+        with mock.patch.object(td, "play", self.fake_play()), mock.patch.object(td, "ROOT", self.dir):
+            with self.assertRaises(td.Error) as raised:
+                td.play_loading(Path("a.exe"), self.dir / "loader.txt", None, None)
+        self.assertIn("loader: load saver: there is no scenario", str(raised.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

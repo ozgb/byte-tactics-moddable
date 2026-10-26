@@ -7,6 +7,7 @@ import contextlib
 import io
 import os
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -238,6 +239,120 @@ class ReferenceEnvTest(unittest.TestCase):
     def test_module_env_carries_the_pin(self):
         pin = (reference.ROOT / ".python-version").read_text().strip()
         self.assertEqual(reference.REF_ENV["UV_PYTHON"], os.environ.get("UV_PYTHON", pin))
+
+
+class LoadOrderTest(unittest.TestCase):
+    def scenarios(self, tmp: Path, loader_saver: str = "saver") -> dict[str, Path]:
+        texts = {"loader": f"ticks 9\nload {loader_saver}\n", "saver": "ticks 99\nsave 5\n", "plain": "ticks 5\n",
+                 "longer": "ticks 500\n"}
+        for name, text in texts.items():
+            (tmp / f"{name}.txt").write_text(text)
+        return {name: tmp / f"{name}.txt" for name in texts}
+
+    def play(self, scenarios, parallel, writes_save=True, fail=()):
+        order, loaded = [], {}
+        lock = threading.Lock()
+
+        def fake_play_scenario(exe, scenario, game_dir, want=None, poison=False, keep_always=False, scans=None,
+                               scan_every=1, retry_any=False, save_to=None, load_from=None):
+            name = scenario.stem
+            with lock:
+                order.append(name)
+            if name in fail:
+                raise reference.tracediff.Error("boom")
+            if load_from is not None:
+                loaded[name] = load_from.read_bytes()
+            if save_to is not None and writes_save:
+                save_to.write_bytes(b"save of " + name.encode())
+            return {}, [], 0.0, None
+
+        failed: dict[str, str] = {}
+        with mock.patch.object(reference.playtest, "template_prefix"), \
+                mock.patch.object(reference, "play_scenario", fake_play_scenario):
+            results = reference.play_all(Path("x.exe"), scenarios, None, parallel, failed=failed)
+        return order, loaded, failed, results
+
+    def test_loader_runs_after_every_scenario_that_loads_nothing(self):
+        for parallel in (1, 2, 6):
+            with tempfile.TemporaryDirectory() as tmp:
+                order, loaded, failed, results = self.play(self.scenarios(Path(tmp)), parallel)
+            self.assertEqual(order[-1], "loader", parallel)
+            self.assertEqual(sorted(order), ["loader", "longer", "plain", "saver"])
+            self.assertEqual(failed, {})
+            self.assertEqual(loaded, {"loader": b"save of saver"})
+            self.assertIn("loader", results)
+
+    def test_only_a_saver_collects_a_save_and_only_a_loader_gets_one(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            saves = []
+
+            def spy(*args, save_to=None, load_from=None, **kw):
+                if save_to is not None:
+                    save_to.write_bytes(b"x")
+                saves.append((args[1].stem, save_to is not None, load_from is not None))
+                return {}, [], 0.0, None
+
+            scenarios = self.scenarios(Path(tmp))
+            with mock.patch.object(reference.playtest, "template_prefix"), mock.patch.object(reference, "play_scenario", spy):
+                reference.play_all(Path("x.exe"), scenarios, None, 1, failed={})
+        self.assertEqual(sorted(saves), [("loader", False, True), ("longer", False, False), ("plain", False, False),
+                                         ("saver", True, False)])
+
+    def test_saver_that_failed_fails_the_loader_naming_both(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            order, loaded, failed, results = self.play(self.scenarios(Path(tmp)), 2, fail=("saver",))
+        self.assertNotIn("loader", order)
+        self.assertIn("loader: load saver: saver failed to run", failed["loader"])
+        self.assertIn("saver", failed)
+
+    def test_saver_that_wrote_no_save_fails_the_loader_naming_both(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            order, loaded, failed, results = self.play(self.scenarios(Path(tmp)), 1, writes_save=False)
+        self.assertNotIn("loader", order)
+        self.assertIn("loader: load saver: saver wrote no savegame/harness.sav", failed["loader"])
+        self.assertNotIn("saver", failed)
+
+    def test_saver_outside_the_set_fails_the_loader_naming_both(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            scenarios = self.scenarios(Path(tmp))
+            del scenarios["saver"]
+            order, loaded, failed, results = self.play(scenarios, 1)
+        self.assertNotIn("loader", order)
+        self.assertIn("loader: load saver: saver is not among the scenarios played", failed["loader"])
+
+    def test_with_savers_adds_the_scenario_a_loader_names(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            every = self.scenarios(Path(tmp))
+            chosen = reference.with_savers({"loader": every["loader"]}, every)
+            self.assertEqual(sorted(chosen), ["loader", "saver"])
+            self.assertEqual(sorted(reference.with_savers({"plain": every["plain"]}, every)), ["plain"])
+
+    def test_with_savers_ignores_a_name_that_is_no_scenario(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            every = self.scenarios(Path(tmp), "nothing")
+            self.assertEqual(sorted(reference.with_savers({"loader": every["loader"]}, every)), ["loader"])
+
+    def test_the_save_is_copied_out_before_the_run_is_removed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp) / "session" / "run"
+            (run / "savegame").mkdir(parents=True)
+            (run / "savegame/harness.sav").write_bytes(b"data")
+            (run / "trace.txt").write_text("")
+            seen = {}
+
+            def fake_play(exe, scenario, game_dir, dump, timeout, poison, scan, put=None, collect=()):
+                seen.update(put=put, collect=collect)
+                return run
+
+            target = Path(tmp) / "kept.sav"
+            with mock.patch.object(reference.tracediff, "play", fake_play), \
+                    mock.patch.object(reference.tracediff, "parse_trace", lambda p: ({"game_seed": "1", "crt_seed": "1", "view_seed": "1"}, [])), \
+                    mock.patch.object(reference.tracedigest, "digests", lambda rows: []):
+                (Path(tmp) / "s.txt").write_text("ticks 5\n")
+                reference.play_scenario(Path("x.exe"), Path(tmp) / "s.txt", None, save_to=target)
+            self.assertEqual(target.read_bytes(), b"data")
+            self.assertEqual(seen["collect"], ("savegame/harness.sav",))
+            self.assertFalse(run.parent.exists())
 
 
 class TracediffCommandTest(unittest.TestCase):

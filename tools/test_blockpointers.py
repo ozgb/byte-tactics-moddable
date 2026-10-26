@@ -350,9 +350,22 @@ class PlaySuiteTest(unittest.TestCase):
         self.assertEqual(calls, [(["a", "b", "c"], True)])
 
     def test_scenario_subset(self):
-        texts, _, calls = self.play(["c", "a"])
+        with tempfile.TemporaryDirectory() as tmp:
+            self.SCENARIOS = {n: Path(tmp) / f"{n}.txt" for n in "abc"}
+            for path in self.SCENARIOS.values():
+                path.write_text("ticks 5\n")
+            texts, _, calls = self.play(["c", "a"])
         self.assertEqual(sorted(texts), ["a", "c"])
         self.assertEqual(calls[0][0], ["a", "c"])
+
+    def test_a_loader_is_played_with_its_saver(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.SCENARIOS = {n: Path(tmp) / f"{n}.txt" for n in "abc"}
+            self.SCENARIOS["a"].write_text("ticks 5\n")
+            self.SCENARIOS["b"].write_text("ticks 5\nsave 2\n")
+            self.SCENARIOS["c"].write_text("ticks 5\nload b\n")
+            texts, _, calls = self.play(["c"])
+        self.assertEqual(calls[0][0], ["b", "c"])
 
     def test_unknown_scenario_exits(self):
         with self.assertRaises(SystemExit):

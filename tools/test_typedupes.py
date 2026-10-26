@@ -146,6 +146,11 @@ class CanonicalTest(unittest.TestCase):
         sigs = [sig(4, (0, "int", "a"))] * 3
         self.assertEqual(td.pick_canonical(ds, sigs, set()), "src/x.h")
 
+    def test_ta_types_loses_to_any_other_file_even_with_more_members(self):
+        ds = [definition("include/ta_types.h"), definition("src/y.cpp")]
+        sigs = [sig(8, (0, "int", "a"), (4, "int", "b")), sig(4, (0, "int", "a"))]
+        self.assertEqual(td.pick_canonical(ds, sigs, set()), "src/y.cpp")
+
     def test_among_headers_the_most_named_members_win(self):
         ds = [definition("src/a.h"), definition("src/b.h")]
         sigs = [sig(4, (0, "int", "a")), sig(8, (0, "int", "a"), (4, "int", "b"))]

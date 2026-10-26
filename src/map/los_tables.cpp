@@ -185,18 +185,18 @@ void __stdcall InsertionSortUnitTypes(UnitDef* first, UnitDef* last, Compare com
         }
 }
 
-typedef std::vector<Column_00433270> Outer_004330b0;
+typedef std::vector<Column_00433270> TableList;
 
 // FUNCTION: 0x4330b0
 void LosTables::FreeTables()
 {
-    ((Outer_004330b0*)this)->~vector();
+    ((TableList*)this)->~vector();
 }
 
 static inline LosTable* GetTable(LosTables* self, short n)
 {
     n--;
-    return (LosTable*)&(*(Outer_004330b0*)self)[n];
+    return (LosTable*)&(*(TableList*)self)[n];
 }
 
 // FUNCTION: 0x433380
@@ -223,7 +223,7 @@ void LosTables::LoadLosTable(TdfFile* file, short table)
 // FUNCTION: 0x433520
 int LosTables::GetLosTableCount()
 {
-    return ((Outer_004330b0*)this)->size();
+    return ((TableList*)this)->size();
 }
 
 typedef std::vector<Elem_00434020> Inner_00434020;
@@ -451,7 +451,7 @@ AssignFn_00434770 g_assign_00434770 = &Vec_00434770::operator=;
 // FUNCTION: 0x433500
 Inner_00433500* LosTables::GetLosTable(int n)
 {
-    return (Inner_00433500*)&(*(Outer_004330b0*)this)[(short)(n - 1)];
+    return (Inner_00433500*)&(*(TableList*)this)[(short)(n - 1)];
 }
 
 // FUNCTION: 0x432d40
@@ -480,7 +480,7 @@ void LosTables::LoadLosTables()
         if ((&tdf)->SelectRecord("TABLEINFO") != 0) {
             short numtables = (short)tdf.current->GetFieldInt("numtables", 0);
             {
-                Outer_004330b0& tables = *(Outer_004330b0*)this;
+                TableList& tables = *(TableList*)this;
                 Column_00433270 temp;
                 unsigned n = (unsigned)numtables;
                 if (tables.size() < n)
@@ -499,26 +499,28 @@ void LosTables::LoadLosTables()
 void LosTables::ResizeTables(short n)
 {
     Column_00433270 x;
-    ((Outer_004330b0*)this)->resize(n, x);
+    ((TableList*)this)->resize(n, x);
 }
 
-typedef Outer_004330b0& (Outer_004330b0::*AssignFn_00433a80)(const Outer_004330b0&);
+typedef TableList& (TableList::*AssignFn_00433a80)(const TableList&);
 
-AssignFn_00433a80 g_assign_00433a80 = &Outer_004330b0::operator=;
+AssignFn_00433a80 g_assign_00433a80 = &TableList::operator=;
 
 // FUNCTION: 0x433a80 ??1?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAE@XZ
 
-typedef Outer_00433a30::iterator (Outer_00433a30::*EraseFn_00434020)(
-    Outer_00433a30::iterator, Outer_00433a30::iterator);
+typedef Column_00433270::iterator (Column_00433270::*EraseFn_00434020)(
+    Column_00433270::iterator, Column_00433270::iterator);
 
 // FUNCTION: 0x434020 ?erase@?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAEPAUElem_00434360@@PAU3@0@Z
-EraseFn_00434020 g_erase_00434020 = &Outer_00433a30::erase;
+EraseFn_00434020 g_erase_00434020 = &Column_00433270::erase;
+
+typedef void (TableList::*InsertFn_004344e0)(TableList::iterator, TableList::size_type, const Column_00433270&);
 
 // FUNCTION: 0x4344e0 ??0?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAE@ABV01@@Z
-InsertFn_004340f0 g_insert_004344e0 = &Outer_004340f0::insert;
+InsertFn_004344e0 g_insert_004344e0 = &TableList::insert;
 
-typedef Outer_004330b0::iterator (Outer_004330b0::*EraseFn_00434360)(
-    Outer_004330b0::iterator, Outer_004330b0::iterator);
+typedef TableList::iterator (TableList::*EraseFn_00434360)(
+    TableList::iterator, TableList::iterator);
 
 // FUNCTION: 0x434360 ?erase@?$vector@V?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@V?$allocator@V?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@@2@@std@@QAEPAV?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@2@PAV32@0@Z
-EraseFn_00434360 g_erase_00434360 = &Outer_004330b0::erase;
+EraseFn_00434360 g_erase_00434360 = &TableList::erase;

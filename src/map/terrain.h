@@ -28,5 +28,9 @@ void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisit
 void __stdcall VisitObjectsInRange(Vec3* pos, int range, DamagedAllyCollector& visitor);
 
 int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell);
+void __stdcall AddUnitToMap(Unit* obj);
+void __stdcall RemoveUnitFromMap(Unit* obj);
+int __stdcall GetFootprintHeight(UnitDef* unit, Point16 cell);
+int __stdcall CanPlaceFootprintAt(Unit* unit, Vec3* pos);
 
 #endif

@@ -127,8 +127,6 @@ struct Entry_0047ea40 {
 
 #include "../../link/globals.h"
 extern ClaimFootprintVisitor g_claimFootprintVtable[];
-void __stdcall RemoveUnitFromMap(Unit* unit);
-
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
 
@@ -295,8 +293,6 @@ void __stdcall SetOwner(Unit* unit, UnitBucket* bucket)
     }
 }
 
-void __stdcall RemoveUnitFromMap(Unit* unit);
-
 // FUNCTION: 0x47cbd0
 void __stdcall ClearFootprintAndUnlink(Unit* unit)
 {
@@ -309,6 +305,187 @@ void __stdcall ClearFootprintAndUnlink(Unit* unit)
         }
     }
     unit->spatialBucket = 0;
+}
+
+// FUNCTION: 0x47cc30
+void __stdcall AddUnitToMap(Unit* obj)
+{
+    Point16 size = obj->footprint;
+    if (obj->motion.get() != nullptr)
+        *(int*)((unsigned char*)obj->motion.get() + 0x26) = g_game->ticks;
+    {
+        short px = obj->cell.x;
+        if (px < 0)
+            goto remove;
+        short py = obj->cell.y;
+        if (py < 0 || px + size.x >= g_game->width || py + size.y >= g_game->height)
+            goto remove;
+    }
+    {
+        Vec3 p = obj->pos;
+        SetOwner(obj,
+            &((UnitBucket*)g_game->cells_1429f.get())[(p.x >> 23) + (p.z >> 23) * (int)g_game->width_142a3]);
+    }
+    {
+        Cell* cell = &g_game->cells[g_game->width * obj->cell.y + obj->cell.x];
+        unsigned int f = obj->flags;
+        int index = 0;
+
+        if (f & 0x20000000) {
+            for (int y = size.y; y > 0; y--) {
+                for (int x = size.x; x > 0; x--) {
+                    unsigned char m = ((unsigned char*)obj->def->yardmap.get())[index++];
+                    if (m & (obj->bit2 ? 2 : 4)) {
+                        unsigned short id = cell->unit;
+                        if (id != 0) {
+                            Unit* rec = &g_game->units[id];
+                            if (rec->player->active == 0) {
+                                goto a_bad;
+                            } else if (rec->player->type != 3) {
+                                goto a_bad;
+                            }
+                            rec->flags |= 0x8000000;
+                            obj->flags |= 0x4000000;
+                            goto a_write;
+                        a_bad:
+                            rec->flags |= 0x4000000;
+                            obj->flags |= 0x8000000;
+                            goto a_next;
+                        a_write: ;
+                        }
+                        cell->unit = obj->id;
+                    }
+                a_next:
+                    if (m & 1)
+                        cell->flags |= 2;
+                    cell++;
+                }
+                cell += g_game->width - size.x;
+            }
+            Point16 grown;
+            grown.x = size.x + 2;
+            grown.y = size.y + 2;
+            Point16 pad;
+            pad.x = obj->cell.x - 1;
+            pad.y = obj->cell.y - 1;
+            g_seams.los_radar->UpdateCellHeightRange(pad, grown);
+            RefreshAllPassMaps(obj->cell, obj->footprint);
+            return;
+        }
+        if ((f & 3) == 1) {
+            for (int y = size.y; y > 0; y--) {
+                for (int x = size.x; x > 0; x--) {
+                    unsigned short id = cell->unit;
+                    if (id != 0) {
+                        Unit* rec = &g_game->units[id];
+                        if (rec->player->active == 0) {
+                            goto b_bad;
+                        } else if (rec->player->type != 3) {
+                            goto b_bad;
+                        }
+                        rec->flags |= 0x8000000;
+                        obj->flags |= 0x4000000;
+                        goto b_write;
+                    b_bad:
+                        rec->flags |= 0x4000000;
+                        obj->flags |= 0x8000000;
+                        goto b_next;
+                    b_write: ;
+                    }
+                    cell->unit = obj->id;
+                b_next:
+                    cell++;
+                }
+                cell += g_game->width - size.x;
+            }
+            return;
+        }
+        if ((f & 3) == 2) {
+            for (int y = size.y; y > 0; y--) {
+                for (int x = size.x; x > 0; x--) {
+                    unsigned short id = cell->unit2;
+                    if (id != 0) {
+                        Unit* rec = &g_game->units[id];
+                        if (rec->player->active == 0) {
+                            goto c_bad;
+                        } else if (rec->player->type != 3) {
+                            goto c_bad;
+                        }
+                        rec->flags |= 0x8000000;
+                        obj->flags |= 0x4000000;
+                        goto c_write;
+                    c_bad:
+                        rec->flags |= 0x4000000;
+                        obj->flags |= 0x8000000;
+                        goto c_next;
+                    c_write: ;
+                    }
+                    cell->unit2 = obj->id;
+                c_next:
+                    cell++;
+                }
+                cell += g_game->width - size.x;
+            }
+        }
+    }
+    return;
+
+remove:
+    SetOwner(obj, (UnitBucket*)g_game->overflowBucket.get());
+}
+
+void __stdcall RefreshPassMapsForUnit(Unit* obj);
+
+// FUNCTION: 0x47d0e0
+void __stdcall RemoveUnitFromMap(Unit* obj)
+{
+    if ((int)obj->spatialBucket.get() != (int)g_game->overflowBucket.get()) {
+        Point16 size = obj->footprint;
+        Cell* cell = &g_game->cells[obj->cell.y * g_game->width + obj->cell.x];
+        int index = 0;
+        if (obj->flags & 0x20000000) {
+            for (int j = size.y; j > 0; j--) {
+                for (int i = size.x; i > 0; i--) {
+                    unsigned char m = ((unsigned char*)obj->def->yardmap.get())[index];
+                    index++;
+                    if (cell->unit == obj->id) cell->unit = 0;
+                    if (m & 1) cell->flags &= 0xfd;
+                    cell++;
+                }
+                cell += g_game->width - size.x;
+            }
+            Point16 grown;
+            grown.x = size.x + 2;
+            grown.y = size.y + 2;
+            Point16 pad;
+            pad.x = obj->cell.x - 1;
+            pad.y = obj->cell.y - 1;
+            g_seams.los_radar->UpdateCellHeightRange(pad, grown);
+        } else if ((obj->flags & 3) == 1) {
+            for (int j = size.y; j > 0; j--) {
+                for (int i = size.x; i > 0; i--) {
+                    if (cell->unit == obj->id) cell->unit = 0;
+                    cell++;
+                }
+                cell += g_game->width - size.x;
+            }
+        } else if ((obj->flags & 3) == 2) {
+            for (int j = size.y; j > 0; j--) {
+                for (int i = size.x; i > 0; i--) {
+                    if (cell->unit2 == obj->id) cell->unit2 = 0;
+                    cell++;
+                }
+                cell += g_game->width - size.x;
+            }
+        }
+    }
+    obj->flags &= ~0x08000000;
+    if (obj->flags & 0x4000000) {
+        obj->flags &= ~0x04000000;
+        ClaimFootprintVisitor visitor;
+        VisitObjectsInArea(obj->cell, obj->footprint, &visitor);
+    }
+    RefreshPassMapsForUnit(obj);
 }
 
 int __stdcall GetCellHeight(Point16* p);
@@ -497,6 +674,43 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
     return 1;
 }
 
+// FUNCTION: 0x47d820
+int __stdcall GetFootprintHeight(UnitDef* unit, Point16 cell)
+{
+    short y = cell.y;
+    Point16 fp = *(Point16*)&unit->footprintx;
+    short x = cell.x;
+    if (x < 1 || y < 1 || x + fp.x >= g_game->width || y + fp.y >= g_game->height)
+        return 0;
+    int width = g_game->width;
+    Cell* c = &g_game->cells[y * width + x];
+    unsigned char low = 0xff, high = 0, high2 = 0;
+    int i = 0;
+    for (int row = fp.y; row > 0; row--) {
+        for (int col = fp.x; col > 0; col--) {
+            int f = ((unsigned char*)unit->yardmap.get())[i++];
+            if (f & 8) {
+                if (c->low < low)
+                    low = c->low;
+                if (c->high > high)
+                    high = c->high;
+            }
+            if (f & 0x10) {
+                if (c->high > high2)
+                    high2 = c->high;
+            }
+            c++;
+        }
+        c += width - fp.x;
+    }
+    unsigned char r;
+    if (high < low)
+        r = g_game->seaLevel - unit->draft;
+    else
+        r = low;
+    return r;
+}
+
 // FUNCTION: 0x47d970
 int __stdcall IsFootprintClear(Unit* obj, int flag)
 {
@@ -609,8 +823,6 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
     }
     return 1;
 }
-
-int __stdcall GetFootprintHeight(UnitDef* unit, Point16 cell);
 
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {
@@ -771,6 +983,79 @@ unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj
     if (GetPassMapFootprintValue(obj, x, y + h, w + 1, 1) != 3)
         return 1;
     return GetPassMapFootprintValue(obj, x - 1, y, 1, h + 1) == 3 ? 3 : 1;
+}
+
+// FUNCTION: 0x47e2d0
+int __stdcall CanPlaceFootprintAt(Unit* unit, Vec3* pos)
+{
+    Point16 footprint = unit->footprint;
+    Vec3 v = *pos;
+    UnitDef* def = unit->def;
+    short a = (v.x - (footprint.x << 19) + 0x80000) >> 20;
+    short c = (v.z - (footprint.y << 19) + 0x80000) >> 20;
+    if (a < 0 || c < 0)
+        return 0;
+    Game* g = g_game;
+    if (a + footprint.x >= g->width)
+        return 0;
+    if (c + footprint.y >= g->height)
+        return 0;
+    int w = g->width;
+    int x = footprint.x;
+    int idx = ((c >> 1) + (footprint.x >> 2)) * (w >> 1)
+            + (a >> 1) + (footprint.x >> 2);
+    if (!(g->visibilityMask[idx] & (1 << unit->playerIndex)))
+        return 1;
+    unsigned char field228 = def->maxslope;
+    short bd0 = def->maxwaterdepth;
+    int sl = g->seaLevel;
+    int lowBound = sl - bd0;
+    int upperBound = sl - def->minwaterdepth;
+    if (lowBound < sl && (def->flags1 & 0x800) && !(def->flags1 & 0x200000))
+        lowBound = sl;
+    Cell* cell = &g->cells[c * w + a];
+    int rowStep = w - x;
+    for (int i = 0; i < footprint.y; i++, cell += rowStep) {
+        for (int j = 0; j < x; j++, cell++) {
+            unsigned short f = cell->feature;
+            unsigned int occ;
+            if (f == 0xffff) {
+                occ = 0;
+            } else if (f < 0xfffb) {
+                if (f < g->featureCount)
+                    occ = (g->features[f].flags >> 6) & 1;
+                else
+                    occ = 1;
+            } else {
+                if (f != 0xfffe) {
+                    occ = 1;
+                } else {
+                    unsigned short f2 = cell[-(cell->offsetY * w + cell->offsetX)].feature;
+                    if (f2 >= 0xfffb)
+                        occ = 0;
+                    else
+                        occ = (g->features[f2].flags >> 6) & 1;
+                }
+            }
+            if (occ != 0)
+                return 0;
+            if (cell->flags & 2)
+                return 0;
+            if (cell->unit != 0 && cell->unit != unit->id)
+                return 0;
+            if (cell->unit2 != 0 && cell->unit2 != unit->id)
+                return 0;
+            int lo = cell->low;
+            if (lo < lowBound)
+                return 0;
+            int hi = cell->high;
+            if (hi > upperBound)
+                return 0;
+            if (hi - lo > field228)
+                return 0;
+        }
+    }
+    return 1;
 }
 
 // FUNCTION: 0x47e570

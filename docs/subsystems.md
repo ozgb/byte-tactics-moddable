@@ -268,7 +268,7 @@ Coverage: 89.4% of functions (93 of 104), 89.0% of lines, 83.0% of branches; 11 
 
 Issue #14. 56 functions. The search in `src/ai/pathfind*.cpp`: per-player cost tables, the node budget, the open heap and the grid.
 
-Coverage: 93.8% of functions (45 of 48), 92.4% of lines, 86.7% of branches; 3 live functions no scenario enters, and 10 more are dead (data/coverage.csv).
+Coverage: 93.8% of functions (45 of 48), 92.4% of lines, 87.1% of branches; 3 live functions no scenario enters, and 10 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (3 of 48, #421; 45 are entered, 93.8%), by reason:
 
@@ -418,7 +418,7 @@ none
 
 Issue #17. 95 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 88.9% of functions (64 of 72), 82.8% of lines, 73.0% of branches; 8 live functions no scenario enters, and 22 more are dead (data/coverage.csv).
+Coverage: 88.9% of functions (64 of 72), 82.8% of lines, 72.9% of branches; 8 live functions no scenario enters, and 22 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (8 of 72 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 64 are entered, 88.9%), by reason:
 
@@ -562,7 +562,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Entered by the console: `TransferEnergy` and `TransferMetal` (console `Give`, `console-economy`) and `MissionConditions::Deactivate` (console `Kill`, `console-units`) (#445).
 
-**map** (108 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 67 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.6% of functions (79 of 98), 86.8% of lines, 76.0% of branches; 19 live functions no scenario enters, and 13 more are dead (data/coverage.csv).
+**map** (108 functions). No phase root. 51 functions are called from outside, by presentation (24), game (22), units (12) and orders (9); the busiest are `Mission::GetGameType` (45), `Mission::LoadMissionByName` (15), `Mission::GetMissionName` (12) (mission accessors) and `CanPlaceUnitFootprint` (8). It imports 67 functions: platform 36, los_radar 7, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.6% of functions (79 of 98), 86.8% of lines, 75.9% of branches; 19 live functions no scenario enters, and 13 more are dead (data/coverage.csv).
 
 **map, functions no scenario enters** (19 of 98 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 79 are entered, 80.6%), by reason:
 
@@ -645,14 +645,14 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | **economy** | 27 of 29 | 93.1% | 78.1% | 43.8% | 2 | 3 |
 | **features** | 42 of 44 | 95.5% | 82.0% | 69.6% | 2 | 4 |
 | **ai** | 93 of 104 | 89.4% | 89.0% | 83.0% | 11 | 35 |
-| **pathfinding** | 45 of 48 | 93.8% | 92.4% | 86.7% | 3 | 10 |
+| **pathfinding** | 45 of 48 | 93.8% | 92.4% | 87.1% | 3 | 10 |
 | **weapons** | 75 of 89 | 84.3% | 84.6% | 70.4% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 64 of 72 | 88.9% | 82.8% | 73.0% | 8 | 22 |
+| **los_radar** | 64 of 72 | 88.9% | 82.8% | 72.9% | 8 | 22 |
 | **orders** | 306 of 369 | 82.9% | 79.3% | 61.5% | 63 | 26 |
 | **units** | 132 of 164 | 80.5% | 84.5% | 71.1% | 32 | 33 |
 | **players** | 74 of 143 | 51.7% | 52.8% | 44.2% | 69 | 11 |
-| **map** | 79 of 98 | 80.6% | 86.8% | 76.0% | 19 | 13 |
+| **map** | 79 of 98 | 80.6% | 86.8% | 75.9% | 19 | 13 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
 | game | 113 of 183 | 61.7% | 50.4% | 31.4% | 70 | 25 |
 | network | 50 of 297 | 16.8% | 10.7% | 4.5% | 247 | 70 |

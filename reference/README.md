@@ -399,6 +399,12 @@ seeds) and runs deterministically: two runs give identical traces.
 | --- | --- | ---: | ---: | --- |
 | allied-victory | Metal Heck | 4 | 2400 | Game type 3: players 0 and 1 allied against players 2 and 3, whose commanders self-destruct, so allied victory ends the run early |
 | commander-death | The Pass | 2 | 1800 | The human Arm commander self-destructs, so commander death ends the run about 150 ticks later |
+| console-economy | The Pass | 2 | 200 | Console: resources (`atm`, `nometal`, `noenergy`, `give`), the share commands, the AI toggle (`ai`) and the player switches (`control`, `view`) |
+| console-features | The Pass | 2 | 300 | Console: `feature`, `burnone`, `burnall`, `treedeath`, `meteor` (a shower, meteors on and off) and `sealevel` |
+| console-ilose | The Pass | 2 | 100 | Console: `ilose`, so the local side loses its units and the run ends at tick 30 |
+| console-iwin | The Pass | 2 | 100 | Console: `iwin`, so the other side loses its units and the run ends at tick 30 |
+| console-sight | The Pass | 2 | 200 | Console: `los`, `lostype`, `mapping`, `radar`, `nowisee`, then `ai` and `reloadaiprofiles` |
+| console-units | The Pass | 2 | 300 | Console: unit names typed alone, `move`, `reload`, `kill`, the damage toggles, `search`, `edge`, `assign` and `selectable` |
 | duel-coast-to-coast | Coast To Coast | 2 | 5400 | Two Core players on Coast To Coast, three minutes, difficulty 2 |
 | duel-great-divide | Great Divide | 2 | 3600 | Two Arm players on Great Divide, random start positions, two minutes |
 | duel-pass-dark | The Pass | 2 | 2700 | Two players on The Pass with the map unmapped and line of sight off, ninety seconds |

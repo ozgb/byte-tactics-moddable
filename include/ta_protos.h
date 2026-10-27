@@ -51,7 +51,7 @@ class BitWriter;
 class BitReader;
 class Class_0042b370;
 class MissionType;
-class OrderType;
+struct OrderType;
 class Class_00438880;
 class Class_00438b90;
 class Class_0043a1f0;

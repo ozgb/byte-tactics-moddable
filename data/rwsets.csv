@@ -49526,15 +49526,28 @@ address,function,file,kind,target
 ,RunScriptedConsole,src/harness/harness.cpp,call,ConsoleWordIsUnitType
 ,RunScriptedConsole,src/harness/harness.cpp,call,ExecuteCommandLine
 ,RunScriptedConsole,src/harness/harness.cpp,call,FailLine
+,RunScriptedConsole,src/harness/harness.cpp,call,GameAt
+,RunScriptedConsole,src/harness/harness.cpp,call,WorldPosition
+,RunScriptedConsole,src/harness/harness.cpp,call,memcpy
 ,RunScriptedConsole,src/harness/harness.cpp,call,sprintf
 ,RunScriptedConsole,src/harness/harness.cpp,call,strcpy
+,RunScriptedConsole,src/harness/harness.cpp,deref_read,*short
+,RunScriptedConsole,src/harness/harness.cpp,deref_write,*short
+,RunScriptedConsole,src/harness/harness.cpp,deref_write,*unsigned short
+,RunScriptedConsole,src/harness/harness.cpp,field_read,FeaturesSeam::GetCellFeature
 ,RunScriptedConsole,src/harness/harness.cpp,field_read,Game::uiOptionFlags
+,RunScriptedConsole,src/harness/harness.cpp,field_read,LosRadarSeam::GetMapCell
 ,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::lineNo
 ,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::text
 ,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::word
+,RunScriptedConsole,src/harness/harness.cpp,field_read,Seams::features
+,RunScriptedConsole,src/harness/harness.cpp,field_read,Seams::los_radar
 ,RunScriptedConsole,src/harness/harness.cpp,function,
 ,RunScriptedConsole,src/harness/harness.cpp,global_read,g_game
 ,RunScriptedConsole,src/harness/harness.cpp,global_read,g_nonCampaignGame
+,RunScriptedConsole,src/harness/harness.cpp,global_read,g_seams
+,RunScriptedConsole,src/harness/harness.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
+,RunScriptedConsole,src/harness/harness.cpp,indirect_call,indirect via unsigned short (*)(Cell *) __attribute__((stdcall)) [FeaturesSeam::GetCellFeature]
 ,RunSearchesNative,src/seams/native.cpp,call,Pathfinder::RunSearches
 ,RunSearchesNative,src/seams/native.cpp,function,
 ,SamePos,src/weapons/weapons.cpp,field_read,Vec3::x

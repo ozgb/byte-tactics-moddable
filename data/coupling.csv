@@ -3652,8 +3652,12 @@ seams,game,shared_write,WindMeteorsSeam::UpdateMeteors,1
 seams,game,shared_write,WindMeteorsSeam::UpdateWind,1
 seams,game,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 seams,harness,shared_write,AiSeam::SetUnitSquad,1
+seams,harness,shared_write,FeaturesSeam::GetCellFeature,1
+seams,harness,shared_write,LosRadarSeam::GetMapCell,1
 seams,harness,shared_write,MapSeam::SnapWorldPosToFootprint,1
 seams,harness,shared_write,Seams::ai,1
+seams,harness,shared_write,Seams::features,1
+seams,harness,shared_write,Seams::los_radar,1
 seams,harness,shared_write,Seams::map,1
 seams,harness,shared_write,Seams::units,1
 seams,harness,shared_write,UnitsSeam::CreateUnit,1

@@ -95,6 +95,7 @@ static char s_loadName[64];
 static int s_loadLine = 0;
 static char s_decidedKey[32];
 static int s_decidedLine = 0;
+static int s_loadAhead = 0;
 static const char s_savePath[] = "savegame\\harness.sav";
 using OptionsTable = Table_0047ae60;
 static const char s_optionsPath[] = "savegame\\harness.opt";
@@ -546,6 +547,8 @@ static void ReadKey(int lineNo, const char* key, char* value)
         strcpy(s_decidedKey, key);
         s_decidedLine = lineNo;
     }
+    if (s_loadAhead && KeyIsDecidedByLoad(key))
+        return;
     if (strcmp(key, "game_seed") == 0)
         s_gameSeed = ParseNumber(lineNo, key, value);
     else if (strcmp(key, "crt_seed") == 0)
@@ -730,16 +733,40 @@ static void CheckScenario()
     }
 }
 
+static void FailReadScenario(const char* path)
+{
+    char msg[700];
+    sprintf(msg, "testmode: cannot read scenario file %s\n", path);
+    Fail(msg);
+}
+
+static int FileHasLoadLine(FILE* f)
+{
+    char line[512];
+    int found = 0;
+    if (f == nullptr)
+        return found;
+    while (!found && fgets(line, sizeof line, f) != nullptr) {
+        const char* key = line;
+        while (*key == ' ' || *key == '\t')
+            key++;
+        found = strncmp(key, "load", 4) == 0 && (key[4] == ' ' || key[4] == '\t' || key[4] == '\r' || key[4] == '\n' || key[4] == '\0');
+    }
+    if (fseek(f, 0, SEEK_SET) != 0)
+        return -1;
+    return found;
+}
+
 static void ReadScenario(const char* path)
 {
     char line[512];
     InitPlayerSpecs();
     FILE* f = fopen(path, "r");
-    if (f == NULL) {
-        char msg[700];
-        sprintf(msg, "testmode: cannot read scenario file %s\n", path);
-        Fail(msg);
-    }
+    if (f == nullptr)
+        FailReadScenario(path);
+    s_loadAhead = FileHasLoadLine(f);
+    if (s_loadAhead < 0)
+        FailReadScenario(path);
     int lineNo = 0;
     while (fgets(line, sizeof line, f) != NULL) {
         lineNo++;
@@ -820,6 +847,19 @@ static void SeedNetworkHost(int host)
 
 static OptionsTable* ScenarioTable() { return (OptionsTable*)g_game->options; }
 
+static Mission* BeginMission(int type)
+{
+    SetMissionType(type);
+    return (Mission*)g_game->net;
+}
+
+static void EnterLoadingFrontend()
+{
+    g_game->frontendState = 9;
+    g_game->frontendSubState = 2;
+    g_game->frontendNextSubState = 2;
+}
+
 static void SetUpSkirmish()
 {
     auto* t = ScenarioTable();
@@ -856,8 +896,7 @@ static void SetUpSkirmish()
             active++;
     }
 
-    SetMissionType(s_gameType);
-    Mission* mission = (Mission*)g_game->net;
+    Mission* mission = BeginMission(s_gameType);
     strcpy(t->mapName, s_map);
     t->difficulty = s_difficulty;
     t->commanderDeath = s_commanderDeath;
@@ -909,9 +948,7 @@ static void SetUpSkirmish()
     if (s_gameType == 3)
         SeedNetworkHost(local);
 
-    g_game->frontendState = 9;
-    g_game->frontendSubState = 2;
-    g_game->frontendNextSubState = 2;
+    EnterLoadingFrontend();
     if (s_gameType == 3) {
         HideSoftwareCursor();
         g_game->mode_391f1 = 5;
@@ -979,9 +1016,8 @@ static void SetUpLoadedGame()
     }
     HapiBank* bank = g_game->pendingSaveStore;
     bank->OpenAccount("summary");
-    SetMissionType(bank->GetIntegerItem("Gametype", 0));
+    Mission* mission = BeginMission(bank->GetIntegerItem("Gametype", 0));
     char* campaign = bank->GetStringItem("Campaign", nullptr);
-    Mission* mission = (Mission*)g_game->net;
     if (campaign != nullptr)
         mission->LoadCampaign(campaign);
     g_game->flag_37ef2 = bank->GetIntegerItem("Side", 0);
@@ -1004,9 +1040,7 @@ static void SetUpLoadedGame()
     t->mapping = bank->GetIntegerItem("Mapping", 1);
     t->lineOfSight = bank->GetIntegerItem("LineOfSight", 1);
     t->losType = bank->GetIntegerItem("LineOfSightType", 1);
-    g_game->frontendState = 9;
-    g_game->frontendSubState = 2;
-    g_game->frontendNextSubState = 2;
+    EnterLoadingFrontend();
 }
 
 static void OpenTrace(unsigned controlWord);

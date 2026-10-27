@@ -270,5 +270,43 @@ class PlayLoadingTest(unittest.TestCase):
         self.assertIn("loader: load saver: there is no scenario", str(raised.exception))
 
 
+class SaveHelperTest(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.dir = Path(tmp.name)
+        self.run = self.dir / "run"
+        (self.run / "savegame").mkdir(parents=True)
+
+    def write(self, *names: str) -> None:
+        for name in names:
+            (self.run / "savegame" / name).write_bytes(b"the " + name.encode())
+
+    def test_copy_save_copies_each_file_by_name(self):
+        self.write("harness.sav", "harness.opt")
+        td.copy_save(self.run, self.dir / "saved")
+        self.assertEqual(sorted(f.name for f in (self.dir / "saved").iterdir()), ["harness.opt", "harness.sav"])
+        self.assertEqual((self.dir / "saved" / "harness.sav").read_bytes(), b"the harness.sav")
+
+    def test_copy_save_leaves_out_a_missing_file(self):
+        self.write("harness.opt")
+        td.copy_save(self.run, self.dir / "saved")
+        self.assertEqual([f.name for f in (self.dir / "saved").iterdir()], ["harness.opt"])
+
+    def test_save_put_maps_each_save_file_to_its_copy(self):
+        self.write("harness.sav", "harness.opt")
+        td.copy_save(self.run, self.dir / "saved")
+        self.assertEqual(td.save_put(self.dir / "saved", "loader", "saver"),
+                         {"savegame/harness.sav": self.dir / "saved" / "harness.sav",
+                          "savegame/harness.opt": self.dir / "saved" / "harness.opt"})
+
+    def test_save_put_names_the_loader_saver_and_missing_file(self):
+        self.write("harness.sav")
+        td.copy_save(self.run, self.dir / "saved")
+        with self.assertRaises(td.Error) as raised:
+            td.save_put(self.dir / "saved", "loader", "saver")
+        self.assertEqual(str(raised.exception), "loader: load saver: saver wrote no savegame/harness.opt")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -411,6 +411,22 @@ def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, time
     return runs[0]
 
 
+def copy_save(run: Path, dest: Path) -> None:
+    """Copy each of SAVE_FILES that `run` holds into `dest`, by file name (a file the run lacks is left out)."""
+    dest.mkdir(parents=True, exist_ok=True)
+    for path in SAVE_FILES:
+        if (run / path).is_file():
+            shutil.copyfile(run / path, dest / Path(path).name)
+
+
+def save_put(saved: Path, loader: str, saver: str) -> dict[str, Path]:
+    """The `put` map that places the files of `saved` (see copy_save) in a loading run; raises Error if `saver` wrote one short."""
+    for path in SAVE_FILES:
+        if not (saved / Path(path).name).is_file():
+            raise Error(f"{loader}: load {saver}: {saver} wrote no {path}")
+    return {path: saved / Path(path).name for path in SAVE_FILES}
+
+
 def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
                  poison: bool = False) -> Path:
     """`play`, but a scenario with a `load` line first plays the scenario it names, from the same directory, and gets its save."""
@@ -427,13 +443,10 @@ def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | No
         except Error as e:
             raise Error(f"{scenario.stem}: load {saver}: {saver} failed to run:\n{e}") from None
         try:
-            for path in SAVE_FILES:
-                if not (run / path).is_file():
-                    raise Error(f"{scenario.stem}: load {saver}: {saver} wrote no {path}")
-                shutil.copyfile(run / path, Path(scratch) / Path(path).name)
+            copy_save(run, Path(scratch))
         finally:
             shutil.rmtree(run.parent, ignore_errors=True)
-        return play(exe, scenario, game_dir, dump, timeout, poison, put={path: Path(scratch) / Path(path).name for path in SAVE_FILES})
+        return play(exe, scenario, game_dir, dump, timeout, poison, put=save_put(Path(scratch), scenario.stem, saver))
 
 
 def need(run: Path, name: str) -> Path:

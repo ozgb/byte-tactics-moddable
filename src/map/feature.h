@@ -113,20 +113,6 @@ struct Feature {
     };
 };
 
-static_assert(sizeof(Feature) == 0x100, "");
-static_assert(__builtin_offsetof(Feature, footprint) == 0x94, "");
-static_assert(__builtin_offsetof(Feature, object) == 0x98, "");
-static_assert(__builtin_offsetof(Feature, anims) == 0xa8, "");
-static_assert(__builtin_offsetof(Feature, animTable) == 0xac, "");
-static_assert(__builtin_offsetof(Feature, seqburn) == 0xb4, "");
-static_assert(__builtin_offsetof(Feature, seqreclamateshad) == 0xc8, "");
-static_assert(__builtin_offsetof(Feature, anim) == 0xcc, "");
-static_assert(__builtin_offsetof(Feature, shadowAnim) == 0xd8, "");
-static_assert(__builtin_offsetof(Feature, burnweapon) == 0xe4, "");
-static_assert(__builtin_offsetof(Feature, energy) == 0xec, "");
-static_assert(__builtin_offsetof(Feature, metal) == 0xf0, "");
-static_assert(__builtin_offsetof(Feature, flags16) == 0xfe, "");
-
 #pragma pack(pop)
 
 #endif

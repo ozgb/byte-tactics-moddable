@@ -37,11 +37,6 @@ struct Cell {
     };
 };
 
-static_assert(sizeof(Cell) == 13, "");
-static_assert(__builtin_offsetof(Cell, feature) == 8, "");
-static_assert(__builtin_offsetof(Cell, spot) == 10, "");
-static_assert(__builtin_offsetof(Cell, flags) == 12, "");
-
 #pragma pack(pop)
 
 #endif

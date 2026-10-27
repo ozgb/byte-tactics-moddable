@@ -42102,6 +42102,21 @@ address,function,file,kind,target
 ,Charge,src/game/main_loop.cpp,field_write,FrameTimers::last
 ,Charge,src/game/main_loop.cpp,function,
 ,Charge,src/game/main_loop.cpp,global_read,g_game
+,CheckGameType,src/harness/harness.cpp,call,Fail
+,CheckGameType,src/harness/harness.cpp,call,FailLine
+,CheckGameType,src/harness/harness.cpp,call,RejectUnderMission
+,CheckGameType,src/harness/harness.cpp,call,sprintf
+,CheckGameType,src/harness/harness.cpp,field_read,PlayerSpec::energyLine
+,CheckGameType,src/harness/harness.cpp,field_read,PlayerSpec::metalLine
+,CheckGameType,src/harness/harness.cpp,function,
+,CheckGameType,src/harness/harness.cpp,global_read,s_campaignLine@src/harness/harness.cpp
+,CheckGameType,src/harness/harness.cpp,global_read,s_commanderDeathLine@src/harness/harness.cpp
+,CheckGameType,src/harness/harness.cpp,global_read,s_gameType@src/harness/harness.cpp
+,CheckGameType,src/harness/harness.cpp,global_read,s_lineOfSightLine@src/harness/harness.cpp
+,CheckGameType,src/harness/harness.cpp,global_read,s_losTypeLine@src/harness/harness.cpp
+,CheckGameType,src/harness/harness.cpp,global_read,s_mappingLine@src/harness/harness.cpp
+,CheckGameType,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
+,CheckGameType,src/harness/harness.cpp,global_read,s_startPositionsLine@src/harness/harness.cpp
 ,CheckLoadScenario,src/harness/harness.cpp,call,Fail
 ,CheckLoadScenario,src/harness/harness.cpp,call,FailLine
 ,CheckLoadScenario,src/harness/harness.cpp,call,sprintf
@@ -42155,6 +42170,7 @@ address,function,file,kind,target
 ,CheckOrders,src/harness/harness.cpp,global_read,s_orderCount@src/harness/harness.cpp
 ,CheckOrders,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
 ,CheckOrders,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
+,CheckScenario,src/harness/harness.cpp,call,CheckGameType
 ,CheckScenario,src/harness/harness.cpp,call,CheckLoadScenario
 ,CheckScenario,src/harness/harness.cpp,call,CheckOrders
 ,CheckScenario,src/harness/harness.cpp,call,CheckSpawns
@@ -46826,6 +46842,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,call,strncmp
 ,ReadKey,src/harness/harness.cpp,deref_read,*char
 ,ReadKey,src/harness/harness.cpp,function,
+,ReadKey,src/harness/harness.cpp,global_maybe_written,s_campaign@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_maybe_written,s_decidedKey@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_maybe_written,s_loadName@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_maybe_written,s_map@src/harness/harness.cpp
@@ -46836,7 +46853,9 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_campaignLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_commanderDeath@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_commanderDeathLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_crtSeed@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_decidedLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_difficulty@src/harness/harness.cpp
@@ -46846,14 +46865,18 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_write,s_gameType@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_gameTypeLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_lineOfSight@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_lineOfSightLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_loadLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_localPlayer@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_localPlayerLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_losType@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_losTypeLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_mapLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_mapping@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_mappingLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_saveLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_saveTick@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_startPositionsLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_ticks@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_viewSeed@src/harness/harness.cpp
 ,ReadMasked,src/harness/harness.cpp,deref_read,*unsigned char
@@ -46904,8 +46927,10 @@ address,function,file,kind,target
 ,ReadPlayerKey,src/harness/harness.cpp,field_maybe_written,PlayerSpec::side
 ,ReadPlayerKey,src/harness/harness.cpp,field_write,PlayerSpec::color
 ,ReadPlayerKey,src/harness/harness.cpp,field_write,PlayerSpec::energy
+,ReadPlayerKey,src/harness/harness.cpp,field_write,PlayerSpec::energyLine
 ,ReadPlayerKey,src/harness/harness.cpp,field_write,PlayerSpec::human
 ,ReadPlayerKey,src/harness/harness.cpp,field_write,PlayerSpec::metal
+,ReadPlayerKey,src/harness/harness.cpp,field_write,PlayerSpec::metalLine
 ,ReadPlayerKey,src/harness/harness.cpp,field_write,PlayerSpec::named
 ,ReadPlayerKey,src/harness/harness.cpp,field_write,PlayerSpec::sideLine
 ,ReadPlayerKey,src/harness/harness.cpp,field_write,PlayerSpec::team
@@ -46997,6 +47022,8 @@ address,function,file,kind,target
 ,RegisterOrder,src/harness/harness.cpp,global_read,s_orderCountSeen@src/harness/harness.cpp
 ,RegisterOrder,src/harness/harness.cpp,global_write,s_orderCountSeen@src/harness/harness.cpp
 ,RegisterOrder,src/harness/harness.cpp,global_write,s_orderList@src/harness/harness.cpp
+,RejectUnderMission,src/harness/harness.cpp,call,FailLine
+,RejectUnderMission,src/harness/harness.cpp,function,
 ,Remove,src/weapons/weapons_49b720.cpp,call,operator=
 ,Remove,src/weapons/weapons_49b720.cpp,field_read,Game::cameraFollowTrackObj
 ,Remove,src/weapons/weapons_49b720.cpp,field_read,Proj_0049b720::pos
@@ -47419,6 +47446,8 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,call,HideSoftwareCursor
 ,SetUpSkirmish,src/harness/harness.cpp,call,InitMissionStatus
 ,SetUpSkirmish,src/harness/harness.cpp,call,Mission::CountStartPositions
+,SetUpSkirmish,src/harness/harness.cpp,call,Mission::GetCampaignName
+,SetUpSkirmish,src/harness/harness.cpp,call,Mission::LoadCampaign
 ,SetUpSkirmish,src/harness/harness.cpp,call,Mission::LoadMissionByName
 ,SetUpSkirmish,src/harness/harness.cpp,call,ResetPlayerSlots
 ,SetUpSkirmish,src/harness/harness.cpp,call,ScenarioTable
@@ -47473,7 +47502,9 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,function,
 ,SetUpSkirmish,src/harness/harness.cpp,global_escape,s_map@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_escape,s_players@src/harness/harness.cpp
+,SetUpSkirmish,src/harness/harness.cpp,global_maybe_written,s_campaign@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,g_game
+,SetUpSkirmish,src/harness/harness.cpp,global_read,s_campaignLine@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_commanderDeath@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_difficulty@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_fixedLocations@src/harness/harness.cpp

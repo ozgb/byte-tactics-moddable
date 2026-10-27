@@ -1,0 +1,12 @@
+# Game type 1: Sub Hunting on Easy, the human sonar buoy self-destructs, so the defeat condition UnitTypeKilled fires and the run ends at game over.
+game_seed 432
+crt_seed 1432
+view_seed 2432
+game_type 1
+campaign Battle Tactics - Arm Very Short
+map Sub Hunting
+difficulty 0
+ticks 2400
+player0.controller human
+player1.controller ai
+order 30 0:ARMSONAR:1 selfdestruct

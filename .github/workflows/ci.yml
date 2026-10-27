@@ -229,6 +229,8 @@ jobs:
         run: |
           uv run tools/test_coupling.py
           uv run tools/coupling.py --check
+          uv run tools/test_subsystemsdoc.py
+          uv run tools/subsystemsdoc.py --check
 
   bitexact-portable:
     name: bitexact-portable (${{ matrix.name }})

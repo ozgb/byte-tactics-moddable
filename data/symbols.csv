@@ -4527,7 +4527,9 @@ address,name
 0x51e590,g_hapinetOnlineReport
 0x51e594,g_reportFlags
 0x51e598,IUUnitSyncEntry::IU?$pair::?$_Tree::_Nil
+0x51e598,g_unitSyncMapNil
 0x51e59c,IUUnitSyncEntry::IU?$pair::?$_Tree::_Nilrefs
+0x51e59c,g_unitSyncMapNilRefs
 0x51e5a0,g_unitSyncStatusText
 0x51e608,g_fxEventPoolBlocked
 0x51e610,g_particlePool

@@ -461,8 +461,8 @@ address,function,callee,kind,file,class,notes
 0x46c920,DeleteUnitSync,std::_Lockit::~_Lockit,call,src/network/unit_sync.cpp,presentation,sites=1
 0x46ca60,FinishUnitSync,std::_Lockit::_Lockit,call,src/network/unit_sync.cpp,presentation,sites=1
 0x46ca60,FinishUnitSync,std::_Lockit::~_Lockit,call,src/network/unit_sync.cpp,presentation,sites=1
-0x46d1a0,UnitSync::~UnitSync,std::_Lockit::_Lockit,call,src/network/unit_sync_46d1a0.cpp,presentation,sites=1
-0x46d1a0,UnitSync::~UnitSync,std::_Lockit::~_Lockit,call,src/network/unit_sync_46d1a0.cpp,presentation,sites=1
+0x46d1a0,UnitSync::~UnitSync,std::_Lockit::_Lockit,call,src/network/unit_sync.cpp,presentation,sites=1
+0x46d1a0,UnitSync::~UnitSync,std::_Lockit::~_Lockit,call,src/network/unit_sync.cpp,presentation,sites=1
 0x46d2e0,UnitSync::ResetEntries,std::_Lockit::_Lockit,call,src/network/unit_sync.cpp,presentation,sites=1
 0x46d2e0,UnitSync::ResetEntries,std::_Lockit::~_Lockit,call,src/network/unit_sync.cpp,presentation,sites=1
 0x46df40,UnitSync::GetSyncStatusText,sprintf,call,src/network/unit_sync.cpp,presentation,sites=1

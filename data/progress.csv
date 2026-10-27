@@ -1371,7 +1371,7 @@ address,size,file,symbol,status,similarity
 0x46cec0,33,src/network/unit_sync.cpp,?SendUnsequenced@PacketSequencer@@QAEXIPAX@Z,matched,100.0
 0x46cef0,325,src/network/unit_sync.cpp,?ReceiveSequenced@PacketSequencer@@QAEXPAUUnitSyncPacket@@HPAXI@Z,matched,100.0
 0x46d040,342,src/network/unit_sync.cpp,??0UnitSync@@QAE@H@Z,matched,100.0
-0x46d1a0,312,src/network/unit_sync_46d1a0.cpp,??1UnitSync@@QAE@XZ,matched,100.0
+0x46d1a0,312,src/network/unit_sync.cpp,??1UnitSync@@QAE@XZ,matched,100.0
 0x46d2e0,475,src/network/unit_sync.cpp,?ResetEntries@UnitSync@@QAEXXZ,matched,100.0
 0x46d4c0,49,src/network/unit_sync.cpp,?SendSyncPacket@UnitSync@@QAEXPAIPAUUnitSyncPacket@@H@Z,matched,100.0
 0x46d500,33,src/network/unit_sync.cpp,?ReceiveSyncPacket@UnitSync@@QAEXPAXH@Z,matched,100.0
@@ -1381,7 +1381,7 @@ address,size,file,symbol,status,similarity
 0x46d6c0,416,src/network/unit_sync.cpp,?HandleSyncPacket@UnitSync@@QAEXPAUUnitSyncPacket@@E@Z,matched,100.0
 0x46d860,259,src/network/unit_sync.cpp,?NotifyEntryChanged@UnitSync@@QAEXI@Z,matched,100.0
 0x46d970,351,src/network/unit_sync.cpp,?CheckUnitAvailable@UnitSync@@QAEXIH@Z,matched,100.0
-0x46dad0,1024,src/network/unit_sync_46dad0.cpp,?ProcessSync@UnitSync@@QAEXXZ,matched,100.0
+0x46dad0,1024,src/network/unit_sync.cpp,?ProcessSync@UnitSync@@QAEXXZ,matched,100.0
 0x46ded0,111,src/network/unit_sync_player.cpp,??1UnitSyncPlayer@@QAE@XZ,matched,100.0
 0x46df40,185,src/network/unit_sync.cpp,?GetSyncStatusText@UnitSync@@QAEPADXZ,matched,100.0
 0x46e000,166,src/network/unit_sync.cpp,?AllPlayersSynced@UnitSync@@QAEHXZ,matched,100.0

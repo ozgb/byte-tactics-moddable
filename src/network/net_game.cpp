@@ -81,7 +81,7 @@ void __stdcall AddMessage(char* text, int key, int value, char last);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall SetupPlayerSlot(unsigned char player, char type);
 int GetTicks();
-int __stdcall ReportGameEvent(int msg);
+#include "unit_sync.h"
 #include "../gui/dialogs.h"
 #include <memory.h>
 #include "../frontend/multi.h"

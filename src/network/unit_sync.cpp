@@ -242,31 +242,6 @@ void FUN_0046c8d0(void)
 {
 }
 
-struct UnitSyncEntry {
-    int x;
-    int y;
-    short w;
-    short h;
-    int limit;
-};
-
-struct UnitSyncNode {
-    UnitSyncNode* left;
-    UnitSyncNode* parent;
-    UnitSyncNode* right;
-    unsigned int key;
-    UnitSyncEntry value;
-    int color;
-};
-
-class UnitSyncIter {
-public:
-    UnitSyncNode* ptr;
-    UnitSyncIter() {}
-    UnitSyncIter(UnitSyncNode* p) : ptr(p) {}
-    bool operator==(const UnitSyncIter& other) const { return ptr == other.ptr; }
-};
-
 #pragma pack(push, 1)
 struct Unit_0046e330 {
     char unknown_0[0x13e];
@@ -277,23 +252,13 @@ struct Unit_0046e330 {
 
 #include "player.h"
 #include "player_info.h"
+#include "unit_sync.h"
+#include "unit_sync_state.h"
+
+extern UnitSyncNode* g_unitSyncMapNil;
+extern int g_unitSyncMapNilRefs;
 
 #pragma pack(push, 1)
-struct UnitSyncPacket {
-    unsigned char type;
-    unsigned char arg;
-    unsigned int id;
-    int key;
-    union {
-        int value;
-        struct {
-            unsigned char enabled;
-            unsigned char match;
-            short limit;
-        };
-    };
-};
-
 struct Target_0046d530 {
     unsigned int id;
     char unknown_4[0x24];
@@ -312,150 +277,6 @@ struct Source_0046d630 {
 
 #pragma pack(pop)
 
-struct Cmp_0046d040 {
-    char x;
-};
-
-struct Alloc_0046d040 {
-    char x;
-};
-
-class Vec_0046d6c0 {
-public:
-    int pad;
-    int* first;
-    int* last;
-    int* cap;
-
-    int* begin() { return first; }
-    int* end() { return last; }
-    unsigned int size() { return first == 0 ? 0 : last - first; }
-    void insert(int* pos, int n, int const& val);
-};
-
-struct PlayerSync_0046e0b0 {
-    unsigned int id;
-    Vec_0046d6c0 ids;
-    Vec_0046d6c0 pairs;
-    int expected;
-    int sent;
-    unsigned int ackd;
-    char unknown_30[0x5c - 0x30];
-};
-
-struct Kfn_0046d6c0 {};
-struct Alloc_0046d6c0 {};
-
-struct Less_0046d6c0 {
-    bool operator()(const unsigned int& a, const unsigned int& b) const { return a < b; }
-};
-
-template<class _K, class _Ty, class _Kfn, class _Pr, class _A>
-class _Tree {
-public:
-    typedef UnitSyncNode _Node;
-    struct _Pairib {
-        _Node* first;
-        bool second;
-        _Pairib() {}
-    };
-
-    char _Alloc;
-    union {
-        char _Pred;
-        _Pr key_compare;
-    };
-    _Node* _Head;
-    bool _Multi;
-    int _Size;
-
-    _Pairib insert(const _Ty& _V);
-};
-
-typedef std::pair<const unsigned int, UnitSyncEntry> Value_0046d6c0;
-
-extern UnitSyncNode* DAT_0051e598;
-extern int DAT_0051e59c;
-
-class UnitSyncMap : public _Tree<unsigned int, Value_0046d6c0, Kfn_0046d6c0,
-                                  Less_0046d6c0, Alloc_0046d6c0> {
-public:
-    UnitSyncMap(Cmp_0046d040 c, Alloc_0046d040 a)
-    {
-        _Alloc = c.x;
-        _Pred = a.x;
-        _Multi = 0;
-        Init();
-    }
-
-    UnitSyncIter End() { return UnitSyncIter(_Head); }
-    UnitSyncIter FindExact(const unsigned int& key);
-    UnitSyncNode* LowerBound(const unsigned int* key);
-    int* Begin(int* param_1);
-
-    UnitSyncNode* Buynode(UnitSyncNode* parent, int color)
-    {
-        UnitSyncNode* s = (UnitSyncNode*)operator new(sizeof(UnitSyncNode));
-        s->parent = parent;
-        s->color = color;
-        return s;
-    }
-
-    void Init();
-
-    UnitSyncEntry& operator[](const unsigned int& k)
-    {
-        _Pairib p = insert(Value_0046d6c0(k, UnitSyncEntry()));
-        return p.first->value;
-    }
-};
-
-class Sub_0046d040 {
-public:
-    int seqSent;
-    int seqCur;
-    int seqMax;
-
-    void SendUnsequenced(void* packet, int to);
-};
-
-class Sub2_0046d040 {
-public:
-    int direct;
-    int* pendingPlayerCount;
-    int* checksumProgress;
-    int* disabled;
-};
-
-#pragma pack(push, 2)
-struct Elem_0046faf0 {
-    union {
-        struct {
-            int a;
-            int b;
-            int c;
-            short d;
-        };
-        UnitSyncPacket packet;
-    };
-};
-#pragma pack(pop)
-
-class UnitSyncPlayer {
-public:
-    char unknown_0[0x5c];
-
-    UnitSyncPlayer(const UnitSyncPlayer& other);
-    ~UnitSyncPlayer();
-    UnitSyncPlayer& operator=(const UnitSyncPlayer& rhs);
-};
-
-class SyncChecksumVector {
-public:
-    std::vector<int> vec;
-    ~SyncChecksumVector();
-};
-
 #include "net_game.h"
 unsigned int GetHostDpid();
 #include "net_game.h"
@@ -469,64 +290,14 @@ static inline void SendPacket(unsigned int to, UnitSyncPacket* packet)
     SendPacketToPlayer(GetLocalHumanDpid(), to, (unsigned char *)packet, 0xe);
 }
 
-class UnitSync {
-public:
-    UnitSyncMap map;
-    std::vector<PlayerSync_0046e0b0> players;
-    std::list<int> ids;
-    Sub_0046d040 sub;
-    std::vector<int> seqSentQueue;
-    std::vector<int> seqHeldQueue;
-    union {
-        Sub2_0046d040 sub2;
-        struct {
-            int direct;
-            union {
-                int* first;
-                int pendingPlayerCount;
-            };
-            int* checksumProgress;
-            int disabled;
-        };
-    };
-
-    UnitSync(int param);
-
-    UnitSyncIter End() { return UnitSyncIter(map._Head); }
-    UnitSyncIter Find(const unsigned int* key)
-    {
-        UnitSyncIter p = UnitSyncIter(map.LowerBound(key));
-        return (p == End() || map.key_compare(*key, p.ptr->key)) ? End() : p;
+inline void UnitSync::Send(Target_0046d530* target, UnitSyncPacket* packet)
+{
+    if (direct != 0) {
+        SendPacket(target->id, packet);
+    } else {
+        SendPacket(GetHostDpid(), packet);
     }
-    void Send(Target_0046d530* target, UnitSyncPacket* packet)
-    {
-        if (direct != 0) {
-            SendPacket(target->id, packet);
-        } else {
-            SendPacket(GetHostDpid(), packet);
-        }
-    }
-
-    void SendSyncPacket(unsigned int* param_1, UnitSyncPacket* param_2, int unused);
-    void SendSyncMessage(unsigned char arg, int a, int b, int unused);
-    void SendSyncMessageTo(Target_0046d530* target, unsigned char arg, int a, int b, int unused);
-    void SendEntryTo(Target_0046d530* target, unsigned char arg, Source_0046d630* src, int unused);
-    void HandleSyncPacket(UnitSyncPacket* packet, unsigned char player);
-    void ReceiveSyncPacket(void* param_1, int param_2);
-    void NotifyEntryChanged(unsigned int param_1);
-    void CheckUnitAvailable(unsigned int key, int y);
-    char* GetSyncStatusText();
-    int AllPlayersSynced();
-    int IsPlayerSynced(int id);
-    int PopChangedEntry(UnitSyncEntry* out);
-    int GetUnitEntry(Unit_0046e330* unit, UnitSyncEntry* out);
-    int ToggleUnitAllowed(Unit_0046e330* unit);
-    int DisallowUnit(Unit_0046e330* unit);
-    int AllowUnit(Unit_0046e330* unit);
-    void SetUnitLimit(Unit_0046e330* unit, int value);
-    void ApplyToUnitTypes();
-    void ResetEntries();
-};
+}
 
 static inline UnitDef* Defs_0046d040()
 {
@@ -538,22 +309,6 @@ static inline bool FlagOf_0046d040(UnitDef* d)
     return (d->flags2 >> 16) & 1;
 }
 
-class UnitSyncDeleter {
-public:
-    std::map<unsigned int, UnitSyncEntry> map;
-    std::vector<UnitSyncPlayer> elems;
-    std::list<int> ids;
-    Sub_0046d040 sub;
-    SyncChecksumVector seqSentQueue;
-    std::vector<int> seqHeldQueue;
-    int direct;
-    int pendingPlayerCount;
-    int checksumProgress;
-    int disabled;
-
-    ~UnitSyncDeleter() {}
-};
-
 // FUNCTION: 0x46c8e0
 void __stdcall CreateUnitSync(int param_1)
 {
@@ -564,7 +319,7 @@ void __stdcall CreateUnitSync(int param_1)
 void __fastcall DeleteUnitSync()
 {
     if ((UnitSync *)g_game->sync)
-        delete (UnitSyncDeleter*)(UnitSync *)g_game->sync;
+        delete (UnitSync *)g_game->sync;
     (*(UnitSync **)&g_game->sync) = 0;
 }
 
@@ -575,19 +330,6 @@ public:
     UnitSyncPacket* last;
     UnitSyncPacket* end;
     void InsertPacket(UnitSyncPacket* where, int count, UnitSyncPacket* val);
-};
-
-struct PacketSequencer {
-    int lastSent;
-    unsigned int cur;
-    unsigned int max;
-    std::vector<Elem_0046faf0> sentQueue;
-    std::vector<Elem_0046faf0> heldQueue;
-    PacketSequencer();
-    PacketSequencer& operator=(const PacketSequencer& rhs);
-    void SendUnsequenced(unsigned int param_1, void* param_2);
-    void SendSequenced(Elem_0046faf0* param_1, Elem_0046faf0* param_2);
-    void ReceiveSequenced(UnitSyncPacket* packet, int param_2, void* param_3, unsigned int target);
 };
 
 // FUNCTION: 0x46cbe0
@@ -693,6 +435,11 @@ UnitSync::UnitSync(int param)
     }
 }
 
+// FUNCTION: 0x46d1a0
+UnitSync::~UnitSync()
+{
+}
+
 // FUNCTION: 0x46d2e0
 void UnitSync::ResetEntries()
 {
@@ -792,7 +539,7 @@ void UnitSync::HandleSyncPacket(UnitSyncPacket* packet, unsigned char player)
     }
     pendingPlayerCount++;
     if (direct != 0) {
-        std::vector<PlayerSync_0046e0b0>::iterator i = players.begin();
+        std::vector<UnitSyncPlayer>::iterator i = players.begin();
         if (i != players.end()) {
             unsigned int id = g_game->players_1b67[player].id;
             for (; i != players.end(); i++) {
@@ -824,11 +571,11 @@ void UnitSync::HandleSyncPacket(UnitSyncPacket* packet, unsigned char player)
                 }
             }
             {
-                Vec_0046d6c0& v = i->ids;
+                std::vector<int>& v = i->ids;
                 v.insert(v.end(), 1, packet->key);
             }
             {
-                Vec_0046d6c0& w = i->pairs;
+                std::vector<int>& w = i->pairs;
                 w.insert(w.end(), 1, packet->value);
             }
             this->CheckUnitAvailable(packet->key, packet->value);
@@ -860,13 +607,13 @@ void UnitSync::HandleSyncPacket(UnitSyncPacket* packet, unsigned char player)
 // FUNCTION: 0x46d860
 void UnitSync::NotifyEntryChanged(unsigned int param_1)
 {
-    std::vector<PlayerSync_0046e0b0>& ps = players;
+    std::vector<UnitSyncPlayer>& ps = players;
     if (disabled != 0) {
         return;
     }
     if (direct != 0) {
         UnitSyncIter it = map.FindExact(param_1);
-        for (std::vector<PlayerSync_0046e0b0>::iterator i = ps.begin(); i != ps.end(); ++i) {
+        for (std::vector<UnitSyncPlayer>::iterator i = ps.begin(); i != ps.end(); ++i) {
             UnitSyncEntry* v = &it.ptr->value;
             if (disabled == 0) {
                 UnitSyncPacket packet;
@@ -919,7 +666,7 @@ void UnitSync::CheckUnitAvailable(unsigned int key, int y)
     }
 
     {
-        for (PlayerSync_0046e0b0* e = players.begin(); e != players.end(); e++) {
+        for (UnitSyncPlayer* e = players.begin(); e != players.end(); e++) {
             int flag;
             if (y != 0) {
                 Player* pl = FindPlayerByDpid(e->id);
@@ -929,9 +676,9 @@ void UnitSync::CheckUnitAvailable(unsigned int key, int y)
             } else {
                 flag = 0;
             }
-            int* p2 = e->pairs.first;
-            int* p1 = e->ids.first;
-            int* p3 = e->ids.last;
+            int* p2 = e->pairs.begin();
+            int* p1 = e->ids.begin();
+            int* p3 = e->ids.end();
             while (p1 != p3) {
                 if (*p1 == key) {
                     if (flag && *p2 != y)
@@ -952,13 +699,156 @@ void UnitSync::CheckUnitAvailable(unsigned int key, int y)
     NotifyEntryChanged(key);
 }
 
+inline int Pass(int v) { return v; }
+
+extern int DAT_00000000;
+
+inline void PacketSequencer::Inl(unsigned int param_1, UnitSyncPacket* param_2)
+{
+    param_2->id = 0;
+    SendPacketToPlayer(GetLocalHumanDpid(), param_1, (unsigned char *)param_2, 0xe);
+}
+
+// FUNCTION: 0x46dad0
+void UnitSync::ProcessSync() {
+    if (disabled != 0)
+        return;
+
+    if (direct != 0) {
+        int changed = 0;
+        std::vector<UnitSyncPlayer>::iterator it = players.begin();
+        if (it != players.end()) {
+            do {
+                int live = 0;
+                for (int i = 0; i < 10; i++) {
+                    Player* p = &g_game->players[i];
+                    if (p->active != 0 && p->type == 3 && p->info->kind == 1 &&
+                        it->id == p->id) {
+                        live = 1;
+                        break;
+                    }
+                }
+                if (live == 0) {
+                    it = players.erase(it);
+                    --it;
+                    changed = 1;
+                }
+                ++it;
+            } while (it != players.end());
+        }
+
+        for (int i = 0; i < 10; i++) {
+            Player* p = &g_game->players[i];
+            if (p->active != 0 && p->type == 3 && p->info->kind == 1) {
+                int found = 0;
+                for (std::vector<UnitSyncPlayer>::iterator j = players.begin(); j != players.end();
+                     ++j) {
+                    if (j->id == p->id) {
+                        found = 1;
+                        break;
+                    }
+                }
+                if (found == 0) {
+                    UnitSyncPlayer entry;
+                    entry.id = p->id;
+                    entry.expected = 0;
+                    entry.sent = 0;
+                    entry.ackd = 0;
+                    players.insert(players.end(), 1, entry);
+                    UnitSyncPlayer* e = &players.back();
+                    if (disabled == 0) {
+                        UnitSyncPacket packet;
+                        packet.type = 0x1a;
+                        packet.arg = 0;
+                        packet.key = 0;
+                        packet.value = 0;
+                        this->SendSyncPacket(&e->id, &packet, 1);
+                        e->sent++;
+                    }
+                    changed = 1;
+                }
+            }
+        }
+
+        if (changed != 0) {
+            std::map<unsigned int, UnitSyncEntry>& entries = (std::map<unsigned int, UnitSyncEntry>&)map;
+            typedef std::map<unsigned int, UnitSyncEntry>::_Imp Tree;
+            typedef void (Tree::iterator::*Increment)();
+            Increment increment = &Tree::iterator::_Inc;
+            for (std::map<unsigned int, UnitSyncEntry>::iterator k = entries.begin(); k != entries.end();
+                 (k.*increment)()) {
+                CheckUnitAvailable(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(k->second.x)))))))))), 0);
+            }
+        }
+        return;
+    }
+
+    if (pendingPlayerCount > 0) {
+        if (checksumProgress < g_game->unitDefCount) {
+            if (checksumProgress == 0) {
+                if (GetHostDpid() == -1)
+                    return;
+                int v = g_game->unitDefCount - 1;
+                if (disabled == 0) {
+                    UnitSyncPacket packet;
+                    packet.type = 0x1a;
+                    packet.arg = 1;
+                    packet.key = 0;
+                    packet.value = v;
+                    if (direct != 0) {
+                        ((PacketSequencer*)&sub)->SendUnsequenced(DAT_00000000, &packet);
+                    } else {
+                        unsigned int id = GetHostDpid();
+                        ((PacketSequencer*)&sub)->SendUnsequenced(id, &packet);
+                    }
+                }
+                checksumProgress = 1;
+                return;
+            }
+
+            for (int n = 0; n < 4;) {
+                Game* game = g_game;
+                if (checksumProgress >= game->unitDefCount)
+                    return;
+                UnitDef* def = &game->defs[checksumProgress];
+                ComputeUnitScriptChecksum(def);
+                int y = def->scriptChecksum;
+                unsigned int key = def->fbiChecksum;
+                if (disabled == 0) {
+                    UnitSyncPacket packet;
+                    packet.type = 0x1a;
+                    packet.arg = 2;
+                    packet.key = key;
+                    packet.value = y;
+                    if (direct != 0) {
+                        ((PacketSequencer*)&sub)->Inl(DAT_00000000, &packet);
+                    } else {
+                        unsigned int id = GetHostDpid();
+                        ((PacketSequencer*)&sub)->SendUnsequenced(id, &packet);
+                    }
+                }
+                n++;
+                checksumProgress++;
+            }
+        } else {
+            UnitSyncPacket packet;
+            packet.type = 0x1a;
+            packet.arg = 4;
+            packet.key = 0;
+            packet.value = pendingPlayerCount;
+            unsigned int id = GetHostDpid();
+            ((PacketSequencer*)&sub)->SendUnsequenced(id, &packet);
+        }
+    }
+}
+
 // FUNCTION: 0x46df40
 char* UnitSync::GetSyncStatusText()
 {
     if (direct == 0) {
         return 0;
     }
-    for (std::vector<PlayerSync_0046e0b0>::iterator it = players.begin(); it != players.end(); ++it) {
+    for (std::vector<UnitSyncPlayer>::iterator it = players.begin(); it != players.end(); ++it) {
         if (it->expected == 0) {
             return "No units_expected sent from player";
         }
@@ -981,7 +871,7 @@ int UnitSync::AllPlayersSynced()
         return 1;
     if (direct == 0)
         return 1;
-    PlayerSync_0046e0b0* p = players.begin();
+    UnitSyncPlayer* p = players.begin();
     if (p == players.end())
         return 1;
     for (; p != players.end(); p++) {
@@ -1013,7 +903,7 @@ int UnitSync::IsPlayerSynced(int id)
         || (player->active != 0 && player->type == 3 && player->info->kind == 2)
         || (player->active != 0 && player->type == 2))
         return 1;
-    for (std::vector<PlayerSync_0046e0b0>::iterator it = players.begin(); it != players.end(); ++it) {
+    for (std::vector<UnitSyncPlayer>::iterator it = players.begin(); it != players.end(); ++it) {
         if (it->id != id)
             continue;
         if (it->expected == 0 || it->ids.size() != it->expected)
@@ -1125,13 +1015,6 @@ struct Elem_0046e5e0 {
     int value;
 };
 
-class SyncTempTaggedVector {
-public:
-    std::vector<Elem_0046e5e0> vec;
-
-    ~SyncTempTaggedVector();
-};
-
 // FUNCTION: 0x46e5e0
 SyncTempTaggedVector::~SyncTempTaggedVector()
 {
@@ -1178,8 +1061,6 @@ UnitSyncIter UnitSyncMap::FindExact(const unsigned int& key)
 // FUNCTION: 0x46ff90 ?_Dec@iterator@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@QAEXXZ
 template class std::_Tree<unsigned int, std::pair<const unsigned int, UnitSyncEntry>, std::map<unsigned int, UnitSyncEntry>::_Kfn, std::less<unsigned int>, std::allocator<UnitSyncEntry> >;
 
-void __stdcall NopChecksumEntryDtor(int);
-
 namespace std {
 template<> inline void allocator<Elem_0046faf0>::destroy(Elem_0046faf0* p)
 {
@@ -1190,8 +1071,6 @@ template<> inline void allocator<Elem_0046faf0>::destroy(Elem_0046faf0* p)
 struct Elem_004702a0 {
     int unknown_0;
 };
-
-int* __stdcall CopyDwordRangeOverwrite(int* first, int* last, int* dest);
 
 class Class_00470250 : public std::vector<Elem_004702a0> {
 public:
@@ -1312,13 +1191,45 @@ EraseFn_0046eb60 g_erase_0046eb60 = &List_0046eb60::erase;
 void UnitSyncMap::Init()
 {
     std::_Lockit lock;
-    if (DAT_0051e598 == 0) {
-        DAT_0051e598 = Buynode(0, 1);
-        DAT_0051e598->left = 0, DAT_0051e598->right = 0;
+    if (g_unitSyncMapNil == 0) {
+        g_unitSyncMapNil = Buynode(0, 1);
+        g_unitSyncMapNil->left = 0, g_unitSyncMapNil->right = 0;
     }
-    ++DAT_0051e59c;
-    _Head = Buynode(DAT_0051e598, 0), _Size = 0;
+    ++g_unitSyncMapNilRefs;
+    _Head = Buynode(g_unitSyncMapNil, 0), _Size = 0;
     _Head->left = _Head, _Head->right = _Head;
+}
+
+UnitSyncMap::~UnitSyncMap()
+{
+    if (_Size != 0) {
+        std::_Lockit lock;
+        Erase(_Head->parent);
+        _Head->parent = g_unitSyncMapNil;
+        _Size = 0;
+        _Head->left = _Head;
+        _Head->right = _Head;
+    }
+    operator delete(_Head);
+    _Head = nullptr;
+    _Size = 0;
+    {
+        std::_Lockit lock;
+        if (--g_unitSyncMapNilRefs == 0) {
+            operator delete(g_unitSyncMapNil);
+            g_unitSyncMapNil = nullptr;
+        }
+    }
+}
+
+void UnitSyncMap::Erase(UnitSyncNode* x)
+{
+    std::_Lockit lock;
+    for (UnitSyncNode* y = x; y != g_unitSyncMapNil; x = y) {
+        Erase(y->right);
+        y = y->left;
+        operator delete(x);
+    }
 }
 
 typedef std::list<int> List_0046fac0;
@@ -1352,7 +1263,7 @@ UnitSyncNode* UnitSyncMap::LowerBound(const unsigned int* key)
     std::_Lockit lock;
     UnitSyncNode* x = _Head->parent;
     UnitSyncNode* y = _Head;
-    while (x != DAT_0051e598)
+    while (x != g_unitSyncMapNil)
         if (key_compare(x->key, *key))
             x = x->right;
         else
@@ -1425,7 +1336,7 @@ AssignFn_0046faf0 g_assign_0046faf0 = &Vec_0046faf0::operator=;
 void __fastcall FinishUnitSync()
 {
     ((UnitSync *)g_game->sync)->ApplyToUnitTypes();
-    delete (UnitSyncDeleter *)(UnitSync *)g_game->sync;
+    delete (UnitSync *)g_game->sync;
     (*(UnitSync **)&g_game->sync) = 0;
 }
 

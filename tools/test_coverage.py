@@ -401,6 +401,45 @@ class SaturatedTest(unittest.TestCase):
         self.assertEqual((t.branches, t.branches_covered), (2, 1))
 
 
+class UnstableTest(unittest.TestCase):
+    RESET = ("UnitResources::Reset", "src/game/economy.cpp", "?Reset@UnitResources@@QAEXXZ")
+    REASON = "unstable: branches follow wall-clock sampling"
+
+    def totals(self, marked=True):
+        unstable = {("economy", *self.RESET): self.REASON} if marked else None
+        return cov.summarize(EXPORT, KEY, NAME, None, unstable)[0]
+
+    def test_marked_function_branches_are_left_out_of_the_totals(self):
+        plain, marked = self.totals(False)["economy"], self.totals()["economy"]
+        self.assertEqual((plain.branches, plain.branches_covered), (4, 1))
+        self.assertEqual((marked.branches, marked.branches_covered), (2, 0))
+        for attr in ("functions", "functions_entered", "lines", "lines_hit"):
+            self.assertEqual(getattr(marked, attr), getattr(plain, attr))
+        self.assertEqual(marked.unstable, [self.RESET])
+        self.assertEqual(self.totals()["units"], self.totals(False)["units"])
+
+    def test_csv_round_trip_keeps_the_marker(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "coverage.csv"
+            cov.write_csv(self.totals(), out)
+            lines = out.read_text().splitlines()
+            back = cov.read_csv(out)
+        row = "economy,UnitResources::Reset,src/game/economy.cpp,0,0,0,0,0,0,?Reset@UnitResources@@QAEXXZ,0," + self.REASON
+        self.assertIn(row, lines)
+        self.assertEqual(back["economy"].unstable, [self.RESET])
+        self.assertEqual(back["economy"].never_entered, self.totals()["economy"].never_entered)
+        self.assertEqual(cov.unstable_keys(back), {("economy", *self.RESET): self.REASON})
+
+    def test_unmatched_marker_is_an_error(self):
+        want = {("economy", *self.RESET): self.REASON}
+        self.assertEqual(cov.unmatched_unstable(want, self.totals()), "")
+        gone = {("economy", "Gone", "src/game/economy.cpp", "?Gone@@YAXXZ"): self.REASON}
+        text = cov.unmatched_unstable(gone, self.totals())
+        self.assertIn("1 unstable rows", text)
+        self.assertIn("economy Gone (src/game/economy.cpp) ?Gone@@YAXXZ", text)
+        self.assertTrue(cov.unmatched_unstable(want, self.totals(False)))
+
+
 class PlaySuiteTest(unittest.TestCase):
     def test_attempt_clears_the_scenarios_old_profiles(self):
         seen = []

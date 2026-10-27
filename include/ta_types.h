@@ -19,6 +19,7 @@
 #include "../interfaces/ref.h"
 #include "../src/graphics/rect.h"
 #include "../src/network/bit_reader.h"
+#include "../src/network/unit_sync.h"
 #include "../src/units/unit_type_set.h"
 #include "../src/debug/command_line.h"
 
@@ -8331,19 +8332,6 @@ public:
     Iter_0046e330 End(void);
     void SetUnitLimit(UnitDef*, int);
     Iter_0046e330 Find(unsigned int*);
-};
-
-class SyncTempTaggedVector {
-public:
-    std::vector<Elem_0046e5e0> vec;
-    SyncTempTaggedVector(Alloc_0046e5c0&);
-    ~SyncTempTaggedVector(void);
-    int FUN_00470270(void);
-    Elem_004702a0* begin(void);
-    Elem_004702a0* end(void);
-    static void burn(int);
-    void assign_first(SyncTempTaggedVector*, SyncTempTaggedVector*);
-    void assign_second(SyncTempTaggedVector*, SyncTempTaggedVector*);
 };
 
 struct SyncPlayerRecord {

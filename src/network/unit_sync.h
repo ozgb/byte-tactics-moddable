@@ -1,6 +1,8 @@
 #ifndef UNIT_SYNC_H
 #define UNIT_SYNC_H
 
+#include <vector>
+
 struct Unit_0046e330;
 struct UnitSyncEntry;
 struct UnitSyncPacket;
@@ -8,6 +10,15 @@ struct Target_0046d530;
 struct Source_0046d630;
 
 class UnitSync;
+
+struct Elem_0046e5e0;
+
+class SyncTempTaggedVector {
+public:
+    std::vector<Elem_0046e5e0> vec;
+
+    ~SyncTempTaggedVector();
+};
 
 void __stdcall ReportIntervalTimer(void);
 

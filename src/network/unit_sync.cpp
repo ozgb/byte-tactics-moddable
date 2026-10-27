@@ -252,6 +252,7 @@ struct Unit_0046e330 {
 
 #include "player.h"
 #include "player_info.h"
+#include "unit_sync.h"
 #include "unit_sync_state.h"
 
 extern UnitSyncNode* g_unitSyncMapNil;
@@ -1014,13 +1015,6 @@ struct Elem_0046e5e0 {
     int value;
 };
 
-class SyncTempTaggedVector {
-public:
-    std::vector<Elem_0046e5e0> vec;
-
-    ~SyncTempTaggedVector();
-};
-
 // FUNCTION: 0x46e5e0
 SyncTempTaggedVector::~SyncTempTaggedVector()
 {
@@ -1067,8 +1061,6 @@ UnitSyncIter UnitSyncMap::FindExact(const unsigned int& key)
 // FUNCTION: 0x46ff90 ?_Dec@iterator@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@QAEXXZ
 template class std::_Tree<unsigned int, std::pair<const unsigned int, UnitSyncEntry>, std::map<unsigned int, UnitSyncEntry>::_Kfn, std::less<unsigned int>, std::allocator<UnitSyncEntry> >;
 
-void __stdcall NopChecksumEntryDtor(int);
-
 namespace std {
 template<> inline void allocator<Elem_0046faf0>::destroy(Elem_0046faf0* p)
 {
@@ -1079,8 +1071,6 @@ template<> inline void allocator<Elem_0046faf0>::destroy(Elem_0046faf0* p)
 struct Elem_004702a0 {
     int unknown_0;
 };
-
-int* __stdcall CopyDwordRangeOverwrite(int* first, int* last, int* dest);
 
 class Class_00470250 : public std::vector<Elem_004702a0> {
 public:

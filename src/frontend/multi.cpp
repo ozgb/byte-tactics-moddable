@@ -775,7 +775,7 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../game/data_files.h"
 #include "../map/radar.h"
 #include "../util/registry.h"
-int __stdcall ReportGameEvent(int msg);
+#include "../network/unit_sync.h"
 #include "../map/map_list.h"
 #include "../gui/file_list.h"
 void __stdcall SetGadgetItems(void* gui, const char* name, void** items, int count);
@@ -795,7 +795,6 @@ void ShowSoftwareCursor();
 #include "../files/files_api.h"
 int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
 extern "C" __declspec(dllimport) char* __stdcall lstrcpynA(char*, const char*, int);
-void __stdcall CreateUnitSync(int param_1);
 void* __stdcall LoadPcx(char* path, int param_2);
 void __stdcall FrameFromSurface(void* dst, void* src);
 void* __stdcall FindGafEntry(void* gaf, const char* name);

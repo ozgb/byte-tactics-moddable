@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4447 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4433 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -21,7 +21,7 @@ The subsystems and the issue each maps to:
 | [features](#features) | 47 | #12 |
 | [ai](#ai) | 134 | #13 |
 | [pathfinding](#pathfinding) | 56 | #14 |
-| [weapons](#weapons) | 102 | #15 |
+| [weapons](#weapons) | 101 | #15 |
 | [targeting](#targeting) | 11 | #16 |
 | [los_radar](#los_radar) | 95 | #17 |
 | [orders](#orders) | 378 | #18 |
@@ -31,7 +31,7 @@ The subsystems and the issue each maps to:
 | [network](#the-remaining-subsystems) | 341 | none yet |
 | [game](#the-remaining-subsystems) | 211 | none yet |
 | [harness](#the-remaining-subsystems) | 162 | none yet |
-| [presentation](#the-remaining-subsystems) | 1415 | none yet |
+| [presentation](#the-remaining-subsystems) | 1402 | none yet |
 | [platform](#the-remaining-subsystems) | 731 | none yet |
 | [seams](#the-remaining-subsystems) | 103 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
@@ -317,7 +317,7 @@ Coverage: 93.8% of functions (45 of 48), 92.4% of lines, 86.7% of branches; 3 li
 
 ## weapons
 
-Issue #15. 102 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
+Issue #15. 101 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
 
 Coverage: 84.3% of functions (75 of 89), 84.6% of lines, 70.2% of branches; 14 live functions no scenario enters, and 17 more are dead (data/coverage.csv).
 
@@ -344,7 +344,7 @@ Coverage: 84.3% of functions (75 of 89), 84.6% of lines, 70.2% of branches; 14 l
 - features (2): `DamageFeature`, `GetFootprintCentre`
 - 6 smaller targets: los_radar (2), orders (2), targeting (2), economy (1), game (1), map (1)
 
-**Sim writes.** 204 items in all, 141 after leaving out the shared value types (Vec3, Point, Fixed) and per-file copies of a struct (names ending in an address). The most used:
+**Sim writes.** 203 items in all, 141 after leaving out the shared value types (Vec3, Point, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
 `Game::projectiles` (mixed, 18 fn); `WeaponDef::index` (sim, 11 fn); `Game::projectileCount` (mixed, 9 fn); `WeaponDef::speed` (sim, 9 fn); `WeaponFirePacket::aimOrVel` (sim, 9 fn); `WeaponFirePacket::weaponDefIndex` (sim, 8 fn); `Game::projCount` (sim, 7 fn); `WeaponFirePacket::origin` (sim, 7 fn); `WeaponFirePacket::targetUnitId` (sim, 7 fn); `WeaponFirePacket::type` (sim, 7 fn); `WeaponDef::holdTime` (sim, 6 fn); `WeaponFirePacket::fireHeading` (sim, 6 fn)
 
@@ -616,7 +616,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **harness** (162 functions). The test harness of #3 (`src/harness`). No phase root. 10 functions are called from outside; the busiest are `HarnessViewRand` (20), `HarnessTestMode` (4), `HarnessCrtSeed` (2). It imports 50 functions (presentation 5, map 3).
 
-**presentation** (1415 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 311 functions are called from outside, mostly by game (215 distinct functions); the busiest are `QueueUnitSpeech` (27), `PlaySoundByName` (18), `GetDisplay` (17). It imports 335 functions: platform 85, network 65, game 24, map 24, players 14. The reverse direction is the one to remove: 53 imports from presentation in the nine module subsystems, the largest in los_radar (18), weapons (16) and features (9).
+**presentation** (1402 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 311 functions are called from outside, mostly by game (215 distinct functions); the busiest are `QueueUnitSpeech` (27), `PlaySoundByName` (18), `GetDisplay` (17). It imports 335 functions: platform 85, network 65, game 24, map 24, players 14. The reverse direction is the one to remove: 53 imports from presentation in the nine module subsystems, the largest in los_radar (18), weapons (16) and features (9).
 
 **platform** (731 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (24 functions, set by `override`). No phase root. 290 functions are called from outside, by game (88 distinct functions), presentation (85), units (56) and map (36); the busiest are `operator new` (138), `GameFreeThunk` (134), `operator delete` (104), then `Translate` (84) and `RandomInt` (60). It imports 170 functions: game 67, presentation 44.
 

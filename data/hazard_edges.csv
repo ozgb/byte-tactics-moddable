@@ -917,7 +917,7 @@ PackedPosGoal::~PackedPosGoal,RingApproach::Destroy,"delete of an OrderFx, slot 
 ParalyzeOrder,ClaimWeaponsNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::ClaimWeapons, ParalyzeOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
 ParalyzeOrder,ClearWeaponTarget,"seam slot filled by InstallNativeSeams, TargetingSeam::ClearWeaponTarget, ParalyzeOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
 ParalyzeOrder,SetStateBitsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::SetStateBits, ParalyzeOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
-ParticleLists::Add,ParticleSystem::~ParticleSystem,"delete of a ParticleSystem, slot 0; the derived particle systems have implicit destructors that run ParticleSystem::~ParticleSystem, delete (src/graphics/particles.cpp)"
+ParticleLists::AddToList,ParticleSystem::~ParticleSystem,"delete of a ParticleSystem, slot 0; the derived particle systems have implicit destructors that run ParticleSystem::~ParticleSystem, delete (src/graphics/particles.cpp)"
 ParticleLists::~ParticleLists,ParticleSystem::~ParticleSystem,"delete of a ParticleSystem, slot 0; the derived particle systems have implicit destructors that run ParticleSystem::~ParticleSystem, delete (src/graphics/particles.cpp)"
 PathOrder::Destroy,UnitRefUnlinkNative,"seam slot filled by InstallNativeSeams, UnitsSeam::UnitRefUnlink, src/orders/order_targets.cpp, src/seams/native.cpp"
 PathOrder::FillWorldPos,GetPiecePosition,"seam slot filled by InstallNativeSeams, UnitsSeam::GetPiecePosition, PathOrder::FillWorldPos (src/orders/order_targets.cpp), src/seams/native.cpp"

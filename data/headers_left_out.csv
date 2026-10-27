@@ -169,9 +169,7 @@ GetDisplayModes,mismatch,placeholder type ModeList_004b5330: left for the type-n
 GetEnergyIncome,mismatch,pointer/int cast: definition's type is likely wrong
 GetEnergyUsage,mismatch,pointer/int cast: definition's type is likely wrong
 GetFactoriesInRadius,skip,qualified name std::vector
-GetFootprintHeight,mismatch,placeholder type Unit_0047d820: left for the type-naming issues
 GetGadgetActiveByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
-GetGadgetName,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
 GetGadgetStatus,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 GetGadgetText,mismatch,fixing it changes the generated code of a caller
 GetGafFrame,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"

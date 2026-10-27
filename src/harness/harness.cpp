@@ -733,6 +733,13 @@ static void CheckScenario()
     }
 }
 
+static void FailReadScenario(const char* path)
+{
+    char msg[700];
+    sprintf(msg, "testmode: cannot read scenario file %s\n", path);
+    Fail(msg);
+}
+
 static int FileHasLoadLine(FILE* f)
 {
     char line[512];
@@ -746,7 +753,7 @@ static int FileHasLoadLine(FILE* f)
         found = strncmp(key, "load", 4) == 0 && (key[4] == ' ' || key[4] == '\t' || key[4] == '\r' || key[4] == '\n' || key[4] == '\0');
     }
     if (fseek(f, 0, SEEK_SET) != 0)
-        Fail("testmode: cannot rewind the scenario file\n");
+        return -1;
     return found;
 }
 
@@ -755,12 +762,11 @@ static void ReadScenario(const char* path)
     char line[512];
     InitPlayerSpecs();
     FILE* f = fopen(path, "r");
-    if (f == NULL) {
-        char msg[700];
-        sprintf(msg, "testmode: cannot read scenario file %s\n", path);
-        Fail(msg);
-    }
+    if (f == nullptr)
+        FailReadScenario(path);
     s_loadAhead = FileHasLoadLine(f);
+    if (s_loadAhead < 0)
+        FailReadScenario(path);
     int lineNo = 0;
     while (fgets(line, sizeof line, f) != NULL) {
         lineNo++;

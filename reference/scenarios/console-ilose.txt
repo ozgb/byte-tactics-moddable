@@ -1,0 +1,13 @@
+# The ilose console command on The Pass: the local side loses its units and the game ends at tick 30; 100 ticks.
+game_seed 456
+crt_seed 1456
+view_seed 2456
+map The Pass
+start_positions fixed
+ticks 100
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +now Film Chris Include Reload Assert
+console 30 +ilose

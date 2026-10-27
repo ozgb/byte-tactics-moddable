@@ -473,6 +473,7 @@ game,harness,shared_write,Game::mode_391f1,1
 game,harness,shared_write,Game::numPlayers,2
 game,harness,shared_write,Game::playerIndex,1
 game,harness,shared_write,Game::ticks,1
+game,harness,shared_write,Game::uiOptionFlags,1
 game,harness,shared_write,LoadFlags_00497f40::value,1
 game,harness,shared_write,Player::allied,1
 game,los_radar,indirect,FreeMapResources,1
@@ -1101,6 +1102,7 @@ harness,files,call,HapiBank::GetStringItem,1
 harness,files,call,HapiBank::OpenAccount,1
 harness,files,call,MakeDirectoryPath,1
 harness,game,call,ApplySlotsToGamePlayers,1
+harness,game,call,ExecuteCommandLine,1
 harness,game,call,FreeSummaryBank,1
 harness,game,call,GameHoldrand,1
 harness,game,call,OpenHapiBank,1
@@ -3021,6 +3023,7 @@ presentation,game,shared_write,Vec3::z,2
 presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::numPlayers,2
+presentation,harness,shared_write,Game::uiOptionFlags,1
 presentation,harness,shared_write,MissionType::index,1
 presentation,harness,shared_write,Player::allied,1
 presentation,harness,shared_write,Player::alliedBy,1
@@ -3643,8 +3646,12 @@ seams,game,shared_write,WindMeteorsSeam::UpdateMeteors,1
 seams,game,shared_write,WindMeteorsSeam::UpdateWind,1
 seams,game,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 seams,harness,shared_write,AiSeam::SetUnitSquad,1
+seams,harness,shared_write,FeaturesSeam::GetCellFeature,1
+seams,harness,shared_write,LosRadarSeam::GetMapCell,1
 seams,harness,shared_write,MapSeam::SnapWorldPosToFootprint,1
 seams,harness,shared_write,Seams::ai,1
+seams,harness,shared_write,Seams::features,1
+seams,harness,shared_write,Seams::los_radar,1
 seams,harness,shared_write,Seams::map,1
 seams,harness,shared_write,Seams::units,1
 seams,harness,shared_write,UnitsSeam::CreateUnit,1

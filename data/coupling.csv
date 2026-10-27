@@ -974,7 +974,7 @@ harness,map,call,Mission::CountStartPositions,1
 harness,map,call,Mission::GetCampaignName,1
 harness,map,call,Mission::LoadCampaign,2
 harness,map,call,Mission::LoadMissionByName,2
-harness,map,call,SetMissionType,2
+harness,map,call,SetMissionType,1
 harness,map,call,SnapWorldPosToFootprint,1
 harness,map,shared_write,Game::difficulty,1
 harness,map,shared_write,Game::playerIndex,1
@@ -2532,7 +2532,7 @@ presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,MissionType::index,1
 presentation,harness,shared_write,g_explodedPieces,1
-presentation,harness,shared_write,g_game,10
+presentation,harness,shared_write,g_game,12
 presentation,los_radar,call,BuildFogTiles,1
 presentation,los_radar,call,CalcRadarViewportRect,1
 presentation,los_radar,call,GetMapCell,1

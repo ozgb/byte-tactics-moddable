@@ -391,6 +391,16 @@ class DeadTest(unittest.TestCase):
             self.assertEqual(cov.read_live_counters(out), {"?A@@YAXXZ", "file.cpp_?B@@YAXXZ"})
 
 
+class SaturatedTest(unittest.TestCase):
+    def test_saturated_branch_count_is_not_covered(self):
+        saturated = (1 << 63) - 1
+        export = {"data": [{"functions": [entry("?Reset@UnitResources@@QAEXXZ", "src/game/economy.cpp", 4,
+                                                [region(10, 1, 14, 2, 4)],
+                                                [[11, 5, 11, 9, 3, saturated, 0, 9, 4]])]}]}
+        t = cov.summarize(export, KEY, NAME)[0]["economy"]
+        self.assertEqual((t.branches, t.branches_covered), (2, 1))
+
+
 class PlaySuiteTest(unittest.TestCase):
     def test_attempt_clears_the_scenarios_old_profiles(self):
         seen = []

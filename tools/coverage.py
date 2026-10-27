@@ -44,6 +44,10 @@ the counter of a function inlined into a kept function is there, though the func
 counter of a function in a section nothing reaches is not. A function that is neither entered nor live is
 dead. Of the copies of a source function, it is dead when all are.
 
+Saturated counts. A branch side whose count is 2^62 or more is not covered: clang's profile counters are
+not atomic, so two threads can lose an update, and llvm-cov then reports the other side as a count that
+underflowed to 2^63-1.
+
 data/coverage.csv: columns subsystem, function, file, functions, functions_entered, lines, lines_hit,
 branches, branches_covered, decorated, dead, reason. One totals row per subsystem (function `*`, file and decorated
 empty, dead the number of dead functions, every other count over live functions only), one row per live
@@ -90,6 +94,7 @@ SORTED = ("files", "game", "network")
 METRICS = (("functions", "functions", "functions_entered"), ("lines", "lines", "lines_hit"),
            ("branches", "branches", "branches_covered"))
 CODE_REGION = 0
+SATURATED = 1 << 62
 REGION_FILE_ID = 5
 REGION_KIND = 7
 BRANCH_FILE_ID = 6
@@ -220,7 +225,7 @@ def parse_function(entry: dict) -> Copy | None:
     if rel is None:
         return None
     primary = {i for i, n in enumerate(names) if n == names[0]}
-    sides = {tuple(b[:4]): (b[4] > 0, b[5] > 0) for b in entry.get("branches", []) if b[BRANCH_FILE_ID] in primary}
+    sides = {tuple(b[:4]): (0 < b[4] < SATURATED, 0 < b[5] < SATURATED) for b in entry.get("branches", []) if b[BRANCH_FILE_ID] in primary}
     return Copy(decorated_name(entry["name"]), plain_name(entry["name"]), rel, entry.get("count", 0) > 0,
                 region_lines(entry.get("regions", []), primary), sides, counter_name(entry["name"]))
 

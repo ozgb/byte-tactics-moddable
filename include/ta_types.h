@@ -1433,7 +1433,6 @@ struct Map_00458fa0;
 struct Map_004658e0;
 class Map_0046d6c0;
 class Map_0046e280;
-struct Map_004745e0;
 class Map_004b2540;
 class Map_004c3e40;
 class Map_004df380;
@@ -7722,12 +7721,6 @@ struct Pic_4665d0 {
 struct IconSet_00466780 {
     int count;
     unsigned char* data;
-};
-
-struct Map_004745e0 {
-    char unknown_0[124];
-    ByteMap_00408090 explored;
-    char unknown_88[195];
 };
 
 union FlagWord {

@@ -493,29 +493,6 @@ public:
                               int alt);
 };
 
-struct MapSize_004745e0 {
-    unsigned int width;
-    unsigned int height;
-
-    int Contains(int col, int row)
-    {
-        return (unsigned int)col < width && (unsigned int)row < height;
-    }
-};
-
-struct ByteMap_004745e0 {
-    Ref<unsigned char> data;
-    MapSize_004745e0 size;
-
-    unsigned char Get(int tx, int ty) { return data[size.width * ty + tx]; }
-};
-
-struct Map_004745e0 {
-    char unknown_0[0x7c];
-    ByteMap_004745e0 explored;
-    char unknown_88[0x14b - 0x88];
-};
-
 #pragma pack(pop)
 
 extern Game* g_game;
@@ -544,31 +521,23 @@ static inline int IsSeen(Player* p, Player* q, int col, int row)
 
 static inline int Identity(int v) { return v; }
 
-static inline int IsSeen_004745e0(Map_004745e0* p, Map_004745e0* q, int col, int row)
-{
-    if (!p->explored.size.Contains(col, row))
-        return 0;
-    return (g_game->visibilityMask[q->explored.size.width * row + col] &
-            (1 << g_game->playerIndex)) != 0;
-}
-
 inline int Pos_004745e0::Visible()
 {
-    Map_004745e0* p = &(*(Map_004745e0 (*)[10])&g_game->players)[g_game->playerIndex];
-    Map_004745e0* p2 = &(*(Map_004745e0 (*)[10])&g_game->players)[g_game->playerIndex];
+    Player* p = &g_game->players[g_game->playerIndex];
+    Player* p2 = &g_game->players[g_game->playerIndex];
     int visible;
     if ((g_game->mapFlags & 2) == 2) {
         int col = x >> 5;
         int row = (y - (height >> 1)) >> 5;
-        if (p->explored.size.Contains(col, row) &&
-            p->explored.Get(col, row) != 0)
+        if (InsideExplored(p, col, row) &&
+            p->explored[p2->exploredWidth * row + col] != 0)
             visible = 1;
         else
             visible = 0;
     } else {
         int col = x >> 5;
         int row = (y - (height >> 1)) >> 5;
-        visible = Identity(IsSeen_004745e0(p, p2, col, row));
+        visible = Identity(IsSeen(p, p2, col, row));
     }
     return visible;
 }

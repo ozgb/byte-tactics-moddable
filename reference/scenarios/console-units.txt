@@ -1,0 +1,30 @@
+# Console unit commands on The Pass: unit names typed alone, the cursor move, the unit reload, the kill commands and the damage toggles; 300 ticks.
+game_seed 453
+crt_seed 1453
+view_seed 2453
+map The Pass
+start_positions fixed
+ticks 300
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +now Film Chris Include Reload Assert
+console 12 +move 3 2
+console 12 +armpw 0
+console 14 +corak 1
+console 40 +move -3 -2
+console 40 +armflea 0
+console 50 +selectable
+console 60 +shootall
+console 70 +doubleshot
+console 80 +halfshot
+console 90 +drop 1
+console 100 +search 20 1.5
+console 110 +edge 10 10
+console 120 +armpw 1
+console 130 +assign stop
+console 140 +reload armpw
+console 150 +kill 1
+console 160 +armpw 1
+console 170 +kill

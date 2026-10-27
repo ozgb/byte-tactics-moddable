@@ -1,0 +1,25 @@
+# Console sight commands on The Pass: line of sight, its type, mapping, radar and the sight reset, then the AI toggle and the AI profile reload; 200 ticks.
+game_seed 454
+crt_seed 1454
+view_seed 2454
+map The Pass
+start_positions fixed
+ticks 200
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +now Film Chris Include Reload Assert
+console 10 +los
+console 20 +los
+console 30 +lostype
+console 40 +lostype
+console 50 +mapping
+console 60 +mapping
+console 70 +radar
+console 80 +radar
+console 90 +nowisee
+console 100 +ai 1
+console 110 +reloadaiprofiles
+console 130 +view 1
+console 140 +atm

@@ -1,0 +1,22 @@
+# Console features on The Pass: place, burn and kill trees, a meteor shower and meteors on and off, and the sea level; 300 ticks.
+game_seed 452
+crt_seed 1452
+view_seed 2452
+map The Pass
+start_positions fixed
+ticks 300
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +now Film Chris Include Reload Assert
+console 10 +feature Tree1
+console 20 +feature smudge01
+console 40 +burnone
+console 50 +feature Tree1
+console 60 +treedeath
+console 70 +meteor
+console 90 +burnall
+console 100 +meteor 1
+console 150 +meteor 0
+console 160 +sealevel 20

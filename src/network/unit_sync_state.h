@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-struct Unit_0046e330;
+struct UnitSyncDef;
 struct Target_0046d530;
 struct Source_0046d630;
 
@@ -239,11 +239,11 @@ public:
     int AllPlayersSynced();
     int IsPlayerSynced(int id);
     int PopChangedEntry(UnitSyncEntry* out);
-    int GetUnitEntry(Unit_0046e330* unit, UnitSyncEntry* out);
-    int ToggleUnitAllowed(Unit_0046e330* unit);
-    int DisallowUnit(Unit_0046e330* unit);
-    int AllowUnit(Unit_0046e330* unit);
-    void SetUnitLimit(Unit_0046e330* unit, int value);
+    int GetUnitEntry(UnitSyncDef* unit, UnitSyncEntry* out);
+    int ToggleUnitAllowed(UnitSyncDef* unit);
+    int DisallowUnit(UnitSyncDef* unit);
+    int AllowUnit(UnitSyncDef* unit);
+    void SetUnitLimit(UnitSyncDef* unit, int value);
     void ApplyToUnitTypes();
     void ResetEntries();
 };

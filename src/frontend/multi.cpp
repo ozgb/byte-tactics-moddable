@@ -17,7 +17,6 @@ struct GameOptionsView;
 struct PlayerInfo;
 struct UnitDefView;
 struct Logos_00445110;
-class UnitSync;
 
 #pragma pack(push, 1)
 
@@ -605,35 +604,6 @@ struct UnitDefView {
     } flags2;
 };
 
-struct Event_44c220 {
-    int fbiChecksum;
-    int field_4;
-    short enabled;
-    short peerEnabled;
-    int max;
-};
-
-struct Info_0044c7e0 {
-    char unknown_0[0xa];
-    short peerEnabled;
-    int max;
-};
-
-class UnitSync {
-public:
-    int SendAllQueued(int value);
-    int IsPlayerSynced(int id);
-    int AllPlayersSynced();
-    void ProcessSync();
-    char* GetSyncStatusText();
-    void CheckUnitAvailable(unsigned int, int);
-    int PopChangedEntry(Event_44c220* event);
-    void SetUnitLimit(UnitDefView* unit, int value);
-    int DisallowUnit(UnitDefView* unit);
-    int AllowUnit(UnitDefView* unit);
-    int GetUnitEntry(UnitDefView* type, Info_0044c7e0* out);
-};
-
 struct GameOptionsView {
     char unknown_0[0x118];
     int fixedloc;
@@ -776,6 +746,7 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../map/radar.h"
 #include "../util/registry.h"
 #include "../network/unit_sync.h"
+#include "../network/unit_sync_state.h"
 #include "../map/map_list.h"
 #include "../gui/file_list.h"
 void __stdcall SetGadgetItems(void* gui, const char* name, void** items, int count);
@@ -4037,7 +4008,7 @@ void __stdcall HandleUnitCountSlider(void* obj, char* gadget)
     }
     g_unitRestrictEntries[n + desc->firstRow].max = value;
     ((UnitSync *)g_game->sync)->SetUnitLimit(
-        &((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
+        (UnitSyncDef *)&((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
     desc->flags[n + desc->firstRow] = g_unitRestrictEntries[n + desc->firstRow].peerEnabled == 0;
     desc->flags[n + desc->firstRow] |= g_unitRestrictEntries[n + desc->firstRow].max == 0 ? 2 : 0;
     SetTranslatedTextByName(obj, count, (char*)buf, 0);
@@ -4115,7 +4086,7 @@ void LoadUnitPortrait()
 // FUNCTION: 0x44c220
 void UnitRestrictDialogFrame()
 {
-    Event_44c220 event;
+    UnitSyncEntry event;
     int n = 0;
     Gadget* entry = (Gadget*)FindGadgetChecked(g_game->gui.layer->entries, "PICLIST");
 
@@ -4127,11 +4098,11 @@ void UnitRestrictDialogFrame()
     while (((UnitSync *)g_game->sync)->PopChangedEntry(&event) != 0) {
         n++;
         for (int i = 0; i < entry->list.count; i++) {
-            if (event.fbiChecksum == ((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
-                entry->flags[i] = (event.peerEnabled == 0);
-                g_unitRestrictEntries[i].peerEnabled = event.peerEnabled;
-                g_unitRestrictEntries[i].max = event.max;
-                entry->flags[i] |= (event.max != 0) ? 0 : 2;
+            if (event.x == ((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
+                entry->flags[i] = (event.h == 0);
+                g_unitRestrictEntries[i].peerEnabled = event.h;
+                g_unitRestrictEntries[i].max = event.limit;
+                entry->flags[i] |= (event.limit != 0) ? 0 : 2;
             }
         }
     }
@@ -4234,17 +4205,17 @@ void OpenUnitRestrictions()
             continue;
         {
             UnitDefView* type = &((UnitDefView *)g_game->defs.get())[i];
-            Info_0044c7e0 info;
+            UnitSyncEntry info;
             int count;
             sprintf(g_unitRestrictEntries[n].name, "%s\r%s %dM  %dE",
                     ((UnitDefView *)g_game->defs.get())[i].unitName, Translate(type->description),
                     (int)type->metalCost, (int)type->energyCost);
             g_unitRestrictEntries[n].unitIndex = i;
-            ((UnitSync *)g_game->sync)->GetUnitEntry(&((UnitDefView *)g_game->defs.get())[i], &info);
-            count = info.max == -1 ? 0x65 : info.max;
+            ((UnitSync *)g_game->sync)->GetUnitEntry((UnitSyncDef *)&((UnitDefView *)g_game->defs.get())[i], &info);
+            count = info.limit == -1 ? 0x65 : info.limit;
             g_unitRestrictEntries[n].max = count;
             g_unitRestrictOldCounts[n] = count;
-            g_unitRestrictEntries[n].peerEnabled = info.peerEnabled;
+            g_unitRestrictEntries[n].peerEnabled = info.h;
             n++;
         }
     }
@@ -4802,9 +4773,9 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
                     if (item->flags2.bits.flag) {
                     } else {
                         if (g_unitRestrictEntries[i].max == 0)
-                            ((UnitSync *)g_game->sync)->DisallowUnit(item);
+                            ((UnitSync *)g_game->sync)->DisallowUnit((UnitSyncDef *)item);
                         else
-                            ((UnitSync *)g_game->sync)->AllowUnit(item);
+                            ((UnitSync *)g_game->sync)->AllowUnit((UnitSyncDef *)item);
                     }
                 }
             }
@@ -4842,7 +4813,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
                     g_unitRestrictEntries[i].max = 0;
                 if (g_unitRestrictEntries[i].max != g_unitRestrictEntries[i].previousMax) {
                     ((UnitSync *)g_game->sync)->SetUnitLimit(
-                        &((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex],
+                        (UnitSyncDef *)&((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex],
                         g_unitRestrictEntries[i].max);
                 }
             }
@@ -4863,7 +4834,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
             if (((UnitDefView *)g_game->defs.get())[i].flags2.bits.flag) {
             } else if (((UnitDefView *)g_game->defs.get())[i].name != nullptr) {
                 ((UnitSync *)g_game->sync)->SetUnitLimit(
-                    &((UnitDefView *)g_game->defs.get())[i], g_unitRestrictOldCounts[n]);
+                    (UnitSyncDef *)&((UnitDefView *)g_game->defs.get())[i], g_unitRestrictOldCounts[n]);
                 n++;
             }
         }

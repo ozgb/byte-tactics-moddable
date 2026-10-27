@@ -243,7 +243,7 @@ void FUN_0046c8d0(void)
 }
 
 #pragma pack(push, 1)
-struct Unit_0046e330 {
+struct UnitSyncDef {
     char unknown_0[0x13e];
     unsigned int key;
 };
@@ -948,14 +948,14 @@ int UnitSync::PopChangedEntry(UnitSyncEntry* out)
 }
 
 // FUNCTION: 0x46e330
-int UnitSync::GetUnitEntry(Unit_0046e330* unit, UnitSyncEntry* out)
+int UnitSync::GetUnitEntry(UnitSyncDef* unit, UnitSyncEntry* out)
 {
     *out = Find(&unit->key).ptr->value;
     return out->w != 0 && out->h != 0;
 }
 
 // FUNCTION: 0x46e3c0
-int UnitSync::ToggleUnitAllowed(Unit_0046e330* unit)
+int UnitSync::ToggleUnitAllowed(UnitSyncDef* unit)
 {
     UnitSyncNode* n = Find(&unit->key).ptr;
     n->value.w = (n->value.w == 0);
@@ -964,7 +964,7 @@ int UnitSync::ToggleUnitAllowed(Unit_0046e330* unit)
 }
 
 // FUNCTION: 0x46e450
-int UnitSync::DisallowUnit(Unit_0046e330* unit)
+int UnitSync::DisallowUnit(UnitSyncDef* unit)
 {
     UnitSyncNode* n = Find(&unit->key).ptr;
     n->value.w = 0;
@@ -973,7 +973,7 @@ int UnitSync::DisallowUnit(Unit_0046e330* unit)
 }
 
 // FUNCTION: 0x46e4d0
-int UnitSync::AllowUnit(Unit_0046e330* unit)
+int UnitSync::AllowUnit(UnitSyncDef* unit)
 {
     UnitSyncNode* n = Find(&unit->key).ptr;
     n->value.w = 1;
@@ -982,7 +982,7 @@ int UnitSync::AllowUnit(Unit_0046e330* unit)
 }
 
 // FUNCTION: 0x46e550
-void UnitSync::SetUnitLimit(Unit_0046e330* unit, int value)
+void UnitSync::SetUnitLimit(UnitSyncDef* unit, int value)
 {
     UnitSyncIter it = Find(&unit->key);
     if (!(it == End())) {

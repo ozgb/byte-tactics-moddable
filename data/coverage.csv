@@ -332,7 +332,7 @@ map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetP
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
 map,Vector_00438480::~Vector_00438480,src/map/vector_00438480.h,1,0,0,0,0,0,??1?$Vector_00438480@HV?$allocator@H@std@@@@QAE@XZ,0,
 map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVVisitor_0047e750@@@Z,1,
-network,*,,297,44,5311,485,2586,88,,70,
+network,*,,298,44,5319,485,2588,88,,70,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,1,
 network,??$copy@PBUElem_0046faf0@@PAU1@@std@@YGPAUElem_0046faf0@@PBU1@0PAU1@@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PBUElem_0046faf0@@PAU1@@std@@YGPAUElem_0046faf0@@PBU1@0PAU1@@Z,0,menu
@@ -363,6 +363,7 @@ network,AddNetPlayer,src/network/net_game.cpp,1,0,0,0,0,0,?AddNetPlayer@@YGHH@Z,
 network,AreAllPlayersReady,src/network/net_game.cpp,1,0,0,0,0,0,?AreAllPlayersReady@@YGHXZ,0,menu
 network,AssignPlayerColor,src/network/net_game.cpp,1,0,0,0,0,0,?AssignPlayerColor@@YGHHHH@Z,0,network
 network,AssignStartPositions,src/network/net_game.cpp,1,0,0,0,0,0,?AssignStartPositions@@YGHXZ,0,network
+network,BitReader::ReadBit,src/network/bit_reader.h,1,0,0,0,0,0,?ReadBit@BitReader@@QAEHXZ,0,network
 network,BitReader::ReadBits,src/network/net_stats.cpp,1,0,0,0,0,0,?ReadBits@BitReader@@QAEHH@Z,0,network
 network,BitReader::ReadSignedBits,src/network/net_stats.cpp,1,0,0,0,0,0,?ReadSignedBits@BitReader@@QAEHH@Z,0,network
 network,BitWriter::BitWriter,src/network/net_stats.cpp,1,0,0,0,0,0,??0BitWriter@@QAE@XZ,0,network
@@ -656,7 +657,7 @@ network,Vec_0046d6c0::size,src/network/unit_sync.cpp,1,0,0,0,0,0,?size@Vec_0046d
 network,Vec_0046d860::Push,src/network/unit_sync_46dad0.cpp,1,0,0,0,0,0,?Push@Vec_0046d860@@QAEXABUSyncPlayerRecord@@@Z,0,menu
 network,Wrap_0046e5e0::Wrap_0046e5e0,src/network/unit_sync_46dad0.cpp,1,0,0,0,0,0,??0Wrap_0046e5e0@@QAE@ABUAlloc_0046e5c0@@@Z,0,menu
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UElem_0046faf0@@@std@@QAEXPAUElem_0046faf0@@@Z,0,menu
-orders,*,,369,306,6457,5119,3188,1962,,26,
+orders,*,,368,306,6449,5119,3186,1962,,26,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,AiSearchGoal::HasNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,
 orders,AiSearchGoal::SerializeNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,
@@ -672,7 +673,6 @@ orders,Angle,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Angle@@YGFPAUVec3@@0@Z,1,
 orders,ApproachRadius::ApproachRadius,src/orders/order_targets.cpp,1,0,0,0,0,0,??0ApproachRadius@@QAE@HPAVHapiBank@@PAD@Z,0,
 orders,ApproachRadius::GetType,src/orders/order_targets.cpp,1,0,0,0,0,0,?GetType@ApproachRadius@@UAEHXZ,0,
 orders,ApproachRadius::Serialize,src/orders/order_targets.cpp,1,0,0,0,0,0,?Serialize@ApproachRadius@@QAEHHPAVHapiBank@@PAD@Z,0,
-orders,BitReader::ReadBit,src/orders/order_targets.cpp,1,0,0,0,0,0,?ReadBit@BitReader@@QAEHXZ,0,
 orders,ClearOrderTypeTable,src/orders/order_list.cpp,1,0,0,0,0,0,?ClearOrderTypeTable@@YGXXZ,0,
 orders,ClearTargets_0043b7c0,src/orders/order_list.cpp,1,0,0,0,0,0,?ClearTargets_0043b7c0@@YGXPAUUnit@@@Z,0,
 orders,CopyDwordRangeUnchecked,src/orders/order_targets.cpp,0,0,0,0,0,0,?CopyDwordRangeUnchecked@@YGPAUPoint16@@PAU1@00@Z,1,

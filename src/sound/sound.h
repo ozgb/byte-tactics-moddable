@@ -5,7 +5,9 @@ struct Unit;
 struct Unit;
 
 struct FileHandle;
-struct Pos_004cf570;
+struct Pos_004cf570 {
+    int x, y, z;
+};
 struct HWND__;
 
 class Sound {

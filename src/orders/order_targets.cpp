@@ -144,23 +144,7 @@ struct PathOrderRecord {
 
 #pragma pack(pop)
 
-class BitReader {
-public:
-    unsigned int* data;
-    int index;
-    int bit;
-    int ReadBits(int bits);
-
-    int ReadBit()
-    {
-        int r = (data[index] & (1 << bit)) != 0;
-        if (++bit == 32) {
-            bit = 0;
-            index++;
-        }
-        return r;
-    }
-};
+#include "../network/bit_reader.h"
 
 class Pathfinder;
 

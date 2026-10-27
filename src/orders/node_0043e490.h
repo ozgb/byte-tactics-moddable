@@ -68,4 +68,10 @@ struct Pos_0043e490 {
 };
 #pragma pack(pop)
 
+struct Limits_0043e490 {
+    char unknown_0[0xc0];
+    float fc0;
+    float fc4;
+};
+
 #endif

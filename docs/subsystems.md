@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4453 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4447 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -24,7 +24,7 @@ The subsystems and the issue each maps to:
 | [weapons](#weapons) | 102 | #15 |
 | [targeting](#targeting) | 11 | #16 |
 | [los_radar](#los_radar) | 95 | #17 |
-| [orders](#orders) | 379 | #18 |
+| [orders](#orders) | 378 | #18 |
 | [units](#the-remaining-subsystems) | 193 | none yet |
 | [players](#the-remaining-subsystems) | 144 | none yet |
 | [map](#the-remaining-subsystems) | 108 | none yet |
@@ -475,7 +475,7 @@ Coverage: 88.9% of functions (64 of 72), 82.8% of lines, 72.9% of branches; 8 li
 
 ## orders
 
-Issue #18. 379 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`, 14,000 lines). The largest subsystem.
+Issue #18. 378 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`, 14,000 lines). The largest subsystem.
 
 Coverage: 82.9% of functions (306 of 369), 79.3% of lines, 61.5% of branches; 63 live functions no scenario enters, and 26 more are dead (data/coverage.csv).
 
@@ -500,7 +500,7 @@ Coverage: 82.9% of functions (306 of 369), 79.3% of lines, 61.5% of branches; 63
 - `ApproachRadius::ApproxDistExcess` (3 from pathfinding)
 - By calling subsystem (functions called): units 21, pathfinding 16, presentation 13, ai 6, game 6, map 3
 
-**Imports.** 94 functions of 13 subsystems, by target, each with the number of functions it calls there:
+**Imports.** 95 functions of 13 subsystems, by target, each with the number of functions it calls there:
 
 - units (26): `GetHeadingBetween`, `Unit::SetStateBits`, `AttachUnitToPiece`, `GetNanoPiecePosition`, and 22 more
 - platform (11): `operator new`, `RandomInt`, `operator delete`, `HapiBank::OpenNamedBox`, and 7 more
@@ -511,7 +511,7 @@ Coverage: 82.9% of functions (306 of 369), 79.3% of lines, 61.5% of branches; 63
 - targeting (6): `SetWeaponTargetUnit`, `FindBestTargetIfFireAtWill`, `ClearWeaponTarget`, `GetWeaponTargetUnit`, and 2 more
 - 6 smaller targets: ai (5), features (3), los_radar (3), economy (1), pathfinding (1), players (1)
 
-**Sim writes.** 129 items in all, 114 after leaving out the shared value types (Vec3, Point, Fixed) and per-file copies of a struct (names ending in an address). The most used:
+**Sim writes.** 127 items in all, 114 after leaving out the shared value types (Vec3, Point, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
 `Order::flags` (mixed, 95 fn, also written by presentation); `Unit::pos` (mixed, 66 fn, also written by presentation, units); `Order::state` (sim, 52 fn); `Order::pos` (sim, 39 fn); `Order::next` (mixed, 37 fn); `PathOrderAttach::owner` (mixed, 30 fn); `Unit::flags` (mixed, 25 fn, also written by ai, game, los_radar, map, players, units, weapons); `Unit::health` (mixed, 20 fn, also written by game, players, units, weapons); `Unit::buildLeft` (mixed, 15 fn, also written by players, units); `Angles16::heading` (mixed, 12 fn, also written by game, presentation, units); `Order::unit` (mixed, 12 fn); `PathGoal::owner` (sim, 11 fn)
 
@@ -522,7 +522,7 @@ Coverage: 82.9% of functions (306 of 369), 79.3% of lines, 61.5% of branches; 63
 **Draft interface.**
 
 - Exports: 59 functions (`RunOrders`, `RunSecondaryOrders`, `AddOrder`, `DeleteOrders`, `GetOrderType`, `IssueAttackOrder`, `OrderType::GetTableEntry` (presentation), the `UnitMotion::` functions (13 in orders, 4 called from outside: `UpdateMotion`, `LoadMotion`, `SaveMotion`, `DestroyObject`), and the goal methods pathfinding calls).
-- Needs from seams: 94 functions in seams, units, platform, network, files, map, presentation, features, los_radar, weapons, targeting, ai, players.
+- Needs from seams: 95 functions in seams, units, platform, network, files, map, presentation, features, los_radar, weapons, targeting, ai, players.
 - Owns: 87 named sim items that only this subsystem writes, for example `Order::state`, `Order::pos`, `Order::next`, `PathOrderAttach::owner`, `Order::unit`.
 - Shares: 27 named sim items that other subsystems also write, for example `Order::flags`, `Unit::pos`, `Unit::flags`, `Unit::health`, `Unit::buildLeft`.
 - The units imports (26) are the unit lifecycle and geometry: `CreateUnit`, `SetUnitPosition`, `Unit::SetStateBits`, COB script calls and piece positions. Weapons (7) is mostly `Unit::ClaimWeapons` and `Unit::ReleaseWeapons`.

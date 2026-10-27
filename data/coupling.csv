@@ -1665,9 +1665,6 @@ network,map,shared_write,Game::numPlayers,1
 network,map,shared_write,Player::active,2
 network,map,shared_write,Player::type,2
 network,map,shared_write,g_packetManager,1
-network,orders,shared_write,BitReader::bit,1
-network,orders,shared_write,BitReader::data,1
-network,orders,shared_write,BitReader::index,1
 network,orders,shared_write,BitWriter::bit,1
 network,orders,shared_write,BitWriter::capacity,1
 network,orders,shared_write,BitWriter::data,1
@@ -1958,6 +1955,7 @@ orders,map,shared_write,Unit::pos,2
 orders,map,shared_write,Vec3::x,12
 orders,map,shared_write,Vec3::y,4
 orders,map,shared_write,Vec3::z,12
+orders,network,call,BitReader::ReadBit,1
 orders,network,call,BitReader::ReadBits,4
 orders,network,call,BitWriter::GrowBuffer,1
 orders,network,call,BitWriter::WriteBits,4
@@ -1967,8 +1965,6 @@ orders,network,call,Player::GetMetal,1
 orders,network,call,SendScriptCall,1
 orders,network,call,SendScriptCallByName,1
 orders,network,call,SendScriptCallNoArgs,2
-orders,network,shared_write,BitReader::bit,3
-orders,network,shared_write,BitReader::index,3
 orders,network,shared_write,BitWriter::bit,2
 orders,network,shared_write,BitWriter::index,2
 orders,network,shared_write,FeatureDamagePacket::sub,1
@@ -2098,8 +2094,6 @@ orders,units,indirect,SetUnitPosition,2
 orders,units,shared_write,Angles16::bank,6
 orders,units,shared_write,Angles16::heading,10
 orders,units,shared_write,Angles16::pitch,7
-orders,units,shared_write,BitReader::bit,1
-orders,units,shared_write,BitReader::index,1
 orders,units,shared_write,BitWriter::bit,2
 orders,units,shared_write,BitWriter::index,2
 orders,units,shared_write,Fixed::value,3
@@ -4223,9 +4217,6 @@ units,orders,indirect,RunSecondaryOrders,1
 units,orders,shared_write,Angles16::bank,1
 units,orders,shared_write,Angles16::heading,12
 units,orders,shared_write,Angles16::pitch,2
-units,orders,shared_write,BitReader::bit,1
-units,orders,shared_write,BitReader::data,1
-units,orders,shared_write,BitReader::index,1
 units,orders,shared_write,BitWriter::bit,1
 units,orders,shared_write,BitWriter::index,1
 units,orders,shared_write,Fixed::value,8

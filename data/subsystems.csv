@@ -3002,7 +3002,6 @@ Bar_004685a0,src/ingame/info_panel.cpp,presentation,presentation,
 BelowSeaLevel,src/orders/vtol_orders.cpp,orders,file:src/orders/,
 BindNamedSliderWithCallback_0044c7e0,src/frontend/multi.cpp,presentation,presentation,
 BitReader::ReadBit,src/network/bit_reader.h,network,file:src/network/,
-BitReader::ReadBit,src/orders/order_targets.cpp,orders,file:src/orders/,
 Bits::Test,src/ai/ai_player.cpp,platform,file:src/ai/,platform
 BlockMap::Begin,src/debug/debug_lib.cpp,platform,folder:src/debug/,
 BlockMap::End,src/debug/debug_lib.cpp,platform,folder:src/debug/,

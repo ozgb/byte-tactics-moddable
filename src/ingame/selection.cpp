@@ -18,11 +18,7 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int 
 #include "../units/unit_def.h"
 
 #include "../units/unit.h"
-
-class UnitTypeSet {
-public:
-    int bits[16];
-};
+#include "../units/unit_type_set.h"
 
 #include "../network/player.h"
 #include "../network/player_info.h"

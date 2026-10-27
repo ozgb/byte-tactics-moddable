@@ -17,10 +17,6 @@ extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void
 
 struct FileHandle;
 
-struct Pos_004cf570 {
-    int x, y, z;
-};
-
 #include "../files/files_api.h"
 
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));

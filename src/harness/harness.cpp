@@ -700,13 +700,16 @@ static int FileHasLoadLine(FILE* f)
 {
     char line[512];
     int found = 0;
+    if (f == NULL)
+        return found;
     while (!found && fgets(line, sizeof line, f) != NULL) {
         const char* key = line;
         while (*key == ' ' || *key == '\t')
             key++;
         found = strncmp(key, "load", 4) == 0 && (key[4] == ' ' || key[4] == '\t' || key[4] == '\r' || key[4] == '\n' || key[4] == '\0');
     }
-    rewind(f);
+    if (fseek(f, 0, SEEK_SET) != 0)
+        Fail("testmode: cannot rewind the scenario file\n");
     return found;
 }
 

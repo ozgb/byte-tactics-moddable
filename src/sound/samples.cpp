@@ -33,10 +33,6 @@ struct FileHandle;
 
 extern int g_playBufferLooping;
 
-struct Pos_004cf570 {
-    int x, y, z;
-};
-
 #include "../files/files_api.h"
 
 #include "samples.h"

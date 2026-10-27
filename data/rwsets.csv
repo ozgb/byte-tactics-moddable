@@ -43492,13 +43492,6 @@ address,function,file,kind,target
 ,BitReader::ReadBit,src/network/bit_reader.h,field_write,BitReader::bit
 ,BitReader::ReadBit,src/network/bit_reader.h,field_write,BitReader::index
 ,BitReader::ReadBit,src/network/bit_reader.h,function,
-,BitReader::ReadBit,src/orders/order_targets.cpp,deref_read,*unsigned int
-,BitReader::ReadBit,src/orders/order_targets.cpp,field_read,BitReader::bit
-,BitReader::ReadBit,src/orders/order_targets.cpp,field_read,BitReader::data
-,BitReader::ReadBit,src/orders/order_targets.cpp,field_read,BitReader::index
-,BitReader::ReadBit,src/orders/order_targets.cpp,field_write,BitReader::bit
-,BitReader::ReadBit,src/orders/order_targets.cpp,field_write,BitReader::index
-,BitReader::ReadBit,src/orders/order_targets.cpp,function,
 ,Bits::Test,src/ai/ai_player.cpp,deref_read,*unsigned int
 ,Bits::Test,src/ai/ai_player.cpp,field_read,Bits::words
 ,Bits::Test,src/ai/ai_player.cpp,function,

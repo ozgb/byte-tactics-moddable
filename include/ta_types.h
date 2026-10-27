@@ -17,6 +17,10 @@
 #include "../src/network/packet_receiver.h"
 #include "../src/network/packet_manager.h"
 #include "../interfaces/ref.h"
+#include "../src/graphics/rect.h"
+#include "../src/network/bit_reader.h"
+#include "../src/units/unit_type_set.h"
+#include "../src/debug/command_line.h"
 
 struct PlayerInfo;
 
@@ -2116,12 +2120,6 @@ union Word_0051f522;
 struct Wrap_00433270;
 struct Zero11_004917d0;
 
-struct Elem_00401000 {
-    int field_0;
-    Elem_00401000(void);
-    ~Elem_00401000(void);
-};
-
 class Obj_2 {
 public:
     char unknown_0[1];
@@ -2335,13 +2333,6 @@ struct Unit_00402fc0 {
 struct Obj_403010 {
     char unknown_0[146];
     Sub_403010* sub;
-};
-
-struct Sub_403010 {
-    char unknown_0[581];
-    unsigned int unused_bits : 2;
-    unsigned int flag : 1;
-    unsigned int unused_bits2 : 29;
 };
 
 struct Obj_403040 {
@@ -2624,12 +2615,6 @@ public:
     char* GetArg(int, char*);
     int FUN_004b73c0(int, int);
     void SubstituteArgs(Class_004b73c0*);
-};
-
-class UnitTypeSet {
-public:
-    int bits[16];
-    void AddTypeOrCategory(char*, int*);
 };
 
 class Class_004b7410 {
@@ -3290,16 +3275,6 @@ struct Class_00415da0 {
     void SetByteAt(int, unsigned char);
 };
 
-class BitReader {
-public:
-    unsigned int* data;
-    int index;
-    int bit;
-    int ReadBits(int);
-    int ReadSignedBits(int);
-    int ReadBit(void);
-};
-
 struct Pair_00419560 {
     unsigned int offset;
     int length;
@@ -3541,35 +3516,11 @@ public:
     void FUN_00417e00(void*);
 };
 
-class Iface_00417f30 {
-public:
-    virtual void Method_00(void);
-    virtual void Method_04(void);
-    virtual void Method_08(void);
-    virtual void Method_0c(void);
-    virtual void Method_10(void);
-    virtual void Method_14(void);
-    virtual void Method_18(void);
-    virtual void Method_1c(void);
-    virtual void Method_20(void);
-    virtual void Method_24(void);
-    virtual void Method_28(int);
-};
-
 struct Movement {
     char unknown_0[16];
     int width;
     char unknown_14[4];
     unsigned int* states;
-};
-
-struct Rect {
-    int left;
-    int top;
-    int right;
-    int bottom;
-    Rect(int, int, int, int);
-    Rect(void);
 };
 
 struct Flags_418ca0 {
@@ -3756,11 +3707,6 @@ class Class_004b4630 {
 public:
     Table_004b3630* table;
     int SetIntegerItem(char*, int);
-};
-
-struct FindData_0041d4c0 {
-    char unknown_0[20];
-    char name[260];
 };
 
 class Class_004c2f60 {
@@ -4331,18 +4277,6 @@ struct Model_00424c00 {
     Rot16 rot;
 };
 
-struct Map_00425b80 {
-    char unknown_0[12];
-    unsigned char* cells;
-};
-
-struct Display_00425d80 {
-    char unknown_0[240];
-    unsigned short bit0 : 1;
-    unsigned short fullscreen : 1;
-    unsigned short rest : 14;
-};
-
 struct Gadget_00426190 {
     char unknown_0[24];
     Dialog* owner;
@@ -4468,13 +4402,6 @@ struct Bitmap_00437b50 {
     unsigned short Pitch(void);
 };
 
-struct Pic_004295b0 {
-    int w;
-    int h;
-    int unknown;
-    char header[64];
-};
-
 struct AnimEntry_00429700 {
     char name[64];
     void* gaf;
@@ -4486,28 +4413,6 @@ public:
     int field_4;
     int field_8;
     void Unload(void);
-};
-
-struct Elem_0042a140 {
-    int type;
-    char unknown_4[12];
-    void* name;
-    char unknown_14[8];
-    int flags;
-};
-
-struct Model_0042a140 {
-    char unknown_0[8];
-    int count;
-    char unknown_c[28];
-    Elem_0042a140* entries;
-    Model_0042a140* child1;
-    Model_0042a140* child2;
-};
-
-struct FindData_0042a440 {
-    char unknown_0[20];
-    char name[260];
 };
 
 struct Class_004402e0 {
@@ -4649,11 +4554,6 @@ struct Slot_0042f740 {
     int* b;
 };
 
-struct Entry_0042f740 {
-    char unknown_0[64];
-    Slot_0042f740 slots[24];
-};
-
 class Class_00435d30 {
 public:
     char unknown_0[3364];
@@ -4783,11 +4683,6 @@ public:
     int SetStringItem(char*, char*);
 };
 
-struct Elem_00432be0 {
-    char* data;
-    ~Elem_00432be0(void);
-};
-
 struct Elem_00432be0_2 {
     char* data;
 };
@@ -4826,11 +4721,6 @@ public:
 
 struct Elem_00434360_2 {
     std::vector<Elem_00434020> v;
-};
-
-struct Elem_00434360 {
-    std::vector<Elem_00434020> v;
-    Elem_00434360(Elem_00434360&);
 };
 
 class Class_00433130 {
@@ -5383,14 +5273,6 @@ struct Obj_00439e30 {
 
 #include "../src/orders/order_base.h"
 
-struct PointInit_0043a1f0 : public Point16 {
-    PointInit_0043a1f0(short, short);
-};
-
-struct Vec3Init_0043a1f0 : public Vec3 {
-    Vec3Init_0043a1f0(int, int, int);
-};
-
 class Attached_0043a1f0 {
 public:
     virtual ~Attached_0043a1f0(void);
@@ -5491,16 +5373,6 @@ public:
     short turn;
     char unknown_26[2];
     void SteerGroundUnit(Unit*);
-};
-
-class Iface_0043dd20 {
-public:
-    virtual void v0(void);
-    virtual void v1(void);
-    virtual void v2(void);
-    virtual void v3(Vec3*, int, int);
-    virtual void v4(void);
-    virtual int v5(void);
 };
 
 class Class_0043d290 : public Class_0043d210 {
@@ -5614,12 +5486,6 @@ public:
     int CanLoad(Class_00489a70*);
 };
 
-struct Limits_0043e490 {
-    char unknown_0[192];
-    float fc0;
-    float fc4;
-};
-
 union F110_0048ad30 {
     unsigned int bits_0 : 4;
     unsigned int flag_4 : 1;
@@ -5647,11 +5513,6 @@ union Flags111_0043f0e0 {
     unsigned int bits_9 : 8;
     unsigned int flag_17 : 1;
     unsigned int bits_18 : 14;
-};
-
-struct Thing_0043f0e0 {
-    char unknown_0[254];
-    unsigned char ffe;
 };
 
 class Class_00440470 {
@@ -5730,11 +5591,6 @@ struct Serial_00441c30 {
     unsigned long unknown_10;
 };
 
-struct Entry_004426e0 {
-    char name[129];
-    char number[129];
-};
-
 struct Gui_00443100 {
     char unknown_0[24];
 };
@@ -5758,12 +5614,6 @@ struct Msg_00441220 {
     char unknown_0[153];
     Class_004bbd00_Other group;
     char unknown_a9[19];
-};
-
-struct Desc_004437c0 {
-    char unknown_0[76];
-    int size;
-    int offset;
 };
 
 struct PlayerData_004437c0 {
@@ -5815,12 +5665,6 @@ struct AnimSeq_00445110 {
 struct LogoEntry_00445110 {
     void* ptr;
     int unknown_4;
-};
-
-struct Logos_00445110 {
-    unsigned short count;
-    char unknown_2[38];
-    LogoEntry_00445110 entries[1];
 };
 
 struct Head_004455b0 {
@@ -6968,13 +6812,6 @@ public:
     void RecolorByShade(Surface_004c0a90*, unsigned char, int, int, int);
 };
 
-struct Pos_4589c0 {
-    int x;
-    int y;
-    int z;
-    Pos_4589c0(int, int, int);
-};
-
 struct Surface {
     int width;
     int height;
@@ -7184,13 +7021,6 @@ union Flags_0045d280 {
 };
 
 #include "../src/ingame/flags_00495e90_37ebe.h"
-
-struct FreeObj_0045e100 {
-    char unknown_0[4];
-    void* field_4;
-    char unknown_8[12];
-    void* field_14;
-};
 
 struct Rule_0045f1d0 {
     char unknown_0[12];
@@ -7459,12 +7289,6 @@ public:
     int* buffer;
     int size;
     int SendFrameState(int, Msg_00461900*);
-};
-
-struct Msg_00461900 {
-    char unknown_0[16];
-    int field_10;
-    int field_14;
 };
 
 struct Channel_4619e0 {
@@ -7934,21 +7758,6 @@ public:
     virtual void MarkUnitsInRadarOrSonarRadius(Unit*);
 };
 
-class RadarJamVisitor {
-public:
-    virtual void ApplyRadarJamFlag(Unit*);
-};
-
-class SonarJamVisitor {
-public:
-    virtual void ApplySonarJamFlag(Unit*);
-};
-
-struct Unit_00467960 {
-    char unknown_0[272];
-    unsigned int flags;
-};
-
 struct Unit_00467980 {
     char unknown_0[272];
     unsigned int flags;
@@ -8050,12 +7859,6 @@ struct Class_0046c620 {
     char unknown_11[1211];
     int field_4c9;
     char unknown_4d0[4];
-};
-
-class SyncChecksumVector {
-public:
-    std::vector<int> vec;
-    ~SyncChecksumVector(void);
 };
 
 struct Elem_0046faf0 {
@@ -9245,15 +9048,6 @@ public:
     void* FUN_00475bd0(Record_00474cd0*, unsigned int, Record_00474cd0&);
 };
 
-struct Pos_004745e0 {
-    short x;
-    char unknown_2[2];
-    short height;
-    char unknown_6[2];
-    short y;
-    int Visible(void);
-};
-
 class Class_00474760 {
 public:
     int deadline;
@@ -9424,16 +9218,6 @@ struct Sub_00477360 {
 
 struct Menu_00477410 {
     char unknown_0[24];
-};
-
-struct Info_00477510 {
-    char unknown_0[48];
-    char name[8];
-};
-
-struct Object_00477510 {
-    char unknown_0[24];
-    Info_00477510* info;
 };
 
 struct ColourEntry_00478790 {
@@ -9731,12 +9515,6 @@ public:
     void PlayFrame(void*);
 };
 
-class ClaimFootprintVisitor {
-public:
-    virtual void ClaimFootprint(Obj_0047e5c0*);
-    virtual void ClaimFootprint(void);
-};
-
 struct Class_0047cb00 {
     unsigned char a;
     unsigned char b;
@@ -9781,11 +9559,6 @@ struct Obj_0047e5c0 {
     char unknown_82[8];
     Obj_0047e5c0* child;
     Obj_0047e5c0* next;
-};
-
-class Visitor_0047e750 {
-public:
-    virtual void Visit(Unit*) = 0;
 };
 
 struct Entry_4 {
@@ -10645,11 +10418,6 @@ public:
     void ClearRef(void);
 };
 
-class Listener_004896f0 {
-public:
-    virtual void Notify(int);
-};
-
 struct Owner_004896f0 {
     char unknown_0[162];
     Class_004896f0* head;
@@ -10788,12 +10556,6 @@ struct Object_0048a440 {
     unsigned short id;
 };
 
-struct MapRow_0048a490 {
-    char unknown_0[12];
-    unsigned short* ids;
-    char unknown_10[16];
-};
-
 struct Order_0048ab70 {
     unsigned char type;
     unsigned short id1;
@@ -10815,14 +10577,6 @@ union Fixed_0048bae0 {
 struct Point_0048c6a0 {
     int x;
     int y;
-};
-
-struct OrderTypeEntry {
-    unsigned char index;
-    char unknown_1[7];
-    unsigned int flags_a;
-    char unknown_c[5];
-    unsigned int flags;
 };
 
 struct Orders_0048d630 {
@@ -11482,11 +11236,6 @@ public:
     void FUN_00490a10(BitReader*);
 };
 
-struct CdLists_490f80 {
-    char unknown_0[36];
-    unsigned char tracks[2684];
-};
-
 class Class_004cd9c0 {
 public:
     char unknown_0[1];
@@ -11507,12 +11256,6 @@ public:
 };
 
 #include "../src/game/zero11_004917d0.h"
-
-struct Save_00492df0 {
-    int games;
-    int count;
-    char path[256];
-};
 
 struct Saved_00493bf0 {
     int a;
@@ -11537,11 +11280,6 @@ struct Inner_00494290 {
 struct Owner_00494290 {
     char unknown_0[188];
     void* surface;
-};
-
-struct FindData_00495930 {
-    char unknown_0[20];
-    char name[260];
 };
 
 struct Class_004cb7c0 {
@@ -11654,11 +11392,6 @@ struct Object_00499c10 {
     Class_004b0a70* anims;
 };
 
-struct Source_00499c10 {
-    char unknown_0[22];
-    short heading;
-};
-
 struct NameLess_00499cd0 {
     char unknown_0[1];
     unsigned char operator()(char*, char*);
@@ -11688,11 +11421,6 @@ struct Angles_0049be60 {
     short x;
     short y;
     short z;
-};
-
-struct Sprite_0049be60 {
-    char unknown_0[48];
-    void* child;
 };
 
 struct FlagsBits_0049cc20 {
@@ -11988,21 +11716,10 @@ struct Struct_0049fbf0 {
     char path[256];
 };
 
-struct Obj2_49fd20 {
-    char unknown_0[19];
-    short val_13;
-    short val_15;
-};
-
 struct Vec6_49fd20 {
     int x;
     int y;
     char unknown_8[16];
-};
-
-struct Obj1_49fd20 {
-    char unknown_0[60];
-    Vec6_49fd20 data;
 };
 
 struct Entry_004a0bf0 {
@@ -12159,11 +11876,6 @@ struct Class_004a4620 {
     Table_004b3630* table;
 };
 
-struct GameState_4a4930 {
-    char unknown_0[24];
-    ElemArray_4a4930* arr;
-};
-
 struct Class_004a4980 {
     char unknown_0[24];
     Dialog* holder;
@@ -12178,11 +11890,6 @@ struct Frame_004a4980 {
     short field_6;
     char unknown_8;
     unsigned char field_9;
-};
-
-struct Point_004a4b50 {
-    int x;
-    int y;
 };
 
 struct Class_004a4c90 {
@@ -12317,20 +12024,6 @@ struct Class_004ab040 {
 struct Class_004ab2b0 {
     char unknown_0[24];
     Dialog* holder;
-};
-
-struct Record_004ab2b0 {
-    unsigned char type;
-    char unknown_1[181];
-    short count;
-    char unknown_b8[134];
-};
-
-struct Record_004ab3a0 {
-    unsigned char type;
-    char unknown_1[181];
-    short count;
-    char unknown_b8[30];
 };
 
 struct Flags_004ab400 {
@@ -12516,16 +12209,6 @@ struct Obj_004ad4f0 {
     char panel[16];
 };
 
-struct Struct_004ad980 {
-    char unknown_0[182];
-    short status;
-};
-
-struct StructA_004ada10 {
-    char unknown_0[182];
-    short status;
-};
-
 struct Obj_004ada40 {
     char unknown_0[182];
     char text[128];
@@ -12536,31 +12219,6 @@ struct Obj_004ada40 {
     char padding_0x13b;
     unsigned char grayedout;
     char unknown_13d[1];
-};
-
-struct Struct_004add60 {
-    char unknown_0[218];
-    short itemheight;
-};
-
-struct Struct_004addf0 {
-    char unknown_0[206];
-    int callback;
-    char unknown_d2[4];
-    int user;
-    unsigned short itemheight;
-};
-
-struct Obj_004ade20 {
-    char unknown_0[182];
-    char text[130];
-    short maxchars;
-};
-
-struct Obj_004adf10 {
-    char unknown_0[182];
-    char text[130];
-    short maxchars;
 };
 
 struct Obj_004ae170 {
@@ -12585,19 +12243,6 @@ struct Obj_004ae170_2 {
     int field_144;
 };
 
-struct Obj_004ae230 {
-    char unknown_0[182];
-    char text[128];
-    char link[128];
-};
-
-struct Obj_004ae300 {
-    char unknown_0[182];
-    char text[128];
-    char link[17];
-    char hotkey;
-};
-
 struct Obj_004ae380 {
     char unknown_0[200];
     unsigned int hotornot : 1;
@@ -12608,36 +12253,6 @@ struct Obj_004ae410 {
     char unknown_0[200];
     unsigned int hotornot : 1;
     unsigned int : 31;
-};
-
-struct Obj_004ae440 {
-    char unknown_0[182];
-    char text[128];
-};
-
-struct Obj_004ae4b0 {
-    char unknown_0[182];
-    char text[128];
-};
-
-struct Obj_004ae4e0 {
-    char unknown_0[182];
-    char text[128];
-};
-
-struct Obj_004ae550 {
-    char unknown_0[182];
-    char text[128];
-};
-
-struct Obj_004ae580 {
-    char unknown_0[182];
-    int nuttin;
-};
-
-struct StructA_004ae610 {
-    char unknown_0[182];
-    int nuttin;
 };
 
 struct Sub2_004aeac0 {
@@ -12701,12 +12316,6 @@ struct Common_004ad350 {
     unsigned short gaffile;
     char text[128];
     Tail_004aeac0 tail;
-};
-
-struct Table_004aedd0 {
-    unsigned short count;
-    char unknown_2[38];
-    void* entries[1];
 };
 
 struct BlinkWord_004afc60 {
@@ -13505,11 +13114,6 @@ struct Display_004b8310 {
     char unknown_f1[3];
 };
 
-struct Screen_004b8310 {
-    char unknown_0[32];
-    Surface surf;
-};
-
 struct Src_004b8310 {
     int width;
     int height;
@@ -13913,16 +13517,6 @@ struct Header_004be400 {
     List_004be3b0* table;
 };
 
-struct App_004bec70 {
-    char unknown_0[200];
-    unsigned int* palette;
-};
-
-struct App_004bed70 {
-    char unknown_0[192];
-    unsigned int* palette;
-};
-
 struct Point_004bf060 {
     int x;
     int y;
@@ -13962,16 +13556,6 @@ struct Point_004c07b0 {
     int z;
 };
 
-struct App_004c0b10 {
-    char unknown_0[196];
-    unsigned char* shade;
-};
-
-struct Obj_004c13d0 {
-    char unknown_0[528];
-    int keyColor;
-};
-
 struct Obj_6 {
     char unknown_0[528];
     int field_210;
@@ -13998,14 +13582,6 @@ struct Game_004c14f0 {
 struct Game_004c1830 {
     char unknown_0[516];
     Font_004a50b0* font;
-};
-
-struct Queue_004c1ab0 {
-    char unknown_0[242];
-    int size;
-    int entries[30];
-    int head;
-    int tail;
 };
 
 struct Queue_004c1ab0_2 {
@@ -14751,13 +14327,6 @@ struct Frame_004c7580 {
 struct Display_004c8020 {
     char unknown_0[196];
     unsigned char* palette;
-};
-
-class Class_004c90b0 {
-public:
-    char* ptr;
-    unsigned char IsEmpty(void);
-    Class_004c90b0* Append(Class_004c90b0&);
 };
 
 class Class_004c9230 {
@@ -15691,11 +15260,6 @@ struct Bitmap_004cb170 {
     unsigned char* data;
 };
 
-struct FindData_004cb170 {
-    char unknown_0[20];
-    char name[260];
-};
-
 struct Game_004cb170 {
     char unknown_0[188];
     Bitmap_004cb170* bitmap;
@@ -15854,12 +15418,6 @@ struct IDirectSound3DBuffer {
     long __stdcall SetPosition(float, float, float, unsigned long);
 };
 
-struct Pos_004cf570 {
-    int x;
-    int y;
-    int z;
-};
-
 class Class_004cf800 {
 public:
     char unknown_0[452];
@@ -15942,20 +15500,6 @@ struct PackHeader_004d1c00 {
     unsigned char encryptType;
     long packedSize;
     long unpackedSize;
-};
-
-class CommandLineSwitch {
-public:
-    char on;
-    CommandLineSwitch(char*, int, char, char*, char*, char*, char*);
-    ~CommandLineSwitch(void);
-};
-
-class CommandLineNumber {
-public:
-    int value;
-    CommandLineNumber(char*, int, int, char*);
-    ~CommandLineNumber(void);
 };
 
 class Class_004d8820 {
@@ -16278,10 +15822,6 @@ public:
     static LiveNode* _Max(LiveNode*);
     void _Lrotate(LiveNode*);
     void _Rrotate(LiveNode*);
-};
-
-struct Elem_004dd8c0 {
-    unsigned int w[12];
 };
 
 struct Less_004dd3d0 {
@@ -17442,12 +16982,6 @@ public:
 struct Weapon_3 {
     char unknown_0[273];
     unsigned char flags;
-};
-
-struct Struct_0040bab0 {
-    int a;
-    int b;
-    int c;
 };
 
 struct Rating {

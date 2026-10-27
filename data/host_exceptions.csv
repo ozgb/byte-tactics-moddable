@@ -266,7 +266,6 @@ src/ingame/info_panel.cpp,src/graphics/surface.h,#392
 src/ingame/info_panel.cpp,src/gui/dialogs.h,#392
 src/ingame/info_panel.cpp,src/gui/gui.h,#392
 src/ingame/info_panel.cpp,src/gui/keyboard.h,#392
-src/ingame/info_panel.cpp,src/ingame/feature_spot.h,#392
 src/ingame/info_panel.cpp,src/ingame/frame_timers.h,#392
 src/ingame/info_panel.cpp,src/ingame/info_panel.h,#392
 src/ingame/info_panel.cpp,src/ingame/map_grid.h,#392

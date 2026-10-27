@@ -33,13 +33,10 @@ struct FileHandle;
 
 extern int g_playBufferLooping;
 
-struct Pos_004cf570 {
-    int x, y, z;
-};
-
 #include "../files/files_api.h"
 
 #include "samples.h"
+#include "cd_audio.h"
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 
 extern int g_delayedSampleVolume;

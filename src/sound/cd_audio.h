@@ -1,6 +1,10 @@
 #ifndef CD_AUDIO_H
 #define CD_AUDIO_H
 
+struct Pos_004cf570 {
+    int x, y, z;
+};
+
 void __stdcall NopRet4(int);
 void __cdecl HandleCdMessage(int msg, int wParam, int lParam);
 int __stdcall GetTrackLength(int track);

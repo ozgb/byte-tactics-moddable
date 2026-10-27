@@ -11,12 +11,6 @@
 
 #include "../network/player.h"
 
-struct Limits_0043e490 {
-    char unknown_0[0xc0];
-    float fc0;
-    float fc4;
-};
-
 #include "../map/cell.h"
 #include "mission_type.h"
 

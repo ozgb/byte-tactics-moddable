@@ -195,7 +195,7 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 #include "order_list.h"
 
 #include "../../link/globals.h"
-typedef Elem_0043c390* SimView_g_missionOrderTableBegin;
+typedef OrderTableEntry* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
 
@@ -206,7 +206,7 @@ extern int __cdecl _strcmpi(const char*, const char*);
 
 #include "../ingame/markers.h"
 void __stdcall DrawUnitRangeRings(void* a, void* b, Order* e, Vec3* p, int c);
-extern Elem_0043c390 g_readyOrder[];
+extern OrderTableEntry g_readyOrder[];
 extern signed char g_slopeSpeedFactor[];
 int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
@@ -216,7 +216,6 @@ int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 MissionType __stdcall GetOrderType(unsigned char relation, Unit* unit, Unit* target, Vec3* pos);
 void __stdcall AddOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7);
 int __stdcall FindWeaponTarget(Unit* unit, int a, int b);
-int __stdcall CompareOrderTypeNames(const Elem_0043c390& a, const Elem_0043c390& b);
 void RegisterUnitOrders();
 extern int DAT_0051234c;
 
@@ -666,8 +665,8 @@ public:
 };
 
 
-typedef std::vector<Elem_0043c390> Vec_0043c390;
-typedef int(__stdcall* Pred_0043c390)(const Elem_0043c390&, const Elem_0043c390&);
+typedef std::vector<OrderTableEntry> Vec_0043c390;
+typedef int(__stdcall* Pred_0043c390)(const OrderTableEntry&, const OrderTableEntry&);
 
 struct Record_0043dd70 {
     Vec3 velocity;
@@ -693,7 +692,7 @@ class Class_0043db50 { public: void UpdateSfxOccupy(Unit* u); };
 
 #pragma pack(pop)
 
-typedef Elem_0043c390* SimView_g_missionOrderTableBegin;
+typedef OrderTableEntry* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
 
@@ -1060,20 +1059,20 @@ typedef Vec_0043c390 SimView_g_missionOrderTableVec;
 #define g_missionOrderTableVec (*reinterpret_cast<SimView_g_missionOrderTableVec*>(&Sim().g_missionOrderTableVec))
 
 // FUNCTION: 0x43c940
-inline void __stdcall InsertShiftOrderTypes(Elem_0043c390* _L, Elem_0043c390 _V, Pred_0043c390 _P)
+inline void __stdcall InsertShiftOrderTypes(OrderTableEntry* _L, OrderTableEntry _V, Pred_0043c390 _P)
 {
-    for (Elem_0043c390* _M = _L; _P(_V, *--_M); _L = _M)
+    for (OrderTableEntry* _M = _L; _P(_V, *--_M); _L = _M)
         *_L = *_M;
     *_L = _V;
 }
 
 // FUNCTION: 0x43c990
-inline void __stdcall InsertionSortOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P,
-                                   Elem_0043c390*)
+inline void __stdcall InsertionSortOrderTypes(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P,
+                                   OrderTableEntry*)
 {
     if (_F != _L)
-        for (Elem_0043c390* _M = _F; ++_M != _L; ) {
-            Elem_0043c390 _V = *_M;
+        for (OrderTableEntry* _M = _F; ++_M != _L; ) {
+            OrderTableEntry _V = *_M;
             if (!_P(_V, *_F))
                 InsertShiftOrderTypes(_M, _V, _P);
             else {
@@ -1083,13 +1082,13 @@ inline void __stdcall InsertionSortOrderTypes(Elem_0043c390* _F, Elem_0043c390* 
         }
 }
 
-inline void _Insertion_sort_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P)
+inline void _Insertion_sort_0043bc90(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P)
 {
     InsertionSortOrderTypes(_F, _L, _P, std::_Val_type(_F));
 }
 
 // FUNCTION: 0x43ca70
-inline Elem_0043c390 __stdcall MedianOrderTypes(Elem_0043c390 _X, Elem_0043c390 _Y, Elem_0043c390 _Z,
+inline OrderTableEntry __stdcall MedianOrderTypes(OrderTableEntry _X, OrderTableEntry _Y, OrderTableEntry _Z,
                                             Pred_0043c390 _P)
 {
     if (_P(_X, _Y))
@@ -1099,8 +1098,8 @@ inline Elem_0043c390 __stdcall MedianOrderTypes(Elem_0043c390 _X, Elem_0043c390 
 }
 
 // FUNCTION: 0x43cb20
-inline Elem_0043c390* __stdcall PartitionOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L,
-                                             Elem_0043c390 _Piv, Pred_0043c390 _P)
+inline OrderTableEntry* __stdcall PartitionOrderTypes(OrderTableEntry* _F, OrderTableEntry* _L,
+                                             OrderTableEntry _Piv, Pred_0043c390 _P)
 {
     for (; ; ++_F) {
         for (; _P(*_F, _Piv); ++_F)
@@ -1114,12 +1113,12 @@ inline Elem_0043c390* __stdcall PartitionOrderTypes(Elem_0043c390* _F, Elem_0043
 }
 
 // FUNCTION: 0x43c720
-inline void __stdcall SortOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P,
-                                   Elem_0043c390*)
+inline void __stdcall SortOrderTypes(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P,
+                                   OrderTableEntry*)
 {
     for (; std::_SORT_MAX < _L - _F; ) {
-        Elem_0043c390* _M = PartitionOrderTypes(_F, _L, MedianOrderTypes(Elem_0043c390(*_F),
-            Elem_0043c390(*(_F + (_L - _F) / 2)), Elem_0043c390(*(_L - 1)), _P), _P);
+        OrderTableEntry* _M = PartitionOrderTypes(_F, _L, MedianOrderTypes(OrderTableEntry(*_F),
+            OrderTableEntry(*(_F + (_L - _F) / 2)), OrderTableEntry(*(_L - 1)), _P), _P);
         if (_L - _M <= _M - _F)
             SortOrderTypes(_M, _L, _P, std::_Val_type(_F)), _L = _M;
         else
@@ -1127,27 +1126,27 @@ inline void __stdcall SortOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L, Pred_
     }
 }
 
-inline void _Sort_0_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P,
-                             Elem_0043c390*)
+inline void _Sort_0_0043bc90(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P,
+                             OrderTableEntry*)
 {
     if (_L - _F <= std::_SORT_MAX)
         _Insertion_sort_0043bc90(_F, _L, _P);
     else {
-        SortOrderTypes(_F, _L, _P, (Elem_0043c390*)0);
+        SortOrderTypes(_F, _L, _P, (OrderTableEntry*)0);
         _Insertion_sort_0043bc90(_F, _F + std::_SORT_MAX, _P);
         for (_F += std::_SORT_MAX; _F != _L; ++_F)
-            InsertShiftOrderTypes(_F, Elem_0043c390(*_F), _P);
+            InsertShiftOrderTypes(_F, OrderTableEntry(*_F), _P);
     }
 }
 
-inline void sort_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P)
+inline void sort_0043bc90(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P)
 {
     _Sort_0_0043bc90(_F, _L, _P, std::_Val_type(_F));
 }
 
 
 // FUNCTION: 0x43bc90
-void __stdcall RegisterOrderTypes(Elem_0043c390* from, int count)
+void __stdcall RegisterOrderTypes(OrderTableEntry* from, int count)
 {
     int sz = g_missionOrderTableVec.size();
     g_missionOrderTableVec.reserve(sz + count);
@@ -1156,7 +1155,7 @@ void __stdcall RegisterOrderTypes(Elem_0043c390* from, int count)
 }
 
 // FUNCTION: 0x43c020
-int __stdcall CompareOrderTypeNames(const Elem_0043c390& a, const Elem_0043c390& b)
+int __stdcall CompareOrderTypeNames(const OrderTableEntry& a, const OrderTableEntry& b)
 {
     return _strcmpi(a.name, b.name) < 0 ? 1 : 0;
 }
@@ -1183,21 +1182,21 @@ int MissionOrderTable::GetCount(void)
     return first == 0 ? 0 : (last - first) / 0x19;
 }
 
-template class std::vector<Elem_0043c390>;
+template class std::vector<OrderTableEntry>;
 
-// FUNCTION: 0x43c3a0 ?insert@?$vector@UElem_0043c390@@V?$allocator@UElem_0043c390@@@std@@@std@@QAEXPAUElem_0043c390@@IABU3@@Z
+// FUNCTION: 0x43c3a0 ?insert@?$vector@UOrderTableEntry@@V?$allocator@UOrderTableEntry@@@std@@@std@@QAEXPAUOrderTableEntry@@IABU3@@Z
 
-typedef int (__stdcall* Pred_0043c6b0)(const Elem_0043c390& entry, char* name);
+typedef int (__stdcall* Pred_0043c6b0)(const OrderTableEntry& entry, char* name);
 
 // FUNCTION: 0x43c6b0
-Elem_0043c390* __stdcall LowerBoundOrderTypes(Elem_0043c390* first, Elem_0043c390* last,
+OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTableEntry* last,
                                       char* const& value, Pred_0043c6b0 pred, int*)
 {
     int n = 0;
     n += last - first;
     for (; 0 < n; ) {
         int n2 = n / 2;
-        Elem_0043c390* m = first;
+        OrderTableEntry* m = first;
         m += n2;
         if (pred(*m, value))
             first = ++m, n -= n2 + 1;

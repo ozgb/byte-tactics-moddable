@@ -98,18 +98,6 @@ struct FrameTable {
 
 #include "eye.h"
 
-union Flags_14281 {
-    unsigned short raw;
-    unsigned char rawByte;
-    struct {
-        unsigned short bit0 : 1;
-        unsigned short bit1 : 1;
-        unsigned short flag2 : 1;
-        unsigned short flag3 : 1;
-        unsigned short rest : 12;
-    };
-};
-
 union Flags_142f1 {
     unsigned short raw;
     unsigned char rawByte;
@@ -353,7 +341,7 @@ void ExpireEyeballs()
 // FUNCTION: 0x4825b0
 void __stdcall UpdateLineOfSight(SightQuery* params)
 {
-    if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 4) == 4) {
+    if ((g_game->mapFlags_14281.raw & 4) == 4) {
         int x = ((short*)&params->pos.x)[1] >> 5;
         int v = params->eyeHeight + ((short*)&params->pos.y)[1];
         if (v < 0) {
@@ -366,7 +354,7 @@ void __stdcall UpdateLineOfSight(SightQuery* params)
         int diff = abs((int)*params->frameIdx - v);
         unsigned char c = *params->frameIdx;
         if (params->cacheCell[0] != x || params->cacheCell[1] != y || diff > 5) {
-            if (c != 0 && ((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2)) {
+            if (c != 0 && (g_game->mapFlags_14281.raw & 2)) {
                 RemoveLineOfSight(params);
             }
             params->cacheCell[0] = (short)x;
@@ -376,10 +364,10 @@ void __stdcall UpdateLineOfSight(SightQuery* params)
                 return;
             }
             *params->frameIdx = (unsigned char)v;
-            if ((unsigned char)((*(Flags_14281*)&g_game->mapFlags_14281).raw >> 1) & 1) {
+            if ((unsigned char)(g_game->mapFlags_14281.raw >> 1) & 1) {
                 AddLineOfSight(params);
             }
-            if ((*(Flags_14281*)&g_game->mapFlags_14281).raw & 1) {
+            if (g_game->mapFlags_14281.raw & 1) {
                 RevealAroundUnit(params);
             }
         }
@@ -397,7 +385,7 @@ void __stdcall UpdateLineOfSight(SightQuery* params)
         cx -= e->xOffset;
         cy -= e->yOffset;
         if (params->cacheCell[0] != cx || params->cacheCell[1] != cy || *params->frameIdx != i) {
-            if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2) == 2) {
+            if ((g_game->mapFlags_14281.raw & 2) == 2) {
                 RemoveLineOfSight(params);
                 params->cacheCell[0] = (short)cx;
                 params->cacheCell[1] = (short)cy;
@@ -408,7 +396,7 @@ void __stdcall UpdateLineOfSight(SightQuery* params)
                 params->cacheCell[1] = (short)cy;
                 *params->frameIdx = (unsigned char)i;
             }
-            if ((*(Flags_14281*)&g_game->mapFlags_14281).raw & 1) {
+            if (g_game->mapFlags_14281.raw & 1) {
                 RevealAroundUnit(params);
             }
         }
@@ -435,11 +423,11 @@ void __stdcall UpdateUnitLineOfSight(Unit* unit)
 // FUNCTION: 0x482830
 void __stdcall InitUnitSightCircleReveal(SightQuery* params)
 {
-    if (((*(Flags_14281*)&g_game->mapFlags_14281).rawByte & 2) != 2) {
+    if ((g_game->mapFlags_14281.rawByte & 2) != 2) {
         return;
     }
     *params->frameIdx = 0;
-    if (((*(Flags_14281*)&g_game->mapFlags_14281).rawByte & 4) == 4) {
+    if ((g_game->mapFlags_14281.rawByte & 4) == 4) {
         UpdateLineOfSight(params);
         return;
     }
@@ -998,7 +986,7 @@ void LoadTntMap()
     else
         buf = 0;
     obj[0] = buf;
-    (*(Flags_14281*)&g_game->mapFlags_14281).raw &= 0xfff7;
+    g_game->mapFlags_14281.raw &= 0xfff7;
     b.p.x = 0;
     b.p.y = 0;
     a.p.x = (short)g_game->width;
@@ -1171,9 +1159,9 @@ void __stdcall DrawMapTiles(void* surface)
 // FUNCTION: 0x4848e0
 void __stdcall DrawFogOfWar(void* surface)
 {
-    if (!((*(Flags_14281*)&g_game->mapFlags_14281).raw & 8)) {
+    if (!(g_game->mapFlags_14281.raw & 8)) {
         BuildFogTiles();
-        (*(Flags_14281*)&g_game->mapFlags_14281).raw |= 8;
+        g_game->mapFlags_14281.raw |= 8;
     }
 
     MapFogGrid* grid = (MapFogGrid *)g_game->fogGrid;
@@ -1272,7 +1260,7 @@ done:
 void __stdcall RecalculateLineOfSight(int arg)
 {
     if (arg != 0) {
-        memset(g_game->visibilityMask, ((*(Flags_14281*)&g_game->mapFlags_14281).raw & 1) ? 0 : 0xFFFF,
+        memset(g_game->visibilityMask, (g_game->mapFlags_14281.raw & 1) ? 0 : 0xFFFF,
                g_game->width * g_game->height * sizeof(short) / 4);
     }
     for (unsigned char i = 0; i < 10; i++) {
@@ -1281,7 +1269,7 @@ void __stdcall RecalculateLineOfSight(int arg)
         if (p->active == 0) continue;
         if (p->type != 1 && p->type != 2 && p->type != 3) continue;
         if (p->index == 10) continue;
-        memset(p->explored, (unsigned char)~((unsigned char)(*(Flags_14281*)&g_game->mapFlags_14281).raw >> 1) & 1, p->exploredSize);
+        memset(p->explored, (unsigned char)~((unsigned char)g_game->mapFlags_14281.raw >> 1) & 1, p->exploredSize);
     }
     for (Unit* u = g_game->units + 1; u <= g_game->unitsEnd; u++) {
         if (u->unitDefIndex == 0)
@@ -1295,9 +1283,9 @@ void __stdcall RecalculateLineOfSight(int arg)
         params.eyeHeight = (unsigned char)u->def->field_170;
         if (params.pos.y < (int)((g_game->seaLevel + 1) << 16))
             params.pos.y = (g_game->seaLevel + 1) << 16;
-        if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2) == 2) {
+        if ((g_game->mapFlags_14281.raw & 2) == 2) {
             *params.frameIdx = 0;
-            if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 4) == 4) {
+            if ((g_game->mapFlags_14281.raw & 4) == 4) {
                 UpdateLineOfSight(&params);
             } else {
                 int i = params.sightDistance / 32 - 5;
@@ -1320,7 +1308,7 @@ void __stdcall RecalculateLineOfSight(int arg)
         }
     }
     (*(Flags_142f1*)&g_game->viewDirtyFlags).mapChanged = 1;
-    (*(Flags_14281*)&g_game->mapFlags_14281).raw &= 0xfff7;
+    g_game->mapFlags_14281.raw &= 0xfff7;
     UpdateRadarMapped();
     DrawRadarUnits();
 }
@@ -1349,7 +1337,7 @@ void __stdcall RevealAroundUnit(SightQuery* params)
     int halfH = g_game->height / 2;
     x = params->cacheCell[0];
     y = params->cacheCell[1];
-    if ((*(Flags_14281*)&g_game->mapFlags_14281).flag2 == 1) {
+    if (g_game->mapFlags_14281.bit2 == 1) {
         FogGrid* grid = (FogGrid*)&g_game->grid1;
         if ((unsigned)x < grid->width && (unsigned)y < grid->height) {
             LosTable* table =
@@ -1442,7 +1430,7 @@ void __stdcall RevealAroundUnit(SightQuery* params)
         }
     }
     if (changed && ((Player*)params->player)->index == g_game->playerIndex) {
-        (*(Flags_14281*)&g_game->mapFlags_14281).flag3 = 0;
+        g_game->mapFlags_14281.bit3 = 0;
         (*(Flags_142f1*)&g_game->viewDirtyFlags).rawByte |= 4;
     }
 }
@@ -1450,7 +1438,7 @@ void __stdcall RevealAroundUnit(SightQuery* params)
 // FUNCTION: 0x482910
 void __stdcall AddEyeball(Vec3* src, int a, int b, int c)
 {
-    if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2) == 2 && g_game->count_14277 < 0x14) {
+    if ((g_game->mapFlags_14281.raw & 2) == 2 && g_game->count_14277 < 0x14) {
         Eye* e = &((Eye *)g_game->eyes)[g_game->count_14277];
         e->player = (char*)&g_game->players[g_game->playerIndex];
         e->screen = &e->screenPos;
@@ -1463,9 +1451,9 @@ void __stdcall AddEyeball(Vec3* src, int a, int b, int c)
             e->pos.y = minY;
         }
         e->expires = (unsigned int)g_game->ticks + c;
-        if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2) == 2) {
+        if ((g_game->mapFlags_14281.raw & 2) == 2) {
             *e->flagPtr = 0;
-            if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 4) == 4) {
+            if ((g_game->mapFlags_14281.raw & 4) == 4) {
                 UpdateLineOfSight((SightQuery*)e);
             } else {
                 int lod = e->x / 32 - 5;
@@ -1504,9 +1492,9 @@ void __stdcall RevealNewUnit(Unit* unit)
     if (p.pos.y < min_y) {
         p.pos.y = min_y;
     }
-    if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2) == 2) {
+    if ((g_game->mapFlags_14281.raw & 2) == 2) {
         *p.frameIdx = 0;
-        if (((*(Flags_14281*)&g_game->mapFlags_14281).raw & 4) == 4) {
+        if ((g_game->mapFlags_14281.raw & 4) == 4) {
             UpdateLineOfSight(&p);
         } else {
             int i = p.sightDistance / 32 - 5;
@@ -1742,7 +1730,7 @@ void BuildFogTiles(void)
     for (int y = y0; y < yEnd; y++) {
         for (int x = x0; x < xEnd; x++) {
             if (x < pg->width && y < pg->height) {
-                if (pg->cells[y * pg->width + x] == 0 && ((*(Flags_14281*)&g_game->mapFlags_14281).raw & 2)) {
+                if (pg->cells[y * pg->width + x] == 0 && (g_game->mapFlags_14281.raw & 2)) {
                     if (x - x0 < grid->width && y - y0 < grid->height)
                         grid->cells[(y - y0) * grid->width + x - x0].hi |= 1;
                     if (x - x0 - 1 < grid->width && y - y0 < grid->height)
@@ -1768,7 +1756,7 @@ void BuildFogTiles(void)
 
     if (y0 < 0) {
         for (unsigned int i = 0; i < grid->width; i++) {
-            if ((*(Flags_14281*)&g_game->mapFlags_14281).bit1) {
+            if (g_game->mapFlags_14281.bit1) {
                 if (grid->cells[i].hi & 4) grid->cells[i].hi |= 1;
                 if (grid->cells[i].hi & 8) grid->cells[i].hi |= 2;
             }
@@ -1779,7 +1767,7 @@ void BuildFogTiles(void)
 
     if (yEnd > info->height / 2) {
         for (unsigned int i = 0; i < grid->width; i++) {
-            if ((*(Flags_14281*)&g_game->mapFlags_14281).bit1) {
+            if (g_game->mapFlags_14281.bit1) {
                 if (grid->cells[(grid->height - 2) * grid->width + i].hi & 1)
                     grid->cells[(grid->height - 2) * grid->width + i].hi |= 4;
                 if (grid->cells[(grid->height - 2) * grid->width + i].hi & 2)
@@ -1794,7 +1782,7 @@ void BuildFogTiles(void)
 
     if (x0 < 0) {
         for (unsigned int i = 0; i < grid->height; i++) {
-            if ((*(Flags_14281*)&g_game->mapFlags_14281).bit1) {
+            if (g_game->mapFlags_14281.bit1) {
                 if (grid->cells[i * grid->width].hi & 8)
                     grid->cells[i * grid->width].hi |= 4;
                 if (grid->cells[i * grid->width].hi & 2)
@@ -1811,7 +1799,7 @@ void BuildFogTiles(void)
         if (grid->height > 0) {
             unsigned int i = 1;
             do {
-                if ((*(Flags_14281*)&g_game->mapFlags_14281).bit1) {
+                if (g_game->mapFlags_14281.bit1) {
                     if (grid->cells[i * grid->width - 2].hi & 4)
                         grid->cells[i * grid->width - 2].hi |= 8;
                     if (grid->cells[i * grid->width - 2].hi & 1)

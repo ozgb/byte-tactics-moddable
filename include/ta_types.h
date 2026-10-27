@@ -1013,7 +1013,7 @@ struct Elem_00434020;
 struct Elem_00434360;
 struct Elem_00434360_2;
 struct Elem_00434a60;
-struct Elem_0043c390;
+struct OrderTableEntry;
 struct Elem_0043ca70;
 struct Elem_00441c30;
 struct Elem_0044ce90;

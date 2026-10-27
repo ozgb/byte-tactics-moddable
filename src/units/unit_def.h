@@ -1,6 +1,7 @@
 #ifndef UNIT_DEF_H
 #define UNIT_DEF_H
 #include "../../interfaces/ref.h"
+#include "../util/vec3.h"
 
 #pragma pack(push, 1)
 
@@ -21,6 +22,7 @@ public:
     int weaponHashXor;
     union {
         int f14a;
+        Point16 origin;
         struct {
             short footprintx;
             short footprintz;

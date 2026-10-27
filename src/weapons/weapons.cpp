@@ -119,13 +119,14 @@ struct Vec3_0049abb0 {
 
 #include "../units/unit.h"
 #include "projectile.h"
+#include "../map/cell.h"
+#include "../map/feature.h"
+#include "../map/feature_spot.h"
 
 struct Unit_0049c880;
 
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
-
-struct MapFeature_0049b090;
 
 struct Net {
     char unknown_0[0xd48];
@@ -141,10 +142,6 @@ struct Net {
 #pragma pack(push, 1)
 
 struct Unit;
-struct Spot_0049a120;
-struct FeatureDef_0049a120;
-struct MapFeature_0049b090;
-struct Cell;
 
 #pragma pack(pop)
 
@@ -507,34 +504,6 @@ struct CellPos_0049a120 {
 };
 
 #pragma pack(push, 1)
-
-struct Cell {
-    unsigned short unit;
-    unsigned short unit2;
-    unsigned char height;
-    unsigned char high;
-    unsigned char low;
-    unsigned char metal;
-    unsigned short feature;
-    union {
-        unsigned short spot;
-        struct {
-            unsigned char offsetZ;
-            unsigned char offsetX;
-        } origin;
-    };
-    unsigned char flags;
-};
-
-struct Spot_0049a120 {
-    char unknown_0[8];
-    Vec3 pos;
-    char unknown_14[0x30 - 0x14];
-};
-
-struct FeatureDef_0049a120 {
-    char unknown_0[0x100];
-};
 
 void Unused_0049a120(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
@@ -2048,12 +2017,6 @@ int AddBlinkWord(void*, const char*, int, int, int, int, float, float);
 
 #pragma pack(push, 1)
 
-struct MapFeature_0049b090 {
-    char unknown_0[0xfa];
-    unsigned char height;
-    char unknown_fb[0x100 - 0xfb];
-};
-
 #pragma pack(pop)
 
 // FUNCTION: 0x49b090
@@ -2105,21 +2068,21 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
         short cx = proj->positionWords.xWhole / 16;
         short cz = proj->positionWords.zWhole / 16;
         unsigned short f = cell->feature;
-        MapFeature_0049b090* mf;
+        Feature* mf;
         if (f < 0xfffb) {
             if (f < g_game->featureCount)
-                mf = (MapFeature_0049b090 *)g_game->features + f;
+                mf = &g_game->features[f];
             else
                 mf = 0;
         } else if (!(f == 0xfffe)) {
             mf = 0;
         } else {
-            int n = cell->origin.offsetX + g_game->width * cell->origin.offsetZ;
+            int n = cell->offsetX + g_game->width * cell->offsetY;
             unsigned short f2 = (cell - n)->feature;
             if (f2 >= 0xfffb) {
                 mf = 0;
             } else {
-                mf = (MapFeature_0049b090 *)g_game->features + f2;
+                mf = &g_game->features[f2];
             }
         }
         if (mf) {
@@ -2390,13 +2353,6 @@ void __stdcall DrawProjectiles(void* surface)
     }
 }
 
-static inline Spot_0049a120* SpotAt(unsigned short index)
-{
-    Ref<Spot_0049a120> spots;
-    spots.offset = g_game->spots.offset;
-    return &spots[index];
-}
-
 // FUNCTION: 0x49a120
 void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
 {
@@ -2505,8 +2461,8 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
             int fx = x;
             int fz = z;
             if (cell->feature == 0xfffe) {
-                fx -= cell->origin.offsetX;
-                fz -= cell->origin.offsetZ;
+                fx -= cell->offsetX;
+                fz -= cell->offsetY;
                 origin = g_seams.los_radar->GetMapCell(fx, fz);
             }
             unsigned short feature = origin->feature;
@@ -2517,7 +2473,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
             cp.x = index % g_game->width;
             cp.z = index / g_game->width;
             CellPos_0049a120 at = cp;
-            Spot_0049a120* spot = SpotAt(cell->spot);
+            FeatureSpot* spot = &g_game->spots[cell->spot];
             int distance;
             if ((cell->flags & 1) && spot) {
                 Vec3 v = Sub(*pos, spot->pos);
@@ -2525,7 +2481,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 dist.raw = VectorLength(&v);
                 distance = dist.part.whole;
             } else {
-                Vec3 centre = g_seams.features->GetFootprintCentre((Point16*)&at, (Feature*)&((FeatureDef_0049a120*)g_game->features)[feature]);
+                Vec3 centre = g_seams.features->GetFootprintCentre((Point16*)&at, &g_game->features[feature]);
                 Vec3 p = *(Vec3*)&centre;
                 Vec3 v = Sub(*pos, p);
                 Fixed_0049a120 dist;

@@ -811,6 +811,19 @@ static void SeedNetworkHost(int host)
 
 static OptionsTable* ScenarioTable() { return (OptionsTable*)g_game->options; }
 
+static Mission* BeginMission(int type)
+{
+    SetMissionType(type);
+    return (Mission*)g_game->net;
+}
+
+static void EnterLoadingFrontend()
+{
+    g_game->field_2bbe = 9;
+    g_game->field_2bbf = 2;
+    g_game->field_2bc0 = 2;
+}
+
 static void SetUpSkirmish()
 {
     Table_0047ae60* t = ScenarioTable();
@@ -847,10 +860,9 @@ static void SetUpSkirmish()
             active++;
     }
 
-    SetMissionType(s_gameType);
+    Mission* mission = BeginMission(s_gameType);
     if (s_gameType == 3)
         SeedNetworkTable();
-    Mission* mission = (Mission*)g_game->net;
     strcpy(t->mapName, s_map);
     t->difficulty = s_difficulty;
     t->commanderDeath = s_commanderDeath;
@@ -900,9 +912,7 @@ static void SetUpSkirmish()
     if (s_gameType == 3)
         SeedNetworkHost(local);
 
-    g_game->field_2bbe = 9;
-    g_game->field_2bbf = 2;
-    g_game->field_2bc0 = 2;
+    EnterLoadingFrontend();
     if (s_gameType == 3) {
         HideSoftwareCursor();
         g_game->mode_391f1 = 5;
@@ -960,9 +970,8 @@ static void SetUpLoadedGame()
     }
     HapiBank* bank = (HapiBank*)g_game->pendingSaveStore;
     bank->OpenAccount("summary");
-    SetMissionType(bank->GetIntegerItem("Gametype", 0));
+    Mission* mission = BeginMission(bank->GetIntegerItem("Gametype", 0));
     char* campaign = HarnessBankString(bank, "Campaign", 0);
-    Mission* mission = (Mission*)g_game->net;
     if (campaign != NULL)
         mission->LoadCampaign(campaign);
     g_game->flag_37ef2 = bank->GetIntegerItem("Side", 0);
@@ -985,9 +994,7 @@ static void SetUpLoadedGame()
     t->mapping = bank->GetIntegerItem("Mapping", 1);
     t->lineOfSight = bank->GetIntegerItem("LineOfSight", 1);
     t->losType = bank->GetIntegerItem("LineOfSightType", 1);
-    g_game->field_2bbe = 9;
-    g_game->field_2bbf = 2;
-    g_game->field_2bc0 = 2;
+    EnterLoadingFrontend();
 }
 
 static void OpenTrace(unsigned controlWord);

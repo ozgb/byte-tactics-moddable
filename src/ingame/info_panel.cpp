@@ -87,7 +87,7 @@ struct LayerView {
     int value;
 };
 
-#include "feature_spot.h"
+#include "../map/feature_spot.h"
 
 struct Def_004685a0 {
     char unknown_0[0x20];
@@ -1401,7 +1401,7 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
     int shade = s >> 3;
     int y = f->footprintZ * 16 / 2 - shade + (iy + 2) * 16 - g_game->scrollY;
     if (cell->flags & 1) {
-        FeatureSpot* spot = &g_game->spots[*(unsigned short*)&cell->offsetY];
+        FeatureSpot* spot = &g_game->spots[cell->spot];
         if (f->drawn) {
             if ((spot->spotFlags & 4) && (DrawFlags() & 0x10)) {
                 short* frame = (short*)GetGafSequenceFrame(&spot->shadow);

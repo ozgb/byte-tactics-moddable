@@ -11,8 +11,13 @@ struct Cell {
     unsigned char low;
     unsigned char metal;
     unsigned short feature;
-    unsigned char offsetY;
-    unsigned char offsetX;
+    union {
+        unsigned short spot;
+        struct {
+            unsigned char offsetY;
+            unsigned char offsetX;
+        };
+    };
     unsigned char flags;
 };
 

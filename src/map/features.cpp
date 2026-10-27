@@ -157,45 +157,7 @@ struct Spot {
 };
 
 
-union SpotField {
-    struct {
-        unsigned char offsetY;
-        unsigned char offsetX;
-    };
-    unsigned short spot;
-};
-
-struct Cell {
-    union {
-        char unknown_0[8];
-        struct {
-            short unit;
-            char unknown_2[6];
-        };
-        struct {
-            char unknown_0b[7];
-            char field7;
-        };
-    };
-    unsigned short feature;
-    union {
-        struct {
-            unsigned char offsetY;
-            unsigned char offsetX;
-        };
-        unsigned short spot;
-        SpotField sf;
-    };
-    union {
-        unsigned char flags;
-        struct {
-            unsigned char flag0 : 1;
-            unsigned char bits1 : 2;
-            unsigned char owner : 4;
-            unsigned char bit7 : 1;
-        };
-    };
-};
+#include "cell.h"
 
 #include "../network/player.h"
 #include "../network/player_info.h"
@@ -359,7 +321,7 @@ void StampFeatureMetal(void)
                     for (int x = x0; x < x0 + f->footprintX; x++) {
                         Cell* cc = g_seams.los_radar->GetMapCell(x, y);
                         if (cc != 0)
-                            cc->field7 = (char)f->metal;
+                            cc->metal = (char)f->metal;
                     }
                 }
             }
@@ -1195,19 +1157,19 @@ static inline void ClearCell(Cell* c)
 int __stdcall RemoveFeature(Cell* cell, int flag)
 {
     if (cell->feature == 0xfffe)
-        cell -= cell->sf.offsetY * g_game->width + cell->sf.offsetX;
+        cell -= cell->offsetY * g_game->width + cell->offsetX;
     if (cell->feature >= 0xfffb)
         return 0;
     Feature* f = &g_game->features[cell->feature];
     if (flag == 0 && (f->flags16 & 0x200))
         return 0;
     if (cell->flags & 1) {
-        Spot* spot = &((Spot *)g_game->spots.get())[cell->sf.spot];
+        Spot* spot = &((Spot *)g_game->spots.get())[cell->spot];
         if (!(f->flags16 & 1)) {
             FreeObjectState(spot->state);
             spot->state = 0;
         }
-        MoveFeatureSpot(cell->sf.spot, &g_game->pool.freeHead);
+        MoveFeatureSpot(cell->spot, &g_game->pool.freeHead);
     }
     ClearCell(cell);
     for (int y = 0; y < f->footprint.y; y++) {

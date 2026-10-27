@@ -15,23 +15,7 @@
 
 #include "../graphics/rect.h"
 
-struct Cell {
-    unsigned short unit;
-    char unknown_2[2];
-    unsigned char height;
-    unsigned char high;
-    unsigned char low;
-    unsigned char metal;
-    unsigned short feature;
-    union {
-        struct {
-            unsigned char offsetY;
-            unsigned char offsetX;
-        };
-        unsigned short spotField;
-    } sf;
-    unsigned char flags;
-};
+#include "../map/cell.h"
 
 struct FogCell {
     union {
@@ -282,8 +266,8 @@ Cell* __stdcall GetOriginCellAtPosition(Vec3* pos)
     Cell* cell = &g_game->cells[z * g_game->width + x];
     if (cell->feature == 0xfffe)
     {
-        x -= cell->sf.offsetX;
-        z -= cell->sf.offsetY;
+        x -= cell->offsetX;
+        z -= cell->offsetY;
         if (x < 0 || x >= g_game->width || z < 0 || z >= g_game->height)
             cell = 0;
         else

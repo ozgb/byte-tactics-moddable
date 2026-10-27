@@ -18,8 +18,29 @@ struct Cell {
             unsigned char offsetX;
         };
     };
-    unsigned char flags;
+    union {
+        unsigned char flags;
+        struct {
+            unsigned char flag0 : 1;
+            unsigned char bits1 : 2;
+            unsigned char owner : 4;
+            unsigned char bit7 : 1;
+        };
+        struct {
+            unsigned char plotLow : 3;
+            unsigned char plotFeature : 5;
+        };
+        struct {
+            unsigned char plotLow4 : 3;
+            unsigned char plotFeature4 : 4;
+        };
+    };
 };
+
+static_assert(sizeof(Cell) == 13, "");
+static_assert(__builtin_offsetof(Cell, feature) == 8, "");
+static_assert(__builtin_offsetof(Cell, spot) == 10, "");
+static_assert(__builtin_offsetof(Cell, flags) == 12, "");
 
 #pragma pack(pop)
 

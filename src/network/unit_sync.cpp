@@ -1211,13 +1211,13 @@ UnitSyncMap::~UnitSyncMap()
         _Head->right = _Head;
     }
     operator delete(_Head);
-    _Head = 0;
+    _Head = nullptr;
     _Size = 0;
     {
         std::_Lockit lock;
         if (--g_unitSyncMapNilRefs == 0) {
             operator delete(g_unitSyncMapNil);
-            g_unitSyncMapNil = 0;
+            g_unitSyncMapNil = nullptr;
         }
     }
 }

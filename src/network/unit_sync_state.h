@@ -187,7 +187,7 @@ public:
     unsigned int ackd;
     PacketSequencer sub;
 
-    UnitSyncPlayer() {}
+    UnitSyncPlayer() : id(0), expected(0), sent(0), ackd(0) {}
     UnitSyncPlayer(const UnitSyncPlayer& other);
     ~UnitSyncPlayer();
     UnitSyncPlayer& operator=(const UnitSyncPlayer& rhs);

@@ -49,8 +49,8 @@ not atomic, so two threads can lose an update, and llvm-cov then reports the oth
 underflowed to 2^63-1.
 
 Unstable functions. A row with `functions` and `dead` 0 and a reason starting `unstable:` marks a live function whose
-branches depend on wall-clock timing (a sampler on GetTicks). The function is counted as before, but its
-branches are left out of its subsystem's branch total and covered count. The rows are written by hand, and
+lines or branches depend on timing (a sampler on GetTicks, a wait on a lock another thread holds). The function
+is counted as before, but its lines and branches are left out of its subsystem's totals and covered counts. The rows are written by hand, and
 `--write` keeps them. `--write` and `--check` fail when a marked (subsystem, function, file, decorated) row
 matches no live function of the export.
 
@@ -282,7 +282,7 @@ def subsystem_of(fn: Function, by_key: dict[tuple[str, str], str], by_name: dict
 def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[str, set[str]],
               live: set[str] | None = None,
               unstable: dict[tuple[str, str, str, str], str] | None = None) -> tuple[dict[str, Totals], int, int]:
-    """(subsystem -> Totals, entries excluded, functions unassigned) of an llvm-cov export, counting each (file, decorated name) once. Dead functions (see merge_copies) are listed and counted apart, and left out of the sums. A function named by an unstable key (subsystem, function, file, decorated) counts as before but with no branches, and is listed in its subsystem's unstable and reasons."""
+    """(subsystem -> Totals, entries excluded, functions unassigned) of an llvm-cov export, counting each (file, decorated name) once. Dead functions (see merge_copies) are listed and counted apart, and left out of the sums. A function named by an unstable key (subsystem, function, file, decorated) counts as before but with no lines or branches, and is listed in its subsystem's unstable and reasons."""
     groups: dict[tuple[str, str], list[Copy]] = {}
     missed: dict[str, list[tuple[str, str, str]]] = {}
     dead: dict[str, list[tuple[str, str, str]]] = {}
@@ -306,7 +306,7 @@ def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[st
             continue
         key = (subsystem, fn.name, fn.file, path_free(decorated))
         if unstable and key in unstable:
-            fn.branches = fn.branches_covered = 0
+            fn.lines = fn.lines_hit = fn.branches = fn.branches_covered = 0
             t.unstable.append(key[1:])
             t.reasons[key[1:]] = unstable[key]
         t.add(fn)

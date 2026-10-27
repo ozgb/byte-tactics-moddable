@@ -409,11 +409,11 @@ class UnstableTest(unittest.TestCase):
         unstable = {("economy", *self.RESET): self.REASON} if marked else None
         return cov.summarize(EXPORT, KEY, NAME, None, unstable)[0]
 
-    def test_marked_function_branches_are_left_out_of_the_totals(self):
+    def test_marked_function_lines_and_branches_are_left_out_of_the_totals(self):
         plain, marked = self.totals(False)["economy"], self.totals()["economy"]
-        self.assertEqual((plain.branches, plain.branches_covered), (4, 1))
-        self.assertEqual((marked.branches, marked.branches_covered), (2, 0))
-        for attr in ("functions", "functions_entered", "lines", "lines_hit"):
+        self.assertEqual((plain.lines, plain.lines_hit, plain.branches, plain.branches_covered), (7, 5, 4, 1))
+        self.assertEqual((marked.lines, marked.lines_hit, marked.branches, marked.branches_covered), (2, 0, 2, 0))
+        for attr in ("functions", "functions_entered"):
             self.assertEqual(getattr(marked, attr), getattr(plain, attr))
         self.assertEqual(marked.unstable, [self.RESET])
         self.assertEqual(self.totals()["units"], self.totals(False)["units"])

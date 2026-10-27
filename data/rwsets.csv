@@ -7939,9 +7939,7 @@ address,function,file,kind,target
 0x424890,SaveFeatures,src/map/features.cpp,field_read,Cell::feature
 0x424890,SaveFeatures,src/map/features.cpp,field_read,Cell::flags
 0x424890,SaveFeatures,src/map/features.cpp,field_read,Cell::spot
-0x424890,SaveFeatures,src/map/features.cpp,field_read,Feature::anim0
-0x424890,SaveFeatures,src/map/features.cpp,field_read,Feature::anim1
-0x424890,SaveFeatures,src/map/features.cpp,field_read,Feature::anim2
+0x424890,SaveFeatures,src/map/features.cpp,field_read,Feature::animIds
 0x424890,SaveFeatures,src/map/features.cpp,field_read,Feature::flags
 0x424890,SaveFeatures,src/map/features.cpp,field_read,Game::cells
 0x424890,SaveFeatures,src/map/features.cpp,field_read,Game::featureCount

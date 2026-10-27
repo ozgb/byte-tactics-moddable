@@ -36,7 +36,6 @@ extern int g_playBufferLooping;
 #include "../files/files_api.h"
 
 #include "samples.h"
-#include "cd_audio.h"
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 
 extern int g_delayedSampleVolume;

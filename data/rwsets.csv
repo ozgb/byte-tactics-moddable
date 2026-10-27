@@ -47140,9 +47140,16 @@ address,function,file,kind,target
 ,RunScriptedConsole,src/harness/harness.cpp,call,ExecuteCommandLine
 ,RunScriptedConsole,src/harness/harness.cpp,call,FailLine
 ,RunScriptedConsole,src/harness/harness.cpp,call,GameAt
+,RunScriptedConsole,src/harness/harness.cpp,call,GetCellFeature
+,RunScriptedConsole,src/harness/harness.cpp,call,GetMapCell
+,RunScriptedConsole,src/harness/harness.cpp,call,WorldPosition
+,RunScriptedConsole,src/harness/harness.cpp,call,memcpy
 ,RunScriptedConsole,src/harness/harness.cpp,call,sprintf
 ,RunScriptedConsole,src/harness/harness.cpp,call,strcpy
+,RunScriptedConsole,src/harness/harness.cpp,deref_read,*short
 ,RunScriptedConsole,src/harness/harness.cpp,deref_read,*unsigned short
+,RunScriptedConsole,src/harness/harness.cpp,deref_write,*short
+,RunScriptedConsole,src/harness/harness.cpp,deref_write,*unsigned short
 ,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::lineNo
 ,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::text
 ,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::word

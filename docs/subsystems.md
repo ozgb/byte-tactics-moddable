@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4438 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4442 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -30,7 +30,7 @@ The subsystems and the issue each maps to:
 | [map](#the-remaining-subsystems) | 108 | none yet |
 | [network](#the-remaining-subsystems) | 341 | none yet |
 | [game](#the-remaining-subsystems) | 211 | none yet |
-| [harness](#the-remaining-subsystems) | 167 | none yet |
+| [harness](#the-remaining-subsystems) | 171 | none yet |
 | [presentation](#the-remaining-subsystems) | 1402 | none yet |
 | [platform](#the-remaining-subsystems) | 731 | none yet |
 | [seams](#the-remaining-subsystems) | 103 | none yet |
@@ -612,7 +612,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Developer tool only (2): `HAPI_CreateFile`, `RenameFile`. The GUI layout editor.
 - Game data only (4): `FreeRecord_004be180`, `HAPI_LoadOpenFile`, `RemoveFile`, `WriteBufferToFile`. Entered only with files the stock install lacks (OVR banks, `download` TDFs, briefings) or with a cache missing (palette and shade tables written on first run). `AccountBank::GetIntegerItem`, `AccountBank::LoadAccount`, `HAPI_TellFile`, `HapiBank::GetIntegerItem` and `SquashUnpackedSize` are entered by the load of `load-midgame` (#442).
 
-**harness** (167 functions). The test harness of #3 (`src/harness`). No phase root. 10 functions are called from outside; the busiest are `HarnessViewRand` (20), `HarnessTestMode` (4), `HarnessCrtSeed` (2). It imports 51 functions (presentation 5, map 3).
+**harness** (171 functions). The test harness of #3 (`src/harness`). No phase root. 10 functions are called from outside; the busiest are `HarnessViewRand` (20), `HarnessTestMode` (4), `HarnessCrtSeed` (2). It imports 51 functions (presentation 5, map 3).
 
 **presentation** (1402 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 311 functions are called from outside, mostly by game (215 distinct functions); the busiest are `QueueUnitSpeech` (27), `PlaySoundByName` (18), `GetDisplay` (17). It imports 335 functions: platform 85, network 65, game 24, map 24, players 14. The reverse direction is the one to remove: 53 imports from presentation in the nine module subsystems, the largest in los_radar (18), weapons (16) and features (9). Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 

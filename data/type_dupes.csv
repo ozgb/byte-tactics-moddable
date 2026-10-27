@@ -24,7 +24,7 @@ BuilderLinkPacket,no,2,include/ta_types.h:6599|src/network/net_game.cpp:909,diff
 Cell,no,7,include/ta_types.h:2500|src/map/cell.h:6|src/map/features.cpp:274|src/map/line_of_sight.cpp:18|src/map/plot_map.cpp:6|src/units/units.cpp:17|src/weapons/explosions.cpp:115,differs,src/map/cell.h
 Channel_004b0c40,no,2,include/ta_types.h:12521|src/units/cob.cpp:8,same-layout,src/units/cob.cpp
 Chunk,no,3,include/ta_types.h:5056|src/graphics/surface.cpp:705|src/state/block.cpp:30,differs,src/graphics/surface.cpp
-Class_0043db50,no,3,include/ta_types.h:5412|src/orders/order_list.cpp:692|src/units/sfx_occupy.h:6,differs,src/units/sfx_occupy.h
+Class_0043db50,no,3,include/ta_types.h:5412|src/orders/order_list.cpp:691|src/units/sfx_occupy.h:6,differs,src/units/sfx_occupy.h
 Class_00440500,no,2,include/ta_types.h:5535|src/units/movement_class.cpp:55,differs,src/units/movement_class.cpp
 Class_0044e6c0,no,2,include/ta_types.h:3160|src/orders/vtol_orders.cpp:106,differs,src/orders/vtol_orders.cpp
 Class_0044e720,no,2,include/ta_types.h:3220|src/orders/vtol_orders.cpp:108,differs,src/orders/vtol_orders.cpp
@@ -128,7 +128,7 @@ MappedFile,no,2,include/ta_types.h:16098|src/host/win32/crash.cpp:305,differs,sr
 Message_0047fad0,no,2,include/ta_types.h:9712|src/sound/sound.cpp:126,differs,src/sound/sound.cpp
 MeteorParams,no,4,include/ta_types.h:4940|src/map/map_list.cpp:49|src/map/meteors.cpp:22|src/seams/native.cpp:28,differs,src/map/map_list.cpp
 MissionHolder,no,2,include/ta_types.h:4467|src/units/unit_types.cpp:63,differs,src/units/unit_types.cpp
-MissionOrderTable,no,2,include/ta_types.h:5339|src/orders/order_list.cpp:659,differs,src/orders/order_list.cpp
+MissionOrderTable,no,2,include/ta_types.h:5339|src/orders/order_list.cpp:658,differs,src/orders/order_list.cpp
 Mission_00467e50,no,2,include/ta_types.h:7790|src/ingame/info_panel.cpp:136,differs,src/ingame/info_panel.cpp
 ModeList_004b5330,no,2,include/ta_types.h:5692|src/graphics/display.cpp:116,differs,src/graphics/display.cpp
 Mode_00446310,no,2,include/ta_types.h:5684|src/frontend/multi.cpp:541,differs,src/frontend/multi.cpp

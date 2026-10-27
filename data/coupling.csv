@@ -1132,7 +1132,7 @@ harness,map,call,Mission::CountStartPositions,1
 harness,map,call,Mission::GetCampaignName,1
 harness,map,call,Mission::LoadCampaign,2
 harness,map,call,Mission::LoadMissionByName,2
-harness,map,call,SetMissionType,2
+harness,map,call,SetMissionType,1
 harness,map,shared_write,Game::difficulty,1
 harness,map,shared_write,Game::numPlayers,1
 harness,map,shared_write,Game::playerIndex,1
@@ -1430,7 +1430,7 @@ map,game,shared_write,Grid::width,1
 map,game,shared_write,Unit::flags,3
 map,game,shared_write,Vec3::x,2
 map,game,shared_write,Vec3::z,2
-map,harness,shared_write,Game::net,2
+map,harness,shared_write,Game::net,1
 map,los_radar,indirect,DetectionVisitor::MarkUnitsInRadarOrSonarRadius,1
 map,los_radar,indirect,GetMapCell,1
 map,los_radar,indirect,GetMapCellAtPosition,1

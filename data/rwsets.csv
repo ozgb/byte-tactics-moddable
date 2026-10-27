@@ -43461,6 +43461,11 @@ address,function,file,kind,target
 ,Bar_004685a0,src/ingame/info_panel.cpp,field_write,Rect::right
 ,Bar_004685a0,src/ingame/info_panel.cpp,function,
 ,Bar_004685a0,src/ingame/info_panel.cpp,global_read,g_game
+,BeginMission,src/harness/harness.cpp,call,SetMissionType
+,BeginMission,src/harness/harness.cpp,call,operator Mission *
+,BeginMission,src/harness/harness.cpp,field_read,Game::net
+,BeginMission,src/harness/harness.cpp,function,
+,BeginMission,src/harness/harness.cpp,global_read,g_game
 ,BelowSeaLevel,src/orders/vtol_orders.cpp,call,operator Unit *
 ,BelowSeaLevel,src/orders/vtol_orders.cpp,call,operator->
 ,BelowSeaLevel,src/orders/vtol_orders.cpp,field_read,Game::seaLevel
@@ -44500,6 +44505,11 @@ address,function,file,kind,target
 ,EndSection,src/harness/harness.cpp,function,
 ,EnergyAccount,src/game/economy.cpp,field_escape,UnitResources::energyMake
 ,EnergyAccount,src/game/economy.cpp,function,
+,EnterLoadingFrontend,src/harness/harness.cpp,field_write,Game::frontendNextSubState
+,EnterLoadingFrontend,src/harness/harness.cpp,field_write,Game::frontendState
+,EnterLoadingFrontend,src/harness/harness.cpp,field_write,Game::frontendSubState
+,EnterLoadingFrontend,src/harness/harness.cpp,function,
+,EnterLoadingFrontend,src/harness/harness.cpp,global_read,g_game
 ,Entries,src/ingame/control_panel.cpp,function,
 ,EntriesInsertNew,src/util/tdf.cpp,call,MakePair
 ,EntriesInsertNew,src/util/tdf.cpp,call,Rows
@@ -44585,6 +44595,11 @@ address,function,file,kind,target
 ,FeatureVec3,src/map/features.cpp,field_write,Vec3::y
 ,FeatureVec3,src/map/features.cpp,field_write,Vec3::z
 ,FeatureVec3,src/map/features.cpp,function,
+,FileHasLoadLine,src/harness/harness.cpp,call,fgets
+,FileHasLoadLine,src/harness/harness.cpp,call,rewind
+,FileHasLoadLine,src/harness/harness.cpp,call,strncmp
+,FileHasLoadLine,src/harness/harness.cpp,deref_read,*char
+,FileHasLoadLine,src/harness/harness.cpp,function,
 ,FileNameEntry::operator char *,src/units/unit_types.cpp,field_read,FileNameEntry::data
 ,FileNameEntry::operator char *,src/units/unit_types.cpp,function,
 ,FileNameEntry::~FileNameEntry,src/units/unit_types.cpp,call,StringRef::ReleaseRef
@@ -49105,6 +49120,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_read,s_decidedLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_gameType@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_gameTypeLine@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_read,s_loadAhead@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_loadLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_quirkReach@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
@@ -49210,6 +49226,7 @@ address,function,file,kind,target
 ,ReadScenario,src/harness/harness.cpp,call,CheckScenario
 ,ReadScenario,src/harness/harness.cpp,call,Fail
 ,ReadScenario,src/harness/harness.cpp,call,FailLine
+,ReadScenario,src/harness/harness.cpp,call,FileHasLoadLine
 ,ReadScenario,src/harness/harness.cpp,call,InitPlayerSpecs
 ,ReadScenario,src/harness/harness.cpp,call,ReadKey
 ,ReadScenario,src/harness/harness.cpp,call,fclose
@@ -49221,6 +49238,7 @@ address,function,file,kind,target
 ,ReadScenario,src/harness/harness.cpp,deref_read,*char
 ,ReadScenario,src/harness/harness.cpp,deref_write,*char
 ,ReadScenario,src/harness/harness.cpp,function,
+,ReadScenario,src/harness/harness.cpp,global_write,s_loadAhead@src/harness/harness.cpp
 ,ReadSettingInt,src/game/settings.cpp,call,SettingGetInt
 ,ReadSettingInt,src/game/settings.cpp,call,SettingSetInt
 ,ReadSettingInt,src/game/settings.cpp,field_read,Game::options
@@ -49794,6 +49812,8 @@ address,function,file,kind,target
 ,SetTarget,src/ingame/control_panel.cpp,field_write,Game::y2
 ,SetTarget,src/ingame/control_panel.cpp,function,
 ,SetTarget,src/ingame/control_panel.cpp,global_read,g_game
+,SetUpLoadedGame,src/harness/harness.cpp,call,BeginMission
+,SetUpLoadedGame,src/harness/harness.cpp,call,EnterLoadingFrontend
 ,SetUpLoadedGame,src/harness/harness.cpp,call,FailLoad
 ,SetUpLoadedGame,src/harness/harness.cpp,call,FreeSummaryBank
 ,SetUpLoadedGame,src/harness/harness.cpp,call,HapiBank::GetIntegerItem
@@ -49805,13 +49825,11 @@ address,function,file,kind,target
 ,SetUpLoadedGame,src/harness/harness.cpp,call,OpenHapiBank
 ,SetUpLoadedGame,src/harness/harness.cpp,call,OpenSummaryBank
 ,SetUpLoadedGame,src/harness/harness.cpp,call,ScenarioTable
-,SetUpLoadedGame,src/harness/harness.cpp,call,SetMissionType
 ,SetUpLoadedGame,src/harness/harness.cpp,call,fclose
 ,SetUpLoadedGame,src/harness/harness.cpp,call,fopen
 ,SetUpLoadedGame,src/harness/harness.cpp,call,fread
 ,SetUpLoadedGame,src/harness/harness.cpp,call,fseek
 ,SetUpLoadedGame,src/harness/harness.cpp,call,ftell
-,SetUpLoadedGame,src/harness/harness.cpp,call,operator Mission *
 ,SetUpLoadedGame,src/harness/harness.cpp,call,sprintf
 ,SetUpLoadedGame,src/harness/harness.cpp,call,strcpy
 ,SetUpLoadedGame,src/harness/harness.cpp,call,strlen
@@ -49820,13 +49838,9 @@ address,function,file,kind,target
 ,SetUpLoadedGame,src/harness/harness.cpp,field_maybe_written,Game::campaignMissionStatus
 ,SetUpLoadedGame,src/harness/harness.cpp,field_maybe_written,Game::saveName_38c6b
 ,SetUpLoadedGame,src/harness/harness.cpp,field_maybe_written,OptionsTable::mapName
-,SetUpLoadedGame,src/harness/harness.cpp,field_read,Game::net
 ,SetUpLoadedGame,src/harness/harness.cpp,field_read,Game::pendingSaveStore
 ,SetUpLoadedGame,src/harness/harness.cpp,field_write,Game::difficulty
 ,SetUpLoadedGame,src/harness/harness.cpp,field_write,Game::flag_37ef2
-,SetUpLoadedGame,src/harness/harness.cpp,field_write,Game::frontendNextSubState
-,SetUpLoadedGame,src/harness/harness.cpp,field_write,Game::frontendState
-,SetUpLoadedGame,src/harness/harness.cpp,field_write,Game::frontendSubState
 ,SetUpLoadedGame,src/harness/harness.cpp,field_write,Game::numPlayers
 ,SetUpLoadedGame,src/harness/harness.cpp,field_write,Game::pendingSaveStore
 ,SetUpLoadedGame,src/harness/harness.cpp,field_write,OptionsTable::commanderDeath
@@ -49844,6 +49858,8 @@ address,function,file,kind,target
 ,SetUpLoadedGame,src/harness/harness.cpp,global_read,s_savePath@src/harness/harness.cpp
 ,SetUpLoadedGame,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,call,ApplySlotsToGamePlayers
+,SetUpSkirmish,src/harness/harness.cpp,call,BeginMission
+,SetUpSkirmish,src/harness/harness.cpp,call,EnterLoadingFrontend
 ,SetUpSkirmish,src/harness/harness.cpp,call,Fail
 ,SetUpSkirmish,src/harness/harness.cpp,call,FailLine
 ,SetUpSkirmish,src/harness/harness.cpp,call,FindSide
@@ -49857,9 +49873,7 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,call,ScenarioTable
 ,SetUpSkirmish,src/harness/harness.cpp,call,SeedNetworkHost
 ,SetUpSkirmish,src/harness/harness.cpp,call,SeedNetworkTable
-,SetUpSkirmish,src/harness/harness.cpp,call,SetMissionType
 ,SetUpSkirmish,src/harness/harness.cpp,call,memset
-,SetUpSkirmish,src/harness/harness.cpp,call,operator Mission *
 ,SetUpSkirmish,src/harness/harness.cpp,call,operator=
 ,SetUpSkirmish,src/harness/harness.cpp,call,sprintf
 ,SetUpSkirmish,src/harness/harness.cpp,call,strcpy
@@ -49868,7 +49882,6 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,field_escape,PlayerSpec::side
 ,SetUpSkirmish,src/harness/harness.cpp,field_maybe_written,OptionsTable::mapName
 ,SetUpSkirmish,src/harness/harness.cpp,field_maybe_written,PlayerSpec::side
-,SetUpSkirmish,src/harness/harness.cpp,field_read,Game::net
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,Game::sides
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,OptionsTable::difficulty
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,PlayerSpec::color
@@ -49882,9 +49895,6 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,Player_0047ae60::active
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,Player_0047ae60::shade
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::difficulty
-,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::frontendNextSubState
-,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::frontendState
-,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::frontendSubState
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::handler
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::localPlayer
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::mode_391f1

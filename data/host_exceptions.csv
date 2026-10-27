@@ -261,7 +261,6 @@ src/ingame/game_dialogs.cpp,src/sound/sound.h,#392
 src/ingame/info_panel.cpp,src/graphics/display.h,#392
 src/ingame/info_panel.cpp,src/graphics/draw.h,#392
 src/ingame/info_panel.cpp,src/graphics/gaf_frame.h,#392
-src/ingame/info_panel.cpp,src/graphics/handle.h,#392
 src/ingame/info_panel.cpp,src/graphics/rect.h,#392
 src/ingame/info_panel.cpp,src/graphics/surface.h,#392
 src/ingame/info_panel.cpp,src/gui/dialogs.h,#392

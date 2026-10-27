@@ -34,68 +34,6 @@ struct Nano_0041b8d0 {
     int drawFrame;
 };
 
-struct UnitTypeFlagsBits {
-    unsigned int unknown_0 : 6;
-    unsigned int flag_6 : 1;
-    unsigned int unknown_7 : 4;
-    unsigned int flag_11 : 1;
-    unsigned int unknown_12 : 6;
-    unsigned int flag_18 : 1;
-    unsigned int unknown_19 : 5;
-    unsigned int flag_24 : 1;
-    unsigned int unknown_25 : 7;
-};
-
-union UnitTypeFlags {
-    unsigned int raw;
-    UnitTypeFlagsBits bits;
-};
-
-struct UnitTypeFlags2 {
-    unsigned int canMoveOrder : 1;
-    unsigned int canFireOrder : 1;
-    unsigned int canOnOff : 1;
-    unsigned int canStop : 1;
-    unsigned int canAttack : 1;
-    unsigned int canDefend : 1;
-    unsigned int canPatrol : 1;
-    unsigned int canMove : 1;
-    unsigned int canLoad : 1;
-    unsigned int canRepair : 1;
-    unsigned int canReclaim : 1;
-    unsigned int bit11 : 1;
-    unsigned int canCapture : 1;
-    unsigned int canCloak : 1;
-    unsigned int canBlast : 1;
-    unsigned int bits15 : 17;
-};
-
-struct UnitType {
-    char unknown_0[0x20];
-    char unitname[0x20];
-    char unknown_40[0x111 - 0x40];
-    unsigned int field_111;
-    char unknown_115[0x14a - 0x115];
-    Point16 origin;
-    char unknown_14e[0x156 - 0x14e];
-    int ids;
-    char unknown_15a[0x186 - 0x15a];
-    float energyCost;
-    float metalCost;
-    char unknown_18e[0x1ea - 0x18e];
-    int buildtime;
-    char unknown_1ee[0x1fa - 0x1ee];
-    unsigned int maxHealth;
-    char unknown_1fe[0x21e - 0x1fe];
-    short id;
-    char unknown_220[0x22e - 0x220];
-    unsigned char buildMenuPageCount;
-    unsigned char mobile;
-    char unknown_230[0x241 - 0x230];
-    UnitTypeFlags flags;
-    UnitTypeFlags2 flags2;
-};
-
 #include "../gui/gadget.h"
 #include "../gui/layer.h"
 #include "../gui/gui.h"
@@ -106,6 +44,7 @@ struct UnitType {
 
 #include "../units/unit_def.h"
 #include "../units/unit.h"
+#include "../weapons/weapon_def.h"
 
 struct BuildEntry_0041ace0 {
     short typeId;
@@ -171,9 +110,9 @@ void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mas
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 void __stdcall IssueOrCancelOrder(MissionType kind, int remove, Unit* owner,
                             int id, Vec3* pos, int typeId, int amount);
-int __stdcall CanBuildAt(UnitType* type, Point16 cell, int a, Player* player);
+int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, Player* player);
 #include "../graphics/movies.h"
-int __stdcall GetFootprintHeight(UnitType* unit, Point16 cell);
+int __stdcall GetFootprintHeight(UnitDef* unit, Point16 cell);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 #include "../orders/order_list.h"
 int __stdcall FindGadgetIndexBySubstring(int value, char* name);
@@ -236,7 +175,7 @@ void InitCommands()
 // FUNCTION: 0x4195f0
 void __stdcall CopyMenuEntryName(char* dest, unsigned short index)
 {
-    strncpy(dest, ((UnitType *)g_game->defs.get())[index].unitname, 0x20);
+    strncpy(dest, ((UnitDef *)g_game->defs.get())[index].unitname, 0x20);
     dest[0x1f] = 0;
 }
 
@@ -253,7 +192,7 @@ void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
 {
     unsigned int remove = (arg->keyFlags >> 2) & 1;
     unsigned short index = g_game->buildTypeIndex;
-    UnitType* def = &((UnitType *)g_game->defs.get())[index];
+    UnitDef* def = &((UnitDef *)g_game->defs.get())[index];
     Vec3 pos = g_game->pos;
     Point16 origin = def->origin;
     Point16 cell = WorldToCell(pos, origin);
@@ -263,12 +202,11 @@ void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
     unsigned char team = g_game->localPlayer;
     Player* p = &g_game->players[team];
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
-        if ((u->flags & 0x10) && (((UnitType*)u->def.get())->flags.raw & 0x40)) {
-            if (!(((UnitType*)u->def.get())->flags.raw & 0x800)) {
+        if ((u->flags & 0x10) && (((UnitDef*)u->def.get())->flags1 & 0x40)) {
+            if (!(((UnitDef*)u->def.get())->flags1 & 0x800)) {
                 IssueOrCancelOrder("MOBILEBUILD", remove, u, 0, &pos, index, 0);
             } else {
-                UnitTypeFlagsBits flags = ((UnitType*)u->def.get())->flags.bits;
-                if (flags.flag_11) {
+                if (((UnitDef*)u->def.get())->flying) {
                     IssueOrCancelOrder("VTOL_MOBILEBUILD", remove, u, 0, &pos, index, 0);
                 }
             }
@@ -279,7 +217,7 @@ void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
 // FUNCTION: 0x4197d0
 int UpdatePlacementGhostValidity(void)
 {
-    UnitType* item = &((UnitType *)g_game->defs.get())[g_game->buildTypeIndex];
+    UnitDef* item = &((UnitDef *)g_game->defs.get())[g_game->buildTypeIndex];
     Point16 cell = WorldToCell(g_game->pos, item->origin);
     g_game->boxStartX = cell.x << 4;
     g_game->boxStartZ = cell.y << 4;
@@ -300,7 +238,7 @@ int UpdatePlacementGhostValidity(void)
 // FUNCTION: 0x419940
 void __stdcall SetBuildCountText(Gui* obj, unsigned short index, int n)
 {
-    Gadget* e = FindGadgetOrNull(obj->layer->entries, ((UnitType *)g_game->defs.get())[index].unitname);
+    Gadget* e = FindGadgetOrNull(obj->layer->entries, ((UnitDef *)g_game->defs.get())[index].unitname);
     if (e) {
         if (n)
             sprintf(e->u.text, "+%d", n);
@@ -506,7 +444,7 @@ void __stdcall RefreshOrderButtons(Unit* unit)
 
     index = FindGadgetIndexBySubstring(layer, "BUILD");
     if (index != -1) {
-        if (unit && ((UnitType*)unit->def.get())->buildMenuPageCount) {
+        if (unit && ((UnitDef*)unit->def.get())->buildMenuPageCount) {
             SetGadgetStatus(menu, index, unit->menu.menuOpen);
         } else {
             SetGrayedOut(menu, index, 1);
@@ -514,7 +452,7 @@ void __stdcall RefreshOrderButtons(Unit* unit)
     }
     index = FindGadgetIndexBySubstring(layer, "ORDERS");
     if (index != -1) {
-        if (unit && ((UnitType*)unit->def.get())->buildMenuPageCount) {
+        if (unit && ((UnitDef*)unit->def.get())->buildMenuPageCount) {
             SetGadgetStatus(menu, index, !unit->menu.menuOpen);
         } else {
             SetGrayedOut(menu, index, 1);
@@ -705,7 +643,7 @@ int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
 void __stdcall SetPrevNextGadgetNames(Unit* unit)
 {
     char buf[256];
-    if (((UnitType*)unit->def.get())->buildMenuPageCount < 2) {
+    if (((UnitDef*)unit->def.get())->buildMenuPageCount < 2) {
         sprintf(buf, "%sPREV", g_game->sideNames_37f5b[unit->player->info->side].name);
         SetGadgetActiveByName(&g_game->gui, buf, 0);
         sprintf(buf, "%sNEXT", g_game->sideNames_37f5b[unit->player->info->side].name);
@@ -735,7 +673,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
         } else if (strstr(name, "BUILD")) {
             g_game->ordersPanelFlags_37ebe_6.bits.build = 1;
             PlaySoundByName("buildbutton", 0);
-        } else if (id != 0 && ((UnitType *)g_game->defs.get())[id].mobile == 0) {
+        } else if (id != 0 && ((UnitDef *)g_game->defs.get())[id].mobile == 0) {
             g_game->orderMode = 0xe;
             g_game->buildTypeIndex = id;
             PlaySoundByName("addbuild", 0);
@@ -755,7 +693,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
                         QueueBuildOrder(text, unit, -1);
                 }
                 if (unit->immobile
-                    || (((UnitType*)unit->weapons[0].weapon.get())->field_111 & 0x10000000))
+                    || (unit->weapons[0].weapon.get()->flags.value & 0x10000000))
                     RefreshBuildCountTexts(menu, unit);
                 MarkChanged((Dialog *)&g_game->gui);
             }
@@ -816,7 +754,7 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
                 for (int j = 0; j < g_game->buildLists[i].count; j++) {
                     BuildList_0041ace0* lists = g_game->buildLists;
                     BuildEntry_0041ace0* entry = &lists[i].entries[j];
-                    if (((UnitType*)unit->def.get())->id == entry->typeId
+                    if ((short)((UnitDef*)unit->def.get())->id == entry->typeId
                         && entry->page - 1 == page) {
                         char* src = entry->name;
                         Gadget* e = &layer->entries[entry->slot + 4];
@@ -884,7 +822,7 @@ int __stdcall GetBuildMenuPage(Unit* obj)
 void __stdcall BuildEntryGuiName(char* dest, unsigned short index, int n)
 {
     char name[256];
-    strncpy(name, ((UnitType *)g_game->defs.get())[index].unitname, 0x20);
+    strncpy(name, ((UnitDef *)g_game->defs.get())[index].unitname, 0x20);
     name[0x1f] = 0;
     sprintf(dest, "%s%d.GUI", name, n);
 }
@@ -1054,7 +992,7 @@ void RefreshSelectionOrders()
 // FUNCTION: 0x41b8d0
 void __stdcall FinishConstruction(Unit* unit, Unit* target)
 {
-    if (unit && (unit->flags & 0x10000000) && ((UnitType*)unit->def.get())->ids != 0
+    if (unit && (unit->flags & 0x10000000) && ((UnitDef*)unit->def.get())->ids.offset != 0
         && target && (target->flags & 0x10000000)) {
         ((Nano_0041b8d0*)target->state.get())->drawFrame = 0;
         target->buildLeft = 0;
@@ -1069,11 +1007,11 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
                     AttachUnitToPiece(target, 0, -1, 1);
             }
         }
-        if (((UnitType*)target->def.get())->flags.bits.flag_18)
+        if (((UnitDef*)target->def.get())->b18)
             target->SetStateBits(1, 1);
         if (g_game->unitIndex == unit->id)
             RefreshBuildCountTexts(&g_game->gui, unit);
-        if (((UnitType*)target->def.get())->flags.bits.flag_24) {
+        if (((UnitDef*)target->def.get())->b24) {
             target->lastDamageType = 7;
             target->flags |= 0x4000;
         }
@@ -1097,7 +1035,7 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
         ((unsigned char*)&unit->netDirtyFlags)[1] |= 0x80;
     if (amount == 0.0f)
         return 0;
-    UnitType* type = (UnitType*)unit->def.get();
+    UnitDef* type = (UnitDef*)unit->def.get();
     float prev = unit->buildLeft;
 #ifdef __clang__
     volatile float roundedNext = min(max(prev - amount / type->buildtime, 0.0f), 1.0f);
@@ -1141,7 +1079,7 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
         if (next >= 1.0f)
             g_seams.weapons->DamageUnit(unit, unit, 30000, 9, 0);
     } else if (g_seams.economy->RequestEnergyAndMetal(&builder->resourceSlot, energyCharge, metalCharge)) {
-        unit->health = min(hp + unit->health, ((UnitType*)unit->def.get())->maxHealth);
+        unit->health = min(hp + unit->health, ((UnitDef*)unit->def.get())->maxHealth);
         unit->buildLeft = next;
         unit->flags |= 0x2000;
         result = 1;
@@ -1154,7 +1092,7 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
 // FUNCTION: 0x41bcd0
 void __stdcall ApplyUnfinishedBuildDecay(Unit* unit, int ticks)
 {
-    float val = -((float)(((UnitType*)unit->def.get())->buildtime * ticks) / ((UnitType*)unit->def.get())->energyCost);
+    float val = -((float)(((UnitDef*)unit->def.get())->buildtime * ticks) / ((UnitDef*)unit->def.get())->energyCost);
     AddBuildProgress(unit, unit, val);
 }
 
@@ -1162,7 +1100,7 @@ void __stdcall ApplyUnfinishedBuildDecay(Unit* unit, int ticks)
 int __stdcall AddRepairProgress(Unit* builder, Unit* unit, float f)
 {
     int result = 0;
-    UnitType* s = (UnitType*)unit->def.get();
+    UnitDef* s = (UnitDef*)unit->def.get();
     int max = s->maxHealth;
     int v = s->buildtime;
     if (unit->health >= max)
@@ -1218,7 +1156,7 @@ void __stdcall StepBuildMenuPage(int toggle)
 
 static inline unsigned int SetPage(Unit* u, unsigned int f)
 {
-    return (((((UnitType*)u->def.get())->buildMenuPageCount + 0x1ff) << 23) ^ f) & 0x3800000 ^ f;
+    return (((((UnitDef*)u->def.get())->buildMenuPageCount + 0x1ff) << 23) ^ f) & 0x3800000 ^ f;
 }
 
 static inline unsigned int StepPage(unsigned int f)
@@ -1273,7 +1211,7 @@ void __stdcall OpenBuildMenuPage(int page)
         if (unit->unitDefIndex == 0)
             unit = 0;
         if (unit != 0) {
-            if (page < ((UnitType*)unit->def.get())->buildMenuPageCount) {
+            if (page < ((UnitDef*)unit->def.get())->buildMenuPageCount) {
                 unit->menu.menuOpen = page > 0;
                 if (page != 0)
                     unit->menu.page = page;

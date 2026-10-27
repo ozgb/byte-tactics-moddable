@@ -35,16 +35,6 @@ struct UnitType_004685a0 {
 
 #include "../network/player_info.h"
 
-struct Owner_00467440 {
-    void* active;
-    char unknown_4[0x27 - 0x4];
-    Ref<PlayerInfo> data;
-    char unknown_2b[0x73 - 0x2b];
-    char type;
-    char unknown_74[0x108 - 0x74];
-    unsigned char allied[1];
-};
-
 struct PlayerInfo_004685a0 {
     int f_0;
     char unknown_4[0x2b - 4];
@@ -72,76 +62,13 @@ struct Object_004cb650;
 #include "../units/unit_commands.h"
 #include "../graphics/gaf_frame.h"
 
-struct MapSize_00467440 {
-    unsigned int width;
-    unsigned int height;
-
-    int Contains(unsigned int tx, unsigned int ty)
-    {
-        return tx < width && ty < height;
-    }
-};
-
-struct ByteMap_00467440 {
-    Ref<unsigned char> data;
-    MapSize_00467440 size;
-
-    unsigned char Get(int x, int y) { return data[size.width * y + x]; }
-};
-
-struct PlayerInfo_00467440 {
-    void* active;
-    char unknown_4[0x27 - 0x4];
-    Ref<PlayerInfo> data;
-    char unknown_2b[0x67 - 0x2b];
-    Ref<Unit> unitsBegin;
-    Ref<Unit> unitsEnd;
-    char unknown_6f[0x7c - 0x6f];
-    ByteMap_00467440 explored;
-    char unknown_88[0x144 - 0x88];
-    unsigned short unitCount;
-    unsigned char index;
-    char unknown_147[0x14b - 0x147];
-};
-
 struct Team_004689c0 {
     char unknown_0[4];
     unsigned char* data;
     char unknown_8[347 - 8];
 };
 
-#include "../graphics/handle.h"
-
-struct Feature {
-    char name[0x80];
-    char description[0x14];
-    Point16 footprint;
-    char unknown_98[0xac - 0x98];
-    unsigned short* animTable;
-    unsigned short* shadowTable;
-    char unknown_b4[0xcc - 0xb4];
-    Handle anim;
-    Handle shadowAnim;
-    char unknown_e4[0xec - 0xe4];
-    float energy;
-    float metal;
-    char unknown_f4[0xfa - 0xf4];
-    unsigned char height;
-    char unknown_fb[3];
-    union {
-        struct {
-            unsigned short drawn : 1;
-            unsigned short over : 1;
-            unsigned short flipAnim : 1;
-            unsigned short flipShadow : 1;
-            unsigned short unknown_bits : 4;
-        };
-        struct {
-            char bitsLow;
-            unsigned char flags;
-        };
-    };
-};
+#include "../map/feature.h"
 
 struct ObjectState {
     char unknown_0[0xc];
@@ -633,7 +560,7 @@ void DrawLightBars()
     SetOffscreenSurface(surf);
     FillSurface((Surface *)surf, 0);
 
-    int side = (*(PlayerInfo_00467440 (*)[10])&g_game->players)[g_game->playerIndex].data->side;
+    int side = g_game->players[g_game->playerIndex].info->side;
 
     short* bar = (short*)GetGafFrame(g_game->sidePanelTopSeq[side], 0);
     DrawFrame(surf, bar, bar[2] + 0x81, bar[3]);
@@ -949,7 +876,7 @@ void __stdcall DrawStatusPanel(Surface* win)
     DrawTextClipped(win, buf, left + 0x19, bottom + 0xa, -1, 0);
     int team = g_game->localPlayer;
     sprintf(buf, "%s : %d  (Max %d)", Translate("Total Units"),
-            (*(PlayerInfo_00467440 (*)[10])&g_game->players)[team].unitCount, g_game->maxUnitsSetting);
+            g_game->players[team].unitCount, g_game->maxUnitsSetting);
     DrawTextClipped(win, buf, left + 0xbe, bottom + 0xa, -1, 0);
     if ((unsigned short)g_game->effectiveGameSpeed == 10)
         sprintf(num, Translate("Normal"));
@@ -1205,8 +1132,8 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
                 if (tile->feature < 0xfffb) {
                     Feature* feat = g_game->features + tile->feature;
                     if (feat->height < 10) {
-                        if ((feat->flags & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
-                            if (IsFootprintVisible((int)player, x, y, feat->footprint.x, feat->footprint.y, tile->height))
+                        if ((feat->flagsHigh & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
+                            if (IsFootprintVisible((int)player, x, y, feat->footprintX, feat->footprintZ, tile->height))
                                 BlitFeatureGaf(&ctx, tile, x, y);
                         } else
                             BlitFeatureGaf(&ctx, tile, x, y);
@@ -1242,8 +1169,8 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
 
                 if (tile->flags & 4) {
                     Feature* feat = g_game->features + tile->feature;
-                    if ((feat->flags & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
-                        if (IsFootprintVisible((int)player, x, y, (int)feat->footprint.x, feat->footprint.y, tile->height))
+                    if ((feat->flagsHigh & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
+                        if (IsFootprintVisible((int)player, x, y, (int)feat->footprintX, feat->footprintZ, tile->height))
                             BlitFeatureGaf(&ctx, tile, x, y);
                     } else
                         BlitFeatureGaf(&ctx, tile, x, y);
@@ -1493,13 +1420,13 @@ static int DrawFlags()
 void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
 {
     Feature* f = &g_game->features[cell->feature];
-    int x = f->footprint.x * 16 / 2 + (ix + 8) * 16 - g_game->scrollX;
+    int x = f->footprintX * 16 / 2 + (ix + 8) * 16 - g_game->scrollX;
     int s = cell->height;
     s += cell[1].height;
     s += cell[g_game->width].height;
     s += cell[g_game->width + 1].height;
     int shade = s >> 3;
-    int y = f->footprint.y * 16 / 2 - shade + (iy + 2) * 16 - g_game->scrollY;
+    int y = f->footprintZ * 16 / 2 - shade + (iy + 2) * 16 - g_game->scrollY;
     if (cell->flags & 1) {
         FeatureSpot* spot = &g_game->spots[*(unsigned short*)&cell->offsetY];
         if (f->drawn) {
@@ -1820,7 +1747,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         }
     } else if (snapshot.feature != 0xffff) {
         Feature* feature = g_game->features + snapshot.feature;
-        if ((feature->flags & 4) == 0 || (g_game->flagsByte_3923b & 2) != 0) {
+        if ((feature->flagsHigh & 4) == 0 || (g_game->flagsByte_3923b & 2) != 0) {
             char mText[16];
             if (feature->metal != 0.0f)
                 sprintf(mText, " M:%d", (int)feature->metal);
@@ -1832,7 +1759,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             else
                 eText[0] = 0;
             char* name = g_game->endGameFlags_3923b.b1 ? feature->name : feature->description;
-            if ((feature->flags & 2) == 0)
+            if ((feature->flagsHigh & 2) == 0)
                 sprintf(text, "%s %s%s", Translate(name), mText, eText);
             else
                 strcpy(text, Translate(name));

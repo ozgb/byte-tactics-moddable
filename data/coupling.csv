@@ -1840,9 +1840,9 @@ network,presentation,shared_write,PlayerInfo::flags_9d_wide,4
 network,presentation,shared_write,PlayerInfo::kind,4
 network,presentation,shared_write,PlayerInfo::versionMajor,1
 network,presentation,shared_write,PlayerInfo::versionMinor,1
-network,presentation,shared_write,UnitSyncEntry::h,2
+network,presentation,shared_write,UnitSyncEntry::fbiChecksum,1
 network,presentation,shared_write,UnitSyncEntry::limit,2
-network,presentation,shared_write,UnitSyncEntry::x,1
+network,presentation,shared_write,UnitSyncEntry::peerEnabled,2
 network,presentation,shared_write,g_packetManager,1
 network,targeting,shared_write,Player::active,1
 network,targeting,shared_write,Player::type,1

@@ -4098,9 +4098,9 @@ void UnitRestrictDialogFrame()
     while (((UnitSync *)g_game->sync)->PopChangedEntry(&event) != 0) {
         n++;
         for (int i = 0; i < entry->list.count; i++) {
-            if (event.x == ((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
-                entry->flags[i] = (event.h == 0);
-                g_unitRestrictEntries[i].peerEnabled = event.h;
+            if (event.fbiChecksum == ((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
+                entry->flags[i] = (event.peerEnabled == 0);
+                g_unitRestrictEntries[i].peerEnabled = event.peerEnabled;
                 g_unitRestrictEntries[i].max = event.limit;
                 entry->flags[i] |= (event.limit != 0) ? 0 : 2;
             }
@@ -4215,7 +4215,7 @@ void OpenUnitRestrictions()
             count = info.limit == -1 ? 0x65 : info.limit;
             g_unitRestrictEntries[n].max = count;
             g_unitRestrictOldCounts[n] = count;
-            g_unitRestrictEntries[n].peerEnabled = info.h;
+            g_unitRestrictEntries[n].peerEnabled = info.peerEnabled;
             n++;
         }
     }

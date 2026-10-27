@@ -10,10 +10,10 @@ struct Target_0046d530;
 struct Source_0046d630;
 
 struct UnitSyncEntry {
-    int x;
-    int y;
-    short w;
-    short h;
+    int fbiChecksum;
+    int scriptChecksum;
+    short enabled;
+    short peerEnabled;
     int limit;
 };
 

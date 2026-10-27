@@ -402,14 +402,35 @@ def listing(names, indent: str) -> str:
     return textwrap.fill(", ".join(sorted(names)) or "none", 118, initial_indent=indent, subsequent_indent=indent)
 
 
-def summary(result: Result, subsystems: list[dict], wanted: list[str]) -> str:
-    """Per subsystem: its entry points, its imports and the sim items it writes and reads."""
+def call_tables(result: Result) -> tuple[dict, dict]:
+    """The callers of each subsystem's entry points, and the targets each subsystem imports."""
     callers: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
     imports: dict[str, dict[str, set]] = defaultdict(lambda: defaultdict(set))
     for r in result.rows:
         if r["kind"] != "shared_write":
             callers[r["to"]][r["target"]] += int(r["count"])
             imports[r["from"]][r["to"]].add(r["target"])
+    return callers, imports
+
+
+def import_targets(imports: dict[str, set]) -> list[str]:
+    """The subsystems imported from, the one with the most functions first."""
+    return [to for to, _ in sorted(imports.items(), key=lambda x: (-len(x[1]), x[0]))]
+
+
+def subsystem_counts(result: Result, subsystems: list[dict]) -> dict[str, dict]:
+    """Per subsystem: its function count, called functions, imported functions and targets, and sim items written."""
+    callers, imports = call_tables(result)
+    sizes: dict[str, int] = defaultdict(int)
+    for r in subsystems:
+        sizes[r["subsystem"]] += 1
+    return {s: {"functions": sizes[s], "called": len(callers[s]), "imported": sum(len(v) for v in imports[s].values()),
+                "targets": import_targets(imports[s]), "written": len(result.wrote[s])} for s in SUBSYSTEMS}
+
+
+def summary(result: Result, subsystems: list[dict], wanted: list[str]) -> str:
+    """Per subsystem: its entry points, its imports and the sim items it writes and reads."""
+    callers, imports = call_tables(result)
     sizes: dict[str, int] = defaultdict(int)
     roots: dict[str, list[str]] = defaultdict(list)
     of = {}
@@ -428,7 +449,8 @@ def summary(result: Result, subsystems: list[dict], wanted: list[str]) -> str:
         out.append(listing(["%s(%d)" % (n, c) for n, c in called.items()], "    "))
         total = sum(len(v) for v in imports[subsystem].values())
         out.append("  imports (%d functions of %d subsystems):" % (total, len(imports[subsystem])))
-        for to, targets in sorted(imports[subsystem].items(), key=lambda x: (-len(x[1]), x[0])):
+        for to in import_targets(imports[subsystem]):
+            targets = imports[subsystem][to]
             out.append("    to %s (%d):" % (to, len(targets)))
             out.append(listing(targets, "      "))
         for label, items in (("sim items written", result.wrote[subsystem]),

@@ -1284,7 +1284,6 @@ address,function,callee,kind,file,class,notes
 0x4e06f0,GetMemStatusLock,atexit,call,src/debug/debug_lib.cpp,presentation,sites=1
 0x4e07e0,FormatWorkingSet,_chkstk,call,src/debug/debug_lib.cpp,presentation,sites=1
 0x4e07e0,FormatWorkingSet,sprintf,call,src/debug/debug_lib.cpp,presentation,sites=1
-0x4e0b90,MemoryStatusDialog::HandleMemoryStatusMessage,sprintf,call,src/debug/memory_status_dialog.cpp,presentation,sites=3
 0x4e1410,GetMemoryStatusDialog,atexit,call,src/debug/debug_lib.cpp,presentation,sites=1
 0x4e17c0,NameTable::NameTable,std::_Lockit::_Lockit,call,src/debug/debug_lib.cpp,presentation,sites=1
 0x4e17c0,NameTable::NameTable,std::_Lockit::~_Lockit,call,src/debug/debug_lib.cpp,presentation,sites=1

@@ -18,11 +18,6 @@ public:
 };
 
 #pragma pack(push, 1)
-struct Point_004898b0 {
-    short a;
-    short b;
-};
-
 struct Target_0048a1e0 {
     char unknown_0[0x68];
     int radius;

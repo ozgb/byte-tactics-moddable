@@ -14,11 +14,6 @@
 struct Unit;
 
 #pragma pack(push, 1)
-struct Point_004898b0 {
-    short a;
-    short b;
-};
-
 union Flags_004898b0 {
     struct {
         unsigned char bit0 : 1;

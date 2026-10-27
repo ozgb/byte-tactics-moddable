@@ -710,25 +710,6 @@ public:
     void* Allocate(unsigned int n);
 };
 
-struct Pair_004db000 {
-    unsigned int offset;
-    unsigned int length;
-    Pair_004db000() {}
-    Pair_004db000(unsigned int o, unsigned int l) : offset(o), length(l) {}
-};
-
-struct Node_004db000 {
-    Node_004db000* left;
-    Node_004db000* parent;
-    Node_004db000* right;
-    Pair_004db000 value;
-    int color;
-};
-
-struct Node_004dd1b0 {
-    Node_004dd1b0* left;
-};
-
 Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p);
 
 static inline Node_004db000* Max_004dd2a0(Node_004db000* p)

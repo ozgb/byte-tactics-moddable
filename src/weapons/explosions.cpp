@@ -16,12 +16,6 @@ static inline Vec3 PosPlus(const Vec3& a, const Vec3& b)
     return r;
 }
 
-struct Vec3f {
-    float x;
-    float y;
-    float z;
-};
-
 #include "../util/point.h"
 
 struct Fixed {

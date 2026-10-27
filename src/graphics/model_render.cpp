@@ -26,8 +26,6 @@ union Fixed {
 
 #include "../util/vec3.h"
 
-struct Vec3f { float x; float y; float z; };
-
 struct Poly_459c70 { int x; int y; int z; int shade; };
 
 #include "../util/point.h"

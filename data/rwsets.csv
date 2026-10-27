@@ -48449,8 +48449,7 @@ address,function,file,kind,target
 ,Pair_0046faf0::Pair_0046faf0,src/network/unit_sync_player.cpp,field_read,Pair_0046faf0::sentQueue
 ,Pair_0046faf0::Pair_0046faf0,src/network/unit_sync_player.cpp,function,
 ,Pair_004b7620::Pair_004b7620,src/util/commands.cpp,function,
-,Pair_004db000::Pair_004db000,src/debug/debug_lib.cpp,function,
-,Pair_004db000::Pair_004db000,src/debug/free_block_map.cpp,function,
+,Pair_004db000::Pair_004db000,src/debug/debug_lib.h,function,
 ,ParseBlockScan,src/harness/harness.cpp,call,_strnicmp
 ,ParseBlockScan,src/harness/harness.cpp,call,isdigit
 ,ParseBlockScan,src/harness/harness.cpp,call,isspace

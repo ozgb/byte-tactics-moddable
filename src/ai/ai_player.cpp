@@ -163,12 +163,7 @@ void RegisterUnitOrders(void);
 
 #include "../orders/mission_type.h"
 
-struct Feature {
-    char unknown_0[0xf0];
-    float value;
-    char unknown_f4[0xfe - 0xf4];
-    unsigned short flags;
-};
+#include "../map/feature.h"
 
 #include "../map/cell.h"
 
@@ -1473,8 +1468,8 @@ void PlayerAI::BuildFeatureCells()
         for (int x = 0; x < w; x++) {
             if (row[x].feature < 0xfffb) {
                 Feature* f = &g_game->features[row[x].feature];
-                if (f->value != 0.0f && (f->flags & 0x200))
-                    cells.push_back(Elem_0040cc40(x, y, f->value));
+                if (f->metal != 0.0f && (f->flags16 & 0x200))
+                    cells.push_back(Elem_0040cc40(x, y, f->metal));
             }
         }
     }

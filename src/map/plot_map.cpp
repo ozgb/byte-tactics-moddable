@@ -3,22 +3,7 @@
 #include "plot_map.h"
 
 #pragma pack(push, 1)
-struct Cell {
-    char unknown_0[0x7];
-    unsigned char metal;
-    char unknown_8[0x4];
-
-    union {
-        struct {
-            unsigned char low : 3;
-            unsigned char feature : 5;
-        };
-        struct {
-            unsigned char low4 : 3;
-            unsigned char feature4 : 4;
-        };
-    };
-};
+#include "../map/cell.h"
 
 #include "../game/game.h"
 #pragma pack(pop)
@@ -51,7 +36,7 @@ void __stdcall SavePlayerFeaturesPlotmap(HapiBank* file)
     unsigned char* buf = new unsigned char[size];
     if (buf) {
         for (int i = 0; i < size; i++) {
-            buf[i] = (cells[i * 2].feature << 4) | (cells[i * 2 + 1].feature & 0xf);
+            buf[i] = (cells[i * 2].plotFeature << 4) | (cells[i * 2 + 1].plotFeature & 0xf);
         }
         file->OpenNamedBox("Plotmap");
         file->WriteBox(buf, size);
@@ -89,8 +74,8 @@ void __stdcall LoadPlayerFeaturesPlotmap(HapiBank* file)
                 if ((unsigned int)file->ReadBox(buf, size) >= size) {
                     Cell* c = cells;
                     for (int i = 0; i < size; i++, c += 2) {
-                        c->feature4 = buf[i] >> 4;
-                        c[1].feature4 = buf[i] & 0xf;
+                        c->plotFeature4 = buf[i] >> 4;
+                        c[1].plotFeature4 = buf[i] & 0xf;
                     }
                     delete[] buf;
                 }

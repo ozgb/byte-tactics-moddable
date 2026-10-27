@@ -1289,7 +1289,7 @@ los_radar,platform,call,TdfFile::~TdfFile,1
 los_radar,platform,call,TdfRecord::GetFieldInt,2
 los_radar,platform,call,TdfRecord::GetFieldString,1
 los_radar,platform,call,_Destroy,1
-los_radar,platform,call,operator delete,5
+los_radar,platform,call,operator delete,3
 los_radar,platform,call,operator new,2
 los_radar,platform,shared_write,GafFrame::pixelsOrLayers,1
 los_radar,platform,shared_write,Game::loadProgress,1
@@ -1317,7 +1317,7 @@ los_radar,presentation,call,FillSurface,1
 los_radar,presentation,call,FrameFromSurface,1
 los_radar,presentation,call,FreeSurface,2
 los_radar,presentation,call,GetGafFrame,9
-los_radar,presentation,call,StringRef::ReleaseRef,3
+los_radar,presentation,call,StringRef::ReleaseRef,1
 los_radar,presentation,call,SurfaceFromFrame,2
 los_radar,presentation,shared_write,Cell::feature,2
 los_radar,presentation,shared_write,Flags_14281::raw,1

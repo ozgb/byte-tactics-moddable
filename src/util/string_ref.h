@@ -47,8 +47,6 @@ public:
     }
     int IsEmpty() const;
     StringRef SubString(int start, int end) const;
-    void* FUN_00432c00(unsigned char param_1);
-    void* FUN_00432c20(unsigned char param_1);
 };
 
 #endif

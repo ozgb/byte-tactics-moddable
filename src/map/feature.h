@@ -56,12 +56,7 @@ struct Feature {
             AnimPair death[2];
         };
         struct {
-            int anim0;
-            int field_b8;
-            int anim1;
-            int field_c0;
-            int anim2;
-            int field_c8;
+            int animIds[6];
         };
     };
     Handle anim;

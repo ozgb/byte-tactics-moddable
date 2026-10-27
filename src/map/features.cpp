@@ -1243,11 +1243,11 @@ void __stdcall SaveFeatures(HapiBank* file)
                 rec.damage = s->damage;
                 rec.frame = s->frame;
                 rec.animHi = s->animHi;
-                if (s->animIndex == f->anim0)
+                if (s->animIndex == f->animIds[0])
                     rec.anim = 0;
-                else if (s->animIndex == f->anim1)
+                else if (s->animIndex == f->animIds[2])
                     rec.anim = 1;
-                else if (s->animIndex == f->anim2)
+                else if (s->animIndex == f->animIds[4])
                     rec.anim = 2;
                 else
                     goto next;

@@ -55,6 +55,7 @@ struct Callback;
 
 struct Order;
 struct _iobuf;
+struct Los_0047d2e0;
 class MissionType;
 
 #include "../ai/ai_player.h"
@@ -795,7 +796,7 @@ void InstallNativeSeams()
     s_ai.SetUnitSquad = SetUnitSquad;
     s_ai.SquadManagerTickIfActive = SquadManagerTickIfActiveNative;
     s_ai.SquadManagerDeleteTimers = SquadManagerDeleteTimersNative;
-    s_map.CanBuildAt = CanBuildAt;
+    s_map.CanBuildAt = (decltype(s_map.CanBuildAt))CanBuildAt;
     s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
     s_orders.AddOrder = AddOrder;
     s_orders.DeleteOrders = DeleteOrders;

@@ -202,7 +202,7 @@ Slot_0042f740,no,2,include/ta_types.h:4551|src/sound/sound_types.cpp:16,identica
 Smk_0047bf70_b,no,2,include/ta_types.h:9423|src/graphics/movies.cpp:104,differs,src/graphics/movies.cpp
 SmokeParticle,no,2,include/ta_types.h:9068|src/graphics/smoke_particle.h:15,differs,src/graphics/smoke_particle.h
 SmokeParticles,no,2,include/ta_types.h:8542|src/graphics/particles.cpp:476,differs,src/graphics/particles.cpp
-Sound,no,8,include/ta_types.h:4595|src/frontend/campaign_menu.cpp:11|src/frontend/frontend.cpp:10|src/game/console_commands.cpp:96|src/game/game_state.cpp:214|src/game/main.cpp:81|src/sound/sound.cpp:8|src/sound/sound.h:11,differs,src/sound/sound.h
+Sound,no,8,include/ta_types.h:4595|src/frontend/campaign_menu.cpp:11|src/frontend/frontend.cpp:10|src/game/console_commands.cpp:96|src/game/game_state.cpp:214|src/game/main.cpp:81|src/sound/sound.cpp:8|src/sound/sound.h:13,differs,src/sound/sound.h
 Source_0046d630,no,2,include/ta_types.h:8085|src/network/unit_sync.cpp:303,differs,src/network/unit_sync.cpp
 Span,no,2,src/graphics/draw.cpp:16|src/harness/block_spans.h:4,differs,src/harness/block_spans.h
 SpatialBucket,no,4,src/map/spatial_bucket.h:6|src/map/terrain.cpp:95|src/units/unit_position.cpp:76|src/units/units.cpp:142,differs,src/map/spatial_bucket.h

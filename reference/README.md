@@ -238,10 +238,11 @@ console 12 +armpw 0
   multiplayer game (`g_nonCampaignGame`). The harness sets nothing before the call. A command whose mask the line's mask
   lacks does nothing, as in the game, so a scenario types the cheat code first: `console 1 +now Film Chris Include Reload
   Assert` sets `uiOptionFlags` bit 1, which enables the debug commands and the unit names below.
-- The text is at most 79 characters, the size of the game's command buffer. A command works on the game's cursor state
-  as typed: `burnone` and `feature` act on the cell under the cursor, a unit name creates its unit at the cursor
-  position (`move <dx> <dz>` shifts it, but the shift does not last to a later tick, so `move` and the unit name go on
-  one tick), and `give`, `nometal` and `noenergy` take the local player when no slot is given.
+- The text is at most 79 characters, the size of the game's command buffer. The chat path takes the cursor from the
+  mouse; the harness puts it at the fixed world position 640 260 before each console line (`pos`, the cell
+  `point` and `cellFeature`), so `burnone` and `feature` act on the cell there and a unit name creates its unit
+  there. `move <dx> <dz>` shifts the cursor, but the next console line sets it again, so
+  it changes nothing a scenario can see. `give`, `nometal` and `noenergy` take the local player when no slot is given.
 - A unit type name typed alone creates that unit for the slot in its first argument (`armpw 1`), the way the console
   does through `DefaultCommandHandler` and `MatchWildcard`. The name must be a unit type of the game (any case, no
   wildcard), so the handler never falls back to its `debugdat` file lookup.

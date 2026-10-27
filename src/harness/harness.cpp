@@ -3174,6 +3174,8 @@ static void IssueScriptedSpawn(const ScriptedSpawn* sp)
 }
 
 void __stdcall ExecuteCommandLine(char* commandLine, int mask);
+Cell* __stdcall GetMapCell(int x, int y);
+unsigned short __stdcall GetCellFeature(Cell* cell);
 extern int g_nonCampaignGame;
 
 static int ConsoleWordIsUnitType(const char* word)
@@ -3201,6 +3203,14 @@ static void RunScriptedConsole(const ScriptedConsole* c)
         mask = 7;
     if (g_nonCampaignGame)
         mask |= 2;
+    {
+        int cursor[3];
+        WorldPosition(640, 260, cursor);
+        memcpy(GameAt(0x2caa), cursor, sizeof cursor);
+        *(short*)GameAt(0x2c8e) = (short)(cursor[0] >> 20);
+        *(short*)GameAt(0x2c90) = (short)(cursor[2] >> 20);
+        *(unsigned short*)GameAt(0x2cbc) = (unsigned short)GetCellFeature(GetMapCell(*(short*)GameAt(0x2c8e), *(short*)GameAt(0x2c90)));
+    }
     ExecuteCommandLine(text, mask);
 }
 

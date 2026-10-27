@@ -44576,6 +44576,9 @@ address,function,file,kind,target
 ,FailLoad,src/harness/harness.cpp,function,
 ,FailLoad,src/harness/harness.cpp,global_maybe_written,s_loadName@src/harness/harness.cpp
 ,FailLoad,src/harness/harness.cpp,global_read,s_loadLine@src/harness/harness.cpp
+,FailReadScenario,src/harness/harness.cpp,call,Fail
+,FailReadScenario,src/harness/harness.cpp,call,sprintf
+,FailReadScenario,src/harness/harness.cpp,function,
 ,Fall,src/weapons/weapons.cpp,field_read,Game::gravity
 ,Fall,src/weapons/weapons.cpp,field_read,Vec3::y
 ,Fall,src/weapons/weapons.cpp,field_write,Vec3::y
@@ -44596,7 +44599,7 @@ address,function,file,kind,target
 ,FeatureVec3,src/map/features.cpp,field_write,Vec3::z
 ,FeatureVec3,src/map/features.cpp,function,
 ,FileHasLoadLine,src/harness/harness.cpp,call,fgets
-,FileHasLoadLine,src/harness/harness.cpp,call,rewind
+,FileHasLoadLine,src/harness/harness.cpp,call,fseek
 ,FileHasLoadLine,src/harness/harness.cpp,call,strncmp
 ,FileHasLoadLine,src/harness/harness.cpp,deref_read,*char
 ,FileHasLoadLine,src/harness/harness.cpp,function,
@@ -49224,8 +49227,8 @@ address,function,file,kind,target
 ,ReadRefAt,src/harness/harness.cpp,call,SimBlockBase
 ,ReadRefAt,src/harness/harness.cpp,function,
 ,ReadScenario,src/harness/harness.cpp,call,CheckScenario
-,ReadScenario,src/harness/harness.cpp,call,Fail
 ,ReadScenario,src/harness/harness.cpp,call,FailLine
+,ReadScenario,src/harness/harness.cpp,call,FailReadScenario
 ,ReadScenario,src/harness/harness.cpp,call,FileHasLoadLine
 ,ReadScenario,src/harness/harness.cpp,call,InitPlayerSpecs
 ,ReadScenario,src/harness/harness.cpp,call,ReadKey
@@ -49233,11 +49236,11 @@ address,function,file,kind,target
 ,ReadScenario,src/harness/harness.cpp,call,fgets
 ,ReadScenario,src/harness/harness.cpp,call,fopen
 ,ReadScenario,src/harness/harness.cpp,call,isspace
-,ReadScenario,src/harness/harness.cpp,call,sprintf
 ,ReadScenario,src/harness/harness.cpp,call,strlen
 ,ReadScenario,src/harness/harness.cpp,deref_read,*char
 ,ReadScenario,src/harness/harness.cpp,deref_write,*char
 ,ReadScenario,src/harness/harness.cpp,function,
+,ReadScenario,src/harness/harness.cpp,global_read,s_loadAhead@src/harness/harness.cpp
 ,ReadScenario,src/harness/harness.cpp,global_write,s_loadAhead@src/harness/harness.cpp
 ,ReadSettingInt,src/game/settings.cpp,call,SettingGetInt
 ,ReadSettingInt,src/game/settings.cpp,call,SettingSetInt

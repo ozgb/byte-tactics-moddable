@@ -374,8 +374,8 @@ public:
 
 typedef std::pair<const unsigned int, UnitSyncEntry> Value_0046d6c0;
 
-extern UnitSyncNode* DAT_0051e598;
-extern int DAT_0051e59c;
+extern UnitSyncNode* g_unitSyncMapNil;
+extern int g_unitSyncMapNilRefs;
 
 class UnitSyncMap : public _Tree<unsigned int, Value_0046d6c0, Kfn_0046d6c0,
                                   Less_0046d6c0, Alloc_0046d6c0> {
@@ -1312,12 +1312,12 @@ EraseFn_0046eb60 g_erase_0046eb60 = &List_0046eb60::erase;
 void UnitSyncMap::Init()
 {
     std::_Lockit lock;
-    if (DAT_0051e598 == 0) {
-        DAT_0051e598 = Buynode(0, 1);
-        DAT_0051e598->left = 0, DAT_0051e598->right = 0;
+    if (g_unitSyncMapNil == 0) {
+        g_unitSyncMapNil = Buynode(0, 1);
+        g_unitSyncMapNil->left = 0, g_unitSyncMapNil->right = 0;
     }
-    ++DAT_0051e59c;
-    _Head = Buynode(DAT_0051e598, 0), _Size = 0;
+    ++g_unitSyncMapNilRefs;
+    _Head = Buynode(g_unitSyncMapNil, 0), _Size = 0;
     _Head->left = _Head, _Head->right = _Head;
 }
 
@@ -1352,7 +1352,7 @@ UnitSyncNode* UnitSyncMap::LowerBound(const unsigned int* key)
     std::_Lockit lock;
     UnitSyncNode* x = _Head->parent;
     UnitSyncNode* y = _Head;
-    while (x != DAT_0051e598)
+    while (x != g_unitSyncMapNil)
         if (key_compare(x->key, *key))
             x = x->right;
         else

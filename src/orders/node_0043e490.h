@@ -1,6 +1,8 @@
 #ifndef NODE_0043E490_H
 #define NODE_0043E490_H
 
+#include "../../interfaces/ref.h"
+
 struct Limits_0043e490;
 struct UnitDef;
 struct Player;

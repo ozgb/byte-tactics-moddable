@@ -3138,7 +3138,6 @@ address,size,file,symbol,status,similarity
 0x4e0740,67,src/debug/debug_lib.cpp,?UnloadPsapiImpl@@YGXXZ,matched,100.0
 0x4e0790,67,src/debug/debug_lib.cpp,?UnloadPsapi@@YGXXZ,matched,100.0
 0x4e07e0,934,src/debug/debug_lib.cpp,?FormatWorkingSet@@YADPAD@Z,matched,100.0
-0x4e0b90,2150,src/debug/memory_status_dialog.cpp,?HandleMemoryStatusMessage@MemoryStatusDialog@@QAEHIHH@Z,matched,100.0
 0x4e1400,15,src/debug/debug_lib.cpp,?ShowMemoryStatus@@YGXXZ,matched,100.0
 0x4e1410,51,src/debug/debug_lib.cpp,?GetMemoryStatusDialog@@YGPAVMemoryStatusDialog@@XZ,matched,100.0
 0x4e1450,1,src/debug/debug_lib.cpp,?MemoryStatusAtexitHandler@@YGXXZ,matched,100.0

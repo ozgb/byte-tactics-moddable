@@ -13,25 +13,7 @@
 
 #pragma pack(push, 1)
 
-struct Gaf;
-
-struct AnimSrc {
-    unsigned short count;
-    unsigned char kind;
-};
-
-struct Anim {
-    unsigned short index;
-    unsigned short value;
-    unsigned char kind;
-    char unknown_5[3];
-    AnimSrc* src;
-};
-
-struct AnimPair {
-    AnimSrc* anim;
-    AnimSrc* shadow;
-};
+#include "feature.h"
 
 #include "../util/vec3.h"
 
@@ -120,8 +102,8 @@ struct Spot {
     short next;
     union {
         struct {
-            Anim anim;
-            Anim shadow;
+            Handle anim;
+            Handle shadow;
         };
         struct {
             Ref<SpotState> state;
@@ -174,94 +156,6 @@ struct Spot {
     };
 };
 
-struct Feature {
-    char name[0x80];
-    char description[0x14];
-    union {
-        Point16 footprint;
-        struct {
-            short footprintx;
-            short footprintz;
-        };
-    };
-    union {
-        void* object;
-        char filename[0x10];
-    };
-    Gaf* anims;
-    AnimSrc* seq;
-    AnimSrc* seqshad;
-    union {
-        struct {
-            AnimSrc* seqburn;
-            AnimSrc* seqburnshad;
-            AnimSrc* seqdie;
-            AnimSrc* seqdieshad;
-            AnimSrc* seqreclamate;
-            AnimSrc* seqreclamateshad;
-        };
-        struct {
-            AnimPair burn;
-            AnimPair death[2];
-        };
-        struct {
-            int anim0;
-            int field_b8;
-            int anim1;
-            int field_c0;
-            int anim2;
-            int field_c8;
-        };
-    };
-    Anim ref;
-    Anim refshad;
-    Ref<char> burnweapon;
-    union {
-        short sparktime;
-        unsigned short burnTime;
-    };
-    unsigned short damage;
-    float energy;
-    union {
-        float metal;
-        float value;
-    };
-    unsigned short dead;
-    unsigned short burnt;
-    unsigned short reclamate;
-    char height;
-    union {
-        char spreadchance;
-        unsigned char spreadChance;
-    };
-    union {
-        char reproduce;
-        unsigned char seedChance;
-    };
-    union {
-        char reproducearea;
-        unsigned char seedSpread;
-    };
-    union {
-        unsigned short flags16;
-        unsigned char flags;
-        struct {
-            unsigned short noobject : 1;
-            unsigned short animating : 1;
-            unsigned short animtrans : 1;
-            unsigned short shadtrans : 1;
-            unsigned short flamable : 1;
-            unsigned short geothermal : 1;
-            unsigned short blocking : 1;
-            unsigned short reclaimable : 1;
-            unsigned short autoreclaimable : 1;
-            unsigned short indestructible : 1;
-            unsigned short nodisplayinfo : 1;
-            unsigned short nodrawundergray : 1;
-            unsigned short bits12 : 4;
-        };
-    };
-};
 
 union SpotField {
     struct {
@@ -377,7 +271,7 @@ void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 Gaf* __stdcall LoadGaf(char* path);
 void __stdcall FreeObjectState(void* obj);
 AnimSrc* __stdcall FindGafEntry(void* list, const char* name);
-void __stdcall InitGafSequence(Anim* ref, AnimSrc* src, int index);
+void __stdcall InitGafSequence(Handle* ref, AnimSrc* src, int index);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot,
                              unsigned char owner);
 #include "features.h"
@@ -386,8 +280,8 @@ void __stdcall PlaySoundAtByName(char* name, Vec3* pos, int param_3);
 #include "../network/net_game.h"
 int GetHostDpid();
 int __stdcall BroadcastPacket(int player, void* data, int size);
-int __stdcall StepGafSequence(Anim* anim);
-GafFrame* __stdcall GetGafSequenceFrame(Anim* anim);
+int __stdcall StepGafSequence(Handle* anim);
+GafFrame* __stdcall GetGafSequenceFrame(Handle* anim);
 void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
 #include "../graphics/model_render.h"
 #include "../graphics/particles.h"
@@ -458,14 +352,14 @@ void StampFeatureMetal(void)
     for (int i = 0; i < g_game->width * g_game->height; i++, c++) {
         if (c->feature < 0xfffb) {
             Feature* f = &g_game->features[c->feature];
-            if (f->value != 0.0f && (f->flags16 & 0x200)) {
+            if (f->metal != 0.0f && (f->flags16 & 0x200)) {
                 int x0 = i % g_game->width;
                 int y0 = i / g_game->width;
-                for (int y = y0; y < y0 + f->footprintz; y++) {
-                    for (int x = x0; x < x0 + f->footprintx; x++) {
+                for (int y = y0; y < y0 + f->footprintZ; y++) {
+                    for (int x = x0; x < x0 + f->footprintX; x++) {
                         Cell* cc = g_seams.los_radar->GetMapCell(x, y);
                         if (cc != 0)
-                            cc->field7 = (char)f->value;
+                            cc->field7 = (char)f->metal;
                     }
                 }
             }
@@ -597,8 +491,8 @@ int __stdcall LoadFeatureType(char* name)
     Feature* def = &g_game->features[g_game->featureCount];
     strncpy(def->name, name, 0x80);
     entry->current->GetFieldString(def->description, "Description", 0x14, DAT_005119b8);
-    def->footprintx = entry->current->GetFieldInt("footprintx", 0);
-    def->footprintz = entry->current->GetFieldInt("footprintz", 0);
+    def->footprintX = entry->current->GetFieldInt("footprintx", 0);
+    def->footprintZ = entry->current->GetFieldInt("footprintz", 0);
     def->height = entry->current->GetFieldInt("height", 0);
     ok = entry->current->GetFieldString(file, "object", 0x100, DAT_005119b8);
     if (ok) {
@@ -630,9 +524,9 @@ int __stdcall LoadFeatureType(char* name)
         LoadFeatureSeqOnce(entry->current, "seqnamereclamate", seqname, anims, &def->seqreclamate);
         LoadFeatureSeqOnce(entry->current, "seqnamereclamateshad", seqname, anims, &def->seqreclamateshad);
     }
-    def->spreadchance = entry->current->GetFieldInt("spreadchance", 0);
-    def->reproduce = entry->current->GetFieldInt("reproduce", 0);
-    def->reproducearea = entry->current->GetFieldInt("reproducearea", 0);
+    def->spreadChance = entry->current->GetFieldInt("spreadchance", 0);
+    def->seedChance = entry->current->GetFieldInt("reproduce", 0);
+    def->seedSpread = entry->current->GetFieldInt("reproducearea", 0);
     def->metal = (unsigned short)entry->current->GetFieldInt("metal", 0);
     def->energy = (unsigned short)entry->current->GetFieldInt("energy", 0);
     def->damage = entry->current->GetFieldInt("damage", 0);
@@ -655,22 +549,22 @@ int __stdcall LoadFeatureType(char* name)
         def->nodrawundergray = 1;
     if (_strcmpi(name, "Fortification_Core") == 0)
         def->nodrawundergray = 1;
-    def->sparktime = (short)(entry->current->GetFieldDouble("sparktime", 0.0) * 30.0);
+    def->burnTime = (short)(entry->current->GetFieldDouble("sparktime", 0.0) * 30.0);
     entry->current->GetFieldString(seqname, "burnweapon", 0x100, DAT_005119b8);
     def->burnweapon = (char*)g_seams.weapons->FindWeaponByName(seqname);
-    def->ref.index = 0;
-    def->ref.value = 0;
-    def->ref.kind = 0;
-    def->ref.src = nullptr;
-    def->refshad.index = 0;
-    def->refshad.value = 0;
-    def->refshad.kind = 0;
-    def->refshad.src = nullptr;
+    def->anim.index = 0;
+    def->anim.value = 0;
+    def->anim.kind = 0;
+    def->anim.src = nullptr;
+    def->shadowAnim.index = 0;
+    def->shadowAnim.value = 0;
+    def->shadowAnim.kind = 0;
+    def->shadowAnim.src = nullptr;
     if (def->animating) {
         if (def->seq)
-            InitGafSequence(&def->ref, def->seq, 0);
+            InitGafSequence(&def->anim, def->seq, 0);
         if (def->seqshad)
-            InitGafSequence(&def->refshad, def->seqshad, 0);
+            InitGafSequence(&def->shadowAnim, def->seqshad, 0);
     }
     return g_game->featureCount++;
 }
@@ -1165,8 +1059,8 @@ void __stdcall UpdateFeatures()
     Feature* types = g_game->features;
     for (int k = 0; k < g_game->featureCount; k++) {
         if (types[k].animating) {
-            StepGafSequence(&types[k].ref);
-            StepGafSequence(&types[k].refshad);
+            StepGafSequence(&types[k].anim);
+            StepGafSequence(&types[k].shadowAnim);
         }
     }
     if (--g_game->scanIndex < 0) {

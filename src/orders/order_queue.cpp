@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "order_queue.h"
+#include "order_type_entry.h"
 
 class Order;
 class HapiBank;
@@ -241,22 +242,14 @@ MissionType::MissionType(const char* name)
     index = 0;
 }
 
-struct OrderType;
-
-struct OrderType
-{
-public:
-    int GetTableEntry();
-};
-
 // FUNCTION: 0x438830
-int OrderType::GetTableEntry()
+Elem_0043c390* OrderType::GetTableEntry()
 {
     unsigned int result = 0;
     result = *(unsigned char*)this;
     int* base = (int*)&g_missionOrderTableBegin;
     int fives = result * 5;
-    return *base + fives * 4 + fives;
+    return (Elem_0043c390*)(*base + fives * 4 + fives);
 }
 
 // FUNCTION: 0x438850

@@ -17,6 +17,11 @@ struct Elem_0043c390 {
     int operator==(const Elem_0043c390&) const { return 0; }
     int operator!=(const Elem_0043c390&) const { return 0; }
 };
+
+struct OrderType {
+    unsigned char index;
+    Elem_0043c390* GetTableEntry();
+};
 #pragma pack(pop)
 
 #endif

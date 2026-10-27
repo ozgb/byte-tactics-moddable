@@ -141,15 +141,7 @@ struct Mission_00467e50 {
     Ref<Mission_00467e50> next;
 };
 
-struct MissionName_00467e50 {
-    char pad_0[0x15];
-    char* name;
-};
-
-struct OrderType {
-    MissionName_00467e50* GetTableEntry();
-};
-
+#include "../orders/order_type_entry.h"
 #include "../graphics/surface.h"
 
 #include "frame_timers.h"

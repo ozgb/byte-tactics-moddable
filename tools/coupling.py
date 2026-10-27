@@ -151,6 +151,8 @@ NAME_PATTERNS = [(subsystem, re.compile(pattern)) for subsystem, pattern in NAME
 FOLDER_DEFAULT = {"src/ai/": "ai", "src/units/": "units", "src/orders/": "orders", "src/weapons/": "weapons",
                   "src/network/": "network", "src/game/": "game", "src/map/": "map"}
 BIG = 1 << 40
+SHARED_VALUE_TYPES = {"Vec3", "Point", "Point16", "Fixed"}
+ADDRESS_COPY = re.compile(r"_[0-9a-f]{6,8}::")
 
 
 def rule_of(function: str, file: str, reached: dict[str, set[str]]) -> tuple[str, str]:
@@ -418,14 +420,39 @@ def import_targets(imports: dict[str, set]) -> list[str]:
     return [to for to, _ in sorted(imports.items(), key=lambda x: (-len(x[1]), x[0]))]
 
 
+def named_items(items: set[str]) -> set[str]:
+    """The items without the shared value types (Vec3, Point, Point16, Fixed) and the per-file copies of a struct (type names ending in an address)."""
+    return {i for i in items if i.partition("::")[0] not in SHARED_VALUE_TYPES and not ADDRESS_COPY.search(i)}
+
+
 def subsystem_counts(result: Result, subsystems: list[dict]) -> dict[str, dict]:
-    """Per subsystem: its function count, called functions, imported functions and targets, and sim items written."""
+    """Per subsystem: its function count, the functions called from outside and imported, and the sim items it writes and reads."""
     callers, imports = call_tables(result)
+    from_outside: dict[str, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(dict))
+    for r in result.rows:
+        if r["kind"] != "shared_write":
+            by_from = from_outside[r["to"]][r["target"]]
+            by_from[r["from"]] = by_from.get(r["from"], 0) + int(r["count"])
     sizes: dict[str, int] = defaultdict(int)
     for r in subsystems:
         sizes[r["subsystem"]] += 1
-    return {s: {"functions": sizes[s], "called": len(callers[s]), "imported": sum(len(v) for v in imports[s].values()),
-                "targets": import_targets(imports[s]), "written": len(result.wrote[s])} for s in SUBSYSTEMS}
+    out = {}
+    for s in SUBSYSTEMS:
+        called_by: dict[str, int] = defaultdict(int)
+        for by_from in from_outside[s].values():
+            for caller in by_from:
+                called_by[caller] += 1
+        others = set().union(*(result.wrote[o] for o in SUBSYSTEMS if o != s))
+        written = named_items(result.wrote[s])
+        only_read = result.read[s] - result.wrote[s]
+        out[s] = {"functions": sizes[s], "called": len(callers[s]), "imported": sum(len(v) for v in imports[s].values()),
+                  "targets": import_targets(imports[s]), "written": len(result.wrote[s]),
+                  "target_sizes": {to: len(imports[s][to]) for to in import_targets(imports[s])},
+                  "callers": {target: dict(by_from) for target, by_from in from_outside[s].items()},
+                  "called_by": dict(called_by), "named": len(written), "owned": len(written - others),
+                  "shared": len(written & others), "only_read": len(only_read), "read_named": len(named_items(only_read)),
+                  "wrote_items": result.wrote[s], "read_items": only_read}
+    return out
 
 
 def summary(result: Result, subsystems: list[dict], wanted: list[str]) -> str:

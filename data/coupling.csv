@@ -968,7 +968,8 @@ harness,game,shared_write,Game::playerIndex,5
 harness,los_radar,shared_write,Game::localPlayer,5
 harness,los_radar,shared_write,Game::playerIndex,14
 harness,map,call,Mission::CountStartPositions,1
-harness,map,call,Mission::LoadCampaign,1
+harness,map,call,Mission::GetCampaignName,1
+harness,map,call,Mission::LoadCampaign,2
 harness,map,call,Mission::LoadMissionByName,2
 harness,map,call,SetMissionType,2
 harness,map,call,SnapWorldPosToFootprint,1

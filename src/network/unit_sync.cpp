@@ -243,7 +243,7 @@ void FUN_0046c8d0(void)
 }
 
 #pragma pack(push, 1)
-struct Unit_0046e330 {
+struct UnitSyncDef {
     char unknown_0[0x13e];
     unsigned int key;
 };
@@ -425,10 +425,10 @@ UnitSync::UnitSync(int param)
         UnitSyncEntry v;
         for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
             unsigned int key = g_game->defs[i].fbiChecksum;
-            v.x = key;
-            v.y = 0;
-            v.w = 1;
-            v.h = (short)sub2.direct;
+            v.fbiChecksum = key;
+            v.scriptChecksum = 0;
+            v.enabled = 1;
+            v.peerEnabled = (short)sub2.direct;
             v.limit = FlagOf_0046d040(&g_game->defs[i]) ? 0 : -1;
             map[key] = v;
         }
@@ -445,12 +445,12 @@ void UnitSync::ResetEntries()
 {
     UnitSyncEntry v;
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
-        v.x = g_game->defs[i].fbiChecksum;
-        v.y = 0;
-        v.w = 1;
-        v.h = (short)direct;
+        v.fbiChecksum = g_game->defs[i].fbiChecksum;
+        v.scriptChecksum = 0;
+        v.enabled = 1;
+        v.peerEnabled = (short)direct;
         v.limit = FlagOf_0046d040(&g_game->defs[i]) ? 0 : -1;
-        ((std::map<unsigned int, UnitSyncEntry>&)map)[v.x] = v;
+        ((std::map<unsigned int, UnitSyncEntry>&)map)[v.fbiChecksum] = v;
     }
 }
 
@@ -593,10 +593,10 @@ void UnitSync::HandleSyncPacket(UnitSyncPacket* packet, unsigned char player)
     } else {
         if (packet->arg != 0 && packet->arg == 3) {
             UnitSyncEntry r;
-            r.x = packet->key;
-            r.y = 0;
-            r.w = packet->enabled;
-            r.h = packet->match;
+            r.fbiChecksum = packet->key;
+            r.scriptChecksum = 0;
+            r.enabled = packet->enabled;
+            r.peerEnabled = packet->match;
             r.limit = packet->limit;
             map[packet->key] = r;
             this->NotifyEntryChanged(packet->key);
@@ -619,9 +619,9 @@ void UnitSync::NotifyEntryChanged(unsigned int param_1)
                 UnitSyncPacket packet;
                 packet.type = 0x1a;
                 packet.arg = 3;
-                packet.key = v->x;
-                packet.enabled = v->w;
-                packet.match = v->h;
+                packet.key = v->fbiChecksum;
+                packet.enabled = v->enabled;
+                packet.match = v->peerEnabled;
                 packet.limit = v->limit;
                 this->SendSyncPacket(&i->id, &packet, 1);
                 i->sent++;
@@ -648,20 +648,20 @@ void UnitSync::CheckUnitAvailable(unsigned int key, int y)
 
     int h = 1;
     if (y != 0) {
-        if (it.ptr->value.y == 0) {
+        if (it.ptr->value.scriptChecksum == 0) {
             int n = g_game->unitDefCount;
             for (int i = 1; i < n; i++) {
                 UnitDef* def = &g_game->defs[i];
                 if (def->fbiChecksum == key) {
                     ComputeUnitScriptChecksum(def);
-                    it.ptr->value.y = def->scriptChecksum;
+                    it.ptr->value.scriptChecksum = def->scriptChecksum;
                     break;
                 }
             }
         }
     }
     if (y != 0) {
-        if (y != it.ptr->value.y)
+        if (y != it.ptr->value.scriptChecksum)
             h = 0;
     }
 
@@ -695,7 +695,7 @@ void UnitSync::CheckUnitAvailable(unsigned int key, int y)
         }
     }
 
-    it.ptr->value.h = h;
+    it.ptr->value.peerEnabled = h;
     NotifyEntryChanged(key);
 }
 
@@ -777,7 +777,7 @@ void UnitSync::ProcessSync() {
             Increment increment = &Tree::iterator::_Inc;
             for (std::map<unsigned int, UnitSyncEntry>::iterator k = entries.begin(); k != entries.end();
                  (k.*increment)()) {
-                CheckUnitAvailable(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(k->second.x)))))))))), 0);
+                CheckUnitAvailable(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(k->second.fbiChecksum)))))))))), 0);
             }
         }
         return;
@@ -929,7 +929,7 @@ void UnitSync::ApplyToUnitTypes()
             ((UnitDefFlags_0046e160*)&def->flags1)->flag_23 = 0;
         } else {
             ProtectUnitDefsReadWrite();
-            ((UnitDefFlags_0046e160*)&def->flags1)->flag_23 = (it.ptr->value.w != 0 && it.ptr->value.h != 0);
+            ((UnitDefFlags_0046e160*)&def->flags1)->flag_23 = (it.ptr->value.enabled != 0 && it.ptr->value.peerEnabled != 0);
             def->maxThisUnit = it.ptr->value.limit;
         }
         ProtectUnitDefsReadOnly();
@@ -948,41 +948,41 @@ int UnitSync::PopChangedEntry(UnitSyncEntry* out)
 }
 
 // FUNCTION: 0x46e330
-int UnitSync::GetUnitEntry(Unit_0046e330* unit, UnitSyncEntry* out)
+int UnitSync::GetUnitEntry(UnitSyncDef* unit, UnitSyncEntry* out)
 {
     *out = Find(&unit->key).ptr->value;
-    return out->w != 0 && out->h != 0;
+    return out->enabled != 0 && out->peerEnabled != 0;
 }
 
 // FUNCTION: 0x46e3c0
-int UnitSync::ToggleUnitAllowed(Unit_0046e330* unit)
+int UnitSync::ToggleUnitAllowed(UnitSyncDef* unit)
 {
     UnitSyncNode* n = Find(&unit->key).ptr;
-    n->value.w = (n->value.w == 0);
+    n->value.enabled = (n->value.enabled == 0);
     NotifyEntryChanged(unit->key);
-    return n->value.w != 0 && n->value.h != 0;
+    return n->value.enabled != 0 && n->value.peerEnabled != 0;
 }
 
 // FUNCTION: 0x46e450
-int UnitSync::DisallowUnit(Unit_0046e330* unit)
+int UnitSync::DisallowUnit(UnitSyncDef* unit)
 {
     UnitSyncNode* n = Find(&unit->key).ptr;
-    n->value.w = 0;
+    n->value.enabled = 0;
     NotifyEntryChanged(unit->key);
-    return n->value.w != 0 && n->value.h != 0;
+    return n->value.enabled != 0 && n->value.peerEnabled != 0;
 }
 
 // FUNCTION: 0x46e4d0
-int UnitSync::AllowUnit(Unit_0046e330* unit)
+int UnitSync::AllowUnit(UnitSyncDef* unit)
 {
     UnitSyncNode* n = Find(&unit->key).ptr;
-    n->value.w = 1;
+    n->value.enabled = 1;
     NotifyEntryChanged(unit->key);
-    return n->value.w != 0 && n->value.h != 0;
+    return n->value.enabled != 0 && n->value.peerEnabled != 0;
 }
 
 // FUNCTION: 0x46e550
-void UnitSync::SetUnitLimit(Unit_0046e330* unit, int value)
+void UnitSync::SetUnitLimit(UnitSyncDef* unit, int value)
 {
     UnitSyncIter it = Find(&unit->key);
     if (!(it == End())) {

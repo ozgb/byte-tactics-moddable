@@ -44,7 +44,6 @@ struct Holder_00453640;
 #include "../gui/layer.h"
 struct Net_4517b0;
 struct ChatPacket;
-class UnitSync;
 
 #include "player_info.h"
 
@@ -82,6 +81,7 @@ int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall SetupPlayerSlot(unsigned char player, char type);
 int GetTicks();
 #include "unit_sync.h"
+#include "unit_sync_state.h"
 #include "../gui/dialogs.h"
 #include <memory.h>
 #include "../frontend/multi.h"
@@ -806,11 +806,6 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
 #pragma pack(push, 1)
 
 #include "packet_receiver.h"
-
-class UnitSync {
-public:
-    void ReceiveSyncPacket(void*, unsigned char);
-};
 
 struct Guid_4517b0 {
     int data[4];

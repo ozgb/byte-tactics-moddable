@@ -20,6 +20,7 @@
 #include "../src/graphics/rect.h"
 #include "../src/network/bit_reader.h"
 #include "../src/network/unit_sync.h"
+#include "../src/network/unit_sync_state.h"
 #include "../src/units/unit_type_set.h"
 #include "../src/debug/command_line.h"
 
@@ -386,15 +387,12 @@ class SonarJamVisitor;
 struct FrameTimers;
 struct Class_0046c620;
 class Class_0046cc10;
-class PacketSequencer;
 class Class_0046cef0;
 class Class_0046d040;
 class Class_0046d4c0;
 class Class_0046d630;
 class Class_0046d6c0;
 class Class_0046d860;
-class UnitSyncPlayer;
-class UnitSync;
 class Class_0046e160;
 class Class_0046e330;
 class Class_0046e3c0;
@@ -1019,7 +1017,6 @@ struct Elem_0043ca70;
 struct Elem_00441c30;
 struct Elem_0044ce90;
 struct Elem_0046e5e0;
-struct Elem_0046faf0;
 struct Elem_004702a0;
 struct Elem_004702a0_2;
 struct Elem_00470a40;
@@ -1958,7 +1955,6 @@ struct Struct_004c2ac0;
 struct Struct_004c2ac0_2;
 struct Struct_004c6ac0;
 struct Sub;
-class Sub2_0046d040;
 struct Sub2_004aeac0;
 struct Sub34_004aeac0;
 struct Sub5_004aeac0;
@@ -1966,7 +1962,6 @@ struct Sub6_004aeac0;
 struct Sub_00409520;
 struct Sub_004679a0_a;
 struct Sub_004679a0_b;
-class Sub_0046d040;
 struct Sub_0046e000;
 struct Sub_00477360;
 struct Sub_00496b10;
@@ -5643,18 +5638,6 @@ struct Message_00447150 {
     char unknown_0[5706];
 };
 
-class UnitSync {
-public:
-    char unknown_0[20];
-    Entry_0046e000* begin;
-    Entry_0046e000* end;
-    char unknown_1c[60];
-    int field_58;
-    char unknown_5c[8];
-    int field_64;
-    int AllPlayersSynced(void);
-};
-
 struct Record_005129b4 {
     char name[82];
     int unitIndex;
@@ -7799,13 +7782,6 @@ struct Class_0046c620 {
     char unknown_4d0[4];
 };
 
-struct Elem_0046faf0 {
-    int a;
-    int b;
-    int c;
-    short d;
-};
-
 class VecInt_0046ca60 {
 public:
     std::allocator<int> alloc;
@@ -7833,13 +7809,6 @@ public:
     char unknown_4[8];
     std::vector<Elem_0046faf0> vec;
     void SendSequenced(Elem_0046faf0*, Elem_0046faf0*);
-};
-
-class PacketSequencer {
-public:
-    char unknown_0[1];
-    void SendUnsequenced(unsigned int, void*);
-    void Inl(unsigned int, void*);
 };
 
 class Class_0046eba0 {
@@ -7879,22 +7848,6 @@ public:
     LiveNode* Buynode(LiveNode*, int);
     void FUN_0046f720(void);
     Rect& operator[](unsigned int);
-};
-
-class Sub2_0046d040 {
-public:
-    int flag;
-    int* first;
-    int* last;
-    int* end;
-};
-
-class Sub_0046d040 {
-public:
-    int a;
-    int b;
-    int c;
-    void SendUnsequenced(void*, int);
 };
 
 class ListWrap_0046d1a0 {
@@ -8295,13 +8248,6 @@ public:
     void NotifyEntryChanged(unsigned int);
     void ProcessSync(void);
     void CheckUnitAvailable(unsigned int, int);
-};
-
-class UnitSyncPlayer : public SyncPlayerRecord {
-public:
-    UnitSyncPlayer(UnitSyncPlayer&);
-    ~UnitSyncPlayer(void);
-    UnitSyncPlayer& operator=(UnitSyncPlayer&);
 };
 
 class Class_0046d040 {

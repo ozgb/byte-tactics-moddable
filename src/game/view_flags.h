@@ -3,10 +3,17 @@
 
 #pragma pack(push, 1)
 struct MapViewFlags {
-    unsigned short bit0 : 1;
-    unsigned short bit1 : 1;
-    unsigned short bit2 : 1;
-    unsigned short rest : 13;
+    union {
+        unsigned short raw;
+        unsigned char rawByte;
+        struct {
+            unsigned short bit0 : 1;
+            unsigned short bit1 : 1;
+            unsigned short bit2 : 1;
+            unsigned short bit3 : 1;
+            unsigned short rest : 12;
+        };
+    };
 };
 #pragma pack(pop)
 

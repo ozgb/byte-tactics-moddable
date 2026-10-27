@@ -648,17 +648,55 @@ void* GetBlockMap()
 }
 #pragma auto_inline(on)
 
+#include <vector>
+
+struct Elem_004dd8c0 {
+    unsigned int w[0xc];
+};
+
+class Alloc_004dd8c0 {
+public:
+    typedef unsigned int size_type;
+    typedef int difference_type;
+    typedef Elem_004dd8c0* pointer;
+    typedef const Elem_004dd8c0* const_pointer;
+    typedef Elem_004dd8c0& reference;
+    typedef const Elem_004dd8c0& const_reference;
+    typedef Elem_004dd8c0 value_type;
+
+    pointer allocate(size_type _N, const void* = 0)
+    {
+        pointer _P;
+        do {
+            _P = (pointer)host_mem_alloc(_N * sizeof(value_type));
+            if (_P == 0 && g_outOfMemoryHandler != 0)
+                g_outOfMemoryHandler();
+        } while (_P == 0 && g_outOfMemoryHandler != 0);
+        return _P;
+    }
+    void deallocate(pointer _P, size_type)
+    {
+        if (_P != 0)
+            host_mem_free(_P);
+    }
+    void construct(pointer _P, const value_type& _V)
+    {
+        std::_Construct(_P, _V);
+    }
+    void destroy(pointer) {}
+    size_type max_size() const { return (size_type)(-1) / sizeof(value_type); }
+};
+
+typedef std::vector<Elem_004dd8c0, Alloc_004dd8c0> FreedBlocks;
+
 template <class T, class A>
 class FreedBlockRing {
 public:
     explicit FreedBlockRing(const A& al = A())
-        : allocator(al), first(0), last(0), end(0), count(0) {}
+        : ring(), count(0) {}
     static void* operator new(size_t size) { return host_mem_alloc(size); }
 
-    A allocator;
-    int first;
-    int last;
-    int end;
+    FreedBlocks ring;
     int count;
 };
 
@@ -680,7 +718,6 @@ FreedBlockRing<int>* GetFreedBlockRing()
 #include <map>
 #include <list>
 #include <time.h>
-#include <vector>
 #include <algorithm>
 
 class FreeBlockMap;
@@ -1214,46 +1251,8 @@ public:
     void RotateRight(Node_004db000* x);
 };
 
-struct Elem_004dd8c0 {
-    unsigned int w[0xc];
-};
-
-class Alloc_004dd8c0 {
-public:
-    typedef unsigned int size_type;
-    typedef int difference_type;
-    typedef Elem_004dd8c0* pointer;
-    typedef const Elem_004dd8c0* const_pointer;
-    typedef Elem_004dd8c0& reference;
-    typedef const Elem_004dd8c0& const_reference;
-    typedef Elem_004dd8c0 value_type;
-
-    pointer allocate(size_type _N, const void* = 0)
-    {
-        pointer _P;
-        do {
-            _P = (pointer)host_mem_alloc(_N * sizeof(value_type));
-            if (_P == 0 && g_outOfMemoryHandler != 0)
-                g_outOfMemoryHandler();
-        } while (_P == 0 && g_outOfMemoryHandler != 0);
-        return _P;
-    }
-    void deallocate(pointer _P, size_type)
-    {
-        if (_P != 0)
-            host_mem_free(_P);
-    }
-    void construct(pointer _P, const value_type& _V)
-    {
-        std::_Construct(_P, _V);
-    }
-    void destroy(pointer) {}
-    size_type max_size() const { return (size_type)(-1) / sizeof(value_type); }
-};
-
-typedef std::vector<Elem_004dd8c0, Alloc_004dd8c0> FreedBlockVector;
-typedef void (FreedBlockVector::*InsertFn_004dd8c0)(
-    FreedBlockVector::iterator, FreedBlockVector::size_type, const Elem_004dd8c0&);
+typedef void (FreedBlocks::*InsertFn_004dd8c0)(
+    FreedBlocks::iterator, FreedBlocks::size_type, const Elem_004dd8c0&);
 
 
 // FUNCTION: 0x4db000
@@ -2238,7 +2237,7 @@ void BlockMapIter::PrevNode()
 }
 
 // FUNCTION: 0x4dd8c0 ?insert@?$vector@UElem_004dd8c0@@VAlloc_004dd8c0@@@std@@QAEXPAUElem_004dd8c0@@IABU3@@Z
-InsertFn_004dd8c0 g_insert_004dd8c0 = &FreedBlockVector::insert;
+InsertFn_004dd8c0 g_insert_004dd8c0 = &FreedBlocks::insert;
 
 // FUNCTION: 0x4ddbe0
 MapInsertResult* MapInsertResult::Assign(int* iter, unsigned char* inserted)
@@ -2618,7 +2617,7 @@ void __cdecl FreeDebugBlock(void* p, int flags)
         CheckFillPattern((unsigned int *)((char*)p + size), GetDebugFillPattern(), pad);
     Elem_004dd8c0* old = (Elem_004dd8c0*)&*it;
     FreedBlockRing<int>* arena = GetFreedBlockRing();
-    FreedBlockVector& ring = *(FreedBlockVector*)arena;
+    FreedBlocks& ring = arena->ring;
     if ((unsigned int)arena->count < 0x2000)
         ring.push_back(*old);
     else

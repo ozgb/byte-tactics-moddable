@@ -53,12 +53,7 @@ struct OrderTypeEntry {
     unsigned int flags;
 };
 
-class OrderType {
-public:
-    unsigned char index;
-    OrderTypeEntry* GetTableEntry();
-};
-
+#include "../orders/order_type_entry.h"
 #include "../game/game.h"
 #pragma pack(pop)
 

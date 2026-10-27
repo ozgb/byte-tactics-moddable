@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4446 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4442 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -21,17 +21,17 @@ The subsystems and the issue each maps to:
 | [features](#features) | 47 | #12 |
 | [ai](#ai) | 134 | #13 |
 | [pathfinding](#pathfinding) | 56 | #14 |
-| [weapons](#weapons) | 102 | #15 |
+| [weapons](#weapons) | 101 | #15 |
 | [targeting](#targeting) | 11 | #16 |
 | [los_radar](#los_radar) | 95 | #17 |
 | [orders](#orders) | 378 | #18 |
 | [units](#the-remaining-subsystems) | 193 | none yet |
 | [players](#the-remaining-subsystems) | 144 | none yet |
 | [map](#the-remaining-subsystems) | 108 | none yet |
-| [network](#the-remaining-subsystems) | 331 | none yet |
+| [network](#the-remaining-subsystems) | 341 | none yet |
 | [game](#the-remaining-subsystems) | 211 | none yet |
 | [harness](#the-remaining-subsystems) | 171 | none yet |
-| [presentation](#the-remaining-subsystems) | 1415 | none yet |
+| [presentation](#the-remaining-subsystems) | 1402 | none yet |
 | [platform](#the-remaining-subsystems) | 731 | none yet |
 | [seams](#the-remaining-subsystems) | 103 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
@@ -315,9 +315,9 @@ Coverage: 93.8% of functions (45 of 48), 92.4% of lines, 87.1% of branches; 3 li
 
 ## weapons
 
-Issue #15. 102 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
+Issue #15. 101 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
 
-Coverage: 84.3% of functions (75 of 89), 84.6% of lines, 70.4% of branches; 14 live functions no scenario enters, and 17 more are dead (data/coverage.csv).
+Coverage: 84.1% of functions (74 of 88), 84.6% of lines, 70.4% of branches; 14 live functions no scenario enters, and 17 more are dead (data/coverage.csv).
 
 **Entry points.** Phase roots: `UpdateProjectiles` and `UpdateExplosions`, called from `RunGameSteps`. `UpdateUnitWeapons` is not a root: `UpdateAllUnits` (units) calls it.
 
@@ -342,7 +342,7 @@ Coverage: 84.3% of functions (75 of 89), 84.6% of lines, 70.4% of branches; 14 l
 - features (2): `DamageFeature`, `GetFootprintCentre`
 - 6 smaller targets: los_radar (2), orders (2), targeting (2), economy (1), game (1), map (1)
 
-**Sim writes.** 204 items in all, 141 after leaving out the shared value types (Vec3, Point, Fixed) and per-file copies of a struct (names ending in an address). The most used:
+**Sim writes.** 203 items in all, 141 after leaving out the shared value types (Vec3, Point, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
 `Game::projectiles` (mixed, 18 fn); `WeaponDef::index` (sim, 11 fn); `Game::projectileCount` (mixed, 9 fn); `WeaponDef::speed` (sim, 9 fn); `WeaponFirePacket::aimOrVel` (sim, 9 fn); `WeaponFirePacket::weaponDefIndex` (sim, 8 fn); `Game::projCount` (sim, 7 fn); `WeaponFirePacket::origin` (sim, 7 fn); `WeaponFirePacket::targetUnitId` (sim, 7 fn); `WeaponFirePacket::type` (sim, 7 fn); `WeaponDef::holdTime` (sim, 6 fn); `WeaponFirePacket::fireHeading` (sim, 6 fn)
 
@@ -572,7 +572,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Multiplayer lobby and menus only (5): `Mission::GetTerrainSizeTier` (the lobby colour), `Mission::GetDescription`, `Mission::GetPlanet`, `Mission::GetTranslatedName` and `Mission::HasMissionName` (the map list and mission menus). Test mode calls only `LoadMissionByName`.
 - Campaign menu, end screen and restart only (5): `Mission::GetBriefing`, `Mission::SelectMission`, `Mission::MissionExists`, `Mission::AdvanceMission` and `Mission::GetMissionIndex`.
 
-**network** (331 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 95 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 116 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (237 in all).
+**network** (341 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 95 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 116 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (235 in all).
 
 **network, functions no scenario enters** (248 of 298 after `save-midgame` (#422) and `allied-victory` (#432), and the six `console-` scenarios (#445); 50 are entered, 16.8%), by reason:
 
@@ -614,7 +614,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **harness** (171 functions). The test harness of #3 (`src/harness`). No phase root. 10 functions are called from outside; the busiest are `HarnessViewRand` (20), `HarnessTestMode` (4), `HarnessCrtSeed` (2). It imports 51 functions (presentation 5, map 3).
 
-**presentation** (1415 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 311 functions are called from outside, mostly by game (215 distinct functions); the busiest are `QueueUnitSpeech` (27), `PlaySoundByName` (18), `GetDisplay` (17). It imports 335 functions: platform 85, network 65, game 24, map 24, players 14. The reverse direction is the one to remove: 53 imports from presentation in the nine module subsystems, the largest in los_radar (18), weapons (16) and features (9). Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
+**presentation** (1402 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 311 functions are called from outside, mostly by game (215 distinct functions); the busiest are `QueueUnitSpeech` (27), `PlaySoundByName` (18), `GetDisplay` (17). It imports 335 functions: platform 85, network 65, game 24, map 24, players 14. The reverse direction is the one to remove: 53 imports from presentation in the nine module subsystems, the largest in los_radar (18), weapons (16) and features (9). Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
 **platform** (731 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (24 functions, set by `override`). No phase root. 290 functions are called from outside, by game (88 distinct functions), presentation (85), units (56) and map (36); the busiest are `operator new` (138), `GameFreeThunk` (134), `operator delete` (104), then `Translate` (84) and `RandomInt` (60). It imports 170 functions: game 67, presentation 44.
 
@@ -648,7 +648,7 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | **features** | 42 of 44 | 95.5% | 82.0% | 69.6% | 2 | 4 |
 | **ai** | 93 of 104 | 89.4% | 89.0% | 83.0% | 11 | 35 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 87.1% | 3 | 10 |
-| **weapons** | 75 of 89 | 84.3% | 84.6% | 70.4% | 14 | 17 |
+| **weapons** | 74 of 88 | 84.1% | 84.6% | 70.4% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
 | **los_radar** | 64 of 72 | 88.9% | 82.8% | 72.9% | 8 | 22 |
 | **orders** | 306 of 368 | 83.2% | 79.4% | 61.6% | 62 | 26 |
@@ -657,11 +657,11 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | **map** | 79 of 98 | 80.6% | 86.8% | 75.9% | 19 | 13 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
 | game | 113 of 183 | 61.7% | 50.4% | 31.4% | 70 | 25 |
-| network | 50 of 287 | 17.4% | 10.7% | 4.5% | 237 | 73 |
+| network | 50 of 298 | 16.8% | 10.7% | 4.5% | 248 | 70 |
 | platform | 318 of 641 | 49.6% | 34.9% | 22.7% | 323 | 80 |
-| presentation | 464 of 1124 | 41.3% | 31.0% | 21.7% | 660 | 300 |
+| presentation | 460 of 1116 | 41.2% | 31.0% | 21.7% | 656 | 295 |
 | seams | 94 of 103 | 91.3% | 95.8% | - | 9 | 0 |
-| state | 296 of 350 | 84.6% | 80.5% | 50.5% | 54 | 21 |
+| state | 294 of 350 | 84.0% | 80.2% | 50.3% | 56 | 21 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
 

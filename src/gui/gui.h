@@ -1,5 +1,7 @@
 #ifndef GUI_H
 #define GUI_H
+struct Gadget;
+
 struct Dialog;
 struct Dialog_4a1b40;
 struct Dialog_4a2be0;
@@ -148,5 +150,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags);
 void __stdcall CloseTopScreen(Gui* gui);
 void __stdcall SetCurrentGuiContext(Gui* ctx);
 void __stdcall SetDefaultFont(int*, int);
+
+void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 
 #endif

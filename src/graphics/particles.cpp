@@ -534,7 +534,7 @@ static inline int InsideExplored(Player* p, int col, int row)
            (unsigned int)row < (unsigned int)p->exploredHeight;
 }
 
-static inline int IsSeen_00473590(Player* p, Player* q, int col, int row)
+static inline int IsSeen(Player* p, Player* q, int col, int row)
 {
     if (!InsideExplored(p, col, row))
         return 0;
@@ -542,45 +542,13 @@ static inline int IsSeen_00473590(Player* p, Player* q, int col, int row)
             (1 << g_game->playerIndex)) != 0;
 }
 
-static inline int Identity_00473590(int v) { return v; }
-
-static inline int Identity_00473a00(int v) { return v; }
-
-static inline int IsSeen_00473a00(Player* p, Player* q, int col, int row)
-{
-    if (!InsideExplored(p, col, row))
-        return 0;
-    return (g_game->visibilityMask[q->exploredWidth * row + col] &
-            (1 << g_game->playerIndex)) != 0;
-}
-
-static inline int Identity_00474170(int v) { return v; }
-
-static inline int IsSeen_00474170(Player* p, Player* q, int col, int row)
-{
-    if (!InsideExplored(p, col, row))
-        return 0;
-    return (g_game->visibilityMask[q->exploredWidth * row + col] &
-            (1 << g_game->playerIndex)) != 0;
-}
-
-static inline int Identity_004745e0(int v) { return v; }
+static inline int Identity(int v) { return v; }
 
 static inline int IsSeen_004745e0(Map_004745e0* p, Map_004745e0* q, int col, int row)
 {
     if (!p->explored.size.Contains(col, row))
         return 0;
     return (g_game->visibilityMask[q->explored.size.width * row + col] &
-            (1 << g_game->playerIndex)) != 0;
-}
-
-static inline int Identity_00474b80(int v) { return v; }
-
-static inline int IsSeen_00474b80(Player* p, Player* q, int col, int row)
-{
-    if (!InsideExplored(p, col, row))
-        return 0;
-    return (g_game->visibilityMask[q->exploredWidth * row + col] &
             (1 << g_game->playerIndex)) != 0;
 }
 
@@ -600,7 +568,7 @@ inline int Pos_004745e0::Visible()
     } else {
         int col = x >> 5;
         int row = (y - (height >> 1)) >> 5;
-        visible = Identity_004745e0(IsSeen_004745e0(p, p2, col, row));
+        visible = Identity(IsSeen_004745e0(p, p2, col, row));
     }
     return visible;
 }
@@ -739,7 +707,7 @@ void ParticleLists::AddTeleportParticles(int posA, int posB, int lifetime, short
     TeleportParticles* p = new TeleportParticles;
     if (p) {
         p->Init((Vec3_004736e0*)posA, (Vec3_004736e0*)posB, lifetime);
-        Add(index, p);
+        AddToList(p, index);
     }
 }
 
@@ -752,7 +720,7 @@ void ParticleLists::AddNanoParticles(int posA, int posB, int lifetime, short ind
     NanoParticles* p = new NanoParticles;
     if (p) {
         p->Init((Seg_00473b50*)posA, (Seg_00473b50*)posB, lifetime);
-        Add(index, p);
+        AddToList(p, index);
     }
 }
 
@@ -765,7 +733,7 @@ void ParticleLists::AddThrustParticles(int posA, int posB, int period, int lifet
     ThrustParticles* p = new ThrustParticles;
     if (p) {
         p->Init((Shape_00472ab0*)posA, (Shape_00472ab0*)posB, period, lifetime);
-        Add(index, p);
+        AddToList(p, index);
     }
 }
 
@@ -779,7 +747,7 @@ void ParticleLists::AddWakeParticles(int posA, int posB, int period,
     WakeParticles* p = new WakeParticles;
     if (p) {
         p->Init((Vec3_00474760*)posA, (Vec3_00474760*)posB, period, lifetime, isAscending);
-        Add(index, p);
+        AddToList(p, index);
     }
 }
 
@@ -938,7 +906,7 @@ void __stdcall EmitReverseNanoParticles(Pos_00472200* targetBounds, Vec3* origin
     NanoParticles* p = new NanoParticles;
     if (p) {
         p->Init((Seg_00473b50*)targetBounds, (Seg_00473b50*)&pos, 1);
-        lists->Add(index, p);
+        lists->AddToList(p, index);
     }
 }
 
@@ -1170,7 +1138,7 @@ void TeleportParticle::DrawParticle(void* dest, short px, short py)
     } else {
         int col = posw.x >> 5;
         int row = (posw.y - (posw.h >> 1)) >> 5;
-        visible = Identity_00473590(IsSeen_00473590(p, p2, col, row));
+        visible = Identity(IsSeen(p, p2, col, row));
     }
     if (visible)
         DrawFrameBlended(dest, GetGafFrame(data, frame), sx, sy);
@@ -1289,7 +1257,7 @@ void ThrustParticle::DrawParticle(void* dest, short px, short py)
     } else {
         int col = posw.x >> 5;
         int row = (posw.y - (posw.h >> 1)) >> 5;
-        visible = Identity_00474170(IsSeen_00474170(p, p2, col, row));
+        visible = Identity(IsSeen(p, p2, col, row));
     }
     if (visible)
         DrawFrameBlended(dest, GetGafFrame(bitmask, frame), sx, sy);
@@ -1711,7 +1679,7 @@ void ParticleLists::AddSmoke(Vec3* pos, int limit, int emitPeriod,
     SmokeParticles* p = new SmokeParticles;
     if (p) {
         p->Init(pos, limit, emitPeriod, holdPeriod, lifetime, alt);
-        Add(index, p);
+        AddToList(p, index);
     }
 }
 
@@ -1722,7 +1690,7 @@ void ParticleLists::AddTimedSubParticles(Vec3* pos, int emitPeriod,
     TimedSubParticles* e = new TimedSubParticles;
     if (e) {
         e->Init(pos, emitPeriod, holdPeriod, lifetime);
-        Add(index, e);
+        AddToList(e, index);
     }
 }
 
@@ -1742,7 +1710,7 @@ void __stdcall EmitSmoke(Vec3* pos, int emitPeriod, int lifetime, short index)
     SmokeParticles* e = new SmokeParticles;
     if (e) {
         e->Init((Vec3*)pos, 0, emitPeriod, 0, lifetime, 0);
-        owner->Add(index, e);
+        owner->AddToList(e, index);
     }
 }
 
@@ -1753,7 +1721,7 @@ void __stdcall EmitTimedBlackSmoke(Vec3* pos, int emitPeriod, int lifetime, shor
     SmokeParticles* e = new SmokeParticles;
     if (e) {
         e->Init((Vec3*)pos, 0, emitPeriod, 0, lifetime, 1);
-        owner->Add(index, e);
+        owner->AddToList(e, index);
     }
 }
 
@@ -1764,7 +1732,7 @@ void __stdcall EmitWhiteSmoke(Vec3* pos, short index)
     SmokeParticles* e = new SmokeParticles;
     if (e) {
         e->Init((Vec3*)pos, 0, 1, 0, 0, 0);
-        owner->Add(index, e);
+        owner->AddToList(e, index);
     }
 }
 
@@ -1775,7 +1743,7 @@ void __stdcall EmitBlackSmoke(Vec3* p, short index)
     SmokeParticles* e = new SmokeParticles;
     if (e) {
         e->Init((Vec3*)p, 0, 1, 0, 0, 1);
-        l.Add(index, e);
+        l.AddToList(e, index);
     }
 }
 
@@ -1786,7 +1754,7 @@ void __stdcall EmitWeaponSmoke(Vec3* p, short index)
     SmokeParticles* e = new SmokeParticles;
     if (e) {
         e->Init((Vec3*)p, 3, 1, 0x1e, 0, 0);
-        l.Add(index, e);
+        l.AddToList(e, index);
     }
 }
 
@@ -1797,7 +1765,7 @@ void __stdcall EmitTimedSubParticles(Vec3* p, short index)
     TimedSubParticles* e = new TimedSubParticles;
     if (e) {
         e->Init(p, 5, 0, 0x96);
-        l.Add(index, e);
+        l.AddToList(e, index);
     }
 }
 
@@ -1827,7 +1795,7 @@ void NanoParticle::DrawParticle(int dest, short x, short y)
     } else {
         int col = posw.x >> 5;
         int row = (posw.y - (posw.height >> 1)) >> 5;
-        visible = Identity_00473a00(IsSeen_00473a00(p, q, col, row));
+        visible = Identity(IsSeen(p, q, col, row));
     }
 
     if (visible)
@@ -1897,7 +1865,7 @@ void SmokeParticle::DrawParticle(void* dest, short px, short py)
     } else {
         int col = posw.x >> 5;
         int row = (posw.z - (posw.y >> 1)) >> 5;
-        visible = Identity_00474b80(IsSeen_00474b80(p, p2, col, row));
+        visible = Identity(IsSeen(p, p2, col, row));
     }
     if (visible)
         DrawFrameBlended(dest, GetGafFrame(data, count), sx, sy);

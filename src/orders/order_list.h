@@ -1,5 +1,7 @@
 #ifndef ORDER_LIST_H
 #define ORDER_LIST_H
+struct OrderTableEntry;
+
 struct Unit;
 
 class HapiBank;
@@ -30,5 +32,7 @@ int __stdcall SumQueuedBuildCount(Unit* owner, int index);
 int __stdcall GetOrderName(Unit* obj);
 int __stdcall ReadyOrder(int arg1, int arg2, int arg3);
 int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int);
+
+int __stdcall CompareOrderTypeNames(const OrderTableEntry& a, const OrderTableEntry& b);
 
 #endif

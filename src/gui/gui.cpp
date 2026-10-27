@@ -53,455 +53,6 @@ void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
 unsigned int __cdecl GetTicks();
 
-class SquadManager;
-
-
-#pragma pack(push, 1)
-
-struct Holder_0049f8c0;
-
-struct Entry_0049f8c0 {
-    unsigned char type;
-    char team;
-    char name[0x10];
-    char unknown_12[0x29 - 0x12];
-    char value;
-    char unknown_2a[0x33 - 0x2a];
-    char key[0xb6 - 0x33];
-    union {
-        struct {
-            short count;
-            char unknown_b8[0x138 - 0xb8];
-            short status;
-            char unknown_13a[0x15b - 0x13a];
-        };
-        char text[0x15b - 0xb6];
-    };
-};
-
-struct Holder_0049f8c0 {
-    char unknown_0[4];
-    Entry_0049f8c0* entries;
-    char unknown_8[0x14 - 0x8];
-    int dirty;
-    int keyboardInput;
-    char unknown_1c[0x20 - 0x1c];
-    int selected;
-};
-
-struct Dialog {
-    char unknown_0[0x18];
-    Holder_0049f8c0* holder;
-    char unknown_1c[0x60 - 0x1c];
-    int current;
-    int focus;
-    int index;
-    int used;
-    char unknown_70[0x74 - 0x70];
-    int length;
-    char unknown_78[0xa2 - 0x78];
-    int dirty;
-    char unknown_a6[0x9b6 - 0xa6];
-    char path_9b6[0x100];
-    char path_ab6[0x100];
-    char path_bb6[0x100];
-    char unknown_cb6[0xcca - 0xcb6];
-    int changed;
-};
-
-struct Vec6_49fd20 {
-    int x;
-    int y;
-    char pad[16];
-};
-
-struct Obj1_49fd20 {
-    char unknown_0[0x3c];
-    Vec6_49fd20 data;
-};
-
-struct Obj2_49fd20 {
-    char unknown_0[0x13];
-    short val_13;
-    short val_15;
-};
-
-#pragma pack(pop)
-
-void __stdcall UpdateMenu(Dialog* menu);
-void __stdcall BlitLayers(void* param_1, unsigned int* param_2, int* param_3);
-void FlipScreen();
-void __stdcall DrawButton(Dialog* param_1, int param_2);
-void __stdcall SelectAdjacentGadget(Dialog* menu, int value);
-
-
-static inline int FindEntry(Entry_0049f8c0* entries, char* name)
-{
-    for (int i = 1; i < entries->count + 1; i++) {
-        if (strncmp(entries[i].name, name, 0x10) == 0)
-            return i;
-    }
-    return -1;
-}
-
-// FUNCTION: 0x49f8c0
-int __stdcall HasGadgetNamed(Dialog* obj, char* name, int unused)
-{
-    Entry_0049f8c0* entries = obj->holder->entries;
-    for (int i = 1; i < entries->count + 1; i++) {
-        if (strncmp(entries[i].name, name, 0x10) == 0) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-// FUNCTION: 0x49f930
-void __stdcall SetGadgetName(Dialog* obj, char* name, char* text)
-{
-    if (obj->holder) {
-        Entry_0049f8c0* entries = obj->holder->entries;
-        int index = FindEntry(entries, name);
-        if (index != -1)
-        {
-            int i = 0;
-            while (i < 0x10 && text[i]) {
-                entries[index].name[i] = text[i];
-                i++;
-            }
-            entries[index].name[i] = 0;
-        }
-    }
-}
-
-// FUNCTION: 0x49f9c0
-void __stdcall RunWhileScreenNamed(Dialog* menu, char* name)
-{
-    while (1) {
-        if (!menu->holder || _strnicmp(menu->holder->entries->name, name, 16) != 0)
-            break;
-        host_pump_events(0);
-        DispatchHostEvents();
-        UpdateMenu(menu);
-        BlitLayers(menu->holder, 0, 0);
-        ShowSoftwareCursor();
-        FlipScreen();
-    }
-}
-
-// FUNCTION: 0x49fa50
-void __stdcall EnableKeyCommands(Dialog* p)
-{
-    *(int*)((char*)p + 0xa2) = 1;
-}
-
-// FUNCTION: 0x49fa70
-void __stdcall DisableKeyCommands(Dialog* obj)
-{
-    obj->dirty = 0;
-}
-
-// FUNCTION: 0x49fa90
-void __stdcall MarkChanged(Dialog* obj)
-{
-    obj->changed = 1;
-}
-
-// FUNCTION: 0x49fab0
-void __stdcall ClearChanged(void* param_1)
-{
-    *(int*)((char*)param_1 + 0xcca) = 0;
-}
-
-// FUNCTION: 0x49fad0
-void __stdcall MarkLayerChanged(Dialog* obj)
-{
-    if (obj->holder != 0) {
-        obj->holder->dirty = 1;
-    }
-}
-
-// FUNCTION: 0x49faf0
-void __stdcall ClearLayerChanged(Dialog* param)
-{
-    param->holder->dirty = 0;
-}
-
-// FUNCTION: 0x49fb10
-void __stdcall SetKeyboardInput(int param_1, int param_2)
-{
-    int eax = *(int*)(param_1 + 0x18);
-    if (eax != 0) {
-        *(int*)(eax + 0x18) = param_2;
-    }
-}
-
-// FUNCTION: 0x49fb30
-int __stdcall GetKeyboardInput(Dialog* obj)
-{
-    if (obj->holder != 0) {
-        return obj->holder->keyboardInput;
-    }
-    return 0;
-}
-
-// FUNCTION: 0x49fb50
-void __stdcall SetFontsPath(Dialog* obj, const char* dir)
-{
-    strncpy(obj->path_bb6, dir, 0x100);
-    strcat(obj->path_bb6, "\\");
-}
-
-// FUNCTION: 0x49fba0
-void __stdcall SetGuiPath(Dialog* obj, const char* dir)
-{
-    strncpy(obj->path_9b6, dir, 0x100);
-    strcat(obj->path_9b6, "\\");
-}
-
-// FUNCTION: 0x49fbf0
-void __stdcall SetAnimsPath(Dialog* obj, const char* dir)
-{
-    strncpy(obj->path_ab6, dir, 0x100);
-    strcat(obj->path_ab6, "\\");
-}
-
-// FUNCTION: 0x49fc40
-void __stdcall ClearFocus(Dialog* param_1)
-{
-    param_1->focus = 0xffffffff;
-}
-
-// FUNCTION: 0x49fc50
-int __stdcall TrySetFocus(Dialog* obj, int index)
-{
-    if (obj->focus != -1 && obj->holder->entries[obj->focus].type == 3) {
-        obj->focus = -1;
-    }
-    if (obj->focus != -1 && obj->focus != index) {
-        return 0;
-    }
-    obj->focus = index;
-    if (index != -1 && obj->holder->entries[index].type == 3) {
-        obj->length = strlen(obj->holder->entries[index].text);
-    }
-    return 1;
-}
-
-// FUNCTION: 0x49fcf0
-int __stdcall IsFocused(int param_1, int param_2)
-{
-    int result = 0;
-    result = *(int*)(param_1 + 0x64) == param_2;
-    return result;
-}
-
-// FUNCTION: 0x49fd10
-bool __stdcall HasFocus(int param_1)
-{
-    return *(int*)(param_1 + 0x64) != -1;
-}
-
-// FUNCTION: 0x49fd20
-void __stdcall FUN_0049fd20(Obj1_49fd20* param_1, Obj2_49fd20* param_2, Vec6_49fd20* param_3)
-{
-    *param_3 = param_1->data;
-    param_3->x -= param_2->val_13;
-    param_3->y -= param_2->val_15;
-}
-
-// FUNCTION: 0x49fd60
-int __stdcall IsCurrentGadgetNamed(Dialog* gui, char* name)
-{
-    if (!gui->holder)
-        return 0;
-    if (gui->current == -1)
-        return 0;
-    return strcmp(gui->holder->entries[gui->current].name, name) == 0;
-}
-
-// FUNCTION: 0x49fdf0
-int __stdcall FindGadgetIndex(Entry_0049f8c0* entries, char* name, int type)
-{
-    for (int i = 1; i < entries->count + 1; i++) {
-        if (strncmp(entries[i].name, name, 0x10) == 0) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-// FUNCTION: 0x49fe60
-int __stdcall FindGadgetIndexBySubstring(Entry_0049f8c0* entries, char* name)
-{
-    for (int i = 1; i < entries->count + 1; i++) {
-        if (strstr(entries[i].name, name)) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-// FUNCTION: 0x49fed0
-void __stdcall GetGadgetName(Entry_0049f8c0* entries, char* name, int index)
-{
-    strncpy(name, entries[index].name, 0x10);
-    name[0x10] = 0;
-}
-
-// FUNCTION: 0x49ff10
-Entry_0049f8c0* __stdcall FindGadgetOrNull(Entry_0049f8c0* entries, char* name)
-{
-    int i = FindEntry(entries, name);
-    if (i != -1) {
-        return &entries[i];
-    }
-    return 0;
-}
-
-// FUNCTION: 0x49ff90
-Entry_0049f8c0* __stdcall FindGadgetChecked(Entry_0049f8c0* entries, char* name)
-{
-    int i = FindEntry(entries, name);
-    if (i != -1) {
-        return &entries[i];
-    }
-    FatalError("Error in GUI layout");
-    return 0;
-}
-
-// FUNCTION: 0x4a0010
-Entry_0049f8c0* __stdcall FindGadgetChecked_B(Entry_0049f8c0* entries, char* name)
-{
-    int i = FindEntry(entries, name);
-    if (i != -1) {
-        return &entries[i];
-    }
-    FatalError("Error in GUI layout");
-    return 0;
-}
-
-// FUNCTION: 0x4a0090
-void __stdcall UpdateHelpText(Dialog* obj)
-{
-    char* text = DAT_005119b8;
-    if (obj->index != -1) {
-        obj->used = obj->index;
-        text = obj->holder->entries[obj->index].key;
-    }
-    int found = FindEntry(obj->holder->entries, "HELPTEXT");
-    if (found != -1) {
-        strcpy((char*)&obj->holder->entries[found].count, Translate(text));
-        obj->changed = 1;
-    }
-}
-
-// FUNCTION: 0x4a0180
-Entry_0049f8c0* __stdcall FindGadgetChecked_C(Entry_0049f8c0* entries, char* name)
-{
-    int i = FindEntry(entries, name);
-    if (i != -1) {
-        return &entries[i];
-    }
-    FatalError("Error in GUI layout");
-    return 0;
-}
-
-// FUNCTION: 0x4a0200
-Entry_0049f8c0* __stdcall FindGadgetChecked_D(Entry_0049f8c0* entries, char* name)
-{
-    int i = FindEntry(entries, name);
-    if (i != -1) {
-        return &entries[i];
-    }
-    FatalError("Error in GUI layout");
-    return 0;
-}
-
-// FUNCTION: 0x4a0280
-Entry_0049f8c0* __stdcall FindGadgetChecked_E(Entry_0049f8c0* entries, char* name)
-{
-    int i = FindEntry(entries, name);
-    if (i != -1) {
-        return &entries[i];
-    }
-    FatalError("Error in GUI layout");
-    return 0;
-}
-
-// FUNCTION: 0x4a0300
-int __stdcall IsGadgetNamed(Entry_0049f8c0* entries, int i, char* name)
-{
-    if (i == -1) {
-        return 0;
-    }
-    return strncmp(entries[i].name, name, 0x10) == 0;
-}
-
-// FUNCTION: 0x4a0340
-void __stdcall ClearPeerStatus(Dialog* param_1, int index)
-{
-    Entry_0049f8c0* entries = param_1->holder->entries;
-    Entry_0049f8c0* me = &entries[index];
-    if (me->team != 0) {
-        Entry_0049f8c0* e = &entries[1];
-        for (int i = 1; i < entries->count + 1; i++, e++) {
-            if (e->type == 1 && i != index && e->team == me->team
-                && e->status != 0) {
-                e->status = 0;
-                DrawButton(param_1, i);
-                if (param_1->holder != 0) {
-                    param_1->holder->dirty = 1;
-                }
-            }
-        }
-    }
-}
-
-// FUNCTION: 0x4a03f0
-void __stdcall SetGadgetActive(Dialog* menu, int index, int value)
-{
-    Entry_0049f8c0* entries = menu->holder->entries;
-    int i;
-
-    entries[index].value = value;
-
-    if (entries[index].type == 4) {
-        for (i = 0; i <= entries[0].count; i++) {
-            if (entries[i].type == 1 && entries[i].team == entries[index].team) {
-                entries[i].value = value;
-            }
-        }
-    } else if (entries[index].type == 2) {
-        if (value == 0) {
-            char team = entries[index].team;
-            int found = 0;
-            i = 1;
-            for (;;) {
-                if (i >= entries[0].count + 1) {
-                    found = 0;
-                    break;
-                }
-                if (entries[i].type == 4 && entries[i].team == team) {
-                    found = i;
-                    break;
-                }
-                i++;
-            }
-            if (found != -1) {
-                SetGadgetActive(menu, found, 0);
-            }
-        }
-    }
-
-    if (value == 0 && index == menu->holder->selected) {
-        SelectAdjacentGadget(menu, 1);
-    }
-    menu->changed = 1;
-}
-
-struct Pad_p2_0 { int field; };
-
 struct GafEntry;
 struct GafFrame;
 struct Gui;
@@ -629,6 +180,425 @@ struct Gadget {
     int sliderLocked;
 };
 #pragma pack(pop)
+
+class SquadManager;
+
+
+#pragma pack(push, 1)
+
+struct Dialog {
+    char unknown_0[0x18];
+    Layer* holder;
+    char unknown_1c[0x60 - 0x1c];
+    int current;
+    int focus;
+    int index;
+    int used;
+    char unknown_70[0x74 - 0x70];
+    int length;
+    char unknown_78[0xa2 - 0x78];
+    int dirty;
+    char unknown_a6[0x9b6 - 0xa6];
+    char path_9b6[0x100];
+    char path_ab6[0x100];
+    char path_bb6[0x100];
+    char unknown_cb6[0xcca - 0xcb6];
+    int changed;
+};
+
+struct Vec6_49fd20 {
+    int x;
+    int y;
+    char pad[16];
+};
+
+struct Obj1_49fd20 {
+    char unknown_0[0x3c];
+    Vec6_49fd20 data;
+};
+
+struct Obj2_49fd20 {
+    char unknown_0[0x13];
+    short val_13;
+    short val_15;
+};
+
+#pragma pack(pop)
+
+void __stdcall UpdateMenu(Dialog* menu);
+void __stdcall BlitLayers(void* param_1, unsigned int* param_2, int* param_3);
+void FlipScreen();
+void __stdcall DrawButton(Dialog* param_1, int param_2);
+void __stdcall SelectAdjacentGadget(Dialog* menu, int value);
+
+
+static inline int FindEntry(Gadget* entries, char* name)
+{
+    for (int i = 1; i < entries->u.count + 1; i++) {
+        if (strncmp(entries[i].name, name, 0x10) == 0)
+            return i;
+    }
+    return -1;
+}
+
+// FUNCTION: 0x49f8c0
+int __stdcall HasGadgetNamed(Dialog* obj, char* name, int unused)
+{
+    Gadget* entries = obj->holder->entries;
+    for (int i = 1; i < entries->u.count + 1; i++) {
+        if (strncmp(entries[i].name, name, 0x10) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: 0x49f930
+void __stdcall SetGadgetName(Dialog* obj, char* name, char* text)
+{
+    if (obj->holder) {
+        Gadget* entries = obj->holder->entries;
+        int index = FindEntry(entries, name);
+        if (index != -1)
+        {
+            int i = 0;
+            while (i < 0x10 && text[i]) {
+                entries[index].name[i] = text[i];
+                i++;
+            }
+            entries[index].name[i] = 0;
+        }
+    }
+}
+
+// FUNCTION: 0x49f9c0
+void __stdcall RunWhileScreenNamed(Dialog* menu, char* name)
+{
+    while (1) {
+        if (!menu->holder || _strnicmp(menu->holder->entries->name, name, 16) != 0)
+            break;
+        host_pump_events(0);
+        DispatchHostEvents();
+        UpdateMenu(menu);
+        BlitLayers(menu->holder, 0, 0);
+        ShowSoftwareCursor();
+        FlipScreen();
+    }
+}
+
+// FUNCTION: 0x49fa50
+void __stdcall EnableKeyCommands(Dialog* p)
+{
+    *(int*)((char*)p + 0xa2) = 1;
+}
+
+// FUNCTION: 0x49fa70
+void __stdcall DisableKeyCommands(Dialog* obj)
+{
+    obj->dirty = 0;
+}
+
+// FUNCTION: 0x49fa90
+void __stdcall MarkChanged(Dialog* obj)
+{
+    obj->changed = 1;
+}
+
+// FUNCTION: 0x49fab0
+void __stdcall ClearChanged(void* param_1)
+{
+    *(int*)((char*)param_1 + 0xcca) = 0;
+}
+
+// FUNCTION: 0x49fad0
+void __stdcall MarkLayerChanged(Dialog* obj)
+{
+    if (obj->holder != 0) {
+        obj->holder->dirty = 1;
+    }
+}
+
+// FUNCTION: 0x49faf0
+void __stdcall ClearLayerChanged(Dialog* param)
+{
+    param->holder->dirty = 0;
+}
+
+// FUNCTION: 0x49fb10
+void __stdcall SetKeyboardInput(int param_1, int param_2)
+{
+    int eax = *(int*)(param_1 + 0x18);
+    if (eax != 0) {
+        *(int*)(eax + 0x18) = param_2;
+    }
+}
+
+// FUNCTION: 0x49fb30
+int __stdcall GetKeyboardInput(Dialog* obj)
+{
+    if (obj->holder != 0) {
+        return obj->holder->keyboardInput;
+    }
+    return 0;
+}
+
+// FUNCTION: 0x49fb50
+void __stdcall SetFontsPath(Dialog* obj, const char* dir)
+{
+    strncpy(obj->path_bb6, dir, 0x100);
+    strcat(obj->path_bb6, "\\");
+}
+
+// FUNCTION: 0x49fba0
+void __stdcall SetGuiPath(Dialog* obj, const char* dir)
+{
+    strncpy(obj->path_9b6, dir, 0x100);
+    strcat(obj->path_9b6, "\\");
+}
+
+// FUNCTION: 0x49fbf0
+void __stdcall SetAnimsPath(Dialog* obj, const char* dir)
+{
+    strncpy(obj->path_ab6, dir, 0x100);
+    strcat(obj->path_ab6, "\\");
+}
+
+// FUNCTION: 0x49fc40
+void __stdcall ClearFocus(Dialog* param_1)
+{
+    param_1->focus = 0xffffffff;
+}
+
+// FUNCTION: 0x49fc50
+int __stdcall TrySetFocus(Dialog* obj, int index)
+{
+    if (obj->focus != -1 && obj->holder->entries[obj->focus].type == 3) {
+        obj->focus = -1;
+    }
+    if (obj->focus != -1 && obj->focus != index) {
+        return 0;
+    }
+    obj->focus = index;
+    if (index != -1 && obj->holder->entries[index].type == 3) {
+        obj->length = strlen(obj->holder->entries[index].u.text);
+    }
+    return 1;
+}
+
+// FUNCTION: 0x49fcf0
+int __stdcall IsFocused(int param_1, int param_2)
+{
+    int result = 0;
+    result = *(int*)(param_1 + 0x64) == param_2;
+    return result;
+}
+
+// FUNCTION: 0x49fd10
+bool __stdcall HasFocus(int param_1)
+{
+    return *(int*)(param_1 + 0x64) != -1;
+}
+
+// FUNCTION: 0x49fd20
+void __stdcall FUN_0049fd20(Obj1_49fd20* param_1, Obj2_49fd20* param_2, Vec6_49fd20* param_3)
+{
+    *param_3 = param_1->data;
+    param_3->x -= param_2->val_13;
+    param_3->y -= param_2->val_15;
+}
+
+// FUNCTION: 0x49fd60
+int __stdcall IsCurrentGadgetNamed(Dialog* gui, char* name)
+{
+    if (!gui->holder)
+        return 0;
+    if (gui->current == -1)
+        return 0;
+    return strcmp(gui->holder->entries[gui->current].name, name) == 0;
+}
+
+// FUNCTION: 0x49fdf0
+int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type)
+{
+    for (int i = 1; i < entries->u.count + 1; i++) {
+        if (strncmp(entries[i].name, name, 0x10) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// FUNCTION: 0x49fe60
+int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name)
+{
+    for (int i = 1; i < entries->u.count + 1; i++) {
+        if (strstr(entries[i].name, name)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// FUNCTION: 0x49fed0
+void __stdcall GetGadgetName(Gadget* entries, char* name, int index)
+{
+    strncpy(name, entries[index].name, 0x10);
+    name[0x10] = 0;
+}
+
+// FUNCTION: 0x49ff10
+Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name)
+{
+    int i = FindEntry(entries, name);
+    if (i != -1) {
+        return &entries[i];
+    }
+    return 0;
+}
+
+// FUNCTION: 0x49ff90
+Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name)
+{
+    int i = FindEntry(entries, name);
+    if (i != -1) {
+        return &entries[i];
+    }
+    FatalError("Error in GUI layout");
+    return 0;
+}
+
+// FUNCTION: 0x4a0010
+Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name)
+{
+    int i = FindEntry(entries, name);
+    if (i != -1) {
+        return &entries[i];
+    }
+    FatalError("Error in GUI layout");
+    return 0;
+}
+
+// FUNCTION: 0x4a0090
+void __stdcall UpdateHelpText(Dialog* obj)
+{
+    char* text = DAT_005119b8;
+    if (obj->index != -1) {
+        obj->used = obj->index;
+        text = obj->holder->entries[obj->index].helpKey;
+    }
+    int found = FindEntry(obj->holder->entries, "HELPTEXT");
+    if (found != -1) {
+        strcpy((char*)&obj->holder->entries[found].u.count, Translate(text));
+        obj->changed = 1;
+    }
+}
+
+// FUNCTION: 0x4a0180
+Gadget* __stdcall FindGadgetChecked_C(Gadget* entries, char* name)
+{
+    int i = FindEntry(entries, name);
+    if (i != -1) {
+        return &entries[i];
+    }
+    FatalError("Error in GUI layout");
+    return 0;
+}
+
+// FUNCTION: 0x4a0200
+Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name)
+{
+    int i = FindEntry(entries, name);
+    if (i != -1) {
+        return &entries[i];
+    }
+    FatalError("Error in GUI layout");
+    return 0;
+}
+
+// FUNCTION: 0x4a0280
+Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name)
+{
+    int i = FindEntry(entries, name);
+    if (i != -1) {
+        return &entries[i];
+    }
+    FatalError("Error in GUI layout");
+    return 0;
+}
+
+// FUNCTION: 0x4a0300
+int __stdcall IsGadgetNamed(Gadget* entries, int i, char* name)
+{
+    if (i == -1) {
+        return 0;
+    }
+    return strncmp(entries[i].name, name, 0x10) == 0;
+}
+
+// FUNCTION: 0x4a0340
+void __stdcall ClearPeerStatus(Dialog* param_1, int index)
+{
+    Gadget* entries = param_1->holder->entries;
+    Gadget* me = &entries[index];
+    if (me->team != 0) {
+        Gadget* e = &entries[1];
+        for (int i = 1; i < entries->u.count + 1; i++, e++) {
+            if (e->type == 1 && i != index && e->team == me->team
+                && e->status != 0) {
+                e->status = 0;
+                DrawButton(param_1, i);
+                if (param_1->holder != 0) {
+                    param_1->holder->dirty = 1;
+                }
+            }
+        }
+    }
+}
+
+// FUNCTION: 0x4a03f0
+void __stdcall SetGadgetActive(Dialog* menu, int index, int value)
+{
+    Gadget* entries = menu->holder->entries;
+    int i;
+
+    entries[index].active = value;
+
+    if (entries[index].type == 4) {
+        for (i = 0; i <= entries[0].u.count; i++) {
+            if (entries[i].type == 1 && entries[i].team == entries[index].team) {
+                entries[i].active = value;
+            }
+        }
+    } else if (entries[index].type == 2) {
+        if (value == 0) {
+            unsigned char team = entries[index].team;
+            int found = 0;
+            i = 1;
+            for (;;) {
+                if (i >= entries[0].u.count + 1) {
+                    found = 0;
+                    break;
+                }
+                if (entries[i].type == 4 && entries[i].team == team) {
+                    found = i;
+                    break;
+                }
+                i++;
+            }
+            if (found != -1) {
+                SetGadgetActive(menu, found, 0);
+            }
+        }
+    }
+
+    if (value == 0 && index == menu->holder->current) {
+        SelectAdjacentGadget(menu, 1);
+    }
+    menu->changed = 1;
+}
+
+struct Pad_p2_0 { int field; };
+
 
 #pragma pack(push, 1)
 
@@ -791,7 +761,7 @@ void __stdcall SetGadgetTextByName(Dialog_004a04f0* obj, char* name, char* text)
 // FUNCTION: 0x4a0880
 void __stdcall SetGadgetText(Dialog* obj, int index, char* text)
 {
-    strcpy(((Layer*)obj->holder)->entries[index].u.text, text);
+    strcpy(obj->holder->entries[index].u.text, text);
     if (obj->focus == index) {
         obj->length = strlen(text);
     }
@@ -3800,15 +3770,6 @@ static inline int LineHeightDirect()
     if (g_guiContext->language == 0)
         return GetFontHeight();
     return (int)GetGafFrame(g_guiContext->language->glyphs, 0x49)->height + 2;
-}
-
-static inline int FindEntry(Gadget* entries, char* name)
-{
-    for (int i = 1; i < entries->u.count + 1; i++) {
-        if (strncmp(entries[i].name, name, 0x10) == 0)
-            return i;
-    }
-    return -1;
 }
 
 static inline int SelectLabelFont(Gadget* entries, int index)

@@ -10,15 +10,6 @@ class ParticleLists {
 public:
     std::vector<ParticleSystem*> lists[10];
 
-    void Add(short index, ParticleSystem* p)
-    {
-        if (lists[index].size() > 400) {
-            delete lists[index][0];
-            lists[index].erase(lists[index].begin());
-        }
-        lists[index].push_back(p);
-    }
-
     ParticleLists();
     ~ParticleLists();
     void UpdateAll();

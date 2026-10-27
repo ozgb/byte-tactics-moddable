@@ -47,6 +47,7 @@
 #include "../graphics/model_types.h"
 #include "../graphics/object3do.h"
 #include "../graphics/piece_frame.h"
+#include "../graphics/rect.h"
 #include "../graphics/spot_state.h"
 #include "../gui/gadget.h"
 #include "../gui/gui.h"
@@ -1878,6 +1879,11 @@ static_assert(offsetof(Quirks, hoverBobWallClock) == 5, "");
 static_assert(sizeof(RadarTimer_00466dc0) == 4, "");
 static_assert(offsetof(RadarTimer_00466dc0, word) == 0, "");
 static_assert(offsetof(RadarTimer_00466dc0, byte) == 0, "");
+static_assert(sizeof(Rect) == 16, "");
+static_assert(offsetof(Rect, left) == 0, "");
+static_assert(offsetof(Rect, top) == 4, "");
+static_assert(offsetof(Rect, right) == 8, "");
+static_assert(offsetof(Rect, bottom) == 12, "");
 static_assert(sizeof(RingApproach) == 28, "");
 static_assert(offsetof(RingApproach, pos) == 8, "");
 static_assert(offsetof(RingApproach, x) == 8, "");

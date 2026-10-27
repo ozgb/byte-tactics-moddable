@@ -1058,7 +1058,6 @@ void AddOrder(int, int, Owner_0043adc0*, void*, Vec3_0043adc0*, int, int);
 void IssueOrCancelOrder(unsigned char, int, Owner_0043afc0*, int, int*, int, int);
 void AdjustBuildCount(int, Owner_0043b0b0*, int, int);
 void RegisterOrderTypes(OrderTableEntry*, int);
-int CompareOrderTypeNames(void*, void*);
 Entry_0043c6b0* LowerBoundOrderTypes(Entry_0043c6b0*, Entry_0043c6b0*, char* const&, int (__stdcall *)(const Entry_0043c6b0&, char*), int*);
 void SortOrderTypes(Elem_0043c720*, Elem_0043c720*, int (__stdcall *)(const Elem_0043c720&, const Elem_0043c720&), Elem_0043c720*);
 void InsertShiftOrderTypes(Elem_0043c940*, Elem_0043c940, int (__stdcall *)(const Elem_0043c940&, const Elem_0043c940&));

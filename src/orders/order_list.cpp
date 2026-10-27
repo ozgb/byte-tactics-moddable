@@ -216,7 +216,6 @@ int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 MissionType __stdcall GetOrderType(unsigned char relation, Unit* unit, Unit* target, Vec3* pos);
 void __stdcall AddOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7);
 int __stdcall FindWeaponTarget(Unit* unit, int a, int b);
-int __stdcall CompareOrderTypeNames(const OrderTableEntry& a, const OrderTableEntry& b);
 void RegisterUnitOrders();
 extern int DAT_0051234c;
 

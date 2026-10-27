@@ -42,7 +42,6 @@ ClampPositionToMap,skip,placeholder type Vec3_004853b0: left for the type-naming
 ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
 ClickSelectHoverUnit,mismatch,placeholder type Param_0048c7f0: left for the type-naming issues
 CollectSelectedUnits,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-CompareOrderTypeNames,skip,placeholder type OrderTableEntry: left for the type-naming issues
 ComputeUnitScriptChecksum,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ConfigureListBoxByName,mismatch,fixing it changes the generated code of a caller
 CopyPathLockFields,skip,placeholder type Dst_00440ca0: left for the type-naming issues

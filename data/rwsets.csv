@@ -11580,9 +11580,9 @@ address,function,file,kind,target
 0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,call,DrawWeaponCoverage
 0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,call,operator Order *
 0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,call,operator=
-0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,field_read,Elem_0043c390::drawMask
 0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,field_read,MissionType::index
 0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,field_read,Order::next
+0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,field_read,OrderTableEntry::drawMask
 0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,field_read,Unit::list
 0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,field_read,Unit::pos
 0x439b30,DrawOrderOverlays,src/orders/order_list.cpp,function,
@@ -11617,15 +11617,15 @@ address,function,file,kind,target
 0x439dd0,GetOrderTarget,src/orders/order_list.cpp,function,
 0x439df0,GetOrderName,src/orders/order_list.cpp,call,operator bool
 0x439df0,GetOrderName,src/orders/order_list.cpp,call,operator->
-0x439df0,GetOrderName,src/orders/order_list.cpp,field_read,Elem_0043c390::value
 0x439df0,GetOrderName,src/orders/order_list.cpp,field_read,MissionType::index
+0x439df0,GetOrderName,src/orders/order_list.cpp,field_read,OrderTableEntry::value
 0x439df0,GetOrderName,src/orders/order_list.cpp,field_read,Unit::list
 0x439df0,GetOrderName,src/orders/order_list.cpp,function,
 0x439df0,GetOrderName,src/orders/order_list.cpp,global_read,g_missionOrderTableBegin
 0x439e30,FindOrderByType,src/orders/order_list.cpp,call,operator Order *
-0x439e30,FindOrderByType,src/orders/order_list.cpp,field_read,Elem_0043c390::flags
 0x439e30,FindOrderByType,src/orders/order_list.cpp,field_read,MissionType::index
 0x439e30,FindOrderByType,src/orders/order_list.cpp,field_read,Order::next
+0x439e30,FindOrderByType,src/orders/order_list.cpp,field_read,OrderTableEntry::flags
 0x439e30,FindOrderByType,src/orders/order_list.cpp,field_read,Unit::list
 0x439e30,FindOrderByType,src/orders/order_list.cpp,field_read,Unit::list2
 0x439e30,FindOrderByType,src/orders/order_list.cpp,function,
@@ -11692,9 +11692,9 @@ address,function,file,kind,target
 0x43a0c0,Order::Order,src/orders/order_list.cpp,call,operator=
 0x43a0c0,Order::Order,src/orders/order_list.cpp,deref_read,*Vec3
 0x43a0c0,Order::Order,src/orders/order_list.cpp,field_maybe_written,Order::link
-0x43a0c0,Order::Order,src/orders/order_list.cpp,field_read,Elem_0043c390::flags
 0x43a0c0,Order::Order,src/orders/order_list.cpp,field_read,Game::ticks
 0x43a0c0,Order::Order,src/orders/order_list.cpp,field_read,Order::flags_42
+0x43a0c0,Order::Order,src/orders/order_list.cpp,field_read,OrderTableEntry::flags
 0x43a0c0,Order::Order,src/orders/order_list.cpp,field_write,Order::attached
 0x43a0c0,Order::Order,src/orders/order_list.cpp,field_write,Order::flags
 0x43a0c0,Order::Order,src/orders/order_list.cpp,field_write,Order::flags_42
@@ -11976,12 +11976,12 @@ address,function,file,kind,target
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_escape,Order::next
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_escape,Unit::list
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_escape,Unit::list2
-0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_read,Elem_0043c390::flags
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_read,MissionType::index
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_read,Order::count
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_read,Order::flags_42
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_read,Order::id
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_read,Order::next
+0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_read,OrderTableEntry::flags
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_read,Unit::list
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_read,Unit::list2
 0x43b0b0,AdjustBuildCount,src/orders/order_list.cpp,field_write,Order::count
@@ -12052,7 +12052,6 @@ address,function,file,kind,target
 0x43b7c0,RunOrders,src/orders/order_list.cpp,call,operator Unit *
 0x43b7c0,RunOrders,src/orders/order_list.cpp,call,operator!=
 0x43b7c0,RunOrders,src/orders/order_list.cpp,call,operator->
-0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,Elem_0043c390::notify
 0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,Game::ticks
 0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,MissionType::index
 0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,Order::flags
@@ -12062,6 +12061,7 @@ address,function,file,kind,target
 0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,Order::subFlags
 0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,Order::unit
 0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,Order::wakeFrame
+0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,OrderTableEntry::notify
 0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,Player::active
 0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,Player::type
 0x43b7c0,RunOrders,src/orders/order_list.cpp,field_read,Unit::def
@@ -12078,12 +12078,11 @@ address,function,file,kind,target
 0x43b7c0,RunOrders,src/orders/order_list.cpp,function,
 0x43b7c0,RunOrders,src/orders/order_list.cpp,global_read,g_game
 0x43b7c0,RunOrders,src/orders/order_list.cpp,global_read,g_missionOrderTableBegin
-0x43b7c0,RunOrders,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [Elem_0043c390::notify]"
+0x43b7c0,RunOrders,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [OrderTableEntry::notify]"
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,call,RandomInt
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,call,RemoveAndDelete
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,call,operator Order *
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,call,operator Unit *
-0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_read,Elem_0043c390::notify
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_read,Game::ticks
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_read,MissionType::index
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_read,Order::flags
@@ -12091,6 +12090,7 @@ address,function,file,kind,target
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_read,Order::state
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_read,Order::unit
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_read,Order::wakeFrame
+0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_read,OrderTableEntry::notify
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_read,Unit::list2
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_write,Order::flags
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,field_write,Order::state
@@ -12098,7 +12098,7 @@ address,function,file,kind,target
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,function,
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,global_read,g_game
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,global_read,g_missionOrderTableBegin
-0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [Elem_0043c390::notify]"
+0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [OrderTableEntry::notify]"
 0x43bc90,RegisterOrderTypes,src/orders/order_list.cpp,call,back_inserter
 0x43bc90,RegisterOrderTypes,src/orders/order_list.cpp,call,begin
 0x43bc90,RegisterOrderTypes,src/orders/order_list.cpp,call,copy
@@ -12111,7 +12111,7 @@ address,function,file,kind,target
 0x43bc90,RegisterOrderTypes,src/orders/order_list.cpp,global_maybe_written,g_missionOrderTableVec@src/orders/order_list.cpp
 0x43bc90,RegisterOrderTypes,src/orders/order_list.cpp,global_read,g_missionOrderTableVec@src/orders/order_list.cpp
 0x43c020,CompareOrderTypeNames,src/orders/order_list.cpp,call,_strcmpi
-0x43c020,CompareOrderTypeNames,src/orders/order_list.cpp,field_read,Elem_0043c390::name
+0x43c020,CompareOrderTypeNames,src/orders/order_list.cpp,field_read,OrderTableEntry::name
 0x43c020,CompareOrderTypeNames,src/orders/order_list.cpp,function,
 0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,call,RegisterGroundOrders
 0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,call,RegisterOrderTypes
@@ -12129,34 +12129,34 @@ address,function,file,kind,target
 0x43c360,MissionOrderTable::GetCount,src/orders/order_list.cpp,field_read,MissionOrderTable::first
 0x43c360,MissionOrderTable::GetCount,src/orders/order_list.cpp,field_read,MissionOrderTable::last
 0x43c360,MissionOrderTable::GetCount,src/orders/order_list.cpp,function,
-0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,deref_read,*Elem_0043c390
+0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,deref_read,*OrderTableEntry
 0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,function,
-0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const Elem_0043c390 &, char *) __attribute__((stdcall)) [pred]"
+0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const OrderTableEntry &, char *) __attribute__((stdcall)) [pred]"
 0x43c720,SortOrderTypes,src/orders/order_list.cpp,call,MedianOrderTypes
 0x43c720,SortOrderTypes,src/orders/order_list.cpp,call,PartitionOrderTypes
 0x43c720,SortOrderTypes,src/orders/order_list.cpp,call,SortOrderTypes
 0x43c720,SortOrderTypes,src/orders/order_list.cpp,call,_Val_type
-0x43c720,SortOrderTypes,src/orders/order_list.cpp,deref_read,*Elem_0043c390
+0x43c720,SortOrderTypes,src/orders/order_list.cpp,deref_read,*OrderTableEntry
 0x43c720,SortOrderTypes,src/orders/order_list.cpp,function,
 0x43c720,SortOrderTypes,src/orders/order_list.cpp,global_read,_SORT_MAX
 0x43c940,InsertShiftOrderTypes,src/orders/order_list.cpp,call,operator=
-0x43c940,InsertShiftOrderTypes,src/orders/order_list.cpp,deref_read,*Elem_0043c390
-0x43c940,InsertShiftOrderTypes,src/orders/order_list.cpp,deref_write,*Elem_0043c390
+0x43c940,InsertShiftOrderTypes,src/orders/order_list.cpp,deref_read,*OrderTableEntry
+0x43c940,InsertShiftOrderTypes,src/orders/order_list.cpp,deref_write,*OrderTableEntry
 0x43c940,InsertShiftOrderTypes,src/orders/order_list.cpp,function,
-0x43c940,InsertShiftOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const Elem_0043c390 &, const Elem_0043c390 &) __attribute__((stdcall)) [_P]"
+0x43c940,InsertShiftOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const OrderTableEntry &, const OrderTableEntry &) __attribute__((stdcall)) [_P]"
 0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,call,InsertShiftOrderTypes
 0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,call,copy_backward
 0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,call,operator=
-0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,deref_read,*Elem_0043c390
-0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,deref_write,*Elem_0043c390
+0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,deref_read,*OrderTableEntry
+0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,deref_write,*OrderTableEntry
 0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,function,
-0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const Elem_0043c390 &, const Elem_0043c390 &) __attribute__((stdcall)) [_P]"
+0x43c990,InsertionSortOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const OrderTableEntry &, const OrderTableEntry &) __attribute__((stdcall)) [_P]"
 0x43ca70,MedianOrderTypes,src/orders/order_list.cpp,function,
-0x43ca70,MedianOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const Elem_0043c390 &, const Elem_0043c390 &) __attribute__((stdcall)) [_P]"
+0x43ca70,MedianOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const OrderTableEntry &, const OrderTableEntry &) __attribute__((stdcall)) [_P]"
 0x43cb20,PartitionOrderTypes,src/orders/order_list.cpp,call,iter_swap
-0x43cb20,PartitionOrderTypes,src/orders/order_list.cpp,deref_read,*Elem_0043c390
+0x43cb20,PartitionOrderTypes,src/orders/order_list.cpp,deref_read,*OrderTableEntry
 0x43cb20,PartitionOrderTypes,src/orders/order_list.cpp,function,
-0x43cb20,PartitionOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const Elem_0043c390 &, const Elem_0043c390 &) __attribute__((stdcall)) [_P]"
+0x43cb20,PartitionOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const OrderTableEntry &, const OrderTableEntry &) __attribute__((stdcall)) [_P]"
 0x43cbb0,UnitMotion::ApplyClampedTurnDelta,src/orders/order_list.cpp,call,get
 0x43cbb0,UnitMotion::ApplyClampedTurnDelta,src/orders/order_list.cpp,field_read,Angles16::heading
 0x43cbb0,UnitMotion::ApplyClampedTurnDelta,src/orders/order_list.cpp,field_read,Unit::def
@@ -21414,7 +21414,6 @@ address,function,file,kind,target
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,deref_read,*int
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,deref_read,*unsigned char
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_escape,Game::colors
-0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Elem_0043c390::name
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Game::fontComix
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Game::unitInfoHoverTrack
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Game::unitInfoHoverUnitId
@@ -21422,6 +21421,7 @@ address,function,file,kind,target
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Mission_00467e50::next
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Mission_00467e50::state
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Mission_00467e50::target
+0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,OrderTableEntry::name
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Rect::bottom
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Rect::right
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Unit::buildLeft
@@ -29021,11 +29021,11 @@ address,function,file,kind,target
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,deref_read,*int
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_escape,Game::players
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_maybe_written,Game::pos_2caa
-0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,Elem_0043c390::flags
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,Game::hoverUnitId
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,Game::localPlayer
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,Game::units
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,MissionType::index
+0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,OrderTableEntry::flags
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,OrderType::index
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,OrderTypeEntry::flags_a
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,Player::unitsBegin
@@ -44464,9 +44464,6 @@ address,function,file,kind,target
 ,Elem_0040cc40::operator<,src/ai/player_ai.h,function,
 ,Elem_00432be0::~Elem_00432be0,src/map/los_tables.cpp,call,StringRef::ReleaseRef
 ,Elem_00432be0::~Elem_00432be0,src/map/los_tables.cpp,function,
-,Elem_0043c390::operator!=,src/orders/order_type_entry.h,function,
-,Elem_0043c390::operator<,src/orders/order_type_entry.h,function,
-,Elem_0043c390::operator==,src/orders/order_type_entry.h,function,
 ,Elem_00487af0,src/units/unit_save.cpp,function,
 ,EmitTdfFieldDestructor,src/util/tdf.cpp,call,TdfField::~TdfField
 ,EmitTdfFieldDestructor,src/util/tdf.cpp,function,
@@ -48349,6 +48346,9 @@ address,function,file,kind,target
 ,OrderPosYUnset,src/harness/harness.cpp,call,strcmp
 ,OrderPosYUnset,src/harness/harness.cpp,function,
 ,OrderPosYUnset,src/harness/harness.cpp,global_read,kinds@OrderPosYUnset
+,OrderTableEntry::operator!=,src/orders/order_type_entry.h,function,
+,OrderTableEntry::operator<,src/orders/order_type_entry.h,function,
+,OrderTableEntry::operator==,src/orders/order_type_entry.h,function,
 ,OrderTakesNoTarget,src/harness/harness.cpp,function,
 ,OrderTarget,src/orders/vtol_orders.cpp,call,operator Unit *
 ,OrderTarget,src/orders/vtol_orders.cpp,field_read,Order::target
@@ -51564,7 +51564,7 @@ address,function,file,kind,target
 ,_Sort_0_0043bc90,src/orders/order_list.cpp,call,InsertShiftOrderTypes
 ,_Sort_0_0043bc90,src/orders/order_list.cpp,call,SortOrderTypes
 ,_Sort_0_0043bc90,src/orders/order_list.cpp,call,_Insertion_sort_0043bc90
-,_Sort_0_0043bc90,src/orders/order_list.cpp,deref_read,*Elem_0043c390
+,_Sort_0_0043bc90,src/orders/order_list.cpp,deref_read,*OrderTableEntry
 ,_Sort_0_0043bc90,src/orders/order_list.cpp,function,
 ,_Sort_0_0043bc90,src/orders/order_list.cpp,global_read,_SORT_MAX
 ,clear_screen,src/graphics/surface.cpp,call,memset

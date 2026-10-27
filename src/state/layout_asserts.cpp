@@ -69,8 +69,11 @@
 #include "../ingame/snapshot_0046a860.h"
 #include "../ingame/sub_004679a0_a.h"
 #include "../ingame/sub_004679a0_b.h"
+#include "../map/cell.h"
 #include "../map/eye.h"
+#include "../map/feature.h"
 #include "../map/feature_anim_pool.h"
+#include "../map/feature_spot.h"
 #include "../map/grid.h"
 #include "../map/grid2.h"
 #include "../map/los_tables.h"
@@ -175,6 +178,18 @@ static_assert(sizeof(Callback) == 4, "");
 static_assert(sizeof(CameraFlags) == 2, "");
 static_assert(offsetof(CameraFlags, raw) == 0, "");
 static_assert(offsetof(CameraFlags, lo) == 0, "");
+static_assert(sizeof(Cell) == 13, "");
+static_assert(offsetof(Cell, unit) == 0, "");
+static_assert(offsetof(Cell, unit2) == 2, "");
+static_assert(offsetof(Cell, height) == 4, "");
+static_assert(offsetof(Cell, high) == 5, "");
+static_assert(offsetof(Cell, low) == 6, "");
+static_assert(offsetof(Cell, metal) == 7, "");
+static_assert(offsetof(Cell, feature) == 8, "");
+static_assert(offsetof(Cell, spot) == 10, "");
+static_assert(offsetof(Cell, offsetY) == 10, "");
+static_assert(offsetof(Cell, offsetX) == 11, "");
+static_assert(offsetof(Cell, flags) == 12, "");
 static_assert(sizeof(Channel) == 164, "");
 static_assert(offsetof(Channel, state) == 0, "");
 static_assert(offsetof(Channel, pc) == 4, "");
@@ -327,6 +342,50 @@ static_assert(offsetof(Eye, screenPos) == 32, "");
 static_assert(sizeof(F14373) == 4, "");
 static_assert(offsetof(F14373, bits) == 0, "");
 static_assert(offsetof(F14373, all) == 0, "");
+static_assert(sizeof(Feature) == 256, "");
+static_assert(offsetof(Feature, name) == 0, "");
+static_assert(offsetof(Feature, description) == 128, "");
+static_assert(offsetof(Feature, footprint) == 148, "");
+static_assert(offsetof(Feature, footprintX) == 148, "");
+static_assert(offsetof(Feature, footprintZ) == 150, "");
+static_assert(offsetof(Feature, object) == 152, "");
+static_assert(offsetof(Feature, filename) == 152, "");
+static_assert(offsetof(Feature, anims) == 168, "");
+static_assert(offsetof(Feature, animTable) == 172, "");
+static_assert(offsetof(Feature, seq) == 172, "");
+static_assert(offsetof(Feature, shadowTable) == 176, "");
+static_assert(offsetof(Feature, seqshad) == 176, "");
+static_assert(offsetof(Feature, seqburn) == 180, "");
+static_assert(offsetof(Feature, seqburnshad) == 184, "");
+static_assert(offsetof(Feature, seqdie) == 188, "");
+static_assert(offsetof(Feature, seqdieshad) == 192, "");
+static_assert(offsetof(Feature, seqreclamate) == 196, "");
+static_assert(offsetof(Feature, seqreclamateshad) == 200, "");
+static_assert(offsetof(Feature, burn) == 180, "");
+static_assert(offsetof(Feature, death) == 188, "");
+static_assert(offsetof(Feature, anim0) == 180, "");
+static_assert(offsetof(Feature, field_b8) == 184, "");
+static_assert(offsetof(Feature, anim1) == 188, "");
+static_assert(offsetof(Feature, field_c0) == 192, "");
+static_assert(offsetof(Feature, anim2) == 196, "");
+static_assert(offsetof(Feature, field_c8) == 200, "");
+static_assert(offsetof(Feature, anim) == 204, "");
+static_assert(offsetof(Feature, shadowAnim) == 216, "");
+static_assert(offsetof(Feature, burnweapon) == 228, "");
+static_assert(offsetof(Feature, burnTime) == 232, "");
+static_assert(offsetof(Feature, damage) == 234, "");
+static_assert(offsetof(Feature, energy) == 236, "");
+static_assert(offsetof(Feature, metal) == 240, "");
+static_assert(offsetof(Feature, dead) == 244, "");
+static_assert(offsetof(Feature, burnt) == 246, "");
+static_assert(offsetof(Feature, reclamate) == 248, "");
+static_assert(offsetof(Feature, height) == 250, "");
+static_assert(offsetof(Feature, spreadChance) == 251, "");
+static_assert(offsetof(Feature, seedChance) == 252, "");
+static_assert(offsetof(Feature, seedSpread) == 253, "");
+static_assert(offsetof(Feature, flags16) == 254, "");
+static_assert(offsetof(Feature, flags) == 254, "");
+static_assert(offsetof(Feature, flagsHigh) == 255, "");
 static_assert(sizeof(FeatureAnimPool) == 120, "");
 static_assert(offsetof(FeatureAnimPool, unknown_0) == 0, "");
 static_assert(offsetof(FeatureAnimPool, anim) == 16, "");
@@ -338,6 +397,17 @@ static_assert(offsetof(FeatureAnimPool, unknown_24) == 36, "");
 static_assert(offsetof(FeatureAnimPool, nameCount) == 88, "");
 static_assert(offsetof(FeatureAnimPool, unknown_5c) == 92, "");
 static_assert(offsetof(FeatureAnimPool, names) == 116, "");
+static_assert(sizeof(FeatureSpot) == 48, "");
+static_assert(offsetof(FeatureSpot, next) == 0, "");
+static_assert(offsetof(FeatureSpot, prev) == 2, "");
+static_assert(offsetof(FeatureSpot, anim) == 4, "");
+static_assert(offsetof(FeatureSpot, shadow) == 16, "");
+static_assert(offsetof(FeatureSpot, state) == 4, "");
+static_assert(offsetof(FeatureSpot, pos) == 8, "");
+static_assert(offsetof(FeatureSpot, vel) == 20, "");
+static_assert(offsetof(FeatureSpot, rot) == 32, "");
+static_assert(offsetof(FeatureSpot, unknown_26) == 38, "");
+static_assert(offsetof(FeatureSpot, spotFlags) == 47, "");
 static_assert(sizeof(FeatureUnit_00421f20) == 280, "");
 static_assert(offsetof(FeatureUnit_00421f20, unknown_0) == 0, "");
 static_assert(offsetof(FeatureUnit_00421f20, def) == 146, "");

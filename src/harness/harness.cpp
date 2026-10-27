@@ -95,6 +95,7 @@ static char s_loadName[64];
 static int s_loadLine = 0;
 static char s_decidedKey[32];
 static int s_decidedLine = 0;
+static int s_loadAhead = 0;
 static const char s_savePath[] = "savegame\\harness.sav";
 using OptionsTable = Table_0047ae60;
 static const char s_optionsPath[] = "savegame\\harness.opt";
@@ -546,6 +547,8 @@ static void ReadKey(int lineNo, const char* key, char* value)
         strcpy(s_decidedKey, key);
         s_decidedLine = lineNo;
     }
+    if (s_loadAhead && KeyIsDecidedByLoad(key))
+        return;
     if (strcmp(key, "game_seed") == 0)
         s_gameSeed = ParseNumber(lineNo, key, value);
     else if (strcmp(key, "crt_seed") == 0)
@@ -730,6 +733,20 @@ static void CheckScenario()
     }
 }
 
+static int FileHasLoadLine(FILE* f)
+{
+    char line[512];
+    int found = 0;
+    while (!found && fgets(line, sizeof line, f) != NULL) {
+        const char* key = line;
+        while (*key == ' ' || *key == '\t')
+            key++;
+        found = strncmp(key, "load", 4) == 0 && (key[4] == ' ' || key[4] == '\t' || key[4] == '\r' || key[4] == '\n' || key[4] == '\0');
+    }
+    rewind(f);
+    return found;
+}
+
 static void ReadScenario(const char* path)
 {
     char line[512];
@@ -740,6 +757,7 @@ static void ReadScenario(const char* path)
         sprintf(msg, "testmode: cannot read scenario file %s\n", path);
         Fail(msg);
     }
+    s_loadAhead = FileHasLoadLine(f);
     int lineNo = 0;
     while (fgets(line, sizeof line, f) != NULL) {
         lineNo++;

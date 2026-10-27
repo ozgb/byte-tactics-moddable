@@ -737,7 +737,9 @@ static int FileHasLoadLine(FILE* f)
 {
     char line[512];
     int found = 0;
-    while (!found && fgets(line, sizeof line, f) != NULL) {
+    if (f == nullptr)
+        return found;
+    while (!found && fgets(line, sizeof line, f) != nullptr) {
         const char* key = line;
         while (*key == ' ' || *key == '\t')
             key++;

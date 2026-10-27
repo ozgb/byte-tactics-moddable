@@ -505,7 +505,6 @@ void __stdcall SetBrightness(float value);
 #include "../game/game_state.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 void __stdcall SetGadgetStatus(Menu_0045b800* menu, int index, short value);
-void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 
 

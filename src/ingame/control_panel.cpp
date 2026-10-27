@@ -107,12 +107,11 @@ Display_0041ce90* GetDisplay();
 void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mask);
 #include "../game/console_commands.h"
 
-void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 void __stdcall IssueOrCancelOrder(MissionType kind, int remove, Unit* owner,
                             int id, Vec3* pos, int typeId, int amount);
 int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, Player* player);
 #include "../graphics/movies.h"
-int __stdcall GetFootprintHeight(UnitDef* unit, Point16 cell);
+#include "../map/terrain.h"
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 #include "../orders/order_list.h"
 int __stdcall FindGadgetIndexBySubstring(int value, char* name);

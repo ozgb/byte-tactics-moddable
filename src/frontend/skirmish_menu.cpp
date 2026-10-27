@@ -793,7 +793,6 @@ struct ClickFrame {
 };
 #pragma pack(pop)
 
-void __stdcall GetGadgetName(Gadget* entries, char* text, int id);
 #include "../game/cd_check.h"
 #include "endgame.h"
 #include "../game/settings.h"

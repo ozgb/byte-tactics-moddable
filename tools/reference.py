@@ -220,7 +220,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         try:
             extra: dict = {}
             if load_from is not None:
-                extra["put"] = {path: load_from / Path(path).name for path in tracediff.SAVE_FILES}
+                extra["put"] = tracediff.save_put(load_from, scenario.stem, load_from.name)
             if save_to is not None:
                 extra["collect"] = tracediff.SAVE_FILES
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, scan_every if scans is not None else 0, **extra)
@@ -233,10 +233,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     kept = None
     try:
         if save_to is not None:
-            save_to.mkdir(parents=True, exist_ok=True)
-            for path in tracediff.SAVE_FILES:
-                if (run / path).is_file():
-                    shutil.copyfile(run / path, save_to / Path(path).name)
+            tracediff.copy_save(run, save_to)
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
         for key in ("game_seed", "crt_seed", "view_seed"):
             if key not in header:
@@ -304,9 +301,10 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
             return f"{name}: load {saver}: {saver} is not among the scenarios played"
         if saver in errors:
             return f"{name}: load {saver}: {saver} failed to run"
-        for path in tracediff.SAVE_FILES:
-            if not (saves / saver / Path(path).name).is_file():
-                return f"{name}: load {saver}: {saver} wrote no {path}"
+        try:
+            tracediff.save_put(saves / saver, name, saver)
+        except tracediff.Error as e:
+            return str(e)
         return None
 
     def one(name: str) -> None:

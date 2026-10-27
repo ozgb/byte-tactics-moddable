@@ -418,7 +418,7 @@ none
 
 Issue #17. 95 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 84.7% of functions (61 of 72), 82.2% of lines, 71.8% of branches; 11 live functions no scenario enters, and 24 more are dead (data/coverage.csv).
+Coverage: 84.7% of functions (61 of 72), 82.2% of lines, 71.8% of branches; 11 live functions no scenario enters, and 22 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (11 of 72 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437); 61 are entered, 84.7%), by reason:
 
@@ -644,7 +644,7 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 86.7% | 3 | 10 |
 | **weapons** | 75 of 89 | 84.3% | 84.6% | 70.2% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 61 of 72 | 84.7% | 82.2% | 71.8% | 11 | 24 |
+| **los_radar** | 61 of 72 | 84.7% | 82.2% | 71.8% | 11 | 22 |
 | **orders** | 306 of 369 | 82.9% | 79.3% | 61.5% | 63 | 26 |
 | **units** | 129 of 164 | 78.7% | 83.5% | 70.3% | 35 | 33 |
 | **players** | 71 of 143 | 49.7% | 49.6% | 40.4% | 72 | 11 |
@@ -653,7 +653,7 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 | game | 83 of 183 | 45.4% | 45.4% | 28.0% | 100 | 25 |
 | network | 44 of 297 | 14.8% | 9.1% | 3.4% | 253 | 70 |
 | platform | 317 of 641 | 49.5% | 34.7% | 22.6% | 324 | 80 |
-| presentation | 464 of 1124 | 41.3% | 31.2% | 22.0% | 660 | 300 |
+| presentation | 464 of 1124 | 41.3% | 31.2% | 21.9% | 660 | 300 |
 | seams | 91 of 103 | 88.3% | 94.4% | - | 12 | 0 |
 | state | 294 of 352 | 83.5% | 79.9% | 50.3% | 58 | 21 |
 

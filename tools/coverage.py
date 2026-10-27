@@ -44,6 +44,16 @@ the counter of a function inlined into a kept function is there, though the func
 counter of a function in a section nothing reaches is not. A function that is neither entered nor live is
 dead. Of the copies of a source function, it is dead when all are.
 
+Saturated counts. A branch side whose count is 2^62 or more is not covered: clang's profile counters are
+not atomic, so two threads can lose an update, and llvm-cov then reports the other side as a count that
+underflowed to 2^63-1.
+
+Unstable functions. A row with `functions` and `dead` 0 and a reason starting `unstable:` marks a live function whose
+lines or branches depend on timing (a sampler on GetTicks, a wait on a lock another thread holds). The function
+is counted as before, but its lines and branches are left out of its subsystem's totals and covered counts. The rows are written by hand, and
+`--write` keeps them. `--write` and `--check` fail when a marked (subsystem, function, file, decorated) row
+matches no live function of the export.
+
 data/coverage.csv: columns subsystem, function, file, functions, functions_entered, lines, lines_hit,
 branches, branches_covered, decorated, dead, reason. One totals row per subsystem (function `*`, file and decorated
 empty, dead the number of dead functions, every other count over live functions only), one row per live
@@ -90,6 +100,8 @@ SORTED = ("files", "game", "network")
 METRICS = (("functions", "functions", "functions_entered"), ("lines", "lines", "lines_hit"),
            ("branches", "branches", "branches_covered"))
 CODE_REGION = 0
+UNSTABLE = "unstable:"
+SATURATED = 1 << 62
 REGION_FILE_ID = 5
 REGION_KIND = 7
 BRANCH_FILE_ID = 6
@@ -130,6 +142,7 @@ class Totals:
     branches: int = 0
     branches_covered: int = 0
     dead: int = 0
+    unstable: list[tuple[str, str, str]] = field(default_factory=list)
     never_entered: list[tuple[str, str, str]] = field(default_factory=list)
     dead_functions: list[tuple[str, str, str]] = field(default_factory=list)
     reasons: dict[tuple[str, str, str], str] = field(default_factory=dict)
@@ -220,7 +233,7 @@ def parse_function(entry: dict) -> Copy | None:
     if rel is None:
         return None
     primary = {i for i, n in enumerate(names) if n == names[0]}
-    sides = {tuple(b[:4]): (b[4] > 0, b[5] > 0) for b in entry.get("branches", []) if b[BRANCH_FILE_ID] in primary}
+    sides = {tuple(b[:4]): (0 < b[4] < SATURATED, 0 < b[5] < SATURATED) for b in entry.get("branches", []) if b[BRANCH_FILE_ID] in primary}
     return Copy(decorated_name(entry["name"]), plain_name(entry["name"]), rel, entry.get("count", 0) > 0,
                 region_lines(entry.get("regions", []), primary), sides, counter_name(entry["name"]))
 
@@ -267,8 +280,9 @@ def subsystem_of(fn: Function, by_key: dict[tuple[str, str], str], by_name: dict
 
 
 def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[str, set[str]],
-              live: set[str] | None = None) -> tuple[dict[str, Totals], int, int]:
-    """(subsystem -> Totals, entries excluded, functions unassigned) of an llvm-cov export, counting each (file, decorated name) once. Dead functions (see merge_copies) are listed and counted apart, and left out of the sums."""
+              live: set[str] | None = None,
+              unstable: dict[tuple[str, str, str, str], str] | None = None) -> tuple[dict[str, Totals], int, int]:
+    """(subsystem -> Totals, entries excluded, functions unassigned) of an llvm-cov export, counting each (file, decorated name) once. Dead functions (see merge_copies) are listed and counted apart, and left out of the sums. A function named by an unstable key (subsystem, function, file, decorated) counts as before but with no lines or branches, and is listed in its subsystem's unstable and reasons."""
     groups: dict[tuple[str, str], list[Copy]] = {}
     missed: dict[str, list[tuple[str, str, str]]] = {}
     dead: dict[str, list[tuple[str, str, str]]] = {}
@@ -290,6 +304,11 @@ def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[st
             t.dead += 1
             dead.setdefault(subsystem, []).append((fn.name, fn.file, decorated))
             continue
+        key = (subsystem, fn.name, fn.file, path_free(decorated))
+        if unstable and key in unstable:
+            fn.lines = fn.lines_hit = fn.branches = fn.branches_covered = 0
+            t.unstable.append(key[1:])
+            t.reasons[key[1:]] = unstable[key]
         t.add(fn)
         if not fn.entered:
             missed.setdefault(subsystem, []).append((fn.name, fn.file, decorated))
@@ -297,6 +316,8 @@ def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[st
         totals[subsystem].never_entered = sorted(rows)
     for subsystem, rows in dead.items():
         totals[subsystem].dead_functions = sorted(rows)
+    for t in totals.values():
+        t.unstable.sort()
     return totals, excluded, unassigned
 
 
@@ -316,6 +337,8 @@ def csv_rows(totals: dict[str, Totals]) -> list[list[str]]:
         rows += [[subsystem, name, file, 1, 0, 0, 0, 0, 0, path_free(decorated), 0, t.reasons.get((name, file, decorated), "")]
                  for name, file, decorated in t.never_entered]
         rows += [[subsystem, name, file, 0, 0, 0, 0, 0, 0, path_free(decorated), 1, ""] for name, file, decorated in t.dead_functions]
+        rows += [[subsystem, name, file, 0, 0, 0, 0, 0, 0, decorated, 0, t.reasons.get((name, file, decorated), UNSTABLE)]
+                 for name, file, decorated in t.unstable]
         rows[first:] = sorted(rows[first:], key=lambda r: (r[1] != "*", r[1], r[2], r[9]))
     return [[str(c) for c in r] for r in rows]
 
@@ -342,12 +365,30 @@ def read_csv(path: Path) -> dict[str, Totals]:
                 t.dead = int(row.get("dead") or 0)
             elif int(row.get("dead") or 0):
                 t.dead_functions.append((row["function"], row["file"], row["decorated"]))
+            elif row.get("reason", "").startswith(UNSTABLE) and not int(row["functions"]):
+                key = (row["function"], row["file"], row["decorated"])
+                t.unstable.append(key)
+                t.reasons[key] = row["reason"]
             else:
                 key = (row["function"], row["file"], row["decorated"])
                 t.never_entered.append(key)
                 if row.get("reason"):
                     t.reasons[key] = row["reason"]
     return totals
+
+
+def unstable_keys(totals: dict[str, Totals]) -> dict[tuple[str, str, str, str], str]:
+    """(subsystem, function, file, decorated) -> reason of the unstable rows that read_csv found."""
+    return {(subsystem, *key): t.reasons[key] for subsystem, t in totals.items() for key in t.unstable}
+
+
+def unmatched_unstable(want: dict[tuple[str, str, str, str], str], got: dict[str, Totals]) -> str:
+    """The failure text listing the unstable rows that no function of the export matched, or an empty string."""
+    missing = sorted(k for k in want if k[1:] not in got.get(k[0], Totals()).unstable)
+    if not missing:
+        return ""
+    return ("coverage: %d unstable rows of data/coverage.csv match no live function:\n" % len(missing)
+            + "\n".join(f"{s} {name} ({file}) {decorated}" for s, name, file, decorated in missing))
 
 
 def carry_reasons(totals: dict[str, Totals], old: dict[str, Totals]) -> None:
@@ -495,8 +536,12 @@ def main() -> None:
                                            args.scenario)
     print(f"profile: {profdata}")
     by_key, by_name = read_subsystems()
+    old = read_csv(OUT) if OUT.is_file() else {}
+    marked = unstable_keys(old)
     totals, excluded, unassigned = summarize(export(args.exe, profdata), by_key, by_name,
-                                           read_live_counters(live_path))
+                                           read_live_counters(live_path), marked)
+    if (args.write or args.check) and unmatched_unstable(marked, totals):
+        sys.exit(unmatched_unstable(marked, totals))
     print(table(totals))
     if args.write and not totals:
         sys.exit("coverage: no game function in the export; not writing an empty baseline")
@@ -504,13 +549,12 @@ def main() -> None:
     print(f"unassigned: {unassigned} functions")
     if args.write:
         if OUT.is_file():
-            carry_reasons(totals, read_csv(OUT))
+            carry_reasons(totals, old)
         write_csv(totals, OUT)
         print(f"wrote {OUT.relative_to(ROOT)}")
         if unreasoned(totals):
             sys.exit(unreasoned(totals))
     if args.check:
-        old = read_csv(OUT)
         carry_reasons(totals, old)
         falls, notes = compare(old, totals)
         for note in notes:

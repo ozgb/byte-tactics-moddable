@@ -249,6 +249,26 @@ struct ScriptedSpawn {
 static ScriptedSpawn s_spawns[MAX_ORDERS];
 static int s_spawnCount = 0;
 
+enum { CONSOLE_TEXT = 0x4f };
+
+struct ScriptedConsole {
+    int lineNo;
+    unsigned tick;
+    char text[CONSOLE_TEXT + 1];
+    char word[40];
+};
+
+static ScriptedConsole s_consoles[MAX_ORDERS];
+static int s_consoleCount = 0;
+
+static const char* const s_consoleAllowed[] = {
+    "give", "nometal", "noenergy", "shareenergy", "sharemetal", "shareall", "setsharemetal", "setshareenergy",
+    "meteor", "burnall", "burnone", "feature", "kill", "reload", "reloadaiprofiles", "los", "lostype", "radar",
+    "mapping", "nowisee", "ai", "atm", "assign", "control", "doubleshot", "halfshot", "drop", "edge", "ilose",
+    "iwin", "move", "search", "sealevel", "selectable", "shootall", "treedeath", "view", "assert", "dprint",
+    "mem", "zbuffer", "now"
+};
+
 static char* NextToken(char** cursor)
 {
     char* s = *cursor;
@@ -424,6 +444,56 @@ static void ReadSpawn(int lineNo, char* value)
     sp->z = ParseCoordinate(lineNo, zText);
 }
 
+static void ReadConsole(int lineNo, char* value)
+{
+    char* cursor = value;
+    char* tickText = NextToken(&cursor);
+    while (*cursor == ' ' || *cursor == '\t')
+        cursor++;
+    if (*cursor != '+')
+        FailLine(lineNo, "needs <tick> +<command>", "console", "");
+    if (s_consoleCount >= MAX_ORDERS)
+        FailLine(lineNo, "is past the limit of 256 console lines", "console", "");
+    if (strlen(cursor) > CONSOLE_TEXT)
+        FailLine(lineNo, "is longer than 79 characters", "console", "");
+    ScriptedConsole* c = &s_consoles[s_consoleCount++];
+    memset(c, 0, sizeof *c);
+    c->lineNo = lineNo;
+    c->tick = ParseNumber(lineNo, "console", tickText);
+    if (c->tick == 0)
+        FailLine(lineNo, "needs a tick of at least 1", "console", "");
+    strcpy(c->text, cursor + 1);
+    const char* word = c->text;
+    while (*word == ' ' || *word == '\t')
+        word++;
+    int length = 0;
+    while (word[length] != '\0' && word[length] != ' ' && word[length] != '\t')
+        length++;
+    if (length == 0)
+        FailLine(lineNo, "needs a command after the +", "console", "");
+    if (length >= (int)sizeof c->word)
+        FailLine(lineNo, "has a command word that is too long", "console", "");
+    memcpy(c->word, word, length);
+    c->word[length] = '\0';
+}
+
+static int ConsoleWordAllowed(const char* word)
+{
+    for (unsigned i = 0; i < sizeof s_consoleAllowed / sizeof s_consoleAllowed[0]; i++) {
+        if (_stricmp(word, s_consoleAllowed[i]) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+static void CheckConsoles()
+{
+    for (int i = 0; i < s_consoleCount; i++) {
+        if (s_consoles[i].tick > s_ticks)
+            FailLine(s_consoles[i].lineNo, "has a tick after the last tick", "console", "");
+    }
+}
+
 static void CheckSpawns()
 {
     for (int i = 0; i < s_spawnCount; i++) {
@@ -462,7 +532,7 @@ static void CheckOrders()
 static int KeyIsDecidedByLoad(const char* key)
 {
     static const char* const keys[] = { "game_type", "campaign", "map", "difficulty", "commander_death", "mapping",
-        "line_of_sight", "los_type", "start_positions", "local_player", "spawn", "order", "save" };
+        "line_of_sight", "los_type", "start_positions", "local_player", "spawn", "order", "console", "save" };
     for (unsigned i = 0; i < sizeof keys / sizeof keys[0]; i++) {
         if (strcmp(key, keys[i]) == 0)
             return 1;
@@ -584,6 +654,8 @@ static void ReadKey(int lineNo, const char* key, char* value)
         ReadOrder(lineNo, value);
     else if (strcmp(key, "spawn") == 0)
         ReadSpawn(lineNo, value);
+    else if (strcmp(key, "console") == 0)
+        ReadConsole(lineNo, value);
     else if (strncmp(key, "player", 6) == 0 && isdigit((unsigned char)key[6]) && key[7] == '.')
         ReadPlayerKey(lineNo, key, value);
     else
@@ -647,6 +719,7 @@ static void CheckScenario()
     CheckGameType();
     CheckOrders();
     CheckSpawns();
+    CheckConsoles();
     if (s_saveLine != 0 && s_saveTick > s_ticks)
         FailLine(s_saveLine, "has a tick after the last tick", "save", "");
     if (s_localPlayer >= 0 && !s_players[s_localPlayer].named) {
@@ -3231,6 +3304,44 @@ static void IssueScriptedSpawn(const ScriptedSpawn* sp)
     g_seams.units->CreateUnit((unsigned char)sp->slot, (unsigned short)defIndex, pos, 1, 1, 0);
 }
 
+void __stdcall ExecuteCommandLine(char* commandLine, int mask);
+
+static int ConsoleWordIsUnitType(const char* word)
+{
+    unsigned char* defs = (unsigned char*)GameRef(GAME_DEFS);
+    unsigned count = GameU32(GAME_DEF_COUNT);
+    for (unsigned i = 1; i < count; i++) {
+        if (_stricmp((const char*)defs + i * UNITDEF_STRIDE + UNITDEF_NAME, word) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+static void RunScriptedConsole(const ScriptedConsole* c)
+{
+    if (!ConsoleWordAllowed(c->word) && !ConsoleWordIsUnitType(c->word)) {
+        char detail[100];
+        sprintf(detail, ", \"%.40s\" is not an allowed command or a unit type", c->word);
+        FailLine(c->lineNo, "names a command that is not allowed", "console", detail);
+    }
+    char text[CONSOLE_TEXT + 1];
+    strcpy(text, c->text);
+    int mask = 1;
+    if (mask & (unsigned char)(g_game->uiOptionFlags >> 1))
+        mask = 7;
+    if (g_nonCampaignGame)
+        mask |= 2;
+    {
+        int cursor[3];
+        WorldPosition(640, 260, cursor);
+        memcpy(GameAt(0x2caa), cursor, sizeof cursor);
+        *(short*)GameAt(0x2c8e) = (short)(cursor[0] >> 20);
+        *(short*)GameAt(0x2c90) = (short)(cursor[2] >> 20);
+        *(unsigned short*)GameAt(0x2cbc) = (unsigned short)g_seams.features->GetCellFeature(g_seams.los_radar->GetMapCell(*(short*)GameAt(0x2c8e), *(short*)GameAt(0x2c90)));
+    }
+    ExecuteCommandLine(text, mask);
+}
+
 #include "../units/units.h"
 
 static void ReachQuirkGuard()
@@ -3311,6 +3422,10 @@ void HarnessBeforeStep()
     for (int i = 0; i < s_orderCount; i++) {
         if (s_orders[i].tick == tick)
             IssueScriptedOrder(&s_orders[i]);
+    }
+    for (int i = 0; i < s_consoleCount; i++) {
+        if (s_consoles[i].tick == tick)
+            RunScriptedConsole(&s_consoles[i]);
     }
 }
 

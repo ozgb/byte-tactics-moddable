@@ -43821,6 +43821,13 @@ address,function,file,kind,target
 ,Charge,src/game/main_loop.cpp,field_write,FrameTimers::last
 ,Charge,src/game/main_loop.cpp,function,
 ,Charge,src/game/main_loop.cpp,global_read,g_game
+,CheckConsoles,src/harness/harness.cpp,call,FailLine
+,CheckConsoles,src/harness/harness.cpp,field_read,ScriptedConsole::lineNo
+,CheckConsoles,src/harness/harness.cpp,field_read,ScriptedConsole::tick
+,CheckConsoles,src/harness/harness.cpp,function,
+,CheckConsoles,src/harness/harness.cpp,global_read,s_consoleCount@src/harness/harness.cpp
+,CheckConsoles,src/harness/harness.cpp,global_read,s_consoles@src/harness/harness.cpp
+,CheckConsoles,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,CheckGameType,src/harness/harness.cpp,call,Fail
 ,CheckGameType,src/harness/harness.cpp,call,FailLine
 ,CheckGameType,src/harness/harness.cpp,call,RejectUnderMission
@@ -43863,6 +43870,7 @@ address,function,file,kind,target
 ,CheckOrders,src/harness/harness.cpp,global_read,s_orderCount@src/harness/harness.cpp
 ,CheckOrders,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
 ,CheckOrders,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
+,CheckScenario,src/harness/harness.cpp,call,CheckConsoles
 ,CheckScenario,src/harness/harness.cpp,call,CheckGameType
 ,CheckScenario,src/harness/harness.cpp,call,CheckLoadScenario
 ,CheckScenario,src/harness/harness.cpp,call,CheckOrders
@@ -44069,6 +44077,13 @@ address,function,file,kind,target
 ,ComputeMapChecksumNative,src/seams/native.cpp,function,
 ,ConditionClassOf,src/harness/harness.cpp,call,HarnessConditionClass
 ,ConditionClassOf,src/harness/harness.cpp,function,
+,ConsoleWordAllowed,src/harness/harness.cpp,call,_stricmp
+,ConsoleWordAllowed,src/harness/harness.cpp,function,
+,ConsoleWordAllowed,src/harness/harness.cpp,global_read,s_consoleAllowed@src/harness/harness.cpp
+,ConsoleWordIsUnitType,src/harness/harness.cpp,call,GameRef
+,ConsoleWordIsUnitType,src/harness/harness.cpp,call,GameU32
+,ConsoleWordIsUnitType,src/harness/harness.cpp,call,_stricmp
+,ConsoleWordIsUnitType,src/harness/harness.cpp,function,
 ,ConstIter_004dbd00::ConstIter_004dbd00,src/debug/debug_lib.cpp,function,
 ,Contains,src/ai/ai_player.cpp,deref_read,*unsigned int
 ,Contains,src/ai/ai_player.cpp,function,
@@ -45852,7 +45867,9 @@ address,function,file,kind,target
 ,HarnessBeforeStep,src/harness/harness.cpp,call,QuirksFlipFirstSim
 ,HarnessBeforeStep,src/harness/harness.cpp,call,QuirksHash
 ,HarnessBeforeStep,src/harness/harness.cpp,call,ReachQuirkGuard
+,HarnessBeforeStep,src/harness/harness.cpp,call,RunScriptedConsole
 ,HarnessBeforeStep,src/harness/harness.cpp,call,sprintf
+,HarnessBeforeStep,src/harness/harness.cpp,field_read,ScriptedConsole::tick
 ,HarnessBeforeStep,src/harness/harness.cpp,field_read,ScriptedOrder::tick
 ,HarnessBeforeStep,src/harness/harness.cpp,field_read,ScriptedSpawn::tick
 ,HarnessBeforeStep,src/harness/harness.cpp,field_write,Player::progress
@@ -45860,6 +45877,8 @@ address,function,file,kind,target
 ,HarnessBeforeStep,src/harness/harness.cpp,global_maybe_written,g_quirks
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,g_game
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,g_quirks
+,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_consoleCount@src/harness/harness.cpp
+,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_consoles@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_gameType@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_orderCount@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_orders@src/harness/harness.cpp
@@ -49037,12 +49056,32 @@ address,function,file,kind,target
 ,ReachQuirkGuard,src/harness/harness.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
 ,ReachQuirkGuard,src/harness/harness.cpp,indirect_call,indirect via void (*)(void *) __attribute__((thiscall)) [onTimer]
 ,ReachQuirkGuard,src/harness/harness.cpp,indirect_call,"indirect via void (*)(void *, int, int) __attribute__((thiscall)) [setUnitValue]"
+,ReadConsole,src/harness/harness.cpp,call,FailLine
+,ReadConsole,src/harness/harness.cpp,call,NextToken
+,ReadConsole,src/harness/harness.cpp,call,ParseNumber
+,ReadConsole,src/harness/harness.cpp,call,memcpy
+,ReadConsole,src/harness/harness.cpp,call,memset
+,ReadConsole,src/harness/harness.cpp,call,strcpy
+,ReadConsole,src/harness/harness.cpp,call,strlen
+,ReadConsole,src/harness/harness.cpp,deref_read,*char
+,ReadConsole,src/harness/harness.cpp,field_escape,ScriptedConsole::text
+,ReadConsole,src/harness/harness.cpp,field_escape,ScriptedConsole::word
+,ReadConsole,src/harness/harness.cpp,field_maybe_written,ScriptedConsole::text
+,ReadConsole,src/harness/harness.cpp,field_read,ScriptedConsole::tick
+,ReadConsole,src/harness/harness.cpp,field_write,ScriptedConsole::lineNo
+,ReadConsole,src/harness/harness.cpp,field_write,ScriptedConsole::tick
+,ReadConsole,src/harness/harness.cpp,field_write,ScriptedConsole::word
+,ReadConsole,src/harness/harness.cpp,function,
+,ReadConsole,src/harness/harness.cpp,global_escape,s_consoles@src/harness/harness.cpp
+,ReadConsole,src/harness/harness.cpp,global_read,s_consoleCount@src/harness/harness.cpp
+,ReadConsole,src/harness/harness.cpp,global_write,s_consoleCount@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,call,FailLine
 ,ReadKey,src/harness/harness.cpp,call,KeyIsDecidedByLoad
 ,ReadKey,src/harness/harness.cpp,call,ParseNumber
 ,ReadKey,src/harness/harness.cpp,call,ParseRange
 ,ReadKey,src/harness/harness.cpp,call,QuirksNormalise
 ,ReadKey,src/harness/harness.cpp,call,QuirksParse
+,ReadKey,src/harness/harness.cpp,call,ReadConsole
 ,ReadKey,src/harness/harness.cpp,call,ReadOrder
 ,ReadKey,src/harness/harness.cpp,call,ReadPlayerKey
 ,ReadKey,src/harness/harness.cpp,call,ReadSpawn
@@ -49476,6 +49515,32 @@ address,function,file,kind,target
 ,Rows,src/util/tdf.cpp,deref_read,*std::vector<TdfField>
 ,Rows,src/util/tdf.cpp,field_escape,TdfEntries::v
 ,Rows,src/util/tdf.cpp,function,
+,RunScriptedConsole,src/harness/harness.cpp,call,ConsoleWordAllowed
+,RunScriptedConsole,src/harness/harness.cpp,call,ConsoleWordIsUnitType
+,RunScriptedConsole,src/harness/harness.cpp,call,ExecuteCommandLine
+,RunScriptedConsole,src/harness/harness.cpp,call,FailLine
+,RunScriptedConsole,src/harness/harness.cpp,call,GameAt
+,RunScriptedConsole,src/harness/harness.cpp,call,WorldPosition
+,RunScriptedConsole,src/harness/harness.cpp,call,memcpy
+,RunScriptedConsole,src/harness/harness.cpp,call,sprintf
+,RunScriptedConsole,src/harness/harness.cpp,call,strcpy
+,RunScriptedConsole,src/harness/harness.cpp,deref_read,*short
+,RunScriptedConsole,src/harness/harness.cpp,deref_write,*short
+,RunScriptedConsole,src/harness/harness.cpp,deref_write,*unsigned short
+,RunScriptedConsole,src/harness/harness.cpp,field_read,FeaturesSeam::GetCellFeature
+,RunScriptedConsole,src/harness/harness.cpp,field_read,Game::uiOptionFlags
+,RunScriptedConsole,src/harness/harness.cpp,field_read,LosRadarSeam::GetMapCell
+,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::lineNo
+,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::text
+,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::word
+,RunScriptedConsole,src/harness/harness.cpp,field_read,Seams::features
+,RunScriptedConsole,src/harness/harness.cpp,field_read,Seams::los_radar
+,RunScriptedConsole,src/harness/harness.cpp,function,
+,RunScriptedConsole,src/harness/harness.cpp,global_read,g_game
+,RunScriptedConsole,src/harness/harness.cpp,global_read,g_nonCampaignGame
+,RunScriptedConsole,src/harness/harness.cpp,global_read,g_seams
+,RunScriptedConsole,src/harness/harness.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
+,RunScriptedConsole,src/harness/harness.cpp,indirect_call,indirect via unsigned short (*)(Cell *) __attribute__((stdcall)) [FeaturesSeam::GetCellFeature]
 ,RunSearchesNative,src/seams/native.cpp,call,Pathfinder::RunSearches
 ,RunSearchesNative,src/seams/native.cpp,function,
 ,SamePos,src/weapons/weapons.cpp,field_read,Vec3::x

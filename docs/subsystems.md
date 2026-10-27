@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4456 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4446 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -28,7 +28,7 @@ The subsystems and the issue each maps to:
 | [units](#the-remaining-subsystems) | 193 | none yet |
 | [players](#the-remaining-subsystems) | 144 | none yet |
 | [map](#the-remaining-subsystems) | 108 | none yet |
-| [network](#the-remaining-subsystems) | 341 | none yet |
+| [network](#the-remaining-subsystems) | 331 | none yet |
 | [game](#the-remaining-subsystems) | 211 | none yet |
 | [harness](#the-remaining-subsystems) | 171 | none yet |
 | [presentation](#the-remaining-subsystems) | 1415 | none yet |
@@ -572,7 +572,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Multiplayer lobby and menus only (5): `Mission::GetTerrainSizeTier` (the lobby colour), `Mission::GetDescription`, `Mission::GetPlanet`, `Mission::GetTranslatedName` and `Mission::HasMissionName` (the map list and mission menus). Test mode calls only `LoadMissionByName`.
 - Campaign menu, end screen and restart only (5): `Mission::GetBriefing`, `Mission::SelectMission`, `Mission::MissionExists`, `Mission::AdvanceMission` and `Mission::GetMissionIndex`.
 
-**network** (341 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 95 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 116 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (235 in all).
+**network** (331 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 95 functions are called from outside, mostly by presentation (65) and game (32); the busiest are `BroadcastPlayerInfo` (26), `BroadcastPacket` (23), `AddMessage` (18). It imports 116 functions: presentation 26, platform 21, players 11, units 10. Its packet handlers write many sim items (237 in all).
 
 **network, functions no scenario enters** (248 of 298 after `save-midgame` (#422) and `allied-victory` (#432), and the six `console-` scenarios (#445); 50 are entered, 16.8%), by reason:
 

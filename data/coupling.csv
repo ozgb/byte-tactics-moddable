@@ -1725,7 +1725,7 @@ network,platform,call,host_thread_set_priority,2
 network,platform,call,host_thread_start,1
 network,platform,call,host_time_ms,2
 network,platform,call,host_user_name,2
-network,platform,call,operator delete,18
+network,platform,call,operator delete,20
 network,platform,call,operator new,17
 network,platform,call,operator==,7
 network,players,call,FillScoreTables,2
@@ -2646,7 +2646,7 @@ players,network,shared_write,Game::localPlayer,19
 players,network,shared_write,Game::tail,5
 players,network,shared_write,OwnershipTransferPacket::newOwnerNetId,1
 players,network,shared_write,OwnershipTransferPacket::unitId,1
-players,network,shared_write,Player::active,54
+players,network,shared_write,Player::active,55
 players,network,shared_write,Player::alliance,6
 players,network,shared_write,Player::allied,4
 players,network,shared_write,Player::alliedBy,2
@@ -2657,9 +2657,9 @@ players,network,shared_write,Player::energyWasted,2
 players,network,shared_write,Player::explored,2
 players,network,shared_write,Player::exploredHeight,1
 players,network,shared_write,Player::exploredWidth,1
-players,network,shared_write,Player::id,47
+players,network,shared_write,Player::id,48
 players,network,shared_write,Player::index,19
-players,network,shared_write,Player::info,40
+players,network,shared_write,Player::info,41
 players,network,shared_write,Player::keepaliveFlags,2
 players,network,shared_write,Player::kills,2
 players,network,shared_write,Player::lobbyDataSynced,9
@@ -2672,13 +2672,13 @@ players,network,shared_write,Player::totalEnergyConsumed,2
 players,network,shared_write,Player::totalEnergyProduced,2
 players,network,shared_write,Player::totalMetalConsumed,2
 players,network,shared_write,Player::totalMetalProduced,2
-players,network,shared_write,Player::type,72
+players,network,shared_write,Player::type,73
 players,network,shared_write,Player::unitCount,6
 players,network,shared_write,Player::unitsBegin,1
 players,network,shared_write,Player::unitsCreated,7
 players,network,shared_write,PlayerInfo::bit6,1
 players,network,shared_write,PlayerInfo::color,7
-players,network,shared_write,PlayerInfo::kind,10
+players,network,shared_write,PlayerInfo::kind,11
 players,network,shared_write,PlayerInfo::memory,1
 players,network,shared_write,PlayerInfo::started,2
 players,network,shared_write,Unit::angles,1
@@ -3160,12 +3160,12 @@ presentation,network,shared_write,Game::pauseFlags,1
 presentation,network,shared_write,Game::textLines,1
 presentation,network,shared_write,Game::uiOptionFlags,1
 presentation,network,shared_write,Gui::layer,1
-presentation,network,shared_write,Player::active,54
+presentation,network,shared_write,Player::active,55
 presentation,network,shared_write,Player::alliance,6
 presentation,network,shared_write,Player::allied,4
 presentation,network,shared_write,Player::alliedBy,2
 presentation,network,shared_write,Player::energy,1
-presentation,network,shared_write,Player::id,47
+presentation,network,shared_write,Player::id,48
 presentation,network,shared_write,Player::index,19
 presentation,network,shared_write,Player::metal,1
 presentation,network,shared_write,Player::rejectReason,10

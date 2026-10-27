@@ -687,7 +687,7 @@ public:
     size_type max_size() const { return (size_type)(-1) / sizeof(value_type); }
 };
 
-typedef std::vector<Elem_004dd8c0, Alloc_004dd8c0> Vector_004dd8c0;
+typedef std::vector<Elem_004dd8c0, Alloc_004dd8c0> FreedBlocks;
 
 template <class T, class A>
 class FreedBlockRing {
@@ -696,7 +696,7 @@ public:
         : ring(), count(0) {}
     static void* operator new(size_t size) { return host_mem_alloc(size); }
 
-    Vector_004dd8c0 ring;
+    FreedBlocks ring;
     int count;
 };
 
@@ -1251,8 +1251,8 @@ public:
     void RotateRight(Node_004db000* x);
 };
 
-typedef void (Vector_004dd8c0::*InsertFn_004dd8c0)(
-    Vector_004dd8c0::iterator, Vector_004dd8c0::size_type, const Elem_004dd8c0&);
+typedef void (FreedBlocks::*InsertFn_004dd8c0)(
+    FreedBlocks::iterator, FreedBlocks::size_type, const Elem_004dd8c0&);
 
 
 // FUNCTION: 0x4db000
@@ -2237,7 +2237,7 @@ void BlockMapIter::PrevNode()
 }
 
 // FUNCTION: 0x4dd8c0 ?insert@?$vector@UElem_004dd8c0@@VAlloc_004dd8c0@@@std@@QAEXPAUElem_004dd8c0@@IABU3@@Z
-InsertFn_004dd8c0 g_insert_004dd8c0 = &Vector_004dd8c0::insert;
+InsertFn_004dd8c0 g_insert_004dd8c0 = &FreedBlocks::insert;
 
 // FUNCTION: 0x4ddbe0
 MapInsertResult* MapInsertResult::Assign(int* iter, unsigned char* inserted)
@@ -2617,7 +2617,7 @@ void __cdecl FreeDebugBlock(void* p, int flags)
         CheckFillPattern((unsigned int *)((char*)p + size), GetDebugFillPattern(), pad);
     Elem_004dd8c0* old = (Elem_004dd8c0*)&*it;
     FreedBlockRing<int>* arena = GetFreedBlockRing();
-    Vector_004dd8c0& ring = arena->ring;
+    FreedBlocks& ring = arena->ring;
     if ((unsigned int)arena->count < 0x2000)
         ring.push_back(*old);
     else

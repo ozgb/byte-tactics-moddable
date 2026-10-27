@@ -243,13 +243,13 @@ MissionType::MissionType(const char* name)
 }
 
 // FUNCTION: 0x438830
-Elem_0043c390* OrderType::GetTableEntry()
+OrderTableEntry* OrderType::GetTableEntry()
 {
     unsigned int result = 0;
     result = *(unsigned char*)this;
     int* base = (int*)&g_missionOrderTableBegin;
     int fives = result * 5;
-    return (Elem_0043c390*)(*base + fives * 4 + fives);
+    return (OrderTableEntry*)(*base + fives * 4 + fives);
 }
 
 // FUNCTION: 0x438850

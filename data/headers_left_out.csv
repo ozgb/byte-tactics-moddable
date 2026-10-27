@@ -42,7 +42,7 @@ ClampPositionToMap,skip,placeholder type Vec3_004853b0: left for the type-naming
 ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
 ClickSelectHoverUnit,mismatch,placeholder type Param_0048c7f0: left for the type-naming issues
 CollectSelectedUnits,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-CompareOrderTypeNames,skip,placeholder type Elem_0043c390: left for the type-naming issues
+CompareOrderTypeNames,skip,placeholder type OrderTableEntry: left for the type-naming issues
 ComputeUnitScriptChecksum,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ConfigureListBoxByName,mismatch,fixing it changes the generated code of a caller
 CopyPathLockFields,skip,placeholder type Dst_00440ca0: left for the type-naming issues
@@ -292,7 +292,7 @@ ReadTextLinkFields,skip,placeholder type Obj_004ae300: left for the type-naming 
 RedrawMouseCursor,skip,placeholder type Obj_004c2380: left for the type-naming issues
 RefreshPassMapsForUnit,mismatch,placeholder type Struct_00440a70: left for the type-naming issues
 RegisterCommand,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-RegisterOrderTypes,mismatch,placeholder type Elem_0043c390: left for the type-naming issues
+RegisterOrderTypes,mismatch,placeholder type OrderTableEntry: left for the type-naming issues
 RegisterUnitOrders,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 RejectPlayer,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ReleasePacketData,mismatch,placeholder type Class_00451fd0: left for the type-naming issues

@@ -2390,7 +2390,7 @@ static void NumberUnitHeap(unsigned char* units, unsigned count)
     }
 }
 
-typedef Elem_0043c390* SimView_g_missionOrderTableBegin;
+typedef OrderTableEntry* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
 

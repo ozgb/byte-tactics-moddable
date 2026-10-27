@@ -2122,10 +2122,6 @@ struct Elem_00401000 {
     ~Elem_00401000(void);
 };
 
-struct Holder_00401000 {
-    Elem_00401000 items[4];
-};
-
 class Obj_2 {
 public:
     char unknown_0[1];
@@ -2177,15 +2173,6 @@ public:
     float y1;
     float y2;
     int RequestEnergyAndMetal(float, float);
-};
-
-struct Obj_00401320 {
-    float x0;
-    float x1;
-    float x2;
-    float x3;
-    float prev0;
-    float prev1;
 };
 
 struct PlayerRes_00401360 {
@@ -2731,11 +2718,6 @@ struct Map_0040d7b0 {
     unsigned int* cells;
     int InBounds(unsigned int, unsigned int);
     int Get(int, int);
-};
-
-struct Pair_0040d880 {
-    unsigned char a;
-    unsigned char b;
 };
 
 struct Cell_0040d8b0 {
@@ -3574,11 +3556,6 @@ public:
     virtual void Method_28(int);
 };
 
-struct Point_00417f60 {
-    int x;
-    int y;
-};
-
 struct Movement {
     char unknown_0[16];
     int width;
@@ -3726,11 +3703,6 @@ struct BuildEntry_0041ace0 {
     char name[33];
 };
 
-struct BuildList_0041ace0 {
-    int count;
-    BuildEntry_0041ace0 entries[5];
-};
-
 struct Table_0041ace0 {
     char unknown_0[182];
     short count;
@@ -3850,11 +3822,6 @@ struct Button_0041e420 {
 };
 
 #include "../src/game/slot_0041e420.h"
-
-struct Amount {
-    int current;
-    int required;
-};
 
 struct FileRequester {
     void* gui;
@@ -4166,12 +4133,6 @@ struct Texture_00421700 {
     unsigned short* texlist;
 };
 
-struct Vec3f {
-    float x;
-    float y;
-    float z;
-};
-
 struct Cell_00421eb0 {
     short x;
     short y;
@@ -4373,17 +4334,6 @@ struct Model_00424c00 {
 struct Map_00425b80 {
     char unknown_0[12];
     unsigned char* cells;
-};
-
-struct Smoke_00425b80 {
-    short x;
-    short y;
-    unsigned char active;
-    char dx;
-    char dy;
-    unsigned char life;
-    unsigned char fuel;
-    int pos;
 };
 
 struct Display_00425d80 {
@@ -4686,21 +4636,11 @@ public:
     Elem_0040cc40* LowerBound(char*);
 };
 
-struct Source_0042f450 {
-    char unknown_0[4];
-    TdfRecord* tdf;
-};
-
 class Class_004c4450 {
 public:
     int unknown_0;
     std::vector<Named_004c4450*> entries;
     int GetSubRecordCount(void);
-};
-
-struct SoundInfo_005086fc {
-    char* name;
-    int unknown_4[5];
 };
 
 struct Slot_0042f740 {
@@ -4751,15 +4691,6 @@ public:
 #include "../src/ingame/flags_00495e90_37f06.h"
 
 #include "../src/game/mission_flags_0042f9a0.h"
-
-struct SkirmishPlayer {
-    int controller;
-    int side;
-    int allyGroup;
-    int metal;
-    int energy;
-    int color;
-};
 
 class Sound {
 public:
@@ -4893,11 +4824,6 @@ public:
     void FreeTables(void);
 };
 
-struct Elem_00434020 {
-    unsigned short a;
-    unsigned short b;
-};
-
 struct Elem_00434360_2 {
     std::vector<Elem_00434020> v;
 };
@@ -4977,10 +4903,6 @@ public:
     char unknown_0[4];
     int field_4;
     int GetLosLine(short);
-};
-
-struct Elem_004336c0 {
-    int value;
 };
 
 class Class_004339c0 {
@@ -5692,25 +5614,6 @@ public:
     int CanLoad(Class_00489a70*);
 };
 
-struct Flags_0043e490 {
-    unsigned int b0 : 1;
-    unsigned int b1 : 1;
-    unsigned int b2 : 1;
-    unsigned int b3 : 1;
-    unsigned int b4 : 1;
-    unsigned int b5 : 1;
-    unsigned int b6 : 1;
-    unsigned int b7 : 1;
-    unsigned int b8 : 1;
-    unsigned int b9 : 1;
-    unsigned int b10 : 1;
-    unsigned int b11 : 1;
-    unsigned int b12 : 1;
-    unsigned int b13 : 1;
-    unsigned int b14 : 1;
-    unsigned int b15_31 : 17;
-};
-
 struct Limits_0043e490 {
     char unknown_0[192];
     float fc0;
@@ -5749,11 +5652,6 @@ union Flags111_0043f0e0 {
 struct Thing_0043f0e0 {
     char unknown_0[254];
     unsigned char ffe;
-};
-
-struct Source_00440340 {
-    char unknown_0[4];
-    TdfRecord* tdf;
 };
 
 class Class_00440470 {
@@ -5819,25 +5717,6 @@ struct Src_00440ca0 {
     Rect rect;
 };
 
-struct Settings_00441460 {
-    unsigned short memory;
-    unsigned short players : 4;
-    unsigned short playing : 1;
-    unsigned short pad5 : 3;
-    unsigned short black : 1;
-    unsigned short nocmd : 1;
-    unsigned short pad10 : 1;
-    unsigned short mode : 2;
-    unsigned short pad13 : 2;
-    unsigned short lock : 1;
-    unsigned short allyWinFlags;
-    unsigned short pingLimit;
-    unsigned short energy;
-    unsigned short metal;
-    unsigned short maxUnits;
-    unsigned short version;
-};
-
 struct Elem_00441c30 {
     V4i guid;
     unsigned long size;
@@ -5858,10 +5737,6 @@ struct Entry_004426e0 {
 
 struct Gui_00443100 {
     char unknown_0[24];
-};
-
-struct Len {
-    unsigned int v;
 };
 
 struct Net_00443100 {
@@ -6728,13 +6603,6 @@ struct Player_0044feb0 {
     unsigned char field_146;
 };
 
-struct DPNAME {
-    unsigned long dwSize;
-    unsigned long dwFlags;
-    char* lpszShortNameA;
-    char* lpszLongNameA;
-};
-
 struct Msg_00450530 {
     unsigned char type;
     unsigned char flag;
@@ -6946,21 +6814,11 @@ struct Msg20_00456310 {
     Data_0046d970 info;
 };
 
-struct Msg26_00456310 {
-    unsigned char type;
-    int table[10];
-};
-
 struct Message_004565a0 {
     char unknown_0[1];
     int start_tick;
     int sent_tick;
     int id;
-};
-
-struct Packet_00456de0 {
-    unsigned char type;
-    unsigned char progress;
 };
 
 struct Packet_00456ee0 {
@@ -7148,10 +7006,6 @@ struct Surface_004c0a90 {
     unsigned char* shade;
 };
 
-struct Count_00458d20 {
-    int count;
-};
-
 class Class_00458fa0 {
 public:
     char unknown_0[1];
@@ -7189,13 +7043,6 @@ union UnitTypeFlags_459200 {
 
 #include "../src/graphics/model_types.h"
 #include "../src/graphics/spot_state.h"
-
-struct Poly_459c70 {
-    int x;
-    int y;
-    int z;
-    int shade;
-};
 
 class Class_0045a510 {
 public:
@@ -7350,13 +7197,6 @@ struct Rule_0045f1d0 {
     int startMetal;
     int startEnergy;
     char unknown_14[4];
-};
-
-struct Page_0045f8c0 {
-    char blank[2];
-    char blank2[2];
-    int first;
-    int last;
 };
 
 struct Point_004948e0 {
@@ -8073,12 +7913,6 @@ union Flags142f0_00466dc0 {
     union { unsigned char bytes[2]; struct { unsigned char lo; unsigned char hi; } b; struct { unsigned short bit0 : 1; unsigned short bit1 : 1; } bits; };
 };
 
-struct Flags241_00466dc0 {
-    unsigned int : 29;
-    unsigned int bit29 : 1;
-    unsigned int : 2;
-};
-
 struct PlayerInfo_00466dc0 {
     char unknown_0[39];
     Ref<PlayerInfo> data;
@@ -8123,13 +7957,6 @@ struct Unit_00467980 {
 #include "../src/ingame/sub_004679a0_a.h"
 
 #include "../src/ingame/sub_004679a0_b.h"
-
-struct Colors_00467b60 {
-    char unknown_0[4];
-    unsigned char empty;
-    char unknown_5[5];
-    unsigned char full;
-};
 
 struct PlayerData_467c00 {
     char unknown_0[150];
@@ -8183,30 +8010,7 @@ struct Class_004c6b10 {
 
 #include "../src/ingame/map_grid.h"
 
-struct Resources {
-    char owner;
-    float metal;
-    float metalIncome;
-    float metalUse;
-    float energy;
-    float energyIncome;
-    float energyUse;
-    float maxMetal;
-    float maxEnergy;
-};
-
-struct Flags_0046a530 {
-    unsigned short low : 2;
-    unsigned short flag : 1;
-    unsigned short rest : 13;
-};
-
 #include "../src/ingame/snapshot_0046a860.h"
-
-struct Size_0046b9d0 {
-    short w;
-    short h;
-};
 
 struct Point_0046ba80 {
     int x;
@@ -8324,10 +8128,6 @@ struct Packet_0046cef0 {
     int field_a;
 };
 
-struct Alloc_0046d040 {
-    char x;
-};
-
 class Class_0046f720 {
 public:
     char unknown_0[4];
@@ -8338,10 +8138,6 @@ public:
     LiveNode* Buynode(LiveNode*, int);
     void FUN_0046f720(void);
     Rect& operator[](unsigned int);
-};
-
-struct Cmp_0046d040 {
-    char x;
 };
 
 class Sub2_0046d040 {
@@ -8734,10 +8530,6 @@ public:
     Iter_0046e330 Find(unsigned int*);
 };
 
-struct Elem_0046e5e0 {
-    int value;
-};
-
 class SyncTempTaggedVector {
 public:
     std::vector<Elem_0046e5e0> vec;
@@ -8857,21 +8649,10 @@ public:
     unsigned int count(void);
 };
 
-struct Elem_004702a0 {
-    int unknown_0;
-};
-
 struct Pair_0046faf0 {
     std::vector<Elem_0046faf0> list_c;
     std::vector<Elem_0046faf0> list_d;
     Pair_0046faf0(Pair_0046faf0&);
-};
-
-struct Elem_00470a40 {
-    int a;
-    int b;
-    int c;
-    short d;
 };
 
 class ObjectPool {
@@ -9950,37 +9731,6 @@ public:
     void PlayFrame(void*);
 };
 
-struct Display_0047c3a0 {
-    char unknown_0[8];
-    unsigned int width;
-    unsigned int height;
-    void* palette;
-};
-
-struct SmkStats_0047c530 {
-    unsigned int totalTime;
-    unsigned int unknown_04;
-    unsigned int openTime;
-    unsigned int frames;
-    unsigned int framesSkipped;
-    unsigned int unknown_14;
-    unsigned int timeBlit;
-    unsigned int readTime;
-    unsigned int decompTime;
-    unsigned int unknown_24;
-    unsigned int readSpeed;
-    unsigned int slowestFrameTime;
-    unsigned int slowest2FrameTime;
-    unsigned int unknown_34;
-    unsigned int unknown_38;
-    unsigned int averageFrameSize;
-    unsigned int highest1SecRate;
-    unsigned int unknown_44;
-    unsigned int highestMemAmount;
-    unsigned int totalExtraMemory;
-    unsigned int highestExtraUsed;
-};
-
 class ClaimFootprintVisitor {
 public:
     virtual void ClaimFootprint(Obj_0047e5c0*);
@@ -10120,13 +9870,6 @@ public:
     void PlayLooping(int, int);
 };
 
-struct Packet_0047f0c0 {
-    unsigned char type;
-    unsigned char flag;
-    int index;
-    int unknown_6[3];
-};
-
 struct Sound_0047f210 {
     char name[32];
 };
@@ -10261,11 +10004,6 @@ class IntDynArray {
 public:
     std::vector<int> items;
     int EraseByValue(int);
-};
-
-struct Diff_00480570 {
-    int dx;
-    int dy;
 };
 
 class Class_00480c30 {
@@ -11050,21 +10788,10 @@ struct Object_0048a440 {
     unsigned short id;
 };
 
-struct Hs_0048a490 {
-    int wx;
-    int h;
-    int spare;
-};
-
 struct MapRow_0048a490 {
     char unknown_0[12];
     unsigned short* ids;
     char unknown_10[16];
-};
-
-struct Pos2_0048a490 {
-    int x;
-    int z;
 };
 
 struct Order_0048ab70 {
@@ -11086,12 +10813,6 @@ union Fixed_0048bae0 {
 };
 
 struct Point_0048c6a0 {
-    int x;
-    int y;
-};
-
-struct Slot_0048cd80 {
-    unsigned short unitId;
     int x;
     int y;
 };
@@ -11893,19 +11614,9 @@ public:
 
 #include "../src/game/player_slots_00497f40.h"
 
-struct Point_00498cd0 {
-    int x;
-    int y;
-};
-
 #include "../src/ingame/bit_flags16_00499200.h"
 
 #include "../src/ingame/flags16_00499200.h"
-
-struct Kind_00499ab0 {
-    char unknown_0[4];
-    int f4;
-};
 
 struct Obj_00499ab0 {
     char unknown_0[150];
@@ -11948,13 +11659,6 @@ struct Source_00499c10 {
     short heading;
 };
 
-struct Flags_00499cd0 {
-    unsigned short bits0_6 : 7;
-    unsigned short flag7 : 1;
-    unsigned short flag8 : 1;
-    unsigned short rest : 7;
-};
-
 struct NameLess_00499cd0 {
     char unknown_0[1];
     unsigned char operator()(char*, char*);
@@ -11989,11 +11693,6 @@ struct Angles_0049be60 {
 struct Sprite_0049be60 {
     char unknown_0[48];
     void* child;
-};
-
-struct Gun_0049c9c0 {
-    short angle;
-    char unknown_2[2];
 };
 
 struct FlagsBits_0049cc20 {
@@ -12460,11 +12159,6 @@ struct Class_004a4620 {
     Table_004b3630* table;
 };
 
-struct ElemArray_4a4930 {
-    char unknown_0[4];
-    char* base;
-};
-
 struct GameState_4a4930 {
     char unknown_0[24];
     ElemArray_4a4930* arr;
@@ -12832,11 +12526,6 @@ struct StructA_004ada10 {
     short status;
 };
 
-struct StructB_004ada10 {
-    char unknown_0[4];
-    TdfRecord* tdf;
-};
-
 struct Obj_004ada40 {
     char unknown_0[182];
     char text[128];
@@ -12852,11 +12541,6 @@ struct Obj_004ada40 {
 struct Struct_004add60 {
     char unknown_0[218];
     short itemheight;
-};
-
-struct Param2_004addf0 {
-    char unknown_0[4];
-    TdfRecord* obj;
 };
 
 struct Struct_004addf0 {
@@ -12877,11 +12561,6 @@ struct Obj_004adf10 {
     char unknown_0[182];
     char text[130];
     short maxchars;
-};
-
-struct Source_004adf10 {
-    char unknown_0[4];
-    TdfRecord* tdf;
 };
 
 struct Obj_004ae170 {
@@ -12906,11 +12585,6 @@ struct Obj_004ae170_2 {
     int field_144;
 };
 
-struct Source_004ae170 {
-    char unknown_0[4];
-    TdfRecord* tdf;
-};
-
 struct Obj_004ae230 {
     char unknown_0[182];
     char text[128];
@@ -12922,11 +12596,6 @@ struct Obj_004ae300 {
     char text[128];
     char link[17];
     char hotkey;
-};
-
-struct Source_004ae300 {
-    char unknown_0[4];
-    TdfRecord* tdf;
 };
 
 struct Obj_004ae380 {
@@ -12941,11 +12610,6 @@ struct Obj_004ae410 {
     unsigned int : 31;
 };
 
-struct Source_004ae410 {
-    char unknown_0[4];
-    TdfRecord* tdf;
-};
-
 struct Obj_004ae440 {
     char unknown_0[182];
     char text[128];
@@ -12954,11 +12618,6 @@ struct Obj_004ae440 {
 struct Obj_004ae4b0 {
     char unknown_0[182];
     char text[128];
-};
-
-struct Source_004ae4b0 {
-    char unknown_0[4];
-    TdfRecord* tdf;
 };
 
 struct Obj_004ae4e0 {
@@ -12971,11 +12630,6 @@ struct Obj_004ae550 {
     char text[128];
 };
 
-struct Source_004ae550 {
-    char unknown_0[4];
-    TdfRecord* tdf;
-};
-
 struct Obj_004ae580 {
     char unknown_0[182];
     int nuttin;
@@ -12984,11 +12638,6 @@ struct Obj_004ae580 {
 struct StructA_004ae610 {
     char unknown_0[182];
     int nuttin;
-};
-
-struct StructB_004ae610 {
-    char unknown_0[4];
-    TdfRecord* tdf;
 };
 
 struct Sub2_004aeac0 {
@@ -13054,21 +12703,10 @@ struct Common_004ad350 {
     Tail_004aeac0 tail;
 };
 
-struct Obj_004aeda0 {
-    char unknown_0[8];
-    int* buffers[3];
-    int activeFontGaf;
-};
-
 struct Table_004aedd0 {
     unsigned short count;
     char unknown_2[38];
     void* entries[1];
-};
-
-struct Obj_004aef80 {
-    char unknown_0[4];
-    int* gaf;
 };
 
 struct BlinkWord_004afc60 {
@@ -13131,11 +12769,6 @@ struct Word_004aff00 {
     int field_98;
     float field_9c;
     int value;
-};
-
-struct Cell_004b0230 {
-    int step_x;
-    int step_y;
 };
 
 class Class_004b07a0 {
@@ -13864,28 +13497,6 @@ public:
     void* AssignEntry(int*);
 };
 
-struct Entry_004b7ee0 {
-    int value;
-    int unknown_4;
-};
-
-struct Obj_004b7f00 {
-    unsigned short index;
-    char unknown_2[6];
-    unsigned short* table;
-};
-
-struct Entry_004b7f70 {
-    unsigned short value;
-    char unknown_2[6];
-};
-
-struct Obj_004b7f70 {
-    unsigned short index;
-    char unknown_2[6];
-    void* table;
-};
-
 struct Display_004b8310 {
     char unknown_0[200];
     unsigned char* lightTable;
@@ -13904,11 +13515,6 @@ struct Src_004b8310 {
     int height;
     int pitch;
     Bitmap_00437b50** pixels;
-};
-
-struct Bounds_src_004b8310 {
-    Rect bounds;
-    Src_004b8310 src;
 };
 
 struct Display_004b8500 {
@@ -14061,13 +13667,6 @@ struct Obj_004ba750 {
     unsigned short bit0_4 : 5;
     unsigned short flag5 : 1;
     unsigned short bit6_15 : 10;
-};
-
-struct RGBA {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-    unsigned char a;
 };
 
 struct Obj_004baad0 {
@@ -14265,24 +13864,6 @@ struct Struct_004bcea0 {
     char name[256];
 };
 
-struct HapiBuf {
-    unsigned int size;
-    char* buf;
-};
-
-struct Hapi_004bd160 {
-    char magic[4];
-    char a4;
-    char a5;
-    char a6;
-    char a7;
-    unsigned int size;
-    unsigned char key;
-    char ad;
-    unsigned short ae;
-    int extra;
-};
-
 struct File_004bdd70 {
     _iobuf* fp;
     int field_4;
@@ -14384,13 +13965,6 @@ struct Point_004c07b0 {
 struct App_004c0b10 {
     char unknown_0[196];
     unsigned char* shade;
-};
-
-struct Point_004c0c70 {
-    int x;
-    int y;
-    int z;
-    int s;
 };
 
 struct Obj_004c13d0 {
@@ -15156,11 +14730,6 @@ struct Surface_004c6f80 {
     char unknown_31[3];
 };
 
-struct Range {
-    int low;
-    int high;
-};
-
 struct Range_2 {
     int low;
     int high;
@@ -15177,16 +14746,6 @@ struct Frame_004c7580 {
     unsigned short h;
     char unknown_4[12];
     void* data;
-};
-
-struct Rec_004c7580 {
-    int left;
-    int right;
-    int tx;
-    int ty;
-    int trx;
-    int try_;
-    int pad[4];
 };
 
 struct Display_004c8020 {
@@ -16087,13 +15646,6 @@ public:
     virtual int __stdcall GetPlayerAddress(unsigned long, void*, unsigned long*);
 };
 
-struct PCX_004caa40 {
-    unsigned char* data;
-    unsigned char* palette;
-    int width;
-    int height;
-};
-
 struct Header_004cac40 {
     unsigned char a;
     unsigned char b;
@@ -16175,40 +15727,6 @@ struct Elem_004cb5f0 {
     int unknown_0;
     int value;
     int unknown_8;
-};
-
-struct BmpFileHeader {
-    unsigned short bfType;
-    unsigned int bfSize;
-    unsigned short bfReserved1;
-    unsigned short bfReserved2;
-    unsigned int bfOffBits;
-};
-
-struct BmpInfoHeader {
-    unsigned int biSize;
-    int biWidth;
-    int biHeight;
-    unsigned short biPlanes;
-    unsigned short biBitCount;
-    unsigned int biCompression;
-    unsigned int biSizeImage;
-    int biXPelsPerMeter;
-    int biYPelsPerMeter;
-    unsigned int biClrUsed;
-    unsigned int biClrImportant;
-};
-
-struct RgbQuad {
-    unsigned char blue;
-    unsigned char green;
-    unsigned char red;
-    unsigned char reserved;
-};
-
-struct BmpInfo {
-    BmpInfoHeader header;
-    RgbQuad colors[256];
 };
 
 struct Image_004cb940 {
@@ -16368,15 +15886,6 @@ struct Class_004d01b0 {
     int DetectSampleFormat(void*);
 };
 
-struct WaveFormat {
-    unsigned short wFormatTag;
-    unsigned short nChannels;
-    int nSamplesPerSec;
-    int nAvgBytesPerSec;
-    unsigned short nBlockAlign;
-    unsigned short wBitsPerSample;
-};
-
 class Class_004d0660 {
 public:
     char unknown_0[1];
@@ -16401,12 +15910,6 @@ public:
     int FindDataChunkSize(void*);
 };
 
-struct Entry_004d0a10 {
-    short a;
-    short b;
-    short c;
-};
-
 struct Node_004d0b10 {
     unsigned short parent;
     unsigned short smaller;
@@ -16421,16 +15924,6 @@ struct Node_004d0f60 {
     unsigned short parent;
     unsigned short smaller;
     unsigned short larger;
-};
-
-struct Chunk_4d1820 {
-    int marker;
-    unsigned char version;
-    unsigned char method;
-    unsigned char encrypt;
-    int compressedSize;
-    int size;
-    int checksum;
 };
 
 struct Chunk_4d1970 {
@@ -16598,11 +16091,6 @@ public:
     unsigned long* pc;
     char buf[42060];
     void FormatStackReport(void);
-};
-
-struct ExceptionName {
-    unsigned long code;
-    char* name;
 };
 
 class CritSec_004e1ac0 {
@@ -17118,14 +16606,6 @@ struct DebugDir_004ddfa0 {
     unsigned int sizeOfData;
     unsigned int addressOfRawData;
     unsigned int pointerToRawData;
-};
-
-struct Fpo_004de020 {
-    unsigned int offStart;
-    unsigned int procSize;
-    unsigned int locals;
-    unsigned short params;
-    unsigned short flags;
 };
 
 class Class_004ddfe0 {

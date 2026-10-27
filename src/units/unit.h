@@ -21,6 +21,11 @@ struct SpotState;
 class PathOrderAttach;
 
 #pragma pack(push, 1)
+struct Point_004898b0 {
+    short a;
+    short b;
+};
+
 struct Unit {
     Ref<UnitMotion> motion;
     union {

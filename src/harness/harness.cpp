@@ -743,7 +743,8 @@ static int FileHasLoadLine(FILE* f)
             key++;
         found = strncmp(key, "load", 4) == 0 && (key[4] == ' ' || key[4] == '\t' || key[4] == '\r' || key[4] == '\n' || key[4] == '\0');
     }
-    rewind(f);
+    if (fseek(f, 0, SEEK_SET) != 0)
+        Fail("testmode: cannot rewind the scenario file\n");
     return found;
 }
 

@@ -85,7 +85,17 @@ REASON_CODES = {
     "Console command, host only": "console", "Key, window or screenshot input only": "input", "Shutdown only": "shutdown",
     "Game over only": "game-over", "Error paths only": "error-path", "Test only": "test-only",
     "Moddable-only key": "moddable-only", "Command-line switch only": "command-line", "Developer tool only": "dev-tool",
-    "Game data only": "data",
+    "Game data only": "data", "Game type 1 (campaign) only": "campaign-game", "Mission maps only": "mission-map",
+    "Menu or dialog click only": "menu", "Info panel, cursor, build menu and shutdown only": "info-panel",
+    "Campaign mission script only": "campaign-script", "No caller in the game": "no-caller",
+    "Base-class slots of `CobScript` that `UnitScript` overrides": "base-slot",
+    "COB opcodes that no script of the game data uses": "unused-opcode", "Load only": "load-only",
+    "Console command only": "console", "Unit info dialog only": "unit-info", "Slot no code calls": "unused-slot",
+    "Network lobby and map check only": "map-check", "Multiplayer lobby and menus only": "menu",
+    "Campaign menu, end screen and restart only": "campaign-menu", "Needs a case no scenario sets up yet": "unset-case",
+    "Unreachable": "unreachable", "Menu and cursor only": "menu-cursor", "Share dialog or network only": "share-dialog",
+    "Network game only": "network-game", "Cursor only": "cursor",
+    "Template instances no entered function uses": "unused-instance",
 }
 UNWRITABLE = ("none", "missing", "unlisted")
 UNWRITABLE_KINDS = ("names", "names listed", "in order", "sim item names")

@@ -42102,6 +42102,13 @@ address,function,file,kind,target
 ,Charge,src/game/main_loop.cpp,field_write,FrameTimers::last
 ,Charge,src/game/main_loop.cpp,function,
 ,Charge,src/game/main_loop.cpp,global_read,g_game
+,CheckConsoles,src/harness/harness.cpp,call,FailLine
+,CheckConsoles,src/harness/harness.cpp,field_read,ScriptedConsole::lineNo
+,CheckConsoles,src/harness/harness.cpp,field_read,ScriptedConsole::tick
+,CheckConsoles,src/harness/harness.cpp,function,
+,CheckConsoles,src/harness/harness.cpp,global_read,s_consoleCount@src/harness/harness.cpp
+,CheckConsoles,src/harness/harness.cpp,global_read,s_consoles@src/harness/harness.cpp
+,CheckConsoles,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,CheckGameType,src/harness/harness.cpp,call,Fail
 ,CheckGameType,src/harness/harness.cpp,call,FailLine
 ,CheckGameType,src/harness/harness.cpp,call,RejectUnderMission
@@ -42170,6 +42177,7 @@ address,function,file,kind,target
 ,CheckOrders,src/harness/harness.cpp,global_read,s_orderCount@src/harness/harness.cpp
 ,CheckOrders,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
 ,CheckOrders,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
+,CheckScenario,src/harness/harness.cpp,call,CheckConsoles
 ,CheckScenario,src/harness/harness.cpp,call,CheckGameType
 ,CheckScenario,src/harness/harness.cpp,call,CheckLoadScenario
 ,CheckScenario,src/harness/harness.cpp,call,CheckOrders
@@ -42412,6 +42420,12 @@ address,function,file,kind,target
 ,CompactActivePlayerSlots,src/frontend/multi_44a680.cpp,global_read,g_game
 ,ConditionClassOf,src/harness/harness.cpp,call,HarnessConditionClass
 ,ConditionClassOf,src/harness/harness.cpp,function,
+,ConsoleWordAllowed,src/harness/harness.cpp,call,_stricmp
+,ConsoleWordAllowed,src/harness/harness.cpp,function,
+,ConsoleWordAllowed,src/harness/harness.cpp,global_read,s_consoleAllowed@src/harness/harness.cpp
+,ConsoleWordIsUnitType,src/harness/harness.cpp,call,GameU32
+,ConsoleWordIsUnitType,src/harness/harness.cpp,call,_stricmp
+,ConsoleWordIsUnitType,src/harness/harness.cpp,function,
 ,ConstIter_004dbd00::ConstIter_004dbd00,src/debug/debug_lib.cpp,function,
 ,Contains,src/ai/ai_player.cpp,deref_read,*unsigned int
 ,Contains,src/ai/ai_player.cpp,function,
@@ -44098,11 +44112,15 @@ address,function,file,kind,target
 ,HarnessBeforeStep,src/harness/harness.cpp,call,GameU32
 ,HarnessBeforeStep,src/harness/harness.cpp,call,IssueScriptedOrder
 ,HarnessBeforeStep,src/harness/harness.cpp,call,IssueScriptedSpawn
+,HarnessBeforeStep,src/harness/harness.cpp,call,RunScriptedConsole
+,HarnessBeforeStep,src/harness/harness.cpp,field_read,ScriptedConsole::tick
 ,HarnessBeforeStep,src/harness/harness.cpp,field_read,ScriptedOrder::tick
 ,HarnessBeforeStep,src/harness/harness.cpp,field_read,ScriptedSpawn::tick
 ,HarnessBeforeStep,src/harness/harness.cpp,field_write,Player::progress
 ,HarnessBeforeStep,src/harness/harness.cpp,function,
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,g_game
+,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_consoleCount@src/harness/harness.cpp
+,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_consoles@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_gameType@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_orderCount@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_orders@src/harness/harness.cpp
@@ -46831,6 +46849,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,call,KeyIsDecidedByLoad
 ,ReadKey,src/harness/harness.cpp,call,ParseNumber
 ,ReadKey,src/harness/harness.cpp,call,ParseRange
+,ReadKey,src/harness/harness.cpp,call,ReadConsoleA
 ,ReadKey,src/harness/harness.cpp,call,ReadOrder
 ,ReadKey,src/harness/harness.cpp,call,ReadPlayerKey
 ,ReadKey,src/harness/harness.cpp,call,ReadSpawn
@@ -47116,6 +47135,19 @@ address,function,file,kind,target
 ,RestoreSurfacesInline,src/graphics/surface.cpp,field_read,Screen::primary
 ,RestoreSurfacesInline,src/graphics/surface.cpp,field_read,Screen::surface
 ,RestoreSurfacesInline,src/graphics/surface.cpp,function,
+,RunScriptedConsole,src/harness/harness.cpp,call,ConsoleWordAllowed
+,RunScriptedConsole,src/harness/harness.cpp,call,ConsoleWordIsUnitType
+,RunScriptedConsole,src/harness/harness.cpp,call,ExecuteCommandLine
+,RunScriptedConsole,src/harness/harness.cpp,call,FailLine
+,RunScriptedConsole,src/harness/harness.cpp,call,GameAt
+,RunScriptedConsole,src/harness/harness.cpp,call,sprintf
+,RunScriptedConsole,src/harness/harness.cpp,call,strcpy
+,RunScriptedConsole,src/harness/harness.cpp,deref_read,*unsigned short
+,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::lineNo
+,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::text
+,RunScriptedConsole,src/harness/harness.cpp,field_read,ScriptedConsole::word
+,RunScriptedConsole,src/harness/harness.cpp,function,
+,RunScriptedConsole,src/harness/harness.cpp,global_read,g_nonCampaignGame
 ,SamePos,src/weapons/weapons.cpp,field_read,Vec3::x
 ,SamePos,src/weapons/weapons.cpp,field_read,Vec3::y
 ,SamePos,src/weapons/weapons.cpp,field_read,Vec3::z

@@ -4,7 +4,8 @@
 #include "../util/vec3.h"
 #include "../network/player.h"
 #include "game.h"
-#include "../../link/globals.h"
+
+extern Game* g_game;
 
 static inline int IsExplored(Player* player, Vec3Words* pos)
 {

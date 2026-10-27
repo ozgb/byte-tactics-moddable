@@ -175,6 +175,7 @@ struct Feature {
 #include "../map/mission.h"
 
 #include "../game/game.h"
+#include "../game/los_helpers.h"
 
 #include "player_ai.h"
 
@@ -730,16 +731,6 @@ SpatialTimer::SpatialTimer(SquadManager* p, void* q)
     x = (int)(g_game->baseX / 2 * 65536.0);
     step = MakeVec3(x, 0, (int)(g_game->baseY / 2 * 65536.0));
     bestRating = 0;
-}
-
-static inline int IsExplored(Player* player, Vec3Words* pos)
-{
-    int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
-    if ((unsigned int)tx < (unsigned int)player->exploredWidth && (unsigned int)ty < (unsigned int)player->exploredHeight &&
-        player->explored[(unsigned int)player->exploredWidth * ty + tx])
-        return 1;
-    return 0;
 }
 
 static inline int IsVisible(Player* player, Vec3Words* pos)

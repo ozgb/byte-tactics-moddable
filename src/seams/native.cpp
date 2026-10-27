@@ -55,13 +55,12 @@ struct Callback;
 
 struct Order;
 struct _iobuf;
-struct Los_0047d2e0;
 class MissionType;
 
 #include "../ai/ai_player.h"
 void __stdcall GetFactoriesInRadius(int player, const Vec* pos, int radius, std::vector<Unit*>* out);
 #include "../units/squads.h"
-int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* los);
+int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los);
 int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target, Vec3* pos, int param_6, int param_7);
 #include "../orders/order_list.h"

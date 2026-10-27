@@ -24,6 +24,7 @@
 
 #pragma pack(push, 1)
 #include "../game/game.h"
+#include "../game/los_helpers.h"
 #pragma pack(pop)
 
 #pragma pack(push, 2)
@@ -448,20 +449,11 @@ struct Lists_00472530 {
     }
 };
 
-struct Position_00475150 {
-    short xFrac;
-    short x;
-    short yFrac;
-    short y;
-    short zFrac;
-    short z;
-};
-
 struct TimedSubParticle {
     void* data;
     union {
         Vec3 pos;
-        Position_00475150 posw;
+        Vec3Words posw;
     };
     int limit;
     int count;
@@ -1466,8 +1458,8 @@ void TimedSubParticle::Step()
 // FUNCTION: 0x475040
 void TimedSubParticle::DrawParticle(void* dest, short px, short py)
 {
-    short sy = posw.z - (posw.y >> 1) - py + 0x20;
-    short sx = posw.x - px + 0x80;
+    short sy = posw.zWhole - (posw.yWhole >> 1) - py + 0x20;
+    short sx = posw.xWhole - px + 0x80;
     DrawFrameBlended(dest, GetGafFrame(data, count), sx, sy);
 }
 
@@ -1818,22 +1810,22 @@ void NanoParticles::Emit()
 // FUNCTION: 0x474b80
 void SmokeParticle::DrawParticle(void* dest, short px, short py)
 {
-    short sx = posw.x - px + 0x80;
-    short sy = posw.z - (posw.y >> 1) - py + 0x20;
+    short sx = posw.xWhole - px + 0x80;
+    short sy = posw.zWhole - (posw.yWhole >> 1) - py + 0x20;
     Player* p = &g_game->players[g_game->playerIndex];
     Player* p2 = &g_game->players[g_game->playerIndex];
     int visible;
     if ((g_game->mapFlags & 2) == 2) {
-        int col = posw.x >> 5;
-        int row = (posw.z - (posw.y >> 1)) >> 5;
+        int col = posw.xWhole >> 5;
+        int row = (posw.zWhole - (posw.yWhole >> 1)) >> 5;
         if ((unsigned int)col < (unsigned int)p->exploredWidth && (unsigned int)row < (unsigned int)p->exploredHeight &&
             p->explored[(unsigned int)p->exploredWidth * row + col] != 0)
             visible = 1;
         else
             visible = 0;
     } else {
-        int col = posw.x >> 5;
-        int row = (posw.z - (posw.y >> 1)) >> 5;
+        int col = posw.xWhole >> 5;
+        int row = (posw.zWhole - (posw.yWhole >> 1)) >> 5;
         visible = Identity(IsSeen(p, p2, col, row));
     }
     if (visible)
@@ -1864,29 +1856,7 @@ int TimedSubParticles::IsEmitDue()
     return (unsigned int)time <= (unsigned int)g_game->ticks;
 }
 
-static inline int IsExplored(Player* map, Position_00475470* pos)
-{
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
-    if ((unsigned int)tx < (unsigned int)map->exploredWidth && (unsigned int)ty < (unsigned int)map->exploredHeight &&
-        map->explored[(unsigned int)map->exploredWidth * ty + tx])
-        return 1;
-    return 0;
-}
-
-static inline int IsSeen(Player* map, Position_00475470* pos)
-{
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
-    if (!((unsigned int)tx < (unsigned int)map->exploredWidth && (unsigned int)ty < (unsigned int)map->exploredHeight)) {
-        return 0;
-    }
-    Player* b = map;
-    return (g_game->visibilityMask[(unsigned int)b->exploredWidth * ty + tx] &
-            (1 << g_game->playerIndex)) != 0;
-}
-
-static inline int IsVisible(Player* map, Position_00475470* pos)
+static inline int IsVisible(Player* map, Vec3Words* pos)
 {
     if ((g_game->mapFlags & 2) == 2)
         return IsExplored(map, pos);
@@ -1895,8 +1865,8 @@ static inline int IsVisible(Player* map, Position_00475470* pos)
 
 static inline void DrawIfVisible(SmokeParticle* s, void* dest, short px, short py)
 {
-    short sx = s->posw.x - px + 0x80;
-    short sy = s->posw.z - (s->posw.y >> 1) - py + 0x20;
+    short sx = s->posw.xWhole - px + 0x80;
+    short sy = s->posw.zWhole - (s->posw.yWhole >> 1) - py + 0x20;
     if (IsVisible(&g_game->players[g_game->playerIndex], &s->posw))
         DrawFrameBlended(dest, GetGafFrame(s->data, s->count), sx, sy);
 }

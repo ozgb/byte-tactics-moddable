@@ -3,20 +3,11 @@
 
 #include "../util/vec3.h"
 
-struct Position_00475470 {
-    short xFrac;
-    short x;
-    short yFrac;
-    short y;
-    short zFrac;
-    short z;
-};
-
 struct SmokeParticle {
     void* data;
     union {
         Vec3 pos;
-        Position_00475470 posw;
+        Vec3Words posw;
     };
     int limit;
     int count;

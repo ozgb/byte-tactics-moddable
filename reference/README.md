@@ -79,7 +79,7 @@ menu's table, and never clears it; the summary items above then overwrite the fi
 - **Keys it may not set:** the save decides them, so a scenario with a `load` line that sets one exits 2 and
   names it: `game_type`, `campaign`, `map`, `difficulty`, `commander_death`, `mapping`, `line_of_sight`, `los_type`,
   `start_positions`, every `player<N>.*` key (the controllers, sides, colours, resources and alliances),
-  `local_player` (the save keeps the human player). `spawn` and `order` are not accepted either (the
+  `local_player` (the save keeps the human player). `spawn`, `order` and `console` are not accepted either (the
   scenario has no players of its own to name), and neither is `save`. `map` and the `player<N>.*` keys are
   not required.
 - **The tick:** the save holds the game's tick counter (`ticks`, in the `GameTime` box that `SavePlayers`
@@ -218,6 +218,58 @@ A bad selector, kind or position, a slot that is not `human` (a `spawn` needs on
 last tick, an unknown unit type, a build site the game rejects, or a selector
 that names no live unit at its tick exits with status 2 and a message that
 names the line.
+
+## Console commands
+
+A scenario can type a console command, as the chat line does. One `console` line per command:
+
+```
+console <tick> +<command> [arguments]
+console 1 +now Film Chris Include Reload Assert
+console 10 +nometal 0 50
+console 12 +armpw 0
+```
+
+- `<tick>` is a game tick from 1 to `ticks`. The line runs at the start of that tick, after the tick's `spawn` and
+  `order` lines, in file order. A tick of 0 or after the last tick exits with status 2.
+- The text after the tick is what a player types in the chat line, with its leading `+` (the line must have one). The
+  harness drops the `+` and calls the game's `ExecuteCommandLine`, as the chat line does, with the mask the chat line
+  computes: 1, or 7 when the cheat code has been typed (bit 1 of `uiOptionFlags`), and with 2 added in a skirmish or
+  multiplayer game (`g_nonCampaignGame`). The harness sets nothing before the call. A command whose mask the line's mask
+  lacks does nothing, as in the game, so a scenario types the cheat code first: `console 1 +now Film Chris Include Reload
+  Assert` sets `uiOptionFlags` bit 1, which enables the debug commands and the unit names below.
+- The text is at most 79 characters, the size of the game's command buffer. The chat path takes the cursor from the
+  mouse; the harness puts it at the fixed world position 640 260 before each console line (`pos`, the cell
+  `point` and `cellFeature`), so `burnone` and `feature` act on the cell there and a unit name creates its unit
+  there. `move <dx> <dz>` shifts the cursor, but the next console line sets it again, so
+  it changes nothing a scenario can see. `give`, `nometal` and `noenergy` take the local player when no slot is given.
+- A unit type name typed alone creates that unit for the slot in its first argument (`armpw 1`), the way the console
+  does through `DefaultCommandHandler` and `MatchWildcard`. The name must be a unit type of the game (any case, no
+  wildcard), so the handler never falls back to its `debugdat` file lookup.
+
+The commands a line may type, by their names in the game's command table (any case):
+
+| Group | Commands |
+| --- | --- |
+| Cheat code | `now` (typed as `now Film Chris Include Reload Assert`) |
+| Resources and players | `atm`, `give`, `nometal`, `noenergy`, `ai`, `control`, `view` |
+| Sharing (they do nothing without a network game) | `sharemetal`, `shareenergy`, `shareall`, `setsharemetal`, `setshareenergy` |
+| Units | `reload`, `kill`, `assign`, `selectable`, `shootall`, `doubleshot`, `halfshot`, a unit type name |
+| Features and the map | `feature`, `burnone`, `burnall`, `treedeath`, `meteor`, `sealevel`, `edge`, `search`, `move`, `drop` |
+| Sight | `los`, `lostype`, `mapping`, `radar`, `nowisee` |
+| AI | `reloadaiprofiles` |
+| Game end | `iwin`, `ilose` |
+| No effect | `assert`, `dprint`, `mem`, `zbuffer` |
+
+The sharing commands, `assert`, `dprint`, `mem`, `zbuffer`, `assign` (nothing is selected), `selectable`, `drop` and
+`edge` change no field the trace hashes: a scenario types them to enter their functions.
+
+A command that is not in the table, or a first word that is neither a listed command nor a unit type, exits with
+status 2 and a message that names the line. Left out are the display, sound, debugger and host commands (task #398's),
+`compression` and `netstats` (network statistics), `sharemapping` and `shareradar` (network games only), and two
+commands that touch the file system: `include` (reads `debugdat\include.txt`) and `printweights` (writes the file
+named in its second argument, so the AI weights dump `DumpPlayerAI` is not reachable). `los` and `mapping` save the
+game's settings through the host, which writes the run's own registry, and no scenario reads settings from it.
 
 ## Traces
 
@@ -372,6 +424,12 @@ seeds) and runs deterministically: two runs give identical traces.
 | --- | --- | ---: | ---: | --- |
 | allied-victory | Metal Heck | 4 | 2400 | Game type 3: players 0 and 1 allied against players 2 and 3, whose commanders self-destruct, so allied victory ends the run early |
 | commander-death | The Pass | 2 | 1800 | The human Arm commander self-destructs, so commander death ends the run about 150 ticks later |
+| console-economy | The Pass | 2 | 200 | Console: resources (`atm`, `nometal`, `noenergy`, `give`), the share commands, the AI toggle (`ai`) and the player switches (`control`, `view`) |
+| console-features | The Pass | 2 | 300 | Console: `feature`, `burnone`, `burnall`, `treedeath`, `meteor` (a shower, meteors on and off) and `sealevel` |
+| console-ilose | The Pass | 2 | 100 | Console: `ilose`, so the local side loses its units and the run ends at tick 30 |
+| console-iwin | The Pass | 2 | 100 | Console: `iwin`, so the other side loses its units and the run ends at tick 30 |
+| console-sight | The Pass | 2 | 200 | Console: `los`, `lostype`, `mapping`, `radar`, `nowisee`, then `ai` and `reloadaiprofiles` |
+| console-units | The Pass | 2 | 300 | Console: unit names typed alone, `move`, `reload`, `kill`, the damage toggles, `search`, `edge`, `assign` and `selectable` |
 | duel-coast-to-coast | Coast To Coast | 2 | 5400 | Two Core players on Coast To Coast, three minutes, difficulty 2 |
 | duel-great-divide | Great Divide | 2 | 3600 | Two Arm players on Great Divide, random start positions, two minutes |
 | duel-pass-dark | The Pass | 2 | 2700 | Two players on The Pass with the map unmapped and line of sight off, ninety seconds |

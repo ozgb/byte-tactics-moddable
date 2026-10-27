@@ -955,9 +955,11 @@ harness,ai,shared_write,Game::difficulty,2
 harness,ai,shared_write,Game::playerIndex,1
 harness,economy,shared_write,Game::difficulty,4
 harness,economy,shared_write,Game::localPlayer,8
+harness,features,call,GetCellFeature,1
 harness,features,shared_write,Game::difficulty,2
 harness,features,shared_write,Game::playerIndex,1
 harness,game,call,ApplySlotsToGamePlayers,1
+harness,game,call,ExecuteCommandLine,1
 harness,game,call,FreeSummaryBank,1
 harness,game,call,OpenHapiBank,1
 harness,game,call,OpenSummaryBank,1
@@ -965,6 +967,7 @@ harness,game,call,SaveGameFile,1
 harness,game,shared_write,Game::difficulty,4
 harness,game,shared_write,Game::localPlayer,13
 harness,game,shared_write,Game::playerIndex,5
+harness,los_radar,call,GetMapCell,1
 harness,los_radar,shared_write,Game::localPlayer,5
 harness,los_radar,shared_write,Game::playerIndex,14
 harness,map,call,Mission::CountStartPositions,1

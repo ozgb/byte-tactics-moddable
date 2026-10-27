@@ -1,0 +1,32 @@
+# Console cheats on The Pass: resources, the share commands (no-ops without a network game), the AI toggle and the player views; 200 ticks.
+game_seed 451
+crt_seed 1451
+view_seed 2451
+map The Pass
+start_positions fixed
+ticks 200
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +now Film Chris Include Reload Assert
+console 10 +atm
+console 20 +nometal 0 50
+console 30 +noenergy 1 20
+console 40 +give 1 100 metal
+console 50 +give 1 100 energy
+console 60 +shareall
+console 62 +sharemetal
+console 64 +shareenergy
+console 66 +setsharemetal 50
+console 68 +setshareenergy 50
+console 70 +ai 1
+console 80 +ai 1
+console 90 +control 1
+console 100 +give 0 100 metal
+console 110 +view 0
+console 120 +control 0
+console 130 +assert
+console 132 +dprint
+console 134 +mem
+console 136 +zbuffer

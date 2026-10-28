@@ -4008,7 +4008,7 @@ void __stdcall HandleUnitCountSlider(void* obj, char* gadget)
     }
     g_unitRestrictEntries[n + desc->firstRow].max = value;
     ((UnitSync *)g_game->sync)->SetUnitLimit(
-        (UnitSyncDef *)&((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
+        (UnitDef *)&((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
     desc->flags[n + desc->firstRow] = g_unitRestrictEntries[n + desc->firstRow].peerEnabled == 0;
     desc->flags[n + desc->firstRow] |= g_unitRestrictEntries[n + desc->firstRow].max == 0 ? 2 : 0;
     SetTranslatedTextByName(obj, count, (char*)buf, 0);
@@ -4211,7 +4211,7 @@ void OpenUnitRestrictions()
                     ((UnitDefView *)g_game->defs.get())[i].unitName, Translate(type->description),
                     (int)type->metalCost, (int)type->energyCost);
             g_unitRestrictEntries[n].unitIndex = i;
-            ((UnitSync *)g_game->sync)->GetUnitEntry((UnitSyncDef *)&((UnitDefView *)g_game->defs.get())[i], &info);
+            ((UnitSync *)g_game->sync)->GetUnitEntry((UnitDef *)&((UnitDefView *)g_game->defs.get())[i], &info);
             count = info.limit == -1 ? 0x65 : info.limit;
             g_unitRestrictEntries[n].max = count;
             g_unitRestrictOldCounts[n] = count;
@@ -4773,9 +4773,9 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
                     if (item->flags2.bits.flag) {
                     } else {
                         if (g_unitRestrictEntries[i].max == 0)
-                            ((UnitSync *)g_game->sync)->DisallowUnit((UnitSyncDef *)item);
+                            ((UnitSync *)g_game->sync)->DisallowUnit((UnitDef *)item);
                         else
-                            ((UnitSync *)g_game->sync)->AllowUnit((UnitSyncDef *)item);
+                            ((UnitSync *)g_game->sync)->AllowUnit((UnitDef *)item);
                     }
                 }
             }
@@ -4813,7 +4813,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
                     g_unitRestrictEntries[i].max = 0;
                 if (g_unitRestrictEntries[i].max != g_unitRestrictEntries[i].previousMax) {
                     ((UnitSync *)g_game->sync)->SetUnitLimit(
-                        (UnitSyncDef *)&((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex],
+                        (UnitDef *)&((UnitDefView *)g_game->defs.get())[g_unitRestrictEntries[i].unitIndex],
                         g_unitRestrictEntries[i].max);
                 }
             }
@@ -4834,7 +4834,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
             if (((UnitDefView *)g_game->defs.get())[i].flags2.bits.flag) {
             } else if (((UnitDefView *)g_game->defs.get())[i].name != nullptr) {
                 ((UnitSync *)g_game->sync)->SetUnitLimit(
-                    (UnitSyncDef *)&((UnitDefView *)g_game->defs.get())[i], g_unitRestrictOldCounts[n]);
+                    (UnitDef *)&((UnitDefView *)g_game->defs.get())[i], g_unitRestrictOldCounts[n]);
                 n++;
             }
         }

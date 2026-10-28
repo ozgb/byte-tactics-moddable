@@ -511,7 +511,6 @@ struct Eye;
 class UnitScript;
 class Class_00488c50;
 class UnitTypeSet;
-struct UnitType;
 class Class_00489240;
 class UnitCategory;
 class Class_00489540;
@@ -2022,7 +2021,7 @@ class UnitCallback_0048edb0;
 class UnitCallback_0048f530;
 class UnitCallback_0048f7e0;
 class UnitCallback_0048f7e0_2;
-struct UnitDef;
+class UnitDef;
 struct UnitFlag_0044e7d0;
 struct UnitFlags_0048d630;
 class UnitList;
@@ -4353,12 +4352,6 @@ struct Class_004402e0 {
 };
 
 #include "../src/units/movement_class.h"
-
-struct UnitType {
-    char unknown_0[542];
-    unsigned short team;
-    void AddToCategories(char*);
-};
 
 class Class_004c4630 {
 public:

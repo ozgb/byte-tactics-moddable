@@ -11263,12 +11263,13 @@ address,function,file,kind,target
 0x4385f0,StopBuildingScript,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [UnitsSeam::FindScript]"
 0x4385f0,StopBuildingScript,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(CobScript *, int, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgsByIndex]"
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,call,get
+0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,call,operator->
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,<anon>::q
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,Unit::def
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,Unit::killCount
-0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,UnitType::field_1fe
-0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,UnitType::maxHealth
-0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,UnitType::metalCost
+0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,UnitDef::buildRate
+0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,UnitDef::maxHealth
+0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,UnitDef::metalCost
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_write,<anon>::hi
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_write,<anon>::lo
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,function,
@@ -11342,7 +11343,7 @@ address,function,file,kind,target
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Owner_0043a1f0::slot
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Unit::def
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Unit::motion
-0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,UnitType::flags32
+0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,UnitDef::flags1
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Vec3::x
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Vec3::z
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_write,Order::attached
@@ -11365,7 +11366,7 @@ address,function,file,kind,target
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Owner_0043a1f0::slot
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Unit::def
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Unit::motion
-0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,UnitType::flags32
+0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,UnitDef::flags1
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Vec3::x
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Vec3::z
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_write,Order::attached
@@ -11388,7 +11389,7 @@ address,function,file,kind,target
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,Owner_0043a1f0::slot
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,Unit::def
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,Unit::motion
-0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,UnitType::flags32
+0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,UnitDef::flags1
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_write,Order::attached
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_write,Order::subFlags
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,function,
@@ -11413,10 +11414,12 @@ address,function,file,kind,target
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,call,operator+
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,call,operator->
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,call,operator=
-0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,deref_escape,*UnitType
+0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,deref_escape,*UnitDef
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,deref_read,*Pos
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,deref_write,*Pos
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_escape,Order::pos
+0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_escape,UnitDef::modelMaxX
+0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_escape,UnitDef::modelMinX
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Fixed::whole
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Game::colors
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Game::defs
@@ -11429,8 +11432,6 @@ address,function,file,kind,target
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Rect::right
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Rect::top
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,Unit::selected
-0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,UnitType::hi
-0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_read,UnitType::lo
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_write,Rect::bottom
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_write,Rect::left
 0x438c00,DrawBuildFootprint,src/ingame/markers.cpp,field_write,Rect::right
@@ -11463,17 +11464,17 @@ address,function,file,kind,target
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Unit::activateFlags
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Unit::def
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Unit::motion
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::buildDistance
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::flags
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::kamikazeDistance
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::maneuver
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::minCloakDistance
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::radar
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::radarJam
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::sight
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::sonar
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::sonarJam
-0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitType::weapon_220
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::buildRange
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::explodeas
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::flags1
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::kamikazeUnsigned
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::maneuverleashUnsigned
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::mincloakdistance
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::radardistance
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::radardistancejam
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::range
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::sonardistance
+0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitDef::sonardistancejam
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitWeaponSlot::flags
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,UnitWeaponSlot::weapon
 0x4390a0,DrawUnitRangeRings,src/ingame/markers.cpp,field_read,Weapon::areaOfEffect
@@ -11536,7 +11537,7 @@ address,function,file,kind,target
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Point16::y
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Unit::def
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Unit::player
-0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,UnitType::attackLength
+0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,UnitDef::attackrunlength
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,UnitWeaponSlot::flags
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,UnitWeaponSlot::weapon
 0x439740,DrawWeaponCoverage,src/ingame/markers.cpp,field_read,Vec3::y
@@ -11554,7 +11555,6 @@ address,function,file,kind,target
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,DrawLine
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,ScaledCos
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,ScaledSin
-0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,get
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,operator!=
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,operator->
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,operator=
@@ -11566,7 +11566,7 @@ address,function,file,kind,target
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,Game::colors
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,Order::target
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,Unit::def
-0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,UnitType::field_178
+0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,UnitDef::modelSizeXHigh
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,View::scroll_x
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,field_read,View::scroll_y
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,function,
@@ -11852,7 +11852,7 @@ address,function,file,kind,target
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_escape,Order::cached
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_escape,Order::pos
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_escape,Order::start
-0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_maybe_written,UnitType::name
+0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_maybe_written,UnitDef::unitname
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,Entry_0043a1f0::name
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,Game::defs
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,Game::unitDefCount
@@ -22566,7 +22566,7 @@ address,function,file,kind,target
 0x46e330,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,call,UnitSync::Find
 0x46e330,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,call,operator=
 0x46e330,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,deref_write,*UnitSyncEntry
-0x46e330,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,field_read,UnitSyncDef::key
+0x46e330,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,field_read,UnitDef::fbiChecksum
 0x46e330,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,field_read,UnitSyncEntry::enabled
 0x46e330,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,field_read,UnitSyncEntry::peerEnabled
 0x46e330,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,field_read,UnitSyncIter::ptr
@@ -22574,7 +22574,7 @@ address,function,file,kind,target
 0x46e330,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,function,
 0x46e3c0,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,call,UnitSync::Find
 0x46e3c0,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,call,UnitSync::NotifyEntryChanged
-0x46e3c0,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,field_read,UnitSyncDef::key
+0x46e3c0,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,field_read,UnitDef::fbiChecksum
 0x46e3c0,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,field_read,UnitSyncEntry::enabled
 0x46e3c0,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,field_read,UnitSyncEntry::peerEnabled
 0x46e3c0,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,field_read,UnitSyncIter::ptr
@@ -22582,7 +22582,7 @@ address,function,file,kind,target
 0x46e3c0,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,function,
 0x46e450,UnitSync::DisallowUnit,src/network/unit_sync.cpp,call,UnitSync::Find
 0x46e450,UnitSync::DisallowUnit,src/network/unit_sync.cpp,call,UnitSync::NotifyEntryChanged
-0x46e450,UnitSync::DisallowUnit,src/network/unit_sync.cpp,field_read,UnitSyncDef::key
+0x46e450,UnitSync::DisallowUnit,src/network/unit_sync.cpp,field_read,UnitDef::fbiChecksum
 0x46e450,UnitSync::DisallowUnit,src/network/unit_sync.cpp,field_read,UnitSyncEntry::enabled
 0x46e450,UnitSync::DisallowUnit,src/network/unit_sync.cpp,field_read,UnitSyncEntry::peerEnabled
 0x46e450,UnitSync::DisallowUnit,src/network/unit_sync.cpp,field_read,UnitSyncIter::ptr
@@ -22590,7 +22590,7 @@ address,function,file,kind,target
 0x46e450,UnitSync::DisallowUnit,src/network/unit_sync.cpp,function,
 0x46e4d0,UnitSync::AllowUnit,src/network/unit_sync.cpp,call,UnitSync::Find
 0x46e4d0,UnitSync::AllowUnit,src/network/unit_sync.cpp,call,UnitSync::NotifyEntryChanged
-0x46e4d0,UnitSync::AllowUnit,src/network/unit_sync.cpp,field_read,UnitSyncDef::key
+0x46e4d0,UnitSync::AllowUnit,src/network/unit_sync.cpp,field_read,UnitDef::fbiChecksum
 0x46e4d0,UnitSync::AllowUnit,src/network/unit_sync.cpp,field_read,UnitSyncEntry::enabled
 0x46e4d0,UnitSync::AllowUnit,src/network/unit_sync.cpp,field_read,UnitSyncEntry::peerEnabled
 0x46e4d0,UnitSync::AllowUnit,src/network/unit_sync.cpp,field_read,UnitSyncIter::ptr
@@ -22600,7 +22600,7 @@ address,function,file,kind,target
 0x46e550,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,call,UnitSync::Find
 0x46e550,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,call,UnitSync::NotifyEntryChanged
 0x46e550,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,call,operator==
-0x46e550,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,field_read,UnitSyncDef::key
+0x46e550,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,field_read,UnitDef::fbiChecksum
 0x46e550,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,field_read,UnitSyncIter::ptr
 0x46e550,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,field_write,UnitSyncEntry::limit
 0x46e550,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,function,
@@ -26853,7 +26853,8 @@ address,function,file,kind,target
 0x485a40,InitUnitFromType,src/units/units.cpp,call,get
 0x485a40,InitUnitFromType,src/units/units.cpp,call,operator->
 0x485a40,InitUnitFromType,src/units/units.cpp,call,operator=
-0x485a40,InitUnitFromType,src/units/units.cpp,deref_escape,*UnitType
+0x485a40,InitUnitFromType,src/units/units.cpp,deref_escape,*UnitDef
+0x485a40,InitUnitFromType,src/units/units.cpp,field_escape,UnitDef::flags1
 0x485a40,InitUnitFromType,src/units/units.cpp,field_maybe_written,Unit::resourceSlot
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,<anon>::b7
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,<anon>::b9
@@ -26878,11 +26879,11 @@ address,function,file,kind,target
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Unit::player
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Unit::playerIndex
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Unit::unitDefIndex
-0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitType::buildMenuPageCount
-0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitType::buildangle
-0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitType::hp
-0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitType::mobile
-0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitType::offset
+0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitDef::buildMenuPageCount
+0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitDef::buildangleUnsigned
+0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitDef::hp
+0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitDef::mobile
+0x485a40,InitUnitFromType,src/units/units.cpp,field_read,UnitDef::origin
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Vec3::x
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Vec3::z
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,WeaponsSeam::ReleaseWeapons
@@ -26952,6 +26953,7 @@ address,function,file,kind,target
 0x485d40,InitUnitScript,src/units/units.cpp,call,UnitScript::SetObjectState
 0x485d40,InitUnitScript,src/units/units.cpp,call,get
 0x485d40,InitUnitScript,src/units/units.cpp,call,operator new
+0x485d40,InitUnitScript,src/units/units.cpp,call,operator->
 0x485d40,InitUnitScript,src/units/units.cpp,call,operator=
 0x485d40,InitUnitScript,src/units/units.cpp,deref_read,*Object3do
 0x485d40,InitUnitScript,src/units/units.cpp,field_read,Game::types
@@ -26959,7 +26961,7 @@ address,function,file,kind,target
 0x485d40,InitUnitScript,src/units/units.cpp,field_read,Unit::script
 0x485d40,InitUnitScript,src/units/units.cpp,field_read,Unit::state
 0x485d40,InitUnitScript,src/units/units.cpp,field_read,Unit::unitDefIndex
-0x485d40,InitUnitScript,src/units/units.cpp,field_read,UnitType::data
+0x485d40,InitUnitScript,src/units/units.cpp,field_read,UnitDef::data
 0x485d40,InitUnitScript,src/units/units.cpp,field_write,ObjectState_00485d40::drawFrame
 0x485d40,InitUnitScript,src/units/units.cpp,field_write,ObjectState_00485d40::unit
 0x485d40,InitUnitScript,src/units/units.cpp,field_write,Unit::script
@@ -26969,11 +26971,11 @@ address,function,file,kind,target
 0x485d40,InitUnitScript,src/units/units.cpp,global_read,kSim
 0x485e30,emit_00485e30,src/units/units.cpp,call,operator new
 0x485e30,emit_00485e30,src/units/units.cpp,function,
-0x485e50,CreateUnitMotion,src/units/units.cpp,call,get
 0x485e50,CreateUnitMotion,src/units/units.cpp,call,operator new
+0x485e50,CreateUnitMotion,src/units/units.cpp,call,operator->
 0x485e50,CreateUnitMotion,src/units/units.cpp,call,operator=
 0x485e50,CreateUnitMotion,src/units/units.cpp,field_read,Unit::def
-0x485e50,CreateUnitMotion,src/units/units.cpp,field_read,UnitType::buildangle
+0x485e50,CreateUnitMotion,src/units/units.cpp,field_read,UnitDef::buildangleUnsigned
 0x485e50,CreateUnitMotion,src/units/units.cpp,field_write,Angles16::heading
 0x485e50,CreateUnitMotion,src/units/units.cpp,field_write,Unit::motion
 0x485e50,CreateUnitMotion,src/units/units.cpp,function,
@@ -26982,15 +26984,16 @@ address,function,file,kind,target
 0x485e90,InitUnit,src/units/units.cpp,call,InitUnitScript
 0x485e90,InitUnit,src/units/units.cpp,call,get
 0x485e90,InitUnit,src/units/units.cpp,call,operator new
+0x485e90,InitUnit,src/units/units.cpp,call,operator->
 0x485e90,InitUnit,src/units/units.cpp,call,operator=
-0x485e90,InitUnit,src/units/units.cpp,deref_escape,*UnitType
+0x485e90,InitUnit,src/units/units.cpp,deref_escape,*UnitDef
 0x485e90,InitUnit,src/units/units.cpp,field_read,EconomySeam::UpdateMetalExtraction
 0x485e90,InitUnit,src/units/units.cpp,field_read,Game::defs
 0x485e90,InitUnit,src/units/units.cpp,field_read,Seams::economy
 0x485e90,InitUnit,src/units/units.cpp,field_read,Seams::weapons
 0x485e90,InitUnit,src/units/units.cpp,field_read,Unit::def
-0x485e90,InitUnit,src/units/units.cpp,field_read,UnitType::buildangle
-0x485e90,InitUnit,src/units/units.cpp,field_read,UnitType::mobile
+0x485e90,InitUnit,src/units/units.cpp,field_read,UnitDef::buildangleUnsigned
+0x485e90,InitUnit,src/units/units.cpp,field_read,UnitDef::mobile
 0x485e90,InitUnit,src/units/units.cpp,field_read,WeaponsSeam::InitUnitWeaponSlots
 0x485e90,InitUnit,src/units/units.cpp,field_write,Angles16::heading
 0x485e90,InitUnit,src/units/units.cpp,field_write,Unit::motion
@@ -27011,8 +27014,10 @@ address,function,file,kind,target
 0x485f50,CreateUnit,src/units/units.cpp,call,get
 0x485f50,CreateUnit,src/units/units.cpp,call,operator MissionConditions *
 0x485f50,CreateUnit,src/units/units.cpp,call,operator Unit *
+0x485f50,CreateUnit,src/units/units.cpp,call,operator->
 0x485f50,CreateUnit,src/units/units.cpp,deref_escape,*Unit
-0x485f50,CreateUnit,src/units/units.cpp,deref_escape,*UnitType
+0x485f50,CreateUnit,src/units/units.cpp,deref_escape,*UnitDef
+0x485f50,CreateUnit,src/units/units.cpp,field_escape,UnitDef::flags1
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Game::defs
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Game::list_391ed
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Game::units
@@ -27026,13 +27031,13 @@ address,function,file,kind,target
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::los_radar
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::map
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::players
-0x485f50,CreateUnit,src/units/units.cpp,field_read,TypeFlags::all
 0x485f50,CreateUnit,src/units/units.cpp,field_read,TypeFlags::bit18
 0x485f50,CreateUnit,src/units/units.cpp,field_read,TypeFlags::bit24
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Unit::def
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Unit::unitDefIndex
-0x485f50,CreateUnit,src/units/units.cpp,field_read,UnitType::limit
-0x485f50,CreateUnit,src/units/units.cpp,field_read,UnitType::mobile
+0x485f50,CreateUnit,src/units/units.cpp,field_read,UnitDef::flags1
+0x485f50,CreateUnit,src/units/units.cpp,field_read,UnitDef::maxThisUnit
+0x485f50,CreateUnit,src/units/units.cpp,field_read,UnitDef::mobile
 0x485f50,CreateUnit,src/units/units.cpp,field_write,Player::unitCount
 0x485f50,CreateUnit,src/units/units.cpp,field_write,Player::unitsCreated
 0x485f50,CreateUnit,src/units/units.cpp,field_write,Unit::killPending
@@ -27073,7 +27078,7 @@ address,function,file,kind,target
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,EmitSmoke
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,GetGroundHeight
-0x486360,CreateUnitCorpse,src/units/units.cpp,call,get
+0x486360,CreateUnitCorpse,src/units/units.cpp,call,operator->
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_escape,Unit::angles
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_escape,Unit::pos
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,Entry_486360::next
@@ -27085,10 +27090,10 @@ address,function,file,kind,target
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,Point16::y
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,Seams::features
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,Seams::los_radar
-0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,TypeFlags::all
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,Unit::def
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,Unit::playerIndex
-0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,UnitType::corpse
+0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,UnitDef::corpseUnsigned
+0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,UnitDef::flags1
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_write,Result_486360::velY
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_write,Result_486360::velZ
 0x486360,CreateUnitCorpse,src/units/units.cpp,function,
@@ -27097,10 +27102,9 @@ address,function,file,kind,target
 0x486360,CreateUnitCorpse,src/units/units.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
 0x486360,CreateUnitCorpse,src/units/units.cpp,indirect_call,"indirect via Spot *(*)(Cell *, unsigned short, Vec3 *, Rot16 *, unsigned char) __attribute__((stdcall)) [FeaturesSeam::PlaceFeature]"
 0x486460,IsUnitCommander,src/units/units.cpp,call,_strcmpi
-0x486460,IsUnitCommander,src/units/units.cpp,call,get
 0x486460,IsUnitCommander,src/units/units.cpp,call,operator->
 0x486460,IsUnitCommander,src/units/units.cpp,field_escape,Name_004864b0::name
-0x486460,IsUnitCommander,src/units/units.cpp,field_escape,UnitType::name
+0x486460,IsUnitCommander,src/units/units.cpp,field_escape,UnitDef::unitname
 0x486460,IsUnitCommander,src/units/units.cpp,field_read,Player::info
 0x486460,IsUnitCommander,src/units/units.cpp,field_read,PlayerInfo::side
 0x486460,IsUnitCommander,src/units/units.cpp,field_read,Unit::def
@@ -27117,7 +27121,7 @@ address,function,file,kind,target
 0x4864b0,KillUnit,src/units/units.cpp,call,operator->
 0x4864b0,KillUnit,src/units/units.cpp,call,operator==
 0x4864b0,KillUnit,src/units/units.cpp,field_escape,Name_004864b0::name
-0x4864b0,KillUnit,src/units/units.cpp,field_escape,UnitType::name
+0x4864b0,KillUnit,src/units/units.cpp,field_escape,UnitDef::unitname
 0x4864b0,KillUnit,src/units/units.cpp,field_read,Game::commanderDeath
 0x4864b0,KillUnit,src/units/units.cpp,field_read,Player::active
 0x4864b0,KillUnit,src/units/units.cpp,field_read,Player::flags
@@ -27138,7 +27142,7 @@ address,function,file,kind,target
 0x4864b0,KillUnit,src/units/units.cpp,field_read,Unit::playerIndex
 0x4864b0,KillUnit,src/units/units.cpp,field_read,Unit::prevHealthPercent
 0x4864b0,KillUnit,src/units/units.cpp,field_read,Unit::script
-0x4864b0,KillUnit,src/units/units.cpp,field_read,UnitType::maxHealth
+0x4864b0,KillUnit,src/units/units.cpp,field_read,UnitDef::maxHealth
 0x4864b0,KillUnit,src/units/units.cpp,field_write,Player::flags
 0x4864b0,KillUnit,src/units/units.cpp,field_write,UnitKilledPacket::attackerPlayerNetId
 0x4864b0,KillUnit,src/units/units.cpp,field_write,UnitKilledPacket::attackerUnitId
@@ -27184,7 +27188,7 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Name_004864b0::name
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Unit::attacker
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Unit::pos
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,UnitType::name
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,UnitDef::unitname
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_maybe_written,Player::name
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,<anon>::b7
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,AiSeam::SetUnitSquad
@@ -27238,6 +27242,9 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::playerIndex
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::script
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::state
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitDef::metalCost
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitDef::modelMaxYHigh
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitDef::range
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitKilledPacket::attackerPlayerNetId
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitKilledPacket::attackerUnitId
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitKilledPacket::cobKilledSeverity
@@ -27246,9 +27253,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitKilledPacket::wreckageLevel
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitResources::metalMake
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitResources::player
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitType::x170
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitType::x18a
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitType::x202
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,WeaponsSeam::DamageUnit
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,WeaponsSeam::DetonateUnitWeapon
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,WeaponsSeam::RemoveUnitProjectiles
@@ -27856,20 +27860,20 @@ address,function,file,kind,target
 0x489280,MakePropList,src/units/unit_targets.cpp,call,spd
 0x489280,MakePropList,src/units/unit_targets.cpp,call,sprintf
 0x489280,MakePropList,src/units/unit_targets.cpp,call,strlen
-0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitType::energyCost
-0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitType::field_19e
-0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitType::field_1ba
-0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitType::field_1ea
-0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitType::metalCost
-0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitType::mobile
-0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitType::sight
+0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitDef::acceleration
+0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitDef::buildtime
+0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitDef::energyCost
+0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitDef::maxvelocity
+0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitDef::metalCost
+0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitDef::mobile
+0x489280,MakePropList,src/units/unit_targets.cpp,field_read,UnitDef::turnrateUnsigned
 0x489280,MakePropList,src/units/unit_targets.cpp,function,
-0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,call,get
 0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,call,operator short *
+0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,call,operator->
 0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,deref_read,*short
 0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,field_read,Unit::def
-0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,field_read,UnitType::count
-0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,field_read,UnitType::ids
+0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,field_read,UnitDef::count
+0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,field_read,UnitDef::idsSigned
 0x4894f0,UnitCanBuild,src/units/unit_targets.cpp,function,
 0x489540,UnitRef::LinkToUnit,src/units/unit_targets.cpp,call,get
 0x489540,UnitRef::LinkToUnit,src/units/unit_targets.cpp,call,operator=
@@ -28045,7 +28049,6 @@ address,function,file,kind,target
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,call,ApplyUnitDamage
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,call,BroadcastPacket
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,call,GetLocalDpid
-0x489bb0,DamageUnit,src/units/unit_targets.cpp,call,get
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,call,operator->
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_read,Player::active
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_read,Player::id
@@ -28055,7 +28058,7 @@ address,function,file,kind,target
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_read,Unit::id
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_read,Unit::killCount
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_read,Unit::player
-0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_read,UnitType::f1aa
+0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_read,UnitDef::damagemodifier
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_write,UnitDamagePacketOut::amount
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_write,UnitDamagePacketOut::attackerId
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_write,UnitDamagePacketOut::damageKind
@@ -28098,8 +28101,8 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,UnitDamagePacket::damageKind
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,UnitDamagePacket::headingByte
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,UnitDamagePacket::victimId
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,UnitType::f241
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,UnitType::maxhp
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,UnitDef::flags1
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,UnitDef::maxHealth
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,UnitsSeam::MarkRecentlyDamaged
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,UnitsSeam::StartScriptWithArgs
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_write,Order::ticks
@@ -28119,10 +28122,10 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [UnitsSeam::MarkRecentlyDamaged]
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Order *) __attribute__((stdcall)) [OrdersSeam::AppendOrder]"
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [AiSeam::ReactToAttack]"
-0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,get
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator Order *
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator Player *
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator new
+0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator->
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator==
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Order::kind
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Order::ticks
@@ -28134,7 +28137,7 @@ address,function,file,kind,target
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Unit::flags
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Unit::list
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Unit::player
-0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,UnitType::f241
+0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,UnitDef::flags1
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_write,Order::ticks
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,function,
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,global_read,g_seams
@@ -28228,6 +28231,7 @@ address,function,file,kind,target
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,ScaledCos
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,abs
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,get
+0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,operator->
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,deref_read,*MapInfo_0048a490
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,deref_read,*unsigned char
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,deref_read,*unsigned short
@@ -28255,8 +28259,8 @@ address,function,file,kind,target
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_read,Unit::hoverBobPhase
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_read,Unit::motion
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_read,Unit::unitDefIndex
-0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_read,UnitType::f241
-0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_read,UnitType::sight
+0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_read,UnitDef::flags1
+0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_read,UnitDef::maxvelocity
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_read,Vec3::x
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_read,Vec3::z
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,field_write,Angles16::bank
@@ -28271,18 +28275,20 @@ address,function,file,kind,target
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,global_read,g_game
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,global_read,g_quirks
 0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,call,GetGroundHeight
-0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,call,get
+0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,call,operator->
+0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,field_escape,UnitDef::flags1
 0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,field_maybe_written,Unit::pos
 0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,field_read,<anon>::floats
 0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,field_read,Game::seaLevel
 0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,field_read,Unit::def
-0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,field_read,UnitType::draft
+0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,field_read,UnitDef::draft
 0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,field_write,Vec3::y
 0x48a7f0,SnapUnitToGround,src/units/unit_position.cpp,function,
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,call,AlignUnitToGround
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,call,GetGroundHeight
-0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,call,get
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,call,operator bool
+0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,call,operator->
+0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_escape,UnitDef::flags1
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_maybe_written,Unit::pos
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_read,<anon>::floats
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_read,<anon>::on_water
@@ -28292,7 +28298,7 @@ address,function,file,kind,target
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_read,Unit::def
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_read,Unit::flags
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_read,Unit::motion
-0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_read,UnitType::draft
+0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_read,UnitDef::draft
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_write,Fixed::value
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_write,Unit::flags
 0x48a870,UpdateUnitHeight,src/units/unit_position.cpp,field_write,Vec3::y
@@ -28349,6 +28355,7 @@ address,function,file,kind,target
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,deref_write,*Ref<Unit>
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_escape,Unit::cargo
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_escape,Unit::cargoNext
+0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_escape,UnitDef::flags1
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,<anon>::low
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Game::units
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,MapSeam::SpatialBucketPrependUnit
@@ -28404,6 +28411,7 @@ address,function,file,kind,target
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_escape,Game::autoFollowTicks
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_escape,Game::f14353
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_escape,Game::players
+0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_escape,UnitDef::flags1
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,<anon>::b1
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,<anon>::floats
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,Game::autoFollowTicks
@@ -28440,8 +28448,8 @@ address,function,file,kind,target
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,Unit::selected
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,Unit::unitDefIndex
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,Unit::yWhole
-0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,UnitType::f1fa
-0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,UnitType::f200
+0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,UnitDef::healtimeUnsigned
+0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,UnitDef::maxHealth
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,WeaponsSeam::DamageUnit
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_read,WeaponsSeam::UpdateUnitWeapons
 0x48ad30,UpdateAllUnits,src/units/unit_position.cpp,field_write,Unit::healthPercent
@@ -29239,7 +29247,7 @@ address,function,file,kind,target
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,deref_read,*PlayerName
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,field_escape,Game::sideDefs
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,field_escape,PlayerName::commander
-0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,field_escape,UnitType::name
+0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,field_read,Link_0048ea40::owner
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,field_read,Owner_0048ea40::side
@@ -29355,8 +29363,8 @@ address,function,file,kind,target
 0x48ee70,VictoryBuildUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_satisfiedKey
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,PlaySoundByName
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,_strcmpi
-0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,get
-0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,field_escape,UnitType::name
+0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,operator->
+0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,field_escape,VictoryCaptureUnitType::name
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,field_read,Unit::def
@@ -29382,9 +29390,9 @@ address,function,file,kind,target
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,UnitList::ForEach
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,_strcmpi
-0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,get
+0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,operator->
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,deref_read,*UnitList
-0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,field_escape,UnitType::name
+0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,field_escape,VictoryKillAllOfType::name
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,field_read,MissionCondition::satisfied
@@ -29413,8 +29421,8 @@ address,function,file,kind,target
 0x48f0b0,VictoryKillAllOfType::LoadState,src/game/victory.cpp,function,
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,_strcmpi
-0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,get
-0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,field_escape,UnitType::name
+0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,operator->
+0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,field_escape,VictoryKillUnitType::name
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,field_read,Unit::def
@@ -29460,10 +29468,9 @@ address,function,file,kind,target
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,indirect_call,"indirect via void (*)(int, int, Vec3 *) __attribute__((stdcall)) [LosRadarSeam::ClampWorldPosToTerrain]"
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,_strcmpi
-0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,get
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,operator->
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,operator==
-0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,field_escape,UnitType::name
+0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,field_escape,VictoryMoveUnitToRadius::name
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,field_read,Unit::buildLeft
@@ -29489,8 +29496,8 @@ address,function,file,kind,target
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,_strcmpi
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,abs
-0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,get
-0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,field_escape,UnitType::name
+0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,operator->
+0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,field_escape,VictoryUnitTypePassesX::name
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,field_read,MissionCondition::satisfied
@@ -29519,8 +29526,8 @@ address,function,file,kind,target
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,_strcmpi
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,abs
-0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,get
-0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,field_escape,UnitType::name
+0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,operator->
+0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,field_escape,VictoryUnitTypePassesZ::name
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,field_read,MissionCondition::satisfied
@@ -29566,7 +29573,7 @@ address,function,file,kind,target
 0x48f6b0,DefeatCommanderKilled::OnUnitDied,src/game/victory.cpp,deref_read,*PlayerName
 0x48f6b0,DefeatCommanderKilled::OnUnitDied,src/game/victory.cpp,field_escape,Game::sideDefs
 0x48f6b0,DefeatCommanderKilled::OnUnitDied,src/game/victory.cpp,field_escape,PlayerName::commander
-0x48f6b0,DefeatCommanderKilled::OnUnitDied,src/game/victory.cpp,field_escape,UnitType::name
+0x48f6b0,DefeatCommanderKilled::OnUnitDied,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48f6b0,DefeatCommanderKilled::OnUnitDied,src/game/victory.cpp,field_read,Link_0048ea40::owner
 0x48f6b0,DefeatCommanderKilled::OnUnitDied,src/game/victory.cpp,field_read,Owner_0048ea40::side
 0x48f6b0,DefeatCommanderKilled::OnUnitDied,src/game/victory.cpp,field_read,Unit::def
@@ -29614,9 +29621,9 @@ address,function,file,kind,target
 0x48f880,DefeatAllUnitsKilled::LoadState,src/game/victory.cpp,field_write,MissionCondition::satisfied
 0x48f880,DefeatAllUnitsKilled::LoadState,src/game/victory.cpp,function,
 0x48f8c0,DefeatUnitTypeKilled::OnUnitDied,src/game/victory.cpp,call,_strcmpi
-0x48f8c0,DefeatUnitTypeKilled::OnUnitDied,src/game/victory.cpp,call,get
+0x48f8c0,DefeatUnitTypeKilled::OnUnitDied,src/game/victory.cpp,call,operator->
 0x48f8c0,DefeatUnitTypeKilled::OnUnitDied,src/game/victory.cpp,field_escape,DefeatUnitTypeKilled::name
-0x48f8c0,DefeatUnitTypeKilled::OnUnitDied,src/game/victory.cpp,field_escape,UnitType::name
+0x48f8c0,DefeatUnitTypeKilled::OnUnitDied,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48f8c0,DefeatUnitTypeKilled::OnUnitDied,src/game/victory.cpp,field_read,DefeatUnitTypeKilled::numLeftToKill
 0x48f8c0,DefeatUnitTypeKilled::OnUnitDied,src/game/victory.cpp,field_read,Unit::def
 0x48f8c0,DefeatUnitTypeKilled::OnUnitDied,src/game/victory.cpp,field_write,DefeatUnitTypeKilled::numLeftToKill
@@ -29641,10 +29648,10 @@ address,function,file,kind,target
 0x48f9a0,DefeatAllUnitsKilledOfType::VisitUnit,src/game/victory.cpp,function,
 0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,call,UnitList::ForEach
 0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,call,_strcmpi
-0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,call,get
+0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,call,operator->
 0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,deref_read,*UnitList
 0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,field_escape,DefeatAllUnitsKilledOfType::name
-0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,field_escape,UnitType::name
+0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,field_escape,UnitDef::unitname
 0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,field_read,DefeatAllUnitsKilledOfType::count
 0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,field_read,Seams::units
 0x48f9d0,DefeatAllUnitsKilledOfType::OnUnitDied,src/game/victory.cpp,field_read,Unit::def
@@ -46237,15 +46244,16 @@ address,function,file,kind,target
 ,InitUnit_00485e90,src/units/units.cpp,call,InitUnitScript
 ,InitUnit_00485e90,src/units/units.cpp,call,get
 ,InitUnit_00485e90,src/units/units.cpp,call,operator new
+,InitUnit_00485e90,src/units/units.cpp,call,operator->
 ,InitUnit_00485e90,src/units/units.cpp,call,operator=
-,InitUnit_00485e90,src/units/units.cpp,deref_escape,*UnitType
+,InitUnit_00485e90,src/units/units.cpp,deref_escape,*UnitDef
 ,InitUnit_00485e90,src/units/units.cpp,field_read,EconomySeam::UpdateMetalExtraction
 ,InitUnit_00485e90,src/units/units.cpp,field_read,Game::defs
 ,InitUnit_00485e90,src/units/units.cpp,field_read,Seams::economy
 ,InitUnit_00485e90,src/units/units.cpp,field_read,Seams::weapons
 ,InitUnit_00485e90,src/units/units.cpp,field_read,Unit::def
-,InitUnit_00485e90,src/units/units.cpp,field_read,UnitType::buildangle
-,InitUnit_00485e90,src/units/units.cpp,field_read,UnitType::mobile
+,InitUnit_00485e90,src/units/units.cpp,field_read,UnitDef::buildangleUnsigned
+,InitUnit_00485e90,src/units/units.cpp,field_read,UnitDef::mobile
 ,InitUnit_00485e90,src/units/units.cpp,field_read,WeaponsSeam::InitUnitWeaponSlots
 ,InitUnit_00485e90,src/units/units.cpp,field_write,Angles16::heading
 ,InitUnit_00485e90,src/units/units.cpp,field_write,Unit::motion
@@ -49297,7 +49305,7 @@ address,function,file,kind,target
 ,ResolveUnitTypeKey,src/orders/order_queue.cpp,field_read,Game::defs
 ,ResolveUnitTypeKey,src/orders/order_queue.cpp,field_read,Game::unitDefCount
 ,ResolveUnitTypeKey,src/orders/order_queue.cpp,field_read,Seams::units
-,ResolveUnitTypeKey,src/orders/order_queue.cpp,field_read,UnitType::flags
+,ResolveUnitTypeKey,src/orders/order_queue.cpp,field_read,UnitDef::flags1Byte
 ,ResolveUnitTypeKey,src/orders/order_queue.cpp,field_read,UnitsSeam::FindUnitTypeId
 ,ResolveUnitTypeKey,src/orders/order_queue.cpp,function,
 ,ResolveUnitTypeKey,src/orders/order_queue.cpp,global_read,g_game

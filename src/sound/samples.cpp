@@ -18,12 +18,7 @@ extern int g_cdNextTrackTimer;
 #include "../graphics/display.h"
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
 
-struct App_004b6220 {
-    char unknown_0[0x40];
-    HWND hwnd;
-};
-
-extern App_004b6220* GetDisplay();
+extern Display* GetDisplay();
 
 struct FileHandle;
 
@@ -93,20 +88,20 @@ extern Sound* g_cdPlayer;
 extern HANDLE g_squashThreadLockEvent;
 extern int g_squashThreadLockTicket;
 
-struct Entry_004d0a10 {
+struct LzssTreeEntry {
     short a;
     short b;
     short c;
 };
 
-struct Struct_00526ff0 {
-    Entry_004d0a10 entries[0x1000];
+struct LzssDictTree {
+    LzssTreeEntry entries[0x1000];
     short field_6000;
     short field_6002;
     short field_6004;
 };
 
-extern Struct_00526ff0* g_squashDictTree;
+extern LzssDictTree* g_squashDictTree;
 
 extern void* g_squashWindow;
 
@@ -352,7 +347,7 @@ void Sound::PlayLooping(void** set, LONG volume)
 }
 
 // FUNCTION: 0x4cf570
-int Sound::PlaySampleSet(void** set, LONG volume, Pos_004cf570* pos)
+int Sound::PlaySampleSet(void** set, LONG volume, Vec3* pos)
 {
     void* unit = 0;
     int slot = 0;
@@ -423,7 +418,7 @@ int Sound::PlaySampleSet(void** set, LONG volume, Pos_004cf570* pos)
 }
 
 // FUNCTION: 0x4cf800
-int Sound::PlayMemorySample(void* src, unsigned long bytes, int sampleRate, int bits, int channels, LONG volume, Pos_004cf570* pos)
+int Sound::PlayMemorySample(void* src, unsigned long bytes, int sampleRate, int bits, int channels, LONG volume, Vec3* pos)
 {
     ReapFinishedBuffers();
     for (int i = 0; i < 8; i++) {
@@ -443,7 +438,7 @@ int Sound::PlayMemorySample(void* src, unsigned long bytes, int sampleRate, int 
 }
 
 // FUNCTION: 0x4cf8a0
-int Sound::PlayFileSample(FileHandle* file, unsigned long bytes, int sampleRate, int bits, int channels, LONG volume, Pos_004cf570* pos)
+int Sound::PlayFileSample(FileHandle* file, unsigned long bytes, int sampleRate, int bits, int channels, LONG volume, Vec3* pos)
 {
     ReapFinishedBuffers();
     for (int i = 0; i < 8; i++) {
@@ -857,7 +852,7 @@ int Sound::OpenSample(char* path, int mode, int p3, int p4) {
             result = (int)this->CreateSampleFromFile(file, size, 0x2b11, 8, 1);
             break;
         case 1:
-            result = this->PlayFileSample(file, size, 0x2b11, 8, 1, p3, (Pos_004cf570*)p4);
+            result = this->PlayFileSample(file, size, 0x2b11, 8, 1, p3, (Vec3*)p4);
             break;
         case 2:
             this->StartStream(file, 0x2b11, 8, 1, p3);
@@ -876,7 +871,7 @@ int Sound::OpenSample(char* path, int mode, int p3, int p4) {
             result = (int)this->CreateSampleFromFile(file, size - 0x28, x, 8, 1);
             break;
         case 1:
-            result = this->PlayFileSample(file, size - 0x28, x, 8, 1, p3, (Pos_004cf570*)p4);
+            result = this->PlayFileSample(file, size - 0x28, x, 8, 1, p3, (Vec3*)p4);
             break;
         case 2:
             this->StartStream(file, x, 8, 1, p3);
@@ -900,7 +895,7 @@ int Sound::OpenSample(char* path, int mode, int p3, int p4) {
             result = (int)CreateSampleFromFile(file, len, wfx.nSamplesPerSec, bits, chans);
             break;
         case 1:
-            result = PlayFileSample(file, len, wfx.nSamplesPerSec, bits, chans, p3, (Pos_004cf570*)p4);
+            result = PlayFileSample(file, len, wfx.nSamplesPerSec, bits, chans, p3, (Vec3*)p4);
             break;
         case 2:
             StartStream(file, wfx.nSamplesPerSec, bits, chans, p3);
@@ -1081,6 +1076,6 @@ int __cdecl LzssAllocWindow(void)
 int LzssAllocTree()
 {
     void* p = calloc(0x1001, 6);
-    g_squashDictTree = (Struct_00526ff0*)p;
+    g_squashDictTree = (LzssDictTree*)p;
     return p ? 0 : -1;
 }

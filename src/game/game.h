@@ -76,7 +76,7 @@ class Class_004cdb40;
 struct ConnectionBlob;
 struct MainFrameDisplayContext;
 struct GameDescEntry;
-struct Entry_0042f740;
+struct SoundCategoryEntry;
 struct Entry_00479620;
 struct Eye_00482130;
 struct Feature;
@@ -783,7 +783,7 @@ struct Game {
         char soundNames_33e13[256][32];
         char soundNames_33e13_4000[512][32];
     };
-    Entry_0042f740* entries_37e13;
+    SoundCategoryEntry* entries_37e13;
     int entry_count;
     void* screen;
     int width_37e1f;
@@ -921,7 +921,7 @@ struct Game {
             unsigned char cdMode;
             unsigned char unitChat;
             unsigned char unitChatText;
-            Flags_0045c570 soundFlags;
+            SoundSettingFlags soundFlags;
             int width_37f1b;
             int height_37f1f;
             int textScroll;

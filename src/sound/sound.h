@@ -5,9 +5,7 @@ struct Unit;
 struct Unit;
 
 struct FileHandle;
-struct Pos_004cf570 {
-    int x, y, z;
-};
+#include "../util/vec3.h"
 struct HWND__;
 
 class Sound {
@@ -99,9 +97,9 @@ public:
     void** CreateSampleFromFile(FileHandle* file, unsigned long bytes, int sampleRate, int bits, int channels);
     void ReleaseSampleSet(void** set);
     void PlayLooping(void** set, long volume);
-    int PlaySampleSet(void** set, long volume, Pos_004cf570* pos);
-    int PlayMemorySample(void* src, unsigned long bytes, int sampleRate, int bits, int channels, long volume, Pos_004cf570* pos);
-    int PlayFileSample(FileHandle* file, unsigned long bytes, int sampleRate, int bits, int channels, long volume, Pos_004cf570* pos);
+    int PlaySampleSet(void** set, long volume, Vec3* pos);
+    int PlayMemorySample(void* src, unsigned long bytes, int sampleRate, int bits, int channels, long volume, Vec3* pos);
+    int PlayFileSample(FileHandle* file, unsigned long bytes, int sampleRate, int bits, int channels, long volume, Vec3* pos);
     void StartStream(FileHandle* file, int sampleRate, int bits, int channels, long volume);
     void StopStream();
     int IsStreamActive(void);

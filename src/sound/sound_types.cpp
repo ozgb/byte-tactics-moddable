@@ -3,25 +3,25 @@
 
 #include "../util/tdf.h"
 
-struct Source_0042f450 {
+struct TdfFileCursorView {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
-struct SoundInfo_005086fc {
+struct SpeechCategoryInfo {
     char* name;
     int unknown_4[5];
 };
 
-struct Slot_0042f740 {
+struct SoundCategorySlot {
     int count;
     int* a;
     int* b;
 };
 
-struct Entry_0042f740 {
+struct SoundCategoryEntry {
     char unknown_0[0x40];
-    Slot_0042f740 slots[0x18];
+    SoundCategorySlot slots[0x18];
 };
 
 
@@ -31,18 +31,18 @@ struct Entry_0042f740 {
 #pragma pack(pop)
 
 #include "../../link/globals.h"
-extern SoundInfo_005086fc g_speechCategories[];
+extern SpeechCategoryInfo g_speechCategories[];
 
 int __cdecl GameReallocTagged(int block, char* name, int size);
 #include "../graphics/object_pool.h"
 #include "../debug/debug_lib.h"
 #include "../game/data_files.h"
-int __stdcall ReadSoundEntry(Source_0042f450* source, char* key, int* out);
+int __stdcall ReadSoundEntry(TdfFileCursorView* source, char* key, int* out);
 #include "sound_types.h"
 #include "sound.h"
 
 // FUNCTION: 0x42f450
-int __stdcall ReadSoundEntry(Source_0042f450* source, char* key, int* out)
+int __stdcall ReadSoundEntry(TdfFileCursorView* source, char* key, int* out)
 {
     char text[0x40];
     char value[0x40];
@@ -70,13 +70,13 @@ void LoadSoundCategories()
     TdfFile obj;
     char name[32];
     char path[256];
-    SoundInfo_005086fc* p;
+    SpeechCategoryInfo* p;
 
     BuildDataPath(path, "gamedata", "sound", "TDF");
     if (obj.LoadFile(path)) {
         g_game->entry_count = obj.root->GetSubRecordCount();
         int size = g_game->entry_count * 0x160;
-        g_game->entries_37e13 = (Entry_0042f740*)GameAllocIgnoreTag("Sound Categories", size);
+        g_game->entries_37e13 = (SoundCategoryEntry*)GameAllocIgnoreTag("Sound Categories", size);
         memset(g_game->entries_37e13, 0, size);
         for (int i = 0; i < g_game->entry_count; i++) {
             char* rec = (char*)g_game->entries_37e13 + i * 0x160;
@@ -86,10 +86,10 @@ void LoadSoundCategories()
                 p = g_speechCategories;
                 int* vals = (int*)(rec + 0x4c);
                 while ((int)p < (int)(g_speechCategories + 23)) {
-                    ReadSoundEntry((Source_0042f450*)&obj, p->name, vals);
+                    ReadSoundEntry((TdfFileCursorView*)&obj, p->name, vals);
                     for (int n = 1; ; n++) {
                         sprintf(name, "%s%i", p->name, n);
-                        if (!ReadSoundEntry((Source_0042f450*)&obj, name, vals))
+                        if (!ReadSoundEntry((TdfFileCursorView*)&obj, name, vals))
                             break;
                     }
                     p++;
@@ -106,7 +106,7 @@ void FreeSoundCategories()
 {
     if (g_game->entry_count > 0) {
         for (int i = 0; i < g_game->entry_count; i++) {
-            Entry_0042f740* e = &g_game->entries_37e13[i];
+            SoundCategoryEntry* e = &g_game->entries_37e13[i];
             for (int j = 0; j < 0x18; j++) {
                 if (e->slots[j].count > 0) {
                     GameFreeThunk(e->slots[j].a);

@@ -652,7 +652,6 @@ class Class_004b73e0;
 class Class_004b7410;
 class Class_004b7440;
 class Class_004b7540;
-class CommandEntry;
 class Class_004b7e30;
 struct Class_004bb650;
 class Class_004bb670;
@@ -690,8 +689,6 @@ class Class_004c4800;
 class Class_004c5470;
 class Class_004c54a0;
 class Class_004c54d0;
-class TranslationTable;
-class TdfFieldVector;
 struct Class_004c5c60;
 struct Class_004c61f0;
 struct Class_004c6890;
@@ -1014,7 +1011,6 @@ struct Elem_004b75d0;
 struct Elem_004b75d0_2;
 struct Elem_004b75d0_3;
 struct Elem_004b75d0_4;
-struct ArchiveEntry;
 struct Elem_004c5740;
 struct TdfField;
 struct Elem_004cb4c0;
@@ -1246,7 +1242,6 @@ struct Gui_00443100;
 struct Gui_00453a50;
 struct Gun_0049c9c0;
 struct Handle;
-struct HandlerSlot_004b7900;
 class Handler_004388d0;
 struct HapiBuf;
 struct Hapi_004bd160;
@@ -1436,13 +1431,11 @@ struct Msg_00450530;
 struct Msg_00461900;
 struct Muzzle_0048a1e0;
 struct NameLess_00499cd0;
-struct NameLess_004b7620;
 struct NameLess_004b7760;
 struct NameLess_004b7900;
 struct NameLess_004c4630;
 struct NameLess_004c46c0;
 struct NameLess_004c4760;
-struct NameNe_004b7620;
 struct NameNe_004b7760;
 struct NameTable_004b0830;
 struct Name_0046c620;
@@ -1489,7 +1482,6 @@ struct Node_0043ad50;
 struct Node_0046fad0;
 struct Node_0047e570;
 struct Node_004bb2e0;
-struct Node_004d0b10;
 struct Node_004d0f60;
 struct Node_004dbd00;
 struct Node_439d20;
@@ -11869,16 +11861,6 @@ public:
     Class_004b7e30& operator=(Class_004b7e30&);
 };
 
-struct NameLess_004b7620 {
-    char unknown_0[1];
-    unsigned char operator()(char*, char*);
-};
-
-struct NameNe_004b7620 {
-    char unknown_0[1];
-    unsigned char operator()(Class_004c9390&, Class_004c9390&);
-};
-
 struct NameLess_004b7760 {
     char unknown_0[1];
     unsigned char operator()(char*, char*);
@@ -11909,11 +11891,6 @@ struct Elem_004b75d0_3 {
     ~Elem_004b75d0_3(void);
 };
 
-struct HandlerSlot_004b7900 {
-    void (__stdcall *fn)(void*);
-    int mask;
-};
-
 struct NameLess_004b7900 {
     char unknown_0[1];
     unsigned char operator()(char*, char*);
@@ -11924,14 +11901,6 @@ struct Elem_004b75d0_4 {
     int value1;
     int value2;
     ~Elem_004b75d0_4(void);
-};
-
-class CommandEntry {
-public:
-    char unknown_0[4];
-    int field1;
-    int field2;
-    void* AssignEntry(int*);
 };
 
 struct Display_004b8500 {
@@ -12275,13 +12244,6 @@ struct File_004bdd70 {
 struct Class_004be010 {
     int count;
     int base;
-};
-
-struct ArchiveEntry {
-    int a;
-    int b;
-    unsigned char flags;
-    char unknown_9[3];
 };
 
 struct File_004be070 {
@@ -12679,24 +12641,6 @@ class Class_004c5470 {
 public:
     char unknown_0[8];
     void* AssignPair(int*);
-};
-
-class TranslationTable {
-public:
-    char unknown_0;
-    std::vector<Pair_00419560> pairs;
-    TranslationTable(char);
-};
-
-class TdfFieldVector {
-public:
-    char count;
-    char unknown_1[3];
-    int field_4;
-    int field_8;
-    TdfField* end;
-    TdfField* Insert(TdfField*, TdfField&);
-    int GetPairCount(void);
 };
 
 struct Class_004c5c60 {
@@ -14181,16 +14125,6 @@ class Class_004d0910 {
 public:
     char unknown_0[1];
     int FindDataChunkSize(void*);
-};
-
-struct Node_004d0b10 {
-    unsigned short parent;
-    unsigned short smaller;
-    unsigned short larger;
-    char unknown_6[24570];
-    short field_6000;
-    short field_6002;
-    short field_6004;
 };
 
 struct Node_004d0f60 {

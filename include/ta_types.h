@@ -1015,7 +1015,7 @@ struct Elem_004c5740;
 struct TdfField;
 struct Elem_004cb4c0;
 struct Elem_004cb5f0;
-struct Elem_004dd8c0;
+struct FreedBlockRecord;
 struct StringValueElem;
 struct Elem_432cb0_2;
 struct Elem_4b0610;
@@ -1303,7 +1303,7 @@ struct Inner_004afd20;
 struct Inner_004c51b0;
 struct Inner_44b3c0;
 struct Input_004c2cc0;
-struct InsertResult_004db450;
+struct FreeBlockInsertResult;
 struct IntLess_004b3430;
 struct IntLess_004b3490;
 struct IntRec_004b4270;
@@ -1344,7 +1344,7 @@ struct Less_004dc680;
 struct Less_004dce00;
 struct Less_004dce60;
 struct Less_004dd250;
-struct Less_004dd3d0;
+struct UnsignedLess;
 struct Less_004dd430;
 struct Less_004dd7d0;
 struct Less_004ddc90;
@@ -1945,7 +1945,7 @@ struct Thing_0043f0e0;
 struct TlsBlock;
 struct TntHeader_00483610;
 struct PathAnimTrail;
-class Tree_004da8d0;
+class BlockMapInitView;
 struct Triple_004e0570;
 union UType_0042b370_flags;
 struct Unit;
@@ -13853,7 +13853,7 @@ public:
     ~CritSec_004e1ac0(void);
 };
 
-class Tree_004da8d0 {
+class BlockMapInitView {
 public:
     char allocator;
     char key_compare;
@@ -13862,8 +13862,8 @@ public:
     unsigned char _Multi;
     char unknown_9[3];
     unsigned int _Size;
-    Tree_004da8d0(char&, char&);
-    ~Tree_004da8d0(void);
+    BlockMapInitView(char&, char&);
+    ~BlockMapInitView(void);
     LiveNode*& _Root(void);
     static int& _Color(LiveNode*);
     static void* operator new(unsigned int);
@@ -13931,7 +13931,7 @@ public:
     int* FUN_004dbeb0(int*);
 };
 
-struct InsertResult_004db450 {
+struct FreeBlockInsertResult {
     FreeBlockIter first;
     int second;
 };
@@ -13964,14 +13964,14 @@ public:
     void _Rrotate(LiveNode*);
 };
 
-struct Less_004dd3d0 {
+struct UnsignedLess {
     char unknown_0[1];
     unsigned char operator()(unsigned int&, unsigned int&);
 };
 
 class Class_004dd3d0 {
 public:
-    Less_004dd3d0 compare;
+    UnsignedLess compare;
     char unknown_1[3];
     LiveNode* head;
     Iter_0046e330 End(void);
@@ -14059,7 +14059,7 @@ public:
     int size;
     FreeBlockIter Begin(void);
     MapInsertResult FUN_004dbec0(MessageByteCounter*);
-    void FUN_004dbec0(InsertResult_004db450*, MessageByteCounter*);
+    void FUN_004dbec0(FreeBlockInsertResult*, MessageByteCounter*);
 };
 
 struct Alloc_004dc130 {
@@ -14768,7 +14768,7 @@ public:
     void FUN_004e2950(LiveNode*);
 };
 
-class Class_004e29b0 : public Tree_004da8d0 {
+class Class_004e29b0 : public BlockMapInitView {
 public:
     void FUN_004e29b0(LiveNode*);
 };

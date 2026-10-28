@@ -12,7 +12,7 @@
 // FUNCTION: 0x4db1c0
 unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
 {
-    Pair_004db000 k;
+    FreeBlockRange k;
     if (size() > 0) {
         k.offset = g_lastAllocOffset;
         k.length = 0;
@@ -45,10 +45,10 @@ unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
                 else
                     mark = base;
                 if (mark > base)
-                    InsertOrFindInline(Pair_004db000(base, mark - base));
+                    InsertOrFindInline(FreeBlockRange(base, mark - base));
                 unsigned int end = mark + bytes;
                 if (end < base + len)
-                    InsertOrFindInline(Pair_004db000(end, base - mark + len - bytes));
+                    InsertOrFindInline(FreeBlockRange(end, base - mark + len - bytes));
                 g_lastAllocOffset = end;
                 return mark;
             }

@@ -404,7 +404,7 @@ struct Node_004ab0b0;
 struct Node_004b3370;
 struct Node_004cb4c0;
 struct Node_004cb5f0;
-struct Node_004dd1b0;
+struct LeftChainNode;
 struct Node_004e04e0;
 struct Obj;
 struct Obj1_49fd20;
@@ -1358,7 +1358,7 @@ int SaveBmp(char*, Image_004cb9e0*);
 int ExceptionFilter(int, int);
 void __cdecl GameReallocTagged(void*, int, unsigned int);
 void __cdecl GameAllocThunk(unsigned int);
-Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0*);
+LeftChainNode* __cdecl FindLeftmost(LeftChainNode*);
 void __cdecl WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 void __cdecl WalkStack(int, int, int, int, int*, int, int*);
 

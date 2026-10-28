@@ -11,6 +11,7 @@
 #include "../../interfaces/ref.h"
 #include "../util/rot16.h"
 #include "tnt_info.h"
+#include "feature_anim_pool.h"
 
 #pragma pack(push, 1)
 

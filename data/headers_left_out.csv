@@ -336,7 +336,7 @@ UpdatePlayerEconomy,mismatch,"static risk rule: a convention, parameter count, o
 UpdateTimeoutDialog,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 VectorFromTo,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 VectorFromToInt,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-VectorLength,mismatch,placeholder type Vec3i_0049a850: left for the type-naming issues
+VectorLength,mismatch,"weapons.cpp declares it with Vec3* and defines it with VectorLengthArg*, which has Vec3's layout, but joining the two changes the exe"
 WalkFrameChain,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WalkStack,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WeaponCanReachPos,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

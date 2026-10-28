@@ -16,6 +16,13 @@ struct Feature;
 struct Obj;
 struct Point16;
 
+struct FeatureDamagePacket {
+    unsigned char type;
+    unsigned char sub;
+    unsigned short x;
+    unsigned short z;
+};
+
 unsigned short __stdcall GetCellFeature(Cell* cell);
 void __stdcall StampFeatureMetal(void);
 void __stdcall FreeFeaturePool();

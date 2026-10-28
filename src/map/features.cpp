@@ -48,13 +48,6 @@ struct SmokePos {
 
 #include "../graphics/gaf_frame.h"
 
-struct FeatureDamagePacket {
-    unsigned char type;
-    unsigned char sub;
-    short x;
-    short z;
-};
-
 struct FeatureUnit {
     char unknown_0[0x92];
     int def;

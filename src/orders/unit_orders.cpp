@@ -799,12 +799,7 @@ union Fixed {
 
 
 
-struct FeatureDamagePacket {
-    unsigned char type;
-    unsigned char sub;
-    short x;
-    short z;
-};
+#include "../map/features.h"
 
 #include "../map/terrain.h"
 

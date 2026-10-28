@@ -929,13 +929,6 @@ struct PlayerIdIntPacket {
     int value;
 };
 
-struct FeatureDamagePacket {
-    unsigned char type;
-    unsigned char sub;
-    unsigned short x;
-    unsigned short z;
-};
-
 struct UnitScriptCallRecv {
     unsigned char type;
     unsigned short id;

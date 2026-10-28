@@ -283,14 +283,14 @@ class Class_0044da00;
 struct PointMarker;
 class Class_0044dcb0;
 class Class_0044dd00;
-class Class_0044de80;
+class PathOrderLoadView;
 class Class_0044df80;
 class Class_0044dfb0;
 class PathOrderView;
-class Class_0044e190;
-class Class_0044e250;
-class Class_0044e2d0;
-class Class_0044e330;
+class PathOrderUnitView;
+class PathOrderMoveToUnitView;
+class PathOrderPosView;
+class PathOrderCoordsView;
 class Class_0044e3a0;
 class Class_0044e3c0;
 class Class_0044e530;
@@ -877,7 +877,7 @@ struct Connection_004ca450;
 struct Connection_4c9a70;
 union Coord_00407ae0;
 union Coord_004239c0;
-union Coord_0044f2a0;
+union CoordHalves;
 struct Count_00458d20;
 class CritSec_004e1ac0;
 struct Ctx_004720d0;
@@ -1898,7 +1898,7 @@ struct Sub_00477360;
 struct Sub_00496b10;
 struct Sub_004e0570;
 struct Sub_2;
-struct Sub_403010;
+struct UnitDefActivateFlagView;
 struct Sub_403040;
 struct Surface;
 struct SurfaceWrapper;
@@ -2256,7 +2256,7 @@ struct Unit_00402fc0 {
 
 struct Obj_403010 {
     char unknown_0[146];
-    Sub_403010* sub;
+    UnitDefActivateFlagView* sub;
 };
 
 struct Obj_403040 {

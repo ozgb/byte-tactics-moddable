@@ -18,11 +18,11 @@ extern void __cdecl operator delete(void* p);
 void RegisterUnitOrders();
 
 
-typedef std::vector<Point16> Vec_0044d0e0;
+typedef std::vector<Point16> ApproachRadiusCellVector;
 
 #include "approach_areas.h"
 
-typedef std::vector<Point16> Vec_0044d560;
+typedef std::vector<Point16> RingApproachCellVector;
 
 unsigned short __stdcall GetHeadingBetween(void* from, void* to);
 
@@ -38,7 +38,7 @@ int __cdecl ScaledCos(short angle, int scale);
 #include "../weapons/weapon_def.h"
 #pragma pack(pop)
 
-typedef std::vector<Point16> Vec_0044da00;
+typedef std::vector<Point16> PointMarkerCellVector;
 
 #pragma pack(push, 2)
 
@@ -160,30 +160,30 @@ extern Game* g_game;
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
 
-typedef std::vector<Point16> Vec_0044ee60;
-typedef void (Vec_0044ee60::*DestroyFn_0044ee60)(Vec_0044ee60::iterator, Vec_0044ee60::iterator);
+typedef std::vector<Point16> DestroyPointVector;
+typedef void (DestroyPointVector::*DestroyPointVectorFn)(DestroyPointVector::iterator, DestroyPointVector::iterator);
 
-struct PointVectorDestroyAccess : Vec_0044ee60 {
-    static DestroyFn_0044ee60 fn;
+struct PointVectorDestroyAccess : DestroyPointVector {
+    static DestroyPointVectorFn fn;
 };
 
-typedef std::vector<Point16> Vec_0044ee70;
-typedef Vec_0044ee70::size_type (Vec_0044ee70::*SizeFn_0044ee70)() const;
+typedef std::vector<Point16> SizePointVector;
+typedef SizePointVector::size_type (SizePointVector::*SizePointVectorFn)() const;
 
-typedef std::vector<Point16> Vec_0044ee90;
-typedef Vec_0044ee90::iterator (Vec_0044ee90::*UcopyFn_0044ee90)(
-    Vec_0044ee90::const_iterator, Vec_0044ee90::const_iterator, Vec_0044ee90::iterator);
+typedef std::vector<Point16> UcopyPointVector;
+typedef UcopyPointVector::iterator (UcopyPointVector::*UcopyPointVectorFn)(
+    UcopyPointVector::const_iterator, UcopyPointVector::const_iterator, UcopyPointVector::iterator);
 
-struct PointVectorUcopyAccess : Vec_0044ee90 {
-    static UcopyFn_0044ee90 fn;
+struct PointVectorUcopyAccess : UcopyPointVector {
+    static UcopyPointVectorFn fn;
 };
 
-typedef std::vector<Point16> Vec_0044eec0;
-typedef void (Vec_0044eec0::*UfillFn_0044eec0)(
-    Vec_0044eec0::iterator, Vec_0044eec0::size_type, const Point16&);
+typedef std::vector<Point16> UfillPointVector;
+typedef void (UfillPointVector::*UfillPointVectorFn)(
+    UfillPointVector::iterator, UfillPointVector::size_type, const Point16&);
 
-struct PointVectorUfillAccess : Vec_0044eec0 {
-    static UfillFn_0044eec0 fn;
+struct PointVectorUfillAccess : UfillPointVector {
+    static UfillPointVectorFn fn;
 };
 
 #include "order_target_types.h"
@@ -429,7 +429,7 @@ int ApproachRadius::Serialize(int unused, HapiBank* file, char* name)
 // FUNCTION: 0x44d0e0
 void ApproachRadius::AppendGoalCell(void* cells)
 {
-    Vec_0044d0e0* list = (Vec_0044d0e0*)cells;
+    ApproachRadiusCellVector* list = (ApproachRadiusCellVector*)cells;
     list->clear();
     list->push_back(*(Point16*)&pos);
 }
@@ -552,7 +552,7 @@ int RingApproach::Serialize(int unused, HapiBank* file, char* name)
 // FUNCTION: 0x44d560
 void RingApproach::AppendGoalCell(void* cells)
 {
-    Vec_0044d560* list = (Vec_0044d560*)cells;
+    RingApproachCellVector* list = (RingApproachCellVector*)cells;
     list->clear();
     Point16 p = *(Point16*)&pos;
     p.y = p.y + (outer + inner) / 32;
@@ -687,7 +687,7 @@ int PointMarker::Serialize(int unused, HapiBank* file, char* name)
     return 1;
 }
 
-static inline int MidX_44dc60(PointMarker* w)
+static inline int PointMarkerMidX(PointMarker* w)
 {
     return (w->x1 + w->x2) / 2;
 }
@@ -695,7 +695,7 @@ static inline int MidX_44dc60(PointMarker* w)
 // FUNCTION: 0x44dc60
 int PointMarker::FillWorldPos(int* out)
 {
-    short avg = (short)MidX_44dc60(this);
+    short avg = (short)PointMarkerMidX(this);
     short z = (short)y2;
     Point16 pos = ((Order*)source)->unit->footprint;
     out[0] = (pos.x + avg * 2) << 0x13;
@@ -715,7 +715,7 @@ int PointMarker::ContainsCell(int x, int y)
     return 0;
 }
 
-#define Min_0044dd00(a, b) ((a) < (b) ? (a) : (b))
+#define MARKER_MIN(a, b) ((a) < (b) ? (a) : (b))
 
 // FUNCTION: 0x44dd00
 int PointMarker::ApproxDist(int x, int y)
@@ -732,9 +732,9 @@ int PointMarker::ApproxDist(int x, int y)
             return (y1 - y) * 16;
         if (y > y2)
             return (y - y2) * 16;
-        int mx = Min_0044dd00(x - x1, x2 - x);
-        int my = Min_0044dd00(y - y1, y2 - y);
-        return Min_0044dd00(mx, my) * 16;
+        int mx = MARKER_MIN(x - x1, x2 - x);
+        int my = MARKER_MIN(y - y1, y2 - y);
+        return MARKER_MIN(mx, my) * 16;
     }
 
     int dy;
@@ -942,7 +942,7 @@ int PathOrder::KeepAfterComplete() {
     return 1;
 }
 
-static inline Vec3 Direction_0044e3c0(short angle, int scale)
+static inline Vec3 ForwardOffset(short angle, int scale)
 {
     Vec3 v;
     v.x = -ScaledSin(angle, scale);
@@ -964,7 +964,7 @@ int PathOrder::FillWorldPos(Vec3* out)
             short angle = ref.owner->heading;
             if (flags & 0x40)
                 angle += heading;
-            Vec3 d = Direction_0044e3c0(angle, followOffset);
+            Vec3 d = ForwardOffset(angle, followOffset);
             p->x -= d.x;
             p->y -= d.y;
             p->z -= d.z;
@@ -1244,16 +1244,16 @@ void AirManeuverOrder::SetHeading(short v)
 }
 
 // FUNCTION: 0x44ee60 ?_Destroy@?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@IAEXPAUPoint16@@0@Z
-DestroyFn_0044ee60 PointVectorDestroyAccess::fn = &PointVectorDestroyAccess::_Destroy;
+DestroyPointVectorFn PointVectorDestroyAccess::fn = &PointVectorDestroyAccess::_Destroy;
 
 // FUNCTION: 0x44ee70 ?size@?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@QBEIXZ
-SizeFn_0044ee70 g_size_0044ee70 = &Vec_0044ee70::size;
+SizePointVectorFn g_size_0044ee70 = &SizePointVector::size;
 
 // FUNCTION: 0x44ee90 ?_Ucopy@?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@IAEPAUPoint16@@PBU3@0PAU3@@Z
-UcopyFn_0044ee90 PointVectorUcopyAccess::fn = &PointVectorUcopyAccess::_Ucopy;
+UcopyPointVectorFn PointVectorUcopyAccess::fn = &PointVectorUcopyAccess::_Ucopy;
 
 // FUNCTION: 0x44eec0 ?_Ufill@?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@IAEXPAUPoint16@@IABU3@@Z
-UfillFn_0044eec0 PointVectorUfillAccess::fn = &PointVectorUfillAccess::_Ufill;
+UfillPointVectorFn PointVectorUfillAccess::fn = &PointVectorUfillAccess::_Ufill;
 
 // FUNCTION: 0x44eef0
 Point16* __stdcall CopyDwordRangeUnchecked(Point16* first, Point16* last, Point16* dest)
@@ -1570,19 +1570,19 @@ void DestroyPathfinder()
 
 
 
-typedef std::vector<Point16> Vec_0044ec30;
-typedef void (Vec_0044ec30::*InsertFn_0044ec30)(
-    Vec_0044ec30::iterator, Vec_0044ec30::size_type, const Point16&);
+typedef std::vector<Point16> InsertPointVector;
+typedef void (InsertPointVector::*InsertPointVectorFn)(
+    InsertPointVector::iterator, InsertPointVector::size_type, const Point16&);
 
-void __stdcall Grow_0044ec30(Vec_0044ec30* v, int extra)
+void __stdcall ReservePointVector(InsertPointVector* v, int extra)
 {
     v->reserve(extra + v->size());
 }
 
 // FUNCTION: 0x44ec30 ?insert@?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@QAEXPAUPoint16@@IABU3@@Z
-InsertFn_0044ec30 g_insert_0044ec30 = &Vec_0044ec30::insert;
+InsertPointVectorFn g_insert_0044ec30 = &InsertPointVector::insert;
 
-static Point16 MakePoint_0044da00(int x, int y)
+static Point16 MakePoint16(int x, int y)
 {
     Point16 p;
     p.x = (short)x;
@@ -1593,14 +1593,14 @@ static Point16 MakePoint_0044da00(int x, int y)
 // FUNCTION: 0x44da00
 void PointMarker::AppendGoalCell(void* cells)
 {
-    Vec_0044da00* list = (Vec_0044da00*)cells;
+    PointMarkerCellVector* list = (PointMarkerCellVector*)cells;
     list->clear();
     for (int i = x1; i <= x2; i++) {
-        list->push_back(MakePoint_0044da00(i, y1));
-        list->push_back(MakePoint_0044da00(i, y2));
+        list->push_back(MakePoint16(i, y1));
+        list->push_back(MakePoint16(i, y2));
     }
     for (int j = y1 + 1; j <= y2 - 1; j++) {
-        list->push_back(MakePoint_0044da00(x1, j));
-        list->push_back(MakePoint_0044da00(x2, j));
+        list->push_back(MakePoint16(x1, j));
+        list->push_back(MakePoint16(x2, j));
     }
 }

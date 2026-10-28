@@ -535,7 +535,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     sprintf(buf3, "%s%s", name, "g");
     switch (desc.field_4) {
     case 2:
-        attached = new (kSim) Class_0044de80((int)this, file, buf3);
+        attached = new (kSim) PathOrderLoadView((int)this, file, buf3);
         return;
     case 3:
         attached = new (kSim) AirManeuverOrder((int)this, file, buf3);

@@ -70,7 +70,7 @@ struct DirectDrawSurfaceSet {
     void* clipper;
     void* palette;
 };
-static_assert(sizeof(DirectDrawSurfaceSet) == 0x14, "Surfaces_0047bdf0 size");
+static_assert(sizeof(DirectDrawSurfaceSet) == 0x14, "DirectDrawSurfaceSet size");
 
 struct DisplayMovieView {
     char unknown_0[0x24];

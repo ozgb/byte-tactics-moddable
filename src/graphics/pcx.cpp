@@ -221,7 +221,7 @@ struct DisplayScreenshotView {
     PALETTEENTRY palette[256];
 };
 #pragma pack(pop)
-static_assert(sizeof(DisplayScreenshotView) == 0x614, "Game_004caec0 size");
+static_assert(sizeof(DisplayScreenshotView) == 0x614, "DisplayScreenshotView size");
 
 DisplayScreenshotView* GetDisplay();
 

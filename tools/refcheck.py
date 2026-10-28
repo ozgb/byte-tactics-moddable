@@ -388,8 +388,7 @@ def scan_unit(job: tuple[dict, bool]) -> UnitScan:
 def game_fields(by_name: dict) -> dict[str, tuple[list[str], bool]]:
     """field -> (type identifiers, held by value) for the fields of `struct Game`, anonymous unions and structs flattened.
 
-    typedupes.Scope reads Game from include/ta_types.h only, where it no longer is, so its game-region
-    rows resolve to nothing; this reads the definition wherever it is."""
+    typedupes.Scope reads Game wherever it is defined, as this does."""
     out = {}
     for d in by_name.get("Game", []):
         toks = d["toks"]

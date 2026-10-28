@@ -2,8 +2,6 @@
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 
-typedef Vec3 Vec3_0049e1a0;
-
 #include "../units/cob_script.h"
 
 #include "../files/files_api.h"
@@ -115,8 +113,6 @@ struct ReachUnitVec3 {
 #include "../map/feature.h"
 #include "../map/feature_spot.h"
 
-struct Unit_0049c880;
-
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
 
@@ -154,12 +150,6 @@ void FreeWeaponArray(void)
 
 #pragma pack(push, 1)
 
-struct Vec3_00499ab0 {
-    int x;
-    int y;
-    int z;
-};
-
 struct WeaponFirePlayerView {
     char unknown_0[4];
     int f4;
@@ -192,8 +182,8 @@ int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // FUNCTION: 0x499ab0
 void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, WeaponFireUnitView* source,
-                            WeaponFireUnitView* target, Vec3_00499ab0* a,
-                            Vec3_00499ab0* b)
+                            WeaponFireUnitView* target, Vec3* a,
+                            Vec3* b)
 {
     WeaponFirePacket packet;
     if (g_game->flags_2a44 & 1) {
@@ -211,12 +201,6 @@ void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, WeaponFireUnitView* so
     }
 }
 
-struct Vec3_00499ba0 {
-    int x;
-    int y;
-    int z;
-};
-
 #pragma pack(push, 1)
 void Unused_00499ba0(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
@@ -224,7 +208,7 @@ void Unused_00499ba0(int a, int b, int c, int d, int e, int f);
 #include "../network/net_game.h"
 
 // FUNCTION: 0x499ba0
-void __stdcall BroadcastWeaponFire(char param_1, Vec3_00499ba0* a, Vec3_00499ba0* b)
+void __stdcall BroadcastWeaponFire(char param_1, Vec3* a, Vec3* b)
 {
     WeaponFirePacket packet;
     if (g_game->flags_2a44 & 1) {
@@ -439,16 +423,10 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
     }
 }
 
-struct Vec3_0049a0c0 {
-    int x;
-    int y;
-    int z;
-};
-
 #pragma pack(push, 1)
 struct AreaDamageProjectileView {
     Ref<char> owner;
-    Vec3_0049a0c0 pos;
+    Vec3 pos;
     char unknown_10[0x42];
     int ownerUnit;
     char unknown_56[0x10];
@@ -458,7 +436,7 @@ struct AreaDamageProjectileView {
 #pragma pack(pop)
 
 // FUNCTION: 0x49a0c0
-void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
+void __stdcall ApplyAreaDamageAt(void* owner, Vec3* pos)
 {
     AreaDamageProjectileView p;
     memset(&p, 0, sizeof(p));
@@ -559,14 +537,14 @@ static inline Vec3 Sub(const Vec3& a, const Vec3& b)
 #include <time.h>
 #include <malloc.h>
 
-struct Vec3i_0049a850 {
+struct VectorLengthArg {
     int x;
     int y;
     int z;
 };
 
 // FUNCTION: 0x49a850
-int __stdcall VectorLength(Vec3i_0049a850* v)
+int __stdcall VectorLength(VectorLengthArg* v)
 {
     double x = v->x;
     double y = v->y;
@@ -795,17 +773,15 @@ done:
     g_game->projectileCount = count;
 }
 
-typedef Vec3 Vec3_0049af90;
-
 #pragma pack(push, 1)
 struct ProjectileDetonatePacket {
     unsigned char type;
-    Vec3_0049af90 aim;
+    Vec3 aim;
     unsigned char weaponIndex;
 };
 #pragma pack(pop)
 
-static inline int SamePos(const Vec3_0049af90& a, const Vec3_0049af90& b)
+static inline int SamePos(const Vec3& a, const Vec3& b)
 {
     return a.x == b.x && a.z == b.z && a.y == b.y;
 }
@@ -984,7 +960,7 @@ static inline void ClearTrackedProjectile(Projectile* proj)
 }
 
 // FUNCTION: 0x49c880
-void __stdcall RemoveUnitProjectiles(Unit_0049c880* owner)
+void __stdcall RemoveUnitProjectiles(Unit* owner)
 {
     Projectile* proj = g_game->projectiles;
     for (int i = 0; i < g_game->projectileCount; i++, proj++) {

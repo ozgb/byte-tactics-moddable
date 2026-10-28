@@ -1999,7 +1999,6 @@ struct Unit_00485d40;
 struct Unit_004894f0;
 struct Unit_0048ec20;
 struct Unit_0048f8c0;
-struct Unit_0049c880;
 struct Unit_0049df10;
 struct Unit_2;
 struct Unit_3;

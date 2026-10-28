@@ -93,16 +93,59 @@ Coverage: 93.8% of functions (15 of 16), 96.4% of lines, 76.3% of branches; 1 li
 """
 
 
-def run_main(doc: Path, flag: str) -> tuple[int, str]:
+def run_main(doc: Path, flag: str, counts: dict = COUNTS, cover: dict = COVER) -> tuple[int, str]:
     out = io.StringIO()
     code = 0
-    with mock.patch.object(sd, "load_counts", return_value=(COUNTS, 21, COVER)), mock.patch.object(
+    with mock.patch.object(sd, "load_counts", return_value=(counts, 21, cover)), mock.patch.object(
             sys, "argv", ["subsystemsdoc.py", flag, "--doc", str(doc)]), contextlib.redirect_stdout(out):
         try:
             sd.main()
         except SystemExit as exit:
             code = exit.code if isinstance(exit.code, int) else 1
     return code, out.getvalue()
+
+
+ORDERS_COUNTS = {"orders" if name == "alpha" else name: value for name, value in COUNTS.items()}
+ORDERS_COUNTS["beta"] = dict(COUNTS["beta"], targets=["platform", "orders"], target_sizes={"platform": 4, "orders": 3})
+ORDERS_COVER = {"orders" if name == "alpha" else name: dict(value) for name, value in COVER.items()}
+ORDERS_COVER["orders"].update(entered=13, never=3, fpct="81.3%", reasons={"info-panel": ["GetOrderName", "Marked"],
+                                                                         "no-caller": ["ReadyOrder"]})
+ORDERS_DOC = (DOC.replace("alpha", "orders")
+              .replace("1 live function no scenario enters, and 0 more", "3 live functions no scenario enters, and 0 more")
+              .replace("93.8% of functions (15 of 16)", "81.3% of functions (13 of 16)")
+              .replace("(1 of 16 after `x` (#1); 15 are entered, 93.8%)", "(3 of 16 after `x` (#1); 13 are entered, 81.3%)")
+              .replace("| **orders** | 15 of 16 | 93.8% | 96.4% | 76.3% | 1 | 0 |", "| **orders** | 13 of 16 | 81.3% | 96.4% | 76.3% | 3 | 0 |")
+              .replace("- Shutdown only (1): `Free`.",
+                       "- Info panel, cursor, build menu and shutdown only (2): `GetOrderName`, `Marked`. The info panel and the smart click.\n"
+                       "- No caller in the game (1): `ReadyOrder`. Nothing creates the order."))
+
+
+class SortedSubsystemDocTest(unittest.TestCase):
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.dir.cleanup)
+        self.path = Path(self.dir.name) / "subsystems.md"
+
+    def check(self, doc: str) -> tuple[int, str]:
+        self.path.write_text(doc)
+        return run_main(self.path, "--check", ORDERS_COUNTS, ORDERS_COVER)
+
+    def test_a_matching_orders_doc_passes(self):
+        self.assertEqual(self.check(ORDERS_DOC)[0], 0)
+
+    def test_a_renamed_orders_name_fails(self):
+        self.assertIn("`Marked`", ORDERS_DOC)
+        code, out = self.check(ORDERS_DOC.replace("`Marked`", "`Marker`", 1))
+        self.assertEqual(code, 1)
+        self.assertIn("orders, reason info-panel names: doc has extra: Marker, tool has absent: Marked", out)
+
+    def test_a_count_moved_between_orders_bullets_fails(self):
+        doc = (ORDERS_DOC.replace("shutdown only (2)", "shutdown only (1)")
+               .replace("No caller in the game (1)", "No caller in the game (2)"))
+        code, out = self.check(doc)
+        self.assertEqual(code, 1)
+        self.assertIn("orders, reason info-panel count: doc has 1, tool has 2", out)
+        self.assertIn("orders, reason no-caller count: doc has 2, tool has 1", out)
 
 
 class SubsystemsDocTest(unittest.TestCase):

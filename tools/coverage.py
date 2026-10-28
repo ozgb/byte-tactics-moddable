@@ -62,8 +62,8 @@ apart, dead 0, reason why test mode never enters it, a short word such as `netwo
 function (every count 0, dead 1), sorted by subsystem, totals first, then by name, file and decorated name; the reason
 of a totals or dead row is empty. `--write` reads the old file first and carries each never-entered row's reason to
 the row with the same subsystem, function, file and decorated name; a new row has none. In the subsystems of SORTED
-(files, game and network) every never-entered row needs a reason: `--write` (after writing) and `--check` fail
-and list the rows without. Percentages are derived. `--check` fails when a subsystem's function, line or
+(every subsystem but presentation, platform and seams) every never-entered row needs a reason: `--write` (after
+writing) and `--check` fail and list the rows without. Percentages are derived. `--check` fails when a subsystem's function, line or
 branch fraction is below the file's, or the file is missing; rises and new functions only print a note.
 """
 
@@ -96,7 +96,8 @@ STATE = "state"
 EXCLUDED_PREFIXES = ("src/harness/", "build/", "toolchain/")
 COLUMNS = ["subsystem", "function", "file", "functions", "functions_entered", "lines", "lines_hit",
            "branches", "branches_covered", "decorated", "dead", "reason"]
-SORTED = ("files", "game", "network")
+SORTED = ("ai", "economy", "features", "files", "game", "los_radar", "map", "network", "orders", "pathfinding", "players",
+          "state", "units", "weapons", "wind_meteors")
 METRICS = (("functions", "functions", "functions_entered"), ("lines", "lines", "lines_hit"),
            ("branches", "branches", "branches_covered"))
 CODE_REGION = 0

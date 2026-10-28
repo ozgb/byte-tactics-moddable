@@ -35,20 +35,7 @@ struct UnitBucket {
 
 #include "../units/unit_def.h"
 
-struct Feature {
-    char unknown_0[0xec];
-    float weightA;
-    float weightB;
-    char unknown_f4[0xfe - 0xf4];
-    union {
-        unsigned char flags;
-        unsigned short flags16;
-        struct {
-            unsigned char unknown_6 : 6;
-            unsigned char steep : 1;
-        };
-    };
-};
+#include "../map/feature.h"
 
 #include "../units/unit.h"
 
@@ -1200,14 +1187,14 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* center, Fixed radius,
                 continue;
             if (!(fl & 0x100))
                 continue;
-            if (g_game->features[index].weightA != 0.0f) {
+            if (g_game->features[index].energy != 0.0f) {
                 b[countB].pos = pos;
-                b[countB].val = g_game->features[index].weightA;
+                b[countB].val = g_game->features[index].energy;
                 countB++;
             }
-            if (g_game->features[index].weightB != 0.0f) {
+            if (g_game->features[index].metal != 0.0f) {
                 a[countA].pos = pos;
-                a[countA].val = g_game->features[index].weightB;
+                a[countA].val = g_game->features[index].metal;
                 countA++;
             }
         }

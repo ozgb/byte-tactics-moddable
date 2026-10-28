@@ -880,7 +880,7 @@ union Coord_004239c0;
 union Coord_0044f2a0;
 struct CountedList;
 class CritSec_004e1ac0;
-struct Ctx_004720d0;
+struct NanoTargetBounds;
 struct MainFrameDisplayContext;
 struct GameCursorState;
 struct CursorState_0041cd20;
@@ -997,7 +997,7 @@ struct Elem_0044ce90;
 struct SyncTempTaggedElem;
 struct SyncRecordIntElem;
 struct Elem_004702a0_2;
-struct Elem_00470a40;
+struct StructRangeElement;
 struct Elem_00472e70;
 struct Elem_00473130;
 struct Elem_00473290;
@@ -1739,9 +1739,9 @@ struct Pos2_0048a490;
 struct Pos_00409160;
 struct Pos_004658e0;
 struct Pos_00465ac0;
-struct Pos_00473590;
+struct TeleportParticleWholePos;
 struct Pos_00473590_2;
-struct Pos_004745e0;
+struct WakeParticleWholePos;
 struct Pos_00474b80;
 struct BuildCenterFixed;
 struct Pos_00485330;
@@ -1813,7 +1813,7 @@ struct Screen_004c6e70;
 struct ScriptTable;
 struct Section_004b4800;
 struct Section_004b4850;
-struct Seg_00473b50;
+struct NanoSegment;
 struct SerialPortConfig;
 struct SessionDesc_004c9920;
 struct SessionDesc_4c9dd0;
@@ -1823,7 +1823,7 @@ struct Settings_00460160;
 struct MissionOptionFlags;
 struct Settings_00496e10_2;
 struct Shape;
-struct Shape_00472ab0;
+struct ThrustPos;
 struct VLaunchFireSlotView;
 struct MotionFireSlotView;
 struct SideDef;
@@ -7980,7 +7980,7 @@ struct Player_00473a00 {
     char unknown_88[195];
 };
 
-struct Seg_00473b50 {
+struct NanoSegment {
     Vec3 start;
     Vec3 end;
 };
@@ -7988,14 +7988,14 @@ struct Seg_00473b50 {
 class Class_00473b50 {
 public:
     char unknown_4[24];
-    Seg_00473b50 seg_1c;
-    Seg_00473b50 seg_34;
+    NanoSegment seg_1c;
+    NanoSegment seg_34;
     virtual void v0(void);
     virtual void v1(void);
     virtual void v2(void);
     virtual void v3(void);
     virtual void v4(void);
-    void FUN_00473b50(Seg_00473b50*, Seg_00473b50*, int);
+    void FUN_00473b50(NanoSegment*, NanoSegment*, int);
 };
 
 union Fix_00473d50 {

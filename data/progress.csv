@@ -1426,7 +1426,7 @@ address,size,file,symbol,status,similarity
 0x470560,515,src/network/unit_sync.cpp,??4PacketSequencer@@QAEAAU0@ABU0@@Z,matched,100.0
 0x470770,35,src/network/unit_sync.cpp,?size@?$vector@UUnitSyncPacketElem@@V?$allocator@UUnitSyncPacketElem@@@std@@@std@@QBEIXZ,matched,100.0
 0x4707a0,661,src/network/unit_sync.cpp,??4?$vector@UUnitSyncPacketElem@@V?$allocator@UUnitSyncPacketElem@@@std@@@std@@QAEAAV01@ABV01@@Z,matched,100.0
-0x470a40,70,src/graphics/particles.cpp,?CopyStructRange@@YGPAUElem_00470a40@@PAU1@00@Z,matched,100.0
+0x470a40,70,src/graphics/particles.cpp,?CopyStructRange@@YGPAUStructRangeElement@@PAU1@00@Z,matched,100.0
 0x470a90,70,src/graphics/particles.cpp,?Construct@ObjectPool@@QAEPAV1@HH@Z,matched,100.0
 0x470ae0,151,src/graphics/particles.cpp,??_GObjectPool@@UAEPAXI@Z,matched,100.0
 0x470b80,130,src/graphics/particles.cpp,?Destroy@ObjectPool@@QAEXXZ,matched,100.0
@@ -1465,8 +1465,8 @@ address,size,file,symbol,status,similarity
 0x471f40,66,src/graphics/particles.cpp,?DrawParticles@@YGXH@Z,matched,100.0
 0x471f90,62,src/graphics/particles.cpp,?DrawParticleList@@YGXPAXF@Z,matched,100.0
 0x471fd0,248,src/graphics/particles.cpp,?EmitTeleportParticles@@YGXHHHF@Z,matched,100.0
-0x4720d0,297,src/graphics/particles.cpp,?EmitNanoParticles@@YGXPAUVec3_004720d0@@PAXF@Z,matched,100.0
-0x472200,297,src/graphics/particles.cpp,?EmitReverseNanoParticles@@YGXPAUPos_00472200@@PAUVec3@@F@Z,matched,100.0
+0x4720d0,297,src/graphics/particles.cpp,?EmitNanoParticles@@YGXPAUVec3@@PAXF@Z,matched,100.0
+0x472200,297,src/graphics/particles.cpp,?EmitReverseNanoParticles@@YGXPAUNanoTargetBounds@@PAUVec3@@F@Z,matched,100.0
 0x472330,253,src/graphics/particles.cpp,?EmitThrustParticles@@YGXHHHHF@Z,matched,100.0
 0x472430,252,src/graphics/particles.cpp,?EmitWakeParticles@@YGXHHHF@Z,matched,100.0
 0x472530,251,src/graphics/particles.cpp,?EmitBubbles@@YGXHHHF@Z,matched,100.0
@@ -1475,7 +1475,7 @@ address,size,file,symbol,status,similarity
 0x472810,224,src/graphics/particles.cpp,?EmitWhiteSmoke@@YGXPAUVec3_00472810@@F@Z,matched,100.0
 0x4728f0,224,src/graphics/particles.cpp,?EmitBlackSmoke@@YGXPAUVec3_00474cd0@@F@Z,matched,100.0
 0x4729d0,224,src/graphics/particles.cpp,?EmitWeaponSmoke@@YGXPAUVec3_00474cd0@@F@Z,matched,100.0
-0x472ab0,413,src/graphics/particles.cpp,?EmitJitteredThrustParticles@@YGXPAUShape_00472ab0@@F@Z,matched,100.0
+0x472ab0,413,src/graphics/particles.cpp,?EmitJitteredThrustParticles@@YGXPAUThrustPos@@F@Z,matched,100.0
 0x472c50,223,src/graphics/particles.cpp,?EmitTimedSubParticles@@YGXPAUVec3_00475150@@F@Z,matched,100.0
 0x472d50,163,src/graphics/particles.cpp,?Update@TeleportParticles@@UAEXXZ,matched,100.0
 0x472e00,33,src/graphics/particles.cpp,?IsEmitDue@TeleportParticles@@UAEHXZ,matched,100.0
@@ -1497,12 +1497,12 @@ address,size,file,symbol,status,similarity
 0x473560,45,src/graphics/particles.cpp,?Step@TeleportParticle@@QAEXXZ,matched,100.0
 0x473590,301,src/graphics/particles.cpp,?DrawParticle@TeleportParticle@@QAEXPAXFF@Z,matched,100.0
 0x4736c0,19,src/graphics/particles.cpp,?IsExpired@TeleportParticle@@QAEHH@Z,matched,100.0
-0x4736e0,212,src/graphics/particles.cpp,?Init@TeleportParticles@@UAEXPAUVec3_004736e0@@0H@Z,matched,100.0
+0x4736e0,212,src/graphics/particles.cpp,?Init@TeleportParticles@@UAEXPAUTeleportEndpoint@@0H@Z,matched,100.0
 0x4737c0,493,src/graphics/particles.cpp,?Emit@TeleportParticles@@UAEXXZ,matched,100.0
 0x4739b0,69,src/graphics/particles.cpp,?Step@NanoParticle@@QAEXXZ,matched,100.0
 0x473a00,300,src/graphics/particles.cpp,?DrawParticle@NanoParticle@@QAEXHFF@Z,matched,100.0
 0x473b30,19,src/graphics/particles.cpp,?IsExpired@NanoParticle@@QAEHH@Z,matched,100.0
-0x473b50,499,src/graphics/particles.cpp,?Init@NanoParticles@@UAEXPAUSeg_00473b50@@0H@Z,matched,100.0
+0x473b50,499,src/graphics/particles.cpp,?Init@NanoParticles@@UAEXPAUNanoSegment@@0H@Z,matched,100.0
 0x473d50,983,src/graphics/particles.cpp,?Emit@NanoParticles@@QAEXXZ,matched,100.0
 0x474130,60,src/graphics/particles.cpp,?Step@ThrustParticle@@QAEXXZ,matched,100.0
 0x474170,301,src/graphics/particles.cpp,?DrawParticle@ThrustParticle@@QAEXPAXFF@Z,matched,100.0
@@ -1512,7 +1512,7 @@ address,size,file,symbol,status,similarity
 0x474580,90,src/graphics/particles.cpp,?Step@WakeParticle@@QAEXXZ,matched,100.0
 0x4745e0,306,src/graphics/particles.cpp,?DrawParticle@WakeParticle@@QAEXPAXFF@Z,matched,100.0
 0x474720,51,src/graphics/particles.cpp,?IsExpired@WakeParticle@@QAEHH@Z,matched,100.0
-0x474760,284,src/graphics/particles.cpp,?Init@WakeParticles@@UAEXPAUVec3_00474760@@0HHH@Z,matched,100.0
+0x474760,284,src/graphics/particles.cpp,?Init@WakeParticles@@UAEXPAUWakeVector@@0HHH@Z,matched,100.0
 0x474880,630,src/graphics/particles.cpp,?Emit@WakeParticles@@UAEXXZ,matched,100.0
 0x474b00,127,src/graphics/particles.cpp,?Step@SmokeParticle@@QAEXXZ,matched,100.0
 0x474b80,303,src/graphics/particles.cpp,?DrawParticle@SmokeParticle@@QAEXPAXFF@Z,matched,100.0

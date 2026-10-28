@@ -28,7 +28,7 @@
 #pragma pack(pop)
 
 #pragma pack(push, 2)
-struct Elem_00470a40 {
+struct StructRangeElement {
     int a;
     int b;
     int c;
@@ -37,13 +37,13 @@ struct Elem_00470a40 {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-struct Vec3_004736e0 {
+struct TeleportEndpoint {
     int x;
     int y;
     int z;
-    Vec3_004736e0 operator-(const Vec3_004736e0& o) const
+    TeleportEndpoint operator-(const TeleportEndpoint& o) const
     {
-        Vec3_004736e0 r;
+        TeleportEndpoint r;
         r.x = x - o.x;
         r.y = y - o.y;
         r.z = z - o.z;
@@ -56,7 +56,7 @@ struct Vec3_004736e0 {
         float fz = z;
         return (int)sqrt(fx * fx + fy * fy + fz * fz);
     }
-    Vec3_004736e0& operator+=(const Vec3_004736e0& o)
+    TeleportEndpoint& operator+=(const TeleportEndpoint& o)
     {
         x += o.x;
         y += o.y;
@@ -70,7 +70,7 @@ union Fixed16 {
     short half[2];
 };
 
-struct Pos_00473590 {
+struct TeleportParticleWholePos {
     short x;
     char unknown_2[0x4 - 0x2];
     short h;
@@ -78,7 +78,7 @@ struct Pos_00473590 {
     short y;
 };
 
-struct Pos_004745e0 {
+struct WakeParticleWholePos {
     short x;
     char unknown_2[2];
     short height;
@@ -92,13 +92,13 @@ struct TeleportParticle {
     void* data;
     union {
         struct {
-            Vec3_004736e0 pos1;
-            Vec3_004736e0 pos2;
-            Vec3_004736e0 dir;
+            TeleportEndpoint pos1;
+            TeleportEndpoint pos2;
+            TeleportEndpoint dir;
         };
         struct {
             char unknown_4[0x6 - 0x4];
-            Pos_00473590 posw;
+            TeleportParticleWholePos posw;
         };
     };
     int frameCount;
@@ -110,7 +110,7 @@ struct TeleportParticle {
     int IsExpired(int currentTick);
 };
 
-struct Pos_004739b0 {
+struct NanoParticleWholePos {
     char unknown_0[0x2];
     short x;
     char unknown_4[0x2];
@@ -123,7 +123,7 @@ struct NanoParticle {
 public:
     union {
         Vec3 pos;
-        Pos_004739b0 posw;
+        NanoParticleWholePos posw;
     };
     Vec3 tgt;
     Vec3 vel;
@@ -136,15 +136,9 @@ public:
     int IsExpired(int value);
 };
 
-struct Vec3_00473b50 {
-    int x;
-    int y;
-    int z;
-};
-
-struct Seg_00473b50 {
-    Vec3_00473b50 start;
-    Vec3_00473b50 end;
+struct NanoSegment {
+    Vec3 start;
+    Vec3 end;
 };
 
 #define SPLIT_SEG(g)                         \
@@ -177,7 +171,7 @@ struct ThrustParticle {
         };
         struct {
             char unknown_4[0x6 - 0x4];
-            Pos_00473590 posw;
+            TeleportParticleWholePos posw;
         };
     };
     int frameCount;
@@ -191,23 +185,23 @@ struct ThrustParticle {
     int IsExpired(int currentTick);
 };
 
-struct Pair_00474880 {
+struct WordPair {
     short lo;
     short hi;
 };
 
-struct Vec3_00474760 {
+struct WakeVector {
     union {
         int x;
-        Pair_00474880 xp;
+        WordPair xp;
     };
     union {
         int y;
-        Pair_00474880 yp;
+        WordPair yp;
     };
     union {
         int z;
-        Pair_00474880 zp;
+        WordPair zp;
     };
     int Length() const
     {
@@ -222,7 +216,7 @@ struct Vec3_00474760 {
         y = (int)(((__int64)y * s) >> 16);
         z = (int)(((__int64)z * s) >> 16);
     }
-    Vec3_00474760& operator+=(const Vec3_00474760& o)
+    WakeVector& operator+=(const WakeVector& o)
     {
         x += o.x;
         y += o.y;
@@ -231,9 +225,9 @@ struct Vec3_00474760 {
     }
 };
 
-static inline Vec3_00474760 operator-(const Vec3_00474760& p, const Vec3_00474760& q)
+static inline WakeVector operator-(const WakeVector& p, const WakeVector& q)
 {
-    Vec3_00474760 r;
+    WakeVector r;
     r.x = p.x - q.x;
     r.y = p.y - q.y;
     r.z = p.z - q.z;
@@ -244,13 +238,13 @@ struct WakeParticle {
     void* data;
     union {
         struct {
-            Vec3_00474760 pos;
-            Vec3_00474760 pos2;
-            Vec3_00474760 vel;
+            WakeVector pos;
+            WakeVector pos2;
+            WakeVector vel;
         };
         struct {
             char unknown_4[0x6 - 0x4];
-            Pos_004745e0 posw;
+            WakeParticleWholePos posw;
         };
     };
     int min;
@@ -271,9 +265,9 @@ public:
     int time;
     std::vector<TeleportParticle> items;
     int sparkLifetime;
-    Vec3_004736e0 pos1;
-    Vec3_004736e0 pos2;
-    Vec3_004736e0 dir;
+    TeleportEndpoint pos1;
+    TeleportEndpoint pos2;
+    TeleportEndpoint dir;
 
     TeleportParticles() {}
     virtual void Update();
@@ -281,15 +275,15 @@ public:
     virtual int IsFinished();
     virtual void Emit();
     virtual int IsEmitDue();
-    virtual void Init(Vec3_004736e0* a, Vec3_004736e0* b, int c);
+    virtual void Init(TeleportEndpoint* a, TeleportEndpoint* b, int c);
 };
 
 class NanoParticles : public ParticleSystem {
 public:
     int time;
     std::vector<NanoParticle> items;
-    Seg_00473b50 seg_1c;
-    Seg_00473b50 seg_34;
+    NanoSegment seg_1c;
+    NanoSegment seg_34;
 
     NanoParticles() {}
     virtual void Update();
@@ -297,10 +291,10 @@ public:
     virtual int IsFinished();
     virtual void Emit();
     virtual int IsEmitDue();
-    virtual void Init(Seg_00473b50* a, Seg_00473b50* b, int c);
+    virtual void Init(NanoSegment* a, NanoSegment* b, int c);
 };
 
-struct Shape_00472ab0;
+struct ThrustPos;
 
 class ThrustParticles : public ParticleSystem {
 public:
@@ -317,7 +311,7 @@ public:
     virtual int IsFinished();
     virtual void Emit();
     virtual int IsEmitDue();
-    virtual void Init(Shape_00472ab0* p, Shape_00472ab0* q, int a, int b);
+    virtual void Init(ThrustPos* p, ThrustPos* q, int a, int b);
     void Init(Vec3* p, Vec3* q, int a, int b);
 };
 
@@ -326,9 +320,9 @@ public:
     int time;
     std::vector<WakeParticle> items;
     int period;
-    Vec3_00474760 pos_a;
-    Vec3_00474760 pos_b;
-    Vec3_00474760 dir;
+    WakeVector pos_a;
+    WakeVector pos_b;
+    WakeVector dir;
     int ascending;
 
     WakeParticles() {}
@@ -337,20 +331,11 @@ public:
     virtual int IsFinished();
     virtual void Emit();
     virtual int IsEmitDue();
-    virtual void Init(Vec3_00474760* a, Vec3_00474760* b, int newPeriod,
+    virtual void Init(WakeVector* a, WakeVector* b, int newPeriod,
                               int lifetime, int isAscending);
 };
 
-struct Vec3_004720d0 {
-    int x, y, z;
-};
-
-struct Ctx_004720d0 {
-    Vec3_004720d0 a;
-    Vec3_004720d0 b;
-};
-
-struct Pos_00472200 {
+struct NanoTargetBounds {
     Vec3 a;
     Vec3 b;
 };
@@ -419,7 +404,7 @@ static inline int IsSeen(Player* p, Player* q, int col, int row)
 
 static inline int Identity(int v) { return v; }
 
-inline int Pos_004745e0::Visible()
+inline int WakeParticleWholePos::Visible()
 {
     Player* p = &g_game->players[g_game->playerIndex];
     Player* p2 = &g_game->players[g_game->playerIndex];
@@ -441,7 +426,7 @@ inline int Pos_004745e0::Visible()
 }
 
 // FUNCTION: 0x470a40
-Elem_00470a40* __stdcall CopyStructRange(Elem_00470a40* first, Elem_00470a40* last, Elem_00470a40* dest)
+StructRangeElement* __stdcall CopyStructRange(StructRangeElement* first, StructRangeElement* last, StructRangeElement* dest)
 {
     for (; first != last; ++dest, ++first)
         *dest = *first;
@@ -573,7 +558,7 @@ void ParticleLists::AddTeleportParticles(int posA, int posB, int lifetime, short
 {
     TeleportParticles* p = new TeleportParticles;
     if (p) {
-        p->Init((Vec3_004736e0*)posA, (Vec3_004736e0*)posB, lifetime);
+        p->Init((TeleportEndpoint*)posA, (TeleportEndpoint*)posB, lifetime);
         AddToList(p, index);
     }
 }
@@ -586,7 +571,7 @@ void ParticleLists::AddNanoParticles(int posA, int posB, int lifetime, short ind
 {
     NanoParticles* p = new NanoParticles;
     if (p) {
-        p->Init((Seg_00473b50*)posA, (Seg_00473b50*)posB, lifetime);
+        p->Init((NanoSegment*)posA, (NanoSegment*)posB, lifetime);
         AddToList(p, index);
     }
 }
@@ -599,7 +584,7 @@ void ParticleLists::AddThrustParticles(int posA, int posB, int period, int lifet
 {
     ThrustParticles* p = new ThrustParticles;
     if (p) {
-        p->Init((Shape_00472ab0*)posA, (Shape_00472ab0*)posB, period, lifetime);
+        p->Init((ThrustPos*)posA, (ThrustPos*)posB, period, lifetime);
         AddToList(p, index);
     }
 }
@@ -613,7 +598,7 @@ void ParticleLists::AddWakeParticles(int posA, int posB, int period,
 {
     WakeParticles* p = new WakeParticles;
     if (p) {
-        p->Init((Vec3_00474760*)posA, (Vec3_00474760*)posB, period, lifetime, isAscending);
+        p->Init((WakeVector*)posA, (WakeVector*)posB, period, lifetime, isAscending);
         AddToList(p, index);
     }
 }
@@ -726,35 +711,35 @@ void __stdcall EmitTeleportParticles(int posA, int posB, int lifetime, short ind
     ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     TeleportParticles* p = new TeleportParticles;
     if (p) {
-        p->Init((Vec3_004736e0*)posA, (Vec3_004736e0*)posB, lifetime);
+        p->Init((TeleportEndpoint*)posA, (TeleportEndpoint*)posB, lifetime);
         l->AddToList(p, index);
     }
 }
 
 // FUNCTION: 0x4720d0
-void __stdcall EmitNanoParticles(Vec3_004720d0* p, void* posB, short index)
+void __stdcall EmitNanoParticles(Vec3* p, void* posB, short index)
 {
-    Ctx_004720d0 ctx;
+    NanoTargetBounds ctx;
     ctx.a = *p;
     ctx.b = *p;
     ParticleLists* lists = (ParticleLists *)g_game->lists_38d77;
     NanoParticles* q = new NanoParticles;
     if (q) {
-        q->Init((Seg_00473b50*)&ctx.a, (Seg_00473b50*)posB, 1);
+        q->Init((NanoSegment*)&ctx.a, (NanoSegment*)posB, 1);
         lists->AddToList(q, index);
     }
 }
 
 // FUNCTION: 0x472200
-void __stdcall EmitReverseNanoParticles(Pos_00472200* targetBounds, Vec3* origin, short index)
+void __stdcall EmitReverseNanoParticles(NanoTargetBounds* targetBounds, Vec3* origin, short index)
 {
-    Pos_00472200 pos;
+    NanoTargetBounds pos;
     pos.a = *origin;
     pos.b = *origin;
     ParticleLists* lists = (ParticleLists *)g_game->lists_38d77;
     NanoParticles* p = new NanoParticles;
     if (p) {
-        p->Init((Seg_00473b50*)targetBounds, (Seg_00473b50*)&pos, 1);
+        p->Init((NanoSegment*)targetBounds, (NanoSegment*)&pos, 1);
         lists->AddToList(p, index);
     }
 }
@@ -766,7 +751,7 @@ void __stdcall EmitThrustParticles(int posA, int posB, int period, int lifetime,
     ParticleLists* lists = (ParticleLists *)g_game->lists_38d77;
     ThrustParticles* p = new ThrustParticles;
     if (p) {
-        p->Init((Shape_00472ab0*)posA, (Shape_00472ab0*)posB, period, lifetime);
+        p->Init((ThrustPos*)posA, (ThrustPos*)posB, period, lifetime);
         lists->AddToList(p, index);
     }
 }
@@ -777,7 +762,7 @@ void __stdcall EmitWakeParticles(int posA, int posB, int period, short index)
     ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     WakeParticles* p = new WakeParticles;
     if (p) {
-        p->Init((Vec3_00474760*)posA, (Vec3_00474760*)posB, period, 1, 1);
+        p->Init((WakeVector*)posA, (WakeVector*)posB, period, 1, 1);
         l->AddToList(p, index);
     }
 }
@@ -788,7 +773,7 @@ void __stdcall EmitBubbles(int posA, int posB, int period, short index)
     ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     WakeParticles* p = new WakeParticles;
     if (p) {
-        p->Init((Vec3_00474760*)posA, (Vec3_00474760*)posB, period, 1, 0);
+        p->Init((WakeVector*)posA, (WakeVector*)posB, period, 1, 0);
         l->AddToList(p, index);
     }
 }
@@ -970,7 +955,7 @@ void TeleportParticle::Step()
 // FUNCTION: 0x473590
 void TeleportParticle::DrawParticle(void* dest, short px, short py)
 {
-    Pos_00473590* q = &posw;
+    TeleportParticleWholePos* q = &posw;
     short sx = q->x - px + 0x80;
     short sy = q->y - (q->h >> 1) - py + 0x20;
     Player* p = &g_game->players[g_game->playerIndex];
@@ -1002,7 +987,7 @@ int TeleportParticle::IsExpired(int currentTick)
 #pragma auto_inline(on)
 
 // FUNCTION: 0x4736e0
-void TeleportParticles::Init(Vec3_004736e0* a, Vec3_004736e0* b, int c)
+void TeleportParticles::Init(TeleportEndpoint* a, TeleportEndpoint* b, int c)
 {
     SetLifetime(c);
     pos1 = *a;
@@ -1064,7 +1049,7 @@ int NanoParticle::IsExpired(int value)
 #pragma auto_inline(on)
 
 // FUNCTION: 0x473b50
-void NanoParticles::Init(Seg_00473b50* a, Seg_00473b50* b, int c)
+void NanoParticles::Init(NanoSegment* a, NanoSegment* b, int c)
 {
     SetLifetime(c);
     seg_1c = *a;
@@ -1089,7 +1074,7 @@ void ThrustParticle::Step()
 // FUNCTION: 0x474170
 void ThrustParticle::DrawParticle(void* dest, short px, short py)
 {
-    Pos_00473590* q = &posw;
+    TeleportParticleWholePos* q = &posw;
     short sx = q->x - px + 0x80;
     short sy = q->y - (q->h >> 1) - py + 0x20;
     Player* p = &g_game->players[g_game->playerIndex];
@@ -1201,7 +1186,7 @@ int WakeParticle::IsExpired(int currentTick)
 #pragma auto_inline(on)
 
 // FUNCTION: 0x474760
-void WakeParticles::Init(Vec3_00474760* a, Vec3_00474760* b, int newPeriod,
+void WakeParticles::Init(WakeVector* a, WakeVector* b, int newPeriod,
                                   int lifetime, int isAscending)
 {
     SetLifetime(lifetime);
@@ -1459,14 +1444,14 @@ int NanoParticleVector::GetCount()
     return _First == 0 ? 0 : (_Last - _First) / 48;
 }
 
-struct Shape_00472ab0 {
-    Pair_00474880 v[3];
+struct ThrustPos {
+    WordPair v[3];
 };
 
 // FUNCTION: 0x472ab0
-void __stdcall EmitJitteredThrustParticles(Shape_00472ab0* pos, short index)
+void __stdcall EmitJitteredThrustParticles(ThrustPos* pos, short index)
 {
-    Shape_00472ab0 s = *pos;
+    ThrustPos s = *pos;
     s.v[0].hi += (int)((__int64)HarnessViewRand() * 3 / 0x8000) - 1;
     s.v[1].hi += (int)((__int64)HarnessViewRand() * 3 / 0x8000) - 1;
     s.v[2].hi += (int)((__int64)HarnessViewRand() * 3 / 0x8000) - 1;

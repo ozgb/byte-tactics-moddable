@@ -8,11 +8,7 @@
 
 #include "../util/tdf.h"
 
-class Sound {
-public:
-    int IsStreamActive();
-    void StopStream();
-};
+#include "../sound/sound.h"
 
 #include "../map/mission.h"
 

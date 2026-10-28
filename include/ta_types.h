@@ -2536,12 +2536,6 @@ public:
     Class_004b73b0* InitArgs(void);
 };
 
-class Class_004800c0 {
-public:
-    std::vector<Unit*> units;
-    Unit** EraseSwapBack(Unit**);
-};
-
 struct Player_00446080 {
     char name[72];
     unsigned char control;
@@ -4274,12 +4268,6 @@ public:
 #include "../src/ingame/flags_00495e90_37f06.h"
 
 #include "../src/game/mission_flags_0042f9a0.h"
-
-class Sound {
-public:
-    char unknown_0[1];
-    int GetMaxBuffers(void);
-};
 
 class Class_004cfff0 {
 public:
@@ -8731,12 +8719,6 @@ public:
     Entry_00480020 entries[9];
     int count;
     void RemoveSpeechOfId(int);
-};
-
-class IntDynArray {
-public:
-    std::vector<int> items;
-    int EraseByValue(int);
 };
 
 class Class_00480c30 {

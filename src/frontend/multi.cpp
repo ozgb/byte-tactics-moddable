@@ -599,7 +599,6 @@ struct UnitRestrictRecord {
 #include "../network/packet_manager.h"
 #include "../state/sim_globals.h"
 
-class Class_004a1080;
 struct Dialog;
 struct Struct_004c6ac0;
 
@@ -687,7 +686,7 @@ char __stdcall GetGadgetActiveByName(void* menu, char* name);
 int __stdcall GetButtonStage(void* gadget, int index);
 int __stdcall GetButtonStageByName(void* gadget, char* name);
 void __stdcall SetButtonStageByName(void* gui, char* name, int value);
-int __stdcall SetButtonStageByName(Class_004a1080* obj, char* name, int value);
+int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
 void __stdcall SetGadgetStatusByName(void* gui, char* name, int value);
 void __stdcall SetGadgetRows(void* table, char* name, int* pics, int count);
 void __stdcall DrawButton(void* gadget, int value);
@@ -2098,7 +2097,7 @@ void __cdecl BuildPlayerSlotGadgets(void)
                     break;
                 case 9:
                     dst->active = 0;
-                    SetButtonStageByName((Class_004a1080*)&g_game->gui, dst->name, 10);
+                    SetButtonStageByName((Gui*)&g_game->gui, dst->name, 10);
                     break;
                 default:
                     if (dst->state == 1)
@@ -2237,19 +2236,19 @@ void UpdateBattleRoomFlags()
     }
     PlayerInfo* info = g_game->players_1b63[i].info;
 
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "COMMANDER", info->commander);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "MAPPING", !info->mapping);
+    SetButtonStageByName((Gui*)&g_game->gui, "COMMANDER", info->commander);
+    SetButtonStageByName((Gui*)&g_game->gui, "MAPPING", !info->mapping);
     int los;
     if (!info->los) {
         los = 2;
     } else {
         los = !info->losType;
     }
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "LOSTYPE", los);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "WATCHING", info->watching);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "CHEATING", info->cheating);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "FIXEDLOC", info->fixedloc);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "GAMEOPEN", !info->closed);
+    SetButtonStageByName((Gui*)&g_game->gui, "LOSTYPE", los);
+    SetButtonStageByName((Gui*)&g_game->gui, "WATCHING", info->watching);
+    SetButtonStageByName((Gui*)&g_game->gui, "CHEATING", info->cheating);
+    SetButtonStageByName((Gui*)&g_game->gui, "FIXEDLOC", info->fixedloc);
+    SetButtonStageByName((Gui*)&g_game->gui, "GAMEOPEN", !info->closed);
 }
 
 // FUNCTION: 0x446020
@@ -2370,8 +2369,8 @@ void CyclePlayerDisplayMode(void)
 void UpdateWatchingGadgets()
 {
     PlayerInfo* info = g_game->players_1b63[g_game->localPlayer].info;
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "WATCHING", info->watching);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "GAMEOPEN", !info->closed);
+    SetButtonStageByName((Gui*)&g_game->gui, "WATCHING", info->watching);
+    SetButtonStageByName((Gui*)&g_game->gui, "GAMEOPEN", !info->closed);
     MarkChanged((Dialog*)&g_game->gui);
 }
 
@@ -2392,9 +2391,9 @@ void __stdcall HandleControlDialogClick(Gui* gui)
             info->watching = !info->watching;
             PlaySoundByName("Options", 0);
             info = g_game->players_1b63[g_game->localPlayer].info;
-            SetButtonStageByName((Class_004a1080*)&g_game->gui, "WATCHING", info->watching);
-            SetButtonStageByName((Class_004a1080*)&g_game->gui, "GAMEOPEN", !info->closed);
-            MarkChanged((Dialog *)((Class_004a1080*)&g_game->gui));
+            SetButtonStageByName((Gui*)&g_game->gui, "WATCHING", info->watching);
+            SetButtonStageByName((Gui*)&g_game->gui, "GAMEOPEN", !info->closed);
+            MarkChanged((Dialog *)((Gui*)&g_game->gui));
             BroadcastPlayerInfo();
         } else if (IsCurrentGadgetNamed((Dialog *)gui, "OK")) {
             UpdateNetGameInfo();
@@ -2428,8 +2427,8 @@ void OpenControlDialog()
     gadget->owner = g_game;
     RefreshAlliesScreen(1);
     info = g_game->players_1b63[g_game->localPlayer].info;
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "WATCHING", info->watching);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "GAMEOPEN", !info->closed);
+    SetButtonStageByName((Gui*)&g_game->gui, "WATCHING", info->watching);
+    SetButtonStageByName((Gui*)&g_game->gui, "GAMEOPEN", !info->closed);
     MarkChanged((Dialog*)&g_game->gui);
     SetKeyboardInput((Dialog*)&g_game->gui, 1);
     RenderLayer((Gui *)((Dialog*)&g_game->gui), 0x40);
@@ -2524,13 +2523,13 @@ void RefreshTeamIcons()
 
             switch (count) {
             case 0:
-                SetButtonStageByName((Class_004a1080*)&g_game->gui, buffer, 10);
+                SetButtonStageByName((Gui*)&g_game->gui, buffer, 10);
                 break;
             case 1:
-                SetButtonStageByName((Class_004a1080*)&g_game->gui, buffer, alliance * 2 + 1);
+                SetButtonStageByName((Gui*)&g_game->gui, buffer, alliance * 2 + 1);
                 break;
             default:
-                SetButtonStageByName((Class_004a1080*)&g_game->gui, buffer, alliance * 2);
+                SetButtonStageByName((Gui*)&g_game->gui, buffer, alliance * 2);
                 break;
             }
         }
@@ -2892,7 +2891,7 @@ void OpenAlliesDialog()
     Player* local = &g_game->players_1b63[g_game->localPlayer];
     int old = (local->info->flags_9d_wide >> 1) & 1;
     unsigned char win = (local->info->flags_9b >> 6) & 1;
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "VICTORY", old);
+    SetButtonStageByName((Gui*)&g_game->gui, "VICTORY", old);
     int alliance = local->alliance;
     int count;
     if (alliance == 5)
@@ -3319,7 +3318,7 @@ void __stdcall UpdateSideGadget(int side)
     Player* p = &g_game->players[side];
 
     sprintf(name, "SIDE%d", side);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, name,
+    SetButtonStageByName((Gui*)&g_game->gui, name,
                  (p->active != 0 && (p->info->flags_9b & 0x40)) ? 2 : p->info->side);
 }
 
@@ -3541,7 +3540,7 @@ void RefreshBattleRoomRows()
             sprintf(name, "ALLY%d", n);
             e = FindGadgetOrNull(entries, name);
             if (e) {
-                SetButtonStageByName((Class_004a1080*)&g_game->gui, name,
+                SetButtonStageByName((Gui*)&g_game->gui, name,
                              me->alliedBy[n] << 1 | me->allied[n]);
                 e->visible = (IsLocalHumanInRefreshBattleRoomRows(p) || IsWatchingInRefreshBattleRoomRows(p)
                               || IsLocalAiInRefreshBattleRoomRows(p) || IsRemoteAiInRefreshBattleRoomRows(p)

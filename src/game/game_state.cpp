@@ -609,16 +609,16 @@ void ShutdownIngameAndQuit()
     QuitApp(0);
 }
 
-struct Obj_004ab400;
+struct Gui;
 
-void __stdcall SetCursorAnimation(Obj_004ab400* p, Src_004ab400* src);
+void __stdcall SetCursorAnimation(Gui* p, Src_004ab400* src);
 
 // FUNCTION: 0x491c80
 void __stdcall SetCursorMode(int n)
 {
     if (((signed char)g_game->cursorMode) != n) {
         g_game->cursorMode = (char)(n);
-        SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->table[n]);
+        SetCursorAnimation((Gui*)&g_game->gui, g_game->table[n]);
     }
 }
 
@@ -637,7 +637,7 @@ void __stdcall UpdateBattleHoverMode(int unused)
     if ((flags & 2) == 0 && (flags & 1) == 0) {
         if (((signed char)g_game->cursorMode) != 0x13) {
             g_game->cursorMode = (char)(0x13);
-            SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->table[0x13]);
+            SetCursorAnimation((Gui*)&g_game->gui, g_game->table[0x13]);
         }
         return;
     }
@@ -645,7 +645,7 @@ void __stdcall UpdateBattleHoverMode(int unused)
     int n = ResolveCursorModeForSelection(g_game->orderMode);
     if (((signed char)g_game->cursorMode) != n) {
         g_game->cursorMode = (char)(n);
-        SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->table[n]);
+        SetCursorAnimation((Gui*)&g_game->gui, g_game->table[n]);
     }
 }
 

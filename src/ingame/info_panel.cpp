@@ -51,7 +51,7 @@ struct RadarJamUnit {
     unsigned int flags;
 };
 
-struct Object_004cb650;
+struct Object3do;
 
 #include "../units/unit.h"
 #include "../weapons/weapon_def.h"
@@ -225,7 +225,7 @@ void __stdcall PlaySoundByName(char* name, int param_2);
 #include "../gui/keyboard.h"
 #include "../gui/gui.h"
 
-void __stdcall GetObjectBounds(Object_004cb650* obj, Vec3* lo, Vec3* hi, int arg);
+void __stdcall GetObjectBounds(Object3do* obj, Vec3* lo, Vec3* hi, int arg);
 #include "info_panel.h"
 
 int __stdcall GetGafSequenceFrame(short* ref);
@@ -1354,7 +1354,7 @@ void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
     if (f->flag) {
         Vec3 lo;
         Vec3 hi;
-        GetObjectBounds(((Object_004cb650 **)g_game->types.get())[unit->unitDefIndex], &lo, &hi, 0);
+        GetObjectBounds(((Object3do **)g_game->types.get())[unit->unitDefIndex], &lo, &hi, 0);
         Vec3 corners[4];
         corners[0].x = lo.x;
         corners[0].y = lo.y;

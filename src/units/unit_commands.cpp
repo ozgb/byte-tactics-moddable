@@ -4,7 +4,7 @@
 
 #include "../weapons/unit_weapon_slot.h"
 
-struct Item_00485940;
+struct Player;
 
 #pragma pack(push, 1)
 #include "../util/angles.h"
@@ -380,24 +380,24 @@ void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPack
     g_seams.units->SetStateBits(n, ~unit->activateFlags, 0);
 }
 
-typedef int (__stdcall* QuickSortPred)(Item_00485940*, Item_00485940*);
+typedef int (__stdcall* QuickSortPred)(Player*, Player*);
 
-static inline int PointerSpanBytes(Item_00485940** low, Item_00485940** high)
+static inline int PointerSpanBytes(Player** low, Player** high)
 {
     return (int)((char*)high - (char*)low) & ~3;
 }
 
-void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, QuickSortPred pred, int unused);
+void __stdcall QuickSort(Player** first, Player** last, QuickSortPred pred, int unused);
 
 // FUNCTION: 0x488810
-void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, QuickSortPred pred, int unused)
+void __stdcall QuickSort(Player** first, Player** last, QuickSortPred pred, int unused)
 {
     while (((int)((char*)last - (char*)first) & ~3) > 0x40) {
         int len = (int)((char*)last - (char*)first);
-        Item_00485940* a = *first;
-        Item_00485940* m = first[(len >> 2) / 2];
-        Item_00485940* c = last[-1];
-        Item_00485940* pivot;
+        Player* a = *first;
+        Player* m = first[(len >> 2) / 2];
+        Player* c = last[-1];
+        Player* pivot;
 
         if (pred(a, m)) {
             if (pred(m, c))
@@ -412,8 +412,8 @@ void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, QuickSortP
             pivot = pred(m, c) ? c : m;
         }
 
-        Item_00485940** j = last;
-        Item_00485940** i = first;
+        Player** j = last;
+        Player** i = first;
         for (;;) {
             while (pred(*i, pivot))
                 ++i;
@@ -421,7 +421,7 @@ void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, QuickSortP
                 ;
             if (j <= i)
                 break;
-            Item_00485940* t = *i;
+            Player* t = *i;
             *i = *j;
             *j = t;
             ++i;
@@ -438,16 +438,16 @@ void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, QuickSortP
 }
 
 // FUNCTION: 0x488920
-void __stdcall InsertShift(Item_00485940** last, Item_00485940* value, QuickSortPred pred)
+void __stdcall InsertShift(Player** last, Player* value, QuickSortPred pred)
 {
-    for (Item_00485940** m = last; pred(value, *--m); last = m)
+    for (Player** m = last; pred(value, *--m); last = m)
         *last = *m;
     *last = value;
 }
 
 // FUNCTION: 0x488960
-Item_00485940** __stdcall Partition(Item_00485940** first, Item_00485940** last,
-                                        Item_00485940* pivot, QuickSortPred pred)
+Player** __stdcall Partition(Player** first, Player** last,
+                                        Player* pivot, QuickSortPred pred)
 {
     for (;; ++first) {
         for (; pred(*first, pivot); ++first)
@@ -456,7 +456,7 @@ Item_00485940** __stdcall Partition(Item_00485940** first, Item_00485940** last,
             ;
         if (last <= first)
             return first;
-        Item_00485940* t = *first;
+        Player* t = *first;
         *first = *last;
         *last = t;
     }

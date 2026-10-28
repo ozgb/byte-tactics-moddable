@@ -1313,7 +1313,7 @@ struct Item_00478790;
 struct Item_00478b40;
 struct Item_004794d0;
 struct Item_00481430;
-struct Item_00485940;
+struct Player;
 struct Item_004b3630_10;
 struct Item_004b4d70;
 struct Item_004bb2e0;
@@ -1675,7 +1675,6 @@ union ModelPieceFlags;
 struct PieceFrame;
 struct Piece_00458310;
 struct Placement;
-struct Player;
 struct PlayerData_004437c0;
 struct PlayerData_004956c0;
 struct PlayerData_004ca6a0;
@@ -9000,14 +8999,6 @@ struct Pos_00485330 {
     Fixed_00485330 x;
     Fixed_00485330 y;
     Fixed_00485330 z;
-};
-
-struct Item_00485940 {
-    char unknown_0[4];
-    unsigned int key;
-    char unknown_8[318];
-    unsigned char field_146;
-    char unknown_147[5];
 };
 
 union Flags114_485a40 {

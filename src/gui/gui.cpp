@@ -187,15 +187,9 @@ class SquadManager;
 
 #pragma pack(push, 1)
 
-struct Vec6_49fd20 {
-    int x;
-    int y;
-    char pad[16];
-};
-
 struct Obj1_49fd20 {
     char unknown_0[0x3c];
-    Vec6_49fd20 data;
+    DialogMouseEvent data;
 };
 
 struct Obj2_49fd20 {
@@ -381,7 +375,7 @@ bool __stdcall HasFocus(int param_1)
 }
 
 // FUNCTION: 0x49fd20
-void __stdcall FUN_0049fd20(Obj1_49fd20* param_1, Obj2_49fd20* param_2, Vec6_49fd20* param_3)
+void __stdcall FUN_0049fd20(Obj1_49fd20* param_1, Obj2_49fd20* param_2, DialogMouseEvent* param_3)
 {
     *param_3 = param_1->data;
     param_3->x -= param_2->val_13;

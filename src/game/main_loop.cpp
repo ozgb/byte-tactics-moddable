@@ -25,7 +25,7 @@ struct CampaignSetupRecord {
     char flag_96;
 };
 
-struct Obj_004ab400;
+struct Gui;
 struct Src_004ab400;
 
 #include "../network/player_info.h"
@@ -74,7 +74,7 @@ unsigned int GetTicks();
 #include "../ingame/selection.h"
 #include "../ingame/info_panel.h"
 #include "../graphics/pcx.h"
-void __stdcall SetCursorAnimation(Obj_004ab400* p, Src_004ab400* src);
+void __stdcall SetCursorAnimation(Gui* p, Src_004ab400* src);
 void ShowSoftwareCursor();
 #include "../gui/keyboard.h"
 void __cdecl LeaveNetGameCallback(int param);
@@ -178,7 +178,7 @@ void InitFrame()
 {
     if (((signed char)g_game->cursorMode) != 0x13) {
         g_game->cursorMode = (char)(0x13);
-        SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->table[0x13]);
+        SetCursorAnimation((Gui*)&g_game->gui, g_game->table[0x13]);
     }
     ShowSoftwareCursor();
     g_game->bits_2a44.bit2 = 0;

@@ -39,10 +39,10 @@ public:
 
 #include "../weapons/weapon_def.h"
 
-struct Holder_00453640;
+struct OutputLayerHolder;
 #include "../gui/gui.h"
 #include "../gui/layer.h"
-struct Net_4517b0;
+struct DplConnectionView;
 struct ChatPacket;
 
 #include "player_info.h"
@@ -469,7 +469,7 @@ void CheckDuplicatePlayerIds(void)
     g_game->duplicateIds = dup;
 }
 
-static inline unsigned char FindSlot_00450a10(int id)
+static inline unsigned char FindSlotByIdInAddNetPlayer(int id)
 {
     unsigned char i;
     for (i = 0; i < 10; i++) {
@@ -493,7 +493,7 @@ int __stdcall AddNetPlayer(int id)
     if (id == -1) {
         slot = 10;
     } else {
-        slot = FindSlot_00450a10(id);
+        slot = FindSlotByIdInAddNetPlayer(id);
     }
     int flag = 0;
     if (slot != 10) {
@@ -807,19 +807,19 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
 
 #include "packet_receiver.h"
 
-struct Guid_4517b0 {
+struct JoinGuidView {
     int data[4];
 };
 
-struct SessionDesc_004517b0 {
+struct DplSessionDescView {
     char unknown_0[0x30];
     char* lpszSessionName;
 };
 
-struct Net_4517b0 {
+struct DplConnectionView {
     char unknown_0[4];
     unsigned int flags;
-    SessionDesc_004517b0* desc;
+    DplSessionDescView* desc;
     DPNAME* name;
 };
 
@@ -829,7 +829,7 @@ struct DisplayFlagsView {
     unsigned short flag : 1;
 };
 
-struct Args_00451640 {
+struct LobbyJoinArgs {
     char* name;
     int arg_4;
     int arg_8;
@@ -840,7 +840,7 @@ struct Args_00451640 {
     void* event;
 };
 
-struct Class_00451fd0 {
+struct PacketTableOwnerView {
     char unknown_0[0x870];
     unsigned int lobbySyncTick;
     char unknown_874[0x1745 - 0x874];
@@ -850,27 +850,27 @@ struct Class_00451fd0 {
     };
 };
 
-struct Entry_00453640 {
+struct OutputGadgetEntry {
     char unknown_0[0xc0];
     short count;
 };
 
-struct Holder_00453640 {
+struct OutputLayerHolder {
     int unknown_0;
-    Entry_00453640* entries;
+    OutputGadgetEntry* entries;
 };
 
-struct Entry_004538f0 {
+struct TalkGadgetEntry {
     char unknown_0[0xb6];
     char text[0x15b - 0xb6];
 };
 
-struct OutEntry_00453a50 {
+struct OutputHeightEntry {
     char unknown_0[0x19];
     short height;
 };
 
-struct Gui_00453a50 {
+struct TimeoutDialogLayer {
     char unknown_0[4];
     void* entries;
     void (__stdcall* callback)(void*);
@@ -913,7 +913,7 @@ struct JoinRequestData {
     short versionMinor;
 };
 
-struct Packet_00453d40 {
+struct CreatePlayerSystemMsg {
     unsigned int type;
     int playerType;
     int id;
@@ -966,8 +966,8 @@ typedef EntryFunc SimView_g_packetHandlerType2;
 #define g_packetHandlerType2 (*reinterpret_cast<SimView_g_packetHandlerType2*>(reinterpret_cast<char*>(&g_packetHandlers) + 0x8))
 
 #include "../debug/debug_lib.h"
-int __stdcall InitPacketTables(Class_00451fd0* obj);
-void __stdcall JoinLobbyGameThread(Args_00451640* args);
+int __stdcall InitPacketTables(PacketTableOwnerView* obj);
+void __stdcall JoinLobbyGameThread(LobbyJoinArgs* args);
 unsigned __stdcall JoinLobbyGameThread(void* args);
 int __stdcall SetAlliance(int from, int to, unsigned char value, int extra);
 int __stdcall RejectPlayer(int id, unsigned char value);
@@ -985,7 +985,7 @@ void __stdcall ApplyWeaponFirePacket(Player* player, void* packet);
 void __stdcall ApplyProjectileHitPacket(Player* player, void* packet);
 void __stdcall PlaySoundAt(int index, void* pos, int param_3);
 void __stdcall PlaySoundByName(char* name, int param_2);
-Entry_004538f0* __stdcall FindGadgetChecked_B(Entry_004538f0* entries, char* name);
+TalkGadgetEntry* __stdcall FindGadgetChecked_B(TalkGadgetEntry* entries, char* name);
 int __stdcall SendChatMessage(Player* from, char* text, int key, char* to);
 int __stdcall FindGadgetIndex(void* gadgets, const char* name, int flag);
 void* __stdcall LoadGuiLayer(void* obj, const char* name, int size);
@@ -1023,7 +1023,7 @@ void __stdcall EnumPlayersCallback(int id, int unused1, int unused2, int unused3
 
 static void HOST_CALL JoinLobbyGameEntry(void* param)
 {
-    Args_00451640* args = (Args_00451640*)param;
+    LobbyJoinArgs* args = (LobbyJoinArgs*)param;
     void* event = args->event;
     JoinLobbyGameThread(args);
     host_event_set(event);
@@ -1045,7 +1045,7 @@ int __stdcall JoinLobbyGame(Player* p)
         g_game->netMode = count;
     }
 
-    Args_00451640* args = (Args_00451640*)GameAllocIgnoreTag("LOBBY JOIN INFO", 0x20);
+    LobbyJoinArgs* args = (LobbyJoinArgs*)GameAllocIgnoreTag("LOBBY JOIN INFO", 0x20);
     if (args != 0) {
         memset(args, 0, 0x20);
         args->arg_4 = count;
@@ -1081,14 +1081,14 @@ int __stdcall JoinLobbyGame(Player* p)
 }
 
 // FUNCTION: 0x451770
-void __stdcall JoinLobbyGameThread(Args_00451640* args)
+void __stdcall JoinLobbyGameThread(LobbyJoinArgs* args)
 {
     args->result = host_net_create_or_join_lobby_game((host_net*)g_game->net_14, args->name, args->arg_4, args->arg_8,
                                 args->arg_c, args->arg_10, args->arg_14);
 }
 
 // FUNCTION: 0x4517b0
-int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
+int __stdcall JoinNetGame(JoinGuidView guid, int player)
 {
     char name[0x100];
     SideDataPacket packet;
@@ -1096,7 +1096,7 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
     if (player == g_game->localPlayer) {
         Player* p = &g_game->players[player];
 
-        Net_4517b0* net = g_game->dplConnection;
+        DplConnectionView* net = g_game->dplConnection;
         if (net != 0) {
             int v = IsOnlineConfigLoaded();
             char* s = &g_onlineLobbyPlayerName;
@@ -1212,7 +1212,7 @@ void RemoveLocalPlayers()
     ShutdownScoreTables();
 }
 
-static inline unsigned char FindIndex_00451bc0(int id)
+static inline unsigned char FindSlotByDpidInSendPacketToPlayer(int id)
 {
     for (unsigned char i = 0; i < 10; i++) {
         if (GetSlotDpid(i) == id)
@@ -1228,7 +1228,7 @@ int __stdcall SendPacketToPlayer(int from, int to, unsigned char* packet, int si
     if (from == -1)
         fi = 10;
     else
-        fi = FindIndex_00451bc0(from);
+        fi = FindSlotByDpidInSendPacketToPlayer(from);
     Player* fromPlayer;
     if (fi == 10)
         fromPlayer = 0;
@@ -1239,7 +1239,7 @@ int __stdcall SendPacketToPlayer(int from, int to, unsigned char* packet, int si
     if (to == -1)
         ti = 10;
     else
-        ti = FindIndex_00451bc0(to);
+        ti = FindSlotByDpidInSendPacketToPlayer(to);
     Player* toPlayer;
     if (ti == 10)
         toPlayer = 0;
@@ -1302,7 +1302,7 @@ int __stdcall BroadcastPacket(int id, unsigned char* packet, int size)
 }
 
 // FUNCTION: 0x451fd0
-int __stdcall InitPacketTables(Class_00451fd0* obj)
+int __stdcall InitPacketTables(PacketTableOwnerView* obj)
 {
     g_packetModes[9] = 4;
     g_packetModes[44] = 4;
@@ -1434,7 +1434,7 @@ int __stdcall InitPacketTables(Class_00451fd0* obj)
 }
 
 // FUNCTION: 0x452370
-void __stdcall ReleasePacketData(Class_00451fd0* obj)
+void __stdcall ReleasePacketData(PacketTableOwnerView* obj)
 {
     if (obj->buffer) {
         GameFreeThunk(obj->buffer);
@@ -1482,7 +1482,7 @@ int __stdcall AssignPlayerColor(int from, int to, int group)
     return result;
 }
 
-static __inline unsigned char FindSlot_00452570(int id)
+static __inline unsigned char FindSlotByIdInIsColorFree(int id)
 {
     unsigned char i;
     for (i = 0; i < 10; i++) {
@@ -1513,10 +1513,10 @@ int __stdcall IsColorFree(int id, int slot)
     if (id == -1) {
         found = 10;
     } else {
-        found = FindSlot_00452570(id);
+        found = FindSlotByIdInIsColorFree(id);
     }
     if (found != 10 && id != -1) {
-        FindSlot_00452570(id);
+        FindSlotByIdInIsColorFree(id);
     }
     for (int j = 0; j < 10; j++) {
         if (g_game->players[j].type != 0 && g_game->players[j].id != id &&
@@ -1583,7 +1583,7 @@ int __stdcall BroadcastPlayerLeft(int id)
     return BroadcastPacket(g_game->players[g_game->localPlayer].id, msg, 5);
 }
 
-static inline unsigned char FindIndex_00452960(int id)
+static inline unsigned char FindSlotByDpidInSetAlliance(int id)
 {
     for (unsigned char i = 0; i < 10; i++) {
         if (GetSlotDpid(i) == id)
@@ -1592,7 +1592,7 @@ static inline unsigned char FindIndex_00452960(int id)
     return 10;
 }
 
-static inline int IsActive12_00452960(Player* p)
+static inline int IsActiveLocalInSetAlliance(Player* p)
 {
     if (p->active == 0)
         return 0;
@@ -1601,7 +1601,7 @@ static inline int IsActive12_00452960(Player* p)
     return 0;
 }
 
-static inline int IsType3_00452960(Player* p)
+static inline int IsActiveRemoteInSetAlliance(Player* p)
 {
     if (p->active == 0)
         return 0;
@@ -1610,7 +1610,7 @@ static inline int IsType3_00452960(Player* p)
     return 0;
 }
 
-static inline int IsState2_00452960(Player* p)
+static inline int IsActiveLocalAiInSetAlliance(Player* p)
 {
     if (p->active == 0)
         return 0;
@@ -1619,7 +1619,7 @@ static inline int IsState2_00452960(Player* p)
     return 0;
 }
 
-static inline int IsState3_00452960(Player* p)
+static inline int IsActiveRemoteInSetAllianceB(Player* p)
 {
     if (p->active == 0)
         return 0;
@@ -1635,7 +1635,7 @@ int __stdcall SetAlliance(int from, int to, unsigned char value, int extra)
     if (from == -1)
         fi = 10;
     else
-        fi = FindIndex_00452960(from);
+        fi = FindSlotByDpidInSetAlliance(from);
 
     Player* p1;
     if (fi == 10)
@@ -1655,26 +1655,26 @@ int __stdcall SetAlliance(int from, int to, unsigned char value, int extra)
 
     unsigned char idx_;
     unsigned char& idx = idx_;
-    if (IsActive12_00452960(p1)) {
+    if (IsActiveLocalInSetAlliance(p1)) {
         idx = p2->index;
         p1->allied[idx] = value;
-        if (IsState2_00452960(p2)
-            || (IsState3_00452960(p2) && p2->info->kind == 2)
+        if (IsActiveLocalAiInSetAlliance(p2)
+            || (IsActiveRemoteInSetAllianceB(p2) && p2->info->kind == 2)
             || extra != 0) {
             idx = p2->index;
             p1->alliedBy[idx] = value;
         }
         result = 1;
     }
-    if (IsActive12_00452960(p2)) {
+    if (IsActiveLocalInSetAlliance(p2)) {
         idx = p1->index;
         p2->alliedBy[idx] = value;
-        if (IsState2_00452960(p2) || extra != 0) {
+        if (IsActiveLocalAiInSetAlliance(p2) || extra != 0) {
             idx = p1->index;
             p2->allied[idx] = value;
         }
         result = 1;
-    } else if (IsType3_00452960(p2)) {
+    } else if (IsActiveRemoteInSetAlliance(p2)) {
         AllyFlagsPacket* msg = (AllyFlagsPacket*)g_game->recvPacketPtr;
         msg->allied = value;
         msg->type = 0x23;
@@ -1752,7 +1752,7 @@ char* __stdcall GetRejectReasonText(int reason)
     }
 }
 
-static inline int IsType1_00452cc0(Player* p)
+static inline int IsActiveLocalHumanInRemovePlayer(Player* p)
 {
     if (p->active == 0)
         return 0;
@@ -1761,7 +1761,7 @@ static inline int IsType1_00452cc0(Player* p)
     return 0;
 }
 
-static inline int IsType3_00452cc0(Player* p)
+static inline int IsActiveRemoteInRemovePlayer(Player* p)
 {
     if (p->active == 0)
         return 0;
@@ -1770,7 +1770,7 @@ static inline int IsType3_00452cc0(Player* p)
     return 0;
 }
 
-static inline void Remove_00452cc0(Player* p)
+static inline void ClearPlayerSlotInRemovePlayer(Player* p)
 {
     p->SetType(0);
     p->active = 0;
@@ -1808,11 +1808,11 @@ void __stdcall RemovePlayer(int id)
 
     if (g_game->bits_2a44.bit2) {
         if (!IsConnected(p))
-            Remove_00452cc0(p);
+            ClearPlayerSlotInRemovePlayer(p);
     } else {
         if (IsConnected(p))
             host_net_remove_player((host_net*)g_game->net_14, p->id);
-        Remove_00452cc0(p);
+        ClearPlayerSlotInRemovePlayer(p);
     }
     g_game->numPlayers--;
     p->info->flags_9d_wide &= 0xfffb;
@@ -1824,7 +1824,7 @@ void __stdcall RemovePlayer(int id)
     if ((g_game->flags_2a44 & 4) && host != 0) {
         unsigned int best = 0;
         for (int j = 0; j < 10; j++) {
-            if (IsType3_00452cc0(&g_game->players[j]) || IsType1_00452cc0(&g_game->players[j])) {
+            if (IsActiveRemoteInRemovePlayer(&g_game->players[j]) || IsActiveLocalHumanInRemovePlayer(&g_game->players[j])) {
                 if (g_game->players[j].id > best)
                     best = g_game->players[j].id;
             }
@@ -1835,7 +1835,7 @@ void __stdcall RemovePlayer(int id)
     }
 }
 
-static inline unsigned char FindIndex_00453010(int id)
+static inline unsigned char FindSlotByDpidInRejectPlayer(int id)
 {
     for (unsigned char i = 0; i < 10; i++) {
         if (GetSlotDpid(i) == id)
@@ -1844,7 +1844,7 @@ static inline unsigned char FindIndex_00453010(int id)
     return 10;
 }
 
-static inline int FindActiveId_00453010()
+static inline int FindFirstActiveLocalIdInRejectPlayer()
 {
     int i = 0;
     while (1) {
@@ -1865,7 +1865,7 @@ int __stdcall RejectPlayer(int id, unsigned char value)
     if (id == -1)
         fi = 10;
     else
-        fi = FindIndex_00453010(id);
+        fi = FindSlotByDpidInRejectPlayer(id);
 
     Player* p;
     if (fi == 10)
@@ -1889,7 +1889,7 @@ int __stdcall RejectPlayer(int id, unsigned char value)
                 if (g_game->players[i].active != 0
                     && (g_game->players[i].type == 1 || g_game->players[i].type == 2)) {
                     msg->id = g_game->players[i].id;
-                    BroadcastPacket(FindActiveId_00453010(), msg, 6);
+                    BroadcastPacket(FindFirstActiveLocalIdInRejectPlayer(), msg, 6);
                     RemovePlayer(p->id);
                     g_game->players[i].rejectReason = value;
                 }
@@ -1897,13 +1897,13 @@ int __stdcall RejectPlayer(int id, unsigned char value)
             result = 1;
         } else {
             msg->id = p->id;
-            BroadcastPacket(FindActiveId_00453010(), msg, 6);
+            BroadcastPacket(FindFirstActiveLocalIdInRejectPlayer(), msg, 6);
             RemovePlayer(p->id);
             result = 1;
         }
     } else if (p->active != 0 && p->type == 3 && p->rejectReason == 0) {
         msg->id = id;
-        result = BroadcastPacket(FindActiveId_00453010(), msg, 6);
+        result = BroadcastPacket(FindFirstActiveLocalIdInRejectPlayer(), msg, 6);
         if (p->active != 0 && p->type == 3 && p->info->kind == 1) {
             unsigned char c = p->lobbyDataSynced;
             for (int i = 0; i < 10; i++) {
@@ -2021,7 +2021,7 @@ int __stdcall ReceiveNetPacket(void)
 // FUNCTION: 0x453640
 void UpdateTimeoutDialog()
 {
-    Entry_00453640* entry = (Entry_00453640*)FindGadgetChecked(((Holder_00453640*)g_game->layer)->entries, "OUTPUT");
+    OutputGadgetEntry* entry = (OutputGadgetEntry*)FindGadgetChecked(((OutputLayerHolder*)g_game->layer)->entries, "OUTPUT");
 
     if (g_loungeRefreshTime < GetTicks()) {
         g_loungeRefreshTime = GetTicks() + 2;
@@ -2076,7 +2076,7 @@ void UpdateTimeoutDialog()
 // FUNCTION: 0x4538f0
 void __stdcall HandleTimeoutDialog(Gui* gadget)
 {
-    Entry_004538f0* entries = (Entry_004538f0*)gadget->layer->entries;
+    TalkGadgetEntry* entries = (TalkGadgetEntry*)gadget->layer->entries;
 
     if (gadget->hotGadgetIndex == -1) {
         PlaySoundByName("Previous", 0);
@@ -2086,7 +2086,7 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
         return;
     }
     if (IsCurrentGadgetNamed((Dialog *)gadget, "TALK")) {
-        Entry_004538f0* entry = FindGadgetChecked_B(entries, "TALK");
+        TalkGadgetEntry* entry = FindGadgetChecked_B(entries, "TALK");
         if (strlen(entry->text)) {
             SendChatMessage(&g_game->players[g_game->localPlayer], entry->text, 4, 0);
             g_game->bits_2bee_1.dirty = 1;
@@ -2104,7 +2104,7 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
     ClearSelectedGadget(gadget);
 }
 
-static __inline unsigned char FindSlot_00453a50(int id)
+static __inline unsigned char FindSlotByIdInOpenTimeoutDialog(int id)
 {
     unsigned char i;
     for (i = 0; i < 10; i++) {
@@ -2134,12 +2134,12 @@ void __stdcall OpenTimeoutDialog(int id)
         return;
     }
 
-    int i = FindSlot_00453a50(id);
+    int i = FindSlotByIdInOpenTimeoutDialog(id);
     if (i == 10) {
         return;
     }
 
-    Gui_00453a50* gui = (Gui_00453a50*)LoadGuiLayer(g_game->menu,
+    TimeoutDialogLayer* gui = (TimeoutDialogLayer*)LoadGuiLayer(g_game->menu,
                                                     "TIMEOUT.GUI", 0x800);
     void* entries = gui->entries;
     gui->callback = (void (__stdcall *)(void *))&HandleTimeoutDialog;
@@ -2149,7 +2149,7 @@ void __stdcall OpenTimeoutDialog(int id)
     g_loungeChatter = p;
     memset(p, 0, 0x780);
 
-    OutEntry_00453a50* out = (OutEntry_00453a50*)FindGadgetChecked(entries, "OUTPUT");
+    OutputHeightEntry* out = (OutputHeightEntry*)FindGadgetChecked(entries, "OUTPUT");
     ConfigureListBoxByName(g_game->menu, "OUTPUT", g_loungeChatter,
                  (int)out->height / (GetFontLineHeight() + 2), 0);
 
@@ -2311,7 +2311,7 @@ int HandleNetPackets()
                 continue;
             if (recipient->type != 1)
                 continue;
-            Packet_00453d40* msg = (Packet_00453d40*)packet;
+            CreatePlayerSystemMsg* msg = (CreatePlayerSystemMsg*)packet;
             switch (msg->type) {
             case 5: {
                 if (msg->playerType != 1)
@@ -2814,17 +2814,17 @@ struct LatencyPacket {
     int targetPlayerNetId;
 };
 
-struct Msg26_00456310 {
+struct HeartbeatTableMsg {
     unsigned char type;
     int table[10];
 };
 
-struct Msg20_00456310 {
+struct HeartbeatInfoMsg {
     unsigned char type;
     PlayerInfo info;
 };
 
-struct Packet_00456de0 {
+struct LoadProgressPacket {
     unsigned char type;
     unsigned char progress;
 };
@@ -2992,7 +2992,7 @@ void SendNetHeartbeat()
                         g_game->table_2c28[k] = g_game->players[k].id;
                 }
 
-                Msg26_00456310 msg26;
+                HeartbeatTableMsg msg26;
                 memcpy(msg26.table, g_game->table_2c28, 0x28);
                 msg26.type = 0x26;
                 BroadcastPacket(p->id, (unsigned char*)&msg26, 0x29);
@@ -3000,7 +3000,7 @@ void SendNetHeartbeat()
         }
     }
 
-    Msg20_00456310 msg;
+    HeartbeatInfoMsg msg;
     if (g_game->netGameFlags & 1) {
         for (int i = 0; i < 10; i++) {
             Player* p = &g_game->players[i];
@@ -3107,7 +3107,7 @@ void __stdcall ReportPacketGap(int, int, int)
 {
 }
 
-static inline unsigned char FindOccupied_004568c0() {
+static inline unsigned char FindHostSlotInAssignStartPositions() {
     for (unsigned char i = 0; i < 10; i++) {
         if (g_game->players[i].type != 0 && g_game->players[i].info->host)
             return i;
@@ -3115,7 +3115,7 @@ static inline unsigned char FindOccupied_004568c0() {
     return 10;
 }
 
-static inline int FirstJoinedId_004568c0() {
+static inline int FindFirstType1IdInAssignStartPositions() {
     for (int j = 0; j < 10; j++) {
         if (g_game->players[j].type == 1)
             return g_game->players[j].id;
@@ -3125,7 +3125,7 @@ static inline int FirstJoinedId_004568c0() {
 
 // FUNCTION: 0x4568c0
 int AssignStartPositions() {
-    unsigned char idx = FindOccupied_004568c0();
+    unsigned char idx = FindHostSlotInAssignStartPositions();
     int res = g_game->players[idx].IsPlayableSlot();
     if (res != 0 && g_game->startPosShuffleReady == 0) {
         int* out = g_game->startPosShuffle;
@@ -3198,7 +3198,7 @@ int AssignStartPositions() {
             packet[1] = (unsigned char)g_game->startPosShuffle[k4];
             if (g_game->players[k4].active != 0) {
                 if (g_game->players[k4].type == 3) {
-                    SendPacketToPlayer(FirstJoinedId_004568c0(), GetSlotDpid(k4), packet, 2);
+                    SendPacketToPlayer(FindFirstType1IdInAssignStartPositions(), GetSlotDpid(k4), packet, 2);
                 } else if (IsConnected(&g_game->players[k4])) {
                     g_game->players[k4].startPos = packet[1];
                     g_game->startPosAssignAck[k4] = 1;
@@ -3224,7 +3224,7 @@ int AssignStartPositions() {
 // FUNCTION: 0x456de0
 void __stdcall SendLoadProgress()
 {
-    Packet_00456de0 packet;
+    LoadProgressPacket packet;
     packet.type = 0x2a;
     int total = (*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[0];
     total += (*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[5];
@@ -3291,7 +3291,7 @@ void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value)
     }
 }
 
-static inline int PlayerDpid_00457d30(unsigned char i)
+static inline int SlotDpidInUpdateResourceSharing(unsigned char i)
 {
     if (g_game->players[i].type != 0)
         return g_game->players[i].id;
@@ -3305,10 +3305,10 @@ void __stdcall SendShareMapInfo(unsigned char from, unsigned char to)
         ResourceSharePacket packet;
         packet.type = 0x16;
         packet.subtype = 3;
-        packet.fromNetId = PlayerDpid_00457d30(from);
-        packet.toNetId = PlayerDpid_00457d30(to);
+        packet.fromNetId = SlotDpidInUpdateResourceSharing(from);
+        packet.toNetId = SlotDpidInUpdateResourceSharing(to);
         packet.amount = 0;
-        SendPacketToPlayer(PlayerDpid_00457d30(from), PlayerDpid_00457d30(to), (unsigned char *)&packet, sizeof(packet));
+        SendPacketToPlayer(SlotDpidInUpdateResourceSharing(from), SlotDpidInUpdateResourceSharing(to), (unsigned char *)&packet, sizeof(packet));
     }
 }
 
@@ -3568,7 +3568,7 @@ void __cdecl LeaveNetGameCallback(int)
     QuitApp(text);
 }
 
-static inline unsigned char FindPlayer_00457a50()
+static inline unsigned char FindFlag97SlotInIsHostLocal()
 {
     for (unsigned char i = 0; i < 10; i++) {
         if (g_game->players[i].type != 0 && (g_game->players[i].info->flags_97 & 1))
@@ -3587,7 +3587,7 @@ static inline int IsHuman(Player* p)
 // FUNCTION: 0x457a50
 int IsHostLocal()
 {
-    return IsHuman(&g_game->players[FindPlayer_00457a50()]);
+    return IsHuman(&g_game->players[FindFlag97SlotInIsHostLocal()]);
 }
 
 // FUNCTION: 0x457af0
@@ -3762,10 +3762,10 @@ void __stdcall UpdateResourceSharing(Player* player)
                     ResourceSharePacket packet;
                     packet.type = 0x16;
                     packet.subtype = 3;
-                    packet.fromNetId = PlayerDpid_00457d30(a);
-                    packet.toNetId = PlayerDpid_00457d30(b);
+                    packet.fromNetId = SlotDpidInUpdateResourceSharing(a);
+                    packet.toNetId = SlotDpidInUpdateResourceSharing(b);
                     packet.amount = 0;
-                    SendPacketToPlayer(PlayerDpid_00457d30(a), PlayerDpid_00457d30(b),
+                    SendPacketToPlayer(SlotDpidInUpdateResourceSharing(a), SlotDpidInUpdateResourceSharing(b),
                                  (unsigned char *)&packet, sizeof(packet));
                 }
             }

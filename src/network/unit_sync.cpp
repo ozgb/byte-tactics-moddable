@@ -108,21 +108,21 @@ inline void __stdcall swap(_Ty& _X, _Ty& _Y)
 #include <list>
 #include <yvals.h>
 
-struct Rect_0046c620 {
+struct SessionGuidView {
     int x0;
     int y0;
     int x1;
     int y1;
 };
 
-struct Name_0046c620 {
+struct ReportPlayerName {
     char text[16];
     char flag;
 };
 
 #pragma pack(push, 1)
-struct Net_4c97b0 {
-    Name_0046c620 name;
+struct NetReportBlockView {
+    ReportPlayerName name;
     char unknown_11[0x4c5 - 0x11];
     void* dp;
     int created;
@@ -134,7 +134,7 @@ struct Net_4c97b0 {
 #include "../units/unit_def.h"
 
 #pragma pack(push, 1)
-struct UnitDefFlags_0046e160 {
+struct UnitDefSyncFlagBits {
     unsigned int bits_0 : 23;
     unsigned int flag_23 : 1;
     unsigned int bits_24 : 8;
@@ -149,23 +149,23 @@ struct UnitSync;
 
 extern Game* g_game;
 
-typedef int (__stdcall *SendFn_0046c620)(int, Rect_0046c620*, void*, int, Name_0046c620*,
+typedef int (__stdcall *ReportSendFn)(int, SessionGuidView*, void*, int, ReportPlayerName*,
                                          int, int, int, void*, void*);
 
 extern int g_onlineReportScores;
-extern Name_0046c620 g_reportPlayerName;
+extern ReportPlayerName g_reportPlayerName;
 extern int* g_onlineReportPlayers;
 extern void* g_onlineReportScoreBoards;
-extern SendFn_0046c620 g_riReport;
+extern ReportSendFn g_riReport;
 extern int g_reporterDll;
 extern int g_hapinetOnlineReport;
 extern int g_reportFlags;
 extern void (*g_riIntervalTimer)(void);
 extern int (__stdcall* g_riReportGameChat)(int, int);
 
-Rect_0046c620* __stdcall GetSessionGuidInstance(Net_4c97b0* p);
+SessionGuidView* __stdcall GetSessionGuidInstance(NetReportBlockView* p);
 #include "online_report.h"
-int __stdcall RIReport(int, Rect_0046c620*, void*, int, Name_0046c620*, int,
+int __stdcall RIReport(int, SessionGuidView*, void*, int, ReportPlayerName*, int,
                            int, int, void*, void*);
 #include "../game/statistics.h"
 
@@ -177,11 +177,11 @@ int __stdcall ReportGameEvent(int msg)
     if (!g_onlineReportPlayers || !g_onlineReportScoreBoards || !g_onlineReportScores)
         return 1;
 
-    Rect_0046c620 rect = *GetSessionGuidInstance(&(*(Net_4c97b0*)((char*)g_game + 0x14)));
-    int thing = GetCreatedLobbyInterface(&(*(Net_4c97b0*)((char*)g_game + 0x14)));
+    SessionGuidView rect = *GetSessionGuidInstance(&(*(NetReportBlockView*)((char*)g_game + 0x14)));
+    int thing = GetCreatedLobbyInterface(&(*(NetReportBlockView*)((char*)g_game + 0x14)));
 
     if (msg == 1) {
-        g_reportPlayerName = (*(Net_4c97b0*)((char*)g_game + 0x14)).name;
+        g_reportPlayerName = (*(NetReportBlockView*)((char*)g_game + 0x14)).name;
         char* p = g_reportPlayerName.text + 15;
         while (p > g_reportPlayerName.text && *p == ' ')
             *p-- = 0;
@@ -254,13 +254,13 @@ extern UnitSyncNode* g_unitSyncMapNil;
 extern int g_unitSyncMapNilRefs;
 
 #pragma pack(push, 1)
-struct Target_0046d530 {
+struct UnitSyncTarget {
     unsigned int id;
     char unknown_4[0x24];
     int sent;
 };
 
-struct Source_0046d630 {
+struct UnitSyncSource {
     int key;
     char unknown_4[4];
     unsigned char enabled;
@@ -285,7 +285,7 @@ static inline void SendPacket(unsigned int to, UnitSyncPacket* packet)
     SendPacketToPlayer(GetLocalHumanDpid(), to, (unsigned char *)packet, 0xe);
 }
 
-inline void UnitSync::Send(Target_0046d530* target, UnitSyncPacket* packet)
+inline void UnitSync::Send(UnitSyncTarget* target, UnitSyncPacket* packet)
 {
     if (direct != 0) {
         SendPacket(target->id, packet);
@@ -294,12 +294,12 @@ inline void UnitSync::Send(Target_0046d530* target, UnitSyncPacket* packet)
     }
 }
 
-static inline UnitDef* Defs_0046d040()
+static inline UnitDef* GetUnitDefTable()
 {
     return g_game->defs;
 }
 
-static inline bool FlagOf_0046d040(UnitDef* d)
+static inline bool IsUnitDefFlags2Bit16Set(UnitDef* d)
 {
     return (d->flags2 >> 16) & 1;
 }
@@ -318,7 +318,7 @@ void __fastcall DeleteUnitSync()
     (*(UnitSync **)&g_game->sync) = 0;
 }
 
-class Class_0046eba0 {
+class UnitSyncPacketRangeView {
 public:
     char unknown_0[4];
     UnitSyncPacket* first;
@@ -347,7 +347,7 @@ void PacketSequencer::SendUnsequenced(unsigned int param_1, void* param_2)
 void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void* param_3, unsigned int target)
 {
     if (packet->arg == 0x65) {
-        for (Elem_0046faf0* p = sentQueue.begin(); p != sentQueue.end(); p++) {
+        for (UnitSyncPacketElem* p = sentQueue.begin(); p != sentQueue.end(); p++) {
             if (p->packet.id == packet->id) {
                 SendPacketToPlayer(GetLocalHumanDpid(), target, (unsigned char *)p, 0xe);
                 break;
@@ -362,7 +362,7 @@ void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void
         cur = packet->id;
         ((UnitSync*)param_3)->HandleSyncPacket(packet, param_2);
         for (unsigned int i = cur + 1; i <= max; i++) {
-            Elem_0046faf0* p;
+            UnitSyncPacketElem* p;
             for (p = heldQueue.begin(); p != heldQueue.end(); p++) {
                 if (p->packet.id == i) break;
             }
@@ -375,10 +375,10 @@ void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void
     if (packet->id <= cur) {
         return;
     }
-    Class_0046eba0& v = *(Class_0046eba0*)&heldQueue;
+    UnitSyncPacketRangeView& v = *(UnitSyncPacketRangeView*)&heldQueue;
     v.InsertPacket(v.last, 1, packet);
     for (unsigned int i = cur + 1; i <= max; i++) {
-        Elem_0046faf0* p;
+        UnitSyncPacketElem* p;
         for (p = heldQueue.begin(); p != heldQueue.end(); p++) {
             if (p->packet.id == i) break;
         }
@@ -407,7 +407,7 @@ PacketSequencer& PacketSequencer::operator=(const PacketSequencer& rhs)
 
 // FUNCTION: 0x46d040
 UnitSync::UnitSync(int param)
-    : map(Cmp_0046d040(), Alloc_0046d040())
+    : map(SyncMapPredArg(), SyncMapAllocArg())
 {
     sub.seqSent = 0;
     sub.seqCur = 0;
@@ -424,7 +424,7 @@ UnitSync::UnitSync(int param)
             v.scriptChecksum = 0;
             v.enabled = 1;
             v.peerEnabled = (short)sub2.direct;
-            v.limit = FlagOf_0046d040(&g_game->defs[i]) ? 0 : -1;
+            v.limit = IsUnitDefFlags2Bit16Set(&g_game->defs[i]) ? 0 : -1;
             map[key] = v;
         }
     }
@@ -444,7 +444,7 @@ void UnitSync::ResetEntries()
         v.scriptChecksum = 0;
         v.enabled = 1;
         v.peerEnabled = (short)direct;
-        v.limit = FlagOf_0046d040(&g_game->defs[i]) ? 0 : -1;
+        v.limit = IsUnitDefFlags2Bit16Set(&g_game->defs[i]) ? 0 : -1;
         ((std::map<unsigned int, UnitSyncEntry>&)map)[v.fbiChecksum] = v;
     }
 }
@@ -489,7 +489,7 @@ void UnitSync::SendSyncMessage(unsigned char arg, int a, int b, int unused)
 }
 
 // FUNCTION: 0x46d5b0
-void UnitSync::SendSyncMessageTo(Target_0046d530* target, unsigned char arg, int a, int b, int unused)
+void UnitSync::SendSyncMessageTo(UnitSyncTarget* target, unsigned char arg, int a, int b, int unused)
 {
     if (disabled == 0) {
         UnitSyncPacket packet;
@@ -507,7 +507,7 @@ void UnitSync::SendSyncMessageTo(Target_0046d530* target, unsigned char arg, int
 }
 
 // FUNCTION: 0x46d630
-void UnitSync::SendEntryTo(Target_0046d530* target, unsigned char arg, Source_0046d630* src, int unused)
+void UnitSync::SendEntryTo(UnitSyncTarget* target, unsigned char arg, UnitSyncSource* src, int unused)
 {
     if (disabled == 0) {
         UnitSyncPacket packet;
@@ -921,10 +921,10 @@ void UnitSync::ApplyToUnitTypes()
         if (it == End()) {
             ProtectUnitDefsReadWrite();
             def->maxThisUnit = 0;
-            ((UnitDefFlags_0046e160*)&def->flags1)->flag_23 = 0;
+            ((UnitDefSyncFlagBits*)&def->flags1)->flag_23 = 0;
         } else {
             ProtectUnitDefsReadWrite();
-            ((UnitDefFlags_0046e160*)&def->flags1)->flag_23 = (it.ptr->value.enabled != 0 && it.ptr->value.peerEnabled != 0);
+            ((UnitDefSyncFlagBits*)&def->flags1)->flag_23 = (it.ptr->value.enabled != 0 && it.ptr->value.peerEnabled != 0);
             def->maxThisUnit = it.ptr->value.limit;
         }
         ProtectUnitDefsReadOnly();
@@ -1006,7 +1006,7 @@ SyncTaggedVector* SyncTaggedVector::InitTaggedVector(char* param_1)
     return this;
 }
 
-struct Elem_0046e5e0 {
+struct SyncTempTaggedElem {
     int value;
 };
 
@@ -1029,12 +1029,12 @@ int* UnitSyncMap::Begin(int* param_1)
     return param_1;
 }
 
-typedef std::map<unsigned int, UnitSyncEntry>::_Imp Tree_0046e890;
-typedef Tree_0046e890::iterator (Tree_0046e890::*EraseFn_0046e890)(
-    Tree_0046e890::iterator, Tree_0046e890::iterator);
+typedef std::map<unsigned int, UnitSyncEntry>::_Imp UnitSyncTree;
+typedef UnitSyncTree::iterator (UnitSyncTree::*UnitSyncTreeEraseFn)(
+    UnitSyncTree::iterator, UnitSyncTree::iterator);
 
 // FUNCTION: 0x46e890 ?erase@?$_Tree@IU?$pair@IUUnitSyncEntry@@@std@@U_Kfn@?$map@IUUnitSyncEntry@@U?$less@I@std@@V?$allocator@UUnitSyncEntry@@@3@@2@U?$less@I@2@V?$allocator@UUnitSyncEntry@@@2@@std@@QAE?AViterator@12@V312@0@Z
-EraseFn_0046e890 g_erase_0046e890 = &Tree_0046e890::erase;
+UnitSyncTreeEraseFn g_erase_0046e890 = &UnitSyncTree::erase;
 
 #pragma auto_inline(off)
 // FUNCTION: 0x46e9b0
@@ -1057,17 +1057,17 @@ UnitSyncIter UnitSyncMap::FindExact(const unsigned int& key)
 template class std::_Tree<unsigned int, std::pair<const unsigned int, UnitSyncEntry>, std::map<unsigned int, UnitSyncEntry>::_Kfn, std::less<unsigned int>, std::allocator<UnitSyncEntry> >;
 
 namespace std {
-template<> inline void allocator<Elem_0046faf0>::destroy(Elem_0046faf0* p)
+template<> inline void allocator<UnitSyncPacketElem>::destroy(UnitSyncPacketElem* p)
 {
     NopChecksumEntryDtor((int)p);
 }
 }
 
-struct Elem_004702a0 {
+struct SyncRecordIntElem {
     int unknown_0;
 };
 
-class Class_00470250 : public std::vector<Elem_004702a0> {
+class SyncRecordIntVectorBase : public std::vector<SyncRecordIntElem> {
 public:
     unsigned int Capacity() const;
 
@@ -1079,14 +1079,14 @@ public:
     }
 };
 
-class Class_00470270 : public Class_00470250 {
+class SyncRecordIntVector : public SyncRecordIntVectorBase {
 public:
     unsigned int Size() const;
 
-    __inline Elem_004702a0* begin() { return _First; }
-    __inline Elem_004702a0* end() { return _Last; }
-    __inline const Elem_004702a0* begin() const { return _First; }
-    __inline const Elem_004702a0* end() const { return _Last; }
+    __inline SyncRecordIntElem* begin() { return _First; }
+    __inline SyncRecordIntElem* end() { return _Last; }
+    __inline const SyncRecordIntElem* begin() const { return _First; }
+    __inline const SyncRecordIntElem* end() const { return _Last; }
 
     static __inline void burn(int a)
     {
@@ -1095,7 +1095,7 @@ public:
         (void)t;
     }
 
-    void __inline assign_first(Class_00470270* d, const Class_00470270* s)
+    void __inline assign_first(SyncRecordIntVector* d, const SyncRecordIntVector* s)
     {
         if (d == s)
             ;
@@ -1109,7 +1109,7 @@ public:
         } else {
             unsigned int room = d->Capacity();
             if (s->Size() <= room) {
-                Elem_004702a0* mid = s->_First;
+                SyncRecordIntElem* mid = s->_First;
                 mid += d->Size();
                 CopyDwordRangeOverwrite((int*)s->begin(), (int*)mid, (int*)d->_First);
                 d->_Ucopy(mid, s->_Last, d->_Last);
@@ -1121,28 +1121,28 @@ public:
                 int n = (int)s->Size();
                 if (n < 0)
                     n = 0;
-                Elem_004702a0* p = (Elem_004702a0*)operator new(n * 4);
+                SyncRecordIntElem* p = (SyncRecordIntElem*)operator new(n * 4);
                 d->_First = p;
-                Elem_004702a0* q = d->_Ucopy(s->begin(), s->end(), p);
+                SyncRecordIntElem* q = d->_Ucopy(s->begin(), s->end(), p);
                 d->_Last = q;
                 d->_End = q;
             }
         }
     }
 
-    void __inline assign_second(Class_00470270* d, const Class_00470270* s)
+    void __inline assign_second(SyncRecordIntVector* d, const SyncRecordIntVector* s)
     {
         if (d == s)
             ;
         else if (s->Size() <= d->Size()) {
-            Elem_004702a0* r = (Elem_004702a0*)CopyDwordRangeOverwrite(
+            SyncRecordIntElem* r = (SyncRecordIntElem*)CopyDwordRangeOverwrite(
                 (int*)s->_First, (int*)s->_Last, (int*)d->_First);
             d->_Destroy(r, d->_Last);
             d->_Last = d->_First + s->Size();
         } else {
             unsigned int room = d->Capacity();
             if (s->Size() <= room) {
-                Elem_004702a0* mid = s->_First;
+                SyncRecordIntElem* mid = s->_First;
                 mid += d->Size();
                 CopyDwordRangeOverwrite((int*)s->_First, (int*)mid, (int*)d->_First);
                 d->_Ucopy(mid, s->_Last, d->_Last);
@@ -1154,9 +1154,9 @@ public:
                 int n = (int)s->Size();
                 if (n < 0)
                     n = 0;
-                Elem_004702a0* p = (Elem_004702a0*)operator new(n * 4);
+                SyncRecordIntElem* p = (SyncRecordIntElem*)operator new(n * 4);
                 d->_First = p;
-                Elem_004702a0* q = d->_Ucopy(s->_First, s->_Last, p);
+                SyncRecordIntElem* q = d->_Ucopy(s->_First, s->_Last, p);
                 d->_Last = q;
                 d->_End = q;
             }
@@ -1166,8 +1166,8 @@ public:
 
 struct SyncPlayerRecord {
     int id;
-    std::vector<Elem_004702a0> ids;
-    std::vector<Elem_004702a0> pairs;
+    std::vector<SyncRecordIntElem> ids;
+    std::vector<SyncRecordIntElem> pairs;
     int expected;
     int sent;
     int ackd;
@@ -1176,11 +1176,11 @@ struct SyncPlayerRecord {
     SyncPlayerRecord& operator=(const SyncPlayerRecord& src);
 };
 
-typedef std::list<int> List_0046eb60;
-typedef List_0046eb60::iterator (List_0046eb60::*EraseFn_0046eb60)(List_0046eb60::iterator);
+typedef std::list<int> UnitSyncIntListForErase;
+typedef UnitSyncIntListForErase::iterator (UnitSyncIntListForErase::*UnitSyncIntListEraseFn)(UnitSyncIntListForErase::iterator);
 
 // FUNCTION: 0x46eb60 ?erase@?$list@HV?$allocator@H@std@@@std@@QAE?AViterator@12@V312@@Z
-EraseFn_0046eb60 g_erase_0046eb60 = &List_0046eb60::erase;
+UnitSyncIntListEraseFn g_erase_0046eb60 = &UnitSyncIntListForErase::erase;
 
 // FUNCTION: 0x46f720
 void UnitSyncMap::Init()
@@ -1227,29 +1227,29 @@ void UnitSyncMap::Erase(UnitSyncNode* x)
     }
 }
 
-typedef std::list<int> List_0046fac0;
-typedef List_0046fac0::iterator (List_0046fac0::iterator::*PostIncFn_0046fac0)(int);
+typedef std::list<int> UnitSyncIntListForPostInc;
+typedef UnitSyncIntListForPostInc::iterator (UnitSyncIntListForPostInc::iterator::*UnitSyncIntListPostIncFn)(int);
 
 // FUNCTION: 0x46fac0 ??Eiterator@?$list@HV?$allocator@H@std@@@std@@QAE?AV012@H@Z
-PostIncFn_0046fac0 g_postinc_0046fac0 = &List_0046fac0::iterator::operator++;
+UnitSyncIntListPostIncFn g_postinc_0046fac0 = &UnitSyncIntListForPostInc::iterator::operator++;
 
-struct Node_0046fad0;
+struct InsertResultNode;
 
 class InsertResult {
 public:
-    Node_0046fad0* first;
+    InsertResultNode* first;
     bool second;
 
-    InsertResult(Node_0046fad0* const& f, const bool& s);
+    InsertResult(InsertResultNode* const& f, const bool& s);
 };
 
 // FUNCTION: 0x46fad0
-InsertResult::InsertResult(Node_0046fad0* const& f, const bool& s)
+InsertResult::InsertResult(InsertResultNode* const& f, const bool& s)
     : first(f), second(s)
 {
 }
 
-typedef std::vector<Elem_0046faf0> Vec_0046faf0;
+typedef std::vector<UnitSyncPacketElem> UnitSyncPacketElemVector;
 
 #pragma auto_inline(off)
 // FUNCTION: 0x46fe60
@@ -1277,12 +1277,12 @@ SyncPlayerRecord& SyncPlayerRecord::operator=(const SyncPlayerRecord& src)
 {
     id = src.id;
 
-    ((Class_00470270*)&ids)->assign_first((Class_00470270*)&ids, (const Class_00470270*)&src.ids);
-    ((Class_00470270*)&pairs)->assign_second((Class_00470270*)&pairs, (const Class_00470270*)&src.pairs);
+    ((SyncRecordIntVector*)&ids)->assign_first((SyncRecordIntVector*)&ids, (const SyncRecordIntVector*)&src.ids);
+    ((SyncRecordIntVector*)&pairs)->assign_second((SyncRecordIntVector*)&pairs, (const SyncRecordIntVector*)&src.pairs);
 
-    Class_00470270::burn(1);
-    Class_00470270::burn(2);
-    Class_00470270::burn(3);
+    SyncRecordIntVector::burn(1);
+    SyncRecordIntVector::burn(2);
+    SyncRecordIntVector::burn(3);
 
     expected = src.expected;
     sent = src.sent;
@@ -1292,7 +1292,7 @@ SyncPlayerRecord& SyncPlayerRecord::operator=(const SyncPlayerRecord& src)
 }
 
 // FUNCTION: 0x470250
-unsigned int Class_00470250::Capacity() const
+unsigned int SyncRecordIntVectorBase::Capacity() const
 {
     if (!_First) {
         return 0;
@@ -1301,7 +1301,7 @@ unsigned int Class_00470250::Capacity() const
 }
 
 // FUNCTION: 0x470270
-unsigned int Class_00470270::Size() const
+unsigned int SyncRecordIntVector::Size() const
 {
     if (_First == 0) {
         return 0;
@@ -1317,15 +1317,15 @@ int* __stdcall CopyDwordRangeOverwrite(int* first, int* last, int* dest)
     return dest;
 }
 
-typedef Vec_0046faf0::size_type (Vec_0046faf0::*SizeFn_00470770)() const;
+typedef UnitSyncPacketElemVector::size_type (UnitSyncPacketElemVector::*PacketElemVectorSizeFn)() const;
 
-// FUNCTION: 0x470770 ?size@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@QBEIXZ
-SizeFn_00470770 g_size_00470770 = &Vec_0046faf0::size;
+// FUNCTION: 0x470770 ?size@?$vector@UUnitSyncPacketElem@@V?$allocator@UUnitSyncPacketElem@@@std@@@std@@QBEIXZ
+PacketElemVectorSizeFn g_size_00470770 = &UnitSyncPacketElemVector::size;
 
-typedef Vec_0046faf0& (Vec_0046faf0::*AssignFn_0046faf0)(const Vec_0046faf0&);
+typedef UnitSyncPacketElemVector& (UnitSyncPacketElemVector::*PacketElemVectorAssignFn)(const UnitSyncPacketElemVector&);
 
-// FUNCTION: 0x4707a0 ??4?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@QAEAAV01@ABV01@@Z
-AssignFn_0046faf0 g_assign_0046faf0 = &Vec_0046faf0::operator=;
+// FUNCTION: 0x4707a0 ??4?$vector@UUnitSyncPacketElem@@V?$allocator@UUnitSyncPacketElem@@@std@@@std@@QAEAAV01@ABV01@@Z
+PacketElemVectorAssignFn g_assign_0046faf0 = &UnitSyncPacketElemVector::operator=;
 
 // FUNCTION: 0x46ca60
 void __fastcall FinishUnitSync()
@@ -1336,7 +1336,7 @@ void __fastcall FinishUnitSync()
 }
 
 // FUNCTION: 0x46cc10
-void PacketSequencer::SendSequenced(Elem_0046faf0* to, Elem_0046faf0* packet)
+void PacketSequencer::SendSequenced(UnitSyncPacketElem* to, UnitSyncPacketElem* packet)
 {
     packet->packet.id = ++lastSent;
     sentQueue.insert(sentQueue.end(), 1, *packet);

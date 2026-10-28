@@ -56,7 +56,7 @@ public:
 void RegisterUnitOrders();
 
 #pragma pack(push, 1)
-struct Net_00462f30 {
+struct NetFrameAddressView {
     char unknown_0[0x4b5];
     int from;
     int to;
@@ -145,7 +145,7 @@ extern int g_netFrameRateConfig;
 
 #include "packet_channel.h"
 
-struct Msg_00461900 {
+struct FrameStateMsg {
     char unknown_0[0x10];
     int field_10;
     int field_14;
@@ -387,7 +387,7 @@ int PacketManager::SendAllQueued(int force)
 }
 
 // FUNCTION: 0x461900
-int PacketManager::SendFrameState(int from, Msg_00461900* msg)
+int PacketManager::SendFrameState(int from, FrameStateMsg* msg)
 {
     *(int*)buffer = msg->field_14 ? -1 : msg->field_10;
     SendToDPID(from, msg->field_14, buffer, size);
@@ -1163,7 +1163,7 @@ PacketReceiver::~PacketReceiver()
         operator delete(buffer);
 }
 
-static int Prev_00462f30(int n)
+static int PrevFrameSeqInReceiveFrame(int n)
 {
     int r = n - 1;
     if (r >= -1)
@@ -1171,7 +1171,7 @@ static int Prev_00462f30(int n)
     return r;
 }
 
-static int Next_00462f30(int n)
+static int NextFrameSeqInReceiveFrame(int n)
 {
     int r = n + 1;
     if (r >= -1)
@@ -1246,7 +1246,7 @@ int PacketReceiver::ResetReceiveBuffer()
 // FUNCTION: 0x462f30
 int PacketReceiver::ReceiveFrame(void* net, unsigned char* data, int* size)
 {
-    Net_00462f30* hnet = (Net_00462f30*)net;
+    NetFrameAddressView* hnet = (NetFrameAddressView*)net;
     int tick = g_game->ticks;
     PlayerFrameInfo* entry;
     unsigned int i;
@@ -1366,21 +1366,21 @@ int PacketReceiver::ReceiveFrame(void* net, unsigned char* data, int* size)
                                             length = 0;
                                             return (int)0x887700be;
                                         }
-                                        prev = Prev_00462f30(entry->frameSeq);
+                                        prev = PrevFrameSeqInReceiveFrame(entry->frameSeq);
                                         if (*(int*)entry->frame <= cur) {
                                             if (prev != cur)
-                                                ReportPacketGap(fromId, prev, Next_00462f30(cur));
-                                            int p2 = Prev_00462f30(*(int*)buffer);
+                                                ReportPacketGap(fromId, prev, NextFrameSeqInReceiveFrame(cur));
+                                            int p2 = PrevFrameSeqInReceiveFrame(*(int*)buffer);
                                             if (p2 != *(int*)entry->frame)
-                                                ReportPacketGap(fromId, p2, Next_00462f30(*(int*)entry->frame));
+                                                ReportPacketGap(fromId, p2, NextFrameSeqInReceiveFrame(*(int*)entry->frame));
                                             flag = 0;
                                             savedFrameEntry = entry;
                                         } else {
                                             if (prev != *(int*)entry->frame)
-                                                ReportPacketGap(fromId, prev, Next_00462f30(*(int*)entry->frame));
-                                            int p2 = Prev_00462f30(*(int*)entry->frame);
+                                                ReportPacketGap(fromId, prev, NextFrameSeqInReceiveFrame(*(int*)entry->frame));
+                                            int p2 = PrevFrameSeqInReceiveFrame(*(int*)entry->frame);
                                             if (p2 != *(int*)buffer)
-                                                ReportPacketGap(fromId, p2, Next_00462f30(*(int*)buffer));
+                                                ReportPacketGap(fromId, p2, NextFrameSeqInReceiveFrame(*(int*)buffer));
                                         }
                                     }
                                     if (flag && entry->pendingBytes > 0) {

@@ -5,7 +5,7 @@
 #include "net_condenser.h"
 
 #pragma pack(push, 1)
-struct Net_0044f9c0 {
+struct NetSenderView {
     char unknown_0[0x4b5];
     int from;
 };
@@ -92,7 +92,7 @@ int NetCondenser::ReceivePacket(void* net, char* data, int* size)
 
     CondensedHeader* received = (CondensedHeader*)data;
     int result = host_net_receive_packet((host_net*)net, data, (unsigned long*)size);
-    if (((Net_0044f9c0*)net)->from != 0) {
+    if (((NetSenderView*)net)->from != 0) {
         if (result == 0) {
             CountPacket(*size, 0, 0);
             if (received->kind != 3 && received->kind != 4)

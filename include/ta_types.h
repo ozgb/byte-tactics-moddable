@@ -34,7 +34,7 @@ struct PlayerInfo;
 struct AI;
 struct Account_004b4d70;
 struct Aim_0049dd60;
-struct Alloc_0046d040;
+struct SyncMapAllocArg;
 struct Alloc_0046e5c0;
 struct Alloc_004b2290;
 struct Alloc_004dc130;
@@ -59,7 +59,7 @@ struct App_004c25e0;
 struct Arena_004da9f0;
 struct Arg_00419670;
 struct Arg_004c6210;
-struct Args_00451640;
+struct LobbyJoinArgs;
 struct Arr_00421550;
 struct ArrayA;
 struct ArrayB;
@@ -320,7 +320,7 @@ class Class_0044f940;
 class Class_0044f9c0_2;
 class NetCondenser;
 class NetPacket;
-class Class_00451fd0;
+class PacketTableOwnerView;
 struct Class_00452370;
 class Class_00456030;
 class Class_00458180;
@@ -398,11 +398,11 @@ class SyncChecksumVector;
 class Class_0046e880;
 class Class_0046e9b0;
 struct SyncPlayerRecord;
-class Class_0046eba0;
+class UnitSyncPacketRangeView;
 class Class_0046f720;
 class InsertResult;
 class Class_0046fe60;
-class Class_00470250;
+class SyncRecordIntVectorBase;
 struct Class_00470560;
 class ObjectPool;
 class Class_00470c10;
@@ -860,7 +860,7 @@ class Class_004e8230;
 class LosTable;
 class Class_44ef90;
 struct DisplayContext;
-struct Cmp_0046d040;
+struct SyncMapPredArg;
 struct CobFile_0042d1f0;
 struct Color_004acc70;
 struct Colors_00467b60;
@@ -994,8 +994,8 @@ struct OrderTableEntry;
 struct Elem_0043ca70;
 struct CompoundAddressElement;
 struct Elem_0044ce90;
-struct Elem_0046e5e0;
-struct Elem_004702a0;
+struct SyncTempTaggedElem;
+struct SyncRecordIntElem;
 struct Elem_004702a0_2;
 struct Elem_00470a40;
 struct Elem_00472e70;
@@ -1239,7 +1239,7 @@ struct Group_00409160;
 struct Group_004bc640;
 struct Groups_004bc640;
 struct Gui_00443100;
-struct Gui_00453a50;
+struct TimeoutDialogLayer;
 struct Gun_0049c9c0;
 struct Handle;
 class Handler_004388d0;
@@ -1422,11 +1422,11 @@ struct Model_0042a140;
 struct Mouse_0041ce90;
 struct Movement;
 struct Msg13_00456310;
-struct Msg20_00456310;
-struct Msg26_00456310;
+struct HeartbeatInfoMsg;
+struct HeartbeatTableMsg;
 struct GameSelectionMsg;
 struct Msg_00450530;
-struct Msg_00461900;
+struct FrameStateMsg;
 struct Muzzle_0048a1e0;
 struct NameLess_00499cd0;
 struct NameLess_004b7760;
@@ -1436,7 +1436,7 @@ struct NameLess_004c46c0;
 struct NameLess_004c4760;
 struct NameNe_004b7760;
 struct NameTable_004b0830;
-struct Name_0046c620;
+struct ReportPlayerName;
 struct Name_004866d0;
 struct Name_0048d630;
 struct Named_004c4450;
@@ -1447,8 +1447,8 @@ struct Net_004c9920;
 struct Net_004c9e50;
 struct Net_004ca450;
 struct Net_004ca6a0;
-struct Net_4517b0;
-struct Net_4c97b0;
+struct DplConnectionView;
+struct NetReportBlockView;
 struct Net_4c9800;
 struct Net_4c9840;
 struct Net_4c9890;
@@ -1477,7 +1477,7 @@ struct Node_0040ef20;
 struct Node_004390a0;
 struct Node_00439e30;
 struct Node_0043ad50;
-struct Node_0046fad0;
+struct InsertResultNode;
 struct Node_0047e570;
 struct Node_004bb2e0;
 struct Node_004d0f60;
@@ -1624,7 +1624,7 @@ struct UnitScriptCallPacket;
 struct Packet_00456190;
 struct Packet_00456200;
 struct Packet_00456290;
-struct Packet_00456de0;
+struct LoadProgressPacket;
 struct Packet_00456ee0;
 struct Packet_00457050;
 struct Packet_004571c0;
@@ -1655,7 +1655,7 @@ struct Packet_4517b0;
 struct HelpPageLines;
 struct Pair_0040d880;
 struct Pair_0040e630;
-struct Pair_00419560;
+struct MessageByteCounter;
 struct Pair_0046faf0;
 struct Pair_00472ab0;
 struct PalEntry_004ac710;
@@ -1851,7 +1851,7 @@ struct Sound_0047f210;
 struct Sound_45ffb0;
 struct Source_0042f450;
 struct Source_00440340;
-struct Source_0046d630;
+struct UnitSyncSource;
 struct Source_00499c10;
 struct ReadTextInputFieldsSource;
 struct ReadSliderFieldsSource;
@@ -1931,7 +1931,7 @@ struct Target_0044ddc0;
 struct Target_0044f2a0;
 struct Target_0044f4a0;
 struct Target_0044f5c0;
-struct Target_0046d530;
+struct UnitSyncTarget;
 struct Target_0046d5b0;
 struct Target_0046d630;
 struct Target_004908c0;
@@ -3857,8 +3857,8 @@ struct List_004be3b0 {
 class Class_004c4760 {
 public:
     char unknown_0[25];
-    Pair_00419560* first;
-    Pair_00419560* last;
+    MessageByteCounter* first;
+    MessageByteCounter* last;
     double GetFieldDouble(char*, double);
 };
 
@@ -4121,8 +4121,8 @@ struct Class_004402e0 {
 class Class_004c4630 {
 public:
     char unknown_0[25];
-    Pair_00419560* first;
-    Pair_00419560* last;
+    MessageByteCounter* first;
+    MessageByteCounter* last;
     int FindFieldValue(char*);
 };
 
@@ -4195,7 +4195,7 @@ public:
 class Class_004c45e0 {
 public:
     char unknown_0[21];
-    std::vector<Pair_00419560> pairs;
+    std::vector<MessageByteCounter> pairs;
     char* GetFieldName(int);
 };
 
@@ -6611,7 +6611,7 @@ public:
     char unknown_0[45812];
     int* buffer;
     int size;
-    int SendFrameState(int, Msg_00461900*);
+    int SendFrameState(int, FrameStateMsg*);
 };
 
 struct Channel_4619e0 {
@@ -7113,13 +7113,13 @@ struct ElemB_0046c190 {
     void* ppScores;
 };
 
-struct Name_0046c620 {
+struct ReportPlayerName {
     char text[16];
     char flag;
 };
 
 struct Class_0046c620 {
-    Name_0046c620 name;
+    ReportPlayerName name;
     char unknown_11[1211];
     int field_4c9;
     char unknown_4d0[4];
@@ -7139,8 +7139,8 @@ struct Class_00470560 {
     int field_0;
     int field_4;
     int field_8;
-    std::vector<Elem_0046faf0> list_c;
-    std::vector<Elem_0046faf0> list_d;
+    std::vector<UnitSyncPacketElem> list_c;
+    std::vector<UnitSyncPacketElem> list_d;
     Class_00470560(Class_00470560&);
     Class_00470560(void);
     Class_00470560& operator=(Class_00470560&);
@@ -7150,11 +7150,11 @@ class Class_0046cc10 {
 public:
     int field_0;
     char unknown_4[8];
-    std::vector<Elem_0046faf0> vec;
-    void SendSequenced(Elem_0046faf0*, Elem_0046faf0*);
+    std::vector<UnitSyncPacketElem> vec;
+    void SendSequenced(UnitSyncPacketElem*, UnitSyncPacketElem*);
 };
 
-class Class_0046eba0 {
+class UnitSyncPacketRangeView {
 public:
     char unknown_0[4];
     Packet_0046cef0* first;
@@ -7168,8 +7168,8 @@ public:
     char unknown_0[4];
     unsigned int cur;
     unsigned int max;
-    Class_0046eba0 sent;
-    Class_0046eba0 queue;
+    UnitSyncPacketRangeView sent;
+    UnitSyncPacketRangeView queue;
     void ReceiveSequenced(Packet_0046cef0*, int, void*, unsigned int);
 };
 
@@ -7187,7 +7187,7 @@ public:
     void* head;
     char unknown_8[4];
     int size;
-    Class_0046f720(Cmp_0046d040, Alloc_0046d040);
+    Class_0046f720(SyncMapPredArg, SyncMapAllocArg);
     LiveNode* Buynode(LiveNode*, int);
     void FUN_0046f720(void);
     Rect& operator[](unsigned int);
@@ -7249,7 +7249,7 @@ public:
     int disabled;
     void SendSyncPacket(unsigned int*, Packet_0046d860*, int);
     void SendSyncMessageTo(Target_0046d5b0*, unsigned char, int, int, int);
-    void Send(Target_0046d530*, void*);
+    void Send(UnitSyncTarget*, void*);
     void SendSyncMessage(unsigned char, int, int, int);
 };
 
@@ -7291,7 +7291,7 @@ public:
     int direct;
     char unknown_5c[8];
     int disabled;
-    void SendEntryTo(Target_0046d630*, unsigned char, Source_0046d630*, int);
+    void SendEntryTo(Target_0046d630*, unsigned char, UnitSyncSource*, int);
 };
 
 struct Packet_0046d630 {
@@ -7569,7 +7569,7 @@ public:
     int field_2c;
     int field_30;
     int field_34;
-    std::vector<Elem_0046faf0> field_38;
+    std::vector<UnitSyncPacketElem> field_38;
     std::vector<int> field_48;
     int field_58;
     int field_5c;
@@ -7625,8 +7625,8 @@ public:
 };
 
 struct Pair_0046faf0 {
-    std::vector<Elem_0046faf0> list_c;
-    std::vector<Elem_0046faf0> list_d;
+    std::vector<UnitSyncPacketElem> list_c;
+    std::vector<UnitSyncPacketElem> list_d;
     Pair_0046faf0(Pair_0046faf0&);
 };
 
@@ -11445,7 +11445,7 @@ public:
     int value1;
     int value2;
     Class_004b7e30(Class_004b7e30&);
-    Class_004b7e30(Class_004c9390&, Pair_00419560);
+    Class_004b7e30(Class_004c9390&, MessageByteCounter);
     ~Class_004b7e30(void);
     Class_004b7e30& operator=(Class_004b7e30&);
 };
@@ -13900,8 +13900,8 @@ public:
     unsigned char operator!=(FreeBlockIter&);
     void FUN_004dd2a0(void);
     void FUN_004dd820(void);
-    Pair_00419560& operator*(void);
-    Pair_00419560* operator->(void);
+    MessageByteCounter& operator*(void);
+    MessageByteCounter* operator->(void);
     FreeBlockIter Previous(int);
     FreeBlockIter operator--(int);
     FreeBlockIter& operator--(void);
@@ -13983,7 +13983,7 @@ public:
 
 struct Kfn_004dbbc0 {
     char unknown_0[1];
-    unsigned int& operator()(Pair_00419560&);
+    unsigned int& operator()(MessageByteCounter&);
 };
 
 struct Less_004dbbc0 {
@@ -13999,8 +13999,8 @@ public:
     LiveNode* head;
     char unknown_8[4];
     int size;
-    FreeBlockIter FUN_004dce60(LiveNode*, LiveNode*, Pair_00419560*);
-    MapInsertResult FUN_004dbbc0(Pair_00419560&);
+    FreeBlockIter FUN_004dce60(LiveNode*, LiveNode*, MessageByteCounter*);
+    MapInsertResult FUN_004dbbc0(MessageByteCounter&);
     static LiveNode*& Left(LiveNode*);
     void Lrotate(LiveNode*);
     static LiveNode*& Right(LiveNode*);
@@ -14009,7 +14009,7 @@ public:
     LiveNode*& Root(void);
     LiveNode*& Lmost(void);
     FreeBlockIter begin(void);
-    MapInsertResult TreeInsert(Pair_00419560&);
+    MapInsertResult TreeInsert(MessageByteCounter&);
 };
 
 struct Less_004dbd20 {
@@ -14059,8 +14059,8 @@ public:
     char unknown_9[3];
     int size;
     FreeBlockIter Begin(void);
-    MapInsertResult FUN_004dbec0(Pair_00419560*);
-    void FUN_004dbec0(InsertResult_004db450*, Pair_00419560*);
+    MapInsertResult FUN_004dbec0(MessageByteCounter*);
+    void FUN_004dbec0(InsertResult_004db450*, MessageByteCounter*);
 };
 
 struct Alloc_004dc130 {

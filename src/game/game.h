@@ -88,7 +88,7 @@ struct IconSet_00466780;
 struct List_00420960;
 class Mission;
 class MissionConditions;
-struct Net_4517b0;
+struct DplConnectionView;
 struct Projectile;
 class Pathfinder;
 struct PlayerInfo;
@@ -140,7 +140,7 @@ struct Game {
         char net_14[1225];
     };
     char pad_4dd[8];
-    Net_4517b0* dplConnection;
+    DplConnectionView* dplConnection;
     char pad_4e9[4];
     int compressionDisabled;
     int netMode;

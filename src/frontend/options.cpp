@@ -17,7 +17,6 @@ struct Dialog;
 struct Surface;
 struct DisplayMode;
 struct OptionsReselectLink;
-struct GadgetOwnerView;
 struct ScreenLayer;
 
 #pragma pack(push, 1)
@@ -372,7 +371,6 @@ struct OptionsReselectLink {
     void (__stdcall* reselect)(void* gadget);
 };
 
-#include "../game/gadget_owner_view.h"
 
 #include "../gui/layer.h"
 

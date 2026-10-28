@@ -385,7 +385,7 @@ address,function,file
 0x43d290,UnitMotion::SteerAircraft,src/orders/order_list.cpp
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp
 0x43da70,UnitMotion::UpdateMoveRate,src/orders/order_list.cpp
-0x43db50,Class_0043db50::UpdateSfxOccupy,src/units/unit_scripts.cpp
+0x43db50,SfxOccupyTracker::UpdateSfxOccupy,src/units/unit_scripts.cpp
 0x43dc00,UnitMotion::UnitMotion,src/orders/order_list.cpp
 0x43dd10,UnitMotion::DestroyObject,src/orders/order_list.cpp
 0x43dd20,UnitMotion::UpdateMotion,src/orders/order_list.cpp

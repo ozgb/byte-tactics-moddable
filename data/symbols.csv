@@ -793,7 +793,7 @@ address,name
 0x43d290,UnitMotion::SteerAircraft
 0x43d6d0,UnitMotion::UpdatePosition
 0x43da70,UnitMotion::UpdateMoveRate
-0x43db50,Class_0043db50::UpdateSfxOccupy
+0x43db50,SfxOccupyTracker::UpdateSfxOccupy
 0x43dc00,UnitMotion::UnitMotion
 0x43dd10,UnitMotion::DestroyObject
 0x43dd20,UnitMotion::UpdateMotion

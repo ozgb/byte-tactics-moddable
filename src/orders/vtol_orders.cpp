@@ -71,6 +71,15 @@ class SpatialTimer;
 struct Mover {
     char unknown_0[0xdc];
     int speed;
+    char pad_e0[49];
+    union {
+        unsigned int f111;
+        struct {
+            unsigned int b0_7 : 8;
+            unsigned int b8 : 1;
+            unsigned int b9_31 : 23;
+        } f111b;
+    };
 };
 
 #include "../network/player.h"

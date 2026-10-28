@@ -178,7 +178,6 @@ class BitWriter;
 struct Class_00415da0;
 class BitReader;
 class Class_00417e00;
-class AIProfileParser;
 class Class_00428d10;
 struct Class_00428f40;
 class Class_00428f60;
@@ -237,7 +236,6 @@ class Class_00438b90;
 class Class_00439e80;
 class OrderBase;
 class Class_0043a420;
-class MissionOrderTable;
 class Class_0043cbb0;
 class Class_0043cc20;
 class Class_0043cd20;
@@ -253,7 +251,6 @@ struct Class_004402e0;
 struct MovementClass;
 class Class_00440470;
 struct Class_004404c0;
-class Class_00440500;
 class Class_00440830;
 class Class_00440af0;
 class Class_0044ce20;
@@ -284,7 +281,6 @@ class Class_0044da00;
 struct PointMarker;
 class Class_0044dcb0;
 class Class_0044dd00;
-class PathOrder;
 class Class_0044de80;
 class Class_0044df80;
 class Class_0044dfb0;
@@ -297,9 +293,6 @@ class Class_0044e3a0;
 class Class_0044e3c0;
 class Class_0044e530;
 class Class_0044e5b0;
-class Class_0044e6c0;
-class Class_0044e720;
-class Class_0044e730;
 class Class_0044e740;
 class Class_0044e7b0;
 class Class_0044e9c0;
@@ -511,7 +504,6 @@ class UnitScript;
 class Class_00488c50;
 class UnitTypeSet;
 class Class_00489240;
-class UnitCategory;
 class Class_00489540;
 class PathOrderAttach;
 class Class_00489650;
@@ -875,7 +867,6 @@ class Class_004e8230;
 class LosTable;
 class Class_44ef90;
 struct DisplayContext;
-struct UnitKilledPacket;
 struct Cmp_0046d040;
 struct CobFile_0042d1f0;
 struct Color_004acc70;
@@ -982,9 +973,7 @@ struct Display_004c6d20;
 struct Display_004c6dc0;
 struct Display_004c6e70;
 struct Display_004c8020;
-struct UnitDamagePacketOut;
 struct Driver_004c6890;
-struct Dst_00440ca0;
 class Dummy_00440be0;
 union Dword_0051f410;
 struct Effect;
@@ -1115,7 +1104,6 @@ struct Eye_00482130;
 struct F0_00462d30;
 struct F0_00462d30_2;
 union F110_0048ad30;
-struct FP_0043d6d0;
 struct Fade_004c6890;
 struct Feature;
 struct FeatureDef_00421eb0;
@@ -1146,20 +1134,15 @@ union Fix_004736e0;
 union Fix_00473d50;
 union Fix_0047d2e0;
 union Fixed;
-struct FixedParts_00407ae0;
-struct FixedParts_004853b0;
-union Fixed_00407ae0;
 struct Fixed_004239c0;
 struct Fixed_00424050;
 struct Fixed_00485140;
 struct Fixed_00485330;
-union Fixed_004853b0;
 union Fixed_0048bae0;
 union Fixed_0049abb0;
 union Fixed_2;
 union Fixed_3;
 union Fixed_4;
-union Fixed_437840;
 union Fixed_497180;
 union Fixed_5;
 class Fixed_6;
@@ -1167,8 +1150,6 @@ struct FlagBits_00457d30;
 struct FlagBits_00487080;
 struct FlagBits_004876c0;
 union FlagWord;
-union Flags110_0043f0e0;
-union Flags111_0043f0e0;
 union Flags114_485a40;
 union Flags142f0_00466dc0;
 struct Flags16_00493bf0;
@@ -1439,7 +1420,6 @@ struct Message_0047fad0;
 struct Mid_00462d30;
 struct MissionFeature_00436c30;
 struct MissionFlags_0042f9a0;
-struct MissionHolder;
 struct MissionName_00467e50;
 struct MissionRule_00436c30;
 struct MissionUnit_00436c30;
@@ -1453,7 +1433,6 @@ struct Model_00424c00;
 struct Model_0042a140;
 struct Mouse_0041ce90;
 struct Movement;
-struct Mover;
 struct Msg13_00456310;
 struct Msg20_00456310;
 struct Msg26_00456310;
@@ -1514,7 +1493,6 @@ struct Node_00439e30;
 struct Node_0043ad50;
 struct Node_0046fad0;
 struct Node_0047e570;
-struct Node_00489a90;
 struct Node_004bb2e0;
 struct Node_004d0b10;
 struct Node_004d0f60;
@@ -1532,7 +1510,6 @@ struct Obj_00423bf0;
 struct Obj_00426e80;
 struct Obj_00431950;
 struct Obj_00439e30;
-struct Obj_0043e0b0;
 struct Obj_00444910;
 struct Obj_0044d310;
 struct Obj_00462d30;
@@ -1626,7 +1603,6 @@ struct Other_0048fc40;
 struct Out_004c5ff0;
 struct Out_482830;
 struct Outer_0049fb30;
-struct Outs_t;
 class Owner;
 struct Owner_00407560;
 struct Owner_0041a920;
@@ -1682,7 +1658,6 @@ struct Packet_0046dad0;
 struct Packet_0047f0c0;
 struct Packet_0047f300;
 struct OwnershipTransferPacket;
-struct ActivateFlagsPacket;
 struct WeaponFirePacket;
 struct Packet_00499ba0;
 struct ProjectileDetonatePacket;
@@ -1902,13 +1877,11 @@ struct Source_004ae4b0;
 struct Source_004ae550;
 struct Span_004c0a90;
 struct Spawn_00420e50;
-struct Spawn_004861d0;
 union SpotField_004246b0;
 struct SpotState;
 struct Sprite_0049be60;
 struct Sprite_004b94c0;
 struct SrcPiece_00487080;
-struct Src_00440ca0;
 struct Src_004ab400;
 struct Src_004ab5d0;
 struct Src_004b8310;
@@ -1920,7 +1893,6 @@ struct StructA_004ae610;
 struct StructB_004ada10;
 struct StructB_004ae610;
 struct Struct_0040bab0;
-struct Struct_00487af0;
 struct Struct_004907e0;
 struct Struct_0049fb50;
 struct Struct_0049fba0;
@@ -3088,27 +3060,6 @@ public:
     void LoadMotion(Unit*, HapiBank*);
 };
 
-class Class_0044e6c0 {
-public:
-    char unknown_0[8];
-    unsigned short field_8;
-    short field_a;
-    short field_c;
-    char unknown_e[24];
-    Vec3 pos;
-    void SetAltitude(int);
-};
-
-class Class_0044e730 {
-public:
-    char unknown_0[8];
-    unsigned short unknown_bits : 4;
-    unsigned short flag : 1;
-    unsigned short unknown_rest : 11;
-    short value;
-    void SetApproachRadius(short);
-};
-
 union Fixed_2 {
     union { int value; struct { unsigned short frac; short whole; } parts; };
 };
@@ -3132,26 +3083,8 @@ union Fixed_4 {
     union { int value; struct { unsigned short frac; short whole; } parts; };
 };
 
-struct Mover {
-    char unknown_0[220];
-    int speed;
-    char unknown_e0[49];
-    union { unsigned int f111; struct { unsigned int b0_7 : 8; unsigned int b8 : 1; unsigned int b9_31 : 23; } f111b; };
-};
-
 union Fixed_5 {
     union { int v; struct { unsigned short frac; short whole; } p; };
-};
-
-class Class_0044e720 {
-public:
-    char unknown_0[8];
-    unsigned short unknown_bits : 6;
-    unsigned short flag : 1;
-    unsigned short unknown_rest : 9;
-    char unknown_a[4];
-    short value;
-    void SetHeading(short);
 };
 
 class Order_00415250 {
@@ -4172,22 +4105,6 @@ struct Obj_00426e80 {
 
 #include "v4i.h"
 
-class AIProfileParser {
-public:
-    char flag;
-    char unknown_1[127];
-    char* field_80;
-    char* field_84;
-    char* field_88;
-    int field_8c;
-    int field_90;
-    int field_94;
-    AIProfileParser(void);
-    void SetBuffer(char*, int);
-    int NextToken(void);
-    int ReadInt(void);
-};
-
 class Class_00428d10 {
 public:
     char token[128];
@@ -4282,12 +4199,6 @@ class Fixed_6 {
 public:
     int value;
     Fixed_6(int);
-};
-
-struct MissionHolder {
-    char unknown_0[3];
-    MissionType mission;
-    MissionHolder(char*);
 };
 
 struct CobFile_0042d1f0 {
@@ -4827,10 +4738,6 @@ public:
     Class_00437800(int*);
 };
 
-union Fixed_437840 {
-    union { int value; struct { unsigned short fraction; short whole; } parts; };
-};
-
 class Class_004379a0_2 {
 public:
     char unknown_0[4];
@@ -5111,14 +5018,6 @@ struct Owner_0043ad50 {
 
 #include "../src/orders/order_type_entry.h"
 
-class MissionOrderTable {
-public:
-    char unknown_0[4];
-    int field_4;
-    int field_8;
-    int GetCount(void);
-};
-
 struct Elem_0043ca70 {
     char unknown_0[21];
     char* name;
@@ -5167,11 +5066,6 @@ public:
     unsigned char flag : 1;
     unsigned char unknown_2f : 5;
     void UpdatePosition(Unit*);
-};
-
-struct FP_0043d6d0 {
-    unsigned int frac : 16;
-    unsigned int whole : 16;
 };
 
 class Class_0043da70 {
@@ -5236,14 +5130,6 @@ struct Record_0043de30 {
     unsigned char : 5;
 };
 
-struct Obj_0043e0b0 {
-    char unknown_0[106];
-    Vec3 pos;
-    char unknown_76[36];
-    Class_004b0a70* table;
-    char* table_9e;
-};
-
 class Class_00489a70 {
 public:
     int f0;
@@ -5277,19 +5163,6 @@ union F110_0048ad30 {
     unsigned int bits_15 : 17;
 };
 
-union Flags110_0043f0e0 {
-    unsigned int bits_0 : 31;
-    unsigned int flag_31 : 1;
-};
-
-union Flags111_0043f0e0 {
-    unsigned int bits_0 : 8;
-    unsigned int flag_8 : 1;
-    unsigned int bits_9 : 8;
-    unsigned int flag_17 : 1;
-    unsigned int bits_18 : 14;
-};
-
 class Class_00440470 {
 public:
     char unknown_0[16];
@@ -5305,24 +5178,6 @@ struct Class_004404c0 {
     char unknown_14[4];
     unsigned int* base;
     void SetPassMapCell(int, int, int);
-};
-
-class Class_00440500 {
-public:
-    void* field_0;
-    short footprintX;
-    short footprintZ;
-    short maxWaterDepth;
-    short minWaterDepth;
-    unsigned char maxSlope;
-    unsigned char badSlope;
-    unsigned char field_e;
-    unsigned char field_f;
-    unsigned int field_10;
-    unsigned int field_14;
-    unsigned int* field_18;
-    unsigned int lastTick;
-    void BuildPassMap(void);
 };
 
 class Class_00440830 {
@@ -5341,16 +5196,6 @@ public:
     unsigned int* cells;
     unsigned int lastTick;
     void RefreshPassMap(Point16, Point16);
-};
-
-struct Dst_00440ca0 {
-    char unknown_0[153];
-    Rect rect;
-};
-
-struct Src_00440ca0 {
-    int unknown_0;
-    Rect rect;
 };
 
 struct Gui_00443100 {
@@ -5736,23 +5581,6 @@ public:
     int y1;
     int y2;
     int FUN_0044dd00(int, int);
-};
-
-class PathOrder {
-public:
-    char unknown_0[8];
-    unsigned short flags;
-    short field_a;
-    short field_c;
-    short field_e;
-    short field_10;
-    char unknown_12[8];
-    Target_0044ddc0* ptr;
-    char unknown_1e[8];
-    int field_26;
-    int field_2a;
-    int field_2e;
-    void FUN_0044ddc0(BitWriter*);
 };
 
 struct Target_0044ddc0 {
@@ -9311,15 +9139,6 @@ struct Pos_00485330 {
     Fixed_00485330 z;
 };
 
-struct FixedParts_004853b0 {
-    unsigned int frac : 16;
-    unsigned int whole : 16;
-};
-
-union Fixed_004853b0 {
-    union { int value; FixedParts_004853b0 parts; };
-};
-
 struct Item_00485940 {
     char unknown_0[4];
     unsigned int key;
@@ -9335,24 +9154,6 @@ union Flags114_485a40 {
 struct Unit_00485d40 {
     char unknown_0[398];
     BuildList_0045a950* data;
-};
-
-struct Spawn_004861d0 {
-    unsigned char player;
-    unsigned short type;
-    unsigned short id;
-    Vec3 pos;
-    char unknown_11[6];
-};
-
-struct UnitKilledPacket {
-    unsigned char type;
-    unsigned short unitId;
-    int killerId;
-    unsigned short parentId;
-    char field_9;
-    unsigned char count : 4;
-    unsigned char kind : 4;
 };
 
 struct Name_004866d0 {
@@ -9524,15 +9325,6 @@ struct Entry_00487af0 {
     unsigned char flags;
 };
 
-struct Struct_00487af0 {
-    char unknown_0[4];
-    int* ids;
-};
-
-struct Outs_t {
-    char unknown_0[20];
-};
-
 struct OwnershipTransferPacket {
     unsigned char type;
     short team;
@@ -9567,16 +9359,6 @@ class Class_00488c50 {
 public:
     int unknown_0[16];
     Class_00488c50(void);
-};
-
-class UnitCategory {
-public:
-    Class_004c9390 name;
-    int value;
-    UnitCategory(UnitCategory&);
-    UnitCategory(Class_004c9390&, void*);
-    ~UnitCategory(void);
-    UnitCategory& operator=(UnitCategory&);
 };
 
 class Class_00489240 {
@@ -9705,22 +9487,6 @@ struct Def_004899b0 {
     int f245;
 };
 
-struct Node_00489a90 {
-    char unknown_0[134];
-    Class_00489a70* owner;
-    char unknown_8a[4];
-    Node_00489a90* next;
-};
-
-struct UnitDamagePacketOut {
-    unsigned char type;
-    unsigned short attacker;
-    unsigned short target;
-    unsigned short amount;
-    unsigned char param_7;
-    unsigned char type_8;
-};
-
 struct Entry_0048a0f0 {
     Point16 point;
     char unknown_4[24];
@@ -9776,12 +9542,6 @@ struct Order_0048ab70 {
     unsigned short id2;
     char param;
     unsigned char param2;
-};
-
-struct ActivateFlagsPacket {
-    unsigned char type;
-    short field_1;
-    unsigned char field_3;
 };
 
 union Fixed_0048bae0 {
@@ -15514,15 +15274,6 @@ public:
 #include "../src/ai/squad_timer.h"
 
 #include "../src/ai/group.h"
-
-struct FixedParts_00407ae0 {
-    unsigned int frac : 16;
-    unsigned int whole : 16;
-};
-
-union Fixed_00407ae0 {
-    union { int value; FixedParts_00407ae0 parts; };
-};
 
 class Class_00408620 {
 public:

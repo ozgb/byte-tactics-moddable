@@ -1574,11 +1574,6 @@ typedef std::vector<Point16> InsertPointVector;
 typedef void (InsertPointVector::*InsertPointVectorFn)(
     InsertPointVector::iterator, InsertPointVector::size_type, const Point16&);
 
-void __stdcall ReservePointVector(InsertPointVector* v, int extra)
-{
-    v->reserve(extra + v->size());
-}
-
 // FUNCTION: 0x44ec30 ?insert@?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@QAEXPAUPoint16@@IABU3@@Z
 InsertPointVectorFn g_insert_0044ec30 = &InsertPointVector::insert;
 

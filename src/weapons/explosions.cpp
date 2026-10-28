@@ -116,11 +116,7 @@ struct PieceList {
 
 #include "../map/feature.h"
 
-struct Net {
-    char unknown_0[0xd44];
-    int f_d44;
-    int f_d48;
-};
+#include "../map/mission.h"
 
 void WriteScreenshot(char*, char*, int, int, int, int);
 
@@ -457,9 +453,9 @@ void UpdateExplosions()
                 }
             } else {
                 if (d->flag) {
-                    Net* net = (Net *)g_game->net.get();
-                    if (net->f_d48 == 0) {
-                        GafSequence* src = net->f_d44 != 0 ? (GafSequence *)g_game->src2 : (GafSequence *)g_game->src1;
+                    Mission* net = g_game->net.get();
+                    if (net->noSeaLevelTrigger == 0) {
+                        GafSequence* src = net->lavaWorld != 0 ? (GafSequence *)g_game->src2 : (GafSequence *)g_game->src1;
                         AddExplosionEffect(&d->pos, src, -1, 1);
                     }
                 }
@@ -603,9 +599,9 @@ int __stdcall UpdateExplodedPiece(ExplodedPiece* obj)
 
     Vec3 pos;
     if (inner->pos.y <= (int)((unsigned)g_game->seaLevel << 16)) {
-        if (obj->b4 && ((Net *)g_game->net.get())->f_d48 == 0) {
+        if (obj->b4 && g_game->net->noSeaLevelTrigger == 0) {
             GafSequence* src;
-            if (((Net *)g_game->net.get())->f_d44 != 0)
+            if (g_game->net->lavaWorld != 0)
                 src = (GafSequence *)g_game->src2;
             else
                 src = (GafSequence *)g_game->src1;

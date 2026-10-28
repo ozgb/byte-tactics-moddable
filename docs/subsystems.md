@@ -359,7 +359,7 @@ Coverage: 84.1% of functions (74 of 88), 84.6% of lines, 70.4% of branches; 14 l
 
 `Projectile::flags` (mixed); `Projectile::targetUnit` (mixed); `Game::projectileCount` (mixed); `Angles16::heading` (mixed); `Projectile::speed` (sim); `WeaponFirePacket::aimOrVel` (sim); `WeaponFirePacket::origin` (sim); `WeaponFirePacket::type` (sim); `WeaponFirePacket::weaponDefIndex` (sim); `Angles16::pitch` (mixed); `Game::tracked` (mixed); `Game::trackedPos` (mixed)
 
-**Sim reads.** 185 items only read, 137 named. The most used (`g_game`, the root pointer, left out):
+**Sim reads.** 184 items only read, 136 named. The most used (`g_game`, the root pointer, left out):
 
 `Seams::units` (sim); `Unit::def` (mixed); `Unit::heading` (sim); `Game::ticks` (mixed); `Unit::player` (sim); `Game::seaLevel` (mixed); `UnitsSeam::StartScriptWithArgs` (sim); `Unit::script` (mixed); `Game::gravity` (sim); `Unit::playerIndex` (sim); `Game::net` (mixed); `Unit::id` (sim)
 

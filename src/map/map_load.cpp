@@ -1,15 +1,6 @@
 #include <vector>
 
-#include "../util/string_ref.h"
-
-class MapCacheEntry {
-public:
-    StringRef handle;
-    int tntChecksum;
-
-    MapCacheEntry(const MapCacheEntry& other);
-    MapCacheEntry& operator=(const MapCacheEntry& other);
-};
+#include "map_cache_entry.h"
 
 typedef std::vector<MapCacheEntry> Vec_00437580;
 typedef void (Vec_00437580::*InsertFn_00437580)(

@@ -18,11 +18,6 @@ Class_0047cb00,head,pointer,include/ta_types.h,#353
 Class_004b0a70,table,pointer,include/ta_types.h,#353
 CobScript,table,pointer,src/units/cob_script.h,#352
 Conn_443ff0,data,pointer,src/frontend/connection_blob.h,#353
-Entry,field_ce,pointer,include/ta_types.h,#353
-Entry,gaf,pointer,include/ta_types.h,#353
-Entry,glyphs,pointer,include/ta_types.h,#353
-Entry,handler,function-pointer,include/ta_types.h,#353
-Entry,text,pointer,include/ta_types.h,#353
 Face,vindex,pointer,src/weapons/explosions.cpp,#352
 Feature,animTable,pointer,src/map/feature.h,#353
 Feature,anims,pointer,src/map/feature.h,#353
@@ -39,7 +34,7 @@ Feature,shadowTable,pointer,src/map/feature.h,#353
 Frame,data,pointer,src/network/packets.cpp,#353
 FrameQueue,buffer,pointer,src/network/packet_receiver.h,#353
 FrameQueue,recvBuffer,pointer,src/network/packet_receiver.h,#353
-FrameTable,entries,pointer,include/ta_types.h|src/map/line_of_sight.cpp,#353
+FrameTable,entries,pointer,src/map/line_of_sight.cpp,#353
 Gadget,archive,pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
 Gadget,bits,pointer,src/frontend/multi.cpp,#353
 Gadget,callback,function-pointer,src/frontend/campaign_menu.cpp,#353

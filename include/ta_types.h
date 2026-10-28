@@ -3064,11 +3064,6 @@ union Fixed_4 {
     union { int value; struct { unsigned short frac; short whole; } parts; };
 };
 
-class UnitList {
-public:
-    char unknown_0[16];
-};
-
 union Fixed_5 {
     union { int v; struct { unsigned short frac; short whole; } p; };
 };
@@ -3359,13 +3354,6 @@ public:
     unsigned char field_64;
     char unknown_65[3];
     void FUN_00417e00(void*);
-};
-
-struct Movement {
-    char unknown_0[16];
-    int width;
-    char unknown_14[4];
-    unsigned int* states;
 };
 
 struct Flags_418ca0 {
@@ -3684,13 +3672,6 @@ struct ImageFrame {
     void* image;
     short duration;
     short unknown;
-};
-
-struct Explosion {
-    short count;
-    char flags;
-    char unknown_3[37];
-    ImageFrame frames[1];
 };
 
 #include "../src/graphics/object3do.h"
@@ -4428,11 +4409,6 @@ public:
     char unknown_0[1];
 };
 
-struct Elem_432cb0 {
-    Class_004c9390 handle;
-    int field4;
-};
-
 struct Elem_432cb0_2 {
     Class_004c9390 handle;
     int field4;
@@ -4519,25 +4495,12 @@ public:
     int GetLosLineCount(void);
 };
 
-class LosTable {
-public:
-    char unknown_0[4];
-    int field_4;
-    int GetLosLine(short);
-};
-
 class Class_004339c0 {
 public:
     char unknown_0[4];
     int field_4;
     int field_8;
     int GetLosLineStepCount(void);
-};
-
-class LosLine {
-public:
-    char unknown_0[1];
-    void GetLosLineStep(short, unsigned short*, unsigned short*);
 };
 
 struct Elem_00434a60 {
@@ -4747,21 +4710,6 @@ public:
     int field_c20;
     int ComputeMapChecksum(void);
     char* GetName(int);
-};
-
-class MapCache {
-public:
-    char unknown_0[4];
-    void InsertMapCacheEntry(MapCacheEntry*, int, MapCacheEntry&);
-};
-
-class MapCacheEntry {
-public:
-    Class_004c9390 handle;
-    int field_4;
-    MapCacheEntry(MapCacheEntry&);
-    MapCacheEntry& operator=(MapCacheEntry&);
-    MapCacheEntry& SetChecksum(Class_004373a0*);
 };
 
 class Class_00437800 {
@@ -7167,11 +7115,6 @@ struct Pic_4665d0 {
     unsigned short y;
 };
 
-struct IconSet_00466780 {
-    int count;
-    unsigned char* data;
-};
-
 union FlagWord {
     union { unsigned short all; struct { unsigned short bit0 : 1; unsigned short bit1 : 1; unsigned short bit9 : 1; } bits; };
 };
@@ -8648,12 +8591,6 @@ union Fix_0047d2e0 {
     union { int v; struct { short lo; short hi; } p; };
 };
 
-struct Pos_0047d2e0 {
-    Fix_0047d2e0 x;
-    Fix_0047d2e0 y;
-    Fix_0047d2e0 z;
-};
-
 struct Cell_0047e5c0 {
     char unknown_0[6];
     Obj_0047e5c0* head;
@@ -9026,12 +8963,6 @@ public:
     unsigned short FUN_00481470(void);
 };
 
-struct FrameTable {
-    unsigned short count;
-    char unknown_2[38];
-    Entry* entries;
-};
-
 struct Eye_00482130 {
     void* field_0;
     short* field_4;
@@ -9078,11 +9009,6 @@ struct Frame_00481d50 {
 };
 
 #include "../src/map/eye.h"
-
-struct Expired {
-    char unknown_0[1];
-    int operator()(Eye_00482130&);
-};
 
 struct Out_482830 {
     short x;
@@ -9238,19 +9164,6 @@ struct PieceBits_00487080 {
     unsigned char c : 2;
     unsigned char d : 1;
     unsigned char b5 : 3;
-};
-
-struct Slot {
-    int f0;
-    int unused;
-    int f8;
-    void* obj;
-    int fc;
-    short f14;
-    short f16;
-    short f18;
-    unsigned char f1a;
-    PieceBits_00487080 flags;
 };
 
 struct SrcPiece_00487080 {
@@ -10337,10 +10250,6 @@ struct Sub_00496b10 {
 
 #include "../src/game/settings_00496e10.h"
 
-union Fixed_497180 {
-    union { int i; struct { short frac; short whole; } h; };
-};
-
 struct PlayerFlags_497180 {
     unsigned short low : 8;
     unsigned short b8 : 1;
@@ -10374,27 +10283,6 @@ public:
 
 #include "../src/ingame/flags16_00499200.h"
 
-struct Obj_00499ab0 {
-    char unknown_0[150];
-    Kind_00499ab0* kind;
-    char unknown_9a[14];
-    unsigned short team;
-};
-
-struct WeaponFirePacket {
-    unsigned char type;
-    Vec3 a;
-    Vec3 b;
-    unsigned char f19;
-    unsigned char flag : 1;
-    unsigned char : 7;
-    unsigned short f1b;
-    unsigned short f1d;
-    unsigned short f1f;
-    unsigned short f21;
-    unsigned char f23;
-};
-
 struct Packet_00499ba0 {
     unsigned char type;
     Vec3 a;
@@ -10403,36 +10291,14 @@ struct Packet_00499ba0 {
     char unknown_1a[10];
 };
 
-struct Object_00499c10 {
-    char unknown_0[102];
-    short heading;
-    char unknown_68[50];
-    Class_004b0a70* anims;
-};
-
-struct NameLess_00499cd0 {
-    char unknown_0[1];
-    unsigned char operator()(char*, char*);
-};
-
 struct UnitType_499e50 {
     char unknown_0[254];
     short value;
 };
 
-union Fixed_0049abb0 {
-    union { int value; struct { unsigned short fraction; short whole; } parts; };
-};
-
 struct Weapon_0049abb0 {
     WeaponDef* def;
     char unknown_4[24];
-};
-
-struct ProjectileDetonatePacket {
-    char kind;
-    Vec3 pos;
-    unsigned char typeId;
 };
 
 struct Angles_0049be60 {
@@ -10453,46 +10319,9 @@ struct Head_0049cc20 {
     char unknown_4e[50];
 };
 
-struct Shot_0049cc20 {
-    char unknown_0[8];
-    int piece;
-    UnitMotion* def;
-    char unknown_10[6];
-    short heading;
-    short pitch;
-    char unknown_1a;
-    unsigned char weapon;
-};
-
 struct Heading_0049cde0 {
     char unknown_0[76];
     short heading;
-};
-
-struct Shot_0049d000 {
-    char unknown_0[12];
-    void* weapon;
-};
-
-struct Entry_0049d120 {
-    char unknown_0[12];
-    UnitMotion* def;
-    char unknown_10[10];
-    unsigned char active;
-    char unknown_1b;
-};
-
-struct Event_0049d1e0 {
-    char unknown_0[13];
-    Vec3 pos;
-    unsigned char team;
-    unsigned char flag : 1;
-    unsigned char unknown_1a : 7;
-    unsigned short f_1b;
-    unsigned short f_1d;
-    unsigned short ownerId;
-    unsigned short unitId;
-    unsigned char entryIndex;
 };
 
 struct DefFlags_0049d270 {
@@ -10506,15 +10335,6 @@ struct DefFlags_0049d270 {
     unsigned int b9 : 11;
     unsigned int b20 : 1;
     unsigned int b21 : 11;
-};
-
-struct Entry_0049d270 {
-    char unknown_0[12];
-    UnitMotion* type;
-    char unknown_10[6];
-    short f_16;
-    short f_18;
-    char unknown_1a[2];
 };
 
 struct Packet_0049d580 {
@@ -10557,16 +10377,6 @@ struct Packet_0049db70 {
     unsigned char weapon;
 };
 
-struct Aim_0049dd60 {
-    char unknown_0[12];
-    UnitMotion* type;
-    char unknown_10[6];
-    short field_16;
-    short field_18;
-    char unknown_1a;
-    unsigned char weapon;
-};
-
 struct Packet_0049dd60 {
     unsigned char type;
     Vec3 a;
@@ -10603,12 +10413,6 @@ struct Flags_0049e010 {
     unsigned int bit19 : 1;
     unsigned int bit20 : 1;
     unsigned int : 11;
-};
-
-struct Frame_0049e070 {
-    unsigned char i;
-    char unknown_1[3];
-    int maxTime;
 };
 
 struct Flags_0049e1a0 {
@@ -10671,31 +10475,6 @@ public:
     void** sets[8];
     int field_1e4;
     void ReapFinishedBuffers(void);
-};
-
-union Dword_0051f410 {
-    union { int value; struct { unsigned int b0 : 1; unsigned int b1 : 1; unsigned int b2 : 1; unsigned int b3 : 1; unsigned int b4 : 1; unsigned int b5 : 1; unsigned int b6 : 1; unsigned int b7 : 1; unsigned int b8 : 1; unsigned int b9 : 1; unsigned int b10 : 1; unsigned int b11 : 1; unsigned int spare : 20; } bits; };
-};
-
-union Word_0051f522 {
-    union { unsigned short value; struct { unsigned short b0 : 1; unsigned short b1 : 1; unsigned short b2 : 1; unsigned short b3 : 1; unsigned short b4 : 1; unsigned short b5 : 1; unsigned short b6 : 1; unsigned short b7 : 1; unsigned short b8 : 1; unsigned short b9 : 1; unsigned short spare : 6; } bits; };
-};
-
-struct App_0049e830 {
-    int hInstance;
-    int nCmdShow;
-    int className;
-    int title;
-    int unknown_10;
-    int menuId;
-    char unknown_18[200];
-    int field_e0;
-    char unknown_e4[12];
-    Dword_0051f410 flags;
-    char unknown_f4[262];
-    int startWidth;
-    int startHeight;
-    Word_0051f522 video;
 };
 
 struct Class_0049f8c0 {
@@ -14221,11 +14000,6 @@ public:
     char unknown_30[280];
     void FormatBlockHistory(char*, int, char);
     void FUN_004d8d40(char);
-};
-
-struct S {
-    char unknown_0[4];
-    int val;
 };
 
 struct TlsBlock {

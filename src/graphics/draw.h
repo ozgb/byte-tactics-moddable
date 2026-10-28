@@ -18,6 +18,7 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
 int __stdcall DrawPolyline(Surface* surface, Point* points, int count, int color);
 int __stdcall DrawPolylines(Surface* surface, Point* points, int* counts, int rows, int color);
 int __stdcall ClipRectangle(Surface* surface, Rect* r);
+int __stdcall FillRectangle(Surface* surface, Rect* rect, int color);
 int __stdcall XorRectangle(Surface* surface, Rect* rect, int value);
 int __stdcall DrawPolygon(Surface* surface, Vec3* pts, int count, int color);
 void __stdcall FillShadedSpan(int row, ScanlineSpan* span, GafFrame* surf, unsigned char color);

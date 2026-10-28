@@ -2915,13 +2915,10 @@ struct DrawProgressBarGadgetDialog {
     void *fallbackSurface;
 };
 
-struct DrawProgressBarGadgetRect { int left, top, right, bottom; };
-
 struct DrawProgressBarGadgetLanguage { char unknown_0[0xc]; unsigned short *glyphs; };
 struct DrawProgressBarGadgetLanguageRoot { char unknown_0[0x14]; DrawProgressBarGadgetLanguage *language; };
 
 void __stdcall LockScreen(void *);
-void __stdcall FillRectangle(void *, DrawProgressBarGadgetRect *, int);
 int __stdcall GetTextWidth(int, char *);
 void __stdcall UnlockScreen(void *);
 
@@ -2957,18 +2954,18 @@ void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog *obj, int index
         surface = *(void **)((char *)obj + 0xcd2);
     LockScreen(surface);
 
-    DrawProgressBarGadgetRect rect;
+    Rect rect;
     rect.left = entry->x;
     rect.top = entry->y;
     rect.right = entry->width + entry->x;
     rect.bottom = entry->height + entry->y;
-    FillBevelBox(surface, (Rect *)&rect, obj->color1, obj->color2, obj->color3);
+    FillBevelBox(surface, &rect, obj->color1, obj->color2, obj->color3);
 
     rect.left += 2;
     rect.top += 2;
     rect.right -= 2;
     rect.bottom -= 2;
-    FillRectangle(surface, &rect, entry->image);
+    FillRectangle((Surface*)surface, &rect, entry->image);
 
 #ifdef __clang__
     double scale = (double)entry->u.anim.value / entry->u.anim.total;
@@ -2977,7 +2974,7 @@ void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog *obj, int index
     float scale = (float)entry->u.anim.value / entry->u.anim.total;
     rect.right = (int)(scale * (entry->width - 4)) + rect.left;
 #endif
-    FillRectangle(surface, &rect, entry->colours);
+    FillRectangle((Surface*)surface, &rect, entry->colours);
 
     if (entry->u.anim.showText != 0) {
         char text[20];
@@ -3074,7 +3071,6 @@ struct DrawHotspotQuad {
 
 
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
-int __stdcall FillRectangle(void* surface, Rect* rect, int color);
 void __stdcall DrawFrameQuad(void* surf, void* entry, DrawHotspotQuad* dst, DrawHotspotQuad* src);
 
 // FUNCTION: 0x4a4980
@@ -3132,7 +3128,7 @@ void __stdcall DrawHotspot(DrawHotspotDialog* obj, int index)
         src.p[3].y = e->u.hotspot.frame->height - 1;
         DrawFrameQuad(entries->u.assets.surface, e->u.hotspot.frame, &dst, &src);
     } else {
-        FillRectangle(entries->u.assets.surface, &rect, obj->colour7);
+        FillRectangle((Surface*)entries->u.assets.surface, &rect, obj->colour7);
     }
 }
 
@@ -3169,9 +3165,7 @@ struct HandleHotspotInputDialog {
 
 extern int __stdcall TrySetFocus(HandleHotspotInputDialog* obj, int index);
 
-struct HandleHotspotInputRect { int left, top, right, bottom; };
-
-static inline int PointInHotspotRect(const HandleHotspotInputRect& r, const HandleHotspotInputPoint& p)
+static inline int PointInHotspotRect(const Rect& r, const HandleHotspotInputPoint& p)
 {
     return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
 }
@@ -3180,7 +3174,7 @@ static inline int PointInHotspotRect(const HandleHotspotInputRect& r, const Hand
 int __stdcall HandleHotspotInput(HandleHotspotInputDialog* obj, int index)
 {
     Gadget* entries = obj->table->entries;
-    HandleHotspotInputRect r;
+    Rect r;
     if (entries[index].type == 0) {
         r.left = 0;
         r.top = 0;
@@ -3298,8 +3292,6 @@ struct DrawTextInputDialog {
     void* fallback;
 };
 
-struct DrawTextInputRect { int left, top, right, bottom; };
-
 struct DrawTextInputLanguageRoot {
     int current;
     char unknown_04[0x14 - 0x04];
@@ -3308,7 +3300,6 @@ struct DrawTextInputLanguageRoot {
 #pragma pack(pop)
 
 int __stdcall DrawListboxFrame(DrawTextInputDialog* obj, int index, void* bmp);
-int __stdcall FillRectangle(void* surface, DrawTextInputRect* rect, int colour);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int colour);
 
@@ -3364,7 +3355,7 @@ void __stdcall DrawTextInput(DrawTextInputDialog* obj, int index)
 
     Gadget* me = &entries[index];
 
-    DrawTextInputRect rect;
+    Rect rect;
     if (me->type == 0) {
         rect.left = 0;
         rect.top = 0;
@@ -3376,7 +3367,7 @@ void __stdcall DrawTextInput(DrawTextInputDialog* obj, int index)
     rect.bottom = me->height + rect.top - 1;
 
     if (me->attribs & 1) {
-        FillRectangle(entries->u.assets.surface, &rect, obj->colours[0]);
+        FillRectangle((Surface*)entries->u.assets.surface, &rect, obj->colours[0]);
     } else {
         void* surface = obj->holder->surface;
         if (surface == 0)
@@ -3384,7 +3375,7 @@ void __stdcall DrawTextInput(DrawTextInputDialog* obj, int index)
         if (surface == 0) {
             DrawListboxFrame(obj, index, 0);
         } else {
-            CopySurfaceRect((Surface *)entries->u.assets.surface, (Surface *)surface, (Rect *)&rect, (Point *)((int*)&rect));
+            CopySurfaceRect((Surface *)entries->u.assets.surface, (Surface *)surface, &rect, (Point *)((int*)&rect));
         }
     }
 
@@ -3651,7 +3642,6 @@ char* __stdcall GetGadgetText(Gui* menu, char* name, char* buf);
 
 void* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
-int __stdcall FillRectangle(void* surface, Rect* rect, int colour);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colour);
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw, int rem, int style);
@@ -3767,7 +3757,7 @@ void __stdcall DrawLabel(Gui* obj, int index)
     GetGadgetRect(&entries[index], &rect);
 
     if (entries[index].image != 0)
-        FillRectangle(entries->u.assets.surface, &rect, obj->colours[entries[index].image]);
+        FillRectangle((Surface*)entries->u.assets.surface, &rect, obj->colours[entries[index].image]);
     int nx = rect.left;
     Gadget* entry = &entries[index];
 

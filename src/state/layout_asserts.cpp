@@ -26,6 +26,7 @@
 #include "../frontend/player_info_entry.h"
 #include "../frontend/track_option_flags.h"
 #include "../game/all_missions_flags.h"
+#include "../game/build_menu.h"
 #include "../game/chat_recipients.h"
 #include "../game/end_game_player_slot.h"
 #include "../game/game.h"
@@ -101,6 +102,7 @@
 #include "../orders/order_base.h"
 #include "../orders/order_fx.h"
 #include "../orders/order_goals.h"
+#include "../orders/path_order.h"
 #include "../orders/path_order_attach.h"
 #include "../orders/unit_motion.h"
 #include "../quirks/quirks.h"
@@ -159,6 +161,14 @@ static_assert(offsetof(AssaultTimer, limit) == 28, "");
 static_assert(offsetof(AssaultTimer, kind) == 32, "");
 static_assert(offsetof(AssaultTimer, attacking) == 36, "");
 static_assert(sizeof(BroadcastToggleFlags) == 2, "");
+static_assert(sizeof(BuildMenuEntry) == 37, "");
+static_assert(offsetof(BuildMenuEntry, typeId) == 0, "");
+static_assert(offsetof(BuildMenuEntry, page) == 2, "");
+static_assert(offsetof(BuildMenuEntry, slot) == 3, "");
+static_assert(offsetof(BuildMenuEntry, name) == 4, "");
+static_assert(sizeof(BuildMenuPage) == 189, "");
+static_assert(offsetof(BuildMenuPage, count) == 0, "");
+static_assert(offsetof(BuildMenuPage, entries) == 4, "");
 static_assert(sizeof(BuildRatingWeights) == 3, "");
 static_assert(offsetof(BuildRatingWeights, a) == 0, "");
 static_assert(offsetof(BuildRatingWeights, b) == 1, "");
@@ -1652,6 +1662,20 @@ static_assert(offsetof(PathCell, node) == 2, "");
 static_assert(sizeof(PathGoal) == 12, "");
 static_assert(offsetof(PathGoal, target) == 4, "");
 static_assert(offsetof(PathGoal, owner) == 8, "");
+static_assert(sizeof(PathOrder) == 54, "");
+static_assert(offsetof(PathOrder, flags) == 8, "");
+static_assert(offsetof(PathOrder, field_8) == 8, "");
+static_assert(offsetof(PathOrder, approachRadius) == 10, "");
+static_assert(offsetof(PathOrder, altitude) == 12, "");
+static_assert(offsetof(PathOrder, heading) == 14, "");
+static_assert(offsetof(PathOrder, piece) == 16, "");
+static_assert(offsetof(PathOrder, unit) == 18, "");
+static_assert(offsetof(PathOrder, ref) == 22, "");
+static_assert(offsetof(PathOrder, pos) == 38, "");
+static_assert(offsetof(PathOrder, pos_x) == 38, "");
+static_assert(offsetof(PathOrder, pos_y) == 42, "");
+static_assert(offsetof(PathOrder, pos_z) == 46, "");
+static_assert(offsetof(PathOrder, followOffset) == 50, "");
 static_assert(sizeof(PathOrderAttach) == 16, "");
 static_assert(offsetof(PathOrderAttach, owner) == 4, "");
 static_assert(offsetof(PathOrderAttach, next) == 8, "");

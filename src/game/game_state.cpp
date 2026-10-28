@@ -424,8 +424,6 @@ void InitGame()
     g_game->maxUnits_37eec = (unsigned short)(limit);
 }
 
-struct FreeGafSlotDialog;
-struct FreeCommonGuiGafDialog;
 struct Class_00452370;
 
 #include "../gui/gui_file.h"

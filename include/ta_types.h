@@ -91,7 +91,6 @@ struct Block_004c5ff0;
 struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;
-union Body_004aeac0;
 struct Bounds_src_004b8310;
 struct Box;
 struct Box_004b4d70;
@@ -883,7 +882,6 @@ struct Color_004acc70;
 struct Colors_00467b60;
 struct ColourEntry_00478790;
 struct Colour_00478790;
-struct Common_004ad350;
 struct Common_004ad350_2;
 struct Comp_004b2290;
 class MissionCondition;
@@ -1942,10 +1940,6 @@ struct Struct_004c2ac0;
 struct Struct_004c2ac0_2;
 struct Struct_004c6ac0;
 struct Sub;
-struct Sub2_004aeac0;
-struct Sub34_004aeac0;
-struct Sub5_004aeac0;
-struct Sub6_004aeac0;
 struct Sub_00409520;
 struct Sub_004679a0_a;
 struct Sub_004679a0_b;
@@ -1977,7 +1971,6 @@ struct Table_004b3630;
 struct Table_004b7ee0;
 struct Table_004cb2f0;
 struct Tail_004635b0;
-union Tail_004aeac0;
 struct Target_004030a0;
 class Target_0040da40;
 struct Target_0040da70;
@@ -12016,69 +12009,6 @@ struct Obj_004ae410 {
     char unknown_0[200];
     unsigned int hotornot : 1;
     unsigned int : 31;
-};
-
-struct Sub2_004aeac0 {
-    char unknown_0[24];
-    int field_ce;
-    char unknown_1c[4];
-    int field_d6;
-    short itemheight;
-    char unknown_26[90];
-};
-
-struct Sub34_004aeac0 {
-    short range;
-    short maxchars;
-    char unknown_4[2];
-    int thick;
-    short knobpos;
-    short knobsize;
-    int field_144;
-    char unknown_12[19];
-};
-
-struct Sub5_004aeac0 {
-    char link[17];
-    char hotkey;
-    char unknown_12[19];
-};
-
-struct Sub6_004aeac0 {
-    char unknown_0[18];
-    unsigned int hotornot : 1;
-    unsigned int : 31;
-    char unknown_16[106];
-};
-
-union Body_004aeac0 {
-    union { char text[128]; Sub2_004aeac0 s2; Sub6_004aeac0 s6; int nuttin; short total; };
-};
-
-union Tail_004aeac0 {
-    union { Sub34_004aeac0 s34; Sub5_004aeac0 s5; };
-};
-
-struct Common_004ad350 {
-    unsigned char type;
-    unsigned char assoc;
-    char name[17];
-    short xpos;
-    short ypos;
-    short width;
-    short height;
-    int attribs;
-    int colorf;
-    int colorb;
-    unsigned char texturenumber;
-    unsigned char fontnumber;
-    unsigned char active;
-    unsigned char commonattribs;
-    char unknown_2b[8];
-    char help[129];
-    unsigned short gaffile;
-    char text[128];
-    Tail_004aeac0 tail;
 };
 
 struct BlinkWord_004afc60 {

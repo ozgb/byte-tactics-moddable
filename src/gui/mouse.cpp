@@ -61,7 +61,7 @@ void* __stdcall AllocSurface(char* name, int width, int height);
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
 
-void __stdcall RedrawMouseCursor(MouseDisplay* app);
+#include "mouse.h"
 #include "mouse.h"
 
 static inline void GetRect(MouseQueueEvent* out)

@@ -1149,8 +1149,6 @@ void __stdcall BuildColorRemapTable(RemapPaletteEntry* src, RemapPaletteEntry* d
     }
 }
 
-void __stdcall ApplySlidersToPaletteEntry(PaletteEditorDialog* obj, RemapPaletteEntry* palette);
-
 // FUNCTION: 0x4ac7d0
 void __stdcall RemapPaletteToClosestIndices(RemapPalette* pal, RemapPaletteEntry* src, RemapPaletteEntry* copy)
 {

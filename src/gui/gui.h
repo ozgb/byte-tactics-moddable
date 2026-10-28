@@ -1,5 +1,9 @@
 #ifndef GUI_H
 #define GUI_H
+struct GadgetAccessDialog;
+struct IsAboveRectTopRect;
+struct IsBelowRectBottomRect;
+
 struct Gadget;
 
 struct BlinkWord;
@@ -215,5 +219,13 @@ void __stdcall SetCurrentGuiContext(Gui* ctx);
 void __stdcall SetDefaultFont(int*, int);
 
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
+
+void __stdcall TranslateGadgetItems(GadgetAccessDialog* obj, int index);
+void __stdcall SetGadgetGrayedOut(GadgetAccessDialog* obj, int index, int value);
+void __stdcall SetGadgetGrayedOutByNameTwin(GadgetAccessDialog* obj, char* name, int);
+int __stdcall IsAboveRectTop(IsAboveRectTopRect*, int);
+int __stdcall IsBelowRectBottom(IsBelowRectBottomRect* obj, int value);
+void __stdcall DrawGafBar(GadgetAccessDialog*, int index);
+void __stdcall ResetListBox(GadgetAccessDialog* obj, int index);
 
 #endif

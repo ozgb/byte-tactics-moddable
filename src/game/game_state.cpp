@@ -428,8 +428,7 @@ struct FreeGafSlotDialog;
 struct FreeCommonGuiGafDialog;
 struct Class_00452370;
 
-void __stdcall FreeGafSlot(FreeGafSlotDialog* obj, int i);
-void __stdcall FreeCommonGuiGaf(FreeCommonGuiGafDialog* obj);
+#include "../gui/gui_file.h"
 void ShutdownSound();
 void __stdcall ReleasePacketData(Class_00452370* obj);
 

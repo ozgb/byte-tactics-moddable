@@ -465,30 +465,17 @@ void __stdcall SurfaceFromFrame(Surface* dst, GafFrame* src)
     ResetClipRect((int*)dst);
 }
 
-struct Src_004b8ae0 {
-    unsigned short a;
-    char unknown_2[2];
-    unsigned short b;
-    char unknown_6[2];
-    unsigned short c;
-    char unknown_a[2];
-    int d;
-    char unknown_10[8];
-    unsigned short e;
-    unsigned short f;
-};
-
 #include "../files/files_api.h"
 
 // FUNCTION: 0x4b8ae0
-void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src)
+void __stdcall FrameFromSurface(GafFrame* dst, Surface* src)
 {
-    dst->width = src->a;
-    dst->height = src->b;
-    dst->width = src->c;
-    dst->pixelsOrLayers = (unsigned char*)src->d;
-    dst->xOffset = src->e;
-    dst->yOffset = src->f;
+    dst->width = src->width;
+    dst->height = src->height;
+    dst->width = src->pitch;
+    dst->pixelsOrLayers = src->pixels;
+    dst->xOffset = src->x;
+    dst->yOffset = src->y;
     dst->compressed = 0;
     dst->transparency = 0xff;
     dst->layers = 0;

@@ -2145,7 +2145,7 @@ seams,LoadCampaignNative,src/seams/native.cpp,1,0,0,0,0,0,?LoadCampaignNative@@Y
 seams,MissionExistsNative,src/seams/native.cpp,1,0,0,0,0,0,?MissionExistsNative@@YIHPAVMission@@HH@Z,0,
 seams,SelectMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?SelectMissionNative@@YIHPAVMission@@HH@Z,0,
 seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadManagerDeleteTimersNative@@YIXPAVSquadManager@@H@Z,0,
-state,*,,344,293,640,517,614,312,,21,
+state,*,,345,293,641,517,614,312,,21,
 state,??$?8PAUUnit@@PAU0@@@YG_NABV?$SimAllocator@PAUUnit@@@@0@Z,src/state/sim_allocator.h,0,0,0,0,0,0,??$?8PAUUnit@@PAU0@@@YG_NABV?$SimAllocator@PAUUnit@@@@0@Z,1,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
@@ -2156,6 +2156,7 @@ state,??8@YG_NABU?$Ref@UUnit_0043e490@@@@PAUUnit_0043e490@@@Z,interfaces/ref.h,1
 state,??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z,0,unused-instance
 state,??9@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??9@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
+state,??9@YG_NABU?$Ref@UWeaponDef@@@@PAUWeaponDef@@@Z,interfaces/ref.h,1,0,0,0,0,0,??9@YG_NABU?$Ref@UWeaponDef@@@@PAUWeaponDef@@@Z,0,unused-instance
 state,??9@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z,interfaces/ref.h,1,0,0,0,0,0,??9@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z,0,unused-instance
 state,??9@YG_NABU?$Ref@VUnitDef@@@@PAVUnitDef@@@Z,interfaces/ref.h,1,0,0,0,0,0,??9@YG_NABU?$Ref@VUnitDef@@@@PAVUnitDef@@@Z,0,unused-instance
 state,??_V@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??_V@YAXPAXABUSimHeap@@@Z,1,

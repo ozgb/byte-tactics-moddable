@@ -13,17 +13,7 @@
 
 #include "unit_def.h"
 
-struct DownloadMenuEntry {
-    unsigned short typeId;
-    unsigned char page;
-    unsigned char slot;
-    char name[0x21];
-};
-
-struct DownloadMenuList {
-    int count;
-    DownloadMenuEntry entries[5];
-};
+#include "../game/build_menu.h"
 
 class UnitTable;
 
@@ -373,7 +363,7 @@ void CheckDownloadableFlags()
     for (int i = 0; i < g_game->unitDefCount;
          i++, def = (UnitDef*)((char*)def + 0x249)) {
         for (int j = 0; j < g_game->buildListCount; j++) {
-            if (_strcmpi(((DownloadMenuList *)g_game->buildLists)[j].entries[0].name, def->unitname) == 0
+            if (_strcmpi(g_game->buildLists[j].entries[0].name, def->unitname) == 0
                 && !def->downloadable) {
                 char message[128];
                 sprintf(message,
@@ -395,9 +385,9 @@ void AddDownloadBuildOptions()
     for (int a = 0; a < g_game->unitDefCount; a++, e++) {
         if (e->ids != 0) {
             for (int b = 0; b < g_game->buildListCount; b++) {
-                for (int c = 0; c < ((DownloadMenuList *)g_game->buildLists)[b].count; c++) {
-                    if (a == ((DownloadMenuList *)g_game->buildLists)[b].entries[c].typeId && e->count <= 0x1e) {
-                        unsigned short id = FindUnitTypeId(((DownloadMenuList *)g_game->buildLists)[b].entries[c].name);
+                for (int c = 0; c < g_game->buildLists[b].count; c++) {
+                    if (a == g_game->buildLists[b].entries[c].typeId && e->count <= 0x1e) {
+                        unsigned short id = FindUnitTypeId(g_game->buildLists[b].entries[c].name);
                         if (id != 0) {
                             ((unsigned short*)e->ids)[e->count] = id;
                             e->count++;
@@ -670,26 +660,26 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             unitdef->maxwaterslope = move->maxWaterSlope;
             unitdef->maxslopevelocity = (int)(((__int64)unitdef->maxvelocity << 16) /
                                              ((unitdef->maxslope + 1) * 0x10000));
-            char* defaultWeapon = (char*)g_game->weapons;
+            WeaponDef* defaultWeapon = g_game->weapons;
             parser.current->GetFieldString(weapon, "weapon1", 128, DAT_005119b8);
-            char* weapon1 = (char*)g_seams.weapons->FindWeaponByName(weapon);
-            unitdef->weapons[0] = (WeaponDef*)(weapon1 ? weapon1 : defaultWeapon);
+            WeaponDef* weapon1 = g_seams.weapons->FindWeaponByName(weapon);
+            unitdef->weapons[0] = weapon1 ? weapon1 : defaultWeapon;
             parser.current->GetFieldString(weapon, "weapon2", 128, DAT_005119b8);
-            char* weapon2 = (char*)g_seams.weapons->FindWeaponByName(weapon);
-            unitdef->weapons[1] = (WeaponDef*)(weapon2 ? weapon2 : defaultWeapon);
+            WeaponDef* weapon2 = g_seams.weapons->FindWeaponByName(weapon);
+            unitdef->weapons[1] = weapon2 ? weapon2 : defaultWeapon;
             parser.current->GetFieldString(weapon, "weapon3", 128, DAT_005119b8);
-            char* weapon3 = (char*)g_seams.weapons->FindWeaponByName(weapon);
-            unitdef->weapons[2] = (WeaponDef*)(weapon3 ? weapon3 : defaultWeapon);
+            WeaponDef* weapon3 = g_seams.weapons->FindWeaponByName(weapon);
+            unitdef->weapons[2] = weapon3 ? weapon3 : defaultWeapon;
             parser.current->GetFieldString(weapon, "explodeas", 128, DAT_005119b8);
             WeaponDef* explodeas = g_seams.weapons->FindWeaponByName(weapon);
-            unitdef->explodeas = explodeas ? explodeas : (WeaponDef*)defaultWeapon;
+            unitdef->explodeas = explodeas ? explodeas : defaultWeapon;
             parser.current
                 ->GetFieldString(weapon, "selfdestructas", 128, DAT_005119b8);
             WeaponDef* selfdestructas = g_seams.weapons->FindWeaponByName(weapon);
-            unitdef->selfdestructas = selfdestructas ? selfdestructas : (WeaponDef*)defaultWeapon;
-            if ((char*)unitdef->weapons[0].get() == defaultWeapon &&
-                (char*)unitdef->weapons[1].get() == defaultWeapon &&
-                (char*)unitdef->weapons[2].get() == defaultWeapon)
+            unitdef->selfdestructas = selfdestructas ? selfdestructas : defaultWeapon;
+            if (unitdef->weapons[0].get() == defaultWeapon &&
+                unitdef->weapons[1].get() == defaultWeapon &&
+                unitdef->weapons[2].get() == defaultWeapon)
                 unitdef->flags1 &= ~0x10000;
             else
                 unitdef->flags1 |= 0x10000;
@@ -1065,7 +1055,7 @@ void LoadDownloadMenus()
 
     int n = files.size();
     g_game->buildListCount = n;
-    (*(DownloadMenuList **)&g_game->buildLists) = (DownloadMenuList*)SimAllocTagged("DOWNLOADMENU", n * 0xbd);
+    g_game->buildLists = (BuildMenuPage*)SimAllocTagged("DOWNLOADMENU", n * 0xbd);
 
     for (i = 0; i < n; i++) {
         TdfFile parser;
@@ -1076,15 +1066,15 @@ void LoadDownloadMenus()
                 parser.ResetCurrentRecord();
                 if (!parser.SelectRecordAt(j))
                     break;
-                ((DownloadMenuList *)g_game->buildLists)[i].count = j + 1;
+                g_game->buildLists[i].count = j + 1;
                 char* buf = unitbuf;
                 if (parser.current->GetFieldString(unitbuf, "UNITMENU", 0x20, DAT_005119b8)) {
                     for (unsigned short u = 0; u < g_game->unitDefCount; u++) {
                         if (_strcmpi(g_game->defs[u].unitname, buf) == 0) {
-                            ((DownloadMenuList *)g_game->buildLists)[i].entries[j].typeId = u;
-                            ((DownloadMenuList *)g_game->buildLists)[i].entries[j].page = (unsigned char)parser.current->GetFieldInt("MENU", 0);
-                            ((DownloadMenuList *)g_game->buildLists)[i].entries[j].slot = (unsigned char)parser.current->GetFieldInt("BUTTON", 0);
-                            parser.current->GetFieldString(((DownloadMenuList *)g_game->buildLists)[i].entries[j].name, "UNITNAME", 0x20, DAT_005119b8);
+                            g_game->buildLists[i].entries[j].typeId = u;
+                            g_game->buildLists[i].entries[j].page = (unsigned char)parser.current->GetFieldInt("MENU", 0);
+                            g_game->buildLists[i].entries[j].slot = (unsigned char)parser.current->GetFieldInt("BUTTON", 0);
+                            parser.current->GetFieldString(g_game->buildLists[i].entries[j].name, "UNITNAME", 0x20, DAT_005119b8);
                             break;
                         }
                     }
@@ -1097,10 +1087,10 @@ void LoadDownloadMenus()
     ProtectBlockReadWrite(g_game->defs);
     for (unsigned short u = 0; u < g_game->unitDefCount; u++) {
         for (c = 0; c < n; c++) {
-            for (int d = 0; d < ((DownloadMenuList *)g_game->buildLists)[c].count; d++) {
-                if (((DownloadMenuList *)g_game->buildLists)[c].entries[d].typeId == u) {
-                    if (g_game->defs[u].buildMenuPageCount < ((DownloadMenuList *)g_game->buildLists)[c].entries[d].page)
-                        g_game->defs[u].buildMenuPageCount = ((DownloadMenuList *)g_game->buildLists)[c].entries[d].page;
+            for (int d = 0; d < g_game->buildLists[c].count; d++) {
+                if (g_game->buildLists[c].entries[d].typeId == u) {
+                    if (g_game->defs[u].buildMenuPageCount < g_game->buildLists[c].entries[d].page)
+                        g_game->defs[u].buildMenuPageCount = g_game->buildLists[c].entries[d].page;
                 }
             }
         }
@@ -1110,7 +1100,7 @@ void LoadDownloadMenus()
     UnitDef* defs = g_game->defs;
     for (c = 0; c < g_game->unitDefCount; c++) {
         for (int i = 0; i < g_game->buildListCount; i++) {
-            if (_strcmpi(((DownloadMenuList *)g_game->buildLists)[i].entries[0].name, defs[c].unitname) == 0
+            if (_strcmpi(g_game->buildLists[i].entries[0].name, defs[c].unitname) == 0
                 && !defs[c].downloadable) {
                 char buf[128];
                 sprintf(buf, "Hey!  Somebody forgot to set downloadable=1 for %s", defs[c].unitname);
@@ -1127,7 +1117,7 @@ void LoadDownloadMenus()
 // FUNCTION: 0x42e120
 void FreeDownloadMenus()
 {
-    GameFreeThunk((DownloadMenuList *)g_game->buildLists);
+    GameFreeThunk(g_game->buildLists);
 }
 
 #pragma auto_inline(off)

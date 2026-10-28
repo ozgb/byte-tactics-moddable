@@ -22,7 +22,6 @@ struct ConstructionNanoState;
 struct Gadget;
 struct Layer;
 struct Gui;
-struct BuildMenuPage;
 
 #include "../game/unit_resources.h"
 
@@ -43,17 +42,7 @@ struct ConstructionNanoState {
 #include "../units/unit.h"
 #include "../weapons/weapon_def.h"
 
-struct BuildMenuEntry {
-    short typeId;
-    unsigned char page;
-    unsigned char slot;
-    char name[0x21];
-};
-
-struct BuildMenuPage {
-    int count;
-    BuildMenuEntry entries[5];
-};
+#include "../game/build_menu.h"
 
 #include "../gui/mouse_event.h"
 
@@ -751,7 +740,7 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
                 for (int j = 0; j < g_game->buildLists[i].count; j++) {
                     BuildMenuPage* lists = g_game->buildLists;
                     BuildMenuEntry* entry = &lists[i].entries[j];
-                    if ((short)((UnitDef*)unit->def.get())->id == entry->typeId
+                    if ((short)((UnitDef*)unit->def.get())->id == (short)entry->typeId
                         && entry->page - 1 == page) {
                         char* src = entry->name;
                         Gadget* e = &layer->entries[entry->slot + 4];

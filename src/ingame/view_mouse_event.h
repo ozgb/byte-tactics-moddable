@@ -1,8 +1,8 @@
-#ifndef ARG_00419670_H
-#define ARG_00419670_H
+#ifndef VIEW_MOUSE_EVENT_H
+#define VIEW_MOUSE_EVENT_H
 
 #pragma pack(push, 1)
-struct Arg_00419670 {
+struct ViewMouseEvent {
     int x;
     int y;
     unsigned int keyFlags;
@@ -11,7 +11,7 @@ struct Arg_00419670 {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(Arg_00419670) == 24, "Arg_00419670");
+static_assert(sizeof(ViewMouseEvent) == 24, "ViewMouseEvent");
 #endif
 
 #endif

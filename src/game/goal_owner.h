@@ -10,7 +10,7 @@ struct UnitDef;
 struct Order;
 class UnitMotion;
 
-struct Target_00490880 {
+struct GoalMotionFlags {
     char unknown_0[0x2e];
     union {
         unsigned char flags;
@@ -21,16 +21,16 @@ struct Target_00490880 {
     };
 };
 
-struct Vec3_004907e0 {
+struct GoalCoordTriple {
     Coord_0044f2a0 x;
     Coord_0044f2a0 y;
     Coord_0044f2a0 z;
 };
 
 #pragma pack(push, 2)
-struct Struct_004907e0 {
+struct GoalOwnerUnit {
     union {
-        Ref<Target_00490880> target;
+        Ref<GoalMotionFlags> target;
         Ref<UnitMotion> obj;
     };
     char pad4[0x5c - 0x4];
@@ -39,7 +39,7 @@ struct Struct_004907e0 {
     Angles16 angles;
     union {
         Vec3 pos;
-        Vec3_004907e0 fixedPos;
+        GoalCoordTriple fixedPos;
     };
     char pad76[0x82 - 0x76];
     Ref<unsigned char> spatialBucket;

@@ -9,7 +9,7 @@
 #include "../../interfaces/host.h"
 #include "game_state.h"
 
-struct Display_00491a70;
+struct Force640x480Display;
 struct Src_004ab400;
 
 #pragma pack(push, 1)
@@ -193,12 +193,12 @@ void DecreaseGameSpeed()
     }
 }
 
-struct CdLists_490f80 {
+struct CdListsBlock {
     char unknown_0[0x24];
     unsigned char tracks[0xaa0 - 0x24];
 };
 
-extern CdLists_490f80 g_cdListsDiscEntries;
+extern CdListsBlock g_cdListsDiscEntries;
 
 #include "settings.h"
 
@@ -424,8 +424,6 @@ void InitGame()
     g_game->maxUnits_37eec = (unsigned short)(limit);
 }
 
-struct FreeGafSlotDialog;
-struct FreeCommonGuiGafDialog;
 struct Class_00452370;
 
 #include "../gui/gui_file.h"
@@ -539,7 +537,7 @@ void LoadBattleAssets()
     g_scorePanelSlidePos = 0;
 }
 
-struct Display_00491a70 {
+struct Force640x480Display {
     char unknown_0[0x40];
     HWND hwnd;
 };

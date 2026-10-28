@@ -17,7 +17,6 @@ AllocAlphaTable,mismatch,pointer/int cast: definition's type is likely wrong
 AllocDepthFrame,mismatch,fixing it changes the generated code of a caller
 AllocSurface,mismatch,pointer/int cast: definition's type is likely wrong
 ApplyAreaDamageAt,skip,placeholder type Vec3_0049a0c0: left for the type-naming issues
-ApplyMissionOptionFlags,skip,placeholder type Settings_00496e10: left for the type-naming issues
 ApplyProjectileHitPacket,mismatch,pointer/int cast: definition's type is likely wrong
 ApplyWeaponFirePacket,mismatch,pointer/int cast: definition's type is likely wrong
 AssignQuickKey,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
@@ -62,7 +61,6 @@ DecrementCountArgument,skip,placeholder type Count_00458d20: left for the type-n
 DeleteOrder,mismatch,pointer/int cast: definition's type is likely wrong
 DestroyLine,skip,placeholder type Elem_00434360: left for the type-naming issues
 DrawButton,mismatch,fixing it changes the generated code of a caller
-DrawCellContours,skip,placeholder type Point_00417f60: left for the type-naming issues
 DrawExplosions,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawFogOfWar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -97,7 +95,6 @@ DrawTile,mismatch,pointer/int cast: definition's type is likely wrong
 DrawTriangleContours,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawUnitRangeRings,mismatch,pointer/int cast: definition's type is likely wrong
-DrawWorldDeltaLine,skip,placeholder type Pos_00417bb0: left for the type-naming issues
 DrawWrappedText,mismatch,fixing it changes the generated code of a caller
 EmitBlackSmoke,mismatch,pointer/int cast: definition's type is likely wrong
 EmitJitteredThrustParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -245,11 +242,9 @@ LockScreen,mismatch,"definition type not nameable in a header, or no clean cast 
 LowerBoundOrderTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 MakeBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
 MakeGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
-MinimapCursorToWorldPos,skip,placeholder type Pos_00498d00: left for the type-naming issues
 MirrorObject,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
 MoveToward,skip,placeholder type Vec3_0040beb0: left for the type-naming issues
 NormalizeVector,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-OffsetWorldPosFromView,skip,placeholder type Point_00498cd0: left for the type-naming issues
 OrderSquad,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 Partition,skip,placeholder type Item_00485940: left for the type-naming issues
 PickRandomReclaimableResourcesInRadius,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -333,7 +328,6 @@ SetTextColors,mismatch,"static risk rule: a convention, parameter count, or non-
 SetTranslatedText,mismatch,fixing it changes the generated code of a caller
 SetTranslatedTextByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 SetUnitLimits,mismatch,fixing it changes the generated code of a caller
-SettleResourceAccount,skip,placeholder type Obj_00401320: left for the type-naming issues
 SetupPlayerSlot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ShowErrorBox,mismatch,pointer/int cast: definition's type is likely wrong
 ShowSoftwareCursor,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -369,7 +363,6 @@ VisitObjectsInRect,skip,placeholder type Visitor_0047e750: left for the type-nam
 WalkFrameChain,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WalkStack,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WeaponCanReachPos,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-WorldToScreenWithHeight,skip,placeholder type Pos_00417bb0: left for the type-naming issues
 WriteScreenshot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 g_airManeuverOrderVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_approachRadiusVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses

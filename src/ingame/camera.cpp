@@ -1,23 +1,18 @@
 #include "../../interfaces/ref.h"
+#include "view_mouse_event.h"
 
 #pragma pack(push, 1)
-struct Rect_0041d0f0 {
-    int x;
-    int y;
-    int unknown_8[4];
-};
-
-struct Entry_0041d1f0 {
+struct StartPositionEntry {
     int type;
     int id;
     short x;
     short z;
 };
 
-class Class_0041d1f0_net {
+class StartPositionNetView {
 public:
     char unknown_0[0xdb4];
-    Ref<Entry_0041d1f0> entries;
+    Ref<StartPositionEntry> entries;
     int entry_count;
 };
 
@@ -43,7 +38,7 @@ static inline void SetPos(int x, int y)
 // FUNCTION: 0x41d0f0
 void CenterCameraOnRadarClick()
 {
-    Rect_0041d0f0 r = (*(Rect_0041d0f0*)&g_game->view);
+    ViewMouseEvent r = g_game->view;
     int y = g_game->mapHeight * (r.y - g_game->posY) / g_game->screen_h - g_game->viewHeight / 2;
     int x = g_game->mapWidth * (r.x - g_game->posX) / g_game->width_142eb - g_game->viewWidth / 2;
     g_game->scrollX = x;
@@ -62,8 +57,8 @@ void CenterCameraOnRadarClick()
 void CenterCameraOnStartPosition()
 {
     int i = 0;
-    Entry_0041d1f0* e = ((Class_0041d1f0_net *)g_game->net.get())->entries;
-    int count = ((Class_0041d1f0_net *)g_game->net.get())->entry_count;
+    StartPositionEntry* e = ((StartPositionNetView *)g_game->net.get())->entries;
+    int count = ((StartPositionNetView *)g_game->net.get())->entry_count;
     for (; i < count; i++, e++) {
         if (e->type == 1 && e->id == 0) {
             SetPos(e->x - g_game->viewWidth / 2, e->z - g_game->viewHeight / 2);

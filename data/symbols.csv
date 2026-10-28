@@ -4095,7 +4095,7 @@ address,name
 0x4fd870,??_7VictoryUnitTypePassesX@@6BMissionCondition@@@
 0x4fd888,??_7VictoryMoveUnitToRadius@@6BListener_0048f250@@@
 0x4fd890,??_7VictoryMoveUnitToRadius@@6BMissionCondition@@@
-0x4fd8a8,??_7Listener_0048f250@@6B@
+0x4fd8a8,??_7RadiusUnitVisitor@@6B@
 0x4fd8b0,??_7VictoryKillUnitType@@6B@
 0x4fd8c8,??_7VictoryKillAllOfType@@6BListener_0048ff40@@@
 0x4fd8d0,??_7VictoryKillAllOfType@@6BMissionCondition@@@
@@ -4104,7 +4104,7 @@ address,name
 0x4fd908,??_7VictoryBuildUnitType@@6BMissionCondition@@@
 0x4fd920,??_7VictoryKillAllMobileUnits@@6BListener_0048ff40@@@
 0x4fd928,??_7VictoryKillAllMobileUnits@@6BMissionCondition@@@
-0x4fd940,??_7Listener_0048ff40@@6B@
+0x4fd940,??_7UnitScanVisitor@@6B@
 0x4fd948,??_7VictoryDestroyAllUnits@@6B@
 0x4fd960,??_7VictoryKillEnemyCommander@@6B@
 0x4fd980,??_7PackedGoal@@6B@

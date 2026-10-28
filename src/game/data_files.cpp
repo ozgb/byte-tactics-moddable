@@ -174,7 +174,7 @@ int __stdcall LoadSoundByName(char* name, const char* file)
 
 #include "../graphics/gaf_frame.h"
 
-struct Pic_004295b0 {
+struct RadarPicHeader {
     int w;
     int h;
     int unknown;
@@ -191,7 +191,7 @@ GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY)
         return 0;
     }
     HAPI_FileLength(file);
-    Pic_004295b0 pic;
+    RadarPicHeader pic;
     HAPI_readfromfile(file, pic.header, 0x40);
     GafFrame* bmp;
     if (pic.header[0x2c] & 1) {
@@ -265,12 +265,12 @@ void __stdcall FindGafSequence(int gaf, char* name)
     FindGafEntry((void*)gaf, name);
 }
 
-struct Frame_00429870 {
+struct FrameFlagView {
     char unknown_0[2];
     char flag;
 };
 
-#define FLAG(p) (((Frame_00429870*)(p))->flag = 0)
+#define FLAG(p) (((FrameFlagView*)(p))->flag = 0)
 
 // FUNCTION: 0x429870
 void LoadGameResources()
@@ -415,7 +415,7 @@ void __stdcall AddAnimplayPointer(void* item)
     g_game->count_148e7++;
 }
 
-struct Ref_0042a140 {
+struct GafSequenceInitRef {
     unsigned short index;
     unsigned short value;
     unsigned char kind;
@@ -423,7 +423,7 @@ struct Ref_0042a140 {
     void* src;
 };
 
-struct Elem_0042a140 {
+struct ModelTextureEntry {
     int type;
     char unknown_4[0xc];
     void* name;
@@ -431,26 +431,26 @@ struct Elem_0042a140 {
     int flags;
 };
 
-struct Model_0042a140 {
+struct TexturedModel {
     char unknown_0[8];
     int count;
     char unknown_c[0x1c];
-    Elem_0042a140* entries;
-    Model_0042a140* child1;
-    Model_0042a140* child2;
+    ModelTextureEntry* entries;
+    TexturedModel* child1;
+    TexturedModel* child2;
 };
 
-void __stdcall InitGafSequence(Ref_0042a140* ref, void* src, int index);
+void __stdcall InitGafSequence(GafSequenceInitRef* ref, void* src, int index);
 
 // FUNCTION: 0x42a140
-void __stdcall BindModelTextures(Model_0042a140* model, const char* name)
+void __stdcall BindModelTextures(TexturedModel* model, const char* name)
 {
     if (model->child1)
         BindModelTextures(model->child1, name);
     if (model->child2)
         BindModelTextures(model->child2, name);
 
-    Elem_0042a140* elem = model->entries;
+    ModelTextureEntry* elem = model->entries;
     for (int i = 0; i < model->count; i++, elem++) {
         if (elem->name) {
             unsigned short* entry;
@@ -471,7 +471,7 @@ void __stdcall BindModelTextures(Model_0042a140* model, const char* name)
                 }
             }
             if (*entry > 1) {
-                InitGafSequence((Ref_0042a140*)&elem->name, entry, 0);
+                InitGafSequence((GafSequenceInitRef*)&elem->name, entry, 0);
                 elem->flags |= 2;
                 if (!(elem->flags & 4)) {
                     g_game->data_148eb = (int*)((void**)GameReallocTagged(((void**)g_game->data_148eb), "Animplay Pointers", (g_game->count_148e7 + 1) * 4));
@@ -499,7 +499,7 @@ void* __stdcall LoadObject3d(const char* name)
         FatalError(path);
     }
     MirrorObject(data);
-    BindModelTextures((Model_0042a140*)data, name);
+    BindModelTextures((TexturedModel*)data, name);
     return data;
 }
 
@@ -528,7 +528,7 @@ int LoadDefaultPalette()
     return 1;
 }
 
-struct FindData_0042a440 {
+struct TextureFindData {
     char unknown_0[0x14];
     char name[260];
 };
@@ -538,7 +538,7 @@ struct FindData_0042a440 {
 void LoadTextureGafs()
 {
     char path[256];
-    FindData_0042a440 fd;
+    TextureFindData fd;
 
     BuildDataPath(path, "textures", "*", "GAF");
     int count = CountDirectoryEntries(path, 0);

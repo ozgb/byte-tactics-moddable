@@ -32,7 +32,7 @@ static inline Vec3 MakeVec3(int ax, int ay, int az)
 
 class TdfRecord;
 
-struct Param_0048e010 {
+struct ConditionParams {
     char unknown_0[4];
     TdfRecord* reader;
 };
@@ -40,14 +40,14 @@ struct Param_0048e010 {
 #include "../../interfaces/ref.h"
 #include "../units/unit_def.h"
 #pragma pack(push, 1)
-struct Owner_0048ea40 {
+struct PlayerInfoSide {
     char unknown_0[0x95];
     unsigned char side;
 };
 
-struct Link_0048ea40 {
+struct PlayerInfoLink {
     char unknown_0[0x27];
-    Ref<Owner_0048ea40> owner;
+    Ref<PlayerInfoSide> owner;
 };
 
 #include "../units/unit.h"
@@ -56,7 +56,7 @@ struct UnitList {
     Ref<Unit> first;
     Ref<Unit> last;
 
-    void ForEach(Listener_0048ff40* visitor)
+    void ForEach(UnitScanVisitor* visitor)
     {
         for (Unit* unit = first; unit <= last; unit++) {
             if (((short)unit->unitDefIndex) != 0) {
@@ -108,7 +108,7 @@ void MissionConditions::FreeConditions()
 }
 
 // FUNCTION: 0x48e010
-void MissionConditions::RegisterConditions(Param_0048e010* p)
+void MissionConditions::RegisterConditions(ConditionParams* p)
 {
     char buf[0x100];
     char stype[0x100];
@@ -238,7 +238,7 @@ void MissionCondition::OnUnitCreated(Unit*)
 void VictoryKillEnemyCommander::OnUnitDied(Unit* unit)
 {
     if (unit->playerIndex == 1) {
-        if (_strcmpi(unit->def->unitname, (*(PlayerName(*)[5])&g_game->sideDefs)[((Link_0048ea40 *)unit->player.get())->owner->side].commander) == 0) {
+        if (_strcmpi(unit->def->unitname, (*(PlayerName(*)[5])&g_game->sideDefs)[((PlayerInfoLink *)unit->player.get())->owner->side].commander) == 0) {
             satisfied = 1;
             if (celebrated == 0) {
                 PlaySoundByName("Victory Condition", 0);
@@ -488,7 +488,7 @@ int VictoryMoveUnitToRadius::IsSatisfied()
     if (pos.y == 0x12345678) {
         g_seams.los_radar->ClampWorldPosToTerrain(pos.x, pos.z, &pos);
     }
-    g_seams.map->VisitObjectsInRange(&pos, radius, (UnitVisitor*)(Listener_0048f250*)this);
+    g_seams.map->VisitObjectsInRange(&pos, radius, (UnitVisitor*)(RadiusUnitVisitor*)this);
     return satisfied;
 }
 
@@ -633,7 +633,7 @@ void VictoryTimerRunsOut::LoadState(HapiBank* obj)
 void DefeatCommanderKilled::OnUnitDied(Unit* unit)
 {
     if (unit->playerIndex == 0) {
-        if (_strcmpi(unit->def->unitname, (*(PlayerName(*)[5])&g_game->sideDefs)[((Link_0048ea40 *)unit->player.get())->owner->side].commander) == 0) {
+        if (_strcmpi(unit->def->unitname, (*(PlayerName(*)[5])&g_game->sideDefs)[((PlayerInfoLink *)unit->player.get())->owner->side].commander) == 0) {
             satisfied = 1;
         }
     }
@@ -1082,7 +1082,7 @@ void MissionConditions::NotifyUnitCreated(Unit* unit)
 #include "../units/unit_def.h"
 
 #pragma pack(push, 1)
-struct UnitDefFlags_0048dfb0 {
+struct UnitDefSeaFlags {
     char unknown_0[0x241];
     unsigned int unknown_241_0 : 22;
     unsigned int seaUnit : 1;
@@ -1094,7 +1094,7 @@ struct UnitDefFlags_0048dfb0 {
 
 #include "../network/bit_reader.h"
 
-struct Struct_004907e0;
+struct GoalOwnerUnit;
 
 #include "../orders/unit_motion.h"
 #include "../util/angles.h"
@@ -1110,7 +1110,7 @@ unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 
 // FUNCTION: 0x4905e0
 // FUNCTION: 0x490630 ??_GPackedGoal@@UAEPAXI@Z
-PackedGoal::PackedGoal(Struct_004907e0* p)
+PackedGoal::PackedGoal(GoalOwnerUnit* p)
     : PathGoal((Unit*)p)
 {
     pos = p->pos;
@@ -1137,7 +1137,7 @@ void PackedGoal::TickTowardGoal()
     vel = pos - old;
     int dist = (int)_hypot(owner->pos.x - pos.x, owner->pos.z - pos.z);
     if (dist > 0xa00000) {
-        if (((UnitDefFlags_0048dfb0*)owner->def.get())->seaUnit)
+        if (((UnitDefSeaFlags*)owner->def.get())->seaUnit)
             pos.y = (g_game->seaLevel + owner->def->altitude) << 16;
         else
             pos.y = (owner->def->altitude + ((unsigned char*)owner->spatialBucket.get())[1]) << 16;
@@ -1154,7 +1154,7 @@ void PackedGoal::TickTowardGoal()
 // FUNCTION: 0x4907e0
 // FUNCTION: 0x490840 ??_GLiteGoal@@UAEPAXI@Z
 LiteGoal::LiteGoal(Unit* p)
-    : PackedGoal((Struct_004907e0*)p)
+    : PackedGoal((GoalOwnerUnit*)p)
 {
     dirty = 1;
     mode = 0;
@@ -1170,7 +1170,7 @@ void LiteGoal::SetPathOrder(void* param)
 // FUNCTION: 0x490880
 void LiteGoal::TickTowardGoal()
 {
-    if ((((Target_00490880*)owner->motion.get())->flags & 3) != mode)
+    if ((((GoalMotionFlags*)owner->motion.get())->flags & 3) != mode)
         dirty = 1;
     PackedGoal::TickTowardGoal();
 }
@@ -1193,13 +1193,13 @@ void LiteGoal::SerializeNetUnitState(BitWriter* stream)
         stream->WriteBits(2, 2);
         ((OrderFx*)target)->SerializeToBits(stream);
     }
-    stream->WriteBits(((Target_00490880*)owner->motion.get())->mode, 2);
-    state = ((Target_00490880*)owner->motion.get())->mode << 1;
+    stream->WriteBits(((GoalMotionFlags*)owner->motion.get())->mode, 2);
+    state = ((GoalMotionFlags*)owner->motion.get())->mode << 1;
 }
 
 // FUNCTION: 0x490940
 PackedPosGoal::PackedPosGoal(Unit* p)
-    : PackedGoal((Struct_004907e0*)p)
+    : PackedGoal((GoalOwnerUnit*)p)
 {
 }
 
@@ -1220,7 +1220,7 @@ void PackedPosGoal::DeserializeNetUnitState(BitReader* reader)
     }
     int kind = reader->ReadBits(2);
     if (kind == 1)
-        target = new (kSim) Class_0044e080((Struct_004907e0*)owner.get(), reader);
+        target = new (kSim) PathOrderView((GoalOwnerUnit*)owner.get(), reader);
     else if (kind == 2)
         target = new (kSim) AirManeuverOrder(owner, reader);
     int state = reader->ReadBits(2);

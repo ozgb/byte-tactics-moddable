@@ -1,5 +1,6 @@
 #ifndef MAIN_LOOP_H
 #define MAIN_LOOP_H
+struct MissionOptionFlags;
 
 struct Player;
 
@@ -13,5 +14,7 @@ void __stdcall SpawnCommanderAtStartPos(int team, int startpos);
 void __stdcall InitStartingResourcesFromSkirmish();
 
 void __stdcall MainLoopTick();
+
+void __stdcall ApplyMissionOptionFlags(MissionOptionFlags* s);
 
 #endif

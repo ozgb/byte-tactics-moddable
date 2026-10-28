@@ -278,7 +278,7 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
     }
 }
 
-static Pos offset_004394e0(int dx, int dy, int dz, int f)
+static Pos ScaledPosOffset(int dx, int dy, int dz, int f)
 {
     Pos d;
     d.x.value = (int)(((__int64)dx * f) >> 16);
@@ -287,7 +287,7 @@ static Pos offset_004394e0(int dx, int dy, int dz, int f)
     return d;
 }
 
-struct Trail_004394e0 {
+struct PathAnimTrail {
     Pos start;
     Vec3 delta;
     int dist;
@@ -301,7 +301,7 @@ struct Trail_004394e0 {
     {
         for (; pos < dist; pos += 0x300000) {
             int f = (int)(((__int64)pos << 16) / dist);
-            Pos o = offset_004394e0(delta.x, delta.y, delta.z, f);
+            Pos o = ScaledPosOffset(delta.x, delta.y, delta.z, f);
             Pos p;
             p.x.value = start.x.value + o.x.value;
             p.y.value = start.y.value + o.y.value;
@@ -339,7 +339,7 @@ void __stdcall DrawPathAnim(void* surface, View* view,
     int frames = len < 1 ? 1 : (int)len;
     unsigned int idx = (t / frames) % anim->count;
 
-    Trail_004394e0 tr;
+    PathAnimTrail tr;
     tr.start = start;
     tr.delta = d;
     tr.dist = dist;

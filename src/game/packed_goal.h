@@ -13,17 +13,17 @@ public:
     short heading;
     char field_26;
 
-    PackedGoal(Struct_004907e0* p);
+    PackedGoal(GoalOwnerUnit* p);
     virtual void TickTowardGoal();
     virtual void ExportGoalPose(Vec3*, Vec3*, short*);
 };
 #pragma pack(pop)
 
 #pragma pack(push, 2)
-class Class_0044e080 : public OrderFx {
+class PathOrderView : public OrderFx {
 public:
     char unknown_8[0x36 - 0x8];
-    Class_0044e080(Struct_004907e0* owner, BitReader* reader);
+    PathOrderView(GoalOwnerUnit* owner, BitReader* reader);
 };
 #pragma pack(pop)
 

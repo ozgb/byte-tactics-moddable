@@ -1,12 +1,12 @@
-#ifndef SIDE_00431A60_H
-#define SIDE_00431A60_H
+#ifndef SIDE_DEF_H
+#define SIDE_DEF_H
 
 #ifndef TA_TYPES_H
 #include "../graphics/rect.h"
 #endif
 
 #pragma pack(push, 1)
-struct Side_00431a60 {
+struct SideDef {
     char name[30];
     char nameprefix[4];
     char commander[32];
@@ -46,7 +46,7 @@ struct Side_00431a60 {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(Side_00431a60) == 562, "Side_00431a60");
+static_assert(sizeof(SideDef) == 562, "SideDef");
 #endif
 
 #endif

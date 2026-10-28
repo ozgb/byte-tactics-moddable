@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "unit_def.h"
 
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
@@ -29,32 +30,22 @@ struct Block;
 struct Beacon;
 struct OrderView;
 struct Spawn;
-struct UnitType;
 struct Player;
 
 #include "../map/mission.h"
 
 #include "../network/player.h"
 
-struct UnitType {
-    char unknown_0[0x1fa];
-    unsigned int f1fa;
-    char unknown_1fe[0x200 - 0x1fe];
-    unsigned short f200;
-    char unknown_202[0x22c - 0x202];
-    unsigned char draft;
-    char unknown_22d[0x241 - 0x22d];
-    union {
-        struct {
-            unsigned int low : 12;
-            unsigned int floats : 1;
-            unsigned int unknown_13 : 6;
-            unsigned int on_water : 1;
-            unsigned int over_water : 1;
-            unsigned int unknown_21 : 11;
-        } bits;
-        unsigned int all;
-    } f241;
+union TerrainFlags {
+    struct {
+        unsigned int low : 12;
+        unsigned int floats : 1;
+        unsigned int mid13 : 6;
+        unsigned int on_water : 1;
+        unsigned int over_water : 1;
+        unsigned int high21 : 11;
+    } bits;
+    unsigned int all;
 };
 
 #include "../orders/unit_motion.h"
@@ -144,8 +135,8 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, Spawn* spawn);
 void __stdcall SnapUnitToGround(Unit* unit)
 {
     extern Game* g_game;
-    if (((UnitType*)unit->def.get())->f241.bits.floats) {
-        unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - ((UnitType*)unit->def.get())->draft) << 16;
+    if (((TerrainFlags*)&unit->def->flags1)->bits.floats) {
+        unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
     } else {
         unit->pos.y = GetGroundHeight(&unit->pos) << 16;
     }
@@ -155,18 +146,18 @@ void __stdcall SnapUnitToGround(Unit* unit)
 void __stdcall UpdateUnitHeight(Unit* unit)
 {
     extern Game* g_game;
-    if ((unit->flags & 0x10000) || ((UnitType*)unit->def.get())->f241.bits.floats) {
+    if ((unit->flags & 0x10000) || ((TerrainFlags*)&unit->def->flags1)->bits.floats) {
         unit->flags &= ~0x10000;
         if (unit->motion && (unit->flags & 3) == 1) {
-            if (((UnitType*)unit->def.get())->f241.bits.over_water) {
-                if (((UnitType*)unit->def.get())->f241.bits.floats) {
-                    unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - ((UnitType*)unit->def.get())->draft) << 16;
+            if (((TerrainFlags*)&unit->def->flags1)->bits.over_water) {
+                if (((TerrainFlags*)&unit->def->flags1)->bits.floats) {
+                    unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
                 } else {
                     unit->pos.y = GetGroundHeight(&unit->pos) << 16;
                 }
-            } else if (((UnitType*)unit->def.get())->f241.bits.on_water) {
+            } else if (((TerrainFlags*)&unit->def->flags1)->bits.on_water) {
                 Fixed h;
-                h.value = ((UnitType*)unit->def.get())->draft * 0xffff + g_game->seaLevel;
+                h.value = unit->def->draft * 0xffff + g_game->seaLevel;
                 h.value <<= 16;
                 unit->pos.y = h.value;
             } else {
@@ -283,7 +274,7 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                         if (u->player->active) {
                             unsigned char k = u->player->type;
                             if (k == 1 || k == 2) {
-                                if (t && !(((UnitType*)t->def.get())->f241.bits.low & 0x200))
+                                if (t && !(((TerrainFlags*)&t->def->flags1)->bits.low & 0x200))
                                     g_seams.orders->AddBeCarriedOrder(u);
                             }
                         }
@@ -348,7 +339,7 @@ void __stdcall UpdateAllUnits(void)
                             }
                         }
                         if ((unsigned int)g_game->ticks % 30 == 0) {
-                            int v = u->health * 100 / ((UnitType*)u->def.get())->f1fa;
+                            int v = u->health * 100 / u->def->maxHealth;
                             if (v < 0) {
                                 v = 0;
                             }
@@ -365,12 +356,12 @@ void __stdcall UpdateAllUnits(void)
                                 if (g_game->net->waterDoesDamage != 0
                                     && g_game->net->waterDamage != 0
                                     && (unsigned int)g_game->ticks % 30 == 0 && u->yWhole <= g_game->seaLevel
-                                    && !((UnitType*)u->def.get())->f241.bits.floats) {
+                                    && !((TerrainFlags*)&u->def->flags1)->bits.floats) {
                                     g_seams.weapons->DamageUnit(0, u, g_game->net->waterDamage, 0xb, 0);
                                 }
-                                if (((UnitType*)u->def.get())->f200 != 0 && u->health < ((UnitType*)u->def.get())->f1fa
+                                if (u->def->healtimeUnsigned != 0 && u->health < u->def->maxHealth
                                     && (g_game->ticks & 7) == 0) {
-                                    int n = ((UnitType*)u->def.get())->f200 * 8;
+                                    int n = u->def->healtimeUnsigned * 8;
                                     AddRepairProgress(u, u, (float)(n / 30));
                                 }
                                 g_seams.orders->RunOrders(u);

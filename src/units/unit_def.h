@@ -33,7 +33,10 @@ public:
         Ref<char> yardmap;
     };
     int count;
-    Ref<unsigned short> ids;
+    union {
+        Ref<unsigned short> ids;
+        Ref<short> idsSigned;
+    };
     int maxThisUnit;
     int modelMinX;
     int modelMinY;
@@ -47,7 +50,13 @@ public:
         };
     };
     int modelMaxZ;
-    int modelSizeX;
+    union {
+        int modelSizeX;
+        struct {
+            short modelSizeXLow;
+            short modelSizeXHigh;
+        };
+    };
     int modelSizeY;
     union {
         int modelSizeZ;
@@ -76,8 +85,14 @@ public:
     int moverate1;
     int moverate2;
     Ref<MovementClass> movementclass;
-    short turnrate;
-    short corpse;
+    union {
+        short turnrate;
+        unsigned short turnrateUnsigned;
+    };
+    union {
+        short corpse;
+        unsigned short corpseUnsigned;
+    };
     short maxwaterdepth;
     short minwaterdepth;
     float energymake;
@@ -92,9 +107,15 @@ public:
     float metalstorage;
     int buildtime;
     Ref<WeaponDef> weapons[3];
-    unsigned int maxHealth;
+    union {
+        unsigned int maxHealth;
+        short hp;
+    };
     unsigned short buildRate;
-    short healtime;
+    union {
+        short healtime;
+        unsigned short healtimeUnsigned;
+    };
     short range;
     short radardistance;
     short sonardistance;
@@ -102,11 +123,20 @@ public:
     short radardistancejam;
     short sonardistancejam;
     short soundcategory;
-    short buildangle;
+    union {
+        short buildangle;
+        unsigned short buildangleUnsigned;
+    };
     unsigned short buildRange;
-    short maneuverleashlength;
+    union {
+        short maneuverleashlength;
+        unsigned short maneuverleashUnsigned;
+    };
     unsigned short attackrunlength;
-    short kamikazedistance;
+    union {
+        short kamikazedistance;
+        unsigned short kamikazeUnsigned;
+    };
     short sortbias;
     short altitude;
     unsigned short id;

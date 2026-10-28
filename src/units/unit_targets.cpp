@@ -1,4 +1,5 @@
 #include "win_types.h"
+#include "unit_def.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include <stdio.h>
@@ -23,31 +24,6 @@ struct Target_0048a1e0 {
     int radius;
     char unknown_6c[0x111 - 0x6c];
     unsigned int field_111;
-};
-
-struct UnitType {
-    char unknown_0[0x152];
-    int count;
-    Ref<short> ids;
-    char unknown_15a[0x186 - 0x15a];
-    float energyCost;
-    float metalCost;
-    char unknown_18e[0x192 - 0x18e];
-    int sight;
-    char unknown_196[0x19e - 0x196];
-    int field_19e;
-    char unknown_1a2[0x1aa - 0x1a2];
-    int f1aa;
-    char unknown_1ae[0x1ba - 0x1ae];
-    unsigned short field_1ba;
-    char unknown_1bc[0x1ea - 0x1bc];
-    int field_1ea;
-    char unknown_1ee[0x1fa - 0x1ee];
-    unsigned int maxhp;
-    char unknown_1fe[0x22f - 0x1fe];
-    unsigned char mobile;
-    char unknown_230[0x241 - 0x230];
-    unsigned int f241;
 };
 
 struct Vec3_0048a1e0 {
@@ -86,7 +62,7 @@ static inline float spd(int v)
 }
 
 // FUNCTION: 0x489280
-char* __stdcall MakePropList(UnitType* obj)
+char* __stdcall MakePropList(UnitDef* obj)
 {
     char* buf = (char*)GameAllocIgnoreTag("PropList", 0xc0);
     memset(buf, 0, 0xc0);
@@ -101,23 +77,23 @@ char* __stdcall MakePropList(UnitType* obj)
     sprintf(p, "%d", (int)obj->metalCost);
     p += strlen(p) + 1;
 
-    sprintf(p, "%d", obj->field_1ea);
+    sprintf(p, "%d", obj->buildtime);
     p += strlen(p) + 1;
 
     sprintf(p, "\n");
     p += strlen(p) + 1;
 
     if (obj->mobile) {
-        sprintf(p, "%.1f %s ", (double)GetTickRate() * spd(obj->sight) * 0.4,
+        sprintf(p, "%.1f %s ", (double)GetTickRate() * spd(obj->maxvelocity) * 0.4,
                 Translate("m/s"));
         p += strlen(p) + 1;
 
-        sprintf(p, "%.2f %s", (double)GetTickRate() * spd(obj->field_19e) * 0.4,
+        sprintf(p, "%.2f %s", (double)GetTickRate() * spd(obj->acceleration) * 0.4,
                 Translate("m/s/s"));
         p += strlen(p) + 1;
 
         sprintf(p, "%.0f %s",
-                (double)GetTickRate() * obj->field_1ba * 0.0054931640625,
+                (double)GetTickRate() * obj->turnrateUnsigned * 0.0054931640625,
                 Translate("deg/s"));
     } else {
         sprintf(p, "%s", Translate("N/A"));
@@ -135,8 +111,8 @@ char* __stdcall MakePropList(UnitType* obj)
 // FUNCTION: 0x4894f0
 int __stdcall UnitCanBuild(Unit* unit, short id)
 {
-    for (int i = 0; i < ((UnitType*)unit->def.get())->count; i++) {
-        if (((UnitType*)unit->def.get())->ids[i] == id)
+    for (int i = 0; i < unit->def->count; i++) {
+        if (unit->def->idsSigned[i] == id)
             return 1;
     }
     return 0;
@@ -304,7 +280,7 @@ void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsi
     int dmg;
     if (type != 10) {
         if ((target->activateFlags & 2) && amount < 0x7530)
-            amount = (int)(((__int64)((UnitType*)target->def.get())->f1aa * amount) >> 0x10);
+            amount = (int)(((__int64)target->def->damagemodifier * amount) >> 0x10);
         int armour = target->killCount / 5;
         if (armour > 5)
             armour = 5;
@@ -364,8 +340,8 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
         return;
 
     if (ev->damageKind == 10) {
-        unit->health = (short)((unsigned int)(unit->health + ev->amount) < ((UnitType*)unit->def.get())->maxhp
-                           ? unit->health + ev->amount : ((UnitType*)unit->def.get())->maxhp);
+        unit->health = (short)((unsigned int)(unit->health + ev->amount) < unit->def->maxHealth
+                           ? unit->health + ev->amount : unit->def->maxHealth);
         return;
     }
 
@@ -390,7 +366,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
             if (!(unit->flags & 0x4000)) {
                 Player* owner = unit->player;
                 if (owner->active && (owner->type == 1 || owner->type == 2)) {
-                    if (!(((UnitType*)unit->def.get())->f241 & 0x4000000)) {
+                    if (!(unit->def->flags1 & 0x4000000)) {
                         MissionType kind(s_paralyze_00508d80);
                         Order* e = unit->list;
                         if (e && e->kind == kind) {
@@ -416,7 +392,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
             int a = ScaledCos(ev->headingByte << 8, 400);
             int b = ScaledSin(ev->headingByte << 8, 400);
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), s_HitByWeapon_00508d74, 0, 0, 2, a, b, 0, 0);
-            int pct = unit->health * 100 / ((UnitType*)unit->def.get())->maxhp;
+            int pct = unit->health * 100 / unit->def->maxHealth;
             if (pct < 0)
                 pct = 0;
             if (pct > 100)
@@ -437,7 +413,7 @@ void __stdcall ParalyzeUnit(Unit* unit, int ticks)
     if (!owner->active)
         return;
     if (owner->type == 1 || owner->type == 2) {
-        if (!(((UnitType*)unit->def.get())->f241 & 0x4000000)) {
+        if (!(unit->def->flags1 & 0x4000000)) {
             MissionType kind("paralyze");
             Order* effect = unit->list;
             if (effect && effect->kind == kind) {
@@ -644,7 +620,7 @@ void __stdcall AlignUnitToGround(Unit* u)
             int H0 = b0 + ((c0 - b0) * fx) / 16;
             int H1 = b1 + ((c1 - b1) * fx) / 16;
             hs[k].wx = wx;
-            if ((((UnitType*)u->def.get())->f241 & 0x1000) && (u->flags & 0x10000000)
+            if ((u->def->flags1 & 0x1000) && (u->flags & 0x10000000)
                 && !(u->flags & 0x4000)) {
                 hs[k].h = H0 + ((H1 - H0) * fz) / 16;
                 int H = hs[k].h;
@@ -652,7 +628,7 @@ void __stdcall AlignUnitToGround(Unit* u)
                 hs[k].h = max(H, sea);
                 unsigned int bobClock = g_quirks.hoverBobWallClock ? GetTicks() : g_game->ticks;
                 short p = (short)(((bobClock & 0x1f) + k * 8) * 2048 + u->hoverBobPhase);
-                int s = ((UnitType*)u->def.get())->sight / 2;
+                int s = u->def->maxvelocity / 2;
                 Body_0048a1e0* o = (Body_0048a1e0*)u->motion.get();
                 int q = o->sight;
                 if (q >= s)

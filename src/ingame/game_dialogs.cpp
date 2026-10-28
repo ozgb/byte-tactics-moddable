@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "../units/unit_def.h"
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -587,7 +588,7 @@ void __stdcall OpenUnitInfoDialog(void)
     char* def = (char *)g_game->defs.get() + 0x249 * (unsigned)type;
     BuildDataPath(buf, "unitpics", def + 0x20, "PCX");
     hotr->u.anim.value = (int)LoadPcx(buf, 0);
-    stats = MakePropList((UnitType *)def);
+    stats = MakePropList((UnitDef *)def);
     int n = entries->u.count;
 
     AddTextGadget(g_game->gui.layer, "TEXT", Translate("Cost"), 0x82, 0x20, -1, 2);

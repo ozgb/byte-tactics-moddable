@@ -106,10 +106,7 @@ public:
 class PathOrderAttach;
 
 
-class UnitRef {
-public:
-    void Unlink();
-};
+#include "../units/unit_ref.h"
 
 extern void* g_pathOrderVtable[];
 extern void* g_airManeuverOrderVtable[];

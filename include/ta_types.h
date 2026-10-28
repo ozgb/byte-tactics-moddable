@@ -13,6 +13,7 @@
 #include "../src/graphics/nano_particle_vector.h"
 #include "../src/units/squad.h"
 #include "../src/util/vec3.h"
+#include "../src/units/unit_ref.h"
 #include "../src/network/packet_ring.h"
 #include "../src/network/packet_receiver.h"
 #include "../src/network/packet_manager.h"
@@ -2400,12 +2401,6 @@ public:
     unsigned int flags;
     Class_0044d8a0* attached;
     void AttachBuildFootprintMarker(Point16, Point16);
-};
-
-struct UnitRef {
-    int vtable;
-    Unit* ptr;
-    Unit* Get(void);
 };
 
 class Class_00489960 {

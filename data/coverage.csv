@@ -1183,11 +1183,10 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1113,458,31775,9857,11838,2566,,295,
+presentation,*,,1108,454,31740,9835,11828,2560,,295,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,
-presentation,Add,src/graphics/particles.cpp,1,0,0,0,0,0,?Add@@YGXPAULists_00471fd0@@FPAVParticleSystem@@@Z,0,
 presentation,AddBarGadget,src/gui/dialogs.cpp,1,0,0,0,0,0,?AddBarGadget@@YGHPAUGui@@PAURecord_004ab3a0@@@Z,0,
 presentation,AddBlinkWord,src/gui/file_list.cpp,1,0,0,0,0,0,?AddBlinkWord@@YGHPAUDialog@@PBDHHHHMM@Z,0,
 presentation,AddButtonGadget,src/gui/dialogs.cpp,1,0,0,0,0,0,?AddButtonGadget@@YGHPAUGui@@PAURecord_004ab2b0@@@Z,0,

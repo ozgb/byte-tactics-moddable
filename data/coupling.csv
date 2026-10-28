@@ -2041,7 +2041,6 @@ orders,presentation,call,EmitTeleportParticles,1
 orders,presentation,call,MarkSelectionOrdersDirty,6
 orders,presentation,call,QueueUnitSpeech,26
 orders,presentation,call,UpdateBuildMenuIfFocusUnit,2
-orders,presentation,indirect,ParticleSystem::~ParticleSystem,1
 orders,presentation,shared_write,AiSearchGoal::active,1
 orders,presentation,shared_write,AiSearchGoal::count,1
 orders,presentation,shared_write,Angles16::bank,1
@@ -3402,7 +3401,7 @@ presentation,platform,call,host_window_has_focus,2
 presentation,platform,call,host_window_raise,1
 presentation,platform,call,host_window_resize,1
 presentation,platform,call,host_window_set_topmost,1
-presentation,platform,call,operator delete,12
+presentation,platform,call,operator delete,7
 presentation,platform,call,operator new,23
 presentation,platform,call,operator-,5
 presentation,platform,call,operator==,10

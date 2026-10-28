@@ -681,7 +681,7 @@ int __stdcall WeaponCanReachPos(Unit* a1, Vec3_0049aa80* a2, Vec3_0049aa80* a3, 
     if (wdef->flags.b.waterWeapon)
         return 1;
 
-    if (a2->y.parts.whole + a1->def->field_170 <= g_game->seaLevel)
+    if (a2->y.parts.whole + a1->def->modelMaxYHigh <= g_game->seaLevel)
         return 0;
 
     if (wdef->flags.b.ballistic) {
@@ -727,14 +727,14 @@ int __stdcall WeaponCanReachUnit(Unit* unit1, Unit* unit2, unsigned char weapon)
     if (w->flags.b.waterWeapon) {
         if (!(unit2->def->flags1 & 0x80000) && unit2->yWhole > g_game->seaLevel)
             return 0;
-        if ((unit2->def->flags1 & 0x1000) && (unit2->def->field_170 >> 1) + unit2->yWhole > g_game->seaLevel)
+        if ((unit2->def->flags1 & 0x1000) && (unit2->def->modelMaxYHigh >> 1) + unit2->yWhole > g_game->seaLevel)
             return 0;
         return Dist2_0049abb0((Vec3_0049abb0*)&unit1->pos, (Vec3_0049abb0*)&unit2->pos) <= w->range * w->range;
     }
 
-    if (unit1->yWhole + unit1->def->field_170 <= g_game->seaLevel)
+    if (unit1->yWhole + unit1->def->modelMaxYHigh <= g_game->seaLevel)
         return 0;
-    if (unit2->yWhole + unit2->def->field_170 <= g_game->seaLevel)
+    if (unit2->yWhole + unit2->def->modelMaxYHigh <= g_game->seaLevel)
         return 0;
     if (w->flags.b.toAirWeapon && (unit2->flags & 3) != 2)
         return 0;

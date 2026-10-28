@@ -538,7 +538,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
         Unit* cargo = order->target;
         if (g_seams.map->CanPlaceUnitFootprint(cargo->def, 0, WorldToCell16(order->pos, *(Point16*)&cargo->footprint), 1)) {
             Class_0044e2d0* obj = new (kSim) Class_0044e2d0(order, order->pos);
-            int h = unit->cargo->def->field_170;
+            int h = unit->cargo->def->modelMaxYHigh;
             ((Class_0044e6c0*)obj)->SetAltitude(h);
             order->SetAttachedFx(obj);
             order->flags = 0xe8;
@@ -1311,7 +1311,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         }
         Class_0044e250* obj = new (kSim) Class_0044e250(order, order->target, order->angle);
         if (unit->cargo)
-            ((Class_0044e2d0*)obj)->SetAltitude(unit->cargo->def->field_170);
+            ((Class_0044e2d0*)obj)->SetAltitude(unit->cargo->def->modelMaxYHigh);
         else
             ((Class_0044e2d0*)obj)->SetAltitude(0);
         g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);

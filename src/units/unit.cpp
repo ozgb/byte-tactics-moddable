@@ -142,11 +142,11 @@ int Unit::CanRepair(Unit* other)
         && (other->health != other->def->maxHealth)
         && ((other->flags & 3) != 2)) {
         if (def->flags1 & 0x800) {
-            if (!(def->flags1 & 0x200000) && other->yWhole + other->def->field_170 < g_game->seaLevel)
+            if (!(def->flags1 & 0x200000) && other->yWhole + other->def->modelMaxYHigh < g_game->seaLevel)
                 goto fail;
         }
         if (!(def->flags1 & 0x800)) {
-            if (other->yWhole + other->def->field_170 < g_game->seaLevel - def->maxwaterdepth)
+            if (other->yWhole + other->def->modelMaxYHigh < g_game->seaLevel - def->maxwaterdepth)
                 goto fail;
         }
         return 1;

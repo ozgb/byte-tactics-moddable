@@ -45,10 +45,6 @@ public:
     union {
         int modelMaxY;
         struct {
-            short unknown_16e;
-            short field_170;
-        };
-        struct {
             short modelMaxYLow;
             short modelMaxYHigh;
         };

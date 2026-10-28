@@ -284,7 +284,7 @@ void __stdcall RemoveUnitLineOfSight(Unit* unit)
     p.sightDistance = unit->def->range;
     p.frameIdx = &unit->losSightFrameIdx;
     p.pos = unit->pos;
-    p.eyeHeight = (unsigned char)unit->def->field_170;
+    p.eyeHeight = (unsigned char)unit->def->modelMaxYHigh;
     int minY = (g_game->seaLevel + 1) << 16;
     if (p.pos.y < minY) {
         p.pos.y = minY;
@@ -395,7 +395,7 @@ void __stdcall UpdateUnitLineOfSight(Unit* unit)
     p.sightDistance = unit->def->range;
     p.frameIdx = &unit->losSightFrameIdx;
     p.pos = unit->pos;
-    p.eyeHeight = (unsigned char)unit->def->field_170;
+    p.eyeHeight = (unsigned char)unit->def->modelMaxYHigh;
     int minY = (g_game->seaLevel + 1) << 16;
     if (p.pos.y < minY) {
         p.pos.y = minY;
@@ -1263,7 +1263,7 @@ void __stdcall RecalculateLineOfSight(int arg)
         params.sightDistance = u->def->range;
         params.frameIdx = &u->losSightFrameIdx;
         params.pos = u->pos;
-        params.eyeHeight = (unsigned char)u->def->field_170;
+        params.eyeHeight = (unsigned char)u->def->modelMaxYHigh;
         if (params.pos.y < (int)((g_game->seaLevel + 1) << 16))
             params.pos.y = (g_game->seaLevel + 1) << 16;
         if ((g_game->mapFlags_14281.raw & 2) == 2) {
@@ -1470,7 +1470,7 @@ void __stdcall RevealNewUnit(Unit* unit)
     p.sightDistance = unit->def->range;
     p.frameIdx = &unit->losSightFrameIdx;
     p.pos = unit->pos;
-    p.eyeHeight = (unsigned char)unit->def->field_170;
+    p.eyeHeight = (unsigned char)unit->def->modelMaxYHigh;
     int min_y = (g_game->seaLevel + 1) << 16;
     if (p.pos.y < min_y) {
         p.pos.y = min_y;

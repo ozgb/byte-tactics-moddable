@@ -20,7 +20,8 @@ source file; a file with no simulation function is not checked:
   host          declared in interfaces/host.h
   bitexact      a bx_ name, or declared in lib/bitexact/bitexact.h
   library       a symbol no object of the build defines (the CRT, the MSVC 5 libraries, the imports), or
-                one src/util/operator_new.cpp defines (operator new and delete)
+                one src/util/operator_new.cpp defines (operator new and delete), or throw info (_TI,
+                _CTA, _CT) or a static or member of a std template (@std@@ in the decorated name)
   const         a data symbol whose data/state_classes.csv class is const or sim
   own           defined by S: a function of S in data/subsystems.csv, or data defined in a file
                 whose functions all belong to S, or a compiler-made symbol (string literal,
@@ -56,6 +57,7 @@ SIMULATION = ("wind_meteors", "economy", "features", "ai", "pathfinding", "weapo
 STATE_DIR = "src/state/"
 LIBRARY_FILE = "src/util/operator_new.cpp"
 GAME_POINTER = "g_game"
+THROW_PREFIXES = ("_TI", "_CTA", "_CT")
 STATE_CLASSES = "data/state_classes.csv"
 CONST_CLASSES = ("const", "sim")
 KINDS = ("seam", "state", "service", "host", "bitexact", "library", "own", "const")
@@ -295,7 +297,7 @@ def classify(rules: Rules, subsystem: str, symbol: str):
         return "host"
     if last.startswith("bx_") or last in rules.bitexact_names:
         return "bitexact"
-    if not files or all(f == LIBRARY_FILE for f in files):
+    if not files or all(f == LIBRARY_FILE for f in files) or compiler_library(symbol):
         return "library"
     if symbol in rules.code_defs:
         owners = {rules.function_subsystem.get((f, base_name(symbol))) for f in rules.code_defs[symbol]} - {None}
@@ -310,6 +312,11 @@ def classify(rules: Rules, subsystem: str, symbol: str):
 def allowed(rules: Rules, subsystem: str, symbol: str) -> bool:
     """True when a function of the subsystem may reference the symbol."""
     return classify(rules, subsystem, symbol) is not None
+
+
+def compiler_library(symbol: str) -> bool:
+    """Throw info and catchable types (_TI, _CTA, _CT) and statics or members of std templates."""
+    return symbol.startswith(THROW_PREFIXES) or "@std@@" in symbol
 
 
 def compiler_made(symbol: str, rules: Rules, subsystem: str, files: set) -> bool:

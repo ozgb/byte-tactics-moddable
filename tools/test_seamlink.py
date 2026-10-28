@@ -234,6 +234,13 @@ class SeamLinkTest(unittest.TestCase):
         other = Unit("src/units/units.cpp", code={"?Foo@@YAXXZ"})
         self.assertEqual(len(self.run_with(self.wind("?Foo@@YAXXZ"), other)), 1)
 
+    def test_throw_info_and_std_statics_are_library(self):
+        names = ["_TI2?AVlogic_error", "_CTA3?AVout_of_range", "_CT??_R0?AVx@@@8", "?_C@?1??_Nullstr@?$basic_string@DU?$char_traits@D@std@@@std@@CGPBDXZ@4DB"]
+        link = Unit("link/data.cpp", data=set(names))
+        self.assertEqual(self.run_with(self.wind(*names), link), [])
+        other = Unit("link/data.cpp", data={"_TXother", "?g_std@@3HA"})
+        self.assertEqual(len(self.run_with(self.wind("_TXother", "?g_std@@3HA"), other)), 2)
+
     def test_operator_new_file_is_library(self):
         lib = Unit("src/util/operator_new.cpp", code={"??2@YAPAXI@Z", "??3@YAXPAX@Z", "??_U@YAPAXI@Z"})
         self.assertEqual(self.run_with(self.wind("??2@YAPAXI@Z", "??3@YAXPAX@Z", "??_U@YAPAXI@Z"), lib), [])

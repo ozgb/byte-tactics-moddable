@@ -1,9 +1,24 @@
 #ifndef UNIT_COMMANDS_H
 #define UNIT_COMMANDS_H
+#include "../util/angles.h"
+
 class UnitTypeSet;
-struct OwnershipTransferPacket;
 struct Player;
 struct Unit;
+
+#pragma pack(push, 1)
+struct OwnershipTransferPacket {
+    unsigned char type;
+    short unitId;
+    int newOwnerNetId;
+    int buildPercent;
+    int hitPoints;
+    Angles16 angles;
+    unsigned char stockpile0;
+    unsigned char stockpile1;
+    unsigned char stockpile2;
+};
+#pragma pack(pop)
 
 class UnitDef;
 

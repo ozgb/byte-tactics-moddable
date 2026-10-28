@@ -5,27 +5,6 @@
 #include "settings.h"
 
 #pragma pack(push, 1)
-struct SkirmishPlayer {
-    int controller;
-    int side;
-    int allyGroup;
-    int metal;
-    int energy;
-    int color;
-};
-
-struct Options {
-    SkirmishPlayer players[10];
-    char unknown_f0[0x108 - 10 * 0x18];
-    int skirmishCommanderDeath;
-    int skirmishMapping;
-    int skirmishLineOfSight;
-    int skirmishLOSType;
-    int fixedLocations;
-    char skirmishMap[0x228 - 0x11c];
-    int skirmishDifficulty;
-};
-
 struct Flags_0042f9a0 {
     unsigned short damagebars : 1;
     unsigned short antiAlias : 1;

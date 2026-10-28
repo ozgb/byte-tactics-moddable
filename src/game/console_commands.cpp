@@ -79,20 +79,6 @@ struct ViewFlags {
 
 #pragma pack(pop)
 
-class CommandArgs {
-public:
-    char* args[0x34];
-    int count;
-
-    int GetIntArg(int index, int fallback);
-    float GetFloatArg(int index, float def);
-    char* GetArg(int index, char* fallback);
-    int Tokenize(char* text, char* end);
-    CommandArgs* InitArgs();
-    void ShiftArgs(int n);
-    void SubstituteArgs(CommandArgs* other);
-};
-
 class Sound {
 public:
     void PlayCdTrack(int index, int flag);
@@ -152,16 +138,7 @@ struct Point_00417f60 {
 #include "../graphics/rect.h"
 #include "../state/sim_globals.h"
 
-struct ConsoleCommand {
-    const char* name;
-    void (__stdcall* run)(CommandArgs* args);
-    int mask;
-};
-
-struct Pair_00419560 {
-    int a;
-    int b;
-};
+#include "../network/net_stats.h"
 
 #include "console_commands.h"
 #include "console_commands.h"
@@ -823,8 +800,7 @@ void __stdcall CmdMusicMode(void* args)
 {
     CommandArgs* obj = (CommandArgs*)args;
     int result = obj->GetIntArg(1, 0);
-    void* p = *(void**)((char*)g_game + 0x10);
-    ((Sound*)p)->SetTrackCategory(result);
+    ((Sound*)g_game->sound)->SetTrackCategory(result);
 }
 
 // FUNCTION: 0x417600

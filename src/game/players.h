@@ -2,6 +2,8 @@
 #define PLAYERS_H
 
 #include "../../interfaces/rand_stream.h"
+struct ContinueWatchingDialog;
+
 struct Class_464b10;
 
 class HapiBank;
@@ -15,7 +17,7 @@ void __stdcall InitPlayers();
 void __stdcall RebuildAIFeatureCells();
 void __stdcall FreePlayers();
 void __stdcall RefreshOwnedUnitsLineOfSight(Player* range);
-void __stdcall ContinueWatchingCallback(Gadget* gadget);
+void __stdcall ContinueWatchingCallback(ContinueWatchingDialog* gadget);
 void __stdcall ShowContinueWatchingDialog();
 void __stdcall UpdatePlayers();
 void __stdcall UpdatePlayersOnStream(RandStream stream);

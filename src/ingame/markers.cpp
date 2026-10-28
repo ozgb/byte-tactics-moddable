@@ -7,13 +7,7 @@
 
 #pragma pack(push, 1)
 
-union Fixed {
-    int value;
-    struct {
-        unsigned short frac;
-        short whole;
-    };
-};
+#include "../util/vec3.h"
 
 struct Pos {
     Fixed x;

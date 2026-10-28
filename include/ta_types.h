@@ -13,6 +13,9 @@
 #include "../src/graphics/nano_particle_vector.h"
 #include "../src/units/squad.h"
 #include "../src/util/vec3.h"
+#include "../src/units/unit_ref.h"
+#include "../src/graphics/surface.h"
+#include "../src/network/net_stats.h"
 #include "../src/network/packet_ring.h"
 #include "../src/network/packet_receiver.h"
 #include "../src/network/packet_manager.h"
@@ -2402,16 +2405,6 @@ public:
     void AttachBuildFootprintMarker(Point16, Point16);
 };
 
-union Fixed {
-    int value;
-};
-
-struct UnitRef {
-    int vtable;
-    Unit* ptr;
-    Unit* Get(void);
-};
-
 class Class_00489960 {
 public:
     char unknown_0[1];
@@ -2436,18 +2429,6 @@ struct Order_9 {
     char unknown_a[4];
     Unit* source;
     UnitRef target;
-};
-
-class DamagedAllyCollector {
-public:
-    Player* owner;
-    std::vector<Unit*>* units;
-    Unit* self;
-    DamagedAllyCollector(DamagedAllyCollector&);
-    DamagedAllyCollector(Player*, std::vector<Unit*>*, Unit*);
-    virtual void CollectDamagedAlly(Unit*);
-    virtual void CollectGroundAlly(Unit*);
-    virtual void CollectRepairableUnit(Unit*);
 };
 
 struct Order_11 {
@@ -2554,12 +2535,6 @@ public:
     char unknown_0[208];
     int field_d0;
     Class_004b73b0* InitArgs(void);
-};
-
-class Class_004800c0 {
-public:
-    std::vector<Unit*> units;
-    Unit** EraseSwapBack(Unit**);
 };
 
 struct Player_00446080 {
@@ -3099,27 +3074,11 @@ struct Class_00415b90 {
     void FreeBuffer(void);
 };
 
-class BitWriter {
-public:
-    int bit;
-    int index;
-    int capacity;
-    unsigned int* data;
-    unsigned int buffer[256];
-    void WriteBits(int, int);
-};
 
 struct Class_00415da0 {
     char unknown_0[12];
     void* field_c;
     void SetByteAt(int, unsigned char);
-};
-
-struct Pair_00419560 {
-    unsigned int offset;
-    int length;
-    Pair_00419560(unsigned int, unsigned int);
-    Pair_00419560(void);
 };
 
 class Class_004618a0 {
@@ -4304,12 +4263,6 @@ public:
 
 #include "../src/game/mission_flags_0042f9a0.h"
 
-class Sound {
-public:
-    char unknown_0[1];
-    int GetMaxBuffers(void);
-};
-
 class Class_004cfff0 {
 public:
     char unknown_0[16];
@@ -4631,16 +4584,6 @@ public:
     void LoadMissionData(char*, TdfFile*);
 };
 
-class MeteorParams {
-public:
-    char name[32];
-    int radius;
-    float density;
-    float duration;
-    float interval;
-    void LoadMeteorDefaults(void);
-};
-
 class Class_004c44c0 {
 public:
     int unknown_0;
@@ -4726,11 +4669,6 @@ public:
     char unknown_8[4];
     int field_c;
     Class_004379a0_2* ClearPointers(void);
-};
-
-struct Chunk {
-    int field_0;
-    int field_4;
 };
 
 class Class_004379b0 {
@@ -5057,12 +4995,6 @@ public:
     char unknown_26[8];
     unsigned char field_2e;
     void UpdateMoveRate(Unit*);
-};
-
-class Class_0043db50 {
-public:
-    char unknown_0[1];
-    void UpdateSfxOccupy(Unit*);
 };
 
 struct Vec3i_00474130 {
@@ -6229,23 +6161,6 @@ public:
     char unknown_0[1];
     int ShadeByIntensity(Surface_004c0a90*, SpotState*);
     void RecolorByShade(Surface_004c0a90*, unsigned char, int, int, int);
-};
-
-struct Surface {
-    int width;
-    int height;
-    int pitch;
-    unsigned char* pixels;
-    int field_10;
-    int field_14;
-    unsigned short x;
-    unsigned short y;
-    Rect clip;
-    unsigned int flag0 : 1;
-    unsigned int flag1 : 1;
-    unsigned int : 30;
-    Rect* GetClipRect(Rect*);
-    void Unlock(void);
 };
 
 struct Surface_004c0a90 {
@@ -8800,12 +8715,6 @@ public:
     void RemoveSpeechOfId(int);
 };
 
-class IntDynArray {
-public:
-    std::vector<int> items;
-    int EraseByValue(int);
-};
-
 class Class_00480c30 {
 public:
     char unknown_0[1344];
@@ -9280,18 +9189,6 @@ struct Entry_00487af0 {
     char unknown_1c[6];
     unsigned char player;
     unsigned char flags;
-};
-
-struct OwnershipTransferPacket {
-    unsigned char type;
-    short team;
-    int who;
-    int x;
-    int y;
-    char unknown_f[6];
-    unsigned char b15;
-    unsigned char b16;
-    unsigned char b17;
 };
 
 struct Elem_00488a00 {
@@ -11480,63 +11377,6 @@ struct FrameCounter_4b6570 {
     void Tick(void);
 };
 
-struct Obj {
-    void* hInstance;
-    int nCmdShow;
-    char* className;
-    char* title;
-    long (__stdcall *wndProc)(void*, unsigned int, unsigned int, long);
-    unsigned short menuId;
-    char unknown_16[2];
-    tagWNDCLASSA wc;
-    void* hwnd;
-    void* old_palette;
-    void* dc;
-    void* hpalette;
-    char unknown_50[48];
-    void (__cdecl *callback)(int, int, int);
-    void* ddraw;
-    void* primary;
-    Surface_4b6570* surface;
-    void* field_90;
-    void* palette;
-    char unknown_98[8];
-    Mode_4b5980 mode;
-    void* font;
-    char unknown_b4[12];
-    void* ptr_at_0xc0;
-    void* field_c4;
-    void* light_table;
-    void* gray_table;
-    void* ptr_at_0xd0;
-    int width;
-    int height;
-    int unknown_dc;
-    int active;
-    char unknown_e4[4];
-    unsigned int rate;
-    int wa_left;
-    Flags_4b5980 flags;
-    char wa_rest[10];
-    char unknown_fc[182];
-    int field_1b2;
-    char unknown_1b6[36];
-    FrameCounter_4b6570 counter;
-    Mode_4b5980 startMode;
-    int startWidth;
-    int startHeight;
-    unsigned short videoFlags;
-    char unknown_204[16];
-    tagPALETTEENTRY entries[256];
-    char unknown_614[4];
-    void** items;
-    int item_count;
-    int availPhys;
-    int unknown_624;
-    char unknown_628[256];
-    unsigned char unknown_728;
-};
-
 class Surface_4b6570 {
 public:
     virtual int Slot_00(void);
@@ -11618,12 +11458,6 @@ struct NameLess_004b7760 {
 struct NameNe_004b7760 {
     char unknown_0[1];
     unsigned char operator()(Class_004c9390&, Class_004c9390&);
-};
-
-struct ConsoleCommand {
-    char* name;
-    void (__stdcall *fn)(void*);
-    int mask;
 };
 
 class Class_004c9290 {
@@ -12112,11 +11946,6 @@ struct Queue_004c1ab0_5 {
     int entries[30];
     int head;
     int tail;
-};
-
-struct DisplayContext {
-    char unknown_0[466];
-    int field_at_0x1d2;
 };
 
 struct Rect_004c2380 {
@@ -15261,7 +15090,6 @@ static_assert(sizeof(Class_0047c3a0) == 0x548, "Class_0047c3a0 size");
 static_assert(sizeof(Class_004ceee0) == 0x28c, "Class_004ceee0 size");
 static_assert(sizeof(Class_004cf0b0) == 0x1e8, "Class_004cf0b0 size");
 static_assert(sizeof(BitmapInfo_004b5510) == 0x428, "BitmapInfo_004b5510 size");
-static_assert(sizeof(Obj) == 0x729, "Obj size");
 static_assert(sizeof(Surface_4b6570) == 0x4, "Surface_4b6570 size");
 static_assert(sizeof(Screen_004c6210) == 0x10, "Screen_004c6210 size");
 static_assert(sizeof(Game_004cb170) == 0x614, "Game_004cb170 size");

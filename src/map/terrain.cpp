@@ -50,12 +50,6 @@ struct BucketGrid {
 
 #include "../units/movement_class.h"
 
-union Fixed {
-    int value;
-    int v;
-    struct { short lo; short hi; } p;
-};
-
 static inline int InsideExplored(Player* los, unsigned int tx, unsigned int ty)
 {
     return tx < (unsigned int)los->exploredWidth && ty < (unsigned int)los->exploredHeight;
@@ -66,16 +60,7 @@ struct Node_0047cb00 {
     Ref<Node_0047cb00> next;
 };
 
-class SpatialBucket {
-public:
-    char unknown_0[6];
-    union {
-        Node_0047cb00* head;
-        int field_6;
-    };
-    void UnlinkUnit(Node_0047cb00* node);
-    void PrependUnit(int node);
-};
+#include "spatial_bucket.h"
 
 class ClaimFootprintVisitor {
 public:
@@ -85,11 +70,6 @@ public:
 class Visitor_0047e750 {
 public:
     virtual void Visit(Unit* obj) = 0;
-};
-
-class DamagedAllyCollector {
-public:
-    virtual void CollectDamagedAlly(Unit* unit);
 };
 
 struct Entry_0047ea40 {
@@ -216,14 +196,15 @@ void FUN_0047caf0(void)
 }
 
 // FUNCTION: 0x47cb00
-void SpatialBucket::UnlinkUnit(Node_0047cb00* node)
+void SpatialBucket::UnlinkUnit(Unit* unit)
 {
-    if (head == node) {
+    Node_0047cb00* node = (Node_0047cb00*)unit;
+    if ((Node_0047cb00*)head == node) {
         head = node->next;
         node->next = 0;
         return;
     }
-    Ref<Node_0047cb00>* pp = &head->next;
+    Ref<Node_0047cb00>* pp = &((Node_0047cb00*)head)->next;
     while (*pp != node)
         pp = &(*pp)->next;
     *pp = node->next;
@@ -233,9 +214,9 @@ void SpatialBucket::UnlinkUnit(Node_0047cb00* node)
 // FUNCTION: 0x47cb40
 void SpatialBucket::PrependUnit(int node)
 {
-    int temp = field_6;
+    int temp = (int)head;
     ((Node_0047cb00*)node)->next = (Node_0047cb00*)temp;
-    field_6 = node;
+    head = (void*)node;
 }
 
 static void UnlinkBucketUnit(UnitBucket* bucket, Unit* unit)
@@ -470,7 +451,7 @@ static inline int IsExploredAtHeight(Player* los, Vec3Words* pos,
     Fixed* hgt)
 {
     int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (hgt->p.hi >> 1)) >> 5;
+    int ty = (pos->zWhole - (hgt->whole >> 1)) >> 5;
     if (InsideExplored(los, tx, ty) && los->explored[(unsigned int)los->exploredWidth * ty + tx] != 0)
         return 1;
     return 0;
@@ -480,7 +461,7 @@ static inline int IsSeenAtHeight(Player* los, Vec3Words* pos,
     Fixed* hgt, unsigned int bit)
 {
     int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (hgt->p.hi >> 1)) >> 5;
+    int ty = (pos->zWhole - (hgt->whole >> 1)) >> 5;
     unsigned int w = los->exploredWidth;
     int r;
     if (!InsideExplored(los, tx, ty))
@@ -493,7 +474,7 @@ static inline int IsSeenAtHeight(Player* los, Vec3Words* pos,
 static inline unsigned short VisibilityWord(Player* los, int tx,
     Vec3Words* pos, Fixed* hgt)
 {
-    int ty = (pos->zWhole - (hgt->p.hi >> 1)) >> 5;
+    int ty = (pos->zWhole - (hgt->whole >> 1)) >> 5;
     unsigned int w = los->exploredWidth;
     return g_game->visibilityMask[w * ty + tx];
 }
@@ -554,11 +535,11 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los)
     if (los != 0) {
         Pos_0047d2e0 pos;
         Fixed hgt;
-        pos.x.v = (origin.x + cell.x * 2) << 19;
-        pos.z.v = (origin.y + cell.y * 2) << 19;
-        hgt.v = GetCellHeight(&cell) << 16;
-        x = pos.x.p.hi >> 5;
-        y = (pos.z.p.hi - (hgt.p.hi >> 1)) >> 5;
+        pos.x.value = (origin.x + cell.x * 2) << 19;
+        pos.z.value = (origin.y + cell.y * 2) << 19;
+        hgt.value = GetCellHeight(&cell) << 16;
+        x = pos.x.whole >> 5;
+        y = (pos.z.whole - (hgt.whole >> 1)) >> 5;
         if (!InsideExplored(los, x, y))
             return 0;
         unsigned int bit = 1 << g_game->playerIndex;
@@ -1169,7 +1150,7 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* center, Fixed radius,
 {
     int countB = 0;
     int countA = 0;
-    int max = radius.p.hi * radius.p.hi / 256;
+    int max = radius.whole * radius.whole / 256;
     Entry_0047ea40* a = (Entry_0047ea40*)SimAlloc(max * sizeof(Entry_0047ea40));
     Entry_0047ea40* b = (Entry_0047ea40*)SimAlloc(max * sizeof(Entry_0047ea40));
     int half = radius.value / 2;

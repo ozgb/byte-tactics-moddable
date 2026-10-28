@@ -1,6 +1,11 @@
 #ifndef NET_STATS_H
 #define NET_STATS_H
 
+struct Pair_00419560 {
+    int a;
+    int b;
+};
+
 void __stdcall RegisterVtolOrders();
 void __stdcall StepAllGafSequences(void);
 void __stdcall ResetNetStats();

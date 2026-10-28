@@ -127,6 +127,7 @@ public:
     int paletteResult;
     int hasSurfaces;
     char unknown_418[0x5b4 - 0x418];
+    char pad_5b4[4];
 
     MoviePlayer(char* path, int a, int b, int c, int d, int e);
     void UpdatePalette(void);
@@ -138,6 +139,8 @@ public:
     int SetupDirectDraw();
     int GetBlitMode(SmackerSurface* unused);
 };
+
+static_assert(sizeof(MoviePlayer) == 0x5b8, "MoviePlayer size");
 
 // FUNCTION: 0x47bdf0
 MoviePlayer::MoviePlayer(char* path, int a, int b, int c, int d, int e)

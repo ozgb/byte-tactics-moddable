@@ -28,7 +28,7 @@ struct ArchiveDirectory {
     ArchiveEntry* entries;
 };
 
-struct Header {
+struct HapiHeader {
     char magic[4];
     unsigned char version[4];
     unsigned int size;
@@ -40,20 +40,13 @@ struct Header {
 struct OPENHAPIFILE {
     void* fp;
     int pos;
-    Header* node;
+    HapiHeader* node;
     int count;
     int mode;
     char name[0x104];
 };
 
-struct DisplayContext {
-    char unknown_0[0x618];
-    OPENHAPIFILE** files;
-    int count;
-    char unknown_620[8];
-    char cwd[0x100];
-    char lastDir[0x100];
-};
+#include "../graphics/display.h"
 
 #include "file_handle.h"
 
@@ -65,7 +58,7 @@ FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
     return HAPI_OpenFile(param1, "a+b");
 }
 
-DisplayContext* GetDisplay(void);
+Display* GetDisplay(void);
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
 
@@ -81,7 +74,7 @@ FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode)
     int off;
     int k;
     unsigned char* p;
-    DisplayContext* state = GetDisplay();
+    Display* state = GetDisplay();
     FileHandle* h = (FileHandle*)GameAllocIgnoreTag("File Handle", 0x118);
     memset(h, 0, 0x118);
     strncpy(h->name, filename, 0x100);
@@ -848,7 +841,7 @@ int __stdcall HAPI_FindNext(int handle, void* out)
         if (!f->recursive)
             return -1;
     }
-    DisplayContext* g = GetDisplay();
+    Display* g = GetDisplay();
     for (; f->state < g->count; f->index = -1, f->state++) {
         if (f->index < 0) {
             f->list = HAPI_FindDirectory(g->files[f->state]->node->list, f->dir);
@@ -1028,7 +1021,7 @@ void __stdcall GetDirectoryEntry(struct _finddata_t* fd, int index, const char* 
 // FUNCTION: 0x4bce10
 void SaveStartDirectory()
 {
-    DisplayContext* g = GetDisplay();
+    Display* g = GetDisplay();
     char buf[12];
     char d = _getdrive() + '@';
     char* p = g->cwd;
@@ -1043,7 +1036,7 @@ void SaveStartDirectory()
 // FUNCTION: 0x4bce60
 int __stdcall SetLastDirectory(char* path)
 {
-    DisplayContext* base = GetDisplay();
+    Display* base = GetDisplay();
     int result = _chdir(path);
     if (result == 0) {
         strncpy(base->lastDir, path, 0x100);
@@ -1054,21 +1047,21 @@ int __stdcall SetLastDirectory(char* path)
 // FUNCTION: 0x4bcea0
 void __stdcall GetLastDirectory(char* dst)
 {
-    DisplayContext* s = GetDisplay();
+    Display* s = GetDisplay();
     strncpy(dst, s->lastDir, 0x100);
 }
 
 // FUNCTION: 0x4bcec0
 void __stdcall GetStartDirectory(char* param)
 {
-    DisplayContext* p = GetDisplay();
+    Display* p = GetDisplay();
     char* src = p->cwd;
     strncpy(param, src, 0x100);
 }
 
 // FUNCTION: 0x4bcee0
 void RestoreStartDirectory() {
-    DisplayContext* p = GetDisplay();
+    Display* p = GetDisplay();
     _chdir(p->cwd);
 }
 
@@ -1481,7 +1474,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
 void __stdcall HAPI_RelocateDirectory(ArchiveDirectory* h, int delta);
 void __stdcall HAPI_RelocateDirectory(int name, int base);
 
-static inline int Bad_004bdd70(void* f, Header* hdr, char* copyright)
+static inline int Bad_004bdd70(void* f, HapiHeader* hdr, char* copyright)
 {
     if (strncmp(hdr->magic, "HAPI", 4) != 0 || hdr->version[0] != 0 || hdr->version[1] != 0 ||
         hdr->version[2] != 1 || hdr->version[3] != 0)
@@ -1508,7 +1501,7 @@ OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
     h->count = 0;
     h->mode = mode;
     host_file_full_path(name, h->name, 0x104);
-    Header hdr;
+    HapiHeader hdr;
     host_file_read(f, &hdr, 0x14);
     char copyright[0x40];
     if (Bad_004bdd70(f, &hdr, copyright)) {
@@ -1516,11 +1509,11 @@ OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
         GameFreeThunk(h);
         return 0;
     }
-    h->node = (Header*)GameAllocIgnoreTag("HAPIFILE header", hdr.size);
+    h->node = (HapiHeader*)GameAllocIgnoreTag("HAPIFILE header", hdr.size);
     host_file_seek(f, 0, HOST_SEEK_SET);
     host_file_read(f, h->node, hdr.size);
     {
-        Header* base = h->node;
+        HapiHeader* base = h->node;
         unsigned char key = base->obfuscate;
         unsigned int w = key;
         unsigned char r = key;
@@ -1543,7 +1536,7 @@ OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
         }
         base = h->node;
         base->list = (ArchiveDirectory*)((char*)base->list + (int)base);
-        Header* b = h->node;
+        HapiHeader* b = h->node;
         ArchiveDirectory* t = b->list;
         t->entries = (ArchiveEntry*)((char*)t->entries + (int)b);
         for (int i = t->count - 1; i >= 0; i--) {
@@ -1588,7 +1581,7 @@ void __stdcall HAPI_CloseArchive(OPENHAPIFILE* f)
 // FUNCTION: 0x4be0b0
 void* __stdcall HAPI_AddArchive(LPCSTR name, int mode)
 {
-    DisplayContext* display = GetDisplay();
+    Display* display = GetDisplay();
     char fullPath[0x100];
     host_file_full_path(name, fullPath, 0x100);
 
@@ -1620,7 +1613,7 @@ static void FreeRecord_004be180(OPENHAPIFILE* p)
 // FUNCTION: 0x4be180
 void HAPI_DropMissingArchives(void)
 {
-    DisplayContext* state = GetDisplay();
+    Display* state = GetDisplay();
     int i;
     for (i = 0; i < state->count; i++) {
         if (state->files[i]->fp == 0) {
@@ -1644,7 +1637,7 @@ void HAPI_DropMissingArchives(void)
 // FUNCTION: 0x4be270
 void __stdcall HAPI_RemoveArchive(OPENHAPIFILE* pRecord)
 {
-    DisplayContext* state = GetDisplay();
+    Display* state = GetDisplay();
     int i;
     for (i = 0; i < state->count; i++) {
         if (state->files[i] == pRecord) {
@@ -1668,7 +1661,7 @@ void __stdcall HAPI_RemoveArchive(OPENHAPIFILE* pRecord)
 // FUNCTION: 0x4be320
 void __stdcall HAPI_ResolveShadowedFiles(void)
 {
-    DisplayContext* state = GetDisplay();
+    Display* state = GetDisplay();
     if (state->count > 0) {
         for (int i = 0; i < state->count; i++) {
             ArchiveDirectory* list = state->files[i]->node->list;
@@ -1695,7 +1688,7 @@ void __stdcall HAPI_ClearShadowFlags(ArchiveDirectory* list)
 // FUNCTION: 0x4be400
 void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
 {
-    DisplayContext* d = GetDisplay();
+    Display* d = GetDisplay();
     char buf[0x100];
     struct _finddata_t fd;
     int i;

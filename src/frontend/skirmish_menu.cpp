@@ -51,17 +51,10 @@ struct Gadget {
 
 #include "../gui/layer.h"
 
-struct SkirmishPlayerSlot {
-    int active;
-    int shade;
-    int team;
-    int metal;
-    int energy;
-    int color;
-};
+#include "../game/settings.h"
 
 struct Table {
-    SkirmishPlayerSlot players[11];
+    SkirmishPlayer players[11];
     int commanderDeath;
     int mapping;
     int lineOfSight;
@@ -97,12 +90,12 @@ void RefreshAllyIcons(void)
         if (index != -1) {
             Gadget* gadget = &entries[index];
             if (gadget != 0) {
-                int team = ((Table *)g_game->options)->players[i].team;
+                int team = ((Table *)g_game->options)->players[i].allyGroup;
                 int count = 0;
                 int j;
                 for (j = 0; j < g_game->playerCount; j++) {
-                    if (((Table *)g_game->options)->players[j].team == team &&
-                        ((Table *)g_game->options)->players[j].active != 0) {
+                    if (((Table *)g_game->options)->players[j].allyGroup == team &&
+                        ((Table *)g_game->options)->players[j].controller != 0) {
                         count++;
                     }
                 }
@@ -130,13 +123,13 @@ int AreAllPlayersInOneAllyGroup(void)
     int type;
     int i;
     for (i = 0; i < g_game->playerCount; i++) {
-        if (((Table *)g_game->options)->players[i].active != 0 && (type = ((Table *)g_game->options)->players[i].team) != 5)
+        if (((Table *)g_game->options)->players[i].controller != 0 && (type = ((Table *)g_game->options)->players[i].allyGroup) != 5)
             break;
     }
     if (i == g_game->playerCount)
         return 0;
     for (i = 0; i < g_game->playerCount; i++) {
-        if (((Table *)g_game->options)->players[i].team != type && ((Table *)g_game->options)->players[i].active != 0)
+        if (((Table *)g_game->options)->players[i].allyGroup != type && ((Table *)g_game->options)->players[i].controller != 0)
             return 0;
     }
     return 1;
@@ -151,7 +144,7 @@ int __cdecl CountHumanSlots()
 {
     int n = 0;
     for (int i = 0; i < g_game->playerCount; i++) {
-        if (((Table *)g_game->options)->players[i].active == 1)
+        if (((Table *)g_game->options)->players[i].controller == 1)
             n++;
     }
     return n;
@@ -160,7 +153,7 @@ int __cdecl CountHumanSlots()
 int __stdcall IsColorTaken(int color, int skip)
 {
     for (int i = 0; i < g_game->playerCount; i++) {
-        if (((Table *)g_game->options)->players[i].color == color && ((Table *)g_game->options)->players[i].active != 0 && i != skip) {
+        if (((Table *)g_game->options)->players[i].color == color && ((Table *)g_game->options)->players[i].controller != 0 && i != skip) {
             return 1;
         }
     }
@@ -205,27 +198,27 @@ void __stdcall CycleSlotController(int playerIndex)
     char buffer[64];
 
     sprintf(buffer, "Player%d", playerIndex);
-    switch (((Table *)g_game->options)->players[playerIndex].active) {
+    switch (((Table *)g_game->options)->players[playerIndex].controller) {
     case 0:
-        ((Table *)g_game->options)->players[playerIndex].active = 2;
+        ((Table *)g_game->options)->players[playerIndex].controller = 2;
         SetTranslatedTextByName(&g_game->gui, buffer, Translate("Computer"), 0);
         break;
     case 1:
-        ((Table *)g_game->options)->players[playerIndex].active = 0;
+        ((Table *)g_game->options)->players[playerIndex].controller = 0;
         SetTranslatedTextByName(&g_game->gui, buffer, Translate("Open"), 0);
         break;
     case 2:
         if (CountHumanSlots() == 0) {
-            ((Table *)g_game->options)->players[playerIndex].active = 1;
+            ((Table *)g_game->options)->players[playerIndex].controller = 1;
             SetTranslatedTextByName(&g_game->gui, buffer, Translate("Player"), 0);
         } else {
-            ((Table *)g_game->options)->players[playerIndex].active = 0;
+            ((Table *)g_game->options)->players[playerIndex].controller = 0;
             SetTranslatedTextByName(&g_game->gui, buffer, Translate("Open"), 0);
         }
         break;
     }
 
-    if (((Table *)g_game->options)->players[playerIndex].active == 0) {
+    if (((Table *)g_game->options)->players[playerIndex].controller == 0) {
         sprintf(buffer, "Player%d", playerIndex);
         SetGadgetActiveByName(&g_game->gui, buffer, 1);
         sprintf(buffer, "Side%d", playerIndex);
@@ -258,21 +251,6 @@ void __stdcall CycleSlotController(int playerIndex)
 }
 
 #pragma pack(push, 1)
-struct Header {
-    unsigned char type;
-    unsigned char group;
-    char name[0x11];
-    short x;
-    short y;
-    short w;
-    short h;
-    int attribs;
-    int color;
-    int color2;
-    char unknown_27[2];
-    unsigned char flag;
-};
-
 struct Rec1 {
     Header h;
     char unknown_2a[0x2f - 0x2a];
@@ -310,8 +288,8 @@ void __stdcall BindGadgetAnimSequence(Rec1* obj, char* name)
             obj->entry = e;
             short* f = (short*)GetGafFrame((unsigned short*)e, obj->frame);
             if (f) {
-                obj->h.w = f[0];
-                obj->h.h = f[1];
+                obj->h.width = f[0];
+                obj->h.height = f[1];
             }
         }
     }
@@ -338,8 +316,8 @@ void BuildSkirmishPlayerRows(void)
         rec2.h.y = y;
         sprintf(rec1.h.name, "Player%d", i);
         rec1.h.x = 0x2d;
-        rec1.h.w = 0x70;
-        rec1.h.h = 0x14;
+        rec1.h.width = 0x70;
+        rec1.h.height = 0x14;
         rec1.h.attribs = 2;
         rec1.text[0] = 0;
         BindGadgetAnimSequence(&rec1, "skirmname");
@@ -347,7 +325,7 @@ void BuildSkirmishPlayerRows(void)
 
         sprintf(rec1.h.name, "Side%d", i);
         rec1.h.x = 0xa3;
-        rec1.h.w = 0x2d;
+        rec1.h.width = 0x2d;
         BindGadgetAnimSequence(&rec1, "SIDEx");
         rec1.frame = 0;
         rec1.stages = 2;
@@ -355,22 +333,22 @@ void BuildSkirmishPlayerRows(void)
 
         sprintf(rec2.h.name, "Color%d", i);
         rec2.h.x = 0xd6;
-        rec2.h.w = 0x14;
-        rec2.h.h = 0x14;
+        rec2.h.width = 0x14;
+        rec2.h.height = 0x14;
         rec2.text[0] = 0;
         AddHotspotGadget(&g_game->gui, &rec2);
 
         sprintf(rec2.h.name, "Allies%d", i);
         rec2.h.x = 0xf1;
-        rec2.h.w = 0x28;
-        rec2.h.h = 0x14;
+        rec2.h.width = 0x28;
+        rec2.h.height = 0x14;
         strcpy(rec2.text, Translate("Click to select an allegiance symbol."));
         AddHotspotGadget(&g_game->gui, &rec2);
 
         sprintf(rec1.h.name, "Metal%d", i);
         rec1.h.x = 0x11e;
-        rec1.h.w = 0x2d;
-        rec1.h.h = 0x14;
+        rec1.h.width = 0x2d;
+        rec1.h.height = 0x14;
         rec1.h.attribs |= 0x10000;
         rec1.stages = 0;
         rec1.f138 = 0;
@@ -381,7 +359,7 @@ void BuildSkirmishPlayerRows(void)
 
         sprintf(rec1.h.name, "Energy%d", i);
         rec1.h.x = 0x151;
-        rec1.h.w = 0x2d;
+        rec1.h.width = 0x2d;
         BindGadgetAnimSequence(&rec1, "skirmmet");
         strcpy(rec1.text, Translate("Left click to increase energy. Right click to decrease energy."));
         AddButtonGadget(&g_game->gui, &rec1);
@@ -406,17 +384,17 @@ void RefreshSkirmishSetup()
 
     int empty = 1;
     if (g_game->playerCount > 0) {
-        SkirmishPlayerSlot* p = ((Table *)g_game->options)->players;
+        SkirmishPlayer* p = ((Table *)g_game->options)->players;
         int n = g_game->playerCount;
         do {
-            if (p->active != 0)
+            if (p->controller != 0)
                 empty = 0;
             p++;
         } while (--n != 0);
     }
     if (empty != 0) {
-        ((Table *)g_game->options)->players[0].active = 1;
-        ((Table *)g_game->options)->players[1].active = 2;
+        ((Table *)g_game->options)->players[0].controller = 1;
+        ((Table *)g_game->options)->players[1].controller = 2;
     }
 
     unsigned short* icons =
@@ -438,7 +416,7 @@ void RefreshSkirmishSetup()
         int i;
         for (i = 0; i < g_game->playerCount; i++) {
             sprintf(buf, "Player%d", i);
-            int type = ((Table *)g_game->options)->players[i].active;
+            int type = ((Table *)g_game->options)->players[i].controller;
             switch (type) {
             case 2:
                 SetTranslatedTextByName(&g_game->gui, buf, Translate("Computer"), 0);
@@ -463,7 +441,7 @@ void RefreshSkirmishSetup()
             }
 
             sprintf(buf, "Side%d", i);
-            SetButtonStageByName(&g_game->gui, buf, ((Table *)g_game->options)->players[i].shade);
+            SetButtonStageByName(&g_game->gui, buf, ((Table *)g_game->options)->players[i].side);
 
             sprintf(buf, "Metal%d", i);
             _itoa(((Table *)g_game->options)->players[i].metal, num, 10);
@@ -555,11 +533,11 @@ void RefreshSkirmishSetup()
 // FUNCTION: 0x47a700
 int __stdcall FindNextAllySlot(int self, int start)
 {
-    SkirmishPlayerSlot* players = ((Table *)g_game->options)->players;
+    SkirmishPlayer* players = ((Table *)g_game->options)->players;
     int n = g_game->playerCount;
     if (start != n) {
         for (int i = start; i < n; i++) {
-            if (players[i].team == players[self].team && players[i].active != 0 && players[i].team != 5)
+            if (players[i].allyGroup == players[self].allyGroup && players[i].controller != 0 && players[i].allyGroup != 5)
                 return i;
             if (i == self)
                 return i;
@@ -572,29 +550,29 @@ int __stdcall FindNextAllySlot(int self, int start)
 void ApplySlotsToGamePlayers()
 {
     for (int i = 0; i < g_game->playerCount; i++) {
-        if (((Table *)g_game->options)->players[i].active == 1) {
+        if (((Table *)g_game->options)->players[i].controller == 1) {
             g_game->players[i].info->color = ((Table *)g_game->options)->players[i].color;
-            g_game->players[i].info->side = ((Table *)g_game->options)->players[i].shade;
+            g_game->players[i].info->side = ((Table *)g_game->options)->players[i].side;
             g_seams.players->SetupPlayerSlot(i, 1);
             g_game->playerIndex = i;
             g_game->localPlayer = i;
-        } else if (((Table *)g_game->options)->players[i].active == 2) {
+        } else if (((Table *)g_game->options)->players[i].controller == 2) {
             g_game->players[i].info->color = ((Table *)g_game->options)->players[i].color;
-            g_game->players[i].info->side = ((Table *)g_game->options)->players[i].shade;
+            g_game->players[i].info->side = ((Table *)g_game->options)->players[i].side;
             g_seams.players->SetupPlayerSlot(i, 2);
         } else {
             g_seams.players->SetupPlayerSlot(i, 0);
         }
-        if (((Table *)g_game->options)->players[i].active == 1 || ((Table *)g_game->options)->players[i].active == 2) {
+        if (((Table *)g_game->options)->players[i].controller == 1 || ((Table *)g_game->options)->players[i].controller == 2) {
             int j = 0;
             for (;;) {
-                SkirmishPlayerSlot* players = ((Table *)g_game->options)->players;
+                SkirmishPlayer* players = ((Table *)g_game->options)->players;
                 int n = g_game->playerCount;
                 int k;
                 int ii;
                 if (j != n) {
                     for (ii = j; ii < n; ii++) {
-                        if (players[ii].team == players[i].team && players[ii].active != 0 && players[ii].team != 5)
+                        if (players[ii].allyGroup == players[i].allyGroup && players[ii].controller != 0 && players[ii].allyGroup != 5)
                             goto found;
                         if (ii == i)
                             goto found;
@@ -618,7 +596,7 @@ void ApplySlotsToGamePlayers()
 void __cdecl CycleCurrentPlayerSide()
 {
     Table* base = (Table *)g_game->options;
-    int* p = &base->players[base->current].shade;
+    int* p = &base->players[base->current].side;
     *p = (*p + 1) % g_game->sides;
 }
 
@@ -738,7 +716,7 @@ static inline int color_taken(int me)
     int j;
     for (j = 0; j < g_game->playerCount; j++) {
         if (((Table *)g_game->options)->players[j].color == ((Table *)g_game->options)->players[me].color &&
-            ((Table *)g_game->options)->players[j].active != 0 && j != me)
+            ((Table *)g_game->options)->players[j].controller != 0 && j != me)
             return 1;
     }
     return 0;
@@ -774,7 +752,7 @@ void __stdcall CyclePlayerColor(int reverse)
 void __cdecl CycleCurrentPlayerAllyGroup()
 {
     Table* base = (Table *)g_game->options;
-    int* p = &base->players[base->current].team;
+    int* p = &base->players[base->current].allyGroup;
     *p = (*p + 1) % 6;
     RefreshAllyIcons();
 }
@@ -820,9 +798,9 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         int n = 0;
         int count = g_game->playerCount;
         if (count > 0) {
-            SkirmishPlayerSlot* p = ((Table *)g_game->options)->players;
+            SkirmishPlayer* p = ((Table *)g_game->options)->players;
             do {
-                if (p->active == 2)
+                if (p->controller == 2)
                     n++;
                 p++;
             } while (--count);
@@ -840,9 +818,9 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         int n2 = g_game->playerCount;
         int c2 = 0;
         if (n2 > 0) {
-            SkirmishPlayerSlot* p = ((Table *)g_game->options)->players;
+            SkirmishPlayer* p = ((Table *)g_game->options)->players;
             for (int i = n2; i > 0; i--) {
-                if (p->active == 2)
+                if (p->controller == 2)
                     c2++;
                 p++;
             }
@@ -850,9 +828,9 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         if (c2 >= 1) {
             int c1 = 0;
             if (n2 > 0) {
-                SkirmishPlayerSlot* p = ((Table *)g_game->options)->players;
+                SkirmishPlayer* p = ((Table *)g_game->options)->players;
                 for (; n2 > 0; n2--) {
-                    if (p->active == 1)
+                    if (p->controller == 1)
                         c1++;
                     p++;
                 }
@@ -878,18 +856,18 @@ void __stdcall HandleSkirmishClick(Gui* menu)
                 int n3 = g_game->playerCount;
                 c2 = 0;
                 if (n3 > 0) {
-                    SkirmishPlayerSlot* p = ((Table *)g_game->options)->players;
+                    SkirmishPlayer* p = ((Table *)g_game->options)->players;
                     for (int i = n3; i > 0; i--) {
-                        if (p->active == 2)
+                        if (p->controller == 2)
                             c2++;
                         p++;
                     }
                 }
                 c1 = 0;
                 if (n3 > 0) {
-                    SkirmishPlayerSlot* p = ((Table *)g_game->options)->players;
+                    SkirmishPlayer* p = ((Table *)g_game->options)->players;
                     for (; n3 > 0; n3--) {
-                        if (p->active == 1)
+                        if (p->controller == 1)
                             c1++;
                         p++;
                     }
@@ -924,12 +902,12 @@ void __stdcall HandleSkirmishClick(Gui* menu)
     } else if (strcmp(frame.bf, "Side") == 0) {
         PlaySoundByName("Skirmish", 0);
         Table* t = (Table *)g_game->options;
-        int* p = &t->players[t->current].shade;
+        int* p = &t->players[t->current].side;
         *p = (*p + 1) % g_game->sides;
     } else if (strcmp(frame.bf, "Allies") == 0) {
         PlaySoundByName("Skirmish", 0);
         Table* t = (Table *)g_game->options;
-        int* p = &t->players[t->current].team;
+        int* p = &t->players[t->current].allyGroup;
         *p = (*p + 1) % 6;
         RefreshAllyIcons();
     } else if (strcmp(frame.bf, "Color") == 0) {

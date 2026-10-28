@@ -2,7 +2,16 @@
 #define METEORS_H
 
 class HapiBank;
-class MeteorParams;
+
+class MeteorParams {
+public:
+    char name[0x20];
+    int radius;
+    float density;
+    float duration;
+    float interval;
+    void LoadMeteorDefaults();
+};
 
 void __stdcall InitMeteors();
 void __stdcall EmptyShutdownPreCleanup(void);

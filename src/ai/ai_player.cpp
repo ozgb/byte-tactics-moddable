@@ -13,18 +13,6 @@
 
 #pragma pack(push, 1)
 
-class CommandArgs {
-public:
-    char unknown_0[0xd0];
-    union {
-        int count;
-    };
-    char* GetArg(int index, char* fallback);
-    float GetFloatArg(int index, float default_val);
-    int GetIntArg(int index, int fallback);
-    CommandArgs* InitArgs();
-};
-
 #include "../units/unit_type_set.h"
 
 #include "../weapons/weapon_def.h"
@@ -218,10 +206,7 @@ static inline Vec3_0040beb0 operator-(const Vec3_0040beb0& p, const Vec3_0040beb
     return r;
 }
 
-struct Class_004800c0 {
-public:
-    void EraseSwapBack(Unit**);
-};
+#include "../units/squad.h"
 
 #pragma pack(pop)
 

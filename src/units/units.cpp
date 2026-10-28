@@ -94,12 +94,7 @@ struct Vec3_004853b0 {
 
 #include "../weapons/unit_weapon_slot.h"
 
-class SpatialBucket {
-public:
-    char unknown_0[6];
-    void* head;
-    void UnlinkUnit(void* node);
-};
+#include "../map/spatial_bucket.h"
 
 
 

@@ -11,12 +11,6 @@
 
 #include "../util/vec3.h"
 
-class Fixed {
-public:
-    int value;
-    Fixed(int v) { value = v; }
-};
-
 #include "unit_def.h"
 
 struct BuildEntry_0042dcf0 {
@@ -49,10 +43,10 @@ class TdfRecord;
 
 #include "../util/tdf.h"
 
-static inline int FixedField(TdfRecord* record, char* key, Fixed def)
+static inline int FixedField(TdfRecord* record, char* key, int def)
 {
     int out;
-    record->GetFieldFixed(&out, key, def.value);
+    record->GetFieldFixed(&out, key, def);
     return out;
 }
 
@@ -464,21 +458,21 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             unitdef->energyCost = (float)parser.current->GetFieldInt("buildcostenergy", 0);
             unitdef->metalCost = (float)parser.current->GetFieldInt("buildcostmetal", 0);
             unitdef->maxvelocity =
-                FixedField(parser.current, "maxvelocity", Fixed(0));
+                FixedField(parser.current, "maxvelocity", 0);
             unitdef->brakerate =
-                FixedField(parser.current, "brakerate", Fixed(0));
+                FixedField(parser.current, "brakerate", 0);
             unitdef->acceleration =
-                FixedField(parser.current, "acceleration", Fixed(0));
+                FixedField(parser.current, "acceleration", 0);
             unitdef->bankscale =
-                FixedField(parser.current, "bankscale", Fixed(0x10000));
+                FixedField(parser.current, "bankscale", 0x10000);
             unitdef->pitchscale =
-                FixedField(parser.current, "pitchscale", Fixed(0));
+                FixedField(parser.current, "pitchscale", 0);
             unitdef->damagemodifier =
-                FixedField(parser.current, "damagemodifier", Fixed(0x10000));
+                FixedField(parser.current, "damagemodifier", 0x10000);
             unitdef->moverate1 =
-                FixedField(parser.current, "moverate1", Fixed(unitdef->maxvelocity * 2));
+                FixedField(parser.current, "moverate1", unitdef->maxvelocity * 2);
             unitdef->moverate2 =
-                FixedField(parser.current, "moverate2", Fixed(unitdef->maxvelocity * 2));
+                FixedField(parser.current, "moverate2", unitdef->maxvelocity * 2);
             unitdef->turnrate =
                 (short)parser.current->GetFieldInt("turnrate", 0);
             unitdef->draft = (char)parser.current->GetFieldInt("waterline", 0);

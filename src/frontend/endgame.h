@@ -3,6 +3,23 @@
 
 struct Gui;
 
+#pragma pack(push, 1)
+struct Header {
+    unsigned char type;
+    unsigned char group;
+    char name[0x11];
+    short x;
+    short y;
+    short width;
+    short height;
+    int attribs;
+    int color;
+    int color2;
+    char pad_27[2];
+    unsigned char flag;
+};
+#pragma pack(pop)
+
 struct Data {
     char unknown_0[0x14];
     char* items;

@@ -11,11 +11,7 @@
 
 #include "../../link/globals.h"
 #include "share_commands.h"
-
-class CommandArgs {
-public:
-    int GetIntArg(int index, int fallback);
-};
+#include "../util/commands.h"
 
 void __stdcall AddMessage(char* text, int key, int value, int last);
 #include "../network/net_game.h"

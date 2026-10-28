@@ -1,16 +1,27 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
+#include <vector>
+
 class MovementClass;
 struct Cell;
 
 class ClaimFootprintVisitor;
-class DamagedAllyCollector;
 class MovementClass;
 class UnitDef;
+struct Player;
 struct Point16;
 struct Unit;
 struct UnitBucket;
 struct Vec3;
+
+class DamagedAllyCollector {
+public:
+    Player* owner;
+    std::vector<Unit*>* units;
+    Unit* self;
+    DamagedAllyCollector(Player* o, std::vector<Unit*>* v, Unit* s) : owner(o), units(v), self(s) {}
+    virtual void CollectDamagedAlly(Unit* unit);
+};
 
 void __stdcall ClaimFootprintCells(Unit* obj);
 void __stdcall ClaimFootprintsInArea(Point16 pos, Point16 size);

@@ -32,11 +32,6 @@ static inline Vec3 FeatureVec3(int ax, int ay, int az)
     return v;
 }
 
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
 union Coord {
     int value;
     Fixed f;
@@ -47,13 +42,6 @@ struct SmokePos {
 };
 
 #include "../graphics/gaf_frame.h"
-
-struct FeatureDamagePacket {
-    unsigned char type;
-    unsigned char sub;
-    short x;
-    short z;
-};
 
 struct FeatureUnit {
     char unknown_0[0x92];
@@ -155,7 +143,7 @@ struct Spot {
 #include "../units/unit.h"
 #include "../weapons/weapon_def.h"
 
-struct Obj {
+struct FeatureSite {
     char unknown_0[0x28];
     short x;
     short y;
@@ -864,7 +852,7 @@ void __stdcall SpreadFire(Feature* f, Point16* cell)
 }
 
 // FUNCTION: 0x423bf0
-void __stdcall ReplaceFeatureWithBurnt(Obj* obj)
+void __stdcall ReplaceFeatureWithBurnt(FeatureSite* obj)
 {
     Cell* target = g_seams.los_radar->GetMapCell(obj->x, obj->y);
     if (target != 0) {

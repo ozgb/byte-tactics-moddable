@@ -13,8 +13,15 @@ class HapiBank;
 class TdfFile;
 struct Cell;
 struct Feature;
-struct Obj;
+struct FeatureSite;
 struct Point16;
+
+struct FeatureDamagePacket {
+    unsigned char type;
+    unsigned char sub;
+    unsigned short x;
+    unsigned short z;
+};
 
 unsigned short __stdcall GetCellFeature(Cell* cell);
 void __stdcall StampFeatureMetal(void);
@@ -32,7 +39,7 @@ void __stdcall StartFeatureBurning(int x, int z, int flag);
 void __stdcall KillFeature(int x, int z, int flag);
 void __stdcall ReplaceFeatureWithDead(int x, int y, int flag);
 void __stdcall SpreadFire(Feature* f, Point16* cell);
-void __stdcall ReplaceFeatureWithBurnt(Obj* obj);
+void __stdcall ReplaceFeatureWithBurnt(FeatureSite* obj);
 void __stdcall UpdateFeatures();
 void __stdcall RemoveAllFeatures(void);
 void __stdcall SaveFeatures(HapiBank* file);

@@ -46,13 +46,11 @@ void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 
 #include "../graphics/gaf_frame.h"
 
-struct Src_004b8ae0 {
-    char unknown_0[0xbc];
-};
+struct Surface;
 
 struct SrcHolder_00495a30 {
     char unknown_0[0xbc];
-    Src_004b8ae0* frame;
+    Surface* frame;
 };
 
 #include "../graphics/surface.h"
@@ -75,7 +73,7 @@ int __stdcall FindGadgetIndexBySubstring(int value, const char* name);
 #include "../debug/debug_lib.h"
 #include "../game/main.h"
 void* __stdcall GetDisplay();
-void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src);
+void __stdcall FrameFromSurface(GafFrame* dst, Surface* src);
 #include "control_panel.h"
 #include "selection.h"
 #include "info_panel.h"

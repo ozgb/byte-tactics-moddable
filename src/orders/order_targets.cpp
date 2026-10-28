@@ -42,16 +42,7 @@ typedef std::vector<Point16> Vec_0044da00;
 
 #pragma pack(push, 2)
 
-class BitWriter {
-public:
-    int bit;
-    int index;
-    int capacity;
-    unsigned int* data;
-    unsigned int buffer[0x100];
-    void GrowBuffer();
-    void WriteBits(int value, int bits);
-};
+#include "../network/bit_writer.h"
 
 class BitReader;
 struct Order;
@@ -115,10 +106,7 @@ public:
 class PathOrderAttach;
 
 
-class UnitRef {
-public:
-    void Unlink();
-};
+#include "../units/unit_ref.h"
 
 extern void* g_pathOrderVtable[];
 extern void* g_airManeuverOrderVtable[];
@@ -1509,16 +1497,16 @@ void AiSearchGoal::SerializeNetUnitState(BitWriter* stream)
         n = 0;
     }
     if (Motion(owner)->flags & 4) {
-        stream->data[stream->bit] |= 1 << stream->index;
+        stream->data[stream->index] |= 1 << stream->bit;
     }
-    stream->index++;
-    if (stream->index == 0x20) {
-        stream->index = 0;
-        stream->bit++;
-        if (stream->bit == stream->capacity) {
+    stream->bit++;
+    if (stream->bit == 0x20) {
+        stream->bit = 0;
+        stream->index++;
+        if (stream->index == stream->capacity) {
             stream->GrowBuffer();
         }
-        stream->data[stream->bit] = 0;
+        stream->data[stream->index] = 0;
     }
     stream->WriteBits(n, 2);
     for (int i = 0; i < n; i++) {

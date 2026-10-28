@@ -560,10 +560,7 @@ static inline void Dummy(void) {}
 
 int __stdcall GetOrderCursor(unsigned char type, Unit* unit, Unit* target, int* out);
 
-class IntDynArray {
-public:
-    int EraseByValue(int value);
-};
+#include "../units/squad.h"
 
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit,
                                        Unit* target, void* pos);

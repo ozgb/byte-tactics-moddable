@@ -929,13 +929,6 @@ struct PlayerIdIntPacket {
     int value;
 };
 
-struct FeatureDamagePacket {
-    unsigned char type;
-    unsigned char sub;
-    unsigned short x;
-    unsigned short z;
-};
-
 struct UnitScriptCallRecv {
     unsigned char type;
     unsigned short id;
@@ -952,13 +945,6 @@ struct PlaySoundPacket {
     unsigned char flag;
     int index;
     int pos[3];
-};
-
-struct OwnershipTransferPacket {
-    unsigned char type;
-    short unitId;
-    int newOwnerNetId;
-    char unknown_7[0x18 - 7];
 };
 
 struct ResourceSharePacket {

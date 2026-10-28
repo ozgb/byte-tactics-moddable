@@ -25,11 +25,6 @@
 
 struct Player;
 
-class MeteorParams {
-public:
-    void LoadMeteorDefaults();
-};
-
 #include "../game/game_state.h"
 #include "../map/meteors.h"
 #include "../game/console_commands.h"
@@ -124,7 +119,6 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../units/unit_position.h"
 #include "../orders/order_queue.h"
 
-struct DamagedAllyCollector;
 
 
 

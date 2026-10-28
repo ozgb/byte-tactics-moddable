@@ -5,13 +5,7 @@
 
 #pragma pack(push, 1)
 
-union Fixed {
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    };
-};
+#include "../util/vec3.h"
 
 #include "../util/vec3.h"
 #include "../util/angles.h"
@@ -23,7 +17,7 @@ struct Tail32 {
 
 class CobScript;
 class UnitMotion;
-class PlayerData;
+class MotionSerializer;
 class BitWriter;
 class BitReader;
 struct Block;
@@ -50,7 +44,7 @@ union TerrainFlags {
 
 #include "../orders/unit_motion.h"
 
-class PlayerData {
+class MotionSerializer {
 public:
     virtual void v0();
     virtual void v1();
@@ -64,13 +58,7 @@ public:
     virtual void ReadFrom(BitReader* reader);
 };
 
-class SpatialBucket {
-public:
-    char unknown_0[6];
-    void* head;
-    void UnlinkUnit(void* node);
-    void PrependUnit(int node);
-};
+#include "../map/spatial_bucket.h"
 
 #include "unit.h"
 

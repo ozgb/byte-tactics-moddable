@@ -38,11 +38,6 @@ struct Pair16 { short lo, hi; };
 
 #include "box.h"
 
-union Fixed {
-    int value;
-    struct { unsigned short frac; short whole; } parts;
-};
-
 #include "../state/block.h"
 #include "../units/cob_script.h"
 
@@ -2030,7 +2025,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
                 order->ticks += 0x2d;
             Fixed d;
             d.value = (int)_hypot(unit->pos.x - order->target->pos.x, unit->pos.z - order->target->pos.z);
-            if (d.parts.whole > 0xa0) {
+            if (d.whole > 0xa0) {
                 Vec3 p = order->target->pos;
                 p.x += ((UnitMotion*)order->target->motion)->velocity.x * 45;
                 p.z += ((UnitMotion*)order->target->motion)->velocity.z * 45;

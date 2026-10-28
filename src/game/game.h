@@ -1196,7 +1196,7 @@ struct Game {
         };
         struct {
             char unknown_37f3d_e[34];
-            Name_004864b0 names_37f5f[8];
+            SideNameView names_37f5f[8];
             char pad_390ef[160];
         };
         struct {

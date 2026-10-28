@@ -131,7 +131,7 @@ struct Channel_004b08c0;
 struct Channel_004b0940;
 struct Channel_004b0a10;
 struct Channel_004b0b00;
-struct Channel_004b0c40;
+struct QueryChannelView;
 struct Channel_4619e0;
 struct Chunk;
 struct Chunk_4d1820;
@@ -485,7 +485,7 @@ class Class_0047f990;
 class Class_0047fa30;
 class Class_0047ffa0;
 class Class_00480020;
-class Class_004800c0;
+class UnitSwapEraseVector;
 class IntDynArray;
 class Squad;
 class Class_00480c30;
@@ -912,7 +912,7 @@ struct Desc_004ca450;
 struct Descriptor_00421620;
 struct Dialog;
 struct Dialog_00464f80;
-struct Diff_00480570;
+struct PointDiff;
 struct DirectDrawState;
 class DirectPlayLobby_4ca490;
 class DirectPlayLobby_4ca880;
@@ -1850,7 +1850,7 @@ struct SoundInfo_005086fc;
 struct Sound_0047f210;
 struct Sound_45ffb0;
 struct Source_0042f450;
-struct Source_00440340;
+struct TdfParserView;
 struct UnitSyncSource;
 struct Source_00499c10;
 struct ReadTextInputFieldsSource;
@@ -11003,7 +11003,7 @@ public:
     virtual void StartScriptWithArgsByIndex(int);
 };
 
-struct Channel_004b0c40 {
+struct QueryChannelView {
     char unknown_0[36];
     int count;
     char unknown_28[20];
@@ -11014,7 +11014,7 @@ struct Channel_004b0c40 {
 
 class Class_004b0c40 {
 public:
-    Channel_004b0c40 channels[8];
+    QueryChannelView channels[8];
     int activeCount;
     int QueryScriptByIndex(int, int*, int*, int*, int*);
 };

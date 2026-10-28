@@ -38,7 +38,7 @@ struct Feature;
 struct Spot;
 struct Rot16;
 struct TntInfo;
-struct Pos_00485070;
+struct GroundHeightPos;
 struct SweetSpotObjectView;
 struct Vec3_0049a0c0;
 struct Vec3_0048a1e0;
@@ -89,7 +89,7 @@ Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange)
 #include "../game/share_commands.h"
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
-int __stdcall GetGroundHeight(Pos_00485070* p);
+int __stdcall GetGroundHeight(GroundHeightPos* p);
 void __stdcall GetSweetSpot(SweetSpotObjectView* obj, int out);
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
@@ -259,7 +259,7 @@ static Unit* __stdcall FindBestTargetIfFireAtWillNative(Unit* unit)
 
 static int __stdcall GetGroundHeightNative(Vec3* pos)
 {
-    return GetGroundHeight((Pos_00485070*)pos);
+    return GetGroundHeight((GroundHeightPos*)pos);
 }
 
 static void __stdcall GetSweetSpotNative(Unit* unit, Vec3* out)
@@ -489,12 +489,12 @@ static int __stdcall MovementClassInBoundsNative(MovementClass* self, unsigned i
 
 static void __stdcall RefreshMovedUnitsNative(MovementClass* self, Unit* unit)
 {
-    self->RefreshMovedUnits((Object_00440af0*)unit);
+    self->RefreshMovedUnits((UnitPassMapView*)unit);
 }
 
 static void __stdcall RefreshUnitIfStaleNative(MovementClass* self, Unit* unit)
 {
-    self->RefreshUnitIfStale((Object_00440af0*)unit);
+    self->RefreshUnitIfStale((UnitPassMapView*)unit);
 }
 
 static void __stdcall AiSearchGoalSetWaypointsNative(AiSearchGoal* self, Point16* points, int count)

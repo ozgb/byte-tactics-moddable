@@ -405,7 +405,7 @@ address,function,file
 0x440320,MovementClass::~MovementClass,src/units/movement_class.cpp
 0x440340,MovementClass::ReadMoveInfo,src/units/movement_class.cpp
 0x440420,FindMovementClass,src/units/movement_class.cpp
-0x440500,Class_00440500::BuildPassMap,src/units/movement_class.cpp
+0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp
 0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp
 0x440930,NopAfterFeatureEnum,src/units/movement_class.cpp
 0x440940,BuildAllPassMaps,src/units/movement_class.cpp
@@ -771,7 +771,7 @@ address,function,file
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp
 0x47fad0,SpeechQueue::EnqueueSpeech,src/sound/sound.cpp
 0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp
-0x4800c0,Class_004800c0::EraseSwapBack,src/sound/sound.cpp
+0x4800c0,UnitSwapEraseVector::EraseSwapBack,src/sound/sound.cpp
 0x480190,CreateSquads,src/units/squads.cpp
 0x480250,SetUnitSquad,src/units/squads.cpp
 0x480460,OrderSquad,src/units/squads.cpp

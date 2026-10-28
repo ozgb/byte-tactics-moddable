@@ -5,7 +5,7 @@
 #include "cob_script.h"
 #include "cob_types.h"
 
-struct Channel_004b0c40 {
+struct QueryChannelView {
     char unknown_0[0x24];
     int count;
     char unknown_28[0x3c - 0x28];
@@ -241,7 +241,7 @@ int CobScript::QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5)
     int i = this->StartThread(index);
     if (i < 0)
         return 0;
-    Channel_004b0c40* c = (Channel_004b0c40*)((char*)this + i * 0xa4);
+    QueryChannelView* c = (QueryChannelView*)((char*)this + i * 0xa4);
     c->unknown_3c = 0;
     int& cnt = c->count;
     c->values[++cnt] = p2 ? *p2 : 0;

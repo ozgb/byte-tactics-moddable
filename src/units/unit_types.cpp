@@ -13,16 +13,16 @@
 
 #include "unit_def.h"
 
-struct BuildEntry_0042dcf0 {
+struct DownloadMenuEntry {
     unsigned short typeId;
     unsigned char page;
     unsigned char slot;
     char name[0x21];
 };
 
-struct BuildList_0042dcf0 {
+struct DownloadMenuList {
     int count;
-    BuildEntry_0042dcf0 entries[5];
+    DownloadMenuEntry entries[5];
 };
 
 class UnitTable;
@@ -373,7 +373,7 @@ void CheckDownloadableFlags()
     for (int i = 0; i < g_game->unitDefCount;
          i++, def = (UnitDef*)((char*)def + 0x249)) {
         for (int j = 0; j < g_game->buildListCount; j++) {
-            if (_strcmpi(((BuildList_0042dcf0 *)g_game->buildLists)[j].entries[0].name, def->unitname) == 0
+            if (_strcmpi(((DownloadMenuList *)g_game->buildLists)[j].entries[0].name, def->unitname) == 0
                 && !def->downloadable) {
                 char message[128];
                 sprintf(message,
@@ -395,9 +395,9 @@ void AddDownloadBuildOptions()
     for (int a = 0; a < g_game->unitDefCount; a++, e++) {
         if (e->ids != 0) {
             for (int b = 0; b < g_game->buildListCount; b++) {
-                for (int c = 0; c < ((BuildList_0042dcf0 *)g_game->buildLists)[b].count; c++) {
-                    if (a == ((BuildList_0042dcf0 *)g_game->buildLists)[b].entries[c].typeId && e->count <= 0x1e) {
-                        unsigned short id = FindUnitTypeId(((BuildList_0042dcf0 *)g_game->buildLists)[b].entries[c].name);
+                for (int c = 0; c < ((DownloadMenuList *)g_game->buildLists)[b].count; c++) {
+                    if (a == ((DownloadMenuList *)g_game->buildLists)[b].entries[c].typeId && e->count <= 0x1e) {
+                        unsigned short id = FindUnitTypeId(((DownloadMenuList *)g_game->buildLists)[b].entries[c].name);
                         if (id != 0) {
                             ((unsigned short*)e->ids)[e->count] = id;
                             e->count++;
@@ -659,7 +659,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             MovementClass movement;
             MovementClass* move = (MovementClass*)unitdef->movementclass;
             if (move == 0) {
-                (&movement)->ReadMoveInfo((Source_00440340*)&parser);
+                (&movement)->ReadMoveInfo((TdfParserView*)&parser);
                 move = &movement;
             }
             unitdef->footprintx = move->footprintX;
@@ -812,7 +812,7 @@ void LoadUnitTypes() {
             if (parser.SelectRecord(classbuf)) {
                 parser.current->GetFieldString(classbuf, "name", 100, DAT_005119b8);
                 cls->name = (int*)GameStrdup(classbuf);
-                cls->ReadMoveInfo((Source_00440340*)&parser);
+                cls->ReadMoveInfo((TdfParserView*)&parser);
             }
             cls++;
             i++;
@@ -1065,7 +1065,7 @@ void LoadDownloadMenus()
 
     int n = files.size();
     g_game->buildListCount = n;
-    (*(BuildList_0042dcf0 **)&g_game->buildLists) = (BuildList_0042dcf0*)SimAllocTagged("DOWNLOADMENU", n * 0xbd);
+    (*(DownloadMenuList **)&g_game->buildLists) = (DownloadMenuList*)SimAllocTagged("DOWNLOADMENU", n * 0xbd);
 
     for (i = 0; i < n; i++) {
         TdfFile parser;
@@ -1076,15 +1076,15 @@ void LoadDownloadMenus()
                 parser.ResetCurrentRecord();
                 if (!parser.SelectRecordAt(j))
                     break;
-                ((BuildList_0042dcf0 *)g_game->buildLists)[i].count = j + 1;
+                ((DownloadMenuList *)g_game->buildLists)[i].count = j + 1;
                 char* buf = unitbuf;
                 if (parser.current->GetFieldString(unitbuf, "UNITMENU", 0x20, DAT_005119b8)) {
                     for (unsigned short u = 0; u < g_game->unitDefCount; u++) {
                         if (_strcmpi(g_game->defs[u].unitname, buf) == 0) {
-                            ((BuildList_0042dcf0 *)g_game->buildLists)[i].entries[j].typeId = u;
-                            ((BuildList_0042dcf0 *)g_game->buildLists)[i].entries[j].page = (unsigned char)parser.current->GetFieldInt("MENU", 0);
-                            ((BuildList_0042dcf0 *)g_game->buildLists)[i].entries[j].slot = (unsigned char)parser.current->GetFieldInt("BUTTON", 0);
-                            parser.current->GetFieldString(((BuildList_0042dcf0 *)g_game->buildLists)[i].entries[j].name, "UNITNAME", 0x20, DAT_005119b8);
+                            ((DownloadMenuList *)g_game->buildLists)[i].entries[j].typeId = u;
+                            ((DownloadMenuList *)g_game->buildLists)[i].entries[j].page = (unsigned char)parser.current->GetFieldInt("MENU", 0);
+                            ((DownloadMenuList *)g_game->buildLists)[i].entries[j].slot = (unsigned char)parser.current->GetFieldInt("BUTTON", 0);
+                            parser.current->GetFieldString(((DownloadMenuList *)g_game->buildLists)[i].entries[j].name, "UNITNAME", 0x20, DAT_005119b8);
                             break;
                         }
                     }
@@ -1097,10 +1097,10 @@ void LoadDownloadMenus()
     ProtectBlockReadWrite(g_game->defs);
     for (unsigned short u = 0; u < g_game->unitDefCount; u++) {
         for (c = 0; c < n; c++) {
-            for (int d = 0; d < ((BuildList_0042dcf0 *)g_game->buildLists)[c].count; d++) {
-                if (((BuildList_0042dcf0 *)g_game->buildLists)[c].entries[d].typeId == u) {
-                    if (g_game->defs[u].buildMenuPageCount < ((BuildList_0042dcf0 *)g_game->buildLists)[c].entries[d].page)
-                        g_game->defs[u].buildMenuPageCount = ((BuildList_0042dcf0 *)g_game->buildLists)[c].entries[d].page;
+            for (int d = 0; d < ((DownloadMenuList *)g_game->buildLists)[c].count; d++) {
+                if (((DownloadMenuList *)g_game->buildLists)[c].entries[d].typeId == u) {
+                    if (g_game->defs[u].buildMenuPageCount < ((DownloadMenuList *)g_game->buildLists)[c].entries[d].page)
+                        g_game->defs[u].buildMenuPageCount = ((DownloadMenuList *)g_game->buildLists)[c].entries[d].page;
                 }
             }
         }
@@ -1110,7 +1110,7 @@ void LoadDownloadMenus()
     UnitDef* defs = g_game->defs;
     for (c = 0; c < g_game->unitDefCount; c++) {
         for (int i = 0; i < g_game->buildListCount; i++) {
-            if (_strcmpi(((BuildList_0042dcf0 *)g_game->buildLists)[i].entries[0].name, defs[c].unitname) == 0
+            if (_strcmpi(((DownloadMenuList *)g_game->buildLists)[i].entries[0].name, defs[c].unitname) == 0
                 && !defs[c].downloadable) {
                 char buf[128];
                 sprintf(buf, "Hey!  Somebody forgot to set downloadable=1 for %s", defs[c].unitname);
@@ -1127,7 +1127,7 @@ void LoadDownloadMenus()
 // FUNCTION: 0x42e120
 void FreeDownloadMenus()
 {
-    GameFreeThunk((BuildList_0042dcf0 *)g_game->buildLists);
+    GameFreeThunk((DownloadMenuList *)g_game->buildLists);
 }
 
 #pragma auto_inline(off)

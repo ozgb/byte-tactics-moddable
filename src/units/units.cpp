@@ -11,7 +11,7 @@ class MissionConditions;
 class CobScript;
 class UnitMotion;
 class UnitResources;
-struct ObjectState_00485d40;
+struct SpotStateUnitView;
 struct Object3do;
 
 #pragma pack(push, 1)
@@ -19,7 +19,7 @@ struct Object3do;
 
 #include "../util/vec3.h"
 
-struct Entry_486360 {
+struct FeatureNextView {
     char unknown_0[0xf4];
     unsigned short next;
     char unknown_f6[0x100 - 0xf6];
@@ -63,33 +63,33 @@ union TypeFlags {
     };
 };
 
-struct Fixed_00485070 {
+struct FixedShorts {
     unsigned short frac;
     short whole;
 };
 
-struct Pos_00485070 {
-    Fixed_00485070 x;
-    Fixed_00485070 y;
-    Fixed_00485070 z;
+struct GroundHeightPos {
+    FixedShorts x;
+    FixedShorts y;
+    FixedShorts z;
 };
 
 
 
-struct FixedParts_004853b0 {
+struct ClampFixedParts {
     unsigned int frac : 16;
     int whole : 16;
 };
 
-union Fixed_004853b0 {
+union ClampFixed {
     int value;
-    FixedParts_004853b0 parts;
+    ClampFixedParts parts;
 };
 
-struct Vec3_004853b0 {
-    Fixed_004853b0 x;
-    Fixed_004853b0 y;
-    Fixed_004853b0 z;
+struct ClampedPos {
+    ClampFixed x;
+    ClampFixed y;
+    ClampFixed z;
 };
 
 #include "../weapons/unit_weapon_slot.h"
@@ -114,7 +114,7 @@ struct Vec3_004853b0 {
 extern Game* g_game;
 
 // FUNCTION: 0x485070
-int __stdcall GetGroundHeight(Pos_00485070* p)
+int __stdcall GetGroundHeight(GroundHeightPos* p)
 {
     int x = p->x.whole;
     int z = p->z.whole;
@@ -134,16 +134,16 @@ int __stdcall GetGroundHeight(Pos_00485070* p)
     return r1 + ((e + (f - e) * xf / 16) - r1) * zf / 16;
 }
 
-static inline Fixed_004853b0 MakeFixed(int i)
+static inline ClampFixed MakeFixed(int i)
 {
-    Fixed_004853b0 f;
+    ClampFixed f;
     f.parts.frac = 0;
     f.parts.whole = i;
     return f;
 }
 
 // FUNCTION: 0x4853b0
-void __stdcall ClampPositionToMap(Vec3_004853b0* p)
+void __stdcall ClampPositionToMap(ClampedPos* p)
 {
     if (p->x.value < 0)
         p->x.value = 0;
@@ -415,7 +415,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
     g_seams.ai->SetUnitSquad(unit, 0);
 }
 
-struct ObjectState_00485d40 {
+struct SpotStateUnitView {
     char unknown_0[8];
     int dirty;
     void* unit;
@@ -433,7 +433,7 @@ struct BmpInfoHeader;
 #include "unit_script.h"
 
 void* __cdecl operator new(size_t size);
-ObjectState_00485d40* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, int player);
+SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, int player);
 #include "../graphics/model_render.h"
 
 // FUNCTION: 0x485d40
@@ -449,14 +449,14 @@ void __stdcall InitUnitScript(Unit* self)
     } else {
         self->script = 0;
         self->state = (SpotState*)CreateObjectState(obj);
-        ((ObjectState_00485d40*)self->state.get())->unit = self;
+        ((SpotStateUnitView*)self->state.get())->unit = self;
     }
-    ((ObjectState_00485d40*)self->state.get())->drawFrame = 0;
+    ((SpotStateUnitView*)self->state.get())->drawFrame = 0;
 }
 
 // FUNCTION: 0x485e30 ??_GUnitScript@@UAEPAXI@Z
 static UnitScript* s_object;
-UnitScript* emit_00485e30() { return new UnitScript; }
+UnitScript* EmitUnitScriptDeletingDtor() { return new UnitScript; }
 
 #include "../orders/unit_motion.h"
 
@@ -495,7 +495,7 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
 #include "../map/terrain.h"
 #include "../network/net_game.h"
 
-static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Vec3 pos,
+static inline void __stdcall InitSpawnedUnit(unsigned short unitType, Vec3 pos,
                                                int param_5, Unit* unit)
 {
     UnitDef* type = &g_game->defs.get()[unitType];
@@ -548,7 +548,7 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos
     }
     return 0;
 found:
-    InitUnit_00485e90(typeId, pos, param_5, unit);
+    InitSpawnedUnit(typeId, pos, param_5, unit);
     unit->mode = mode;
     UpdateUnitHeight(unit);
     g_seams.map->AddUnitToMap(unit);
@@ -571,7 +571,7 @@ found:
 }
 
 #pragma pack(push, 1)
-struct Spawn_004861d0 {
+struct UnitSpawnPacket {
     unsigned char player;
     unsigned short type;
     unsigned short id;
@@ -580,7 +580,7 @@ struct Spawn_004861d0 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4861d0
-Unit* __stdcall CreateUnitFromPacket(unsigned char player, Spawn_004861d0* spawn)
+Unit* __stdcall CreateUnitFromPacket(unsigned char player, UnitSpawnPacket* spawn)
 {
     Player* pl = &g_game->players[player];
     Unit* unit;
@@ -595,7 +595,7 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, Spawn_004861d0* spawn
     if (unit->unitDefIndex != 0) {
         KillUnit(unit, 0);
     }
-    InitUnit_00485e90(spawn->type, spawn->pos, 0, unit);
+    InitSpawnedUnit(spawn->type, spawn->pos, 0, unit);
     UpdateUnitHeight(unit);
     AddUnitToMap(unit);
     g_seams.los_radar->RevealNewUnit(unit);
@@ -605,13 +605,13 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, Spawn_004861d0* spawn
     return unit;
 }
 
-struct Result_486360 {
+struct PlacedFeatureView {
     char unknown_0[0x18];
     int velY;
     int velZ;
 };
 
-void __stdcall EmitSmoke(Pos_00485070* pos, int a, int b, int c);
+void __stdcall EmitSmoke(GroundHeightPos* pos, int a, int b, int c);
 
 // FUNCTION: 0x486360
 void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
@@ -621,14 +621,14 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
         if (id >= 0xfffb) {
             return;
         }
-        id = ((Entry_486360 *)g_game->features)[id].next;
+        id = ((FeatureNextView *)g_game->features)[id].next;
     }
     if (id < 0xfffb) {
         void* target = g_seams.los_radar->GetMapCell(unit->cell.x, unit->cell.y);
         if (target != 0) {
-            Pos_00485070* pos = (Pos_00485070*)&unit->pos;
+            GroundHeightPos* pos = (GroundHeightPos*)&unit->pos;
             if (GetGroundHeight(pos) <= g_game->seaLevel) {
-                Result_486360* r = (Result_486360*)g_seams.features->PlaceFeature((Cell*)target, id, (Vec3*)pos, (Rot16*)&unit->angles, unit->playerIndex);
+                PlacedFeatureView* r = (PlacedFeatureView*)g_seams.features->PlaceFeature((Cell*)target, id, (Vec3*)pos, (Rot16*)&unit->angles, unit->playerIndex);
                 if (r != 0) {
                     if (!(unit->def->flags1 & 0x1000000)) {
                         r->velY = -11468;

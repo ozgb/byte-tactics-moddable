@@ -817,7 +817,7 @@ address,name
 0x440420,FindMovementClass
 0x440470,MovementClass::ResizePassMap
 0x4404c0,MovementClass::SetPassMapCell
-0x440500,Class_00440500::BuildPassMap
+0x440500,MovementClassBuildView::BuildPassMap
 0x440830,MovementClass::RefreshPassMap
 0x440930,NopAfterFeatureEnum
 0x440940,BuildAllPassMaps
@@ -1691,7 +1691,7 @@ address,name
 0x47fd70,SpeechQueue::PlaySpeech
 0x47ffa0,SpeechQueue::RemoveSpeechAt
 0x480020,SpeechQueue::RemoveSpeechOfId
-0x4800c0,Class_004800c0::EraseSwapBack
+0x4800c0,UnitSwapEraseVector::EraseSwapBack
 0x480100,IntDynArray::EraseByValue
 0x480160,Squad::Squad
 0x480190,CreateSquads

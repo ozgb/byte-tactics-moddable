@@ -16,7 +16,7 @@ struct Point16_437840 {
 };
 
 #pragma pack(push, 1)
-struct UnitType_437840 {
+struct UnitDefMetalWindView {
     char unknown_0[0x1ce];
     float extractsMetal;
     float windGenerator;
@@ -27,7 +27,7 @@ struct UnitType_437840 {
 #include "../game/game.h"
 #pragma pack(pop)
 
-union Fixed_437840 {
+union SumFixed {
     int value;
     struct {
         unsigned short fraction;
@@ -35,7 +35,7 @@ union Fixed_437840 {
     } parts;
 };
 
-struct Chunk_00437a30 {
+struct CacheChunk {
     void** owner;
     int size;
 };
@@ -54,8 +54,8 @@ struct Chunk_00437a30 {
 // FUNCTION: 0x437840
 void __stdcall UpdateMetalExtraction(Unit* unit)
 {
-    if (((UnitType_437840*)unit->def.get())->extractsMetal > 0.0f) {
-        Fixed_437840 total;
+    if (((UnitDefMetalWindView*)unit->def.get())->extractsMetal > 0.0f) {
+        SumFixed total;
         total.value = 0;
         Point16_437840 fp = *(Point16_437840*)&unit->footprint;
         for (int y = unit->cell.y; y < unit->cell.y + fp.y; y++) {
@@ -66,7 +66,7 @@ void __stdcall UpdateMetalExtraction(Unit* unit)
                 }
             }
         }
-        *(float*)&unit->extraction = ((UnitType_437840*)unit->def.get())->extractsMetal * 1.52587890625e-05 * (float)total.value;
+        *(float*)&unit->extraction = ((UnitDefMetalWindView*)unit->def.get())->extractsMetal * 1.52587890625e-05 * (float)total.value;
         if (unit->script)
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", 0, 0, 1, total.parts.whole, 0, 0, 0);
     }
@@ -75,7 +75,7 @@ void __stdcall UpdateMetalExtraction(Unit* unit)
 // FUNCTION: 0x437910
 void __stdcall UpdateWindGenerator(Unit* unit)
 {
-    if (((UnitType_437840*)unit->def.get())->windGenerator > 0.0f && g_game->windEnabled) {
+    if (((UnitDefMetalWindView*)unit->def.get())->windGenerator > 0.0f && g_game->windEnabled) {
         ((CobScript*)unit->script.get())->StartScriptWithArgs("SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);
         ((CobScript*)unit->script.get())->StartScriptWithArgs("SetSpeed", 0, 0, 1, g_game->windSpeed << 4, 0, 0, 0);
     }
@@ -97,7 +97,7 @@ int CMemoryCache::InitCache(unsigned int newSize)
         GameFreeThunk((int*)base);
         base = 0;
     }
-    Chunk_00437a30* chunk = (Chunk_00437a30*)GameAllocIgnoreTag("CMemoryCache CCH", newSize);
+    CacheChunk* chunk = (CacheChunk*)GameAllocIgnoreTag("CMemoryCache CCH", newSize);
     base = (int)chunk;
     cap = newSize;
     cur = chunk;
@@ -112,7 +112,7 @@ int CMemoryCache::InitSimCache(unsigned int newSize)
         GameFreeThunk((int*)base);
         base = 0;
     }
-    Chunk_00437a30* chunk = (Chunk_00437a30*)SimAllocTagged("CMemoryCache CCH", newSize);
+    CacheChunk* chunk = (CacheChunk*)SimAllocTagged("CMemoryCache CCH", newSize);
     base = (int)chunk;
     cap = newSize;
     cur = chunk;
@@ -167,11 +167,11 @@ int CMemoryCache::AllocHandle(void** p, int need, bool ref)
         HandleSet(p, 0, ref);
         return 0;
     }
-    Chunk_00437a30* start;
+    CacheChunk* start;
     int end = base + cap;
     if ((int)cur + size > end) {
         int q = (int)cur;
-        start = (Chunk_00437a30*)base;
+        start = (CacheChunk*)base;
         while (q < end) {
             void** owner = *(void***)q;
             if (owner != 0 && HandleGet(owner, ref) == q + 8)
@@ -191,7 +191,7 @@ int CMemoryCache::AllocHandle(void** p, int need, bool ref)
         q += *(int*)(q + 4);
     }
     if (total - size > 8u) {
-        Chunk_00437a30* nc = (Chunk_00437a30*)((char*)start + size);
+        CacheChunk* nc = (CacheChunk*)((char*)start + size);
         nc->owner = 0;
         nc->size = total - size;
         cur = nc;
@@ -200,7 +200,7 @@ int CMemoryCache::AllocHandle(void** p, int need, bool ref)
         int e = (int)start + total;
         if (e >= base + cap)
             e = base;
-        cur = (Chunk_00437a30*)e;
+        cur = (CacheChunk*)e;
     }
     start->owner = p;
     start->size = size;
@@ -269,13 +269,13 @@ void CMemoryCache::FlushCache()
 // FUNCTION: 0x437c90
 void CMemoryCache::ReleaseHandle(int id)
 {
-    Chunk_00437a30* r = (Chunk_00437a30*)base;
+    CacheChunk* r = (CacheChunk*)base;
     for (int offset = 0; offset < cap; ) {
         offset += r->size;
         if ((int)r->owner == id) {
             r->owner = 0;
         }
-        r = (Chunk_00437a30*)((char*)r + r->size);
+        r = (CacheChunk*)((char*)r + r->size);
     }
 }
 

@@ -13,7 +13,7 @@ void __cdecl operator delete(void* p);
 struct MovementClass;
 #include "../map/terrain.h"
 
-struct Source_00440340 {
+struct TdfParserView {
     char unknown_0[4];
     TdfRecord* tdf;
 };
@@ -21,13 +21,13 @@ struct Source_00440340 {
 #include "../util/vec3.h"
 
 #pragma pack(push, 2)
-struct Unit_00440af0 {
+struct MotionTickView {
     char unknown_0[0x26];
     unsigned int lastTick;
 };
 
-struct Object_00440af0 {
-    Ref<Unit_00440af0> unit;
+struct UnitPassMapView {
+    Ref<MotionTickView> unit;
     char unknown_4[0x76 - 0x4];
     Point16 a;
     char unknown_7a[0x7e - 0x7a];
@@ -36,8 +36,8 @@ struct Object_00440af0 {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-struct Record_00440af0 {
-    Ref<Unit_00440af0> unit;
+struct UnitPassMapRecordView {
+    Ref<MotionTickView> unit;
     char unknown_4[0x76 - 0x4];
     Point16 a;
     char unknown_7a[0x7e - 0x7a];
@@ -52,7 +52,7 @@ struct Record_00440af0 {
 
 #include "movement_class.h"
 
-class Class_00440500 {
+class MovementClassBuildView {
 public:
     int* name;
     short footprintX;
@@ -72,8 +72,8 @@ public:
 };
 
 #pragma pack(push, 2)
-struct Struct_00440a70 {
-    Ref<Unit_00440af0> unit;
+struct UnitPassMapStampView {
+    Ref<MotionTickView> unit;
     char unknown_4[0x76 - 0x4];
     Point16 a;
     char unknown_7a[0x7e - 0x7a];
@@ -91,7 +91,7 @@ struct Struct_00440a70 {
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-struct Rect_00440ca0 {
+struct PathLockRect {
     int a;
     int b;
     int c;
@@ -99,15 +99,15 @@ struct Rect_00440ca0 {
 };
 
 #pragma pack(push, 1)
-struct Dst_00440ca0 {
+struct PathLockDstView {
     char unknown_0[0x99];
-    Rect_00440ca0 rect;
+    PathLockRect rect;
 };
 #pragma pack(pop)
 
-struct Src_00440ca0 {
+struct PathLockSrcView {
     int unknown_0;
-    Rect_00440ca0 rect;
+    PathLockRect rect;
 };
 
 #include "../../link/globals.h"
@@ -138,7 +138,7 @@ MovementClass::~MovementClass()
 }
 
 // FUNCTION: 0x440340
-void MovementClass::ReadMoveInfo(Source_00440340* src)
+void MovementClass::ReadMoveInfo(TdfParserView* src)
 {
     footprintX = src->tdf->GetFieldInt("FootPrintX", 0);
     footprintZ = src->tdf->GetFieldInt("FootPrintZ", 0);
@@ -197,7 +197,7 @@ static inline void setcell(unsigned int* q, int sh, unsigned int val)
 }
 
 // FUNCTION: 0x440500
-void Class_00440500::BuildPassMap()
+void MovementClassBuildView::BuildPassMap()
 {
     unsigned char b;
     unsigned char* p;
@@ -340,7 +340,7 @@ void BuildAllPassMaps(void)
             } else {
                 *slot = (unsigned int*)0;
             }
-            ((Class_00440500*)(q - 6))->BuildPassMap();
+            ((MovementClassBuildView*)(q - 6))->BuildPassMap();
             progress += 100;
             g_game->progress_38d73 = progress / count;
         }
@@ -387,7 +387,7 @@ void __stdcall RefreshAllPassMaps(Point16 a, Point16 b)
 }
 
 // FUNCTION: 0x440a70
-void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
+void __stdcall RefreshPassMapsForUnit(UnitPassMapStampView* p)
 {
     if (p->unit != 0) {
         unsigned int last = p->unit->lastTick;
@@ -403,7 +403,7 @@ void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
 }
 
 // FUNCTION: 0x440af0
-void MovementClass::RefreshMovedUnits(Object_00440af0* p)
+void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
 {
     unsigned int now = (unsigned int)g_game->ticks;
     unsigned int old = lastTick;
@@ -418,7 +418,7 @@ void MovementClass::RefreshMovedUnits(Object_00440af0* p)
         g_seams.map->RefreshPassMap(this, 0, p->a, p->b);
     }
     if (start != old) {
-        for (Record_00440af0* r = &((Record_00440af0 *)g_game->units.get())[1]; r <= (Record_00440af0 *)g_game->unitsEnd.get(); r++) {
+        for (UnitPassMapRecordView* r = &((UnitPassMapRecordView *)g_game->units.get())[1]; r <= (UnitPassMapRecordView *)g_game->unitsEnd.get(); r++) {
             if ((r->flags & 0x10000000) != 0 && r->unit != 0) {
                 unsigned int t = r->unit->lastTick;
                 if (t >= old && t < start) {
@@ -431,7 +431,7 @@ void MovementClass::RefreshMovedUnits(Object_00440af0* p)
 }
 
 // FUNCTION: 0x440be0
-void MovementClass::RefreshUnitIfStale(Object_00440af0* p)
+void MovementClass::RefreshUnitIfStale(UnitPassMapView* p)
 {
     if (p->unit->lastTick < lastTick) {
         g_seams.map->RefreshPassMap(this, 0, p->a, p->b);
@@ -441,7 +441,7 @@ void MovementClass::RefreshUnitIfStale(Object_00440af0* p)
 #include "../network/player_info.h"
 
 // FUNCTION: 0x440ca0
-void __stdcall CopyPathLockFields(Dst_00440ca0* dst, Src_00440ca0* src)
+void __stdcall CopyPathLockFields(PathLockDstView* dst, PathLockSrcView* src)
 {
     dst->rect = src->rect;
 }

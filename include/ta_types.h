@@ -3132,11 +3132,6 @@ union Fixed_4 {
     union { int value; struct { unsigned short frac; short whole; } parts; };
 };
 
-class UnitList {
-public:
-    char unknown_0[16];
-};
-
 struct Mover {
     char unknown_0[220];
     int speed;
@@ -3445,13 +3440,6 @@ public:
     unsigned char field_64;
     char unknown_65[3];
     void FUN_00417e00(void*);
-};
-
-struct Movement {
-    char unknown_0[16];
-    int width;
-    char unknown_14[4];
-    unsigned int* states;
 };
 
 struct Flags_418ca0 {
@@ -10613,10 +10601,6 @@ struct Sub_00496b10 {
 
 #include "../src/game/settings_00496e10.h"
 
-union Fixed_497180 {
-    union { int i; struct { short frac; short whole; } h; };
-};
-
 struct PlayerFlags_497180 {
     unsigned short low : 8;
     unsigned short b8 : 1;
@@ -10842,31 +10826,6 @@ public:
     void** sets[8];
     int field_1e4;
     void ReapFinishedBuffers(void);
-};
-
-union Dword_0051f410 {
-    union { int value; struct { unsigned int b0 : 1; unsigned int b1 : 1; unsigned int b2 : 1; unsigned int b3 : 1; unsigned int b4 : 1; unsigned int b5 : 1; unsigned int b6 : 1; unsigned int b7 : 1; unsigned int b8 : 1; unsigned int b9 : 1; unsigned int b10 : 1; unsigned int b11 : 1; unsigned int spare : 20; } bits; };
-};
-
-union Word_0051f522 {
-    union { unsigned short value; struct { unsigned short b0 : 1; unsigned short b1 : 1; unsigned short b2 : 1; unsigned short b3 : 1; unsigned short b4 : 1; unsigned short b5 : 1; unsigned short b6 : 1; unsigned short b7 : 1; unsigned short b8 : 1; unsigned short b9 : 1; unsigned short spare : 6; } bits; };
-};
-
-struct App_0049e830 {
-    int hInstance;
-    int nCmdShow;
-    int className;
-    int title;
-    int unknown_10;
-    int menuId;
-    char unknown_18[200];
-    int field_e0;
-    char unknown_e4[12];
-    Dword_0051f410 flags;
-    char unknown_f4[262];
-    int startWidth;
-    int startHeight;
-    Word_0051f522 video;
 };
 
 struct Class_0049f8c0 {

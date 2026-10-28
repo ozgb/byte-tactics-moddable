@@ -8,8 +8,6 @@
 
 extern void* DAT_00528a54;
 
-Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p);
-
 class BlockMapIter;
 class Iter_004dbd00;
 class ConstIter_004dbd00;
@@ -55,6 +53,7 @@ public:
 
     void Inc()
     {
+        Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0*);
         std::_Lockit lock;
         if (ptr->right != DAT_00528a54)
             ptr = (Node_004db000*)FindLeftmost((Node_004dd1b0*)ptr->right);

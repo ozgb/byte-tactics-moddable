@@ -77,6 +77,7 @@ struct ReclaimableResource {
 #include "../../link/globals.h"
 extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../../interfaces/seams.h"
+#include "../../interfaces/map.h"
 #include "../state/sim_globals.h"
 
 // FUNCTION: 0x47c790

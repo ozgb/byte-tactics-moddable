@@ -48,17 +48,6 @@ struct Flags241_00466dc0 {
     unsigned int :2;
 };
 
-union Flags14281_00466dc0 {
-    unsigned short all;
-    struct {
-        unsigned short bit0 : 1;
-        unsigned short bit1 : 1;
-        unsigned short :7;
-        unsigned short bit9 : 1;
-        unsigned short :5;
-    } bits;
-};
-
 #include "../network/player_info.h"
 
 #include "../network/player.h"
@@ -328,7 +317,7 @@ static inline int OnRadarShort_00466dc0(Player* pi, int px, int py)
 static inline int OnRadar_00466dc0(int px, int py)
 {
     Player* pi = Player_Get(g_game->playerIndex);
-    if (((*(Flags14281_00466dc0*)&g_game->mapFlags_14281).all & 2) == 2)
+    if ((g_game->mapFlags_14281.raw & 2) == 2)
         return OnRadarByte_00466dc0(pi, px, py);
     return OnRadarShort_00466dc0(pi, px, py);
 }
@@ -349,11 +338,11 @@ void DrawRadarUnits(void)
     DrawSurface(surface, g_game->mappedSurface, 0, 0);
 
     int enabled;
-    if ((*(Flags14281_00466dc0*)&g_game->mapFlags_14281).bits.bit0 || (*(Flags14281_00466dc0*)&g_game->mapFlags_14281).bits.bit1)
+    if (g_game->mapFlags_14281.bit0 || g_game->mapFlags_14281.bit1)
         enabled = 0;
     else
         enabled = 1;
-    if ((*(Flags14281_00466dc0*)&g_game->uiOptionFlags_37f2f).bits.bit9)
+    if ((g_game->matchFlags & 2))
         enabled = 1;
 
     Unit* u = g_game->units;

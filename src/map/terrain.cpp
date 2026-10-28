@@ -56,23 +56,10 @@ union Fixed {
     struct { short lo; short hi; } p;
 };
 
-struct MapSize_0047d2e0 {
-    unsigned int width;
-    unsigned int height;
-    int Contains(unsigned int tx, unsigned int ty) { return tx < width && ty < height; }
-};
-
-struct ByteMap_0047d2e0 {
-    Ref<unsigned char> data;
-    MapSize_0047d2e0 size;
-    int Contains(int x, int y) { return x < size.width && y < size.height; }
-    unsigned char Get(int x, int y) { return data[size.width * y + x]; }
-};
-
-struct Los_0047d2e0 {
-    char unknown_0[0x7c];
-    ByteMap_0047d2e0 explored;
-};
+static inline int InsideExplored(Player* los, unsigned int tx, unsigned int ty)
+{
+    return tx < (unsigned int)los->exploredWidth && ty < (unsigned int)los->exploredHeight;
+}
 
 struct Node_0047cb00 {
     char unknown_0[0x8e];
@@ -479,44 +466,35 @@ struct Pos_0047d2e0 {
     Fixed x, y, z;
 };
 
-struct Position_0047d2e0 {
-    short xFrac;
-    short x;
-    short yFrac;
-    short y;
-    short zFrac;
-    short z;
-};
-
-static inline int IsExplored_0047d2e0(Los_0047d2e0* los, Position_0047d2e0* pos,
+static inline int IsExploredAtHeight(Player* los, Vec3Words* pos,
     Fixed* hgt)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (hgt->p.hi >> 1)) >> 5;
-    if (los->explored.size.Contains(tx, ty) && los->explored.Get(tx, ty) != 0)
+    int tx = pos->xWhole >> 5;
+    int ty = (pos->zWhole - (hgt->p.hi >> 1)) >> 5;
+    if (InsideExplored(los, tx, ty) && los->explored[(unsigned int)los->exploredWidth * ty + tx] != 0)
         return 1;
     return 0;
 }
 
-static inline int IsSeen_0047d2e0(Los_0047d2e0* los, Position_0047d2e0* pos,
+static inline int IsSeenAtHeight(Player* los, Vec3Words* pos,
     Fixed* hgt, unsigned int bit)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (hgt->p.hi >> 1)) >> 5;
-    unsigned int w = los->explored.size.width;
+    int tx = pos->xWhole >> 5;
+    int ty = (pos->zWhole - (hgt->p.hi >> 1)) >> 5;
+    unsigned int w = los->exploredWidth;
     int r;
-    if (!los->explored.size.Contains(tx, ty))
+    if (!InsideExplored(los, tx, ty))
         r = 0;
     else
         r = (g_game->visibilityMask[w * ty + tx] & bit) != 0;
     return r;
 }
 
-static inline unsigned short VisWord_0047d2e0(Los_0047d2e0* los, int tx,
-    Position_0047d2e0* pos, Fixed* hgt)
+static inline unsigned short VisibilityWord(Player* los, int tx,
+    Vec3Words* pos, Fixed* hgt)
 {
-    int ty = (pos->z - (hgt->p.hi >> 1)) >> 5;
-    unsigned int w = los->explored.size.width;
+    int ty = (pos->zWhole - (hgt->p.hi >> 1)) >> 5;
+    unsigned int w = los->exploredWidth;
     return g_game->visibilityMask[w * ty + tx];
 }
 
@@ -560,7 +538,7 @@ Cell* c)
 }
 
 // FUNCTION: 0x47d2e0
-int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* los)
+int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los)
 {
     int ok;
     g_lastPlaceHeight = 0;
@@ -581,15 +559,15 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* 
         hgt.v = GetCellHeight(&cell) << 16;
         x = pos.x.p.hi >> 5;
         y = (pos.z.p.hi - (hgt.p.hi >> 1)) >> 5;
-        if (!los->explored.size.Contains(x, y))
+        if (!InsideExplored(los, x, y))
             return 0;
         unsigned int bit = 1 << g_game->playerIndex;
-        if ((VisWord_0047d2e0(los, x, (Position_0047d2e0*)&pos, &hgt) & bit) == 0)
+        if ((VisibilityWord(los, x, (Vec3Words*)&pos, &hgt) & bit) == 0)
             return 0;
         if ((g_game->mapFlags & 2) == 2)
-            ok = IsExplored_0047d2e0(los, (Position_0047d2e0*)&pos, &hgt);
+            ok = IsExploredAtHeight(los, (Vec3Words*)&pos, &hgt);
         else
-            ok = IsSeen_0047d2e0(los, (Position_0047d2e0*)&pos, &hgt, bit);
+            ok = IsSeenAtHeight(los, (Vec3Words*)&pos, &hgt, bit);
     }
     Cell* c = &g_game->cells[cell.y * g_game->width + cell.x];
     unsigned char min6 = 0xff;
@@ -746,7 +724,7 @@ void __stdcall ForceNeighborFootprintReclaim(Unit* obj)
     RefreshAllPassMaps(obj->cell, obj->footprint);
 }
 
-int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* los);
+int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los);
 
 static inline int SteepCell(Cell* c)
 {

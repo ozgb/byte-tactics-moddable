@@ -168,17 +168,6 @@ union SoundFlags_0045cf60 {
     } bits;
 };
 
-union Los_0045cf60 {
-    unsigned short losFlags;
-    struct {
-        unsigned short l0 : 1, l1 : 1, l2 : 1, l3 : 1, l4 : 1, l5 : 1, l6 : 1, l7 : 1,
-                       l8 : 1, l9 : 1, l10 : 1, l11 : 1, l12 : 1, l13 : 1, l14 : 1, l15 : 1;
-    } lb;
-    struct {
-        unsigned short bit0 : 1, bit1 : 1, bit2 : 1, rest : 13;
-    } bits;
-};
-
 #include "../gui/gui.h"
 
 struct Opts_0045f1d0 {
@@ -1092,8 +1081,8 @@ void LoadSavedSettings()
 void SaveGameSettings()
 {
     memcpy(g_optionsPrefsSnapshot.block, (char*)&g_game->block[0], 0x53);
-    g_optionsPrefsSnapshot.bit0 = (*(Los_0045cf60*)&g_game->mapFlags_14281).bits.bit1;
-    g_optionsPrefsSnapshot.bit1 = (*(Los_0045cf60*)&g_game->mapFlags_14281).bits.bit2;
+    g_optionsPrefsSnapshot.bit0 = g_game->mapFlags_14281.bit1;
+    g_optionsPrefsSnapshot.bit1 = g_game->mapFlags_14281.bit2;
     g_optionsBackupGameSpeed.i = g_game->gameSpeed;
     g_optionsBackupEdgeScroll.i = g_game->scrollSpeed;
     g_optionsBackupLockedTrack = ((Sound *)g_game->sound)->GetLockedTrack();
@@ -1907,9 +1896,9 @@ void ShowGameSettingsDialog()
                      0x78, 2);
     }
     AddTextGadget(layer, "TEXT", Translate((char*)"Mapping Mode:"), 0x12, 0x7e, 0x6e, 2);
-    AddTextGadget(layer, "TEXT", Translate(mapStrs[(*(Los_0045cf60*)&g_game->mapFlags_14281).lb.l0]), 0x8c, 0x7e, 0x78, 2);
+    AddTextGadget(layer, "TEXT", Translate(mapStrs[g_game->mapFlags_14281.bit0]), 0x8c, 0x7e, 0x78, 2);
     AddTextGadget(layer, "TEXT", Translate((char*)"Line of Sight:"), 0x12, 0x90, 0x6e, 2);
-    unsigned short losFlags = (*(Los_0045cf60*)&g_game->mapFlags_14281).losFlags;
+    unsigned short losFlags = g_game->mapFlags_14281.raw;
     int losIdx = !(losFlags & 2) ? 2 : (int)(((unsigned char)~losFlags >> 2) & 1);
     AddTextGadget(layer, "TEXT", Translate(losStrs[losIdx]), 0x8c, 0x90, 0x78, 2);
     int y;
@@ -2264,8 +2253,8 @@ void OpenOptionsPanel()
     }
     panel->handler = (void (__stdcall *)(void *))HandleOptionsPanelClick;
     memcpy(g_optionsPrefsSnapshot.block, (char*)&g_game->block[0], 0x53);
-    g_optionsPrefsSnapshot.bit0 = (*(Los_0045cf60*)&g_game->mapFlags_14281).bits.bit1;
-    g_optionsPrefsSnapshot.bit1 = (*(Los_0045cf60*)&g_game->mapFlags_14281).bits.bit2;
+    g_optionsPrefsSnapshot.bit0 = g_game->mapFlags_14281.bit1;
+    g_optionsPrefsSnapshot.bit1 = g_game->mapFlags_14281.bit2;
     g_optionsBackupGameSpeed.i = g_game->gameSpeed;
     g_optionsBackupEdgeScroll.i = g_game->scrollSpeed;
     g_optionsBackupLockedTrack = ((Sound *)g_game->sound)->GetLockedTrack();

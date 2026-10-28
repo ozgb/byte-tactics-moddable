@@ -21,7 +21,7 @@ source file; a file with no simulation function is not checked:
   bitexact      a bx_ name, or declared in lib/bitexact/bitexact.h
   library       a symbol no object of the build defines (the CRT, the MSVC 5 libraries, the imports), or
                 one src/util/operator_new.cpp defines (operator new and delete), or throw info (_TI,
-                _CTA, _CT) or a static or member of a std template (@std@@ in the decorated name)
+                _CTA, _CT) or a symbol whose own scope is std (a member or static of a std template)
   const         a data symbol whose data/state_classes.csv class is const or sim
   own           defined by S: a function of S in data/subsystems.csv, or data defined in a file
                 whose functions all belong to S, or a compiler-made symbol (string literal,
@@ -314,9 +314,60 @@ def allowed(rules: Rules, subsystem: str, symbol: str) -> bool:
     return classify(rules, subsystem, symbol) is not None
 
 
+def name_chain(text: str, i: int) -> tuple:
+    """The fragments of a decorated qualifier chain starting at i, and the index after its closing @."""
+    out = []
+    while text[i] != "@":
+        if text.startswith("?$", i):
+            j = text.index("@", i)
+            out.append(text[i:j])
+            i = template_args(text, j + 1)
+        elif text[i].isdigit():
+            out.append(text[i])
+            i += 1
+        else:
+            j = text.index("@", i)
+            out.append(text[i:j])
+            i = j + 1
+    return out, i + 1
+
+
+def template_args(text: str, i: int) -> int:
+    """The index after the @ that closes the template arguments starting at i."""
+    while text[i] != "@":
+        c = text[i]
+        if c in "UVT":
+            i = name_chain(text, i + 1)[1]
+        elif c == "W":
+            i = name_chain(text, i + 2)[1]
+        elif c == "$":
+            i = text.index("@", i)
+        else:
+            i += 1
+    return i + 1
+
+
+def own_scope_is_std(symbol: str) -> bool:
+    """True when the outermost qualifier of the symbol's own name is std, whatever its type arguments are."""
+    text = symbol
+    local = re.search(r"\?\d+\?\?", text)
+    if local:
+        text = "?" + text[local.end():]
+    if not text.startswith("?"):
+        return False
+    start = 1
+    if text.startswith("??"):
+        start = 4 if text[2] == "_" else 3
+    try:
+        fragments, _ = name_chain(text, start)
+    except (IndexError, ValueError):
+        return base_name(symbol).startswith("std::")
+    return len(fragments) > 1 and fragments[-1] == "std" or base_name(symbol).startswith("std::")
+
+
 def compiler_library(symbol: str) -> bool:
-    """Throw info and catchable types (_TI, _CTA, _CT) and statics or members of std templates."""
-    return symbol.startswith(THROW_PREFIXES) or "@std@@" in symbol
+    """Throw info and catchable types (_TI, _CTA, _CT) and symbols whose own scope is std."""
+    return symbol.startswith(THROW_PREFIXES) or own_scope_is_std(symbol)
 
 
 def compiler_made(symbol: str, rules: Rules, subsystem: str, files: set) -> bool:

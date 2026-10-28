@@ -241,6 +241,16 @@ class SeamLinkTest(unittest.TestCase):
         other = Unit("link/data.cpp", data={"_TXother", "?g_std@@3HA"})
         self.assertEqual(len(self.run_with(self.wind("_TXother", "?g_std@@3HA"), other)), 2)
 
+    def test_std_members_are_library_by_scope(self):
+        names = ["?insert@?$vector@HV?$allocator@H@std@@@std@@QAEXXZ", "??0?$vector@HV?$allocator@H@std@@@std@@QAE@XZ", "?npos@?$basic_string@DU?$char_traits@D@std@@@std@@2IB", "?_Xlen@std@@YAXXZ"]
+        link = Unit("link/data.cpp", code=set(names))
+        self.assertEqual(self.run_with(self.wind(*names), link), [])
+
+    def test_project_function_with_std_argument_is_a_violation(self):
+        names = ["?GetLosTable@LosTables@@QAEABV?$vector@HV?$allocator@H@std@@@std@@XZ", "?Find@PlayerAI@@QAEXAAV?$basic_string@DU?$char_traits@D@std@@@std@@@Z"]
+        other = Unit("src/units/units.cpp", code=set(names))
+        self.assertEqual(len(self.run_with(self.wind(*names), other)), 2)
+
     def test_operator_new_file_is_library(self):
         lib = Unit("src/util/operator_new.cpp", code={"??2@YAPAXI@Z", "??3@YAXPAX@Z", "??_U@YAPAXI@Z"})
         self.assertEqual(self.run_with(self.wind("??2@YAPAXI@Z", "??3@YAXPAX@Z", "??_U@YAPAXI@Z"), lib), [])

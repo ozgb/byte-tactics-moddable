@@ -251,21 +251,6 @@ void __stdcall CycleSlotController(int playerIndex)
 }
 
 #pragma pack(push, 1)
-struct Header {
-    unsigned char type;
-    unsigned char group;
-    char name[0x11];
-    short x;
-    short y;
-    short w;
-    short h;
-    int attribs;
-    int color;
-    int color2;
-    char unknown_27[2];
-    unsigned char flag;
-};
-
 struct Rec1 {
     Header h;
     char unknown_2a[0x2f - 0x2a];
@@ -303,8 +288,8 @@ void __stdcall BindGadgetAnimSequence(Rec1* obj, char* name)
             obj->entry = e;
             short* f = (short*)GetGafFrame((unsigned short*)e, obj->frame);
             if (f) {
-                obj->h.w = f[0];
-                obj->h.h = f[1];
+                obj->h.width = f[0];
+                obj->h.height = f[1];
             }
         }
     }
@@ -331,8 +316,8 @@ void BuildSkirmishPlayerRows(void)
         rec2.h.y = y;
         sprintf(rec1.h.name, "Player%d", i);
         rec1.h.x = 0x2d;
-        rec1.h.w = 0x70;
-        rec1.h.h = 0x14;
+        rec1.h.width = 0x70;
+        rec1.h.height = 0x14;
         rec1.h.attribs = 2;
         rec1.text[0] = 0;
         BindGadgetAnimSequence(&rec1, "skirmname");
@@ -340,7 +325,7 @@ void BuildSkirmishPlayerRows(void)
 
         sprintf(rec1.h.name, "Side%d", i);
         rec1.h.x = 0xa3;
-        rec1.h.w = 0x2d;
+        rec1.h.width = 0x2d;
         BindGadgetAnimSequence(&rec1, "SIDEx");
         rec1.frame = 0;
         rec1.stages = 2;
@@ -348,22 +333,22 @@ void BuildSkirmishPlayerRows(void)
 
         sprintf(rec2.h.name, "Color%d", i);
         rec2.h.x = 0xd6;
-        rec2.h.w = 0x14;
-        rec2.h.h = 0x14;
+        rec2.h.width = 0x14;
+        rec2.h.height = 0x14;
         rec2.text[0] = 0;
         AddHotspotGadget(&g_game->gui, &rec2);
 
         sprintf(rec2.h.name, "Allies%d", i);
         rec2.h.x = 0xf1;
-        rec2.h.w = 0x28;
-        rec2.h.h = 0x14;
+        rec2.h.width = 0x28;
+        rec2.h.height = 0x14;
         strcpy(rec2.text, Translate("Click to select an allegiance symbol."));
         AddHotspotGadget(&g_game->gui, &rec2);
 
         sprintf(rec1.h.name, "Metal%d", i);
         rec1.h.x = 0x11e;
-        rec1.h.w = 0x2d;
-        rec1.h.h = 0x14;
+        rec1.h.width = 0x2d;
+        rec1.h.height = 0x14;
         rec1.h.attribs |= 0x10000;
         rec1.stages = 0;
         rec1.f138 = 0;
@@ -374,7 +359,7 @@ void BuildSkirmishPlayerRows(void)
 
         sprintf(rec1.h.name, "Energy%d", i);
         rec1.h.x = 0x151;
-        rec1.h.w = 0x2d;
+        rec1.h.width = 0x2d;
         BindGadgetAnimSequence(&rec1, "skirmmet");
         strcpy(rec1.text, Translate("Left click to increase energy. Right click to decrease energy."));
         AddButtonGadget(&g_game->gui, &rec1);

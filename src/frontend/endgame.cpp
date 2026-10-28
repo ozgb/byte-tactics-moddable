@@ -96,24 +96,11 @@ struct EndGamePlayerStat {
     };
 };
 
-struct Header {
-    unsigned char type;
-    char unknown_1;
-    char name[0x11];
-    short x;
-    short y;
-    short width;
-    short height;
-    int attribs;
-    int color;
-    int color2;
-    char unknown_27[2];
-    unsigned char flag;
-    char unknown_2a[0xb6 - 0x2a];
-};
+#include "endgame.h"
 
 struct Bar {
     Header h;
+    char pad_2a[0xb6 - 0x2a];
     int max;
     int current;
     int value;
@@ -126,6 +113,7 @@ struct Bar {
 
 struct Button {
     Header h;
+    char pad_2a[0xb6 - 0x2a];
     char unknown_b6[0xc8 - 0xb6];
     int flags;
 };

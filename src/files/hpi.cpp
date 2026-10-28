@@ -28,7 +28,7 @@ struct ArchiveDirectory {
     ArchiveEntry* entries;
 };
 
-struct Header {
+struct HapiHeader {
     char magic[4];
     unsigned char version[4];
     unsigned int size;
@@ -40,7 +40,7 @@ struct Header {
 struct OPENHAPIFILE {
     void* fp;
     int pos;
-    Header* node;
+    HapiHeader* node;
     int count;
     int mode;
     char name[0x104];
@@ -1474,7 +1474,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
 void __stdcall HAPI_RelocateDirectory(ArchiveDirectory* h, int delta);
 void __stdcall HAPI_RelocateDirectory(int name, int base);
 
-static inline int Bad_004bdd70(void* f, Header* hdr, char* copyright)
+static inline int Bad_004bdd70(void* f, HapiHeader* hdr, char* copyright)
 {
     if (strncmp(hdr->magic, "HAPI", 4) != 0 || hdr->version[0] != 0 || hdr->version[1] != 0 ||
         hdr->version[2] != 1 || hdr->version[3] != 0)
@@ -1501,7 +1501,7 @@ OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
     h->count = 0;
     h->mode = mode;
     host_file_full_path(name, h->name, 0x104);
-    Header hdr;
+    HapiHeader hdr;
     host_file_read(f, &hdr, 0x14);
     char copyright[0x40];
     if (Bad_004bdd70(f, &hdr, copyright)) {
@@ -1509,11 +1509,11 @@ OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
         GameFreeThunk(h);
         return 0;
     }
-    h->node = (Header*)GameAllocIgnoreTag("HAPIFILE header", hdr.size);
+    h->node = (HapiHeader*)GameAllocIgnoreTag("HAPIFILE header", hdr.size);
     host_file_seek(f, 0, HOST_SEEK_SET);
     host_file_read(f, h->node, hdr.size);
     {
-        Header* base = h->node;
+        HapiHeader* base = h->node;
         unsigned char key = base->obfuscate;
         unsigned int w = key;
         unsigned char r = key;
@@ -1536,7 +1536,7 @@ OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
         }
         base = h->node;
         base->list = (ArchiveDirectory*)((char*)base->list + (int)base);
-        Header* b = h->node;
+        HapiHeader* b = h->node;
         ArchiveDirectory* t = b->list;
         t->entries = (ArchiveEntry*)((char*)t->entries + (int)b);
         for (int i = t->count - 1; i >= 0; i--) {

@@ -25,11 +25,6 @@ struct Surface_0041df20;
 
 #include "../graphics/rect.h"
 
-struct Data {
-    char unknown_0[0x14];
-    void* items;
-    char unknown_18[8];
-};
 
 struct Gui;
 

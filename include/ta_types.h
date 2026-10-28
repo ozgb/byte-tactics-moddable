@@ -3578,13 +3578,6 @@ struct Player_0041a920 {
     char name[562];
 };
 
-struct BuildEntry_0041ace0 {
-    unsigned short typeId;
-    unsigned char page;
-    unsigned char slot;
-    char name[33];
-};
-
 struct Table_0041ace0 {
     char unknown_0[182];
     short count;
@@ -3620,13 +3613,6 @@ struct CursorState_0041cd20 {
 #include "../src/ingame/point_0041cd50.h"
 
 #include "../src/ingame/cursor_state_0041cc60.h"
-
-struct Display_0041ce90 {
-    char unknown_0[64];
-    void* hwnd;
-    char unknown_44[172];
-    unsigned char flags_f0;
-};
 
 struct Mouse_0041ce90 {
     int x;
@@ -4141,13 +4127,6 @@ struct Model_00424c00 {
     unsigned short damage;
     Vec3 pos;
     Rot16 rot;
-};
-
-struct Gadget_00426190 {
-    char unknown_0[24];
-    Dialog* owner;
-    char unknown_1c[68];
-    int field_60;
 };
 
 class Class_004ce1d0 {
@@ -5047,18 +5026,6 @@ struct Anim_004394e0 {
     unsigned short field_2c;
 };
 
-struct Trail_004394e0 {
-    Vec3 start;
-    Vec3 delta;
-    int dist;
-    int pos;
-    int idx;
-    void* surface;
-    View_00438c00* view;
-    Anim_004394e0* anim;
-    void Run(void);
-};
-
 struct Anim_00439740 {
     unsigned short count;
     char unknown_2[42];
@@ -5438,28 +5405,8 @@ struct Src_00440ca0 {
     Rect rect;
 };
 
-struct Elem_00441c30 {
-    V4i guid;
-    unsigned long size;
-    void* data;
-};
-
-struct Serial_00441c30 {
-    char unknown_0[8];
-    unsigned long unknown_8;
-    unsigned long unknown_c;
-    unsigned long unknown_10;
-};
-
 struct Gui_00443100 {
     char unknown_0[24];
-};
-
-struct Net_00443100 {
-    void* dp;
-    void* dp3;
-    char unknown_8[1221];
-    DirectPlayLobby_4ca880* lobby;
 };
 
 struct Class_004bbd00_Other {
@@ -5468,12 +5415,6 @@ struct Class_004bbd00_Other {
     unsigned char compressed;
     char unknown_9[3];
     unsigned int d;
-};
-
-struct Msg_00441220 {
-    char unknown_0[153];
-    Class_004bbd00_Other group;
-    char unknown_a9[19];
 };
 
 struct PlayerData_004437c0 {
@@ -5516,12 +5457,6 @@ struct Obj_444ba0 {
     int field_60;
 };
 
-struct AnimSeq_00445110 {
-    char unknown_0[40];
-    void* field_28;
-    char unknown_2c[4];
-};
-
 struct LogoEntry_00445110 {
     void* ptr;
     int unknown_4;
@@ -5539,14 +5474,6 @@ struct Head_004455b0 {
     unsigned char field_29;
     char unknown_2a[140];
     char text[136];
-};
-
-struct Mode_00446310 {
-    int width;
-    int height;
-    int refreshRate;
-    char unknown_c[308];
-    short field_140;
 };
 
 struct Player_004467c0 {
@@ -5576,20 +5503,6 @@ struct Menu_44b3c0 {
     Inner_44b3c0* inner;
     char unknown_1c[68];
     int current;
-};
-
-struct Record_0044c0d0 {
-    unsigned short a;
-    unsigned short b;
-    unsigned short e;
-    unsigned short f;
-    unsigned char flag8;
-    unsigned char flag9;
-    unsigned char flaga;
-    unsigned char flagb;
-    int unknown_c;
-    int d;
-    int unknown_14;
 };
 
 struct Entry_0044c370 {
@@ -6771,20 +6684,9 @@ union Flags_0045d280 {
 
 #include "../src/ingame/flags_00495e90_37ebe.h"
 
-struct Rule_0045f1d0 {
-    char unknown_0[12];
-    int startMetal;
-    int startEnergy;
-    char unknown_14[4];
-};
-
 struct Point_004948e0 {
     int x;
     int y;
-};
-
-struct Quad {
-    Point_004948e0 p[4];
 };
 
 struct Sound_45ffb0 {
@@ -7397,17 +7299,6 @@ struct Entry_3 {
     char unknown_1f[41];
 };
 
-struct Ctx_00499890 {
-    char unknown_0[64];
-    void* hwnd;
-    char unknown_44[136];
-    unsigned char* colorMap;
-    char unknown_d0[33];
-    unsigned char flags;
-    char unknown_f2[1326];
-    int field_620;
-};
-
 struct Class_00464ac0 {
     char unknown_0[148];
     float field_0x94;
@@ -7493,14 +7384,6 @@ struct Player_00466dc0 {
     unsigned char field_96;
 };
 
-class DetectionVisitor {
-public:
-    int field_4;
-    int field_8;
-    Vec3 pos;
-    virtual void MarkUnitsInRadarOrSonarRadius(Unit*);
-};
-
 struct Unit_00467980 {
     char unknown_0[272];
     unsigned int flags;
@@ -7530,29 +7413,13 @@ struct MissionName_00467e50 {
     char* name;
 };
 
-struct Mission_00467e50 {
-    char unknown_0[5];
-    unsigned char state;
-    char unknown_6[16];
-    void* target;
-    char unknown_1a[48];
-    void* next;
-};
-
 struct Player_004689c0 {
     char unknown_0[281];
     unsigned short field_119;
     char unknown_11b[48];
 };
 
-struct FrameTimers {
-    int last;
-    int total;
-    int values[9];
-    int acc[9];
-    void AccumulateProfileTime(int);
-};
-
+#include "../src/ingame/frame_timers.h"
 #include "../src/game/game.h"
 
 struct Class_004c6b10 {
@@ -7567,19 +7434,6 @@ struct Class_004c6b10 {
 struct Point_0046ba80 {
     int x;
     int y;
-};
-
-class Prim_0046bae0 {
-public:
-    int field_0;
-    int count;
-    int field_8;
-    unsigned short* indices;
-    int field_10;
-    char unknown_14[8];
-    unsigned int flag0 : 1;
-    unsigned int texIndexed : 1;
-    unsigned int rest : 30;
 };
 
 struct ElemA_0046c190 {
@@ -9563,10 +9417,6 @@ struct Spawn_004861d0 {
     unsigned short id;
     Vec3 pos;
     char unknown_11[6];
-};
-
-struct Name_0048d630 {
-    char name[562];
 };
 
 struct UnitKilledPacket {

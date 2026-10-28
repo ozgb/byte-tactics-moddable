@@ -12,11 +12,6 @@
 
 #include "../graphics/memory_cache.h"
 
-struct Amount {
-    int current;
-    int required;
-};
-
 #include "../map/grid.h"
 
 #pragma pack(push, 1)
@@ -28,47 +23,7 @@ struct Surface_0041df20;
 
 struct Gui;
 
-struct Gadget {
-    unsigned char type;
-    char unknown_1;
-    char name[0x11];
-    short x;
-    short y;
-    short width;
-    short height;
-    int attribs;
-    int color;
-    int color2;
-    char unknown_27[2];
-    unsigned char flag;
-    char unknown_2a[0xb6 - 0x2a];
-    short count;
-    char unknown_b8[2];
-    union {
-        Amount amount;
-        struct {
-            short selected;
-            char unknown_bc[2];
-            void* image;
-            char unknown_c2[4];
-            unsigned short frame;
-        };
-    };
-    char unknown_c8[0xcc - 0xc8];
-    char okName[0x10];
-    char unknown_dc[0x136 - 0xdc];
-    union {
-        short range;
-        struct {
-            unsigned char stages;
-            unsigned char stageIndex;
-        };
-    };
-    char unknown_138[0x142 - 0x138];
-    short knobSize;
-    void (__stdcall* sliderCallback)(Gui*, int);
-    char unknown_148[0x15b - 0x148];
-};
+#include "../gui/gadget.h"
 
 struct Layer;
 #include "../gui/gui.h"
@@ -432,16 +387,16 @@ void FillEndGameStatistics(void)
             if (idx != -1) {
                 Gadget* e = &entries[idx];
                 if (e) {
-                    e->image = g_game->logos32;
-                    e->frame = g_game->players[i].info->color;
+                    e->u.hotspot.gaf = (GafEntry*)g_game->logos32;
+                    e->u.hotspot.index = g_game->players[i].info->color;
                 }
             }
             menu->language = menu->values[1];
             int h = GetFontLineHeight();
             AddTextGadget(g_game->gui.layer, "TEXT", (char*)&g_game->slots_38dd9[i], 0x10,
                          (0x14 - h) / 2 + bar.h.y, -1, 2);
-            entries[entries->count].attribs = 2;
-            entries[entries->count].width = 0x5a;
+            entries[entries->u.count].attribs = 2;
+            entries[entries->u.count].width = 0x5a;
             menu->language = menu->values[0];
             STAT_BAR(0, 0x70, "Kills%d")
             STAT_BAR(1, 0xba, "Losses%d")
@@ -459,11 +414,10 @@ void FillEndGameStatistics(void)
 int AreStatBarsComplete(void)
 {
     Gadget* entries = g_game->gui.layer->entries;
-    int count = entries->count;
+    int count = entries->u.count;
     for (int i = 0; i < count; i++) {
         if (entries[i].type == 0xd) {
-            Amount* amount = &entries[i].amount;
-            if (entries[i].flag == 0 || amount->current < amount->required) {
+            if (entries[i].active == 0 || entries[i].u.anim.value < entries[i].u.anim.max) {
                 return 0;
             }
         }
@@ -581,7 +535,7 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
         g_game->frontendNextSubState = 10;
         SetCursorOverlayEnabled(1);
         SetCursorMode(0x14);
-        if (g_game->net->SelectMission(FindGadgetChecked(entries, "Missions")->selected)) {
+        if (g_game->net->SelectMission(FindGadgetChecked(entries, "Missions")->u.list.selected)) {
             EnterMainMenuState();
             g_game->bits_2a44.bit2 = 0;
             g_game->bits_2a44.bit3 = 1;
@@ -663,7 +617,7 @@ void __stdcall OpenEndMissionScreen()
     if (next) {
         g_game->net->SelectMission(g_game->mission);
         LoadPictureCached("outcome1", 1, 1, 0);
-        strcpy(layer->entries->okName, "Start");
+        strcpy(layer->entries->u.names.choice, "Start");
     } else {
         LoadPictureCached("outcome0", 1, 1, 0);
         SelectGadgetByName(&g_game->gui, "MainMenu");
@@ -796,10 +750,10 @@ int DrawEndGameFrame()
 static inline int StatsComplete()
 {
     Gadget* entries=g_game->gui.layer->entries;
-    int count=entries->count;
+    int count=entries->u.count;
     for(int i=0;i<count;++i) {
         if(entries[i].type==13) {
-            if(!entries[i].flag || entries[i].amount.current<entries[i].amount.required) return 0;
+            if(!entries[i].active || entries[i].u.anim.value<entries[i].u.anim.max) return 0;
         }
     }
     return 1;

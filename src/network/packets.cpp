@@ -137,17 +137,6 @@ static inline void* GetFrame(FrameQueue* q, int tick, int& size)
 
 #pragma pack(push, 1)
 #include "../game/game.h"
-
-class NetCondenser {
-public:
-    char unknown_0[0x21];
-    int to;
-
-    void SendPacketTo(void* session, int from, int value, void* data, int size);
-    void Accumulate(void* data, int size);
-    int SendPacket(void* session, int from);
-    int ReceivePacket(void* net, char* data, int* size);
-};
 #pragma pack(pop)
 
 #include "../../link/globals.h"

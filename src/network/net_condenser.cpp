@@ -15,43 +15,12 @@ struct Net_0044f9c0 {
 #include "../files/files_api.h"
 
 #pragma pack(push, 1)
-struct CondensedHeader {
-    unsigned char kind;
-    unsigned short sum;
-};
-
 #include "../game/game.h"
 #pragma pack(pop)
 
 #include "../../link/globals.h"
 
 #include "../harness/harness.h"
-
-#pragma pack(push, 1)
-class NetCondenser {
-public:
-    char* buffer;
-    int unknown_4;
-    int unpackedCached;
-    int unpackedSize;
-    char* sendBuffer;
-    char* buffer_14;
-    union {
-        char* packet;
-        CondensedHeader* header;
-    };
-    unsigned char sendCount;
-    int sendSize;
-    int to;
-
-    NetCondenser();
-    ~NetCondenser();
-    void Accumulate(void* data, int size);
-    int ReceivePacket(void* net, char* data, int* size);
-    int SendPacket(void* session, int from);
-    void SendPacketTo(void* session, int from, int value, void* data, int size);
-};
-#pragma pack(pop)
 
 // FUNCTION: 0x44f720 _$E4
 // FUNCTION: 0x44f7a0 _$E2

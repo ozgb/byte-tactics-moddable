@@ -6265,18 +6265,6 @@ public:
     ~Class_0044f8a0(void);
 };
 
-class NetCondenser {
-public:
-    char unknown_0[16];
-    char* sendBuffer;
-    char* unknown_14;
-    char* packet;
-    unsigned char flag_1c;
-    int size_1d;
-    int to_21;
-    int SendPacket(void*, int);
-};
-
 struct Player_0044feb0 {
     char unknown_0[326];
     unsigned char field_146;

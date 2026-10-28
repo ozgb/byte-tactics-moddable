@@ -24,8 +24,32 @@ HEADER = """#ifndef W_H
 struct WindSeam {
     void (__cdecl* Update)(void);
 };
-int __cdecl RandomInt(int n);
+#endif
+"""
+SERVICES = """#ifndef S_H
+#define S_H
+int __stdcall RandomInt(int n);
 extern int g_extra;
+// Reader.
+class Reader {
+public:
+    int pos;
+    Reader();
+    ~Reader();
+    int GetInt(int key) { return key + pos; }
+    int Seek(int to);
+};
+#endif
+"""
+HOST = """#ifndef H_H
+#define H_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+void __cdecl host_fatal(void* owner, const char* title, const char* text);
+#ifdef __cplusplus
+}
+#endif
 #endif
 """
 
@@ -41,6 +65,8 @@ class SeamLinkTest(unittest.TestCase):
         self.root = Path(self.tmp.name)
         self.write("data/subsystems.csv", SUBSYSTEMS)
         self.write("interfaces/wind_meteors.h", HEADER)
+        self.write("interfaces/services.h", SERVICES)
+        self.write("interfaces/host.h", HOST)
         self.write("interfaces/seams.h", "struct Seams { int x; };\nextern Seams g_seams;\nvoid InstallNativeSeams();\n")
         self.write("interfaces/ref.h", "bool __cdecl SimOwns(const void* p);\n")
         self.write("lib/bitexact/bitexact.h", "double bx_sin(double x);\n")
@@ -66,15 +92,34 @@ class SeamLinkTest(unittest.TestCase):
         state.code.add("?Accessor@@YAXXZ")
         self.assertEqual(self.run_with(self.wind("?g_block@@3HA", "?Accessor@@YAXXZ", "?SimOwns@@YA_NPBX@Z"), state), [])
 
-    def test_engine_service_in_own_header_is_allowed(self):
-        other = Unit("src/util/rand.cpp", code={"_RandomInt"}, data={"?g_extra@@3HA"})
-        self.assertEqual(self.run_with(self.wind("_RandomInt", "?g_extra@@3HA"), other), [])
+    def test_engine_service_is_allowed_for_every_subsystem(self):
+        other = Unit("src/util/rand.cpp", code={"_RandomInt@4"}, data={"?g_extra@@3HA"})
+        self.assertEqual(self.run_with(self.wind("_RandomInt@4", "?g_extra@@3HA"), other), [])
+        spend = Unit("src/game/economy.cpp", code={"?Spend@@YAXXZ"})
+        spend.refs = [("?Spend@@YAXXZ", "_RandomInt@4")]
+        self.assertEqual(self.run_with(spend, other), [])
 
-    def test_engine_service_of_another_subsystem_is_not_allowed(self):
-        self.write("interfaces/economy.h", "int __cdecl Spend2(int n);\n")
+    def test_members_of_a_service_class_are_allowed(self):
+        reader = Unit("src/util/reader.cpp", code={"??0Reader@@QAE@XZ", "??1Reader@@QAE@XZ", "?Seek@Reader@@QAEHH@Z", "?GetInt@Reader@@QAEHH@Z", "?Other@Reader@@QAEHH@Z"})
+        found = self.run_with(self.wind("??0Reader@@QAE@XZ", "??1Reader@@QAE@XZ", "?Seek@Reader@@QAEHH@Z",
+                                        "?GetInt@Reader@@QAEHH@Z", "?Other@Reader@@QAEHH@Z"), reader)
+        self.assertEqual([v.symbol for v in found], ["Reader::Other"])
+
+    def test_member_of_another_class_with_a_service_member_name_is_not_allowed(self):
+        stranger = Unit("src/util/stranger.cpp", code={"?GetInt@Stranger@@QAEHH@Z"})
+        found = self.run_with(self.wind("?GetInt@Stranger@@QAEHH@Z"), stranger)
+        self.assertEqual([v.symbol for v in found], ["Stranger::GetInt"])
+
+    def test_host_declaration_is_allowed_as_host(self):
+        platform = Unit("src/platform/host.cpp", code={"_host_fatal"})
+        self.assertEqual(self.run_with(self.wind("_host_fatal"), platform), [])
+        rules = seamlink.build_rules(self.root, [platform])
+        self.assertEqual(seamlink.classify(rules, "wind_meteors", "_host_fatal"), "host")
+
+    def test_subsystem_header_declaration_is_not_a_service(self):
+        self.write("interfaces/wind_meteors.h", HEADER + "int __cdecl Spend2(int n);\n")
         other = Unit("src/util/x.cpp", code={"_Spend2"})
-        found = self.run_with(self.wind("_Spend2"), other)
-        self.assertEqual([v.symbol for v in found], ["Spend2"])
+        self.assertEqual([v.symbol for v in self.run_with(self.wind("_Spend2"), other)], ["Spend2"])
 
     def test_declaration_inside_the_seam_struct_is_not_a_service(self):
         other = Unit("src/util/x.cpp", code={"_Update"})
@@ -182,7 +227,7 @@ class SeamLinkTest(unittest.TestCase):
 
     def test_summary_shows_allowed_counts_per_rule(self):
         text = seamlink.summary([], {("wind_meteors", "const"): 3, ("wind_meteors", "state"): 1})
-        self.assertIn("wind_meteors: allowed references by rule: seam 0, state 1, service 0, bitexact 0, library 0, own 0, const 3", text)
+        self.assertIn("wind_meteors: allowed references by rule: seam 0, state 1, service 0, host 0, bitexact 0, library 0, own 0, const 3", text)
 
     def test_summary_counts_kinds(self):
         link = Unit("link/data.cpp", data={"?g_foo@@3HA"})

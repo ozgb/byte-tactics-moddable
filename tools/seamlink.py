@@ -13,7 +13,8 @@ references is allowed only when it is:
 
   seam          g_seams, or anything interfaces/seams.h declares outside the table struct
   state         g_game, a symbol defined in src/state/, or declared in interfaces/ref.h and not defined elsewhere
-  service       declared in S's interface header (interfaces/<S>.h) outside the seam table struct
+  service       declared at depth 0 in interfaces/services.h, or a member of a class it defines
+  host          declared in interfaces/host.h
   bitexact      a bx_ name, or declared in lib/bitexact/bitexact.h
   library       a symbol no object of the build defines (the CRT, the MSVC 5 libraries, the imports), or
                 one src/util/operator_new.cpp defines (operator new and delete)
@@ -54,9 +55,11 @@ LIBRARY_FILE = "src/util/operator_new.cpp"
 GAME_POINTER = "g_game"
 STATE_CLASSES = "data/state_classes.csv"
 CONST_CLASSES = ("const", "sim")
-KINDS = ("seam", "state", "service", "bitexact", "library", "own", "const")
+KINDS = ("seam", "state", "service", "host", "bitexact", "library", "own", "const")
 STATE_HEADERS = ("interfaces/ref.h",)
 SEAMS_HEADER = "interfaces/seams.h"
+SERVICES_HEADER = "interfaces/services.h"
+HOST_HEADER = "interfaces/host.h"
 BITEXACT_HEADER = "lib/bitexact/bitexact.h"
 SEAM_TABLE = "g_seams"
 REASON = re.compile(r"TODO\(#[0-9]+\): \S")
@@ -126,11 +129,43 @@ def normal(sym: str) -> str:
     return base_name(sym)
 
 
-def declared(text: str) -> set:
-    """The names a header declares outside any braces: functions and extern variables."""
+def clean(text: str) -> str:
+    """The text without comments, preprocessor lines and extern "C" wrappers."""
     text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
     text = re.sub(r"//[^\n]*", " ", text)
     text = re.sub(r"^\s*#[^\n]*(\\\n[^\n]*)*", " ", text, flags=re.M)
+    return re.sub(r'extern\s*"C"\s*\{', " ", text)
+
+
+def members(text: str) -> set:
+    """Class::name for each name declared directly inside the body of a class or struct: member functions, constructors and data."""
+    text = clean(text)
+    out = set()
+    for m in re.finditer(r"\b(?:class|struct)\s+(\w+)\s*(?::[^{;]*)?\{", text):
+        depth, i, start = 1, m.end(), m.end()
+        flat = []
+        while i < len(text) and depth:
+            ch = text[i]
+            if ch == "{":
+                depth += 1
+                flat.append(" ")
+            elif ch == "}":
+                depth -= 1
+                flat.append(";" if depth == 1 else " ")
+            elif depth == 1:
+                flat.append(ch)
+            i += 1
+        for stmt in "".join(flat).split(";"):
+            stmt = re.sub(r"\b(public|private|protected)\s*:", " ", stmt).strip()
+            found = re.search(r"(~?[A-Za-z_]\w*)\s*\(", stmt)
+            if found and not stmt.startswith(("typedef", "friend")):
+                out.add(f"{m.group(1)}::{found.group(1)}")
+    return out
+
+
+def declared(text: str) -> set:
+    """The names a header declares outside any braces: functions and extern variables."""
+    text = clean(text)
     flat, depth = [], 0
     for ch in text:
         if ch == "{":
@@ -166,7 +201,8 @@ class Rules:
     """What the build allows a subsystem, gathered from the tree and the units."""
     function_subsystem: dict
     file_subsystems: dict
-    services: dict
+    services: set
+    host: set
     seams: set
     state_names: set
     bitexact_names: set
@@ -227,11 +263,14 @@ def build_rules(root: Path, units: list) -> Rules:
             code_defs.setdefault(name, set()).add(unit.file)
         for name in unit.data:
             data_defs.setdefault(name, set()).add(unit.file)
-    services = {s: header_names(root, f"interfaces/{s}.h") for s in SIMULATION}
+    services_path = root / SERVICES_HEADER
+    services = header_names(root, SERVICES_HEADER)
+    if services_path.exists():
+        services |= members(services_path.read_text(encoding="latin-1"))
     state = set()
     for header in STATE_HEADERS:
         state |= header_names(root, header)
-    return Rules(by_function, by_file, services, header_names(root, SEAMS_HEADER) | {SEAM_TABLE}, state,
+    return Rules(by_function, by_file, services, header_names(root, HOST_HEADER), header_names(root, SEAMS_HEADER) | {SEAM_TABLE}, state,
                  header_names(root, BITEXACT_HEADER), const_names(root), code_defs, data_defs)
 
 
@@ -247,8 +286,10 @@ def classify(rules: Rules, subsystem: str, symbol: str):
     in_state = all(f.startswith(STATE_DIR) for f in files)
     if (files and in_state) or (in_state and (name in rules.state_names or last in rules.state_names)):
         return "state"
-    if name in rules.services[subsystem] or last in rules.services[subsystem]:
+    if name in rules.services or (last in rules.services and "::" not in name):
         return "service"
+    if name in rules.host:
+        return "host"
     if last.startswith("bx_") or last in rules.bitexact_names:
         return "bitexact"
     if not files or all(f == LIBRARY_FILE for f in files):

@@ -106,6 +106,7 @@ inline void __stdcall swap(_Ty& _X, _Ty& _Y)
 #include <vector>
 #include <map>
 #include <list>
+#include <memory>
 #include <yvals.h>
 
 struct SessionGuidView {

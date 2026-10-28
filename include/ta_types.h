@@ -6277,12 +6277,6 @@ public:
     int SendPacket(void*, int);
 };
 
-class NetPacket {
-public:
-    char unknown_0[1];
-    void DispatchPacket(void);
-};
-
 struct Player_0044feb0 {
     char unknown_0[326];
     unsigned char field_146;
@@ -6305,41 +6299,15 @@ struct Packet_00450f90 {
     Data_0046d970 data;
 };
 
-struct Args_00451640 {
-    char* name;
-    int arg_4;
-    int arg_8;
-    int arg_c;
-    int arg_10;
-    int arg_14;
-    int result;
-};
-
 struct Net2_4517b0 {
     char unknown_0[8];
     char* field_8;
     char* field_c;
 };
 
-struct Net_4517b0 {
-    char unknown_0[4];
-    unsigned int field_4;
-    char* field_8;
-    Net2_4517b0* field_c;
-};
-
 struct Packet_4517b0 {
     unsigned char type;
     Data_0046d970 data;
-};
-
-class Class_00451fd0 {
-public:
-    char unknown_0[2160];
-    unsigned int field_870;
-    char unknown_874[3793];
-    int field_1745;
-    int* field_1749;
 };
 
 struct Class_00452370 {
@@ -6379,14 +6347,6 @@ struct Packet_00452b70 {
 };
 
 #include "../src/network/entry_00463ca0.h"
-
-struct Gui_00453a50 {
-    char unknown_0[4];
-    void* entries;
-    void (__stdcall *callback)(void*);
-    char unknown_c[16];
-    void (__stdcall *field_1c)(void*);
-};
 
 class Class_00456030 {
 public:
@@ -6429,31 +6389,6 @@ struct Settings {
     char unknown_8[72];
 };
 
-struct UnitCreatePacket {
-    unsigned char type;
-    short field_1;
-    short field_3;
-    Vec3 field_5;
-    Rot16 field_11;
-};
-
-struct BuilderLinkPacket {
-    unsigned char type;
-    short field_1;
-    short field_3;
-};
-
-struct UnitScriptCallPacket {
-    unsigned char type;
-    short id;
-    short index;
-    char field_5;
-    int field_6;
-    int field_a;
-    int field_e;
-    int field_12;
-};
-
 struct Packet_00456190 {
     unsigned char type;
     short id;
@@ -6492,11 +6427,6 @@ struct Msg13_00456310 {
     int start_tick;
     int sent_tick;
     int id;
-};
-
-struct Msg20_00456310 {
-    unsigned char type;
-    Data_0046d970 info;
 };
 
 struct Message_004565a0 {
@@ -6570,12 +6500,6 @@ struct Packet_00457540 {
     float field_2e;
     float field_32;
     float field_36;
-};
-
-struct ShareLosAckPacket {
-    unsigned char type;
-    unsigned char flag;
-    unsigned char flag2;
 };
 
 struct Net_4c9f90 {

@@ -2616,7 +2616,7 @@ int HandleNetPackets()
             default:
                 DamageFeature(GetMapCell(damage->x, damage->z),
                              damage->x, damage->z,
-                             (Weapon *)&g_game->weapons[damage->sub]);
+                             &g_game->weapons[damage->sub]);
                 break;
             }
             break;

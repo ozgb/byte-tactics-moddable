@@ -48,7 +48,7 @@ void Class_0043db50::UpdateSfxOccupy(Unit* unit)
                 newState = 1;
             if (unit->def->draft + y == seaLevel)
                 newState = 2;
-            if (unit->def->field_170 + y < seaLevel)
+            if (unit->def->modelMaxYHigh + y < seaLevel)
                 newState = 3;
         }
     } else {

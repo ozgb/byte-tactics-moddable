@@ -86,7 +86,7 @@ void CollectVisibleUnitIds(void)
             int uy = u->yWhole;
             int camy = g_game->scrollY;
             int x1 = ((short*)&def->modelMinX)[1] + ux - g_game->scrollX;
-            int y2 = def->field_170 + uy;
+            int y2 = def->modelMaxYHigh + uy;
             int z1 = ((short*)&def->modelMinZ)[1] + u->zWhole - camy;
             int x2 = ((short*)&def->modelMaxX)[1] + ux - g_game->scrollX;
             int y1 = ((short*)&def->modelMinY)[1] + uy;

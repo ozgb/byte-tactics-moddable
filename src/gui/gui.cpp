@@ -3207,7 +3207,6 @@ void __stdcall DrawHotspot(Dialog_4a4980* obj, int index)
 }
 
 struct Feature;
-struct Weapon;
 struct WeaponDef;
 struct Explosion;
 

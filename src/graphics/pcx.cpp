@@ -539,8 +539,7 @@ int __stdcall GetObjectHeight(Object3doLoadView* node)
     return best;
 }
 
-void __stdcall AddObjectBounds(Object3doLoadView* obj, Vec3* offset,
-                            Vec3* lo, Vec3* hi, int arg);
+#include "pcx.h"
 
 // FUNCTION: 0x4cb650
 void __stdcall GetObjectBounds(Object3doLoadView* obj, Vec3* lo,

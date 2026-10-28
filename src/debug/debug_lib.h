@@ -83,4 +83,6 @@ void __cdecl FreeDebugBlock(void* p, int flags);
 
 void* __stdcall GetBlockMap();
 
+LeftChainNode* __cdecl FindLeftmost(LeftChainNode* p);
+
 #endif

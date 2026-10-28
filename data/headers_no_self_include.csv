@@ -4,7 +4,6 @@ src/frontend/skirmish_menu.cpp,"own header is a presentation or host header that
 src/graphics/display.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/graphics/font.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/graphics/movies.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
-src/graphics/pcx.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/gui/gui_file.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/gui/keyboard.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/gui/listbox.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"

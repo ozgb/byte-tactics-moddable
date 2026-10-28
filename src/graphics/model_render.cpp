@@ -82,9 +82,7 @@ int DrawWrappedText(char*, char*, int, int, int, int, int);
 void ScaleUnitWeights(int, unsigned int*, float, int);
 
 void* __stdcall AllocDepthFrame(const char* name, int width, int height);
-Vec3f __stdcall VectorFromToInt(Vec3 a, Vec3 b);
-Vec3f __stdcall CrossProduct(Vec3f a, Vec3f b);
-Vec3f __stdcall NormalizeVector(Vec3f v);
+#include "../util/math.h"
 void* __stdcall GetGafSequenceFrame(void** pic);
 void* __stdcall GetGafFrame(unsigned short* table, int index);
 #include "gaf.h"
@@ -98,7 +96,6 @@ int __stdcall GetGroundHeight(FixedVec3Parts* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
 void __stdcall TintFrameBelow(GafFrame* param_1, int value);
 void __stdcall CutFrameBelow(GafFrame* param_1, int value);
-void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 #include "model_render.h"
 
 // FUNCTION: 0x458160

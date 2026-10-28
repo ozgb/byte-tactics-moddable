@@ -60,7 +60,7 @@ void SfxOccupyTracker::UpdateSfxOccupy(Unit* unit)
     }
 }
 
-void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
+#include "../util/math.h"
 
 struct PieceBase {
     char unknown_0[0x10];

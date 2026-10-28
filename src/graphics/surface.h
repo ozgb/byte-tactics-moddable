@@ -2,6 +2,8 @@
 #define SURFACE_H
 
 #include "rect.h"
+struct DirectDrawSurfaceRefs;
+
 class HapiBank;
 struct GafFrame;
 struct Point;
@@ -59,5 +61,7 @@ Surface* __stdcall LoadSurface(HapiBank* file);
 void __stdcall DrawQuadRow(int row, int* rect, Surface* surf, GafFrame* info);
 void __stdcall DrawTexturedPolygon(GafFrame* target, GafFrame* texture, int* vertices, int* coords);
 void __stdcall DrawLitTexturedPolygon(GafFrame* target, GafFrame* texture, int* vertices, int* coords);
+
+int __stdcall RestoreSurfaces(DirectDrawSurfaceRefs* arg);
 
 #endif

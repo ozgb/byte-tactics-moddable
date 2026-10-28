@@ -188,6 +188,7 @@ src/graphics/particles.cpp,src/graphics/timed_sub_particles.h,#392
 src/graphics/pcx.cpp,interfaces/host.h,#392
 src/graphics/pcx.cpp,src/graphics/display.h,#392
 src/graphics/pcx.cpp,src/graphics/object_pool.h,#392
+src/graphics/pcx.cpp,src/graphics/pcx.h,#392
 src/graphics/pcx.cpp,src/graphics/surface.h,#392
 src/graphics/surface.cpp,interfaces/host.h,#392
 src/graphics/surface.cpp,src/graphics/display.h,#392

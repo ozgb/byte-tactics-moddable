@@ -1,5 +1,8 @@
 #ifndef GAF_H
 #define GAF_H
+struct GafDurationCursor;
+struct GafFrameCountCursor;
+
 struct GafFrame;
 struct Surface;
 
@@ -29,5 +32,8 @@ void __stdcall DrawLens(void* dst, GafFrame* sprite, int x, int y);
 void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y, double sx, double sy);
 void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double sx, double sy);
 void __stdcall DrawFrameLit(Surface* surface, GafFrame* frame, int x, int y, int paletteRow);
+
+int __stdcall SetGafSequenceFrame(GafFrameCountCursor* obj, int index);
+unsigned short __stdcall GetGafFrameDuration(GafDurationCursor* param1);
 
 #endif

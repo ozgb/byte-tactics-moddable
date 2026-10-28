@@ -196,10 +196,6 @@ void __stdcall FillPolygon(void* surface, Point* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src);
 #include "../util/math.h"
 int __stdcall StepGafSequence(GafRef* ref);
-void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
-Vec3f __stdcall VectorFromTo(Vec3f from, Vec3f to);
-Vec3f __stdcall CrossProduct(Vec3f a, Vec3f b);
-Vec3f __stdcall NormalizeVector(Vec3f v);
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
 void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int flag);

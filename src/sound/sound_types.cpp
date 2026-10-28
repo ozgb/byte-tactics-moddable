@@ -37,7 +37,7 @@ int __cdecl GameReallocTagged(int block, char* name, int size);
 #include "../graphics/object_pool.h"
 #include "../debug/debug_lib.h"
 #include "../game/data_files.h"
-int __stdcall ReadSoundEntry(TdfFileCursorView* source, char* key, int* out);
+#include "sound_types.h"
 #include "sound_types.h"
 #include "sound.h"
 

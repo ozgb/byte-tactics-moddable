@@ -1,5 +1,7 @@
 #ifndef MODEL_RENDER_H
 #define MODEL_RENDER_H
+struct CountedList;
+
 struct ModelState;
 struct Object3do;
 struct UnitDrawView;
@@ -22,5 +24,7 @@ void __fastcall PoseModel(ModelState* model, ModelPiece* piece, int force);
 
 ModelState* __stdcall CreateObjectState(Object3do* obj);
 void __stdcall UpdateObjectState(UnitDrawView* unit);
+
+void __stdcall DecrementCountArgument(int, CountedList* list, int);
 
 #endif

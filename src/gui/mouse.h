@@ -2,7 +2,7 @@
 #define MOUSE_H
 struct MouseDisplay;
 
-struct MouseEvent;
+#include "mouse_event.h"
 
 void __stdcall DrawSoftwareCursor();
 void __cdecl MouseThreadProc(int param);

@@ -107,7 +107,7 @@ struct DisplayAppView {
 };
 #pragma pack(pop)
 
-#include "display_mode.h"
+#include "../../include/display_mode.h"
 
 struct DisplayModeTable {
     int count;

@@ -3,7 +3,7 @@
 #include "../../interfaces/host.h"
 
 #include "../graphics/gaf_frame.h"
-#include "mouse_event.h"
+#include "mouse.h"
 
 #pragma pack(push, 2)
 

@@ -537,7 +537,7 @@ struct LogoSelectClickLayout {
     void* seqs;
 };
 
-#include "../graphics/display_mode.h"
+#include "../../include/display_mode.h"
 
 struct ModeList {
     int count;

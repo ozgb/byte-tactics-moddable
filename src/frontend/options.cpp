@@ -11,7 +11,7 @@ extern "C" __declspec(dllimport) int __cdecl wsprintfA(char* out, const char* fo
 #include "../map/mission.h"
 
 #include "../graphics/memory_cache.h"
-#include "../graphics/display_mode.h"
+#include "../../include/display_mode.h"
 
 struct Gui;
 struct Dialog;

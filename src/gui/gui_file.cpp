@@ -61,7 +61,7 @@ void __stdcall WriteKeyValue(FileHandle* file, char* key, char* value, int depth
 #pragma auto_inline(on)
 
 #pragma pack(push, 1)
-struct Sub34_004aeac0 {
+struct GuiFileRangeTail {
     short range;
     short maxchars;
     char pad0[0x13c - 0x13a];
@@ -72,18 +72,18 @@ struct Sub34_004aeac0 {
     char pad1[0x15b - 0x148];
 };
 
-struct Sub5_004aeac0 {
+struct GuiFileLinkTail {
     char link[0x11];
     char hotkey;
     char pad0[0x15b - 0x148];
 };
 
-union Tail_004aeac0 {
-    Sub34_004aeac0 s34;
-    Sub5_004aeac0 s5;
+union GuiFileTail {
+    GuiFileRangeTail s34;
+    GuiFileLinkTail s5;
 };
 
-struct Common_004ad350 {
+struct GuiFileCommonFields {
     unsigned char id;
     unsigned char assoc;
     char name[0x11];
@@ -102,13 +102,13 @@ struct Common_004ad350 {
     char help[0x81];
     unsigned short gaffile;
     char text[0x80];
-    Tail_004aeac0 tail;
+    GuiFileTail tail;
 };
 #pragma pack(pop)
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4ace50
-void __stdcall WriteCommonFields(Common_004ad350* obj, FileHandle* out, int indent)
+void __stdcall WriteCommonFields(GuiFileCommonFields* obj, FileHandle* out, int indent)
 {
     char tab;
     char* value;
@@ -198,7 +198,7 @@ void __stdcall WriteCommonFields(Common_004ad350* obj, FileHandle* out, int inde
 #pragma auto_inline(on)
 
 // FUNCTION: 0x4ad350
-void __stdcall ReadCommonSection(Common_004ad350* obj, TdfFile* tree)
+void __stdcall ReadCommonSection(GuiFileCommonFields* obj, TdfFile* tree)
 {
     if (tree->SelectRecord("COMMON") == 1) {
         obj->id = (unsigned char)tree->current->GetFieldInt("id", 0);
@@ -223,7 +223,7 @@ void __stdcall ReadCommonSection(Common_004ad350* obj, TdfFile* tree)
     }
 }
 
-struct Obj_004ad4f0 {
+struct WritePanelFieldsRecord {
     char unknown_0[0xb6];
     short totalgadgets;
     char unknown_0xb8[0x11];
@@ -238,7 +238,7 @@ struct Obj_004ad4f0 {
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4ad4f0
-void __stdcall WritePanelFields(Obj_004ad4f0* obj, FileHandle* out, int indent)
+void __stdcall WritePanelFields(WritePanelFieldsRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -313,7 +313,7 @@ void __stdcall WritePanelFields(Obj_004ad4f0* obj, FileHandle* out, int indent)
 #pragma auto_inline(on)
 
 #pragma pack(push, 1)
-struct Obj_004ad890 {
+struct ReadPanelFieldsRecord {
     char unknown_0[0xb6];
     short totalGadgets;
     char unknown_b8[0x11];
@@ -328,7 +328,7 @@ struct Obj_004ad890 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4ad890
-void __stdcall ReadPanelFields(Obj_004ad890* obj, TdfFile* src)
+void __stdcall ReadPanelFields(ReadPanelFieldsRecord* obj, TdfFile* src)
 {
     obj->totalGadgets = (short)src->current->GetFieldInt("totalgadgets", 0);
     src->current->GetFieldString(obj->panel, "panel", 0x10, DAT_005119b8);
@@ -342,13 +342,13 @@ void __stdcall ReadPanelFields(Obj_004ad890* obj, TdfFile* src)
     }
 }
 
-struct Struct_004ad980 {
+struct WriteStatusFieldRecord {
     char unknown_0[0xb6];
     short status;
 };
 
 // FUNCTION: 0x4ad980
-void __stdcall WriteStatusField(Struct_004ad980* obj, FileHandle* out, int indent)
+void __stdcall WriteStatusField(WriteStatusFieldRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -361,24 +361,24 @@ void __stdcall WriteStatusField(Struct_004ad980* obj, FileHandle* out, int inden
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct StructA_004ada10 {
+struct ReadStatusFieldRecord {
     char unknown_0[0xb6];
     short status;
 };
 
-struct StructB_004ada10 {
+struct ReadStatusFieldSource {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
 // FUNCTION: 0x4ada10
-void __stdcall ReadStatusField(StructA_004ada10* a, StructB_004ada10* b)
+void __stdcall ReadStatusField(ReadStatusFieldRecord* a, ReadStatusFieldSource* b)
 {
     a->status = (short)b->tdf->GetFieldInt("status", 0);
 }
 
 #pragma pack(push, 2)
-struct Obj_004ada40 {
+struct WriteButtonFieldsRecord {
     char unknown_0[0xb6];
     char text[0x80];
     unsigned char stages;
@@ -390,7 +390,7 @@ struct Obj_004ada40 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4ada40
-void __stdcall WriteButtonFields(Obj_004ada40* obj, FileHandle* out, int indent)
+void __stdcall WriteButtonFields(WriteButtonFieldsRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -433,12 +433,12 @@ void __stdcall WriteButtonFields(Obj_004ada40* obj, FileHandle* out, int indent)
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004adc70 {
+struct ReadButtonFieldsSource {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
-struct Obj_004adc70 {
+struct ReadButtonFieldsRecord {
     char unknown_0[0xb6];
     char text[0x80];
     unsigned char stages;
@@ -450,7 +450,7 @@ struct Obj_004adc70 {
 };
 
 // FUNCTION: 0x4adc70
-void __stdcall ReadButtonFields(Obj_004adc70* obj, Source_004adc70* src)
+void __stdcall ReadButtonFields(ReadButtonFieldsRecord* obj, ReadButtonFieldsSource* src)
 {
     obj->status = (short)src->tdf->GetFieldInt("status", 0);
     memset(obj->text, 0, 0x80);
@@ -467,13 +467,13 @@ void __stdcall ReadButtonFields(Obj_004adc70* obj, Source_004adc70* src)
     obj->stages = (unsigned char)src->tdf->GetFieldInt("stages", 0);
 }
 
-struct Struct_004add60 {
+struct WriteListBoxFieldsRecord {
     char unknown_0[0xda];
     short itemheight;
 };
 
 // FUNCTION: 0x4add60
-void __stdcall WriteListBoxFields(Struct_004add60* obj, FileHandle* out, int indent)
+void __stdcall WriteListBoxFields(WriteListBoxFieldsRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -486,13 +486,13 @@ void __stdcall WriteListBoxFields(Struct_004add60* obj, FileHandle* out, int ind
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Param2_004addf0 {
+struct ReadListBoxFieldsSource {
     char unknown_0[4];
     TdfRecord* obj;
 };
 
 #pragma pack(push, 2)
-struct Struct_004addf0 {
+struct ReadListBoxFieldsRecord {
     char unknown_0[0xce];
     int callback;
     char unknown_d2[4];
@@ -502,7 +502,7 @@ struct Struct_004addf0 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4addf0
-void __stdcall ReadListBoxFields(Struct_004addf0* param1, Param2_004addf0* param2)
+void __stdcall ReadListBoxFields(ReadListBoxFieldsRecord* param1, ReadListBoxFieldsSource* param2)
 {
     param1->callback = 0;
     param1->user = 0;
@@ -510,7 +510,7 @@ void __stdcall ReadListBoxFields(Struct_004addf0* param1, Param2_004addf0* param
 }
 
 #pragma pack(push, 1)
-struct Obj_004ade20 {
+struct WriteTextInputFieldsRecord {
     char unknown_0[0xb6];
     char text[0x82];
     short maxchars;
@@ -518,7 +518,7 @@ struct Obj_004ade20 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4ade20
-void __stdcall WriteTextInputFields(Obj_004ade20* obj, FileHandle* out, int indent)
+void __stdcall WriteTextInputFields(WriteTextInputFieldsRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -537,13 +537,13 @@ void __stdcall WriteTextInputFields(Obj_004ade20* obj, FileHandle* out, int inde
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004adf10 {
+struct ReadTextInputFieldsSource {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
 #pragma pack(push, 1)
-struct Obj_004adf10 {
+struct ReadTextInputFieldsRecord {
     char unknown_0[0xb6];
     char text[0x82];
     short maxchars;
@@ -551,7 +551,7 @@ struct Obj_004adf10 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4adf10
-void __stdcall ReadTextInputFields(Obj_004adf10* obj, Source_004adf10* src)
+void __stdcall ReadTextInputFields(ReadTextInputFieldsRecord* obj, ReadTextInputFieldsSource* src)
 {
     obj->maxchars = src->tdf->GetFieldInt("maxchars", 0);
     if (obj->maxchars > 0x80)
@@ -561,7 +561,7 @@ void __stdcall ReadTextInputFields(Obj_004adf10* obj, Source_004adf10* src)
 }
 
 #pragma pack(push, 1)
-struct Obj_004ae170 {
+struct SliderFieldsRecord {
     char unknown_0[0xb6];
     char text[0x80];
     short range;
@@ -574,7 +574,7 @@ struct Obj_004ae170 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4adf90
-void __stdcall WriteSliderFields(Obj_004ae170* obj, FileHandle* out, int indent)
+void __stdcall WriteSliderFields(SliderFieldsRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -610,13 +610,13 @@ void __stdcall WriteSliderFields(Obj_004ae170* obj, FileHandle* out, int indent)
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae170 {
+struct ReadSliderFieldsSource {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
 // FUNCTION: 0x4ae170
-void __stdcall ReadSliderFields(Obj_004ae170* obj, Source_004ae170* src)
+void __stdcall ReadSliderFields(SliderFieldsRecord* obj, ReadSliderFieldsSource* src)
 {
     obj->range = src->tdf->GetFieldInt("range", 0);
     obj->thick = (short)src->tdf->GetFieldInt("thick", 0);
@@ -627,14 +627,14 @@ void __stdcall ReadSliderFields(Obj_004ae170* obj, Source_004ae170* src)
     strcpy(obj->text, Translate(obj->text));
 }
 
-struct Obj_004ae230 {
+struct WriteTextLinkFieldsRecord {
     char unknown_0[0xb6];
     char text[0x80];
     char link[0x80];
 };
 
 // FUNCTION: 0x4ae230
-void __stdcall WriteTextLinkFields(Obj_004ae230* obj, FileHandle* out, int indent)
+void __stdcall WriteTextLinkFields(WriteTextLinkFieldsRecord* obj, FileHandle* out, int indent)
 {
     char line[100];
     WriteTabsInline(out, indent);
@@ -645,13 +645,13 @@ void __stdcall WriteTextLinkFields(Obj_004ae230* obj, FileHandle* out, int inden
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae300 {
+struct ReadTextLinkFieldsSource {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
 #pragma pack(push, 1)
-struct Obj_004ae300 {
+struct ReadTextLinkFieldsRecord {
     char unknown_0[0xb6];
     char text[0x80];
     char link[0x11];
@@ -660,7 +660,7 @@ struct Obj_004ae300 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4ae300
-void __stdcall ReadTextLinkFields(Obj_004ae300* obj, Source_004ae300* src)
+void __stdcall ReadTextLinkFields(ReadTextLinkFieldsRecord* obj, ReadTextLinkFieldsSource* src)
 {
     obj->hotkey = 0;
     obj->link[0] = 0;
@@ -670,13 +670,13 @@ void __stdcall ReadTextLinkFields(Obj_004ae300* obj, Source_004ae300* src)
     src->tdf->GetFieldString(obj->link, "link", 0x10, DAT_005119b8);
 }
 
-struct Obj_004ae380 {
+struct WriteHotOrNotFieldRecord {
     char unknown_0[0xc8];
     unsigned int hotornot : 1;
 };
 
 // FUNCTION: 0x4ae380
-void __stdcall WriteHotOrNotField(Obj_004ae380* obj, FileHandle* out, int indent)
+void __stdcall WriteHotOrNotField(WriteHotOrNotFieldRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -689,30 +689,30 @@ void __stdcall WriteHotOrNotField(Obj_004ae380* obj, FileHandle* out, int indent
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae410 {
+struct ReadHotOrNotFieldSource {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
-struct Obj_004ae410 {
+struct ReadHotOrNotFieldRecord {
     char unknown_0[0xc8];
     unsigned int hotornot : 1;
 };
 
 // FUNCTION: 0x4ae410
-void __stdcall ReadHotOrNotField(Obj_004ae410* obj, Source_004ae410* src)
+void __stdcall ReadHotOrNotField(ReadHotOrNotFieldRecord* obj, ReadHotOrNotFieldSource* src)
 {
     int value = src->tdf->GetFieldInt("hotornot", 0);
     obj->hotornot = value;
 }
 
-struct Obj_004ae440 {
+struct WriteFontFilenameFieldRecord {
     char unknown_0[0xb6];
     char text[0x80];
 };
 
 // FUNCTION: 0x4ae440
-void __stdcall WriteFontFilenameField(Obj_004ae440* obj, FileHandle* out, int indent)
+void __stdcall WriteFontFilenameField(WriteFontFilenameFieldRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -723,31 +723,31 @@ void __stdcall WriteFontFilenameField(Obj_004ae440* obj, FileHandle* out, int in
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae4b0 {
+struct ReadFontFilenameFieldSource {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
 #pragma pack(push, 1)
-struct Obj_004ae4b0 {
+struct ReadFontFilenameFieldRecord {
     char unknown_0[0xb6];
     char text[0x80];
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x4ae4b0
-void __stdcall ReadFontFilenameField(Obj_004ae4b0* obj, Source_004ae4b0* src)
+void __stdcall ReadFontFilenameField(ReadFontFilenameFieldRecord* obj, ReadFontFilenameFieldSource* src)
 {
     src->tdf->GetFieldString(obj->text, "filename", 0x20, DAT_005119b8);
 }
 
-struct Obj_004ae4e0 {
+struct WriteSurfFilenameFieldRecord {
     char unknown_0[0xb6];
     char text[0x80];
 };
 
 // FUNCTION: 0x4ae4e0
-void __stdcall WriteSurfFilenameField(Obj_004ae4e0* obj, FileHandle* out, int indent)
+void __stdcall WriteSurfFilenameField(WriteSurfFilenameFieldRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -758,33 +758,33 @@ void __stdcall WriteSurfFilenameField(Obj_004ae4e0* obj, FileHandle* out, int in
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae550 {
+struct ReadSurfFilenameFieldSource {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
 #pragma pack(push, 1)
-struct Obj_004ae550 {
+struct ReadSurfFilenameFieldRecord {
     char unknown_0[0xb6];
     char text[0x80];
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x4ae550
-void __stdcall ReadSurfFilenameField(Obj_004ae550* obj, Source_004ae550* src)
+void __stdcall ReadSurfFilenameField(ReadSurfFilenameFieldRecord* obj, ReadSurfFilenameFieldSource* src)
 {
     src->tdf->GetFieldString(obj->text, "filename", 0x20, DAT_005119b8);
 }
 
 #pragma pack(push, 1)
-struct Obj_004ae580 {
+struct WriteNuttinFieldRecord {
     char unknown_0[0xb6];
     int nuttin;
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x4ae580
-void __stdcall WriteNuttinField(Obj_004ae580* obj, FileHandle* out, int indent)
+void __stdcall WriteNuttinField(WriteNuttinFieldRecord* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
@@ -798,19 +798,19 @@ void __stdcall WriteNuttinField(Obj_004ae580* obj, FileHandle* out, int indent)
 }
 
 #pragma pack(push, 1)
-struct StructA_004ae610 {
+struct ReadNuttinFieldRecord {
     char unknown_0[0xb6];
     int nuttin;
 };
 #pragma pack(pop)
 
-struct StructB_004ae610 {
+struct ReadNuttinFieldSource {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
 // FUNCTION: 0x4ae610
-void __stdcall ReadNuttinField(StructA_004ae610* a, StructB_004ae610* b)
+void __stdcall ReadNuttinField(ReadNuttinFieldRecord* a, ReadNuttinFieldSource* b)
 {
     a->nuttin = b->tdf->GetFieldInt("nuttin", 0);
 }
@@ -854,7 +854,7 @@ void __stdcall WriteGuiFile(char* obj, char* name)
         HAPI_WriteFile(out, (void*)"\n", 1);
         WriteTabs(out, 2);
         HAPI_WriteFile(out, (void*)"{\n", 2);
-        WriteCommonFields((Common_004ad350*)p, out, 2);
+        WriteCommonFields((GuiFileCommonFields*)p, out, 2);
         {
             int j = 2;
             char t2 = '\t';
@@ -863,7 +863,7 @@ void __stdcall WriteGuiFile(char* obj, char* name)
         HAPI_WriteFile(out, (void*)"}\n", 2);
         switch (*(unsigned char*)p) {
         case 0:
-            WritePanelFields((Obj_004ad4f0*)p, out, 1);
+            WritePanelFields((WritePanelFieldsRecord*)p, out, 1);
             break;
         case 1:
             WriteKeyValue(out, "status", _itoa(*(short*)(p + 0x138), button, 10), 1);
@@ -912,7 +912,7 @@ void __stdcall WriteGuiFile(char* obj, char* name)
 }
 
 #pragma pack(push, 1)
-struct Sub2_004aeac0 {
+struct GuiFileListBoxBody {
     char pad0[0xce - 0xb6];
     int callback;
     char pad1[0xd6 - 0xce - 4];
@@ -921,30 +921,30 @@ struct Sub2_004aeac0 {
     char pad2[0x136 - 0xdc];
 };
 
-struct Sub6_004aeac0 {
+struct GuiFileHotOrNotBody {
     char pad0[0xc8 - 0xb6];
     unsigned int hotornot : 1;
     char pad1[0x136 - 0xcc];
 };
 
-union Body_004aeac0 {
+union GuiFileBody {
     char text[0x80];
     int nuttin;
     short total;
-    Sub2_004aeac0 s2;
-    Sub6_004aeac0 s6;
+    GuiFileListBoxBody s2;
+    GuiFileHotOrNotBody s6;
 };
 
-struct Elem_004aeac0 {
+struct GuiFileGadget {
     unsigned char type;
     char pad0[0xb6 - 0x001];
-    Body_004aeac0 body;
-    Tail_004aeac0 tail;
+    GuiFileBody body;
+    GuiFileTail tail;
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x4aeac0
-int __stdcall ReadGuiFile(Elem_004aeac0* obj, char* name)
+int __stdcall ReadGuiFile(GuiFileGadget* obj, char* name)
 {
     TdfFile parser;
     int i;
@@ -959,15 +959,15 @@ int __stdcall ReadGuiFile(Elem_004aeac0* obj, char* name)
             if (!(&parser)->SelectRecordAt(i))
                 break;
             int cur = (&parser)->GetCurrentRecord();
-            Elem_004aeac0* e = obj + i;
-            ReadCommonSection((Common_004ad350*)e, &parser);
+            GuiFileGadget* e = obj + i;
+            ReadCommonSection((GuiFileCommonFields*)e, &parser);
             (&parser)->SetCurrentRecord(cur);
             switch (e->type) {
             case 0:
-                ReadPanelFields((Obj_004ad890*)e, &parser);
+                ReadPanelFields((ReadPanelFieldsRecord*)e, &parser);
                 break;
             case 1:
-                ReadButtonFields((Obj_004adc70*)e, (Source_004adc70*)&parser);
+                ReadButtonFields((ReadButtonFieldsRecord*)e, (ReadButtonFieldsSource*)&parser);
                 break;
             case 2:
                 e->body.s2.callback = 0;
@@ -1022,14 +1022,14 @@ int __stdcall ReadGuiFile(Elem_004aeac0* obj, char* name)
     return ret;
 }
 
-struct Obj_004aeda0 {
+struct FreeGafSlotDialog {
     char unknown_0[8];
     int* buffers[3];
     int activeFontGaf;
 };
 
 // FUNCTION: 0x4aeda0
-void __stdcall FreeGafSlot(Obj_004aeda0* obj, int i)
+void __stdcall FreeGafSlot(FreeGafSlotDialog* obj, int i)
 {
     if (obj->buffers[i] != 0) {
         GameFreeThunk(obj->buffers[i]);
@@ -1038,13 +1038,13 @@ void __stdcall FreeGafSlot(Obj_004aeda0* obj, int i)
     }
 }
 
-struct Table_004aedd0 {
+struct LoadGafIntoSlotGafTable {
     unsigned short count;
     char unknown_2[0x28 - 0x2];
     void* entries[1];
 };
 
-struct Object_004aedd0 {
+struct LoadGafIntoSlotDialog {
     char unknown_0[8];
     void* items[1];
     char unknown_c[0x14 - 0xc];
@@ -1054,7 +1054,7 @@ struct Object_004aedd0 {
 };
 
 // FUNCTION: 0x4aedd0
-void __stdcall LoadGafIntoSlot(Object_004aedd0* obj, char* name, int index)
+void __stdcall LoadGafIntoSlot(LoadGafIntoSlotDialog* obj, char* name, int index)
 {
     int unknown;
     char path[256];
@@ -1064,7 +1064,7 @@ void __stdcall LoadGafIntoSlot(Object_004aedd0* obj, char* name, int index)
     if (HAPI_FileLengthByName(path)) {
         void* gaf = LoadGaf(path);
         obj->items[index] = gaf;
-        Table_004aedd0* table = *(Table_004aedd0**)((char*)gaf + 0xc);
+        LoadGafIntoSlotGafTable* table = *(LoadGafIntoSlotGafTable**)((char*)gaf + 0xc);
         char* e = (char*)GetGafFrame(table, 0x49);
         int d;
         if (e)
@@ -1083,7 +1083,7 @@ void __stdcall LoadGafIntoSlot(Object_004aedd0* obj, char* name, int index)
     }
 }
 
-struct Object_004aeee0 {
+struct LoadGafFileDialog {
     int font;
     void* gaf;
     char unknown_8[0xab6 - 0x8];
@@ -1091,7 +1091,7 @@ struct Object_004aeee0 {
 };
 
 // FUNCTION: 0x4aeee0
-void __stdcall LoadGafFile(Object_004aeee0* obj, char* name)
+void __stdcall LoadGafFile(LoadGafFileDialog* obj, char* name)
 {
     char path[256];
     strncpy(path, obj->dir, 0x100);
@@ -1102,13 +1102,13 @@ void __stdcall LoadGafFile(Object_004aeee0* obj, char* name)
     }
 }
 
-struct Obj_004aef80 {
+struct FreeCommonGuiGafDialog {
     char unknown_0[4];
     int* gaf;
 };
 
 // FUNCTION: 0x4aef80
-void __stdcall FreeCommonGuiGaf(Obj_004aef80* obj)
+void __stdcall FreeCommonGuiGaf(FreeCommonGuiGafDialog* obj)
 {
     if (obj->gaf) {
         GameFreeThunk(obj->gaf);

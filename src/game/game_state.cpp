@@ -424,12 +424,12 @@ void InitGame()
     g_game->maxUnits_37eec = (unsigned short)(limit);
 }
 
-struct Obj_004aeda0;
-struct Obj_004aef80;
+struct FreeGafSlotDialog;
+struct FreeCommonGuiGafDialog;
 struct Class_00452370;
 
-void __stdcall FreeGafSlot(Obj_004aeda0* obj, int i);
-void __stdcall FreeCommonGuiGaf(Obj_004aef80* obj);
+void __stdcall FreeGafSlot(FreeGafSlotDialog* obj, int i);
+void __stdcall FreeCommonGuiGaf(FreeCommonGuiGafDialog* obj);
 void ShutdownSound();
 void __stdcall ReleasePacketData(Class_00452370* obj);
 
@@ -441,9 +441,9 @@ void ShutdownGame(void)
     }
     WriteGameRegistryValue((void*)"CDLISTS", &g_cdListsDiscEntries, 0xaa0);
     FreePictureCache();
-    FreeGafSlot((Obj_004aeda0*)&g_game->gui, 1);
-    FreeGafSlot((Obj_004aeda0*)&g_game->gui, 0);
-    FreeCommonGuiGaf((Obj_004aef80*)&g_game->gui);
+    FreeGafSlot((FreeGafSlotDialog*)&g_game->gui, 1);
+    FreeGafSlot((FreeGafSlotDialog*)&g_game->gui, 0);
+    FreeCommonGuiGaf((FreeCommonGuiGafDialog*)&g_game->gui);
     FreeLogos();
     FreeSideFonts();
     FreeSounds();

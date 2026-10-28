@@ -14,6 +14,7 @@
 #include "../src/units/squad.h"
 #include "../src/util/vec3.h"
 #include "../src/units/unit_ref.h"
+#include "../src/graphics/surface.h"
 #include "../src/network/packet_ring.h"
 #include "../src/network/packet_receiver.h"
 #include "../src/network/packet_manager.h"
@@ -6178,23 +6179,6 @@ public:
     char unknown_0[1];
     int ShadeByIntensity(Surface_004c0a90*, SpotState*);
     void RecolorByShade(Surface_004c0a90*, unsigned char, int, int, int);
-};
-
-struct Surface {
-    int width;
-    int height;
-    int pitch;
-    unsigned char* pixels;
-    int field_10;
-    int field_14;
-    unsigned short x;
-    unsigned short y;
-    Rect clip;
-    unsigned int flag0 : 1;
-    unsigned int flag1 : 1;
-    unsigned int : 30;
-    Rect* GetClipRect(Rect*);
-    void Unlock(void);
 };
 
 struct Surface_004c0a90 {

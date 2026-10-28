@@ -597,7 +597,6 @@ extern int Pad_497f40_e0;
 // FUNCTION: 0x497f40
 void LoadingScreenFrame(void)
 {
-    struct Surface { int width, height; char unknown_8[0x28]; };
     Surface gadget;
     char buf[128];
     char aux[256];

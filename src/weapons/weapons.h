@@ -1,5 +1,16 @@
 #ifndef WEAPONS_H
 #define WEAPONS_H
+struct FireByFlagsSlotView;
+struct MotionFireSlotView;
+struct Projectile;
+struct RemoteFireEventView;
+struct RockSourceSlotView;
+struct RockUnitView;
+struct Unit;
+struct UnitWeaponSlot;
+struct Vec3;
+struct WeaponFireUnitView;
+
 struct Projectile;
 struct Unit;
 
@@ -38,5 +49,14 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj);
 int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit, Unit* target, Vec3* point);
 
 void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit);
+
+void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, WeaponFireUnitView* source, WeaponFireUnitView* target, Vec3* a, Vec3* b);
+void __stdcall BroadcastWeaponFire(char, Vec3* a, Vec3* b);
+void __stdcall RockUnit(RockUnitView* obj, RockSourceSlotView* src);
+void __stdcall ApplyAreaDamageAt(void* owner, Vec3* pos);
+void __stdcall RemoveUnitProjectiles(Unit* owner);
+int __stdcall SpawnProjectileFromUnitMotion(MotionFireSlotView* shot, Unit* unit, Vec3* pos);
+int __stdcall FireWeaponByFlags(FireByFlagsSlotView* obj, int a, int b, int d, int c);
+Projectile* __stdcall FindRemoteProjectile(RemoteFireEventView* ev);
 
 #endif

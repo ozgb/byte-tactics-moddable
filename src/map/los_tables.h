@@ -2,6 +2,8 @@
 #define LOS_TABLES_H
 
 #include "../util/string_ref.h"
+struct LosLineData;
+
 struct StringValueElem;
 
 struct LosStep;
@@ -54,5 +56,7 @@ StringValueElem* __stdcall AssignRangeBack(StringValueElem*, StringValueElem*, S
 void __stdcall DestroyPoint(int);
 
 void __stdcall StoreDwordIfDst(int*, int*);
+
+void __stdcall DestroyLine(LosLineData* p);
 
 #endif

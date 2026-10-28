@@ -7051,20 +7051,20 @@ address,function,file,kind,target
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Object3D::faces
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Object3D::firstFace
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Object3D::vertexCount
-0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Off_004211d0::a
-0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Off_004211d0::b
-0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Off_004211d0::y
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,PieceRec::desc
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,PieceRec::verts
+0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,PieceScreenOffset::a
+0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,PieceScreenOffset::b
+0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,PieceScreenOffset::y
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Player::info
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,PlayerInfo::color
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Unit::player
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Vec3::x
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Vec3::y
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_read,Vec3::z
-0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_write,Off_004211d0::a
-0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_write,Off_004211d0::b
-0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_write,Off_004211d0::y
+0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_write,PieceScreenOffset::a
+0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_write,PieceScreenOffset::b
+0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_write,PieceScreenOffset::y
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_write,Point::x
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,field_write,Point::y
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,function,
@@ -7287,21 +7287,21 @@ address,function,file,kind,target
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,LoadFeatureType
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,SimAllocTagged
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,memset
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,operator AnimEntry_00421f20 *
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,operator FeatureUnit_00421f20 *
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,operator FeatureAnimEntry *
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,operator FeaturePseudoUnit *
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,operator->
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,operator=
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_escape,Game::anim
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_maybe_written,TntFeatureName::name
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeatureAnimPool::anim
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeatureAnimPool::featureUnit
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeatureUnit_00421f20::flags_110
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeatureUnit_00421f20::flags_114
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeaturePseudoUnit::flags_110
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeaturePseudoUnit::flags_114
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,Game::defs
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,TntInfo::featureCount
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,TntInfo::featureNames
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,AnimEntry_00421f20::next
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,AnimEntry_00421f20::prev
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureAnimEntry::next
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureAnimEntry::prev
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureAnimPool::activeHead
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureAnimPool::anim
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureAnimPool::featureUnit
@@ -7309,10 +7309,10 @@ address,function,file,kind,target
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureAnimPool::idleHead
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureAnimPool::nameCount
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureAnimPool::names
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureUnit_00421f20::def
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureUnit_00421f20::flags_110
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureUnit_00421f20::flags_114
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureUnit_00421f20::unitDefIndex
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeaturePseudoUnit::def
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeaturePseudoUnit::flags_110
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeaturePseudoUnit::flags_114
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeaturePseudoUnit::unitDefIndex
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,function,
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,global_read,g_game
 0x422040,StampFeatureMetal,src/map/features.cpp,call,operator Cell *
@@ -7371,7 +7371,7 @@ address,function,file,kind,target
 0x4222e0,LoadFeatureFileList,src/map/features.cpp,call,operator delete
 0x4222e0,LoadFeatureFileList,src/map/features.cpp,call,operator new
 0x4222e0,LoadFeatureFileList,src/map/features.cpp,call,push_back
-0x4222e0,LoadFeatureFileList,src/map/features.cpp,field_read,Class_004c9390::data
+0x4222e0,LoadFeatureFileList,src/map/features.cpp,field_read,StringRefView::data
 0x4222e0,LoadFeatureFileList,src/map/features.cpp,function,
 0x4222e0,LoadFeatureFileList,src/map/features.cpp,global_read,s_featureTdfParsers@src/map/features.cpp
 0x4222e0,LoadFeatureFileList,src/map/features.cpp,global_write,s_featureTdfParsers@src/map/features.cpp
@@ -8025,13 +8025,13 @@ address,function,file,kind,target
 0x424c00,LoadFeatures,src/map/features.cpp,global_read,g_game
 0x424c00,LoadFeatures,src/map/features.cpp,global_read,g_seams
 0x424c00,LoadFeatures,src/map/features.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
-0x4251f0,Grow_00425210,src/map/features.cpp,call,reserve
-0x4251f0,Grow_00425210,src/map/features.cpp,call,size
-0x4251f0,Grow_00425210,src/map/features.cpp,function,
-0x425430,Assign_00425480,src/map/features.cpp,call,operator=
-0x425430,Assign_00425480,src/map/features.cpp,deref_read,*std::vector<TdfFile >
-0x425430,Assign_00425480,src/map/features.cpp,deref_write,*std::vector<TdfFile >
-0x425430,Assign_00425480,src/map/features.cpp,function,
+0x4251f0,ReserveUShortVector,src/map/features.cpp,call,reserve
+0x4251f0,ReserveUShortVector,src/map/features.cpp,call,size
+0x4251f0,ReserveUShortVector,src/map/features.cpp,function,
+0x425430,AssignTdfFileVector,src/map/features.cpp,call,operator=
+0x425430,AssignTdfFileVector,src/map/features.cpp,deref_read,*std::vector<TdfFile >
+0x425430,AssignTdfFileVector,src/map/features.cpp,deref_write,*std::vector<TdfFile >
+0x425430,AssignTdfFileVector,src/map/features.cpp,function,
 0x4256a0,copy,src/map/features.cpp,deref_read,*unsigned short
 0x4256a0,copy,src/map/features.cpp,deref_write,*unsigned short
 0x4256a0,copy,src/map/features.cpp,function,
@@ -9717,7 +9717,8 @@ address,function,file,kind,target
 0x42e310,LoadWeaponTypes,src/weapons/weapon_types.cpp,global_read,g_game
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,BindModelTextures
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,BuildDataPath
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,Entry_00432cf0::~Entry_00432cf0
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,DamageTable::LowerBound
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,DamageTableEntry::~DamageTableEntry
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,FatalError
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,FindGafEntry
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,Load3do
@@ -9727,7 +9728,6 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,Ne
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,SetWeaponFireHandler
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,StringRef::~StringRef
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,Table_00499cd0::LowerBound
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,TdfRecord::FindSubRecord
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,TdfRecord::GetFieldDouble
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,TdfRecord::GetFieldInt
@@ -9743,14 +9743,14 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_read,*int
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_write,*int
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_write,*unsigned char
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_escape,Entry_00432cf0::value
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_escape,DamageTableEntry::value
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_escape,Game::weapons
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_escape,WeaponDef::modelName
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_maybe_written,Table_00499cd0::v
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_maybe_written,DamageTable::v
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_maybe_written,WeaponDef::description
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_maybe_written,WeaponDef::modelName
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_maybe_written,WeaponDef::name
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,Entry_00432cf0::name
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,DamageTableEntry::name
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,Game::net
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,StringRef::ptr
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,WeaponDef::index
@@ -9830,8 +9830,8 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_maybe_written,DAT_005119b8
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_read,g_game
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_read,kSim
+0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,call,DamageTable::~DamageTable
 0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,call,GameFreeThunk
-0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,call,Table_00499cd0::~Table_00499cd0
 0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,call,operator delete
 0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,call,strlen
 0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,field_escape,Game::weapons
@@ -10341,23 +10341,23 @@ address,function,file,kind,target
 0x432b80,SaveNumSkirmishPlayers,src/game/settings_campaign.cpp,function,
 0x432b80,SaveNumSkirmishPlayers,src/game/settings_campaign.cpp,global_read,g_game
 0x432c80,AssignRange,src/map/los_tables.cpp,call,StringRef::Assign
-0x432c80,AssignRange,src/map/los_tables.cpp,field_maybe_written,Elem_432cb0::handle
-0x432c80,AssignRange,src/map/los_tables.cpp,field_read,Elem_432cb0::handle
-0x432c80,AssignRange,src/map/los_tables.cpp,field_read,Elem_432cb0::value
-0x432c80,AssignRange,src/map/los_tables.cpp,field_write,Elem_432cb0::value
+0x432c80,AssignRange,src/map/los_tables.cpp,field_maybe_written,StringValueElem::handle
+0x432c80,AssignRange,src/map/los_tables.cpp,field_read,StringValueElem::handle
+0x432c80,AssignRange,src/map/los_tables.cpp,field_read,StringValueElem::value
+0x432c80,AssignRange,src/map/los_tables.cpp,field_write,StringValueElem::value
 0x432c80,AssignRange,src/map/los_tables.cpp,function,
 0x432cb0,AssignRangeBack,src/map/los_tables.cpp,call,StringRef::Assign
-0x432cb0,AssignRangeBack,src/map/los_tables.cpp,field_maybe_written,Elem_432cb0::handle
-0x432cb0,AssignRangeBack,src/map/los_tables.cpp,field_read,Elem_432cb0::handle
-0x432cb0,AssignRangeBack,src/map/los_tables.cpp,field_read,Elem_432cb0::value
-0x432cb0,AssignRangeBack,src/map/los_tables.cpp,field_write,Elem_432cb0::value
+0x432cb0,AssignRangeBack,src/map/los_tables.cpp,field_maybe_written,StringValueElem::handle
+0x432cb0,AssignRangeBack,src/map/los_tables.cpp,field_read,StringValueElem::handle
+0x432cb0,AssignRangeBack,src/map/los_tables.cpp,field_read,StringValueElem::value
+0x432cb0,AssignRangeBack,src/map/los_tables.cpp,field_write,StringValueElem::value
 0x432cb0,AssignRangeBack,src/map/los_tables.cpp,function,
-0x432d20,Entry_00432cf0::AssignPair,src/map/los_tables.cpp,call,StringRef::Assign
-0x432d20,Entry_00432cf0::AssignPair,src/map/los_tables.cpp,field_maybe_written,Entry_00432cf0::name
-0x432d20,Entry_00432cf0::AssignPair,src/map/los_tables.cpp,field_read,Entry_00432cf0::name
-0x432d20,Entry_00432cf0::AssignPair,src/map/los_tables.cpp,field_read,Entry_00432cf0::value
-0x432d20,Entry_00432cf0::AssignPair,src/map/los_tables.cpp,field_write,Entry_00432cf0::value
-0x432d20,Entry_00432cf0::AssignPair,src/map/los_tables.cpp,function,
+0x432d20,DamageTableEntry::AssignPair,src/map/los_tables.cpp,call,StringRef::Assign
+0x432d20,DamageTableEntry::AssignPair,src/map/los_tables.cpp,field_maybe_written,DamageTableEntry::name
+0x432d20,DamageTableEntry::AssignPair,src/map/los_tables.cpp,field_read,DamageTableEntry::name
+0x432d20,DamageTableEntry::AssignPair,src/map/los_tables.cpp,field_read,DamageTableEntry::value
+0x432d20,DamageTableEntry::AssignPair,src/map/los_tables.cpp,field_write,DamageTableEntry::value
+0x432d20,DamageTableEntry::AssignPair,src/map/los_tables.cpp,function,
 0x432d40,SortUnitTypes,src/map/los_tables.cpp,call,SortUnitTypes
 0x432d40,SortUnitTypes,src/map/los_tables.cpp,call,_Median
 0x432d40,SortUnitTypes,src/map/los_tables.cpp,call,_Unguarded_partition
@@ -10385,7 +10385,7 @@ address,function,file,kind,target
 0x433130,LosTables::LoadLosTables,src/map/los_tables.cpp,call,erase
 0x433130,LosTables::LoadLosTables,src/map/los_tables.cpp,call,insert
 0x433130,LosTables::LoadLosTables,src/map/los_tables.cpp,call,size
-0x433130,LosTables::LoadLosTables,src/map/los_tables.cpp,deref_read,*std::vector<std::vector<Elem_00434360>>
+0x433130,LosTables::LoadLosTables,src/map/los_tables.cpp,deref_read,*std::vector<std::vector<LosLineData>>
 0x433130,LosTables::LoadLosTables,src/map/los_tables.cpp,field_read,TdfFile::current
 0x433130,LosTables::LoadLosTables,src/map/los_tables.cpp,function,
 0x433270,LosTables::ResizeTables,src/map/los_tables.cpp,call,resize
@@ -10401,7 +10401,7 @@ address,function,file,kind,target
 0x433380,LosTables::LoadLosTable,src/map/los_tables.cpp,field_read,TdfFile::current
 0x433380,LosTables::LoadLosTable,src/map/los_tables.cpp,function,
 0x433500,LosTables::GetLosTable,src/map/los_tables.cpp,call,operator[]
-0x433500,LosTables::GetLosTable,src/map/los_tables.cpp,deref_read,*std::vector<std::vector<Elem_00434360>>
+0x433500,LosTables::GetLosTable,src/map/los_tables.cpp,deref_read,*std::vector<std::vector<LosLineData>>
 0x433500,LosTables::GetLosTable,src/map/los_tables.cpp,function,
 0x433520,LosTables::GetLosTableCount,src/map/los_tables.cpp,call,size
 0x433520,LosTables::GetLosTableCount,src/map/los_tables.cpp,function,
@@ -10412,7 +10412,7 @@ address,function,file,kind,target
 0x4335e0,LosTable::GetLosLine,src/map/los_tables.cpp,call,operator[]
 0x4335e0,LosTable::GetLosLine,src/map/los_tables.cpp,deref_read,*LosTable
 0x4335e0,LosTable::GetLosLine,src/map/los_tables.cpp,function,
-0x4335f0,LosTable::ResizeLines,src/map/los_tables.cpp,call,Elem_00434360::~Elem_00434360
+0x4335f0,LosTable::ResizeLines,src/map/los_tables.cpp,call,LosLineData::~LosLineData
 0x4335f0,LosTable::ResizeLines,src/map/los_tables.cpp,call,resize
 0x4335f0,LosTable::ResizeLines,src/map/los_tables.cpp,function,
 0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,call,TdfRecord::GetFieldString
@@ -10423,8 +10423,8 @@ address,function,file,kind,target
 0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,call,strtok
 0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,deref_read,*LosLine
 0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,field_read,TdfFile::current
-0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,field_write,Elem_00434020::a
-0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,field_write,Elem_00434020::b
+0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,field_write,LosStep::a
+0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,field_write,LosStep::b
 0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,function,
 0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,global_maybe_written,DAT_005119b8
 0x4339c0,LosLine::GetLosLineStepCount,src/map/los_tables.cpp,call,size
@@ -10835,7 +10835,7 @@ address,function,file,kind,target
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,field_read,Game::numPlayers
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,field_read,Game::options
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,field_read,Game::table_2c28
-0x436860,Mission::SelectSchema,src/map/map_list.cpp,field_read,Slot_00436860::active
+0x436860,Mission::SelectSchema,src/map/map_list.cpp,field_read,GameOptionSlotView::active
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,field_read,TdfFile::current
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,field_write,TdfFile::current
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,function,
@@ -10952,16 +10952,16 @@ address,function,file,kind,target
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,call,Mission::GetNameSlot
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,call,StringRef::~StringRef
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,call,_strcmpi
-0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,Header_004373a0::featureOffset
-0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,Header_004373a0::features
-0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,Header_004373a0::height
-0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,Header_004373a0::magic
-0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,Header_004373a0::plotOffset
-0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,Header_004373a0::width
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,MapCacheEntry::tntChecksum
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,Mission::headerChecksum
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,Mission::tntChecksum
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,StringRef::data
+0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,TntFileHeader::featureOffset
+0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,TntFileHeader::features
+0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,TntFileHeader::height
+0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,TntFileHeader::magic
+0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,TntFileHeader::plotOffset
+0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_read,TntFileHeader::width
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,field_write,Mission::tntChecksum
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,function,
 0x4373a0,Mission::ComputeMapChecksum,src/map/map_list.cpp,global_maybe_written,s_mapCache@src/map/map_list.cpp
@@ -21050,8 +21050,8 @@ address,function,file,kind,target
 0x4665d0,ResizeRadarPicture,src/map/radar.cpp,field_read,GafFrame::width
 0x4665d0,ResizeRadarPicture,src/map/radar.cpp,field_write,GafFrame::height
 0x4665d0,ResizeRadarPicture,src/map/radar.cpp,field_write,GafFrame::width
-0x4665d0,ResizeRadarPicture,src/map/radar.cpp,field_write,Point_4665d0::x
-0x4665d0,ResizeRadarPicture,src/map/radar.cpp,field_write,Point_4665d0::y
+0x4665d0,ResizeRadarPicture,src/map/radar.cpp,field_write,Point::x
+0x4665d0,ResizeRadarPicture,src/map/radar.cpp,field_write,Point::y
 0x4665d0,ResizeRadarPicture,src/map/radar.cpp,function,
 0x466780,BuildRadarPicture,src/map/radar.cpp,call,AllocSurface
 0x466780,BuildRadarPicture,src/map/radar.cpp,call,DownsampleFrame
@@ -21066,8 +21066,8 @@ address,function,file,kind,target
 0x466780,BuildRadarPicture,src/map/radar.cpp,field_read,Game::pictureSurface
 0x466780,BuildRadarPicture,src/map/radar.cpp,field_read,Game::radarFrame
 0x466780,BuildRadarPicture,src/map/radar.cpp,field_read,Game::width
-0x466780,BuildRadarPicture,src/map/radar.cpp,field_read,IconSet_00466780::cell
-0x466780,BuildRadarPicture,src/map/radar.cpp,field_read,IconSet_00466780::count
+0x466780,BuildRadarPicture,src/map/radar.cpp,field_read,MapTileSet::cell
+0x466780,BuildRadarPicture,src/map/radar.cpp,field_read,MapTileSet::count
 0x466780,BuildRadarPicture,src/map/radar.cpp,field_write,Game::pictureSurface
 0x466780,BuildRadarPicture,src/map/radar.cpp,field_write,Game::posX
 0x466780,BuildRadarPicture,src/map/radar.cpp,field_write,Game::posY
@@ -21135,7 +21135,7 @@ address,function,file,kind,target
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,deref_write,*unsigned char
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_escape,Game::players_1b63_14b
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,<anon>::mapChanged
-0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Fx_00466c20::colorMap
+0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,DisplayContextColorMapView::colorMap
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::displayContext
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::height
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::mappedSurface
@@ -21157,9 +21157,9 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,DrawPixel
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,DrawSurface
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,GetGafFrame
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,OnRadar_00466dc0
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,IsOnRadar
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,Player_Get
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,ScaleY_00466dc0
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,ScaledRadarY
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,get
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,operator Projectile *
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,operator Unit *
@@ -21171,7 +21171,6 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::hi
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::interceptor
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::value
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Flags241_00466dc0::bit29
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::finalSurface
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::hotRadar
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::hotRadarCount
@@ -21192,6 +21191,7 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::units
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::unitsEnd
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::width_142eb
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,InterceptorDefFlags::bit29
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,MapViewFlags::bit0
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,MapViewFlags::bit1
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Player::info
@@ -21199,6 +21199,11 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Projectile::attacker
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Projectile::owner
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Projectile::type
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,RadarUnitDefView::flags2
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,RadarUnitDefView::radardistance
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,RadarUnitDefView::radardistancejam
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,RadarUnitDefView::sonardistance
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,RadarUnitDefView::sonardistancejam
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Unit::activateFlags
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Unit::def
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Unit::flags
@@ -21208,11 +21213,6 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Unit::selected
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Unit::unitDefIndex
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Unit::xWhole
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::flags2
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::radardistance
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::radardistancejam
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::sonardistance
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::sonardistancejam
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,UnitWeaponSlot::stockpile
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,UnitWeaponSlot::weapon
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Vec3Words::xWhole
@@ -24804,22 +24804,22 @@ address,function,file,kind,target
 0x47cac0,ClaimFootprintsInArea,src/map/terrain.cpp,call,VisitObjectsInArea
 0x47cac0,ClaimFootprintsInArea,src/map/terrain.cpp,function,
 0x47caf0,FUN_0047caf0,src/map/terrain.cpp,function,
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator Node_0047cb00 *
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator SpatialBucketNode *
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator!=
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator->
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator=
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,deref_read,*Ref<Node_0047cb00>
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,deref_write,*Ref<Node_0047cb00>
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_escape,Node_0047cb00::next
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_read,Node_0047cb00::next
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,deref_read,*Ref<SpatialBucketNode>
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,deref_write,*Ref<SpatialBucketNode>
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_escape,SpatialBucketNode::next
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_read,SpatialBucket::head
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_write,Node_0047cb00::next
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_read,SpatialBucketNode::next
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_write,SpatialBucket::head
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_write,SpatialBucketNode::next
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,function,
 0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,call,operator=
 0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,field_read,SpatialBucket::head
-0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,field_write,Node_0047cb00::next
 0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,field_write,SpatialBucket::head
+0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,field_write,SpatialBucketNode::next
 0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,function,
 0x47cb60,SetOwner,src/map/terrain.cpp,call,UnlinkBucketUnit
 0x47cb60,SetOwner,src/map/terrain.cpp,call,get
@@ -24926,12 +24926,12 @@ address,function,file,kind,target
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,global_read,g_game
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,global_read,g_seams
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [LosRadarSeam::UpdateCellHeightRange]"
-0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,Blocked_0047d2e0
+0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,CellFeatureBlocks
+0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,GetCellFeatureDef
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,GetCellHeight
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,InsideExplored
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,IsExploredAtHeight
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,IsSeenAtHeight
-0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,Terrain_0047d2e0
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,VisibilityWord
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,get
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,operator Cell *
@@ -25177,7 +25177,8 @@ address,function,file,kind,target
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,function,
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,global_read,g_game
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,indirect_call,virtual ClaimFootprintVisitor::ClaimFootprint
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,Clamp_0047e750
+0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,ClampBucketCoord
+0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,Visit
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,operator Unit *
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,operator UnitBucket *
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,deref_read,*BucketGrid
@@ -25190,12 +25191,11 @@ address,function,file,kind,target
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,Vec3::z
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,function,
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,global_read,g_game
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,indirect_call,virtual Visitor_0047e750::Visit
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampX2_0047e890
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampX_0047e890
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampZ2_0047e890
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampZ_0047e890
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,Dist2_0047e890
+0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,BucketDistSquared
+0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMaxX
+0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMaxZ
+0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMinX
+0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMinZ
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,operator Unit *
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,operator UnitBucket *
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,deref_read,*BucketGrid
@@ -25215,8 +25215,6 @@ address,function,file,kind,target
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,deref_read,*Vec3
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,deref_write,*Vec3
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,deref_write,*float
-0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Entry_0047ea40::pos
-0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Entry_0047ea40::val
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Feature::energy
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Feature::flags16
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Feature::metal
@@ -25225,12 +25223,14 @@ address,function,file,kind,target
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Fixed::whole
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Game::features
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
+0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,ReclaimableResource::pos
+0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,ReclaimableResource::val
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Seams::features
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Seams::los_radar
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Vec3::x
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_read,Vec3::z
-0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_write,Entry_0047ea40::pos
-0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_write,Entry_0047ea40::val
+0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_write,ReclaimableResource::pos
+0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_write,ReclaimableResource::val
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_write,Vec3::x
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,field_write,Vec3::z
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,function,
@@ -26607,9 +26607,8 @@ address,function,file,kind,target
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,call,GetGafFrame
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,call,GrayRectangle
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,deref_escape,*FogCell
-0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,deref_read,*Flags_004848e0
+0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,deref_read,*GraphicsOptionFlagsView
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_escape,Game::flags_37f06
-0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Flags_004848e0::ditheredFog
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,FogCell::level0
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,FogCell::level1
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::black
@@ -26618,6 +26617,7 @@ address,function,file,kind,target
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::gray
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::scrollX
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,Game::scrollY
+0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,GraphicsOptionFlagsView::ditheredFog
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,MapFogGrid::cells
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,MapFogGrid::height
 0x4848e0,DrawFogOfWar,src/map/line_of_sight.cpp,field_read,MapFogGrid::width
@@ -32276,14 +32276,14 @@ address,function,file,kind,target
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,deref_read,*Vec3
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,<anon>::value
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,Game::flags_2a44
-0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,Kind_00499ab0::f4
-0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,Obj_00499ab0::kind
-0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,Obj_00499ab0::team
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,UnitWeaponSlot::fireHeading
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,UnitWeaponSlot::firePitch
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,UnitWeaponSlot::flags
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,UnitWeaponSlot::weapon
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,WeaponDef::index
+0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,WeaponFirePlayerView::f4
+0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,WeaponFireUnitView::kind
+0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_read,WeaponFireUnitView::team
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_write,WeaponFirePacket::aimOrVel
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_write,WeaponFirePacket::fireHeading
 0x499ab0,SendWeaponFirePacket,src/weapons/weapons.cpp,field_write,WeaponFirePacket::firePitch
@@ -32310,10 +32310,10 @@ address,function,file,kind,target
 0x499c10,RockUnit,src/weapons/weapons.cpp,call,ScaledCos
 0x499c10,RockUnit,src/weapons/weapons.cpp,call,ScaledSin
 0x499c10,RockUnit,src/weapons/weapons.cpp,call,operator CobScript *
-0x499c10,RockUnit,src/weapons/weapons.cpp,field_read,Object_00499c10::anims
-0x499c10,RockUnit,src/weapons/weapons.cpp,field_read,Object_00499c10::heading
+0x499c10,RockUnit,src/weapons/weapons.cpp,field_read,RockSourceSlotView::heading
+0x499c10,RockUnit,src/weapons/weapons.cpp,field_read,RockUnitView::anims
+0x499c10,RockUnit,src/weapons/weapons.cpp,field_read,RockUnitView::heading
 0x499c10,RockUnit,src/weapons/weapons.cpp,field_read,Seams::units
-0x499c10,RockUnit,src/weapons/weapons.cpp,field_read,Source_00499c10::heading
 0x499c10,RockUnit,src/weapons/weapons.cpp,field_read,UnitsSeam::StartScriptWithArgs
 0x499c10,RockUnit,src/weapons/weapons.cpp,function,
 0x499c10,RockUnit,src/weapons/weapons.cpp,global_read,g_seams
@@ -32334,15 +32334,15 @@ address,function,file,kind,target
 0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(SquadManager *, int, Projectile *, int, int) __attribute__((fastcall)) [AiSeam::MarkOwnerNetDirtyFromDamageSplit]"
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,AngleOfVector
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,DamageUnit
-0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,Find_00499cd0
+0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,FindDamageValue
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,operator Unit *
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,operator->
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,deref_read,*int
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,field_maybe_written,UnitDef::unitname
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,field_read,<anon>::paralyzer
-0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,field_read,Flags_00499cd0::flag7
-0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,field_read,Flags_00499cd0::flag8
+0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,field_read,DamageScaleFlags::flag7
+0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,field_read,DamageScaleFlags::flag8
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,field_read,Projectile::attacker
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,field_read,Projectile::type
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,field_read,Unit::def
@@ -32423,17 +32423,17 @@ address,function,file,kind,target
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,call,ApplyAreaDamage
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,call,memset
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,call,operator=
-0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,deref_read,*Vec3_0049a0c0
-0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,Params_0049a0c0::kind
-0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,Params_0049a0c0::owner
-0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,Params_0049a0c0::ownerUnit
-0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,Params_0049a0c0::pos
+0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,deref_read,*Vec3
+0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,AreaDamageProjectileView::kind
+0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,AreaDamageProjectileView::owner
+0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,AreaDamageProjectileView::ownerUnit
+0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,AreaDamageProjectileView::pos
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,function,
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,ApplyWeaponDamage
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,AreaDamageHits::AddFeature
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,AreaDamageHits::AddUnit
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,BroadcastPacket
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,DetonateProjectile
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,Hits_0049a120::AddFeature
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,Hits_0049a120::AddUnit
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,Length
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,Sub
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,UnitFromId
@@ -32501,9 +32501,9 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,WeaponDef::areaOfEffect
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,WeaponDef::edgeDamage
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,WeaponDef::index
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_write,CellPos_0049a120::x
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_write,CellPos_0049a120::z
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_write,Fixed_0049a120::raw
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_write,AreaDamageFixed::raw
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_write,CellPosXZ::x
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_write,CellPosXZ::z
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_write,ProjectileDetonatePacket::aim
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_write,ProjectileDetonatePacket::type
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_write,ProjectileDetonatePacket::weaponIndex
@@ -32518,9 +32518,9 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(Cell *, int, int, WeaponDef *) __attribute__((stdcall)) [FeaturesSeam::DamageFeature]"
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(SquadManager *, int, Projectile *, int, int) __attribute__((fastcall)) [AiSeam::MarkOwnerNetDirtyFromDamageSplit]"
 0x49a850,VectorLength,src/weapons/weapons.cpp,call,bx_sqrt
-0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,Vec3i_0049a850::x
-0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,Vec3i_0049a850::y
-0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,Vec3i_0049a850::z
+0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,VectorLengthArg::x
+0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,VectorLengthArg::y
+0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,VectorLengthArg::z
 0x49a850,VectorLength,src/weapons/weapons.cpp,function,
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,call,bx_acos
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,call,bx_hypot
@@ -32528,29 +32528,29 @@ address,function,file,kind,target
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,field_read,Game::gravity
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,function,
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,global_read,g_game
-0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,call,LineOfFire_0049aa80
+0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,call,ReachPosLineOfFire
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,call,operator->
-0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,deref_read,*Vec3_0049aa80
+0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,deref_read,*ReachPosVec3
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,<anon>::ballistic
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,<anon>::waterWeapon
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,<anon>::whole
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,Game::seaLevel
+0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,ReachPosVec3::x
+0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,ReachPosVec3::z
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,Unit::def
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,UnitDef::modelMaxYHigh
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,UnitWeaponSlot::weapon
-0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,Vec3_0049aa80::x
-0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,Vec3_0049aa80::z
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,WeaponDef::field_c8
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,WeaponDef::range
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,field_read,WeaponDef::speed
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,function,
 0x49aa80,WeaponCanReachPos,src/weapons/weapons.cpp,global_read,g_game
-0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,Dist2_0049abb0
-0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,LineOfFire_0049abb0
+0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,ReachUnitDistSquared
+0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,ReachUnitLineOfFire
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,call,operator->
-0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,deref_read,*Vec3_0049abb0
+0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,deref_read,*ReachUnitVec3
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,field_escape,Unit::pos
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,field_read,<anon>::ballistic
 0x49abb0,WeaponCanReachUnit,src/weapons/weapons.cpp,field_read,<anon>::toAirWeapon
@@ -32895,6 +32895,7 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::scrollX
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::scrollY
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::ticks
+0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,ModelChildView::child
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Player::explored
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Player::exploredHeight
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Player::exploredWidth
@@ -32905,7 +32906,6 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Projectile::spawnTick
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Projectile::time
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Projectile::type
-0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Sprite_0049be60::child
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Vec3::x
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Vec3::y
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Vec3::z
@@ -32953,8 +32953,8 @@ address,function,file,kind,target
 0x49c740,InitProjectile,src/weapons/weapons.cpp,field_write,Unit::workTime
 0x49c740,InitProjectile,src/weapons/weapons.cpp,function,
 0x49c740,InitProjectile,src/weapons/weapons.cpp,global_read,g_game
+0x49c880,RemoveUnitProjectiles,src/weapons/weapons.cpp,call,ClearTrackedProjectile
 0x49c880,RemoveUnitProjectiles,src/weapons/weapons.cpp,call,CompactProjectiles
-0x49c880,RemoveUnitProjectiles,src/weapons/weapons.cpp,call,Untrack_0049c880
 0x49c880,RemoveUnitProjectiles,src/weapons/weapons.cpp,call,operator Projectile *
 0x49c880,RemoveUnitProjectiles,src/weapons/weapons.cpp,call,operator==
 0x49c880,RemoveUnitProjectiles,src/weapons/weapons.cpp,field_read,Game::projectileCount
@@ -32992,11 +32992,11 @@ address,function,file,kind,target
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,<anon>::halves
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,<anon>::startSmoke
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,<anon>::value
-0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,Fire_0049c9c0::f_1b
-0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,Fire_0049c9c0::shot
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,Game::projectileCount
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,Game::projectiles
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,Game::ticks
+0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,LineOfSightFireSlotView::f_1b
+0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,LineOfSightFireSlotView::shot
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,Projectile::flags
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,Projectile::speed
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,Projectile::type
@@ -33055,13 +33055,13 @@ address,function,file,kind,target
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,Projectile::flags
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,Projectile::type
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,Seams::units
-0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,Shot_0049cc20::def
-0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,Shot_0049cc20::flags
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,Unit::heading
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,Unit::script
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,UnitWeaponSlot::fireHeading
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,UnitsSeam::StartScript
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,UnitsSeam::StartScriptWithArgs
+0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,VLaunchFireSlotView::def
+0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,VLaunchFireSlotView::flags
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::acceleration
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::burst
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::lifetime
@@ -33078,7 +33078,7 @@ address,function,file,kind,target
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_write,Projectile::targetUnit
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_write,Projectile::targetUnitPtr
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_write,Projectile::time
-0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_write,Shot_0049cc20::aimCobDone
+0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_write,VLaunchFireSlotView::aimCobDone
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,function,
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,global_read,g_fireScriptNames
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,global_read,g_game
@@ -33100,17 +33100,17 @@ address,function,file,kind,target
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_escape,UnitWeaponSlot::fireHeading
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,<anon>::burnBlow
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,<anon>::startSmoke
+0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,BallisticFireSlotView::def
+0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,BallisticFireSlotView::flags
+0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,BallisticFireSlotView::heading
+0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,BallisticFireSlotView::muzzleAimFromDeltaZ
+0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,BallisticFireSlotView::pitch
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Game::gravity
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Game::projectileCount
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Game::projectiles
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Game::ticks
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Projectile::flags
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Seams::units
-0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Shot_0049cde0::def
-0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Shot_0049cde0::flags
-0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Shot_0049cde0::heading
-0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Shot_0049cde0::muzzleAimFromDeltaZ
-0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Shot_0049cde0::pitch
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Unit::heading
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Unit::script
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,UnitsSeam::StartScript
@@ -33137,10 +33137,10 @@ address,function,file,kind,target
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,global_read,g_seams
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *, Callback *, int) __attribute__((stdcall)) [UnitsSeam::StartScript]"
+0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,call,InitMotionProjectile
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,call,InitProjectile
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,call,ScaledCos
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,call,ScaledSin
-0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,call,Setup_0049d000
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,call,get
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,call,operator Projectile *
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,call,operator char *
@@ -33149,10 +33149,10 @@ address,function,file,kind,target
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_read,Game::projectileCount
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_read,Game::projectiles
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_read,Game::ticks
+0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_read,MotionFireSlotView::weapon
+0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_read,MotionRangeView::range
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_read,Projectile::flags
-0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_read,Shot_0049d000::weapon
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_read,Unit::motion
-0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_read,UnitType_0049d000::range
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_write,Game::projectileCount
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_write,Projectile::flags
 0x49d000,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,field_write,Projectile::targetUnit
@@ -33166,21 +33166,21 @@ address,function,file,kind,target
 0x49d0c0,FireWeaponByFlags,src/weapons/weapons.cpp,field_read,<anon>::ballistic
 0x49d0c0,FireWeaponByFlags,src/weapons/weapons.cpp,field_read,<anon>::lineOfSight
 0x49d0c0,FireWeaponByFlags,src/weapons/weapons.cpp,field_read,<anon>::selfProp
-0x49d0c0,FireWeaponByFlags,src/weapons/weapons.cpp,field_read,Object_0049d0c0::info
+0x49d0c0,FireWeaponByFlags,src/weapons/weapons.cpp,field_read,FireByFlagsSlotView::info
 0x49d0c0,FireWeaponByFlags,src/weapons/weapons.cpp,function,
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,call,operator Projectile *
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,call,operator->
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,call,operator==
-0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_escape,Table_0049d120::entries
+0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_escape,InterceptorUnitView::entries
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,<anon>::targetable
-0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Entry_0049d120::active
-0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Entry_0049d120::def
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Game::projectileCount
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Game::projectiles
+0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,InterceptorSlotView::active
+0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,InterceptorSlotView::def
+0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,InterceptorUnitView::player
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Projectile::interceptedProjectile
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Projectile::owner
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Projectile::type
-0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Table_0049d120::player
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Vec3::x
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,Vec3::z
 0x49d120,FindTargetableProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::coverage
@@ -33189,19 +33189,19 @@ address,function,file,kind,target
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,call,SamePos
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,call,operator Projectile *
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,call,operator->
-0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Event_0049d1e0::flag
-0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Event_0049d1e0::ownerId
-0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Event_0049d1e0::pos
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Game::localPlayer
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Game::projectileCount
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Game::projectiles
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Projectile::attacker
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Projectile::owner
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Projectile::target
+0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,RemoteFireEventView::flag
+0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,RemoteFireEventView::ownerId
+0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,RemoteFireEventView::pos
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,field_read,Unit::id
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,function,
 0x49d1e0,FindRemoteProjectile,src/weapons/weapons.cpp,global_read,g_game
-0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,FindRemoteProjectile_0049d270
+0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,FindRemoteProjectileForPacket
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,FireBallisticProjectile
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,FireLineOfSightProjectile
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,FireVLaunchProjectile
@@ -33209,8 +33209,8 @@ address,function,file,kind,target
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,ScaledCos
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,ScaledSin
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,get
+0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,operator DroppedMotionParamView *
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,operator Projectile *
-0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,operator Type_0049d270 *
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,operator Unit *
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,call,operator=
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,deref_escape,*Projectile
@@ -33227,13 +33227,13 @@ address,function,file,kind,target
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,<anon>::selfProp
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,<anon>::vLaunch
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Angles16::heading
-0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Entry_0049d270::type
+0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,DroppedMotionParamView::param
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Game::projectileCount
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Game::projectiles
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Game::ticks
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Game::units
+0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,NetFireSlotView::type
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Projectile::flags
-0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Type_0049d270::param
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Unit::alive
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Unit::heading
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,Unit::motion
@@ -33244,9 +33244,9 @@ address,function,file,kind,target
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,WeaponFirePacket::weaponDefIndex
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_read,WeaponFirePacket::weaponSlotIndex
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_write,Angles16::heading
-0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_write,Entry_0049d270::f_16
-0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_write,Entry_0049d270::f_18
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_write,Game::projectileCount
+0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_write,NetFireSlotView::f_16
+0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_write,NetFireSlotView::f_18
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_write,Projectile::direction
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_write,Projectile::flags
 0x49d270,ApplyWeaponFirePacket,src/weapons/weapons.cpp,field_write,Projectile::speed
@@ -33318,9 +33318,9 @@ address,function,file,kind,target
 0x49d580,FireTurretWeapon,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *, unsigned char) __attribute__((stdcall)) [UnitsSeam::GetAimFromPosition]"
 0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,call,abs
 0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,call,operator->
-0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,Aim_0049d880::fireHeading
-0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,Aim_0049d880::firePitch
-0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,Aim_0049d880::type
+0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,ToleranceAimSlotView::fireHeading
+0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,ToleranceAimSlotView::firePitch
+0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,ToleranceAimSlotView::type
 0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,Unit::flags
 0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,WeaponDef::pitchTolerance
 0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,WeaponDef::tolerance
@@ -33349,12 +33349,12 @@ address,function,file,kind,target
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,call,operator=
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,deref_read,*Vec3
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,<anon>::value
-0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Aim_0049d9c0::fireHeading
-0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Aim_0049d9c0::firePitch
-0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Aim_0049d9c0::type
-0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Aim_0049d9c0::weapon
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Fixed::whole
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Game::netGameFlags
+0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,LineOfSightAimSlotView::fireHeading
+0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,LineOfSightAimSlotView::firePitch
+0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,LineOfSightAimSlotView::type
+0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,LineOfSightAimSlotView::weapon
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Player::id
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Unit::heading
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Unit::id
@@ -33365,9 +33365,9 @@ address,function,file,kind,target
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Vec3::y
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Vec3::z
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,WeaponDef::index
-0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_write,Aim_0049d9c0::fireHeading
-0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_write,Aim_0049d9c0::firePitch
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_write,Fixed::value
+0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_write,LineOfSightAimSlotView::fireHeading
+0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_write,LineOfSightAimSlotView::firePitch
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_write,WeaponFirePacket::aimOrVel
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_write,WeaponFirePacket::fireHeading
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_write,WeaponFirePacket::firePitch
@@ -33392,23 +33392,23 @@ address,function,file,kind,target
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,<anon>::halves
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,<anon>::interceptor
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Game::flags_2a44
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Kind_0049db70::player
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Object_0049db70::kind
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Object_0049db70::team
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Shot_0049db70::def
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Shot_0049db70::heading
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Shot_0049db70::piece
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Shot_0049db70::pitch
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Shot_0049db70::weapon
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,VLaunchPlayerView::player
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,VLaunchUnitView::kind
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,VLaunchUnitView::team
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,VLaunchWeaponSlotView::def
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,VLaunchWeaponSlotView::heading
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,VLaunchWeaponSlotView::piece
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,VLaunchWeaponSlotView::pitch
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,VLaunchWeaponSlotView::weapon
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Vec3::x
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Vec3::y
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,Vec3::z
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,WeaponDef::index
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,<anon>::value
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,Shot_0049db70::heading
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,Shot_0049db70::piece
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,Shot_0049db70::pitch
-0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,Shot_0049db70::weapon
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,VLaunchWeaponSlotView::heading
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,VLaunchWeaponSlotView::piece
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,VLaunchWeaponSlotView::pitch
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,VLaunchWeaponSlotView::weapon
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,WeaponFirePacket::aimOrVel
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,WeaponFirePacket::fireHeading
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_write,WeaponFirePacket::firePitch
@@ -33434,16 +33434,16 @@ address,function,file,kind,target
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,deref_escape,*Projectile
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,deref_read,*Vec3
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,<anon>::value
-0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Aim_0049dd60::fireHeading
-0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Aim_0049dd60::firePitch
-0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Aim_0049dd60::type
-0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Aim_0049dd60::weapon
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Angles16::heading
+0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,DroppedAimSlotView::fireHeading
+0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,DroppedAimSlotView::firePitch
+0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,DroppedAimSlotView::type
+0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,DroppedAimSlotView::weapon
+0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,DroppedMotionIdView::id
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Game::netGameFlags
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Game::projectileCount
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Game::projectiles
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Game::ticks
-0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Owner_0049dd60::id
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Player::id
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Projectile::flags
 0x49dd60,FireDroppedWeapon,src/weapons/weapons.cpp,field_read,Unit::heading
@@ -33510,8 +33510,6 @@ address,function,file,kind,target
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,operator->
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,operator=
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_escape,Unit::weapons
-0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,Frame_0049e070::i
-0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,Frame_0049e070::maxTime
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,Seams::units
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,Unit::def
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,Unit::script
@@ -33523,13 +33521,15 @@ address,function,file,kind,target
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,Vec3::z
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,WeaponDef::index
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,WeaponDef::reloadTime
-0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_write,Frame_0049e070::i
-0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_write,Frame_0049e070::maxTime
+0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,WeaponSlotInitState::i
+0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_read,WeaponSlotInitState::maxTime
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_write,UnitWeaponSlot::flags
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_write,UnitWeaponSlot::muzzleAimFromDeltaZ
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_write,UnitWeaponSlot::reloadTimer
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_write,UnitWeaponSlot::stockpile
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_write,UnitWeaponSlot::weapon
+0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_write,WeaponSlotInitState::i
+0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_write,WeaponSlotInitState::maxTime
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,function,
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,global_read,g_seams
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
@@ -33548,12 +33548,12 @@ address,function,file,kind,target
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,deref_read,*unsigned short
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,deref_write,*unsigned char
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,deref_write,*unsigned short
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_escape,Entry_0049e1a0::name
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_escape,Unit::netDirtyFlags
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_escape,Unit::weapons
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_maybe_written,Entry_0049e1a0::point
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_escape,UpdateWeaponSlotView::name
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_maybe_written,Unit::pos
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_maybe_written,Unit::resourceSlot
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_maybe_written,UpdateWeaponSlotView::point
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,<anon>::ballistic
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,<anon>::commandFire
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,<anon>::lineOfSight
@@ -33561,10 +33561,6 @@ address,function,file,kind,target
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,<anon>::turret
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,<anon>::vLaunch
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,EconomySeam::SpendEnergyAndMetal
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Entry_0049e1a0::attached
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Entry_0049e1a0::f_14
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Entry_0049e1a0::f_1a
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Entry_0049e1a0::flags
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Player::energy
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Player::metal
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Seams::economy
@@ -33581,18 +33577,22 @@ address,function,file,kind,target
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,UnitResources::player
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,UnitsSeam::GetAimFromPosition
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,UnitsSeam::StartScriptWithArgs
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,UpdateWeaponSlotView::attached
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,UpdateWeaponSlotView::f_14
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,UpdateWeaponSlotView::f_1a
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,UpdateWeaponSlotView::flags
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,WeaponDef::energyPerShot
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,WeaponDef::fire
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,WeaponDef::metalPerShot
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,WeaponDef::pitch
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,WeaponDef::reloadTime
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,WeaponDef::speed
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,Entry_0049e1a0::f_14
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,Entry_0049e1a0::f_16
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,Entry_0049e1a0::f_18
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,Entry_0049e1a0::f_1a
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,Entry_0049e1a0::f_8
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,Entry_0049e1a0::flags
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,UpdateWeaponSlotView::f_14
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,UpdateWeaponSlotView::f_16
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,UpdateWeaponSlotView::f_18
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,UpdateWeaponSlotView::f_1a
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,UpdateWeaponSlotView::f_8
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_write,UpdateWeaponSlotView::flags
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,function,
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,global_read,g_aimScriptNames
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,global_read,g_seams
@@ -43331,6 +43331,16 @@ address,function,file,kind,target
 ,ApplyMissionOptionFlags,src/game/game_load.cpp,global_read,g_game
 ,Approach,src/ingame/control_panel.cpp,function,
 ,Approach,src/ingame/info_panel.cpp,function,
+,AreaDamageHits::AddFeature,src/weapons/weapons.cpp,field_read,AreaDamageHits::features
+,AreaDamageHits::AddFeature,src/weapons/weapons.cpp,field_read,AreaDamageHits::numFeatures
+,AreaDamageHits::AddFeature,src/weapons/weapons.cpp,field_write,AreaDamageHits::features
+,AreaDamageHits::AddFeature,src/weapons/weapons.cpp,field_write,AreaDamageHits::numFeatures
+,AreaDamageHits::AddFeature,src/weapons/weapons.cpp,function,
+,AreaDamageHits::AddUnit,src/weapons/weapons.cpp,field_read,AreaDamageHits::numUnits
+,AreaDamageHits::AddUnit,src/weapons/weapons.cpp,field_read,AreaDamageHits::units
+,AreaDamageHits::AddUnit,src/weapons/weapons.cpp,field_write,AreaDamageHits::numUnits
+,AreaDamageHits::AddUnit,src/weapons/weapons.cpp,field_write,AreaDamageHits::units
+,AreaDamageHits::AddUnit,src/weapons/weapons.cpp,function,
 ,AsByte,src/units/unit.cpp,function,
 ,At,src/state/block.cpp,function,
 ,At,src/state/block.cpp,global_read,g_base
@@ -43606,15 +43616,9 @@ address,function,file,kind,target
 ,BlockScanWrite,src/harness/block_scan.cpp,global_read,g_scanned
 ,BlockScanWrite,src/harness/block_scan.cpp,global_read,g_words
 ,BlockScanWrite,src/harness/block_scan.cpp,global_read,kRowSize
-,Blocked_0047d2e0,src/map/terrain.cpp,deref_read,*unsigned char
-,Blocked_0047d2e0,src/map/terrain.cpp,field_read,Cell::feature
-,Blocked_0047d2e0,src/map/terrain.cpp,field_read,Cell::offsetX
-,Blocked_0047d2e0,src/map/terrain.cpp,field_read,Cell::offsetY
-,Blocked_0047d2e0,src/map/terrain.cpp,field_read,Game::featureCount
-,Blocked_0047d2e0,src/map/terrain.cpp,field_read,Game::features
-,Blocked_0047d2e0,src/map/terrain.cpp,field_read,Game::width
-,Blocked_0047d2e0,src/map/terrain.cpp,function,
-,Blocked_0047d2e0,src/map/terrain.cpp,global_read,g_game
+,BucketDistSquared,src/map/terrain.cpp,field_read,Vec3::x
+,BucketDistSquared,src/map/terrain.cpp,field_read,Vec3::z
+,BucketDistSquared,src/map/terrain.cpp,function,
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,call,BuildCompoundAddress
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,field_write,ConnectionBlob::data
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,field_write,ConnectionBlob::size
@@ -43693,6 +43697,15 @@ address,function,file,kind,target
 ,CellAt,src/map/terrain.cpp,field_read,Game::width
 ,CellAt,src/map/terrain.cpp,function,
 ,CellAt,src/map/terrain.cpp,global_read,g_game
+,CellFeatureBlocks,src/map/terrain.cpp,deref_read,*unsigned char
+,CellFeatureBlocks,src/map/terrain.cpp,field_read,Cell::feature
+,CellFeatureBlocks,src/map/terrain.cpp,field_read,Cell::offsetX
+,CellFeatureBlocks,src/map/terrain.cpp,field_read,Cell::offsetY
+,CellFeatureBlocks,src/map/terrain.cpp,field_read,Game::featureCount
+,CellFeatureBlocks,src/map/terrain.cpp,field_read,Game::features
+,CellFeatureBlocks,src/map/terrain.cpp,field_read,Game::width
+,CellFeatureBlocks,src/map/terrain.cpp,function,
+,CellFeatureBlocks,src/map/terrain.cpp,global_read,g_game
 ,CellToWorld,src/ai/ai_player.cpp,field_read,Point16::x
 ,CellToWorld,src/ai/ai_player.cpp,field_read,Point16::y
 ,CellToWorld,src/ai/ai_player.cpp,field_write,Vec3::x
@@ -43838,6 +43851,20 @@ address,function,file,kind,target
 ,ChunkSizeFor,src/state/block.cpp,global_read,kSimBlockBytes
 ,ClaimWeaponsNative,src/seams/native.cpp,call,Unit::ClaimWeapons
 ,ClaimWeaponsNative,src/seams/native.cpp,function,
+,ClampBucketCoord,src/map/terrain.cpp,function,
+,ClampBucketMaxX,src/map/terrain.cpp,call,ClampBucketRangeCoord
+,ClampBucketMaxX,src/map/terrain.cpp,field_read,Vec3::x
+,ClampBucketMaxX,src/map/terrain.cpp,function,
+,ClampBucketMaxZ,src/map/terrain.cpp,call,ClampBucketRangeCoord
+,ClampBucketMaxZ,src/map/terrain.cpp,field_read,Vec3::z
+,ClampBucketMaxZ,src/map/terrain.cpp,function,
+,ClampBucketMinX,src/map/terrain.cpp,call,ClampBucketRangeCoord
+,ClampBucketMinX,src/map/terrain.cpp,field_read,Vec3::x
+,ClampBucketMinX,src/map/terrain.cpp,function,
+,ClampBucketMinZ,src/map/terrain.cpp,call,ClampBucketRangeCoord
+,ClampBucketMinZ,src/map/terrain.cpp,field_read,Vec3::z
+,ClampBucketMinZ,src/map/terrain.cpp,function,
+,ClampBucketRangeCoord,src/map/terrain.cpp,function,
 ,ClampKnobPosAndNotify,src/gui/gui.cpp,call,DrawSliderBar
 ,ClampKnobPosAndNotify,src/gui/gui.cpp,call,SyncAssocGadgets
 ,ClampKnobPosAndNotify,src/gui/gui.cpp,field_read,Gadget::knobPos
@@ -43858,25 +43885,9 @@ address,function,file,kind,target
 ,ClampToCell,src/orders/order_list.cpp,function,
 ,ClampToZero,src/orders/order_list.cpp,function,
 ,ClampVolume,src/sound/samples.cpp,function,
-,ClampX2_0047e890,src/map/terrain.cpp,call,Clamp_0047e890
-,ClampX2_0047e890,src/map/terrain.cpp,field_read,Vec3::x
-,ClampX2_0047e890,src/map/terrain.cpp,function,
-,ClampX_0047e890,src/map/terrain.cpp,call,Clamp_0047e890
-,ClampX_0047e890,src/map/terrain.cpp,field_read,Vec3::x
-,ClampX_0047e890,src/map/terrain.cpp,function,
-,ClampZ2_0047e890,src/map/terrain.cpp,call,Clamp_0047e890
-,ClampZ2_0047e890,src/map/terrain.cpp,field_read,Vec3::z
-,ClampZ2_0047e890,src/map/terrain.cpp,function,
-,ClampZ_0047e890,src/map/terrain.cpp,call,Clamp_0047e890
-,ClampZ_0047e890,src/map/terrain.cpp,field_read,Vec3::z
-,ClampZ_0047e890,src/map/terrain.cpp,function,
-,Clamp_0047e750,src/map/terrain.cpp,function,
-,Clamp_0047e890,src/map/terrain.cpp,function,
 ,Class_004c90b0::IsEmpty,src/graphics/surface.cpp,deref_read,*char
 ,Class_004c90b0::IsEmpty,src/graphics/surface.cpp,field_read,Class_004c90b0::ptr
 ,Class_004c90b0::IsEmpty,src/graphics/surface.cpp,function,
-,Class_004c9390::~Class_004c9390,src/map/string_ref_view.h,call,ReleaseRef
-,Class_004c9390::~Class_004c9390,src/map/string_ref_view.h,function,
 ,CleanTag,src/harness/block_scan.cpp,call,host_mem_readable
 ,CleanTag,src/harness/block_scan.cpp,call,strcpy
 ,CleanTag,src/harness/block_scan.cpp,deref_read,*char
@@ -43908,6 +43919,19 @@ address,function,file,kind,target
 ,ClearTargets_0043b7c0,src/orders/order_list.cpp,function,
 ,ClearTargets_0043b7c0,src/orders/order_list.cpp,global_read,g_seams
 ,ClearTargets_0043b7c0,src/orders/order_list.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
+,ClearTrackedProjectile,src/weapons/weapons.cpp,call,operator->
+,ClearTrackedProjectile,src/weapons/weapons.cpp,call,operator=
+,ClearTrackedProjectile,src/weapons/weapons.cpp,field_read,Game::tracked
+,ClearTrackedProjectile,src/weapons/weapons.cpp,field_read,Projectile::flags
+,ClearTrackedProjectile,src/weapons/weapons.cpp,field_read,Projectile::position
+,ClearTrackedProjectile,src/weapons/weapons.cpp,field_read,Projectile::type
+,ClearTrackedProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::holdTime
+,ClearTrackedProjectile,src/weapons/weapons.cpp,field_write,Game::tracked
+,ClearTrackedProjectile,src/weapons/weapons.cpp,field_write,Game::trackedPos
+,ClearTrackedProjectile,src/weapons/weapons.cpp,field_write,Game::value_1434b
+,ClearTrackedProjectile,src/weapons/weapons.cpp,field_write,Projectile::flags
+,ClearTrackedProjectile,src/weapons/weapons.cpp,function,
+,ClearTrackedProjectile,src/weapons/weapons.cpp,global_read,g_game
 ,Close_004bcf80,src/files/hpi.cpp,call,GameFreeThunk
 ,Close_004bcf80,src/files/hpi.cpp,call,host_file_close
 ,Close_004bcf80,src/files/hpi.cpp,field_read,FileHandle::buffer
@@ -44060,6 +44084,15 @@ address,function,file,kind,target
 ,CyclePlayerAllianceInBattleRoom,src/frontend/multi.cpp,global_read,g_game
 ,DamageFeatureNative,src/seams/native.cpp,call,DamageFeature
 ,DamageFeatureNative,src/seams/native.cpp,function,
+,DamageNameLess::operator(),src/weapons/weapons.cpp,call,_strcmpi
+,DamageNameLess::operator(),src/weapons/weapons.cpp,function,
+,DamageTable::LowerBound,src/weapons/weapon_types.cpp,call,Less
+,DamageTable::LowerBound,src/weapons/weapon_types.cpp,call,begin
+,DamageTable::LowerBound,src/weapons/weapon_types.cpp,call,end
+,DamageTable::LowerBound,src/weapons/weapon_types.cpp,field_maybe_written,DamageTable::v
+,DamageTable::LowerBound,src/weapons/weapon_types.cpp,field_read,StringRef::ptr
+,DamageTable::LowerBound,src/weapons/weapon_types.cpp,function,
+,DamageTableEntry::DamageTableEntry,src/map/los_tables.h,function,
 ,DamagedAllyCollector::DamagedAllyCollector,src/map/terrain.h,function,
 ,DeactivateConditionsNative,src/seams/native.cpp,call,MissionConditions::Deactivate
 ,DeactivateConditionsNative,src/seams/native.cpp,function,
@@ -44201,12 +44234,6 @@ address,function,file,kind,target
 ,Display::LockScreen,src/graphics/surface.cpp,function,
 ,Display::LockScreen,src/graphics/surface.cpp,global_read,g_screenLockCount
 ,Display::LockScreen,src/graphics/surface.cpp,global_write,g_screenLocks
-,Dist2_0047e890,src/map/terrain.cpp,field_read,Vec3::x
-,Dist2_0047e890,src/map/terrain.cpp,field_read,Vec3::z
-,Dist2_0047e890,src/map/terrain.cpp,function,
-,Dist2_0049abb0,src/weapons/weapons.cpp,field_read,Vec3_0049abb0::x
-,Dist2_0049abb0,src/weapons/weapons.cpp,field_read,Vec3_0049abb0::z
-,Dist2_0049abb0,src/weapons/weapons.cpp,function,
 ,DistSq,src/ai/ai_player.cpp,field_read,Point16::x
 ,DistSq,src/ai/ai_player.cpp,field_read,Point16::y
 ,DistSq,src/ai/ai_player.cpp,function,
@@ -44390,8 +44417,6 @@ address,function,file,kind,target
 ,Elem_0040cc40::Elem_0040cc40,src/ai/player_ai.h,function,
 ,Elem_0040cc40::operator<,src/ai/player_ai.h,field_read,Elem_0040cc40::key
 ,Elem_0040cc40::operator<,src/ai/player_ai.h,function,
-,Elem_00432be0::~Elem_00432be0,src/map/los_tables.cpp,call,StringRef::ReleaseRef
-,Elem_00432be0::~Elem_00432be0,src/map/los_tables.cpp,function,
 ,Elem_00487af0,src/units/unit_save.cpp,function,
 ,EmitTdfFieldDestructor,src/util/tdf.cpp,call,TdfField::~TdfField
 ,EmitTdfFieldDestructor,src/util/tdf.cpp,function,
@@ -44418,7 +44443,6 @@ address,function,file,kind,target
 ,EntriesLowerBound,src/util/tdf.cpp,call,end
 ,EntriesLowerBound,src/util/tdf.cpp,field_read,StringRef::ptr
 ,EntriesLowerBound,src/util/tdf.cpp,function,
-,Entry_00432cf0::Entry_00432cf0,src/map/los_tables.h,function,
 ,Entry_40d670::Entry_40d670,src/ai/pathfind.cpp,field_read,Entry_40d670::key
 ,Entry_40d670::Entry_40d670,src/ai/pathfind.cpp,field_read,Entry_40d670::value
 ,Entry_40d670::Entry_40d670,src/ai/pathfind.cpp,function,
@@ -44431,6 +44455,12 @@ address,function,file,kind,target
 ,ExploredCell,src/map/line_of_sight.cpp,field_read,Player::explored
 ,ExploredCell,src/map/line_of_sight.cpp,field_read,Player::exploredWidth
 ,ExploredCell,src/map/line_of_sight.cpp,function,
+,ExploredOnRadar,src/map/radar.cpp,call,operator unsigned char *
+,ExploredOnRadar,src/map/radar.cpp,deref_read,*unsigned char
+,ExploredOnRadar,src/map/radar.cpp,field_read,Player::explored
+,ExploredOnRadar,src/map/radar.cpp,field_read,Player::exploredHeight
+,ExploredOnRadar,src/map/radar.cpp,field_read,Player::exploredWidth
+,ExploredOnRadar,src/map/radar.cpp,function,
 ,Eye::operator=,src/map/eye.h,call,operator=
 ,Eye::operator=,src/map/eye.h,deref_read,*Eye
 ,Eye::operator=,src/map/eye.h,field_escape,Eye::flagB
@@ -44604,6 +44634,13 @@ address,function,file,kind,target
 ,FindConnectedPlayerId,src/network/net_game.cpp,field_read,Player::id
 ,FindConnectedPlayerId,src/network/net_game.cpp,function,
 ,FindConnectedPlayerId,src/network/net_game.cpp,global_read,g_game
+,FindDamageValue,src/weapons/weapons.cpp,call,begin
+,FindDamageValue,src/weapons/weapons.cpp,call,end
+,FindDamageValue,src/weapons/weapons.cpp,call,operator()
+,FindDamageValue,src/weapons/weapons.cpp,field_escape,DamageEntryView::value
+,FindDamageValue,src/weapons/weapons.cpp,field_read,DamageEntryView::name
+,FindDamageValue,src/weapons/weapons.cpp,field_read,DamageTable::v
+,FindDamageValue,src/weapons/weapons.cpp,function,
 ,FindDefIndex,src/harness/harness.cpp,call,FindDefIndexAt
 ,FindDefIndex,src/harness/harness.cpp,field_read,ScriptedOrder::lineNo
 ,FindDefIndex,src/harness/harness.cpp,function,
@@ -44737,21 +44774,21 @@ address,function,file,kind,target
 ,FindReadyPlayer,src/network/net_game.cpp,field_read,PlayerInfo::host
 ,FindReadyPlayer,src/network/net_game.cpp,function,
 ,FindReadyPlayer,src/network/net_game.cpp,global_read,g_game
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,call,SamePos_0049d270
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,call,operator Projectile *
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,call,operator->
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,Game::localPlayer
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,Game::projectileCount
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,Game::projectiles
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,Projectile::attacker
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,Projectile::owner
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,Projectile::target
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,Unit::id
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,WeaponFirePacket::aimOrVel
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,WeaponFirePacket::flag
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,field_read,WeaponFirePacket::targetUnitId
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,function,
-,FindRemoteProjectile_0049d270,src/weapons/weapons.cpp,global_read,g_game
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,call,SameTargetPos
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,call,operator Projectile *
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,call,operator->
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,Game::localPlayer
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,Game::projectileCount
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,Game::projectiles
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,Projectile::attacker
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,Projectile::owner
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,Projectile::target
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,Unit::id
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,WeaponFirePacket::aimOrVel
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,WeaponFirePacket::flag
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,WeaponFirePacket::targetUnitId
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,function,
+,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,global_read,g_game
 ,FindScriptNative,src/seams/native.cpp,call,CobScript::FindScript
 ,FindScriptNative,src/seams/native.cpp,function,
 ,FindSetGadgetItemsEntry,src/gui/gui.cpp,call,strncmp
@@ -44812,13 +44849,6 @@ address,function,file,kind,target
 ,FindWeapon,src/units/unit_types.cpp,global_read,s_weaponTdfParsers@src/units/unit_types.cpp
 ,FindWeaponByNameNative,src/seams/native.cpp,call,FindWeaponByName
 ,FindWeaponByNameNative,src/seams/native.cpp,function,
-,Find_00499cd0,src/weapons/weapons.cpp,call,begin
-,Find_00499cd0,src/weapons/weapons.cpp,call,end
-,Find_00499cd0,src/weapons/weapons.cpp,call,operator()
-,Find_00499cd0,src/weapons/weapons.cpp,field_escape,Pair_00499cd0::value
-,Find_00499cd0,src/weapons/weapons.cpp,field_read,Pair_00499cd0::name
-,Find_00499cd0,src/weapons/weapons.cpp,field_read,Table_00499cd0::v
-,Find_00499cd0,src/weapons/weapons.cpp,function,
 ,Find_004b7900,src/util/commands.cpp,call,begin
 ,Find_004b7900,src/util/commands.cpp,call,end
 ,Find_004b7900,src/util/commands.cpp,call,operator()
@@ -45170,6 +45200,14 @@ address,function,file,kind,target
 ,GetCellCachedWidth,src/map/terrain.cpp,field_read,Game::width
 ,GetCellCachedWidth,src/map/terrain.cpp,function,
 ,GetCellCachedWidth,src/map/terrain.cpp,global_read,g_game
+,GetCellFeatureDef,src/map/terrain.cpp,field_read,Cell::feature
+,GetCellFeatureDef,src/map/terrain.cpp,field_read,Cell::offsetX
+,GetCellFeatureDef,src/map/terrain.cpp,field_read,Cell::offsetY
+,GetCellFeatureDef,src/map/terrain.cpp,field_read,Game::featureCount
+,GetCellFeatureDef,src/map/terrain.cpp,field_read,Game::features
+,GetCellFeatureDef,src/map/terrain.cpp,field_read,Game::width
+,GetCellFeatureDef,src/map/terrain.cpp,function,
+,GetCellFeatureDef,src/map/terrain.cpp,global_read,g_game
 ,GetCellMeanHeightNative,src/seams/native.cpp,call,GetCellMeanHeight
 ,GetCellMeanHeightNative,src/seams/native.cpp,function,
 ,GetCellPixel,src/map/line_of_sight.cpp,call,operator Cell *
@@ -45392,7 +45430,7 @@ address,function,file,kind,target
 ,GetSweetSpotNative,src/seams/native.cpp,call,GetSweetSpot
 ,GetSweetSpotNative,src/seams/native.cpp,function,
 ,GetTable,src/map/los_tables.cpp,call,operator[]
-,GetTable,src/map/los_tables.cpp,deref_read,*std::vector<std::vector<Elem_00434360>>
+,GetTable,src/map/los_tables.cpp,deref_read,*std::vector<std::vector<LosLineData>>
 ,GetTable,src/map/los_tables.cpp,function,
 ,GetTerrainLengthNative,src/seams/native.cpp,call,Mission::GetTerrainLength
 ,GetTerrainLengthNative,src/seams/native.cpp,function,
@@ -46159,16 +46197,6 @@ address,function,file,kind,target
 ,HeadlessWindowPost,src/host/win32/headless.cpp,global_read,g_windowOpen
 ,HeadlessWindowPost,src/host/win32/headless.cpp,global_read,kQueueSize
 ,HeadlessWindowPost,src/host/win32/headless.cpp,global_write,g_posted
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_read,Hits_0049a120::features
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_read,Hits_0049a120::numFeatures
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_write,Hits_0049a120::features
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_write,Hits_0049a120::numFeatures
-,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,function,
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_read,Hits_0049a120::numUnits
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_read,Hits_0049a120::units
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_write,Hits_0049a120::numUnits
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,field_write,Hits_0049a120::units
-,Hits_0049a120::AddUnit,src/weapons/weapons.cpp,function,
 ,HostHeadless,src/host/win32/headless.cpp,call,Scan
 ,HostHeadless,src/host/win32/headless.cpp,function,
 ,Identity,src/graphics/particles.cpp,function,
@@ -46193,6 +46221,11 @@ address,function,file,kind,target
 ,InfoPacket,src/network/net_game.cpp,field_write,PlayerInfo::id
 ,InfoPacket,src/network/net_game.cpp,field_write,SideDataPacket::type
 ,InfoPacket,src/network/net_game.cpp,function,
+,InitMotionProjectile,src/weapons/weapons.cpp,field_read,Unit::heading
+,InitMotionProjectile,src/weapons/weapons.cpp,field_write,Angles16::heading
+,InitMotionProjectile,src/weapons/weapons.cpp,field_write,Projectile::speed
+,InitMotionProjectile,src/weapons/weapons.cpp,field_write,Vec3::y
+,InitMotionProjectile,src/weapons/weapons.cpp,function,
 ,InitPlayerSpecs,src/harness/harness.cpp,call,memset
 ,InitPlayerSpecs,src/harness/harness.cpp,field_write,PlayerSpec::color
 ,InitPlayerSpecs,src/harness/harness.cpp,field_write,PlayerSpec::energy
@@ -47103,6 +47136,13 @@ address,function,file,kind,target
 ,IsLocalInRefreshBattleRoomRows,src/frontend/multi.cpp,field_read,Player::active
 ,IsLocalInRefreshBattleRoomRows,src/frontend/multi.cpp,field_read,Player::type
 ,IsLocalInRefreshBattleRoomRows,src/frontend/multi.cpp,function,
+,IsOnRadar,src/map/radar.cpp,call,ExploredOnRadar
+,IsOnRadar,src/map/radar.cpp,call,Player_Get
+,IsOnRadar,src/map/radar.cpp,call,VisibleOnRadar
+,IsOnRadar,src/map/radar.cpp,field_read,Game::playerIndex
+,IsOnRadar,src/map/radar.cpp,field_read,MapViewFlags::raw
+,IsOnRadar,src/map/radar.cpp,function,
+,IsOnRadar,src/map/radar.cpp,global_read,g_game
 ,IsPlayerAlive,src/ingame/game_dialogs.cpp,field_read,Player::type
 ,IsPlayerAlive,src/ingame/game_dialogs.cpp,field_read,Player::unitCount
 ,IsPlayerAlive,src/ingame/game_dialogs.cpp,field_read,Player::unitsCreated
@@ -47402,18 +47442,6 @@ address,function,file,kind,target
 ,LineHeightDirect,src/gui/gui.cpp,field_read,GafFrame::height
 ,LineHeightDirect,src/gui/gui.cpp,function,
 ,LineHeightDirect,src/gui/gui.cpp,global_read,g_guiContext
-,LineOfFire_0049aa80,src/weapons/weapons.cpp,call,SolveLaunchAngle
-,LineOfFire_0049aa80,src/weapons/weapons.cpp,call,operator-
-,LineOfFire_0049aa80,src/weapons/weapons.cpp,field_read,Fixed_0049aa80::value
-,LineOfFire_0049aa80,src/weapons/weapons.cpp,field_read,Vec3_0049aa80::x
-,LineOfFire_0049aa80,src/weapons/weapons.cpp,field_read,Vec3_0049aa80::z
-,LineOfFire_0049aa80,src/weapons/weapons.cpp,function,
-,LineOfFire_0049abb0,src/weapons/weapons.cpp,call,SolveLaunchAngle
-,LineOfFire_0049abb0,src/weapons/weapons.cpp,call,operator-
-,LineOfFire_0049abb0,src/weapons/weapons.cpp,field_read,Fixed_0049abb0::value
-,LineOfFire_0049abb0,src/weapons/weapons.cpp,field_read,Vec3_0049abb0::x
-,LineOfFire_0049abb0,src/weapons/weapons.cpp,field_read,Vec3_0049abb0::z
-,LineOfFire_0049abb0,src/weapons/weapons.cpp,function,
 ,ListDirectory,src/files/files_api.h,field_read,FilesSeam::ListDirectory
 ,ListDirectory,src/files/files_api.h,field_read,Seams::files
 ,ListDirectory,src/files/files_api.h,function,
@@ -47555,10 +47583,6 @@ address,function,file,kind,target
 ,Lod,src/map/line_of_sight.cpp,function,
 ,LodRaw,src/map/line_of_sight.cpp,field_read,SightQuery::sightDistance
 ,LodRaw,src/map/line_of_sight.cpp,function,
-,LodRaw_00481930,src/map/line_of_sight.cpp,field_read,SightQuery::sightDistance
-,LodRaw_00481930,src/map/line_of_sight.cpp,function,
-,Lod_00481930,src/map/line_of_sight.cpp,call,LodRaw_00481930
-,Lod_00481930,src/map/line_of_sight.cpp,function,
 ,LogStateChange,src/frontend/frontend.cpp,call,CodeChecksumFailed
 ,LogStateChange,src/frontend/frontend.cpp,call,OpenMessageBox
 ,LogStateChange,src/frontend/frontend.cpp,call,sprintf
@@ -47590,7 +47614,7 @@ address,function,file,kind,target
 ,LosTable::GetLine,src/map/los_lines.h,call,operator[]
 ,LosTable::GetLine,src/map/los_lines.h,deref_read,*LosTable
 ,LosTable::GetLine,src/map/los_lines.h,function,
-,LosTable::SetNumLines,src/map/los_lines.h,call,Elem_00434360::~Elem_00434360
+,LosTable::SetNumLines,src/map/los_lines.h,call,LosLineData::~LosLineData
 ,LosTable::SetNumLines,src/map/los_lines.h,call,resize
 ,LosTable::SetNumLines,src/map/los_lines.h,function,
 ,LosTables::LosTables,src/map/los_tables.h,function,
@@ -47841,8 +47865,6 @@ address,function,file,kind,target
 ,MulFixed,src/orders/order_list.cpp,function,
 ,NameLess::operator(),src/util/tdf.cpp,call,_strcmpi
 ,NameLess::operator(),src/util/tdf.cpp,function,
-,NameLess_00499cd0::operator(),src/weapons/weapons.cpp,call,_strcmpi
-,NameLess_00499cd0::operator(),src/weapons/weapons.cpp,function,
 ,NameLess_004b7620::operator(),src/util/commands.cpp,call,_strcmpi
 ,NameLess_004b7620::operator(),src/util/commands.cpp,function,
 ,NameNe_004b7620::operator(),src/util/commands.cpp,call,operator==
@@ -48025,27 +48047,6 @@ address,function,file,kind,target
 ,OnLeave,src/harness/block_scan.cpp,function,
 ,OnLeave,src/harness/block_scan.cpp,global_read,g_depth
 ,OnLeave,src/harness/block_scan.cpp,global_write,g_depth
-,OnRadarByte_00466dc0,src/map/radar.cpp,call,operator unsigned char *
-,OnRadarByte_00466dc0,src/map/radar.cpp,deref_read,*unsigned char
-,OnRadarByte_00466dc0,src/map/radar.cpp,field_read,Player::explored
-,OnRadarByte_00466dc0,src/map/radar.cpp,field_read,Player::exploredHeight
-,OnRadarByte_00466dc0,src/map/radar.cpp,field_read,Player::exploredWidth
-,OnRadarByte_00466dc0,src/map/radar.cpp,function,
-,OnRadarShort_00466dc0,src/map/radar.cpp,call,operator unsigned short *
-,OnRadarShort_00466dc0,src/map/radar.cpp,deref_read,*unsigned short
-,OnRadarShort_00466dc0,src/map/radar.cpp,field_read,Game::playerIndex
-,OnRadarShort_00466dc0,src/map/radar.cpp,field_read,Game::visibilityMask
-,OnRadarShort_00466dc0,src/map/radar.cpp,field_read,Player::exploredHeight
-,OnRadarShort_00466dc0,src/map/radar.cpp,field_read,Player::exploredWidth
-,OnRadarShort_00466dc0,src/map/radar.cpp,function,
-,OnRadarShort_00466dc0,src/map/radar.cpp,global_read,g_game
-,OnRadar_00466dc0,src/map/radar.cpp,call,OnRadarByte_00466dc0
-,OnRadar_00466dc0,src/map/radar.cpp,call,OnRadarShort_00466dc0
-,OnRadar_00466dc0,src/map/radar.cpp,call,Player_Get
-,OnRadar_00466dc0,src/map/radar.cpp,field_read,Game::playerIndex
-,OnRadar_00466dc0,src/map/radar.cpp,field_read,MapViewFlags::raw
-,OnRadar_00466dc0,src/map/radar.cpp,function,
-,OnRadar_00466dc0,src/map/radar.cpp,global_read,g_game
 ,OnRemoved,src/harness/block_scan.cpp,call,Inside
 ,OnRemoved,src/harness/block_scan.cpp,call,Slot
 ,OnRemoved,src/harness/block_scan.cpp,call,host_mutex_lock
@@ -48191,6 +48192,8 @@ address,function,file,kind,target
 ,OvrFile::OvrFile,src/units/unit_types.cpp,function,
 ,OvrFile::~OvrFile,src/units/unit_types.cpp,call,HapiBank::CloseBank
 ,OvrFile::~OvrFile,src/units/unit_types.cpp,function,
+,OwnedString::~OwnedString,src/map/los_tables.cpp,call,StringRef::ReleaseRef
+,OwnedString::~OwnedString,src/map/los_tables.cpp,function,
 ,PacketManager::~PacketManager,src/state/sim_globals.cpp,function,
 ,PacketReceiver::PacketReceiver,src/network/packet_receiver.h,function,
 ,PacketRing::Peek,src/network/packet_ring.h,field_read,PacketRing::buf
@@ -48777,6 +48780,12 @@ address,function,file,kind,target
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,function,
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,global_read,g_seams
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,indirect_call,indirect via float (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
+,ReachPosLineOfFire,src/weapons/weapons.cpp,call,SolveLaunchAngle
+,ReachPosLineOfFire,src/weapons/weapons.cpp,call,operator-
+,ReachPosLineOfFire,src/weapons/weapons.cpp,field_read,ReachPosFixed::value
+,ReachPosLineOfFire,src/weapons/weapons.cpp,field_read,ReachPosVec3::x
+,ReachPosLineOfFire,src/weapons/weapons.cpp,field_read,ReachPosVec3::z
+,ReachPosLineOfFire,src/weapons/weapons.cpp,function,
 ,ReachQuirkGuard,src/harness/harness.cpp,call,ApplyUnitDeath
 ,ReachQuirkGuard,src/harness/harness.cpp,call,Fail
 ,ReachQuirkGuard,src/harness/harness.cpp,call,GameAt
@@ -48801,6 +48810,15 @@ address,function,file,kind,target
 ,ReachQuirkGuard,src/harness/harness.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
 ,ReachQuirkGuard,src/harness/harness.cpp,indirect_call,indirect via void (*)(void *) __attribute__((thiscall)) [onTimer]
 ,ReachQuirkGuard,src/harness/harness.cpp,indirect_call,"indirect via void (*)(void *, int, int) __attribute__((thiscall)) [setUnitValue]"
+,ReachUnitDistSquared,src/weapons/weapons.cpp,field_read,ReachUnitVec3::x
+,ReachUnitDistSquared,src/weapons/weapons.cpp,field_read,ReachUnitVec3::z
+,ReachUnitDistSquared,src/weapons/weapons.cpp,function,
+,ReachUnitLineOfFire,src/weapons/weapons.cpp,call,SolveLaunchAngle
+,ReachUnitLineOfFire,src/weapons/weapons.cpp,call,operator-
+,ReachUnitLineOfFire,src/weapons/weapons.cpp,field_read,ReachUnitFixed::value
+,ReachUnitLineOfFire,src/weapons/weapons.cpp,field_read,ReachUnitVec3::x
+,ReachUnitLineOfFire,src/weapons/weapons.cpp,field_read,ReachUnitVec3::z
+,ReachUnitLineOfFire,src/weapons/weapons.cpp,function,
 ,ReadConsole,src/harness/harness.cpp,call,FailLine
 ,ReadConsole,src/harness/harness.cpp,call,NextToken
 ,ReadConsole,src/harness/harness.cpp,call,ParseNumber
@@ -49307,10 +49325,10 @@ address,function,file,kind,target
 ,SamePos,src/weapons/weapons.cpp,field_read,Vec3::y
 ,SamePos,src/weapons/weapons.cpp,field_read,Vec3::z
 ,SamePos,src/weapons/weapons.cpp,function,
-,SamePos_0049d270,src/weapons/weapons.cpp,field_read,Vec3::x
-,SamePos_0049d270,src/weapons/weapons.cpp,field_read,Vec3::y
-,SamePos_0049d270,src/weapons/weapons.cpp,field_read,Vec3::z
-,SamePos_0049d270,src/weapons/weapons.cpp,function,
+,SameTargetPos,src/weapons/weapons.cpp,field_read,Vec3::x
+,SameTargetPos,src/weapons/weapons.cpp,field_read,Vec3::y
+,SameTargetPos,src/weapons/weapons.cpp,field_read,Vec3::z
+,SameTargetPos,src/weapons/weapons.cpp,function,
 ,SaveConditionsNative,src/seams/native.cpp,call,MissionConditions::SaveConditions
 ,SaveConditionsNative,src/seams/native.cpp,function,
 ,SaveMotionNative,src/seams/native.cpp,call,UnitMotion::SaveMotion
@@ -49323,13 +49341,13 @@ address,function,file,kind,target
 ,SaveUnitAccountsNative,src/seams/native.cpp,call,UnitResources::SaveUnitAccounts
 ,SaveUnitAccountsNative,src/seams/native.cpp,function,
 ,Scale,src/graphics/model_render.cpp,function,
-,ScaleY_00466dc0,src/map/radar.cpp,field_read,Game::screen_h
-,ScaleY_00466dc0,src/map/radar.cpp,field_read,Unit::yWhole
-,ScaleY_00466dc0,src/map/radar.cpp,field_read,Unit::zWhole
-,ScaleY_00466dc0,src/map/radar.cpp,function,
-,ScaleY_00466dc0,src/map/radar.cpp,global_read,g_game
 ,ScaledPosOffset,src/ingame/markers.cpp,field_write,Fixed::value
 ,ScaledPosOffset,src/ingame/markers.cpp,function,
+,ScaledRadarY,src/map/radar.cpp,field_read,Game::screen_h
+,ScaledRadarY,src/map/radar.cpp,field_read,Unit::yWhole
+,ScaledRadarY,src/map/radar.cpp,field_read,Unit::zWhole
+,ScaledRadarY,src/map/radar.cpp,function,
+,ScaledRadarY,src/map/radar.cpp,global_read,g_game
 ,Scan,src/host/win32/headless.cpp,call,InterlockedExchange
 ,Scan,src/host/win32/headless.cpp,call,ScanCommandLine
 ,Scan,src/host/win32/headless.cpp,deref_read,*long
@@ -49714,11 +49732,6 @@ address,function,file,kind,target
 ,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::produced
 ,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::used
 ,SettleResourceAccount,src/game/economy.cpp,function,
-,Setup_0049d000,src/weapons/weapons.cpp,field_read,Unit::heading
-,Setup_0049d000,src/weapons/weapons.cpp,field_write,Angles16::heading
-,Setup_0049d000,src/weapons/weapons.cpp,field_write,Projectile::speed
-,Setup_0049d000,src/weapons/weapons.cpp,field_write,Vec3::y
-,Setup_0049d000,src/weapons/weapons.cpp,function,
 ,ShowSelectBox,src/ingame/info_panel.cpp,call,PointInRect
 ,ShowSelectBox,src/ingame/info_panel.cpp,field_escape,Game::rect
 ,ShowSelectBox,src/ingame/info_panel.cpp,field_read,Game::cursorScreenX
@@ -49727,6 +49740,10 @@ address,function,file,kind,target
 ,ShowSelectBox,src/ingame/info_panel.cpp,field_read,Game::orderMode
 ,ShowSelectBox,src/ingame/info_panel.cpp,function,
 ,ShowSelectBox,src/ingame/info_panel.cpp,global_read,g_game
+,SightTilesClamped,src/map/line_of_sight.cpp,call,SightTilesRaw
+,SightTilesClamped,src/map/line_of_sight.cpp,function,
+,SightTilesRaw,src/map/line_of_sight.cpp,field_read,SightQuery::sightDistance
+,SightTilesRaw,src/map/line_of_sight.cpp,function,
 ,Sim,src/state/sim_globals.h,call,SimCreate
 ,Sim,src/state/sim_globals.h,deref_read,*SimGlobals
 ,Sim,src/state/sim_globals.h,function,
@@ -49932,6 +49949,8 @@ address,function,file,kind,target
 ,StringRef::operator=,src/util/string_ref.h,function,
 ,StringRef::~StringRef,src/util/string_ref.h,call,ReleaseRef
 ,StringRef::~StringRef,src/util/string_ref.h,function,
+,StringRefView::~StringRefView,src/map/string_ref_view.h,call,ReleaseRef
+,StringRefView::~StringRefView,src/map/string_ref_view.h,function,
 ,StripDir,src/files/hpi.cpp,call,strlen
 ,StripDir,src/files/hpi.cpp,deref_read,*char
 ,StripDir,src/files/hpi.cpp,deref_write,*char
@@ -50032,12 +50051,6 @@ address,function,file,kind,target
 ,SyncRecordIntVectorBase::count,src/network/unit_sync.cpp,field_read,std::vector<SyncRecordIntElem>::_Last
 ,SyncRecordIntVectorBase::count,src/network/unit_sync.cpp,function,
 ,SystemValueType,src/host/win32/settings.cpp,function,
-,Table_00499cd0::LowerBound,src/weapons/weapon_types.cpp,call,Less
-,Table_00499cd0::LowerBound,src/weapons/weapon_types.cpp,call,begin
-,Table_00499cd0::LowerBound,src/weapons/weapon_types.cpp,call,end
-,Table_00499cd0::LowerBound,src/weapons/weapon_types.cpp,field_maybe_written,Table_00499cd0::v
-,Table_00499cd0::LowerBound,src/weapons/weapon_types.cpp,field_read,StringRef::ptr
-,Table_00499cd0::LowerBound,src/weapons/weapon_types.cpp,function,
 ,TakeFrame,src/network/packets.cpp,call,FrameRing::Pop
 ,TakeFrame,src/network/packets.cpp,field_read,Frame::data
 ,TakeFrame,src/network/packets.cpp,field_read,Frame::size
@@ -50076,14 +50089,6 @@ address,function,file,kind,target
 ,TdfRecord::GetChild,src/util/tdf.cpp,call,size
 ,TdfRecord::GetChild,src/util/tdf.cpp,function,
 ,TeleportParticles::TeleportParticles,src/graphics/particles.cpp,function,
-,Terrain_0047d2e0,src/map/terrain.cpp,field_read,Cell::feature
-,Terrain_0047d2e0,src/map/terrain.cpp,field_read,Cell::offsetX
-,Terrain_0047d2e0,src/map/terrain.cpp,field_read,Cell::offsetY
-,Terrain_0047d2e0,src/map/terrain.cpp,field_read,Game::featureCount
-,Terrain_0047d2e0,src/map/terrain.cpp,field_read,Game::features
-,Terrain_0047d2e0,src/map/terrain.cpp,field_read,Game::width
-,Terrain_0047d2e0,src/map/terrain.cpp,function,
-,Terrain_0047d2e0,src/map/terrain.cpp,global_read,g_game
 ,TestBit,src/ingame/control_panel.cpp,deref_read,*unsigned int
 ,TestBit,src/ingame/control_panel.cpp,function,
 ,TestBit,src/ingame/game_dialogs.cpp,deref_read,*unsigned int
@@ -50318,19 +50323,6 @@ address,function,file,kind,target
 ,UnlockPosts,src/host/win32/headless.cpp,call,LeaveCriticalSection
 ,UnlockPosts,src/host/win32/headless.cpp,function,
 ,UnlockPosts,src/host/win32/headless.cpp,global_maybe_written,g_postLock
-,Untrack_0049c880,src/weapons/weapons.cpp,call,operator->
-,Untrack_0049c880,src/weapons/weapons.cpp,call,operator=
-,Untrack_0049c880,src/weapons/weapons.cpp,field_read,Game::tracked
-,Untrack_0049c880,src/weapons/weapons.cpp,field_read,Projectile::flags
-,Untrack_0049c880,src/weapons/weapons.cpp,field_read,Projectile::position
-,Untrack_0049c880,src/weapons/weapons.cpp,field_read,Projectile::type
-,Untrack_0049c880,src/weapons/weapons.cpp,field_read,WeaponDef::holdTime
-,Untrack_0049c880,src/weapons/weapons.cpp,field_write,Game::tracked
-,Untrack_0049c880,src/weapons/weapons.cpp,field_write,Game::trackedPos
-,Untrack_0049c880,src/weapons/weapons.cpp,field_write,Game::value_1434b
-,Untrack_0049c880,src/weapons/weapons.cpp,field_write,Projectile::flags
-,Untrack_0049c880,src/weapons/weapons.cpp,function,
-,Untrack_0049c880,src/weapons/weapons.cpp,global_read,g_game
 ,UpdateCounts,src/ingame/control_panel.cpp,call,FindUnitTypeId
 ,UpdateCounts,src/ingame/control_panel.cpp,call,SetGrayedOut
 ,UpdateCounts,src/ingame/control_panel.cpp,deref_escape,*Gadget
@@ -50654,6 +50646,14 @@ address,function,file,kind,target
 ,Visible,src/units/unit_scripts.cpp,field_read,Unit_0043e490::player
 ,Visible,src/units/unit_scripts.cpp,function,
 ,Visible,src/units/unit_scripts.cpp,global_read,g_game
+,VisibleOnRadar,src/map/radar.cpp,call,operator unsigned short *
+,VisibleOnRadar,src/map/radar.cpp,deref_read,*unsigned short
+,VisibleOnRadar,src/map/radar.cpp,field_read,Game::playerIndex
+,VisibleOnRadar,src/map/radar.cpp,field_read,Game::visibilityMask
+,VisibleOnRadar,src/map/radar.cpp,field_read,Player::exploredHeight
+,VisibleOnRadar,src/map/radar.cpp,field_read,Player::exploredWidth
+,VisibleOnRadar,src/map/radar.cpp,function,
+,VisibleOnRadar,src/map/radar.cpp,global_read,g_game
 ,Visit,src/harness/block_scan.cpp,call,BuildSpans
 ,Visit,src/harness/block_scan.cpp,call,Find
 ,Visit,src/harness/block_scan.cpp,call,LocateSpan
@@ -52242,18 +52242,18 @@ address,function,file,kind,target
 ,operator-,src/ingame/markers.cpp,field_read,Vec3::z
 ,operator-,src/ingame/markers.cpp,field_write,Fixed::value
 ,operator-,src/ingame/markers.cpp,function,
-,operator-,src/weapons/weapons.cpp,field_read,Fixed_0049aa80::value
-,operator-,src/weapons/weapons.cpp,field_read,Fixed_0049abb0::value
-,operator-,src/weapons/weapons.cpp,field_read,Vec3_0049aa80::x
-,operator-,src/weapons/weapons.cpp,field_read,Vec3_0049aa80::z
-,operator-,src/weapons/weapons.cpp,field_read,Vec3_0049abb0::x
-,operator-,src/weapons/weapons.cpp,field_read,Vec3_0049abb0::z
-,operator-,src/weapons/weapons.cpp,field_write,Fixed_0049aa80::value
-,operator-,src/weapons/weapons.cpp,field_write,Fixed_0049abb0::value
-,operator-,src/weapons/weapons.cpp,field_write,Vec3_0049aa80::x
-,operator-,src/weapons/weapons.cpp,field_write,Vec3_0049aa80::z
-,operator-,src/weapons/weapons.cpp,field_write,Vec3_0049abb0::x
-,operator-,src/weapons/weapons.cpp,field_write,Vec3_0049abb0::z
+,operator-,src/weapons/weapons.cpp,field_read,ReachPosFixed::value
+,operator-,src/weapons/weapons.cpp,field_read,ReachPosVec3::x
+,operator-,src/weapons/weapons.cpp,field_read,ReachPosVec3::z
+,operator-,src/weapons/weapons.cpp,field_read,ReachUnitFixed::value
+,operator-,src/weapons/weapons.cpp,field_read,ReachUnitVec3::x
+,operator-,src/weapons/weapons.cpp,field_read,ReachUnitVec3::z
+,operator-,src/weapons/weapons.cpp,field_write,ReachPosFixed::value
+,operator-,src/weapons/weapons.cpp,field_write,ReachPosVec3::x
+,operator-,src/weapons/weapons.cpp,field_write,ReachPosVec3::z
+,operator-,src/weapons/weapons.cpp,field_write,ReachUnitFixed::value
+,operator-,src/weapons/weapons.cpp,field_write,ReachUnitVec3::x
+,operator-,src/weapons/weapons.cpp,field_write,ReachUnitVec3::z
 ,operator-,src/weapons/weapons.cpp,function,
 ,operator<,src/ai/pathfind.cpp,field_read,Entry_40d670::key
 ,operator<,src/ai/pathfind.cpp,function,

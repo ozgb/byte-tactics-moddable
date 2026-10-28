@@ -517,8 +517,8 @@ void __stdcall DrawExplodedPieceFaces(void* surface, ExplodedPiece* obj, PieceRe
     int i;
 
     Object3D* arr = inner->desc;
-    struct Off_004211d0 { int a; int y; int b; };
-    Off_004211d0 off;
+    struct PieceScreenOffset { int a; int y; int b; };
+    PieceScreenOffset off;
     off.a = inner->pos.x - (g_game->scrollX << 16);
     off.y = inner->pos.y;
     off.b = inner->pos.z - (g_game->scrollY << 16);

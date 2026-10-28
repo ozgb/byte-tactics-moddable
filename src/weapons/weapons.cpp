@@ -34,27 +34,27 @@ struct Gun_0049c9c0 {
 
 struct Unit;
 
-struct Type_0049d270 {
+struct DroppedMotionParamView {
     char unknown_0[0x20];
     int param;
 };
 
-struct Entry_0049d270 {
+struct NetFireSlotView {
     char unknown_0[0xc];
-    Ref<Type_0049d270> type;
+    Ref<DroppedMotionParamView> type;
     char unknown_10[0x16 - 0x10];
     short f_16;
     short f_18;
     char unknown_1a[0x1c - 0x1a];
 };
 
-struct Point_0049e1a0 {
+struct SlotAimTarget {
     short x;
     short z;
 };
 
-struct Entry_0049e1a0 {
-    Point_0049e1a0 point;
+struct UpdateWeaponSlotView {
+    SlotAimTarget point;
     char* name;
     int f_8;
     Ref<WeaponDef> attached;
@@ -68,19 +68,19 @@ struct Entry_0049e1a0 {
 
 #include "../game/unit_resources.h"
 
-struct Owner_0049dd60 {
+struct DroppedMotionIdView {
     char unknown_0[0x20];
     int id;
 };
 
-struct UnitType_0049d000 {
+struct MotionRangeView {
     char unknown_0[0x20];
     int range;
 };
 
 #include "weapon_def.h"
 
-union Fbb_0049d580 {
+union NetDirtyFlagBits {
     unsigned short value;
     struct {
         unsigned short b0 : 1, b1 : 1, b2 : 1, b3 : 1;
@@ -95,7 +95,7 @@ union Fba_0049e1a0 {
     unsigned char b[2];
 };
 
-union Fixed_0049abb0 {
+union ReachUnitFixed {
     int value;
     struct {
         unsigned short fraction;
@@ -103,9 +103,9 @@ union Fixed_0049abb0 {
     } parts;
 };
 
-struct Vec3_0049abb0 {
+struct ReachUnitVec3 {
     int x;
-    Fixed_0049abb0 y;
+    ReachUnitFixed y;
     int z;
 };
 
@@ -160,14 +160,14 @@ struct Vec3_00499ab0 {
     int z;
 };
 
-struct Kind_00499ab0 {
+struct WeaponFirePlayerView {
     char unknown_0[4];
     int f4;
 };
 
-struct Obj_00499ab0 {
+struct WeaponFireUnitView {
     char unknown_0[0x96];
-    Ref<Kind_00499ab0> kind;
+    Ref<WeaponFirePlayerView> kind;
     char unknown_9a[0xa8 - 0x9a];
     unsigned short team;
 };
@@ -191,8 +191,8 @@ struct WeaponFirePacket {
 int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // FUNCTION: 0x499ab0
-void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, Obj_00499ab0* source,
-                            Obj_00499ab0* target, Vec3_00499ab0* a,
+void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, WeaponFireUnitView* source,
+                            WeaponFireUnitView* target, Vec3_00499ab0* a,
                             Vec3_00499ab0* b)
 {
     WeaponFirePacket packet;
@@ -237,7 +237,7 @@ void __stdcall BroadcastWeaponFire(char param_1, Vec3_00499ba0* a, Vec3_00499ba0
 }
 
 #pragma pack(push, 2)
-struct Object_00499c10 {
+struct RockUnitView {
     char unknown_0[0x66];
     short heading;
     char unknown_68[0x9a - 0x68];
@@ -245,7 +245,7 @@ struct Object_00499c10 {
 };
 #pragma pack(pop)
 
-struct Source_00499c10 {
+struct RockSourceSlotView {
     char unknown_0[0x16];
     short heading;
 };
@@ -256,7 +256,7 @@ int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 
 // FUNCTION: 0x499c10
-void __stdcall RockUnit(Object_00499c10* obj, Source_00499c10* src)
+void __stdcall RockUnit(RockUnitView* obj, RockSourceSlotView* src)
 {
     short angle = src->heading - obj->heading;
     int a = -ScaledSin(angle, 800);
@@ -288,12 +288,12 @@ void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target)
 
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
-struct Pair_00499cd0 {
+struct DamageEntryView {
     char* name;
     int value;
 };
 
-struct NameLess_00499cd0 {
+struct DamageNameLess {
     bool operator()(const char* a, const char* b) const
     {
         return _strcmpi(a, b) < 0;
@@ -301,7 +301,7 @@ struct NameLess_00499cd0 {
 };
 
 #pragma pack(push, 1)
-struct Flags_00499cd0 {
+struct DamageScaleFlags {
     unsigned short bits0_6 : 7;
     unsigned short flag7 : 1;
     unsigned short flag8 : 1;
@@ -313,19 +313,19 @@ short __cdecl AngleOfVector(int x, int z);
 void __stdcall DamageUnit(Unit* source, Unit* target,
                             int amount, int type, unsigned short extra);
 
-static inline int* Find_00499cd0(const Table_00499cd0* table, char* name)
+static inline int* FindDamageValue(const DamageTable* table, char* name)
 {
-    NameLess_00499cd0 less;
-    Pair_00499cd0* first = (Pair_00499cd0*)table->v.begin();
-    Pair_00499cd0* last = (Pair_00499cd0*)table->v.end();
+    DamageNameLess less;
+    DamageEntryView* first = (DamageEntryView*)table->v.begin();
+    DamageEntryView* last = (DamageEntryView*)table->v.end();
     while (first != last) {
-        Pair_00499cd0* mid = first + (last - first) / 2;
+        DamageEntryView* mid = first + (last - first) / 2;
         if (less(mid->name, name))
             first = mid + 1;
         else
             last = mid;
     }
-    if (first == (Pair_00499cd0*)table->v.end() || less(name, first->name))
+    if (first == (DamageEntryView*)table->v.end() || less(name, first->name))
         return 0;
     return &first->value;
 }
@@ -336,9 +336,9 @@ int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
 {
     WeaponDef* def = weapon->type;
     int damage = def->damage;
-    Table_00499cd0* table = def->table;
+    DamageTable* table = def->table;
     if (table) {
-        int* p = Find_00499cd0(table, target->def->unitname);
+        int* p = FindDamageValue(table, target->def->unitname);
         if (p)
             damage = *p;
     }
@@ -352,7 +352,7 @@ int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
             armour = 5;
         damage = (armour * 6 + 100) * damage / 100;
     }
-    Flags_00499cd0* flags = (Flags_00499cd0*)((char*)g_game + 0x37f2f);
+    DamageScaleFlags* flags = (DamageScaleFlags*)((char*)g_game + 0x37f2f);
     if (flags->flag7)
         damage *= 2;
     if (flags->flag8)
@@ -446,7 +446,7 @@ struct Vec3_0049a0c0 {
 };
 
 #pragma pack(push, 1)
-struct Params_0049a0c0 {
+struct AreaDamageProjectileView {
     Ref<char> owner;
     Vec3_0049a0c0 pos;
     char unknown_10[0x42];
@@ -460,7 +460,7 @@ struct Params_0049a0c0 {
 // FUNCTION: 0x49a0c0
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
 {
-    Params_0049a0c0 p;
+    AreaDamageProjectileView p;
     memset(&p, 0, sizeof(p));
     p.ownerUnit = 0;
     p.owner = (char*)owner;
@@ -471,7 +471,7 @@ void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
 
 #include <math.h>
 
-union Fixed_0049a120 {
+union AreaDamageFixed {
     int raw;
     struct {
         unsigned short frac;
@@ -480,12 +480,12 @@ union Fixed_0049a120 {
 };
 
 struct FixedVec3 {
-    Fixed_0049a120 x;
-    Fixed_0049a120 y;
-    Fixed_0049a120 z;
+    AreaDamageFixed x;
+    AreaDamageFixed y;
+    AreaDamageFixed z;
 };
 
-struct CellPos_0049a120 {
+struct CellPosXZ {
     short x;
     short z;
 };
@@ -497,7 +497,7 @@ void Unused_0049a120(int a, int b, int c, int d, int e, int f);
 
 #include <vector>
 
-struct Hits_0049a120 {
+struct AreaDamageHits {
     int numUnits;
     int numFeatures;
     Unit* units[20];
@@ -625,14 +625,14 @@ int AimCobStub(int, int, int, int);
 
 #pragma pack(push, 1)
 
-union Fixed_0049aa80 {
+union ReachPosFixed {
     int value;
     struct { unsigned short fraction; short whole; } parts;
 };
 
-struct Vec3_0049aa80 {
+struct ReachPosVec3 {
     int x;
-    Fixed_0049aa80 y;
+    ReachPosFixed y;
     int z;
 };
 
@@ -640,23 +640,23 @@ struct Vec3_0049aa80 {
 
 short __stdcall SolveLaunchAngle(int dx, int dy, int dz, int a, int b);
 
-inline Vec3_0049aa80 operator-(Vec3_0049aa80 a, Vec3_0049aa80 b)
+inline ReachPosVec3 operator-(ReachPosVec3 a, ReachPosVec3 b)
 {
-    Vec3_0049aa80 r;
+    ReachPosVec3 r;
     r.x = b.x - a.x;
     r.y.value = b.y.value - a.y.value;
     r.z = b.z - a.z;
     return r;
 }
 
-static inline short LineOfFire_0049aa80(Vec3_0049aa80 to, Vec3_0049aa80 from, int s, int f)
+static inline short ReachPosLineOfFire(ReachPosVec3 to, ReachPosVec3 from, int s, int f)
 {
-    Vec3_0049aa80 d = from - to;
+    ReachPosVec3 d = from - to;
     return SolveLaunchAngle(d.x, d.y.value, d.z, s, f);
 }
 
 // FUNCTION: 0x49aa80
-int __stdcall WeaponCanReachPos(Unit* a1, Vec3_0049aa80* a2, Vec3_0049aa80* a3, int a4)
+int __stdcall WeaponCanReachPos(Unit* a1, ReachPosVec3* a2, ReachPosVec3* a3, int a4)
 {
     WeaponDef* wdef = a1->weapons[a4 & 0xff].weapon;
 
@@ -672,7 +672,7 @@ int __stdcall WeaponCanReachPos(Unit* a1, Vec3_0049aa80* a2, Vec3_0049aa80* a3, 
         return 0;
 
     if (wdef->flags.b.ballistic) {
-        if (LineOfFire_0049aa80(*a2, *a3, wdef->speed, wdef->field_c8) == (short)0x8000)
+        if (ReachPosLineOfFire(*a2, *a3, wdef->speed, wdef->field_c8) == (short)0x8000)
             return 0;
     }
     return 1;
@@ -684,22 +684,22 @@ int __stdcall WeaponCanReachPos(Unit* a1, Vec3_0049aa80* a2, Vec3_0049aa80* a3, 
 
 #pragma pack(pop)
 
-inline Vec3_0049abb0 operator-(Vec3_0049abb0 a, Vec3_0049abb0 b)
+inline ReachUnitVec3 operator-(ReachUnitVec3 a, ReachUnitVec3 b)
 {
-    Vec3_0049abb0 r;
+    ReachUnitVec3 r;
     r.x = b.x - a.x;
     r.y.value = b.y.value - a.y.value;
     r.z = b.z - a.z;
     return r;
 }
 
-static inline short LineOfFire_0049abb0(Vec3_0049abb0 to, Vec3_0049abb0 from, int s, int f)
+static inline short ReachUnitLineOfFire(ReachUnitVec3 to, ReachUnitVec3 from, int s, int f)
 {
-    Vec3_0049abb0 d = from - to;
+    ReachUnitVec3 d = from - to;
     return SolveLaunchAngle(d.x, d.y.value, d.z, s, f);
 }
 
-static inline int Dist2_0049abb0(Vec3_0049abb0* b, Vec3_0049abb0* a)
+static inline int ReachUnitDistSquared(ReachUnitVec3* b, ReachUnitVec3* a)
 {
     int dz = a->z - b->z;
     int dx = a->x - b->x;
@@ -716,7 +716,7 @@ int __stdcall WeaponCanReachUnit(Unit* unit1, Unit* unit2, unsigned char weapon)
             return 0;
         if ((unit2->def->flags1 & 0x1000) && (unit2->def->modelMaxYHigh >> 1) + unit2->yWhole > g_game->seaLevel)
             return 0;
-        return Dist2_0049abb0((Vec3_0049abb0*)&unit1->pos, (Vec3_0049abb0*)&unit2->pos) <= w->range * w->range;
+        return ReachUnitDistSquared((ReachUnitVec3*)&unit1->pos, (ReachUnitVec3*)&unit2->pos) <= w->range * w->range;
     }
 
     if (unit1->yWhole + unit1->def->modelMaxYHigh <= g_game->seaLevel)
@@ -726,10 +726,10 @@ int __stdcall WeaponCanReachUnit(Unit* unit1, Unit* unit2, unsigned char weapon)
     if (w->flags.b.toAirWeapon && (unit2->flags & 3) != 2)
         return 0;
     if (w->flags.b.ballistic) {
-        if (LineOfFire_0049abb0(*(Vec3_0049abb0*)&unit1->pos, *(Vec3_0049abb0*)&unit2->pos, w->speed, w->field_c8) == (short)0x8000)
+        if (ReachUnitLineOfFire(*(ReachUnitVec3*)&unit1->pos, *(ReachUnitVec3*)&unit2->pos, w->speed, w->field_c8) == (short)0x8000)
             return 0;
     }
-    return Dist2_0049abb0((Vec3_0049abb0*)&unit1->pos, (Vec3_0049abb0*)&unit2->pos) <= w->range * w->range;
+    return ReachUnitDistSquared((ReachUnitVec3*)&unit1->pos, (ReachUnitVec3*)&unit2->pos) <= w->range * w->range;
 }
 
 // FUNCTION: 0x49adf0
@@ -973,7 +973,7 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
     PlaySoundAt(shot->sound, pos, 0);
 }
 
-static inline void Untrack_0049c880(Projectile* proj)
+static inline void ClearTrackedProjectile(Projectile* proj)
 {
     if (proj == g_game->tracked) {
         g_game->trackedPos = g_game->tracked->position;
@@ -989,7 +989,7 @@ void __stdcall RemoveUnitProjectiles(Unit_0049c880* owner)
     Projectile* proj = g_game->projectiles;
     for (int i = 0; i < g_game->projectileCount; i++, proj++) {
         if (proj->active != 0 && proj->attacker == (Unit*)owner) {
-            Untrack_0049c880(proj);
+            ClearTrackedProjectile(proj);
             CompactProjectiles();
         }
     }
@@ -1027,7 +1027,7 @@ int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 #include "../graphics/particles.h"
 
-struct Fire_0049c9c0 {
+struct LineOfSightFireSlotView {
     char unknown_0[0xc];
     Ref<WeaponDef> shot;
     char unknown_10[0x1b - 0x10];
@@ -1039,7 +1039,7 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot,
                            Unit* unit);
 
 // FUNCTION: 0x49c9c0
-int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
+int __stdcall FireLineOfSightProjectile(LineOfSightFireSlotView* fire, Unit* unit,
                            Vec3* p3, Vec3* p4, int param_5)
 {
     Projectile* proj = 0;
@@ -1101,7 +1101,7 @@ int __stdcall FireLineOfSightProjectile(Fire_0049c9c0* fire, Unit* unit,
 #include <string.h>
 
 #pragma pack(push, 1)
-struct Shot_0049cc20 {
+struct VLaunchFireSlotView {
     char unknown_0[0x8];
     int aimCobDone;
     Ref<WeaponDef> def;
@@ -1116,7 +1116,7 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
                             Vec3* aim, int field_5, Unit* unit);
 
 // FUNCTION: 0x49cc20
-int __stdcall FireVLaunchProjectile(Shot_0049cc20* shot, Unit* unit, Vec3* pos,
+int __stdcall FireVLaunchProjectile(VLaunchFireSlotView* shot, Unit* unit, Vec3* pos,
                            Vec3* aim, int param_5, int param_6)
 {
     Projectile* proj = 0;
@@ -1160,7 +1160,7 @@ int __stdcall FireVLaunchProjectile(Shot_0049cc20* shot, Unit* unit, Vec3* pos,
 }
 
 #pragma pack(push, 1)
-struct Shot_0049cde0 {
+struct BallisticFireSlotView {
     char unknown_0[0xc];
     Ref<WeaponDef> def;
     unsigned int muzzleAimFromDeltaZ;
@@ -1177,7 +1177,7 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
                             Vec3* aim, int field_5, Unit* unit);
 
 // FUNCTION: 0x49cde0
-int __stdcall FireBallisticProjectile(Shot_0049cde0* shot, Unit* unit, Vec3* pos,
+int __stdcall FireBallisticProjectile(BallisticFireSlotView* shot, Unit* unit, Vec3* pos,
                            Vec3* aim, int param_5)
 {
     Projectile* proj = 0;
@@ -1216,14 +1216,14 @@ int __stdcall FireBallisticProjectile(Shot_0049cde0* shot, Unit* unit, Vec3* pos
 }
 
 #pragma pack(push, 1)
-struct Shot_0049d000 {
+struct MotionFireSlotView {
     char unknown_0[0xc];
     Ref<char> weapon;
 };
 
 #pragma pack(pop)
 
-static inline void Setup_0049d000(Projectile* proj, Unit* u)
+static inline void InitMotionProjectile(Projectile* proj, Unit* u)
 {
     proj->angles.heading = u->heading;
     proj->speed = 0;
@@ -1233,7 +1233,7 @@ static inline void Setup_0049d000(Projectile* proj, Unit* u)
 void __stdcall InitProjectile(Projectile*, void*, void*, int, int, Unit*);
 
 // FUNCTION: 0x49d000
-int __stdcall SpawnProjectileFromUnitMotion(Shot_0049d000* shot, Unit* unit, Vec3* pos)
+int __stdcall SpawnProjectileFromUnitMotion(MotionFireSlotView* shot, Unit* unit, Vec3* pos)
 {
     Projectile* proj = 0;
     if (g_game->projectileCount < 300) {
@@ -1243,24 +1243,24 @@ int __stdcall SpawnProjectileFromUnitMotion(Shot_0049d000* shot, Unit* unit, Vec
     }
     if (proj) {
         InitProjectile(proj, shot->weapon, pos, 0, g_game->ticks, unit);
-        Setup_0049d000(proj, unit);
-        proj->direction.x = -ScaledSin(proj->angles.heading, ((UnitType_0049d000*)unit->motion.get())->range);
-        proj->direction.z = -ScaledCos(proj->angles.heading, ((UnitType_0049d000*)unit->motion.get())->range);
+        InitMotionProjectile(proj, unit);
+        proj->direction.x = -ScaledSin(proj->angles.heading, ((MotionRangeView*)unit->motion.get())->range);
+        proj->direction.z = -ScaledCos(proj->angles.heading, ((MotionRangeView*)unit->motion.get())->range);
         return 1;
     }
     return 0;
 }
 
-struct Object_0049d0c0 {
+struct FireByFlagsSlotView {
     char unknown_0[0xc];
     Ref<WeaponDef> info;
 };
 
-int __stdcall FireLineOfSightProjectile(Object_0049d0c0* obj, int a, int b, int c, int d);
-int __stdcall FireBallisticProjectile(Object_0049d0c0* obj, int a, int b, int c, int d);
+int __stdcall FireLineOfSightProjectile(FireByFlagsSlotView* obj, int a, int b, int c, int d);
+int __stdcall FireBallisticProjectile(FireByFlagsSlotView* obj, int a, int b, int c, int d);
 
 // FUNCTION: 0x49d0c0
-int __stdcall FireWeaponByFlags(Object_0049d0c0* obj, int a, int b, int d, int c)
+int __stdcall FireWeaponByFlags(FireByFlagsSlotView* obj, int a, int b, int d, int c)
 {
     int result = 0;
     if (obj->info->flags.b.lineOfSight || obj->info->flags.b.selfProp)
@@ -1271,7 +1271,7 @@ int __stdcall FireWeaponByFlags(Object_0049d0c0* obj, int a, int b, int d, int c
 }
 
 #pragma pack(push, 1)
-struct Entry_0049d120 {
+struct InterceptorSlotView {
     char unknown_0[0xc];
     Ref<WeaponDef> def;
     char unknown_10[0x1a - 0x10];
@@ -1279,9 +1279,9 @@ struct Entry_0049d120 {
     char unknown_1b;
 };
 
-struct Table_0049d120 {
+struct InterceptorUnitView {
     char unknown_0[4];
-    Entry_0049d120 entries[3];
+    InterceptorSlotView entries[3];
     char unknown_58[0x6a - 0x58];
     Vec3 pos;
     char unknown_76[0xff - 0x76];
@@ -1292,9 +1292,9 @@ struct Table_0049d120 {
 #pragma pack(pop)
 
 // FUNCTION: 0x49d120
-Projectile* __stdcall FindTargetableProjectile(Table_0049d120* table, int index)
+Projectile* __stdcall FindTargetableProjectile(InterceptorUnitView* table, int index)
 {
-    Entry_0049d120* entry = &table->entries[index & 0xff];
+    InterceptorSlotView* entry = &table->entries[index & 0xff];
     if (!entry->active)
         return 0;
     int radius = entry->def->coverage << 16;
@@ -1320,7 +1320,7 @@ Projectile* __stdcall FindTargetableProjectile(Table_0049d120* table, int index)
 }
 
 #pragma pack(push, 1)
-struct Event_0049d1e0 {
+struct RemoteFireEventView {
     char unknown_0[0xd];
     Vec3 pos;
     unsigned char team;
@@ -1338,7 +1338,7 @@ static inline int SamePos(Vec3& a, Vec3& b)
 }
 
 // FUNCTION: 0x49d1e0
-Projectile* __stdcall FindRemoteProjectile(Event_0049d1e0* ev)
+Projectile* __stdcall FindRemoteProjectile(RemoteFireEventView* ev)
 {
     if (!ev->flag)
         return 0;
@@ -1355,18 +1355,18 @@ Projectile* __stdcall FindRemoteProjectile(Event_0049d1e0* ev)
 void Unused_0049d270(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
-static inline int SamePos_0049d270(Vec3& a, Vec3& b)
+static inline int SameTargetPos(Vec3& a, Vec3& b)
 {
     return a.x == b.x && a.z == b.z && a.y == b.y;
 }
 
-Projectile* __stdcall FindRemoteProjectile_0049d270(WeaponFirePacket* ev)
+Projectile* __stdcall FindRemoteProjectileForPacket(WeaponFirePacket* ev)
 {
     if (ev->flag) {
         char me = (char)g_game->localPlayer;
         Projectile* proj = g_game->projectiles;
         for (int i = 0; i < g_game->projectileCount; i++, proj++) {
-            if ((char)proj->owner != me && SamePos_0049d270(proj->target, ev->aimOrVel) && proj->attacker->id == ev->targetUnitId)
+            if ((char)proj->owner != me && SameTargetPos(proj->target, ev->aimOrVel) && proj->attacker->id == ev->targetUnitId)
                 return proj;
         }
     }
@@ -1403,12 +1403,12 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
         return;
     if (!unit->alive)
         return;
-    Entry_0049d270* entry = (Entry_0049d270*)&unit->weapons[ev->weaponSlotIndex];
+    NetFireSlotView* entry = (NetFireSlotView*)&unit->weapons[ev->weaponSlotIndex];
     entry->f_18 = ev->firePitch;
     entry->f_16 = ev->fireHeading;
     unsigned short targetId = ev->targetUnitId;
     Unit* target = targetId == 0 ? 0 : &g_game->units[targetId];
-    Projectile* found = FindRemoteProjectile_0049d270(ev);
+    Projectile* found = FindRemoteProjectileForPacket(ev);
     if (def->flags.b.ballistic) {
         FireBallisticProjectile(entry, unit, (void*)((char*)ev + 1), &ev->aimOrVel, target);
         return;
@@ -1434,8 +1434,8 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
         proj->angles.heading = unit->heading;
         proj->speed = 0;
         proj->direction.y = 0;
-        proj->direction.x = -ScaledSin(proj->angles.heading, ((Type_0049d270*)unit->motion.get())->param);
-        proj->direction.z = -ScaledCos(proj->angles.heading, ((Type_0049d270*)unit->motion.get())->param);
+        proj->direction.x = -ScaledSin(proj->angles.heading, ((DroppedMotionParamView*)unit->motion.get())->param);
+        proj->direction.z = -ScaledCos(proj->angles.heading, ((DroppedMotionParamView*)unit->motion.get())->param);
         return;
     }
 }
@@ -1482,7 +1482,7 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
         }
         if (!ok) {
             unit->flags &= 0xfe;
-            ((Fbb_0049d580*)&fire->netDirtyFlags)->f.b12 = 1;
+            ((NetDirtyFlagBits*)&fire->netDirtyFlags)->f.b12 = 1;
             return 0;
         }
         if (!AimWithinTolerance(fire, (Unit*)unit, heading, pitch)) {
@@ -1535,7 +1535,7 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
 #include <stdlib.h>
 
 
-struct Aim_0049d880 {
+struct ToleranceAimSlotView {
     char unknown_0[0xc];
     Ref<WeaponDef> type;
     char unknown_10[0x16 - 0x10];
@@ -1544,7 +1544,7 @@ struct Aim_0049d880 {
 };
 
 // FUNCTION: 0x49d880
-int __stdcall AimWithinTolerance(Unit* unit, Aim_0049d880* aim, short angle1, short angle2)
+int __stdcall AimWithinTolerance(Unit* unit, ToleranceAimSlotView* aim, short angle1, short angle2)
 {
     unsigned short a = aim->type->tolerance;
     int x;
@@ -1585,7 +1585,7 @@ int __stdcall CalcAimAngles(Unit* unit, Unit* target, short* out_heading, short*
 }
 
 #pragma pack(push, 1)
-struct Aim_0049d9c0 {
+struct LineOfSightAimSlotView {
     char unknown_0[0xc];
     Ref<WeaponDef> type;
     char unknown_10[0x16 - 0x10];
@@ -1598,12 +1598,12 @@ struct Aim_0049d9c0 {
 void Unused_0049d9c0(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
-int __stdcall AimWithinTolerance(Unit* unit, Aim_0049d9c0* aim, short angle1, short angle2);
-int __stdcall FireLineOfSightProjectile(Aim_0049d9c0* aim, Unit* unit, Vec3* aimPos,
+int __stdcall AimWithinTolerance(Unit* unit, LineOfSightAimSlotView* aim, short angle1, short angle2);
+int __stdcall FireLineOfSightProjectile(LineOfSightAimSlotView* aim, Unit* unit, Vec3* aimPos,
                            Vec3* point, Unit* target);
 
 // FUNCTION: 0x49d9c0
-int __stdcall FireLineOfSightWeapon(Unit* unit, Aim_0049d9c0* aim,
+int __stdcall FireLineOfSightWeapon(Unit* unit, LineOfSightAimSlotView* aim,
                            Unit* target, Vec3* point)
 {
     Vec3 p;
@@ -1641,7 +1641,7 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, Aim_0049d9c0* aim,
 }
 
 #pragma pack(push, 1)
-struct Shot_0049db70 {
+struct VLaunchWeaponSlotView {
     char unknown_0[8];
     int piece;
     Ref<WeaponDef> def;
@@ -1652,14 +1652,14 @@ struct Shot_0049db70 {
     unsigned char weapon;
 };
 
-struct Kind_0049db70 {
+struct VLaunchPlayerView {
     char unknown_0[4];
     int player;
 };
 
-struct Object_0049db70 {
+struct VLaunchUnitView {
     char unknown_0[0x96];
-    Ref<Kind_0049db70> kind;
+    Ref<VLaunchPlayerView> kind;
     char unknown_9a[0xa8 - 0x9a];
     short team;
 };
@@ -1667,16 +1667,16 @@ struct Object_0049db70 {
 void Unused_0049db70(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
-void __stdcall GetWeaponPiecePosition(Object_0049db70* obj, Vec3* out, unsigned char weapon, int piece);
-int* __stdcall FindTargetableProjectile(Object_0049db70* obj, unsigned char weapon);
-int __stdcall FireVLaunchProjectile(Shot_0049db70* shot, Object_0049db70* source, Vec3* pos,
-                           Vec3* aim, Object_0049db70* target, int* param_6);
+void __stdcall GetWeaponPiecePosition(VLaunchUnitView* obj, Vec3* out, unsigned char weapon, int piece);
+int* __stdcall FindTargetableProjectile(VLaunchUnitView* obj, unsigned char weapon);
+int __stdcall FireVLaunchProjectile(VLaunchWeaponSlotView* shot, VLaunchUnitView* source, Vec3* pos,
+                           Vec3* aim, VLaunchUnitView* target, int* param_6);
 double __cdecl _hypot(double x, double y);
 long __cdecl _ftol();
 
 // FUNCTION: 0x49db70
-int __stdcall FireVLaunchWeapon(Object_0049db70* source, Shot_0049db70* shot,
-                           Object_0049db70* target, Vec3* aim)
+int __stdcall FireVLaunchWeapon(VLaunchUnitView* source, VLaunchWeaponSlotView* shot,
+                           VLaunchUnitView* target, Vec3* aim)
 {
     Vec3 pos;
     if (shot->piece != 0) {
@@ -1720,7 +1720,7 @@ int __stdcall FireVLaunchWeapon(Object_0049db70* source, Shot_0049db70* shot,
 }
 
 #pragma pack(push, 1)
-struct Aim_0049dd60 {
+struct DroppedAimSlotView {
     char unknown_0[0xc];
     Ref<WeaponDef> type;
     char unknown_10[0x16 - 0x10];
@@ -1736,7 +1736,7 @@ void Unused_0049dd60(int a, int b, int c, int d, int e, int f);
 void __stdcall InitProjectile(Projectile*, WeaponDef*, Vec3*, int, int, Unit*);
 
 // FUNCTION: 0x49dd60
-int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
+int __stdcall FireDroppedWeapon(Unit* unit, DroppedAimSlotView* aim,
                            Unit* target, Vec3* point)
 {
     Vec3 p;
@@ -1752,8 +1752,8 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
         projectile->angles.heading = unit->heading;
         projectile->speed = 0;
         projectile->direction.y = 0;
-        projectile->direction.x = -ScaledSin(projectile->angles.heading, ((Owner_0049dd60*)unit->motion.get())->id);
-        projectile->direction.z = -ScaledCos(projectile->angles.heading, ((Owner_0049dd60*)unit->motion.get())->id);
+        projectile->direction.x = -ScaledSin(projectile->angles.heading, ((DroppedMotionIdView*)unit->motion.get())->id);
+        projectile->direction.z = -ScaledCos(projectile->angles.heading, ((DroppedMotionIdView*)unit->motion.get())->id);
         if (g_game->netGameFlags & 1) {
             WeaponFirePacket packet;
             packet.type = 0xd;
@@ -1834,7 +1834,7 @@ void __stdcall SetWeaponFireHandler(WeaponDef* weapon)
         weapon->fire = (WeaponFireFn)FireDroppedWeapon;
 }
 
-struct Frame_0049e070 {
+struct WeaponSlotInitState {
     unsigned char i;
     int maxTime;
 };
@@ -1842,7 +1842,7 @@ struct Frame_0049e070 {
 // FUNCTION: 0x49e070
 void __stdcall InitUnitWeaponSlots(Unit* unit)
 {
-    Frame_0049e070 frame = {0, 0};
+    WeaponSlotInitState frame = {0, 0};
     for (frame.i = 0; frame.i < 3; frame.i++) {
         UnitWeaponSlot* s = &unit->weapons[frame.i];
         s->reloadTimer = 0;
@@ -1881,7 +1881,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
     Vec3 aim;
 
     for (i = 0; i < 3; i++) {
-        Entry_0049e1a0* e = (Entry_0049e1a0*)&unit->weapons[i];
+        UpdateWeaponSlotView* e = (UpdateWeaponSlotView*)&unit->weapons[i];
         unsigned char fl = e->flags;
         WeaponDef* attached = e->attached;
         if (!(fl & 2))
@@ -2118,7 +2118,7 @@ TdfFile g_tdfGlobalParser;
 #include "../util/angles.h"
 
 #pragma pack(push, 1)
-struct Sprite_0049be60 {
+struct ModelChildView {
     char unknown_0[0x30];
     void* child;
 };
@@ -2217,7 +2217,7 @@ void __stdcall DrawProjectiles(void* surface)
                     rot.heading += 0x8000;
                     rot.pitch += 0x8000;
                     DrawModel3doProjected(surface, &sp, type->model, &rot);
-                    Sprite_0049be60* s = (Sprite_0049be60*)type->model;
+                    ModelChildView* s = (ModelChildView*)type->model;
                     if (0 != s->child && p->time > time) {
                         if (type->flags.b.propeller) {
                             rot.bank = p->propellerSpin;
@@ -2348,7 +2348,7 @@ void __stdcall DrawProjectiles(void* surface)
 // FUNCTION: 0x49a120
 void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
 {
-    Hits_0049a120 hits;
+    AreaDamageHits hits;
     memset(&hits, 0, 8);
     int radius = weapon->type->areaOfEffect >> 1;
     int r = radius / 16 + 1;
@@ -2418,7 +2418,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                         d.z = 0;
                     }
                 }
-                Fixed_0049a120 dist;
+                AreaDamageFixed dist;
                 dist.raw = Length(&d);
                 int distance = dist.part.whole;
                 if (distance < radius) {
@@ -2461,22 +2461,22 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
             if (feature >= 0xfffb)
                 continue;
             int index = cell - g_game->cells;
-            CellPos_0049a120 cp;
+            CellPosXZ cp;
             cp.x = index % g_game->width;
             cp.z = index / g_game->width;
-            CellPos_0049a120 at = cp;
+            CellPosXZ at = cp;
             FeatureSpot* spot = &g_game->spots[cell->spot];
             int distance;
             if ((cell->flags & 1) && spot) {
                 Vec3 v = Sub(*pos, spot->pos);
-                Fixed_0049a120 dist;
+                AreaDamageFixed dist;
                 dist.raw = VectorLength(&v);
                 distance = dist.part.whole;
             } else {
                 Vec3 centre = g_seams.features->GetFootprintCentre((Point16*)&at, &g_game->features[feature]);
                 Vec3 p = *(Vec3*)&centre;
                 Vec3 v = Sub(*pos, p);
-                Fixed_0049a120 dist;
+                AreaDamageFixed dist;
                 dist.raw = (int)sqrt((double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z);
                 distance = dist.part.whole;
             }

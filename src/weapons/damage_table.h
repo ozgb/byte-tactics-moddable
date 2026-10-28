@@ -7,7 +7,7 @@ struct DamageTableEntry;
 
 #pragma pack(push, 1)
 
-struct Table_00499cd0 {
+struct DamageTable {
     char less;
     std::vector<DamageTableEntry> v;
 

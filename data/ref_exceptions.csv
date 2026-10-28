@@ -235,7 +235,7 @@ SpotState,root,pointer,src/graphics/spot_state.h,#353
 StringRef,data,pointer,src/util/string_ref.h,#353
 StringRef,p,pointer,src/util/string_ref.h,#353
 StringRef,ptr,pointer,src/util/string_ref.h,#353
-Table_00499cd0,v,container,src/weapons/damage_table.h,#361
+DamageTable,v,container,src/weapons/damage_table.h,#361
 TdfFieldList,end,pointer,interfaces/services.h,#353
 TdfFieldList,first,pointer,interfaces/services.h,#353
 TdfFieldList,last,pointer,interfaces/services.h,#353

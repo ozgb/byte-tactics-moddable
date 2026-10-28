@@ -341,51 +341,6 @@ public:
                               int lifetime, int isAscending);
 };
 
-class Listener_00471d90 {
-public:
-    virtual void Slot0();
-    virtual void Slot1();
-    virtual void Slot2(void* msg);
-};
-
-struct Lists_00471d90 {
-    std::vector<Listener_00471d90*> lists[10];
-};
-
-class Listener_00471eb0 {
-public:
-    virtual ~Listener_00471eb0();
-    virtual void Slot1();
-    virtual void Slot2(void* msg);
-    virtual int Slot3();
-};
-
-struct Lists_00471eb0 {
-    std::vector<Listener_00471eb0*> lists[10];
-};
-
-class Listener_471f40 {
-public:
-    virtual void Slot0();
-    virtual void Slot1();
-    virtual void Slot2(int arg);
-};
-
-struct Lists_471f40 {
-    std::vector<Listener_471f40*> lists[10];
-};
-
-class Listener_00471f90 {
-public:
-    virtual void Slot0();
-    virtual void Slot1();
-    virtual void Slot2(void* msg);
-};
-
-struct Lists_00471f90 {
-    std::vector<Listener_00471f90*> lists[10];
-};
-
 struct Vec3_004720d0 {
     int x, y, z;
 };
@@ -722,23 +677,23 @@ void ParticleSystem::SetLifetime(int ticks)
 // FUNCTION: 0x471d90
 void CreateParticleLists()
 {
-    (*(Lists_00471d90 **)&g_game->lists_38d77) = new Lists_00471d90;
+    (*(ParticleLists **)&g_game->lists_38d77) = new ParticleLists;
 }
 
 // FUNCTION: 0x471eb0
 void UpdateParticles()
 {
-    Lists_00471eb0* l = (Lists_00471eb0 *)g_game->lists_38d77;
+    ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     for (int i = 0; i < 10; i++) {
-        std::vector<Listener_00471eb0*>& v = l->lists[i];
-        std::vector<Listener_00471eb0*>::iterator it = v.begin();
+        std::vector<ParticleSystem*>& v = l->lists[i];
+        std::vector<ParticleSystem*>::iterator it = v.begin();
         while (it != v.end()) {
-            Listener_00471eb0* p = *it;
-            if (p->Slot3()) {
+            ParticleSystem* p = *it;
+            if (p->IsFinished()) {
                 delete p;
                 v.erase(it);
             } else {
-                p->Slot1();
+                p->Update();
                 ++it;
             }
         }
@@ -748,10 +703,10 @@ void UpdateParticles()
 // FUNCTION: 0x471f40
 void __stdcall DrawParticles(int arg)
 {
-    Lists_471f40* l = (Lists_471f40 *)g_game->lists_38d77;
+    ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     for (int i = 0; i < 10; i++) {
-        for (std::vector<Listener_471f40*>::iterator it = l->lists[i].begin(); it != l->lists[i].end(); ++it) {
-            (*it)->Slot2(arg);
+        for (std::vector<ParticleSystem*>::iterator it = l->lists[i].begin(); it != l->lists[i].end(); ++it) {
+            (*it)->Render(arg);
         }
     }
 }
@@ -759,9 +714,9 @@ void __stdcall DrawParticles(int arg)
 // FUNCTION: 0x471f90
 void __stdcall DrawParticleList(void* msg, short kind)
 {
-    std::vector<Listener_00471f90*>& v = ((Lists_00471f90 *)g_game->lists_38d77)->lists[kind];
-    for (std::vector<Listener_00471f90*>::iterator it = v.begin(); it != v.end(); ++it) {
-        (*it)->Slot2(msg);
+    std::vector<ParticleSystem*>& v = ((ParticleLists *)g_game->lists_38d77)->lists[kind];
+    for (std::vector<ParticleSystem*>::iterator it = v.begin(); it != v.end(); ++it) {
+        (*it)->Render((int)msg);
     }
 }
 

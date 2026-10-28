@@ -1,6 +1,10 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 struct Gadget;
+struct OptionsSliderMenu;
+struct ValueTextEntry;
+
+struct Gadget;
 struct Gui;
 
 void __stdcall SetDirectConnectAddress(char*);
@@ -59,5 +63,16 @@ void __stdcall HandleRestartDialogClick(Gui* gui);
 void __stdcall HandleSurrenderChoice(Gui* gui);
 void __stdcall HandleExitMenuClick(Gui* gui);
 void __stdcall HandleInGameOptionsClick(Gui* gui);
+
+void __stdcall UpdateVideoModeLabel(OptionsSliderMenu*, Gadget*);
+void __stdcall HandleVideoModeSlider(OptionsSliderMenu* obj, int unused);
+void __stdcall HandleGammaSlider(OptionsSliderMenu* obj, int unused);
+void __stdcall HandleEffectsVolumeSlider(OptionsSliderMenu* obj, int unused);
+void __stdcall HandleMusicVolumeSlider(OptionsSliderMenu* obj, int unused);
+void __stdcall SetGadgetTextFromValueTable(ValueTextEntry* table, char* name, int value);
+void __stdcall HandleGameSpeedSlider(OptionsSliderMenu* obj, int unused);
+void __stdcall HandleScreenSlider(OptionsSliderMenu* obj, int unused);
+void __stdcall HandleMaxLinesSlider(OptionsSliderMenu* obj, int unused);
+void __stdcall HandleTextScrollSlider(OptionsSliderMenu* obj, int unused);
 
 #endif

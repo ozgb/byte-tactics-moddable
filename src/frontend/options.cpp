@@ -572,17 +572,9 @@ void __stdcall FreeBlinkWords(int param_1);
 #include "../gui/file_list.h"
 
 #include "options.h"
-void __stdcall HandleVideoModeSlider(OptionsSliderMenu* obj, int unused);
-void __stdcall HandleGammaSlider(OptionsSliderMenu* obj, int unused);
 void __stdcall HandleMusicOptionsClick(int value);
-void __stdcall HandleMusicVolumeSlider(OptionsSliderMenu* obj, int unused);
-void __stdcall HandleEffectsVolumeSlider(OptionsSliderMenu* obj, int unused);
 void __stdcall HandleSoundOptionsClick(void* obj, int arg);
 void __stdcall HandleSpeedOptionsClick(void* obj, int arg);
-void __stdcall HandleGameSpeedSlider(OptionsSliderMenu* obj, int unused);
-void __stdcall HandleScreenSlider(OptionsSliderMenu* obj, int unused);
-void __stdcall HandleMaxLinesSlider(OptionsSliderMenu* obj, int unused);
-void __stdcall HandleTextScrollSlider(OptionsSliderMenu* obj, int unused);
 #include "../game/savegame.h"
 
 #include "../graphics/object_pool.h"

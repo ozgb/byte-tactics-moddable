@@ -193,24 +193,14 @@ GroundPickupOrder,mismatch,"static risk rule: a convention, parameter count, or 
 HAPI_PackDirectory,skip,unknown name cb
 HAPI_RelocateDirectory,mismatch,pointer/int cast: definition's type is likely wrong
 HAPI_WriteArchiveData,skip,unknown name cb
-HandleCloseCdPlayerChoice,skip,placeholder type Gadget_00426190: left for the type-naming issues
-HandleEffectsVolumeSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
-HandleGameSpeedSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
-HandleGammaSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
 HandleHostEvent,skip,unknown name host_event
 HandleHotspotInput,mismatch,fixing it changes the generated code of a caller
 HandleLabelInput,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 HandleListBoxInput,mismatch,fixing it changes the generated code of a caller
-HandleMainMenuClick,skip,placeholder type Gadget_00425d80: left for the type-naming issues
-HandleMaxLinesSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
 HandleMusicOptionsClick,mismatch,placeholder type Object_0045d280: left for the type-naming issues
-HandleMusicVolumeSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
-HandleScreenSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
 HandleSliderInput,mismatch,placeholder type Object_004a4170: left for the type-naming issues
 HandleSoundOptionsClick,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 HandleSpeedOptionsClick,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-HandleTextScrollSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
-HandleVideoModeSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
 HideSoftwareCursor,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 InitCursorFrames,mismatch,pointer/int cast: definition's type is likely wrong
 InitGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming issues
@@ -316,7 +306,6 @@ SetGadgetStatus,mismatch,"static risk rule: a convention, parameter count, or no
 SetGadgetStatusByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 SetGadgetText,mismatch,placeholder type Object_004a0880: left for the type-naming issues
 SetGadgetTextByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
-SetGadgetTextFromValueTable,skip,placeholder type Entry_0045c010: left for the type-naming issues
 SetGafSequenceFrame,skip,placeholder type Obj_004b7f00: left for the type-naming issues
 SetGrayedOut,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 SetGrayedOutByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
@@ -342,7 +331,6 @@ SubtractVec3,mismatch,fixing it changes the generated code of a caller
 SwapPrimitives,skip,placeholder type Primitive_004cb2f0: left for the type-naming issues
 TickProgressBar,skip,src/gui/gui.cpp defines a static TickProgressBar and sees src/gui/gui.h
 TintFrameBelow,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-ToggleAnyMission,skip,placeholder type Object_00477510: left for the type-naming issues
 TransferEnergy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 TransferMetal,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 Translate,mismatch,pointer/int cast: definition's type is likely wrong
@@ -355,7 +343,6 @@ UpdateHelpText,mismatch,"definition type not nameable in a header, or no clean c
 UpdateMenu,mismatch,fixing it changes the generated code of a caller
 UpdatePlayerEconomy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 UpdateTimeoutDialog,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-UpdateVideoModeLabel,skip,placeholder type Menu_0045b800: left for the type-naming issues
 VectorFromTo,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 VectorFromToInt,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 VectorLength,mismatch,placeholder type Vec3i_0049a850: left for the type-naming issues

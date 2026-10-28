@@ -223,8 +223,6 @@ void __stdcall FinishUnitSync(void);
 #include "../game/statistics.h"
 #include "endgame.h"
 void __stdcall SetFrontendState(char state, int line, char* file);
-void __stdcall HandleMainMenuClick(MainMenuGadgetView* gadget);
-void __stdcall HandleCloseCdPlayerChoice(CdPlayerChoiceGadgetView* gadget);
 void* __stdcall LoadBitmapByName(const char* name, int param_2);
 int __stdcall SetBackgroundSurface(int param_1, int param_2);
 

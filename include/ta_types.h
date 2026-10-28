@@ -874,7 +874,6 @@ class Class_004e8230;
 class LosTable;
 class Class_44ef90;
 struct DisplayContext;
-struct UnitKilledPacket;
 struct Cmp_0046d040;
 struct CobFile_0042d1f0;
 struct Color_004acc70;
@@ -1145,12 +1144,10 @@ union Fix_004736e0;
 union Fix_00473d50;
 union Fix_0047d2e0;
 union Fixed;
-struct FixedParts_004853b0;
 struct Fixed_004239c0;
 struct Fixed_00424050;
 struct Fixed_00485140;
 struct Fixed_00485330;
-union Fixed_004853b0;
 union Fixed_0048bae0;
 union Fixed_0049abb0;
 union Fixed_2;
@@ -1511,7 +1508,6 @@ struct Node_00439e30;
 struct Node_0043ad50;
 struct Node_0046fad0;
 struct Node_0047e570;
-struct Node_00489a90;
 struct Node_004bb2e0;
 struct Node_004d0b10;
 struct Node_004d0f60;
@@ -1679,7 +1675,6 @@ struct Packet_0046dad0;
 struct Packet_0047f0c0;
 struct Packet_0047f300;
 struct OwnershipTransferPacket;
-struct ActivateFlagsPacket;
 struct WeaponFirePacket;
 struct Packet_00499ba0;
 struct ProjectileDetonatePacket;
@@ -1899,7 +1894,6 @@ struct Source_004ae4b0;
 struct Source_004ae550;
 struct Span_004c0a90;
 struct Spawn_00420e50;
-struct Spawn_004861d0;
 union SpotField_004246b0;
 struct SpotState;
 struct Sprite_0049be60;
@@ -9500,15 +9494,6 @@ struct Pos_00485330 {
     Fixed_00485330 z;
 };
 
-struct FixedParts_004853b0 {
-    unsigned int frac : 16;
-    unsigned int whole : 16;
-};
-
-union Fixed_004853b0 {
-    union { int value; FixedParts_004853b0 parts; };
-};
-
 struct Item_00485940 {
     char unknown_0[4];
     unsigned int key;
@@ -9524,24 +9509,6 @@ union Flags114_485a40 {
 struct Unit_00485d40 {
     char unknown_0[398];
     BuildList_0045a950* data;
-};
-
-struct Spawn_004861d0 {
-    unsigned char player;
-    unsigned short type;
-    unsigned short id;
-    Vec3 pos;
-    char unknown_11[6];
-};
-
-struct UnitKilledPacket {
-    unsigned char type;
-    unsigned short unitId;
-    int killerId;
-    unsigned short parentId;
-    char field_9;
-    unsigned char count : 4;
-    unsigned char kind : 4;
 };
 
 struct Name_004866d0 {
@@ -9907,13 +9874,6 @@ struct Def_004899b0 {
     int f245;
 };
 
-struct Node_00489a90 {
-    char unknown_0[134];
-    Class_00489a70* owner;
-    char unknown_8a[4];
-    Node_00489a90* next;
-};
-
 struct UnitDamagePacketOut {
     unsigned char type;
     unsigned short attacker;
@@ -9978,12 +9938,6 @@ struct Order_0048ab70 {
     unsigned short id2;
     char param;
     unsigned char param2;
-};
-
-struct ActivateFlagsPacket {
-    unsigned char type;
-    short field_1;
-    unsigned char field_3;
 };
 
 union Fixed_0048bae0 {

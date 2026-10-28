@@ -12,7 +12,7 @@ struct Vector3s {
     short z;
 };
 
-struct FaceFlags_459c70 {
+struct ModelFaceFlags {
     union {
         unsigned int raw;
         struct {
@@ -24,7 +24,7 @@ struct FaceFlags_459c70 {
     };
 };
 
-struct Face_459c70 {
+struct ModelFace {
     int unknown_0;
     int count;
     int unknown_8;
@@ -32,11 +32,11 @@ struct Face_459c70 {
     void* pic;
     int unknown_14;
     unsigned short* color;
-    FaceFlags_459c70 flags;
+    ModelFaceFlags flags;
 };
 
 #pragma pack(push, 2)
-union PieceFlags_459c70 {
+union ModelPieceFlags {
     unsigned short word;
     struct {
         unsigned short visible : 1;
@@ -46,7 +46,7 @@ union PieceFlags_459c70 {
     } bits;
 };
 
-struct Piece_459c70 {
+struct ModelPiece {
     Object3do* object;
     int rot_x;
     int rot_y;
@@ -57,18 +57,18 @@ struct Piece_459c70 {
     Vec3 offset;
     Ref<Vec3> points;
     short modified;
-    PieceFlags_459c70 flags;
-    Piece_459c70* sibling;
-    Piece_459c70* child;
-    Piece_459c70* parent;
+    ModelPieceFlags flags;
+    ModelPiece* sibling;
+    ModelPiece* child;
+    ModelPiece* parent;
 };
 #pragma pack(pop)
 
 struct UnitDef;
-struct Model_459200;
+struct ModelState;
 
 #pragma pack(push, 1)
-struct Unit_459200 {
+struct UnitDrawView {
     Ref<char> motion;
     char unknown_4[0x60];
     Vector3s angles;
@@ -77,11 +77,11 @@ struct Unit_459200 {
     int pos_z;
     char unknown_76[0x86 - 0x76];
     int carrier;
-    Ref<Unit_459200> cargo;
-    Ref<Unit_459200> cargoNext;
+    Ref<UnitDrawView> cargo;
+    Ref<UnitDrawView> cargoNext;
     Ref<UnitDef> def;
     char unknown_96[8];
-    Ref<Model_459200> state;
+    Ref<ModelState> state;
     char unknown_a2[4];
     short unitDefIndex;
     unsigned short id;
@@ -98,41 +98,35 @@ struct Unit_459200 {
 #pragma pack(pop)
 
 #pragma pack(push, 2)
-struct Model_459200 {
+struct ModelState {
     int count;
     int cacheDrawCount;
     int animDirty;
-    Unit_459200* owner;
+    UnitDrawView* owner;
     GafFrame* bitmap;
     GafFrame* shadow;
     Vector3s pos;
-    Piece_459c70* root;
-    Piece_459c70 pieces[1];
+    ModelPiece* root;
+    ModelPiece pieces[1];
 };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-struct Fixed_459200 {
+struct FixedParts {
     unsigned short frac;
     short whole;
 };
 
-struct Pos_459200 {
-    Fixed_459200 x;
-    Fixed_459200 y;
-    Fixed_459200 z;
+struct FixedVec3Parts {
+    FixedParts x;
+    FixedParts y;
+    FixedParts z;
 };
 
-struct Ints_459200 {
-    int x;
-    int y;
-    int z;
-};
-
-union Vec3_459200 {
+union FixedVec3Union {
     int v[3];
-    Pos_459200 p;
-    Ints_459200 i;
+    FixedVec3Parts p;
+    Vec3 i;
 };
 #pragma pack(pop)
 

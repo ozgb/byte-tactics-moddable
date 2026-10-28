@@ -20,20 +20,20 @@ struct Game;
 
 #include "../util/vec3.h"
 
-struct Poly_459c70 { int x; int y; int z; int shade; };
+struct ShadedVertex { int x; int y; int z; int shade; };
 
 #include "../util/point.h"
 
-struct Pos_4589c0 {
+struct ModelBoundsOrigin {
     int x;
     int y;
     int z;
-    Pos_4589c0(int a, int b, int c) { x = a; y = b; z = c; }
+    ModelBoundsOrigin(int a, int b, int c) { x = a; y = b; z = c; }
 };
 
 #include "gaf_frame.h"
 
-struct Surface_4589c0 {
+struct CompositeSurfaceView {
     int width;
     int height;
     int pitch;
@@ -94,18 +94,12 @@ void __stdcall FillShadedPolygon(GafFrame* surface, void* poly, int count, int f
 void __stdcall FillPolygon(void* surface, Point* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
-int __stdcall GetGroundHeight(Pos_459200* p);
+int __stdcall GetGroundHeight(FixedVec3Parts* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
 void __stdcall TintFrameBelow(GafFrame* param_1, int value);
 void __stdcall CutFrameBelow(GafFrame* param_1, int value);
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 #include "model_render.h"
-
-struct Vertex_0045a610 {
-    int x;
-    int y;
-    int z;
-};
 
 // FUNCTION: 0x458160
 UnitTable* UnitTable::Construct(void)
@@ -133,14 +127,14 @@ void UnitTable::Destroy()
     this->FreeBuffer();
 }
 
-static __inline int shade_bias(Unit_459200* owner)
+static __inline int shade_bias(UnitDrawView* owner)
 {
     bool c = ((owner->def->flags1 >> 30) & 1) != 0;
     return c ? 125 : 50;
 }
 
 // FUNCTION: 0x4581e0
-void UnitTable::MeasureModel(int* width, int* height, int* originX, int* originY, Model_459200* model, Vec3* offset)
+void UnitTable::MeasureModel(int* width, int* height, int* originX, int* originY, ModelState* model, Vec3* offset)
 {
     int minX;
     int minY;
@@ -148,7 +142,7 @@ void UnitTable::MeasureModel(int* width, int* height, int* originX, int* originY
     int maxY;
     minX = maxX = minY = maxY = 0;
     for (int i = model->count - 1; i >= 0; i--) {
-        Piece_459c70* piece = &model->pieces[i];
+        ModelPiece* piece = &model->pieces[i];
         if (piece->flags.bits.visible) {
             Vec3* v = piece->points;
             for (int n = 0; n < piece->object->vertexCount; n++) {
@@ -183,13 +177,13 @@ void UnitTable::MeasureModel(int* width, int* height, int* originX, int* originY
 }
 
 // FUNCTION: 0x4586a0
-int UnitTable::BuildObjectPicture(Model_459200* list, int param_2, int param_3)
+int UnitTable::BuildObjectPicture(ModelState* list, int param_2, int param_3)
 {
     int w;
     int h;
     int oy;
     int ox;
-    Unit_459200* owner = list->owner;
+    UnitDrawView* owner = list->owner;
     MeasureModel(&w, &h, &oy, &ox, list, 0);
     if (param_2 == 0 && (owner->zBufferFlag & 1) == 0 && owner->buildLeft == 0.0f) {
         this->AllocBitmap(&list->bitmap, w, h);
@@ -212,7 +206,7 @@ int UnitTable::BuildObjectPicture(Model_459200* list, int param_2, int param_3)
 }
 
 // FUNCTION: 0x459830
-void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
+void UnitTable::DrawPieces(GafFrame* bitmap, ModelState* list,
     int kind, int useColor)
 {
     Vec3 vertex[2000];
@@ -270,13 +264,13 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
                     verts++;
                 }
 
-                Face_459c70* face;
+                ModelFace* face;
                 int fi;
                 if (info->firstFace != -1) {
-                    face = (Face_459c70*)info->faces + 1;
+                    face = (ModelFace*)info->faces + 1;
                     fi = 1;
                 } else {
-                    face = (Face_459c70*)info->faces;
+                    face = (ModelFace*)info->faces;
                     fi = 0;
                 }
                 for (; fi < info->faceCount; fi++, face++) {
@@ -284,7 +278,7 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
                     for (int j = 0; j < face->count; j++, idx++) {
                         poly[j] = vertex[*idx];
                     }
-                    FaceFlags_459c70 fflags = face->flags;
+                    ModelFaceFlags fflags = face->flags;
                     if (!fflags.bits.textured) {
                         if (face->count == 4) {
                             void* pic;
@@ -332,14 +326,14 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
 
 // FUNCTION: 0x458310
 void CMemoryCache::AddModelBounds(int* minX, int* maxX, int* minY, int* maxY,
-                                    Model_459200* model, Pos_4589c0 pos)
+                                    ModelState* model, ModelBoundsOrigin pos)
 {
     int hiY = 0;
     int loY = 0;
     int hiX = 0;
     int loX = 0;
     for (int i = model->count - 1; i >= 0; i--) {
-        Piece_459c70* piece = &model->pieces[i];
+        ModelPiece* piece = &model->pieces[i];
         if (piece->flags.bits.visible) {
             Vec3* v = piece->points;
             for (int n = 0; n < piece->object->vertexCount; n++) {
@@ -366,10 +360,10 @@ void CMemoryCache::AddModelBounds(int* minX, int* maxX, int* minY, int* maxY,
 }
 
 // FUNCTION: 0x458430
-void CMemoryCache::DrawObjectPieces(int param_1, Model_459200* list, Vec3 v, int param_6)
+void CMemoryCache::DrawObjectPieces(int param_1, ModelState* list, Vec3 v, int param_6)
 {
     if (list->bitmap != 0) {
-        DrawObjectPicture(param_1, list, (Vec3_459200&)v, param_6);
+        DrawObjectPicture(param_1, list, (FixedVec3Union&)v, param_6);
         return;
     }
     for (int i = list->count - 1; i >= 0; i--) {
@@ -406,16 +400,16 @@ template <class T> inline void Swap(T& a, T& b)
 }
 
 // FUNCTION: 0x4589c0
-void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
+void CMemoryCache::MergeIntoComposite(GafFrame* bmp, ModelState* model)
 {
-    Pos_4589c0 origin(0, 0, 0);
+    ModelBoundsOrigin origin(0, 0, 0);
     int minX = 0;
     int maxX = 0;
     int minY = 0;
     int maxY = 0;
 
     AddModelBounds(&minX, &maxX, &minY, &maxY, model, origin);
-    Unit_459200* child = model->owner->cargo;
+    UnitDrawView* child = model->owner->cargo;
     while (child != 0) {
         if ((child->flags & 0x20000) == 0) {
             int cminX = 0;
@@ -472,7 +466,7 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
         short sdy = 0;
         Swap(bmp->xOffset, sdx);
         Swap(bmp->yOffset, sdy);
-        Surface_4589c0 surface;
+        CompositeSurfaceView surface;
         SurfaceFromFrame((Surface *)&surface, this->bitmap);
         memset(this->bitmap->pixelsOrLayers, this->bitmap->transparency,
                this->bitmap->height * this->bitmap->width);
@@ -490,12 +484,12 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
     ShadeByIntensity(this->bitmap, model);
 }
 
-struct Count_00458d20 {
+struct CountedList {
     int count;
 };
 
 // FUNCTION: 0x458d20
-void __stdcall DecrementCountArgument(int param_1, Count_00458d20* list, int param_3)
+void __stdcall DecrementCountArgument(int param_1, CountedList* list, int param_3)
 {
     for (int i = list->count - 1; i >= 0; i--) {
     }
@@ -535,12 +529,12 @@ void CMemoryCache::RecolorByShade(GafFrame* img, unsigned char level, int above,
 }
 
 // FUNCTION: 0x458dd0
-int CMemoryCache::ShadeByIntensity(GafFrame* image, Model_459200* model)
+int CMemoryCache::ShadeByIntensity(GafFrame* image, ModelState* model)
 {
     if (image->scratch == 0)
         return 0;
 
-    Unit_459200* owner = model->owner;
+    UnitDrawView* owner = model->owner;
     if (owner->buildLeft == 0.0f)
         return 0;
 
@@ -604,7 +598,7 @@ GafFrame* CMemoryCache::MakeSilhouette(GafFrame* src)
 }
 
 // FUNCTION: 0x45a510
-void CMemoryCache::MeasureShadow(int* width, int* height, int* originX, int* originY, Model_459200* model)
+void CMemoryCache::MeasureShadow(int* width, int* height, int* originX, int* originY, ModelState* model)
 {
     int minX;
     int minY;
@@ -613,7 +607,7 @@ void CMemoryCache::MeasureShadow(int* width, int* height, int* originX, int* ori
     minX = maxX = minY = maxY = 0;
     *width = *height = *originX = *originY = 0;
     for (int i = model->count - 1; i >= 0; i--) {
-        Piece_459c70* piece = &model->pieces[i];
+        ModelPiece* piece = &model->pieces[i];
         if (piece->flags.bits.visible) {
             Vec3* v = piece->points;
             for (int n = 0; n < piece->object->vertexCount; n++) {
@@ -642,14 +636,14 @@ void CMemoryCache::MeasureShadow(int* width, int* height, int* originX, int* ori
 }
 
 // FUNCTION: 0x45a610
-void CMemoryCache::DrawShadowShape(GafFrame* view, Model_459200* model)
+void CMemoryCache::DrawShadowShape(GafFrame* view, ModelState* model)
 {
     Vec3 verts[2000];
     Vec3 tmp[25];
     int segno = 0;
     int i = model->count - 1;
     if (i >= 0) {
-        Piece_459c70* piece = &model->pieces[i];
+        ModelPiece* piece = &model->pieces[i];
         while (i >= 0) {
             if (piece->flags.word & 1) {
                 if (piece->flags.word & 2) {
@@ -664,7 +658,7 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, Model_459200* model)
                         verts[j].y += view->yOffset;
                         v++;
                     }
-                    Face_459c70* seg = (Face_459c70*)info->faces;
+                    ModelFace* seg = (ModelFace*)info->faces;
                     if (info->firstFace != -1) {
                         seg++;
                         segno = 1;
@@ -687,7 +681,7 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, Model_459200* model)
 }
 
 // FUNCTION: 0x45a8d0
-Model_459200* __stdcall CreateObjectState(Object3do* obj)
+ModelState* __stdcall CreateObjectState(Object3do* obj)
 {
     int count = 1;
     if (obj->child != 0) {
@@ -698,14 +692,14 @@ Model_459200* __stdcall CreateObjectState(Object3do* obj)
         count += CountObjects(obj->sibling);
     }
     int size = count * 0x36 + 0x22;
-    Model_459200* state = (Model_459200*)SimAllocTagged("Object State", size);
+    ModelState* state = (ModelState*)SimAllocTagged("Object State", size);
     memset(state, 0, size);
     state->root = AddStateEntries(state, obj, 0);
     state->animDirty = 1;
     return state;
 }
 
-struct BuildList_0045a950 {
+struct ModelBuildList {
     char unknown_0[8];
     int count;
     char unknown_c[0x20 - 0xc];
@@ -713,7 +707,7 @@ struct BuildList_0045a950 {
 };
 
 // FUNCTION: 0x45a950
-Model_459200* __stdcall CreatePlayerObjectState(Object3do* obj, BuildList_0045a950* list, int player)
+ModelState* __stdcall CreatePlayerObjectState(Object3do* obj, ModelBuildList* list, int player)
 {
     int count = 1;
     if (obj->child != 0) {
@@ -724,16 +718,16 @@ Model_459200* __stdcall CreatePlayerObjectState(Object3do* obj, BuildList_0045a9
         count += CountObjects(obj->sibling);
     }
     int size = count * 0x36 + 0x22;
-    Model_459200* state = (Model_459200*)SimAllocTagged("Object State", size);
+    ModelState* state = (ModelState*)SimAllocTagged("Object State", size);
     memset(state, 0, size);
     state->root = AddStateEntries(state, obj, 0);
     state->animDirty = 1;
-    state->owner = (Unit_459200*)player;
+    state->owner = (UnitDrawView*)player;
     for (int i = 0; i < list->count; i++) {
         for (int j = i; j < state->count; j++) {
             if (_strcmpi(list->names[i], state->pieces[j].object->name) == 0) {
                 if (i != j) {
-                    Piece_459c70 temp = state->pieces[i];
+                    ModelPiece temp = state->pieces[i];
                     state->pieces[i] = state->pieces[j];
                     state->pieces[j] = temp;
                 }
@@ -746,7 +740,7 @@ Model_459200* __stdcall CreatePlayerObjectState(Object3do* obj, BuildList_0045a9
 }
 
 // FUNCTION: 0x45aaa0
-void __stdcall FreeObjectState(Model_459200* state)
+void __stdcall FreeObjectState(ModelState* state)
 {
     for (int i = 0; i < state->count; i++) {
         GameFreeThunk(state->pieces[i].points);
@@ -759,7 +753,7 @@ void __stdcall FreeObjectState(Model_459200* state)
 }
 
 // FUNCTION: 0x45b030
-int __fastcall RestorePieceVertices(Piece_459c70* piece, int force)
+int __fastcall RestorePieceVertices(ModelPiece* piece, int force)
 {
     int result = force;
     if (piece->modified == 0 || force) {
@@ -777,7 +771,7 @@ int __fastcall RestorePieceVertices(Piece_459c70* piece, int force)
     return result;
 }
 
-static inline int FarFrom(Model_459200* state, const Vector3s* pos)
+static inline int FarFrom(ModelState* state, const Vector3s* pos)
 {
     return abs((short)(state->pos.z - pos->z)) >= 8
         || abs((short)(state->pos.y - pos->y)) >= 8
@@ -785,9 +779,9 @@ static inline int FarFrom(Model_459200* state, const Vector3s* pos)
 }
 
 // FUNCTION: 0x45ab10
-void __stdcall UpdateObjectState(Unit_459200* unit)
+void __stdcall UpdateObjectState(UnitDrawView* unit)
 {
-    Model_459200* state = unit->state;
+    ModelState* state = unit->state;
     if (FarFrom(state, &unit->angles)) {
         state->pos = unit->angles;
         state->animDirty = 1;
@@ -804,10 +798,10 @@ void __stdcall UpdateObjectState(Unit_459200* unit)
 }
 
 // FUNCTION: 0x45ac20
-void __stdcall DrawUnit(void* context, Unit_459200* unit)
+void __stdcall DrawUnit(void* context, UnitDrawView* unit)
 {
     if (unit->carrier == 0) {
-        Model_459200* state = unit->state;
+        ModelState* state = unit->state;
         if (FarFrom(state, &unit->angles)) {
             state->pos = unit->angles;
             state->animDirty = 1;
@@ -821,9 +815,9 @@ void __stdcall DrawUnit(void* context, Unit_459200* unit)
             PoseModel(unit->state, unit->state->root, 0);
             unit->state->animDirty = 0;
         }
-        for (Unit_459200* u = unit->cargo; u; u = u->cargoNext) {
+        for (UnitDrawView* u = unit->cargo; u; u = u->cargoNext) {
             if (!(u->flags & 0x20000)) {
-                Model_459200* child = u->state;
+                ModelState* child = u->state;
                 if (FarFrom(child, &u->angles)) {
                     child->pos = u->angles;
                     child->animDirty = 1;
@@ -869,10 +863,10 @@ int __stdcall CountObjects(Object3do* edi)
 #pragma auto_inline(on)
 
 // FUNCTION: 0x45aec0
-Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj,
-                                       Piece_459c70* parent)
+ModelPiece* __stdcall AddStateEntries(ModelState* state, Object3do* obj,
+                                       ModelPiece* parent)
 {
-    Piece_459c70* e = &state->pieces[state->count];
+    ModelPiece* e = &state->pieces[state->count];
     e->flags.word |= 2;
     e->object = obj;
     e->modified = 0;
@@ -900,7 +894,7 @@ Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj,
 }
 
 // FUNCTION: 0x45af90
-Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent)
+ModelPiece* __stdcall LinkStateEntries(ModelState* state, Object3do* obj, ModelPiece* parent)
 {
     int i = state->count - 1;
     if (i >= 0) {
@@ -911,7 +905,7 @@ Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Pi
             if (i < 0)
                 return 0;
         }
-        Piece_459c70* e = &state->pieces[i];
+        ModelPiece* e = &state->pieces[i];
         if (e->object->sibling != 0) {
             e->sibling = LinkStateEntries(state, e->object->sibling, parent);
         } else {
@@ -929,7 +923,7 @@ Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Pi
 }
 
 // FUNCTION: 0x45b150
-void __fastcall TransformPieces(Model_459200* owner, Piece_459c70* piece,
+void __fastcall TransformPieces(ModelState* owner, ModelPiece* piece,
                              Vector3s* angles, Vec3* delta, int deep)
 {
     for (;;) {
@@ -963,7 +957,7 @@ void __fastcall TransformPieces(Model_459200* owner, Piece_459c70* piece,
 }
 
 // FUNCTION: 0x45b0a0
-void __fastcall PoseModel(Model_459200* model, Piece_459c70* piece, int force)
+void __fastcall PoseModel(ModelState* model, ModelPiece* piece, int force)
 {
     if (piece->child)
         PoseModel(model, piece->child, 1);
@@ -991,7 +985,7 @@ void __fastcall PoseModel(Model_459200* model, Piece_459c70* piece, int force)
 }
 
 // FUNCTION: 0x4584d0
-void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
+void CMemoryCache::DrawPiece(ModelState* model, void* surface, Vec3* camera,
     Object3do* info, Vec3* vertices, unsigned char palette, int useColor)
 {
     void* pic;
@@ -999,9 +993,9 @@ void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
     int unit;
     Point projected[2000];
     Point poly[25];
-    Unit_459200* view = model->owner;
-    struct Off_4584d0 { int a; int y; int b; };
-    Off_4584d0 off;
+    UnitDrawView* view = model->owner;
+    struct PieceDrawOffset { int a; int y; int b; };
+    PieceDrawOffset off;
     off.a = view->pos_x - camera->x;
     off.y = view->pos_y;
     off.b = view->pos_z - camera->z;
@@ -1012,12 +1006,12 @@ void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
                 - ((short)((off.y + vertices->y) >> 16) >> 1)));
         }
     }
-    Face_459c70* face;
+    ModelFace* face;
     if (info->firstFace != -1) {
-        face = (Face_459c70*)info->faces + 1;
+        face = (ModelFace*)info->faces + 1;
         i = 1;
     } else {
-        face = (Face_459c70*)info->faces;
+        face = (ModelFace*)info->faces;
         i = 0;
     }
     if (i < info->faceCount) do {
@@ -1033,7 +1027,7 @@ void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
                     break;
             }
         }
-        FaceFlags_459c70 flags = face->flags;
+        ModelFaceFlags flags = face->flags;
         if (!flags.bits.textured) {
             if (face->count != 4) goto skip0;
             if (flags.bits.usePic) {
@@ -1052,20 +1046,20 @@ skip0:;
 }
 
 // FUNCTION: 0x458fa0
-void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color)
+void CMemoryCache::DrawPieceEdges(GafFrame* view, ModelState* model, int color)
 {
-    Vertex_0045a610 verts[2000];
-    Vertex_0045a610 tmp[25];
+    Vec3 verts[2000];
+    Vec3 tmp[25];
     int faceno = 0;
     int i = model->count - 1;
     if (i >= 0) {
-        Piece_459c70* piece = &model->pieces[i];
+        ModelPiece* piece = &model->pieces[i];
         while (i >= 0) {
             unsigned char flags = piece->flags.word;
             do {} while (0);
             if (flags & 1) {
                 Object3do* info = piece->object;
-                Vertex_0045a610* v = (Vertex_0045a610*)piece->points.get();
+                Vec3* v = (Vec3*)piece->points.get();
                 for (int j = 0; j < info->vertexCount; j++, v++) {
                     int bright = shade_bias(model->owner);
                     int x = (short)(v->x >> 16);
@@ -1077,12 +1071,12 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color
                     verts[j].x += view->xOffset;
                     verts[j].y += view->yOffset;
                 }
-                Face_459c70* f;
+                ModelFace* f;
                 if (info->firstFace != -1) {
-                    f = (Face_459c70*)info->faces + 1;
+                    f = (ModelFace*)info->faces + 1;
                     faceno = 1;
                 } else {
-                    f = (Face_459c70*)info->faces;
+                    f = (ModelFace*)info->faces;
                     faceno = 0;
                 }
                 for (; faceno < info->faceCount; faceno++, f++) {
@@ -1101,20 +1095,20 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_459200* model, int color
 }
 
 // FUNCTION: 0x459200
-void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_459200 v, int useColor)
+void CMemoryCache::DrawObjectPicture(int param_2, ModelState* model, FixedVec3Union v, int useColor)
 {
     GafFrame* bmp = model->bitmap;
     unsigned int f;
     if (bmp == 0)
         return;
 
-    Vec3_459200 cv;
-    Vec3_459200 d;
+    FixedVec3Union cv;
+    FixedVec3Union d;
     cv = v;
     v.v[0] = model->owner->pos_x - v.v[0];
     v.v[1] = model->owner->pos_y;
     v.v[2] = model->owner->pos_z - cv.v[2];
-    int altitude = GetGroundHeight((Pos_459200*)&model->owner->pos_x);
+    int altitude = GetGroundHeight((FixedVec3Parts*)&model->owner->pos_x);
     int z = v.p.z.whole - (v.p.y.whole >> 1) + 0x20;
     int y = v.p.z.whole - (altitude >> 1) + 0x20;
     short dx = v.p.y.whole;
@@ -1155,11 +1149,11 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
                                  model->pieces[i].points, model->owner->playerIndex, useColor);
                 }
         }
-        Unit_459200* unit = model->owner->cargo;
+        UnitDrawView* unit = model->owner->cargo;
         while (unit) {
             if (!(unit->flags & 0x20000)) {
                 for (int i = unit->state->count - 1; i >= 0; i--) {
-                    Piece_459c70* piece = &unit->state->pieces[i];
+                    ModelPiece* piece = &unit->state->pieces[i];
                     if (piece->flags.word & 1) {
                         DrawPiece(unit->state, (void*)param_2, (Vec3*)&cv, piece->object, piece->points,
                                      unit->state->owner->playerIndex, useColor);
@@ -1211,7 +1205,7 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
         MergeIntoComposite(bmp, model);
         if ((model->owner->flags & 0x20000000) == 0 || model->owner->buildLeft == DAT_004fd4c0)
             ((UnitTable*)this)->DrawPieces(this->bitmap,model,model->owner->playerIndex,0);
-        Unit_459200* unit = model->owner->cargo;
+        UnitDrawView* unit = model->owner->cargo;
         while (unit) {
             if (!(unit->flags & 0x20000)) {
                 ((UnitTable*)this)->BuildObjectPicture(unit->state,1,-1);
@@ -1247,15 +1241,15 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
 }
 
 // FUNCTION: 0x459c70
-void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
+void UnitTable::DrawLitPieces(GafFrame* bitmap, ModelState* list,
     int kind, int useColor)
 {
     Object3do* info;
-    Poly_459c70 poly[25];
+    ShadedVertex poly[25];
     float accum[2000][3];
     Vec3f normal[2000];
     int weight[2000];
-    Poly_459c70 vertex[2000];
+    ShadedVertex vertex[2000];
 
     int mode;
     GafFrame* src;
@@ -1313,13 +1307,13 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                     weight[k] = 0;
                 }
 
-                Face_459c70* face;
+                ModelFace* face;
                 int fi;
                 if (info->firstFace != -1) {
-                    face = (Face_459c70*)info->faces + 1;
+                    face = (ModelFace*)info->faces + 1;
                     fi = 1;
                 } else {
-                    face = (Face_459c70*)info->faces;
+                    face = (ModelFace*)info->faces;
                     fi = 0;
                 }
                 for (; fi < info->faceCount; fi++, face++) {
@@ -1342,10 +1336,10 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                 }
 
                 if (info->firstFace != -1) {
-                    face = (Face_459c70*)info->faces + 1;
+                    face = (ModelFace*)info->faces + 1;
                     fi = 1;
                 } else {
-                    face = (Face_459c70*)info->faces;
+                    face = (ModelFace*)info->faces;
                     fi = 0;
                 }
                 for (; fi < info->faceCount; fi++, face++) {
@@ -1369,10 +1363,10 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                 }
 
                 if (info->firstFace != -1) {
-                    face = (Face_459c70*)info->faces + 1;
+                    face = (ModelFace*)info->faces + 1;
                     fi = 1;
                 } else {
-                    face = (Face_459c70*)info->faces;
+                    face = (ModelFace*)info->faces;
                     fi = 0;
                 }
                 for (; fi < info->faceCount; fi++, face++) {

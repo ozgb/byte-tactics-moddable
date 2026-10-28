@@ -105,7 +105,7 @@ struct Buffer_461020;
 struct Buffers_00462d30;
 struct BuildMenuEntry;
 struct BuildMenuPage;
-struct BuildList_0045a950;
+struct ModelBuildList;
 struct Button_0041e420;
 struct Button_004a7f70;
 struct ByteMap_00408090;
@@ -878,7 +878,7 @@ struct Connection_4c9a70;
 union Coord_00407ae0;
 union Coord_004239c0;
 union Coord_0044f2a0;
-struct Count_00458d20;
+struct CountedList;
 class CritSec_004e1ac0;
 struct Ctx_004720d0;
 struct MainFrameDisplayContext;
@@ -1308,7 +1308,7 @@ struct IntLess_004b3430;
 struct IntLess_004b3490;
 struct IntRec_004b4270;
 class Intf_004c6210;
-struct Ints_459200;
+struct Vec3;
 struct Item_00470ae0;
 struct Item_00478790;
 struct Item_00478b40;
@@ -1607,7 +1607,7 @@ struct Owner_00494290;
 struct Owner_2;
 struct Owner_439d20;
 struct Owner_439d80;
-struct Owner_459c70;
+struct UnitDrawView;
 struct PCX_004caa40;
 struct PackHeader_004d1c00;
 struct Packet;
@@ -1673,7 +1673,7 @@ struct RadarPicHeader;
 struct Pic_4665d0;
 struct Piece;
 struct PieceBits_00487080;
-union PieceFlags_459c70;
+union ModelPieceFlags;
 struct PieceFrame;
 struct Piece_00458310;
 struct Placement;
@@ -1730,7 +1730,7 @@ struct Point_004bf260;
 struct Point_004c0330;
 struct Point_004c07b0;
 struct Point_004c0c70;
-struct Poly_459c70;
+struct ShadedVertex;
 class PoolAlloc_004db610;
 struct Pool_00422170;
 struct Pool_004232a0;
@@ -1747,7 +1747,7 @@ struct BuildCenterFixed;
 struct Pos_00485330;
 struct Pos_0048d630;
 struct Vec3;
-struct Pos_4589c0;
+struct ModelBoundsOrigin;
 class ProjectedPrimitive;
 struct Quad;
 class Queue_00461f90;
@@ -2013,7 +2013,7 @@ struct Vec3;
 struct Vec3Init_0043a1f0;
 struct Vec3_004b1ec0;
 struct Vec3_2;
-union Vec3_459200;
+union FixedVec3Union;
 struct Vec3f;
 struct Vec3i_00474130;
 class VecElems_0046ca60;
@@ -3407,7 +3407,7 @@ struct Entry {
 
 struct Object_00419940 {
     char unknown_0[24];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
 };
 
 struct Unit_00419ac0 {
@@ -6131,7 +6131,7 @@ struct Class_004581e0 {
 class Class_00458310 {
 public:
     char unknown_0[1];
-    void AddModelBounds(int*, int*, int*, int*, SpotState*, Pos_4589c0);
+    void AddModelBounds(int*, int*, int*, int*, SpotState*, ModelBoundsOrigin);
     void AddModelBounds(int*, int*, int*, int*, SpotState*, int, int, int);
 };
 
@@ -6152,7 +6152,7 @@ public:
     char unknown_0[16];
     int bitmap;
     void MergeIntoComposite(Surface_004c0a90*, SpotState*);
-    void DrawObjectPicture(int, SpotState*, Vec3_459200, int);
+    void DrawObjectPicture(int, SpotState*, FixedVec3Union, int);
 };
 
 class Class_00458d30 {
@@ -8735,7 +8735,7 @@ struct Data_00480c30 {
 class Class_00480c50 {
 public:
     char unknown_0[1344];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
     void SetPieceTranslation(int, int, int);
 };
 
@@ -8777,7 +8777,7 @@ public:
 class Class_00480d50 {
 public:
     char unknown_0[1344];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
     void SetPieceVisible(int, int);
 };
 
@@ -9018,7 +9018,7 @@ union Flags114_485a40 {
 
 struct Unit_00485d40 {
     char unknown_0[398];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
 };
 
 struct Name_004866d0 {
@@ -10380,7 +10380,7 @@ struct Class_0049f8c0 {
 
 struct Object_0049f930 {
     char unknown_0[24];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
 };
 
 struct Inner_0049fb30 {
@@ -11288,7 +11288,7 @@ struct ArrayB {
 
 class Class_004b4c50 {
 public:
-    BuildList_0045a950* data;
+    ModelBuildList* data;
     int SeekBoxEnd(void);
 };
 

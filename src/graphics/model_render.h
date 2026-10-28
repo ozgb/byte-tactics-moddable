@@ -1,26 +1,26 @@
 #ifndef MODEL_RENDER_H
 #define MODEL_RENDER_H
-struct Model_459200;
+struct ModelState;
 struct Object3do;
-struct Unit_459200;
+struct UnitDrawView;
 
 struct GafFrame;
-struct Model_459200;
+struct ModelState;
 struct Object3do;
-struct Piece_459c70;
+struct ModelPiece;
 struct Vec3;
 struct Vector3s;
 
 void __stdcall HalveFrame(GafFrame* src, GafFrame* dst);
 void __stdcall SetLightVector(int, int, int);
-int __fastcall RestorePieceVertices(Piece_459c70* piece, int force);
+int __fastcall RestorePieceVertices(ModelPiece* piece, int force);
 int __stdcall CountObjects(Object3do* edi);
-Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent);
-Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent);
-void __fastcall TransformPieces(Model_459200* owner, Piece_459c70* piece, Vector3s* angles, Vec3* delta, int deep);
-void __fastcall PoseModel(Model_459200* model, Piece_459c70* piece, int force);
+ModelPiece* __stdcall AddStateEntries(ModelState* state, Object3do* obj, ModelPiece* parent);
+ModelPiece* __stdcall LinkStateEntries(ModelState* state, Object3do* obj, ModelPiece* parent);
+void __fastcall TransformPieces(ModelState* owner, ModelPiece* piece, Vector3s* angles, Vec3* delta, int deep);
+void __fastcall PoseModel(ModelState* model, ModelPiece* piece, int force);
 
-Model_459200* __stdcall CreateObjectState(Object3do* obj);
-void __stdcall UpdateObjectState(Unit_459200* unit);
+ModelState* __stdcall CreateObjectState(Object3do* obj);
+void __stdcall UpdateObjectState(UnitDrawView* unit);
 
 #endif

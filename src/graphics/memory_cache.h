@@ -4,10 +4,10 @@
 struct GafFrame;
 struct Chunk_00437a30;
 struct Vec3;
-union Vec3_459200;
-struct Model_459200;
+union FixedVec3Union;
+struct ModelState;
 struct Object3do;
-struct Pos_4589c0;
+struct ModelBoundsOrigin;
 
 class CMemoryCache {
 public:
@@ -37,22 +37,22 @@ public:
     int AllocTwoPlaneBitmap(GafFrame** handle, int w, int h);
     void FlushCache();
     void ReleaseHandle(int handle);
-    void DrawObjectState(Model_459200* list, void* context);
+    void DrawObjectState(ModelState* list, void* context);
     void CopyPicture(GafFrame* source);
-    void BuildShadow(Model_459200* model, GafFrame* dest);
-    void DrawPiece(Model_459200* model, void* surface, Vec3* camera,
+    void BuildShadow(ModelState* model, GafFrame* dest);
+    void DrawPiece(ModelState* model, void* surface, Vec3* camera,
         Object3do* info, Vec3* vertices, unsigned char palette, int useColor);
-    void DrawObjectPicture(int param_2, Model_459200* model, Vec3_459200 v, int useColor);
-    void DrawObjectPieces(int param_1, Model_459200* list, Vec3 v, int param_6);
-    void MergeIntoComposite(GafFrame* src, Model_459200* model);
+    void DrawObjectPicture(int param_2, ModelState* model, FixedVec3Union v, int useColor);
+    void DrawObjectPieces(int param_1, ModelState* list, Vec3 v, int param_6);
+    void MergeIntoComposite(GafFrame* src, ModelState* model);
     void AddModelBounds(int* minX, int* maxX, int* minY, int* maxY,
-        Model_459200* model, Pos_4589c0 pos);
+        ModelState* model, ModelBoundsOrigin pos);
     void RecolorByShade(GafFrame* img, unsigned char level, int above, int below, int between);
-    int ShadeByIntensity(GafFrame* image, Model_459200* model);
-    void DrawPieceEdges(GafFrame* view, Model_459200* model, int color);
+    int ShadeByIntensity(GafFrame* image, ModelState* model);
+    void DrawPieceEdges(GafFrame* view, ModelState* model, int color);
     GafFrame* MakeSilhouette(GafFrame* src);
-    void MeasureShadow(int* width, int* height, int* originX, int* originY, Model_459200* model);
-    void DrawShadowShape(GafFrame* view, Model_459200* model);
+    void MeasureShadow(int* width, int* height, int* originX, int* originY, ModelState* model);
+    void DrawShadowShape(GafFrame* view, ModelState* model);
 };
 
 class UnitTable : public CMemoryCache {
@@ -60,10 +60,10 @@ public:
     UnitTable* Construct(void);
     int Initialize(unsigned int size);
     void Destroy();
-    void MeasureModel(int* width, int* height, int* originX, int* originY, Model_459200* model, Vec3* offset);
-    int BuildObjectPicture(Model_459200* list, int param_2, int param_3);
-    void DrawPieces(GafFrame* bitmap, Model_459200* list, int kind, int useColor);
-    void DrawLitPieces(GafFrame* bitmap, Model_459200* list, int kind, int useColor);
+    void MeasureModel(int* width, int* height, int* originX, int* originY, ModelState* model, Vec3* offset);
+    int BuildObjectPicture(ModelState* list, int param_2, int param_3);
+    void DrawPieces(GafFrame* bitmap, ModelState* list, int kind, int useColor);
+    void DrawLitPieces(GafFrame* bitmap, ModelState* list, int kind, int useColor);
 };
 
 #endif

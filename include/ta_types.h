@@ -282,7 +282,6 @@ class Class_0044da00;
 struct PointMarker;
 class Class_0044dcb0;
 class Class_0044dd00;
-class PathOrder;
 class Class_0044de80;
 class Class_0044df80;
 class Class_0044dfb0;
@@ -295,9 +294,6 @@ class Class_0044e3a0;
 class Class_0044e3c0;
 class Class_0044e530;
 class Class_0044e5b0;
-class Class_0044e6c0;
-class Class_0044e720;
-class Class_0044e730;
 class Class_0044e740;
 class Class_0044e7b0;
 class Class_0044e9c0;
@@ -1445,7 +1441,6 @@ struct Model_00424c00;
 struct Model_0042a140;
 struct Mouse_0041ce90;
 struct Movement;
-struct Mover;
 struct Msg13_00456310;
 struct Msg20_00456310;
 struct Msg26_00456310;
@@ -3076,27 +3071,6 @@ public:
     void LoadMotion(Unit*, HapiBank*);
 };
 
-class Class_0044e6c0 {
-public:
-    char unknown_0[8];
-    unsigned short field_8;
-    short field_a;
-    short field_c;
-    char unknown_e[24];
-    Vec3 pos;
-    void SetAltitude(int);
-};
-
-class Class_0044e730 {
-public:
-    char unknown_0[8];
-    unsigned short unknown_bits : 4;
-    unsigned short flag : 1;
-    unsigned short unknown_rest : 11;
-    short value;
-    void SetApproachRadius(short);
-};
-
 union Fixed_2 {
     union { int value; struct { unsigned short frac; short whole; } parts; };
 };
@@ -3125,26 +3099,8 @@ public:
     char unknown_0[16];
 };
 
-struct Mover {
-    char unknown_0[220];
-    int speed;
-    char unknown_e0[49];
-    union { unsigned int f111; struct { unsigned int b0_7 : 8; unsigned int b8 : 1; unsigned int b9_31 : 23; } f111b; };
-};
-
 union Fixed_5 {
     union { int v; struct { unsigned short frac; short whole; } p; };
-};
-
-class Class_0044e720 {
-public:
-    char unknown_0[8];
-    unsigned short unknown_bits : 6;
-    unsigned short flag : 1;
-    unsigned short unknown_rest : 9;
-    char unknown_a[4];
-    short value;
-    void SetHeading(short);
 };
 
 class Order_00415250 {
@@ -5732,23 +5688,6 @@ public:
     int y1;
     int y2;
     int FUN_0044dd00(int, int);
-};
-
-class PathOrder {
-public:
-    char unknown_0[8];
-    unsigned short flags;
-    short field_a;
-    short field_c;
-    short field_e;
-    short field_10;
-    char unknown_12[8];
-    Target_0044ddc0* ptr;
-    char unknown_1e[8];
-    int field_26;
-    int field_2a;
-    int field_2e;
-    void FUN_0044ddc0(BitWriter*);
 };
 
 struct Target_0044ddc0 {

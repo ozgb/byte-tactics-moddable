@@ -9200,13 +9200,7 @@ struct Table_0047ae60 {
     int difficulty;
 };
 
-struct Surfaces_0047bdf0 {
-    void* surface_0;
-    void* surface_4;
-    void* back;
-    void* field_c;
-    void* surface_10;
-};
+#include "../src/graphics/movie_surfaces.h"
 
 class MoviePlayer {
 public:
@@ -9253,15 +9247,6 @@ struct Smk_0047bf70 {
     int lastTop;
     int lastWidth;
     int lastHeight;
-};
-
-struct Smk_0047bf70_b {
-    char unknown_0[44];
-    unsigned long paletteColors;
-    char unknown_30[12];
-    unsigned long palette;
-    char unknown_40[1020];
-    unsigned long paletteType;
 };
 
 class Class_0047bf70 {
@@ -15050,36 +15035,7 @@ public:
     virtual int __stdcall GetPlayerAddress(unsigned long, void*, unsigned long*);
 };
 
-struct Header_004cac40 {
-    unsigned char a;
-    unsigned char b;
-    unsigned char c;
-    unsigned char d;
-    unsigned short e;
-    unsigned short f;
-    short g;
-    short h;
-    short i;
-    short j;
-    unsigned char palette[48];
-    unsigned char k;
-    unsigned char l;
-    unsigned short m;
-    unsigned short n;
-    char unknown_46[58];
-};
-
-struct Bitmap_004caec0 {
-    int width;
-    int height;
-    char unknown_8[4];
-    unsigned char* data;
-};
-
-struct Game_004caec0 {
-    char unknown_0[532];
-    tagPALETTEENTRY palette[256];
-};
+#include "../src/graphics/pcx_display.h"
 
 struct Image_004caf30 {
     int width;

@@ -27610,7 +27610,7 @@ address,function,file,kind,target
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,Mission::units
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionUnit::ident
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionUnit::name
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,Struct_00487af0::field_4
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,Struct_00487af0::ids
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,function,
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,global_read,g_game
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,bx_sscanf

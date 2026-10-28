@@ -12,10 +12,12 @@ subsystem S (data/subsystems.csv, by source file and name), each symbol its code
 references is allowed only when it is:
 
   seam          g_seams, or anything interfaces/seams.h declares outside the table struct
-  state         defined in src/state/, or declared in interfaces/ref.h
+  state         g_game, a symbol defined in src/state/, or declared in interfaces/ref.h and not defined elsewhere
   service       declared in S's interface header (interfaces/<S>.h) outside the seam table struct
   bitexact      a bx_ name, or declared in lib/bitexact/bitexact.h
-  library       a symbol no object of the build defines: the CRT, the MSVC 5 libraries, the imports
+  library       a symbol no object of the build defines (the CRT, the MSVC 5 libraries, the imports), or
+                one src/util/operator_new.cpp defines (operator new and delete)
+  const         a data symbol whose data/state_classes.csv class is const or sim
   own           defined by S: a function of S in data/subsystems.csv, or data defined in a file
                 whose functions all belong to S, or a compiler-made symbol (string literal,
                 vtable, constant) defined by an object of a file with a function of S
@@ -48,6 +50,11 @@ COLUMNS = ["subsystem", "function", "symbol", "reason"]
 SIMULATION = ("wind_meteors", "economy", "features", "ai", "pathfinding", "weapons", "targeting", "los_radar",
               "orders", "units", "players", "map")
 STATE_DIR = "src/state/"
+LIBRARY_FILE = "src/util/operator_new.cpp"
+GAME_POINTER = "g_game"
+STATE_CLASSES = "data/state_classes.csv"
+CONST_CLASSES = ("const", "sim")
+KINDS = ("seam", "state", "service", "bitexact", "library", "own", "const")
 STATE_HEADERS = ("interfaces/ref.h",)
 SEAMS_HEADER = "interfaces/seams.h"
 BITEXACT_HEADER = "lib/bitexact/bitexact.h"
@@ -163,6 +170,7 @@ class Rules:
     seams: set
     state_names: set
     bitexact_names: set
+    const_names: set
     code_defs: dict
     data_defs: dict
 
@@ -202,6 +210,15 @@ def read_subsystems(root: Path) -> tuple:
     return by_function, by_file
 
 
+def const_names(root: Path) -> set:
+    """The names data/state_classes.csv gives class const or sim."""
+    path = root / STATE_CLASSES
+    if not path.exists():
+        return set()
+    with path.open(newline="") as f:
+        return {r["name"] for r in csv.DictReader(f) if r["class"] in CONST_CLASSES}
+
+
 def build_rules(root: Path, units: list) -> Rules:
     by_function, by_file = read_subsystems(root)
     code_defs, data_defs = {}, {}
@@ -215,30 +232,40 @@ def build_rules(root: Path, units: list) -> Rules:
     for header in STATE_HEADERS:
         state |= header_names(root, header)
     return Rules(by_function, by_file, services, header_names(root, SEAMS_HEADER) | {SEAM_TABLE}, state,
-                 header_names(root, BITEXACT_HEADER), code_defs, data_defs)
+                 header_names(root, BITEXACT_HEADER), const_names(root), code_defs, data_defs)
+
+
+def classify(rules: Rules, subsystem: str, symbol: str):
+    """The kind of rule that lets a function of the subsystem reference the symbol, or None for a violation."""
+    name = normal(symbol)
+    last = name.split("::")[-1]
+    if last == GAME_POINTER:
+        return "state"
+    if name in rules.seams or last in rules.seams:
+        return "seam"
+    files = rules.code_defs.get(symbol, set()) | rules.data_defs.get(symbol, set())
+    in_state = all(f.startswith(STATE_DIR) for f in files)
+    if (files and in_state) or (in_state and (name in rules.state_names or last in rules.state_names)):
+        return "state"
+    if name in rules.services[subsystem] or last in rules.services[subsystem]:
+        return "service"
+    if last.startswith("bx_") or last in rules.bitexact_names:
+        return "bitexact"
+    if not files or all(f == LIBRARY_FILE for f in files):
+        return "library"
+    if symbol in rules.code_defs:
+        owners = {rules.function_subsystem.get((f, base_name(symbol))) for f in rules.code_defs[symbol]} - {None}
+        if owners:
+            return "own" if owners == {subsystem} else None
+        return "own" if any(subsystem in rules.file_subsystems.get(f, ()) for f in rules.code_defs[symbol]) else None
+    if any(rules.own_file(subsystem, f) for f in files) or compiler_made(symbol, rules, subsystem, files):
+        return "own"
+    return "const" if name in rules.const_names or last in rules.const_names else None
 
 
 def allowed(rules: Rules, subsystem: str, symbol: str) -> bool:
     """True when a function of the subsystem may reference the symbol."""
-    name = normal(symbol)
-    last = name.split("::")[-1]
-    if name in rules.seams or last in rules.seams:
-        return True
-    files = rules.code_defs.get(symbol, set()) | rules.data_defs.get(symbol, set())
-    if any(f.startswith(STATE_DIR) for f in files) or name in rules.state_names or last in rules.state_names:
-        return True
-    if name in rules.services[subsystem] or last in rules.services[subsystem]:
-        return True
-    if last.startswith("bx_") or last in rules.bitexact_names:
-        return True
-    if not files:
-        return True
-    if symbol in rules.code_defs:
-        owners = {rules.function_subsystem.get((f, base_name(symbol))) for f in rules.code_defs[symbol]} - {None}
-        if owners:
-            return owners == {subsystem}
-        return any(subsystem in rules.file_subsystems.get(f, ()) for f in rules.code_defs[symbol])
-    return any(rules.own_file(subsystem, f) for f in files) or compiler_made(symbol, rules, subsystem, files)
+    return classify(rules, subsystem, symbol) is not None
 
 
 def compiler_made(symbol: str, rules: Rules, subsystem: str, files: set) -> bool:
@@ -248,18 +275,28 @@ def compiler_made(symbol: str, rules: Rules, subsystem: str, files: set) -> bool
 
 
 def violations(units: list, root: Path) -> list:
+    return analyse(units, root)[0]
+
+
+def analyse(units: list, root: Path) -> tuple:
+    """(violations, {(subsystem, kind): allowed (function, symbol) pairs}) of the units."""
     rules = build_rules(root, units)
-    found = set()
+    found, kept = set(), {}
     for unit in units:
         for function, symbol in unit.refs:
             name = base_name(function)
             subsystem = rules.function_subsystem.get((unit.file, name))
-            if subsystem not in SIMULATION or allowed(rules, subsystem, symbol):
+            if subsystem not in SIMULATION:
+                continue
+            why = classify(rules, subsystem, symbol)
+            if why:
+                kept.setdefault((subsystem, why), set()).add((name, symbol))
                 continue
             kind = "code" if symbol in rules.code_defs else "data"
             owner = rules.code_owner(symbol) if kind == "code" else rules.data_owner(symbol)
             found.add(Violation(subsystem, name, base_name(symbol), kind, owner))
-    return sorted(found, key=lambda v: (v.subsystem, v.function, v.symbol, v.kind, v.owner))
+    ordered = sorted(found, key=lambda v: (v.subsystem, v.function, v.symbol, v.kind, v.owner))
+    return ordered, {k: len(v) for k, v in kept.items()}
 
 
 def keys(vs: list) -> list:
@@ -297,7 +334,7 @@ def check(vs: list, rows: list) -> list:
     return problems
 
 
-def summary(vs: list) -> str:
+def summary(vs: list, allowed_counts: dict = None) -> str:
     lines = []
     for s in SIMULATION:
         mine = [v for v in vs if v.subsystem == s]
@@ -305,8 +342,14 @@ def summary(vs: list) -> str:
         owners = Counter(v.owner for v in mine).most_common(5)
         top = ", ".join(f"{o} {n}" for o, n in owners) or "none"
         lines.append(f"{s}: {len(mine)} violations ({kinds['code']} code, {kinds['data']} data); top owners: {top}")
+        if allowed_counts is not None:
+            by = ", ".join(f"{k} {allowed_counts.get((s, k), 0)}" for k in KINDS)
+            lines.append(f"{s}: allowed references by rule: {by}")
     total = Counter(v.kind for v in vs)
     lines.append(f"total: {len(vs)} violations ({total['code']} code, {total['data']} data)")
+    if allowed_counts is not None:
+        by = ", ".join(f"{k} {sum(n for (_, kk), n in allowed_counts.items() if kk == k)}" for k in KINDS)
+        lines.append(f"total allowed references by rule: {by}")
     return "\n".join(lines)
 
 
@@ -326,7 +369,7 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     root = Path(args.root)
     units = [unit_of(p) for a in args.objects for p in response(a)]
-    vs = violations(units, root)
+    vs, counts = analyse(units, root)
     if args.write:
         old = {(s, f, y): r for s, f, y, r in read_exceptions(root)}
         rows = [(s, f, y, old.get((s, f, y), "TODO(#0): triage")) for s, f, y in keys(vs)]
@@ -340,7 +383,7 @@ def main(argv=None) -> int:
     for v in vs:
         print(v.line())
     if args.summary:
-        print(summary(vs))
+        print(summary(vs, counts))
     return 0
 
 

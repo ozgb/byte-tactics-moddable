@@ -113,9 +113,9 @@ class SeamLinkTest(unittest.TestCase):
         self.assertEqual([v.line() for v in found], ["economy Mixed -> Other (code, units)"])
 
     def test_global_outside_own_files_is_data_violation(self):
-        link = Unit("link/data.cpp", data={"?g_game@@3HA"})
-        found = self.run_with(self.wind("?g_game@@3HA"), link)
-        self.assertEqual([v.line() for v in found], ["wind_meteors Tick -> g_game (data, link/data.cpp)"])
+        link = Unit("link/data.cpp", data={"?g_foo@@3HA"})
+        found = self.run_with(self.wind("?g_foo@@3HA"), link)
+        self.assertEqual([v.line() for v in found], ["wind_meteors Tick -> g_foo (data, link/data.cpp)"])
 
     def test_data_of_shared_file_is_a_violation(self):
         mixed = Unit("src/game/mixed.cpp", data={"?g_shared@@3HA"})
@@ -124,40 +124,70 @@ class SeamLinkTest(unittest.TestCase):
 
     def test_function_of_a_non_simulation_subsystem_is_not_checked(self):
         unit = Unit("src/gui/x.cpp")
-        unit.refs = [("?Draw@@YAXXZ", "?g_game@@3HA")]
+        unit.refs = [("?Draw@@YAXXZ", "?g_foo@@3HA")]
         self.assertEqual(self.run_with(unit), [])
 
     def test_duplicate_references_report_once(self):
-        link = Unit("link/data.cpp", data={"?g_game@@3HA"})
-        self.assertEqual(len(self.run_with(self.wind("?g_game@@3HA", "?g_game@@3HA"), link)), 1)
+        link = Unit("link/data.cpp", data={"?g_foo@@3HA"})
+        self.assertEqual(len(self.run_with(self.wind("?g_foo@@3HA", "?g_foo@@3HA"), link)), 1)
 
     def test_check_passes_with_row_and_fails_without(self):
-        link = Unit("link/data.cpp", data={"?g_game@@3HA"})
-        vs = self.run_with(self.wind("?g_game@@3HA"), link)
-        row = ("wind_meteors", "Tick", "g_game", "TODO(#400): move into the block")
+        link = Unit("link/data.cpp", data={"?g_foo@@3HA"})
+        vs = self.run_with(self.wind("?g_foo@@3HA"), link)
+        row = ("wind_meteors", "Tick", "g_foo", "TODO(#400): move into the block")
         self.assertEqual(seamlink.check(vs, [row]), [])
         self.assertEqual(len(seamlink.check(vs, [])), 1)
 
     def test_stale_row_fails(self):
-        row = ("wind_meteors", "Tick", "g_game", "TODO(#400): move into the block")
+        row = ("wind_meteors", "Tick", "g_foo", "TODO(#400): move into the block")
         problems = seamlink.check([], [row])
         self.assertEqual(len(problems), 1)
         self.assertIn("stale", problems[0])
 
     def test_reason_must_name_an_issue(self):
-        link = Unit("link/data.cpp", data={"?g_game@@3HA"})
-        vs = self.run_with(self.wind("?g_game@@3HA"), link)
-        self.assertEqual(len(seamlink.check(vs, [("wind_meteors", "Tick", "g_game", "later")])), 1)
+        link = Unit("link/data.cpp", data={"?g_foo@@3HA"})
+        vs = self.run_with(self.wind("?g_foo@@3HA"), link)
+        self.assertEqual(len(seamlink.check(vs, [("wind_meteors", "Tick", "g_foo", "later")])), 1)
 
     def test_rows_round_trip_sorted(self):
         text = seamlink.render([("b", "f", "s", "TODO(#1): x"), ("a", "f, g", "s", "TODO(#2): y")])
         self.write(seamlink.EXCEPTIONS, text)
         self.assertEqual(seamlink.read_exceptions(self.root), [("a", "f, g", "s", "TODO(#2): y"), ("b", "f", "s", "TODO(#1): x")])
 
+    def test_g_game_is_allowed_wherever_defined(self):
+        link = Unit("link/data.cpp", data={"?g_game@@3PAVGame@@A"})
+        self.assertEqual(self.run_with(self.wind("?g_game@@3PAVGame@@A"), link), [])
+
+    def test_const_and_sim_classes_are_allowed_and_others_are_not(self):
+        self.write("data/state_classes.csv", "name,class\nk_table,const\ng_input,sim\ng_view,view\ng_mix,mixed\n")
+        link = Unit("link/data.cpp", data={"?k_table@@3HA", "?g_input@@3HA", "?g_view@@3HA", "?g_mix@@3HA"})
+        found = self.run_with(self.wind("?k_table@@3HA", "?g_input@@3HA", "?g_view@@3HA", "?g_mix@@3HA"), link)
+        self.assertEqual([v.symbol for v in found], ["g_mix", "g_view"])
+
+    def test_const_rule_does_not_allow_code(self):
+        self.write("data/state_classes.csv", "name,class\nFoo,const\n")
+        other = Unit("src/units/units.cpp", code={"?Foo@@YAXXZ"})
+        self.assertEqual(len(self.run_with(self.wind("?Foo@@YAXXZ"), other)), 1)
+
+    def test_operator_new_file_is_library(self):
+        lib = Unit("src/util/operator_new.cpp", code={"??2@YAPAXI@Z", "??3@YAXPAX@Z", "??_U@YAPAXI@Z"})
+        self.assertEqual(self.run_with(self.wind("??2@YAPAXI@Z", "??3@YAXPAX@Z", "??_U@YAPAXI@Z"), lib), [])
+
+    def test_ref_header_name_defined_outside_state_is_a_violation(self):
+        self.write("interfaces/ref.h", "bool __cdecl SimOwns(const void* p);\nint HarnessTestMode();\n")
+        harness = Unit("src/harness/harness.cpp", code={"?HarnessTestMode@@YAHXZ"})
+        state = Unit("src/state/block.cpp", code={"?SimOwns@@YA_NPBX@Z"})
+        found = self.run_with(self.wind("?HarnessTestMode@@YAHXZ", "?SimOwns@@YA_NPBX@Z"), harness, state)
+        self.assertEqual([v.symbol for v in found], ["HarnessTestMode"])
+
+    def test_summary_shows_allowed_counts_per_rule(self):
+        text = seamlink.summary([], {("wind_meteors", "const"): 3, ("wind_meteors", "state"): 1})
+        self.assertIn("wind_meteors: allowed references by rule: seam 0, state 1, service 0, bitexact 0, library 0, own 0, const 3", text)
+
     def test_summary_counts_kinds(self):
-        link = Unit("link/data.cpp", data={"?g_game@@3HA"})
+        link = Unit("link/data.cpp", data={"?g_foo@@3HA"})
         foreign = Unit("src/units/units.cpp", code={"?Foreign@@YAXXZ"})
-        text = seamlink.summary(self.run_with(self.wind("?g_game@@3HA", "?Foreign@@YAXXZ"), link, foreign))
+        text = seamlink.summary(self.run_with(self.wind("?g_foo@@3HA", "?Foreign@@YAXXZ"), link, foreign))
         self.assertIn("wind_meteors: 2 violations (1 code, 1 data)", text)
 
 

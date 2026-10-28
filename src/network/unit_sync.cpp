@@ -120,12 +120,15 @@ struct Name_0046c620 {
     char flag;
 };
 
+#pragma pack(push, 1)
 struct Net_4c97b0 {
     Name_0046c620 name;
-    char unknown_11[0x4c9 - 0x11];
+    char unknown_11[0x4c5 - 0x11];
+    void* dp;
     int created;
     char unknown_4cd[4];
 };
+#pragma pack(pop)
 
 #include "../map/mission.h"
 #include "../units/unit_def.h"

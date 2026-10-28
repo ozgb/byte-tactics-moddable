@@ -13,7 +13,7 @@ struct Settings {
             unsigned int unknown_475_6 : 26;
         } bits_475;
     };
-    char unknown_479[0x48];
+    char pad_479[0x48];
 };
 
 #pragma pack(pop)

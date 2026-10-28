@@ -93,6 +93,7 @@
 #include "../network/player.h"
 #include "../network/player_entry_0046d6c0.h"
 #include "../network/player_info.h"
+#include "../network/settings.h"
 #include "../orders/air_maneuver_order.h"
 #include "../orders/approach_areas.h"
 #include "../orders/mission_type.h"
@@ -1985,6 +1986,11 @@ static_assert(offsetof(ScriptTable, entries) == 24, "");
 static_assert(offsetof(ScriptTable, names) == 28, "");
 static_assert(offsetof(ScriptTable, unknown_20) == 32, "");
 static_assert(offsetof(ScriptTable, code) == 36, "");
+static_assert(sizeof(Settings) == 80, "");
+static_assert(offsetof(Settings, field_471) == 0, "");
+static_assert(offsetof(Settings, flags_475) == 4, "");
+static_assert(offsetof(Settings, bits_475) == 4, "");
+static_assert(offsetof(Settings, pad_479) == 8, "");
 static_assert(sizeof(Settings_00496e10) == 16, "");
 static_assert(offsetof(Settings_00496e10, value) == 0, "");
 static_assert(offsetof(Settings_00496e10, flag_4) == 4, "");

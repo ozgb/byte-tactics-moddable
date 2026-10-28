@@ -770,7 +770,6 @@ class StackTrace;
 class Class_004d9ca0;
 class CommandLineSwitch;
 class CommandLineNumber;
-class FreeBlockMap;
 class Class_004db450;
 class Class_004dbd00;
 class Class_004dbd20;
@@ -791,7 +790,6 @@ class Class_004dd430;
 class Class_004dd710;
 class Class_004dd770;
 class Class_004dd7d0;
-class MapInsertResult;
 class Class_004ddc00;
 class Class_004ddc90;
 class Class_004ddce0;
@@ -1334,7 +1332,6 @@ struct Less_0046e3c0;
 struct Less_0046e450;
 struct Less_0046e4d0;
 struct Less_0046fe60;
-struct Less_004db000;
 struct Less_004dbbc0;
 struct Less_004dbd20;
 struct Less_004dbec0;
@@ -14330,48 +14327,6 @@ public:
     int* field_4;
     FreeBlockIter FUN_004dbeb0(void);
     int* FUN_004dbeb0(int*);
-};
-
-class MapInsertResult {
-public:
-    FreeBlockIter first;
-    unsigned char second;
-    char unknown_5[3];
-    MapInsertResult(FreeBlockIter, unsigned char);
-    MapInsertResult(MapInsertResult&);
-    MapInsertResult(void);
-    MapInsertResult* FUN_004ddbe0(int*, unsigned char*);
-};
-
-struct Less_004db000 {
-    char unknown_0[1];
-    unsigned char operator()(unsigned int&, unsigned int&);
-};
-
-class FreeBlockMap {
-public:
-    Less_004db000 key_compare;
-    char unknown_1[3];
-    LiveNode* head;
-    unsigned char rebuild;
-    char unknown_9[3];
-    unsigned int count;
-    unsigned int total;
-    FreeBlockMap(FreeBlockMap&);
-    FreeBlockMap(void);
-    FreeBlockIter Begin(void);
-    FreeBlockIter begin(void);
-    FreeBlockIter End(void);
-    FreeBlockIter end(void);
-    static void* operator new(unsigned int);
-    FreeBlockIter upper_bound(unsigned int&);
-    unsigned char Neq(FreeBlockIter, FreeBlockIter);
-    unsigned int size(void);
-    FreeBlockIter erase(FreeBlockIter);
-    unsigned int TakeFreeBlock(unsigned int);
-    MapInsertResult insert(Pair_00419560&);
-    void AddFreeBlock(Pair_00419560);
-    unsigned char Grow(unsigned int);
 };
 
 struct InsertResult_004db450 {

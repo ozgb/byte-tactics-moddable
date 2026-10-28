@@ -282,14 +282,8 @@ class Class_0044da00;
 struct PointMarker;
 class Class_0044dcb0;
 class Class_0044dd00;
-class PathOrderLoadView;
 class Class_0044df80;
 class Class_0044dfb0;
-class PathOrderView;
-class PathOrderUnitView;
-class PathOrderMoveToUnitView;
-class PathOrderPosView;
-class PathOrderCoordsView;
 class Class_0044e3a0;
 class Class_0044e3c0;
 class Class_0044e530;
@@ -5216,7 +5210,7 @@ public:
     Class_0044ce20(int);
 };
 
-#include "../src/orders/path_fx.h"
+#include "../src/orders/path_order.h"
 
 class Class_0044e740 : public Class_0044ce20 {
 public:

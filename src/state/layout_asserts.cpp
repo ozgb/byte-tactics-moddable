@@ -101,7 +101,6 @@
 #include "../orders/order_base.h"
 #include "../orders/order_fx.h"
 #include "../orders/order_goals.h"
-#include "../orders/path_fx.h"
 #include "../orders/path_order_attach.h"
 #include "../orders/unit_motion.h"
 #include "../quirks/quirks.h"
@@ -1657,58 +1656,6 @@ static_assert(sizeof(PathOrderAttach) == 16, "");
 static_assert(offsetof(PathOrderAttach, owner) == 4, "");
 static_assert(offsetof(PathOrderAttach, next) == 8, "");
 static_assert(offsetof(PathOrderAttach, value) == 12, "");
-static_assert(sizeof(PathOrderCoordsView) == 54, "");
-static_assert(offsetof(PathOrderCoordsView, field_8) == 8, "");
-static_assert(offsetof(PathOrderCoordsView, field_a) == 10, "");
-static_assert(offsetof(PathOrderCoordsView, field_c) == 12, "");
-static_assert(offsetof(PathOrderCoordsView, field_e) == 14, "");
-static_assert(offsetof(PathOrderCoordsView, field_10) == 16, "");
-static_assert(offsetof(PathOrderCoordsView, field_12) == 18, "");
-static_assert(offsetof(PathOrderCoordsView, ref) == 22, "");
-static_assert(offsetof(PathOrderCoordsView, pos) == 38, "");
-static_assert(offsetof(PathOrderCoordsView, unknown_32) == 50, "");
-static_assert(sizeof(PathOrderLoadView) == 54, "");
-static_assert(offsetof(PathOrderLoadView, field_8) == 8, "");
-static_assert(offsetof(PathOrderLoadView, field_a) == 10, "");
-static_assert(offsetof(PathOrderLoadView, field_c) == 12, "");
-static_assert(offsetof(PathOrderLoadView, field_e) == 14, "");
-static_assert(offsetof(PathOrderLoadView, field_10) == 16, "");
-static_assert(offsetof(PathOrderLoadView, field_12) == 18, "");
-static_assert(offsetof(PathOrderLoadView, ref) == 22, "");
-static_assert(offsetof(PathOrderLoadView, pos) == 38, "");
-static_assert(offsetof(PathOrderLoadView, field_32) == 50, "");
-static_assert(sizeof(PathOrderMoveToUnitView) == 54, "");
-static_assert(offsetof(PathOrderMoveToUnitView, field_8) == 8, "");
-static_assert(offsetof(PathOrderMoveToUnitView, field_a) == 10, "");
-static_assert(offsetof(PathOrderMoveToUnitView, field_c) == 12, "");
-static_assert(offsetof(PathOrderMoveToUnitView, field_e) == 14, "");
-static_assert(offsetof(PathOrderMoveToUnitView, field_10) == 16, "");
-static_assert(offsetof(PathOrderMoveToUnitView, field_12) == 18, "");
-static_assert(offsetof(PathOrderMoveToUnitView, ref) == 22, "");
-static_assert(offsetof(PathOrderMoveToUnitView, pos) == 38, "");
-static_assert(offsetof(PathOrderMoveToUnitView, unknown_32) == 50, "");
-static_assert(sizeof(PathOrderPosView) == 54, "");
-static_assert(offsetof(PathOrderPosView, field_8) == 8, "");
-static_assert(offsetof(PathOrderPosView, field_a) == 10, "");
-static_assert(offsetof(PathOrderPosView, field_c) == 12, "");
-static_assert(offsetof(PathOrderPosView, field_e) == 14, "");
-static_assert(offsetof(PathOrderPosView, field_10) == 16, "");
-static_assert(offsetof(PathOrderPosView, field_12) == 18, "");
-static_assert(offsetof(PathOrderPosView, ref) == 22, "");
-static_assert(offsetof(PathOrderPosView, pos) == 38, "");
-static_assert(offsetof(PathOrderPosView, unknown_32) == 50, "");
-static_assert(sizeof(PathOrderUnitView) == 54, "");
-static_assert(offsetof(PathOrderUnitView, field_8) == 8, "");
-static_assert(offsetof(PathOrderUnitView, field_a) == 10, "");
-static_assert(offsetof(PathOrderUnitView, field_c) == 12, "");
-static_assert(offsetof(PathOrderUnitView, field_e) == 14, "");
-static_assert(offsetof(PathOrderUnitView, field_10) == 16, "");
-static_assert(offsetof(PathOrderUnitView, field_12) == 18, "");
-static_assert(offsetof(PathOrderUnitView, ref) == 22, "");
-static_assert(offsetof(PathOrderUnitView, pos) == 38, "");
-static_assert(offsetof(PathOrderUnitView, field_32) == 50, "");
-static_assert(sizeof(PathOrderView) == 54, "");
-static_assert(offsetof(PathOrderView, unknown_8) == 8, "");
 static_assert(sizeof(Pathfinder) == 201, "");
 static_assert(offsetof(Pathfinder, grid) == 28, "");
 static_assert(offsetof(Pathfinder, start) == 48, "");

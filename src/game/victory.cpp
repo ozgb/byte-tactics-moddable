@@ -1104,6 +1104,7 @@ class AiSearchGoal;
 #include "../orders/air_maneuver_order.h"
 
 #include "packed_goal.h"
+#include "../orders/path_order.h"
 #include "../orders/order_goals.h"
 
 unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
@@ -1220,7 +1221,7 @@ void PackedPosGoal::DeserializeNetUnitState(BitReader* reader)
     }
     int kind = reader->ReadBits(2);
     if (kind == 1)
-        target = new (kSim) PathOrderView((GoalOwnerUnit*)owner.get(), reader);
+        target = new (kSim) PathOrder((Unit*)owner.get(), reader);
     else if (kind == 2)
         target = new (kSim) AirManeuverOrder(owner, reader);
     int state = reader->ReadBits(2);

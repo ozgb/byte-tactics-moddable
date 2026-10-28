@@ -1540,16 +1540,11 @@ struct Obj_00479bf0;
 struct Obj_0047e5c0;
 struct Obj_00499ab0;
 struct Obj_004a7f70;
-struct Obj_004ad4f0;
-struct Obj_004ada40;
 struct Obj_004ade20;
 struct Obj_004adf10;
-struct Obj_004ae170;
 struct Obj_004ae170_2;
 struct Obj_004ae230;
 struct Obj_004ae300;
-struct Obj_004ae380;
-struct Obj_004ae410;
 struct Obj_004ae440;
 struct Obj_004ae4b0;
 struct Obj_004ae4e0;
@@ -11952,42 +11947,6 @@ struct Common_004ad350_2 {
     unsigned short gaffile;
 };
 
-struct Obj_004ad4f0 {
-    char unknown_0[182];
-    short totalgadgets;
-    char unknown_0xb8[17];
-    char major;
-    char minor;
-    char revision;
-    char crdefault[16];
-    char escdefault[16];
-    char defaultfocus[16];
-    char panel[16];
-};
-
-struct Obj_004ada40 {
-    char unknown_0[182];
-    char text[128];
-    unsigned char stages;
-    char unknown_137[1];
-    short status;
-    char quickkey;
-    char padding_0x13b;
-    unsigned char grayedout;
-    char unknown_13d[1];
-};
-
-struct Obj_004ae170 {
-    char unknown_0[182];
-    char text[128];
-    short range;
-    char unknown_138[4];
-    int thick;
-    short knobpos;
-    short knobsize;
-    int field_144;
-};
-
 struct Obj_004ae170_2 {
     char unknown_0[182];
     char text[128];
@@ -11997,18 +11956,6 @@ struct Obj_004ae170_2 {
     short knobpos;
     short knobsize;
     int field_144;
-};
-
-struct Obj_004ae380 {
-    char unknown_0[200];
-    unsigned int hotornot : 1;
-    unsigned int : 31;
-};
-
-struct Obj_004ae410 {
-    char unknown_0[200];
-    unsigned int hotornot : 1;
-    unsigned int : 31;
 };
 
 struct BlinkWord_004afc60 {

@@ -5481,28 +5481,8 @@ struct Src_00440ca0 {
     Rect rect;
 };
 
-struct Elem_00441c30 {
-    V4i guid;
-    unsigned long size;
-    void* data;
-};
-
-struct Serial_00441c30 {
-    char unknown_0[8];
-    unsigned long unknown_8;
-    unsigned long unknown_c;
-    unsigned long unknown_10;
-};
-
 struct Gui_00443100 {
     char unknown_0[24];
-};
-
-struct Net_00443100 {
-    void* dp;
-    void* dp3;
-    char unknown_8[1221];
-    DirectPlayLobby_4ca880* lobby;
 };
 
 struct Class_004bbd00_Other {
@@ -5511,12 +5491,6 @@ struct Class_004bbd00_Other {
     unsigned char compressed;
     char unknown_9[3];
     unsigned int d;
-};
-
-struct Msg_00441220 {
-    char unknown_0[153];
-    Class_004bbd00_Other group;
-    char unknown_a9[19];
 };
 
 struct PlayerData_004437c0 {
@@ -5559,12 +5533,6 @@ struct Obj_444ba0 {
     int field_60;
 };
 
-struct AnimSeq_00445110 {
-    char unknown_0[40];
-    void* field_28;
-    char unknown_2c[4];
-};
-
 struct LogoEntry_00445110 {
     void* ptr;
     int unknown_4;
@@ -5582,14 +5550,6 @@ struct Head_004455b0 {
     unsigned char field_29;
     char unknown_2a[140];
     char text[136];
-};
-
-struct Mode_00446310 {
-    int width;
-    int height;
-    int refreshRate;
-    char unknown_c[308];
-    short field_140;
 };
 
 struct Player_004467c0 {
@@ -5619,20 +5579,6 @@ struct Menu_44b3c0 {
     Inner_44b3c0* inner;
     char unknown_1c[68];
     int current;
-};
-
-struct Record_0044c0d0 {
-    unsigned short a;
-    unsigned short b;
-    unsigned short e;
-    unsigned short f;
-    unsigned char flag8;
-    unsigned char flag9;
-    unsigned char flaga;
-    unsigned char flagb;
-    int unknown_c;
-    int d;
-    int unknown_14;
 };
 
 struct Entry_0044c370 {

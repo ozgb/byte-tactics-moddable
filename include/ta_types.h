@@ -983,11 +983,11 @@ struct Elem_0040d550;
 struct Elem_0040f110;
 struct Elem_004222e0;
 struct ModelTextureEntry;
-struct Elem_00432be0;
+struct OwnedString;
 struct Elem_00432be0_2;
-struct Elem_004336c0;
-struct Elem_00434020;
-struct Elem_00434360;
+struct IntValueElem;
+struct LosStep;
+struct LosLineData;
 struct Elem_00434360_2;
 struct Elem_00434a60;
 struct OrderTableEntry;
@@ -1016,7 +1016,7 @@ struct TdfField;
 struct Elem_004cb4c0;
 struct Elem_004cb5f0;
 struct Elem_004dd8c0;
-struct Elem_432cb0;
+struct StringValueElem;
 struct Elem_432cb0_2;
 struct Elem_4b0610;
 struct Element_00475ef0;
@@ -4380,12 +4380,12 @@ public:
 };
 
 struct Elem_00434360_2 {
-    std::vector<Elem_00434020> v;
+    std::vector<LosStep> v;
 };
 
 class Class_00433130 {
 public:
-    std::vector<std::vector<Elem_00434360> > tables;
+    std::vector<std::vector<LosLineData> > tables;
     void LoadLosTables(void);
 };
 
@@ -4396,13 +4396,13 @@ public:
 };
 
 struct Wrap_00433270 {
-    std::vector<Elem_00434020> v;
+    std::vector<LosStep> v;
 };
 
 class Class_004335f0 {
 public:
     char unknown_0[16];
-    Elem_00434360* GetLine(short);
+    LosLineData* GetLine(short);
     void ResizeLines(short);
     void SetNumLines(short);
 };
@@ -4422,8 +4422,8 @@ public:
 
 class Class_00433500 {
 public:
-    std::vector<std::vector<Elem_00434020> > items;
-    std::vector<Elem_00434020>* GetLosTable(int);
+    std::vector<std::vector<LosStep> > items;
+    std::vector<LosStep>* GetLosTable(int);
 };
 
 class Class_00433520 {

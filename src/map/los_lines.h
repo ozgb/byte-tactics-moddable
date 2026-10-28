@@ -5,27 +5,27 @@
 
 class TdfFile;
 
-struct Elem_00434020 {
+struct LosStep {
     unsigned short a;
     unsigned short b;
 };
 
-struct Elem_00434360 {
-    std::vector<Elem_00434020> v;
+struct LosLineData {
+    std::vector<LosStep> v;
 };
 
-typedef std::vector<Elem_00434020> Vec_004336f0;
+typedef std::vector<LosStep> LosStepVector;
 
-class LosLine : public Vec_004336f0 {
+class LosLine : public LosStepVector {
 public:
     int GetLosLineStepCount();
     void GetLosLineStep(short index, unsigned short* out1, unsigned short* out2);
     void LoadLosLine(TdfFile* obj, short line, short mode);
 };
 
-class LosTable : public std::vector<Elem_00434360> {
+class LosTable : public std::vector<LosLineData> {
 public:
-    Elem_00434360* GetLine(short i) { return &(*this)[i]; }
+    LosLineData* GetLine(short i) { return &(*this)[i]; }
     void SetNumLines(short n) { resize(n * 4); }
 
     int GetLosLineCount();

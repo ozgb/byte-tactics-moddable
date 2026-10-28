@@ -24,11 +24,11 @@ static inline bool Less(const char* a, const char* b) {
 
 #include "../map/los_tables.h"
 
-inline Entry_00432cf0* Table_00499cd0::LowerBound(const char* key) {
-    Entry_00432cf0* first = v.begin();
-    Entry_00432cf0* last = v.end();
+inline DamageTableEntry* Table_00499cd0::LowerBound(const char* key) {
+    DamageTableEntry* first = v.begin();
+    DamageTableEntry* last = v.end();
     while (first != last) {
-        Entry_00432cf0* mid = first + (last - first) / 2;
+        DamageTableEntry* mid = first + (last - first) / 2;
         if (Less(mid->name.ptr, key))
             first = mid + 1;
         else
@@ -246,10 +246,10 @@ model_done:
                     w->table = new (kSim) Table_00499cd0;
                 StringRef name(key);
                 Table_00499cd0* m = w->table;
-                Entry_00432cf0* e = m->LowerBound(name.ptr);
+                DamageTableEntry* e = m->LowerBound(name.ptr);
                 int* r;
                 if (e == m->v.end() || Ne(e->name, name)) {
-                    e = m->v.insert(e, Entry_00432cf0(name, 0));
+                    e = m->v.insert(e, DamageTableEntry(name, 0));
                     r = &e->value;
                 } else {
                     r = &e->value;

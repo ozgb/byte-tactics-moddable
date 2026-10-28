@@ -4186,13 +4186,6 @@ struct Model_00424c00 {
     Rot16 rot;
 };
 
-struct Gadget_00426190 {
-    char unknown_0[24];
-    Dialog* owner;
-    char unknown_1c[68];
-    int field_60;
-};
-
 class Class_004ce1d0 {
 public:
     char unknown_0[1];
@@ -6851,13 +6844,6 @@ union Flags_0045d280 {
 };
 
 #include "../src/ingame/flags_00495e90_37ebe.h"
-
-struct Rule_0045f1d0 {
-    char unknown_0[12];
-    int startMetal;
-    int startEnergy;
-    char unknown_14[4];
-};
 
 struct Point_004948e0 {
     int x;

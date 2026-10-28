@@ -47,10 +47,7 @@ struct Gadget {
 
 #include "../gui/gui.h"
 
-struct Data {
-    char unknown_0[0x14];
-    char* items;
-};
+#include "list_data.h"
 
 #include "../gui/layer.h"
 

@@ -2,7 +2,7 @@
 #define UNIT_TARGETS_H
 struct Unit;
 struct UnitDamagePacket;
-struct UnitType;
+class UnitDef;
 
 struct Unit;
 
@@ -15,7 +15,7 @@ Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index);
 int __stdcall IsTargetingUnit(Unit* list, Unit* obj);
 void __stdcall AlignUnitToGround(Unit* u);
 
-char* __stdcall MakePropList(UnitType* obj);
+char* __stdcall MakePropList(UnitDef* obj);
 void __stdcall ClearUnitRefs(Unit* obj);
 void __stdcall ApplyUnitDamage(UnitDamagePacket* ev);
 void __stdcall SetWeaponTargetUnit(char*, char*, int);

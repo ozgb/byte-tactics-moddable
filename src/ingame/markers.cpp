@@ -1,4 +1,5 @@
 #include "win_types.h"
+#include "../units/unit_def.h"
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -51,31 +52,6 @@ struct Weapon {
     char unknown_d8[0xdc - 0xd8];
     int range;
     int coverage;
-};
-
-struct UnitType {
-    char unknown_0[0x15e];
-    Pos lo;
-    Pos hi;
-    char unknown_176[0x178 - 0x176];
-    short field_178;
-    char unknown_17a[0x202 - 0x17a];
-    short sight;
-    short radar;
-    short sonar;
-    short minCloakDistance;
-    short radarJam;
-    short sonarJam;
-    char unknown_20e[0x212 - 0x20e];
-    unsigned short buildDistance;
-    unsigned short maneuver;
-    unsigned short attackLength;
-    unsigned short kamikazeDistance;
-    char unknown_21a[0x220 - 0x21a];
-    Ref<Weapon> weapon_220;
-    char unknown_224[0x241 - 0x224];
-    unsigned int flags;
-    char unknown_245[0x249 - 0x245];
 };
 
 struct Anim {
@@ -134,9 +110,9 @@ void __stdcall DrawBuildFootprint(void* surface, View* view, Order* order,
 {
     if ((unsigned short)order->type == 0)
         return;
-    UnitType* type = &((UnitType *)g_game->defs.get())[(unsigned short)order->type];
-    Pos lo = *(Pos*)&order->pos + type->lo;
-    Pos hi = *(Pos*)&order->pos + type->hi;
+    UnitDef* type = &g_game->defs.get()[(unsigned short)order->type];
+    Pos lo = *(Pos*)&order->pos + *(Pos*)&type->modelMinX;
+    Pos hi = *(Pos*)&order->pos + *(Pos*)&type->modelMaxX;
     Rect r;
     r.left = ScreenX(view, lo.x.whole);
     r.top = ScreenY(view, lo.z.whole, lo.y.whole);
@@ -234,15 +210,15 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
                             int unused1, int unused2)
 {
     Unit* unit = order->unit;
-    UnitType* def = (UnitType*)unit->def.get();
+    UnitDef* def = unit->def.get();
     int index = 0;
     if (g_game->showRanges == 0) {
-        short mincloak = def->minCloakDistance;
+        short mincloak = def->mincloakdistance;
         if (mincloak != 0 && (unit->activateFlags & 4)) {
             DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, mincloak, g_game->colors[15], 0, 0);
         }
-        if ((def->flags & 0x10000000) && def->weapon_220 != 0) {
-            int r = def->weapon_220->areaOfEffect;
+        if ((def->flags1 & 0x10000000) && def->explodeas != 0) {
+            int r = ((Weapon*)def->explodeas.get())->areaOfEffect;
             r = r >> 1;
             unsigned int t = ((unsigned int)g_game->ticks % 60) * r * 2 / 60;
             int radius = (t < 8) ? 8 : t;
@@ -250,49 +226,49 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
                 radius = r;
             DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, radius, g_game->colors[12], 0, 0);
             if (unit->motion != 0) {
-                DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->kamikazeDistance,
+                DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->kamikazeUnsigned,
                              g_game->colors[12], 0, 0);
                 return;
             }
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sight, g_game->colors[12], 0, 0);
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->range, g_game->colors[12], 0, 0);
             return;
         }
     } else {
-        short mincloak = def->minCloakDistance;
+        short mincloak = def->mincloakdistance;
         if (mincloak != 0) {
             DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, mincloak, g_game->colors[14],
                          "mincloak", index++);
         }
-        if (def->sight != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sight, g_game->colors[14],
+        if (def->range != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->range, g_game->colors[14],
                          "sight", index++);
         }
-        if (def->radar != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->radar, g_game->colors[14],
+        if (def->radardistance != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->radardistance, g_game->colors[14],
                          "radar", index++);
         }
-        if (def->sonar != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sonar, g_game->colors[14],
+        if (def->sonardistance != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sonardistance, g_game->colors[14],
                          "sonar", index++);
         }
-        if (def->radarJam != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->radarJam, g_game->colors[14],
+        if (def->radardistancejam != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->radardistancejam, g_game->colors[14],
                          "radarjam", index++);
         }
-        if (def->sonarJam != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sonarJam, g_game->colors[14],
+        if (def->sonardistancejam != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->sonardistancejam, g_game->colors[14],
                          "sonarjam", index++);
         }
-        if (def->buildDistance != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->buildDistance, g_game->colors[14],
+        if (def->buildRange != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->buildRange, g_game->colors[14],
                          "build distance", index++);
         }
-        if (def->maneuver != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->maneuver, g_game->colors[14],
+        if (def->maneuverleashUnsigned != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->maneuverleashUnsigned, g_game->colors[14],
                          "maneuver", index++);
         }
-        if (def->kamikazeDistance != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->kamikazeDistance,
+        if (def->kamikazeUnsigned != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, def->kamikazeUnsigned,
                          g_game->colors[14], "kamikazedistance", index);
         }
         int color;
@@ -432,7 +408,7 @@ void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
                 }
             }
         }
-        unsigned short len = ((UnitType*)u->def.get())->attackLength;
+        unsigned short len = u->def->attackrunlength;
         if (len != 0)
             DrawRangeCircle(surface, view, &pos, len, color, "attack length", 2);
     }
@@ -453,7 +429,7 @@ void __stdcall DrawOrderRangeRing(void* surface, View* view, Order* order,
     int height;
     if (order->target != 0) {
         p = *(Pos*)&order->target->pos;
-        height = ((UnitType*)order->target->def.get())->field_178;
+        height = order->target->def->modelSizeXHigh;
     } else {
         p = *(Pos*)&order->pos;
         height = 0x20;

@@ -1,4 +1,5 @@
 #include "../../interfaces/seams.h"
+#include "../units/unit_def.h"
 #include "../../interfaces/ref.h"
 #include <stdio.h>
 #include <string.h>
@@ -18,22 +19,6 @@ class Slot_0043a1f0;
 
 struct Owner_0043a1f0 {
     Ref<Slot_0043a1f0> slot;
-};
-
-struct UnitType {
-    char unknown_0[0x20];
-    char name[0x20];
-    char unknown_40[0x18a - 0x40];
-    float metalCost;
-    char unknown_18e[0x1fa - 0x18e];
-    unsigned int maxHealth;
-    unsigned short field_1fe;
-    char unknown_200[0x241 - 0x200];
-    union {
-        unsigned char flags;
-        unsigned int flags32;
-    };
-    char unknown_245[0x249 - 0x245];
 };
 
 #include "../units/unit.h"
@@ -181,7 +166,7 @@ void __stdcall StopBuildingScript(Unit* obj, Order* target)
 // FUNCTION: 0x438650
 int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n)
 {
-    UnitType* bt = ((UnitType *)b->def.get());
+    UnitDef* bt = b->def.get();
     float v = bt->metalCost > 10.0f ? bt->metalCost : 10.0f;
     union {
         __int64 q;
@@ -190,7 +175,7 @@ int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n)
             int hi;
         } w;
     } p;
-    p.w.lo = ((UnitType *)a->def.get())->field_1fe * ((a->killCount + 5) / 5) * (int)bt->maxHealth * n;
+    p.w.lo = a->def->buildRate * ((a->killCount + 5) / 5) * (int)bt->maxHealth * n;
     p.w.hi = 0;
     int r = (int)((double)p.q / (v * 300.0f));
     if (r <= 1) {
@@ -314,7 +299,7 @@ void Order::SetAttachedFx(OrderFx* obj)
 // FUNCTION: 0x438930
 void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 {
-    if ((((UnitType *)unit->def.get())->flags32 & 0x800) == 0) {
+    if ((unit->def->flags1 & 0x800) == 0) {
         ApproachRadius* obj = new (kSim) ApproachRadius(this, p->x, p->z, n);
         if (((Owner_0043a1f0 *)unit->motion.get())) {
             if (attached) {
@@ -340,7 +325,7 @@ void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 // FUNCTION: 0x438a00
 void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 {
-    if (!(((UnitType *)unit->def.get())->flags32 & 0x800)) {
+    if (!(unit->def->flags1 & 0x800)) {
         RingApproach* obj = new (kSim) RingApproach(this, pos->x, pos->z, radius1, radius2);
         if (((Owner_0043a1f0 *)unit->motion.get())) {
             if (attached) {
@@ -368,7 +353,7 @@ void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 // FUNCTION: 0x438ad0
 void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 {
-    if (!(((UnitType *)unit->def.get())->flags32 & 0x800)) {
+    if (!(unit->def->flags1 & 0x800)) {
         PointMarker* obj = new (kSim) PointMarker(this, cell, size);
         if (((Owner_0043a1f0 *)unit->motion.get())) {
             if (attached) {
@@ -451,7 +436,7 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
     int i, n = 0;
     unsigned short k = 0;
     for (i = 1; i < g_game->unitDefCount; i++, n++) {
-        if (!(((UnitType *)g_game->defs.get())[(unsigned short)i].flags & 0x20)) {
+        if (!(g_game->defs.get()[(unsigned short)i].flags1Byte & 0x20)) {
             if (k == id)
                 return n;
             k++;
@@ -621,7 +606,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
         char buf2[0x80];
         sprintf(buf2, "UTYPENAME%4d", id);
         if (!file->HasItem(buf2) && id >= 1 && id < g_game->unitDefCount)
-            file->SetStringItem(buf2, ((UnitType *)g_game->defs.get())[id].name);
+            file->SetStringItem(buf2, g_game->defs.get()[id].unitname);
     }
 
     if (desc.field_4 != 0) {

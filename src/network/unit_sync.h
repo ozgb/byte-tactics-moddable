@@ -3,7 +3,7 @@
 
 #include <vector>
 
-struct UnitSyncDef;
+class UnitDef;
 struct UnitSyncEntry;
 struct UnitSyncPacket;
 struct Target_0046d530;

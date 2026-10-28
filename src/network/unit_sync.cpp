@@ -242,14 +242,6 @@ void FUN_0046c8d0(void)
 {
 }
 
-#pragma pack(push, 1)
-struct UnitSyncDef {
-    char unknown_0[0x13e];
-    unsigned int key;
-};
-
-#pragma pack(pop)
-
 #include "player.h"
 #include "player_info.h"
 #include "unit_sync.h"
@@ -948,46 +940,46 @@ int UnitSync::PopChangedEntry(UnitSyncEntry* out)
 }
 
 // FUNCTION: 0x46e330
-int UnitSync::GetUnitEntry(UnitSyncDef* unit, UnitSyncEntry* out)
+int UnitSync::GetUnitEntry(UnitDef* unit, UnitSyncEntry* out)
 {
-    *out = Find(&unit->key).ptr->value;
+    *out = Find(&unit->fbiChecksum).ptr->value;
     return out->enabled != 0 && out->peerEnabled != 0;
 }
 
 // FUNCTION: 0x46e3c0
-int UnitSync::ToggleUnitAllowed(UnitSyncDef* unit)
+int UnitSync::ToggleUnitAllowed(UnitDef* unit)
 {
-    UnitSyncNode* n = Find(&unit->key).ptr;
+    UnitSyncNode* n = Find(&unit->fbiChecksum).ptr;
     n->value.enabled = (n->value.enabled == 0);
-    NotifyEntryChanged(unit->key);
+    NotifyEntryChanged(unit->fbiChecksum);
     return n->value.enabled != 0 && n->value.peerEnabled != 0;
 }
 
 // FUNCTION: 0x46e450
-int UnitSync::DisallowUnit(UnitSyncDef* unit)
+int UnitSync::DisallowUnit(UnitDef* unit)
 {
-    UnitSyncNode* n = Find(&unit->key).ptr;
+    UnitSyncNode* n = Find(&unit->fbiChecksum).ptr;
     n->value.enabled = 0;
-    NotifyEntryChanged(unit->key);
+    NotifyEntryChanged(unit->fbiChecksum);
     return n->value.enabled != 0 && n->value.peerEnabled != 0;
 }
 
 // FUNCTION: 0x46e4d0
-int UnitSync::AllowUnit(UnitSyncDef* unit)
+int UnitSync::AllowUnit(UnitDef* unit)
 {
-    UnitSyncNode* n = Find(&unit->key).ptr;
+    UnitSyncNode* n = Find(&unit->fbiChecksum).ptr;
     n->value.enabled = 1;
-    NotifyEntryChanged(unit->key);
+    NotifyEntryChanged(unit->fbiChecksum);
     return n->value.enabled != 0 && n->value.peerEnabled != 0;
 }
 
 // FUNCTION: 0x46e550
-void UnitSync::SetUnitLimit(UnitSyncDef* unit, int value)
+void UnitSync::SetUnitLimit(UnitDef* unit, int value)
 {
-    UnitSyncIter it = Find(&unit->key);
+    UnitSyncIter it = Find(&unit->fbiChecksum);
     if (!(it == End())) {
         it.ptr->value.limit = value;
-        NotifyEntryChanged(unit->key);
+        NotifyEntryChanged(unit->fbiChecksum);
     }
 }
 

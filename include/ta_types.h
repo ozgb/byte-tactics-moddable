@@ -35,7 +35,6 @@ struct Alloc_0046d040;
 struct Alloc_0046e5c0;
 struct Alloc_004b2290;
 struct Alloc_004dc130;
-class Alloc_004dd8c0;
 class Alloc_004e2b60;
 struct Amount;
 struct Angles_0049be60;
@@ -800,9 +799,6 @@ class MapInsertResult;
 class Class_004ddc00;
 class Class_004ddc90;
 class Class_004ddce0;
-class FreeBlockAllocator;
-class BlockMapAllocator;
-class BlockMapIter;
 class LoadedImage;
 class Class_004ddfa0;
 class Class_004ddfe0;
@@ -1208,7 +1204,6 @@ struct Frame_0049e070;
 struct Frame_004a4980;
 struct Frame_004a7f70;
 struct Frame_004c7580;
-struct Frame_004db450;
 struct Frame_004de700;
 struct Frame_482270;
 struct FreeObj_0045e100;
@@ -14352,12 +14347,6 @@ public:
     ~CritSec_004e1ac0(void);
 };
 
-class BlockMapAllocator {
-public:
-    char unknown_0[1];
-    void* FUN_004dddf0(unsigned int);
-};
-
 class Tree_004da8d0 {
 public:
     char allocator;
@@ -14483,31 +14472,10 @@ struct InsertResult_004db450 {
     int second;
 };
 
-struct Frame_004db450 {
-    InsertResult_004db450 r;
-    Pair_00419560 p;
-};
-
-class FreeBlockAllocator {
-public:
-    char unknown_0[1];
-    void* FUN_004ddd70(unsigned int);
-};
-
 class PoolAlloc_004db610 {
 public:
     char unknown_0[1];
     char* _Charalloc(unsigned int);
-};
-
-class Alloc_004dd8c0 {
-public:
-    char unknown_0[1];
-    Elem_004dd8c0* allocate(unsigned int, void*);
-    void deallocate(Elem_004dd8c0*, unsigned int);
-    void construct(Elem_004dd8c0*, Elem_004dd8c0&);
-    void destroy(Elem_004dd8c0*);
-    unsigned int max_size(void);
 };
 
 struct Arena_004da9f0 {
@@ -14714,12 +14682,6 @@ public:
     int size;
     FreeBlockIter Begin(void);
     MapInsertResult FUN_004dc680(Class_004d8820*);
-};
-
-class BlockMapIter {
-public:
-    LiveNode* ptr;
-    void FUN_004dde70(void);
 };
 
 struct Less_004dce00 {

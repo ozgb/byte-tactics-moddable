@@ -14,7 +14,7 @@
 struct Unit;
 
 #pragma pack(push, 1)
-union Flags_004898b0 {
+union WeaponSlotFlagBits {
     struct {
         unsigned char bit0 : 1;
         unsigned char bit1 : 1;
@@ -26,7 +26,7 @@ union Flags_004898b0 {
     unsigned char all;
 };
 
-union Flags_00489a90 {
+union UnitDefCanLoadFlags {
     struct {
         unsigned int unknown_0 : 19;
         unsigned int flag19 : 1;
@@ -35,11 +35,11 @@ union Flags_00489a90 {
     int all;
 };
 
-struct Node_00489a90 {
+struct CargoLinkView {
     char unknown_0[0x86];
     Ref<Unit> owner;
     char unknown_8a[4];
-    Ref<Node_00489a90> next;
+    Ref<CargoLinkView> next;
 };
 
 #include "../game/game.h"
@@ -77,10 +77,10 @@ void Unit::ReleaseWeapons(unsigned char index)
         index = 2;
     }
     UnitWeaponSlot* e = &weapons[index];
-    if (((Flags_004898b0*)&e->flags)->bits.bit1 != 0 && ((Flags_004898b0*)&e->flags)->bits.bit4 == 0) {
-        ((Flags_004898b0*)&e->flags)->bits.bit4 = 1;
+    if (((WeaponSlotFlagBits*)&e->flags)->bits.bit1 != 0 && ((WeaponSlotFlagBits*)&e->flags)->bits.bit4 == 0) {
+        ((WeaponSlotFlagBits*)&e->flags)->bits.bit4 = 1;
         int i = index;
-        Point_004898b0* p = (Point_004898b0*)&weapons[i];
+        AimTargetPair* p = (AimTargetPair*)&weapons[i];
         if (p->a != 0 || p->b != (short)0x8000) {
             p->a = 0;
             p->b = (short)0x8000;
@@ -99,10 +99,10 @@ void Unit::ClaimWeapons(unsigned char index)
         index = 2;
     }
     UnitWeaponSlot* e = &weapons[index];
-    if (((Flags_004898b0*)&e->flags)->bits.bit1 != 0 && ((Flags_004898b0*)&e->flags)->bits.bit4 != 0) {
-        ((Flags_004898b0*)&e->flags)->bits.bit4 = 0;
+    if (((WeaponSlotFlagBits*)&e->flags)->bits.bit1 != 0 && ((WeaponSlotFlagBits*)&e->flags)->bits.bit4 != 0) {
+        ((WeaponSlotFlagBits*)&e->flags)->bits.bit4 = 0;
         int i = index;
-        Point_004898b0* p = (Point_004898b0*)&weapons[i];
+        AimTargetPair* p = (AimTargetPair*)&weapons[i];
         if (p->a != 0 || p->b != (short)0x8000) {
             p->a = 0;
             p->b = (short)0x8000;
@@ -159,7 +159,7 @@ fail:
 int Unit::CountCargo()
 {
     int count = 0;
-    Node_00489a90* node = (Node_00489a90*)cargo.get();
+    CargoLinkView* node = (CargoLinkView*)cargo.get();
     while (node) {
         if (node->owner == this)
             count++;
@@ -172,7 +172,7 @@ int Unit::CountCargo()
 int Unit::CanLoad(Unit* other)
 {
     UnitDef* theirDef = other->def;
-    if (((Flags_00489a90*)&theirDef->flags2)->bits.flag19)
+    if (((UnitDefCanLoadFlags*)&theirDef->flags2)->bits.flag19)
         return 0;
     UnitDef* ourDef = def;
     if (!(ourDef->flags2 & 0x100))

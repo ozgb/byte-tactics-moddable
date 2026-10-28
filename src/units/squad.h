@@ -19,7 +19,7 @@ public:
     Squad(Player*, int);
 };
 
-class Class_004800c0 {
+class UnitSwapEraseVector {
 public:
     typedef std::vector<Unit*> UnitVector;
     UnitVector units;

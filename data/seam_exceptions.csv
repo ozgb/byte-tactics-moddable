@@ -191,9 +191,9 @@ orders,StopBuildingScript,SendScriptCallNoArgs,TODO(#506): sim sends a packet
 orders,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,UnitMotion::SteerGroundUnit,GetHeadingBetween,TODO(#504): engine service
-orders,VIface_0043dd20::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,VMissionCondition::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,VOrderFx::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+orders,VPathGoalVtableView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,VPathfinder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,VUnitRef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -284,13 +284,13 @@ players,VictoryKillUnitType::OnUnitDied,PlaySoundByName,TODO(#505): sim-to-prese
 players,VictoryMoveUnitToRadius::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryUnitTypePassesX::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryUnitTypePassesZ::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
-targeting,FindWeaponTarget,Class_004800c0::EraseSwapBack,TODO(#504): engine service
+targeting,FindWeaponTarget,UnitSwapEraseVector::EraseSwapBack,TODO(#504): engine service
 targeting,PAUUnit::?$vector::insert,CopyDwordIfNonNull,TODO(#504): engine service
 targeting,UGroup::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UPlayer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,VIface_0043dd20::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+targeting,VPathGoalVtableView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VPlayerAI::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -333,9 +333,9 @@ units,GetCategoryMask,StringRef::StringRef,TODO(#505): sim-to-presentation event
 units,GetSweetSpot,UpdateObjectState,TODO(#505): sim-to-presentation event
 units,H::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,I::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+units,InitSpawnedUnit,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
 units,InitUnit,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
 units,InitUnitScript,CreateObjectState,TODO(#505): sim-to-presentation event
-units,InitUnit_00485e90,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
 units,KillUnit,BroadcastPacket,TODO(#506): sim sends a packet
 units,KillUnit,GetSlotDpid,TODO(#506): sim sends a packet
 units,KillUnit,PopUntilNamedLayout,TODO(#505): sim-to-presentation event

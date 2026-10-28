@@ -10,7 +10,7 @@
 class TdfRecord;
 struct UnitMotion;
 struct Mover;
-struct Limits_0043e490;
+struct WeaponDefShotCostView;
 struct Order;
 struct WeaponDef;
 struct UnitDef;
@@ -21,7 +21,7 @@ struct SpotState;
 class PathOrderAttach;
 
 #pragma pack(push, 1)
-struct Point_004898b0 {
+struct AimTargetPair {
     short a;
     short b;
 };

@@ -5,7 +5,7 @@
 
 #pragma pack(push, 1)
 
-#include "node_0043e490.h"
+#include "order_cursor_views.h"
 
 #include "../units/unit_def.h"
 
@@ -14,7 +14,7 @@
 #include "../map/cell.h"
 #include "mission_type.h"
 
-union Flags110_0043f0e0 {
+union UnitOrderTypeFlags {
     unsigned int raw;
     struct {
         unsigned int bits_0 : 31;
@@ -22,7 +22,7 @@ union Flags110_0043f0e0 {
     };
 };
 
-union Flags241_0043f0e0 {
+union UnitDefFlags1Bits {
     unsigned int raw;
     struct {
         unsigned int bits_0 : 11;
@@ -33,7 +33,7 @@ union Flags241_0043f0e0 {
     };
 };
 
-union Flags111_0043f0e0 {
+union WeaponDefFlagsBits {
     unsigned int raw;
     struct {
         unsigned int bits_0 : 8;
@@ -44,7 +44,7 @@ union Flags111_0043f0e0 {
     };
 };
 
-union Flags245_0043f0e0 {
+union UnitDefFlags2Bits {
     unsigned int raw;
     struct {
         unsigned int bits_0 : 4;
@@ -65,54 +65,49 @@ union Flags245_0043f0e0 {
 
 #include "../game/game.h"
 
-struct Node_0043f0e0 {
+struct WeaponDefOrderTypeView {
     char unknown_0[0x111];
     union {
         unsigned int f111;
-        Flags111_0043f0e0 f111bits;
+        WeaponDefFlagsBits f111bits;
     };
 };
 
-struct Def_0043f0e0 {
+struct UnitDefOrderTypeView {
     char unknown_0[0x146];
     char unknown_146[0x156 - 0x146];
     int f156;
     char unknown_15a[0x170 - 0x15a];
     short f170;
     char unknown_172[0x1ee - 0x172];
-    Ref<Node_0043f0e0> f1ee;
+    Ref<WeaponDefOrderTypeView> f1ee;
     char unknown_1f2[0x1fa - 0x1f2];
     unsigned int f1fa;
     char unknown_1fe[0x241 - 0x1fe];
     union {
         unsigned int f241;
-        Flags241_0043f0e0 f241bits;
+        UnitDefFlags1Bits f241bits;
     };
     union {
         unsigned int f245;
-        Flags245_0043f0e0 f245bits;
+        UnitDefFlags2Bits f245bits;
     };
 };
 
-struct Size_0043f0e0 {
-    unsigned int width;
-    unsigned int height;
-};
-
-struct Unit_0043f0e0 {
+struct UnitOrderTypeView {
     int motion;
     char unknown_4[0x10 - 0x4];
-    Ref<Node_0043f0e0> f10;
+    Ref<WeaponDefOrderTypeView> f10;
     char unknown_14[0x2c - 0x14];
-    Ref<Node_0043f0e0> f2c;
+    Ref<WeaponDefOrderTypeView> f2c;
     char unknown_30[0x3b - 0x30];
     unsigned char f3b;
     char unknown_3c[0x70 - 0x3c];
     short f70;
     char unknown_72[0x86 - 0x72];
-    Ref<Unit_0043f0e0> carrier;
+    Ref<UnitOrderTypeView> carrier;
     char unknown_8a[0x92 - 0x8a];
-    Ref<Def_0043f0e0> def;
+    Ref<UnitDefOrderTypeView> def;
     Ref<Player> player;
     char unknown_9a[0xfb - 0x9a];
     int postTransferHoldoff;
@@ -123,19 +118,13 @@ struct Unit_0043f0e0 {
     char unknown_10a[0x110 - 0x10a];
     union {
         unsigned int flags;
-        Flags110_0043f0e0 f110bits;
+        UnitOrderTypeFlags f110bits;
     };
-};
-
-struct Pos_0043f0e0 {
-    short xf, x;
-    short yf, y;
-    short zf, z;
 };
 
 void RegisterUnitOrders();
 
-struct Thing_0043f0e0 {
+struct FeatureMarkView {
     char unknown_0[0xfe];
     unsigned char ffe;
 };
@@ -147,13 +136,13 @@ struct Thing_0043f0e0 {
 #include "../units/unit.h"
 void __stdcall DrawUnit(void*, Unit*);
 
-MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
-                                      Unit_0043f0e0* target, Pos_0043f0e0* pos);
+MissionType __stdcall GetOrderType(unsigned char mode, UnitOrderTypeView* unit,
+                                      UnitOrderTypeView* target, FixedPosView* pos);
 
-int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
-                           Pos_0043e490* pos);
+int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCursorView* target,
+                           FixedPosView* pos);
 
-static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
+static inline int Visible(UnitCursorView* unit, FixedPosView* pos) {
     Player* p = unit->player;
     int y, x;
     x = pos->x >> 5;
@@ -162,41 +151,41 @@ static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
            0 != ((1 << g_game->playerIndex) & g_game->visibilityMask[x + y * unit->player->exploredWidth]);
 }
 
-static inline Feature_0043e490* GetFeature(Cell* cell) {
+static inline FeatureCursorView* GetFeature(Cell* cell) {
     if (cell == 0)
         return 0;
     unsigned short id = cell->feature;
     if (id < 0xfffb) {
         if (id >= g_game->featureCount)
             return 0;
-        return &((struct Feature_0043e490 *)g_game->features)[id];
+        return &((struct FeatureCursorView *)g_game->features)[id];
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->width + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return &((struct Feature_0043e490 *)g_game->features)[id];
+    return &((struct FeatureCursorView *)g_game->features)[id];
 }
 
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \
     do {                                                             \
         if (((def)->flags2 & (mask)) && Visible((unit), (pos))) {      \
-            Feature_0043e490* f = GetFeature(g_seams.los_radar->GetMapCellAtPosition((Vec3*)(pos)));     \
+            FeatureCursorView* f = GetFeature(g_seams.los_radar->GetMapCellAtPosition((Vec3*)(pos)));     \
             if (f && (f->flags & 0x80))                              \
                 return (result);                                     \
         }                                                            \
     } while (0)
 
-static inline int Selectable(Unit_0043e490* t) {
+static inline int Selectable(UnitCursorView* t) {
     return t && t->playerIndex == g_game->localPlayer && (t->flags & 0x20) && t->buildLeft == 0.0f && t->postTransferHoldoff == 0 &&
            (t->carrier == 0 || (t->carrier->flags & 0x40000000));
 }
 
-int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
-                           Pos_0043e490* pos) {
+int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCursorView* target,
+                           FixedPosView* pos) {
     UnitDef* def;
-    Node_0043e490* node;
+    WeaponDefCursorView* node;
     int friendly;
     int enemy;
     friendly = 0;
@@ -211,7 +200,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
     switch (mode) {
     case 3:
-        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0].get())->f111b.b8)
+        if ((def->flags2 & 0x10) && ((WeaponDefCursorView*)def->weapons[0].get())->f111b.b8)
             return 2;
         if (def->c04) {
             node = unit->f10;
@@ -255,8 +244,8 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
         return 0x10;
     case 4:
         if (def->c14) {
-            Limits_0043e490* l = unit->f48;
-            Stats_0043e490* s = unit->fec;
+            WeaponDefShotCostView* l = unit->f48;
+            PlayerResourceView* s = unit->fec;
             if (s->f8c < l->fc0 || s->f98 < l->fc4)
                 return 3;
             return 1;
@@ -312,11 +301,11 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
     return 0x13;
 }
 
-static inline MissionType Pick(Def_0043f0e0* def, const char* vtol, const char* ground) {
+static inline MissionType Pick(UnitDefOrderTypeView* def, const char* vtol, const char* ground) {
     return MissionType(def->f241bits.flag_11 ? vtol : ground);
 }
 
-static inline int Visible(Unit_0043f0e0* unit, Pos_0043f0e0* pos) {
+static inline int Visible(UnitOrderTypeView* unit, FixedPosView* pos) {
     Player* p = unit->player;
     int x = pos->x >> 5;
     int y = (pos->z - (pos->y >> 1)) >> 5;
@@ -330,9 +319,9 @@ static inline int Visible(Unit_0043f0e0* unit, Pos_0043f0e0* pos) {
             return (result);                                                                   \
     } while (0)
 
-static inline int Marked(Thing_0043f0e0* t) { return t && (t->ffe & 0x80); }
+static inline int Marked(FeatureMarkView* t) { return t && (t->ffe & 0x80); }
 
-static inline Thing_0043f0e0* Lookup(Pos_0043f0e0* pos) {
+static inline FeatureMarkView* Lookup(FixedPosView* pos) {
     Cell* cell = g_seams.los_radar->GetMapCellAtPosition((Vec3*)pos);
     if (!cell)
         return 0;
@@ -340,20 +329,20 @@ static inline Thing_0043f0e0* Lookup(Pos_0043f0e0* pos) {
     if (id < 0xfffb) {
         if (id >= g_game->featureCount)
             return 0;
-        return (Thing_0043f0e0*)((char*)(struct Feature_0043e490 *)g_game->features + (id << 8));
+        return (FeatureMarkView*)((char*)(struct FeatureCursorView *)g_game->features + (id << 8));
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->width + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return (Thing_0043f0e0*)((char*)(struct Feature_0043e490 *)g_game->features + (id << 8));
+    return (FeatureMarkView*)((char*)(struct FeatureCursorView *)g_game->features + (id << 8));
 }
 
 // FUNCTION: 0x43f0e0
-MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
-                                      Unit_0043f0e0* target, Pos_0043f0e0* pos) {
-    Def_0043f0e0* def;
+MissionType __stdcall GetOrderType(unsigned char mode, UnitOrderTypeView* unit,
+                                      UnitOrderTypeView* target, FixedPosView* pos) {
+    UnitDefOrderTypeView* def;
     int friendly = 0;
     int enemy = 0;
     if (target) {
@@ -369,10 +358,10 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
     case 3: {
         if (!(def->f245 & 0x10))
             break;
-        Flags110_0043f0e0 flags;
+        UnitOrderTypeFlags flags;
         flags.raw = unit->flags;
         if (flags.flag_31) {
-            Node_0043f0e0* node = unit->f10;
+            WeaponDefOrderTypeView* node = unit->f10;
             if (!enemy) {
                 if (node->f111bits.flag_17)
                     break;
@@ -452,7 +441,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
     case 12: {
         if (!(def->f245 & 0x400))
             break;
-        Thing_0043f0e0* t = Lookup(pos);
+        FeatureMarkView* t = Lookup(pos);
         if (pos && (def->f245 & 0x800)) {
             if (Visible(unit, pos) && t && (t->ffe & 0x80))
                 return MissionType("RESURRECT");

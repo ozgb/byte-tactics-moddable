@@ -22,9 +22,9 @@ struct GoalMotionFlags {
 };
 
 struct GoalCoordTriple {
-    Coord_0044f2a0 x;
-    Coord_0044f2a0 y;
-    Coord_0044f2a0 z;
+    CoordHalves x;
+    CoordHalves y;
+    CoordHalves z;
 };
 
 #pragma pack(push, 2)

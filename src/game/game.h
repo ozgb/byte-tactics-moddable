@@ -45,7 +45,7 @@
 #include "../network/player_id_entry.h"
 #include "../sound/sound_setting_flags.h"
 #include "../units/f14373.h"
-#include "../units/name_004864b0.h"
+#include "../units/side_name_view.h"
 #include "../util/point.h"
 #include "../weapons/debris.h"
 #include "../weapons/weapon_def.h"
@@ -1196,7 +1196,7 @@ struct Game {
         };
         struct {
             char unknown_37f3d_e[34];
-            Name_004864b0 names_37f5f[8];
+            SideNameView names_37f5f[8];
             char pad_390ef[160];
         };
         struct {

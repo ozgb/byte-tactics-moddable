@@ -10,7 +10,7 @@ CMemoryCache,handle,pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,image,pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,ptr,pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,shadow,pointer,src/graphics/memory_cache.h,#353
-Chunk_00437a30,owner,pointer,src/units/unit_motion.cpp,#353
+CacheChunk,owner,pointer,src/units/unit_motion.cpp,#353
 Class_0045ae80,points,pointer,include/ta_types.h,#353
 Class_0045ae80,unknown_2c,pointer,include/ta_types.h,#353
 Class_0045ae80,unknown_30,pointer,include/ta_types.h,#353
@@ -250,5 +250,5 @@ UnitDef,categories,pointer,src/units/unit_def.h,#352
 UnitDef,data,pointer,src/units/unit_def.h,#352
 UnitDef,weaponCategories,pointer,src/units/unit_def.h,#352
 UnitInfoSnapshot,orderName,int-pointer,src/ingame/unit_info_snapshot.h,#353
-UnitList_00409160,units,container,src/ai/player_ai.h,#361
+AiUnitList,units,container,src/ai/player_ai.h,#361
 WeaponDef,fire,pointer,src/weapons/weapon_def.h,#352

@@ -7,24 +7,20 @@
 struct Item_00485940;
 
 #pragma pack(push, 1)
-struct Vec3_00487bf0 {
-    int x, y, z;
-};
-
 #include "../util/angles.h"
 
 #include "../network/player.h"
 #include "../util/vec3.h"
 #include "../../interfaces/seams.h"
 
-struct Def_00488310 {
+struct UnitDefMaxHealthView {
     char unknown_0[0x1fa];
     int f1fa;
 };
 
 #include "unit.h"
 
-struct Table_00487bf0 {
+struct UnitPtrVectorView {
     char allocator_byte;
     char pad[3];
     Unit** ids;
@@ -46,10 +42,10 @@ struct Outs_t {
 };
 
 // FUNCTION: 0x487bf0
-void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
+void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* table)
 {
     int count;
-    struct { float f1, f2; int n; Vec3_00487bf0 pos; int move; } L;
+    struct { float f1, f2; int n; Vec3 pos; int move; } L;
     Outs_t out;
     char buf[256];
     int processed = 0, selected = 0;
@@ -219,7 +215,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
 }
 
 #pragma pack(push, 1)
-struct UnitType_00488b10 {
+struct UnitDefNameKeyView {
     char unknown_0[0x20];
     char name[0x21e - 0x20];
     unsigned short id;
@@ -234,9 +230,9 @@ struct UnitType_00488b10 {
 
 #include "../../link/globals.h"
 
-UnitType_00488b10* __stdcall FindUnitType(const char* name);
+UnitDefNameKeyView* __stdcall FindUnitType(const char* name);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
-                                      Vec3_00487bf0 pos, int a, int b, int c);
+                                      Vec3 pos, int a, int b, int c);
 #include "../graphics/display.h"
 
 #include <math.h>
@@ -281,7 +277,7 @@ void __cdecl CreateMissionUnits()
     std::vector<Unit*> units(n);
     for (int i = 0; i < g_game->net->unitCount; i++) {
         MissionUnit* e = &g_game->net->units[i];
-        UnitType_00488b10* item = (UnitType_00488b10*)g_seams.units->FindUnitType(e->name);
+        UnitDefNameKeyView* item = (UnitDefNameKeyView*)g_seams.units->FindUnitType(e->name);
         if (item == 0) {
             units[i] = 0;
             continue;
@@ -298,7 +294,7 @@ void __cdecl CreateMissionUnits()
         Unit* u = g_seams.units->CreateUnit((unsigned char)(e->player - 1), item->id, *(Vec3*)&e->x, 1, 1, 0);
         if (u) {
             u->flags = (u->flags & ~0x8000) | ((e->flags & 0xffffff80) << 8);
-            u->health = (unsigned short)((unsigned)(((Def_00488310*)u->def.get())->f1fa * e->health) / 100);
+            u->health = (unsigned short)((unsigned)(((UnitDefMaxHealthView*)u->def.get())->f1fa * e->health) / 100);
             u->angles.heading = e->angle;
             units[i] = u;
         }
@@ -306,7 +302,7 @@ void __cdecl CreateMissionUnits()
     for (int j = 0; j < g_game->net->unitCount; j++) {
         MissionUnit* e = &g_game->net->units[j];
         if (e->initialMission && units[j])
-            RunInitialMission(units[j], e->initialMission, (Table_00487bf0*)&units);
+            RunInitialMission(units[j], e->initialMission, (UnitPtrVectorView*)&units);
     }
     if (g_game->net->unitCount <= 0)
         g_seams.players->DeactivateConditions(g_game->list_391ed);
@@ -384,17 +380,17 @@ void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPack
     g_seams.units->SetStateBits(n, ~unit->activateFlags, 0);
 }
 
-typedef int (__stdcall* Pred_00488810)(Item_00485940*, Item_00485940*);
+typedef int (__stdcall* QuickSortPred)(Item_00485940*, Item_00485940*);
 
-static inline int RangeSize_00488810(Item_00485940** low, Item_00485940** high)
+static inline int PointerSpanBytes(Item_00485940** low, Item_00485940** high)
 {
     return (int)((char*)high - (char*)low) & ~3;
 }
 
-void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, Pred_00488810 pred, int unused);
+void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, QuickSortPred pred, int unused);
 
 // FUNCTION: 0x488810
-void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, Pred_00488810 pred, int unused)
+void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, QuickSortPred pred, int unused)
 {
     while (((int)((char*)last - (char*)first) & ~3) > 0x40) {
         int len = (int)((char*)last - (char*)first);
@@ -431,7 +427,7 @@ void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, Pred_00488
             ++i;
         }
 
-        if (RangeSize_00488810(i, last) <= RangeSize_00488810(first, i)) {
+        if (PointerSpanBytes(i, last) <= PointerSpanBytes(first, i)) {
             QuickSort(i, last, pred, 0);
             last = i;
         } else {
@@ -442,7 +438,7 @@ void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, Pred_00488
 }
 
 // FUNCTION: 0x488920
-void __stdcall InsertShift(Item_00485940** last, Item_00485940* value, Pred_00488810 pred)
+void __stdcall InsertShift(Item_00485940** last, Item_00485940* value, QuickSortPred pred)
 {
     for (Item_00485940** m = last; pred(value, *--m); last = m)
         *last = *m;
@@ -451,7 +447,7 @@ void __stdcall InsertShift(Item_00485940** last, Item_00485940* value, Pred_0048
 
 // FUNCTION: 0x488960
 Item_00485940** __stdcall Partition(Item_00485940** first, Item_00485940** last,
-                                        Item_00485940* pivot, Pred_00488810 pred)
+                                        Item_00485940* pivot, QuickSortPred pred)
 {
     for (;; ++first) {
         for (; pred(*first, pivot); ++first)
@@ -491,22 +487,22 @@ static std::vector<UnitCategory> s_unitCategories;
 
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
-static inline int Less_00488a50(const char* a, const char* b)
+static inline int NameLessNoCase(const char* a, const char* b)
 {
     return _strcmpi(a, b) < 0;
 }
 
 #pragma auto_inline(off)
 // FUNCTION: 0x488a50
-UnitType_00488b10* __stdcall FindUnitType(const char* name)
+UnitDefNameKeyView* __stdcall FindUnitType(const char* name)
 {
-    UnitType_00488b10* end = (UnitType_00488b10 *)g_game->defs.get() + g_game->unitDefCount;
-    UnitType_00488b10* lo = (UnitType_00488b10 *)g_game->defs.get() + 1;
+    UnitDefNameKeyView* end = (UnitDefNameKeyView *)g_game->defs.get() + g_game->unitDefCount;
+    UnitDefNameKeyView* lo = (UnitDefNameKeyView *)g_game->defs.get() + 1;
     int n = (int)(end - lo);
     while (n > 0) {
         int half = n / 2;
-        UnitType_00488b10* mid = lo + half;
-        if (Less_00488a50(mid->name, name)) {
+        UnitDefNameKeyView* mid = lo + half;
+        if (NameLessNoCase(mid->name, name)) {
             lo = mid + 1;
             n = n - half - 1;
         } else {
@@ -522,12 +518,12 @@ UnitType_00488b10* __stdcall FindUnitType(const char* name)
 // FUNCTION: 0x488b10
 unsigned short __stdcall FindUnitTypeId(const char* name)
 {
-    UnitType_00488b10* last = (UnitType_00488b10 *)g_game->defs.get() + g_game->unitDefCount;
-    UnitType_00488b10* first = (UnitType_00488b10 *)g_game->defs.get() + 1;
+    UnitDefNameKeyView* last = (UnitDefNameKeyView *)g_game->defs.get() + g_game->unitDefCount;
+    UnitDefNameKeyView* first = (UnitDefNameKeyView *)g_game->defs.get() + 1;
     int n = ((char*)last - (char*)first) / 0x249;
     while (n > 0) {
         int mid = n / 2;
-        UnitType_00488b10* e = first + mid;
+        UnitDefNameKeyView* e = first + mid;
         if (_strcmpi(e->name, name) < 0) {
             first = e + 1;
             n = n - mid - 1;
@@ -581,12 +577,12 @@ UnitTypeSet* __stdcall GetCategoryMask(char* name)
     return p;
 }
 
-static inline UnitType_00488b10* FindByName(UnitType_00488b10* first, UnitType_00488b10* last, char* text)
+static inline UnitDefNameKeyView* FindByName(UnitDefNameKeyView* first, UnitDefNameKeyView* last, char* text)
 {
     int n = (int)((char*)last - (char*)first) / 0x249;
     while (n > 0) {
         int m = n / 2;
-        UnitType_00488b10* e = first + m;
+        UnitDefNameKeyView* e = first + m;
         if (_strcmpi(e->name, text) < 0) {
             n = n - m - 1;
             first = e + 1;
@@ -602,9 +598,9 @@ static inline UnitType_00488b10* FindByName(UnitType_00488b10* first, UnitType_0
 // FUNCTION: 0x488d30
 void UnitTypeSet::AddTypeOrCategory(char* text, int* out)
 {
-    UnitType_00488b10* base = (UnitType_00488b10 *)g_game->defs.get();
-    UnitType_00488b10* last = base + g_game->unitDefCount;
-    UnitType_00488b10* first = FindByName(base + 1, last, text);
+    UnitDefNameKeyView* base = (UnitDefNameKeyView *)g_game->defs.get();
+    UnitDefNameKeyView* last = base + g_game->unitDefCount;
+    UnitDefNameKeyView* first = FindByName(base + 1, last, text);
     unsigned short v = first ? first->id : 0;
     if (v != 0) {
         bits[v >> 5] |= 1 << (v & 31);
@@ -635,12 +631,12 @@ float __stdcall GetEnergyUse(UnitDef* def)
     return 0.0f;
 }
 
-typedef std::vector<UnitCategory> Vec_00488fb0;
-typedef void (Vec_00488fb0::*InsertFn_00488fb0)(
-    Vec_00488fb0::iterator, Vec_00488fb0::size_type, const UnitCategory&);
+typedef std::vector<UnitCategory> UnitCategoryVector;
+typedef void (UnitCategoryVector::*UnitCategoryInsertFn)(
+    UnitCategoryVector::iterator, UnitCategoryVector::size_type, const UnitCategory&);
 
 // FUNCTION: 0x488fb0 ?insert@?$vector@VUnitCategory@@V?$allocator@VUnitCategory@@@std@@@std@@QAEXPAVUnitCategory@@IABV3@@Z
-InsertFn_00488fb0 g_insert_00488fb0 = &Vec_00488fb0::insert;
+UnitCategoryInsertFn g_insert_00488fb0 = &UnitCategoryVector::insert;
 
 #pragma auto_inline(off)
 // FUNCTION: 0x489240

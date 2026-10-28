@@ -61,7 +61,7 @@ struct CloakDefView {
     unsigned int flag : 1;
 };
 
-struct Sub_403010 {
+struct UnitDefActivateFlagView {
     char unknown_0[0x245];
     unsigned int unused_bits : 2;
     unsigned int flag : 1;
@@ -164,7 +164,7 @@ int __stdcall WaitOrder(Unit* unit, Order* order, int flags)
     }
 }
 
-struct PadE_00401e00_0 { int field; };
+struct PadWordE { int field; };
 
 // FUNCTION: 0x401fd0
 int __stdcall WaitForAttackOrder(int unused1, Order* obj, int unused3)
@@ -601,7 +601,7 @@ int __stdcall BeCarriedOrder(Unit* unit, Order* order, int unused)
 // FUNCTION: 0x403010
 int __stdcall ActivateOrder(Unit* unit, int unused1, int unused2)
 {
-    if (((Sub_403010*)unit->def.get())->flag) {
+    if (((UnitDefActivateFlagView*)unit->def.get())->flag) {
         g_seams.units->SetStateBits(unit, 1, 1);
     }
     return 5;
@@ -610,7 +610,7 @@ int __stdcall ActivateOrder(Unit* unit, int unused1, int unused2)
 // FUNCTION: 0x403040
 int __stdcall DeactivateOrder(Unit* unit, int unused1, int unused2)
 {
-    if (((Sub_403010*)unit->def.get())->flag) {
+    if (((UnitDefActivateFlagView*)unit->def.get())->flag) {
         g_seams.units->SetStateBits(unit, 1, 0);
     }
     return 5;
@@ -775,14 +775,14 @@ int __stdcall PatrolOrder(Unit* unit, Order* order, int flags)
     }
 }
 
-struct Pad_00400000_0 { int field; };
-struct Pad_00400000_1 { int field; };
-struct Pad_00400000_2 { int field; };
-struct Pad_00400000_3 { int field; };
-struct Pad_00400000_4 { int field; };
-struct Pad_00400000_5 { int field; };
-struct Pad_00400000_6 { int field; };
-struct Pad_00400000_7 { int field; };
+struct PadWord0 { int field; };
+struct PadWord1 { int field; };
+struct PadWord2 { int field; };
+struct PadWord3 { int field; };
+struct PadWord4 { int field; };
+struct PadWord5 { int field; };
+struct PadWord6 { int field; };
+struct PadWord7 { int field; };
 
 
 #include "../map/feature_spot.h"
@@ -793,7 +793,7 @@ struct Pad_00400000_7 { int field; };
 
 #include "../map/terrain.h"
 
-static const float Zero_004fc920 = 0.0f;
+static const float kZeroFloatOrders = 0.0f;
 
 
 void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
@@ -939,7 +939,7 @@ static inline void CellToWorld(Point16 footprint, Point16 c, Vec3* v)
     v->z = (footprint.y + c.y * 2) << 19;
 }
 
-int __stdcall PadConstants_403a20(double x)
+int __stdcall ClassifyEighths(double x)
 {
     if (x == 8.0) return 1;
     if (x == -8.0) return 2;
@@ -966,7 +966,7 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
             QueueUnitSpeech(unit, 7, "That unit cannot be captured");
             return 8;
         }
-        if (target->buildLeft != Zero_004fc920) {
+        if (target->buildLeft != kZeroFloatOrders) {
             QueueUnitSpeech(unit, 7, "That unit is a cloud of vapor and cannot be captured");
             return 8;
         }
@@ -1038,7 +1038,7 @@ static inline int SquaredDistance(int dx, int dz)
     return (int)((x * x) >> 32) + (int)((z * z) >> 32);
 }
 
-float PadConstant_404ad0(float x)
+float HalfNegated(float x)
 {
     return x * -0.5f;
 }
@@ -1132,7 +1132,7 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
     }
     switch (order->state) {
     case 0:
-        if (unit->motion && (unit->def->flags1Byte & 0x40) && order->target->buildLeft == Zero_004fc920) {
+        if (unit->motion && (unit->def->flags1Byte & 0x40) && order->target->buildLeft == kZeroFloatOrders) {
             order->AnnounceStatusIfFlagged("Repairing");
             return 1;
         }
@@ -1203,7 +1203,7 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
     switch (state) {
     case 0:
         if (!(unit->def->flags1Byte & 0x40)) return 7;
-        if (target->buildLeft == Zero_004fc920 && (unit->activateFlags & 1)) {
+        if (target->buildLeft == kZeroFloatOrders && (unit->activateFlags & 1)) {
             g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
             return 1;
         }
@@ -1247,7 +1247,7 @@ void DamagedAllyCollector::CollectDamagedAlly(Unit* unit)
     if (!owner->allied[index]) return;
     unsigned int kind = unit->flags & 3;
     if ((unsigned char)kind != 1) return;
-    if ((unsigned int)unit->health >= unit->def->maxHealth && unit->buildLeft == Zero_004fc920) return;
+    if ((unsigned int)unit->health >= unit->def->maxHealth && unit->buildLeft == kZeroFloatOrders) return;
     if (unit->lastAttackerSlot == owner->index && unit->lastDamageType == 5) return;
     units->push_back(unit);
 }
@@ -1616,7 +1616,7 @@ extern const UnitOrderType g_readyOrder[1] = {
     {"Ready", (int (__stdcall *)(Unit *, Order *, int))ReadyOrder, 0, 0, 0xf, 0, ""},
 };
 
-extern const int PadAlign_004fc6d0 = 0;
+extern const int kAlignPad = 0;
 
 
 static inline Vec3 PosPlus(const Vec3& a, const Vec3& other)

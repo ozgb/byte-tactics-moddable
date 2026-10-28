@@ -2,7 +2,7 @@
 #define MEMORY_CACHE_H
 
 struct GafFrame;
-struct Chunk_00437a30;
+struct CacheChunk;
 struct Vec3;
 union FixedVec3Union;
 struct ModelState;
@@ -16,7 +16,7 @@ public:
         int base;
         int* basePointer;
     };
-    Chunk_00437a30* cur;
+    CacheChunk* cur;
     void* handle;
     union {
         GafFrame* image;

@@ -45,7 +45,7 @@ address,function,file
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp
 0x40a150,PlayerAI::InitPlacementGrid,src/ai/ai_player.cpp
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp
-0x40a5b0,Elem_0040cc40::Elem_0040cc40,src/ai/ai_player.cpp
+0x40a5b0,KeyedCell::KeyedCell,src/ai/ai_player.cpp
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp
 0x40aa40,PlayerAI::RefreshUnitLists,src/ai/player_ai.cpp
@@ -385,7 +385,7 @@ address,function,file
 0x43d290,UnitMotion::SteerAircraft,src/orders/order_list.cpp
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp
 0x43da70,UnitMotion::UpdateMoveRate,src/orders/order_list.cpp
-0x43db50,Class_0043db50::UpdateSfxOccupy,src/units/unit_scripts.cpp
+0x43db50,SfxOccupyTracker::UpdateSfxOccupy,src/units/unit_scripts.cpp
 0x43dc00,UnitMotion::UnitMotion,src/orders/order_list.cpp
 0x43dd10,UnitMotion::DestroyObject,src/orders/order_list.cpp
 0x43dd20,UnitMotion::UpdateMotion,src/orders/order_list.cpp
@@ -405,7 +405,7 @@ address,function,file
 0x440320,MovementClass::~MovementClass,src/units/movement_class.cpp
 0x440340,MovementClass::ReadMoveInfo,src/units/movement_class.cpp
 0x440420,FindMovementClass,src/units/movement_class.cpp
-0x440500,Class_00440500::BuildPassMap,src/units/movement_class.cpp
+0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp
 0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp
 0x440930,NopAfterFeatureEnum,src/units/movement_class.cpp
 0x440940,BuildAllPassMaps,src/units/movement_class.cpp
@@ -771,7 +771,7 @@ address,function,file
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp
 0x47fad0,SpeechQueue::EnqueueSpeech,src/sound/sound.cpp
 0x47fd70,SpeechQueue::PlaySpeech,src/sound/sound.cpp
-0x4800c0,Class_004800c0::EraseSwapBack,src/sound/sound.cpp
+0x4800c0,UnitSwapEraseVector::EraseSwapBack,src/sound/sound.cpp
 0x480190,CreateSquads,src/units/squads.cpp
 0x480250,SetUnitSquad,src/units/squads.cpp
 0x480460,OrderSquad,src/units/squads.cpp

@@ -12,8 +12,8 @@
 #include "unit_scripts.h"
 
 
-struct Unit_0043e490;
-struct Feature_0043e490;
+struct UnitCursorView;
+struct FeatureCursorView;
 
 #include "../units/unit_def.h"
 #include "sfx_occupy.h"
@@ -35,7 +35,7 @@ struct Object {
 #include "../../link/globals.h"
 
 // FUNCTION: 0x43db50
-void Class_0043db50::UpdateSfxOccupy(Unit* unit)
+void SfxOccupyTracker::UpdateSfxOccupy(Unit* unit)
 {
     int seaLevel = g_game->seaLevel;
     int y = unit->yWhole;
@@ -62,7 +62,7 @@ void Class_0043db50::UpdateSfxOccupy(Unit* unit)
 
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 
-struct Ptr_0043def0 {
+struct PieceBase {
     char unknown_0[0x10];
     int f10;
     int f14;
@@ -70,8 +70,8 @@ struct Ptr_0043def0 {
 };
 
 #pragma pack(push, 2)
-struct Item_0043def0 {
-    Ptr_0043def0* p;
+struct PieceRecord {
+    PieceBase* p;
     int x;
     int y;
     int z;
@@ -79,27 +79,27 @@ struct Item_0043def0 {
     short f12;
     short f14;
     char unknown_16[0x32 - 0x16];
-    Item_0043def0* next;
+    PieceRecord* next;
 };
 
-struct Block_0043def0 {
+struct PieceTable {
     int count;
     char unknown_4[0x22 - 4];
-    Item_0043def0 items[1];
+    PieceRecord items[1];
 };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-struct Object_0043def0 {
+struct PieceOffsetObjectView {
     char unknown_0[0x64];
     Angles16 angles;
     char unknown_6a[0x9e - 0x6a];
-    Ref<Block_0043def0> recs;
+    Ref<PieceTable> recs;
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x43def0
-Vec3 __stdcall GetPieceOffset(Object_0043def0* obj, int index)
+Vec3 __stdcall GetPieceOffset(PieceOffsetObjectView* obj, int index)
 {
     if (obj == 0 || obj->recs == 0) {
         Vec3 v;
@@ -108,7 +108,7 @@ Vec3 __stdcall GetPieceOffset(Object_0043def0* obj, int index)
         v.z = 0;
         return v;
     }
-    Block_0043def0* block = obj->recs;
+    PieceTable* block = obj->recs;
     Vec3 out;
     Vec3 result;
     if (index < 0 || index >= block->count) {
@@ -116,11 +116,11 @@ Vec3 __stdcall GetPieceOffset(Object_0043def0* obj, int index)
         out.y = 0;
         out.z = 0;
     } else {
-        Item_0043def0* item = &block->items[index];
+        PieceRecord* item = &block->items[index];
         result.x = item->p->f10 + item->x;
         result.y = item->p->f14 + item->y;
         result.z = item->p->f18 + item->z;
-        for (Item_0043def0* n = item->next; n != 0; n = n->next) {
+        for (PieceRecord* n = item->next; n != 0; n = n->next) {
             short angles[3];
             angles[0] = n->f14;
             angles[2] = n->f10;
@@ -147,22 +147,22 @@ Vec3 __stdcall GetPieceOffset(Object_0043def0* obj, int index)
 // FUNCTION: 0x43e060
 Vec3 __stdcall GetPiecePosition(Object* obj, int param)
 {
-    return obj->pos + GetPieceOffset((Object_0043def0*)obj, param);
+    return obj->pos + GetPieceOffset((PieceOffsetObjectView*)obj, param);
 }
 
-struct Geom_0043e0b0 {
+struct PieceGeometry {
     char pad0[4];
     int count;
 };
 
 #pragma pack(push, 1)
-struct Piece_0043e0b0 {
-    Geom_0043e0b0* geom;
+struct PieceVertexView {
+    PieceGeometry* geom;
     char pad4[0x22 - 4];
     Ref<Vec3> verts;
 };
 
-struct Obj_0043e0b0 {
+struct PieceCenterObjectView {
     char pad0[0x6a];
     Vec3 pos;
     char pad76[0x9a - 0x76];
@@ -172,11 +172,11 @@ struct Obj_0043e0b0 {
 #pragma pack(pop)
 
 // FUNCTION: 0x43e0b0
-void __stdcall GetPieceCenter(Obj_0043e0b0* obj, Vec3* out, int value)
+void __stdcall GetPieceCenter(PieceCenterObjectView* obj, Vec3* out, int value)
 {
     int minx = 0, miny = 0, minz = 0;
     int maxx = 0, maxy = 0, maxz = 0;
-    Piece_0043e0b0* p = (Piece_0043e0b0*)(obj->table + value * 0x36 + 0x22);
+    PieceVertexView* p = (PieceVertexView*)(obj->table + value * 0x36 + 0x22);
     Vec3* v = p->verts;
     int n = p->geom->count;
     while (n > 0) {
@@ -197,7 +197,7 @@ void __stdcall GetPieceCenter(Obj_0043e0b0* obj, Vec3* out, int value)
     out->z = (maxz + minz) / 2 + obj->pos.z;
 }
 
-struct Rec_0043e180 {
+struct PieceAngleRecord {
     short a;
     char pad[0x30];
     short b;
@@ -205,34 +205,34 @@ struct Rec_0043e180 {
 };
 
 #pragma pack(push, 2)
-struct Obj_0043e180 {
+struct PieceAnglesObjectView {
     char pad0[0x64];
     Angles16 angles;
     char pad1[0x9e - 0x6a];
-    Ref<Rec_0043e180> recs;
+    Ref<PieceAngleRecord> recs;
 };
 #pragma pack(pop)
 
-static inline short SumY_0043e180(Obj_0043e180* obj, Rec_0043e180* q)
+static inline short AddPieceHeading(PieceAnglesObjectView* obj, PieceAngleRecord* q)
 {
     return obj->angles.heading + q->c;
 }
 
-static inline short SumZ_0043e180(Obj_0043e180* obj, Rec_0043e180* q)
+static inline short AddPiecePitch(PieceAnglesObjectView* obj, PieceAngleRecord* q)
 {
     return obj->angles.pitch + q->b;
 }
 
 // FUNCTION: 0x43e180
-Angles16 __stdcall GetPieceAngles(Obj_0043e180* obj, int index)
+Angles16 __stdcall GetPieceAngles(PieceAnglesObjectView* obj, int index)
 {
-    Rec_0043e180* r = obj->recs;
+    PieceAngleRecord* r = obj->recs;
     Angles16 p;
     p.pitch = obj->angles.pitch;
     p.heading = obj->angles.heading;
     if (index >= 0) {
-        p.pitch = SumZ_0043e180(obj, &r[index]);
-        p.heading = SumY_0043e180(obj, &r[index]);
+        p.pitch = AddPiecePitch(obj, &r[index]);
+        p.heading = AddPieceHeading(obj, &r[index]);
     }
     p.bank = obj->angles.bank + r[index + 1].a;
     return p;
@@ -267,14 +267,14 @@ void __stdcall GetAimFromPosition(Object* obj, Vec3* out, unsigned char weapon)
         char* qnames[3] = { "QueryPrimary", "QuerySecondary", "QueryTertiary" };
         int q = 0;
         obj->script->QueryScript(qnames[weapon], &q, 0, 0, 0);
-        *out = obj->pos + GetPieceOffset((Object_0043def0*)obj, q);
+        *out = obj->pos + GetPieceOffset((PieceOffsetObjectView*)obj, q);
     } else {
-        *out = obj->pos + GetPieceOffset((Object_0043def0*)obj, piece);
+        *out = obj->pos + GetPieceOffset((PieceOffsetObjectView*)obj, piece);
     }
 }
 
 #pragma pack(push, 2)
-struct Obj_0043e3c0 {
+struct SweetSpotObjectView {
     char unknown_0[0x9a];
     Ref<CobScript> table;
 };
@@ -305,13 +305,13 @@ void __stdcall PoseUnitModel(Unit* unit)
 }
 
 // FUNCTION: 0x43e3c0
-void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out)
+void __stdcall GetSweetSpot(SweetSpotObjectView* obj, int out)
 {
     int value = 0;
     obj->table->QueryScript("SweetSpot", &value, 0, 0, 0);
     if (!g_quirks.renderPoseReads)
         PoseUnitModel((Unit*)obj);
-    GetPieceCenter((Obj_0043e0b0*)obj, (Vec3*)out, value);
+    GetPieceCenter((PieceCenterObjectView*)obj, (Vec3*)out, value);
 }
 
 // FUNCTION: 0x43e400
@@ -319,7 +319,7 @@ void __stdcall GetNanoPiecePosition(Object* obj, Vec3* out)
 {
     int piece = 0;
     obj->script->QueryScript("QueryNanoPiece", &piece, 0, 0, 0);
-    *out = obj->pos + GetPieceOffset((Object_0043def0*)obj, piece);
+    *out = obj->pos + GetPieceOffset((PieceOffsetObjectView*)obj, piece);
 }
 
 // FUNCTION: 0x43e470
@@ -331,10 +331,10 @@ int __stdcall OrderModeTakesTarget(unsigned char type)
 }
 
 #pragma pack(push, 1)
-#include "../orders/node_0043e490.h"
+#include "../orders/order_cursor_views.h"
 
 
-struct Flags_0043e490 {
+struct UnitDefCursorFlags {
     unsigned int b0 : 1;
     unsigned int b1 : 1;
     unsigned int b2 : 1;
@@ -353,10 +353,10 @@ struct Flags_0043e490 {
     unsigned int b15_31 : 17;
 };
 
-struct UnitDefFlags_0043e490 {
+struct UnitDefCursorFlagsView {
     char unknown_0[0x241];
-    Flags_0043e490 f241b;
-    Flags_0043e490 f245b;
+    UnitDefCursorFlags f241b;
+    UnitDefCursorFlags f245b;
 };
 
 #include "../network/player.h"
@@ -365,7 +365,7 @@ struct UnitDefFlags_0043e490 {
 
 #pragma pack(pop)
 
-static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
+static inline int Visible(UnitCursorView* unit, FixedPosView* pos) {
     Player* p = unit->player;
     int y, x;
     x = pos->x >> 5;
@@ -374,42 +374,42 @@ static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
            0 != ((1 << g_game->playerIndex) & g_game->visibilityMask[x + y * unit->player->exploredWidth]);
 }
 
-static inline Feature_0043e490* GetFeature(Cell* cell) {
+static inline FeatureCursorView* GetFeature(Cell* cell) {
     if (cell == 0)
         return 0;
     unsigned short id = cell->feature;
     if (id < 0xfffb) {
         if (id >= g_game->featureCount)
             return 0;
-        return &((Feature_0043e490 *)g_game->features)[id];
+        return &((FeatureCursorView *)g_game->features)[id];
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->width + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return &((Feature_0043e490 *)g_game->features)[id];
+    return &((FeatureCursorView *)g_game->features)[id];
 }
 
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \
     do {                                                             \
         if (((def)->flags2 & (mask)) && Visible((unit), (pos))) {      \
-            Feature_0043e490* f = GetFeature(g_seams.los_radar->GetMapCellAtPosition((Vec3*)(pos)));     \
+            FeatureCursorView* f = GetFeature(g_seams.los_radar->GetMapCellAtPosition((Vec3*)(pos)));     \
             if (f && (f->flags & 0x80))                              \
                 return (result);                                     \
         }                                                            \
     } while (0)
 
-static inline int Selectable(Unit_0043e490* t) {
+static inline int Selectable(UnitCursorView* t) {
     return t && t->playerIndex == g_game->localPlayer && (t->flags & 0x20) && t->buildLeft == 0.0f && t->postTransferHoldoff == 0 &&
            (t->carrier == 0 || (t->carrier->flags & 0x40000000));
 }
 
 // FUNCTION: 0x43e490
-int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
-                           Pos_0043e490* pos) {
+int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCursorView* target,
+                           FixedPosView* pos) {
     UnitDef* def;
-    Node_0043e490* node;
+    WeaponDefCursorView* node;
     int friendly;
     int enemy;
     friendly = 0;
@@ -424,9 +424,9 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
     switch (mode) {
     case 3:
-        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0].get())->f111b.b8)
+        if ((def->flags2 & 0x10) && ((WeaponDefCursorView*)def->weapons[0].get())->f111b.b8)
             return 2;
-        if (((UnitDefFlags_0043e490*)def)->f245b.b4) {
+        if (((UnitDefCursorFlagsView*)def)->f245b.b4) {
             node = unit->f10;
             if (unit->motion)
                 return 1;
@@ -438,7 +438,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
         }
         break;
     case 9:
-        return ((UnitDefFlags_0043e490*)def)->f245b.b6 ? 7 : 0x13;
+        return ((UnitDefCursorFlagsView*)def)->f245b.b6 ? 7 : 0x13;
     case 8:
         return g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) ? 6 : 0x13;
     case 7:
@@ -459,17 +459,17 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
     case 6:
         if (!target || !g_seams.units->CanLoad(((Unit*)unit), 0, (Unit*)target))
             break;
-        return ((UnitDefFlags_0043e490*)def)->f241b.b11 ? 8 : 0xc;
+        return ((UnitDefCursorFlagsView*)def)->f241b.b11 ? 8 : 0xc;
     case 5:
-        return ((UnitDefFlags_0043e490*)def)->f245b.b8 ? 0xd : 0x13;
+        return ((UnitDefCursorFlagsView*)def)->f245b.b8 ? 0xd : 0x13;
     case 14:
         if (def->ids == 0 || unit->motion == 0)
             break;
         return 0x10;
     case 4:
-        if (((UnitDefFlags_0043e490*)def)->f245b.b14) {
-            Limits_0043e490* l = unit->f48;
-            Stats_0043e490* s = unit->fec;
+        if (((UnitDefCursorFlagsView*)def)->f245b.b14) {
+            WeaponDefShotCostView* l = unit->f48;
+            PlayerResourceView* s = unit->fec;
             if (s->f8c < l->fc0 || s->f98 < l->fc4)
                 return 3;
             return 1;
@@ -494,7 +494,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
         if ((def->flags1 & 0x800) && (target->def->flags1 & 0x200))
             return 0xd;
         if (g_seams.units->CanLoad(((Unit*)unit), 0, (Unit*)target))
-            return ((UnitDefFlags_0043e490*)def)->f241b.b11 ? 8 : 0xc;
+            return ((UnitDefCursorFlagsView*)def)->f241b.b11 ? 8 : 0xc;
         if ((def->flags2 & 0x20) && friendly)
             return 5;
         return 0xe;
@@ -520,7 +520,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
             return 0xf;
         RECLAIM_CHECK(def, unit, pos, 0x800, 0xa);
         RECLAIM_CHECK(def, unit, pos, 0x400, 0xb);
-        return ((UnitDefFlags_0043e490*)def)->f245b.b7 ? 0xe : 0x13;
+        return ((UnitDefCursorFlagsView*)def)->f245b.b7 ? 0xe : 0x13;
     }
     return 0x13;
 }

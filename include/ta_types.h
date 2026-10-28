@@ -15,6 +15,7 @@
 #include "../src/util/vec3.h"
 #include "../src/units/unit_ref.h"
 #include "../src/graphics/surface.h"
+#include "../src/network/net_stats.h"
 #include "../src/network/packet_ring.h"
 #include "../src/network/packet_receiver.h"
 #include "../src/network/packet_manager.h"
@@ -3078,13 +3079,6 @@ struct Class_00415da0 {
     char unknown_0[12];
     void* field_c;
     void SetByteAt(int, unsigned char);
-};
-
-struct Pair_00419560 {
-    unsigned int offset;
-    int length;
-    Pair_00419560(unsigned int, unsigned int);
-    Pair_00419560(void);
 };
 
 class Class_004618a0 {

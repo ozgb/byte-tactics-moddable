@@ -37,6 +37,7 @@ extern int g_delayedSampleVolume;
 extern char g_delayedSampleName[];
 
 #include "sound.h"
+#include "../util/vec3.h"
 
 static inline int ClampVolume(int v)
 {

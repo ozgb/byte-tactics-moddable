@@ -107,6 +107,7 @@ struct CursorWorldPos {
 };
 
 #include "../graphics/rect.h"
+#include "../ingame/view_mouse_event.h"
 
 struct CursorMoveEvent {
     int x;

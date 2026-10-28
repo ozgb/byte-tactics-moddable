@@ -153,14 +153,7 @@ struct Spot {
 #include "../network/player_info.h"
 
 #include "../units/unit.h"
-
-struct Weapon {
-    char unknown_0[0xd4];
-    unsigned short damage;
-    char unknown_d6[0x10a - 0xd6];
-    unsigned char kind;
-    char flag_10b;
-};
+#include "../weapons/weapon_def.h"
 
 struct Obj {
     char unknown_0[0x28];
@@ -1079,7 +1072,7 @@ void __stdcall UpdateFeatures()
 }
 
 // FUNCTION: 0x4244b0
-void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon)
+void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
 {
     if (!(g_game->uiOptionFlags_37f2f_1 & 8))
         return;
@@ -1093,7 +1086,7 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon)
     if (g_seams.map->GetGameType(g_game->net) == 3) {
         if (!(g_game->players[g_game->playerIndex].info->flags_97 & 1)) {
             packet.type = 0xf;
-            packet.sub = weapon->kind;
+            packet.sub = weapon->index;
             packet.x = x;
             packet.z = z;
             SendPacketToPlayer(GetLocalDpid(), GetHostDpid(), (unsigned char *)&packet, 6);
@@ -1104,7 +1097,7 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon)
     } else {
         send = 0;
     }
-    if (f->flamable && weapon->flag_10b && !(cell->flags & 1)) {
+    if (f->flamable && weapon->fireStarter && !(cell->flags & 1)) {
         StartFeatureBurning(x, z, 0);
     } else if (cell->flags & 1) {
         if (!f->noobject) {

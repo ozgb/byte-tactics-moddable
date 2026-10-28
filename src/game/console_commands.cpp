@@ -800,8 +800,7 @@ void __stdcall CmdMusicMode(void* args)
 {
     CommandArgs* obj = (CommandArgs*)args;
     int result = obj->GetIntArg(1, 0);
-    void* p = *(void**)((char*)g_game + 0x10);
-    ((Sound*)p)->SetTrackCategory(result);
+    ((Sound*)g_game->sound)->SetTrackCategory(result);
 }
 
 // FUNCTION: 0x417600

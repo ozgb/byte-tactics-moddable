@@ -573,9 +573,9 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Entered by the console: `TransferEnergy` and `TransferMetal` (console `Give`, `console-economy`) and `MissionConditions::Deactivate` (console `Kill`, `console-units`) (#445).
 
-**map** (106 functions). No phase root. 51 functions are called from outside, by presentation (24), seams (19), game (10) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 67 functions: platform 29, files 12, los_radar 6, game 4, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.4% of functions (78 of 97), 86.8% of lines, 75.9% of branches; 19 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
+**map** (106 functions). No phase root. 51 functions are called from outside, by presentation (24), seams (19), game (10) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 67 functions: platform 29, files 12, los_radar 6, game 4, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.6% of functions (79 of 98), 86.8% of lines, 75.9% of branches; 19 live functions no scenario enters, and 13 more are dead (data/coverage.csv).
 
-**map, functions no scenario enters** (19 of 97 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 78 are entered, 80.4%), by reason:
+**map, functions no scenario enters** (19 of 98 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 79 are entered, 80.6%), by reason:
 
 - Load only (1): `ForceNeighborFootprintReclaim` (called from `LoadUnit`). `save-midgame` (#422) enters the save side, and `load-midgame` (#442) enters `LoadMetalPlotmap`, `LoadPlayerFeaturesPlotmap` and `LoadMappingData` (the saved game files).
 - Shutdown only (2): `FreeOtaEnumCacheAndMission` and `Vector_00438480::~Vector_00438480`. The first is called at the end of `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick. The second is the destructor of the static `g_missionOrderTableVec`, which never runs, because `host_exit` ends the process with `TerminateProcess`.
@@ -670,12 +670,12 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | **orders** | 306 of 368 | 83.2% | 79.4% | 61.6% | 62 | 26 |
 | **units** | 132 of 164 | 80.5% | 84.5% | 71.1% | 32 | 33 |
 | **players** | 74 of 143 | 51.7% | 52.8% | 44.2% | 69 | 11 |
-| **map** | 78 of 97 | 80.4% | 86.8% | 75.9% | 19 | 12 |
+| **map** | 79 of 98 | 80.6% | 86.8% | 75.9% | 19 | 13 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
 | game | 113 of 183 | 61.7% | 50.4% | 31.4% | 70 | 25 |
 | network | 50 of 287 | 17.4% | 10.7% | 4.5% | 237 | 73 |
 | platform | 318 of 641 | 49.6% | 34.9% | 22.7% | 323 | 80 |
-| presentation | 458 of 1113 | 41.2% | 31.0% | 21.7% | 655 | 295 |
+| presentation | 460 of 1116 | 41.2% | 31.0% | 21.7% | 656 | 295 |
 | seams | 94 of 103 | 91.3% | 95.8% | - | 9 | 0 |
 | state | 294 of 348 | 84.5% | 80.4% | 50.5% | 54 | 21 |
 

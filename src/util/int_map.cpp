@@ -1,6 +1,6 @@
 #include <map>
 
-struct Data_004b2450 {
+struct CobScriptHeader {
     int unknown_0;
     int count_1;
     int count_2;
@@ -14,7 +14,7 @@ struct Data_004b2450 {
     int offset_28;
 };
 
-struct Pair8_004b2450 {
+struct CobScriptOffsetEntry {
     int unknown_0;
     int offset;
 };
@@ -28,7 +28,7 @@ struct Pair8_004b2450 {
 // TODO(#187): move the cache into the block, with Ref keys and nodes from the block
 static std::map<int, int> s_cobScriptCache;
 
-static void Relocate(Data_004b2450* data)
+static void Relocate(CobScriptHeader* data)
 {
     data->offset_18 += (int)data;
     data->offset_1c += (int)data;
@@ -40,13 +40,13 @@ static void Relocate(Data_004b2450* data)
     data->offset_24 += (int)data;
     data->offset_28 += (int)data;
     for (int k = 0; k < data->count_3; k++)
-        ((Pair8_004b2450*)data->offset_28)[k].offset += (int)data;
+        ((CobScriptOffsetEntry*)data->offset_28)[k].offset += (int)data;
 }
 
 // FUNCTION: 0x4b2450
-Data_004b2450* __stdcall LoadCobScript(char* name)
+CobScriptHeader* __stdcall LoadCobScript(char* name)
 {
-    Data_004b2450* data = (Data_004b2450*)HAPI_LoadFile(name, 0);
+    CobScriptHeader* data = (CobScriptHeader*)HAPI_LoadFile(name, 0);
     if (data == 0)
         return 0;
     int sum = ComputeChecksum((unsigned char*)data, HAPI_FileLengthByName(name));

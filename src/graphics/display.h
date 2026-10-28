@@ -1,12 +1,12 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
-struct App_4b5980;
+struct DisplayAppView;
 
 #include "surface.h"
 
 struct OPENHAPIFILE;
 
-union Flags_004c61b0 {
+union DisplayFlags {
     unsigned short word;
     unsigned char byte;
     struct {
@@ -47,7 +47,7 @@ struct Display {
     char pad_e0[0xe4 - 0xe0];
     int field_e4;
     char pad_e8[0xf0 - 0xe8];
-    Flags_004c61b0 flags;
+    DisplayFlags flags;
     char pad_f2[0x196 - 0xf2];
     int rect_x;
     int rect_y;
@@ -87,10 +87,10 @@ void __stdcall ResetTimers();
 int __stdcall DrawFrameRate();
 int __stdcall GetFrameRate();
 
-void __stdcall ReleaseDirectDraw(App_4b5980* d);
-void __stdcall InitDisplayDefaults(App_4b5980* p);
-int __stdcall InitEnvironment(App_4b5980* d);
-void __stdcall ShutdownEnvironment(App_4b5980* d);
+void __stdcall ReleaseDirectDraw(DisplayAppView* d);
+void __stdcall InitDisplayDefaults(DisplayAppView* p);
+int __stdcall InitEnvironment(DisplayAppView* d);
+void __stdcall ShutdownEnvironment(DisplayAppView* d);
 void __stdcall QuitApp(char* message);
 #include "../../interfaces/services.h"
 unsigned long __stdcall GetMilliseconds(void);

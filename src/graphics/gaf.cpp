@@ -30,25 +30,25 @@ void __stdcall ClipRects(Rect* other, Rect* rect, Rect* bounds)
     }
 }
 
-struct Entry_004b7ee0 {
+struct GafFrameTableEntry {
     int value;
     int unknown_4;
 };
 
-struct Table_004b7ee0 {
+struct GafFrameTable {
     unsigned short count;
     char unknown_2[0x26];
-    Entry_004b7ee0 entries[1];
+    GafFrameTableEntry entries[1];
 };
 
-struct Handle_004b7ee0 {
+struct GafFrameCursor {
     unsigned short index;
     char unknown_2[6];
-    Table_004b7ee0* table;
+    GafFrameTable* table;
 };
 
 // FUNCTION: 0x4b7ee0
-int __stdcall GetGafSequenceFrame(Handle_004b7ee0* h)
+int __stdcall GetGafSequenceFrame(GafFrameCursor* h)
 {
     int result = 0;
     if (h->table != 0)
@@ -56,13 +56,13 @@ int __stdcall GetGafSequenceFrame(Handle_004b7ee0* h)
     return result;
 }
 
-struct Obj_004b7f00 {
+struct GafFrameCountCursor {
     unsigned short index;
     char unknown_2[6];
     unsigned short* table;
 };
 // FUNCTION: 0x4b7f00
-int __stdcall SetGafSequenceFrame(Obj_004b7f00* obj, int index)
+int __stdcall SetGafSequenceFrame(GafFrameCountCursor* obj, int index)
 {
     int result = 0;
     if (obj->table != 0 && *obj->table > index) {
@@ -88,23 +88,23 @@ unsigned short __stdcall GetGafFrameCount(void* ptr)
     return (unsigned short)result;
 }
 
-struct Entry_004b7f70 {
+struct GafDurationEntry {
     unsigned short value;
     char unknown_2[6];
 };
 
-struct Obj_004b7f70 {
+struct GafDurationCursor {
     unsigned short index;
     char unknown_2[6];
     void* table;
 };
 
-static inline Entry_004b7f70* GetEntries(Obj_004b7f70* obj)
+static inline GafDurationEntry* GetEntries(GafDurationCursor* obj)
 {
-    return (Entry_004b7f70*)((char*)obj->table + 0x2c);
+    return (GafDurationEntry*)((char*)obj->table + 0x2c);
 }
 // FUNCTION: 0x4b7f70
-unsigned short __stdcall GetGafFrameDuration(Obj_004b7f70* param1)
+unsigned short __stdcall GetGafFrameDuration(GafDurationCursor* param1)
 {
     unsigned short result;
     if (param1->table != 0) {
@@ -231,7 +231,7 @@ void __stdcall DrawFrameOpaque(Surface* dst, GafFrame* bmp, int x, int y)
         UnlockScreen(&screen);
 }
 
-union Flags_004b8310 {
+union DisplayTableFlags {
     unsigned short word;
     unsigned char byte;
     struct {
@@ -247,7 +247,7 @@ union Flags_004b8310 {
     } bits;
 };
 
-struct Display_004b8310 {
+struct DisplayTablesView {
     char unknown_0[0xc0];
     unsigned char* alphaTable;
     unsigned char* shadeTable;
@@ -255,15 +255,15 @@ struct Display_004b8310 {
     unsigned char* grayTable;
     unsigned char* blueTable;
     char unknown_d4[0xf0 - 0xd4];
-    Flags_004b8310 flags;
+    DisplayTableFlags flags;
 };
 
-struct Screen_004b8310 {
+struct ScreenSurfaceView {
     char unknown_0[0x20];
     Surface surf;
 };
 
-struct Src_004b8310 {
+struct BlitSourceView {
     int width;
     int height;
     int pitch;
@@ -272,11 +272,11 @@ struct Src_004b8310 {
 
 struct Bounds_src_004b8310 {
     Rect bounds;
-    Src_004b8310 src;
+    BlitSourceView src;
 };
 
-Display_004b8310* GetDisplay();
-void __cdecl BlitRectBlended(Surface* p, Src_004b8310* src, Rect* rect,
+DisplayTablesView* GetDisplay();
+void __cdecl BlitRectBlended(Surface* p, BlitSourceView* src, Rect* rect,
                              Rect* pos, int colour, unsigned char* palette);
 void __cdecl BlitCompressedLit(unsigned char* pixels, int pitch, Rect* drect,
                                GafFrame** src, Rect* srect,
@@ -288,9 +288,9 @@ void __cdecl BlitCompressedBlended(unsigned char* pixels, int pitch, Rect* drect
 // FUNCTION: 0x4b8500
 void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y)
 {
-    Display_004b8310* d = GetDisplay();
+    DisplayTablesView* d = GetDisplay();
     if ((d->flags.byte & 0x20) != 0) {
-        Screen_004b8310 screen;
+        ScreenSurfaceView screen;
         if (surface == 0) {
             int locked = LockScreen(&screen.surf);
             if (locked != 0)
@@ -316,7 +316,7 @@ void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y)
                 if (screen_rect.right >= screen_rect.left && screen_rect.bottom >= screen_rect.top
                     && sprite_rect.right >= sprite_rect.left && sprite_rect.bottom >= sprite_rect.top) {
                     if (frame->compressed == 0) {
-                        Src_004b8310& src = bs.src;
+                        BlitSourceView& src = bs.src;
                         src.width = frame->width;
                         src.height = frame->height;
                         src.pitch = frame->width;
@@ -343,7 +343,7 @@ void __stdcall ResetClipRect(int* surface);
 // FUNCTION: 0x4b86e0
 void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
 {
-    Display_004b8310* d = GetDisplay();
+    DisplayTablesView* d = GetDisplay();
     if ((d->flags.word & 0x100) != 0 && frame->compressed == 0) {
         Surface screen;
         if (surface == 0) {
@@ -482,45 +482,43 @@ void __stdcall FrameFromSurface(GafFrame* dst, Surface* src)
     dst->blend = 0;
 }
 
-struct Entry_004b8b30 {
-    unsigned short value;
-    char unknown_2[6];
-};
-
-struct Src_004b8b30 {
+struct GafSequenceRecord {
     unsigned short count;
     unsigned char kind;
-    char unknown_3[0x2c - 3];
-    Entry_004b8b30 entries[1];
+    char unknown_3[5];
+    char name[1];
+    char unknown_9[31];
+    GafFrame* child[1];
+    GafDurationEntry entries[1];
 };
 
-struct Ref_004b8b30 {
+struct GafSequencePlayer {
     unsigned short index;
     unsigned short value;
     unsigned char kind;
     char unknown_5[3];
-    Src_004b8b30* src;
+    GafSequenceRecord* src;
 };
 
-static inline unsigned short Value_004b8b30(Src_004b8b30* s, unsigned short i)
+static inline unsigned short GafDurationAt(GafSequenceRecord* s, unsigned short i)
 {
     if (s)
         return s->entries[i].value;
     return 0xffff;
 }
 // FUNCTION: 0x4b8b30
-void __stdcall InitGafSequence(Ref_004b8b30* ref, Src_004b8b30* src, int index)
+void __stdcall InitGafSequence(GafSequencePlayer* ref, GafSequenceRecord* src, int index)
 {
     ref->index = index < src->count ? index : 0;
     ref->src = src;
-    ref->value = Value_004b8b30(src, ref->index);
+    ref->value = GafDurationAt(src, ref->index);
     ref->kind = src->kind;
 }
 
 // FUNCTION: 0x4b8b90
-int __stdcall StepGafSequence(Ref_004b8b30* ref)
+int __stdcall StepGafSequence(GafSequencePlayer* ref)
 {
-    Src_004b8b30* src = ref->src;
+    GafSequenceRecord* src = ref->src;
     if (src) {
         if (ref->value < 2) {
             ref->index++;
@@ -540,15 +538,15 @@ int __stdcall StepGafSequence(Ref_004b8b30* ref)
     return 0;
 }
 
-struct Ref_004b8bf0 {
+struct GafSequencePlayerSigned {
     unsigned short index;
     short value;
     unsigned char kind;
     char unknown_5[3];
-    Src_004b8b30* src;
+    GafSequenceRecord* src;
 };
 
-static inline unsigned short Value_004b8bf0(Ref_004b8bf0* r)
+static inline unsigned short GafCurrentDuration(GafSequencePlayerSigned* r)
 {
     if (r->src)
         return r->src->entries[r->index].value;
@@ -556,9 +554,9 @@ static inline unsigned short Value_004b8bf0(Ref_004b8bf0* r)
 }
 
 // FUNCTION: 0x4b8bf0
-void __stdcall AdvanceGafSequence(Ref_004b8bf0* ref, short step)
+void __stdcall AdvanceGafSequence(GafSequencePlayerSigned* ref, short step)
 {
-    Src_004b8b30* src = ref->src;
+    GafSequenceRecord* src = ref->src;
     if (src == 0 || src->count <= 1) {
         return;
     }
@@ -572,11 +570,11 @@ void __stdcall AdvanceGafSequence(Ref_004b8bf0* ref, short step)
             }
             ref->index = 0;
         }
-        ref->value += Value_004b8bf0(ref);
+        ref->value += GafCurrentDuration(ref);
     }
 }
 
-struct Entry_004b8c60 {
+struct GafBlockEntry {
     int off;
     int pad;
 };
@@ -585,7 +583,7 @@ struct Blk {
     unsigned char pad1[8];
     unsigned char subcount;
     unsigned char pad2[29];
-    Entry_004b8c60 e[2];
+    GafBlockEntry e[2];
 };
 // FUNCTION: 0x4b8c60
 void* __stdcall LoadGaf(char* name)
@@ -617,28 +615,18 @@ void* __stdcall LoadGaf(char* name)
     return base;
 }
 
-struct GafEntry_004b8d40 {
-    unsigned short count;
-    unsigned char kind;
-    char unknown_3[5];
-    char name[1];
-    char unknown_9[31];
-    GafFrame* child[1];
-    Entry_004b8b30 entries[1];
-};
-
-struct Gaf_004b8d40 {
+struct GafFileIndex {
     char unknown_0[4];
     short count;
     char unknown_6[6];
-    GafEntry_004b8d40* entries[1];
+    GafSequenceRecord* entries[1];
 };
 
 // FUNCTION: 0x4b8d40
-GafEntry_004b8d40* __stdcall FindGafEntry(Gaf_004b8d40* gaf, const char* name)
+GafSequenceRecord* __stdcall FindGafEntry(GafFileIndex* gaf, const char* name)
 {
     if (gaf) {
-        GafEntry_004b8d40** p = gaf->entries;
+        GafSequenceRecord** p = gaf->entries;
         for (int i = 0; i < gaf->count; i++, p++) {
             if (_strcmpi((*p)->name, name) == 0)
                 return *p;
@@ -703,7 +691,7 @@ void __cdecl BlitCompressedShadow(unsigned char* pixels, int pitch, Rect* rect,
 // FUNCTION: 0x4b8ec0
 void __stdcall DrawFrameShadow(Surface* dst, GafFrame* bmp, int x, int y)
 {
-    Display_004b8310* d = GetDisplay();
+    DisplayTablesView* d = GetDisplay();
     if (d->flags.bits.has_obj_c8 == 1) {
         Surface screen;
         if (dst == 0) {
@@ -916,7 +904,7 @@ void __stdcall TintFrameBelow(GafFrame* image, unsigned char level)
     unsigned char* p = image->pixelsOrLayers;
     unsigned char* m = image->scratch;
     int count = image->height * image->width;
-    Display_004b8310* pal = GetDisplay();
+    DisplayTablesView* pal = GetDisplay();
     while (count--) {
         if (*m <= level && *p != image->transparency) {
             *p = pal->blueTable[*p];
@@ -929,7 +917,7 @@ void __stdcall TintFrameBelow(GafFrame* image, unsigned char level)
 // FUNCTION: 0x4b9740
 void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y, double sx, double sy)
 {
-    Display_004b8310* d = GetDisplay();
+    DisplayTablesView* d = GetDisplay();
     Surface screen;
     if (dst == 0) {
         int ok = LockScreen(&screen);
@@ -1280,7 +1268,7 @@ void __stdcall CutFrameBelow(GafFrame* image, unsigned char level)
     unsigned char* p = image->pixelsOrLayers;
     unsigned char* m = image->scratch;
     int count = image->height * image->width;
-    Display_004b8310* pal = GetDisplay();
+    DisplayTablesView* pal = GetDisplay();
     while (count--) {
         if (*m <= level) {
             *p = image->transparency;
@@ -1293,9 +1281,9 @@ void __stdcall CutFrameBelow(GafFrame* image, unsigned char level)
 // FUNCTION: 0x4b8310
 void __stdcall DrawFrameLit(Surface* surface, GafFrame* frame, int x, int y, int paletteRow)
 {
-    Display_004b8310* d = GetDisplay();
+    DisplayTablesView* d = GetDisplay();
     if ((d->flags.byte & 0x80) == 0x80) {
-        Screen_004b8310 screen;
+        ScreenSurfaceView screen;
         if (surface == 0) {
             int locked = LockScreen(&screen.surf);
             if (locked != 0)
@@ -1321,7 +1309,7 @@ void __stdcall DrawFrameLit(Surface* surface, GafFrame* frame, int x, int y, int
                 if (screen_rect.right >= screen_rect.left && screen_rect.bottom >= screen_rect.top
                     && sprite_rect.right >= sprite_rect.left && sprite_rect.bottom >= sprite_rect.top) {
                     if (frame->compressed == 0) {
-                        Src_004b8310& src = bs.src;
+                        BlitSourceView& src = bs.src;
                         src.width = frame->width;
                         src.height = frame->height;
                         src.pitch = frame->width;
@@ -1373,7 +1361,7 @@ void __stdcall DrawFrameDepth(GafFrame* src, GafFrame* dst, int x, int y, int le
 // FUNCTION: 0x4b95a0
 void __stdcall DownsampleFrame(GafFrame* src, GafFrame* dst)
 {
-    Display_004b8310* pal = GetDisplay();
+    DisplayTablesView* pal = GetDisplay();
     int row = 0;
     for (; row < dst->height; row++) {
         for (int x = 0; x < dst->width; x++) {

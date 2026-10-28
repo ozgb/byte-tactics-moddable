@@ -8,23 +8,23 @@ class FreeBlockMap;
 template <class T, class A = std::allocator<T> >
 class FreedBlockRing;
 
-struct Pair_004db000 {
+struct FreeBlockRange {
     unsigned int offset;
     unsigned int length;
-    Pair_004db000() {}
-    Pair_004db000(unsigned int o, unsigned int l) : offset(o), length(l) {}
+    FreeBlockRange() {}
+    FreeBlockRange(unsigned int o, unsigned int l) : offset(o), length(l) {}
 };
 
-struct Node_004db000 {
-    Node_004db000* left;
-    Node_004db000* parent;
-    Node_004db000* right;
-    Pair_004db000 value;
+struct FreeBlockNode {
+    FreeBlockNode* left;
+    FreeBlockNode* parent;
+    FreeBlockNode* right;
+    FreeBlockRange value;
     int color;
 };
 
-struct Node_004dd1b0 {
-    Node_004dd1b0* left;
+struct LeftChainNode {
+    LeftChainNode* left;
 };
 
 char __stdcall IsMemFussy();
@@ -82,5 +82,7 @@ FreedBlockRing<int>* GetFreedBlockRing();
 void __cdecl FreeDebugBlock(void* p, int flags);
 
 void* __stdcall GetBlockMap();
+
+LeftChainNode* __cdecl FindLeftmost(LeftChainNode* p);
 
 #endif

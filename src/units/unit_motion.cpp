@@ -285,13 +285,13 @@ int __stdcall GetHandleSize(int param_1)
 }
 
 // FUNCTION: 0x458810
-void CMemoryCache::DrawObjectState(Model_459200* list, void* result)
+void CMemoryCache::DrawObjectState(ModelState* list, void* result)
 {
     int rebuild = 0;
     int x = g_game->scrollX << 16;
     int z = g_game->scrollY << 16;
     int visible;
-    Unit_459200* owner = list->owner;
+    UnitDrawView* owner = list->owner;
     if (owner->flags & 0x20000000) {
         int t = (unsigned char)~owner->activateFlags;
         if (t & 1)
@@ -344,7 +344,7 @@ void CMemoryCache::CopyPicture(GafFrame* source)
 }
 
 // FUNCTION: 0x45a790
-void CMemoryCache::BuildShadow(Model_459200* obj, GafFrame* dest)
+void CMemoryCache::BuildShadow(ModelState* obj, GafFrame* dest)
 {
     int w, h, x, y;
     MeasureShadow(&w, &h, &x, &y, obj);

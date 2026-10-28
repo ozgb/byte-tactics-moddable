@@ -23,25 +23,25 @@ struct ScanlineSpan {
     int s2;
 };
 
-struct Span_004c0330 {
+struct PolygonSpan {
     int left;
     int right;
     int unknown_8[8];
 };
 
-struct Point_004c0c70 {
+struct ShadedPoint {
     int x;
     int y;
     int z;
     int s;
 };
 
-struct Segment_004bf060 {
+struct PolylineSegment {
     Point* from;
     Point* to;
 };
 
-struct Engine_004bf4d0 {
+struct DisplayFadeView {
     char unknown_0[0xc4];
     unsigned char* fade_neg;
     unsigned char* fade_pos;
@@ -50,29 +50,29 @@ struct Engine_004bf4d0 {
     int height;
 };
 
-struct App_004bec70 {
+struct DisplayLitLineView {
     char unknown_0[0xc8];
     unsigned int* palette;
 };
 
-struct App_004bed70 {
+struct DisplayBlendLineView {
     char unknown_0[0xc0];
     unsigned int* palette;
 };
 
-struct App_004c0b10 {
+struct DisplayShadeView {
     char unknown_0[0xc4];
     unsigned char* shade;
 };
 
-struct Game_004bfe10 {
+struct DisplayGrayView {
     char unknown_0[0xcc];
     int grayTable;
     char unknown_d0[0xf1 - 0xd0];
     unsigned char flags;
 };
 
-struct Obj_004c13d0 {
+struct DisplayKeyColorView {
     char unknown_0[0x210];
     int keyColor;
 };
@@ -207,7 +207,7 @@ fail:
 Surface* __stdcall DrawLitLine(Surface* surface, int x0, int y0,
                                          int x1, int y1, int color)
 {
-    App_004bec70* app = (App_004bec70*)GetDisplay();
+    DisplayLitLineView* app = (DisplayLitLineView*)GetDisplay();
     if (!app->palette)
         return 0;
     Surface* ret;
@@ -231,7 +231,7 @@ Surface* __stdcall DrawLitLine(Surface* surface, int x0, int y0,
 Surface* __stdcall DrawBlendedLine(Surface* surface, int x0, int y0,
                                          int x1, int y1, int color)
 {
-    App_004bed70* app = (App_004bed70*)GetDisplay();
+    DisplayBlendLineView* app = (DisplayBlendLineView*)GetDisplay();
     Surface* ret;
     if (surface == 0) {
         Surface screen;
@@ -305,7 +305,7 @@ int __stdcall DrawPolyline(Surface* surface, Point* points,
         Surface screen;
         result = LockScreen(&screen);
         if (result != 0) {
-            Segment_004bf060 seg;
+            PolylineSegment seg;
             seg.from = points;
             seg.to = points + 1;
             int n = count - 1;
@@ -333,7 +333,7 @@ int __stdcall DrawPolyline(Surface* surface, Point* points,
             UnlockScreen(&screen);
         }
     } else {
-        Segment_004bf060 seg;
+        PolylineSegment seg;
         seg.from = points;
         seg.to = points + 1;
         int n = count - 1;
@@ -423,7 +423,7 @@ int __stdcall DrawPolylines(Surface* surface, Point* points, int* counts,
 // FUNCTION: 0x4bf4d0
 int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
 {
-    Engine_004bf4d0* engine = (Engine_004bf4d0*)GetDisplay();
+    DisplayFadeView* engine = (DisplayFadeView*)GetDisplay();
     Surface screen;
     Rect r;
     if (surface == 0) {
@@ -664,7 +664,7 @@ int __stdcall GrayRectangle(Surface* surface, Rect* rect)
 {
     Surface screen;
     Rect r = *rect;
-    Game_004bfe10* g = (Game_004bfe10*)GetDisplay();
+    DisplayGrayView* g = (DisplayGrayView*)GetDisplay();
     if ((g->flags & 1) == 0)
         return 0;
     int result;
@@ -747,7 +747,7 @@ int __stdcall DitherRectangle(Surface* surface, Rect* rect, int phase)
 }
 
 
-static inline void Draw_004c0070(Surface* surface, int x0, int y0,
+static inline void DrawClippedLine(Surface* surface, int x0, int y0,
                                  int x1, int y1, int color)
 {
     if (surface == 0) {
@@ -772,7 +772,7 @@ void __stdcall DrawCircle(Surface* surface, int xc, int yc, int radius,
     for (int angle = 0x800; angle <= 0x10000; angle += 0x800) {
         int x1 = ScaledCos(angle, radius) + xc;
         int y1 = ScaledSin(angle, radius) + yc;
-        Draw_004c0070(surface, x0, y0, x1, y1, color);
+        DrawClippedLine(surface, x0, y0, x1, y1, color);
         x0 = x1;
         y0 = y1;
     }
@@ -958,7 +958,7 @@ void __stdcall FillShadedSpan(int row, ScanlineSpan* span, GafFrame* surf, unsig
 {
     unsigned char* p = surf->pixelsOrLayers;
     unsigned char* d = surf->scratch;
-    App_004c0b10* app = (App_004c0b10*)GetDisplay();
+    DisplayShadeView* app = (DisplayShadeView*)GetDisplay();
     int w = span->x2 - span->x1;
     int dz = (span->z2 - span->z1) / w;
     int ds = (span->s2 - span->s1) / w;
@@ -1002,7 +1002,7 @@ void __stdcall FillShadedSpan(int row, ScanlineSpan* span, GafFrame* surf, unsig
 
 
 // FUNCTION: 0x4c0c70
-int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
+int __stdcall FillShadedPolygon(GafFrame* surf, ShadedPoint* pts, int n,
                            unsigned char color) {
     int y0, y1, x, dx, dz;
     ScanlineSpan spans[2048];
@@ -1016,7 +1016,7 @@ int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
     GafFrame* sf = surf;
     int scanIndex = 0;
     if (n > 0) {
-        Point_004c0c70* p = pts;
+        ShadedPoint* p = pts;
         do {
             if (p->y < minY) {
                 minY = p->y;
@@ -1054,8 +1054,8 @@ int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
             int j = i - 1;
             if (j < 0)
                 j = n - 1;
-            Point_004c0c70* p = &pts[i];
-            Point_004c0c70* q = &pts[j];
+            ShadedPoint* p = &pts[i];
+            ShadedPoint* q = &pts[j];
             y0 = p->y;
             y1 = q->y;
             if (y0 < y1) {
@@ -1100,8 +1100,8 @@ int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
             int j = i + 1;
             if (j >= n)
                 j = 0;
-            Point_004c0c70* p = &pts[i];
-            Point_004c0c70* q = &pts[j];
+            ShadedPoint* p = &pts[i];
+            ShadedPoint* q = &pts[j];
             y0 = p->y;
             y1 = q->y;
             if (y0 < y1) {
@@ -1324,7 +1324,7 @@ void __stdcall SetTextColors(int param_1, int param_2)
 // FUNCTION: 0x4c13d0
 void __stdcall SetTextKeyColor(int value)
 {
-    Obj_004c13d0* obj = (Obj_004c13d0*)GetDisplay();
+    DisplayKeyColorView* obj = (DisplayKeyColorView*)GetDisplay();
     obj->keyColor = value;
 }
 
@@ -1455,7 +1455,7 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
 {
     Surface screen;
     Rect clip;
-    Span_004c0330 span[0x800];
+    PolygonSpan span[0x800];
     int locked;
     int minY;
     int maxY;
@@ -1527,7 +1527,7 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
         return 0;
     }
 
-    Span_004c0330* sp = span;
+    PolygonSpan* sp = span;
     i = minIdx;
     do {
         j = i - 1;
@@ -1589,7 +1589,7 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
             i = 0;
     } while (i != maxIdx);
 
-    Span_004c0330* s = span;
+    PolygonSpan* s = span;
     for (i = minY; i < maxY; i++) {
         if (s->right > clip.right)
             s->right = clip.right;

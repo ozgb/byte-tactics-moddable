@@ -273,7 +273,7 @@ void UnitScript::EmitSfx(int a, int b)
 {
     if (!g_seams.los_radar->IsUnitVisibleToPlayer(&g_game->players[g_game->playerIndex], state->unit))
         return;
-    UpdateObjectState((Unit_459200 *)state->unit);
+    UpdateObjectState((UnitDrawView *)state->unit);
 
     Vec3 v1;
     Vec3 v2;

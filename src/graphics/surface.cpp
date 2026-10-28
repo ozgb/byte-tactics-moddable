@@ -71,7 +71,7 @@ inline int Display::LockPrimary(Surface* out)
     return 1;
 }
 
-struct Arg_004c6210 {
+struct DirectDrawSurfaceRefs {
     int ddraw;
     void* primary;
     void* back;
@@ -194,7 +194,7 @@ void __stdcall SetRestoreSurface(int surface)
 }
 
 // FUNCTION: 0x4c6210
-int __stdcall RestoreSurfaces(Arg_004c6210* arg)
+int __stdcall RestoreSurfaces(DirectDrawSurfaceRefs* arg)
 {
     Display* d = GetDisplay();
     if (d->windowed != 0)
@@ -827,11 +827,11 @@ void __stdcall DrawQuadRow(int row, int* rect, Surface* surf, GafFrame* info)
     }
 }
 
-struct Quad_004c7580 {
+struct FrameQuad {
     Point p[4];
 };
 
-struct Rec_004c7580 {
+struct FrameQuadScanline {
     int left;
     int right;
     int tx;
@@ -843,7 +843,7 @@ struct Rec_004c7580 {
 
 // FUNCTION: 0x4c7580
 void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
-                            Quad_004c7580* dst, Quad_004c7580* src)
+                            FrameQuad* dst, FrameQuad* src)
 {
     if (bmp == 0)
         return;
@@ -862,7 +862,7 @@ void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
         locked = 0;
     }
 
-    Quad_004c7580 tmp;
+    FrameQuad tmp;
     if (src == 0) {
         src = &tmp;
         tmp.p[0].x = 0;
@@ -876,7 +876,7 @@ void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
     }
 
     int y0, y1;
-    Rec_004c7580 recs[800];
+    FrameQuadScanline recs[800];
     int ymin = 999999;
     int ymax = -999999;
     int xmin = 999999;
@@ -884,7 +884,7 @@ void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
     Rect clip;
     int imin, imax;
     int i;
-    Rec_004c7580* out;
+    FrameQuadScanline* out;
     int j, k;
     int dxdy;
     int x, tx, ty, dtx, dty;
@@ -1592,17 +1592,17 @@ void __stdcall DrawLitTexturedPolygon(GafFrame* target, GafFrame* texture, int* 
         }
 }
 
-class Class_004c90b0 {
+class StringRefAppendView {
 public:
     char* ptr;
 
     bool IsEmpty() const { return *ptr == 0; }
 
-    Class_004c90b0* Append(const Class_004c90b0& other);
+    StringRefAppendView* Append(const StringRefAppendView& other);
 };
 
 // FUNCTION: 0x4c90b0
-Class_004c90b0* Class_004c90b0::Append(const Class_004c90b0& other)
+StringRefAppendView* StringRefAppendView::Append(const StringRefAppendView& other)
 {
     if (!other.IsEmpty()) {
         char* chars;

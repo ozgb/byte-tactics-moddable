@@ -6,6 +6,7 @@
 
 #include "../../link/globals.h"
 #include "math.h"
+#include "vec3.h"
 
 // FUNCTION: 0x4b6b80
 void __stdcall ShowErrorBox(const char* message, int unused)
@@ -49,17 +50,11 @@ void __stdcall SeedRandom(unsigned int seed)
     g_randomSeed = (seed ^ 0x66e29572) | 1;
 }
 
-struct Vec3_004b6cc0 {
-    int x;
-    int y;
-    int z;
-};
-
 void __cdecl RotatePoint2D(short angle, int* xy);
 void __cdecl RotatePoint2D(int angle, int* xy);
 
 // FUNCTION: 0x4b6cc0
-void __stdcall RotateByAngles(Vec3_004b6cc0* in, Vec3_004b6cc0* out, short* angles)
+void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles)
 {
     int a[2];
     int b[2];
@@ -77,7 +72,7 @@ void __stdcall RotateByAngles(Vec3_004b6cc0* in, Vec3_004b6cc0* out, short* angl
 }
 
 // FUNCTION: 0x4b6d50
-void __stdcall RotateAboutZ(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
+void __stdcall RotateAboutZ(Vec3* in, Vec3* out, int angle)
 {
     int xy[2];
     xy[0] = in->x;
@@ -89,7 +84,7 @@ void __stdcall RotateAboutZ(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
 }
 
 // FUNCTION: 0x4b6da0
-void __stdcall RotateAboutY(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
+void __stdcall RotateAboutY(Vec3* in, Vec3* out, int angle)
 {
     int xz[2];
     xz[0] = in->x;
@@ -101,7 +96,7 @@ void __stdcall RotateAboutY(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
 }
 
 // FUNCTION: 0x4b6df0
-void __stdcall RotateAboutX(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
+void __stdcall RotateAboutX(Vec3* in, Vec3* out, int angle)
 {
     int yz[2];
     yz[0] = in->y;
@@ -132,16 +127,10 @@ double __stdcall DotProduct(float ax, float ay, float az,
     return result;
 }
 
-struct Vec3f_004b6eb0 {
-    float x;
-    float y;
-    float z;
-};
-
 // FUNCTION: 0x4b6eb0
-Vec3f_004b6eb0 __stdcall VectorFromTo(Vec3f_004b6eb0 from, Vec3f_004b6eb0 to)
+Vec3f __stdcall VectorFromTo(Vec3f from, Vec3f to)
 {
-    Vec3f_004b6eb0 r;
+    Vec3f r;
     r.x = to.x - from.x;
     r.y = to.y - from.y;
     r.z = to.z - from.z;
@@ -149,9 +138,9 @@ Vec3f_004b6eb0 __stdcall VectorFromTo(Vec3f_004b6eb0 from, Vec3f_004b6eb0 to)
 }
 
 // FUNCTION: 0x4b6f00
-Vec3f_004b6eb0 __stdcall VectorFromToInt(Vec3_004b6cc0 from, Vec3_004b6cc0 to)
+Vec3f __stdcall VectorFromToInt(Vec3 from, Vec3 to)
 {
-    Vec3f_004b6eb0 r;
+    Vec3f r;
     r.x = (float)(to.x - from.x);
     r.y = (float)(to.y - from.y);
     r.z = (float)(to.z - from.z);
@@ -159,7 +148,7 @@ Vec3f_004b6eb0 __stdcall VectorFromToInt(Vec3_004b6cc0 from, Vec3_004b6cc0 to)
 }
 
 // FUNCTION: 0x4b6f70
-Vec3f_004b6eb0 __stdcall CrossProduct(Vec3f_004b6eb0 a, Vec3f_004b6eb0 b)
+Vec3f __stdcall CrossProduct(Vec3f a, Vec3f b)
 {
 #ifdef __clang__
     double yz = (double)a.y * b.z;
@@ -176,7 +165,7 @@ Vec3f_004b6eb0 __stdcall CrossProduct(Vec3f_004b6eb0 a, Vec3f_004b6eb0 b)
     float xy = a.x * b.y;
     float yx = a.y * b.x;
 #endif
-    Vec3f_004b6eb0 r;
+    Vec3f r;
     r.z = (float)(xy - yx);
     r.x = (float)(yz - zy);
     r.y = (float)(zx - xz);
@@ -184,7 +173,7 @@ Vec3f_004b6eb0 __stdcall CrossProduct(Vec3f_004b6eb0 a, Vec3f_004b6eb0 b)
 }
 
 // FUNCTION: 0x4b6ff0
-Vec3f_004b6eb0 __stdcall NormalizeVector(Vec3f_004b6eb0 v)
+Vec3f __stdcall NormalizeVector(Vec3f v)
 {
 #ifdef __clang__
     struct { double x, y, z; } sq;
@@ -193,7 +182,7 @@ Vec3f_004b6eb0 __stdcall NormalizeVector(Vec3f_004b6eb0 v)
     sq.z = (double)v.z * v.z;
     double len = sqrt(sq.x + sq.y + sq.z);
 #else
-    Vec3f_004b6eb0 sq;
+    Vec3f sq;
     sq.x = v.x * v.x;
     sq.y = v.y * v.y;
     sq.z = v.z * v.z;

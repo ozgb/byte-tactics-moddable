@@ -194,7 +194,7 @@ int __stdcall GetGafFrame(unsigned short* param_1, int param_2);
 void __stdcall DrawFrame(void* param_1, short* param_2, int x, int y);
 void __stdcall DrawFrame(void* dst, void* bmp, int x, int y);
 
-void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
+#include "../util/math.h"
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
 
 void __stdcall FillRectangle(void* surface, Rect* rect, int color);

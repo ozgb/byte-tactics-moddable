@@ -288,7 +288,7 @@ int AccountBank::SaveBank(char* filename, char* name, int compress, int audit)
     int handle = SetOutOfMemoryHandler(0);
     char* cbuf = (char*)GameAllocShared(pool.csize);
     SetOutOfMemoryHandler(handle);
-    if (cbuf != 0) { err = SquashPack((Chunk_4d1820 *)cbuf, &pool.csize, pool.data, dsize, 1, 0); }
+    if (cbuf != 0) { err = SquashPack((SquashChunkHeader *)cbuf, &pool.csize, pool.data, dsize, 1, 0); }
     else { err = noff; }
     if (cbuf != 0 && err == 0 && pool.csize < dsize) {
         host_file_write(file, cbuf, pool.csize);
@@ -425,7 +425,7 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
             int csize = SquashMaxPackedSize(len, 1);
             char* cbuf = (char*)GameAllocShared(csize);
             if (cbuf != 0) {
-                int err = SquashPack((Chunk_4d1820 *)cbuf, &csize, raw, len, 1, 0);
+                int err = SquashPack((SquashChunkHeader *)cbuf, &csize, raw, len, 1, 0);
                 if (err == 0 && csize < len) {
                     host_file_seek(file, off + 0x20, HOST_SEEK_SET);
                     host_file_write(file, cbuf, csize);

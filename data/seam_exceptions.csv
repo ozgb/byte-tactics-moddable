@@ -330,6 +330,7 @@ units,FreeUnitTypes,UnitTable::Destroy,TODO(#505): sim-to-presentation event
 units,G::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,GetCategoryMask,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 units,GetCategoryMask,StringRef::StringRef,TODO(#505): sim-to-presentation event
+units,GetPieceOffset,RotateByAngles,TODO(#504): engine service
 units,GetSweetSpot,UpdateObjectState,TODO(#505): sim-to-presentation event
 units,H::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,I::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -407,6 +408,9 @@ units,WriteUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
 weapons,??__Fg_tdfGlobalParser@@YAXXZ,g_tdfGlobalParser,TODO(#507): sim reads view data
 weapons,ApplyUnitDamage,AddCdActivitySample,TODO(#505): sim-to-presentation event
 weapons,ApplyUnitDamage,MissionType::MissionType,TODO(#508): constructor across a seam
+weapons,BreakPieceIntoDebris,CrossProduct,TODO(#504): engine service
+weapons,BreakPieceIntoDebris,NormalizeVector,TODO(#504): engine service
+weapons,BreakPieceIntoDebris,VectorFromTo,TODO(#504): engine service
 weapons,BroadcastWeaponFire,GetLocalDpid,TODO(#506): sim sends a packet
 weapons,BuildCalcedExplosion,GameAllocIgnoreTag,TODO(#504): engine service
 weapons,BuildExplosionFrame,AllocFrame,TODO(#505): sim-to-presentation event

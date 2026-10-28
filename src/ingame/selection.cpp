@@ -374,7 +374,7 @@ int __stdcall SelectUnitsInBox(void* param_1)
     return 1;
 }
 
-void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
+#include "../util/math.h"
 void __stdcall GetObjectBounds(void* obj, Vec3* lo, Vec3* hi, int arg);
 #include "../graphics/draw.h"
 

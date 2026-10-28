@@ -60,7 +60,7 @@ void SfxOccupyTracker::UpdateSfxOccupy(Unit* unit)
     }
 }
 
-void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
+#include "../util/math.h"
 
 struct PieceBase {
     char unknown_0[0x10];
@@ -289,7 +289,7 @@ static_assert(offsetof(Unit, state) == 0x9e, "state");
 static_assert(offsetof(SpotState, animDirty) == 0x8, "animDirty");
 static_assert(offsetof(SpotState, pos) == 0x18, "pos");
 static_assert(offsetof(SpotState, root) == 0x1e, "root");
-static_assert(offsetof(Piece_459c70, modified) == 0x26, "modified");
+static_assert(offsetof(ModelPiece, modified) == 0x26, "modified");
 
 #include "../graphics/model_render.h"
 
@@ -301,7 +301,7 @@ void __stdcall PoseUnitModel(Unit* unit)
     memcpy(&state->pos, &unit->angles, 6);
     state->animDirty = 1;
     state->root->modified = 0;
-    UpdateObjectState((Unit_459200 *)unit);
+    UpdateObjectState((UnitDrawView *)unit);
 }
 
 // FUNCTION: 0x43e3c0

@@ -1,7 +1,7 @@
 #include <string.h>
 #include "../../interfaces/host.h"
 
-struct PCX_004caa40 {
+struct PcxImage {
     unsigned char* data;
     unsigned char* palette;
     int width;
@@ -39,7 +39,7 @@ static inline void FUN_row(void* file, unsigned char* p, int x)
 }
 
 // FUNCTION: 0x4caa40
-int __stdcall DecodePcx(void* file, PCX_004caa40* pcx)
+int __stdcall DecodePcx(void* file, PcxImage* pcx)
 {
     unsigned char header[0x80];
     memset(pcx, 0, 16);
@@ -68,7 +68,7 @@ int __stdcall DecodePcx(void* file, PCX_004caa40* pcx)
 
 #include <stdio.h>
 
-struct Header_004cac40 {
+struct PcxHeader {
     unsigned char a;
     unsigned char b;
     unsigned char c;
@@ -90,7 +90,7 @@ struct Header_004cac40 {
 // FUNCTION: 0x4cac40
 int __stdcall WritePcx(void* filename, unsigned char* data, int width, int height, unsigned char* block)
 {
-    Header_004cac40 hdr;
+    PcxHeader hdr;
     FileHandle* file = HAPI_OpenFileAppend((char*)filename);
     int total;
     int rows;
@@ -200,7 +200,7 @@ out:
 
 #include "win_types.h"
 
-struct Bitmap_004caec0 {
+struct PcxBitmap {
     int width;
     int height;
     int pitch;
@@ -208,11 +208,11 @@ struct Bitmap_004caec0 {
 };
 
 #pragma pack(push, 1)
-struct Game_004caec0 {
+struct DisplayScreenshotView {
     char unknown_0[0x40];
     HWND hwnd;
     char unknown_44[0xbc - 0x44];
-    Bitmap_004caec0* bitmap;
+    PcxBitmap* bitmap;
     char unknown_c0[0x1c];
     int useOverrideSurface;
     char unknown_e0[0x1b2 - 0xe0];
@@ -221,15 +221,15 @@ struct Game_004caec0 {
     PALETTEENTRY palette[256];
 };
 #pragma pack(pop)
-static_assert(sizeof(Game_004caec0) == 0x614, "Game_004caec0 size");
+static_assert(sizeof(DisplayScreenshotView) == 0x614, "DisplayScreenshotView size");
 
-Game_004caec0* GetDisplay();
+DisplayScreenshotView* GetDisplay();
 
 // FUNCTION: 0x4caec0
-void __stdcall SaveSurfacePcx(char* name, Bitmap_004caec0* bitmap)
+void __stdcall SaveSurfacePcx(char* name, PcxBitmap* bitmap)
 {
     unsigned char pal[256 * 3];
-    Game_004caec0* game = GetDisplay();
+    DisplayScreenshotView* game = GetDisplay();
     for (int i = 0; i < 256; i++) {
         pal[i * 3] = game->palette[i].peRed;
         pal[i * 3 + 1] = game->palette[i].peGreen;
@@ -238,18 +238,19 @@ void __stdcall SaveSurfacePcx(char* name, Bitmap_004caec0* bitmap)
     WritePcx(name, bitmap->data, bitmap->width, bitmap->height, pal);
 }
 
-Bitmap_004caec0* __stdcall AllocSurface(char* name, int width, int height);
+PcxBitmap* __stdcall AllocSurface(char* name, int width, int height);
 #include "surface.h"
+#include "../util/vec3.h"
 #include "object_pool.h"
 
 // FUNCTION: 0x4caf30
-Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
+PcxBitmap* __stdcall LoadPcx(char* path, unsigned char* outPalette)
 {
     FileHandle* file = HAPI_OpenFileRead(path);
     if (file == 0)
         return 0;
     int ok;
-    PCX_004caa40 pcx;
+    PcxImage pcx;
     unsigned char header[0x80];
     if (HAPI_readfromfile(file, header, 0x80) != 0x80 || header[0] != 0x0a || header[1] != 5) {
         HAPI_CloseFile(file);
@@ -257,7 +258,7 @@ Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
     }
     int width = *(unsigned short*)(header + 8) - *(unsigned short*)(header + 4) + 1;
     int height = *(unsigned short*)(header + 10) - *(unsigned short*)(header + 6) + 1;
-    Bitmap_004caec0* image = AllocSurface(path, width, height);
+    PcxBitmap* image = AllocSurface(path, width, height);
     if (image == 0) {
         HAPI_CloseFile(file);
         return 0;
@@ -293,7 +294,7 @@ int __stdcall LoadPcxPalette(char* path, unsigned int* out)
     FileHandle* file = HAPI_OpenFileRead(path);
     if (file == 0)
         return 0;
-    PCX_004caa40 pcx;
+    PcxImage pcx;
     unsigned char header[0x80];
     PALETTEENTRY pal[0x100];
     if (HAPI_readfromfile(file, header, 0x80) != 0x80) {
@@ -325,7 +326,7 @@ int __stdcall LoadPcxPalette(char* path, unsigned int* out)
 #include <stdlib.h>
 #include "../state/sim_globals.h"
 
-struct FindData_004cb170 {
+struct ScreenshotFileFindData {
     char unknown_0[0x14];
     char name[260];
 };
@@ -336,10 +337,10 @@ struct FindData_004cb170 {
 // FUNCTION: 0x4cb170
 int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
 {
-    Game_004caec0* game = GetDisplay();
+    DisplayScreenshotView* game = GetDisplay();
     int flag = 0;
     char filename[260];
-    FindData_004cb170 fd;
+    ScreenshotFileFindData fd;
     unsigned char pal[768];
     int best = 0;
 
@@ -368,8 +369,8 @@ int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
     sep = flag ? g_pathSepBackslash : DAT_005119b8;
     sprintf(filename, "%s%s%s%04i.pcx", dirPath, sep, namePrefix, best + 1);
 
-    Bitmap_004caec0* bitmap = game->bitmap;
-    Game_004caec0* g = GetDisplay();
+    PcxBitmap* bitmap = game->bitmap;
+    DisplayScreenshotView* g = GetDisplay();
     for (int i = 0; i < 256; i++) {
         pal[i * 3] = g->palette[i].peRed;
         pal[i * 3 + 1] = g->palette[i].peGreen;
@@ -378,13 +379,7 @@ int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
     return WritePcx(filename, bitmap->data, bitmap->width, bitmap->height, pal);
 }
 
-struct Vec3_004cb2f0 {
-    int x;
-    int y;
-    int z;
-};
-
-struct Primitive_004cb2f0 {
+struct Object3doPrimitive {
     int colorIndex;
     int count;
     int always0;
@@ -396,7 +391,7 @@ struct Primitive_004cb2f0 {
     int unknown_14[3];
 };
 
-struct Object_004cb2f0 {
+struct Object3doLoadView {
     int version;
     int vertexCount;
     int count;
@@ -406,14 +401,14 @@ struct Object_004cb2f0 {
     int z;
     int name;
     int always0;
-    Vec3_004cb2f0* vertices;
-    Primitive_004cb2f0* elems;
-    Object_004cb2f0* sibling;
-    Object_004cb2f0* child;
+    Vec3* vertices;
+    Object3doPrimitive* elems;
+    Object3doLoadView* sibling;
+    Object3doLoadView* child;
 };
 
 // FUNCTION: 0x4cb2f0
-int __stdcall AveragePrimitiveY(Object_004cb2f0* table, Primitive_004cb2f0* list)
+int __stdcall AveragePrimitiveY(Object3doLoadView* table, Object3doPrimitive* list)
 {
     int sum = 0;
     int n = list->count;
@@ -425,24 +420,24 @@ int __stdcall AveragePrimitiveY(Object_004cb2f0* table, Primitive_004cb2f0* list
 }
 
 // FUNCTION: 0x4cb330
-void __stdcall SwapPrimitives(Primitive_004cb2f0* a, Primitive_004cb2f0* b)
+void __stdcall SwapPrimitives(Object3doPrimitive* a, Object3doPrimitive* b)
 {
-    Primitive_004cb2f0 tmp = *a;
+    Object3doPrimitive tmp = *a;
     *a = *b;
     *b = tmp;
 }
 
 // FUNCTION: 0x4cb370
-void __stdcall SortPrimitives(Object_004cb2f0* node)
+void __stdcall SortPrimitives(Object3doLoadView* node)
 {
     if (node->index != -1 && node->count > 0) {
-        Primitive_004cb2f0* elems = node->elems;
-        Primitive_004cb2f0 temp = elems[node->index];
+        Object3doPrimitive* elems = node->elems;
+        Object3doPrimitive temp = elems[node->index];
         elems[node->index] = elems[0];
         elems[0] = temp;
         node->index = 0;
     }
-    Primitive_004cb2f0* e;
+    Object3doPrimitive* e;
     int i;
     int swapped;
     do {
@@ -454,14 +449,14 @@ void __stdcall SortPrimitives(Object_004cb2f0* node)
             for (int k = e->count; k > 0; k--)
                 a += node->vertices[*q++].y;
             a /= e->count;
-            Primitive_004cb2f0* p = e + 1;
+            Object3doPrimitive* p = e + 1;
             unsigned short* r = p->indices;
             int b = 0;
             for (int j = p->count; j > 0; j--)
                 b += node->vertices[*r++].y;
             b /= p->count;
             if (a > b) {
-                Primitive_004cb2f0 t = *e;
+                Object3doPrimitive t = *e;
                 *e = *p;
                 *p = t;
                 swapped = 1;
@@ -471,23 +466,23 @@ void __stdcall SortPrimitives(Object_004cb2f0* node)
 }
 
 // FUNCTION: 0x4cb4c0
-void __stdcall RelocateObject(int delta, Object_004cb2f0* node)
+void __stdcall RelocateObject(int delta, Object3doLoadView* node)
 {
     if (node->name)
         node->name += delta;
     if (node->always0)
         node->always0 += delta;
-    node->vertices = (Vec3_004cb2f0*)((char*)node->vertices + delta);
-    node->elems = (Primitive_004cb2f0*)((char*)node->elems + delta);
+    node->vertices = (Vec3*)((char*)node->vertices + delta);
+    node->elems = (Object3doPrimitive*)((char*)node->elems + delta);
     if (node->sibling) {
-        node->sibling = (Object_004cb2f0*)((char*)node->sibling + delta);
+        node->sibling = (Object3doLoadView*)((char*)node->sibling + delta);
         RelocateObject(delta, node->sibling);
     }
     if (node->child) {
-        node->child = (Object_004cb2f0*)((char*)node->child + delta);
+        node->child = (Object3doLoadView*)((char*)node->child + delta);
         RelocateObject(delta, node->child);
     }
-    Primitive_004cb2f0* e = node->elems;
+    Object3doPrimitive* e = node->elems;
     for (int i = 0; i < node->count; i++, e++) {
         if (e->always0)
             e->always0 += delta;
@@ -506,12 +501,12 @@ void* __stdcall Load3do(char* param)
     if (result == 0) {
         return 0;
     }
-    RelocateObject((int)result, (Object_004cb2f0*)result);
+    RelocateObject((int)result, (Object3doLoadView*)result);
     return result;
 }
 
 // FUNCTION: 0x4cb590
-void __stdcall MirrorObject(Object_004cb2f0* obj)
+void __stdcall MirrorObject(Object3doLoadView* obj)
 {
     for (int i = 0; i < obj->vertexCount; i++) {
         obj->vertices[i].x = -obj->vertices[i].x;
@@ -526,7 +521,7 @@ void __stdcall MirrorObject(Object_004cb2f0* obj)
 }
 
 // FUNCTION: 0x4cb5f0
-int __stdcall GetObjectHeight(Object_004cb2f0* node)
+int __stdcall GetObjectHeight(Object3doLoadView* node)
 {
     int best = 0;
     for (; node; node = node->sibling) {
@@ -544,14 +539,13 @@ int __stdcall GetObjectHeight(Object_004cb2f0* node)
     return best;
 }
 
-void __stdcall AddObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* offset,
-                            Vec3_004cb2f0* lo, Vec3_004cb2f0* hi, int arg);
+#include "pcx.h"
 
 // FUNCTION: 0x4cb650
-void __stdcall GetObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* lo,
-                            Vec3_004cb2f0* hi, int arg)
+void __stdcall GetObjectBounds(Object3doLoadView* obj, Vec3* lo,
+                            Vec3* hi, int arg)
 {
-    Vec3_004cb2f0 offset;
+    Vec3 offset;
     lo->x = 0;
     lo->y = 0;
     lo->z = 0;
@@ -565,16 +559,16 @@ void __stdcall GetObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* lo,
 }
 
 // FUNCTION: 0x4cb6a0
-void __stdcall AddObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* offset,
-                            Vec3_004cb2f0* lo, Vec3_004cb2f0* hi, int arg)
+void __stdcall AddObjectBounds(Object3doLoadView* obj, Vec3* offset,
+                            Vec3* lo, Vec3* hi, int arg)
 {
-    Vec3_004cb2f0 local;
+    Vec3 local;
     local.x = obj->x + offset->x;
     local.y = offset->y + obj->y;
     local.z = obj->z + offset->z;
     if (obj->vertexCount > 2) {
         for (int i = 0; i < obj->vertexCount; i++) {
-            Vec3_004cb2f0* v = &obj->vertices[i];
+            Vec3* v = &obj->vertices[i];
             if (v->x + local.x > hi->x) hi->x = v->x + local.x;
             if (v->x + local.x < lo->x) lo->x = v->x + local.x;
             if (v->y + local.y > hi->y) hi->y = v->y + local.y;
@@ -601,7 +595,7 @@ public:
     BmpWriter* Init();
     void Close();
     bool Open(const char* name, int w, int h);
-    bool WriteRows(Bitmap_004caec0* image, int x, int rows, int unused_4, int y,
+    bool WriteRows(PcxBitmap* image, int x, int rows, int unused_4, int y,
                       int unused_6, int srcY);
 };
 
@@ -705,7 +699,7 @@ bool BmpWriter::Open(const char* name, int w, int h)
 }
 
 // FUNCTION: 0x4cb940
-bool BmpWriter::WriteRows(Bitmap_004caec0* image, int x, int rows, int unused_4,
+bool BmpWriter::WriteRows(PcxBitmap* image, int x, int rows, int unused_4,
                                   int y, int unused_6, int srcY)
 {
     int stride = (image->width + 3) & ~3;
@@ -721,7 +715,7 @@ bool BmpWriter::WriteRows(Bitmap_004caec0* image, int x, int rows, int unused_4,
 }
 
 // FUNCTION: 0x4cb9e0
-int __stdcall SaveBmp(char* name, Bitmap_004caec0* image)
+int __stdcall SaveBmp(char* name, PcxBitmap* image)
 {
     BmpWriter bmp;
     bool ok;
@@ -785,13 +779,13 @@ static inline void Unlock(LONG held)
 int __stdcall ExceptionFilter(int exception, int thread)
 {
     host_crash_report((void*)exception, (const char*)thread);
-    Game_004caec0* app = GetDisplay();
+    DisplayScreenshotView* app = GetDisplay();
     if (app != 0) {
         LONG held = Lock();
         app->cursorFrame = 0;
         UnlockAllScreens();
         Unlock(held);
-        ReleaseDirectDraw((App_4b5980 *)app);
+        ReleaseDirectDraw((DisplayAppView *)app);
         if (app->hwnd != 0) {
             host_window_set_topmost(0);
         }

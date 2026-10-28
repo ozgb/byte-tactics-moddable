@@ -1098,8 +1098,8 @@ address,function,callee,kind,file,class,notes
 0x4c7580,DrawFrameQuad,_chkstk,call,src/graphics/surface.cpp,game,sites=1
 0x4c8760,DrawTexturedPolygon,_chkstk,call,src/graphics/surface.cpp,game,sites=1; via console commands only
 0x4c8bb0,DrawLitTexturedPolygon,_chkstk,call,src/graphics/surface.cpp,game,sites=1; via console commands only
-0x4c90b0,Class_004c90b0::Append,free,call,src/graphics/surface.cpp,presentation,sites=1
-0x4c90b0,Class_004c90b0::Append,malloc,call,src/graphics/surface.cpp,presentation,sites=1
+0x4c90b0,StringRefAppendView::Append,free,call,src/graphics/surface.cpp,presentation,sites=1
+0x4c90b0,StringRefAppendView::Append,malloc,call,src/graphics/surface.cpp,presentation,sites=1
 0x4c91b0,StringRef::StringRef,malloc,call,src/graphics/surface.cpp,game,sites=1
 0x4c9230,StringRef::StringRef,malloc,call,src/graphics/surface.cpp,presentation,sites=1
 0x4c9230,StringRef::StringRef,strncpy,call,src/graphics/surface.cpp,presentation,sites=1

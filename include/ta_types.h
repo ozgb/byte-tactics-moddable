@@ -52,13 +52,13 @@ struct Anim_00424890;
 struct Anim_004394e0;
 struct Anim_00439740;
 struct GameMainDisplayContext;
-struct App_004bec70;
-struct App_004bed70;
-struct App_004c0b10;
+struct DisplayLitLineView;
+struct DisplayBlendLineView;
+struct DisplayShadeView;
 struct App_004c25e0;
 struct Arena_004da9f0;
 struct ViewMouseEvent;
-struct Arg_004c6210;
+struct DirectDrawSurfaceRefs;
 struct LobbyJoinArgs;
 struct Arr_00421550;
 struct ArrayA;
@@ -78,10 +78,10 @@ struct NetGameFlagBits;
 struct CursorInputBits;
 struct BitmapInfo_004b5510;
 struct Bitmap_00437b50;
-struct Bitmap_004caec0;
+struct PcxBitmap;
 struct Bitmap_004cb170;
 struct Bits10F_00487080;
-struct Bits_0045c570;
+struct SoundSettingBits;
 struct Bits_0045d280;
 struct BlinkWord_004afc60;
 struct Blk;
@@ -105,7 +105,7 @@ struct Buffer_461020;
 struct Buffers_00462d30;
 struct BuildMenuEntry;
 struct BuildMenuPage;
-struct BuildList_0045a950;
+struct ModelBuildList;
 struct Button_0041e420;
 struct Button_004a7f70;
 struct ByteMap;
@@ -134,7 +134,7 @@ struct Channel_004b0b00;
 struct QueryChannelView;
 struct Channel_4619e0;
 struct Chunk;
-struct Chunk_4d1820;
+struct SquashChunkHeader;
 struct Chunk_4d1970;
 class Class_004010b0;
 class Class_00401110;
@@ -695,7 +695,7 @@ struct Class_004c5c60;
 struct Class_004c61f0;
 struct Class_004c6890;
 struct Class_004c6b10;
-class Class_004c90b0;
+class StringRefAppendView;
 class Class_004c9180;
 class Class_004c91b0;
 class Class_004c9230;
@@ -878,9 +878,9 @@ struct Connection_4c9a70;
 union Coord_00407ae0;
 union Coord_004239c0;
 union CoordHalves;
-struct Count_00458d20;
+struct CountedList;
 class CritSec_004e1ac0;
-struct Ctx_004720d0;
+struct NanoTargetBounds;
 struct MainFrameDisplayContext;
 struct GameCursorState;
 struct CursorState_0041cd20;
@@ -941,9 +941,9 @@ struct Display_0041da60;
 struct Display_0041ec50;
 struct Display_0041f760;
 struct DisplayFlagsView;
-struct Display_0047bdf0;
-struct Display_0047c3a0;
-struct Display_004b8310;
+struct DisplayMovieView;
+struct DisplayOffscreenView;
+struct DisplayTablesView;
 struct Display_004b8500;
 struct Display_004b86e0;
 struct Display_004b8ec0;
@@ -997,7 +997,7 @@ struct Elem_0044ce90;
 struct SyncTempTaggedElem;
 struct SyncRecordIntElem;
 struct Elem_004702a0_2;
-struct Elem_00470a40;
+struct StructRangeElement;
 struct Elem_00472e70;
 struct Elem_00473130;
 struct Elem_00473290;
@@ -1015,7 +1015,7 @@ struct Elem_004c5740;
 struct TdfField;
 struct Elem_004cb4c0;
 struct Elem_004cb5f0;
-struct Elem_004dd8c0;
+struct FreedBlockRecord;
 struct StringValueElem;
 struct Elem_432cb0_2;
 struct Elem_4b0610;
@@ -1030,7 +1030,7 @@ struct Entry_0040f1e0;
 struct Entry_0041aa00;
 struct Entry_00420960;
 struct Entry_004263b0;
-struct Entry_0042f740;
+struct SoundCategoryEntry;
 struct Entry_00431a20;
 struct ModemAccount;
 struct Entry_0044c370;
@@ -1074,10 +1074,10 @@ struct Entry_004aafe0;
 struct Entry_004abba0;
 struct Entry_004abd20;
 struct Entry_004b0d20;
-struct Entry_004b7ee0;
-struct Entry_004b7f70;
-struct Entry_004b8b30;
-struct Entry_004d0a10;
+struct GafFrameTableEntry;
+struct GafDurationEntry;
+struct GafDurationEntry;
+struct LzssTreeEntry;
 struct Entry_2;
 struct Entry_3;
 struct Entry_4;
@@ -1087,7 +1087,7 @@ struct Entry_5;
 struct EventEntry;
 struct Event_0046d860;
 struct RemoteFireEventView;
-struct Event_4b5cc0;
+struct MouseEventView;
 struct ExceptionName;
 struct Expired;
 struct Explosion;
@@ -1119,7 +1119,7 @@ struct ScreenshotFindData;
 struct FindData_004bc930;
 struct FindData_004bca30;
 struct FindData_004bcd10;
-struct FindData_004cb170;
+struct ScreenshotFileFindData;
 struct FindHandle_004bc930;
 struct Find_004bc8d0;
 union Fix_004736e0;
@@ -1163,7 +1163,7 @@ union CursorInputFlags;
 struct Flags_004268b0;
 struct Flags_004269d0;
 struct UnitDefCursorFlags;
-union Flags_0045c570;
+union SoundSettingFlags;
 union Flags_0045d280;
 struct SelectionBoxFlags;
 union WeaponSlotFlagBits;
@@ -1182,13 +1182,13 @@ struct Flags_142f1_004816a0;
 struct Flags_416630;
 struct Flags_418ca0;
 struct Flags_418fd0;
-union Flags_4b5980;
+union DisplayAppFlags;
 struct FloatVec;
 struct CameraFollowTarget;
 struct FontGlyphTable;
 struct Form_00464e70;
 struct Fp_004bbff0;
-struct Fpo_004de020;
+struct FpoRecord;
 struct FrameCounter_4b6570;
 struct Frame_00424050;
 struct Frame_00462f30;
@@ -1200,7 +1200,7 @@ struct WeaponSlotInitState;
 struct Frame_004a4980;
 struct Frame_004a7f70;
 struct Frame_004c7580;
-struct Frame_004de700;
+struct StackWalkFrame;
 struct Frame_482270;
 struct ScreenFreeData;
 struct CdPlayerChoiceGadgetView;
@@ -1211,16 +1211,16 @@ struct Gadget_004ac340;
 struct Gadget_004ac4c0;
 struct Gadget_004ac8c0;
 struct GafEntry_004a5f40;
-struct GafEntry_004b8d40;
+struct GafSequenceRecord;
 struct Gaf_004224b0;
-struct Gaf_004b8d40;
+struct GafFileIndex;
 struct Game;
 struct GameRec_4c9c50;
 struct ResetProgressBarDialog;
-struct Game_004bfe10;
+struct DisplayGrayView;
 struct Game_004c14f0;
 struct Game_004c1830;
-struct Game_004caec0;
+struct DisplayScreenshotView;
 struct Game_004cb170;
 struct GlobalObj;
 struct GlobalObj_2;
@@ -1244,7 +1244,7 @@ struct Gun_0049c9c0;
 struct Handle;
 class Handler_004388d0;
 struct HapiBuf;
-struct Hapi_004bd160;
+struct HapiPackHeaderView;
 struct Head_0043a420;
 struct Head_004455b0;
 struct Head_004635b0;
@@ -1261,7 +1261,7 @@ struct Header_0044e7d0;
 struct Header_0044e880;
 struct Header_00479c50;
 struct Header_004be400;
-struct Header_004cac40;
+struct PcxHeader;
 struct Heading_0049cde0;
 struct HeapNode_0040f000;
 struct Heap_0040e630;
@@ -1303,12 +1303,12 @@ struct Inner_004afd20;
 struct Inner_004c51b0;
 struct Inner_44b3c0;
 struct Input_004c2cc0;
-struct InsertResult_004db450;
+struct FreeBlockInsertResult;
 struct IntLess_004b3430;
 struct IntLess_004b3490;
 struct IntRec_004b4270;
 class Intf_004c6210;
-struct Ints_459200;
+struct Vec3;
 struct Item_00470ae0;
 struct Item_00478790;
 struct Item_00478b40;
@@ -1344,7 +1344,7 @@ struct Less_004dc680;
 struct Less_004dce00;
 struct Less_004dce60;
 struct Less_004dd250;
-struct Less_004dd3d0;
+struct UnsignedLess;
 struct Less_004dd430;
 struct Less_004dd7d0;
 struct Less_004ddc90;
@@ -1412,7 +1412,7 @@ struct MissionRule_00436c30;
 struct MissionUnit_00436c30;
 struct Mission_00467e50;
 struct MobHdr_43dd70;
-struct ModeList_004b5330;
+struct DisplayModeTable;
 struct DisplayMode;
 struct Mode_4b5980;
 struct Model_00424890;
@@ -1513,8 +1513,8 @@ struct ReadSurfFilenameFieldRecord;
 struct WriteNuttinFieldRecord;
 struct FreeGafSlotDialog;
 struct FreeCommonGuiGafDialog;
-struct Obj_004b7f00;
-struct Obj_004b7f70;
+struct GafFrameCountCursor;
+struct GafDurationCursor;
 struct Obj_004ba590;
 struct Obj_004ba750;
 struct Obj_004baad0;
@@ -1523,7 +1523,7 @@ struct Obj_004bab60;
 struct Obj_004baba0;
 struct Obj_004babd0;
 struct Obj_004badf0;
-struct Obj_004c13d0;
+struct DisplayKeyColorView;
 struct Obj_004c23e0;
 struct Obj_004c2470;
 struct Obj_004c24b0;
@@ -1606,8 +1606,8 @@ struct Owner_00494290;
 struct Owner_2;
 struct Owner_439d20;
 struct Owner_439d80;
-struct Owner_459c70;
-struct PCX_004caa40;
+struct UnitDrawView;
+struct PcxImage;
 struct PackHeader_004d1c00;
 struct Packet;
 struct Packet_004233a0;
@@ -1639,7 +1639,7 @@ struct Packet_0046d630;
 struct Packet_0046d6c0;
 struct Packet_0046d860;
 struct Packet_0046dad0;
-struct Packet_0047f0c0;
+struct SoundIndexPacket;
 struct OwnershipTransferPacket;
 struct WeaponFirePacket;
 struct Packet_00499ba0;
@@ -1672,7 +1672,7 @@ struct RadarPicHeader;
 struct Pic_4665d0;
 struct Piece;
 struct PieceBits_00487080;
-union PieceFlags_459c70;
+union ModelPieceFlags;
 struct PieceFrame;
 struct Piece_00458310;
 struct Placement;
@@ -1728,8 +1728,8 @@ struct Point_004bf060;
 struct Point_004bf260;
 struct Point_004c0330;
 struct Point_004c07b0;
-struct Point_004c0c70;
-struct Poly_459c70;
+struct ShadedPoint;
+struct ShadedVertex;
 class PoolAlloc_004db610;
 struct Pool_00422170;
 struct Pool_004232a0;
@@ -1738,15 +1738,15 @@ struct XzPoint;
 struct CenterPos;
 struct Pos_004658e0;
 struct Pos_00465ac0;
-struct Pos_00473590;
+struct TeleportParticleWholePos;
 struct Pos_00473590_2;
-struct Pos_004745e0;
+struct WakeParticleWholePos;
 struct Pos_00474b80;
 struct BuildCenterFixed;
 struct Pos_00485330;
 struct Pos_0048d630;
-struct Pos_004cf570;
-struct Pos_4589c0;
+struct Vec3;
+struct ModelBoundsOrigin;
 class ProjectedPrimitive;
 struct Quad;
 class Queue_00461f90;
@@ -1774,7 +1774,7 @@ struct PieceAngleRecord;
 struct Rec_0044de80;
 struct Rec_0044dfb0;
 struct ConsoleCommand;
-struct Rec_004c7580;
+struct FrameQuadScanline;
 struct Record_0043de30;
 struct UnitRestrictRecord;
 struct Record_00474cd0;
@@ -1796,7 +1796,7 @@ struct SaveGameScreenState;
 struct SavedPiece_004876c0;
 struct Saved_00493bf0;
 struct Screen_004a75d0;
-struct Screen_004b8310;
+struct ScreenSurfaceView;
 struct Screen_004b8500;
 struct Screen_004c5df0;
 struct Screen_004c5fa0;
@@ -1812,7 +1812,7 @@ struct Screen_004c6e70;
 struct ScriptTable;
 struct Section_004b4800;
 struct Section_004b4850;
-struct Seg_00473b50;
+struct NanoSegment;
 struct SerialPortConfig;
 struct SessionDesc_004c9920;
 struct SessionDesc_4c9dd0;
@@ -1822,7 +1822,7 @@ struct Settings_00460160;
 struct MissionOptionFlags;
 struct Settings_00496e10_2;
 struct Shape;
-struct Shape_00472ab0;
+struct ThrustPos;
 struct VLaunchFireSlotView;
 struct MotionFireSlotView;
 struct SideDef;
@@ -1831,7 +1831,7 @@ struct SkirmishPlayer;
 struct Slider_004acc70;
 struct Slot;
 struct EndGamePlayerSlot;
-struct Slot_0042f740;
+struct SoundCategorySlot;
 struct Slot_004390a0;
 struct Slot_00471120;
 union Slot_00483610;
@@ -1840,15 +1840,15 @@ struct Slot_4b62d0;
 struct Smack_0047c330;
 struct SmackerSurface;
 struct SmackerSurfaces;
-struct SmkStats_0047c530;
+struct SmackSummaryView;
 struct Smk_0047bf70;
-struct Smk_0047bf70_b;
+struct SmackBufferView;
 struct MenuSpark;
 struct UnitInfoSnapshot;
-struct SoundInfo_005086fc;
+struct SpeechCategoryInfo;
 struct Sound_0047f210;
 struct Sound_45ffb0;
-struct Source_0042f450;
+struct TdfFileCursorView;
 struct TdfParserView;
 struct UnitSyncSource;
 struct RockSourceSlotView;
@@ -1867,7 +1867,7 @@ struct Sprite_004b94c0;
 struct SrcPiece_00487080;
 struct Src_004ab400;
 struct Src_004ab5d0;
-struct Src_004b8310;
+struct BlitSourceView;
 struct Src_004b8a80;
 struct Stack_004d89b0;
 struct State_004bb2e0;
@@ -1906,7 +1906,7 @@ struct Surface_004c5d90;
 struct Surface_004c5df0;
 struct Surface_004c6f80;
 class Surface_4b6570;
-struct Surfaces_0047bdf0;
+struct DirectDrawSurfaceSet;
 struct Sym_004dea00;
 struct TurnCostTable;
 struct Table_0041ace0;
@@ -1917,7 +1917,7 @@ struct DamageTable;
 struct LoadGafIntoSlotGafTable;
 struct Table_004b08c0;
 struct Table_004b3630;
-struct Table_004b7ee0;
+struct GafFrameTable;
 struct Table_004cb2f0;
 struct Tail_004635b0;
 struct Target_004030a0;
@@ -1944,7 +1944,7 @@ struct FeatureMarkView;
 struct TlsBlock;
 struct TntHeader_00483610;
 struct PathAnimTrail;
-class Tree_004da8d0;
+class BlockMapInitView;
 struct Triple_004e0570;
 union UType_0042b370_flags;
 struct Unit;
@@ -2012,7 +2012,7 @@ struct Vec3;
 struct Vec3FromInts;
 struct Vec3_004b1ec0;
 struct Vec3_2;
-union Vec3_459200;
+union FixedVec3Union;
 struct Vec3f;
 struct Vec3i_00474130;
 class VecElems_0046ca60;
@@ -2026,7 +2026,7 @@ struct Video_0045bb00;
 struct MapViewFlags;
 struct View_00438c00;
 struct View_0044d8a0;
-struct View_4b5980;
+struct MouseEventView;
 class UnitVisitor;
 struct WaveFormat;
 struct WeaponDef;
@@ -3271,7 +3271,7 @@ public:
     int GetTrackCategory(void);
     int GetCurrentTrack(void);
     int InitDirectSound(int, int, int, void*);
-    int PlaySampleSet(void**, long, Pos_004cf570*);
+    int PlaySampleSet(void**, long, Vec3*);
     int IsStreamActive(void);
     unsigned char GetCategoryOfTrack(int);
     void PlayNextTrack(void);
@@ -3406,7 +3406,7 @@ struct Entry {
 
 struct Object_00419940 {
     char unknown_0[24];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
 };
 
 struct Unit_00419ac0 {
@@ -4004,7 +4004,7 @@ public:
     char unknown_4[1040];
     int hasSurfaces;
     char unknown_418[300];
-    Surfaces_0047bdf0* surfaces;
+    DirectDrawSurfaceSet* surfaces;
     void FUN_0047bf20(void);
 };
 
@@ -4217,7 +4217,7 @@ public:
     int GetSubRecordCount(void);
 };
 
-struct Slot_0042f740 {
+struct SoundCategorySlot {
     int count;
     int* a;
     int* b;
@@ -6130,7 +6130,7 @@ struct Class_004581e0 {
 class Class_00458310 {
 public:
     char unknown_0[1];
-    void AddModelBounds(int*, int*, int*, int*, SpotState*, Pos_4589c0);
+    void AddModelBounds(int*, int*, int*, int*, SpotState*, ModelBoundsOrigin);
     void AddModelBounds(int*, int*, int*, int*, SpotState*, int, int, int);
 };
 
@@ -6151,7 +6151,7 @@ public:
     char unknown_0[16];
     int bitmap;
     void MergeIntoComposite(Surface_004c0a90*, SpotState*);
-    void DrawObjectPicture(int, SpotState*, Vec3_459200, int);
+    void DrawObjectPicture(int, SpotState*, FixedVec3Union, int);
 };
 
 class Class_00458d30 {
@@ -6282,12 +6282,12 @@ struct Video_0045bb00 {
     int field_13c;
     short field_140;
     char unknown_142[8];
-    ModeList_004b5330* field_14a;
+    DisplayModeTable* field_14a;
 };
 
-#include "../src/sound/bits_0045c570.h"
+#include "../src/sound/sound_setting_bits.h"
 
-#include "../src/sound/flags_0045c570.h"
+#include "../src/sound/sound_setting_flags.h"
 
 class Class_004ce3e0 {
 public:
@@ -7979,7 +7979,7 @@ struct Player_00473a00 {
     char unknown_88[195];
 };
 
-struct Seg_00473b50 {
+struct NanoSegment {
     Vec3 start;
     Vec3 end;
 };
@@ -7987,14 +7987,14 @@ struct Seg_00473b50 {
 class Class_00473b50 {
 public:
     char unknown_4[24];
-    Seg_00473b50 seg_1c;
-    Seg_00473b50 seg_34;
+    NanoSegment seg_1c;
+    NanoSegment seg_34;
     virtual void v0(void);
     virtual void v1(void);
     virtual void v2(void);
     virtual void v3(void);
     virtual void v4(void);
-    void FUN_00473b50(Seg_00473b50*, Seg_00473b50*, int);
+    void FUN_00473b50(NanoSegment*, NanoSegment*, int);
 };
 
 union Fix_00473d50 {
@@ -8262,7 +8262,7 @@ struct Obj_00479bf0 {
     short x;
     short y;
     char unknown_1b[20];
-    GafEntry_004b8d40* entry;
+    GafSequenceRecord* entry;
     char unknown_33[264];
     unsigned char frame;
 };
@@ -8481,7 +8481,7 @@ public:
     void* hwnd;
     tagPALETTEENTRY entries[256];
     char unknown_410[308];
-    Display_0047c3a0* display;
+    DisplayOffscreenView* display;
     void PlayFrame(void*);
 };
 
@@ -8734,7 +8734,7 @@ struct Data_00480c30 {
 class Class_00480c50 {
 public:
     char unknown_0[1344];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
     void SetPieceTranslation(int, int, int);
 };
 
@@ -8776,7 +8776,7 @@ public:
 class Class_00480d50 {
 public:
     char unknown_0[1344];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
     void SetPieceVisible(int, int);
 };
 
@@ -9017,7 +9017,7 @@ union Flags114_485a40 {
 
 struct Unit_00485d40 {
     char unknown_0[398];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
 };
 
 struct Name_004866d0 {
@@ -10379,7 +10379,7 @@ struct Class_0049f8c0 {
 
 struct Object_0049f930 {
     char unknown_0[24];
-    BuildList_0045a950* data;
+    ModelBuildList* data;
 };
 
 struct Inner_0049fb30 {
@@ -10532,7 +10532,7 @@ struct Entry_004a7ee0 {
 
 struct Button_004a7f70 {
     char unknown_0[4];
-    Gaf_004b8d40* gaf;
+    GafFileIndex* gaf;
     char unknown_8[16];
     Screen_004a75d0* screen;
 };
@@ -10551,7 +10551,7 @@ struct Obj_004a7f70 {
     short y;
     int flags;
     char unknown_1f[16];
-    GafEntry_004b8d40* entry;
+    GafSequenceRecord* entry;
     char unknown_33[259];
     unsigned char stage;
     char unknown_137[4];
@@ -11287,7 +11287,7 @@ struct ArrayB {
 
 class Class_004b4c50 {
 public:
-    BuildList_0045a950* data;
+    ModelBuildList* data;
     int SeekBoxEnd(void);
 };
 
@@ -11347,7 +11347,7 @@ struct BitmapInfo_004b5510 {
     tagRGBQUAD bmiColors[256];
 };
 
-union Flags_4b5980 {
+union DisplayAppFlags {
     union { unsigned short value; struct { unsigned short opt : 1; unsigned short bit1 : 1; unsigned short gdi : 1; unsigned short bit3 : 1; unsigned short bit4 : 1; unsigned short has_c0 : 1; unsigned short has_c4 : 1; unsigned short has_c8 : 1; unsigned short has_cc : 1; unsigned short has_d0 : 1; unsigned short sound_opt : 1; unsigned short no_video : 1; unsigned short bit12 : 4; } bits; };
 };
 
@@ -11358,7 +11358,7 @@ struct Mode_4b5980 {
     int unknown_0c;
 };
 
-struct Event_4b5cc0 {
+struct MouseEventView {
     int data[6];
 };
 
@@ -11514,7 +11514,7 @@ struct Src_004b8a80 {
     int bits;
 };
 
-struct Entry_004b8b30 {
+struct GafDurationEntry {
     unsigned short value;
     char unknown_2[6];
 };
@@ -12089,10 +12089,10 @@ struct Queue_4c2de0 {
 struct Queue_4c2e30 {
     char unknown_0[390];
     int capacity;
-    Event_4b5cc0* entries;
+    MouseEventView* entries;
     int head;
     int tail;
-    Event_4b5cc0 empty;
+    MouseEventView empty;
 };
 
 class Class_004c33a0 {
@@ -13852,7 +13852,7 @@ public:
     ~CritSec_004e1ac0(void);
 };
 
-class Tree_004da8d0 {
+class BlockMapInitView {
 public:
     char allocator;
     char key_compare;
@@ -13861,8 +13861,8 @@ public:
     unsigned char _Multi;
     char unknown_9[3];
     unsigned int _Size;
-    Tree_004da8d0(char&, char&);
-    ~Tree_004da8d0(void);
+    BlockMapInitView(char&, char&);
+    ~BlockMapInitView(void);
     LiveNode*& _Root(void);
     static int& _Color(LiveNode*);
     static void* operator new(unsigned int);
@@ -13930,7 +13930,7 @@ public:
     int* FUN_004dbeb0(int*);
 };
 
-struct InsertResult_004db450 {
+struct FreeBlockInsertResult {
     FreeBlockIter first;
     int second;
 };
@@ -13963,14 +13963,14 @@ public:
     void _Rrotate(LiveNode*);
 };
 
-struct Less_004dd3d0 {
+struct UnsignedLess {
     char unknown_0[1];
     unsigned char operator()(unsigned int&, unsigned int&);
 };
 
 class Class_004dd3d0 {
 public:
-    Less_004dd3d0 compare;
+    UnsignedLess compare;
     char unknown_1[3];
     LiveNode* head;
     Iter_0046e330 End(void);
@@ -14058,7 +14058,7 @@ public:
     int size;
     FreeBlockIter Begin(void);
     MapInsertResult FUN_004dbec0(MessageByteCounter*);
-    void FUN_004dbec0(InsertResult_004db450*, MessageByteCounter*);
+    void FUN_004dbec0(FreeBlockInsertResult*, MessageByteCounter*);
 };
 
 struct Alloc_004dc130 {
@@ -14245,7 +14245,7 @@ public:
     char unknown_c[24];
     DebugDir_004ddfa0* debugDirs;
     int numDebugDirs;
-    Fpo_004de020* GetFpoRecords(void);
+    FpoRecord* GetFpoRecords(void);
 };
 
 struct DebugDir_004ddfa0 {
@@ -14273,7 +14273,7 @@ class Class_004de020 {
 public:
     char unknown_0[24];
     unsigned int imageBase;
-    Fpo_004de020* FindFpoRecord(unsigned int);
+    FpoRecord* FindFpoRecord(unsigned int);
 };
 
 struct Line_004de550 {
@@ -14767,7 +14767,7 @@ public:
     void FUN_004e2950(LiveNode*);
 };
 
-class Class_004e29b0 : public Tree_004da8d0 {
+class Class_004e29b0 : public BlockMapInitView {
 public:
     void FUN_004e29b0(LiveNode*);
 };

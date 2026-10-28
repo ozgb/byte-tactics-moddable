@@ -25,12 +25,12 @@ public:
     void SetMaxBuffers(int count);
 };
 
-struct SoundParams_0047ed40 {
+struct DisplayHwndView {
     char unknown_0[0x40];
     int hwnd;
 };
 
-union Pos_0047f300 {
+union SoundWorldPos {
     struct {
         short xFrac;
         short x;
@@ -46,38 +46,34 @@ union Pos_0047f300 {
     };
 };
 
-struct Vector3_0047f300 {
-    int x, y, z;
-};
-
 #pragma pack(push, 1)
-struct Packet_0047f0c0 {
+struct SoundIndexPacket {
     unsigned char type;
     unsigned char flag;
     int index;
     int unknown_6[3];
 };
 
-struct Packet_0047f300 {
+struct SoundAtPacket {
     unsigned char type;
     unsigned char flag;
     int index;
-    Pos_0047f300 pos;
+    SoundWorldPos pos;
 };
 
 #include "../units/unit_def.h"
 
 #include "../units/unit.h"
 
-struct Slot_0047fd70 {
+struct SoundCategorySlotView {
     int count;
     char* table1;
     char* table2;
 };
 
-struct SoundCat_0047fd70 {
+struct SoundCategoryEntryView {
     char unknown_0[0x40];
-    Slot_0047fd70 slots[24];
+    SoundCategorySlotView slots[24];
 };
 
 #include "../network/player.h"
@@ -123,7 +119,7 @@ public:
     void RemoveSpeechOfId(Unit* unit);
 };
 
-struct Message_0047fad0 {
+struct SpeechTypeInfo {
     int priority;
     int cooldown;
     int unknown_8;
@@ -134,7 +130,7 @@ struct Message_0047fad0 {
 #pragma pack(pop)
 
 #include "../../link/globals.h"
-extern Message_0047fad0 g_speechTypes[24];
+extern SpeechTypeInfo g_speechTypes[24];
 
 
 #include "../game/main.h"
@@ -177,7 +173,7 @@ void InitSound(void)
         g_noDirectSound = 1;
     }
     if (!g_noDirectSound) {
-        int hr = ((Sound *)g_game->sound)->InitDirectSound(0x2b11, 0x10, 2, ((SoundParams_0047ed40 *)g_game->displayContext)->hwnd);
+        int hr = ((Sound *)g_game->sound)->InitDirectSound(0x2b11, 0x10, 2, ((DisplayHwndView *)g_game->displayContext)->hwnd);
         if (hr == 0) {
             if (((Sound *)g_game->sound)->HasNoDriver())
                 g_noDirectSound = 1;
@@ -306,7 +302,7 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
         if (g_game->volume1 != 0 && (g_game->soundFlags_37f19 & 7) != 0
             && g_noDirectSound == 0) {
             if (param_2) {
-                Packet_0047f0c0 packet;
+                SoundIndexPacket packet;
                 packet.type = 0x13;
                 packet.flag = 1;
                 packet.index = index;
@@ -359,7 +355,7 @@ static inline int MapContains(unsigned int w, unsigned int h, int tx, int ty)
 }
 
 // FUNCTION: 0x47f300
-int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
+int __stdcall PlaySoundAt(int index, SoundWorldPos* pos, int param_3)
 {
     if (g_useWindowsSound)
         return PlaySoundByIndex(index, param_3);
@@ -375,7 +371,7 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
     int sound = g_game->sounds[index];
 
     if (param_3) {
-        Packet_0047f300 packet;
+        SoundAtPacket packet;
         packet.type = 0x13;
         packet.flag = 1;
         packet.index = index;
@@ -409,7 +405,7 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
     }
     if (vis != 0) {
         if (((Sound *)g_game->sound)->Is3DEnabled()) {
-            Vector3_0047f300 p;
+            Vec3 p;
             p.x = pos->x - g_game->scrollX - (g_game->screenTilesX / 2) * 16;
             p.z = g_game->scrollY + (g_game->screenTilesY / 2) * 16
                 + (pos->y >> 1) - pos->z;
@@ -432,7 +428,7 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
 // FUNCTION: 0x47f610
 void __stdcall PlaySoundAtByName(char* name, int param_2, int param_3)
 {
-    PlaySoundAt(FindSound(name), (Pos_0047f300*)param_2, param_3);
+    PlaySoundAt(FindSound(name), (SoundWorldPos*)param_2, param_3);
 }
 
 // FUNCTION: 0x47f680
@@ -611,7 +607,7 @@ void SpeechQueue::PlaySpeech(int index, int param_2, int param_3)
     int slot = entries[index].kind;
     unsigned int catIndex = 0;
     catIndex = (unsigned short)entries[index].unit->def->soundcategory;
-    SoundCat_0047fd70* cat = &((SoundCat_0047fd70 *)g_game->entries_37e13)[catIndex];
+    SoundCategoryEntryView* cat = &((SoundCategoryEntryView *)g_game->entries_37e13)[catIndex];
     int count = cat->slots[slot].count;
     int idx = (int)((__int64)HarnessViewRand() * count / 0x8000);
 

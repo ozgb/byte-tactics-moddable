@@ -7,10 +7,10 @@ class StringRef;
 
 int GetLocalizedString(void*, char*, const char*, int, char*, char*);
 
-struct Pair_004b7620 {
+struct CommandHandlerInit {
     int fn;
     int mask;
-    Pair_004b7620(int f, int m) : fn(f), mask(m) {}
+    CommandHandlerInit(int f, int m) : fn(f), mask(m) {}
 };
 
 int __cdecl atoi(const char* str);
@@ -35,21 +35,21 @@ static inline bool operator==(const StringRef& a, const StringRef& b)
     return strcmp(a.data, b.data) == 0;
 }
 
-struct NameLess_004b7620 {
+struct CommandNameLess {
     bool operator()(const char* a, const char* b) const
     {
         return _strcmpi(a, b) < 0;
     }
 };
 
-struct NameNe_004b7620 {
+struct CommandNameNotEqual {
     bool operator()(const StringRef& a, const StringRef& b) const
     {
         return !(a == b);
     }
 };
 
-typedef void (__stdcall *Handler_004b7620)(void*);
+typedef void (__stdcall *CommandHandlerFn)(void*);
 
 class CommandEntry {
 public:
@@ -57,7 +57,7 @@ public:
     int value1;
     int value2;
 
-    CommandEntry(const StringRef& h, Pair_004b7620 pp);
+    CommandEntry(const StringRef& h, CommandHandlerInit pp);
     CommandEntry(const CommandEntry& other);
     CommandEntry& operator=(const CommandEntry& other)
     {
@@ -67,9 +67,9 @@ public:
     void* AssignEntry(int* source);
 };
 
-CommandEntry::CommandEntry(const StringRef& h, Pair_004b7620 pp) : handle(h)
+CommandEntry::CommandEntry(const StringRef& h, CommandHandlerInit pp) : handle(h)
 {
-    *(Pair_004b7620*)&value1 = pp;
+    *(CommandHandlerInit*)&value1 = pp;
 }
 
 #pragma auto_inline(off)
@@ -191,13 +191,13 @@ void ClearDefaultCommandHandler()
 }
 
 // FUNCTION: 0x4b7620
-void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
+void __stdcall RegisterCommand(const char* name, CommandHandlerFn fn, int mask)
 {
-    Pair_004b7620 p((int)fn, mask);
+    CommandHandlerInit p((int)fn, mask);
     StringRef key(name);
     CommandEntry* first = s_commandTable.begin();
     CommandEntry* last = s_commandTable.end();
-    NameLess_004b7620 less;
+    CommandNameLess less;
     const char* k = key.data;
     while (first != last) {
         CommandEntry* mid = first + (last - first) / 2;
@@ -207,15 +207,15 @@ void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
             last = mid;
     }
     int* slot;
-    if (first == s_commandTable.end() || NameNe_004b7620()(first->handle, key)) {
-        CommandEntry e(key, Pair_004b7620(0, 0));
+    if (first == s_commandTable.end() || CommandNameNotEqual()(first->handle, key)) {
+        CommandEntry e(key, CommandHandlerInit(0, 0));
         int index = first - s_commandTable.begin();
         s_commandTable.insert(first, e);
         slot = &(s_commandTable.begin() + index)->value1;
     } else {
         slot = &first->value1;
     }
-    *(Pair_004b7620*)slot = p;
+    *(CommandHandlerInit*)slot = p;
 }
 
 // FUNCTION: 0x4b7760
@@ -223,11 +223,11 @@ void __stdcall RegisterCommands(ConsoleCommand* rec)
 {
     for (; rec->name; rec++) {
         int mask = rec->mask;
-        Handler_004b7620 fn = (Handler_004b7620)rec->run;
+        CommandHandlerFn fn = (CommandHandlerFn)rec->run;
         StringRef key(rec->name);
         CommandEntry* first = s_commandTable.begin();
         CommandEntry* last = s_commandTable.end();
-        NameLess_004b7620 less;
+        CommandNameLess less;
         const char* k = key.data;
         while (first != last) {
             CommandEntry* mid = first + (last - first) / 2;
@@ -237,8 +237,8 @@ void __stdcall RegisterCommands(ConsoleCommand* rec)
                 last = mid;
         }
         int* slot;
-        if (first == s_commandTable.end() || NameNe_004b7620()(first->handle, key)) {
-            CommandEntry e(key, Pair_004b7620(0, 0));
+        if (first == s_commandTable.end() || CommandNameNotEqual()(first->handle, key)) {
+            CommandEntry e(key, CommandHandlerInit(0, 0));
             int index = first - s_commandTable.begin();
             s_commandTable.insert(first, e);
             slot = &(s_commandTable.begin() + index)->value1;
@@ -257,14 +257,14 @@ void __stdcall SetDefaultCommandHandler(int callback, int mask)
     g_defaultCommandMask = mask;
 }
 
-struct HandlerSlot_004b7900 {
-    Handler_004b7620 fn;
+struct CommandHandlerSlot {
+    CommandHandlerFn fn;
     int mask;
 };
 
-static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
+static inline CommandHandlerSlot* FindCommandSlot(const char* key)
 {
-    NameLess_004b7620 less;
+    CommandNameLess less;
     CommandEntry* first = s_commandTable.begin();
     CommandEntry* last = s_commandTable.end();
     while (first != last) {
@@ -276,7 +276,7 @@ static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
     }
     if (first == s_commandTable.end() || less(key, first->handle.data))
         return 0;
-    return (HandlerSlot_004b7900*)&first->value1;
+    return (CommandHandlerSlot*)&first->value1;
 }
 
 #pragma auto_inline(off)
@@ -287,7 +287,7 @@ int __stdcall ExecuteCommand(CommandArgs* obj, int mask)
     if (obj->count >= 1) {
         StringRef key(obj->GetArg(0, DAT_005119b8));
         key.MakeLower();
-        HandlerSlot_004b7900* h = Find_004b7900(key.data);
+        CommandHandlerSlot* h = FindCommandSlot(key.data);
         if (h != 0 && (h->mask & mask)) {
             result = h->mask;
             h->fn(obj);
@@ -343,12 +343,12 @@ void ClearCommandTable()
     s_commandTable.clear();
 }
 
-typedef std::vector<CommandEntry> Vec_004b7b00;
-typedef void (Vec_004b7b00::*InsertFn_004b7b00)(
-    Vec_004b7b00::iterator, Vec_004b7b00::size_type, const CommandEntry&);
+typedef std::vector<CommandEntry> CommandVector;
+typedef void (CommandVector::*CommandVectorInsertFn)(
+    CommandVector::iterator, CommandVector::size_type, const CommandEntry&);
 
 // FUNCTION: 0x4b7b00 ?insert@?$vector@VCommandEntry@@V?$allocator@VCommandEntry@@@std@@@std@@QAEXPAVCommandEntry@@IABV3@@Z
-InsertFn_004b7b00 g_insert_004b7b00 = &Vec_004b7b00::insert;
+CommandVectorInsertFn g_insert_004b7b00 = &CommandVector::insert;
 
 // FUNCTION: 0x4b7e00
 void* CommandEntry::AssignEntry(int* source)

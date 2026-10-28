@@ -6,7 +6,7 @@
 
 #include "rect.h"
 
-union Flags_4b5980 {
+union DisplayAppFlags {
     unsigned short value;
     struct {
         unsigned short opt : 1;
@@ -25,7 +25,7 @@ union Flags_4b5980 {
     } bits;
 };
 
-struct FrameCounter_4b66a0 {
+struct FrameRateCounter {
     int accum;
     unsigned int lastTick;
     int frames;
@@ -59,7 +59,7 @@ struct DirectDrawState {
 };
 
 #pragma pack(push, 2)
-struct App_4b5980 {
+struct DisplayAppView {
     void* hInstance;
     int nCmdShow;
     char* className;
@@ -87,10 +87,10 @@ struct App_4b5980 {
     char unknown_e4[0xe8 - 0xe4];
     int tickScale;
     int wa_left;
-    Flags_4b5980 flags;
+    DisplayAppFlags flags;
     char wa_rest[0xfc - 0xf2];
     char unknown_fc[0x1da - 0xfc];
-    FrameCounter_4b66a0 counter;
+    FrameRateCounter counter;
     Rect startMode;
     int startWidth;
     int startHeight;
@@ -107,20 +107,20 @@ struct App_4b5980 {
 };
 #pragma pack(pop)
 
-struct Mode_004b5330 {
+struct DisplayModeInfo {
     unsigned int width;
     unsigned int height;
     unsigned int refreshRate;
 };
 
-struct ModeList_004b5330 {
+struct DisplayModeTable {
     int count;
-    Mode_004b5330* modes;
+    DisplayModeInfo* modes;
     char unknown_8[12];
     char* buffer;
 };
 
-struct View_4b5980 {
+struct MouseEventView {
     int x;
     int y;
     int buttons;
@@ -131,33 +131,24 @@ struct View_4b5980 {
 
 #include "surface.h"
 
-struct Event_4b5cc0 {
-    int x;
-    int y;
-    int buttons;
-    int time;
-    int message;
-    int flag;
-};
-
-struct Timer_4b63f0 {
+struct TimerSlot {
     void* callback;
     int id;
     int interval;
     int countdown;
 };
 
-struct TimerTable_4b63f0 {
-    Timer_4b63f0 slots[10];
+struct TimerSlotTable {
+    TimerSlot slots[10];
     void (__cdecl *closeHandler)(int);
     int closeHandlerArg;
     int count;
 };
 
-typedef void (__stdcall *TimerCb_4b63f0)(int);
+typedef void (__stdcall *TimerCallback)(int);
 
-extern App_4b5980* g_display;
-extern TimerTable_4b63f0 g_timerSlots;
+extern DisplayAppView* g_display;
+extern TimerSlotTable g_timerSlots;
 extern unsigned int g_lastTimerTick;
 extern long g_gfxBlitLockHeld;
 extern long g_gfxBlitLockOwner;
@@ -168,17 +159,17 @@ extern void* g_gfxBlitLockEvent;
 #include "../gui/keyboard.h"
 #include "../gui/mouse.h"
 #include "palette.h"
-int __stdcall AllocAlphaTable(App_4b5980* d);
+int __stdcall AllocAlphaTable(DisplayAppView* d);
 int __stdcall LockScreen(Surface *s);
 void __cdecl BlitSurface(Surface *dst, void *src, int x, int y);
 int __stdcall UnlockScreen(Surface *s);
-void __stdcall FreeLightTable(App_4b5980* obj);
+void __stdcall FreeLightTable(DisplayAppView* obj);
 #include "object_pool.h"
 
 // FUNCTION: 0x4b4f50
 int ApplyPalette()
 {
-    App_4b5980* d = g_display;
+    DisplayAppView* d = g_display;
     if (d->windowed) {
         host_palette_apply();
         return 1;
@@ -194,7 +185,7 @@ void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param)
 }
 
 // FUNCTION: 0x4b4ff0
-void __stdcall ReleaseDirectDraw(App_4b5980* d)
+void __stdcall ReleaseDirectDraw(DisplayAppView* d)
 {
     host_display_close();
 }
@@ -222,7 +213,7 @@ int __stdcall CheckDirectXVersion(int want0, int want1, int want2, int want3, in
 }
 
 // FUNCTION: 0x4b52e0
-void __stdcall InitDisplayDefaults(App_4b5980* p)
+void __stdcall InitDisplayDefaults(DisplayAppView* p)
 {
     p->videoFlags &= 0xfc00;
     p->startWidth = 640;
@@ -237,8 +228,8 @@ void __stdcall InitDisplayDefaults(App_4b5980* p)
 // FUNCTION: 0x4b5330
 void __stdcall EnumModesCallback(const host_display_mode* desc, void* context)
 {
-    ModeList_004b5330* list = (ModeList_004b5330*)context;
-    Mode_004b5330* mode = &list->modes[list->count];
+    DisplayModeTable* list = (DisplayModeTable*)context;
+    DisplayModeInfo* mode = &list->modes[list->count];
     if (desc->bits == 8) {
         mode->width = desc->width;
         mode->height = desc->height;
@@ -248,7 +239,7 @@ void __stdcall EnumModesCallback(const host_display_mode* desc, void* context)
 }
 
 // FUNCTION: 0x4b5370
-int __stdcall GetDisplayModes(ModeList_004b5330* list)
+int __stdcall GetDisplayModes(DisplayModeTable* list)
 {
     if (g_display->windowed) {
         int width;
@@ -291,7 +282,7 @@ int __stdcall GetDisplayModes(ModeList_004b5330* list)
     return result;
 }
 
-static inline void FreeGdi_004b5510(App_4b5980 *d)
+static inline void ClearWindowedFlag(DisplayAppView *d)
 {
     d->windowed = 0;
 }
@@ -299,7 +290,7 @@ static inline void FreeGdi_004b5510(App_4b5980 *d)
 // FUNCTION: 0x4b5510
 int __stdcall SetFullScreen(int mode) {
     int lockResult;
-    App_4b5980 *d;
+    DisplayAppView *d;
     Surface surf;
 
     while (1) {
@@ -320,7 +311,7 @@ int __stdcall SetFullScreen(int mode) {
     dd->haveBackBuffer = 0;
     ReleaseDirectDraw(g_display);
 
-    FreeGdi_004b5510(g_display);
+    ClearWindowedFlag(g_display);
     host_window_resize(g_display->width, g_display->height);
 
     if (mode != 0) {
@@ -389,7 +380,7 @@ void __stdcall SetResolution(int x, int y)
 }
 
 // FUNCTION: 0x4b5980
-int __stdcall InitEnvironment(App_4b5980* d)
+int __stdcall InitEnvironment(DisplayAppView* d)
 {
     g_display = d;
     host_memory m;
@@ -412,7 +403,7 @@ int __stdcall InitEnvironment(App_4b5980* d)
     d->flags.bits.sound_opt = (d->videoFlags >> 9) & 1;
     InitKeyQueue(0x1e);
     InitMouse(0x14, d->flags.bits.sound_opt);
-    View_4b5980 view;
+    MouseEventView view;
     view.x = 0;
     view.y = 0;
     view.buttons = 0;
@@ -469,7 +460,7 @@ int __stdcall InitEnvironment(App_4b5980* d)
 
 int __stdcall HandleHostEvent(host_event* ev)
 {
-    Event_4b5cc0 e;
+    MouseEventView e;
     switch (ev->type) {
     case HOST_EVENT_DESTROY:
         if (g_display->flags.bits.bit1)
@@ -559,7 +550,7 @@ int DispatchHostEvents()
 }
 
 // FUNCTION: 0x4b6110
-void __stdcall ShutdownEnvironment(App_4b5980* d)
+void __stdcall ShutdownEnvironment(DisplayAppView* d)
 {
     DestroyPreCleanup();
     ShutdownMouse();
@@ -642,11 +633,11 @@ void UpdateTimers()
     int diff = (int)q1 - g_lastTimerTick;
     g_lastTimerTick = (host_time_ms() * g_display->tickScale) / 1000;
 
-    for (Timer_4b63f0* s = g_timerSlots.slots; s < g_timerSlots.slots + 10; s++) {
+    for (TimerSlot* s = g_timerSlots.slots; s < g_timerSlots.slots + 10; s++) {
         if (s->interval >= 0) {
             if ((s->countdown -= diff) <= 0) {
                 int arg = s->id;
-                TimerCb_4b63f0 fn = (TimerCb_4b63f0)s->callback;
+                TimerCallback fn = (TimerCallback)s->callback;
                 fn(arg);
                 s->countdown = s->interval;
             }
@@ -655,16 +646,16 @@ void UpdateTimers()
 }
 
 // FUNCTION: 0x4b63f0
-int __stdcall AddTimer(int interval, int id, TimerCb_4b63f0 callback)
+int __stdcall AddTimer(int interval, int id, TimerCallback callback)
 {
     unsigned int now = (host_time_ms() * g_display->tickScale) / 1000;
     int diff = (int)now - g_lastTimerTick;
     g_lastTimerTick = (host_time_ms() * g_display->tickScale) / 1000;
 
-    for (Timer_4b63f0* s = g_timerSlots.slots; s < g_timerSlots.slots + 10; s++) {
+    for (TimerSlot* s = g_timerSlots.slots; s < g_timerSlots.slots + 10; s++) {
         if (s->interval >= 0) {
             if ((s->countdown -= diff) <= 0) {
-                TimerCb_4b63f0 fn = (TimerCb_4b63f0)s->callback;
+                TimerCallback fn = (TimerCallback)s->callback;
                 fn(s->id);
                 s->countdown = s->interval;
             }
@@ -714,7 +705,7 @@ unsigned long GetMilliseconds(void)
 // FUNCTION: 0x4b6570
 int __stdcall DrawFrameRate()
 {
-    FrameCounter_4b66a0* c = &g_display->counter;
+    FrameRateCounter* c = &g_display->counter;
     unsigned int now = host_time_ms();
     c->accum += now - c->lastTick;
     c->lastTick = now;

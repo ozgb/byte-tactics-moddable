@@ -516,7 +516,7 @@ char g_delayedSampleName[112];
 char g_lzssPresetWindow[4113];
 unsigned char DAT_00520fe1[7];
 char g_lzssPresetTree[24584];
-Struct_00526ff0* g_squashDictTree;
+LzssDictTree* g_squashDictTree;
 int g_lzssPresetReady;
 int g_lzssUsePreset;
 char g_memFussyQueried;

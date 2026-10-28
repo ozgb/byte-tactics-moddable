@@ -504,7 +504,6 @@ class UnitScript;
 class Class_00488c50;
 class UnitTypeSet;
 class Class_00489240;
-class UnitCategory;
 class Class_00489540;
 class PathOrderAttach;
 class Class_00489650;
@@ -974,7 +973,6 @@ struct Display_004c6d20;
 struct Display_004c6dc0;
 struct Display_004c6e70;
 struct Display_004c8020;
-struct UnitDamagePacketOut;
 struct Driver_004c6890;
 class Dummy_00440be0;
 union Dword_0051f410;
@@ -1145,7 +1143,6 @@ union Fixed_0049abb0;
 union Fixed_2;
 union Fixed_3;
 union Fixed_4;
-union Fixed_437840;
 union Fixed_497180;
 union Fixed_5;
 class Fixed_6;
@@ -1423,7 +1420,6 @@ struct Message_0047fad0;
 struct Mid_00462d30;
 struct MissionFeature_00436c30;
 struct MissionFlags_0042f9a0;
-struct MissionHolder;
 struct MissionName_00467e50;
 struct MissionRule_00436c30;
 struct MissionUnit_00436c30;
@@ -1514,7 +1510,6 @@ struct Obj_00423bf0;
 struct Obj_00426e80;
 struct Obj_00431950;
 struct Obj_00439e30;
-struct Obj_0043e0b0;
 struct Obj_00444910;
 struct Obj_0044d310;
 struct Obj_00462d30;
@@ -1608,7 +1603,6 @@ struct Other_0048fc40;
 struct Out_004c5ff0;
 struct Out_482830;
 struct Outer_0049fb30;
-struct Outs_t;
 class Owner;
 struct Owner_00407560;
 struct Owner_0041a920;
@@ -1899,7 +1893,6 @@ struct StructA_004ae610;
 struct StructB_004ada10;
 struct StructB_004ae610;
 struct Struct_0040bab0;
-struct Struct_00487af0;
 struct Struct_004907e0;
 struct Struct_0049fb50;
 struct Struct_0049fba0;
@@ -4227,12 +4220,6 @@ public:
     Fixed_6(int);
 };
 
-struct MissionHolder {
-    char unknown_0[3];
-    MissionType mission;
-    MissionHolder(char*);
-};
-
 struct CobFile_0042d1f0 {
     int unknown_0;
     int count_1;
@@ -4803,10 +4790,6 @@ public:
     Class_00437800(int*);
 };
 
-union Fixed_437840 {
-    union { int value; struct { unsigned short fraction; short whole; } parts; };
-};
-
 class Class_004379a0_2 {
 public:
     char unknown_0[4];
@@ -5197,14 +5180,6 @@ struct Record_0043de30 {
     unsigned char state : 2;
     unsigned char flag : 1;
     unsigned char : 5;
-};
-
-struct Obj_0043e0b0 {
-    char unknown_0[106];
-    Vec3 pos;
-    char unknown_76[36];
-    Class_004b0a70* table;
-    char* table_9e;
 };
 
 class Class_00489a70 {
@@ -9571,15 +9546,6 @@ struct Entry_00487af0 {
     unsigned char flags;
 };
 
-struct Struct_00487af0 {
-    char unknown_0[4];
-    int* ids;
-};
-
-struct Outs_t {
-    char unknown_0[20];
-};
-
 struct OwnershipTransferPacket {
     unsigned char type;
     short team;
@@ -9614,16 +9580,6 @@ class Class_00488c50 {
 public:
     int unknown_0[16];
     Class_00488c50(void);
-};
-
-class UnitCategory {
-public:
-    Class_004c9390 name;
-    int value;
-    UnitCategory(UnitCategory&);
-    UnitCategory(Class_004c9390&, void*);
-    ~UnitCategory(void);
-    UnitCategory& operator=(UnitCategory&);
 };
 
 class Class_00489240 {
@@ -9750,15 +9706,6 @@ struct Def_004899b0 {
     char unknown_1fe[67];
     int f241;
     int f245;
-};
-
-struct UnitDamagePacketOut {
-    unsigned char type;
-    unsigned short attacker;
-    unsigned short target;
-    unsigned short amount;
-    unsigned char param_7;
-    unsigned char type_8;
 };
 
 struct Entry_0048a0f0 {

@@ -165,7 +165,8 @@ struct Piece_0043e0b0 {
 struct Obj_0043e0b0 {
     char pad0[0x6a];
     Vec3 pos;
-    char pad76[0x9e - 0x76];
+    char pad76[0x9a - 0x76];
+    void* script;
     Ref<char> table;
 };
 #pragma pack(pop)

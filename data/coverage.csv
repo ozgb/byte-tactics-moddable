@@ -221,7 +221,7 @@ game,UpdateBattleHoverMode,src/game/game_state.cpp,0,0,0,0,0,0,?UpdateBattleHove
 game,UpdateBattleRoom,src/frontend/multi.cpp,1,0,0,0,0,0,?UpdateBattleRoom@@YGXXZ,0,network
 game,WriteGameRegistryValue,src/game/settings.cpp,1,0,0,0,0,0,?WriteGameRegistryValue@@YGXPAX0H@Z,0,shutdown
 game,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,0,0,0,0,0,0,?Clear@Zero11_004917d0@@QAEXXZ,1,
-los_radar,*,,72,64,1950,1615,890,649,,22,
+los_radar,*,,72,64,1948,1613,890,649,,22,
 los_radar,AssignRange,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRange@@YGXPAUElem_432cb0@@00@Z,1,
 los_radar,AssignRangeBack,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRangeBack@@YGPAUElem_432cb0@@PAU1@00@Z,1,
 los_radar,CmdShareMapping,src/game/share_commands.cpp,1,0,0,0,0,0,?CmdShareMapping@@YGXH@Z,0,network
@@ -261,7 +261,7 @@ map,ForceNeighborFootprintReclaim,src/map/terrain.cpp,1,0,0,0,0,0,?ForceNeighbor
 map,FreeOtaEnumCacheAndMission,src/map/map_list.cpp,1,0,0,0,0,0,?FreeOtaEnumCacheAndMission@@YGXXZ,0,shutdown
 map,GetCellPosition,src/map/terrain.cpp,0,0,0,0,0,0,?GetCellPosition@@YGXHHPAUVec3@@@Z,1,
 map,Grid::Grid,src/map/grid.h,0,0,0,0,0,0,??0Grid@@QAE@XZ,1,
-map,MapCacheEntry::MapCacheEntry,src/map/map_list.cpp,1,0,0,0,0,0,??0MapCacheEntry@@QAE@ABVStringRef@@@Z,0,map-check
+map,MapCacheEntry::MapCacheEntry,src/map/map_cache_entry.h,1,0,0,0,0,0,??0MapCacheEntry@@QAE@ABVStringRef@@@Z,0,map-check
 map,MapCacheEntry::MapCacheEntry,src/map/map_load.cpp,1,0,0,0,0,0,??0MapCacheEntry@@QAE@ABV0@@Z,0,map-check
 map,MapCacheEntry::SetChecksum,src/map/map_list.cpp,1,0,0,0,0,0,?SetChecksum@MapCacheEntry@@QAEAAV1@PAVMission@@@Z,0,map-check
 map,MapCacheEntry::operator?4,src/map/map_load.cpp,1,0,0,0,0,0,??4MapCacheEntry@@QAEAAV0@ABV0@@Z,0,map-check

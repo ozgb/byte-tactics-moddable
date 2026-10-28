@@ -358,7 +358,7 @@ void FillEndGameStatistics(void)
     char name[64];
     Gui* menu = &g_game->gui;
     Gadget* entries = menu->layer->entries;
-    __builtin_assume(entries != 0);
+    __builtin_assume(entries != nullptr);
     memset(&bar, 0, sizeof(bar));
     bar.h.flag = 0;
     bar.h.y = 0x5d;

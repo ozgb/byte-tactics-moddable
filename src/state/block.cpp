@@ -27,13 +27,13 @@ struct BlockHeader {
 static_assert(sizeof(BlockHeader) == 64, "the block header is 64 bytes");
 static_assert(offsetof(BlockHeader, streams) == 0x10, "the rand streams sit at 0x10 and 0x14");
 
-struct Chunk {
+struct BlockChunk {
     unsigned int size;
     unsigned int aux;
 };
 
 const unsigned int kFreeBit = 1;
-const unsigned int kChunkHeader = sizeof(Chunk);
+const unsigned int kChunkHeader = sizeof(BlockChunk);
 const unsigned int kMinChunk = 16;
 const unsigned int kFirstChunk = sizeof(BlockHeader);
 
@@ -69,9 +69,9 @@ BlockHeader* Head()
     return (BlockHeader*)g_base;
 }
 
-Chunk* At(unsigned int off)
+BlockChunk* At(unsigned int off)
 {
-    return (Chunk*)(g_base + off);
+    return (BlockChunk*)(g_base + off);
 }
 
 void Prepare()
@@ -84,7 +84,7 @@ void Prepare()
         h->streams[0].holdrand = 1;
         h->streams[1].holdrand = 1;
         h->freeHead = kFirstChunk;
-        Chunk* first = At(kFirstChunk);
+        BlockChunk* first = At(kFirstChunk);
         first->size = ((kSimBlockBytes - kFirstChunk) & ~7u) | kFreeBit;
         first->aux = 0;
     }
@@ -124,12 +124,12 @@ void CountUse(unsigned int bytes)
         h->highWater = h->inUse;
 }
 
-Chunk* Lookup(void* p)
+BlockChunk* Lookup(void* p)
 {
     unsigned int off = (unsigned int)((char*)p - g_base) - kChunkHeader;
     if (g_base == 0 || off >= kSimBlockBytes || off < kFirstChunk || (off & 7) != 0)
         Fatal("pointer is not a sim block");
-    Chunk* c = At(off);
+    BlockChunk* c = At(off);
     if ((c->size & kFreeBit) != 0)
         Fatal("pointer is already free");
     return c;
@@ -142,14 +142,14 @@ void* AllocLocked(unsigned int size)
         unsigned int prev = 0;
         unsigned int off = Head()->freeHead;
         while (off != 0) {
-            Chunk* c = At(off);
+            BlockChunk* c = At(off);
             unsigned int sz = c->size & ~kFreeBit;
             if (sz >= need) {
                 unsigned int next = c->aux;
                 unsigned int link = next;
                 if (sz - need >= kMinChunk) {
                     unsigned int restOff = off + need;
-                    Chunk* rest = At(restOff);
+                    BlockChunk* rest = At(restOff);
                     rest->size = (sz - need) | kFreeBit;
                     rest->aux = next;
                     link = restOff;
@@ -181,7 +181,7 @@ void* AllocLocked(unsigned int size)
 
 void FreeLocked(void* p)
 {
-    Chunk* c = Lookup(p);
+    BlockChunk* c = Lookup(p);
     unsigned int off = (unsigned int)((char*)c - g_base);
     unsigned int sz = c->size;
     Head()->inUse -= sz;
@@ -202,7 +202,7 @@ void FreeLocked(void* p)
         Head()->freeHead = off;
         return;
     }
-    Chunk* before = At(prev);
+    BlockChunk* before = At(prev);
     unsigned int beforeSize = before->size & ~kFreeBit;
     if (prev + beforeSize == off) {
         before->size = (beforeSize + sz) | kFreeBit;
@@ -220,7 +220,7 @@ void* ReallocLocked(void* p, unsigned int size)
         FreeLocked(p);
         return 0;
     }
-    Chunk* c = Lookup(p);
+    BlockChunk* c = Lookup(p);
     unsigned int off = (unsigned int)((char*)c - g_base);
     unsigned int sz = c->size;
     unsigned int old = c->aux;
@@ -228,7 +228,7 @@ void* ReallocLocked(void* p, unsigned int size)
     char* payload = (char*)c + kChunkHeader;
     if (need <= sz) {
         if (sz - need >= kMinChunk) {
-            Chunk* rest = At(off + need);
+            BlockChunk* rest = At(off + need);
             rest->size = sz - need;
             rest->aux = 0;
             c->size = need;
@@ -241,7 +241,7 @@ void* ReallocLocked(void* p, unsigned int size)
     }
     unsigned int nextOff = off + sz;
     if (nextOff < kSimBlockBytes && (At(nextOff)->size & kFreeBit) != 0) {
-        Chunk* n = At(nextOff);
+        BlockChunk* n = At(nextOff);
         unsigned int combined = sz + (n->size & ~kFreeBit);
         if (combined >= need) {
             unsigned int prev = 0;
@@ -253,7 +253,7 @@ void* ReallocLocked(void* p, unsigned int size)
             unsigned int link = n->aux;
             unsigned int total = combined;
             if (combined - need >= kMinChunk) {
-                Chunk* rest = At(off + need);
+                BlockChunk* rest = At(off + need);
                 rest->size = (combined - need) | kFreeBit;
                 rest->aux = n->aux;
                 link = off + need;
@@ -317,7 +317,7 @@ void __cdecl SimBlockForEach(void(__cdecl* fn)(void* payload, unsigned int size,
     Guard guard;
     unsigned int off = kFirstChunk;
     while (off + kMinChunk <= kSimBlockBytes) {
-        Chunk* c = At(off);
+        BlockChunk* c = At(off);
         unsigned int sz = c->size & ~kFreeBit;
         if (sz < kMinChunk || (sz & 7) != 0 || sz > kSimBlockBytes - off)
             break;

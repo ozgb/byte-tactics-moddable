@@ -3,7 +3,7 @@
 
 #include "../util/tdf.h"
 
-struct AnimEntry {
+struct AnimFileEntry {
     char name[0x40];
     void* gaf;
 };
@@ -240,8 +240,8 @@ void* __stdcall LoadAnimGaf(char* name)
     char path[256];
     int i;
     for (i = 0; i < g_game->count_147ab; i++) {
-        if (_strcmpi(((AnimEntry*)g_game->entries_147af)[i].name, name) == 0) {
-            return ((AnimEntry*)g_game->entries_147af)[i].gaf;
+        if (_strcmpi(((AnimFileEntry*)g_game->entries_147af)[i].name, name) == 0) {
+            return ((AnimFileEntry*)g_game->entries_147af)[i].gaf;
         }
     }
     BuildDataPath(path, "anims", name, "GAF");
@@ -249,10 +249,10 @@ void* __stdcall LoadAnimGaf(char* name)
     if (gaf == 0) {
         FatalError(path);
     }
-    g_game->entries_147af = (AnimEntry_00429700*)((AnimEntry*)GameReallocTagged(((AnimEntry*)g_game->entries_147af), "Animation Files",
+    g_game->entries_147af = (AnimEntry_00429700*)((AnimFileEntry*)GameReallocTagged(((AnimFileEntry*)g_game->entries_147af), "Animation Files",
                                              (g_game->count_147ab + 1) * 0x44));
-    strcpy(((AnimEntry*)g_game->entries_147af)[g_game->count_147ab].name, name);
-    ((AnimEntry*)g_game->entries_147af)[g_game->count_147ab].gaf = gaf;
+    strcpy(((AnimFileEntry*)g_game->entries_147af)[g_game->count_147ab].name, name);
+    ((AnimFileEntry*)g_game->entries_147af)[g_game->count_147ab].gaf = gaf;
     g_game->count_147ab++;
     return gaf;
 }
@@ -395,9 +395,9 @@ void FreeAnimFiles()
 {
     int i;
     for (i = 0; i < g_game->count_147ab; i++) {
-        GameFreeThunk(((AnimEntry*)g_game->entries_147af)[i].gaf);
+        GameFreeThunk(((AnimFileEntry*)g_game->entries_147af)[i].gaf);
     }
-    GameFreeThunk(((AnimEntry*)g_game->entries_147af));
+    GameFreeThunk(((AnimFileEntry*)g_game->entries_147af));
     g_game->count_147ab = 0;
     g_game->entries_147af = (AnimEntry_00429700*)(0);
     for (i = 0; i < g_game->sides; i++) {

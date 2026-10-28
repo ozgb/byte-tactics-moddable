@@ -32,15 +32,6 @@ struct FindData_00495930 {
     char name[260];
 };
 
-struct BmpWriter {
-    char unknown_0[0xc];
-    void* file;
-    BmpWriter* Init();
-    bool Open(const char* name, int width, int height);
-    bool WriteRows(void* image, int x, int rows, int unused_4, int y, int unused_6, int srcY);
-    void Close();
-};
-
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 
@@ -254,7 +245,7 @@ void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h
                         srcY = 1;
                     }
                     if (y2 + rows > h) rows = h + sy;
-                    if (!bmp.WriteRows(&surf, w, rows, 0, row, 0, srcY)) break;
+                    if (!bmp.WriteRows((Bitmap_004caec0*)&surf, w, rows, 0, row, 0, srcY)) break;
                     if (var24 < h) {
                         row = row - 1;
                         var10++;

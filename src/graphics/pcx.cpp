@@ -591,19 +591,7 @@ void __stdcall AddObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* offset,
     }
 }
 
-class BmpWriter {
-public:
-    int width;
-    int height;
-    int dataOffset;
-    void* file;
-
-    BmpWriter* Init();
-    void Close();
-    bool Open(const char* name, int w, int h);
-    bool WriteRows(Bitmap_004caec0* image, int x, int rows, int unused_4, int y,
-                      int unused_6, int srcY);
-};
+#include "pcx.h"
 
 // FUNCTION: 0x4cb7c0
 BmpWriter* BmpWriter::Init()

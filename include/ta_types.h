@@ -3099,15 +3099,6 @@ struct Class_00415b90 {
     void FreeBuffer(void);
 };
 
-class BitWriter {
-public:
-    int bit;
-    int index;
-    int capacity;
-    unsigned int* data;
-    unsigned int buffer[256];
-    void WriteBits(int, int);
-};
 
 struct Class_00415da0 {
     char unknown_0[12];
@@ -4726,11 +4717,6 @@ public:
     char unknown_8[4];
     int field_c;
     Class_004379a0_2* ClearPointers(void);
-};
-
-struct Chunk {
-    int field_0;
-    int field_4;
 };
 
 class Class_004379b0 {

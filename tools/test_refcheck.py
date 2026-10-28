@@ -87,7 +87,7 @@ class FieldKindTest(unittest.TestCase):
                  ("void (*[2])()", None, "function-pointer"),
                  ("int (Derived::*)(int) __attribute__((thiscall))", None, "function-pointer"),
                  ("std::vector<int *>", None, "container"), ("SimVector<int>", None, "container"),
-                 ("Vector_00438480<Unit *>", None, "container"), ("SyncTaggedVector<Order>", None, "container"),
+                 ("MsvcVector<Unit *>", None, "container"), ("SyncTaggedVector<Order>", None, "container"),
                  ("Ref<Unit>", None, "ref"), ("Ref<Unit>[4]", None, "ref"), ("Ref<Unit> *", None, "pointer"),
                  ("Unit", None, None), ("Point16[4]", None, None), ("Foo &", None, "pointer"),
                  ("int (*)[4]", None, "pointer")]

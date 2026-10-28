@@ -44,7 +44,7 @@ SOURCE_SUFFIXES = (".cpp", ".h", ".inl")
 
 TYPE_OVERRIDES = {
     "g_explodedPieces": "ExplodedPiece*[100]",
-    "g_missionOrderTableVec": "Vector_00438480<int>",
+    "g_missionOrderTableVec": "MsvcVector<int>",
     "g_missionOrderTableBegin": "char*",
     "g_playerAI": "PlayerAI*[10]",
     "g_quirks": "Quirks",
@@ -76,11 +76,11 @@ VECTOR_CLASS = """#ifndef MAP_VECTOR_00438480_H
 #include <memory>
 
 template <class T, class A = std::allocator<T> >
-class Vector_00438480 {
+class MsvcVector {
 public:
-    explicit Vector_00438480(const A& al = A())
+    explicit MsvcVector(const A& al = A())
         : allocator(al), first(0), last(0), end(0) {}
-    ~Vector_00438480()
+    ~MsvcVector()
     {
         allocator.deallocate(first, end - first);
         first = 0, last = 0, end = 0;
@@ -95,7 +95,7 @@ public:
 #endif
 """
 VECTOR_CLASS_IN_SOURCE = re.compile(
-    r"(?:^//[^\n]*\n)*^template <class T, class A = std::allocator<T> >\nclass Vector_00438480 \{.*?^\};\n\n?",
+    r"(?:^//[^\n]*\n)*^template <class T, class A = std::allocator<T> >\nclass MsvcVector \{.*?^\};\n\n?",
     re.S | re.M)
 
 
@@ -199,7 +199,7 @@ def resolve_plain_type(row: Row) -> str:
         sys.exit(f"simglobals: {row.name} has no row in data/globals.csv and no entry in TYPE_OVERRIDES")
     t = row.type
     if row.leaf == "g_missionOrderTableVec":
-        t = "Vector_00438480<int>"
+        t = "MsvcVector<int>"
     elif "(" not in t and "[]" in t and not row.interior:
         elem = t[:t.index("[")]
         width = 4 if elem.endswith("*") else ELEMENT_SIZES.get(elem)

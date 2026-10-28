@@ -701,7 +701,7 @@ class Class_004c91b0;
 class Class_004c9230;
 class Class_004c9290;
 class Class_004c9310;
-class Class_004c9390;
+class StringRefView;
 class Class_004c93f0;
 class Class_004c9490;
 struct Class_004cb7c0;
@@ -1146,7 +1146,7 @@ union Flags114_485a40;
 union Flags142f0_00466dc0;
 struct Flags16_00493bf0;
 union NetGameFlags;
-struct Flags241_00466dc0;
+struct InterceptorDefFlags;
 struct FlagsBits_0049cc20;
 union FlagsU_00419670;
 struct Flags_004165c0;
@@ -1273,7 +1273,7 @@ struct Holder_00499eb0;
 struct Holder_004a75d0;
 struct Hs_0048a490;
 struct IDirectSound3DBuffer;
-struct IconSet_00466780;
+struct MapTileSet;
 class Id_004df1e0;
 struct Ids_0046d970;
 class GoalDrawInterface;
@@ -1743,7 +1743,7 @@ struct Pos_00473590;
 struct Pos_00473590_2;
 struct Pos_004745e0;
 struct Pos_00474b80;
-struct Pos_0047d2e0;
+struct BuildCenterFixed;
 struct Pos_00485330;
 struct Pos_0048d630;
 struct Pos_004cf570;
@@ -2029,7 +2029,7 @@ struct MapViewFlags;
 struct View_00438c00;
 struct View_0044d8a0;
 struct View_4b5980;
-class Visitor_0047e750;
+class UnitVisitor;
 struct WaveFormat;
 struct WeaponDef;
 struct WeaponType;
@@ -3818,7 +3818,7 @@ struct Pool_00422170 {
 #include "../src/map/class_004c9390.h"
 
 struct Elem_004222e0 {
-    Class_004c9390 name;
+    StringRefView name;
     ~Elem_004222e0(void);
 };
 
@@ -4199,7 +4199,7 @@ public:
     char* GetFieldName(int);
 };
 
-class Class_004c91b0 : public Class_004c9390 {
+class Class_004c91b0 : public StringRefView {
 public:
     Class_004c91b0(char*);
     ~Class_004c91b0(void);
@@ -4363,7 +4363,7 @@ public:
 };
 
 struct Elem_432cb0_2 {
-    Class_004c9390 handle;
+    StringRefView handle;
     int field4;
 };
 
@@ -4457,7 +4457,7 @@ public:
 };
 
 struct Elem_00434a60 {
-    Class_004c9390 name;
+    StringRefView name;
     int value;
     ~Elem_00434a60(void);
 };
@@ -9192,19 +9192,19 @@ struct Entry_00487af0 {
 };
 
 struct Elem_00488a00 {
-    Class_004c9390 name;
+    StringRefView name;
     int value;
     ~Elem_00488a00(void);
 };
 
 struct Elem_00488a00_2 {
-    Class_004c9390 name;
+    StringRefView name;
     int value;
     ~Elem_00488a00_2(void);
 };
 
 struct Elem_00488a00_3 {
-    Class_004c9390 name;
+    StringRefView name;
     void* value;
     ~Elem_00488a00_3(void);
 };
@@ -9217,7 +9217,7 @@ public:
 
 class Class_00489240 {
 public:
-    Class_004c9390 name;
+    StringRefView name;
     int value;
     Class_00489240* AssignCategory(Class_00489240*);
 };
@@ -11426,14 +11426,14 @@ public:
 };
 
 struct Elem_004b75d0 {
-    Class_004c9390 name;
+    StringRefView name;
     int value1;
     int value2;
     ~Elem_004b75d0(void);
 };
 
 struct Elem_004b75d0_2 {
-    Class_004c9390 name;
+    StringRefView name;
     int value1;
     int value2;
     ~Elem_004b75d0_2(void);
@@ -11441,11 +11441,11 @@ struct Elem_004b75d0_2 {
 
 class Class_004b7e30 {
 public:
-    Class_004c9390 handle;
+    StringRefView handle;
     int value1;
     int value2;
     Class_004b7e30(Class_004b7e30&);
-    Class_004b7e30(Class_004c9390&, Pair_00419560);
+    Class_004b7e30(StringRefView&, Pair_00419560);
     ~Class_004b7e30(void);
     Class_004b7e30& operator=(Class_004b7e30&);
 };
@@ -11457,7 +11457,7 @@ struct NameLess_004b7760 {
 
 struct NameNe_004b7760 {
     char unknown_0[1];
-    unsigned char operator()(Class_004c9390&, Class_004c9390&);
+    unsigned char operator()(StringRefView&, StringRefView&);
 };
 
 class Class_004c9290 {
@@ -11468,7 +11468,7 @@ public:
 };
 
 struct Elem_004b75d0_3 {
-    Class_004c9390 name;
+    StringRefView name;
     int value1;
     int value2;
     ~Elem_004b75d0_3(void);
@@ -11480,7 +11480,7 @@ struct NameLess_004b7900 {
 };
 
 struct Elem_004b75d0_4 {
-    Class_004c9390 name;
+    StringRefView name;
     int value1;
     int value2;
     ~Elem_004b75d0_4(void);
@@ -12136,27 +12136,27 @@ public:
 class Class_004c4340 {
 public:
     char unknown_0[1];
-    Class_004c9390 MakeTrimmedString(char*, char*);
-    Class_004c9390* MakeTrimmedString(Class_004c9390*, char*, char*);
+    StringRefView MakeTrimmedString(char*, char*);
+    StringRefView* MakeTrimmedString(StringRefView*, char*, char*);
 };
 
 class Class_004c54a0 {
 public:
-    Class_004c9390 first;
-    Class_004c9390 second;
+    StringRefView first;
+    StringRefView second;
     Class_004c54a0(Class_004c54a0&);
     Class_004c54a0& operator=(Class_004c54a0&);
 };
 
 class Class_004c54d0 {
 public:
-    Class_004c9390 field_0;
-    Class_004c9390 field_4;
+    StringRefView field_0;
+    StringRefView field_4;
     Class_004c54d0(Class_004c54d0&);
-    Class_004c54d0(Class_004c9390&, Class_004c9390&);
+    Class_004c54d0(StringRefView&, StringRefView&);
 };
 
-class Class_004c9180 : public Class_004c9390 {
+class Class_004c9180 : public StringRefView {
 public:
     Class_004c9180(Class_004c9180&);
     Class_004c9180(void);
@@ -12168,7 +12168,7 @@ public:
     char less;
     std::vector<Class_004c54a0> v;
     Class_004c54a0* LowerBound(char*);
-    Class_004c9390* InsertNew(Class_004c54a0*, Class_004c9390&);
+    StringRefView* InsertNew(Class_004c54a0*, StringRefView&);
 };
 
 class Class_004c3e40 {

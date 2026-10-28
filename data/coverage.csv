@@ -282,7 +282,7 @@ map,Mission::SelectMission,src/map/map_list.cpp,1,0,0,0,0,0,?SelectMission@Missi
 map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?ResizePassMap@MovementClass@@QAEXII@Z,1,
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
-map,Vector_00438480::~Vector_00438480,src/map/vector_00438480.h,1,0,0,0,0,0,??1?$Vector_00438480@HV?$allocator@H@std@@@@QAE@XZ,0,shutdown
+map,MsvcVector::~MsvcVector,src/map/vector_00438480.h,1,0,0,0,0,0,??1?$MsvcVector@HV?$allocator@H@std@@@@QAE@XZ,0,shutdown
 map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVVisitor_0047e750@@@Z,1,
 network,*,,287,50,5310,567,2590,117,,73,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,

@@ -1631,7 +1631,7 @@ address,size,file,symbol,status,similarity
 0x47e2d0,658,src/map/terrain.cpp,?CanPlaceFootprintAt@@YGHPAUUnit@@PAUVec3@@@Z,matched,100.0
 0x47e570,75,src/map/terrain.cpp,?IsPadSlotFree@@YGHPAUUnit@@H@Z,matched,100.0
 0x47e5c0,386,src/map/terrain.cpp,?VisitObjectsInArea@@YGXUPoint16@@0PAVClaimFootprintVisitor@@@Z,matched,100.0
-0x47e750,307,src/map/terrain.cpp,?VisitObjectsInRect@@YGXHHHHPAVVisitor_0047e750@@@Z,matched,100.0
+0x47e750,307,src/map/terrain.cpp,?VisitObjectsInRect@@YGXHHHHPAVUnitVisitor@@@Z,matched,100.0
 0x47e890,425,src/map/terrain.cpp,?VisitObjectsInRange@@YGXPAUVec3@@HAAVDamagedAllyCollector@@@Z,matched,100.0
 0x47ea40,746,src/map/terrain.cpp,?PickRandomReclaimableResourcesInRadius@@YGHPAUVec3@@TFixed@@PAPAU1@PAM23@Z,matched,100.0
 0x47ed30,13,src/map/terrain.cpp,?ClaimFootprint@ClaimFootprintVisitor@@UAEXPAUUnit@@@Z,matched,100.0

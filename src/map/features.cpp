@@ -189,7 +189,7 @@ struct Model {
 #include "class_004c9390.h"
 
 struct Elem {
-    Class_004c9390 name;
+    StringRefView name;
 };
 
 #include "../../link/globals.h"
@@ -1342,42 +1342,42 @@ void __stdcall LoadFeatures(HapiBank* file)
     }
 }
 
-typedef std::vector<unsigned short> Vec_004251f0;
-typedef Vec_004251f0::size_type (Vec_004251f0::*SizeFn_004251f0)() const;
+typedef std::vector<unsigned short> UShortVectorSize;
+typedef UShortVectorSize::size_type (UShortVectorSize::*UShortVectorSizeFn)() const;
 
 // FUNCTION: 0x4251f0 ?size@?$vector@GV?$allocator@G@std@@@std@@QBEIXZ
-SizeFn_004251f0 g_size_004251f0 = &Vec_004251f0::size;
+UShortVectorSizeFn g_size_004251f0 = &UShortVectorSize::size;
 
-typedef std::vector<unsigned short> Vec_00425210;
-typedef void (Vec_00425210::*InsertFn_00425210)(
-    Vec_00425210::iterator, Vec_00425210::size_type, const unsigned short&);
+typedef std::vector<unsigned short> UShortVectorInsert;
+typedef void (UShortVectorInsert::*UShortVectorInsertFn)(
+    UShortVectorInsert::iterator, UShortVectorInsert::size_type, const unsigned short&);
 
-void __stdcall Grow_00425210(Vec_00425210* v, int extra)
+void __stdcall ReserveUShortVector(UShortVectorInsert* v, int extra)
 {
     v->reserve(extra + v->size());
 }
 
 // FUNCTION: 0x425210 ?insert@?$vector@GV?$allocator@G@std@@@std@@QAEXPAGIABG@Z
-InsertFn_00425210 g_insert_00425210 = &Vec_00425210::insert;
+UShortVectorInsertFn g_insert_00425210 = &UShortVectorInsert::insert;
 
-typedef std::vector<unsigned short> Vec_00425430;
-typedef Vec_00425430::iterator (Vec_00425430::*EraseFn_00425430)(
-    Vec_00425430::iterator, Vec_00425430::iterator);
+typedef std::vector<unsigned short> UShortVectorErase;
+typedef UShortVectorErase::iterator (UShortVectorErase::*UShortVectorEraseFn)(
+    UShortVectorErase::iterator, UShortVectorErase::iterator);
 
 // FUNCTION: 0x425430 ?erase@?$vector@GV?$allocator@G@std@@@std@@QAEPAGPAG0@Z
-EraseFn_00425430 g_erase_00425430 = &Vec_00425430::erase;
+UShortVectorEraseFn g_erase_00425430 = &UShortVectorErase::erase;
 
-typedef std::vector<TdfFile*> Vec_00425480;
-typedef void (Vec_00425480::*InsertFn_00425480)(
-    Vec_00425480::iterator, Vec_00425480::size_type, TdfFile* const&);
+typedef std::vector<TdfFile*> TdfFileVectorInsert;
+typedef void (TdfFileVectorInsert::*TdfFileVectorInsertFn)(
+    TdfFileVectorInsert::iterator, TdfFileVectorInsert::size_type, TdfFile* const&);
 
-void __stdcall Assign_00425480(Vec_00425480* a, const Vec_00425480* b)
+void __stdcall AssignTdfFileVector(TdfFileVectorInsert* a, const TdfFileVectorInsert* b)
 {
     *a = *b;
 }
 
 // FUNCTION: 0x425480 ?insert@?$vector@PAVTdfFile@@V?$allocator@PAVTdfFile@@@std@@@std@@QAEXPAPAVTdfFile@@IABQAV3@@Z
-InsertFn_00425480 g_insert_00425480 = &Vec_00425480::insert;
+TdfFileVectorInsertFn g_insert_00425480 = &TdfFileVectorInsert::insert;
 
 namespace std {
 // FUNCTION: 0x4256a0 ?copy@std@@YGPAGPAG00@Z

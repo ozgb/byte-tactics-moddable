@@ -84,7 +84,7 @@ struct FeatureSpot;
 struct Font;
 class HapiBank;
 struct FrameTable;
-struct IconSet_00466780;
+struct MapTileSet;
 struct List_00420960;
 class Mission;
 class MissionConditions;
@@ -424,7 +424,7 @@ struct Game {
             unsigned char seaLevel;
             unsigned char debugMode;
             unsigned short mapFlags;
-            IconSet_00466780* iconSet;
+            MapTileSet* iconSet;
             Ref<Cell> cells;
             unsigned short* mapValues;
             Grid grid1;
@@ -603,7 +603,7 @@ struct Game {
         struct {
             char password_2be3[17];
             char unknown_2bf4[71419];
-            RadarTimer_00466dc0 timer;
+            RadarTimer timer;
             char pad_142f3_e[90];
         };
         char name_2be3[64];

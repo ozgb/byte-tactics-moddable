@@ -2,7 +2,7 @@
 #define RADAR_TIMER_00466DC0_H
 
 #pragma pack(push, 1)
-union RadarTimer_00466dc0 {
+union RadarTimer {
     struct {
         short blinkTimer;
         struct {
@@ -33,7 +33,7 @@ union RadarTimer_00466dc0 {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(RadarTimer_00466dc0) == 4, "RadarTimer_00466dc0");
+static_assert(sizeof(RadarTimer) == 4, "RadarTimer");
 #endif
 
 #endif

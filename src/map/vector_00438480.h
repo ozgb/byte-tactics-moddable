@@ -4,11 +4,11 @@
 #include <memory>
 
 template <class T, class A = std::allocator<T> >
-class Vector_00438480 {
+class MsvcVector {
 public:
-    explicit Vector_00438480(const A& al = A())
+    explicit MsvcVector(const A& al = A())
         : allocator(al), first(0), last(0), end(0) {}
-    ~Vector_00438480()
+    ~MsvcVector()
     {
         allocator.deallocate(first, end - first);
         first = 0, last = 0, end = 0;

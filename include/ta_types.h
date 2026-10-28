@@ -6006,24 +6006,6 @@ public:
     ~Class_0044f8a0(void);
 };
 
-class NetCondenser {
-public:
-    char unknown_0[16];
-    char* sendBuffer;
-    char* unknown_14;
-    char* packet;
-    unsigned char flag_1c;
-    int size_1d;
-    int to_21;
-    int SendPacket(void*, int);
-};
-
-class NetPacket {
-public:
-    char unknown_0[1];
-    void DispatchPacket(void);
-};
-
 struct Player_0044feb0 {
     char unknown_0[326];
     unsigned char field_146;
@@ -6046,41 +6028,15 @@ struct Packet_00450f90 {
     Data_0046d970 data;
 };
 
-struct Args_00451640 {
-    char* name;
-    int arg_4;
-    int arg_8;
-    int arg_c;
-    int arg_10;
-    int arg_14;
-    int result;
-};
-
 struct Net2_4517b0 {
     char unknown_0[8];
     char* field_8;
     char* field_c;
 };
 
-struct Net_4517b0 {
-    char unknown_0[4];
-    unsigned int field_4;
-    char* field_8;
-    Net2_4517b0* field_c;
-};
-
 struct Packet_4517b0 {
     unsigned char type;
     Data_0046d970 data;
-};
-
-class Class_00451fd0 {
-public:
-    char unknown_0[2160];
-    unsigned int field_870;
-    char unknown_874[3793];
-    int field_1745;
-    int* field_1749;
 };
 
 struct Class_00452370 {
@@ -6121,14 +6077,6 @@ struct Packet_00452b70 {
 
 #include "../src/network/entry_00463ca0.h"
 
-struct Gui_00453a50 {
-    char unknown_0[4];
-    void* entries;
-    void (__stdcall *callback)(void*);
-    char unknown_c[16];
-    void (__stdcall *field_1c)(void*);
-};
-
 class Class_00456030 {
 public:
     int field_0;
@@ -6164,36 +6112,7 @@ struct Packet {
     int AppendPacket(Packet*, int, void*, unsigned int, int);
 };
 
-struct Settings {
-    int field_471;
-    int flags_475;
-    char unknown_8[72];
-};
-
-struct UnitCreatePacket {
-    unsigned char type;
-    short field_1;
-    short field_3;
-    Vec3 field_5;
-    Rot16 field_11;
-};
-
-struct BuilderLinkPacket {
-    unsigned char type;
-    short field_1;
-    short field_3;
-};
-
-struct UnitScriptCallPacket {
-    unsigned char type;
-    short id;
-    short index;
-    char field_5;
-    int field_6;
-    int field_a;
-    int field_e;
-    int field_12;
-};
+#include "../src/network/settings.h"
 
 struct Packet_00456190 {
     unsigned char type;
@@ -6233,11 +6152,6 @@ struct Msg13_00456310 {
     int start_tick;
     int sent_tick;
     int id;
-};
-
-struct Msg20_00456310 {
-    unsigned char type;
-    Data_0046d970 info;
 };
 
 struct Message_004565a0 {
@@ -6311,12 +6225,6 @@ struct Packet_00457540 {
     float field_2e;
     float field_32;
     float field_36;
-};
-
-struct ShareLosAckPacket {
-    unsigned char type;
-    unsigned char flag;
-    unsigned char flag2;
 };
 
 struct Net_4c9f90 {
@@ -7469,14 +7377,6 @@ public:
     int* FUN_0046e880(int*);
 };
 
-class InsertResult {
-public:
-    Node_0046fad0* first;
-    unsigned char second;
-    char unknown_5[3];
-    InsertResult(Node_0046fad0*&, bool&);
-};
-
 struct Less_0046d2e0 {
     char unknown_0[1];
     unsigned char operator()(unsigned int&, unsigned int&);
@@ -7532,10 +7432,6 @@ struct Packet_0046d530 {
     int field_a;
 };
 
-struct Target_0046d530 {
-    unsigned int id;
-};
-
 struct Packet_0046d5b0 {
     unsigned char type;
     unsigned char arg;
@@ -7567,17 +7463,6 @@ struct Packet_0046d630 {
     unsigned char field_a;
     unsigned char field_b;
     short field_c;
-};
-
-struct Source_0046d630 {
-    int field_0;
-    char unknown_4[4];
-    unsigned char field_8;
-    char unknown_9;
-    unsigned char field_a;
-    char unknown_b;
-    short field_c;
-    char unknown_e[2];
 };
 
 struct Target_0046d630 {
@@ -7674,15 +7559,6 @@ public:
 
 struct Alloc_0046e5c0 {
     char unknown_0[1];
-};
-
-struct SyncTaggedVector {
-    char field_0x0;
-    char unknown_1[3];
-    int field_0x4;
-    int field_0x8;
-    int field_0xc;
-    SyncTaggedVector* InitTaggedVector(char*);
 };
 
 struct Data_0046dad0 {
@@ -7907,16 +7783,6 @@ public:
     char unknown_2[2];
     LiveNode* head;
     LiveNode* FUN_0046fe60(unsigned int*);
-};
-
-class Class_00470250 {
-public:
-    char unknown_0[4];
-    int first;
-    char unknown_8[4];
-    int last;
-    int Capacity(void);
-    unsigned int count(void);
 };
 
 struct Pair_0046faf0 {
@@ -13292,11 +13158,6 @@ public:
     virtual int __stdcall Send(unsigned long, unsigned long, unsigned long, void*, unsigned long);
 };
 
-struct Net_4c97b0 {
-    char unknown_0[1221];
-    DirectPlay_4c97b0* dp;
-};
-
 class DirectPlay_4c9800 {
 public:
     virtual int __stdcall Slot00(void);
@@ -14277,27 +14138,6 @@ public:
     void** CreateSampleFromFile(Class_004bbbe0*, unsigned long, int, int, int);
 };
 
-struct IDirectSound3DBuffer {
-    char unknown_0[4];
-    long __stdcall GetAllParameters(void*);
-    long __stdcall GetConeAngles(unsigned long*, unsigned long*);
-    long __stdcall GetConeOrientation(void*);
-    long __stdcall GetConeOutsideVolume(long*);
-    long __stdcall GetMaxDistance(float*);
-    long __stdcall GetMinDistance(float*);
-    long __stdcall GetMode(unsigned long*);
-    long __stdcall GetPosition(void*);
-    long __stdcall GetVelocity(void*);
-    long __stdcall SetAllParameters(void*, unsigned long);
-    long __stdcall SetConeAngles(unsigned long, unsigned long, unsigned long);
-    long __stdcall SetConeOrientation(float, float, float, unsigned long);
-    long __stdcall SetConeOutsideVolume(long, unsigned long);
-    long __stdcall SetMaxDistance(float, unsigned long);
-    long __stdcall SetMinDistance(float, unsigned long);
-    long __stdcall SetMode(unsigned long, unsigned long);
-    long __stdcall SetPosition(float, float, float, unsigned long);
-};
-
 class Class_004cf800 {
 public:
     char unknown_0[452];
@@ -14492,18 +14332,6 @@ struct S {
 struct TlsBlock {
     char unknown_0[8];
     void* limit;
-};
-
-class StackTrace {
-public:
-    char unknown_0[120];
-    int field_78;
-    int field_7c;
-    char unknown_80[8188];
-    int field_207c;
-    int* field_2080;
-    char dump_text[42060];
-    void CaptureStack(int*, int*, int, int);
 };
 
 class Class_004d9ca0 {
@@ -14975,28 +14803,6 @@ public:
     LiveNode* FUN_004ddc90(unsigned int&);
 };
 
-class MappedFile {
-public:
-    void* hFile;
-    void* hMapping;
-    void* view;
-    int size;
-    int state;
-    MappedFile(char*);
-};
-
-class LoadedImage : public MappedFile {
-public:
-    void* module;
-    unsigned int imageBase;
-    _IMAGE_DOS_HEADER* dosHeader;
-    _IMAGE_NT_HEADERS* ntHeaders;
-    _IMAGE_DEBUG_DIRECTORY* debugDirs;
-    unsigned int numDebugDirs;
-    LoadedImage(void*);
-    ~LoadedImage(void);
-};
-
 class Class_004e1590 {
 public:
     void* hFile;
@@ -15051,20 +14857,6 @@ struct Line_004de550 {
     unsigned long LineNumber;
     unsigned long FileName;
     unsigned long Address;
-};
-
-struct Frame_004de700 {
-    int addrFrame;
-    int unknown_04;
-    int flags0;
-    char unknown_c[12];
-    int addrStack;
-    char unknown_1c[4];
-    int flags1;
-    int handler;
-    char unknown_28[4];
-    int flags2;
-    char unknown_30[64];
 };
 
 struct Sym_004dea00 {
@@ -15879,7 +15671,6 @@ static_assert(sizeof(Class_004cfb40) == 0x28c, "Class_004cfb40 size");
 static_assert(sizeof(Class_004cf180) == 0x1b8, "Class_004cf180 size");
 static_assert(sizeof(Class_004cf230) == 0x28, "Class_004cf230 size");
 static_assert(sizeof(Class_004cf370) == 0x28, "Class_004cf370 size");
-static_assert(sizeof(IDirectSound3DBuffer) == 0x4, "IDirectSound3DBuffer size");
 static_assert(sizeof(Class_004cf800) == 0x1e4, "Class_004cf800 size");
 static_assert(sizeof(Class_004cf8a0) == 0x1e4, "Class_004cf8a0 size");
 static_assert(sizeof(CavedogRegistryKey) == 0x34, "CavedogRegistryKey size");

@@ -132,7 +132,3 @@ static_assert(offsetof(NameTable_004b0830, unknown_0) == 0, "");
 static_assert(offsetof(NameTable_004b0830, count) == 4, "");
 static_assert(offsetof(NameTable_004b0830, unknown_8) == 8, "");
 static_assert(offsetof(NameTable_004b0830, names) == 28, "");
-static_assert(sizeof(Settings) == 80, "");
-static_assert(offsetof(Settings, field_471) == 0, "");
-static_assert(offsetof(Settings, flags_475) == 4, "");
-static_assert(offsetof(Settings, unknown_8) == 8, "");

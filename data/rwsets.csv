@@ -18766,15 +18766,13 @@ address,function,file,kind,target
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,call,Sound::GetCategoryOfTrack
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,call,Sound::GetLockedTrack
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,call,memcpy
-0x45cde0,SaveGameSettings,src/frontend/options.cpp,deref_read,*Los_0045cf60
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_escape,Game::block
-0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_escape,Game::mapFlags_14281
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_escape,Settings_45cde0::block
-0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,<anon>::bit1
-0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,<anon>::bit2
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,Game::gameSpeed
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,Game::scrollSpeed
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,Game::sound
+0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,MapViewFlags::bit1
+0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_read,MapViewFlags::bit2
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_write,OptionsBackupEdgeScroll::i
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_write,OptionsBackupGameSpeed::i
 0x45cde0,SaveGameSettings,src/frontend/options.cpp,field_write,Settings_45cde0::bit0
@@ -19298,13 +19296,10 @@ address,function,file,kind,target
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,call,get
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,call,operator->
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,deref_escape,*Rule_0045f1d0
-0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,deref_read,*Los_0045cf60
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_escape,Game::gui
-0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_escape,Game::mapFlags_14281
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,<anon>::b13
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,<anon>::b14
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,<anon>::b7
-0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,<anon>::l0
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Gadget::count
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Game::commanderDeath
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Game::difficulty
@@ -19313,7 +19308,8 @@ address,function,file,kind,target
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Game::net
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Game::options
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Layer::entries
-0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Los_0045cf60::losFlags
+0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,MapViewFlags::bit0
+0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,MapViewFlags::raw
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Opts_0045f1d0::startEnergy
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Opts_0045f1d0::startMetal
 0x45f1d0,ShowGameSettingsDialog,src/frontend/options.cpp,field_read,Player::info
@@ -19521,13 +19517,10 @@ address,function,file,kind,target
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,call,Sound::GetLockedTrack
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,call,memcpy
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,deref_read,*Bits_0045cf60
-0x460160,OpenOptionsPanel,src/frontend/options.cpp,deref_read,*Los_0045cf60
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_escape,Game::block
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_escape,Game::gui
-0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_escape,Game::mapFlags_14281
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_escape,Game::netGameFlags_2a44
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_escape,Settings_45cde0::block
-0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,<anon>::bit1
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,<anon>::bit2
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Gadget::height
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Gadget::surface
@@ -19538,6 +19531,8 @@ address,function,file,kind,target
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Game::sound
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Gui::layer
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Layer::entries
+0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,MapViewFlags::bit1
+0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,MapViewFlags::bit2
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_read,Surface::pixels
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_write,Layer::handler
 0x460160,OpenOptionsPanel,src/frontend/options.cpp,field_write,OptionsBackupEdgeScroll::i
@@ -21168,16 +21163,10 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,operator Projectile *
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,operator Unit *
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,operator->
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,deref_read,*Flags14281_00466dc0
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,deref_read,*unsigned char
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,deref_write,*int
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,deref_write,*unsigned short
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_escape,Game::mapFlags_14281
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_escape,Game::uiOptionFlags_37f2f
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_escape,Unit::weapons
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::bit0
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::bit1
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::bit9
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::hi
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::interceptor
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::value
@@ -21189,6 +21178,7 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::mapHeight
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::mapWidth
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::mappedSurface
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::matchFlags
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::nuclogo
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::playerIndex
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::posX
@@ -21201,6 +21191,8 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::units
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::unitsEnd
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Game::width_142eb
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,MapViewFlags::bit0
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,MapViewFlags::bit1
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Player::info
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,PlayerInfo::color
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,Projectile::attacker
@@ -23433,11 +23425,11 @@ address,function,file,kind,target
 0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Player::explored
 0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Player::exploredHeight
 0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Player::exploredWidth
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Position_00475470::x
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Position_00475470::y
-0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Position_00475470::z
 0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,SmokeParticle::count
 0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,SmokeParticle::data
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Vec3Words::xWhole
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Vec3Words::yWhole
+0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,field_read,Vec3Words::zWhole
 0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,function,
 0x474b80,SmokeParticle::DrawParticle,src/graphics/particles.cpp,global_read,g_game
 0x474cb0,SmokeParticle::IsExpired,src/graphics/particles.cpp,field_read,SmokeParticle::count
@@ -23514,11 +23506,11 @@ address,function,file,kind,target
 0x474fc0,TimedSubParticle::Step,src/graphics/particles.cpp,global_read,g_game
 0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,call,DrawFrameBlended
 0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,call,GetGafFrame
-0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,field_read,Position_00475150::x
-0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,field_read,Position_00475150::y
-0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,field_read,Position_00475150::z
 0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,field_read,TimedSubParticle::count
 0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,field_read,TimedSubParticle::data
+0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,field_read,Vec3Words::xWhole
+0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,field_read,Vec3Words::yWhole
+0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,field_read,Vec3Words::zWhole
 0x475040,TimedSubParticle::DrawParticle,src/graphics/particles.cpp,function,
 0x475090,TimedSubParticle::IsExpired,src/graphics/particles.cpp,field_read,TimedSubParticle::count
 0x475090,TimedSubParticle::IsExpired,src/graphics/particles.cpp,field_read,TimedSubParticle::limit
@@ -24935,18 +24927,17 @@ address,function,file,kind,target
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [LosRadarSeam::UpdateCellHeightRange]"
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,Blocked_0047d2e0
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,GetCellHeight
-0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,IsExplored_0047d2e0
-0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,IsSeen_0047d2e0
-0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,MapSize_0047d2e0::Contains
+0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,InsideExplored
+0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,IsExploredAtHeight
+0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,IsSeenAtHeight
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,Terrain_0047d2e0
-0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,VisWord_0047d2e0
+0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,VisibilityWord
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,get
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,operator Cell *
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,deref_escape,*Cell
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,deref_read,*Point16
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,deref_read,*unsigned char
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,field_escape,UnitDef::footprintx
-0x47d2e0,CanBuildAt,src/map/terrain.cpp,field_maybe_written,ByteMap_0047d2e0::size
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,field_read,<anon>::hi
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,field_read,Cell::flags
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,field_read,Cell::high
@@ -43706,19 +43697,6 @@ address,function,file,kind,target
 ,ByteMap_00408090::Get,src/ai/byte_map.h,field_read,ByteMap_00408090::data
 ,ByteMap_00408090::Get,src/ai/byte_map.h,field_read,MapSize_00408090::width
 ,ByteMap_00408090::Get,src/ai/byte_map.h,function,
-,ByteMap_004745e0::Get,src/graphics/particles.cpp,call,operator unsigned char *
-,ByteMap_004745e0::Get,src/graphics/particles.cpp,deref_read,*unsigned char
-,ByteMap_004745e0::Get,src/graphics/particles.cpp,field_read,ByteMap_004745e0::data
-,ByteMap_004745e0::Get,src/graphics/particles.cpp,field_read,MapSize_004745e0::width
-,ByteMap_004745e0::Get,src/graphics/particles.cpp,function,
-,ByteMap_0047d2e0::Contains,src/map/terrain.cpp,field_read,MapSize_0047d2e0::height
-,ByteMap_0047d2e0::Contains,src/map/terrain.cpp,field_read,MapSize_0047d2e0::width
-,ByteMap_0047d2e0::Contains,src/map/terrain.cpp,function,
-,ByteMap_0047d2e0::Get,src/map/terrain.cpp,call,operator unsigned char *
-,ByteMap_0047d2e0::Get,src/map/terrain.cpp,deref_read,*unsigned char
-,ByteMap_0047d2e0::Get,src/map/terrain.cpp,field_read,ByteMap_0047d2e0::data
-,ByteMap_0047d2e0::Get,src/map/terrain.cpp,field_read,MapSize_0047d2e0::width
-,ByteMap_0047d2e0::Get,src/map/terrain.cpp,function,
 ,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,call,GameFreeThunk
 ,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,call,SimAllocTagged
 ,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_read,CMemoryCache::base
@@ -44324,11 +44302,11 @@ address,function,file,kind,target
 ,DrawIfVisible,src/graphics/particles.cpp,field_maybe_written,Game::players
 ,DrawIfVisible,src/graphics/particles.cpp,field_maybe_written,SmokeParticle::posw
 ,DrawIfVisible,src/graphics/particles.cpp,field_read,Game::playerIndex
-,DrawIfVisible,src/graphics/particles.cpp,field_read,Position_00475470::x
-,DrawIfVisible,src/graphics/particles.cpp,field_read,Position_00475470::y
-,DrawIfVisible,src/graphics/particles.cpp,field_read,Position_00475470::z
 ,DrawIfVisible,src/graphics/particles.cpp,field_read,SmokeParticle::count
 ,DrawIfVisible,src/graphics/particles.cpp,field_read,SmokeParticle::data
+,DrawIfVisible,src/graphics/particles.cpp,field_read,Vec3Words::xWhole
+,DrawIfVisible,src/graphics/particles.cpp,field_read,Vec3Words::yWhole
+,DrawIfVisible,src/graphics/particles.cpp,field_read,Vec3Words::zWhole
 ,DrawIfVisible,src/graphics/particles.cpp,function,
 ,DrawIfVisible,src/graphics/particles.cpp,global_read,g_game
 ,DrawLoadingBar,src/game/game_load.cpp,call,DrawFrame
@@ -46374,6 +46352,9 @@ address,function,file,kind,target
 ,InsideExplored,src/graphics/particles.cpp,field_read,Player::exploredHeight
 ,InsideExplored,src/graphics/particles.cpp,field_read,Player::exploredWidth
 ,InsideExplored,src/graphics/particles.cpp,function,
+,InsideExplored,src/map/terrain.cpp,field_read,Player::exploredHeight
+,InsideExplored,src/map/terrain.cpp,field_read,Player::exploredWidth
+,InsideExplored,src/map/terrain.cpp,function,
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreatePlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreateSquads
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::DestroyPlayerAI
@@ -47139,18 +47120,19 @@ address,function,file,kind,target
 ,IsExplored,src/graphics/particles.cpp,field_read,Player::explored
 ,IsExplored,src/graphics/particles.cpp,field_read,Player::exploredHeight
 ,IsExplored,src/graphics/particles.cpp,field_read,Player::exploredWidth
-,IsExplored,src/graphics/particles.cpp,field_read,Position_00475470::x
-,IsExplored,src/graphics/particles.cpp,field_read,Position_00475470::y
-,IsExplored,src/graphics/particles.cpp,field_read,Position_00475470::z
+,IsExplored,src/graphics/particles.cpp,field_read,Vec3Words::xWhole
+,IsExplored,src/graphics/particles.cpp,field_read,Vec3Words::yWhole
+,IsExplored,src/graphics/particles.cpp,field_read,Vec3Words::zWhole
 ,IsExplored,src/graphics/particles.cpp,function,
-,IsExplored_0047d2e0,src/map/terrain.cpp,call,ByteMap_0047d2e0::Get
-,IsExplored_0047d2e0,src/map/terrain.cpp,call,MapSize_0047d2e0::Contains
-,IsExplored_0047d2e0,src/map/terrain.cpp,field_maybe_written,ByteMap_0047d2e0::size
-,IsExplored_0047d2e0,src/map/terrain.cpp,field_maybe_written,Los_0047d2e0::explored
-,IsExplored_0047d2e0,src/map/terrain.cpp,field_read,<anon>::hi
-,IsExplored_0047d2e0,src/map/terrain.cpp,field_read,Position_0047d2e0::x
-,IsExplored_0047d2e0,src/map/terrain.cpp,field_read,Position_0047d2e0::z
-,IsExplored_0047d2e0,src/map/terrain.cpp,function,
+,IsExploredAtHeight,src/map/terrain.cpp,call,InsideExplored
+,IsExploredAtHeight,src/map/terrain.cpp,call,operator unsigned char *
+,IsExploredAtHeight,src/map/terrain.cpp,deref_read,*unsigned char
+,IsExploredAtHeight,src/map/terrain.cpp,field_read,<anon>::hi
+,IsExploredAtHeight,src/map/terrain.cpp,field_read,Player::explored
+,IsExploredAtHeight,src/map/terrain.cpp,field_read,Player::exploredWidth
+,IsExploredAtHeight,src/map/terrain.cpp,field_read,Vec3Words::xWhole
+,IsExploredAtHeight,src/map/terrain.cpp,field_read,Vec3Words::zWhole
+,IsExploredAtHeight,src/map/terrain.cpp,function,
 ,IsFlag12,src/ai/ai_player.cpp,field_read,UnitDef::flags2
 ,IsFlag12,src/ai/ai_player.cpp,function,
 ,IsHuman,src/network/net_game.cpp,field_read,Player::active
@@ -47263,31 +47245,21 @@ address,function,file,kind,target
 ,IsSeen,src/graphics/particles.cpp,field_read,Game::visibilityMask
 ,IsSeen,src/graphics/particles.cpp,field_read,Player::exploredHeight
 ,IsSeen,src/graphics/particles.cpp,field_read,Player::exploredWidth
-,IsSeen,src/graphics/particles.cpp,field_read,Position_00475470::x
-,IsSeen,src/graphics/particles.cpp,field_read,Position_00475470::y
-,IsSeen,src/graphics/particles.cpp,field_read,Position_00475470::z
+,IsSeen,src/graphics/particles.cpp,field_read,Vec3Words::xWhole
+,IsSeen,src/graphics/particles.cpp,field_read,Vec3Words::yWhole
+,IsSeen,src/graphics/particles.cpp,field_read,Vec3Words::zWhole
 ,IsSeen,src/graphics/particles.cpp,function,
 ,IsSeen,src/graphics/particles.cpp,global_read,g_game
-,IsSeen_004745e0,src/graphics/particles.cpp,call,MapSize_004745e0::Contains
-,IsSeen_004745e0,src/graphics/particles.cpp,call,operator unsigned short *
-,IsSeen_004745e0,src/graphics/particles.cpp,deref_read,*unsigned short
-,IsSeen_004745e0,src/graphics/particles.cpp,field_maybe_written,ByteMap_004745e0::size
-,IsSeen_004745e0,src/graphics/particles.cpp,field_read,Game::playerIndex
-,IsSeen_004745e0,src/graphics/particles.cpp,field_read,Game::visibilityMask
-,IsSeen_004745e0,src/graphics/particles.cpp,field_read,MapSize_004745e0::width
-,IsSeen_004745e0,src/graphics/particles.cpp,function,
-,IsSeen_004745e0,src/graphics/particles.cpp,global_read,g_game
-,IsSeen_0047d2e0,src/map/terrain.cpp,call,MapSize_0047d2e0::Contains
-,IsSeen_0047d2e0,src/map/terrain.cpp,call,operator unsigned short *
-,IsSeen_0047d2e0,src/map/terrain.cpp,deref_read,*unsigned short
-,IsSeen_0047d2e0,src/map/terrain.cpp,field_maybe_written,ByteMap_0047d2e0::size
-,IsSeen_0047d2e0,src/map/terrain.cpp,field_read,<anon>::hi
-,IsSeen_0047d2e0,src/map/terrain.cpp,field_read,Game::visibilityMask
-,IsSeen_0047d2e0,src/map/terrain.cpp,field_read,MapSize_0047d2e0::width
-,IsSeen_0047d2e0,src/map/terrain.cpp,field_read,Position_0047d2e0::x
-,IsSeen_0047d2e0,src/map/terrain.cpp,field_read,Position_0047d2e0::z
-,IsSeen_0047d2e0,src/map/terrain.cpp,function,
-,IsSeen_0047d2e0,src/map/terrain.cpp,global_read,g_game
+,IsSeenAtHeight,src/map/terrain.cpp,call,InsideExplored
+,IsSeenAtHeight,src/map/terrain.cpp,call,operator unsigned short *
+,IsSeenAtHeight,src/map/terrain.cpp,deref_read,*unsigned short
+,IsSeenAtHeight,src/map/terrain.cpp,field_read,<anon>::hi
+,IsSeenAtHeight,src/map/terrain.cpp,field_read,Game::visibilityMask
+,IsSeenAtHeight,src/map/terrain.cpp,field_read,Player::exploredWidth
+,IsSeenAtHeight,src/map/terrain.cpp,field_read,Vec3Words::xWhole
+,IsSeenAtHeight,src/map/terrain.cpp,field_read,Vec3Words::zWhole
+,IsSeenAtHeight,src/map/terrain.cpp,function,
+,IsSeenAtHeight,src/map/terrain.cpp,global_read,g_game
 ,IsSelectable,src/frontend/multi.cpp,field_read,Player::index
 ,IsSelectable,src/frontend/multi.cpp,field_read,Player::type
 ,IsSelectable,src/frontend/multi.cpp,function,
@@ -47871,12 +47843,6 @@ address,function,file,kind,target
 ,MapSize_00408090::Contains,src/ai/byte_map.h,field_read,MapSize_00408090::height
 ,MapSize_00408090::Contains,src/ai/byte_map.h,field_read,MapSize_00408090::width
 ,MapSize_00408090::Contains,src/ai/byte_map.h,function,
-,MapSize_004745e0::Contains,src/graphics/particles.cpp,field_read,MapSize_004745e0::height
-,MapSize_004745e0::Contains,src/graphics/particles.cpp,field_read,MapSize_004745e0::width
-,MapSize_004745e0::Contains,src/graphics/particles.cpp,function,
-,MapSize_0047d2e0::Contains,src/map/terrain.cpp,field_read,MapSize_0047d2e0::height
-,MapSize_0047d2e0::Contains,src/map/terrain.cpp,field_read,MapSize_0047d2e0::width
-,MapSize_0047d2e0::Contains,src/map/terrain.cpp,function,
 ,MapSlot,src/harness/harness.cpp,deref_read,*unsigned int
 ,MapSlot,src/harness/harness.cpp,function,
 ,MarkOwnerNetDirtyFromDamageSplitNative,src/seams/native.cpp,call,SquadManager::MarkOwnerNetDirtyFromDamageSplit
@@ -48228,10 +48194,8 @@ address,function,file,kind,target
 ,OnRadar_00466dc0,src/map/radar.cpp,call,OnRadarByte_00466dc0
 ,OnRadar_00466dc0,src/map/radar.cpp,call,OnRadarShort_00466dc0
 ,OnRadar_00466dc0,src/map/radar.cpp,call,Player_Get
-,OnRadar_00466dc0,src/map/radar.cpp,deref_read,*Flags14281_00466dc0
-,OnRadar_00466dc0,src/map/radar.cpp,field_escape,Game::mapFlags_14281
-,OnRadar_00466dc0,src/map/radar.cpp,field_read,Flags14281_00466dc0::all
 ,OnRadar_00466dc0,src/map/radar.cpp,field_read,Game::playerIndex
+,OnRadar_00466dc0,src/map/radar.cpp,field_read,MapViewFlags::raw
 ,OnRadar_00466dc0,src/map/radar.cpp,function,
 ,OnRadar_00466dc0,src/map/radar.cpp,global_read,g_game
 ,OnRemoved,src/harness/block_scan.cpp,call,Inside
@@ -48778,16 +48742,16 @@ address,function,file,kind,target
 ,Pos_00409160::Pos_00409160,src/ai/player_ai.h,field_write,Pos_00409160::x
 ,Pos_00409160::Pos_00409160,src/ai/player_ai.h,field_write,Pos_00409160::y
 ,Pos_00409160::Pos_00409160,src/ai/player_ai.h,function,
-,Pos_004745e0::Visible,src/graphics/particles.cpp,call,ByteMap_004745e0::Get
 ,Pos_004745e0::Visible,src/graphics/particles.cpp,call,Identity
-,Pos_004745e0::Visible,src/graphics/particles.cpp,call,IsSeen_004745e0
-,Pos_004745e0::Visible,src/graphics/particles.cpp,call,MapSize_004745e0::Contains
-,Pos_004745e0::Visible,src/graphics/particles.cpp,deref_read,*Map_004745e0
+,Pos_004745e0::Visible,src/graphics/particles.cpp,call,InsideExplored
+,Pos_004745e0::Visible,src/graphics/particles.cpp,call,IsSeen
+,Pos_004745e0::Visible,src/graphics/particles.cpp,call,operator unsigned char *
+,Pos_004745e0::Visible,src/graphics/particles.cpp,deref_read,*unsigned char
 ,Pos_004745e0::Visible,src/graphics/particles.cpp,field_escape,Game::players
-,Pos_004745e0::Visible,src/graphics/particles.cpp,field_maybe_written,ByteMap_004745e0::size
-,Pos_004745e0::Visible,src/graphics/particles.cpp,field_maybe_written,Map_004745e0::explored
 ,Pos_004745e0::Visible,src/graphics/particles.cpp,field_read,Game::mapFlags
 ,Pos_004745e0::Visible,src/graphics/particles.cpp,field_read,Game::playerIndex
+,Pos_004745e0::Visible,src/graphics/particles.cpp,field_read,Player::explored
+,Pos_004745e0::Visible,src/graphics/particles.cpp,field_read,Player::exploredWidth
 ,Pos_004745e0::Visible,src/graphics/particles.cpp,field_read,Pos_004745e0::height
 ,Pos_004745e0::Visible,src/graphics/particles.cpp,field_read,Pos_004745e0::x
 ,Pos_004745e0::Visible,src/graphics/particles.cpp,field_read,Pos_004745e0::y
@@ -50754,14 +50718,14 @@ address,function,file,kind,target
 ,VictoryUnitTypePassesZ::VictoryUnitTypePassesZ,src/game/victory_conditions.h,field_write,VictoryUnitTypePassesZ::name
 ,VictoryUnitTypePassesZ::VictoryUnitTypePassesZ,src/game/victory_conditions.h,field_write,VictoryUnitTypePassesZ::z
 ,VictoryUnitTypePassesZ::VictoryUnitTypePassesZ,src/game/victory_conditions.h,function,
-,VisWord_0047d2e0,src/map/terrain.cpp,call,operator unsigned short *
-,VisWord_0047d2e0,src/map/terrain.cpp,deref_read,*unsigned short
-,VisWord_0047d2e0,src/map/terrain.cpp,field_read,<anon>::hi
-,VisWord_0047d2e0,src/map/terrain.cpp,field_read,Game::visibilityMask
-,VisWord_0047d2e0,src/map/terrain.cpp,field_read,MapSize_0047d2e0::width
-,VisWord_0047d2e0,src/map/terrain.cpp,field_read,Position_0047d2e0::z
-,VisWord_0047d2e0,src/map/terrain.cpp,function,
-,VisWord_0047d2e0,src/map/terrain.cpp,global_read,g_game
+,VisibilityWord,src/map/terrain.cpp,call,operator unsigned short *
+,VisibilityWord,src/map/terrain.cpp,deref_read,*unsigned short
+,VisibilityWord,src/map/terrain.cpp,field_read,<anon>::hi
+,VisibilityWord,src/map/terrain.cpp,field_read,Game::visibilityMask
+,VisibilityWord,src/map/terrain.cpp,field_read,Player::exploredWidth
+,VisibilityWord,src/map/terrain.cpp,field_read,Vec3Words::zWhole
+,VisibilityWord,src/map/terrain.cpp,function,
+,VisibilityWord,src/map/terrain.cpp,global_read,g_game
 ,Visible,src/orders/order_dispatch.cpp,call,operator Player *
 ,Visible,src/orders/order_dispatch.cpp,call,operator unsigned short *
 ,Visible,src/orders/order_dispatch.cpp,call,operator->

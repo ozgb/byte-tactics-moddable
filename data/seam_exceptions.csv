@@ -1,7 +1,10 @@
 subsystem,function,symbol,reason
 ai,BuildTimer::OnTimer,QueueBuildOrder,TODO(#505): sim-to-presentation event
 ai,BuildTimer::TryIssueIdleFactoryBuildOrder,QueueBuildOrder,TODO(#505): sim-to-presentation event
+ai,CmdLimit,CommandArgs::GetArg,TODO(#504): engine service
 ai,CmdLimit,CommandArgs::GetIntArg,TODO(#504): engine service
+ai,CmdPlan,CommandArgs::GetArg,TODO(#504): engine service
+ai,CmdWeight,CommandArgs::GetArg,TODO(#504): engine service
 ai,CmdWeight,CommandArgs::GetFloatArg,TODO(#504): engine service
 ai,DumpPlayerAI,FilePrintf,TODO(#504): engine service
 ai,PAUUnit::?$vector::insert,CopyDwordIfNonNull,TODO(#504): engine service
@@ -40,6 +43,7 @@ economy,VUnitCategory::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to
 economy,VUnitCategory::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
 economy,VUnitDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 economy,VUnitMotion::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+features,CmdFeature,CommandArgs::GetArg,TODO(#504): engine service
 features,D::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,DamageFeature,GetHostDpid,TODO(#506): sim sends a packet
 features,DamageFeature,GetLocalDpid,TODO(#506): sim sends a packet
@@ -280,6 +284,7 @@ players,VictoryKillUnitType::OnUnitDied,PlaySoundByName,TODO(#505): sim-to-prese
 players,VictoryMoveUnitToRadius::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryUnitTypePassesX::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryUnitTypePassesZ::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
+targeting,FindWeaponTarget,Class_004800c0::EraseSwapBack,TODO(#504): engine service
 targeting,PAUUnit::?$vector::insert,CopyDwordIfNonNull,TODO(#504): engine service
 targeting,UGroup::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service

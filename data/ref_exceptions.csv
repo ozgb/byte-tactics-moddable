@@ -70,6 +70,7 @@ Gadget,u.list.callback,function-pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
 Gadget,u.list.field_c2,pointer,src/gui/gui.cpp,#353
 Gadget,u.list.filebuf,pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
 Gadget,u.list.gaf,pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
+Gadget,u.list.lines,pointer,src/gui/gadget.h,#353
 Gadget,u.list.records,pointer,src/gui/gadget.h,#353
 Gadget,u.list.rows,pointer,src/gui/gadget.h|src/gui/gui.cpp,#353
 GafFrame,pixelsOrLayers,pointer,src/graphics/gaf_frame.h,#353

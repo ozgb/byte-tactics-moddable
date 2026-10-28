@@ -600,7 +600,7 @@ struct UnitRestrictRecord {
 #include "../state/sim_globals.h"
 
 struct Dialog;
-struct Struct_004c6ac0;
+struct UnitRestrictPicView;
 
 void RegisterUnitOrders();
 
@@ -4723,7 +4723,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
         if ((short)desc->rowCount > 0) {
             do {
                 if (*p != 0)
-                    FreeSurface((Surface *)((Struct_004c6ac0*)*p));
+                    FreeSurface((Surface *)((UnitRestrictPicView*)*p));
                 p++;
                 i++;
             } while (i < (short)desc->rowCount);

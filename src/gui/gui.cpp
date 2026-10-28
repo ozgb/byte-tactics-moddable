@@ -187,12 +187,12 @@ class SquadManager;
 
 #pragma pack(push, 1)
 
-struct Obj1_49fd20 {
+struct DialogPointView {
     char unknown_0[0x3c];
     DialogMouseEvent data;
 };
 
-struct Obj2_49fd20 {
+struct DialogOriginView {
     char unknown_0[0x13];
     short val_13;
     short val_15;
@@ -375,7 +375,7 @@ bool __stdcall HasFocus(int param_1)
 }
 
 // FUNCTION: 0x49fd20
-void __stdcall FUN_0049fd20(Obj1_49fd20* param_1, Obj2_49fd20* param_2, DialogMouseEvent* param_3)
+void __stdcall FUN_0049fd20(DialogPointView* param_1, DialogOriginView* param_2, DialogMouseEvent* param_3)
 {
     *param_3 = param_1->data;
     param_3->x -= param_2->val_13;

@@ -26,7 +26,7 @@ struct CampaignSetupRecord {
 };
 
 struct Gui;
-struct Src_004ab400;
+struct GafSequenceSource;
 
 #include "../network/player_info.h"
 
@@ -74,7 +74,7 @@ unsigned int GetTicks();
 #include "../ingame/selection.h"
 #include "../ingame/info_panel.h"
 #include "../graphics/pcx.h"
-void __stdcall SetCursorAnimation(Gui* p, Src_004ab400* src);
+void __stdcall SetCursorAnimation(Gui* p, GafSequenceSource* src);
 void ShowSoftwareCursor();
 #include "../gui/keyboard.h"
 void __cdecl LeaveNetGameCallback(int param);

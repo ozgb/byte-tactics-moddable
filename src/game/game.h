@@ -67,18 +67,18 @@ struct AnimFileEntry;
 struct BuildMenuPage;
 struct Cell;
 struct ChatPacket;
-class Class_00437c80;
+class MemoryCacheView;
 struct Class_0045ae80;
-class Class_0046d040;
-struct Class_00472200;
+class UnitSyncView;
+struct ParticleListsView;
 struct Class_0047cb00;
-class Class_004cdb40;
+class SoundView;
 struct ConnectionBlob;
 struct MainFrameDisplayContext;
 struct GameDescEntry;
 struct SoundCategoryEntry;
-struct Entry_00479620;
-struct Eye_00482130;
+struct SkirmishOptionsView;
+struct EyeView;
 struct Feature;
 struct FeatureSpot;
 struct Font;
@@ -93,7 +93,7 @@ struct Projectile;
 class Pathfinder;
 struct PlayerInfo;
 struct SideData;
-struct Src_004ab400;
+struct GafSequenceSource;
 struct LayerHeadView;
 struct Unit;
 struct UnitDef;
@@ -112,7 +112,7 @@ struct Game {
     char* build_date;
     char* build_time;
     MainFrameDisplayContext* displayContext;
-    Class_004cdb40* sound;
+    SoundView* sound;
     union {
         struct {
             char session[4];
@@ -250,7 +250,7 @@ struct Game {
         char message_519[5745];
         char messages[9351];
     };
-    Entry_00479620* options;
+    SkirmishOptionsView* options;
     union {
         struct {
             int loaded[10];
@@ -264,7 +264,7 @@ struct Game {
         int shareVisionReady[11];
         LoadingPlayerSlots slots_29a4;
     };
-    Class_0046d040* sync;
+    UnitSyncView* sync;
     int recvPacketSize;
     union {
         unsigned char* recvPacketPtr;
@@ -420,7 +420,7 @@ struct Game {
             Feature* features;
             Ref<unsigned short> visibilityMask;
             int count_14277;
-            Eye_00482130* eyes;
+            EyeView* eyes;
             unsigned char seaLevel;
             unsigned char debugMode;
             unsigned short mapFlags;
@@ -632,7 +632,7 @@ struct Game {
         unsigned int autoFollowFlags_14373;
     };
     Ref<Class_0045ae80*> types;
-    Class_00437c80* unitTable;
+    MemoryCacheView* unitTable;
     char pad_1437f[4];
     void* xform;
     void* projected;
@@ -712,7 +712,7 @@ struct Game {
     };
     union {
         struct {
-            Src_004ab400* table[1];
+            GafSequenceSource* table[1];
             int cursorAttack;
             int cursorAirstrike;
             int cursorTooFar;
@@ -1097,7 +1097,7 @@ struct Game {
             unsigned char progress_38d73;
             unsigned char shade;
             unsigned short net_flags;
-            Class_00472200* lists_38d77;
+            ParticleListsView* lists_38d77;
             void* moviePlayer;
             unsigned short flags_38d7f;
             int playerCount;

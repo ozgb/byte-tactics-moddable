@@ -1,6 +1,6 @@
 struct,field,kind,file,issue
-Bitmap_00437b50,data,pointer,include/ta_types.h,#353
-Bitmap_00437b50,depth,pointer,include/ta_types.h,#353
+SpotBitmap,data,pointer,include/ta_types.h,#353
+SpotBitmap,depth,pointer,include/ta_types.h,#353
 CMemoryCache,base,int-pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,basePointer,pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,bitmap,pointer,src/graphics/memory_cache.h,#353
@@ -186,7 +186,7 @@ ModelState,owner,pointer,src/graphics/model_types.h,#353
 ModelState,root,pointer,src/graphics/model_types.h,#353
 ModelState,shadow,pointer,src/graphics/model_types.h,#353
 MovementClass,name,pointer,src/units/movement_class.h,#352
-NameTable_004b0830,names,pointer,include/ta_types.h,#353
+ScriptNameTableView,names,pointer,include/ta_types.h,#353
 NetPacketPendingEntry,next,pointer,src/network/packets.cpp,#353
 NetPacketPendingEntry,owner,pointer,src/network/packets.cpp,#353
 NetPacketPendingEntry,prev,pointer,src/network/packets.cpp,#353

@@ -25,14 +25,14 @@ struct Layer {
     Gadget gadgets[200];
 };
 
-struct Src_004ab400;
+struct GafSequenceSource;
 
 struct GafSequenceRef {
     unsigned short index;
     unsigned short value;
     unsigned char kind;
     char unknown_5[3];
-    Src_004ab400* src;
+    GafSequenceSource* src;
 };
 
 struct ActiveBitFlags {
@@ -114,7 +114,7 @@ extern int __stdcall PointInRect(DialogRect* r, int x, int y);
 #include "../util/registry.h"
 extern void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 
-extern void __stdcall InitGafSequence(GafSequenceRef* ref, Src_004ab400* src, int index);
+extern void __stdcall InitGafSequence(GafSequenceRef* ref, GafSequenceSource* src, int index);
 extern int __stdcall GetGafSequenceFrame(GafSequenceRef* ref);
 #include "mouse.h"
 
@@ -487,7 +487,7 @@ int __stdcall AddBarGadget(Gui* obj, AddBarGadgetRecord* record)
 }
 
 // FUNCTION: 0x4ab400
-void __stdcall SetCursorAnimation(Gui* p, Src_004ab400* src)
+void __stdcall SetCursorAnimation(Gui* p, GafSequenceSource* src)
 {
     p->src_2c = src;
     InitGafSequence((GafSequenceRef*)&p->cursorIndex, src, 0);
@@ -495,9 +495,9 @@ void __stdcall SetCursorAnimation(Gui* p, Src_004ab400* src)
     SetCursorSprite(GetGafSequenceFrame((GafSequenceRef*)&p->cursorIndex));
 }
 
-static inline void SetSource(Gui* p, Src_004ab400* src)
+static inline void SetSource(Gui* p, GafSequenceSource* src)
 {
-    if ((Src_004ab400*)p->cursorSrc == src)
+    if ((GafSequenceSource*)p->cursorSrc == src)
         return;
     InitGafSequence((GafSequenceRef*)&p->cursorIndex, src, 0);
     SetCursorSprite(GetGafSequenceFrame((GafSequenceRef*)&p->cursorIndex));
@@ -518,12 +518,12 @@ void __stdcall SetCursorHover(Gui* p, int alt)
 {
     if (alt) {
         if (p->src_28)
-            SetSource(p, (Src_004ab400*)p->src_28);
+            SetSource(p, (GafSequenceSource*)p->src_28);
         else
             SetValue(p, p->cursorHoverFrame);
     } else {
         if (p->src_2c)
-            SetSource(p, (Src_004ab400*)p->src_2c);
+            SetSource(p, (GafSequenceSource*)p->src_2c);
         else
             SetValue(p, p->cursorDefaultFrame);
     }

@@ -97,7 +97,7 @@ static char s_decidedKey[32];
 static int s_decidedLine = 0;
 static int s_loadAhead = 0;
 static const char s_savePath[] = "savegame\\harness.sav";
-using OptionsTable = Table_0047ae60;
+using OptionsTable = SkirmishOptionsTable;
 static const char s_optionsPath[] = "savegame\\harness.opt";
 static OptionsTable s_savedOptions;
 
@@ -870,7 +870,7 @@ static void SetUpSkirmish()
     memset(t, 0, sizeof *t);
     for (int i = 0; i < MAX_PLAYERS; i++) {
         PlayerSpec* p = &s_players[i];
-        Player_0047ae60* slot = &t->players[i];
+        SkirmishOptionsPlayer* slot = &t->players[i];
         slot->active = p->named ? (p->human ? 1 : 2) : 0;
         slot->shade = i % 2;
         if (p->side[0] != '\0') {

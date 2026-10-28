@@ -10,7 +10,7 @@
 #include "game_state.h"
 
 struct Force640x480Display;
-struct Src_004ab400;
+struct GafSequenceSource;
 
 #pragma pack(push, 1)
 #include "../gui/gui.h"
@@ -373,7 +373,7 @@ void InitGame()
     LoadLightTable(g_game->paletteRgba);
     MakeGrayTable(g_game->paletteRgba);
     MakeBlueTable(g_game->paletteRgba);
-    g_game->options = (Entry_00479620*)(GameAllocIgnoreTag(g_skirmishInfoTag, 0x22c));
+    g_game->options = (SkirmishOptionsView*)(GameAllocIgnoreTag(g_skirmishInfoTag, 0x22c));
     LoadSettings();
     size = 0xaa0;
     int ok = ReadGameRegistryValue(g_cdListsKey, &g_cdListsDiscEntries, &size);
@@ -424,11 +424,11 @@ void InitGame()
     g_game->maxUnits_37eec = (unsigned short)(limit);
 }
 
-struct Class_00452370;
+struct PacketBufferOwnerView;
 
 #include "../gui/gui_file.h"
 void ShutdownSound();
-void __stdcall ReleasePacketData(Class_00452370* obj);
+void __stdcall ReleasePacketData(PacketBufferOwnerView* obj);
 
 // FUNCTION: 0x4916a0
 void ShutdownGame(void)
@@ -453,9 +453,9 @@ void ShutdownGame(void)
     RestoreScreen();
     g_seams.orders->ClearOrderTypeTable();
     GameFreeThunk((int*)((void*)g_game->options));
-    g_game->options = (Entry_00479620*)(0);
+    g_game->options = (SkirmishOptionsView*)(0);
     g_seams.units->FreeUnitInfo();
-    ReleasePacketData((Class_00452370*)g_game->chatHudRing);
+    ReleasePacketData((PacketBufferOwnerView*)g_game->chatHudRing);
     g_seams.map->FreeOtaEnumCacheAndMission();
 }
 
@@ -611,7 +611,7 @@ void ShutdownIngameAndQuit()
 
 struct Gui;
 
-void __stdcall SetCursorAnimation(Gui* p, Src_004ab400* src);
+void __stdcall SetCursorAnimation(Gui* p, GafSequenceSource* src);
 
 // FUNCTION: 0x491c80
 void __stdcall SetCursorMode(int n)

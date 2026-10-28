@@ -76,7 +76,7 @@ struct Big_004b1ec0;
 struct NetGameFlagBits;
 struct CursorInputBits;
 struct BitmapInfo_004b5510;
-struct Bitmap_00437b50;
+struct SpotBitmap;
 struct PcxBitmap;
 struct Bitmap_004cb170;
 struct Bits10F_00487080;
@@ -127,7 +127,7 @@ struct DrawListboxFrameCell;
 struct Channel;
 struct Channel_00460f60;
 struct Channel_004b08c0;
-struct Channel_004b0940;
+struct CobChannelView;
 struct Channel_004b0a10;
 struct Channel_004b0b00;
 struct QueryChannelView;
@@ -222,7 +222,7 @@ class Class_004379a0_2;
 class Class_004379b0;
 class Class_00437a20;
 class CMemoryCache;
-class Class_00437c80;
+class MemoryCacheView;
 class MeteorParams;
 class MissionType;
 class Class_00438760_2;
@@ -320,7 +320,7 @@ class Class_0044f9c0_2;
 class NetCondenser;
 class NetPacket;
 class PacketTableOwnerView;
-struct Class_00452370;
+struct PacketBufferOwnerView;
 class Class_00456030;
 class Class_00458180;
 struct Class_004581e0;
@@ -381,7 +381,7 @@ struct FrameTimers;
 struct Class_0046c620;
 class Class_0046cc10;
 class Class_0046cef0;
-class Class_0046d040;
+class UnitSyncView;
 class Class_0046d4c0;
 class Class_0046d630;
 class Class_0046d6c0;
@@ -423,7 +423,7 @@ class Class_00471a50;
 class ParticleSystem;
 struct ParticleSystem;
 class Class_00471d70;
-struct Class_00472200;
+struct ParticleListsView;
 class Class_00472e00;
 struct Class_00472e30;
 struct Class_00472e70;
@@ -710,7 +710,7 @@ struct Class_004cb940;
 class Class_004cd9c0;
 class Class_004cd9d0;
 class Class_004cda00;
-class Class_004cdb40;
+class SoundView;
 class Class_004ce020;
 class Class_004ce1d0;
 class Class_004ce260;
@@ -1046,7 +1046,7 @@ struct ChatHudEntryView;
 struct Entry_00463ef0;
 struct Entry_0046d6c0;
 struct Entry_0046e000;
-struct Entry_00479620;
+struct SkirmishOptionsView;
 struct Entry_0047f8c0;
 struct Entry_0047f990;
 struct Entry_0047fa30;
@@ -1091,7 +1091,7 @@ struct ExceptionName;
 struct Expired;
 struct Explosion;
 struct ExplosionEntry;
-struct Eye_00482130;
+struct EyeView;
 struct F0_00462d30;
 struct F0_00462d30_2;
 union F110_0048ad30;
@@ -1432,7 +1432,7 @@ struct NameLess_004c4630;
 struct NameLess_004c46c0;
 struct NameLess_004c4760;
 struct NameNe_004b7760;
-struct NameTable_004b0830;
+struct ScriptNameTableView;
 struct ReportPlayerName;
 struct Name_004866d0;
 struct SideCommanderName;
@@ -1484,8 +1484,8 @@ struct Node_439d80;
 struct Normal_00424890;
 struct Obj;
 struct Obj18_004aff00;
-struct Obj1_49fd20;
-struct Obj2_49fd20;
+struct DialogPointView;
+struct DialogOriginView;
 struct ResourceAccountView;
 struct Obj_0041b200;
 struct Obj_00423bf0;
@@ -1701,7 +1701,7 @@ struct Player_004689c0;
 struct Player_00473a00;
 struct Player_0047a0e0;
 struct Player_0047acd0;
-struct Player_0047ae60;
+struct SkirmishOptionsPlayer;
 struct Player_00481340;
 struct Player_004813b0;
 struct Player_00481930;
@@ -1862,7 +1862,7 @@ struct SpotState;
 struct ModelChildView;
 struct Sprite_004b94c0;
 struct SrcPiece_00487080;
-struct Src_004ab400;
+struct GafSequenceSource;
 struct Src_004ab5d0;
 struct BlitSourceView;
 struct Src_004b8a80;
@@ -1884,7 +1884,7 @@ struct ReadListBoxFieldsRecord;
 struct Struct_004bcea0;
 struct Struct_004c2ac0;
 struct Struct_004c2ac0_2;
-struct Struct_004c6ac0;
+struct UnitRestrictPicView;
 struct Sub;
 struct WeaponDefRatingView;
 struct LightBarCounters;
@@ -1909,7 +1909,7 @@ struct TurnCostTable;
 struct Table_0041ace0;
 struct Table_004611e0;
 struct Table_0047acd0;
-struct Table_0047ae60;
+struct SkirmishOptionsTable;
 struct DamageTable;
 struct LoadGafIntoSlotGafTable;
 struct Table_004b08c0;
@@ -3087,14 +3087,14 @@ public:
     void* QueuePacket(int, int, void*, unsigned int);
 };
 
-class Class_00437c80 {
+class MemoryCacheView {
 public:
     int length;
     Record_00474cd0* records;
     char unknown_8[4];
     void* handle;
     void* ptr;
-    Class_00437c80* Construct(void);
+    MemoryCacheView* Construct(void);
     void FlushCache(void);
     void ReleaseHandle(int);
     void Destroy(void);
@@ -3223,7 +3223,7 @@ struct Flags_00417300 {
     unsigned short rest : 9;
 };
 
-class Class_004cdb40 {
+class SoundView {
 public:
     int field_0;
     int field_4;
@@ -3547,7 +3547,7 @@ struct Display_0041ec50 {
     int field_614;
 };
 
-struct Entry_00479620 {
+struct SkirmishOptionsView {
     int active;
     int unknown_4;
     int type;
@@ -4064,7 +4064,7 @@ public:
     void ReportParseError(char*);
 };
 
-struct Bitmap_00437b50 {
+struct SpotBitmap {
     unsigned short width;
     unsigned short height;
     short dx;
@@ -5892,7 +5892,7 @@ struct Packet_4517b0 {
     Data_0046d970 data;
 };
 
-struct Class_00452370 {
+struct PacketBufferOwnerView {
     char unknown_0[5961];
     int* buffer;
 };
@@ -6114,11 +6114,11 @@ struct Packet_00457d30 {
 
 struct Class_004581e0 {
     char unknown_0[16];
-    Bitmap_00437b50* shadow;
+    SpotBitmap* shadow;
     int BuildObjectPicture(SpotState*, int, int);
     void MeasureModel(int*, int*, int*, int*, SpotState*, Vec3*);
-    void DrawPieces(Bitmap_00437b50*, SpotState*, int, int);
-    void DrawLitPieces(Bitmap_00437b50*, SpotState*, int, int);
+    void DrawPieces(SpotBitmap*, SpotState*, int, int);
+    void DrawLitPieces(SpotBitmap*, SpotState*, int, int);
 };
 
 class Class_00458310 {
@@ -6216,7 +6216,7 @@ public:
 class Class_0045a610 {
 public:
     char unknown_0[1];
-    void DrawShadowShape(Bitmap_00437b50*, SpotState*);
+    void DrawShadowShape(SpotBitmap*, SpotState*);
 };
 
 struct Class_0045ae80 {
@@ -7553,7 +7553,7 @@ public:
     void CheckUnitAvailable(unsigned int, int);
 };
 
-class Class_0046d040 {
+class UnitSyncView {
 public:
     std::map<unsigned int, Rect> rects;
     std::vector<UnitSyncPlayer> players;
@@ -7567,8 +7567,8 @@ public:
     int field_5c;
     int field_60;
     int field_64;
-    Class_0046d040(int);
-    ~Class_0046d040(void);
+    UnitSyncView(int);
+    ~UnitSyncView(void);
     Iter_0046e330 End(void);
     char* GetSyncStatusText(void);
     int IsPlayerSynced(int);
@@ -7783,9 +7783,9 @@ public:
     void SetLifetime(int);
 };
 
-struct Class_00472200 {
+struct ParticleListsView {
     std::vector<ParticleSystem*> lists[10];
-    ~Class_00472200(void);
+    ~ParticleListsView(void);
     void Add(short, ParticleSystem*);
 };
 
@@ -8323,7 +8323,7 @@ struct Frame_0047ae60 {
     char bf[64];
 };
 
-struct Player_0047ae60 {
+struct SkirmishOptionsPlayer {
     int active;
     int shade;
     int type;
@@ -8333,8 +8333,8 @@ struct Player_0047ae60 {
     char unknown_16[2];
 };
 
-struct Table_0047ae60 {
-    Player_0047ae60 players[11];
+struct SkirmishOptionsTable {
+    SkirmishOptionsPlayer players[11];
     int commanderDeath;
     int mapping;
     int lineOfSight;
@@ -8864,7 +8864,7 @@ public:
     unsigned short FUN_00481470(void);
 };
 
-struct Eye_00482130 {
+struct EyeView {
     void* field_0;
     short* field_4;
     short field_8;
@@ -8874,7 +8874,7 @@ struct Eye_00482130 {
     Vec3 pos;
     int unknown_1c;
     int unknown_20;
-    Eye_00482130& operator=(Eye_00482130&);
+    EyeView& operator=(EyeView&);
 };
 
 struct Flags_142f1_004816a0 {
@@ -10658,7 +10658,7 @@ struct Class_004a6a40 {
     int y;
     int z;
     int unknown_28;
-    Src_004ab400* src_2c;
+    GafSequenceSource* src_2c;
     Handle ref;
     ViewMouseEvent point;
     int field_54;
@@ -10858,11 +10858,11 @@ public:
 class Class_004b0830 {
 public:
     char unknown_0[8];
-    NameTable_004b0830* table;
+    ScriptNameTableView* table;
     int StartThreadByName(char*);
 };
 
-struct NameTable_004b0830 {
+struct ScriptNameTableView {
     int unknown_0;
     int count;
     char unknown_8[20];
@@ -10896,7 +10896,7 @@ struct Table_004b08c0 {
     int* entries;
 };
 
-struct Channel_004b0940 {
+struct CobChannelView {
     int used;
     int id;
     char unknown_8[24];
@@ -10907,9 +10907,9 @@ struct Channel_004b0940 {
 class Class_004b0a70 {
 public:
     int unknown_4;
-    NameTable_004b0830* table;
+    ScriptNameTableView* table;
     char unknown_c[16];
-    Channel_004b0940 channels[8];
+    CobChannelView channels[8];
     int activeCount;
     virtual ~Class_004b0a70(void);
     virtual void v00(void);
@@ -11963,7 +11963,7 @@ struct Obj_004c24b0 {
     int rect_x;
     int rect_y;
     char unknown_19e[20];
-    Bitmap_00437b50* bmp;
+    SpotBitmap* bmp;
     int x;
     int y;
     int* field_1be;
@@ -11976,7 +11976,7 @@ struct App_004c25e0 {
     int cursorX;
     int cursorY;
     char unknown_19e[20];
-    Bitmap_00437b50* sprite;
+    SpotBitmap* sprite;
     int savedX;
     int savedY;
     Surface* saved;
@@ -11996,7 +11996,7 @@ struct Obj_004c2870 {
     char unknown_0[406];
     Rect_004c2870 rect;
     int count;
-    Bitmap_00437b50* bmp;
+    SpotBitmap* bmp;
     int x;
     int y;
     int* field_1be;
@@ -12487,7 +12487,7 @@ struct Fade_004c6890 {
     char unknown_54[16];
 };
 
-struct Struct_004c6ac0 {
+struct UnitRestrictPicView {
     char unknown_0[44];
     unsigned char flags;
 };
@@ -15064,7 +15064,7 @@ struct Rating {
     char energy;
 };
 
-static_assert(sizeof(Class_004cdb40) == 0x294, "Class_004cdb40 size");
+static_assert(sizeof(SoundView) == 0x294, "Class_004cdb40 size");
 static_assert(sizeof(Class_0047bf20) == 0x548, "Class_0047bf20 size");
 static_assert(sizeof(MoviePlayer) == 0x5b8, "MoviePlayer size");
 static_assert(sizeof(Class_0047bf70) == 0x5b4, "Class_0047bf70 size");

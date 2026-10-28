@@ -9,6 +9,7 @@
 
 #include "cob_script.h"
 #include "../util/angles.h"
+#include "../util/vec3.h"
 #include "../quirks/quirks.h"
 
 class UnitRef;

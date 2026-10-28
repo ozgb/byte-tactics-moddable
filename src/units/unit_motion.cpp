@@ -6,6 +6,7 @@
 #include "../debug/debug_lib.h"
 
 #include "cob_script.h"
+#include "../util/vec3.h"
 
 #include "../map/cell.h"
 #include "unit_motion.h"

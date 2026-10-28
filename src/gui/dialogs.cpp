@@ -598,7 +598,7 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
     }
 
     MouseEvent e;
-    if (PeekMouseEvent((MouseQueueEvent *)&e) != 0) {
+    if (PeekMouseEvent(&e) != 0) {
         if (p->layer != 0) {
             DialogRect r;
             GetGadgetScreenRect((char *)p->layer->entries, 0, (Rect *)&r);

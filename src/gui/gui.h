@@ -27,17 +27,11 @@ struct ResetProgressBarDialog;
 struct DialogPointView;
 struct DialogOriginView;
 struct Rect;
-struct DialogMouseEvent;
+#include "mouse_event.h"
 
 #pragma pack(push, 1)
 
 struct Layer;
-
-struct DialogMouseEvent {
-    int x;
-    int y;
-    int unknown_8[4];
-};
 
 struct Dialog {
     union {
@@ -63,7 +57,7 @@ struct Dialog {
     char field_36;
     int field_37;
     char unknown_3b[1];
-    DialogMouseEvent point;
+    MouseEvent point;
     unsigned int flags_54;
     char unknown_58[8];
     int current;
@@ -73,7 +67,7 @@ struct Dialog {
     int field_70;
     int length;
     int field_78;
-    DialogMouseEvent saved;
+    MouseEvent saved;
     short field_94;
     char unknown_96[12];
     int keyCommands;
@@ -154,7 +148,7 @@ int __stdcall GetKeyboardInput(Dialog* obj);
 void __stdcall ClearFocus(Dialog*);
 int __stdcall IsFocused(int, int);
 bool __stdcall HasFocus(int);
-void __stdcall FUN_0049fd20(DialogPointView*, DialogOriginView*, DialogMouseEvent*);
+void __stdcall FUN_0049fd20(DialogPointView*, DialogOriginView*, MouseEvent*);
 void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
 int __stdcall FindAssocListBox(Gadget* entries, int index);
 int __stdcall FindAssocSlider(Gadget* entries, int index);

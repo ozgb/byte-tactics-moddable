@@ -189,7 +189,7 @@ class SquadManager;
 
 struct DialogPointView {
     char unknown_0[0x3c];
-    DialogMouseEvent data;
+    MouseEvent data;
 };
 
 struct DialogOriginView {
@@ -375,7 +375,7 @@ bool __stdcall HasFocus(int param_1)
 }
 
 // FUNCTION: 0x49fd20
-void __stdcall FUN_0049fd20(DialogPointView* param_1, DialogOriginView* param_2, DialogMouseEvent* param_3)
+void __stdcall FUN_0049fd20(DialogPointView* param_1, DialogOriginView* param_2, MouseEvent* param_3)
 {
     *param_3 = param_1->data;
     param_3->x -= param_2->val_13;
@@ -2794,7 +2794,7 @@ struct HandleLabelInputObject {
     char unknown_0[0x18];
     HandleLabelInputHolder* holder;
     char unknown_1c[0x3c - 0x1c];
-    DialogMouseEvent point;
+    MouseEvent point;
     char unknown_54[0x64 - 0x54];
     int focus;
     char unknown_68[0xcc6 - 0x68];
@@ -2811,7 +2811,7 @@ int __stdcall HandleLabelInput(HandleLabelInputObject* obj, int index, char key)
     Gadget* entries = obj->holder->entries;
     Gadget* entry = &entries[index];
     struct HandleLabelInputRect { int x1, y1, x2, y2; } rect;
-    DialogMouseEvent point;
+    MouseEvent point;
     int rel_x, rel_y;
 
     if (entry->hotkey == 0 && (entry->attribs & 0x10))

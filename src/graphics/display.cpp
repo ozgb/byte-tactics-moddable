@@ -529,7 +529,7 @@ int __stdcall HandleHostEvent(host_event* ev)
         return 1;
     }
     e.message = ev->type;
-    PushMouseEvent((MouseQueueEvent *)&e);
+    PushMouseEvent((MouseEvent *)&e);
     return 1;
 }
 

@@ -32,7 +32,7 @@ ConsoleCommand,no,3,include/ta_types.h:12523|src/game/console_commands.cpp:155|s
 DamagedAllyCollector,no,3,include/ta_types.h:2511|src/map/terrain.cpp:90|src/orders/unit_orders.cpp:809,differs,src/orders/unit_orders.cpp
 Def,no,2,src/ai/player_ai.cpp:11|src/orders/unit_orders.cpp:1987,differs,src/ai/player_ai.cpp
 Dialog,no,3,include/ta_types.h:11301|src/gui/file_list.cpp:65|src/gui/gui.cpp:189,differs,src/gui/gui.cpp
-Display,no,2,src/frontend/endgame.cpp:79|src/graphics/surface.cpp:37,differs,src/graphics/surface.cpp
+Display,no,2,src/frontend/endgame.cpp:78|src/graphics/surface.cpp:37,differs,src/graphics/surface.cpp
 DisplayContext,no,4,include/ta_types.h:13037|src/files/hpi.cpp:49|src/graphics/palette.cpp:6|src/gui/keyboard.cpp:16,differs,src/graphics/palette.cpp
 Dst_00440ca0,no,2,include/ta_types.h:5441|src/units/movement_class.cpp:102,differs,src/units/movement_class.cpp
 Dword_0051f410,no,2,include/ta_types.h:11136|src/game/main.cpp:133,differs,src/game/main.cpp
@@ -71,11 +71,11 @@ Frame_004de700,no,2,include/ta_types.h:15557|src/host/win32/crash.cpp:626,differ
 FreeBlockAllocator,no,2,include/ta_types.h:15164|src/debug/debug_lib.cpp:745,differs,src/debug/debug_lib.cpp
 FreeBlockIter,no,3,include/ta_types.h:15063|src/debug/debug_lib.cpp:787|src/debug/free_block_map.cpp:16,differs,src/debug/debug_lib.cpp
 FreeBlockMap,no,3,include/ta_types.h:15128|src/debug/debug_lib.cpp:1066|src/debug/free_block_map.cpp:59,differs,src/debug/debug_lib.cpp
-Gadget,no,8,src/frontend/campaign_menu.cpp:43|src/frontend/endgame.cpp:32|src/frontend/multi.cpp:23|src/frontend/options.cpp:31|src/frontend/skirmish_menu.cpp:20|src/game/players.cpp:59|src/gui/gadget.h:10|src/gui/gui.cpp:61,differs,src/gui/gadget.h
+Gadget,no,8,src/frontend/campaign_menu.cpp:43|src/frontend/endgame.cpp:31|src/frontend/multi.cpp:23|src/frontend/options.cpp:31|src/frontend/skirmish_menu.cpp:20|src/game/players.cpp:59|src/gui/gadget.h:10|src/gui/gui.cpp:61,differs,src/gui/gadget.h
 Gui_00453a50,no,2,include/ta_types.h:6339|src/network/net_game.cpp:873,differs,src/network/net_game.cpp
 Handle,no,2,include/ta_types.h:3837|src/graphics/handle.h:6,differs,src/graphics/handle.h
 HandlerSlot_004b7900,no,2,include/ta_types.h:12543|src/util/commands.cpp:289,differs,src/util/commands.cpp
-Header,no,3,src/files/hpi.cpp:31|src/frontend/endgame.cpp:110|src/frontend/skirmish_menu.cpp:261,differs,src/frontend/endgame.cpp
+Header,no,3,src/files/hpi.cpp:31|src/frontend/endgame.cpp:109|src/frontend/skirmish_menu.cpp:261,differs,src/frontend/endgame.cpp
 IDirectSound3DBuffer,no,2,include/ta_types.h:14781|src/host/win32/sound.cpp:10,differs,src/host/win32/sound.cpp
 IconSet_00466780,no,2,include/ta_types.h:7496|src/map/radar.cpp:33,differs,src/map/radar.cpp
 ImageFrame,no,2,include/ta_types.h:3812|src/weapons/explosions.cpp:35,identical,src/weapons/explosions.cpp
@@ -127,7 +127,7 @@ Obj_004ae410,no,2,include/ta_types.h:11730|src/gui/gui_file.cpp:673,differs,src/
 Obj_004c2380,no,2,include/ta_types.h:13048|src/gui/mouse.cpp:25,differs,src/gui/mouse.cpp
 ObjectState,no,2,src/ingame/info_panel.cpp:73|src/units/unit_script.cpp:25,differs,src/units/unit_script.cpp
 Object_00499c10,no,2,include/ta_types.h:10866|src/weapons/weapons.cpp:253,differs,src/weapons/weapons.cpp
-Options,no,2,src/frontend/endgame.cpp:144|src/game/settings.cpp:17,differs,src/game/settings.cpp
+Options,no,2,src/frontend/endgame.cpp:143|src/game/settings.cpp:17,differs,src/game/settings.cpp
 Outs_t,no,2,include/ta_types.h:9796|src/units/unit_commands.cpp:44,differs,src/units/unit_commands.cpp
 OwnershipTransferPacket,no,3,include/ta_types.h:9800|src/network/net_game.cpp:957|src/units/unit_commands.cpp:316,differs,src/units/unit_commands.cpp
 Packet_0047f300,no,2,include/ta_types.h:9140|src/sound/sound.cpp:61,differs,src/sound/sound.cpp

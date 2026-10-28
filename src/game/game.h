@@ -10,11 +10,11 @@
 #endif
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
-#include "../frontend/bits_00426e80.h"
+#include "../frontend/net_game_flag_low_bits.h"
 #include "../frontend/connection_info.h"
-#include "../frontend/flags37f14_0045cf60.h"
-#include "../frontend/menu_0045b800.h"
-#include "../frontend/player_entry_004777a0.h"
+#include "../frontend/track_option_flags.h"
+#include "../frontend/options_slider_menu.h"
+#include "../frontend/player_info_entry.h"
 #include "../../include/v4i.h"
 #include "../graphics/object3do.h"
 #include "../graphics/piece_frame.h"
@@ -41,8 +41,8 @@
 #include "../map/pool.h"
 #include "../map/radar_timer_00466dc0.h"
 #include "../network/chat_hud_entry.h"
-#include "../network/entry_00463ca0.h"
-#include "../network/player_entry_0046d6c0.h"
+#include "../network/chat_hud_entry_view.h"
+#include "../network/player_id_entry.h"
 #include "../sound/flags_0045c570.h"
 #include "../units/f14373.h"
 #include "../units/name_004864b0.h"
@@ -73,7 +73,7 @@ class Class_0046d040;
 struct Class_00472200;
 struct Class_0047cb00;
 class Class_004cdb40;
-struct Conn_443ff0;
+struct ConnectionBlob;
 struct Ctx_00499890;
 struct GameDescEntry;
 struct Entry_0042f740;
@@ -183,7 +183,7 @@ struct Game {
             char pad_ddb[1040];
             void* surface;
             char pad_11ef[256];
-            Entry_00463ca0 entries[30];
+            ChatHudEntryView entries[30];
             int lobbySyncTick;
             Player players[10];
             char pad_2851[331];
@@ -223,17 +223,17 @@ struct Game {
             char unknown_531[3559];
             ChatHudEntry entries_1318[30];
             char pad_1b88[2];
-            PlayerEntry_004777a0 players_1b8a[10];
+            PlayerInfoEntry players_1b8a[10];
             char pad_2878[296];
         };
         struct {
             Menu_00497ce0 menu_519_18;
             char unknown_531_a[5686];
-            PlayerEntry_0046d6c0 players_1b67[10];
+            PlayerIdEntry players_1b67[10];
             char pad_2855[331];
         };
         struct {
-            Menu_0045b800 menu_519_1c;
+            OptionsSliderMenu menu_519_1c;
             char unknown_535_a[5802];
             PlayerGrid players_1bdf[10];
             char pad_28cd[211];
@@ -310,7 +310,7 @@ struct Game {
     char pad_2a87[20];
     void* list;
     V4i* sessions;
-    Conn_443ff0* conns;
+    ConnectionBlob* conns;
     GameDescEntry* desc;
     char* shared;
     union {
@@ -1250,7 +1250,7 @@ struct Game {
             int pad_39215;
         };
         char providerGuid[16];
-        ConnInfo_443ff0 info;
+        ConnectionInfo info;
     };
     union {
         struct {

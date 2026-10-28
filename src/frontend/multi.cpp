@@ -4358,7 +4358,7 @@ void FillProviderList()
     LoadPictureCached("selconnect2", 1, 0, 0);
     g_game->data[0] = GameAllocIgnoreTag("PROVIDER DESCRIPTIONS", 0x500);
     g_game->sessions = (V4i*)GameAllocIgnoreTag("PROVIDER GUIDS", 0xa0);
-    g_game->conns = (Conn_443ff0*)GameAllocIgnoreTag("DPLAY CONNECTIONS", 0x50);
+    g_game->conns = (ConnectionBlob*)GameAllocIgnoreTag("DPLAY CONNECTIONS", 0x50);
     if (g_game->conns != nullptr)
         memset(g_game->conns, 0, 0x50);
     g_game->net->RefreshMapList(1);

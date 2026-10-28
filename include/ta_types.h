@@ -869,9 +869,9 @@ struct Colour_00478790;
 struct Common_004ad350_2;
 struct Comp_004b2290;
 class MissionCondition;
-struct ConnInfo_443ff0;
+struct ConnectionInfo;
 struct Conn_00443cb0;
-struct Conn_443ff0;
+struct ConnectionBlob;
 struct Conn_4ca100;
 struct Connection_004ca450;
 struct Connection_4c9a70;
@@ -1043,7 +1043,7 @@ struct Entry_00462d30;
 struct Entry_00462d30_2;
 struct Entry_00462d30_3;
 struct Entry_00462d30_4;
-struct Entry_00463ca0;
+struct ChatHudEntryView;
 struct Entry_00463ef0;
 struct Entry_0046d6c0;
 struct Entry_0046e000;
@@ -5936,7 +5936,7 @@ struct Packet_00452b70 {
     int extra;
 };
 
-#include "../src/network/entry_00463ca0.h"
+#include "../src/network/chat_hud_entry_view.h"
 
 class Class_00456030 {
 public:

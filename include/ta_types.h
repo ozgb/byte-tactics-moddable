@@ -178,7 +178,6 @@ class BitWriter;
 struct Class_00415da0;
 class BitReader;
 class Class_00417e00;
-class AIProfileParser;
 class Class_00428d10;
 struct Class_00428f40;
 class Class_00428f60;
@@ -1146,9 +1145,7 @@ union Fix_004736e0;
 union Fix_00473d50;
 union Fix_0047d2e0;
 union Fixed;
-struct FixedParts_00407ae0;
 struct FixedParts_004853b0;
-union Fixed_00407ae0;
 struct Fixed_004239c0;
 struct Fixed_00424050;
 struct Fixed_00485140;
@@ -4190,22 +4187,6 @@ struct Obj_00426e80 {
 };
 
 #include "v4i.h"
-
-class AIProfileParser {
-public:
-    char flag;
-    char unknown_1[127];
-    char* field_80;
-    char* field_84;
-    char* field_88;
-    int field_8c;
-    int field_90;
-    int field_94;
-    AIProfileParser(void);
-    void SetBuffer(char*, int);
-    int NextToken(void);
-    int ReadInt(void);
-};
 
 class Class_00428d10 {
 public:
@@ -15948,15 +15929,6 @@ public:
 #include "../src/ai/squad_timer.h"
 
 #include "../src/ai/group.h"
-
-struct FixedParts_00407ae0 {
-    unsigned int frac : 16;
-    unsigned int whole : 16;
-};
-
-union Fixed_00407ae0 {
-    union { int value; FixedParts_00407ae0 parts; };
-};
 
 class Class_00408620 {
 public:

@@ -31,19 +31,19 @@ struct SkirmishInfo {
     char aMapName[0x100];
 };
 
-struct Entry_004931d0 {
+struct LoadGameGadgetInfo {
     char unknown_0[0xce];
     void* handler;
 };
 
-struct Gadget_004931d0 {
+struct LoadGameGuiLayer {
     char unknown_0[4];
-    Entry_004931d0* info;
+    LoadGameGadgetInfo* info;
     void (__stdcall* handler)(Gui*);
     void* context;
 };
 
-struct Save_00492df0 {
+struct SaveGameScreenState {
     int games;
     int count;
     char path[0x100];
@@ -94,7 +94,7 @@ Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
-Entry_004931d0* __stdcall FindGadgetChecked(void* entries, char* name);
+LoadGameGadgetInfo* __stdcall FindGadgetChecked(void* entries, char* name);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
@@ -126,14 +126,14 @@ void __cdecl LeaveNetGameCallback(int param);
 void __cdecl operator delete(void* p);
 void* __cdecl operator new(unsigned int size);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-Gadget_004931d0* __stdcall LoadGuiLayer(char* sub, const char* name, int flags);
+LoadGameGuiLayer* __stdcall LoadGuiLayer(char* sub, const char* name, int flags);
 #include "../gui/dialogs.h"
 void __stdcall SetCursorAnimation(void* menu, void* data);
 void __stdcall SetDescListCleanupFlag(Gui* menu, int flag);
 const char* __stdcall Translate(const char* key);
 #include "savegame.h"
 
-__inline void DeleteSave_00492360(HapiBank* obj)
+__inline void DeleteHapiBank(HapiBank* obj)
 {
     if (obj) {
         obj->CloseBank();
@@ -388,7 +388,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
             (((HapiBank*)g_game->pendingSaveStore))->HasItem("BetweenMissions")) {
             (*(union Flags_2a44*)&g_game->netGameFlags_2a44).b3 = 1;
             if (((HapiBank*)g_game->pendingSaveStore)) {
-                DeleteSave_00492360(((HapiBank*)g_game->pendingSaveStore));
+                DeleteHapiBank(((HapiBank*)g_game->pendingSaveStore));
                 g_game->pendingSaveStore = (int)(0);
             }
             (*(union Flags_2a44*)&g_game->netGameFlags_2a44).b2 = 0;
@@ -402,7 +402,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
     }
 invalid:
     if (((HapiBank*)g_game->pendingSaveStore)) {
-        DeleteSave_00492360(((HapiBank*)g_game->pendingSaveStore));
+        DeleteHapiBank(((HapiBank*)g_game->pendingSaveStore));
     }
     g_game->pendingSaveStore = (int)(0);
     OpenMessageBox(gadget, (char *)Translate("Invalid savegame file"), 0x140, 1, 1);
@@ -471,7 +471,7 @@ void __stdcall SavedGameSelectHandler(int arg1, int arg2)
 void __stdcall SaveGameScreenHandler(Gui* gadget)
 {
     Gadget* entries = gadget->layer->entries;
-    Save_00492df0 save;
+    SaveGameScreenState save;
     if (gadget->hotGadgetIndex == -1) {
         SetDescListCleanupFlag(gadget, 1);
         if (g_savegameFileNames)
@@ -557,7 +557,7 @@ void ShowSaveGameScreen()
 // FUNCTION: 0x4931d0
 void ShowLoadGameScreen()
 {
-    Gadget_004931d0* gadget = LoadGuiLayer((char*)&g_game->message_519[0], "LOADGAME.GUI", 0x980);
+    LoadGameGuiLayer* gadget = LoadGuiLayer((char*)&g_game->message_519[0], "LOADGAME.GUI", 0x980);
     gadget->handler = LoadGameScreenHandler;
     gadget->context = g_game;
     LoadPictureCached("DLOADGAME2", 0, 0, 0);
@@ -573,7 +573,7 @@ void ShowLoadGameScreen()
     ConfigureListBoxByName((char*)&g_game->message_519[0], "GAMES", g_savegameDescs, count, 0);
     SetGadgetActiveByName((char*)&g_game->message_519[0], "DELETE", 0);
     SetGadgetActiveByName((char*)&g_game->message_519[0], "GAMENAME", 0);
-    Entry_004931d0* entry = FindGadgetChecked(gadget->info, "GAMES");
+    LoadGameGadgetInfo* entry = FindGadgetChecked(gadget->info, "GAMES");
     if (entry != 0) {
         entry->handler = (void*)SavedGameSelectHandler;
     }

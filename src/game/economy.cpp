@@ -9,7 +9,7 @@
 
 #pragma pack(push, 1)
 
-struct Obj_00401320 {
+struct ResourceAccountView {
     float x0;
     float x1;
     float x2;
@@ -42,17 +42,17 @@ class ArrayElement {};
 typedef void (ArrayElement::*ThisFn)();
 
 // FUNCTION: 0x401000 ??_H@YGXPAXIHP6EX0@Z@Z
-struct Elem_00401000 {
-    Elem_00401000();
-    ~Elem_00401000();
+struct ConstructedElement {
+    ConstructedElement();
+    ~ConstructedElement();
     int field_0;
 };
 
-struct Holder_00401000 {
-    Elem_00401000 items[4];
+struct ConstructedElementArray {
+    ConstructedElement items[4];
 };
 
-Holder_00401000 g_holder_00401000;
+ConstructedElementArray g_holder_00401000;
 
 // FUNCTION: 0x401030
 void __stdcall CallOnEachReverse(ArrayElement* base, int stride, int count, ThisFn func)
@@ -155,7 +155,7 @@ int UnitResources::SpendEnergyAndMetal(float energy, float metal)
 }
 
 // FUNCTION: 0x401320
-void __stdcall SettleResourceAccount(Obj_00401320* p, float a, float b)
+void __stdcall SettleResourceAccount(ResourceAccountView* p, float a, float b)
 {
     p->prev1 = p->x1;
     p->prev0 = p->x0;

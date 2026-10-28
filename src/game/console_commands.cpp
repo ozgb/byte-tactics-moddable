@@ -97,14 +97,14 @@ public:
 
 int ScanDirectory(char*, char*);
 
-struct Display_00417a60 {
+struct DebugBreakDisplay {
     char unknown_0[0xf0];
     unsigned short bit0 : 1;
     unsigned short windowed : 1;
     unsigned short bit2_15 : 14;
 };
 
-struct Pos_00417bb0 {
+struct FixedWorldPos {
     unsigned short x_frac;
     short x;
     unsigned short y_frac;
@@ -115,7 +115,7 @@ struct Pos_00417bb0 {
 
 #include "../ai/ai_search_goal.h"
 
-class Iface_00417f30 {
+class GoalDrawInterface {
 public:
     virtual void Method_00();
     virtual void Method_04();
@@ -181,7 +181,7 @@ unsigned int GetTicks();
 #include "../map/meteors.h"
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"
-extern Display_00417a60* GetDisplay();
+extern DebugBreakDisplay* GetDisplay();
 #include "../graphics/display.h"
 #include "../debug/debug_lib.h"
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
@@ -955,10 +955,10 @@ void __stdcall ExecuteCommandLine(char* commandLine, int mask)
     ExecuteCommand(&buf, mask);
 }
 
-int __stdcall GetGroundHeight(Pos_00417bb0* pos);
+int __stdcall GetGroundHeight(FixedWorldPos* pos);
 
 // FUNCTION: 0x417bb0
-void __stdcall WorldToScreenWithHeight(Pos_00417bb0* pos, int* screen_x, int* screen_y)
+void __stdcall WorldToScreenWithHeight(FixedWorldPos* pos, int* screen_x, int* screen_y)
 {
     int height = GetGroundHeight(pos);
     *screen_x = pos->x - g_game->scrollX + 0x80;
@@ -968,16 +968,16 @@ void __stdcall WorldToScreenWithHeight(Pos_00417bb0* pos, int* screen_x, int* sc
 // FUNCTION: 0x417c00
 void __stdcall WorldToScreenTileOffset(int x, int z, int* screen_x, int* screen_y)
 {
-    Pos_00417bb0 pos;
+    FixedWorldPos pos;
     *(int*)&pos.x_frac = x << 16;
     *(int*)&pos.z_frac = z << 16;
     WorldToScreenWithHeight(&pos, screen_x, screen_y);
 }
 
 // FUNCTION: 0x417c70
-void __stdcall DrawWorldDeltaLine(void* surface, Pos_00417bb0* p, short dx, short dz, int color)
+void __stdcall DrawWorldDeltaLine(void* surface, FixedWorldPos* p, short dx, short dz, int color)
 {
-    Pos_00417bb0 pos;
+    FixedWorldPos pos;
     *(int*)&pos.x_frac = (dx << 16) + *(int*)&p->x_frac;
     *(int*)&pos.z_frac = (dz << 16) + *(int*)&p->z_frac;
 
@@ -994,7 +994,7 @@ void __stdcall DrawWorldDeltaLine(void* surface, Pos_00417bb0* p, short dx, shor
 // FUNCTION: 0x417d30
 void __stdcall DrawWorldSegmentLine(void* surface, Point16 from, short dx, short dz, int color)
 {
-    Pos_00417bb0 pos1, pos2;
+    FixedWorldPos pos1, pos2;
     int x1 = from.x << 16;
     int z1 = from.y << 16;
     *(int*)&pos1.x_frac = x1;
@@ -1013,14 +1013,14 @@ void AiSearchGoal::DrawOnSurface(void* surface)
     DrawMapTileSelectionOutline(surface, (short*)&this->owner->cell, (*(int*)&this->owner->footprint), 0xf);
     unsigned char color = g_game->colors[(this->active & 1) ? 9 : 12];
     for (int i = 0; i < this->count - 1; i++) {
-        Pos_00417bb0 p1;
+        FixedWorldPos p1;
         *(int*)&p1.x_frac = this->points[i].x << 16;
         *(int*)&p1.z_frac = this->points[i].y << 16;
         int h = GetGroundHeight(&p1);
         int x1 = p1.x - g_game->scrollX + 0x80;
         int y1 = p1.z - g_game->scrollY - (h >> 1) + 0x20;
 
-        Pos_00417bb0 p2;
+        FixedWorldPos p2;
         *(int*)&p2.x_frac = this->points[i + 1].x << 16;
         *(int*)&p2.z_frac = this->points[i + 1].y << 16;
         h = GetGroundHeight(&p2);
@@ -1032,7 +1032,7 @@ void AiSearchGoal::DrawOnSurface(void* surface)
 }
 
 // FUNCTION: 0x417f30
-void __stdcall DrawSelectedGoal(int ctx, Iface_00417f30*** unit)
+void __stdcall DrawSelectedGoal(int ctx, GoalDrawInterface*** unit)
 {
     if (unit && *unit && **unit) {
         (**unit)->Method_28(ctx);

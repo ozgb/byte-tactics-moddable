@@ -13,12 +13,12 @@ class Mission;
 #pragma pack(push, 1)
 #include "../network/player_info.h"
 
-struct PlayerEntry_004326b0 {
+struct SaveGamePlayerEntry {
     Ref<PlayerInfo> info;
     char unknown_4[0x14b - 4];
 };
 
-struct Options_004326b0 {
+struct SaveGameOptions {
     char unknown_0[0x108];
     int commanderDeath;
     int mapping;
@@ -133,16 +133,16 @@ int __stdcall SaveGameFile(char* path, char* description, int gameId)
     (&file)->SetStringItem(g_missionKey, g_seams.map->GetMissionName(g_game->net));
     (&file)->SetStringItem(g_mapKey, g_seams.map->GetMissionName(g_game->net));
     (&file)->SetIntegerItem(g_difficultyKey, g_game->difficulty);
-    (&file)->SetIntegerItem(g_sideKey, (*(PlayerEntry_004326b0(*)[10])&g_game->players_1b8a)[g_game->localPlayer].info->side);
+    (&file)->SetIntegerItem(g_sideKey, (*(SaveGamePlayerEntry(*)[10])&g_game->players_1b8a)[g_game->localPlayer].info->side);
     (&file)->SetIntegerItem(g_playersKey, g_game->numPlayers);
     (&file)->SetIntegerItem(g_gameTypeKey, g_seams.map->GetGameType(g_game->net));
     (&file)->SetStringItem(g_thumbsKey, g_game->campaignMissionStatus_391cf);
     if (g_seams.map->GetGameType(g_game->net) == 2) {
-        (&file)->SetIntegerItem(g_commanderDeathKey, ((Options_004326b0*)g_game->options)->commanderDeath);
-        (&file)->SetIntegerItem(g_locationKey, ((Options_004326b0*)g_game->options)->location);
-        (&file)->SetIntegerItem(g_mappingKey, ((Options_004326b0*)g_game->options)->mapping);
-        (&file)->SetIntegerItem(g_lineOfSightKey, ((Options_004326b0*)g_game->options)->lineOfSight);
-        (&file)->SetIntegerItem(g_lineOfSightTypeKey, ((Options_004326b0*)g_game->options)->lineOfSightType);
+        (&file)->SetIntegerItem(g_commanderDeathKey, ((SaveGameOptions*)g_game->options)->commanderDeath);
+        (&file)->SetIntegerItem(g_locationKey, ((SaveGameOptions*)g_game->options)->location);
+        (&file)->SetIntegerItem(g_mappingKey, ((SaveGameOptions*)g_game->options)->mapping);
+        (&file)->SetIntegerItem(g_lineOfSightKey, ((SaveGameOptions*)g_game->options)->lineOfSight);
+        (&file)->SetIntegerItem(g_lineOfSightTypeKey, ((SaveGameOptions*)g_game->options)->lineOfSightType);
     }
     if (g_game->mode_391f1 != 6) {
         (&file)->SetIntegerItem(g_betweenMissionsKey, 1);

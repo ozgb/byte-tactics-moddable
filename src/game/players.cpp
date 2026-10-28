@@ -352,14 +352,14 @@ float __stdcall GetMetalUsage(void* param_1)
     return *(float*)((char*)param_1 + 0xa0);
 }
 
-struct Class_464b10 {
+struct NetMetalSource {
     char unknown_0[0x9c];
     float metalIncome;
     float metalUsage;
 };
 
 // FUNCTION: 0x464b10
-float __stdcall GetNetMetal(Class_464b10* param_1)
+float __stdcall GetNetMetal(NetMetalSource* param_1)
 {
     return param_1->metalIncome - param_1->metalUsage;
 }
@@ -515,14 +515,14 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
 #include "../ingame/selection.h"
 void __stdcall SendPlayerEconomy(Player* player, int a, int b);
 
-static int loopCond_00464f80(unsigned char i)
+static int IsPlayerSlotInRange(unsigned char i)
 {
     if (i >= 0xa)
         return 0;
     return 1;
 }
 
-static int more_00464f80(unsigned char i)
+static int HasMorePlayerSlots(unsigned char i)
 {
     if (i < 0xa)
         return 1;
@@ -544,7 +544,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
     g_seams.pathfinding->RunSearches(g_game->pathfinder);
     unsigned char bl = 0;
     for (;;) {
-        if (!loopCond_00464f80(bl))
+        if (!IsPlayerSlotInRange(bl))
             goto next_bl;
         Player* pi;
         if (g_game->players[bl].active == 0)
@@ -812,7 +812,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
         goto skip508;
 
     next_bl:
-        if (!more_00464f80(++bl))
+        if (!HasMorePlayerSlots(++bl))
             break;
     }
 

@@ -5,7 +5,7 @@
 #include "../../interfaces/ref.h"
 
 class HapiBank;
-struct Param_0048e010;
+struct ConditionParams;
 struct Unit;
 
 class MissionCondition {
@@ -33,7 +33,7 @@ public:
     MissionConditions();
     ~MissionConditions() { FreeConditions(); }
     void FreeConditions();
-    void RegisterConditions(Param_0048e010* p);
+    void RegisterConditions(ConditionParams* p);
     void SaveConditions(HapiBank* file);
     void LoadConditions(HapiBank* file);
     int AllVictoryConditionsMet();

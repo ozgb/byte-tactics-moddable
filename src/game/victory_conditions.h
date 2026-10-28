@@ -8,12 +8,12 @@
 struct Unit;
 class HapiBank;
 
-class Listener_0048ff40 {
+class UnitScanVisitor {
 public:
     virtual int VisitUnit(Unit* unit) = 0;
 };
 
-class Listener_0048f250 {
+class RadiusUnitVisitor {
 public:
     virtual void VisitUnit(Unit* unit) = 0;
 };
@@ -32,7 +32,7 @@ public:
     virtual void LoadState(HapiBank* file);
 };
 
-class VictoryKillAllMobileUnits : public MissionCondition, public Listener_0048ff40 {
+class VictoryKillAllMobileUnits : public MissionCondition, public UnitScanVisitor {
 public:
     virtual int VisitUnit(Unit* unit);
     int numUnits;
@@ -43,7 +43,7 @@ public:
 };
 
 #pragma pack(push, 2)
-class VictoryBuildUnitType : public MissionCondition, public Listener_0048ff40 {
+class VictoryBuildUnitType : public MissionCondition, public UnitScanVisitor {
 public:
     virtual int VisitUnit(Unit* unit);
     char name[0x20];
@@ -71,7 +71,7 @@ public:
 };
 
 #pragma pack(push, 2)
-class VictoryKillAllOfType : public MissionCondition, public Listener_0048ff40 {
+class VictoryKillAllOfType : public MissionCondition, public UnitScanVisitor {
 public:
     virtual int VisitUnit(Unit* unit);
     char name[0x20];
@@ -101,7 +101,7 @@ public:
 };
 
 #pragma pack(push, 2)
-class VictoryMoveUnitToRadius : public MissionCondition, public Listener_0048f250 {
+class VictoryMoveUnitToRadius : public MissionCondition, public RadiusUnitVisitor {
 public:
     virtual void VisitUnit(Unit* unit);
     char name[0x20];
@@ -127,7 +127,7 @@ public:
 #pragma pack(pop)
 
 #pragma pack(push, 2)
-class VictoryUnitTypePassesX : public MissionCondition, public Listener_0048ff40 {
+class VictoryUnitTypePassesX : public MissionCondition, public UnitScanVisitor {
 public:
     virtual int VisitUnit(Unit* unit);
     char name[0x20];
@@ -148,7 +148,7 @@ public:
 #pragma pack(pop)
 
 #pragma pack(push, 2)
-class VictoryUnitTypePassesZ : public MissionCondition, public Listener_0048ff40 {
+class VictoryUnitTypePassesZ : public MissionCondition, public UnitScanVisitor {
 public:
     virtual int VisitUnit(Unit* unit);
     char name[0x20];
@@ -185,7 +185,7 @@ public:
     virtual void LoadState(HapiBank* file);
 };
 
-class DefeatAllUnitsKilled : public MissionCondition, public Listener_0048ff40 {
+class DefeatAllUnitsKilled : public MissionCondition, public UnitScanVisitor {
 public:
     virtual int IsSatisfied();
     virtual void SaveState(HapiBank* file);
@@ -194,7 +194,7 @@ public:
 };
 
 #pragma pack(push, 2)
-class DefeatAllUnitsKilledOfType : public MissionCondition, public Listener_0048ff40 {
+class DefeatAllUnitsKilledOfType : public MissionCondition, public UnitScanVisitor {
 public:
     virtual int VisitUnit(Unit* unit);
     char name[0x20];
@@ -233,7 +233,7 @@ public:
     virtual void LoadState(HapiBank* file);
 };
 
-class DefeatAnyUnitPassesX : public MissionCondition, public Listener_0048ff40 {
+class DefeatAnyUnitPassesX : public MissionCondition, public UnitScanVisitor {
 public:
     virtual int VisitUnit(Unit* unit);
     int x;
@@ -244,7 +244,7 @@ public:
     virtual void LoadState(HapiBank* file);
 };
 
-class DefeatAnyUnitPassesZ : public MissionCondition, public Listener_0048ff40 {
+class DefeatAnyUnitPassesZ : public MissionCondition, public UnitScanVisitor {
 public:
     virtual int VisitUnit(Unit* unit);
     int z;

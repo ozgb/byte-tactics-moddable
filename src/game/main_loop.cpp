@@ -20,7 +20,7 @@ struct Flags_38d75 {
 
 #include "../gui/gui.h"
 
-struct Sub_00496db0 {
+struct CampaignSetupRecord {
     char unknown_0[0x96];
     char flag_96;
 };
@@ -32,14 +32,14 @@ struct Src_004ab400;
 
 #include "game.h"
 
-struct Slot_00497080 {
+struct SkirmishSlotResources {
     char unknown_0[0xc];
     int metal;
     int energy;
     char unknown_14[4];
 };
 
-struct TeamDef_00496ee0 {
+struct SkirmishSlotTeam {
     char unknown_0[0x4];
     unsigned char nameIndex;
     char unknown_5[0xc - 0x5];
@@ -295,7 +295,7 @@ void CampaignSetupFrame()
     g_game->numPlayers = 2;
     g_seams.players->SetupPlayerSlot(0, 1);
     g_seams.players->SetupPlayerSlot(1, 2);
-    ((Sub_00496db0*)g_game->p1cd5.get())->flag_96 = 1;
+    ((CampaignSetupRecord*)g_game->p1cd5.get())->flag_96 = 1;
     g_game->mode_391f1 = 5;
     g_game->handler = LoadingScreenFrame;
     SetCloseHandler(LeaveNetGameCallback, 0);
@@ -328,11 +328,11 @@ void __stdcall SetStartingStorageBonus(Player* obj, int height, int width)
 // FUNCTION: 0x496ee0
 void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
 {
-    g_game->players[team].info->side = ((TeamDef_00496ee0*)g_game->options)[team].nameIndex;
-    g_game->players[team].info->color = ((TeamDef_00496ee0*)g_game->options)[team].index2;
+    g_game->players[team].info->side = ((SkirmishSlotTeam*)g_game->options)[team].nameIndex;
+    g_game->players[team].info->color = ((SkirmishSlotTeam*)g_game->options)[team].index2;
     Player* p = &g_game->players[team];
-    int w = ((TeamDef_00496ee0*)g_game->options)[team].size2;
-    int v = ((TeamDef_00496ee0*)g_game->options)[team].size1;
+    int w = ((SkirmishSlotTeam*)g_game->options)[team].size2;
+    int v = ((SkirmishSlotTeam*)g_game->options)[team].size1;
     p->bits_148.started = 1;
     p->energyStorageBonus = (float)(w >= 200 ? w : 200);
     p->metalStorageBonus = (float)(v >= 200 ? v : 200);
@@ -366,7 +366,7 @@ static int IsPlaying(unsigned char i)
     return 0;
 }
 
-static inline void __stdcall SetSize_00496e90(Player* obj, int height, int width)
+static inline void __stdcall SetStartingStorageBonusInline(Player* obj, int height, int width)
 {
     obj->bits_149.storage = 1;
     obj->energyStorageBonus = (float)(width >= 200 ? width : 200);
@@ -380,12 +380,12 @@ void InitStartingResourcesFromSkirmish()
     int w = 0;
     for (int i = 0; i < 10; i++) {
         if (IsPlaying(i)) {
-            Slot_00497080* s = &((Slot_00497080*)g_game->options)[i];
+            SkirmishSlotResources* s = &((SkirmishSlotResources*)g_game->options)[i];
             if (s->metal > h)
                 h = s->metal;
             if (s->energy > w)
                 w = s->energy;
-            SetSize_00496e90(&g_game->players[i], h, w);
+            SetStartingStorageBonusInline(&g_game->players[i], h, w);
         }
     }
 }

@@ -114,7 +114,7 @@ extern int g_cdTrackCategory;
 extern int g_cdNeedsReopenAfterFocus;
 extern DWORD g_lastSoundReapTick;
 
-union Word_0051f522 {
+union DisplayVideoFlags {
     unsigned short value;
     struct {
         unsigned short b0 : 1;
@@ -130,7 +130,7 @@ union Word_0051f522 {
         unsigned short spare : 6;
     } bits;
 };
-union Dword_0051f410 {
+union DisplayContextFlags {
     int value;
     struct {
         unsigned b0 : 1;
@@ -150,7 +150,7 @@ union Dword_0051f410 {
 };
 
 #pragma pack(push, 2)
-struct App_0049e830 {
+struct GameMainDisplayContext {
     int hInstance;
     int nCmdShow;
     int className;
@@ -160,14 +160,14 @@ struct App_0049e830 {
     char unknown_18[0xe0 - 0x18];
     int active;
     char unknown_e4[0xf0 - 0xe4];
-    Dword_0051f410 flags;
+    DisplayContextFlags flags;
     char unknown_f4[0x1fa - 0xf4];
     int startWidth;
     int startHeight;
-    Word_0051f522 video;
+    DisplayVideoFlags video;
 };
 #pragma pack(pop)
-extern App_0049e830 g_displayContext;
+extern GameMainDisplayContext g_displayContext;
 
 
 extern const char DAT_005097f4[];

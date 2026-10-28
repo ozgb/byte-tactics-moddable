@@ -1166,7 +1166,7 @@ struct UnitDefCursorFlags;
 union Flags_0045c570;
 union Flags_0045d280;
 struct SelectionBoxFlags;
-union Flags_004898b0;
+union WeaponSlotFlagBits;
 union Flags_004898b0_2;
 struct OrdersPanelFlags;
 struct GraphicsOptionFlags;
@@ -1271,7 +1271,7 @@ struct Holder_00479bf0;
 struct Holder_004908c0;
 struct Holder_00499eb0;
 struct Holder_004a75d0;
-struct Hs_0048a490;
+struct CornerHeightSample;
 struct IDirectSound3DBuffer;
 struct IconSet_00466780;
 class Id_004df1e0;
@@ -1365,7 +1365,7 @@ struct List_00420960;
 struct List_004be3b0;
 class Listener_00470fb0;
 class Listener_00471120;
-class Listener_004896f0;
+class UnitRefListener;
 class Listener_00489740;
 class RadiusUnitVisitor;
 class UnitScanVisitor;
@@ -1381,7 +1381,7 @@ struct MapGrid;
 struct MapInfo;
 struct MapInfo_00483610;
 struct MapInfo_44dc60;
-struct MapRow_0048a490;
+struct ModelGroundPrimitive;
 struct MapSize_00408090;
 struct MapVertex_0048a490;
 struct Map_0040d7b0;
@@ -1735,7 +1735,7 @@ class PoolAlloc_004db610;
 struct Pool_00422170;
 struct Pool_004232a0;
 struct Pos16_44dc60;
-struct Pos2_0048a490;
+struct XzPoint;
 struct Pos_00409160;
 struct Pos_004658e0;
 struct Pos_00465ac0;
@@ -9264,7 +9264,7 @@ public:
     char unknown_0[4];
     Owner_004896f0* owner;
     Class_004896f0* next;
-    Listener_004896f0* listener;
+    UnitRefListener* listener;
     void ClearRef(void);
 };
 
@@ -9291,14 +9291,14 @@ struct Owner_00489740 {
     Class_00489740* head;
 };
 
-union Flags_004898b0 {
+union WeaponSlotFlagBits {
     union { struct { unsigned char bit0 : 1; unsigned char bit1 : 1; unsigned char bit2 : 1; unsigned char bit3 : 1; unsigned char bit4 : 1; unsigned char rest : 3; } bits; unsigned char all; };
 };
 
 struct Entry_004898b0 {
     Point16 point;
     char unknown_4[23];
-    Flags_004898b0 flags;
+    WeaponSlotFlagBits flags;
 };
 
 class Class_00489800 {

@@ -21,7 +21,7 @@ struct SpotState;
 class PathOrderAttach;
 
 #pragma pack(push, 1)
-struct Point_004898b0 {
+struct AimTargetPair {
     short a;
     short b;
 };

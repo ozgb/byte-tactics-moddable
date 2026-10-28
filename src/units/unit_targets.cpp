@@ -13,13 +13,13 @@
 
 class UnitRef;
 
-class Listener_004896f0 {
+class UnitRefListener {
 public:
     virtual void Notify(int code);
 };
 
 #pragma pack(push, 1)
-struct Target_0048a1e0 {
+struct WeaponDefTargetView {
     char unknown_0[0x68];
     int radius;
     char unknown_6c[0x111 - 0x6c];
@@ -32,7 +32,7 @@ struct Vec3_0048a1e0 {
     int z;
 };
 
-struct Body_0048a1e0 {
+struct UnitMotionBodyView {
     char unknown_0[8];
     Vec3_0048a1e0 offset;
     char unknown_14[0x20 - 0x14];
@@ -45,7 +45,7 @@ struct Body_0048a1e0 {
 
 #include "unit.h"
 
-struct MapInfo_0048a490;
+struct ModelGroundView;
 
 #include "../game/game.h"
 #pragma pack(pop)
@@ -449,7 +449,7 @@ void __stdcall SetWeaponTargetPos(char* param_1, int* param_2, int param_3)
 // FUNCTION: 0x48a0f0
 void __stdcall ClearWeaponTarget(Unit* unit, int index)
 {
-    Point_004898b0* p = (Point_004898b0*)&unit->weapons[index];
+    AimTargetPair* p = (AimTargetPair*)&unit->weapons[index];
     if (p->a != 0 || p->b != (short)0x8000) {
         p->a = 0;
         p->b = (short)0x8000;
@@ -461,7 +461,7 @@ void __stdcall ClearWeaponTarget(Unit* unit, int index)
 // FUNCTION: 0x48a160
 void __stdcall ResetWeaponTarget(Unit* obj, int index)
 {
-    Point_004898b0* p = (Point_004898b0*)&obj->weapons[index];
+    AimTargetPair* p = (AimTargetPair*)&obj->weapons[index];
     p->a = 0;
     p->b = (short)0x8000;
 }
@@ -469,7 +469,7 @@ void __stdcall ResetWeaponTarget(Unit* obj, int index)
 // FUNCTION: 0x48a190
 Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
 {
-    Point_004898b0* p = (Point_004898b0*)&obj->weapons[index];
+    AimTargetPair* p = (AimTargetPair*)&obj->weapons[index];
     if (p->b != (short)0x8000) {
         return 0;
     }
@@ -479,7 +479,7 @@ Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
     return &g_game->units[p->a];
 }
 
-static Vec3_0048a1e0 offset_0048a1e0(Body_0048a1e0* m, __int64 s)
+static Vec3_0048a1e0 ScaleBodyOffset(UnitMotionBodyView* m, __int64 s)
 {
     Vec3_0048a1e0 d;
     d.x = (int)(((__int64)m->offset.x * s) >> 16);
@@ -513,17 +513,17 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
         return 0;
     }
     g_seams.units->GetSweetSpot(def, (Vec3*)pos);
-    if ((e->flags & 2) && !(((Target_0048a1e0*)e->weapon.get())->field_111 & 0x2000000) && def->motion != 0
-        && unit->killCount > 5 && ((Target_0048a1e0*)e->weapon.get())->radius != 0) {
+    if ((e->flags & 2) && !(((WeaponDefTargetView*)e->weapon.get())->field_111 & 0x2000000) && def->motion != 0
+        && unit->killCount > 5 && ((WeaponDefTargetView*)e->weapon.get())->radius != 0) {
         Vec3_0048a1e0 d;
         d.x = unit->pos.x - pos->x;
         d.y = unit->pos.y - pos->y;
         d.z = unit->pos.z - pos->z;
         int dist = (int)sqrt((double)d.x * d.x + (double)d.y * d.y + (double)d.z * d.z);
-        int scale = (int)(((__int64)dist << 16) / ((Target_0048a1e0*)e->weapon.get())->radius);
+        int scale = (int)(((__int64)dist << 16) / ((WeaponDefTargetView*)e->weapon.get())->radius);
         scale = (int)((scale * (__int64)0xcccc) >> 16);
         __int64 s = scale;
-        d = offset_0048a1e0((Body_0048a1e0*)def->motion.get(), s);
+        d = ScaleBodyOffset((UnitMotionBodyView*)def->motion.get(), s);
         pos->x = pos->x + d.x;
         pos->y = pos->y + d.y;
         pos->z = pos->z + d.z;
@@ -549,26 +549,26 @@ struct MapVertex_0048a490 {
     int z;
 };
 
-struct MapRow_0048a490 {
+struct ModelGroundPrimitive {
     char unknown_0[0xc];
     unsigned short* ids;
     char unknown_10[0x20 - 0x10];
 };
 
-struct MapInfo_0048a490 {
+struct ModelGroundView {
     char unknown_0[0xc];
     int count;
     char unknown_10[0x24 - 0x10];
     MapVertex_0048a490* verts;
-    MapRow_0048a490* rows;
+    ModelGroundPrimitive* rows;
 };
 
-struct Pos2_0048a490 {
+struct XzPoint {
     int x;
     int z;
 };
 
-struct Hs_0048a490 {
+struct CornerHeightSample {
     int wx;
     int h;
     int spare;
@@ -577,20 +577,20 @@ struct Hs_0048a490 {
 
 unsigned int GetTicks();
 int __cdecl AngleOfVector(int x, int y);
-void __cdecl RotatePoint2D(unsigned short deg, Pos2_0048a490* p);
+void __cdecl RotatePoint2D(unsigned short deg, XzPoint* p);
 
 // FUNCTION: 0x48a490
 void __stdcall AlignUnitToGround(Unit* u)
 {
-    MapInfo_0048a490* m = ((MapInfo_0048a490 **)g_game->types.get())[u->unitDefIndex];
-    MapRow_0048a490* row = m->rows + m->count;
+    ModelGroundView* m = ((ModelGroundView **)g_game->types.get())[u->unitDefIndex];
+    ModelGroundPrimitive* row = m->rows + m->count;
     if (m->count < 0)
         return;
     {
         int gw, c0;
-        Pos2_0048a490 t;
-        Pos2_0048a490 pts[4];
-        Hs_0048a490 hs[4];
+        XzPoint t;
+        XzPoint pts[4];
+        CornerHeightSample hs[4];
         int k;
         for (k = 0; k < 4; k++) {
             MapVertex_0048a490* v = m->verts + row->ids[k];
@@ -629,7 +629,7 @@ void __stdcall AlignUnitToGround(Unit* u)
                 unsigned int bobClock = g_quirks.hoverBobWallClock ? GetTicks() : g_game->ticks;
                 short p = (short)(((bobClock & 0x1f) + k * 8) * 2048 + u->hoverBobPhase);
                 int s = u->def->maxvelocity / 2;
-                Body_0048a1e0* o = (Body_0048a1e0*)u->motion.get();
+                UnitMotionBodyView* o = (UnitMotionBodyView*)u->motion.get();
                 int q = o->sight;
                 if (q >= s)
                     q = s;

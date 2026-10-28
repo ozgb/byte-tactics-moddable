@@ -4,14 +4,14 @@
 #include "../../interfaces/ref.h"
 
 struct Unit;
-class Listener_004896f0;
+class UnitRefListener;
 
 class UnitRef {
 public:
     void* table;
     Ref<Unit> owner;
     Ref<UnitRef> next;
-    Listener_004896f0* listener;
+    UnitRefListener* listener;
 
     Unit* Get() { do {} while (0); return owner; }
 

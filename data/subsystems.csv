@@ -4389,7 +4389,7 @@ host_window_resize,src/host/win32/window.cpp,platform,folder:src/host/,
 host_window_set_topmost,src/host/win32/window.cpp,platform,folder:src/host/,
 key_state,src/gui/keyboard.cpp,presentation,presentation,
 nblocks,src/files/hpi.cpp,files,folder:src/files/,
-offset_0048a1e0,src/units/unit_targets.cpp,targeting,default:src/units/,targeting
+ScaleBodyOffset,src/units/unit_targets.cpp,targeting,default:src/units/,targeting
 operator delete,src/state/block.cpp,platform,library,
 operator delete[],src/state/block.cpp,game,default,
 operator new,src/state/block.cpp,platform,library,

@@ -20,7 +20,7 @@ ApplyWeaponFirePacket,mismatch,pointer/int cast: definition's type is likely wro
 AssignQuickKey,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 AttachUnitToPiece,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BindModelTextures,mismatch,placeholder type Model_0042a140: left for the type-naming issues
-BindNamedSliderWithCallback,skip,placeholder type Callback_00445e50: left for the type-naming issues
+BindNamedSliderWithCallback,skip,unknown name SliderCallback
 BlitLayers,mismatch,placeholder type Rect_004b6720: left for the type-naming issues
 BlitMenuLayers,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BlitSideLogoToRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -188,7 +188,7 @@ InitGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming
 InitNetConnection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 InitPacketTables,mismatch,placeholder type Class_00451fd0: left for the type-naming issues
 InitProjectile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-InsertShift,skip,placeholder type Item_00485940: left for the type-naming issues
+InsertShift,skip,unknown name QuickSortPred
 InsertionSortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsCountBelowAiLimit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsFootprintVisible,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -215,7 +215,7 @@ MakeBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
 MakeGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
 MirrorObject,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
 OrderSquad,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-Partition,skip,placeholder type Item_00485940: left for the type-naming issues
+Partition,skip,unknown name QuickSortPred
 PickRandomReclaimableResourcesInRadius,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 PlaceFeature,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 PlayLoopingWavMemory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -226,7 +226,7 @@ PlayWavMemory,mismatch,"static risk rule: a convention, parameter count, or non-
 PointInRect,mismatch,pointer/int cast: definition's type is likely wrong
 PopHeapFirst,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 PopMouseEvent,mismatch,fixing it changes the generated code of a caller
-QuickSort,skip,placeholder type Item_00485940: left for the type-naming issues
+QuickSort,skip,unknown name QuickSortPred
 RIReport,mismatch,pointer/int cast: definition's type is likely wrong
 ReadGuiFile,mismatch,placeholder type Elem_004aeac0: left for the type-naming issues
 RefreshPassMapsForUnit,mismatch,placeholder type Struct_00440a70: left for the type-naming issues

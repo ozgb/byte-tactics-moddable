@@ -80,6 +80,8 @@ struct FrameTable {
     void* entries;
 };
 static_assert(sizeof(FrameTable) == 44, "");
+static_assert(offsetof(FrameTable, count) == 0, "");
+static_assert(offsetof(FrameTable, entries) == 40, "");
 
 #include "eye.h"
 
@@ -126,17 +128,7 @@ struct Flags_004848e0 {
 
 #include "../../link/globals.h"
 
-class LosTable {
-public:
-    short GetLosLineCount();
-    void* GetLosLine(short i);
-};
-
-class LosLine {
-public:
-    short GetLosLineStepCount();
-    void GetLosLineStep(short i, int* a, int* b);
-};
+#include "los_lines.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
@@ -1320,7 +1312,7 @@ void __stdcall RevealAroundUnit(SightQuery* params)
             }
             int ref = *params->frameIdx;
             for (short i = 0; (short)i < count; i++) {
-                LosLine* line = (LosLine*)table->GetLosLine(i);
+                LosLine* line = table->GetLosLine(i);
                 short num = line->GetLosLineStepCount();
                 int bestIdx = 0;
                 int j1;
@@ -1329,10 +1321,10 @@ void __stdcall RevealAroundUnit(SightQuery* params)
                 if ((short)num > 0) {
                     j1 = 1;
                     do {
-                        int y2, x2;
-                        line->GetLosLineStep((short)j, &x2, &y2);
-                        x2 += x;
-                        y2 += y;
+                        unsigned short sx, sy;
+                        line->GetLosLineStep((short)j, &sx, &sy);
+                        int x2 = sx + x;
+                        int y2 = sy + y;
                         if ((unsigned)(short)x2 < grid->width &&
                             (unsigned)(short)y2 < grid->height) {
                             unsigned char* c =
@@ -1515,7 +1507,7 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
         (*ExploredCell(player, x, y))--;
         int ref = *params->frameIdx;
         for (i = 0; i < count; i++) {
-            LosLine* line = (LosLine*)table->GetLosLine(i);
+            LosLine* line = table->GetLosLine(i);
             short num = line->GetLosLineStepCount();
             int bestIdx = 0;
             int j1;
@@ -1524,11 +1516,10 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
             if ((short)num > 0) {
                 j1 = 1;
                 do {
-                    int dx;
-                    int dy;
-                    line->GetLosLineStep(j, &dx, &dy);
-                    dx += x;
-                    dy += y;
+                    unsigned short sx, sy;
+                    line->GetLosLineStep(j, &sx, &sy);
+                    int dx = sx + x;
+                    int dy = sy + y;
                     if ((unsigned)(short)dx >= grid->width)
                         continue;
                     if ((unsigned)(short)dy >= grid->height)
@@ -1607,7 +1598,7 @@ void __stdcall AddLineOfSight(SightQuery* params)
         (*ExploredCell(player, x, y))++;
         int ref = *params->frameIdx;
         for (i = 0; i < count; i++) {
-            LosLine* line = (LosLine*)table->GetLosLine(i);
+            LosLine* line = table->GetLosLine(i);
             short num = line->GetLosLineStepCount();
             int bestIdx = 0;
             int j1;
@@ -1616,11 +1607,10 @@ void __stdcall AddLineOfSight(SightQuery* params)
             if ((short)num > 0) {
                 j1 = 1;
                 do {
-                    int dx;
-                    int dy;
-                    line->GetLosLineStep(j, &dx, &dy);
-                    dx += x;
-                    dy += y;
+                    unsigned short sx, sy;
+                    line->GetLosLineStep(j, &sx, &sy);
+                    int dx = sx + x;
+                    int dy = sy + y;
                     if ((unsigned)(short)dx >= grid->width)
                         continue;
                     if ((unsigned)(short)dy >= grid->height)

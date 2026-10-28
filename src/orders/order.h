@@ -13,7 +13,6 @@ class HapiBank;
 struct Feature;
 struct Point;
 struct OrderSaveRecord;
-struct Head_0043a1f0;
 struct OrderTableEntryView;
 
 #pragma pack(push, 1)

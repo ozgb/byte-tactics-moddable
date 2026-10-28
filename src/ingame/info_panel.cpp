@@ -51,7 +51,7 @@ struct RadarJamUnit {
     unsigned int flags;
 };
 
-struct Object_004cb650;
+struct Object3do;
 
 #include "../units/unit.h"
 #include "../weapons/weapon_def.h"
@@ -133,13 +133,13 @@ struct LogoFrameSize {
     unsigned short h;
 };
 
-struct Mission_00467e50 {
+struct OrderQueueNode {
     char pad_0[5];
     unsigned char state;
     char pad_6[0x16 - 0x6];
     Ref<Unit> target;
     char pad_1a[0x4a - 0x1a];
-    Ref<Mission_00467e50> next;
+    Ref<OrderQueueNode> next;
 };
 
 #include "../orders/order_type_entry.h"
@@ -225,7 +225,7 @@ void __stdcall PlaySoundByName(char* name, int param_2);
 #include "../gui/keyboard.h"
 #include "../gui/gui.h"
 
-void __stdcall GetObjectBounds(Object_004cb650* obj, Vec3* lo, Vec3* hi, int arg);
+void __stdcall GetObjectBounds(Object3do* obj, Vec3* lo, Vec3* hi, int arg);
 #include "info_panel.h"
 
 int __stdcall GetGafSequenceFrame(short* ref);
@@ -559,7 +559,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
     int lineH;
     int y;
     int prev;
-    Mission_00467e50* m;
+    OrderQueueNode* m;
 
     if (g_game->unitInfoHoverTrack == 0 || g_game->unitInfoHoverUnitId == 0)
         return 0;
@@ -629,7 +629,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
         if (((void *)unit->list) != 0) {
             DrawString(surface, "Mission Q:", 0x86, y, -1);
             y += lineH;
-            for (m = (Mission_00467e50*)((void *)unit->list); m != 0;
+            for (m = reinterpret_cast<OrderQueueNode*>(unit->list.get()); m != 0;
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
@@ -646,7 +646,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
         if (((void *)unit->list2) != 0) {
             DrawString(surface, "Background Mission Q:", 0x86, y, -1);
             y += lineH;
-            for (m = (Mission_00467e50*)((void *)unit->list2); m != 0;
+            for (m = reinterpret_cast<OrderQueueNode*>(unit->list2.get()); m != 0;
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
@@ -1354,7 +1354,7 @@ void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
     if (f->flag) {
         Vec3 lo;
         Vec3 hi;
-        GetObjectBounds(((Object_004cb650 **)g_game->types.get())[unit->unitDefIndex], &lo, &hi, 0);
+        GetObjectBounds(((Object3do **)g_game->types.get())[unit->unitDefIndex], &lo, &hi, 0);
         Vec3 corners[4];
         corners[0].x = lo.x;
         corners[0].y = lo.y;

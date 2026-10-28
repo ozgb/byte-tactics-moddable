@@ -823,11 +823,7 @@ struct DplConnectionView {
     DPNAME* name;
 };
 
-struct DisplayFlagsView {
-    char unknown_0[0xf0];
-    unsigned short bit0 : 1;
-    unsigned short flag : 1;
-};
+#include "../game/display_flags_view.h"
 
 struct LobbyJoinArgs {
     char* name;
@@ -882,8 +878,6 @@ struct ChatPacket {
     unsigned char type;
     char text[0x40];
 };
-
-void Unused_00452960(int a, int b, int c, int d, int e);
 
 struct AllyFlagsPacket {
     unsigned char type;
@@ -1062,7 +1056,7 @@ int __stdcall JoinLobbyGame(Player* p)
         if (host_thread_start(JoinLobbyGameEntry, 0x8000, args)) {
             if (host_event_wait(args->event, 40000) == 0) {
                 SetCursorMode(0x13);
-                if (GetDisplay()->flag) {
+                if (GetDisplay()->fullscreen) {
                     ToggleFullScreen();
                     host_sleep_ms(500);
                 }
@@ -1155,7 +1149,7 @@ int __stdcall JoinNetGame(JoinGuidView guid, int player)
         if (g_game->dplConnection != 0) {
             result = JoinLobbyGame(p);
             if (result == 0) {
-                if (GetDisplay()->flag) {
+                if (GetDisplay()->fullscreen) {
                     ToggleFullScreen();
                     host_sleep_ms(500);
                 }
@@ -2794,8 +2788,6 @@ void __stdcall BroadcastBuilderLink(Unit* obj, Unit* target)
 
 #pragma pack(push, 1)
 
-void Unused_004565a0(int a, int b, int c, int d, int e, int f);
-
 struct UnitScriptCallPacket {
     unsigned char type;
     short id;
@@ -2829,10 +2821,6 @@ struct LoadProgressPacket {
     unsigned char progress;
 };
 
-void Unused_00457050(int a, int b, int c, int d, int e, int f);
-
-void Unused_004571c0(int a, int b, int c, int d, int e, int f);
-
 struct PlayerViewStatePacket {
     unsigned char type;
     unsigned char shareFlag;
@@ -2852,15 +2840,11 @@ struct PlayerViewStatePacket {
     float metalWasted;
 };
 
-void Unused_00457540(int a, int b, int c, int d, int e, int f);
-
 struct ShareLosAckPacket {
     unsigned char type;
     unsigned char ackLos;
     unsigned char ackMapping;
 };
-
-void Unused_00457d30(int a, int b, int c, int d, int e, int f);
 
 #pragma pack(pop)
 

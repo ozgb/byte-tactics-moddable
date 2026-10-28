@@ -16501,7 +16501,7 @@ address,function,file,kind,target
 0x451640,JoinLobbyGame,src/network/net_game.cpp,call,operator->
 0x451640,JoinLobbyGame,src/network/net_game.cpp,field_escape,Game::net_14
 0x451640,JoinLobbyGame,src/network/net_game.cpp,field_escape,PlayerInfo::password
-0x451640,JoinLobbyGame,src/network/net_game.cpp,field_read,DisplayFlagsView::flag
+0x451640,JoinLobbyGame,src/network/net_game.cpp,field_read,DisplayFlagsView::fullscreen
 0x451640,JoinLobbyGame,src/network/net_game.cpp,field_read,LobbyJoinArgs::event
 0x451640,JoinLobbyGame,src/network/net_game.cpp,field_read,LobbyJoinArgs::result
 0x451640,JoinLobbyGame,src/network/net_game.cpp,field_read,Player::info
@@ -16562,7 +16562,7 @@ address,function,file,kind,target
 0x4517b0,JoinNetGame,src/network/net_game.cpp,field_maybe_written,PlayerInfo::password
 0x4517b0,JoinNetGame,src/network/net_game.cpp,field_read,DPNAME::lpszLongNameA
 0x4517b0,JoinNetGame,src/network/net_game.cpp,field_read,DPNAME::lpszShortNameA
-0x4517b0,JoinNetGame,src/network/net_game.cpp,field_read,DisplayFlagsView::flag
+0x4517b0,JoinNetGame,src/network/net_game.cpp,field_read,DisplayFlagsView::fullscreen
 0x4517b0,JoinNetGame,src/network/net_game.cpp,field_read,DplConnectionView::flags
 0x4517b0,JoinNetGame,src/network/net_game.cpp,field_read,DplConnectionView::name
 0x4517b0,JoinNetGame,src/network/net_game.cpp,field_read,Game::dplConnection
@@ -21391,8 +21391,8 @@ address,function,file,kind,target
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,call,SetFont
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,call,SetTextColors
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,call,get
-0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,call,operator Mission_00467e50 *
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,call,operator Order *
+0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,call,operator OrderQueueNode *
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,call,operator!=
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,call,operator->
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,call,sprintf
@@ -21403,9 +21403,9 @@ address,function,file,kind,target
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Game::unitInfoHoverTrack
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Game::unitInfoHoverUnitId
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Game::units
-0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Mission_00467e50::next
-0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Mission_00467e50::state
-0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Mission_00467e50::target
+0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,OrderQueueNode::next
+0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,OrderQueueNode::state
+0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,OrderQueueNode::target
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,OrderTableEntry::name
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Rect::bottom
 0x467e50,DrawUnitStateProbe,src/ingame/info_panel.cpp,field_read,Rect::right
@@ -21744,7 +21744,7 @@ address,function,file,kind,target
 0x46a530,DrawSelectionBox,src/ingame/info_panel.cpp,call,DrawRotatedQuadOutline
 0x46a530,DrawSelectionBox,src/ingame/info_panel.cpp,call,GetObjectBounds
 0x46a530,DrawSelectionBox,src/ingame/info_panel.cpp,call,get
-0x46a530,DrawSelectionBox,src/ingame/info_panel.cpp,deref_read,*Object_004cb650
+0x46a530,DrawSelectionBox,src/ingame/info_panel.cpp,deref_read,*Object3do
 0x46a530,DrawSelectionBox,src/ingame/info_panel.cpp,field_escape,Unit::angles
 0x46a530,DrawSelectionBox,src/ingame/info_panel.cpp,field_read,Game::scrollX
 0x46a530,DrawSelectionBox,src/ingame/info_panel.cpp,field_read,Game::scrollY
@@ -27764,18 +27764,18 @@ address,function,file,kind,target
 0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
 0x488810,QuickSort,src/units/unit_commands.cpp,call,PointerSpanBytes
 0x488810,QuickSort,src/units/unit_commands.cpp,call,QuickSort
-0x488810,QuickSort,src/units/unit_commands.cpp,deref_read,*Item_00485940
-0x488810,QuickSort,src/units/unit_commands.cpp,deref_write,*Item_00485940
+0x488810,QuickSort,src/units/unit_commands.cpp,deref_read,*Player
+0x488810,QuickSort,src/units/unit_commands.cpp,deref_write,*Player
 0x488810,QuickSort,src/units/unit_commands.cpp,function,
-0x488810,QuickSort,src/units/unit_commands.cpp,indirect_call,"indirect via int (*)(Item_00485940 *, Item_00485940 *) __attribute__((stdcall)) [pred]"
-0x488920,InsertShift,src/units/unit_commands.cpp,deref_read,*Item_00485940
-0x488920,InsertShift,src/units/unit_commands.cpp,deref_write,*Item_00485940
+0x488810,QuickSort,src/units/unit_commands.cpp,indirect_call,"indirect via int (*)(Player *, Player *) __attribute__((stdcall)) [pred]"
+0x488920,InsertShift,src/units/unit_commands.cpp,deref_read,*Player
+0x488920,InsertShift,src/units/unit_commands.cpp,deref_write,*Player
 0x488920,InsertShift,src/units/unit_commands.cpp,function,
-0x488920,InsertShift,src/units/unit_commands.cpp,indirect_call,"indirect via int (*)(Item_00485940 *, Item_00485940 *) __attribute__((stdcall)) [pred]"
-0x488960,Partition,src/units/unit_commands.cpp,deref_read,*Item_00485940
-0x488960,Partition,src/units/unit_commands.cpp,deref_write,*Item_00485940
+0x488920,InsertShift,src/units/unit_commands.cpp,indirect_call,"indirect via int (*)(Player *, Player *) __attribute__((stdcall)) [pred]"
+0x488960,Partition,src/units/unit_commands.cpp,deref_read,*Player
+0x488960,Partition,src/units/unit_commands.cpp,deref_write,*Player
 0x488960,Partition,src/units/unit_commands.cpp,function,
-0x488960,Partition,src/units/unit_commands.cpp,indirect_call,"indirect via int (*)(Item_00485940 *, Item_00485940 *) __attribute__((stdcall)) [pred]"
+0x488960,Partition,src/units/unit_commands.cpp,indirect_call,"indirect via int (*)(Player *, Player *) __attribute__((stdcall)) [pred]"
 0x488a00,NameLessNoCase,src/units/unit_commands.cpp,call,_strcmpi
 0x488a00,NameLessNoCase,src/units/unit_commands.cpp,function,
 0x488a50,FindUnitType,src/units/unit_commands.cpp,call,NameLessNoCase
@@ -33870,14 +33870,14 @@ address,function,file,kind,target
 0x49fd10,HasFocus,src/gui/gui.cpp,deref_read,*int
 0x49fd10,HasFocus,src/gui/gui.cpp,function,
 0x49fd20,FUN_0049fd20,src/gui/gui.cpp,call,operator=
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,deref_write,*Vec6_49fd20
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,Obj1_49fd20::data
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,Obj2_49fd20::val_13
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,Obj2_49fd20::val_15
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,Vec6_49fd20::x
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,Vec6_49fd20::y
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_write,Vec6_49fd20::x
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_write,Vec6_49fd20::y
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,deref_write,*DialogMouseEvent
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogMouseEvent::x
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogMouseEvent::y
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogOriginView::val_13
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogOriginView::val_15
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogPointView::data
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_write,DialogMouseEvent::x
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_write,DialogMouseEvent::y
 0x49fd20,FUN_0049fd20,src/gui/gui.cpp,function,
 0x49fd60,IsCurrentGadgetNamed,src/gui/gui.cpp,call,strcmp
 0x49fd60,IsCurrentGadgetNamed,src/gui/gui.cpp,field_escape,Gadget::name
@@ -49673,7 +49673,7 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,call,operator=
 ,SetUpSkirmish,src/harness/harness.cpp,call,sprintf
 ,SetUpSkirmish,src/harness/harness.cpp,call,strcpy
-,SetUpSkirmish,src/harness/harness.cpp,deref_read,*Table_0047ae60
+,SetUpSkirmish,src/harness/harness.cpp,deref_read,*SkirmishOptionsTable
 ,SetUpSkirmish,src/harness/harness.cpp,field_escape,OptionsTable::players
 ,SetUpSkirmish,src/harness/harness.cpp,field_escape,PlayerSpec::side
 ,SetUpSkirmish,src/harness/harness.cpp,field_maybe_written,OptionsTable::mapName
@@ -49688,8 +49688,8 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,PlayerSpec::side
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,PlayerSpec::sideLine
 ,SetUpSkirmish,src/harness/harness.cpp,field_read,PlayerSpec::team
-,SetUpSkirmish,src/harness/harness.cpp,field_read,Player_0047ae60::active
-,SetUpSkirmish,src/harness/harness.cpp,field_read,Player_0047ae60::shade
+,SetUpSkirmish,src/harness/harness.cpp,field_read,SkirmishOptionsPlayer::active
+,SetUpSkirmish,src/harness/harness.cpp,field_read,SkirmishOptionsPlayer::shade
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::difficulty
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::handler
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,Game::localPlayer
@@ -49703,12 +49703,12 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,OptionsTable::lineOfSight
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,OptionsTable::losType
 ,SetUpSkirmish,src/harness/harness.cpp,field_write,OptionsTable::mapping
-,SetUpSkirmish,src/harness/harness.cpp,field_write,Player_0047ae60::active
-,SetUpSkirmish,src/harness/harness.cpp,field_write,Player_0047ae60::color
-,SetUpSkirmish,src/harness/harness.cpp,field_write,Player_0047ae60::energy
-,SetUpSkirmish,src/harness/harness.cpp,field_write,Player_0047ae60::metal
-,SetUpSkirmish,src/harness/harness.cpp,field_write,Player_0047ae60::shade
-,SetUpSkirmish,src/harness/harness.cpp,field_write,Player_0047ae60::type
+,SetUpSkirmish,src/harness/harness.cpp,field_write,SkirmishOptionsPlayer::active
+,SetUpSkirmish,src/harness/harness.cpp,field_write,SkirmishOptionsPlayer::color
+,SetUpSkirmish,src/harness/harness.cpp,field_write,SkirmishOptionsPlayer::energy
+,SetUpSkirmish,src/harness/harness.cpp,field_write,SkirmishOptionsPlayer::metal
+,SetUpSkirmish,src/harness/harness.cpp,field_write,SkirmishOptionsPlayer::shade
+,SetUpSkirmish,src/harness/harness.cpp,field_write,SkirmishOptionsPlayer::type
 ,SetUpSkirmish,src/harness/harness.cpp,fn_ref,LoadingScreenFrame
 ,SetUpSkirmish,src/harness/harness.cpp,function,
 ,SetUpSkirmish,src/harness/harness.cpp,global_escape,s_map@src/harness/harness.cpp

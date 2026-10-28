@@ -25,8 +25,8 @@ struct CampaignSetupRecord {
     char flag_96;
 };
 
-struct Obj_004ab400;
-struct Src_004ab400;
+struct Gui;
+struct GafSequenceSource;
 
 #include "../network/player_info.h"
 
@@ -54,19 +54,7 @@ struct SkirmishSlotTeam {
 #include "../util/vec3.h"
 #include "../../interfaces/seams.h"
 
-union CreateUnitFixed {
-    int i;
-    struct {
-        short frac;
-        short whole;
-    } h;
-};
-
-struct CreateUnitPos {
-    CreateUnitFixed x;
-    CreateUnitFixed y;
-    CreateUnitFixed z;
-};
+#include "create_unit_pos.h"
 
 #include "../network/player.h"
 #include "../state/sim_globals.h"
@@ -86,7 +74,7 @@ unsigned int GetTicks();
 #include "../ingame/selection.h"
 #include "../ingame/info_panel.h"
 #include "../graphics/pcx.h"
-void __stdcall SetCursorAnimation(Obj_004ab400* p, Src_004ab400* src);
+void __stdcall SetCursorAnimation(Gui* p, GafSequenceSource* src);
 void ShowSoftwareCursor();
 #include "../gui/keyboard.h"
 void __cdecl LeaveNetGameCallback(int param);
@@ -190,7 +178,7 @@ void InitFrame()
 {
     if (((signed char)g_game->cursorMode) != 0x13) {
         g_game->cursorMode = (char)(0x13);
-        SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->table[0x13]);
+        SetCursorAnimation((Gui*)&g_game->gui, g_game->table[0x13]);
     }
     ShowSoftwareCursor();
     g_game->bits_2a44.bit2 = 0;

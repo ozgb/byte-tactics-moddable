@@ -248,7 +248,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             strcpy(g_preferredLanguage, g_defaultLanguage);
     }
     LoadTranslations((char *)g_translationFile, g_preferredLanguage);
-    g_game->sound = (Class_004cdb40*)(new Sound);
+    g_game->sound = (SoundView*)(new Sound);
     EmptyPreFrontendInitHook();
     InitGame();
 

@@ -1413,7 +1413,7 @@ presentation,ExceptionFilter,src/graphics/pcx.cpp,1,0,0,0,0,0,?ExceptionFilter@@
 presentation,ExitParticlePool,src/graphics/particles.cpp,1,0,0,0,0,0,?ExitParticlePool@@YGXXZ,0,
 presentation,ExpandGadgetTextToType5,src/frontend/multi.cpp,0,0,0,0,0,0,?ExpandGadgetTextToType5@@YGXPAUGadget@@@Z,1,
 presentation,FUN_0042f900,src/sound/sound_types.cpp,0,0,0,0,0,0,?FUN_0042f900@@YGXH@Z,1,
-presentation,FUN_0049fd20,src/gui/gui.cpp,0,0,0,0,0,0,?FUN_0049fd20@@YGXPAUObj1_49fd20@@PAUObj2_49fd20@@PAUVec6_49fd20@@@Z,1,
+presentation,FUN_0049fd20,src/gui/gui.cpp,0,0,0,0,0,0,?FUN_0049fd20@@YGXPAUDialogPointView@@PAUDialogOriginView@@PAUDialogMouseEvent@@@Z,1,
 presentation,FadeRectangle,src/graphics/draw.cpp,1,0,0,0,0,0,?FadeRectangle@@YGHPAUSurface@@PAURect@@H@Z,0,
 presentation,FileRequesterHandler,src/gui/file_list.cpp,0,0,0,0,0,0,?FileRequesterHandler@@YGXPAUGui@@@Z,1,
 presentation,FillAccountList,src/frontend/multi.cpp,0,0,0,0,0,0,?FillAccountList@@YGXXZ,1,
@@ -2161,7 +2161,7 @@ state,Ref::Ref,interfaces/ref.h,1,0,0,0,0,0,??0?$Ref@USpot@@@@QAE@PAUSpot@@@Z,0,
 state,Ref::Ref,interfaces/ref.h,1,0,0,0,0,0,??0?$Ref@VPacketChannel@@@@QAE@PAVPacketChannel@@@Z,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UCargoLinkView@@@@QBEPAUCargoLinkView@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UDroppedMotionParamView@@@@QBEPAUDroppedMotionParamView@@XZ,0,unused-instance
-state,Ref::get,interfaces/ref.h,0,0,0,0,0,0,?get@?$Ref@UMission_00467e50@@@@QBEPAUMission_00467e50@@XZ,1,
+state,Ref::get,interfaces/ref.h,0,0,0,0,0,0,?get@?$Ref@UOrderQueueNode@@@@QBEPAUOrderQueueNode@@XZ,1,
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UPlayerResourceView@@@@QBEPAUPlayerResourceView@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UScreenPos@@@@QBEPAUScreenPos@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UUnitCursorView@@@@QBEPAUUnitCursorView@@XZ,0,unused-instance
@@ -2176,7 +2176,7 @@ state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@VPlayerFrameInfo@@@@QBEPA
 state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@UCargoLinkView@@@@QBEPAUCargoLinkView@@XZ,0,unused-instance
 state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@UDroppedMotionParamView@@@@QBEPAUDroppedMotionParamView@@XZ,0,unused-instance
 state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@UGroup@@@@QBE_NXZ,0,unused-instance
-state,Ref::operator?B,interfaces/ref.h,0,0,0,0,0,0,??B?$Ref@UMission_00467e50@@@@QBEPAUMission_00467e50@@XZ,1,
+state,Ref::operator?B,interfaces/ref.h,0,0,0,0,0,0,??B?$Ref@UOrderQueueNode@@@@QBEPAUOrderQueueNode@@XZ,1,
 state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@UPlayerResourceView@@@@QBEPAUPlayerResourceView@@XZ,0,unused-instance
 state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@UUnitOrderTypeView@@@@QBE_NXZ,0,unused-instance
 state,Ref::operator?B,interfaces/ref.h,1,0,0,0,0,0,??B?$Ref@UWeaponDefCursorView@@@@QBEPAUWeaponDefCursorView@@XZ,0,unused-instance
@@ -2258,14 +2258,14 @@ units,GetHeadingBetweenOrDefault,src/units/unit_position.cpp,0,0,0,0,0,0,?GetHea
 units,HasBit,src/units/unit.cpp,0,0,0,0,0,0,?HasBit@@YGHE@Z,1,
 units,IdAt,src/units/unit_save.cpp,1,0,0,0,0,0,?IdAt@@YGPAHPAHH@Z,0,load-only
 units,InitUnit,src/units/units.cpp,0,0,0,0,0,0,?InitUnit@@YGXHUVec3@@HPAUUnit@@@Z,1,
-units,InsertShift,src/units/unit_commands.cpp,0,0,0,0,0,0,?InsertShift@@YGXPAPAUItem_00485940@@PAU1@P6GH11@Z@Z,1,
+units,InsertShift,src/units/unit_commands.cpp,0,0,0,0,0,0,?InsertShift@@YGXPAPAUPlayer@@PAU1@P6GH11@Z@Z,1,
 units,IsUnitCommander,src/units/units.cpp,0,0,0,0,0,0,?IsUnitCommander@@YGHPAUUnit@@@Z,1,
 units,MakeFixed,src/units/units.cpp,0,0,0,0,0,0,?MakeFixed@@YG?ATClampFixed@@H@Z,1,
 units,MakePropList,src/units/unit_targets.cpp,1,0,0,0,0,0,?MakePropList@@YGPADPAVUnitDef@@@Z,0,unit-info
 units,OctantBetween,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?OctantBetween@@YGDUPoint16@@0@Z,1,
-units,Partition,src/units/unit_commands.cpp,0,0,0,0,0,0,?Partition@@YGPAPAUItem_00485940@@PAPAU1@0PAU1@P6GH11@Z@Z,1,
-units,PointerSpanBytes,src/units/unit_commands.cpp,0,0,0,0,0,0,?PointerSpanBytes@@YGHPAPAUItem_00485940@@0@Z,1,
-units,QuickSort,src/units/unit_commands.cpp,0,0,0,0,0,0,?QuickSort@@YGXPAPAUItem_00485940@@0P6GHPAU1@1@ZH@Z,1,
+units,Partition,src/units/unit_commands.cpp,0,0,0,0,0,0,?Partition@@YGPAPAUPlayer@@PAPAU1@0PAU1@P6GH11@Z@Z,1,
+units,PointerSpanBytes,src/units/unit_commands.cpp,0,0,0,0,0,0,?PointerSpanBytes@@YGHPAPAUPlayer@@0@Z,1,
+units,QuickSort,src/units/unit_commands.cpp,0,0,0,0,0,0,?QuickSort@@YGXPAPAUPlayer@@0P6GHPAU1@1@ZH@Z,1,
 units,ReadUnitState,src/units/unit_position.cpp,1,0,0,0,0,0,?ReadUnitState@@YGXPAVBitReader@@PAUUnit@@@Z,0,network
 units,ReceiveUnitStates,src/units/unit_position.cpp,1,0,0,0,0,0,?ReceiveUnitStates@@YGXPAUPlayer@@PAI@Z,0,network
 units,Selectable,src/units/unit_scripts.cpp,1,0,0,0,0,0,?Selectable@@YGHPAUUnitCursorView@@@Z,0,console

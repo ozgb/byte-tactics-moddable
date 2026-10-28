@@ -1,6 +1,6 @@
 struct,field,kind,file,issue
-Bitmap_00437b50,data,pointer,include/ta_types.h,#353
-Bitmap_00437b50,depth,pointer,include/ta_types.h,#353
+SpotBitmap,data,pointer,include/ta_types.h,#353
+SpotBitmap,depth,pointer,include/ta_types.h,#353
 CMemoryCache,base,int-pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,basePointer,pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,bitmap,pointer,src/graphics/memory_cache.h,#353
@@ -11,11 +11,11 @@ CMemoryCache,image,pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,ptr,pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,shadow,pointer,src/graphics/memory_cache.h,#353
 CacheChunk,owner,pointer,src/units/unit_motion.cpp,#353
-Class_0045ae80,points,pointer,include/ta_types.h,#353
-Class_0045ae80,unknown_2c,pointer,include/ta_types.h,#353
-Class_0045ae80,unknown_30,pointer,include/ta_types.h,#353
-Class_0047cb00,head,pointer,include/ta_types.h,#353
-Class_004b0a70,table,pointer,include/ta_types.h,#353
+Object3doView,points,pointer,include/ta_types.h,#353
+Object3doView,unknown_2c,pointer,include/ta_types.h,#353
+Object3doView,unknown_30,pointer,include/ta_types.h,#353
+SpatialBucketView,head,pointer,include/ta_types.h,#353
+CobScriptView,table,pointer,include/ta_types.h,#353
 CobScript,table,pointer,src/units/cob_script.h,#352
 ConnectionBlob,data,pointer,src/frontend/connection_blob.h,#353
 Face,vindex,pointer,src/weapons/explosions.cpp,#352
@@ -186,7 +186,7 @@ ModelState,owner,pointer,src/graphics/model_types.h,#353
 ModelState,root,pointer,src/graphics/model_types.h,#353
 ModelState,shadow,pointer,src/graphics/model_types.h,#353
 MovementClass,name,pointer,src/units/movement_class.h,#352
-NameTable_004b0830,names,pointer,include/ta_types.h,#353
+ScriptNameTableView,names,pointer,include/ta_types.h,#353
 NetPacketPendingEntry,next,pointer,src/network/packets.cpp,#353
 NetPacketPendingEntry,owner,pointer,src/network/packets.cpp,#353
 NetPacketPendingEntry,prev,pointer,src/network/packets.cpp,#353

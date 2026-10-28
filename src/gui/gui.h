@@ -24,10 +24,10 @@ struct ResetSliderGadgetDialog;
 struct ScheduleGadgetEndTickDialog;
 struct Gadget;
 struct ResetProgressBarDialog;
-struct Obj1_49fd20;
-struct Obj2_49fd20;
+struct DialogPointView;
+struct DialogOriginView;
 struct Rect;
-struct Vec6_49fd20;
+struct DialogMouseEvent;
 
 #pragma pack(push, 1)
 
@@ -154,7 +154,7 @@ int __stdcall GetKeyboardInput(Dialog* obj);
 void __stdcall ClearFocus(Dialog*);
 int __stdcall IsFocused(int, int);
 bool __stdcall HasFocus(int);
-void __stdcall FUN_0049fd20(Obj1_49fd20*, Obj2_49fd20*, Vec6_49fd20*);
+void __stdcall FUN_0049fd20(DialogPointView*, DialogOriginView*, DialogMouseEvent*);
 void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
 int __stdcall FindAssocListBox(Gadget* entries, int index);
 int __stdcall FindAssocSlider(Gadget* entries, int index);

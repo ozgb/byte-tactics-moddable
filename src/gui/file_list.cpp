@@ -59,7 +59,7 @@ struct FileRequester {
 
 #pragma pack(pop)
 
-struct Entry_004a1810;
+struct Gadget;
 
 Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_C(Gadget* entries, char* name);
@@ -71,7 +71,7 @@ Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 #include "dialogs.h"
 #include "file_list.h"
 void* __stdcall LoadGuiLayer(void* param_1, char* param_2, int param_3);
-void __stdcall SelectFontForEntry(Entry_004a1810* entries, int index);
+void __stdcall SelectFontForEntry(Gadget* entries, int index);
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
 
@@ -521,7 +521,7 @@ void __stdcall DrawBlinkWords(Dialog* obj)
     int time = GetTicks();
 
     if (obj->words->value != -1)
-        SelectFontForEntry((Entry_004a1810*)obj->holder->entries,
+        SelectFontForEntry((Gadget*)obj->holder->entries,
                      obj->words->value);
 
     for (int i = 0; i < obj->count; i++) {

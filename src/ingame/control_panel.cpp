@@ -11,7 +11,7 @@
 
 #include "../orders/mission_type.h"
 
-struct Option_00419560;
+struct ConsoleCommandTable;
 
 #include "../network/net_stats.h"
 
@@ -79,9 +79,9 @@ struct CameraFollowTarget {
 extern Game* g_game;
 
 #include "../../link/globals.h"
-extern Option_00419560 g_consoleCommands;
-extern Option_00419560 g_cheatCommands;
-extern Option_00419560 g_debugCommands;
+extern ConsoleCommandTable g_consoleCommands;
+extern ConsoleCommandTable g_cheatCommands;
+extern ConsoleCommandTable g_debugCommands;
 
 #pragma pack(push, 1)
 struct EdgeScrollDisplay {

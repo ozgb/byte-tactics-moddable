@@ -88,10 +88,7 @@ struct MainMenuGadgetView {
     int selected;
 };
 
-struct GadgetOwnerView {
-    int unknown_0;
-    int gadgets;
-};
+#include "../game/gadget_owner_view.h"
 
 struct CdPlayerChoiceGadgetView {
     char unknown_0[0x18];
@@ -100,12 +97,7 @@ struct CdPlayerChoiceGadgetView {
     int selected;
 };
 
-struct DisplayFlagsView {
-    char unknown_0[0xf0];
-    unsigned short bit0 : 1;
-    unsigned short fullscreen : 1;
-    unsigned short rest : 14;
-};
+#include "../game/display_flags_view.h"
 
 #include "../game/game.h"
 #pragma pack(pop)

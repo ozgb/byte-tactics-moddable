@@ -17,19 +17,7 @@
 #include "mission_option_flags.h"
 #include "main2_menu.h"
 
-union CreateUnitFixed {
-    int i;
-    struct {
-        short frac;
-        short whole;
-    } h;
-};
-
-struct CreateUnitPos {
-    CreateUnitFixed x;
-    CreateUnitFixed y;
-    CreateUnitFixed z;
-};
+#include "create_unit_pos.h"
 
 struct PlayerRecordFlags {
     unsigned short started : 1;
@@ -559,7 +547,6 @@ static inline void DrawLoadingBar(void* gadget, void* lightbar, int index, unsig
     FillRectangle(gadget, rect, color);
     DrawFrame(gadget, lightbar, rect[0], rect[1]);
 }
-extern int Pad_497f40_e0;
 // FUNCTION: 0x497f40
 void LoadingScreenFrame(void)
 {

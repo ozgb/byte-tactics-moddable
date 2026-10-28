@@ -38,8 +38,8 @@ struct UnitInfo {
 // GLOBAL: 0x511de8
 extern Game* g_game;
 
-class Obj {};
-typedef void (Obj::*ThisFn)();
+class ArrayElement {};
+typedef void (ArrayElement::*ThisFn)();
 
 // FUNCTION: 0x401000 ??_H@YGXPAXIHP6EX0@Z@Z
 struct Elem_00401000 {
@@ -55,11 +55,11 @@ struct Holder_00401000 {
 Holder_00401000 g_holder_00401000;
 
 // FUNCTION: 0x401030
-void __stdcall CallOnEachReverse(Obj* base, int stride, int count, ThisFn func)
+void __stdcall CallOnEachReverse(ArrayElement* base, int stride, int count, ThisFn func)
 {
-    base = (Obj*)((char*)base + count * stride);
+    base = (ArrayElement*)((char*)base + count * stride);
     while (--count >= 0) {
-        base = (Obj*)((char*)base - stride);
+        base = (ArrayElement*)((char*)base - stride);
         (base->*func)();
     }
 }

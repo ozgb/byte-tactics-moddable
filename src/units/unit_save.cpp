@@ -86,11 +86,6 @@ struct SaveRec {
 
 
 
-struct Obj {
-    char gap_0[0x10a];
-    unsigned char f10a;
-};
-
 #include "unit.h"
 
 struct Mission;
@@ -378,7 +373,7 @@ void __stdcall SaveUnits(HapiBank* file)
             for (int k = 0; k < 3; k++) {
                 rec.pieces[k].f0 = *(int*)&unit->weapons[k];
                 rec.pieces[k].f4 = unit->weapons[k].aimCob.nAimCobDone;
-                rec.pieces[k].f8 = ((Obj*)unit->weapons[k].weapon.get())->f10a;
+                rec.pieces[k].f8 = unit->weapons[k].weapon.get()->index;
                 rec.pieces[k].fc = unit->weapons[k].muzzleAimFromDeltaZ;
                 rec.pieces[k].f10 = unit->weapons[k].reloadTimer;
                 rec.pieces[k].f12 = unit->weapons[k].fireHeading;

@@ -8286,18 +8286,6 @@ struct Pair_0046faf0 {
     Pair_0046faf0(Pair_0046faf0&);
 };
 
-class ObjectPool {
-public:
-    std::vector<Item_00470ae0*> items;
-    void* slots;
-    int slotSize;
-    int capacity;
-    int used;
-    virtual ~ObjectPool(void);
-    ObjectPool(ObjectPool&);
-    ObjectPool(int, int);
-};
-
 struct Item_00470ae0 {
     int unknown_0;
 };
@@ -8335,16 +8323,6 @@ public:
     int AllocSlot(int);
 };
 
-class ParticleLists {
-public:
-    std::vector<Listener_00470fb0*> lists[10];
-    ParticleLists(ParticleLists&);
-    ~ParticleLists(void);
-    ParticleLists(void);
-    void UpdateAll(void);
-    void DrawAll(void*);
-};
-
 class Listener_00470fb0 {
 public:
     virtual ~Listener_00470fb0(void);
@@ -8365,28 +8343,6 @@ struct Slot_00471120 {
     Listener_00471120** first;
     Listener_00471120** last;
     char unknown_c[4];
-};
-
-class SmokeParticles {
-public:
-    char unknown_4[4];
-    int time;
-    std::vector<Record_00474cd0> records;
-    int emitPeriod;
-    int holdPeriod;
-    int maxFrame;
-    void* altAnimation;
-    Vec3 pos;
-    virtual ~SmokeParticles(void);
-    SmokeParticles(SmokeParticles&);
-    SmokeParticles(void);
-    virtual void Notify(void*);
-    virtual void FUN_00472d50(void);
-    virtual void Render(int);
-    virtual int IsFinished(void);
-    virtual void FUN_00474df0(void);
-    virtual int FUN_00475440(void);
-    virtual void FUN_00474d50(Vec3*, int, int, int, int, int);
 };
 
 struct Elem_00473500 {
@@ -8426,26 +8382,6 @@ public:
     void FUN_00473590(void*, short, short);
 };
 
-class TeleportParticles {
-public:
-    int deadline;
-    int time;
-    std::vector<Class_00473590> items;
-    int sparkLifetime;
-    Vec3 pos1;
-    Vec3 pos2;
-    Vec3 dir;
-    TeleportParticles(TeleportParticles&);
-    TeleportParticles(void);
-    virtual void FUN_00471430(void);
-    virtual void FUN_00472d50(void);
-    virtual void Render(int);
-    virtual int IsFinished(void);
-    virtual void FUN_004737c0(void);
-    virtual int FUN_00472e00(void);
-    virtual void FUN_004736e0(int, int, int);
-};
-
 class Class_00471470 {
 public:
     std::vector<ParticleSystem*> lists[1];
@@ -8458,26 +8394,6 @@ public:
     int dwords[12];
     void FUN_004739b0(void);
     void FUN_00473a00(int, short, short);
-};
-
-class NanoParticles {
-public:
-    char unknown_0[4];
-    int deadline;
-    int time;
-    std::vector<Elem_00475880> items;
-    Vec3 center;
-    Vec3 radius;
-    Vec3 target;
-    Vec3 spread;
-    NanoParticles(NanoParticles&);
-    NanoParticles(void);
-    void FUN_00472d50(void);
-    void Render(int);
-    int IsFinished(void);
-    void FUN_00473d50(void);
-    int FUN_00472f60(void);
-    void FUN_00473b50(int, int, int);
 };
 
 class Class_004715a0 {
@@ -8510,26 +8426,6 @@ public:
     void FUN_004745e0(void*, short, short);
 };
 
-class WakeParticles {
-public:
-    char unknown_0[8];
-    int time;
-    std::vector<Class_004745e0> items;
-    int period;
-    Vec3 pos_a;
-    Vec3 pos_b;
-    Vec3 dir;
-    int ascending;
-    WakeParticles(WakeParticles&);
-    WakeParticles(void);
-    void FUN_00472d50(void);
-    void Render(int);
-    int IsFinished(void);
-    void FUN_00474880(void);
-    int FUN_00473220(void);
-    void FUN_00474760(int, int, int, int, int);
-};
-
 class Class_00471820 {
 public:
     std::vector<Elem_00473500> lists[1];
@@ -8542,25 +8438,6 @@ public:
     std::vector<Elem_00473500> lists[1];
     void Add(short, TimedSubParticles*);
     void AddTimedSubParticles(Vec3*, int, int, int, short);
-};
-
-class TimedSubParticles {
-public:
-    char unknown_0[8];
-    int time;
-    std::vector<Record_00474cd0> records;
-    int emitPeriod;
-    int holdPeriod;
-    int maxFrame;
-    Vec3 pos;
-    TimedSubParticles(TimedSubParticles&);
-    TimedSubParticles(void);
-    void FUN_00472d50(void);
-    void Render(int);
-    int IsFinished(void);
-    void FUN_004751c0(void);
-    int FUN_004750f0(void);
-    void FUN_00475150(Vec3*, int, int, int);
 };
 
 class Class_00471d70 {
@@ -8576,18 +8453,9 @@ struct Class_00472200 {
     void Add(short, ParticleSystem*);
 };
 
-struct Ctx_004720d0 {
-    Vec3 a;
-    Vec3 b;
-};
-
 struct Pair_00472ab0 {
     short lo;
     short hi;
-};
-
-struct Shape_00472ab0 {
-    Pair_00472ab0 v[3];
 };
 
 class Class_004736c0 {
@@ -8744,15 +8612,6 @@ struct Class_00473290 {
     int FUN_00473290(void);
 };
 
-struct Pos_00473590 {
-    short x;
-    char unknown_2[2];
-    short h;
-    char unknown_6[2];
-    short y;
-    char unknown_a[28];
-};
-
 class Class_004736e0 {
 public:
     char unknown_4[24];
@@ -8819,23 +8678,6 @@ public:
     void FUN_00474170(void*, short, short);
 };
 
-class ThrustParticles {
-public:
-    char unknown_0[8];
-    int time;
-    std::vector<Class_00474170> items;
-    char unknown_1c[40];
-    ThrustParticles(ThrustParticles&);
-    ThrustParticles(void);
-    void FUN_00472d50(void);
-    void Render(int);
-    int IsFinished(void);
-    void Emit(void);
-    int FUN_004730c0(void);
-    void FUN_004742c0(int, int, int, int);
-    void FUN_00473010(void);
-};
-
 class Class_004730f0 {
 public:
     char unknown_0[12];
@@ -8893,18 +8735,6 @@ public:
     virtual void FUN_00474760(Vec3*, Vec3*, int, int, int);
 };
 
-struct SmokeParticle {
-    int data;
-    Pair_00419560* cursor1;
-    int* cursor2;
-    Pair_00419560* cursor3;
-    int limit;
-    int rounds;
-    int period;
-    int countdown;
-    void FUN_00474b00(void);
-};
-
 struct Pos_00474b80 {
     short x;
     char unknown_2[2];
@@ -8950,19 +8780,6 @@ struct Class_00474f80 {
     int field_10;
     int field_14;
     int FUN_00474f80(void);
-};
-
-class TimedSubParticle {
-public:
-    int data;
-    int x;
-    int y;
-    int z;
-    int limit;
-    int count;
-    int period;
-    int timer;
-    void FUN_00474fc0(void);
 };
 
 class Class_00475040 {

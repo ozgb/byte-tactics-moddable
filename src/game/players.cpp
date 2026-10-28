@@ -34,13 +34,7 @@ struct UnitDef;
 
 #include "../network/player.h"
 
-struct SkirmishPlayerSlot {
-    int controller;
-    char unknown_4[0xc - 0x4];
-    int metal;
-    int energy;
-    int unknown_14;
-};
+#include "settings.h"
 
 struct Form {
     char unknown_0[0xcc];
@@ -919,8 +913,8 @@ void InitPlayerResources()
                 player->metal = g_game->net->startMetal[i];
                 break;
             case 2:
-                player->energy = (float)((SkirmishPlayerSlot*)g_game->options)[i].energy;
-                player->metal = (float)((SkirmishPlayerSlot*)g_game->options)[i].metal;
+                player->energy = (float)((SkirmishPlayer*)g_game->options)[i].energy;
+                player->metal = (float)((SkirmishPlayer*)g_game->options)[i].metal;
                 break;
             case 3: {
                 int index = FindHostSlot();
@@ -942,7 +936,7 @@ void __stdcall LoadPlayerControllers(HapiBank* file)
     char name[16];
     for (int i = 0; i < 10; i++) {
         Player* player = &g_game->players[i];
-        int* slot = &((SkirmishPlayerSlot*)g_game->options)[i].controller;
+        int* slot = &((SkirmishPlayer*)g_game->options)[i].controller;
         sprintf(name, "Player%i", i);
         if (file->OpenAccount(name)) {
             *slot = file->GetIntegerItem("Controller", 0);

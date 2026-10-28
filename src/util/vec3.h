@@ -1,6 +1,14 @@
 #ifndef VEC3_H
 #define VEC3_H
 
+union Fixed {
+    int value;
+    struct {
+        unsigned short fraction;
+        short whole;
+    };
+};
+
 struct Vec3 {
     int x;
     int y;

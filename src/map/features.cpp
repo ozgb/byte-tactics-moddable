@@ -32,11 +32,6 @@ static inline Vec3 FeatureVec3(int ax, int ay, int az)
     return v;
 }
 
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
 union Coord {
     int value;
     Fixed f;

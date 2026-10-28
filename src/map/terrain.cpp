@@ -50,12 +50,6 @@ struct BucketGrid {
 
 #include "../units/movement_class.h"
 
-union Fixed {
-    int value;
-    int v;
-    struct { short lo; short hi; } p;
-};
-
 static inline int InsideExplored(Player* los, unsigned int tx, unsigned int ty)
 {
     return tx < (unsigned int)los->exploredWidth && ty < (unsigned int)los->exploredHeight;
@@ -465,7 +459,7 @@ static inline int IsExploredAtHeight(Player* los, Vec3Words* pos,
     Fixed* hgt)
 {
     int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (hgt->p.hi >> 1)) >> 5;
+    int ty = (pos->zWhole - (hgt->whole >> 1)) >> 5;
     if (InsideExplored(los, tx, ty) && los->explored[(unsigned int)los->exploredWidth * ty + tx] != 0)
         return 1;
     return 0;
@@ -475,7 +469,7 @@ static inline int IsSeenAtHeight(Player* los, Vec3Words* pos,
     Fixed* hgt, unsigned int bit)
 {
     int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (hgt->p.hi >> 1)) >> 5;
+    int ty = (pos->zWhole - (hgt->whole >> 1)) >> 5;
     unsigned int w = los->exploredWidth;
     int r;
     if (!InsideExplored(los, tx, ty))
@@ -488,7 +482,7 @@ static inline int IsSeenAtHeight(Player* los, Vec3Words* pos,
 static inline unsigned short VisibilityWord(Player* los, int tx,
     Vec3Words* pos, Fixed* hgt)
 {
-    int ty = (pos->zWhole - (hgt->p.hi >> 1)) >> 5;
+    int ty = (pos->zWhole - (hgt->whole >> 1)) >> 5;
     unsigned int w = los->exploredWidth;
     return g_game->visibilityMask[w * ty + tx];
 }
@@ -549,11 +543,11 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los)
     if (los != 0) {
         Pos_0047d2e0 pos;
         Fixed hgt;
-        pos.x.v = (origin.x + cell.x * 2) << 19;
-        pos.z.v = (origin.y + cell.y * 2) << 19;
-        hgt.v = GetCellHeight(&cell) << 16;
-        x = pos.x.p.hi >> 5;
-        y = (pos.z.p.hi - (hgt.p.hi >> 1)) >> 5;
+        pos.x.value = (origin.x + cell.x * 2) << 19;
+        pos.z.value = (origin.y + cell.y * 2) << 19;
+        hgt.value = GetCellHeight(&cell) << 16;
+        x = pos.x.whole >> 5;
+        y = (pos.z.whole - (hgt.whole >> 1)) >> 5;
         if (!InsideExplored(los, x, y))
             return 0;
         unsigned int bit = 1 << g_game->playerIndex;
@@ -1164,7 +1158,7 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* center, Fixed radius,
 {
     int countB = 0;
     int countA = 0;
-    int max = radius.p.hi * radius.p.hi / 256;
+    int max = radius.whole * radius.whole / 256;
     Entry_0047ea40* a = (Entry_0047ea40*)SimAlloc(max * sizeof(Entry_0047ea40));
     Entry_0047ea40* b = (Entry_0047ea40*)SimAlloc(max * sizeof(Entry_0047ea40));
     int half = radius.value / 2;

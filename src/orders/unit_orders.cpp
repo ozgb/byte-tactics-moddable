@@ -785,16 +785,6 @@ struct Pad_00400000_6 { int field; };
 struct Pad_00400000_7 { int field; };
 
 
-union Fixed {
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    };
-};
-
-
-
 #include "../map/feature_spot.h"
 
 

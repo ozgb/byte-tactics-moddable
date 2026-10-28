@@ -4,14 +4,6 @@
 
 typedef Vec3 Vec3_0049e1a0;
 
-union Fixed {
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    };
-};
-
 #include "../units/cob_script.h"
 
 #include "../files/files_api.h"

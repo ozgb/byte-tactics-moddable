@@ -5,13 +5,7 @@
 
 #pragma pack(push, 1)
 
-union Fixed {
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    };
-};
+#include "../util/vec3.h"
 
 #include "../util/vec3.h"
 #include "../util/angles.h"

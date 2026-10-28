@@ -18,16 +18,6 @@ static inline Vec3 PosPlus(const Vec3& a, const Vec3& b)
 
 #include "../util/point.h"
 
-struct Fixed {
-    union {
-        int value;
-        struct {
-            unsigned short fraction;
-            short whole;
-        } parts;
-    };
-};
-
 struct Position {
     Fixed x, y, z;
 };
@@ -332,8 +322,8 @@ void __stdcall DrawExplosions(void* surface)
         pos.x.value = d->pos.x - (g_game->scrollX << 16);
         pos.y.value = d->pos.y;
         pos.z.value = d->pos.z - (g_game->scrollY << 16);
-        int x = pos.x.parts.whole + 128;
-        int y = pos.z.parts.whole - (pos.y.parts.whole >> 1) + 32;
+        int x = pos.x.whole + 128;
+        int y = pos.z.whole - (pos.y.whole >> 1) + 32;
         if (PointInRect(g_game->viewport, x, y) && d->ref2.src)
             DrawFrameShadow((Surface *)surface, (GafFrame *)GetGafSequenceFrame(&d->ref2), x, y);
     }
@@ -342,8 +332,8 @@ void __stdcall DrawExplosions(void* surface)
         pos.x.value = d->pos.x - (g_game->scrollX << 16);
         pos.y.value = d->pos.y;
         pos.z.value = d->pos.z - (g_game->scrollY << 16);
-        int x = pos.x.parts.whole + 128;
-        int y = pos.z.parts.whole - (pos.y.parts.whole >> 1) + 32;
+        int x = pos.x.whole + 128;
+        int y = pos.z.whole - (pos.y.whole >> 1) + 32;
         if (PointInRect(g_game->viewport, x, y)) {
             if (d->obj) DrawModel3doProjected(surface, &pos, d->obj, &d->angle_x);
             if (d->ref1.src) DrawFrame(surface, GetGafSequenceFrame(&d->ref1), x, y);

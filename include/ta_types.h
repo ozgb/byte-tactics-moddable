@@ -2402,10 +2402,6 @@ public:
     void AttachBuildFootprintMarker(Point16, Point16);
 };
 
-union Fixed {
-    int value;
-};
-
 struct UnitRef {
     int vtable;
     Unit* ptr;

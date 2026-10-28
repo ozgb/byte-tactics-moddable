@@ -1961,16 +1961,12 @@ follow:
 
 static inline Vec Add(const Vec& a,const Vec& b) { Vec r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
 static inline Vec Sub(const Vec& a,const Vec& b) { Vec r; r.x=a.x-b.x; r.y=a.y-b.y; r.z=a.z-b.z; return r; }
-#pragma pack(push,1)
-struct Def { char pad[0x15e]; Vec low, high; };
-
-#pragma pack(pop)
 void __stdcall EmitTeleportParticles(Vec*,Vec*,int,int);
 // FUNCTION: 0x406aa0
 int __stdcall TeleportOrder(Unit* unit,Order* order,int unused)
 {
-    Vec low = Add(*(Vec*)&unit->pos, ((Def*)unit->def.get())->low);
-    Vec high = Add(*(Vec*)&unit->pos, ((Def*)unit->def.get())->high);
+    Vec low = Add(*(Vec*)&unit->pos, *(Vec*)&unit->def.get()->modelMinX);
+    Vec high = Add(*(Vec*)&unit->pos, *(Vec*)&unit->def.get()->modelMaxX);
     for(Unit* p=g_game->units;p<=g_game->unitsEnd;++p) {
         if(p->pos.x >= low.x && p->pos.x <= high.x && p->pos.z >= low.z && p->pos.z <= high.z && p->pos.y >= low.y && p->pos.y <= high.y && unit != p) {
             Vec dest = Sub(Add(*(Vec*)&order->pos,*(Vec*)&p->pos),*(Vec*)&unit->pos);

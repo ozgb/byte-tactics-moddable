@@ -8,7 +8,6 @@
 
 #pragma pack(push,1)
 #include "../network/player.h"
-struct Def { char pad[0x156]; int builder; char pad15a[0x22f-0x15a]; char mobile; char pad230[0x241-0x230]; unsigned flags; char pad245[0x249-0x245]; };
 #include "../units/unit.h"
 inline int Unit::Ready() { return (flags & 0x10000000) && !(flags & 0x4000); }
 inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
@@ -81,9 +80,9 @@ void PlayerAI::RefreshUnitLists()
                 if((unsigned char)(u->flags>>8)&1) known.units.push_back(u);
             } else if(u->PlayerIndex()==owner->index && u->buildLeft==0.0) {
                 ++counts[u->unitDefIndex];
-                if(((Def*)u->def.get())->builder) ++builders;
-                if((((Def*)u->def.get())->flags&0x40) && (((Def*)u->def.get())->flags&0x200) && (u->activateFlags&1)) factories.list.units.push_back(u);
-                if((((Def*)u->def.get())->flags&0x400) && (u->activateFlags&1)) hasSpecial=1;
+                if(u->def.get()->ids.offset) ++builders;
+                if((u->def.get()->flags1&0x40) && (u->def.get()->flags1&0x200) && (u->activateFlags&1)) factories.list.units.push_back(u);
+                if((u->def.get()->flags1&0x400) && (u->activateFlags&1)) hasSpecial=1;
                 float weight=(char)weights[u->unitDefIndex];
                 sum.total+=weight;
 #ifdef __clang__

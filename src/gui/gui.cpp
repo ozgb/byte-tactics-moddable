@@ -41,6 +41,7 @@ extern Root_004a32a0* g_guiContext;
 #include "../state/sim_globals.h"
 #include "../files/files_api.h"
 #include "layer.h"
+#include "dialog.h"
 
 void ShowSoftwareCursor();
 char* __stdcall Translate(char* text);
@@ -186,26 +187,6 @@ class SquadManager;
 
 #pragma pack(push, 1)
 
-struct Dialog {
-    char unknown_0[0x18];
-    Layer* holder;
-    char unknown_1c[0x60 - 0x1c];
-    int current;
-    int focus;
-    int index;
-    int used;
-    char unknown_70[0x74 - 0x70];
-    int length;
-    char unknown_78[0xa2 - 0x78];
-    int dirty;
-    char unknown_a6[0x9b6 - 0xa6];
-    char path_9b6[0x100];
-    char path_ab6[0x100];
-    char path_bb6[0x100];
-    char unknown_cb6[0xcca - 0xcb6];
-    int changed;
-};
-
 struct Vec6_49fd20 {
     int x;
     int y;
@@ -295,7 +276,7 @@ void __stdcall EnableKeyCommands(Dialog* p)
 // FUNCTION: 0x49fa70
 void __stdcall DisableKeyCommands(Dialog* obj)
 {
-    obj->dirty = 0;
+    obj->keyCommands = 0;
 }
 
 // FUNCTION: 0x49fa90
@@ -2853,12 +2834,6 @@ struct Holder_0049fc50 {
     Gadget* entries;
 };
 
-struct Point_0049fc50 {
-    int x;
-    int y;
-    int unknown_8[4];
-};
-
 #pragma pack(push, 1)
 struct Object_0049fc50 {
     char unknown_0[0x18];
@@ -3525,7 +3500,10 @@ int __stdcall GetTextPixelWidth(unsigned char* text)
 }
 
 struct Font_004a50b0 {
-    char unknown_0[0xc];
+    char unknown_0[3];
+    unsigned char first;
+    unsigned short offsets[1];
+    char unknown_6[6];
     void* glyphs;
 };
 

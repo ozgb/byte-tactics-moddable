@@ -1765,7 +1765,6 @@ struct Point_0046ba80;
 struct Point_0048c6a0;
 struct Point_004948e0;
 struct Point_00498cd0;
-struct Point_0049fc50;
 struct Point_004a4b50;
 struct Point_004bf060;
 struct Point_004bf260;
@@ -11544,15 +11543,6 @@ struct Class_004a1ab0 {
     Dialog* holder;
 };
 
-struct Font_004a50b0 {
-    unsigned char glyphs[1];
-    char unknown_1[2];
-    unsigned char first;
-    unsigned short offsets[1];
-    char unknown_6[6];
-    unsigned short* glyphs_c;
-};
-
 struct Glyph_004a1b40 {
     unsigned short width;
     unsigned short height;
@@ -11568,53 +11558,6 @@ struct Class_004a2480 {
 struct Class_004a30c0 {
     char unknown_0[24];
     Dialog* holder;
-};
-
-struct Point_0049fc50 {
-    int x;
-    int y;
-    int unknown_08[4];
-};
-
-struct Dialog {
-    int unknown_0;
-    Entry* entries;
-    void (__stdcall *handler)(void*);
-    void* data;
-    int flags;
-    Font_004a50b0* language;
-    Dialog* holder;
-    void (__stdcall *field_1c)(void);
-    int field_20;
-    void* surface;
-    char text[14];
-    char field_36;
-    int field_37;
-    char unknown_3b[1];
-    Point_0049fc50 point;
-    unsigned int flags_54;
-    char unknown_58[8];
-    int field_60;
-    int focus;
-    int field_68;
-    char unknown_6c[4];
-    int field_70;
-    int length;
-    int field_78;
-    Point_0049fc50 saved;
-    short field_94;
-    char unknown_96[12];
-    int keyCommands;
-    char unknown_a6[2060];
-    unsigned char colour;
-    char unknown_8b3[259];
-    char str_9b6[256];
-    char str_ab6[256];
-    char str_bb6[256];
-    char unknown_cb6[16];
-    int field_cc6;
-    int changed;
-    ~Dialog(void);
 };
 
 struct Class_004a3eb0 {

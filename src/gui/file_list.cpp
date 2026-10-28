@@ -31,11 +31,6 @@ struct BlinkWord {
 
 #include "gadget.h"
 
-struct Obj18 {
-    char unknown_0[4];
-    char* entries;
-};
-
 struct ReqSub {
     char unknown_0[0x140];
     short knobPos;
@@ -62,20 +57,7 @@ struct FileRequester {
 
 #include "gui.h"
 
-struct Dialog {
-    char path[0x13];
-    short field_13;
-    char unknown_15[0x18 - 0x15];
-    Obj18* holder;
-    char unknown_1c[0xa6 - 0x1c];
-    BlinkWord* words;
-    int count;
-    int active;
-    char unknown_b2[0xcca - 0xb2];
-    int changed;
-
-    FileRequester* OpenFileRequester(Dialog* self, char* arg2, char* arg3, char* arg4);
-};
+#include "dialog.h"
 
 #pragma pack(pop)
 
@@ -566,7 +548,7 @@ void __stdcall DrawBlinkWords(Dialog* obj)
         else
             SetTextColors(obj->words[i].colourA, GetTextKeyColor());
 
-        DrawString((void*)*(int*)(obj->holder->entries + 0xbc),
+        DrawString((void*)*(int*)((char*)obj->holder->entries + 0xbc),
                      obj->words[i].text, obj->words[i].x,
                      obj->words[i].y, -1);
     }

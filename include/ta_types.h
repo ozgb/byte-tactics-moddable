@@ -236,7 +236,6 @@ class Class_00438b90;
 class Class_00439e80;
 class OrderBase;
 class Class_0043a420;
-class MissionOrderTable;
 class Class_0043cbb0;
 class Class_0043cc20;
 class Class_0043cd20;
@@ -1107,7 +1106,6 @@ struct Eye_00482130;
 struct F0_00462d30;
 struct F0_00462d30_2;
 union F110_0048ad30;
-struct FP_0043d6d0;
 struct Fade_004c6890;
 struct Feature;
 struct FeatureDef_00421eb0;
@@ -1155,8 +1153,6 @@ struct FlagBits_00457d30;
 struct FlagBits_00487080;
 struct FlagBits_004876c0;
 union FlagWord;
-union Flags110_0043f0e0;
-union Flags111_0043f0e0;
 union Flags114_485a40;
 union Flags142f0_00466dc0;
 struct Flags16_00493bf0;
@@ -5091,14 +5087,6 @@ struct Owner_0043ad50 {
 
 #include "../src/orders/order_type_entry.h"
 
-class MissionOrderTable {
-public:
-    char unknown_0[4];
-    int field_4;
-    int field_8;
-    int GetCount(void);
-};
-
 struct Elem_0043ca70 {
     char unknown_0[21];
     char* name;
@@ -5147,11 +5135,6 @@ public:
     unsigned char flag : 1;
     unsigned char unknown_2f : 5;
     void UpdatePosition(Unit*);
-};
-
-struct FP_0043d6d0 {
-    unsigned int frac : 16;
-    unsigned int whole : 16;
 };
 
 class Class_0043da70 {
@@ -5255,19 +5238,6 @@ union F110_0048ad30 {
     unsigned int bits_13 : 1;
     unsigned int flag_14 : 1;
     unsigned int bits_15 : 17;
-};
-
-union Flags110_0043f0e0 {
-    unsigned int bits_0 : 31;
-    unsigned int flag_31 : 1;
-};
-
-union Flags111_0043f0e0 {
-    unsigned int bits_0 : 8;
-    unsigned int flag_8 : 1;
-    unsigned int bits_9 : 8;
-    unsigned int flag_17 : 1;
-    unsigned int bits_18 : 14;
 };
 
 class Class_00440470 {

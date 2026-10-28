@@ -480,7 +480,6 @@ class ClaimFootprintVisitor;
 class Class_0047f960;
 class Class_0047f990;
 class Class_0047fa30;
-class SpeechQueue;
 class Class_0047ffa0;
 class Class_00480020;
 class Class_004800c0;
@@ -1406,7 +1405,6 @@ struct Menu_44b3c0;
 struct Message_00447150;
 struct Message_004565a0;
 struct Message_0047f780;
-struct Message_0047fad0;
 struct Mid_00462d30;
 struct MissionFeature_00436c30;
 struct MissionFlags_0042f9a0;
@@ -1643,7 +1641,6 @@ struct Packet_0046d6c0;
 struct Packet_0046d860;
 struct Packet_0046dad0;
 struct Packet_0047f0c0;
-struct Packet_0047f300;
 struct OwnershipTransferPacket;
 struct WeaponFirePacket;
 struct Packet_00499ba0;
@@ -8775,13 +8772,6 @@ public:
     void Set3DDistances(int, int);
 };
 
-struct Packet_0047f300 {
-    unsigned char type;
-    unsigned char flag;
-    int index;
-    char unknown_6[12];
-};
-
 struct Class_004cf150 {
     char unknown_0[48];
     int count;
@@ -8829,29 +8819,12 @@ public:
     void ClearSpeechEntries(void);
 };
 
-struct Message_0047fad0 {
-    int priority;
-    char unknown_4[8];
-    char* text;
-    unsigned int minFrame;
-    char unknown_14[4];
-};
-
 struct Entry_0047fca0 {
     int field_0;
     int field_4;
     int field_8;
     int* data;
     char field_10;
-};
-
-class SpeechQueue {
-public:
-    Entry_0047fca0 entries[9];
-    int count;
-    unsigned int field_9d;
-    unsigned int field_a1;
-    void PlayNextSpeechEntry(void);
 };
 
 struct Emitter_0047fd70 {

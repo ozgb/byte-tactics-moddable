@@ -46,10 +46,11 @@ ai,Vec3_0040beb0::Length,src/ai/ai_player.cpp,0,0,0,0,0,0,?Length@Vec3_0040beb0@
 ai,Vec3_0040beb0::Scale,src/ai/ai_player.cpp,0,0,0,0,0,0,?Scale@Vec3_0040beb0@@QAEXH@Z,1,
 ai,Vec::Vec,src/ai/vec.h,0,0,0,0,0,0,??0Vec@@QAE@HHH@Z,1,
 ai,std::_Construct,src/ai/ai_player.cpp,0,0,0,0,0,0,?_Construct@std@@YGXPAUElem_0040d4f0@@ABU2@@Z,1,
-economy,*,,29,27,584,456,308,135,,3,
+economy,*,,29,27,584,456,308,135,,4,
 economy,CallOnEachReverse,src/game/economy.cpp,0,0,0,0,0,0,?CallOnEachReverse@@YGXPAVArrayElement@@HHP81@AEXXZ@Z,1,
 economy,InitStartingResourcesFromSkirmish,src/game/main_loop.cpp,0,0,0,0,0,0,?InitStartingResourcesFromSkirmish@@YGXXZ,1,
-economy,SettleResourceAccount,src/game/economy.cpp,0,0,0,0,0,0,?SettleResourceAccount@@YGXPAUObj_00401320@@MM@Z,1,
+economy,SetStartingStorageBonusInline,src/game/main_loop.cpp,0,0,0,0,0,0,?SetStartingStorageBonusInline@@YGXPAUPlayer@@HH@Z,1,
+economy,SettleResourceAccount,src/game/economy.cpp,0,0,0,0,0,0,?SettleResourceAccount@@YGXPAUResourceAccountView@@MM@Z,1,
 economy,ShareMapInfo,src/units/units.cpp,1,0,0,0,0,0,?ShareMapInfo@@YGXEE@Z,0,share-dialog
 economy,UpdateResourceSharing,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateResourceSharing@@YGXPAUPlayer@@@Z,0,network-game
 features,*,,44,42,1051,861,448,312,,4,
@@ -125,10 +126,11 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,183,113,4378,2208,1720,540,,25,
+game,*,,183,113,4378,2208,1720,540,,24,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
+game,ChatRecipients::Clear,src/game/chat_recipients.h,0,0,0,0,0,0,?Clear@ChatRecipients@@QAEXXZ,1,
 game,CloseTopScreenIfNotNamed,src/game/game_state.cpp,0,0,0,0,0,0,?CloseTopScreenIfNotNamed@@YGXXZ,1,
 game,CmdAntiAlias,src/game/console_commands.cpp,1,0,0,0,0,0,?CmdAntiAlias@@YGXH@Z,0,console
 game,CmdBigBrother,src/game/console_commands.cpp,1,0,0,0,0,0,?CmdBigBrother@@YGXH@Z,0,console
@@ -167,7 +169,7 @@ game,CmdSwitchAlt,src/game/console_commands.cpp,1,0,0,0,0,0,?CmdSwitchAlt@@YGXPA
 game,CmdTShadow,src/game/console_commands.cpp,1,0,0,0,0,0,?CmdTShadow@@YGXH@Z,0,console
 game,CreateOffscreenSurface,src/game/game_state.cpp,0,0,0,0,0,0,?CreateOffscreenSurface@@YGXXZ,1,
 game,DecreaseGameSpeed,src/game/game_state.cpp,0,0,0,0,0,0,?DecreaseGameSpeed@@YGXXZ,1,
-game,DeleteSave_00492360,src/game/savegame.cpp,1,0,0,0,0,0,?DeleteSave_00492360@@YGXPAVHapiBank@@@Z,0,save-load
+game,DeleteHapiBank,src/game/savegame.cpp,1,0,0,0,0,0,?DeleteHapiBank@@YGXPAVHapiBank@@@Z,0,save-load
 game,DestroySimGlobals,src/state/sim_globals.cpp,1,0,0,0,0,0,?DestroySimGlobals@@YAXXZ,0,shutdown
 game,EndGameFrame,src/ingame/build_placement.cpp,1,0,0,0,0,0,?EndGameFrame@@YGXXZ,0,game-over
 game,Fail,src/quirks/quirks.cpp,1,0,0,0,0,0,?Fail@?A0x@@YGXPADHPBD1@Z,0,error-path
@@ -185,8 +187,8 @@ game,ListSavedGames,src/game/savegame.cpp,1,0,0,0,0,0,?ListSavedGames@@YGPADPAH@
 game,LoadCampaignRegistryName,src/game/settings_campaign.cpp,0,0,0,0,0,0,?LoadCampaignRegistryName@@YGXHPAD@Z,1,
 game,LoadCdLists,src/game/game_state.cpp,0,0,0,0,0,0,?LoadCdLists@@YGXXZ,1,
 game,LoadGameScreenHandler,src/game/savegame.cpp,1,0,0,0,0,0,?LoadGameScreenHandler@@YGXPAUGui@@@Z,0,save-load
-game,MinimapCursorToWorldPos,src/game/game_load.cpp,0,0,0,0,0,0,?MinimapCursorToWorldPos@@YGXPAUPos_00498d00@@@Z,1,
-game,OffsetWorldPosFromView,src/game/game_load.cpp,0,0,0,0,0,0,?OffsetWorldPosFromView@@YGXPAUPoint_00498cd0@@PAUView_00498cd0@@H@Z,1,
+game,MinimapCursorToWorldPos,src/game/game_load.cpp,0,0,0,0,0,0,?MinimapCursorToWorldPos@@YGXPAUMinimapWorldPos@@@Z,1,
+game,OffsetWorldPosFromView,src/game/game_load.cpp,0,0,0,0,0,0,?OffsetWorldPosFromView@@YGXPAUPoint@@PAUWorldViewOrigin@@H@Z,1,
 game,OutOfBlock,src/state/block.cpp,1,0,0,0,0,0,?OutOfBlock@?A0x@@YGXXZ,0,error-path
 game,OutOfMemoryHandler,src/game/main.cpp,1,0,0,0,0,0,?OutOfMemoryHandler@@YGXXZ,0,error-path
 game,PreBattleFrame,src/game/main_loop.cpp,1,0,0,0,0,0,?PreBattleFrame@@YGXXZ,0,network
@@ -204,7 +206,6 @@ game,SaveTrackSettings,src/game/settings.cpp,0,0,0,0,0,0,?SaveTrackSettings@@YGX
 game,SavedGameSelectHandler,src/game/savegame.cpp,1,0,0,0,0,0,?SavedGameSelectHandler@@YGXHH@Z,0,save-load
 game,SetGameMode,src/game/game_state.cpp,1,0,0,0,0,0,?SetGameMode@@YGXH@Z,0,menu
 game,SetGameSpeed,src/game/game_state.cpp,1,0,0,0,0,0,?SetGameSpeed@@YGXHH@Z,0,input
-game,SetSize_00496e90,src/game/main_loop.cpp,0,0,0,0,0,0,?SetSize_00496e90@@YGXPAUPlayer@@HH@Z,1,
 game,ShowInvalidSavegameDialog,src/game/savegame.cpp,0,0,0,0,0,0,?ShowInvalidSavegameDialog@@YGXPAX@Z,1,
 game,ShowLoadGameScreen,src/game/savegame.cpp,1,0,0,0,0,0,?ShowLoadGameScreen@@YGXXZ,0,save-load
 game,ShowSaveGameScreen,src/game/savegame.cpp,1,0,0,0,0,0,?ShowSaveGameScreen@@YGXXZ,0,save-load
@@ -220,7 +221,6 @@ game,SimHighWater,src/state/block.cpp,0,0,0,0,0,0,?SimHighWater@@YAIXZ,1,
 game,UpdateBattleHoverMode,src/game/game_state.cpp,0,0,0,0,0,0,?UpdateBattleHoverMode@@YGXH@Z,1,
 game,UpdateBattleRoom,src/frontend/multi.cpp,1,0,0,0,0,0,?UpdateBattleRoom@@YGXXZ,0,network
 game,WriteGameRegistryValue,src/game/settings.cpp,1,0,0,0,0,0,?WriteGameRegistryValue@@YGXPAX0H@Z,0,shutdown
-game,Zero11_004917d0::Clear,src/game/chat_recipients.h,0,0,0,0,0,0,?Clear@Zero11_004917d0@@QAEXXZ,1,
 los_radar,*,,72,64,1948,1613,890,649,,22,
 los_radar,AssignRange,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRange@@YGXPAUElem_432cb0@@00@Z,1,
 los_radar,AssignRangeBack,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRangeBack@@YGPAUElem_432cb0@@PAU1@00@Z,1,
@@ -1148,7 +1148,7 @@ players,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,0,0,0,0,0,0,?RefreshOw
 players,SaveNumSkirmishPlayers,src/game/settings_campaign.cpp,1,0,0,0,0,0,?SaveNumSkirmishPlayers@@YGXXZ,0,menu
 players,ShowContinueWatchingDialog,src/game/players.cpp,0,0,0,0,0,0,?ShowContinueWatchingDialog@@YGXXZ,1,
 players,ShutdownScoreTables,src/game/statistics.cpp,1,0,0,0,0,0,?ShutdownScoreTables@@YGXXZ,0,network
-players,UnitList::ForEach,src/game/victory.cpp,1,0,0,0,0,0,?ForEach@UnitList@@QAEXPAVListener_0048ff40@@@Z,0,campaign-game
+players,UnitList::ForEach,src/game/victory.cpp,1,0,0,0,0,0,?ForEach@UnitList@@QAEXPAVUnitScanVisitor@@@Z,0,campaign-game
 players,VictoryBuildUnitType::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?IsSatisfied@VictoryBuildUnitType@@UAEHXZ,0,campaign-game
 players,VictoryBuildUnitType::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryBuildUnitType@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryBuildUnitType::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryBuildUnitType@@UAEXPAVHapiBank@@@Z,0,save-load
@@ -1219,7 +1219,6 @@ presentation,ArePlayersAllied,src/frontend/multi.cpp,0,0,0,0,0,0,?ArePlayersAlli
 presentation,AreStatBarsComplete,src/frontend/endgame.cpp,0,0,0,0,0,0,?AreStatBarsComplete@@YGHXZ,1,
 presentation,AssignQuickKey,src/gui/gui.cpp,1,0,0,0,0,0,?AssignQuickKey@@YGXPAUGadgetAccessDialog@@H@Z,0,
 presentation,AveragePrimitiveY,src/graphics/pcx.cpp,0,0,0,0,0,0,?AveragePrimitiveY@@YGHPAUObject_004cb2f0@@PAUPrimitive_004cb2f0@@@Z,1,
-presentation,Bar_004685a0,src/ingame/info_panel.cpp,0,0,0,0,0,0,?Bar_004685a0@@YGXPAXPAURect@@H@Z,1,
 presentation,BeginMouseScroll,src/ingame/control_panel.cpp,1,0,0,0,0,0,?BeginMouseScroll@@YGXXZ,0,
 presentation,BeginTextEdit,src/gui/gui.cpp,1,0,0,0,0,0,?BeginTextEdit@@YGXPAUGui@@H@Z,0,
 presentation,BindGadgetAnimSequence,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?BindGadgetAnimSequence@@YGXPAURec1@@PAD@Z,0,
@@ -1279,7 +1278,7 @@ presentation,ClearScreenWithHudPalette,src/frontend/options.cpp,0,0,0,0,0,0,?Cle
 presentation,ClearSelectedGadget,src/gui/dialogs.cpp,1,0,0,0,0,0,?ClearSelectedGadget@@YGXPAX@Z,0,
 presentation,ClearSelection,src/ingame/selection.cpp,1,0,0,0,0,0,?ClearSelection@@YGXXZ,0,
 presentation,ClearUnitSelectFlags,src/ingame/selection.cpp,0,0,0,0,0,0,?ClearUnitSelectFlags@@YGXXZ,1,
-presentation,ClickSelectHoverUnit,src/ingame/selection.cpp,1,0,0,0,0,0,?ClickSelectHoverUnit@@YGXPAUParam_0048c7f0@@@Z,0,
+presentation,ClickSelectHoverUnit,src/ingame/selection.cpp,1,0,0,0,0,0,?ClickSelectHoverUnit@@YGXPAUClickSelectArg@@@Z,0,
 presentation,CloneFix_004455b0,src/frontend/multi.cpp,1,0,0,0,0,0,?CloneFix_004455b0@@YGXPAUGadget@@@Z,0,
 presentation,CloneServiceSlot,src/frontend/multi.cpp,1,0,0,0,0,0,?CloneServiceSlot@@YGHPAUGadget@@HFHPAD@Z,0,
 presentation,CloseOptionsPanel,src/frontend/options.cpp,0,0,0,0,0,0,?CloseOptionsPanel@@YGXXZ,1,
@@ -1339,7 +1338,7 @@ presentation,DrawBlendedLine,src/graphics/draw.cpp,0,0,0,0,0,0,?DrawBlendedLine@
 presentation,DrawBlinkWords,src/gui/file_list.cpp,1,0,0,0,0,0,?DrawBlinkWords@@YGXPAUDialog@@@Z,0,
 presentation,DrawBuildFootprint,src/ingame/markers.cpp,1,0,0,0,0,0,?DrawBuildFootprint@@YGXPAXPAUView@@PAUOrder@@PAUPos@@H@Z,0,
 presentation,DrawButton,src/gui/gui.cpp,1,0,0,0,0,0,?DrawButton@@YGXPAUGui@@H@Z,0,
-presentation,DrawCellContours,src/game/console_commands.cpp,1,0,0,0,0,0,?DrawCellContours@@YGXPAXPAUPoint_00417f60@@PAE@Z,0,
+presentation,DrawCellContours,src/game/console_commands.cpp,1,0,0,0,0,0,?DrawCellContours@@YGXPAXPAUPoint@@PAE@Z,0,
 presentation,DrawCircle,src/graphics/draw.cpp,1,0,0,0,0,0,?DrawCircle@@YGXPAUSurface@@HHHH@Z,0,
 presentation,DrawClosedPolygon,src/ingame/info_panel.cpp,0,0,0,0,0,0,?DrawClosedPolygon@@YGXPAXPAUPoint@@HH@Z,1,
 presentation,DrawColorCellOutline,src/gui/dialogs.cpp,0,0,0,0,0,0,?DrawColorCellOutline@@YGXPAUGui@@HH@Z,1,
@@ -1362,7 +1361,7 @@ presentation,DrawLineGadget,src/gui/gui.cpp,1,0,0,0,0,0,?DrawLineGadget@@YGXPAUD
 presentation,DrawListBox,src/gui/gui.cpp,1,0,0,0,0,0,?DrawListBox@@YGXPAUDrawListBoxDialog@@H@Z,0,
 presentation,DrawLitLine,src/graphics/draw.cpp,1,0,0,0,0,0,?DrawLitLine@@YGPAUSurface@@PAU1@HHHHH@Z,0,
 presentation,DrawLitRectangle,src/graphics/draw.cpp,1,0,0,0,0,0,?DrawLitRectangle@@YGPAUSurface@@PAU1@PAHH@Z,0,
-presentation,DrawMapTileSelectionOutline,src/ingame/info_panel.cpp,1,0,0,0,0,0,?DrawMapTileSelectionOutline@@YGXPAXPAFUSize_0046b9d0@@H@Z,0,
+presentation,DrawMapTileSelectionOutline,src/ingame/info_panel.cpp,1,0,0,0,0,0,?DrawMapTileSelectionOutline@@YGXPAXPAFUTileOutlineSize@@H@Z,0,
 presentation,DrawNetworkStats,src/ingame/info_panel.cpp,1,0,0,0,0,0,?DrawNetworkStats@@YGXPAX@Z,0,
 presentation,DrawOrderOverlays,src/orders/order_list.cpp,1,0,0,0,0,0,?DrawOrderOverlays@@YGXPAUUnit@@IPAX1H@Z,0,
 presentation,DrawOrderRangeRing,src/ingame/markers.cpp,1,0,0,0,0,0,?DrawOrderRangeRing@@YGXPAXPAUView@@PAUOrder@@PAUPos@@H@Z,0,
@@ -1374,13 +1373,14 @@ presentation,DrawPercentBar,src/ingame/info_panel.cpp,1,0,0,0,0,0,?DrawPercentBa
 presentation,DrawPolygon,src/graphics/draw.cpp,0,0,0,0,0,0,?DrawPolygon@@YGHPAUSurface@@PAUVec3@@HH@Z,1,
 presentation,DrawPolyline,src/graphics/draw.cpp,0,0,0,0,0,0,?DrawPolyline@@YGHPAUSurface@@PAUPoint@@HH@Z,1,
 presentation,DrawPolylines,src/graphics/draw.cpp,0,0,0,0,0,0,?DrawPolylines@@YGHPAUSurface@@PAUPoint@@PAHHH@Z,1,
+presentation,DrawProbeProbabilityBar,src/ingame/info_panel.cpp,0,0,0,0,0,0,?DrawProbeProbabilityBar@@YGXPAXPAURect@@H@Z,1,
 presentation,DrawProfileBarLine,src/ingame/info_panel.cpp,1,0,0,0,0,0,?DrawProfileBarLine@@YGXHPBDH@Z,0,
-presentation,DrawProgressBar,src/ingame/info_panel.cpp,0,0,0,0,0,0,?DrawProgressBar@@YGXPAXHHPAURect@@PAUColors_00467b60@@H@Z,1,
+presentation,DrawProgressBar,src/ingame/info_panel.cpp,0,0,0,0,0,0,?DrawProgressBar@@YGXPAXHHPAURect@@PAUProgressBarColors@@H@Z,1,
 presentation,DrawProgressBarGadget,src/gui/gui.cpp,1,0,0,0,0,0,?DrawProgressBarGadget@@YGXPAUDrawProgressBarGadgetDialog@@H@Z,0,
 presentation,DrawRaisedBox,src/gui/listbox.cpp,1,0,0,0,0,0,?DrawRaisedBox@@YGXPAXPAURect@@HEH@Z,0,
 presentation,DrawRangeCircle,src/ingame/markers.cpp,1,0,0,0,0,0,?DrawRangeCircle@@YGXPAXPAUView@@PAUPos@@HHPBDH@Z,0,
 presentation,DrawRotatedQuadOutline,src/ingame/info_panel.cpp,1,0,0,0,0,0,?DrawRotatedQuadOutline@@YGXPAXPAUVec3@@1PAF@Z,0,
-presentation,DrawSelectedGoal,src/game/console_commands.cpp,1,0,0,0,0,0,?DrawSelectedGoal@@YGXHPAPAPAVIface_00417f30@@@Z,0,
+presentation,DrawSelectedGoal,src/game/console_commands.cpp,1,0,0,0,0,0,?DrawSelectedGoal@@YGXHPAPAPAVGoalDrawInterface@@@Z,0,
 presentation,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,1,0,0,0,0,0,?DrawSelectedUnitOrderOverlays@@YGXPAXPAPAUUnit@@@Z,0,
 presentation,DrawSelectionBox,src/ingame/info_panel.cpp,1,0,0,0,0,0,?DrawSelectionBox@@YGXPAUVec3@@PAUUnit@@@Z,0,
 presentation,DrawSlider,src/gui/gui.cpp,1,0,0,0,0,0,?DrawSlider@@YGXPAUDialog@@H@Z,0,
@@ -1390,13 +1390,13 @@ presentation,DrawStringCentered,src/graphics/font.cpp,0,0,0,0,0,0,?DrawStringCen
 presentation,DrawSunkenBox,src/gui/listbox.cpp,1,0,0,0,0,0,?DrawSunkenBox@@YGXPAXPAURect@@HHH@Z,0,
 presentation,DrawSurfaceKeyed,src/graphics/surface.cpp,0,0,0,0,0,0,?DrawSurfaceKeyed@@YGXPAUSurface@@0HHH@Z,1,
 presentation,DrawTextInput,src/gui/gui.cpp,1,0,0,0,0,0,?DrawTextInput@@YGXPAUDrawTextInputDialog@@H@Z,0,
-presentation,DrawTriangleContours,src/game/console_commands.cpp,1,0,0,0,0,0,?DrawTriangleContours@@YGXPAXUPoint_00417f60@@H1H1H@Z,0,
+presentation,DrawTriangleContours,src/game/console_commands.cpp,1,0,0,0,0,0,?DrawTriangleContours@@YGXPAXUPoint@@H1H1H@Z,0,
 presentation,DrawUnitBuilderProbe,src/ingame/info_panel.cpp,0,0,0,0,0,0,?DrawUnitBuilderProbe@@YGHPAX@Z,1,
 presentation,DrawUnitInfoImage,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?DrawUnitInfoImage@@YGXPAUGui@@PAUGadget@@@Z,0,
 presentation,DrawUnitRangeRings,src/ingame/markers.cpp,1,0,0,0,0,0,?DrawUnitRangeRings@@YGXPAXPAUView@@PAUOrder@@HH@Z,0,
 presentation,DrawUnitStateProbe,src/ingame/info_panel.cpp,0,0,0,0,0,0,?DrawUnitStateProbe@@YGHPAX@Z,1,
 presentation,DrawWeaponCoverage,src/ingame/markers.cpp,1,0,0,0,0,0,?DrawWeaponCoverage@@YGXPAXPAUView@@PAUOrder@@PAUPos@@H@Z,0,
-presentation,DrawWorldDeltaLine,src/game/console_commands.cpp,0,0,0,0,0,0,?DrawWorldDeltaLine@@YGXPAXPAUPos_00417bb0@@FFH@Z,1,
+presentation,DrawWorldDeltaLine,src/game/console_commands.cpp,0,0,0,0,0,0,?DrawWorldDeltaLine@@YGXPAXPAUFixedWorldPos@@FFH@Z,1,
 presentation,DrawWorldSegmentLine,src/game/console_commands.cpp,0,0,0,0,0,0,?DrawWorldSegmentLine@@YGXPAXUPoint16@@FFH@Z,1,
 presentation,DrawWrappedText,src/gui/gui.cpp,1,0,0,0,0,0,?DrawWrappedText@@YGHPAD0HHHHH@Z,0,
 presentation,Draw_004c0070,src/graphics/draw.cpp,1,0,0,0,0,0,?Draw_004c0070@@YGXPAUSurface@@HHHHH@Z,0,
@@ -1533,7 +1533,6 @@ presentation,GetSliderRects,src/gui/gui.cpp,1,0,0,0,0,0,?GetSliderRects@@YGXPAUG
 presentation,GetTextBackColor,src/graphics/draw.cpp,0,0,0,0,0,0,?GetTextBackColor@@YGHXZ,1,
 presentation,GetTextForeColor,src/graphics/draw.cpp,0,0,0,0,0,0,?GetTextForeColor@@YGHXZ,1,
 presentation,GetTrackLength,src/sound/cd_audio.cpp,0,0,0,0,0,0,?GetTrackLength@@YGHH@Z,1,
-presentation,GetUnit_0048c190,src/ingame/selection.cpp,1,0,0,0,0,0,?GetUnit_0048c190@@YGPAUUnit@@G@Z,0,
 presentation,GiveSelectedUnitsToPlayer,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?GiveSelectedUnitsToPlayer@@YGXE@Z,0,
 presentation,GrabBackground,src/graphics/gaf.cpp,0,0,0,0,0,0,?GrabBackground@@YGXPAXPAUGafFrame@@HH@Z,1,
 presentation,HalveFrame,src/graphics/model_render.cpp,0,0,0,0,0,0,?HalveFrame@@YGXPAUGafFrame@@0@Z,1,
@@ -1636,7 +1635,6 @@ presentation,IsCounted,src/frontend/multi.cpp,1,0,0,0,0,0,?IsCounted@@YGHPAUPlay
 presentation,IsCounted_00447380,src/frontend/multi.cpp,1,0,0,0,0,0,?IsCounted_00447380@@YGHPAUPlayer@@@Z,0,
 presentation,IsCounted_004478b0,src/frontend/multi.cpp,1,0,0,0,0,0,?IsCounted_004478b0@@YGHPAUPlayer@@@Z,0,
 presentation,IsCounted_00447b10,src/frontend/multi.cpp,1,0,0,0,0,0,?IsCounted_00447b10@@YGHPAUPlayer@@@Z,0,
-presentation,IsCounted_4934b0,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?IsCounted_4934b0@@YGHPAUPlayer@@@Z,0,
 presentation,IsCurrentGadgetNamed,src/gui/gui.cpp,1,0,0,0,0,0,?IsCurrentGadgetNamed@@YGHPAUDialog@@PAD@Z,0,
 presentation,IsDoubleClickMessage,src/gui/dialogs.cpp,1,0,0,0,0,0,?IsDoubleClickMessage@@YGHPAUGui@@E@Z,0,
 presentation,IsFadeDone,src/frontend/endgame.cpp,0,0,0,0,0,0,?IsFadeDone@@YGHXZ,1,
@@ -1652,11 +1650,12 @@ presentation,IsLocal_00447b10,src/frontend/multi.cpp,1,0,0,0,0,0,?IsLocal_00447b
 presentation,IsLocal_00448c70,src/frontend/multi.cpp,1,0,0,0,0,0,?IsLocal_00448c70@@YGHPAUPlayer@@@Z,0,
 presentation,IsMessageBoxScreen,src/gui/dialogs.cpp,0,0,0,0,0,0,?IsMessageBoxScreen@@YGHPAUGui@@@Z,1,
 presentation,IsMouseButtonMessage,src/gui/dialogs.cpp,1,0,0,0,0,0,?IsMouseButtonMessage@@YGHPAUGui@@E@Z,0,
+presentation,IsPlayerAlive,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?IsPlayerAlive@@YGHPAUPlayer@@@Z,0,
+presentation,IsPlayerInGame,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?IsPlayerInGame@@YGHPAUPlayer@@@Z,0,
 presentation,IsPlaying,src/frontend/multi.cpp,1,0,0,0,0,0,?IsPlaying@@YGHPAUPlayer@@@Z,0,
 presentation,IsPlaying_004478b0,src/frontend/multi.cpp,1,0,0,0,0,0,?IsPlaying_004478b0@@YGHPAUPlayer@@@Z,0,
 presentation,IsPlaying_00447b10,src/frontend/multi.cpp,1,0,0,0,0,0,?IsPlaying_00447b10@@YGHPAUPlayer@@@Z,0,
 presentation,IsPlaying_00448c70,src/frontend/multi.cpp,1,0,0,0,0,0,?IsPlaying_00448c70@@YGHPAUPlayer@@@Z,0,
-presentation,IsPlaying_4934b0,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?IsPlaying_4934b0@@YGHPAUPlayer@@@Z,0,
 presentation,IsPointInEntryRect,src/gui/dialogs.cpp,0,0,0,0,0,0,?IsPointInEntryRect@@YGHPAUGui@@@Z,1,
 presentation,IsPointInRect,src/gui/gui.cpp,1,0,0,0,0,0,?IsPointInRect@@YGHPAURect@@HH@Z,0,
 presentation,IsRemoteAI_00448c70,src/frontend/multi.cpp,1,0,0,0,0,0,?IsRemoteAI_00448c70@@YGHPAUPlayer@@@Z,0,
@@ -1794,6 +1793,7 @@ presentation,ParticleLists::DrawAll,src/graphics/particles.cpp,0,0,0,0,0,0,?Draw
 presentation,ParticleLists::DrawList,src/graphics/particles.cpp,0,0,0,0,0,0,?DrawList@ParticleLists@@QAEXPAXF@Z,1,
 presentation,ParticleLists::UpdateAll,src/graphics/particles.cpp,0,0,0,0,0,0,?UpdateAll@ParticleLists@@QAEXXZ,1,
 presentation,ParticleLists::~ParticleLists,src/graphics/particles.cpp,1,0,0,0,0,0,??1ParticleLists@@QAE@XZ,0,
+presentation,PathAnimTrail::Run,src/ingame/markers.cpp,1,0,0,0,0,0,?Run@PathAnimTrail@@QAEXXZ,0,
 presentation,PathGoal::DrawOnSurface,src/orders/order_targets.cpp,1,0,0,0,0,0,?DrawOnSurface@PathGoal@@UAEXPAX@Z,0,
 presentation,PickUnit,src/ingame/selection.cpp,1,0,0,0,0,0,?PickUnit@@YGPAUUnit@@PAUPlayer@@@Z,0,
 presentation,PlayLoopingSoundByName,src/sound/sound.cpp,1,0,0,0,0,0,?PlayLoopingSoundByName@@YGXPADH@Z,0,
@@ -1862,6 +1862,7 @@ presentation,SaveModemNumbers,src/frontend/multi.cpp,1,0,0,0,0,0,?SaveModemNumbe
 presentation,SaveScreenshot,src/graphics/pcx.cpp,1,0,0,0,0,0,?SaveScreenshot@@YGHPAD0@Z,0,
 presentation,SaveSurfacePcx,src/graphics/pcx.cpp,0,0,0,0,0,0,?SaveSurfacePcx@@YGXPADPAUBitmap_004caec0@@@Z,1,
 presentation,SaveUnitRestrictListFile,src/frontend/multi.cpp,1,0,0,0,0,0,?SaveUnitRestrictListFile@@YGXPAD@Z,0,
+presentation,ScaledPosOffset,src/ingame/markers.cpp,1,0,0,0,0,0,?ScaledPosOffset@@YG?AUPos@@HHHH@Z,0,
 presentation,ScanDirectory,src/gui/file_list.cpp,1,0,0,0,0,0,?ScanDirectory@@YGHPAD00HHH@Z,0,
 presentation,ScheduleFadeTick,src/frontend/endgame.cpp,0,0,0,0,0,0,?ScheduleFadeTick@@YGXXZ,1,
 presentation,ScheduleGadgetEndTick,src/gui/gui.cpp,0,0,0,0,0,0,?ScheduleGadgetEndTick@@YGXPAUScheduleGadgetEndTickDialog@@H@Z,1,
@@ -2060,7 +2061,6 @@ presentation,TimedSubParticle::IsExpired,src/graphics/particles.cpp,0,0,0,0,0,0,
 presentation,TimedSubParticle::Step,src/graphics/particles.cpp,0,0,0,0,0,0,?Step@TimedSubParticle@@QAEXXZ,1,
 presentation,ToggleAnyMission,src/frontend/campaign_menu.cpp,1,0,0,0,0,0,?ToggleAnyMission@@YGXPAUObject_00477510@@@Z,0,
 presentation,ToggleTabMenu,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?ToggleTabMenu@@YGXXZ,0,
-presentation,Trail_004394e0::Run,src/ingame/markers.cpp,1,0,0,0,0,0,?Run@Trail_004394e0@@QAEXXZ,0,
 presentation,TranslateGadgetItems,src/gui/gui.cpp,0,0,0,0,0,0,?TranslateGadgetItems@@YGXPAUGadgetAccessDialog@@H@Z,1,
 presentation,TruncateGadgetText,src/gui/gui.cpp,1,0,0,0,0,0,?TruncateGadgetText@@YGHPAUGui@@H@Z,0,
 presentation,TruncateListItems,src/gui/gui.cpp,0,0,0,0,0,0,?TruncateListItems@@YGXHHPADH@Z,1,
@@ -2069,6 +2069,7 @@ presentation,TryConnect,src/frontend/multi.cpp,0,0,0,0,0,0,?TryConnect@@YGHH@Z,1
 presentation,TryConnect_00442050,src/frontend/multi.cpp,1,0,0,0,0,0,?TryConnect_00442050@@YGHXZ,0,
 presentation,TryConnect_00442a30,src/frontend/multi.cpp,1,0,0,0,0,0,?TryConnect_00442a30@@YGHXZ,0,
 presentation,TrySetFocus,src/gui/gui.cpp,1,0,0,0,0,0,?TrySetFocus@@YGHPAUDialog@@H@Z,0,
+presentation,UnitFromIndex,src/ingame/selection.cpp,1,0,0,0,0,0,?UnitFromIndex@@YGPAUUnit@@G@Z,0,
 presentation,UnitRestrictDialogFrame,src/frontend/multi.cpp,1,0,0,0,0,0,?UnitRestrictDialogFrame@@YGXXZ,0,
 presentation,UnitTable::Destroy,src/graphics/model_render.cpp,1,0,0,0,0,0,?Destroy@UnitTable@@QAEXXZ,0,
 presentation,Unlock,src/graphics/pcx.cpp,1,0,0,0,0,0,?Unlock@@YGXJ@Z,0,
@@ -2107,7 +2108,7 @@ presentation,Vec3_004736e0::operator?G,src/graphics/particles.cpp,1,0,0,0,0,0,??
 presentation,Vec3_004736e0::operator?Y,src/graphics/particles.cpp,1,0,0,0,0,0,??YVec3_004736e0@@QAEAAU0@ABU0@@Z,0,
 presentation,WordWrapText,src/gui/dialogs.cpp,1,0,0,0,0,0,?WordWrapText@@YGPADPAUGui@@PADHH@Z,0,
 presentation,WorldToScreenTileOffset,src/game/console_commands.cpp,0,0,0,0,0,0,?WorldToScreenTileOffset@@YGXHHPAH0@Z,1,
-presentation,WorldToScreenWithHeight,src/game/console_commands.cpp,0,0,0,0,0,0,?WorldToScreenWithHeight@@YGXPAUPos_00417bb0@@PAH1@Z,1,
+presentation,WorldToScreenWithHeight,src/game/console_commands.cpp,0,0,0,0,0,0,?WorldToScreenWithHeight@@YGXPAUFixedWorldPos@@PAH1@Z,1,
 presentation,WriteButtonFields,src/gui/gui_file.cpp,0,0,0,0,0,0,?WriteButtonFields@@YGXPAUWriteButtonFieldsRecord@@PAUFileHandle@@H@Z,1,
 presentation,WriteCommonFields,src/gui/gui_file.cpp,0,0,0,0,0,0,?WriteCommonFields@@YGXPAUGuiFileCommonFields@@PAUFileHandle@@H@Z,1,
 presentation,WriteFontFilenameField,src/gui/gui_file.cpp,0,0,0,0,0,0,?WriteFontFilenameField@@YGXPAUWriteFontFilenameFieldRecord@@PAUFileHandle@@H@Z,1,
@@ -2133,7 +2134,6 @@ presentation,YesNoDialogHandler,src/gui/dialogs.cpp,0,0,0,0,0,0,?YesNoDialogHand
 presentation,clear_screen,src/graphics/surface.cpp,1,0,0,0,0,0,?clear_screen@@YGXPAUDisplay@@H@Z,0,
 presentation,color_taken,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?color_taken@@YGHH@Z,0,
 presentation,entry_at,src/gui/gui.cpp,1,0,0,0,0,0,?entry_at@@YGPAUGadget@@PAUGui@@H@Z,0,
-presentation,offset_004394e0,src/ingame/markers.cpp,1,0,0,0,0,0,?offset_004394e0@@YG?AUPos@@HHHH@Z,0,
 seams,*,,103,94,641,614,0,0,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YIHPAVMission@@@Z,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YIHPAVMission@@@Z,0,

@@ -98,7 +98,7 @@ Coverage: 93.8% of functions (15 of 16), 96.4% of lines, 76.3% of branches; 1 li
 
 Issue #11. 32 functions. The resource accounts (`UnitResources`), `UpdatePlayerEconomy`, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`, `UpdateResourceSharing` in `src/network/net_game.cpp`).
 
-Coverage: 93.1% of functions (27 of 29), 78.1% of lines, 43.8% of branches; 2 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
+Coverage: 93.1% of functions (27 of 29), 78.1% of lines, 43.8% of branches; 2 live functions no scenario enters, and 4 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (2 of 29 after `conditions-dark-side` and `conditions-shore-to-shore` (#420) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445); 27 are entered, 93.1%), by reason:
 
@@ -660,7 +660,7 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | subsystem | entered of live functions | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
 | **wind_meteors** | 15 of 16 | 93.8% | 96.4% | 76.3% | 1 | 0 |
-| **economy** | 27 of 29 | 93.1% | 78.1% | 43.8% | 2 | 3 |
+| **economy** | 27 of 29 | 93.1% | 78.1% | 43.8% | 2 | 4 |
 | **features** | 42 of 44 | 95.5% | 81.9% | 69.6% | 2 | 4 |
 | **ai** | 93 of 104 | 89.4% | 89.0% | 83.0% | 11 | 35 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 87.1% | 3 | 10 |
@@ -672,7 +672,7 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | **players** | 74 of 143 | 51.7% | 52.8% | 44.2% | 69 | 11 |
 | **map** | 79 of 98 | 80.6% | 86.8% | 75.9% | 19 | 12 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
-| game | 113 of 183 | 61.7% | 50.4% | 31.4% | 70 | 25 |
+| game | 113 of 183 | 61.7% | 50.4% | 31.4% | 70 | 24 |
 | network | 50 of 287 | 17.4% | 10.7% | 4.5% | 237 | 73 |
 | platform | 318 of 639 | 49.8% | 34.9% | 22.8% | 321 | 83 |
 | presentation | 454 of 1107 | 41.0% | 31.0% | 21.6% | 653 | 294 |

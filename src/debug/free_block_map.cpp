@@ -6,6 +6,7 @@
 #include <time.h>
 #include <malloc.h>
 
+#include "debug_lib.h"
 #include "free_block_map.h"
 #include "../../link/globals.h"
 

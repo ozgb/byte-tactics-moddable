@@ -9231,18 +9231,6 @@ struct Entry_00487af0 {
     unsigned char flags;
 };
 
-struct OwnershipTransferPacket {
-    unsigned char type;
-    short team;
-    int who;
-    int x;
-    int y;
-    char unknown_f[6];
-    unsigned char b15;
-    unsigned char b16;
-    unsigned char b17;
-};
-
 struct Elem_00488a00 {
     Class_004c9390 name;
     int value;

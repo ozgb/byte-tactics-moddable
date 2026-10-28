@@ -312,20 +312,6 @@ void __cdecl CreateMissionUnits()
         g_seams.players->DeactivateConditions(g_game->list_391ed);
 }
 
-#pragma pack(push, 1)
-struct OwnershipTransferPacket {
-    unsigned char type;
-    short unitId;
-    int newOwnerNetId;
-    int buildPercent;
-    int hitPoints;
-    Angles16 angles;
-    unsigned char stockpile0;
-    unsigned char stockpile1;
-    unsigned char stockpile2;
-};
-#pragma pack(pop)
-
 #include "../network/net_game.h"
 void __stdcall BroadcastPacket(int who, OwnershipTransferPacket* packet, int size);
 

@@ -947,13 +947,6 @@ struct PlaySoundPacket {
     int pos[3];
 };
 
-struct OwnershipTransferPacket {
-    unsigned char type;
-    short unitId;
-    int newOwnerNetId;
-    char unknown_7[0x18 - 7];
-};
-
 struct ResourceSharePacket {
     unsigned char type;
     int subtype;

@@ -50,7 +50,6 @@ extern const char g_animsDirName[8];
 extern char g_descriptionKey[12];
 extern char g_frontendStateChangeFormat[104];
 extern char g_frontendSourceFile[32];
-extern char g_extTdf[4];
 extern char g_choice2GadgetName[8];
 extern char g_choice1GadgetName[8];
 extern char g_smallButtonSoundName[12];

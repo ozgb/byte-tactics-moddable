@@ -687,12 +687,12 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             char* weapon3 = (char*)g_seams.weapons->FindWeaponByName(weapon);
             unitdef->weapons[2] = (WeaponDef*)(weapon3 ? weapon3 : defaultWeapon);
             parser.current->GetFieldString(weapon, "explodeas", 128, DAT_005119b8);
-            char* explodeas = (char*)g_seams.weapons->FindWeaponByName(weapon);
-            unitdef->explodeas = explodeas ? explodeas : defaultWeapon;
+            WeaponDef* explodeas = g_seams.weapons->FindWeaponByName(weapon);
+            unitdef->explodeas = explodeas ? explodeas : (WeaponDef*)defaultWeapon;
             parser.current
                 ->GetFieldString(weapon, "selfdestructas", 128, DAT_005119b8);
-            char* selfdestructas = (char*)g_seams.weapons->FindWeaponByName(weapon);
-            unitdef->selfdestructas = selfdestructas ? selfdestructas : defaultWeapon;
+            WeaponDef* selfdestructas = g_seams.weapons->FindWeaponByName(weapon);
+            unitdef->selfdestructas = selfdestructas ? selfdestructas : (WeaponDef*)defaultWeapon;
             if ((char*)unitdef->weapons[0].get() == defaultWeapon &&
                 (char*)unitdef->weapons[1].get() == defaultWeapon &&
                 (char*)unitdef->weapons[2].get() == defaultWeapon)

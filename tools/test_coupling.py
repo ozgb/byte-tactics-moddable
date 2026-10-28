@@ -30,6 +30,7 @@ def subsystem_of(name, file, reached=None):
 class RuleTest(unittest.TestCase):
     def test_folder_decides_platform_and_harness(self):
         self.assertEqual(cp.rule_of("Hash", "src/util/math.cpp", {}), ("platform", "folder:src/util/"))
+        self.assertEqual(cp.rule_of("Reader::Seek", "interfaces/services.h", {}), ("platform", "folder:interfaces/services.h"))
         self.assertEqual(subsystem_of("DumpFields", "src/harness/harness.cpp"), "harness")
         self.assertEqual(subsystem_of("DumpFields", "src/debug/debug_lib.cpp", {"DumpFields": {"UpdateAllUnits"}}),
                          "platform")

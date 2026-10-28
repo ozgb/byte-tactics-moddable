@@ -14,6 +14,7 @@
 #include "../files/files_api.h"
 
 #include "../util/tdf.h"
+#include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
 #include "meteors.h"

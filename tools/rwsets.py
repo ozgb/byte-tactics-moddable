@@ -454,7 +454,8 @@ class Analyzer:
         if file not in self.root_cache:
             real = os.path.realpath(file)
             rel = os.path.relpath(real, self.root)
-            self.root_cache[file] = rel if rel.startswith(("src" + os.sep, "include" + os.sep)) else None
+            project = rel.startswith(("src" + os.sep, "include" + os.sep)) or rel == os.path.join("interfaces", "services.h")
+            self.root_cache[file] = rel if project else None
         return self.root_cache[file]
 
     def assign_markers(self) -> None:

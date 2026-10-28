@@ -45,10 +45,6 @@ public:
     union {
         int modelMaxY;
         struct {
-            short unknown_16e;
-            short field_170;
-        };
-        struct {
             short modelMaxYLow;
             short modelMaxYHigh;
         };
@@ -144,8 +140,8 @@ public:
     short sortbias;
     short altitude;
     unsigned short id;
-    Ref<char> explodeas;
-    Ref<char> selfdestructas;
+    Ref<WeaponDef> explodeas;
+    Ref<WeaponDef> selfdestructas;
     unsigned char maxslope;
     unsigned char maxwaterslope;
     unsigned char capacity;

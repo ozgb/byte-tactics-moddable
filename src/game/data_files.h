@@ -16,7 +16,7 @@ void __stdcall FreeGameFonts();
 void __stdcall LoadTextureGafs();
 void __stdcall FreeTextureGafs();
 
-char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
+#include "../../interfaces/services.h"
 int __stdcall LoadSoundByName(char* name, const char* file);
 GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY);
 char* __stdcall LoadFileWithProgress(char* path);

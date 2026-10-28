@@ -1115,13 +1115,7 @@ void __stdcall TruncateTextWithEllipsis(Gui* obj, unsigned char* text, int limit
         strcpy((char*)end, "...");
 }
 
-struct Bitmap_004cb170;
 struct Blk;
-struct Blob32_4cb330;
-struct BlobRec_004b4270;
-struct Block_00421620;
-struct Block_004b1ec0;
-struct Block_004c5ff0;
 struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;

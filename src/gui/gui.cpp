@@ -1561,13 +1561,6 @@ void __stdcall DrawListBox(DrawListBoxDialog* obj, int index)
     }
 }
 
-struct Params_00481930;
-struct Parent_0043b730;
-struct Pathfinder_0047dfc0;
-struct Player_00401360;
-struct Player_004467c0;
-struct Player_0044fed0;
-struct Player_004573d0;
 
 // FUNCTION: 0x4a23b0
 void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2)
@@ -1591,13 +1584,6 @@ void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2)
     }
 }
 
-struct Player_00463e50;
-struct Player_0047bd70;
-struct Player_0048b920;
-struct Point_0044eef0;
-struct Point_00480510;
-struct Point_00480720;
-struct Point_004bf060;
 
 void RegisterUnitOrders();
 
@@ -1610,15 +1596,7 @@ extern int Pad_a2480_e2;
 extern int Pad_a2480_e3;
 extern int Pad_a2480_e4;
 
-struct Point_004c07b0;
-struct Point_004c1000;
-struct Point_004c6dc0;
-struct Pos_00420a30;
-struct Pos_00438ea0;
 struct FixedPosView;
-struct Pos_00484b50;
-struct Pos_00485330;
-struct Pos_0048a9f0;
 
 // FUNCTION: 0x4a2480
 void __stdcall DrawGafBar(GadgetAccessDialog* param_1, int index)
@@ -1692,25 +1670,8 @@ static inline void* GetSliderBarSurface(DrawSliderBarObject* o)
 
 #include <setjmp.h>
 
-struct Arg_00498f70;
-struct Args_00451770;
-struct Bitmap_004b8150;
-struct Bitmap_004b8da0;
-struct Bitmap_004b8ec0;
-struct Bitmap_004b9a50;
-struct BlockInfo_004d8790;
-struct Button_004a7f70;
-struct Cell_00423c50;
-struct Cell_0047de60;
-struct Cell_004815f0;
 struct UnitDef;
-struct Class_0045ba20;
 struct Unit;
-struct Class_0049fa90;
-struct Class_004a04f0;
-struct Class_004a1030;
-struct Class_004a1200;
-struct Class_004a1530;
 
 // FUNCTION: 0x4a2580
 void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)

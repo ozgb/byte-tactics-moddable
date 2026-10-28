@@ -16,7 +16,6 @@
 
 #pragma pack(push, 1)
 
-struct Surface_0041df20;
 
 #include "../graphics/rect.h"
 

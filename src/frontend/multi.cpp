@@ -537,11 +537,7 @@ struct LogoSelectClickLayout {
     void* seqs;
 };
 
-struct DisplayMode {
-    int width;
-    int height;
-    int refreshRate;
-};
+#include "../graphics/display_mode.h"
 
 struct ModeList {
     int count;

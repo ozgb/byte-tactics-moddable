@@ -11,11 +11,11 @@ extern "C" __declspec(dllimport) int __cdecl wsprintfA(char* out, const char* fo
 #include "../map/mission.h"
 
 #include "../graphics/memory_cache.h"
+#include "../graphics/display_mode.h"
 
 struct Gui;
 struct Dialog;
 struct Surface;
-struct DisplayMode;
 struct OptionsReselectLink;
 struct ScreenLayer;
 
@@ -326,12 +326,6 @@ struct SurrenderGui {
 struct OptionsBlitGui {
     char unknown_0[0xcca];
     int changed;
-};
-
-struct DisplayMode {
-    int width;
-    int height;
-    int refreshRate;
 };
 
 struct DisplayModeList {

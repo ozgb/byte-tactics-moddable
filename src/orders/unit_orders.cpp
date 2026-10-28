@@ -806,14 +806,7 @@ struct FeatureDamagePacket {
     short z;
 };
 
-class DamagedAllyCollector {
-public:
-    Player* owner;
-    std::vector<Unit*>* units;
-    Unit* self;
-    DamagedAllyCollector(Player* o, std::vector<Unit*>* v, Unit* s) : owner(o), units(v), self(s) {}
-    virtual void CollectDamagedAlly(Unit*);
-};
+#include "../map/terrain.h"
 
 static const float Zero_004fc920 = 0.0f;
 

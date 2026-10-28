@@ -87,11 +87,6 @@ public:
     virtual void Visit(Unit* obj) = 0;
 };
 
-class DamagedAllyCollector {
-public:
-    virtual void CollectDamagedAlly(Unit* unit);
-};
-
 struct Entry_0047ea40 {
     Vec3 pos;
     float val;

@@ -124,7 +124,6 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../units/unit_position.h"
 #include "../orders/order_queue.h"
 
-struct DamagedAllyCollector;
 
 
 

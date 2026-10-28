@@ -2438,18 +2438,6 @@ struct Order_9 {
     UnitRef target;
 };
 
-class DamagedAllyCollector {
-public:
-    Player* owner;
-    std::vector<Unit*>* units;
-    Unit* self;
-    DamagedAllyCollector(DamagedAllyCollector&);
-    DamagedAllyCollector(Player*, std::vector<Unit*>*, Unit*);
-    virtual void CollectDamagedAlly(Unit*);
-    virtual void CollectGroundAlly(Unit*);
-    virtual void CollectRepairableUnit(Unit*);
-};
-
 struct Order_11 {
     char unknown_0[5];
     unsigned char state;

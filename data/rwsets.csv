@@ -33841,7 +33841,7 @@ address,function,file,kind,target
 0x49f9c0,RunWhileScreenNamed,src/gui/gui.cpp,function,
 0x49fa50,EnableKeyCommands,src/gui/gui.cpp,deref_write,*int
 0x49fa50,EnableKeyCommands,src/gui/gui.cpp,function,
-0x49fa70,DisableKeyCommands,src/gui/gui.cpp,field_write,Dialog::dirty
+0x49fa70,DisableKeyCommands,src/gui/gui.cpp,field_write,Dialog::keyCommands
 0x49fa70,DisableKeyCommands,src/gui/gui.cpp,function,
 0x49fa90,MarkChanged,src/gui/gui.cpp,field_write,Dialog::changed
 0x49fa90,MarkChanged,src/gui/gui.cpp,function,
@@ -36617,7 +36617,7 @@ address,function,file,kind,target
 0x4afa30,Dialog::OpenFileRequester,src/gui/file_list.cpp,field_read,FileRequester::nameGadget
 0x4afa30,Dialog::OpenFileRequester,src/gui/file_list.cpp,field_read,FileRequester::names
 0x4afa30,Dialog::OpenFileRequester,src/gui/file_list.cpp,field_read,FileRequester::sizes
-0x4afa30,Dialog::OpenFileRequester,src/gui/file_list.cpp,field_read,Obj18::entries
+0x4afa30,Dialog::OpenFileRequester,src/gui/file_list.cpp,field_read,Layer::entries
 0x4afa30,Dialog::OpenFileRequester,src/gui/file_list.cpp,field_write,FileRequester::callback
 0x4afa30,Dialog::OpenFileRequester,src/gui/file_list.cpp,field_write,FileRequester::gui
 0x4afa30,Dialog::OpenFileRequester,src/gui/file_list.cpp,field_write,FileRequester::mask
@@ -36700,7 +36700,7 @@ address,function,file,kind,target
 0x4aff00,DrawBlinkWords,src/gui/file_list.cpp,field_read,Dialog::count
 0x4aff00,DrawBlinkWords,src/gui/file_list.cpp,field_read,Dialog::holder
 0x4aff00,DrawBlinkWords,src/gui/file_list.cpp,field_read,Dialog::words
-0x4aff00,DrawBlinkWords,src/gui/file_list.cpp,field_read,Obj18::entries
+0x4aff00,DrawBlinkWords,src/gui/file_list.cpp,field_read,Layer::entries
 0x4aff00,DrawBlinkWords,src/gui/file_list.cpp,field_write,BlinkWord::nextToggle
 0x4aff00,DrawBlinkWords,src/gui/file_list.cpp,field_write,BlinkWord::phase
 0x4aff00,DrawBlinkWords,src/gui/file_list.cpp,function,

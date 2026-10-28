@@ -91,7 +91,6 @@ struct Block_004c5ff0;
 struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;
-union Body_004aeac0;
 struct Bounds_src_004b8310;
 struct Box;
 struct Box_004b4d70;
@@ -618,7 +617,6 @@ struct Class_004ab040;
 struct Class_004ab2b0;
 struct Class_004ac610;
 struct Class_004acc70;
-struct FileRequester;
 struct Class_004afc60;
 struct Class_004aff00;
 class CobScript;
@@ -884,7 +882,6 @@ struct Color_004acc70;
 struct Colors_00467b60;
 struct ColourEntry_00478790;
 struct Colour_00478790;
-struct Common_004ad350;
 struct Common_004ad350_2;
 struct Comp_004b2290;
 class MissionCondition;
@@ -1215,7 +1212,6 @@ struct Flags_418fd0;
 union Flags_4b5980;
 struct FloatVec;
 struct Follow_0041ca10;
-struct Font_004a3ef0;
 struct Font_004a50b0;
 struct Form_00464e70;
 struct Fp_004bbff0;
@@ -1348,9 +1344,6 @@ struct Item_00478b40;
 struct Item_004794d0;
 struct Item_00481430;
 struct Item_00485940;
-struct Item_004a1b40;
-struct Item_004a36a0;
-struct Item_004a3780;
 struct Item_004b3630_10;
 struct Item_004b4d70;
 struct Item_004bb2e0;
@@ -1546,18 +1539,12 @@ struct Obj_00462d30;
 struct Obj_00479bf0;
 struct Obj_0047e5c0;
 struct Obj_00499ab0;
-struct Obj_004a1950;
 struct Obj_004a7f70;
-struct Obj_004ad4f0;
-struct Obj_004ada40;
 struct Obj_004ade20;
 struct Obj_004adf10;
-struct Obj_004ae170;
 struct Obj_004ae170_2;
 struct Obj_004ae230;
 struct Obj_004ae300;
-struct Obj_004ae380;
-struct Obj_004ae410;
 struct Obj_004ae440;
 struct Obj_004ae4b0;
 struct Obj_004ae4e0;
@@ -1576,7 +1563,6 @@ struct Obj_004baba0;
 struct Obj_004babd0;
 struct Obj_004badf0;
 struct Obj_004c13d0;
-struct Obj_004c2380;
 struct Obj_004c23e0;
 struct Obj_004c2470;
 struct Obj_004c24b0;
@@ -1779,7 +1765,6 @@ struct Point_0046ba80;
 struct Point_0048c6a0;
 struct Point_004948e0;
 struct Point_00498cd0;
-struct Point_0049fc50;
 struct Point_004a4b50;
 struct Point_004bf060;
 struct Point_004bf260;
@@ -1845,7 +1830,6 @@ struct Res_0045bbf0;
 struct Resources;
 struct RgbQuad;
 struct Rot16;
-struct Row_004a35a0;
 struct Rule_0045f1d0;
 struct S;
 struct SaveDesc_0043a420;
@@ -1941,7 +1925,6 @@ struct Struct_004907e0;
 struct Struct_0049fb50;
 struct Struct_0049fba0;
 struct Struct_0049fbf0;
-struct Struct_004a1970;
 struct Struct_004a81b0;
 struct Struct_004ad980;
 struct Struct_004add60;
@@ -1951,10 +1934,6 @@ struct Struct_004c2ac0;
 struct Struct_004c2ac0_2;
 struct Struct_004c6ac0;
 struct Sub;
-struct Sub2_004aeac0;
-struct Sub34_004aeac0;
-struct Sub5_004aeac0;
-struct Sub6_004aeac0;
 struct Sub_00409520;
 struct Sub_004679a0_a;
 struct Sub_004679a0_b;
@@ -1986,7 +1965,6 @@ struct Table_004b3630;
 struct Table_004b7ee0;
 struct Table_004cb2f0;
 struct Tail_004635b0;
-union Tail_004aeac0;
 struct Target_004030a0;
 class Target_0040da40;
 struct Target_0040da70;
@@ -2083,7 +2061,6 @@ struct Vec3_2;
 union Vec3_459200;
 struct Vec3f;
 struct Vec3i_00474130;
-struct Vec6_49fd20;
 class VecElems_0046ca60;
 class VecInt_0046ca60;
 class Vec_0046d1a0;
@@ -3722,26 +3699,6 @@ struct Button_0041e420 {
 };
 
 #include "../src/game/slot_0041e420.h"
-
-struct FileRequester {
-    void* gui;
-    Mode_00446310* modes;
-    char* nameGadget;
-    char* maskGadget;
-    char* pathGadget;
-    void* field_14;
-    void* field_18;
-    void* field_1c;
-    char unknown_20[4];
-    char cwd[256];
-    char save_drive[16];
-    char save_cwd[256];
-    int field_234;
-    int field_238;
-    int field_23c;
-    int mask;
-    void (__stdcall *callback)(void*);
-};
 
 struct Display_0041ec50 {
     char unknown_0[1556];
@@ -11344,12 +11301,6 @@ struct Struct_0049fbf0 {
     char path[256];
 };
 
-struct Vec6_49fd20 {
-    int x;
-    int y;
-    char unknown_8[16];
-};
-
 struct Entry_004a0bf0 {
     char name[16];
     char unknown_10[331];
@@ -11380,28 +11331,9 @@ struct Class_004a16f0 {
     int f_cca;
 };
 
-struct Obj_004a1950 {
-    char unknown_0[4];
-    int field_4;
-};
-
-struct Struct_004a1970 {
-    char unknown_0[12];
-    int field_c;
-};
-
 struct Class_004a1ab0 {
     char unknown_0[24];
     Dialog* holder;
-};
-
-struct Font_004a50b0 {
-    unsigned char glyphs[1];
-    char unknown_1[2];
-    unsigned char first;
-    unsigned short offsets[1];
-    char unknown_6[6];
-    unsigned short* glyphs_c;
 };
 
 struct Glyph_004a1b40 {
@@ -11409,11 +11341,6 @@ struct Glyph_004a1b40 {
     unsigned short height;
     short xoff;
     short yoff;
-};
-
-struct Item_004a1b40 {
-    char unknown_0[40];
-    Cell* cell;
 };
 
 struct Class_004a2480 {
@@ -11426,77 +11353,9 @@ struct Class_004a30c0 {
     Dialog* holder;
 };
 
-struct Row_004a35a0 {
-    short unknown_0;
-    unsigned short height;
-    char unknown_4[20];
-};
-
-struct Item_004a36a0 {
-    char unknown_0[40];
-    int field_28;
-};
-
-struct Item_004a3780 {
-    char unknown_0[40];
-    Row_004a35a0* row;
-};
-
-struct Point_0049fc50 {
-    int x;
-    int y;
-    int unknown_08[4];
-};
-
-struct Dialog {
-    int unknown_0;
-    Entry* entries;
-    void (__stdcall *handler)(void*);
-    void* data;
-    int flags;
-    Font_004a50b0* language;
-    Dialog* holder;
-    void (__stdcall *field_1c)(void);
-    int field_20;
-    void* surface;
-    char text[14];
-    char field_36;
-    int field_37;
-    char unknown_3b[1];
-    Point_0049fc50 point;
-    unsigned int flags_54;
-    char unknown_58[8];
-    int field_60;
-    int focus;
-    int field_68;
-    char unknown_6c[4];
-    int field_70;
-    int length;
-    int field_78;
-    Point_0049fc50 saved;
-    short field_94;
-    char unknown_96[12];
-    int keyCommands;
-    char unknown_a6[2060];
-    unsigned char colour;
-    char unknown_8b3[259];
-    char str_9b6[256];
-    char str_ab6[256];
-    char str_bb6[256];
-    char unknown_cb6[16];
-    int field_cc6;
-    int changed;
-    ~Dialog(void);
-};
-
 struct Class_004a3eb0 {
     char unknown_0[24];
     Table_004b3630* table;
-};
-
-struct Font_004a3ef0 {
-    char unknown_0[40];
-    Glyph_004a1b40* glyph;
 };
 
 struct Class_004a4620 {
@@ -11824,42 +11683,6 @@ struct Common_004ad350_2 {
     unsigned short gaffile;
 };
 
-struct Obj_004ad4f0 {
-    char unknown_0[182];
-    short totalgadgets;
-    char unknown_0xb8[17];
-    char major;
-    char minor;
-    char revision;
-    char crdefault[16];
-    char escdefault[16];
-    char defaultfocus[16];
-    char panel[16];
-};
-
-struct Obj_004ada40 {
-    char unknown_0[182];
-    char text[128];
-    unsigned char stages;
-    char unknown_137[1];
-    short status;
-    char quickkey;
-    char padding_0x13b;
-    unsigned char grayedout;
-    char unknown_13d[1];
-};
-
-struct Obj_004ae170 {
-    char unknown_0[182];
-    char text[128];
-    short range;
-    char unknown_138[4];
-    int thick;
-    short knobpos;
-    short knobsize;
-    int field_144;
-};
-
 struct Obj_004ae170_2 {
     char unknown_0[182];
     char text[128];
@@ -11869,81 +11692,6 @@ struct Obj_004ae170_2 {
     short knobpos;
     short knobsize;
     int field_144;
-};
-
-struct Obj_004ae380 {
-    char unknown_0[200];
-    unsigned int hotornot : 1;
-    unsigned int : 31;
-};
-
-struct Obj_004ae410 {
-    char unknown_0[200];
-    unsigned int hotornot : 1;
-    unsigned int : 31;
-};
-
-struct Sub2_004aeac0 {
-    char unknown_0[24];
-    int field_ce;
-    char unknown_1c[4];
-    int field_d6;
-    short itemheight;
-    char unknown_26[90];
-};
-
-struct Sub34_004aeac0 {
-    short range;
-    short maxchars;
-    char unknown_4[2];
-    int thick;
-    short knobpos;
-    short knobsize;
-    int field_144;
-    char unknown_12[19];
-};
-
-struct Sub5_004aeac0 {
-    char link[17];
-    char hotkey;
-    char unknown_12[19];
-};
-
-struct Sub6_004aeac0 {
-    char unknown_0[18];
-    unsigned int hotornot : 1;
-    unsigned int : 31;
-    char unknown_16[106];
-};
-
-union Body_004aeac0 {
-    union { char text[128]; Sub2_004aeac0 s2; Sub6_004aeac0 s6; int nuttin; short total; };
-};
-
-union Tail_004aeac0 {
-    union { Sub34_004aeac0 s34; Sub5_004aeac0 s5; };
-};
-
-struct Common_004ad350 {
-    unsigned char type;
-    unsigned char assoc;
-    char name[17];
-    short xpos;
-    short ypos;
-    short width;
-    short height;
-    int attribs;
-    int colorf;
-    int colorb;
-    unsigned char texturenumber;
-    unsigned char fontnumber;
-    unsigned char active;
-    unsigned char commonattribs;
-    char unknown_2b[8];
-    char help[129];
-    unsigned short gaffile;
-    char text[128];
-    Tail_004aeac0 tail;
 };
 
 struct BlinkWord_004afc60 {
@@ -13193,15 +12941,6 @@ struct Rect_004c2380 {
     int x;
     int y;
     int data[4];
-};
-
-struct Obj_004c2380 {
-    char unknown_0[406];
-    Rect_004c2380 rect;
-    int count;
-    short* image;
-    char unknown_1b6[24];
-    int mode;
 };
 
 struct Obj_004c23e0 {

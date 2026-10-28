@@ -70,10 +70,7 @@ struct Team_004689c0 {
 
 #include "../map/feature.h"
 
-struct ObjectState {
-    char unknown_0[0xc];
-    Unit* unit;
-};
+#include "../units/unit_script.h"
 
 struct DisplayContextView {
     char unknown_0[0x9c];

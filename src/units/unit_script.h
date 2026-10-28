@@ -3,8 +3,34 @@
 
 #include "cob_script.h"
 #include "../../interfaces/ref.h"
+#include "../util/vec3.h"
 
-struct ObjectState;
+struct Unit;
+
+#pragma pack(push, 1)
+struct PieceState {
+    int object;
+    int translation[3];
+    unsigned short rotation[3];
+    Vec3 pos;
+    Ref<int> sfxOffset;
+    short value;
+    unsigned short visible : 1;
+    unsigned short cached : 1;
+    unsigned short shaded : 1;
+    char unknown_2a[0x36 - 0x2a];
+};
+
+struct ObjectState {
+    int unknown_0;
+    int unknown_4;
+    int dirty;
+    Unit* unit;
+    int field_10;
+    char unknown_14[0x22 - 0x14];
+    PieceState pieces[1];
+};
+#pragma pack(pop)
 
 class UnitScript : public CobScript {
 public:

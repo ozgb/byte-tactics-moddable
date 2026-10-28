@@ -750,7 +750,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         return;
 
     if (unit->player->index == g_game->playerIndex)
-        g_seams.los_radar->AddEyeball((Vec3*)&unit->pos, unit->def->range, unit->def->field_170, 60);
+        g_seams.los_radar->AddEyeball((Vec3*)&unit->pos, unit->def->range, unit->def->modelMaxYHigh, 60);
     Unit* parent;
     if (cmd->attackerUnitId == 0)
         parent = 0;

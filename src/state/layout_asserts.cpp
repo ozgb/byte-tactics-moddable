@@ -2251,6 +2251,8 @@ static_assert(offsetof(UnitDef, modelMaxX) == 362, "");
 static_assert(offsetof(UnitDef, modelMaxY) == 366, "");
 static_assert(offsetof(UnitDef, unknown_16e) == 366, "");
 static_assert(offsetof(UnitDef, field_170) == 368, "");
+static_assert(offsetof(UnitDef, modelMaxYLow) == 366, "");
+static_assert(offsetof(UnitDef, modelMaxYHigh) == 368, "");
 static_assert(offsetof(UnitDef, modelMaxZ) == 370, "");
 static_assert(offsetof(UnitDef, modelSizeX) == 374, "");
 static_assert(offsetof(UnitDef, modelSizeXLow) == 374, "");

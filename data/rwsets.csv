@@ -27252,8 +27252,8 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::playerIndex
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::script
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::state
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitDef::field_170
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitDef::metalCost
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitDef::modelMaxYHigh
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitDef::range
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitKilledPacket::attackerPlayerNetId
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitKilledPacket::attackerUnitId

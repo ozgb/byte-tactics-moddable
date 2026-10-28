@@ -1612,7 +1612,7 @@ address,size,file,symbol,status,similarity
 0x47c790,816,src/map/terrain.cpp,?ClaimFootprintCells@@YGXPAUUnit@@@Z,matched,100.0
 0x47cac0,33,src/map/terrain.cpp,?ClaimFootprintsInArea@@YGXUPoint16@@0@Z,matched,100.0
 0x47caf0,1,src/map/terrain.cpp,?FUN_0047caf0@@YGXXZ,matched,100.0
-0x47cb00,51,src/map/terrain.cpp,?UnlinkUnit@SpatialBucket@@QAEXPAUNode_0047cb00@@@Z,matched,100.0
+0x47cb00,51,src/map/terrain.cpp,?UnlinkUnit@SpatialBucket@@QAEXPAUSpatialBucketNode@@@Z,matched,100.0
 0x47cb40,19,src/map/terrain.cpp,?PrependUnit@SpatialBucket@@QAEXH@Z,matched,100.0
 0x47cb60,99,src/map/terrain.cpp,?SetOwner@@YGXPAUUnit@@PAUUnitBucket@@@Z,matched,100.0
 0x47cbd0,83,src/map/terrain.cpp,?ClearFootprintAndUnlink@@YGXPAUUnit@@@Z,matched,100.0

@@ -25,6 +25,11 @@ Every change is classed, and the class decides which bump it needs:
             adapter; until #9 any major bump with a change fails with `adapter required (#9)`
   layout    a field that moves or changes size: fails whatever the bump
 
+data/abi_majors.csv (interface,major,issue) lists the major bumps that pass without an adapter: a major bump
+with changes passes when its interface and new major have a row, and reports `ok (major 2->3, no adapter:
+#499)`. A row fails the run when its issue is not a `#N` reference, or when the header has no such major.
+#9 deletes the file and the clause in `judge()`.
+
 A bump with nothing changed is fine. A version that goes down fails.
 
 A retype is a parameter or return type that changed in a slot. Once an `interfaces-v*` tag exists, every
@@ -45,6 +50,7 @@ the newest `interfaces-v*` tag; until one exists, the merge base of HEAD and ori
 """
 
 import argparse
+import csv
 import json
 import re
 import subprocess
@@ -56,6 +62,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE_BRANCH = "origin/moddable"
+MAJORS_CSV = ROOT / "data" / "abi_majors.csv"
+ISSUE = re.compile(r"#[0-9]+")
 CLANG = ["clang-cl", "--target=i686-pc-windows-msvc", "/nologo", "-TP", "-fms-compatibility",
          "-fms-extensions", "-fms-compatibility-version=11.00", "-fsyntax-only",
          "-Xclang", "-fdump-record-layouts-complete", "-Xclang", "-ast-dump=json"]
@@ -287,7 +295,7 @@ def compare_interfaces(old: Interface, new: Interface, tagged: bool) -> list[Cha
     return changes
 
 
-def judge(old: Interface, new: Interface, changes: list[Change]) -> Result:
+def judge(old: Interface, new: Interface, changes: list[Change], majors: dict | None = None) -> Result:
     """The verdict on the changes, given the version bump."""
     kinds = {c.kind for c in changes}
     details = [c.text if c.kind != "retype" else "retype (before interfaces-v1), " + c.text for c in changes]
@@ -305,7 +313,11 @@ def judge(old: Interface, new: Interface, changes: list[Change]) -> Result:
         bump = ", " + bump_text(old, new) if (old.major, old.minor) != (new.major, new.minor) else ""
         return Result(new.name, True, "ok (no change%s)" % bump)
     if major_up:
-        return fail("adapter required (#9)")
+        # TODO(#9): delete the list and this clause when adapters exist
+        issue = (majors or {}).get((new.name, new.major))
+        if issue is None:
+            return fail("adapter required (#9)")
+        return Result(new.name, True, "ok (major %d->%d, no adapter: %s)" % (old.major, new.major, issue), details)
     if "breaking" in kinds:
         return fail("breaking change needs a major bump, version is %s" % versions)
     if not minor_up:
@@ -319,7 +331,7 @@ def bump_text(old: Interface, new: Interface) -> str:
     return "minor %d->%d" % (old.minor, new.minor)
 
 
-def diff_headers(old_path: Path, new_path: Path, scratch: Path, tagged: bool) -> Result:
+def diff_headers(old_path: Path, new_path: Path, scratch: Path, tagged: bool, majors: dict | None = None) -> Result:
     """The verdict for one interface header against its baseline."""
     name = new_path.stem if new_path.exists() else old_path.stem
     if not old_path.exists():
@@ -330,17 +342,37 @@ def diff_headers(old_path: Path, new_path: Path, scratch: Path, tagged: bool) ->
     new = load_interface(new_path, scratch / "new")
     if not new.major and not new.minor and not old.major and not old.minor:
         return Result(name, True, "skipped (no version macros)")
-    return judge(old, new, compare_interfaces(old, new, tagged))
+    return judge(old, new, compare_interfaces(old, new, tagged), majors)
 
 
-def diff_dirs(old_dir: Path, new_dir: Path, tagged: bool) -> list[Result]:
+def diff_dirs(old_dir: Path, new_dir: Path, tagged: bool, majors: dict | None = None) -> list[Result]:
     """The verdicts for every header in either directory, sorted by name."""
     names = sorted({p.name for p in old_dir.glob("*.h")} | {p.name for p in new_dir.glob("*.h")})
     with tempfile.TemporaryDirectory(prefix="abidiff-") as tmp:
         def one(name: str) -> Result:
-            return diff_headers(old_dir / name, new_dir / name, Path(tmp) / name, tagged)
+            return diff_headers(old_dir / name, new_dir / name, Path(tmp) / name, tagged, majors)
         with ThreadPoolExecutor() as pool:
             return list(pool.map(one, names))
+
+
+def load_majors(path: Path) -> list[tuple[str, int, str]]:
+    """The rows of the major-bump list as (interface, major, issue)."""
+    with open(path, newline="") as f:
+        return [(r["interface"], int(r["major"]), r["issue"]) for r in csv.DictReader(f)]
+
+
+def stale_rows(rows: list, interfaces: Path) -> list[str]:
+    """One message for each row with no issue reference or no such major in the header."""
+    problems = []
+    for number, (name, major, issue) in enumerate(rows, 2):
+        header = interfaces / (name + ".h")
+        found = MAJOR.search(header.read_text()) if header.exists() else None
+        if not ISSUE.fullmatch(issue):
+            problems.append("%s row %d (%s,%d): issue %r is not a #N reference" % (MAJORS_CSV.name, number, name, major, issue))
+        if found is None or int(found.group(2)) != major:
+            problems.append("%s row %d (%s,%d): stale, %s has no major %d"
+                            % (MAJORS_CSV.name, number, name, major, header.name, major))
+    return problems
 
 
 def git(*args: str) -> str:
@@ -391,13 +423,18 @@ def main() -> None:
     ref = args.base or ref
     with tempfile.TemporaryDirectory(prefix="abidiff-base-") as tmp:
         extract_baseline(ref, Path(tmp))
-        results = diff_dirs(Path(tmp), ROOT / "interfaces", tagged)
+        rows = load_majors(MAJORS_CSV)
+        majors = {(name, major): issue for name, major, issue in rows}
+        results = diff_dirs(Path(tmp), ROOT / "interfaces", tagged, majors)
+    problems = stale_rows(rows, ROOT / "interfaces")
     print("baseline: %s (%s)" % (ref, "interfaces-v* tag exists" if tagged else "before interfaces-v1"))
     for result in results:
         print("%s: %s" % (result.name, result.summary))
         for line in result.details:
             print("    " + line)
-    sys.exit(0 if all(r.ok for r in results) else 1)
+    for line in problems:
+        print(line)
+    sys.exit(0 if all(r.ok for r in results) and not problems else 1)
 
 
 if __name__ == "__main__":

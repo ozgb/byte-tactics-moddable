@@ -221,6 +221,7 @@ struct Game_004caec0 {
     PALETTEENTRY palette[256];
 };
 #pragma pack(pop)
+static_assert(sizeof(Game_004caec0) == 0x614, "Game_004caec0 size");
 
 Game_004caec0* GetDisplay();
 

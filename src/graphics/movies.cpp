@@ -70,6 +70,7 @@ struct Surfaces_0047bdf0 {
     void* clipper;
     void* palette;
 };
+static_assert(sizeof(Surfaces_0047bdf0) == 0x14, "Surfaces_0047bdf0 size");
 
 struct Display_0047bdf0 {
     char unknown_0[0x24];

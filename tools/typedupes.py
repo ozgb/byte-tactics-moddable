@@ -15,7 +15,7 @@ body and are not definitions. A name defined in more than one place is a row of 
   in_scope   `yes` if the shared state block reaches the type, else `no`. The scope starts from the
              `sim` and `mixed` rows of data/state_classes.csv, each resolved to a type (a global
              through data/globals.csv, a region of `struct Game` through its field in
-             include/ta_types.h, a heap row through the allocated type, a static through its
+             src/game/game.h, a heap row through the allocated type, a static through its
              declaration) and closes over base classes and pointer, embedded and array members.
              `Game` is entered only through those regions, never expanded as a whole.
   defs       the number of definitions
@@ -531,8 +531,6 @@ class Scope:
     def game_field_types(self) -> dict[str, list[str]]:
         out = {}
         for d in self.by_name.get("Game", []):
-            if d["file"] != "include/ta_types.h":
-                continue
             toks = d["toks"]
             j = toks.index("{") if "{" in toks else len(toks)
             depth, cur = 0, []

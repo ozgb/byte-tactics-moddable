@@ -1990,7 +1990,7 @@ static_assert(sizeof(Settings) == 80, "");
 static_assert(offsetof(Settings, field_471) == 0, "");
 static_assert(offsetof(Settings, flags_475) == 4, "");
 static_assert(offsetof(Settings, bits_475) == 4, "");
-static_assert(offsetof(Settings, unknown_479) == 8, "");
+static_assert(offsetof(Settings, pad_479) == 8, "");
 static_assert(sizeof(Settings_00496e10) == 16, "");
 static_assert(offsetof(Settings_00496e10, value) == 0, "");
 static_assert(offsetof(Settings_00496e10, flag_4) == 4, "");

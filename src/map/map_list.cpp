@@ -46,15 +46,7 @@ char* __stdcall Translate(char* text);
 void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 void RegisterUnitOrders();
 
-class MeteorParams {
-public:
-    char name[0x20];
-    int radius;
-    float density;
-    float duration;
-    float interval;
-    void LoadMeteorDefaults();
-};
+#include "meteors.h"
 
 #include "../game/data_files.h"
 void __stdcall ShowErrorBox(const char* text, const char* caption);

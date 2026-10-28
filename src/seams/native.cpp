@@ -25,11 +25,6 @@
 
 struct Player;
 
-class MeteorParams {
-public:
-    void LoadMeteorDefaults();
-};
-
 #include "../game/game_state.h"
 #include "../map/meteors.h"
 #include "../game/console_commands.h"

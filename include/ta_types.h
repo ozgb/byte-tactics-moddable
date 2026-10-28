@@ -4601,16 +4601,6 @@ public:
     void LoadMissionData(char*, TdfFile*);
 };
 
-class MeteorParams {
-public:
-    char name[32];
-    int radius;
-    float density;
-    float duration;
-    float interval;
-    void LoadMeteorDefaults(void);
-};
-
 class Class_004c44c0 {
 public:
     int unknown_0;

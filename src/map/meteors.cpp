@@ -20,15 +20,6 @@
 #include "meteors.h"
 
 
-class MeteorParams {
-public:
-    char name[0x20];
-    int radius;
-    float density;
-    float duration;
-    float interval;
-    void LoadMeteorDefaults();
-};
 
 #include "../../link/globals.h"
 typedef char SimView_g_meteorWeaponName[];

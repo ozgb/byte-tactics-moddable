@@ -349,7 +349,7 @@ int TdfRecord::GetRecordName()
     return (int)name;
 }
 
-class Class_004c90b0;
+class StringRefAppendView;
 class TranslationTable;
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int WalkFrameChain(int, int, int, int, int, int, int, int, int, int);

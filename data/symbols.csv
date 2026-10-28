@@ -2823,7 +2823,7 @@ address,name
 0x4c8020,DrawLitTexturedSpan
 0x4c8760,DrawTexturedPolygon
 0x4c8bb0,DrawLitTexturedPolygon
-0x4c90b0,Class_004c90b0::Append
+0x4c90b0,StringRefAppendView::Append
 0x4c9180,StringRef::StringRef
 0x4c9290,StringRef::MakeLower
 0x4c9310,StringRef::MakeUpper

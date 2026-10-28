@@ -5,7 +5,7 @@
 
 int __stdcall HandleHostEvent(host_event* ev);
 
-struct Smk_0047c3a0 {
+struct SmackHandleView {
     unsigned int version;
     unsigned int width;
     unsigned int height;
@@ -26,18 +26,18 @@ struct Smk_0047c3a0 {
 
 extern "C" __declspec(dllimport) int __stdcall SmackSoundEnable(HWND hwnd);
 extern "C" __declspec(dllimport) int __stdcall SmackSoundUseDirectSound(void* sound);
-extern "C" __declspec(dllimport) Smk_0047c3a0* __stdcall SmackOpen(char* path, unsigned int flags, int extra);
-extern "C" __declspec(dllimport) unsigned int __stdcall SmackSoundOnOff(Smk_0047c3a0* smk, unsigned int on);
-extern "C" __declspec(dllimport) void __stdcall SmackGoto(Smk_0047c3a0* smk, unsigned int frame);
-extern "C" __declspec(dllimport) void __stdcall SmackDoFrame(Smk_0047c3a0* smk);
-extern "C" __declspec(dllimport) void __stdcall SmackNextFrame(Smk_0047c3a0* smk);
-extern "C" __declspec(dllimport) void __stdcall SmackToBuffer(Smk_0047c3a0* smk, unsigned int left, unsigned int top, unsigned int width, unsigned int height, unsigned int bufferHeight, void* buffer);
-extern "C" __declspec(dllimport) int __stdcall SmackToBufferRect(Smk_0047c3a0* smk, int flag);
-extern "C" __declspec(dllimport) unsigned int __stdcall SmackWait(Smk_0047c3a0* smack);
+extern "C" __declspec(dllimport) SmackHandleView* __stdcall SmackOpen(char* path, unsigned int flags, int extra);
+extern "C" __declspec(dllimport) unsigned int __stdcall SmackSoundOnOff(SmackHandleView* smk, unsigned int on);
+extern "C" __declspec(dllimport) void __stdcall SmackGoto(SmackHandleView* smk, unsigned int frame);
+extern "C" __declspec(dllimport) void __stdcall SmackDoFrame(SmackHandleView* smk);
+extern "C" __declspec(dllimport) void __stdcall SmackNextFrame(SmackHandleView* smk);
+extern "C" __declspec(dllimport) void __stdcall SmackToBuffer(SmackHandleView* smk, unsigned int left, unsigned int top, unsigned int width, unsigned int height, unsigned int bufferHeight, void* buffer);
+extern "C" __declspec(dllimport) int __stdcall SmackToBufferRect(SmackHandleView* smk, int flag);
+extern "C" __declspec(dllimport) unsigned int __stdcall SmackWait(SmackHandleView* smack);
 
 extern "C" __declspec(dllimport) void __stdcall SmackClose(void* smack);
 
-struct SmkStats_0047c530 {
+struct SmackSummaryView {
     unsigned int totalTime;
     unsigned int unknown_04;
     unsigned int openTime;
@@ -61,29 +61,29 @@ struct SmkStats_0047c530 {
     unsigned int highestExtraUsed;
 };
 
-extern "C" __declspec(dllimport) void __stdcall SmackSummary(Smk_0047c3a0* smk, SmkStats_0047c530* stats);
+extern "C" __declspec(dllimport) void __stdcall SmackSummary(SmackHandleView* smk, SmackSummaryView* stats);
 
-struct Surfaces_0047bdf0 {
+struct DirectDrawSurfaceSet {
     void* ddraw;
     void* primary;
     void* back;
     void* clipper;
     void* palette;
 };
-static_assert(sizeof(Surfaces_0047bdf0) == 0x14, "Surfaces_0047bdf0 size");
+static_assert(sizeof(DirectDrawSurfaceSet) == 0x14, "Surfaces_0047bdf0 size");
 
-struct Display_0047bdf0 {
+struct DisplayMovieView {
     char unknown_0[0x24];
     void* sound;
     char unknown_28[0x40 - 0x28];
     HWND hwnd;
     char unknown_44[0x84 - 0x44];
-    Surfaces_0047bdf0 surfaces;
+    DirectDrawSurfaceSet surfaces;
     char unknown_98[0xf0 - 0x98];
     unsigned short flags;
 };
 
-struct Display_0047c3a0 {
+struct DisplayOffscreenView {
     char unknown_0[8];
     unsigned int width;
     unsigned int height;
@@ -97,12 +97,12 @@ struct Display_0047c3a0 {
 
 #include "../../link/globals.h"
 
-Display_0047bdf0* GetDisplay();
+DisplayMovieView* GetDisplay();
 #include "display.h"
-void __stdcall SetOffscreenSurface(Display_0047c3a0* display);
+void __stdcall SetOffscreenSurface(DisplayOffscreenView* display);
 void FlipScreen();
 
-struct Smk_0047bf70_b {
+struct SmackBufferView {
     char unknown_0[0x2c];
     DWORD paletteColors;
     char unknown_30[0x3c - 0x30];
@@ -111,15 +111,15 @@ struct Smk_0047bf70_b {
     DWORD paletteType;
 };
 
-extern "C" __declspec(dllimport) Smk_0047bf70_b *__stdcall SmackBufferOpen(HWND hwnd, HDC hdc, int width, int height, int flags, int background);
-extern "C" __declspec(dllimport) void __stdcall SmackBufferNewPalette(Smk_0047bf70_b *smk, unsigned char *rgb, unsigned short flag);
-extern "C" __declspec(dllimport) void __stdcall SmackColorRemap(Smk_0047c3a0 *smk, DWORD *palette, DWORD paletteColors, DWORD paletteType);
+extern "C" __declspec(dllimport) SmackBufferView *__stdcall SmackBufferOpen(HWND hwnd, HDC hdc, int width, int height, int flags, int background);
+extern "C" __declspec(dllimport) void __stdcall SmackBufferNewPalette(SmackBufferView *smk, unsigned char *rgb, unsigned short flag);
+extern "C" __declspec(dllimport) void __stdcall SmackColorRemap(SmackHandleView *smk, DWORD *palette, DWORD paletteColors, DWORD paletteType);
 
 struct SmackerSurface;
 
 class MoviePlayer {
 public:
-    Smk_0047c3a0* smack;
+    SmackHandleView* smack;
     unsigned int frame;
     int stopped;
     HWND hwnd;
@@ -156,7 +156,7 @@ MoviePlayer::MoviePlayer(char* path, int a, int b, int c, int d, int e)
         FatalError("Could not open movie file, please check filename in INI.");
     SmackSoundOnOff(smack, sound != 0);
 
-    Display_0047bdf0* disp = GetDisplay();
+    DisplayMovieView* disp = GetDisplay();
     hwnd = disp->hwnd;
     if ((disp->flags & 2) && host_display_is_open()) {
         hasSurfaces = 0;
@@ -202,7 +202,7 @@ int MoviePlayer::SetupDirectDraw()
         host_window_raise();
     }
     if (smack->newPalette) {
-        Smk_0047bf70_b *smk = SmackBufferOpen(hwnd, 0, 0x280, 0x1e0, 0, 0);
+        SmackBufferView *smk = SmackBufferOpen(hwnd, 0, 0x280, 0x1e0, 0, 0);
         SmackBufferNewPalette(smk, &smack->rgb[0][0], smack->palType);
         SmackColorRemap(smack, &smk->palette, smk->paletteColors, smk->paletteType);
     }
@@ -264,8 +264,8 @@ void MoviePlayer::PlayFrame(HWND hwnd)
         }
         host_palette_set(0, 256, (unsigned char*)entries);
     }
-    SetOffscreenSurface((Display_0047c3a0 *)g_game->screen);
-    SmackToBuffer(smack, 0, (0x1e0 - smack->height) >> 1, ((Display_0047c3a0 *)g_game->screen)->width, smack->height, ((Display_0047c3a0 *)g_game->screen)->height, 0);
+    SetOffscreenSurface((DisplayOffscreenView *)g_game->screen);
+    SmackToBuffer(smack, 0, (0x1e0 - smack->height) >> 1, ((DisplayOffscreenView *)g_game->screen)->width, smack->height, ((DisplayOffscreenView *)g_game->screen)->height, 0);
     SmackDoFrame(smack);
     FlipScreen();
     if (SmackToBufferRect(smack, 1) && smack->lastLeft == 0 && smack->lastTop == 0
@@ -282,7 +282,7 @@ void MoviePlayer::PlayFrame(HWND hwnd)
 // FUNCTION: 0x47c530
 void MoviePlayer::WriteSmackStats()
 {
-    SmkStats_0047c530 stats;
+    SmackSummaryView stats;
     SmackSummary(smack, &stats);
     void* file = host_file_create("stats.txt", HOST_FILE_TEXT);
     if (file) {

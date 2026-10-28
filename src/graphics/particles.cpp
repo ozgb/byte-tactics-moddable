@@ -24,6 +24,7 @@
 
 #pragma pack(push, 1)
 #include "../game/game.h"
+#include "../game/los_helpers.h"
 #pragma pack(pop)
 
 #pragma pack(push, 2)
@@ -338,51 +339,6 @@ public:
     virtual int IsEmitDue();
     virtual void Init(Vec3_00474760* a, Vec3_00474760* b, int newPeriod,
                               int lifetime, int isAscending);
-};
-
-class Listener_00471d90 {
-public:
-    virtual void Slot0();
-    virtual void Slot1();
-    virtual void Slot2(void* msg);
-};
-
-struct Lists_00471d90 {
-    std::vector<Listener_00471d90*> lists[10];
-};
-
-class Listener_00471eb0 {
-public:
-    virtual ~Listener_00471eb0();
-    virtual void Slot1();
-    virtual void Slot2(void* msg);
-    virtual int Slot3();
-};
-
-struct Lists_00471eb0 {
-    std::vector<Listener_00471eb0*> lists[10];
-};
-
-class Listener_471f40 {
-public:
-    virtual void Slot0();
-    virtual void Slot1();
-    virtual void Slot2(int arg);
-};
-
-struct Lists_471f40 {
-    std::vector<Listener_471f40*> lists[10];
-};
-
-class Listener_00471f90 {
-public:
-    virtual void Slot0();
-    virtual void Slot1();
-    virtual void Slot2(void* msg);
-};
-
-struct Lists_00471f90 {
-    std::vector<Listener_00471f90*> lists[10];
 };
 
 struct Vec3_004720d0 {
@@ -721,23 +677,23 @@ void ParticleSystem::SetLifetime(int ticks)
 // FUNCTION: 0x471d90
 void CreateParticleLists()
 {
-    (*(Lists_00471d90 **)&g_game->lists_38d77) = new Lists_00471d90;
+    (*(ParticleLists **)&g_game->lists_38d77) = new ParticleLists;
 }
 
 // FUNCTION: 0x471eb0
 void UpdateParticles()
 {
-    Lists_00471eb0* l = (Lists_00471eb0 *)g_game->lists_38d77;
+    ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     for (int i = 0; i < 10; i++) {
-        std::vector<Listener_00471eb0*>& v = l->lists[i];
-        std::vector<Listener_00471eb0*>::iterator it = v.begin();
+        std::vector<ParticleSystem*>& v = l->lists[i];
+        std::vector<ParticleSystem*>::iterator it = v.begin();
         while (it != v.end()) {
-            Listener_00471eb0* p = *it;
-            if (p->Slot3()) {
+            ParticleSystem* p = *it;
+            if (p->IsFinished()) {
                 delete p;
                 v.erase(it);
             } else {
-                p->Slot1();
+                p->Update();
                 ++it;
             }
         }
@@ -747,10 +703,10 @@ void UpdateParticles()
 // FUNCTION: 0x471f40
 void __stdcall DrawParticles(int arg)
 {
-    Lists_471f40* l = (Lists_471f40 *)g_game->lists_38d77;
+    ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     for (int i = 0; i < 10; i++) {
-        for (std::vector<Listener_471f40*>::iterator it = l->lists[i].begin(); it != l->lists[i].end(); ++it) {
-            (*it)->Slot2(arg);
+        for (std::vector<ParticleSystem*>::iterator it = l->lists[i].begin(); it != l->lists[i].end(); ++it) {
+            (*it)->Render(arg);
         }
     }
 }
@@ -758,9 +714,9 @@ void __stdcall DrawParticles(int arg)
 // FUNCTION: 0x471f90
 void __stdcall DrawParticleList(void* msg, short kind)
 {
-    std::vector<Listener_00471f90*>& v = ((Lists_00471f90 *)g_game->lists_38d77)->lists[kind];
-    for (std::vector<Listener_00471f90*>::iterator it = v.begin(); it != v.end(); ++it) {
-        (*it)->Slot2(msg);
+    std::vector<ParticleSystem*>& v = ((ParticleLists *)g_game->lists_38d77)->lists[kind];
+    for (std::vector<ParticleSystem*>::iterator it = v.begin(); it != v.end(); ++it) {
+        (*it)->Render((int)msg);
     }
 }
 
@@ -1786,28 +1742,6 @@ TimedSubParticles::TimedSubParticles()
 int TimedSubParticles::IsEmitDue()
 {
     return (unsigned int)time <= (unsigned int)g_game->ticks;
-}
-
-static inline int IsExplored(Player* map, Vec3Words* pos)
-{
-    int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
-    if ((unsigned int)tx < (unsigned int)map->exploredWidth && (unsigned int)ty < (unsigned int)map->exploredHeight &&
-        map->explored[(unsigned int)map->exploredWidth * ty + tx])
-        return 1;
-    return 0;
-}
-
-static inline int IsSeen(Player* map, Vec3Words* pos)
-{
-    int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
-    if (!((unsigned int)tx < (unsigned int)map->exploredWidth && (unsigned int)ty < (unsigned int)map->exploredHeight)) {
-        return 0;
-    }
-    Player* b = map;
-    return (g_game->visibilityMask[(unsigned int)b->exploredWidth * ty + tx] &
-            (1 << g_game->playerIndex)) != 0;
 }
 
 static inline int IsVisible(Player* map, Vec3Words* pos)

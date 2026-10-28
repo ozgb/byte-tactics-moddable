@@ -1399,7 +1399,6 @@ class Link_004908c0;
 struct ListOwner_0043a1f0;
 class ListWrap_0046d1a0;
 struct List_00420960;
-struct List_00421f20;
 struct List_004be3b0;
 class Listener_00470fb0;
 class Listener_00471120;
@@ -1469,7 +1468,6 @@ struct Msg_00441220;
 struct Msg_00450530;
 struct Msg_00461900;
 struct Muzzle_0048a1e0;
-struct NameEntry_00421f20;
 struct NameLess_00499cd0;
 struct NameLess_004b7620;
 struct NameLess_004b7760;
@@ -4012,17 +4010,6 @@ struct FeatureDef_00421eb0 {
 };
 
 #include "../src/map/feature_anim_pool.h"
-
-struct List_00421f20 {
-    char unknown_0[28];
-    int count;
-    NameEntry_00421f20* entries;
-};
-
-struct NameEntry_00421f20 {
-    char unknown_0[4];
-    char name[128];
-};
 
 struct Pool_00422170 {
     Entry* entries;

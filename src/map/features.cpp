@@ -10,6 +10,7 @@
 #include "../files/files_api.h"
 #include "../../interfaces/ref.h"
 #include "../util/rot16.h"
+#include "tnt_info.h"
 
 #pragma pack(push, 1)
 
@@ -70,11 +71,6 @@ struct AnimEntry {
     char unknown_4[0x2c];
 };
 
-struct NameEntry {
-    char unknown_0[4];
-    char name[0x80];
-};
-
 struct AnimManager {
     char unknown_0[0x10];
     Ref<AnimEntry> anim;
@@ -86,12 +82,6 @@ struct AnimManager {
     int nameCount;
     char unknown_5c[0x74 - 0x5c];
     char (*names)[0x100];
-};
-
-struct List_00421f20 {
-    char unknown_0[0x1c];
-    int count;
-    NameEntry* entries;
 };
 
 struct Feature;
@@ -267,7 +257,7 @@ Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def)
 }
 
 // FUNCTION: 0x421f20
-void __stdcall InitFeatureAnimPool(List_00421f20* list)
+void __stdcall InitFeatureAnimPool(TntInfo* info)
 {
     FeatureAnimPool* m = &g_game->anim;
 
@@ -293,10 +283,8 @@ void __stdcall InitFeatureAnimPool(List_00421f20* list)
     m->names = nullptr;
     m->nameCount = 0;
 
-    NameEntry*& entries = list->entries;
-
-    for (int j = 0; j < list->count; j++) {
-        LoadFeatureType(entries[j].name);
+    for (int j = 0; j < info->featureCount; j++) {
+        LoadFeatureType(info->featureNames[j].name);
     }
 }
 

@@ -52,7 +52,7 @@ economy,InitStartingResourcesFromSkirmish,src/game/main_loop.cpp,0,0,0,0,0,0,?In
 economy,SettleResourceAccount,src/game/economy.cpp,0,0,0,0,0,0,?SettleResourceAccount@@YGXPAUObj_00401320@@MM@Z,1,
 economy,ShareMapInfo,src/units/units.cpp,1,0,0,0,0,0,?ShareMapInfo@@YGXEE@Z,0,share-dialog
 economy,UpdateResourceSharing,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateResourceSharing@@YGXPAUPlayer@@@Z,0,network-game
-features,*,,44,42,1053,863,448,312,,4,
+features,*,,44,42,1051,861,448,312,,4,
 features,??$copy@PAGPAG@std@@YGPAGPAG00@Z,src/map/features.cpp,0,0,0,0,0,0,??$copy@PAGPAG@std@@YGPAGPAG00@Z,1,
 features,Assign_00425480,src/map/features.cpp,0,0,0,0,0,0,?Assign_00425480@@YGXPAV?$vector@PAVTdfFile@@V?$allocator@PAVTdfFile@@@std@@@std@@PBV12@@Z,1,
 features,FreeFeaturePool,src/map/features.cpp,1,0,0,0,0,0,?FreeFeaturePool@@YGXXZ,0,shutdown
@@ -1183,7 +1183,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1108,454,31740,9835,11828,2560,,295,
+presentation,*,,1107,454,31724,9829,11818,2554,,294,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,
@@ -1656,7 +1656,6 @@ presentation,IsPointInRect,src/gui/gui.cpp,1,0,0,0,0,0,?IsPointInRect@@YGHPAURec
 presentation,IsRemoteAI_00448c70,src/frontend/multi.cpp,1,0,0,0,0,0,?IsRemoteAI_00448c70@@YGHPAUPlayer@@@Z,0,
 presentation,IsRemoteHuman_00447b10,src/frontend/multi.cpp,1,0,0,0,0,0,?IsRemoteHuman_00447b10@@YGHPAUPlayer@@@Z,0,
 presentation,IsRemoteHuman_00448c70,src/frontend/multi.cpp,1,0,0,0,0,0,?IsRemoteHuman_00448c70@@YGHPAUPlayer@@@Z,0,
-presentation,IsSeen,src/graphics/particles.cpp,1,0,0,0,0,0,?IsSeen@@YGHPAUPlayer@@PAUVec3Words@@@Z,0,
 presentation,IsSelectable,src/frontend/multi.cpp,1,0,0,0,0,0,?IsSelectable@@YGHPAUPlayer@@@Z,0,
 presentation,IsType_00447380,src/frontend/multi.cpp,1,0,0,0,0,0,?IsType_00447380@@YGHPAUPlayer@@@Z,0,
 presentation,IsWatching_00447380,src/frontend/multi.cpp,1,0,0,0,0,0,?IsWatching_00447380@@YGHPAUPlayer@@@Z,0,
@@ -1792,7 +1791,6 @@ presentation,ParticleLists::AddTimedSubParticles,src/graphics/particles.cpp,0,0,
 presentation,ParticleLists::AddWakeParticles,src/graphics/particles.cpp,0,0,0,0,0,0,?AddWakeParticles@ParticleLists@@QAEXHHHHFH@Z,1,
 presentation,ParticleLists::DrawAll,src/graphics/particles.cpp,0,0,0,0,0,0,?DrawAll@ParticleLists@@QAEXPAX@Z,1,
 presentation,ParticleLists::DrawList,src/graphics/particles.cpp,0,0,0,0,0,0,?DrawList@ParticleLists@@QAEXPAXF@Z,1,
-presentation,ParticleLists::ParticleLists,src/graphics/particles.cpp,0,0,0,0,0,0,??0ParticleLists@@QAE@XZ,1,
 presentation,ParticleLists::UpdateAll,src/graphics/particles.cpp,0,0,0,0,0,0,?UpdateAll@ParticleLists@@QAEXXZ,1,
 presentation,ParticleLists::~ParticleLists,src/graphics/particles.cpp,1,0,0,0,0,0,??1ParticleLists@@QAE@XZ,0,
 presentation,PathGoal::DrawOnSurface,src/orders/order_targets.cpp,1,0,0,0,0,0,?DrawOnSurface@PathGoal@@UAEXPAX@Z,0,

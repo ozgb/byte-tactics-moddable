@@ -9,13 +9,13 @@ struct Rot16;
 struct Unit;
 struct Vec3;
 struct Point16;
-struct List_00421f20;
+struct TntInfo;
 class HapiBank;
 
 // Major version of the features interface, changed when a slot is removed or its signature changes.
-#define FEATURES_VERSION_MAJOR 1
+#define FEATURES_VERSION_MAJOR 2
 // Minor version of the features interface, changed when a slot is added.
-#define FEATURES_VERSION_MINOR 1
+#define FEATURES_VERSION_MINOR 0
 
 // Map features such as wrecks and trees.
 struct FeaturesSeam {
@@ -30,7 +30,7 @@ struct FeaturesSeam {
     // Links each feature to its dead and burnt versions by name. Hooks: none.
     void (__stdcall* ResolveFeatureLinks)(void);
     // Prepares the pool of feature animations for a map. Hooks: none.
-    void (__stdcall* InitFeatureAnimPool)(List_00421f20* list);
+    void (__stdcall* InitFeatureAnimPool)(TntInfo* info);
     // Releases the pool of feature animations. Hooks: none.
     void (__stdcall* FreeFeaturePool)(void);
     // Places the features a mission file lists. Hooks: none.

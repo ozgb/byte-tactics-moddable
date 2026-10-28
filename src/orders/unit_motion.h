@@ -7,7 +7,7 @@
 struct Unit;
 class HapiBank;
 class Iface_0043dd20;
-class PlayerData;
+class MotionSerializer;
 
 class PathGoal;
 class OrderFx;
@@ -38,7 +38,7 @@ class UnitMotion {
 public:
     union {
         Ref<Iface_0043dd20> obj;
-        Ref<PlayerData> player;
+        Ref<MotionSerializer> player;
     };
     int movementClass;
     Vec3 velocity;

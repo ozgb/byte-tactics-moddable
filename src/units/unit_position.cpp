@@ -17,7 +17,7 @@ struct Tail32 {
 
 class CobScript;
 class UnitMotion;
-class PlayerData;
+class MotionSerializer;
 class BitWriter;
 class BitReader;
 struct Block;
@@ -44,7 +44,7 @@ union TerrainFlags {
 
 #include "../orders/unit_motion.h"
 
-class PlayerData {
+class MotionSerializer {
 public:
     virtual void v0();
     virtual void v1();

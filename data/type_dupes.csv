@@ -50,7 +50,7 @@ Dst_00440ca0,no,2,include/ta_types.h:5474|src/units/movement_class.cpp:102,diffe
 Dword_0051f410,no,2,include/ta_types.h:11493|src/game/main.cpp:133,differs,src/game/main.cpp
 Elem_00441c30,no,2,include/ta_types.h:5484|src/frontend/multi.cpp:192,differs,src/frontend/multi.cpp
 Elem_432cb0,no,2,include/ta_types.h:4603|src/map/los_tables.cpp:19,differs,src/map/los_tables.cpp
-EmptyStringRep,no,2,link/globals.h:215|src/graphics/surface.cpp:1682,identical,link/globals.h
+EmptyStringRep,no,2,link/globals.h:214|src/graphics/surface.cpp:1682,identical,link/globals.h
 Entry,no,2,include/ta_types.h:3508|src/harness/block_scan.cpp:20,differs,src/harness/block_scan.cpp
 Entry_0049d120,no,2,include/ta_types.h:11294|src/weapons/weapons.cpp:1284,differs,src/weapons/weapons.cpp
 Entry_0049d270,no,2,include/ta_types.h:11328|src/weapons/weapons.cpp:50,differs,src/weapons/weapons.cpp
@@ -116,7 +116,7 @@ MapCacheEntry,no,3,include/ta_types.h:4930|src/map/map_list.cpp:107|src/map/map_
 MapInsertResult,no,3,include/ta_types.h:15566|src/debug/debug_lib.cpp:861|src/debug/free_block_map.cpp:46,differs,src/debug/debug_lib.cpp
 MappedFile,no,2,include/ta_types.h:15933|src/host/win32/crash.cpp:305,differs,src/host/win32/crash.cpp
 Message_0047fad0,no,2,include/ta_types.h:9547|src/sound/sound.cpp:126,differs,src/sound/sound.cpp
-MeteorParams,no,4,include/ta_types.h:4843|src/map/map_list.cpp:49|src/map/meteors.cpp:22|src/seams/native.cpp:28,differs,src/map/map_list.cpp
+MeteorParams,no,4,include/ta_types.h:4843|src/map/map_list.cpp:49|src/map/meteors.cpp:23|src/seams/native.cpp:28,differs,src/map/map_list.cpp
 MissionHolder,no,2,include/ta_types.h:4370|src/units/unit_types.cpp:63,differs,src/units/unit_types.cpp
 MissionOrderTable,no,2,include/ta_types.h:5242|src/orders/order_list.cpp:658,differs,src/orders/order_list.cpp
 Mission_00467e50,no,2,include/ta_types.h:7675|src/ingame/info_panel.cpp:136,differs,src/ingame/info_panel.cpp

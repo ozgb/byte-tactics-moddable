@@ -430,9 +430,9 @@ Coverage: 100.0% of functions (10 of 10), 96.2% of lines, 73.7% of branches; 0 l
 
 Issue #17. 93 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 88.9% of functions (64 of 72), 82.8% of lines, 72.9% of branches; 8 live functions no scenario enters, and 22 more are dead (data/coverage.csv).
+Coverage: 88.6% of functions (62 of 70), 82.8% of lines, 72.9% of branches; 8 live functions no scenario enters, and 22 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (8 of 72 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 64 are entered, 88.9%), by reason:
+**Live functions no scenario enters** (8 of 70 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 62 are entered, 88.6%), by reason:
 
 - Shutdown only (4): `FreeRadar`, `FreeMapResources`, `LosTables::FreeTables` and `LosTables::~LosTables`. `FreeRadar` and `FreeMapResources` are called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick. `FreeTables` has no caller but `FreeLosTables`, which nothing calls, and the destructor is that of the static table, which never runs, because `host_exit` ends the process with `TerminateProcess`.
 - Network only (2): `CmdShareMapping` and `CmdShareRadar` (the share commands, which all check `netGameFlags & 1`, a network game). Test mode runs a skirmish.
@@ -574,9 +574,9 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Entered by the console: `TransferEnergy` and `TransferMetal` (console `Give`, `console-economy`) and `MissionConditions::Deactivate` (console `Kill`, `console-units`) (#445).
 
-**map** (108 functions). No phase root. 53 functions are called from outside, by presentation (24), seams (19), game (10) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 67 functions: platform 29, files 12, los_radar 6, game 4, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.4% of functions (78 of 97), 86.8% of lines, 75.9% of branches; 19 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
+**map** (108 functions). No phase root. 53 functions are called from outside, by presentation (24), seams (19), game (10) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 67 functions: platform 29, files 12, los_radar 6, game 4, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.8% of functions (80 of 99), 86.8% of lines, 75.9% of branches; 19 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
 
-**map, functions no scenario enters** (19 of 97 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 78 are entered, 80.4%), by reason:
+**map, functions no scenario enters** (19 of 99 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 80 are entered, 80.8%), by reason:
 
 - Load only (1): `ForceNeighborFootprintReclaim` (called from `LoadUnit`). `save-midgame` (#422) enters the save side, and `load-midgame` (#442) enters `LoadMetalPlotmap`, `LoadPlayerFeaturesPlotmap` and `LoadMappingData` (the saved game files).
 - Shutdown only (2): `FreeOtaEnumCacheAndMission` and `Vector_00438480::~Vector_00438480`. The first is called at the end of `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick. The second is the destructor of the static `g_missionOrderTableVec`, which never runs, because `host_exit` ends the process with `TerminateProcess`.
@@ -667,11 +667,11 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 87.1% | 3 | 10 |
 | **weapons** | 74 of 88 | 84.1% | 84.6% | 70.4% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 64 of 72 | 88.9% | 82.8% | 72.9% | 8 | 22 |
+| **los_radar** | 62 of 70 | 88.6% | 82.8% | 72.9% | 8 | 22 |
 | **orders** | 306 of 368 | 83.2% | 79.4% | 61.6% | 62 | 26 |
 | **units** | 132 of 164 | 80.5% | 84.5% | 71.1% | 32 | 33 |
 | **players** | 74 of 143 | 51.7% | 52.8% | 44.2% | 69 | 11 |
-| **map** | 78 of 97 | 80.4% | 86.8% | 75.9% | 19 | 12 |
+| **map** | 80 of 99 | 80.8% | 86.8% | 75.9% | 19 | 12 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
 | game | 113 of 183 | 61.7% | 50.4% | 31.4% | 70 | 25 |
 | network | 50 of 287 | 17.4% | 10.7% | 4.5% | 237 | 73 |

@@ -50,7 +50,7 @@ struct Gadget {
             short firstRow;
             short maxFirstRow;
             short rowCount;
-            char* field_c2;
+            char* lines;
             void* rows;
             GafEntry* gaf;
             void (__stdcall* callback)(Gui*, Gadget*);

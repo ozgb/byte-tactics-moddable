@@ -174,7 +174,7 @@ void __stdcall ShowSavedGameInfo()
             g_savegameRadarPreview = (char*)LoadSurface(file);
             if (g_savegameRadarPreview != 0) {
                 FrameFromSurface(g_savegameRadarFrame, g_savegameRadarPreview);
-                radar->u.list.field_c2 = g_savegameRadarFrame;
+                radar->u.list.lines = g_savegameRadarFrame;
             }
             SetGadgetActiveByName(menu, "RADAR", g_savegameRadarPreview != 0);
 

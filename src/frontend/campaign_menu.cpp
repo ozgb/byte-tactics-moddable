@@ -36,60 +36,7 @@ struct Layer;
 
 #pragma pack(push, 1)
 
-struct Gadget {
-    char unknown_0[0x13];
-    short x;
-    short y;
-    short w;
-    short h;
-    int attribs;
-    int colour_1f;
-    void* colours;
-    char unknown_27[0x28 - 0x27];
-    unsigned char tab;
-    char unknown_29[0x60 - 0x29];
-    int index;
-    char unknown_64[0xb6 - 0x64];
-    union {
-        short count;
-        char text_b6[0x80];
-        void* hotspotCallback;
-        struct {
-            char unknown_b6[4];
-            short selected;
-            union {
-                struct {
-                    void* surface;
-                    void* gaf;
-                    char unknown_c4[2];
-                };
-                struct {
-                    char unknown_bc[2];
-                    void* hotspotGaf;
-                    char unknown_c2[4];
-                };
-                struct {
-                    char unknown_c0[6];
-                    char* text;
-                };
-            };
-            short frame;
-            char unknown_c8[0xce - 0xc8];
-            void (__stdcall* callback)();
-            char unknown_d2[0x136 - 0xd2];
-            union {
-                short range;
-                struct {
-                    unsigned char stages;
-                    unsigned char stageIndex;
-                };
-            };
-            char unknown_138[0x144 - 0x138];
-            void (__stdcall* sliderCallback)(Gui*, int);
-            char unknown_148[0x15b - 0x148];
-        };
-    };
-};
+#include "../gui/gadget.h"
 
 #include "../gui/layer.h"
 
@@ -406,7 +353,7 @@ void InitBriefingText()
         gadgets[j].tab = g_game->side + 1;
         SelectFontForEntry(gadgets, j);
         g_briefingPaginateReset = 1;
-        g_briefingWrappedText = WordWrapText(&g_game->gui, text, gadgets[j].w, j);
+        g_briefingWrappedText = WordWrapText(&g_game->gui, text, gadgets[j].width, j);
         g_briefingWrappedText = AllocColorMarkupText(g_briefingWrappedText);
         DrawHelpPage();
     }
@@ -477,11 +424,11 @@ void DrawHelpPage()
         return;
 
     if (g_briefingPaginateReset != 0) {
-        g_briefingBaseGadgetCount = gadgets[0].count;
+        g_briefingBaseGadgetCount = gadgets[0].u.count;
         g_briefingPageIndex = -1;
         g_briefingPaginateReset = 0;
     } else {
-        gadgets[0].count = (short)g_briefingBaseGadgetCount;
+        gadgets[0].u.count = (short)g_briefingBaseGadgetCount;
     }
 
     ClearBlinkWords((Dialog *)&g_game->gui);
@@ -493,10 +440,10 @@ void DrawHelpPage()
     SelectFontForEntry(gadgets, idx);
 
     int divisor = FontHeight((void *)GetFont()) + 2;
-    int linesPerPage = gp->h / divisor;
+    int linesPerPage = gp->height / divisor;
     int textX = gp->x + 5;
     int y = gp->y + divisor / 2;
-    count = gadgets[0].count;
+    count = gadgets[0].u.count;
     g_briefingPageIndex++;
 
     char* lineStart = FindPageStart(g_briefingWrappedText, linesPerPage, g_briefingPageIndex);
@@ -524,11 +471,11 @@ void DrawHelpPage()
          i < (g_briefingPageIndex + 1) * linesPerPage; i++) {
         AddTextGadget(dialog, "TextRegion", DAT_005119b8, textX, y, -1, 2);
         count++;
-        char* dst = gadgets[count].text_b6;
+        char* dst = gadgets[count].u.text;
         gadgets[count].attribs = 0x411;
         gadgets[count].tab = gp->tab;
-        gadgets[count].colour_1f = g_briefingTextColors[g_game->flag_37ef2 * 4];
-        memset(gadgets[count].text_b6, 0, 0x80);
+        gadgets[count].colours = g_briefingTextColors[g_game->flag_37ef2 * 4];
+        memset(gadgets[count].u.text, 0, 0x80);
 
         y += divisor;
         while (*lineStart != '\n') {
@@ -548,7 +495,7 @@ void DrawHelpPage()
                     lineStart++;
                     int colour =
                         g_briefingTextColors[g_game->flag_37ef2 * 4 + sel];
-                    int x = GetTextWidth((void *)GetFont(), gadgets[count].text_b6) + textX;
+                    int x = GetTextWidth((void *)GetFont(), gadgets[count].u.text) + textX;
                     int ey = gadgets[count].y;
                     int k = 0;
                     char* q = lineStart;
@@ -746,7 +693,7 @@ void __stdcall FillMissionList(Gui* menu, int unused)
     }
     Gadget* layout =
         FindGadgetChecked(g_game->gui.layer->entries, "Campaign");
-    g_game->net->LoadCampaign(SkipTextLines(layout->text, layout->selected));
+    g_game->net->LoadCampaign(SkipTextLines(layout->u.list.lines, layout->u.list.selected));
     int count = g_game->net->BuildMissionList(&g_missionNameList);
     ConfigureListBoxByName(menu, "Missions", g_missionNameList, count, 0);
     SyncAssocGadgets((Dialog_4a2be0 *)&g_game->gui,
@@ -779,7 +726,7 @@ static inline void FillMissionListInline(Gui* menu, Gadget* unused)
     Gadget* layout =
         FindGadgetChecked(g_game->gui.layer->entries, "Campaign");
     g_game->net->LoadCampaign(
-        SkipTextLines(layout->text, layout->selected));
+        SkipTextLines(layout->u.list.lines, layout->u.list.selected));
     int count = g_game->net->BuildMissionList(&g_missionNameList);
     ConfigureListBoxByName(menu, "Missions", g_missionNameList, count, 0);
     SyncAssocGadgets((Dialog_4a2be0 *)&g_game->gui,
@@ -812,7 +759,7 @@ void __stdcall HandleNewGameClick(Gui* menu)
             char* name;
             if (g_campaignSimplifiedLayout == 0) {
                 Gadget* e = FindGadgetChecked(entries, "Campaign");
-                name = SkipTextLines(e->text, e->selected);
+                name = SkipTextLines(e->u.list.lines, e->u.list.selected);
                 g_game->net->LoadCampaign(name);
             } else if (*(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1b8a)).get() + 0x95) == 0) {
                 g_game->net->LoadCampaign("Arm Campaign");
@@ -822,7 +769,7 @@ void __stdcall HandleNewGameClick(Gui* menu)
         }
         if (g_anyMissionMode != 0) {
             Gadget* e = FindGadgetChecked(entries, "Missions");
-            index = e->selected;
+            index = e->u.list.selected;
         }
         if (g_game->net->SelectMission(index) != 0) {
             SetCursorMode(0x14);
@@ -932,17 +879,17 @@ void __stdcall OpenNewGameMenu(int param_1)
         if (i != -1) {
             Gadget* e = (Gadget*)((char*)entries + i * 0x15b);
             e->y = 0x134;
-            e->h = 0x30;
+            e->height = 0x30;
         }
         i = FindGadgetIndex(entries, "CampaignKnob", 4);
         if (i != -1) {
             Gadget* e = (Gadget*)((char*)entries + i * 0x15b);
             e->y = 0x134;
-            e->h = 0x30;
+            e->height = 0x30;
         }
         i = FindGadgetIndex(entries, "Missions", 2);
         if (i != -1)
-            ((Gadget*)((char*)entries + i * 0x15b))->h = 0x3e;
+            ((Gadget*)((char*)entries + i * 0x15b))->height = 0x3e;
     }
 
     HideSoftwareCursor();
@@ -950,7 +897,7 @@ void __stdcall OpenNewGameMenu(int param_1)
     ShowSoftwareCursor();
 
     unsigned short* p =
-        (unsigned short*)FindGafEntry(entries->gaf, "Side0");
+        (unsigned short*)FindGafEntry(entries->u.assets.archive, "Side0");
     int n = 0;
     while (n < *p) {
         char* r = (char*)GetGafFrame(p, 0);
@@ -958,7 +905,7 @@ void __stdcall OpenNewGameMenu(int param_1)
         *(short*)(r + 4) = 0;
         n++;
     }
-    p = (unsigned short*)FindGafEntry(entries->gaf, "Side1");
+    p = (unsigned short*)FindGafEntry(entries->u.assets.archive, "Side1");
     n = 0;
     while (n < *p) {
         char* r = (char*)GetGafFrame(p, 0);
@@ -991,9 +938,9 @@ void __stdcall OpenNewGameMenu(int param_1)
         SetGadgetActiveByName(&g_game->gui, "CampaignKnob", 1);
         Gadget* c = FindGadgetChecked(entries, "Campaign");
         if (c != 0 && g_anyMissionMode != 0)
-            c->callback = FillMissionList;
+            c->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))(void (__stdcall*)(Gui*, int))FillMissionList;
         else
-            c->callback = 0;
+            c->u.list.callback = 0;
 
         int side = g_game->players_1b8a[g_game->localPlayer].info->side;
         Layer* cur = g_game->gui.layer;
@@ -1021,7 +968,7 @@ void __stdcall OpenNewGameMenu(int param_1)
             }
             Gadget* m = FindGadgetChecked(g_game->gui.layer->entries,
                                              "Campaign");
-            char* text = SkipTextLines(m->text, m->selected);
+            char* text = SkipTextLines(m->u.list.lines, m->u.list.selected);
             g_game->net->LoadCampaign(text);
             int mc = g_game->net->BuildMissionList(
                 &g_missionNameList);
@@ -1051,7 +998,7 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
 {
     int windMin = g_game->net->minWindSpeed;
     int windMax = g_game->net->maxWindSpeed;
-    void* surface = arg1->layer->entries->surface;
+    void* surface = arg1->layer->entries->u.assets.surface;
 
     if (--g_briefingWindTickCountdown <= 0) {
         g_briefingWindSpeed += HarnessViewRand() % 5 - 2;
@@ -1068,8 +1015,8 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
     Rect rect;
     rect.left = g->x;
     rect.top = g->y;
-    rect.right = rect.left + g->w - 1;
-    rect.bottom = rect.top + g->h - 1;
+    rect.right = rect.left + g->width - 1;
+    rect.bottom = rect.top + g->height - 1;
 
     FillRectangle(surface, &rect, arg1->colours[0]);
     SelectFontForEntry(arg1->layer->entries, i);
@@ -1087,10 +1034,10 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
 
     DrawBlinkWords((Dialog *)&g_game->gui);
 
-    if (arg2->hotspotGaf != 0) {
+    if (arg2->u.hotspot.gaf != 0) {
         int total = 0;
-        for (int j = 0; j < *(unsigned short*)arg2->hotspotGaf; j++)
-            total += ((GafFrame*)GetGafFrame((unsigned short*)arg2->hotspotGaf, j))->width;
+        for (int j = 0; j < *(unsigned short*)arg2->u.hotspot.gaf; j++)
+            total += ((GafFrame*)GetGafFrame((unsigned short*)arg2->u.hotspot.gaf, j))->width;
 
         if (g_briefingPanoramaNextTick < (int)GetTicks()) {
             g_briefingPanoramaScrollX++;
@@ -1104,36 +1051,36 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
         Rect rect2;
         rect2.left = arg2->x;
         rect2.top = arg2->y;
-        rect2.right = arg2->x + arg2->w - 1;
-        rect2.bottom = arg2->y + arg2->h - 1;
-        void* gaf = arg2->hotspotGaf;
-        surface = arg1->layer->entries->surface;
+        rect2.right = arg2->x + arg2->width - 1;
+        rect2.bottom = arg2->y + arg2->height - 1;
+        void* gaf = arg2->u.hotspot.gaf;
+        surface = arg1->layer->entries->u.assets.surface;
 
         int now = (int)GetTicks();
         int idx = now / 3 % *(unsigned short*)gaf;
-        arg2->frame = (short)idx;
-        GafFrame* f = (GafFrame*)GetGafFrame((unsigned short*)gaf, arg2->frame);
+        arg2->u.hotspot.index = (short)idx;
+        GafFrame* f = (GafFrame*)GetGafFrame((unsigned short*)gaf, arg2->u.hotspot.index);
         if (f == 0)
             return;
 
         unsigned char colour =
-            ((unsigned char*)arg2->colours)[(int)arg1 + 0x8b2];
+            ((unsigned char*)arg2->image)[(int)arg1 + 0x8b2];
         FillRectangle(surface, &rect2, colour);
 
         int x = arg2->x - g_briefingPanoramaScrollX;
         int y = arg2->y;
-        int n = *(unsigned short*)arg2->hotspotGaf;
+        int n = *(unsigned short*)arg2->u.hotspot.gaf;
         for (int k = 0; k <= n; k++) {
             GafFrame* fr =
-                (GafFrame*)GetGafFrame((unsigned short*)arg2->hotspotGaf, k % n);
+                (GafFrame*)GetGafFrame((unsigned short*)arg2->u.hotspot.gaf, k % n);
             fr->xOffset = 0;
             fr->yOffset = 0;
             DrawFrame(surface, fr, x, y);
             x += fr->width;
-            n = *(unsigned short*)arg2->hotspotGaf;
+            n = *(unsigned short*)arg2->u.hotspot.gaf;
         }
 
-        void* panGaf = arg1->layer->entries->gaf;
+        void* panGaf = arg1->layer->entries->u.assets.archive;
         void* pan = FindGafEntry(panGaf, "Panmask");
         PlayerInfo* info =
             g_game->players_1b8a[g_game->localPlayer].info;
@@ -1149,7 +1096,7 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
 // FUNCTION: 0x478b40
 void __stdcall UpdatePlanet(Gui* arg1, Gadget* arg2)
 {
-    void* surface = arg1->layer->entries->surface;
+    void* surface = arg1->layer->entries->u.assets.surface;
     if (g_briefingPlanetNextTick <= host_time_ms()) {
         g_briefingPlanetNextTick = host_time_ms() + 0x19;
         if (((Sound *)g_game->sound)->IsStreamActive() == 0) {
@@ -1158,13 +1105,13 @@ void __stdcall UpdatePlanet(Gui* arg1, Gadget* arg2)
                 MarkChanged((Dialog *)arg1);
             }
         }
-        if (arg2->hotspotGaf != 0) {
+        if (arg2->u.hotspot.gaf != 0) {
             MarkLayerChanged((Dialog *)arg1);
 
             int x1 = arg2->x;
-            int x2 = x1 + arg2->w - 1;
+            int x2 = x1 + arg2->width - 1;
             int y1 = arg2->y;
-            int y2 = y1 + arg2->h - 1;
+            int y2 = y1 + arg2->height - 1;
             Rect rect;
             rect.left = x1;
             rect.right = x2;
@@ -1173,18 +1120,18 @@ void __stdcall UpdatePlanet(Gui* arg1, Gadget* arg2)
 
             if (GetTicks() != g_briefingPlanetLastTick) {
                 StepGafSequence(&g_briefingPlanetFrameCursor);
-                arg2->frame = g_briefingPlanetFrameCursor.index;
+                arg2->u.hotspot.index = g_briefingPlanetFrameCursor.index;
             }
-            GafFrame* frame = (GafFrame*)GetGafFrame(arg2->hotspotGaf, arg2->frame);
+            GafFrame* frame = (GafFrame*)GetGafFrame(arg2->u.hotspot.gaf, arg2->u.hotspot.index);
             if (frame == 0) {
                 return;
             }
             frame->xOffset = 0;
-            int px = arg2->x + arg2->w / 2 - frame->width / 2;
+            int px = arg2->x + arg2->width / 2 - frame->width / 2;
             frame->yOffset = 0;
-            int py = arg2->y + arg2->h / 2 - frame->height / 2;
+            int py = arg2->y + arg2->height / 2 - frame->height / 2;
             unsigned char colour =
-                ((unsigned char*)arg2->colours)[(int)arg1 + 0x8b2];
+                ((unsigned char*)arg2->image)[(int)arg1 + 0x8b2];
             FillRectangle(surface, &rect, colour);
             DrawFrame(surface, frame, px, py);
         } else {
@@ -1365,22 +1312,22 @@ void OpenMissionBriefing(void)
         int idx = FindGadgetIndex(gadgets, "PANORAMA", 6);
         if (idx != -1) {
             Gadget* g = &gadgets[idx];
-            g->frame = 0;
-            void* gaf = FindGafEntry(gadgets->gaf, pans[i]);
+            g->u.hotspot.index = 0;
+            void* gaf = FindGafEntry(gadgets->u.assets.archive, pans[i]);
             if (gaf != 0) {
-                g->hotspotGaf = gaf;
-                g->hotspotCallback = (void*)UpdateSolarSystem;
+                g->u.hotspot.gaf = (GafEntry*)gaf;
+                g->u.hotspot.callback = UpdateSolarSystem;
             }
         }
         idx = FindGadgetIndex(gadgets, "PLANET", 6);
         if (idx != -1) {
-            void* gaf = FindGafEntry(gadgets->gaf, rotates[i]);
+            void* gaf = FindGafEntry(gadgets->u.assets.archive, rotates[i]);
             if (gaf != 0) {
                 InitGafSequence(&g_briefingPlanetFrameCursor, gaf, 0);
                 Gadget* g = &gadgets[idx];
-                g->frame = 0;
-                g->hotspotGaf = gaf;
-                g->hotspotCallback = (void*)UpdatePlanet;
+                g->u.hotspot.index = 0;
+                g->u.hotspot.gaf = (GafEntry*)gaf;
+                g->u.hotspot.callback = UpdatePlanet;
             }
         }
     }

@@ -35,7 +35,6 @@ struct Alloc_0046d040;
 struct Alloc_0046e5c0;
 struct Alloc_004b2290;
 struct Alloc_004dc130;
-class Alloc_004dd8c0;
 class Alloc_004e2b60;
 struct Amount;
 struct Angles_0049be60;
@@ -481,7 +480,6 @@ class ClaimFootprintVisitor;
 class Class_0047f960;
 class Class_0047f990;
 class Class_0047fa30;
-class SpeechQueue;
 class Class_0047ffa0;
 class Class_00480020;
 class Class_004800c0;
@@ -653,7 +651,6 @@ class Class_004b73e0;
 class Class_004b7410;
 class Class_004b7440;
 class Class_004b7540;
-class CommandEntry;
 class Class_004b7e30;
 struct Class_004bb650;
 class Class_004bb670;
@@ -691,8 +688,6 @@ class Class_004c4800;
 class Class_004c5470;
 class Class_004c54a0;
 class Class_004c54d0;
-class TranslationTable;
-class TdfFieldVector;
 struct Class_004c5c60;
 struct Class_004c61f0;
 struct Class_004c6890;
@@ -775,7 +770,6 @@ class StackTrace;
 class Class_004d9ca0;
 class CommandLineSwitch;
 class CommandLineNumber;
-class FreeBlockMap;
 class Class_004db450;
 class Class_004dbd00;
 class Class_004dbd20;
@@ -796,13 +790,9 @@ class Class_004dd430;
 class Class_004dd710;
 class Class_004dd770;
 class Class_004dd7d0;
-class MapInsertResult;
 class Class_004ddc00;
 class Class_004ddc90;
 class Class_004ddce0;
-class FreeBlockAllocator;
-class BlockMapAllocator;
-class BlockMapIter;
 class LoadedImage;
 class Class_004ddfa0;
 class Class_004ddfe0;
@@ -1018,7 +1008,6 @@ struct Elem_004b75d0;
 struct Elem_004b75d0_2;
 struct Elem_004b75d0_3;
 struct Elem_004b75d0_4;
-struct ArchiveEntry;
 struct Elem_004c5740;
 struct TdfField;
 struct Elem_004cb4c0;
@@ -1208,7 +1197,6 @@ struct Frame_0049e070;
 struct Frame_004a4980;
 struct Frame_004a7f70;
 struct Frame_004c7580;
-struct Frame_004db450;
 struct Frame_004de700;
 struct Frame_482270;
 struct FreeObj_0045e100;
@@ -1251,7 +1239,6 @@ struct Gui_00443100;
 struct Gui_00453a50;
 struct Gun_0049c9c0;
 struct Handle;
-struct HandlerSlot_004b7900;
 class Handler_004388d0;
 struct HapiBuf;
 struct Hapi_004bd160;
@@ -1345,7 +1332,6 @@ struct Less_0046e3c0;
 struct Less_0046e450;
 struct Less_0046e4d0;
 struct Less_0046fe60;
-struct Less_004db000;
 struct Less_004dbbc0;
 struct Less_004dbd20;
 struct Less_004dbec0;
@@ -1416,7 +1402,6 @@ struct Menu_44b3c0;
 struct Message_00447150;
 struct Message_004565a0;
 struct Message_0047f780;
-struct Message_0047fad0;
 struct Mid_00462d30;
 struct MissionFeature_00436c30;
 struct MissionFlags_0042f9a0;
@@ -1441,13 +1426,11 @@ struct Msg_00450530;
 struct Msg_00461900;
 struct Muzzle_0048a1e0;
 struct NameLess_00499cd0;
-struct NameLess_004b7620;
 struct NameLess_004b7760;
 struct NameLess_004b7900;
 struct NameLess_004c4630;
 struct NameLess_004c46c0;
 struct NameLess_004c4760;
-struct NameNe_004b7620;
 struct NameNe_004b7760;
 struct NameTable_004b0830;
 struct Name_0046c620;
@@ -1494,7 +1477,6 @@ struct Node_0043ad50;
 struct Node_0046fad0;
 struct Node_0047e570;
 struct Node_004bb2e0;
-struct Node_004d0b10;
 struct Node_004d0f60;
 struct Node_004dbd00;
 struct Node_439d20;
@@ -1656,7 +1638,6 @@ struct Packet_0046d6c0;
 struct Packet_0046d860;
 struct Packet_0046dad0;
 struct Packet_0047f0c0;
-struct Packet_0047f300;
 struct OwnershipTransferPacket;
 struct WeaponFirePacket;
 struct Packet_00499ba0;
@@ -8725,13 +8706,6 @@ public:
     void Set3DDistances(int, int);
 };
 
-struct Packet_0047f300 {
-    unsigned char type;
-    unsigned char flag;
-    int index;
-    char unknown_6[12];
-};
-
 struct Class_004cf150 {
     char unknown_0[48];
     int count;
@@ -8779,29 +8753,12 @@ public:
     void ClearSpeechEntries(void);
 };
 
-struct Message_0047fad0 {
-    int priority;
-    char unknown_4[8];
-    char* text;
-    unsigned int minFrame;
-    char unknown_14[4];
-};
-
 struct Entry_0047fca0 {
     int field_0;
     int field_4;
     int field_8;
     int* data;
     char field_10;
-};
-
-class SpeechQueue {
-public:
-    Entry_0047fca0 entries[9];
-    int count;
-    unsigned int field_9d;
-    unsigned int field_a1;
-    void PlayNextSpeechEntry(void);
 };
 
 struct Emitter_0047fd70 {
@@ -11653,16 +11610,6 @@ public:
     Class_004b7e30& operator=(Class_004b7e30&);
 };
 
-struct NameLess_004b7620 {
-    char unknown_0[1];
-    unsigned char operator()(char*, char*);
-};
-
-struct NameNe_004b7620 {
-    char unknown_0[1];
-    unsigned char operator()(Class_004c9390&, Class_004c9390&);
-};
-
 struct NameLess_004b7760 {
     char unknown_0[1];
     unsigned char operator()(char*, char*);
@@ -11693,11 +11640,6 @@ struct Elem_004b75d0_3 {
     ~Elem_004b75d0_3(void);
 };
 
-struct HandlerSlot_004b7900 {
-    void (__stdcall *fn)(void*);
-    int mask;
-};
-
 struct NameLess_004b7900 {
     char unknown_0[1];
     unsigned char operator()(char*, char*);
@@ -11708,14 +11650,6 @@ struct Elem_004b75d0_4 {
     int value1;
     int value2;
     ~Elem_004b75d0_4(void);
-};
-
-class CommandEntry {
-public:
-    char unknown_0[4];
-    int field1;
-    int field2;
-    void* AssignEntry(int*);
 };
 
 struct Display_004b8500 {
@@ -12059,13 +11993,6 @@ struct File_004bdd70 {
 struct Class_004be010 {
     int count;
     int base;
-};
-
-struct ArchiveEntry {
-    int a;
-    int b;
-    unsigned char flags;
-    char unknown_9[3];
 };
 
 struct File_004be070 {
@@ -12463,24 +12390,6 @@ class Class_004c5470 {
 public:
     char unknown_0[8];
     void* AssignPair(int*);
-};
-
-class TranslationTable {
-public:
-    char unknown_0;
-    std::vector<Pair_00419560> pairs;
-    TranslationTable(char);
-};
-
-class TdfFieldVector {
-public:
-    char count;
-    char unknown_1[3];
-    int field_4;
-    int field_8;
-    TdfField* end;
-    TdfField* Insert(TdfField*, TdfField&);
-    int GetPairCount(void);
 };
 
 struct Class_004c5c60 {
@@ -13967,16 +13876,6 @@ public:
     int FindDataChunkSize(void*);
 };
 
-struct Node_004d0b10 {
-    unsigned short parent;
-    unsigned short smaller;
-    unsigned short larger;
-    char unknown_6[24570];
-    short field_6000;
-    short field_6002;
-    short field_6004;
-};
-
 struct Node_004d0f60 {
     unsigned short parent;
     unsigned short smaller;
@@ -14126,12 +14025,6 @@ public:
     ~CritSec_004e1ac0(void);
 };
 
-class BlockMapAllocator {
-public:
-    char unknown_0[1];
-    void* FUN_004dddf0(unsigned int);
-};
-
 class Tree_004da8d0 {
 public:
     char allocator;
@@ -14210,78 +14103,15 @@ public:
     int* FUN_004dbeb0(int*);
 };
 
-class MapInsertResult {
-public:
-    FreeBlockIter first;
-    unsigned char second;
-    char unknown_5[3];
-    MapInsertResult(FreeBlockIter, unsigned char);
-    MapInsertResult(MapInsertResult&);
-    MapInsertResult(void);
-    MapInsertResult* FUN_004ddbe0(int*, unsigned char*);
-};
-
-struct Less_004db000 {
-    char unknown_0[1];
-    unsigned char operator()(unsigned int&, unsigned int&);
-};
-
-class FreeBlockMap {
-public:
-    Less_004db000 key_compare;
-    char unknown_1[3];
-    LiveNode* head;
-    unsigned char rebuild;
-    char unknown_9[3];
-    unsigned int count;
-    unsigned int total;
-    FreeBlockMap(FreeBlockMap&);
-    FreeBlockMap(void);
-    FreeBlockIter Begin(void);
-    FreeBlockIter begin(void);
-    FreeBlockIter End(void);
-    FreeBlockIter end(void);
-    static void* operator new(unsigned int);
-    FreeBlockIter upper_bound(unsigned int&);
-    unsigned char Neq(FreeBlockIter, FreeBlockIter);
-    unsigned int size(void);
-    FreeBlockIter erase(FreeBlockIter);
-    unsigned int TakeFreeBlock(unsigned int);
-    MapInsertResult insert(Pair_00419560&);
-    void AddFreeBlock(Pair_00419560);
-    unsigned char Grow(unsigned int);
-};
-
 struct InsertResult_004db450 {
     FreeBlockIter first;
     int second;
-};
-
-struct Frame_004db450 {
-    InsertResult_004db450 r;
-    Pair_00419560 p;
-};
-
-class FreeBlockAllocator {
-public:
-    char unknown_0[1];
-    void* FUN_004ddd70(unsigned int);
 };
 
 class PoolAlloc_004db610 {
 public:
     char unknown_0[1];
     char* _Charalloc(unsigned int);
-};
-
-class Alloc_004dd8c0 {
-public:
-    char unknown_0[1];
-    Elem_004dd8c0* allocate(unsigned int, void*);
-    void deallocate(Elem_004dd8c0*, unsigned int);
-    void construct(Elem_004dd8c0*, Elem_004dd8c0&);
-    void destroy(Elem_004dd8c0*);
-    unsigned int max_size(void);
 };
 
 struct Arena_004da9f0 {
@@ -14488,12 +14318,6 @@ public:
     int size;
     FreeBlockIter Begin(void);
     MapInsertResult FUN_004dc680(Class_004d8820*);
-};
-
-class BlockMapIter {
-public:
-    LiveNode* ptr;
-    void FUN_004dde70(void);
 };
 
 struct Less_004dce00 {

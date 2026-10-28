@@ -2177,7 +2177,7 @@ address,name
 0x4a1250,SetGrayedOutByName
 0x4a12e0,SetGadgetGrayedOut
 0x4a1450,SetGadgetGrayedOutByName
-0x4a14c0,FUN_004a14c0
+0x4a14c0,SetGadgetGrayedOutByNameTwin
 0x4a1530,SetQuickKeyByName
 0x4a15c0,GetGadgetRectByIndex
 0x4a1630,GetGadgetRect

@@ -688,7 +688,7 @@ void OpenSkirmishMapSelector()
 
     for (int i = 0; i < n; i++) {
         if (strcmp(((Table *)g_game->options)->mapName, SkipTextLines(data->items, i)) == 0) {
-            SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "MAPNAMES", i);
+            SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "MAPNAMES", i);
             break;
         }
     }

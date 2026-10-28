@@ -10,7 +10,7 @@
 
 struct GafEntry;
 
-struct List_004a32a0 {
+struct ConfigureListBoxByNameList {
     char unknown_0[0xc];
     union {
         GafEntry* glyphs;
@@ -19,23 +19,23 @@ struct List_004a32a0 {
 
 struct Gadget;
 
-struct Holder_004a32a0 {
+struct ConfigureListBoxByNameHolder {
     int unknown_0;
     Gadget* entries;
 };
 
-struct Root_004a32a0 {
+struct ConfigureListBoxByNameRoot {
     union { int current; int group; int fontId; };
     char unknown_04[0x14 - 0x04];
     union {
-        List_004a32a0* language;
-        List_004a32a0* font;
-        List_004a32a0* list;
+        ConfigureListBoxByNameList* language;
+        ConfigureListBoxByNameList* font;
+        ConfigureListBoxByNameList* list;
     };
-    Holder_004a32a0* holder;
+    ConfigureListBoxByNameHolder* holder;
 };
 
-extern Root_004a32a0* g_guiContext;
+extern ConfigureListBoxByNameRoot* g_guiContext;
 
 #include "../graphics/rect.h"
 #include "../state/sim_globals.h"
@@ -585,15 +585,15 @@ struct Pad_p2_0 { int field; };
 
 int __cdecl CountHumanSlots();
 
-struct Holder_004a04f0 {
-    Holder_004a04f0* unknown_0;
+struct GadgetAccessHolder {
+    GadgetAccessHolder* unknown_0;
     Gadget* entries;
 };
 
-struct Dialog_004a04f0 {
+struct GadgetAccessDialog {
     int group;
     char unknown_04[0x18 - 0x04];
-    Holder_004a04f0* holder;
+    GadgetAccessHolder* holder;
     char unknown_1c[0x64 - 0x1c];
     int current;
     char unknown_68[0x74 - 0x68];
@@ -604,12 +604,12 @@ struct Dialog_004a04f0 {
 
 #pragma pack(pop)
 
-void __stdcall SetGadgetActive(Dialog_004a04f0* menu, int index, int value);
-void __stdcall ClearPeerStatus(Dialog_004a04f0* obj, int index);
+void __stdcall SetGadgetActive(GadgetAccessDialog* menu, int index, int value);
+void __stdcall ClearPeerStatus(GadgetAccessDialog* obj, int index);
 void __stdcall DrawLitRectangle(int surface, Rect* rect, int level);
 
 
-static inline int FindEntry_004a04f0(Gadget* entries, char* name)
+static inline int FindGadgetAccessEntry(Gadget* entries, char* name)
 {
     for (int i = 1; i < entries->u.count + 1; i++) {
         if (strncmp(entries[i].name, name, 0x10) == 0) {
@@ -619,26 +619,26 @@ static inline int FindEntry_004a04f0(Gadget* entries, char* name)
     return -1;
 }
 
-static inline Gadget* GetEntry(Dialog_004a04f0* obj, int index)
+static inline Gadget* GetEntry(GadgetAccessDialog* obj, int index)
 {
     return obj->holder->entries + index;
 }
 
-static inline Gadget* GetEntries(Dialog_004a04f0* obj)
+static inline Gadget* GetEntries(GadgetAccessDialog* obj)
 {
     return obj->holder->entries;
 }
 
-static inline char* GetData(Dialog_004a04f0* obj)
+static inline char* GetData(GadgetAccessDialog* obj)
 {
     return (char*)obj->holder->entries;
 }
 
 // FUNCTION: 0x4a04f0
-char __stdcall GetGadgetActiveByName(Dialog_004a04f0* obj, char* name)
+char __stdcall GetGadgetActiveByName(GadgetAccessDialog* obj, char* name)
 {
     Gadget* entries = obj->holder->entries;
-    int i = FindEntry_004a04f0(entries, name);
+    int i = FindGadgetAccessEntry(entries, name);
     if (i == -1) {
         return -1;
     }
@@ -646,17 +646,17 @@ char __stdcall GetGadgetActiveByName(Dialog_004a04f0* obj, char* name)
 }
 
 // FUNCTION: 0x4a0570
-void __stdcall SetGadgetActiveByName(Dialog_004a04f0* obj, char* name, int param_3)
+void __stdcall SetGadgetActiveByName(GadgetAccessDialog* obj, char* name, int param_3)
 {
     if (obj->holder) {
-        int index = FindEntry_004a04f0(obj->holder->entries, name);
+        int index = FindGadgetAccessEntry(obj->holder->entries, name);
         if (index != -1)
             SetGadgetActive(obj, index, param_3);
     }
 }
 
 // FUNCTION: 0x4a05e0
-void __stdcall AssignQuickKey(Dialog_004a04f0* obj, int index)
+void __stdcall AssignQuickKey(GadgetAccessDialog* obj, int index)
 {
     Gadget* entries;
     Gadget* scan;
@@ -726,11 +726,11 @@ void __stdcall AssignQuickKey(Dialog_004a04f0* obj, int index)
 }
 
 // FUNCTION: 0x4a07d0
-void __stdcall SetGadgetTextByName(Dialog_004a04f0* obj, char* name, char* text)
+void __stdcall SetGadgetTextByName(GadgetAccessDialog* obj, char* name, char* text)
 {
     if (obj->holder) {
         Gadget* entries = obj->holder->entries;
-        int index = FindEntry_004a04f0(entries, name);
+        int index = FindGadgetAccessEntry(entries, name);
         if (index != -1) {
             strncpy(entries[index].u.text, text, 0x80);
             obj->changed = 1;
@@ -749,7 +749,7 @@ void __stdcall SetGadgetText(Dialog* obj, int index, char* text)
 }
 
 // FUNCTION: 0x4a08f0
-void __stdcall TranslateGadgetItems(Dialog_004a04f0* obj, int index)
+void __stdcall TranslateGadgetItems(GadgetAccessDialog* obj, int index)
 {
     Gadget* entry = GetEntry(obj, index);
     char temp[0x80];
@@ -766,7 +766,7 @@ void __stdcall TranslateGadgetItems(Dialog_004a04f0* obj, int index)
 }
 
 // FUNCTION: 0x4a09c0
-void __stdcall SetTranslatedText(Dialog_004a04f0* context, int index, char* source, int value)
+void __stdcall SetTranslatedText(GadgetAccessDialog* context, int index, char* source, int value)
 {
     if (index == -1 || context->holder == 0)
         return;
@@ -817,10 +817,10 @@ void __stdcall SetTranslatedText(Dialog_004a04f0* context, int index, char* sour
 }
 
 // FUNCTION: 0x4a0bf0
-void __stdcall SetTranslatedTextByName(Dialog_004a04f0* obj, char* name, char* param_3, int param_4)
+void __stdcall SetTranslatedTextByName(GadgetAccessDialog* obj, char* name, char* param_3, int param_4)
 {
     if (obj->holder != 0) {
-        int index = FindEntry_004a04f0(obj->holder->entries, name);
+        int index = FindGadgetAccessEntry(obj->holder->entries, name);
         if (index != -1) {
             SetTranslatedText(obj, index, param_3, param_4);
         }
@@ -828,11 +828,11 @@ void __stdcall SetTranslatedTextByName(Dialog_004a04f0* obj, char* name, char* p
 }
 
 // FUNCTION: 0x4a0c70
-void __stdcall SetGadgetColorByName(Dialog_004a04f0* obj, char* name, int value)
+void __stdcall SetGadgetColorByName(GadgetAccessDialog* obj, char* name, int value)
 {
     if (obj->holder) {
         Gadget* entries = obj->holder->entries;
-        int index = FindEntry_004a04f0(entries, name);
+        int index = FindGadgetAccessEntry(entries, name);
         if (index != -1) {
             entries[index].colours = value;
             obj->changed = 1;
@@ -841,14 +841,14 @@ void __stdcall SetGadgetColorByName(Dialog_004a04f0* obj, char* name, int value)
 }
 
 // FUNCTION: 0x4a0d00
-char* __stdcall GetGadgetText(Dialog_004a04f0* obj, char* name, char* buf)
+char* __stdcall GetGadgetText(GadgetAccessDialog* obj, char* name, char* buf)
 {
     char* desc = 0;
     if (obj->holder == 0) {
         FatalError("Internal error");
     }
     Gadget* entries = obj->holder->entries;
-    int index = FindEntry_004a04f0(entries, name);
+    int index = FindGadgetAccessEntry(entries, name);
     if (index != -1) {
         switch (entries[index].type) {
         case 1:
@@ -865,12 +865,12 @@ char* __stdcall GetGadgetText(Dialog_004a04f0* obj, char* name, char* buf)
 }
 
 // FUNCTION: 0x4a0e00
-void __stdcall SetControlTextByName(Dialog_004a04f0* obj, char* name, char* text)
+void __stdcall SetControlTextByName(GadgetAccessDialog* obj, char* name, char* text)
 {
     Gadget* entries = obj->holder->unknown_0->entries;
     if (obj->holder->unknown_0 == 0)
         return;
-    int index = FindEntry_004a04f0(entries, name);
+    int index = FindGadgetAccessEntry(entries, name);
     if (index == -1)
         return;
     switch (entries[index].type) {
@@ -890,16 +890,16 @@ void __stdcall SetControlTextByName(Dialog_004a04f0* obj, char* name, char* text
 }
 
 // FUNCTION: 0x4a0f30
-int __stdcall GetGadgetStatus(Dialog_004a04f0* obj, int index)
+int __stdcall GetGadgetStatus(GadgetAccessDialog* obj, int index)
 {
     return GetEntries(obj)[index].status;
 }
 
 // FUNCTION: 0x4a0f60
-int __stdcall GetButtonStageByName(Dialog_004a04f0* obj, char* name)
+int __stdcall GetButtonStageByName(GadgetAccessDialog* obj, char* name)
 {
     Gadget* entries = obj->holder->entries;
-    int i = FindEntry_004a04f0(entries, name);
+    int i = FindGadgetAccessEntry(entries, name);
     if (i != -1 && entries[i].type == 1) {
         return entries[i].stageIndex;
     }
@@ -907,7 +907,7 @@ int __stdcall GetButtonStageByName(Dialog_004a04f0* obj, char* name)
 }
 
 // FUNCTION: 0x4a0ff0
-int __stdcall GetButtonStage(Dialog_004a04f0* obj, int index)
+int __stdcall GetButtonStage(GadgetAccessDialog* obj, int index)
 {
     Gadget* entries = obj->holder->entries;
     if (entries[index].type == 1) {
@@ -917,7 +917,7 @@ int __stdcall GetButtonStage(Dialog_004a04f0* obj, int index)
 }
 
 // FUNCTION: 0x4a1030
-int __stdcall SetButtonStage(Dialog_004a04f0* obj, int index, char value)
+int __stdcall SetButtonStage(GadgetAccessDialog* obj, int index, char value)
 {
     Gadget* entries = obj->holder->entries;
     if (entries[index].type == 1) {
@@ -928,10 +928,10 @@ int __stdcall SetButtonStage(Dialog_004a04f0* obj, int index, char value)
 }
 
 // FUNCTION: 0x4a1080
-int __stdcall SetButtonStageByName(Dialog_004a04f0* obj, char* name, char value)
+int __stdcall SetButtonStageByName(GadgetAccessDialog* obj, char* name, char value)
 {
     Gadget* entries = obj->holder->entries;
-    int i = FindEntry_004a04f0(entries, name);
+    int i = FindGadgetAccessEntry(entries, name);
     if (i != -1) {
         entries[i].stageIndex = value;
         return 1;
@@ -940,10 +940,10 @@ int __stdcall SetButtonStageByName(Dialog_004a04f0* obj, char* name, char value)
 }
 
 // FUNCTION: 0x4a1110
-int __stdcall SetGadgetStatusByName(Dialog_004a04f0* obj, char* name, int value)
+int __stdcall SetGadgetStatusByName(GadgetAccessDialog* obj, char* name, int value)
 {
     Gadget* entries = obj->holder->entries;
-    int i = FindEntry_004a04f0(entries, name);
+    int i = FindGadgetAccessEntry(entries, name);
     if (i != -1) {
         entries[i].status = value;
         obj->changed = 1;
@@ -957,31 +957,31 @@ int __stdcall SetGadgetStatusByName(Dialog_004a04f0* obj, char* name, int value)
 
 
 // FUNCTION: 0x4a11c0
-void __stdcall SetGadgetStatus(Dialog_004a04f0* param_1, int param_2, short param_3)
+void __stdcall SetGadgetStatus(GadgetAccessDialog* param_1, int param_2, short param_3)
 {
     *(short*)(GetData(param_1) + param_2 * 347 + 0x138) = param_3;
     ClearPeerStatus(param_1, param_2);
 }
 
 // FUNCTION: 0x4a1200
-void __stdcall SetGrayedOut(Dialog_004a04f0* obj, int index, int value)
+void __stdcall SetGrayedOut(GadgetAccessDialog* obj, int index, int value)
 {
     GetEntries(obj)[index].flag_bit = value;
     obj->changed = 1;
 }
 
 // FUNCTION: 0x4a1250
-void __stdcall SetGrayedOutByName(Dialog_004a04f0* obj, char* name, int value)
+void __stdcall SetGrayedOutByName(GadgetAccessDialog* obj, char* name, int value)
 {
     Gadget* entries = obj->holder->entries;
-    int i = FindEntry_004a04f0(entries, name);
+    int i = FindGadgetAccessEntry(entries, name);
     if (i != -1) {
         entries[i].flag_bit = value;
     }
 }
 
 // FUNCTION: 0x4a12e0
-void __stdcall SetGadgetGrayedOut(Dialog_004a04f0* obj, int index, int value)
+void __stdcall SetGadgetGrayedOut(GadgetAccessDialog* obj, int index, int value)
 {
     Gadget* entries = obj->holder->entries;
     if (index == -1) {
@@ -1021,25 +1021,25 @@ void __stdcall SetGadgetGrayedOut(Dialog_004a04f0* obj, int index, int value)
 }
 
 // FUNCTION: 0x4a1450
-void __stdcall SetGadgetGrayedOutByName(Dialog_004a04f0* obj, char* name, int param_3)
+void __stdcall SetGadgetGrayedOutByName(GadgetAccessDialog* obj, char* name, int param_3)
 {
-    int index = FindEntry_004a04f0(obj->holder->entries, name);
+    int index = FindGadgetAccessEntry(obj->holder->entries, name);
     if (index != -1)
         SetGadgetGrayedOut(obj, index, param_3);
 }
 
 // FUNCTION: 0x4a14c0
-void __stdcall FUN_004a14c0(Dialog_004a04f0* obj, char* name, int param_3)
+void __stdcall SetGadgetGrayedOutByNameTwin(GadgetAccessDialog* obj, char* name, int param_3)
 {
-    int index = FindEntry_004a04f0(obj->holder->entries, name);
+    int index = FindGadgetAccessEntry(obj->holder->entries, name);
     if (index != -1)
         SetGadgetGrayedOut(obj, index, param_3);
 }
 
 // FUNCTION: 0x4a1530
-void __stdcall SetQuickKeyByName(Dialog_004a04f0* obj, char* name, char value)
+void __stdcall SetQuickKeyByName(GadgetAccessDialog* obj, char* name, char value)
 {
-    int i = FindEntry_004a04f0(obj->holder->entries, name);
+    int i = FindGadgetAccessEntry(obj->holder->entries, name);
     obj->holder->entries[i].quickKey = value;
     obj->changed = 1;
 }
@@ -1088,7 +1088,7 @@ void __stdcall GetGadgetScreenRect(char* param_1, int param_2, Rect* param_3)
 }
 
 // FUNCTION: 0x4a16f0
-void __stdcall DrawGadgetSelectionBox(Dialog_004a04f0* obj, int index, int param_3)
+void __stdcall DrawGadgetSelectionBox(GadgetAccessDialog* obj, int index, int param_3)
 {
     Gadget* entries = obj->holder->entries;
     int i;
@@ -1179,23 +1179,23 @@ int __stdcall IsPointInRect(Rect* r, int px, int py)
     return 0;
 }
 
-struct Obj_004a1950 {
+struct IsAboveRectTopRect {
     char unknown_0[4];
     int top;
 };
 
 // FUNCTION: 0x4a1950
-int __stdcall IsAboveRectTop(Obj_004a1950* param_1, int param_2) {
+int __stdcall IsAboveRectTop(IsAboveRectTopRect* param_1, int param_2) {
     return param_2 < param_1->top;
 }
 
-struct Struct_004a1970 {
+struct IsBelowRectBottomRect {
     char unknown_0[0xc];
     int bottom;
 };
 
 // FUNCTION: 0x4a1970
-int __stdcall IsBelowRectBottom(Struct_004a1970* obj, int value)
+int __stdcall IsBelowRectBottom(IsBelowRectBottomRect* obj, int value)
 {
     return value > obj->bottom;
 }
@@ -1240,23 +1240,23 @@ int __stdcall FindAssocTextInput(Gadget* entries, int index)
     return 0;
 }
 
-struct Surface_004a1ab0;
+struct RedrawGadgetRectSurface;
 
 #include "../graphics/draw.h"
 
-struct Holder_004a1ab0 {
+struct RedrawGadgetRectHolder {
     char unknown_0[4];
     Gadget* entries;
 };
 
-struct Dialog_4a1ab0 {
+struct RedrawGadgetRectDialog {
     char unknown_0[0x18];
-    Holder_004a1ab0* holder;
+    RedrawGadgetRectHolder* holder;
 };
 
 
 // FUNCTION: 0x4a1ab0
-void __stdcall RedrawGadgetRect(Dialog_4a1ab0* obj, int index)
+void __stdcall RedrawGadgetRect(RedrawGadgetRectDialog* obj, int index)
 {
     Gadget* entries = obj->holder->entries;
     Gadget* e = &entries[index];
@@ -1270,14 +1270,14 @@ void __stdcall RedrawGadgetRect(Dialog_4a1ab0* obj, int index)
     }
     rect.right = e->width + rect.left - 1;
     rect.bottom = e->height + rect.top - 1;
-    GrayRectangle((Surface *)(Surface_004a1ab0*)entries->u.assets.surface, &rect);
-    FadeRectangle((Surface *)(Surface_004a1ab0*)entries->u.assets.surface, &rect, -0x14);
+    GrayRectangle((Surface *)(RedrawGadgetRectSurface*)entries->u.assets.surface, &rect);
+    FadeRectangle((Surface *)(RedrawGadgetRectSurface*)entries->u.assets.surface, &rect, -0x14);
 }
 
 #pragma pack(push, 1)
 
 
-struct Holder_004a1b40 {
+struct DrawListBoxHolder {
     char unknown_00[4];
     Gadget* entries;
     char unknown_08[0x10 - 0x08];
@@ -1288,9 +1288,9 @@ struct Holder_004a1b40 {
     void* surface;
 };
 
-struct Dialog_4a1b40 {
+struct DrawListBoxDialog {
     char unknown_00[0x18];
-    Holder_004a1b40* holder;
+    DrawListBoxHolder* holder;
     char unknown_1c[0x8b2 - 0x1c];
     unsigned char colour[0x8be - 0x8b2];
     unsigned char colour_8be;
@@ -1300,22 +1300,22 @@ struct Dialog_4a1b40 {
 
 #include "../graphics/gaf_frame.h"
 
-struct Language_004a1b40 {
+struct DrawListBoxLanguage {
     char unknown_0[0xc];
     unsigned short* glyphs;
 };
 
-struct LanguageRoot_004a1b40 {
+struct DrawListBoxLanguageRoot {
     int current;
     char unknown_04[0x14 - 0x04];
-    Language_004a1b40* language;
+    DrawListBoxLanguage* language;
 };
 
-struct Point_004a1b40 { int x; int y; };
-struct Quad_004a1b40 { Point_004a1b40 points[4]; };
+struct DrawListBoxPoint { int x; int y; };
+struct DrawListBoxQuad { DrawListBoxPoint points[4]; };
 
 
-struct Item_004a1b40 {
+struct DrawListBoxItem {
     char unknown_0[0x28];
     GafFrame* cell;
 };
@@ -1325,17 +1325,17 @@ struct Item_004a1b40 {
 #include "../graphics/surface.h"
 
 
-void __stdcall DrawListboxFrame(Dialog_4a1b40* obj, int index, void* bmp);
+void __stdcall DrawListboxFrame(DrawListBoxDialog* obj, int index, void* bmp);
 #include "../util/registry.h"
 #include "gui.h"
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw,
                             int rem, int style);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int colour);
-void __stdcall DrawFrameQuad(void* surface, void* bitmap, Quad_004a1b40* dst,
-                            Quad_004a1b40* src);
+void __stdcall DrawFrameQuad(void* surface, void* bitmap, DrawListBoxQuad* dst,
+                            DrawListBoxQuad* src);
 
-static inline int Measure_004a1b40(char* text)
+static inline int MeasureDrawListBoxText(char* text)
 {
     int width = 0;
     if (0 == text)
@@ -1354,7 +1354,7 @@ static inline int Measure_004a1b40(char* text)
     return width;
 }
 
-static inline int LineHeight_004a1b40()
+static inline int GetDrawListBoxLineHeight()
 {
     if (0 == g_guiContext->language)
         return GetFontHeight();
@@ -1368,7 +1368,7 @@ extern int Pad_a1b40_e3;
 
 
 // FUNCTION: 0x4a1b40
-void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
+void __stdcall DrawListBox(DrawListBoxDialog* obj, int index)
 {
     unsigned char font;
     int yoff;
@@ -1378,7 +1378,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
     int flag = 0;
     if (0 != obj->holder)
         obj->holder->dirty = 1;
-    Holder_004a1b40* holder = obj->holder;
+    DrawListBoxHolder* holder = obj->holder;
     Gadget* entries;
     entries = obj->holder->entries;
     Gadget* me = &entries[index];
@@ -1392,7 +1392,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
         DrawListboxFrame(obj, index, surface);
     else if (surface != 0)
         CopySurfaceRect((Surface *)entries->u.assets.surface, (Surface *)surface, &bounds, (Point *)&bounds);
-    int lh = LineHeight_004a1b40();
+    int lh = GetDrawListBoxLineHeight();
     int step;
     if (me->u.list.scroll == 0)
         step = lh + 1;
@@ -1425,7 +1425,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
             rowRect.right = me->width + rowRect.left - 2;
             rowRect.top = bounds.top + yoff + 2;
             rowRect.bottom = rowRect.top + step;
-            int w = Measure_004a1b40(q);
+            int w = MeasureDrawListBoxText(q);
             int col = obj->colour[me->colours];
             if (me->u.list.filebuf == 0 || ((char*)me->u.list.filebuf)[y] != 1) {
                 if (*q == '&') {
@@ -1450,7 +1450,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
                     xx = rowRect.left;
                 xw = rowRect.right - xx + 1;
             }
-            if (me->u.list.scroll > 6 + LineHeight_004a1b40())
+            if (me->u.list.scroll > 6 + GetDrawListBoxLineHeight())
                 DrawWrappedText(entries->u.assets.surface, q, xx, ty, xw, bounds.bottom - bounds.top, 0);
             else
                 DrawTextClipped(entries->u.assets.surface, q, xx, ty, xw, 0);
@@ -1481,7 +1481,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
             }
         }
     } else if (flags & 0xa0) {
-        Item_004a1b40** colPtr;
+        DrawListBoxItem** colPtr;
         GafFrame* cellPtr;
         Rect cellRect;
         Rect clip;
@@ -1491,7 +1491,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
         ((Surface*)surf)->SetClipRect(bounds);
         int k = me->u.list.firstRow;
         if (!bp) {
-            colPtr = &((Item_004a1b40**)me->u.list.rows)[k];
+            colPtr = &((DrawListBoxItem**)me->u.list.rows)[k];
         } else {
             colPtr = 0;
             cellPtr = &((GafFrame*)me->u.list.rows)[k];
@@ -1508,8 +1508,8 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
                 cell = (*colPtr)->cell;
             }
             if (cell != 0 && cell->pixelsOrLayers != 0) {
-                Quad_004a1b40 dst;
-                Quad_004a1b40 src;
+                DrawListBoxQuad dst;
+                DrawListBoxQuad src;
                 dst.points[3].x = bounds.left;
                 src.points[0].x = 1;
                 src.points[0].y = 1;
@@ -1621,7 +1621,7 @@ struct Pos_00485330;
 struct Pos_0048a9f0;
 
 // FUNCTION: 0x4a2480
-void __stdcall DrawGafBar(Dialog_004a04f0* param_1, int index)
+void __stdcall DrawGafBar(GadgetAccessDialog* param_1, int index)
 {
     Gadget* base = param_1->holder->entries;
     void* surface = base->u.assets.surface;
@@ -1651,14 +1651,14 @@ void __stdcall DrawGafBar(Dialog_004a04f0* param_1, int index)
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
 
 
-struct Holder_004a2580 {
+struct DrawSliderBarHolder {
     char unknown_0[4];
     Gadget* entries;
 };
 
-struct Object_004a2580 {
+struct DrawSliderBarObject {
     char unknown_0[0x18];
-    Holder_004a2580* holder;
+    DrawSliderBarHolder* holder;
     char unknown_1c[0x8b2 - 0x1c];
     unsigned char field_8b2;
     char unknown_8b3[0x8c1 - 0x8b3];
@@ -1669,23 +1669,23 @@ struct Object_004a2580 {
     unsigned char field_8c6;
 };
 
-struct Font_004a2580 {
+struct DrawSliderBarFont {
     char unknown_0[0xc];
     void* glyphs;
 };
 
-struct Dialog_4a2580 {
+struct DrawSliderBarDialog {
     int group;
     char unknown_04[0x14 - 0x04];
-    Font_004a2580* font;
+    DrawSliderBarFont* font;
 };
 
 void __stdcall DrawRaisedBox(void* surface, int* r, int a, int b, int c);
 #include "listbox.h"
 void __stdcall SetTextColors(int a, int b);
-void __stdcall GetTextWidth(Font_004a2580* font, char* text);
+void __stdcall GetTextWidth(DrawSliderBarFont* font, char* text);
 
-static inline void* Surface_004a2580(Object_004a2580* o)
+static inline void* GetSliderBarSurface(DrawSliderBarObject* o)
 {
     return o->holder->entries->u.assets.surface;
 }
@@ -1713,11 +1713,11 @@ struct Class_004a1200;
 struct Class_004a1530;
 
 // FUNCTION: 0x4a2580
-void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
+void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
 {
     Gadget* entries = obj->holder->entries;
     Gadget* e = &entries[index];
-    void* surface = Surface_004a2580(obj);
+    void* surface = GetSliderBarSurface(obj);
     GafFrame* g;
 
     int n = 0;
@@ -1746,7 +1746,7 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
         short w = e->width;
         short h = e->height;
         if (w < h) {
-            void* surf = Surface_004a2580(obj);
+            void* surf = GetSliderBarSurface(obj);
             int y = e->y;
             int x = e->x;
             int limit = y + e->height - 1;
@@ -1784,7 +1784,7 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
             g = (GafFrame*)GetGafFrame(e->sliderGaf, e->sliderStyle + 5);
             DrawFrame(surf, g, x, limit - g->height + 1);
         } else {
-            void* surf = Surface_004a2580(obj);
+            void* surf = GetSliderBarSurface(obj);
             int x = e->x;
             int y = e->y;
             int limit = x + e->width - 1;
@@ -1830,7 +1830,7 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
         int total = 0;
         if (text != 0) {
             if (g_guiContext->font == 0) {
-                GetTextWidth((Font_004a2580*)GetFont(), text);
+                GetTextWidth((DrawSliderBarFont*)GetFont(), text);
             } else {
                 char* p = text;
                 for (; *p != 0; p++) {
@@ -1867,23 +1867,23 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
 int WriteScreenshot(int, int, int, int, int, int);
 #pragma pack(pop)
 
-struct Holder_004a2be0 {
+struct SyncAssocGadgetsHolder {
     int current;
     Gadget* entries;
     char unknown_08[0x14 - 0x08];
     void* list;
 };
 
-struct Dialog_4a2be0 {
+struct SyncAssocGadgetsDialog {
     char unknown_0[0x18];
-    Holder_004a2be0* holder;
+    SyncAssocGadgetsHolder* holder;
 };
 
-void __stdcall DrawSliderBar(Dialog_4a2be0* param_1, int param_2);
-void __stdcall DrawTextInput(Dialog_4a2be0* param_1, int param_2);
+void __stdcall DrawSliderBar(SyncAssocGadgetsDialog* param_1, int param_2);
+void __stdcall DrawTextInput(SyncAssocGadgetsDialog* param_1, int param_2);
 
 // FUNCTION: 0x4a2be0
-void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
+void __stdcall SyncAssocGadgets(SyncAssocGadgetsDialog* param_1, int param_2)
 {
     Gadget* entries = param_1->holder->entries;
     int i = 1;
@@ -1899,7 +1899,7 @@ void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
                     if (type == 2) {
                         *(short*)(entry - 0x84) = *(short*)(me + 0xbc);
                         *(short*)(entry - 0x86) = *(short*)(me + 0xba);
-                        DrawListBox((Dialog_4a1b40 *)param_1, i);
+                        DrawListBox((DrawListBoxDialog *)param_1, i);
                     } else if (type == 4) {
                         int esi_val;
                         if (*(unsigned char*)(entry - 0x125) & 0x20) {
@@ -1921,7 +1921,7 @@ void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
 #endif
                             *(short*)(entry - 0x84) = result;
                         }
-                        DrawListBox((Dialog_4a1b40 *)param_1, i);
+                        DrawListBox((DrawListBoxDialog *)param_1, i);
                     }
                     break;
                 case 3:
@@ -1966,29 +1966,29 @@ void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
 #include "dialogs.h"
 #pragma pack(pop)
 
-struct List_004a2e40 {
+struct SetListBoxScrollByNameList {
     char unknown_0[0x0c];
     unsigned short* glyphs;
 };
 
-struct Holder_004a2e40 {
+struct SetListBoxScrollByNameHolder {
     int current;
     Gadget* entries;
     char unknown_08[0x14 - 0x08];
-    List_004a2e40* list;
+    SetListBoxScrollByNameList* list;
 };
 
 #pragma pack(push, 1)
-struct Dialog_4a2e40 {
+struct SetListBoxScrollByNameDialog {
     char unknown_00[0x18];
-    Holder_004a2e40* holder;
+    SetListBoxScrollByNameHolder* holder;
     char unknown_1c[0xcca - 0x1c];
     int changed;
 };
 #pragma pack(pop)
 
 
-static inline int FindEntry_004a2e40(Gadget* entries, char* name) {
+static inline int FindSetListBoxScrollEntry(Gadget* entries, char* name) {
     int i;
     for (i = 1; i < entries->u.count + 1; i++) {
         if (strncmp(entries[i].name, name, 0x10) == 0)
@@ -1997,7 +1997,7 @@ static inline int FindEntry_004a2e40(Gadget* entries, char* name) {
     return -1;
 }
 
-static inline int FindKind_004a2e40(Gadget* entries, unsigned char kind) {
+static inline int FindSetListBoxScrollPeerByTeam(Gadget* entries, unsigned char kind) {
     int i;
     for (i = 1; i < entries->u.count + 1; i++) {
         if (entries[i].type == 4 && entries[i].team == kind)
@@ -2016,9 +2016,9 @@ extern int Pad_a2e40_e1;
 extern int Pad_a2e40_e2;
 
 // FUNCTION: 0x4a2e40
-void __stdcall SetListBoxScrollByName(Dialog_4a2e40* param_1, char* param_2, int param_3) {
+void __stdcall SetListBoxScrollByName(SetListBoxScrollByNameDialog* param_1, char* param_2, int param_3) {
     Gadget* entries = param_1->holder->entries;
-    int found = FindEntry_004a2e40(entries, param_2);
+    int found = FindSetListBoxScrollEntry(entries, param_2);
     if (found == -1)
         return;
 
@@ -2052,9 +2052,9 @@ void __stdcall SetListBoxScrollByName(Dialog_4a2e40* param_1, char* param_2, int
             me->u.list.firstRow = sel;
         if (me->u.list.firstRow > me->u.list.maxFirstRow)
             me->u.list.firstRow = me->u.list.maxFirstRow;
-        Gadget* peer = &entries[FindEntry_004a2e40(entries, param_2)];
+        Gadget* peer = &entries[FindSetListBoxScrollEntry(entries, param_2)];
         unsigned char pkind = peer->team;
-        Gadget* e3 = &entries[FindKind_004a2e40(entries, pkind)];
+        Gadget* e3 = &entries[FindSetListBoxScrollPeerByTeam(entries, pkind)];
 #ifdef __clang__
         double q = (double)e3->range * me->u.list.firstRow / me->u.list.maxFirstRow;
         if ((double)e3->knobPos != q)
@@ -2068,20 +2068,20 @@ void __stdcall SetListBoxScrollByName(Dialog_4a2e40* param_1, char* param_2, int
 }
 
 
-struct Font_004a30c0 {
+struct ResetListBoxFont {
     char unknown_0[0xc];
     void* glyphs;
 };
 
-struct Dialog_4a30c0 {
+struct ResetListBoxDialog {
     int group;
     char unknown_04[0x14 - 0x04];
-    Font_004a30c0* font;
+    ResetListBoxFont* font;
 };
 
 
 // FUNCTION: 0x4a30c0
-void __stdcall ResetListBox(Dialog_004a04f0* obj, int index)
+void __stdcall ResetListBox(GadgetAccessDialog* obj, int index)
 {
     Gadget* entries = obj->holder->entries;
     Gadget* e = &entries[index];
@@ -2132,20 +2132,20 @@ void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4)
 }
 
 
-struct Dialog_4a32a0 {
+struct ConfigureListBoxByNameDialog {
     char unknown_00[0x18];
-    Holder_004a32a0* holder;
+    ConfigureListBoxByNameHolder* holder;
 };
 
-void __stdcall SetGadgetActive(Root_004a32a0* menu, int index, int value);
+void __stdcall SetGadgetActive(ConfigureListBoxByNameRoot* menu, int index, int value);
 
-static inline int FontHeight_004a32a0() {
+static inline int ConfigureListBoxFontHeight() {
     if (g_guiContext->language == 0)
         return GetFontHeight();
     return (int)((GafFrame*)GetGafFrame(g_guiContext->language->glyphs, 0x49))->height + 2;
 }
 
-static inline int FindName_004a32a0(Gadget* entries, char* name) {
+static inline int FindConfigureListBoxEntry(Gadget* entries, char* name) {
     for (int i = 1; i < entries->u.count + 1; i++) {
         if (strncmp(entries[i].name, name, 0x10) == 0)
             return i;
@@ -2153,7 +2153,7 @@ static inline int FindName_004a32a0(Gadget* entries, char* name) {
     return -1;
 }
 
-static inline int FindType_004a32a0(Gadget* entries, unsigned char kind) {
+static inline int FindConfigureListBoxPeerByTeam(Gadget* entries, unsigned char kind) {
     for (int i = 1; i < entries->u.count + 1; i++) {
         if (entries[i].type == 4 && entries[i].team == kind)
             return i;
@@ -2162,10 +2162,10 @@ static inline int FindType_004a32a0(Gadget* entries, unsigned char kind) {
 }
 
 // FUNCTION: 0x4a32a0
-void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bitmap, int count, int flag) {
-    Holder_004a32a0* holder = param_1->holder;
+void __stdcall ConfigureListBoxByName(ConfigureListBoxByNameDialog* param_1, char* name, int bitmap, int count, int flag) {
+    ConfigureListBoxByNameHolder* holder = param_1->holder;
     Gadget* entries = holder->entries;
-    int index = FindName_004a32a0(entries, name);
+    int index = FindConfigureListBoxEntry(entries, name);
     Gadget* me;
     if (index != -1) {
         me = &entries[index];
@@ -2177,7 +2177,7 @@ void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bi
     me->u.list.field_c2 = (char*)bitmap;
     me->attribs |= 0x10;
     me->u.list.scroll =
-        (short)((me->u.list.scroll > FontHeight_004a32a0() + 1) ? (int)me->u.list.scroll : FontHeight_004a32a0() + 1);
+        (short)((me->u.list.scroll > ConfigureListBoxFontHeight() + 1) ? (int)me->u.list.scroll : ConfigureListBoxFontHeight() + 1);
     if (flag != 0) {
         me->u.list.language = flag;
         me->attribs |= 0x800;
@@ -2188,7 +2188,7 @@ void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bi
     me->u.list.maxFirstRow = (short)(count - 1);
     int step;
     if (me->u.list.scroll == 0) {
-        step = FontHeight_004a32a0() + 1;
+        step = ConfigureListBoxFontHeight() + 1;
     } else {
         step = me->u.list.scroll;
     }
@@ -2200,16 +2200,16 @@ void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bi
     }
     if (me->active == 0)
         return;
-    int i2 = FindName_004a32a0(holder->entries, name);
+    int i2 = FindConfigureListBoxEntry(holder->entries, name);
     Gadget* list = holder->entries;
     unsigned char kind = list[i2].team;
-    int found = FindType_004a32a0(list, kind);
+    int found = FindConfigureListBoxPeerByTeam(list, kind);
     if (found == -1)
         return;
     char* text = (char*)&holder->entries[found].name;
-    Root_004a32a0* root = g_guiContext;
+    ConfigureListBoxByNameRoot* root = g_guiContext;
     if (root->holder != 0) {
-        int j2 = FindName_004a32a0(root->holder->entries, text);
+        int j2 = FindConfigureListBoxEntry(root->holder->entries, text);
         if (j2 != -1) {
             SetGadgetActive(root, j2, remain < 0);
         }
@@ -2220,19 +2220,19 @@ void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bi
 }
 
 #pragma pack(push, 1)
-struct Row_004a35a0 {
+struct SetGadgetRowsRow {
     char unknown_0[2];
     unsigned short height;
     char unknown_4[0x18 - 4];
 };
 
-struct Table_004a35a0 {
+struct SetGadgetRowsTable {
     int unknown_0;
     Gadget* entries;
 };
 #pragma pack(pop)
 
-static inline int FindEntry_004a35a0(Gadget* entries, char* name)
+static inline int FindSetGadgetRowsEntry(Gadget* entries, char* name)
 {
     for (int i = 1; i < entries->u.count + 1; i++) {
         if (strncmp(entries[i].name, name, 0x10) == 0)
@@ -2242,11 +2242,11 @@ static inline int FindEntry_004a35a0(Gadget* entries, char* name)
 }
 
 // FUNCTION: 0x4a35a0
-void __stdcall SetGadgetRows(Table_004a35a0* table, char* name,
-                            Row_004a35a0* rows, int count)
+void __stdcall SetGadgetRows(SetGadgetRowsTable* table, char* name,
+                            SetGadgetRowsRow* rows, int count)
 {
     Gadget* entries = table->entries;
-    int index = FindEntry_004a35a0(entries, name);
+    int index = FindSetGadgetRowsEntry(entries, name);
     Gadget* e;
     if (index != -1) {
         e = &entries[index];
@@ -2255,7 +2255,7 @@ void __stdcall SetGadgetRows(Table_004a35a0* table, char* name,
         e = 0;
     }
     e->u.list.rows = rows;
-    Row_004a35a0* row = rows + count - 1;
+    SetGadgetRowsRow* row = rows + count - 1;
     e->u.list.rowCount = (short)count;
     e->attribs |= 0x80;
     e->u.list.firstRow = 0;
@@ -2270,17 +2270,17 @@ void __stdcall SetGadgetRows(Table_004a35a0* table, char* name,
     }
 }
 
-struct Table_004a36a0 {
+struct SetGadgetItemsTable {
     char unknown_0[4];
     Gadget* entries;
 };
 
-struct Item_004a36a0 {
+struct SetGadgetItemsItem {
     char unknown_0[0x28];
     int cell;
 };
 
-static inline int FindEntry_004a36a0(Gadget* entries, char* name)
+static inline int FindSetGadgetItemsEntry(Gadget* entries, char* name)
 {
     for (int i = 1; i < entries->u.count + 1; i++) {
         if (strncmp(entries[i].name, name, 0x10) == 0) {
@@ -2291,10 +2291,10 @@ static inline int FindEntry_004a36a0(Gadget* entries, char* name)
 }
 
 // FUNCTION: 0x4a36a0
-void __stdcall SetGadgetItems(Table_004a36a0* table, char* name, int* items, int count)
+void __stdcall SetGadgetItems(SetGadgetItemsTable* table, char* name, int* items, int count)
 {
     Gadget* entries = table->entries;
-    int i = FindEntry_004a36a0(entries, name);
+    int i = FindSetGadgetItemsEntry(entries, name);
     Gadget* e;
     if (i != -1) {
         e = &entries[i];
@@ -2311,7 +2311,7 @@ void __stdcall SetGadgetItems(Table_004a36a0* table, char* name, int* items, int
     int* p = &items[count - 1];
     e->u.list.maxFirstRow = (short)(count - 1);
     for (int j = count - 1; j > -1; ) {
-        Item_004a36a0* item = (Item_004a36a0*)*p;
+        SetGadgetItemsItem* item = (SetGadgetItemsItem*)*p;
         unsigned short w = *(unsigned short*)(item->cell + 2);
         v -= w;
         if (v < 0) {
@@ -2325,38 +2325,38 @@ void __stdcall SetGadgetItems(Table_004a36a0* table, char* name, int* items, int
 #pragma pack(push, 1)
 int DrawTriangleContours(int, int, int, int, int, int, int);
 
-struct List_004a3780 {
+struct HandleListBoxInputList {
     char unknown_0[0xc];
     unsigned short* glyphs;
 };
 
-struct Holder_004a3780 {
+struct HandleListBoxInputHolder {
     int current;
     Gadget* entries;
     char unknown_08[0x14 - 0x08];
-    List_004a3780* list;
+    HandleListBoxInputList* list;
     char unknown_18[0x20 - 0x18];
     int selected;
 };
 
-struct Rect_004a3780 { int x0, y0, x1, y1; };
+struct HandleListBoxInputRect { int x0, y0, x1, y1; };
 
-struct Point_004a3780 {
+struct HandleListBoxInputPoint {
     int x;
     int y;
     int unknown_08[4];
 };
 
-static inline int PointInListRect(const Rect_004a3780& r, const Point_004a3780& p)
+static inline int PointInListRect(const HandleListBoxInputRect& r, const HandleListBoxInputPoint& p)
 {
     return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1;
 }
 
-struct Object_004a3780 {
+struct HandleListBoxInputObject {
     char unknown_00[0x18];
-    Holder_004a3780* holder;
+    HandleListBoxInputHolder* holder;
     char unknown_1c[0x3c - 0x1c];
-    Point_004a3780 point;
+    HandleListBoxInputPoint point;
     char unknown_54[0x60 - 0x54];
     int hotGadgetIndex;
     int focus;
@@ -2367,17 +2367,17 @@ struct Object_004a3780 {
 
 #include "../../link/globals.h"
 
-void __stdcall TrySetFocus(Object_004a3780* obj, int index);
+void __stdcall TrySetFocus(HandleListBoxInputObject* obj, int index);
 
 int __stdcall AllocAlphaTable(int param_1);
 
-struct Item_004a3780 {
+struct HandleListBoxInputItem {
     char unknown_0[0x28];
     GafFrame* row;
 };
 
 
-static inline int LineHeight_004a3780()
+static inline int GetHandleListBoxInputLineHeight()
 {
     if (0 == g_guiContext->list)
         return GetFontHeight();
@@ -2405,7 +2405,7 @@ static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
 }
 
 // FUNCTION: 0x4a3780
-int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
+int __stdcall HandleListBoxInput(HandleListBoxInputObject* obj, int index, int param_3)
 {
     if (obj->hotGadgetIndex != -1)
         return 0;
@@ -2414,18 +2414,18 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
     int orig_sel = me->u.list.selected;
     if (me->u.list.rowCount == 0)
         return 0;
-    Rect_004a3780 r;
+    HandleListBoxInputRect r;
     unsigned int flags;
     GetGadgetRect(&entries[index], (Rect*)&r);
     int n = 0;
     r.y0 += 2;
     r.y1 -= 3;
-    Point_004a3780 point = obj->point;
+    HandleListBoxInputPoint point = obj->point;
     point.x -= entries[0].x;
     point.y -= entries[0].y;
     int i = SelectFontForEntry_inlined(entries, index);
 
-    int size = LineHeight_004a3780();
+    int size = GetHandleListBoxInputLineHeight();
     short da = me->u.list.scroll;
     int span = (da != 0) ? da : size + 1;
     int step = (me->height - 2) / span;
@@ -2493,11 +2493,11 @@ skip0:;
         } else if (flags & 0x20 | 0x80) {
             int flag8 = (flags >> 7) & 1;
             GafFrame* fixed;
-            Item_004a3780** ip;
+            HandleListBoxInputItem** ip;
             if (flag8)
                 fixed = &((GafFrame*)me->u.list.rows)[me->u.list.firstRow];
             else
-                ip = &((Item_004a3780**)me->u.list.rows)[me->u.list.firstRow];
+                ip = &((HandleListBoxInputItem**)me->u.list.rows)[me->u.list.firstRow];
             int k = me->u.list.firstRow;
             int remain = point.y - r.y0 - 2;
             int n2 = 0;
@@ -2522,7 +2522,7 @@ skip0:;
             }
         }
         if (orig_sel != me->u.list.selected) {
-            DrawListBox((Dialog_4a1b40 *)obj, index);
+            DrawListBox((DrawListBoxDialog *)obj, index);
             if (me->u.list.callback)
                 me->u.list.callback((Gui*)obj, me);
         }
@@ -2562,8 +2562,8 @@ ret1:
                     me->u.list.selected = orig_sel;
             }
 finish:
-            DrawListBox((Dialog_4a1b40 *)obj, index);
-            SyncAssocGadgets((Dialog_4a2be0 *)obj, index);
+            DrawListBox((DrawListBoxDialog *)obj, index);
+            SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, index);
         }
     }
 end:
@@ -2572,14 +2572,14 @@ end:
 
 
 
-struct Table_004a3eb0 {
+struct ResetSliderGadgetTable {
     char unknown_0[4];
     Gadget* entries;
 };
 
-struct Dialog_4a3eb0 {
+struct ResetSliderGadgetDialog {
     char unknown_0[0x18];
-    Table_004a3eb0* table;
+    ResetSliderGadgetTable* table;
 };
 
 static inline void ClearEntry(Gadget* e)
@@ -2594,25 +2594,25 @@ struct Pad_a3eb0_1 { int field; };
 struct Pad_a3eb0_2 { int field; };
 
 // FUNCTION: 0x4a3eb0
-void __stdcall ResetSliderGadget(Dialog_4a3eb0* obj, int i)
+void __stdcall ResetSliderGadget(ResetSliderGadgetDialog* obj, int i)
 {
     ClearEntry(&obj->table->entries[i]);
 }
 
 
-struct Font_004a3ef0 {
+struct DrawSliderFont {
     char unknown_0[0x28];
     GafFrame* glyph;
 };
 
 void __stdcall DrawSliderBar(Dialog* gui, int gadgetIndex);
 
-static inline GafFrame* GetGlyph_004a3ef0(unsigned char c)
+static inline GafFrame* GetDrawSliderGlyph(unsigned char c)
 {
     return (GafFrame*)GetGafFrame(g_guiContext->list->glyphs, c);
 }
 
-static inline int Find_004a3ef0(Gadget* entries, unsigned char kind)
+static inline int FindDrawSliderPeerByTeam(Gadget* entries, unsigned char kind)
 {
     for (int i = 1; i < entries->u.count + 1; i++) {
         if (entries[i].type == 2 && entries[i].team == kind)
@@ -2621,10 +2621,10 @@ static inline int Find_004a3ef0(Gadget* entries, unsigned char kind)
     return 0;
 }
 
-static inline int LineSize_004a3ef0(Gadget* e)
+static inline int GetDrawSliderRowsHeight(Gadget* e)
 {
     int count = e->u.list.rowCount;
-    Font_004a3ef0** font = (Font_004a3ef0**)e->u.list.rows;
+    DrawSliderFont** font = (DrawSliderFont**)e->u.list.rows;
     int lines = 0;
     if (count > 0)
         lines = (*font)->glyph->height * count;
@@ -2637,7 +2637,7 @@ void __stdcall DrawSlider(Dialog* gui, int gadgetIndex)
     Gadget* entries = (Gadget*)gui->holder->entries;
     Gadget* me = &entries[gadgetIndex];
     unsigned char kind = me->team;
-    int found = Find_004a3ef0(entries, kind);
+    int found = FindDrawSliderPeerByTeam(entries, kind);
     union { int full; short word; } lines;
     lines.full = 0;
     lines.word = 0;
@@ -2660,7 +2660,7 @@ void __stdcall DrawSlider(Dialog* gui, int gadgetIndex)
                     SetFont(g_guiContext->current);
                 }
                 int size = (g_guiContext->list == 0) ? GetFontHeight()
-                    : GetGlyph_004a3ef0(0x49)->height + 2;
+                    : GetDrawSliderGlyph(0x49)->height + 2;
                 int numerator = e->height - 2;
                 int denominator = (e->u.list.scroll > size + 1) ? e->u.list.scroll : size + 1;
                 int step = numerator / denominator;
@@ -2680,7 +2680,7 @@ void __stdcall DrawSlider(Dialog* gui, int gadgetIndex)
                     me->range = me->height - me->knobSize - 3;
                 }
             } else if (e->attribs & 0x20) {
-                lines.full = LineSize_004a3ef0(e);
+                lines.full = GetDrawSliderRowsHeight(e);
                 int s = e->height * me->height / lines.full;
                 me->knobSize = s;
                 if (me->attribs & 1) {
@@ -2705,36 +2705,36 @@ void __stdcall DrawSlider(Dialog* gui, int gadgetIndex)
 }
 
 
-struct Holder_004a4170 {
+struct HandleSliderInputHolder {
     char unknown_00[4];
     Gadget* entries;
     char unknown_08[0x14 - 0x08];
     int dirty;
 };
 
-struct Point_004a4170 {
+struct HandleSliderInputPoint {
     int x;
     int y;
     int unknown_08[4];
 };
 
-struct Object_004a4170 {
+struct HandleSliderInputObject {
     char unknown_00[0x18];
-    Holder_004a4170* holder;
+    HandleSliderInputHolder* holder;
     char unknown_1c[0x3c - 0x1c];
-    Point_004a4170 point;
+    HandleSliderInputPoint point;
     char unknown_54[0x64 - 0x54];
     int focus;
     char unknown_68[0x78 - 0x68];
     int knobDragging;
-    Point_004a4170 saved;
+    HandleSliderInputPoint saved;
     short dragKnobPos;
 };
 
-void __stdcall TrySetFocus(Object_004a4170* obj, int index);
-void __stdcall DrawSliderBar(Object_004a4170* obj, int index);
+void __stdcall TrySetFocus(HandleSliderInputObject* obj, int index);
+void __stdcall DrawSliderBar(HandleSliderInputObject* obj, int index);
 
-static inline void OffsetChanged_004a4170(Object_004a4170* obj, int index, Gadget* e, int old)
+static inline void ClampKnobPosAndNotify(HandleSliderInputObject* obj, int index, Gadget* e, int old)
 {
     if (e->knobPos > e->range - 1)
         e->knobPos = e->range - 1;
@@ -2745,13 +2745,13 @@ static inline void OffsetChanged_004a4170(Object_004a4170* obj, int index, Gadge
     if (obj->holder)
         obj->holder->dirty = 1;
     DrawSliderBar(obj, index);
-    SyncAssocGadgets((Dialog_4a2be0 *)obj, index);
+    SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, index);
     if (e->sliderCallback)
         e->sliderCallback((Gui*)obj, e->sliderUser);
 }
 
 // FUNCTION: 0x4a4170
-void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
+void __stdcall HandleSliderInput(HandleSliderInputObject* obj, int index)
 {
     Gadget* entries = obj->holder->entries;
     Gadget* e = &entries[index];
@@ -2760,7 +2760,7 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
     if (e->sliderLocked)
         return;
 
-    Point_004a4170 p = obj->point;
+    HandleSliderInputPoint p = obj->point;
     p.x -= entries->x;
     p.y -= entries->y;
     int r1[4];
@@ -2778,7 +2778,7 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
                 e->knobPos = obj->dragKnobPos - obj->saved.x + p.x;
             else
                 e->knobPos = obj->dragKnobPos - obj->saved.y + p.y;
-            OffsetChanged_004a4170(obj, index, e, old);
+            ClampKnobPosAndNotify(obj, index, e, old);
         } else {
             int old = e->knobPos;
             if (e->attribs & 1) {
@@ -2792,7 +2792,7 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
                 else if (p.y > r2[3])
                     e->knobPos++;
             }
-            OffsetChanged_004a4170(obj, index, e, old);
+            ClampKnobPosAndNotify(obj, index, e, old);
         }
         return;
     }
@@ -2829,17 +2829,17 @@ int __cdecl tolower(int);
 int __cdecl toupper(int);
 
 
-struct Holder_0049fc50 {
+struct HandleLabelInputHolder {
     int unknown_0;
     Gadget* entries;
 };
 
 #pragma pack(push, 1)
-struct Object_0049fc50 {
+struct HandleLabelInputObject {
     char unknown_0[0x18];
-    Holder_0049fc50* holder;
+    HandleLabelInputHolder* holder;
     char unknown_1c[0x3c - 0x1c];
-    Point_0049fc50 point;
+    DialogMouseEvent point;
     char unknown_54[0x64 - 0x54];
     int focus;
     char unknown_68[0xcc6 - 0x68];
@@ -2847,16 +2847,16 @@ struct Object_0049fc50 {
 };
 #pragma pack(pop)
 
-int __stdcall TrySetFocus(Object_0049fc50* obj, int index);
+int __stdcall TrySetFocus(HandleLabelInputObject* obj, int index);
 #include "keyboard.h"
 
 // FUNCTION: 0x4a4440
-int __stdcall HandleLabelInput(Object_0049fc50* obj, int index, char key)
+int __stdcall HandleLabelInput(HandleLabelInputObject* obj, int index, char key)
 {
     Gadget* entries = obj->holder->entries;
     Gadget* entry = &entries[index];
-    struct Rect_0049fc50 { int x1, y1, x2, y2; } rect;
-    Point_0049fc50 point;
+    struct HandleLabelInputRect { int x1, y1, x2, y2; } rect;
+    DialogMouseEvent point;
     int rel_x, rel_y;
 
     if (entry->hotkey == 0 && (entry->attribs & 0x10))
@@ -2917,14 +2917,14 @@ final_check:
 }
 
 
-struct Table_004a4620 {
+struct ScheduleGadgetEndTickTable {
     char unknown_0[4];
     Gadget* entries;
 };
 
-struct Dialog_4a4620 {
+struct ScheduleGadgetEndTickDialog {
     char unknown_0[0x18];
-    Table_004a4620* table;
+    ScheduleGadgetEndTickTable* table;
 };
 
 
@@ -2933,23 +2933,23 @@ struct Dialog_4a4620 {
 extern int Pad_a4620_e0;
 
 // FUNCTION: 0x4a4620
-void __stdcall ScheduleGadgetEndTick(Dialog_4a4620* obj, int i)
+void __stdcall ScheduleGadgetEndTick(ScheduleGadgetEndTickDialog* obj, int i)
 {
     Gadget* e = &obj->table->entries[i];
     e->u.anim.next = GetTicks() + e->u.anim.interval;
 }
 
-struct Holder_004a4660 {
+struct DrawProgressBarGadgetHolder {
     char unknown_0[4];
     Gadget *entries;
 };
 
-struct Dialog_4a4660 {
+struct DrawProgressBarGadgetDialog {
     char unknown_0[0xc];
     void *surface;
     int unknown_10;
     void *oldSurface;
-    Holder_004a4660 *holder;
+    DrawProgressBarGadgetHolder *holder;
     char unknown_1c[0x8b2 - 0x1c];
     unsigned char color1;
     char unknown_8b3[0x8c3 - 0x8b3];
@@ -2960,17 +2960,17 @@ struct Dialog_4a4660 {
     void *fallbackSurface;
 };
 
-struct Rect_004a4660 { int left, top, right, bottom; };
+struct DrawProgressBarGadgetRect { int left, top, right, bottom; };
 
-struct Language_004a4660 { char unknown_0[0xc]; unsigned short *glyphs; };
-struct LanguageRoot_004a4660 { char unknown_0[0x14]; Language_004a4660 *language; };
+struct DrawProgressBarGadgetLanguage { char unknown_0[0xc]; unsigned short *glyphs; };
+struct DrawProgressBarGadgetLanguageRoot { char unknown_0[0x14]; DrawProgressBarGadgetLanguage *language; };
 
 void __stdcall LockScreen(void *);
-void __stdcall FillRectangle(void *, Rect_004a4660 *, int);
+void __stdcall FillRectangle(void *, DrawProgressBarGadgetRect *, int);
 int __stdcall GetTextWidth(int, char *);
 void __stdcall UnlockScreen(void *);
 
-static inline int Measure_004a4660(char *text)
+static inline int MeasureProgressBarText(char *text)
 {
     int width = 0;
     char *p = text;
@@ -2991,7 +2991,7 @@ static inline int Measure_004a4660(char *text)
 }
 
 // FUNCTION: 0x4a4660
-void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
+void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog *obj, int index)
 {
     Gadget *entries = obj->holder->entries;
     Gadget *entry = (Gadget *)((char *)entries + index * 0x15b);
@@ -3002,7 +3002,7 @@ void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
         surface = *(void **)((char *)obj + 0xcd2);
     LockScreen(surface);
 
-    Rect_004a4660 rect;
+    DrawProgressBarGadgetRect rect;
     rect.left = entry->x;
     rect.top = entry->y;
     rect.right = entry->width + entry->x;
@@ -3027,7 +3027,7 @@ void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
     if (entry->u.anim.showText != 0) {
         char text[20];
         _itoa(entry->u.anim.value, text, 10);
-        int width = Measure_004a4660(text);
+        int width = MeasureProgressBarText(text);
         int height;
         if (g_guiContext->language == 0) {
             height = GetFontHeight();
@@ -3046,19 +3046,19 @@ void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
 }
 
 
-struct Table_004a4890 {
+struct TickProgressBarTable {
     char unknown_0[4];
     Gadget* entries;
 };
 
-struct Dialog_4a4890 {
+struct TickProgressBarDialog {
     char unknown_0[0x18];
-    Table_004a4890* table;
+    TickProgressBarTable* table;
 };
 
 
 // FUNCTION: 0x4a4890
-void __stdcall TickProgressBar(Dialog_4a4890* obj, int i)
+void __stdcall TickProgressBar(TickProgressBarDialog* obj, int i)
 {
     Gadget* e = &obj->table->entries[i];
     if (e->u.anim.active && e->u.anim.value < e->u.anim.max) {
@@ -3070,21 +3070,21 @@ void __stdcall TickProgressBar(Dialog_4a4890* obj, int i)
             }
             e->u.anim.next = GetTicks() + e->u.anim.interval;
         }
-        DrawProgressBarGadget((Dialog_4a4660 *)obj, i);
+        DrawProgressBarGadget((DrawProgressBarGadgetDialog *)obj, i);
     }
 }
-struct ElemArray_4a4930 {
+struct ResetProgressBarEntries {
     char unknown_0[4];
     char* base;
 };
 
-struct GameState_4a4930 {
+struct ResetProgressBarDialog {
     char unknown_0[0x18];
-    ElemArray_4a4930* arr;
+    ResetProgressBarEntries* arr;
 };
 
 // FUNCTION: 0x4a4930
-void __stdcall ResetProgressBar(GameState_4a4930* param_1, int index)
+void __stdcall ResetProgressBar(ResetProgressBarDialog* param_1, int index)
 {
     char* e = param_1->arr->base + index * 0x15b;
     *(int*)(e + 0xb6) = 0;
@@ -3094,36 +3094,36 @@ void __stdcall ResetProgressBar(GameState_4a4930* param_1, int index)
 }
 
 
-struct Holder_004a4980 {
+struct DrawHotspotHolder {
     char unknown_0[4];
     Gadget* entries;
 };
 
 #pragma pack(push, 1)
-struct Dialog_4a4980 {
+struct DrawHotspotDialog {
     char unknown_0[0x18];
-    Holder_004a4980* holder;
+    DrawHotspotHolder* holder;
     char unknown_1c[0x8b9 - 0x1c];
     unsigned char colour7;
 };
 #pragma pack(pop)
 
-struct Point_004a4980 {
+struct DrawHotspotPoint {
     int x;
     int y;
 };
 
-struct Quad_004a4980 {
-    Point_004a4980 p[4];
+struct DrawHotspotQuad {
+    DrawHotspotPoint p[4];
 };
 
 
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 int __stdcall FillRectangle(void* surface, Rect* rect, int color);
-void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_004a4980* dst, Quad_004a4980* src);
+void __stdcall DrawFrameQuad(void* surf, void* entry, DrawHotspotQuad* dst, DrawHotspotQuad* src);
 
 // FUNCTION: 0x4a4980
-void __stdcall DrawHotspot(Dialog_4a4980* obj, int index)
+void __stdcall DrawHotspot(DrawHotspotDialog* obj, int index)
 {
     Gadget* entries = obj->holder->entries;
     Gadget* e = &entries[index];
@@ -3139,7 +3139,7 @@ void __stdcall DrawHotspot(Dialog_4a4980* obj, int index)
     rect.right = e->width + rect.left - 1;
     rect.bottom = e->height + rect.top - 1;
 
-    Quad_004a4980 dst;
+    DrawHotspotQuad dst;
     dst.p[0].x = rect.left;
     dst.p[3].x = rect.left;
     dst.p[0].y = rect.top;
@@ -3149,7 +3149,7 @@ void __stdcall DrawHotspot(Dialog_4a4980* obj, int index)
     dst.p[2].y = rect.bottom;
     dst.p[3].y = rect.bottom;
 
-    Quad_004a4980 src;
+    DrawHotspotQuad src;
     src.p[0].x = 1;
     src.p[0].y = 1;
     src.p[3].x = 1;
@@ -3187,8 +3187,8 @@ struct Explosion;
 
 #pragma pack(push, 1)
 
-struct Dialog_4a4b50;
-struct Point_004a4b50 { int x, y; };
+struct HandleHotspotInputDialog;
+struct HandleHotspotInputPoint { int x, y; };
 
 int GetType();
 int KeepAfterComplete();
@@ -3197,35 +3197,35 @@ void TickTowardGoal();
 int HasNetUnitState();
 int TryClaimRepath();
 
-struct Table_004a4b50 {
+struct HandleHotspotInputTable {
     char unknown_0[4];
     Gadget* entries;
 };
 
-struct Dialog_4a4b50 {
+struct HandleHotspotInputDialog {
     char unknown_0[0x18];
-    Table_004a4b50* table;
+    HandleHotspotInputTable* table;
     char unknown_1c[0x3c - 0x1c];
-    Point_004a4b50 pos;
+    HandleHotspotInputPoint pos;
     char unknown_44[0x64 - 0x44];
     int focus;
 };
 #pragma pack(pop)
 
-extern int __stdcall TrySetFocus(Dialog_4a4b50* obj, int index);
+extern int __stdcall TrySetFocus(HandleHotspotInputDialog* obj, int index);
 
-struct Rect_004a4b50 { int left, top, right, bottom; };
+struct HandleHotspotInputRect { int left, top, right, bottom; };
 
-static inline int PointInHotspotRect(const Rect_004a4b50& r, const Point_004a4b50& p)
+static inline int PointInHotspotRect(const HandleHotspotInputRect& r, const HandleHotspotInputPoint& p)
 {
     return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
 }
 
 // FUNCTION: 0x4a4b50
-int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
+int __stdcall HandleHotspotInput(HandleHotspotInputDialog* obj, int index)
 {
     Gadget* entries = obj->table->entries;
-    Rect_004a4b50 r;
+    HandleHotspotInputRect r;
     if (entries[index].type == 0) {
         r.left = 0;
         r.top = 0;
@@ -3239,13 +3239,13 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
         entries[index].u.hotspot.callback((Gui*)obj, &entries[index]);
     if (entries[index].u.hotspot.flags & 1) {
         if (IsMouseButtonMessage((Gui *)obj, 1)) {
-            Point_004a4b50 p = obj->pos;
+            HandleHotspotInputPoint p = obj->pos;
             if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 1);
             }
         } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
-            Point_004a4b50 p = obj->pos;
+            HandleHotspotInputPoint p = obj->pos;
             if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 2);
@@ -3253,8 +3253,8 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
         }
         if (obj->focus == index && !HasMouseKeyFlags((Gui *)obj, 3)) {
             obj->focus = -1;
-            Point_004a4b50* pp = &obj->pos;
-            Point_004a4b50 q;
+            HandleHotspotInputPoint* pp = &obj->pos;
+            HandleHotspotInputPoint q;
             q.y = pp->y;
             q.x = pp->x;
             if (PointInHotspotRect(r, q))
@@ -3266,14 +3266,14 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
 
 int GetHostDpid();
 
-struct Holder_004a4c90 {
+struct DrawLineGadgetHolder {
     char unknown_0[4];
     Gadget* entries;
 };
 
-struct Dialog_4a4c90 {
+struct DrawLineGadgetDialog {
     char unknown_0[0x18];
-    Holder_004a4c90* holder;
+    DrawLineGadgetHolder* holder;
     char unknown_1c[0x8b2 - 0x1c];
     unsigned char colour[0x100];
 };
@@ -3281,7 +3281,7 @@ struct Dialog_4a4c90 {
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int color);
 
-static inline void FillRect_004a4c90(Gadget* e, Rect* r)
+static inline void GetLineGadgetRect(Gadget* e, Rect* r)
 {
     if (e->type == 0) {
         r->left = 0;
@@ -3295,12 +3295,12 @@ static inline void FillRect_004a4c90(Gadget* e, Rect* r)
 }
 
 // FUNCTION: 0x4a4c90
-void __stdcall DrawLineGadget(Dialog_4a4c90* obj, int index, unsigned char param_3)
+void __stdcall DrawLineGadget(DrawLineGadgetDialog* obj, int index, unsigned char param_3)
 {
     Gadget* entries = obj->holder->entries;
     Gadget* e = (Gadget*)((char*)entries + index * 0x15b);
     Rect rect;
-    FillRect_004a4c90(e, &rect);
+    GetLineGadgetRect(e, &rect);
     if (param_3 & 1) {
         if (e->attribs & 1)
             DrawLine(entries->u.assets.surface, rect.left, rect.top, rect.right, rect.top,
@@ -3317,23 +3317,23 @@ void __stdcall DrawLineGadget(Dialog_4a4c90* obj, int index, unsigned char param
 void InitNetConnection();
 
 #pragma pack(push, 1)
-struct List_004a4d70 {
+struct DrawTextInputList {
     char unknown_0[0x0c];
     unsigned short* glyphs;
 };
 
-struct Holder_004a4d70 {
+struct DrawTextInputHolder {
     int current;
     Gadget* entries;
     char unknown_08[0x14 - 0x08];
-    List_004a4d70* language;
+    DrawTextInputList* language;
     char unknown_18[0x24 - 0x18];
     void* surface;
 };
 
-struct Dialog_4a4d70 {
+struct DrawTextInputDialog {
     char unknown_00[0x18];
-    Holder_004a4d70* holder;
+    DrawTextInputHolder* holder;
     char unknown_1c[0x64 - 0x1c];
     int focus;
     char unknown_68[0x74 - 0x68];
@@ -3343,26 +3343,26 @@ struct Dialog_4a4d70 {
     void* fallback;
 };
 
-struct Rect_004a4d70 { int left, top, right, bottom; };
+struct DrawTextInputRect { int left, top, right, bottom; };
 
-struct LanguageRoot_004a4d70 {
+struct DrawTextInputLanguageRoot {
     int current;
     char unknown_04[0x14 - 0x04];
-    List_004a4d70* language;
+    DrawTextInputList* language;
 };
 #pragma pack(pop)
 
-int __stdcall DrawListboxFrame(Dialog_4a4d70* obj, int index, void* bmp);
-int __stdcall FillRectangle(void* surface, Rect_004a4d70* rect, int colour);
+int __stdcall DrawListboxFrame(DrawTextInputDialog* obj, int index, void* bmp);
+int __stdcall FillRectangle(void* surface, DrawTextInputRect* rect, int colour);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int colour);
 
-static inline GafFrame* GetGlyph_004a4d70(unsigned char c)
+static inline GafFrame* GetDrawTextInputGlyph(unsigned char c)
 {
     return (GafFrame*)GetGafFrame(g_guiContext->language->glyphs, c);
 }
 
-static inline int Measure_004a4d70(char* text)
+static inline int MeasureTextInputText(char* text)
 {
     int width = 0;
     char* p = text;
@@ -3373,7 +3373,7 @@ static inline int Measure_004a4d70(char* text)
     char* q = text;
     while (*q != 0) {
         char ch = *q;
-        GafFrame* glyph = GetGlyph_004a4d70(ch);
+        GafFrame* glyph = GetDrawTextInputGlyph(ch);
         if (glyph != 0)
             width += glyph->width;
         ++q;
@@ -3402,14 +3402,14 @@ static inline int SelectTextInputFont(Gadget* entries, int index)
 }
 
 // FUNCTION: 0x4a4d70
-void __stdcall DrawTextInput(Dialog_4a4d70* obj, int index)
+void __stdcall DrawTextInput(DrawTextInputDialog* obj, int index)
 {
     Gadget* entries = obj->holder->entries;
     SelectTextInputFont(entries, index);
 
     Gadget* me = &entries[index];
 
-    Rect_004a4d70 rect;
+    DrawTextInputRect rect;
     if (me->type == 0) {
         rect.left = 0;
         rect.top = 0;
@@ -3442,26 +3442,26 @@ void __stdcall DrawTextInput(Dialog_4a4d70* obj, int index)
         char* at = &me->u.text[obj->cursor];
         char save = *at;
         *at = 0;
-        int w = Measure_004a4d70(me->u.text);
+        int w = MeasureTextInputText(me->u.text);
         *at = save;
         int height;
         if (g_guiContext->language == 0)
             height = GetFontHeight();
         else
-            height = GetGlyph_004a4d70(0x49)->height + 2;
+            height = GetDrawTextInputGlyph(0x49)->height + 2;
         int x = rect.left + w;
         DrawLine(entries->u.assets.surface, x, rect.top, x, height + rect.top, obj->colours[9]);
     }
 }
 
-struct Font_004a5010 {
+struct GetCharGlyphFont {
     char unknown_0[0xc];
     void* glyphs;
 };
 
-struct Dialog_4a5010 {
+struct GetCharGlyphDialog {
     char unknown_0[0x14];
-    Font_004a5010* font;
+    GetCharGlyphFont* font;
 };
 
 // FUNCTION: 0x4a5010
@@ -3470,14 +3470,14 @@ void* __stdcall GetCharGlyph(unsigned char c)
     return GetGafFrame(g_guiContext->font->glyphs, c);
 }
 
-struct Font_004a5030 {
+struct GetTextPixelWidthFont {
     char unknown_0[0xc];
     void* glyphs;
 };
 
-struct Dialog_4a5030 {
+struct GetTextPixelWidthDialog {
     char unknown_0[0x14];
-    Font_004a5030* font;
+    GetTextPixelWidthFont* font;
 };
 
 int __stdcall GetTextWidth(int param_1, unsigned char* text);
@@ -3499,7 +3499,7 @@ int __stdcall GetTextPixelWidth(unsigned char* text)
     return width;
 }
 
-struct Font_004a50b0 {
+struct FontGlyphTable {
     char unknown_0[3];
     unsigned char first;
     unsigned short offsets[1];
@@ -3507,9 +3507,9 @@ struct Font_004a50b0 {
     void* glyphs;
 };
 
-struct Dialog_4a50b0 {
+struct GetFontLineHeightDialog {
     char unknown_0[0x14];
-    Font_004a50b0* font;
+    FontGlyphTable* font;
 };
 
 
@@ -3522,14 +3522,14 @@ int GetFontLineHeight()
     return ((GafFrame*)GetGafFrame(g_guiContext->font->glyphs, 'I'))->height + 2;
 }
 
-struct Font_004a50e0 {
+struct DrawTextClippedFont {
     char unknown_0[0xc];
     void* glyphs;
 };
 
-struct Dialog_4a50e0 {
+struct DrawTextClippedDialog {
     char unknown_0[0x14];
-    Font_004a50e0* font;
+    DrawTextClippedFont* font;
 };
 
 #include "../graphics/gaf.h"
@@ -3569,19 +3569,19 @@ void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw
 }
 
 
-struct Font_004a51d0 {
+struct DrawWrappedTextFont {
     char unknown_0[0xc];
     void* glyphs;
 };
 
-struct Dialog_4a51d0 {
+struct DrawWrappedTextDialog {
     char unknown_0[0x14];
-    Font_004a51d0* font;
+    DrawWrappedTextFont* font;
 };
 
 int __stdcall GetTextWidth(int a, char* text);
 
-static inline int LineHeight_004a50b0()
+static inline int GetDrawWrappedTextLineHeight()
 {
     if (g_guiContext->font == 0)
         return GetFontHeight();
@@ -3632,8 +3632,8 @@ int __stdcall DrawWrappedText(char* p2, char* text, int p4, int y, int maxw, int
         }
         DrawTextClipped(p2, word, p4, y, maxw, p7);
         text[i] = saved;
-        y += LineHeight_004a50b0() + 2;
-        rem -= LineHeight_004a50b0() + 2;
+        y += GetDrawWrappedTextLineHeight() + 2;
+        rem -= GetDrawWrappedTextLineHeight() + 2;
         if (text[i] == 0)
             goto done;
         k = i + 1;
@@ -4351,7 +4351,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
         if (obj->layer)
             obj->layer->dirty = 1;
         DrawSliderBar(obj, found);
-        SyncAssocGadgets((Dialog_4a2be0 *)obj, found);
+        SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, found);
         if (f->sliderCallback)
             f->sliderCallback(obj, f->sliderUser);
         return 0;
@@ -5180,7 +5180,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].u.list.sortKey = GetTicks();
                 }
                 if (force || (flags & 0x40))
-                    DrawListBox((Dialog_4a1b40 *)menu, i);
+                    DrawListBox((DrawListBoxDialog *)menu, i);
                 break;
             }
             case 3:
@@ -5210,7 +5210,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].u.hotspot.index = 0;
                 }
                 if (force || (flags & 0x40))
-                    DrawHotspot((Dialog_4a4980 *)menu, i);
+                    DrawHotspot((DrawHotspotDialog *)menu, i);
                 break;
             case 13:
                 if (force) {
@@ -5218,7 +5218,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].u.anim.next = GetTicks() + base[i].u.anim.interval;
                 }
                 if (force || (flags & 0x40))
-                    DrawProgressBarGadget((Dialog_4a4660 *)menu, i);
+                    DrawProgressBarGadget((DrawProgressBarGadgetDialog *)menu, i);
                 break;
             case 10:
                 if (force || (flags & 0x40))
@@ -5304,7 +5304,7 @@ void __stdcall DecrementKnobPos(Gui* obj, int index)
     if (e->knobPos != old) {
         obj->changed = 1;
         DrawSliderBar(obj, index);
-        SyncAssocGadgets((Dialog_4a2be0 *)obj, index);
+        SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, index);
     }
     if (e->sliderCallback) {
         e->sliderCallback(obj, e->sliderUser);
@@ -5333,7 +5333,7 @@ void __stdcall IncrementKnobPos(Gui* obj, int index)
     if (e->knobPos != old) {
         obj->changed = 1;
         DrawSliderBar(obj, index);
-        SyncAssocGadgets((Dialog_4a2be0 *)obj, index);
+        SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, index);
     }
     if (e->sliderCallback) {
         e->sliderCallback(obj, e->sliderUser);
@@ -5403,12 +5403,12 @@ void __stdcall ListBoxSelectUp(Gui* param_1, int index)
                 me->u.list.selected = isel;
             }
         }
-        DrawListBox((Dialog_4a1b40 *)param_1, index);
-        SyncAssocGadgets((Dialog_4a2be0 *)param_1, index);
+        DrawListBox((DrawListBoxDialog *)param_1, index);
+        SyncAssocGadgets((SyncAssocGadgetsDialog *)param_1, index);
         return;
     }
     if (me->u.list.rowCount != 0) {
-        SetListBoxScrollByName((Dialog_4a2e40 *)param_1, me->name, isel);
+        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)param_1, me->name, isel);
     }
 }
 
@@ -5459,13 +5459,13 @@ void __stdcall ListBoxSelectDown(Gui* param_1, int index)
                     me->u.list.selected = isel;
                 }
             }
-            DrawListBox((Dialog_4a1b40 *)param_1, index);
-            SyncAssocGadgets((Dialog_4a2be0 *)param_1, index);
+            DrawListBox((DrawListBoxDialog *)param_1, index);
+            SyncAssocGadgets((SyncAssocGadgetsDialog *)param_1, index);
             return;
         }
     }
     if (me->u.list.rowCount != 0) {
-        SetListBoxScrollByName((Dialog_4a2e40 *)param_1, me->name, isel);
+        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)param_1, me->name, isel);
     }
 }
 
@@ -5622,7 +5622,7 @@ static inline void TickProgressBar(Gui* menu, int i)
             }
             e->u.anim.next = GetTicks() + e->u.anim.interval;
         }
-        DrawProgressBarGadget((Dialog_4a4660 *)menu, i);
+        DrawProgressBarGadget((DrawProgressBarGadgetDialog *)menu, i);
     }
 }
 
@@ -5826,7 +5826,7 @@ int __stdcall UpdateMenu(Gui* menu)
 // FUNCTION: 0x4aa850
 void __stdcall SetCurrentGuiContext(Gui* ctx)
 {
-    g_guiContext = (Root_004a32a0*)ctx;
+    g_guiContext = (ConfigureListBoxByNameRoot*)ctx;
     ctx->layer = 0;
     ctx->str_9b6[0] = 0;
     ctx->str_ab6[0] = 0;

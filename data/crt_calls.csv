@@ -739,7 +739,7 @@ address,function,callee,kind,file,class,notes
 0x4a1110,SetGadgetStatusByName,strncmp,call,src/gui/gui.cpp,presentation,sites=1
 0x4a1250,SetGrayedOutByName,strncmp,call,src/gui/gui.cpp,presentation,sites=1
 0x4a1450,SetGadgetGrayedOutByName,strncmp,call,src/gui/gui.cpp,presentation,sites=1
-0x4a14c0,FUN_004a14c0,strncmp,call,src/gui/gui.cpp,presentation,sites=1
+0x4a14c0,SetGadgetGrayedOutByNameTwin,strncmp,call,src/gui/gui.cpp,presentation,sites=1
 0x4a1530,SetQuickKeyByName,strncmp,call,src/gui/gui.cpp,presentation,sites=1
 0x4a2580,DrawSliderBar,_ftol,call,src/gui/gui.cpp,game,sites=1
 0x4a2580,DrawSliderBar,_itoa,call,src/gui/gui.cpp,game,sites=1

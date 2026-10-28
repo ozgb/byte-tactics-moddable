@@ -713,17 +713,17 @@ MovementClass::RefreshMovedUnits,RefreshPassMapNative,"seam slot filled by Insta
 MovementClass::RefreshUnitIfStale,RefreshPassMapNative,"seam slot filled by InstallNativeSeams, MapSeam::RefreshPassMap, MovementClass::RefreshUnitIfStale (src/units/movement_class.cpp), src/seams/native.cpp"
 NanoParticles::Init,NanoParticles::Emit,"Emit() on this, NanoParticles has no subclass, src/graphics/particles.cpp"
 NotifyUnitRefs,Order::OrStatusFlags,"slot 0 of Order; listener is the Order stored by Order constructor, src/orders/order_list.cpp"
-OffsetChanged_004a4170,HandleEffectsVolumeSlider,slider callback assigned at src/frontend/options.cpp
-OffsetChanged_004a4170,HandleGameSpeedSlider,slider callback assigned at src/frontend/options.cpp
-OffsetChanged_004a4170,HandleGammaSlider,slider callback assigned at src/frontend/options.cpp
-OffsetChanged_004a4170,HandleMaxLinesSlider,slider callback assigned at src/frontend/options.cpp
-OffsetChanged_004a4170,HandleMusicVolumeSlider,slider callback assigned at src/frontend/options.cpp
-OffsetChanged_004a4170,HandleScreenSlider,slider callback assigned at src/frontend/options.cpp
-OffsetChanged_004a4170,HandleTextScrollSlider,slider callback assigned at src/frontend/options.cpp
-OffsetChanged_004a4170,HandleUnitCountSlider,slider callback assigned at src/frontend/multi.cpp
-OffsetChanged_004a4170,HandleVideoModeSlider,slider callback assigned at src/frontend/options.cpp
-OffsetChanged_004a4170,UpdateEnergyReadout,slider callback assigned at src/ingame/game_dialogs.cpp
-OffsetChanged_004a4170,UpdateMetalReadout,slider callback assigned at src/ingame/game_dialogs.cpp
+ClampKnobPosAndNotify,HandleEffectsVolumeSlider,slider callback assigned at src/frontend/options.cpp
+ClampKnobPosAndNotify,HandleGameSpeedSlider,slider callback assigned at src/frontend/options.cpp
+ClampKnobPosAndNotify,HandleGammaSlider,slider callback assigned at src/frontend/options.cpp
+ClampKnobPosAndNotify,HandleMaxLinesSlider,slider callback assigned at src/frontend/options.cpp
+ClampKnobPosAndNotify,HandleMusicVolumeSlider,slider callback assigned at src/frontend/options.cpp
+ClampKnobPosAndNotify,HandleScreenSlider,slider callback assigned at src/frontend/options.cpp
+ClampKnobPosAndNotify,HandleTextScrollSlider,slider callback assigned at src/frontend/options.cpp
+ClampKnobPosAndNotify,HandleUnitCountSlider,slider callback assigned at src/frontend/multi.cpp
+ClampKnobPosAndNotify,HandleVideoModeSlider,slider callback assigned at src/frontend/options.cpp
+ClampKnobPosAndNotify,UpdateEnergyReadout,slider callback assigned at src/ingame/game_dialogs.cpp
+ClampKnobPosAndNotify,UpdateMetalReadout,slider callback assigned at src/ingame/game_dialogs.cpp
 OpenSoundOptions,HandleEffectsVolumeSlider,"Gadget::sliderCallback assigned in menu code, see the HandleButtonInput edges; UpdateUnitSliders is passed at src/frontend/multi.cpp"
 OpenSoundOptions,HandleGameSpeedSlider,"Gadget::sliderCallback assigned in menu code, see the HandleButtonInput edges; UpdateUnitSliders is passed at src/frontend/multi.cpp"
 OpenSoundOptions,HandleGammaSlider,"Gadget::sliderCallback assigned in menu code, see the HandleButtonInput edges; UpdateUnitSliders is passed at src/frontend/multi.cpp"

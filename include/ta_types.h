@@ -972,7 +972,7 @@ union Dword_0051f410;
 struct Effect;
 struct Effects;
 struct ElemA_0046c190;
-struct ElemArray_4a4930;
+struct ResetProgressBarEntries;
 struct ElemB_0046c190;
 struct Elem_00401000;
 struct Elem_0040cc40;
@@ -1185,7 +1185,7 @@ struct Flags_418fd0;
 union Flags_4b5980;
 struct FloatVec;
 struct Follow_0041ca10;
-struct Font_004a50b0;
+struct FontGlyphTable;
 struct Form_00464e70;
 struct Fp_004bbff0;
 struct Fpo_004de020;
@@ -1216,7 +1216,7 @@ struct Gaf_004224b0;
 struct Gaf_004b8d40;
 struct Game;
 struct GameRec_4c9c50;
-struct GameState_4a4930;
+struct ResetProgressBarDialog;
 struct Game_004bfe10;
 struct Game_004c14f0;
 struct Game_004c1830;
@@ -1724,7 +1724,7 @@ struct Point_0046ba80;
 struct Point_0048c6a0;
 struct Point_004948e0;
 struct Point_00498cd0;
-struct Point_004a4b50;
+struct HandleHotspotInputPoint;
 struct Point_004bf060;
 struct Point_004bf260;
 struct Point_004c0330;
@@ -11905,7 +11905,7 @@ struct Obj_8 {
 
 struct Game_004c14f0 {
     char unknown_0[516];
-    Font_004a50b0* font;
+    FontGlyphTable* font;
     int colour1;
     int colour2;
     int colour3;
@@ -11913,7 +11913,7 @@ struct Game_004c14f0 {
 
 struct Game_004c1830 {
     char unknown_0[516];
-    Font_004a50b0* font;
+    FontGlyphTable* font;
 };
 
 struct Queue_004c1ab0_2 {

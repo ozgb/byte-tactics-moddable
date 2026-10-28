@@ -883,8 +883,6 @@ struct ChatPacket {
     char text[0x40];
 };
 
-void Unused_00452960(int a, int b, int c, int d, int e);
-
 struct AllyFlagsPacket {
     unsigned char type;
     int fromNetId;
@@ -2794,8 +2792,6 @@ void __stdcall BroadcastBuilderLink(Unit* obj, Unit* target)
 
 #pragma pack(push, 1)
 
-void Unused_004565a0(int a, int b, int c, int d, int e, int f);
-
 struct UnitScriptCallPacket {
     unsigned char type;
     short id;
@@ -2829,10 +2825,6 @@ struct LoadProgressPacket {
     unsigned char progress;
 };
 
-void Unused_00457050(int a, int b, int c, int d, int e, int f);
-
-void Unused_004571c0(int a, int b, int c, int d, int e, int f);
-
 struct PlayerViewStatePacket {
     unsigned char type;
     unsigned char shareFlag;
@@ -2852,15 +2844,11 @@ struct PlayerViewStatePacket {
     float metalWasted;
 };
 
-void Unused_00457540(int a, int b, int c, int d, int e, int f);
-
 struct ShareLosAckPacket {
     unsigned char type;
     unsigned char ackLos;
     unsigned char ackMapping;
 };
-
-void Unused_00457d30(int a, int b, int c, int d, int e, int f);
 
 #pragma pack(pop)
 

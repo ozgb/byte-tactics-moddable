@@ -23,11 +23,6 @@ class SquadScoutTimer;
 #include "../units/unit_def.h"
 #include "unit_weapon_slot.h"
 
-struct Gun_0049c9c0 {
-    short angle;
-    char unknown_2[2];
-};
-
 #pragma pack(push, 1)
 
 struct Unit;
@@ -86,11 +81,6 @@ union NetDirtyFlagBits {
         unsigned short b8 : 1, b9 : 1, b10 : 1, b11 : 1;
         unsigned short b12 : 1, b13 : 1, b14 : 1, b15 : 1;
     } f;
-};
-
-union Fba_0049e1a0 {
-    unsigned short w;
-    unsigned char b[2];
 };
 
 union ReachUnitFixed {
@@ -200,10 +190,6 @@ void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, WeaponFireUnitView* so
         BroadcastPacket(source->kind->f4, &packet, 0x24);
     }
 }
-
-#pragma pack(push, 1)
-void Unused_00499ba0(int a, int b, int c, int d, int e, int f);
-#pragma pack(pop)
 
 #include "../network/net_game.h"
 
@@ -468,11 +454,6 @@ struct CellPosXZ {
     short z;
 };
 
-#pragma pack(push, 1)
-
-void Unused_0049a120(int a, int b, int c, int d, int e, int f);
-#pragma pack(pop)
-
 #include <vector>
 
 struct AreaDamageHits {
@@ -657,10 +638,6 @@ int __stdcall WeaponCanReachPos(Unit* a1, ReachPosVec3* a2, ReachPosVec3* a3, in
 }
 
 #include <stdlib.h>
-
-#pragma pack(push, 1)
-
-#pragma pack(pop)
 
 inline ReachUnitVec3 operator-(ReachUnitVec3 a, ReachUnitVec3 b)
 {
@@ -1327,10 +1304,6 @@ Projectile* __stdcall FindRemoteProjectile(RemoteFireEventView* ev)
     return 0;
 }
 
-#pragma pack(push, 1)
-void Unused_0049d270(int a, int b, int c, int d, int e, int f);
-#pragma pack(pop)
-
 static inline int SameTargetPos(Vec3& a, Vec3& b)
 {
     return a.x == b.x && a.z == b.z && a.y == b.y;
@@ -1415,10 +1388,6 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
         return;
     }
 }
-
-#pragma pack(push, 1)
-void Unused_0049d580(int a, int b, int c, int d, int e, int f);
-#pragma pack(pop)
 
 void __stdcall GetWeaponPiecePosition(Unit* obj, Vec3* out, unsigned char weapon, int piece);
 short __stdcall SolveLaunchAngle(int dx, int dy, int dz, int speed, float pitch);
@@ -1571,7 +1540,6 @@ struct LineOfSightAimSlotView {
     unsigned char weapon;
 };
 
-void Unused_0049d9c0(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
 int __stdcall AimWithinTolerance(Unit* unit, LineOfSightAimSlotView* aim, short angle1, short angle2);
@@ -1640,7 +1608,6 @@ struct VLaunchUnitView {
     short team;
 };
 
-void Unused_0049db70(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
 void __stdcall GetWeaponPiecePosition(VLaunchUnitView* obj, Vec3* out, unsigned char weapon, int piece);
@@ -1706,7 +1673,6 @@ struct DroppedAimSlotView {
     unsigned char weapon;
 };
 
-void Unused_0049dd60(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
 void __stdcall InitProjectile(Projectile*, WeaponDef*, Vec3*, int, int, Unit*);
@@ -1755,7 +1721,6 @@ int __stdcall FireDroppedWeapon(Unit* unit, DroppedAimSlotView* aim,
     return 0;
 }
 
-void Unused_0049df10(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
 void __stdcall InitProjectile(Projectile*, void*, void*, int, int, void*);
@@ -1982,10 +1947,6 @@ int ScanDirectory(char*, char*, char*, int, int, int);
 #include "../graphics/gaf.h"
 void OrderSquad(void*, int, unsigned char, int, void*, int, int, int);
 int AddBlinkWord(void*, const char*, int, int, int, int, float, float);
-
-#pragma pack(push, 1)
-
-#pragma pack(pop)
 
 // FUNCTION: 0x49b090
 void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)

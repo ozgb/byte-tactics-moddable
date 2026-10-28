@@ -1240,7 +1240,6 @@ struct Group_004bc640;
 struct Groups_004bc640;
 struct Gui_00443100;
 struct TimeoutDialogLayer;
-struct Gun_0049c9c0;
 struct Handle;
 class Handler_004388d0;
 struct HapiBuf;

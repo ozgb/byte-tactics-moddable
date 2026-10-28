@@ -250,5 +250,5 @@ UnitDef,categories,pointer,src/units/unit_def.h,#352
 UnitDef,data,pointer,src/units/unit_def.h,#352
 UnitDef,weaponCategories,pointer,src/units/unit_def.h,#352
 UnitInfoSnapshot,orderName,int-pointer,src/ingame/unit_info_snapshot.h,#353
-UnitList_00409160,units,container,src/ai/player_ai.h,#361
+AiUnitList,units,container,src/ai/player_ai.h,#361
 WeaponDef,fire,pointer,src/weapons/weapon_def.h,#352

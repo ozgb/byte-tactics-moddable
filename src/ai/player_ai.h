@@ -9,49 +9,49 @@ struct Unit;
 struct UnitDef;
 struct Vec3;
 
-struct Elem_0040cc40 {
+struct KeyedCell {
     Point16 pos;
     float key;
-    Elem_0040cc40() {}
+    KeyedCell() {}
     // FUNCTION: 0x40a5b0
-    Elem_0040cc40(const Elem_0040cc40& o) : pos(o.pos), key(o.key) {}
-    Elem_0040cc40(short x, short y, float k) { pos.x = x; pos.y = y; key = k; }
-    bool operator<(const Elem_0040cc40& o) const { return key < o.key; }
+    KeyedCell(const KeyedCell& o) : pos(o.pos), key(o.key) {}
+    KeyedCell(short x, short y, float k) { pos.x = x; pos.y = y; key = k; }
+    bool operator<(const KeyedCell& o) const { return key < o.key; }
 };
 
-struct Elem_0040cfb0 {
+struct BuildRatingWeights {
     char a;
     char b;
     char c;
 };
 
-struct Elem_0040d4f0 {
+struct PercentByte {
     unsigned char value;
 };
 
-struct Elem_0040d550 {
+struct UnitTypeInt {
     int unknown_0;
 };
 
-struct Pos_00409160 {
+struct CenterPos {
     short x, y;
     int unknown_4;
-    Pos_00409160(short ax, short ay) : unknown_4(0) { x = ax; y = ay; }
+    CenterPos(short ax, short ay) : unknown_4(0) { x = ax; y = ay; }
 };
 
-struct Vec3_00409160 {
+struct AiVec3 {
     int x, y, z;
-    Vec3_00409160(int ax, int ay, int az) : x(ax), y(ay), z(az) {}
-    Vec3_00409160() { *this = Vec3_00409160(0, 0, 0); }
+    AiVec3(int ax, int ay, int az) : x(ax), y(ay), z(az) {}
+    AiVec3() { *this = AiVec3(0, 0, 0); }
 };
 
-struct UnitList_00409160 {
+struct AiUnitList {
     SimVector<Unit*> units;
     void Clear() { units.clear(); }
 };
 
-struct Group_00409160 {
-    UnitList_00409160 list;
+struct FactoryUnitGroup {
+    AiUnitList list;
     void Clear() { list.Clear(); }
 };
 
@@ -59,23 +59,23 @@ class PlayerAI {
 public:
     Ref<Player> owner;
     unsigned char index;
-    UnitList_00409160 visible;
-    UnitList_00409160 known;
-    Group_00409160 factories;
-    Vec3_00409160 centre;
-    Vec3_00409160 pos_41;
-    SimVector<Elem_0040cc40> cells;
-    Pos_00409160 center;
-    SimVector<Elem_0040cfb0> vec_65;
+    AiUnitList visible;
+    AiUnitList known;
+    FactoryUnitGroup factories;
+    AiVec3 centre;
+    AiVec3 pos_41;
+    SimVector<KeyedCell> cells;
+    CenterPos center;
+    SimVector<BuildRatingWeights> vec_65;
     int builders;
     int hasSpecial;
     SimVector<short> counts;
     SimVector<unsigned char> vec_8d;
     SimVector<unsigned char> weights;
-    SimVector<Elem_0040d4f0> vec_ad;
-    SimVector<Elem_0040d550> vec_bd;
-    SimVector<Elem_0040d550> values;
-    SimVector<Elem_0040d550> locked;
+    SimVector<PercentByte> vec_ad;
+    SimVector<UnitTypeInt> vec_bd;
+    SimVector<UnitTypeInt> values;
+    SimVector<UnitTypeInt> locked;
     unsigned int lastTick;
     Point16 spacing0;
     Point16 offset0;
@@ -89,7 +89,7 @@ public:
     void InitUnitTables();
     void InitPlacementGrid();
     void ComputeBaseWeights();
-    bool FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<Elem_0040cc40>* list, int range, Point16* out);
+    bool FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<KeyedCell>* list, int range, Point16* out);
     bool FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Point16* out);
     void BuildFeatureCells();
     void RefreshUnitLists();

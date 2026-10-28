@@ -108,7 +108,7 @@ struct BuildMenuPage;
 struct BuildList_0045a950;
 struct Button_0041e420;
 struct Button_004a7f70;
-struct ByteMap_00408090;
+struct ByteMap;
 struct CalcedExplosion;
 struct Callback;
 struct Callback_0043a1f0;
@@ -975,11 +975,11 @@ struct ElemA_0046c190;
 struct ResetProgressBarEntries;
 struct ElemB_0046c190;
 struct ConstructedElement;
-struct Elem_0040cc40;
+struct KeyedCell;
 struct Elem_0040cc40_2;
-struct Elem_0040cfb0;
-struct Elem_0040d4f0;
-struct Elem_0040d550;
+struct BuildRatingWeights;
+struct PercentByte;
+struct UnitTypeInt;
 struct Elem_0040f110;
 struct Elem_004222e0;
 struct ModelTextureEntry;
@@ -1235,7 +1235,7 @@ struct Grid_0040e050;
 struct Grid_0040e630;
 struct Grid_0047e5c0;
 struct Group;
-struct Group_00409160;
+struct FactoryUnitGroup;
 struct Group_004bc640;
 struct Groups_004bc640;
 struct Gui_00443100;
@@ -1382,7 +1382,7 @@ struct MapInfo;
 struct MapInfo_00483610;
 struct MapInfo_44dc60;
 struct ModelGroundPrimitive;
-struct MapSize_00408090;
+struct ByteMapSize;
 struct MapVertex_0048a490;
 struct Map_0040d7b0;
 struct MenuBackdropBitmap;
@@ -1653,7 +1653,7 @@ struct Packet_0049df10;
 struct Packet_2;
 struct Packet_4517b0;
 struct HelpPageLines;
-struct Pair_0040d880;
+struct TurnCostPair;
 struct Pair_0040e630;
 struct MessageByteCounter;
 struct Pair_0046faf0;
@@ -1736,7 +1736,7 @@ struct Pool_00422170;
 struct Pool_004232a0;
 struct Pos16_44dc60;
 struct XzPoint;
-struct Pos_00409160;
+struct CenterPos;
 struct Pos_004658e0;
 struct Pos_00465ac0;
 struct Pos_00473590;
@@ -1876,7 +1876,7 @@ struct ReadStatusFieldRecord;
 struct ReadNuttinFieldRecord;
 struct ReadStatusFieldSource;
 struct ReadNuttinFieldSource;
-struct Struct_0040bab0;
+struct MirroredBasePos;
 struct GoalOwnerUnit;
 struct Struct_0049fb50;
 struct Struct_0049fba0;
@@ -1890,7 +1890,7 @@ struct Struct_004c2ac0;
 struct Struct_004c2ac0_2;
 struct Struct_004c6ac0;
 struct Sub;
-struct Sub_00409520;
+struct WeaponDefRatingView;
 struct LightBarCounters;
 struct LightBarSprite;
 struct Sub_0046e000;
@@ -1909,7 +1909,7 @@ struct Surface_004c6f80;
 class Surface_4b6570;
 struct Surfaces_0047bdf0;
 struct Sym_004dea00;
-struct Table_0040d880;
+struct TurnCostTable;
 struct Table_0041ace0;
 struct Table_004611e0;
 struct Table_0047acd0;
@@ -1959,7 +1959,7 @@ class UnitDef;
 struct UnitFlag_0044e7d0;
 struct UnitFlags_0048d630;
 class UnitList;
-struct UnitList_00409160;
+struct AiUnitList;
 struct UnitList_00409730;
 struct UnitList_0048ec20;
 struct UnitRange_0048d920;
@@ -4208,8 +4208,8 @@ public:
 class Map_0042e440 {
 public:
     char unknown_0;
-    std::vector<Elem_0040cc40> vec;
-    Elem_0040cc40* LowerBound(char*);
+    std::vector<KeyedCell> vec;
+    KeyedCell* LowerBound(char*);
 };
 
 class Class_004c4450 {
@@ -7005,7 +7005,7 @@ struct Widget_00464f80 {
 
 struct Map_004658e0 {
     char unknown_0[124];
-    ByteMap_00408090 explored;
+    ByteMap explored;
 };
 
 struct Pos_004658e0 {
@@ -7042,7 +7042,7 @@ struct PlayerInfo_00466dc0 {
     char unknown_0[39];
     Ref<PlayerInfo> data;
     char unknown_2b[81];
-    ByteMap_00408090 explored;
+    ByteMap explored;
     char unknown_88[195];
 };
 
@@ -7977,7 +7977,7 @@ union Fix_004736e0 {
 
 struct Player_00473a00 {
     char unknown_0[124];
-    ByteMap_00408090 explored;
+    ByteMap explored;
     char unknown_88[195];
 };
 
@@ -14977,23 +14977,23 @@ public:
     char* player;
     unsigned char index;
     std::vector<Unit*> units;
-    UnitList_00409160 list_15;
-    Group_00409160 group_25;
+    AiUnitList list_15;
+    FactoryUnitGroup group_25;
     Vec3 pos_35;
     Vec3 pos_41;
-    std::vector<Elem_0040cc40> vec_4d;
-    Pos_00409160 center;
-    std::vector<Elem_0040cfb0> vec_65;
+    std::vector<KeyedCell> vec_4d;
+    CenterPos center;
+    std::vector<BuildRatingWeights> vec_65;
     int field_75;
     int field_79;
     std::vector<short> vec_7d;
     std::vector<unsigned char> vec_8d;
     std::vector<unsigned char> vec_9d;
-    std::vector<Elem_0040d4f0> vec_ad;
+    std::vector<PercentByte> vec_ad;
     char unknown_bd[4];
     int* d;
     char unknown_c5[8];
-    std::vector<Elem_0040d550> values;
+    std::vector<UnitTypeInt> values;
     char unknown_dd[4];
     int* locked;
     char unknown_e5[8];
@@ -15006,7 +15006,7 @@ public:
     int margin1;
     int field_109;
     Owner(unsigned char);
-    bool FindCellNearFeatures(UnitDef*, Vec3*, std::vector<Elem_0040cc40>*, int, Point16*);
+    bool FindCellNearFeatures(UnitDef*, Vec3*, std::vector<KeyedCell>*, int, Point16*);
     bool FindRandomPlacementCell(UnitDef*, Vec3*, int, Point16*);
     void InitUnitTables(void);
 };
@@ -15038,7 +15038,7 @@ struct Sub {
 
 struct Class_0040a7b0 {
     char unknown_0[77];
-    std::vector<Elem_0040cc40> cells;
+    std::vector<KeyedCell> cells;
     void BuildFeatureCells(void);
 };
 

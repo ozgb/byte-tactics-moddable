@@ -64,7 +64,7 @@ static inline Vec3 MakeVec3(int x, int y, int z)
     return v;
 }
 
-struct Sub_00409520 {
+struct WeaponDefRatingView {
     char unknown_0[0xd4];
     unsigned short damage;
     char unknown_d6[6];
@@ -130,7 +130,7 @@ void __stdcall OrderSquad(Player*, int, unsigned char, int, Unit*, Vec3*, int, i
 
 #include "squad_manager.h"
 
-struct Target_00406f50 {
+struct UnitNetDirtyFlagsView {
     char unknown_0[0xbb];
     unsigned short bit0_4 : 5;
     unsigned short flag5 : 1;
@@ -169,15 +169,15 @@ struct Vec3_40b0d0 {
     int z;
 };
 
-struct Struct_0040ba80 {
+struct BasePos {
     int a, b, c;
 };
 
-struct Struct_0040bab0 {
+struct MirroredBasePos {
     int a, b, c;
 };
 
-struct Vec3_0040beb0 {
+struct MovableVec3 {
     int x;
     int y;
     int z;
@@ -197,9 +197,9 @@ struct Vec3_0040beb0 {
     }
 };
 
-static inline Vec3_0040beb0 operator-(const Vec3_0040beb0& p, const Vec3_0040beb0& q)
+static inline MovableVec3 operator-(const MovableVec3& p, const MovableVec3& q)
 {
-    Vec3_0040beb0 r;
+    MovableVec3 r;
     r.x = p.x - q.x;
     r.y = p.y - q.y;
     r.z = p.z - q.z;
@@ -215,8 +215,8 @@ static inline Vec3_0040beb0 operator-(const Vec3_0040beb0& p, const Vec3_0040beb
 void __stdcall ScaleUnitWeights(int player, UnitTypeSet* set, float value, int count);
 void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_4);
 #include "ai_player.h"
-typedef void (__stdcall* Command_00406f00)(CommandArgs* args);
-void __stdcall RegisterCommand(const char* name, Command_00406f00 fn, int flags);
+typedef void (__stdcall* AiCommandFn)(CommandArgs* args);
+void __stdcall RegisterCommand(const char* name, AiCommandFn fn, int flags);
 #include "../../interfaces/seams.h"
 #include "../quirks/quirks.h"
 #include "../state/sim_globals.h"
@@ -231,16 +231,16 @@ int __cdecl ScaledCos(short angle, int scale);
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
 #include "pathfind.h"
-void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
-                            Elem_0040cc40 val, int*);
+void __stdcall PopHeapFirst(KeyedCell* first, KeyedCell* last, KeyedCell* dest,
+                            KeyedCell val, int*);
 
 #include "../util/commands.h"
 int __stdcall GetWeaponRange(Unit*, unsigned char);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
 int __stdcall IsCountBelowAiLimit(int, unsigned short, int);
-void __stdcall GetBasePosition(int index, Struct_0040ba80* out);
+void __stdcall GetBasePosition(int index, BasePos* out);
 
-static const float Zero_004fc968 = 0.0f;
+static const float kZeroFloatAi = 0.0f;
 
 static inline int Contains(unsigned int* bits, unsigned short index)
 {
@@ -271,9 +271,9 @@ static inline int DistSq(const Point16& a, const Point16& b)
     return dx * dx + dy * dy;
 }
 
-static inline void PopHeap(Elem_0040cc40* f, Elem_0040cc40* l)
+static inline void PopHeap(KeyedCell* f, KeyedCell* l)
 {
-    PopHeapFirst(f, l - 1, l - 1, Elem_0040cc40(*(l - 1)), (int*)0);
+    PopHeapFirst(f, l - 1, l - 1, KeyedCell(*(l - 1)), (int*)0);
 }
 
 static inline float Max(float a, float b) { return a > b ? a : b; }
@@ -378,7 +378,7 @@ void FUN_00406f40(void)
 // FUNCTION: 0x406f50
 void SquadManager::MarkOwnerNetDirtyFromDamageSplit(Projectile* projectile, int a, int b)
 {
-    Target_00406f50* t = (Target_00406f50*)projectile->attacker.get();
+    UnitNetDirtyFlagsView* t = (UnitNetDirtyFlagsView*)projectile->attacker.get();
     if (t) {
         if (a > b * 2) {
             t->flag6 = 1;
@@ -398,7 +398,7 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
         g_seams.orders->DeleteOrders(unit,0);
     }
     if (attacker && unit->player->active && (unit->player->type==1 || unit->player->type==2) &&
-        (unit->def->flags1&0x10010000) && unit->buildLeft==Zero_004fc968 && !unit->player->allied[attacker->player->index]) {
+        (unit->def->flags1&0x10010000) && unit->buildLeft==kZeroFloatAi && !unit->player->allied[attacker->player->index]) {
         int ordered=0;
         if ((!unit->list || (unit->list->flags_42&0x20000)) &&
             !Contains(unit->def->categories,attacker->unitDefIndex) &&
@@ -629,19 +629,19 @@ SquadScoutTimer::SquadScoutTimer(SquadManager* p, Group* q)
 {
 }
 
-struct FixedParts_00407ae0 {
+struct AiFixedParts {
     unsigned int frac : 16;
     int whole : 16;
 };
 
-union Fixed_00407ae0 {
+union AiFixed {
     int value;
-    FixedParts_00407ae0 parts;
+    AiFixedParts parts;
 };
 
-static inline Fixed_00407ae0 MakeFixed(int i)
+static inline AiFixed MakeFixed(int i)
 {
-    Fixed_00407ae0 f;
+    AiFixed f;
     f.parts.frac = 0;
     f.parts.whole = i;
     return f;
@@ -900,7 +900,7 @@ void __stdcall UpdateConverter(Unit* unit)
 {
     Economy* economy = (Economy*)unit->player.get();
     if (economy->cost + economy->cost < economy->energy) {
-        if (g_seams.players->GetNetEnergy((Player*)economy) > Zero_004fc968 && RandomInt(5) != 0) {
+        if (g_seams.players->GetNetEnergy((Player*)economy) > kZeroFloatAi && RandomInt(5) != 0) {
             g_seams.units->SetStateBits(unit, 1, 1);
         }
     } else {
@@ -917,7 +917,7 @@ void BuildTimer::OnTimer()
         if ((u->flags & 0x20000000) && (u->flags & 0x10000000) && !(u->flags & 0x4000)) {
             if (u->def->makesMetal) {
                 if (((Economy*)u->player.get())->cost + ((Economy*)u->player.get())->cost < ((Economy*)u->player.get())->energy) {
-                    if (g_seams.players->GetNetEnergy(u->player) > Zero_004fc968 && RandomInt(5))
+                    if (g_seams.players->GetNetEnergy(u->player) > kZeroFloatAi && RandomInt(5))
                         g_seams.units->SetStateBits(u, 1, 1);
                 } else
                     g_seams.units->SetStateBits(u, 1, 0);
@@ -986,7 +986,7 @@ void SquadManager::RetargetWeapons(int force)
             cursor = next;
         } else
             cursor = player->unitsBegin;
-        if (cursor->unitDefIndex != 0 && cursor->buildLeft == Zero_004fc968 && (cursor->flags & 0x80000000)
+        if (cursor->unitDefIndex != 0 && cursor->buildLeft == kZeroFloatAi && (cursor->flags & 0x80000000)
             && (cursor->flags & 0x300000) == 0x200000) {
             for (unsigned char w = 0; w < 3; w++) {
                 if ((cursor->weapons[w].flags & 2) && (cursor->weapons[w].flags & 0x10)
@@ -1070,17 +1070,17 @@ void SquadManager::DeleteTimers()
     }
 }
 
-typedef SimVector<Unit*> Vec_00408f30;
-typedef void (Vec_00408f30::*InsertFn_00408f30)(
-    Vec_00408f30::iterator, Vec_00408f30::size_type, Unit* const&);
+typedef SimVector<Unit*> UnitPtrVectorInsert;
+typedef void (UnitPtrVectorInsert::*UnitPtrInsertFn)(
+    UnitPtrVectorInsert::iterator, UnitPtrVectorInsert::size_type, Unit* const&);
 
-void __stdcall Grow_00408f30(Vec_00408f30* units, int extra)
+void __stdcall ReserveUnitPtrVector(UnitPtrVectorInsert* units, int extra)
 {
     units->reserve(extra + units->size());
 }
 
 // FUNCTION: 0x408f30 ?insert@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEXPAPAUUnit@@IABQAU3@@Z
-InsertFn_00408f30 g_insert_00408f30 = &Vec_00408f30::insert;
+UnitPtrInsertFn g_insert_00408f30 = &UnitPtrVectorInsert::insert;
 
 // FUNCTION: 0x409160
 PlayerAI::PlayerAI(unsigned char p)
@@ -1094,19 +1094,19 @@ PlayerAI::PlayerAI(unsigned char p)
     weights.resize(n, 0);
     counts.resize(n, 0);
     {
-        Elem_0040cfb0 e;
+        BuildRatingWeights e;
         e.a = 0;
         e.b = 0;
         e.c = 0;
         vec_65.resize(n, e);
     }
     {
-        Elem_0040d4f0 f;
+        PercentByte f;
         f.value = 0;
         vec_ad.resize(n, f);
     }
     {
-        Elem_0040d550 g;
+        UnitTypeInt g;
         g.unknown_0 = 0;
         vec_bd.resize(n, g);
         g.unknown_0 = 0;
@@ -1144,9 +1144,9 @@ int __stdcall RateWeapons(UnitDef* p)
     int result = 1;
     if (((Flags245*)&p->flags2)->flag4)
         result = 0xb;
-    Ref<Sub_00409520>* pp = (Ref<Sub_00409520>*)p->weapons;
+    Ref<WeaponDefRatingView>* pp = (Ref<WeaponDefRatingView>*)p->weapons;
     for (int i = 3; i != 0; i--) {
-        Sub_00409520* s = pp->get();
+        WeaponDefRatingView* s = pp->get();
         if (s->index != 0)
             result = result + s->damage / 40 + s->range / 100 + 5;
         pp++;
@@ -1170,9 +1170,9 @@ int __stdcall RateUnitType(UnitDef* p)
     int extra = 1;
     if (((Flags245*)&p->flags2)->flag4)
         extra = 0xb;
-    Ref<Sub_00409520>* pp = (Ref<Sub_00409520>*)p->weapons;
+    Ref<WeaponDefRatingView>* pp = (Ref<WeaponDefRatingView>*)p->weapons;
     for (int i = 3; i != 0; i--) {
-        Sub_00409520* s = pp->get();
+        WeaponDefRatingView* s = pp->get();
         if (s->index != 0)
             extra = extra + s->damage / 40 + s->range / 100 + 5;
         pp++;
@@ -1208,7 +1208,7 @@ void PlayerAI::ComputeBaseWeights()
 {
     vec_8d.resize(g_game->unitDefCount, 0);
     {
-        Elem_0040cfb0 e;
+        BuildRatingWeights e;
         e.a = 0;
         e.b = 0;
         e.c = 0;
@@ -1219,7 +1219,7 @@ void PlayerAI::ComputeBaseWeights()
         vec_8d[i] = RateUnitTypeForWeights(def);
 
         int a = 1;
-        Elem_0040cfb0* e = &vec_65[i];
+        BuildRatingWeights* e = &vec_65[i];
         int n = (short)counts[i];
         if (def->c04)
             a = 21;
@@ -1375,15 +1375,15 @@ void PlayerAI::InitPlacementGrid()
 }
 
 // FUNCTION: 0x40a260
-bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<Elem_0040cc40>* list, int range, Point16* out)
+bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<KeyedCell>* list, int range, Point16* out)
 {
     if (list->empty())
         return false;
-    std::vector<Elem_0040cc40> heap;
+    std::vector<KeyedCell> heap;
     heap.reserve(list->size());
     int rangeSq = range * range;
     Point16 center = WorldToCell(*pos, *(Point16*)&type->f14a);
-    for (SimVector<Elem_0040cc40>::iterator p = list->begin(); p != list->end(); p++) {
+    for (SimVector<KeyedCell>::iterator p = list->begin(); p != list->end(); p++) {
         int d = DistSq(p->pos, center);
         if (d <= rangeSq) {
             heap.push_back(*p);
@@ -1391,7 +1391,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<Elem_004
         }
     }
     if (2 <= heap.end() - heap.begin())
-        MakeHeap((Entry_40d670 *)heap.begin(), (Entry_40d670 *)heap.end(), (int*)0, (Entry_40d670 *)(Elem_0040cc40*)0);
+        MakeHeap((HeapEntry *)heap.begin(), (HeapEntry *)heap.end(), (int*)0, (HeapEntry *)(KeyedCell*)0);
     int limit = -1;
     int best = 0;
     Point16 result;
@@ -1454,7 +1454,7 @@ void PlayerAI::BuildFeatureCells()
             if (row[x].feature < 0xfffb) {
                 Feature* f = &g_game->features[row[x].feature];
                 if (f->metal != 0.0f && (f->flags16 & 0x200))
-                    cells.push_back(Elem_0040cc40(x, y, f->metal));
+                    cells.push_back(KeyedCell(x, y, f->metal));
             }
         }
     }
@@ -1629,36 +1629,36 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
 }
 
 // FUNCTION: 0x40ba80
-void __stdcall GetBasePosition(int index, Struct_0040ba80* out)
+void __stdcall GetBasePosition(int index, BasePos* out)
 {
-    Struct_0040ba80* entry = (Struct_0040ba80*)((char*)g_playerAI[index].get() + 0x35);
+    BasePos* entry = (BasePos*)((char*)g_playerAI[index].get() + 0x35);
     *out = *entry;
 }
 
 // FUNCTION: 0x40bab0
-void __stdcall GetMirroredBasePosition(int index, int unused, Struct_0040bab0* out)
+void __stdcall GetMirroredBasePosition(int index, int unused, MirroredBasePos* out)
 {
     out->a = (g_game->baseX << 16) -
-             ((Struct_0040bab0*)((char*)g_playerAI[index].get() + 0x35))->a;
+             ((MirroredBasePos*)((char*)g_playerAI[index].get() + 0x35))->a;
     out->b = 0;
     out->c = (g_game->baseX << 16) -
-             ((Struct_0040bab0*)((char*)g_playerAI[index].get() + 0x35))->c;
+             ((MirroredBasePos*)((char*)g_playerAI[index].get() + 0x35))->c;
 }
 
 // FUNCTION: 0x40bb00
 int __stdcall GetBuildRating(int player,unsigned short type)
 {
 #pragma pack(push, 1)
-    struct Owner_40bb00 {
+    struct PlayerAIRatingView {
         char pad[0x69];
-        Elem_0040cfb0* ratings;
+        BuildRatingWeights* ratings;
         char pad6d[0x81-0x6d];
         short* counts;
         char pad85[0xb1-0x85];
         unsigned char* weights;
     };
 #pragma pack(pop)
-    Owner_40bb00* owner=(Owner_40bb00*)g_playerAI[player].get();
+    PlayerAIRatingView* owner=(PlayerAIRatingView*)g_playerAI[player].get();
     Player* p=&g_game->players[player];
     if(p->energy<50.0f) return 0;
     if(p->metal<25.0f) return 0;
@@ -1677,7 +1677,7 @@ int __stdcall GetBuildRating(int player,unsigned short type)
     int energy2=min(max(energy-metal2,0),100);
     int normal=max(100-metal2-energy2,0);
     if(!IsCountBelowAiLimit(player,type,owner->counts[type])) return 0;
-    Elem_0040cfb0* r=&owner->ratings[type];
+    BuildRatingWeights* r=&owner->ratings[type];
     return (normal*r->a+r->b*metal2+r->c*energy2)*owner->weights[type]/10000;
 }
 
@@ -1703,15 +1703,15 @@ unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit* unit)
 }
 
 // FUNCTION: 0x40beb0
-Vec3_0040beb0 __stdcall MoveToward(const Vec3_0040beb0* from, const Vec3_0040beb0* to,
+MovableVec3 __stdcall MoveToward(const MovableVec3* from, const MovableVec3* to,
                                      int maxLen)
 {
-    Vec3_0040beb0 d = *to - *from;
+    MovableVec3 d = *to - *from;
     int len = d.Length();
     if (maxLen >= len)
         return *to;
     d.Scale((int)(((__int64)maxLen << 16) / len));
-    Vec3_0040beb0 r;
+    MovableVec3 r;
     r.x = from->x + d.x;
     r.y = from->y + d.y;
     r.z = from->z + d.z;
@@ -1797,107 +1797,107 @@ template class std::vector<Unit*, SimAllocator<Unit*> >;
 
 // FUNCTION: 0x40c510 ??0?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@ABV?$allocator@PAUUnit@@@1@@Z
 
-inline void __stdcall CopyOneByte(Elem_0040d4f0* dest, const Elem_0040d4f0* src) { new (dest) Elem_0040d4f0(*src); }
-inline void __stdcall CopyDwordPair(Elem_0040cc40* dest, const Elem_0040cc40* src) { new (dest) Elem_0040cc40(*src); }
+inline void __stdcall CopyOneByte(PercentByte* dest, const PercentByte* src) { new (dest) PercentByte(*src); }
+inline void __stdcall CopyDwordPair(KeyedCell* dest, const KeyedCell* src) { new (dest) KeyedCell(*src); }
 namespace std {
-inline void _Construct(Elem_0040d4f0* dest, const Elem_0040d4f0& src) { CopyOneByte(dest, &src); }
-inline void _Construct(Elem_0040cc40* dest, const Elem_0040cc40& src) { CopyDwordPair(dest, &src); }
+inline void _Construct(PercentByte* dest, const PercentByte& src) { CopyOneByte(dest, &src); }
+inline void _Construct(KeyedCell* dest, const KeyedCell& src) { CopyDwordPair(dest, &src); }
 }
 
-typedef SimVector<Unit*> Vec_0040c530;
-typedef SimVector<Elem_0040cc40> Vec_0040c580;
-typedef SimVector<Elem_0040cfb0> Vec_0040c5d0;
-typedef SimVector<Elem_0040d4f0> Vec_0040c600;
-typedef SimVector<Elem_0040d550> Vec_0040c7f0;
-typedef SimVector<short> Vec_0040d000;
-typedef SimVector<unsigned char> Vec_0040d290;
+typedef SimVector<Unit*> SimUnitPtrVector;
+typedef SimVector<KeyedCell> KeyedCellVector;
+typedef SimVector<BuildRatingWeights> BuildRatingVector;
+typedef SimVector<PercentByte> PercentByteVector;
+typedef SimVector<UnitTypeInt> UnitTypeIntVector;
+typedef SimVector<short> ShortVector;
+typedef SimVector<unsigned char> ByteVector;
 
-typedef SimVector<Vec_0040c530> Outer_0040c530;
-typedef Outer_0040c530& (Outer_0040c530::*AssignFn_0040c530)(const Outer_0040c530&);
+typedef SimVector<SimUnitPtrVector> UnitPtrVectorVector;
+typedef UnitPtrVectorVector& (UnitPtrVectorVector::*UnitPtrVectorVectorAssignFn)(const UnitPtrVectorVector&);
 // FUNCTION: 0x40c530 ??1?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@XZ
-AssignFn_0040c530 g_assign_0040c530 = &Outer_0040c530::operator=;
+UnitPtrVectorVectorAssignFn g_assign_0040c530 = &UnitPtrVectorVector::operator=;
 
-typedef Vec_0040c530::size_type (Vec_0040c530::*SizeFn_0040c560)() const;
+typedef SimUnitPtrVector::size_type (SimUnitPtrVector::*UnitPtrVectorSizeFn)() const;
 // FUNCTION: 0x40c560 ?size@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QBEIXZ
-SizeFn_0040c560 g_size_0040c560 = &Vec_0040c530::size;
+UnitPtrVectorSizeFn g_size_0040c560 = &SimUnitPtrVector::size;
 
-typedef SimVector<Vec_0040c580> Outer_0040c580;
-typedef Outer_0040c580& (Outer_0040c580::*AssignFn_0040c580)(const Outer_0040c580&);
-// FUNCTION: 0x40c580 ??1?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QAE@XZ
-AssignFn_0040c580 g_assign_0040c580 = &Outer_0040c580::operator=;
+typedef SimVector<KeyedCellVector> KeyedCellVectorVector;
+typedef KeyedCellVectorVector& (KeyedCellVectorVector::*KeyedCellVectorVectorAssignFn)(const KeyedCellVectorVector&);
+// FUNCTION: 0x40c580 ??1?$vector@UKeyedCell@@V?$allocator@UKeyedCell@@@std@@@std@@QAE@XZ
+KeyedCellVectorVectorAssignFn g_assign_0040c580 = &KeyedCellVectorVector::operator=;
 
-typedef Vec_0040c580::size_type (Vec_0040c580::*SizeFn_0040c5b0)() const;
-// FUNCTION: 0x40c5b0 ?size@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QBEIXZ
-SizeFn_0040c5b0 g_size_0040c5b0 = &Vec_0040c580::size;
+typedef KeyedCellVector::size_type (KeyedCellVector::*KeyedCellVectorSizeFn)() const;
+// FUNCTION: 0x40c5b0 ?size@?$vector@UKeyedCell@@V?$allocator@UKeyedCell@@@std@@@std@@QBEIXZ
+KeyedCellVectorSizeFn g_size_0040c5b0 = &KeyedCellVector::size;
 
-typedef SimVector<Vec_0040c5d0> Outer_0040c5d0;
-typedef Outer_0040c5d0& (Outer_0040c5d0::*AssignFn_0040c5d0)(const Outer_0040c5d0&);
-// FUNCTION: 0x40c5d0 ??1?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QAE@XZ
-AssignFn_0040c5d0 g_assign_0040c5d0 = &Outer_0040c5d0::operator=;
+typedef SimVector<BuildRatingVector> BuildRatingVectorVector;
+typedef BuildRatingVectorVector& (BuildRatingVectorVector::*BuildRatingVectorVectorAssignFn)(const BuildRatingVectorVector&);
+// FUNCTION: 0x40c5d0 ??1?$vector@UBuildRatingWeights@@V?$allocator@UBuildRatingWeights@@@std@@@std@@QAE@XZ
+BuildRatingVectorVectorAssignFn g_assign_0040c5d0 = &BuildRatingVectorVector::operator=;
 
-typedef void (Vec_0040c600::*ResizeFn_0040c600)(unsigned int, const Elem_0040d4f0&);
-// FUNCTION: 0x40c600 ?resize@?$vector@UElem_0040d4f0@@V?$allocator@UElem_0040d4f0@@@std@@@std@@QAEXIABUElem_0040d4f0@@@Z
-ResizeFn_0040c600 g_resize_0040c600 = &Vec_0040c600::resize;
+typedef void (PercentByteVector::*PercentByteVectorResizeFn)(unsigned int, const PercentByte&);
+// FUNCTION: 0x40c600 ?resize@?$vector@UPercentByte@@V?$allocator@UPercentByte@@@std@@@std@@QAEXIABUPercentByte@@@Z
+PercentByteVectorResizeFn g_resize_0040c600 = &PercentByteVector::resize;
 
-typedef void (Vec_0040c7f0::*ResizeFn_0040c7f0)(unsigned int, const Elem_0040d550&);
-// FUNCTION: 0x40c7f0 ?resize@?$vector@UElem_0040d550@@V?$allocator@UElem_0040d550@@@std@@@std@@QAEXIABUElem_0040d550@@@Z
-ResizeFn_0040c7f0 g_resize_0040c7f0 = &Vec_0040c7f0::resize;
+typedef void (UnitTypeIntVector::*UnitTypeIntVectorResizeFn)(unsigned int, const UnitTypeInt&);
+// FUNCTION: 0x40c7f0 ?resize@?$vector@UUnitTypeInt@@V?$allocator@UUnitTypeInt@@@std@@@std@@QAEXIABUUnitTypeInt@@@Z
+UnitTypeIntVectorResizeFn g_resize_0040c7f0 = &UnitTypeIntVector::resize;
 
-typedef Vec_0040c530::iterator (Vec_0040c530::*EraseFn_0040c9f0)(
-    Vec_0040c530::iterator, Vec_0040c530::iterator);
+typedef SimUnitPtrVector::iterator (SimUnitPtrVector::*UnitPtrVectorEraseFn)(
+    SimUnitPtrVector::iterator, SimUnitPtrVector::iterator);
 // FUNCTION: 0x40c9f0 ?erase@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEPAPAUUnit@@PAPAU3@0@Z
-EraseFn_0040c9f0 g_erase_0040c9f0 = &Vec_0040c530::erase;
+UnitPtrVectorEraseFn g_erase_0040c9f0 = &SimUnitPtrVector::erase;
 
-typedef Vec_0040c580::size_type (Vec_0040c580::*CapacityFn_0040ca30)() const;
-// FUNCTION: 0x40ca30 ?capacity@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QBEIXZ
-CapacityFn_0040ca30 g_capacity_0040ca30 = &Vec_0040c580::capacity;
+typedef KeyedCellVector::size_type (KeyedCellVector::*KeyedCellVectorCapacityFn)() const;
+// FUNCTION: 0x40ca30 ?capacity@?$vector@UKeyedCell@@V?$allocator@UKeyedCell@@@std@@@std@@QBEIXZ
+KeyedCellVectorCapacityFn g_capacity_0040ca30 = &KeyedCellVector::capacity;
 
-typedef Vec_0040c580::iterator (Vec_0040c580::*InsertFn_0040ca50)(Vec_0040c580::iterator, const Elem_0040cc40&);
-// FUNCTION: 0x40ca50 ?insert@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QAEPAUElem_0040cc40@@PAU3@ABU3@@Z
-InsertFn_0040ca50 g_insert_0040ca50 = &Vec_0040c580::insert;
+typedef KeyedCellVector::iterator (KeyedCellVector::*KeyedCellVectorInsertFn)(KeyedCellVector::iterator, const KeyedCell&);
+// FUNCTION: 0x40ca50 ?insert@?$vector@UKeyedCell@@V?$allocator@UKeyedCell@@@std@@@std@@QAEPAUKeyedCell@@PAU3@ABU3@@Z
+KeyedCellVectorInsertFn g_insert_0040ca50 = &KeyedCellVector::insert;
 
-typedef Vec_0040c5d0::size_type (Vec_0040c5d0::*SizeFn_0040cc80)() const;
-// FUNCTION: 0x40cc80 ?size@?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QBEIXZ
-SizeFn_0040cc80 g_size_0040cc80 = &Vec_0040c5d0::size;
+typedef BuildRatingVector::size_type (BuildRatingVector::*BuildRatingVectorSizeFn)() const;
+// FUNCTION: 0x40cc80 ?size@?$vector@UBuildRatingWeights@@V?$allocator@UBuildRatingWeights@@@std@@@std@@QBEIXZ
+BuildRatingVectorSizeFn g_size_0040cc80 = &BuildRatingVector::size;
 
-typedef void (Vec_0040c5d0::*InsertFn_0040cca0)(Vec_0040c5d0::iterator, unsigned int, const Elem_0040cfb0&);
+typedef void (BuildRatingVector::*BuildRatingVectorInsertFn)(BuildRatingVector::iterator, unsigned int, const BuildRatingWeights&);
 
-void __stdcall Grow_0040cca0(Vec_0040c5d0* v, int extra)
+void __stdcall ReserveBuildRatingVector(BuildRatingVector* v, int extra)
 {
     v->reserve(extra + v->size());
 }
 
-// FUNCTION: 0x40cca0 ?insert@?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QAEXPAUElem_0040cfb0@@IABU3@@Z
-InsertFn_0040cca0 g_insert_0040cca0 = &Vec_0040c5d0::insert;
+// FUNCTION: 0x40cca0 ?insert@?$vector@UBuildRatingWeights@@V?$allocator@UBuildRatingWeights@@@std@@@std@@QAEXPAUBuildRatingWeights@@IABU3@@Z
+BuildRatingVectorInsertFn g_insert_0040cca0 = &BuildRatingVector::insert;
 
-typedef Vec_0040c5d0::iterator (Vec_0040c5d0::*EraseFn_0040cfb0)(
-    Vec_0040c5d0::iterator, Vec_0040c5d0::iterator);
-// FUNCTION: 0x40cfb0 ?erase@?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QAEPAUElem_0040cfb0@@PAU3@0@Z
-EraseFn_0040cfb0 g_erase_0040cfb0 = &Vec_0040c5d0::erase;
+typedef BuildRatingVector::iterator (BuildRatingVector::*BuildRatingVectorEraseFn)(
+    BuildRatingVector::iterator, BuildRatingVector::iterator);
+// FUNCTION: 0x40cfb0 ?erase@?$vector@UBuildRatingWeights@@V?$allocator@UBuildRatingWeights@@@std@@@std@@QAEPAUBuildRatingWeights@@PAU3@0@Z
+BuildRatingVectorEraseFn g_erase_0040cfb0 = &BuildRatingVector::erase;
 
-typedef Vec_0040d000::size_type (Vec_0040d000::*SizeFn_0040d000)() const;
+typedef ShortVector::size_type (ShortVector::*ShortVectorSizeFn)() const;
 // FUNCTION: 0x40d000 ?size@?$vector@FV?$allocator@F@std@@@std@@QBEIXZ
-SizeFn_0040d000 g_size_0040d000 = &Vec_0040d000::size;
+ShortVectorSizeFn g_size_0040d000 = &ShortVector::size;
 
-typedef void (Vec_0040d000::*InsertFn_0040d020)(
-    Vec_0040d000::iterator, Vec_0040d000::size_type, const short&);
+typedef void (ShortVector::*ShortVectorInsertFn)(
+    ShortVector::iterator, ShortVector::size_type, const short&);
 // FUNCTION: 0x40d020 ?insert@?$vector@FV?$allocator@F@std@@@std@@QAEXPAFIABF@Z
-InsertFn_0040d020 g_insert_0040d020 = &Vec_0040d000::insert;
+ShortVectorInsertFn g_insert_0040d020 = &ShortVector::insert;
 
-typedef Vec_0040d000::iterator (Vec_0040d000::*EraseFn_0040d240)(
-    Vec_0040d000::iterator, Vec_0040d000::iterator);
+typedef ShortVector::iterator (ShortVector::*ShortVectorEraseFn)(
+    ShortVector::iterator, ShortVector::iterator);
 // FUNCTION: 0x40d240 ?erase@?$vector@FV?$allocator@F@std@@@std@@QAEPAFPAF0@Z
-EraseFn_0040d240 g_erase_0040d240 = &Vec_0040d000::erase;
+ShortVectorEraseFn g_erase_0040d240 = &ShortVector::erase;
 
 // FUNCTION: 0x40d290 ?insert@?$vector@EV?$allocator@E@std@@@std@@QAEXPAEIABE@Z
 void (SimVector<unsigned char>::*g_insert_0040d290)(unsigned char*, unsigned int,
                                                       const unsigned char&) = &SimVector<unsigned char>::insert;
 
-typedef Vec_0040d290::iterator (Vec_0040d290::*EraseFn_0040d470)(
-    Vec_0040d290::iterator, Vec_0040d290::iterator);
+typedef ByteVector::iterator (ByteVector::*ByteVectorEraseFn)(
+    ByteVector::iterator, ByteVector::iterator);
 // FUNCTION: 0x40d470 ?erase@?$vector@EV?$allocator@E@std@@@std@@QAEPAEPAE0@Z
-EraseFn_0040d470 g_erase_0040d470 = &Vec_0040d290::erase;
+ByteVectorEraseFn g_erase_0040d470 = &ByteVector::erase;
 
-typedef Vec_0040c7f0::size_type (Vec_0040c7f0::*SizeFn_0040d4c0)() const;
-// FUNCTION: 0x40d4c0 ?size@?$vector@UElem_0040d550@@V?$allocator@UElem_0040d550@@@std@@@std@@QBEIXZ
-SizeFn_0040d4c0 g_size_0040d4c0 = &Vec_0040c7f0::size;
+typedef UnitTypeIntVector::size_type (UnitTypeIntVector::*UnitTypeIntVectorSizeFn)() const;
+// FUNCTION: 0x40d4c0 ?size@?$vector@UUnitTypeInt@@V?$allocator@UUnitTypeInt@@@std@@@std@@QBEIXZ
+UnitTypeIntVectorSizeFn g_size_0040d4c0 = &UnitTypeIntVector::size;

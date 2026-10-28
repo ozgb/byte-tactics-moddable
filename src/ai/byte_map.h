@@ -3,16 +3,16 @@
 
 #include "../../interfaces/ref.h"
 
-struct MapSize_00408090 {
+struct ByteMapSize {
     unsigned int width;
     unsigned int height;
 
     int Contains(unsigned int tx, unsigned int ty) { return tx < width && ty < height; }
 };
 
-struct ByteMap_00408090 {
+struct ByteMap {
     Ref<unsigned char> data;
-    MapSize_00408090 size;
+    ByteMapSize size;
 
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };

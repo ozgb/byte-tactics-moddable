@@ -45,7 +45,7 @@ address,function,file
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp
 0x40a150,PlayerAI::InitPlacementGrid,src/ai/ai_player.cpp
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp
-0x40a5b0,Elem_0040cc40::Elem_0040cc40,src/ai/ai_player.cpp
+0x40a5b0,KeyedCell::KeyedCell,src/ai/ai_player.cpp
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp
 0x40aa40,PlayerAI::RefreshUnitLists,src/ai/player_ai.cpp

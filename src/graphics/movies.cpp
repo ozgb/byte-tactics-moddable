@@ -63,7 +63,14 @@ struct SmkStats_0047c530 {
 
 extern "C" __declspec(dllimport) void __stdcall SmackSummary(Smk_0047c3a0* smk, SmkStats_0047c530* stats);
 
-#include "movie_surfaces.h"
+struct Surfaces_0047bdf0 {
+    void* ddraw;
+    void* primary;
+    void* back;
+    void* clipper;
+    void* palette;
+};
+static_assert(sizeof(Surfaces_0047bdf0) == 0x14, "Surfaces_0047bdf0 size");
 
 struct Display_0047bdf0 {
     char unknown_0[0x24];

@@ -9010,8 +9010,6 @@ struct Table_0047ae60 {
     int difficulty;
 };
 
-#include "../src/graphics/movie_surfaces.h"
-
 class MoviePlayer {
 public:
     void* smack;
@@ -14779,8 +14777,6 @@ public:
     virtual int __stdcall GetPlayerAddress(unsigned long, void*, unsigned long*);
 };
 
-#include "../src/graphics/pcx_display.h"
-
 struct Image_004caf30 {
     int width;
     int height;
@@ -16527,7 +16523,6 @@ struct Rating {
 
 static_assert(sizeof(Class_004cdb40) == 0x294, "Class_004cdb40 size");
 static_assert(sizeof(Class_0047bf20) == 0x548, "Class_0047bf20 size");
-static_assert(sizeof(Surfaces_0047bdf0) == 0x14, "Surfaces_0047bdf0 size");
 static_assert(sizeof(MoviePlayer) == 0x5b8, "MoviePlayer size");
 static_assert(sizeof(Class_0047bf70) == 0x5b4, "Class_0047bf70 size");
 static_assert(sizeof(Class_0047c230) == 0x410, "Class_0047c230 size");
@@ -16539,7 +16534,6 @@ static_assert(sizeof(BitmapInfo_004b5510) == 0x428, "BitmapInfo_004b5510 size");
 static_assert(sizeof(Obj) == 0x729, "Obj size");
 static_assert(sizeof(Surface_4b6570) == 0x4, "Surface_4b6570 size");
 static_assert(sizeof(Screen_004c6210) == 0x10, "Screen_004c6210 size");
-static_assert(sizeof(Game_004caec0) == 0x614, "Game_004caec0 size");
 static_assert(sizeof(Game_004cb170) == 0x614, "Game_004cb170 size");
 static_assert(sizeof(Class_004cfb40) == 0x28c, "Class_004cfb40 size");
 static_assert(sizeof(Class_004cf180) == 0x1b8, "Class_004cf180 size");

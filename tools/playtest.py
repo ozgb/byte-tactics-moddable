@@ -743,10 +743,13 @@ class Instance:
     def collect_traces(self) -> None:
         if not self.run.testmode:
             return
-        for name in ("trace.txt", "dump.txt", "blockptrs.txt"):
+        for name in ("trace.txt", "dump.txt", "blockptrs.txt", CRASH_FILE):
             if (self.game / name).is_file():
                 shutil.copyfile(self.game / name, self.run.out / name)
                 self.run.notes.append(f"{name}: {self.run.out / name}")
+        crash = self.game / CRASH_FILE
+        if crash.is_file():
+            self.run.notes.append(f"{CRASH_FILE}{self.suffix}: " + "; ".join(crash.read_text(errors="replace").split("\n")).strip("; "))
         for name in self.run.collect:
             if (self.game / name).is_file():
                 (self.run.out / name).parent.mkdir(parents=True, exist_ok=True)
@@ -889,6 +892,7 @@ class StepFailed(Exception):
         self.kind = kind
 
 
+CRASH_FILE = "crash.txt"
 DEBUG_SCREEN = "-all,err+seh,+msgbox"
 DEBUG_TESTMODE = "-all,+seh,+msgbox"
 DIALOG_POLL_SECONDS = 5

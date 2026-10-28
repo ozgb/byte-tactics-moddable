@@ -175,6 +175,17 @@ def keep_run(run: Path, scenario: str, suffix: str = "") -> Path:
     return kept
 
 
+def keep_failed_attempt(error: Exception, scenario: str) -> Path | None:
+    """Copy the playtest.py session a failed attempt left (its wine.log, steps.log, summary.md, trace.txt and crash.txt)
+    to build/scratch/check-<scenario>-failed-<time>/, or None when the error names no session."""
+    m = re.search(r"^logs and screenshots: (.+)/$", str(error), re.M)
+    if not m or not (ROOT / m[1]).is_dir():
+        return None
+    kept = ROOT / "build/scratch" / f"check-{scenario}-failed-{time.strftime('%Y%m%d-%H%M%S')}"
+    shutil.copytree(ROOT / m[1], kept, dirs_exist_ok=True)
+    return kept
+
+
 def should_retry(message: str) -> bool:
     """Whether a failed run is tried again: an exe crash or the DirectX init dialog, not a hang or another dialog.
 
@@ -228,7 +239,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         except tracediff.Error as e:
             if attempt == RUN_ATTEMPTS - 1 or not (retry_any or should_retry(str(e))):
                 raise
-            print(f"{scenario.stem}: run failed, trying again: {last_lines(e)}", flush=True)
+            failed = keep_failed_attempt(e, scenario.stem)
+            where = f" [failed attempt kept: {failed.relative_to(ROOT)}]" if failed else ""
+            print(f"{scenario.stem}: run failed, trying again: {last_lines(e)}{where}", flush=True)
     elapsed = time.time() - t0
     kept = None
     try:

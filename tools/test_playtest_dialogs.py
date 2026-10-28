@@ -174,6 +174,24 @@ def test_put_does_not_write_through_a_symlink() -> None:
         assert (inst.game / "savegame/harness.opt").read_bytes() == b"put"
 
 
+def test_collect_notes_the_crash_file() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        run = fake_run(tmp)
+        inst = playtest.Instance(run, 1)
+        (inst.game).mkdir(parents=True)
+        (inst.game / "crash.txt").write_text("purecall from 0x0040106c\n")
+        run.out.mkdir(parents=True)
+        inst.collect_traces()
+        assert (run.out / "crash.txt").read_text() == "purecall from 0x0040106c\n"
+        assert any("purecall from 0x0040106c" in n for n in run.notes), run.notes
+
+
+def test_debug_defaults() -> None:
+    assert "+seh" in playtest.DEBUG_TESTMODE.split(",") and "err+seh" not in playtest.DEBUG_TESTMODE
+    assert "err+seh" in playtest.DEBUG_SCREEN and "+msgbox" in playtest.DEBUG_SCREEN
+
+
 def test_collect_keeps_a_file_of_the_game_copy() -> None:
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d)

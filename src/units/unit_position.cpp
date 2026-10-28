@@ -58,13 +58,7 @@ public:
     virtual void ReadFrom(BitReader* reader);
 };
 
-class SpatialBucket {
-public:
-    char unknown_0[6];
-    void* head;
-    void UnlinkUnit(void* node);
-    void PrependUnit(int node);
-};
+#include "../map/spatial_bucket.h"
 
 #include "unit.h"
 

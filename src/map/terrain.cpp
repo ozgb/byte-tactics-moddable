@@ -60,16 +60,7 @@ struct Node_0047cb00 {
     Ref<Node_0047cb00> next;
 };
 
-class SpatialBucket {
-public:
-    char unknown_0[6];
-    union {
-        Node_0047cb00* head;
-        int field_6;
-    };
-    void UnlinkUnit(Node_0047cb00* node);
-    void PrependUnit(int node);
-};
+#include "spatial_bucket.h"
 
 class ClaimFootprintVisitor {
 public:
@@ -205,14 +196,15 @@ void FUN_0047caf0(void)
 }
 
 // FUNCTION: 0x47cb00
-void SpatialBucket::UnlinkUnit(Node_0047cb00* node)
+void SpatialBucket::UnlinkUnit(Unit* unit)
 {
-    if (head == node) {
+    Node_0047cb00* node = (Node_0047cb00*)unit;
+    if ((Node_0047cb00*)head == node) {
         head = node->next;
         node->next = 0;
         return;
     }
-    Ref<Node_0047cb00>* pp = &head->next;
+    Ref<Node_0047cb00>* pp = &((Node_0047cb00*)head)->next;
     while (*pp != node)
         pp = &(*pp)->next;
     *pp = node->next;
@@ -222,9 +214,9 @@ void SpatialBucket::UnlinkUnit(Node_0047cb00* node)
 // FUNCTION: 0x47cb40
 void SpatialBucket::PrependUnit(int node)
 {
-    int temp = field_6;
+    int temp = (int)head;
     ((Node_0047cb00*)node)->next = (Node_0047cb00*)temp;
-    field_6 = node;
+    head = (void*)node;
 }
 
 static void UnlinkBucketUnit(UnitBucket* bucket, Unit* unit)

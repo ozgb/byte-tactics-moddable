@@ -1277,7 +1277,7 @@ struct IconSet_00466780;
 class Id_004df1e0;
 struct Ids_0046d970;
 class GoalDrawInterface;
-class Iface_0043dd20;
+class PathGoalVtableView;
 class Iface_4ca590;
 struct ImageFrame;
 struct Image_004b3770;
@@ -4959,7 +4959,7 @@ public:
 
 class Class_0043cd20 {
 public:
-    Iface_0043dd20* obj;
+    PathGoalVtableView* obj;
     char unknown_4[28];
     int field_20;
     short turn;

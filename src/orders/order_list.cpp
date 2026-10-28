@@ -678,7 +678,7 @@ struct UnitMotionSaveRecord {
     unsigned char flag : 1;
 };
 
-class Iface_0043dd20 {
+class PathGoalVtableView {
 public:
     virtual void v0(int);
     virtual void v1();
@@ -1627,14 +1627,14 @@ UnitMotion::UnitMotion(Unit* unit)
     movementClass = (int)((UnitDefMoveView*)unit->def.get())->movementclass.get();
     if (((PlayerTypeView*)unit->player.get())->active != 0 && ((PlayerTypeView*)unit->player.get())->type == 3) {
         if (((UnitDefMoveView*)unit->def.get())->flag_800)
-            obj = (Iface_0043dd20*)new (kSim) PackedPosGoal(unit);
+            obj = (PathGoalVtableView*)new (kSim) PackedPosGoal(unit);
         else
-            obj = (Iface_0043dd20*)new (kSim) PatrolGoal(unit);
+            obj = (PathGoalVtableView*)new (kSim) PatrolGoal(unit);
     } else {
         if (((UnitDefMoveView*)unit->def.get())->flag_800)
-            obj = (Iface_0043dd20*)new (kSim) LiteGoal(unit);
+            obj = (PathGoalVtableView*)new (kSim) LiteGoal(unit);
         else
-            obj = (Iface_0043dd20*)new (kSim) AiSearchGoal(unit);
+            obj = (PathGoalVtableView*)new (kSim) AiSearchGoal(unit);
     }
 }
 

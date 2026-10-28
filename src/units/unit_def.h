@@ -144,8 +144,8 @@ public:
     short sortbias;
     short altitude;
     unsigned short id;
-    Ref<char> explodeas;
-    Ref<char> selfdestructas;
+    Ref<WeaponDef> explodeas;
+    Ref<WeaponDef> selfdestructas;
     unsigned char maxslope;
     unsigned char maxwaterslope;
     unsigned char capacity;

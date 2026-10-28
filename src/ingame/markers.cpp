@@ -1,5 +1,6 @@
 #include "win_types.h"
 #include "../units/unit_def.h"
+#include "../weapons/weapon_def.h"
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -218,7 +219,7 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
             DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, mincloak, g_game->colors[15], 0, 0);
         }
         if ((def->flags1 & 0x10000000) && def->explodeas != 0) {
-            int r = ((Weapon*)def->explodeas.get())->areaOfEffect;
+            int r = def->explodeas->areaOfEffect;
             r = r >> 1;
             unsigned int t = ((unsigned int)g_game->ticks % 60) * r * 2 / 60;
             int radius = (t < 8) ? 8 : t;

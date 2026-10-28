@@ -838,8 +838,8 @@ void __stdcall ApplyProjectileHitPacket(int unused, ProjectileDetonatePacket* p)
 // FUNCTION: 0x49b000
 void __stdcall DetonateUnitWeapon(Unit* unit, int second)
 {
-    WeaponDef* weapon = second ? (WeaponDef*)unit->def->selfdestructas.get()
-                               : (WeaponDef*)unit->def->explodeas.get();
+    WeaponDef* weapon = second ? unit->def->selfdestructas.get()
+                               : unit->def->explodeas.get();
     if (weapon) {
         Projectile proj;
         proj.type = weapon;

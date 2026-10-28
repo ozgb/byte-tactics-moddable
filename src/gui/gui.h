@@ -27,7 +27,7 @@ struct ResetProgressBarDialog;
 struct DialogPointView;
 struct DialogOriginView;
 struct Rect;
-#include "mouse_event.h"
+#include "../../include/mouse_event.h"
 
 #pragma pack(push, 1)
 

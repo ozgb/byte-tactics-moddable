@@ -167,6 +167,26 @@ class SeamLinkTest(unittest.TestCase):
         found = self.run_with(self.wind("?g_shared@@3HA"), mixed)
         self.assertEqual([(v.kind, v.owner) for v in found], [("data", "src/game/mixed.cpp")])
 
+    def test_unlisted_function_is_judged_for_the_subsystem_of_its_file(self):
+        link = Unit("link/data.cpp", data={"?g_foo@@3HA"})
+        wind = self.wind(code={"??$Inline@H@@YAXXZ"})
+        wind.refs = [("??$Inline@H@@YAXXZ", "?g_foo@@3HA")]
+        found = self.run_with(wind, link)
+        self.assertEqual([(v.subsystem, v.symbol) for v in found], [("wind_meteors", "g_foo")])
+
+    def test_unlisted_function_in_a_shared_file_is_judged_for_each_subsystem(self):
+        link = Unit("link/data.cpp", data={"?g_foo@@3HA"})
+        mixed = Unit("src/game/mixed.cpp", code={"?Mixed@@YAXXZ", "?Other@@YAXXZ"})
+        mixed.refs = [("??_GFoo@@UAEPAXI@Z", "?g_foo@@3HA")]
+        found = self.run_with(mixed, link)
+        self.assertEqual(sorted((v.subsystem, v.symbol) for v in found), [("economy", "g_foo"), ("units", "g_foo")])
+
+    def test_unlisted_function_in_a_non_simulation_file_is_not_checked(self):
+        link = Unit("link/data.cpp", data={"?g_foo@@3HA"})
+        gui = Unit("src/gui/x.cpp")
+        gui.refs = [("??_GFoo@@UAEPAXI@Z", "?g_foo@@3HA")]
+        self.assertEqual(self.run_with(gui, link), [])
+
     def test_function_of_a_non_simulation_subsystem_is_not_checked(self):
         unit = Unit("src/gui/x.cpp")
         unit.refs = [("?Draw@@YAXXZ", "?g_foo@@3HA")]

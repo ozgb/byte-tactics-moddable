@@ -9,7 +9,10 @@
 The build puts every function in its own COMDAT section, so the relocations of a
 section name the symbols one function needs. For each function of a simulation
 subsystem S (data/subsystems.csv, by source file and name), each symbol its code
-references is allowed only when it is:
+references is allowed only when it is the following. A function with no row (an inline,
+template or compiler-made function such as Ref<T>::Ref, a static initialiser or a scalar
+deleting destructor) is judged for every simulation subsystem that has a function in its
+source file; a file with no simulation function is not checked:
 
   seam          g_seams, or anything interfaces/seams.h declares outside the table struct
   state         g_game, a symbol defined in src/state/, or declared in interfaces/ref.h and not defined elsewhere
@@ -326,16 +329,19 @@ def analyse(units: list, root: Path) -> tuple:
     for unit in units:
         for function, symbol in unit.refs:
             name = base_name(function)
-            subsystem = rules.function_subsystem.get((unit.file, name))
-            if subsystem not in SIMULATION:
-                continue
-            why = classify(rules, subsystem, symbol)
-            if why:
-                kept.setdefault((subsystem, why), set()).add((name, symbol))
-                continue
-            kind = "code" if symbol in rules.code_defs else "data"
-            owner = rules.code_owner(symbol) if kind == "code" else rules.data_owner(symbol)
-            found.add(Violation(subsystem, name, base_name(symbol), kind, owner))
+            listed = rules.function_subsystem.get((unit.file, name))
+            if listed is None:
+                judged = sorted(s for s in rules.file_subsystems.get(unit.file, ()) if s in SIMULATION)
+            else:
+                judged = [listed] if listed in SIMULATION else []
+            for subsystem in judged:
+                why = classify(rules, subsystem, symbol)
+                if why:
+                    kept.setdefault((subsystem, why), set()).add((name, symbol))
+                    continue
+                kind = "code" if symbol in rules.code_defs else "data"
+                owner = rules.code_owner(symbol) if kind == "code" else rules.data_owner(symbol)
+                found.add(Violation(subsystem, name, base_name(symbol), kind, owner))
     ordered = sorted(found, key=lambda v: (v.subsystem, v.function, v.symbol, v.kind, v.owner))
     return ordered, {k: len(v) for k, v in kept.items()}
 

@@ -252,7 +252,6 @@ struct Class_004402e0;
 struct MovementClass;
 class Class_00440470;
 struct Class_004404c0;
-class Class_00440500;
 class Class_00440830;
 class Class_00440af0;
 class Class_0044ce20;
@@ -982,7 +981,6 @@ struct Display_004c6e70;
 struct Display_004c8020;
 struct UnitDamagePacketOut;
 struct Driver_004c6890;
-struct Dst_00440ca0;
 class Dummy_00440be0;
 union Dword_0051f410;
 struct Effect;
@@ -1899,7 +1897,6 @@ struct SpotState;
 struct Sprite_0049be60;
 struct Sprite_004b94c0;
 struct SrcPiece_00487080;
-struct Src_00440ca0;
 struct Src_004ab400;
 struct Src_004ab5d0;
 struct Src_004b8310;
@@ -5334,24 +5331,6 @@ struct Class_004404c0 {
     void SetPassMapCell(int, int, int);
 };
 
-class Class_00440500 {
-public:
-    void* field_0;
-    short footprintX;
-    short footprintZ;
-    short maxWaterDepth;
-    short minWaterDepth;
-    unsigned char maxSlope;
-    unsigned char badSlope;
-    unsigned char field_e;
-    unsigned char field_f;
-    unsigned int field_10;
-    unsigned int field_14;
-    unsigned int* field_18;
-    unsigned int lastTick;
-    void BuildPassMap(void);
-};
-
 class Class_00440830 {
 public:
     int* field_0;
@@ -5368,16 +5347,6 @@ public:
     unsigned int* cells;
     unsigned int lastTick;
     void RefreshPassMap(Point16, Point16);
-};
-
-struct Dst_00440ca0 {
-    char unknown_0[153];
-    Rect rect;
-};
-
-struct Src_00440ca0 {
-    int unknown_0;
-    Rect rect;
 };
 
 struct Gui_00443100 {

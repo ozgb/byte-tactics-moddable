@@ -140,10 +140,7 @@ struct Button {
     int flags;
 };
 
-struct Options {
-    char unknown_0[0x228];
-    int difficulty;
-};
+#include "../game/settings.h"
 
 #include "../network/player.h"
 
@@ -628,19 +625,19 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
     } else if (IsCurrentGadgetNamed((Dialog *)gadget, "Difficulty")) {
         PlaySoundByName("SKirmish", 0);
         if (g_game->difficulty == 0) {
-            ((Options*)g_game->options)->difficulty = 1;
+            ((Options*)g_game->options)->skirmishDifficulty = 1;
             g_game->difficulty = 1;
             ClearSelectedGadget(gadget);
             return;
         }
         if (g_game->difficulty == 1) {
-            ((Options*)g_game->options)->difficulty = 2;
+            ((Options*)g_game->options)->skirmishDifficulty = 2;
             g_game->difficulty = 2;
             ClearSelectedGadget(gadget);
             return;
         }
         if (g_game->difficulty == 2) {
-            ((Options*)g_game->options)->difficulty = 0;
+            ((Options*)g_game->options)->skirmishDifficulty = 0;
             g_game->difficulty = 0;
             ClearSelectedGadget(gadget);
             return;

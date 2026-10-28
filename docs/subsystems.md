@@ -187,11 +187,11 @@ Coverage: 95.5% of functions (42 of 44), 82.0% of lines, 69.6% of branches; 2 li
 - los_radar (1): `GetMapCell`
 - map (1): `RefreshAllPassMaps`
 
-**Sim writes.** 77 items in all, 65 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
+**Sim writes.** 83 items in all, 71 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
 `Cell::spot` (mixed); `Cell::flags` (mixed); `FeatureDamagePacket::sub` (mixed); `FeatureDamagePacket::type` (mixed); `FeatureDamagePacket::x` (mixed); `FeatureDamagePacket::z` (mixed); `Spot::damage` (mixed); `Spot::feature` (mixed); `Spot::used` (mixed); `Cell::feature` (mixed); `Coord::value` (sim); `Feature::object` (mixed)
 
-**Sim reads.** 63 items only read, 63 named. The most used (`g_game`, the root pointer, left out):
+**Sim reads.** 56 items only read, 56 named. The most used (`g_game`, the root pointer, left out):
 
 `LosRadarSeam::GetMapCell` (sim); `Seams::los_radar` (sim); `Game::width` (sim); `Game::cells` (mixed); `DAT_005119b8` (sim); `Feature::name` (sim); `Game::height` (sim); `Game::spots` (sim); `Seams::map` (sim); `Feature::flags` (sim); `Feature::footprint` (sim); `Spot::anim` (sim)
 
@@ -199,8 +199,8 @@ Coverage: 95.5% of functions (42 of 44), 82.0% of lines, 69.6% of branches; 2 li
 
 - Exports: 23 functions (`UpdateFeatures`, the cell accessor `GetCellFeature`, `PlaceFeature` (los_radar, units), `DamageFeature` (weapons, network), `ReclaimFeature` (orders), and the load, save, pool and file-list calls from game and los_radar).
 - Needs from seams: 48 functions in platform, files, presentation, seams, network, game, los_radar, map.
-- Owns: 59 named sim items that only this subsystem writes, for example `Game::features`, `Game::featureCount`, `Pool::entries`, `Cell::spot`, `Spot::feature`.
-- Shares: 6 named sim items that other subsystems also write, for example `Cell::feature`, `Cell::flags`, `FeatureDamagePacket::sub`, `FeatureDamagePacket::type`, `FeatureDamagePacket::x`.
+- Owns: 64 named sim items that only this subsystem writes, for example `Game::features`, `Game::featureCount`, `Pool::entries`, `Cell::spot`, `Spot::feature`.
+- Shares: 7 named sim items that other subsystems also write, for example `Cell::feature`, `Cell::flags`, `FeatureDamagePacket::sub`, `FeatureDamagePacket::type`, `FeatureDamagePacket::x`.
 - It imports from presentation (`EmitWhiteSmoke`, `PlaySoundAtByName`, the GAF loaders, `CreateObjectState`). Sim code that draws or plays sound has to raise events instead (#22).
 - Features and weapons call each other: features calls `ApplyAreaDamageAt`, weapons calls `DamageFeature`. `Cell::feature` is also written by los_radar (`ClearFeature` is in `line_of_sight.cpp`, so it is los_radar by file).
 
@@ -250,7 +250,7 @@ Coverage: 89.4% of functions (93 of 104), 89.0% of lines, 83.0% of branches; 11 
 
 `SquadTimer::next` (sim); `PlayerAI::lastTick` (sim); `SquadManager::countdown` (sim); `Player::groups` (mixed); `SquadManager::cursor` (sim); `SquadManager::nextAction` (mixed); `g_aiCommandsEnabled` (sim); `PlayerAI::builders` (sim); `PlayerAI::centre` (sim); `PlayerAI::hasSpecial` (sim); `Squad::field_8` (sim); `Squad::field_c` (sim)
 
-**Sim reads.** 136 items only read, 131 named. The most used (`g_game`, the root pointer, left out):
+**Sim reads.** 137 items only read, 132 named. The most used (`g_game`, the root pointer, left out):
 
 `Game::defs` (mixed); `Game::ticks` (mixed); `Game::unitDefCount` (mixed); `Unit::def` (mixed); `UnitDef::flags1` (mixed); `Game::net` (mixed); `Player::index` (mixed); `Player::type` (mixed); `Seams::map` (sim); `Unit::player` (sim); `Player::active` (mixed); `Player::unitsBegin` (mixed)
 

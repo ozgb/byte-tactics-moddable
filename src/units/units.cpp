@@ -14,16 +14,7 @@ struct ObjectState_00485d40;
 struct Object3do;
 
 #pragma pack(push, 1)
-struct Cell {
-    unsigned short unit;
-    char unknown_2[0x4 - 0x2];
-    unsigned char height;
-    unsigned char high;
-    unsigned char low;
-    char metal;
-    unsigned short feature;
-    char unknown_a[0xd - 0xa];
-};
+#include "../map/cell.h"
 
 #include "../util/vec3.h"
 

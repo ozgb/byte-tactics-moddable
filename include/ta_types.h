@@ -2493,20 +2493,6 @@ public:
     int CanReclaim(void*);
 };
 
-struct Cell {
-    unsigned short unit;
-    unsigned short unit2;
-    unsigned char height;
-    unsigned char high;
-    unsigned char low;
-    unsigned char metal;
-    unsigned short feature;
-    unsigned char offsetY;
-    unsigned char offsetX;
-    unsigned char flags;
-    char unknown_d[3];
-    int field_10;
-};
 
 struct Packet_2 {
     unsigned char type;
@@ -2517,21 +2503,6 @@ struct Packet_2 {
 
 #include "../src/util/rot16.h"
 
-struct FeatureSpot {
-    short prev;
-    short next;
-    Ref<SpotState> state;
-    Vec3 pos;
-    Vec3 vel;
-    Rot16 rot;
-    unsigned short damage;
-    short x;
-    short z;
-    unsigned short feature;
-    unsigned char animLo : 4;
-    unsigned char animHi : 4;
-    unsigned char flags;
-};
 
 struct Order_9 {
     char unknown_0[5];
@@ -3898,40 +3869,6 @@ struct Handle {
     void* src;
 };
 
-struct Feature {
-    char name[128];
-    char description[20];
-    Point16 footprint;
-    void* object;
-    char unknown_9c[12];
-    void* field_a8;
-    unsigned short* animTable;
-    unsigned short* shadowTable;
-    int anim0;
-    GafEntry_004b8d40* seqburnshad;
-    int anim1;
-    GafEntry_004b8d40* seqdieshad;
-    int anim2;
-    GafEntry_004b8d40* seqreclamateshad;
-    Handle anim;
-    Handle shadowAnim;
-    void* burnt;
-    unsigned short burnTime;
-    unsigned short damage;
-    float metal;
-    float value;
-    unsigned short dead;
-    unsigned short burnt_f6;
-    unsigned short reclamate;
-    unsigned char height;
-    unsigned char spreadChance;
-    unsigned char unknown_fc;
-    unsigned char unknown_fd;
-    unsigned char unknown_6 : 6;
-    unsigned char steep : 1;
-    unsigned char : 1;
-    char unknown_ff;
-};
 
 #include "../src/weapons/debris.h"
 

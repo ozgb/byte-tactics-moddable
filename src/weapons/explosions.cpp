@@ -112,19 +112,9 @@ struct PieceList {
     int count;
 };
 
-struct Cell {
-    char unknown_0[8];
-    unsigned short feature;
-    unsigned char offsetY;
-    unsigned char offsetX;
-    char unknown_c;
-};
+#include "../map/cell.h"
 
-struct Feature {
-    char unknown_0[0x94];
-    Point16 footprint;
-    char unknown_98[0x100 - 0x98];
-};
+#include "../map/feature.h"
 
 struct Net {
     char unknown_0[0xd44];

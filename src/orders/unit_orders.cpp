@@ -795,11 +795,7 @@ union Fixed {
 
 
 
-struct FeatureSpot {
-    char unknown_0[0x20];
-    Angles16 rot;
-    char unknown_26[0x30 - 0x26];
-};
+#include "../map/feature_spot.h"
 
 
 

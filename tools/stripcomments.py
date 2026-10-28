@@ -21,7 +21,7 @@ from pathlib import Path
 
 import commentlint
 
-STRIP_GENERATED = {"include/ta_protos.h", "link/data.cpp", "link/globals.h"}
+STRIP_GENERATED = {"link/data.cpp", "link/globals.h"}
 
 MARK = ""
 

@@ -6,8 +6,8 @@
 #include <vector>
 
 class UnitDef;
-struct Target_0046d530;
-struct Source_0046d630;
+struct UnitSyncTarget;
+struct UnitSyncSource;
 
 struct UnitSyncEntry {
     int fbiChecksum;
@@ -52,7 +52,7 @@ struct UnitSyncPacket {
 #pragma pack(pop)
 
 #pragma pack(push, 2)
-struct Elem_0046faf0 {
+struct UnitSyncPacketElem {
     union {
         struct {
             int a;
@@ -65,18 +65,18 @@ struct Elem_0046faf0 {
 };
 #pragma pack(pop)
 
-struct Cmp_0046d040 {
+struct SyncMapPredArg {
     char x;
 };
 
-struct Alloc_0046d040 {
+struct SyncMapAllocArg {
     char x;
 };
 
-struct Kfn_0046d6c0 {};
-struct Alloc_0046d6c0 {};
+struct UnitSyncMapKeyFn {};
+struct UnitSyncMapAlloc {};
 
-struct Less_0046d6c0 {
+struct UnitSyncMapLess {
     bool operator()(const unsigned int& a, const unsigned int& b) const { return a < b; }
 };
 
@@ -102,12 +102,12 @@ public:
     _Pairib insert(const _Ty& _V);
 };
 
-typedef std::pair<const unsigned int, UnitSyncEntry> Value_0046d6c0;
+typedef std::pair<const unsigned int, UnitSyncEntry> UnitSyncMapValue;
 
-class UnitSyncMap : public _Tree<unsigned int, Value_0046d6c0, Kfn_0046d6c0,
-                                  Less_0046d6c0, Alloc_0046d6c0> {
+class UnitSyncMap : public _Tree<unsigned int, UnitSyncMapValue, UnitSyncMapKeyFn,
+                                  UnitSyncMapLess, UnitSyncMapAlloc> {
 public:
-    UnitSyncMap(Cmp_0046d040 c, Alloc_0046d040 a)
+    UnitSyncMap(SyncMapPredArg c, SyncMapAllocArg a)
     {
         _Alloc = c.x;
         _Pred = a.x;
@@ -135,12 +135,12 @@ public:
 
     UnitSyncEntry& operator[](const unsigned int& k)
     {
-        _Pairib p = insert(Value_0046d6c0(k, UnitSyncEntry()));
+        _Pairib p = insert(UnitSyncMapValue(k, UnitSyncEntry()));
         return p.first->value;
     }
 };
 
-class Sub_0046d040 {
+class UnitSyncSeqView {
 public:
     int seqSent;
     int seqCur;
@@ -149,7 +149,7 @@ public:
     void SendUnsequenced(void* packet, int to);
 };
 
-class Sub2_0046d040 {
+class UnitSyncSharedView {
 public:
     int direct;
     int* pendingPlayerCount;
@@ -167,13 +167,13 @@ struct PacketSequencer {
     int lastSent;
     unsigned int cur;
     unsigned int max;
-    std::vector<Elem_0046faf0> sentQueue;
-    std::vector<Elem_0046faf0> heldQueue;
+    std::vector<UnitSyncPacketElem> sentQueue;
+    std::vector<UnitSyncPacketElem> heldQueue;
     PacketSequencer();
     void Inl(unsigned int param_1, UnitSyncPacket* param_2);
     PacketSequencer& operator=(const PacketSequencer& rhs);
     void SendUnsequenced(unsigned int param_1, void* param_2);
-    void SendSequenced(Elem_0046faf0* param_1, Elem_0046faf0* param_2);
+    void SendSequenced(UnitSyncPacketElem* param_1, UnitSyncPacketElem* param_2);
     void ReceiveSequenced(UnitSyncPacket* packet, int param_2, void* param_3, unsigned int target);
 };
 
@@ -199,11 +199,11 @@ public:
     UnitSyncMap map;
     std::vector<UnitSyncPlayer> players;
     std::list<int> ids;
-    Sub_0046d040 sub;
+    UnitSyncSeqView sub;
     SyncChecksumVector seqSentQueue;
     std::vector<int> seqHeldQueue;
     union {
-        Sub2_0046d040 sub2;
+        UnitSyncSharedView sub2;
         struct {
             int direct;
             union {
@@ -224,13 +224,13 @@ public:
         UnitSyncIter p = UnitSyncIter(map.LowerBound(key));
         return (p == End() || map.key_compare(*key, p.ptr->key)) ? End() : p;
     }
-    void Send(Target_0046d530* target, UnitSyncPacket* packet);
+    void Send(UnitSyncTarget* target, UnitSyncPacket* packet);
 
     void ProcessSync();
     void SendSyncPacket(unsigned int* param_1, UnitSyncPacket* param_2, int unused);
     void SendSyncMessage(unsigned char arg, int a, int b, int unused);
-    void SendSyncMessageTo(Target_0046d530* target, unsigned char arg, int a, int b, int unused);
-    void SendEntryTo(Target_0046d530* target, unsigned char arg, Source_0046d630* src, int unused);
+    void SendSyncMessageTo(UnitSyncTarget* target, unsigned char arg, int a, int b, int unused);
+    void SendEntryTo(UnitSyncTarget* target, unsigned char arg, UnitSyncSource* src, int unused);
     void HandleSyncPacket(UnitSyncPacket* packet, unsigned char player);
     void ReceiveSyncPacket(void* param_1, int param_2);
     void NotifyEntryChanged(unsigned int param_1);

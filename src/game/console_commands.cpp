@@ -775,7 +775,7 @@ void __stdcall CmdNetStats(int)
     DAT_00511c20 = g_game->ticks;
     g_messageBytesReceived = 0;
     g_messageBytesSent = 0;
-    Pair_00419560* p = (Pair_00419560*)&g_messageBytesByType[1];
+    MessageByteCounter* p = (MessageByteCounter*)&g_messageBytesByType[1];
     for (int i = 0; i < 44; i++) {
         g_messageCountByType[i + 1][0] = 0;
         g_messageCountByType[i + 1][1] = 0;

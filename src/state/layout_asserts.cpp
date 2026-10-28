@@ -19,12 +19,12 @@
 #include "../ai/player_ai.h"
 #include "../ai/squad_manager.h"
 #include "../ai/squad_timer.h"
-#include "../frontend/bits_00426e80.h"
 #include "../frontend/connection_blob.h"
 #include "../frontend/connection_info.h"
-#include "../frontend/flags37f14_0045cf60.h"
-#include "../frontend/menu_0045b800.h"
-#include "../frontend/player_entry_004777a0.h"
+#include "../frontend/net_game_flag_low_bits.h"
+#include "../frontend/options_slider_menu.h"
+#include "../frontend/player_info_entry.h"
+#include "../frontend/track_option_flags.h"
 #include "../game/all_missions_flags.h"
 #include "../game/chat_recipients.h"
 #include "../game/end_game_player_slot.h"
@@ -85,13 +85,13 @@
 #include "../map/pool.h"
 #include "../map/radar_timer_00466dc0.h"
 #include "../network/chat_hud_entry.h"
-#include "../network/entry_00463ca0.h"
+#include "../network/chat_hud_entry_view.h"
 #include "../network/packet_channel.h"
 #include "../network/packet_manager.h"
 #include "../network/packet_receiver.h"
 #include "../network/packet_ring.h"
 #include "../network/player.h"
-#include "../network/player_entry_0046d6c0.h"
+#include "../network/player_id_entry.h"
 #include "../network/player_info.h"
 #include "../network/settings.h"
 #include "../orders/air_maneuver_order.h"
@@ -158,7 +158,6 @@ static_assert(offsetof(AssaultTimer, maximum) == 24, "");
 static_assert(offsetof(AssaultTimer, limit) == 28, "");
 static_assert(offsetof(AssaultTimer, kind) == 32, "");
 static_assert(offsetof(AssaultTimer, attacking) == 36, "");
-static_assert(sizeof(Bits_00426e80) == 2, "");
 static_assert(sizeof(BroadcastToggleFlags) == 2, "");
 static_assert(sizeof(BuildTimer) == 20, "");
 static_assert(sizeof(CMemoryCache) == 20, "");
@@ -207,6 +206,12 @@ static_assert(offsetof(ChatHudEntry, unit) == 68, "");
 static_assert(offsetof(ChatHudEntry, player) == 70, "");
 static_assert(offsetof(ChatHudEntry, unit_46) == 70, "");
 static_assert(offsetof(ChatHudEntry, flags) == 71, "");
+static_assert(sizeof(ChatHudEntryView) == 72, "");
+static_assert(offsetof(ChatHudEntryView, text) == 0, "");
+static_assert(offsetof(ChatHudEntryView, time) == 64, "");
+static_assert(offsetof(ChatHudEntryView, field_44) == 68, "");
+static_assert(offsetof(ChatHudEntryView, field_46) == 70, "");
+static_assert(offsetof(ChatHudEntryView, flags) == 71, "");
 static_assert(sizeof(ChatRecipients) == 11, "");
 static_assert(offsetof(ChatRecipients, a) == 0, "");
 static_assert(offsetof(ChatRecipients, b) == 4, "");
@@ -271,12 +276,12 @@ static_assert(offsetof(CobScript, pieces) == 20, "");
 static_assert(offsetof(CobScript, changed) == 24, "");
 static_assert(offsetof(CobScript, channels) == 28, "");
 static_assert(offsetof(CobScript, activeCount) == 1340, "");
-static_assert(sizeof(ConnInfo_443ff0) == 24, "");
-static_assert(offsetof(ConnInfo_443ff0, guid) == 0, "");
-static_assert(offsetof(ConnInfo_443ff0, conn) == 16, "");
-static_assert(sizeof(Conn_443ff0) == 8, "");
-static_assert(offsetof(Conn_443ff0, data) == 0, "");
-static_assert(offsetof(Conn_443ff0, size) == 4, "");
+static_assert(sizeof(ConnectionBlob) == 8, "");
+static_assert(offsetof(ConnectionBlob, data) == 0, "");
+static_assert(offsetof(ConnectionBlob, size) == 4, "");
+static_assert(sizeof(ConnectionInfo) == 24, "");
+static_assert(offsetof(ConnectionInfo, guid) == 0, "");
+static_assert(offsetof(ConnectionInfo, conn) == 16, "");
 static_assert(sizeof(CursorInputFlags) == 1, "");
 static_assert(offsetof(CursorInputFlags, value) == 0, "");
 static_assert(offsetof(CursorInputFlags, bits) == 0, "");
@@ -327,12 +332,6 @@ static_assert(offsetof(EndGamePlayerSlot, stats) == 30, "");
 static_assert(sizeof(Entry_00432cf0) == 8, "");
 static_assert(offsetof(Entry_00432cf0, name) == 0, "");
 static_assert(offsetof(Entry_00432cf0, value) == 4, "");
-static_assert(sizeof(Entry_00463ca0) == 72, "");
-static_assert(offsetof(Entry_00463ca0, text) == 0, "");
-static_assert(offsetof(Entry_00463ca0, time) == 64, "");
-static_assert(offsetof(Entry_00463ca0, field_44) == 68, "");
-static_assert(offsetof(Entry_00463ca0, field_46) == 70, "");
-static_assert(offsetof(Entry_00463ca0, flags) == 71, "");
 static_assert(sizeof(EscortTimer) == 24, "");
 static_assert(offsetof(EscortTimer, other) == 20, "");
 static_assert(sizeof(Eye) == 36, "");
@@ -417,9 +416,6 @@ static_assert(offsetof(FeatureUnit_00421f20, unitDefIndex) == 166, "");
 static_assert(offsetof(FeatureUnit_00421f20, unknown_a8) == 168, "");
 static_assert(offsetof(FeatureUnit_00421f20, flags_110) == 272, "");
 static_assert(offsetof(FeatureUnit_00421f20, flags_114) == 276, "");
-static_assert(sizeof(Flags37f14_0045cf60) == 2, "");
-static_assert(offsetof(Flags37f14_0045cf60, notrak) == 0, "");
-static_assert(offsetof(Flags37f14_0045cf60, word) == 0, "");
 static_assert(sizeof(Flags_0045c570) == 2, "");
 static_assert(offsetof(Flags_0045c570, word) == 0, "");
 static_assert(offsetof(Flags_0045c570, bits) == 0, "");
@@ -1430,9 +1426,6 @@ static_assert(offsetof(MapViewFlags, raw) == 0, "");
 static_assert(offsetof(MapViewFlags, rawByte) == 0, "");
 static_assert(sizeof(Menu) == 64, "");
 static_assert(offsetof(Menu, unknown_0) == 0, "");
-static_assert(sizeof(Menu_0045b800) == 28, "");
-static_assert(offsetof(Menu_0045b800, unknown_0) == 0, "");
-static_assert(offsetof(Menu_0045b800, holder) == 24, "");
 static_assert(sizeof(Mission) == 3780, "");
 static_assert(offsetof(Mission, type) == 0, "");
 static_assert(offsetof(Mission, campaign) == 4, "");
@@ -1532,6 +1525,7 @@ static_assert(sizeof(MovementClassTable) == 1024, "");
 static_assert(offsetof(MovementClassTable, entries) == 0, "");
 static_assert(sizeof(Name_004864b0) == 562, "");
 static_assert(offsetof(Name_004864b0, name) == 0, "");
+static_assert(sizeof(NetGameFlagLowBits) == 2, "");
 static_assert(sizeof(NetGameFlags) == 2, "");
 static_assert(offsetof(NetGameFlags, value) == 0, "");
 static_assert(offsetof(NetGameFlags, bits) == 0, "");
@@ -1570,6 +1564,9 @@ static_assert(offsetof(OpenHeap, used) == 12, "");
 static_assert(offsetof(OpenHeap, capacity) == 16, "");
 static_assert(offsetof(OpenHeap, count) == 20, "");
 static_assert(offsetof(OpenHeap, topPopped) == 24, "");
+static_assert(sizeof(OptionsSliderMenu) == 28, "");
+static_assert(offsetof(OptionsSliderMenu, unknown_0) == 0, "");
+static_assert(offsetof(OptionsSliderMenu, holder) == 24, "");
 static_assert(sizeof(Order) == 86, "");
 static_assert(offsetof(Order, kind) == 4, "");
 static_assert(offsetof(Order, state) == 5, "");
@@ -1866,12 +1863,6 @@ static_assert(offsetof(PlayerAI, spacing1) == 253, "");
 static_assert(offsetof(PlayerAI, offset1) == 257, "");
 static_assert(offsetof(PlayerAI, margin1) == 261, "");
 static_assert(offsetof(PlayerAI, searchRadius) == 265, "");
-static_assert(sizeof(PlayerEntry_0046d6c0) == 331, "");
-static_assert(offsetof(PlayerEntry_0046d6c0, id) == 0, "");
-static_assert(offsetof(PlayerEntry_0046d6c0, unknown_4) == 4, "");
-static_assert(sizeof(PlayerEntry_004777a0) == 331, "");
-static_assert(offsetof(PlayerEntry_004777a0, info) == 0, "");
-static_assert(offsetof(PlayerEntry_004777a0, unknown_4) == 4, "");
 static_assert(sizeof(PlayerFrameInfo) == 52, "");
 static_assert(offsetof(PlayerFrameInfo, playerNetId) == 0, "");
 static_assert(offsetof(PlayerFrameInfo, pendingDpToId) == 4, "");
@@ -1885,6 +1876,9 @@ static_assert(offsetof(PlayerGrid, cells) == 0, "");
 static_assert(offsetof(PlayerGrid, width) == 4, "");
 static_assert(offsetof(PlayerGrid, height) == 8, "");
 static_assert(offsetof(PlayerGrid, unknown_c) == 12, "");
+static_assert(sizeof(PlayerIdEntry) == 331, "");
+static_assert(offsetof(PlayerIdEntry, id) == 0, "");
+static_assert(offsetof(PlayerIdEntry, unknown_4) == 4, "");
 static_assert(sizeof(PlayerInfo) == 185, "");
 static_assert(offsetof(PlayerInfo, map) == 0, "");
 static_assert(offsetof(PlayerInfo, password) == 128, "");
@@ -1910,6 +1904,9 @@ static_assert(offsetof(PlayerInfo, versionMajor) == 167, "");
 static_assert(offsetof(PlayerInfo, versionMinor) == 168, "");
 static_assert(offsetof(PlayerInfo, mapCrc) == 169, "");
 static_assert(offsetof(PlayerInfo, unknown_ad) == 173, "");
+static_assert(sizeof(PlayerInfoEntry) == 331, "");
+static_assert(offsetof(PlayerInfoEntry, info) == 0, "");
+static_assert(offsetof(PlayerInfoEntry, unknown_4) == 4, "");
 static_assert(sizeof(Point) == 8, "");
 static_assert(offsetof(Point, x) == 0, "");
 static_assert(offsetof(Point, y) == 4, "");
@@ -2119,6 +2116,9 @@ static_assert(offsetof(TdfRecordList, unknown_0) == 0, "");
 static_assert(offsetof(TdfRecordList, first) == 4, "");
 static_assert(offsetof(TdfRecordList, last) == 8, "");
 static_assert(offsetof(TdfRecordList, end) == 12, "");
+static_assert(sizeof(TrackOptionFlags) == 2, "");
+static_assert(offsetof(TrackOptionFlags, notrak) == 0, "");
+static_assert(offsetof(TrackOptionFlags, word) == 0, "");
 static_assert(sizeof(UiOptionFlags) == 2, "");
 static_assert(sizeof(Unit) == 280, "");
 static_assert(offsetof(Unit, motion) == 0, "");

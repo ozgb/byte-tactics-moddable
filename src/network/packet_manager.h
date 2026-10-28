@@ -4,7 +4,7 @@
 #include "packet_channel.h"
 #include "packet_receiver.h"
 
-struct Msg_00461900;
+struct FrameStateMsg;
 
 class PacketManager {
 public:
@@ -25,7 +25,7 @@ public:
     void ReleaseChannel(int id);
     void ReleaseAllChannels();
     int SendAllQueued(int force);
-    int SendFrameState(int from, Msg_00461900* msg);
+    int SendFrameState(int from, FrameStateMsg* msg);
     int QueueOnChannel(int frame, PacketChannel* channel, int data, int len);
     int QueuePacket(int frame, int dpid, void* data, unsigned int len);
     void SetDefaultSendPacing(int rate);

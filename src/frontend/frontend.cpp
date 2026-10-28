@@ -34,7 +34,7 @@ public:
 #pragma pack(push, 1)
 #include "../network/player_info.h"
 
-struct Smoke_00425b80 {
+struct MenuSpark {
     short x;
     short y;
     unsigned char active;
@@ -45,14 +45,14 @@ struct Smoke_00425b80 {
     int pos;
 };
 
-struct Map_00425b80 {
+struct MenuBackdropBitmap {
     char unknown_0[0xc];
     unsigned char* cells;
 };
 
-struct World_00425b80 {
+struct MenuBackdropLayerData {
     char unknown_0[0xbc];
-    Map_00425b80* map;
+    MenuBackdropBitmap* map;
 };
 
 struct Layer {
@@ -68,7 +68,7 @@ struct Layer {
 
 #include "../gui/gui.h"
 
-struct Entry_428b60 {
+struct LabelGadgetEntry {
     unsigned char type;
     char unknown_1[0x1b - 1];
     int attribs;
@@ -77,30 +77,30 @@ struct Entry_428b60 {
     char unknown_b8[0x15b - 0xb8];
 };
 
-struct Entry_00428730 {
+struct PictureCacheEntry {
     void* surface;
     int* data;
     char name[0x20];
 };
 
-struct Gadget_00425d80 {
+struct MainMenuGadgetView {
     char unknown_0[0x60];
     int selected;
 };
 
-struct GadgetOwner_00426190 {
+struct GadgetOwnerView {
     int unknown_0;
     int gadgets;
 };
 
-struct Gadget_00426190 {
+struct CdPlayerChoiceGadgetView {
     char unknown_0[0x18];
-    GadgetOwner_00426190* owner;
+    GadgetOwnerView* owner;
     char unknown_1c[0x60 - 0x1c];
     int selected;
 };
 
-struct Display_00425d80 {
+struct DisplayFlagsView {
     char unknown_0[0xf0];
     unsigned short bit0 : 1;
     unsigned short fullscreen : 1;
@@ -156,13 +156,13 @@ extern char g_dpspGuidTcpip[];
 extern V4i DAT_004fdaf0;
 
 extern char g_directXWarningText[];
-extern Smoke_00425b80* g_menuSparks;
+extern MenuSpark* g_menuSparks;
 extern int DAT_00512288;
 extern int g_gpfCheckDone;
 extern int g_noSoundDriverShown;
 extern int g_directXCheckDone;
 extern int g_cdPlayerDialogShown;
-extern Entry_00428730 g_pictureCache[10];
+extern PictureCacheEntry g_pictureCache[10];
 
 #include "../gui/dialogs.h"
 int __stdcall GetTextPixelWidth(char* text);
@@ -181,7 +181,7 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
 void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall SetCursorMode(int param_1);
 char* __stdcall Translate(char* text);
-Display_00425d80* __stdcall GetDisplay(void);
+DisplayFlagsView* __stdcall GetDisplay(void);
 void HideSoftwareCursor();
 #include "../game/game_state.h"
 Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
@@ -223,8 +223,6 @@ void __stdcall FinishUnitSync(void);
 #include "../game/statistics.h"
 #include "endgame.h"
 void __stdcall SetFrontendState(char state, int line, char* file);
-void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget);
-void __stdcall HandleCloseCdPlayerChoice(Gadget_00426190* gadget);
 void* __stdcall LoadBitmapByName(const char* name, int param_2);
 int __stdcall SetBackgroundSurface(int param_1, int param_2);
 
@@ -375,9 +373,9 @@ void UpdateMenuSparks()
 {
     Layer* terrain = g_game->gui.layer;
     if (terrain->surface != 0) {
-        unsigned char* src = ((Map_00425b80*)terrain->surface)->cells;
-        Smoke_00425b80* s = g_menuSparks;
-        unsigned char* dest = ((World_00425b80*)terrain->gadgets)->map->cells;
+        unsigned char* src = ((MenuBackdropBitmap*)terrain->surface)->cells;
+        MenuSpark* s = g_menuSparks;
+        unsigned char* dest = ((MenuBackdropLayerData*)terrain->gadgets)->map->cells;
         int count = 100;
         do {
             if (s->active) {
@@ -448,7 +446,7 @@ void UpdateMenuSparks()
 }
 
 // FUNCTION: 0x425d80
-void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
+void __stdcall HandleMainMenuClick(MainMenuGadgetView* gadget)
 {
     char buf[256];
 
@@ -483,7 +481,7 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
     }
     if (IsCurrentGadgetNamed((Dialog *)gadget, "INTRO")) {
         PlaySoundByName("smlButton", 0);
-        Display_00425d80* display = GetDisplay();
+        DisplayFlagsView* display = GetDisplay();
         if (!display->fullscreen) {
             OpenMessageBox(&g_game->gui,
                          "Debug:  You must be in full-screen mode to play a movie.",
@@ -522,7 +520,7 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
     }
     if (IsCurrentGadgetNamed((Dialog *)gadget, "Credits")) {
         PlaySoundByName("smlButton", 0);
-        Display_00425d80* display = GetDisplay();
+        DisplayFlagsView* display = GetDisplay();
         if (!display->fullscreen) {
             OpenMessageBox(&g_game->gui,
                          "Debug:  You must be in full-screen mode to play a movie.",
@@ -538,7 +536,7 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
 }
 
 // FUNCTION: 0x426190
-void __stdcall HandleCloseCdPlayerChoice(Gadget_00426190* gadget)
+void __stdcall HandleCloseCdPlayerChoice(CdPlayerChoiceGadgetView* gadget)
 {
     int owner = gadget->owner->gadgets;
     if (gadget->selected == -1)
@@ -571,7 +569,7 @@ void __stdcall OpenCloseCdPlayerDialog()
     }
 }
 
-static char* Lookup_004263b0(const char* name)
+static char* FindPictureDataByName(const char* name)
 {
     if (name != 0) {
         for (int i = 0; i < 10; i++) {
@@ -606,7 +604,7 @@ void __stdcall OpenMainMenu()
     EnableKeyCommands((Dialog *)&g_game->gui);
 
     char* name = "FrontendX";
-    char* found = Lookup_004263b0(name);
+    char* found = FindPictureDataByName(name);
 
     char version[32];
     char palpath[256];
@@ -634,7 +632,7 @@ void __stdcall OpenMainMenu()
     ShowSoftwareCursor();
     ClearMouseEventQueue();
 
-    g_menuSparks = (Smoke_00425b80*)GameAllocIgnoreTag("SPARKS", 0x514);
+    g_menuSparks = (MenuSpark*)GameAllocIgnoreTag("SPARKS", 0x514);
     memset(g_menuSparks, 0, 0x145 * 4);
 
     if (g_cdPlayerDialogShown == 0) {
@@ -715,8 +713,8 @@ void __stdcall LoadWarpLevel(int param_1)
     SetMissionType(1);
     g_game->net->LoadCampaign(value);
     if (g_game->net->SelectMission(n)) {
-        (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b3 = 1;
-        (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2 = 1;
+        (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b3 = 1;
+        (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 1;
     }
 }
 
@@ -761,8 +759,8 @@ void HandleFrontendDebugKey(void)
             SetMissionType(1);
             g_game->net->LoadCampaign(buf);
             if (g_game->net->SelectMission(n)) {
-                (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b3 = 1;
-                (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2 = 1;
+                (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b3 = 1;
+                (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 1;
             }
         }
         return;
@@ -794,7 +792,7 @@ int ConnectToService(void)
     char buf[256];
 
     if (InitNetConnection()) {
-        (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b0 = 1;
+        (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b0 = 1;
         return 1;
     }
     strncpy(g_frontendErrorText, "An error occurred trying to use this service", 0xf9);
@@ -875,7 +873,7 @@ static void UpdateSubState()
 static int UseService(void)
 {
     if (InitNetConnection()) {
-        (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b0 = 1;
+        (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b0 = 1;
         return 1;
     }
     SetFrontendErrorText(g_serviceErrorMessage);
@@ -887,7 +885,7 @@ static int UseService(void)
 static int UseServiceCalls(void)
 {
     if (InitNetConnection()) {
-        (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b0 = 1;
+        (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b0 = 1;
         return 1;
     }
     SetFrontendErrorText(g_serviceErrorMessage);
@@ -903,7 +901,7 @@ void RunFrontendStateMachine(void)
 
     switch ((unsigned char)(char)g_game->frontendState) {
     case 0: {
-        Display_00425d80* p = GetDisplay();
+        DisplayFlagsView* p = GetDisplay();
         SetCursorOverlayEnabled(0);
         if (p->fullscreen) {
             if (g_game->playMovie) {
@@ -928,7 +926,7 @@ void RunFrontendStateMachine(void)
         switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
             if (InitLobbiedConnection()) {
-                (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b0 = 1;
+                (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b0 = 1;
                 g_game->lobbyUiDirtyFlags_2bee.b4 = 1;
                 SetState(0x10, 0x403, g_frontendSourceFile);
                 SetSubState(0x12, 0x404, g_frontendSourceFile);
@@ -951,11 +949,11 @@ void RunFrontendStateMachine(void)
             return;
         case 6:
             SetMissionType(3);
-            (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b3 = 0;
+            (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b3 = 0;
             SetState(0xf, 0x41c, g_frontendSourceFile);
             return;
         case 5:
-            (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b3 = 1;
+            (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b3 = 1;
             SetState(7, 0x421, g_frontendSourceFile);
             return;
         case 7:
@@ -989,7 +987,7 @@ void RunFrontendStateMachine(void)
         case 1:
             PlayMovie(g_zrbMovie3);
             PlayMovie(g_zrbMovie5);
-            (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2 = 0;
+            (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 0;
             SetState(2, 0x44a, g_frontendSourceFile);
             SetGameMode(2);
             return;
@@ -1004,7 +1002,7 @@ void RunFrontendStateMachine(void)
         case 1:
             PlayMovie(g_zrbMovie4);
             PlayMovie(g_zrbMovie5);
-            (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2 = 0;
+            (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 0;
             SetState(2, 0x45b, g_frontendSourceFile);
             SetGameMode(2);
             return;
@@ -1090,7 +1088,7 @@ void RunFrontendStateMachine(void)
             PresentFrontendFrame();
             return;
         case 2:
-            (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2 = 1;
+            (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 1;
             return;
         case 3:
             SetState(7, 0x4e5, g_frontendSourceFile);
@@ -1112,7 +1110,7 @@ void RunFrontendStateMachine(void)
             PresentFrontendFrame();
             return;
         case 2:
-            (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2 = 1;
+            (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 1;
             return;
         case 3:
             switch ((unsigned char)(char)g_game->frontendState) {
@@ -1149,7 +1147,7 @@ void RunFrontendStateMachine(void)
             g_game->dplayAddressDialogFlags.b1 = 0;
             g_game->dplayAddressDialogFlags.b0 = 0;
             if (InitLobbiedConnection()) {
-                (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b0 = 1;
+                (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b0 = 1;
                 SetState(0x10, 0x52d, g_frontendSourceFile);
                 SetSubState(0x12, 0x52e, g_frontendSourceFile);
                 return;
@@ -1275,8 +1273,8 @@ void RunFrontendStateMachine(void)
             if ((char)g_game->frontendSubState == 0x13)
                 g_game->players[(unsigned char)g_game->localPlayer].info->bit6 = 1;
             unsigned char* q = (unsigned char*)g_game + 0x14b * (unsigned char)g_game->localPlayer + 0x1b84;
-            *q = ((*(Bits_00426e80*)&g_game->flags_2b4c).b4 << 1) | (*q & 0xfd);
-            if ((*(Bits_00426e80*)&g_game->flags_2b4c).b4) {
+            *q = ((*(NetGameFlagLowBits*)&g_game->flags_2b4c).b4 << 1) | (*q & 0xfd);
+            if ((*(NetGameFlagLowBits*)&g_game->flags_2b4c).b4) {
                 g_game->net->LoadMissionByName(g_game->buffer_2ab1);
                 for (int i = 0; i < 10; i++) {
                     if (g_game->players[i].active) {
@@ -1285,7 +1283,7 @@ void RunFrontendStateMachine(void)
                             AddNetPlayer(g_game->players[i].id);
                     }
                 }
-                (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2 = 1;
+                (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 1;
                 return;
             }
             SetStateLogged(0x11, 0x5ea, g_frontendSourceFile);
@@ -1301,7 +1299,7 @@ void RunFrontendStateMachine(void)
     case 17:
         switch ((unsigned char)(char)g_game->frontendSubState) {
         case 0:
-            if (!(*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2) {
+            if (!(*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2) {
                 OpenBattleRoom();
                 ReportGameEvent(1);
                 ReportGameEvent(2);
@@ -1316,7 +1314,7 @@ void RunFrontendStateMachine(void)
         case 1:
             UpdateBattleRoom();
             PresentFrontendFrame();
-            if ((*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2) {
+            if ((*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2) {
                 FinishUnitSync();
                 CloseTopScreen(&g_game->gui);
                 SetSubStateLogged(0x11, 0x613, g_frontendSourceFile);
@@ -1330,11 +1328,11 @@ void RunFrontendStateMachine(void)
                 p++;
             }
             FinishUnitSync();
-            (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b2 = 1;
+            (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 1;
             return;
         }
         case 3:
-            (*(Bits_00426e80*)&g_game->netGameFlags_2a44).b0 = 1;
+            (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b0 = 1;
             host_net_quit_game((host_net*)((char*)g_game + 0x14));
             InitPacketManager(2, 100);
             DeleteUnitSync();
@@ -1414,7 +1412,7 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
 {
     void* surface = 0;
     int* data = 0;
-    Entry_00428730 saved;
+    PictureCacheEntry saved;
 
     if (param_2 != 0) {
         SetOffscreenSurface((int)g_game->screen);
@@ -1481,7 +1479,7 @@ after:
 // FUNCTION: 0x428b60
 void OrLabelAttribs(void)
 {
-    Entry_428b60* entries = (Entry_428b60*)g_game->gui.layer->gadgets;
+    LabelGadgetEntry* entries = (LabelGadgetEntry*)g_game->gui.layer->gadgets;
     for (int i = 1; i <= entries->count; i++) {
         if (entries[i].type == 5) {
             entries[i].attribs |= 8;

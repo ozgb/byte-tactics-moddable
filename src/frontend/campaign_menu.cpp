@@ -12,17 +12,17 @@
 
 #include "../map/mission.h"
 
-struct Info_00477510 {
+struct CampaignMissionInfo {
     char unknown_0[0x30];
     char name[8];
 };
 
-struct Object_00477510 {
+struct CampaignMissionObject {
     char unknown_0[0x18];
-    Info_00477510* info;
+    CampaignMissionInfo* info;
 };
 
-struct Anim_00478b40 {
+struct BriefingPlanetAnim {
     short index;
     char unknown_2[6];
 };
@@ -76,7 +76,7 @@ extern short g_briefingPanoramaScrollX;
 extern int g_briefingPanoramaNextTick;
 extern unsigned int g_briefingPlanetLastTick;
 extern unsigned int g_briefingPlanetNextTick;
-extern Anim_00478b40 g_briefingPlanetFrameCursor;
+extern BriefingPlanetAnim g_briefingPlanetFrameCursor;
 extern unsigned char g_briefingTextColors[];
 extern int g_campaignSimplifiedLayout;
 extern char g_tdfExtension[];
@@ -119,7 +119,7 @@ unsigned int __cdecl GetTicks();
 int __stdcall GetGafFrame(void* gaf, int frame);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
 void __stdcall InitGafSequence(void* state, void* gaf, int param_3);
-int __stdcall StepGafSequence(Anim_00478b40* anim);
+int __stdcall StepGafSequence(BriefingPlanetAnim* anim);
 int __stdcall GetButtonStageByName(Gui* menu, char* name);
 int __stdcall SetButtonStageByName(Gui* menu, char* name, char value);
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int value);
@@ -243,7 +243,7 @@ int __stdcall ListCampaignFiles(void** names)
     return count;
 }
 
-static inline char* AppendName_00476a60(char* p, char* s)
+static inline char* AppendNameInBuildCampaignNameList(char* p, char* s)
 {
     strcpy(p, s);
     return p + strlen(p) + 1;
@@ -271,7 +271,7 @@ int __stdcall BuildCampaignNameList(char** out, int side)
                 parser.current->GetFieldString(name, "campaignside", 0x40, DAT_005119b8);
                 if (strcmp(g_game->names[side], name) == 0 || strcmp("ALL", name) == 0) {
                     found++;
-                    p = AppendName_00476a60(p, q);
+                    p = AppendNameInBuildCampaignNameList(p, q);
                 }
             }
             q += strlen(q) + 1;
@@ -568,7 +568,7 @@ int HasFewerThanThreeCampaignFiles(void)
 }
 
 // FUNCTION: 0x477510
-void __stdcall ToggleAnyMission(Object_00477510* obj)
+void __stdcall ToggleAnyMission(CampaignMissionObject* obj)
 {
     if (strncmp(obj->info->name, "DRDEATH", 7) == 0) {
         if (!(g_game->flags_38d7f & 1)) {

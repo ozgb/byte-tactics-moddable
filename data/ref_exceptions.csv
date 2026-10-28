@@ -17,7 +17,7 @@ Class_0045ae80,unknown_30,pointer,include/ta_types.h,#353
 Class_0047cb00,head,pointer,include/ta_types.h,#353
 Class_004b0a70,table,pointer,include/ta_types.h,#353
 CobScript,table,pointer,src/units/cob_script.h,#352
-Conn_443ff0,data,pointer,src/frontend/connection_blob.h,#353
+ConnectionBlob,data,pointer,src/frontend/connection_blob.h,#353
 Face,vindex,pointer,src/weapons/explosions.cpp,#352
 Feature,animTable,pointer,src/map/feature.h,#353
 Feature,anims,pointer,src/map/feature.h,#353
@@ -158,7 +158,7 @@ Gui,layer,pointer,src/gui/gui.h,#353
 Gui,src_28,pointer,src/gui/gui.h,#353
 Gui,src_2c,pointer,src/gui/gui.h,#353
 Gui,values,pointer,src/gui/gui.h,#353
-Holder_0045b800,entries,pointer,src/frontend/options.cpp,#353
+OptionsSliderLayer,entries,pointer,src/frontend/options.cpp,#353
 Layer,cb1c,function-pointer,src/frontend/frontend.cpp|src/gui/layer.h,#353
 Layer,cb1c,pointer,src/frontend/multi.cpp,#353
 Layer,data,pointer,src/frontend/multi.cpp|src/gui/layer.h,#353
@@ -179,7 +179,7 @@ MapGrid,buf,pointer,src/ingame/map_grid.h,#353
 MapGrid,count,pointer,src/ingame/map_grid.h,#353
 MapGrid,cursor,pointer,src/ingame/map_grid.h,#353
 MapInfo,grid,pointer,src/map/map_info.h,#353
-Menu_0045b800,holder,pointer,src/frontend/menu_0045b800.h,#353
+OptionsSliderMenu,holder,pointer,src/frontend/options_slider_menu.h,#353
 Mission,mapList,pointer,src/map/mission.h,#352
 Model_459200,bitmap,pointer,src/graphics/model_types.h,#353
 Model_459200,owner,pointer,src/graphics/model_types.h,#353

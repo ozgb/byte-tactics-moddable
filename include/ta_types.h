@@ -1176,7 +1176,7 @@ struct Flags_00496ce0;
 struct Flags_00499cd0;
 struct Flags_0049e010;
 struct Flags_0049e1a0;
-struct Flags_004ab400;
+struct ActiveBitFlags;
 struct Flags_004ab440;
 struct Flags_142f1_004816a0;
 struct Flags_416630;
@@ -1779,8 +1779,8 @@ struct Rec_004c7580;
 struct Record_0043de30;
 struct Record_0044c0d0;
 struct Record_00474cd0;
-struct Record_004ab2b0;
-struct Record_004ab3a0;
+struct AddButtonGadgetRecord;
+struct AddBarGadgetRecord;
 struct Record_005129b4;
 struct Rect;
 struct Rect_004c2380;
@@ -10622,7 +10622,7 @@ struct Class_004ab2b0 {
     Dialog* holder;
 };
 
-struct Flags_004ab400 {
+struct ActiveBitFlags {
     unsigned int active : 1;
     unsigned int rest : 31;
 };
@@ -10651,7 +10651,7 @@ struct Obj_00462d30 {
     char unknown_3c[24];
     int field_54;
     char unknown_58[4];
-    Flags_004ab400 flags_5c;
+    ActiveBitFlags flags_5c;
     char unknown_60[2646];
     char name[256];
     Obj_00462d30(void);

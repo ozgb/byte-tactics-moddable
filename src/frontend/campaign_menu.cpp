@@ -90,7 +90,6 @@ extern int DAT_00511de8;
 #include "../graphics/object_pool.h"
 int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
 #include "../util/registry.h"
-void __stdcall StreamSoundDelayed(char* text, int a, int b);
 int __stdcall SetGadgetStatusByName(Gui* menu, const char* name, int value);
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, const char* name);

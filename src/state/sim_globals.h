@@ -10,7 +10,7 @@
 #include "../../interfaces/ref.h"
 #include "../graphics/memory_cache.h"
 #include "../map/los_tables.h"
-#include "../map/vector_00438480.h"
+#include "../map/msvc_vector.h"
 #include "../network/packet_manager.h"
 #include "../quirks/quirks.h"
 #include "../units/movement_class.h"

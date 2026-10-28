@@ -1,5 +1,5 @@
-#ifndef CLASS_004C9390_H
-#define CLASS_004C9390_H
+#ifndef STRING_REF_VIEW_H
+#define STRING_REF_VIEW_H
 
 class StringRefView {
 public:

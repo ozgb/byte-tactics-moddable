@@ -1,5 +1,5 @@
-#ifndef RADAR_TIMER_00466DC0_H
-#define RADAR_TIMER_00466DC0_H
+#ifndef RADAR_TIMER_H
+#define RADAR_TIMER_H
 
 #pragma pack(push, 1)
 union RadarTimer {

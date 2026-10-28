@@ -43908,8 +43908,8 @@ address,function,file,kind,target
 ,Class_004c90b0::IsEmpty,src/graphics/surface.cpp,deref_read,*char
 ,Class_004c90b0::IsEmpty,src/graphics/surface.cpp,field_read,Class_004c90b0::ptr
 ,Class_004c90b0::IsEmpty,src/graphics/surface.cpp,function,
-,Class_004c9390::~Class_004c9390,src/map/class_004c9390.h,call,ReleaseRef
-,Class_004c9390::~Class_004c9390,src/map/class_004c9390.h,function,
+,Class_004c9390::~Class_004c9390,src/map/string_ref_view.h,call,ReleaseRef
+,Class_004c9390::~Class_004c9390,src/map/string_ref_view.h,function,
 ,CleanTag,src/harness/block_scan.cpp,call,host_mem_readable
 ,CleanTag,src/harness/block_scan.cpp,call,strcpy
 ,CleanTag,src/harness/block_scan.cpp,deref_read,*char

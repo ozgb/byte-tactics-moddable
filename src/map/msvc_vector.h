@@ -1,5 +1,5 @@
-#ifndef MAP_VECTOR_00438480_H
-#define MAP_VECTOR_00438480_H
+#ifndef MSVC_VECTOR_H
+#define MSVC_VECTOR_H
 
 #include <memory>
 

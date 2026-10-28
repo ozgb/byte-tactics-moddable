@@ -33,13 +33,13 @@ GLOBALS = ROOT / "data" / "globals.csv"
 LAYOUT_REFS = ROOT / "data" / "layout_refs.csv"
 SIM_HEADER = ROOT / "src" / "state" / "sim_globals.h"
 SIM_CSV = ROOT / "src" / "state" / "sim_globals.csv"
-VECTOR_HEADER = ROOT / "src" / "map" / "vector_00438480.h"
+VECTOR_HEADER = ROOT / "src" / "map" / "msvc_vector.h"
 LINK_DATA = ROOT / "link" / "data.cpp"
 LINK_GLOBALS = ROOT / "link" / "globals.h"
 
 EXCLUDED = {"s_cobScriptCache@src/util/int_map.cpp", "g_game"}
 SKIP_FILES = {"src/state/sim_globals.h", "src/state/sim_globals.cpp", "src/harness/trace_schema.h"}
-SKIP_FILES |= {"src/map/vector_00438480.h"}
+SKIP_FILES |= {"src/map/msvc_vector.h"}
 SOURCE_SUFFIXES = (".cpp", ".h", ".inl")
 
 TYPE_OVERRIDES = {
@@ -62,7 +62,7 @@ HEADER_INCLUDES = [
     '"../../interfaces/ref.h"',
     '"../graphics/memory_cache.h"',
     '"../map/los_tables.h"',
-    '"../map/vector_00438480.h"',
+    '"../map/msvc_vector.h"',
     '"../network/packet_manager.h"',
     '"../quirks/quirks.h"',
     '"../units/movement_class.h"',
@@ -70,8 +70,8 @@ HEADER_INCLUDES = [
 ]
 FORWARD_DECLARATIONS = ["struct ExplodedPiece;", "struct PlayerAI;", "struct WeaponDef;"]
 
-VECTOR_CLASS = """#ifndef MAP_VECTOR_00438480_H
-#define MAP_VECTOR_00438480_H
+VECTOR_CLASS = """#ifndef MSVC_VECTOR_H
+#define MSVC_VECTOR_H
 
 #include <memory>
 

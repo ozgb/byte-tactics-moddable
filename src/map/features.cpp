@@ -186,7 +186,7 @@ struct Model {
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
-#include "class_004c9390.h"
+#include "string_ref_view.h"
 
 struct Elem {
     StringRefView name;

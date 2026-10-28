@@ -3814,7 +3814,7 @@ struct Pool_00422170 {
     int headC;
 };
 
-#include "../src/map/class_004c9390.h"
+#include "../src/map/string_ref_view.h"
 
 struct Elem_004222e0 {
     StringRefView name;

@@ -83,7 +83,7 @@
 #include "../map/mission.h"
 #include "../map/player_grid.h"
 #include "../map/pool.h"
-#include "../map/radar_timer_00466dc0.h"
+#include "../map/radar_timer.h"
 #include "../network/chat_hud_entry.h"
 #include "../network/entry_00463ca0.h"
 #include "../network/packet_channel.h"

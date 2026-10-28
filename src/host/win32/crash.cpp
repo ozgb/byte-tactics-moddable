@@ -315,7 +315,7 @@ public:
     void CloseMappedFile();
 };
 
-struct Fpo_004de020 {
+struct FpoRecord {
     unsigned int offStart;
     unsigned int procSize;
     unsigned int locals;
@@ -333,9 +333,9 @@ public:
     int numDebugDirs;
 
     LoadedImage(HMODULE m);
-    Fpo_004de020* GetFpoRecords();
+    FpoRecord* GetFpoRecords();
     unsigned int GetFpoRecordCount();
-    Fpo_004de020* FindFpoRecord(unsigned int address);
+    FpoRecord* FindFpoRecord(unsigned int address);
 };
 
 static unsigned char g_loadedImage[sizeof(LoadedImage)];
@@ -365,13 +365,13 @@ LoadedImage::LoadedImage(HMODULE m) : MappedFile(0)
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddfa0
-Fpo_004de020* LoadedImage::GetFpoRecords()
+FpoRecord* LoadedImage::GetFpoRecords()
 {
     if (debugDirs == 0)
         return 0;
     for (int i = 0; i < numDebugDirs; i++) {
         if (debugDirs[i].Type == IMAGE_DEBUG_TYPE_FPO)
-            return (Fpo_004de020*)((char*)view + debugDirs[i].PointerToRawData);
+            return (FpoRecord*)((char*)view + debugDirs[i].PointerToRawData);
     }
     return 0;
 }
@@ -385,23 +385,23 @@ unsigned int LoadedImage::GetFpoRecordCount()
         return 0;
     for (int i = 0; i < numDebugDirs; i++) {
         if (debugDirs[i].Type == 3)
-            return debugDirs[i].SizeOfData / sizeof(Fpo_004de020);
+            return debugDirs[i].SizeOfData / sizeof(FpoRecord);
     }
     return 0;
 }
 #pragma auto_inline(on)
 
 // FUNCTION: 0x4de020
-Fpo_004de020* LoadedImage::FindFpoRecord(unsigned int address)
+FpoRecord* LoadedImage::FindFpoRecord(unsigned int address)
 {
-    Fpo_004de020* first = GetFpoRecords();
+    FpoRecord* first = GetFpoRecords();
     if (first == 0)
         return 0;
     int n = GetFpoRecordCount();
     if (n == 0)
         return 0;
-    Fpo_004de020* last = first + n;
-    Fpo_004de020* mid = first + n / 2;
+    FpoRecord* last = first + n;
+    FpoRecord* mid = first + n / 2;
     unsigned int rva = address - imageBase;
     while (first + 1 != last) {
         if (rva < mid->offStart)
@@ -433,23 +433,23 @@ void __stdcall GetModuleBase(int arg1, int arg2)
 {
 }
 
-typedef DWORD (__stdcall *SymSetOptions_004de180)(DWORD);
-typedef BOOL (__stdcall *SymInitialize_004de180)(HANDLE, char*, DWORD);
-typedef void (__stdcall *SymProc_004de180)(void);
-typedef BOOL (__stdcall *StackWalk_004de700)(DWORD, HANDLE, HANDLE, void*, void*, void*, void*, void*, void*);
+typedef DWORD (__stdcall *SymSetOptionsFn)(DWORD);
+typedef BOOL (__stdcall *SymInitializeFn)(HANDLE, char*, DWORD);
+typedef void (__stdcall *SymVoidProcFn)(void);
+typedef BOOL (__stdcall *StackWalkFn)(DWORD, HANDLE, HANDLE, void*, void*, void*, void*, void*, void*);
 
 static char g_imageHelpLoaded;
 static char g_imageHelpInited;
 static HMODULE g_imageHelpModule;
-static SymSetOptions_004de180 g_pfnSymSetOptions;
-static SymInitialize_004de180 g_pfnSymInitialize;
+static SymSetOptionsFn g_pfnSymSetOptions;
+static SymInitializeFn g_pfnSymInitialize;
 static BOOL (__stdcall* g_pfnSymCleanup)(HANDLE);
-static StackWalk_004de700 g_pfnStackWalk;
+static StackWalkFn g_pfnStackWalk;
 static void* g_pfnSymFunctionTableAccess;
 static void* g_pfnSymGetModuleBase;
-static SymProc_004de180 g_pfnSymGetSymFromAddr;
-static SymProc_004de180 g_pfnSymGetLineFromAddr;
-static SymProc_004de180 g_pfnUnDecorateSymbolName;
+static SymVoidProcFn g_pfnSymGetSymFromAddr;
+static SymVoidProcFn g_pfnSymGetLineFromAddr;
+static SymVoidProcFn g_pfnUnDecorateSymbolName;
 
 static bool HasCommandLineSwitch(const char* name)
 {
@@ -508,8 +508,8 @@ char __cdecl LoadImageHelp(char param)
     char* searchPath;
     char* windir;
     char* slash;
-    typedef int (__stdcall *GetProcAddress_004de180)(HMODULE, char*);
-    GetProcAddress_004de180 getProcAddress = (GetProcAddress_004de180)GetProcAddress;
+    typedef int (__stdcall *GetProcAddressFn)(HMODULE, char*);
+    GetProcAddressFn getProcAddress = (GetProcAddressFn)GetProcAddress;
     HANDLE (__stdcall *getCurrentProcess)(void) = GetCurrentProcess;
 
     if (!param && !imagehlpOn)
@@ -519,21 +519,21 @@ char __cdecl LoadImageHelp(char param)
     g_imageHelpLoaded = 1;
     if (!(g_imageHelpModule = LoadLibraryA("IMAGEHLP.DLL")))
         return 0;
-    if (!(g_pfnSymSetOptions = (SymSetOptions_004de180)getProcAddress(g_imageHelpModule, "SymSetOptions")))
+    if (!(g_pfnSymSetOptions = (SymSetOptionsFn)getProcAddress(g_imageHelpModule, "SymSetOptions")))
         return 0;
-    if (!(g_pfnSymInitialize = (SymInitialize_004de180)getProcAddress(g_imageHelpModule, "SymInitialize")))
+    if (!(g_pfnSymInitialize = (SymInitializeFn)getProcAddress(g_imageHelpModule, "SymInitialize")))
         return 0;
     if (!(g_pfnSymCleanup = (BOOL (__stdcall*)(HANDLE))getProcAddress(g_imageHelpModule, "SymCleanup")))
         return 0;
-    if (!(g_pfnStackWalk = (StackWalk_004de700)getProcAddress(g_imageHelpModule, "StackWalk")))
+    if (!(g_pfnStackWalk = (StackWalkFn)getProcAddress(g_imageHelpModule, "StackWalk")))
         return 0;
-    if (!(g_pfnSymFunctionTableAccess = (SymProc_004de180)getProcAddress(g_imageHelpModule, "SymFunctionTableAccess")))
+    if (!(g_pfnSymFunctionTableAccess = (SymVoidProcFn)getProcAddress(g_imageHelpModule, "SymFunctionTableAccess")))
         return 0;
-    if (!(g_pfnSymGetModuleBase = (SymProc_004de180)getProcAddress(g_imageHelpModule, "SymGetModuleBase")))
+    if (!(g_pfnSymGetModuleBase = (SymVoidProcFn)getProcAddress(g_imageHelpModule, "SymGetModuleBase")))
         return 0;
-    g_pfnSymGetSymFromAddr = (SymProc_004de180)getProcAddress(g_imageHelpModule, "SymGetSymFromAddr");
-    g_pfnSymGetLineFromAddr = (SymProc_004de180)getProcAddress(g_imageHelpModule, "SymGetLineFromAddr");
-    g_pfnUnDecorateSymbolName = (SymProc_004de180)getProcAddress(g_imageHelpModule, "UnDecorateSymbolName");
+    g_pfnSymGetSymFromAddr = (SymVoidProcFn)getProcAddress(g_imageHelpModule, "SymGetSymFromAddr");
+    g_pfnSymGetLineFromAddr = (SymVoidProcFn)getProcAddress(g_imageHelpModule, "SymGetLineFromAddr");
+    g_pfnUnDecorateSymbolName = (SymVoidProcFn)getProcAddress(g_imageHelpModule, "UnDecorateSymbolName");
     DWORD symOpts = 4;
     if (g_pfnSymGetLineFromAddr)
         symOpts = 0x14;
@@ -556,8 +556,8 @@ char __cdecl LoadImageHelp(char param)
     }
     BOOL inited = g_pfnSymInitialize(getCurrentProcess(), searchPath, 1);
     if (!inited) {
-        g_pfnSymFunctionTableAccess = (SymProc_004de180)FunctionTableAccess;
-        g_pfnSymGetModuleBase = (SymProc_004de180)GetModuleBase;
+        g_pfnSymFunctionTableAccess = (SymVoidProcFn)FunctionTableAccess;
+        g_pfnSymGetModuleBase = (SymVoidProcFn)GetModuleBase;
         g_pfnSymGetSymFromAddr = 0;
         g_pfnSymGetLineFromAddr = 0;
         if (!g_pfnSymInitialize(getCurrentProcess(), searchPath, inited)) {
@@ -623,7 +623,7 @@ void __cdecl WalkFrameChain(int* frame, int* stack, int eip, int skip, int* out,
         copy[i] = 0;
 }
 
-struct Frame_004de700 {
+struct StackWalkFrame {
     int addrPc;
     int unknown_04;
     int flags0;
@@ -636,7 +636,7 @@ struct Frame_004de700 {
     int flags2;
     char unknown_30[0x68];
 };
-static_assert(sizeof(Frame_004de700) == 0x98, "StackWalk writes the 0x98-byte STACKFRAME");
+static_assert(sizeof(StackWalkFrame) == 0x98, "StackWalk writes the 0x98-byte STACKFRAME");
 
 static char g_stackProcessHandleRead;
 static HANDLE g_stackProcessHandle;
@@ -644,7 +644,7 @@ static HANDLE g_stackProcessHandle;
 // FUNCTION: 0x4de700
 void __cdecl WalkStack(int param1, int param2, int param3, int param4, int* param5, int param6, int* param7)
 {
-    Frame_004de700 frame;
+    StackWalkFrame frame;
     memset(&frame, 0, sizeof(frame));
     frame.addrPc = param3;
     frame.flags0 = 3;

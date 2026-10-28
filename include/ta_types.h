@@ -134,7 +134,7 @@ struct Channel_004b0b00;
 struct Channel_004b0c40;
 struct Channel_4619e0;
 struct Chunk;
-struct Chunk_4d1820;
+struct SquashChunkHeader;
 struct Chunk_4d1970;
 class Class_004010b0;
 class Class_00401110;
@@ -1188,7 +1188,7 @@ struct CameraFollowTarget;
 struct FontGlyphTable;
 struct Form_00464e70;
 struct Fp_004bbff0;
-struct Fpo_004de020;
+struct FpoRecord;
 struct FrameCounter_4b6570;
 struct Frame_00424050;
 struct Frame_00462f30;
@@ -1200,7 +1200,7 @@ struct WeaponSlotInitState;
 struct Frame_004a4980;
 struct Frame_004a7f70;
 struct Frame_004c7580;
-struct Frame_004de700;
+struct StackWalkFrame;
 struct Frame_482270;
 struct ScreenFreeData;
 struct CdPlayerChoiceGadgetView;
@@ -1244,7 +1244,7 @@ struct Gun_0049c9c0;
 struct Handle;
 class Handler_004388d0;
 struct HapiBuf;
-struct Hapi_004bd160;
+struct HapiPackHeaderView;
 struct Head_0043a420;
 struct Head_004455b0;
 struct Head_004635b0;
@@ -14246,7 +14246,7 @@ public:
     char unknown_c[24];
     DebugDir_004ddfa0* debugDirs;
     int numDebugDirs;
-    Fpo_004de020* GetFpoRecords(void);
+    FpoRecord* GetFpoRecords(void);
 };
 
 struct DebugDir_004ddfa0 {
@@ -14274,7 +14274,7 @@ class Class_004de020 {
 public:
     char unknown_0[24];
     unsigned int imageBase;
-    Fpo_004de020* FindFpoRecord(unsigned int);
+    FpoRecord* FindFpoRecord(unsigned int);
 };
 
 struct Line_004de550 {

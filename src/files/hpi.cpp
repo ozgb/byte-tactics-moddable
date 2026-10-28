@@ -1080,7 +1080,7 @@ void __stdcall MakeDirectoryPath(char* path)
     _mkdir(buf);
 }
 
-static void Close_004bcf80(FileHandle* f)
+static void ReleaseFileHandle(FileHandle* f)
 {
     if (f->shared) {
         f->shared->count--;
@@ -1133,12 +1133,12 @@ int __stdcall HAPI_CopyIntoFile(FileHandle* dst, char* name)
             goto fail;
         left -= got;
     }
-    Close_004bcf80(f);
+    ReleaseFileHandle(f);
     return len;
 fail:
     if (buf)
         GameFreeThunk(buf);
-    Close_004bcf80(f);
+    ReleaseFileHandle(f);
     return 0;
 }
 
@@ -1153,7 +1153,7 @@ struct HapiBuf {
     char* buf;
 };
 
-struct Hapi_004bd160 {
+struct HapiPackHeaderView {
     char magic[4];
     char a4;
     char a5;
@@ -1201,7 +1201,7 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
     off = HAPI_BuildArchiveDirectory(srcname, &sb, (int*)&extra);
 
     {
-        struct Hapi_004bd160* h = (struct Hapi_004bd160*)sb.buf;
+        struct HapiPackHeaderView* h = (struct HapiPackHeaderView*)sb.buf;
         unsigned int m;
         unsigned int t;
         unsigned char k;
@@ -1262,7 +1262,7 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
 }
 
 #pragma pack(push, 1)
-struct Node_004bd3b0 {
+struct ArchiveFileInfoView {
     unsigned int offset;
     unsigned int size;
     unsigned char flags;
@@ -1343,7 +1343,7 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
                     e = (ArchiveEntry*)(out->buf + entries);
                     e += k;
                     e->data = nodeOff;
-                    Node_004bd3b0* node = (Node_004bd3b0*)(out->buf + e->data);
+                    ArchiveFileInfoView* node = (ArchiveFileInfoView*)(out->buf + e->data);
                     node->size = fd.size;
                     node->offset = 0;
                     node->flags = 0;
@@ -1413,7 +1413,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                     chunk = remaining >= 0x10000 ? 0x10000 : remaining;
                     HAPI_readfromfile(file, data, chunk);
                     clen = packlen;
-                    SquashPack((Chunk_4d1820 *)pack, &clen, (char*)data, chunk, flags & 0xff, 1);
+                    SquashPack((SquashChunkHeader *)pack, &clen, (char*)data, chunk, flags & 0xff, 1);
                     table[n] = clen;
                     pos = host_file_seek(f, 0, HOST_SEEK_CUR);
                     len = clen;
@@ -1474,7 +1474,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
 void __stdcall HAPI_RelocateDirectory(ArchiveDirectory* h, int delta);
 void __stdcall HAPI_RelocateDirectory(int name, int base);
 
-static inline int Bad_004bdd70(void* f, HapiHeader* hdr, char* copyright)
+static inline int IsArchiveHeaderInvalid(void* f, HapiHeader* hdr, char* copyright)
 {
     if (strncmp(hdr->magic, "HAPI", 4) != 0 || hdr->version[0] != 0 || hdr->version[1] != 0 ||
         hdr->version[2] != 1 || hdr->version[3] != 0)
@@ -1504,7 +1504,7 @@ OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
     HapiHeader hdr;
     host_file_read(f, &hdr, 0x14);
     char copyright[0x40];
-    if (Bad_004bdd70(f, &hdr, copyright)) {
+    if (IsArchiveHeaderInvalid(f, &hdr, copyright)) {
         host_file_close(f);
         GameFreeThunk(h);
         return 0;
@@ -1600,7 +1600,7 @@ void* __stdcall HAPI_AddArchive(LPCSTR name, int mode)
     return file;
 }
 
-static void FreeRecord_004be180(OPENHAPIFILE* p)
+static void FreeArchiveRecord(OPENHAPIFILE* p)
 {
     if (p != 0) {
         if (p->fp != 0)
@@ -1620,7 +1620,7 @@ void HAPI_DropMissingArchives(void)
             state->files[i]->fp = host_file_open_read(state->files[i]->name);
             OPENHAPIFILE* rec = state->files[i];
             if (rec->fp == 0) {
-                FreeRecord_004be180(state->files[i]);
+                FreeArchiveRecord(state->files[i]);
                 state->files[i] = 0;
                 for (int j = i; j < state->count - 1; j++)
                     state->files[j] = state->files[j + 1];

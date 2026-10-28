@@ -5,8 +5,8 @@
 #include <math.h>
 #include "../../interfaces/host.h"
 
-struct Node_004d0b10;
-extern Node_004d0b10* g_squashDictTree;
+struct LzssTreeNode;
+extern LzssTreeNode* g_squashDictTree;
 extern char* g_squashWindow;
 
 // FUNCTION: 0x4d0ab0
@@ -33,7 +33,7 @@ int LzssFreeTree()
     return 0;
 }
 
-struct Node_004d0b10 {
+struct LzssTreeNode {
     unsigned short parent;
     unsigned short smaller;
     unsigned short larger;
@@ -140,7 +140,7 @@ int __stdcall LzssAddString(int pos, int* out)
             best = n;
             *out = cur;
             if (n >= 0x11) {
-                Node_004d0b10* par = &g_squashDictTree[g_squashDictTree[cur].parent];
+                LzssTreeNode* par = &g_squashDictTree[g_squashDictTree[cur].parent];
                 if (par->smaller == (unsigned short)cur)
                     par->smaller = pos;
                 else
@@ -223,7 +223,7 @@ int __stdcall LzssCompress(unsigned char *dest, unsigned char *src, int len) {
         }
         return -1;
     }
-    g_squashDictTree = (Node_004d0b10 *)calloc(0x1001, 6);
+    g_squashDictTree = (LzssTreeNode *)calloc(0x1001, 6);
     if (g_squashDictTree == 0) {
         printf("Could not alloc compression tree.\n");
         if (state.own == 0) {
@@ -445,7 +445,7 @@ int __stdcall LzssSetPreset(unsigned char* src, int len)
         printf("Could not alloc decompression window.\n");
         return -1;
     }
-    g_squashDictTree = (Node_004d0b10*)calloc(0x1001, 6);
+    g_squashDictTree = (LzssTreeNode*)calloc(0x1001, 6);
     if (g_squashDictTree == 0) {
         printf("Could not alloc compression tree.\n");
         return -1;
@@ -495,7 +495,7 @@ int LzssEnablePreset()
 }
 
 #pragma pack(push, 1)
-struct Chunk_4d1820 {
+struct SquashChunkHeader {
     int marker;
     unsigned char version;
     unsigned char method;
@@ -511,9 +511,9 @@ void __stdcall _compress(char* out, int* outSize, char* in, int size);
 static inline unsigned int encryptByte(unsigned int i, char* out) { return (i ^ out[i]) + i; }
 
 // FUNCTION: 0x4d1820
-int __stdcall SquashPack(Chunk_4d1820* chunk, int* chunkSize, char* data, int size, int method, int encrypt)
+int __stdcall SquashPack(SquashChunkHeader* chunk, int* chunkSize, char* data, int size, int method, int encrypt)
 {
-    Chunk_4d1820 header, * payload = chunk + 1;
+    SquashChunkHeader header, * payload = chunk + 1;
     char* out = (char*)payload;
     if ((char*)payload == 0) {
         return 6;
@@ -575,8 +575,8 @@ int __stdcall _uncompress(unsigned char* dest, unsigned long* destLen, unsigned 
 // FUNCTION: 0x4d1970
 int __stdcall SquashUnpack(char* dest, char* data)
 {
-    Chunk_4d1820 header;
-    Chunk_4d1820* chunk = (Chunk_4d1820*)data;
+    SquashChunkHeader header;
+    SquashChunkHeader* chunk = (SquashChunkHeader*)data;
     memcpy(&header, data, 0x13);
     if (memcmp(&header, "SQSH", 4) != 0) {
         return 1;
@@ -694,7 +694,7 @@ int __stdcall SquashChecksum(unsigned char* data, int size)
 }
 
 // FUNCTION: 0x4d1c00
-void __stdcall SquashDumpHeader(Chunk_4d1820* header)
+void __stdcall SquashDumpHeader(SquashChunkHeader* header)
 {
     printf("\nheader.packType     = %d\n", header->method);
     printf("header.encryptType  = %d\n", header->encrypt);

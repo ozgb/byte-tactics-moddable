@@ -33,7 +33,7 @@ struct PlayerInfo;
 
 struct AI;
 struct Account_004b4d70;
-struct Aim_0049dd60;
+struct DroppedAimSlotView;
 struct SyncMapAllocArg;
 struct Alloc_0046e5c0;
 struct Alloc_004b2290;
@@ -41,7 +41,7 @@ struct Alloc_004dc130;
 class Alloc_004e2b60;
 struct Amount;
 struct Angles_0049be60;
-struct AnimEntry_00421f20;
+struct FeatureAnimEntry;
 struct AnimEntry_00429700;
 struct FeatureAnimPool;
 struct AnimPair_00423550;
@@ -701,7 +701,7 @@ class Class_004c91b0;
 class Class_004c9230;
 class Class_004c9290;
 class Class_004c9310;
-class Class_004c9390;
+class StringRefView;
 class Class_004c93f0;
 class Class_004c9490;
 struct Class_004cb7c0;
@@ -983,11 +983,11 @@ struct UnitTypeInt;
 struct Elem_0040f110;
 struct Elem_004222e0;
 struct ModelTextureEntry;
-struct Elem_00432be0;
+struct OwnedString;
 struct Elem_00432be0_2;
-struct Elem_004336c0;
-struct Elem_00434020;
-struct Elem_00434360;
+struct IntValueElem;
+struct LosStep;
+struct LosLineData;
 struct Elem_00434360_2;
 struct Elem_00434a60;
 struct OrderTableEntry;
@@ -1016,7 +1016,7 @@ struct TdfField;
 struct Elem_004cb4c0;
 struct Elem_004cb5f0;
 struct Elem_004dd8c0;
-struct Elem_432cb0;
+struct StringValueElem;
 struct Elem_432cb0_2;
 struct Elem_4b0610;
 struct Element_00475ef0;
@@ -1066,8 +1066,8 @@ struct Entry_0048a160;
 struct Entry_0048a190;
 struct Entry_0048a1e0;
 struct Entry_0048a440;
-struct Entry_0049d120;
-struct Entry_0049d270;
+struct InterceptorSlotView;
+struct NetFireSlotView;
 struct Entry_004a0bf0;
 struct Entry_004a7ee0;
 struct Entry_004aafe0;
@@ -1086,7 +1086,7 @@ struct Entry_482ac0;
 struct Entry_5;
 struct EventEntry;
 struct Event_0046d860;
-struct Event_0049d1e0;
+struct RemoteFireEventView;
 struct Event_4b5cc0;
 struct ExceptionName;
 struct Expired;
@@ -1103,7 +1103,7 @@ struct FeatureName_00424890;
 struct FeatureName_00424c00;
 struct FeatureSpot;
 struct FeatureSpot_2;
-struct FeatureUnit_00421f20;
+struct FeaturePseudoUnit;
 union Field136_004a6ae0;
 struct Field_0046d6c0;
 class File_0043a970;
@@ -1131,7 +1131,7 @@ struct Fixed_00424050;
 struct Fixed_00485140;
 struct Fixed_00485330;
 union Fixed_0048bae0;
-union Fixed_0049abb0;
+union ReachUnitFixed;
 union Fixed_2;
 union Fixed_3;
 union Fixed_4;
@@ -1146,7 +1146,7 @@ union Flags114_485a40;
 union Flags142f0_00466dc0;
 struct Flags16_00493bf0;
 union NetGameFlags;
-struct Flags241_00466dc0;
+struct InterceptorDefFlags;
 struct FlagsBits_0049cc20;
 union FlagsU_00419670;
 struct Flags_004165c0;
@@ -1173,7 +1173,7 @@ struct GraphicsOptionFlags;
 struct BroadcastToggleFlags;
 union InfoModeFlags;
 struct PreBattleFlags;
-struct Flags_00499cd0;
+struct DamageScaleFlags;
 struct Flags_0049e010;
 struct Flags_0049e1a0;
 struct ActiveBitFlags;
@@ -1196,7 +1196,7 @@ struct Frame_00478b40;
 struct Frame_0047ae60;
 struct Frame_00481930;
 struct Frame_00481d50;
-struct Frame_0049e070;
+struct WeaponSlotInitState;
 struct Frame_004a4980;
 struct Frame_004a7f70;
 struct Frame_004c7580;
@@ -1273,7 +1273,7 @@ struct Holder_00499eb0;
 struct Holder_004a75d0;
 struct CornerHeightSample;
 struct IDirectSound3DBuffer;
-struct IconSet_00466780;
+struct MapTileSet;
 class Id_004df1e0;
 struct Ids_0046d970;
 class GoalDrawInterface;
@@ -1323,7 +1323,7 @@ class Iter_0046e330;
 struct Iterator_004df590;
 struct Kfn_004dbbc0;
 struct Kfn_004e2250;
-struct Kind_00499ab0;
+struct WeaponFirePlayerView;
 struct Len;
 struct Less_0046d2e0;
 struct Less_0046d970;
@@ -1427,7 +1427,7 @@ struct GameSelectionMsg;
 struct Msg_00450530;
 struct FrameStateMsg;
 struct Muzzle_0048a1e0;
-struct NameLess_00499cd0;
+struct DamageNameLess;
 struct NameLess_004b7760;
 struct NameLess_004b7900;
 struct NameLess_004c4630;
@@ -1499,7 +1499,7 @@ struct Obj_0044d310;
 struct Obj_00462d30;
 struct Obj_00479bf0;
 struct Obj_0047e5c0;
-struct Obj_00499ab0;
+struct WeaponFireUnitView;
 struct Obj_004a7f70;
 struct WriteTextInputFieldsRecord;
 struct ReadTextInputFieldsRecord;
@@ -1552,7 +1552,7 @@ struct Object_0044ea60;
 struct Object_0044eb40;
 struct CampaignMissionObject;
 struct Object_0048a440;
-struct Object_00499c10;
+struct RockUnitView;
 struct Object_0049f930;
 struct Object_004aafe0;
 struct Object_004abd20;
@@ -1742,7 +1742,7 @@ struct Pos_00473590;
 struct Pos_00473590_2;
 struct Pos_004745e0;
 struct Pos_00474b80;
-struct Pos_0047d2e0;
+struct BuildCenterFixed;
 struct Pos_00485330;
 struct Pos_0048d630;
 struct Pos_004cf570;
@@ -1823,8 +1823,8 @@ struct MissionOptionFlags;
 struct Settings_00496e10_2;
 struct Shape;
 struct Shape_00472ab0;
-struct Shot_0049cc20;
-struct Shot_0049d000;
+struct VLaunchFireSlotView;
+struct MotionFireSlotView;
 struct SideDef;
 struct TileOutlineSize;
 struct SkirmishPlayer;
@@ -1851,7 +1851,7 @@ struct Sound_45ffb0;
 struct Source_0042f450;
 struct TdfParserView;
 struct UnitSyncSource;
-struct Source_00499c10;
+struct RockSourceSlotView;
 struct ReadTextInputFieldsSource;
 struct ReadSliderFieldsSource;
 struct ReadTextLinkFieldsSource;
@@ -1862,7 +1862,7 @@ struct Span_004c0a90;
 struct Spawn_00420e50;
 union SpotField_004246b0;
 struct SpotState;
-struct Sprite_0049be60;
+struct ModelChildView;
 struct Sprite_004b94c0;
 struct SrcPiece_00487080;
 struct Src_004ab400;
@@ -1913,7 +1913,7 @@ struct Table_0041ace0;
 struct Table_004611e0;
 struct Table_0047acd0;
 struct Table_0047ae60;
-struct Table_00499cd0;
+struct DamageTable;
 struct LoadGafIntoSlotGafTable;
 struct Table_004b08c0;
 struct Table_004b3630;
@@ -1998,7 +1998,6 @@ struct Unit_00485d40;
 struct Unit_004894f0;
 struct Unit_0048ec20;
 struct Unit_0048f8c0;
-struct Unit_0049c880;
 struct Unit_0049df10;
 struct Unit_2;
 struct Unit_3;
@@ -2028,7 +2027,7 @@ struct MapViewFlags;
 struct View_00438c00;
 struct View_0044d8a0;
 struct View_4b5980;
-class Visitor_0047e750;
+class UnitVisitor;
 struct WaveFormat;
 struct WeaponDef;
 struct WeaponType;
@@ -3814,10 +3813,10 @@ struct Pool_00422170 {
     int headC;
 };
 
-#include "../src/map/class_004c9390.h"
+#include "../src/map/string_ref_view.h"
 
 struct Elem_004222e0 {
-    Class_004c9390 name;
+    StringRefView name;
     ~Elem_004222e0(void);
 };
 
@@ -4198,7 +4197,7 @@ public:
     char* GetFieldName(int);
 };
 
-class Class_004c91b0 : public Class_004c9390 {
+class Class_004c91b0 : public StringRefView {
 public:
     Class_004c91b0(char*);
     ~Class_004c91b0(void);
@@ -4362,7 +4361,7 @@ public:
 };
 
 struct Elem_432cb0_2 {
-    Class_004c9390 handle;
+    StringRefView handle;
     int field4;
 };
 
@@ -4379,12 +4378,12 @@ public:
 };
 
 struct Elem_00434360_2 {
-    std::vector<Elem_00434020> v;
+    std::vector<LosStep> v;
 };
 
 class Class_00433130 {
 public:
-    std::vector<std::vector<Elem_00434360> > tables;
+    std::vector<std::vector<LosLineData> > tables;
     void LoadLosTables(void);
 };
 
@@ -4395,13 +4394,13 @@ public:
 };
 
 struct Wrap_00433270 {
-    std::vector<Elem_00434020> v;
+    std::vector<LosStep> v;
 };
 
 class Class_004335f0 {
 public:
     char unknown_0[16];
-    Elem_00434360* GetLine(short);
+    LosLineData* GetLine(short);
     void ResizeLines(short);
     void SetNumLines(short);
 };
@@ -4421,8 +4420,8 @@ public:
 
 class Class_00433500 {
 public:
-    std::vector<std::vector<Elem_00434020> > items;
-    std::vector<Elem_00434020>* GetLosTable(int);
+    std::vector<std::vector<LosStep> > items;
+    std::vector<LosStep>* GetLosTable(int);
 };
 
 class Class_00433520 {
@@ -4456,7 +4455,7 @@ public:
 };
 
 struct Elem_00434a60 {
-    Class_004c9390 name;
+    StringRefView name;
     int value;
     ~Elem_00434a60(void);
 };
@@ -9191,19 +9190,19 @@ struct Entry_00487af0 {
 };
 
 struct Elem_00488a00 {
-    Class_004c9390 name;
+    StringRefView name;
     int value;
     ~Elem_00488a00(void);
 };
 
 struct Elem_00488a00_2 {
-    Class_004c9390 name;
+    StringRefView name;
     int value;
     ~Elem_00488a00_2(void);
 };
 
 struct Elem_00488a00_3 {
-    Class_004c9390 name;
+    StringRefView name;
     void* value;
     ~Elem_00488a00_3(void);
 };
@@ -9216,7 +9215,7 @@ public:
 
 class Class_00489240 {
 public:
-    Class_004c9390 name;
+    StringRefView name;
     int value;
     Class_00489240* AssignCategory(Class_00489240*);
 };
@@ -11425,14 +11424,14 @@ public:
 };
 
 struct Elem_004b75d0 {
-    Class_004c9390 name;
+    StringRefView name;
     int value1;
     int value2;
     ~Elem_004b75d0(void);
 };
 
 struct Elem_004b75d0_2 {
-    Class_004c9390 name;
+    StringRefView name;
     int value1;
     int value2;
     ~Elem_004b75d0_2(void);
@@ -11440,11 +11439,11 @@ struct Elem_004b75d0_2 {
 
 class Class_004b7e30 {
 public:
-    Class_004c9390 handle;
+    StringRefView handle;
     int value1;
     int value2;
     Class_004b7e30(Class_004b7e30&);
-    Class_004b7e30(Class_004c9390&, MessageByteCounter);
+    Class_004b7e30(StringRefView&, MessageByteCounter);
     ~Class_004b7e30(void);
     Class_004b7e30& operator=(Class_004b7e30&);
 };
@@ -11456,7 +11455,7 @@ struct NameLess_004b7760 {
 
 struct NameNe_004b7760 {
     char unknown_0[1];
-    unsigned char operator()(Class_004c9390&, Class_004c9390&);
+    unsigned char operator()(StringRefView&, StringRefView&);
 };
 
 class Class_004c9290 {
@@ -11467,7 +11466,7 @@ public:
 };
 
 struct Elem_004b75d0_3 {
-    Class_004c9390 name;
+    StringRefView name;
     int value1;
     int value2;
     ~Elem_004b75d0_3(void);
@@ -11479,7 +11478,7 @@ struct NameLess_004b7900 {
 };
 
 struct Elem_004b75d0_4 {
-    Class_004c9390 name;
+    StringRefView name;
     int value1;
     int value2;
     ~Elem_004b75d0_4(void);
@@ -12135,27 +12134,27 @@ public:
 class Class_004c4340 {
 public:
     char unknown_0[1];
-    Class_004c9390 MakeTrimmedString(char*, char*);
-    Class_004c9390* MakeTrimmedString(Class_004c9390*, char*, char*);
+    StringRefView MakeTrimmedString(char*, char*);
+    StringRefView* MakeTrimmedString(StringRefView*, char*, char*);
 };
 
 class Class_004c54a0 {
 public:
-    Class_004c9390 first;
-    Class_004c9390 second;
+    StringRefView first;
+    StringRefView second;
     Class_004c54a0(Class_004c54a0&);
     Class_004c54a0& operator=(Class_004c54a0&);
 };
 
 class Class_004c54d0 {
 public:
-    Class_004c9390 field_0;
-    Class_004c9390 field_4;
+    StringRefView field_0;
+    StringRefView field_4;
     Class_004c54d0(Class_004c54d0&);
-    Class_004c54d0(Class_004c9390&, Class_004c9390&);
+    Class_004c54d0(StringRefView&, StringRefView&);
 };
 
-class Class_004c9180 : public Class_004c9390 {
+class Class_004c9180 : public StringRefView {
 public:
     Class_004c9180(Class_004c9180&);
     Class_004c9180(void);
@@ -12167,7 +12166,7 @@ public:
     char less;
     std::vector<Class_004c54a0> v;
     Class_004c54a0* LowerBound(char*);
-    Class_004c9390* InsertNew(Class_004c54a0*, Class_004c9390&);
+    StringRefView* InsertNew(Class_004c54a0*, StringRefView&);
 };
 
 class Class_004c3e40 {

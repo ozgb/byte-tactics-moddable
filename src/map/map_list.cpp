@@ -13,7 +13,7 @@ class StringRef;
 
 
 #pragma pack(push, 1)
-struct Slot_00436860 {
+struct GameOptionSlotView {
     int active;
     char unknown_4[0x14];
 };
@@ -81,7 +81,7 @@ struct MissionRule {
 #include "../util/string_ref.h"
 #include "../state/sim_globals.h"
 
-struct Header_004373a0 {
+struct TntFileHeader {
     int magic;
     int width;
     int height;
@@ -838,7 +838,7 @@ int Mission::SelectSchema(int type, TdfFile* parser, char* schema)
     }
     case 2: {
         for (int i = 0; i < 10; i++) {
-            if (((Slot_00436860 *)g_game->options)[i].active != 0)
+            if (((GameOptionSlotView *)g_game->options)[i].active != 0)
                 players = i + 1;
         }
         order[0] = 3;
@@ -1092,7 +1092,7 @@ int Mission::ComputeMapChecksum()
     if (file == 0) {
         return 0;
     }
-    Header_004373a0 header;
+    TntFileHeader header;
     HAPI_readfromfile(file, &header, 0x40);
     if (header.magic != 0x2000) {
         return 0;

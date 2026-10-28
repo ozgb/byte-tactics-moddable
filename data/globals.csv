@@ -399,7 +399,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x512334,g_meteorTarget,.bss,4,gap,data,Point16,2,0,1,one type,2,0x2,_DAT_00512334,,SimGlobals,
 0x512338,g_meteorScheduleGap,.bss,4,type,data,int,2,0,1,one type,2,,INT_00512338,,SimGlobals,
 0x51233c,DAT_0051233c,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,SimGlobals,
-0x512340,g_missionOrderTableVec,.bss,16,definition,data,"Vector_00438480<int, std::allocator<int> >",1,0,1,one type,1,0xc,DAT_00512340,,SimGlobals,
+0x512340,g_missionOrderTableVec,.bss,16,definition,data,"MsvcVector<int, std::allocator<int> >",1,0,1,one type,1,0xc,DAT_00512340,,SimGlobals,
 0x512344,g_missionOrderTableBegin,.bss,4,type,data,MissionOrderTableEntry*,1,2,3,conflicting: struct names only,3,,DAT_00512344,,in g_missionOrderTableVec+0x4,
 0x512348,g_missionOrderTableEnd,.bss,4,type,data,int,1,1,2,conflicting: shape,2,,DAT_00512348,,in g_missionOrderTableVec+0x8,
 0x512350,DAT_00512350,.bss,8,gap,unreferenced,unsigned char[8],0,0,0,,0,,,,SimGlobals,

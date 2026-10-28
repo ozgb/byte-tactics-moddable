@@ -16,7 +16,6 @@ AimWithinTolerance,mismatch,fixing it changes the generated code of a caller
 AllocAlphaTable,mismatch,pointer/int cast: definition's type is likely wrong
 AllocDepthFrame,mismatch,fixing it changes the generated code of a caller
 AllocSurface,mismatch,pointer/int cast: definition's type is likely wrong
-ApplyAreaDamageAt,skip,placeholder type Vec3_0049a0c0: left for the type-naming issues
 ApplyProjectileHitPacket,mismatch,pointer/int cast: definition's type is likely wrong
 ApplyWeaponFirePacket,mismatch,pointer/int cast: definition's type is likely wrong
 AssignQuickKey,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
@@ -28,7 +27,6 @@ BlitLayers,mismatch,placeholder type Rect_004b6720: left for the type-naming iss
 BlitMenuLayers,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BlitSideLogoToRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BroadcastPacket,mismatch,fixing it changes the generated code of a caller
-BroadcastWeaponFire,skip,placeholder type Vec3_00499ba0: left for the type-naming issues
 BuildBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
 BuildGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
 CalcAimAngles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -59,7 +57,6 @@ DamageUnit,mismatch,"static risk rule: a convention, parameter count, or non-poi
 DecodePcx,skip,placeholder type PCX_004caa40: left for the type-naming issues
 DecrementCountArgument,skip,placeholder type Count_00458d20: left for the type-naming issues
 DeleteOrder,mismatch,pointer/int cast: definition's type is likely wrong
-DestroyLine,skip,placeholder type Elem_00434360: left for the type-naming issues
 DrawButton,mismatch,fixing it changes the generated code of a caller
 DrawExplosions,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawFogOfWar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -126,7 +123,6 @@ FindLeftmost,skip,placeholder type Node_004dd1b0: left for the type-naming issue
 FindMissionUnit,mismatch,placeholder type Struct_00487af0: left for the type-naming issues
 FindNextSelectedUnit,mismatch,pointer/int cast: definition's type is likely wrong
 FindOrderByType,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-FindRemoteProjectile,skip,placeholder type Event_0049d1e0: left for the type-naming issues
 FindTargetableProjectile,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FindUnitType,mismatch,placeholder type UnitType_00488b10: left for the type-naming issues
 FindWeaponTarget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -137,7 +133,6 @@ FireLineOfSightProjectile,mismatch,placeholder type Fire_0049c9c0: left for the 
 FireLineOfSightWeapon,mismatch,placeholder type Aim_0049d9c0: left for the type-naming issues
 FireVLaunchProjectile,mismatch,fixing it changes the generated code of a caller
 FireVLaunchWeapon,mismatch,placeholder type Object_0049db70: left for the type-naming issues
-FireWeaponByFlags,skip,placeholder type Object_0049d0c0: left for the type-naming issues
 FlipScreen,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FontHeight,mismatch,pointer/int cast: definition's type is likely wrong
 FormatNetStats,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -260,12 +255,10 @@ ReleasePacketData,mismatch,placeholder type Class_00451fd0: left for the type-na
 RelocateObject,skip,placeholder type Object_004cb2f0: left for the type-naming issues
 RemapPaletteToClosestIndices,mismatch,placeholder type Palette_004aa8f0: left for the type-naming issues
 RemoveSpeechOfUnit,mismatch,pointer/int cast: definition's type is likely wrong
-RemoveUnitProjectiles,mismatch,placeholder type Unit_0049c880: left for the type-naming issues
 ReportGameChat,mismatch,pointer/int cast: definition's type is likely wrong
 ResetClipRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ResolveCursorModeForSelection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 RestoreSurfaces,skip,placeholder type Arg_004c6210: left for the type-naming issues
-RockUnit,skip,placeholder type Object_00499c10: left for the type-naming issues
 RotateAboutX,skip,placeholder type Vec3_004b6cc0: left for the type-naming issues
 RotateAboutY,skip,placeholder type Vec3_004b6cc0: left for the type-naming issues
 RotateAboutZ,skip,placeholder type Vec3_004b6cc0: left for the type-naming issues
@@ -281,7 +274,6 @@ SendChatMessage,mismatch,"static risk rule: a convention, parameter count, or no
 SendPlayerEconomy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SendScriptCall,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SendScriptCallByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SendWeaponFirePacket,skip,placeholder type Obj_00499ab0: left for the type-naming issues
 SerializeSave,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetAlliance,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetBackgroundSurface,mismatch,pointer/int cast: definition's type is likely wrong
@@ -324,7 +316,6 @@ SolveLaunchAngle,mismatch,"static risk rule: a convention, parameter count, or n
 SortDisplayModes,mismatch,placeholder type ModeList_0045e4c0: left for the type-naming issues
 SortPrimitives,skip,placeholder type Object_004cb2f0: left for the type-naming issues
 SortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SpawnProjectileFromUnitMotion,skip,placeholder type Shot_0049d000: left for the type-naming issues
 StartBuildingScript,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 StepGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming issues
 SubtractVec3,mismatch,fixing it changes the generated code of a caller
@@ -345,8 +336,7 @@ UpdatePlayerEconomy,mismatch,"static risk rule: a convention, parameter count, o
 UpdateTimeoutDialog,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 VectorFromTo,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 VectorFromToInt,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-VectorLength,mismatch,placeholder type Vec3i_0049a850: left for the type-naming issues
-VisitObjectsInRect,skip,placeholder type Visitor_0047e750: left for the type-naming issues
+VectorLength,mismatch,"weapons.cpp declares it with Vec3* and defines it with VectorLengthArg*, which has Vec3's layout, but joining the two changes the exe"
 WalkFrameChain,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WalkStack,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WeaponCanReachPos,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

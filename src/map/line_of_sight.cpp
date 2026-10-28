@@ -110,7 +110,7 @@ union Slot {
 
 class Mission;
 
-struct Flags_004848e0 {
+struct GraphicsOptionFlagsView {
     unsigned short damagebars : 1;
     unsigned short antiAlias : 1;
     unsigned short shadows : 1;
@@ -180,14 +180,14 @@ static inline void ClearFeature(Cell* c)
         c->feature = 0xfffd;
 }
 
-inline int LodRaw_00481930(SightQuery* params)
+inline int SightTilesRaw(SightQuery* params)
 {
     return params->sightDistance / 32;
 }
 
-inline int Lod_00481930(SightQuery* params)
+inline int SightTilesClamped(SightQuery* params)
 {
-    int v = LodRaw_00481930(params);
+    int v = SightTilesRaw(params);
     return v < 0 ? 0 : v;
 }
 
@@ -1149,13 +1149,13 @@ void __stdcall DrawFogOfWar(void* surface)
                 if (cell->level1 != 0) {
                     if (cell->level1 != 0xf) {
                         void* bmp = GetGafFrame(g_game->gray[(i + j + q) & 3], cell->level1 - 1);
-                        if ((*(Flags_004848e0*)&g_game->flags_37f06).ditheredFog) {
+                        if ((*(GraphicsOptionFlagsView*)&g_game->flags_37f06).ditheredFog) {
                             EraseFrameDithered((Surface *)surface, (GafFrame *)bmp, r.left, r.top, parity);
                         } else {
                             DrawFrameGray((Surface *)surface, (GafFrame *)bmp, r.left, r.top);
                         }
                     } else {
-                        if ((*(Flags_004848e0*)&g_game->flags_37f06).ditheredFog) {
+                        if ((*(GraphicsOptionFlagsView*)&g_game->flags_37f06).ditheredFog) {
                             DitherRectangle((Surface *)surface, &r, parity);
                         } else {
                             GrayRectangle((Surface *)surface, &r);

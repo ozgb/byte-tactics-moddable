@@ -2,12 +2,12 @@
 
 #include "map_cache_entry.h"
 
-typedef std::vector<MapCacheEntry> Vec_00437580;
-typedef void (Vec_00437580::*InsertFn_00437580)(
-    Vec_00437580::iterator, Vec_00437580::size_type, const MapCacheEntry&);
+typedef std::vector<MapCacheEntry> MapCacheEntryVectorInsert;
+typedef void (MapCacheEntryVectorInsert::*MapCacheEntryVectorInsertFn)(
+    MapCacheEntryVectorInsert::iterator, MapCacheEntryVectorInsert::size_type, const MapCacheEntry&);
 
 // FUNCTION: 0x437580 ?insert@?$vector@VMapCacheEntry@@V?$allocator@VMapCacheEntry@@@std@@@std@@QAEXPAVMapCacheEntry@@IABV3@@Z
-InsertFn_00437580 g_insert_00437580 = &Vec_00437580::insert;
+MapCacheEntryVectorInsertFn g_insert_00437580 = &MapCacheEntryVectorInsert::insert;
 
 #pragma auto_inline(off)
 // FUNCTION: 0x437800

@@ -40,7 +40,6 @@ struct Rot16;
 struct TntInfo;
 struct GroundHeightPos;
 struct SweetSpotObjectView;
-struct Vec3_0049a0c0;
 struct Vec;
 struct UnitDef;
 struct WeaponDef;
@@ -70,7 +69,6 @@ int __stdcall WeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags);
 #include "../weapons/weapon_types.h"
 #include "../weapons/explosions.h"
 void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra);
-void __stdcall RemoveUnitProjectiles(Unit* unit);
 #include "../units/unit_scripts.h"
 Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 #include "../ingame/info_panel.h"
@@ -90,7 +88,6 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetGroundHeight(GroundHeightPos* p);
 void __stdcall GetSweetSpot(SweetSpotObjectView* obj, int out);
-void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
 
@@ -273,7 +270,7 @@ static int __stdcall GetCellMeanHeightNative(Vec3* pos)
 
 static void __stdcall ApplyAreaDamageAtNative(WeaponDef* weapon, Vec3* pos)
 {
-    ApplyAreaDamageAt(weapon, (Vec3_0049a0c0*)pos);
+    ApplyAreaDamageAt(weapon, (Vec3*)pos);
 }
 
 static WeaponDef* __stdcall FindWeaponByNameNative(char* name)

@@ -53,11 +53,11 @@ features,LoadFeatureType,LoadObject3d,TODO(#504): engine service
 features,PlaceFeature,CreateObjectState,TODO(#505): sim-to-presentation event
 features,PlaceFeature,EmitTimedSubParticles,TODO(#505): sim-to-presentation event
 features,StartFeatureBurning,GetLocalDpid,TODO(#506): sim sends a packet
-features,UAnimEntry_00421f20::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-features,UFeatureUnit_00421f20::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+features,UFeatureAnimEntry::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+features,UFeaturePseudoUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,??4?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-los_radar,??4?$vector@V?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@V?$allocator@V?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@@2@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
+los_radar,??4?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
+los_radar,??4?$vector@V?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@V?$allocator@V?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@@2@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,DownsampleFrame,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,DrawPixel,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,FreeSurface,TODO(#505): sim-to-presentation event
@@ -87,7 +87,7 @@ los_radar,ResizeRadarPicture,SurfaceFromFrame,TODO(#505): sim-to-presentation ev
 los_radar,ToggleShareLos,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 los_radar,UCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UClass_0047cb00::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,UEntry_00432cf0::?$allocator::construct,StringRef::StringRef,TODO(#505): sim-to-presentation event
+los_radar,UDamageTableEntry::?$allocator::construct,StringRef::StringRef,TODO(#505): sim-to-presentation event
 los_radar,UFogCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UPlayerInfo::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UScreenPos::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -134,7 +134,7 @@ map,UClass_0047cb00::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,UMissionFeature::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,UMissionRule::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,UMissionUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,UNode_0047cb00::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+map,USpatialBucketNode::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,VMapCacheEntry::?$vector::insert,StringRef::Assign,TODO(#504): engine service
 map,VMapCacheEntry::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
@@ -296,8 +296,8 @@ targeting,VPlayerAI::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VSquadTimer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VUnitRef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,??4?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-units,??4?$vector@V?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@V?$allocator@V?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@@2@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
+units,??4?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
+units,??4?$vector@V?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@V?$allocator@V?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@@2@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 units,??__Fs_unitCategories@@YAXXZ,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 units,AddDownloadBuildOptions,ProtectBlockReadOnly,TODO(#504): engine service
 units,AddDownloadBuildOptions,ProtectBlockReadWrite,TODO(#504): engine service
@@ -375,7 +375,7 @@ units,SendUnitStates,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
 units,SendUnitStates,BitWriter::SetByteAt,TODO(#506): sim sends a packet
 units,SendUnitStates,BitWriter::WriteBits,TODO(#506): sim sends a packet
 units,UCallback::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,UEntry_00432cf0::?$allocator::construct,StringRef::StringRef,TODO(#505): sim-to-presentation event
+units,UDamageTableEntry::?$allocator::construct,StringRef::StringRef,TODO(#505): sim-to-presentation event
 units,UObjectState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,UPiece::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -443,9 +443,9 @@ weapons,ParalyzeUnit,MissionType::MissionType,TODO(#508): constructor across a s
 weapons,SpawnProjectile,GetLocalDpid,TODO(#506): sim sends a packet
 weapons,StartExplodePiece,CMemoryCache::AllocHandle,TODO(#504): engine service
 weapons,UCallback::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UEntry_00432cf0::?$vector::insert,StringRef::Assign,TODO(#504): engine service
-weapons,UEntry_00432cf0::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-weapons,UEntry_00432cf0::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
+weapons,UDamageTableEntry::?$vector::insert,StringRef::Assign,TODO(#504): engine service
+weapons,UDamageTableEntry::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
+weapons,UDamageTableEntry::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
 weapons,UObjectState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UPiece::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UPieceRec::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service

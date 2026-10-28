@@ -10,7 +10,7 @@
 #include "../../interfaces/ref.h"
 #include "../graphics/memory_cache.h"
 #include "../map/los_tables.h"
-#include "../map/vector_00438480.h"
+#include "../map/msvc_vector.h"
 #include "../network/packet_manager.h"
 #include "../quirks/quirks.h"
 #include "../units/movement_class.h"
@@ -47,7 +47,7 @@ struct SimGlobals {
     Point16 g_meteorTarget;
     int g_meteorScheduleGap;
     unsigned char DAT_0051233c[4];
-    Vector_00438480<int> g_missionOrderTableVec;
+    MsvcVector<int> g_missionOrderTableVec;
     unsigned char DAT_00512350[8];
     MovementClassTable g_movementClasses;
     unsigned char DAT_00512758[8];

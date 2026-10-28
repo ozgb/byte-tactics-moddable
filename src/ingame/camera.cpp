@@ -1,12 +1,7 @@
 #include "../../interfaces/ref.h"
+#include "../gui/mouse_event.h"
 
 #pragma pack(push, 1)
-struct Rect_0041d0f0 {
-    int x;
-    int y;
-    int unknown_8[4];
-};
-
 struct StartPositionEntry {
     int type;
     int id;
@@ -43,7 +38,7 @@ static inline void SetPos(int x, int y)
 // FUNCTION: 0x41d0f0
 void CenterCameraOnRadarClick()
 {
-    Rect_0041d0f0 r = (*(Rect_0041d0f0*)&g_game->view);
+    MouseEvent r = (*(MouseEvent*)&g_game->view);
     int y = g_game->mapHeight * (r.y - g_game->posY) / g_game->screen_h - g_game->viewHeight / 2;
     int x = g_game->mapWidth * (r.x - g_game->posX) / g_game->width_142eb - g_game->viewWidth / 2;
     g_game->scrollX = x;

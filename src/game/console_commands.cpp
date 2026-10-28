@@ -130,11 +130,6 @@ public:
     virtual void Method_28(int ctx);
 };
 
-struct Point_00417f60 {
-    int x;
-    int y;
-};
-
 #include "../graphics/rect.h"
 #include "../state/sim_globals.h"
 
@@ -190,9 +185,9 @@ void __stdcall SetFont(int font);
 #include "../graphics/draw.h"
 void __stdcall SetTextColors(int color, int background);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
-void __stdcall FillPolygon(void* surface, Point_00417f60* points, int count, int color);
+void __stdcall FillPolygon(void* surface, Point* points, int count, int color);
 void __stdcall FillRectangle(void* surface, Rect* rect, int color);
-void __stdcall DrawCellContours(void* surface, Point_00417f60* corners, unsigned char* heights);
+void __stdcall DrawCellContours(void* surface, Point* corners, unsigned char* heights);
 Unit* __stdcall FindNextSelectedUnit(int, int);
 
 // FUNCTION: 0x416240
@@ -1040,12 +1035,12 @@ void __stdcall DrawSelectedGoal(int ctx, GoalDrawInterface*** unit)
 }
 
 // FUNCTION: 0x417f60
-void __stdcall DrawTriangleContours(void* surface, Point_00417f60 p1, int z1,
-                            Point_00417f60 p2, int z2,
-                            Point_00417f60 p3, int z3)
+void __stdcall DrawTriangleContours(void* surface, Point p1, int z1,
+                            Point p2, int z2,
+                            Point p3, int z3)
 {
     int tz;
-    Point_00417f60 tp;
+    Point tp;
     if (z2 > z3) {
         tz = z2; z2 = z3; z3 = tz;
         tp = p2; p2 = p3; p3 = tp;
@@ -1095,9 +1090,9 @@ void __stdcall DrawTriangleContours(void* surface, Point_00417f60 p1, int z1,
 }
 
 // FUNCTION: 0x4181d0
-void __stdcall DrawCellContours(void* surface, Point_00417f60* corners, unsigned char* heights)
+void __stdcall DrawCellContours(void* surface, Point* corners, unsigned char* heights)
 {
-    Point_00417f60 mid;
+    Point mid;
     mid.x = (corners[0].x + corners[1].x + corners[2].x + corners[3].x + 2) / 4;
     mid.y = (corners[0].y + corners[1].y + corners[2].y + corners[3].y + 2) / 4;
     int midHeight = (heights[0] + heights[1] + heights[2] + heights[3]) * 64;
@@ -1134,7 +1129,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
     unsigned char arrowColor;
     for (int y = firstY; y < lastY; ++y) {
         int offscreen = 1;
-        Point_00417f60 p[4];
+        Point p[4];
         unsigned char heights[4];
         for (int x = firstX; x < lastX; ++x) {
             Tile* tile = &((Tile*)g_game->cells.get())[y * g_game->width + x];

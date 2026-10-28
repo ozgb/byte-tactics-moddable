@@ -49,15 +49,11 @@ struct SkirmishSlotTeam {
     char unknown_15[0x18 - 0x15];
 };
 
-struct PlayerName_00496ee0 {
-    char name[0x232];
-};
-
 #include "../map/mission.h"
 #include "../util/vec3.h"
 #include "../../interfaces/seams.h"
 
-union Fixed_00496ee0 {
+union CreateUnitFixed {
     int i;
     struct {
         short frac;
@@ -65,10 +61,10 @@ union Fixed_00496ee0 {
     } h;
 };
 
-struct FixedPos_00496ee0 {
-    Fixed_00496ee0 x;
-    Fixed_00496ee0 y;
-    Fixed_00496ee0 z;
+struct CreateUnitPos {
+    CreateUnitFixed x;
+    CreateUnitFixed y;
+    CreateUnitFixed z;
 };
 
 #include "../network/player.h"
@@ -101,7 +97,7 @@ void HideSoftwareCursor();
 void __stdcall BlitMenuLayers(Gui* sub, unsigned int* dest, int* clip);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 #include "../network/net_game.h"
-void __stdcall CreateUnit(int team, unsigned short id, FixedPos_00496ee0 pos, int a, int b,
+void __stdcall CreateUnit(int team, unsigned short id, CreateUnitPos pos, int a, int b,
     int c);
 
 static inline void Charge(int bucket)
@@ -337,10 +333,10 @@ void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
     p->energyStorageBonus = (float)(w >= 200 ? w : 200);
     p->metalStorageBonus = (float)(v >= 200 ? v : 200);
 
-    FixedPos_00496ee0 pos;
+    CreateUnitPos pos;
     if (g_seams.map->GetStartPosition(g_game->net, 0, (Vec3*)&pos, startpos)) {
         unsigned short id = g_seams.units->FindUnitTypeId(
-            (*(PlayerName_00496ee0(*)[8])&g_game->names_37f5f)[g_game->players[team].info->side].name);
+            (*(SideNameEntry(*)[8])&g_game->names_37f5f)[g_game->players[team].info->side].name);
         g_seams.units->CreateUnit(team, id, *(Vec3*)&pos, 1, 1, 0);
     } else {
         char buf[128];

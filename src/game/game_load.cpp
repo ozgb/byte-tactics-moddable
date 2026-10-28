@@ -15,7 +15,7 @@
 
 #include "game.h"
 
-union Fixed_497180 {
+union CreateUnitFixed {
     int i;
     struct {
         short frac;
@@ -23,10 +23,10 @@ union Fixed_497180 {
     } h;
 };
 
-struct FixedPos_497180 {
-    Fixed_497180 x;
-    Fixed_497180 y;
-    Fixed_497180 z;
+struct CreateUnitPos {
+    CreateUnitFixed x;
+    CreateUnitFixed y;
+    CreateUnitFixed z;
 };
 
 struct PlayerRecordFlags {
@@ -83,13 +83,8 @@ struct LoadingPlayerRecord {
     PlayerRecordFlags flags_149;
 };
 
-typedef LoadingPlayerRecord PlayerInfo_00497f40;
-typedef LoadingPlayerRecord PlayerRec_00497ce0;
-
-struct Point_00498cd0 {
-    int x;
-    int y;
-};
+typedef LoadingPlayerRecord LoadingPlayerInfo;
+typedef LoadingPlayerRecord LoadingPlayerEntry;
 
 struct WorldViewOrigin {
     char unknown_0[0x2c];
@@ -97,21 +92,10 @@ struct WorldViewOrigin {
     int y;
 };
 
-struct Fixed_00498d00 {
-    unsigned short frac;
-    short whole;
-};
-
 struct MinimapWorldPos {
-    Fixed_00498d00 x;
-    Fixed_00498d00 y;
-    Fixed_00498d00 z;
-};
-
-struct Rect_00498d00 {
-    int x;
-    int y;
-    int unknown_8[4];
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 struct CursorWorldPos {
@@ -121,29 +105,9 @@ struct CursorWorldPos {
 };
 
 #include "../graphics/rect.h"
+#include "../gui/mouse_event.h"
 
-struct Point_00498da0 {
-    short x;
-    short y;
-};
-
-struct BitFlags_00498da0 {
-    unsigned char b0:1;
-    unsigned char b1:1;
-    unsigned char b2:1;
-    unsigned char b3:1;
-    unsigned char b4:1;
-    unsigned char b5:1;
-    unsigned char b6:1;
-    unsigned char b7:1;
-};
-
-union Flags_00498da0 {
-    unsigned char value;
-    BitFlags_00498da0 bits;
-};
-
-struct View_00498da0 {
+struct CursorMoveEvent {
     int x;
     int y;
     char unknown_8[0x18 - 0x8];
@@ -201,7 +165,7 @@ unsigned char __stdcall FindHostSlot();
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "../network/unit_sync.h"
 #include "main_loop.h"
-void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedPos_497180 pos, int a,
+void __stdcall CreateUnit(unsigned char team, unsigned short id, CreateUnitPos pos, int a,
     int b, int c);
 LoadedGuiLayer* __stdcall LoadGuiLayer(LoadGuiLayerParent* sub, const char* name, int flags);
 #include "../ingame/game_dialogs.h"
@@ -261,8 +225,8 @@ inline void __stdcall ApplyMissionOptionFlags(MissionOptionFlags* s)
 void __cdecl LoadMatch(void*)
 {
     unsigned long long perfCount;
-    FixedPos_497180 pos;
-    FixedPos_497180 start;
+    CreateUnitPos pos;
+    CreateUnitPos start;
     int order[10];
 
     perfCount = host_time_counter();
@@ -528,7 +492,7 @@ void __stdcall DrawSyncStatus(void* surface)
         int countA = 0;
         int countB = 0;
         for (int i = 0; i < 10; i++) {
-            PlayerRec_00497ce0* p = &(*(LoadingPlayerRecord(*)[10])&g_game->players)[i];
+            LoadingPlayerEntry* p = &(*(LoadingPlayerRecord(*)[10])&g_game->players)[i];
             if (p->present && (p->team == 1 || p->team == 2 || p->team == 3) && p->kind != 10)
                 countA++;
             if (p->present && (p->team == 1 || p->team == 2 || p->team == 3) && p->kind != 10 &&
@@ -544,9 +508,9 @@ void __stdcall DrawSyncStatus(void* surface)
         r.bottom = 435;
         off = 0;
         x = 11;
-        for (; off < 10 * (int)sizeof(PlayerRec_00497ce0); off += sizeof(PlayerRec_00497ce0)) {
+        for (; off < 10 * (int)sizeof(LoadingPlayerEntry); off += sizeof(LoadingPlayerEntry)) {
             Game* game = g_game;
-            PlayerRec_00497ce0* q = (PlayerRec_00497ce0*)PlayerRecordAt(game, off);
+            LoadingPlayerEntry* q = (LoadingPlayerEntry*)PlayerRecordAt(game, off);
             if (!(q->present && (q->team == 1 || q->team == 2 || q->team == 3) && q->kind != 10))
                 continue;
             {
@@ -606,7 +570,7 @@ void LoadingScreenFrame(void)
     int textWidth;
     unsigned int stamp;
     int rect[4];
-    PlayerInfo_00497f40* pi;
+    LoadingPlayerInfo* pi;
     char namebuf[100];
 
     if (!(*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.started) {
@@ -784,7 +748,7 @@ void LoadingScreenFrame(void)
     host_sleep_ms(200);
 }
 // FUNCTION: 0x498cd0
-void __stdcall OffsetWorldPosFromView(Point_00498cd0* p, WorldViewOrigin* view, int param_3)
+void __stdcall OffsetWorldPosFromView(Point* p, WorldViewOrigin* view, int param_3)
 {
     g_seams.los_radar->ClampWorldPosToTerrain((view->x - 0x80) + p->x, (view->y - 0x20) + p->y, (Vec3*)param_3);
 }
@@ -792,7 +756,7 @@ void __stdcall OffsetWorldPosFromView(Point_00498cd0* p, WorldViewOrigin* view, 
 // FUNCTION: 0x498d00
 void __stdcall MinimapCursorToWorldPos(MinimapWorldPos* out)
 {
-    Rect_00498d00 r = (*(struct Rect_00498d00*)&g_game->view);
+    MouseEvent r = (*(struct MouseEvent*)&g_game->view);
     int dx = r.x - g_game->posX;
     int dy = r.y - g_game->posY;
     memset(out, 0, sizeof(MinimapWorldPos));
@@ -805,31 +769,31 @@ void __stdcall MinimapCursorToWorldPos(MinimapWorldPos* out)
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 // FUNCTION: 0x498da0
-void __stdcall UpdateCursorWorldPos(View_00498da0* r)
+void __stdcall UpdateCursorWorldPos(CursorMoveEvent* r)
 {
     int mx, my;
 
-    if (PointInRect(&g_game->viewLimit, r->x, r->y) && !((*(union Flags_00498da0*)&g_game->inputFlags_2cc6).value & 8)) {
+    if (PointInRect(&g_game->viewLimit, r->x, r->y) && !((*(union CursorInputFlags*)&g_game->inputFlags_2cc6).value & 8)) {
         mx = (r->x - g_game->posX) * g_game->mapWidth / g_game->width_142eb;
         my = (r->y - g_game->posY) * g_game->mapHeight / g_game->screen_h;
-        (*(union Flags_00498da0*)&g_game->inputFlags_2cc6).value |= 1;
-        (*(union Flags_00498da0*)&g_game->inputFlags_2cc6).value &= ~2;
+        (*(union CursorInputFlags*)&g_game->inputFlags_2cc6).value |= 1;
+        (*(union CursorInputFlags*)&g_game->inputFlags_2cc6).value &= ~2;
     } else {
         Rect* lim = &g_game->rect;
         mx = g_game->scrollX + MIN(MAX(r->x, lim->left), lim->right) - lim->left;
         my = g_game->scrollY + MIN(MAX(r->y, lim->top), lim->bottom) - lim->top;
-        (*(union Flags_00498da0*)&g_game->inputFlags_2cc6).value &= ~1;
-        (*(union Flags_00498da0*)&g_game->inputFlags_2cc6).bits.b1 = PointInRect(lim, r->x, r->y);
+        (*(union CursorInputFlags*)&g_game->inputFlags_2cc6).value &= ~1;
+        (*(union CursorInputFlags*)&g_game->inputFlags_2cc6).bits.b1 = PointInRect(lim, r->x, r->y);
     }
-    (*(union Flags_00498da0*)&g_game->inputFlags_2cc6).bits.b2 = (*(union Flags_00498da0*)&g_game->inputFlags_2cc6).bits.b0 || (*(union Flags_00498da0*)&g_game->inputFlags_2cc6).bits.b1;
+    (*(union CursorInputFlags*)&g_game->inputFlags_2cc6).bits.b2 = (*(union CursorInputFlags*)&g_game->inputFlags_2cc6).bits.b0 || (*(union CursorInputFlags*)&g_game->inputFlags_2cc6).bits.b1;
     g_seams.los_radar->ClampWorldPosToTerrain(mx, my, (Vec3*)&(*(struct CursorWorldPos*)&g_game->pos));
     {
         CursorWorldPos* p = &(*(struct CursorWorldPos*)&g_game->pos);
-        Point_00498da0 pt;
+        Point16 pt;
         CursorWorldPos v = *p;
         pt.x = (short)(v.x >> 20);
         pt.y = (short)(v.z >> 20);
-        (*(struct Point_00498da0*)&g_game->point) = pt;
+        (*(struct Point16*)&g_game->point) = pt;
     }
-    g_game->cellFeature = g_seams.features->GetCellFeature(g_seams.los_radar->GetMapCell((*(struct Point_00498da0*)&g_game->point).x, (*(struct Point_00498da0*)&g_game->point).y));
+    g_game->cellFeature = g_seams.features->GetCellFeature(g_seams.los_radar->GetMapCell((*(struct Point16*)&g_game->point).x, (*(struct Point16*)&g_game->point).y));
 }

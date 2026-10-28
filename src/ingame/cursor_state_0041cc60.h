@@ -6,10 +6,10 @@
 
 #pragma pack(push, 1)
 struct GameCursorState {
-    Arg_00419670 rect;
+    ViewMouseEvent rect;
     int flag;
-    Point_0041cd50 center;
-    Point_0041cd50 savedScroll;
+    CursorPoint center;
+    CursorPoint savedScroll;
 };
 #pragma pack(pop)
 

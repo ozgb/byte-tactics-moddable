@@ -367,7 +367,7 @@ struct Game {
             char pad_2c50[36];
             unsigned char lockFlags;
             char pad_2c75[1];
-            Arg_00419670 view;
+            ViewMouseEvent view;
             short x;
             short y;
             int boxStartX;

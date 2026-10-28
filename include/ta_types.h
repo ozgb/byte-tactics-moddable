@@ -57,7 +57,7 @@ struct App_004bed70;
 struct App_004c0b10;
 struct App_004c25e0;
 struct Arena_004da9f0;
-struct Arg_00419670;
+struct ViewMouseEvent;
 struct Arg_004c6210;
 struct Args_00451640;
 struct Arr_00421550;
@@ -1135,7 +1135,7 @@ union Fixed_0049abb0;
 union Fixed_2;
 union Fixed_3;
 union Fixed_4;
-union Fixed_497180;
+union CreateUnitFixed;
 union Fixed_5;
 class Fixed_6;
 struct FlagBits_00457d30;
@@ -1718,12 +1718,12 @@ struct Player_48efb0;
 struct Point16;
 struct Point16_00437de0;
 struct PointInit_0043a1f0;
-struct Point_00417f60;
-struct Point_0041cd50;
+struct Point;
+struct CursorPoint;
 struct Point_0046ba80;
 struct Point_0048c6a0;
 struct Point_004948e0;
-struct Point_00498cd0;
+struct Point;
 struct HandleHotspotInputPoint;
 struct Point_004bf060;
 struct Point_004bf260;
@@ -10676,7 +10676,7 @@ struct Class_004a6a40 {
     int unknown_28;
     Src_004ab400* src_2c;
     Handle ref;
-    Arg_00419670 point;
+    ViewMouseEvent point;
     int field_54;
     char unknown_58[4];
     Flags_004ab440 flags_5c;
@@ -12073,19 +12073,19 @@ struct Input_004c2cc0 {
 struct Queue_4c2d60 {
     char unknown_0[390];
     int capacity;
-    Arg_00419670* entries;
+    ViewMouseEvent* entries;
     int head;
     int tail;
-    Arg_00419670 empty;
+    ViewMouseEvent empty;
 };
 
 struct Queue_4c2de0 {
     char unknown_0[390];
     int capacity;
-    Arg_00419670* entries;
+    ViewMouseEvent* entries;
     int head;
     int tail;
-    Arg_00419670 empty;
+    ViewMouseEvent empty;
 };
 
 struct Queue_4c2e30 {

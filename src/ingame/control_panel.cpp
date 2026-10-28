@@ -184,7 +184,7 @@ int __stdcall MenuEntryNameContains(Gadget* entries, char* text, int index)
 }
 
 // FUNCTION: 0x419670
-void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
+void __stdcall IssueMobileBuildOrders(ViewMouseEvent* arg)
 {
     unsigned int remove = (arg->keyFlags >> 2) & 1;
     unsigned short index = g_game->buildTypeIndex;

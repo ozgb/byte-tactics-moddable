@@ -206,10 +206,7 @@ static inline Vec3_0040beb0 operator-(const Vec3_0040beb0& p, const Vec3_0040beb
     return r;
 }
 
-struct Class_004800c0 {
-public:
-    void EraseSwapBack(Unit**);
-};
+#include "../units/squad.h"
 
 #pragma pack(pop)
 

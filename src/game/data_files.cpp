@@ -3,13 +3,9 @@
 
 #include "../util/tdf.h"
 
-struct AnimFileEntry {
-    char name[0x40];
-    void* gaf;
-};
-
 #pragma pack(push, 1)
 #include "game.h"
+#include "anim_file_entry.h"
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
@@ -249,7 +245,7 @@ void* __stdcall LoadAnimGaf(char* name)
     if (gaf == 0) {
         FatalError(path);
     }
-    g_game->entries_147af = (AnimEntry_00429700*)((AnimFileEntry*)GameReallocTagged(((AnimFileEntry*)g_game->entries_147af), "Animation Files",
+    g_game->entries_147af = (AnimFileEntry*)((AnimFileEntry*)GameReallocTagged(((AnimFileEntry*)g_game->entries_147af), "Animation Files",
                                              (g_game->count_147ab + 1) * 0x44));
     strcpy(((AnimFileEntry*)g_game->entries_147af)[g_game->count_147ab].name, name);
     ((AnimFileEntry*)g_game->entries_147af)[g_game->count_147ab].gaf = gaf;
@@ -399,7 +395,7 @@ void FreeAnimFiles()
     }
     GameFreeThunk(((AnimFileEntry*)g_game->entries_147af));
     g_game->count_147ab = 0;
-    g_game->entries_147af = (AnimEntry_00429700*)(0);
+    g_game->entries_147af = (AnimFileEntry*)(0);
     for (i = 0; i < g_game->sides; i++) {
         g_game->panelTop[i] = 0;
     }

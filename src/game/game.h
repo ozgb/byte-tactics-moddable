@@ -63,7 +63,7 @@
 #include "view_flags.h"
 #include "chat_recipients.h"
 
-struct AnimEntry_00429700;
+struct AnimFileEntry;
 struct BuildMenuPage;
 struct Cell;
 struct ChatPacket;
@@ -651,7 +651,7 @@ struct Game {
     };
     int baseHeight;
     int count_147ab;
-    AnimEntry_00429700* entries_147af;
+    AnimFileEntry* entries_147af;
     char pad_147b3[8];
     void* gaf_147bb;
     void* gaf_147bf;

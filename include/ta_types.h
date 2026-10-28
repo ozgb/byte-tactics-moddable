@@ -42,7 +42,6 @@ class Alloc_004e2b60;
 struct Amount;
 struct Angles_0049be60;
 struct FeatureAnimEntry;
-struct AnimEntry_00429700;
 struct FeatureAnimPool;
 struct AnimPair_00423550;
 struct LogoAnimSeq;
@@ -4081,10 +4080,7 @@ struct Bitmap_00437b50 {
     unsigned short Pitch(void);
 };
 
-struct AnimEntry_00429700 {
-    char name[64];
-    void* gaf;
-};
+#include "../src/game/anim_file_entry.h"
 
 class Class_004c3240 {
 public:

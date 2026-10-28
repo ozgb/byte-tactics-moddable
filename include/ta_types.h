@@ -334,7 +334,7 @@ class Class_00459200;
 struct Class_0045a470;
 class Class_0045a510;
 class Class_0045a610;
-struct Class_0045ae80;
+struct Object3doView;
 class Class_00460f40;
 class Class_00460f60_3;
 struct Class_004615f0;
@@ -476,7 +476,7 @@ class Class_0047c2f0;
 class Class_0047c330;
 class Class_0047c3a0;
 class Class_0047c6c0;
-struct Class_0047cb00;
+struct SpatialBucketView;
 struct Class_0047cb40;
 class ClaimFootprintVisitor;
 class Class_0047f960;
@@ -616,7 +616,7 @@ class Class_004b07a0;
 class Class_004b0830;
 class Class_004b08c0;
 class Class_004b0a10;
-class Class_004b0a70;
+class CobScriptView;
 class Class_004b0b00;
 class ScriptCallback;
 class Class_004b0c40;
@@ -6219,7 +6219,7 @@ public:
     void DrawShadowShape(SpotBitmap*, SpotState*);
 };
 
-struct Class_0045ae80 {
+struct Object3doView {
     int unknown_0;
     int unknown_4;
     int unknown_8;
@@ -6231,12 +6231,12 @@ struct Class_0045ae80 {
     int unknown_20;
     void* points;
     int unknown_28;
-    Class_0045ae80* unknown_2c;
-    Class_0045ae80* unknown_30;
+    Object3doView* unknown_2c;
+    Object3doView* unknown_30;
 };
 
 struct Entry_0045a950 {
-    Class_0045ae80* object;
+    Object3doView* object;
     char unknown_4[30];
     void* points;
     short unknown_26;
@@ -8479,12 +8479,12 @@ public:
     void PlayFrame(void*);
 };
 
-struct Class_0047cb00 {
+struct SpatialBucketView {
     unsigned char a;
     unsigned char b;
     int flags;
     Unit* head;
-    Class_0047cb00(void);
+    SpatialBucketView(void);
     void UnlinkUnit(Unit*);
 };
 
@@ -9290,7 +9290,7 @@ public:
     int unknown_0;
     Entry_004898b0 entries[5];
     char unknown_90[10];
-    Class_004b0a70* script;
+    CobScriptView* script;
     void ReleaseWeapons(unsigned char);
 };
 
@@ -9309,7 +9309,7 @@ public:
     int unknown_0;
     Entry_004898b0_2 entries[5];
     char unknown_90[10];
-    Class_004b0a70* script;
+    CobScriptView* script;
     void ClaimWeapons(unsigned char);
 };
 
@@ -10904,14 +10904,14 @@ struct CobChannelView {
     char unknown_24[128];
 };
 
-class Class_004b0a70 {
+class CobScriptView {
 public:
     int unknown_4;
     ScriptNameTableView* table;
     char unknown_c[16];
     CobChannelView channels[8];
     int activeCount;
-    virtual ~Class_004b0a70(void);
+    virtual ~CobScriptView(void);
     virtual void v00(void);
     virtual void v04(void);
     virtual void v08(void);

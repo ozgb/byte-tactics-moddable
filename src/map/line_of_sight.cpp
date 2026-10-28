@@ -412,7 +412,7 @@ void __stdcall InitUnitSightCircleReveal(SightQuery* params)
 void BuildDerivedLayers(void)
 {
     Rec* rec = new (kSim) Rec;
-    g_game->overflowBucket = (Class_0047cb00*)rec;
+    g_game->overflowBucket = (SpatialBucketView*)rec;
     ((Rec *)g_game->overflowBucket.get())->flags = 0x1f;
 
     Grid2* grid2 = &g_game->spatialGrid_1429f;

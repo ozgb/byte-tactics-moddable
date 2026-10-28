@@ -34,7 +34,7 @@ CommandArgs,no,5,src/ai/ai_player.cpp:16|src/game/console_commands.cpp:82|src/ga
 CommandEntry,no,2,include/ta_types.h:12965|src/util/commands.cpp:60,differs,src/util/commands.cpp
 Common_004ad350,no,2,include/ta_types.h:12163|src/gui/gui_file.cpp:64,differs,src/gui/gui_file.cpp
 ConsoleCommand,no,3,include/ta_types.h:12928|src/game/console_commands.cpp:155|src/util/commands.cpp:54,differs,src/game/console_commands.cpp
-Ctx_004720d0,no,2,include/ta_types.h:8615|src/graphics/particles.cpp:396,differs,src/graphics/particles.cpp
+Ctx_004720d0,no,2,include/ta_types.h:8615|src/graphics/particles.cpp:392,differs,src/graphics/particles.cpp
 Ctx_00499890,no,2,include/ta_types.h:7571|src/ingame/screenshots.cpp:11,differs,src/ingame/screenshots.cpp
 DamagedAllyCollector,no,3,include/ta_types.h:2515|src/map/terrain.cpp:90|src/orders/unit_orders.cpp:809,differs,src/orders/unit_orders.cpp
 Data,no,2,src/frontend/endgame.cpp:28|src/frontend/skirmish_menu.cpp:50,differs,src/frontend/endgame.cpp
@@ -178,7 +178,7 @@ Screen,no,2,src/game/players.cpp:53|src/graphics/surface.cpp:19,differs,src/grap
 Seg_00473b50,no,2,include/ta_types.h:8817|src/graphics/particles.cpp:144,differs,src/graphics/particles.cpp
 Serial_00441c30,no,2,include/ta_types.h:5519|src/frontend/multi.cpp:184,differs,src/frontend/multi.cpp
 Settings,no,2,include/ta_types.h:6505|src/network/settings.h:6,differs,src/network/settings.h
-Shape_00472ab0,no,2,include/ta_types.h:8625|src/graphics/particles.cpp:1573,differs,src/graphics/particles.cpp
+Shape_00472ab0,no,2,include/ta_types.h:8625|src/graphics/particles.cpp:1506,differs,src/graphics/particles.cpp
 ShareLosAckPacket,no,2,include/ta_types.h:6654|src/network/net_game.cpp:2871,differs,src/network/net_game.cpp
 Shot_0049cc20,no,2,include/ta_types.h:11302|src/weapons/weapons.cpp:1117,differs,src/weapons/weapons.cpp
 Shot_0049d000,no,2,include/ta_types.h:11318|src/weapons/weapons.cpp:1229,differs,src/weapons/weapons.cpp
@@ -187,7 +187,7 @@ Slot,no,2,include/ta_types.h:10048|src/map/line_of_sight.cpp:123,differs,src/map
 Slot_0042f740,no,2,include/ta_types.h:4483|src/sound/sound_types.cpp:16,identical,src/sound/sound_types.cpp
 Smk_0047bf70_b,no,2,include/ta_types.h:9287|src/graphics/movies.cpp:104,differs,src/graphics/movies.cpp
 SmokeParticle,no,2,include/ta_types.h:8932|src/graphics/smoke_particle.h:6,differs,src/graphics/smoke_particle.h
-SmokeParticles,no,2,include/ta_types.h:8406|src/graphics/particles.cpp:467,differs,src/graphics/particles.cpp
+SmokeParticles,no,2,include/ta_types.h:8406|src/graphics/particles.cpp:418,differs,src/graphics/particles.cpp
 Sound,no,8,include/ta_types.h:4527|src/frontend/campaign_menu.cpp:11|src/frontend/frontend.cpp:10|src/game/console_commands.cpp:96|src/game/game_state.cpp:214|src/game/main.cpp:81|src/sound/sound.cpp:8|src/sound/sound.h:13,differs,src/sound/sound.h
 Source_0046d630,no,2,include/ta_types.h:7969|src/network/unit_sync.cpp:268,differs,src/network/unit_sync.cpp
 Span,no,2,src/graphics/draw.cpp:16|src/harness/block_spans.h:4,differs,src/harness/block_spans.h
@@ -213,7 +213,7 @@ Target_0046d530,no,2,include/ta_types.h:7932|src/network/unit_sync.cpp:262,diffe
 TdfFieldVector,no,2,include/ta_types.h:13777|src/util/tdf.cpp:621,differs,src/util/tdf.cpp
 TeleportParticles,no,2,include/ta_types.h:8465|src/graphics/particles.cpp:268,differs,src/graphics/particles.cpp
 ThrustParticles,no,2,include/ta_types.h:8858|src/graphics/particles.cpp:304,differs,src/graphics/particles.cpp
-TimedSubParticle,no,2,include/ta_types.h:8991|src/graphics/particles.cpp:451,differs,src/graphics/particles.cpp
+TimedSubParticle,no,2,include/ta_types.h:8991|src/graphics/particles.cpp:402,differs,src/graphics/particles.cpp
 TimedSubParticles,no,2,include/ta_types.h:8583|src/graphics/timed_sub_particles.h:12,differs,src/graphics/timed_sub_particles.h
 Trail_004394e0,no,2,include/ta_types.h:5122|src/ingame/markers.cpp:327,differs,src/ingame/markers.cpp
 TranslationTable,no,2,include/ta_types.h:13770|src/util/tdf.cpp:643,differs,src/util/tdf.cpp

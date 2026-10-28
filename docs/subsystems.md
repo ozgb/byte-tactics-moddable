@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4427 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4422 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -31,7 +31,7 @@ The subsystems and the issue each maps to:
 | [network](#the-remaining-subsystems) | 331 | none yet |
 | [game](#the-remaining-subsystems) | 211 | none yet |
 | [harness](#the-remaining-subsystems) | 171 | none yet |
-| [presentation](#the-remaining-subsystems) | 1399 | none yet |
+| [presentation](#the-remaining-subsystems) | 1394 | none yet |
 | [platform](#the-remaining-subsystems) | 731 | none yet |
 | [seams](#the-remaining-subsystems) | 103 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
@@ -511,7 +511,7 @@ Coverage: 83.2% of functions (306 of 368), 79.4% of lines, 61.6% of branches; 62
 - `DeleteOrder` (1 from harness, 1 from presentation)
 - By calling subsystem (functions called): units 15, pathfinding 14, presentation 12, seams 8, game 4, ai 3, map 3, harness 2, platform 1, weapons 1
 
-**Imports.** 95 functions of 13 subsystems, by target, each with the number of functions it calls there:
+**Imports.** 94 functions of 13 subsystems, by target, each with the number of functions it calls there:
 
 - seams (26): `ClaimWeaponsNative`, `ReleaseWeaponsNative`, `SetStateBitsNative`, `SetWeaponTargetUnitNative`, and 22 more
 - units (13): `GetNanoPiecePosition`, `AttachUnitToPiece`, `AddBuildProgress`, `AddRepairProgress`, and 9 more
@@ -519,7 +519,7 @@ Coverage: 83.2% of functions (306 of 368), 79.4% of lines, 61.6% of branches; 62
 - network (10): `BitReader::ReadBits`, `BitWriter::WriteBits`, `SendScriptCallNoArgs`, `BitReader::ReadBit`, and 6 more
 - files (7): `HapiBank::OpenNamedBox`, `HapiBank::SeekBox`, `HapiBank::ReadBox`, `HapiBank::WriteBox`, and 3 more
 - map (7): `CanPlaceUnitFootprint`, `IsPadSlotFree`, `PickRandomReclaimableResourcesInRadius`, `SnapWorldPosToFootprint`, and 3 more
-- presentation (7): `QueueUnitSpeech`, `EmitNanoParticles`, `MarkSelectionOrdersDirty`, `EmitReverseNanoParticles`, and 3 more
+- presentation (6): `QueueUnitSpeech`, `EmitNanoParticles`, `MarkSelectionOrdersDirty`, `EmitReverseNanoParticles`, and 2 more
 - 6 smaller targets: features (3), los_radar (3), weapons (3), targeting (2), ai (1), players (1)
 
 **Sim writes.** 127 items in all, 118 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
@@ -533,7 +533,7 @@ Coverage: 83.2% of functions (306 of 368), 79.4% of lines, 61.6% of branches; 62
 **Draft interface.**
 
 - Exports: 59 functions (`RunOrders`, `RunSecondaryOrders`, `AddOrder`, `DeleteOrders`, `GetOrderType`, `IssueAttackOrder`, `OrderType::GetTableEntry` (presentation), the `UnitMotion::` functions called from outside (`UpdateMotion`, `LoadMotion`, `SaveMotion`, `DestroyObject`), and the goal methods pathfinding calls).
-- Needs from seams: 95 functions in seams, units, platform, network, files, map, presentation, features, los_radar, weapons, targeting, ai, players.
+- Needs from seams: 94 functions in seams, units, platform, network, files, map, presentation, features, los_radar, weapons, targeting, ai, players.
 - Owns: 89 named sim items that only this subsystem writes, for example `Order::state`, `Order::pos`, `Order::next`, `PathOrderAttach::owner`, `Order::unit`.
 - Shares: 29 named sim items that other subsystems also write, for example `Order::flags`, `Unit::pos`, `Unit::flags`, `Unit::health`, `Unit::buildLeft`.
 - The units imports are the unit lifecycle and geometry: `CreateUnit`, `SetUnitPosition`, `Unit::SetStateBits`, COB script calls and piece positions. The weapons imports are mostly the claim and release of weapons, which orders reaches through seams.
@@ -630,9 +630,9 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **harness** (171 functions). The test harness of #3 (`src/harness`). No phase root. 10 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2), `HarnessTestMode` (2). It imports 51 functions (game 15, platform 14).
 
-**presentation** (1399 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 311 functions are called from outside, mostly by game (216 distinct functions); the busiest are `QueueUnitSpeech` (27), `PlaySoundByName` (18), `GetDisplay` (16). It imports 335 functions: platform 156, network 54, files 31, game 26, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
+**presentation** (1394 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 310 functions are called from outside, mostly by game (216 distinct functions); the busiest are `QueueUnitSpeech` (27), `PlaySoundByName` (18), `GetDisplay` (16). It imports 335 functions: platform 156, network 54, files 31, game 26, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
-**platform** (731 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 290 functions are called from outside, by presentation (156 distinct functions), game (94), network (48) and units (46); the busiest are `GameFreeThunk` (164), `operator new` (123), `operator delete` (91), then `Translate` (78) and `GameAllocIgnoreTag` (77). It imports 170 functions: game 73, presentation 46.
+**platform** (731 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 290 functions are called from outside, by presentation (156 distinct functions), game (94), network (48) and units (46); the busiest are `GameFreeThunk` (164), `operator new` (123), `operator delete` (86), then `Translate` (78) and `GameAllocIgnoreTag` (77). It imports 170 functions: game 73, presentation 46.
 
 **seams** (103 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 98 functions are called from outside. It imports 103 functions.
 

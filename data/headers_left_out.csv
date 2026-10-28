@@ -32,13 +32,11 @@ BuildGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
 CalcAimAngles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 CanBuildAt,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 CanPlaceUnitFootprint,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-ClampPositionToMap,skip,placeholder type Vec3_004853b0: left for the type-naming issues
 ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
 ClickSelectHoverUnit,mismatch,placeholder type Param_0048c7f0: left for the type-naming issues
 CollectSelectedUnits,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 ComputeUnitScriptChecksum,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ConfigureListBoxByName,mismatch,fixing it changes the generated code of a caller
-CopyPathLockFields,skip,placeholder type Dst_00440ca0: left for the type-naming issues
 CopyStructRange,skip,placeholder type Elem_00470a40: left for the type-naming issues
 CountHumanSlots,ambiguous,several definitions share the name
 CreatePlayerObjectState,mismatch,placeholder type BuildList_0045a950: left for the type-naming issues
@@ -166,24 +164,20 @@ GetHostDpid,mismatch,"static risk rule: a convention, parameter count, or non-po
 GetLocalizedString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetMetalIncome,mismatch,pointer/int cast: definition's type is likely wrong
 GetMetalUsage,mismatch,pointer/int cast: definition's type is likely wrong
-GetMirroredBasePosition,skip,placeholder type Struct_0040bab0: left for the type-naming issues
 GetObjectBounds,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
 GetObjectHeight,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
 GetOrderCursor,ambiguous,several definitions share the name
 GetOrderTarget,mismatch,pointer/int cast: definition's type is likely wrong
 GetOrderType,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetPieceAngles,mismatch,placeholder type Obj_0043e180: left for the type-naming issues
-GetPieceCenter,skip,placeholder type Obj_0043e0b0: left for the type-naming issues
 GetPieceOffset,mismatch,placeholder type Object_0043def0: left for the type-naming issues
 GetSessionGuidInstance,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-GetSweetSpot,skip,placeholder type Obj_0043e3c0: left for the type-naming issues
 GetTextPixelWidth,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetTextWidth,mismatch,pointer/int cast: definition's type is likely wrong
 GetTicks,mismatch,fixing it changes the generated code of a caller
 GetVisibleEnemiesInRadius,skip,qualified name std::vector
 GetWeaponPiecePosition,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetWeaponRange,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-GetWeaponTargetPos,skip,placeholder type Vec3_0048a1e0: left for the type-naming issues
 GroundPickupOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 HAPI_PackDirectory,skip,unknown name cb
 HAPI_RelocateDirectory,mismatch,pointer/int cast: definition's type is likely wrong
@@ -228,7 +222,6 @@ LowerBoundOrderTypes,mismatch,"static risk rule: a convention, parameter count, 
 MakeBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
 MakeGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
 MirrorObject,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
-MoveToward,skip,placeholder type Vec3_0040beb0: left for the type-naming issues
 NormalizeVector,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 OrderSquad,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 Partition,skip,placeholder type Item_00485940: left for the type-naming issues
@@ -263,7 +256,6 @@ RotateAboutX,skip,placeholder type Vec3_004b6cc0: left for the type-naming issue
 RotateAboutY,skip,placeholder type Vec3_004b6cc0: left for the type-naming issues
 RotateAboutZ,skip,placeholder type Vec3_004b6cc0: left for the type-naming issues
 RotateByAngles,mismatch,placeholder type Vec3_004b6cc0: left for the type-naming issues
-RunInitialMission,skip,placeholder type Table_00487bf0: left for the type-naming issues
 SaveBmp,skip,placeholder type Bitmap_004caec0: left for the type-naming issues
 SaveSurfacePcx,skip,placeholder type Bitmap_004caec0: left for the type-naming issues
 ScaleUnitWeights,mismatch,fixing it changes the generated code of a caller

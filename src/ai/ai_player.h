@@ -1,5 +1,8 @@
 #ifndef AI_PLAYER_H
 #define AI_PLAYER_H
+struct MirroredBasePos;
+struct MovableVec3;
+
 struct Player;
 struct Vec3;
 
@@ -44,5 +47,8 @@ int __stdcall GetBuilderCount(int);
 
 int __stdcall IsPointVisible(Player* player, Vec3* point);
 int __stdcall SumUnitRatingsInRange(int player, Vec3* pos, int range);
+
+void __stdcall GetMirroredBasePosition(int index, int unused, MirroredBasePos* out);
+MovableVec3 __stdcall MoveToward(const MovableVec3* from, const MovableVec3* to, int maxLen);
 
 #endif

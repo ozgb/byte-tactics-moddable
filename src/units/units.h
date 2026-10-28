@@ -1,5 +1,7 @@
 #ifndef UNITS_H
 #define UNITS_H
+struct ClampedPos;
+
 struct UnitKilledPacket;
 
 struct Player;
@@ -22,5 +24,7 @@ void __stdcall KillAllUnits(void);
 void __stdcall KillPlayerUnits(unsigned char player);
 
 void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local);
+
+void __stdcall ClampPositionToMap(ClampedPos* p);
 
 #endif

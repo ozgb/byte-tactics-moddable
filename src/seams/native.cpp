@@ -79,7 +79,6 @@ void __stdcall UpdatePlayerEconomy(Player* p);
 
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
 
-int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index);
 Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange);
 
 #include "../map/line_of_sight.h"
@@ -87,7 +86,6 @@ Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange)
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetGroundHeight(GroundHeightPos* p);
-void __stdcall GetSweetSpot(SweetSpotObjectView* obj, int out);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
 

@@ -1,6 +1,8 @@
 #ifndef UNIT_COMMANDS_H
 #define UNIT_COMMANDS_H
 #include "../util/angles.h"
+struct Unit;
+struct UnitPtrVectorView;
 
 class UnitTypeSet;
 struct Player;
@@ -30,5 +32,7 @@ void __cdecl CreateMissionUnits();
 void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPacket* p);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 UnitTypeSet* __stdcall GetCategoryMask(char* name);
+
+void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* table);
 
 #endif

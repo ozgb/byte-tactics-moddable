@@ -62,6 +62,7 @@
 #include "../ingame/flags_00495e90_37f06.h"
 #include "../ingame/flags_00495e90_38a51.h"
 #include "../ingame/flags_00495e90_3923b.h"
+#include "../ingame/frame_timers.h"
 #include "../ingame/map_grid.h"
 #include "../ingame/orders.h"
 #include "../ingame/orders_bits.h"
@@ -437,6 +438,11 @@ static_assert(offsetof(FrameQueue, recvBuffer) == 12, "");
 static_assert(offsetof(FrameQueue, buffer) == 16, "");
 static_assert(offsetof(FrameQueue, fromId) == 20, "");
 static_assert(offsetof(FrameQueue, toId) == 24, "");
+static_assert(sizeof(FrameTimers) == 80, "");
+static_assert(offsetof(FrameTimers, last) == 0, "");
+static_assert(offsetof(FrameTimers, total) == 4, "");
+static_assert(offsetof(FrameTimers, values) == 8, "");
+static_assert(offsetof(FrameTimers, acc) == 44, "");
 static_assert(sizeof(Gadget) == 347, "");
 static_assert(offsetof(Gadget, type) == 0, "");
 static_assert(offsetof(Gadget, team) == 1, "");

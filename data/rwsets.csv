@@ -22885,13 +22885,13 @@ address,function,file,kind,target
 0x471f90,DrawParticleList,src/graphics/particles.cpp,function,
 0x471f90,DrawParticleList,src/graphics/particles.cpp,global_read,g_game
 0x471f90,DrawParticleList,src/graphics/particles.cpp,indirect_call,virtual Listener_00471f90::Slot2
-0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,call,Add
+0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,call,ParticleLists::AddToList
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,call,operator new
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,field_read,Game::lists_38d77
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,function,
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,global_read,g_game
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,indirect_call,virtual TeleportParticles::Init
-0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,call,Add_004720d0
+0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,call,ParticleLists::AddToList
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,call,operator new
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,call,operator=
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,deref_read,*Vec3_004720d0
@@ -22912,19 +22912,19 @@ address,function,file,kind,target
 0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,function,
 0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,global_read,g_game
 0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,indirect_call,virtual NanoParticles::Init
-0x472330,EmitThrustParticles,src/graphics/particles.cpp,call,Lists_00472330::Add
+0x472330,EmitThrustParticles,src/graphics/particles.cpp,call,ParticleLists::AddToList
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,call,operator new
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,field_read,Game::lists_38d77
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,function,
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,global_read,g_game
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,indirect_call,virtual ThrustParticles::Init
-0x472430,EmitWakeParticles,src/graphics/particles.cpp,call,Lists_00472430::Add
+0x472430,EmitWakeParticles,src/graphics/particles.cpp,call,ParticleLists::AddToList
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,call,operator new
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,field_read,Game::lists_38d77
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,function,
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,global_read,g_game
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,indirect_call,virtual WakeParticles::Init
-0x472530,EmitBubbles,src/graphics/particles.cpp,call,Lists_00472530::Add
+0x472530,EmitBubbles,src/graphics/particles.cpp,call,ParticleLists::AddToList
 0x472530,EmitBubbles,src/graphics/particles.cpp,call,operator new
 0x472530,EmitBubbles,src/graphics/particles.cpp,field_read,Game::lists_38d77
 0x472530,EmitBubbles,src/graphics/particles.cpp,function,
@@ -22963,7 +22963,7 @@ address,function,file,kind,target
 0x4729d0,EmitWeaponSmoke,src/graphics/particles.cpp,function,
 0x4729d0,EmitWeaponSmoke,src/graphics/particles.cpp,global_read,g_game
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,call,HarnessViewRand
-0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,call,Lists_00472330::Add
+0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,call,ParticleLists::AddToList
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,call,operator new
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,deref_read,*Shape_00472ab0
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,field_read,Game::lists_38d77
@@ -43129,17 +43129,6 @@ address,function,file,kind,target
 ,Activate,src/gui/gui.cpp,field_read,Layer::entries
 ,Activate,src/gui/gui.cpp,field_write,Layer::current
 ,Activate,src/gui/gui.cpp,function,
-,Add,src/graphics/particles.cpp,call,ParticleSystem::~ParticleSystem
-,Add,src/graphics/particles.cpp,call,begin
-,Add,src/graphics/particles.cpp,call,erase
-,Add,src/graphics/particles.cpp,call,operator delete
-,Add,src/graphics/particles.cpp,call,operator[]
-,Add,src/graphics/particles.cpp,call,push_back
-,Add,src/graphics/particles.cpp,call,size
-,Add,src/graphics/particles.cpp,field_maybe_written,Lists_00471fd0::lists
-,Add,src/graphics/particles.cpp,field_read,Lists_00471fd0::lists
-,Add,src/graphics/particles.cpp,function,
-,Add,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::~ParticleSystem
 ,Add,src/orders/unit_orders.cpp,field_read,Vec3::x
 ,Add,src/orders/unit_orders.cpp,field_read,Vec3::y
 ,Add,src/orders/unit_orders.cpp,field_read,Vec3::z
@@ -43234,17 +43223,6 @@ address,function,file,kind,target
 ,AddScaled,src/map/features.cpp,field_read,Unit::owner
 ,AddScaled,src/map/features.cpp,function,
 ,AddScaled,src/map/features.cpp,global_read,g_game
-,Add_004720d0,src/graphics/particles.cpp,call,ParticleSystem::~ParticleSystem
-,Add_004720d0,src/graphics/particles.cpp,call,begin
-,Add_004720d0,src/graphics/particles.cpp,call,erase
-,Add_004720d0,src/graphics/particles.cpp,call,operator delete
-,Add_004720d0,src/graphics/particles.cpp,call,operator[]
-,Add_004720d0,src/graphics/particles.cpp,call,push_back
-,Add_004720d0,src/graphics/particles.cpp,call,size
-,Add_004720d0,src/graphics/particles.cpp,field_maybe_written,Lists_004720d0::lists
-,Add_004720d0,src/graphics/particles.cpp,field_read,Lists_004720d0::lists
-,Add_004720d0,src/graphics/particles.cpp,function,
-,Add_004720d0,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::~ParticleSystem
 ,AdvanceMissionNative,src/seams/native.cpp,call,Mission::AdvanceMission
 ,AdvanceMissionNative,src/seams/native.cpp,function,
 ,AiSearchGoalSetWaypointsNative,src/seams/native.cpp,call,AiSearchGoal::SetWaypoints
@@ -47515,39 +47493,6 @@ address,function,file,kind,target
 ,ListDirectory,src/files/files_api.h,indirect_call,"indirect via void (*)(const char *, int, FileNameList *) __attribute__((stdcall)) [FilesSeam::ListDirectory]"
 ,ListDirectoryNative,src/seams/native.cpp,call,ListDirectory
 ,ListDirectoryNative,src/seams/native.cpp,function,
-,Lists_00472330::Add,src/graphics/particles.cpp,call,ParticleSystem::~ParticleSystem
-,Lists_00472330::Add,src/graphics/particles.cpp,call,begin
-,Lists_00472330::Add,src/graphics/particles.cpp,call,erase
-,Lists_00472330::Add,src/graphics/particles.cpp,call,operator delete
-,Lists_00472330::Add,src/graphics/particles.cpp,call,operator[]
-,Lists_00472330::Add,src/graphics/particles.cpp,call,push_back
-,Lists_00472330::Add,src/graphics/particles.cpp,call,size
-,Lists_00472330::Add,src/graphics/particles.cpp,field_maybe_written,Lists_00472330::lists
-,Lists_00472330::Add,src/graphics/particles.cpp,field_read,Lists_00472330::lists
-,Lists_00472330::Add,src/graphics/particles.cpp,function,
-,Lists_00472330::Add,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::~ParticleSystem
-,Lists_00472430::Add,src/graphics/particles.cpp,call,ParticleSystem::~ParticleSystem
-,Lists_00472430::Add,src/graphics/particles.cpp,call,begin
-,Lists_00472430::Add,src/graphics/particles.cpp,call,erase
-,Lists_00472430::Add,src/graphics/particles.cpp,call,operator delete
-,Lists_00472430::Add,src/graphics/particles.cpp,call,operator[]
-,Lists_00472430::Add,src/graphics/particles.cpp,call,push_back
-,Lists_00472430::Add,src/graphics/particles.cpp,call,size
-,Lists_00472430::Add,src/graphics/particles.cpp,field_maybe_written,Lists_00472430::lists
-,Lists_00472430::Add,src/graphics/particles.cpp,field_read,Lists_00472430::lists
-,Lists_00472430::Add,src/graphics/particles.cpp,function,
-,Lists_00472430::Add,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::~ParticleSystem
-,Lists_00472530::Add,src/graphics/particles.cpp,call,ParticleSystem::~ParticleSystem
-,Lists_00472530::Add,src/graphics/particles.cpp,call,begin
-,Lists_00472530::Add,src/graphics/particles.cpp,call,erase
-,Lists_00472530::Add,src/graphics/particles.cpp,call,operator delete
-,Lists_00472530::Add,src/graphics/particles.cpp,call,operator[]
-,Lists_00472530::Add,src/graphics/particles.cpp,call,push_back
-,Lists_00472530::Add,src/graphics/particles.cpp,call,size
-,Lists_00472530::Add,src/graphics/particles.cpp,field_maybe_written,Lists_00472530::lists
-,Lists_00472530::Add,src/graphics/particles.cpp,field_read,Lists_00472530::lists
-,Lists_00472530::Add,src/graphics/particles.cpp,function,
-,Lists_00472530::Add,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::~ParticleSystem
 ,LoadCampaignNative,src/seams/native.cpp,call,Mission::LoadCampaign
 ,LoadCampaignNative,src/seams/native.cpp,function,
 ,LoadConditionsNative,src/seams/native.cpp,call,MissionConditions::LoadConditions

@@ -385,10 +385,6 @@ struct Lists_00471f90 {
     std::vector<Listener_00471f90*> lists[10];
 };
 
-struct Lists_00471fd0 {
-    std::vector<ParticleSystem*> lists[10];
-};
-
 struct Vec3_004720d0 {
     int x, y, z;
 };
@@ -398,54 +394,9 @@ struct Ctx_004720d0 {
     Vec3_004720d0 b;
 };
 
-struct Lists_004720d0 {
-    std::vector<ParticleSystem*> lists[1];
-};
-
 struct Pos_00472200 {
     Vec3 a;
     Vec3 b;
-};
-
-class Lists_00472330 {
-public:
-    std::vector<ParticleSystem*> lists[10];
-
-    void Add(short index, ParticleSystem* p)
-    {
-        if (lists[index].size() > 400) {
-            delete lists[index][0];
-            lists[index].erase(lists[index].begin());
-        }
-        lists[index].push_back(p);
-    }
-};
-
-class Lists_00472430 {
-public:
-    std::vector<ParticleSystem*> lists[10];
-
-    void Add(short index, ParticleSystem* p)
-    {
-        if (lists[index].size() > 400) {
-            delete lists[index][0];
-            lists[index].erase(lists[index].begin());
-        }
-        lists[index].push_back(p);
-    }
-};
-
-struct Lists_00472530 {
-    std::vector<ParticleSystem*> lists[10];
-
-    void Add(short index, ParticleSystem* p)
-    {
-        if (lists[index].size() > 400) {
-            delete lists[index][0];
-            lists[index].erase(lists[index].begin());
-        }
-        lists[index].push_back(p);
-    }
 };
 
 struct TimedSubParticle {
@@ -813,33 +764,15 @@ void __stdcall DrawParticleList(void* msg, short kind)
     }
 }
 
-static void __stdcall Add(Lists_00471fd0* l, short index, ParticleSystem* p)
-{
-    if (l->lists[index].size() > 400) {
-        delete l->lists[index][0];
-        l->lists[index].erase(l->lists[index].begin());
-    }
-    l->lists[index].push_back(p);
-}
-
 // FUNCTION: 0x471fd0
 void __stdcall EmitTeleportParticles(int posA, int posB, int lifetime, short index)
 {
-    Lists_00471fd0* l = (Lists_00471fd0 *)g_game->lists_38d77;
+    ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     TeleportParticles* p = new TeleportParticles;
     if (p) {
         p->Init((Vec3_004736e0*)posA, (Vec3_004736e0*)posB, lifetime);
-        Add(l, index, p);
+        l->AddToList(p, index);
     }
-}
-
-static void Add_004720d0(Lists_004720d0* lists, short index, ParticleSystem* p)
-{
-    if (lists->lists[index].size() > 400) {
-        delete lists->lists[index][0];
-        lists->lists[index].erase(lists->lists[index].begin());
-    }
-    lists->lists[index].push_back(p);
 }
 
 // FUNCTION: 0x4720d0
@@ -848,11 +781,11 @@ void __stdcall EmitNanoParticles(Vec3_004720d0* p, void* posB, short index)
     Ctx_004720d0 ctx;
     ctx.a = *p;
     ctx.b = *p;
-    Lists_004720d0* lists = (Lists_004720d0 *)g_game->lists_38d77;
+    ParticleLists* lists = (ParticleLists *)g_game->lists_38d77;
     NanoParticles* q = new NanoParticles;
     if (q) {
         q->Init((Seg_00473b50*)&ctx.a, (Seg_00473b50*)posB, 1);
-        Add_004720d0(lists, index, q);
+        lists->AddToList(q, index);
     }
 }
 
@@ -874,33 +807,33 @@ void __stdcall EmitReverseNanoParticles(Pos_00472200* targetBounds, Vec3* origin
 void __stdcall EmitThrustParticles(int posA, int posB, int period, int lifetime,
                             short index)
 {
-    Lists_00472330* lists = (Lists_00472330 *)g_game->lists_38d77;
+    ParticleLists* lists = (ParticleLists *)g_game->lists_38d77;
     ThrustParticles* p = new ThrustParticles;
     if (p) {
         p->Init((Shape_00472ab0*)posA, (Shape_00472ab0*)posB, period, lifetime);
-        lists->Add(index, p);
+        lists->AddToList(p, index);
     }
 }
 
 // FUNCTION: 0x472430
 void __stdcall EmitWakeParticles(int posA, int posB, int period, short index)
 {
-    Lists_00472430* l = (Lists_00472430 *)g_game->lists_38d77;
+    ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     WakeParticles* p = new WakeParticles;
     if (p) {
         p->Init((Vec3_00474760*)posA, (Vec3_00474760*)posB, period, 1, 1);
-        l->Add(index, p);
+        l->AddToList(p, index);
     }
 }
 
 // FUNCTION: 0x472530
 void __stdcall EmitBubbles(int posA, int posB, int period, short index)
 {
-    Lists_00472530* l = (Lists_00472530 *)g_game->lists_38d77;
+    ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     WakeParticles* p = new WakeParticles;
     if (p) {
         p->Init((Vec3_00474760*)posA, (Vec3_00474760*)posB, period, 1, 0);
-        l->Add(index, p);
+        l->AddToList(p, index);
     }
 }
 
@@ -1582,11 +1515,11 @@ void __stdcall EmitJitteredThrustParticles(Shape_00472ab0* pos, short index)
     s.v[1].hi += (int)((__int64)HarnessViewRand() * 3 / 0x8000) - 1;
     s.v[2].hi += (int)((__int64)HarnessViewRand() * 3 / 0x8000) - 1;
     int r = (int)((__int64)HarnessViewRand() * 3 / 0x8000) + 1;
-    Lists_00472330* lists = (Lists_00472330 *)g_game->lists_38d77;
+    ParticleLists* lists = (ParticleLists *)g_game->lists_38d77;
     ThrustParticles* p = new ThrustParticles;
     if (p) {
         p->Init(&s, &s, 1, r);
-        lists->Add(index, p);
+        lists->AddToList(p, index);
     }
 }
 

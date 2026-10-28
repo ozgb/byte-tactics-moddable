@@ -331,7 +331,7 @@ int __stdcall OrderModeTakesTarget(unsigned char type)
 }
 
 #pragma pack(push, 1)
-#include "../orders/node_0043e490.h"
+#include "../orders/order_cursor_views.h"
 
 
 struct UnitDefCursorFlags {

@@ -45,7 +45,7 @@
 #include "../network/player_id_entry.h"
 #include "../sound/flags_0045c570.h"
 #include "../units/f14373.h"
-#include "../units/name_004864b0.h"
+#include "../units/side_name_view.h"
 #include "../util/point.h"
 #include "../weapons/debris.h"
 #include "../weapons/weapon_def.h"

@@ -31,7 +31,7 @@ struct Unit;
 
 #include "../network/player.h"
 
-#include "name_004864b0.h"
+#include "side_name_view.h"
 
 #include "cob_types.h"
 

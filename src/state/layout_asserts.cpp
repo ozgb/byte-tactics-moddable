@@ -110,7 +110,7 @@
 #include "../units/cob_types.h"
 #include "../units/f14373.h"
 #include "../units/movement_class.h"
-#include "../units/name_004864b0.h"
+#include "../units/side_name_view.h"
 #include "../units/unit.h"
 #include "../units/unit_def.h"
 #include "../units/unit_script.h"

@@ -1941,7 +1941,7 @@ union UnitTypeFlags_459200;
 struct ShareLosAckPacket;
 struct Team_0048d9a0;
 struct Texture_00421700;
-struct Thing_0043f0e0;
+struct FeatureMarkView;
 struct TlsBlock;
 struct TntHeader_00483610;
 struct PathAnimTrail;

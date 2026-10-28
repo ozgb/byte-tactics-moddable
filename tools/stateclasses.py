@@ -23,7 +23,7 @@ Rows (kind), one per item, sorted by kind, then address, then name:
                file-level or class static (`name@path`, `Owner::name`) and a global that
                exists only in the source (the test harness, the debug library); a
                file-level static only when it is not const or something reads it
-  game-region  a top-level field of `struct Game` in include/ta_types.h (name, address is
+  game-region  a top-level field of `struct Game` in src/game/game.h (name, address is
                the offset): an array of structs such as `Player[10]` is one region, the
                fields of a bit-field storage unit are one region (`a|b|c`), and the
                `unknown_` and padding ranges are regions of their own
@@ -146,7 +146,7 @@ and reads the layout of the file's own `struct Game`: each last-field access is 
 range, and a region takes the reads and writes whose range overlaps its own and the
 maybe-written and address-taken accesses that start in it (a view often declares one
 array over the unknown bytes after a field, and taking its address names only its start).
-The regions are the layout of include/ta_types.h, from a probe file that includes it. Accesses reached through
+The regions are the layout of src/game/game.h, from a probe file that includes it. Accesses reached through
 a nested path (`g_game->players[i].hp`) are `Player::hp` in rwsets.csv, which is why
 a region of structs takes the fields of the type.
 
@@ -195,7 +195,7 @@ from rwsets import ROOT, Analyzer, Walker, is_pointer, record_name, strip, type_
 
 GLOBALS = ROOT / "data/globals.csv"
 GAME_LOGIC = ROOT / "data/game_logic.csv"
-TYPES_HEADER = "ta_types.h"
+GAME_HEADER = ROOT / "src" / "game" / "game.h"
 OUT = ROOT / "data/state_classes.csv"
 COLUMNS = ["name", "address", "kind", "proposed", "class", "rule", "phases_write", "phases_read",
            "presentation", "load_write", "writers", "readers", "note"]
@@ -644,19 +644,19 @@ def layout_argv(argv: list[str]) -> list[str]:
 
 
 def canonical_regions(argv: list[str], directory: str) -> list[dict]:
-    """The regions of `struct Game` in include/ta_types.h, from a probe file that includes it."""
+    """The regions of `struct Game` in src/game/game.h, from a probe file that includes it."""
     i = argv.index("--")
     dump = argv.index("-ast-dump=json")
     flags = argv[:dump - 1] + argv[dump + 1:i]
     with tempfile.TemporaryDirectory() as tmp:
         probe = Path(tmp) / "probe.cpp"
-        probe.write_text('#include "%s"\nstatic_assert(sizeof(Game) > 0, "");\n' % TYPES_HEADER)
+        probe.write_text('#include "%s"\nstatic_assert(sizeof(Game) > 0, "");\n' % GAME_HEADER.as_posix())
         run = subprocess.run(flags + LAYOUT_FLAG + ["--", str(probe)], cwd=directory, capture_output=True,
                              text=True, errors="replace")
     found = layout_fields(run.stdout, "Game")
     if not found:
-        raise SystemExit("stateclasses: no layout of struct Game from include/%s\n%s" % (TYPES_HEADER,
-                                                                                           run.stderr[-1000:]))
+        raise SystemExit("stateclasses: no layout of struct Game from %s\n%s" % (GAME_HEADER.relative_to(ROOT),
+                                                                                  run.stderr[-1000:]))
     return game_regions(found[1])
 
 

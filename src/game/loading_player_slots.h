@@ -1,5 +1,5 @@
-#ifndef PLAYER_SLOTS_00497F40_H
-#define PLAYER_SLOTS_00497F40_H
+#ifndef LOADING_PLAYER_SLOTS_H
+#define LOADING_PLAYER_SLOTS_H
 
 #pragma pack(push, 1)
 struct LoadingPlayerSlots {
@@ -11,7 +11,7 @@ struct LoadingPlayerSlots {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(LoadingPlayerSlots) == 140, "PlayerSlots_00497f40");
+static_assert(sizeof(LoadingPlayerSlots) == 140, "LoadingPlayerSlots");
 #endif
 
 #endif

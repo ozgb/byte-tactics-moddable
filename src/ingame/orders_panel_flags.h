@@ -1,5 +1,5 @@
-#ifndef FLAGS_00495E90_37EBE_H
-#define FLAGS_00495E90_37EBE_H
+#ifndef ORDERS_PANEL_FLAGS_H
+#define ORDERS_PANEL_FLAGS_H
 
 #pragma pack(push, 1)
 struct OrdersPanelFlags {
@@ -11,7 +11,7 @@ struct OrdersPanelFlags {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(OrdersPanelFlags) == 2, "Flags_00495e90_37ebe");
+static_assert(sizeof(OrdersPanelFlags) == 2, "OrdersPanelFlags");
 #endif
 
 #endif

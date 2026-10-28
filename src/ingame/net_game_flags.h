@@ -1,7 +1,7 @@
-#ifndef FLAGS16_00499200_H
-#define FLAGS16_00499200_H
+#ifndef NET_GAME_FLAGS_H
+#define NET_GAME_FLAGS_H
 
-#include "bit_flags16_00499200.h"
+#include "net_game_flag_bits.h"
 
 #pragma pack(push, 1)
 union NetGameFlags {
@@ -10,7 +10,7 @@ union NetGameFlags {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(NetGameFlags) == 2, "Flags16_00499200");
+static_assert(sizeof(NetGameFlags) == 2, "NetGameFlags");
 #endif
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef LOAD_FLAGS_00497F40_H
-#define LOAD_FLAGS_00497F40_H
+#ifndef LOADING_FLAGS_H
+#define LOADING_FLAGS_H
 
 #pragma pack(push, 1)
 union LoadingFlags {
@@ -8,7 +8,7 @@ union LoadingFlags {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(LoadingFlags) == 2, "LoadFlags_00497f40");
+static_assert(sizeof(LoadingFlags) == 2, "LoadingFlags");
 #endif
 
 #endif

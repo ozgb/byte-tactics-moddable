@@ -1,5 +1,5 @@
-#ifndef SUB_004679A0_B_H
-#define SUB_004679A0_B_H
+#ifndef LIGHT_BAR_SPRITE_H
+#define LIGHT_BAR_SPRITE_H
 
 #pragma pack(push, 1)
 struct LightBarSprite {
@@ -10,7 +10,7 @@ struct LightBarSprite {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(LightBarSprite) == 56, "Sub_004679a0_b");
+static_assert(sizeof(LightBarSprite) == 56, "LightBarSprite");
 #endif
 
 #endif

@@ -220,7 +220,7 @@ game,SimHighWater,src/state/block.cpp,0,0,0,0,0,0,?SimHighWater@@YAIXZ,1,
 game,UpdateBattleHoverMode,src/game/game_state.cpp,0,0,0,0,0,0,?UpdateBattleHoverMode@@YGXH@Z,1,
 game,UpdateBattleRoom,src/frontend/multi.cpp,1,0,0,0,0,0,?UpdateBattleRoom@@YGXXZ,0,network
 game,WriteGameRegistryValue,src/game/settings.cpp,1,0,0,0,0,0,?WriteGameRegistryValue@@YGXPAX0H@Z,0,shutdown
-game,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,0,0,0,0,0,0,?Clear@Zero11_004917d0@@QAEXXZ,1,
+game,Zero11_004917d0::Clear,src/game/chat_recipients.h,0,0,0,0,0,0,?Clear@Zero11_004917d0@@QAEXXZ,1,
 los_radar,*,,72,64,1948,1613,890,649,,22,
 los_radar,AssignRange,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRange@@YGXPAUElem_432cb0@@00@Z,1,
 los_radar,AssignRangeBack,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRangeBack@@YGPAUElem_432cb0@@PAU1@00@Z,1,

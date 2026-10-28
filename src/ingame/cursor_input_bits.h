@@ -1,5 +1,5 @@
-#ifndef BIT_FLAGS_004197D0_H
-#define BIT_FLAGS_004197D0_H
+#ifndef CURSOR_INPUT_BITS_H
+#define CURSOR_INPUT_BITS_H
 
 #pragma pack(push, 1)
 struct CursorInputBits {
@@ -15,7 +15,7 @@ struct CursorInputBits {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(CursorInputBits) == 1, "BitFlags_004197d0");
+static_assert(sizeof(CursorInputBits) == 1, "CursorInputBits");
 #endif
 
 #endif

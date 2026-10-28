@@ -1,5 +1,5 @@
-#ifndef SIDE_NAME_00497180_H
-#define SIDE_NAME_00497180_H
+#ifndef SIDE_NAME_ENTRY_H
+#define SIDE_NAME_ENTRY_H
 
 #pragma pack(push, 1)
 struct SideNameEntry {
@@ -8,7 +8,7 @@ struct SideNameEntry {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(SideNameEntry) == 562, "SideName_00497180");
+static_assert(sizeof(SideNameEntry) == 562, "SideNameEntry");
 #endif
 
 #endif

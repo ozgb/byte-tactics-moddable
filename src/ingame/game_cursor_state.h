@@ -1,8 +1,8 @@
-#ifndef CURSOR_STATE_0041CC60_H
-#define CURSOR_STATE_0041CC60_H
+#ifndef GAME_CURSOR_STATE_H
+#define GAME_CURSOR_STATE_H
 
-#include "arg_00419670.h"
-#include "point_0041cd50.h"
+#include "view_mouse_event.h"
+#include "cursor_point.h"
 
 #pragma pack(push, 1)
 struct GameCursorState {
@@ -14,7 +14,7 @@ struct GameCursorState {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(GameCursorState) == 44, "CursorState_0041cc60");
+static_assert(sizeof(GameCursorState) == 44, "GameCursorState");
 #endif
 
 #endif

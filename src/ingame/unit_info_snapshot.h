@@ -1,5 +1,5 @@
-#ifndef SNAPSHOT_0046A860_H
-#define SNAPSHOT_0046A860_H
+#ifndef UNIT_INFO_SNAPSHOT_H
+#define UNIT_INFO_SNAPSHOT_H
 
 #pragma pack(push, 1)
 struct UnitInfoSnapshot {
@@ -20,7 +20,7 @@ struct UnitInfoSnapshot {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(UnitInfoSnapshot) == 60, "Snapshot_0046a860");
+static_assert(sizeof(UnitInfoSnapshot) == 60, "UnitInfoSnapshot");
 #endif
 
 #endif

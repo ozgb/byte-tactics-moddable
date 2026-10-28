@@ -1,7 +1,7 @@
-#ifndef FLAGS_004197D0_H
-#define FLAGS_004197D0_H
+#ifndef CURSOR_INPUT_FLAGS_H
+#define CURSOR_INPUT_FLAGS_H
 
-#include "bit_flags_004197d0.h"
+#include "cursor_input_bits.h"
 
 #pragma pack(push, 1)
 union CursorInputFlags {
@@ -10,7 +10,7 @@ union CursorInputFlags {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(CursorInputFlags) == 1, "Flags_004197d0");
+static_assert(sizeof(CursorInputFlags) == 1, "CursorInputFlags");
 #endif
 
 #endif

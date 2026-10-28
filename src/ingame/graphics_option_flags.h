@@ -1,5 +1,5 @@
-#ifndef FLAGS_00495E90_37F06_H
-#define FLAGS_00495E90_37F06_H
+#ifndef GRAPHICS_OPTION_FLAGS_H
+#define GRAPHICS_OPTION_FLAGS_H
 
 #pragma pack(push, 1)
 struct GraphicsOptionFlags {
@@ -12,7 +12,7 @@ struct GraphicsOptionFlags {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(GraphicsOptionFlags) == 2, "Flags_00495e90_37f06");
+static_assert(sizeof(GraphicsOptionFlags) == 2, "GraphicsOptionFlags");
 #endif
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef SUB_004679A0_A_H
-#define SUB_004679A0_A_H
+#ifndef LIGHT_BAR_COUNTERS_H
+#define LIGHT_BAR_COUNTERS_H
 
 #pragma pack(push, 1)
 struct LightBarCounters {
@@ -14,7 +14,7 @@ struct LightBarCounters {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(LightBarCounters) == 33, "Sub_004679a0_a");
+static_assert(sizeof(LightBarCounters) == 33, "LightBarCounters");
 #endif
 
 #endif

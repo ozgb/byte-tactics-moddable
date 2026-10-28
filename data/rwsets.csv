@@ -51378,11 +51378,11 @@ address,function,file,kind,target
 ,WriteBufferToFile,src/files/files_api.h,indirect_call,"indirect via int (*)(char *, void *, int) __attribute__((stdcall)) [FilesSeam::WriteBuffer]"
 ,WriteTabsInline,src/gui/gui_file.cpp,call,HAPI_WriteFile
 ,WriteTabsInline,src/gui/gui_file.cpp,function,
-,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,field_write,Zero11_004917d0::a
-,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,field_write,Zero11_004917d0::b
-,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,field_write,Zero11_004917d0::c
-,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,field_write,Zero11_004917d0::d
-,Zero11_004917d0::Clear,src/game/zero11_004917d0.h,function,
+,Zero11_004917d0::Clear,src/game/chat_recipients.h,field_write,Zero11_004917d0::a
+,Zero11_004917d0::Clear,src/game/chat_recipients.h,field_write,Zero11_004917d0::b
+,Zero11_004917d0::Clear,src/game/chat_recipients.h,field_write,Zero11_004917d0::c
+,Zero11_004917d0::Clear,src/game/chat_recipients.h,field_write,Zero11_004917d0::d
+,Zero11_004917d0::Clear,src/game/chat_recipients.h,function,
 ,_Construct,src/ai/ai_player.cpp,call,CopyDwordIfNonNull
 ,_Construct,src/ai/ai_player.cpp,call,CopyDwordPair
 ,_Construct,src/ai/ai_player.cpp,call,CopyOneByte

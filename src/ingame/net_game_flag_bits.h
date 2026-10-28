@@ -1,5 +1,5 @@
-#ifndef BIT_FLAGS16_00499200_H
-#define BIT_FLAGS16_00499200_H
+#ifndef NET_GAME_FLAG_BITS_H
+#define NET_GAME_FLAG_BITS_H
 
 #pragma pack(push, 1)
 struct NetGameFlagBits {
@@ -23,7 +23,7 @@ struct NetGameFlagBits {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(NetGameFlagBits) == 2, "BitFlags16_00499200");
+static_assert(sizeof(NetGameFlagBits) == 2, "NetGameFlagBits");
 #endif
 
 #endif

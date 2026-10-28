@@ -3325,7 +3325,7 @@ struct Flags_418fd0 {
     char unknown_0[2];
 };
 
-#include "../src/ingame/arg_00419670.h"
+#include "../src/ingame/view_mouse_event.h"
 
 struct Flags_00419670 {
     unsigned int bits_0 : 6;
@@ -3339,9 +3339,9 @@ union FlagsU_00419670 {
     union { unsigned int raw; Flags_00419670 bits; };
 };
 
-#include "../src/ingame/bit_flags_004197d0.h"
+#include "../src/ingame/cursor_input_bits.h"
 
-#include "../src/ingame/flags_004197d0.h"
+#include "../src/ingame/cursor_input_flags.h"
 
 struct Entry {
     unsigned char type;
@@ -3471,9 +3471,9 @@ struct CursorState_0041cd20 {
     int flag;
 };
 
-#include "../src/ingame/point_0041cd50.h"
+#include "../src/ingame/cursor_point.h"
 
-#include "../src/ingame/cursor_state_0041cc60.h"
+#include "../src/ingame/game_cursor_state.h"
 
 struct Mouse_0041ce90 {
     int x;
@@ -3545,7 +3545,7 @@ struct Button_0041e420 {
     int flags;
 };
 
-#include "../src/game/slot_0041e420.h"
+#include "../src/game/end_game_player_slot.h"
 
 struct Display_0041ec50 {
     char unknown_0[1556];
@@ -4259,9 +4259,9 @@ public:
     int SetAuxVolume(int, int);
 };
 
-#include "../src/ingame/flags_00495e90_37f06.h"
+#include "../src/ingame/graphics_option_flags.h"
 
-#include "../src/game/mission_flags_0042f9a0.h"
+#include "../src/game/all_missions_flags.h"
 
 class Class_004cfff0 {
 public:
@@ -4300,7 +4300,7 @@ struct Entry_00431a20 {
     char unknown_4[558];
 };
 
-#include "../src/game/side_00431a60.h"
+#include "../src/game/side_def.h"
 
 class Class_004b3630 {
 public:
@@ -6354,7 +6354,7 @@ union Flags_0045d280 {
     union { unsigned short word; Bits_0045d280 bits; unsigned char byte; };
 };
 
-#include "../src/ingame/flags_00495e90_37ebe.h"
+#include "../src/ingame/orders_panel_flags.h"
 
 struct Point_004948e0 {
     int x;
@@ -7056,9 +7056,9 @@ struct Unit_00467980 {
     unsigned int flags;
 };
 
-#include "../src/ingame/sub_004679a0_a.h"
+#include "../src/ingame/light_bar_counters.h"
 
-#include "../src/ingame/sub_004679a0_b.h"
+#include "../src/ingame/light_bar_sprite.h"
 
 struct PlayerData_467c00 {
     char unknown_0[150];
@@ -7096,7 +7096,7 @@ struct Class_004c6b10 {
 
 #include "../src/ingame/map_grid.h"
 
-#include "../src/ingame/snapshot_0046a860.h"
+#include "../src/ingame/unit_info_snapshot.h"
 
 struct Point_0046ba80 {
     int x;
@@ -10083,7 +10083,7 @@ public:
     int SetCdCallback(void (__stdcall *)(void));
 };
 
-#include "../src/game/zero11_004917d0.h"
+#include "../src/game/chat_recipients.h"
 
 struct Saved_00493bf0 {
     int a;
@@ -10135,17 +10135,17 @@ struct Class_004cb940 {
     bool WriteRows(Image_004cb940*, int, int, int, int, int, int);
 };
 
-#include "../src/ingame/flags_00495e90_38a51.h"
+#include "../src/ingame/broadcast_toggle_flags.h"
 
-#include "../src/ingame/flags_00495e90_3923b.h"
+#include "../src/ingame/info_mode_flags.h"
 
 struct Sub_00496b10 {
     char unknown_0[166];
 };
 
-#include "../src/game/flags_00496ce0.h"
+#include "../src/game/pre_battle_flags.h"
 
-#include "../src/game/settings_00496e10.h"
+#include "../src/game/mission_option_flags.h"
 
 struct PlayerFlags_497180 {
     unsigned short low : 8;
@@ -10172,13 +10172,13 @@ public:
     int IsCdPlaying(void);
 };
 
-#include "../src/game/load_flags_00497f40.h"
+#include "../src/game/loading_flags.h"
 
-#include "../src/game/player_slots_00497f40.h"
+#include "../src/game/loading_player_slots.h"
 
-#include "../src/ingame/bit_flags16_00499200.h"
+#include "../src/ingame/net_game_flag_bits.h"
 
-#include "../src/ingame/flags16_00499200.h"
+#include "../src/ingame/net_game_flags.h"
 
 struct Packet_00499ba0 {
     unsigned char type;

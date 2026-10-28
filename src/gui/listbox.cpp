@@ -1,37 +1,37 @@
 #include "../graphics/rect.h"
 #include "../graphics/gaf_frame.h"
 
-struct Bits_004b0230 {
+struct DrawListboxFrameGafEntry {
     unsigned short count;
     char unknown_2[0x28 - 0x2];
     GafFrame* child[1];
 };
 
-struct Gaf_004b0230 {
+struct DrawListboxFrameGaf {
     char unknown_0[0x14];
 };
 
-struct Cell_004b0230 {
+struct DrawListboxFrameCell {
     int step_x;
     int step_y;
 };
 
-struct Surface_004b0230 {
+struct DrawListboxFrameSurface {
     int tiles_x;
     int tiles_y;
     char unknown_8[0xbc - 0x8];
 };
 
-struct Holder_004b0230 {
+struct DrawListboxFrameHolder {
     char unknown_0[4];
     char* entries;
 };
 
-struct Object_004b0230 {
+struct DrawListboxFrameDialog {
     char unknown_0[4];
-    Gaf_004b0230* gaf;
+    DrawListboxFrameGaf* gaf;
     char unknown_8[0x18 - 0x8];
-    Holder_004b0230* holder;
+    DrawListboxFrameHolder* holder;
     char unknown_1c[0x8b2 - 0x1c];
     unsigned char dark;
     char unknown_8b3[0x8c3 - 0x8b3];
@@ -43,10 +43,10 @@ struct Object_004b0230 {
 int __stdcall DrawLine(void* surface, int x0, int y0, int x1, int y1, unsigned char color);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
 #include "gui.h"
-Bits_004b0230* __stdcall FindGafEntry(Gaf_004b0230* gaf, const char* name);
-void __stdcall DrawSurface(Surface_004b0230* dst, Cell_004b0230* cell, int x, int y);
-GafFrame* __stdcall GetGafFrame(Bits_004b0230* bits, int index);
-void __stdcall DrawFrame(Surface_004b0230* dst, GafFrame* pic, int x, int y);
+DrawListboxFrameGafEntry* __stdcall FindGafEntry(DrawListboxFrameGaf* gaf, const char* name);
+void __stdcall DrawSurface(DrawListboxFrameSurface* dst, DrawListboxFrameCell* cell, int x, int y);
+GafFrame* __stdcall GetGafFrame(DrawListboxFrameGafEntry* bits, int index);
+void __stdcall DrawFrame(DrawListboxFrameSurface* dst, GafFrame* pic, int x, int y);
 
 // FUNCTION: 0x4b0090
 void __stdcall DrawBevelBorder(void* surface, Rect* rect, int light,
@@ -76,11 +76,11 @@ void __stdcall DrawBevelBorderDarkFirst(void* surface, Rect* rect, int dark, int
 }
 
 // FUNCTION: 0x4b0230
-void __stdcall DrawListboxFrame(Object_004b0230* obj, int index, Bits_004b0230* bmp)
+void __stdcall DrawListboxFrame(DrawListboxFrameDialog* obj, int index, DrawListboxFrameGafEntry* bmp)
 {
     char* entries;
     int col;
-    Surface_004b0230* surface;
+    DrawListboxFrameSurface* surface;
     int height;
     int x;
     int width;
@@ -93,7 +93,7 @@ void __stdcall DrawListboxFrame(Object_004b0230* obj, int index, Bits_004b0230* 
     int yoff;
     GafFrame* p;
     int y0;
-    Cell_004b0230* cell;
+    DrawListboxFrameCell* cell;
     int h;
     GafFrame* sub;
     entries = obj->holder->entries;
@@ -111,8 +111,8 @@ void __stdcall DrawListboxFrame(Object_004b0230* obj, int index, Bits_004b0230* 
         rect.bottom += 3;
     }
 
-    surface = *(Surface_004b0230**)(obj->holder->entries + 0xbc);
-    cell = (Cell_004b0230*)FindBackgroundCell((Gadget *)entries, index);
+    surface = *(DrawListboxFrameSurface**)(obj->holder->entries + 0xbc);
+    cell = (DrawListboxFrameCell*)FindBackgroundCell((Gadget *)entries, index);
 
     if (cell != 0) {
         for (x = 0; x < surface->tiles_x; x += cell->step_x) {

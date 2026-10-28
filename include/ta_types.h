@@ -5549,13 +5549,6 @@ struct Mode_00446310 {
     short field_140;
 };
 
-struct ModeList_004b5330 {
-    int count;
-    Mode_00446310* modes;
-    char unknown_8[12];
-    char* buffer;
-};
-
 struct Player_004467c0 {
     char unknown_0[319];
     unsigned char alliance;
@@ -8250,18 +8243,6 @@ struct Pair_0046faf0 {
     Pair_0046faf0(Pair_0046faf0&);
 };
 
-class ObjectPool {
-public:
-    std::vector<Item_00470ae0*> items;
-    void* slots;
-    int slotSize;
-    int capacity;
-    int used;
-    virtual ~ObjectPool(void);
-    ObjectPool(ObjectPool&);
-    ObjectPool(int, int);
-};
-
 struct Item_00470ae0 {
     int unknown_0;
 };
@@ -8299,16 +8280,6 @@ public:
     int AllocSlot(int);
 };
 
-class ParticleLists {
-public:
-    std::vector<Listener_00470fb0*> lists[10];
-    ParticleLists(ParticleLists&);
-    ~ParticleLists(void);
-    ParticleLists(void);
-    void UpdateAll(void);
-    void DrawAll(void*);
-};
-
 class Listener_00470fb0 {
 public:
     virtual ~Listener_00470fb0(void);
@@ -8329,28 +8300,6 @@ struct Slot_00471120 {
     Listener_00471120** first;
     Listener_00471120** last;
     char unknown_c[4];
-};
-
-class SmokeParticles {
-public:
-    char unknown_4[4];
-    int time;
-    std::vector<Record_00474cd0> records;
-    int emitPeriod;
-    int holdPeriod;
-    int maxFrame;
-    void* altAnimation;
-    Vec3 pos;
-    virtual ~SmokeParticles(void);
-    SmokeParticles(SmokeParticles&);
-    SmokeParticles(void);
-    virtual void Notify(void*);
-    virtual void FUN_00472d50(void);
-    virtual void Render(int);
-    virtual int IsFinished(void);
-    virtual void FUN_00474df0(void);
-    virtual int FUN_00475440(void);
-    virtual void FUN_00474d50(Vec3*, int, int, int, int, int);
 };
 
 struct Elem_00473500 {
@@ -8390,26 +8339,6 @@ public:
     void FUN_00473590(void*, short, short);
 };
 
-class TeleportParticles {
-public:
-    int deadline;
-    int time;
-    std::vector<Class_00473590> items;
-    int sparkLifetime;
-    Vec3 pos1;
-    Vec3 pos2;
-    Vec3 dir;
-    TeleportParticles(TeleportParticles&);
-    TeleportParticles(void);
-    virtual void FUN_00471430(void);
-    virtual void FUN_00472d50(void);
-    virtual void Render(int);
-    virtual int IsFinished(void);
-    virtual void FUN_004737c0(void);
-    virtual int FUN_00472e00(void);
-    virtual void FUN_004736e0(int, int, int);
-};
-
 class Class_00471470 {
 public:
     std::vector<ParticleSystem*> lists[1];
@@ -8422,26 +8351,6 @@ public:
     int dwords[12];
     void FUN_004739b0(void);
     void FUN_00473a00(int, short, short);
-};
-
-class NanoParticles {
-public:
-    char unknown_0[4];
-    int deadline;
-    int time;
-    std::vector<Elem_00475880> items;
-    Vec3 center;
-    Vec3 radius;
-    Vec3 target;
-    Vec3 spread;
-    NanoParticles(NanoParticles&);
-    NanoParticles(void);
-    void FUN_00472d50(void);
-    void Render(int);
-    int IsFinished(void);
-    void FUN_00473d50(void);
-    int FUN_00472f60(void);
-    void FUN_00473b50(int, int, int);
 };
 
 class Class_004715a0 {
@@ -8474,26 +8383,6 @@ public:
     void FUN_004745e0(void*, short, short);
 };
 
-class WakeParticles {
-public:
-    char unknown_0[8];
-    int time;
-    std::vector<Class_004745e0> items;
-    int period;
-    Vec3 pos_a;
-    Vec3 pos_b;
-    Vec3 dir;
-    int ascending;
-    WakeParticles(WakeParticles&);
-    WakeParticles(void);
-    void FUN_00472d50(void);
-    void Render(int);
-    int IsFinished(void);
-    void FUN_00474880(void);
-    int FUN_00473220(void);
-    void FUN_00474760(int, int, int, int, int);
-};
-
 class Class_00471820 {
 public:
     std::vector<Elem_00473500> lists[1];
@@ -8506,25 +8395,6 @@ public:
     std::vector<Elem_00473500> lists[1];
     void Add(short, TimedSubParticles*);
     void AddTimedSubParticles(Vec3*, int, int, int, short);
-};
-
-class TimedSubParticles {
-public:
-    char unknown_0[8];
-    int time;
-    std::vector<Record_00474cd0> records;
-    int emitPeriod;
-    int holdPeriod;
-    int maxFrame;
-    Vec3 pos;
-    TimedSubParticles(TimedSubParticles&);
-    TimedSubParticles(void);
-    void FUN_00472d50(void);
-    void Render(int);
-    int IsFinished(void);
-    void FUN_004751c0(void);
-    int FUN_004750f0(void);
-    void FUN_00475150(Vec3*, int, int, int);
 };
 
 class Class_00471d70 {
@@ -8540,18 +8410,9 @@ struct Class_00472200 {
     void Add(short, ParticleSystem*);
 };
 
-struct Ctx_004720d0 {
-    Vec3 a;
-    Vec3 b;
-};
-
 struct Pair_00472ab0 {
     short lo;
     short hi;
-};
-
-struct Shape_00472ab0 {
-    Pair_00472ab0 v[3];
 };
 
 class Class_004736c0 {
@@ -8708,15 +8569,6 @@ struct Class_00473290 {
     int FUN_00473290(void);
 };
 
-struct Pos_00473590 {
-    short x;
-    char unknown_2[2];
-    short h;
-    char unknown_6[2];
-    short y;
-    char unknown_a[28];
-};
-
 class Class_004736e0 {
 public:
     char unknown_4[24];
@@ -8783,23 +8635,6 @@ public:
     void FUN_00474170(void*, short, short);
 };
 
-class ThrustParticles {
-public:
-    char unknown_0[8];
-    int time;
-    std::vector<Class_00474170> items;
-    char unknown_1c[40];
-    ThrustParticles(ThrustParticles&);
-    ThrustParticles(void);
-    void FUN_00472d50(void);
-    void Render(int);
-    int IsFinished(void);
-    void Emit(void);
-    int FUN_004730c0(void);
-    void FUN_004742c0(int, int, int, int);
-    void FUN_00473010(void);
-};
-
 class Class_004730f0 {
 public:
     char unknown_0[12];
@@ -8857,18 +8692,6 @@ public:
     virtual void FUN_00474760(Vec3*, Vec3*, int, int, int);
 };
 
-struct SmokeParticle {
-    int data;
-    Pair_00419560* cursor1;
-    int* cursor2;
-    Pair_00419560* cursor3;
-    int limit;
-    int rounds;
-    int period;
-    int countdown;
-    void FUN_00474b00(void);
-};
-
 struct Pos_00474b80 {
     short x;
     char unknown_2[2];
@@ -8914,19 +8737,6 @@ struct Class_00474f80 {
     int field_10;
     int field_14;
     int FUN_00474f80(void);
-};
-
-class TimedSubParticle {
-public:
-    int data;
-    int x;
-    int y;
-    int z;
-    int limit;
-    int count;
-    int period;
-    int timer;
-    void FUN_00474fc0(void);
 };
 
 class Class_00475040 {
@@ -9157,14 +8967,6 @@ struct Table_0047ae60 {
     int difficulty;
 };
 
-struct Surfaces_0047bdf0 {
-    void* surface_0;
-    void* surface_4;
-    void* back;
-    void* field_c;
-    void* surface_10;
-};
-
 class MoviePlayer {
 public:
     void* smack;
@@ -9210,15 +9012,6 @@ struct Smk_0047bf70 {
     int lastTop;
     int lastWidth;
     int lastHeight;
-};
-
-struct Smk_0047bf70_b {
-    char unknown_0[44];
-    unsigned long paletteColors;
-    char unknown_30[12];
-    unsigned long palette;
-    char unknown_40[1020];
-    unsigned long paletteType;
 };
 
 class Class_0047bf70 {
@@ -12447,16 +12240,6 @@ struct BitmapInfo_004b5510 {
     tagRGBQUAD bmiColors[256];
 };
 
-struct DirectDrawState {
-    void* ddraw;
-    void* primary;
-    void* back;
-    void* clipper;
-    void* palette;
-    void* field_98;
-    int field_9c;
-};
-
 union Flags_4b5980 {
     union { unsigned short value; struct { unsigned short opt : 1; unsigned short bit1 : 1; unsigned short gdi : 1; unsigned short bit3 : 1; unsigned short bit4 : 1; unsigned short has_c0 : 1; unsigned short has_c4 : 1; unsigned short has_c8 : 1; unsigned short has_cc : 1; unsigned short has_d0 : 1; unsigned short sound_opt : 1; unsigned short no_video : 1; unsigned short bit12 : 4; } bits; };
 };
@@ -12466,15 +12249,6 @@ struct Mode_4b5980 {
     int unknown_04;
     int unknown_08;
     int unknown_0c;
-};
-
-struct View_4b5980 {
-    int x;
-    int y;
-    int z;
-    int unknown_0c;
-    int unknown_10;
-    int unknown_14;
 };
 
 struct Event_4b5cc0 {
@@ -12689,21 +12463,6 @@ public:
     void* AssignEntry(int*);
 };
 
-struct Display_004b8310 {
-    char unknown_0[200];
-    unsigned char* lightTable;
-    char unknown_cc[36];
-    unsigned char flags;
-    char unknown_f1[3];
-};
-
-struct Src_004b8310 {
-    int width;
-    int height;
-    int pitch;
-    Bitmap_00437b50** pixels;
-};
-
 struct Display_004b8500 {
     char unknown_0[192];
     unsigned char* field_c0;
@@ -12739,27 +12498,9 @@ struct Entry_004b8b30 {
     char unknown_2[6];
 };
 
-struct GafEntry_004b8d40 {
-    unsigned short count;
-    unsigned char kind;
-    char unknown_3[5];
-    char name[1];
-    char unknown_9[31];
-    Bitmap_00437b50* child[1];
-    Entry_004b8b30 entries[1];
-};
-
 struct Entry_5 {
     int off;
     int pad;
-};
-
-struct Blk {
-    unsigned short count;
-    char unknown_2[8];
-    unsigned char subcount;
-    char unknown_b[29];
-    Entry_5 e[2];
 };
 
 struct Desc_004b8ec0 {
@@ -13108,14 +12849,6 @@ struct Point_004bf060 {
 struct Point_004bf260 {
     int x;
     int y;
-};
-
-struct Game_004bfe10 {
-    char unknown_0[204];
-    int field_cc;
-    char unknown_d0[33];
-    unsigned char flags;
-    char unknown_f2[2];
 };
 
 struct Point_004c0330 {
@@ -13622,12 +13355,6 @@ struct Obj_004c61b0 {
 struct Class_004c61f0 {
     char unknown_0[152];
     int field_98;
-};
-
-struct Arg_004c6210 {
-    int unknown_0;
-    Intf_004c6210* field_4;
-    Intf_004c6210* field_8;
 };
 
 class Intf_004c6210 {
@@ -14787,37 +14514,6 @@ public:
     virtual int __stdcall Slot16(void);
     virtual int __stdcall Slot17(void);
     virtual int __stdcall GetPlayerAddress(unsigned long, void*, unsigned long*);
-};
-
-struct Header_004cac40 {
-    unsigned char a;
-    unsigned char b;
-    unsigned char c;
-    unsigned char d;
-    unsigned short e;
-    unsigned short f;
-    short g;
-    short h;
-    short i;
-    short j;
-    unsigned char palette[48];
-    unsigned char k;
-    unsigned char l;
-    unsigned short m;
-    unsigned short n;
-    char unknown_46[58];
-};
-
-struct Bitmap_004caec0 {
-    int width;
-    int height;
-    char unknown_8[4];
-    unsigned char* data;
-};
-
-struct Game_004caec0 {
-    char unknown_0[532];
-    tagPALETTEENTRY palette[256];
 };
 
 struct Image_004caf30 {
@@ -16566,7 +16262,6 @@ struct Rating {
 
 static_assert(sizeof(Class_004cdb40) == 0x294, "Class_004cdb40 size");
 static_assert(sizeof(Class_0047bf20) == 0x548, "Class_0047bf20 size");
-static_assert(sizeof(Surfaces_0047bdf0) == 0x14, "Surfaces_0047bdf0 size");
 static_assert(sizeof(MoviePlayer) == 0x5b8, "MoviePlayer size");
 static_assert(sizeof(Class_0047bf70) == 0x5b4, "Class_0047bf70 size");
 static_assert(sizeof(Class_0047c230) == 0x410, "Class_0047c230 size");
@@ -16578,7 +16273,6 @@ static_assert(sizeof(BitmapInfo_004b5510) == 0x428, "BitmapInfo_004b5510 size");
 static_assert(sizeof(Obj) == 0x729, "Obj size");
 static_assert(sizeof(Surface_4b6570) == 0x4, "Surface_4b6570 size");
 static_assert(sizeof(Screen_004c6210) == 0x10, "Screen_004c6210 size");
-static_assert(sizeof(Game_004caec0) == 0x614, "Game_004caec0 size");
 static_assert(sizeof(Game_004cb170) == 0x614, "Game_004cb170 size");
 static_assert(sizeof(Class_004cfb40) == 0x28c, "Class_004cfb40 size");
 static_assert(sizeof(Class_004cf180) == 0x1b8, "Class_004cf180 size");

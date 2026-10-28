@@ -631,8 +631,13 @@ void* __stdcall LoadGaf(char* name)
 }
 
 struct GafEntry_004b8d40 {
-    char unknown_0[8];
+    unsigned short count;
+    unsigned char kind;
+    char unknown_3[5];
     char name[1];
+    char unknown_9[31];
+    GafFrame* child[1];
+    Entry_004b8b30 entries[1];
 };
 
 struct Gaf_004b8d40 {

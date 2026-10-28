@@ -1263,8 +1263,6 @@ los_radar,game,shared_write,Game::width_142eb,2
 los_radar,game,shared_write,Unit::flags,3
 los_radar,game,shared_write,Vec3::x,2
 los_radar,game,shared_write,Vec3::z,2
-los_radar,map,call,LosTable::GetLine,1
-los_radar,map,call,LosTable::SetNumLines,1
 los_radar,map,shared_write,Cell::feature,7
 los_radar,map,shared_write,Cell::high,7
 los_radar,map,shared_write,Cell::low,7

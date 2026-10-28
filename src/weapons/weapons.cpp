@@ -128,11 +128,6 @@ struct Unit_0049c880;
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
 
-struct Net {
-    char unknown_0[0xd48];
-    int noSeaLevelTrigger;
-};
-
 #include "../game/game.h"
 
 #pragma pack(pop)
@@ -410,7 +405,7 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
         }
         projectile->flags = projectile->flags | 2;
     }
-    if (((Net *)g_game->net.get())->noSeaLevelTrigger && hostile && !unit) {
+    if (g_game->net->noSeaLevelTrigger && hostile && !unit) {
         if (projectile == g_game->tracked) {
             g_game->trackedPos = g_game->tracked->position;
             g_game->value_1434b = projectile->type->holdTime;
@@ -1118,7 +1113,10 @@ struct Shot_0049cc20 {
     char unknown_0[0x8];
     int aimCobDone;
     Ref<WeaponDef> def;
-    char unknown_10[0x1b - 0x10];
+    char pad_10[0x16 - 0x10];
+    short heading;
+    short pitch;
+    char pad_1a;
     unsigned char flags;
 };
 
@@ -1333,10 +1331,12 @@ Projectile* __stdcall FindTargetableProjectile(Table_0049d120* table, int index)
 struct Event_0049d1e0 {
     char unknown_0[0xd];
     Vec3 pos;
-    char unknown_19;
+    unsigned char team;
     unsigned char flag : 1;
     char unknown_1b[0x1f - 0x1b];
     short ownerId;
+    unsigned short unitId;
+    unsigned char entryIndex;
 };
 #pragma pack(pop)
 
@@ -2111,7 +2111,7 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
         return;
     } else if (proj->positionWords.yWhole >= g_game->seaLevel) {
         return;
-    } else if (((Net *)g_game->net.get())->noSeaLevelTrigger) {
+    } else if (g_game->net->noSeaLevelTrigger) {
         return;
     }
     DetonateProjectile(proj, 0);
@@ -2687,7 +2687,7 @@ void UpdateProjectiles()
             }
             if (oldY > g_game->seaLevel && p->positionWords.yWhole <= g_game->seaLevel) {
                 Cell* cell = g_seams.los_radar->GetMapCellAtPosition((Vec3*)&p->position);
-                if (cell && cell->high < g_game->seaLevel && ((Net*)g_game->net.get())->noSeaLevelTrigger == 0)
+                if (cell && cell->high < g_game->seaLevel && g_game->net->noSeaLevelTrigger == 0)
                     AddExplosionEffect(&p->position, type->splash, 0, 1);
             }
         }

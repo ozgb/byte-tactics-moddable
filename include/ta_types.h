@@ -3772,13 +3772,6 @@ struct ImageFrame {
     short unknown;
 };
 
-struct Explosion {
-    short count;
-    char flags;
-    char unknown_3[37];
-    ImageFrame frames[1];
-};
-
 #include "../src/graphics/object3do.h"
 
 struct Shape {
@@ -10657,27 +10650,6 @@ public:
 
 #include "../src/ingame/flags16_00499200.h"
 
-struct Obj_00499ab0 {
-    char unknown_0[150];
-    Kind_00499ab0* kind;
-    char unknown_9a[14];
-    unsigned short team;
-};
-
-struct WeaponFirePacket {
-    unsigned char type;
-    Vec3 a;
-    Vec3 b;
-    unsigned char f19;
-    unsigned char flag : 1;
-    unsigned char : 7;
-    unsigned short f1b;
-    unsigned short f1d;
-    unsigned short f1f;
-    unsigned short f21;
-    unsigned char f23;
-};
-
 struct Packet_00499ba0 {
     unsigned char type;
     Vec3 a;
@@ -10686,36 +10658,14 @@ struct Packet_00499ba0 {
     char unknown_1a[10];
 };
 
-struct Object_00499c10 {
-    char unknown_0[102];
-    short heading;
-    char unknown_68[50];
-    Class_004b0a70* anims;
-};
-
-struct NameLess_00499cd0 {
-    char unknown_0[1];
-    unsigned char operator()(char*, char*);
-};
-
 struct UnitType_499e50 {
     char unknown_0[254];
     short value;
 };
 
-union Fixed_0049abb0 {
-    union { int value; struct { unsigned short fraction; short whole; } parts; };
-};
-
 struct Weapon_0049abb0 {
     WeaponDef* def;
     char unknown_4[24];
-};
-
-struct ProjectileDetonatePacket {
-    char kind;
-    Vec3 pos;
-    unsigned char typeId;
 };
 
 struct Angles_0049be60 {
@@ -10736,46 +10686,9 @@ struct Head_0049cc20 {
     char unknown_4e[50];
 };
 
-struct Shot_0049cc20 {
-    char unknown_0[8];
-    int piece;
-    UnitMotion* def;
-    char unknown_10[6];
-    short heading;
-    short pitch;
-    char unknown_1a;
-    unsigned char weapon;
-};
-
 struct Heading_0049cde0 {
     char unknown_0[76];
     short heading;
-};
-
-struct Shot_0049d000 {
-    char unknown_0[12];
-    void* weapon;
-};
-
-struct Entry_0049d120 {
-    char unknown_0[12];
-    UnitMotion* def;
-    char unknown_10[10];
-    unsigned char active;
-    char unknown_1b;
-};
-
-struct Event_0049d1e0 {
-    char unknown_0[13];
-    Vec3 pos;
-    unsigned char team;
-    unsigned char flag : 1;
-    unsigned char unknown_1a : 7;
-    unsigned short f_1b;
-    unsigned short f_1d;
-    unsigned short ownerId;
-    unsigned short unitId;
-    unsigned char entryIndex;
 };
 
 struct DefFlags_0049d270 {
@@ -10789,15 +10702,6 @@ struct DefFlags_0049d270 {
     unsigned int b9 : 11;
     unsigned int b20 : 1;
     unsigned int b21 : 11;
-};
-
-struct Entry_0049d270 {
-    char unknown_0[12];
-    UnitMotion* type;
-    char unknown_10[6];
-    short f_16;
-    short f_18;
-    char unknown_1a[2];
 };
 
 struct Packet_0049d580 {
@@ -10840,16 +10744,6 @@ struct Packet_0049db70 {
     unsigned char weapon;
 };
 
-struct Aim_0049dd60 {
-    char unknown_0[12];
-    UnitMotion* type;
-    char unknown_10[6];
-    short field_16;
-    short field_18;
-    char unknown_1a;
-    unsigned char weapon;
-};
-
 struct Packet_0049dd60 {
     unsigned char type;
     Vec3 a;
@@ -10886,12 +10780,6 @@ struct Flags_0049e010 {
     unsigned int bit19 : 1;
     unsigned int bit20 : 1;
     unsigned int : 11;
-};
-
-struct Frame_0049e070 {
-    unsigned char i;
-    char unknown_1[3];
-    int maxTime;
 };
 
 struct Flags_0049e1a0 {

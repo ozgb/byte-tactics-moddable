@@ -3674,7 +3674,7 @@ struct Language {
     GafEntry* glyphs;
 };
 
-struct Point {
+struct MouseRecord {
     int x;
     int y;
     int unknown_08[4];
@@ -4199,7 +4199,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
     Rect r;
     GetGadgetRect(entry, &r);
 
-    Point point = *(Point*)&obj->pointX;
+    MouseRecord point = *(MouseRecord*)&obj->pointX;
     point.x -= entries->x;
     point.y -= entries->y;
 
@@ -4432,7 +4432,7 @@ int __stdcall HandleTextInput(Gui* obj, int index, int key)
     GetGadgetRectByIndex((char*)entries, index, &rect);
     SelectFontForEntry_inlined(entries, index);
 
-    Point point = *(Point*)&obj->pointX;
+    MouseRecord point = *(MouseRecord*)&obj->pointX;
     int rel_x = point.x - entries->x;
     int rel_y = point.y - entries->y;
 
@@ -5675,7 +5675,7 @@ int __stdcall UpdateMenu(Gui* menu)
     if (entries == 0)
         return 1;
 
-    Point& pt = *(Point*)&menu->pointX;
+    MouseRecord& pt = *(MouseRecord*)&menu->pointX;
     {
         Rect box;
         box.left = entries->x;
@@ -5694,7 +5694,7 @@ int __stdcall UpdateMenu(Gui* menu)
     int saved = menu->hoverGadgetIndex;
     menu->hoverGadgetIndex = -1;
 
-    Point point;
+    MouseRecord point;
     memcpy(&point, &menu->pointX, 24);
     point.x -= entries->x;
     point.y -= entries->y;

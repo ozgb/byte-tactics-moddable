@@ -13,7 +13,7 @@
 
 #include "gaf_frame.h"
 
-struct Span {
+struct ScanlineSpan {
     int x1;
     int x2;
     char unknown_8[0x18 - 0x8];
@@ -837,8 +837,8 @@ int __stdcall DrawPolygon(Surface* surface, Vec3* pts, int count, int color)
 // FUNCTION: 0x4c0820
 int __stdcall DrawPolygonEdges(GafFrame* surf, Vec3* pts, int count,
                            int color) {
-    Span spans[2048];
-    Span* out;
+    ScanlineSpan spans[2048];
+    ScanlineSpan* out;
     Vec3* b;
     int x, dx;
     int ymin = 999999;
@@ -847,7 +847,7 @@ int __stdcall DrawPolygonEdges(GafFrame* surf, Vec3* pts, int count,
     int xmin = 999999;
     int iymin, iymax;
     int y;
-    Span* s;
+    ScanlineSpan* s;
     int i;
     Vec3* p;
     i = 0;
@@ -954,7 +954,7 @@ int __stdcall DrawPolygonEdges(GafFrame* surf, Vec3* pts, int count,
 }
 
 // FUNCTION: 0x4c0b10
-void __stdcall FillShadedSpan(int row, Span* span, GafFrame* surf, unsigned char color)
+void __stdcall FillShadedSpan(int row, ScanlineSpan* span, GafFrame* surf, unsigned char color)
 {
     unsigned char* p = surf->pixelsOrLayers;
     unsigned char* d = surf->scratch;
@@ -1005,7 +1005,7 @@ void __stdcall FillShadedSpan(int row, Span* span, GafFrame* surf, unsigned char
 int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
                            unsigned char color) {
     int y0, y1, x, dx, dz;
-    Span spans[2048];
+    ScanlineSpan spans[2048];
     int maxX = -999999;
     int minY = 999999;
     int maxY = -999999;
@@ -1048,7 +1048,7 @@ int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
     if (maxY == minY)
         return 0;
     {
-        Span* sp = spans;
+        ScanlineSpan* sp = spans;
         i = minYi;
         for (;;) {
             int j = i - 1;
@@ -1142,7 +1142,7 @@ int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
         }
     }
     {
-        Span* sp = spans;
+        ScanlineSpan* sp = spans;
         for (i = minY; i < maxY; i++) {
             if (sp->x2 - sp->x1 > 0)
                 FillShadedSpan(i, sp, surf, color);
@@ -1156,7 +1156,7 @@ int __stdcall FillShadedPolygon(GafFrame* surf, Point_004c0c70* pts, int n,
 int __stdcall FillFlatPolygon(GafFrame* surf, Vec3* pts, int n, int color)
 {
     int y0, y1, x, dx, dz;
-    Span spans[2048];
+    ScanlineSpan spans[2048];
     int maxX = -999999;
     int minY = 999999;
     int maxY = -999999;
@@ -1200,7 +1200,7 @@ int __stdcall FillFlatPolygon(GafFrame* surf, Vec3* pts, int n, int color)
     if (maxY == minY)
         return 0;
     {
-        Span* sp = spans;
+        ScanlineSpan* sp = spans;
         {
             int i = minYi;
             for (;;) {
@@ -1284,7 +1284,7 @@ int __stdcall FillFlatPolygon(GafFrame* surf, Vec3* pts, int n, int color)
         }
     }
     {
-        Span* sp = spans;
+        ScanlineSpan* sp = spans;
         for (i = minY; i < maxY; i++) {
             if (sp->x2 - sp->x1 > 0)
                 FillFlatSpan(i, sp, surf, color);
@@ -1390,7 +1390,7 @@ unsigned char __stdcall FontHeight(void* ptr)
 }
 
 // FUNCTION: 0x4c0a90
-void __stdcall PlotSpanEnds(int row, Span* span, GafFrame* surf, unsigned char color)
+void __stdcall PlotSpanEnds(int row, ScanlineSpan* span, GafFrame* surf, unsigned char color)
 {
     unsigned char* d = surf->scratch;
     unsigned char* p = surf->pixelsOrLayers;
@@ -1421,7 +1421,7 @@ void __stdcall PlotSpanEnds(int row, Span* span, GafFrame* surf, unsigned char c
 }
 
 // FUNCTION: 0x4c06e0
-void __stdcall FillFlatSpan(int row, Span* span, GafFrame* surf, unsigned char color)
+void __stdcall FillFlatSpan(int row, ScanlineSpan* span, GafFrame* surf, unsigned char color)
 {
     unsigned char* p = surf->pixelsOrLayers;
     unsigned char* d = surf->scratch;

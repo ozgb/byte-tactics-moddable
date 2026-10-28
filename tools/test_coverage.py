@@ -206,13 +206,53 @@ class ReasonTest(unittest.TestCase):
     def test_sorted_subsystem_row_without_a_reason_fails(self):
         t = cov.Totals(functions=1, never_entered=[("Send", "src/network/net.cpp", "?Send@@YAXXZ")])
         text = cov.unreasoned({"network": t})
-        self.assertEqual(text, "coverage: 1 never-entered functions of files, game and network have no reason "
-                               "in data/coverage.csv:\nnetwork Send (src/network/net.cpp)")
+        self.assertEqual(text, "coverage: 1 never-entered functions of %s and %s have no reason "
+                               "in data/coverage.csv:\nnetwork Send (src/network/net.cpp)"
+                         % (", ".join(cov.SORTED[:-1]), cov.SORTED[-1]))
         t.reasons[t.never_entered[0]] = "network"
         self.assertEqual(cov.unreasoned({"network": t}), "")
 
     def test_unsorted_subsystem_without_a_reason_passes(self):
-        self.assertEqual(cov.unreasoned(self.totals()), "")
+        t = cov.Totals(functions=1, never_entered=[("Draw", "src/graphics/draw.cpp", "?Draw@@YAXXZ")])
+        self.assertEqual(cov.unreasoned({"presentation": t, "platform": t, "seams": t}), "")
+
+    def test_every_simulation_subsystem_is_sorted(self):
+        for name in ("players", "orders", "state", "units", "map", "weapons", "ai", "los_radar", "pathfinding",
+                     "economy", "features", "wind_meteors", "files", "game", "network"):
+            self.assertIn(name, cov.SORTED)
+        for name in ("presentation", "platform", "seams"):
+            self.assertNotIn(name, cov.SORTED)
+
+    def test_a_newly_sorted_subsystem_row_without_a_reason_fails(self):
+        t = cov.Totals(functions=1, never_entered=[("GetOrderName", "src/orders/order_list.cpp", "?GetOrderName@@YAXXZ")])
+        text = cov.unreasoned({"orders": t})
+        self.assertIn("orders GetOrderName (src/orders/order_list.cpp)", text)
+        t.reasons[t.never_entered[0]] = "info-panel"
+        self.assertEqual(cov.unreasoned({"orders": t}), "")
+
+    def test_check_fails_for_a_newly_sorted_row_without_a_reason(self):
+        with tempfile.TemporaryDirectory() as d:
+            exe = Path(d) / "TotalA.exe"
+            exe.write_bytes(b"")
+            live = Path(d) / cov.LIVE_COUNTERS
+            live.write_text("?Reset@UnitResources@@QAEXXZ\n?Never@@YAXXZ\n")
+            saved = (cov.export, cov.read_subsystems, cov.OUT, sys.argv)
+            cov.export = lambda exe, profdata: EXPORT
+            cov.read_subsystems = lambda: (KEY, NAME)
+            cov.OUT = Path(d) / "coverage.csv"
+            totals = self.totals()
+            cov.write_csv(totals, cov.OUT)
+            sys.argv = ["coverage.py", "--exe", str(exe), "--from", "x.profdata", "--check"]
+            try:
+                with contextlib.redirect_stdout(io.StringIO()), self.assertRaises(SystemExit) as raised:
+                    cov.main()
+                self.assertIn("economy Never (src/game/economy.cpp)", str(raised.exception))
+                totals["economy"].reasons[self.NEVER] = "menu"
+                cov.write_csv(totals, cov.OUT)
+                with contextlib.redirect_stdout(io.StringIO()):
+                    cov.main()
+            finally:
+                cov.export, cov.read_subsystems, cov.OUT, sys.argv = saved
 
     def test_reading_a_file_without_the_reason_column(self):
         with tempfile.TemporaryDirectory() as d:

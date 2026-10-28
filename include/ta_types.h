@@ -6371,11 +6371,7 @@ struct Packet {
     int AppendPacket(Packet*, int, void*, unsigned int, int);
 };
 
-struct Settings {
-    int field_471;
-    int flags_475;
-    char unknown_8[72];
-};
+#include "../src/network/settings.h"
 
 struct Packet_00456190 {
     unsigned char type;

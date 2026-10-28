@@ -4517,11 +4517,6 @@ public:
     char unknown_0[1];
 };
 
-struct Elem_432cb0 {
-    Class_004c9390 handle;
-    int field4;
-};
-
 struct Elem_432cb0_2 {
     Class_004c9390 handle;
     int field4;
@@ -4608,25 +4603,12 @@ public:
     int GetLosLineCount(void);
 };
 
-class LosTable {
-public:
-    char unknown_0[4];
-    int field_4;
-    int GetLosLine(short);
-};
-
 class Class_004339c0 {
 public:
     char unknown_0[4];
     int field_4;
     int field_8;
     int GetLosLineStepCount(void);
-};
-
-class LosLine {
-public:
-    char unknown_0[1];
-    void GetLosLineStep(short, unsigned short*, unsigned short*);
 };
 
 struct Elem_00434a60 {
@@ -4836,21 +4818,6 @@ public:
     int field_c20;
     int ComputeMapChecksum(void);
     char* GetName(int);
-};
-
-class MapCache {
-public:
-    char unknown_0[4];
-    void InsertMapCacheEntry(MapCacheEntry*, int, MapCacheEntry&);
-};
-
-class MapCacheEntry {
-public:
-    Class_004c9390 handle;
-    int field_4;
-    MapCacheEntry(MapCacheEntry&);
-    MapCacheEntry& operator=(MapCacheEntry&);
-    MapCacheEntry& SetChecksum(Class_004373a0*);
 };
 
 class Class_00437800 {
@@ -7339,11 +7306,6 @@ struct Pic_4665d0 {
     unsigned short y;
 };
 
-struct IconSet_00466780 {
-    int count;
-    unsigned char* data;
-};
-
 union FlagWord {
     union { unsigned short all; struct { unsigned short bit0 : 1; unsigned short bit1 : 1; unsigned short bit9 : 1; } bits; };
 };
@@ -8820,12 +8782,6 @@ union Fix_0047d2e0 {
     union { int v; struct { short lo; short hi; } p; };
 };
 
-struct Pos_0047d2e0 {
-    Fix_0047d2e0 x;
-    Fix_0047d2e0 y;
-    Fix_0047d2e0 z;
-};
-
 struct Cell_0047e5c0 {
     char unknown_0[6];
     Obj_0047e5c0* head;
@@ -9222,12 +9178,6 @@ public:
     unsigned short FUN_00481470(void);
 };
 
-struct FrameTable {
-    unsigned short count;
-    char unknown_2[38];
-    Entry* entries;
-};
-
 struct Eye_00482130 {
     void* field_0;
     short* field_4;
@@ -9274,11 +9224,6 @@ struct Frame_00481d50 {
 };
 
 #include "../src/map/eye.h"
-
-struct Expired {
-    char unknown_0[1];
-    int operator()(Eye_00482130&);
-};
 
 struct Out_482830 {
     short x;
@@ -9461,19 +9406,6 @@ struct PieceBits_00487080 {
     unsigned char c : 2;
     unsigned char d : 1;
     unsigned char b5 : 3;
-};
-
-struct Slot {
-    int f0;
-    int unused;
-    int f8;
-    void* obj;
-    int fc;
-    short f14;
-    short f16;
-    short f18;
-    unsigned char f1a;
-    PieceBits_00487080 flags;
 };
 
 struct SrcPiece_00487080 {
@@ -14409,11 +14341,6 @@ public:
     char unknown_30[280];
     void FormatBlockHistory(char*, int, char);
     void FUN_004d8d40(char);
-};
-
-struct S {
-    char unknown_0[4];
-    int val;
 };
 
 struct TlsBlock {

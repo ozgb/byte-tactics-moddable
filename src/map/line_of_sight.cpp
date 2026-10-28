@@ -79,6 +79,7 @@ struct FrameTable {
     char unknown_2[0x28 - 2];
     void* entries;
 };
+static_assert(sizeof(FrameTable) == 44, "");
 
 #include "eye.h"
 

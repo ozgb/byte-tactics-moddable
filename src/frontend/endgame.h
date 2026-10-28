@@ -3,6 +3,12 @@
 
 struct Gui;
 
+struct Data {
+    char unknown_0[0x14];
+    char* items;
+    char unknown_18[8];
+};
+
 void __stdcall CreateGameObject();
 void __stdcall SetMissionStatus(int param1, int param2, int param3);
 void __stdcall SetUpEndMissionScreen();

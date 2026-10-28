@@ -25,7 +25,6 @@ struct Surface_0041df20;
 
 #include "../graphics/rect.h"
 
-#include "list_data.h"
 
 struct Gui;
 

@@ -47,7 +47,7 @@ struct Gadget {
 
 #include "../gui/gui.h"
 
-#include "list_data.h"
+#include "endgame.h"
 
 #include "../gui/layer.h"
 

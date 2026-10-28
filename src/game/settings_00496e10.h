@@ -2,7 +2,7 @@
 #define SETTINGS_00496E10_H
 
 #pragma pack(push, 1)
-struct Settings_00496e10 {
+struct MissionOptionFlags {
     int value;
     int flag_4;
     int flag_8;
@@ -11,7 +11,7 @@ struct Settings_00496e10 {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(Settings_00496e10) == 16, "Settings_00496e10");
+static_assert(sizeof(MissionOptionFlags) == 16, "Settings_00496e10");
 #endif
 
 #endif

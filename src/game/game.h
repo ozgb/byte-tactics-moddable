@@ -227,7 +227,7 @@ struct Game {
             char pad_2878[296];
         };
         struct {
-            Menu_00497ce0 menu_519_18;
+            Main2Menu menu_519_18;
             char unknown_531_a[5686];
             PlayerEntry_0046d6c0 players_1b67[10];
             char pad_2855[331];
@@ -262,7 +262,7 @@ struct Game {
             char pad_2a2c[4];
         };
         int shareVisionReady[11];
-        PlayerSlots_00497f40 slots_29a4;
+        LoadingPlayerSlots slots_29a4;
     };
     Class_0046d040* sync;
     int recvPacketSize;
@@ -332,7 +332,7 @@ struct Game {
         };
         struct {
             char pad_2ab1_a[155];
-            Flags_00496ce0 flags_2b4c;
+            PreBattleFlags flags_2b4c;
             char pad_2b4e_a[28];
         };
         char buffer_2ab1[185];
@@ -518,7 +518,7 @@ struct Game {
                 unsigned short dirty : 1;
             } bits_2bee_3;
             char pad_2bf0_a[1];
-            Zero11_004917d0 chatRecipients_2bf1_b;
+            ChatRecipients chatRecipients_2bf1_b;
             char pad_2bfc_a[122];
             Point view_2c76;
             char pad_2c7e[44];
@@ -992,7 +992,7 @@ struct Game {
             char pad_37f16_a[3];
             unsigned short soundFlags_37f19_2;
             char pad_37f1b[20];
-            ClockFlags_0042f9a0 uiOptionFlags_37f2f;
+            UiOptionFlags uiOptionFlags_37f2f;
             char pad_37f31_a[8];
         };
         struct {
@@ -1103,7 +1103,7 @@ struct Game {
             int playerCount;
             FrameTimers timers;
             int profileBarsEnabled;
-            Slot_0041e420 slots_38dd9[10];
+            EndGamePlayerSlot slots_38dd9[10];
             char pad_3901d[58];
             int endGameState;
             unsigned int deadline;
@@ -1123,7 +1123,7 @@ struct Game {
         };
         struct {
             char pad_37f3d[30];
-            SideName_00497180 sideNames[2];
+            SideNameEntry sideNames[2];
             char unknown_383bf[1682];
             unsigned char pauseFlags;
             char pad_38a52[1];
@@ -1134,7 +1134,7 @@ struct Game {
             unsigned char progress_38d6f[6];
             unsigned char flags_38d75;
             char pad_38d76[9];
-            MissionFlags_0042f9a0 allMissionsFlags;
+            AllMissionsFlags allMissionsFlags;
             char pad_38d81[8];
             int total;
             int values[8];
@@ -1149,11 +1149,11 @@ struct Game {
             } bits_38a51;
             char imageOutputDirectory[516];
             char pad_38c57[286];
-            LoadFlags_00497f40 loadingFlags;
+            LoadingFlags loadingFlags;
             char pad_38d77[1048];
         };
         struct {
-            Side_00431a60 sideDefs[5];
+            SideDef sideDefs[5];
             char unknown_38a37[26];
             struct {
                 unsigned short flag_38a51 : 1;
@@ -1259,7 +1259,7 @@ struct Game {
             int singleLineOfSight;
             int singleLOSType;
         };
-        Settings_00496e10 singleSettings;
+        MissionOptionFlags singleSettings;
     };
     int multiCommanderDeath;
     int multiMapping;

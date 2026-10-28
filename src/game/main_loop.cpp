@@ -302,7 +302,7 @@ void CampaignSetupFrame()
 }
 
 // FUNCTION: 0x496e10
-void __stdcall ApplyMissionOptionFlags(Settings_00496e10* s)
+void __stdcall ApplyMissionOptionFlags(MissionOptionFlags* s)
 {
     g_game->commanderDeath = s->value;
     g_game->bits_14281.bit2_14281 = s->flag_c;

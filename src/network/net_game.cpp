@@ -2269,7 +2269,7 @@ static inline void DropPlayer(int id)
     out->type = 0x1c;
     out->id = id;
     Player* p = &g_game->players[FindSlotByDpid(id)];
-    if ((p->active && p->type == 3) || !((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value & 1) || ((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value & 2))
+    if ((p->active && p->type == 3) || !((*(volatile union LoadingFlags*)&g_game->loadingFlags).value & 1) || ((*(volatile union LoadingFlags*)&g_game->loadingFlags).value & 2))
         RemovePlayer(id);
     BroadcastPacket(LocalPlayer()->id, out, 5);
 }

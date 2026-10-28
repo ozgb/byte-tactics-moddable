@@ -102,7 +102,7 @@ void __stdcall LoadSideData(void)
     char msgEnergymax[0x100];
     char msgEnergybar[0x100];
     char msgMetalmax[0x100];
-    Side_00431a60* s;
+    SideDef* s;
 
     BuildDataPath(name, "gamedata", "sidedata", "TDF");
     parser.LoadFile(name);

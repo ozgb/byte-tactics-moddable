@@ -160,7 +160,7 @@ struct Slot_00497180 {
 struct Options_00497180 {
     Slot_00497180 slots[10];
     char unknown_f0[0x108 - 0xf0];
-    Settings_00496e10 settings;
+    MissionOptionFlags settings;
     int fixedloc;
 };
 
@@ -208,7 +208,7 @@ Gadget_497180* __stdcall LoadGuiLayer(Sub_497180* sub, const char* name, int fla
 void __cdecl operator delete(void* p);
 
 #include "../gui/gui.h"
-void __stdcall BlitMenuLayers(Menu_00497ce0* menu, int a, int b);
+void __stdcall BlitMenuLayers(Main2Menu* menu, int a, int b);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
 char* __stdcall Translate(char* s);
 
@@ -249,7 +249,7 @@ unsigned int __cdecl GetTicks();
 #include "../state/sim_globals.h"
 int __stdcall PointInRect(Rect* r, int x, int y);
 
-inline void __stdcall ApplyMissionOptionFlags(Settings_00496e10* s)
+inline void __stdcall ApplyMissionOptionFlags(MissionOptionFlags* s)
 {
     g_game->commanderDeath = s->value;
     g_game->mapFlags_14281.bit2 = s->flag_c;
@@ -352,8 +352,8 @@ void __cdecl LoadMatch(void*)
 
     if (g_seams.map->GetGameType(g_game->net) != 1) {
         if (g_seams.map->GetGameType(g_game->net) == 3) {
-            (*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value |= 4;
-            while (((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value & 8) == 0)
+            (*(volatile union LoadingFlags*)&g_game->loadingFlags).value |= 4;
+            while (((*(volatile union LoadingFlags*)&g_game->loadingFlags).value & 8) == 0)
                 host_sleep_ms(0x32);
 
             int sel = FindHostSlot();
@@ -498,7 +498,7 @@ tail:
     }
     g_seams.players->RebuildAIFeatureCells();
 
-    (*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).value |= 2;
+    (*(volatile union LoadingFlags*)&g_game->loadingFlags).value |= 2;
 }
 static inline char* PlayerRecordAt(Game* game, int off) { return (char*)(*(PlayerRec_00497f40(*)[10])&game->players) + off; }
 
@@ -609,7 +609,7 @@ void LoadingScreenFrame(void)
     PlayerInfo_00497f40* pi;
     char namebuf[100];
 
-    if (!(*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.started) {
+    if (!(*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.started) {
         while (((int)g_game->layer) != 0) {
             CloseTopScreen((Gui *)&g_game->gui);
         }
@@ -675,10 +675,10 @@ void LoadingScreenFrame(void)
         memset(g_scorePanelLossFlash, 0, 10);
         memset(g_loadingBarFlashAlpha, 0, 6);
         memset(g_loadingBarPrevPercent, 0, 6);
-        (*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.started = 1;
+        (*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.started = 1;
         OnlineUnload();
     }
-    if ((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.loaded) {
+    if ((*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.loaded) {
         StopAllSounds();
         BlankScreen();
         FreePictureCache();
@@ -719,10 +719,10 @@ void LoadingScreenFrame(void)
         }
     }
     HandleNetPackets();
-    if ((*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.b2) {
+    if ((*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.b2) {
         if (AssignStartPositions() != 0) {
-            (*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.b2 = 0;
-            (*(volatile union LoadFlags_00497f40*)&g_game->loadingFlags).bits.b3 = 1;
+            (*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.b2 = 0;
+            (*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.b3 = 1;
             host_net_guarantee_packets(0);
         }
     }

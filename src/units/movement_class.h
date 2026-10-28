@@ -2,11 +2,14 @@
 #define MOVEMENT_CLASS_H
 
 #include "../../interfaces/ref.h"
+struct PathLockDstView;
+struct PathLockSrcView;
+
 struct Point16;
 
 struct Point16;
-struct Source_00440340;
-struct Object_00440af0;
+struct TdfParserView;
+struct UnitPassMapView;
 
 class MovementClass {
 public:
@@ -26,12 +29,12 @@ public:
 
     MovementClass();
     ~MovementClass();
-    void ReadMoveInfo(Source_00440340* src);
+    void ReadMoveInfo(TdfParserView* src);
     void ResizePassMap(unsigned int w, unsigned int h);
     void SetPassMapCell(int x, int y, int value);
     void RefreshPassMap(Point16 a, Point16 b);
-    void RefreshMovedUnits(Object_00440af0* p);
-    void RefreshUnitIfStale(Object_00440af0* p);
+    void RefreshMovedUnits(UnitPassMapView* p);
+    void RefreshUnitIfStale(UnitPassMapView* p);
     int InBounds(unsigned int x, unsigned int y)
     {
         return x < width && y < height;
@@ -51,5 +54,7 @@ void __stdcall NopAfterFeatureEnum(void);
 void __stdcall BuildAllPassMaps(void);
 void __stdcall FreeMovementClasses(void);
 void __stdcall RefreshAllPassMaps(Point16 a, Point16 b);
+
+void __stdcall CopyPathLockFields(PathLockDstView* dst, PathLockSrcView* src);
 
 #endif

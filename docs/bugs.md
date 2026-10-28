@@ -663,7 +663,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   s_weaponTdfParsers (only the normal end does, from 0x42b20a). Found by a Claude
   Code / Opus 5.5 subagent in #2662.
 - **0x413470** (an order handler), state 3 (likely): after two misses it
-  allocates a `Class_0044e2d0` waypoint and sets its speed with
+  allocates a `PathOrderPosView` waypoint and sets its speed with
   `SetApproachRadius(0x80)`, then only ORs 0x110e8 into the order flags and returns
   2. Every other branch hands the waypoint to the order through
   `SetAttachedFx`; this one never does, so the object leaks and the waypoint

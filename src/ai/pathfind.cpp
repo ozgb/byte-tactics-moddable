@@ -7,14 +7,14 @@
 void __cdecl operator delete(void* p);
 #include "../graphics/object_pool.h"
 
-struct Entry_40d670 {
-    Entry_40d670() {}
-    Entry_40d670(const Entry_40d670& o) : value(o.value), key(o.key) {}
+struct HeapEntry {
+    HeapEntry() {}
+    HeapEntry(const HeapEntry& o) : value(o.value), key(o.key) {}
     int value;
     float key;
 };
 
-static inline bool operator<(const Entry_40d670& a, const Entry_40d670& b)
+static inline bool operator<(const HeapEntry& a, const HeapEntry& b)
 {
     return a.key < b.key;
 }
@@ -38,17 +38,17 @@ void __stdcall CopyOneByte(char* dest, char* src)
 }
 
 // FUNCTION: 0x40d620
-void __stdcall MakeHeap(Entry_40d670* first, Entry_40d670* last, int*, Entry_40d670*)
+void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int*, HeapEntry*)
 {
     int n = last - first;
     for (int h = n / 2; 0 < h; ) {
         --h;
-        AdjustHeap(first, h, n, Entry_40d670(first[h]));
+        AdjustHeap(first, h, n, HeapEntry(first[h]));
     }
 }
 
 // FUNCTION: 0x40d670
-void __stdcall AdjustHeap(Entry_40d670* first, int hole, int len, Entry_40d670 val)
+void __stdcall AdjustHeap(HeapEntry* first, int hole, int len, HeapEntry val)
 {
     int top = hole;
     int k = 2 * hole + 2;
@@ -68,15 +68,15 @@ void __stdcall AdjustHeap(Entry_40d670* first, int hole, int len, Entry_40d670 v
 }
 
 // FUNCTION: 0x40d700
-void __stdcall PopHeapFirst(Entry_40d670* first, Entry_40d670* last, Entry_40d670* dest,
-                             Entry_40d670 val, void* unused)
+void __stdcall PopHeapFirst(HeapEntry* first, HeapEntry* last, HeapEntry* dest,
+                             HeapEntry val, void* unused)
 {
     *dest = *first;
     AdjustHeap(first, 0, last - first, val);
 }
 
 // FUNCTION: 0x40d740
-void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d670 val)
+void __stdcall PushHeapSiftUp(HeapEntry* first, int hole, int top, HeapEntry val)
 {
     for (int idx = (hole - 1) / 2; top < hole && first[idx] < val; idx = (hole - 1) / 2) {
         first[hole] = first[idx];
@@ -90,11 +90,11 @@ void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d6
 extern signed char g_dirDeltaX[];
 extern signed char g_dirDeltaZ[];
 
-class Planner_0040eb70;
+class PathPlannerView;
 
 #pragma pack(push, 1)
-struct Owner_0040eb70 {
-    Ref<Planner_0040eb70> planner;
+struct UnitMotionPlannerView {
+    Ref<PathPlannerView> planner;
     void* owner;
 };
 
@@ -114,7 +114,7 @@ extern Game* g_game;
 #include "ai_search_goal.h"
 #include "../state/sim_globals.h"
 
-class Planner_0040eb70 {
+class PathPlannerView {
 public:
     virtual void unused0();
     virtual void unused1();
@@ -446,7 +446,7 @@ greedy:
 // FUNCTION: 0x40e630
 void Pathfinder::StartSearch(Target* t)
 {
-    owner = (MovementClass*)((Owner_0040eb70 *)object->motion.get())->owner;
+    owner = (MovementClass*)((UnitMotionPlannerView *)object->motion.get())->owner;
     target = t;
     start = object->cell;
     g_seams.units->RefreshMovedUnits(owner, object);
@@ -621,8 +621,8 @@ void Pathfinder::RunSearches()
             else
                 *c = c->get() + 1;
             Unit* u = cursor[player];
-            if (((short)u->unitDefIndex) != 0 && ((Owner_0040eb70 *)u->motion.get()) != 0 && ((Owner_0040eb70 *)u->motion.get())->owner != 0) {
-                path = ((Owner_0040eb70 *)u->motion.get())->planner->GetPath();
+            if (((short)u->unitDefIndex) != 0 && ((UnitMotionPlannerView *)u->motion.get()) != 0 && ((UnitMotionPlannerView *)u->motion.get())->owner != 0) {
+                path = ((UnitMotionPlannerView *)u->motion.get())->planner->GetPath();
                 if (path != 0) {
                     object = u;
                     steps += 100;

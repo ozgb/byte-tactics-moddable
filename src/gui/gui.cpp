@@ -1615,7 +1615,7 @@ struct Point_004c1000;
 struct Point_004c6dc0;
 struct Pos_00420a30;
 struct Pos_00438ea0;
-struct Pos_0043e490;
+struct FixedPosView;
 struct Pos_00484b50;
 struct Pos_00485330;
 struct Pos_0048a9f0;

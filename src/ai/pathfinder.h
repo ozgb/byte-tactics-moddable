@@ -128,16 +128,16 @@ struct PathGrid {
     }
 };
 
-struct Table_0040d880 {
+struct TurnCostTable {
     unsigned char values[8];
 };
 
-struct Pair_0040d880 {
+struct TurnCostPair {
     unsigned char a;
     unsigned char b;
 };
 
-extern const Table_0040d880 g_turnCosts;
+extern const TurnCostTable g_turnCosts;
 
 static int FixMul(int a, int b)
 {
@@ -291,11 +291,11 @@ public:
     Ref<Target> target;
     Ref<MovementClass> owner;
     union {
-        Table_0040d880 table;
+        TurnCostTable table;
         unsigned char turnCost[8];
     };
     union {
-        Pair_0040d880 pairs[4];
+        TurnCostPair pairs[4];
         unsigned char stepCost[8];
     };
     unsigned char player;

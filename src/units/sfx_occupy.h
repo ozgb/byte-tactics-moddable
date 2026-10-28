@@ -3,7 +3,7 @@
 
 struct Unit;
 
-class Class_0043db50 {
+class SfxOccupyTracker {
 public:
     void UpdateSfxOccupy(Unit* unit);
 };

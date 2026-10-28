@@ -2,7 +2,7 @@
 #define ORDER_TARGET_TYPES_H
 
 #pragma pack(push, 1)
-union Coord_0044f2a0 {
+union CoordHalves {
     int fixed;
     short half[2];
 };

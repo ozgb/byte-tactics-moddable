@@ -6,7 +6,7 @@
 
 struct Unit;
 class HapiBank;
-class Iface_0043dd20;
+class PathGoalVtableView;
 class MotionSerializer;
 
 class PathGoal;
@@ -37,7 +37,7 @@ class UnitTable;
 class UnitMotion {
 public:
     union {
-        Ref<Iface_0043dd20> obj;
+        Ref<PathGoalVtableView> obj;
         Ref<MotionSerializer> player;
     };
     int movementClass;

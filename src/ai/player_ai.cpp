@@ -31,8 +31,8 @@ int __cdecl ScaledSin(short angle, int scale);
 int __cdecl ScaledCos(short angle, int scale);
 int __stdcall CanPlaceUnitFootprint(UnitDef* type, short a, Point16 cell, int b);
 int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, int b);
-void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
-                            Elem_0040cc40 val, int*);
+void __stdcall PopHeapFirst(KeyedCell* first, KeyedCell* last, KeyedCell* dest,
+                            KeyedCell val, int*);
 #include "../../interfaces/seams.h"
 
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
@@ -50,9 +50,9 @@ static inline int DistSq(const Point16& a, const Point16& b)
     return dx * dx + dy * dy;
 }
 
-static inline void PopHeap(Elem_0040cc40* f, Elem_0040cc40* l)
+static inline void PopHeap(KeyedCell* f, KeyedCell* l)
 {
-    PopHeapFirst(f, l - 1, l - 1, Elem_0040cc40(*(l - 1)), (int*)0);
+    PopHeapFirst(f, l - 1, l - 1, KeyedCell(*(l - 1)), (int*)0);
 }
 
 static inline Vec3 Direction(short angle, int scale)
@@ -116,5 +116,5 @@ void PlayerAI::RefreshUnitLists()
     int ix=(int)(sum.x*65536.0);
     int iy=(int)(sum.y*65536.0);
     int iz=(int)(sum.z*65536.0);
-    centre=Vec3_00409160(ix,iy,iz);
+    centre=AiVec3(ix,iy,iz);
 }

@@ -4,7 +4,7 @@
 #include "unit_script_calls.h"
 
 
-struct Diff_00480570 { int dx; int dy; };
+struct PointDiff { int dx; int dy; };
 
 // FUNCTION: 0x480720
 char __stdcall OctantBetween(Point16 from, Point16 to)
@@ -63,9 +63,9 @@ Point16 __stdcall StepPointTowards(Point16 p, Point16 target, short step)
     return p;
 }
 
-static inline Diff_00480570 Sub(Point16 a, Point16 b)
+static inline PointDiff Sub(Point16 a, Point16 b)
 {
-    Diff_00480570 d;
+    PointDiff d;
     d.dx = a.x - b.x;
     d.dy = a.y - b.y;
     return d;
@@ -74,7 +74,7 @@ static inline Diff_00480570 Sub(Point16 a, Point16 b)
 // FUNCTION: 0x480570
 int __stdcall ChebyshevDistance(Point16 a, Point16 b)
 {
-    Diff_00480570 d = Sub(a, b);
+    PointDiff d = Sub(a, b);
     int dx = abs(d.dx);
     int dy = abs(d.dy);
     return dx > dy ? dx : dy;

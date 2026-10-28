@@ -94,7 +94,7 @@ struct Mission;
 
 #include "../map/mission.h"
 
-struct Struct_00487af0 {
+struct MissionUnitIdTable {
     char unknown_0[4];
     int* ids;
 };
@@ -396,18 +396,18 @@ void __stdcall SaveUnits(HapiBank* file)
     }
 }
 
-static inline int* Elem_00487af0(int* arr, int i)
+static inline int* IdAt(int* arr, int i)
 {
     return arr + i;
 }
 
 // FUNCTION: 0x487af0
-int __stdcall FindMissionUnit(char* name, Struct_00487af0* param_2, int value)
+int __stdcall FindMissionUnit(char* name, MissionUnitIdTable* param_2, int value)
 {
     int i = 0;
 
     if (value) {
-        while (*Elem_00487af0(param_2->ids, i++) != value) {
+        while (*IdAt(param_2->ids, i++) != value) {
             if (i >= g_game->net->unitCount)
                 return 0;
         }

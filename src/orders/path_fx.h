@@ -6,7 +6,7 @@
 #include "../../interfaces/ref.h"
 
 #pragma pack(push, 1)
-class Class_0044e2d0 : public OrderFx {
+class PathOrderPosView : public OrderFx {
 public:
     short field_8;
     short field_a;
@@ -18,12 +18,12 @@ public:
     Vec3 pos;
     char unknown_32[4];
 
-    Class_0044e2d0(Order* order, const Vec3& pos);
+    PathOrderPosView(Order* order, const Vec3& pos);
     void SetAltitude(int altitude);
     void SetApproachRadius(short radius);
 };
 
-class Class_0044e190 : public OrderFx {
+class PathOrderUnitView : public OrderFx {
 public:
     short field_8;
     short field_a;
@@ -35,10 +35,10 @@ public:
     Vec3 pos;
     int field_32;
 
-    Class_0044e190(Order* order, Unit* unit);
+    PathOrderUnitView(Order* order, Unit* unit);
 };
 
-class Class_0044e250 : public OrderFx {
+class PathOrderMoveToUnitView : public OrderFx {
 public:
     short field_8;
     short field_a;
@@ -50,10 +50,10 @@ public:
     Vec3 pos;
     char unknown_32[4];
 
-    Class_0044e250(Order* order, Unit* unit, int value);
+    PathOrderMoveToUnitView(Order* order, Unit* unit, int value);
 };
 
-class Class_0044e330 : public OrderFx {
+class PathOrderCoordsView : public OrderFx {
 public:
     short field_8;
     short field_a;
@@ -65,12 +65,12 @@ public:
     Vec3 pos;
     char unknown_32[4];
 
-    Class_0044e330(Order* order, Unit* unit, const Vec3& p);
+    PathOrderCoordsView(Order* order, Unit* unit, const Vec3& p);
 };
 
 class HapiBank;
 
-class Class_0044de80 : public OrderFx {
+class PathOrderLoadView : public OrderFx {
 public:
     short field_8;
     short field_a;
@@ -82,7 +82,7 @@ public:
     Vec3 pos;
     int field_32;
 
-    Class_0044de80(int owner, HapiBank* file, char* name);
+    PathOrderLoadView(int owner, HapiBank* file, char* name);
 };
 #pragma pack(pop)
 

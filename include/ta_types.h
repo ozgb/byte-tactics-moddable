@@ -108,7 +108,7 @@ struct BuildMenuPage;
 struct BuildList_0045a950;
 struct Button_0041e420;
 struct Button_004a7f70;
-struct ByteMap_00408090;
+struct ByteMap;
 struct CalcedExplosion;
 struct Callback;
 struct Callback_0043a1f0;
@@ -131,7 +131,7 @@ struct Channel_004b08c0;
 struct Channel_004b0940;
 struct Channel_004b0a10;
 struct Channel_004b0b00;
-struct Channel_004b0c40;
+struct QueryChannelView;
 struct Channel_4619e0;
 struct Chunk;
 struct Chunk_4d1820;
@@ -245,7 +245,7 @@ class Class_0043d210;
 class Class_0043d290;
 class Class_0043d6d0;
 class Class_0043da70;
-class Class_0043db50;
+class SfxOccupyTracker;
 struct UnitMotion;
 class Class_0043dd70;
 struct MovementClassTable;
@@ -283,14 +283,14 @@ class Class_0044da00;
 struct PointMarker;
 class Class_0044dcb0;
 class Class_0044dd00;
-class Class_0044de80;
+class PathOrderLoadView;
 class Class_0044df80;
 class Class_0044dfb0;
 class PathOrderView;
-class Class_0044e190;
-class Class_0044e250;
-class Class_0044e2d0;
-class Class_0044e330;
+class PathOrderUnitView;
+class PathOrderMoveToUnitView;
+class PathOrderPosView;
+class PathOrderCoordsView;
 class Class_0044e3a0;
 class Class_0044e3c0;
 class Class_0044e530;
@@ -485,7 +485,7 @@ class Class_0047f990;
 class Class_0047fa30;
 class Class_0047ffa0;
 class Class_00480020;
-class Class_004800c0;
+class UnitSwapEraseVector;
 class IntDynArray;
 class Squad;
 class Class_00480c30;
@@ -877,7 +877,7 @@ struct Connection_004ca450;
 struct Connection_4c9a70;
 union Coord_00407ae0;
 union Coord_004239c0;
-union Coord_0044f2a0;
+union CoordHalves;
 struct Count_00458d20;
 class CritSec_004e1ac0;
 struct Ctx_004720d0;
@@ -912,7 +912,7 @@ struct Desc_004ca450;
 struct Descriptor_00421620;
 struct Dialog;
 struct Dialog_00464f80;
-struct Diff_00480570;
+struct PointDiff;
 struct DirectDrawState;
 class DirectPlayLobby_4ca490;
 class DirectPlayLobby_4ca880;
@@ -975,11 +975,11 @@ struct ElemA_0046c190;
 struct ResetProgressBarEntries;
 struct ElemB_0046c190;
 struct ConstructedElement;
-struct Elem_0040cc40;
+struct KeyedCell;
 struct Elem_0040cc40_2;
-struct Elem_0040cfb0;
-struct Elem_0040d4f0;
-struct Elem_0040d550;
+struct BuildRatingWeights;
+struct PercentByte;
+struct UnitTypeInt;
 struct Elem_0040f110;
 struct Elem_004222e0;
 struct ModelTextureEntry;
@@ -1162,11 +1162,11 @@ struct Flags_00419670;
 union CursorInputFlags;
 struct Flags_004268b0;
 struct Flags_004269d0;
-struct Flags_0043e490;
+struct UnitDefCursorFlags;
 union Flags_0045c570;
 union Flags_0045d280;
 struct SelectionBoxFlags;
-union Flags_004898b0;
+union WeaponSlotFlagBits;
 union Flags_004898b0_2;
 struct OrdersPanelFlags;
 struct GraphicsOptionFlags;
@@ -1235,7 +1235,7 @@ struct Grid_0040e050;
 struct Grid_0040e630;
 struct Grid_0047e5c0;
 struct Group;
-struct Group_00409160;
+struct FactoryUnitGroup;
 struct Group_004bc640;
 struct Groups_004bc640;
 struct Gui_00443100;
@@ -1271,13 +1271,13 @@ struct Holder_00479bf0;
 struct Holder_004908c0;
 struct Holder_00499eb0;
 struct Holder_004a75d0;
-struct Hs_0048a490;
+struct CornerHeightSample;
 struct IDirectSound3DBuffer;
 struct MapTileSet;
 class Id_004df1e0;
 struct Ids_0046d970;
 class GoalDrawInterface;
-class Iface_0043dd20;
+class PathGoalVtableView;
 class Iface_4ca590;
 struct ImageFrame;
 struct Image_004b3770;
@@ -1353,7 +1353,7 @@ struct Less_004e1990;
 struct Less_004e2250;
 struct Less_004e2580;
 struct Less_004e2620;
-struct Limits_0043e490;
+struct WeaponDefShotCostView;
 struct Line_004de550;
 struct Link_0044f4a0;
 struct Link_00462ed0;
@@ -1365,7 +1365,7 @@ struct List_00420960;
 struct List_004be3b0;
 class Listener_00470fb0;
 class Listener_00471120;
-class Listener_004896f0;
+class UnitRefListener;
 class Listener_00489740;
 class RadiusUnitVisitor;
 class UnitScanVisitor;
@@ -1381,9 +1381,8 @@ struct MapGrid;
 struct MapInfo;
 struct MapInfo_00483610;
 struct MapInfo_44dc60;
-struct MapRow_0048a490;
-struct MapSize_00408090;
-struct MapVertex_0048a490;
+struct ModelGroundPrimitive;
+struct ByteMapSize;
 struct Map_0040d7b0;
 struct MenuBackdropBitmap;
 class Map_0042e440;
@@ -1653,7 +1652,7 @@ struct Packet_0049df10;
 struct Packet_2;
 struct Packet_4517b0;
 struct HelpPageLines;
-struct Pair_0040d880;
+struct TurnCostPair;
 struct Pair_0040e630;
 struct MessageByteCounter;
 struct Pair_0046faf0;
@@ -1717,7 +1716,7 @@ struct Player_467c00;
 struct Player_48efb0;
 struct Point16;
 struct Point16_00437de0;
-struct PointInit_0043a1f0;
+struct Point16FromShorts;
 struct Point;
 struct CursorPoint;
 struct Point_0046ba80;
@@ -1735,8 +1734,8 @@ class PoolAlloc_004db610;
 struct Pool_00422170;
 struct Pool_004232a0;
 struct Pos16_44dc60;
-struct Pos2_0048a490;
-struct Pos_00409160;
+struct XzPoint;
+struct CenterPos;
 struct Pos_004658e0;
 struct Pos_00465ac0;
 struct Pos_00473590;
@@ -1771,7 +1770,7 @@ struct Rec2_00479c50;
 struct Rec2_004b1ec0;
 struct Rec2_004b2040;
 struct Rec_00421620;
-struct Rec_0043e180;
+struct PieceAngleRecord;
 struct Rec_0044de80;
 struct Rec_0044dfb0;
 struct ConsoleCommand;
@@ -1850,7 +1849,7 @@ struct SoundInfo_005086fc;
 struct Sound_0047f210;
 struct Sound_45ffb0;
 struct Source_0042f450;
-struct Source_00440340;
+struct TdfParserView;
 struct UnitSyncSource;
 struct RockSourceSlotView;
 struct ReadTextInputFieldsSource;
@@ -1876,7 +1875,7 @@ struct ReadStatusFieldRecord;
 struct ReadNuttinFieldRecord;
 struct ReadStatusFieldSource;
 struct ReadNuttinFieldSource;
-struct Struct_0040bab0;
+struct MirroredBasePos;
 struct GoalOwnerUnit;
 struct Struct_0049fb50;
 struct Struct_0049fba0;
@@ -1890,7 +1889,7 @@ struct Struct_004c2ac0;
 struct Struct_004c2ac0_2;
 struct Struct_004c6ac0;
 struct Sub;
-struct Sub_00409520;
+struct WeaponDefRatingView;
 struct LightBarCounters;
 struct LightBarSprite;
 struct Sub_0046e000;
@@ -1898,7 +1897,7 @@ struct Sub_00477360;
 struct Sub_00496b10;
 struct Sub_004e0570;
 struct Sub_2;
-struct Sub_403010;
+struct UnitDefActivateFlagView;
 struct Sub_403040;
 struct Surface;
 struct SurfaceWrapper;
@@ -1909,7 +1908,7 @@ struct Surface_004c6f80;
 class Surface_4b6570;
 struct Surfaces_0047bdf0;
 struct Sym_004dea00;
-struct Table_0040d880;
+struct TurnCostTable;
 struct Table_0041ace0;
 struct Table_004611e0;
 struct Table_0047acd0;
@@ -1941,7 +1940,7 @@ union UnitTypeFlags_459200;
 struct ShareLosAckPacket;
 struct Team_0048d9a0;
 struct Texture_00421700;
-struct Thing_0043f0e0;
+struct FeatureMarkView;
 struct TlsBlock;
 struct TntHeader_00483610;
 struct PathAnimTrail;
@@ -1959,7 +1958,7 @@ class UnitDef;
 struct UnitFlag_0044e7d0;
 struct UnitFlags_0048d630;
 class UnitList;
-struct UnitList_00409160;
+struct AiUnitList;
 struct UnitList_00409730;
 struct UnitList_0048ec20;
 struct UnitRange_0048d920;
@@ -2010,7 +2009,7 @@ struct Value_004e17c0;
 struct Value_004e2250;
 struct Vec;
 struct Vec3;
-struct Vec3Init_0043a1f0;
+struct Vec3FromInts;
 struct Vec3_004b1ec0;
 struct Vec3_2;
 union Vec3_459200;
@@ -2255,7 +2254,7 @@ struct Unit_00402fc0 {
 
 struct Obj_403010 {
     char unknown_0[146];
-    Sub_403010* sub;
+    UnitDefActivateFlagView* sub;
 };
 
 struct Obj_403040 {
@@ -4207,8 +4206,8 @@ public:
 class Map_0042e440 {
 public:
     char unknown_0;
-    std::vector<Elem_0040cc40> vec;
-    Elem_0040cc40* LowerBound(char*);
+    std::vector<KeyedCell> vec;
+    KeyedCell* LowerBound(char*);
 };
 
 class Class_004c4450 {
@@ -4959,7 +4958,7 @@ public:
 
 class Class_0043cd20 {
 public:
-    Iface_0043dd20* obj;
+    PathGoalVtableView* obj;
     char unknown_4[28];
     int field_20;
     short turn;
@@ -7004,7 +7003,7 @@ struct Widget_00464f80 {
 
 struct Map_004658e0 {
     char unknown_0[124];
-    ByteMap_00408090 explored;
+    ByteMap explored;
 };
 
 struct Pos_004658e0 {
@@ -7041,7 +7040,7 @@ struct PlayerInfo_00466dc0 {
     char unknown_0[39];
     Ref<PlayerInfo> data;
     char unknown_2b[81];
-    ByteMap_00408090 explored;
+    ByteMap explored;
     char unknown_88[195];
 };
 
@@ -7976,7 +7975,7 @@ union Fix_004736e0 {
 
 struct Player_00473a00 {
     char unknown_0[124];
-    ByteMap_00408090 explored;
+    ByteMap explored;
     char unknown_88[195];
 };
 
@@ -9263,7 +9262,7 @@ public:
     char unknown_0[4];
     Owner_004896f0* owner;
     Class_004896f0* next;
-    Listener_004896f0* listener;
+    UnitRefListener* listener;
     void ClearRef(void);
 };
 
@@ -9290,14 +9289,14 @@ struct Owner_00489740 {
     Class_00489740* head;
 };
 
-union Flags_004898b0 {
+union WeaponSlotFlagBits {
     union { struct { unsigned char bit0 : 1; unsigned char bit1 : 1; unsigned char bit2 : 1; unsigned char bit3 : 1; unsigned char bit4 : 1; unsigned char rest : 3; } bits; unsigned char all; };
 };
 
 struct Entry_004898b0 {
     Point16 point;
     char unknown_4[23];
-    Flags_004898b0 flags;
+    WeaponSlotFlagBits flags;
 };
 
 class Class_00489800 {
@@ -11002,7 +11001,7 @@ public:
     virtual void StartScriptWithArgsByIndex(int);
 };
 
-struct Channel_004b0c40 {
+struct QueryChannelView {
     char unknown_0[36];
     int count;
     char unknown_28[20];
@@ -11013,7 +11012,7 @@ struct Channel_004b0c40 {
 
 class Class_004b0c40 {
 public:
-    Channel_004b0c40 channels[8];
+    QueryChannelView channels[8];
     int activeCount;
     int QueryScriptByIndex(int, int*, int*, int*, int*);
 };
@@ -14976,23 +14975,23 @@ public:
     char* player;
     unsigned char index;
     std::vector<Unit*> units;
-    UnitList_00409160 list_15;
-    Group_00409160 group_25;
+    AiUnitList list_15;
+    FactoryUnitGroup group_25;
     Vec3 pos_35;
     Vec3 pos_41;
-    std::vector<Elem_0040cc40> vec_4d;
-    Pos_00409160 center;
-    std::vector<Elem_0040cfb0> vec_65;
+    std::vector<KeyedCell> vec_4d;
+    CenterPos center;
+    std::vector<BuildRatingWeights> vec_65;
     int field_75;
     int field_79;
     std::vector<short> vec_7d;
     std::vector<unsigned char> vec_8d;
     std::vector<unsigned char> vec_9d;
-    std::vector<Elem_0040d4f0> vec_ad;
+    std::vector<PercentByte> vec_ad;
     char unknown_bd[4];
     int* d;
     char unknown_c5[8];
-    std::vector<Elem_0040d550> values;
+    std::vector<UnitTypeInt> values;
     char unknown_dd[4];
     int* locked;
     char unknown_e5[8];
@@ -15005,7 +15004,7 @@ public:
     int margin1;
     int field_109;
     Owner(unsigned char);
-    bool FindCellNearFeatures(UnitDef*, Vec3*, std::vector<Elem_0040cc40>*, int, Point16*);
+    bool FindCellNearFeatures(UnitDef*, Vec3*, std::vector<KeyedCell>*, int, Point16*);
     bool FindRandomPlacementCell(UnitDef*, Vec3*, int, Point16*);
     void InitUnitTables(void);
 };
@@ -15037,7 +15036,7 @@ struct Sub {
 
 struct Class_0040a7b0 {
     char unknown_0[77];
-    std::vector<Elem_0040cc40> cells;
+    std::vector<KeyedCell> cells;
     void BuildFeatureCells(void);
 };
 

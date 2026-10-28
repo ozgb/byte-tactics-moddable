@@ -1,6 +1,9 @@
 #ifndef UNIT_TARGETS_H
 #define UNIT_TARGETS_H
 struct Unit;
+struct Vec3;
+
+struct Unit;
 struct UnitDamagePacket;
 class UnitDef;
 
@@ -20,5 +23,7 @@ void __stdcall ClearUnitRefs(Unit* obj);
 void __stdcall ApplyUnitDamage(UnitDamagePacket* ev);
 void __stdcall SetWeaponTargetUnit(char*, char*, int);
 void __stdcall SetWeaponTargetPos(char*, int*, int);
+
+int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index);
 
 #endif

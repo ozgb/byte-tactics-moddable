@@ -13,7 +13,7 @@
 
 #include "../game/game.h"
 
-struct Header_00481140 {
+struct ExplodedPieceInit {
     Ref<Unit> obj;
     int index;
     int r1;
@@ -334,7 +334,7 @@ void UnitScript::EmitSfx(int a, int b)
 void UnitScript::ExplodePiece(int a, unsigned int b)
 {
     if (!(b & 0x20)) {
-        Header_00481140 h;
+        ExplodedPieceInit h;
         h.obj = state->unit;
         h.index = a;
         h.r1 = RandomInt(3000);

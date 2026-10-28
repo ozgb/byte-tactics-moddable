@@ -690,7 +690,7 @@ void SpeechQueue::RemoveSpeechOfId(Unit* unit)
 #include <algorithm>
 
 // FUNCTION: 0x4800c0
-Class_004800c0::UnitVector::iterator Class_004800c0::EraseSwapBack(UnitVector::iterator where)
+UnitSwapEraseVector::UnitVector::iterator UnitSwapEraseVector::EraseSwapBack(UnitVector::iterator where)
 {
     UnitVector::iterator last = units.end() - 1;
     *where = *last;

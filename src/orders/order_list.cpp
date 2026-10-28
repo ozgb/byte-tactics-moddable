@@ -37,27 +37,27 @@ static inline void Vec3Add(Vec3* v, const Vec3* o)
 
 #pragma pack(push, 1)
 
-struct FP_0043d6d0 {
+struct OrderFixedParts {
     unsigned int frac : 16;
     int whole : 16;
 };
 
-union Fixed_0043d6d0 {
+union OrderFixed {
     int value;
-    FP_0043d6d0 parts;
+    OrderFixedParts parts;
 };
 
-static inline Fixed_0043d6d0 MakeFixed_0043d6d0(int i)
+static inline OrderFixed MakeOrderFixed(int i)
 {
-    Fixed_0043d6d0 f;
+    OrderFixed f;
     f.parts.frac = 0;
     f.parts.whole = i;
     return f;
 }
 
-inline int operator>(const Fixed_0043d6d0& a, const Fixed_0043d6d0& b) { return a.value > b.value; }
+inline int operator>(const OrderFixed& a, const OrderFixed& b) { return a.value > b.value; }
 
-#define MAXM_0043d6d0(a, b) ((a) > (b) ? (a) : (b))
+#define ORDER_MAX(a, b) ((a) > (b) ? (a) : (b))
 
 static inline void MulFixed(int& v, int f)
 {
@@ -90,13 +90,13 @@ static inline Vec3 PosMinus(const Vec3& a, const Vec3& b)
     return r;
 }
 
-struct Vec3Init_0043a1f0 : Vec3 {
-    Vec3Init_0043a1f0(int a, int b, int c) { x = a; y = b; z = c; }
+struct Vec3FromInts : Vec3 {
+    Vec3FromInts(int a, int b, int c) { x = a; y = b; z = c; }
 };
 
-struct PointInit_0043a1f0 : Point16 {
-    PointInit_0043a1f0() {}
-    PointInit_0043a1f0(short a, short b) { x = a; y = b; }
+struct Point16FromShorts : Point16 {
+    Point16FromShorts() {}
+    Point16FromShorts(short a, short b) { x = a; y = b; }
 };
 
 #include "../util/angles.h"
@@ -104,7 +104,7 @@ struct PointInit_0043a1f0 : Point16 {
 
 #include "../network/player.h"
 
-struct Target_0043d6d0 {
+struct PlayerTypeView {
     int active;
     char unknown_4[0x73 - 0x4];
     unsigned char type;
@@ -112,19 +112,19 @@ struct Target_0043d6d0 {
     unsigned short field_e4;
 };
 
-struct TargetData_0043d6d0 {
+struct MotionVelocityView {
     char unknown_0[8];
     Vec3 velocity;
     char unknown_14[0x20 - 0x14];
     int speed;
 };
 
-struct Path_0043d6d0 {
-    Ref<TargetData_0043d6d0> motion;
+struct CarrierMotionView {
+    Ref<MotionVelocityView> motion;
 };
 
 class MovementClass;
-struct UnitType_0043cd20 {
+struct UnitDefMoveView {
     char unknown_0[0x20];
     char name[0x20];
     char unknown_40[0x192 - 0x40];
@@ -449,7 +449,7 @@ static inline MissionType MissionTypeOf(unsigned char k)
 
 // FUNCTION: 0x43a0c0
 Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
-    : kind(MissionTypeOf(k)), link(o, 0), start(PointInit_0043a1f0(0, 0)), cached(PointInit_0043a1f0(0, 0)),
+    : kind(MissionTypeOf(k)), link(o, 0), start(Point16FromShorts(0, 0)), cached(Point16FromShorts(0, 0)),
       id(a), count(b), progress(c), created((unsigned int)g_game->ticks)
 {
     link.SetValue(this);
@@ -457,7 +457,7 @@ Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
     flags = 0;
     subFlags = 0;
     wakeFrame = -1;
-    pos = p ? *p : Vec3Init_0043a1f0(0, 0, 0);
+    pos = p ? *p : Vec3FromInts(0, 0, 0);
     flags_42 = g_missionOrderTableBegin[k & 0xff].flags;
     unit = 0;
     next = 0;
@@ -481,7 +481,7 @@ void __stdcall WriteUnitTypeNameKey(HapiBank* file, unsigned short id)
     char key[0x80];
     sprintf(key, "UTYPENAME%4d", id);
     if (!file->HasItem(key) && id >= 1 && id < g_game->unitDefCount)
-        file->SetStringItem(key, ((UnitType_0043cd20 *)g_game->defs.get())[id].name);
+        file->SetStringItem(key, ((UnitDefMoveView *)g_game->defs.get())[id].name);
 }
 
 // FUNCTION: 0x43a360
@@ -494,7 +494,7 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
     int i, n = 0;
     unsigned short k = 0;
     for (i = 1; i < g_game->unitDefCount; i++, n++) {
-        if (!(((UnitType_0043cd20 *)g_game->defs.get())[(unsigned short)i].flags & 0x20)) {
+        if (!(((UnitDefMoveView *)g_game->defs.get())[(unsigned short)i].flags & 0x20)) {
             if (k == id)
                 return n;
             k++;
@@ -665,10 +665,10 @@ public:
 };
 
 
-typedef std::vector<OrderTableEntry> Vec_0043c390;
-typedef int(__stdcall* Pred_0043c390)(const OrderTableEntry&, const OrderTableEntry&);
+typedef std::vector<OrderTableEntry> OrderTableEntryVector;
+typedef int(__stdcall* OrderTableEntryCompare)(const OrderTableEntry&, const OrderTableEntry&);
 
-struct Record_0043dd70 {
+struct UnitMotionSaveRecord {
     Vec3 velocity;
     Vec3 p2;
     int speed;
@@ -828,7 +828,7 @@ int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3)
         MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
-        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitType_0043cd20*)unit->def.get())->maneuverleashlength);
+        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->maneuverleashlength);
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
         Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
@@ -850,7 +850,7 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
         MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
-        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitType_0043cd20*)unit->def.get())->range);
+        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->range);
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
         Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
@@ -859,7 +859,7 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
         MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
-        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitType_0043cd20*)unit->def.get())->maneuverleashlength);
+        Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->maneuverleashlength);
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
         Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
@@ -912,14 +912,14 @@ static void InsertCommand(Unit* p, unsigned char type)
     InsertOrderBefore(p, child, (child->flags_42 & 0x40000) ? p->list2 : p->list);
 }
 
-static void Wait_0043b7c0(Order* node, int n)
+static void DelayOrderWake(Order* node, int n)
 {
     unsigned int when = RandomInt(n) + 0x1e;
     node->flags |= 1;
     node->wakeFrame = (unsigned int)g_game->ticks + when;
 }
 
-static void ClearTargets_0043b7c0(Unit* unit)
+static void ClearAllWeaponTargets(Unit* unit)
 {
     for (char i = 0; i < 3; i++)
         g_seams.targeting->ClearWeaponTarget(unit, i);
@@ -944,10 +944,10 @@ void __stdcall RunOrders(Unit* unit)
         node->subFlags &= ~pending;
         node->flags = 0;
         if (pending & 0x10000)
-            ClearTargets_0043b7c0(unit);
+            ClearAllWeaponTargets(unit);
         switch (g_missionOrderTableBegin[node->kind.index].notify(node->unit, node, pending)) {
         case 3:
-            Wait_0043b7c0(node, 0xf);
+            DelayOrderWake(node, 0xf);
             break;
         case 1:
             node->state++;
@@ -968,7 +968,7 @@ void __stdcall RunOrders(Unit* unit)
                 DeleteOrder(unit, node);
             } else {
                 node->state = 0;
-                Wait_0043b7c0(node, 0x1e);
+                DelayOrderWake(node, 0x1e);
             }
             break;
         case 6:
@@ -987,9 +987,9 @@ void __stdcall RunOrders(Unit* unit)
     char state = unit->player->type;
     if (state != 1 && state != 2)
         return;
-    if (((UnitType_0043cd20*)unit->def.get())->defaultmissiontype == 0)
+    if (((UnitDefMoveView*)unit->def.get())->defaultmissiontype == 0)
         return;
-    InsertCommand(unit, ((UnitType_0043cd20*)unit->def.get())->defaultmissiontype);
+    InsertCommand(unit, ((UnitDefMoveView*)unit->def.get())->defaultmissiontype);
 }
 
 static void RemoveAndDelete(Unit* p, Order* child)
@@ -1054,12 +1054,12 @@ void __stdcall RunSecondaryOrders(Unit* p)
     }
 }
 
-typedef Vec_0043c390 SimView_g_missionOrderTableVec;
+typedef OrderTableEntryVector SimView_g_missionOrderTableVec;
 #undef g_missionOrderTableVec
 #define g_missionOrderTableVec (*reinterpret_cast<SimView_g_missionOrderTableVec*>(&Sim().g_missionOrderTableVec))
 
 // FUNCTION: 0x43c940
-inline void __stdcall InsertShiftOrderTypes(OrderTableEntry* _L, OrderTableEntry _V, Pred_0043c390 _P)
+inline void __stdcall InsertShiftOrderTypes(OrderTableEntry* _L, OrderTableEntry _V, OrderTableEntryCompare _P)
 {
     for (OrderTableEntry* _M = _L; _P(_V, *--_M); _L = _M)
         *_L = *_M;
@@ -1067,7 +1067,7 @@ inline void __stdcall InsertShiftOrderTypes(OrderTableEntry* _L, OrderTableEntry
 }
 
 // FUNCTION: 0x43c990
-inline void __stdcall InsertionSortOrderTypes(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P,
+inline void __stdcall InsertionSortOrderTypes(OrderTableEntry* _F, OrderTableEntry* _L, OrderTableEntryCompare _P,
                                    OrderTableEntry*)
 {
     if (_F != _L)
@@ -1082,14 +1082,14 @@ inline void __stdcall InsertionSortOrderTypes(OrderTableEntry* _F, OrderTableEnt
         }
 }
 
-inline void _Insertion_sort_0043bc90(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P)
+inline void _Insertion_sort_0043bc90(OrderTableEntry* _F, OrderTableEntry* _L, OrderTableEntryCompare _P)
 {
     InsertionSortOrderTypes(_F, _L, _P, std::_Val_type(_F));
 }
 
 // FUNCTION: 0x43ca70
 inline OrderTableEntry __stdcall MedianOrderTypes(OrderTableEntry _X, OrderTableEntry _Y, OrderTableEntry _Z,
-                                            Pred_0043c390 _P)
+                                            OrderTableEntryCompare _P)
 {
     if (_P(_X, _Y))
         return (_P(_Y, _Z) ? _Y : _P(_X, _Z) ? _Z : _X);
@@ -1099,7 +1099,7 @@ inline OrderTableEntry __stdcall MedianOrderTypes(OrderTableEntry _X, OrderTable
 
 // FUNCTION: 0x43cb20
 inline OrderTableEntry* __stdcall PartitionOrderTypes(OrderTableEntry* _F, OrderTableEntry* _L,
-                                             OrderTableEntry _Piv, Pred_0043c390 _P)
+                                             OrderTableEntry _Piv, OrderTableEntryCompare _P)
 {
     for (; ; ++_F) {
         for (; _P(*_F, _Piv); ++_F)
@@ -1113,7 +1113,7 @@ inline OrderTableEntry* __stdcall PartitionOrderTypes(OrderTableEntry* _F, Order
 }
 
 // FUNCTION: 0x43c720
-inline void __stdcall SortOrderTypes(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P,
+inline void __stdcall SortOrderTypes(OrderTableEntry* _F, OrderTableEntry* _L, OrderTableEntryCompare _P,
                                    OrderTableEntry*)
 {
     for (; std::_SORT_MAX < _L - _F; ) {
@@ -1126,7 +1126,7 @@ inline void __stdcall SortOrderTypes(OrderTableEntry* _F, OrderTableEntry* _L, P
     }
 }
 
-inline void _Sort_0_0043bc90(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P,
+inline void _Sort_0_0043bc90(OrderTableEntry* _F, OrderTableEntry* _L, OrderTableEntryCompare _P,
                              OrderTableEntry*)
 {
     if (_L - _F <= std::_SORT_MAX)
@@ -1139,7 +1139,7 @@ inline void _Sort_0_0043bc90(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043
     }
 }
 
-inline void sort_0043bc90(OrderTableEntry* _F, OrderTableEntry* _L, Pred_0043c390 _P)
+inline void SortOrderTableEntries(OrderTableEntry* _F, OrderTableEntry* _L, OrderTableEntryCompare _P)
 {
     _Sort_0_0043bc90(_F, _L, _P, std::_Val_type(_F));
 }
@@ -1151,7 +1151,7 @@ void __stdcall RegisterOrderTypes(OrderTableEntry* from, int count)
     int sz = g_missionOrderTableVec.size();
     g_missionOrderTableVec.reserve(sz + count);
     std::copy(from, from + count, std::back_inserter(g_missionOrderTableVec));
-    sort_0043bc90(g_missionOrderTableVec.begin(), g_missionOrderTableVec.end(), CompareOrderTypeNames);
+    SortOrderTableEntries(g_missionOrderTableVec.begin(), g_missionOrderTableVec.end(), CompareOrderTypeNames);
 }
 
 // FUNCTION: 0x43c020
@@ -1186,11 +1186,11 @@ template class std::vector<OrderTableEntry>;
 
 // FUNCTION: 0x43c3a0 ?insert@?$vector@UOrderTableEntry@@V?$allocator@UOrderTableEntry@@@std@@@std@@QAEXPAUOrderTableEntry@@IABU3@@Z
 
-typedef int (__stdcall* Pred_0043c6b0)(const OrderTableEntry& entry, char* name);
+typedef int (__stdcall* OrderTableNamePred)(const OrderTableEntry& entry, char* name);
 
 // FUNCTION: 0x43c6b0
 OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTableEntry* last,
-                                      char* const& value, Pred_0043c6b0 pred, int*)
+                                      char* const& value, OrderTableNamePred pred, int*)
 {
     int n = 0;
     n += last - first;
@@ -1210,7 +1210,7 @@ OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTab
 void UnitMotion::ApplyClampedTurnDelta(Unit* unit, short amount)
 {
     if (amount != 0) {
-        unsigned short max = ((UnitType_0043cd20*)unit->def.get())->max_turn;
+        unsigned short max = ((UnitDefMoveView*)unit->def.get())->max_turn;
         if (amount >= max)
             turn = max;
         else if (amount <= -max)
@@ -1244,7 +1244,7 @@ static inline Vec3 Offset(short angle, int distance)
     return v;
 }
 
-static inline void ClampToCell(Vec3& pos, PointInit_0043a1f0 cell, PointInit_0043a1f0 draft)
+static inline void ClampToCell(Vec3& pos, Point16FromShorts cell, Point16FromShorts draft)
 {
     int cx = (draft.x + cell.x * 2) << 19;
     int cz = (draft.y + cell.y * 2) << 19;
@@ -1270,9 +1270,9 @@ void UnitMotion::UpdateVelocityFromHeading(Unit* unit, int amount)
     if (idx > 5)
         idx = 5;
 
-    int range = (int)(((__int64)(g_slopeSpeedFactor[idx] << 16) * ((UnitType_0043cd20*)unit->def.get())->maxvelocity) >> 16);
+    int range = (int)(((__int64)(g_slopeSpeedFactor[idx] << 16) * ((UnitDefMoveView*)unit->def.get())->maxvelocity) >> 16);
     range = (int)(((__int64)range << 16) / 0x640000);
-    if (unit->yWhole < g_game->seaLevel && !(((UnitType_0043cd20*)unit->def.get())->flags1 & 0x81000))
+    if (unit->yWhole < g_game->seaLevel && !(((UnitDefMoveView*)unit->def.get())->flags1 & 0x81000))
         range = (int)(((__int64)range * 0x8000) >> 16);
     if (speed > range)
         speed = range;
@@ -1291,7 +1291,7 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
 {
     if (obj->v5() == 0) {
         turn = 0;
-        const int& amount = -((UnitType_0043cd20*)unit->def.get())->brakerate;
+        const int& amount = -((UnitDefMoveView*)unit->def.get())->brakerate;
         UpdateVelocityFromHeading(unit, amount);
         return;
     }
@@ -1333,7 +1333,7 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
     int d2 = (int)(((__int64)bx * bx) >> 32) + (int)(((__int64)bz * bz) >> 32);
 
     if (diff != 0) {
-        unsigned short max = ((UnitType_0043cd20*)unit->def.get())->max_turn;
+        unsigned short max = ((UnitDefMoveView*)unit->def.get())->max_turn;
         if (sdiff >= max)
             turn = max;
         else if (sdiff <= -max)
@@ -1347,8 +1347,8 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
     }
 
     int turned = (int)((((__int64)(adiff & 0xffff) * (__int64)speed)
-                        / ((UnitType_0043cd20*)unit->def.get())->max_turn));
-    int rate = ((UnitType_0043cd20*)unit->def.get())->brakerate;
+                        / ((UnitDefMoveView*)unit->def.get())->max_turn));
+    int rate = ((UnitDefMoveView*)unit->def.get())->brakerate;
     int spd = speed;
     int t = (int)(((__int64)spd * spd) >> 16);
     int q = (int)(((__int64)t << 16) / (2 * rate));
@@ -1356,7 +1356,7 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
     int lim = (int)(((__int64)turned * turned) >> 32) * 4;
 
     if (d1 > lim && d2 > r)
-        UpdateVelocityFromHeading(unit, ((UnitType_0043cd20*)unit->def.get())->acceleration);
+        UpdateVelocityFromHeading(unit, ((UnitDefMoveView*)unit->def.get())->acceleration);
     else
         UpdateVelocityFromHeading(unit, -rate);
 }
@@ -1372,8 +1372,8 @@ void UnitMotion::ApplyBankAndPitch(Unit* owner, Vec3* v)
     xz[1] = p2.z;
     RotatePoint2D(owner->angles.heading, xz);
     int n = (int)(((__int64)g_game->gravity << 16) / 0xccd);
-    owner->angles.bank = (short)AngleOfVector((int)(((__int64)((UnitType_0043cd20*)owner->def.get())->bankscale * -xz[0]) >> 16), n);
-    owner->angles.pitch = (short)AngleOfVector((int)(((__int64)((UnitType_0043cd20*)owner->def.get())->pitchscale * -xz[0]) >> 16), n);
+    owner->angles.bank = (short)AngleOfVector((int)(((__int64)((UnitDefMoveView*)owner->def.get())->bankscale * -xz[0]) >> 16), n);
+    owner->angles.pitch = (short)AngleOfVector((int)(((__int64)((UnitDefMoveView*)owner->def.get())->pitchscale * -xz[0]) >> 16), n);
 }
 #pragma auto_inline(on)
 
@@ -1409,7 +1409,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     short heading;
     obj->v4(&a, &b, &heading);
 
-    UnitType_0043cd20* type = (UnitType_0043cd20*)unit->def.get();
+    UnitDefMoveView* type = (UnitDefMoveView*)unit->def.get();
     const float eps = 1.52587890625e-05f;
 
     float f18 = (float)type->acceleration * eps;
@@ -1418,7 +1418,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     Vec3Scale(&velocity, scale);
 
     float dist = (float)_hypot(velocity.x, velocity.z) * eps;
-    float maxd = (float)((UnitType_0043cd20*)unit->def.get())->brakerate * eps;
+    float maxd = (float)((UnitDefMoveView*)unit->def.get())->brakerate * eps;
     if (dist > maxd) {
         int f = (int)((double)maxd / dist * 65536.0);
         MulFixed(velocity.x, f);
@@ -1451,7 +1451,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
 #endif
     short d = (short)(heading - unit->angles.heading);
     if (d != 0) {
-        unsigned short max = ((UnitType_0043cd20*)unit->def.get())->max_turn;
+        unsigned short max = ((UnitDefMoveView*)unit->def.get())->max_turn;
         if (d >= (int)max)
             turn = max;
         else if (d <= -(int)max)
@@ -1511,15 +1511,15 @@ void UnitMotion::UpdatePosition(Unit* u)
     if (u->carrier != 0) {
         Vec3 v;
         v = g_seams.units->GetPiecePosition(u->carrier, (signed char)u->transportPiece);
-        if (((UnitType_0043cd20*)u->def.get())->b19) {
-            *(Fixed_0043d6d0*)&v.y = MAXM_0043d6d0(*(Fixed_0043d6d0*)&v.y, MakeFixed_0043d6d0(((UnitType_0043cd20*)u->def.get())->draft * 0xffff + g_game->seaLevel));
+        if (((UnitDefMoveView*)u->def.get())->b19) {
+            *(OrderFixed*)&v.y = ORDER_MAX(*(OrderFixed*)&v.y, MakeOrderFixed(((UnitDefMoveView*)u->def.get())->draft * 0xffff + g_game->seaLevel));
         }
         g_seams.units->SetUnitPosition(u, v, mode);
         Angles16 o = g_seams.units->GetPieceAngles(u->carrier, (signed char)u->transportPiece);
         u->angles = o;
-        if (((Path_0043d6d0*)u->carrier.get())->motion != 0) {
-            speed = ((Path_0043d6d0*)u->carrier.get())->motion->speed;
-            velocity = ((Path_0043d6d0*)u->carrier.get())->motion->velocity;
+        if (((CarrierMotionView*)u->carrier.get())->motion != 0) {
+            speed = ((CarrierMotionView*)u->carrier.get())->motion->speed;
+            velocity = ((CarrierMotionView*)u->carrier.get())->motion->velocity;
         } else {
             speed = 0;
             Vec3 zero = OrderVec3(0, 0, 0);
@@ -1536,8 +1536,8 @@ void UnitMotion::UpdatePosition(Unit* u)
         return;
 
     lastMoveTick = g_game->ticks;
-    PointInit_0043a1f0 draft = *(PointInit_0043a1f0*)&u->footprint;
-    PointInit_0043a1f0 cell;
+    Point16FromShorts draft = *(Point16FromShorts*)&u->footprint;
+    Point16FromShorts cell;
     cell.x = (pos.x - draft.x * 0x80000 + 0x80000) >> 20;
     cell.y = (pos.z - draft.y * 0x80000 + 0x80000) >> 20;
     if (cell.x == u->cell.x && cell.y == u->cell.y && m == u->mode) {
@@ -1546,16 +1546,16 @@ void UnitMotion::UpdatePosition(Unit* u)
         return;
     }
 
-    if (((Target_0043d6d0*)u->player.get())->active != 0) {
-        if (((Target_0043d6d0*)u->player.get())->type == 1 || ((Target_0043d6d0*)u->player.get())->type == 2)
+    if (((PlayerTypeView*)u->player.get())->active != 0) {
+        if (((PlayerTypeView*)u->player.get())->type == 1 || ((PlayerTypeView*)u->player.get())->type == 2)
             flag = g_seams.map->CanPlaceUnitFootprint((UnitDef*)u->def, (unsigned short)u->id, *(Point16*)&cell, m) == 0;
     }
 
     if (flag) {
-        ClampToCell(pos, *(PointInit_0043a1f0*)&u->cell, *(PointInit_0043a1f0*)&u->footprint);
+        ClampToCell(pos, *(Point16FromShorts*)&u->cell, *(Point16FromShorts*)&u->footprint);
 
-        if (speed > (((UnitType_0043cd20*)u->def.get())->maxvelocity / 2)) {
-            int half = ((UnitType_0043cd20*)u->def.get())->maxvelocity / 2;
+        if (speed > (((UnitDefMoveView*)u->def.get())->maxvelocity / 2)) {
+            int half = ((UnitDefMoveView*)u->def.get())->maxvelocity / 2;
             speed = half;
             unsigned short angle = u->angles.heading;
             Vec3 vec;
@@ -1585,10 +1585,10 @@ void UnitMotion::UpdateMoveRate(Unit* unit)
     int rate;
     if ((flags & 4) == 0 && unit->carrier == 0
         && (speed != 0 || turn != 0)) {
-        if (speed <= ((UnitType_0043cd20*)unit->def.get())->moverate1) {
+        if (speed <= ((UnitDefMoveView*)unit->def.get())->moverate1) {
             rate = 1;
         } else {
-            rate = 2 + (speed > ((UnitType_0043cd20*)unit->def.get())->moverate2);
+            rate = 2 + (speed > ((UnitDefMoveView*)unit->def.get())->moverate2);
         }
     } else {
         rate = 0;
@@ -1624,14 +1624,14 @@ UnitMotion::UnitMotion(Unit* unit)
     p2 = OrderVec3(0, 0, 0);
     mode = 1;
     flag = 0;
-    movementClass = (int)((UnitType_0043cd20*)unit->def.get())->movementclass.get();
-    if (((Target_0043d6d0*)unit->player.get())->active != 0 && ((Target_0043d6d0*)unit->player.get())->type == 3) {
-        if (((UnitType_0043cd20*)unit->def.get())->flag_800)
+    movementClass = (int)((UnitDefMoveView*)unit->def.get())->movementclass.get();
+    if (((PlayerTypeView*)unit->player.get())->active != 0 && ((PlayerTypeView*)unit->player.get())->type == 3) {
+        if (((UnitDefMoveView*)unit->def.get())->flag_800)
             obj = (Iface_0043dd20*)new (kSim) PackedPosGoal(unit);
         else
             obj = (Iface_0043dd20*)new (kSim) PatrolGoal(unit);
     } else {
-        if (((UnitType_0043cd20*)unit->def.get())->flag_800)
+        if (((UnitDefMoveView*)unit->def.get())->flag_800)
             obj = (Iface_0043dd20*)new (kSim) LiteGoal(unit);
         else
             obj = (Iface_0043dd20*)new (kSim) AiSearchGoal(unit);
@@ -1650,7 +1650,7 @@ void UnitMotion::DestroyObject()
 void UnitMotion::UpdateMotion(Unit* u)
 {
     obj->v2();
-    if (((UnitType_0043cd20*)u->def.get())->flag_800)
+    if (((UnitDefMoveView*)u->def.get())->flag_800)
         SteerAircraft(u);
     else
         SteerGroundUnit(u);
@@ -1663,7 +1663,7 @@ void UnitMotion::UpdateMotion(Unit* u)
 void UnitMotion::SaveMotion(Unit* info, HapiBank* file)
 {
     char name[32];
-    Record_0043dd70 hdr;
+    UnitMotionSaveRecord hdr;
     hdr.velocity = velocity;
     hdr.p2 = p2;
     hdr.speed = speed;
@@ -1681,7 +1681,7 @@ void UnitMotion::SaveMotion(Unit* info, HapiBank* file)
 void UnitMotion::LoadMotion(Unit* unit, HapiBank* file)
 {
     char name[32];
-    Record_0043dd70 rec;
+    UnitMotionSaveRecord rec;
     sprintf(name, "u%04xmob", unit->id);
     file->OpenNamedBox(name);
     file->SeekBox(0);

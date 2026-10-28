@@ -12,9 +12,9 @@ class OrderFx;
 class HapiBank;
 struct Feature;
 struct Point;
-struct SaveDesc_0043a1f0;
+struct OrderSaveRecord;
 struct Head_0043a1f0;
-struct Entry_0043a1f0;
+struct OrderTableEntryView;
 struct Vec3_0043a1f0;
 
 #pragma pack(push, 1)

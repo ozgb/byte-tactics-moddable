@@ -121,7 +121,7 @@ ClampWorldPosToTerrain,GetGroundHeightNative,"seam slot filled by InstallNativeS
 OrderFx::ContainsUnit,OrderFx::ContainsCell,"ContainsUnit is used only by OrderFx and PointMarker, src/data/vtables.cpp"
 OrderFx::ContainsUnit,PointMarker::ContainsCell,"ContainsUnit is used only by OrderFx and PointMarker, g_pointMarkerVtable (src/data/vtables.cpp)"
 PathOrder::IsComplete,PathOrder::FillWorldPos,"v8 of the PathOrder vtable (IsComplete is used only by it), g_pathOrderVtable (src/data/vtables.cpp)"
-ClearTargets_0043b7c0,ClearWeaponTarget,"seam slot filled by InstallNativeSeams, TargetingSeam::ClearWeaponTarget, ClearTargets_0043b7c0 (src/orders/order_list.cpp), src/seams/native.cpp"
+ClearAllWeaponTargets,ClearWeaponTarget,"seam slot filled by InstallNativeSeams, TargetingSeam::ClearWeaponTarget, ClearTargets_0043b7c0 (src/orders/order_list.cpp), src/seams/native.cpp"
 ClearUnitRefs,Order::OrStatusFlags,"slot 0 of Order; listener is the Order stored by Order constructor, src/orders/order_list.cpp"
 ClearWeaponTarget,FindScriptNative,"seam slot filled by InstallNativeSeams, UnitsSeam::FindScript, ClearWeaponTarget (src/units/unit_targets.cpp), src/seams/native.cpp"
 ClearWeaponTarget,StartScriptWithArgsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::StartScriptWithArgs, ClearWeaponTarget (src/units/unit_targets.cpp), src/seams/native.cpp"

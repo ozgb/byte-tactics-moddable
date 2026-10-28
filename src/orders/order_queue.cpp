@@ -15,15 +15,15 @@ struct Vec3_0043a1f0 {
 };
 
 class CobScript;
-class Slot_0043a1f0;
+class OrderFxSlot;
 
-struct Owner_0043a1f0 {
-    Ref<Slot_0043a1f0> slot;
+struct UnitMotionSlotView {
+    Ref<OrderFxSlot> slot;
 };
 
 #include "../units/unit.h"
 
-struct Entry_0043a1f0 {
+struct OrderTableEntryView {
     char unknown_0[4];
     void (__stdcall* notify)(Unit* unit, Order* obj, int code);
     char unknown_8[0x11 - 0x8];
@@ -39,7 +39,7 @@ struct Entry_0043a1f0 {
 
 #include "../game/game.h"
 
-struct SaveDesc_0043a1f0 {
+struct OrderSaveRecord {
     unsigned short unitType;
     unsigned short ownerType;
     int field_4;
@@ -68,7 +68,7 @@ struct SaveDesc_0043a1f0 {
 #include "air_maneuver_order.h"
 #include "../state/sim_globals.h"
 
-class Slot_0043a1f0 {
+class OrderFxSlot {
 public:
     virtual void Slot0();
     virtual void Attach(void* obj);
@@ -76,7 +76,7 @@ public:
 };
 
 #include "order_list.h"
-Entry_0043a1f0* __stdcall LowerBoundOrderTypes(Entry_0043a1f0* first, Entry_0043a1f0* last,
+OrderTableEntryView* __stdcall LowerBoundOrderTypes(OrderTableEntryView* first, OrderTableEntryView* last,
                                        char* const& value, int(__stdcall* pred)(int, char*),
                                        int* unused);
 #include "../network/net_game.h"
@@ -84,10 +84,10 @@ void __stdcall SendScriptCall(Unit* obj, int index, int param_3, int param_4, in
 #include "../sound/sound.h"
 
 #include "../../link/globals.h"
-typedef Entry_0043a1f0* SimView_g_missionOrderTableBegin;
+typedef OrderTableEntryView* SimView_g_missionOrderTableBegin;
 #undef g_missionOrderTableBegin
 #define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-typedef Entry_0043a1f0* SimView_g_missionOrderTableEnd;
+typedef OrderTableEntryView* SimView_g_missionOrderTableEnd;
 #undef g_missionOrderTableEnd
 #define g_missionOrderTableEnd (*reinterpret_cast<SimView_g_missionOrderTableEnd*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x8))
 
@@ -208,11 +208,11 @@ int __stdcall WaitIfCobBusy(char* param_1, char* param_2, unsigned int param_3)
 // FUNCTION: 0x438760
 MissionType::MissionType(const char* name)
 {
-    Entry_0043a1f0* first = g_missionOrderTableBegin;
+    OrderTableEntryView* first = g_missionOrderTableBegin;
     int n = g_missionOrderTableEnd - g_missionOrderTableBegin;
     for (; 0 < n; ) {
         int n2 = n / 2;
-        Entry_0043a1f0* m = first;
+        OrderTableEntryView* m = first;
         m += n2;
         int less = _strcmpi(m->name, name) < 0;
         if (less)
@@ -268,7 +268,7 @@ void Order::ReattachFxToUnit()
 {
     if (attached != 0) {
         void* p1 = unit->motion.get();
-        void* p2 = ((Owner_0043a1f0*)p1)->slot.get();
+        void* p2 = ((UnitMotionSlotView*)p1)->slot.get();
         void* p3 = *(void**)p2;
         void* fn_ptr = *(void**)((char*)p3 + 4);
 #ifdef __clang__
@@ -282,15 +282,15 @@ void Order::ReattachFxToUnit()
 // FUNCTION: 0x4388d0
 void Order::SetAttachedFx(OrderFx* obj)
 {
-    if (((Owner_0043a1f0 *)unit->motion.get())) {
+    if (((UnitMotionSlotView *)unit->motion.get())) {
         if (attached) {
-            ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
+            ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
             delete (OrderFx*)attached;
             attached = 0;
         }
         if (obj) {
             subFlags &= ~0x3e0;
-            ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(obj);
+            ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(obj);
             attached = obj;
         }
     }
@@ -301,21 +301,21 @@ void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 {
     if ((unit->def->flags1 & 0x800) == 0) {
         ApproachRadius* obj = new (kSim) ApproachRadius(this, p->x, p->z, n);
-        if (((Owner_0043a1f0 *)unit->motion.get())) {
+        if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
+                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(obj);
+                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(obj);
                 attached = obj;
             }
         }
     } else {
-        if (((Owner_0043a1f0 *)unit->motion.get()) && attached) {
-            ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
+        if (((UnitMotionSlotView *)unit->motion.get()) && attached) {
+            ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
             delete (OrderFx*)attached;
             attached = 0;
         }
@@ -327,22 +327,22 @@ void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 {
     if (!(unit->def->flags1 & 0x800)) {
         RingApproach* obj = new (kSim) RingApproach(this, pos->x, pos->z, radius1, radius2);
-        if (((Owner_0043a1f0 *)unit->motion.get())) {
+        if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
+                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(obj);
+                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(obj);
                 attached = obj;
             }
         }
     } else {
-        if (((Owner_0043a1f0 *)unit->motion.get())) {
+        if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
+                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
@@ -355,22 +355,22 @@ void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 {
     if (!(unit->def->flags1 & 0x800)) {
         PointMarker* obj = new (kSim) PointMarker(this, cell, size);
-        if (((Owner_0043a1f0 *)unit->motion.get())) {
+        if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
+                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(obj);
+                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(obj);
                 attached = obj;
             }
         }
     } else {
-        if (((Owner_0043a1f0 *)unit->motion.get())) {
+        if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((Owner_0043a1f0 *)unit->motion.get())->slot->Attach(0);
+                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
                 delete (OrderFx*)attached;
                 attached = 0;
             }
@@ -408,8 +408,8 @@ Order::~Order()
         SendScriptCallNoArgs(obj, index);
         flags_42 &= ~0x400000;
     }
-    if (((Owner_0043a1f0 *)unit->motion.get()) != 0) {
-        Slot_0043a1f0* slot = ((Owner_0043a1f0 *)unit->motion.get())->slot;
+    if (((UnitMotionSlotView *)unit->motion.get()) != 0) {
+        OrderFxSlot* slot = ((UnitMotionSlotView *)unit->motion.get())->slot;
         if (slot->current.get() != 0 && slot->current.get() == attached.get()) {
             if (attached != 0) {
                 slot->Attach(0);
@@ -445,19 +445,19 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
     return 0;
 }
 
-static unsigned char KindByName_0043a420(char* s)
+static unsigned char OrderKindFromName(char* s)
 {
-    Entry_0043a1f0* e = LowerBoundOrderTypes(g_missionOrderTableBegin, g_missionOrderTableEnd, s, OrderTypeNameLess, 0);
+    OrderTableEntryView* e = LowerBoundOrderTypes(g_missionOrderTableBegin, g_missionOrderTableEnd, s, OrderTypeNameLess, 0);
     if (e == g_missionOrderTableEnd || _strcmpi(e->name, s) != 0)
         return 0;
     return (unsigned char)(e - g_missionOrderTableBegin);
 }
 
-static unsigned char KindByIndex_0043a420(unsigned char want)
+static unsigned char OrderKindFromSavedIndex(unsigned char want)
 {
     int idx = 0;
     int k = 0;
-    for (Entry_0043a1f0* p = g_missionOrderTableBegin; p <= g_missionOrderTableEnd; p++, idx++) {
+    for (OrderTableEntryView* p = g_missionOrderTableBegin; p <= g_missionOrderTableEnd; p++, idx++) {
         if (!(p->flag14 & 1)) {
             if (k == want)
                 break;
@@ -485,7 +485,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
 
     file->OpenNamedBox(name);
     file->SeekBox(0);
-    SaveDesc_0043a1f0 desc;
+    OrderSaveRecord desc;
     if (file->ReadBox(&desc, 0x3a) != 0x3a)
         return;
 
@@ -494,9 +494,9 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     {
         char* s = file->GetStringItem(buf1, 0);
         if (s != 0)
-            desc.kind = KindByName_0043a420(s);
+            desc.kind = OrderKindFromName(s);
         else
-            desc.kind = KindByIndex_0043a420(desc.kind);
+            desc.kind = OrderKindFromSavedIndex(desc.kind);
     }
 
     Unit* u;
@@ -569,7 +569,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
     if (strlen(name) > 0x1f)
         return 0;
 
-    SaveDesc_0043a1f0 desc;
+    OrderSaveRecord desc;
     Unit* u = unit;
     if (u == 0)
         desc.unitType = 0;

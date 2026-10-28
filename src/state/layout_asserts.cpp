@@ -110,7 +110,6 @@
 #include "../units/cob_types.h"
 #include "../units/f14373.h"
 #include "../units/movement_class.h"
-#include "../units/side_name_view.h"
 #include "../units/unit.h"
 #include "../units/unit_def.h"
 #include "../units/unit_script.h"
@@ -2051,8 +2050,6 @@ static_assert(offsetof(SideName, field_224) == 548, "");
 static_assert(offsetof(SideName, unknown_228) == 552, "");
 static_assert(sizeof(SideNameEntry) == 562, "");
 static_assert(offsetof(SideNameEntry, name) == 0, "");
-static_assert(sizeof(SideNameView) == 562, "");
-static_assert(offsetof(SideNameView, name) == 0, "");
 static_assert(sizeof(SoundSettingFlags) == 2, "");
 static_assert(offsetof(SoundSettingFlags, word) == 0, "");
 static_assert(offsetof(SoundSettingFlags, bits) == 0, "");

@@ -24,6 +24,7 @@
 
 #pragma pack(push, 1)
 #include "../game/game.h"
+#include "../game/los_helpers.h"
 #pragma pack(pop)
 
 #pragma pack(push, 2)
@@ -1786,28 +1787,6 @@ TimedSubParticles::TimedSubParticles()
 int TimedSubParticles::IsEmitDue()
 {
     return (unsigned int)time <= (unsigned int)g_game->ticks;
-}
-
-static inline int IsExplored(Player* map, Vec3Words* pos)
-{
-    int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
-    if ((unsigned int)tx < (unsigned int)map->exploredWidth && (unsigned int)ty < (unsigned int)map->exploredHeight &&
-        map->explored[(unsigned int)map->exploredWidth * ty + tx])
-        return 1;
-    return 0;
-}
-
-static inline int IsSeen(Player* map, Vec3Words* pos)
-{
-    int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
-    if (!((unsigned int)tx < (unsigned int)map->exploredWidth && (unsigned int)ty < (unsigned int)map->exploredHeight)) {
-        return 0;
-    }
-    Player* b = map;
-    return (g_game->visibilityMask[(unsigned int)b->exploredWidth * ty + tx] &
-            (1 << g_game->playerIndex)) != 0;
 }
 
 static inline int IsVisible(Player* map, Vec3Words* pos)

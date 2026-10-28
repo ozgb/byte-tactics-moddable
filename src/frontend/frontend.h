@@ -1,5 +1,7 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
+struct CdPlayerChoiceGadgetView;
+struct MainMenuGadgetView;
 
 void __stdcall CheckFrontendStateChange(int line, char* file);
 void __stdcall SetFrontendErrorText(char*);
@@ -36,5 +38,8 @@ void __stdcall FreePictureCache();
 int __stdcall MainLoopContinueStub(void);
 int __stdcall MainLoopContinueStub_B(void);
 int __stdcall MainLoopContinueStub_C(void);
+
+void __stdcall HandleMainMenuClick(MainMenuGadgetView* gadget);
+void __stdcall HandleCloseCdPlayerChoice(CdPlayerChoiceGadgetView* gadget);
 
 #endif

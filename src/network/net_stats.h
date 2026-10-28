@@ -1,7 +1,7 @@
 #ifndef NET_STATS_H
 #define NET_STATS_H
 
-struct Pair_00419560 {
+struct MessageByteCounter {
     int a;
     int b;
 };

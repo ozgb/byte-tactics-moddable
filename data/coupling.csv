@@ -133,8 +133,8 @@ economy,los_radar,indirect,CmdShareRadar,1
 economy,los_radar,indirect,GetMapCell,1
 economy,network,call,AddMessage,4
 economy,network,call,BroadcastPlayerInfo,2
-economy,network,call,PlayerDpid_00457d30,1
 economy,network,call,SendPacketToPlayer,1
+economy,network,call,SlotDpidInUpdateResourceSharing,1
 economy,network,shared_write,Player::energy,1
 economy,network,shared_write,Player::energyWasted,2
 economy,network,shared_write,Player::metal,1

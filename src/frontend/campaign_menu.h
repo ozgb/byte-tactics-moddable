@@ -1,5 +1,6 @@
 #ifndef CAMPAIGN_MENU_H
 #define CAMPAIGN_MENU_H
+struct CampaignMissionObject;
 
 struct Gadget;
 struct Gui;
@@ -33,5 +34,7 @@ int __stdcall CountComputerSlots();
 int __stdcall FindOpenSlot();
 int __stdcall AreAllSlotsEmpty();
 int __stdcall CountPlayersInAllyGroup(int owner);
+
+void __stdcall ToggleAnyMission(CampaignMissionObject* obj);
 
 #endif

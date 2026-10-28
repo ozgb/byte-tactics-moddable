@@ -3,7 +3,7 @@
 #include "../../interfaces/host.h"
 #include "online_report.h"
 
-struct Net_4c97b0;
+struct NetReportBlockView;
 
 #include "../../link/globals.h"
 
@@ -19,7 +19,7 @@ char* GetEnumSessionsErrorText()
 }
 
 // FUNCTION: 0x4ca9d0
-int __stdcall GetCreatedLobbyInterface(Net_4c97b0* net)
+int __stdcall GetCreatedLobbyInterface(NetReportBlockView* net)
 {
     return *(int*)((char*)net + 0x4c9);
 }

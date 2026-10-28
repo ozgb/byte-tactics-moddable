@@ -6,16 +6,16 @@
 class UnitDef;
 struct UnitSyncEntry;
 struct UnitSyncPacket;
-struct Target_0046d530;
-struct Source_0046d630;
+struct UnitSyncTarget;
+struct UnitSyncSource;
 
 class UnitSync;
 
-struct Elem_0046e5e0;
+struct SyncTempTaggedElem;
 
 class SyncTempTaggedVector {
 public:
-    std::vector<Elem_0046e5e0> vec;
+    std::vector<SyncTempTaggedElem> vec;
 
     ~SyncTempTaggedVector();
 };

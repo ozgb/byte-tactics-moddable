@@ -553,14 +553,14 @@ network,SyncTempTaggedVector::~SyncTempTaggedVector,src/network/unit_sync.cpp,0,
 network,TakeFrame,src/network/packets.cpp,1,0,0,0,0,0,?TakeFrame@@YGPAXPAVFrameQueue@@PAUFrame@@HAAH@Z,0,network
 network,UnitAt,src/network/net_game.cpp,1,0,0,0,0,0,?UnitAt@@YGPAUUnit@@G@Z,0,network
 network,UnitSync::AllPlayersSynced,src/network/unit_sync.cpp,1,0,0,0,0,0,?AllPlayersSynced@UnitSync@@QAEHXZ,0,menu
-network,UnitSync::AllowUnit,src/network/unit_sync.cpp,1,0,0,0,0,0,?AllowUnit@UnitSync@@QAEHPAUUnitSyncDef@@@Z,0,menu
+network,UnitSync::AllowUnit,src/network/unit_sync.cpp,1,0,0,0,0,0,?AllowUnit@UnitSync@@QAEHPAVUnitDef@@@Z,0,menu
 network,UnitSync::ApplyToUnitTypes,src/network/unit_sync.cpp,1,0,0,0,0,0,?ApplyToUnitTypes@UnitSync@@QAEXXZ,0,menu
 network,UnitSync::CheckUnitAvailable,src/network/unit_sync.cpp,1,0,0,0,0,0,?CheckUnitAvailable@UnitSync@@QAEXIH@Z,0,network
-network,UnitSync::DisallowUnit,src/network/unit_sync.cpp,1,0,0,0,0,0,?DisallowUnit@UnitSync@@QAEHPAUUnitSyncDef@@@Z,0,menu
+network,UnitSync::DisallowUnit,src/network/unit_sync.cpp,1,0,0,0,0,0,?DisallowUnit@UnitSync@@QAEHPAVUnitDef@@@Z,0,menu
 network,UnitSync::End,src/network/unit_sync_state.h,1,0,0,0,0,0,?End@UnitSync@@QAE?AVUnitSyncIter@@XZ,0,menu
 network,UnitSync::Find,src/network/unit_sync_state.h,1,0,0,0,0,0,?Find@UnitSync@@QAE?AVUnitSyncIter@@PBI@Z,0,menu
 network,UnitSync::GetSyncStatusText,src/network/unit_sync.cpp,1,0,0,0,0,0,?GetSyncStatusText@UnitSync@@QAEPADXZ,0,menu
-network,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,1,0,0,0,0,0,?GetUnitEntry@UnitSync@@QAEHPAUUnitSyncDef@@PAUUnitSyncEntry@@@Z,0,menu
+network,UnitSync::GetUnitEntry,src/network/unit_sync.cpp,1,0,0,0,0,0,?GetUnitEntry@UnitSync@@QAEHPAVUnitDef@@PAUUnitSyncEntry@@@Z,0,menu
 network,UnitSync::HandleSyncPacket,src/network/unit_sync.cpp,1,0,0,0,0,0,?HandleSyncPacket@UnitSync@@QAEXPAUUnitSyncPacket@@E@Z,0,network
 network,UnitSync::IsPlayerSynced,src/network/unit_sync.cpp,1,0,0,0,0,0,?IsPlayerSynced@UnitSync@@QAEHH@Z,0,menu
 network,UnitSync::NotifyEntryChanged,src/network/unit_sync.cpp,1,0,0,0,0,0,?NotifyEntryChanged@UnitSync@@QAEXI@Z,0,network
@@ -573,8 +573,8 @@ network,UnitSync::SendEntryTo,src/network/unit_sync.cpp,0,0,0,0,0,0,?SendEntryTo
 network,UnitSync::SendSyncMessage,src/network/unit_sync.cpp,0,0,0,0,0,0,?SendSyncMessage@UnitSync@@QAEXEHHH@Z,1,
 network,UnitSync::SendSyncMessageTo,src/network/unit_sync.cpp,0,0,0,0,0,0,?SendSyncMessageTo@UnitSync@@QAEXPAUTarget_0046d530@@EHHH@Z,1,
 network,UnitSync::SendSyncPacket,src/network/unit_sync.cpp,1,0,0,0,0,0,?SendSyncPacket@UnitSync@@QAEXPAIPAUUnitSyncPacket@@H@Z,0,network
-network,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,1,0,0,0,0,0,?SetUnitLimit@UnitSync@@QAEXPAUUnitSyncDef@@H@Z,0,menu
-network,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,0,0,0,0,0,0,?ToggleUnitAllowed@UnitSync@@QAEHPAUUnitSyncDef@@@Z,1,
+network,UnitSync::SetUnitLimit,src/network/unit_sync.cpp,1,0,0,0,0,0,?SetUnitLimit@UnitSync@@QAEXPAVUnitDef@@H@Z,0,menu
+network,UnitSync::ToggleUnitAllowed,src/network/unit_sync.cpp,0,0,0,0,0,0,?ToggleUnitAllowed@UnitSync@@QAEHPAVUnitDef@@@Z,1,
 network,UnitSync::UnitSync,src/network/unit_sync.cpp,1,0,0,0,0,0,??0UnitSync@@QAE@H@Z,0,menu
 network,UnitSync::~UnitSync,src/network/unit_sync.cpp,1,0,0,0,0,0,??1UnitSync@@QAE@XZ,0,menu
 network,UnitSyncIter::UnitSyncIter,src/network/unit_sync_state.h,1,0,0,0,0,0,??0UnitSyncIter@@QAE@PAUUnitSyncNode@@@Z,0,menu
@@ -1184,7 +1184,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1116,460,31785,9861,11844,2568,,295,
+presentation,*,,1116,460,31785,9861,11844,2569,,295,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,
@@ -2148,7 +2148,7 @@ seams,LoadCampaignNative,src/seams/native.cpp,1,0,0,0,0,0,?LoadCampaignNative@@Y
 seams,MissionExistsNative,src/seams/native.cpp,1,0,0,0,0,0,?MissionExistsNative@@YIHPAVMission@@HH@Z,0,
 seams,SelectMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?SelectMissionNative@@YIHPAVMission@@HH@Z,0,
 seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadManagerDeleteTimersNative@@YIXPAVSquadManager@@H@Z,0,
-state,*,,348,294,649,522,624,315,,21,
+state,*,,344,293,640,517,614,312,,21,
 state,??$?8PAUUnit@@PAU0@@@YG_NABV?$SimAllocator@PAUUnit@@@@0@Z,src/state/sim_allocator.h,0,0,0,0,0,0,??$?8PAUUnit@@PAU0@@@YG_NABV?$SimAllocator@PAUUnit@@@@0@Z,1,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
@@ -2159,7 +2159,6 @@ state,??8@YG_NABU?$Ref@UUnit_0043e490@@@@PAUUnit_0043e490@@@Z,interfaces/ref.h,1
 state,??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z,0,unused-instance
 state,??9@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??9@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
-state,??9@YG_NABU?$Ref@UWeapon@@@@PAUWeapon@@@Z,interfaces/ref.h,1,0,0,0,0,0,??9@YG_NABU?$Ref@UWeapon@@@@PAUWeapon@@@Z,0,unused-instance
 state,??9@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z,interfaces/ref.h,1,0,0,0,0,0,??9@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z,0,unused-instance
 state,??9@YG_NABU?$Ref@VUnitDef@@@@PAVUnitDef@@@Z,interfaces/ref.h,1,0,0,0,0,0,??9@YG_NABU?$Ref@VUnitDef@@@@PAVUnitDef@@@Z,0,unused-instance
 state,??_V@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??_V@YAXPAXABUSimHeap@@@Z,1,
@@ -2176,7 +2175,6 @@ state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UStats_0043e490@@@@QBEPAU
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UType_0049d270@@@@QBEPAUType_0049d270@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UUnit_0043e490@@@@QBEPAUUnit_0043e490@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UUnit_0043f0e0@@@@QBEPAUUnit_0043f0e0@@XZ,0,unused-instance
-state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UWeapon@@@@QBEPAUWeapon@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@VPacketChannel@@@@QBEPAVPacketChannel@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@VPlayerData@@@@QBEPAVPlayerData@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@VPlayerFrameInfo@@@@QBEPAVPlayerFrameInfo@@XZ,0,unused-instance
@@ -2197,7 +2195,6 @@ state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UScreenPos@@@@QBEPAU
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@USideData@@@@QBEPAUSideData@@XZ,0,unused-instance
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UUnit_0043e490@@@@QBEPAUUnit_0043e490@@XZ,0,unused-instance
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UUnit_0043f0e0@@@@QBEPAUUnit_0043f0e0@@XZ,0,unused-instance
-state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UWeapon@@@@QBEPAUWeapon@@XZ,0,unused-instance
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VPacketChannel@@@@QBEPAVPacketChannel@@XZ,0,unused-instance
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VPlayerData@@@@QBEPAVPlayerData@@XZ,0,unused-instance
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VPlayerFrameInfo@@@@QBEPAVPlayerFrameInfo@@XZ,0,unused-instance
@@ -2268,7 +2265,7 @@ units,InitUnit,src/units/units.cpp,0,0,0,0,0,0,?InitUnit@@YGXHUVec3@@HPAUUnit@@@
 units,InsertShift,src/units/unit_commands.cpp,0,0,0,0,0,0,?InsertShift@@YGXPAPAUItem_00485940@@PAU1@P6GH11@Z@Z,1,
 units,IsUnitCommander,src/units/units.cpp,0,0,0,0,0,0,?IsUnitCommander@@YGHPAUUnit@@@Z,1,
 units,MakeFixed,src/units/units.cpp,0,0,0,0,0,0,?MakeFixed@@YG?ATFixed_004853b0@@H@Z,1,
-units,MakePropList,src/units/unit_targets.cpp,1,0,0,0,0,0,?MakePropList@@YGPADPAUUnitType@@@Z,0,unit-info
+units,MakePropList,src/units/unit_targets.cpp,1,0,0,0,0,0,?MakePropList@@YGPADPAVUnitDef@@@Z,0,unit-info
 units,OctantBetween,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?OctantBetween@@YGDUPoint16@@0@Z,1,
 units,Partition,src/units/unit_commands.cpp,0,0,0,0,0,0,?Partition@@YGPAPAUItem_00485940@@PAPAU1@0PAU1@P6GH11@Z@Z,1,
 units,QuickSort,src/units/unit_commands.cpp,0,0,0,0,0,0,?QuickSort@@YGXPAPAUItem_00485940@@0P6GHPAU1@1@ZH@Z,1,

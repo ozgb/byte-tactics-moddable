@@ -48,17 +48,17 @@ struct Form {
     char choice2[0x20];
 };
 
-struct Gadget;
+struct ContinueWatchingDialog;
 
-struct Screen {
+struct ContinueWatchingLayer {
     char unknown_0[4];
     Form* form;
-    void (__stdcall *callback)(Gadget*);
+    void (__stdcall *callback)(ContinueWatchingDialog*);
 };
 
-struct Gadget {
+struct ContinueWatchingDialog {
     char unknown_0[0x18];
-    Screen* screen;
+    ContinueWatchingLayer* screen;
     char unknown_1c[0x60 - 0x1c];
     int selected;
 };
@@ -468,7 +468,7 @@ int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 #include "../gui/dialogs.h"
 
 // FUNCTION: 0x464de0
-void __stdcall ContinueWatchingCallback(Gadget* gadget)
+void __stdcall ContinueWatchingCallback(ContinueWatchingDialog* gadget)
 {
     int screen = (int)gadget->screen->form;
     if (gadget->selected == -1)
@@ -489,7 +489,7 @@ void __stdcall ContinueWatchingCallback(Gadget* gadget)
 }
 
 
-Screen* __stdcall LoadGuiLayer(Menu* menu, char* name, int value);
+ContinueWatchingLayer* __stdcall LoadGuiLayer(Menu* menu, char* name, int value);
 void __stdcall SetKeyboardInput(Menu* menu, int flag);
 void __stdcall SetTranslatedTextByName(Menu* menu, char* name, char* text, int value);
 #include "../gui/gui.h"
@@ -497,7 +497,7 @@ void __stdcall SetTranslatedTextByName(Menu* menu, char* name, char* text, int v
 // FUNCTION: 0x464e70
 void ShowContinueWatchingDialog()
 {
-    Screen* screen = LoadGuiLayer(&g_game->gui_519, g_yesNoGuiName, 0x900);
+    ContinueWatchingLayer* screen = LoadGuiLayer(&g_game->gui_519, g_yesNoGuiName, 0x900);
     if (screen) {
         Form* form;
         SetKeyboardInput(&g_game->gui_519, 1);
@@ -765,7 +765,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                     g_seams.los_radar->RecalculateLineOfSight(1);
                     BroadcastPlayerInfo();
                     if (CountActiveAIPlayers() == 0) {
-                        Screen* dlg = LoadGuiLayer(&g_game->gui_519, "YESORNO.GUI", 0x900);
+                        ContinueWatchingLayer* dlg = LoadGuiLayer(&g_game->gui_519, "YESORNO.GUI", 0x900);
                         if (dlg != 0) {
                             SetKeyboardInput(&g_game->gui_519, 1);
                             Form* w = dlg->form;

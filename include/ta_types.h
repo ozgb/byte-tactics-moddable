@@ -1411,7 +1411,7 @@ struct AllMissionsFlags;
 struct MissionName_00467e50;
 struct MissionRule_00436c30;
 struct MissionUnit_00436c30;
-struct UnitOrderNode;
+struct Mission_00467e50;
 struct MobHdr_43dd70;
 struct ModeList_004b5330;
 struct Mode_00446310;

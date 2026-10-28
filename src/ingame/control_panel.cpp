@@ -70,6 +70,7 @@ struct CameraFollowTarget {
 };
 
 #include "../game/game.h"
+#include "view_mouse_event.h"
 #include "../game/game_state.h"
 
 #pragma pack(pop)

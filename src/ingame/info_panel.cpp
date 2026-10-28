@@ -92,6 +92,9 @@ struct BuilderProbeDefName {
 };
 
 #include "../game/game.h"
+#include "light_bar_counters.h"
+#include "light_bar_sprite.h"
+#include "unit_info_snapshot.h"
 #include "../game/los_helpers.h"
 
 class DetectionVisitor {
@@ -130,13 +133,13 @@ struct LogoFrameSize {
     unsigned short h;
 };
 
-struct UnitOrderNode {
+struct Mission_00467e50 {
     char pad_0[5];
     unsigned char state;
     char pad_6[0x16 - 0x6];
     Ref<Unit> target;
     char pad_1a[0x4a - 0x1a];
-    Ref<UnitOrderNode> next;
+    Ref<Mission_00467e50> next;
 };
 
 #include "../orders/order_type_entry.h"
@@ -556,7 +559,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
     int lineH;
     int y;
     int prev;
-    UnitOrderNode* m;
+    Mission_00467e50* m;
 
     if (g_game->unitInfoHoverTrack == 0 || g_game->unitInfoHoverUnitId == 0)
         return 0;
@@ -626,7 +629,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
         if (((void *)unit->list) != 0) {
             DrawString(surface, "Mission Q:", 0x86, y, -1);
             y += lineH;
-            for (m = (UnitOrderNode*)((void *)unit->list); m != 0;
+            for (m = (Mission_00467e50*)((void *)unit->list); m != 0;
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
@@ -643,7 +646,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
         if (((void *)unit->list2) != 0) {
             DrawString(surface, "Background Mission Q:", 0x86, y, -1);
             y += lineH;
-            for (m = (UnitOrderNode*)((void *)unit->list2); m != 0;
+            for (m = (Mission_00467e50*)((void *)unit->list2); m != 0;
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",

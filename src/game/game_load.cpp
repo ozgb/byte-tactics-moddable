@@ -14,6 +14,8 @@
 #pragma pack(push, 1)
 
 #include "game.h"
+#include "mission_option_flags.h"
+#include "main2_menu.h"
 
 union CreateUnitFixed {
     int i;

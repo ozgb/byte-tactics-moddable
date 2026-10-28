@@ -31,6 +31,7 @@ struct Src_004ab400;
 #include "../network/player_info.h"
 
 #include "game.h"
+#include "mission_option_flags.h"
 
 struct SkirmishSlotResources {
     char unknown_0[0xc];

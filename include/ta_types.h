@@ -12926,21 +12926,6 @@ public:
     void* AssignEntry(int*);
 };
 
-struct Display_004b8310 {
-    char unknown_0[200];
-    unsigned char* lightTable;
-    char unknown_cc[36];
-    unsigned char flags;
-    char unknown_f1[3];
-};
-
-struct Src_004b8310 {
-    int width;
-    int height;
-    int pitch;
-    Bitmap_00437b50** pixels;
-};
-
 struct Display_004b8500 {
     char unknown_0[192];
     unsigned char* field_c0;
@@ -12976,27 +12961,9 @@ struct Entry_004b8b30 {
     char unknown_2[6];
 };
 
-struct GafEntry_004b8d40 {
-    unsigned short count;
-    unsigned char kind;
-    char unknown_3[5];
-    char name[1];
-    char unknown_9[31];
-    Bitmap_00437b50* child[1];
-    Entry_004b8b30 entries[1];
-};
-
 struct Entry_5 {
     int off;
     int pad;
-};
-
-struct Blk {
-    unsigned short count;
-    char unknown_2[8];
-    unsigned char subcount;
-    char unknown_b[29];
-    Entry_5 e[2];
 };
 
 struct Desc_004b8ec0 {

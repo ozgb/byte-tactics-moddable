@@ -14528,27 +14528,6 @@ public:
     void** CreateSampleFromFile(Class_004bbbe0*, unsigned long, int, int, int);
 };
 
-struct IDirectSound3DBuffer {
-    char unknown_0[4];
-    long __stdcall GetAllParameters(void*);
-    long __stdcall GetConeAngles(unsigned long*, unsigned long*);
-    long __stdcall GetConeOrientation(void*);
-    long __stdcall GetConeOutsideVolume(long*);
-    long __stdcall GetMaxDistance(float*);
-    long __stdcall GetMinDistance(float*);
-    long __stdcall GetMode(unsigned long*);
-    long __stdcall GetPosition(void*);
-    long __stdcall GetVelocity(void*);
-    long __stdcall SetAllParameters(void*, unsigned long);
-    long __stdcall SetConeAngles(unsigned long, unsigned long, unsigned long);
-    long __stdcall SetConeOrientation(float, float, float, unsigned long);
-    long __stdcall SetConeOutsideVolume(long, unsigned long);
-    long __stdcall SetMaxDistance(float, unsigned long);
-    long __stdcall SetMinDistance(float, unsigned long);
-    long __stdcall SetMode(unsigned long, unsigned long);
-    long __stdcall SetPosition(float, float, float, unsigned long);
-};
-
 class Class_004cf800 {
 public:
     char unknown_0[452];
@@ -14743,18 +14722,6 @@ struct S {
 struct TlsBlock {
     char unknown_0[8];
     void* limit;
-};
-
-class StackTrace {
-public:
-    char unknown_0[120];
-    int field_78;
-    int field_7c;
-    char unknown_80[8188];
-    int field_207c;
-    int* field_2080;
-    char dump_text[42060];
-    void CaptureStack(int*, int*, int, int);
 };
 
 class Class_004d9ca0 {
@@ -15226,28 +15193,6 @@ public:
     LiveNode* FUN_004ddc90(unsigned int&);
 };
 
-class MappedFile {
-public:
-    void* hFile;
-    void* hMapping;
-    void* view;
-    int size;
-    int state;
-    MappedFile(char*);
-};
-
-class LoadedImage : public MappedFile {
-public:
-    void* module;
-    unsigned int imageBase;
-    _IMAGE_DOS_HEADER* dosHeader;
-    _IMAGE_NT_HEADERS* ntHeaders;
-    _IMAGE_DEBUG_DIRECTORY* debugDirs;
-    unsigned int numDebugDirs;
-    LoadedImage(void*);
-    ~LoadedImage(void);
-};
-
 class Class_004e1590 {
 public:
     void* hFile;
@@ -15302,20 +15247,6 @@ struct Line_004de550 {
     unsigned long LineNumber;
     unsigned long FileName;
     unsigned long Address;
-};
-
-struct Frame_004de700 {
-    int addrFrame;
-    int unknown_04;
-    int flags0;
-    char unknown_c[12];
-    int addrStack;
-    char unknown_1c[4];
-    int flags1;
-    int handler;
-    char unknown_28[4];
-    int flags2;
-    char unknown_30[64];
 };
 
 struct Sym_004dea00 {
@@ -16139,7 +16070,6 @@ static_assert(sizeof(Class_004cfb40) == 0x28c, "Class_004cfb40 size");
 static_assert(sizeof(Class_004cf180) == 0x1b8, "Class_004cf180 size");
 static_assert(sizeof(Class_004cf230) == 0x28, "Class_004cf230 size");
 static_assert(sizeof(Class_004cf370) == 0x28, "Class_004cf370 size");
-static_assert(sizeof(IDirectSound3DBuffer) == 0x4, "IDirectSound3DBuffer size");
 static_assert(sizeof(Class_004cf800) == 0x1e4, "Class_004cf800 size");
 static_assert(sizeof(Class_004cf8a0) == 0x1e4, "Class_004cf8a0 size");
 static_assert(sizeof(CavedogRegistryKey) == 0x34, "CavedogRegistryKey size");

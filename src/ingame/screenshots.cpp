@@ -9,7 +9,11 @@ struct Input_00499890 {
 };
 
 struct Ctx_00499890 {
-    char unknown_0[0xf1];
+    char pad_0[0x40];
+    void* hwnd;
+    char pad_44[0xcc - 0x44];
+    unsigned char* colorMap;
+    char pad_d0[0xf1 - 0xd0];
     unsigned char flags;
 };
 

@@ -6286,9 +6286,9 @@ struct Video_0045bb00 {
     ModeList_004b5330* field_14a;
 };
 
-#include "../src/sound/bits_0045c570.h"
+#include "../src/sound/sound_setting_bits.h"
 
-#include "../src/sound/flags_0045c570.h"
+#include "../src/sound/sound_setting_flags.h"
 
 class Class_004ce3e0 {
 public:

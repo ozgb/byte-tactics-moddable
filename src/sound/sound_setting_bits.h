@@ -1,5 +1,5 @@
-#ifndef BITS_0045C570_H
-#define BITS_0045C570_H
+#ifndef SOUND_SETTING_BITS_H
+#define SOUND_SETTING_BITS_H
 
 #pragma pack(push, 1)
 struct SoundSettingBits {

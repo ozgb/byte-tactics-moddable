@@ -43,7 +43,7 @@
 #include "../network/chat_hud_entry.h"
 #include "../network/chat_hud_entry_view.h"
 #include "../network/player_id_entry.h"
-#include "../sound/flags_0045c570.h"
+#include "../sound/sound_setting_flags.h"
 #include "../units/f14373.h"
 #include "../units/name_004864b0.h"
 #include "../util/point.h"

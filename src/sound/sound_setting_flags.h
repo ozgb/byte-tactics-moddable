@@ -1,7 +1,7 @@
-#ifndef FLAGS_0045C570_H
-#define FLAGS_0045C570_H
+#ifndef SOUND_SETTING_FLAGS_H
+#define SOUND_SETTING_FLAGS_H
 
-#include "bits_0045c570.h"
+#include "sound_setting_bits.h"
 
 #pragma pack(push, 1)
 union SoundSettingFlags {

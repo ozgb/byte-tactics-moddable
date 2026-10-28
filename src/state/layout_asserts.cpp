@@ -105,7 +105,7 @@
 #include "../orders/path_order_attach.h"
 #include "../orders/unit_motion.h"
 #include "../quirks/quirks.h"
-#include "../sound/flags_0045c570.h"
+#include "../sound/sound_setting_flags.h"
 #include "../units/cob_script.h"
 #include "../units/cob_types.h"
 #include "../units/f14373.h"

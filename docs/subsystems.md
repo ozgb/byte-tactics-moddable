@@ -674,7 +674,7 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
 | game | 113 of 183 | 61.7% | 50.4% | 31.4% | 70 | 25 |
 | network | 50 of 287 | 17.4% | 10.7% | 4.5% | 237 | 73 |
-| platform | 318 of 641 | 49.6% | 34.9% | 22.7% | 323 | 80 |
+| platform | 318 of 639 | 49.8% | 34.9% | 22.8% | 321 | 83 |
 | presentation | 454 of 1107 | 41.0% | 31.0% | 21.6% | 653 | 294 |
 | seams | 94 of 103 | 91.3% | 95.8% | - | 9 | 0 |
 | state | 293 of 345 | 84.9% | 80.7% | 50.8% | 52 | 21 |

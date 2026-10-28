@@ -1409,7 +1409,7 @@ struct AllMissionsFlags;
 struct MissionName_00467e50;
 struct MissionRule_00436c30;
 struct MissionUnit_00436c30;
-struct Mission_00467e50;
+struct OrderQueueNode;
 struct MobHdr_43dd70;
 struct DisplayModeTable;
 struct DisplayMode;

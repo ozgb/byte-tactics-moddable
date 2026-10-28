@@ -32,6 +32,7 @@ install.
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -180,11 +181,10 @@ def should_retry(message: str) -> bool:
     playtest.py names an error dialog's kind (dialog-directx, dialog-crt, ...) in the failure. The DirectX
     box is only classified so before the first tick; the runtime error (R6025) is a real fault.
     """
-    if "still runs after" in message:
-        return False
-    if "dialog-" in message:
-        return RETRY_DIALOG in message
-    return True
+    kind = re.search(r"dialog-\w+", message)
+    if kind:
+        return kind[0] == RETRY_DIALOG
+    return "still runs after" not in message
 
 
 def play_scenario(exe: Path, scenario: Path, game_dir: str | None,

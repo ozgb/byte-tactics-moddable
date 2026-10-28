@@ -26,6 +26,42 @@ def test_classify() -> None:
     assert playtest.classify_dialog([("tiny", 1, 1)], False) is None
 
 
+WINE_LOG = (
+    '0120:trace:dialog:MSGBOX_DlgProc Message number 0x0007 is being ignored.\n'
+    '0120:trace:msgbox:MSGBOX_OnInit L"Runtime Error!\\n\\nProgram: Z:\\\\game\\\\TotalA.exe\\n\\nR6025\\r\\n'
+    '- pure virtual function call\\r\\n"\n'
+    '0120:trace:dialog:MSGBOX_DlgProc Message number 0x0008 is being ignored.\n'
+)
+
+
+def test_dialog_text() -> None:
+    assert playtest.dialog_text(WINE_LOG) == "Runtime Error! Program: Z:\\game\\TotalA.exe R6025 - pure virtual function call"
+    assert playtest.dialog_text("fixme:ntdll:something\n") == ""
+    assert playtest.dialog_text('trace:msgbox:MSGBOX_OnInit L"a \\"q\\" \\00e9"\n') == 'a "q" \u00e9'
+    two = WINE_LOG + 'trace:msgbox:MSGBOX_OnInit L"second"\n'
+    assert playtest.dialog_text(two) == "second"
+
+
+def test_error_dialog_reads_the_text_from_wine_log() -> None:
+    from unittest import mock
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        run = fake_run(tmp)
+        inst = playtest.Instance(run, 1)
+        run.out.mkdir(parents=True)
+        (run.out / f"wine{inst.suffix}.log").write_text(WINE_LOG)
+        crt = ("Microsoft Visual C++ Runtime Library", 380, 150)
+        with mock.patch.object(inst, "windows", return_value=[GAME, crt]):
+            kind, title, text = inst.error_dialog()
+        assert (kind, title) == ("dialog-crt", crt[0])
+        assert "R6025 - pure virtual function call" in text
+        with mock.patch.object(inst, "windows", return_value=[GAME]):
+            assert inst.error_dialog() is None
+        (run.out / f"wine{inst.suffix}.log").unlink()
+        with mock.patch.object(inst, "windows", return_value=[GAME, crt]):
+            assert inst.error_dialog() == ("dialog-crt", crt[0], "")
+
+
 def test_ticks_started() -> None:
     assert not playtest.ticks_started("bt-trace 1\ngame_seed 5\n")
     assert playtest.ticks_started("bt-trace 1\ngame_seed 5\n1 move 00ff12ab\n")
@@ -37,6 +73,11 @@ def test_retry() -> None:
     assert not reference.should_retry("the game shows an error dialog (dialog-crt, window title \"x\")")
     assert not reference.should_retry("the game shows an error dialog (dialog-cavedog, window title \"x\")")
     assert not reference.should_retry("the game still runs after 1470s")
+    crt = 'the game shows an error dialog (dialog-crt, window title "x", text "R6025 - pure virtual function call")'
+    assert not reference.should_retry(crt)
+    assert not reference.should_retry(crt.replace("R6025", "dialog-directx"))
+    directx = 'the game shows an error dialog (dialog-directx, window title "x", text "DirectDraw failed, still runs after")'
+    assert reference.should_retry(directx)
 
 
 

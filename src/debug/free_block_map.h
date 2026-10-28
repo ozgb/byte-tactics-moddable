@@ -9,12 +9,6 @@
 extern void* DAT_00528a54;
 
 class BlockMapIter;
-class Iter_004dbd00;
-class ConstIter_004dbd00;
-class Iter_004dbd20;
-class Iter_004dc620;
-struct InsertResult_004db450;
-struct Pair_004db450;
 
 struct Less_004db000 {
     bool operator()(const unsigned int& a, const unsigned int& b) const { return a < b; }
@@ -166,14 +160,14 @@ public:
     MapInsertResult InsertOrFind(const Pair_004db000& V);
     MapInsertResult InsertOrFindInline(Pair_004db000* p);
     MapInsertResult InsertOrFindInline(const Pair_004db000& v);
-    void InsertOrFindInline(InsertResult_004db450* it, Pair_004db450* p);
+    void InsertOrFindInline(struct InsertResult_004db450* it, struct Pair_004db450* p);
     FreeBlockIter Insert(Node_004db000* x, Node_004db000* y, const Pair_004db000* v);
     FreeBlockIter Erase(FreeBlockIter _P);
     void Erase(FreeBlockIter* out, FreeBlockIter it);
-    Iter_004dbd00 Erase(Iter_004dbd00 it);
-    ConstIter_004dbd00 EraseCopyIter(ConstIter_004dbd00 it);
-    Iter_004dbd20 UpperBound(const unsigned int& kv);
-    Iter_004dc620 lower_bound(const unsigned int& kv);
+    class Iter_004dbd00 Erase(Iter_004dbd00 it);
+    class ConstIter_004dbd00 EraseCopyIter(ConstIter_004dbd00 it);
+    class Iter_004dbd20 UpperBound(const unsigned int& kv);
+    class Iter_004dc620 lower_bound(const unsigned int& kv);
     void lower_bound(FreeBlockIter* out, const unsigned int& kv);
     Node_004db000* LowerBound(const Pair_004db000& k);
     Node_004db000* LowerBound(const unsigned int& kv);

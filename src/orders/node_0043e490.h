@@ -3,12 +3,12 @@
 
 #include "../../interfaces/ref.h"
 
-struct Limits_0043e490;
+struct WeaponDefShotCostView;
 struct UnitDef;
 struct Player;
 
 #pragma pack(push, 1)
-struct Node_0043e490 {
+struct WeaponDefCursorView {
     char unknown_0[0x111];
     union {
         unsigned int f111;
@@ -20,38 +20,38 @@ struct Node_0043e490 {
     };
 };
 
-struct Feature_0043e490 {
+struct FeatureCursorView {
     char unknown_0[0xfe];
     unsigned char flags;
     char unknown_ff;
 };
 
-struct Size_0043e490 {
+struct UIntSize {
     unsigned int width;
     unsigned int height;
 };
 
-struct Stats_0043e490 {
+struct PlayerResourceView {
     char unknown_0[0x8c];
     float f8c;
     char unknown_90[0x98 - 0x90];
     float f98;
 };
 
-struct Unit_0043e490 {
+struct UnitCursorView {
     int motion;
     char unknown_4[0x10 - 0x4];
-    Ref<Node_0043e490> f10;
+    Ref<WeaponDefCursorView> f10;
     char unknown_14[0x48 - 0x14];
-    Ref<Limits_0043e490> f48;
+    Ref<WeaponDefShotCostView> f48;
     char unknown_4c[0x6a - 0x4c];
     char f6a[0x86 - 0x6a];
-    Ref<Unit_0043e490> carrier;
+    Ref<UnitCursorView> carrier;
     char unknown_8a[0x92 - 0x8a];
     Ref<UnitDef> def;
     Ref<Player> player;
     char unknown_9a[0xec - 0x9a];
-    Ref<Stats_0043e490> fec;
+    Ref<PlayerResourceView> fec;
     char unknown_f0[0xfb - 0xf0];
     int postTransferHoldoff;
     unsigned char playerIndex;
@@ -61,14 +61,14 @@ struct Unit_0043e490 {
     unsigned int flags;
 };
 
-struct Pos_0043e490 {
+struct FixedPosView {
     short xf, x;
     short yf, y;
     short zf, z;
 };
 #pragma pack(pop)
 
-struct Limits_0043e490 {
+struct WeaponDefShotCostView {
     char unknown_0[0xc0];
     float fc0;
     float fc4;

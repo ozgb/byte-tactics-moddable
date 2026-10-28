@@ -150,10 +150,10 @@ void __stdcall DrawUnit(void*, Unit*);
 MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
                                       Unit_0043f0e0* target, Pos_0043f0e0* pos);
 
-int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
-                           Pos_0043e490* pos);
+int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCursorView* target,
+                           FixedPosView* pos);
 
-static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
+static inline int Visible(UnitCursorView* unit, FixedPosView* pos) {
     Player* p = unit->player;
     int y, x;
     x = pos->x >> 5;
@@ -162,41 +162,41 @@ static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
            0 != ((1 << g_game->playerIndex) & g_game->visibilityMask[x + y * unit->player->exploredWidth]);
 }
 
-static inline Feature_0043e490* GetFeature(Cell* cell) {
+static inline FeatureCursorView* GetFeature(Cell* cell) {
     if (cell == 0)
         return 0;
     unsigned short id = cell->feature;
     if (id < 0xfffb) {
         if (id >= g_game->featureCount)
             return 0;
-        return &((struct Feature_0043e490 *)g_game->features)[id];
+        return &((struct FeatureCursorView *)g_game->features)[id];
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->width + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return &((struct Feature_0043e490 *)g_game->features)[id];
+    return &((struct FeatureCursorView *)g_game->features)[id];
 }
 
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \
     do {                                                             \
         if (((def)->flags2 & (mask)) && Visible((unit), (pos))) {      \
-            Feature_0043e490* f = GetFeature(g_seams.los_radar->GetMapCellAtPosition((Vec3*)(pos)));     \
+            FeatureCursorView* f = GetFeature(g_seams.los_radar->GetMapCellAtPosition((Vec3*)(pos)));     \
             if (f && (f->flags & 0x80))                              \
                 return (result);                                     \
         }                                                            \
     } while (0)
 
-static inline int Selectable(Unit_0043e490* t) {
+static inline int Selectable(UnitCursorView* t) {
     return t && t->playerIndex == g_game->localPlayer && (t->flags & 0x20) && t->buildLeft == 0.0f && t->postTransferHoldoff == 0 &&
            (t->carrier == 0 || (t->carrier->flags & 0x40000000));
 }
 
-int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
-                           Pos_0043e490* pos) {
+int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCursorView* target,
+                           FixedPosView* pos) {
     UnitDef* def;
-    Node_0043e490* node;
+    WeaponDefCursorView* node;
     int friendly;
     int enemy;
     friendly = 0;
@@ -211,7 +211,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
     switch (mode) {
     case 3:
-        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0].get())->f111b.b8)
+        if ((def->flags2 & 0x10) && ((WeaponDefCursorView*)def->weapons[0].get())->f111b.b8)
             return 2;
         if (def->c04) {
             node = unit->f10;
@@ -255,8 +255,8 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
         return 0x10;
     case 4:
         if (def->c14) {
-            Limits_0043e490* l = unit->f48;
-            Stats_0043e490* s = unit->fec;
+            WeaponDefShotCostView* l = unit->f48;
+            PlayerResourceView* s = unit->fec;
             if (s->f8c < l->fc0 || s->f98 < l->fc4)
                 return 3;
             return 1;
@@ -340,14 +340,14 @@ static inline Thing_0043f0e0* Lookup(Pos_0043f0e0* pos) {
     if (id < 0xfffb) {
         if (id >= g_game->featureCount)
             return 0;
-        return (Thing_0043f0e0*)((char*)(struct Feature_0043e490 *)g_game->features + (id << 8));
+        return (Thing_0043f0e0*)((char*)(struct FeatureCursorView *)g_game->features + (id << 8));
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->width + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return (Thing_0043f0e0*)((char*)(struct Feature_0043e490 *)g_game->features + (id << 8));
+    return (Thing_0043f0e0*)((char*)(struct FeatureCursorView *)g_game->features + (id << 8));
 }
 
 // FUNCTION: 0x43f0e0

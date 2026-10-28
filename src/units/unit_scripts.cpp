@@ -12,8 +12,8 @@
 #include "unit_scripts.h"
 
 
-struct Unit_0043e490;
-struct Feature_0043e490;
+struct UnitCursorView;
+struct FeatureCursorView;
 
 #include "../units/unit_def.h"
 #include "sfx_occupy.h"
@@ -334,7 +334,7 @@ int __stdcall OrderModeTakesTarget(unsigned char type)
 #include "../orders/node_0043e490.h"
 
 
-struct Flags_0043e490 {
+struct UnitDefCursorFlags {
     unsigned int b0 : 1;
     unsigned int b1 : 1;
     unsigned int b2 : 1;
@@ -353,10 +353,10 @@ struct Flags_0043e490 {
     unsigned int b15_31 : 17;
 };
 
-struct UnitDefFlags_0043e490 {
+struct UnitDefCursorFlagsView {
     char unknown_0[0x241];
-    Flags_0043e490 f241b;
-    Flags_0043e490 f245b;
+    UnitDefCursorFlags f241b;
+    UnitDefCursorFlags f245b;
 };
 
 #include "../network/player.h"
@@ -365,7 +365,7 @@ struct UnitDefFlags_0043e490 {
 
 #pragma pack(pop)
 
-static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
+static inline int Visible(UnitCursorView* unit, FixedPosView* pos) {
     Player* p = unit->player;
     int y, x;
     x = pos->x >> 5;
@@ -374,42 +374,42 @@ static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
            0 != ((1 << g_game->playerIndex) & g_game->visibilityMask[x + y * unit->player->exploredWidth]);
 }
 
-static inline Feature_0043e490* GetFeature(Cell* cell) {
+static inline FeatureCursorView* GetFeature(Cell* cell) {
     if (cell == 0)
         return 0;
     unsigned short id = cell->feature;
     if (id < 0xfffb) {
         if (id >= g_game->featureCount)
             return 0;
-        return &((Feature_0043e490 *)g_game->features)[id];
+        return &((FeatureCursorView *)g_game->features)[id];
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->width + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return &((Feature_0043e490 *)g_game->features)[id];
+    return &((FeatureCursorView *)g_game->features)[id];
 }
 
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \
     do {                                                             \
         if (((def)->flags2 & (mask)) && Visible((unit), (pos))) {      \
-            Feature_0043e490* f = GetFeature(g_seams.los_radar->GetMapCellAtPosition((Vec3*)(pos)));     \
+            FeatureCursorView* f = GetFeature(g_seams.los_radar->GetMapCellAtPosition((Vec3*)(pos)));     \
             if (f && (f->flags & 0x80))                              \
                 return (result);                                     \
         }                                                            \
     } while (0)
 
-static inline int Selectable(Unit_0043e490* t) {
+static inline int Selectable(UnitCursorView* t) {
     return t && t->playerIndex == g_game->localPlayer && (t->flags & 0x20) && t->buildLeft == 0.0f && t->postTransferHoldoff == 0 &&
            (t->carrier == 0 || (t->carrier->flags & 0x40000000));
 }
 
 // FUNCTION: 0x43e490
-int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
-                           Pos_0043e490* pos) {
+int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCursorView* target,
+                           FixedPosView* pos) {
     UnitDef* def;
-    Node_0043e490* node;
+    WeaponDefCursorView* node;
     int friendly;
     int enemy;
     friendly = 0;
@@ -424,9 +424,9 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
     switch (mode) {
     case 3:
-        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0].get())->f111b.b8)
+        if ((def->flags2 & 0x10) && ((WeaponDefCursorView*)def->weapons[0].get())->f111b.b8)
             return 2;
-        if (((UnitDefFlags_0043e490*)def)->f245b.b4) {
+        if (((UnitDefCursorFlagsView*)def)->f245b.b4) {
             node = unit->f10;
             if (unit->motion)
                 return 1;
@@ -438,7 +438,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
         }
         break;
     case 9:
-        return ((UnitDefFlags_0043e490*)def)->f245b.b6 ? 7 : 0x13;
+        return ((UnitDefCursorFlagsView*)def)->f245b.b6 ? 7 : 0x13;
     case 8:
         return g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) ? 6 : 0x13;
     case 7:
@@ -459,17 +459,17 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
     case 6:
         if (!target || !g_seams.units->CanLoad(((Unit*)unit), 0, (Unit*)target))
             break;
-        return ((UnitDefFlags_0043e490*)def)->f241b.b11 ? 8 : 0xc;
+        return ((UnitDefCursorFlagsView*)def)->f241b.b11 ? 8 : 0xc;
     case 5:
-        return ((UnitDefFlags_0043e490*)def)->f245b.b8 ? 0xd : 0x13;
+        return ((UnitDefCursorFlagsView*)def)->f245b.b8 ? 0xd : 0x13;
     case 14:
         if (def->ids == 0 || unit->motion == 0)
             break;
         return 0x10;
     case 4:
-        if (((UnitDefFlags_0043e490*)def)->f245b.b14) {
-            Limits_0043e490* l = unit->f48;
-            Stats_0043e490* s = unit->fec;
+        if (((UnitDefCursorFlagsView*)def)->f245b.b14) {
+            WeaponDefShotCostView* l = unit->f48;
+            PlayerResourceView* s = unit->fec;
             if (s->f8c < l->fc0 || s->f98 < l->fc4)
                 return 3;
             return 1;
@@ -494,7 +494,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
         if ((def->flags1 & 0x800) && (target->def->flags1 & 0x200))
             return 0xd;
         if (g_seams.units->CanLoad(((Unit*)unit), 0, (Unit*)target))
-            return ((UnitDefFlags_0043e490*)def)->f241b.b11 ? 8 : 0xc;
+            return ((UnitDefCursorFlagsView*)def)->f241b.b11 ? 8 : 0xc;
         if ((def->flags2 & 0x20) && friendly)
             return 5;
         return 0xe;
@@ -520,7 +520,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
             return 0xf;
         RECLAIM_CHECK(def, unit, pos, 0x800, 0xa);
         RECLAIM_CHECK(def, unit, pos, 0x400, 0xb);
-        return ((UnitDefFlags_0043e490*)def)->f245b.b7 ? 0xe : 0x13;
+        return ((UnitDefCursorFlagsView*)def)->f245b.b7 ? 0xe : 0x13;
     }
     return 0x13;
 }

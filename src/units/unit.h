@@ -10,7 +10,7 @@
 class TdfRecord;
 struct UnitMotion;
 struct Mover;
-struct Limits_0043e490;
+struct WeaponDefShotCostView;
 struct Order;
 struct WeaponDef;
 struct UnitDef;

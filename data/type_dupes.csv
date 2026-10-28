@@ -43,8 +43,6 @@ Layer,no,5,src/frontend/frontend.cpp:58|src/frontend/multi.cpp:232|src/gui/dialo
 Less_004db000,no,3,include/ta_types.h:14224|src/debug/debug_lib.cpp:1049|src/debug/free_block_map.cpp:55,differs,src/debug/debug_lib.cpp
 Less_004dd3d0,no,2,include/ta_types.h:14309|src/debug/debug_lib.cpp:910,differs,src/debug/debug_lib.cpp
 LogoEntry_00445110,no,2,include/ta_types.h:5253|src/frontend/multi.cpp:501,identical,src/frontend/multi.cpp
-LosLine,no,2,src/map/line_of_sight.cpp:135|src/map/los_tables.cpp:46,differs,src/map/line_of_sight.cpp
-LosTable,no,2,src/map/line_of_sight.cpp:129|src/map/los_tables.cpp:53,differs,src/map/line_of_sight.cpp
 MapInsertResult,no,3,include/ta_types.h:14213|src/debug/debug_lib.cpp:861|src/debug/free_block_map.cpp:46,differs,src/debug/debug_lib.cpp
 Message_0047fad0,no,2,include/ta_types.h:8782|src/sound/sound.cpp:126,differs,src/sound/sound.cpp
 MeteorParams,no,4,include/ta_types.h:4653|src/map/map_list.cpp:49|src/map/meteors.cpp:23|src/seams/native.cpp:28,differs,src/map/map_list.cpp

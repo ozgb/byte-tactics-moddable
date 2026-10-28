@@ -228,7 +228,7 @@ ScriptTable,code,pointer,src/units/cob_types.h,#352
 ScriptTable,entries,pointer,src/units/cob_types.h,#352
 ScriptTable,names,pointer,src/units/cob_types.h,#352
 SimGlobals,g_packetHandlers,function-pointer,src/state/sim_globals.h,#352
-Snapshot_0046a860,orderName,int-pointer,src/ingame/snapshot_0046a860.h,#353
+UnitInfoSnapshot,orderName,int-pointer,src/ingame/snapshot_0046a860.h,#353
 SpotState,bitmap,pointer,src/graphics/spot_state.h,#353
 SpotState,owner,pointer,src/graphics/spot_state.h,#353
 SpotState,ownerPointer,pointer,src/graphics/spot_state.h,#353

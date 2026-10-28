@@ -2,7 +2,7 @@
 #define SUB_004679A0_A_H
 
 #pragma pack(push, 1)
-struct Sub_004679a0_a {
+struct LightBarCounters {
     char unknown_0[1];
     int field_1;
     char unknown_5[8];
@@ -14,7 +14,7 @@ struct Sub_004679a0_a {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(Sub_004679a0_a) == 33, "Sub_004679a0_a");
+static_assert(sizeof(LightBarCounters) == 33, "Sub_004679a0_a");
 #endif
 
 #endif

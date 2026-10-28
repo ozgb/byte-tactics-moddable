@@ -18,15 +18,15 @@ struct Option_00419560;
 struct Unit;
 struct Player;
 struct PlayerInfo;
-struct Nano_0041b8d0;
+struct ConstructionNanoState;
 struct Gadget;
 struct Layer;
 struct Gui;
-struct BuildList_0041ace0;
+struct BuildMenuPage;
 
 #include "../game/unit_resources.h"
 
-struct Nano_0041b8d0 {
+struct ConstructionNanoState {
     char unknown_0[0x10];
     int drawFrame;
 };
@@ -43,16 +43,16 @@ struct Nano_0041b8d0 {
 #include "../units/unit.h"
 #include "../weapons/weapon_def.h"
 
-struct BuildEntry_0041ace0 {
+struct BuildMenuEntry {
     short typeId;
     unsigned char page;
     unsigned char slot;
     char name[0x21];
 };
 
-struct BuildList_0041ace0 {
+struct BuildMenuPage {
     int count;
-    BuildEntry_0041ace0 entries[5];
+    BuildMenuEntry entries[5];
 };
 
 #include "../gui/mouse_event.h"
@@ -64,7 +64,7 @@ struct CursorState {
     POINT savedScroll;
 };
 
-struct Follow_0041ca10 {
+struct CameraFollowTarget {
     int unknown_0;
     Vec3 pos;
 };
@@ -83,7 +83,7 @@ extern Option_00419560 g_cheatCommands;
 extern Option_00419560 g_debugCommands;
 
 #pragma pack(push, 1)
-struct Display_0041ce90 {
+struct EdgeScrollDisplay {
     char unknown_0[0x40];
     HWND hwnd;
     char unknown_44[0xf0 - 0x44];
@@ -98,7 +98,7 @@ Unit* __stdcall FindNextSelectedUnit(Unit*, int);
 #include "../gui/keyboard.h"
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
-Display_0041ce90* GetDisplay();
+EdgeScrollDisplay* GetDisplay();
 
 #include "../util/commands.h"
 void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mask);
@@ -748,8 +748,8 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
             layer->data = 0;
             for (int i = 0; i < g_game->buildListCount; i++) {
                 for (int j = 0; j < g_game->buildLists[i].count; j++) {
-                    BuildList_0041ace0* lists = g_game->buildLists;
-                    BuildEntry_0041ace0* entry = &lists[i].entries[j];
+                    BuildMenuPage* lists = g_game->buildLists;
+                    BuildMenuEntry* entry = &lists[i].entries[j];
                     if ((short)((UnitDef*)unit->def.get())->id == entry->typeId
                         && entry->page - 1 == page) {
                         char* src = entry->name;
@@ -990,7 +990,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
 {
     if (unit && (unit->flags & 0x10000000) && ((UnitDef*)unit->def.get())->ids.offset != 0
         && target && (target->flags & 0x10000000)) {
-        ((Nano_0041b8d0*)target->state.get())->drawFrame = 0;
+        ((ConstructionNanoState*)target->state.get())->drawFrame = 0;
         target->buildLeft = 0;
         target->flags |= 0x2000;
         if (target->player->active != 0
@@ -1307,7 +1307,7 @@ void __cdecl ClearCameraFollowState()
 {
     (*(unsigned short*)&g_game->value_1434b) = 0;
     (*(Unit **)&g_game->value_142f3) = 0;
-    (*(Follow_0041ca10 **)&g_game->tracked) = 0;
+    (*(CameraFollowTarget **)&g_game->tracked) = 0;
 }
 
 #pragma auto_inline(off)
@@ -1523,15 +1523,15 @@ void UpdateCameraFollow()
     if ((unsigned short)g_game->value_1434b != 0) {
         (*(unsigned short*)&g_game->value_1434b)--;
         p = &g_game->trackedPos;
-    } else if ((Follow_0041ca10 *)g_game->tracked != 0) {
-        p = &((Follow_0041ca10 *)g_game->tracked)->pos;
+    } else if ((CameraFollowTarget *)g_game->tracked != 0) {
+        p = &((CameraFollowTarget *)g_game->tracked)->pos;
     } else if ((Unit *)g_game->value_142f3 != 0) {
         if (((Unit *)g_game->value_142f3)->flags & 0x10000000) {
             p = &((Unit *)g_game->value_142f3)->pos;
         } else {
             (*(unsigned short*)&g_game->value_1434b) = 0;
             (*(Unit **)&g_game->value_142f3) = 0;
-            (*(Follow_0041ca10 **)&g_game->tracked) = 0;
+            (*(CameraFollowTarget **)&g_game->tracked) = 0;
         }
     }
     if (p != 0) {
@@ -1559,7 +1559,7 @@ void BeginMouseScroll()
 {
     (*(unsigned short*)&g_game->value_1434b) = 0;
     (*(Unit **)&g_game->value_142f3) = 0;
-    (*(Follow_0041ca10 **)&g_game->tracked) = 0;
+    (*(CameraFollowTarget **)&g_game->tracked) = 0;
     HideSoftwareCursor();
     CursorState* cursor = &(*(CursorState*)&g_game->cursor);
     cursor->flag = 1;
@@ -1626,7 +1626,7 @@ void UpdateEdgeScroll()
     if (speed == 0)
         return;
     GetCurrentMouseEvent(&mouse);
-    Display_0041ce90* d = GetDisplay();
+    EdgeScrollDisplay* d = GetDisplay();
     if (!(d->flags_f0 & 2)) {
         host_cursor_get((int*)&pt.x, (int*)&pt.y);
         int w = g_game->width_37e1f;
@@ -1669,6 +1669,6 @@ void UpdateEdgeScroll()
         g_game->mapFlags &= 0xfff7;
         (*(unsigned short*)&g_game->value_1434b) = 0;
         (*(Unit **)&g_game->value_142f3) = 0;
-        (*(Follow_0041ca10 **)&g_game->tracked) = 0;
+        (*(CameraFollowTarget **)&g_game->tracked) = 0;
     }
 }

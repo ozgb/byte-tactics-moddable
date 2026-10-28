@@ -17,7 +17,7 @@
 #include "../network/player.h"
 
 #pragma pack(push, 1)
-struct UnitDefFlags_00467440 {
+struct UnitDefDetectionFlags {
     char unknown_0[0x241];
     unsigned int bit0_7 : 8;
     unsigned int bit8 : 1;
@@ -25,7 +25,7 @@ struct UnitDefFlags_00467440 {
 };
 #pragma pack(pop)
 
-struct UnitType_004685a0 {
+struct BuilderProbeUnitDef {
     char name[0x152];
     int count;
     Ref<unsigned short> ids;
@@ -35,7 +35,7 @@ struct UnitType_004685a0 {
 
 #include "../network/player_info.h"
 
-struct PlayerInfo_004685a0 {
+struct BuilderProbePlayerInfo {
     int f_0;
     char unknown_4[0x2b - 4];
     char name[0x73 - 0x2b];
@@ -46,7 +46,7 @@ struct PlayerInfo_004685a0 {
     unsigned char mobile;
 };
 
-struct Unit_00467960 {
+struct RadarJamUnit {
     char unknown_0[0x110];
     unsigned int flags;
 };
@@ -62,7 +62,7 @@ struct Object_004cb650;
 #include "../units/unit_commands.h"
 #include "../graphics/gaf_frame.h"
 
-struct Team_004689c0 {
+struct StatusPanelTeamTable {
     char unknown_0[4];
     unsigned char* data;
     char unknown_8[347 - 8];
@@ -86,7 +86,7 @@ struct LayerView {
 
 #include "../map/feature_spot.h"
 
-struct Def_004685a0 {
+struct BuilderProbeDefName {
     char unknown_0[0x20];
     char name[0x229];
 };
@@ -114,29 +114,29 @@ public:
 
 #include "../graphics/rect.h"
 
-struct Colors_00467b60 {
+struct ProgressBarColors {
     char unknown_0[4];
     unsigned char empty;
     char unknown_5[5];
     unsigned char full;
 };
 
-struct Quad_467c00 {
+struct LogoQuad {
     Point p[4];
 };
 
-struct Entry_467c00 {
+struct LogoFrameSize {
     unsigned short w;
     unsigned short h;
 };
 
-struct Mission_00467e50 {
+struct UnitOrderNode {
     char pad_0[5];
     unsigned char state;
     char pad_6[0x16 - 0x6];
     Ref<Unit> target;
     char pad_1a[0x4a - 0x1a];
-    Ref<Mission_00467e50> next;
+    Ref<UnitOrderNode> next;
 };
 
 #include "../orders/order_type_entry.h"
@@ -144,18 +144,18 @@ struct Mission_00467e50 {
 
 #include "frame_timers.h"
 
-struct Flags_0046a530 {
+struct SelectionBoxFlags {
     unsigned short low : 2;
     unsigned short flag : 1;
     unsigned short rest : 13;
 };
 
-struct Size_0046b9d0 {
+struct TileOutlineSize {
     short w;
     short h;
 };
 
-class Prim_0046bae0 {
+class ProjectedPrimitive {
 public:
     int colorIndex;
     int count;
@@ -168,7 +168,7 @@ public:
     unsigned int rest : 30;
 };
 
-class Object_0046bae0 {
+class ProjectedModel {
 public:
     int version;
     int count;
@@ -176,7 +176,7 @@ public:
     int firstFace;
     char unknown_10[0x24 - 0x10];
     Vec3* verts;
-    Prim_0046bae0* prims;
+    ProjectedPrimitive* prims;
 };
 
 #pragma pack(pop)
@@ -202,7 +202,7 @@ void __stdcall DrawRectangle(void* surface, Rect* rect, int color);
 void __stdcall DrawRectangle(void* surface, void* rect, int color);
 void __stdcall DrawRectangle(int surface, Rect* rect, int color);
 
-void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_467c00* dst, Quad_467c00* src);
+void __stdcall DrawFrameQuad(void* surf, void* entry, LogoQuad* dst, LogoQuad* src);
 
 char* __stdcall Translate(char* text);
 #include "../graphics/draw.h"
@@ -375,7 +375,7 @@ void DetectionVisitor::MarkUnitsInRadarOrSonarRadius(Unit* unit)
     }
 
     UnitDef* def = unit->def;
-    if (((UnitDefFlags_00467440*)def)->bit8) {
+    if (((UnitDefDetectionFlags*)def)->bit8) {
         return;
     }
 
@@ -413,9 +413,9 @@ void SonarJamVisitor::ApplySonarJamFlag(Unit* unit)
 // FUNCTION: 0x4679a0
 void LoadLightBar()
 {
-    Sub_004679a0_a* a = &g_game->a;
+    LightBarCounters* a = &g_game->a;
     a->field_1 = a->field_d = a->field_19 = a->field_1d = 0;
-    Sub_004679a0_b* b = &g_game->b;
+    LightBarSprite* b = &g_game->b;
     b->field_30 = 0;
     b->lightbar = 0;
     unsigned short* frames = FindGafEntry(g_game->gaf, "LIGHTBAR");
@@ -459,7 +459,7 @@ void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset,
 }
 
 // FUNCTION: 0x467b60
-void __stdcall DrawProgressBar(void* surface, int value, int max, Rect* rect, Colors_00467b60* colors, int dy)
+void __stdcall DrawProgressBar(void* surface, int value, int max, Rect* rect, ProgressBarColors* colors, int dy)
 {
     Rect r = *rect;
     r.top += dy;
@@ -481,9 +481,9 @@ void __stdcall DrawProgressBar(void* surface, int value, int max, Rect* rect, Co
 void __stdcall BlitSideLogoToRect(void* surf, Player* player, Rect* rect, int dy)
 {
     unsigned char idx = player->info->color;
-    Entry_467c00* entry = (Entry_467c00*)*(void**)((char*)g_game->logos32 + idx * 8 + 0x28);
+    LogoFrameSize* entry = (LogoFrameSize*)*(void**)((char*)g_game->logos32 + idx * 8 + 0x28);
 
-    Quad_467c00 src;
+    LogoQuad src;
     src.p[0].x = 0;
     src.p[0].y = 0;
     src.p[1].x = entry->w;
@@ -493,7 +493,7 @@ void __stdcall BlitSideLogoToRect(void* surf, Player* player, Rect* rect, int dy
     src.p[3].x = 0;
     src.p[3].y = entry->h;
 
-    Quad_467c00 dst;
+    LogoQuad dst;
     dst.p[0].x = rect->left;
     dst.p[0].y = rect->top + dy;
     dst.p[1].x = rect->right;
@@ -556,7 +556,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
     int lineH;
     int y;
     int prev;
-    Mission_00467e50* m;
+    UnitOrderNode* m;
 
     if (g_game->unitInfoHoverTrack == 0 || g_game->unitInfoHoverUnitId == 0)
         return 0;
@@ -626,7 +626,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
         if (((void *)unit->list) != 0) {
             DrawString(surface, "Mission Q:", 0x86, y, -1);
             y += lineH;
-            for (m = (Mission_00467e50*)((void *)unit->list); m != 0;
+            for (m = (UnitOrderNode*)((void *)unit->list); m != 0;
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
@@ -643,7 +643,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
         if (((void *)unit->list2) != 0) {
             DrawString(surface, "Background Mission Q:", 0x86, y, -1);
             y += lineH;
-            for (m = (Mission_00467e50*)((void *)unit->list2); m != 0;
+            for (m = (UnitOrderNode*)((void *)unit->list2); m != 0;
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
@@ -703,7 +703,7 @@ void __stdcall DrawNetworkStats(void* surface)
     DrawPercentBar(surface, &r, received * 100 / 5600);
 }
 
-static void Bar_004685a0(void* surface, Rect* rect, int percent)
+static void DrawProbeProbabilityBar(void* surface, Rect* rect, int percent)
 {
     unsigned char& color = g_game->colors[15];
     DrawRectangle(surface, rect, color);
@@ -721,7 +721,7 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
         return 0;
     Unit* unit = &g_game->units[g_game->unitBuilderHoverUnitId];
     if ((((int)unit->flags) & 0x10000000) == 0 || (((int)unit->flags) & 0x4000) != 0
-            || ((UnitType_004685a0 *)unit->def.get())->ids == 0) {
+            || ((BuilderProbeUnitDef *)unit->def.get())->ids == 0) {
         g_game->unitInfoHoverTrack = 0;
         g_game->unitInfoHoverUnitId = 0;
     }
@@ -749,22 +749,22 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
     y += lineHeight;
     DrawString(surface, "==================", 0x86, y, -1);
     y += lineHeight;
-    sprintf(buf, "uid: %03d '%s'\n", unit->id, (char*)((UnitType_004685a0 *)unit->def.get()));
+    sprintf(buf, "uid: %03d '%s'\n", unit->id, (char*)((BuilderProbeUnitDef *)unit->def.get()));
     DrawString(surface, buf, 0x86, y, -1);
     y += lineHeight;
-    char* mobile = (char*)(((UnitType_004685a0 *)unit->def.get())->mobile ? "MOBILE" : "BUILDING");
+    char* mobile = (char*)(((BuilderProbeUnitDef *)unit->def.get())->mobile ? "MOBILE" : "BUILDING");
     char* remote;
-    if (((PlayerInfo_004685a0 *)unit->player.get())->f_0 != 0 && (((PlayerInfo_004685a0 *)unit->player.get())->controller == 1 || ((PlayerInfo_004685a0 *)unit->player.get())->controller == 2))
+    if (((BuilderProbePlayerInfo *)unit->player.get())->f_0 != 0 && (((BuilderProbePlayerInfo *)unit->player.get())->controller == 1 || ((BuilderProbePlayerInfo *)unit->player.get())->controller == 2))
         remote = "LOCAL";
     else
         remote = "REMOTE";
-    sprintf(buf, "playerno: %d '%s' %s - %s\n", ((PlayerInfo_004685a0 *)unit->player.get())->player, ((PlayerInfo_004685a0 *)unit->player.get())->name, remote, mobile);
+    sprintf(buf, "playerno: %d '%s' %s - %s\n", ((BuilderProbePlayerInfo *)unit->player.get())->player, ((BuilderProbePlayerInfo *)unit->player.get())->name, remote, mobile);
     DrawString(surface, buf, 0x86, y, -1);
     y += lineHeight;
-    sprintf(buf, "controller: %d\n\n", ((PlayerInfo_004685a0 *)unit->player.get())->controller);
+    sprintf(buf, "controller: %d\n\n", ((BuilderProbePlayerInfo *)unit->player.get())->controller);
     DrawString(surface, buf, 0x86, y, -1);
     y += lineHeight;
-    if (((PlayerInfo_004685a0 *)unit->player.get())->f_0 != 0 && (((PlayerInfo_004685a0 *)unit->player.get())->controller == 1 || ((PlayerInfo_004685a0 *)unit->player.get())->controller == 2)) {
+    if (((BuilderProbePlayerInfo *)unit->player.get())->f_0 != 0 && (((BuilderProbePlayerInfo *)unit->player.get())->controller == 1 || ((BuilderProbePlayerInfo *)unit->player.get())->controller == 2)) {
         sprintf(buf, "Units I can build, and the probabilities:\n",
                 ((unit->f_1f & 0x10) ? 'X' : '-'),
                 ((unit->f_3b & 0x10) ? 'X' : '-'),
@@ -772,23 +772,23 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
         DrawString(surface, buf, 0x86, y, -1);
         int i = 0;
         y += lineHeight;
-        if (((UnitType_004685a0 *)unit->def.get())->count > 0) {
+        if (((BuilderProbeUnitDef *)unit->def.get())->count > 0) {
             do {
-                unsigned short id = ((UnitType_004685a0 *)unit->def.get())->ids[i];
+                unsigned short id = ((BuilderProbeUnitDef *)unit->def.get())->ids[i];
                 int prob = GetBuildRating(unit->playerIndex, id);
-                Def_004685a0* def = &((Def_004685a0 *)g_game->defs.get())[id];
+                BuilderProbeDefName* def = &((BuilderProbeDefName *)g_game->defs.get())[id];
                 Rect bar;
                 bar.left = 0x88;
                 bar.top = y + 1;
                 bar.right = 0xa2;
                 bar.bottom = bar.top + lineHeight - 6;
-                Bar_004685a0(surface, &bar, prob);
+                DrawProbeProbabilityBar(surface, &bar, prob);
                 char* name = def->name;
                 sprintf(buf, "       %3d %% - '%s'\n", prob, name);
                 DrawString(surface, buf, 0x86, y, -1);
                 y += lineHeight;
                 i++;
-            } while (i < ((UnitType_004685a0 *)unit->def.get())->count);
+            } while (i < ((BuilderProbeUnitDef *)unit->def.get())->count);
         }
     }
     g_probePanelBottom = y;
@@ -803,7 +803,7 @@ void __stdcall DrawStatusPanel(Surface* win)
     int v = g_game->panel;
     if (g_statusPanelNextTick < (int)GetMilliseconds()) {
         g_statusPanelNextTick = GetMilliseconds() + 15;
-        if (!IsKeyDown(0x20) || (g_game->team_index != -1 && ((unsigned char*)((Team_004689c0 *)g_game->layer)->data)[g_game->team_index * 347] == 3)) {
+        if (!IsKeyDown(0x20) || (g_game->team_index != -1 && ((unsigned char*)((StatusPanelTeamTable *)g_game->layer)->data)[g_game->team_index * 347] == 3)) {
             if (v < 0) {
                 if (v == -31)
                     PlaySoundByName("Panel", 0);
@@ -1347,7 +1347,7 @@ void __stdcall DrawHitPointBar(void* surface, Unit* unit, int x, int y)
 // FUNCTION: 0x46a530
 void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
 {
-    Flags_0046a530* f = (Flags_0046a530*)((char*)g_game + 0x37f2f);
+    SelectionBoxFlags* f = (SelectionBoxFlags*)((char*)g_game + 0x37f2f);
     if (f->flag) {
         Vec3 lo;
         Vec3 hi;
@@ -1466,7 +1466,7 @@ static float PositiveOrZero(float value) {
 // FUNCTION: 0x46a860
 void __stdcall DrawUnitInfoPanel(void* surface) {
     int yOffset = g_game->screenHeight - g_game->baseHeight;
-    Snapshot_0046a860 snapshot;
+    UnitInfoSnapshot snapshot;
     memset(&snapshot, 0, sizeof(snapshot));
     char text[256];
 
@@ -1764,7 +1764,7 @@ void __stdcall DrawProfileBarLine(int surface, const char* text, int index)
 }
 
 // FUNCTION: 0x46b9d0
-void __stdcall DrawMapTileSelectionOutline(void* surface, short* pos, Size_0046b9d0 size, int kind)
+void __stdcall DrawMapTileSelectionOutline(void* surface, short* pos, TileOutlineSize size, int kind)
 {
     unsigned char* colors = (unsigned char*)g_game + 0xdcb;
     int h = GetCellHeight(pos);
@@ -1798,7 +1798,7 @@ void __stdcall DrawClosedPolygon(void* surface, Point* points, int count, int co
 
 // FUNCTION: 0x46bae0
 void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
-                            Object_0046bae0* obj, short* angles)
+                            ProjectedModel* obj, short* angles)
 {
     Vec3* v = obj->verts;
     Vec3* scratch = (Vec3 *)g_game->xform;
@@ -1814,7 +1814,7 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
     }
 
     int j;
-    Prim_0046bae0* e = obj->prims;
+    ProjectedPrimitive* e = obj->prims;
     if (obj->firstFace != -1) {
         e++;
         j = 1;

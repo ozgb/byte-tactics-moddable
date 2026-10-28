@@ -1332,7 +1332,7 @@ address,size,file,symbol,status,similarity
 0x4679a0,126,src/ingame/info_panel.cpp,?LoadLightBar@@YGXXZ,matched,100.0
 0x467a20,40,src/ingame/info_panel.cpp,?BlitGafFrameAtOffset@@YGXPAXPAFHH@Z,matched,100.0
 0x467a50,259,src/ingame/info_panel.cpp,?DrawRotatedQuadOutline@@YGXPAXPAUVec3@@1PAF@Z,matched,100.0
-0x467b60,157,src/ingame/info_panel.cpp,?DrawProgressBar@@YGXPAXHHPAURect@@PAUColors_00467b60@@H@Z,matched,100.0
+0x467b60,157,src/ingame/info_panel.cpp,?DrawProgressBar@@YGXPAXHHPAURect@@PAUProgressBarColors@@H@Z,matched,100.0
 0x467c00,175,src/ingame/info_panel.cpp,?BlitSideLogoToRect@@YGXPAXPAUPlayer@@PAURect@@H@Z,matched,100.0
 0x467cb0,192,src/ingame/info_panel.cpp,?DrawKillCount@@YGXPAXPAUUnit@@HH@Z,matched,100.0
 0x467d70,218,src/ingame/info_panel.cpp,?DrawLightBars@@YGXXZ,matched,100.0
@@ -1348,9 +1348,9 @@ address,size,file,symbol,status,similarity
 0x46a610,589,src/ingame/info_panel.cpp,?BlitFeatureGaf@@YGXPAXPAUCell@@HH@Z,matched,100.0
 0x46a860,4247,src/ingame/info_panel.cpp,?DrawUnitInfoPanel@@YGXPAX@Z,matched,100.0
 0x46b900,196,src/ingame/info_panel.cpp,?DrawProfileBarLine@@YGXHPBDH@Z,matched,100.0
-0x46b9d0,165,src/ingame/info_panel.cpp,?DrawMapTileSelectionOutline@@YGXPAXPAFUSize_0046b9d0@@H@Z,matched,100.0
+0x46b9d0,165,src/ingame/info_panel.cpp,?DrawMapTileSelectionOutline@@YGXPAXPAFUTileOutlineSize@@H@Z,matched,100.0
 0x46ba80,89,src/ingame/info_panel.cpp,?DrawClosedPolygon@@YGXPAXPAUPoint@@HH@Z,matched,100.0
-0x46bae0,380,src/ingame/info_panel.cpp,?DrawModel3doProjected@@YGXPAXPAUVec3@@PAVObject_0046bae0@@PAF@Z,matched,100.0
+0x46bae0,380,src/ingame/info_panel.cpp,?DrawModel3doProjected@@YGXPAXPAUVec3@@PAVProjectedModel@@PAF@Z,matched,100.0
 0x46bc60,13,src/ingame/info_panel.cpp,?ReportGameEventCallback@@YGXH@Z,matched,100.0
 0x46bc70,108,src/ingame/info_panel.cpp,?ShowGameMessage@@YGHPADH@Z,matched,100.0
 0x46bce0,542,src/game/statistics.cpp,?AllocScoreTables@@YGHXZ,matched,100.0
@@ -1834,7 +1834,7 @@ address,size,file,symbol,status,similarity
 0x48c320,109,src/ingame/selection.cpp,?MarkLocalVisibleUnits@@YGXXZ,matched,100.0
 0x48c390,773,src/ingame/selection.cpp,?SelectUnitsInBox@@YGHPAX@Z,matched,100.0
 0x48c6a0,331,src/ingame/selection.cpp,?HitTestUnitScreenHull@@YGHPAUUnit@@PAUPoint@@@Z,matched,100.0
-0x48c7f0,447,src/ingame/selection.cpp,?ClickSelectHoverUnit@@YGXPAUParam_0048c7f0@@@Z,matched,100.0
+0x48c7f0,447,src/ingame/selection.cpp,?ClickSelectHoverUnit@@YGXPAUClickSelectArg@@@Z,matched,100.0
 0x48c9b0,109,src/ingame/selection.cpp,?DeselectIfIneligible@@YGXPAUUnit@@@Z,matched,100.0
 0x48ca20,513,src/ingame/selection.cpp,?CollectSelectedUnits@@YGXPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@@Z,matched,100.0
 0x48cc30,323,src/ingame/selection.cpp,?DrawSelectedUnitOrderOverlays@@YGXPAXPAPAUUnit@@@Z,matched,100.0

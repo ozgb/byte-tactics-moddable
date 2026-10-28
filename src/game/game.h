@@ -64,7 +64,7 @@
 #include "zero11_004917d0.h"
 
 struct AnimEntry_00429700;
-struct BuildList_0041ace0;
+struct BuildMenuPage;
 struct Cell;
 struct ChatPacket;
 class Class_00437c80;
@@ -74,7 +74,7 @@ struct Class_00472200;
 struct Class_0047cb00;
 class Class_004cdb40;
 struct Conn_443ff0;
-struct Ctx_00499890;
+struct MainFrameDisplayContext;
 struct Desc_004437c0;
 struct Entry_0042f740;
 struct Entry_00479620;
@@ -94,7 +94,7 @@ class Pathfinder;
 struct PlayerInfo;
 struct SideData;
 struct Src_004ab400;
-struct Struct_00499200_531;
+struct LayerHeadView;
 struct Unit;
 struct UnitDef;
 
@@ -111,7 +111,7 @@ struct Game {
     };
     char* build_date;
     char* build_time;
-    Ctx_00499890* displayContext;
+    MainFrameDisplayContext* displayContext;
     Class_004cdb40* sound;
     union {
         struct {
@@ -159,7 +159,7 @@ struct Game {
             int field_525;
             char pad_529[4];
             int field_52d;
-            Struct_00499200_531* layer;
+            LayerHeadView* layer;
             char pad_535[72];
             int team_index;
             int selected;
@@ -285,7 +285,7 @@ struct Game {
             unsigned char leaving : 1;
             unsigned char rest_2a44 : 7;
         } bits_2a44_2a44;
-        Flags16_00499200 netGameFlags_2a44;
+        NetGameFlags netGameFlags_2a44;
         struct {
             unsigned short bit0 : 1;
             unsigned short bit1 : 1;
@@ -388,7 +388,7 @@ struct Game {
             unsigned char bit5_2cc6 : 1;
             unsigned char bit6_2cc6 : 1;
             unsigned char rest_2cc6 : 1;
-            CursorState_0041cc60 cursor;
+            GameCursorState cursor;
             WeaponDef weapons[256];
             int projectileCount;
             Ref<Projectile> projectiles;
@@ -524,7 +524,7 @@ struct Game {
             char pad_2c7e[44];
             void* pos_2caa;
             char pad_2cae_a[24];
-            Flags_004197d0 inputFlags_2cc6;
+            CursorInputFlags inputFlags_2cc6;
             char pad_2cc7_a[70964];
             FeatureAnimPool anim;
             char pad_14273[14];
@@ -793,8 +793,8 @@ struct Game {
             Rect rect;
             int viewWidth;
             int viewHeight;
-            Sub_004679a0_a a;
-            Sub_004679a0_b b;
+            LightBarCounters a;
+            LightBarSprite b;
             int field_37e98;
             unsigned short unitIndex;
             unsigned short unitDefIndex;
@@ -823,9 +823,9 @@ struct Game {
         struct {
             int viewport[4];
             char pad_37e37_a[41];
-            Snapshot_0046a860 selectionInfoCache;
+            UnitInfoSnapshot selectionInfoCache;
             char pad_37e9c[34];
-            Flags_00495e90_37ebe ordersPanelFlags_37ebe;
+            OrdersPanelFlags ordersPanelFlags_37ebe;
             char pad_37ec0[12];
         };
         struct {
@@ -913,7 +913,7 @@ struct Game {
             int interfaceType;
             int mode;
             int screenchat;
-            Flags_00495e90_37f06 flags_37f06;
+            GraphicsOptionFlags flags_37f06;
             int brightness;
             int volume1;
             int volume2;
@@ -1169,7 +1169,7 @@ struct Game {
         };
         struct {
             char unknown_37f3d_b[2836];
-            Flags_00495e90_38a51 flags_38a51;
+            BroadcastToggleFlags flags_38a51;
             char pad_38a53[802];
             struct {
                 unsigned short : 3;
@@ -1226,7 +1226,7 @@ struct Game {
     int showRanges;
     int showBps;
     int buildListCount;
-    BuildList_0041ace0* buildLists;
+    BuildMenuPage* buildLists;
     union {
         struct {
             char pad_391cf[24];
@@ -1269,7 +1269,7 @@ struct Game {
     union {
         unsigned short endGameFlags;
         unsigned char flagsByte_3923b;
-        Flags_00495e90_3923b endGameFlags_3923b;
+        InfoModeFlags endGameFlags_3923b;
         struct {
             unsigned short bits0_3923b : 2;
             unsigned short flag2_3923b : 1;

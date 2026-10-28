@@ -189,13 +189,13 @@ void __stdcall GiveSelectedUnitsToPlayer(unsigned char player)
     }
 }
 
-static inline int IsPlaying_4934b0(Player* p)
+static inline int IsPlayerInGame(Player* p)
 {
     return p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
         && p->index != 10;
 }
 
-static inline int IsCounted_4934b0(Player* p)
+static inline int IsPlayerAlive(Player* p)
 {
     return (p->type == 1 || p->type == 2 || p->type == 3)
         && (p->unitCount != 0 || p->unitsCreated == 0);
@@ -233,7 +233,7 @@ void __stdcall HandleShareDialogEvent(Gui* obj)
             return;
         int pi = FindSlotByDpid(g_shareDialogPlayerNetIds[idx]);
         Player* p = &g_game->players[pi];
-        if (IsPlaying_4934b0(p) && !(p->info->flags_9b & 0x40) && IsCounted_4934b0(p)) {
+        if (IsPlayerInGame(p) && !(p->info->flags_9b & 0x40) && IsPlayerAlive(p)) {
             TransferEnergy(g_game->localPlayer, pi,
                          (float)ReadSliderValue(FindGadgetChecked_D(data, "METAL")), 1);
             TransferMetal(g_game->localPlayer, pi,

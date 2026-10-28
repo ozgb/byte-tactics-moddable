@@ -237,7 +237,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     InitTimers(0x1e);
     RegisterDataArchives();
     EmptyPostArchiveMountHook(DAT_005097f4);
-    g_game->displayContext = (Ctx_00499890*)(&g_displayContext);
+    g_game->displayContext = (MainFrameDisplayContext*)(&g_displayContext);
     g_game->version = 3;
     g_game->versionMinor = 1;
     g_game->field_3 = 1;

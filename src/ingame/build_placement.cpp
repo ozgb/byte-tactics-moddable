@@ -5,7 +5,7 @@
 
 #include "../util/vec3.h"
 
-struct Struct_00499200_531 {
+struct LayerHeadView {
     int next;
     int entries;
 };
@@ -246,7 +246,7 @@ void BattleFrame(void)
         }
     }
 
-    if ((*(Flags16_00499200*)&g_game->endGameFlags_3923b).bits.b2 || (*(Flags16_00499200*)&g_game->endGameFlags_3923b).bits.b4) {
+    if ((*(NetGameFlags*)&g_game->endGameFlags_3923b).bits.b2 || (*(NetGameFlags*)&g_game->endGameFlags_3923b).bits.b4) {
         if (g_seams.map->GetGameType(g_game->net) != 3 ||
             (g_seams.map->GetGameType(g_game->net) == 3 &&
              BroadcastPendingViewState() != 0)) {

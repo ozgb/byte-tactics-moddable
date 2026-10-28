@@ -2,7 +2,7 @@
 #define BIT_FLAGS16_00499200_H
 
 #pragma pack(push, 1)
-struct BitFlags16_00499200 {
+struct NetGameFlagBits {
     unsigned short b0 : 1;
     unsigned short b1 : 1;
     unsigned short b2 : 1;
@@ -23,7 +23,7 @@ struct BitFlags16_00499200 {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(BitFlags16_00499200) == 2, "BitFlags16_00499200");
+static_assert(sizeof(NetGameFlagBits) == 2, "BitFlags16_00499200");
 #endif
 
 #endif

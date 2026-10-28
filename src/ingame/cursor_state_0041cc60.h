@@ -5,7 +5,7 @@
 #include "point_0041cd50.h"
 
 #pragma pack(push, 1)
-struct CursorState_0041cc60 {
+struct GameCursorState {
     Arg_00419670 rect;
     int flag;
     Point_0041cd50 center;
@@ -14,7 +14,7 @@ struct CursorState_0041cc60 {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(CursorState_0041cc60) == 44, "CursorState_0041cc60");
+static_assert(sizeof(GameCursorState) == 44, "CursorState_0041cc60");
 #endif
 
 #endif

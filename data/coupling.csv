@@ -1263,6 +1263,8 @@ los_radar,game,shared_write,Game::width_142eb,2
 los_radar,game,shared_write,Unit::flags,3
 los_radar,game,shared_write,Vec3::x,2
 los_radar,game,shared_write,Vec3::z,2
+los_radar,map,call,LosTable::GetLine,1
+los_radar,map,call,LosTable::SetNumLines,1
 los_radar,map,shared_write,Cell::feature,7
 los_radar,map,shared_write,Cell::high,7
 los_radar,map,shared_write,Cell::low,7
@@ -1577,6 +1579,8 @@ map,weapons,shared_write,Cell::flags,1
 map,weapons,shared_write,Cell::unit,2
 map,weapons,shared_write,Cell::unit2,2
 map,weapons,shared_write,Game::net,6
+map,weapons,shared_write,Mission::lavaWorld,2
+map,weapons,shared_write,Mission::noSeaLevelTrigger,5
 map,weapons,shared_write,Point16::x,1
 map,weapons,shared_write,Point16::y,1
 map,weapons,shared_write,Unit::flags,6

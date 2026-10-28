@@ -6985,8 +6985,8 @@ address,function,file,kind,target
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Game::src2
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Game::src3
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,MapSeam::GetCellMeanHeight
-0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Net::f_d44
-0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Net::f_d48
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Mission::lavaWorld
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Mission::noSeaLevelTrigger
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Seams::map
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Vec3::x
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Vec3::y
@@ -7071,8 +7071,8 @@ address,function,file,kind,target
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,function,
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,global_read,g_game
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,call,AddExplosionEffect
-0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,call,get
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,call,operator PieceRec *
+0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,call,operator->
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::angVelX
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::angVelY
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::angVelZ
@@ -7090,8 +7090,8 @@ address,function,file,kind,target
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Game::src2
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Game::src3
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,MapSeam::GetCellMeanHeight
-0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Net::f_d44
-0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Net::f_d48
+0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Mission::lavaWorld
+0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Mission::noSeaLevelTrigger
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,PieceRec::angle_10
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,PieceRec::angle_12
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,PieceRec::angle_14
@@ -32376,7 +32376,6 @@ address,function,file,kind,target
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,ApplyWeaponDamage
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,EmitWhiteSmoke
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,PlaySoundAt
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,get
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator SquadManager *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator Unit *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator WeaponDef *
@@ -32394,7 +32393,7 @@ address,function,file,kind,target
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Game::seaLevel
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Game::tracked
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Net::noSeaLevelTrigger
+0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Mission::noSeaLevelTrigger
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Player::active
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Player::ai
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Player::type
@@ -32621,7 +32620,6 @@ address,function,file,kind,target
 0x49b000,DetonateUnitWeapon,src/weapons/weapons.cpp,field_write,Projectile::type
 0x49b000,DetonateUnitWeapon,src/weapons/weapons.cpp,function,
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,DetonateProjectile
-0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,get
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator Unit *
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator bool
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator->
@@ -32647,7 +32645,7 @@ address,function,file,kind,target
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Game::units
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Game::width
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
-0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Net::noSeaLevelTrigger
+0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Mission::noSeaLevelTrigger
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Projectile::cellX
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Projectile::cellZ
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Projectile::interceptedProjectile
@@ -32758,7 +32756,6 @@ address,function,file,kind,target
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,ScaledCos
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,ScaledSin
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,TurnUnitTowardsPoint
-0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,get
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,operator Projectile *
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,operator Unit *
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,operator WeaponDef *
@@ -32805,7 +32802,7 @@ address,function,file,kind,target
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::seaLevel
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::ticks
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
-0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Net::noSeaLevelTrigger
+0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Mission::noSeaLevelTrigger
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Projectile::active
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Projectile::attacker
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Projectile::direction
@@ -47661,12 +47658,12 @@ address,function,file,kind,target
 ,Lookup_004263b0,src/frontend/frontend.cpp,function,
 ,Lookup_004263b0,src/frontend/frontend.cpp,global_escape,g_pictureCache
 ,Lookup_004263b0,src/frontend/frontend.cpp,global_read,g_pictureCache
-,LosTable::GetLine,src/map/los_tables.cpp,call,operator[]
-,LosTable::GetLine,src/map/los_tables.cpp,deref_read,*LosTable
-,LosTable::GetLine,src/map/los_tables.cpp,function,
-,LosTable::SetNumLines,src/map/los_tables.cpp,call,Elem_00434360::~Elem_00434360
-,LosTable::SetNumLines,src/map/los_tables.cpp,call,resize
-,LosTable::SetNumLines,src/map/los_tables.cpp,function,
+,LosTable::GetLine,src/map/los_lines.h,call,operator[]
+,LosTable::GetLine,src/map/los_lines.h,deref_read,*LosTable
+,LosTable::GetLine,src/map/los_lines.h,function,
+,LosTable::SetNumLines,src/map/los_lines.h,call,Elem_00434360::~Elem_00434360
+,LosTable::SetNumLines,src/map/los_lines.h,call,resize
+,LosTable::SetNumLines,src/map/los_lines.h,function,
 ,LosTables::LosTables,src/map/los_tables.h,function,
 ,LosTables::~LosTables,src/map/los_tables.h,call,FreeTables
 ,LosTables::~LosTables,src/map/los_tables.h,function,
@@ -47749,7 +47746,7 @@ address,function,file,kind,target
 ,MapAdd,src/harness/harness.cpp,deref_read,*unsigned int
 ,MapAdd,src/harness/harness.cpp,deref_write,*unsigned int
 ,MapAdd,src/harness/harness.cpp,function,
-,MapCacheEntry::MapCacheEntry,src/map/map_list.cpp,function,
+,MapCacheEntry::MapCacheEntry,src/map/map_cache_entry.h,function,
 ,MapCacheEntry::SetChecksum,src/map/map_list.cpp,deref_read,*MapCacheEntry
 ,MapCacheEntry::SetChecksum,src/map/map_list.cpp,field_read,Mission::tntChecksum
 ,MapCacheEntry::SetChecksum,src/map/map_list.cpp,field_write,MapCacheEntry::tntChecksum

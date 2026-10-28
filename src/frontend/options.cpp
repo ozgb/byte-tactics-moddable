@@ -375,10 +375,7 @@ struct OptionsReselectLink {
     void (__stdcall* reselect)(void* gadget);
 };
 
-struct GadgetOwnerView {
-    int unknown_0;
-    int gadgets;
-};
+#include "../game/gadget_owner_view.h"
 
 #include "../gui/layer.h"
 

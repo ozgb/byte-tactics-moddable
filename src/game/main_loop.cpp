@@ -54,19 +54,7 @@ struct SkirmishSlotTeam {
 #include "../util/vec3.h"
 #include "../../interfaces/seams.h"
 
-union CreateUnitFixed {
-    int i;
-    struct {
-        short frac;
-        short whole;
-    } h;
-};
-
-struct CreateUnitPos {
-    CreateUnitFixed x;
-    CreateUnitFixed y;
-    CreateUnitFixed z;
-};
+#include "create_unit_pos.h"
 
 #include "../network/player.h"
 #include "../state/sim_globals.h"

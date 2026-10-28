@@ -823,11 +823,7 @@ struct DplConnectionView {
     DPNAME* name;
 };
 
-struct DisplayFlagsView {
-    char unknown_0[0xf0];
-    unsigned short bit0 : 1;
-    unsigned short flag : 1;
-};
+#include "../game/display_flags_view.h"
 
 struct LobbyJoinArgs {
     char* name;
@@ -1060,7 +1056,7 @@ int __stdcall JoinLobbyGame(Player* p)
         if (host_thread_start(JoinLobbyGameEntry, 0x8000, args)) {
             if (host_event_wait(args->event, 40000) == 0) {
                 SetCursorMode(0x13);
-                if (GetDisplay()->flag) {
+                if (GetDisplay()->fullscreen) {
                     ToggleFullScreen();
                     host_sleep_ms(500);
                 }
@@ -1153,7 +1149,7 @@ int __stdcall JoinNetGame(JoinGuidView guid, int player)
         if (g_game->dplConnection != 0) {
             result = JoinLobbyGame(p);
             if (result == 0) {
-                if (GetDisplay()->flag) {
+                if (GetDisplay()->fullscreen) {
                     ToggleFullScreen();
                     host_sleep_ms(500);
                 }

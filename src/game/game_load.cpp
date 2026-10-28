@@ -17,19 +17,7 @@
 #include "mission_option_flags.h"
 #include "main2_menu.h"
 
-union CreateUnitFixed {
-    int i;
-    struct {
-        short frac;
-        short whole;
-    } h;
-};
-
-struct CreateUnitPos {
-    CreateUnitFixed x;
-    CreateUnitFixed y;
-    CreateUnitFixed z;
-};
+#include "create_unit_pos.h"
 
 struct PlayerRecordFlags {
     unsigned short started : 1;

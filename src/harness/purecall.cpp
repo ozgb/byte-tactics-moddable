@@ -2,6 +2,7 @@
 
 #include "../state/alloc_hooks.h"
 #include "../../interfaces/ref.h"
+#include "purecall.h"
 
 extern "C" void __cdecl PurecallAmsgExit(int);
 #pragma comment(linker, "/alternatename:_PurecallAmsgExit=__amsg_exit")

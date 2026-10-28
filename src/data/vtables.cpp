@@ -1,6 +1,6 @@
 typedef void (*VirtualFunction)();
 
-extern "C" int __cdecl _purecall(void);
+#include "../harness/purecall.h"
 
 namespace OrderFx { void GetType(); }
 namespace OrderFx { void Destroy(); }

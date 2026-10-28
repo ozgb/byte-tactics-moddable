@@ -51446,6 +51446,13 @@ address,function,file,kind,target
 ,_Sort_0_0043bc90,src/orders/order_list.cpp,deref_read,*OrderTableEntry
 ,_Sort_0_0043bc90,src/orders/order_list.cpp,function,
 ,_Sort_0_0043bc90,src/orders/order_list.cpp,global_read,_SORT_MAX
+,_purecall,src/harness/purecall.cpp,call,HarnessTestMode
+,_purecall,src/harness/purecall.cpp,call,PurecallAmsgExit
+,_purecall,src/harness/purecall.cpp,call,_ReturnAddress
+,_purecall,src/harness/purecall.cpp,call,fclose
+,_purecall,src/harness/purecall.cpp,call,fopen
+,_purecall,src/harness/purecall.cpp,call,fprintf
+,_purecall,src/harness/purecall.cpp,function,
 ,clear_screen,src/graphics/surface.cpp,call,memset
 ,clear_screen,src/graphics/surface.cpp,field_read,Surface::height
 ,clear_screen,src/graphics/surface.cpp,field_read,Surface::pitch

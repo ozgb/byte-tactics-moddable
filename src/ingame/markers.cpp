@@ -47,14 +47,6 @@ struct View {
     int scroll_y;
 };
 
-struct Weapon {
-    char unknown_0[0xd6];
-    unsigned short areaOfEffect;
-    char unknown_d8[0xdc - 0xd8];
-    int range;
-    int coverage;
-};
-
 struct Anim {
     unsigned short count;
     char unknown_2[0x2c - 2];
@@ -277,16 +269,16 @@ void __stdcall DrawUnitRangeRings(void* surface, View* view, Order* order,
             color = g_game->colors[4];
         else
             color = g_game->colors[12];
-        if ((unit->weapons[0].flags & 2) && ((Weapon*)unit->weapons[0].weapon.get())->range != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[0].weapon.get())->range, color,
+        if ((unit->weapons[0].flags & 2) && unit->weapons[0].weapon.get()->range != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, unit->weapons[0].weapon.get()->range, color,
                          "weapon1 range", 0);
         }
-        if ((unit->weapons[1].flags & 2) && ((Weapon*)unit->weapons[1].weapon.get())->range != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[1].weapon.get())->range, color,
+        if ((unit->weapons[1].flags & 2) && unit->weapons[1].weapon.get()->range != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, unit->weapons[1].weapon.get()->range, color,
                          "weapon2 range", 1);
         }
-        if ((unit->weapons[0].flags & 2) && ((Weapon*)unit->weapons[2].weapon.get())->range != 0) {
-            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, ((Weapon*)unit->weapons[2].weapon.get())->range, color,
+        if ((unit->weapons[0].flags & 2) && unit->weapons[2].weapon.get()->range != 0) {
+            DrawRangeCircle(surface, view, (Pos*)&order->unit->pos, unit->weapons[2].weapon.get()->range, color,
                          "weapon3 range", 2);
         }
     }
@@ -399,13 +391,13 @@ void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
             color = g_game->colors[12];
         for (int i = 0; i < 3; i++) {
             if (u->weapons[(unsigned char)i].flags & 2) {
-                if (((Weapon*)u->weapons[i].weapon.get())->areaOfEffect != 0) {
+                if (u->weapons[i].weapon.get()->areaOfEffect != 0) {
                     sprintf(buf, "weapon %d - area of effect", i);
-                    DrawRangeCircle(surface, view, &pos, ((Weapon*)u->weapons[i].weapon.get())->areaOfEffect, color, buf, 0);
+                    DrawRangeCircle(surface, view, &pos, u->weapons[i].weapon.get()->areaOfEffect, color, buf, 0);
                 }
-                if (((Weapon*)u->weapons[i].weapon.get())->coverage != 0) {
+                if (u->weapons[i].weapon.get()->coverage != 0) {
                     sprintf(buf, "weapon %d - coverage", i);
-                    DrawRangeCircle(surface, view, &pos, ((Weapon*)u->weapons[i].weapon.get())->coverage, color, buf, 1);
+                    DrawRangeCircle(surface, view, &pos, u->weapons[i].weapon.get()->coverage, color, buf, 1);
                 }
             }
         }

@@ -61,7 +61,6 @@ struct PlayerGridView {
 };
 
 struct Sound;
-struct Weapon;
 struct Feature;
 struct Camera;
 struct Palette;

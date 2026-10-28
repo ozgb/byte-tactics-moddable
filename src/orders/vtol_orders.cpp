@@ -68,14 +68,6 @@ class SpatialTimer;
 #pragma pack(push, 1)
 #include "../weapons/weapon_def.h"
 
-struct Weapon {
-    char unknown_0[8];
-    WeaponDef* def;
-    char unknown_c[11];
-    unsigned char flags;
-    char unknown_18[4];
-};
-
 struct Mover {
     char unknown_0[0xdc];
     int speed;
@@ -1509,7 +1501,6 @@ struct TdfRecord;
 struct Mission;
 struct Gadget;
 struct Layer;
-struct Weapon;
 struct Feature;
 
 #pragma pack(pop)

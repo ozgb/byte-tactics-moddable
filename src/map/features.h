@@ -5,7 +5,7 @@ struct Feature;
 struct Point16;
 struct Unit;
 struct Vec3;
-struct Weapon;
+struct WeaponDef;
 
 class HapiBank;
 class TdfFile;
@@ -37,7 +37,7 @@ void __stdcall SaveFeatures(HapiBank* file);
 
 Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def);
 int __stdcall ReclaimFeature(Unit* unit, Vec3* pos);
-void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon);
+void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon);
 int __stdcall RemoveFeature(Cell* cell, int flag);
 void __stdcall ResolveFeatureLinks();
 void __stdcall LoadFeatures(HapiBank* file);

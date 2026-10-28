@@ -2100,7 +2100,6 @@ struct View_0044d8a0;
 struct View_4b5980;
 class Visitor_0047e750;
 struct WaveFormat;
-struct Weapon;
 struct WeaponDef;
 struct WeaponType;
 struct Weapon_0049abb0;
@@ -2535,14 +2534,6 @@ struct Order_12 {
     unsigned int flags;
     char unknown_a[64];
     void* next;
-};
-
-struct Weapon {
-    char unknown_0[8];
-    WeaponDef* def;
-    char unknown_c[11];
-    unsigned char flags;
-    char unknown_18[4];
 };
 
 struct Order_13 {

@@ -40,7 +40,6 @@ public:
 struct Cell;
 struct Point16;
 struct Feature;
-struct Weapon;
 struct Spot;
 struct Rot16;
 struct List_00421f20;
@@ -258,7 +257,7 @@ static int __stdcall GetWeaponTargetPosNative(Unit* unit, Vec3* pos, int weapon)
 
 static void __stdcall DamageFeatureNative(Cell* cell, int x, int z, WeaponDef* weapon)
 {
-    DamageFeature(cell, x, z, (Weapon*)weapon);
+    DamageFeature(cell, x, z, weapon);
 }
 
 static Unit* __stdcall FindBestTargetIfFireAtWillNative(Unit* unit)

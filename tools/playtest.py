@@ -667,14 +667,21 @@ class Instance:
                 found.append((xdo_out("getwindowname", wid).strip(), int(geo["WIDTH"]), int(geo["HEIGHT"])))
         return found
 
-    def error_dialog(self) -> tuple[str, str] | None:
-        """The (kind, title) of an error dialog this game shows, or None."""
+    def error_dialog(self) -> tuple[str, str, str] | None:
+        """The (kind, title, text) of an error dialog this game shows, or None; the text is "" when wine.log has none."""
         trace = self.game / "trace.txt"
         try:
             started = ticks_started(trace.read_text(errors="replace")) if trace.is_file() else False
         except OSError:
             started = False
-        return classify_dialog(self.windows(), started)
+        found = classify_dialog(self.windows(), started)
+        if found is None:
+            return None
+        try:
+            log = (self.run.out / f"wine{self.suffix}.log").read_text(errors="replace")
+        except OSError:
+            log = ""
+        return found[0], found[1], dialog_text(log)
 
     def shot(self, name: str, jpeg: bool = False) -> None:
         if not self.display:
@@ -736,10 +743,13 @@ class Instance:
     def collect_traces(self) -> None:
         if not self.run.testmode:
             return
-        for name in ("trace.txt", "dump.txt", "blockptrs.txt"):
+        for name in ("trace.txt", "dump.txt", "blockptrs.txt", CRASH_FILE):
             if (self.game / name).is_file():
                 shutil.copyfile(self.game / name, self.run.out / name)
                 self.run.notes.append(f"{name}: {self.run.out / name}")
+        crash = self.game / CRASH_FILE
+        if crash.is_file():
+            self.run.notes.append(f"{CRASH_FILE}{self.suffix}: " + "; ".join(crash.read_text(errors="replace").split("\n")).strip("; "))
         for name in self.run.collect:
             if (self.game / name).is_file():
                 (self.run.out / name).parent.mkdir(parents=True, exist_ok=True)
@@ -882,6 +892,9 @@ class StepFailed(Exception):
         self.kind = kind
 
 
+CRASH_FILE = "crash.txt"
+DEBUG_SCREEN = "-all,err+seh,+msgbox"
+DEBUG_TESTMODE = "-all,+seh,+msgbox"
 DIALOG_POLL_SECONDS = 5
 CRT_DIALOG_TITLE = "Microsoft Visual C++ Runtime Library"
 FATAL_DIALOG_TITLE = "Cavedog"
@@ -910,6 +923,23 @@ def classify_dialog(windows: list[tuple[str, int, int]], started: bool) -> tuple
             if lo_w <= w <= hi_w and lo_h <= h <= hi_h:
                 return "dialog-directx", title
     return None
+
+
+MSGBOX_TEXT = re.compile(r'trace:msgbox:MSGBOX_OnInit L"((?:[^"\\]|\\.)*)"')
+DEBUGSTR_ESCAPES = {"n": "\n", "r": "\r", "t": "\t", '"': '"', "\\": "\\"}
+
+
+def dialog_text(wine_log: str) -> str:
+    """The text of the last message box in a wine.log taken with the msgbox channel on, whitespace collapsed; "" if none.
+
+    Wine's debugstr_w writes the text as L"...", with \\n, \\", \\\\ and \\xxxx (four hex digits) escapes.
+    """
+    found = MSGBOX_TEXT.findall(wine_log)
+    if not found:
+        return ""
+    text = re.sub(r"\\([nrt\"\\]|[0-9a-fA-F]{4})",
+                  lambda m: DEBUGSTR_ESCAPES[m[1]] if m[1] in DEBUGSTR_ESCAPES else chr(int(m[1], 16)), found[-1])
+    return " ".join(text.split())
 
 
 class Interrupted(Exception):
@@ -1134,8 +1164,9 @@ class Run:
                     for i in self.instances:
                         found = not self.testmode and i.alive() and i.error_dialog()
                         if found:
+                            self.note(f"  error dialog{i.suffix}: {found[0]}, window title \"{found[1]}\", text \"{found[2]}\"")
                             raise StepFailed(f"the game{i.suffix} shows an error dialog ({found[0]}, "
-                                             f"window title \"{found[1]}\")", found[0])
+                                             f"window title \"{found[1]}\", text \"{found[2]}\")", found[0])
             for i in self.instances:
                 if i.alive():
                     raise StepFailed(f"the game{i.suffix} still runs after {args[0]}s")
@@ -1392,7 +1423,8 @@ def main() -> None:
     ap.add_argument("--repeat", type=int, default=1, help="run each pair this many times")
     ap.add_argument("--parallel", type=int, default=0, help="runs at once (default: all of them, at most 3)")
     ap.add_argument("--game-dir", help="the game's install (default: Steam's)")
-    ap.add_argument("--debug", default="-all,err+seh", help="WINEDEBUG for the game (default -all,err+seh)")
+    ap.add_argument("--debug", default=None,
+                    help=f"WINEDEBUG for the game (default {DEBUG_SCREEN}, with --testmode {DEBUG_TESTMODE})")
     ap.add_argument("--window", action="store_true",
                     help="show each game in a Xephyr window on the desktop (default: an invisible Xvfb display)")
     ap.add_argument("--keep", action="store_true", help="keep each run's prefix and game directory")
@@ -1518,7 +1550,7 @@ def main() -> None:
             for k in range(args.repeat):
                 name = f"{sc.name}-{tag}" + (f"-{k + 1}" if args.repeat > 1 else "")
                 runs.append(Run(len(runs) + 1, name, sc, [p for _, p in parts], tag, session, screens,
-                                args.debug, args.window,
+                                args.debug or (DEBUG_TESTMODE if args.testmode else DEBUG_SCREEN), args.window,
                                 Path(args.testmode).resolve() if sc is testmode else None,
                                 args.testdump if sc is testmode else None,
                                 args.poison and sc is testmode, scan_every if sc is testmode else 0,

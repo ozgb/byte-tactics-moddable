@@ -261,6 +261,17 @@ add_custom_command(
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(block_test DEPENDS "${CMAKE_BINARY_DIR}/block_test.exe")
 
+add_library(purecall_test_objects OBJECT src/harness/purecall.cpp tests/purecall_test.cpp)
+target_include_directories(purecall_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(purecall_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+add_custom_command(
+  OUTPUT "${CMAKE_BINARY_DIR}/purecall_test.exe"
+  COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/purecall_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no /map:${CMAKE_BINARY_DIR}/purecall_test.map
+          $<TARGET_OBJECTS:purecall_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS purecall_test_objects $<TARGET_OBJECTS:purecall_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+  VERBATIM COMMAND_EXPAND_LISTS)
+add_custom_target(purecall_test DEPENDS "${CMAKE_BINARY_DIR}/purecall_test.exe")
+
 add_library(ref_test_objects OBJECT src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/ref_test.cpp)
 target_include_directories(ref_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(ref_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})

@@ -218,6 +218,49 @@ class ScanRunTest(unittest.TestCase):
         self.assertEqual(len(timeouts), 1)
 
 
+class FailedAttemptTest(unittest.TestCase):
+    def test_a_failed_attempt_is_kept_when_the_retry_passes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            session = root / "build/playtest/20260101-000000-1"
+            (session / "run").mkdir(parents=True)
+            (session / "run/wine.log").write_text("trace:seh:...\n")
+            (session / "run/crash.txt").write_text("purecall from 0x0040106c\n")
+            (session / "summary.md").write_text("| FAIL |\n")
+            message = ("playtest.py failed for x.exe (exit 1):\n| FAIL |\n\n"
+                       "logs and screenshots: build/playtest/20260101-000000-1/\n")
+            run = root / "ok/run"
+            run.mkdir(parents=True)
+            (run / "trace.txt").write_text("")
+            attempts = []
+
+            def fake_play(exe, scenario, game_dir, want, timeout, poison, every):
+                attempts.append(1)
+                if len(attempts) == 1:
+                    raise reference.tracediff.Error(message)
+                return run
+
+            (root / "s.txt").write_text("ticks 5\n")
+            with mock.patch.object(reference, "ROOT", root), \
+                    mock.patch.object(reference.tracediff, "play", fake_play), \
+                    mock.patch.object(reference.tracediff, "parse_trace", lambda p: ({"game_seed": "1", "crt_seed": "1", "view_seed": "1"}, [])), \
+                    mock.patch.object(reference.tracedigest, "digests", lambda rows: []), \
+                    contextlib.redirect_stdout(io.StringIO()) as out:
+                reference.play_scenario(Path("x.exe"), root / "s.txt", None)
+            self.assertEqual(len(attempts), 2)
+            kept = list((root / "build/scratch").glob("check-s-failed-*"))
+            self.assertEqual(len(kept), 1)
+            self.assertEqual((kept[0] / "run/crash.txt").read_text(), "purecall from 0x0040106c\n")
+            self.assertTrue((kept[0] / "run/wine.log").is_file())
+            self.assertTrue((kept[0] / "summary.md").is_file())
+            self.assertIn(f"[failed attempt kept: build/scratch/{kept[0].name}]", out.getvalue())
+
+    def test_an_error_that_names_no_session_keeps_nothing(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(reference, "ROOT", Path(tmp)):
+            self.assertIsNone(reference.keep_failed_attempt(RuntimeError("playtest.py failed"), "s"))
+            self.assertIsNone(reference.keep_failed_attempt(RuntimeError("logs and screenshots: build/playtest/x/"), "s"))
+
+
 class ReferenceEnvTest(unittest.TestCase):
     def test_pins_the_python_of_this_tree(self):
         with tempfile.TemporaryDirectory() as tmp:

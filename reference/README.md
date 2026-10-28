@@ -488,6 +488,21 @@ Library" box, as for R6025) or `dialog-cavedog` (the fatal error box). `referenc
 once more after a nonzero exit or `dialog-directx`; any other dialog, a hang and a failure after
 tick 1 are reported as they are.
 
+A run that dies leaves three records:
+
+- `crash.txt`, beside `trace.txt` in the game copy (test mode only): a pure virtual call writes `purecall from 0x<address>`,
+  the address of the instruction after the call, before the runtime error R6025 and exit code 255. `playtest.py` copies it into
+  the run's directory and quotes it in the `summary.md` notes. Look the address up in the exe's link map
+  (`build/modern/TotalA.map`).
+- The dialog text: the failure message, and with it the `summary.md` row and a line in `steps.log`, ends with `text "..."`, the
+  text of the message box (Wine's `msgbox` channel, which `playtest.py` always turns on, in `wine.log`). A test-mode run is headless and
+  shows no box, so only a play-test with a display has this record; a test-mode run has `crash.txt` and `wine.log`.
+- The failed attempt: when `reference.py` tries a run again, it copies the failed attempt's `playtest.py` session
+  (`wine.log`, `steps.log`, `summary.md`, `trace.txt`, `crash.txt`) to `build/scratch/check-<scenario>-failed-<time>/`, whether the
+  retry passes or not, and the console line `run failed, trying again` ends with `[failed attempt kept: <path>]`. Its `wine.log`
+  is taken with `WINEDEBUG=-all,+seh,+msgbox` (a play-test with a display uses `-all,err+seh,+msgbox`; `--debug` sets it), so
+  it names the exception chain of the faulting thread, and a startup page fault such as the one in `FlipScreen` has a backtrace.
+
 `--check --steps-per-frame <n>` (1 to 8) plays every scenario with that `steps_per_frame` and compares with
 the stored traces; it is a check on presentation code, not the gate.
 

@@ -104,19 +104,13 @@ struct Header_004373a0 {
 
 #include "../util/math.h"
 
-class MapCacheEntry {
-public:
-    StringRef handle;
-    int tntChecksum;
+#include "map_cache_entry.h"
 
-    MapCacheEntry(const StringRef& other) : handle(other) {}
-
-    MapCacheEntry& SetChecksum(Mission* self)
-    {
-        tntChecksum = self->tntChecksum;
-        return *this;
-    }
-};
+inline MapCacheEntry& MapCacheEntry::SetChecksum(Mission* self)
+{
+    tntChecksum = self->tntChecksum;
+    return *this;
+}
 
 extern MapCacheEntry* g_mapCacheBegin;
 extern MapCacheEntry* g_mapCacheEnd;

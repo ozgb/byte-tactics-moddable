@@ -5045,12 +5045,6 @@ public:
     void UpdateMoveRate(Unit*);
 };
 
-class Class_0043db50 {
-public:
-    char unknown_0[1];
-    void UpdateSfxOccupy(Unit*);
-};
-
 struct Vec3i_00474130 {
     int x;
     int y;

@@ -688,7 +688,7 @@ public:
     virtual int v5();
 };
 
-class Class_0043db50 { public: void UpdateSfxOccupy(Unit* u); };
+#include "../units/sfx_occupy.h"
 
 #pragma pack(pop)
 

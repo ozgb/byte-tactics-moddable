@@ -41,7 +41,7 @@ extern Root_004a32a0* g_guiContext;
 #include "../state/sim_globals.h"
 #include "../files/files_api.h"
 #include "layer.h"
-#include "dialog.h"
+#include "gui.h"
 
 void ShowSoftwareCursor();
 char* __stdcall Translate(char* text);

@@ -57,8 +57,6 @@ struct FileRequester {
 
 #include "gui.h"
 
-#include "dialog.h"
-
 #pragma pack(pop)
 
 struct Entry_004a1810;

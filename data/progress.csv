@@ -482,8 +482,8 @@ address,size,file,symbol,status,similarity
 0x425a90,196,src/frontend/frontend.cpp,?EnterMainMenuState@@YGXXZ,matched,100.0
 0x425b60,32,src/frontend/frontend.cpp,?PresentFrontendFrame@@YGXXZ,matched,100.0
 0x425b80,497,src/frontend/frontend.cpp,?UpdateMenuSparks@@YGXXZ,matched,100.0
-0x425d80,1034,src/frontend/frontend.cpp,?HandleMainMenuClick@@YGXPAUGadget_00425d80@@@Z,matched,100.0
-0x426190,100,src/frontend/frontend.cpp,?HandleCloseCdPlayerChoice@@YGXPAUGadget_00426190@@@Z,matched,100.0
+0x425d80,1034,src/frontend/frontend.cpp,?HandleMainMenuClick@@YGXPAUMainMenuGadgetView@@@Z,matched,100.0
+0x426190,100,src/frontend/frontend.cpp,?HandleCloseCdPlayerChoice@@YGXPAUCdPlayerChoiceGadgetView@@@Z,matched,100.0
 0x426200,420,src/frontend/frontend.cpp,?OpenCloseCdPlayerDialog@@YGXXZ,matched,100.0
 0x4263b0,971,src/frontend/frontend.cpp,?OpenMainMenu@@YGXXZ,matched,100.0
 0x426780,289,src/frontend/frontend.cpp,?PlayMovie@@YGXPAD@Z,matched,100.0
@@ -1166,7 +1166,7 @@ address,size,file,symbol,status,similarity
 0x45bde0,179,src/frontend/options.cpp,?HandleEffectsVolumeSlider@@YGXPAUMenu_0045b800@@H@Z,matched,100.0
 0x45bea0,179,src/frontend/options.cpp,?HandleMusicVolumeSlider@@YGXPAUMenu_0045b800@@H@Z,matched,100.0
 0x45bf60,161,src/frontend/options.cpp,?SetGameSpeedLabel@@YGXPAD0HH@Z,matched,100.0
-0x45c010,90,src/frontend/options.cpp,?SetGadgetTextFromValueTable@@YGXPAUEntry_0045c010@@PADH@Z,matched,100.0
+0x45c010,90,src/frontend/options.cpp,?SetGadgetTextFromValueTable@@YGXPAUValueTextEntry@@PADH@Z,matched,100.0
 0x45c070,251,src/frontend/options.cpp,?HandleGameSpeedSlider@@YGXPAUMenu_0045b800@@H@Z,matched,100.0
 0x45c170,173,src/frontend/options.cpp,?HandleScreenSlider@@YGXPAUMenu_0045b800@@H@Z,matched,100.0
 0x45c220,268,src/frontend/options.cpp,?HandleMaxLinesSlider@@YGXPAUMenu_0045b800@@H@Z,matched,100.0
@@ -1189,10 +1189,10 @@ address,size,file,symbol,status,similarity
 0x45cfc0,244,src/frontend/options.cpp,?OpenOptionsLayout@@YAHXZ,matched,100.0
 0x45d0c0,111,src/frontend/options.cpp,?TickMusicOptions@@YGXXZ,matched,100.0
 0x45d130,326,src/frontend/options.cpp,?UpdateMusicGadgets@@YGXXZ,matched,100.0
-0x45d280,1333,src/frontend/options.cpp,?HandleMusicOptionsClick@@YGXPAUObject_0045d280@@@Z,matched,100.0
+0x45d280,1333,src/frontend/options.cpp,?HandleMusicOptionsClick@@YGXPAUMusicOptionsDialog@@@Z,matched,100.0
 0x45d7c0,526,src/frontend/options.cpp,?OpenMusicOptions@@YGXXZ,matched,100.0
 0x45d9d0,177,src/frontend/options.cpp,?UpdateSoundGadgets@@YGXXZ,matched,100.0
-0x45da90,923,src/frontend/options.cpp,?HandleSoundOptionsClick@@YGXPAUObject_0045da90@@@Z,matched,100.0
+0x45da90,923,src/frontend/options.cpp,?HandleSoundOptionsClick@@YGXPAUSoundOptionsDialog@@@Z,matched,100.0
 0x45de30,710,src/frontend/options.cpp,?OpenSoundOptions@@YGXXZ,matched,100.0
 0x45e100,946,src/frontend/options.cpp,?HandleVisualOptionsClick@@YGXPAUGui@@@Z,matched,100.0
 0x45e4c0,287,src/frontend/options.cpp,?SortDisplayModes@@YGXPAUModeList_0045e4c0@@@Z,matched,100.0

@@ -319,7 +319,7 @@ struct Game {
             unsigned short bit1 : 1;
             unsigned short bits2 : 14;
         };
-        Bits_00426e80 dplayAddressDialogFlags;
+        NetGameFlagLowBits dplayAddressDialogFlags;
         unsigned short dplayAddressDialogFlags_2aaf;
     };
     union {
@@ -544,7 +544,7 @@ struct Game {
         };
         struct {
             char pad_2be3_b[11];
-            Bits_00426e80 lobbyUiDirtyFlags_2bee;
+            NetGameFlagLowBits lobbyUiDirtyFlags_2bee;
             char pad_2bf0_b[134];
             char orders[28];
             char pad_2c92_a[71017];
@@ -988,7 +988,7 @@ struct Game {
                 } visualBits;
             };
             char pad_37f08[12];
-            Flags37f14_0045cf60 flags_37f14_37f14;
+            TrackOptionFlags flags_37f14_37f14;
             char pad_37f16_a[3];
             unsigned short soundFlags_37f19_2;
             char pad_37f1b[20];

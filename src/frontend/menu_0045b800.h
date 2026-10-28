@@ -1,12 +1,12 @@
 #ifndef MENU_0045B800_H
 #define MENU_0045B800_H
 
-struct Holder_0045b800;
+struct OptionsSliderLayer;
 
 #pragma pack(push, 1)
 struct Menu_0045b800 {
     char unknown_0[0x18];
-    Holder_0045b800* holder;
+    OptionsSliderLayer* holder;
 };
 #pragma pack(pop)
 

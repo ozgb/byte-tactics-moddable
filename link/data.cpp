@@ -355,7 +355,7 @@ int DAT_00512288;
 int g_directXCheckDone;
 int g_gpfCheckDone;
 int g_noSoundDriverShown;
-Smoke_00425b80* g_menuSparks;
+MenuSpark* g_menuSparks;
 int g_cdPlayerDialogShown;
 unsigned char DAT_005122a0[4];
 char* g_otaEnumFileList;

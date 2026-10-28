@@ -823,7 +823,7 @@ struct Net_4517b0 {
     DPNAME* name;
 };
 
-struct Obj_00451640 {
+struct DisplayFlagsView {
     char unknown_0[0xf0];
     unsigned short bit0 : 1;
     unsigned short flag : 1;
@@ -977,7 +977,7 @@ void __stdcall SetCursorMode(int n);
 #include "../graphics/object_pool.h"
 void* __cdecl GameReallocTagged(void* ptr, const char* name, unsigned int size);
 #include "../game/players.h"
-Obj_00451640* GetDisplay(void);
+DisplayFlagsView* GetDisplay(void);
 #include "../graphics/display.h"
 #include "net_stats.h"
 void __stdcall CreateUnitFromPacket(unsigned char p, void* packet);

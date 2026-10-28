@@ -158,7 +158,7 @@ Gui,layer,pointer,src/gui/gui.h,#353
 Gui,src_28,pointer,src/gui/gui.h,#353
 Gui,src_2c,pointer,src/gui/gui.h,#353
 Gui,values,pointer,src/gui/gui.h,#353
-Holder_0045b800,entries,pointer,src/frontend/options.cpp,#353
+OptionsSliderLayer,entries,pointer,src/frontend/options.cpp,#353
 Layer,cb1c,function-pointer,src/frontend/frontend.cpp|src/gui/layer.h,#353
 Layer,cb1c,pointer,src/frontend/multi.cpp,#353
 Layer,data,pointer,src/frontend/multi.cpp|src/gui/layer.h,#353

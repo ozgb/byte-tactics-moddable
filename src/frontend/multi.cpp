@@ -537,7 +537,7 @@ struct Layout_00444930 {
     void* seqs;
 };
 
-struct Mode_00446310 {
+struct DisplayMode {
     int width;
     int height;
     int refreshRate;
@@ -545,7 +545,7 @@ struct Mode_00446310 {
 
 struct ModeList {
     int count;
-    Mode_00446310* modes;
+    DisplayMode* modes;
     char unknown_8[0x14 - 0x8];
     char* available;
     char unknown_18[0x20 - 0x18];
@@ -2304,7 +2304,7 @@ void __stdcall HandleDisplayModesClick(Gui* gui)
     if (IsCurrentGadgetNamed((Dialog *)gui, "MODES") || IsCurrentGadgetNamed((Dialog *)gui, "SELECT")) {
         Player* player = &g_game->players[g_game->localPlayer];
         Gadget* entry = FindGadgetChecked(gadgets, "MODES");
-        Mode_00446310* mode = &obj->modes[entry->selected];
+        DisplayMode* mode = &obj->modes[entry->selected];
         g_game->width_37f1b = mode->width;
         g_game->height_37f1f = mode->height;
         player->info->width = (unsigned short)mode->width;
@@ -2331,7 +2331,7 @@ void CyclePlayerDisplayMode(void)
 {
     ModeList* obj = (ModeList*)GameAllocIgnoreTag("SELECT VIDEO MODE", 0x20);
     obj->available = 0;
-    obj->modes = (Mode_00446310*)GameAllocIgnoreTag("DISPLAY MODES", 0x4b0);
+    obj->modes = (DisplayMode*)GameAllocIgnoreTag("DISPLAY MODES", 0x4b0);
 
     if (GetDisplayModes(obj) != 0) {
         SortDisplayModes(obj);
@@ -2352,7 +2352,7 @@ void CyclePlayerDisplayMode(void)
                     if (i >= count)
                         i = 0;
                 }
-                Mode_00446310& mode = obj->modes[i];
+                DisplayMode& mode = obj->modes[i];
                 player->info->width = (unsigned short)mode.width;
                 player->info->height = (unsigned short)mode.height;
                 BroadcastPlayerInfo();

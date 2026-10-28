@@ -10,10 +10,6 @@ class Order;
 class HapiBank;
 
 #pragma pack(push, 1)
-struct Vec3_0043a1f0 {
-    int x, y, z;
-};
-
 class CobScript;
 class OrderFxSlot;
 
@@ -47,7 +43,7 @@ struct OrderSaveRecord {
     unsigned char flag5;
     unsigned int flags6;
     int last_id;
-    Vec3_0043a1f0 pos;
+    Vec3 pos;
     int start;
     int cached;
     int field_26;
@@ -582,7 +578,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
     desc.flag5 = state;
     desc.flags6 = flags;
     desc.last_id = wakeFrame;
-    desc.pos = *(Vec3_0043a1f0*)&pos;
+    desc.pos = *(Vec3*)&pos;
     desc.start = *(int*)&start;
     desc.cached = *(int*)&cached;
     desc.field_26 = unitType;

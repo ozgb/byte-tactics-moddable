@@ -26,15 +26,9 @@ struct WeaponDefTargetView {
     unsigned int field_111;
 };
 
-struct Vec3_0048a1e0 {
-    int x;
-    int y;
-    int z;
-};
-
 struct UnitMotionBodyView {
     char unknown_0[8];
-    Vec3_0048a1e0 offset;
+    Vec3 offset;
     char unknown_14[0x20 - 0x14];
     int sight;
     char unknown_24[0x2a - 0x24];
@@ -479,9 +473,9 @@ Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
     return &g_game->units[p->a];
 }
 
-static Vec3_0048a1e0 ScaleBodyOffset(UnitMotionBodyView* m, __int64 s)
+static Vec3 ScaleBodyOffset(UnitMotionBodyView* m, __int64 s)
 {
-    Vec3_0048a1e0 d;
+    Vec3 d;
     d.x = (int)(((__int64)m->offset.x * s) >> 16);
     d.y = (int)(((__int64)m->offset.y * s) >> 16);
     d.z = (int)(((__int64)m->offset.z * s) >> 16);
@@ -489,7 +483,7 @@ static Vec3_0048a1e0 ScaleBodyOffset(UnitMotionBodyView* m, __int64 s)
 }
 
 // FUNCTION: 0x48a1e0
-int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
+int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
 {
     UnitWeaponSlot* e = &unit->weapons[index];
     if (e->aimTargetZOrUnitSentinel != (short)0x8000) {
@@ -515,7 +509,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
     g_seams.units->GetSweetSpot(def, (Vec3*)pos);
     if ((e->flags & 2) && !(((WeaponDefTargetView*)e->weapon.get())->field_111 & 0x2000000) && def->motion != 0
         && unit->killCount > 5 && ((WeaponDefTargetView*)e->weapon.get())->radius != 0) {
-        Vec3_0048a1e0 d;
+        Vec3 d;
         d.x = unit->pos.x - pos->x;
         d.y = unit->pos.y - pos->y;
         d.z = unit->pos.z - pos->z;
@@ -543,12 +537,6 @@ int __stdcall IsTargetingUnit(Unit* list, Unit* obj)
 }
 
 #pragma pack(push, 1)
-struct MapVertex_0048a490 {
-    int x;
-    int y;
-    int z;
-};
-
 struct ModelGroundPrimitive {
     char unknown_0[0xc];
     unsigned short* ids;
@@ -559,7 +547,7 @@ struct ModelGroundView {
     char unknown_0[0xc];
     int count;
     char unknown_10[0x24 - 0x10];
-    MapVertex_0048a490* verts;
+    Vec3* verts;
     ModelGroundPrimitive* rows;
 };
 
@@ -593,7 +581,7 @@ void __stdcall AlignUnitToGround(Unit* u)
         CornerHeightSample hs[4];
         int k;
         for (k = 0; k < 4; k++) {
-            MapVertex_0048a490* v = m->verts + row->ids[k];
+            Vec3* v = m->verts + row->ids[k];
             int vx = v->x;
             pts[k].x = t.x = vx;
             int vz = v->z;

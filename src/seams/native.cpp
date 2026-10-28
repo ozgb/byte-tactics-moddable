@@ -41,7 +41,6 @@ struct TntInfo;
 struct GroundHeightPos;
 struct SweetSpotObjectView;
 struct Vec3_0049a0c0;
-struct Vec3_0048a1e0;
 struct Vec;
 struct UnitDef;
 struct WeaponDef;
@@ -82,7 +81,7 @@ void __stdcall UpdatePlayerEconomy(Player* p);
 
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
 
-int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index);
+int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index);
 Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange);
 
 #include "../map/line_of_sight.h"
@@ -244,7 +243,7 @@ static void __stdcall SetWeaponTargetPosNative(Unit* unit, Vec3* pos, int weapon
 
 static int __stdcall GetWeaponTargetPosNative(Unit* unit, Vec3* pos, int weapon)
 {
-    return GetWeaponTargetPos(unit, (Vec3_0048a1e0*)pos, weapon);
+    return GetWeaponTargetPos(unit, (Vec3*)pos, weapon);
 }
 
 static void __stdcall DamageFeatureNative(Cell* cell, int x, int z, WeaponDef* weapon)

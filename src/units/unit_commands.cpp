@@ -7,10 +7,6 @@
 struct Item_00485940;
 
 #pragma pack(push, 1)
-struct Vec3_00487bf0 {
-    int x, y, z;
-};
-
 #include "../util/angles.h"
 
 #include "../network/player.h"
@@ -49,7 +45,7 @@ struct Outs_t {
 void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* table)
 {
     int count;
-    struct { float f1, f2; int n; Vec3_00487bf0 pos; int move; } L;
+    struct { float f1, f2; int n; Vec3 pos; int move; } L;
     Outs_t out;
     char buf[256];
     int processed = 0, selected = 0;
@@ -236,7 +232,7 @@ struct UnitDefNameKeyView {
 
 UnitDefNameKeyView* __stdcall FindUnitType(const char* name);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
-                                      Vec3_00487bf0 pos, int a, int b, int c);
+                                      Vec3 pos, int a, int b, int c);
 #include "../graphics/display.h"
 
 #include <math.h>

@@ -10,11 +10,6 @@
 #include "../map/cell.h"
 #include "unit_motion.h"
 
-struct Point16_437840 {
-    short x;
-    short y;
-};
-
 #pragma pack(push, 1)
 struct UnitDefMetalWindView {
     char unknown_0[0x1ce];
@@ -57,7 +52,7 @@ void __stdcall UpdateMetalExtraction(Unit* unit)
     if (((UnitDefMetalWindView*)unit->def.get())->extractsMetal > 0.0f) {
         SumFixed total;
         total.value = 0;
-        Point16_437840 fp = *(Point16_437840*)&unit->footprint;
+        Point16 fp = *(Point16*)&unit->footprint;
         for (int y = unit->cell.y; y < unit->cell.y + fp.y; y++) {
             for (int x = unit->cell.x; x < unit->cell.x + fp.x; x++) {
                 Cell* c = g_seams.los_radar->GetMapCell(x, y);

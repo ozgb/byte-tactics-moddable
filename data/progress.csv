@@ -124,7 +124,7 @@ address,size,file,symbol,status,similarity
 0x40ad20,73,src/ai/ai_player.cpp,?UpdateEveryThirtyTicks@PlayerAI@@QAEXXZ,matched,100.0
 0x40ad70,15,src/ai/ai_player.cpp,?ProbeUnitDefEnergyRate@@YGXHHH@Z,matched,100.0
 0x40ad80,834,src/ai/ai_player.cpp,?GetVisibleEnemiesInRadius@@YGXHPBUVec@@HHPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@@Z,matched,100.0
-0x40b0d0,229,src/ai/ai_player.cpp,?HasReadyUnitInRange@@YG_NHPAUVec3_40b0d0@@H@Z,matched,100.0
+0x40b0d0,229,src/ai/ai_player.cpp,?HasReadyUnitInRange@@YG_NHPAUVec3@@H@Z,matched,100.0
 0x40b1c0,244,src/ai/ai_player.cpp,?SumUnitRatingsInRange@@YGHHPAUVec3@@H@Z,matched,100.0
 0x40b2c0,85,src/ai/ai_player.cpp,?UpdatePlayerAI@@YGXH@Z,matched,100.0
 0x40b320,68,src/ai/ai_player.cpp,?CreatePlayerAI@@YGXH@Z,matched,100.0
@@ -708,7 +708,7 @@ address,size,file,symbol,status,similarity
 0x4388b0,21,src/orders/order_queue.cpp,?ReattachFxToUnit@Order@@QAEXXZ,matched,100.0
 0x4388d0,89,src/orders/order_queue.cpp,?SetAttachedFx@Order@@QAEXPAVOrderFx@@@Z,matched,100.0
 0x438930,196,src/orders/order_queue.cpp,?AttachApproachRadiusGoal@Order@@QAEXPAHH@Z,matched,100.0
-0x438a00,205,src/orders/order_queue.cpp,?AttachRingApproachGoal@Order@@QAEXPAUVec3_0043a1f0@@HH@Z,matched,100.0
+0x438a00,205,src/orders/order_queue.cpp,?AttachRingApproachGoal@Order@@QAEXPAUVec3@@HH@Z,matched,100.0
 0x438ad0,191,src/orders/order_queue.cpp,?AttachBuildFootprintMarker@Order@@QAEXUPoint16@@0@Z,matched,100.0
 0x438b90,69,src/orders/order_queue.cpp,?MergeFlagsFromTable@Order@@QAEXH@Z,matched,100.0
 0x438be0,27,src/orders/order_queue.cpp,?GetOrderFlags@@YGHPAX@Z,matched,100.0
@@ -1806,7 +1806,7 @@ address,size,file,symbol,status,similarity
 0x48a0f0,99,src/units/unit_targets.cpp,?ClearWeaponTarget@@YGXPAVUnit@@H@Z,matched,100.0
 0x48a160,33,src/units/unit_targets.cpp,?ResetWeaponTarget@@YGXPAVUnit@@H@Z,matched,100.0
 0x48a190,77,src/units/unit_targets.cpp,?GetWeaponTargetUnit@@YGPAVUnit@@PAV1@H@Z,matched,100.0
-0x48a1e0,604,src/units/unit_targets.cpp,?GetWeaponTargetPos@@YGHPAVUnit@@PAUVec3_0048a1e0@@H@Z,matched,100.0
+0x48a1e0,604,src/units/unit_targets.cpp,?GetWeaponTargetPos@@YGHPAVUnit@@PAUVec3@@H@Z,matched,100.0
 0x48a440,71,src/units/unit_targets.cpp,?IsTargetingUnit@@YGHPAVUnit@@0@Z,matched,100.0
 0x48a490,857,src/units/unit_targets.cpp,?AlignUnitToGround@@YGXPAVUnit@@@Z,matched,100.0
 0x48a7f0,122,src/units/unit_position.cpp,?SnapUnitToGround@@YGXPAVUnit@@@Z,matched,100.0

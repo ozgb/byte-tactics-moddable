@@ -1383,7 +1383,6 @@ struct MapInfo_00483610;
 struct MapInfo_44dc60;
 struct ModelGroundPrimitive;
 struct ByteMapSize;
-struct MapVertex_0048a490;
 struct Map_0040d7b0;
 struct MenuBackdropBitmap;
 class Map_0042e440;

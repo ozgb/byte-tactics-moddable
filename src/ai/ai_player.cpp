@@ -163,12 +163,6 @@ void RegisterUnitOrders(void);
 
 #include "vec.h"
 
-struct Vec3_40b0d0 {
-    int x;
-    int y;
-    int z;
-};
-
 struct BasePos {
     int a, b, c;
 };
@@ -1503,7 +1497,7 @@ void __stdcall GetVisibleEnemiesInRadius(int player,const Vec* pos,int radius,in
 }
 
 // FUNCTION: 0x40b0d0
-bool __stdcall HasReadyUnitInRange(int player, Vec3_40b0d0* p, int range)
+bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range)
 {
     int r2 = range * range;
     PlayerAI* t = g_playerAI[player];

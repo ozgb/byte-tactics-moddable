@@ -15,7 +15,6 @@ struct Point;
 struct OrderSaveRecord;
 struct Head_0043a1f0;
 struct OrderTableEntryView;
-struct Vec3_0043a1f0;
 
 #pragma pack(push, 1)
 struct Order : public OrderBase {

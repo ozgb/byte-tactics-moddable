@@ -7695,14 +7695,6 @@ public:
     int* FUN_0046e880(int*);
 };
 
-class InsertResult {
-public:
-    Node_0046fad0* first;
-    unsigned char second;
-    char unknown_5[3];
-    InsertResult(Node_0046fad0*&, bool&);
-};
-
 struct Less_0046d2e0 {
     char unknown_0[1];
     unsigned char operator()(unsigned int&, unsigned int&);
@@ -7758,10 +7750,6 @@ struct Packet_0046d530 {
     int field_a;
 };
 
-struct Target_0046d530 {
-    unsigned int id;
-};
-
 struct Packet_0046d5b0 {
     unsigned char type;
     unsigned char arg;
@@ -7793,17 +7781,6 @@ struct Packet_0046d630 {
     unsigned char field_a;
     unsigned char field_b;
     short field_c;
-};
-
-struct Source_0046d630 {
-    int field_0;
-    char unknown_4[4];
-    unsigned char field_8;
-    char unknown_9;
-    unsigned char field_a;
-    char unknown_b;
-    short field_c;
-    char unknown_e[2];
 };
 
 struct Target_0046d630 {
@@ -7900,15 +7877,6 @@ public:
 
 struct Alloc_0046e5c0 {
     char unknown_0[1];
-};
-
-struct SyncTaggedVector {
-    char field_0x0;
-    char unknown_1[3];
-    int field_0x4;
-    int field_0x8;
-    int field_0xc;
-    SyncTaggedVector* InitTaggedVector(char*);
 };
 
 struct Data_0046dad0 {
@@ -8133,16 +8101,6 @@ public:
     char unknown_2[2];
     LiveNode* head;
     LiveNode* FUN_0046fe60(unsigned int*);
-};
-
-class Class_00470250 {
-public:
-    char unknown_0[4];
-    int first;
-    char unknown_8[4];
-    int last;
-    int Capacity(void);
-    unsigned int count(void);
 };
 
 struct Pair_0046faf0 {
@@ -13588,11 +13546,6 @@ public:
     virtual int __stdcall Slot24(void);
     virtual int __stdcall Slot25(void);
     virtual int __stdcall Send(unsigned long, unsigned long, unsigned long, void*, unsigned long);
-};
-
-struct Net_4c97b0 {
-    char unknown_0[1221];
-    DirectPlay_4c97b0* dp;
 };
 
 class DirectPlay_4c9800 {

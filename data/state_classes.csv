@@ -1400,7 +1400,7 @@ g_lastSoundReapTick,0x51fb94,global,,view,none: only code outside every walk tou
 DAT_0051fb98,0x51fb98,global,,view,none: no access found,,,,,,,"Padding or unused gap after g_lastSoundReapTick, no access found."
 g_loopingWav,0x51fb9c,global,view,view,"view: presentation writes it, no phase reads it",,,rw,,2:PlayLoopingWavMemory|StopWindowsSound,1:ResumeLoopingWav,Sound playback state.
 g_diskWav,0x51fba0,global,view,view,"view: presentation writes it, no phase reads it",,,rw,,2:PlayWavFromDisk|StopWindowsSound,2:PlayWavFromDisk|StopWindowsSound,Sound playback state.
-g_guiContext,0x51fba4,global,view,view,"view: presentation writes it, no phase reads it",,,rw,,1:SetCurrentGuiContext,37:BeginTextEdit|ConfigureListBoxByName|DoSelect,"UI and display timer or context state (gui, window handlers)."
+g_guiContext,0x51fba4,global,view,view,"view: presentation writes it, no phase reads it",,,rw,,1:SetCurrentGuiContext,37:BeginTextEdit|ConfigureListBoxByName|ConfigureListBoxFontHeight,"UI and display timer or context state (gui, window handlers)."
 DAT_0051fba8,0x51fba8,global,view,view,"view: only presentation reads it, nothing writes it",,,r,,,1:WriteCommonFields,"Frontend or screen UI state, only presentation code touches it."
 DAT_0051fbac,0x51fbac,global,view,view,"view: presentation writes it, no phase reads it",,,rw,,1:HandleButtonInput,1:HandleButtonInput,"Frontend or screen UI state, only presentation code touches it."
 DAT_0051fbb0,0x51fbb0,global,view,view,"view: presentation writes it, no phase reads it",,,rw,,1:HandleButtonInput,1:HandleButtonInput,"Frontend or screen UI state, only presentation code touches it."

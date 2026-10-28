@@ -107,6 +107,7 @@ src/game/game_state.cpp,src/graphics/particles.h,#392
 src/game/game_state.cpp,src/graphics/surface.h,#392
 src/game/game_state.cpp,src/gui/dialogs.h,#392
 src/game/game_state.cpp,src/gui/gui.h,#392
+src/game/game_state.cpp,src/gui/gui_file.h,#392
 src/game/game_state.cpp,src/ingame/build_placement.h,#392
 src/game/game_state.cpp,src/ingame/control_panel.h,#392
 src/game/game_state.cpp,src/ingame/info_panel.h,#392

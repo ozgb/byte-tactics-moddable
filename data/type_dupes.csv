@@ -1,4 +1,5 @@
 name,in_scope,defs,files,layout,canonical
+ActiveBitFlags,no,2,include/ta_types.h:10625|src/gui/dialogs.cpp:38,identical,src/gui/dialogs.cpp
 BlockInfo,no,2,include/ta_types.h:13743|src/debug/debug_lib.cpp:348,differs,src/debug/debug_lib.cpp
 BmpWriter,no,2,src/graphics/pcx.cpp:594|src/ingame/keys.cpp:35,differs,src/graphics/pcx.cpp
 Channel_004b0c40,no,2,include/ta_types.h:11006|src/units/cob.cpp:8,same-layout,src/units/cob.cpp
@@ -9,7 +10,6 @@ Entry,no,2,include/ta_types.h:3346|src/harness/block_scan.cpp:20,differs,src/har
 Entry_004b8b30,no,2,include/ta_types.h:11519|src/graphics/gaf.cpp:485,identical,src/graphics/gaf.cpp
 Event_4b5cc0,no,2,include/ta_types.h:11363|src/graphics/display.cpp:134,differs,src/graphics/display.cpp
 Flags_004898b0,no,2,include/ta_types.h:9294|src/units/unit.cpp:17,differs,src/units/unit.cpp
-Flags_004ab400,no,2,include/ta_types.h:10625|src/gui/dialogs.cpp:38,identical,src/gui/dialogs.cpp
 Flags_4b5980,no,2,include/ta_types.h:11352|src/graphics/display.cpp:9,differs,src/graphics/display.cpp
 FreeBlockIter,no,2,include/ta_types.h:13886|src/debug/free_block_map.h:26,differs,src/debug/free_block_map.h
 Gadget,no,5,src/frontend/multi.cpp:23|src/frontend/options.cpp:31|src/frontend/skirmish_menu.cpp:20|src/gui/gadget.h:10|src/gui/gui.cpp:62,differs,src/gui/gadget.h

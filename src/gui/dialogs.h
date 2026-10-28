@@ -1,5 +1,8 @@
 #ifndef DIALOGS_H
 #define DIALOGS_H
+struct PaletteEditorDialog;
+struct RemapPaletteEntry;
+
 struct Gui;
 
 struct FileHandle;
@@ -40,5 +43,8 @@ int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, ch
 char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index);
 
 void __stdcall DrawColorCellOutline(Gui* obj, int cell, int color);
+
+void __stdcall BuildColorRemapTable(RemapPaletteEntry* src, RemapPaletteEntry* dest, unsigned char* table);
+void __stdcall ApplySlidersToPaletteEntry(PaletteEditorDialog* obj, RemapPaletteEntry* palette);
 
 #endif

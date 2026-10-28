@@ -19,7 +19,6 @@ AllocSurface,mismatch,pointer/int cast: definition's type is likely wrong
 ApplyAreaDamageAt,skip,placeholder type Vec3_0049a0c0: left for the type-naming issues
 ApplyMissionOptionFlags,skip,placeholder type Settings_00496e10: left for the type-naming issues
 ApplyProjectileHitPacket,mismatch,pointer/int cast: definition's type is likely wrong
-ApplySlidersToPaletteEntry,skip,placeholder type PalEntry_004aa8f0: left for the type-naming issues
 ApplyWeaponFirePacket,mismatch,pointer/int cast: definition's type is likely wrong
 AssignQuickKey,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 AttachUnitToPiece,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -32,12 +31,10 @@ BlitSideLogoToRect,mismatch,"static risk rule: a convention, parameter count, or
 BroadcastPacket,mismatch,fixing it changes the generated code of a caller
 BroadcastWeaponFire,skip,placeholder type Vec3_00499ba0: left for the type-naming issues
 BuildBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
-BuildColorRemapTable,skip,placeholder type PalEntry_004aa8f0: left for the type-naming issues
 BuildGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
 CalcAimAngles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 CanBuildAt,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 CanPlaceUnitFootprint,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-CaptureBackgroundAndDrawCursor,skip,placeholder type Obj_004c2380: left for the type-naming issues
 ClampPositionToMap,skip,placeholder type Vec3_004853b0: left for the type-naming issues
 ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
 ClickSelectHoverUnit,mismatch,placeholder type Param_0048c7f0: left for the type-naming issues
@@ -72,7 +69,6 @@ DrawFrame,mismatch,"static risk rule: a convention, parameter count, or non-poin
 DrawFrameBlended,mismatch,pointer/int cast: definition's type is likely wrong
 DrawFrameQuad,mismatch,placeholder type Quad_004c7580: left for the type-naming issues
 DrawGadgetSelectionBox,mismatch,fixing it changes the generated code of a caller
-DrawGafBar,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
 DrawLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawLineGadget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawListboxFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -114,7 +110,6 @@ EmptyPostArchiveMountHook,mismatch,pointer/int cast: definition's type is likely
 EnumModesCallback,skip,unknown name host_display_mode
 ExceptionFilter,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ExecuteCommandLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-FUN_004a14c0,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
 FillMissionList,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FillPolygon,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FillRectangle,mismatch,fixing it changes the generated code of a caller
@@ -152,8 +147,6 @@ FormatNetStats,mismatch,"static risk rule: a convention, parameter count, or non
 FrameFromSurface,mismatch,placeholder type Src_004b8ae0: left for the type-naming issues
 FreeBlinkWords,mismatch,pointer/int cast: definition's type is likely wrong
 FreeCobScript,mismatch,pointer/int cast: definition's type is likely wrong
-FreeCommonGuiGaf,skip,placeholder type Obj_004aef80: left for the type-naming issues
-FreeGafSlot,skip,placeholder type Obj_004aeda0: left for the type-naming issues
 FreeLightTable,mismatch,pointer/int cast: definition's type is likely wrong
 FreeObjectState,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GameAllocThunk,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -229,8 +222,6 @@ InitPacketTables,mismatch,placeholder type Class_00451fd0: left for the type-nam
 InitProjectile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 InsertShift,skip,placeholder type Item_00485940: left for the type-naming issues
 InsertionSortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-IsAboveRectTop,skip,placeholder type Obj_004a1950: left for the type-naming issues
-IsBelowRectBottom,skip,placeholder type Struct_004a1970: left for the type-naming issues
 IsCountBelowAiLimit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsFootprintVisible,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsGadgetNamed,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
@@ -273,21 +264,8 @@ PopHeapFirst,mismatch,"static risk rule: a convention, parameter count, or non-p
 PopMouseEvent,mismatch,fixing it changes the generated code of a caller
 QuickSort,skip,placeholder type Item_00485940: left for the type-naming issues
 RIReport,mismatch,pointer/int cast: definition's type is likely wrong
-ReadButtonFields,skip,placeholder type Obj_004adc70: left for the type-naming issues
-ReadCommonSection,skip,placeholder type Common_004ad350: left for the type-naming issues
-ReadFontFilenameField,skip,placeholder type Obj_004ae4b0: left for the type-naming issues
 ReadGuiFile,mismatch,placeholder type Elem_004aeac0: left for the type-naming issues
-ReadHotOrNotField,skip,placeholder type Obj_004ae410: left for the type-naming issues
-ReadListBoxFields,skip,placeholder type Param2_004addf0: left for the type-naming issues
-ReadNuttinField,skip,placeholder type StructA_004ae610: left for the type-naming issues
-ReadPanelFields,skip,placeholder type Obj_004ad890: left for the type-naming issues
-ReadSliderFields,skip,placeholder type Obj_004ae170: left for the type-naming issues
 ReadSoundEntry,skip,placeholder type Source_0042f450: left for the type-naming issues
-ReadStatusField,skip,placeholder type StructA_004ada10: left for the type-naming issues
-ReadSurfFilenameField,skip,placeholder type Obj_004ae550: left for the type-naming issues
-ReadTextInputFields,skip,placeholder type Obj_004adf10: left for the type-naming issues
-ReadTextLinkFields,skip,placeholder type Obj_004ae300: left for the type-naming issues
-RedrawMouseCursor,skip,placeholder type Obj_004c2380: left for the type-naming issues
 RefreshPassMapsForUnit,mismatch,placeholder type Struct_00440a70: left for the type-naming issues
 RegisterCommand,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 RegisterOrderTypes,mismatch,placeholder type OrderTableEntry: left for the type-naming issues
@@ -300,9 +278,7 @@ RemoveSpeechOfUnit,mismatch,pointer/int cast: definition's type is likely wrong
 RemoveUnitProjectiles,mismatch,placeholder type Unit_0049c880: left for the type-naming issues
 ReportGameChat,mismatch,pointer/int cast: definition's type is likely wrong
 ResetClipRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-ResetListBox,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
 ResolveCursorModeForSelection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-RestoreCursorBackground,skip,placeholder type Obj_004c2380: left for the type-naming issues
 RestoreSurfaces,skip,placeholder type Arg_004c6210: left for the type-naming issues
 RockUnit,skip,placeholder type Object_00499c10: left for the type-naming issues
 RotateAboutX,skip,placeholder type Vec3_004b6cc0: left for the type-naming issues
@@ -338,7 +314,6 @@ SetFrontendState,mismatch,"static risk rule: a convention, parameter count, or n
 SetGadgetActive,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetGadgetActiveByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGadgetColorByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
-SetGadgetGrayedOut,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
 SetGadgetGrayedOutByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 SetGadgetItems,mismatch,placeholder type Table_004a36a0: left for the type-naming issues
 SetGadgetRows,mismatch,placeholder type Table_004a35a0: left for the type-naming issues
@@ -368,9 +343,7 @@ SortPrimitives,skip,placeholder type Object_004cb2f0: left for the type-naming i
 SortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SpawnProjectileFromUnitMotion,skip,placeholder type Shot_0049d000: left for the type-naming issues
 StartBuildingScript,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-StartMouseThread,skip,placeholder type Obj_004c2380: left for the type-naming issues
 StepGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming issues
-StopMouseThread,skip,placeholder type Obj_004c2380: left for the type-naming issues
 SubtractVec3,mismatch,fixing it changes the generated code of a caller
 SwapPrimitives,skip,placeholder type Primitive_004cb2f0: left for the type-naming issues
 TickProgressBar,skip,src/gui/gui.cpp defines a static TickProgressBar and sees src/gui/gui.h
@@ -379,7 +352,6 @@ ToggleAnyMission,skip,placeholder type Object_00477510: left for the type-naming
 TransferEnergy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 TransferMetal,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 Translate,mismatch,pointer/int cast: definition's type is likely wrong
-TranslateGadgetItems,skip,placeholder type Dialog_004a04f0: left for the type-naming issues
 TruncateTextWithEllipsis,mismatch,pointer/int cast: definition's type is likely wrong
 TryGetDesiredHeading,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 TrySetFocus,mismatch,fixing it changes the generated code of a caller
@@ -398,19 +370,7 @@ WalkFrameChain,mismatch,"static risk rule: a convention, parameter count, or non
 WalkStack,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WeaponCanReachPos,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WorldToScreenWithHeight,skip,placeholder type Pos_00417bb0: left for the type-naming issues
-WriteButtonFields,skip,placeholder type Obj_004ada40: left for the type-naming issues
-WriteCommonFields,skip,placeholder type Common_004ad350: left for the type-naming issues
-WriteFontFilenameField,skip,placeholder type Obj_004ae440: left for the type-naming issues
-WriteHotOrNotField,skip,placeholder type Obj_004ae380: left for the type-naming issues
-WriteListBoxFields,skip,placeholder type Struct_004add60: left for the type-naming issues
-WriteNuttinField,skip,placeholder type Obj_004ae580: left for the type-naming issues
-WritePanelFields,skip,placeholder type Obj_004ad4f0: left for the type-naming issues
 WriteScreenshot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-WriteSliderFields,skip,placeholder type Obj_004ae170: left for the type-naming issues
-WriteStatusField,skip,placeholder type Struct_004ad980: left for the type-naming issues
-WriteSurfFilenameField,skip,placeholder type Obj_004ae4e0: left for the type-naming issues
-WriteTextInputFields,skip,placeholder type Obj_004ade20: left for the type-naming issues
-WriteTextLinkFields,skip,placeholder type Obj_004ae230: left for the type-naming issues
 g_airManeuverOrderVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_approachRadiusVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_briefingPlanetFrameCursor,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses

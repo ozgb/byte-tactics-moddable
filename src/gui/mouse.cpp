@@ -6,40 +6,40 @@
 
 #pragma pack(push, 2)
 
-struct Desc_004c25e0 {
+struct MouseSurfaceDesc {
     int width;
     int height;
     int pitch;
 };
 
-struct Event_4c2d60 {
+struct MouseQueueEvent {
     int x;
     int y;
     int data[4];
 };
 
-struct Surface_004c23e0 {
+struct RestoreCursorBackgroundSurface {
     int data[12];
 };
 
-struct Obj_004c2380 {
+struct MouseDisplay {
     char unknown_0[0xf0];
     unsigned short bit0_9 : 10;
     unsigned short active : 1;
     unsigned short bit11_15 : 5;
     char unknown_f2[0x186 - 0xf2];
     int capacity;
-    Event_4c2d60* entries;
+    MouseQueueEvent* entries;
     int head;
     int tail;
-    Event_4c2d60 rect;
+    MouseQueueEvent rect;
     int count;
     GafFrame* sprite;
     int x;
     int y;
-    Desc_004c25e0* saved;
-    Desc_004c25e0* under;
-    Desc_004c25e0* work;
+    MouseSurfaceDesc* saved;
+    MouseSurfaceDesc* under;
+    MouseSurfaceDesc* work;
     int running;
     int mode;
     int visible;
@@ -48,26 +48,26 @@ struct Obj_004c2380 {
 
 #pragma pack(pop)
 
-Obj_004c2380* GetDisplay(void);
+MouseDisplay* GetDisplay(void);
 
 #include "../../link/globals.h"
 
 void __cdecl BlitSurface(void* dst, void* src, int x, int y);
 void __stdcall DrawFrame(void* dst, GafFrame* bmp, int x, int y);
-void __stdcall DrawSurface(Desc_004c25e0* dst, Desc_004c25e0* bmp, int x, int y);
+void __stdcall DrawSurface(MouseSurfaceDesc* dst, MouseSurfaceDesc* bmp, int x, int y);
 #include "../graphics/surface.h"
 void __stdcall ResetClipRect(void* d);
 void* __stdcall AllocSurface(char* name, int width, int height);
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
 
-void __stdcall RedrawMouseCursor(Obj_004c2380* app);
+#include "mouse.h"
 #include "mouse.h"
 
-static inline void GetRect(Event_4c2d60* out)
+static inline void GetRect(MouseQueueEvent* out)
 {
-    Obj_004c2380* p = GetDisplay();
-    memcpy(out, &p->rect, sizeof(Event_4c2d60));
+    MouseDisplay* p = GetDisplay();
+    memcpy(out, &p->rect, sizeof(MouseQueueEvent));
 }
 
 static inline LONG LockMouse()
@@ -119,20 +119,20 @@ static inline void UnlockMain(LONG held)
 // FUNCTION: 0x4c2380
 void DrawSoftwareCursor()
 {
-    Obj_004c2380* obj = GetDisplay();
+    MouseDisplay* obj = GetDisplay();
     if (obj->mode != 1 && obj->count <= 0) {
-        Event_4c2d60 r;
+        MouseQueueEvent r;
         GetRect(&r);
         DrawFrame(0, obj->sprite, r.x, r.y);
     }
 }
 
 // FUNCTION: 0x4c23e0
-void __stdcall RestoreCursorBackground(Obj_004c2380* obj)
+void __stdcall RestoreCursorBackground(MouseDisplay* obj)
 {
     if (obj->visible) {
-        Desc_004c25e0* bmp = obj->saved;
-        Surface_004c23e0 s;
+        MouseSurfaceDesc* bmp = obj->saved;
+        RestoreCursorBackgroundSurface s;
         if (LockPrimary((Surface *)&s)) {
             BlitSurface(&s, bmp, obj->x, obj->y);
             RECT r;
@@ -148,16 +148,16 @@ void __stdcall RestoreCursorBackground(Obj_004c2380* obj)
 // FUNCTION: 0x4c2470
 void HideSoftwareCursor()
 {
-    Obj_004c2380* o = GetDisplay();
+    MouseDisplay* o = GetDisplay();
     if (o->mode != 1 && o->count++ == 0)
         DrawSurface(0, o->saved, o->x, o->y);
 }
 
 // FUNCTION: 0x4c24b0
-void __stdcall CaptureBackgroundAndDrawCursor(Obj_004c2380* obj)
+void __stdcall CaptureBackgroundAndDrawCursor(MouseDisplay* obj)
 {
     if (obj->visible) {
-        Surface_004c23e0 s;
+        RestoreCursorBackgroundSurface s;
         if (LockPrimary((Surface *)&s)) {
             RECT r;
             POINT pt;
@@ -181,9 +181,9 @@ void __stdcall CaptureBackgroundAndDrawCursor(Obj_004c2380* obj)
 }
 
 // FUNCTION: 0x4c25e0
-void __stdcall RedrawMouseCursor(Obj_004c2380* app)
+void __stdcall RedrawMouseCursor(MouseDisplay* app)
 {
-    Surface_004c23e0 info;
+    RestoreCursorBackgroundSurface info;
     RECT r1;
     RECT r2;
     POINT pt;
@@ -232,7 +232,7 @@ void __stdcall RedrawMouseCursor(Obj_004c2380* app)
 // FUNCTION: 0x4c2870
 void __fastcall ShowSoftwareCursor(void)
 {
-    Obj_004c2380* o = GetDisplay();
+    MouseDisplay* o = GetDisplay();
     if (o->mode != 1) {
         if (--o->count <= 0) {
             POINT pt;
@@ -247,9 +247,9 @@ void __fastcall ShowSoftwareCursor(void)
                 o->saved->pitch = o->sprite->width;
             }
             DrawSurface(o->saved, 0, -o->x, -o->y);
-            Obj_004c2380* o2 = GetDisplay();
+            MouseDisplay* o2 = GetDisplay();
             if (o2->mode != 1 && o2->count <= 0) {
-                Event_4c2d60 r;
+                MouseQueueEvent r;
                 GetRect(&r);
                 DrawFrame(0, o2->sprite, r.x, r.y);
             }
@@ -260,7 +260,7 @@ void __fastcall ShowSoftwareCursor(void)
 // FUNCTION: 0x4c2990
 void __cdecl MouseThreadProc(int param)
 {
-    Obj_004c2380* o = (Obj_004c2380*)param;
+    MouseDisplay* o = (MouseDisplay*)param;
     host_thread_set_priority(2);
     while (o->pending == 0) {
         int start = host_time_ms() + 0x21;
@@ -274,7 +274,7 @@ void __cdecl MouseThreadProc(int param)
 }
 
 // FUNCTION: 0x4c2a80
-int __stdcall StartMouseThread(Obj_004c2380* s)
+int __stdcall StartMouseThread(MouseDisplay* s)
 {
     s->pending = 0;
     s->running = host_thread_start((void (__cdecl*)(void*))MouseThreadProc, 0x8000, s);
@@ -286,7 +286,7 @@ int __stdcall StartMouseThread(Obj_004c2380* s)
 }
 
 // FUNCTION: 0x4c2ac0
-int __stdcall StopMouseThread(Obj_004c2380* s)
+int __stdcall StopMouseThread(MouseDisplay* s)
 {
     if (s->running == 0)
         return 1;
@@ -318,7 +318,7 @@ int GetCursorSprite()
 // FUNCTION: 0x4c2bb0
 void ClearMouseEventQueue()
 {
-    Obj_004c2380* p = GetDisplay();
+    MouseDisplay* p = GetDisplay();
     p->head = 0;
     p->tail = 0;
 }
@@ -326,16 +326,16 @@ void ClearMouseEventQueue()
 // FUNCTION: 0x4c2bd0
 void __stdcall InitMouse(int count, int start)
 {
-    Obj_004c2380* p = (Obj_004c2380*)GetDisplay();
+    MouseDisplay* p = (MouseDisplay*)GetDisplay();
     p->capacity = count;
-    p->entries = (Event_4c2d60*)GameAllocIgnoreTag("MOUSE EVENTS", count * 0x18);
-    Obj_004c2380* q = (Obj_004c2380*)GetDisplay();
+    p->entries = (MouseQueueEvent*)GameAllocIgnoreTag("MOUSE EVENTS", count * 0x18);
+    MouseDisplay* q = (MouseDisplay*)GetDisplay();
     q->head = 0;
     q->tail = 0;
     p->sprite = 0;
-    p->saved = (Desc_004c25e0*)AllocSurface("SAVEMOUSE 1", 0x640, 1);
-    p->under = (Desc_004c25e0*)AllocSurface("SAVEMOUSE 2", 0x640, 1);
-    p->work = (Desc_004c25e0*)AllocSurface("SAVEMOUSE 3", 0x640, 1);
+    p->saved = (MouseSurfaceDesc*)AllocSurface("SAVEMOUSE 1", 0x640, 1);
+    p->under = (MouseSurfaceDesc*)AllocSurface("SAVEMOUSE 2", 0x640, 1);
+    p->work = (MouseSurfaceDesc*)AllocSurface("SAVEMOUSE 3", 0x640, 1);
     p->count = 1;
     p->visible = 0;
     p->mode = 0;
@@ -353,7 +353,7 @@ void __stdcall InitMouse(int count, int start)
 // FUNCTION: 0x4c2cc0
 void ShutdownMouse()
 {
-    Obj_004c2380* o = GetDisplay();
+    MouseDisplay* o = GetDisplay();
     if (o->entries) {
         if (o->active) {
             if (o->running) {
@@ -379,9 +379,9 @@ void ShutdownMouse()
 }
 
 // FUNCTION: 0x4c2d60
-int __stdcall PopMouseEvent(Event_4c2d60* out)
+int __stdcall PopMouseEvent(MouseQueueEvent* out)
 {
-    Obj_004c2380* q = GetDisplay();
+    MouseDisplay* q = GetDisplay();
     if (q->head == q->tail) {
         *out = q->rect;
         return 0;
@@ -394,9 +394,9 @@ int __stdcall PopMouseEvent(Event_4c2d60* out)
 }
 
 // FUNCTION: 0x4c2de0
-int __stdcall PeekMouseEvent(Event_4c2d60* out)
+int __stdcall PeekMouseEvent(MouseQueueEvent* out)
 {
-    Obj_004c2380* q = GetDisplay();
+    MouseDisplay* q = GetDisplay();
     if (q->head == q->tail) {
         *out = q->rect;
         return 0;
@@ -406,9 +406,9 @@ int __stdcall PeekMouseEvent(Event_4c2d60* out)
 }
 
 // FUNCTION: 0x4c2e30
-void __stdcall PushMouseEvent(Event_4c2d60* ev)
+void __stdcall PushMouseEvent(MouseQueueEvent* ev)
 {
-    Obj_004c2380* q = GetDisplay();
+    MouseDisplay* q = GetDisplay();
     if ((q->head + 1) % q->capacity != q->tail) {
         q->entries[q->head] = *ev;
         if (++q->head == q->capacity) {

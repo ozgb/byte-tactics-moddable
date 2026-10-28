@@ -1,25 +1,29 @@
 #ifndef GUI_H
 #define GUI_H
+struct GadgetAccessDialog;
+struct IsAboveRectTopRect;
+struct IsBelowRectBottomRect;
+
 struct Gadget;
 
 struct BlinkWord;
 struct Dialog;
-struct Dialog_4a1b40;
-struct Dialog_4a2be0;
-struct Dialog_4a2e40;
-struct Dialog_4a4660;
-struct Dialog_4a4980;
+struct DrawListBoxDialog;
+struct SyncAssocGadgetsDialog;
+struct SetListBoxScrollByNameDialog;
+struct DrawProgressBarGadgetDialog;
+struct DrawHotspotDialog;
 struct Gadget;
 struct Rect;
 
 struct FileRequester;
-struct Font_004a50b0;
+struct FontGlyphTable;
 struct Dialog;
-struct Dialog_4a1ab0;
-struct Dialog_4a3eb0;
-struct Dialog_4a4620;
+struct RedrawGadgetRectDialog;
+struct ResetSliderGadgetDialog;
+struct ScheduleGadgetEndTickDialog;
 struct Gadget;
-struct GameState_4a4930;
+struct ResetProgressBarDialog;
 struct Obj1_49fd20;
 struct Obj2_49fd20;
 struct Rect;
@@ -29,7 +33,7 @@ struct Vec6_49fd20;
 
 struct Layer;
 
-struct Point_0049fc50 {
+struct DialogMouseEvent {
     int x;
     int y;
     int unknown_8[4];
@@ -43,7 +47,7 @@ struct Dialog {
             void (__stdcall* handler)(void*);
             void* data;
             int flags;
-            Font_004a50b0* language;
+            FontGlyphTable* language;
         };
         struct {
             char path[0x13];
@@ -59,7 +63,7 @@ struct Dialog {
     char field_36;
     int field_37;
     char unknown_3b[1];
-    Point_0049fc50 point;
+    DialogMouseEvent point;
     unsigned int flags_54;
     char unknown_58[8];
     int current;
@@ -69,7 +73,7 @@ struct Dialog {
     int field_70;
     int length;
     int field_78;
-    Point_0049fc50 saved;
+    DialogMouseEvent saved;
     short field_94;
     char unknown_96[12];
     int keyCommands;
@@ -155,12 +159,12 @@ void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
 int __stdcall FindAssocListBox(Gadget* entries, int index);
 int __stdcall FindAssocSlider(Gadget* entries, int index);
 int __stdcall FindAssocTextInput(Gadget* entries, int index);
-void __stdcall RedrawGadgetRect(Dialog_4a1ab0* obj, int index);
+void __stdcall RedrawGadgetRect(RedrawGadgetRectDialog* obj, int index);
 void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2);
 void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4);
-void __stdcall ResetSliderGadget(Dialog_4a3eb0* obj, int i);
-void __stdcall ScheduleGadgetEndTick(Dialog_4a4620* obj, int i);
-void __stdcall ResetProgressBar(GameState_4a4930*, int index);
+void __stdcall ResetSliderGadget(ResetSliderGadgetDialog* obj, int i);
+void __stdcall ScheduleGadgetEndTick(ScheduleGadgetEndTickDialog* obj, int i);
+void __stdcall ResetProgressBar(ResetProgressBarDialog*, int index);
 void* __stdcall GetCharGlyph(unsigned char c);
 int __stdcall GetFontLineHeight();
 void __stdcall LayoutLabelText(Gui* obj, int index);
@@ -197,11 +201,11 @@ void __stdcall GetGadgetRectByIndex(char*, int, Rect*);
 void __stdcall GetGadgetScreenRect(char*, int, Rect*);
 int __stdcall FindBackgroundCell(Gadget* entries, int index);
 int __stdcall IsPointInRect(Rect* r, int px, int py);
-void __stdcall DrawListBox(Dialog_4a1b40* obj, int index);
-void __stdcall SyncAssocGadgets(Dialog_4a2be0*, int);
-void __stdcall SetListBoxScrollByName(Dialog_4a2e40*, char*, int);
-void __stdcall DrawProgressBarGadget(Dialog_4a4660 * obj, int index);
-void __stdcall DrawHotspot(Dialog_4a4980* obj, int index);
+void __stdcall DrawListBox(DrawListBoxDialog* obj, int index);
+void __stdcall SyncAssocGadgets(SyncAssocGadgetsDialog*, int);
+void __stdcall SetListBoxScrollByName(SetListBoxScrollByNameDialog*, char*, int);
+void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog * obj, int index);
+void __stdcall DrawHotspot(DrawHotspotDialog* obj, int index);
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 void __stdcall SetCurrentFont(Gui* p, int index);
 int __stdcall TruncateGadgetText(Gui* menu, int index);
@@ -215,5 +219,13 @@ void __stdcall SetCurrentGuiContext(Gui* ctx);
 void __stdcall SetDefaultFont(int*, int);
 
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
+
+void __stdcall TranslateGadgetItems(GadgetAccessDialog* obj, int index);
+void __stdcall SetGadgetGrayedOut(GadgetAccessDialog* obj, int index, int value);
+void __stdcall SetGadgetGrayedOutByNameTwin(GadgetAccessDialog* obj, char* name, int);
+int __stdcall IsAboveRectTop(IsAboveRectTopRect*, int);
+int __stdcall IsBelowRectBottom(IsBelowRectBottomRect* obj, int value);
+void __stdcall DrawGafBar(GadgetAccessDialog*, int index);
+void __stdcall ResetListBox(GadgetAccessDialog* obj, int index);
 
 #endif

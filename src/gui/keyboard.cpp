@@ -3,7 +3,7 @@
 #include "../../interfaces/host.h"
 
 #pragma pack(push, 2)
-struct Queue_004c1ab0 {
+struct KeyQueueDisplay {
     char unknown_0[0xf2];
     int size;
     int entries[30];
@@ -20,7 +20,7 @@ struct DisplayContext
 };
 #pragma pack(pop)
 
-Queue_004c1ab0* GetDisplay(void);
+KeyQueueDisplay* GetDisplay(void);
 
 extern int g_gfxBlitLockHeld;
 extern HANDLE g_gfxBlitLockEvent;
@@ -28,7 +28,7 @@ extern HANDLE g_gfxBlitLockEvent;
 // FUNCTION: 0x4c1a40
 void ClearKeyQueue(void)
 {
-    Queue_004c1ab0* q = GetDisplay();
+    KeyQueueDisplay* q = GetDisplay();
     q->head = 0;
     q->tail = 0;
 }
@@ -36,7 +36,7 @@ void ClearKeyQueue(void)
 // FUNCTION: 0x4c1a60
 void __stdcall InitKeyQueue(int size)
 {
-    Queue_004c1ab0* q = GetDisplay();
+    KeyQueueDisplay* q = GetDisplay();
     if (size <= 0x1e)
         q->size = size;
     else
@@ -55,7 +55,7 @@ void DestroyPreCleanup(void)
 // FUNCTION: 0x4c1ab0
 int PopKey(void)
 {
-    Queue_004c1ab0* q = GetDisplay();
+    KeyQueueDisplay* q = GetDisplay();
     int v;
     if (q->head == q->tail) {
         v = 0;
@@ -72,7 +72,7 @@ int PopKey(void)
 // FUNCTION: 0x4c1b00
 int __cdecl PeekKey()
 {
-    Queue_004c1ab0* q = GetDisplay();
+    KeyQueueDisplay* q = GetDisplay();
     int head = q->head;
     int tail = q->tail;
     if (head == tail) {
@@ -85,7 +85,7 @@ int __cdecl PeekKey()
 // FUNCTION: 0x4c1b20
 void __stdcall PushKeyCode(int v)
 {
-    Queue_004c1ab0* q = GetDisplay();
+    KeyQueueDisplay* q = GetDisplay();
     int next = q->head + 1;
     if ((q->head + 1) % q->size != q->tail) {
         q->entries[next - 1] = v;
@@ -120,7 +120,7 @@ int __stdcall IsKeyDown(int key)
 
 static inline void PushKey(int v)
 {
-    Queue_004c1ab0* q = GetDisplay();
+    KeyQueueDisplay* q = GetDisplay();
     int next = q->head + 1;
     if ((q->head + 1) % q->size == q->tail)
         return;

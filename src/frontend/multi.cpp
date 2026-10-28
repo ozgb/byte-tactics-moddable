@@ -1147,10 +1147,10 @@ void OpenSerialDialog()
     unsigned int size = 4;
 
     if (ReadGameRegistryValue("SERBAUD", &value, &size)) {
-        SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "SPEEDS", value);
+        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "SPEEDS", value);
     }
     if (ReadGameRegistryValue("SERPORT", &value, &size)) {
-        SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "PORTS", value);
+        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "PORTS", value);
     }
     Gadget* entry = FindGadgetChecked(gadget->entries, "PORTS");
     entry->handler = SetSerialPortFromGadget;
@@ -1174,7 +1174,7 @@ void FillAccountList(void)
     Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
     int player = entry->index;
     ConfigureListBoxByName(&g_game->gui, "ACCOUNTS", g_modemAccountNames, 20, 0);
-    SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "ACCOUNTS", player);
+    SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "ACCOUNTS", player);
 }
 
 // FUNCTION: 0x4427a0
@@ -1194,7 +1194,7 @@ void RefreshAccountList(void)
         }
         int player = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->index;
         ConfigureListBoxByName(&g_game->gui, "ACCOUNTS", g_modemAccountNames, 20, 0);
-        SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "ACCOUNTS", player);
+        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "ACCOUNTS", player);
     }
 }
 
@@ -1394,7 +1394,7 @@ void __stdcall OpenModemDialog()
                         Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
                         int player = entry->index;
                         ConfigureListBoxByName(&g_game->gui, "ACCOUNTS", g_modemAccountNames, 20, 0);
-                        SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "ACCOUNTS", player);
+                        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "ACCOUNTS", player);
                         entry = FindGadgetChecked(gadget->entries, "ACCOUNTS");
                         entry->handler = ShowSelectedAccount;
                         ShowSelectedAccount(&g_game->gui, entry);
@@ -1875,7 +1875,7 @@ void OpenMultiMapSelector()
 
     for (int i = 0; i < n; i++) {
         if (strcmp(g_oldMapName, SkipTextLines(data->items, i)) == 0) {
-            SetListBoxScrollByName((Dialog_4a2e40 *)&g_game->gui, "MAPNAMES", i);
+            SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "MAPNAMES", i);
             break;
         }
     }

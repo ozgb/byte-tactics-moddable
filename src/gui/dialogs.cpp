@@ -27,7 +27,7 @@ struct Layer {
 
 struct Src_004ab400;
 
-struct Ref_004ab400 {
+struct GafSequenceRef {
     unsigned short index;
     unsigned short value;
     unsigned char kind;
@@ -35,7 +35,7 @@ struct Ref_004ab400 {
     Src_004ab400* src;
 };
 
-struct Flags_004ab400 {
+struct ActiveBitFlags {
     unsigned int active : 1;
     unsigned int rest : 31;
 };
@@ -51,7 +51,7 @@ struct DialogRect {
 
 #include "gui.h"
 
-struct Record_004ab2b0 {
+struct AddButtonGadgetRecord {
     unsigned char type;
     char unknown_1[0xb6 - 0x1];
     short count;
@@ -60,7 +60,7 @@ struct Record_004ab2b0 {
 
 int PlaceFeature(int, int, int, int, int);
 
-struct Record_004ab310 {
+struct AddHotspotGadgetRecord {
     unsigned char type;
     char unknown_1[0xb6 - 0x1];
     union {
@@ -74,20 +74,20 @@ struct Record_004ab310 {
     char unknown_c8[0xcc - 0xc8];
 };
 
-struct Entry_004ab310 {
-    Record_004ab310 record;
+struct AddHotspotGadgetEntry {
+    AddHotspotGadgetRecord record;
     char unknown_cc[0x15b - 0xcc];
 };
 
-struct Record_004ab3a0 {
+struct AddBarGadgetRecord {
     unsigned char type;
     char unknown_1[0xb6 - 0x1];
     short count;
     char unknown_b8[0xd6 - 0xb8];
 };
 
-struct Entry_004ab3a0 {
-    Record_004ab3a0 record;
+struct AddBarGadgetEntry {
+    AddBarGadgetRecord record;
     char unknown_d6[0x15b - 0xd6];
 };
 
@@ -114,18 +114,18 @@ extern int __stdcall PointInRect(DialogRect* r, int x, int y);
 #include "../util/registry.h"
 extern void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 
-extern void __stdcall InitGafSequence(Ref_004ab400* ref, Src_004ab400* src, int index);
-extern int __stdcall GetGafSequenceFrame(Ref_004ab400* ref);
+extern void __stdcall InitGafSequence(GafSequenceRef* ref, Src_004ab400* src, int index);
+extern int __stdcall GetGafSequenceFrame(GafSequenceRef* ref);
 #include "mouse.h"
 
-extern void __stdcall AdvanceGafSequence(Ref_004ab400* ref, int step);
+extern void __stdcall AdvanceGafSequence(GafSequenceRef* ref, int step);
 extern void __stdcall PopMouseEvent(MouseEvent* out);
 
 extern void __stdcall DrawTextInput(Gui* control, int index);
 extern int __stdcall GetTextPixelWidth(unsigned char* text);
 void* GetDisplay();
 
-static inline int FindPanel_004aa8f0(Layer* layer)
+static inline int FindPanelGadget(Layer* layer)
 {
     Gadget* base = layer->entries;
     int i;
@@ -189,7 +189,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
         }
         if (ReadGuiFile(entry, layerName) != 0) {
           if (mask != 0) {
-            int idx = FindPanel_004aa8f0(layer);
+            int idx = FindPanelGadget(layer);
             if (idx != -1) {
                 layer->entries[idx].active = 0;
                 flags |= 0x20;
@@ -442,30 +442,30 @@ int __stdcall SetBackgroundSurface(Gui* menu, int value)
 }
 
 // FUNCTION: 0x4ab2b0
-int __stdcall AddButtonGadget(Gui* obj, Record_004ab2b0* record)
+int __stdcall AddButtonGadget(Gui* obj, AddButtonGadgetRecord* record)
 {
     Gadget* entries = obj->layer->entries;
     if (entries->u.count == 200) {
         return 0;
     }
     short n = ++entries->u.count;
-    Record_004ab2b0* dst = (Record_004ab2b0*)&entries[n];
+    AddButtonGadgetRecord* dst = (AddButtonGadgetRecord*)&entries[n];
     *dst = *record;
     dst->type = 1;
     return 1;
 }
 
 // FUNCTION: 0x4ab310
-int __stdcall AddHotspotGadget(Gui* obj, Record_004ab310* record)
+int __stdcall AddHotspotGadget(Gui* obj, AddHotspotGadgetRecord* record)
 {
-    Entry_004ab310* entries = (Entry_004ab310*)obj->layer->entries;
+    AddHotspotGadgetEntry* entries = (AddHotspotGadgetEntry*)obj->layer->entries;
     if (entries->record.count == 200) {
         return 0;
     }
     short n = ++entries->record.count;
     entries[n].record = *record;
     entries[n].record.type = 6;
-    Entry_004ab310* dst = (Entry_004ab310*)&obj->layer->entries[n];
+    AddHotspotGadgetEntry* dst = (AddHotspotGadgetEntry*)&obj->layer->entries[n];
     dst->record.callback = 0;
     dst->record.image = 0;
     dst->record.frame = 0;
@@ -474,9 +474,9 @@ int __stdcall AddHotspotGadget(Gui* obj, Record_004ab310* record)
 }
 
 // FUNCTION: 0x4ab3a0
-int __stdcall AddBarGadget(Gui* obj, Record_004ab3a0* record)
+int __stdcall AddBarGadget(Gui* obj, AddBarGadgetRecord* record)
 {
-    Entry_004ab3a0* entries = (Entry_004ab3a0*)obj->layer->entries;
+    AddBarGadgetEntry* entries = (AddBarGadgetEntry*)obj->layer->entries;
     if (entries->record.count == 200) {
         return 0;
     }
@@ -490,17 +490,17 @@ int __stdcall AddBarGadget(Gui* obj, Record_004ab3a0* record)
 void __stdcall SetCursorAnimation(Gui* p, Src_004ab400* src)
 {
     p->src_2c = src;
-    InitGafSequence((Ref_004ab400*)&p->cursorIndex, src, 0);
+    InitGafSequence((GafSequenceRef*)&p->cursorIndex, src, 0);
     p->cursorFlags |= 1;
-    SetCursorSprite(GetGafSequenceFrame((Ref_004ab400*)&p->cursorIndex));
+    SetCursorSprite(GetGafSequenceFrame((GafSequenceRef*)&p->cursorIndex));
 }
 
 static inline void SetSource(Gui* p, Src_004ab400* src)
 {
     if ((Src_004ab400*)p->cursorSrc == src)
         return;
-    InitGafSequence((Ref_004ab400*)&p->cursorIndex, src, 0);
-    SetCursorSprite(GetGafSequenceFrame((Ref_004ab400*)&p->cursorIndex));
+    InitGafSequence((GafSequenceRef*)&p->cursorIndex, src, 0);
+    SetCursorSprite(GetGafSequenceFrame((GafSequenceRef*)&p->cursorIndex));
     p->cursorFlags |= 1;
 }
 
@@ -592,13 +592,13 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
 {
     if (p->cursorFlags & 1) {
         int old = p->cursorIndex;
-        AdvanceGafSequence((Ref_004ab400*)&p->cursorIndex, p->animTimer);
+        AdvanceGafSequence((GafSequenceRef*)&p->cursorIndex, p->animTimer);
         if (p->cursorIndex != old)
-            SetCursorSprite(GetGafSequenceFrame((Ref_004ab400*)&p->cursorIndex));
+            SetCursorSprite(GetGafSequenceFrame((GafSequenceRef*)&p->cursorIndex));
     }
 
     MouseEvent e;
-    if (PeekMouseEvent((Event_4c2d60 *)&e) != 0) {
+    if (PeekMouseEvent((MouseQueueEvent *)&e) != 0) {
         if (p->layer != 0) {
             DialogRect r;
             GetGadgetScreenRect((char *)p->layer->entries, 0, (Rect *)&r);
@@ -747,32 +747,32 @@ done:
 #include <math.h>
 
 #pragma pack(push, 1)
-struct PalEntry_004aa8f0 {
+struct RemapPaletteEntry {
     unsigned char r;
     unsigned char g;
     unsigned char b;
     unsigned char flags;
 };
 
-struct Palette_004aa8f0 {
+struct RemapPalette {
     char unknown_0[0xb2];
-    PalEntry_004aa8f0 dest[256];
+    RemapPaletteEntry dest[256];
     char unknown_4b2[0x400];
     unsigned char table[256];
 };
 
-struct Slider_004aa8f0 {
+struct PaletteSliderGadget {
     char unknown_0[0x140];
     unsigned char value;
 };
 
-struct PaletteDialog_004aa8f0 {
+struct PaletteEditorDialog {
     char unknown_0[0x9b2];
     int index;
     char unknown_9b6[0xcb6 - 0x9b6];
-    Slider_004aa8f0* red;
-    Slider_004aa8f0* green;
-    Slider_004aa8f0* blue;
+    PaletteSliderGadget* red;
+    PaletteSliderGadget* green;
+    PaletteSliderGadget* blue;
 };
 
 #pragma pack(pop)
@@ -1070,7 +1070,7 @@ char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index)
     return buf;
 }
 
-static inline int Measure_004ac610(unsigned char* text, int charset)
+static inline int MeasureTruncatedText(unsigned char* text, int charset)
 {
     if (charset == -1)
         return GetTextPixelWidth(text);
@@ -1097,7 +1097,7 @@ void __stdcall TruncateTextWithEllipsis(Gui* obj, unsigned char* text, int limit
             return;
     }
 
-    dots = flag ? Measure_004ac610((unsigned char*)"...", charset) : 0;
+    dots = flag ? MeasureTruncatedText((unsigned char*)"...", charset) : 0;
 
     unsigned char* end = text;
     while (*end)
@@ -1108,7 +1108,7 @@ void __stdcall TruncateTextWithEllipsis(Gui* obj, unsigned char* text, int limit
             break;
         end--;
         *end = 0;
-        width = Measure_004ac610(text, charset);
+        width = MeasureTruncatedText(text, charset);
     }
 
     if (flag)
@@ -1127,12 +1127,12 @@ struct BmpInfo;
 struct BmpInfoHeader;
 
 // FUNCTION: 0x4ac710
-void __stdcall BuildColorRemapTable(PalEntry_004aa8f0* src, PalEntry_004aa8f0* dest, unsigned char* table)
+void __stdcall BuildColorRemapTable(RemapPaletteEntry* src, RemapPaletteEntry* dest, unsigned char* table)
 {
     for (int n = 256; n != 0; n--) {
         int i = 0;
         int best = 9999999;
-        PalEntry_004aa8f0* p = dest;
+        RemapPaletteEntry* p = dest;
         int b = src->b;
         int g = src->g;
         int r = src->r;
@@ -1149,19 +1149,17 @@ void __stdcall BuildColorRemapTable(PalEntry_004aa8f0* src, PalEntry_004aa8f0* d
     }
 }
 
-void __stdcall ApplySlidersToPaletteEntry(PaletteDialog_004aa8f0* obj, PalEntry_004aa8f0* palette);
-
 // FUNCTION: 0x4ac7d0
-void __stdcall RemapPaletteToClosestIndices(Palette_004aa8f0* pal, PalEntry_004aa8f0* src, PalEntry_004aa8f0* copy)
+void __stdcall RemapPaletteToClosestIndices(RemapPalette* pal, RemapPaletteEntry* src, RemapPaletteEntry* copy)
 {
     memcpy(pal->dest, copy, 0x400);
 
     unsigned char* table = pal->table;
-    PalEntry_004aa8f0* p = pal->dest;
+    RemapPaletteEntry* p = pal->dest;
     for (int n = 256; n != 0; n--) {
         int i = 0;
         int best = 9999999;
-        PalEntry_004aa8f0* q = src;
+        RemapPaletteEntry* q = src;
         int bestIndex;
         for (; i < 256; i++, q++) {
             int d = abs(p->r - q->r) + abs(p->b - q->b) + abs(p->g - q->g);
@@ -1291,9 +1289,9 @@ int __stdcall GetColorCellAt(Gui* obj, int x, int y)
 }
 
 // FUNCTION: 0x4acc70
-void __stdcall ApplySlidersToPaletteEntry(PaletteDialog_004aa8f0* obj, PalEntry_004aa8f0* palette)
+void __stdcall ApplySlidersToPaletteEntry(PaletteEditorDialog* obj, RemapPaletteEntry* palette)
 {
-    PalEntry_004aa8f0 c;
+    RemapPaletteEntry c;
     c.r = obj->red->value;
     c.g = obj->green->value;
     c.b = obj->blue->value;

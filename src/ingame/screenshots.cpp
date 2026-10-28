@@ -64,9 +64,9 @@ void MainFrameTick()
         SaveScreenshot(path, g_screenshotPrefix);
         (*(int*)&g_game->lastTick) = GetTicks();
     }
-    PeekMouseEvent((Event_4c2d60 *)&first);
+    PeekMouseEvent((MouseQueueEvent *)&first);
     UpdateMenu(g_game->menu_519);
-    PeekMouseEvent((Event_4c2d60 *)&second);
+    PeekMouseEvent((MouseQueueEvent *)&second);
     UpdateCdCategoryByActivity();
     PlayNextSpeech();
     if (first.fields[4] == second.fields[4])

@@ -116,6 +116,8 @@ struct Mode_004b5330 {
 struct ModeList_004b5330 {
     int count;
     Mode_004b5330* modes;
+    char unknown_8[12];
+    char* buffer;
 };
 
 struct View_4b5980 {

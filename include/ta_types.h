@@ -5592,13 +5592,6 @@ struct Mode_00446310 {
     short field_140;
 };
 
-struct ModeList_004b5330 {
-    int count;
-    Mode_00446310* modes;
-    char unknown_8[12];
-    char* buffer;
-};
-
 struct Player_004467c0 {
     char unknown_0[319];
     unsigned char alliance;
@@ -12684,16 +12677,6 @@ struct BitmapInfo_004b5510 {
     tagRGBQUAD bmiColors[256];
 };
 
-struct DirectDrawState {
-    void* ddraw;
-    void* primary;
-    void* back;
-    void* clipper;
-    void* palette;
-    void* field_98;
-    int field_9c;
-};
-
 union Flags_4b5980 {
     union { unsigned short value; struct { unsigned short opt : 1; unsigned short bit1 : 1; unsigned short gdi : 1; unsigned short bit3 : 1; unsigned short bit4 : 1; unsigned short has_c0 : 1; unsigned short has_c4 : 1; unsigned short has_c8 : 1; unsigned short has_cc : 1; unsigned short has_d0 : 1; unsigned short sound_opt : 1; unsigned short no_video : 1; unsigned short bit12 : 4; } bits; };
 };
@@ -12703,15 +12686,6 @@ struct Mode_4b5980 {
     int unknown_04;
     int unknown_08;
     int unknown_0c;
-};
-
-struct View_4b5980 {
-    int x;
-    int y;
-    int z;
-    int unknown_0c;
-    int unknown_10;
-    int unknown_14;
 };
 
 struct Event_4b5cc0 {
@@ -13314,14 +13288,6 @@ struct Point_004bf260 {
     int y;
 };
 
-struct Game_004bfe10 {
-    char unknown_0[204];
-    int field_cc;
-    char unknown_d0[33];
-    unsigned char flags;
-    char unknown_f2[2];
-};
-
 struct Point_004c0330 {
     int x;
     int y;
@@ -13835,12 +13801,6 @@ struct Obj_004c61b0 {
 struct Class_004c61f0 {
     char unknown_0[152];
     int field_98;
-};
-
-struct Arg_004c6210 {
-    int unknown_0;
-    Intf_004c6210* field_4;
-    Intf_004c6210* field_8;
 };
 
 class Intf_004c6210 {

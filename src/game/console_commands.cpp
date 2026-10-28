@@ -138,10 +138,7 @@ struct Point_00417f60 {
 #include "../graphics/rect.h"
 #include "../state/sim_globals.h"
 
-struct Pair_00419560 {
-    int a;
-    int b;
-};
+#include "../network/net_stats.h"
 
 #include "console_commands.h"
 #include "console_commands.h"

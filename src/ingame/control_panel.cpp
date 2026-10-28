@@ -13,10 +13,7 @@
 
 struct Option_00419560;
 
-struct Pair_00419560 {
-    int a;
-    int b;
-};
+#include "../network/net_stats.h"
 
 struct Unit;
 struct Player;

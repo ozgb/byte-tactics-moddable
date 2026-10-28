@@ -6,11 +6,6 @@
 #include "../game/game.h"
 #pragma pack(pop)
 
-struct Pair_00419560 {
-    int a;
-    int b;
-};
-
 #include "net_stats.h"
 #include "../../link/globals.h"
 

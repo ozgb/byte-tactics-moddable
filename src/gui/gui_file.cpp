@@ -61,6 +61,28 @@ void __stdcall WriteKeyValue(FileHandle* file, char* key, char* value, int depth
 #pragma auto_inline(on)
 
 #pragma pack(push, 1)
+struct Sub34_004aeac0 {
+    short range;
+    short maxchars;
+    char pad0[0x13c - 0x13a];
+    int thick;
+    short knobpos;
+    short knobsize;
+    void* sliderCallback;
+    char pad1[0x15b - 0x148];
+};
+
+struct Sub5_004aeac0 {
+    char link[0x11];
+    char hotkey;
+    char pad0[0x15b - 0x148];
+};
+
+union Tail_004aeac0 {
+    Sub34_004aeac0 s34;
+    Sub5_004aeac0 s5;
+};
+
 struct Common_004ad350 {
     unsigned char id;
     unsigned char assoc;
@@ -79,6 +101,8 @@ struct Common_004ad350 {
     char unknown_2b[8];
     char help[0x81];
     unsigned short gaffile;
+    char text[0x80];
+    Tail_004aeac0 tail;
 };
 #pragma pack(pop)
 
@@ -909,28 +933,6 @@ union Body_004aeac0 {
     short total;
     Sub2_004aeac0 s2;
     Sub6_004aeac0 s6;
-};
-
-struct Sub34_004aeac0 {
-    short range;
-    short maxchars;
-    char pad0[0x13c - 0x13a];
-    int thick;
-    short knobpos;
-    short knobsize;
-    void* sliderCallback;
-    char pad1[0x15b - 0x148];
-};
-
-struct Sub5_004aeac0 {
-    char link[0x11];
-    char hotkey;
-    char pad0[0x15b - 0x148];
-};
-
-union Tail_004aeac0 {
-    Sub34_004aeac0 s34;
-    Sub5_004aeac0 s5;
 };
 
 struct Elem_004aeac0 {

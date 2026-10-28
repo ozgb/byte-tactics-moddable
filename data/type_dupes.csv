@@ -4,6 +4,8 @@ BlockInfo,no,2,include/ta_types.h:13743|src/debug/debug_lib.cpp:348,differs,src/
 BmpWriter,no,2,src/graphics/pcx.cpp:594|src/ingame/keys.cpp:35,differs,src/graphics/pcx.cpp
 Channel_004b0c40,no,2,include/ta_types.h:11006|src/units/cob.cpp:8,same-layout,src/units/cob.cpp
 Class_0046eba0,no,2,include/ta_types.h:7157|src/network/unit_sync.cpp:321,differs,src/network/unit_sync.cpp
+CreateUnitFixed,no,2,src/game/game_load.cpp:20|src/game/main_loop.cpp:57,identical,src/game/game_load.cpp
+CreateUnitPos,no,2,src/game/game_load.cpp:28|src/game/main_loop.cpp:65,identical,src/game/game_load.cpp
 DisplayContext,no,2,src/graphics/palette.cpp:6|src/gui/keyboard.cpp:16,differs,src/graphics/palette.cpp
 EmptyStringRep,no,2,link/globals.h:214|src/graphics/surface.cpp:1629,identical,link/globals.h
 Entry,no,2,include/ta_types.h:3346|src/harness/block_scan.cpp:20,differs,src/harness/block_scan.cpp

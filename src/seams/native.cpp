@@ -394,7 +394,7 @@ static void __fastcall SaveConditionsNative(MissionConditions* self, int unusedE
 
 static void __fastcall RegisterConditionsNative(MissionConditions* self, int unusedEdx, TdfFile* mission)
 {
-    self->RegisterConditions((Param_0048e010*)mission);
+    self->RegisterConditions((ConditionParams*)mission);
 }
 
 static void __fastcall FreeConditionsNative(MissionConditions* self)

@@ -51,13 +51,13 @@ struct AnimSrc_00423550;
 struct Anim_00424890;
 struct Anim_004394e0;
 struct Anim_00439740;
-struct App_0049e830;
+struct GameMainDisplayContext;
 struct App_004bec70;
 struct App_004bed70;
 struct App_004c0b10;
 struct App_004c25e0;
 struct Arena_004da9f0;
-struct Arg_00419670;
+struct ViewMouseEvent;
 struct Arg_004c6210;
 struct LobbyJoinArgs;
 struct Arr_00421550;
@@ -74,8 +74,8 @@ class Base_00490a10_2;
 class Base_00490a10_3;
 struct Base_004d8ae0;
 struct Big_004b1ec0;
-struct BitFlags16_00499200;
-struct BitFlags_004197d0;
+struct NetGameFlagBits;
+struct CursorInputBits;
 struct BitmapInfo_004b5510;
 struct Bitmap_00437b50;
 struct Bitmap_004caec0;
@@ -103,8 +103,8 @@ struct Buffer_004636b0;
 struct Buffer_004b39c0;
 struct Buffer_461020;
 struct Buffers_00462d30;
-struct BuildEntry_0041ace0;
-struct BuildList_0041ace0;
+struct BuildMenuEntry;
+struct BuildMenuPage;
 struct BuildList_0045a950;
 struct Button_0041e420;
 struct Button_004a7f70;
@@ -112,7 +112,7 @@ struct ByteMap_00408090;
 struct CalcedExplosion;
 struct Callback;
 struct Callback_0043a1f0;
-struct CdLists_490f80;
+struct CdListsBlock;
 struct Cell;
 struct Cell_0040d8b0;
 struct Cell_0040d900;
@@ -286,7 +286,7 @@ class Class_0044dd00;
 class Class_0044de80;
 class Class_0044df80;
 class Class_0044dfb0;
-class Class_0044e080;
+class PathOrderView;
 class Class_0044e190;
 class Class_0044e250;
 class Class_0044e2d0;
@@ -863,7 +863,7 @@ struct DisplayContext;
 struct SyncMapPredArg;
 struct CobFile_0042d1f0;
 struct Color_004acc70;
-struct Colors_00467b60;
+struct ProgressBarColors;
 struct ColourEntry_00478790;
 struct Colour_00478790;
 struct Common_004ad350_2;
@@ -881,8 +881,8 @@ union Coord_0044f2a0;
 struct Count_00458d20;
 class CritSec_004e1ac0;
 struct Ctx_004720d0;
-struct Ctx_00499890;
-struct CursorState_0041cc60;
+struct MainFrameDisplayContext;
+struct GameCursorState;
 struct CursorState_0041cd20;
 class DDraw_0047bf70;
 struct DPNAME;
@@ -936,7 +936,7 @@ class DirectPlay_4ca7c0;
 class DirectPlay_4ca800;
 class DirectPlay_4ca840;
 struct DisplaySurface;
-struct Display_0041ce90;
+struct EdgeScrollDisplay;
 struct Display_0041da60;
 struct Display_0041ec50;
 struct Display_0041f760;
@@ -968,13 +968,13 @@ struct Display_004c6e70;
 struct Display_004c8020;
 struct Driver_004c6890;
 class Dummy_00440be0;
-union Dword_0051f410;
+union DisplayContextFlags;
 struct Effect;
 struct Effects;
 struct ElemA_0046c190;
 struct ResetProgressBarEntries;
 struct ElemB_0046c190;
-struct Elem_00401000;
+struct ConstructedElement;
 struct Elem_0040cc40;
 struct Elem_0040cc40_2;
 struct Elem_0040cfb0;
@@ -982,7 +982,7 @@ struct Elem_0040d4f0;
 struct Elem_0040d550;
 struct Elem_0040f110;
 struct Elem_004222e0;
-struct Elem_0042a140;
+struct ModelTextureEntry;
 struct Elem_00432be0;
 struct Elem_00432be0_2;
 struct Elem_004336c0;
@@ -1113,9 +1113,9 @@ struct File_004b4910;
 struct File_004bdd70;
 struct File_004be070;
 struct File_004be400;
-struct FindData_0041d4c0;
-struct FindData_0042a440;
-struct FindData_00495930;
+struct ArchiveFindData;
+struct TextureFindData;
+struct ScreenshotFindData;
 struct FindData_004bc930;
 struct FindData_004bca30;
 struct FindData_004bcd10;
@@ -1135,7 +1135,7 @@ union Fixed_0049abb0;
 union Fixed_2;
 union Fixed_3;
 union Fixed_4;
-union Fixed_497180;
+union CreateUnitFixed;
 union Fixed_5;
 class Fixed_6;
 struct FlagBits_00457d30;
@@ -1145,7 +1145,7 @@ union FlagWord;
 union Flags114_485a40;
 union Flags142f0_00466dc0;
 struct Flags16_00493bf0;
-union Flags16_00499200;
+union NetGameFlags;
 struct Flags241_00466dc0;
 struct FlagsBits_0049cc20;
 union FlagsU_00419670;
@@ -1159,20 +1159,20 @@ struct Flags_00417090;
 struct Flags_00417300;
 struct Flags_004177a0;
 struct Flags_00419670;
-union Flags_004197d0;
+union CursorInputFlags;
 struct Flags_004268b0;
 struct Flags_004269d0;
 struct Flags_0043e490;
 union Flags_0045c570;
 union Flags_0045d280;
-struct Flags_0046a530;
+struct SelectionBoxFlags;
 union Flags_004898b0;
 union Flags_004898b0_2;
-struct Flags_00495e90_37ebe;
-struct Flags_00495e90_37f06;
-struct Flags_00495e90_38a51;
-union Flags_00495e90_3923b;
-struct Flags_00496ce0;
+struct OrdersPanelFlags;
+struct GraphicsOptionFlags;
+struct BroadcastToggleFlags;
+union InfoModeFlags;
+struct PreBattleFlags;
 struct Flags_00499cd0;
 struct Flags_0049e010;
 struct Flags_0049e1a0;
@@ -1184,7 +1184,7 @@ struct Flags_418ca0;
 struct Flags_418fd0;
 union Flags_4b5980;
 struct FloatVec;
-struct Follow_0041ca10;
+struct CameraFollowTarget;
 struct FontGlyphTable;
 struct Form_00464e70;
 struct Fp_004bbff0;
@@ -1265,7 +1265,7 @@ struct Header_004cac40;
 struct Heading_0049cde0;
 struct HeapNode_0040f000;
 struct Heap_0040e630;
-struct Holder_00401000;
+struct ConstructedElementArray;
 struct Holder_0041e420;
 struct Holder_00479bf0;
 struct Holder_004908c0;
@@ -1276,7 +1276,7 @@ struct IDirectSound3DBuffer;
 struct IconSet_00466780;
 class Id_004df1e0;
 struct Ids_0046d970;
-class Iface_00417f30;
+class GoalDrawInterface;
 class Iface_0043dd20;
 class Iface_4ca590;
 struct ImageFrame;
@@ -1367,12 +1367,12 @@ class Listener_00470fb0;
 class Listener_00471120;
 class Listener_004896f0;
 class Listener_00489740;
-class Listener_0048f250;
-class Listener_0048ff40;
+class RadiusUnitVisitor;
+class UnitScanVisitor;
 class Listener_0048ff40_2;
 class Listener_0048ff40_3;
 struct LiveNode;
-union LoadFlags_00497f40;
+union LoadingFlags;
 class Lobby_4c9a70;
 struct LockEntry_004c5d90;
 struct LogoFrameEntry;
@@ -1407,7 +1407,7 @@ struct Message_004565a0;
 struct Message_0047f780;
 struct Mid_00462d30;
 struct MissionFeature_00436c30;
-struct MissionFlags_0042f9a0;
+struct AllMissionsFlags;
 struct MissionName_00467e50;
 struct MissionRule_00436c30;
 struct MissionUnit_00436c30;
@@ -1418,7 +1418,7 @@ struct DisplayMode;
 struct Mode_4b5980;
 struct Model_00424890;
 struct Model_00424c00;
-struct Model_0042a140;
+struct TexturedModel;
 struct Mouse_0041ce90;
 struct Movement;
 struct Msg13_00456310;
@@ -1438,7 +1438,7 @@ struct NameNe_004b7760;
 struct NameTable_004b0830;
 struct ReportPlayerName;
 struct Name_004866d0;
-struct Name_0048d630;
+struct SideCommanderName;
 struct Named_004c4450;
 class Mission;
 struct Net2_4517b0;
@@ -1489,7 +1489,7 @@ struct Obj;
 struct Obj18_004aff00;
 struct Obj1_49fd20;
 struct Obj2_49fd20;
-struct Obj_00401320;
+struct ResourceAccountView;
 struct Obj_0041b200;
 struct Obj_00423bf0;
 struct Obj_00426e80;
@@ -1669,7 +1669,7 @@ struct PathCell;
 struct PathGrid;
 class PathMap;
 struct Path_004bc640;
-struct Pic_004295b0;
+struct RadarPicHeader;
 struct Pic_4665d0;
 struct Piece;
 struct PieceBits_00487080;
@@ -1689,7 +1689,7 @@ struct PlayerInfo_00466dc0;
 struct PlayerInfo_0046dad0;
 class UnitResources;
 struct PlayerRes_00401360;
-struct PlayerSlots_00497f40;
+struct LoadingPlayerSlots;
 struct Player_00407ae0;
 struct Player_00409730;
 struct Player_0041a920;
@@ -1718,12 +1718,12 @@ struct Player_48efb0;
 struct Point16;
 struct Point16_00437de0;
 struct PointInit_0043a1f0;
-struct Point_00417f60;
-struct Point_0041cd50;
+struct Point;
+struct CursorPoint;
 struct Point_0046ba80;
 struct Point_0048c6a0;
 struct Point_004948e0;
-struct Point_00498cd0;
+struct Point;
 struct HandleHotspotInputPoint;
 struct Point_004bf060;
 struct Point_004bf260;
@@ -1748,7 +1748,7 @@ struct Pos_00485330;
 struct Pos_0048d630;
 struct Pos_004cf570;
 struct Pos_4589c0;
-class Prim_0046bae0;
+class ProjectedPrimitive;
 struct Quad;
 class Queue_00461f90;
 struct KeyQueueDisplay;
@@ -1793,7 +1793,7 @@ struct PlayerRuleView;
 struct S;
 struct SaveDesc_0043a420;
 struct SaveRec_00487080;
-struct Save_00492df0;
+struct SaveGameScreenState;
 struct SavedPiece_004876c0;
 struct Saved_00493bf0;
 struct Screen_004a75d0;
@@ -1820,23 +1820,23 @@ struct SessionDesc_4c9dd0;
 struct Settings;
 struct GameSessionSettings;
 struct Settings_00460160;
-struct Settings_00496e10;
+struct MissionOptionFlags;
 struct Settings_00496e10_2;
 struct Shape;
 struct Shape_00472ab0;
 struct Shot_0049cc20;
 struct Shot_0049d000;
-struct Side_00431a60;
-struct Size_0046b9d0;
+struct SideDef;
+struct TileOutlineSize;
 struct SkirmishPlayer;
 struct Slider_004acc70;
 struct Slot;
-struct Slot_0041e420;
+struct EndGamePlayerSlot;
 struct Slot_0042f740;
 struct Slot_004390a0;
 struct Slot_00471120;
 union Slot_00483610;
-struct Slot_0048cd80;
+struct HotRadarSlot;
 struct Slot_4b62d0;
 struct Smack_0047c330;
 struct SmackerSurface;
@@ -1845,7 +1845,7 @@ struct SmkStats_0047c530;
 struct Smk_0047bf70;
 struct Smk_0047bf70_b;
 struct MenuSpark;
-struct Snapshot_0046a860;
+struct UnitInfoSnapshot;
 struct SoundInfo_005086fc;
 struct Sound_0047f210;
 struct Sound_45ffb0;
@@ -1877,7 +1877,7 @@ struct ReadNuttinFieldRecord;
 struct ReadStatusFieldSource;
 struct ReadNuttinFieldSource;
 struct Struct_0040bab0;
-struct Struct_004907e0;
+struct GoalOwnerUnit;
 struct Struct_0049fb50;
 struct Struct_0049fba0;
 struct Struct_0049fbf0;
@@ -1891,8 +1891,8 @@ struct Struct_004c2ac0_2;
 struct Struct_004c6ac0;
 struct Sub;
 struct Sub_00409520;
-struct Sub_004679a0_a;
-struct Sub_004679a0_b;
+struct LightBarCounters;
+struct LightBarSprite;
 struct Sub_0046e000;
 struct Sub_00477360;
 struct Sub_00496b10;
@@ -1944,7 +1944,7 @@ struct Texture_00421700;
 struct Thing_0043f0e0;
 struct TlsBlock;
 struct TntHeader_00483610;
-struct Trail_004394e0;
+struct PathAnimTrail;
 class Tree_004da8d0;
 struct Triple_004e0570;
 union UType_0042b370_flags;
@@ -1991,7 +1991,7 @@ struct Unit_00438880;
 struct Unit_0044dfb0;
 struct Unit_0044e7d0;
 struct Unit_00452570;
-struct Unit_00467960;
+struct RadarJamUnit;
 struct Unit_00467980;
 struct Unit_0046e3c0;
 struct Unit_0047fad0;
@@ -2040,9 +2040,9 @@ struct Weapon_3;
 struct Widget_00464f80;
 struct Word_004afd80;
 struct Word_004aff00;
-union Word_0051f522;
+union DisplayVideoFlags;
 struct Wrap_00433270;
-struct Zero11_004917d0;
+struct ChatRecipients;
 
 class Obj_2 {
 public:
@@ -3325,7 +3325,7 @@ struct Flags_418fd0 {
     char unknown_0[2];
 };
 
-#include "../src/ingame/arg_00419670.h"
+#include "../src/ingame/view_mouse_event.h"
 
 struct Flags_00419670 {
     unsigned int bits_0 : 6;
@@ -3339,9 +3339,9 @@ union FlagsU_00419670 {
     union { unsigned int raw; Flags_00419670 bits; };
 };
 
-#include "../src/ingame/bit_flags_004197d0.h"
+#include "../src/ingame/cursor_input_bits.h"
 
-#include "../src/ingame/flags_004197d0.h"
+#include "../src/ingame/cursor_input_flags.h"
 
 struct Entry {
     unsigned char type;
@@ -3471,9 +3471,9 @@ struct CursorState_0041cd20 {
     int flag;
 };
 
-#include "../src/ingame/point_0041cd50.h"
+#include "../src/ingame/cursor_point.h"
 
-#include "../src/ingame/cursor_state_0041cc60.h"
+#include "../src/ingame/game_cursor_state.h"
 
 struct Mouse_0041ce90 {
     int x;
@@ -3545,7 +3545,7 @@ struct Button_0041e420 {
     int flags;
 };
 
-#include "../src/game/slot_0041e420.h"
+#include "../src/game/end_game_player_slot.h"
 
 struct Display_0041ec50 {
     char unknown_0[1556];
@@ -4259,9 +4259,9 @@ public:
     int SetAuxVolume(int, int);
 };
 
-#include "../src/ingame/flags_00495e90_37f06.h"
+#include "../src/ingame/graphics_option_flags.h"
 
-#include "../src/game/mission_flags_0042f9a0.h"
+#include "../src/game/all_missions_flags.h"
 
 class Class_004cfff0 {
 public:
@@ -4300,7 +4300,7 @@ struct Entry_00431a20 {
     char unknown_4[558];
 };
 
-#include "../src/game/side_00431a60.h"
+#include "../src/game/side_def.h"
 
 class Class_004b3630 {
 public:
@@ -5780,7 +5780,7 @@ public:
     virtual void SerializeSave(void);
     virtual void FUN_0044ce40(void);
     virtual void IsFxStyle(void);
-    virtual int FUN_0044cf00(Struct_004907e0*);
+    virtual int FUN_0044cf00(GoalOwnerUnit*);
     virtual int ContainsCell(int, int);
     virtual void FillGoalCells(void);
     virtual void ApproxDist(void);
@@ -6354,7 +6354,7 @@ union Flags_0045d280 {
     union { unsigned short word; Bits_0045d280 bits; unsigned char byte; };
 };
 
-#include "../src/ingame/flags_00495e90_37ebe.h"
+#include "../src/ingame/orders_panel_flags.h"
 
 struct Point_004948e0 {
     int x;
@@ -7056,9 +7056,9 @@ struct Unit_00467980 {
     unsigned int flags;
 };
 
-#include "../src/ingame/sub_004679a0_a.h"
+#include "../src/ingame/light_bar_counters.h"
 
-#include "../src/ingame/sub_004679a0_b.h"
+#include "../src/ingame/light_bar_sprite.h"
 
 struct PlayerData_467c00 {
     char unknown_0[150];
@@ -7096,7 +7096,7 @@ struct Class_004c6b10 {
 
 #include "../src/ingame/map_grid.h"
 
-#include "../src/ingame/snapshot_0046a860.h"
+#include "../src/ingame/unit_info_snapshot.h"
 
 struct Point_0046ba80 {
     int x;
@@ -10083,7 +10083,7 @@ public:
     int SetCdCallback(void (__stdcall *)(void));
 };
 
-#include "../src/game/zero11_004917d0.h"
+#include "../src/game/chat_recipients.h"
 
 struct Saved_00493bf0 {
     int a;
@@ -10135,17 +10135,17 @@ struct Class_004cb940 {
     bool WriteRows(Image_004cb940*, int, int, int, int, int, int);
 };
 
-#include "../src/ingame/flags_00495e90_38a51.h"
+#include "../src/ingame/broadcast_toggle_flags.h"
 
-#include "../src/ingame/flags_00495e90_3923b.h"
+#include "../src/ingame/info_mode_flags.h"
 
 struct Sub_00496b10 {
     char unknown_0[166];
 };
 
-#include "../src/game/flags_00496ce0.h"
+#include "../src/game/pre_battle_flags.h"
 
-#include "../src/game/settings_00496e10.h"
+#include "../src/game/mission_option_flags.h"
 
 struct PlayerFlags_497180 {
     unsigned short low : 8;
@@ -10172,13 +10172,13 @@ public:
     int IsCdPlaying(void);
 };
 
-#include "../src/game/load_flags_00497f40.h"
+#include "../src/game/loading_flags.h"
 
-#include "../src/game/player_slots_00497f40.h"
+#include "../src/game/loading_player_slots.h"
 
-#include "../src/ingame/bit_flags16_00499200.h"
+#include "../src/ingame/net_game_flag_bits.h"
 
-#include "../src/ingame/flags16_00499200.h"
+#include "../src/ingame/net_game_flags.h"
 
 struct Packet_00499ba0 {
     unsigned char type;
@@ -10676,7 +10676,7 @@ struct Class_004a6a40 {
     int unknown_28;
     Src_004ab400* src_2c;
     Handle ref;
-    Arg_00419670 point;
+    ViewMouseEvent point;
     int field_54;
     char unknown_58[4];
     Flags_004ab440 flags_5c;
@@ -12073,19 +12073,19 @@ struct Input_004c2cc0 {
 struct Queue_4c2d60 {
     char unknown_0[390];
     int capacity;
-    Arg_00419670* entries;
+    ViewMouseEvent* entries;
     int head;
     int tail;
-    Arg_00419670 empty;
+    ViewMouseEvent empty;
 };
 
 struct Queue_4c2de0 {
     char unknown_0[390];
     int capacity;
-    Arg_00419670* entries;
+    ViewMouseEvent* entries;
     int head;
     int tail;
-    Arg_00419670 empty;
+    ViewMouseEvent empty;
 };
 
 struct Queue_4c2e30 {

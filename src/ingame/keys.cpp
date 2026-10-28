@@ -11,13 +11,13 @@ struct Layer {
     int value;
 };
 
-typedef Layer Struct_004958c0;
+typedef Layer StopOrderLayer;
 
 class Mission;
 
 #include "../gui/gui.h"
 
-struct Flags_00495e90_37f2f {
+struct DebugKeyFlags {
     unsigned short b0 : 1;
     unsigned short b1 : 1;
     unsigned short rest : 14;
@@ -27,7 +27,7 @@ struct Flags_00495e90_37f2f {
 
 #include "../network/player.h"
 
-struct FindData_00495930 {
+struct ScreenshotFindData {
     char unknown_0[0x14];
     char name[260];
 };
@@ -48,7 +48,7 @@ void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 
 struct Surface;
 
-struct SrcHolder_00495a30 {
+struct DisplayFrameHolder {
     char unknown_0[0xbc];
     Surface* frame;
 };
@@ -136,7 +136,7 @@ void __stdcall SetOrSelectStopOrder(int set)
 void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name, const char* ext)
 {
     bool needSep = false;
-    FindData_00495930 fd;
+    ScreenshotFindData fd;
     int max = 0;
 
     if (*dir != 0) {
@@ -210,7 +210,7 @@ void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h
 
             g_game->textLines = 0;
             SurfaceFromFrame(&surf, bm);
-            FrameFromSurface(&pal, ((SrcHolder_00495a30*)GetDisplay())->frame);
+            FrameFromSurface(&pal, ((DisplayFrameHolder*)GetDisplay())->frame);
 
             pal.transparency = 0;
             int row = 0;
@@ -435,7 +435,7 @@ void HandleGameKey(void)
         break;
 
     case 0xd7: {
-        if ((*(Flags_00495e90_37f2f*)&g_game->uiOptionFlags_37f2f).b1) {
+        if ((*(DebugKeyFlags*)&g_game->uiOptionFlags_37f2f).b1) {
             if (g_game->movieCaptureIndex != 0) {
                 g_game->movieCaptureIndex = 0;
             } else {
@@ -465,7 +465,7 @@ void HandleGameKey(void)
     }
 
     case 0xec:
-        if ((*(Flags_00495e90_37f2f*)&g_game->uiOptionFlags_37f2f).b1) {
+        if ((*(DebugKeyFlags*)&g_game->uiOptionFlags_37f2f).b1) {
             g_game->endGameFlags_3923b.b1 = !g_game->endGameFlags_3923b.b1;
             if (g_game->endGameFlags_3923b.b1) {
                 SetDescListCleanupFlag(&g_game->gui, 0);
@@ -478,7 +478,7 @@ void HandleGameKey(void)
         break;
 
     case 0x5c:
-        if ((*(Flags_00495e90_37f2f*)&g_game->uiOptionFlags_37f2f).b1)
+        if ((*(DebugKeyFlags*)&g_game->uiOptionFlags_37f2f).b1)
             ExecuteCommandLine(0, -1);
         break;
 

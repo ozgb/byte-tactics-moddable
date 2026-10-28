@@ -10,7 +10,7 @@ class TdfRecord;
 #include "../state/sim_globals.h"
 
 
-struct FindData_0041d4c0 {
+struct ArchiveFindData {
     char unknown_0[0x14];
     char name[260];
 };
@@ -24,7 +24,7 @@ struct FindData_0041d4c0 {
 // FUNCTION: 0x41d4c0
 void RegisterDataArchives()
 {
-    FindData_0041d4c0 fd;
+    ArchiveFindData fd;
     char pattern[64];
     if (DAT_0050289c != 0) {
         HAPI_DropMissingArchives();

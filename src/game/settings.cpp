@@ -5,7 +5,7 @@
 #include "settings.h"
 
 #pragma pack(push, 1)
-struct Flags_0042f9a0 {
+struct GraphicsSettingFlags {
     unsigned short damagebars : 1;
     unsigned short antiAlias : 1;
     unsigned short shadows : 1;
@@ -25,7 +25,7 @@ struct SoundFlags {
     unsigned short speechfx : 1;
 };
 
-struct MusicFlags_0042f9a0 {
+struct MusicSettingFlags {
     unsigned short musicmode : 1;
 };
 
@@ -151,10 +151,10 @@ void LoadSettings()
     ReadSettingInt("screenchat", &Game::screenchat, 1, value);
     int ok12 = SettingGetInt((void*)"Total Annihilation", (void*)"damagebars", &value);
     if (ok12 != 0) {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).damagebars = value;
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).damagebars = value;
     } else {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).damagebars = 0;
-        SettingSetInt((void*)"Total Annihilation", (void*)"damagebars", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).damagebars);
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).damagebars = 0;
+        SettingSetInt((void*)"Total Annihilation", (void*)"damagebars", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).damagebars);
     }
     int ok13 = SettingGetInt((void*)"Total Annihilation", (void*)"Sound Mode", &value);
     if (ok13 != 0) {
@@ -193,45 +193,45 @@ void LoadSettings()
     }
     int ok18 = SettingGetInt((void*)"Total Annihilation", (void*)"Anti-Alias", &value);
     if (ok18 != 0) {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).antiAlias = value;
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).antiAlias = value;
     } else {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).antiAlias = 1;
-        SettingSetInt((void*)"Total Annihilation", (void*)"Anti-Alias", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).antiAlias);
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).antiAlias = 1;
+        SettingSetInt((void*)"Total Annihilation", (void*)"Anti-Alias", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).antiAlias);
     }
     int ok19 = SettingGetInt((void*)"Total Annihilation", (void*)"Shadows", &value);
     if (ok19 != 0) {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).shadows = value;
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).shadows = value;
     } else {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).shadows = 1;
-        SettingSetInt((void*)"Total Annihilation", (void*)"Shadows", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).shadows);
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).shadows = 1;
+        SettingSetInt((void*)"Total Annihilation", (void*)"Shadows", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).shadows);
     }
     int ok20 = SettingGetInt((void*)"Total Annihilation", (void*)"FeatureShadows", &value);
     if (ok20 != 0) {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).featureShadows = value;
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).featureShadows = value;
     } else {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).featureShadows = 1;
-        SettingSetInt((void*)"Total Annihilation", (void*)"FeatureShadows", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).featureShadows);
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).featureShadows = 1;
+        SettingSetInt((void*)"Total Annihilation", (void*)"FeatureShadows", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).featureShadows);
     }
     int ok21 = SettingGetInt((void*)"Total Annihilation", (void*)"VehicleShadows", &value);
     if (ok21 != 0) {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).vehicleShadows = value;
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).vehicleShadows = value;
     } else {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).vehicleShadows = 1;
-        SettingSetInt((void*)"Total Annihilation", (void*)"VehicleShadows", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).vehicleShadows);
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).vehicleShadows = 1;
+        SettingSetInt((void*)"Total Annihilation", (void*)"VehicleShadows", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).vehicleShadows);
     }
     int ok22 = SettingGetInt((void*)"Total Annihilation", (void*)"Shading", &value);
     if (ok22 != 0) {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).shading = value;
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).shading = value;
     } else {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).shading = 1;
-        SettingSetInt((void*)"Total Annihilation", (void*)"Shading", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).shading);
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).shading = 1;
+        SettingSetInt((void*)"Total Annihilation", (void*)"Shading", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).shading);
     }
     int ok23 = SettingGetInt((void*)"Total Annihilation", (void*)"DitheredFog", &value);
     if (ok23 != 0) {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).ditheredFog = value;
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).ditheredFog = value;
     } else {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).ditheredFog = 0;
-        SettingSetInt((void*)"Total Annihilation", (void*)"DitheredFog", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).ditheredFog);
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).ditheredFog = 0;
+        SettingSetInt((void*)"Total Annihilation", (void*)"DitheredFog", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).ditheredFog);
     }
     if (SettingGetInt((void*)"Total Annihilation", (void*)"Gamma", &value) != 0) {
         if (value == 10) {
@@ -244,10 +244,10 @@ void LoadSettings()
         SettingSetInt((void*)"Total Annihilation", (void*)"Gamma", g_game->brightness);
     }
     if (SettingGetInt((void*)"Total Annihilation", (void*)"SwitchAlt", &value) != 0) {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).switchAlt = value;
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).switchAlt = value;
     } else {
-        (*(struct Flags_0042f9a0*)&g_game->flags_37f06).switchAlt = 0;
-        SettingSetInt((void*)"Total Annihilation", (void*)"SwitchAlt", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).switchAlt);
+        (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).switchAlt = 0;
+        SettingSetInt((void*)"Total Annihilation", (void*)"SwitchAlt", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).switchAlt);
     }
     value = 0xb;
     if (SettingGetString((void*)"Total Annihilation", (void*)"Password", g_game->password_2be3_1176a, &value) == 0) {
@@ -300,9 +300,9 @@ void LoadSettings()
         g_game->unitChatText = 5;
     }
     if (SettingGetInt((void*)"Total Annihilation", (void*)"musicmode", &value) != 0) {
-        (*(struct MusicFlags_0042f9a0*)&g_game->flags_37f14_37f14).musicmode = value;
+        (*(struct MusicSettingFlags*)&g_game->flags_37f14_37f14).musicmode = value;
     } else {
-        (*(struct MusicFlags_0042f9a0*)&g_game->flags_37f14_37f14).musicmode = 1;
+        (*(struct MusicSettingFlags*)&g_game->flags_37f14_37f14).musicmode = 1;
     }
     if (SettingGetInt((void*)"Total Annihilation", (void*)"cdmode", &value) != 0) {
         g_game->cdMode = (unsigned char)value;
@@ -396,7 +396,7 @@ void LoadSettings()
         if (value == 1) g_game->uiOptionFlags_37f2f.bit1=1;
         else g_game->uiOptionFlags_37f2f.bit1=0;
     } else g_game->uiOptionFlags_37f2f.bit1=0;
-label_430e7f:
+setUiOptionDefaults:
     g_game->uiOptionFlags_37f2f.bit2 = 1;
     g_game->uiOptionFlags_37f2f.bit3 = 1;
     g_game->uiOptionFlags_37f2f.bit4 = 0;
@@ -425,7 +425,7 @@ void SaveSettings()
     SettingSetInt((void*)"Total Annihilation", (void*)"SingleLineOfSight", g_game->singleLineOfSight);
     SettingSetInt((void*)"Total Annihilation", (void*)"SingleLOSType", g_game->singleLOSType);
     SettingSetInt((void*)"Total Annihilation", (void*)"screenchat", g_game->screenchat);
-    SettingSetInt((void*)"Total Annihilation", (void*)"damagebars", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).damagebars);
+    SettingSetInt((void*)"Total Annihilation", (void*)"damagebars", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).damagebars);
     SettingSetInt((void*)"Total Annihilation", (void*)"Sound Mode", (*(struct SoundFlags*)&g_game->soundFlags).soundMode);
     SettingSetInt((void*)"Total Annihilation", (void*)"RestoreVolume", (*(struct SoundFlags*)&g_game->soundFlags).restoreVolume);
     SettingSetInt((void*)"Total Annihilation", (void*)"MixingBuffers",
@@ -436,15 +436,15 @@ void SaveSettings()
         SettingSetInt((void*)"Total Annihilation", (void*)"CDAudioVolume",
                      ((Sound*)g_game->sound)->QueryAuxVolume());
     }
-    SettingSetInt((void*)"Total Annihilation", (void*)"Anti-Alias", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).antiAlias);
-    SettingSetInt((void*)"Total Annihilation", (void*)"Shadows", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).shadows);
-    SettingSetInt((void*)"Total Annihilation", (void*)"FeatureShadows", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).featureShadows);
-    SettingSetInt((void*)"Total Annihilation", (void*)"VehicleShadows", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).vehicleShadows);
-    SettingSetInt((void*)"Total Annihilation", (void*)"Shading", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).shading);
-    SettingSetInt((void*)"Total Annihilation", (void*)"DitheredFog", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).ditheredFog);
+    SettingSetInt((void*)"Total Annihilation", (void*)"Anti-Alias", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).antiAlias);
+    SettingSetInt((void*)"Total Annihilation", (void*)"Shadows", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).shadows);
+    SettingSetInt((void*)"Total Annihilation", (void*)"FeatureShadows", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).featureShadows);
+    SettingSetInt((void*)"Total Annihilation", (void*)"VehicleShadows", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).vehicleShadows);
+    SettingSetInt((void*)"Total Annihilation", (void*)"Shading", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).shading);
+    SettingSetInt((void*)"Total Annihilation", (void*)"DitheredFog", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).ditheredFog);
     SettingSetInt((void*)"Total Annihilation", (void*)"Difficulty", g_game->difficulty);
     SettingSetInt((void*)"Total Annihilation", (void*)"Gamma", g_game->brightness);
-    SettingSetInt((void*)"Total Annihilation", (void*)"SwitchAlt", (*(struct Flags_0042f9a0*)&g_game->flags_37f06).switchAlt);
+    SettingSetInt((void*)"Total Annihilation", (void*)"SwitchAlt", (*(struct GraphicsSettingFlags*)&g_game->flags_37f06).switchAlt);
     SettingSetString((void*)"Total Annihilation", (void*)"Password", g_game->password_2be3_1176a);
     SettingSetString((void*)"Total Annihilation", (void*)"Nickname", g_game->nickname);
     SettingSetString((void*)"Total Annihilation", (void*)"Game Name", g_game->gameName_2bc1);

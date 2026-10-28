@@ -33,13 +33,13 @@ union Orders_37ebe {
     };
 };
 
-struct Slot_0048cd80 {
+struct HotRadarSlot {
     unsigned short unitId;
     int x;
     int y;
 };
 
-struct Name_0048d630 {
+struct SideCommanderName {
     char unknown_0[0x22];
     char name[0x20];
     char unknown_42[0x232 - 0x42];
@@ -252,7 +252,7 @@ void ClearUnitSelectFlags(void)
         u->flags &= 0xffffff3f;
 }
 
-static inline Unit* GetUnit_0048c190(unsigned short i)
+static inline Unit* UnitFromIndex(unsigned short i)
 {
     return i == 0 ? 0 : g_game->units + i;
 }
@@ -269,7 +269,7 @@ Unit* __stdcall FindNextSelectedUnit(Unit* unit, int dir)
         short j = x;
         while ((unsigned short)j != p->firstIndex) {
             --j;
-            Unit* v = GetUnit_0048c190((unsigned short)j);
+            Unit* v = UnitFromIndex((unsigned short)j);
             if (v->selected) {
                 return v;
             }
@@ -277,7 +277,7 @@ Unit* __stdcall FindNextSelectedUnit(Unit* unit, int dir)
         j = p->lastIndex + 1;
         while ((unsigned short)j != x) {
             --j;
-            Unit* v = GetUnit_0048c190((unsigned short)j);
+            Unit* v = UnitFromIndex((unsigned short)j);
             if (v->selected) {
                 return v;
             }
@@ -285,13 +285,13 @@ Unit* __stdcall FindNextSelectedUnit(Unit* unit, int dir)
     } else {
         short j;
         for (j = x; (unsigned short)j != p->lastIndex; j++) {
-            Unit* v = GetUnit_0048c190((unsigned short)(j + 1));
+            Unit* v = UnitFromIndex((unsigned short)(j + 1));
             if (v->selected) {
                 return v;
             }
         }
         for (j = p->firstIndex - 1; (unsigned short)j != x; j++) {
-            Unit* v = GetUnit_0048c190((unsigned short)(j + 1));
+            Unit* v = UnitFromIndex((unsigned short)(j + 1));
             if (v->selected) {
                 return v;
             }
@@ -311,7 +311,7 @@ void MarkLocalVisibleUnits(void)
     }
 }
 
-struct Select_0048c390 {
+struct SelectBoxArg {
     char unknown_0[8];
     unsigned int flags;
 };
@@ -329,7 +329,7 @@ int __stdcall SelectUnitsInBox(void* param_1)
     int t;
     if (ymin > ymax) { t = ymin; ymin = ymax; ymax = t; }
     if (xmin > xmax) { t = xmin; xmin = xmax; xmax = t; }
-    int toggle = (((Select_0048c390*)param_1)->flags >> 2) & 1;
+    int toggle = (((SelectBoxArg*)param_1)->flags >> 2) & 1;
     if (!toggle) {
         for (Unit* v = g_game->units; v <= g_game->unitsEnd; v++)
             v->flags &= 0xffffff2f;
@@ -414,13 +414,13 @@ int __stdcall HitTestUnitScreenHull(Unit* obj, Point* p)
     return PointInPolygon(pts, 4, p->x, p->y) != 0;
 }
 
-struct Param_0048c7f0 {
+struct ClickSelectArg {
     char unknown_0[8];
     unsigned char flags;
 };
 
 // FUNCTION: 0x48c7f0
-void __stdcall ClickSelectHoverUnit(Param_0048c7f0* param)
+void __stdcall ClickSelectHoverUnit(ClickSelectArg* param)
 {
     Unit* unit = !g_game->hoverUnitId ? 0 : &g_game->units[g_game->hoverUnitId];
     if (unit == 0)
@@ -541,7 +541,7 @@ unsigned short __stdcall PickUnitUnderCursor(void)
         }
     } else if (PointInRect(&g_game->viewLimit, p->x, p->y)) {
         int best = 99999;
-        Slot_0048cd80* s = (Slot_0048cd80 *)g_game->hotRadar;
+        HotRadarSlot* s = (HotRadarSlot *)g_game->hotRadar;
         for (int i = g_game->hotRadarCount; i > 0; i--) {
             int dy = s->y - p->y;
             int dx = s->x - p->x;
@@ -762,7 +762,7 @@ void FocusNextLocalUnit(void)
 void __stdcall FocusCommander(int param_1)
 {
     Player* team = &g_game->players[g_game->playerIndex];
-    char* playerName = (*(Name_0048d630 (*)[5])&g_game->sideDefs)[team->info->side].name;
+    char* playerName = (*(SideCommanderName (*)[5])&g_game->sideDefs)[team->info->side].name;
     Unit* last = team->unitsEnd;
     for (Unit* u = team->unitsBegin; u <= last; u++) {
         if (u->selectable && u->buildLeft == 0.0f && u->postTransferHoldoff == 0
@@ -965,12 +965,12 @@ int __stdcall SquadHasReadyMember(int param_1)
     return 0;
 }
 
-typedef std::vector<Unit*> Vec_0048ddc0;
-typedef Vec_0048ddc0::iterator (Vec_0048ddc0::*InsertFn_0048ddc0)(
-    Vec_0048ddc0::iterator, Unit* const&);
+typedef std::vector<Unit*> UnitPtrVector;
+typedef UnitPtrVector::iterator (UnitPtrVector::*UnitPtrVectorInsertFn)(
+    UnitPtrVector::iterator, Unit* const&);
 
 // FUNCTION: 0x48ddc0 ?insert@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEPAPAUUnit@@PAPAU3@ABQAU3@@Z
-InsertFn_0048ddc0 g_insert_0048ddc0 = &Vec_0048ddc0::insert;
+UnitPtrVectorInsertFn g_insert_0048ddc0 = &UnitPtrVector::insert;
 
 #include "../game/mission_conditions.h"
 

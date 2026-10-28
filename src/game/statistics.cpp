@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "../../interfaces/host.h"
 
-struct Guid_0046bf30 {
+struct DpspGuid {
     unsigned long data1;
     unsigned long data2;
     unsigned long data3;
@@ -35,31 +35,31 @@ struct OnlineReportScoreBoard {
 
 #include "../../link/globals.h"
 extern char DAT_00512c98[];
-extern Guid_0046bf30 g_dpspGuidIpx;
-extern Guid_0046bf30 g_dpspGuidSerial;
-extern Guid_0046bf30 g_dpspGuidModem;
+extern DpspGuid g_dpspGuidIpx;
+extern DpspGuid g_dpspGuidSerial;
+extern DpspGuid g_dpspGuidModem;
 extern OnlineReportPlayer** g_onlineReportPlayers;
 extern OnlineReportScoreBoard** g_onlineReportScoreBoards;
 extern char** g_onlineReportScores;
 extern int g_reporterDll;
 
-typedef int (__stdcall *EnableFn_0046bf30)(int);
-typedef int (__stdcall *VersionFn_0046bf30)(char*);
-typedef int (__stdcall *InitFn_0046bf30)(int*, int);
-typedef int (__stdcall *ReportFn_0046bf30)(int, int, int, int, int, int, int, int, int, int);
-typedef int (__stdcall *ChatFn_0046bf30)(int, char*);
-typedef void (__stdcall *SetCbFn_0046bf30)(void (__stdcall* cb1)(int), int (__stdcall* cb2)(char*, int));
-typedef int (__stdcall *TimerFn_0046bf30)();
-typedef void (__cdecl *TermFn_0046bf30)();
+typedef int (__stdcall *RiEnableFn)(int);
+typedef int (__stdcall *RiGetVersionFn)(char*);
+typedef int (__stdcall *RiInitializeExFn)(int*, int);
+typedef int (__stdcall *RiReportFn)(int, int, int, int, int, int, int, int, int, int);
+typedef int (__stdcall *RiReportGameChatFn)(int, char*);
+typedef void (__stdcall *RiSetCallbacksFn)(void (__stdcall* cb1)(int), int (__stdcall* cb2)(char*, int));
+typedef int (__stdcall *RiIntervalTimerFn)();
+typedef void (__cdecl *RiTerminateFn)();
 
-extern EnableFn_0046bf30 g_riEnable;
-extern InitFn_0046bf30 g_riInitializeEx;
-extern VersionFn_0046bf30 g_riGetVersion;
-extern TermFn_0046bf30 g_riTerminate;
-extern SetCbFn_0046bf30 g_riSetCallbacks;
-extern TimerFn_0046bf30 g_riIntervalTimer;
-extern ReportFn_0046bf30 g_riReport;
-extern ChatFn_0046bf30 g_riReportGameChat;
+extern RiEnableFn g_riEnable;
+extern RiInitializeExFn g_riInitializeEx;
+extern RiGetVersionFn g_riGetVersion;
+extern RiTerminateFn g_riTerminate;
+extern RiSetCallbacksFn g_riSetCallbacks;
+extern RiIntervalTimerFn g_riIntervalTimer;
+extern RiReportFn g_riReport;
+extern RiReportGameChatFn g_riReportGameChat;
 
 #include "statistics.h"
 #include "../debug/debug_lib.h"

@@ -19,21 +19,21 @@
 #include "../graphics/object3do.h"
 #include "../graphics/piece_frame.h"
 #include "../gui/gui.h"
-#include "../ingame/arg_00419670.h"
+#include "../ingame/view_mouse_event.h"
 #include "../ingame/camera_flags.h"
-#include "../ingame/cursor_state_0041cc60.h"
-#include "../ingame/flags16_00499200.h"
-#include "../ingame/flags_004197d0.h"
-#include "../ingame/flags_00495e90_37ebe.h"
-#include "../ingame/flags_00495e90_37f06.h"
-#include "../ingame/flags_00495e90_38a51.h"
-#include "../ingame/flags_00495e90_3923b.h"
+#include "../ingame/game_cursor_state.h"
+#include "../ingame/net_game_flags.h"
+#include "../ingame/cursor_input_flags.h"
+#include "../ingame/orders_panel_flags.h"
+#include "../ingame/graphics_option_flags.h"
+#include "../ingame/broadcast_toggle_flags.h"
+#include "../ingame/info_mode_flags.h"
 #include "../ingame/map_grid.h"
 #include "../ingame/orders.h"
 #include "../ingame/side_name.h"
-#include "../ingame/snapshot_0046a860.h"
-#include "../ingame/sub_004679a0_a.h"
-#include "../ingame/sub_004679a0_b.h"
+#include "../ingame/unit_info_snapshot.h"
+#include "../ingame/light_bar_counters.h"
+#include "../ingame/light_bar_sprite.h"
 #include "../map/feature_anim_pool.h"
 #include "../map/grid2.h"
 #include "../map/map_info.h"
@@ -49,22 +49,22 @@
 #include "../util/point.h"
 #include "../weapons/debris.h"
 #include "../weapons/weapon_def.h"
-#include "clock_flags_0042f9a0.h"
-#include "flags_00496ce0.h"
-#include "load_flags_00497f40.h"
+#include "ui_option_flags.h"
+#include "pre_battle_flags.h"
+#include "loading_flags.h"
 #include "menu.h"
-#include "menu_00497ce0.h"
-#include "mission_flags_0042f9a0.h"
-#include "player_slots_00497f40.h"
-#include "settings_00496e10.h"
-#include "side_00431a60.h"
-#include "side_name_00497180.h"
-#include "slot_0041e420.h"
+#include "main2_menu.h"
+#include "all_missions_flags.h"
+#include "loading_player_slots.h"
+#include "mission_option_flags.h"
+#include "side_def.h"
+#include "side_name_entry.h"
+#include "end_game_player_slot.h"
 #include "view_flags.h"
-#include "zero11_004917d0.h"
+#include "chat_recipients.h"
 
 struct AnimEntry_00429700;
-struct BuildList_0041ace0;
+struct BuildMenuPage;
 struct Cell;
 struct ChatPacket;
 class Class_00437c80;
@@ -74,7 +74,7 @@ struct Class_00472200;
 struct Class_0047cb00;
 class Class_004cdb40;
 struct ConnectionBlob;
-struct Ctx_00499890;
+struct MainFrameDisplayContext;
 struct GameDescEntry;
 struct Entry_0042f740;
 struct Entry_00479620;
@@ -94,7 +94,7 @@ class Pathfinder;
 struct PlayerInfo;
 struct SideData;
 struct Src_004ab400;
-struct Struct_00499200_531;
+struct LayerHeadView;
 struct Unit;
 struct UnitDef;
 
@@ -111,7 +111,7 @@ struct Game {
     };
     char* build_date;
     char* build_time;
-    Ctx_00499890* displayContext;
+    MainFrameDisplayContext* displayContext;
     Class_004cdb40* sound;
     union {
         struct {
@@ -159,7 +159,7 @@ struct Game {
             int field_525;
             char pad_529[4];
             int field_52d;
-            Struct_00499200_531* layer;
+            LayerHeadView* layer;
             char pad_535[72];
             int team_index;
             int selected;
@@ -227,7 +227,7 @@ struct Game {
             char pad_2878[296];
         };
         struct {
-            Menu_00497ce0 menu_519_18;
+            Main2Menu menu_519_18;
             char unknown_531_a[5686];
             PlayerIdEntry players_1b67[10];
             char pad_2855[331];
@@ -262,7 +262,7 @@ struct Game {
             char pad_2a2c[4];
         };
         int shareVisionReady[11];
-        PlayerSlots_00497f40 slots_29a4;
+        LoadingPlayerSlots slots_29a4;
     };
     Class_0046d040* sync;
     int recvPacketSize;
@@ -285,7 +285,7 @@ struct Game {
             unsigned char leaving : 1;
             unsigned char rest_2a44 : 7;
         } bits_2a44_2a44;
-        Flags16_00499200 netGameFlags_2a44;
+        NetGameFlags netGameFlags_2a44;
         struct {
             unsigned short bit0 : 1;
             unsigned short bit1 : 1;
@@ -332,7 +332,7 @@ struct Game {
         };
         struct {
             char pad_2ab1_a[155];
-            Flags_00496ce0 flags_2b4c;
+            PreBattleFlags flags_2b4c;
             char pad_2b4e_a[28];
         };
         char buffer_2ab1[185];
@@ -367,7 +367,7 @@ struct Game {
             char pad_2c50[36];
             unsigned char lockFlags;
             char pad_2c75[1];
-            Arg_00419670 view;
+            ViewMouseEvent view;
             short x;
             short y;
             int boxStartX;
@@ -388,7 +388,7 @@ struct Game {
             unsigned char bit5_2cc6 : 1;
             unsigned char bit6_2cc6 : 1;
             unsigned char rest_2cc6 : 1;
-            CursorState_0041cc60 cursor;
+            GameCursorState cursor;
             WeaponDef weapons[256];
             int projectileCount;
             Ref<Projectile> projectiles;
@@ -518,13 +518,13 @@ struct Game {
                 unsigned short dirty : 1;
             } bits_2bee_3;
             char pad_2bf0_a[1];
-            Zero11_004917d0 chatRecipients_2bf1_b;
+            ChatRecipients chatRecipients_2bf1_b;
             char pad_2bfc_a[122];
             Point view_2c76;
             char pad_2c7e[44];
             void* pos_2caa;
             char pad_2cae_a[24];
-            Flags_004197d0 inputFlags_2cc6;
+            CursorInputFlags inputFlags_2cc6;
             char pad_2cc7_a[70964];
             FeatureAnimPool anim;
             char pad_14273[14];
@@ -793,8 +793,8 @@ struct Game {
             Rect rect;
             int viewWidth;
             int viewHeight;
-            Sub_004679a0_a a;
-            Sub_004679a0_b b;
+            LightBarCounters a;
+            LightBarSprite b;
             int field_37e98;
             unsigned short unitIndex;
             unsigned short unitDefIndex;
@@ -823,9 +823,9 @@ struct Game {
         struct {
             int viewport[4];
             char pad_37e37_a[41];
-            Snapshot_0046a860 selectionInfoCache;
+            UnitInfoSnapshot selectionInfoCache;
             char pad_37e9c[34];
-            Flags_00495e90_37ebe ordersPanelFlags_37ebe;
+            OrdersPanelFlags ordersPanelFlags_37ebe;
             char pad_37ec0[12];
         };
         struct {
@@ -913,7 +913,7 @@ struct Game {
             int interfaceType;
             int mode;
             int screenchat;
-            Flags_00495e90_37f06 flags_37f06;
+            GraphicsOptionFlags flags_37f06;
             int brightness;
             int volume1;
             int volume2;
@@ -992,7 +992,7 @@ struct Game {
             char pad_37f16_a[3];
             unsigned short soundFlags_37f19_2;
             char pad_37f1b[20];
-            ClockFlags_0042f9a0 uiOptionFlags_37f2f;
+            UiOptionFlags uiOptionFlags_37f2f;
             char pad_37f31_a[8];
         };
         struct {
@@ -1103,7 +1103,7 @@ struct Game {
             int playerCount;
             FrameTimers timers;
             int profileBarsEnabled;
-            Slot_0041e420 slots_38dd9[10];
+            EndGamePlayerSlot slots_38dd9[10];
             char pad_3901d[58];
             int endGameState;
             unsigned int deadline;
@@ -1123,7 +1123,7 @@ struct Game {
         };
         struct {
             char pad_37f3d[30];
-            SideName_00497180 sideNames[2];
+            SideNameEntry sideNames[2];
             char unknown_383bf[1682];
             unsigned char pauseFlags;
             char pad_38a52[1];
@@ -1134,7 +1134,7 @@ struct Game {
             unsigned char progress_38d6f[6];
             unsigned char flags_38d75;
             char pad_38d76[9];
-            MissionFlags_0042f9a0 allMissionsFlags;
+            AllMissionsFlags allMissionsFlags;
             char pad_38d81[8];
             int total;
             int values[8];
@@ -1149,11 +1149,11 @@ struct Game {
             } bits_38a51;
             char imageOutputDirectory[516];
             char pad_38c57[286];
-            LoadFlags_00497f40 loadingFlags;
+            LoadingFlags loadingFlags;
             char pad_38d77[1048];
         };
         struct {
-            Side_00431a60 sideDefs[5];
+            SideDef sideDefs[5];
             char unknown_38a37[26];
             struct {
                 unsigned short flag_38a51 : 1;
@@ -1169,7 +1169,7 @@ struct Game {
         };
         struct {
             char unknown_37f3d_b[2836];
-            Flags_00495e90_38a51 flags_38a51;
+            BroadcastToggleFlags flags_38a51;
             char pad_38a53[802];
             struct {
                 unsigned short : 3;
@@ -1226,7 +1226,7 @@ struct Game {
     int showRanges;
     int showBps;
     int buildListCount;
-    BuildList_0041ace0* buildLists;
+    BuildMenuPage* buildLists;
     union {
         struct {
             char pad_391cf[24];
@@ -1259,7 +1259,7 @@ struct Game {
             int singleLineOfSight;
             int singleLOSType;
         };
-        Settings_00496e10 singleSettings;
+        MissionOptionFlags singleSettings;
     };
     int multiCommanderDeath;
     int multiMapping;
@@ -1269,7 +1269,7 @@ struct Game {
     union {
         unsigned short endGameFlags;
         unsigned char flagsByte_3923b;
-        Flags_00495e90_3923b endGameFlags_3923b;
+        InfoModeFlags endGameFlags_3923b;
         struct {
             unsigned short bits0_3923b : 2;
             unsigned short flag2_3923b : 1;

@@ -4,11 +4,11 @@
 #include "../../interfaces/seams.h"
 #include "screenshots.h"
 
-struct Input_00499890 {
+struct MouseEventWords {
     int fields[6];
 };
 
-struct Ctx_00499890 {
+struct MainFrameDisplayContext {
     char pad_0[0x40];
     void* hwnd;
     char pad_44[0xcc - 0x44];
@@ -38,8 +38,8 @@ void __stdcall PopMouseEvent(int*);
 // FUNCTION: 0x499890
 void MainFrameTick()
 {
-    Input_00499890 first;
-    Input_00499890 second;
+    MouseEventWords first;
+    MouseEventWords second;
     char path[0x100];
     int key = PeekKey();
 
@@ -70,11 +70,11 @@ void MainFrameTick()
     UpdateCdCategoryByActivity();
     PlayNextSpeech();
     if (first.fields[4] == second.fields[4])
-        PopMouseEvent((*(Input_00499890*)&g_game->view).fields);
+        PopMouseEvent((*(MouseEventWords*)&g_game->view).fields);
     else if (first.fields[4] == 0x205 || first.fields[4] == 0x202)
-        (*(Input_00499890*)&g_game->view) = first;
+        (*(MouseEventWords*)&g_game->view) = first;
     else
-        (*(Input_00499890*)&g_game->view) = second;
+        (*(MouseEventWords*)&g_game->view) = second;
     UpdateTimers();
     if (!(g_game->displayContext->flags & 8))
         ((void (__cdecl*)())g_game->handler)();

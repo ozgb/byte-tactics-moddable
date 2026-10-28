@@ -4,7 +4,7 @@
 #include "../../interfaces/rand_stream.h"
 struct ContinueWatchingDialog;
 
-struct Class_464b10;
+struct NetMetalSource;
 
 class HapiBank;
 struct Gadget;
@@ -29,6 +29,6 @@ void __stdcall LoadPlayers(HapiBank* file);
 void __stdcall SavePlayers(HapiBank* file);
 
 float __stdcall GetNetEnergy(void*);
-float __stdcall GetNetMetal(Class_464b10*);
+float __stdcall GetNetMetal(NetMetalSource*);
 
 #endif

@@ -1,8 +1,8 @@
-#ifndef FLAGS_00496CE0_H
-#define FLAGS_00496CE0_H
+#ifndef PRE_BATTLE_FLAGS_H
+#define PRE_BATTLE_FLAGS_H
 
 #pragma pack(push, 1)
-struct Flags_00496ce0 {
+struct PreBattleFlags {
     unsigned short low : 4;
     unsigned short flag : 1;
     unsigned short rest : 11;
@@ -10,7 +10,7 @@ struct Flags_00496ce0 {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
-static_assert(sizeof(Flags_00496ce0) == 2, "Flags_00496ce0");
+static_assert(sizeof(PreBattleFlags) == 2, "PreBattleFlags");
 #endif
 
 #endif

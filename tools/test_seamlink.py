@@ -235,7 +235,7 @@ class SeamLinkTest(unittest.TestCase):
         self.assertEqual(len(self.run_with(self.wind("?Foo@@YAXXZ"), other)), 1)
 
     def test_throw_info_and_std_statics_are_library(self):
-        names = ["_TI2?AVlogic_error", "_CTA3?AVout_of_range", "_CT??_R0?AVx@@@8", "?_C@?1??_Nullstr@?$basic_string@DU?$char_traits@D@std@@@std@@CGPBDXZ@4DB"]
+        names = ["_TI2?AVlogic_error", "__TI3?AVout_of_range@std@@", "_CTA3?AVout_of_range", "_CT??_R0?AVx@@@8", "?_C@?1??_Nullstr@?$basic_string@DU?$char_traits@D@std@@@std@@CGPBDXZ@4DB"]
         link = Unit("link/data.cpp", data=set(names))
         self.assertEqual(self.run_with(self.wind(*names), link), [])
         other = Unit("link/data.cpp", data={"_TXother", "?g_std@@3HA"})

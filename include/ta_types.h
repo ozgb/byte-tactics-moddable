@@ -11600,12 +11600,6 @@ struct NameNe_004b7760 {
     unsigned char operator()(Class_004c9390&, Class_004c9390&);
 };
 
-struct ConsoleCommand {
-    char* name;
-    void (__stdcall *fn)(void*);
-    int mask;
-};
-
 class Class_004c9290 {
 public:
     char* data;

@@ -251,13 +251,6 @@ guard:
     }
 }
 
-class CommandArgs {
-public:
-    char unknown_0[0xd0];
-    int count;
-    CommandArgs* InitArgs();
-};
-
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"
 

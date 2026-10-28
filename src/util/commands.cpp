@@ -51,12 +51,6 @@ struct NameNe_004b7620 {
 
 typedef void (__stdcall *Handler_004b7620)(void*);
 
-struct ConsoleCommand {
-    const char* name;
-    Handler_004b7620 fn;
-    int mask;
-};
-
 class CommandEntry {
 public:
     StringRef handle;
@@ -78,29 +72,6 @@ CommandEntry::CommandEntry(const StringRef& h, Pair_004b7620 pp) : handle(h)
     *(Pair_004b7620*)&value1 = pp;
 }
 
-class CommandArgs {
-public:
-    char* args[0x14];
-    char buffer[0x7e];
-    char unknown_ce[2];
-    int count;
-
-    void Tokenize(char* text, char* end);
-    CommandArgs* InitArgs();
-    int GetArg(int index, int default_val);
-    int GetIntArg(int index, int default_val);
-    float GetFloatArg(int index, float default_val);
-    void ShiftArgs(int n);
-
-    char* GetArgPtr(int index, char* def)
-    {
-        if (index < 0 || index >= count) return def;
-        return args[index];
-    }
-
-    void SubstituteArgs(CommandArgs* other);
-};
-
 #pragma auto_inline(off)
 
 // FUNCTION: 0x4b73b0
@@ -111,12 +82,12 @@ CommandArgs* CommandArgs::InitArgs()
 }
 
 // FUNCTION: 0x4b73c0
-int CommandArgs::GetArg(int index, int default_val)
+char* CommandArgs::GetArg(int index, char* default_val)
 {
     if (index < 0 || index >= count) {
         return default_val;
     }
-    return (int)args[index];
+    return args[index];
 }
 
 // FUNCTION: 0x4b73e0
@@ -252,7 +223,7 @@ void __stdcall RegisterCommands(ConsoleCommand* rec)
 {
     for (; rec->name; rec++) {
         int mask = rec->mask;
-        Handler_004b7620 fn = rec->fn;
+        Handler_004b7620 fn = (Handler_004b7620)rec->run;
         StringRef key(rec->name);
         CommandEntry* first = s_commandTable.begin();
         CommandEntry* last = s_commandTable.end();
@@ -314,7 +285,7 @@ int __stdcall ExecuteCommand(CommandArgs* obj, int mask)
 {
     int result = 0;
     if (obj->count >= 1) {
-        StringRef key((char*)obj->GetArg(0, (int)DAT_005119b8));
+        StringRef key(obj->GetArg(0, DAT_005119b8));
         key.MakeLower();
         HandlerSlot_004b7900* h = Find_004b7900(key.data);
         if (h != 0 && (h->mask & mask)) {

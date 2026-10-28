@@ -3,16 +3,13 @@
 #include <math.h>
 #include "radar.h"
 
-struct Point_4665d0 {
-    int x;
-    int y;
+#include "../util/point.h"
+
+struct RadarQuad {
+    Point p[4];
 };
 
-struct Quad_4665d0 {
-    Point_4665d0 p[4];
-};
-
-struct Surface_4665d0 {
+struct RadarSurfaceView {
     int width;
     int height;
     int pitch;
@@ -30,19 +27,19 @@ struct Surface_4665d0 {
 
 #pragma pack(push, 1)
 
-struct IconSet_00466780 {
+struct MapTileSet {
     int count;
     unsigned char (*cell)[32][32];
 };
 
-struct Fx_00466c20 {
+struct DisplayContextColorMapView {
     char unknown_0[0xcc];
     unsigned char* colorMap;
 };
 
 struct WeaponDef;
 
-struct Flags241_00466dc0 {
+struct InterceptorDefFlags {
     unsigned int :29;
     unsigned int bit29 : 1;
     unsigned int :2;
@@ -57,7 +54,7 @@ struct Flags241_00466dc0 {
 #include "../util/angles.h"
 #include "../weapons/unit_weapon_slot.h"
 
-struct UnitType_00466dc0 {
+struct RadarUnitDefView {
     char unknown_0[0x204];
     short radardistance;
     short sonardistance;
@@ -65,7 +62,7 @@ struct UnitType_00466dc0 {
     short radardistancejam;
     short sonardistancejam;
     char unknown_20e[0x241 - 0x20e];
-    Flags241_00466dc0 flags1;
+    InterceptorDefFlags flags1;
     unsigned char flags2;
 };
 
@@ -80,7 +77,7 @@ struct UnitType_00466dc0 {
 #include "../graphics/gaf.h"
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 #include "../graphics/surface.h"
-void __stdcall DrawFrameQuad(Surface_4665d0* surface, void* pic, Quad_4665d0* dst, Quad_4665d0* src);
+void __stdcall DrawFrameQuad(RadarSurfaceView* surface, void* pic, RadarQuad* dst, RadarQuad* src);
 #include "../graphics/object_pool.h"
 
 void __stdcall FrameFromSurface(GafFrame* dst, void* src);
@@ -103,9 +100,9 @@ void __stdcall ResizeRadarPicture(GafFrame* pic, int x, int y, int w, int h)
     int dhy;
     int sw;
     int sh;
-    Quad_4665d0 src;
-    Quad_4665d0 dst;
-    Surface_4665d0 surface;
+    RadarQuad src;
+    RadarQuad dst;
+    RadarSurfaceView surface;
     int dw = w - 0x20;
     int dh = h - 0x80;
     int ox;
@@ -275,7 +272,7 @@ void UpdateRadarMapped()
                 } else if (t->explored[index]) {
                     *dst = *src;
                 } else {
-                    *dst = ((Fx_00466c20 *)g_game->displayContext)->colorMap[*src];
+                    *dst = ((DisplayContextColorMapView *)g_game->displayContext)->colorMap[*src];
                 }
                 j++;
                 mapX += halfWidth;
@@ -292,7 +289,7 @@ static Player* Player_Get(unsigned char p)
     return &g_game->players_1b63_14b[0] + p;
 }
 
-static inline int OnRadarByte_00466dc0(Player* pi, int px, int py)
+static inline int ExploredOnRadar(Player* pi, int px, int py)
 {
     int tx = px >> 5;
     int ty = py >> 5;
@@ -302,7 +299,7 @@ static inline int OnRadarByte_00466dc0(Player* pi, int px, int py)
     return 0;
 }
 
-static inline int OnRadarShort_00466dc0(Player* pi, int px, int py)
+static inline int VisibleOnRadar(Player* pi, int px, int py)
 {
     int tx = px >> 5;
     int ty = py >> 5;
@@ -314,15 +311,15 @@ static inline int OnRadarShort_00466dc0(Player* pi, int px, int py)
             (1 << g_game->playerIndex)) != 0;
 }
 
-static inline int OnRadar_00466dc0(int px, int py)
+static inline int IsOnRadar(int px, int py)
 {
     Player* pi = Player_Get(g_game->playerIndex);
     if ((g_game->mapFlags_14281.raw & 2) == 2)
-        return OnRadarByte_00466dc0(pi, px, py);
-    return OnRadarShort_00466dc0(pi, px, py);
+        return ExploredOnRadar(pi, px, py);
+    return VisibleOnRadar(pi, px, py);
 }
 
-static inline int ScaleY_00466dc0(Unit* u)
+static inline int ScaledRadarY(Unit* u)
 {
     return ((int)u->zWhole - ((int)u->yWhole >> 1)) * (int)g_game->screen_h;
 }
@@ -349,13 +346,13 @@ void DrawRadarUnits(void)
     Unit* end = g_game->unitsEnd;
     if (u <= end) {
         do {
-            UnitType_00466dc0* type = (UnitType_00466dc0*)u->def.get();
+            RadarUnitDefView* type = (RadarUnitDefView*)u->def.get();
             if (u->unitDefIndex != 0) {
                 if (enabled != 0 || (u->flags & 0x300) != 0 ||
                     u->playerIndex == g_game->playerIndex) {
                     int x = u->xWhole * g_game->width_142eb /
                             g_game->mapWidth;
-                    int y = ScaleY_00466dc0(u) / g_game->mapHeight;
+                    int y = ScaledRadarY(u) / g_game->mapHeight;
                     if (u->recentlyDamagedTimer == 0 ||
                         (g_game->timer.byte.field_142f0.b.hi & 1) != 0) {
                         DrawFrame(surface,
@@ -428,14 +425,14 @@ void DrawRadarUnits(void)
             int y = (int)g_game->screen_h * py / g_game->mapHeight;
             if ((p->type->flags.value & 0x60000000) == 0) {
                 if ((p->type->flags.value & 0x40) == 0) {
-                    if (OnRadar_00466dc0(px, py) ||
+                    if (IsOnRadar(px, py) ||
                         p->owner ==
                             g_game->playerIndex) {
                         DrawPixel((Surface *)surface, x, y, base[0xe]);
                     }
                 }
             } else {
-                if (OnRadar_00466dc0(px, py) ||
+                if (IsOnRadar(px, py) ||
                     p->attacker->playerIndex ==
                         g_game->playerIndex) {
                     DrawFrame(surface,

@@ -55,9 +55,9 @@ static inline int InsideExplored(Player* los, unsigned int tx, unsigned int ty)
     return tx < (unsigned int)los->exploredWidth && ty < (unsigned int)los->exploredHeight;
 }
 
-struct Node_0047cb00 {
+struct SpatialBucketNode {
     char unknown_0[0x8e];
-    Ref<Node_0047cb00> next;
+    Ref<SpatialBucketNode> next;
 };
 
 #include "spatial_bucket.h"
@@ -67,12 +67,7 @@ public:
     virtual void ClaimFootprint(Unit* obj);
 };
 
-class Visitor_0047e750 {
-public:
-    virtual void Visit(Unit* obj) = 0;
-};
-
-struct Entry_0047ea40 {
+struct ReclaimableResource {
     Vec3 pos;
     float val;
 };
@@ -82,6 +77,7 @@ struct Entry_0047ea40 {
 #include "../../link/globals.h"
 extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../../interfaces/seams.h"
+#include "../../interfaces/map.h"
 #include "../state/sim_globals.h"
 
 // FUNCTION: 0x47c790
@@ -198,13 +194,13 @@ void FUN_0047caf0(void)
 // FUNCTION: 0x47cb00
 void SpatialBucket::UnlinkUnit(Unit* unit)
 {
-    Node_0047cb00* node = (Node_0047cb00*)unit;
-    if ((Node_0047cb00*)head == node) {
+    SpatialBucketNode* node = (SpatialBucketNode*)unit;
+    if ((SpatialBucketNode*)head == node) {
         head = node->next;
         node->next = 0;
         return;
     }
-    Ref<Node_0047cb00>* pp = &((Node_0047cb00*)head)->next;
+    Ref<SpatialBucketNode>* pp = &((SpatialBucketNode*)head)->next;
     while (*pp != node)
         pp = &(*pp)->next;
     *pp = node->next;
@@ -215,7 +211,7 @@ void SpatialBucket::UnlinkUnit(Unit* unit)
 void SpatialBucket::PrependUnit(int node)
 {
     int temp = (int)head;
-    ((Node_0047cb00*)node)->next = (Node_0047cb00*)temp;
+    ((SpatialBucketNode*)node)->next = (SpatialBucketNode*)temp;
     head = (void*)node;
 }
 
@@ -443,7 +439,7 @@ void __stdcall RemoveUnitFromMap(Unit* obj)
     RefreshPassMapsForUnit(obj);
 }
 
-struct Pos_0047d2e0 {
+struct BuildCenterFixed {
     Fixed x, y, z;
 };
 
@@ -479,7 +475,7 @@ static inline unsigned short VisibilityWord(Player* los, int tx,
     return g_game->visibilityMask[w * ty + tx];
 }
 
-static int Blocked_0047d2e0(Cell* c)
+static int CellFeatureBlocks(Cell* c)
 {
     unsigned short v = c->feature;
     if (v == 0xffff)
@@ -498,7 +494,7 @@ static int Blocked_0047d2e0(Cell* c)
     return (((unsigned char *)g_game->features)[v2 * 0x100 + 0xfe] >> 6) & 1;
 }
 
-static unsigned char* Terrain_0047d2e0(
+static unsigned char* GetCellFeatureDef(
 Cell* c)
 {
     if (c == 0)
@@ -533,7 +529,7 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los)
     int y;
     ok = 1;
     if (los != 0) {
-        Pos_0047d2e0 pos;
+        BuildCenterFixed pos;
         Fixed hgt;
         pos.x.value = (origin.x + cell.x * 2) << 19;
         pos.z.value = (origin.y + cell.y * 2) << 19;
@@ -578,17 +574,17 @@ int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los)
                 if ((m & 6) && (short)c->unit != 0 && (short)c->unit != type && ok)
                     return 0;
                 if (m & 0x20) {
-                    if (Blocked_0047d2e0(c) != 0)
+                    if (CellFeatureBlocks(c) != 0)
                         return 0;
                 }
                 if (m & 0x40) {
-                    unsigned char* e = Terrain_0047d2e0(c);
+                    unsigned char* e = GetCellFeatureDef(c);
                     if (e != 0 && (e[0xff] & 2))
                         return 0;
                 }
                 if (m & 0x80) {
                     found80 = 1;
-                    unsigned char* e = Terrain_0047d2e0(c);
+                    unsigned char* e = GetCellFeatureDef(c);
                     if (e != 0 && (e[0xfe] & 0x20))
                         foundFE20 = 1;
                 }
@@ -1053,7 +1049,7 @@ void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisit
     }
 }
 
-static inline int Clamp_0047e750(int v, unsigned int size)
+static inline int ClampBucketCoord(int v, unsigned int size)
 {
     if (v < size) {
         return v;
@@ -1065,12 +1061,12 @@ static inline int Clamp_0047e750(int v, unsigned int size)
 }
 
 // FUNCTION: 0x47e750
-void __stdcall VisitObjectsInRect(int x1, int y1, int x2, int y2, Visitor_0047e750* visitor)
+void __stdcall VisitObjectsInRect(int x1, int y1, int x2, int y2, UnitVisitor* visitor)
 {
-    int cx1 = Clamp_0047e750(x1 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
-    int cy1 = Clamp_0047e750(y1 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
-    int cx2 = Clamp_0047e750(x2 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
-    int cy2 = Clamp_0047e750(y2 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
+    int cx1 = ClampBucketCoord(x1 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
+    int cy1 = ClampBucketCoord(y1 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
+    int cx2 = ClampBucketCoord(x2 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
+    int cy2 = ClampBucketCoord(y2 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
     for (int y = cy1; y <= cy2; y++) {
         for (int x = cx1; x <= cx2; x++) {
             for (Unit* o = (*(BucketGrid*)((char*)g_game + 0x1429f)).cells[(*(BucketGrid*)((char*)g_game + 0x1429f)).width * y + x].first; o != 0; o = o->cargoNext) {
@@ -1082,7 +1078,7 @@ void __stdcall VisitObjectsInRect(int x1, int y1, int x2, int y2, Visitor_0047e7
     }
 }
 
-static inline int Clamp_0047e890(int v, unsigned int size)
+static inline int ClampBucketRangeCoord(int v, unsigned int size)
 {
     if (v < size) {
         return v;
@@ -1093,27 +1089,27 @@ static inline int Clamp_0047e890(int v, unsigned int size)
     return size - 1;
 }
 
-static inline int ClampX_0047e890(Vec3* p, int range, unsigned int size)
+static inline int ClampBucketMinX(Vec3* p, int range, unsigned int size)
 {
-    return Clamp_0047e890((p->x - range) >> 23, size);
+    return ClampBucketRangeCoord((p->x - range) >> 23, size);
 }
 
-static inline int ClampZ_0047e890(Vec3* p, int range, unsigned int size)
+static inline int ClampBucketMinZ(Vec3* p, int range, unsigned int size)
 {
-    return Clamp_0047e890((p->z - range) >> 23, size);
+    return ClampBucketRangeCoord((p->z - range) >> 23, size);
 }
 
-static inline int ClampX2_0047e890(Vec3* p, int range, unsigned int size)
+static inline int ClampBucketMaxX(Vec3* p, int range, unsigned int size)
 {
-    return Clamp_0047e890((p->x + range) >> 23, size);
+    return ClampBucketRangeCoord((p->x + range) >> 23, size);
 }
 
-static inline int ClampZ2_0047e890(Vec3* p, int range, unsigned int size)
+static inline int ClampBucketMaxZ(Vec3* p, int range, unsigned int size)
 {
-    return Clamp_0047e890((p->z + range) >> 23, size);
+    return ClampBucketRangeCoord((p->z + range) >> 23, size);
 }
 
-static inline int Dist2_0047e890(Vec3* b, Vec3* a)
+static inline int BucketDistSquared(Vec3* b, Vec3* a)
 {
     int dz = a->z - b->z;
     int dx = a->x - b->x;
@@ -1123,15 +1119,15 @@ static inline int Dist2_0047e890(Vec3* b, Vec3* a)
 // FUNCTION: 0x47e890
 void __stdcall VisitObjectsInRange(Vec3* pos, int range, DamagedAllyCollector& visitor)
 {
-    int cx1 = ClampX_0047e890(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
-    int cy1 = ClampZ_0047e890(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
-    int cx2 = ClampX2_0047e890(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
-    int cy2 = ClampZ2_0047e890(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
+    int cx1 = ClampBucketMinX(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
+    int cy1 = ClampBucketMinZ(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
+    int cx2 = ClampBucketMaxX(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
+    int cy2 = ClampBucketMaxZ(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
     int range2 = (int)(((__int64)range * range) >> 32);
     for (int y = cy1; y <= cy2; y++) {
         for (int x = cx1; x <= cx2; x++) {
             for (Unit* o = (*(BucketGrid*)((char*)g_game + 0x1429f)).cells[(*(BucketGrid*)((char*)g_game + 0x1429f)).width * y + x].first; o != 0; o = o->cargoNext) {
-                if (Dist2_0047e890(pos, &o->pos) <= range2) {
+                if (BucketDistSquared(pos, &o->pos) <= range2) {
                     visitor.CollectDamagedAlly(o);
                 }
             }
@@ -1151,8 +1147,8 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* center, Fixed radius,
     int countB = 0;
     int countA = 0;
     int max = radius.whole * radius.whole / 256;
-    Entry_0047ea40* a = (Entry_0047ea40*)SimAlloc(max * sizeof(Entry_0047ea40));
-    Entry_0047ea40* b = (Entry_0047ea40*)SimAlloc(max * sizeof(Entry_0047ea40));
+    ReclaimableResource* a = (ReclaimableResource*)SimAlloc(max * sizeof(ReclaimableResource));
+    ReclaimableResource* b = (ReclaimableResource*)SimAlloc(max * sizeof(ReclaimableResource));
     int half = radius.value / 2;
     Vec3 pos;
     for (pos.z = center->z - half; pos.z <= center->z + half; pos.z += 0x300000) {

@@ -10,13 +10,13 @@
 
 #include "../util/string_ref.h"
 
-struct Elem_00432be0 {
+struct OwnedString {
     char* data;
 
-    ~Elem_00432be0() { ((StringRef*)this)->ReleaseRef(); }
+    ~OwnedString() { ((StringRef*)this)->ReleaseRef(); }
 };
 
-struct Elem_432cb0 {
+struct StringValueElem {
     StringRef handle;
     int value;
 };
@@ -29,14 +29,14 @@ typedef int (__stdcall* Compare)(const UnitDef&, const UnitDef&);
 
 #include "los_lines.h"
 
-typedef std::vector<Elem_00434360> LineList;
+typedef std::vector<LosLineData> LineList;
 
 #include "../util/tdf.h"
 #include "../game/data_files.h"
 
-typedef std::vector<Elem_00434020> Inner_00433500;
+typedef std::vector<LosStep> LosTableView;
 
-struct Elem_004336c0 {
+struct IntValueElem {
     int value;
 };
 
@@ -45,22 +45,22 @@ struct Elem_004336c0 {
 
 extern void __cdecl operator delete(void*);
 
-typedef std::vector<Elem_00432be0> Inner_00432ba0;
-typedef std::vector<Inner_00432ba0> Outer_00432ba0;
-typedef Outer_00432ba0& (Outer_00432ba0::*AssignFn_00432ba0)(const Outer_00432ba0&);
+typedef std::vector<OwnedString> OwnedStringRow;
+typedef std::vector<OwnedStringRow> OwnedStringRowList;
+typedef OwnedStringRowList& (OwnedStringRowList::*OwnedStringRowListAssignFn)(const OwnedStringRowList&);
 
-AssignFn_00432ba0 g_assign_00432ba0 = &Outer_00432ba0::operator=;
+OwnedStringRowListAssignFn g_assign_00432ba0 = &OwnedStringRowList::operator=;
 
-// FUNCTION: 0x432ba0 ??1?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@QAE@XZ
+// FUNCTION: 0x432ba0 ??1?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@QAE@XZ
 
-typedef std::vector<Elem_00432be0> Vec_00432be0;
-typedef Vec_00432be0::size_type (Vec_00432be0::*SizeFn_00432be0)() const;
+typedef std::vector<OwnedString> OwnedStringVectorSize;
+typedef OwnedStringVectorSize::size_type (OwnedStringVectorSize::*OwnedStringVectorSizeFn)() const;
 
-// FUNCTION: 0x432be0 ?size@?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@QBEIXZ
-SizeFn_00432be0 g_size_00432be0 = &Vec_00432be0::size;
+// FUNCTION: 0x432be0 ?size@?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@QBEIXZ
+OwnedStringVectorSizeFn g_size_00432be0 = &OwnedStringVectorSize::size;
 
 // FUNCTION: 0x432c80
-void __stdcall AssignRange(Elem_432cb0* first, Elem_432cb0* last, Elem_432cb0* value)
+void __stdcall AssignRange(StringValueElem* first, StringValueElem* last, StringValueElem* value)
 {
     for (; first != last; ++first) {
         first->handle.Assign(&value->handle);
@@ -69,7 +69,7 @@ void __stdcall AssignRange(Elem_432cb0* first, Elem_432cb0* last, Elem_432cb0* v
 }
 
 // FUNCTION: 0x432cb0
-Elem_432cb0* __stdcall AssignRangeBack(Elem_432cb0* param_1, Elem_432cb0* param_2, Elem_432cb0* param_3)
+StringValueElem* __stdcall AssignRangeBack(StringValueElem* param_1, StringValueElem* param_2, StringValueElem* param_3)
 {
     while (param_1 != param_2) {
         --param_2;
@@ -80,14 +80,14 @@ Elem_432cb0* __stdcall AssignRangeBack(Elem_432cb0* param_1, Elem_432cb0* param_
     return param_3;
 }
 
-typedef std::allocator<Entry_00432cf0> Alloc_00432cf0;
-typedef void (Alloc_00432cf0::*ConstructFn_00432cf0)(Entry_00432cf0*, const Entry_00432cf0&);
+typedef std::allocator<DamageTableEntry> DamageTableEntryAllocator;
+typedef void (DamageTableEntryAllocator::*DamageTableEntryConstructFn)(DamageTableEntry*, const DamageTableEntry&);
 
-// FUNCTION: 0x432cf0 ?construct@?$allocator@UEntry_00432cf0@@@std@@QAEXPAUEntry_00432cf0@@ABU3@@Z
-ConstructFn_00432cf0 g_construct_00432cf0 = &Alloc_00432cf0::construct;
+// FUNCTION: 0x432cf0 ?construct@?$allocator@UDamageTableEntry@@@std@@QAEXPAUDamageTableEntry@@ABU3@@Z
+DamageTableEntryConstructFn g_construct_00432cf0 = &DamageTableEntryAllocator::construct;
 
 // FUNCTION: 0x432d20
-void* Entry_00432cf0::AssignPair(Entry_00432cf0* param)
+void* DamageTableEntry::AssignPair(DamageTableEntry* param)
 {
     name.Assign(&param->name);
     value = param->value;
@@ -178,16 +178,16 @@ int LosTables::GetLosTableCount()
     return ((TableList*)this)->size();
 }
 
-typedef std::vector<Elem_00434020> Inner_00434020;
-typedef std::vector<Inner_00434020> Outer_00434020;
-typedef void (std::allocator<Elem_00434020>::*DestroyFn_00434020)(Elem_00434020*);
+typedef std::vector<LosStep> LosLineSteps;
+typedef std::vector<LosLineSteps> LosTableLines;
+typedef void (std::allocator<LosStep>::*LosStepDestroyFn)(LosStep*);
 
-DestroyFn_00434020 g_destroy_00434020 = &std::allocator<Elem_00434020>::destroy;
+LosStepDestroyFn g_destroy_00434020 = &std::allocator<LosStep>::destroy;
 
 // FUNCTION: 0x433540
 void LosTable::FreeLines()
 {
-    ((Outer_00434020*)this)->~vector();
+    ((LosTableLines*)this)->~vector();
 }
 
 // FUNCTION: 0x4335c0
@@ -199,7 +199,7 @@ int LosTable::GetLosLineCount()
 // FUNCTION: 0x4335f0
 void LosTable::ResizeLines(short n)
 {
-    Elem_00434360 x;
+    LosLineData x;
     resize(n * 4, x);
 }
 
@@ -209,13 +209,13 @@ LosLine* LosTable::GetLosLine(short param_1)
     return (LosLine*)&(*this)[param_1];
 }
 
-typedef std::vector<Elem_004336c0> Inner_004336c0;
-typedef std::vector<Inner_004336c0> Outer_004336c0;
-typedef Outer_004336c0& (Outer_004336c0::*AssignFn_004336c0)(const Outer_004336c0&);
+typedef std::vector<IntValueElem> IntValueElemRow;
+typedef std::vector<IntValueElemRow> IntValueElemRowList;
+typedef IntValueElemRowList& (IntValueElemRowList::*IntValueElemRowListAssignFn)(const IntValueElemRowList&);
 
-AssignFn_004336c0 g_assign_004336c0 = &Outer_004336c0::operator=;
+IntValueElemRowListAssignFn g_assign_004336c0 = &IntValueElemRowList::operator=;
 
-// FUNCTION: 0x4336c0 ??1?$vector@UElem_004336c0@@V?$allocator@UElem_004336c0@@@std@@@std@@QAE@XZ
+// FUNCTION: 0x4336c0 ??1?$vector@UIntValueElem@@V?$allocator@UIntValueElem@@@std@@@std@@QAE@XZ
 
 
 // FUNCTION: 0x4336f0
@@ -230,7 +230,7 @@ void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
         if (tok == 0)
             return;
         short n = atoi(tok);
-        Elem_00434020 x;
+        LosStep x;
         resize(n, x);
         short i;
         switch (mode) {
@@ -260,7 +260,7 @@ void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
             break;
         }
     } else {
-        Elem_00434020 x;
+        LosStep x;
         resize(0, x);
     }
 }
@@ -283,78 +283,78 @@ void LosLine::GetLosLineStep(short index, unsigned short* out1, unsigned short* 
     *out2 = val2;
 }
 
-bool operator==(const Elem_00434020&, const Elem_00434020&);
-bool operator<(const Elem_00434020&, const Elem_00434020&);
+bool operator==(const LosStep&, const LosStep&);
+bool operator<(const LosStep&, const LosStep&);
 
-template class std::vector<Elem_00434020>;
+template class std::vector<LosStep>;
 
-// FUNCTION: 0x433a10 ??0?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@QAE@ABV?$allocator@UElem_00434020@@@1@@Z
+// FUNCTION: 0x433a10 ??0?$vector@ULosStep@@V?$allocator@ULosStep@@@std@@@std@@QAE@ABV?$allocator@ULosStep@@@1@@Z
 
-typedef std::vector<Elem_00434360> Outer_00433a30;
-typedef Outer_00433a30& (Outer_00433a30::*AssignFn_00433a30)(const Outer_00433a30&);
+typedef std::vector<LosLineData> LosLineDataDtorVector;
+typedef LosLineDataDtorVector& (LosLineDataDtorVector::*LosLineDataDtorAssignFn)(const LosLineDataDtorVector&);
 
-AssignFn_00433a30 g_assign_00433a30 = &Outer_00433a30::operator=;
+LosLineDataDtorAssignFn g_assign_00433a30 = &LosLineDataDtorVector::operator=;
 
-// FUNCTION: 0x433a30 ??1?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@QAE@XZ
+// FUNCTION: 0x433a30 ??1?$vector@ULosStep@@V?$allocator@ULosStep@@@std@@@std@@QAE@XZ
 
-typedef std::vector<Elem_00434020> Vec_00433a60;
-typedef Vec_00433a60::size_type (Vec_00433a60::*SizeFn_00433a60)() const;
+typedef std::vector<LosStep> LosStepVectorSize;
+typedef LosStepVectorSize::size_type (LosStepVectorSize::*LosStepVectorSizeFn)() const;
 
-// FUNCTION: 0x433a60 ?size@?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@QBEIXZ
-SizeFn_00433a60 g_size_00433a60 = &Vec_00433a60::size;
+// FUNCTION: 0x433a60 ?size@?$vector@ULosStep@@V?$allocator@ULosStep@@@std@@@std@@QBEIXZ
+LosStepVectorSizeFn g_size_00433a60 = &LosStepVectorSize::size;
 
-typedef std::vector<Elem_00434360> Vec_00433b00;
-typedef Vec_00433b00::size_type (Vec_00433b00::*SizeFn_00433b00)() const;
+typedef std::vector<LosLineData> LosLineDataVectorSize;
+typedef LosLineDataVectorSize::size_type (LosLineDataVectorSize::*LosLineDataVectorSizeFn)() const;
 
-// FUNCTION: 0x433b00 ?size@?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QBEIXZ
-SizeFn_00433b00 g_size_00433b00 = &Vec_00433b00::size;
+// FUNCTION: 0x433b00 ?size@?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@QBEIXZ
+LosLineDataVectorSizeFn g_size_00433b00 = &LosLineDataVectorSize::size;
 
-typedef std::vector<Elem_00434020> Vec_00433b20;
-typedef void (Vec_00433b20::*InsertFn_00433b20)(
-    Vec_00433b20::iterator, Vec_00433b20::size_type, const Elem_00434020&);
+typedef std::vector<LosStep> LosStepVectorInsert;
+typedef void (LosStepVectorInsert::*LosStepVectorInsertFn)(
+    LosStepVectorInsert::iterator, LosStepVectorInsert::size_type, const LosStep&);
 
-// FUNCTION: 0x433b20 ?insert@?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@QAEXPAUElem_00434020@@IABU3@@Z
-InsertFn_00433b20 g_insert_00433b20 = &Vec_00433b20::insert;
+// FUNCTION: 0x433b20 ?insert@?$vector@ULosStep@@V?$allocator@ULosStep@@@std@@@std@@QAEXPAULosStep@@IABU3@@Z
+LosStepVectorInsertFn g_insert_00433b20 = &LosStepVectorInsert::insert;
 
-typedef std::vector<Elem_00434020> Vec_00433d50;
-typedef Vec_00433d50::iterator (Vec_00433d50::*EraseFn_00433d50)(
-    Vec_00433d50::iterator, Vec_00433d50::iterator);
+typedef std::vector<LosStep> LosStepVectorErase;
+typedef LosStepVectorErase::iterator (LosStepVectorErase::*LosStepVectorEraseFn)(
+    LosStepVectorErase::iterator, LosStepVectorErase::iterator);
 
-// FUNCTION: 0x433d50 ?erase@?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@QAEPAUElem_00434020@@PAU3@0@Z
-EraseFn_00433d50 g_erase_00433d50 = &Vec_00433d50::erase;
+// FUNCTION: 0x433d50 ?erase@?$vector@ULosStep@@V?$allocator@ULosStep@@@std@@@std@@QAEPAULosStep@@PAU3@0@Z
+LosStepVectorEraseFn g_erase_00433d50 = &LosStepVectorErase::erase;
 
-typedef std::allocator<Elem_00434020> Alloc_00433da0;
-typedef void (Alloc_00433da0::*DeallocateFn_00433da0)(void*, Alloc_00433da0::size_type);
+typedef std::allocator<LosStep> LosStepAllocatorDeallocate;
+typedef void (LosStepAllocatorDeallocate::*LosStepDeallocateFn)(void*, LosStepAllocatorDeallocate::size_type);
 
-// FUNCTION: 0x433da0 ?deallocate@?$allocator@UElem_00434020@@@std@@QAEXPAXI@Z
-DeallocateFn_00433da0 g_deallocate_00433da0 = &Alloc_00433da0::deallocate;
+// FUNCTION: 0x433da0 ?deallocate@?$allocator@ULosStep@@@std@@QAEXPAXI@Z
+LosStepDeallocateFn g_deallocate_00433da0 = &LosStepAllocatorDeallocate::deallocate;
 
-typedef std::vector<Elem_00434360> Vec_00433db0;
-typedef void (Vec_00433db0::*InsertFn_00433db0)(
-    Vec_00433db0::iterator, Vec_00433db0::size_type, const Elem_00434360&);
+typedef std::vector<LosLineData> LosLineDataVectorInsert;
+typedef void (LosLineDataVectorInsert::*LosLineDataVectorInsertFn)(
+    LosLineDataVectorInsert::iterator, LosLineDataVectorInsert::size_type, const LosLineData&);
 
-// FUNCTION: 0x433db0 ?insert@?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAEXPAUElem_00434360@@IABU3@@Z
-InsertFn_00433db0 g_insert_00433db0 = &Vec_00433db0::insert;
+// FUNCTION: 0x433db0 ?insert@?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@QAEXPAULosLineData@@IABU3@@Z
+LosLineDataVectorInsertFn g_insert_00433db0 = &LosLineDataVectorInsert::insert;
 
-typedef std::vector<Elem_00434360> Inner_004340f0;
-typedef std::vector<Inner_004340f0> Outer_004340f0;
-typedef void (Outer_004340f0::*InsertFn_004340f0)(
-    Outer_004340f0::iterator, Outer_004340f0::size_type, const Inner_004340f0&);
+typedef std::vector<LosLineData> LosLineDataRow;
+typedef std::vector<LosLineDataRow> LosLineDataRowList;
+typedef void (LosLineDataRowList::*LosLineDataRowListInsertFn)(
+    LosLineDataRowList::iterator, LosLineDataRowList::size_type, const LosLineDataRow&);
 
-// FUNCTION: 0x4340f0 ?insert@?$vector@V?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@V?$allocator@V?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@@2@@std@@QAEXPAV?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@2@IABV32@@Z
-InsertFn_004340f0 g_insert_004340f0 = &Outer_004340f0::insert;
+// FUNCTION: 0x4340f0 ?insert@?$vector@V?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@V?$allocator@V?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@@2@@std@@QAEXPAV?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@2@IABV32@@Z
+LosLineDataRowListInsertFn g_insert_004340f0 = &LosLineDataRowList::insert;
 
-typedef std::allocator<Elem_00434020> Alloc_004343f0;
-typedef void (Alloc_004343f0::*DestroyFn_004343f0)(Elem_00434020*);
+typedef std::allocator<LosStep> LosStepAllocatorDestroy;
+typedef void (LosStepAllocatorDestroy::*LosStepAllocatorDestroyFn)(LosStep*);
 
-// FUNCTION: 0x4343f0 ?destroy@?$allocator@UElem_00434020@@@std@@QAEXPAUElem_00434020@@@Z
-DestroyFn_004343f0 g_destroy_004343f0 = &Alloc_004343f0::destroy;
+// FUNCTION: 0x4343f0 ?destroy@?$allocator@ULosStep@@@std@@QAEXPAULosStep@@@Z
+LosStepAllocatorDestroyFn g_destroy_004343f0 = &LosStepAllocatorDestroy::destroy;
 
-typedef std::allocator<Elem_00434360> Alloc_00434400;
-typedef void (Alloc_00434400::*DestroyFn_00434400)(Elem_00434360*);
+typedef std::allocator<LosLineData> LosLineDataAllocator;
+typedef void (LosLineDataAllocator::*LosLineDataDestroyFn)(LosLineData*);
 
-// FUNCTION: 0x434400 ?destroy@?$allocator@UElem_00434360@@@std@@QAEXPAUElem_00434360@@@Z
-DestroyFn_00434400 g_destroy_00434400 = &Alloc_00434400::destroy;
+// FUNCTION: 0x434400 ?destroy@?$allocator@ULosLineData@@@std@@QAEXPAULosLineData@@@Z
+LosLineDataDestroyFn g_destroy_00434400 = &LosLineDataAllocator::destroy;
 
 // FUNCTION: 0x434430
 void __stdcall DestroyPoint(int)
@@ -362,23 +362,23 @@ void __stdcall DestroyPoint(int)
 }
 
 // FUNCTION: 0x434440
-void __stdcall DestroyLine(Elem_00434360* p)
+void __stdcall DestroyLine(LosLineData* p)
 {
     std::_Destroy(p);
 }
 
-typedef std::vector<Elem_00434360> Vec_00434470;
-typedef void (Vec_00434470::*InsertFn_00434470)(
-    Vec_00434470::iterator, Vec_00434470::size_type, const Elem_00434360&);
+typedef std::vector<LosLineData> LosLineDataCopyVector;
+typedef void (LosLineDataCopyVector::*LosLineDataCopyInsertFn)(
+    LosLineDataCopyVector::iterator, LosLineDataCopyVector::size_type, const LosLineData&);
 
-typedef std::vector<Elem_00434360> Vec_004349f0;
-typedef Vec_004349f0& (Vec_004349f0::*AssignFn_004349f0)(const Vec_004349f0&);
+typedef std::vector<LosLineData> LosLineDataDeleteVector;
+typedef LosLineDataDeleteVector& (LosLineDataDeleteVector::*LosLineDataDeleteAssignFn)(const LosLineDataDeleteVector&);
 
-// FUNCTION: 0x434470 ??0Elem_00434360@@QAE@ABU0@@Z
-InsertFn_00434470 g_insert_00434470 = &Vec_00434470::insert;
+// FUNCTION: 0x434470 ??0LosLineData@@QAE@ABU0@@Z
+LosLineDataCopyInsertFn g_insert_00434470 = &LosLineDataCopyVector::insert;
 
-// FUNCTION: 0x4349f0 ??_GElem_00434360@@QAEPAXI@Z
-AssignFn_004349f0 g_assign_004349f0 = &Vec_004349f0::operator=;
+// FUNCTION: 0x4349f0 ??_GLosLineData@@QAEPAXI@Z
+LosLineDataDeleteAssignFn g_assign_004349f0 = &LosLineDataDeleteVector::operator=;
 
 // FUNCTION: 0x4345c0
 void __stdcall StoreDwordIfDst(int* param_1, int* param_2)
@@ -388,22 +388,22 @@ void __stdcall StoreDwordIfDst(int* param_1, int* param_2)
     }
 }
 
-typedef std::vector<Elem_00434020> Inner_004345e0;
-typedef Inner_004345e0& (Inner_004345e0::*AssignFn_004345e0)(const Inner_004345e0&);
+typedef std::vector<LosStep> LosStepVectorAssign;
+typedef LosStepVectorAssign& (LosStepVectorAssign::*LosStepVectorAssignFn)(const LosStepVectorAssign&);
 
-// FUNCTION: 0x4345e0 ??4?$vector@UElem_00434020@@V?$allocator@UElem_00434020@@@std@@@std@@QAEAAV01@ABV01@@Z
-AssignFn_004345e0 g_assign_004345e0 = &Inner_004345e0::operator=;
+// FUNCTION: 0x4345e0 ??4?$vector@ULosStep@@V?$allocator@ULosStep@@@std@@@std@@QAEAAV01@ABV01@@Z
+LosStepVectorAssignFn g_assign_004345e0 = &LosStepVectorAssign::operator=;
 
-typedef std::vector<Elem_00434360> Vec_00434770;
-typedef Vec_00434770& (Vec_00434770::*AssignFn_00434770)(const Vec_00434770&);
+typedef std::vector<LosLineData> LosLineDataVectorAssign;
+typedef LosLineDataVectorAssign& (LosLineDataVectorAssign::*LosLineDataVectorAssignFn)(const LosLineDataVectorAssign&);
 
-// FUNCTION: 0x434770 ??4?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAEAAV01@ABV01@@Z
-AssignFn_00434770 g_assign_00434770 = &Vec_00434770::operator=;
+// FUNCTION: 0x434770 ??4?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@QAEAAV01@ABV01@@Z
+LosLineDataVectorAssignFn g_assign_00434770 = &LosLineDataVectorAssign::operator=;
 
 // FUNCTION: 0x433500
-Inner_00433500* LosTables::GetLosTable(int n)
+LosTableView* LosTables::GetLosTable(int n)
 {
-    return (Inner_00433500*)&(*(TableList*)this)[(short)(n - 1)];
+    return (LosTableView*)&(*(TableList*)this)[(short)(n - 1)];
 }
 
 // FUNCTION: 0x432d40
@@ -454,25 +454,25 @@ void LosTables::ResizeTables(short n)
     ((TableList*)this)->resize(n, x);
 }
 
-typedef TableList& (TableList::*AssignFn_00433a80)(const TableList&);
+typedef TableList& (TableList::*TableListAssignFn)(const TableList&);
 
-AssignFn_00433a80 g_assign_00433a80 = &TableList::operator=;
+TableListAssignFn g_assign_00433a80 = &TableList::operator=;
 
-// FUNCTION: 0x433a80 ??1?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAE@XZ
+// FUNCTION: 0x433a80 ??1?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@QAE@XZ
 
-typedef LineList::iterator (LineList::*EraseFn_00434020)(
+typedef LineList::iterator (LineList::*LineListEraseFn)(
     LineList::iterator, LineList::iterator);
 
-// FUNCTION: 0x434020 ?erase@?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAEPAUElem_00434360@@PAU3@0@Z
-EraseFn_00434020 g_erase_00434020 = &LineList::erase;
+// FUNCTION: 0x434020 ?erase@?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@QAEPAULosLineData@@PAU3@0@Z
+LineListEraseFn g_erase_00434020 = &LineList::erase;
 
-typedef void (TableList::*InsertFn_004344e0)(TableList::iterator, TableList::size_type, const LineList&);
+typedef void (TableList::*TableListInsertFn)(TableList::iterator, TableList::size_type, const LineList&);
 
-// FUNCTION: 0x4344e0 ??0?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@QAE@ABV01@@Z
-InsertFn_004344e0 g_insert_004344e0 = &TableList::insert;
+// FUNCTION: 0x4344e0 ??0?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@QAE@ABV01@@Z
+TableListInsertFn g_insert_004344e0 = &TableList::insert;
 
-typedef TableList::iterator (TableList::*EraseFn_00434360)(
+typedef TableList::iterator (TableList::*TableListEraseFn)(
     TableList::iterator, TableList::iterator);
 
-// FUNCTION: 0x434360 ?erase@?$vector@V?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@V?$allocator@V?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@std@@@2@@std@@QAEPAV?$vector@UElem_00434360@@V?$allocator@UElem_00434360@@@std@@@2@PAV32@0@Z
-EraseFn_00434360 g_erase_00434360 = &TableList::erase;
+// FUNCTION: 0x434360 ?erase@?$vector@V?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@V?$allocator@V?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@std@@@2@@std@@QAEPAV?$vector@ULosLineData@@V?$allocator@ULosLineData@@@std@@@2@PAV32@0@Z
+TableListEraseFn g_erase_00434360 = &TableList::erase;

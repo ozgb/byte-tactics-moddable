@@ -3,13 +3,13 @@
 
 #pragma pack(push, 1)
 
-struct Table_00499cd0;
+struct DamageTable;
 
 struct WeaponDef {
     char name[0x20];
     char description[0x40];
     void* fire;
-    Table_00499cd0* table;
+    DamageTable* table;
     int speed;
     int startSpeed;
     int acceleration;

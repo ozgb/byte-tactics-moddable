@@ -5,13 +5,13 @@
 struct UnitDef;
 
 #pragma pack(push, 1)
-struct AnimEntry_00421f20 {
+struct FeatureAnimEntry {
     short next;
     short prev;
     char unknown_4[0x2c];
 };
 
-struct FeatureUnit_00421f20 {
+struct FeaturePseudoUnit {
     char unknown_0[0x92];
     Ref<UnitDef> def;
     char unknown_96[0xa6 - 0x96];
@@ -23,8 +23,8 @@ struct FeatureUnit_00421f20 {
 
 struct FeatureAnimPool {
     char unknown_0[16];
-    Ref<AnimEntry_00421f20> anim;
-    Ref<FeatureUnit_00421f20> featureUnit;
+    Ref<FeatureAnimEntry> anim;
+    Ref<FeaturePseudoUnit> featureUnit;
     int activeHead;
     int idleHead;
     int freeHead;

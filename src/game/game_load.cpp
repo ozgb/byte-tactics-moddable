@@ -107,7 +107,6 @@ struct CursorWorldPos {
 };
 
 #include "../graphics/rect.h"
-#include "../gui/mouse_event.h"
 
 struct CursorMoveEvent {
     int x;
@@ -758,7 +757,7 @@ void __stdcall OffsetWorldPosFromView(Point* p, WorldViewOrigin* view, int param
 // FUNCTION: 0x498d00
 void __stdcall MinimapCursorToWorldPos(MinimapWorldPos* out)
 {
-    MouseEvent r = (*(struct MouseEvent*)&g_game->view);
+    ViewMouseEvent r = g_game->view;
     int dx = r.x - g_game->posX;
     int dy = r.y - g_game->posY;
     memset(out, 0, sizeof(MinimapWorldPos));

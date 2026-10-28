@@ -2277,7 +2277,7 @@ address,function,file,kind,target
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_write,Point16::y
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,function,
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,global_read,g_seams
-0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(UnitDef *, Point16, short, Los_0047d2e0 *) __attribute__((stdcall)) [MapSeam::CanBuildAt]"
+0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(UnitDef *, Point16, short, Player *) __attribute__((stdcall)) [MapSeam::CanBuildAt]"
 0x40a5b0,Elem_0040cc40::Elem_0040cc40,src/ai/player_ai.h,field_read,Elem_0040cc40::key
 0x40a5b0,Elem_0040cc40::Elem_0040cc40,src/ai/player_ai.h,field_read,Elem_0040cc40::pos
 0x40a5b0,Elem_0040cc40::Elem_0040cc40,src/ai/player_ai.h,function,
@@ -7293,14 +7293,14 @@ address,function,file,kind,target
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,operator->
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,call,operator=
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_escape,Game::anim
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_maybe_written,NameEntry::name
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_maybe_written,TntFeatureName::name
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeatureAnimPool::anim
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeatureAnimPool::featureUnit
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeatureUnit_00421f20::flags_110
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,FeatureUnit_00421f20::flags_114
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,Game::defs
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,List_00421f20::count
-0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,List_00421f20::entries
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,TntInfo::featureCount
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_read,TntInfo::featureNames
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,AnimEntry_00421f20::next
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,AnimEntry_00421f20::prev
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeatureAnimPool::activeHead
@@ -22846,7 +22846,7 @@ address,function,file,kind,target
 0x471d70,ParticleSystem::SetLifetime,src/graphics/particles.cpp,function,
 0x471d70,ParticleSystem::SetLifetime,src/graphics/particles.cpp,global_read,g_game
 0x471d90,CreateParticleLists,src/graphics/particles.cpp,call,operator new
-0x471d90,CreateParticleLists,src/graphics/particles.cpp,deref_write,*Lists_00471d90
+0x471d90,CreateParticleLists,src/graphics/particles.cpp,deref_write,*ParticleLists
 0x471d90,CreateParticleLists,src/graphics/particles.cpp,field_escape,Game::lists_38d77
 0x471d90,CreateParticleLists,src/graphics/particles.cpp,function,
 0x471d90,CreateParticleLists,src/graphics/particles.cpp,global_read,g_game
@@ -22856,35 +22856,35 @@ address,function,file,kind,target
 0x471de0,DestroyParticleLists,src/graphics/particles.cpp,field_write,Game::lists_38d77
 0x471de0,DestroyParticleLists,src/graphics/particles.cpp,function,
 0x471de0,DestroyParticleLists,src/graphics/particles.cpp,global_read,g_game
-0x471eb0,UpdateParticles,src/graphics/particles.cpp,call,Listener_00471eb0::~Listener_00471eb0
+0x471eb0,UpdateParticles,src/graphics/particles.cpp,call,ParticleSystem::~ParticleSystem
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,call,begin
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,call,end
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,call,erase
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,call,operator delete
-0x471eb0,UpdateParticles,src/graphics/particles.cpp,deref_read,*Listener_00471eb0
+0x471eb0,UpdateParticles,src/graphics/particles.cpp,deref_read,*ParticleSystem
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,field_read,Game::lists_38d77
-0x471eb0,UpdateParticles,src/graphics/particles.cpp,field_read,Lists_00471eb0::lists
+0x471eb0,UpdateParticles,src/graphics/particles.cpp,field_read,ParticleLists::lists
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,function,
 0x471eb0,UpdateParticles,src/graphics/particles.cpp,global_read,g_game
-0x471eb0,UpdateParticles,src/graphics/particles.cpp,indirect_call,virtual Listener_00471eb0::Slot1
-0x471eb0,UpdateParticles,src/graphics/particles.cpp,indirect_call,virtual Listener_00471eb0::Slot3
-0x471eb0,UpdateParticles,src/graphics/particles.cpp,indirect_call,virtual Listener_00471eb0::~Listener_00471eb0
+0x471eb0,UpdateParticles,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::IsFinished
+0x471eb0,UpdateParticles,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::Update
+0x471eb0,UpdateParticles,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::~ParticleSystem
 0x471f40,DrawParticles,src/graphics/particles.cpp,call,begin
 0x471f40,DrawParticles,src/graphics/particles.cpp,call,end
-0x471f40,DrawParticles,src/graphics/particles.cpp,deref_read,*Listener_471f40
-0x471f40,DrawParticles,src/graphics/particles.cpp,field_maybe_written,Lists_471f40::lists
+0x471f40,DrawParticles,src/graphics/particles.cpp,deref_read,*ParticleSystem
+0x471f40,DrawParticles,src/graphics/particles.cpp,field_maybe_written,ParticleLists::lists
 0x471f40,DrawParticles,src/graphics/particles.cpp,field_read,Game::lists_38d77
 0x471f40,DrawParticles,src/graphics/particles.cpp,function,
 0x471f40,DrawParticles,src/graphics/particles.cpp,global_read,g_game
-0x471f40,DrawParticles,src/graphics/particles.cpp,indirect_call,virtual Listener_471f40::Slot2
+0x471f40,DrawParticles,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::Render
 0x471f90,DrawParticleList,src/graphics/particles.cpp,call,begin
 0x471f90,DrawParticleList,src/graphics/particles.cpp,call,end
-0x471f90,DrawParticleList,src/graphics/particles.cpp,deref_read,*Listener_00471f90
+0x471f90,DrawParticleList,src/graphics/particles.cpp,deref_read,*ParticleSystem
 0x471f90,DrawParticleList,src/graphics/particles.cpp,field_read,Game::lists_38d77
-0x471f90,DrawParticleList,src/graphics/particles.cpp,field_read,Lists_00471f90::lists
+0x471f90,DrawParticleList,src/graphics/particles.cpp,field_read,ParticleLists::lists
 0x471f90,DrawParticleList,src/graphics/particles.cpp,function,
 0x471f90,DrawParticleList,src/graphics/particles.cpp,global_read,g_game
-0x471f90,DrawParticleList,src/graphics/particles.cpp,indirect_call,virtual Listener_00471f90::Slot2
+0x471f90,DrawParticleList,src/graphics/particles.cpp,indirect_call,virtual ParticleSystem::Render
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,call,ParticleLists::AddToList
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,call,operator new
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,field_read,Game::lists_38d77
@@ -26380,7 +26380,6 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_write,*unsigned short
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_escape,Game::eyes
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_escape,Mission::tidalStrength
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_escape,TntInfo::version
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,FeaturesSeam::InitFeatureAnimPool
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,FeaturesSeam::PlaceFeature
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,FeaturesSeam::PlaceMissionFeatures
@@ -26474,15 +26473,15 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::attr_a
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::attr_b
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::attr_limit
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::featureCount
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::featureNames
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::feature_data
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::feature_flags
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::flag
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::height
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::map_size
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::sea_a
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::sea_b
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::sea_d
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::tile_count
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::tile_map_src
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::tile_set_count
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,TntInfo::tile_set_src
@@ -26496,7 +26495,7 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,"indirect via char *(*)(Mission *, int) __attribute__((stdcall)) [MapSeam::GetNameSlot]"
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::PlaceMissionFeatures]
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::StampFeatureMetal]
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)(List_00421f20 *) __attribute__((stdcall)) [FeaturesSeam::InitFeatureAnimPool]
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)(TntInfo *) __attribute__((stdcall)) [FeaturesSeam::InitFeatureAnimPool]
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,call,GameFreeThunk
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,call,get
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,call,operator Cell *
@@ -47093,15 +47092,6 @@ address,function,file,kind,target
 ,IsExplored,src/game/los_helpers.h,field_read,Vec3Words::yWhole
 ,IsExplored,src/game/los_helpers.h,field_read,Vec3Words::zWhole
 ,IsExplored,src/game/los_helpers.h,function,
-,IsExplored,src/graphics/particles.cpp,call,operator unsigned char *
-,IsExplored,src/graphics/particles.cpp,deref_read,*unsigned char
-,IsExplored,src/graphics/particles.cpp,field_read,Player::explored
-,IsExplored,src/graphics/particles.cpp,field_read,Player::exploredHeight
-,IsExplored,src/graphics/particles.cpp,field_read,Player::exploredWidth
-,IsExplored,src/graphics/particles.cpp,field_read,Vec3Words::xWhole
-,IsExplored,src/graphics/particles.cpp,field_read,Vec3Words::yWhole
-,IsExplored,src/graphics/particles.cpp,field_read,Vec3Words::zWhole
-,IsExplored,src/graphics/particles.cpp,function,
 ,IsExploredAtHeight,src/map/terrain.cpp,call,InsideExplored
 ,IsExploredAtHeight,src/map/terrain.cpp,call,operator unsigned char *
 ,IsExploredAtHeight,src/map/terrain.cpp,deref_read,*unsigned char
@@ -47221,11 +47211,7 @@ address,function,file,kind,target
 ,IsSeen,src/graphics/particles.cpp,deref_read,*unsigned short
 ,IsSeen,src/graphics/particles.cpp,field_read,Game::playerIndex
 ,IsSeen,src/graphics/particles.cpp,field_read,Game::visibilityMask
-,IsSeen,src/graphics/particles.cpp,field_read,Player::exploredHeight
 ,IsSeen,src/graphics/particles.cpp,field_read,Player::exploredWidth
-,IsSeen,src/graphics/particles.cpp,field_read,Vec3Words::xWhole
-,IsSeen,src/graphics/particles.cpp,field_read,Vec3Words::yWhole
-,IsSeen,src/graphics/particles.cpp,field_read,Vec3Words::zWhole
 ,IsSeen,src/graphics/particles.cpp,function,
 ,IsSeen,src/graphics/particles.cpp,global_read,g_game
 ,IsSeenAtHeight,src/map/terrain.cpp,call,InsideExplored

@@ -1,5 +1,7 @@
 #ifndef FEATURES_H
 #define FEATURES_H
+struct TntInfo;
+
 struct Cell;
 struct Feature;
 struct Point16;
@@ -43,5 +45,7 @@ void __stdcall ResolveFeatureLinks();
 void __stdcall LoadFeatures(HapiBank* file);
 
 int __stdcall LoadFeatureType(char* name);
+
+void __stdcall InitFeatureAnimPool(TntInfo* info);
 
 #endif

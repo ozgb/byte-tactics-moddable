@@ -1244,6 +1244,8 @@ los_radar,features,shared_write,GafFrame::yOffset,1
 los_radar,features,shared_write,Game::cells,6
 los_radar,features,shared_write,Point16::x,10
 los_radar,features,shared_write,Point16::y,10
+los_radar,features,shared_write,TntInfo::featureCount,1
+los_radar,features,shared_write,TntInfo::featureNames,1
 los_radar,features,shared_write,Vec3::x,6
 los_radar,features,shared_write,Vec3::y,4
 los_radar,features,shared_write,Vec3::z,6
@@ -1364,9 +1366,9 @@ los_radar,presentation,shared_write,Unit::flags,29
 los_radar,presentation,shared_write,Vec3::x,37
 los_radar,presentation,shared_write,Vec3::y,36
 los_radar,presentation,shared_write,Vec3::z,36
-los_radar,presentation,shared_write,Vec3Words::xWhole,6
-los_radar,presentation,shared_write,Vec3Words::yWhole,6
-los_radar,presentation,shared_write,Vec3Words::zWhole,6
+los_radar,presentation,shared_write,Vec3Words::xWhole,4
+los_radar,presentation,shared_write,Vec3Words::yWhole,4
+los_radar,presentation,shared_write,Vec3Words::zWhole,4
 los_radar,seams,indirect,GetGroundHeightNative,1
 los_radar,seams,indirect,GetNameSlotNative,1
 los_radar,seams,indirect,VisitObjectsInRangeNative,1
@@ -1837,9 +1839,9 @@ network,presentation,shared_write,Player::alliedBy,4
 network,presentation,shared_write,Player::commanderKills,1
 network,presentation,shared_write,Player::commanderLosses,1
 network,presentation,shared_write,Player::energyWasted,1
-network,presentation,shared_write,Player::explored,9
-network,presentation,shared_write,Player::exploredHeight,7
-network,presentation,shared_write,Player::exploredWidth,11
+network,presentation,shared_write,Player::explored,8
+network,presentation,shared_write,Player::exploredHeight,5
+network,presentation,shared_write,Player::exploredWidth,10
 network,presentation,shared_write,Player::id,8
 network,presentation,shared_write,Player::index,23
 network,presentation,shared_write,Player::info,61
@@ -2790,9 +2792,9 @@ players,presentation,shared_write,Player::displayTimer,1
 players,presentation,shared_write,Player::energy,4
 players,presentation,shared_write,Player::energyCapacity,3
 players,presentation,shared_write,Player::energyWasted,1
-players,presentation,shared_write,Player::explored,9
-players,presentation,shared_write,Player::exploredHeight,7
-players,presentation,shared_write,Player::exploredWidth,11
+players,presentation,shared_write,Player::explored,8
+players,presentation,shared_write,Player::exploredHeight,5
+players,presentation,shared_write,Player::exploredWidth,10
 players,presentation,shared_write,Player::firstIndex,1
 players,presentation,shared_write,Player::id,8
 players,presentation,shared_write,Player::index,23
@@ -2913,6 +2915,7 @@ players,wind_meteors,shared_write,Vec3::x,1
 players,wind_meteors,shared_write,Vec3::y,1
 players,wind_meteors,shared_write,Vec3::z,1
 presentation,ai,call,GetBuildRating,1
+presentation,ai,call,IsExplored,1
 presentation,ai,call,IsPointVisible,1
 presentation,ai,call,SetUnitSquad,1
 presentation,ai,indirect,IsPointVisible,1
@@ -4842,7 +4845,7 @@ weapons,presentation,shared_write,UnitWeaponSlot::weapon,3
 weapons,presentation,shared_write,Vec3::x,37
 weapons,presentation,shared_write,Vec3::y,36
 weapons,presentation,shared_write,Vec3::z,36
-weapons,presentation,shared_write,Vec3Words::yWhole,6
+weapons,presentation,shared_write,Vec3Words::yWhole,4
 weapons,presentation,shared_write,Vec3f::x,1
 weapons,presentation,shared_write,Vec3f::y,1
 weapons,presentation,shared_write,Vec3f::z,1

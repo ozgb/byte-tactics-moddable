@@ -28,15 +28,65 @@ struct Data { %s };
 """ % (major, minor, "\n".join(slots), data)
 
 
-def verdict(old: str, new: str, tagged: bool = True) -> abidiff.Result:
+def verdict(old: str, new: str, tagged: bool = True, majors: dict | None = None) -> abidiff.Result:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         (root / "old").mkdir()
         (root / "new").mkdir()
         (root / "old/t.h").write_text(old)
         (root / "new/t.h").write_text(new)
-        (result,) = abidiff.diff_dirs(root / "old", root / "new", tagged)
+        (result,) = abidiff.diff_dirs(root / "old", root / "new", tagged, majors)
     return result
+
+
+class ListedMajorTest(unittest.TestCase):
+    old = header([SLOT_A, SLOT_B])
+    listed = {("t", 2): "#499"}
+
+    def test_listed_major_bump_passes(self):
+        result = verdict(self.old, header([SLOT_A], major=2), majors=self.listed)
+        self.assertTrue(result.ok, result)
+        self.assertEqual(result.summary, "ok (major 1->2, no adapter: #499)")
+        self.assertTrue(result.details)
+
+    def test_unlisted_major_bump_fails(self):
+        for majors in ({}, {("t", 3): "#499"}, {("other", 2): "#499"}):
+            result = verdict(self.old, header([SLOT_A], major=2), majors=majors)
+            self.assertFalse(result.ok)
+            self.assertIn("adapter required (#9)", result.summary)
+
+    def test_listed_major_with_a_layout_change_fails(self):
+        result = verdict(self.old, header([SLOT_A], major=2, data="int b; int a;"), majors=self.listed)
+        self.assertFalse(result.ok, result)
+
+    def test_listed_major_going_down_fails(self):
+        result = verdict(header([SLOT_A], major=3), header([SLOT_A], major=2), majors=self.listed)
+        self.assertFalse(result.ok)
+
+
+class StaleRowTest(unittest.TestCase):
+    def problems(self, rows: list) -> list[str]:
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "t.h").write_text(header([SLOT_A], major=2))
+            return abidiff.stale_rows(rows, Path(tmp))
+
+    def test_current_row_is_fine(self):
+        self.assertEqual(self.problems([("t", 2, "#499")]), [])
+
+    def test_wrong_major_is_stale(self):
+        (line,) = self.problems([("t", 3, "#499")])
+        self.assertIn("row 2 (t,3): stale", line)
+
+    def test_unknown_interface_is_stale(self):
+        (line,) = self.problems([("gone", 2, "#499")])
+        self.assertIn("gone", line)
+
+    def test_issue_must_be_a_reference(self):
+        (line,) = self.problems([("t", 2, "later")])
+        self.assertIn("not a #N reference", line)
+
+    def test_the_checked_in_list_is_current(self):
+        self.assertEqual(abidiff.stale_rows(abidiff.load_majors(abidiff.MAJORS_CSV), abidiff.ROOT / "interfaces"), [])
 
 
 class NewSlotTest(unittest.TestCase):

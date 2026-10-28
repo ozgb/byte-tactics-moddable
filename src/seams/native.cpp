@@ -43,7 +43,7 @@ struct Feature;
 struct Weapon;
 struct Spot;
 struct Rot16;
-struct List_00421f20;
+struct TntInfo;
 struct Pos_00485070;
 struct Obj_0043e3c0;
 struct Vec3_0049a0c0;
@@ -55,7 +55,6 @@ struct Callback;
 
 struct Order;
 struct _iobuf;
-struct Los_0047d2e0;
 class MissionType;
 
 #include "../ai/ai_player.h"
@@ -87,7 +86,6 @@ Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 void __stdcall UpdatePlayerEconomy(Player* p);
 #include "../units/unit_motion.h"
 
-void __stdcall InitFeatureAnimPool(List_00421f20* list);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
 
 int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index);
@@ -796,7 +794,7 @@ void InstallNativeSeams()
     s_ai.SetUnitSquad = SetUnitSquad;
     s_ai.SquadManagerTickIfActive = SquadManagerTickIfActiveNative;
     s_ai.SquadManagerDeleteTimers = SquadManagerDeleteTimersNative;
-    s_map.CanBuildAt = (decltype(s_map.CanBuildAt))CanBuildAt;
+    s_map.CanBuildAt = CanBuildAt;
     s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
     s_orders.AddOrder = AddOrder;
     s_orders.DeleteOrders = DeleteOrders;

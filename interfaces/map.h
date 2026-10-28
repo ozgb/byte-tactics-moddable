@@ -5,16 +5,16 @@ struct Vec3;
 struct Point16;
 struct Unit;
 struct UnitDef;
-struct Los_0047d2e0;
+struct Player;
 class Mission;
 class HapiBank;
 class MovementClass;
 class SpatialBucket;
 
 // Major version of the map interface, changed when a slot is removed or its signature changes.
-#define MAP_VERSION_MAJOR 2
+#define MAP_VERSION_MAJOR 3
 // Minor version of the map interface, changed when a slot is added.
-#define MAP_VERSION_MINOR 1
+#define MAP_VERSION_MINOR 0
 
 // Visits each unit VisitObjectsInRange finds. Implementations keep the vtable pointer first and this method in the first slot.
 class UnitVisitor {
@@ -36,7 +36,7 @@ struct MapSeam {
     // Calls a visitor on each unit within a range of a position. Hooks: none.
     void (__stdcall* VisitObjectsInRange)(Vec3* pos, int range, UnitVisitor* visitor);
     // Returns 1 when a unit type can be built at a cell, with a visibility check when los is given. Hooks: none.
-    int (__stdcall* CanBuildAt)(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* los);
+    int (__stdcall* CanBuildAt)(UnitDef* unit, Point16 cell, short type, Player* player);
     // Returns 1 when the footprint of a unit type fits at a cell (flags 2 counts a cell off the map as a fit). Hooks: none.
     int (__stdcall* CanPlaceUnitFootprint)(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
     // Builds the pass map of every movement class for the loaded terrain. Hooks: none.

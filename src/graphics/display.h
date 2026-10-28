@@ -21,7 +21,7 @@ void __stdcall InitDisplayDefaults(App_4b5980* p);
 int __stdcall InitEnvironment(App_4b5980* d);
 void __stdcall ShutdownEnvironment(App_4b5980* d);
 void __stdcall QuitApp(char* message);
-void __stdcall FatalError(char* message);
+#include "../../interfaces/services.h"
 unsigned long __stdcall GetMilliseconds(void);
 int __stdcall GetScreenWidth();
 int __stdcall GetScreenHeight();

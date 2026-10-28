@@ -71,7 +71,7 @@ Only the maintainer merges. A branch doesn't have to contain `moddable`'s head t
 ## Issue states
 
 - **Available:** open, no assignee, no open blockers (`blocked_by` API, mirrored in the "Blocked by" line), not labelled `needs-grooming`.
-- **Claimed:** assigned, with a "Lead: Claimed" comment. One claim at a time per lead.
+- **Claimed:** assigned, with a "Lead: Claimed" comment. One claim at a time per lead, or two while the first only waits on Wine runs, when the two touch different files; the first one's pull request comes first in review.
 - **Done:** closed by the merged pull request's `Closes #N`.
 
 Blockers are kept in two places that must agree: the `blocked_by` dependency API, which tools query, and the "**Blocked by:**" line at the top of the body, which people read. Whoever changes one changes the other.

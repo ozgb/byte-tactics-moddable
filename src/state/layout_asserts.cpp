@@ -12,6 +12,7 @@
 #pragma pack(push, 1)
 #include "../util/vec3.h"
 #include "../../include/v4i.h"
+#include "../../interfaces/services.h"
 #include "../ai/ai_search_goal.h"
 #include "../ai/group.h"
 #include "../ai/pathfinder.h"
@@ -115,7 +116,6 @@
 #include "../util/point.h"
 #include "../util/rot16.h"
 #include "../util/string_ref.h"
-#include "../util/tdf.h"
 #include "../weapons/damage_table.h"
 #include "../weapons/debris.h"
 #include "../weapons/projectile.h"

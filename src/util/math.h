@@ -7,6 +7,6 @@ float __stdcall VectorLengthFloat(float x, float y, float z);
 
 int __stdcall ComputeChecksum(unsigned char* data, int len);
 void __stdcall SeedRandom(unsigned int seed);
-int __stdcall RandomInt(int range);
+#include "../../interfaces/services.h"
 
 #endif

@@ -1215,7 +1215,6 @@ struct Flags_418fd0;
 union Flags_4b5980;
 struct FloatVec;
 struct Follow_0041ca10;
-struct Font_004a3ef0;
 struct Font_004a50b0;
 struct Form_00464e70;
 struct Fp_004bbff0;
@@ -1348,9 +1347,6 @@ struct Item_00478b40;
 struct Item_004794d0;
 struct Item_00481430;
 struct Item_00485940;
-struct Item_004a1b40;
-struct Item_004a36a0;
-struct Item_004a3780;
 struct Item_004b3630_10;
 struct Item_004b4d70;
 struct Item_004bb2e0;
@@ -1546,7 +1542,6 @@ struct Obj_00462d30;
 struct Obj_00479bf0;
 struct Obj_0047e5c0;
 struct Obj_00499ab0;
-struct Obj_004a1950;
 struct Obj_004a7f70;
 struct Obj_004ad4f0;
 struct Obj_004ada40;
@@ -1845,7 +1840,6 @@ struct Res_0045bbf0;
 struct Resources;
 struct RgbQuad;
 struct Rot16;
-struct Row_004a35a0;
 struct Rule_0045f1d0;
 struct S;
 struct SaveDesc_0043a420;
@@ -1941,7 +1935,6 @@ struct Struct_004907e0;
 struct Struct_0049fb50;
 struct Struct_0049fba0;
 struct Struct_0049fbf0;
-struct Struct_004a1970;
 struct Struct_004a81b0;
 struct Struct_004ad980;
 struct Struct_004add60;
@@ -2083,7 +2076,6 @@ struct Vec3_2;
 union Vec3_459200;
 struct Vec3f;
 struct Vec3i_00474130;
-struct Vec6_49fd20;
 class VecElems_0046ca60;
 class VecInt_0046ca60;
 class Vec_0046d1a0;
@@ -11551,12 +11543,6 @@ struct Struct_0049fbf0 {
     char path[256];
 };
 
-struct Vec6_49fd20 {
-    int x;
-    int y;
-    char unknown_8[16];
-};
-
 struct Entry_004a0bf0 {
     char name[16];
     char unknown_10[331];
@@ -11587,16 +11573,6 @@ struct Class_004a16f0 {
     int f_cca;
 };
 
-struct Obj_004a1950 {
-    char unknown_0[4];
-    int field_4;
-};
-
-struct Struct_004a1970 {
-    char unknown_0[12];
-    int field_c;
-};
-
 struct Class_004a1ab0 {
     char unknown_0[24];
     Dialog* holder;
@@ -11618,11 +11594,6 @@ struct Glyph_004a1b40 {
     short yoff;
 };
 
-struct Item_004a1b40 {
-    char unknown_0[40];
-    Cell* cell;
-};
-
 struct Class_004a2480 {
     char unknown_0[24];
     Dialog* holder;
@@ -11631,22 +11602,6 @@ struct Class_004a2480 {
 struct Class_004a30c0 {
     char unknown_0[24];
     Dialog* holder;
-};
-
-struct Row_004a35a0 {
-    short unknown_0;
-    unsigned short height;
-    char unknown_4[20];
-};
-
-struct Item_004a36a0 {
-    char unknown_0[40];
-    int field_28;
-};
-
-struct Item_004a3780 {
-    char unknown_0[40];
-    Row_004a35a0* row;
 };
 
 struct Point_0049fc50 {
@@ -11699,11 +11654,6 @@ struct Dialog {
 struct Class_004a3eb0 {
     char unknown_0[24];
     Table_004b3630* table;
-};
-
-struct Font_004a3ef0 {
-    char unknown_0[40];
-    Glyph_004a1b40* glyph;
 };
 
 struct Class_004a4620 {

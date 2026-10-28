@@ -618,7 +618,6 @@ struct Class_004ab040;
 struct Class_004ab2b0;
 struct Class_004ac610;
 struct Class_004acc70;
-struct FileRequester;
 struct Class_004afc60;
 struct Class_004aff00;
 class CobScript;
@@ -1571,7 +1570,6 @@ struct Obj_004baba0;
 struct Obj_004babd0;
 struct Obj_004badf0;
 struct Obj_004c13d0;
-struct Obj_004c2380;
 struct Obj_004c23e0;
 struct Obj_004c2470;
 struct Obj_004c24b0;
@@ -3714,26 +3712,6 @@ struct Button_0041e420 {
 };
 
 #include "../src/game/slot_0041e420.h"
-
-struct FileRequester {
-    void* gui;
-    Mode_00446310* modes;
-    char* nameGadget;
-    char* maskGadget;
-    char* pathGadget;
-    void* field_14;
-    void* field_18;
-    void* field_1c;
-    char unknown_20[4];
-    char cwd[256];
-    char save_drive[16];
-    char save_cwd[256];
-    int field_234;
-    int field_238;
-    int field_23c;
-    int mask;
-    void (__stdcall *callback)(void*);
-};
 
 struct Display_0041ec50 {
     char unknown_0[1556];
@@ -13410,15 +13388,6 @@ struct Rect_004c2380 {
     int x;
     int y;
     int data[4];
-};
-
-struct Obj_004c2380 {
-    char unknown_0[406];
-    Rect_004c2380 rect;
-    int count;
-    short* image;
-    char unknown_1b6[24];
-    int mode;
 };
 
 struct Obj_004c23e0 {

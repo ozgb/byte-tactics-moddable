@@ -223,7 +223,6 @@ HandleTextScrollSlider,skip,placeholder type Menu_0045b800: left for the type-na
 HandleVideoModeSlider,skip,placeholder type Menu_0045b800: left for the type-naming issues
 HideSoftwareCursor,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 InitCursorFrames,mismatch,pointer/int cast: definition's type is likely wrong
-InitFeatureAnimPool,skip,placeholder type List_00421f20: left for the type-naming issues
 InitGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming issues
 InitNetConnection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 InitPacketTables,mismatch,placeholder type Class_00451fd0: left for the type-naming issues

@@ -16,6 +16,7 @@
 #include "../graphics/rect.h"
 
 #include "../map/cell.h"
+#include "../map/tnt_info.h"
 
 struct FogCell {
     union {
@@ -96,26 +97,6 @@ union Flags_142f1 {
 struct IconSet {
     char unknown_0[4];
     unsigned char* data;
-};
-
-struct TntInfo {
-    int version;
-    int width;
-    int height;
-    int flag;
-    int sea_a;
-    int sea_b;
-    int sea_d;
-    int tile_count;
-    int map_size;
-    int* tile_set_src;
-    unsigned int tile_set_count;
-    int* tile_map_src;
-    unsigned char* attr_b;
-    unsigned char* attr_a;
-    int attr_limit;
-    unsigned int feature_flags;
-    unsigned short* feature_data;
 };
 
 #include "line_of_sight.h"
@@ -769,8 +750,8 @@ void LoadTntMap()
         info.sea_d = tnt[0xd];
         info.sea_a = tnt[10];
         info.sea_b = tnt[0xb];
-        info.tile_count = tnt[7];
-        info.map_size = tnt[8] + (int)tnt;
+        info.featureCount = tnt[7];
+        info.featureNames = (TntFeatureName*)(tnt[8] + (int)tnt);
         info.tile_set_count = tnt[6];
         info.tile_set_src = (int*)(tnt[5] + (int)tnt);
         info.tile_map_src = (int*)(tnt[3] + (int)tnt);
@@ -787,8 +768,8 @@ void LoadTntMap()
         info.sea_d = 0;
         info.sea_a = 100;
         info.sea_b = 2000;
-        info.tile_count = tnt[7];
-        info.map_size = tnt[8] + (int)tnt;
+        info.featureCount = tnt[7];
+        info.featureNames = (TntFeatureName*)(tnt[8] + (int)tnt);
         info.tile_set_count = tnt[6];
         info.tile_set_src = (int*)(tnt[5] + (int)tnt);
         info.tile_map_src = (int*)(tnt[3] + (int)tnt);
@@ -867,7 +848,7 @@ void LoadTntMap()
         plot[7] = (unsigned char)fill;
         plot += 0xd;
     }
-    g_seams.features->InitFeatureAnimPool((List_00421f20*)&info.version);
+    g_seams.features->InitFeatureAnimPool(&info);
     if (info.attr_b != 0) {
         unsigned char* q = (unsigned char*)mapSettings->cells.get();
         if (a.n > 0) {

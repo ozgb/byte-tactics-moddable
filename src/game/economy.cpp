@@ -6,6 +6,7 @@
 #include <math.h>
 #include "../files/files_api.h"
 #include "../../interfaces/seams.h"
+#include "economy.h"
 
 #pragma pack(push, 1)
 

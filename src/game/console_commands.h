@@ -1,5 +1,8 @@
 #ifndef CONSOLE_COMMANDS_H
 #define CONSOLE_COMMANDS_H
+struct FixedWorldPos;
+struct Point;
+
 class CommandArgs;
 
 class CommandArgs;
@@ -81,5 +84,9 @@ void __stdcall CmdNetStats(int);
 void __stdcall CmdMusicMode(void* args);
 void __stdcall DefaultCommandHandler(CommandArgs* args);
 void __stdcall CmdShootAll(int unused);
+
+void __stdcall WorldToScreenWithHeight(FixedWorldPos* pos, int* screen_x, int* screen_y);
+void __stdcall DrawWorldDeltaLine(void* surface, FixedWorldPos* p, short dx, short dz, int color);
+void __stdcall DrawCellContours(void* surface, Point* corners, unsigned char* heights);
 
 #endif

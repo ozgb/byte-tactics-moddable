@@ -187,7 +187,6 @@ void __stdcall SetTextColors(int color, int background);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
 void __stdcall FillPolygon(void* surface, Point* points, int count, int color);
 void __stdcall FillRectangle(void* surface, Rect* rect, int color);
-void __stdcall DrawCellContours(void* surface, Point* corners, unsigned char* heights);
 Unit* __stdcall FindNextSelectedUnit(int, int);
 
 // FUNCTION: 0x416240

@@ -75,7 +75,7 @@ struct Class_0047cb00;
 class Class_004cdb40;
 struct Conn_443ff0;
 struct Ctx_00499890;
-struct Desc_004437c0;
+struct GameDescEntry;
 struct Entry_0042f740;
 struct Entry_00479620;
 struct Eye_00482130;
@@ -311,7 +311,7 @@ struct Game {
     void* list;
     V4i* sessions;
     Conn_443ff0* conns;
-    Desc_004437c0* desc;
+    GameDescEntry* desc;
     char* shared;
     union {
         struct {

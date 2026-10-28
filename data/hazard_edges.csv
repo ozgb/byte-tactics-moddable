@@ -95,7 +95,7 @@ BattleFrame,LoadCampaignNative,"seam slot filled by InstallNativeSeams, MapSeam:
 BattleFrame,LoadMissionByNameNative,"seam slot filled by InstallNativeSeams, MapSeam::LoadMissionByName, BattleFrame (src/ingame/build_placement.cpp), src/seams/native.cpp"
 BattleFrame,SelectMissionNative,"seam slot filled by InstallNativeSeams, MapSeam::SelectMission, BattleFrame (src/ingame/build_placement.cpp), src/seams/native.cpp"
 BeCarriedOrder,ClaimWeaponsNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::ClaimWeapons, BeCarriedOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
-BindNamedSliderWithCallback_0044c7e0,UpdateUnitSliders,"its only caller passes UpdateUnitSliders, src/frontend/multi.cpp"
+BindUnitRestrictSlider,UpdateUnitSliders,"its only caller passes UpdateUnitSliders, src/frontend/multi.cpp"
 BlockMap::erase,BlockMap::_Max,"static member call, src/debug/debug_lib.cpp"
 BlockMap::erase,BlockMap::_Min,"static member call, src/debug/debug_lib.cpp"
 BlockMapAllocator::Allocate,OutOfMemoryHandler,"g_outOfMemoryHandler is set only to OutOfMemoryHandler, src/game/main.cpp"

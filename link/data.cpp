@@ -372,7 +372,7 @@ int g_unitRestrictPicCursor;
 int g_unitRestrictRecordCursor;
 char* g_modemInfo;
 int g_modemCount;
-Entry_004426e0* g_modemAccounts;
+ModemAccount* g_modemAccounts;
 char* g_modemAccountNames;
 char* g_oldMapName;
 int g_battleRoomSlotsBuilt;

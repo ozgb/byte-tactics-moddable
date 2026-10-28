@@ -36,7 +36,7 @@ Flags_004ab400,no,2,include/ta_types.h:10949|src/gui/dialogs.cpp:38,identical,sr
 Flags_4b5980,no,2,include/ta_types.h:11676|src/graphics/display.cpp:9,differs,src/graphics/display.cpp
 FrameTable,no,2,include/ta_types.h:9029|src/map/line_of_sight.cpp:77,differs,src/map/line_of_sight.cpp
 Frame_0049e070,no,2,include/ta_types.h:10608|src/weapons/weapons.cpp:1845,differs,src/weapons/weapons.cpp
-FreeBlockIter,no,2,include/ta_types.h:14283|src/debug/free_block_map.h:34,differs,src/debug/free_block_map.h
+FreeBlockIter,no,2,include/ta_types.h:14283|src/debug/free_block_map.h:26,differs,src/debug/free_block_map.h
 Gadget,no,8,src/frontend/campaign_menu.cpp:43|src/frontend/endgame.cpp:31|src/frontend/multi.cpp:23|src/frontend/options.cpp:31|src/frontend/skirmish_menu.cpp:20|src/game/players.cpp:59|src/gui/gadget.h:10|src/gui/gui.cpp:62,differs,src/gui/gadget.h
 Handle,no,2,include/ta_types.h:3708|src/graphics/handle.h:6,differs,src/graphics/handle.h
 Header,no,3,src/files/hpi.cpp:31|src/frontend/endgame.cpp:109|src/frontend/skirmish_menu.cpp:261,differs,src/frontend/endgame.cpp

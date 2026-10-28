@@ -6,22 +6,7 @@
 #include "gaf_frame.h"
 
 
-union Flags_004c61b0 {
-    unsigned short word;
-    unsigned char byte;
-    struct {
-        unsigned short flag0 : 1;
-        unsigned short flag1 : 1;
-        unsigned short bit2_15 : 14;
-    } bits;
-};
-
-struct Screen {
-    char unknown_0[0x8];
-    void* primary;
-    void* surface;
-    char unknown_10[0x18 - 0x10];
-};
+#include "display.h"
 
 #pragma pack(push, 1)
 struct LockEntry {
@@ -33,96 +18,58 @@ struct LockEntry {
 extern int g_screenLockCount;
 extern LockEntry g_screenLocks[];
 
-#pragma pack(push, 1)
-struct Display {
-    char unknown_0[0x40];
-    void* hwnd;
-    int windowed;
-    char unknown_48[8];
-    Surface cached;
-    Screen screen;
-    Surface* activeSurface;
-    int haveBackBuffer;
-    Rect vec;
-    char unknown_b0[0xb4 - 0xb0];
-    void* lastBackBuffer;
-    char unknown_b8[0xbc - 0xb8];
-    Surface* overrideSurface;
-    char unknown_c0[0xc4 - 0xc0];
-    unsigned char* palette;
-    char unknown_c8[0xd4 - 0xc8];
-    int width;
-    int height;
-    int useOverrideSurface;
-    char unknown_e0[0xe4 - 0xe0];
-    int field_e4;
-    char unknown_e8[0xf0 - 0xe8];
-    Flags_004c61b0 flags;
-    char unknown_f2[0x196 - 0xf2];
-    int rect_x;
-    int rect_y;
-    char unknown_19e[0x1b2 - 0x19e];
-    GafFrame* bmp;
-    int x;
-    int y;
-    Surface* saveMouse1;
-    char unknown_1c2[0x1ce - 0x1c2];
-    int cursorThreadEnabled;
-    int cursorOverlayEnabled;
 
-    int LockScreen(Surface* out)
-    {
-        if (useOverrideSurface != 0) {
-            *out = *overrideSurface;
-            return 1;
-        }
-        if (windowed != 0) {
-            *out = cached;
-            return 1;
-        }
-        host_frame frame;
-        if (host_frame_lock(HOST_FRAME_BACK, &frame) != HOST_FRAME_OK)
-            return 0;
-        out->width = width;
-        out->height = height;
-        out->pitch = frame.pitch;
-        out->pixels = frame.pixels;
-        out->x = 0;
-        out->y = 0;
-        out->zPriority = 10000;
-        out->colorKey = -1;
-        out->flag0 = 0;
-        out->clip = vec;
-        if (g_screenLockCount < 10) {
-            g_screenLocks[g_screenLockCount].surface = out;
-            g_screenLocks[g_screenLockCount].flag = 0;
-        }
+inline int Display::LockScreen(Surface* out)
+{
+    if (useOverrideSurface != 0) {
+        *out = *overrideSurface;
         return 1;
     }
-
-    int LockPrimary(Surface* out)
-    {
-        if (windowed != 0) {
-            *out = cached;
-            return 1;
-        }
-        host_frame frame;
-        if (host_frame_lock(HOST_FRAME_FRONT, &frame) != HOST_FRAME_OK)
-            return 0;
-        out->width = width;
-        out->height = height;
-        out->pitch = frame.pitch;
-        out->pixels = frame.pixels;
-        out->x = 0;
-        out->y = 0;
-        out->zPriority = 10000;
-        out->colorKey = -1;
-        out->flag0 = 0;
-        out->clip = vec;
+    if (windowed != 0) {
+        *out = cached;
         return 1;
     }
-};
-#pragma pack(pop)
+    host_frame frame;
+    if (host_frame_lock(HOST_FRAME_BACK, &frame) != HOST_FRAME_OK)
+        return 0;
+    out->width = width;
+    out->height = height;
+    out->pitch = frame.pitch;
+    out->pixels = frame.pixels;
+    out->x = 0;
+    out->y = 0;
+    out->zPriority = 10000;
+    out->colorKey = -1;
+    out->flag0 = 0;
+    out->clip = vec;
+    if (g_screenLockCount < 10) {
+        g_screenLocks[g_screenLockCount].surface = out;
+        g_screenLocks[g_screenLockCount].flag = 0;
+    }
+    return 1;
+}
+
+inline int Display::LockPrimary(Surface* out)
+{
+    if (windowed != 0) {
+        *out = cached;
+        return 1;
+    }
+    host_frame frame;
+    if (host_frame_lock(HOST_FRAME_FRONT, &frame) != HOST_FRAME_OK)
+        return 0;
+    out->width = width;
+    out->height = height;
+    out->pitch = frame.pitch;
+    out->pixels = frame.pixels;
+    out->x = 0;
+    out->y = 0;
+    out->zPriority = 10000;
+    out->colorKey = -1;
+    out->flag0 = 0;
+    out->clip = vec;
+    return 1;
+}
 
 struct Arg_004c6210 {
     int ddraw;

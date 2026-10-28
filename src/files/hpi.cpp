@@ -46,14 +46,7 @@ struct OPENHAPIFILE {
     char name[0x104];
 };
 
-struct DisplayContext {
-    char unknown_0[0x618];
-    OPENHAPIFILE** files;
-    int count;
-    char unknown_620[8];
-    char cwd[0x100];
-    char lastDir[0x100];
-};
+#include "../graphics/display.h"
 
 #include "file_handle.h"
 
@@ -65,7 +58,7 @@ FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
     return HAPI_OpenFile(param1, "a+b");
 }
 
-DisplayContext* GetDisplay(void);
+Display* GetDisplay(void);
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
 
@@ -81,7 +74,7 @@ FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode)
     int off;
     int k;
     unsigned char* p;
-    DisplayContext* state = GetDisplay();
+    Display* state = GetDisplay();
     FileHandle* h = (FileHandle*)GameAllocIgnoreTag("File Handle", 0x118);
     memset(h, 0, 0x118);
     strncpy(h->name, filename, 0x100);
@@ -848,7 +841,7 @@ int __stdcall HAPI_FindNext(int handle, void* out)
         if (!f->recursive)
             return -1;
     }
-    DisplayContext* g = GetDisplay();
+    Display* g = GetDisplay();
     for (; f->state < g->count; f->index = -1, f->state++) {
         if (f->index < 0) {
             f->list = HAPI_FindDirectory(g->files[f->state]->node->list, f->dir);
@@ -1028,7 +1021,7 @@ void __stdcall GetDirectoryEntry(struct _finddata_t* fd, int index, const char* 
 // FUNCTION: 0x4bce10
 void SaveStartDirectory()
 {
-    DisplayContext* g = GetDisplay();
+    Display* g = GetDisplay();
     char buf[12];
     char d = _getdrive() + '@';
     char* p = g->cwd;
@@ -1043,7 +1036,7 @@ void SaveStartDirectory()
 // FUNCTION: 0x4bce60
 int __stdcall SetLastDirectory(char* path)
 {
-    DisplayContext* base = GetDisplay();
+    Display* base = GetDisplay();
     int result = _chdir(path);
     if (result == 0) {
         strncpy(base->lastDir, path, 0x100);
@@ -1054,21 +1047,21 @@ int __stdcall SetLastDirectory(char* path)
 // FUNCTION: 0x4bcea0
 void __stdcall GetLastDirectory(char* dst)
 {
-    DisplayContext* s = GetDisplay();
+    Display* s = GetDisplay();
     strncpy(dst, s->lastDir, 0x100);
 }
 
 // FUNCTION: 0x4bcec0
 void __stdcall GetStartDirectory(char* param)
 {
-    DisplayContext* p = GetDisplay();
+    Display* p = GetDisplay();
     char* src = p->cwd;
     strncpy(param, src, 0x100);
 }
 
 // FUNCTION: 0x4bcee0
 void RestoreStartDirectory() {
-    DisplayContext* p = GetDisplay();
+    Display* p = GetDisplay();
     _chdir(p->cwd);
 }
 
@@ -1588,7 +1581,7 @@ void __stdcall HAPI_CloseArchive(OPENHAPIFILE* f)
 // FUNCTION: 0x4be0b0
 void* __stdcall HAPI_AddArchive(LPCSTR name, int mode)
 {
-    DisplayContext* display = GetDisplay();
+    Display* display = GetDisplay();
     char fullPath[0x100];
     host_file_full_path(name, fullPath, 0x100);
 
@@ -1620,7 +1613,7 @@ static void FreeRecord_004be180(OPENHAPIFILE* p)
 // FUNCTION: 0x4be180
 void HAPI_DropMissingArchives(void)
 {
-    DisplayContext* state = GetDisplay();
+    Display* state = GetDisplay();
     int i;
     for (i = 0; i < state->count; i++) {
         if (state->files[i]->fp == 0) {
@@ -1644,7 +1637,7 @@ void HAPI_DropMissingArchives(void)
 // FUNCTION: 0x4be270
 void __stdcall HAPI_RemoveArchive(OPENHAPIFILE* pRecord)
 {
-    DisplayContext* state = GetDisplay();
+    Display* state = GetDisplay();
     int i;
     for (i = 0; i < state->count; i++) {
         if (state->files[i] == pRecord) {
@@ -1668,7 +1661,7 @@ void __stdcall HAPI_RemoveArchive(OPENHAPIFILE* pRecord)
 // FUNCTION: 0x4be320
 void __stdcall HAPI_ResolveShadowedFiles(void)
 {
-    DisplayContext* state = GetDisplay();
+    Display* state = GetDisplay();
     if (state->count > 0) {
         for (int i = 0; i < state->count; i++) {
             ArchiveDirectory* list = state->files[i]->node->list;
@@ -1695,7 +1688,7 @@ void __stdcall HAPI_ClearShadowFlags(ArchiveDirectory* list)
 // FUNCTION: 0x4be400
 void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
 {
-    DisplayContext* d = GetDisplay();
+    Display* d = GetDisplay();
     char buf[0x100];
     struct _finddata_t fd;
     int i;

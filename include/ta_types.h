@@ -12067,11 +12067,6 @@ struct Queue_004c1ab0_5 {
     int tail;
 };
 
-struct DisplayContext {
-    char unknown_0[466];
-    int field_at_0x1d2;
-};
-
 struct Rect_004c2380 {
     int x;
     int y;

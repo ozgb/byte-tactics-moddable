@@ -75,17 +75,7 @@ struct Layer;
 
 #include "../gui/layer.h"
 
-struct Display {
-    char unknown_0[0xd4];
-    int width;
-    int height;
-    char unknown_dc[0xf0 - 0xdc];
-    unsigned short low : 1;
-    unsigned short network : 1;
-    unsigned short high : 14;
-    char unknown_f2[0x614 - 0xf2];
-    float paletteBrightness;
-};
+#include "../graphics/display.h"
 
 #include "../network/player_info.h"
 #include "../../interfaces/seams.h"
@@ -895,7 +885,7 @@ void __stdcall RunEndGameState()
         SetUpEndMissionScreen();
         int next=g_seams.map->MissionExists(g_game->net, 0, g_game->mission+1);
         if(g_seams.map->GetGameType(g_game->net)==1 && g_game->bits_3923b_2.bit4_3923b && !next && !g_game->skip) {
-            if((unsigned char)GetDisplay()->network) {
+            if((unsigned char)GetDisplay()->flags.bits.flag1) {
                 if(!g_game->players[0].info->side) SetFrontendState(4,0x4ce,"c:\\cavedog\\wargame\\endgame.cpp");
                 else SetFrontendState(5,0x4d3,"c:\\cavedog\\wargame\\endgame.cpp");
             } else SetFrontendState(2,0x4d9,"c:\\cavedog\\wargame\\endgame.cpp");

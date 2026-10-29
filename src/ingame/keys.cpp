@@ -35,11 +35,6 @@ void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 
 struct Surface;
 
-struct DisplayFrameHolder {
-    char unknown_0[0xbc];
-    Surface* frame;
-};
-
 #include "../graphics/surface.h"
 
 #include "../game/game.h"
@@ -59,7 +54,8 @@ int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name);
 #include "../graphics/gaf.h"
 #include "../debug/debug_lib.h"
 #include "../game/main.h"
-void* __stdcall GetDisplay();
+#include "../graphics/display.h"
+Display* GetDisplay();
 void __stdcall FrameFromSurface(GafFrame* dst, Surface* src);
 #include "control_panel.h"
 #include "selection.h"
@@ -196,7 +192,7 @@ void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h
 
             g_game->textLines = 0;
             SurfaceFromFrame(&surf, bm);
-            FrameFromSurface(&pal, ((DisplayFrameHolder*)GetDisplay())->frame);
+            FrameFromSurface(&pal, GetDisplay()->overrideSurface);
 
             pal.transparency = 0;
             int row = 0;

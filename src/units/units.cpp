@@ -648,7 +648,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
 // FUNCTION: 0x486460
 int __stdcall IsUnitCommander(Unit* unit)
 {
-    return _strcmpi(g_game->names_37f5f[unit->player->info->side].name, unit->def->unitname) == 0;
+    return _strcmpi(g_game->sideDefs[unit->player->info->side].commander, unit->def->unitname) == 0;
 }
 
 #pragma pack(push, 1)
@@ -670,7 +670,7 @@ int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
 void __stdcall KillUnit(Unit* unit, int param_2)
 {
     if ((unit->flags & 0x10000000) != 0) {
-        int same = _strcmpi(g_game->names_37f5f[unit->player->info->side].name,
+        int same = _strcmpi(g_game->sideDefs[unit->player->info->side].commander,
                             unit->def->unitname) == 0;
         if (same) {
             unit->player->flags &= 0xfffe;
@@ -781,7 +781,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
             unit->player->losses++;
             if (unit->lastAttackerSlot != 10 && unit->buildLeft == 0.0f && unit->playerIndex != unit->lastAttackerSlot)
                 g_game->players[unit->lastAttackerSlot].kills++;
-            int same = _strcmpi(g_game->names_37f5f[unit->player->info->side].name,
+            int same = _strcmpi(g_game->sideDefs[unit->player->info->side].commander,
                                 unit->def->unitname) == 0;
             if (same) {
                 if (unit->lastAttackerSlot != 10)
@@ -798,7 +798,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     case 3:
         if (unit->player != 0 && g_game->players[g_game->localPlayer].shareVision[unit->player->index] == 0) {
             unit->player->losses++;
-            int same = _strcmpi(g_game->names_37f5f[unit->player->info->side].name,
+            int same = _strcmpi(g_game->sideDefs[unit->player->info->side].commander,
                                 unit->def->unitname) == 0;
             if (same)
                 unit->player->commanderLosses++;

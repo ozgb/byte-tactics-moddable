@@ -417,7 +417,7 @@ void __stdcall InitUnitScript(Unit* self)
 {
     Object3do* obj = ((Object3do **)g_game->types.get())[self->unitDefIndex];
     if (self->def->data) {
-        self->script = (CobScriptView*)new (kSim) UnitScript;
+        self->script = new (kSim) UnitScript;
         ((CobScript*)self->script.get())->SetCob((ScriptTable*)self->def->data);
         self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, (int)self);
         ((UnitScript*)self->script.get())->SetObjectState((int)self->state.get());

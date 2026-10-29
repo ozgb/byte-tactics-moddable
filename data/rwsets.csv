@@ -43659,14 +43659,6 @@ address,function,file,kind,target
 ,BurnOut,src/map/features.cpp,global_read,g_game
 ,BurnOut,src/map/features.cpp,global_read,g_seams
 ,BurnOut,src/map/features.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
-,ByteMap::Get,src/ai/byte_map.h,call,operator unsigned char *
-,ByteMap::Get,src/ai/byte_map.h,deref_read,*unsigned char
-,ByteMap::Get,src/ai/byte_map.h,field_read,ByteMap::data
-,ByteMap::Get,src/ai/byte_map.h,field_read,ByteMapSize::width
-,ByteMap::Get,src/ai/byte_map.h,function,
-,ByteMapSize::Contains,src/ai/byte_map.h,field_read,ByteMapSize::height
-,ByteMapSize::Contains,src/ai/byte_map.h,field_read,ByteMapSize::width
-,ByteMapSize::Contains,src/ai/byte_map.h,function,
 ,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,call,GameFreeThunk
 ,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,call,SimAllocTagged
 ,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_read,CMemoryCache::base

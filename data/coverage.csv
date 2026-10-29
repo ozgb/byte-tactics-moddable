@@ -1,5 +1,5 @@
 subsystem,function,file,functions,functions_entered,lines,lines_hit,branches,branches_covered,decorated,dead,reason
-ai,*,,104,93,1235,1099,694,576,,35,
+ai,*,,104,93,1235,1099,694,576,,33,
 ai,??G@YG?AUMovableVec3@@ABU0@0@Z,src/ai/ai_player.cpp,0,0,0,0,0,0,??G@YG?AUMovableVec3@@ABU0@0@Z,1,
 ai,AIProfileParser::AIProfileParser,src/ai/ai_profile.cpp,0,0,0,0,0,0,??0AIProfileParser@@QAE@XZ,1,
 ai,AIProfileParser::NextToken,src/ai/ai_profile.cpp,0,0,0,0,0,0,?NextToken@AIProfileParser@@QAEHXZ,1,
@@ -9,8 +9,6 @@ ai,AIProfileParser::ScanToken,src/ai/ai_profile.cpp,0,0,0,0,0,0,?ScanToken@AIPro
 ai,AIProfileParser::SetBuffer,src/ai/ai_profile.cpp,0,0,0,0,0,0,?SetBuffer@AIProfileParser@@QAEXPADH@Z,1,
 ai,AIProfileParser::TokenEquals,src/ai/ai_profile.cpp,0,0,0,0,0,0,?TokenEquals@AIProfileParser@@QAE_NPAD@Z,1,
 ai,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,0,0,0,0,0,0,?TryIssueIdleFactoryBuildOrder@BuildTimer@@QAEXPAUUnit@@@Z,1,
-ai,ByteMap::Get,src/ai/byte_map.h,0,0,0,0,0,0,?Get@ByteMap@@QAEEHH@Z,1,
-ai,ByteMapSize::Contains,src/ai/byte_map.h,0,0,0,0,0,0,?Contains@ByteMapSize@@QAEHII@Z,1,
 ai,CopyOneByte,src/ai/ai_player.cpp,0,0,0,0,0,0,?CopyOneByte@@YGXPAUPercentByte@@PBU1@@Z,1,
 ai,DestroyPlayerAI,src/ai/ai_player.cpp,1,0,0,0,0,0,?DestroyPlayerAI@@YGXH@Z,0,shutdown
 ai,Direction,src/ai/player_ai.cpp,0,0,0,0,0,0,?Direction@@YG?AUVec3@@FH@Z,1,
@@ -594,7 +592,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,368,306,6449,5119,3186,1962,,25,
+orders,*,,368,306,6452,5122,3186,1962,,25,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,AiSearchGoal::HasNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 orders,AiSearchGoal::SerializeNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network

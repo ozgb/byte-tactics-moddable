@@ -7,8 +7,9 @@
 #include <time.h>
 #include "../../interfaces/host.h"
 
-#include "../../include/ta_types.h"
+#include "../game/game.h"
 #include "../map/mission.h"
+#include "../orders/order_type_entry.h"
 #include "../network/player_info.h"
 #include "../game/game_load.h"
 #include "condition_class.h"
@@ -97,6 +98,29 @@ static char s_decidedKey[32];
 static int s_decidedLine = 0;
 static int s_loadAhead = 0;
 static const char s_savePath[] = "savegame\\harness.sav";
+struct SkirmishOptionsPlayer {
+    int active;
+    int shade;
+    int type;
+    int metal;
+    int energy;
+    short color;
+    char unknown_16[2];
+};
+
+struct SkirmishOptionsTable {
+    SkirmishOptionsPlayer players[11];
+    int commanderDeath;
+    int mapping;
+    int lineOfSight;
+    int losType;
+    int fixedLocations;
+    char mapName[260];
+    int baseGadgetCount;
+    int current;
+    int difficulty;
+};
+
 using OptionsTable = SkirmishOptionsTable;
 static const char s_optionsPath[] = "savegame\\harness.opt";
 static OptionsTable s_savedOptions;

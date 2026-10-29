@@ -34,8 +34,7 @@ Canonical definition, in order:
      size comes from the gap between addresses (`size_from` gap) and whose type is the name, divided
      by the array length. When no definition matches, or none is known, this rule does not apply.
   2. Among those, one in a real header (a .h under src/) wins over another file.
-  3. Among those, one outside include/ta_types.h wins over the one in it, whatever the member counts.
-     Then the one with the most named members.
+  3. Among those, the one with the most named members.
   4. A header class with no data members (only methods) takes the member count of the fullest
      layout and keeps its place, so the header wins even though its own size is that of an empty class.
 
@@ -457,7 +456,7 @@ def pick_canonical(ds: list[dict], sigs: list, known_sizes: set[int]) -> str:
 
     def key(p):
         members = fullest if method_only_header(p) else named_members(p[1])
-        return rank(p[0]), p[0]["file"] == "include/ta_types.h", -members, p[0]["file"], p[0]["line"]
+        return rank(p[0]), -members, p[0]["file"], p[0]["line"]
 
     return min(pool, key=key)[0]["file"]
 

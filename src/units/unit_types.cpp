@@ -893,7 +893,7 @@ void LoadUnitTypes() {
     }
 
     void** models = (void**)SimAllocTagged("MODEL PTRS", g_game->unitDefCount * 4);
-    g_game->types = (Object3doView**)models;
+    g_game->types = (Object3do**)models;
 
     for (unsigned short u = 1; u < g_game->unitDefCount; u++) {
         UnitDef* type = &g_game->defs[u];

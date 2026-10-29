@@ -1,9 +1,7 @@
 #ifndef DEBRIS_H
 #define DEBRIS_H
 
-#ifndef TA_TYPES_H
 #include "../graphics/handle.h"
-#endif
 #include "../util/vec3.h"
 
 #pragma pack(push, 1)

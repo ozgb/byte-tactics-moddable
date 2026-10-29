@@ -157,6 +157,7 @@ int __stdcall FindAssocTextInput(Gadget* entries, int index);
 void __stdcall RedrawGadgetRect(RedrawGadgetRectDialog* obj, int index);
 void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2);
 void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4);
+void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* lines, int count, Font* flag);
 void __stdcall ResetSliderGadget(ResetSliderGadgetDialog* obj, int i);
 void __stdcall ScheduleGadgetEndTick(ScheduleGadgetEndTickDialog* obj, int i);
 void __stdcall ResetProgressBar(ResetProgressBarDialog*, int index);

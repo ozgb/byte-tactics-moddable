@@ -30,7 +30,6 @@ ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
 ClickSelectHoverUnit,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 CollectSelectedUnits,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 ComputeUnitScriptChecksum,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-ConfigureListBoxByName,mismatch,fixing it changes the generated code of a caller
 CountHumanSlots,ambiguous,several definitions share the name
 CreatePlayerObjectState,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 CreateUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

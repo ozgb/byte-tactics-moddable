@@ -100,7 +100,6 @@ int __stdcall GetButtonStageByName(Gui* menu, char* name);
 int __stdcall SetButtonStageByName(Gui* menu, char* name, char value);
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int value);
 void __stdcall SetQuickKeyByName(Gui* menu, const char* name, char value);
-void __stdcall ConfigureListBoxByName(Gui* menu, const char* name, void* data, int count, int flag);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 void __stdcall RemapPaletteToClosestIndices(Gui* menu, void* param_2, void* param_3);

@@ -87,7 +87,6 @@ void __stdcall PlaySoundByName(char* name, int param);
 #include "game_state.h"
 #include "main_loop.h"
 void __stdcall SetKeyboardInput(void* menu, int value);
-void __stdcall ConfigureListBoxByName(void* menu, char* name, void* text, int value, int flag);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "data_files.h"
 #include "../frontend/campaign_menu.h"
@@ -397,7 +396,7 @@ char* __stdcall ListSavedGames(int* count)
     BuildDataPath(buf, g_savegameDir, "*", "SAV");
     *count = CountDirectoryEntries(buf, 0);
     if (*count == 0) {
-        ConfigureListBoxByName(g_game->menu, "GAMES", DAT_005119b8, 0, 0);
+        ConfigureListBoxByName(&g_game->gui, "GAMES", DAT_005119b8, 0, 0);
         return 0;
     }
     g_savegameFileNames = (char*)GameAllocIgnoreTag("SAVEGAME NAMES", *count << 8);
@@ -432,7 +431,7 @@ char* __stdcall ListSavedGames(int* count)
         }
     }
     GameFreeThunk(copy);
-    ConfigureListBoxByName(g_game->menu, "GAMES", g_savegameDescs, found, 0);
+    ConfigureListBoxByName(&g_game->gui, "GAMES", g_savegameDescs, found, 0);
     *count = found;
     return found ? g_savegameFileNames : 0;
 }
@@ -546,7 +545,7 @@ void ShowLoadGameScreen()
         return;
     }
     g_savegameSideList = BuildSideList();
-    ConfigureListBoxByName((char*)&g_game->message_519[0], "GAMES", g_savegameDescs, count, 0);
+    ConfigureListBoxByName(&g_game->gui, "GAMES", g_savegameDescs, count, 0);
     SetGadgetActiveByName((char*)&g_game->message_519[0], "DELETE", 0);
     SetGadgetActiveByName((char*)&g_game->message_519[0], "GAMENAME", 0);
     Gadget* entry = FindGadgetChecked(gadget->entries, "GAMES");

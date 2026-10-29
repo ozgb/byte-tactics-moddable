@@ -1963,11 +1963,6 @@ void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4)
 }
 
 
-struct ConfigureListBoxByNameDialog {
-    char unknown_00[0x18];
-    ConfigureListBoxByNameHolder* holder;
-};
-
 void __stdcall SetGadgetActive(ConfigureListBoxByNameRoot* menu, int index, int value);
 
 static inline int ConfigureListBoxFontHeight() {
@@ -1993,8 +1988,8 @@ static inline int FindConfigureListBoxPeerByTeam(Gadget* entries, unsigned char 
 }
 
 // FUNCTION: 0x4a32a0
-void __stdcall ConfigureListBoxByName(ConfigureListBoxByNameDialog* param_1, char* name, int bitmap, int count, Font* flag) {
-    ConfigureListBoxByNameHolder* holder = param_1->holder;
+void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* lines, int count, Font* flag) {
+    Layer* holder = menu->layer;
     Gadget* entries = holder->entries;
     int index = FindConfigureListBoxEntry(entries, name);
     Gadget* me;
@@ -2005,7 +2000,7 @@ void __stdcall ConfigureListBoxByName(ConfigureListBoxByNameDialog* param_1, cha
         me = 0;
     }
     me->u.list.rowCount = (short)count;
-    me->u.list.lines = (char*)bitmap;
+    me->u.list.lines = lines;
     me->attribs |= 0x10;
     me->u.list.scroll =
         (short)((me->u.list.scroll > ConfigureListBoxFontHeight() + 1) ? (int)me->u.list.scroll : ConfigureListBoxFontHeight() + 1);

@@ -621,7 +621,6 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 #include "../debug/debug_lib.h"
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "../gui/file_list.h"
-void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* items, int count, int flag);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
 void __stdcall SetCursorMode(int value);
 

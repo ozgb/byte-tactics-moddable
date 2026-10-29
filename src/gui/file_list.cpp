@@ -9,7 +9,6 @@ int __cdecl _strcmpi(const char* a, const char* b);
 #include "../files/files_api.h"
 #include "../graphics/palette.h"
 int __stdcall ScanDirectory(char* path, char* list, char* sizes, int mode, int flag, int what);
-void __stdcall ConfigureListBoxByName(void* gui, const char* name, int x, int y, int z);
 #include "../graphics/display.h"
 unsigned int GetTicks();
 #include "../graphics/draw.h"
@@ -37,7 +36,7 @@ struct ReqSub {
 };
 
 struct FileRequester {
-    void* gui;
+    Gui* gui;
     ReqSub* slider;
     char* nameGadget;
     char* maskGadget;
@@ -249,8 +248,8 @@ void __stdcall RefreshFileList(FileRequester* obj)
     GetDriveDirectory(obj->drive, obj->cwd, 0x100);
     int n = ScanDirectory(obj->maskGadget + 0xb6, obj->names, obj->sizes, 1, 0, 0);
     SortFileList(obj->names, obj->sizes, 0, n);
-    ConfigureListBoxByName(obj->gui, "SWIN", (int)obj->names, n, 0);
-    ConfigureListBoxByName(obj->gui, "SIZE", (int)obj->sizes, n, 0);
+    ConfigureListBoxByName(obj->gui, "SWIN", obj->names, n, 0);
+    ConfigureListBoxByName(obj->gui, "SIZE", obj->sizes, n, 0);
     obj->slider->knobPos = 0;
     strcpy(obj->pathGadget + 0xb6, obj->cwd);
 }
@@ -362,7 +361,7 @@ FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, c
     }
 
     FileRequester* obj = (FileRequester*)GameAllocIgnoreTag("FILE REQUESTER DATA", 0x24c);
-    obj->gui = self;
+    obj->gui = (Gui*)self;
     strcpy(obj->cwd, arg2);
     StripFileName(obj->cwd);
 

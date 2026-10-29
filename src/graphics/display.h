@@ -23,7 +23,7 @@ union DisplayFlags {
         unsigned short has_c8 : 1;
         unsigned short has_cc : 1;
         unsigned short has_d0 : 1;
-        unsigned short sound_opt : 1;
+        unsigned short soundOpt : 1;
         unsigned short bit11_15 : 5;
     } bits;
 };

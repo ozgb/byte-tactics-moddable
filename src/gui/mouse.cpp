@@ -16,6 +16,7 @@ struct RestoreCursorBackgroundSurface {
 #pragma pack(pop)
 
 #include "../graphics/display.h"
+#include "../graphics/surface.h"
 
 #include "../../link/globals.h"
 
@@ -321,7 +322,7 @@ void ShutdownMouse()
 {
     Display* o = GetDisplay();
     if (o->mouseQueue) {
-        if (o->flags.bits.sound_opt) {
+        if (o->flags.bits.soundOpt) {
             if (o->mouseThread) {
                 o->mouseThreadStop = 1;
                 int i = 0;

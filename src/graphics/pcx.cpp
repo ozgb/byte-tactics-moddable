@@ -721,7 +721,7 @@ int __stdcall ExceptionFilter(void* exception, const char* thread)
     Display* app = GetDisplay();
     if (app != 0) {
         LONG held = Lock();
-        app->cursorSprite = 0;
+        app->cursorSprite = nullptr;
         UnlockAllScreens();
         Unlock(held);
         ReleaseDirectDraw((DisplayAppView *)app);

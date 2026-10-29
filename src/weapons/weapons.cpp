@@ -2064,7 +2064,6 @@ void __stdcall DrawModel3doProjected(void* dest, Vec3* pos, void* sprite, void* 
 int __stdcall PointInRect(void* region, int x, int y);
 void __stdcall DrawLine(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
 int __stdcall GetGafFrameCount(void* gaf);
-#include "../ai/ai_player.h"
 #include "../harness/harness.h"
 
 // FUNCTION: 0x49be60
@@ -2100,7 +2099,7 @@ void __stdcall DrawProjectiles(void* surface)
                 else
                     visible = 0;
             } else {
-                visible = IsPointVisible(pb, pos);
+                visible = g_seams.ai->IsPointVisible(pb, pos);
             }
             if (visible) {
                 type = p->type;

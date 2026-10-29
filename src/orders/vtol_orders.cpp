@@ -93,15 +93,11 @@ struct Mover {
 #include "../units/unit_ref.h"
 #pragma pack(pop)
 
-#include "path_fx.h"
+#include "path_order.h"
 
 #include "air_maneuver_order.h"
 
 #include "../ingame/control_panel.h"
-
-class PathOrderAltitudeView { public: void SetAltitude(int); };
-class PathOrderApproachRadiusView { public: void SetApproachRadius(int); };
-class PathOrderHeadingView { public: void SetHeading(int); };
 
 class GroundAllyVisitor {
 public:
@@ -238,8 +234,8 @@ int __stdcall VtolEvadeOrder(Unit* unit,Order* order,int flags)
             Vec3 pos;
         if (order->side) pos=AddVec3(unit->pos,Offset(unit->heading-0x4000,range<<16));
         else pos=AddVec3(unit->pos,Offset(unit->heading+0x4000,range<<16));
-            PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
-            ((PathOrderApproachRadiusView*)move)->SetApproachRadius(128);
+            PathOrder* move=new (kSim) PathOrder(order,pos);
+            move->SetApproachRadius(128);
             order->SetAttachedFx(move);
             order->flags=0x100e8;
             return 1;
@@ -249,8 +245,8 @@ int __stdcall VtolEvadeOrder(Unit* unit,Order* order,int flags)
         Vec3 pos;
         if (order->side) pos=AddVec3(unit->pos,Offset(unit->heading-0x4000,range<<17));
         else pos=AddVec3(unit->pos,Offset(unit->heading+0x4000,range<<17));
-        PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
-        ((PathOrderApproachRadiusView*)move)->SetApproachRadius(128);
+        PathOrder* move=new (kSim) PathOrder(order,pos);
+        move->SetApproachRadius(128);
         order->SetAttachedFx(move);
         order->flags=0x100e8;
         return 1;
@@ -271,8 +267,8 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     g_seams.units->SetStateBits(unit, 1, 1);
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, unit->pos);
-        ((PathOrderAltitudeView*)obj)->SetAltitude(unit->def->altitude / 2);
+        PathOrder* obj = new (kSim) PathOrder(order, unit->pos);
+        obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx(obj);
         order->flags |= flags | 0xe0;
     }
@@ -291,8 +287,8 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         centre.z = g_game->mapHeight / 2 << 16;
         short angle = GetHeadingBetween(&unit->pos, &centre);
         Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x3200000));
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, dest);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x80);
+        PathOrder* obj = new (kSim) PathOrder(order, dest);
+        obj->SetApproachRadius(0x80);
         order->flags |= 0xe0;
         order->SetAttachedFx(obj);
         return 2;
@@ -314,9 +310,9 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
     case 1: {
         if (g_seams.map->CanPlaceFootprintAt(unit, &unit->pos)) {
             g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
-            PathOrderPosView* obj = new (kSim) PathOrderPosView(order, unit->pos);
+            PathOrder* obj = new (kSim) PathOrder(order, unit->pos);
             int h = max(g_seams.units->GetGroundHeight(&unit->pos), g_game->seaLevel);
-            ((PathOrderAltitudeView*)obj)->SetAltitude(h <= g_game->seaLevel ? g_seams.units->GetGroundHeight(&unit->pos) - g_game->seaLevel : 0);
+            obj->SetAltitude(h <= g_game->seaLevel ? g_seams.units->GetGroundHeight(&unit->pos) - g_game->seaLevel : 0);
             order->SetAttachedFx(obj);
             order->flags = 0xe0;
             g_seams.units->SetStateBits(unit, 1, 0);
@@ -330,7 +326,7 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
             Point16 cell = WorldToCellMul(p, fp);
             CellToWorld(fp, cell, &p);
             if (g_seams.map->CanPlaceFootprintAt(unit, &p)) {
-                order->SetAttachedFx(new (kSim) PathOrderPosView(order, p));
+                order->SetAttachedFx(new (kSim) PathOrder(order, p));
                 order->flags = 0xe0;
                 return 2;
             }
@@ -343,8 +339,8 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         sum.y = order->pos.y + off.y;
         sum.z = order->pos.z + off.z;
         Vec3 dest = sum;
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, dest);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x40);
+        PathOrder* obj = new (kSim) PathOrder(order, dest);
+        obj->SetApproachRadius(0x40);
         order->SetAttachedFx(obj);
         order->flags |= 0xe0;
         return 2;
@@ -397,8 +393,8 @@ int __stdcall VtolStandbyOrder(Unit* unit, Order* order, int flags)
                 p.z = order->z << 16;
                 int distance = (RandomInt(0x20) + 8) << 16;
                 p += Offset(angle, distance);
-                PathOrderPosView* obj = new (kSim) PathOrderPosView(order, p);
-                ((PathOrderAltitudeView*)obj)->SetAltitude(unit->def->altitude);
+                PathOrder* obj = new (kSim) PathOrder(order, p);
+                obj->SetAltitude(unit->def->altitude);
                 order->SetAttachedFx(obj);
                 order->SetDeadlineTicks(RandomInt(0xf) + 0x1e);
                 order->state = 1;
@@ -431,7 +427,7 @@ int __stdcall VtolMoveOrder(Unit* unit, Order* order, int flags)
         order->AnnounceStatusIfFlagged(0);
         g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
         Snap(&order->pos, *(Point16*)&unit->footprint);
-        order->SetAttachedFx(new (kSim) PathOrderPosView(order, order->pos));
+        order->SetAttachedFx(new (kSim) PathOrder(order, order->pos));
         order->flags = 0xe0;
         return 1;
     case 2:
@@ -504,8 +500,8 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     }
     if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x4000;
     Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
-    PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
-    ((PathOrderApproachRadiusView*)move)->SetApproachRadius(128);
+    PathOrder* move=new (kSim) PathOrder(order,pos);
+    move->SetApproachRadius(128);
     order->SetAttachedFx(move);
     order->SetDeadlineTicks(30);
     order->flags|=0xf8;
@@ -530,9 +526,9 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
         if (unit->motion && (unit->def->flags1 & 0x800)) {
             order->AnnounceStatusIfFlagged("Unloading");
             order->link.SetUnit(unit->cargo);
-            PathOrderPosView* obj = new (kSim) PathOrderPosView(order, order->pos);
-            ((PathOrderAltitudeView*)obj)->SetAltitude(unit->def->altitude);
-            ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x140);
+            PathOrder* obj = new (kSim) PathOrder(order, order->pos);
+            obj->SetAltitude(unit->def->altitude);
+            obj->SetApproachRadius(0x140);
             order->SetAttachedFx(obj);
             order->flags = 0xe8;
             return 1;
@@ -541,9 +537,9 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
     case 1: {
         Unit* cargo = order->target;
         if (g_seams.map->CanPlaceUnitFootprint(cargo->def, 0, WorldToCell16(order->pos, *(Point16*)&cargo->footprint), 1)) {
-            PathOrderPosView* obj = new (kSim) PathOrderPosView(order, order->pos);
+            PathOrder* obj = new (kSim) PathOrder(order, order->pos);
             int h = unit->cargo->def->modelMaxYHigh;
-            ((PathOrderAltitudeView*)obj)->SetAltitude(h);
+            obj->SetAltitude(h);
             order->SetAttachedFx(obj);
             order->flags = 0xe8;
             return 1;
@@ -561,8 +557,8 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
         }
         g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
         g_seams.units->AttachUnitToPiece(unit->cargo, 0, -1, 1);
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, unit->pos);
-        ((PathOrderAltitudeView*)obj)->SetAltitude(unit->def->altitude);
+        PathOrder* obj = new (kSim) PathOrder(order, unit->pos);
+        obj->SetAltitude(unit->def->altitude);
         order->SetAttachedFx(obj);
         order->flags = 0xe0;
         return 1;
@@ -618,8 +614,8 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
             g_seams.units->SetStateBits(unit, 1,1);
             if ((unit->motion->flags&3)==1) {
                 unit->motion->SetFlightMode(unit,2);
-                PathOrderPosView* move=new (kSim) PathOrderPosView(order,unit->pos);
-                ((PathOrderAltitudeView*)move)->SetAltitude(unit->def->altitude/2);
+                PathOrder* move=new (kSim) PathOrder(order,unit->pos);
+                move->SetAltitude(unit->def->altitude/2);
                 order->SetAttachedFx(move);
                 order->flags|=0xe0;
             }
@@ -632,8 +628,8 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         Point16 origin=*(Point16*)&def->footprintx;
         Point16 cell=WorldToCell(order->pos,origin);
         CellToWorldPos(cell,&order->pos,origin);
-        PathOrderPosView* move=new (kSim) PathOrderPosView(order,order->pos);
-        ((PathOrderApproachRadiusView*)move)->SetApproachRadius(unit->def->buildRange);
+        PathOrder* move=new (kSim) PathOrder(order,order->pos);
+        move->SetApproachRadius(unit->def->buildRange);
         order->SetAttachedFx(move);
         order->flags=0xe0;
         return 1;
@@ -665,8 +661,8 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
             int range=unit->def->buildRange<<16;
             angle+=0xdb6e;
             Vec3 pos=PosMinus(order->target->pos,Offset(angle,range));
-            PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
-            ((PathOrderHeadingView*)move)->SetHeading((unsigned short)angle);
+            PathOrder* move=new (kSim) PathOrder(order,pos);
+            move->SetHeading((unsigned short)angle);
             order->SetAttachedFx(move);
         }
         int rate=0; rate=unit->def->buildRate;
@@ -730,8 +726,8 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1: {
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, order->pos);
-        ((PathOrderAltitudeView*)obj)->SetAltitude(unit->def->altitude);
+        PathOrder* obj = new (kSim) PathOrder(order, order->pos);
+        obj->SetAltitude(unit->def->altitude);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
         return 1;
@@ -866,8 +862,8 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         centre.z = g_game->mapHeight / 2 << 16;
         short angle = GetHeadingBetween(&unit->pos, &centre);
         Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x3200000));
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, dest);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x80);
+        PathOrder* obj = new (kSim) PathOrder(order, dest);
+        obj->SetApproachRadius(0x80);
         order->flags |= 0xe0;
         order->SetAttachedFx(obj);
         return 2;
@@ -893,8 +889,8 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         int angle = GetHeadingBetween(&unit->pos, &order->target->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
         Vec3 p = Sum(unit->pos, off);
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, p);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x80);
+        PathOrder* obj = new (kSim) PathOrder(order, p);
+        obj->SetApproachRadius(0x80);
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         return 1;
@@ -902,8 +898,8 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
     case 2: {
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
         g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, order->target->pos);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(range);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target->pos);
+        obj->SetApproachRadius(range);
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         order->side = 0;
@@ -917,8 +913,8 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
             order->misses = 0;
             Vec3 off = Offset(RandomInt(0x10000), range << 16);
             Vec3 p = AddVec3(order->target->pos, off);
-            PathOrderPosView* obj = new (kSim) PathOrderPosView(order, p);
-            ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x80);
+            PathOrder* obj = new (kSim) PathOrder(order, p);
+            obj->SetApproachRadius(0x80);
             order->flags |= 0x110e8;
             return 2;
         }
@@ -933,9 +929,9 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         }
         Vec3 off = Offset(angle, range * 2 / 3 << 16);
         Vec3 p = Diff(order->target->pos, off);
-        PathOrderCoordsView* obj = new (kSim) PathOrderCoordsView(order, order->target, p);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x10);
-        ((PathOrderAltitudeView*)obj)->SetAltitude(unit->def->altitude);
+        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, p);
+        obj->SetApproachRadius(0x10);
+        obj->SetAltitude(unit->def->altitude);
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
@@ -979,9 +975,9 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             }
             break;
         case 1: {
-            PathOrderUnitView* obj = new (kSim) PathOrderUnitView(order, order->target);
-            ((PathOrderAltitudeView*)obj)->SetAltitude(unit->def->altitude);
-            ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x30);
+            PathOrder* obj = new (kSim) PathOrder(order, order->target);
+            obj->SetAltitude(unit->def->altitude);
+            obj->SetApproachRadius(0x30);
             order->SetAttachedFx(obj);
             order->flags = 0x100e8;
             return 1;
@@ -997,8 +993,8 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "BeginTransport", 0, 1, 1, height, 0, 0, 0);
             SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
             Vec3 offset = g_seams.units->GetPieceOffset(unit, order->piece);
-            PathOrderMoveToUnitView* obj = new (kSim) PathOrderMoveToUnitView(order, order->target, -1);
-            ((PathOrderAltitudeView*)obj)->SetAltitude(-((Vec3Words*)&offset)->yWhole);
+            PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, -1);
+            obj->SetAltitude(-((Vec3Words*)&offset)->yWhole);
             order->SetAttachedFx(obj);
             order->flags = 0x100ea;
             return 1;
@@ -1010,8 +1006,8 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             }
             g_seams.units->AttachUnitToPiece(target, unit, order->piece, 0);
             QueueUnitSpeech(unit, 12, 0);
-            PathOrderPosView* obj = new (kSim) PathOrderPosView(order, unit->pos);
-            ((PathOrderAltitudeView*)obj)->SetAltitude(unit->def->altitude);
+            PathOrder* obj = new (kSim) PathOrder(order, unit->pos);
+            obj->SetAltitude(unit->def->altitude);
             order->flags |= 0xe0;
             return 1;
         }
@@ -1040,7 +1036,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             center.z=(g_game->mapHeight/2)<<16;
             short angle=GetHeadingBetween(&unit->pos,&center);
             Vec3 pos=AddVec3(unit->pos,Direction(angle,0x3200000));
-            PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
+            PathOrder* move=new (kSim) PathOrder(order,pos);
             move->SetApproachRadius(128);
             order->flags|=0xe0;
             order->SetAttachedFx(move);
@@ -1057,7 +1053,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                 g_seams.units->SetStateBits(unit, 1,1);
                 if ((unit->motion->flags&3)==1) {
                     unit->motion->SetFlightMode(unit,2);
-                    PathOrderPosView* move=new (kSim) PathOrderPosView(order,unit->pos);
+                    PathOrder* move=new (kSim) PathOrder(order,unit->pos);
                     move->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx(move);
                     order->flags|=0xe0;
@@ -1131,7 +1127,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             if ((unsigned char)(unit->flags>>31)&1)
                 pos=AddVec3(order->target->pos,Offset(angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
             else pos=AddVec3(order->target->pos,Offset(angle,0x1400000));
-            PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
+            PathOrder* move=new (kSim) PathOrder(order,pos);
             move->SetApproachRadius(128);
             order->SetAttachedFx(move);
             order->SetDeadlineTicks(30);
@@ -1181,8 +1177,8 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
             return 6;
         short angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 dest = AddVec3(order->pos, Offset(angle, 0x1400000));
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, dest);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x150);
+        PathOrder* obj = new (kSim) PathOrder(order, dest);
+        obj->SetApproachRadius(0x150);
         order->SetAttachedFx(obj);
         order->flags |= 0xe0;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
@@ -1275,7 +1271,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         }
         Vec3 dest = AddVec3(order->target->pos, Offset(order->angle, radius << 16));
         order->angle += 0x4000;
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, dest);
+        PathOrder* obj = new (kSim) PathOrder(order, dest);
         obj->SetApproachRadius(0x80);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
@@ -1283,8 +1279,8 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         return 2;
     }
     case 2: {
-        PathOrderMoveToUnitView* obj = new (kSim) PathOrderMoveToUnitView(order, order->target, -1);
-        ((PathOrderPosView*)obj)->SetApproachRadius(0xa0);
+        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, -1);
+        obj->SetApproachRadius(0xa0);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
         return 1;
@@ -1296,8 +1292,8 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             QueueUnitSpeech(unit, 7, "Landing failed");
             return 0;
         }
-        PathOrderMoveToUnitView* obj = new (kSim) PathOrderMoveToUnitView(order, order->target, order->angle);
-        ((PathOrderPosView*)obj)->SetApproachRadius(0x30);
+        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, order->angle);
+        obj->SetApproachRadius(0x30);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
         return 1;
@@ -1313,11 +1309,11 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             QueueUnitSpeech(unit, 7, "Landing aborted: all pads are occupied");
             return 0;
         }
-        PathOrderMoveToUnitView* obj = new (kSim) PathOrderMoveToUnitView(order, order->target, order->angle);
+        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, order->angle);
         if (unit->cargo)
-            ((PathOrderPosView*)obj)->SetAltitude(unit->cargo->def->modelMaxYHigh);
+            obj->SetAltitude(unit->cargo->def->modelMaxYHigh);
         else
-            ((PathOrderPosView*)obj)->SetAltitude(0);
+            obj->SetAltitude(0);
         g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
         order->SetAttachedFx(obj);
         order->SetDeadlineTicks(0xf);
@@ -1439,11 +1435,11 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         float x = (float)sqrt(size * 2.0 / rate) * 30.0f;
         int time = (int)(x * unit->motion->field_22) + 1;
         time += def->attackrunlength;
-        PathOrderPosView* obj;
+        PathOrder* obj;
         if (order->target)
-            obj = (PathOrderPosView*)new (kSim) PathOrderUnitView(order, order->target);
+            obj = new (kSim) PathOrder(order, order->target);
         else
-            obj = new (kSim) PathOrderPosView(order, order->pos);
+            obj = new (kSim) PathOrder(order, order->pos);
         obj->SetApproachRadius(time);
         order->SetAttachedFx(obj);
         order->SetDeadlineTicks(1);
@@ -1485,7 +1481,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
 
 static inline void AttachMove(Order* order, const Vec3& dest, short radius)
 {
-    PathOrderPosView* obj = new (kSim) PathOrderPosView(order, dest);
+    PathOrder* obj = new (kSim) PathOrder(order, dest);
     obj->SetApproachRadius(radius);
     order->SetAttachedFx(obj);
 }
@@ -1551,8 +1547,8 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         int angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
         Vec3 p = AddVec3(unit->pos, off);
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, p);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x80);
+        PathOrder* obj = new (kSim) PathOrder(order, p);
+        obj->SetApproachRadius(0x80);
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         return 1;
@@ -1563,8 +1559,8 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
             g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
         else
             g_seams.targeting->SetWeaponTargetPos(unit, &order->pos, 0);
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, order->pos);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(speed);
+        PathOrder* obj = new (kSim) PathOrder(order, order->pos);
+        obj->SetApproachRadius(speed);
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         return 1;
@@ -1573,8 +1569,8 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         short angle = AngleOfVector(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
         Vec3 off = Offset(angle, speed * 0x30000);
         Vec3 p = AddVec3(order->pos, off);
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, p);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(RandomInt(0x80) + 0x80);
+        PathOrder* obj = new (kSim) PathOrder(order, p);
+        obj->SetApproachRadius(RandomInt(0x80) + 0x80);
         order->SetAttachedFx(obj);
         order->flags = 0x100ea;
         return 1;
@@ -1598,8 +1594,8 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         sum.y = unit->pos.y + off.y;
         sum.z = unit->pos.z + off.z;
         Vec3 p = sum;
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, p);
-        ((PathOrderApproachRadiusView*)obj)->SetApproachRadius(0x80);
+        PathOrder* obj = new (kSim) PathOrder(order, p);
+        obj->SetApproachRadius(0x80);
         order->SetAttachedFx(obj);
         order->flags = 0x100ea;
         Dummy();
@@ -1646,8 +1642,8 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
                 g_seams.units->SetStateBits(unit, 1,1);
                 if ((unit->motion->flags&3)==1) {
                     unit->motion->SetFlightMode(unit,2);
-                    PathOrderPosView* move=new (kSim) PathOrderPosView(order,unit->pos);
-                    ((PathOrderAltitudeView*)move)->SetAltitude(unit->def->altitude/2);
+                    PathOrder* move=new (kSim) PathOrder(order,unit->pos);
+                    move->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx(move);
                     order->flags|=0xe0;
                 }
@@ -1657,8 +1653,8 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
         break;
     case 1: {
         order->retries=0;
-        PathOrderPosView* move=new (kSim) PathOrderPosView(order,order->target->pos);
-        ((PathOrderApproachRadiusView*)move)->SetApproachRadius(unit->def->buildRange);
+        PathOrder* move=new (kSim) PathOrder(order,order->target->pos);
+        move->SetApproachRadius(unit->def->buildRange);
         order->SetAttachedFx(move);
         order->flags=0xe0;
         return 1;
@@ -1676,8 +1672,8 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
             angle+=0xdb6e;
             Vec3* base=&order->target->pos;
             Vec3 pos=PosMinus(*base,Offset(angle,range));
-            PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
-            ((PathOrderHeadingView*)move)->SetHeading((unsigned short)angle);
+            PathOrder* move=new (kSim) PathOrder(order,pos);
+            move->SetHeading((unsigned short)angle);
             order->SetAttachedFx(move);
         }
         int rate=0; rate=unit->def->buildRate;
@@ -1737,7 +1733,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1: {
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, order->pos);
+        PathOrder* obj = new (kSim) PathOrder(order, order->pos);
         order->SetAttachedFx(obj);
         order->flags = 0xe0;
         return 1;
@@ -1823,7 +1819,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         Point16 origin = *(Point16*)&unit->footprint;
         Point16 cell = WorldToCell(order->pos, origin);
         CellToWorldPos(cell, &order->pos, origin);
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, order->target->pos);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target->pos);
         order->SetAttachedFx(obj);
         order->flags |= 0x100e8;
         QueueUnitSpeech(unit, 11, 0);
@@ -1874,8 +1870,8 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         center.z=(g_game->mapHeight/2)<<16;
         short angle=GetHeadingBetween(&unit->pos,&center);
         Vec3 pos=AddVec3(unit->pos,Offset(angle,0x3200000));
-        PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
-        ((PathOrderApproachRadiusView*)move)->SetApproachRadius(128);
+        PathOrder* move=new (kSim) PathOrder(order,pos);
+        move->SetApproachRadius(128);
         order->flags|=0xe0;
         order->SetAttachedFx(move);
         return 2;
@@ -1895,8 +1891,8 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
                 g_seams.units->SetStateBits(unit, 1,1);
                 if ((unit->motion->flags&3)==1) {
                     unit->motion->SetFlightMode(unit,2);
-                    PathOrderPosView* move=new (kSim) PathOrderPosView(order,unit->pos);
-                    ((PathOrderAltitudeView*)move)->SetAltitude(unit->def->altitude/2);
+                    PathOrder* move=new (kSim) PathOrder(order,unit->pos);
+                    move->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx(move);
                     order->flags|=0xe0;
                 }
@@ -1921,8 +1917,8 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         if (target && IssueAttackOrder(unit,target,0)) return 5;
         if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x5555;
         Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
-        PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
-        ((PathOrderApproachRadiusView*)move)->SetApproachRadius(128);
+        PathOrder* move=new (kSim) PathOrder(order,pos);
+        move->SetApproachRadius(128);
         order->SetAttachedFx(move);
         order->SetDeadlineTicks(RandomInt(30)+30);
         order->flags|=0xe0;
@@ -1942,7 +1938,7 @@ int __stdcall VtolSeekGuardOrder(Unit* unit, Order* order, int flags)
         center.z=(g_game->mapHeight/2)<<16;
         short angle=GetHeadingBetween(&unit->pos,&center);
         Vec3 pos=AddVec3(unit->pos,Direction(angle,0x3200000));
-        PathOrderPosView* move=new (kSim) PathOrderPosView(order,pos);
+        PathOrder* move=new (kSim) PathOrder(order,pos);
         move->SetApproachRadius(128);
         order->flags|=0xe0;
         order->SetAttachedFx(move);
@@ -1984,7 +1980,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
         centre.z = g_game->mapHeight / 2 << 16;
         short angle = GetHeadingBetween(&unit->pos, &centre);
         Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x3200000));
-        PathOrderPosView* obj = new (kSim) PathOrderPosView(order, dest);
+        PathOrder* obj = new (kSim) PathOrder(order, dest);
         obj->SetApproachRadius(0x80);
         order->flags |= 0xe0;
         order->SetAttachedFx(obj);
@@ -2067,7 +2063,7 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
         case 1: {
             if (flags & 0xe0)
                 return 6;
-            PathOrderPosView* obj = new (kSim) PathOrderPosView(order, order->pos);
+            PathOrder* obj = new (kSim) PathOrder(order, order->pos);
             obj->SetAltitude(unit->def->altitude);
             order->SetAttachedFx(obj);
             order->SetDeadlineTicks(0x2d);

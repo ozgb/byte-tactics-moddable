@@ -40,7 +40,7 @@ struct ActiveBitFlags {
     unsigned int rest : 31;
 };
 
-#include "mouse_event.h"
+#include "../../include/mouse_event.h"
 
 struct DialogRect {
     int left;
@@ -598,7 +598,7 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
     }
 
     MouseEvent e;
-    if (PeekMouseEvent((MouseQueueEvent *)&e) != 0) {
+    if (PeekMouseEvent(&e) != 0) {
         if (p->layer != 0) {
             DialogRect r;
             GetGadgetScreenRect((char *)p->layer->entries, 0, (Rect *)&r);

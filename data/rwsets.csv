@@ -3082,7 +3082,7 @@ address,function,file,kind,target
 0x40f1e0,Pathfinder::FreeNode,src/ai/pathfind.cpp,field_write,OpenHeap::freeHead
 0x40f1e0,Pathfinder::FreeNode,src/ai/pathfind.cpp,function,
 0x40f200,PrepVtolClimb,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
-0x40f200,PrepVtolClimb,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
+0x40f200,PrepVtolClimb,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x40f200,PrepVtolClimb,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
 0x40f200,PrepVtolClimb,src/orders/vtol_orders.cpp,call,operator bool
 0x40f200,PrepVtolClimb,src/orders/vtol_orders.cpp,call,operator new
@@ -3111,8 +3111,8 @@ address,function,file,kind,target
 0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,GetHeadingBetween
 0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,Offset
 0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
-0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
-0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
+0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x40f2a0,VtolLandIfCanOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
@@ -3176,7 +3176,7 @@ address,function,file,kind,target
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,Offset
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
+0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,operator new
@@ -3249,8 +3249,8 @@ address,function,file,kind,target
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,OrderTarget
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,PathOrderPosView::SetAltitude
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,PathOrderPosView::SetApproachRadius
+0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
+0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,get
@@ -3341,8 +3341,8 @@ address,function,file,kind,target
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,Offset
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,empty
@@ -3416,7 +3416,7 @@ address,function,file,kind,target
 0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,Direction
 0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,GetHeadingBetween
 0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
-0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,PathOrderPosView::SetApproachRadius
+0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,Patrol
 0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x410850,VtolSeekGuardOrder,src/orders/vtol_orders.cpp,call,get
@@ -3471,7 +3471,7 @@ address,function,file,kind,target
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,empty
@@ -3511,8 +3511,8 @@ address,function,file,kind,target
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,BelowSeaLevel
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
-0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
-0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
+0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,SendScriptCallByName
@@ -3555,8 +3555,8 @@ address,function,file,kind,target
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
-0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
-0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
+0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrderAttach::SetUnit
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,WorldToCell16
@@ -3609,8 +3609,8 @@ address,function,file,kind,target
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,PathOrderPosView::SetAltitude
-0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,PathOrderPosView::SetApproachRadius
+0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
+0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,RandomInt
@@ -3659,7 +3659,7 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,PathOrderPosView::SetApproachRadius
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,_hypot
@@ -3739,7 +3739,7 @@ address,function,file,kind,target
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,_hypot
@@ -3814,7 +3814,7 @@ address,function,file,kind,target
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,PathOrderPosView::SetApproachRadius
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Sum
@@ -3882,8 +3882,8 @@ address,function,file,kind,target
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,Offset
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
-0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
-0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,Sum
@@ -3957,7 +3957,7 @@ address,function,file,kind,target
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,AddVec3
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,Offset
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
-0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,operator WeaponDef *
 0x413bc0,VtolEvadeOrder,src/orders/vtol_orders.cpp,call,operator bool
@@ -3989,10 +3989,10 @@ address,function,file,kind,target
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
-0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
+0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
+0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetHeading
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrderAttach::SetUnit
-0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrderHeadingView::SetHeading
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PosMinus
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,StartBuildingScript
@@ -4075,9 +4075,9 @@ address,function,file,kind,target
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
-0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
-0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrderHeadingView::SetHeading
+0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
+0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
+0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetHeading
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PosMinus
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,StartBuildingScript
@@ -4242,7 +4242,7 @@ address,function,file,kind,target
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PathOrderAltitudeView::SetAltitude
+0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,_hypot
@@ -4315,7 +4315,7 @@ address,function,file,kind,target
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,PathOrderPosView::SetAltitude
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Player::GetEnergy
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Player::GetMetal
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
@@ -9309,7 +9309,7 @@ address,function,file,kind,target
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,call,_strcmpi
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,call,operator UnitDef *
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,call,sprintf
-0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,field_escape,DownloadMenuEntry::name
+0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,field_escape,BuildMenuEntry::name
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,field_escape,UnitDef::unitname
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,field_maybe_written,UnitDef::unitname
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,field_read,Game::buildListCount
@@ -9327,9 +9327,9 @@ address,function,file,kind,target
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,operator unsigned short *
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,operator!=
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,deref_write,*unsigned short
-0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_escape,DownloadMenuEntry::name
-0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,DownloadMenuEntry::typeId
-0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,DownloadMenuList::count
+0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_escape,BuildMenuEntry::name
+0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,BuildMenuEntry::typeId
+0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,BuildMenuPage::count
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,Game::buildListCount
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,Game::buildLists
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,field_read,Game::defs
@@ -9633,15 +9633,13 @@ address,function,file,kind,target
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,operator[]
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,size
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,sprintf
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,deref_write,*DownloadMenuList
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_escape,DownloadMenuEntry::name
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_escape,Game::buildLists
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_escape,BuildMenuEntry::name
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_escape,UnitDef::unitname
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_maybe_written,DownloadMenuEntry::name
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_maybe_written,BuildMenuEntry::name
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_maybe_written,UnitDef::unitname
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,DownloadMenuEntry::page
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,DownloadMenuEntry::typeId
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,DownloadMenuList::count
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,BuildMenuEntry::page
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,BuildMenuEntry::typeId
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,BuildMenuPage::count
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,Game::buildListCount
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,Game::buildLists
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,Game::defs
@@ -9650,11 +9648,12 @@ address,function,file,kind,target
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,TdfFile::current
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,UnitDef::buildMenuPageCount
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_read,UnitDef::downloadable
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,DownloadMenuEntry::page
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,DownloadMenuEntry::slot
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,DownloadMenuEntry::typeId
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,DownloadMenuList::count
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,BuildMenuEntry::page
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,BuildMenuEntry::slot
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,BuildMenuEntry::typeId
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,BuildMenuPage::count
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,Game::buildListCount
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,Game::buildLists
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,UnitDef::buildMenuPageCount
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,UnitDef::downloadable
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,function,
@@ -27097,7 +27096,7 @@ address,function,file,kind,target
 0x486360,CreateUnitCorpse,src/units/units.cpp,indirect_call,"indirect via Spot *(*)(Cell *, unsigned short, Vec3 *, Rot16 *, unsigned char) __attribute__((stdcall)) [FeaturesSeam::PlaceFeature]"
 0x486460,IsUnitCommander,src/units/units.cpp,call,_strcmpi
 0x486460,IsUnitCommander,src/units/units.cpp,call,operator->
-0x486460,IsUnitCommander,src/units/units.cpp,field_escape,SideNameView::name
+0x486460,IsUnitCommander,src/units/units.cpp,field_escape,SideName::name
 0x486460,IsUnitCommander,src/units/units.cpp,field_escape,UnitDef::unitname
 0x486460,IsUnitCommander,src/units/units.cpp,field_read,Player::info
 0x486460,IsUnitCommander,src/units/units.cpp,field_read,PlayerInfo::side
@@ -27114,7 +27113,7 @@ address,function,file,kind,target
 0x4864b0,KillUnit,src/units/units.cpp,call,get
 0x4864b0,KillUnit,src/units/units.cpp,call,operator->
 0x4864b0,KillUnit,src/units/units.cpp,call,operator==
-0x4864b0,KillUnit,src/units/units.cpp,field_escape,SideNameView::name
+0x4864b0,KillUnit,src/units/units.cpp,field_escape,SideName::name
 0x4864b0,KillUnit,src/units/units.cpp,field_escape,UnitDef::unitname
 0x4864b0,KillUnit,src/units/units.cpp,field_read,Game::commanderDeath
 0x4864b0,KillUnit,src/units/units.cpp,field_read,Player::active
@@ -27179,7 +27178,7 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,deref_escape,*Unit
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,deref_read,*Ref<Unit>
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Game::players
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,SideNameView::name
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,SideName::name
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Unit::attacker
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Unit::pos
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,UnitDef::unitname
@@ -33870,14 +33869,14 @@ address,function,file,kind,target
 0x49fd10,HasFocus,src/gui/gui.cpp,deref_read,*int
 0x49fd10,HasFocus,src/gui/gui.cpp,function,
 0x49fd20,FUN_0049fd20,src/gui/gui.cpp,call,operator=
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,deref_write,*DialogMouseEvent
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogMouseEvent::x
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogMouseEvent::y
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,deref_write,*MouseEvent
 0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogOriginView::val_13
 0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogOriginView::val_15
 0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,DialogPointView::data
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_write,DialogMouseEvent::x
-0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_write,DialogMouseEvent::y
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,MouseEvent::x
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_read,MouseEvent::y
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_write,MouseEvent::x
+0x49fd20,FUN_0049fd20,src/gui/gui.cpp,field_write,MouseEvent::y
 0x49fd20,FUN_0049fd20,src/gui/gui.cpp,function,
 0x49fd60,IsCurrentGadgetNamed,src/gui/gui.cpp,call,strcmp
 0x49fd60,IsCurrentGadgetNamed,src/gui/gui.cpp,field_escape,Gadget::name
@@ -34646,8 +34645,6 @@ address,function,file,kind,target
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,call,toupper
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,deref_escape,*Gadget
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,deref_read,*int
-0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,DialogMouseEvent::x
-0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,DialogMouseEvent::y
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,Gadget::attribs
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,Gadget::height
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,Gadget::hotkey
@@ -34664,6 +34661,8 @@ address,function,file,kind,target
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,HandleLabelInputRect::x2
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,HandleLabelInputRect::y1
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,HandleLabelInputRect::y2
+0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,MouseEvent::x
+0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_read,MouseEvent::y
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_write,HandleLabelInputObject::focus
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_write,HandleLabelInputRect::x1
 0x4a4440,HandleLabelInput,src/gui/gui.cpp,field_write,HandleLabelInputRect::x2
@@ -34679,7 +34678,6 @@ address,function,file,kind,target
 0x4a4620,ScheduleGadgetEndTick,src/gui/gui.cpp,function,
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,DrawTextClipped
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,FillBevelBox
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,FillRectangle
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,GetFontHeight
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,GetGafFrame
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,LockScreen
@@ -34699,10 +34697,6 @@ address,function,file,kind,target
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,DrawProgressBarGadgetDialog::holder
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,DrawProgressBarGadgetDialog::surface
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,DrawProgressBarGadgetHolder::entries
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,DrawProgressBarGadgetRect::bottom
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,DrawProgressBarGadgetRect::left
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,DrawProgressBarGadgetRect::right
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,DrawProgressBarGadgetRect::top
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,Gadget::colours
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,Gadget::height
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,Gadget::image
@@ -34710,13 +34704,19 @@ address,function,file,kind,target
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,Gadget::x
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,Gadget::y
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,GafFrame::height
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,Rect::bottom
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,Rect::left
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,Rect::right
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,Rect::top
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,DrawProgressBarGadgetDialog::oldSurface
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,DrawProgressBarGadgetRect::bottom
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,DrawProgressBarGadgetRect::left
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,DrawProgressBarGadgetRect::right
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,DrawProgressBarGadgetRect::top
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,Rect::bottom
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,Rect::left
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,Rect::right
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,Rect::top
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,fn_ref,FillRectangle
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,function,
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,global_read,g_guiContext
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,indirect_call,"indirect via void (*)(Surface *, Rect *, int) __attribute__((stdcall))"
 0x4a4890,TickProgressBar,src/gui/gui.cpp,call,DrawProgressBarGadget
 0x4a4890,TickProgressBar,src/gui/gui.cpp,call,GetTicks
 0x4a4890,TickProgressBar,src/gui/gui.cpp,deref_escape,*Gadget
@@ -34789,16 +34789,16 @@ address,function,file,kind,target
 0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_read,HandleHotspotInputDialog::table
 0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_read,HandleHotspotInputPoint::x
 0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_read,HandleHotspotInputPoint::y
-0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_read,HandleHotspotInputRect::left
-0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_read,HandleHotspotInputRect::top
 0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_read,HandleHotspotInputTable::entries
+0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_read,Rect::left
+0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_read,Rect::top
 0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,HandleHotspotInputDialog::focus
 0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,HandleHotspotInputPoint::x
 0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,HandleHotspotInputPoint::y
-0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,HandleHotspotInputRect::bottom
-0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,HandleHotspotInputRect::left
-0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,HandleHotspotInputRect::right
-0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,HandleHotspotInputRect::top
+0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,Rect::bottom
+0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,Rect::left
+0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,Rect::right
+0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,field_write,Rect::top
 0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,function,
 0x4a4b50,HandleHotspotInput,src/gui/gui.cpp,indirect_call,"indirect via void (*)(Gui *, Gadget *) __attribute__((stdcall)) [<anon>::callback]"
 0x4a4c90,DrawLineGadget,src/gui/gui.cpp,call,DrawLine
@@ -34839,9 +34839,6 @@ address,function,file,kind,target
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,DrawTextInputDialog::holder
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,DrawTextInputHolder::entries
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,DrawTextInputHolder::surface
-0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,DrawTextInputRect::left
-0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,DrawTextInputRect::right
-0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,DrawTextInputRect::top
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,Gadget::attribs
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,Gadget::colours
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,Gadget::height
@@ -34850,10 +34847,13 @@ address,function,file,kind,target
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,Gadget::x
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,Gadget::y
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,GafFrame::height
-0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_write,DrawTextInputRect::bottom
-0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_write,DrawTextInputRect::left
-0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_write,DrawTextInputRect::right
-0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_write,DrawTextInputRect::top
+0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,Rect::left
+0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,Rect::right
+0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_read,Rect::top
+0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_write,Rect::bottom
+0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_write,Rect::left
+0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_write,Rect::right
+0x4a4d70,DrawTextInput,src/gui/gui.cpp,field_write,Rect::top
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,function,
 0x4a4d70,DrawTextInput,src/gui/gui.cpp,global_read,g_guiContext
 0x4a5010,GetCharGlyph,src/gui/gui.cpp,call,GetGafFrame
@@ -37522,16 +37522,16 @@ address,function,file,kind,target
 0x4b52e0,InitDisplayDefaults,src/graphics/display.cpp,field_write,Rect::right
 0x4b52e0,InitDisplayDefaults,src/graphics/display.cpp,field_write,Rect::top
 0x4b52e0,InitDisplayDefaults,src/graphics/display.cpp,function,
-0x4b5330,EnumModesCallback,src/graphics/display.cpp,deref_escape,*DisplayModeInfo
+0x4b5330,EnumModesCallback,src/graphics/display.cpp,deref_escape,*DisplayMode
 0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_read,DisplayModeTable::count
 0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_read,DisplayModeTable::modes
 0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_read,host_display_mode::bits
 0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_read,host_display_mode::height
 0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_read,host_display_mode::refresh
 0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_read,host_display_mode::width
-0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_write,DisplayModeInfo::height
-0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_write,DisplayModeInfo::refreshRate
-0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_write,DisplayModeInfo::width
+0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_write,DisplayMode::height
+0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_write,DisplayMode::refreshRate
+0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_write,DisplayMode::width
 0x4b5330,EnumModesCallback,src/graphics/display.cpp,field_write,DisplayModeTable::count
 0x4b5330,EnumModesCallback,src/graphics/display.cpp,function,
 0x4b5370,GetDisplayModes,src/graphics/display.cpp,call,EnumModesCallback
@@ -37540,9 +37540,9 @@ address,function,file,kind,target
 0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_read,DisplayAppView::windowed
 0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_read,DisplayModeTable::count
 0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_read,DisplayModeTable::modes
-0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_write,DisplayModeInfo::height
-0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_write,DisplayModeInfo::refreshRate
-0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_write,DisplayModeInfo::width
+0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_write,DisplayMode::height
+0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_write,DisplayMode::refreshRate
+0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_write,DisplayMode::width
 0x4b5370,GetDisplayModes,src/graphics/display.cpp,field_write,DisplayModeTable::count
 0x4b5370,GetDisplayModes,src/graphics/display.cpp,function,
 0x4b5370,GetDisplayModes,src/graphics/display.cpp,global_read,g_display
@@ -39856,8 +39856,8 @@ address,function,file,kind,target
 0x4c2380,DrawSoftwareCursor,src/gui/mouse.cpp,field_read,MouseDisplay::count
 0x4c2380,DrawSoftwareCursor,src/gui/mouse.cpp,field_read,MouseDisplay::mode
 0x4c2380,DrawSoftwareCursor,src/gui/mouse.cpp,field_read,MouseDisplay::sprite
-0x4c2380,DrawSoftwareCursor,src/gui/mouse.cpp,field_read,MouseQueueEvent::x
-0x4c2380,DrawSoftwareCursor,src/gui/mouse.cpp,field_read,MouseQueueEvent::y
+0x4c2380,DrawSoftwareCursor,src/gui/mouse.cpp,field_read,MouseEvent::x
+0x4c2380,DrawSoftwareCursor,src/gui/mouse.cpp,field_read,MouseEvent::y
 0x4c2380,DrawSoftwareCursor,src/gui/mouse.cpp,function,
 0x4c23e0,RestoreCursorBackground,src/gui/mouse.cpp,call,BlitSurface
 0x4c23e0,RestoreCursorBackground,src/gui/mouse.cpp,call,LockPrimary
@@ -39900,16 +39900,16 @@ address,function,file,kind,target
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,MouseDisplay::visible
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,MouseDisplay::x
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,MouseDisplay::y
-0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,MouseQueueEvent::x
-0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,MouseQueueEvent::y
+0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,MouseEvent::x
+0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,MouseEvent::y
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,tagPOINT::x
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,tagPOINT::y
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,tagRECT::left
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_read,tagRECT::top
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_write,MouseDisplay::x
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_write,MouseDisplay::y
-0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_write,MouseQueueEvent::x
-0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_write,MouseQueueEvent::y
+0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_write,MouseEvent::x
+0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_write,MouseEvent::y
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_write,MouseSurfaceDesc::height
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_write,MouseSurfaceDesc::pitch
 0x4c24b0,CaptureBackgroundAndDrawCursor,src/gui/mouse.cpp,field_write,MouseSurfaceDesc::width
@@ -39945,8 +39945,8 @@ address,function,file,kind,target
 0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_read,tagRECT::top
 0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_write,MouseDisplay::x
 0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_write,MouseDisplay::y
-0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_write,MouseQueueEvent::x
-0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_write,MouseQueueEvent::y
+0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_write,MouseEvent::x
+0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_write,MouseEvent::y
 0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_write,MouseSurfaceDesc::height
 0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_write,MouseSurfaceDesc::pitch
 0x4c25e0,RedrawMouseCursor,src/gui/mouse.cpp,field_write,MouseSurfaceDesc::width
@@ -39972,15 +39972,15 @@ address,function,file,kind,target
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_read,MouseDisplay::sprite
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_read,MouseDisplay::x
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_read,MouseDisplay::y
-0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_read,MouseQueueEvent::x
-0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_read,MouseQueueEvent::y
+0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_read,MouseEvent::x
+0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_read,MouseEvent::y
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_read,tagPOINT::x
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_read,tagPOINT::y
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseDisplay::count
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseDisplay::x
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseDisplay::y
-0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseQueueEvent::x
-0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseQueueEvent::y
+0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseEvent::x
+0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseEvent::y
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseSurfaceDesc::height
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseSurfaceDesc::pitch
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,MouseSurfaceDesc::width
@@ -40057,8 +40057,8 @@ address,function,file,kind,target
 0x4c2cc0,ShutdownMouse,src/gui/mouse.cpp,function,
 0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,call,GetDisplay
 0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,call,operator=
-0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,deref_read,*MouseQueueEvent
-0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,deref_write,*MouseQueueEvent
+0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,deref_read,*MouseEvent
+0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,deref_write,*MouseEvent
 0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,field_read,MouseDisplay::capacity
 0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,field_read,MouseDisplay::entries
 0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,field_read,MouseDisplay::head
@@ -40068,8 +40068,8 @@ address,function,file,kind,target
 0x4c2d60,PopMouseEvent,src/gui/mouse.cpp,function,
 0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,call,GetDisplay
 0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,call,operator=
-0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,deref_read,*MouseQueueEvent
-0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,deref_write,*MouseQueueEvent
+0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,deref_read,*MouseEvent
+0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,deref_write,*MouseEvent
 0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,field_read,MouseDisplay::entries
 0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,field_read,MouseDisplay::head
 0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,field_read,MouseDisplay::rect
@@ -40077,8 +40077,8 @@ address,function,file,kind,target
 0x4c2de0,PeekMouseEvent,src/gui/mouse.cpp,function,
 0x4c2e30,PushMouseEvent,src/gui/mouse.cpp,call,GetDisplay
 0x4c2e30,PushMouseEvent,src/gui/mouse.cpp,call,operator=
-0x4c2e30,PushMouseEvent,src/gui/mouse.cpp,deref_read,*MouseQueueEvent
-0x4c2e30,PushMouseEvent,src/gui/mouse.cpp,deref_write,*MouseQueueEvent
+0x4c2e30,PushMouseEvent,src/gui/mouse.cpp,deref_read,*MouseEvent
+0x4c2e30,PushMouseEvent,src/gui/mouse.cpp,deref_write,*MouseEvent
 0x4c2e30,PushMouseEvent,src/gui/mouse.cpp,field_read,MouseDisplay::capacity
 0x4c2e30,PushMouseEvent,src/gui/mouse.cpp,field_read,MouseDisplay::entries
 0x4c2e30,PushMouseEvent,src/gui/mouse.cpp,field_read,MouseDisplay::head
@@ -43320,7 +43320,7 @@ address,function,file,kind,target
 ,At,src/state/block.cpp,global_read,g_base
 ,AtLeast200,src/game/main_loop.cpp,function,
 ,AttachMove,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
-,AttachMove,src/orders/vtol_orders.cpp,call,PathOrderPosView::SetApproachRadius
+,AttachMove,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 ,AttachMove,src/orders/vtol_orders.cpp,call,operator new
 ,AttachMove,src/orders/vtol_orders.cpp,function,
 ,AttachMove,src/orders/vtol_orders.cpp,global_read,kSim
@@ -48471,7 +48471,7 @@ address,function,file,kind,target
 ,Patrol,src/orders/vtol_orders.cpp,call,Offset
 ,Patrol,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 ,Patrol,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-,Patrol,src/orders/vtol_orders.cpp,call,PathOrderApproachRadiusView::SetApproachRadius
+,Patrol,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 ,Patrol,src/orders/vtol_orders.cpp,call,RandomInt
 ,Patrol,src/orders/vtol_orders.cpp,call,SearchRange
 ,Patrol,src/orders/vtol_orders.cpp,call,UnitList::~UnitList
@@ -48552,10 +48552,10 @@ address,function,file,kind,target
 ,PointInButtonRect,src/gui/gui.cpp,function,
 ,PointInHotspotRect,src/gui/gui.cpp,field_read,HandleHotspotInputPoint::x
 ,PointInHotspotRect,src/gui/gui.cpp,field_read,HandleHotspotInputPoint::y
-,PointInHotspotRect,src/gui/gui.cpp,field_read,HandleHotspotInputRect::bottom
-,PointInHotspotRect,src/gui/gui.cpp,field_read,HandleHotspotInputRect::left
-,PointInHotspotRect,src/gui/gui.cpp,field_read,HandleHotspotInputRect::right
-,PointInHotspotRect,src/gui/gui.cpp,field_read,HandleHotspotInputRect::top
+,PointInHotspotRect,src/gui/gui.cpp,field_read,Rect::bottom
+,PointInHotspotRect,src/gui/gui.cpp,field_read,Rect::left
+,PointInHotspotRect,src/gui/gui.cpp,field_read,Rect::right
+,PointInHotspotRect,src/gui/gui.cpp,field_read,Rect::top
 ,PointInHotspotRect,src/gui/gui.cpp,function,
 ,PointInListRect,src/gui/gui.cpp,field_read,HandleListBoxInputPoint::x
 ,PointInListRect,src/gui/gui.cpp,field_read,HandleListBoxInputPoint::y

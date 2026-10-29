@@ -757,7 +757,7 @@ void __cdecl CycleCurrentPlayerAllyGroup()
     RefreshAllyIcons();
 }
 
-#include "../gui/mouse_event.h"
+#include "../../include/mouse_event.h"
 
 #pragma pack(push, 1)
 struct ClickFrame {

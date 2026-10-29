@@ -107,15 +107,11 @@ struct DisplayAppView {
 };
 #pragma pack(pop)
 
-struct DisplayModeInfo {
-    unsigned int width;
-    unsigned int height;
-    unsigned int refreshRate;
-};
+#include "../../include/display_mode.h"
 
 struct DisplayModeTable {
     int count;
-    DisplayModeInfo* modes;
+    DisplayMode* modes;
     char unknown_8[12];
     char* buffer;
 };
@@ -229,7 +225,7 @@ void __stdcall InitDisplayDefaults(DisplayAppView* p)
 void __stdcall EnumModesCallback(const host_display_mode* desc, void* context)
 {
     DisplayModeTable* list = (DisplayModeTable*)context;
-    DisplayModeInfo* mode = &list->modes[list->count];
+    DisplayMode* mode = &list->modes[list->count];
     if (desc->bits == 8) {
         mode->width = desc->width;
         mode->height = desc->height;
@@ -533,7 +529,7 @@ int __stdcall HandleHostEvent(host_event* ev)
         return 1;
     }
     e.message = ev->type;
-    PushMouseEvent((MouseQueueEvent *)&e);
+    PushMouseEvent((MouseEvent *)&e);
     return 1;
 }
 

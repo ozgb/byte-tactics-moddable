@@ -34,13 +34,6 @@ struct GafSequenceSource;
 #include "mission_option_flags.h"
 #include "settings.h"
 
-struct SkirmishSlotResources {
-    char unknown_0[0xc];
-    int metal;
-    int energy;
-    char unknown_14[4];
-};
-
 #include "../map/mission.h"
 #include "../util/vec3.h"
 #include "../../interfaces/seams.h"
@@ -356,7 +349,7 @@ void InitStartingResourcesFromSkirmish()
     int w = 0;
     for (int i = 0; i < 10; i++) {
         if (IsPlaying(i)) {
-            SkirmishSlotResources* s = &((SkirmishSlotResources*)g_game->options)[i];
+            SkirmishPlayer* s = &g_game->options->players[i];
             if (s->metal > h)
                 h = s->metal;
             if (s->energy > w)

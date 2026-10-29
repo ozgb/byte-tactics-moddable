@@ -124,5 +124,38 @@ class WindowTests(unittest.TestCase):
                                                            "segments": [], "elements": []}, wm.fixture_ranges()), [])
 
 
+class LayoutTests(unittest.TestCase):
+    PINS = {"block_base": 1048576, "block_size": 33554432, "scratch": [983040, 65536], "memory_pages": 528}
+    RANGES = [("a", 65536, 131072), ("b", 196608, 202688)]
+
+    def test_the_game_manifest_layout_passes(self):
+        game = wm.game_manifest()
+        ranges = [(n, lo, hi) for n, lo, hi, _, _ in wm.fixture_ranges()]
+        self.assertEqual(wm.check_layout(game, ranges + [("wind_meteors", game["modules"][0]["data_base"], game["modules"][0]["data_base"] + game["window"])]), [])
+
+    def test_disjoint_ranges_pass(self):
+        self.assertEqual(wm.check_layout(self.PINS, self.RANGES), [])
+
+    def test_module_overlapping_another_fails(self):
+        problems = wm.check_layout(self.PINS, self.RANGES + [("c", 200000, 210000)])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("overlaps c", problems[0])
+
+    def test_module_overlapping_the_scratch_fails(self):
+        problems = wm.check_layout(self.PINS, self.RANGES + [("c", 983040, 990000)])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("scratch", problems[0])
+
+    def test_module_reaching_the_block_fails(self):
+        problems = wm.check_layout(self.PINS, self.RANGES + [("c", 1040000, 1048577)])
+        self.assertTrue(any("reaches the block base" in p for p in problems))
+
+    def test_touching_ranges_pass(self):
+        self.assertEqual(wm.check_layout(self.PINS, self.RANGES + [("c", 202688, 983040)]), [])
+
+    def test_pages_must_hold_the_block(self):
+        self.assertTrue(wm.check_layout(dict(self.PINS, memory_pages=527), self.RANGES))
+
+
 if __name__ == "__main__":
     unittest.main()

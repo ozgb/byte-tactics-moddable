@@ -1,6 +1,9 @@
 {
   "tools": {"clang": "22.1.8", "wasm-tools": "1.262.0"},
-  "memory_pages": 4,
+  "block_base": 1048576,
+  "block_size": 33554432,
+  "scratch": [983040, 65536],
+  "memory_pages": 528,
   "table_size": 80,
   "stack_size": 4096,
   "window": 65536,

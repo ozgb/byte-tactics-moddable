@@ -270,6 +270,24 @@ def check_window(entry, pins, info, others):
     return problems
 
 
+def check_layout(pins, ranges):
+    """Reasons the module ranges (name, low, high) and the scratch range overlap each other or reach the block, or the pages do not hold the block."""
+    problems = []
+    base, size = pins["block_base"], pins["block_size"]
+    scratch_low, scratch_size = pins["scratch"]
+    named = list(ranges) + [("scratch", scratch_low, scratch_low + scratch_size)]
+    for name, low, high in named:
+        if high > base:
+            problems.append(f"{name}: {low:#x}..{high:#x} reaches the block base {base:#x}")
+    for index, (name, low, high) in enumerate(named):
+        for other_name, other_low, other_high in named[index + 1:]:
+            if low < other_high and other_low < high:
+                problems.append(f"{name}: {low:#x}..{high:#x} overlaps {other_name}'s {other_low:#x}..{other_high:#x}")
+    if pins["memory_pages"] * 65536 != base + size:
+        problems.append(f"memory_pages {pins['memory_pages']} does not hold the block: {base + size:#x} bytes needed")
+    return problems
+
+
 def fixture_ranges():
     pins = manifest()
     return [(m["name"], m["data_base"], m["data_base"] + pins["window"], m["table_base"], m["table_base"] + pins["table_slots"])
@@ -326,6 +344,10 @@ def build_game_module(entry, pins):
         info = parse_module(f.read())
     others = [r for r in fixture_ranges()]
     problems = check_window(entry, pins, info, others)
+    linked = (min(o for o, _ in info["segments"] + [(info["stack_top"], 0)]),
+              max(o + n for o, n in info["segments"] + [(info["stack_top"], 0)]))
+    ranges = [(name, low, high) for name, low, high, _, _ in others] + [(entry["name"], *linked)]
+    problems += check_layout(pins, ranges)
     if problems:
         sys.exit("\n".join(problems))
     low = min(offset for offset, _ in info["segments"])

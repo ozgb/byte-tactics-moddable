@@ -42,7 +42,7 @@ NAMES: dict[str, dict[int, str]] = {
 POINTERS: dict[str, dict[int, str]] = {
     "Unit": {0x0: "HEAP", 0x8: "HEAP", 0x24: "HEAP", 0x40: "HEAP", 0x82: "REC", 0x86: "UNIT"},
     "Player": {0x74: "HEAP"},
-    "Projectile": {0x4E: "HEAP"},
+    "Projectile": {0x4E: "HEAP", 0x56: "PROJECTILE"},
     "Debris": {0x0: "PIECE"},
 }
 

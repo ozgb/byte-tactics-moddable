@@ -1,0 +1,20 @@
+[package]
+name = "wasmtime_host"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies.wasmtime-c-api-impl]
+version = "=50.0.0"
+default-features = false
+features = ["pulley", "cranelift", "gc", "gc-null"]
+
+[profile.release]
+panic = "abort"
+opt-level = 2
+lto = true
+codegen-units = 1
+strip = true

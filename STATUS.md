@@ -226,6 +226,7 @@ sub-issue per step. The mod-support design it builds on is
   and meteors as the pilot module, then one subsystem at a time
   ([#11](https://github.com/ozgb/byte-tactics-moddable/issues/11) to
   [#18](https://github.com/ozgb/byte-tactics-moddable/issues/18)).
+  - [`docs/module-abi.md`](docs/module-abi.md)
 
 Further out: lockstep netcode
 ([#21](https://github.com/ozgb/byte-tactics-moddable/issues/21)), native

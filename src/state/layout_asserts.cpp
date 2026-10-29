@@ -1137,7 +1137,7 @@ static_assert(offsetof(Game, currentPalette) == 233603, "");
 static_assert(offsetof(Game, desiredPalette) == 233607, "");
 static_assert(offsetof(Game, fadeTable) == 233611, "");
 static_assert(offsetof(Game, glamour) == 233615, "");
-static_assert(offsetof(Game, unknown_37f3d_f) == 229181, "");
+static_assert(offsetof(Game, sideDefsHead) == 229181, "");
 static_assert(offsetof(Game, unknown_383bf) == 230335, "");
 static_assert(offsetof(Game, pauseFlags) == 232017, "");
 static_assert(offsetof(Game, pad_38a52) == 232018, "");

@@ -1116,7 +1116,7 @@ struct Game {
             char glamour[256];
         };
         struct {
-            char unknown_37f3d_f[1154];
+            char sideDefsHead[1154];
             char unknown_383bf[1682];
             unsigned char pauseFlags;
             char pad_38a52[1];

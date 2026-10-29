@@ -32,22 +32,13 @@ struct GafSequenceSource;
 
 #include "game.h"
 #include "mission_option_flags.h"
+#include "settings.h"
 
 struct SkirmishSlotResources {
     char unknown_0[0xc];
     int metal;
     int energy;
     char unknown_14[4];
-};
-
-struct SkirmishSlotTeam {
-    char unknown_0[0x4];
-    unsigned char nameIndex;
-    char unknown_5[0xc - 0x5];
-    int size1;
-    int size2;
-    unsigned char index2;
-    char unknown_15[0x18 - 0x15];
 };
 
 #include "../map/mission.h"
@@ -313,11 +304,11 @@ void __stdcall SetStartingStorageBonus(Player* obj, int height, int width)
 // FUNCTION: 0x496ee0
 void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
 {
-    g_game->players[team].info->side = ((SkirmishSlotTeam*)g_game->options)[team].nameIndex;
-    g_game->players[team].info->color = ((SkirmishSlotTeam*)g_game->options)[team].index2;
+    g_game->players[team].info->side = ((SkirmishOptionsTable*)g_game->options)->players[team].side;
+    g_game->players[team].info->color = ((SkirmishOptionsTable*)g_game->options)->players[team].color;
     Player* p = &g_game->players[team];
-    int w = ((SkirmishSlotTeam*)g_game->options)[team].size2;
-    int v = ((SkirmishSlotTeam*)g_game->options)[team].size1;
+    int w = ((SkirmishOptionsTable*)g_game->options)->players[team].energy;
+    int v = ((SkirmishOptionsTable*)g_game->options)->players[team].metal;
     p->bits_148.started = 1;
     p->energyStorageBonus = (float)(w >= 200 ? w : 200);
     p->metalStorageBonus = (float)(v >= 200 ? v : 200);

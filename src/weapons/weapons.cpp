@@ -465,14 +465,8 @@ static inline Vec3 Sub(const Vec3& a, const Vec3& b)
 #include <time.h>
 #include <malloc.h>
 
-struct VectorLengthArg {
-    int x;
-    int y;
-    int z;
-};
-
 // FUNCTION: 0x49a850
-int __stdcall VectorLength(VectorLengthArg* v)
+int __stdcall VectorLength(Vec3* v)
 {
     double x = v->x;
     double y = v->y;

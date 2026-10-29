@@ -379,11 +379,12 @@ def scenario_load(scenario: Path) -> str | None:
 
 def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
          poison: bool = False, blockscan: int = 0, env: dict[str, str] | None = None,
-         put: dict[str, Path] | None = None, collect: tuple[str, ...] = ()) -> Path:
+         put: dict[str, Path] | None = None, collect: tuple[str, ...] = (), xserver: bool = False) -> Path:
     """Run the exe on the scenario with playtest.py, in `env` (default: this process's); the run's directory.
 
     `put` maps a path in the run's game copy to a file placed there before the exe starts, and each path of
-    `collect` that the game writes in its copy is kept at the same path in the run's directory.
+    `collect` that the game writes in its copy is kept at the same path in the run's directory. An `xserver`
+    run gives the game a display: the reference build has no headless host and exits at once without one.
     """
     cmd = [sys.executable, str(ROOT / "tools/playtest.py"), "--exe", str(exe), "--testmode", str(scenario)]
     for dest, src in (put or {}).items():
@@ -400,6 +401,8 @@ def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, time
         cmd.append("--poison")
     if blockscan:
         cmd += ["--blockscan-every", str(blockscan)]
+    if xserver:
+        cmd.append("--xserver")
     r = subprocess.run(cmd, capture_output=True, text=True, env=env)
     sys.stderr.write(r.stderr)
     m = re.search(r"^logs and screenshots: (.+)/$", r.stdout, re.M)
@@ -428,25 +431,26 @@ def save_put(saved: Path, loader: str, saver: str) -> dict[str, Path]:
 
 
 def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
-                 poison: bool = False) -> Path:
+                 poison: bool = False, xserver: bool = False) -> Path:
     """`play`, but a scenario with a `load` line first plays the scenario it names, from the same directory, and gets its save."""
     saver = scenario_load(scenario)
     if saver is None:
-        return play(exe, scenario, game_dir, dump, timeout, poison)
+        return play(exe, scenario, game_dir, dump, timeout, poison, xserver=xserver)
     saver_path = scenario.parent / f"{saver}.txt"
     if not saver_path.is_file():
         raise Error(f"{scenario.stem}: load {saver}: there is no scenario {saver_path}")
     (ROOT / "build/scratch").mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="save-", dir=ROOT / "build/scratch") as scratch:
         try:
-            run = play(exe, saver_path, game_dir, None, timeout, poison, collect=SAVE_FILES)
+            run = play(exe, saver_path, game_dir, None, timeout, poison, collect=SAVE_FILES, xserver=xserver)
         except Error as e:
             raise Error(f"{scenario.stem}: load {saver}: {saver} failed to run:\n{e}") from None
         try:
             copy_save(run, Path(scratch))
         finally:
             shutil.rmtree(run.parent, ignore_errors=True)
-        return play(exe, scenario, game_dir, dump, timeout, poison, put=save_put(Path(scratch), scenario.stem, saver))
+        return play(exe, scenario, game_dir, dump, timeout, poison, put=save_put(Path(scratch), scenario.stem, saver),
+                    xserver=xserver)
 
 
 def need(run: Path, name: str) -> Path:
@@ -460,7 +464,8 @@ def compare(args: argparse.Namespace) -> int:
     scenarios = [Path(s).resolve() for s in args.scenario]
     scenarios *= 2 if len(scenarios) == 1 else 1
     poison = [False, args.poison_b]
-    runs = [play_loading(e, s, args.game_dir, None, None, p) for e, s, p in zip(exes, scenarios, poison)]
+    xserver = [args.reference == "a", args.reference == "b"]
+    runs = [play_loading(e, s, args.game_dir, None, None, p, x) for e, s, p, x in zip(exes, scenarios, poison, xserver)]
     (ha, ra), (hb, rb) = (parse_trace(need(r, "trace.txt")) for r in runs)
     check_headers(ha, hb, args.ignore_view_seed)
     div = first_divergence(ra, rb)
@@ -469,7 +474,7 @@ def compare(args: argparse.Namespace) -> int:
         return 0
     tick, phase = div
     print_divergence(tick, phase)
-    runs = [play_loading(e, s, args.game_dir, tick, None, p) for e, s, p in zip(exes, scenarios, poison)]
+    runs = [play_loading(e, s, args.game_dir, tick, None, p, x) for e, s, p, x in zip(exes, scenarios, poison, xserver)]
     maps = load_maps(args.reference_ref) if args.reference else None
     print_diff(diff_dumps(need(runs[0], "dump.txt"), need(runs[1], "dump.txt"), tick, phase, args.reference, maps))
     return 1

@@ -191,6 +191,42 @@ class CommandLineTest(unittest.TestCase):
             self.assertIn("players[1].metal", out)
 
 
+class ReferenceDisplayTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        (self.dir / "s.txt").write_text("ticks 9\n")
+        (self.dir / "trace.txt").write_text(f"bt-trace {TRACE_FORMAT}\nscenario s\n1 units 00\n")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def command(self, **kwargs):
+        done = mock.Mock(returncode=0, stdout="logs and screenshots: out/\n", stderr="")
+        with mock.patch.object(td.subprocess, "run", return_value=done) as run, mock.patch.object(td, "ROOT", self.dir):
+            (self.dir / "out" / "r").mkdir(parents=True, exist_ok=True)
+            td.play(Path("TotalA.exe"), self.dir / "s.txt", None, None, **kwargs)
+        return run.call_args.args[0]
+
+    def test_play_starts_an_xserver_only_when_asked(self):
+        self.assertNotIn("--xserver", self.command())
+        self.assertIn("--xserver", self.command(xserver=True))
+
+    def test_the_reference_side_gets_a_display_and_the_other_does_not(self):
+        for side, expected in (("a", [True, False]), ("b", [False, True]), (None, [False, False])):
+            calls = []
+
+            def play_loading(exe, scenario, game_dir, dump, timeout, poison, xserver):
+                calls.append(xserver)
+                return self.dir
+
+            argv = ["tracediff.py", "a.exe", "b.exe", "--scenario", str(self.dir / "s.txt")]
+            with mock.patch("sys.argv", argv + (["--reference", side] if side else [])), \
+                    mock.patch.object(td, "play_loading", play_loading), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(td.main(), 0)
+            self.assertEqual(calls, expected, side)
+
+
 class PlayLoadingTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -204,11 +240,11 @@ class PlayLoadingTest(unittest.TestCase):
         self.tmp.cleanup()
 
     def fake_play(self, writes_save=True, fails=False, writes=("harness.sav", "harness.opt")):
-        def play(exe, scenario, game_dir, dump, timeout=None, poison=False, blockscan=0, env=None, put=None, collect=()):
+        def play(exe, scenario, game_dir, dump, timeout=None, poison=False, blockscan=0, env=None, put=None, collect=(), xserver=False):
             run = self.dir / "session" / f"run-{scenario.stem}" / "run"
             run.mkdir(parents=True)
             seen = {"scenario": scenario.stem, "put": {k: v.read_bytes() for k, v in (put or {}).items()},
-                    "collect": collect, "dump": dump}
+                    "collect": collect, "dump": dump, "xserver": xserver}
             if fails and scenario.stem == "saver":
                 raise td.Error("exited with 2")
             if collect and writes_save:

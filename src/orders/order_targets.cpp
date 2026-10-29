@@ -823,7 +823,7 @@ PathOrder::PathOrder(Order* order, Unit* unit)
     : OrderFx(order), ref(0, 0)
 {
     SetVtable(g_pathOrderVtable);
-    ref.SetUnit((Unit*)unit);
+    ref.SetUnit(unit);
     approachRadius = 0;
     altitude = 0;
     this->unit = order->unit;
@@ -841,8 +841,8 @@ PathOrder::PathOrder(Order* order, Unit* unit)
     }
 }
 
-// FUNCTION: 0x44e250 ??0PathOrder@@QAE@PAUOrder@@HF@Z
-PathOrder::PathOrder(Order* source, int unit, short value)
+// FUNCTION: 0x44e250 ??0PathOrder@@QAE@PAUOrder@@PAUUnit@@F@Z
+PathOrder::PathOrder(Order* source, Unit* unit, short value)
     : OrderFx(source), piece(value), ref(0, 0)
 {
     SetVtable(g_pathOrderVtable);
@@ -851,7 +851,7 @@ PathOrder::PathOrder(Order* source, int unit, short value)
     field_8 = 5;
     this->unit = source->unit;
     pos = this->unit->pos;
-    ref.SetUnit((Unit*)unit);
+    ref.SetUnit(unit);
 }
 
 // FUNCTION: 0x44e2d0 ??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z
@@ -866,12 +866,12 @@ PathOrder::PathOrder(Order* source, const Vec3& p)
     unit = source->unit;
 }
 
-// FUNCTION: 0x44e330 ??0PathOrder@@QAE@PAUOrder@@HABUVec3@@@Z
-PathOrder::PathOrder(Order* source, int unit, const Vec3& p)
+// FUNCTION: 0x44e330 ??0PathOrder@@QAE@PAUOrder@@PAUUnit@@ABUVec3@@@Z
+PathOrder::PathOrder(Order* source, Unit* unit, const Vec3& p)
     : OrderFx(source), ref(0, 0)
 {
     SetVtable(g_pathOrderVtable);
-    ref.SetUnit((Unit*)unit);
+    ref.SetUnit(unit);
     pos = p;
     approachRadius = 0;
     altitude = 0;

@@ -928,7 +928,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         }
         Vec3 off = Offset(angle, range * 2 / 3 << 16);
         Vec3 p = Diff(order->target->pos, off);
-        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, p);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target, p);
         obj->SetApproachRadius(0x10);
         obj->SetAltitude(unit->def->altitude);
         order->SetAttachedFx(obj);
@@ -992,7 +992,7 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "BeginTransport", 0, 1, 1, height, 0, 0, 0);
             SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
             Vec3 offset = g_seams.units->GetPieceOffset(unit, order->piece);
-            PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, -1);
+            PathOrder* obj = new (kSim) PathOrder(order, order->target, -1);
             obj->SetAltitude(-((Vec3Words*)&offset)->yWhole);
             order->SetAttachedFx(obj);
             order->flags = 0x100ea;
@@ -1278,7 +1278,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         return 2;
     }
     case 2: {
-        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, -1);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target, -1);
         obj->SetApproachRadius(0xa0);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
@@ -1291,7 +1291,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             QueueUnitSpeech(unit, 7, "Landing failed");
             return 0;
         }
-        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, order->angle);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target, order->angle);
         obj->SetApproachRadius(0x30);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
@@ -1308,7 +1308,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             QueueUnitSpeech(unit, 7, "Landing aborted: all pads are occupied");
             return 0;
         }
-        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, order->angle);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target, order->angle);
         if (unit->cargo)
             obj->SetAltitude(unit->cargo->def->modelMaxYHigh);
         else

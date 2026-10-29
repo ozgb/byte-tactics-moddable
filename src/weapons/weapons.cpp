@@ -2501,8 +2501,8 @@ void UpdateProjectiles()
                     if (type->spread != 0) {
                         short ang = RandomInt(type->spread) + (short)(p->angles.heading - (type->spread >> 1));
                         int t = ScaledCos((short)p->angles.pitch, type->speed);
-                        p->direction.x = -((int (__cdecl*)(short, int))ScaledSin)(ang, t);
-                        p->direction.z = -((int (__cdecl*)(short, int))ScaledCos)(ang, t);
+                        p->direction.x = -ScaledSin(ang, t);
+                        p->direction.z = -ScaledCos(ang, t);
                     }
                 }
                 if (p->active == 0)

@@ -1,4 +1,5 @@
 #include "../../interfaces/ref.h"
+#include "../util/mouse_event.h"
 
 #pragma pack(push, 1)
 struct StartPositionEntry {

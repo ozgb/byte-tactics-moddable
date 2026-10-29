@@ -286,7 +286,7 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
             }
             if (g_playLooping)
                 return ((Sound *)g_game->sound)->PlayLooping((void**)sound, -585);
-            return ((Sound *)g_game->sound)->PlaySampleSet((void**)sound, -585, 0);
+            return ((Sound *)g_game->sound)->PlaySampleSet((void**)sound, -585, nullptr);
         }
     }
     return 0;
@@ -395,7 +395,7 @@ int __stdcall PlaySoundAt(int index, SoundWorldPos* pos, int param_3)
                 || g_game->scrollX + g_game->screenTilesX * 16 < pos->x
                 || g_game->scrollY + g_game->screenTilesY * 16 < pos->z)
                 return ((Sound *)g_game->sound)->PlaySampleSet(sound, -1585, 0);
-            return ((Sound *)g_game->sound)->PlaySampleSet((void**)sound, -585, 0);
+            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, nullptr);
         }
     }
     return 0;

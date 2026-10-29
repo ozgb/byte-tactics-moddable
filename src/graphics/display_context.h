@@ -27,7 +27,7 @@ struct DisplayContext {
     unsigned short bit10_15 : 6;
     char unknown_f2[0x1d2 - 0xf2];
     int cursorOverlayEnabled;
-    char unknown_1d6[0x214 - 0x1d6];
+    char rest_1d6[0x214 - 0x1d6];
     unsigned int entries[256];
     int paletteBrightness;
 };

@@ -23,7 +23,9 @@ before the exe starts, and `--collect PATH` copies a file the game wrote there (
 own `-memset=0` switch, which makes GameAlloc (and so operator new) zero new memory. `--poison` passes
 `-memset=0xcdcdcdcd` instead, which fills it with 0xCD. `--blockscan` adds `-blockscan` (every tick) and copies
 blockptrs.txt too; `--blockscan-every N` adds `-blockscan=N`. `--windowed` passes the game's own `-d`
-switch, which starts each game in a window instead of full screen (not with `--testmode`).
+switch, which starts each game in a window instead of full screen (not with `--testmode`). `--xserver` gives each
+`--testmode` game an invisible Xvfb display, which an exe built from the reference branch needs (it has no headless host
+and exits at once without a display).
 
 Each run has its own (except that a `--testmode` run has no X server or audio sink):
 
@@ -525,8 +527,9 @@ class Instance:
     def start(self, debug: str) -> None:
         with _live_lock:
             _live.append(self)
-        if not self.run.testmode:
+        if not self.run.testmode or self.run.xserver:
             self.start_x()
+        if not self.run.testmode:
             self.start_sink()
         (self.run.out / f"exe{self.suffix}.sha256").write_text(
             subprocess.run(["sha256sum", str(self.game / "TotalA.exe")], capture_output=True,
@@ -956,7 +959,7 @@ class Run:
                  screens: dict[str, Screen], debug: str, window: bool = False, testmode: Path | None = None,
                  testdump: int | None = None, poison: bool = False, blockscan: int = 0,
                  windowed: bool = False, put: list[tuple[str, Path]] | None = None,
-                 collect: list[str] | None = None):
+                 collect: list[str] | None = None, xserver: bool = False):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -972,6 +975,7 @@ class Run:
         self.poison = poison
         self.blockscan = blockscan
         self.windowed = windowed
+        self.xserver = xserver
         self.put = put or []
         self.collect = collect or []
         self.instances = [Instance(self, i + 1) for i in range(scenario.instances)]
@@ -1442,6 +1446,8 @@ def main() -> None:
                     help="--testmode: run with -blockscan, which writes blockptrs.txt (the pointers out of the block)")
     ap.add_argument("--blockscan-every", type=int, metavar="N", default=0,
                     help="--testmode: --blockscan on every Nth tick and each tick of the last 64 (-blockscan=N)")
+    ap.add_argument("--xserver", action="store_true",
+                    help="--testmode: start an invisible Xvfb display for each game (an exe built from the reference branch needs one)")
     ap.add_argument("--put", nargs=2, action="append", default=[], metavar=("DEST", "SRC"),
                     help="--testmode: copy the file SRC into the run's game copy at DEST (relative to the game directory) before the exe starts; repeatable")
     ap.add_argument("--collect", action="append", default=[], metavar="PATH",
@@ -1489,6 +1495,8 @@ def main() -> None:
         ap.error("--poison needs --testmode")
     if args.windowed and args.testmode:
         ap.error("--windowed does not apply to --testmode (the headless host has no window)")
+    if args.xserver and not args.testmode:
+        ap.error("--xserver needs --testmode")
     if (args.put or args.collect) and not args.testmode:
         ap.error("--put and --collect need --testmode")
     put = []
@@ -1503,7 +1511,7 @@ def main() -> None:
         ap.error("--testdump takes a tick of 0 or more")
     if args.testmode and not Path(args.testmode).is_file():
         ap.error(f"{args.testmode} is not a file")
-    tools = ("wine",) if args.testmode and not args.scenario else ("Xephyr" if args.window else "Xvfb", "xdotool", "import", "wine", "pactl", "parec")
+    tools = (("wine", "Xvfb", "xdpyinfo") if args.xserver else ("wine",)) if args.testmode and not args.scenario else ("Xephyr" if args.window else "Xvfb", "xdotool", "import", "wine", "pactl", "parec")
     for tool in tools:
         if not shutil.which(tool):
             raise SystemExit(f"{tool} is not installed")
@@ -1555,7 +1563,7 @@ def main() -> None:
                                 args.testdump if sc is testmode else None,
                                 args.poison and sc is testmode, scan_every if sc is testmode else 0,
                                 args.windowed, put if sc is testmode else None,
-                                args.collect if sc is testmode else None))
+                                args.collect if sc is testmode else None, args.xserver and sc is testmode))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None

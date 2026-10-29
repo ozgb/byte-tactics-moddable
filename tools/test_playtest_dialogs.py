@@ -84,7 +84,7 @@ def test_retry() -> None:
 def test_tracediff_poisons_only_b() -> None:
     calls = []
 
-    def fake_play(exe, scenario, game_dir, dump, timeout=None, poison=False):
+    def fake_play(exe, scenario, game_dir, dump, timeout=None, poison=False, xserver=False):
         calls.append((exe.name, dump, poison))
         return Path(exe.name)
 

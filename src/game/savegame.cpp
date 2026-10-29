@@ -529,7 +529,7 @@ void ShowSaveGameScreen()
 
     g_game->bits_38a51_2.flag_38a51 |= 1;
     Layer* layer = LoadGuiLayer(&g_game->gui, "LOADGAME.GUI", 0x880);
-    layer->handler = (void (__stdcall*)(void*))SaveGameScreenHandler;
+    layer->handler = SaveGameScreenHandler;
     layer->data = g_game;
     LoadPictureCached("DSAVEGAME2", 0, 0, 0);
     MakeDirectoryPath(g_savegameDir);

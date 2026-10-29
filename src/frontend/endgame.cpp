@@ -608,7 +608,7 @@ void __stdcall OpenEndMissionScreen()
     FillSurface((Surface *)((void*)g_game->screen), 0);
     FlipScreen();
     Layer* layer = LoadGuiLayer(&g_game->gui, "ENDMSN.GUI", 0x80);
-    layer->handler = (void (__stdcall*)(void*))HandleEndMissionClick;
+    layer->handler = HandleEndMissionClick;
     Data* data = (Data*)GameAllocIgnoreTag("EndMsnGUI", 0x20);
     data->items = 0;
     layer->data = data;
@@ -717,7 +717,7 @@ void __stdcall HandleCdCheckClick(Gui* gadget)
 // FUNCTION: 0x41f700
 void OpenCdCheckDialog()
 {
-    LoadGuiLayer(&g_game->gui, "CDCHECK.GUI", 0x101)->handler = (void (__stdcall*)(void*))HandleCdCheckClick;
+    LoadGuiLayer(&g_game->gui, "CDCHECK.GUI", 0x101)->handler = HandleCdCheckClick;
     SetCursorOverlayEnabled(1);
     SetKeyboardInput(&g_game->gui, 1);
     RenderLayer(&g_game->gui, 0x40);

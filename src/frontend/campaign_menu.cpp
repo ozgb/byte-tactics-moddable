@@ -635,7 +635,7 @@ void __stdcall HandleSingleMenuClick(Gui* gadget)
 void OpenSingleMenu()
 {
     Layer* gui = LoadGuiLayer(&g_game->gui, "SINGLE.GUI", 0);
-    gui->handler = (void (__stdcall*)(void*))HandleSingleMenuClick;
+    gui->handler = HandleSingleMenuClick;
     gui->data = g_game;
     BlankScreen();
     LoadPictureCached("singlebg", 0, 0, 0);
@@ -855,7 +855,7 @@ void __stdcall OpenNewGameMenu(int param_1)
     Layer* layer =
         LoadGuiLayer(&g_game->gui, "NEWGAME.GUI", 0x400);
     Gadget* entries = layer->entries;
-    layer->handler = (void (__stdcall*)(void*))HandleNewGameClick;
+    layer->handler = HandleNewGameClick;
     layer->data = g_game;
 
     if (param_1 != 0) {
@@ -1206,7 +1206,7 @@ void OpenMissionBriefing(void)
     sprintf(buf, "mbrief%s", g_game->sideDefs[side].nameprefix);
 
     dialog = LoadGuiLayer(&g_game->gui, "MSNBRIEF.GUI", 0x80);
-    dialog->handler = (void (__stdcall*)(void*))HandleMissionBriefingClick;
+    dialog->handler = HandleMissionBriefingClick;
     dialog->data = g_game;
 
     LoadPictureCached(buf, 1, 1, 0);

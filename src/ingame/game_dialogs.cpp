@@ -264,7 +264,7 @@ void OpenShareDialog()
     Layer* layer = LoadGuiLayer(&g_game->gui, "SHARE.GUI", 0x800);
     g_game->bits_37ebe_3.bit6_37ebe = 1;
     Gadget* entries = layer->entries;
-    layer->handler = (void (__stdcall*)(void*))HandleShareDialogEvent;
+    layer->handler = HandleShareDialogEvent;
     layer->data = g_game;
     int idx = FindGadgetIndex(entries, "METAL", 0xe);
     if (idx != -1) {
@@ -505,7 +505,7 @@ void OpenTalkDialog()
                             multi ? "TALK2.GUI" : "TALK.GUI",
                             multi ? 0x800 : 0x880);
     Gadget* entries = d->entries;
-    d->handler = (void (__stdcall*)(void*))HandleTalkDialogEvent;
+    d->handler = HandleTalkDialogEvent;
     g_game->flags_37ebe |= 4;
     SetTranslatedTextByName(&g_game->gui, "TALK", g_chatDraftText, 0);
     SetButtonStageByName(&g_game->gui, "SENDTO", multi);
@@ -581,7 +581,7 @@ void __stdcall OpenUnitInfoDialog(void)
 
     Layer* layer = LoadGuiLayer(&g_game->gui, "UNITINFOx.GUI", 0x1000);
     Gadget* entries = layer->entries;
-    layer->handler = (void (__stdcall*)(void*))HandleUnitInfoDialogEvent;
+    layer->handler = HandleUnitInfoDialogEvent;
     layer->data = g_game;
     Gadget* hotr = FindGadgetChecked_E(entries, "HOTR");
     hotr->u.hotspot.callback = (void (__stdcall*)(Gui*, Gadget*))DrawUnitInfoImage;
@@ -909,7 +909,7 @@ void ToggleTabMenu()
     HideSoftwareCursor();
     Layer* d = LoadGuiLayer(&g_game->gui, "TABMENU.GUI", 0x800);
     d->data = g_game;
-    d->handler = (void (__stdcall*)(void*))HandleTabMenuEvent;
+    d->handler = HandleTabMenuEvent;
 
     int count = 0;
     Player* p = g_game->players;
@@ -941,7 +941,7 @@ void ToggleTabMenu()
 void OpenMain2Layout()
 {
     Layer* gadget = LoadGuiLayer(&g_game->gui, g_game->name, 0x20);
-    gadget->handler = (void (__stdcall*)(void*))HandleMain2LayoutEvent;
+    gadget->handler = HandleMain2LayoutEvent;
     gadget->data = g_game;
 }
 

@@ -44,20 +44,6 @@ struct PictureCacheEntry {
     char name[0x20];
 };
 
-struct MainMenuGadgetView {
-    char unknown_0[0x60];
-    int selected;
-};
-
-#include "../game/gadget_owner_view.h"
-
-struct CdPlayerChoiceGadgetView {
-    char unknown_0[0x18];
-    GadgetOwnerView* owner;
-    char unknown_1c[0x60 - 0x1c];
-    int selected;
-};
-
 #include "../game/display_flags_view.h"
 
 #include "../game/game.h"
@@ -396,11 +382,11 @@ void UpdateMenuSparks()
 }
 
 // FUNCTION: 0x425d80
-void __stdcall HandleMainMenuClick(MainMenuGadgetView* gadget)
+void __stdcall HandleMainMenuClick(Gui* gadget)
 {
     char buf[256];
 
-    if (gadget->selected == -1) {
+    if (gadget->hotGadgetIndex == -1) {
         GameFreeThunk(g_menuSparks);
         return;
     }
@@ -486,15 +472,15 @@ void __stdcall HandleMainMenuClick(MainMenuGadgetView* gadget)
 }
 
 // FUNCTION: 0x426190
-void __stdcall HandleCloseCdPlayerChoice(CdPlayerChoiceGadgetView* gadget)
+void __stdcall HandleCloseCdPlayerChoice(Gui* gadget)
 {
-    int owner = gadget->owner->gadgets;
-    if (gadget->selected == -1)
+    int owner = (int)gadget->layer->entries;
+    if (gadget->hotGadgetIndex == -1)
         return;
     PlaySoundByName("SmallButton", 0);
-    if (IsGadgetNamed(owner, gadget->selected, "CHOICE1")) {
+    if (IsGadgetNamed(owner, gadget->hotGadgetIndex, "CHOICE1")) {
         ((Sound *)g_game->sound)->CloseCdPlayerWindow();
-    } else if (!IsGadgetNamed(owner, gadget->selected, "CHOICE2")) {
+    } else if (!IsGadgetNamed(owner, gadget->hotGadgetIndex, "CHOICE2")) {
         ClearSelectedGadget(gadget);
     }
 }
@@ -514,7 +500,7 @@ void __stdcall OpenCloseCdPlayerDialog()
         strcpy(choice2->u.text, Translate("No"));
         SetTranslatedTextByName((char*)&g_game->gui, "TITLE", Translate("Close Windows CD Player?"), 0);
         SelectGadgetByName((Gui *)((char*)&g_game->gui), "CHOICE1");
-        gadget->handler = (void (__stdcall*)(void*))HandleCloseCdPlayerChoice;
+        gadget->handler = HandleCloseCdPlayerChoice;
         RenderLayer(&g_game->gui, 0x40);
     }
 }
@@ -544,7 +530,7 @@ void __stdcall OpenMainMenu()
     Force640x480Surfaces();
 
     Layer* dialog = LoadGuiLayer(&g_game->gui, "MAINMENU.GUI", 0x80);
-    dialog->handler = (void (__stdcall*)(void*))HandleMainMenuClick;
+    dialog->handler = HandleMainMenuClick;
     dialog->data = 0;
     dialog->cb1c = UpdateMenuSparks;
 

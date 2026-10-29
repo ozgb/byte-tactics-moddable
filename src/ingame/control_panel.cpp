@@ -730,7 +730,7 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
             strcpy(name, guiName);
         Layer* layer = LoadGuiLayer(&g_game->gui, name, 0);
         if (layer != 0) {
-            layer->handler = (void (__stdcall*)(void*))HandleBuildPanelClick;
+            layer->handler = HandleBuildPanelClick;
             layer->data = 0;
             for (int i = 0; i < g_game->buildListCount; i++) {
                 for (int j = 0; j < g_game->buildLists[i].count; j++) {
@@ -777,7 +777,7 @@ void __stdcall OpenGeneratorDialog(Unit* unit)
             g_game->sideDefs[g_game->players[g_game->localPlayer].info->side].nameprefix);
     Layer* gadget = LoadGuiLayer(&g_game->gui, name, 0);
     if (gadget != 0) {
-        gadget->handler = (void (__stdcall*)(void*))HandleBuildPanelClick;
+        gadget->handler = HandleBuildPanelClick;
         gadget->data = 0;
         RefreshOrderButtons(unit);
         RenderLayer(&g_game->gui, 0x40);

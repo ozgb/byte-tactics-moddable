@@ -1820,7 +1820,7 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
                     if (unit->player->allied[target->player->index]) {
-                        MissionType kind = GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)target, 0);
+                        MissionType kind = GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)target, nullptr);
                         if (kind.index) {
                             if (IssueRepairOrder(unit, target, 0)) return 6;
                             return 3;
@@ -1912,7 +1912,7 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
             }
         }
         if ((unsigned int)order->target->health < order->target->def->maxHealth && (unit->def->flags1&0x40)) {
-            MissionType kind=GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)(Unit*)order->target, 0);
+            MissionType kind=GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)(Unit*)order->target, nullptr);
             if(kind.index) {
                 order->SetAttachedFx(0);
                 AppendOrder(unit,new (kSim) Order(kind,order->target,0,0,0,0));
@@ -2091,7 +2091,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
     }
     case 6: {
         QueueUnitSpeech(unit, 8, "Resurrection complete");
-        MissionType kind = GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)(Unit*)order->target, 0);
+        MissionType kind = GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)(Unit*)order->target, nullptr);
         if (kind.index)
             AppendOrder(unit, new (kSim) Order(kind, order->target, 0, 0, 0, 0));
         return 5;

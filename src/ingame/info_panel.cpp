@@ -1193,7 +1193,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     }
     g_game->timers.AccumulateProfileTime(4);
     if ((g_game->endGameFlags & 1) && (g_game->endGameFlags & 2) && param_1 != 0)
-        DrawSelectedGoal((int)&ctx, (GoalDrawInterface***)(FindNextSelectedUnit(0, 0)));
+        DrawSelectedGoal((int)&ctx, (GoalDrawInterface***)(FindNextSelectedUnit(nullptr, 0)));
     if (param_1 != 0)
         DrawFogOfWar((void*)&ctx);
     g_game->timers.AccumulateProfileTime(5);
@@ -1476,7 +1476,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             int dy = GetScreenHeight() - 0x20;
             unsigned short* icon = g_game->sidePanelBotSeq[idx];
             GafFrame* bmp = (GafFrame*)GetGafFrame(icon, 0);
-            DrawFrame((Surface*)surface, (GafFrame*)((void*)bmp), (short)bmp->xOffset + y,
+            DrawFrame((Surface*)surface, bmp, (short)bmp->xOffset + y,
                          (short)bmp->yOffset + dy);
             y += bmp->width;
         } while (y < g_game->width_37e1f);
@@ -1586,7 +1586,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         int loopSide = loopInfo->side;
         unsigned short* icon = g_game->sidePanelBotSeq[loopSide];
         GafFrame* bmp = (GafFrame*)GetGafFrame(icon, 0);
-        DrawFrame((Surface*)surface, (GafFrame*)((void*)bmp), (short)bmp->xOffset + y,
+        DrawFrame((Surface*)surface, bmp, (short)bmp->xOffset + y,
                      (short)bmp->yOffset + dy);
         y += bmp->width;
     } while (y < g_game->width_37e1f);

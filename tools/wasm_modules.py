@@ -27,7 +27,6 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES = os.path.join(ROOT, "tests", "wasm", "modules")
 OUT = os.path.join(ROOT, "build", "wasm-modules")
-WINDOW = 65536
 GUARD = "WASM_MODULES_UNDER_WASMTIME"
 
 
@@ -127,6 +126,7 @@ def run_check():
         slot_cell = exports["module_slot"](store)
         index = read_i32(memory, store, slot_cell)
         low = entry["data_base"]
+        WINDOW = pins["window"]
         if not low <= data < low + WINDOW or not low <= slot_cell < low + WINDOW:
             failures.append(f"{name}: data {data:#x} or slot cell {slot_cell:#x} outside {low:#x}+{WINDOW:#x}")
         if index != entry["table_base"]:

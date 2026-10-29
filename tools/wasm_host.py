@@ -2,6 +2,7 @@
 
     uv run tools/wasm_host.py build [--out DIR]
     uv run tools/wasm_host.py run MODULE.wasm EXPORT [I32 ARGS...] [--loop N] [--out DIR]
+    uv run tools/wasm_host.py modules [--overlap] [--out DIR]
 
 build compiles three things into DIR (default build/wasm_host):
 
@@ -16,6 +17,14 @@ build compiles three things into DIR (default build/wasm_host):
 run starts host.exe under Wine (WINEPREFIX=DIR/prefix) with the module, calls the
 export with the i32 arguments LOOP times and prints the result and, for LOOP > 1,
 calls per second.
+
+modules builds the fixture modules of tests/wasm/modules (tools/wasm_modules.py
+build) and the host if needed, then runs the host over one memory and one table
+sized and placed by tests/wasm/modules/modules.json: it refuses overlapping
+windows, instantiates every module, calls each module's slot through the shared
+table and checks the results and each module's data. With --overlap it writes a
+manifest to DIR that moves the second module's bases onto the first's and expects
+the host to refuse it, naming both modules.
 """
 
 import argparse
@@ -30,6 +39,8 @@ ROOT = Path(__file__).resolve().parent.parent
 HOST_DIR = ROOT / "tests" / "wasm" / "host"
 DLL_CRATE = HOST_DIR / "dll"
 MSVC5 = (ROOT / "toolchain" / "msvc5-sp3").resolve()
+MODULES_DIR = ROOT / "tests" / "wasm" / "modules"
+WASM_MODULES_OUT = ROOT / "build" / "wasm-modules"
 RUST_TARGET = "i686-pc-windows-gnu"
 C_API_PACKAGE = "wasmtime-c-api-impl"
 CONF_H = """#ifndef WASMTIME_CONF_H
@@ -100,16 +111,21 @@ def build(out):
     print(f"built {out}")
 
 
-def run_module(out, module, export, args, loop):
-    for name in ("host.exe", "wasmtime_host.dll"):
-        if not (out / name).exists():
-            sys.exit(f"{out / name} is missing: run `uv run tools/wasm_host.py build` first")
+def wine_env(out):
     env = dict(os.environ)
     for name in ("DISPLAY", "WAYLAND_DISPLAY"):
         env.pop(name, None)
     env["WINEARCH"] = "win64"
     env["WINEPREFIX"] = str(out / "prefix")
     env["WINEDEBUG"] = "-all"
+    return env
+
+
+def run_module(out, module, export, args, loop):
+    for name in ("host.exe", "wasmtime_host.dll"):
+        if not (out / name).exists():
+            sys.exit(f"{out / name} is missing: run `uv run tools/wasm_host.py build` first")
+    env = wine_env(out)
     command = ["wine", out / "host.exe"]
     if loop != 1:
         command += ["--loop", str(loop)]
@@ -120,10 +136,46 @@ def run_module(out, module, export, args, loop):
     run(command, env=env, cwd=out)
 
 
+def module_arguments(manifest_path):
+    manifest = json.loads(Path(manifest_path).read_text())
+    arguments = ["--modules", manifest["memory_pages"], manifest["table_size"], manifest["window"], manifest["table_slots"]]
+    for entry in manifest["modules"]:
+        arguments += [entry["name"], WASM_MODULES_OUT / f"{entry['name']}.wasm", entry["data_base"], entry["table_base"],
+                      entry["slot_arg"], entry["slot_result"], entry["data_word"]]
+    return arguments
+
+
+def run_modules(out, overlap):
+    manifest_path = MODULES_DIR / "modules.json"
+    if overlap:
+        manifest = json.loads(manifest_path.read_text())
+        first, second = manifest["modules"][0], manifest["modules"][1]
+        second["data_base"] = first["data_base"]
+        second["table_base"] = first["table_base"]
+        manifest_path = out / "overlap.json"
+        manifest_path.write_text(json.dumps(manifest, indent=2))
+    if not (out / "host.exe").exists():
+        build(out)
+    run([sys.executable, ROOT / "tools" / "wasm_modules.py", "build"])
+    env = wine_env(out)
+    command = ["wine", out / "host.exe"] + module_arguments(manifest_path)
+    print("+", " ".join(str(part) for part in command), flush=True)
+    result = subprocess.run([str(part) for part in command], env=env, cwd=out, capture_output=True, text=True)
+    sys.stdout.write(result.stdout)
+    sys.stderr.write(result.stderr)
+    if overlap:
+        names = " and ".join(entry["name"] for entry in json.loads(manifest_path.read_text())["modules"][:2])
+        if result.returncode == 1 and all(entry["name"] in result.stderr for entry in json.loads(manifest_path.read_text())["modules"][:2]):
+            print(f"refused as expected: {names} overlap")
+            return 0
+        sys.exit(f"the host did not refuse the overlapping manifest (exit {result.returncode})")
+    return result.returncode
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("build", "run"):
+    for name in ("build", "run", "modules"):
         cmd = sub.add_parser(name)
         cmd.add_argument("--out", type=Path, default=ROOT / "build" / "wasm_host")
     runner = sub.choices["run"]
@@ -131,10 +183,13 @@ def main():
     runner.add_argument("export")
     runner.add_argument("args", nargs="*")
     runner.add_argument("--loop", type=int, default=1)
+    sub.choices["modules"].add_argument("--overlap", action="store_true")
     options = parser.parse_args()
     out = options.out.resolve()
     if options.command == "build":
         build(out)
+    elif options.command == "modules":
+        sys.exit(run_modules(out, options.overlap))
     else:
         run_module(out, options.module, options.export, options.args, options.loop)
 

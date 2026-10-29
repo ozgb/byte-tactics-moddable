@@ -122,7 +122,7 @@ PHASE_SUBSYSTEMS = {"UpdateAllUnits": "units", "UpdateProjectiles": "weapons",
                     "StepAllGafSequences": "game", "UpdateWind": "wind_meteors", "UpdateMeteors": "wind_meteors",
                     "UpdateResourceSharing": "economy"}
 FOLDER_FIXED = [("src/harness/", "harness"), ("src/seams/", "seams"), ("src/debug/", "platform"), ("src/util/", "platform"),
-                ("src/runtime/", "platform"), ("src/data/", "platform"), ("src/host/", "platform"),
+                ("src/runtime/", "platform"), ("src/data/", "platform"), ("src/host/", "platform"), ("src/wasm/", "platform"),
                 ("src/files/", "files"), ("interfaces/services.h", "platform")]
 DISPATCH_ROOTS = {"HandleNetPackets"}
 DRAW = re.compile(r"(^|::)(Draw|Render|Blit)")

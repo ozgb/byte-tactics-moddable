@@ -18,15 +18,6 @@ struct SaveGamePlayerEntry {
     char unknown_4[0x14b - 4];
 };
 
-struct SaveGameOptions {
-    char unknown_0[0x108];
-    int commanderDeath;
-    int mapping;
-    int lineOfSight;
-    int lineOfSightType;
-    int location;
-};
-
 #include "game.h"
 #pragma pack(pop)
 
@@ -138,11 +129,11 @@ int __stdcall SaveGameFile(char* path, char* description, int gameId)
     (&file)->SetIntegerItem(g_gameTypeKey, g_seams.map->GetGameType(g_game->net));
     (&file)->SetStringItem(g_thumbsKey, g_game->campaignMissionStatus_391cf);
     if (g_seams.map->GetGameType(g_game->net) == 2) {
-        (&file)->SetIntegerItem(g_commanderDeathKey, ((SaveGameOptions*)g_game->options)->commanderDeath);
-        (&file)->SetIntegerItem(g_locationKey, ((SaveGameOptions*)g_game->options)->location);
-        (&file)->SetIntegerItem(g_mappingKey, ((SaveGameOptions*)g_game->options)->mapping);
-        (&file)->SetIntegerItem(g_lineOfSightKey, ((SaveGameOptions*)g_game->options)->lineOfSight);
-        (&file)->SetIntegerItem(g_lineOfSightTypeKey, ((SaveGameOptions*)g_game->options)->lineOfSightType);
+        (&file)->SetIntegerItem(g_commanderDeathKey, g_game->options->commanderDeath);
+        (&file)->SetIntegerItem(g_locationKey, g_game->options->fixedLocations);
+        (&file)->SetIntegerItem(g_mappingKey, g_game->options->mapping);
+        (&file)->SetIntegerItem(g_lineOfSightKey, g_game->options->lineOfSight);
+        (&file)->SetIntegerItem(g_lineOfSightTypeKey, g_game->options->losType);
     }
     if (g_game->mode_391f1 != 6) {
         (&file)->SetIntegerItem(g_betweenMissionsKey, 1);

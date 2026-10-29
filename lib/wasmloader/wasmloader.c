@@ -851,6 +851,19 @@ int wl_export_func(wl_loader* loader, const wl_module* module, const char* name,
     return 1;
 }
 
+int wl_export_memory(wl_loader* loader, const wl_module* module, const char* name, unsigned char** base, size_t* size)
+{
+    wasmtime_extern_t item;
+    if (!loader->api.wasmtime_instance_export_get(loader->context, &module->instance, name, strlen(name), &item)
+        || item.kind != WASMTIME_EXTERN_MEMORY) {
+        set_error(loader, "module %s: no memory export %s", module->name, name);
+        return 0;
+    }
+    *base = loader->api.wasmtime_memory_data(loader->context, &item.of.memory);
+    *size = loader->api.wasmtime_memory_data_size(loader->context, &item.of.memory);
+    return 1;
+}
+
 int wl_table_entry(wl_loader* loader, unsigned index, wasmtime_val_t* value)
 {
     return loader->has_memory && index < loader->layout.table_size

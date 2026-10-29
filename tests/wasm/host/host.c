@@ -250,6 +250,51 @@ static int run_export(wl_loader* loader, const char* wasm_path, const char* expo
     return 0;
 }
 
+static int run_maths(wl_loader* loader, const char* wasm_path)
+{
+    static const char manifest[] =
+        "{\"memory_pages\":1,\"table_size\":8,\"window\":65536,\"table_slots\":8,"
+        "\"modules\":[{\"name\":\"maths\",\"data_base\":0,\"table_base\":0}]}";
+    wasmtime_func_t count_fn, name_fn, run_fn, last_fn;
+    wl_module* module;
+    int count, i;
+
+    if (!wl_load_manifest_text(loader, manifest, sizeof manifest - 1, "built-in manifest") || !wl_create_memory(loader)) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    module = wl_load_module(loader, "maths", wasm_path);
+    if (!module || !wl_export_func(loader, module, "maths_case_count", &count_fn) || !wl_export_func(loader, module, "maths_case_name", &name_fn)
+        || !wl_export_func(loader, module, "maths_run_case", &run_fn) || !wl_export_func(loader, module, "maths_last_count", &last_fn)
+        || !call_i32(loader, module, &count_fn, 0, &count)) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    for (i = 0; i < count; i++) {
+        int name_ptr, digest_ptr, last, j;
+        unsigned char* memory;
+        size_t size;
+        char name[65];
+        if (!call_i32(loader, module, &name_fn, i, &name_ptr) || !call_i32(loader, module, &run_fn, i, &digest_ptr)
+            || !call_i32(loader, module, &last_fn, 0, &last) || !wl_export_memory(loader, module, "memory", &memory, &size)) {
+            fprintf(stderr, "%s\n", wl_error(loader));
+            return 1;
+        }
+        if ((size_t)name_ptr + 64 > size || (size_t)digest_ptr + 32 > size) {
+            fprintf(stderr, "case %d: pointer outside the module's memory\n", i);
+            return 1;
+        }
+        memcpy(name, memory + name_ptr, 64);
+        name[64] = 0;
+        printf("%s %d ", name, last);
+        for (j = 0; j < 32; j++) {
+            printf("%02x", memory[digest_ptr + j]);
+        }
+        printf("\n");
+    }
+    return 0;
+}
+
 int main(int argc, char** argv)
 {
     const char* dll_path = "wasmtime_host.dll";
@@ -274,12 +319,18 @@ int main(int argc, char** argv)
             wasm_dir = argv[++i];
         } else if (!strcmp(argv[i], "--fixtures")) {
             mode = 1;
+        } else if (!strcmp(argv[i], "--maths")) {
+            mode = 3;
         } else if (!strcmp(argv[i], "--wind-meteors")) {
             mode = 2;
         } else {
             fprintf(stderr, "unknown option %s\n", argv[i]);
             return 2;
         }
+    }
+    if (mode == 3 && argc - i != 1) {
+        fprintf(stderr, "usage: host [--dll path] --maths maths.wasm\n");
+        return 2;
     }
     if (mode == 0 && argc - i < 2) {
         fprintf(stderr, "usage: host [--dll path] [--loop n] module.wasm export [i32 args]\n"
@@ -290,7 +341,7 @@ int main(int argc, char** argv)
         fprintf(stderr, "at most 8 arguments\n");
         return 2;
     }
-    if (mode != 0 && !manifest) {
+    if (mode != 0 && mode != 3 && !manifest) {
         fprintf(stderr, "--fixtures and --wind-meteors need --manifest\n");
         return 2;
     }
@@ -300,7 +351,9 @@ int main(int argc, char** argv)
         fprintf(stderr, "%s\n", error);
         return 2;
     }
-    if (mode == 0) {
+    if (mode == 3) {
+        result = run_maths(loader, argv[i]);
+    } else if (mode == 0) {
         nargs = argc - i - 2;
         result = run_export(loader, argv[i], argv[i + 1], nargs, argv + i + 2, loops);
     } else {

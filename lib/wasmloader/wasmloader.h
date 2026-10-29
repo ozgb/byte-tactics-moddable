@@ -79,6 +79,7 @@ size_t WL_CALL wl_data_count(const wl_module* module);
 const char* WL_CALL wl_data_name(const wl_module* module, size_t index);
 unsigned WL_CALL wl_data_address(const wl_module* module, size_t index);
 int WL_CALL wl_export_func(wl_loader* loader, const wl_module* module, const char* name, wasmtime_func_t* func);
+int WL_CALL wl_export_memory(wl_loader* loader, const wl_module* module, const char* name, unsigned char** base, size_t* size);
 
 int WL_CALL wl_table_entry(wl_loader* loader, unsigned index, wasmtime_val_t* value);
 int WL_CALL wl_call(wl_loader* loader, const wl_module* module, const wasmtime_func_t* func, wasmtime_val_raw_t* args_and_results, size_t count);

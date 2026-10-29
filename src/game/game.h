@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "../graphics/rect.h"
+#include "../graphics/movies.h"
 #include "../ingame/frame_timers.h"
 #include "../map/grid.h"
 #include "../network/player.h"
@@ -1086,7 +1087,7 @@ struct Game {
             unsigned char shade;
             unsigned short net_flags;
             ParticleListsView* lists_38d77;
-            void* moviePlayer;
+            MoviePlayer* moviePlayer;
             unsigned short flags_38d7f;
             int playerCount;
             FrameTimers timers;

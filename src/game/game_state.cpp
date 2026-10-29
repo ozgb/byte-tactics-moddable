@@ -389,7 +389,7 @@ void InitGame()
     g_game->valueSet_38c63 = 0;
     g_game->unusedAfterMovieOutputRateDirty = 0;
     g_game->pendingSaveStore = 0;
-    g_game->moviePlayer = (void*)(0);
+    g_game->moviePlayer = 0;
     g_game->mode_391f1 = 0;
     g_game->handler = InitFrame;
     SetCloseHandler(LeaveNetGameCallback, 0);

@@ -10,7 +10,6 @@ AddTimer,mismatch,"static risk rule: a convention, parameter count, or non-point
 AdjustBuildCount,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AdvanceGafSequence,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AimCobStub,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-AimWithinTolerance,mismatch,fixing it changes the generated code of a caller
 AllocAlphaTable,mismatch,pointer/int cast: definition's type is likely wrong
 AllocDepthFrame,mismatch,fixing it changes the generated code of a caller
 AllocSurface,mismatch,pointer/int cast: definition's type is likely wrong

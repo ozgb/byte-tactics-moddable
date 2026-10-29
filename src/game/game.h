@@ -1,13 +1,11 @@
 #ifndef GAME_H
 #define GAME_H
 
-#ifndef TA_TYPES_H
 #include "../graphics/rect.h"
 #include "../ingame/frame_timers.h"
 #include "../map/grid.h"
 #include "../network/player.h"
 #include "../network/settings.h"
-#endif
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
 #include "../frontend/net_game_flag_low_bits.h"

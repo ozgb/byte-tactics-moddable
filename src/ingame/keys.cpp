@@ -6,11 +6,7 @@
 
 #pragma pack(push, 1)
 
-struct Layer {
-    int unknown_0;
-    int value;
-};
-
+#include "../gui/layer.h"
 typedef Layer StopOrderLayer;
 
 class Mission;
@@ -66,7 +62,7 @@ struct DisplayFrameHolder {
 
 #include "../../link/globals.h"
 
-int __stdcall FindGadgetIndexBySubstring(int value, const char* name);
+int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name);
 #include "../files/files_api.h"
 #include "keys.h"
 #include "../graphics/gaf.h"
@@ -108,7 +104,7 @@ void SelectStopOrder(void)
 
     g_game->orderMode = 1;
     g_game->inputFlags &= 0xdf;
-    index = FindGadgetIndexBySubstring(g_game->gui.layer->value, "STOP");
+    index = FindGadgetIndexBySubstring(g_game->gui.layer->entries, "STOP");
     if (index != -1) {
         ClearGroupStatus(&g_game->gui, index);
     }
@@ -125,7 +121,7 @@ void __stdcall SetOrSelectStopOrder(int set)
     }
     g_game->orderMode = 1;
     g_game->inputFlags &= 0xdf;
-    index = FindGadgetIndexBySubstring(g_game->gui.layer->value, "STOP");
+    index = FindGadgetIndexBySubstring(g_game->gui.layer->entries, "STOP");
     if (index != -1) {
         ClearGroupStatus(&g_game->gui, index);
     }
@@ -303,7 +299,7 @@ void HandleGameKey(void)
             if (g_game->orderMode != 1) {
                 g_game->orderMode = 1;
                 g_game->inputFlags = g_game->inputFlags & 0xdf;
-                int handle = FindGadgetIndexBySubstring(g_game->gui.layer->value, "STOP");
+                int handle = FindGadgetIndexBySubstring(g_game->gui.layer->entries, "STOP");
                 if (handle != -1)
                     ClearGroupStatus(&g_game->gui, handle);
             } else {

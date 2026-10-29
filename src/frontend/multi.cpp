@@ -113,23 +113,7 @@ struct GameSessionRecord {
 
 #include "../map/mission.h"
 
-struct Layer {
-    Layer* next;
-    Gadget* entries;
-    void* handler;
-    union {
-        void* owner;
-        void* layout;
-        void* data;
-        int field_c;
-    };
-    char unknown_10[0x1c - 0x10];
-    void* cb1c;
-    int current;
-    char unknown_24[0x37 - 0x24];
-    int clickMode;
-};
-
+#include "../gui/layer.h"
 typedef Layer SelectDialogLayer;
 typedef Layer ListDialogLayer;
 
@@ -697,8 +681,8 @@ void __stdcall HandleNewMultiClick(Gui* gadget)
 void OpenNewMultiDialog()
 {
     Layer* layer = LoadGuiLayer(&g_game->gui, "NEWMULTI.GUI", 0x80);
-    layer->handler = HandleNewMultiClick;
-    layer->owner = g_game;
+    layer->handler = (void (__stdcall*)(void*))HandleNewMultiClick;
+    layer->data = g_game;
     LoadPictureCached("createnew", 0, 0, 0);
     Gadget* entries = layer->entries;
     if (IsOnlineConfigLoaded() && g_onlineLobbyPlayerName != 0) {
@@ -917,8 +901,8 @@ tcpaddr:
 void OpenTcpDialog()
 {
     Layer* dialog = LoadGuiLayer(&g_game->gui, "TCP.GUI", 0x800);
-    dialog->handler = HandleTcpDialogClick;
-    dialog->owner = g_game;
+    dialog->handler = (void (__stdcall*)(void*))HandleTcpDialogClick;
+    dialog->data = g_game;
     dialog->cb1c = 0;
     LoadPictureCached(0, 0, 0, 0);
     host_net_init_lobbied_connection((host_net*)((char*)g_game + 0x14));
@@ -1014,8 +998,8 @@ void __stdcall HandleSerialDialogClick(Gui* gadget)
 void OpenSerialDialog()
 {
     Layer* gadget = LoadGuiLayer(&g_game->gui, "SERIAL.GUI", 0x800);
-    gadget->handler = HandleSerialDialogClick;
-    gadget->owner = g_game;
+    gadget->handler = (void (__stdcall*)(void*))HandleSerialDialogClick;
+    gadget->data = g_game;
     gadget->cb1c = 0;
     LoadPictureCached(0, 0, 0, 0);
     host_net_init_lobbied_connection((host_net*)((char*)g_game + 0x14));
@@ -1224,8 +1208,8 @@ void __stdcall OpenModemDialog()
     GUID iid = g_dpspGuidModem;
 
     gadget = LoadGuiLayer(&g_game->gui, "MODEM.GUI", 0x800);
-    gadget->handler = HandleModemDialogClick;
-    gadget->owner = g_game;
+    gadget->handler = (void (__stdcall*)(void*))HandleModemDialogClick;
+    gadget->data = g_game;
     LoadPictureCached(0, 0, 0, 0);
     host_net_init_lobbied_connection((host_net*)((char*)g_game + 0x14));
     r = host_net_create_play_interface((const host_guid*)&iid, (host_net_pair*)&net);
@@ -1335,8 +1319,8 @@ void __stdcall OpenReportDialog(unsigned int* count, char** names)
 {
     char name[16];
     Layer* gadget = LoadGuiLayer(&g_game->gui, "REPORT.GUI", 0x800);
-    gadget->handler = HandleReportClick;
-    gadget->owner = g_game;
+    gadget->handler = (void (__stdcall*)(void*))HandleReportClick;
+    gadget->data = g_game;
     gadget->cb1c = ReportDialogFrame;
     LoadPictureCached("scorebg", 0, 1, 0);
     for (unsigned int i = 0; i < *count; i++) {
@@ -1499,8 +1483,8 @@ void OpenSelectGameDialog()
 
     BlankScreen();
     Layer* gadget = LoadGuiLayer(&g_game->gui, "SELGAME.GUI", 0x80);
-    gadget->handler = HandleSelectGameClick;
-    gadget->owner = g_game;
+    gadget->handler = (void (__stdcall*)(void*))HandleSelectGameClick;
+    gadget->data = g_game;
     LoadPictureCached("selectgame2x", 0, 0, 0);
     g_game->desc = (GameDescEntry*)GameAllocIgnoreTag("GAME DESCRIPTIONS", 0x690);
     g_game->shared = (char*)GameAllocIgnoreTag("PLAYER SHARED", 0xe74);
@@ -1574,7 +1558,7 @@ void __stdcall CacheLogosGadgetIndex(Gui* param1, Gadget* param2)
 void __stdcall HandleLogoSelectClick(Gui* param_1)
 {
     Gadget* entries = param_1->layer->entries;
-    LogoSelectClickLayout* layout = (LogoSelectClickLayout*)param_1->layer->layout;
+    LogoSelectClickLayout* layout = (LogoSelectClickLayout*)param_1->layer->data;
 
     if (param_1->hotGadgetIndex == -1) {
         GameFreeThunk(layout->seqs);
@@ -1645,7 +1629,7 @@ void __stdcall HandleViewMapClick(Gui* param_1)
 // FUNCTION: 0x444be0
 void OpenViewMapDialog()
 {
-    LoadGuiLayer(&g_game->gui, "VIEWMAP.GUI", 0x900)->handler = HandleViewMapClick;
+    LoadGuiLayer(&g_game->gui, "VIEWMAP.GUI", 0x900)->handler = (void (__stdcall*)(void*))HandleViewMapClick;
     LoadPictureCached("DVIEWMAP", 0, 0, 0);
     ShowSelectedMapInfo();
     SetKeyboardInput(&g_game->gui, 1);
@@ -1668,7 +1652,7 @@ void __stdcall UpdateMapSelection(Gui* menu, Gadget* unused)
 void __stdcall HandleMapSelectClick(Gui* param_1)
 {
     void* entries = param_1->layer->entries;
-    MapSelectClickLayout* layout = (MapSelectClickLayout*)param_1->layer->layout;
+    MapSelectClickLayout* layout = (MapSelectClickLayout*)param_1->layer->data;
 
     if (param_1->hotGadgetIndex == -1) {
         Gadget* entry = FindGadgetChecked_E(g_game->gui.layer->entries, "MAPPIC");
@@ -1743,7 +1727,7 @@ void OpenMultiMapSelector()
     }
 
     SelectDialogLayer* layer = LoadGuiLayer(&g_game->gui, "SELMAP.GUI", 0x980);
-    layer->handler = HandleMapSelectClick;
+    layer->handler = (void (__stdcall*)(void*))HandleMapSelectClick;
     MapSelectData* data = (MapSelectData*)GameAllocIgnoreTag("SELECT MAP DATA", 0x20);
     layer->data = data;
     LoadPictureCached("DSELECTMAP2", 0, 0, 0);
@@ -1776,9 +1760,9 @@ void OpenMultiMapSelector()
 void OpenLogoSelectDialog()
 {
     SelectDialogLayer* gui = LoadGuiLayer(&g_game->gui, "LOGOSEL.GUI", 0x800);
-    gui->handler = HandleLogoSelectClick;
+    gui->handler = (void (__stdcall*)(void*))HandleLogoSelectClick;
     LogoSelectLayout* layout = (LogoSelectLayout*)GameAllocIgnoreTag("SELECT TEAM LOGO", 0x20);
-    gui->layout = layout;
+    gui->data = layout;
     int count = ((LogoTable *)g_game->logos32)->count;
     layout->ptrList = (void**)GameAllocIgnoreTag("ANIMSEQ PTR LIST", count * 4);
     layout->seqs = (LogoAnimSeq*)GameAllocIgnoreTag("ACTUAL ANIMSEQS", count * 0x30);
@@ -2161,8 +2145,8 @@ void __stdcall OpenRejectDialog(int player)
         sprintf(buf, "%s %s?", Translate("Reject"),
                 g_game->players[g_rejectPlayer].name);
         SetTranslatedTextByName(&g_game->gui, "TITLE", buf, 0);
-        gadget->handler = HandleRejectChoice;
-        gadget->owner = g_game;
+        gadget->handler = (void (__stdcall*)(void*))HandleRejectChoice;
+        gadget->data = g_game;
         SetKeyboardInput(&g_game->gui, 1);
         RenderLayer(&g_game->gui, 0x40);
     }
@@ -2173,7 +2157,7 @@ void __stdcall HandleDisplayModesClick(Gui* gui)
 {
     SelectDialogLayer* holder = gui->layer;
     Gadget* gadgets = holder->entries;
-    ModeList* obj = (ModeList*)holder->layout;
+    ModeList* obj = (ModeList*)holder->data;
     if (gui->hotGadgetIndex == -1) {
         GameFreeThunk(obj->available);
         GameFreeThunk(obj->modes);
@@ -2303,8 +2287,8 @@ void OpenControlDialog()
         return;
     }
     SelectDialogLayer* gadget = LoadGuiLayer(&g_game->gui, "CONTROL.GUI", 0x800);
-    gadget->handler = HandleControlDialogClick;
-    gadget->owner = g_game;
+    gadget->handler = (void (__stdcall*)(void*))HandleControlDialogClick;
+    gadget->data = g_game;
     RefreshAlliesScreen(1);
     info = g_game->players_1b63[g_game->localPlayer].info;
     SetButtonStageByName((Gui*)&g_game->gui, "WATCHING", info->watching);
@@ -2756,8 +2740,8 @@ static inline int CountAllianceInOpenAlliesDialog(int alliance)
 void OpenAlliesDialog()
 {
     ListDialogLayer* gadget = LoadGuiLayer(&g_game->gui, "ALLIES.GUI", 0x800);
-    gadget->handler = HandleAlliesClick;
-    gadget->field_c = (int)g_game;
+    gadget->handler = (void (__stdcall*)(void*))HandleAlliesClick;
+    gadget->data = g_game;
     g_game->flags_37ebe |= 0x20;
     char* entries = (char*)g_game->gui.layer->entries;
     int i, j;
@@ -3179,7 +3163,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
                 OpenMultiMapSelector();
             } else {
                 ListDialogLayer* view = LoadGuiLayer(&g_game->gui, "VIEWMAP.GUI", 0x900);
-                view->handler = HandleViewMapClick;
+                view->handler = (void (__stdcall*)(void*))HandleViewMapClick;
                 LoadPictureCached("DVIEWMAP", 0, 0, 0);
                 ShowSelectedMapInfo();
                 SetKeyboardInput(&g_game->gui, 1);
@@ -3519,7 +3503,7 @@ void OpenEndMultiScreen()
     DrawSurface(0, image, 0, 0);
     FreeSurface((Surface *)image);
     FlipScreen();
-    LoadGuiLayer(&g_game->gui, "ENDMULTI.GUI", 0x80)->handler = HandleEndMultiClick;
+    LoadGuiLayer(&g_game->gui, "ENDMULTI.GUI", 0x80)->handler = (void (__stdcall*)(void*))HandleEndMultiClick;
     SetTranslatedTextByName(&g_game->gui, "RESULT",
                  Translate(g_game->bits_3923b.flag4_3923b ? "Victory" : "Failure"), 0);
     RenderLayer(&g_game->gui, 0xc0);
@@ -3744,7 +3728,7 @@ void __stdcall OpenSaveGameDialog()
 {
     int count;
     ListDialogLayer* layer = LoadGuiLayer(&g_game->gui, "SAVELIST.GUI", 0x880);
-    layer->handler = HandleSaveGameClick;
+    layer->handler = (void (__stdcall*)(void*))HandleSaveGameClick;
     layer->data = g_game;
     LoadPictureCached("DSaveList", 0, 0, 0);
     MakeDirectoryPath(g_savegameDir);
@@ -3792,7 +3776,7 @@ void __stdcall OpenSaveGameDialog()
 void OpenLoadListDialog()
 {
     ListDialogLayer* gadget = LoadGuiLayer(&g_game->gui, "LOADLIST.GUI", 0x981);
-    gadget->handler = HandleLoadListClick;
+    gadget->handler = (void (__stdcall*)(void*))HandleLoadListClick;
     gadget->data = g_game;
     LoadPictureCached("DLoadList", 0, 0, 0);
     int count;
@@ -4011,8 +3995,8 @@ void OpenUnitRestrictions()
     int i;
 
     layer = LoadGuiLayer(&g_game->gui, "RESTRICT2.GUI", 0x880);
-    layer->handler = HandleRestrictionsClick;
-    layer->field_c = 0;
+    layer->handler = (void (__stdcall*)(void*))HandleRestrictionsClick;
+    layer->data = 0;
     layer->cb1c = UnitRestrictDialogFrame;
     g_unitRestrictPicLoadIndex = 0;
     LoadPictureCached("UnitRestrict5x", 0, 0, 0);
@@ -4232,8 +4216,8 @@ void FillProviderList()
     SetPaletteColors((unsigned char*)g_game->paletteRgba, 0, 0x100);
     RemapPaletteToClosestIndices(&g_game->gui, g_game->paletteRgba, g_game->gui.palette);
     Layer* menu = LoadGuiLayer(&g_game->gui, "SELPROV.GUI", 0x80);
-    menu->handler = HandleSelectProviderClick;
-    menu->owner = g_game;
+    menu->handler = (void (__stdcall*)(void*))HandleSelectProviderClick;
+    menu->data = g_game;
     LoadPictureCached("selconnect2", 1, 0, 0);
     g_game->data[0] = GameAllocIgnoreTag("PROVIDER DESCRIPTIONS", 0x500);
     g_game->sessions = (V4i*)GameAllocIgnoreTag("PROVIDER GUIDS", 0xa0);
@@ -4301,8 +4285,8 @@ void OpenBattleRoom()
     info->f9d_2 = 1;
 
     layer = LoadGuiLayer(&g_game->gui, "LOUNGE2.GUI", 0);
-    layer->handler = HandleBattleRoomClick;
-    layer->owner = g_game;
+    layer->handler = (void (__stdcall*)(void*))HandleBattleRoomClick;
+    layer->data = g_game;
     LoadPictureCached("battleroom", 0, 1, 0);
     entries = g_game->gui.layer->entries;
     g_battleRoomBaseGadgetCount = layer->entries->u.count;

@@ -155,11 +155,9 @@ extern void* g_gfxBlitLockEvent;
 #include "../gui/keyboard.h"
 #include "../gui/mouse.h"
 #include "palette.h"
-int __stdcall AllocAlphaTable(DisplayAppView* d);
 int __stdcall LockScreen(Surface *s);
 void __cdecl BlitSurface(Surface *dst, void *src, int x, int y);
 int __stdcall UnlockScreen(Surface *s);
-void __stdcall FreeLightTable(DisplayAppView* obj);
 #include "object_pool.h"
 
 // FUNCTION: 0x4b4f50
@@ -421,7 +419,7 @@ int __stdcall InitEnvironment(DisplayAppView* d)
         d->shadeTable = 0;
     }
     if (d->flags.bits.has_c0) {
-        AllocAlphaTable(d);
+        AllocAlphaTable((Display *)d);
     }
     if (d->flags.bits.has_c8) {
         AllocLightTable((Display *)d);
@@ -559,7 +557,7 @@ void __stdcall ShutdownEnvironment(DisplayAppView* d)
     if (d->flags.bits.has_c0)
         FreeAlphaTable((Display *)d);
     if (d->flags.bits.has_c8)
-        FreeLightTable(d);
+        FreeLightTable((Display *)d);
     if (d->flags.bits.has_cc)
         FreeGrayTable((Display *)d);
     if (d->flags.bits.has_d0)

@@ -204,6 +204,7 @@ void __stdcall RockUnit(RockUnitView* obj, UnitWeaponSlot* src)
 #include "../ai/squad_manager.h"
 
 #include "damage_table.h"
+#include "../map/los_tables.h"
 
 #include "weapons.h"
 
@@ -225,11 +226,6 @@ void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target)
 
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
-struct DamageEntryView {
-    char* name;
-    int value;
-};
-
 struct DamageNameLess {
     bool operator()(const char* a, const char* b) const
     {
@@ -250,19 +246,19 @@ short __cdecl AngleOfVector(int x, int z);
 void __stdcall DamageUnit(Unit* source, Unit* target,
                             int amount, int type, unsigned short extra);
 
-static inline int* FindDamageValue(const DamageTable* table, char* name)
+static inline int* FindDamageValue(DamageTable* table, char* name)
 {
     DamageNameLess less;
-    DamageEntryView* first = (DamageEntryView*)table->v.begin();
-    DamageEntryView* last = (DamageEntryView*)table->v.end();
+    DamageTableEntry* first = table->v.begin();
+    DamageTableEntry* last = table->v.end();
     while (first != last) {
-        DamageEntryView* mid = first + (last - first) / 2;
-        if (less(mid->name, name))
+        DamageTableEntry* mid = first + (last - first) / 2;
+        if (less(mid->name.ptr, name))
             first = mid + 1;
         else
             last = mid;
     }
-    if (first == (DamageEntryView*)table->v.end() || less(name, first->name))
+    if (first == table->v.end() || less(name, first->name.ptr))
         return 0;
     return &first->value;
 }

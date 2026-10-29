@@ -28,7 +28,6 @@
 #include "../ingame/info_mode_flags.h"
 #include "../ingame/map_grid.h"
 #include "../ingame/orders.h"
-#include "../ingame/side_name.h"
 #include "../ingame/unit_info_snapshot.h"
 #include "../ingame/light_bar_counters.h"
 #include "../ingame/light_bar_sprite.h"
@@ -55,7 +54,6 @@
 #include "loading_player_slots.h"
 #include "mission_option_flags.h"
 #include "side_def.h"
-#include "side_name_entry.h"
 #include "end_game_player_slot.h"
 #include "view_flags.h"
 #include "chat_recipients.h"
@@ -1118,8 +1116,7 @@ struct Game {
             char glamour[256];
         };
         struct {
-            char pad_37f3d[30];
-            SideNameEntry sideNames[2];
+            char sideDefsHead[1154];
             char unknown_383bf[1682];
             unsigned char pauseFlags;
             char pad_38a52[1];
@@ -1191,14 +1188,7 @@ struct Game {
             char pad_38a53_b[1852];
         };
         struct {
-            char unknown_37f3d_e[34];
-            SideName names_37f5f[8];
-            char pad_390ef[160];
-        };
-        struct {
-            char pad_37f3d_f[30];
-            SideName sideNames_37f5b[8];
-            char pad_390eb[164];
+            char unknown_37f3d_e[4690];
         };
     };
     union {
@@ -1418,14 +1408,11 @@ static_assert(offsetof(Game, bits_37f06_1) == 0x37f06, "bits_37f06_1");
 static_assert(offsetof(Game, bits_37f2f_2) == 0x37f2f, "bits_37f2f_2");
 static_assert(offsetof(Game, block) == 0x37ee6, "block");
 static_assert(offsetof(Game, names) == 0x37f3d, "names");
-static_assert(offsetof(Game, sideNames) == 0x37f5b, "sideNames");
 static_assert(offsetof(Game, startPos) == 0x37f5f, "startPos");
 static_assert(offsetof(Game, sideDefs) == 0x37f3d, "sideDefs");
 static_assert(offsetof(Game, flags_38a51) == 0x38a51, "flags_38a51");
 static_assert(offsetof(Game, bits_38a51_1) == 0x38a51, "bits_38a51_1");
 static_assert(offsetof(Game, bits_38a51_3) == 0x38a51, "bits_38a51_3");
-static_assert(offsetof(Game, names_37f5f) == 0x37f5f, "names_37f5f");
-static_assert(offsetof(Game, sideNames_37f5b) == 0x37f5b, "sideNames_37f5b");
 static_assert(offsetof(Game, maxStats) == 0x3918f, "maxStats");
 static_assert(offsetof(Game, maxKills) == 0x3918f, "maxKills");
 static_assert(offsetof(Game, pad_391cf) == 0x391cf, "pad_391cf");

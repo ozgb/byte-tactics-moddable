@@ -1203,7 +1203,7 @@ void OpenMissionBriefing(void)
     unsigned char side;
 
     side = g_game->players_1b8a[g_game->localPlayer].info->side;
-    sprintf(buf, "mbrief%s", (char*)g_game + 0x37f5b + side * 0x232);
+    sprintf(buf, "mbrief%s", g_game->sideDefs[side].nameprefix);
 
     dialog = LoadGuiLayer(&g_game->gui, "MSNBRIEF.GUI", 0x80);
     dialog->handler = (void (__stdcall*)(void*))HandleMissionBriefingClick;

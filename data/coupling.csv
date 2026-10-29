@@ -1037,7 +1037,7 @@ game,presentation,shared_write,Game::mode_391f1,5
 game,presentation,shared_write,Game::numPlayers,4
 game,presentation,shared_write,Game::playerIndex,20
 game,presentation,shared_write,Game::seaLevel,4
-game,presentation,shared_write,Game::ticks,35
+game,presentation,shared_write,Game::ticks,36
 game,presentation,shared_write,Game::uiOptionFlags,2
 game,presentation,shared_write,Game::unitIndex,22
 game,presentation,shared_write,Game::version,3

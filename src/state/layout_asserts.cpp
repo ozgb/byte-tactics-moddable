@@ -39,7 +39,6 @@
 #include "../game/packed_goal.h"
 #include "../game/pre_battle_flags.h"
 #include "../game/side_def.h"
-#include "../game/side_name_entry.h"
 #include "../game/ui_option_flags.h"
 #include "../game/unit_resources.h"
 #include "../game/victory_conditions.h"
@@ -70,7 +69,6 @@
 #include "../ingame/orders.h"
 #include "../ingame/orders_bits.h"
 #include "../ingame/orders_panel_flags.h"
-#include "../ingame/side_name.h"
 #include "../ingame/unit_info_snapshot.h"
 #include "../ingame/view_mouse_event.h"
 #include "../map/cell.h"
@@ -1139,8 +1137,7 @@ static_assert(offsetof(Game, currentPalette) == 233603, "");
 static_assert(offsetof(Game, desiredPalette) == 233607, "");
 static_assert(offsetof(Game, fadeTable) == 233611, "");
 static_assert(offsetof(Game, glamour) == 233615, "");
-static_assert(offsetof(Game, pad_37f3d) == 229181, "");
-static_assert(offsetof(Game, sideNames) == 229211, "");
+static_assert(offsetof(Game, sideDefsHead) == 229181, "");
 static_assert(offsetof(Game, unknown_383bf) == 230335, "");
 static_assert(offsetof(Game, pauseFlags) == 232017, "");
 static_assert(offsetof(Game, pad_38a52) == 232018, "");
@@ -1183,11 +1180,6 @@ static_assert(offsetof(Game, unknown_37f3d_d) == 229181, "");
 static_assert(offsetof(Game, bits_38a51_3) == 232017, "");
 static_assert(offsetof(Game, pad_38a53_b) == 232019, "");
 static_assert(offsetof(Game, unknown_37f3d_e) == 229181, "");
-static_assert(offsetof(Game, names_37f5f) == 229215, "");
-static_assert(offsetof(Game, pad_390ef) == 233711, "");
-static_assert(offsetof(Game, pad_37f3d_f) == 229181, "");
-static_assert(offsetof(Game, sideNames_37f5b) == 229211, "");
-static_assert(offsetof(Game, pad_390eb) == 233707, "");
 static_assert(offsetof(Game, maxStats) == 233871, "");
 static_assert(offsetof(Game, maxKills) == 233871, "");
 static_assert(offsetof(Game, maxLosses) == 233875, "");
@@ -2024,12 +2016,6 @@ static_assert(offsetof(SideDef, energyColor) == 546, "");
 static_assert(offsetof(SideDef, metalColor) == 550, "");
 static_assert(offsetof(SideDef, sideNumber) == 554, "");
 static_assert(offsetof(SideDef, font) == 558, "");
-static_assert(sizeof(SideName) == 562, "");
-static_assert(offsetof(SideName, name) == 0, "");
-static_assert(offsetof(SideName, field_224) == 548, "");
-static_assert(offsetof(SideName, unknown_228) == 552, "");
-static_assert(sizeof(SideNameEntry) == 562, "");
-static_assert(offsetof(SideNameEntry, name) == 0, "");
 static_assert(sizeof(SoundSettingFlags) == 2, "");
 static_assert(offsetof(SoundSettingFlags, word) == 0, "");
 static_assert(offsetof(SoundSettingFlags, bits) == 0, "");

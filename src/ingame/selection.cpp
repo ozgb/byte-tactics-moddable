@@ -39,12 +39,6 @@ struct HotRadarSlot {
     int y;
 };
 
-struct SideCommanderName {
-    char unknown_0[0x22];
-    char name[0x20];
-    char unknown_42[0x232 - 0x42];
-};
-
 #include "../orders/order_type_entry.h"
 #include "../game/game.h"
 #pragma pack(pop)
@@ -755,7 +749,7 @@ void FocusNextLocalUnit(void)
 void __stdcall FocusCommander(int param_1)
 {
     Player* team = &g_game->players[g_game->playerIndex];
-    char* playerName = (*(SideCommanderName (*)[5])&g_game->sideDefs)[team->info->side].name;
+    char* playerName = g_game->sideDefs[team->info->side].commander;
     Unit* last = team->unitsEnd;
     for (Unit* u = team->unitsBegin; u <= last; u++) {
         if (u->selectable && u->buildLeft == 0.0f && u->postTransferHoldoff == 0

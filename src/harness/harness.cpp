@@ -25,6 +25,7 @@
 #include "../game/players.h"
 #include "../frontend/skirmish_menu.h"
 #include "../frontend/endgame.h"
+#include "../game/settings.h"
 #include "../game/settings_campaign.h"
 #include "../files/files_api.h"
 #include "../debug/debug_lib.h"
@@ -98,29 +99,6 @@ static char s_decidedKey[32];
 static int s_decidedLine = 0;
 static int s_loadAhead = 0;
 static const char s_savePath[] = "savegame\\harness.sav";
-struct SkirmishOptionsPlayer {
-    int active;
-    int shade;
-    int type;
-    int metal;
-    int energy;
-    short color;
-    char unknown_16[2];
-};
-
-struct SkirmishOptionsTable {
-    SkirmishOptionsPlayer players[11];
-    int commanderDeath;
-    int mapping;
-    int lineOfSight;
-    int losType;
-    int fixedLocations;
-    char mapName[260];
-    int baseGadgetCount;
-    int current;
-    int difficulty;
-};
-
 using OptionsTable = SkirmishOptionsTable;
 static const char s_optionsPath[] = "savegame\\harness.opt";
 static OptionsTable s_savedOptions;
@@ -894,9 +872,9 @@ static void SetUpSkirmish()
     memset(t, 0, sizeof *t);
     for (int i = 0; i < MAX_PLAYERS; i++) {
         PlayerSpec* p = &s_players[i];
-        SkirmishOptionsPlayer* slot = &t->players[i];
-        slot->active = p->named ? (p->human ? 1 : 2) : 0;
-        slot->shade = i % 2;
+        SkirmishPlayer* slot = &t->players[i];
+        slot->controller = p->named ? (p->human ? 1 : 2) : 0;
+        slot->side = i % 2;
         if (p->side[0] != '\0') {
             int side = FindSide(p->side);
             if (side < 0) {
@@ -906,17 +884,17 @@ static void SetUpSkirmish()
                 sprintf(detail, ", the game has no side \"%s\"", p->side);
                 FailLine(p->sideLine, "names an unknown side", key, detail);
             }
-            slot->shade = side;
-        } else if (slot->shade >= sideCount) {
-            slot->shade = 0;
+            slot->side = side;
+        } else if (slot->side >= sideCount) {
+            slot->side = 0;
         }
-        slot->type = p->team;
+        slot->allyGroup = p->team;
         slot->metal = p->metal;
         slot->energy = p->energy;
         slot->color = p->color;
         if (p->named)
             highest = i;
-        if (slot->active != 0)
+        if (slot->controller != 0)
             active++;
     }
 
@@ -963,7 +941,7 @@ static void SetUpSkirmish()
     if (local < 0) {
         local = 0;
         for (int i = MAX_PLAYERS - 1; i >= 0; i--) {
-            if (t->players[i].active == 1)
+            if (t->players[i].controller == 1)
                 local = i;
         }
     }

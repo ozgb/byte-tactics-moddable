@@ -93,11 +93,12 @@ static inline void StartShower()
     g_meteorStrikeEndTime = g_meteorShowerDuration + (unsigned int)g_game->ticks;
     g_meteorNextStrikeTime = g_meteorScheduleGap + g_meteorStrikeEndTime;
     g_meteorNextHitTime = (unsigned int)g_game->ticks;
-    g_meteorTarget = MakePoint((int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->width / 0x8000),
-                             (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->height / 0x8000));
-    g_meteorOrigin = AddPoints(MakePoint((int)((__int64)GameRand(RAND_STREAM_MAIN) * 30 / 0x8000) - 15,
-                                       (int)((__int64)GameRand(RAND_STREAM_MAIN) * 10 / 0x8000) - 15),
-                             g_meteorTarget);
+    int targetZ = (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->height / 0x8000);
+    int targetX = (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->width / 0x8000);
+    g_meteorTarget = MakePoint(targetX, targetZ);
+    int offsetZ = (int)((__int64)GameRand(RAND_STREAM_MAIN) * 10 / 0x8000) - 15;
+    int offsetX = (int)((__int64)GameRand(RAND_STREAM_MAIN) * 30 / 0x8000) - 15;
+    g_meteorOrigin = AddPoints(MakePoint(offsetX, offsetZ), g_meteorTarget);
 }
 
 // FUNCTION: 0x437de0
@@ -140,11 +141,12 @@ void StartMeteorShower()
     g_meteorStrikeEndTime = g_meteorShowerDuration + g_game->ticks;
     g_meteorNextStrikeTime = g_meteorScheduleGap + g_meteorStrikeEndTime;
     g_meteorNextHitTime = g_game->ticks;
-    g_meteorTarget = MakePoint((int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->width / 0x8000),
-                             (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->height / 0x8000));
-    g_meteorOrigin = AddPoints(MakePoint((int)((__int64)GameRand(RAND_STREAM_MAIN) * 30 / 0x8000) - 15,
-                                       (int)((__int64)GameRand(RAND_STREAM_MAIN) * 10 / 0x8000) - 15),
-                             g_meteorTarget);
+    int targetZ = (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->height / 0x8000);
+    int targetX = (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->width / 0x8000);
+    g_meteorTarget = MakePoint(targetX, targetZ);
+    int offsetZ = (int)((__int64)GameRand(RAND_STREAM_MAIN) * 10 / 0x8000) - 15;
+    int offsetX = (int)((__int64)GameRand(RAND_STREAM_MAIN) * 30 / 0x8000) - 15;
+    g_meteorOrigin = AddPoints(MakePoint(offsetX, offsetZ), g_meteorTarget);
 }
 
 // FUNCTION: 0x438180

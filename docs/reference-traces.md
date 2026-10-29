@@ -266,12 +266,15 @@ and so on), and this page is updated to name it. The current tag is
   and `mission-radius`, with the new `campaign` key and `game_type 1`, that load a
   campaign mission so that its victory and defeat conditions fire and the run ends at
   game over (#444). The 56 earlier digests and the hashed fields are those of v13.
-- `reference-traces-v16`: six more scenarios, `console-economy`, `console-features`,
+- `reference-traces-v15`: six more scenarios, `console-economy`, `console-features`,
   `console-ilose`, `console-iwin`, `console-sight` and `console-units`, with the new
   `console` key, that type console commands as the chat line does (#445). The 59
   earlier digests and the hashed fields are those of v14.
+- `reference-traces-v16`: the same 65 scenarios, with the Projectile field at +0x56
+  (`interceptedProjectile`) hashed as a pointer to a projectile instead of as bytes
+  (#359). Every digest differs from v15.
 
-`bt-trace N` does not name which fields are hashed. v1 to v15 are
+`bt-trace N` does not name which fields are hashed. v1 to v16 are
 all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` (and
 `src/harness/trace_schema.h`) at the tag. What makes a new format number is in

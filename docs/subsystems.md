@@ -49,7 +49,8 @@ Coverage: 5.9% of functions (1 of 17), 1.7% of lines, 0.0% of branches; 16 live 
 
 **Live functions no scenario enters** (16 of 17 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445); 1 are entered, 5.9%), by reason:
 
-- Shutdown only (1): `EmptyShutdownPreCleanup`. `console-features` (#445) enters `CmdMeteor` and `StartMeteorShower` (`meteor` and `meteor 1`).
+- Native modules switch only (15): `AddPoints`, `CmdMeteor`, `DisableMeteors`, `EnableMeteors`, `InitMeteors`, `LoadMeteors`, `MakePoint`, `MeteorParams::LoadMeteorDefaults`, `SaveMeteors`, `SetMeteorParams`, `StartMeteorShower`, `StartShower`, `UpdateMeteors`, `UpdateWind`, `UpdateWindOnStream`. Wind and meteors run in `wind_meteors.wasm` by default (#564), so their native code runs only with `-modules=native` (`reference.py --check --native-modules`), which the coverage run does not pass. Every scenario enters the module's copies, and `console-features` (#445) enters `CmdMeteor` and `StartMeteorShower` there (`meteor` and `meteor 1`).
+- Shutdown only (1): `EmptyShutdownPreCleanup`.
 
 **Entry points.** Phase roots: `UpdateWind` and `UpdateMeteors`, both called from `RunGameSteps`. `UpdateWind` is also called from `LoadBattleAssets` (game).
 
@@ -610,6 +611,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Error paths only (5): `Fail`, `Fatal`, `OutOfBlock`, `OutOfMemoryHandler`, `ReportViaException`. Fatal errors and out-of-memory handlers, which a passing run never reaches.
 - Test only (2): `QuirksFlipFirstSim`, `SimBlockForEach`. `QuirksFlipFirstSim` is the quirk-freeze check's deliberate failure (`quirks_tamper`), which exits 2 and so has no stored trace. `SimBlockForEach` is called only by the harness's block scan, which `reference.py --check` runs with `-blockscan` and the coverage run does not.
 - Moddable-only key (1): `QuirksNormalise`. Entered by a `quirks` line, which the reference harness does not read, so a scenario with one has no stored trace.
+- Native modules switch only (1): `Reserve`. With WASM modules (#564) the sim block is attached inside the modules' shared memory, so the block reserves its own memory only with `-modules=native`, which the coverage run does not pass.
 
 **files, functions no scenario enters** (30 of 142 after `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 112 are entered, 78.9%), by reason:
 

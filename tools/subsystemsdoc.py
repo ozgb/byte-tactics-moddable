@@ -96,6 +96,7 @@ REASON_CODES = {
     "Unreachable": "unreachable", "Menu and cursor only": "menu-cursor", "Share dialog or network only": "share-dialog",
     "Network game only": "network-game", "Cursor only": "cursor",
     "Template instances no entered function uses": "unused-instance",
+    "Native modules switch only": "wasm",
 }
 UNWRITABLE = ("none", "missing", "unlisted")
 UNWRITABLE_KINDS = ("names", "names listed", "in order", "sim item names")

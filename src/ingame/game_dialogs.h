@@ -29,4 +29,6 @@ void __stdcall HandleDebugHotkey(int eventType);
 
 void __stdcall HandleMain2LayoutEvent(Gui* gadget);
 
+void __stdcall DrawScorePanel(void* surface);
+
 #endif

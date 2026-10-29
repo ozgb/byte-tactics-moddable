@@ -29,4 +29,6 @@ unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* siz
 GafFrame* __stdcall BuildExplosionFrame(int size);
 void __stdcall StartExplodePiece(ExplodedPiece* piece);
 
+void __stdcall DrawExplosions(void* surface);
+
 #endif

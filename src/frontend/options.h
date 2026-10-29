@@ -75,4 +75,6 @@ void __stdcall HandleScreenSlider(OptionsSliderMenu* obj, int unused);
 void __stdcall HandleMaxLinesSlider(OptionsSliderMenu* obj, int unused);
 void __stdcall HandleTextScrollSlider(OptionsSliderMenu* obj, int unused);
 
+void __stdcall DrawOptionsScrollBar(void* surf);
+
 #endif

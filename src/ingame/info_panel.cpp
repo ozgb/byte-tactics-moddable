@@ -187,35 +187,35 @@ public:
 #include "../../link/globals.h"
 #include "../../interfaces/seams.h"
 
+struct GafSequenceRecord;
+struct GafFileIndex;
+struct GafFrameCursor;
+struct FrameQuad;
+struct Object3doLoadView;
+struct UnitDrawView;
 
-unsigned short* __stdcall FindGafEntry(void* gaf, const char* name);
+GafSequenceRecord* __stdcall FindGafEntry(GafFileIndex* gaf, const char* name);
 int __stdcall GetGafFrame(unsigned short* param_1, int param_2);
 
-void __stdcall DrawFrame(void* param_1, short* param_2, int x, int y);
-void __stdcall DrawFrame(void* dst, void* bmp, int x, int y);
+void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
 
 #include "../util/math.h"
-void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
+int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1, int color);
 
-void __stdcall FillRectangle(void* surface, Rect* rect, int color);
-int __stdcall FillRectangle(void* surface, void* rect, int color);
-void __stdcall FillRectangle(int surface, Rect* rect, int color);
+int __stdcall FillRectangle(Surface* surface, Rect* rect, int color);
 
-void __stdcall DrawRectangle(void* surface, Rect* rect, int color);
-void __stdcall DrawRectangle(void* surface, void* rect, int color);
-void __stdcall DrawRectangle(int surface, Rect* rect, int color);
+int __stdcall DrawRectangle(Surface* surface, Rect* r, int color);
 
-void __stdcall DrawFrameQuad(void* surf, void* entry, LogoQuad* dst, LogoQuad* src);
+void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp, FrameQuad* dst, FrameQuad* src);
 
 char* __stdcall Translate(char* text);
 #include "../graphics/draw.h"
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall SetFont(int param_1);
-void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
-void __stdcall DrawString(int surface, const char* text, int x, int y, int maxWidth);
+void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int maxWidth);
 
 #include "../graphics/display.h"
-void __stdcall SetOffscreenSurface(void* surf);
+void __stdcall SetOffscreenSurface(int surface);
 void FlipScreen();
 
 #include "../network/net_stats.h"
@@ -225,51 +225,45 @@ void __stdcall PlaySoundByName(char* name, int param_2);
 #include "../gui/keyboard.h"
 #include "../gui/gui.h"
 
-void __stdcall GetObjectBounds(Object3do* obj, Vec3* lo, Vec3* hi, int arg);
+void __stdcall GetObjectBounds(Object3doLoadView* obj, Vec3* lo, Vec3* hi, int arg);
 #include "info_panel.h"
 
-int __stdcall GetGafSequenceFrame(short* ref);
-void __stdcall FillPolygon(void* surface, Point* points, int count, int color);
-void __stdcall DrawFrameQuad(void* surface, void* texture, Point* points, void* src);
+int __stdcall GetGafSequenceFrame(GafFrameCursor* h);
+void __stdcall FillPolygon(Surface* surface, Point* points, int n, unsigned char color);
+void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp, FrameQuad* dst, FrameQuad* src);
 
-int __stdcall GetCellHeight(void* p);
+#include "../map/terrain.h"
 
 #include "../network/unit_sync.h"
-void __stdcall AddMessage(char* param_1, int param_2, int param_3, int param_4);
+void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, char last);
 #include "../gui/dialogs.h"
 
-int __stdcall FormatNetStats(int);
-int __stdcall DrawSelectedGoal(int, int);
-int __stdcall DrawMapDebugOverlay(int);
-int __stdcall DrawExplosions(int);
-int __stdcall DrawUnit(int, int);
-void __stdcall DrawUnit(void* dest, Unit* unit);
-int __stdcall DrawOptionsScrollBar(int);
-int __stdcall DrawMessages(int);
-float __stdcall GetEnergyIncome(int);
-float __stdcall GetEnergyUsage(int);
-float __stdcall GetMetalIncome(int);
-float __stdcall GetMetalUsage(int);
+#include "../game/console_commands.h"
+#include "../weapons/explosions.h"
+void __stdcall DrawUnit(void* context, UnitDrawView* unit);
+#include "../frontend/options.h"
+#include "../network/net_chat.h"
+float __stdcall GetEnergyIncome(void* param_1);
 #include "../game/players.h"
-int __stdcall DrawRadar(int);
-int __stdcall DrawFogOfWar(int);
-int __stdcall FindNextSelectedUnit(int, int);
-int __stdcall DrawSelectedUnitOrderOverlays(int, int);
-int __stdcall DrawScorePanel(int);
-int __stdcall DrawProjectiles(int);
-int __stdcall BlitMenuLayers(int, int, int);
-int __stdcall DrawParticleList(int, int);
-int __stdcall DrawMapTiles(int);
-int __stdcall PointInRect(int, int, int);
-int __stdcall DrawLine(int, int, int, int, int, int);
-int __stdcall GetTextWidth(int, int);
-int __stdcall Translate(int);
-int __stdcall ResetClipRect(int);
-int HideSoftwareCursor();
-int ShowSoftwareCursor();
-int __stdcall GetOrderTarget(void* unit);
-int __stdcall GetGafSequenceFrame(Handle* h);
-void __stdcall DrawFrameBlended(void* dest, short* frame, int x, int y);
+float __stdcall GetMetalIncome(void* param_1);
+#include "../game/players.h"
+#include "../map/radar.h"
+#include "../map/line_of_sight.h"
+Unit* __stdcall FindNextSelectedUnit(Unit* unit, int dir);
+#include "selection.h"
+#include "game_dialogs.h"
+#include "../weapons/weapons.h"
+void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect);
+#include "../graphics/particles.h"
+int __stdcall PointInRect(Rect* r, int x, int y);
+int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1, int color);
+int __stdcall GetTextWidth(Font* font, unsigned char* text);
+char* __stdcall Translate(char* key);
+void __stdcall ResetClipRect(int* surface);
+void HideSoftwareCursor();
+void __fastcall ShowSoftwareCursor(void);
+int __stdcall GetGafSequenceFrame(GafFrameCursor* h);
+void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y);
 
 // FUNCTION: 0x467440
 void UpdateSensorRadarAndCloak(void)
@@ -420,8 +414,8 @@ void LoadLightBar()
     LightBarSprite* b = &g_game->b;
     b->field_30 = 0;
     b->lightbar = 0;
-    unsigned short* frames = FindGafEntry(g_game->gaf, "LIGHTBAR");
-    g_game->b.lightbar = (unsigned short*)GetGafFrame(frames, 1);
+    GafSequenceRecord* frames = FindGafEntry((GafFileIndex*)g_game->gaf, "LIGHTBAR");
+    g_game->b.lightbar = (unsigned short*)GetGafFrame((unsigned short*)frames, 1);
     g_game->b.lightbar[3] = 0;
     g_game->b.lightbar[2] = 0;
 }
@@ -429,7 +423,7 @@ void LoadLightBar()
 // FUNCTION: 0x467a20
 void __stdcall BlitGafFrameAtOffset(void* param_1, short* param_2, int param_3, int param_4)
 {
-    DrawFrame(param_1, param_2, param_2[2] + param_3, param_2[3] + param_4);
+    DrawFrame((Surface*)param_1, (GafFrame*)param_2, param_2[2] + param_3, param_2[3] + param_4);
 }
 
 // FUNCTION: 0x467a50
@@ -454,10 +448,10 @@ void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset,
     }
 
     Point* quad = (Point *)g_game->projected;
-    DrawLine(surface, quad[0].x, quad[0].y, quad[1].x, quad[1].y, color);
-    DrawLine(surface, quad[1].x, quad[1].y, quad[2].x, quad[2].y, color);
-    DrawLine(surface, quad[2].x, quad[2].y, quad[3].x, quad[3].y, color);
-    DrawLine(surface, quad[3].x, quad[3].y, quad[0].x, quad[0].y, color);
+    DrawLine((Surface*)surface, quad[0].x, quad[0].y, quad[1].x, quad[1].y, color);
+    DrawLine((Surface*)surface, quad[1].x, quad[1].y, quad[2].x, quad[2].y, color);
+    DrawLine((Surface*)surface, quad[2].x, quad[2].y, quad[3].x, quad[3].y, color);
+    DrawLine((Surface*)surface, quad[3].x, quad[3].y, quad[0].x, quad[0].y, color);
 }
 
 // FUNCTION: 0x467b60
@@ -471,11 +465,11 @@ void __stdcall DrawProgressBar(void* surface, int value, int max, Rect* rect, Pr
     if (value > max)
         value = max;
     r.right = (rect->right - rect->left) * value / max + r.left;
-    FillRectangle(surface, &r, colors->full);
+    FillRectangle((Surface*)surface, &r, colors->full);
     if (r.right != rect->right) {
         r.left = r.right + 1;
         r.right = rect->right;
-        FillRectangle(surface, &r, colors->empty);
+        FillRectangle((Surface*)surface, &r, colors->empty);
     }
 }
 
@@ -505,7 +499,7 @@ void __stdcall BlitSideLogoToRect(void* surf, Player* player, Rect* rect, int dy
     dst.p[3].x = rect->left;
     dst.p[3].y = rect->bottom + dy;
 
-    DrawFrameQuad(surf, entry, &dst, &src);
+    DrawFrameQuad(surf, (GafFrame*)entry, (FrameQuad*)&dst, (FrameQuad*)&src);
 }
 
 // FUNCTION: 0x467cb0
@@ -522,27 +516,27 @@ void __stdcall DrawKillCount(void* surface, Unit* unit, int x, int y)
                 unit->killCount == 1 ? kill : kills);
     }
     SetTextColors(g_game->colors[15], GetTextKeyColor());
-    DrawString(surface, buf, x, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, x, y, -1);
 }
 
 // FUNCTION: 0x467d70
 void DrawLightBars()
 {
     void* surf = (void *)g_game->screen;
-    SetOffscreenSurface(surf);
+    SetOffscreenSurface((int)surf);
     FillSurface((Surface *)surf, 0);
 
     int side = g_game->players[g_game->playerIndex].info->side;
 
     short* bar = (short*)GetGafFrame(g_game->sidePanelTopSeq[side], 0);
-    DrawFrame(surf, bar, bar[2] + 0x81, bar[3]);
+    DrawFrame((Surface*)surf, (GafFrame*)bar, bar[2] + 0x81, bar[3]);
 
     int dy = GetScreenHeight() - 0x20;
     bar = (short*)GetGafFrame(g_game->sidePanelBotSeq[side], 0);
-    DrawFrame(surf, bar, bar[2] + 0x81, bar[3] + dy);
+    DrawFrame((Surface*)surf, (GafFrame*)bar, bar[2] + 0x81, bar[3] + dy);
 
     bar = (short*)GetGafFrame(g_game->sidePanelSideSeq[side], 0);
-    DrawFrame(surf, bar, bar[2], bar[3]);
+    DrawFrame((Surface*)surf, (GafFrame*)bar, bar[2], bar[3]);
 
     FlipScreen();
 }
@@ -582,14 +576,14 @@ int __stdcall DrawUnitStateProbe(void* surface)
     FadeRectangle((Surface *)surface, &r, -0x18);
     r.right++;
     r.bottom++;
-    DrawRectangle(surface, &r, colors[5]);
+    DrawRectangle((Surface*)surface, &r, colors[5]);
     y += 3;
-    DrawString(surface, "Unit State Probe", 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)"Unit State Probe", 0x86, y, -1);
     y += lineH;
-    DrawString(surface, "================", 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)"================", 0x86, y, -1);
     y += lineH;
     sprintf(buf, "uid: %03d/%04x '%s'\n", unit->id, unit->id, ((char *)unit->def.get()));
-    DrawString(surface, buf, 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
     y += lineH;
     sprintf(buf, "playerno: %d '%s' %s - %s\n",
             *(unsigned char*)((char*)((int *)unit->player.get()) + 0x146),
@@ -599,22 +593,22 @@ int __stdcall DrawUnitStateProbe(void* surface)
                  || *(unsigned char*)((char*)((int *)unit->player.get()) + 0x73) == 2))
                 ? "LOCAL" : "REMOTE",
             *(unsigned char*)(((char *)unit->def.get()) + 0x22f) != 0 ? "MOBILE" : "BUILDING");
-    DrawString(surface, buf, 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
     y += lineH;
     sprintf(buf, "controller: %d\n", *(unsigned char*)((char*)((int *)unit->player.get()) + 0x73));
-    DrawString(surface, buf, 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
     y += lineH;
     sprintf(buf, "buildtimeleft: %1.3f\n", unit->buildLeft);
-    DrawString(surface, buf, 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
     y += lineH;
     sprintf(buf, "damage: %d\n", unit->health);
-    DrawString(surface, buf, 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
     y += lineH;
     names[0] = "NONE";
     names[1] = "GROUND";
     names[2] = "AIR";
     sprintf(buf, "occupy: %s\n", names[((int)unit->flags) & 3]);
-    DrawString(surface, buf, 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
     y += lineH;
     if (*((int *)unit->player.get()) != 0
         && (*(unsigned char*)((char*)((int *)unit->player.get()) + 0x73) == 1
@@ -623,10 +617,10 @@ int __stdcall DrawUnitStateProbe(void* surface)
                 (unit->f_1f & 0x10) ? 'X' : '-',
                 (unit->f_3b & 0x10) ? 'X' : '-',
                 (unit->f_57 & 0x10) ? 'X' : '-');
-        DrawString(surface, buf, 0x86, y, -1);
+        DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
         y += lineH;
         if (((void *)unit->list) != 0) {
-            DrawString(surface, "Mission Q:", 0x86, y, -1);
+            DrawString((Surface*)surface, (unsigned char*)"Mission Q:", 0x86, y, -1);
             y += lineH;
             for (m = reinterpret_cast<OrderQueueNode*>(unit->list.get()); m != 0;
                  m = m->next) {
@@ -638,12 +632,12 @@ int __stdcall DrawUnitStateProbe(void* surface)
                     sprintf(buf, "    '%s' state: %d\n",
                             ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state);
-                DrawString(surface, buf, 0x86, y, -1);
+                DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
                 y += lineH;
             }
         }
         if (((void *)unit->list2) != 0) {
-            DrawString(surface, "Background Mission Q:", 0x86, y, -1);
+            DrawString((Surface*)surface, (unsigned char*)"Background Mission Q:", 0x86, y, -1);
             y += lineH;
             for (m = reinterpret_cast<OrderQueueNode*>(unit->list2.get()); m != 0;
                  m = m->next) {
@@ -655,7 +649,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
                     sprintf(buf, "    '%s' state: %d\n",
                             ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state);
-                DrawString(surface, buf, 0x86, y, -1);
+                DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
                 y += lineH;
             }
         }
@@ -668,12 +662,12 @@ int __stdcall DrawUnitStateProbe(void* surface)
 void __stdcall DrawPercentBar(void* surface, Rect* rect, int percent)
 {
     unsigned char& color = g_game->colors[15];
-    DrawRectangle(surface, rect, color);
+    DrawRectangle((Surface*)surface, rect, color);
     if (percent >= 100)
         percent = 100;
     if (percent > 0) {
         rect->right = (rect->right - rect->left) * percent / 100 + rect->left;
-        FillRectangle(surface, rect, color);
+        FillRectangle((Surface*)surface, rect, color);
     }
 }
 
@@ -691,7 +685,7 @@ void __stdcall DrawNetworkStats(void* surface)
     int h = GetFontHeight();
     GetByteRates(&sent, &received);
     sprintf(buf, "Send - %1.1f K/s", sent * 0.001);
-    DrawString(surface, buf, r.left, r.top, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, r.left, r.top, -1);
     r.top += h;
     r.bottom = r.top + 8;
     DrawPercentBar(surface, &r, sent * 100 / 5600);
@@ -699,7 +693,7 @@ void __stdcall DrawNetworkStats(void* surface)
     r.right = 0xc1;
     r.top = r.bottom + 1;
     sprintf(buf, "Receive - %1.1f K/s", received * 0.001);
-    DrawString(surface, buf, r.left, r.top, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, r.left, r.top, -1);
     r.top += h;
     r.bottom = r.top + 8;
     DrawPercentBar(surface, &r, received * 100 / 5600);
@@ -708,11 +702,11 @@ void __stdcall DrawNetworkStats(void* surface)
 static void DrawProbeProbabilityBar(void* surface, Rect* rect, int percent)
 {
     unsigned char& color = g_game->colors[15];
-    DrawRectangle(surface, rect, color);
+    DrawRectangle((Surface*)surface, rect, color);
     percent = (percent >= 100) ? 100 : percent;
     if (percent > 0) {
         rect->right = (rect->right - rect->left) * percent / 100 + rect->left;
-        FillRectangle(surface, rect, color);
+        FillRectangle((Surface*)surface, rect, color);
     }
 }
 
@@ -744,15 +738,15 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
     FadeRectangle((Surface *)surface, &r, -0x18);
     r.right++;
     r.bottom++;
-    DrawRectangle(surface, &r, colors[5]);
+    DrawRectangle((Surface*)surface, &r, colors[5]);
     char buf[0x80];
     y += 3;
-    DrawString(surface, "Unit Builder Probe", 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)"Unit Builder Probe", 0x86, y, -1);
     y += lineHeight;
-    DrawString(surface, "==================", 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)"==================", 0x86, y, -1);
     y += lineHeight;
     sprintf(buf, "uid: %03d '%s'\n", unit->id, (char*)((BuilderProbeUnitDef *)unit->def.get()));
-    DrawString(surface, buf, 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
     y += lineHeight;
     char* mobile = (char*)(((BuilderProbeUnitDef *)unit->def.get())->mobile ? "MOBILE" : "BUILDING");
     char* remote;
@@ -761,17 +755,17 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
     else
         remote = "REMOTE";
     sprintf(buf, "playerno: %d '%s' %s - %s\n", ((BuilderProbePlayerInfo *)unit->player.get())->player, ((BuilderProbePlayerInfo *)unit->player.get())->name, remote, mobile);
-    DrawString(surface, buf, 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
     y += lineHeight;
     sprintf(buf, "controller: %d\n\n", ((BuilderProbePlayerInfo *)unit->player.get())->controller);
-    DrawString(surface, buf, 0x86, y, -1);
+    DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
     y += lineHeight;
     if (((BuilderProbePlayerInfo *)unit->player.get())->f_0 != 0 && (((BuilderProbePlayerInfo *)unit->player.get())->controller == 1 || ((BuilderProbePlayerInfo *)unit->player.get())->controller == 2)) {
         sprintf(buf, "Units I can build, and the probabilities:\n",
                 ((unit->f_1f & 0x10) ? 'X' : '-'),
                 ((unit->f_3b & 0x10) ? 'X' : '-'),
                 ((unit->f_57 & 0x10) ? 'X' : '-'));
-        DrawString(surface, buf, 0x86, y, -1);
+        DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
         int i = 0;
         y += lineHeight;
         if (((BuilderProbeUnitDef *)unit->def.get())->count > 0) {
@@ -787,7 +781,7 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
                 DrawProbeProbabilityBar(surface, &bar, prob);
                 char* name = def->name;
                 sprintf(buf, "       %3d %% - '%s'\n", prob, name);
-                DrawString(surface, buf, 0x86, y, -1);
+                DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
                 y += lineHeight;
                 i++;
             } while (i < ((BuilderProbeUnitDef *)unit->def.get())->count);
@@ -838,7 +832,7 @@ void __stdcall DrawStatusPanel(Surface* win)
     win->GetClipRect(&bounds);
     int left = bounds.left;
     int bottom = bounds.bottom + v;
-    DrawFrame(win, g_game->sprite, left, bottom);
+    DrawFrame(win, (GafFrame*)g_game->sprite, left, bottom);
     unsigned int tick = (unsigned int)g_game->ticks;
     int hours = tick / 108000;
     int rest = tick - hours * 108000;
@@ -922,23 +916,23 @@ static void DrawResourcePanel(Surface* ctx, Player* pl, Resources* res)
         }
     }
     sprintf(text, "%d", (int)res->metal);
-    DrawString(ctx, text, sideDef->energyNum.left, sideDef->energyNum.top, -1);
-    DrawString(ctx, "0", sideDef->energy0.left, sideDef->energy0.top, -1);
+    DrawString(ctx, (unsigned char*)text, sideDef->energyNum.left, sideDef->energyNum.top, -1);
+    DrawString(ctx, (unsigned char*)"0", sideDef->energy0.left, sideDef->energy0.top, -1);
     sprintf(text, "%d", (int)pl->energyCapacity);
-    int w = GetTextWidth((int)sideDef->font, (int)text);
-    DrawString(ctx, text, sideDef->energyMax.left - w, sideDef->energyMax.top, -1);
+    int w = GetTextWidth((Font*)sideDef->font, (unsigned char*)text);
+    DrawString(ctx, (unsigned char*)text, sideDef->energyMax.left - w, sideDef->energyMax.top, -1);
     if (res->metalIncome > 99999.0f)
         sprintf(text, "%dK", (int)res->metalIncome / 1000);
     else
         sprintf(text, "%d", (int)res->metalIncome);
     SetTextColors(pal[0xa], GetTextKeyColor());
-    DrawString(ctx, text, sideDef->energyProduced.left, sideDef->energyProduced.top, -1);
+    DrawString(ctx, (unsigned char*)text, sideDef->energyProduced.left, sideDef->energyProduced.top, -1);
     if (res->metalUse < -99999.0f)
         sprintf(text, "%dK", (int)res->metalUse / 1000);
     else
         sprintf(text, "%d", abs((int)res->metalUse));
     SetTextColors(pal[0xc], GetTextKeyColor());
-    DrawString(ctx, text, sideDef->energyConsumed.left, sideDef->energyConsumed.top, -1);
+    DrawString(ctx, (unsigned char*)text, sideDef->energyConsumed.left, sideDef->energyConsumed.top, -1);
     r = &sideDef->metalBar;
     bar = *r;
     if (pl->metalCapacity > 0.0f) {
@@ -953,17 +947,17 @@ static void DrawResourcePanel(Surface* ctx, Player* pl, Resources* res)
     }
     SetTextColors(pal[0xf], GetTextKeyColor());
     sprintf(text, "%d", (int)res->energy);
-    DrawString(ctx, text, sideDef->metalNum.left, sideDef->metalNum.top, -1);
-    DrawString(ctx, "0", sideDef->metal0.left, sideDef->metal0.top, -1);
+    DrawString(ctx, (unsigned char*)text, sideDef->metalNum.left, sideDef->metalNum.top, -1);
+    DrawString(ctx, (unsigned char*)"0", sideDef->metal0.left, sideDef->metal0.top, -1);
     sprintf(text, "%d", (int)pl->metalCapacity);
-    w = GetTextWidth((int)sideDef->font, (int)text);
-    DrawString(ctx, text, sideDef->metalMax.left - w, sideDef->metalMax.top, -1);
+    w = GetTextWidth((Font*)sideDef->font, (unsigned char*)text);
+    DrawString(ctx, (unsigned char*)text, sideDef->metalMax.left - w, sideDef->metalMax.top, -1);
     sprintf(text, "%.1f", res->energyIncome);
     SetTextColors(pal[0xa], GetTextKeyColor());
-    DrawString(ctx, text, sideDef->metalProduced.left, sideDef->metalProduced.top, -1);
+    DrawString(ctx, (unsigned char*)text, sideDef->metalProduced.left, sideDef->metalProduced.top, -1);
     sprintf(text, "%.1f", fabs(res->energyUse));
     SetTextColors(pal[0xc], GetTextKeyColor());
-    DrawString(ctx, text, sideDef->metalConsumed.left, sideDef->metalConsumed.top, -1);
+    DrawString(ctx, (unsigned char*)text, sideDef->metalConsumed.left, sideDef->metalConsumed.top, -1);
 }
 
 static inline int ShowSelectBox(int drawObjects)
@@ -973,7 +967,7 @@ static inline int ShowSelectBox(int drawObjects)
     if (g_game->inputFlags & 8)
         return 1;
     if ((char)g_game->orderMode == '\x0e')
-        return PointInRect((int)&g_game->rect, g_game->cursorScreenX, g_game->cursorScreenY) != 0;
+        return PointInRect((Rect*)&g_game->rect, g_game->cursorScreenX, g_game->cursorScreenY) != 0;
     return 0;
 }
 
@@ -997,21 +991,21 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
 
     cx = (g_game->width_37e1f + 0x80) / 2;
     cy = g_game->screenHeight / 2;
-    SetOffscreenSurface(g_game->screen);
+    SetOffscreenSurface((int)g_game->screen);
     ctx = **(Surface**)&g_game->screen;
     colors = &g_game->colors[0];
     HideSoftwareCursor();
     ctx.SetClipRect(g_game->rect);
     g_game->timers.AccumulateProfileTime(8);
-    DrawMapTiles((int)&ctx);
-    DrawMapDebugOverlay((int)&ctx);
+    DrawMapTiles((void*)&ctx);
+    DrawMapDebugOverlay((void*)&ctx);
     x = g_game->xWhole - g_game->scrollX + 0x80;
     y = g_game->zWhole - (g_game->yWhole >> 1) - g_game->scrollY + 0x20;
     if ((char)g_game->debugMode == '\x02') {
-        DrawLine((int)&ctx, x - 2, y, x + 2, y, colors[0xf]);
-        DrawLine((int)&ctx, x, y - 2, x, y + 2, colors[0xf]);
+        DrawLine((Surface*)&ctx, x - 2, y, x + 2, y, colors[0xf]);
+        DrawLine((Surface*)&ctx, x, y - 2, x, y + 2, colors[0xf]);
     }
-    ResetClipRect((int)&ctx);
+    ResetClipRect((int*)&ctx);
 
     {
         Player* pl = &g_game->players_1b63[g_game->playerIndex];
@@ -1028,10 +1022,10 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         static unsigned int s_incomesShownAt = ~0u;
         if (pl->displayTimer != s_incomesShownAt) {
             s_incomesShownAt = pl->displayTimer;
-            res.metalIncome = GetEnergyIncome((int)pl);
-            res.metalUse = GetEnergyUsage((int)pl);
-            res.energyIncome = GetMetalIncome((int)pl);
-            res.energyUse = GetMetalUsage((int)pl);
+            res.metalIncome = GetEnergyIncome((void*)pl);
+            res.metalUse = GetEnergyUsage((Player*)pl);
+            res.energyIncome = GetMetalIncome((void*)pl);
+            res.energyUse = GetMetalUsage((void*)pl);
         }
         if (memcmp((char*)&(*(Resources*)&g_game->a), &res, sizeof(res)) != 0) {
             (*(Resources*)&g_game->a) = res;
@@ -1039,7 +1033,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         }
     }
     DrawUnitInfoPanel(&ctx);
-    DrawRadar((int)&ctx);
+    DrawRadar((void*)&ctx);
     ctx.SetClipRect(g_game->rect);
     g_game->timers.AccumulateProfileTime(3);
 
@@ -1077,7 +1071,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         unsigned short* pIdx = g_game->list_1435f;
         k = 0;
         while (k < g_game->count_14367) {
-            Unit* unit = (Unit*)((int)g_game->units.get() + *pIdx * 0x118);
+            Unit* unit = (Unit*)((char*)g_game->units.get() + *pIdx * 0x118);
             int row = ((int)unit->zWhole - g_game->scrollY) / 16 + 0x10;
             if (row >= 0 && row < mv->rows) {
                 Unit*** pCur = (Unit***)&mv->cursor[row];
@@ -1090,9 +1084,9 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
             k++;
             pIdx++;
         }
-        DrawParticleList((int)&ctx, 0);
-        DrawParticleList((int)&ctx, 1);
-        DrawParticleList((int)&ctx, 2);
+        DrawParticleList((void*)&ctx, 0);
+        DrawParticleList((void*)&ctx, 1);
+        DrawParticleList((void*)&ctx, 2);
         y = y0;
         i = 0;
         while (i < h) {
@@ -1119,8 +1113,8 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
             i++;
             y++;
         }
-        DrawParticleList((int)&ctx, 3);
-        DrawParticleList((int)&ctx, 4);
+        DrawParticleList((void*)&ctx, 3);
+        DrawParticleList((void*)&ctx, 4);
         for (i = 0; i < h; i++) {
             int row = i + skip;
             y = y0 + i;
@@ -1132,7 +1126,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
                     if (u->selected)
                         DrawSelectionBox((Vec3*)&ctx, u);
                     if (u->script != 0)
-                        DrawUnit((int)&ctx, (int)u);
+                        DrawUnit((void*)&ctx, (UnitDrawView*)u);
                 }
             }
             Cell* tile = (Cell*)mv->tiles.get() + (y * mv->width + x0);
@@ -1150,12 +1144,12 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
             }
         }
     }
-    DrawParticleList((int)&ctx, 5);
+    DrawParticleList((void*)&ctx, 5);
     if (param_1 != 0) {
-        DrawParticleList((int)&ctx, 6);
-        DrawProjectiles((int)&ctx);
-        DrawExplosions((int)&ctx);
-        DrawParticleList((int)&ctx, 7);
+        DrawParticleList((void*)&ctx, 6);
+        DrawProjectiles((void*)&ctx);
+        DrawExplosions((void*)&ctx);
+        DrawParticleList((void*)&ctx, 7);
         for (i = 0; i < mv->rows; i++) {
             Unit** pUnit = (Unit**)mv->buf + mv->stride * i;
             k = 0;
@@ -1165,21 +1159,21 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
                     if (u->selected)
                         DrawSelectionBox((Vec3*)&ctx, u);
                     if (u->script != 0)
-                        DrawUnit((int)&ctx, (int)u);
+                        DrawUnit((void*)&ctx, (UnitDrawView*)u);
                 }
                 k++;
                 pUnit++;
             }
         }
     }
-    DrawParticleList((int)&ctx, 8);
+    DrawParticleList((void*)&ctx, 8);
     if (IsKeyDown(0xf9))
-        DrawSelectedUnitOrderOverlays((int)&ctx, (int)&(*(void**)&g_game->value_142f3));
+        DrawSelectedUnitOrderOverlays((void*)&ctx, (Unit**)&(*(void**)&g_game->value_142f3));
 
     if (param_1 != 0) {
         unsigned short* pIdx = g_game->list_1435f;
         for (k = 0; k < g_game->count_14367; k++, pIdx++) {
-            Unit* unit = (Unit*)((int)g_game->units.get() + *pIdx * 0x118);
+            Unit* unit = (Unit*)((char*)g_game->units.get() + *pIdx * 0x118);
             if ((g_game->visualFlagsByte & 1) || unit->group != 0) {
                 char str[2];
                 str[1] = 0;
@@ -1190,18 +1184,18 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
                         DrawHitPointBar(&ctx, unit, x, y + 10);
                     if ((char)unit->player->index == (char)idx && unit->group != 0) {
                         str[0] = (char)unit->group + '0';
-                        DrawString(&ctx, str, x, y + 0xe, -1);
+                        DrawString(&ctx, (unsigned char*)str, x, y + 0xe, -1);
                     }
                 }
             }
         }
-        DrawParticleList((int)&ctx, 9);
+        DrawParticleList((void*)&ctx, 9);
     }
     g_game->timers.AccumulateProfileTime(4);
     if ((g_game->endGameFlags & 1) && (g_game->endGameFlags & 2) && param_1 != 0)
-        DrawSelectedGoal((int)&ctx, FindNextSelectedUnit(0, 0));
+        DrawSelectedGoal((int)&ctx, (GoalDrawInterface***)(FindNextSelectedUnit(0, 0)));
     if (param_1 != 0)
-        DrawFogOfWar((int)&ctx);
+        DrawFogOfWar((void*)&ctx);
     g_game->timers.AccumulateProfileTime(5);
 
     if (ShowSelectBox(param_1)) {
@@ -1243,38 +1237,38 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     }
     if (g_game->net->GetGameType() == 3 ||
         g_game->net->GetGameType() == 2) {
-        ResetClipRect((int)&ctx);
-        DrawScorePanel((int)&ctx);
+        ResetClipRect((int*)&ctx);
+        DrawScorePanel((void*)&ctx);
         ctx.SetClipRect(g_game->rect);
     }
     DrawStatusPanel(&ctx);
     if (g_game->showBps != 0)
         DrawNetworkStats(&ctx);
     if (param_1 != 0)
-        DrawMessages((int)&ctx);
+        DrawMessages((void*)&ctx);
     if ((g_game->flagsByte_3923b & 2) && param_1 != 0) {
         SetTextColors(colors[0xf], GetTextKeyColor());
         SetFont(g_game->fontComix);
         int ty = GetFontHeight() * 3 - 10;
         sprintf(debugText, "FRATE: %d\n", GetFrameRate());
-        DrawString(&ctx, debugText, 0x83, ty, -1);
-        DrawString(&ctx, "[Release]", 0xbc, ty, -1);
+        DrawString(&ctx, (unsigned char*)debugText, 0x83, ty, -1);
+        DrawString(&ctx, (unsigned char*)"[Release]", 0xbc, ty, -1);
         sprintf(debugText, "MODE %s INFO %s", g_game->endGameFlags_3923b.b1 ? "DEBUG" : "NORMAL",
                 g_game->endGameFlags_3923b.b0 ? "ON" : "OFF");
-        DrawString(&ctx, debugText, 0x1ee, ty, -1);
+        DrawString(&ctx, (unsigned char*)debugText, 0x1ee, ty, -1);
         ty += GetFontHeight();
         if (g_game->netGameFlags & 1) {
-            FormatNetStats((int)debugText);
-            DrawString(&ctx, debugText, 0xbc, ty, -1);
+            FormatNetStats((char*)debugText);
+            DrawString(&ctx, (unsigned char*)debugText, 0xbc, ty, -1);
         }
     }
     if (g_game->pauseFlags & 1)
-        DrawFrame(&ctx, (short*)GetGafFrame((unsigned short*)g_game->igpaused, 0), cx, cy);
+        DrawFrame(&ctx, (GafFrame*)((short*)GetGafFrame((unsigned short*)g_game->igpaused, 0)), cx, cy);
     if ((g_game->players_1b63[g_game->localPlayer].info->flags_9b & 0x40) == 0) {
         if (g_game->bits.flag5)
-            DrawFrame(&ctx, (short*)GetGafFrame((unsigned short*)g_game->image_14813, 0), cx, cy);
+            DrawFrame(&ctx, (GafFrame*)((short*)GetGafFrame((unsigned short*)g_game->image_14813, 0)), cx, cy);
         if (g_game->bits.flag6)
-            DrawFrame(&ctx, (short*)GetGafFrame((unsigned short*)g_game->image_14817, 0), cx, cy);
+            DrawFrame(&ctx, (GafFrame*)((short*)GetGafFrame((unsigned short*)g_game->image_14817, 0)), cx, cy);
     }
     if (g_game->uiOptionFlags_37f2f.clock) {
         unsigned int ticks = (unsigned int)g_game->ticks;
@@ -1282,14 +1276,14 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         int rest = ticks - hours * 108000;
         int minutes = rest / 1800;
         int seconds = (rest - minutes * 1800) / 30;
-        sprintf(gameTime, "%s : %02d:%02d:%02d", (char*)Translate((int)"Game Time"), hours, minutes, seconds);
+        sprintf(gameTime, "%s : %02d:%02d:%02d", (char*)Translate((char*)"Game Time"), hours, minutes, seconds);
         SetTextColors(colors[0xf], GetTextKeyColor());
-        DrawString(&ctx, gameTime, 0x82, -0x22 - GetFontHeight() + GetScreenHeight(), -1);
+        DrawString(&ctx, (unsigned char*)gameTime, 0x82, -0x22 - GetFontHeight() + GetScreenHeight(), -1);
     }
     if (g_game->bits_38a51_3.lagging)
-        DrawFrame(&ctx, (short*)GetGafFrame((unsigned short*)g_game->cursorHourglass, 0), g_game->width_37e1f - 0x10, g_game->screenHeight - 0x50);
-    ResetClipRect((int)&ctx);
-    BlitMenuLayers((int)&g_game->gui, (int)&ctx, (int)&g_game->rect);
+        DrawFrame(&ctx, (GafFrame*)((short*)GetGafFrame((unsigned short*)g_game->cursorHourglass, 0)), g_game->width_37e1f - 0x10, g_game->screenHeight - 0x50);
+    ResetClipRect((int*)&ctx);
+    BlitMenuLayers((Gui*)&g_game->gui, (unsigned int*)&ctx, (int*)&g_game->rect);
     if (g_game->profileBarsEnabled != 0 && param_1 != 0) {
         DrawProfileBarLine((int)&ctx, "Network", 0);
         DrawProfileBarLine((int)&ctx, "Units", 1);
@@ -1301,7 +1295,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         DrawProfileBarLine((int)&ctx, "Weapon", 7);
         DrawProfileBarLine((int)&ctx, "Misc", 8);
     }
-    DrawOptionsScrollBar((int)&ctx);
+    DrawOptionsScrollBar((void*)&ctx);
     ShowSoftwareCursor();
     if (param_1 != 0 && param_2 != 0)
         FlipScreen();
@@ -1331,7 +1325,7 @@ void __stdcall DrawHitPointBar(void* surface, Unit* unit, int x, int y)
     r.top = y - 2;
     r.right = x + 17;
     r.bottom = y + 2;
-    FillRectangle(surface, &r, colors[0]);
+    FillRectangle((Surface*)surface, &r, colors[0]);
     int width;
     r.left++;
     r.top++;
@@ -1339,11 +1333,11 @@ void __stdcall DrawHitPointBar(void* surface, Unit* unit, int x, int y)
     width = unit->health * 32 / unit->def->maxHealth;
     r.right = r.left + width;
     if (unit->health > (int)(unit->def->maxHealth / 3) * 2)
-        FillRectangle(surface, &r, colors[10]);
+        FillRectangle((Surface*)surface, &r, colors[10]);
     else if (unit->health > (int)(unit->def->maxHealth / 3))
-        FillRectangle(surface, &r, colors[14]);
+        FillRectangle((Surface*)surface, &r, colors[14]);
     else
-        FillRectangle(surface, &r, colors[12]);
+        FillRectangle((Surface*)surface, &r, colors[12]);
 }
 
 // FUNCTION: 0x46a530
@@ -1353,7 +1347,7 @@ void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
     if (f->flag) {
         Vec3 lo;
         Vec3 hi;
-        GetObjectBounds(((Object3do **)g_game->types.get())[unit->unitDefIndex], &lo, &hi, 0);
+        GetObjectBounds((Object3doLoadView*)(((Object3do **)g_game->types.get())[unit->unitDefIndex]), &lo, &hi, 0);
         Vec3 corners[4];
         corners[0].x = lo.x;
         corners[0].y = lo.y;
@@ -1383,9 +1377,9 @@ static int DrawFlags()
 #define DrawFlip(flip, dest, frame, x, y) \
     do { \
         if (flip) \
-            DrawFrameBlended(dest, frame, x, y); \
+            DrawFrameBlended((Surface*)(dest), (GafFrame*)(frame), x, y); \
         else \
-            DrawFrame(dest, frame, x, y); \
+            DrawFrame((Surface*)(dest), (GafFrame*)(frame), x, y); \
     } while (0)
 
 // FUNCTION: 0x46a610
@@ -1403,12 +1397,12 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
         FeatureSpot* spot = &g_game->spots[cell->spot];
         if (f->drawn) {
             if ((spot->spotFlags & 4) && (DrawFlags() & 0x10)) {
-                short* frame = (short*)GetGafSequenceFrame(&spot->shadow);
-                DrawFrame(dest, frame, x, y);
+                short* frame = (short*)GetGafSequenceFrame((GafFrameCursor*)&spot->shadow);
+                DrawFrame((Surface*)dest, (GafFrame*)frame, x, y);
             }
             {
-                short* frame = (short*)GetGafSequenceFrame(&spot->anim);
-                DrawFrame(dest, frame, x, y);
+                short* frame = (short*)GetGafSequenceFrame((GafFrameCursor*)&spot->anim);
+                DrawFrame((Surface*)dest, (GafFrame*)frame, x, y);
             }
         } else {
             Unit* unit = g_game->unit;
@@ -1417,16 +1411,16 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
             st->unit = unit;
             unit->angles = spot->rot;
             unit->pos = spot->pos;
-            DrawUnit(dest, unit);
+            DrawUnit(dest, (UnitDrawView*)unit);
         }
     } else {
         if (f->over) {
             if (f->shadowTable && (DrawFlags() & 0x10)) {
-                short* frame = (short*)GetGafSequenceFrame(&f->shadowAnim);
+                short* frame = (short*)GetGafSequenceFrame((GafFrameCursor*)&f->shadowAnim);
                 DrawFlip(f->flipShadow, dest, frame, x, y);
             }
             if (f->animTable) {
-                short* frame = (short*)GetGafSequenceFrame(&f->anim);
+                short* frame = (short*)GetGafSequenceFrame((GafFrameCursor*)&f->anim);
                 DrawFlip(f->flipAnim, dest, frame, x, y);
             }
         } else {
@@ -1452,11 +1446,11 @@ static void DrawPanelBar(void* surface, Rect* bounds, int value, int maximum, in
     if (value > maximum)
         value = maximum;
     rect.right = rect.left + (bounds->right - bounds->left) * value / maximum;
-    FillRectangle(surface, &rect, palette[10]);
+    FillRectangle((Surface*)surface, &rect, palette[10]);
     if (rect.right != bounds->right) {
         rect.left = rect.right + 1;
         rect.right = bounds->right;
-        FillRectangle(surface, &rect, palette[4]);
+        FillRectangle((Surface*)surface, &rect, palette[4]);
     }
 }
 
@@ -1482,7 +1476,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             int dy = GetScreenHeight() - 0x20;
             unsigned short* icon = g_game->sidePanelBotSeq[idx];
             GafFrame* bmp = (GafFrame*)GetGafFrame(icon, 0);
-            DrawFrame(surface, (void*)bmp, (short)bmp->xOffset + y,
+            DrawFrame((Surface*)surface, (GafFrame*)((void*)bmp), (short)bmp->xOffset + y,
                          (short)bmp->yOffset + dy);
             y += bmp->width;
         } while (y < g_game->width_37e1f);
@@ -1492,32 +1486,32 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         int pfstate = g_game->screenHeight - GetFontHeight() - 1;
         sprintf(text, "PFSTATE %d, PFABLE %d\n", ((DisplayContextView *)g_game->displayContext)->flags & 1,
                 ((DisplayContextView *)g_game->displayContext)->haveBackBuffer);
-        DrawString(surface, text, 0x82, pfstate, -1);
+        DrawString((Surface*)surface, (unsigned char*)text, 0x82, pfstate, -1);
 
         if (g_game->hoverUnitId != 0) {
             int idx = g_game->hoverUnitId & 0xffff;
             Unit* unit = g_game->units.get() + idx;
             sprintf(text, "MOVEORD: %d FIREORD: %d\n", (unit->flags >> 0x12) & 3,
                     (unit->flags >> 0x14) & 3);
-            DrawString(surface, text, 0x108, pfstate, -1);
+            DrawString((Surface*)surface, (unsigned char*)text, 0x108, pfstate, -1);
         }
 
         sprintf(text, "DELTATIME: %d\n", g_game->frames_38a3b);
-        DrawString(surface, text, 0x190, pfstate, -1);
+        DrawString((Surface*)surface, (unsigned char*)text, 0x190, pfstate, -1);
 
         sprintf(text, "GAMETIME: %d\n", g_game->ticks);
-        DrawString(surface, text, 0x208, pfstate, -1);
+        DrawString((Surface*)surface, (unsigned char*)text, 0x208, pfstate, -1);
 
         pfstate -= 0x10;
         sprintf(text, "X: %d  Y: %d\n", g_game->scrollX, g_game->scrollY);
-        DrawString(surface, text, 0x82, pfstate, -1);
+        DrawString((Surface*)surface, (unsigned char*)text, 0x82, pfstate, -1);
 
         sprintf(text, "UNITS %d\\%d\n", g_game->f14353, g_game->count_14367);
-        DrawString(surface, text, 0x108, pfstate, -1);
+        DrawString((Surface*)surface, (unsigned char*)text, 0x108, pfstate, -1);
 
         sprintf(text, "PACKETS: %d %d %d\n", g_game->players[1].messages,
                 g_game->players[2].messages, g_game->players[3].messages);
-        DrawString(surface, text, 0x190, pfstate, -1);
+        DrawString((Surface*)surface, (unsigned char*)text, 0x190, pfstate, -1);
 
         int v = g_game->width;
         v *= (short)(unsigned short)g_game->y;
@@ -1525,7 +1519,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         unsigned char c = g_game->cells[v].height;
         sprintf(text, "XYH: %d %d %d\n", (short)(unsigned short)g_game->x,
                 (short)(unsigned short)g_game->y, c);
-        DrawString(surface, text, 0x208, pfstate, -1);
+        DrawString((Surface*)surface, (unsigned char*)text, 0x208, pfstate, -1);
         return;
     }
 
@@ -1563,7 +1557,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
 
         snapshot.targetType = 0;
         if (unit->playerIndex == g_game->playerIndex) {
-            Unit* result = (Unit*)GetOrderTarget(unit);
+            Unit* result = (Unit*)GetOrderTarget((int)unit);
             if (result != 0) {
                 snapshot.targetType = result->id;
                 snapshot.targetHealth = (unsigned short)result->health;
@@ -1592,7 +1586,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         int loopSide = loopInfo->side;
         unsigned short* icon = g_game->sidePanelBotSeq[loopSide];
         GafFrame* bmp = (GafFrame*)GetGafFrame(icon, 0);
-        DrawFrame(surface, (void*)bmp, (short)bmp->xOffset + y,
+        DrawFrame((Surface*)surface, (GafFrame*)((void*)bmp), (short)bmp->xOffset + y,
                      (short)bmp->yOffset + dy);
         y += bmp->width;
     } while (y < g_game->width_37e1f);
@@ -1606,9 +1600,9 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             if (_strcmpi(text, "CORBUILD") != 0) {
                 sprintf(text, "%s  M:%d E:%d", entry->name, (int)entry->metalCost,
                         (int)entry->energyCost);
-                DrawString(surface, text, panel->nameBlock.left,
+                DrawString((Surface*)surface, (unsigned char*)text, panel->nameBlock.left,
                              panel->nameBlock.top + yOffset, -1);
-                DrawString(surface, entry->description, panel->description.left,
+                DrawString((Surface*)surface, (unsigned char*)entry->description, panel->description.left,
                              panel->description.top + yOffset, -1);
                 return;
             }
@@ -1627,9 +1621,9 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                 else
                     strcpy(text, (char*)unit->def.get());
                 int titleX = panel->unitName.left -
-                             GetTextWidth((int)panel->font, (int)text) / 2;
+                             GetTextWidth((Font*)panel->font, (unsigned char*)text) / 2;
                 SetTextColors(0x53, GetTextKeyColor());
-                DrawString(surface, text, titleX, yOffset + panel->unitName.top, -1);
+                DrawString((Surface*)surface, (unsigned char*)text, titleX, yOffset + panel->unitName.top, -1);
                 if (unit->player->index == g_game->playerIndex ||
                     !(unit->def->flags1 & 0x4000)) {
                     int maximum = unit->def->maxHealth;
@@ -1643,17 +1637,17 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     char killsText[100];
                     SetTextColors((unsigned char)palette[10], GetTextKeyColor());
                     sprintf(amount, "+%.1f", PositiveOrZero(snapshot.values[3]));
-                    DrawString(surface, amount, panel->unitMetalMake.left,
+                    DrawString((Surface*)surface, (unsigned char*)amount, panel->unitMetalMake.left,
                                  panel->unitMetalMake.top + yOffset, -1);
                     sprintf(amount, "+%.0f", PositiveOrZero(snapshot.values[1]));
-                    DrawString(surface, amount, panel->unitEnergyMake.left,
+                    DrawString((Surface*)surface, (unsigned char*)amount, panel->unitEnergyMake.left,
                                  panel->unitEnergyMake.top + yOffset, -1);
                     SetTextColors((unsigned char)palette[12], GetTextKeyColor());
                     sprintf(amount, "-%.1f", PositiveOrZero(snapshot.values[2]));
-                    DrawString(surface, amount, panel->unitMetalUse.left,
+                    DrawString((Surface*)surface, (unsigned char*)amount, panel->unitMetalUse.left,
                                  panel->unitMetalUse.top + yOffset, -1);
                     sprintf(amount, "-%.0f", PositiveOrZero(snapshot.values[0]));
-                    DrawString(surface, amount, panel->unitEnergyUse.left,
+                    DrawString((Surface*)surface, (unsigned char*)amount, panel->unitEnergyUse.left,
                                  panel->unitEnergyUse.top + yOffset, -1);
                     if ((unit->flags & 0x80000000) && unit->killCount) {
                         int killsY = panel->damageBar.bottom + yOffset + 2, killsX = panel->damageBar.left;
@@ -1667,14 +1661,14 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                             sprintf(killsText, "%d %s", unit->killCount,
                                     unit->killCount == 1 ? singular : plural);
                         SetTextColors(g_game->colors[15], GetTextKeyColor());
-                        DrawString(surface, killsText, killsX, killsY, -1);
+                        DrawString((Surface*)surface, (unsigned char*)killsText, killsX, killsY, -1);
                     }
                     if (snapshot.orderName) {
                         strcpy(amount, Translate((char*)snapshot.orderName));
                         int orderX = panel->missionText.left -
-                                     GetTextWidth((int)panel->font, (int)amount) / 2;
+                                     GetTextWidth((Font*)panel->font, (unsigned char*)amount) / 2;
                         SetTextColors(0x53, GetTextKeyColor());
-                        DrawString(surface, amount, orderX, panel->missionText.top + yOffset, -1);
+                        DrawString((Surface*)surface, (unsigned char*)amount, orderX, panel->missionText.top + yOffset, -1);
                     }
                 }
                 int progress = GetBuildWeaponPercent(unit);
@@ -1683,9 +1677,9 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                         return;
                     char* weaponText = Translate("Weapon");
                     int progressX = panel->unitName2.left -
-                                    GetTextWidth((int)panel->font, (int)weaponText) / 2;
+                                    GetTextWidth((Font*)panel->font, (unsigned char*)weaponText) / 2;
                     SetTextColors(0x53, GetTextKeyColor());
-                    DrawString(surface, weaponText, progressX, panel->unitName2.top + yOffset, -1);
+                    DrawString((Surface*)surface, (unsigned char*)weaponText, progressX, panel->unitName2.top + yOffset, -1);
                     DrawPanelBar(surface, &panel->damageBar2, progress, 100, yOffset,
                                      (unsigned char*)palette);
                     return;
@@ -1695,9 +1689,9 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     if (!target->unitDefIndex || !IsUnitVisibleToPlayer(playerMap, target))
                         return;
                     int targetX = panel->unitName2.left -
-                                  GetTextWidth((int)panel->font, (int)(char*)target->def.get()) / 2;
+                                  GetTextWidth((Font*)panel->font, (unsigned char*)(char*)target->def.get()) / 2;
                     SetTextColors(0x53, GetTextKeyColor());
-                    DrawString(surface, (char*)target->def.get(), targetX,
+                    DrawString((Surface*)surface, (unsigned char*)((char*)target->def.get()), targetX,
                                  panel->unitName2.top + yOffset, -1);
                     if (target->player->index == g_game->playerIndex ||
                         !(target->def->flags1 & 0x4000)) {
@@ -1710,10 +1704,10 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                 char* prefix = (char*)(((unsigned char)(unit->flags >> 9) & 1) != 0 ? "S: " : "R: ");
                 char* s = Translate("Unidentified object");
                 sprintf(text, "%s%s", prefix, s);
-                int w = GetTextWidth((int)panel->font, (int)text);
+                int w = GetTextWidth((Font*)panel->font, (unsigned char*)text);
                 int x = panel->unitName.left - w / 2;
                 SetTextColors(0x53, GetTextKeyColor());
-                DrawString(surface, text, x, panel->unitName.top + yOffset, -1);
+                DrawString((Surface*)surface, (unsigned char*)text, x, panel->unitName.top + yOffset, -1);
                 return;
             }
         }
@@ -1736,7 +1730,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             else
                 strcpy(text, Translate(name));
             SetTextColors(0x53, GetTextKeyColor());
-            DrawString(surface, text, panel->nameBlock.left, panel->nameBlock.top + yOffset, -1);
+            DrawString((Surface*)surface, (unsigned char*)text, panel->nameBlock.left, panel->nameBlock.top + yOffset, -1);
         }
     }
 }
@@ -1752,9 +1746,9 @@ void __stdcall DrawProfileBarLine(int surface, const char* text, int index)
     rect.right = 0x27f;
     rect.top = 0x26;
     rect.bottom = c * 9 + 0x29;
-    DrawRectangle(surface, &rect, 0xff);
+    DrawRectangle((Surface*)surface, &rect, 0xff);
 
-    DrawString(surface, text, x + 5, c * index + 0x28, -1);
+    DrawString((Surface*)surface, (unsigned char*)text, x + 5, c * index + 0x28, -1);
 
     int w = g_game->values[index] * 100 / g_game->total * 2;
     rect.left = x - w;
@@ -1762,14 +1756,14 @@ void __stdcall DrawProfileBarLine(int surface, const char* text, int index)
     rect.bottom = c * index + 0x28;
     rect.top = rect.bottom;
     rect.bottom = rect.bottom + c;
-    FillRectangle(surface, &rect, index + 1);
+    FillRectangle((Surface*)surface, &rect, index + 1);
 }
 
 // FUNCTION: 0x46b9d0
 void __stdcall DrawMapTileSelectionOutline(void* surface, short* pos, TileOutlineSize size, int kind)
 {
     unsigned char* colors = (unsigned char*)g_game + 0xdcb;
-    int h = GetCellHeight(pos);
+    int h = GetCellHeight((Point16*)pos);
     int y1 = (pos[1] << 4) - g_game->scrollY;
     int x1 = ((pos[0] + 8) << 4) - g_game->scrollX;
     Rect rect;
@@ -1783,7 +1777,7 @@ void __stdcall DrawMapTileSelectionOutline(void* surface, short* pos, TileOutlin
         rect.right--;
         rect.bottom--;
     }
-    DrawRectangle(surface, &rect, colors[kind]);
+    DrawRectangle((Surface*)surface, &rect, colors[kind]);
 }
 
 // FUNCTION: 0x46ba80
@@ -1791,10 +1785,10 @@ void __stdcall DrawClosedPolygon(void* surface, Point* points, int count, int co
 {
     Point* p = points;
     for (int i = count - 1; i > 0; i--) {
-        DrawLine(surface, p[0].x, p[0].y, p[1].x, p[1].y, color);
+        DrawLine((Surface*)surface, p[0].x, p[0].y, p[1].x, p[1].y, color);
         p++;
     }
-    DrawLine(surface, points->x, points->y, p->x, p->y, color);
+    DrawLine((Surface*)surface, points->x, points->y, p->x, p->y, color);
 }
 
 
@@ -1833,13 +1827,13 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
             if (e->count == 4) {
                 void* tex;
                 if (e->texIndexed)
-                    tex = (void*)GetGafSequenceFrame((short*)((char*)e + 0x10));
+                    tex = (void*)GetGafSequenceFrame((GafFrameCursor*)((short*)((char*)e + 0x10)));
                 else
                     tex = (void*)e->pic;
-                DrawFrameQuad(surface, tex, (Point *)g_game->assemPoints, 0);
+                DrawFrameQuad(surface, (GafFrame*)tex, (FrameQuad*)((Point *)g_game->assemPoints), 0);
             }
         } else {
-            FillPolygon(surface, (Point *)g_game->assemPoints, e->count, e->colorIndex);
+            FillPolygon((Surface*)surface, (Point *)g_game->assemPoints, e->count, e->colorIndex);
         }
     }
 }

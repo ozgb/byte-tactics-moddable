@@ -120,7 +120,6 @@ int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3*
 void WriteScreenshot(char*, char*, int, int, int, int);
 int ScanDirectory(char*, char*, char*, int, int, int);
 int __stdcall GroundPickupOrder(Unit* unit, Order* order, int flags);
-int __stdcall GetOrderTarget(int param_1);
 
 
 // FUNCTION: 0x401c20

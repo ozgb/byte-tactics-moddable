@@ -3,6 +3,8 @@
 
 #include "../../interfaces/rand_stream.h"
 struct Player;
+
+struct Player;
 struct Unit;
 
 struct ContinueWatchingDialog;
@@ -36,5 +38,8 @@ float __stdcall GetNetMetal(NetMetalSource*);
 
 int __stdcall IsFootprintVisible(Player* player, int x, int y, int dx, int dy, short size);
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* u);
+
+float __stdcall GetEnergyUsage(Player*);
+float __stdcall GetMetalUsage(void*);
 
 #endif

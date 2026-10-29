@@ -59,4 +59,6 @@ int __stdcall SpawnProjectileFromUnitMotion(MotionFireSlotView* shot, Unit* unit
 int __stdcall FireWeaponByFlags(FireByFlagsSlotView* obj, int a, int b, int d, int c);
 Projectile* __stdcall FindRemoteProjectile(RemoteFireEventView* ev);
 
+void __stdcall DrawProjectiles(void* surface);
+
 #endif

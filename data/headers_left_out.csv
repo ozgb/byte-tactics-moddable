@@ -49,8 +49,6 @@ DPAID_ServiceProvider,mismatch,variable declared with a view type that differs f
 DamageUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DeleteOrder,mismatch,pointer/int cast: definition's type is likely wrong
 DrawButton,mismatch,fixing it changes the generated code of a caller
-DrawExplosions,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawFogOfWar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawFrameBlended,mismatch,pointer/int cast: definition's type is likely wrong
 DrawFrameQuad,mismatch,placeholder type Quad_004c7580: left for the type-naming issues
@@ -59,22 +57,12 @@ DrawLine,mismatch,"static risk rule: a convention, parameter count, or non-point
 DrawLineGadget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawListboxFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawLitRectangle,mismatch,pointer/int cast: definition's type is likely wrong
-DrawMapDebugOverlay,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawMapTileSelectionOutline,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawMapTiles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawMessages,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawModel3doProjected,mismatch,placeholder type Object_0046bae0: left for the type-naming issues
-DrawOptionsScrollBar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawParticleList,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawProgressBar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawProjectiles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawRadar,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawRaisedBox,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawRangeCircle,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawRectangle,mismatch,pointer/int cast: definition's type is likely wrong
-DrawScorePanel,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawSelectedGoal,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-DrawSelectedUnitOrderOverlays,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawSliderBar,mismatch,placeholder type Object_004a2580: left for the type-naming issues
 DrawString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawSurface,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
@@ -120,7 +108,6 @@ FireVLaunchProjectile,mismatch,fixing it changes the generated code of a caller
 FireVLaunchWeapon,mismatch,placeholder type Object_0049db70: left for the type-naming issues
 FlipScreen,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FontHeight,mismatch,pointer/int cast: definition's type is likely wrong
-FormatNetStats,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FrameFromSurface,mismatch,placeholder type Src_004b8ae0: left for the type-naming issues
 FreeBlinkWords,mismatch,pointer/int cast: definition's type is likely wrong
 FreeCobScript,mismatch,pointer/int cast: definition's type is likely wrong
@@ -130,12 +117,10 @@ GameAllocThunk,mismatch,"static risk rule: a convention, parameter count, or non
 GameReallocTagged,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetButtonStage,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 GetButtonStageByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
-GetCellHeight,mismatch,placeholder type Point16_00485010: left for the type-naming issues
 GetCobChecksum,mismatch,pointer/int cast: definition's type is likely wrong
 GetDisplay,mismatch,pointer/int cast: definition's type is likely wrong
 GetDisplayModes,mismatch,placeholder type ModeList_004b5330: left for the type-naming issues
 GetEnergyIncome,mismatch,pointer/int cast: definition's type is likely wrong
-GetEnergyUsage,mismatch,pointer/int cast: definition's type is likely wrong
 GetFactoriesInRadius,skip,qualified name std::vector
 GetGadgetActiveByName,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 GetGadgetStatus,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
@@ -148,11 +133,9 @@ GetHeadingBetween,mismatch,"static risk rule: a convention, parameter count, or 
 GetHostDpid,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetLocalizedString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetMetalIncome,mismatch,pointer/int cast: definition's type is likely wrong
-GetMetalUsage,mismatch,pointer/int cast: definition's type is likely wrong
 GetObjectBounds,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
 GetObjectHeight,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
 GetOrderCursor,ambiguous,several definitions share the name
-GetOrderTarget,mismatch,pointer/int cast: definition's type is likely wrong
 GetPieceAngles,mismatch,placeholder type Obj_0043e180: left for the type-naming issues
 GetPieceOffset,mismatch,placeholder type Object_0043def0: left for the type-naming issues
 GetSessionGuidInstance,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"

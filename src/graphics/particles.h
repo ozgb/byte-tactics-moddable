@@ -30,4 +30,6 @@ void __stdcall EmitReverseNanoParticles(NanoTargetBounds* targetBounds, Vec3* or
 
 void __stdcall EmitTeleportParticles(Vec3* posA, Vec3* posB, int lifetime, short index);
 
+void __stdcall DrawParticleList(void* msg, short kind);
+
 #endif

@@ -35,4 +35,6 @@ int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int);
 
 int __stdcall CompareOrderTypeNames(const OrderTableEntry& a, const OrderTableEntry& b);
 
+int __stdcall GetOrderTarget(int);
+
 #endif

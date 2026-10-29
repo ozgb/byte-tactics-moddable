@@ -132,7 +132,6 @@ struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
 #include "../../interfaces/seams.h"
-void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
 #include "order_queue.h"
 #include "order_queue.h"
 #include "../graphics/particles.h"
@@ -1505,8 +1504,6 @@ struct Feature;
 #pragma pack(pop)
 
 
-
-void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
 
 // FUNCTION: 0x412710
 int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)

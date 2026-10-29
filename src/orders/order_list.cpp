@@ -214,7 +214,6 @@ int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
-void __stdcall AddOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7);
 int __stdcall FindWeaponTarget(Unit* unit, int a, int b);
 void RegisterUnitOrders();
 extern int DAT_0051234c;
@@ -632,10 +631,10 @@ static inline void AddFront(Unit* owner, Order* node)
 }
 
 // FUNCTION: 0x43adc0
-void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id,
+void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target,
                             Vec3* pos, int param_6, int param_7)
 {
-    Order* obj = new (kSim) Order(kind, (Unit*)id, pos, param_6, param_7, 0);
+    Order* obj = new (kSim) Order(kind.index, target, pos, param_6, param_7, 0);
 
     if (remove == 0 && !(obj->flags_42 & 0x40))
         PruneLoose(&owner->list, owner->list);
@@ -740,7 +739,7 @@ void __stdcall IssueOrCancelOrder(unsigned char kind, int remove, Unit* owner, i
             }
         }
     }
-    AddOrder(kind, remove, owner, id, pos, param_6, param_7);
+    AddOrder(MissionType(kind), remove, owner, (Unit*)id, (Vec3*)pos, param_6, param_7);
 }
 
 // FUNCTION: 0x43b0b0
@@ -759,7 +758,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
             node->count += amount;
             return;
         }
-        AddOrder((unsigned char)kind, 1, owner, 0, 0, id, amount);
+        AddOrder(MissionType((unsigned char)kind), 1, owner, 0, 0, id, amount);
         return;
     }
     for (;;) {

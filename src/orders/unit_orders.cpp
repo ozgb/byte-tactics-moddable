@@ -106,8 +106,6 @@ struct FixedPosView;
 #include "order_queue.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
                            int a, int b, int c);
-void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* id, void* pos,
-                        int typeId, int amount);
 #include "../graphics/particles.h"
 char* __stdcall lstrcpynA(char* dest, const char* src, int count);
 int DrawWrappedText(char*, char*, int, int, int, int, int);

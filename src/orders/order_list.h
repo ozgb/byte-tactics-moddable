@@ -1,5 +1,9 @@
 #ifndef ORDER_LIST_H
 #define ORDER_LIST_H
+class MissionType;
+struct Unit;
+struct Vec3;
+
 struct OrderTableEntry;
 
 struct Unit;
@@ -36,5 +40,7 @@ int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int);
 int __stdcall CompareOrderTypeNames(const OrderTableEntry& a, const OrderTableEntry& b);
 
 int __stdcall GetOrderTarget(int);
+
+void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target, Vec3* pos, int, int);
 
 #endif

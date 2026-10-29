@@ -5,7 +5,6 @@ AddButtonGadget,mismatch,"definition type not nameable in a header, or no clean 
 AddExplosionEffect,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 AddHotspotGadget,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 AddMessage,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-AddOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AddTextGadget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AddTimer,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AdjustBuildCount,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

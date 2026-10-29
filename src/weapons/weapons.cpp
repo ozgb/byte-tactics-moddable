@@ -1931,7 +1931,6 @@ char* __stdcall FindWeaponByName(char* name)
 
 void DrawTriangleContours(void*, int, int, int, int, int, int);
 void DrawRangeCircle(void*, void*, void*, int, int, const char*, int);
-void AddOrder(int, int, void*, void*, void*, int, int);
 void IssueOrCancelOrder(unsigned char, int, void*, int, int*, int, int);
 int SendScriptCall(void*, short, char, int, int, int, int);
 void AddTextGadget(void*, char*, char*, int, short, int, int);

@@ -129,8 +129,6 @@ public:
 #include "../../link/globals.h"
 
 #include "../util/math.h"
-int __cdecl ScaledSin(short, int);
-int __cdecl ScaledCos(short, int);
 short __cdecl AngleOfVector(int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 #include "order_list.h"

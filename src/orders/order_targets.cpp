@@ -26,8 +26,7 @@ typedef std::vector<Point16> RingApproachCellVector;
 
 unsigned short __stdcall GetHeadingBetween(void* from, void* to);
 
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
+#include "../util/math.h"
 
 #pragma pack(push, 1)
 #include "../units/unit_def.h"

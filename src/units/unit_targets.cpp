@@ -318,8 +318,7 @@ struct UnitDamagePacket {
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
 #include "../ingame/game_dialogs.h"
-int __cdecl ScaledCos(unsigned short idx, int scale);
-int __cdecl ScaledSin(short idx, int scale);
+#include "../util/math.h"
 
 // FUNCTION: 0x489ce0
 void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
@@ -384,8 +383,8 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
             unit->health = 0;
         }
         if (ev->damageKind == 1) {
-            int a = ScaledCos(ev->headingByte << 8, 400);
-            int b = ScaledSin(ev->headingByte << 8, 400);
+            int a = ScaledCos((unsigned short)(ev->headingByte << 8), 400);
+            int b = ScaledSin((short)(ev->headingByte << 8), 400);
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), s_HitByWeapon_00508d74, 0, 0, 2, a, b, 0, 0);
             int pct = unit->health * 100 / unit->def->maxHealth;
             if (pct < 0)
@@ -626,7 +625,7 @@ void __stdcall AlignUnitToGround(Unit* u)
                 int mm = 2 - (int)((((__int64)w * 2) >> 16));
                 unsigned int n = g_game->ticks - o->age;
                 mm -= (unsigned int)(mm * (n < 60 ? n : 60)) / 60;
-                hs[k].h = ScaledCos(p, mm) + hs[k].h;
+                hs[k].h = ScaledCos((unsigned short)p, mm) + hs[k].h;
             } else {
                 hs[k].h = H0 + ((H1 - H0) * fz) / 16;
             }

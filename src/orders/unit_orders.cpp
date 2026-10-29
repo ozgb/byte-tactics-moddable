@@ -100,7 +100,6 @@ inline int Order::Advance(int distance) {
 
 void __stdcall RegisterOrderTypes(void* table, int id);
 #include "order_list.h"
-#include "../util/math.h"
 struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
@@ -799,8 +798,7 @@ static const float kZeroFloatOrders = 0.0f;
 
 
 void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
-int __cdecl ScaledSin(int angle, int distance);
-int __cdecl ScaledCos(int angle, int distance);
+#include "../util/math.h"
 
 // FUNCTION: 0x4034a0
 int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
@@ -1879,8 +1877,6 @@ struct Player;
 struct Unit;
 struct Order;
 
-int __cdecl ScaledSin(short, int);
-int __cdecl ScaledCos(short, int);
 struct Feature;
 // FUNCTION: 0x406300
 int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)

@@ -190,7 +190,6 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 #include "../ai/ai_search_goal.h"
 #include "unit_motion.h"
 #pragma pack(pop)
-#include "../util/math.h"
 #include "unit_orders.h"
 #include "order_list.h"
 
@@ -208,8 +207,7 @@ extern int __cdecl _strcmpi(const char*, const char*);
 void __stdcall DrawUnitRangeRings(void* a, void* b, Order* e, Vec3* p, int c);
 extern OrderTableEntry g_readyOrder[];
 extern signed char g_slopeSpeedFactor[];
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
+#include "../util/math.h"
 void __cdecl RotatePoint2D(short angle, int* xz);
 int __cdecl AngleOfVector(int x, int z);
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
@@ -1240,9 +1238,9 @@ static inline void AddFixed(int& v, float f)
 static inline Vec3 Offset(short angle, int distance)
 {
     Vec3 v;
-    v.x = -ScaledSin(angle, distance);
+    v.x = -ScaledSin((short)angle, distance);
     v.y = 0;
-    v.z = -ScaledCos(angle, distance);
+    v.z = -ScaledCos((short)angle, distance);
     return v;
 }
 
@@ -1282,9 +1280,9 @@ void UnitMotion::UpdateVelocityFromHeading(Unit* unit, int amount)
     int dist = speed;
     unsigned short angle = unit->angles.heading;
     Vec3 v;
-    v.x = -ScaledSin(angle, dist);
+    v.x = -ScaledSin((short)angle, dist);
     v.y = 0;
-    v.z = -ScaledCos(angle, dist);
+    v.z = -ScaledCos((short)angle, dist);
     velocity = v;
 }
 
@@ -1561,9 +1559,9 @@ void UnitMotion::UpdatePosition(Unit* u)
             speed = half;
             unsigned short angle = u->angles.heading;
             Vec3 vec;
-            vec.x = -ScaledSin(angle, half);
+            vec.x = -ScaledSin((short)angle, half);
             vec.y = 0;
-            int z = -ScaledCos(angle, half);
+            int z = -ScaledCos((short)angle, half);
             vec.z = z;
             velocity = vec;
         }

@@ -216,14 +216,10 @@ void __stdcall RegisterCommand(const char* name, AiCommandFn fn, int flags);
 #include "../state/sim_globals.h"
 #include "../util/file_printf.h"
 #include "../orders/unit_orders.h"
-#include "../util/math.h"
 #include "../sound/sound.h"
 #include "../units/squads.h"
 void __stdcall GetBasePosition(int index, Vec3* out);
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
-int __cdecl ScaledSin(int angle, int distance);
-int __cdecl ScaledCos(int angle, int distance);
+#include "../util/math.h"
 #include "pathfind.h"
 void __stdcall PopHeapFirst(KeyedCell* first, KeyedCell* last, KeyedCell* dest,
                             KeyedCell val, int*);

@@ -37,9 +37,16 @@ The modern build compiles every file under `src/` with clang-cl for
 sudo dnf install clang lld llvm cmake ninja-build      # Fedora
 cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake
 cmake --build build/modern
+cmake --build build/modern --target wasm_runtime
 WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe \
     --testmode reference/scenarios/skirmish2.txt --game-dir ~/.ta
 ```
+
+The `wasm_runtime` target builds what the exe loads at start-up, since wind
+and meteors run in WASM by default: `wasmtime_host.dll` (needs cargo with the
+`i686-pc-windows-gnu` target and `i686-w64-mingw32-gcc`), `wind_meteors.wasm`
+and `modules.json`, copied beside `TotalA.exe`. Without them the game stops at
+start-up naming the missing file; `-modules=native` runs without them.
 
 Every play-test run is private: its own Xvfb display, Wine prefix, game copy
 and audio sink. The `mp` scenario (two instances, DirectPlay over TCP/IP) also

@@ -542,7 +542,7 @@ void HandleGameKey(void)
             }
         }
         if (found == 0)
-            IssueOrderToSelection((OrderTypeEntry*)g_game->orders_2c76, 0, order, 0, 0, 0);
+            IssueOrderToSelection((OrderTypeEntry*)g_game->orders_2c76, 0, order, nullptr, 0, 0);
         break;
     }
 

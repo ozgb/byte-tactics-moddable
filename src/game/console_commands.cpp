@@ -226,7 +226,7 @@ void __stdcall CmdAssign(CommandArgs* args)
     if (kind.index) {
         int a = args->GetIntArg(1, 0);
         int b = args->GetIntArg(2, 0);
-        IssueOrderToSelection((OrderTypeEntry*)g_game->orders_2c76, 0, kind, 0, a, b);
+        IssueOrderToSelection((OrderTypeEntry*)g_game->orders_2c76, 0, kind, nullptr, a, b);
     }
 }
 

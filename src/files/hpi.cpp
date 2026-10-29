@@ -33,7 +33,7 @@ struct HapiHeader {
     unsigned char version[4];
     unsigned int size;
     unsigned char obfuscate;
-    char unknown_d[3];
+    char reserved[3];
     union {
         int listOffset;
         ArchiveDirectory* list;
@@ -1209,9 +1209,9 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
             k = ~t;
         }
         h->obfuscate = k;
-        h->unknown_d[0] = 0;
-        h->unknown_d[1] = 0;
-        h->unknown_d[2] = 0;
+        h->reserved[0] = 0;
+        h->reserved[1] = 0;
+        h->reserved[2] = 0;
         h->listOffset = off;
     }
 

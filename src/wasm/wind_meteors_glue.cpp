@@ -64,6 +64,16 @@ const char* NativeOf(const char* import, unsigned handle, void** native)
     return nullptr;
 }
 
+const char* LiveOf(const char* import, unsigned handle, void** native)
+{
+    const char* error = NativeOf(import, handle, native);
+    if (error == nullptr && *native == nullptr) {
+        sprintf(s_error, "import %s: null handle", import);
+        return s_error;
+    }
+    return error;
+}
+
 const char* FileToNative(const char* import, TdfFile* file)
 {
     void* root;
@@ -189,7 +199,7 @@ IMPORT(TdfRecordGetFieldIntImport)
     (void)user;
     NEED("TdfRecord_GetFieldInt", 1);
     void* record;
-    const char* error = NativeOf("TdfRecord_GetFieldInt", (unsigned)a[0].i32, &record);
+    const char* error = LiveOf("TdfRecord_GetFieldInt", (unsigned)a[0].i32, &record);
     if (error != nullptr)
         return error;
     a[0].i32 = ((TdfRecord*)record)->GetFieldInt((const char*)Linear(a[1].i32), a[2].i32);
@@ -201,7 +211,7 @@ IMPORT(TdfRecordGetFieldDoubleImport)
     (void)user;
     NEED("TdfRecord_GetFieldDouble", 1);
     void* record;
-    const char* error = NativeOf("TdfRecord_GetFieldDouble", (unsigned)a[0].i32, &record);
+    const char* error = LiveOf("TdfRecord_GetFieldDouble", (unsigned)a[0].i32, &record);
     if (error != nullptr)
         return error;
     a[0].f64 = ((TdfRecord*)record)->GetFieldDouble((const char*)Linear(a[1].i32), a[2].f64);
@@ -215,7 +225,7 @@ IMPORT(TdfRecordGetFieldStringImport)
     NEED("TdfRecord_GetFieldString", 2);
     NEED("TdfRecord_GetFieldString", 4);
     void* record;
-    const char* error = NativeOf("TdfRecord_GetFieldString", (unsigned)a[0].i32, &record);
+    const char* error = LiveOf("TdfRecord_GetFieldString", (unsigned)a[0].i32, &record);
     if (error != nullptr)
         return error;
     a[0].i32 = ((TdfRecord*)record)->GetFieldString((char*)Linear(a[1].i32), (char*)Linear(a[2].i32), (size_t)(unsigned)a[3].i32, (char*)Linear(a[4].i32));
@@ -235,7 +245,7 @@ IMPORT(HapiBankOpenAccountImport)
     (void)user;
     NEED("HapiBank_OpenAccount", 1);
     void* bank;
-    const char* error = NativeOf("HapiBank_OpenAccount", (unsigned)a[0].i32, &bank);
+    const char* error = LiveOf("HapiBank_OpenAccount", (unsigned)a[0].i32, &bank);
     if (error != nullptr)
         return error;
     a[0].i32 = ((HapiBank*)bank)->OpenAccount((char*)Linear(a[1].i32));
@@ -247,7 +257,7 @@ IMPORT(HapiBankSetIntegerItemImport)
     (void)user;
     NEED("HapiBank_SetIntegerItem", 1);
     void* bank;
-    const char* error = NativeOf("HapiBank_SetIntegerItem", (unsigned)a[0].i32, &bank);
+    const char* error = LiveOf("HapiBank_SetIntegerItem", (unsigned)a[0].i32, &bank);
     if (error != nullptr)
         return error;
     a[0].i32 = ((HapiBank*)bank)->SetIntegerItem((const char*)Linear(a[1].i32), a[2].i32);
@@ -259,7 +269,7 @@ IMPORT(HapiBankGetIntegerItemImport)
     (void)user;
     NEED("HapiBank_GetIntegerItem", 1);
     void* bank;
-    const char* error = NativeOf("HapiBank_GetIntegerItem", (unsigned)a[0].i32, &bank);
+    const char* error = LiveOf("HapiBank_GetIntegerItem", (unsigned)a[0].i32, &bank);
     if (error != nullptr)
         return error;
     a[0].i32 = ((HapiBank*)bank)->GetIntegerItem((char*)Linear(a[1].i32), a[2].i32);

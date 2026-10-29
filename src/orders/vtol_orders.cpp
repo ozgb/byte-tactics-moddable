@@ -141,8 +141,7 @@ struct FixedPosView;
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
 void __stdcall StartBuildingScript(Unit*, Order*, short);
 #include "order_queue.h"
-void __stdcall EmitNanoParticles(Vec3*, Box*, int);
-void __stdcall EmitReverseNanoParticles(Box*, Vec3*, int);
+#include "../graphics/particles.h"
 void __stdcall DamageUnit(Unit*, Unit*, int, int, int);
 int __stdcall SendScriptCallByName(Unit*, char*, char, int, int, int, int);
 void __stdcall DrawUnit(void*, Unit*);
@@ -1628,7 +1627,6 @@ struct Unit;
 
 
 static inline UnitDef* Definitions() { return g_game->defs; }
-void __stdcall EmitNanoParticles(Vec3*, Vec3*, int);
 static inline short Angle(Vec3* a,Vec3* b) { return AngleOfVector(a->x-b->x,a->z-b->z); }
 struct Feature;
 // FUNCTION: 0x414380
@@ -1715,7 +1713,6 @@ struct Unit;
 
 
 
-void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
 
 // FUNCTION: 0x414770
 int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
@@ -1767,8 +1764,8 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
             box.hi.x += f->footprintX << 20;
             box.hi.z += f->footprintZ << 20;
             box.hi.y += f->height << 16;
-            EmitReverseNanoParticles(&box, &nano, 6);
-            EmitReverseNanoParticles(&box, &nano, 6);
+            EmitReverseNanoParticles((NanoTargetBounds*)&box, &nano, 6);
+            EmitReverseNanoParticles((NanoTargetBounds*)&box, &nano, 6);
         }
         return 2;
     case 4:
@@ -1795,7 +1792,6 @@ struct Unit;
 
 
 
-void __stdcall EmitReverseNanoParticles(Vec3* box, Vec3* from, int count);
 
 // FUNCTION: 0x414a80
 int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
@@ -1854,7 +1850,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
             bounds[1].x += order->target->def->modelMaxX;
             bounds[1].z += order->target->def->modelMaxZ;
             bounds[1].y += order->target->def->modelMaxY;
-            EmitReverseNanoParticles(bounds, &start, 6);
+            EmitReverseNanoParticles((NanoTargetBounds*)bounds, &start, 6);
             order->SetDeadlineTicks(2);
             order->duration += 2;
             return 2;

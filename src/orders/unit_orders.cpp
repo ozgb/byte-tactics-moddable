@@ -109,7 +109,7 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
                            int a, int b, int c);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* id, void* pos,
                         int typeId, int amount);
-void __stdcall EmitNanoParticles(Vec3* from, Box* to, int count);
+#include "../graphics/particles.h"
 char* __stdcall lstrcpynA(char* dest, const char* src, int count);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
 extern char DAT_004fc6e8[];
@@ -799,12 +799,8 @@ static const float kZeroFloatOrders = 0.0f;
 
 
 void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
-void __stdcall EmitNanoParticles(Vec3* from, Vec3* to, int count);
-void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
-void __stdcall EmitReverseNanoParticles(Vec3* from, Vec3* to, int count);
 int __cdecl ScaledSin(int angle, int distance);
 int __cdecl ScaledCos(int angle, int distance);
-void __stdcall EmitTeleportParticles(Vec3* from, Vec3* to, int count, int param);
 
 // FUNCTION: 0x4034a0
 int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
@@ -1019,7 +1015,7 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         bounds[1].x += order->link.Get()->def->modelMaxX;
         bounds[1].z += order->link.Get()->def->modelMaxZ;
         bounds[1].y += order->link.Get()->def->modelMaxY;
-        EmitReverseNanoParticles(bounds, &start, 6);
+        EmitReverseNanoParticles((NanoTargetBounds*)bounds, &start, 6);
         unit->workTime = g_game->ticks + 900;
         order->elapsed += 2;
         order->SetDeadlineTicks(2);
@@ -1106,7 +1102,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
             bounds[1].x += order->link.Get()->def->modelMaxX;
             bounds[1].z += order->link.Get()->def->modelMaxZ;
             bounds[1].y += order->link.Get()->def->modelMaxY;
-            EmitReverseNanoParticles(bounds, &start, 6);
+            EmitReverseNanoParticles((NanoTargetBounds*)bounds, &start, 6);
             order->SetDeadlineTicks(2);
             order->duration += 2;
             return 2;
@@ -1632,7 +1628,6 @@ static inline Vec3 PosPlus(const Vec3& a, const Vec3& other)
 struct Unit;
 
 void __stdcall StartBuildingScript(Unit*, Order*, short);
-void __stdcall EmitNanoParticles(Vec3*, Vec3*, int);
 static inline Point16 WorldToCell16(Vec3 v, Point16 origin)
 {
     Point16 c;
@@ -1791,8 +1786,8 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
             box.hi.x += f->footprintX << 20;
             box.hi.z += f->footprintZ << 20;
             box.hi.y += f->height << 16;
-            EmitReverseNanoParticles(&box, &nano, 6);
-            EmitReverseNanoParticles(&box, &nano, 6);
+            EmitReverseNanoParticles((NanoTargetBounds*)&box, &nano, 6);
+            EmitReverseNanoParticles((NanoTargetBounds*)&box, &nano, 6);
         }
         return 2;
     case 5:
@@ -1960,9 +1955,10 @@ follow:
     return 7;
 }
 
+void __stdcall EmitTeleportParticles(Vec*,Vec*,int,int);
+
 static inline Vec Add(const Vec& a,const Vec& b) { Vec r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
 static inline Vec Sub(const Vec& a,const Vec& b) { Vec r; r.x=a.x-b.x; r.y=a.y-b.y; r.z=a.z-b.z; return r; }
-void __stdcall EmitTeleportParticles(Vec*,Vec*,int,int);
 // FUNCTION: 0x406aa0
 int __stdcall TeleportOrder(Unit* unit,Order* order,int unused)
 {

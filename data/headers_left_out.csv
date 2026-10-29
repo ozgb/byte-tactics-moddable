@@ -86,8 +86,6 @@ DrawUnitRangeRings,mismatch,pointer/int cast: definition's type is likely wrong
 DrawWrappedText,mismatch,fixing it changes the generated code of a caller
 EmitBlackSmoke,mismatch,pointer/int cast: definition's type is likely wrong
 EmitJitteredThrustParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-EmitNanoParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-EmitReverseNanoParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 EmitSmoke,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 EmitTeleportParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 EmitWhiteSmoke,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

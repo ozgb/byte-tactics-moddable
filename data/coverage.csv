@@ -694,7 +694,7 @@ pathfinding,Pathfinder::MarkGoalCell,src/ai/pathfind.cpp,0,0,0,0,0,0,?MarkGoalCe
 pathfinding,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,0,0,0,0,0,0,?ReleaseHeldPathLock@Pathfinder@@QAEXXZ,1,
 pathfinding,Pathfinder::RemoveNode,src/ai/pathfind.cpp,1,0,0,0,0,0,?RemoveNode@Pathfinder@@QAEXH@Z,0,unreachable
 pathfinding,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,1,0,0,0,0,0,??1Pathfinder@@QAE@XZ,0,shutdown
-platform,*,,699,368,7764,2971,3026,748,,83,
+platform,*,,704,373,7854,3055,3070,775,,83,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,

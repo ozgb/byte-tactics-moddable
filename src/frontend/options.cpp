@@ -189,14 +189,6 @@ struct PlayerInfoOptionsView {
 
 #include "../network/player.h"
 
-struct GameRulesView {
-    char unknown_0[0xc];
-    int startMetal;
-    int startEnergy;
-    char unknown_14[0x118 - 0x14];
-    int startType;
-};
-
 struct LobbyUiFlagBits {
     unsigned short unknown_bit0 : 4;
     unsigned short flag4 : 1;
@@ -296,13 +288,6 @@ struct SpeedOptionsLayer {
     char unknown_0[4];
     Gadget* entries;
     void (__stdcall* fn)(void* obj, int arg);
-};
-
-struct PlayerRuleView {
-    char unknown_0[0xc];
-    int startMetal;
-    int startEnergy;
-    char unknown_18[0x18 - 0x14];
 };
 
 struct BriefingGui {
@@ -1854,7 +1839,7 @@ void ShowGameSettingsDialog()
     index &= 0xff;
     char num[0x40];
     PlayerInfoOptionsView* opts = (PlayerInfoOptionsView*)g_game->players[index].info.get();
-    PlayerRuleView* rule = &((PlayerRuleView*)(GameRulesView *)g_game->options)[g_game->localPlayer];
+    SkirmishPlayer* rule = &g_game->options->players[g_game->localPlayer];
     char* deathStrs[3] = { "Game Continues", "Game Ends", "Deathmatch" };
     char* locStrs[2] = { "Random", "Fixed" };
     char* mapStrs[2] = { "Mapped", "Unmapped" };
@@ -1867,7 +1852,7 @@ void ShowGameSettingsDialog()
                  0x5a, 0x78, 2);
     AddTextGadget(layer, "TEXT", Translate((char*)"Starting Locations:"), 0x12, 0x6c, 0x6e, 2);
     if (g_game->net->GetGameType() == 2) {
-        AddTextGadget(layer, "TEXT", Translate(locStrs[((GameRulesView *)g_game->options)->startType]), 0x8c,
+        AddTextGadget(layer, "TEXT", Translate(locStrs[g_game->options->fixedLocations]), 0x8c,
                      0x6c, 0x78, 2);
     } else {
         AddTextGadget(layer, "TEXT", Translate(locStrs[opts->u.b.b14]), 0x8c, 0x6c,
@@ -1904,7 +1889,7 @@ void ShowGameSettingsDialog()
         AddTextGadget(layer, "TEXT", _itoa(opts->startMetal * 100, num, 10), 0x8c, y, 0x78,
                      2);
     } else {
-        AddTextGadget(layer, "TEXT", _itoa(rule->startMetal, num, 10), 0x8c, y, 0x78, 2);
+        AddTextGadget(layer, "TEXT", _itoa(rule->metal, num, 10), 0x8c, y, 0x78, 2);
     }
     y += 0x12;
     AddTextGadget(layer, "TEXT", Translate((char*)"Starting Energy:"), 0x12, y, 0x6e, 2);
@@ -1912,7 +1897,7 @@ void ShowGameSettingsDialog()
         AddTextGadget(layer, "TEXT", _itoa(opts->startEnergy * 100, num, 10), 0x8c, y,
                      0x78, 2);
     } else {
-        AddTextGadget(layer, "TEXT", _itoa(rule->startEnergy, num, 10), 0x8c, y, 0x78, 2);
+        AddTextGadget(layer, "TEXT", _itoa(rule->energy, num, 10), 0x8c, y, 0x78, 2);
     }
     y += 0x12;
     AddTextGadget(layer, "TEXT", Translate((char*)"Max Units:"), 0x12, y, 0x6e, 2);

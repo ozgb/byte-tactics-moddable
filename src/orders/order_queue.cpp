@@ -224,7 +224,7 @@ MissionType::MissionType(const char* name)
 }
 
 // FUNCTION: 0x438830
-OrderTableEntry* OrderType::GetTableEntry()
+OrderTableEntry* MissionType::GetTableEntry()
 {
     unsigned int result = 0;
     result = *(unsigned char*)this;

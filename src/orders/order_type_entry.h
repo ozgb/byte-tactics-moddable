@@ -18,10 +18,6 @@ struct OrderTableEntry {
     int operator!=(const OrderTableEntry&) const { return 0; }
 };
 
-struct OrderType {
-    unsigned char index;
-    OrderTableEntry* GetTableEntry();
-};
 #pragma pack(pop)
 
 #endif

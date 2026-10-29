@@ -565,14 +565,14 @@ int __stdcall GetOrderCursor(unsigned char type, Unit* unit, Unit* target, int* 
 struct UnitOrderTypeView;
 struct FixedPosView;
 #include "../orders/order_dispatch.h"
-void __stdcall IssueOrCancelOrder(OrderType kind, int flag, Unit* unit,
+void __stdcall IssueOrCancelOrder(MissionType kind, int flag, Unit* unit,
                             Unit* target, int* pos, int typeId, int amount);
 
 static inline MissionType Order(const char* name) { return MissionType(name); }
 
 // FUNCTION: 0x48cf30
 void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
-                            OrderType kind, int* pos, int typeId, int amount)
+                            MissionType kind, int* pos, int typeId, int amount)
 {
     int flag_a = (entry->flags_a >> 2) & 1;
     Unit* except = 0;

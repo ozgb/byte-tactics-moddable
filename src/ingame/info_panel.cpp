@@ -143,6 +143,7 @@ struct OrderQueueNode {
 };
 
 #include "../orders/order_type_entry.h"
+#include "../orders/mission_type.h"
 #include "../graphics/surface.h"
 
 #include "frame_timers.h"
@@ -625,11 +626,11 @@ int __stdcall DrawUnitStateProbe(void* surface)
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
-                            ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
+                            ((MissionType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state, (char*)m->target->def.get());
                 else
                     sprintf(buf, "    '%s' state: %d\n",
-                            ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
+                            ((MissionType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state);
                 DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
                 y += lineH;
@@ -642,11 +643,11 @@ int __stdcall DrawUnitStateProbe(void* surface)
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
-                            ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
+                            ((MissionType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state, (char*)m->target->def.get());
                 else
                     sprintf(buf, "    '%s' state: %d\n",
-                            ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
+                            ((MissionType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state);
                 DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
                 y += lineH;

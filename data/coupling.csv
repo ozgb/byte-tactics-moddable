@@ -50,6 +50,7 @@ ai,platform,call,CommandArgs::InitArgs,2
 ai,platform,call,ExecuteCommandText,2
 ai,platform,call,FilePrintf,1
 ai,platform,call,GameFreeThunk,1
+ai,platform,call,MakeFixed,1
 ai,platform,call,MakeHeap,1
 ai,platform,call,MakeVec3,2
 ai,platform,call,PopHeapFirst,2
@@ -108,9 +109,9 @@ ai,weapons,indirect,FindTargetableProjectile,1
 ai,weapons,shared_write,Point16::x,1
 ai,weapons,shared_write,Point16::y,1
 ai,weapons,shared_write,Unit::flags,6
-ai,weapons,shared_write,Vec3::x,26
-ai,weapons,shared_write,Vec3::y,26
-ai,weapons,shared_write,Vec3::z,27
+ai,weapons,shared_write,Vec3::x,27
+ai,weapons,shared_write,Vec3::y,27
+ai,weapons,shared_write,Vec3::z,28
 ai,wind_meteors,shared_write,Point16::x,5
 ai,wind_meteors,shared_write,Point16::y,5
 ai,wind_meteors,shared_write,Vec3::x,1
@@ -291,6 +292,7 @@ features,platform,call,TdfRecord::GetFieldInt,1
 features,platform,call,TdfRecord::GetFieldString,4
 features,platform,call,operator delete,2
 features,platform,call,operator new,1
+features,platform,shared_write,Fixed::whole,1
 features,platform,shared_write,Point16::x,8
 features,platform,shared_write,Point16::y,8
 features,platform,shared_write,Vec3::x,22
@@ -319,7 +321,7 @@ features,presentation,shared_write,Feature::footprintX,2
 features,presentation,shared_write,Feature::footprintZ,2
 features,presentation,shared_write,Feature::height,1
 features,presentation,shared_write,Feature::metal,1
-features,presentation,shared_write,Fixed::whole,6
+features,presentation,shared_write,Fixed::whole,7
 features,presentation,shared_write,Game::features,3
 features,presentation,shared_write,Point16::x,5
 features,presentation,shared_write,Point16::y,5
@@ -335,6 +337,7 @@ features,seams,shared_write,Vec3::x,1
 features,targeting,shared_write,Vec3::x,3
 features,targeting,shared_write,Vec3::y,2
 features,targeting,shared_write,Vec3::z,3
+features,units,shared_write,Fixed::whole,1
 features,units,shared_write,Game::features,1
 features,units,shared_write,Point16::x,7
 features,units,shared_write,Point16::y,7
@@ -347,14 +350,14 @@ features,weapons,shared_write,Cell::offsetX,3
 features,weapons,shared_write,Cell::offsetY,3
 features,weapons,shared_write,Cell::spot,1
 features,weapons,shared_write,Feature::height,1
-features,weapons,shared_write,Fixed::whole,4
+features,weapons,shared_write,Fixed::whole,6
 features,weapons,shared_write,Game::featureCount,1
 features,weapons,shared_write,Game::features,3
 features,weapons,shared_write,Point16::x,1
 features,weapons,shared_write,Point16::y,1
-features,weapons,shared_write,Vec3::x,26
-features,weapons,shared_write,Vec3::y,26
-features,weapons,shared_write,Vec3::z,27
+features,weapons,shared_write,Vec3::x,27
+features,weapons,shared_write,Vec3::y,27
+features,weapons,shared_write,Vec3::z,28
 features,wind_meteors,shared_write,Point16::x,5
 features,wind_meteors,shared_write,Point16::y,5
 features,wind_meteors,shared_write,Vec3::x,1
@@ -393,6 +396,9 @@ files,platform,shared_write,_finddata_t::size,1
 files,platform,shared_write,_finddata_t::time_write,1
 files,presentation,call,GetDisplay,12
 files,presentation,call,StripExtension,1
+files,presentation,shared_write,LzssTreeNode::larger,1
+files,presentation,shared_write,LzssTreeNode::parent,1
+files,presentation,shared_write,LzssTreeNode::smaller,1
 files,presentation,shared_write,_finddata_t::attrib,1
 files,presentation,shared_write,_finddata_t::time_write,1
 files,seams,indirect,BankCloseNative,1
@@ -742,6 +748,7 @@ game,platform,call,host_time_ms,1
 game,platform,call,host_window_place,2
 game,platform,call,operator delete,6
 game,platform,call,operator new,5
+game,platform,shared_write,Fixed::whole,1
 game,platform,shared_write,Point16::x,8
 game,platform,shared_write,Point16::y,8
 game,platform,shared_write,Vec3::x,22
@@ -1006,7 +1013,7 @@ game,presentation,call,UpdatePlacementGhostValidity,2
 game,presentation,call,WriteCameraPosition,1
 game,presentation,call,WriteScreenshot,1
 game,presentation,shared_write,Angles16::heading,1
-game,presentation,shared_write,Fixed::whole,6
+game,presentation,shared_write,Fixed::whole,7
 game,presentation,shared_write,GafSequencePlayer::index,1
 game,presentation,shared_write,GafSequencePlayer::src,1
 game,presentation,shared_write,GafSequencePlayer::value,1
@@ -1100,6 +1107,7 @@ game,units,indirect,ReloadUnitType,1
 game,units,indirect,SaveUnits,1
 game,units,indirect,UpdateAllUnits,1
 game,units,shared_write,Angles16::heading,10
+game,units,shared_write,Fixed::whole,1
 game,units,shared_write,Game::autoFollowTicks,1
 game,units,shared_write,Game::commanderDeath,2
 game,units,shared_write,Game::difficulty,2
@@ -1132,7 +1140,7 @@ game,weapons,indirect,LoadWeaponTypes,1
 game,weapons,indirect,UpdateExplosions,1
 game,weapons,indirect,UpdateProjectiles,1
 game,weapons,shared_write,Angles16::heading,10
-game,weapons,shared_write,Fixed::whole,4
+game,weapons,shared_write,Fixed::whole,6
 game,weapons,shared_write,Game::flags_2a44,4
 game,weapons,shared_write,Game::localPlayer,3
 game,weapons,shared_write,Game::seaLevel,9
@@ -1145,9 +1153,9 @@ game,weapons,shared_write,Point16::y,1
 game,weapons,shared_write,Unit::flags,6
 game,weapons,shared_write,Unit::health,3
 game,weapons,shared_write,UnitDef::flags1,3
-game,weapons,shared_write,Vec3::x,26
-game,weapons,shared_write,Vec3::y,26
-game,weapons,shared_write,Vec3::z,27
+game,weapons,shared_write,Vec3::x,27
+game,weapons,shared_write,Vec3::y,27
+game,weapons,shared_write,Vec3::z,28
 game,wind_meteors,indirect,EmptyShutdownPreCleanup,1
 game,wind_meteors,indirect,InitMeteors,1
 game,wind_meteors,indirect,LoadMeteors,1
@@ -1444,7 +1452,7 @@ los_radar,units,shared_write,Vec3::z,9
 los_radar,weapons,shared_write,Cell::feature,3
 los_radar,weapons,shared_write,Cell::high,2
 los_radar,weapons,shared_write,Cell::low,1
-los_radar,weapons,shared_write,DamageTableEntry::value,1
+los_radar,weapons,shared_write,DamageTableEntry::value,2
 los_radar,weapons,shared_write,GafFrame::pixelsOrLayers,1
 los_radar,weapons,shared_write,GafFrame::transparency,1
 los_radar,weapons,shared_write,GafFrame::xOffset,1
@@ -1453,9 +1461,9 @@ los_radar,weapons,shared_write,Game::cells,1
 los_radar,weapons,shared_write,Point16::x,1
 los_radar,weapons,shared_write,Point16::y,1
 los_radar,weapons,shared_write,Unit::flags,6
-los_radar,weapons,shared_write,Vec3::x,26
-los_radar,weapons,shared_write,Vec3::y,26
-los_radar,weapons,shared_write,Vec3::z,27
+los_radar,weapons,shared_write,Vec3::x,27
+los_radar,weapons,shared_write,Vec3::y,27
+los_radar,weapons,shared_write,Vec3::z,28
 los_radar,weapons,shared_write,Vec3Words::xWhole,1
 los_radar,weapons,shared_write,Vec3Words::yWhole,3
 los_radar,weapons,shared_write,Vec3Words::zWhole,1
@@ -1464,6 +1472,7 @@ los_radar,wind_meteors,shared_write,Point16::y,5
 los_radar,wind_meteors,shared_write,Vec3::x,1
 los_radar,wind_meteors,shared_write,Vec3::y,1
 los_radar,wind_meteors,shared_write,Vec3::z,1
+map,ai,shared_write,Fixed::value,1
 map,ai,shared_write,Game::net,6
 map,ai,shared_write,Point16::x,7
 map,ai,shared_write,Point16::y,7
@@ -1539,7 +1548,7 @@ map,network,shared_write,Unit::flags,2
 map,orders,indirect,DamagedAllyCollector::CollectDamagedAlly,1
 map,orders,indirect,GroundAllyVisitor::CollectGroundAlly,1
 map,orders,indirect,RepairableUnitVisitor::CollectRepairableUnit,1
-map,orders,shared_write,Fixed::value,8
+map,orders,shared_write,Fixed::value,9
 map,orders,shared_write,Game::net,2
 map,orders,shared_write,Point16::x,44
 map,orders,shared_write,Point16::y,41
@@ -1579,7 +1588,7 @@ map,platform,call,WorldToCell,1
 map,platform,call,operator delete,11
 map,platform,call,operator new,7
 map,platform,call,operator==,3
-map,platform,shared_write,Fixed::value,1
+map,platform,shared_write,Fixed::value,2
 map,platform,shared_write,Point16::x,8
 map,platform,shared_write,Point16::y,8
 map,platform,shared_write,Vec3::x,22
@@ -1620,7 +1629,7 @@ map,targeting,shared_write,Unit::flags,1
 map,targeting,shared_write,Vec3::x,3
 map,targeting,shared_write,Vec3::y,2
 map,targeting,shared_write,Vec3::z,3
-map,units,shared_write,Fixed::value,1
+map,units,shared_write,Fixed::value,2
 map,units,shared_write,Game::list_391ed,2
 map,units,shared_write,Game::net,3
 map,units,shared_write,Mission::waterDamage,1
@@ -1641,16 +1650,16 @@ map,units,shared_write,Vec3::z,9
 map,weapons,shared_write,Cell::flags,1
 map,weapons,shared_write,Cell::unit,2
 map,weapons,shared_write,Cell::unit2,2
-map,weapons,shared_write,Fixed::value,4
+map,weapons,shared_write,Fixed::value,7
 map,weapons,shared_write,Game::net,6
 map,weapons,shared_write,Mission::lavaWorld,2
 map,weapons,shared_write,Mission::noSeaLevelTrigger,5
 map,weapons,shared_write,Point16::x,1
 map,weapons,shared_write,Point16::y,1
 map,weapons,shared_write,Unit::flags,6
-map,weapons,shared_write,Vec3::x,26
-map,weapons,shared_write,Vec3::y,26
-map,weapons,shared_write,Vec3::z,27
+map,weapons,shared_write,Vec3::x,27
+map,weapons,shared_write,Vec3::y,27
+map,weapons,shared_write,Vec3::z,28
 map,wind_meteors,indirect,DisableMeteors,1
 map,wind_meteors,indirect,EnableMeteors,1
 map,wind_meteors,indirect,MeteorParams::LoadMeteorDefaults,1
@@ -1978,6 +1987,7 @@ network,weapons,shared_write,Player::info,1
 network,weapons,shared_write,Player::type,4
 network,weapons,shared_write,PlayerInfo::color,1
 orders,ai,indirect,PathGoal::~PathGoal,1
+orders,ai,shared_write,Fixed::value,1
 orders,ai,shared_write,MissionType::index,1
 orders,ai,shared_write,Order::flags_42,2
 orders,ai,shared_write,Point16::x,7
@@ -2077,6 +2087,7 @@ orders,pathfinding,shared_write,PathGoal::target,1
 orders,pathfinding,shared_write,Point16::x,7
 orders,pathfinding,shared_write,Point16::y,7
 orders,platform,call,GetHeadingBetween,27
+orders,platform,call,MakeFixed,1
 orders,platform,call,MakeVec3,1
 orders,platform,call,RandomInt,31
 orders,platform,call,UnitDef::EnergyCost,1
@@ -2088,7 +2099,7 @@ orders,platform,call,operator delete,20
 orders,platform,call,operator new,46
 orders,platform,call,operator-,1
 orders,platform,call,operator==,22
-orders,platform,shared_write,Fixed::value,1
+orders,platform,shared_write,Fixed::value,2
 orders,platform,shared_write,Point16::x,8
 orders,platform,shared_write,Point16::y,8
 orders,platform,shared_write,Vec3::x,22
@@ -2195,7 +2206,7 @@ orders,units,shared_write,Angles16::heading,10
 orders,units,shared_write,Angles16::pitch,7
 orders,units,shared_write,BitWriter::bit,2
 orders,units,shared_write,BitWriter::index,2
-orders,units,shared_write,Fixed::value,1
+orders,units,shared_write,Fixed::value,2
 orders,units,shared_write,MissionType::index,1
 orders,units,shared_write,Order::flags_42,1
 orders,units,shared_write,Order::next,2
@@ -2229,7 +2240,7 @@ orders,weapons,indirect,WeaponCanReachUnit,5
 orders,weapons,shared_write,Angles16::bank,1
 orders,weapons,shared_write,Angles16::heading,10
 orders,weapons,shared_write,Angles16::pitch,6
-orders,weapons,shared_write,Fixed::value,4
+orders,weapons,shared_write,Fixed::value,7
 orders,weapons,shared_write,Order::ticks,2
 orders,weapons,shared_write,Point16::x,1
 orders,weapons,shared_write,Point16::y,1
@@ -2238,10 +2249,10 @@ orders,weapons,shared_write,Unit::health,3
 orders,weapons,shared_write,Unit::netDirtyFlags,2
 orders,weapons,shared_write,Unit::pos,6
 orders,weapons,shared_write,Unit::workTime,1
-orders,weapons,shared_write,UnitWeaponSlot::stockpile,1
-orders,weapons,shared_write,Vec3::x,26
-orders,weapons,shared_write,Vec3::y,26
-orders,weapons,shared_write,Vec3::z,27
+orders,weapons,shared_write,UnitWeaponSlot::stockpile,3
+orders,weapons,shared_write,Vec3::x,27
+orders,weapons,shared_write,Vec3::y,27
+orders,weapons,shared_write,Vec3::z,28
 orders,wind_meteors,shared_write,Point16::x,5
 orders,wind_meteors,shared_write,Point16::y,5
 orders,wind_meteors,shared_write,Vec3::x,1
@@ -2308,6 +2319,7 @@ platform,ai,call,CopyOneByte,1
 platform,ai,indirect,CmdLimit,1
 platform,ai,indirect,CmdPlan,1
 platform,ai,indirect,CmdWeight,1
+platform,ai,shared_write,Fixed::value,1
 platform,ai,shared_write,Point16::x,7
 platform,ai,shared_write,Point16::y,7
 platform,ai,shared_write,Vec3::x,18
@@ -2325,6 +2337,7 @@ platform,economy,shared_write,Point16::y,1
 platform,features,indirect,CmdBurnAll,1
 platform,features,indirect,CmdBurnOne,1
 platform,features,indirect,CmdFeature,1
+platform,features,shared_write,Fixed::whole,2
 platform,features,shared_write,Point16::x,10
 platform,features,shared_write,Point16::y,10
 platform,features,shared_write,Vec3::x,6
@@ -2429,6 +2442,7 @@ platform,game,indirect,CmdView,1
 platform,game,indirect,CmdZBuffer,1
 platform,game,indirect,DefaultCommandHandler,1
 platform,game,indirect,OutOfMemoryHandler,6
+platform,game,shared_write,Fixed::whole,1
 platform,game,shared_write,Game::count_148e7,1
 platform,game,shared_write,Game::data_148eb,1
 platform,game,shared_write,Point16::x,1
@@ -2454,6 +2468,7 @@ platform,los_radar,shared_write,Vec3::x,10
 platform,los_radar,shared_write,Vec3::y,10
 platform,los_radar,shared_write,Vec3::z,10
 platform,map,shared_write,Fixed::value,2
+platform,map,shared_write,Fixed::whole,5
 platform,map,shared_write,Point16::x,12
 platform,map,shared_write,Point16::y,12
 platform,map,shared_write,StringRef::data,2
@@ -2463,7 +2478,8 @@ platform,map,shared_write,Vec3::z,12
 platform,network,indirect,CmdCompression,1
 platform,network,shared_write,UnitDef::scriptChecksum,2
 platform,orders,call,CopyDwordIfNonNull,4
-platform,orders,shared_write,Fixed::value,8
+platform,orders,shared_write,Fixed::value,9
+platform,orders,shared_write,Fixed::whole,4
 platform,orders,shared_write,Point16::x,44
 platform,orders,shared_write,Point16::y,41
 platform,orders,shared_write,Vec3::x,84
@@ -2527,6 +2543,7 @@ platform,presentation,shared_write,CMemoryCache::cur,2
 platform,presentation,shared_write,CacheChunk::owner,3
 platform,presentation,shared_write,CacheChunk::size,3
 platform,presentation,shared_write,Fixed::value,7
+platform,presentation,shared_write,Fixed::whole,7
 platform,presentation,shared_write,Point16::x,5
 platform,presentation,shared_write,Point16::y,5
 platform,presentation,shared_write,StringRef::data,4
@@ -2543,7 +2560,8 @@ platform,targeting,shared_write,Vec3::z,3
 platform,units,call,HandleGet,1
 platform,units,call,HandleSet,1
 platform,units,indirect,CompareUnitTypeNames,1
-platform,units,shared_write,Fixed::value,1
+platform,units,shared_write,Fixed::value,2
+platform,units,shared_write,Fixed::whole,1
 platform,units,shared_write,Point16::x,7
 platform,units,shared_write,Point16::y,7
 platform,units,shared_write,StringRef::data,1
@@ -2551,22 +2569,21 @@ platform,units,shared_write,UnitDef::scriptChecksum,1
 platform,units,shared_write,Vec3::x,9
 platform,units,shared_write,Vec3::y,10
 platform,units,shared_write,Vec3::z,9
-platform,weapons,shared_write,Fixed::value,4
+platform,weapons,shared_write,Fixed::value,7
+platform,weapons,shared_write,Fixed::whole,6
 platform,weapons,shared_write,Game::src1,2
 platform,weapons,shared_write,Game::src2,2
 platform,weapons,shared_write,Game::src3,2
 platform,weapons,shared_write,Point16::x,1
 platform,weapons,shared_write,Point16::y,1
-platform,weapons,shared_write,ReachPosFixed::value,1
 platform,weapons,shared_write,ReachPosVec3::x,2
 platform,weapons,shared_write,ReachPosVec3::z,2
-platform,weapons,shared_write,ReachUnitFixed::value,1
 platform,weapons,shared_write,ReachUnitVec3::x,2
 platform,weapons,shared_write,ReachUnitVec3::z,2
-platform,weapons,shared_write,StringRef::ptr,4
-platform,weapons,shared_write,Vec3::x,26
-platform,weapons,shared_write,Vec3::y,26
-platform,weapons,shared_write,Vec3::z,27
+platform,weapons,shared_write,StringRef::ptr,5
+platform,weapons,shared_write,Vec3::x,27
+platform,weapons,shared_write,Vec3::y,27
+platform,weapons,shared_write,Vec3::z,28
 platform,weapons,shared_write,Vec3f::x,1
 platform,weapons,shared_write,Vec3f::y,1
 platform,weapons,shared_write,Vec3f::z,1
@@ -2990,10 +3007,10 @@ players,weapons,shared_write,Point16::x,1
 players,weapons,shared_write,Point16::y,1
 players,weapons,shared_write,Unit::flags,6
 players,weapons,shared_write,Unit::health,3
-players,weapons,shared_write,UnitWeaponSlot::stockpile,1
-players,weapons,shared_write,Vec3::x,26
-players,weapons,shared_write,Vec3::y,26
-players,weapons,shared_write,Vec3::z,27
+players,weapons,shared_write,UnitWeaponSlot::stockpile,3
+players,weapons,shared_write,Vec3::x,27
+players,weapons,shared_write,Vec3::y,27
+players,weapons,shared_write,Vec3::z,28
 players,wind_meteors,shared_write,Point16::x,5
 players,wind_meteors,shared_write,Point16::y,5
 players,wind_meteors,shared_write,Vec3::x,1
@@ -3003,6 +3020,7 @@ presentation,ai,call,GetBuildRating,1
 presentation,ai,call,IsExplored,1
 presentation,ai,call,SetUnitSquad,1
 presentation,ai,indirect,IsPointVisible,2
+presentation,ai,shared_write,Fixed::value,1
 presentation,ai,shared_write,Game::difficulty,2
 presentation,ai,shared_write,Game::mapFlags,1
 presentation,ai,shared_write,MissionType::index,1
@@ -3076,6 +3094,9 @@ presentation,files,call,MakeDirectoryPath,2
 presentation,files,call,RemoveFile,2
 presentation,files,call,RenameFile,1
 presentation,files,call,WriteBufferToFile,3
+presentation,files,shared_write,LzssTreeNode::larger,7
+presentation,files,shared_write,LzssTreeNode::parent,6
+presentation,files,shared_write,LzssTreeNode::smaller,7
 presentation,game,call,ApplySlotsToGamePlayers,1
 presentation,game,call,ExecuteCommandLine,2
 presentation,game,call,Force640x480Surfaces,2
@@ -3281,6 +3302,8 @@ presentation,network,shared_write,Game::pauseFlags,1
 presentation,network,shared_write,Game::textLines,1
 presentation,network,shared_write,Game::uiOptionFlags,1
 presentation,network,shared_write,Gui::layer,1
+presentation,network,shared_write,PlaySoundPacket::flag,1
+presentation,network,shared_write,PlaySoundPacket::index,1
 presentation,network,shared_write,Player::active,55
 presentation,network,shared_write,Player::alliance,6
 presentation,network,shared_write,Player::allied,4
@@ -3307,13 +3330,13 @@ presentation,orders,call,GetOrderName,1
 presentation,orders,call,GetOrderTarget,1
 presentation,orders,call,GetOrderType,1
 presentation,orders,call,IssueOrCancelOrder,2
+presentation,orders,call,MissionType::GetTableEntry,2
 presentation,orders,call,OrderModeTakesTarget,1
-presentation,orders,call,OrderType::GetTableEntry,2
 presentation,orders,call,SumQueuedBuildCount,1
 presentation,orders,shared_write,Angles16::bank,1
 presentation,orders,shared_write,Angles16::heading,12
 presentation,orders,shared_write,Angles16::pitch,2
-presentation,orders,shared_write,Fixed::value,8
+presentation,orders,shared_write,Fixed::value,9
 presentation,orders,shared_write,Fixed::whole,4
 presentation,orders,shared_write,Game::difficulty,1
 presentation,orders,shared_write,Game::interfaceType,3
@@ -3502,7 +3525,8 @@ presentation,platform,shared_write,CMemoryCache::cap,1
 presentation,platform,shared_write,CMemoryCache::cur,1
 presentation,platform,shared_write,CacheChunk::owner,1
 presentation,platform,shared_write,CacheChunk::size,1
-presentation,platform,shared_write,Fixed::value,1
+presentation,platform,shared_write,Fixed::value,2
+presentation,platform,shared_write,Fixed::whole,1
 presentation,platform,shared_write,GafFrame::pixelsOrLayers,1
 presentation,platform,shared_write,Point16::x,8
 presentation,platform,shared_write,Point16::y,8
@@ -3573,7 +3597,8 @@ presentation,units,call,MakePropList,1
 presentation,units,shared_write,Angles16::bank,6
 presentation,units,shared_write,Angles16::heading,10
 presentation,units,shared_write,Angles16::pitch,7
-presentation,units,shared_write,Fixed::value,1
+presentation,units,shared_write,Fixed::value,2
+presentation,units,shared_write,Fixed::whole,1
 presentation,units,shared_write,Game::commanderDeath,2
 presentation,units,shared_write,Game::difficulty,2
 presentation,units,shared_write,Game::mapFlags,1
@@ -3606,8 +3631,8 @@ presentation,weapons,shared_write,Angles16::bank,1
 presentation,weapons,shared_write,Angles16::heading,10
 presentation,weapons,shared_write,Angles16::pitch,6
 presentation,weapons,shared_write,Cell::flags,1
-presentation,weapons,shared_write,Fixed::value,4
-presentation,weapons,shared_write,Fixed::whole,4
+presentation,weapons,shared_write,Fixed::value,7
+presentation,weapons,shared_write,Fixed::whole,6
 presentation,weapons,shared_write,GafFrame::pixelsOrLayers,1
 presentation,weapons,shared_write,GafFrame::transparency,1
 presentation,weapons,shared_write,GafFrame::xOffset,1
@@ -3628,9 +3653,9 @@ presentation,weapons,shared_write,Unit::flags,6
 presentation,weapons,shared_write,Unit::lastAttackerSlot,1
 presentation,weapons,shared_write,Unit::pos,6
 presentation,weapons,shared_write,Unit::state,3
-presentation,weapons,shared_write,Vec3::x,26
-presentation,weapons,shared_write,Vec3::y,26
-presentation,weapons,shared_write,Vec3::z,27
+presentation,weapons,shared_write,Vec3::x,27
+presentation,weapons,shared_write,Vec3::y,27
+presentation,weapons,shared_write,Vec3::z,28
 presentation,weapons,shared_write,Vec3f::x,1
 presentation,weapons,shared_write,Vec3f::y,1
 presentation,weapons,shared_write,Vec3f::z,1
@@ -4104,13 +4129,14 @@ targeting,units,shared_write,Vec3::z,9
 targeting,weapons,indirect,WeaponCanReachUnit,1
 targeting,weapons,shared_write,AimTargetPair::a,2
 targeting,weapons,shared_write,AimTargetPair::b,2
-targeting,weapons,shared_write,Vec3::x,26
-targeting,weapons,shared_write,Vec3::y,26
-targeting,weapons,shared_write,Vec3::z,27
+targeting,weapons,shared_write,Vec3::x,27
+targeting,weapons,shared_write,Vec3::y,27
+targeting,weapons,shared_write,Vec3::z,28
 targeting,wind_meteors,shared_write,Vec3::x,1
 targeting,wind_meteors,shared_write,Vec3::y,1
 targeting,wind_meteors,shared_write,Vec3::z,1
 units,ai,indirect,SetUnitSquad,3
+units,ai,shared_write,Fixed::value,1
 units,ai,shared_write,Game::defs,12
 units,ai,shared_write,Game::unitDefCount,9
 units,ai,shared_write,Game::units,1
@@ -4385,7 +4411,7 @@ units,orders,shared_write,Angles16::heading,12
 units,orders,shared_write,Angles16::pitch,2
 units,orders,shared_write,BitWriter::bit,1
 units,orders,shared_write,BitWriter::index,1
-units,orders,shared_write,Fixed::value,8
+units,orders,shared_write,Fixed::value,9
 units,orders,shared_write,Game::defs,9
 units,orders,shared_write,Game::unitDefCount,4
 units,orders,shared_write,Game::units,4
@@ -4485,6 +4511,7 @@ units,platform,call,GetLocalizedString,2
 units,platform,call,GetTickRate,2
 units,platform,call,GetTicks,1
 units,platform,call,LoadCobScript,2
+units,platform,call,MakeFixed,1
 units,platform,call,OvrFile::~OvrFile,1
 units,platform,call,ProtectBlockReadOnly,6
 units,platform,call,ProtectBlockReadWrite,8
@@ -4517,7 +4544,7 @@ units,platform,call,operator delete,6
 units,platform,call,operator new,9
 units,platform,call,operator-,1
 units,platform,call,operator==,13
-units,platform,shared_write,Fixed::value,1
+units,platform,shared_write,Fixed::value,2
 units,platform,shared_write,Game::defs,1
 units,platform,shared_write,Point16::x,8
 units,platform,shared_write,Point16::y,8
@@ -4726,7 +4753,7 @@ units,weapons,indirect,WeaponAimCobCb::OnAimCobReturn,2
 units,weapons,shared_write,Angles16::bank,1
 units,weapons,shared_write,Angles16::heading,10
 units,weapons,shared_write,Angles16::pitch,6
-units,weapons,shared_write,Fixed::value,4
+units,weapons,shared_write,Fixed::value,7
 units,weapons,shared_write,Game::units,4
 units,weapons,shared_write,Point16::x,1
 units,weapons,shared_write,Point16::y,1
@@ -4761,21 +4788,22 @@ units,weapons,shared_write,UnitDef::selfdestructas,1
 units,weapons,shared_write,UnitDef::unitname,1
 units,weapons,shared_write,UnitDef::weapons,1
 units,weapons,shared_write,UnitScript::state,1
-units,weapons,shared_write,UnitWeaponSlot::fireHeading,5
-units,weapons,shared_write,UnitWeaponSlot::firePitch,2
-units,weapons,shared_write,UnitWeaponSlot::muzzleAimFromDeltaZ,1
-units,weapons,shared_write,UnitWeaponSlot::reloadTimer,1
-units,weapons,shared_write,UnitWeaponSlot::stockpile,1
-units,weapons,shared_write,Vec3::x,26
-units,weapons,shared_write,Vec3::y,26
-units,weapons,shared_write,Vec3::z,27
-units,weapons,shared_write,WeaponAimCobCb::nAimCobDone,2
+units,weapons,shared_write,UnitWeaponSlot::fireHeading,12
+units,weapons,shared_write,UnitWeaponSlot::firePitch,9
+units,weapons,shared_write,UnitWeaponSlot::muzzleAimFromDeltaZ,2
+units,weapons,shared_write,UnitWeaponSlot::reloadTimer,2
+units,weapons,shared_write,UnitWeaponSlot::stockpile,3
+units,weapons,shared_write,Vec3::x,27
+units,weapons,shared_write,Vec3::y,27
+units,weapons,shared_write,Vec3::z,28
+units,weapons,shared_write,WeaponAimCobCb::nAimCobDone,5
 units,wind_meteors,shared_write,Point16::x,5
 units,wind_meteors,shared_write,Point16::y,5
 units,wind_meteors,shared_write,Vec3::x,1
 units,wind_meteors,shared_write,Vec3::y,1
 units,wind_meteors,shared_write,Vec3::z,1
 weapons,ai,indirect,ReactToAttack,1
+weapons,ai,shared_write,Fixed::value,1
 weapons,ai,shared_write,Point16::x,7
 weapons,ai,shared_write,Point16::y,7
 weapons,ai,shared_write,Projectile::attacker,1
@@ -4852,7 +4880,7 @@ weapons,orders,indirect,AppendOrder,1
 weapons,orders,shared_write,Angles16::bank,1
 weapons,orders,shared_write,Angles16::heading,12
 weapons,orders,shared_write,Angles16::pitch,2
-weapons,orders,shared_write,Fixed::value,8
+weapons,orders,shared_write,Fixed::value,9
 weapons,orders,shared_write,Order::ticks,2
 weapons,orders,shared_write,Point16::x,44
 weapons,orders,shared_write,Point16::y,41
@@ -4902,7 +4930,7 @@ weapons,platform,call,VectorFromTo,1
 weapons,platform,call,operator delete,1
 weapons,platform,call,operator new,3
 weapons,platform,call,operator-,3
-weapons,platform,shared_write,Fixed::value,1
+weapons,platform,shared_write,Fixed::value,2
 weapons,platform,shared_write,Point16::x,8
 weapons,platform,shared_write,Point16::y,8
 weapons,platform,shared_write,Vec3::x,22
@@ -5023,7 +5051,7 @@ weapons,units,indirect,MarkRecentlyDamaged,1
 weapons,units,shared_write,Angles16::bank,6
 weapons,units,shared_write,Angles16::heading,10
 weapons,units,shared_write,Angles16::pitch,7
-weapons,units,shared_write,Fixed::value,1
+weapons,units,shared_write,Fixed::value,2
 weapons,units,shared_write,Point16::x,7
 weapons,units,shared_write,Point16::y,7
 weapons,units,shared_write,Unit::attacker,5
@@ -5136,6 +5164,6 @@ wind_meteors,weapons,indirect,FindWeaponByName,1
 wind_meteors,weapons,indirect,SpawnProjectile,1
 wind_meteors,weapons,shared_write,Point16::x,1
 wind_meteors,weapons,shared_write,Point16::y,1
-wind_meteors,weapons,shared_write,Vec3::x,26
-wind_meteors,weapons,shared_write,Vec3::y,26
-wind_meteors,weapons,shared_write,Vec3::z,27
+wind_meteors,weapons,shared_write,Vec3::x,27
+wind_meteors,weapons,shared_write,Vec3::y,27
+wind_meteors,weapons,shared_write,Vec3::z,28

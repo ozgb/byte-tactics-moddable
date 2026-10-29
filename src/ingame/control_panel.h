@@ -52,7 +52,7 @@ void __stdcall UpdateMouseScroll();
 void __stdcall UpdateEdgeScroll();
 
 int __stdcall UpdatePlacementGhostValidity(void);
-int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries);
+int __stdcall HandleOrderButtonClick(Gui* menu, Gadget* entries);
 void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page);
 void __stdcall OpenGeneratorDialog(Unit* unit);
 void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit);

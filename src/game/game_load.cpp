@@ -29,16 +29,6 @@ struct LoadingScreenDisplay {
     HWND hwnd;
 };
 
-struct LoadGuiLayerParent {
-    char unknown_0[0x10];
-};
-
-struct LoadedGuiLayer {
-    char unknown_0[0x8];
-    void (__stdcall* handler)(LoadedGuiLayer*);
-    char* owner;
-};
-
 
 #include "../network/player_info.h"
 
@@ -144,11 +134,12 @@ void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "main_loop.h"
 void __stdcall CreateUnit(unsigned char team, unsigned short id, CreateUnitPos pos, int a,
     int b, int c);
-LoadedGuiLayer* __stdcall LoadGuiLayer(LoadGuiLayerParent* sub, const char* name, int flags);
+Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
 #include "../ingame/game_dialogs.h"
 void __cdecl operator delete(void* p);
 
 #include "../gui/gui.h"
+#include "../gui/layer.h"
 void __stdcall BlitMenuLayers(Main2Menu* menu, int a, int b);
 char* __stdcall Translate(char* s);
 
@@ -418,10 +409,10 @@ tail:
         int side = pl->side;
         sprintf(g_game->name, "%sMAIN2.GUI", g_game->sideDefs[side].nameprefix);
     }
-    LoadedGuiLayer* gadget =
-        LoadGuiLayer((LoadGuiLayerParent*)&g_game->menu_519_18, g_game->name, 0x20);
-    gadget->handler = (void (__stdcall *)(LoadedGuiLayer *))HandleMain2LayoutEvent;
-    gadget->owner = (char*)g_game;
+    Layer* gadget =
+        LoadGuiLayer(&g_game->gui, g_game->name, 0x20);
+    gadget->handler = HandleMain2LayoutEvent;
+    gadget->data = g_game;
 
     LoadingPlayerRecord* currec = &(*(LoadingPlayerRecord(*)[10])&g_game->players)[g_game->localPlayer];
     currec->data->flags_9b |= 0x10;

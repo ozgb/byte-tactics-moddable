@@ -21,18 +21,6 @@ struct SideData {
     unsigned char bSideId;
 };
 
-struct LoadGameGadgetInfo {
-    char unknown_0[0xce];
-    void* handler;
-};
-
-struct LoadGameGuiLayer {
-    char unknown_0[4];
-    LoadGameGadgetInfo* info;
-    void (__stdcall* handler)(Gui*);
-    void* context;
-};
-
 struct SaveGameScreenState {
     int games;
     int count;
@@ -84,7 +72,6 @@ Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
-LoadGameGadgetInfo* __stdcall FindGadgetChecked(void* entries, char* name);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
@@ -116,7 +103,6 @@ void __cdecl LeaveNetGameCallback(int param);
 void __cdecl operator delete(void* p);
 void* __cdecl operator new(unsigned int size);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-LoadGameGuiLayer* __stdcall LoadGuiLayer(char* sub, const char* name, int flags);
 #include "../gui/dialogs.h"
 void __stdcall SetCursorAnimation(void* menu, void* data);
 void __stdcall SetDescListCleanupFlag(Gui* menu, int flag);
@@ -519,7 +505,7 @@ void ShowSaveGameScreen()
 
     g_game->bits_38a51_2.flag_38a51 |= 1;
     Layer* layer = LoadGuiLayer(&g_game->gui, "LOADGAME.GUI", 0x880);
-    layer->handler = (void (__stdcall*)(void*))SaveGameScreenHandler;
+    layer->handler = SaveGameScreenHandler;
     layer->data = g_game;
     LoadPictureCached("DSAVEGAME2", 0, 0, 0);
     MakeDirectoryPath(g_savegameDir);
@@ -547,9 +533,9 @@ void ShowSaveGameScreen()
 // FUNCTION: 0x4931d0
 void ShowLoadGameScreen()
 {
-    LoadGameGuiLayer* gadget = LoadGuiLayer((char*)&g_game->message_519[0], "LOADGAME.GUI", 0x980);
+    Layer* gadget = LoadGuiLayer(&g_game->gui, "LOADGAME.GUI", 0x980);
     gadget->handler = LoadGameScreenHandler;
-    gadget->context = g_game;
+    gadget->data = g_game;
     LoadPictureCached("DLOADGAME2", 0, 0, 0);
     int count;
     if (ListSavedGames(&count) == 0) {
@@ -563,9 +549,9 @@ void ShowLoadGameScreen()
     ConfigureListBoxByName((char*)&g_game->message_519[0], "GAMES", g_savegameDescs, count, 0);
     SetGadgetActiveByName((char*)&g_game->message_519[0], "DELETE", 0);
     SetGadgetActiveByName((char*)&g_game->message_519[0], "GAMENAME", 0);
-    LoadGameGadgetInfo* entry = FindGadgetChecked(gadget->info, "GAMES");
+    Gadget* entry = FindGadgetChecked(gadget->entries, "GAMES");
     if (entry != 0) {
-        entry->handler = (void*)SavedGameSelectHandler;
+        entry->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))SavedGameSelectHandler;
     }
     ShowSavedGameInfo();
     SetKeyboardInput((char*)&g_game->message_519[0], 1);

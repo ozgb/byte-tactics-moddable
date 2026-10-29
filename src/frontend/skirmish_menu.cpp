@@ -637,7 +637,7 @@ void OpenSkirmishMapSelector()
         return;
     }
     Layer* layer = LoadGuiLayer(&g_game->gui, "SELMAP.GUI", 0x880);
-    layer->handler = (void (__stdcall*)(void*))HandleSkirmishMapClick;
+    layer->handler = HandleSkirmishMapClick;
     Data* data = (Data*)GameAllocIgnoreTag("SELECT MAP DATA", 0x20);
     layer->data = data;
     LoadPictureCached("DSELECTMAP2", 0, 0, 0);
@@ -1068,7 +1068,7 @@ void OpenSkirmishMenu(void)
 
     BlankScreen();
     dialog = LoadGuiLayer(&g_game->gui, g_skirmishGuiName, 0);
-    dialog->handler = (void (__stdcall*)(void*))HandleSkirmishClick;
+    dialog->handler = HandleSkirmishClick;
     dialog->data = (Data*)g_game;
     LoadPictureCached(g_skirmishSetupPictureName, 0, 0, 0);
 

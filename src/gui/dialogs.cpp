@@ -818,7 +818,7 @@ int __stdcall OpenYesNoDialog(Gui* sub, char* title, char* chc2, char* chc1)
         strcpy(p1->u.text, chc1);
         strcpy(p2->u.text, chc2);
         strcpy(p3->u.text, title);
-        layer->handler = (void (__stdcall*)(void*))YesNoDialogHandler;
+        layer->handler = YesNoDialogHandler;
         return 1;
     }
     return 0;
@@ -903,7 +903,7 @@ int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, in
         }
         SetKeyboardInput(gui, 1);
         RenderLayer(gui, 1);
-        layer->handler = (void (__stdcall*)(void*))MessageBoxHandler;
+        layer->handler = MessageBoxHandler;
         MarkChanged((Dialog *)gui);
         UpdateMenu(gui);
         GameFreeThunk(wrapped);
@@ -927,7 +927,7 @@ int __stdcall OpenNotExistDialog(Gui* sub, char* name)
         int i = FindGadgetIndex(gadgets, "NAME", 5);
         strcpy(gadgets[i].u.text, name);
         gadgets[i].x = -1;
-        dialog->handler = (void (__stdcall*)(void*))NotExistDialogHandler;
+        dialog->handler = NotExistDialogHandler;
         return 1;
     }
     return 0;
@@ -959,7 +959,7 @@ int __stdcall OpenChoice3Dialog(Gui* menu, const char* title, const char* choice
         strcpy(e3->u.text, choice3);
         strcpy(et->u.text, title);
         et->x = 0xffff;
-        dialog->handler = (void (__stdcall*)(void*))Choice3DialogHandler;
+        dialog->handler = Choice3DialogHandler;
         return 1;
     }
     return 0;
@@ -990,7 +990,7 @@ int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, ch
         Gadget* g2 = &gadgets[FindGadgetIndex(gadgets, "CHC2", 1)];
         strcpy(g1->u.text, chc1);
         strcpy(g2->u.text, chc2);
-        dialog->handler = (void (__stdcall*)(void*))InputDialogHandler;
+        dialog->handler = InputDialogHandler;
         return 1;
     }
     return 0;

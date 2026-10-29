@@ -3,6 +3,7 @@
 struct DisplayAppView;
 
 #include "surface.h"
+#include "../util/mouse_event.h"
 
 struct OPENHAPIFILE;
 
@@ -12,7 +13,15 @@ union DisplayFlags {
     struct {
         unsigned short flag0 : 1;
         unsigned short flag1 : 1;
-        unsigned short bit2_15 : 14;
+        unsigned short gdi : 1;
+        unsigned short bit3 : 1;
+        unsigned short bit4 : 1;
+        unsigned short has_c0 : 1;
+        unsigned short has_c4 : 1;
+        unsigned short has_c8 : 1;
+        unsigned short has_cc : 1;
+        unsigned short has_d0 : 1;
+        unsigned short bit10_15 : 6;
     } bits;
 };
 
@@ -20,7 +29,8 @@ struct Screen {
     char pad_0[0x8];
     void* primary;
     void* surface;
-    char pad_10[0x18 - 0x10];
+    char pad_10[0x14 - 0x10];
+    void* ddPalette;
 };
 
 #pragma pack(push, 1)
@@ -38,9 +48,11 @@ struct Display {
     void* lastBackBuffer;
     char pad_b8[0xbc - 0xb8];
     Surface* overrideSurface;
-    char pad_c0[0xc4 - 0xc0];
-    unsigned char* palette;
-    char pad_c8[0xd4 - 0xc8];
+    void* alphaTable;
+    unsigned char* shadeTable;
+    void* lightTable;
+    void* grayTable;
+    void* blueTable;
     int width;
     int height;
     int useOverrideSurface;
@@ -48,10 +60,13 @@ struct Display {
     int field_e4;
     char pad_e8[0xf0 - 0xe8];
     DisplayFlags flags;
-    char pad_f2[0x196 - 0xf2];
-    int rect_x;
-    int rect_y;
-    char pad_19e[0x1b2 - 0x19e];
+    int keyQueueSize;
+    int keyQueue[30];
+    int keyQueueHead;
+    int keyQueueTail;
+    char pad_176[0x196 - 0x176];
+    MouseEvent mouseEvent;
+    char pad_1ae[0x1b2 - 0x1ae];
     GafFrame* bmp;
     int x;
     int y;
@@ -59,7 +74,8 @@ struct Display {
     char pad_1c2[0x1ce - 0x1c2];
     int cursorThreadEnabled;
     int cursorOverlayEnabled;
-    char pad_1d6[0x614 - 0x1d6];
+    char pad_1d6[0x214 - 0x1d6];
+    unsigned int entries[256];
     float paletteBrightness;
     OPENHAPIFILE** files;
     int count;

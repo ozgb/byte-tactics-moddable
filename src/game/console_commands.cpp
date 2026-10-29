@@ -152,7 +152,7 @@ void* __stdcall PlaceFeature(void* target, unsigned short id, void* pos, void* a
 #include "../ingame/selection.h"
 #include "settings.h"
 #include "../graphics/model_render.h"
-void __stdcall SetBrightness(float value);
+#include "../graphics/palette.h"
 #include "../files/files_api.h"
 #include "settings_campaign.h"
 #include "../ingame/control_panel.h"

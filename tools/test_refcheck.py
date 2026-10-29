@@ -218,6 +218,46 @@ class ClangTest(unittest.TestCase):
         self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "#350")
         self.assertEqual(len(out), 4)
 
+    def outside_notes(self, rows, hand=()):
+        data = self.root / "data"
+        data.mkdir(exist_ok=True)
+        header = "holder,offsets,target,scenarios,ticks,target_offsets,class,note\n"
+        (data / "block_pointers.csv").write_text(header + "".join(
+            'CreateGameObject,%s,T,1,1,-,outside,"%s"\n' % row for row in rows))
+        old = [{"struct": "Game", "field": "view", "holder": "CreateGameObject", "offset": offset, "words": 1,
+                "issue": "#392", "kind": "pointer", "note": note} for offset, note in hand]
+        (data / "outside_pointers.csv").write_text(rc.render(rc.OUTSIDE_COLUMNS, old))
+        out = rc.outside_rows(self.root, {"Game": rc.Locator(self.scan)}, {"view": "view", "items": "sim"})
+        return {(r["field"], r["offset"]): r["note"] for r in out}
+
+    def test_note_naming_another_offset_is_not_copied(self):
+        notes = self.outside_notes([("0x4 0xc", "Game.items (0xc): the list")])
+        self.assertEqual(notes[("view", "0x4")], "")
+        self.assertEqual(notes[("p", "0xc")], "Game.items (0xc): the list")
+
+    def test_note_naming_the_row_offset_is_copied(self):
+        notes = self.outside_notes([("0x4 0xc", "Game.view (0x4)")])
+        self.assertEqual(notes[("view", "0x4")], "Game.view (0x4)")
+
+    def test_note_naming_no_offset_is_copied(self):
+        notes = self.outside_notes([("0x4 0xc", "Game.view")])
+        self.assertEqual(notes[("view", "0x4")], "Game.view")
+        self.assertEqual(notes[("p", "0xc")], "Game.view")
+
+    def test_hand_note_is_kept_when_the_block_note_is_not_copied(self):
+        notes = self.outside_notes([("0x4 0xc", "Game.items (0xc): the list")], hand=[("0x4", "the view surface")])
+        self.assertEqual(notes[("view", "0x4")], "the view surface")
+
+    def test_holder_only_row_takes_a_note_naming_any_of_its_offsets(self):
+        data = self.root / "data"
+        data.mkdir(exist_ok=True)
+        header = "holder,offsets,target,scenarios,ticks,target_offsets,class,note\n"
+        (data / "block_pointers.csv").write_text(
+            header + 'H,0x4+0x8*k 0x20,T,1,1,-,outside,"X (0x20)"\nG,0x4,T,1,1,-,outside,"X (0x99)"\n')
+        (data / "outside_pointers.csv").write_text(rc.render(rc.OUTSIDE_COLUMNS, []))
+        out = rc.outside_rows(self.root, {}, {})
+        self.assertEqual({r["holder"]: r["note"] for r in out}, {"H": "X (0x20)", "G": ""})
+
     def test_outside_rows_fail_when_the_game_holder_is_gone(self):
         data = self.root / "data"
         data.mkdir(exist_ok=True)
@@ -300,6 +340,15 @@ class CheckTest(unittest.TestCase):
         problems = rc.check(self.root, make_result({}, [row]))
         self.assertEqual(len(problems), 1)
         self.assertIn("data/outside_pointers.csv: out of date", problems[0])
+
+    def test_empty_note_fails(self):
+        self.exceptions()
+        row = {"struct": "Game", "field": "sounds", "holder": "H", "offset": "0x4", "words": 1, "issue": "#392",
+               "kind": "pointer", "note": ""}
+        self.outside([row])
+        problems = rc.check(self.root, make_result({}, [row]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("Game.sounds H 0x4 has an empty note", problems[0])
 
     def test_bad_issue_fails(self):
         self.exceptions(("Unit", "def", "pointer", "src/a.h", "later"))

@@ -2,13 +2,14 @@
 #define LAYER_H
 
 struct Gadget;
+struct Gui;
 
 #pragma pack(push, 1)
 
 struct Layer {
     Layer* next;
     Gadget* entries;
-    void (__stdcall* handler)(void*);
+    void (__stdcall* handler)(Gui*);
     void* data;
     unsigned int flags;
     int dirty;

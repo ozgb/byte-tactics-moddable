@@ -416,7 +416,7 @@ int __stdcall InitEnvironment(DisplayAppView* d)
     int subsys = (d->videoFlags & 0x1fe) << 1;
     d->flags.value = (d->flags.value & 0xfc03) | subsys | 1;
     if (d->flags.bits.has_c4) {
-        AllocShadeTable((DisplayContext *)d);
+        AllocShadeTable((Display *)d);
     } else {
         d->shadeTable = 0;
     }
@@ -424,15 +424,15 @@ int __stdcall InitEnvironment(DisplayAppView* d)
         AllocAlphaTable(d);
     }
     if (d->flags.bits.has_c8) {
-        AllocLightTable((DisplayContext *)d);
+        AllocLightTable((Display *)d);
     } else {
         d->lightTable = 0;
     }
     if (d->flags.bits.has_cc) {
-        AllocGrayTable((DisplayContext *)d);
+        AllocGrayTable((Display *)d);
     }
     if (d->flags.bits.has_d0) {
-        AllocBlueTable((DisplayContext *)d);
+        AllocBlueTable((Display *)d);
     }
     if (d->flags.bits.gdi) {
         d->windowed = 0;
@@ -555,15 +555,15 @@ void __stdcall ShutdownEnvironment(DisplayAppView* d)
     if (d->items)
         GameFreeThunk(d->items);
     if (d->flags.bits.has_c4)
-        FreeShadeTable((DisplayContext *)d);
+        FreeShadeTable((Display *)d);
     if (d->flags.bits.has_c0)
-        FreeAlphaTable((DisplayContext *)d);
+        FreeAlphaTable((Display *)d);
     if (d->flags.bits.has_c8)
         FreeLightTable(d);
     if (d->flags.bits.has_cc)
-        FreeGrayTable((DisplayContext *)d);
+        FreeGrayTable((Display *)d);
     if (d->flags.bits.has_d0)
-        FreeBlueTable((DisplayContext *)d);
+        FreeBlueTable((Display *)d);
     ReleaseDirectDraw(d);
     d->windowed = 0;
 }

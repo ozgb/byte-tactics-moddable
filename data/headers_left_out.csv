@@ -215,7 +215,6 @@ SendScriptCall,mismatch,"static risk rule: a convention, parameter count, or non
 SendScriptCallByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SerializeSave,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetAlliance,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SetBrightness,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetButtonStage,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetButtonStageByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetCloseHandler,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

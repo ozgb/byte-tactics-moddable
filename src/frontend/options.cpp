@@ -402,7 +402,7 @@ void __stdcall SetGrayedOut(Gui* menu, int index, int value);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
-void __stdcall SetBrightness(float value);
+#include "../graphics/palette.h"
 #include "../game/game_state.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
@@ -1519,7 +1519,7 @@ void __stdcall OpenVisualOptions(int param_1)
         }
     }
     EnableKeyCommands((Dialog *)&g_game->gui);
-    layer->handler = (void (__stdcall *)(void *))HandleVisualOptionsClick;
+    layer->handler = HandleVisualOptionsClick;
 
     if (!((*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).byte & 1)) {
         VideoModeList* list = (VideoModeList*)GameAllocIgnoreTag("SELECT VIDEO MODE", 0x20);
@@ -1773,7 +1773,7 @@ void ShowGameSettingsDialog()
 
     Layer* layer = LoadGuiLayer((Layer*)&g_game->gui, "GAMEOPTIONS.GUI", 0x1881);
     Gadget* entries = layer->entries;
-    layer->handler = (void (__stdcall *)(void *))HandleGameSettingsDialogClick;
+    layer->handler = HandleGameSettingsDialogClick;
     LoadPictureCached("GameSettings", 0, 0, 0);
     int count = layer->entries->u.count;
     unsigned int index = FindHostSlot();
@@ -1876,7 +1876,7 @@ void OpenBriefingDialog()
 {
     Layer* g = LoadGuiLayer((BriefingGui*)&g_game->gui, "BRIEFING.GUI", 0);
     Gadget* gadgets = g->entries;
-    g->handler = (void (__stdcall *)(void *))HandleBriefingClick;
+    g->handler = HandleBriefingClick;
     int i = FindGadgetIndex(gadgets, "MOREBAR", 0xe);
     gadgets[i].attribs &= ~0x10;
     i = FindGadgetIndex(gadgets, "TextRegion", 0xe);
@@ -1962,7 +1962,7 @@ void __stdcall HandleHelpClick(Gui* gui)
 void OpenHelpDialog()
 {
     Layer* g = LoadGuiLayer((HelpGui*)&g_game->gui, "HELP.GUI", 0x1881);
-    g->handler = (void (__stdcall *)(void *))HandleHelpClick;
+    g->handler = HandleHelpClick;
     LoadPictureCached("dhelp", 0, 0, 0);
     g_helpDialogBaseGadgetCount = g->entries->u.count;
     FillHelpPage((Gui *)((HelpGui*)&g_game->gui), 0, 0x11);
@@ -2155,7 +2155,7 @@ void OpenOptionsPanel()
     if (!(*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).bits.bit2) {
         LoadPictureCached("options4x", 0, 0, 0);
     }
-    panel->handler = (void (__stdcall *)(void *))HandleOptionsPanelClick;
+    panel->handler = HandleOptionsPanelClick;
     memcpy(g_optionsPrefsSnapshot.block, (char*)&g_game->block[0], 0x53);
     g_optionsPrefsSnapshot.bit0 = g_game->mapFlags_14281.bit1;
     g_optionsPrefsSnapshot.bit1 = g_game->mapFlags_14281.bit2;
@@ -2208,7 +2208,7 @@ void OpenRestartDialog()
     RestartGui* menu = (RestartGui*)&g_game->gui;
     Layer* dialog = LoadGuiLayer(menu, "RESTART.GUI", 0x1000);
     Gadget* gadgets = dialog->entries;
-    dialog->handler = (void (__stdcall *)(void *))HandleRestartDialogClick;
+    dialog->handler = HandleRestartDialogClick;
     LoadPictureCached("drestart", 0, 0, 0);
     int index = FindGadgetIndex(gadgets, "MISSIONNAME", 5);
     menu->language = menu->field_c;
@@ -2279,7 +2279,7 @@ void OpenSurrenderDialog()
         SetTranslatedTextByName((SurrenderGui*)&g_game->gui, "TITLE", title, 0);
     }
     SelectGadgetByName((Gui *)((SurrenderGui*)&g_game->gui), "CHOICE2");
-    layer->handler = (void (__stdcall *)(void *))HandleSurrenderChoice;
+    layer->handler = HandleSurrenderChoice;
     RenderLayer((Gui *)((SurrenderGui*)&g_game->gui), 0x40);
 }
 
@@ -2316,7 +2316,7 @@ void __stdcall HandleExitMenuClick(Gui* gui)
 void OpenExitMenu()
 {
     Layer* dialog = LoadGuiLayer(&g_game->gui, "EXITMENU.GUI", 0x1800);
-    dialog->handler = (void (__stdcall *)(void *))HandleExitMenuClick;
+    dialog->handler = HandleExitMenuClick;
     FindGadgetIndex(dialog->entries, "RESTART", 1);
     if (g_game->net->GetGameType() == 1) {
         SetGadgetActiveByName(&g_game->gui, "RESTART", 1);
@@ -2383,7 +2383,7 @@ void __stdcall HandleInGameOptionsClick(Gui* gui)
     if (IsCurrentGadgetNamed((Dialog *)gui, "HELP")) {
         PlaySoundByName("Options", 0);
         Layer* g = LoadGuiLayer(&g_game->gui, "HELP.GUI", 0x1881);
-        g->handler = (void (__stdcall *)(void *))HandleHelpClick;
+        g->handler = HandleHelpClick;
         LoadPictureCached("dhelp", 0, 0, 0);
         g_helpDialogBaseGadgetCount = g->entries->u.count;
         FillHelpPage(&g_game->gui, 0, 0x11);
@@ -2396,7 +2396,7 @@ void __stdcall HandleInGameOptionsClick(Gui* gui)
         if (g_game->net->GetGameType() == 1) {
             Layer* g = LoadGuiLayer(&g_game->gui, "BRIEFING.GUI", 0);
             Gadget* gadgets = g->entries;
-            g->handler = (void (__stdcall *)(void *))HandleBriefingClick;
+            g->handler = HandleBriefingClick;
             int i = FindGadgetIndex(gadgets, "MOREBAR", 0xe);
             gadgets[i].attribs &= ~0x10;
             i = FindGadgetIndex(gadgets, "TextRegion", 0xe);
@@ -2427,7 +2427,7 @@ void __stdcall HandleInGameOptionsClick(Gui* gui)
 void OpenInGameOptions()
 {
     Layer* layer = LoadGuiLayer(&g_game->gui, "ARMOPT.GUI", 0x800);
-    layer->handler = (void (__stdcall *)(void *))HandleInGameOptionsClick;
+    layer->handler = HandleInGameOptionsClick;
     SetGrayedOut(&g_game->gui, FindGadgetIndex(layer->entries, "SAVEGAME", 1),
                  g_game->net->GetGameType() == 3);
     SetGrayedOut(&g_game->gui, FindGadgetIndex(layer->entries, "LOADGAME", 1),

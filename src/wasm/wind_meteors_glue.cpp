@@ -12,6 +12,7 @@
 #include "../util/vec3.h"
 #include "../files/files_bank.h"
 #include "../util/commands.h"
+#include "../../interfaces/host.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
@@ -351,6 +352,18 @@ wasmtime_func_t s_fuelGet;
 long long s_fuelBudget;
 int s_fuelOpen;
 int s_fuelTick;
+
+const unsigned kImportCount = sizeof kImports / sizeof kImports[0];
+int s_timing;
+unsigned long long s_slotTime[SLOT_COUNT];
+unsigned long long s_callTime[SLOT_COUNT];
+unsigned s_slotCalls[SLOT_COUNT];
+unsigned long long s_emptyTime;
+unsigned s_emptyCalls;
+unsigned long long s_warmTime;
+unsigned s_warmCalls;
+unsigned long long s_importTime[kImportCount];
+unsigned s_importCalls[kImportCount];
 unsigned s_gameAddress;
 unsigned s_simAddress;
 unsigned s_extTdfAddress;
@@ -392,7 +405,12 @@ void FuelSet(long long value)
 {
     wasmtime_val_raw_t a[1];
     a[0].i64 = value;
+    unsigned long long start = s_timing ? host_time_counter() : 0;
     wl_call(s_loader, s_module, &s_fuelSet, a, 1);
+    if (s_timing) {
+        s_emptyTime += host_time_counter() - start;
+        s_emptyCalls++;
+    }
 }
 
 void FuelBegin()
@@ -407,13 +425,28 @@ void FuelBegin()
 
 void Call(Slot slot, wasmtime_val_raw_t* a, size_t count)
 {
+    unsigned long long start = s_timing ? host_time_counter() : 0;
     Prepare(slot);
     if (s_slotDepth == 0)
         FuelBegin();
     s_slotDepth++;
+    unsigned long long callStart = s_timing ? host_time_counter() : 0;
     wl_call(s_loader, s_module, &s_slots[slot], a, count);
-    if (--s_slotDepth == 0)
+    unsigned long long callEnd = s_timing ? host_time_counter() : 0;
+    if (--s_slotDepth == 0) {
         s_handleCount = 0;
+        if (s_timing) {
+            s_slotTime[slot] += host_time_counter() - start;
+            s_callTime[slot] += callEnd - callStart;
+            s_slotCalls[slot]++;
+            wasmtime_val_raw_t b[1];
+            b[0].i64 = 0;
+            unsigned long long warm = host_time_counter();
+            wl_call(s_loader, s_module, &s_fuelGet, b, 1);
+            s_warmTime += host_time_counter() - warm;
+            s_warmCalls++;
+        }
+    }
 }
 
 void Call0(Slot slot)
@@ -509,16 +542,45 @@ void __cdecl UpdateWindOnStreamThunk(RandStream stream)
     Call1(SLOT_UPDATE_WIND_ON_STREAM, (unsigned)stream);
 }
 
+const char* __cdecl TimedImport(void* user, wasmtime_val_raw_t* a)
+{
+    unsigned index = (unsigned)((const ImportDef*)user - kImports);
+    unsigned long long start = host_time_counter();
+    const char* error = kImports[index].function(nullptr, a);
+    s_importTime[index] += host_time_counter() - start;
+    s_importCalls[index]++;
+    return error;
+}
+
 WindMeteorsSeam s_seam;
+const WindMeteorsSeam* s_nativeSeam;
+WindMeteorsSeam s_timedNative;
+
+void __cdecl TimedNativeUpdateWind()
+{
+    unsigned long long start = host_time_counter();
+    s_nativeSeam->UpdateWind();
+    s_slotTime[SLOT_UPDATE_WIND] += host_time_counter() - start;
+    s_slotCalls[SLOT_UPDATE_WIND]++;
+}
+
+void __stdcall TimedNativeUpdateMeteors()
+{
+    unsigned long long start = host_time_counter();
+    s_nativeSeam->UpdateMeteors();
+    s_slotTime[SLOT_UPDATE_METEORS] += host_time_counter() - start;
+    s_slotCalls[SLOT_UPDATE_METEORS]++;
+}
 
 }
 
-int __stdcall WindMeteorsInstall(wl_loader* loader)
+int __stdcall WindMeteorsInstall(wl_loader* loader, int timing)
 {
     s_loader = loader;
+    s_timing = timing;
     for (unsigned i = 0; i < sizeof kImports / sizeof kImports[0]; i++) {
         const ImportDef& def = kImports[i];
-        if (!wl_define_import(loader, def.module, def.name, def.signature, def.function, nullptr))
+        if (!wl_define_import(loader, def.module, def.name, def.signature, timing ? TimedImport : def.function, timing ? (void*)&def : nullptr))
             return 0;
     }
     return 1;
@@ -589,4 +651,26 @@ int __stdcall WindMeteorsOutOfFuel(unsigned* budget)
 {
     *budget = (unsigned)s_fuelBudget;
     return s_fuelOpen && FuelLeft() < 0;
+}
+
+void __stdcall WindMeteorsTimeNative()
+{
+    s_nativeSeam = g_seams.wind_meteors;
+    s_timedNative = *s_nativeSeam;
+    s_timedNative.UpdateWind = TimedNativeUpdateWind;
+    s_timedNative.UpdateMeteors = TimedNativeUpdateMeteors;
+    g_seams.wind_meteors = &s_timedNative;
+}
+
+void __stdcall WindMeteorsTimingReport(char* text)
+{
+    text[0] = '\0';
+    for (int i = 0; i < SLOT_COUNT; i++)
+        if (s_slotCalls[i] != 0)
+            sprintf(text + strlen(text), "slot\t%s\t%u\t%I64u\t%I64u\n", kSlotNames[i], s_slotCalls[i], s_slotTime[i], s_callTime[i]);
+    for (unsigned i = 0; i < kImportCount; i++)
+        if (s_importCalls[i] != 0)
+            sprintf(text + strlen(text), "import\t%s\t%u\t%I64u\n", kImports[i].name, s_importCalls[i], s_importTime[i]);
+    sprintf(text + strlen(text), "empty\t%u\t%I64u\n", s_emptyCalls, s_emptyTime);
+    sprintf(text + strlen(text), "warm\t%u\t%I64u\n", s_warmCalls, s_warmTime);
 }

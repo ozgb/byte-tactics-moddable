@@ -624,12 +624,13 @@ def layout_offsets(wanted):
     return found
 
 
-def statics_run():
+def statics_run(path=None, report=None):
+    """The statics check on the stubbed run; with path, another build of the module (a variant), and with report (a dict), its exports and spawn count."""
     import wasmtime
 
     pins = game_manifest()
     entry = pins["modules"][0]
-    path = os.path.join(OUT, entry["name"] + ".wasm")
+    path = path or os.path.join(OUT, entry["name"] + ".wasm")
     if not os.path.exists(path):
         sys.exit(f"{path} is missing: build first: uv run tools/wasm_modules.py build")
     with open(path, "rb") as f:
@@ -740,6 +741,8 @@ def statics_run():
     if state["spawns"] == 0:
         print("FAIL: SpawnProjectile was never called, so no meteor ran")
         return 1
+    if report is not None:
+        report.update(exports=exports, store=store, spawns=state["spawns"], most=most)
     print(f"statics: {STATICS_TICKS} ticks, {state['spawns']} SpawnProjectile calls, {statics[1] - statics[0]} bytes hashed, ok")
     print(f"fuel: the most one tick burned on the stubbed run is {most}, under the fuel_budget {budget} of {entry['name']}")
     return 0

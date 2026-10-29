@@ -31,6 +31,11 @@ unsigned s_baselineHigh;
 unsigned s_fuelMax;
 unsigned s_fuelMaxTick;
 int s_haveFuel;
+int s_timing;
+int s_timingStarted;
+unsigned s_timingMs;
+unsigned s_timingFirstTick;
+unsigned long long s_timingCounter;
 
 void WhereText(char* text)
 {
@@ -220,7 +225,7 @@ void Start()
     s_memory.scratchSize = layout->scratch_size;
     SimBlockAttach(s_memory.base + layout->block_base);
 
-    if (!WindMeteorsInstall(s_loader))
+    if (!WindMeteorsInstall(s_loader, s_timing))
         LoaderFatal(wl_error(s_loader));
     wl_module* module = wl_load_module_bytes(s_loader, kModuleName, bytes, size);
     unsigned top = 0;
@@ -273,6 +278,12 @@ struct Starter {
         strncpy(line, host_command_line(), sizeof line - 1);
         line[sizeof line - 1] = '\0';
         s_testRun = strstr(line, "testmode") != nullptr;
+        if (s_testRun) {
+            FILE* on = fopen("moduletime.on", "rb");
+            s_timing = on != nullptr;
+            if (on != nullptr)
+                fclose(on);
+        }
         s_wasm = 1;
         if (HasSwitch(line, "modules", mode, sizeof mode)) {
             if (_stricmp(mode, "native") == 0)
@@ -289,8 +300,46 @@ Starter s_starter;
 
 }
 
+namespace {
+
+void WriteTiming(unsigned tick)
+{
+    static char body[8192];
+    unsigned long long overheadStart = host_time_counter();
+    for (int i = 0; i < 20000; i++)
+        host_time_counter();
+    unsigned long long overhead = (host_time_counter() - overheadStart) / 20000;
+    unsigned long long counter = host_time_counter() - s_timingCounter;
+    unsigned ms = host_time_ms() - s_timingMs;
+    WindMeteorsTimingReport(body);
+    FILE* file = fopen("moduletime.txt", "wb");
+    if (file == nullptr)
+        ModulesFatal("testmode: cannot write moduletime.txt");
+    fprintf(file, "bt-moduletime 1\nmode\t%s\nticks\t%u\nwall_counter\t%I64u\nwall_ms\t%u\ntimer_cost\t%I64u\n%s",
+            s_wasm ? "wasm" : "native", tick - s_timingFirstTick + 1, counter, ms, overhead, body);
+    fclose(file);
+}
+
+void TimingTick(unsigned tick)
+{
+    if (!s_timingStarted) {
+        s_timingStarted = 1;
+        s_timingFirstTick = tick;
+        s_timingMs = host_time_ms();
+        s_timingCounter = host_time_counter();
+        if (!s_wasm)
+            WindMeteorsTimeNative();
+    }
+    if (tick % 600 == 0)
+        WriteTiming(tick);
+}
+
+}
+
 void __stdcall ModulesCheckStatics(unsigned tick)
 {
+    if (s_timing)
+        TimingTick(tick);
     if (!s_wasm)
         return;
     unsigned used;

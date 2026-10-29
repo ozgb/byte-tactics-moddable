@@ -2,10 +2,12 @@
 #define GAME_H
 
 #include "../graphics/rect.h"
+#include "../graphics/movies.h"
 #include "../ingame/frame_timers.h"
 #include "../map/grid.h"
 #include "../network/player.h"
 #include "../network/settings.h"
+#include "settings.h"
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
 #include "../frontend/net_game_flag_low_bits.h"
@@ -72,7 +74,6 @@ struct ConnectionBlob;
 struct MainFrameDisplayContext;
 struct GameDescEntry;
 struct SoundCategoryEntry;
-struct SkirmishOptionsView;
 struct EyeView;
 struct Feature;
 struct FeatureSpot;
@@ -244,7 +245,7 @@ struct Game {
         char message_519[5745];
         char messages[9351];
     };
-    SkirmishOptionsView* options;
+    SkirmishOptionsTable* options;
     union {
         struct {
             int loaded[10];
@@ -540,7 +541,7 @@ struct Game {
             char pad_2be3_b[11];
             NetGameFlagLowBits lobbyUiDirtyFlags_2bee;
             char pad_2bf0_b[134];
-            char orders[28];
+            char viewSpanB_2c76[28];
             char pad_2c92_a[71017];
             MapInfo info_141fb;
             char pad_14277[10];
@@ -565,7 +566,7 @@ struct Game {
                 unsigned short bits5 : 11;
             } bits_2bee;
             char pad_2bf0_c[134];
-            char orders_2c76[68];
+            char viewSpanC_2c76[68];
             char pad_2cba[70977];
             MapGrid sortUnits;
             char unknown_1428b[102];
@@ -761,13 +762,7 @@ struct Game {
     };
     PieceFrame frames[300][6];
     int soundCount;
-    union {
-        struct {
-            int soundIds[1];
-            char pad_33a17[1020];
-        };
-        int sounds[256];
-    };
+    void* sounds[256];
     union {
         struct {
             char soundNames[1][32];
@@ -1061,7 +1056,7 @@ struct Game {
     int sides;
     union {
         struct {
-            char names[1][562];
+            char sideDefsSpanFirst_37f3d[562];
             char pad_3816f[2248];
             unsigned int lastTick;
             int frames_38a3b;
@@ -1092,7 +1087,7 @@ struct Game {
             unsigned char shade;
             unsigned short net_flags;
             ParticleListsView* lists_38d77;
-            void* moviePlayer;
+            MoviePlayer* moviePlayer;
             unsigned short flags_38d7f;
             int playerCount;
             FrameTimers timers;
@@ -1116,7 +1111,7 @@ struct Game {
             char glamour[256];
         };
         struct {
-            char sideDefsHead[1154];
+            char sideDefsSpanHead_37f3d[1154];
             char unknown_383bf[1682];
             unsigned char pauseFlags;
             char pad_38a52[1];
@@ -1383,7 +1378,6 @@ static_assert(offsetof(Game, array_14907) == 0x14907, "array_14907");
 static_assert(offsetof(Game, panelTop) == 0x14907, "panelTop");
 static_assert(offsetof(Game, vertices) == 0x1e88f, "vertices");
 static_assert(offsetof(Game, vertices_1e88f) == 0x1e88f, "vertices_1e88f");
-static_assert(offsetof(Game, soundIds) == 0x33a13, "soundIds");
 static_assert(offsetof(Game, sounds) == 0x33a13, "sounds");
 static_assert(offsetof(Game, soundNames) == 0x33e13, "soundNames");
 static_assert(offsetof(Game, soundNames_33e13) == 0x33e13, "soundNames_33e13");
@@ -1407,7 +1401,6 @@ static_assert(offsetof(Game, bits_37f06) == 0x37f06, "bits_37f06");
 static_assert(offsetof(Game, bits_37f06_1) == 0x37f06, "bits_37f06_1");
 static_assert(offsetof(Game, bits_37f2f_2) == 0x37f2f, "bits_37f2f_2");
 static_assert(offsetof(Game, block) == 0x37ee6, "block");
-static_assert(offsetof(Game, names) == 0x37f3d, "names");
 static_assert(offsetof(Game, startPos) == 0x37f5f, "startPos");
 static_assert(offsetof(Game, sideDefs) == 0x37f3d, "sideDefs");
 static_assert(offsetof(Game, flags_38a51) == 0x38a51, "flags_38a51");

@@ -290,7 +290,7 @@ void BattleFrame(void)
             BlankScreen();
             SetCursor(0x14);
             g_game->numPlayers = saved;
-            g_seams.map->LoadMissionByName(g_game->net, 0, (char *)g_game->options + 0x11c);
+            g_seams.map->LoadMissionByName(g_game->net, 0, g_game->options->mapName);
             ApplySlotsToGamePlayers();
             g_game->netGameFlags_2a44.value |= 4;
             g_game->mode_391f1 = 2;

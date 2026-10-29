@@ -800,7 +800,7 @@ static int FindSide(const char* name)
 {
     int count = g_game->sides;
     for (int i = 0; i < count; i++) {
-        if (_stricmp(g_game->names[i], name) == 0)
+        if (_stricmp(g_game->sideDefs[i].name, name) == 0)
             return i;
     }
     return -1;
@@ -847,7 +847,7 @@ static void SeedNetworkHost(int host)
     g_game->loadingFlags.value |= 8;
 }
 
-static OptionsTable* ScenarioTable() { return (OptionsTable*)g_game->options; }
+static OptionsTable* ScenarioTable() { return g_game->options; }
 
 static Mission* BeginMission(int type)
 {

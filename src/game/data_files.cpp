@@ -158,7 +158,7 @@ int __stdcall LoadSoundByName(char* name, const char* file)
     }
     if (g_game->soundCount + 1 >= 0x100)
         return 0;
-    (*(void*(*)[256])&g_game->sounds)[g_game->soundCount] = LoadSoundFile(file);
+    g_game->sounds[g_game->soundCount] = LoadSoundFile(file);
     strncpy(g_game->soundFiles[g_game->soundCount], file, 0x20);
     if (name != 0)
         strncpy(g_game->soundNames_33e13[g_game->soundCount], name, 0x20);

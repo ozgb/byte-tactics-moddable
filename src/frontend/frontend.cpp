@@ -616,8 +616,8 @@ void __stdcall PlayMovie(char* param_1)
         SetCursorOverlayEnabled(0);
         do {
             g_game->moviePlayer = new MoviePlayer(path, 0, 600000, 1, 2000000, 1);
-            ((MoviePlayer*)g_game->moviePlayer)->Play();
-            MoviePlayer* p = (MoviePlayer*)g_game->moviePlayer;
+            g_game->moviePlayer->Play();
+            MoviePlayer* p = g_game->moviePlayer;
             if (p != 0) {
                 p->Close();
                 operator delete(p);

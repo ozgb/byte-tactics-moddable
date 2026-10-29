@@ -146,7 +146,7 @@ void FreeSounds()
 {
     FreeSoundCategories();
     for (int i = 0; i < g_game->soundCount; i++)
-        FreeSoundSet((*(void ** (*)[1])&g_game->soundIds)[i]);
+        FreeSoundSet((void**)g_game->sounds[i]);
     g_game->soundCount = 0;
 }
 

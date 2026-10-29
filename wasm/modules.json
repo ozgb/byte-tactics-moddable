@@ -13,8 +13,8 @@
   "modules": [
     {
       "name": "wind_meteors",
-      "fuel_budget": 1000000000,
-      "size_budget": 20000,
+      "fuel_budget": 250,
+      "size_budget": 13100,
       "data_base": 196608,
       "table_base": 48,
       "cxx": ["wasm/wind_meteors/module.cpp", "src/map/meteors.cpp", "src/game/game_state.cpp", "src/game/console_commands.cpp"],

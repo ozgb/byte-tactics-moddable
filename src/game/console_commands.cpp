@@ -163,7 +163,7 @@ void __stdcall AddMessage(char* text, int key, int value, int last);
 #include "../map/features.h"
 void* __stdcall PlaceFeature(void* target, unsigned short id, void* pos, void* active,
                              unsigned char owner);
-void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind, int d, int e, int f);
+#include "../ingame/selection.h"
 #include "settings.h"
 #include "../graphics/model_render.h"
 void __stdcall SetBrightness(float value);
@@ -226,7 +226,7 @@ void __stdcall CmdAssign(CommandArgs* args)
     if (kind.index) {
         int a = args->GetIntArg(1, 0);
         int b = args->GetIntArg(2, 0);
-        IssueOrderToSelection(g_game->orders_2c76, 0, kind, 0, a, b);
+        IssueOrderToSelection((OrderTypeEntry*)g_game->orders_2c76, 0, kind, nullptr, a, b);
     }
 }
 

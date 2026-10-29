@@ -722,7 +722,7 @@ address,name
 0x438700,WaitIfNotInBuildStance
 0x438730,WaitIfCobBusy
 0x438760,MissionType::MissionType
-0x438830,OrderType::GetTableEntry
+0x438830,MissionType::GetTableEntry
 0x438850,GetTableEntryByTypeByte
 0x438870,Order::OrStatusFlags
 0x438880,Order::AnnounceStatusIfFlagged

@@ -9,6 +9,14 @@ union Fixed {
     };
 };
 
+inline Fixed MakeFixed(int whole)
+{
+    Fixed f;
+    f.fraction = 0;
+    f.whole = whole;
+    return f;
+}
+
 struct Vec3 {
     int x;
     int y;

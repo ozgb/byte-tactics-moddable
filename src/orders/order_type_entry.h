@@ -4,6 +4,14 @@
 struct Order;
 
 #pragma pack(push, 1)
+struct OrderTypeEntry {
+    unsigned char index;
+    char unknown_1[0x8 - 0x1];
+    unsigned int flags_a;
+    char unknown_c[0x11 - 0xc];
+    unsigned int flags;
+};
+
 struct OrderTableEntry {
     int value;
     int (__stdcall* notify)(void* unit, Order* obj, unsigned int code);
@@ -18,10 +26,6 @@ struct OrderTableEntry {
     int operator!=(const OrderTableEntry&) const { return 0; }
 };
 
-struct OrderType {
-    unsigned char index;
-    OrderTableEntry* GetTableEntry();
-};
 #pragma pack(pop)
 
 #endif

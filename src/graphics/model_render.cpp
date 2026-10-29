@@ -33,22 +33,6 @@ struct ModelBoundsOrigin {
 
 #include "gaf_frame.h"
 
-struct CompositeSurfaceView {
-    int width;
-    int height;
-    int pitch;
-    void* bits;
-    int zPriority;
-    int colorKey;
-    unsigned short x;
-    unsigned short y;
-    char unknown_1c[0x10];
-    unsigned int flag0 : 1;
-    unsigned int flag1 : 1;
-};
-
-class Surface;
-
 #include "model_types.h"
 
 #include "../units/unit_def.h"
@@ -463,16 +447,16 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, ModelState* model)
         short sdy = 0;
         Swap(bmp->xOffset, sdx);
         Swap(bmp->yOffset, sdy);
-        CompositeSurfaceView surface;
-        SurfaceFromFrame((Surface *)&surface, this->bitmap);
+        Surface surface;
+        SurfaceFromFrame(&surface, this->bitmap);
         memset(this->bitmap->pixelsOrLayers, this->bitmap->transparency,
                this->bitmap->height * this->bitmap->width);
         memset(this->bitmap->scratch, 0, this->bitmap->height * this->bitmap->width);
-        DrawFrame((Surface*)&surface, bmp,
+        DrawFrame(&surface, bmp,
                      this->bitmap->xOffset - sdx, this->bitmap->yOffset - sdy);
-        surface.bits = this->bitmap->scratch;
+        surface.pixels = this->bitmap->scratch;
         Swap(bmp->pixelsOrLayers, bmp->scratch);
-        DrawFrame((Surface*)&surface, bmp,
+        DrawFrame(&surface, bmp,
                      this->bitmap->xOffset - sdx, this->bitmap->yOffset - sdy);
         Swap(bmp->pixelsOrLayers, bmp->scratch);
         Swap(bmp->xOffset, sdx);

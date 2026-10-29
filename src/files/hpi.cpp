@@ -33,8 +33,11 @@ struct HapiHeader {
     unsigned char version[4];
     unsigned int size;
     unsigned char obfuscate;
-    char unknown_d[3];
-    ArchiveDirectory* list;
+    char reserved[3];
+    union {
+        int listOffset;
+        ArchiveDirectory* list;
+    };
 };
 
 struct OPENHAPIFILE {
@@ -1153,19 +1156,6 @@ struct HapiBuf {
     char* buf;
 };
 
-struct HapiPackHeaderView {
-    char magic[4];
-    char a4;
-    char a5;
-    char a6;
-    char a7;
-    unsigned int size;
-    unsigned char key;
-    char ad;
-    unsigned short ae;
-    int extra;
-};
-
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, void* f,
                            void (__cdecl* cb)(unsigned), unsigned extra,
@@ -1201,15 +1191,15 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
     off = HAPI_BuildArchiveDirectory(srcname, &sb, (int*)&extra);
 
     {
-        struct HapiPackHeaderView* h = (struct HapiPackHeaderView*)sb.buf;
+        HapiHeader* h = (HapiHeader*)sb.buf;
         unsigned int m;
         unsigned int t;
         unsigned char k;
         strncpy(sb.buf, "HAPI", 4);
-        h->a4 = 0;
-        h->a5 = 0;
-        h->a6 = 1;
-        h->a7 = 0;
+        h->version[0] = 0;
+        h->version[1] = 0;
+        h->version[2] = 1;
+        h->version[3] = 0;
         h->size = sb.size;
         m = key & 0xff;
         if ((unsigned char)key == 0)
@@ -1218,10 +1208,11 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
             t = (m >> 2) | (m << 6);
             k = ~t;
         }
-        h->key = k;
-        h->ad = 0;
-        h->ae = 0;
-        h->extra = off;
+        h->obfuscate = k;
+        h->reserved[0] = 0;
+        h->reserved[1] = 0;
+        h->reserved[2] = 0;
+        h->listOffset = off;
     }
 
     f = host_file_create(dstname, 0);
@@ -1260,14 +1251,6 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
     }
     return 1;
 }
-
-#pragma pack(push, 1)
-struct ArchiveFileInfoView {
-    unsigned int offset;
-    unsigned int size;
-    unsigned char flags;
-};
-#pragma pack(pop)
 
 #include "../../link/globals.h"
 
@@ -1343,10 +1326,10 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
                     e = (ArchiveEntry*)(out->buf + entries);
                     e += k;
                     e->data = nodeOff;
-                    ArchiveFileInfoView* node = (ArchiveFileInfoView*)(out->buf + e->data);
+                    Info* node = (Info*)(out->buf + e->data);
                     node->size = fd.size;
                     node->offset = 0;
-                    node->flags = 0;
+                    node->compressed = 0;
                     *total += node->size;
                 }
                 k++;

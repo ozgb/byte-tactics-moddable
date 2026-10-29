@@ -62,33 +62,18 @@ union TypeFlags {
     };
 };
 
-struct FixedShorts {
-    unsigned short frac;
-    short whole;
-};
-
 struct GroundHeightPos {
-    FixedShorts x;
-    FixedShorts y;
-    FixedShorts z;
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 
-
-struct ClampFixedParts {
-    unsigned int frac : 16;
-    int whole : 16;
-};
-
-union ClampFixed {
-    int value;
-    ClampFixedParts parts;
-};
 
 struct ClampedPos {
-    ClampFixed x;
-    ClampFixed y;
-    ClampFixed z;
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 #include "../weapons/unit_weapon_slot.h"
@@ -131,14 +116,6 @@ int __stdcall GetGroundHeight(GroundHeightPos* p)
     int f = c[1].height;
     int r1 = a + (b - a) * xf / 16;
     return r1 + ((e + (f - e) * xf / 16) - r1) * zf / 16;
-}
-
-static inline ClampFixed MakeFixed(int i)
-{
-    ClampFixed f;
-    f.parts.frac = 0;
-    f.parts.whole = i;
-    return f;
 }
 
 // FUNCTION: 0x4853b0

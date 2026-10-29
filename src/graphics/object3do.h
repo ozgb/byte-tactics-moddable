@@ -2,6 +2,7 @@
 #define OBJECT3DO_H
 
 struct PieceFrame;
+struct Vec3;
 
 #pragma pack(push, 1)
 struct Object3do {
@@ -24,7 +25,7 @@ struct Object3do {
     };
     char* name;
     int active;
-    void* vertices;
+    Vec3* vertices;
     PieceFrame* faces;
     Object3do* sibling;
     Object3do* child;

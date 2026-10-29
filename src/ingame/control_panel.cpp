@@ -106,8 +106,7 @@ int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name);
 void __stdcall SetGadgetStatus(Gui* menu, int index, int value);
 void __stdcall PlaySoundByName(char* name, int broadcast);
 void __stdcall AdjustBuildCount(MissionType kind, Unit* unit, int id, int count);
-void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind,
-                                     int d, int e, int f);
+#include "selection.h"
 void __stdcall SetGrayedOut(Gui* menu, int index, int value);
 void __stdcall SetGadgetActive(Gui* menu, int index, char value);
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
@@ -307,7 +306,7 @@ void __stdcall SetOrderIntent(unsigned char mode)
 int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
 {
     char name[32];
-    void* orders = g_game->orders;
+    OrderTypeEntry* orders = (OrderTypeEntry*)g_game->orders;
     Gadget* e;
     if (entries[button->index].type == 1) e = &entries[button->index];
 
@@ -551,7 +550,7 @@ void __stdcall RefreshOrderButtons(Unit* unit)
 int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
 {
     Unit* unit = &g_game->units[g_game->unitIndex];
-    void* orders = g_game->orders;
+    OrderTypeEntry* orders = (OrderTypeEntry*)g_game->orders;
     int index = menu->hotGadgetIndex;
 
     if (MenuEntryNameContains(entries, "MOVEORD", index)) {

@@ -112,15 +112,10 @@ struct ModelState {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-struct FixedParts {
-    unsigned short frac;
-    short whole;
-};
-
 struct FixedVec3Parts {
-    FixedParts x;
-    FixedParts y;
-    FixedParts z;
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 union FixedVec3Union {

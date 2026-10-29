@@ -290,5 +290,66 @@ class MajorsTests(unittest.TestCase):
         self.assertEqual(json.loads(wm.manifest_text(game)), game)
 
 
+SIGNATURES = {"weapons": {"Spawn": [["block", "int"], "int"]}, "services": {"Rand": [["int"], "int"], "Log": [["linear"], "void"]}}
+ADAPTED = {
+    "majors": {"weapons": 1, "services": 2, "wind_meteors": 1},
+    "signatures": SIGNATURES,
+    "adapters": [],
+    "modules": [{"name": "m", "interface": "wind_meteors", "majors": {"wind_meteors": 1, "weapons": 1, "services": 1}, "slots": {},
+                 "imports": {"weapons": {"Spawn": [["block", "int"], "int"]},
+                             "services": {"Rand": [["int", "int"], "int"], "Log": [["linear"], "void"]}}}],
+}
+RAND_ADAPTER = {"interface": "services", "from_major": 1, "name": "Rand", "args": [0], "result": "pass"}
+
+
+class AdapterManifestTests(unittest.TestCase):
+    def test_a_changed_import_without_an_adapter_fails(self):
+        problems = wm.check_majors(ADAPTED, ADAPTED["majors"])
+        self.assertEqual(problems, ["m: services.Rand changed between major 1 and 2, and the manifest has no adapter for it"])
+
+    def test_an_adapter_covers_the_change(self):
+        self.assertEqual(wm.check_majors(dict(ADAPTED, adapters=[RAND_ADAPTER]), ADAPTED["majors"]), [])
+
+    def test_an_adapter_from_another_major_does_not_cover_it(self):
+        adapter = dict(RAND_ADAPTER, from_major=0)
+        problems = wm.check_majors(dict(ADAPTED, adapters=[adapter]), ADAPTED["majors"])
+        self.assertTrue(any("no adapter for it" in p for p in problems))
+        self.assertTrue(any("from_major must be older" in p for p in problems))
+
+    def test_an_adapter_for_an_unknown_name_fails(self):
+        problems = wm.check_majors(dict(ADAPTED, adapters=[RAND_ADAPTER, dict(RAND_ADAPTER, name="Nope")]), ADAPTED["majors"])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("no Nope for services", problems[0])
+
+    def test_a_current_module_must_match_the_signatures(self):
+        entry = dict(ADAPTED["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 2})
+        problems = wm.check_majors(dict(ADAPTED, modules=[entry]), ADAPTED["majors"])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("services.Rand is [['int', 'int'], 'int'] but the current signature is [['int'], 'int']", problems[0])
+
+    def test_a_name_without_a_signature_fails(self):
+        problems = wm.check_majors(dict(ADAPTED, signatures={"weapons": SIGNATURES["weapons"]}, adapters=[RAND_ADAPTER]), ADAPTED["majors"])
+        self.assertTrue(any("the manifest's signatures have no Rand for services" in p for p in problems))
+
+    def test_signatures_come_from_the_current_modules_over_the_old_ones(self):
+        entry = dict(ADAPTED["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 2},
+                     imports={"weapons": {"Spawn": [["block", "int", "int"], "int"]}, "services": {"Rand": [["int"], "int"]}})
+        game = dict(ADAPTED, modules=[entry])
+        found = wm.current_signatures(game, [entry], ADAPTED["majors"])
+        self.assertEqual(found["weapons"], {"Spawn": [["block", "int", "int"], "int"]})
+        self.assertEqual(found["services"], {"Rand": [["int"], "int"], "Log": [["linear"], "void"]})
+
+    def test_modules_that_disagree_on_a_current_signature_fail(self):
+        first = dict(ADAPTED["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 2}, imports={"services": {"Rand": [["int"], "int"]}})
+        second = dict(first, name="n", imports={"services": {"Rand": [["linear"], "int"]}})
+        with self.assertRaises(SystemExit):
+            wm.current_signatures(ADAPTED, [first, second], ADAPTED["majors"])
+
+    def test_the_manifest_writer_keeps_adapters_one_per_line(self):
+        text = wm.manifest_text(dict(ADAPTED, adapters=[RAND_ADAPTER, dict(RAND_ADAPTER, name="Log")]))
+        self.assertIn('"adapters": [\n    {"interface": "services", "from_major": 1, "name": "Rand", "args": [0], "result": "pass"},\n', text)
+        self.assertEqual(json.loads(text)["adapters"][1]["name"], "Log")
+
+
 if __name__ == "__main__":
     unittest.main()

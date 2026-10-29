@@ -4,6 +4,7 @@
     uv run tools/wasm_modules.py check     # run both fixtures in one wasmtime memory and table
     uv run tools/wasm_modules.py imports   # check every built module's imports and exports
     uv run tools/wasm_modules.py statics   # run wind_meteors for 2000 ticks and check its statics never change
+    uv run tools/wasm_modules.py adapters  # run the loader's adapters and refusals over tests/wasm/adapters
 
 Both fixtures use the fixed-base convention (#562): each imports env.memory and
 env.__indirect_function_table, is linked with its own --global-base and --table-base
@@ -45,6 +46,26 @@ data_base to the low end of its stack, as linked) after setup and after every ti
 state outside the block fails at the first tick whose hash differs. The field offsets come from
 src/state/layout_asserts.cpp (Game) and wasm/wind_meteors/layout_asserts.h (SimGlobals).
 
+Adapters (#566). When a module was built against an older major of an interface, the loader (lib/wasmloader)
+fills each slot and import whose signature changed through an adapter. The manifest holds "signatures"
+({interface: {name: [[kinds], result]}}, the current kinds of every slot and import) and "adapters", a list of
+{"interface", "from_major", "name", "args", "result"} (name is a slot of the module's own interface, or an import of
+one of its import groups). The caller makes the call (the game for a slot, the module for an import) and the callee
+receives the converted call (the module for a slot, the host for an import). "args" has one entry per parameter of
+the callee, each the index of a caller parameter of the same kind, or {"const": n} for an int parameter. "result"
+is "pass" (the callee's result is the caller's, of the same kind), "void" (the caller has no result) or
+{"const": n} (the caller's int result). Only reorders, drops and added constants fit; a conversion that needs
+code (linear and handle, int and f64) is refused by the loader. build writes "signatures" from the modules built
+against the current major; check fails when an older module has a changed slot or import with no adapter.
+
+adapters builds lib/wasmloader with clang for the build machine, together with tests/wasm/adapters/adapters.c, and runs it
+against the libwasmtime that the pinned wasmtime package ships (fetched with uv). tests/wasm/adapters holds a manifest of
+a test interface calc (the module's slots, major 2) and calc_host (imports, major 3), and two modules in text format
+built with wasm-tools: current, built against those majors, and old, built against calc 1 and calc_host 2, which
+the manifest's adapters bring to the current signatures with each form (reorder, drop, constant argument, constant
+result, no result). The program loads old, then current, and checks every slot and import of both, and then checks the
+loader's refusals: a changed slot or import without an adapter, and each adapter its kinds rule out.
+
 Interface majors (#566). wasm/modules.json records the major of every interfaces/*.h that has version macros under
 "majors", and for each module the interface its slots belong to ("interface") and the major of each interface it
 exports slots for or imports from, the one it was built against ("majors"). The import groups of a module are
@@ -83,8 +104,11 @@ KINDS = {"int", "f64", "linear", "block", "scratch", "handle"}
 INTERFACES = os.path.join(ROOT, "interfaces")
 MAJOR_MACRO = re.compile(r"^\s*#\s*define\s+(\w+)_VERSION_MAJOR\s+(\d+)", re.M)
 EXPANDED = {(), ("modules",), ("modules", "*"), ("modules", "*", "slots"), ("modules", "*", "imports"), ("modules", "*", "imports", "*"),
-            ("modules", "*", "majors"), ("majors",)}
+            ("modules", "*", "majors"), ("majors",), ("signatures",), ("signatures", "*")}
 WRAP = 132
+ADAPTERS = os.path.join(ROOT, "tests", "wasm", "adapters")
+LOADER = os.path.join(ROOT, "lib", "wasmloader")
+WASMTIME_INCLUDE = os.path.join(ROOT, "third_party", "wasmtime", "include")
 GUARD = "WASM_MODULES_UNDER_WASMTIME"
 
 
@@ -185,13 +209,36 @@ def with_majors(game, majors):
     """The manifest with its interface majors set from the headers: an in-repo module is built against them."""
     out = {}
     for key, value in game.items():
-        if key == "majors":
+        if key in ("majors", "signatures", "adapters"):
             continue
         if key == "modules":
-            out["majors"] = dict(majors)
             value = [with_module_majors(entry, majors) for entry in value]
+            out["majors"] = dict(majors)
+            out["signatures"] = current_signatures(game, value, majors)
+            out["adapters"] = list(game.get("adapters", []))
         out[key] = value
     return out
+
+
+def module_table(entry, interface):
+    """{name: signature} of the slots (the module's own interface) or the imports (a group) of a module for an interface."""
+    return entry["slots"] if interface == entry["interface"] else entry["imports"].get(interface, {})
+
+
+def current_signatures(game, modules, majors):
+    """The signatures of the manifest: the old ones, with those of every module built against the current major over them."""
+    out = {interface: dict(names) for interface, names in game.get("signatures", {}).items()}
+    seen = {}
+    for entry in modules:
+        for interface in module_interfaces(entry):
+            if entry["majors"][interface] != majors[interface]:
+                continue
+            for name, signature in module_table(entry, interface).items():
+                if seen.setdefault((interface, name), (entry["name"], signature))[1] != signature:
+                    sys.exit(f"{interface}.{name}: {seen[(interface, name)][0]} and {entry['name']} are both built against the current major "
+                             "and disagree on its signature")
+                out.setdefault(interface, {})[name] = signature
+    return {interface: out[interface] for interface in sorted(out)}
 
 
 def with_module_majors(entry, majors):
@@ -210,7 +257,7 @@ def with_module_majors(entry, majors):
 
 def dump_manifest(value, path=(), indent=0, key=None):
     """The manifest as text: the layout of wasm/modules.json, one key per line down to the slots and imports, lists inline and wrapped."""
-    generic = tuple("*" if (i == 1 and path[0] == "modules") or (i == 3 and path[2:3] == ("imports",)) else part
+    generic = tuple("*" if (i == 1 and path[0] in ("modules", "signatures")) or (i == 3 and path[2:3] == ("imports",)) else part
                     for i, part in enumerate(path))
     pad = " " * (indent + 2)
     if isinstance(value, dict) and generic in EXPANDED:
@@ -218,7 +265,7 @@ def dump_manifest(value, path=(), indent=0, key=None):
         return "{\n" + ",\n".join(lines) + "\n" + " " * indent + "}"
     if isinstance(value, dict):
         return "{" + ", ".join(f'"{k}": {dump_manifest(v, path + (k,), indent, k)}' for k, v in value.items()) + "}"
-    if isinstance(value, list) and path == ("modules",):
+    if isinstance(value, list) and path in (("modules",), ("adapters",)) and value:
         return "[\n" + ",\n".join(pad + dump_manifest(v, path + (i,), indent + 2) for i, v in enumerate(value)) + "\n" + " " * indent + "]"
     if isinstance(value, list):
         items = [dump_manifest(v, path + (i,), indent) for i, v in enumerate(value)]
@@ -254,10 +301,21 @@ def write_game_manifest(game):
 
 
 def check_majors(game, majors):
-    """Reasons the manifest's majors differ from the headers'."""
+    """Reasons the manifest's majors, signatures and adapters disagree with the headers or with each other."""
     problems = []
     if game.get("majors") != majors:
         problems.append(f"majors differ from interfaces/*.h: {game.get('majors')} against {majors}: uv run tools/wasm_modules.py build")
+    signatures = game.get("signatures", {})
+    adapters = {(a.get("interface"), a.get("from_major"), a.get("name")) for a in game.get("adapters", [])}
+    for adapter in game.get("adapters", []):
+        interface, name = adapter.get("interface"), adapter.get("name")
+        label = f"adapter {interface}.{name} from major {adapter.get('from_major')}"
+        if interface not in majors:
+            problems.append(f"{label}: no such interface")
+        elif not isinstance(adapter.get("from_major"), int) or not 0 < adapter["from_major"] < majors[interface]:
+            problems.append(f"{label}: from_major must be older than the current major {majors[interface]}")
+        if name not in signatures.get(interface, {}):
+            problems.append(f"{label}: the manifest's signatures have no {name} for {interface}")
     for entry in game["modules"]:
         name, built = entry["name"], entry.get("majors", {})
         used = module_interfaces(entry) if "interface" in entry else []
@@ -266,8 +324,25 @@ def check_majors(game, majors):
                 problems.append(f"{name}: no major for {interface}, an interface it uses")
             elif interface in majors and built[interface] > majors[interface]:
                 problems.append(f"{name}: built against {interface} {built[interface]}, the headers have {majors[interface]}")
+            elif interface in majors:
+                problems += check_signatures(name, entry, interface, built[interface], majors[interface], signatures, adapters)
         for interface in sorted(set(built) - set(used)):
             problems.append(f"{name}: has a major for {interface}, which it neither exports slots for nor imports from")
+    return problems
+
+
+def check_signatures(name, entry, interface, built, current, signatures, adapters):
+    """Reasons a module's slots or imports of an interface differ from the current signatures without an adapter that covers the difference."""
+    problems = []
+    for item, signature in module_table(entry, interface).items():
+        if item not in signatures.get(interface, {}):
+            problems.append(f"{name}: the manifest's signatures have no {item} for {interface}")
+        elif signatures[interface][item] == signature:
+            continue
+        elif built == current:
+            problems.append(f"{name}: {interface}.{item} is {signature} but the current signature is {signatures[interface][item]}")
+        elif (interface, built, item) not in adapters:
+            problems.append(f"{name}: {interface}.{item} changed between major {built} and {current}, and the manifest has no adapter for it")
     return problems
 
 
@@ -687,6 +762,28 @@ def run_check():
     return 0
 
 
+def run_adapters():
+    """Build the loader and the adapter program for this machine and run them against the pinned libwasmtime."""
+    import glob
+
+    import wasmtime
+
+    libraries = glob.glob(os.path.join(os.path.dirname(wasmtime.__file__), "*", "_libwasmtime.*"))
+    if len(libraries) != 1:
+        sys.exit(f"expected one libwasmtime in the wasmtime package, found {libraries}")
+    out = os.path.join(OUT, "adapters")
+    os.makedirs(out, exist_ok=True)
+    wasm_tools = find_wasm_tools(game_manifest()["tools"]["wasm-tools"])
+    for name in ("old", "current"):
+        run([wasm_tools, "parse", os.path.join(ADAPTERS, name + ".wat"), "-o", os.path.join(out, name + ".wasm")])
+    program = os.path.join(out, "adapters")
+    sources = [os.path.join(LOADER, name) for name in ("wasmloader.c", "json.c", "format.c")]
+    run(["clang", "-std=gnu11", "-O1", "-Wall", "-Wextra", "-Werror", "-Wno-unused-parameter", "-D_vsnprintf=vsnprintf", f"-I{LOADER}",
+         f"-isystem{WASMTIME_INCLUDE}", os.path.join(ADAPTERS, "adapters.c"), *sources, "-ldl", "-o", program])
+    result = subprocess.run([program, libraries[0], os.path.join(ADAPTERS, "manifest.json"), out], text=True)
+    return result.returncode
+
+
 STATICS_TICKS = 2000
 STATICS_GAME_AT = 0x1000
 STATICS_SIM_AT = 0x1000 + 0x40000
@@ -824,7 +921,7 @@ def run_under_wasmtime(command):
         env = dict(os.environ, **{GUARD: "1"})
         cmd = ["uv", "run", "--no-project", "--with", f"wasmtime=={pin}", "python", "-I", os.path.abspath(__file__), command]
         return subprocess.run(cmd, env=env).returncode
-    return statics_run() if command == "statics" else -1
+    return statics_run() if command == "statics" else run_adapters()
 
 
 def check():
@@ -850,7 +947,7 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "check", "imports", "statics"])
+    parser.add_argument("command", choices=["build", "check", "imports", "statics", "adapters"])
     args = parser.parse_args()
     if args.command == "build":
         build()
@@ -859,6 +956,8 @@ def main():
         return run_imports()
     if args.command == "statics":
         return run_under_wasmtime("statics")
+    if args.command == "adapters":
+        return run_under_wasmtime("adapters")
     return check()
 
 

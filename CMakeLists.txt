@@ -76,6 +76,7 @@ set(GAME_COMPILE_OPTIONS
   -fno-strict-aliasing -fwrapv -fno-delete-null-pointer-checks -Xclang -fno-assume-sane-operator-new -mno-sse
   /Gz /GR- /GS- /Gw -Wno-nonportable-include-path -Wno-c++11-narrowing -Wno-writable-strings -Wno-microsoft -Wno-c++20-extensions
   -vfsoverlay "${CMAKE_BINARY_DIR}/overlay.json")
+target_include_directories(game SYSTEM PRIVATE "${CMAKE_SOURCE_DIR}/lib/wasmloader" "${CMAKE_SOURCE_DIR}/third_party/wasmtime/include")
 foreach(target game data)
   target_include_directories(${target} PRIVATE "${CMAKE_SOURCE_DIR}/include")
   target_include_directories(${target} SYSTEM PRIVATE "${MSVC5_INCLUDE}")
@@ -254,8 +255,8 @@ add_custom_command(
   COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:windows,4.0 /base:0x400000 /fixed /dynamicbase:no /largeaddressaware:no /errorlimit:0 /entry:WinMainCRTStartup /include:_WinMainCRTStartup /out:${CMAKE_BINARY_DIR}/TotalA.exe
           /libpath:${CMAKE_BINARY_DIR}/lib /opt:noref,noicf /incremental:no /safeseh:no /force:multiple /map:${CMAKE_BINARY_DIR}/TotalA.map
           "@${CMAKE_BINARY_DIR}/objs/objects.rsp" "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res"
-          ${ZLIB_OBJECTS} ${IMPORT_LIBS} ${SYSTEM_LIBS}
-  DEPENDS game data extra ${PROFILE_TARGETS} ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res" ${IMPORT_LIBS}
+          ${ZLIB_OBJECTS} ${IMPORT_LIBS} ${SYSTEM_LIBS} $<TARGET_FILE:wasmloader>
+  DEPENDS game data extra wasmloader ${PROFILE_TARGETS} ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res" ${IMPORT_LIBS}
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(TotalA ALL DEPENDS "${CMAKE_BINARY_DIR}/TotalA.exe")
 
@@ -294,5 +295,14 @@ add_custom_target(ref_test DEPENDS "${CMAKE_BINARY_DIR}/ref_test.exe")
 
 add_custom_target(wasm_modules
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  USES_TERMINAL)
+
+add_custom_target(wasm_runtime
+  COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_host.py" build
+  COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build
+  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm_host/wasmtime_host.dll" "${CMAKE_BINARY_DIR}/wasmtime_host.dll"
+  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm-modules/wind_meteors.wasm" "${CMAKE_BINARY_DIR}/wind_meteors.wasm"
+  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/wasm/modules.json" "${CMAKE_BINARY_DIR}/modules.json"
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   USES_TERMINAL)

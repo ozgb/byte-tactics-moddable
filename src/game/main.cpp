@@ -21,8 +21,7 @@ struct FileHandle;
 #include "../files/files_api.h"
 
 char* __stdcall Translate(char* text);
-void __stdcall SetNoDirectSound();
-void __stdcall SetUseWindowsSound();
+#include "../sound/sound.h"
 
 // FUNCTION: 0x49e640
 void __stdcall AppendToDebugFile(char* text)
@@ -78,19 +77,7 @@ void OutOfMemoryHandler()
     _exit(3);
 }
 
-class Sound {
-public:
-    char pad[0x294];
-    Sound();
-    void SetTrackCategory(int param_1);
-    void ReapFinishedBuffers();
-    void CloseCdAudio();
-    void OpenCdAudio();
-    void SetCdCallback(void (*param_1)());
-    int GetTrackCategory();
-    void EnableCdAudio(int param_1);
-    void SetPlaybackOrder(int param_1);
-};
+#include "../sound/sound.h"
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void ScaleUnitWeights(int, unsigned int*, float, int);
@@ -274,12 +261,12 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             break;
         if (!DispatchHostEvents())
             break;
-        if (g_displayContext.active == lzero && *(int*)((Sound*)g_game->sound) != 0) {
+        if (g_displayContext.active == lzero && ((Sound*)g_game->sound)->open != 0) {
             SaveCdLists();
             g_cdTrackCategory = ((Sound*)g_game->sound)->GetTrackCategory();
             ((Sound*)g_game->sound)->CloseCdAudio();
             g_cdNeedsReopenAfterFocus = 1;
-        } else if (g_displayContext.active != lzero && *(int*)((Sound*)g_game->sound) == 0
+        } else if (g_displayContext.active != lzero && ((Sound*)g_game->sound)->open == 0
                    && g_cdNeedsReopenAfterFocus != 0) {
             ((Sound*)g_game->sound)->OpenCdAudio();
             ((Sound*)g_game->sound)->SetCdCallback(ReopenCdAudio);

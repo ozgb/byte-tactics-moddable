@@ -335,11 +335,12 @@ void Sound::ReleaseSampleSet(void** set)
 }
 
 // FUNCTION: 0x4cf540
-void Sound::PlayLooping(void** set, LONG volume)
+int Sound::PlayLooping(void** set, LONG volume)
 {
     g_playBufferLooping = 1;
-    PlaySampleSet(set, volume, 0);
+    int result = PlaySampleSet(set, volume, 0);
     g_playBufferLooping = 0;
+    return result;
 }
 
 // FUNCTION: 0x4cf570
@@ -906,15 +907,15 @@ end:
 }
 
 // FUNCTION: 0x4d0620
-void Sound::LoadSample(char* path)
+void* Sound::LoadSample(char* path)
 {
-    OpenSample(path, 0, 0, 0);
+    return (void*)OpenSample(path, 0, 0, 0);
 }
 
 // FUNCTION: 0x4d0640
-void Sound::PlaySample(const char* param1, int param2, int param3)
+int Sound::PlaySample(const char* param1, int param2, int param3)
 {
-    OpenSample((char*)param1, 1, param2, param3);
+    return OpenSample((char*)param1, 1, param2, param3);
 }
 
 // FUNCTION: 0x4d0660

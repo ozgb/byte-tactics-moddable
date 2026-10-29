@@ -96,7 +96,7 @@ public:
     void** CreateSampleFromMemory(void* src, unsigned long bytes, int sampleRate, int bits, int channels);
     void** CreateSampleFromFile(FileHandle* file, unsigned long bytes, int sampleRate, int bits, int channels);
     void ReleaseSampleSet(void** set);
-    void PlayLooping(void** set, long volume);
+    int PlayLooping(void** set, long volume);
     int PlaySampleSet(void** set, long volume, Vec3* pos);
     int PlayMemorySample(void* src, unsigned long bytes, int sampleRate, int bits, int channels, long volume, Vec3* pos);
     int PlayFileSample(FileHandle* file, unsigned long bytes, int sampleRate, int bits, int channels, long volume, Vec3* pos);
@@ -111,8 +111,8 @@ public:
     int Is3DEnabled();
     void Set3DDistances(float minimum, float maximum);
     int HasNoDriver();
-    void LoadSample(char* path);
-    void PlaySample(const char* param1, int param2, int param3);
+    void* LoadSample(char* path);
+    int PlaySample(const char* param1, int param2, int param3);
     void StreamSample(char* a, int b);
     int StreamSampleDelayed(char* name, int value, int delay);
     int FindChunkSize(void* file, char* target);

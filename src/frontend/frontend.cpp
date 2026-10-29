@@ -7,17 +7,7 @@
 
 #include "../util/tdf.h"
 
-class Sound {
-public:
-#ifdef __clang__
-    bool HasCdPlayerWindow();
-#else
-    int HasCdPlayerWindow();
-#endif
-    void SetTrackCategory(int value);
-    int HasNoDriver();
-    void CloseCdPlayerWindow();
-};
+#include "../sound/sound.h"
 
 #include "../map/mission.h"
 
@@ -148,7 +138,6 @@ DisplayFlagsView* __stdcall GetDisplay(void);
 void HideSoftwareCursor();
 #include "../game/game_state.h"
 Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
-void __stdcall PlayLoopingSoundByName(char* name, int);
 #include "../files/files_api.h"
 void __stdcall RemapPaletteToClosestIndices(Gui* sub, int value, void* palette);
 void __stdcall SetKeyboardInput(Gui* sub, int value);
@@ -165,7 +154,6 @@ void ShowSoftwareCursor();
 #include "../game/data_files.h"
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void __stdcall SetTranslatedTextByName(char* sub, const char* name, const char* text, int param_4);
-void StopAllSounds();
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 int GetTicks(void);

@@ -20,7 +20,6 @@ ApplyWeaponFirePacket,mismatch,pointer/int cast: definition's type is likely wro
 AssignQuickKey,mismatch,placeholder type Dialog_004a04f0: left for the type-naming issues
 AttachUnitToPiece,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BindModelTextures,mismatch,placeholder type Model_0042a140: left for the type-naming issues
-BindNamedSliderWithCallback,skip,unknown name SliderCallback
 BlitLayers,mismatch,placeholder type Rect_004b6720: left for the type-naming issues
 BlitMenuLayers,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BlitSideLogoToRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -93,7 +92,6 @@ EmitSmoke,mismatch,"static risk rule: a convention, parameter count, or non-poin
 EmitTeleportParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 EmitWhiteSmoke,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 EmptyPostArchiveMountHook,mismatch,pointer/int cast: definition's type is likely wrong
-EnumModesCallback,skip,unknown name host_display_mode
 ExceptionFilter,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ExecuteCommandLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FillMissionList,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -171,7 +169,6 @@ GetVisibleEnemiesInRadius,skip,qualified name std::vector
 GetWeaponPiecePosition,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetWeaponRange,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GroundPickupOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-HAPI_PackDirectory,skip,unknown name cb
 HAPI_RelocateDirectory,mismatch,pointer/int cast: definition's type is likely wrong
 HAPI_WriteArchiveData,skip,unknown name cb
 HandleHostEvent,skip,unknown name host_event
@@ -188,7 +185,6 @@ InitGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming
 InitNetConnection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 InitPacketTables,mismatch,placeholder type Class_00451fd0: left for the type-naming issues
 InitProjectile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-InsertShift,skip,unknown name QuickSortPred
 InsertionSortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsCountBelowAiLimit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsFootprintVisible,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -215,7 +211,6 @@ MakeBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
 MakeGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
 MirrorObject,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
 OrderSquad,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-Partition,skip,unknown name QuickSortPred
 PickRandomReclaimableResourcesInRadius,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 PlaceFeature,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 PlayLoopingWavMemory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -291,7 +286,6 @@ SortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-
 StartBuildingScript,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 StepGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming issues
 SubtractVec3,mismatch,fixing it changes the generated code of a caller
-TickProgressBar,skip,src/gui/gui.cpp defines a static TickProgressBar and sees src/gui/gui.h
 TintFrameBelow,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 TransferEnergy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 TransferMetal,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

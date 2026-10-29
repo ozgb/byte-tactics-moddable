@@ -29,6 +29,7 @@ struct FileHandle;
 extern int g_playBufferLooping;
 
 #include "../files/files_api.h"
+#include "../files/lzss_tree.h"
 
 #include "samples.h"
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
@@ -89,14 +90,8 @@ extern Sound* g_cdPlayer;
 extern HANDLE g_squashThreadLockEvent;
 extern int g_squashThreadLockTicket;
 
-struct LzssTreeEntry {
-    short a;
-    short b;
-    short c;
-};
-
 struct LzssDictTree {
-    LzssTreeEntry entries[0x1000];
+    LzssTreeNode entries[0x1000];
     short field_6000;
     short field_6002;
     short field_6004;
@@ -1059,9 +1054,9 @@ void __stdcall LzssInitTree(int index)
     g_squashDictTree->field_6000 = 0;
     g_squashDictTree->field_6004 = (short)index;
     g_squashDictTree->field_6002 = 0;
-    g_squashDictTree->entries[index].a = 0x1000;
-    g_squashDictTree->entries[index].c = 0;
-    g_squashDictTree->entries[index].b = 0;
+    g_squashDictTree->entries[index].parent = 0x1000;
+    g_squashDictTree->entries[index].larger = 0;
+    g_squashDictTree->entries[index].smaller = 0;
 }
 
 // FUNCTION: 0x4d0a70

@@ -1295,7 +1295,7 @@ presentation,CollectSelectedUnits,src/ingame/selection.cpp,1,0,0,0,0,0,?CollectS
 presentation,CommitTextEdit,src/gui/dialogs.cpp,1,0,0,0,0,0,?CommitTextEdit@@YGXPAUGui@@HPADHH@Z,0,
 presentation,CompactActivePlayerSlots,src/frontend/multi.cpp,1,0,0,0,0,0,?CompactActivePlayerSlots@@YGXXZ,0,
 presentation,CompareUnitRestrictEntries,src/frontend/multi.cpp,1,0,0,0,0,0,?CompareUnitRestrictEntries@@YAHPBD0@Z,0,
-presentation,ConfigureListBoxByName,src/gui/gui.cpp,1,0,0,0,0,0,?ConfigureListBoxByName@@YGXPAUConfigureListBoxByNameDialog@@PADHHPAUFont@@@Z,0,
+presentation,ConfigureListBoxByName,src/gui/gui.cpp,1,0,0,0,0,0,?ConfigureListBoxByName@@YGXPAUGui@@PAD1HPAUFont@@@Z,0,
 presentation,ConfigureListBoxFontHeight,src/gui/gui.cpp,1,0,0,0,0,0,?ConfigureListBoxFontHeight@@YGHXZ,0,
 presentation,ConnectToGame,src/frontend/multi.cpp,1,0,0,0,0,0,?ConnectToGame@@YGHPAULayer@@@Z,0,
 presentation,ConnectToService,src/frontend/frontend.cpp,0,0,0,0,0,0,?ConnectToService@@YGHXZ,1,

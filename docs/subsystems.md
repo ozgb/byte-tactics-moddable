@@ -213,7 +213,7 @@ Coverage: 95.5% of functions (42 of 44), 81.9% of lines, 69.6% of branches; 2 li
 
 Issue #13. 132 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
-Coverage: 89.4% of functions (93 of 104), 89.0% of lines, 83.0% of branches; 11 live functions no scenario enters, and 35 more are dead (data/coverage.csv).
+Coverage: 89.4% of functions (93 of 104), 89.0% of lines, 83.0% of branches; 11 live functions no scenario enters, and 33 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (11 of 104 after #420 and `console-sight` (#445); 93 are entered, 89.4%), by reason:
 
@@ -662,7 +662,7 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | **wind_meteors** | 15 of 16 | 93.8% | 96.4% | 76.3% | 1 | 0 |
 | **economy** | 27 of 29 | 93.1% | 78.1% | 43.8% | 2 | 3 |
 | **features** | 42 of 44 | 95.5% | 81.9% | 69.6% | 2 | 4 |
-| **ai** | 93 of 104 | 89.4% | 89.0% | 83.0% | 11 | 35 |
+| **ai** | 93 of 104 | 89.4% | 89.0% | 83.0% | 11 | 33 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 87.1% | 3 | 10 |
 | **weapons** | 74 of 88 | 84.1% | 84.6% | 70.4% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |

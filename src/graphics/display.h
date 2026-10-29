@@ -2,6 +2,7 @@
 #define DISPLAY_H
 struct DisplayAppView;
 
+#include "win_types.h"
 #include "surface.h"
 #include "../util/mouse_event.h"
 
@@ -22,7 +23,8 @@ union DisplayFlags {
         unsigned short has_c8 : 1;
         unsigned short has_cc : 1;
         unsigned short has_d0 : 1;
-        unsigned short bit10_15 : 6;
+        unsigned short sound_opt : 1;
+        unsigned short bit11_15 : 5;
     } bits;
 };
 
@@ -65,22 +67,29 @@ struct Display {
     int keyQueue[30];
     int keyQueueHead;
     int keyQueueTail;
-    char pad_176[0x196 - 0x176];
+    char pad_176[0x186 - 0x176];
+    int mouseQueueSize;
+    MouseEvent* mouseQueue;
+    int mouseQueueHead;
+    int mouseQueueTail;
     MouseEvent mouseEvent;
-    char pad_1ae[0x1b2 - 0x1ae];
-    GafFrame* bmp;
+    int cursorHideCount;
+    GafFrame* cursorSprite;
     int x;
     int y;
     Surface* saveMouse1;
-    char pad_1c2[0x1ce - 0x1c2];
+    Surface* saveMouse2;
+    Surface* saveMouse3;
+    int mouseThread;
     int cursorThreadEnabled;
     int cursorOverlayEnabled;
-    char pad_1d6[0x204 - 0x1d6];
+    int mouseThreadStop;
+    char pad_1da[0x204 - 0x1da];
     Font* font;
     int foreColor;
     int backColor;
     int keyColor;
-    unsigned int entries[256];
+    tagPALETTEENTRY entries[256];
     float paletteBrightness;
     OPENHAPIFILE** files;
     int count;

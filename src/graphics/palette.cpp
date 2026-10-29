@@ -52,11 +52,11 @@ int __stdcall SetPaletteColors(unsigned char* src, int start, int count)
     int end;
     d = GetDisplay();
     brightness = d->paletteBrightness;
-    unsigned int* p = d->entries + start;
+    tagPALETTEENTRY* p = d->entries + start;
     end = start + count;
     unsigned char* s = src;
     for (i = start; i < end; i++, p++, s += 4)
-        *p = *(unsigned int*)s;
+        *p = *(tagPALETTEENTRY*)s;
     for (i = start; i < end; i++) {
         float v0 = src[i * 4] * brightness;
         if (v0 > 255.0)

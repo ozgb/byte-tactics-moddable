@@ -209,33 +209,18 @@ struct PcxBitmap {
     unsigned char* data;
 };
 
-#pragma pack(push, 1)
-struct DisplayScreenshotView {
-    char unknown_0[0x40];
-    HWND hwnd;
-    char unknown_44[0xbc - 0x44];
-    PcxBitmap* bitmap;
-    char unknown_c0[0x1c];
-    int useOverrideSurface;
-    char unknown_e0[0x1b2 - 0xe0];
-    int cursorFrame;
-    char unknown_1b6[0x214 - 0x1b6];
-    PALETTEENTRY palette[256];
-};
-#pragma pack(pop)
-static_assert(sizeof(DisplayScreenshotView) == 0x614, "DisplayScreenshotView size");
-
-DisplayScreenshotView* GetDisplay();
+#include "display.h"
+Display* GetDisplay();
 
 // FUNCTION: 0x4caec0
 void __stdcall SaveSurfacePcx(char* name, PcxBitmap* bitmap)
 {
     unsigned char pal[256 * 3];
-    DisplayScreenshotView* game = GetDisplay();
+    Display* game = GetDisplay();
     for (int i = 0; i < 256; i++) {
-        pal[i * 3] = game->palette[i].peRed;
-        pal[i * 3 + 1] = game->palette[i].peGreen;
-        pal[i * 3 + 2] = game->palette[i].peBlue;
+        pal[i * 3] = game->entries[i].peRed;
+        pal[i * 3 + 1] = game->entries[i].peGreen;
+        pal[i * 3 + 2] = game->entries[i].peBlue;
     }
     WritePcx(name, bitmap->data, bitmap->width, bitmap->height, pal);
 }
@@ -339,7 +324,7 @@ struct ScreenshotFileFindData {
 // FUNCTION: 0x4cb170
 int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
 {
-    DisplayScreenshotView* game = GetDisplay();
+    Display* game = GetDisplay();
     int flag = 0;
     char filename[260];
     ScreenshotFileFindData fd;
@@ -371,14 +356,14 @@ int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
     sep = flag ? g_pathSepBackslash : DAT_005119b8;
     sprintf(filename, "%s%s%s%04i.pcx", dirPath, sep, namePrefix, best + 1);
 
-    PcxBitmap* bitmap = game->bitmap;
-    DisplayScreenshotView* g = GetDisplay();
+    Surface* bitmap = game->overrideSurface;
+    Display* g = GetDisplay();
     for (int i = 0; i < 256; i++) {
-        pal[i * 3] = g->palette[i].peRed;
-        pal[i * 3 + 1] = g->palette[i].peGreen;
-        pal[i * 3 + 2] = g->palette[i].peBlue;
+        pal[i * 3] = g->entries[i].peRed;
+        pal[i * 3 + 1] = g->entries[i].peGreen;
+        pal[i * 3 + 2] = g->entries[i].peBlue;
     }
-    return WritePcx(filename, bitmap->data, bitmap->width, bitmap->height, pal);
+    return WritePcx(filename, bitmap->pixels, bitmap->width, bitmap->height, pal);
 }
 
 // FUNCTION: 0x4cb2f0
@@ -613,7 +598,7 @@ struct BmpInfo {
 // FUNCTION: 0x4cb7f0
 bool BmpWriter::Open(const char* name, int w, int h)
 {
-    void* palbase = GetDisplay();
+    Display* display = GetDisplay();
 
     width = w;
     height = h;
@@ -642,14 +627,10 @@ bool BmpWriter::Open(const char* name, int w, int h)
     info.header.biYPelsPerMeter = 3000;
     info.header.biClrUsed = 0x100;
     info.header.biClrImportant = 0x100;
-    unsigned char* dp = (unsigned char*)info.colors + 1;
-    unsigned char* sp = (unsigned char*)palbase + 0x215;
     for (int i = 0; i < 256; i++) {
-        dp[1] = sp[-1];
-        dp[0] = sp[0];
-        dp[-1] = sp[1];
-        dp += 4;
-        sp += 4;
+        info.colors[i].red = display->entries[i].peRed;
+        info.colors[i].green = display->entries[i].peGreen;
+        info.colors[i].blue = display->entries[i].peBlue;
     }
     if (host_file_write(file, &info, sizeof(info)) != sizeof(info)) {
         return false;
@@ -709,7 +690,6 @@ done:
 }
 
 
-#include "display.h"
 #include "surface.h"
 
 static inline LONG Lock()
@@ -739,10 +719,10 @@ static inline void Unlock(LONG held)
 int __stdcall ExceptionFilter(void* exception, const char* thread)
 {
     host_crash_report(exception, thread);
-    DisplayScreenshotView* app = GetDisplay();
+    Display* app = GetDisplay();
     if (app != 0) {
         LONG held = Lock();
-        app->cursorFrame = 0;
+        app->cursorSprite = 0;
         UnlockAllScreens();
         Unlock(held);
         ReleaseDirectDraw((DisplayAppView *)app);

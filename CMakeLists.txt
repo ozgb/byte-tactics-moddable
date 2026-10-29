@@ -57,6 +57,15 @@ target_compile_options(bitexact PRIVATE
   -fno-strict-aliasing -fwrapv -Wno-nonportable-include-path -Wno-microsoft -Wno-comment
   -vfsoverlay "${CMAKE_BINARY_DIR}/overlay.json")
 
+add_library(wasmloader STATIC lib/wasmloader/wasmloader.c lib/wasmloader/json.c lib/wasmloader/format.c)
+target_include_directories(wasmloader PUBLIC "${CMAKE_SOURCE_DIR}/lib/wasmloader")
+target_include_directories(wasmloader SYSTEM PUBLIC "${CMAKE_SOURCE_DIR}/third_party/wasmtime/include")
+target_include_directories(wasmloader SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(wasmloader PRIVATE
+  -fms-compatibility -fms-extensions -fms-compatibility-version=11.00 -mno-sse /GS-
+  -fno-strict-aliasing -fwrapv -Wno-nonportable-include-path -Wno-microsoft
+  -vfsoverlay "${CMAKE_BINARY_DIR}/overlay.json")
+
 option(BT_COVERAGE "Build the game with clang source-based coverage" OFF)
 set(COMPILER_RT_DIR "${CMAKE_SOURCE_DIR}/build/compiler-rt" CACHE PATH "compiler-rt checkout for the coverage runtime")
 

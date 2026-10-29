@@ -1,5 +1,5 @@
 name,in_scope,defs,files,layout,canonical
-BmpWriter,no,2,src/graphics/pcx.cpp:588|src/ingame/keys.cpp:35,differs,src/graphics/pcx.cpp
+BmpWriter,no,2,src/graphics/pcx.cpp:562|src/ingame/keys.cpp:35,differs,src/graphics/pcx.cpp
 DisplayContext,no,2,src/graphics/palette.cpp:6|src/gui/keyboard.cpp:16,differs,src/graphics/palette.cpp
 EmptyStringRep,no,2,link/globals.h:214|src/graphics/surface.cpp:1629,identical,link/globals.h
 Gadget,no,5,src/frontend/multi.cpp:23|src/frontend/options.cpp:27|src/frontend/skirmish_menu.cpp:20|src/gui/gadget.h:10|src/gui/gui.cpp:62,differs,src/gui/gadget.h

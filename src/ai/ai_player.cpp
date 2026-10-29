@@ -613,24 +613,6 @@ SquadScoutTimer::SquadScoutTimer(SquadManager* p, Group* q)
 {
 }
 
-struct AiFixedParts {
-    unsigned int frac : 16;
-    int whole : 16;
-};
-
-union AiFixed {
-    int value;
-    AiFixedParts parts;
-};
-
-static inline AiFixed MakeFixed(int i)
-{
-    AiFixed f;
-    f.parts.frac = 0;
-    f.parts.whole = i;
-    return f;
-}
-
 static inline Vec3 GetRallyPoint(int index)
 {
     Vec3 p;

@@ -1,10 +1,12 @@
 #ifndef WEAPONS_H
 #define WEAPONS_H
-struct FireByFlagsSlotView;
-struct MotionFireSlotView;
+struct Vec3;
+
+struct Unit;
+struct UnitWeaponSlot;
+
 struct Projectile;
 struct RemoteFireEventView;
-struct RockSourceSlotView;
 struct RockUnitView;
 struct Unit;
 struct UnitWeaponSlot;
@@ -52,13 +54,17 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit);
 
 void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, WeaponFireUnitView* source, WeaponFireUnitView* target, Vec3* a, Vec3* b);
 void __stdcall BroadcastWeaponFire(char, Vec3* a, Vec3* b);
-void __stdcall RockUnit(RockUnitView* obj, RockSourceSlotView* src);
+void __stdcall RockUnit(RockUnitView* obj, UnitWeaponSlot* src);
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3* pos);
 void __stdcall RemoveUnitProjectiles(Unit* owner);
-int __stdcall SpawnProjectileFromUnitMotion(MotionFireSlotView* shot, Unit* unit, Vec3* pos);
-int __stdcall FireWeaponByFlags(FireByFlagsSlotView* obj, int a, int b, int d, int c);
+int __stdcall SpawnProjectileFromUnitMotion(UnitWeaponSlot* shot, Unit* unit, Vec3* pos);
+int __stdcall FireWeaponByFlags(UnitWeaponSlot* obj, int a, int b, int d, int c);
 Projectile* __stdcall FindRemoteProjectile(RemoteFireEventView* ev);
 
 void __stdcall DrawProjectiles(void* surface);
+
+int __stdcall AimWithinTolerance(Unit* unit, UnitWeaponSlot* aim, short angle1, short angle2);
+
+int __stdcall VectorLength(Vec3* v);
 
 #endif

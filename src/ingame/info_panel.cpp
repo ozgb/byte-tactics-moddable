@@ -143,6 +143,7 @@ struct OrderQueueNode {
 };
 
 #include "../orders/order_type_entry.h"
+#include "../orders/mission_type.h"
 #include "../graphics/surface.h"
 
 #include "frame_timers.h"
@@ -191,7 +192,6 @@ struct GafSequenceRecord;
 struct GafFileIndex;
 struct GafFrameCursor;
 struct FrameQuad;
-struct Object3doLoadView;
 struct UnitDrawView;
 
 GafSequenceRecord* __stdcall FindGafEntry(GafFileIndex* gaf, const char* name);
@@ -223,8 +223,8 @@ void FlipScreen();
 void __stdcall PlaySoundByName(char* name, int param_2);
 #include "../gui/keyboard.h"
 #include "../gui/gui.h"
+#include "../graphics/pcx.h"
 
-void __stdcall GetObjectBounds(Object3doLoadView* obj, Vec3* lo, Vec3* hi, int arg);
 #include "info_panel.h"
 
 int __stdcall GetGafSequenceFrame(GafFrameCursor* h);
@@ -625,11 +625,11 @@ int __stdcall DrawUnitStateProbe(void* surface)
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
-                            ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
+                            ((MissionType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state, (char*)m->target->def.get());
                 else
                     sprintf(buf, "    '%s' state: %d\n",
-                            ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
+                            ((MissionType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state);
                 DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
                 y += lineH;
@@ -642,11 +642,11 @@ int __stdcall DrawUnitStateProbe(void* surface)
                  m = m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
-                            ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
+                            ((MissionType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state, (char*)m->target->def.get());
                 else
                     sprintf(buf, "    '%s' state: %d\n",
-                            ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
+                            ((MissionType*)((char*)m + 4))->GetTableEntry()->name,
                             m->state);
                 DrawString((Surface*)surface, (unsigned char*)buf, 0x86, y, -1);
                 y += lineH;
@@ -1346,7 +1346,7 @@ void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
     if (f->flag) {
         Vec3 lo;
         Vec3 hi;
-        GetObjectBounds((Object3doLoadView*)(((Object3do **)g_game->types.get())[unit->unitDefIndex]), &lo, &hi, 0);
+        GetObjectBounds(((Object3do **)g_game->types.get())[unit->unitDefIndex], &lo, &hi, 0);
         Vec3 corners[4];
         corners[0].x = lo.x;
         corners[0].y = lo.y;

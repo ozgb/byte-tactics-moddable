@@ -97,7 +97,6 @@ void __stdcall SetDescListCleanupFlag(Gui* gui, int param);
 void __stdcall BroadcastPacket(int id, void* packet, int size);
 #include "../frontend/options.h"
 #include "../graphics/pcx.h"
-void __stdcall IssueOrderToSelection(void* a, int b, MissionType kind, int d, int e, int f);
 int __stdcall FindOrderByType(int unit, MissionType kind);
 void __stdcall DeleteOrder(int unit, int arg);
 void __cdecl operator delete(void* p);
@@ -543,7 +542,7 @@ void HandleGameKey(void)
             }
         }
         if (found == 0)
-            IssueOrderToSelection(g_game->orders_2c76, 0, order, 0, 0, 0);
+            IssueOrderToSelection((OrderTypeEntry*)g_game->orders_2c76, 0, order, nullptr, 0, 0);
         break;
     }
 

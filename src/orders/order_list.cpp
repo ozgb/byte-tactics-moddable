@@ -37,26 +37,6 @@ static inline void Vec3Add(Vec3* v, const Vec3* o)
 
 #pragma pack(push, 1)
 
-struct OrderFixedParts {
-    unsigned int frac : 16;
-    int whole : 16;
-};
-
-union OrderFixed {
-    int value;
-    OrderFixedParts parts;
-};
-
-static inline OrderFixed MakeOrderFixed(int i)
-{
-    OrderFixed f;
-    f.parts.frac = 0;
-    f.parts.whole = i;
-    return f;
-}
-
-inline int operator>(const OrderFixed& a, const OrderFixed& b) { return a.value > b.value; }
-
 #define ORDER_MAX(a, b) ((a) > (b) ? (a) : (b))
 
 static inline void MulFixed(int& v, int f)
@@ -1511,7 +1491,7 @@ void UnitMotion::UpdatePosition(Unit* u)
         Vec3 v;
         v = g_seams.units->GetPiecePosition(u->carrier, (signed char)u->transportPiece);
         if (((UnitDefMoveView*)u->def.get())->b19) {
-            *(OrderFixed*)&v.y = ORDER_MAX(*(OrderFixed*)&v.y, MakeOrderFixed(((UnitDefMoveView*)u->def.get())->draft * 0xffff + g_game->seaLevel));
+            v.y = ORDER_MAX(v.y, MakeFixed(((UnitDefMoveView*)u->def.get())->draft * 0xffff + g_game->seaLevel).value);
         }
         g_seams.units->SetUnitPosition(u, v, mode);
         Angles16 o = g_seams.units->GetPieceAngles(u->carrier, (signed char)u->transportPiece);

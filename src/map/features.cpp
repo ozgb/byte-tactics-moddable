@@ -44,35 +44,6 @@ struct SmokePos {
 
 #include "../graphics/gaf_frame.h"
 
-struct FeatureUnit {
-    char unknown_0[0x92];
-    int def;
-    char unknown_96[0xa6 - 0x96];
-    unsigned short unitDefIndex;
-    char unknown_a8[0x110 - 0xa8];
-    int flags_110;
-    int flags_114;
-};
-
-struct AnimEntry {
-    short next;
-    short prev;
-    char unknown_4[0x2c];
-};
-
-struct AnimManager {
-    char unknown_0[0x10];
-    Ref<AnimEntry> anim;
-    Ref<FeatureUnit> featureUnit;
-    int activeHead;
-    int idleHead;
-    int freeHead;
-    char unknown_24[0x58 - 0x24];
-    int nameCount;
-    char unknown_5c[0x74 - 0x5c];
-    char (*names)[0x100];
-};
-
 struct Feature;
 struct SpotState;
 

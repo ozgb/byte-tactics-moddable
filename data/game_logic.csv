@@ -346,7 +346,7 @@ address,function,file
 0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp
 0x4384a0,AddBeCarriedOrder,src/orders/order_queue.cpp
 0x438760,MissionType::MissionType,src/orders/order_queue.cpp
-0x438830,OrderType::GetTableEntry,src/orders/order_queue.cpp
+0x438830,MissionType::GetTableEntry,src/orders/order_queue.cpp
 0x438870,Order::OrStatusFlags,src/orders/order_queue.cpp
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp
 0x438be0,GetOrderFlags,src/orders/order_queue.cpp

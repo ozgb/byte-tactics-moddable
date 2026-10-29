@@ -5,7 +5,8 @@
 #include <math.h>
 #include "../../interfaces/host.h"
 
-struct LzssTreeNode;
+#include "lzss_tree.h"
+
 extern LzssTreeNode* g_squashDictTree;
 extern char* g_squashWindow;
 
@@ -32,12 +33,6 @@ int LzssFreeTree()
     g_squashDictTree = 0;
     return 0;
 }
-
-struct LzssTreeNode {
-    unsigned short parent;
-    unsigned short smaller;
-    unsigned short larger;
-};
 
 // FUNCTION: 0x4d0b10
 void __stdcall LzssContractNode(int oldNode, int newNode)

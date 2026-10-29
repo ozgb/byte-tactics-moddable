@@ -91,6 +91,7 @@ int GetTicks();
 #include "../map/line_of_sight.h"
 #include "../ingame/control_panel.h"
 #include "../sound/sound.h"
+#include "play_sound_packet.h"
 #include "../units/unit_commands.h"
 #include "../units/units.h"
 #include "../game/game_state.h"
@@ -932,13 +933,6 @@ struct UnitScriptCallRecv {
     int arg1;
     int arg2;
     int arg3;
-};
-
-struct PlaySoundPacket {
-    unsigned char type;
-    unsigned char flag;
-    int index;
-    int pos[3];
 };
 
 struct ResourceSharePacket {

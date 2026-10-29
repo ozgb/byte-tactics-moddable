@@ -10,7 +10,6 @@ AddTimer,mismatch,"static risk rule: a convention, parameter count, or non-point
 AdjustBuildCount,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AdvanceGafSequence,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 AimCobStub,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-AimWithinTolerance,mismatch,fixing it changes the generated code of a caller
 AllocAlphaTable,mismatch,pointer/int cast: definition's type is likely wrong
 AllocDepthFrame,mismatch,fixing it changes the generated code of a caller
 AllocSurface,mismatch,pointer/int cast: definition's type is likely wrong
@@ -165,7 +164,6 @@ IsCountBelowAiLimit,mismatch,"static risk rule: a convention, parameter count, o
 IsGadgetNamed,mismatch,pointer/int cast: definition's type is likely wrong
 IssueMobileBuildOrders,mismatch,parameter 1 void* vs ViewMouseEvent* (view type): the declaration differs from the definition in a pointer type only
 IssueOrCancelOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-IssueOrderToSelection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 JoinLobbyGameThread,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 JoinNetGame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 LeaveNetGameCallback,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -270,7 +268,6 @@ UpdateHelpText,mismatch,"definition type not nameable in a header, or no clean c
 UpdateMenu,mismatch,fixing it changes the generated code of a caller
 UpdatePlayerEconomy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 UpdateTimeoutDialog,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-VectorLength,mismatch,"weapons.cpp declares it with Vec3* and defines it with VectorLengthArg*, which has Vec3's layout, but joining the two changes the exe"
 WalkFrameChain,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WalkStack,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 WeaponCanReachPos,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

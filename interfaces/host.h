@@ -14,7 +14,7 @@ extern "C" {
 // Major version of the host interface, changed when a function is removed or its signature changes.
 #define HOST_VERSION_MAJOR 2
 // Minor version of the host interface, changed when a function is added.
-#define HOST_VERSION_MINOR 0
+#define HOST_VERSION_MINOR 1
 
 // Timeout for host_event_wait that never expires.
 #define HOST_WAIT_FOREVER 0xffffffffu
@@ -94,6 +94,13 @@ void HOST_CALL host_mem_free(void* block);
 int HOST_CALL host_mem_readable(const void* addr, unsigned int size);
 // Writes the base and byte size of the running program's image and returns 1, or returns 0 when it cannot be found.
 int HOST_CALL host_image_range(const void** base, unsigned int* size);
+
+// Loads the dynamic library at path and returns its handle, or NULL when it cannot.
+void* HOST_CALL host_lib_open(const char* path);
+// Returns the address of the export called name in a library that host_lib_open returned, or NULL when it has none.
+void* HOST_CALL host_lib_symbol(void* lib, const char* name);
+// Frees a library that host_lib_open returned.
+void HOST_CALL host_lib_close(void* lib);
 
 // Returns the command line the program was started with.
 const char* HOST_CALL host_command_line(void);

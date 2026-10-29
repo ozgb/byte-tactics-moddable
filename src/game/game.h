@@ -1061,7 +1061,7 @@ struct Game {
     int sides;
     union {
         struct {
-            char names[1][562];
+            char sideDefsSpanFirst_37f3d[562];
             char pad_3816f[2248];
             unsigned int lastTick;
             int frames_38a3b;
@@ -1116,7 +1116,7 @@ struct Game {
             char glamour[256];
         };
         struct {
-            char sideDefsHead[1154];
+            char sideDefsSpanHead_37f3d[1154];
             char unknown_383bf[1682];
             unsigned char pauseFlags;
             char pad_38a52[1];
@@ -1407,7 +1407,6 @@ static_assert(offsetof(Game, bits_37f06) == 0x37f06, "bits_37f06");
 static_assert(offsetof(Game, bits_37f06_1) == 0x37f06, "bits_37f06_1");
 static_assert(offsetof(Game, bits_37f2f_2) == 0x37f2f, "bits_37f2f_2");
 static_assert(offsetof(Game, block) == 0x37ee6, "block");
-static_assert(offsetof(Game, names) == 0x37f3d, "names");
 static_assert(offsetof(Game, startPos) == 0x37f5f, "startPos");
 static_assert(offsetof(Game, sideDefs) == 0x37f3d, "sideDefs");
 static_assert(offsetof(Game, flags_38a51) == 0x38a51, "flags_38a51");

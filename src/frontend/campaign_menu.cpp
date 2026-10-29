@@ -193,7 +193,7 @@ char* BuildSideList()
 
     buf[0] = 0;
     for (i = 0; i < g_game->sides; i++) {
-        p = strcat(p, g_game->names[i]);
+        p = strcat(p, g_game->sideDefs[i].name);
         p = p + strlen(p) + 1;
         p[0] = 0;
     }
@@ -268,7 +268,7 @@ int __stdcall BuildCampaignNameList(char** out, int side)
         if ((&parser)->LoadFile(path)) {
             if ((&parser)->SelectRecord("HEADER")) {
                 parser.current->GetFieldString(name, "campaignside", 0x40, DAT_005119b8);
-                if (strcmp(g_game->names[side], name) == 0 || strcmp("ALL", name) == 0) {
+                if (strcmp(g_game->sideDefs[side].name, name) == 0 || strcmp("ALL", name) == 0) {
                     found++;
                     p = AppendNameInBuildCampaignNameList(p, q);
                 }

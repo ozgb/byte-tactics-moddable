@@ -800,7 +800,7 @@ static int FindSide(const char* name)
 {
     int count = g_game->sides;
     for (int i = 0; i < count; i++) {
-        if (_stricmp(g_game->names[i], name) == 0)
+        if (_stricmp(g_game->sideDefs[i].name, name) == 0)
             return i;
     }
     return -1;

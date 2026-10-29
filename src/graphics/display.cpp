@@ -126,7 +126,7 @@ int __stdcall CheckDirectXVersion(int want0, int want1, int want2, int want3, in
 // FUNCTION: 0x4b52e0
 void __stdcall InitDisplayDefaults(Display* p)
 {
-    p->videoFlags &= 0xfc00;
+    p->videoFlags.word &= 0xfc00;
     p->startWidth = 640;
     p->startHeight = 480;
     p->startMode.left = 0;
@@ -310,7 +310,7 @@ int __stdcall InitEnvironment(Display* d)
     d->useOverrideSurface = 0;
     d->flags.bits.quitting = 0;
     d->hwnd = 0;
-    d->flags.bits.soundOpt = (d->videoFlags >> 9) & 1;
+    d->flags.bits.soundOpt = (d->videoFlags.word >> 9) & 1;
     InitKeyQueue(0x1e);
     InitMouse(0x14, d->flags.bits.soundOpt);
     MouseEventView view;
@@ -327,7 +327,7 @@ int __stdcall InitEnvironment(Display* d)
     int h = d->startHeight;
     d->width = w;
     d->height = h;
-    int subsys = (d->videoFlags & 0x1fe) << 1;
+    int subsys = (d->videoFlags.word & 0x1fe) << 1;
     d->flags.word = (d->flags.word & 0xfc03) | subsys | 1;
     if (d->flags.bits.has_c4) {
         AllocShadeTable(d);
@@ -352,9 +352,9 @@ int __stdcall InitEnvironment(Display* d)
         d->windowed = 0;
         d->screen.callback = 0;
         d->vec = d->startMode;
-        d->hwnd = host_window_open(d->title, w, h, d->videoFlags & 1);
+        d->hwnd = host_window_open(d->title, w, h, d->videoFlags.word & 1);
         if (d->hwnd != 0) {
-            int r = SetFullScreen(d->videoFlags & 1);
+            int r = SetFullScreen(d->videoFlags.word & 1);
             if (r != 0) {
                 return 1;
             }

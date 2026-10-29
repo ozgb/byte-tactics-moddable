@@ -71,7 +71,7 @@ struct ParticleListsView;
 class SpatialBucket;
 class SoundView;
 struct ConnectionBlob;
-struct MainFrameDisplayContext;
+struct Display;
 struct GameDescEntry;
 struct SoundCategoryEntry;
 struct EyeView;
@@ -106,7 +106,7 @@ struct Game {
     };
     char* build_date;
     char* build_time;
-    MainFrameDisplayContext* displayContext;
+    Display* displayContext;
     SoundView* sound;
     union {
         struct {

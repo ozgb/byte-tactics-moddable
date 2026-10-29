@@ -101,60 +101,7 @@ extern int g_cdTrackCategory;
 extern int g_cdNeedsReopenAfterFocus;
 extern DWORD g_lastSoundReapTick;
 
-union DisplayVideoFlags {
-    unsigned short value;
-    struct {
-        unsigned short b0 : 1;
-        unsigned short b1 : 1;
-        unsigned short b2 : 1;
-        unsigned short b3 : 1;
-        unsigned short b4 : 1;
-        unsigned short b5 : 1;
-        unsigned short b6 : 1;
-        unsigned short b7 : 1;
-        unsigned short b8 : 1;
-        unsigned short b9 : 1;
-        unsigned short spare : 6;
-    } bits;
-};
-union DisplayContextFlags {
-    int value;
-    struct {
-        unsigned b0 : 1;
-        unsigned b1 : 1;
-        unsigned b2 : 1;
-        unsigned b3 : 1;
-        unsigned b4 : 1;
-        unsigned b5 : 1;
-        unsigned b6 : 1;
-        unsigned b7 : 1;
-        unsigned b8 : 1;
-        unsigned b9 : 1;
-        unsigned b10 : 1;
-        unsigned b11 : 1;
-        unsigned spare : 20;
-    } bits;
-};
-
-#pragma pack(push, 2)
-struct GameMainDisplayContext {
-    int hInstance;
-    int nCmdShow;
-    int className;
-    int title;
-    int unknown_10;
-    int menuId;
-    char unknown_18[0xe0 - 0x18];
-    int active;
-    char unknown_e4[0xf0 - 0xe4];
-    DisplayContextFlags flags;
-    char unknown_f4[0x1fa - 0xf4];
-    int startWidth;
-    int startHeight;
-    DisplayVideoFlags video;
-};
-#pragma pack(pop)
-extern GameMainDisplayContext g_displayContext;
+extern Display g_displayContext;
 
 
 extern const char DAT_005097f4[];
@@ -202,29 +149,29 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     GameSrand(RAND_STREAM_MAIN, HarnessCrtSeed(time(0)));
     if (ParseCommandLine(lpCmdLine, g_appName) == 0)
         return 1;
-    InitDisplayDefaults((Display *)&g_displayContext);
+    InitDisplayDefaults(&g_displayContext);
     g_displayContext.startWidth = 0x280;
-    g_displayContext.video.bits.b0 = ~g_cmdlineDisplaySeed;
-    g_displayContext.video.bits.b1 = 1;
-    g_displayContext.video.bits.b8 = 1;
-    g_displayContext.video.bits.b4 = 1;
-    g_displayContext.video.bits.b9 = 1;
-    g_displayContext.video.bits.b5 = 1;
-    g_displayContext.video.bits.b6 = 1;
-    g_displayContext.video.bits.b7 = 1;
+    g_displayContext.videoFlags.bits.b0 = ~g_cmdlineDisplaySeed;
+    g_displayContext.videoFlags.bits.b1 = 1;
+    g_displayContext.videoFlags.bits.b8 = 1;
+    g_displayContext.videoFlags.bits.b4 = 1;
+    g_displayContext.videoFlags.bits.b9 = 1;
+    g_displayContext.videoFlags.bits.b5 = 1;
+    g_displayContext.videoFlags.bits.b6 = 1;
+    g_displayContext.videoFlags.bits.b7 = 1;
     g_displayContext.startHeight = 0x1e0;
-    g_displayContext.hInstance = (int)hInstance;
+    g_displayContext.hInstance = hInstance;
     g_displayContext.nCmdShow = nCmdShow;
-    g_displayContext.className = (int)g_windowClassName;
-    g_displayContext.title = (int)g_appName;
+    g_displayContext.className = g_windowClassName;
+    g_displayContext.title = g_appName;
     g_displayContext.menuId = 0;
-    int bGameOk = InitEnvironment((Display *)&g_displayContext);
+    int bGameOk = InitEnvironment(&g_displayContext);
     if (bGameOk == lzero)
         return 0;
     InitTimers(0x1e);
     RegisterDataArchives();
     EmptyPostArchiveMountHook(DAT_005097f4);
-    g_game->displayContext = (MainFrameDisplayContext*)(&g_displayContext);
+    g_game->displayContext = &g_displayContext;
     g_game->version = 3;
     g_game->versionMinor = 1;
     g_game->field_3 = 1;
@@ -293,7 +240,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         }
     }
 
-    if (g_displayContext.flags.bits.b11) {
+    if (g_displayContext.flags.bits.quitting) {
         ShutdownMouse();
         ShutdownGame();
     }
@@ -302,7 +249,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         strcpy(buf40, DAT_005119b8);
         WriteGameRegistryValue((void *)g_cdShellValueName, buf40, 0x32);
     }
-    ShutdownEnvironment((Display *)&g_displayContext);
+    ShutdownEnvironment(&g_displayContext);
     return 0;
 }
 

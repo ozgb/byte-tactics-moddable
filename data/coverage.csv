@@ -694,7 +694,7 @@ pathfinding,Pathfinder::MarkGoalCell,src/ai/pathfind.cpp,0,0,0,0,0,0,?MarkGoalCe
 pathfinding,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,0,0,0,0,0,0,?ReleaseHeldPathLock@Pathfinder@@QAEXXZ,1,
 pathfinding,Pathfinder::RemoveNode,src/ai/pathfind.cpp,1,0,0,0,0,0,?RemoveNode@Pathfinder@@QAEXH@Z,0,unreachable
 pathfinding,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,1,0,0,0,0,0,??1Pathfinder@@QAE@XZ,0,shutdown
-platform,*,,704,373,7854,3055,3070,775,,83,
+platform,*,,704,373,7853,3054,3070,775,,83,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,
@@ -980,7 +980,7 @@ platform,SetValueAtexitHandler,src/debug/debug_lib.cpp,0,0,0,0,0,0,?SetValueAtex
 platform,SettingSetBlob,src/host/settings_io.h,1,0,0,0,0,0,?SettingSetBlob@@YGXPBX00H@Z,0,
 platform,ShowDebugMessage,src/host/win32/crash.cpp,1,0,0,0,0,0,?ShowDebugMessage@@YAXPBD@Z,0,
 platform,ShowErrorBox,src/util/math.cpp,1,0,0,0,0,0,?ShowErrorBox@@YGXPBDH@Z,0,
-platform,ShutdownEnvironment,src/graphics/display.cpp,1,0,0,0,0,0,?ShutdownEnvironment@@YGXPAUDisplayAppView@@@Z,0,
+platform,ShutdownEnvironment,src/graphics/display.cpp,1,0,0,0,0,0,?ShutdownEnvironment@@YGXPAUDisplay@@@Z,0,
 platform,SkipTextLines,src/host/win32/net.cpp,1,0,0,0,0,0,?SkipTextLines@?A0x@@YGPADPADH@Z,0,
 platform,StackTrace::CaptureStack,src/host/win32/crash.cpp,1,0,0,0,0,0,?CaptureStack@StackTrace@@QAEXPAH0HH@Z,0,
 platform,StackTrace::FormatStackReport,src/host/win32/crash.cpp,1,0,0,0,0,0,?FormatStackReport@StackTrace@@QAEXXZ,0,
@@ -1190,7 +1190,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1107,454,31712,9821,11818,2554,,294,
+presentation,*,,1107,454,31712,9821,11818,2555,,294,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,
@@ -1295,7 +1295,7 @@ presentation,CollectSelectedUnits,src/ingame/selection.cpp,1,0,0,0,0,0,?CollectS
 presentation,CommitTextEdit,src/gui/dialogs.cpp,1,0,0,0,0,0,?CommitTextEdit@@YGXPAUGui@@HPADHH@Z,0,
 presentation,CompactActivePlayerSlots,src/frontend/multi.cpp,1,0,0,0,0,0,?CompactActivePlayerSlots@@YGXXZ,0,
 presentation,CompareUnitRestrictEntries,src/frontend/multi.cpp,1,0,0,0,0,0,?CompareUnitRestrictEntries@@YAHPBD0@Z,0,
-presentation,ConfigureListBoxByName,src/gui/gui.cpp,1,0,0,0,0,0,?ConfigureListBoxByName@@YGXPAUConfigureListBoxByNameDialog@@PADHHH@Z,0,
+presentation,ConfigureListBoxByName,src/gui/gui.cpp,1,0,0,0,0,0,?ConfigureListBoxByName@@YGXPAUConfigureListBoxByNameDialog@@PADHHPAUFont@@@Z,0,
 presentation,ConfigureListBoxFontHeight,src/gui/gui.cpp,1,0,0,0,0,0,?ConfigureListBoxFontHeight@@YGHXZ,0,
 presentation,ConnectToGame,src/frontend/multi.cpp,1,0,0,0,0,0,?ConnectToGame@@YGHPAULayer@@@Z,0,
 presentation,ConnectToService,src/frontend/frontend.cpp,0,0,0,0,0,0,?ConnectToService@@YGHXZ,1,
@@ -1511,7 +1511,7 @@ presentation,GetDrawWrappedTextLineHeight,src/gui/gui.cpp,1,0,0,0,0,0,?GetDrawWr
 presentation,GetEntries,src/graphics/gaf.cpp,0,0,0,0,0,0,?GetEntries@@YGPAUGafDurationEntry@@PAUGafDurationCursor@@@Z,1,
 presentation,GetEntries,src/gui/gui.cpp,1,0,0,0,0,0,?GetEntries@@YGPAUGadget@@PAUGadgetAccessDialog@@@Z,0,
 presentation,GetEntry,src/gui/gui.cpp,0,0,0,0,0,0,?GetEntry@@YGPAUGadget@@PAUGadgetAccessDialog@@H@Z,1,
-presentation,GetFont,src/graphics/draw.cpp,1,0,0,0,0,0,?GetFont@@YGHXZ,0,
+presentation,GetFont,src/graphics/draw.cpp,1,0,0,0,0,0,?GetFont@@YGPAUFont@@XZ,0,
 presentation,GetFontLineHeight,src/gui/gui.cpp,1,0,0,0,0,0,?GetFontLineHeight@@YGHXZ,0,
 presentation,GetFrameRate,src/graphics/display.cpp,1,0,0,0,0,0,?GetFrameRate@@YGHXZ,0,
 presentation,GetGadgetActiveByName,src/gui/gui.cpp,1,0,0,0,0,0,?GetGadgetActiveByName@@YGDPAUGadgetAccessDialog@@PAD@Z,0,

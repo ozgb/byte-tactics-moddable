@@ -28,6 +28,9 @@ unsigned s_staticsHigh;
 int s_haveBaseline;
 unsigned s_baselineLow;
 unsigned s_baselineHigh;
+unsigned s_fuelMax;
+unsigned s_fuelMaxTick;
+int s_haveFuel;
 
 void WhereText(char* text)
 {
@@ -40,7 +43,14 @@ void WhereText(char* text)
 void __cdecl OnTrap(void* user, const char* module, const char* message)
 {
     char text[700];
+    unsigned budget;
     (void)user;
+    if (WindMeteorsOutOfFuel(&budget)) {
+        sprintf(text, "%s ran out of fuel", module);
+        WhereText(text);
+        sprintf(text + strlen(text), ": it burned more than its fuel_budget of %u in one tick", budget);
+        ModulesFatal(text);
+    }
     sprintf(text, "%s trapped", module);
     WhereText(text);
     strcat(text, ": ");
@@ -222,7 +232,10 @@ void Start()
     free(bytes);
     s_staticsLow = (unsigned)dataBase;
     s_staticsHigh = top - layout->stack_size;
-    if (!WindMeteorsBind(s_loader, module))
+    long fuelBudget = 0;
+    if (!wl_module_int(s_loader, kModuleName, "fuel_budget", &fuelBudget) || fuelBudget <= 0)
+        LoaderFatal("the manifest has no fuel_budget");
+    if (!WindMeteorsBind(s_loader, module, (unsigned)fuelBudget))
         LoaderFatal(wl_error(s_loader));
 }
 
@@ -280,6 +293,17 @@ void __stdcall ModulesCheckStatics(unsigned tick)
 {
     if (!s_wasm)
         return;
+    unsigned used;
+    if (WindMeteorsFuelClose(&used) && (!s_haveFuel || used > s_fuelMax)) {
+        s_haveFuel = 1;
+        s_fuelMax = used;
+        s_fuelMaxTick = tick;
+        FILE* file = fopen("fuel.txt", "wb");
+        if (file == nullptr)
+            ModulesFatal("testmode: cannot write fuel.txt");
+        fprintf(file, "bt-fuel 1\n%s\t%u\t%u\n", kModuleName, s_fuelMax, s_fuelMaxTick);
+        fclose(file);
+    }
     unsigned skip[4];
     unsigned skipCount;
     WindMeteorsDataRanges(skip, &skipCount);

@@ -346,6 +346,11 @@ const char* const kSlotNames[SLOT_COUNT] = {
 };
 
 wasmtime_func_t s_slots[SLOT_COUNT];
+wasmtime_func_t s_fuelSet;
+wasmtime_func_t s_fuelGet;
+long long s_fuelBudget;
+int s_fuelOpen;
+int s_fuelTick;
 unsigned s_gameAddress;
 unsigned s_simAddress;
 unsigned s_extTdfAddress;
@@ -374,9 +379,37 @@ void Prepare(Slot slot)
     memcpy(ModulesMemory()->base + s_blockBaseAddress, &blockBase, 4);
 }
 
+long long FuelLeft()
+{
+    wasmtime_val_raw_t a[1];
+    a[0].i64 = 0;
+    if (!wl_call(s_loader, s_module, &s_fuelGet, a, 1))
+        return 0;
+    return a[0].i64;
+}
+
+void FuelSet(long long value)
+{
+    wasmtime_val_raw_t a[1];
+    a[0].i64 = value;
+    wl_call(s_loader, s_module, &s_fuelSet, a, 1);
+}
+
+void FuelBegin()
+{
+    int tick = g_game != nullptr ? g_game->ticks : -1;
+    if (s_fuelOpen && s_fuelTick == tick)
+        return;
+    FuelSet(s_fuelBudget);
+    s_fuelOpen = 1;
+    s_fuelTick = tick;
+}
+
 void Call(Slot slot, wasmtime_val_raw_t* a, size_t count)
 {
     Prepare(slot);
+    if (s_slotDepth == 0)
+        FuelBegin();
     s_slotDepth++;
     wl_call(s_loader, s_module, &s_slots[slot], a, count);
     if (--s_slotDepth == 0)
@@ -491,9 +524,12 @@ int __stdcall WindMeteorsInstall(wl_loader* loader)
     return 1;
 }
 
-int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module)
+int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module, unsigned fuelBudget)
 {
     s_module = module;
+    s_fuelBudget = fuelBudget;
+    if (!wl_export_func(loader, module, "__fuel_set", &s_fuelSet) || !wl_export_func(loader, module, "__fuel_get", &s_fuelGet))
+        return 0;
     for (int i = 0; i < SLOT_COUNT; i++) {
         if (!wl_export_func(loader, module, kSlotNames[i], &s_slots[i]))
             return 0;
@@ -538,4 +574,19 @@ void __stdcall WindMeteorsDataRanges(unsigned* addresses, unsigned* count)
     addresses[2] = s_extTdfAddress;
     addresses[3] = s_blockBaseAddress;
     *count = 4;
+}
+
+int __stdcall WindMeteorsFuelClose(unsigned* used)
+{
+    if (!s_fuelOpen)
+        return 0;
+    s_fuelOpen = 0;
+    *used = (unsigned)(s_fuelBudget - FuelLeft());
+    return 1;
+}
+
+int __stdcall WindMeteorsOutOfFuel(unsigned* budget)
+{
+    *budget = (unsigned)s_fuelBudget;
+    return s_fuelOpen && FuelLeft() < 0;
 }

@@ -17,7 +17,9 @@ const ModuleMemory* __stdcall ModulesMemory();
 
 int __stdcall WindMeteorsInstall(wl_loader* loader);
 void __stdcall WindMeteorsUseSeam();
-int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module);
+int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module, unsigned fuelBudget);
+int __stdcall WindMeteorsFuelClose(unsigned* used);
+int __stdcall WindMeteorsOutOfFuel(unsigned* budget);
 void __stdcall WindMeteorsDataRanges(unsigned* addresses, unsigned* count);
 
 #endif

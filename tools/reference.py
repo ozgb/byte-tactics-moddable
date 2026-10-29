@@ -57,6 +57,8 @@ RUN_TICKS_PER_SECOND = 25
 RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK = 6
 RUN_ATTEMPTS = 2
 GATE_SCAN_EVERY = 8
+FUEL_FILE = "fuel.txt"
+FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 RETRY_DIALOG = "dialog-directx"
 
 
@@ -198,6 +200,41 @@ def should_retry(message: str) -> bool:
     return "still runs after" not in message
 
 
+def parse_fuel(path: Path) -> dict[str, tuple[int, int]]:
+    """The most fuel one tick burned in a run, by module: {module: (fuel, tick)}; empty when the run wrote no fuel.txt (native modules)."""
+    if not path.is_file():
+        return {}
+    lines = path.read_text().splitlines()
+    if not lines or lines[0] != "bt-fuel 1":
+        raise tracediff.Error(f"{path}: not a bt-fuel 1 file")
+    found = {}
+    for line in lines[1:]:
+        module, fuel, tick = line.split("\t")
+        found[module] = (int(fuel), int(tick))
+    return found
+
+
+def report_fuel(exe: Path, scenarios: dict[str, Path]) -> int:
+    """Print the most fuel one tick burned, per scenario and module, and the largest per module; 1 if a WASM run reported none."""
+    if os.environ.get("BT_NATIVE_MODULES") == "1" or not playtest.runs_wasm_modules(exe):
+        print("fuel: not counted (the modules ran as native code)")
+        return 0
+    missing = [name for name in scenarios if not FUEL.get(name)]
+    for name in scenarios:
+        for module, (fuel, tick) in sorted(FUEL.get(name, {}).items()):
+            print(f"fuel {name}: {module} {fuel} at tick {tick}")
+    for name in missing:
+        print(f"fuel {name}: no {FUEL_FILE}: the run counted no fuel")
+    largest: dict[str, tuple[int, str, int]] = {}
+    for name in scenarios:
+        for module, (fuel, tick) in FUEL.get(name, {}).items():
+            if module not in largest or fuel > largest[module][0]:
+                largest[module] = (fuel, name, tick)
+    for module, (fuel, name, tick) in sorted(largest.items()):
+        print(f"fuel max: {module} {fuel} per tick ({name}, tick {tick}) over {len(scenarios) - len(missing)} scenarios")
+    return 1 if missing else 0
+
+
 def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                   want: tuple[dict[str, str], list[tuple[int, str]]] | None = None, poison: bool = False,
                   keep_always: bool = False, scans: dict[str, str | None] | None = None,
@@ -229,11 +266,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {}
+            extra: dict = {"collect": (FUEL_FILE, *(tracediff.SAVE_FILES if save_to is not None else ()))}
             if load_from is not None:
                 extra["put"] = tracediff.save_put(load_from, scenario.stem, load_from.name)
-            if save_to is not None:
-                extra["collect"] = tracediff.SAVE_FILES
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, scan_every if scans is not None else 0, **extra)
             break
         except tracediff.Error as e:
@@ -247,6 +282,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     try:
         if save_to is not None:
             tracediff.copy_save(run, save_to)
+        FUEL[scenario.stem] = parse_fuel(run / FUEL_FILE)
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
         for key in ("game_seed", "crt_seed", "view_seed"):
             if key not in header:
@@ -446,6 +482,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = F
             bad.append(name)
     print(f"{len(scenarios) - len(bad)} of {len(scenarios)} scenarios equal, total {clock(wall)}")
     pointers = report_block_pointers(exe, scans, quick, save_blockptrs)
+    pointers += report_fuel(exe, scenarios)
     if not bad:
         if pointers:
             sys.exit(1)

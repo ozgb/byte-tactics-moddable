@@ -11,6 +11,7 @@
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma pack(push, 1)
 #include "../util/vec3.h"
+#include "../../include/mouse_event.h"
 #include "../../include/v4i.h"
 #include "../../interfaces/services.h"
 #include "../ai/ai_search_goal.h"
@@ -70,7 +71,6 @@
 #include "../ingame/orders_bits.h"
 #include "../ingame/orders_panel_flags.h"
 #include "../ingame/unit_info_snapshot.h"
-#include "../ingame/view_mouse_event.h"
 #include "../map/cell.h"
 #include "../map/eye.h"
 #include "../map/feature.h"
@@ -1490,6 +1490,13 @@ static_assert(offsetof(ModelState, shadow) == 20, "");
 static_assert(offsetof(ModelState, pos) == 24, "");
 static_assert(offsetof(ModelState, root) == 30, "");
 static_assert(offsetof(ModelState, pieces) == 34, "");
+static_assert(sizeof(MouseEvent) == 24, "");
+static_assert(offsetof(MouseEvent, x) == 0, "");
+static_assert(offsetof(MouseEvent, y) == 4, "");
+static_assert(offsetof(MouseEvent, keyFlags) == 8, "");
+static_assert(offsetof(MouseEvent, scaledTick) == 12, "");
+static_assert(offsetof(MouseEvent, msg) == 16, "");
+static_assert(offsetof(MouseEvent, dblClick) == 20, "");
 static_assert(sizeof(MovementClass) == 32, "");
 static_assert(offsetof(MovementClass, name) == 0, "");
 static_assert(offsetof(MovementClass, footprintX) == 4, "");
@@ -2414,11 +2421,6 @@ static_assert(offsetof(VictoryUnitTypePassesX, x) == 48, "");
 static_assert(sizeof(VictoryUnitTypePassesZ) == 52, "");
 static_assert(offsetof(VictoryUnitTypePassesZ, name) == 16, "");
 static_assert(offsetof(VictoryUnitTypePassesZ, z) == 48, "");
-static_assert(sizeof(ViewMouseEvent) == 24, "");
-static_assert(offsetof(ViewMouseEvent, x) == 0, "");
-static_assert(offsetof(ViewMouseEvent, y) == 4, "");
-static_assert(offsetof(ViewMouseEvent, keyFlags) == 8, "");
-static_assert(offsetof(ViewMouseEvent, unknown_c) == 12, "");
 static_assert(sizeof(WeaponDef) == 277, "");
 static_assert(offsetof(WeaponDef, name) == 0, "");
 static_assert(offsetof(WeaponDef, description) == 32, "");

@@ -1,12 +1,12 @@
 #ifndef GAME_CURSOR_STATE_H
 #define GAME_CURSOR_STATE_H
 
-#include "view_mouse_event.h"
+#include "../../include/mouse_event.h"
 #include "cursor_point.h"
 
 #pragma pack(push, 1)
 struct GameCursorState {
-    ViewMouseEvent rect;
+    MouseEvent rect;
     int flag;
     CursorPoint center;
     CursorPoint savedScroll;

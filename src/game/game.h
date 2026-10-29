@@ -17,7 +17,7 @@
 #include "../graphics/object3do.h"
 #include "../graphics/piece_frame.h"
 #include "../gui/gui.h"
-#include "../ingame/view_mouse_event.h"
+#include "../../include/mouse_event.h"
 #include "../ingame/camera_flags.h"
 #include "../ingame/game_cursor_state.h"
 #include "../ingame/net_game_flags.h"
@@ -361,7 +361,7 @@ struct Game {
             char pad_2c50[36];
             unsigned char lockFlags;
             char pad_2c75[1];
-            ViewMouseEvent view;
+            MouseEvent view;
             short x;
             short y;
             int boxStartX;

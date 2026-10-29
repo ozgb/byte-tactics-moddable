@@ -59,7 +59,6 @@ struct CameraFollowTarget {
 };
 
 #include "../game/game.h"
-#include "view_mouse_event.h"
 #include "../game/game_state.h"
 
 #pragma pack(pop)
@@ -173,7 +172,7 @@ int __stdcall MenuEntryNameContains(Gadget* entries, char* text, int index)
 }
 
 // FUNCTION: 0x419670
-void __stdcall IssueMobileBuildOrders(ViewMouseEvent* arg)
+void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
 {
     unsigned int remove = (arg->keyFlags >> 2) & 1;
     unsigned short index = g_game->buildTypeIndex;
@@ -306,7 +305,6 @@ void __stdcall SetOrderIntent(unsigned char mode)
 int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
 {
     char name[32];
-    OrderTypeEntry* orders = (OrderTypeEntry*)g_game->orders;
     Gadget* e;
     if (entries[button->index].type == 1) e = &entries[button->index];
 
@@ -323,7 +321,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "STOP")) {
         SetOrderIntent(1);
-        IssueOrderToSelection(orders, 0, "STOP", 0, 0, 0);
+        IssueOrderToSelection(&g_game->view, 0, "STOP", 0, 0, 0);
         PlaySoundByName("immediateorders", 0);
         return 1;
     }
@@ -550,22 +548,21 @@ void __stdcall RefreshOrderButtons(Unit* unit)
 int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
 {
     Unit* unit = &g_game->units[g_game->unitIndex];
-    OrderTypeEntry* orders = (OrderTypeEntry*)g_game->orders;
     int index = menu->hotGadgetIndex;
 
     if (MenuEntryNameContains(entries, "MOVEORD", index)) {
         switch (g_game->ordersPanelFlags_37ebe_6.bits.moveOrder) {
         case 0:
-            IssueOrderToSelection(orders, 0, "STANDING_MOVEORDER", 0, 1, 0);
+            IssueOrderToSelection(&g_game->view, 0, "STANDING_MOVEORDER", 0, 1, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.moveOrder = 1;
             break;
         case 1:
-            IssueOrderToSelection(orders, 0, "STANDING_MOVEORDER", 0, 2, 0);
+            IssueOrderToSelection(&g_game->view, 0, "STANDING_MOVEORDER", 0, 2, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.moveOrder = 2;
             break;
         case 2:
         case 3:
-            IssueOrderToSelection(orders, 0, "STANDING_MOVEORDER", 0, 0, 0);
+            IssueOrderToSelection(&g_game->view, 0, "STANDING_MOVEORDER", 0, 0, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.moveOrder = 0;
             break;
         }
@@ -574,16 +571,16 @@ int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
     } else if (MenuEntryNameContains(entries, "FIREORD", index)) {
         switch (g_game->ordersPanelFlags_37ebe_6.bits.fireOrder) {
         case 0:
-            IssueOrderToSelection(orders, 0, "STANDING_FIREORDER", 0, 1, 0);
+            IssueOrderToSelection(&g_game->view, 0, "STANDING_FIREORDER", 0, 1, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.fireOrder = 1;
             break;
         case 1:
-            IssueOrderToSelection(orders, 0, "STANDING_FIREORDER", 0, 2, 0);
+            IssueOrderToSelection(&g_game->view, 0, "STANDING_FIREORDER", 0, 2, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.fireOrder = 2;
             break;
         case 2:
         case 3:
-            IssueOrderToSelection(orders, 0, "STANDING_FIREORDER", 0, 0, 0);
+            IssueOrderToSelection(&g_game->view, 0, "STANDING_FIREORDER", 0, 0, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.fireOrder = 0;
             break;
         }
@@ -592,15 +589,15 @@ int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
     } else if (MenuEntryNameContains(entries, "STATUS", index) || MenuEntryNameContains(entries, "ONOFF", index)) {
         switch (g_game->ordersPanelFlags_37ebe_6.bits.onOff) {
         case 0:
-            IssueOrderToSelection(orders, 0, "ACTIVATE", 0, 0, 0);
+            IssueOrderToSelection(&g_game->view, 0, "ACTIVATE", 0, 0, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.onOff = 1;
             break;
         case 1:
-            IssueOrderToSelection(orders, 0, "DEACTIVATE", 0, 0, 0);
+            IssueOrderToSelection(&g_game->view, 0, "DEACTIVATE", 0, 0, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.onOff = 0;
             break;
         case 2:
-            IssueOrderToSelection(orders, 0, "ACTIVATE", 0, 0, 0);
+            IssueOrderToSelection(&g_game->view, 0, "ACTIVATE", 0, 0, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.onOff = 1;
             break;
         }
@@ -608,10 +605,10 @@ int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries)
         SetGadgetStatus(&g_game->gui, index, g_game->ordersPanelFlags_37ebe_6.bits.onOff);
     } else if (MenuEntryNameContains(entries, "CLOAK", index)) {
         if (g_game->ordersPanelFlags_37ebe_6.bits.cloak) {
-            IssueOrderToSelection(orders, 0, "CLOAK_OFF", 0, 0, 0);
+            IssueOrderToSelection(&g_game->view, 0, "CLOAK_OFF", 0, 0, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.cloak = 0;
         } else {
-            IssueOrderToSelection(orders, 0, "CLOAK_ON", 0, 0, 0);
+            IssueOrderToSelection(&g_game->view, 0, "CLOAK_ON", 0, 0, 0);
             g_game->ordersPanelFlags_37ebe_6.bits.cloak = 1;
         }
         PlaySoundByName("specialorders", 0);
@@ -1552,7 +1549,7 @@ void BeginMouseScroll()
     HideSoftwareCursor();
     CursorState* cursor = &(*(CursorState*)&g_game->cursor);
     cursor->flag = 1;
-    cursor->start = (*(MouseEvent*)&g_game->view);
+    cursor->start = g_game->view;
     cursor->savedScroll.x = g_game->scrollX / 16;
     cursor->savedScroll.y = g_game->scrollY / 16;
     cursor->center.x = GetScreenWidth() / 2;
@@ -1584,7 +1581,7 @@ static inline void ScrollTo(int x, int y)
 void UpdateMouseScroll()
 {
     CursorState* c = &(*(CursorState*)&g_game->cursor);
-    MouseEvent r = (*(MouseEvent*)&g_game->view);
+    MouseEvent r = g_game->view;
     int dx = (r.x - c->center.x) / 4;
     int x = (dx + c->savedScroll.x) * 16;
     int dy = (r.y - c->center.y) / 4;

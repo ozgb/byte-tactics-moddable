@@ -3291,15 +3291,15 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
             }
         }
         if (found == 0)
-            IssueOrderToSelection((OrderTypeEntry*)GameAt(0x2c76), 0, order, s_noPosition, 0, 0);
+            IssueOrderToSelection((MouseEvent*)GameAt(0x2c76), 0, order, s_noPosition, 0, 0);
     } else if (OrderTakesNoTarget(o->kind)) {
         const char* mission = s_orderModes[o->kind].mission;
         if (o->kind == ORDER_CLOAK && !o->argument)
             mission = "CLOAK_OFF";
         if (o->kind == ORDER_ACTIVATE || o->kind == ORDER_DEACTIVATE || o->kind == ORDER_STOP || o->kind == ORDER_CLOAK)
-            IssueOrderToSelection((OrderTypeEntry*)GameAt(0x2c76), 0, MissionType(mission), s_noPosition, 0, 0);
+            IssueOrderToSelection((MouseEvent*)GameAt(0x2c76), 0, MissionType(mission), s_noPosition, 0, 0);
         else
-            IssueOrderToSelection((OrderTypeEntry*)GameAt(0x2c76), 0, MissionType(mission), s_noPosition, o->argument, 0);
+            IssueOrderToSelection((MouseEvent*)GameAt(0x2c76), 0, MissionType(mission), s_noPosition, o->argument, 0);
     } else if (o->kind == ORDER_BUILD) {
         *(unsigned short*)GameAt(GAME_BUILD_TYPE) = (unsigned short)buildType;
         if (!UpdatePlacementGhostValidity()) {
@@ -3309,7 +3309,7 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
         }
         IssueMobileBuildOrders(mouse);
     } else {
-        IssueOrderToSelection((OrderTypeEntry*)GameAt(0x2c76), s_orderModes[o->kind].mode, MissionType(), (int*)GameAt(GAME_POS), 0, 0);
+        IssueOrderToSelection((MouseEvent*)GameAt(0x2c76), s_orderModes[o->kind].mode, MissionType(), (int*)GameAt(GAME_POS), 0, 0);
     }
     *entryFlags = savedEntryFlags;
     *GameAt(GAME_ORDER_MODE) = 1;

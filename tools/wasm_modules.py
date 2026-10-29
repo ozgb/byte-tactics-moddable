@@ -57,6 +57,10 @@ import struct
 import subprocess
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import wasm_fuel
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES = os.path.join(ROOT, "tests", "wasm", "modules")
 GAME_MODULES = os.path.join(ROOT, "wasm", "modules.json")
@@ -362,7 +366,14 @@ def build_game_module(entry, pins):
     cmd = ["wasm-ld", *link_flags(entry, pins["stack_size"]), "--gc-sections", *exports, *[obj for _, obj in jobs], "-o", target]
     run(cmd)
     with open(target, "rb") as f:
-        info = parse_module(f.read())
+        linked_wasm = f.read()
+    try:
+        metered = wasm_fuel.instrument(linked_wasm, find_wasm_tools(pins["tools"]["wasm-tools"]))
+    except wasm_fuel.FuelError as e:
+        sys.exit(f"{entry['name']}: {e}")
+    with open(target, "wb") as f:
+        f.write(metered)
+    info = parse_module(metered)
     others = [r for r in fixture_ranges()]
     problems = check_window(entry, pins, info, others)
     linked = (min(o for o, _ in info["segments"] + [(info["stack_top"], 0)]),
@@ -372,7 +383,7 @@ def build_game_module(entry, pins):
     if problems:
         sys.exit("\n".join(problems))
     low = min(offset for offset, _ in info["segments"])
-    print(f"built {target}: data {low:#x}..{max(o + n for o, n in info['segments']):#x}, stack top {info['stack_top']:#x}, "
+    print(f"built {target}: {len(metered)} bytes (size budget {entry['size_budget']}), data {low:#x}..{max(o + n for o, n in info['segments']):#x}, stack top {info['stack_top']:#x}, "
           f"window {entry['data_base']:#x}..{entry['data_base'] + pins['window']:#x}, "
           f"table {min(o for o, _ in info['elements'])}..{max(o + n for o, n in info['elements'])}")
 
@@ -382,6 +393,28 @@ def check_tools_game(pins):
         found = tool_version([name, "--version"], r"(?:clang version|LLD) (\S+)")
         if found != pins["tools"]["clang"]:
             sys.exit(f"{name} is {found}, wasm/modules.json pins {pins['tools']['clang']}")
+
+
+def check_size(entry, size):
+    """Reasons a module's .wasm of the given size is over its manifest size_budget."""
+    budget = entry.get("size_budget")
+    if not isinstance(budget, int) or budget <= 0:
+        return [f"{entry['name']}: the manifest has no size_budget"]
+    if size > budget:
+        return [f"{entry['name']}: the .wasm is {size} bytes, over its size_budget {budget}"]
+    return []
+
+
+def check_fuel_manifest(pins):
+    """Reasons the manifest's fuel rule, or a module's fuel_budget, is not the one the metering pass implements."""
+    problems = []
+    if pins.get("fuel") != {"rule": wasm_fuel.RULE, "version": wasm_fuel.VERSION}:
+        problems.append(f"the manifest's fuel entry is not the pass's rule: {wasm_fuel.RULE!r}, version {wasm_fuel.VERSION}")
+    for entry in pins["modules"]:
+        budget = entry.get("fuel_budget")
+        if not isinstance(budget, int) or not 0 < budget < 1 << 31:
+            problems.append(f"{entry['name']}: fuel_budget must be an integer from 1 to {(1 << 31) - 1}")
+    return problems
 
 
 def check_kinds(name, spec, details):
@@ -414,7 +447,7 @@ def check_kinds(name, spec, details):
     if "slots" not in spec:
         return problems
     slots = spec["slots"]
-    for slot in sorted(set(details["exports"]) ^ set(slots)):
+    for slot in sorted((set(details["exports"]) - set(wasm_fuel.EXPORTS)) ^ set(slots)):
         problems.append(f"{name}: slot {slot} is in only one of the manifest's slots and the module's function exports")
     for slot, entry in slots.items():
         if slot in details["exports"]:
@@ -475,7 +508,7 @@ def module_interface(wasm_tools, path):
 def run_imports():
     game = game_manifest()
     wasm_tools = find_wasm_tools(game["tools"]["wasm-tools"])
-    specs = {m["name"]: {"imports": m["imports"], "exports": m["exports"] + m["data"], "slots": m["slots"]} for m in game["modules"]}
+    specs = {m["name"]: {"imports": m["imports"], "exports": m["exports"] + m["data"] + list(wasm_fuel.EXPORTS), "slots": m["slots"]} for m in game["modules"]}
     for entry in manifest()["modules"]:
         specs[entry["name"]] = {"imports": {}, "exports": FIXTURE_EXPORTS}
     failures = []
@@ -521,12 +554,20 @@ def run_check():
             failures.append(f"{name}: imports are {imports}")
         instances[name] = linker.instantiate(store, module)
 
-    for entry in game_manifest()["modules"]:
+    game = game_manifest()
+    failures += check_fuel_manifest(game)
+    wasm_tools = find_wasm_tools(game["tools"]["wasm-tools"])
+    for entry in game["modules"]:
         path = os.path.join(OUT, entry["name"] + ".wasm")
         if os.path.exists(path):
             for imp in wasmtime.Module.from_file(store.engine, path).imports:
                 if isinstance(imp.type, wasmtime.GlobalType):
                     failures.append(f"{entry['name']}: imports the global {imp.module}.{imp.name}")
+            with open(path, "rb") as f:
+                data = f.read()
+            failures += [f"{entry['name']}: {problem}" for problem in wasm_fuel.check_unmetered_surface(data, wasm_tools)]
+            failures += check_size(entry, len(data))
+            print(f"{entry['name']}: {len(data)} bytes, size budget {entry['size_budget']}, fuel budget {entry['fuel_budget']}")
 
     for entry in pins["modules"]:
         name = entry["name"]
@@ -664,6 +705,8 @@ def statics_run():
     memory.write(store, b"Meteor\0".ljust(32, b"\0"), params)
     memory.write(store, (50).to_bytes(4, "little") + struct.pack("<fff", 0.5, 2.0, 3.0), params + 32)
 
+    budget = entry["fuel_budget"]
+
     def call(name, *args):
         exports[name](store, *args)
 
@@ -677,10 +720,20 @@ def statics_run():
         sys.exit("EnableMeteors did not set g_meteorsEnabled in the block")
     setup = digest()
     ticks = off[("Game", "ticks")]
+    most = 0
     for tick in range(1, STATICS_TICKS + 1):
         put(game_at + ticks, tick)
-        call("UpdateWind")
-        call("UpdateMeteors")
+        exports["__fuel_set"](store, budget)
+        try:
+            call("UpdateWind")
+            call("UpdateMeteors")
+        except wasmtime.Trap as trap:
+            if exports["__fuel_get"](store) < 0:
+                print(f"FAIL: {entry['name']} ran out of fuel at tick {tick}: more than its fuel_budget {budget}")
+            else:
+                print(f"FAIL: {entry['name']} trapped at tick {tick}: {trap}")
+            return 1
+        most = max(most, budget - exports["__fuel_get"](store))
         if digest() != setup:
             print(f"FAIL: the statics {statics[0]:#x}..{statics[1]:#x} of {entry['name']} changed at tick {tick}")
             return 1
@@ -688,6 +741,7 @@ def statics_run():
         print("FAIL: SpawnProjectile was never called, so no meteor ran")
         return 1
     print(f"statics: {STATICS_TICKS} ticks, {state['spawns']} SpawnProjectile calls, {statics[1] - statics[0]} bytes hashed, ok")
+    print(f"fuel: the most one tick burned on the stubbed run is {most}, under the fuel_budget {budget} of {entry['name']}")
     return 0
 
 

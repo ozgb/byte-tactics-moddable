@@ -1,6 +1,7 @@
 {
   "tools": {"clang": "22.1.8", "wasm-tools": "1.262.0"},
   "build_flags": ["-mno-nontrapping-fptoint"],
+  "fuel": {"rule": "The counter drops by 1 at each function entry and at the top of each loop body (once per call and once per iteration). When it goes below zero the module traps (unreachable).", "version": 1},
   "block_base": 1048576,
   "block_size": 33554432,
   "scratch": [983040, 65536],
@@ -12,6 +13,8 @@
   "modules": [
     {
       "name": "wind_meteors",
+      "fuel_budget": 1000000000,
+      "size_budget": 20000,
       "data_base": 196608,
       "table_base": 48,
       "cxx": ["wasm/wind_meteors/module.cpp", "src/map/meteors.cpp", "src/game/game_state.cpp", "src/game/console_commands.cpp"],

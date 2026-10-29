@@ -294,6 +294,9 @@ jobs:
       - name: Test the module tools
         run: uv run tools/test_wasm_modules.py
 
+      - name: Test the fuel metering pass
+        run: uv run tools/test_wasm_fuel.py
+
       - name: The module's maths against the native hashes
         run: |
           uv run tools/wasm_maths.py build --wasm-only

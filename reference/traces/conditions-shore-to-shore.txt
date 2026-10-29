@@ -1,6 +1,6 @@
 bt-digest 3
 trace_format bt-trace 3
-commit b0b050dd51635eeddb8653722e4a1c61c5e7d2d7
+commit ae507bde7be3dd4fe5ca45c4b86f45ba7933ef4f
 scenario reference/scenarios/conditions-shore-to-shore.txt
 game_seed 406
 crt_seed 1406

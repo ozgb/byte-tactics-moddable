@@ -1,6 +1,6 @@
 bt-digest 3
 trace_format bt-trace 3
-commit b05bd2b0d755b87b096f3fac76dcc191274b1203
+commit ae507bde7be3dd4fe5ca45c4b86f45ba7933ef4f
 scenario reference/scenarios/orders-air-repair.txt
 game_seed 417
 crt_seed 1417
@@ -46,10 +46,10 @@ fpu_control_word 0xD001F
 38 943519496aca55fe
 39 617080b11b60d148
 40 38cb34bcf6b6377e
-41 261f5a6f45912373
-42 25f1d18f8f019405
-43 2da77cca48e5ef96
-44 8f8414d4cc53287f
+41 93b42a46a138a02a
+42 0005dfb7fe6fbf4a
+43 6fe46683ec1eb878
+44 3d9f01f2425980f2
 45 db881ae5cd12f69a
 46 0220a12b5ebf1c0e
 47 dd4e3d8bba51970b

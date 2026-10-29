@@ -276,7 +276,6 @@ ShowSoftwareCursor,mismatch,"static risk rule: a convention, parameter count, or
 SolveLaunchAngle,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SortDisplayModes,mismatch,placeholder type ModeList_0045e4c0: left for the type-naming issues
 SortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-StartBuildingScript,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 StepGafSequence,mismatch,placeholder type Ref_004b8b30: left for the type-naming issues
 SubtractVec3,mismatch,fixing it changes the generated code of a caller
 TintFrameBelow,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

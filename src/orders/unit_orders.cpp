@@ -797,7 +797,6 @@ struct PadWord7 { int field; };
 static const float kZeroFloatOrders = 0.0f;
 
 
-void __stdcall StartBuildingScript(Unit* unit, Order* order, short turn);
 #include "../util/math.h"
 
 // FUNCTION: 0x4034a0
@@ -1625,7 +1624,6 @@ static inline Vec3 PosPlus(const Vec3& a, const Vec3& other)
 }
 struct Unit;
 
-void __stdcall StartBuildingScript(Unit*, Order*, short);
 static inline Point16 WorldToCell16(Vec3 v, Point16 origin)
 {
     Point16 c;

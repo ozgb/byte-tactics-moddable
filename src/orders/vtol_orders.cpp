@@ -133,7 +133,7 @@ struct FixedPosView;
 #include "order_dispatch.h"
 #include "../../interfaces/seams.h"
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
-void __stdcall StartBuildingScript(Unit*, Order*, short);
+#include "order_queue.h"
 #include "order_queue.h"
 #include "../graphics/particles.h"
 void __stdcall DamageUnit(Unit*, Unit*, int, int, int);

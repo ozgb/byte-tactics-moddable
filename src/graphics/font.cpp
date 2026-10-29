@@ -9,9 +9,8 @@ struct Font {
     unsigned short offsets[1];
 };
 
-#include "../game/game.h"
+#include "display.h"
 
-Game* GetDisplay(void);
 #include "../util/registry.h"
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
@@ -41,8 +40,8 @@ int __stdcall GetTextWidth(Font* font, unsigned char* text)
 // FUNCTION: 0x4c14f0
 void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int maxWidth)
 {
-    Game* game = GetDisplay();
-    int width = GetTextWidth(game->font, text);
+    Display* display = GetDisplay();
+    int width = GetTextWidth(display->font, text);
     if (maxWidth != -1 && width > maxWidth) {
         unsigned char buf[0x12c];
         strncpy((char*)buf, (char*)text, 0x12b);
@@ -54,7 +53,7 @@ void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int m
             if (end == buf)
                 break;
             end--;
-            width = GetTextWidth(game->font, text);
+            width = GetTextWidth(display->font, text);
             if (width <= maxWidth)
                 break;
         }
@@ -70,24 +69,23 @@ void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int m
             Rect clip;
             screen.GetClipRect(&clip);
             if (RectInsideRect(&r, &clip))
-                BlitText(screen.pixels, screen.pitch, game->font, text, x, y, game->colour1,
-                             game->colour2, game->colour3);
+                BlitText(screen.pixels, screen.pitch, display->font, text, x, y, display->foreColor,
+                             display->backColor, display->keyColor);
             UnlockScreen(&screen);
         }
     } else {
         Rect clip;
         dst->GetClipRect(&clip);
         if (RectInsideRect(&r, &clip))
-            BlitText(dst->pixels, dst->pitch, game->font, text, x, y, game->colour1,
-                         game->colour2, game->colour3);
+            BlitText(dst->pixels, dst->pitch, display->font, text, x, y, display->foreColor,
+                         display->backColor, display->keyColor);
     }
 }
 
 // FUNCTION: 0x4c1760
 void __stdcall DrawStringCentered(Surface* dst, unsigned char* text, int flag)
 {
-    char* single = (char*)GetDisplay();
-    int width = GetTextWidth(*(Font**)(single + 0x204), text);
+    int width = GetTextWidth(GetDisplay()->font, text);
     if (dst == 0) {
         Surface r;
         if (LockScreen(&r) != 0) {
@@ -101,17 +99,17 @@ void __stdcall DrawStringCentered(Surface* dst, unsigned char* text, int flag)
 
 static inline int CurrentColour(void)
 {
-    return *(int*)((unsigned char*)GetDisplay() + 0x210);
+    return GetDisplay()->keyColor;
 }
 
 static inline void SetColour(int a, int b)
 {
-    unsigned char* obj = (unsigned char*)GetDisplay();
+    Display* obj = GetDisplay();
     if (a != -1) {
-        *(int*)(obj + 0x208) = a;
+        obj->foreColor = a;
     }
     if (b != -1) {
-        *(int*)(obj + 0x20c) = b;
+        obj->backColor = b;
     }
 }
 
@@ -119,8 +117,8 @@ static inline void SetColour(int a, int b)
 void __stdcall DrawOutlinedString(Surface* dst, unsigned char* text, int fore,
                             int back, int y)
 {
-    Game* game = (Game*)GetDisplay();
-    int width = GetTextWidth(game->font, text);
+    Display* display = GetDisplay();
+    int width = GetTextWidth(display->font, text);
     if (dst == 0) {
         Surface r;
         if (LockScreen(&r) != 0) {

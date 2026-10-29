@@ -90,7 +90,6 @@ extern Game* g_game;
 unsigned int __cdecl GetTicks();
 #include "../graphics/palette.h"
 #include "../graphics/draw.h"
-Display* GetDisplay();
 #include "../game/data_files.h"
 #include "../files/files_api.h"
 void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);

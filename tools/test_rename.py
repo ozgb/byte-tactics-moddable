@@ -27,8 +27,8 @@ void Walk(int FUN_local, int other)
     "src/b.cpp": "int one = FUN_00402000(1);  // FUN_00402000 comment\nint FUN_00403000, FUN_00403001;\n",
     "src/units/unit.h": "int FUN_00401000(int a);\n",
     "interfaces/seams.h": "extern int FUN_00401000(int);\n",
-    "include/ta_types.h": "int FUN_00404000(int);\nint FUN_00404001(int);\nstruct Unit { short field_8; };\n",
-    "include/ta_protos.h": "int FUN_00404002(int);\nint FUN_00404003(int);\n",
+    "src/units/unit_types.h": "int FUN_00404000(int);\nint FUN_00404001(int);\nstruct Unit { short field_8; };\n",
+    "src/game/game_state.h": "int FUN_00404002(int);\nint FUN_00404003(int);\n",
     "lib/bitexact/bitexact.h": "int bx_FUN_00401000(int);\n",
     "lib/bitexact/trig.c": "int bx_FUN_00401000(int a) { return a; }\n",
     "link/data.cpp": "int g = FUN_00401000(0);\n",
@@ -142,9 +142,9 @@ class Dropped(Fixture):
 
     def test_generated_header_merge_is_renamed(self):
         self.ok("FUN_00404000", "FUN_00404001")
-        self.assertEqual(read(self.root, "include/ta_types.h").count("FUN_00404001"), 2)
+        self.assertEqual(read(self.root, "src/units/unit_types.h").count("FUN_00404001"), 2)
         self.ok("FUN_00404002", "Merged", "FUN_00404003", "Merged")
-        self.assertEqual(read(self.root, "include/ta_protos.h").count("Merged"), 2)
+        self.assertEqual(read(self.root, "src/game/game_state.h").count("Merged"), 2)
 
     def test_gap_entry_label_is_named_in_its_annotation(self):
         self.ok("FUN_00405000", "EntryOne")
@@ -220,7 +220,7 @@ class Scope(Fixture):
         ])
         self.assertEqual(read(self.root, "data/trace_coverage.csv").splitlines()[1],
                          "game-region,hp,0x8,mixed,yes,none,,,hand evidence")
-        self.assertIn("short hp;", read(self.root, "include/ta_types.h"))
+        self.assertIn("short hp;", read(self.root, "src/units/unit_types.h"))
 
     def test_dry_run_writes_nothing(self):
         before = snapshot(self.root)

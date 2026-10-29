@@ -231,33 +231,6 @@ void __stdcall DrawFrameOpaque(Surface* dst, GafFrame* bmp, int x, int y)
         UnlockScreen(&screen);
 }
 
-union DisplayTableFlags {
-    unsigned short word;
-    unsigned char byte;
-    struct {
-        unsigned short bit0 : 1;
-        unsigned short bit1 : 1;
-        unsigned short bit2 : 1;
-        unsigned short bit3 : 1;
-        unsigned short bit4 : 1;
-        unsigned short has_obj_c0 : 1;
-        unsigned short has_obj_c4 : 1;
-        unsigned short has_obj_c8 : 1;
-        unsigned short bit8_15 : 8;
-    } bits;
-};
-
-struct DisplayTablesView {
-    char unknown_0[0xc0];
-    unsigned char* alphaTable;
-    unsigned char* shadeTable;
-    unsigned char* lightTable;
-    unsigned char* grayTable;
-    unsigned char* blueTable;
-    char unknown_d4[0xf0 - 0xd4];
-    DisplayTableFlags flags;
-};
-
 struct ScreenSurfaceView {
     char unknown_0[0x20];
     Surface surf;
@@ -275,7 +248,7 @@ struct Bounds_src_004b8310 {
     BlitSourceView src;
 };
 
-DisplayTablesView* GetDisplay();
+#include "display.h"
 void __cdecl BlitRectBlended(Surface* p, BlitSourceView* src, Rect* rect,
                              Rect* pos, int colour, unsigned char* palette);
 void __cdecl BlitCompressedLit(unsigned char* pixels, int pitch, Rect* drect,
@@ -288,7 +261,7 @@ void __cdecl BlitCompressedBlended(unsigned char* pixels, int pitch, Rect* drect
 // FUNCTION: 0x4b8500
 void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y)
 {
-    DisplayTablesView* d = GetDisplay();
+    Display* d = GetDisplay();
     if ((d->flags.byte & 0x20) != 0) {
         ScreenSurfaceView screen;
         if (surface == 0) {
@@ -343,7 +316,7 @@ void __stdcall ResetClipRect(int* surface);
 // FUNCTION: 0x4b86e0
 void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
 {
-    DisplayTablesView* d = GetDisplay();
+    Display* d = GetDisplay();
     if ((d->flags.word & 0x100) != 0 && frame->compressed == 0) {
         Surface screen;
         if (surface == 0) {
@@ -691,8 +664,8 @@ void __cdecl BlitCompressedShadow(unsigned char* pixels, int pitch, Rect* rect,
 // FUNCTION: 0x4b8ec0
 void __stdcall DrawFrameShadow(Surface* dst, GafFrame* bmp, int x, int y)
 {
-    DisplayTablesView* d = GetDisplay();
-    if (d->flags.bits.has_obj_c8 == 1) {
+    Display* d = GetDisplay();
+    if (d->flags.bits.has_c8 == 1) {
         Surface screen;
         if (dst == 0) {
             int ok = LockScreen(&screen);
@@ -904,7 +877,7 @@ void __stdcall TintFrameBelow(GafFrame* image, unsigned char level)
     unsigned char* p = image->pixelsOrLayers;
     unsigned char* m = image->scratch;
     int count = image->height * image->width;
-    DisplayTablesView* pal = GetDisplay();
+    Display* pal = GetDisplay();
     while (count--) {
         if (*m <= level && *p != image->transparency) {
             *p = pal->blueTable[*p];
@@ -917,7 +890,7 @@ void __stdcall TintFrameBelow(GafFrame* image, unsigned char level)
 // FUNCTION: 0x4b9740
 void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y, double sx, double sy)
 {
-    DisplayTablesView* d = GetDisplay();
+    Display* d = GetDisplay();
     Surface screen;
     if (dst == 0) {
         int ok = LockScreen(&screen);
@@ -1268,7 +1241,7 @@ void __stdcall CutFrameBelow(GafFrame* image, unsigned char level)
     unsigned char* p = image->pixelsOrLayers;
     unsigned char* m = image->scratch;
     int count = image->height * image->width;
-    DisplayTablesView* pal = GetDisplay();
+    Display* pal = GetDisplay();
     while (count--) {
         if (*m <= level) {
             *p = image->transparency;
@@ -1281,7 +1254,7 @@ void __stdcall CutFrameBelow(GafFrame* image, unsigned char level)
 // FUNCTION: 0x4b8310
 void __stdcall DrawFrameLit(Surface* surface, GafFrame* frame, int x, int y, int paletteRow)
 {
-    DisplayTablesView* d = GetDisplay();
+    Display* d = GetDisplay();
     if ((d->flags.byte & 0x80) == 0x80) {
         ScreenSurfaceView screen;
         if (surface == 0) {
@@ -1361,7 +1334,7 @@ void __stdcall DrawFrameDepth(GafFrame* src, GafFrame* dst, int x, int y, int le
 // FUNCTION: 0x4b95a0
 void __stdcall DownsampleFrame(GafFrame* src, GafFrame* dst)
 {
-    DisplayTablesView* pal = GetDisplay();
+    Display* pal = GetDisplay();
     int row = 0;
     for (; row < dst->height; row++) {
         for (int x = 0; x < dst->width; x++) {

@@ -3,7 +3,6 @@
 #include <string.h>
 #include "../../interfaces/host.h"
 
-Display* GetDisplay(void);
 
 extern int g_gfxBlitLockHeld;
 extern HANDLE g_gfxBlitLockEvent;

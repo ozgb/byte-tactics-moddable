@@ -2,7 +2,6 @@
 #define SKIRMISH_MENU_H
 struct Player;
 
-struct Cheat;
 struct Gui;
 struct Rec1;
 
@@ -22,7 +21,7 @@ void __stdcall SelectLogosGadget(Gui* obj, void* unused);
 void __stdcall CyclePlayerColor(int reverse);
 void __cdecl CycleCurrentPlayerAllyGroup();
 void __stdcall HandleSkirmishClick(Gui* menu);
-void __stdcall HandleSkirmishCheatText(Cheat* cheat);
+void __stdcall HandleSkirmishCheatText(Gui* menu);
 void __stdcall OpenSkirmishMenu(void);
 
 void __stdcall AnnounceForcesDestroyed(Player* player);

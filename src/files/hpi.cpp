@@ -61,7 +61,6 @@ FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
     return HAPI_OpenFile(param1, "a+b");
 }
 
-Display* GetDisplay(void);
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
 

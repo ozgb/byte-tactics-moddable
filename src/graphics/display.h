@@ -2,10 +2,12 @@
 #define DISPLAY_H
 struct DisplayAppView;
 
+#include "win_types.h"
 #include "surface.h"
 #include "../util/mouse_event.h"
 
 struct OPENHAPIFILE;
+struct Font;
 
 union DisplayFlags {
     unsigned short word;
@@ -21,7 +23,8 @@ union DisplayFlags {
         unsigned short has_c8 : 1;
         unsigned short has_cc : 1;
         unsigned short has_d0 : 1;
-        unsigned short bit10_15 : 6;
+        unsigned short soundOpt : 1;
+        unsigned short bit11_15 : 5;
     } bits;
 };
 
@@ -48,11 +51,11 @@ struct Display {
     void* lastBackBuffer;
     char pad_b8[0xbc - 0xb8];
     Surface* overrideSurface;
-    void* alphaTable;
+    unsigned char* alphaTable;
     unsigned char* shadeTable;
-    void* lightTable;
-    void* grayTable;
-    void* blueTable;
+    unsigned char* lightTable;
+    unsigned char* grayTable;
+    unsigned char* blueTable;
     int width;
     int height;
     int useOverrideSurface;
@@ -64,18 +67,29 @@ struct Display {
     int keyQueue[30];
     int keyQueueHead;
     int keyQueueTail;
-    char pad_176[0x196 - 0x176];
+    char pad_176[0x186 - 0x176];
+    int mouseQueueSize;
+    MouseEvent* mouseQueue;
+    int mouseQueueHead;
+    int mouseQueueTail;
     MouseEvent mouseEvent;
-    char pad_1ae[0x1b2 - 0x1ae];
-    GafFrame* bmp;
+    int cursorHideCount;
+    GafFrame* cursorSprite;
     int x;
     int y;
     Surface* saveMouse1;
-    char pad_1c2[0x1ce - 0x1c2];
+    Surface* saveMouse2;
+    Surface* saveMouse3;
+    int mouseThread;
     int cursorThreadEnabled;
     int cursorOverlayEnabled;
-    char pad_1d6[0x214 - 0x1d6];
-    unsigned int entries[256];
+    int mouseThreadStop;
+    char pad_1da[0x204 - 0x1da];
+    Font* font;
+    int foreColor;
+    int backColor;
+    int keyColor;
+    tagPALETTEENTRY entries[256];
     float paletteBrightness;
     OPENHAPIFILE** files;
     int count;
@@ -89,6 +103,7 @@ struct Display {
 #pragma pack(pop)
 
 
+Display* GetDisplay(void);
 int __stdcall ApplyPalette();
 int __stdcall CheckDirectXVersion(int want0, int want1, int want2, int want3, int want4);
 int __stdcall SetFullScreen(int mode);

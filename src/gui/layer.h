@@ -20,7 +20,7 @@ struct Layer {
     char text[0xe];
     char lastKey;
     int clickMode;
-    void (__stdcall* textHandler)(void*);
+    void (__stdcall* textHandler)(Gui*);
 };
 
 #pragma pack(pop)

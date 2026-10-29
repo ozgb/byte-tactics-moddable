@@ -457,11 +457,18 @@ does not run, then `world`).
 export WINEARCH=win64
 cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake   # once
 cmake --build build/modern
+cmake --build build/modern --target wasm_runtime   # once, and again after a change to wasm/ or a module's sources
 rm -r build/playtest/prefix     # a fresh prefix; tools/playtest.py makes it again
 uv run tools/reference.py --check --exe build/modern/TotalA.exe --game-dir ~/.ta   # the gate
 ```
 
 The gate is the modern build's `--check`: every scenario must report equal.
+The build runs its modules in WASM (`wind_meteors` so far): the `wasm_runtime` target builds
+`wasmtime_host.dll` and `wind_meteors.wasm` (it needs cargo, the game build does not) and copies them and
+`wasm/modules.json` next to `TotalA.exe`, and `tools/playtest.py` copies the three into each game
+directory, failing with a message naming the target when they are missing. `--check --native-modules`
+plays every scenario with `-modules=native` instead, the modules as native code, which needs no runtime
+files. Both must report every scenario equal.
 `--check` without `--exe` is an error, since `moddable` does not build the
 reference. Add `--game-dir <dir>` when the game is not in a Steam directory.
 

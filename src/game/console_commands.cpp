@@ -1303,6 +1303,11 @@ ConsoleCommand g_consoleCommands[44] = {
     {0, 0, 0},
 };
 
+static void __stdcall CmdMeteorSlot(CommandArgs* args)
+{
+    g_seams.wind_meteors->CmdMeteor(args);
+}
+
 // GLOBAL: 0x501f48
 ConsoleCommand g_cheatCommands[11] = {
     {"Radar", (void (__stdcall *)(CommandArgs *))CmdRadar, 2},
@@ -1313,7 +1318,7 @@ ConsoleCommand g_cheatCommands[11] = {
     {"DoubleShot", (void (__stdcall *)(CommandArgs *))CmdDoubleShot, 2},
     {"HalfShot", (void (__stdcall *)(CommandArgs *))CmdHalfShot, 2},
     {"NowISee", (void (__stdcall *)(CommandArgs *))CmdNowISee, 2},
-    {"Meteor", CmdMeteor, 2},
+    {"Meteor", CmdMeteorSlot, 2},
     {"MakePoster", CmdMakePoster, 2},
     {0, 0, 0},
 };

@@ -15,6 +15,7 @@
 #include "condition_class.h"
 #include "../../interfaces/seams.h"
 #include "../quirks/quirks.h"
+#include "../wasm/modules.h"
 #include "../state/sim_globals.h"
 #include "block_scan.h"
 #include "../state/block.h"
@@ -1144,6 +1145,7 @@ void HarnessInit(char* cmdLine)
     if (s_blockScan)
         BlockScanEnable((unsigned)s_blockScan);
     InstallNativeSeams();
+    ModulesHideSwitch(cmdLine);
     ParseQuirksSwitch(cmdLine);
     char* p = cmdLine;
     char* flag = NULL;
@@ -1270,6 +1272,7 @@ void HarnessAfterStep()
     }
     if (!s_testMode)
         return;
+    ModulesCheckStatics((unsigned)g_game->ticks);
     int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
     if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;

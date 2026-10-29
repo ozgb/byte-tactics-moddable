@@ -13,7 +13,7 @@ missing or extra trace or scenario exits 1. `--quick` restricts `--check` to the
 scenarios named in QUICK.
 
 Every scenario is played with new game allocations zeroed (the game's own -memset=0 switch, through
-tools/playtest.py --testmode). `--check --poison` fills them with 0xCD instead (-memset=0xcdcdcdcd); a
+tools/playtest.py --testmode). `--check --native-modules` runs the exe's modules as native code (-modules=native) instead of in WASM. `--check --poison` fills them with 0xCD instead (-memset=0xcdcdcdcd); a
 table that reads uninitialised bytes may then differ from the stored digests, and the report lists those.
 
 `--check --exe <exe> --quirks <spec>` plays every scenario with `quirks <spec>` added and prints, per
@@ -624,6 +624,8 @@ def main() -> None:
     ap.add_argument("--check", action="store_true", help="play every scenario and compare with reference/traces/")
     ap.add_argument("--quick", action="store_true",
                     help="--check: play only the fixed quick subset (not the gate)")
+    ap.add_argument("--native-modules", action="store_true",
+                    help="--check: play every scenario with -modules=native, so that the modules run as native code (the default runs them in WASM; sets BT_NATIVE_MODULES=1 for tools/playtest.py)")
     ap.add_argument("--poison", action="store_true",
                     help="--check: play the scenarios with new game allocations filled with 0xCD; list the bytes whose starting value reaches hashed state; a difference is expected for real uninitialised reads")
     ap.add_argument("--quirks", metavar="SPEC",
@@ -643,6 +645,10 @@ def main() -> None:
         ap.error("give one of --traces and --check")
     if args.poison and not args.check:
         ap.error("--poison needs --check")
+    if args.native_modules and not args.check:
+        ap.error("--native-modules needs --check")
+    if args.native_modules:
+        os.environ["BT_NATIVE_MODULES"] = "1"
     if args.save_blockptrs and (not args.check or args.quirks is not None):
         ap.error("--save-blockptrs needs --check, and cannot be combined with --quirks")
     if args.quick and not args.check:

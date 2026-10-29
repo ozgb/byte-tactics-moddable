@@ -1,6 +1,12 @@
 (module
   (import "env" "memory" (memory 1))
   (import "env" "__indirect_function_table" (table 8 funcref))
+  (import "env" "double" (func $double (param i32) (result i32)))
+  (import "env" "fail" (func $fail))
+  (func (export "twice") (param i32) (result i32)
+    (call $double (local.get 0)))
+  (func (export "refuse") (call $fail))
+  (func (export "trap") unreachable)
   (func $add (export "add") (param i32 i32) (result i32)
     (i32.store (i32.const 16) (i32.add (local.get 0) (local.get 1)))
     (i32.add (local.get 0) (local.get 1)))

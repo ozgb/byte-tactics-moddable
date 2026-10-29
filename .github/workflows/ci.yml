@@ -288,6 +288,9 @@ jobs:
       - name: Import allowlist
         run: uv run tools/wasm_modules.py imports
 
+      - name: No hidden state in the module
+        run: uv run tools/wasm_modules.py statics
+
       - name: Test the module tools
         run: uv run tools/test_wasm_modules.py
 

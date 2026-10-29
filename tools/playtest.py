@@ -13,6 +13,10 @@ tools/playtest/<name>.txt. Every pair of scenario and
 exe is one run, and `--parallel` runs that many at once. `--trap-stubs` plays
 a copy of an ordinary link whose stubs fault when reached (see stub_traps).
 
+An exe built from this tree runs its modules in WASM and is given wasmtime_host.dll, wind_meteors.wasm and modules.json
+from its directory (`cmake --build <dir> --target wasm_runtime` makes them); `--native-modules` runs it with
+`-modules=native` instead.
+
 `--testmode <file>` instead runs each exe with `-testmode <file>` (a scenario of
 reference/README.md) and passes when it exits with status 0 within
 `--testmode-timeout` seconds. A `--testmode` run uses the game's headless host: no X server,
@@ -73,6 +77,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCENARIOS = ROOT / "tools/playtest"
 OUT = ROOT / "build/playtest"
+WASM_RUNTIME = ("wasmtime_host.dll", "wind_meteors.wasm", "modules.json")
+NATIVE_MODULES_SWITCH = "-modules=native"
 ZERO_FILL_SWITCH = "-memset=0"
 POISON_SWITCH = "-memset=0xcdcdcdcd"
 EXES = {
@@ -466,7 +472,11 @@ class Instance:
             (self.game / dest).unlink(missing_ok=True)
         for path in self.run.collect:
             (self.game / path).unlink(missing_ok=True)
-        shutil.copy2(self.run.exes[min(self.index, len(self.run.exes)) - 1], self.game / "TotalA.exe")
+        exe = self.run.exes[min(self.index, len(self.run.exes)) - 1]
+        shutil.copy2(exe, self.game / "TotalA.exe")
+        if runs_wasm_modules(exe) and not self.run.native_modules:
+            for name in WASM_RUNTIME:
+                shutil.copy2(exe.parent / name, self.game / name)
         if self.run.testmode:
             shutil.copyfile(self.run.testmode, self.game / "testmode.txt")
             commit = self.run.exes[min(self.index, len(self.run.exes)) - 1].parent / "commit.txt"
@@ -542,6 +552,8 @@ class Instance:
             args += ["-testdump", str(self.run.testdump)]
         if self.run.testmode:
             args += [POISON_SWITCH if self.run.poison else ZERO_FILL_SWITCH]
+        if self.run.native_modules and runs_wasm_modules(self.run.exes[min(self.index, len(self.run.exes)) - 1]):
+            args += [NATIVE_MODULES_SWITCH]
         if self.run.windowed:
             args += ["-d"]
         if self.run.testmode and self.run.blockscan:
@@ -959,7 +971,7 @@ class Run:
                  screens: dict[str, Screen], debug: str, window: bool = False, testmode: Path | None = None,
                  testdump: int | None = None, poison: bool = False, blockscan: int = 0,
                  windowed: bool = False, put: list[tuple[str, Path]] | None = None,
-                 collect: list[str] | None = None, xserver: bool = False):
+                 collect: list[str] | None = None, xserver: bool = False, native_modules: bool = False):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -976,6 +988,7 @@ class Run:
         self.blockscan = blockscan
         self.windowed = windowed
         self.xserver = xserver
+        self.native_modules = native_modules
         self.put = put or []
         self.collect = collect or []
         self.instances = [Instance(self, i + 1) for i in range(scenario.instances)]
@@ -1291,6 +1304,11 @@ class Run:
         (self.out / "result.json").write_text(json.dumps(data, indent=1) + "\n")
 
 
+def runs_wasm_modules(exe: Path) -> bool:
+    """Is exe a build of this tree (it has its CMake build directory beside it), which runs its modules in WASM unless told otherwise?"""
+    return (exe.parent / "CMakeCache.txt").is_file()
+
+
 def resolve_exes(values: list[str]) -> list[list[tuple[str, Path]]]:
     """Each --exe choice: the exe of each instance, `orig+modern` giving the
     first instance orig and the second (and any more) modern."""
@@ -1452,6 +1470,8 @@ def main() -> None:
                     help="--testmode: copy the file SRC into the run's game copy at DEST (relative to the game directory) before the exe starts; repeatable")
     ap.add_argument("--collect", action="append", default=[], metavar="PATH",
                     help="--testmode: copy the file PATH of the run's game copy (relative to the game directory) to the same path in the run's directory when the run ends, if it exists; repeatable")
+    ap.add_argument("--native-modules", action="store_true", default=os.environ.get("BT_NATIVE_MODULES") == "1",
+                    help="run the exes of this tree with -modules=native: their modules run as native code, and the WASM runtime files are not needed (default on when BT_NATIVE_MODULES=1)")
     ap.add_argument("--windowed", action="store_true",
                     help="start each game in windowed mode (the game's -d switch; default full screen)")
     ap.add_argument("--list", action="store_true", help="list the scenarios")
@@ -1516,6 +1536,13 @@ def main() -> None:
         if not shutil.which(tool):
             raise SystemExit(f"{tool} is not installed")
     exes = resolve_exes(args.exe)
+    if not args.native_modules:
+        for parts in exes:
+            for _, path in parts:
+                missing = [n for n in WASM_RUNTIME if runs_wasm_modules(path) and not (path.parent / n).is_file()]
+                if missing:
+                    raise SystemExit(f"{path.parent}: {', '.join(missing)} missing: run `cmake --build {path.parent} --target wasm_runtime` "
+                                     "(or pass --native-modules to run the modules as native code)")
     scenarios = [load_scenario(s) for v in args.scenario for s in v.split(",")]
     testmode = None
     if args.testmode:
@@ -1563,7 +1590,8 @@ def main() -> None:
                                 args.testdump if sc is testmode else None,
                                 args.poison and sc is testmode, scan_every if sc is testmode else 0,
                                 args.windowed, put if sc is testmode else None,
-                                args.collect if sc is testmode else None, args.xserver and sc is testmode))
+                                args.collect if sc is testmode else None, args.xserver and sc is testmode,
+                                args.native_modules))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None

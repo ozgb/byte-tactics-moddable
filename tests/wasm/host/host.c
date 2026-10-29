@@ -1,367 +1,143 @@
-#define WASM_API_EXTERN
-#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wasmtime.h>
 
-#define API(name) static __typeof__(name) *pf_##name
+#include "interfaces/host.h"
+#include "wasmloader.h"
 
-API(wasm_config_new);
-API(wasmtime_config_target_set);
-API(wasmtime_config_cranelift_nan_canonicalization_set);
-API(wasmtime_config_consume_fuel_set);
-API(wasm_engine_new_with_config);
-API(wasmtime_store_new);
-API(wasmtime_store_context);
-API(wasmtime_memorytype_new);
-API(wasmtime_memory_new);
-API(wasmtime_memory_data);
-API(wasmtime_memory_data_size);
-API(wasm_valtype_new);
-API(wasm_tabletype_new);
-API(wasmtime_table_new);
-API(wasmtime_table_get);
-API(wasmtime_module_new);
-API(wasmtime_linker_new);
-API(wasmtime_linker_define);
-API(wasmtime_linker_instantiate);
-API(wasmtime_instance_export_get);
-API(wasmtime_func_call_unchecked);
-API(wasmtime_error_message);
-API(wasmtime_error_delete);
-API(wasm_trap_message);
-API(wasm_trap_delete);
-API(wasm_byte_vec_delete);
-
-static HMODULE dll;
-
-static void *symbol(const char *name)
+static void report_trap(void* user, const char* module, const char* message)
 {
-    void *p = (void *)GetProcAddress(dll, name);
-    if (!p) {
-        fprintf(stderr, "missing export %s\n", name);
-        exit(2);
-    }
-    return p;
+    (void)user;
+    fprintf(stderr, "trap in module %s: %s\n", module, message);
 }
 
-#define LOAD(name) pf_##name = (__typeof__(pf_##name))symbol(#name)
-
-static void load_api(const char *path)
+static const char* import_double(void* user, wasmtime_val_raw_t* args_and_results)
 {
-    dll = LoadLibraryA(path);
-    if (!dll) {
-        fprintf(stderr, "cannot load %s (error %lu)\n", path, GetLastError());
-        exit(2);
-    }
-    LOAD(wasm_config_new);
-    LOAD(wasmtime_config_target_set);
-    LOAD(wasmtime_config_cranelift_nan_canonicalization_set);
-    LOAD(wasmtime_config_consume_fuel_set);
-    LOAD(wasm_engine_new_with_config);
-    LOAD(wasmtime_store_new);
-    LOAD(wasmtime_store_context);
-    LOAD(wasmtime_memorytype_new);
-    LOAD(wasmtime_memory_new);
-    LOAD(wasmtime_memory_data);
-    LOAD(wasmtime_memory_data_size);
-    LOAD(wasm_valtype_new);
-    LOAD(wasm_tabletype_new);
-    LOAD(wasmtime_table_new);
-    LOAD(wasmtime_table_get);
-    LOAD(wasmtime_module_new);
-    LOAD(wasmtime_linker_new);
-    LOAD(wasmtime_linker_define);
-    LOAD(wasmtime_linker_instantiate);
-    LOAD(wasmtime_instance_export_get);
-    LOAD(wasmtime_func_call_unchecked);
-    LOAD(wasmtime_error_message);
-    LOAD(wasmtime_error_delete);
-    LOAD(wasm_trap_message);
-    LOAD(wasm_trap_delete);
-    LOAD(wasm_byte_vec_delete);
+    (void)user;
+    args_and_results[0].i32 *= 2;
+    return NULL;
 }
 
-static void die(const char *what, wasmtime_error_t *error, wasm_trap_t *trap)
+static const char* import_fail(void* user, wasmtime_val_raw_t* args_and_results)
 {
-    wasm_byte_vec_t message;
-    if (error) {
-        pf_wasmtime_error_message(error, &message);
-        pf_wasmtime_error_delete(error);
-    } else if (trap) {
-        pf_wasm_trap_message(trap, &message);
-        pf_wasm_trap_delete(trap);
-    } else {
-        message.size = 0;
-        message.data = NULL;
-    }
-    fprintf(stderr, "%s failed: %.*s\n", what, (int)message.size, message.data ? message.data : "");
-    exit(1);
+    (void)user;
+    (void)args_and_results;
+    return "the host refused the call";
 }
 
-static unsigned char *read_file(const char *path, size_t *size)
+static wl_loader* start(const char* dll_path, char* error, size_t error_size)
 {
-    FILE *f = fopen(path, "rb");
-    unsigned char *data;
-    long length;
-    if (!f) {
-        fprintf(stderr, "cannot open %s\n", path);
-        exit(2);
-    }
-    fseek(f, 0, SEEK_END);
-    length = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    data = (unsigned char *)malloc((size_t)length);
-    if (fread(data, 1, (size_t)length, f) != (size_t)length) {
-        fprintf(stderr, "short read of %s\n", path);
-        exit(2);
-    }
-    fclose(f);
-    *size = (size_t)length;
-    return data;
+    wl_config config;
+    memset(&config, 0, sizeof config);
+    config.dll_path = dll_path;
+    config.open = host_lib_open;
+    config.symbol = host_lib_symbol;
+    config.close = host_lib_close;
+    config.on_trap = report_trap;
+    return wl_create(&config, error, error_size);
 }
 
 static double seconds(void)
 {
-    LARGE_INTEGER counter, frequency;
-    QueryPerformanceCounter(&counter);
-    QueryPerformanceFrequency(&frequency);
-    return (double)counter.QuadPart / (double)frequency.QuadPart;
+    return (double)host_time_ms() / 1000.0;
 }
 
-typedef struct {
-    wasm_engine_t *engine;
-    wasmtime_store_t *store;
-    wasmtime_context_t *context;
-    wasmtime_memory_t memory;
-    wasmtime_table_t table;
-    wasmtime_linker_t *linker;
-} shared_t;
-
-static void make_shared(shared_t *shared, unsigned pages, unsigned table_size)
+static int read_i32(wl_loader* loader, unsigned address, int* value)
 {
-    wasm_config_t *config = pf_wasm_config_new();
-    wasmtime_error_t *error = pf_wasmtime_config_target_set(config, "pulley32");
-    wasm_memorytype_t *memory_type;
-    wasm_tabletype_t *table_type;
-    wasm_limits_t table_limits;
-    wasmtime_val_t null_func;
-    wasmtime_extern_t item;
-    if (error) {
-        die("select pulley32", error, NULL);
+    unsigned char* base = wl_memory_base(loader);
+    if ((size_t)address + 4 > wl_memory_size(loader)) {
+        fprintf(stderr, "address %#x is outside the memory\n", address);
+        return 0;
     }
-    pf_wasmtime_config_cranelift_nan_canonicalization_set(config, 1);
-    pf_wasmtime_config_consume_fuel_set(config, 0);
-    shared->engine = pf_wasm_engine_new_with_config(config);
-    shared->store = pf_wasmtime_store_new(shared->engine, NULL, NULL);
-    shared->context = pf_wasmtime_store_context(shared->store);
-
-    error = pf_wasmtime_memorytype_new(pages, 1, pages, 0, 0, 16, &memory_type);
-    if (error) {
-        die("memory type", error, NULL);
-    }
-    error = pf_wasmtime_memory_new(shared->context, memory_type, &shared->memory);
-    if (error) {
-        die("memory", error, NULL);
-    }
-
-    table_limits.min = table_size;
-    table_limits.max = table_size;
-    table_type = pf_wasm_tabletype_new(pf_wasm_valtype_new(WASM_FUNCREF), &table_limits);
-    memset(&null_func, 0, sizeof null_func);
-    null_func.kind = WASMTIME_FUNCREF;
-    error = pf_wasmtime_table_new(shared->context, table_type, &null_func, &shared->table);
-    if (error) {
-        die("table", error, NULL);
-    }
-
-    shared->linker = pf_wasmtime_linker_new(shared->engine);
-    memset(&item, 0, sizeof item);
-    item.kind = WASMTIME_EXTERN_MEMORY;
-    item.of.memory = shared->memory;
-    error = pf_wasmtime_linker_define(shared->linker, shared->context, "env", 3, "memory", 6, &item);
-    if (error) {
-        die("define memory", error, NULL);
-    }
-    item.kind = WASMTIME_EXTERN_TABLE;
-    item.of.table = shared->table;
-    error = pf_wasmtime_linker_define(shared->linker, shared->context, "env", 3, "__indirect_function_table", 25, &item);
-    if (error) {
-        die("define table", error, NULL);
-    }
+    memcpy(value, base + address, 4);
+    return 1;
 }
 
-static wasmtime_instance_t instantiate(shared_t *shared, const char *path)
-{
-    size_t size;
-    unsigned char *wasm = read_file(path, &size);
-    wasmtime_module_t *module;
-    wasmtime_instance_t instance;
-    wasm_trap_t *trap = NULL;
-    wasmtime_error_t *error = pf_wasmtime_module_new(shared->engine, wasm, size, &module);
-    if (error) {
-        die("compile", error, NULL);
-    }
-    error = pf_wasmtime_linker_instantiate(shared->linker, shared->context, module, &instance, &trap);
-    if (error || trap) {
-        die("instantiate", error, trap);
-    }
-    return instance;
-}
-
-static wasmtime_func_t export_func(shared_t *shared, wasmtime_instance_t *instance, const char *name)
-{
-    wasmtime_extern_t item;
-    if (!pf_wasmtime_instance_export_get(shared->context, instance, name, strlen(name), &item)
-        || item.kind != WASMTIME_EXTERN_FUNC) {
-        fprintf(stderr, "no function export %s\n", name);
-        exit(1);
-    }
-    return item.of.func;
-}
-
-static int call_i32(shared_t *shared, const wasmtime_func_t *func, int argument)
+static int call_i32(wl_loader* loader, const wl_module* module, const wasmtime_func_t* func, int argument, int* result)
 {
     wasmtime_val_raw_t raw[2];
-    wasm_trap_t *trap = NULL;
-    wasmtime_error_t *error;
     raw[0].i32 = argument;
-    error = pf_wasmtime_func_call_unchecked(shared->context, func, raw, 2, &trap);
-    if (error || trap) {
-        die("call", error, trap);
+    if (!wl_call(loader, module, func, raw, 2)) {
+        return 0;
     }
-    return raw[0].i32;
+    *result = raw[0].i32;
+    return 1;
 }
 
-static int read_i32(shared_t *shared, unsigned address)
+static int run_fixtures(wl_loader* loader, const char* wasm_dir)
 {
-    unsigned char *base = pf_wasmtime_memory_data(shared->context, &shared->memory);
-    int value;
-    if ((size_t)address + 4 > pf_wasmtime_memory_data_size(shared->context, &shared->memory)) {
-        fprintf(stderr, "address %#x is outside the memory\n", address);
-        exit(1);
-    }
-    memcpy(&value, base + address, 4);
-    return value;
-}
-
-typedef struct {
-    const char *name;
-    const char *path;
-    unsigned data_base;
-    unsigned table_base;
-    int slot_arg;
-    int slot_result;
-    int data_word;
-    wasmtime_instance_t instance;
-} module_t;
-
-static int run_modules(const char *dll_path, int argc, char **argv)
-{
-    unsigned pages;
-    unsigned table_size;
-    unsigned window;
-    unsigned slots;
-    int count;
-    module_t modules[8];
-    shared_t shared;
-    int i;
-    int j;
+    const wl_layout* layout = wl_get_layout(loader);
+    const char* names[8];
+    wl_module* modules[8];
+    int count = 0;
     int failed = 0;
+    int i;
+    char path[512];
 
-    if (argc < 4 + 7 || (argc - 4) % 7) {
-        fprintf(stderr, "usage: host --modules PAGES TABLE_SIZE WINDOW SLOTS (NAME PATH DATA_BASE TABLE_BASE ARG RESULT WORD)...\n");
-        return 2;
+    for (i = 0; i < (int)wl_manifest_module_count(loader) && count < 8; i++) {
+        names[count++] = wl_manifest_module_name(loader, (size_t)i);
     }
-    pages = (unsigned)atol(argv[0]);
-    table_size = (unsigned)atol(argv[1]);
-    window = (unsigned)atol(argv[2]);
-    slots = (unsigned)atol(argv[3]);
-    count = (argc - 4) / 7;
-    if (count > 8) {
-        fprintf(stderr, "at most 8 modules\n");
-        return 2;
-    }
-    for (i = 0; i < count; i++) {
-        char **f = argv + 4 + 7 * i;
-        modules[i].name = f[0];
-        modules[i].path = f[1];
-        modules[i].data_base = (unsigned)atol(f[2]);
-        modules[i].table_base = (unsigned)atol(f[3]);
-        modules[i].slot_arg = atoi(f[4]);
-        modules[i].slot_result = atoi(f[5]);
-        modules[i].data_word = atoi(f[6]);
-    }
-
-    for (i = 0; i < count; i++) {
-        if ((unsigned long)modules[i].data_base + window > (unsigned long)pages * 65536ul
-            || modules[i].table_base + slots > table_size) {
-            fprintf(stderr, "module %s: window [%#x, %#x) or table [%u, %u) does not fit the memory or table\n",
-                    modules[i].name, modules[i].data_base, modules[i].data_base + window,
-                    modules[i].table_base, modules[i].table_base + slots);
-            failed = 1;
-        }
-        for (j = i + 1; j < count; j++) {
-            if (modules[i].data_base < modules[j].data_base + window && modules[j].data_base < modules[i].data_base + window) {
-                fprintf(stderr, "modules %s and %s overlap in memory: [%#x, %#x) and [%#x, %#x)\n",
-                        modules[i].name, modules[j].name, modules[i].data_base, modules[i].data_base + window,
-                        modules[j].data_base, modules[j].data_base + window);
-                failed = 1;
-            }
-            if (modules[i].table_base < modules[j].table_base + slots && modules[j].table_base < modules[i].table_base + slots) {
-                fprintf(stderr, "modules %s and %s overlap in the table: [%u, %u) and [%u, %u)\n",
-                        modules[i].name, modules[j].name, modules[i].table_base, modules[i].table_base + slots,
-                        modules[j].table_base, modules[j].table_base + slots);
-                failed = 1;
-            }
-        }
-    }
-    if (failed) {
+    if (!wl_create_memory(loader)) {
+        fprintf(stderr, "%s\n", wl_error(loader));
         return 1;
     }
-
-    load_api(dll_path);
-    make_shared(&shared, pages, table_size);
     for (i = 0; i < count; i++) {
-        modules[i].instance = instantiate(&shared, modules[i].path);
+        sprintf(path, "%s/%s.wasm", wasm_dir, names[i]);
+        modules[i] = wl_load_module(loader, names[i], path);
+        if (!modules[i]) {
+            fprintf(stderr, "%s\n", wl_error(loader));
+            return 1;
+        }
     }
-
     for (i = 0; i < count; i++) {
-        module_t *m = &modules[i];
-        wasmtime_func_t data_export = export_func(&shared, &m->instance, "module_data");
-        wasmtime_func_t slot_export = export_func(&shared, &m->instance, "module_slot");
-        unsigned data = (unsigned)call_i32(&shared, &data_export, 0);
-        unsigned cell = (unsigned)call_i32(&shared, &slot_export, 0);
-        unsigned index = (unsigned)read_i32(&shared, cell);
+        wasmtime_func_t data_export, slot_export;
+        long data_base, table_base, slot_arg, slot_result;
+        int data, cell, index, result;
         wasmtime_val_t entry;
-        int result;
-        if (data < m->data_base || data >= m->data_base + window || cell < m->data_base || cell >= m->data_base + window) {
-            fprintf(stderr, "module %s: data %#x or slot cell %#x is outside its window at %#x\n", m->name, data, cell, m->data_base);
+        wl_module_int(loader, names[i], "data_base", &data_base);
+        wl_module_int(loader, names[i], "table_base", &table_base);
+        wl_module_int(loader, names[i], "slot_arg", &slot_arg);
+        wl_module_int(loader, names[i], "slot_result", &slot_result);
+        if (!wl_export_func(loader, modules[i], "module_data", &data_export) || !wl_export_func(loader, modules[i], "module_slot", &slot_export)
+            || !call_i32(loader, modules[i], &data_export, 0, &data) || !call_i32(loader, modules[i], &slot_export, 0, &cell)
+            || !read_i32(loader, (unsigned)cell, &index)) {
+            fprintf(stderr, "%s\n", wl_error(loader));
+            return 1;
+        }
+        if ((unsigned)data < (unsigned)data_base || (unsigned)data >= (unsigned)data_base + layout->window
+            || (unsigned)cell < (unsigned)data_base || (unsigned)cell >= (unsigned)data_base + layout->window) {
+            fprintf(stderr, "module %s: data %#x or slot cell %#x is outside its window at %#lx\n", names[i], data, cell, data_base);
             failed = 1;
         }
-        if (index != m->table_base) {
-            fprintf(stderr, "module %s: slot at table index %u, its table base is %u\n", m->name, index, m->table_base);
+        if (index != table_base) {
+            fprintf(stderr, "module %s: slot at table index %d, its table base is %ld\n", names[i], index, table_base);
             failed = 1;
         }
-        if (!pf_wasmtime_table_get(shared.context, &shared.table, index, &entry) || entry.kind != WASMTIME_FUNCREF
-            || wasmtime_funcref_is_null(&entry.of.funcref)) {
-            fprintf(stderr, "module %s: table index %u is empty\n", m->name, index);
+        if (!wl_table_entry(loader, (unsigned)index, &entry)) {
+            fprintf(stderr, "module %s: table index %d is empty\n", names[i], index);
             failed = 1;
             continue;
         }
-        result = call_i32(&shared, &entry.of.funcref, m->slot_arg);
-        printf("%s: data at %#x, slot at table index %u, slot(%d) = %d\n", m->name, data, index, m->slot_arg, result);
-        if (result != m->slot_result) {
-            fprintf(stderr, "module %s: slot returned %d, expected %d\n", m->name, result, m->slot_result);
+        if (!call_i32(loader, modules[i], &entry.of.funcref, (int)slot_arg, &result)) {
+            return 1;
+        }
+        printf("%s: data at %#x, slot at table index %d, slot(%ld) = %d\n", names[i], data, index, slot_arg, result);
+        if (result != slot_result) {
+            fprintf(stderr, "module %s: slot returned %d, expected %ld\n", names[i], result, slot_result);
             failed = 1;
         }
     }
     for (i = 0; i < count; i++) {
-        wasmtime_func_t data_export = export_func(&shared, &modules[i].instance, "module_data");
-        int word = read_i32(&shared, (unsigned)call_i32(&shared, &data_export, 0));
-        if (word != modules[i].data_word) {
-            fprintf(stderr, "module %s: data word is %d after all ran, expected %d\n", modules[i].name, word, modules[i].data_word);
+        wasmtime_func_t data_export;
+        long expected;
+        int data, word;
+        wl_module_int(loader, names[i], "data_word", &expected);
+        if (!wl_export_func(loader, modules[i], "module_data", &data_export) || !call_i32(loader, modules[i], &data_export, 0, &data)
+            || !read_i32(loader, (unsigned)data, &word)) {
+            return 1;
+        }
+        if (word != expected) {
+            fprintf(stderr, "module %s: data word is %d after all ran, expected %ld\n", names[i], word, expected);
             failed = 1;
         }
     }
@@ -372,87 +148,220 @@ static int run_modules(const char *dll_path, int argc, char **argv)
     return 0;
 }
 
-int main(int argc, char **argv)
+static int run_wind_meteors(wl_loader* loader, const char* wasm_dir)
 {
-    const char *dll_path = "wasmtime_host.dll";
-    const char *wasm_path;
-    const char *export_name;
-    long loops = 1;
-    int first_arg;
-    int nargs;
-    int i;
-    shared_t shared;
-    wasmtime_instance_t instance;
-    wasmtime_extern_t export_item;
-    wasmtime_error_t *error;
-    wasm_trap_t *trap = NULL;
+    const wl_layout* layout = wl_get_layout(loader);
+    wl_module* module;
+    char path[512];
+    long table_base = 0;
+    size_t i;
+    if (!layout->has_block) {
+        fprintf(stderr, "the manifest has no block_base\n");
+        return 1;
+    }
+    if (!wl_create_memory(loader)) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    wl_trap_missing_imports(loader, 1);
+    sprintf(path, "%s/wind_meteors.wasm", wasm_dir);
+    module = wl_load_module(loader, "wind_meteors", path);
+    if (!module) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    printf("memory: %lu pages (%lu bytes) at min = max, block at %#x, %u bytes\n", (unsigned long)(wl_memory_size(loader) / 65536),
+           (unsigned long)wl_memory_size(loader), layout->block_base, layout->block_size);
+    wl_module_int(loader, "wind_meteors", "table_base", &table_base);
+    for (i = 0; i < wl_slot_count(module); i++) {
+        const wasmtime_func_t* handle = wl_slot(module, i);
+        wasmtime_val_t entry;
+        printf("slot %2lu %s: handle store %lu, table entry %lu %s\n", (unsigned long)i, wl_slot_name(module, i),
+               (unsigned long)handle->store_id, (unsigned long)(table_base + i),
+               wl_table_entry(loader, (unsigned)(table_base + i), &entry) ? "set" : "empty");
+    }
+    for (i = 0; i < wl_data_count(module); i++) {
+        printf("data %s at %#x\n", wl_data_name(module, i), wl_data_address(module, i));
+    }
+    printf("ok: %lu slots, %lu data exports, %u table entries filled by the loader\n", (unsigned long)wl_slot_count(module),
+           (unsigned long)wl_data_count(module), wl_table_filled(module));
+    return 0;
+}
+
+static int run_export(wl_loader* loader, const char* wasm_path, const char* export_name, int nargs, char** args, long loops)
+{
+    static const char manifest[] =
+        "{\"memory_pages\":1,\"table_size\":8,\"window\":65536,\"table_slots\":8,"
+        "\"modules\":[{\"name\":\"add\",\"data_base\":0,\"table_base\":0}]}";
     wasmtime_val_raw_t raw[8];
     wasmtime_val_t slot;
-    double start;
+    wasmtime_func_t func;
+    wl_module* module;
+    double start_time;
     double elapsed;
     long n;
+    int i;
+    int value;
 
-    for (i = 1; i + 1 < argc && argv[i][0] == '-'; i += 2) {
-        if (!strcmp(argv[i], "--dll")) {
-            dll_path = argv[i + 1];
-        } else if (!strcmp(argv[i], "--loop")) {
-            loops = atol(argv[i + 1]);
-        } else if (!strcmp(argv[i], "--modules")) {
-            return run_modules(dll_path, argc - i - 1, argv + i + 1);
+    if (!wl_load_manifest_text(loader, manifest, sizeof manifest - 1, "built-in manifest") || !wl_create_memory(loader)) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    if (!wl_define_import(loader, "env", "double", "i>i", import_double, NULL) || !wl_define_import(loader, "env", "fail", ">", import_fail, NULL)) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    module = wl_load_module(loader, "add", wasm_path);
+    if (!module) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    if (!wl_table_entry(loader, 0, &slot)) {
+        fprintf(stderr, "table slot 0 was not filled\n");
+        return 1;
+    }
+    printf("table slot 0 filled by the module\n");
+    if (!wl_export_func(loader, module, export_name, &func)) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    start_time = seconds();
+    for (n = 0; n < loops; n++) {
+        for (i = 0; i < nargs; i++) {
+            raw[i].i32 = atoi(args[i]);
+        }
+        if (!wl_call(loader, module, &func, raw, 8)) {
+            return 1;
+        }
+    }
+    elapsed = seconds() - start_time;
+    printf("%s(", export_name);
+    for (i = 0; i < nargs; i++) {
+        printf(i ? ", %s" : "%s", args[i]);
+    }
+    printf(") = %d\n", raw[0].i32);
+    if (!read_i32(loader, 16, &value)) {
+        return 1;
+    }
+    printf("memory[16] = %d\n", value);
+    if (loops > 1) {
+        printf("%ld calls in %.3f s: %.0f calls/s\n", loops, elapsed, (double)loops / elapsed);
+    }
+    return 0;
+}
+
+static int run_maths(wl_loader* loader, const char* wasm_path)
+{
+    static const char manifest[] =
+        "{\"memory_pages\":1,\"table_size\":8,\"window\":65536,\"table_slots\":8,"
+        "\"modules\":[{\"name\":\"maths\",\"data_base\":0,\"table_base\":0}]}";
+    wasmtime_func_t count_fn, name_fn, run_fn, last_fn;
+    wl_module* module;
+    int count, i;
+
+    if (!wl_load_manifest_text(loader, manifest, sizeof manifest - 1, "built-in manifest") || !wl_create_memory(loader)) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    module = wl_load_module(loader, "maths", wasm_path);
+    if (!module || !wl_export_func(loader, module, "maths_case_count", &count_fn) || !wl_export_func(loader, module, "maths_case_name", &name_fn)
+        || !wl_export_func(loader, module, "maths_run_case", &run_fn) || !wl_export_func(loader, module, "maths_last_count", &last_fn)
+        || !call_i32(loader, module, &count_fn, 0, &count)) {
+        fprintf(stderr, "%s\n", wl_error(loader));
+        return 1;
+    }
+    for (i = 0; i < count; i++) {
+        int name_ptr, digest_ptr, last, j;
+        unsigned char* memory;
+        size_t size;
+        char name[65];
+        if (!call_i32(loader, module, &name_fn, i, &name_ptr) || !call_i32(loader, module, &run_fn, i, &digest_ptr)
+            || !call_i32(loader, module, &last_fn, 0, &last) || !wl_export_memory(loader, module, "memory", &memory, &size)) {
+            fprintf(stderr, "%s\n", wl_error(loader));
+            return 1;
+        }
+        if ((size_t)name_ptr + 64 > size || (size_t)digest_ptr + 32 > size) {
+            fprintf(stderr, "case %d: pointer outside the module's memory\n", i);
+            return 1;
+        }
+        memcpy(name, memory + name_ptr, 64);
+        name[64] = 0;
+        printf("%s %d ", name, last);
+        for (j = 0; j < 32; j++) {
+            printf("%02x", memory[digest_ptr + j]);
+        }
+        printf("\n");
+    }
+    return 0;
+}
+
+int main(int argc, char** argv)
+{
+    const char* dll_path = "wasmtime_host.dll";
+    const char* manifest = NULL;
+    const char* wasm_dir = ".";
+    int mode = 0;
+    long loops = 1;
+    int nargs;
+    int i;
+    char error[512];
+    wl_loader* loader;
+    int result;
+
+    for (i = 1; i < argc && argv[i][0] == '-'; i++) {
+        if (i + 1 < argc && !strcmp(argv[i], "--dll")) {
+            dll_path = argv[++i];
+        } else if (i + 1 < argc && !strcmp(argv[i], "--loop")) {
+            loops = atol(argv[++i]);
+        } else if (i + 1 < argc && !strcmp(argv[i], "--manifest")) {
+            manifest = argv[++i];
+        } else if (i + 1 < argc && !strcmp(argv[i], "--wasm-dir")) {
+            wasm_dir = argv[++i];
+        } else if (!strcmp(argv[i], "--fixtures")) {
+            mode = 1;
+        } else if (!strcmp(argv[i], "--maths")) {
+            mode = 3;
+        } else if (!strcmp(argv[i], "--wind-meteors")) {
+            mode = 2;
         } else {
             fprintf(stderr, "unknown option %s\n", argv[i]);
             return 2;
         }
     }
-    if (argc - i < 2) {
-        fprintf(stderr, "usage: host [--dll path] [--loop n] module.wasm export [i32 args]\n");
+    if (mode == 3 && argc - i != 1) {
+        fprintf(stderr, "usage: host [--dll path] --maths maths.wasm\n");
         return 2;
     }
-    wasm_path = argv[i];
-    export_name = argv[i + 1];
-    first_arg = i + 2;
-    nargs = argc - first_arg;
-    if (nargs > 8) {
+    if (mode == 0 && argc - i < 2) {
+        fprintf(stderr, "usage: host [--dll path] [--loop n] module.wasm export [i32 args]\n"
+                        "       host [--dll path] --manifest modules.json --wasm-dir dir (--fixtures | --wind-meteors)\n");
+        return 2;
+    }
+    if (mode == 0 && argc - i - 2 > 8) {
         fprintf(stderr, "at most 8 arguments\n");
         return 2;
     }
-
-    load_api(dll_path);
-    make_shared(&shared, 1, 8);
-    instance = instantiate(&shared, wasm_path);
-
-    if (!pf_wasmtime_table_get(shared.context, &shared.table, 0, &slot) || slot.kind != WASMTIME_FUNCREF || wasmtime_funcref_is_null(&slot.of.funcref)) {
-        fprintf(stderr, "table slot 0 was not filled\n");
-        return 1;
-    }
-    printf("table slot 0 filled by the module\n");
-
-    if (!pf_wasmtime_instance_export_get(shared.context, &instance, export_name, strlen(export_name), &export_item)
-        || export_item.kind != WASMTIME_EXTERN_FUNC) {
-        fprintf(stderr, "no function export %s\n", export_name);
-        return 1;
+    if (mode != 0 && mode != 3 && !manifest) {
+        fprintf(stderr, "--fixtures and --wind-meteors need --manifest\n");
+        return 2;
     }
 
-    start = seconds();
-    for (n = 0; n < loops; n++) {
-        for (i = 0; i < nargs; i++) {
-            raw[i].i32 = atoi(argv[first_arg + i]);
+    loader = start(dll_path, error, sizeof error);
+    if (!loader) {
+        fprintf(stderr, "%s\n", error);
+        return 2;
+    }
+    if (mode == 3) {
+        result = run_maths(loader, argv[i]);
+    } else if (mode == 0) {
+        nargs = argc - i - 2;
+        result = run_export(loader, argv[i], argv[i + 1], nargs, argv + i + 2, loops);
+    } else {
+        if (!wl_load_manifest_file(loader, manifest)) {
+            fprintf(stderr, "%s\n", wl_error(loader));
+            return 1;
         }
-        error = pf_wasmtime_func_call_unchecked(shared.context, &export_item.of.func, raw, 8, &trap);
-        if (error || trap) {
-            die("call", error, trap);
-        }
+        result = mode == 1 ? run_fixtures(loader, wasm_dir) : run_wind_meteors(loader, wasm_dir);
     }
-    elapsed = seconds() - start;
-
-    printf("%s(", export_name);
-    for (i = 0; i < nargs; i++) {
-        printf(i ? ", %s" : "%s", argv[first_arg + i]);
-    }
-    printf(") = %d\n", raw[0].i32);
-    printf("memory[16] = %d\n", read_i32(&shared, 16));
-    if (loops > 1) {
-        printf("%ld calls in %.3f s: %.0f calls/s\n", loops, elapsed, (double)loops / elapsed);
-    }
-    return 0;
+    return result;
 }

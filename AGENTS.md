@@ -113,6 +113,7 @@ identical traces for the scenario suite on the modern build:
 export WINEARCH=win64
 cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake   # once
 cmake --build build/modern
+cmake --build build/modern --target wasm_runtime    # needs cargo: the wasmtime DLL and modules
 uv run tools/reference.py --check --exe build/modern/TotalA.exe --game-dir ~/.ta
 ```
 

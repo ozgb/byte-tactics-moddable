@@ -71,6 +71,7 @@ int __cdecl ScaledCos(int angle, int scale) { return bx_ScaledCos((short)angle, 
 Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];
+unsigned int g_blockBase;
 
 static void __fastcall LoadMeteorDefaultsSlot(MeteorParams* params) { params->LoadMeteorDefaults(); }
 

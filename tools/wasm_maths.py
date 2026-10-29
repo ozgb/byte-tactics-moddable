@@ -4,6 +4,12 @@
     uv run tools/wasm_maths.py check                 # run both, compare every case
     uv run tools/wasm_maths.py check --write         # also write the native hashes to tests/wasm/maths/hashes.txt
     uv run tools/wasm_maths.py check --wasm-only     # compare the wasm side with hashes.txt (no Wine)
+    uv run tools/wasm_maths.py check --embedded      # run maths.wasm under the game's engine, compare with hashes.txt
+
+check runs native (Wine), maths.wasm under the wasmtime package, and maths.wasm under the game's own engine
+(wasmtime 50.0.0 on Pulley, NaN canonicalisation on, through lib/wasmloader and tests/wasm/host/host.c as
+wasmtime_host.dll and host.exe under Wine), and every case must agree across all three. The embedded runs need
+`uv run tools/wasm_host.py build` first. CI runs only --wasm-only, which needs no Wine.
 
 tests/wasm/maths/maths.c walks the input range of each helper the module reaches (ScaledSin and ScaledCos,
 FixedSine, the float expressions of SetMeteorParams, the wind division and clamp, double to float, atof) and
@@ -11,9 +17,10 @@ hashes every result with SHA-256. It is built twice from the same source: for th
 for i686 (x87 code, -mno-sse, as the game's files are; lib/bitexact compiled with SSE2 doubles, as the game
 links it) against MSVC 5's headers and LIBCMT.LIB, run under Wine with the FPU at 53-bit precision, round to
 nearest (_control87 0x9001F); and for the module with clang --target=wasm32 and wasm-ld together with
-lib/bitexact and its generated tables, run under the pinned wasmtime package. Cases whose name starts with
-info_ are printed and compared but never fail the check: they record how the two sides treat results that
-overflow int.
+lib/bitexact and its generated tables, run under the pinned wasmtime package. The module is built with
+-mno-nontrapping-fptoint, so every float to int conversion is LLVM's range-checked lowering, which gives
+0x80000000 for overflow and NaN as x87 _ftol does; the meteor_*_overflow, _negative and _special cases
+check that on every expression of SetMeteorParams.
 """
 
 import argparse
@@ -36,7 +43,7 @@ GUARD = "WASM_MATHS_UNDER_WASMTIME"
 WASMTIME = "50.0.1"
 CLANG = "22.1.8"
 LIB_SOURCES = [LIB / "trig.c", LIB / "math.c", LIB / "strtof.c"]
-WASM_FLAGS = ["--target=wasm32", "-O2", "-nostdlib", "-ffp-contract=off", "-fwrapv", "-fno-strict-aliasing", "-w",
+WASM_FLAGS = ["--target=wasm32", "-O2", "-nostdlib", "-ffp-contract=off", "-mno-nontrapping-fptoint", "-fwrapv", "-fno-strict-aliasing", "-w",
               f"-I{LIB}"]
 
 
@@ -150,34 +157,60 @@ def run_wasm() -> dict[str, tuple[int, str]]:
     return result
 
 
-def compare(native: dict[str, tuple[int, str]], wasm: dict[str, tuple[int, str]]) -> int:
+def run_embedded() -> dict[str, tuple[int, str]]:
+    host = ROOT / "build/wasm_host"
+    for name in ("host.exe", "wasmtime_host.dll"):
+        if not (host / name).exists():
+            sys.exit(f"{host / name} is missing: run `uv run tools/wasm_host.py build` first")
+    env = dict(os.environ, WINEDEBUG="-all", WINEARCH="win64", WINEPREFIX=str(host / "prefix"))
+    for var in ("DISPLAY", "WAYLAND_DISPLAY"):
+        env.pop(var, None)
+    proc = subprocess.run(["wine", str(host / "host.exe"), "--maths", str(OUT / "maths.wasm")], env=env, cwd=host,
+                          capture_output=True, text=True)
+    sys.stderr.write(proc.stderr)
+    if proc.returncode != 0:
+        sys.exit(f"the embedded run exited with {proc.returncode}")
+    return parse_hashes(proc.stdout)
+
+
+def compare(reference: dict[str, tuple[int, str]], others: dict[str, dict[str, tuple[int, str]]],
+            label: str = "native") -> int:
     bad = 0
-    for name in native:
-        n, w = native[name], wasm.get(name)
-        same = n == w
-        status = "ok" if same else ("differs (info)" if name.startswith("info_") else "MISMATCH")
-        print(f"{name}: {n[1]} native / {w[1] if w else 'missing'} wasm ({n[0]} cases) {status}")
-        if not same and not name.startswith("info_"):
+    for name in reference:
+        n = reference[name]
+        found = {key: results.get(name) for key, results in others.items()}
+        same = all(value == n for value in found.values())
+        status = "ok" if same else "MISMATCH"
+        shown = " / ".join(f"{value[1] if value else 'missing'} {key}" for key, value in found.items())
+        print(f"{name}: {n[1]} {label} / {shown} ({n[0]} cases) {status}")
+        if not same:
             bad += 1
-    for name in wasm:
-        if name not in native:
-            print(f"{name}: not in the native results")
-            bad += 1
+    for key, results in others.items():
+        for name in results:
+            if name not in reference:
+                print(f"{name}: in the {key} results but not in the {label} results")
+                bad += 1
     return bad
 
 
 def check(args: argparse.Namespace) -> int:
-    if not (OUT / "maths.wasm").exists() or (not args.wasm_only and not (OUT / "maths_native.exe").exists()):
+    if not (OUT / "maths.wasm").exists() or (not (args.wasm_only or args.embedded) and not (OUT / "maths_native.exe").exists()):
         sys.exit("build first: uv run tools/wasm_maths.py build")
-    if args.wasm_only:
+    if args.wasm_only or args.embedded:
         native = parse_hashes(HASHES.read_text())
+        label = "hashes.txt"
     else:
         native = run_native()
-    wasm = run_wasm()
+        label = "native"
+    others = {}
+    if not args.embedded:
+        others["wasm"] = run_wasm()
+    if not args.wasm_only:
+        others["embedded"] = run_embedded()
     if args.write:
         HASHES.write_text("".join(f"{name} {count} {digest}\n" for name, (count, digest) in native.items()))
         print(f"wrote {HASHES}")
-    bad = compare(native, wasm)
+    bad = compare(native, others, label)
     print("ok" if bad == 0 else f"{bad} MISMATCH")
     return 1 if bad else 0
 
@@ -199,11 +232,15 @@ def main() -> int:
     bld.add_argument("--wasm-only", action="store_true", help="skip the native build (no clang-cl or MSVC 5 needed)")
     chk = sub.add_parser("check")
     chk.add_argument("--wasm-only", action="store_true", help="compare with tests/wasm/maths/hashes.txt, no Wine")
+    chk.add_argument("--embedded", action="store_true",
+                     help="run maths.wasm under the game's engine (Wine) and compare with hashes.txt")
     chk.add_argument("--write", action="store_true", help="write the native hashes to tests/wasm/maths/hashes.txt")
     args = parser.parse_args()
+    if args.command == "check" and args.wasm_only and args.embedded:
+        parser.error("--wasm-only and --embedded exclude each other")
     if args.command == "build":
         return build(not args.wasm_only)
-    code = check_in_wasmtime(sys.argv[1:])
+    code = -1 if args.embedded else check_in_wasmtime(sys.argv[1:])
     return check(args) if code == -1 else code
 
 

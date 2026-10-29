@@ -105,18 +105,6 @@ struct CursorMoveEvent {
 #include "../map/cell.h"
 #include "../util/vec3.h"
 
-struct SkirmishSlot {
-    int kind;
-    char unknown_4[0x18 - 0x4];
-};
-
-struct SkirmishOptions {
-    SkirmishSlot slots[10];
-    char unknown_f0[0x108 - 0xf0];
-    MissionOptionFlags settings;
-    int fixedloc;
-};
-
 class Sound;
 
 
@@ -231,7 +219,7 @@ void __cdecl LoadMatch(void*)
     case 2:
         g_game->maxUnitsSetting = g_game->maxUnits_37eec;
         g_nonCampaignGame = 1;
-        ApplyMissionOptionFlags(&((SkirmishOptions*)g_game->options)->settings);
+        ApplyMissionOptionFlags(&g_game->options->missionFlags);
         break;
     case 3: {
         g_game->maxUnitsSetting = g_game->maxUnits_37eec;
@@ -283,10 +271,10 @@ void __cdecl LoadMatch(void*)
             g_seams.players->LoadPlayerControllers(((HapiBank*)g_game->pendingSaveStore));
             if (g_seams.map->GetGameType(((Mission*)g_game->net)) == 2) {
                 int count = 0;
-                SkirmishSlot* def = ((SkirmishOptions*)g_game->options)->slots;
+                SkirmishPlayer* def = g_game->options->players;
                 int i = 0;
                 while (i < 10) {
-                    if (def->kind == 1 || def->kind == 2)
+                    if (def->controller == 1 || def->controller == 2)
                         count = i + 1;
                     i++;
                     def++;
@@ -359,7 +347,7 @@ void __cdecl LoadMatch(void*)
             ReportGameEvent(6);
         } else if (g_seams.map->GetGameType(((Mission*)g_game->net)) == 2 &&
             ((HapiBank*)g_game->pendingSaveStore) == 0) {
-            if (((SkirmishOptions*)g_game->options)->fixedloc != 0) {
+            if (g_game->options->fixedLocations != 0) {
                 for (int i1 = 0; i1 < 10; i1++) {
                     if ((unsigned char)i1 < 10) {
                         LoadingPlayerRecord* rec = &(*(LoadingPlayerRecord(*)[10])&g_game->players)[(unsigned char)i1];

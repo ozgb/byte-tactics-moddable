@@ -14,7 +14,6 @@ struct Layer;
 struct Gui;
 struct Game;
 struct UnitRestrictEntry;
-struct GameOptionsView;
 struct PlayerInfo;
 struct LogoTable;
 
@@ -435,11 +434,6 @@ struct UnitRestrictEntry {
     int previousMax;
     int max;
     int peerEnabled;
-};
-
-struct GameOptionsView {
-    char unknown_0[0x118];
-    int fixedloc;
 };
 
 struct UnitRestrictRecord {
@@ -3138,7 +3132,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
         g_game->multiLineOfSight = me->info->los;
         g_game->multiLOSType = me->info->losType;
         g_game->multiCommanderDeath = me->info->commander;
-        ((GameOptionsView *)g_game->options)->fixedloc = me->info->fixedloc;
+        g_game->options->fixedLocations = me->info->fixedloc;
         g_game->multiMapping = me->info->mapping;
         SaveSettings();
         g_game->difficulty = 2;
@@ -4348,7 +4342,7 @@ void OpenBattleRoom()
         info->mapping = g_game->multiMapping;
         info->los = g_game->multiLineOfSight;
         info->losType = g_game->multiLOSType;
-        info->fixedloc = ((GameOptionsView *)g_game->options)->fixedloc;
+        info->fixedloc = g_game->options->fixedLocations;
         info->commander = g_game->multiCommanderDeath;
     }
 

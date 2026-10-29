@@ -118,8 +118,8 @@ void __cdecl operator delete(void* p);
 #include "../game/data_files.h"
 #include "../files/files_api.h"
 void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, char last);
-int __stdcall PlayWavMemory(int sound);
-int __stdcall PlayLoopingWavMemory(int sound);
+int __stdcall PlayWavMemory(void* sound);
+int __stdcall PlayLoopingWavMemory(void* sound);
 #include "../network/net_game.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 struct Cell;
@@ -269,7 +269,7 @@ void __stdcall StreamSoundDelayed(char* param_1, int param_2, int param_3)
 int __stdcall PlaySoundByIndex(int index, int param_2)
 {
     if (index != 0xffff) {
-        int sound = g_game->sounds[index];
+        void* sound = g_game->sounds[index];
         if (g_useWindowsSound) {
             if (g_playLooping)
                 return PlayLoopingWavMemory(sound);

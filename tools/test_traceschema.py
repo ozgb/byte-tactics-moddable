@@ -117,8 +117,8 @@ class FollowedHeadersTest(unittest.TestCase):
             self.assertEqual([p.name for p in headers], ["d.h", "b.h", "a.h", "c.h"])
 
     def test_real_list_has_unit_and_game_under_src_only(self):
+        self.assertEqual(len(ts.LAYOUT_HEADERS), len(set(ts.LAYOUT_HEADERS)))
         names = [p.name for p in ts.LAYOUT_HEADERS]
-        self.assertEqual(len(names), len(set(names)))
         self.assertIn("unit.h", names)
         self.assertIn("game.h", names)
         for path in ts.LAYOUT_HEADERS:

@@ -356,7 +356,7 @@ void InitGame()
     LoadLightTable(g_game->paletteRgba);
     MakeGrayTable(g_game->paletteRgba);
     MakeBlueTable(g_game->paletteRgba);
-    g_game->options = (SkirmishOptionsView*)(GameAllocIgnoreTag(g_skirmishInfoTag, 0x22c));
+    g_game->options = (SkirmishOptionsTable*)(GameAllocIgnoreTag(g_skirmishInfoTag, 0x22c));
     LoadSettings();
     size = 0xaa0;
     int ok = ReadGameRegistryValue(g_cdListsKey, &g_cdListsDiscEntries, &size);
@@ -389,7 +389,7 @@ void InitGame()
     g_game->valueSet_38c63 = 0;
     g_game->unusedAfterMovieOutputRateDirty = 0;
     g_game->pendingSaveStore = 0;
-    g_game->moviePlayer = (void*)(0);
+    g_game->moviePlayer = 0;
     g_game->mode_391f1 = 0;
     g_game->handler = InitFrame;
     SetCloseHandler(LeaveNetGameCallback, 0);
@@ -435,7 +435,7 @@ void ShutdownGame(void)
     RestoreScreen();
     g_seams.orders->ClearOrderTypeTable();
     GameFreeThunk((int*)((void*)g_game->options));
-    g_game->options = (SkirmishOptionsView*)(0);
+    g_game->options = (SkirmishOptionsTable*)(0);
     g_seams.units->FreeUnitInfo();
     ReleasePacketData((PacketBufferOwnerView*)g_game->chatHudRing);
     g_seams.map->FreeOtaEnumCacheAndMission();

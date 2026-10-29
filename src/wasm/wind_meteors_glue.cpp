@@ -131,7 +131,7 @@ IMPORT(FatalErrorImport)
 {
     (void)user;
     NEED("FatalError", 0);
-    FatalError((char*)Linear(a[0].i32));
+    ModulesFatal((char*)Linear(a[0].i32));
     return nullptr;
 }
 

@@ -1,6 +1,6 @@
 bt-digest 3
 trace_format bt-trace 3
-commit c01fe514aa059863add246e90899bf34c6564fae
+commit ae507bde7be3dd4fe5ca45c4b86f45ba7933ef4f
 scenario reference/scenarios/console-sight.txt
 game_seed 454
 crt_seed 1454

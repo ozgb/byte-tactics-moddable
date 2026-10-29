@@ -5,29 +5,11 @@
 #include <stdlib.h>
 #include "../units/squad.h"
 
-class Sound {
-public:
-    int InitDirectSound(int rate, int bits, int channels, int handle);
-    int HasNoDriver();
-    void ReleaseDirectSound();
-    void* LoadSample(char* path);
-    void ReleaseSampleSet(void** set);
-    int StreamSampleDelayed(char* name, int value, int delay);
-    int PlayLooping(int sample, int volume);
-    int PlaySampleSet(int a, int b, int c);
-    int PlaySampleSet(int a, int b, void* c);
-    int PlaySample(const char* name, int volume, int pos);
-    int Is3DEnabled();
-    void Set3DDistances(float a, float b);
-    void StopAllBuffers();
-    void OpenCdAudio();
-    void RestoreMixerVolumes();
-    void SetMaxBuffers(int count);
-};
+#include "sound.h"
 
 struct DisplayHwndView {
     char unknown_0[0x40];
-    int hwnd;
+    HWND hwnd;
 };
 
 union SoundWorldPos {
@@ -303,8 +285,8 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
                 BroadcastPacket(GetLocalDpid(), &packet, sizeof(packet));
             }
             if (g_playLooping)
-                return ((Sound *)g_game->sound)->PlayLooping(sound, -585);
-            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, 0);
+                return ((Sound *)g_game->sound)->PlayLooping((void**)sound, -585);
+            return ((Sound *)g_game->sound)->PlaySampleSet((void**)sound, -585, nullptr);
         }
     }
     return 0;
@@ -362,7 +344,7 @@ int __stdcall PlaySoundAt(int index, SoundWorldPos* pos, int param_3)
     if (g_noDirectSound != 0)
         return 0;
 
-    int sound = g_game->sounds[index];
+    void** sound = (void**)g_game->sounds[index];
 
     if (param_3) {
         SoundAtPacket packet;
@@ -413,7 +395,7 @@ int __stdcall PlaySoundAt(int index, SoundWorldPos* pos, int param_3)
                 || g_game->scrollX + g_game->screenTilesX * 16 < pos->x
                 || g_game->scrollY + g_game->screenTilesY * 16 < pos->z)
                 return ((Sound *)g_game->sound)->PlaySampleSet(sound, -1585, 0);
-            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, 0);
+            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, nullptr);
         }
     }
     return 0;

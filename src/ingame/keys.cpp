@@ -6,11 +6,7 @@
 
 #pragma pack(push, 1)
 
-struct Layer {
-    int unknown_0;
-    int value;
-};
-
+#include "../gui/layer.h"
 typedef Layer StopOrderLayer;
 
 class Mission;
@@ -30,15 +26,6 @@ struct DebugKeyFlags {
 struct ScreenshotFindData {
     char unknown_0[0x14];
     char name[260];
-};
-
-struct BmpWriter {
-    char unknown_0[0xc];
-    void* file;
-    BmpWriter* Init();
-    bool Open(const char* name, int width, int height);
-    bool WriteRows(void* image, int x, int rows, int unused_4, int y, int unused_6, int srcY);
-    void Close();
 };
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
@@ -66,7 +53,7 @@ struct DisplayFrameHolder {
 
 #include "../../link/globals.h"
 
-int __stdcall FindGadgetIndexBySubstring(int value, const char* name);
+int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name);
 #include "../files/files_api.h"
 #include "keys.h"
 #include "../graphics/gaf.h"
@@ -108,7 +95,7 @@ void SelectStopOrder(void)
 
     g_game->orderMode = 1;
     g_game->inputFlags &= 0xdf;
-    index = FindGadgetIndexBySubstring(g_game->gui.layer->value, "STOP");
+    index = FindGadgetIndexBySubstring(g_game->gui.layer->entries, "STOP");
     if (index != -1) {
         ClearGroupStatus(&g_game->gui, index);
     }
@@ -125,7 +112,7 @@ void __stdcall SetOrSelectStopOrder(int set)
     }
     g_game->orderMode = 1;
     g_game->inputFlags &= 0xdf;
-    index = FindGadgetIndexBySubstring(g_game->gui.layer->value, "STOP");
+    index = FindGadgetIndexBySubstring(g_game->gui.layer->entries, "STOP");
     if (index != -1) {
         ClearGroupStatus(&g_game->gui, index);
     }
@@ -303,7 +290,7 @@ void HandleGameKey(void)
             if (g_game->orderMode != 1) {
                 g_game->orderMode = 1;
                 g_game->inputFlags = g_game->inputFlags & 0xdf;
-                int handle = FindGadgetIndexBySubstring(g_game->gui.layer->value, "STOP");
+                int handle = FindGadgetIndexBySubstring(g_game->gui.layer->entries, "STOP");
                 if (handle != -1)
                     ClearGroupStatus(&g_game->gui, handle);
             } else {
@@ -542,7 +529,7 @@ void HandleGameKey(void)
             }
         }
         if (found == 0)
-            IssueOrderToSelection((OrderTypeEntry*)g_game->orders_2c76, 0, order, nullptr, 0, 0);
+            IssueOrderToSelection(&g_game->view, 0, order, nullptr, 0, 0);
         break;
     }
 

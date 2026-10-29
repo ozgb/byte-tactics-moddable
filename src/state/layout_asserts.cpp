@@ -70,7 +70,6 @@
 #include "../ingame/orders_bits.h"
 #include "../ingame/orders_panel_flags.h"
 #include "../ingame/unit_info_snapshot.h"
-#include "../ingame/view_mouse_event.h"
 #include "../map/cell.h"
 #include "../map/eye.h"
 #include "../map/feature.h"
@@ -115,6 +114,7 @@
 #include "../units/unit_def.h"
 #include "../units/unit_script.h"
 #include "../util/angles.h"
+#include "../util/mouse_event.h"
 #include "../util/point.h"
 #include "../util/rot16.h"
 #include "../util/string_ref.h"
@@ -406,6 +406,7 @@ static_assert(offsetof(Gadget, height) == 25, "");
 static_assert(offsetof(Gadget, attribs) == 27, "");
 static_assert(offsetof(Gadget, colours) == 31, "");
 static_assert(offsetof(Gadget, image) == 35, "");
+static_assert(offsetof(Gadget, colour) == 35, "");
 static_assert(offsetof(Gadget, textureNumber) == 39, "");
 static_assert(offsetof(Gadget, tab) == 40, "");
 static_assert(offsetof(Gadget, active) == 41, "");
@@ -1489,6 +1490,13 @@ static_assert(offsetof(ModelState, shadow) == 20, "");
 static_assert(offsetof(ModelState, pos) == 24, "");
 static_assert(offsetof(ModelState, root) == 30, "");
 static_assert(offsetof(ModelState, pieces) == 34, "");
+static_assert(sizeof(MouseEvent) == 24, "");
+static_assert(offsetof(MouseEvent, x) == 0, "");
+static_assert(offsetof(MouseEvent, y) == 4, "");
+static_assert(offsetof(MouseEvent, keyFlags) == 8, "");
+static_assert(offsetof(MouseEvent, scaledTick) == 12, "");
+static_assert(offsetof(MouseEvent, msg) == 16, "");
+static_assert(offsetof(MouseEvent, dblClick) == 20, "");
 static_assert(sizeof(MovementClass) == 32, "");
 static_assert(offsetof(MovementClass, name) == 0, "");
 static_assert(offsetof(MovementClass, footprintX) == 4, "");
@@ -2413,11 +2421,6 @@ static_assert(offsetof(VictoryUnitTypePassesX, x) == 48, "");
 static_assert(sizeof(VictoryUnitTypePassesZ) == 52, "");
 static_assert(offsetof(VictoryUnitTypePassesZ, name) == 16, "");
 static_assert(offsetof(VictoryUnitTypePassesZ, z) == 48, "");
-static_assert(sizeof(ViewMouseEvent) == 24, "");
-static_assert(offsetof(ViewMouseEvent, x) == 0, "");
-static_assert(offsetof(ViewMouseEvent, y) == 4, "");
-static_assert(offsetof(ViewMouseEvent, keyFlags) == 8, "");
-static_assert(offsetof(ViewMouseEvent, unknown_c) == 12, "");
 static_assert(sizeof(WeaponDef) == 277, "");
 static_assert(offsetof(WeaponDef, name) == 0, "");
 static_assert(offsetof(WeaponDef, description) == 32, "");

@@ -1048,10 +1048,10 @@ int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* po
         proj->angles.heading = shot->fireHeading;
         proj->angles.pitch = shot->firePitch;
         int q = ((unsigned int)shot->muzzleAimFromDeltaZ / shot->weapon->speed) * g_game->gravity;
-        proj->direction.y = ScaledSin((short)shot->firePitch, shot->weapon->speed) - q;
-        int scale = ScaledCos((short)shot->firePitch, shot->weapon->speed);
-        proj->direction.x = -ScaledSin((short)shot->fireHeading, scale);
-        proj->direction.z = -ScaledCos((short)shot->fireHeading, scale);
+        proj->direction.y = ScaledSin(shot->firePitch, shot->weapon->speed) - q;
+        int scale = ScaledCos(shot->firePitch, shot->weapon->speed);
+        proj->direction.x = -ScaledSin(shot->fireHeading, scale);
+        proj->direction.z = -ScaledCos(shot->fireHeading, scale);
         if (shot->weapon->flags.b.burnBlow) {
             proj->time = (int)_hypot((double)(pos->x - aim->x), (double)(pos->z - aim->z)) / scale
                        + g_game->ticks;
@@ -1061,7 +1061,7 @@ int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* po
         proj->active = shot->weapon->burst;
         proj->targetUnitPtr = (Unit*)param_5;
         g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
-        short angle = *(int*)&unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
+        short angle = unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
         int a = -ScaledSin((short)angle, 800);
         int b = -ScaledCos((short)angle, 800);
         g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);

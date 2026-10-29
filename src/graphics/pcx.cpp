@@ -559,20 +559,6 @@ void __stdcall AddObjectBounds(Object3do* obj, Vec3* offset,
     }
 }
 
-class BmpWriter {
-public:
-    int width;
-    int height;
-    int dataOffset;
-    void* file;
-
-    BmpWriter* Init();
-    void Close();
-    bool Open(const char* name, int w, int h);
-    bool WriteRows(PcxBitmap* image, int x, int rows, int unused_4, int y,
-                      int unused_6, int srcY);
-};
-
 // FUNCTION: 0x4cb7c0
 BmpWriter* BmpWriter::Init()
 {
@@ -673,7 +659,7 @@ bool BmpWriter::Open(const char* name, int w, int h)
 }
 
 // FUNCTION: 0x4cb940
-bool BmpWriter::WriteRows(PcxBitmap* image, int x, int rows, int unused_4,
+bool BmpWriter::WriteRows(Surface* image, int x, int rows, int unused_4,
                                   int y, int unused_6, int srcY)
 {
     int stride = (image->width + 3) & ~3;
@@ -681,7 +667,7 @@ bool BmpWriter::WriteRows(PcxBitmap* image, int x, int rows, int unused_4,
         return false;
     }
     for (int i = rows - 1; i >= 0; i--) {
-        if (host_file_write(file, image->data + image->pitch * (i + srcY), stride) != stride) {
+        if (host_file_write(file, image->pixels + image->pitch * (i + srcY), stride) != stride) {
             return false;
         }
     }

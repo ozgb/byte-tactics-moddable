@@ -209,21 +209,7 @@ void LoadCdLists(void)
     }
 }
 
-class Sound {
-public:
-    void SetTrackCategory(int mode);
-    int GetDiscSerial();
-    int IsFirstTrackData();
-    int GetTrackCategory();
-    int SetCdCallback(void (*cb)());
-    void CopyTrackTypeTable(const void* src);
-    int GetTrackCount();
-    unsigned char GetCategoryOfTrack(int index);
-    int SetPlaybackOrder(int value);
-    void PlayNextTrack();
-    int StopCdAudio();
-    void EnableCdAudio(int on);
-};
+#include "../sound/sound.h"
 
 // FUNCTION: 0x490f80
 void SaveCdLists()
@@ -309,7 +295,6 @@ extern const char g_unitLimitKey[];
 
 #include "../graphics/display.h"
 #include "data_files.h"
-void InitSound();
 #include "../frontend/frontend.h"
 void __stdcall InitPacketTables(void* param_1);
 #include "../sound/sound_types.h"
@@ -425,7 +410,6 @@ void InitGame()
 struct PacketBufferOwnerView;
 
 #include "../gui/gui_file.h"
-void ShutdownSound();
 void __stdcall ReleasePacketData(PacketBufferOwnerView* obj);
 
 // FUNCTION: 0x4916a0
@@ -465,7 +449,6 @@ extern int g_cdActivitySampleRing[30];
 
 #include "../network/packets.h"
 #include "../ingame/info_panel.h"
-void ResetSpeech();
 #include "../graphics/particles.h"
 #include "../ingame/control_panel.h"
 unsigned int GetTicks();

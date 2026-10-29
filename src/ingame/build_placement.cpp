@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #pragma pack(push, 1)
-#include "../../include/mouse_event.h"
+#include "../util/mouse_event.h"
 
 #include "../util/vec3.h"
 
@@ -87,7 +87,7 @@ void __stdcall HandleLeftClick(MouseEvent* mouse)
     {
         MissionType kind;
         kind.index = 0;
-        IssueOrderToSelection((OrderTypeEntry*)mouse, g_game->orderMode, kind, (int*)&g_game->pos, 0, 0);
+        IssueOrderToSelection(mouse, g_game->orderMode, kind, (int*)&g_game->pos, 0, 0);
     }
     if (mouse->keyFlags & 4) {
         g_game->inputFlags |= 0x20;
@@ -133,7 +133,7 @@ void __stdcall HandleRightClick(MouseEvent* mouse)
         }
     } else if (g_game->inputFlags & 4) {
         MissionType kind;
-        IssueOrderToSelection((OrderTypeEntry*)mouse, 1, kind, (int*)&g_game->pos, 0, 0);
+        IssueOrderToSelection(mouse, 1, kind, (int*)&g_game->pos, 0, 0);
     }
 }
 

@@ -6,8 +6,8 @@
 #include "../../interfaces/host.h"
 
 #include "lzss_tree.h"
+#include "../../link/globals.h"
 
-extern LzssTreeNode* g_squashDictTree;
 extern char* g_squashWindow;
 
 // FUNCTION: 0x4d0ab0
@@ -168,13 +168,6 @@ int __stdcall LzssAddString(int pos, int* out)
 #include <io.h>
 #include <malloc.h>
 
-extern HANDLE g_squashThreadLockEvent;
-extern long g_squashThreadLockTicket;
-extern int g_lzssLockOwner;
-extern int g_lzssPresetReady;
-extern int g_lzssUsePreset;
-extern char g_lzssPresetWindow[];
-extern char g_lzssPresetTree[];
 
 // FUNCTION: 0x4d0f60
 int __stdcall LzssCompress(unsigned char *dest, unsigned char *src, int len) {
@@ -696,8 +689,6 @@ void __stdcall SquashDumpHeader(SquashChunkHeader* header)
     printf("header.packedSize   = %ld\n", header->compressedSize);
     printf("header.unpackedSize = %ld\n", header->size);
 }
-
-extern void* g_squashErrorNames[];
 
 // FUNCTION: 0x4d1c60
 void* __stdcall SquashErrorString(int code)

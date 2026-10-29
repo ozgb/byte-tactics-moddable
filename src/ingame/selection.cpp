@@ -40,6 +40,7 @@ struct HotRadarSlot {
 };
 
 #include "../orders/order_type_entry.h"
+#include "../util/mouse_event.h"
 #include "../game/game.h"
 #pragma pack(pop)
 
@@ -557,10 +558,10 @@ void __stdcall IssueOrCancelOrder(MissionType kind, int flag, Unit* unit,
 static inline MissionType Order(const char* name) { return MissionType(name); }
 
 // FUNCTION: 0x48cf30
-void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
+void __stdcall IssueOrderToSelection(MouseEvent* mouse, unsigned char mode,
                             MissionType kind, int* pos, int typeId, int amount)
 {
-    int flag_a = (entry->flags_a >> 2) & 1;
+    int flag_a = (mouse->keyFlags >> 2) & 1;
     Unit* except = 0;
     int flag_b;
     if (mode)

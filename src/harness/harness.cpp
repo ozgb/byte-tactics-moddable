@@ -847,7 +847,7 @@ static void SeedNetworkHost(int host)
     g_game->loadingFlags.value |= 8;
 }
 
-static OptionsTable* ScenarioTable() { return (OptionsTable*)g_game->options; }
+static OptionsTable* ScenarioTable() { return g_game->options; }
 
 static Mission* BeginMission(int type)
 {

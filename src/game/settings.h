@@ -34,18 +34,6 @@ struct SkirmishOptionsTable {
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
 static_assert(sizeof(SkirmishOptionsTable) == 0x22c, "SkirmishOptionsTable");
 #endif
-
-struct Options {
-    SkirmishPlayer players[10];
-    char unknown_f0[0x108 - 10 * 0x18];
-    int skirmishCommanderDeath;
-    int skirmishMapping;
-    int skirmishLineOfSight;
-    int skirmishLOSType;
-    int fixedLocations;
-    char skirmishMap[0x228 - 0x11c];
-    int skirmishDifficulty;
-};
 #pragma pack(pop)
 
 void __stdcall SaveTrackSettings(unsigned char* tracks);

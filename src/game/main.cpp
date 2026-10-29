@@ -324,7 +324,7 @@ void AtexitNoOp(void)
 {
 }
 
-int __stdcall ExceptionFilter(EXCEPTION_POINTERS* exception, const char* thread);
+#include "../graphics/pcx.h"
 
 // FUNCTION: 0x49eda0
 int __stdcall GameEntry(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -332,7 +332,7 @@ int __stdcall GameEntry(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
     __try {
         return GameMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-    } __except (ExceptionFilter(GetExceptionInformation(), "Main Thread")) {
+    } __except (ExceptionFilter((int)GetExceptionInformation(), (int)"Main Thread")) {
     }
     return 0;
 }

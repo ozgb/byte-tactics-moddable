@@ -10,7 +10,7 @@
   "window": 65536,
   "table_slots": 32,
   "majors": {
-    "ai": 1,
+    "ai": 2,
     "economy": 1,
     "features": 2,
     "files": 1,

@@ -15,7 +15,6 @@ struct Vec3;
 class CommandArgs;
 class UnitDef;
 struct Unit;
-struct _iobuf;
 
 void __stdcall CmdPlan(CommandArgs* args);
 void __stdcall EnableAICommands();
@@ -38,7 +37,7 @@ void __stdcall CreatePlayerAI(int player);
 void __stdcall RebuildFeatureCells(int);
 void __stdcall DestroyPlayerAI(int player);
 int __stdcall GetUnitCount(int, unsigned int);
-void __stdcall DumpPlayerAI(int player, _iobuf* file);
+void __stdcall DumpPlayerAI(int player, void* file);
 int __stdcall HasSpecialUnit(int);
 
 bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range);

@@ -166,7 +166,7 @@ void __stdcall BlitMenuLayers(Main2Menu* menu, int a, int b);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
 char* __stdcall Translate(char* s);
 
-int __stdcall ExceptionFilter(EXCEPTION_POINTERS* exception, const char* thread);
+#include "../graphics/pcx.h"
 #include "../ingame/build_placement.h"
 #include "../frontend/options.h"
 #include "../frontend/frontend.h"

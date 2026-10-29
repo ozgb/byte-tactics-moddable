@@ -324,7 +324,7 @@ void AtexitNoOp(void)
 {
 }
 
-int __stdcall ExceptionFilter(EXCEPTION_POINTERS* exception, const char* thread);
+#include "../graphics/pcx.h"
 
 // FUNCTION: 0x49eda0
 int __stdcall GameEntry(HINSTANCE hInstance, HINSTANCE hPrevInstance,

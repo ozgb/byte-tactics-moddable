@@ -85,6 +85,7 @@ src/game/game_load.cpp,src/graphics/display.h,#392
 src/game/game_load.cpp,src/graphics/draw.h,#392
 src/game/game_load.cpp,src/graphics/object_pool.h,#392
 src/game/game_load.cpp,src/graphics/palette.h,#392
+src/game/game_load.cpp,src/graphics/pcx.h,#392
 src/game/game_load.cpp,src/graphics/rect.h,#392
 src/game/game_load.cpp,src/graphics/surface.h,#392
 src/game/game_load.cpp,src/gui/gui.h,#392
@@ -119,6 +120,7 @@ src/game/main.cpp,src/frontend/frontend.h,#392
 src/game/main.cpp,src/frontend/options.h,#392
 src/game/main.cpp,src/graphics/display.h,#392
 src/game/main.cpp,src/graphics/palette.h,#392
+src/game/main.cpp,src/graphics/pcx.h,#392
 src/game/main.cpp,src/gui/mouse.h,#392
 src/game/main.cpp,src/ingame/camera.h,#392
 src/game/main.cpp,src/ingame/screenshots.h,#392

@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v15` is the fixed target for anyone writing a new
+The git tag `reference-traces-v16` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v15`**.
+code as a base. This page names the current tag: **`reference-traces-v16`**.
 
 ## What the tag holds
 
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v15`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v15
+git checkout reference-traces-v16
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -134,7 +134,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v15
+git checkout reference-traces-v16
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -207,9 +207,9 @@ What the code shows about the players fields (`LoadPlayers` and `SavePlayers`, s
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v15`
+the digests that should become a target gets a new tag (`reference-traces-v16`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v15`.
+`reference-traces-v16`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -266,7 +266,7 @@ and so on), and this page is updated to name it. The current tag is
   and `mission-radius`, with the new `campaign` key and `game_type 1`, that load a
   campaign mission so that its victory and defeat conditions fire and the run ends at
   game over (#444). The 56 earlier digests and the hashed fields are those of v13.
-- `reference-traces-v15`: six more scenarios, `console-economy`, `console-features`,
+- `reference-traces-v16`: six more scenarios, `console-economy`, `console-features`,
   `console-ilose`, `console-iwin`, `console-sight` and `console-units`, with the new
   `console` key, that type console commands as the chat line does (#445). The 59
   earlier digests and the hashed fields are those of v14.

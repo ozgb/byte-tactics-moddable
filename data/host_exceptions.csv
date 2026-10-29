@@ -243,7 +243,7 @@ src/gui/gui_file.cpp,src/graphics/object_pool.h,#392
 src/gui/gui_file.cpp,src/graphics/palette.h,#392
 src/gui/gui_file.cpp,src/gui/dialogs.h,#392
 src/gui/keyboard.cpp,interfaces/host.h,#392
-src/gui/keyboard.cpp,src/graphics/display_context.h,#392
+src/gui/keyboard.cpp,src/graphics/display.h,#392
 src/gui/listbox.cpp,src/graphics/draw.h,#392
 src/gui/listbox.cpp,src/graphics/gaf_frame.h,#392
 src/gui/listbox.cpp,src/graphics/rect.h,#392

@@ -3,6 +3,7 @@
 struct DisplayAppView;
 
 #include "surface.h"
+#include "../util/mouse_event.h"
 
 struct OPENHAPIFILE;
 
@@ -48,10 +49,13 @@ struct Display {
     int field_e4;
     char pad_e8[0xf0 - 0xe8];
     DisplayFlags flags;
-    char pad_f2[0x196 - 0xf2];
-    int rect_x;
-    int rect_y;
-    char pad_19e[0x1b2 - 0x19e];
+    int keyQueueSize;
+    int keyQueue[30];
+    int keyQueueHead;
+    int keyQueueTail;
+    char pad_176[0x196 - 0x176];
+    MouseEvent mouseEvent;
+    char pad_1ae[0x1b2 - 0x1ae];
     GafFrame* bmp;
     int x;
     int y;

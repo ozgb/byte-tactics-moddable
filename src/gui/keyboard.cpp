@@ -1,20 +1,9 @@
 #include "win_types.h"
-#include "../graphics/display_context.h"
+#include "../graphics/display.h"
 #include <string.h>
 #include "../../interfaces/host.h"
 
-#pragma pack(push, 2)
-struct KeyQueueDisplay {
-    char unknown_0[0xf2];
-    int size;
-    int entries[30];
-    int head;
-    int tail;
-};
-#pragma pack(pop)
-
-
-KeyQueueDisplay* GetDisplay(void);
+Display* GetDisplay(void);
 
 extern int g_gfxBlitLockHeld;
 extern HANDLE g_gfxBlitLockEvent;
@@ -22,23 +11,23 @@ extern HANDLE g_gfxBlitLockEvent;
 // FUNCTION: 0x4c1a40
 void ClearKeyQueue(void)
 {
-    KeyQueueDisplay* q = GetDisplay();
-    q->head = 0;
-    q->tail = 0;
+    Display* q = GetDisplay();
+    q->keyQueueHead = 0;
+    q->keyQueueTail = 0;
 }
 
 // FUNCTION: 0x4c1a60
 void __stdcall InitKeyQueue(int size)
 {
-    KeyQueueDisplay* q = GetDisplay();
+    Display* q = GetDisplay();
     if (size <= 0x1e)
-        q->size = size;
+        q->keyQueueSize = size;
     else
-        q->size = 0x1e;
+        q->keyQueueSize = 0x1e;
 
     q = GetDisplay();
-    q->head = 0;
-    q->tail = 0;
+    q->keyQueueHead = 0;
+    q->keyQueueTail = 0;
 }
 
 // FUNCTION: 0x4c1aa0
@@ -49,16 +38,16 @@ void DestroyPreCleanup(void)
 // FUNCTION: 0x4c1ab0
 int PopKey(void)
 {
-    KeyQueueDisplay* q = GetDisplay();
+    Display* q = GetDisplay();
     int v;
-    if (q->head == q->tail) {
+    if (q->keyQueueHead == q->keyQueueTail) {
         v = 0;
     } else {
-        int next = q->tail + 1;
-        v = q->entries[next - 1];
-        q->tail++;
-        if (q->tail == q->size)
-            q->tail = 0;
+        int next = q->keyQueueTail + 1;
+        v = q->keyQueue[next - 1];
+        q->keyQueueTail++;
+        if (q->keyQueueTail == q->keyQueueSize)
+            q->keyQueueTail = 0;
     }
     return v;
 }
@@ -66,26 +55,26 @@ int PopKey(void)
 // FUNCTION: 0x4c1b00
 int __cdecl PeekKey()
 {
-    KeyQueueDisplay* q = GetDisplay();
-    int head = q->head;
-    int tail = q->tail;
+    Display* q = GetDisplay();
+    int head = q->keyQueueHead;
+    int tail = q->keyQueueTail;
     if (head == tail) {
         return 0;
     }
-    return q->entries[tail];
+    return q->keyQueue[tail];
 }
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4c1b20
 void __stdcall PushKeyCode(int v)
 {
-    KeyQueueDisplay* q = GetDisplay();
-    int next = q->head + 1;
-    if ((q->head + 1) % q->size != q->tail) {
-        q->entries[next - 1] = v;
-        q->head++;
-        if (q->head == q->size)
-            q->head = 0;
+    Display* q = GetDisplay();
+    int next = q->keyQueueHead + 1;
+    if ((q->keyQueueHead + 1) % q->keyQueueSize != q->keyQueueTail) {
+        q->keyQueue[next - 1] = v;
+        q->keyQueueHead++;
+        if (q->keyQueueHead == q->keyQueueSize)
+            q->keyQueueHead = 0;
     }
 }
 #pragma auto_inline(on)
@@ -114,14 +103,14 @@ int __stdcall IsKeyDown(int key)
 
 static inline void PushKey(int v)
 {
-    KeyQueueDisplay* q = GetDisplay();
-    int next = q->head + 1;
-    if ((q->head + 1) % q->size == q->tail)
+    Display* q = GetDisplay();
+    int next = q->keyQueueHead + 1;
+    if ((q->keyQueueHead + 1) % q->keyQueueSize == q->keyQueueTail)
         return;
-    q->entries[next - 1] = v;
-    q->head++;
-    if (q->head == q->size)
-        q->head = 0;
+    q->keyQueue[next - 1] = v;
+    q->keyQueueHead++;
+    if (q->keyQueueHead == q->keyQueueSize)
+        q->keyQueueHead = 0;
 }
 
 // FUNCTION: 0x4c1d50
@@ -198,7 +187,7 @@ void InitBlitLock()
 // FUNCTION: 0x4c22d0
 void __stdcall SetCursorOverlayEnabled(int param)
 {
-    DisplayContext* obj = (DisplayContext*)GetDisplay();
+    Display* obj = GetDisplay();
     obj->cursorOverlayEnabled = param;
 }
 
@@ -222,14 +211,11 @@ void __stdcall GetCursorPosition(int* x, int* y)
 // FUNCTION: 0x4c2340
 void __stdcall GetCurrentMouseEvent(MouseEvent* event)
 {
-    int ptr = (int)GetDisplay();
-    memcpy(event, (void*)(ptr + 0x196), 6 * 4);
+    *event = GetDisplay()->mouseEvent;
 }
 
 // FUNCTION: 0x4c2360
 void __stdcall SetCurrentMouseEvent(MouseEvent* event)
 {
-    int eax = (int)GetDisplay();
-    int edi = eax + 0x196;
-    memcpy((void*)edi, event, 24);
+    GetDisplay()->mouseEvent = *event;
 }

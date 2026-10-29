@@ -41,6 +41,7 @@ const unsigned kHandleCapacity = 32;
 void* s_handles[kHandleCapacity];
 unsigned s_handleCount;
 int s_slotDepth;
+unsigned s_slotOwner;
 
 unsigned HandleOf(void* native)
 {
@@ -426,9 +427,14 @@ void FuelBegin()
 void Call(Slot slot, wasmtime_val_raw_t* a, size_t count)
 {
     unsigned long long start = s_timing ? host_time_counter() : 0;
+    unsigned thread = host_thread_id();
+    if (s_slotDepth != 0 && thread != s_slotOwner)
+        Stop(slot, "called from a second thread while another thread's call is active");
     Prepare(slot);
-    if (s_slotDepth == 0)
+    if (s_slotDepth == 0) {
+        s_slotOwner = thread;
         FuelBegin();
+    }
     s_slotDepth++;
     unsigned long long callStart = s_timing ? host_time_counter() : 0;
     wl_call(s_loader, s_module, &s_slots[slot], a, count);

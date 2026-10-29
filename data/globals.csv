@@ -659,7 +659,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x520080,DAT_00520080,.bss,3937,gap,unreferenced,unsigned char[3937],0,0,0,,0,,,,in g_lzssPresetWindow+0xb0,
 0x520fe1,DAT_00520fe1,.bss,7,gap,unreferenced,unsigned char[7],0,0,0,,0,,,,,
 0x520fe8,g_lzssPresetTree,.bss,24584,gap,data,char[],1,0,1,one type,1,,s__00520fe8,,,
-0x526ff0,g_squashDictTree,.bss,4,type,data,Struct_00526ff0*,1,1,2,conflicting: struct names only,2,,DAT_00526ff0,,,
+0x526ff0,g_squashDictTree,.bss,4,type,data,LzssTreeNode*,2,0,1,one type,2,,DAT_00526ff0,,,
 0x526ff4,g_squashWindow,.bss,4,type,data,void*,1,1,2,conflicting: shape,2,,DAT_00526ff4,,,
 0x526ff8,g_lzssPresetReady,.bss,4,type,data,int,1,0,1,one type,1,,INT_00526ff8,,,
 0x526ffc,g_lzssUsePreset,.bss,4,type>gap,data,int,1,0,1,one type,1,,INT_00526ffc,,,

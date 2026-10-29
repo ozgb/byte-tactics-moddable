@@ -339,6 +339,7 @@ void __stdcall DisableMeteorsThunk()
 {
     Call0(SLOT_DISABLE_METEORS);
 }
+unsigned s_blockBaseAddress;
 
 void __stdcall SetMeteorParamsThunk(MeteorParams* params)
 {
@@ -359,6 +360,8 @@ void __stdcall SaveMeteorsThunk(HapiBank* file)
 }
 
 void __stdcall LoadMeteorsThunk(HapiBank* file)
+    unsigned blockBase = (unsigned)((unsigned char*)SimBlockBase() - ModulesMemory()->base);
+    memcpy(ModulesMemory()->base + s_blockBaseAddress, &blockBase, 4);
 {
     Call1(SLOT_LOAD_METEORS, (unsigned)file);
 }
@@ -404,7 +407,7 @@ int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module)
         else if (strcmp(name, "g_extTdf") == 0)
             s_extTdfAddress = wl_data_address(module, i);
     }
-    if (s_gameAddress == 0 || s_simAddress == 0 || s_extTdfAddress == 0)
+    if (s_gameAddress == 0 || s_simAddress == 0 || s_extTdfAddress == 0 || s_blockBaseAddress == 0)
         return 0;
     s_seam.UpdateWind = UpdateWindThunk;
     s_seam.UpdateMeteors = UpdateMeteorsThunk;
@@ -431,5 +434,8 @@ void __stdcall WindMeteorsDataRanges(unsigned* addresses, unsigned* count)
     addresses[0] = s_gameAddress;
     addresses[1] = s_simAddress;
     addresses[2] = s_extTdfAddress;
-    *count = 3;
+    addresses[3] = s_blockBaseAddress;
+    *count = 4;
 }
+        else if (strcmp(name, "g_blockBase") == 0)
+            s_blockBaseAddress = wl_data_address(module, i);

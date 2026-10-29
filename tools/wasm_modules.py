@@ -29,13 +29,15 @@ leave the module's table range.
 imports reads each built module's import and export sections with the pinned wasm-tools (found in
 build/tools/bin, install it with `cargo install wasm-tools --version <pin> --locked --root
 build/tools`, or on PATH). A game-logic module may import only env.memory, env.__indirect_function_table,
-the imported globals (env.__sim_base, the block base the loader sets), the interface imports and engine services its manifest lists, and no WASI, clock, random, file or
-network import; it must export exactly the manifest's slots and the data the loader fills.
+the interface imports and engine services its manifest lists, and no global, WASI, clock, random, file or
+network import; it must export exactly the manifest's slots and the data the loader fills. The manifest records each import's
+parameter and result kinds (int, f64, void, linear, block, scratch, handle) and each slot's parameter kinds; imports checks them
+against the wasm signatures: the same count, f64 only where the wasm type is f64, and no other kind where it is.
 
 statics runs wind_meteors under the pinned wasmtime package with the manifest's block layout: a memory of
-memory_pages pages, __sim_base set to block_base, a Game and a SimGlobals zeroed in the block (with the
-size, wind and meteor fields set so showers start within the run), the module's g_game, g_simGlobals and
-g_extTdf written through its exports, and stubs for every import (GameRand and RandomInt from an LCG,
+memory_pages pages, a Game and a SimGlobals zeroed in the block (with the
+size, wind and meteor fields set so showers start within the run), the module's g_game, g_simGlobals,
+g_extTdf and g_blockBase (block_base) written through its exports, and stubs for every import (GameRand and RandomInt from an LCG,
 SpawnProjectile counting its calls, FindWeaponByName returning the first weapon of the Game, FatalError
 raising). It calls InitMeteors, EnableMeteors and SetMeteorParams, then 2000 ticks of UpdateWind and
 UpdateMeteors with Game::ticks incremented, and hashes the module's statics (its data and bss, from
@@ -66,10 +68,11 @@ LAYOUT_TYPES = {"Game", "WeaponDef", "Point16", "Vec3", "TdfFile", "TdfRecord", 
 CXX_FLAGS = [
     "--target=wasm32", "-O2", "-std=gnu++14", "-w", "-fms-compatibility", "-fms-extensions", "-fms-compatibility-version=11.00",
     "-mms-bitfields", "-fshort-wchar", "-fno-strict-aliasing", "-fwrapv", "-fno-delete-null-pointer-checks", "-ffp-contract=off",
-    "-mno-nontrapping-fptoint", "-fno-rtti", "-fno-exceptions", "-ffunction-sections", "-fdata-sections", "-nostdinc", "-nostdinc++",
+    "-fno-rtti", "-fno-exceptions", "-ffunction-sections", "-fdata-sections", "-nostdinc", "-nostdinc++",
 ]
-C_FLAGS = ["--target=wasm32", "-O2", "-w", "-ffreestanding", "-fno-builtin", "-ffp-contract=off", "-mno-nontrapping-fptoint", "-fwrapv", "-fno-strict-aliasing",
+C_FLAGS = ["--target=wasm32", "-O2", "-w", "-ffreestanding", "-fno-builtin", "-ffp-contract=off", "-fwrapv", "-fno-strict-aliasing",
            "-ffunction-sections", "-fdata-sections", "-nostdinc"]
+KINDS = {"int", "f64", "linear", "block", "scratch", "handle"}
 GUARD = "WASM_MODULES_UNDER_WASMTIME"
 
 
@@ -293,6 +296,9 @@ def check_layout(pins, ranges):
     for name, low, high in named:
         if high > base:
             problems.append(f"{name}: {low:#x}..{high:#x} reaches the block base {base:#x}")
+    for name, low, high in ranges:
+        if high > scratch_low:
+            problems.append(f"{name}: {low:#x}..{high:#x} reaches the scratch base {scratch_low:#x}")
     for index, (name, low, high) in enumerate(named):
         for other_name, other_low, other_high in named[index + 1:]:
             if low < other_high and other_low < high:
@@ -338,16 +344,17 @@ def build_game_module(entry, pins):
     generator = os.path.join(ROOT, "tools", "bitexact_tables.py")
     if not os.path.exists(tables) or os.path.getmtime(tables) < os.path.getmtime(generator):
         run([sys.executable, generator, tables])
+    build_flags = pins["build_flags"]
     jobs = []
     includes = [f"-I{os.path.join(ROOT, d)}" for d in ("wasm/include", "include", ".")] + [f"-I{out}"]
     for index, source in enumerate(entry["cxx"]):
         obj = os.path.join(out, f"{index}_{os.path.basename(source)}.o")
-        jobs.append((["clang++", *CXX_FLAGS, *includes, "-c", os.path.join(ROOT, source), "-o", obj], obj))
+        jobs.append((["clang++", *CXX_FLAGS, *build_flags, *includes, "-c", os.path.join(ROOT, source), "-o", obj], obj))
     c_includes = [f"-I{os.path.join(ROOT, d)}" for d in ("wasm/include", "lib/bitexact")]
     for index, source in enumerate(entry["c"] + [tables]):
         path = source if os.path.isabs(source) else os.path.join(ROOT, source)
         obj = os.path.join(out, f"c{index}_{os.path.basename(source)}.o")
-        jobs.append((["clang", *C_FLAGS, *c_includes, "-c", path, "-o", obj], obj))
+        jobs.append((["clang", *C_FLAGS, *build_flags, *c_includes, "-c", path, "-o", obj], obj))
     with concurrent.futures.ThreadPoolExecutor() as pool:
         list(pool.map(lambda job: run(job[0]), jobs))
     target = os.path.join(OUT, entry["name"] + ".wasm")
@@ -377,11 +384,50 @@ def check_tools_game(pins):
             sys.exit(f"{name} is {found}, wasm/modules.json pins {pins['tools']['clang']}")
 
 
-def check_interface(name, imports, exports, spec):
-    """Reasons a module's imports or exports are outside its allowlist; imports and exports are lists of names (module, name) and name."""
+def check_kinds(name, spec, details):
+    """Reasons the manifest's kinds for the imports and slots disagree with the wasm signatures in details."""
+    problems = []
+
+    def compare(label, entry, signature):
+        if not (isinstance(entry, list) and len(entry) == 2 and isinstance(entry[0], list)):
+            return [f"{name}: {label}: the manifest entry is not [[parameter kinds], result kind]"]
+        params, result = entry
+        wasm_params, wasm_result = signature
+        found = []
+        if len(params) != len(wasm_params):
+            found.append(f"{name}: {label}: the manifest has {len(params)} parameters, the wasm signature {len(wasm_params)}")
+        else:
+            for index, (kind, wasm) in enumerate(zip(params, wasm_params)):
+                if kind not in KINDS or (kind == "f64") != (wasm == "f64"):
+                    found.append(f"{name}: {label}: parameter {index} is {kind!r} in the manifest and {wasm} in wasm")
+        if result == "void":
+            if wasm_result != "void":
+                found.append(f"{name}: {label}: the manifest result is void, the wasm result {wasm_result}")
+        elif result not in KINDS or (result == "f64") != (wasm_result == "f64") or wasm_result == "void":
+            found.append(f"{name}: {label}: the result is {result!r} in the manifest and {wasm_result} in wasm")
+        return found
+
+    for module, entries in spec.get("imports", {}).items():
+        for field, entry in entries.items():
+            if (module, field) in details["imports"]:
+                problems += compare(f"{module}.{field}", entry, details["imports"][(module, field)])
+    if "slots" not in spec:
+        return problems
+    slots = spec["slots"]
+    for slot in sorted(set(details["exports"]) ^ set(slots)):
+        problems.append(f"{name}: slot {slot} is in only one of the manifest's slots and the module's function exports")
+    for slot, entry in slots.items():
+        if slot in details["exports"]:
+            problems += compare(f"slot {slot}", entry, details["exports"][slot])
+    return problems
+
+
+def check_interface(name, imports, exports, spec, details=None):
+    """Reasons a module's imports or exports are outside its allowlist; imports and exports are lists of names (module, name) and name.
+
+    details, from module_interface, adds the checks of imported globals and of the manifest's argument kinds."""
     problems = []
     allowed = set(ENV_IMPORTS)
-    allowed |= {("env", n) for n in spec.get("globals", [])}
     for module, names in spec.get("imports", {}).items():
         if module.startswith("wasi") or module == "env":
             problems.append(f"{name}: the manifest lists imports from {module}")
@@ -396,20 +442,40 @@ def check_interface(name, imports, exports, spec):
     if sorted(exports) != sorted(spec["exports"]):
         extra, missing = sorted(set(exports) - set(spec["exports"])), sorted(set(spec["exports"]) - set(exports))
         problems.append(f"{name}: exports differ from the manifest: extra {extra}, missing {missing}")
+    if details is not None:
+        for module, field in details["globals"]:
+            problems.append(f"{name}: imports the global {module}.{field}: a module reads its block base from g_blockBase")
+        problems += check_kinds(name, spec, details)
     return problems
+
+
+def signature_of(text):
+    """The (parameter types, result type or "void") of a wasm-tools signature text."""
+    params = [t for group in re.findall(r"\(param ([^)]*)\)", text) for t in group.split()]
+    results = [t for group in re.findall(r"\(result ([^)]*)\)", text) for t in group.split()]
+    return params, results[0] if results else "void"
 
 
 def module_interface(wasm_tools, path):
     text = subprocess.run([wasm_tools, "print", path], capture_output=True, text=True, check=True).stdout
     imports = re.findall(r'^\s*\(import "([^"]*)" "([^"]*)"', text, re.M)
     exports = re.findall(r'^\s*\(export "([^"]*)"', text, re.M)
-    return imports, exports
+    types = {int(n): body for n, body in re.findall(r"^\s*\(type \(;(\d+);\) \(func([^\n]*)\)\)$", text, re.M)}
+    details = {"globals": re.findall(r'^\s*\(import "([^"]*)" "([^"]*)" \(global', text, re.M), "imports": {}, "exports": {}}
+    for module, field, body in re.findall(r'^\s*\(import "([^"]*)" "([^"]*)" \(func (.*)\)\)$', text, re.M):
+        details["imports"][(module, field)] = signature_of(body)
+    funcs = {}
+    for label, typeno, rest in re.findall(r"^\s*\(func (\$\S+) \(;\d+;\) \(type (\d+)\)([^\n]*)$", text, re.M):
+        funcs[label] = signature_of(types[int(typeno)])
+    for field, label in re.findall(r'^\s*\(export "([^"]*)" \(func (\$\S+)\)\)', text, re.M):
+        details["exports"][field] = funcs[label]
+    return imports, exports, details
 
 
 def run_imports():
     game = game_manifest()
     wasm_tools = find_wasm_tools(game["tools"]["wasm-tools"])
-    specs = {m["name"]: {"imports": m["imports"], "exports": m["exports"] + m["data"], "globals": m.get("globals", [])} for m in game["modules"]}
+    specs = {m["name"]: {"imports": m["imports"], "exports": m["exports"] + m["data"], "slots": m["slots"]} for m in game["modules"]}
     for entry in manifest()["modules"]:
         specs[entry["name"]] = {"imports": {}, "exports": FIXTURE_EXPORTS}
     failures = []
@@ -417,8 +483,8 @@ def run_imports():
         path = os.path.join(OUT, name + ".wasm")
         if not os.path.exists(path):
             sys.exit(f"{path} is missing: build first: uv run tools/wasm_modules.py build")
-        imports, exports = module_interface(wasm_tools, path)
-        problems = check_interface(name, imports, exports, spec)
+        imports, exports, details = module_interface(wasm_tools, path)
+        problems = check_interface(name, imports, exports, spec, details)
         failures += problems
         print(f"{name}: {len(imports)} imports, {len(exports)} exports" + (": FAIL" if problems else ""))
     for failure in failures:
@@ -454,6 +520,13 @@ def run_check():
         if imports != ["env.__indirect_function_table", "env.memory"]:
             failures.append(f"{name}: imports are {imports}")
         instances[name] = linker.instantiate(store, module)
+
+    for entry in game_manifest()["modules"]:
+        path = os.path.join(OUT, entry["name"] + ".wasm")
+        if os.path.exists(path):
+            for imp in wasmtime.Module.from_file(store.engine, path).imports:
+                if isinstance(imp.type, wasmtime.GlobalType):
+                    failures.append(f"{entry['name']}: imports the global {imp.module}.{imp.name}")
 
     for entry in pins["modules"]:
         name = entry["name"]
@@ -564,8 +637,6 @@ def statics_run():
     linker = wasmtime.Linker(store.engine)
     linker.define(store, "env", "memory", memory)
     linker.define(store, "env", "__indirect_function_table", table)
-    linker.define(store, "env", "__sim_base", wasmtime.Global(store, wasmtime.GlobalType(wasmtime.ValType.i32(), False),
-                                                              wasmtime.Val.i32(base)))
     for imp in module.imports:
         if isinstance(imp.type, wasmtime.FuncType):
             key = (imp.module, imp.name)
@@ -582,6 +653,7 @@ def statics_run():
     put(exports["g_game"].value(store), game_at)
     put(exports["g_simGlobals"].value(store), sim_at)
     memory.write(store, b"tdf\0", exports["g_extTdf"].value(store))
+    put(exports["g_blockBase"].value(store), base)
     put(game_at + off[("Game", "width")], 4096)
     put(game_at + off[("Game", "height")], 4096)
     put(game_at + off[("Game", "windSpeedMin")], 0)

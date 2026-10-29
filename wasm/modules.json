@@ -1,5 +1,6 @@
 {
   "tools": {"clang": "22.1.8", "wasm-tools": "1.262.0"},
+  "build_flags": ["-mno-nontrapping-fptoint"],
   "block_base": 1048576,
   "block_size": 33554432,
   "scratch": [983040, 65536],
@@ -17,15 +18,43 @@
       "c": ["wasm/crt/string.c", "lib/bitexact/trig.c"],
       "exports": ["UpdateWind", "UpdateMeteors", "InitMeteors", "EmptyShutdownPreCleanup", "EnableMeteors", "DisableMeteors",
                   "SetMeteorParams", "LoadMeteorDefaults", "SaveMeteors", "LoadMeteors", "CmdMeteor", "UpdateWindOnStream"],
-      "data": ["g_game", "g_simGlobals", "g_extTdf"],
-      "globals": ["__sim_base"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "slots": {
+        "UpdateWind": [[], "void"],
+        "UpdateMeteors": [[], "void"],
+        "InitMeteors": [[], "void"],
+        "EmptyShutdownPreCleanup": [[], "void"],
+        "EnableMeteors": [[], "void"],
+        "DisableMeteors": [[], "void"],
+        "SetMeteorParams": [["linear"], "void"],
+        "LoadMeteorDefaults": [["linear"], "void"],
+        "SaveMeteors": [["handle"], "void"],
+        "LoadMeteors": [["handle"], "void"],
+        "CmdMeteor": [["scratch"], "void"],
+        "UpdateWindOnStream": [["int"], "void"]
+      },
       "imports": {
-        "weapons": ["SpawnProjectile", "FindWeaponByName"],
-        "services": ["GameRand", "RandomInt", "FatalError", "BuildDataPath",
-                     "TdfFile_Construct", "TdfFile_Destruct", "TdfFile_LoadFile", "TdfFile_SelectRecord",
-                     "TdfRecord_GetFieldInt", "TdfRecord_GetFieldDouble", "TdfRecord_GetFieldString",
-                     "CommandArgs_GetIntArg",
-                     "HapiBank_OpenAccount", "HapiBank_SetIntegerItem", "HapiBank_GetIntegerItem"]
+        "weapons": {
+          "SpawnProjectile": [["block", "linear", "linear", "int"], "int"],
+          "FindWeaponByName": [["linear"], "block"]
+        },
+        "services": {
+          "GameRand": [["int"], "int"],
+          "RandomInt": [["int"], "int"],
+          "FatalError": [["linear"], "void"],
+          "BuildDataPath": [["linear", "linear", "linear", "linear"], "linear"],
+          "TdfFile_Construct": [["linear"], "void"],
+          "TdfFile_Destruct": [["linear"], "void"],
+          "TdfFile_LoadFile": [["linear", "linear"], "int"],
+          "TdfFile_SelectRecord": [["linear", "linear"], "int"],
+          "TdfRecord_GetFieldInt": [["handle", "linear", "int"], "int"],
+          "TdfRecord_GetFieldDouble": [["handle", "linear", "f64"], "f64"],
+          "TdfRecord_GetFieldString": [["handle", "linear", "linear", "int", "linear"], "int"],
+          "CommandArgs_GetIntArg": [["scratch", "int", "int"], "int"],
+          "HapiBank_OpenAccount": [["handle", "linear"], "int"],
+          "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
+          "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"]
+        }
       }
     }
   ]

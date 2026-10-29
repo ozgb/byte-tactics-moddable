@@ -27,9 +27,7 @@
     X(wasm_valtype_vec_new_uninitialized)                 \
     X(wasm_functype_new)                                  \
     X(wasm_functype_delete)                               \
-    X(wasm_globaltype_new)                                \
     X(wasm_tabletype_new)                                 \
-    X(wasmtime_global_new)                                \
     X(wasmtime_global_get)                                \
     X(wasmtime_table_new)                                 \
     X(wasmtime_table_get)                                 \
@@ -305,9 +303,8 @@ static int check_layout(wl_loader* loader)
             set_error(loader, "module %s: window [%#lx, %#lx) reaches the block at %#x", an, a_low, a_high, l->block_base);
             return 0;
         }
-        if (l->scratch_size && a_low < (unsigned long)l->scratch_base + l->scratch_size && l->scratch_base < a_high) {
-            set_error(loader, "module %s: window [%#lx, %#lx) overlaps the scratch area [%#x, %#x)",
-                      an, a_low, a_high, l->scratch_base, l->scratch_base + l->scratch_size);
+        if (l->scratch_size && a_high > l->scratch_base) {
+            set_error(loader, "module %s: window [%#lx, %#lx) reaches the scratch area at %#x", an, a_low, a_high, l->scratch_base);
             return 0;
         }
         for (b = a->next; b; b = b->next) {
@@ -528,25 +525,6 @@ int wl_create_memory(wl_loader* loader)
     error = api->wasmtime_linker_define(loader->linker, loader->context, "env", 3, "__indirect_function_table", 25, &item);
     if (error) {
         return fail_wasmtime(loader, "defining the table", error, NULL);
-    }
-    if (layout->has_block) {
-        wasm_globaltype_t* global_type = api->wasm_globaltype_new(api->wasm_valtype_new(WASM_I32), WASM_CONST);
-        wasmtime_val_t value;
-        wasmtime_global_t global;
-        memset(&value, 0, sizeof value);
-        value.kind = WASMTIME_I32;
-        value.of.i32 = (int32_t)layout->block_base;
-        error = api->wasmtime_global_new(loader->context, global_type, &value, &global);
-        if (error) {
-            return fail_wasmtime(loader, "creating env.__sim_base", error, NULL);
-        }
-        memset(&item, 0, sizeof item);
-        item.kind = WASMTIME_EXTERN_GLOBAL;
-        item.of.global = global;
-        error = api->wasmtime_linker_define(loader->linker, loader->context, "env", 3, "__sim_base", 10, &item);
-        if (error) {
-            return fail_wasmtime(loader, "defining env.__sim_base", error, NULL);
-        }
     }
     loader->has_memory = 1;
     return 1;

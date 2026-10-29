@@ -13,6 +13,17 @@ SPEC = {
 }
 GOOD_IMPORTS = [("env", "memory"), ("env", "__indirect_function_table"), ("weapons", "SpawnProjectile"), ("services", "RandomInt")]
 GOOD_EXPORTS = ["UpdateWind", "g_game"]
+SPEC_KINDS = {
+    "imports": {"weapons": {"SpawnProjectile": [["block", "linear"], "int"]}, "services": {"Scale": [["handle", "f64"], "f64"]}},
+    "exports": ["UpdateWind", "g_game"],
+    "slots": {"UpdateWind": [["int"], "void"]},
+}
+KIND_IMPORTS = [("env", "memory"), ("env", "__indirect_function_table"), ("weapons", "SpawnProjectile"), ("services", "Scale")]
+DETAILS = {
+    "globals": [],
+    "imports": {("weapons", "SpawnProjectile"): (["i32", "i32"], "i32"), ("services", "Scale"): (["i32", "f64"], "f64")},
+    "exports": {"UpdateWind": (["i32"], "void")},
+}
 PINS = {"window": 65536, "memory_pages": 4, "table_slots": 32, "table_size": 80}
 ENTRY = {"name": "m", "data_base": 196608, "table_base": 48}
 
@@ -67,12 +78,12 @@ class InterfaceTests(unittest.TestCase):
         imports = [("env", "memory"), ("env", "__indirect_function_table"), ("wasi_snapshot_preview1", "clock_time_get")]
         self.assertTrue(wm.check_interface("m", imports, GOOD_EXPORTS, spec))
 
-    def test_listed_global_passes_and_unlisted_global_fails(self):
-        spec = dict(SPEC, globals=["__sim_base"])
-        imports = GOOD_IMPORTS + [("env", "__sim_base")]
-        self.assertEqual(wm.check_interface("m", imports, GOOD_EXPORTS, spec), [])
-        self.assertTrue(wm.check_interface("m", imports, GOOD_EXPORTS, SPEC))
-        self.assertTrue(wm.check_interface("m", GOOD_IMPORTS, GOOD_EXPORTS, spec))
+    def test_any_imported_global_fails(self):
+        imports = KIND_IMPORTS + [("env", "__sim_base")]
+        details = dict(DETAILS, globals=[("env", "__sim_base")])
+        problems = wm.check_interface("m", imports, GOOD_EXPORTS, SPEC_KINDS, details)
+        self.assertTrue(any("imports the global env.__sim_base" in p for p in problems))
+        self.assertEqual(wm.check_interface("m", KIND_IMPORTS, GOOD_EXPORTS, SPEC_KINDS, DETAILS), [])
 
     def test_unlisted_import_fails(self):
         problems = wm.check_interface("m", GOOD_IMPORTS + [("services", "ClockNow")], GOOD_EXPORTS, SPEC)
@@ -88,6 +99,55 @@ class InterfaceTests(unittest.TestCase):
     def test_extra_and_missing_exports_fail(self):
         self.assertTrue(wm.check_interface("m", GOOD_IMPORTS, GOOD_EXPORTS + ["memory"], SPEC))
         self.assertTrue(wm.check_interface("m", GOOD_IMPORTS, ["UpdateWind"], SPEC))
+
+
+class KindTests(unittest.TestCase):
+    def problems(self, spec=SPEC_KINDS, details=DETAILS):
+        return wm.check_interface("m", KIND_IMPORTS, GOOD_EXPORTS, spec, details)
+
+    def test_matching_kinds_pass(self):
+        self.assertEqual(self.problems(), [])
+
+    def test_wrong_parameter_count_fails(self):
+        spec = dict(SPEC_KINDS, imports={"weapons": {"SpawnProjectile": [["block"], "int"]}, "services": SPEC_KINDS["imports"]["services"]})
+        self.assertTrue(any("1 parameters, the wasm signature 2" in p for p in self.problems(spec)))
+
+    def test_f64_must_match_the_wasm_type(self):
+        spec = dict(SPEC_KINDS, imports={"weapons": SPEC_KINDS["imports"]["weapons"], "services": {"Scale": [["handle", "int"], "f64"]}})
+        self.assertTrue(any("parameter 1 is 'int' in the manifest and f64" in p for p in self.problems(spec)))
+        spec = dict(SPEC_KINDS, imports={"weapons": {"SpawnProjectile": [["f64", "linear"], "int"]}, "services": SPEC_KINDS["imports"]["services"]})
+        self.assertTrue(self.problems(spec))
+
+    def test_result_kind_must_match(self):
+        spec = dict(SPEC_KINDS, imports={"weapons": {"SpawnProjectile": [["block", "linear"], "void"]}, "services": SPEC_KINDS["imports"]["services"]})
+        self.assertTrue(any("result is void" in p for p in self.problems(spec)))
+        spec = dict(SPEC_KINDS, imports={"weapons": SPEC_KINDS["imports"]["weapons"], "services": {"Scale": [["handle", "f64"], "int"]}})
+        self.assertTrue(self.problems(spec))
+
+    def test_unknown_kind_fails(self):
+        spec = dict(SPEC_KINDS, imports={"weapons": {"SpawnProjectile": [["pointer", "linear"], "int"]}, "services": SPEC_KINDS["imports"]["services"]})
+        self.assertTrue(self.problems(spec))
+
+    def test_slot_kinds_are_checked(self):
+        spec = dict(SPEC_KINDS, slots={"UpdateWind": [[], "void"]})
+        self.assertTrue(any("slot UpdateWind" in p for p in self.problems(spec)))
+        spec = dict(SPEC_KINDS, slots={})
+        self.assertTrue(any("only one of" in p for p in self.problems(spec)))
+
+    def test_the_game_manifest_kinds_are_well_formed(self):
+        game = wm.game_manifest()
+        for entry in game["modules"]:
+            self.assertEqual(sorted(entry["slots"]), sorted(entry["exports"]))
+            for entries in entry["imports"].values():
+                for params, result in entries.values():
+                    self.assertTrue(set(params) <= wm.KINDS)
+                    self.assertTrue(result == "void" or result in wm.KINDS)
+
+
+class BuildFlagTests(unittest.TestCase):
+    def test_the_manifest_carries_the_float_conversion_flag(self):
+        self.assertIn("-mno-nontrapping-fptoint", wm.game_manifest()["build_flags"])
+        self.assertNotIn("-mno-nontrapping-fptoint", wm.CXX_FLAGS + wm.C_FLAGS)
 
 
 class WindowTests(unittest.TestCase):
@@ -150,8 +210,15 @@ class LayoutTests(unittest.TestCase):
 
     def test_module_overlapping_the_scratch_fails(self):
         problems = wm.check_layout(self.PINS, self.RANGES + [("c", 983040, 990000)])
-        self.assertEqual(len(problems), 1)
-        self.assertIn("scratch", problems[0])
+        self.assertTrue(any("overlaps scratch" in p for p in problems))
+
+    def test_module_reaching_the_scratch_base_fails(self):
+        problems = wm.check_layout(self.PINS, self.RANGES + [("c", 900000, 983041)])
+        self.assertTrue(any("c: " in p and "reaches the scratch base 0xf0000" in p for p in problems))
+
+    def test_module_above_the_scratch_fails(self):
+        problems = wm.check_layout(self.PINS, self.RANGES + [("c", 1000000, 1040000)])
+        self.assertTrue(any("reaches the scratch base" in p for p in problems))
 
     def test_module_reaching_the_block_fails(self):
         problems = wm.check_layout(self.PINS, self.RANGES + [("c", 1040000, 1048577)])

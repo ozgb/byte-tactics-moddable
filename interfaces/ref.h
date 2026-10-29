@@ -4,7 +4,7 @@
 // Major version of the Ref interface, changed when the stored representation changes.
 #define REF_VERSION_MAJOR 2
 // Minor version of the Ref interface, changed when a member is added.
-#define REF_VERSION_MINOR 0
+#define REF_VERSION_MINOR 1
 
 #if !defined(__wasm32__)
 #include "host.h"
@@ -35,17 +35,11 @@ inline void RefOutsideBlock(const char* signature)
 #define REF_SIGNATURE "Ref<T>"
 #endif
 #else
-// The block base, an address in the module's memory: the immutable i32 global env.__sim_base the loader sets.
+// The block base, an address in the module's memory: the word the module exports as g_blockBase, which the loader sets.
+extern unsigned int g_blockBase;
 static inline unsigned int RefSimBase()
 {
-    unsigned int base;
-    __asm__(".globaltype __sim_base, i32, immutable\n"
-            ".import_module __sim_base, env\n"
-            ".import_name __sim_base, __sim_base\n"
-            "global.get __sim_base\n"
-            "local.set %0"
-            : "=r"(base));
-    return base;
+    return g_blockBase;
 }
 #endif
 

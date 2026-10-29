@@ -280,7 +280,7 @@ void __stdcall ModulesCheckStatics(unsigned tick)
 {
     if (!s_wasm)
         return;
-    unsigned skip[3];
+    unsigned skip[4];
     unsigned skipCount;
     WindMeteorsDataRanges(skip, &skipCount);
     unsigned lo = 0x84222325;

@@ -85,7 +85,7 @@ struct Gadget {
                 unsigned char flags;
                 struct {
                     unsigned char clickable : 1;
-                    unsigned char unknown_c8_1 : 7;
+                    unsigned char : 7;
                 };
             };
         } hotspot;

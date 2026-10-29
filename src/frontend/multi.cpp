@@ -3996,7 +3996,7 @@ void OpenUnitRestrictions()
 
     layer = LoadGuiLayer(&g_game->gui, "RESTRICT2.GUI", 0x880);
     layer->handler = (void (__stdcall*)(void*))HandleRestrictionsClick;
-    layer->data = 0;
+    layer->data = nullptr;
     layer->cb1c = UnitRestrictDialogFrame;
     g_unitRestrictPicLoadIndex = 0;
     LoadPictureCached("UnitRestrict5x", 0, 0, 0);

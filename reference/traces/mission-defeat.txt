@@ -1,6 +1,6 @@
 bt-digest 3
 trace_format bt-trace 3
-commit d829c2444d59cbb71b647e9d2d393718a3d82a34
+commit ae507bde7be3dd4fe5ca45c4b86f45ba7933ef4f
 scenario reference/scenarios/mission-defeat.txt
 game_seed 432
 crt_seed 1432

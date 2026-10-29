@@ -1,6 +1,6 @@
 bt-digest 3
 trace_format bt-trace 3
-commit 1bfa7b0df4534fdd53ffdf406885cec14b03be81
+commit ae507bde7be3dd4fe5ca45c4b86f45ba7933ef4f
 scenario reference/scenarios/load-midgame.txt
 game_seed 1
 crt_seed 1

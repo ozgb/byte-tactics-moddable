@@ -44,6 +44,13 @@ UpdateMeteors with Game::ticks incremented, and hashes the module's statics (its
 data_base to the low end of its stack, as linked) after setup and after every tick. A module that keeps
 state outside the block fails at the first tick whose hash differs. The field offsets come from
 src/state/layout_asserts.cpp (Game) and wasm/wind_meteors/layout_asserts.h (SimGlobals).
+
+Interface majors (#566). wasm/modules.json records the major of every interfaces/*.h that has version macros under
+"majors", and for each module the interface its slots belong to ("interface") and the major of each interface it
+exports slots for or imports from, the one it was built against ("majors"). The import groups of a module are
+header stems (weapons, services). build writes all of it from the headers, because an in-repo module is built
+against the current headers; check fails when the top-level majors differ from the headers, when a module's
+majors name an interface it does not use, or are missing one it does, or are ahead of the headers.
 """
 
 import argparse
@@ -73,6 +80,11 @@ CXX_FLAGS = [
 C_FLAGS = ["--target=wasm32", "-O2", "-w", "-ffreestanding", "-fno-builtin", "-ffp-contract=off", "-fwrapv", "-fno-strict-aliasing",
            "-ffunction-sections", "-fdata-sections", "-nostdinc"]
 KINDS = {"int", "f64", "linear", "block", "scratch", "handle"}
+INTERFACES = os.path.join(ROOT, "interfaces")
+MAJOR_MACRO = re.compile(r"^\s*#\s*define\s+(\w+)_VERSION_MAJOR\s+(\d+)", re.M)
+EXPANDED = {(), ("modules",), ("modules", "*"), ("modules", "*", "slots"), ("modules", "*", "imports"), ("modules", "*", "imports", "*"),
+            ("modules", "*", "majors"), ("majors",)}
+WRAP = 132
 GUARD = "WASM_MODULES_UNDER_WASMTIME"
 
 
@@ -141,11 +153,122 @@ def build():
     check_tools_game(game)
     for entry in game["modules"]:
         build_game_module(entry, game)
+    write_game_manifest(with_majors(game, header_majors()))
 
 
 def game_manifest():
     with open(GAME_MODULES) as f:
         return json.load(f)
+
+
+def header_majors():
+    """{interface: major} of every interfaces/*.h that has version macros, the interface being the file stem."""
+    found = {}
+    for name in sorted(os.listdir(INTERFACES)):
+        if not name.endswith(".h"):
+            continue
+        stem = name[:-2]
+        with open(os.path.join(INTERFACES, name)) as f:
+            for prefix, major in MAJOR_MACRO.findall(f.read()):
+                if prefix != stem.upper():
+                    sys.exit(f"interfaces/{name}: the version macro prefix {prefix} is not {stem.upper()}")
+                found[stem] = int(major)
+    return found
+
+
+def module_interfaces(entry):
+    """The interfaces a game module uses: the one its slots belong to, then the import groups."""
+    return [entry["interface"], *entry["imports"]]
+
+
+def with_majors(game, majors):
+    """The manifest with its interface majors set from the headers: an in-repo module is built against them."""
+    out = {}
+    for key, value in game.items():
+        if key == "majors":
+            continue
+        if key == "modules":
+            out["majors"] = dict(majors)
+            value = [with_module_majors(entry, majors) for entry in value]
+        out[key] = value
+    return out
+
+
+def with_module_majors(entry, majors):
+    out = {}
+    for key, value in entry.items():
+        if key == "majors":
+            continue
+        out[key] = value
+        if key == "interface":
+            missing = [name for name in module_interfaces(entry) if name not in majors]
+            if missing:
+                sys.exit(f"{entry['name']}: no interfaces/<name>.h with version macros for {missing}")
+            out["majors"] = {name: majors[name] for name in module_interfaces(entry)}
+    return out
+
+
+def dump_manifest(value, path=(), indent=0, key=None):
+    """The manifest as text: the layout of wasm/modules.json, one key per line down to the slots and imports, lists inline and wrapped."""
+    generic = tuple("*" if (i == 1 and path[0] == "modules") or (i == 3 and path[2:3] == ("imports",)) else part
+                    for i, part in enumerate(path))
+    pad = " " * (indent + 2)
+    if isinstance(value, dict) and generic in EXPANDED:
+        lines = [f'{pad}"{k}": {dump_manifest(v, path + (k,), indent + 2, k)}' for k, v in value.items()]
+        return "{\n" + ",\n".join(lines) + "\n" + " " * indent + "}"
+    if isinstance(value, dict):
+        return "{" + ", ".join(f'"{k}": {dump_manifest(v, path + (k,), indent, k)}' for k, v in value.items()) + "}"
+    if isinstance(value, list) and path == ("modules",):
+        return "[\n" + ",\n".join(pad + dump_manifest(v, path + (i,), indent + 2) for i, v in enumerate(value)) + "\n" + " " * indent + "]"
+    if isinstance(value, list):
+        items = [dump_manifest(v, path + (i,), indent) for i, v in enumerate(value)]
+        head = " " * indent + (f'"{key}": ' if key else "")
+        text = "[" + ", ".join(items) + "]"
+        if len(head) + len(text) <= WRAP or not all(i.startswith('"') for i in items):
+            return text
+        column = len(head) + 1
+        lines, current = [], ""
+        for item in items:
+            if current and column + len(current) + len(item) + 1 > WRAP:
+                lines.append(current.rstrip())
+                current = ""
+            current += item + ", "
+        lines.append(current[:-2])
+        return "[" + ("\n" + " " * column).join(lines) + "]"
+    return json.dumps(value)
+
+
+def manifest_text(game):
+    return dump_manifest(game) + "\n"
+
+
+def write_game_manifest(game):
+    """Write game to wasm/modules.json when its text differs from the file's."""
+    text = manifest_text(game)
+    with open(GAME_MODULES) as f:
+        if f.read() == text:
+            return
+    with open(GAME_MODULES, "w") as f:
+        f.write(text)
+    print(f"wrote {os.path.relpath(GAME_MODULES, ROOT)}")
+
+
+def check_majors(game, majors):
+    """Reasons the manifest's majors differ from the headers'."""
+    problems = []
+    if game.get("majors") != majors:
+        problems.append(f"majors differ from interfaces/*.h: {game.get('majors')} against {majors}: uv run tools/wasm_modules.py build")
+    for entry in game["modules"]:
+        name, built = entry["name"], entry.get("majors", {})
+        used = module_interfaces(entry) if "interface" in entry else []
+        for interface in used:
+            if interface not in built:
+                problems.append(f"{name}: no major for {interface}, an interface it uses")
+            elif interface in majors and built[interface] > majors[interface]:
+                problems.append(f"{name}: built against {interface} {built[interface]}, the headers have {majors[interface]}")
+        for interface in sorted(set(built) - set(used)):
+            problems.append(f"{name}: has a major for {interface}, which it neither exports slots for nor imports from")
+    return problems
 
 
 def find_wasm_tools(pin):
@@ -705,6 +828,11 @@ def run_under_wasmtime(command):
 
 
 def check():
+    problems = check_majors(game_manifest(), header_majors())
+    for problem in problems:
+        print("FAIL", problem)
+    if problems:
+        return 1
     try:
         import wasmtime
     except ImportError:

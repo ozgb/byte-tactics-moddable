@@ -9,9 +9,34 @@
   "stack_size": 4096,
   "window": 65536,
   "table_slots": 32,
+  "majors": {
+    "ai": 1,
+    "economy": 1,
+    "features": 2,
+    "files": 1,
+    "host": 2,
+    "los_radar": 1,
+    "map": 3,
+    "orders": 1,
+    "pathfinding": 1,
+    "players": 1,
+    "rand_stream": 1,
+    "ref": 2,
+    "services": 1,
+    "targeting": 1,
+    "units": 1,
+    "weapons": 1,
+    "wind_meteors": 1
+  },
   "modules": [
     {
       "name": "wind_meteors",
+      "interface": "wind_meteors",
+      "majors": {
+        "wind_meteors": 1,
+        "weapons": 1,
+        "services": 1
+      },
       "data_base": 196608,
       "table_base": 48,
       "cxx": ["wasm/wind_meteors/module.cpp", "src/map/meteors.cpp", "src/game/game_state.cpp", "src/game/console_commands.cpp"],

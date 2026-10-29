@@ -37,6 +37,12 @@ a struct (Game, SimGlobals) is mapped through its record layout to the field tha
 other holders have no struct, so their rows have a blank field and the first offset of the row. A field on
 this list needs no exceptions row.
 
+A block_pointers.csv row lists many offsets under one note. Its note is copied to an outside row only when it
+is about that row: it names no offset, or names an offset the row stands for (the row's own offset for a Game
+row, any offset of the block row for a SimGlobals or holder-only row, which stands for all of them). Otherwise
+the row keeps the note it has in data/outside_pointers.csv, matched by (struct, field, holder, offset), or
+gets an empty note, and --check fails on an empty note until someone writes one.
+
 Prints one line per problem and exits 1 if there are any.
 """
 
@@ -649,6 +655,15 @@ def expand_offsets(cell: str) -> list[tuple[str, int]]:
     return out
 
 
+HEX_PATTERN = re.compile(r"\b0x([0-9a-fA-F]+)\b")
+
+
+def note_about(note: str, offsets: list[int]) -> bool:
+    """Whether a block note is about a row: it names no offset, or names one of the row's offsets."""
+    named = {int(h, 16) for h in HEX_PATTERN.findall(note)}
+    return not named or bool(named & set(offsets))
+
+
 def outside_issue(note: str, struct: str, top: str, classes: dict[str, str]) -> str:
     if struct == GAME:
         return VIEW_ISSUE if classes.get(top, "") in ("view", "platform") else GAME_SIM_ISSUE
@@ -666,8 +681,11 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
         sys.exit("refcheck: %s has no outside rows for the Game holder %s: it was renamed, set HOLDERS in "
                  "tools/refcheck.py to its new name" % (BLOCK_POINTERS, HOLDERS[GAME]))
     rows: dict[tuple, dict] = {}
+    hand = {(r["struct"], r["field"], r["holder"], r["offset"]): r["note"] for r in read_csv(root / OUTSIDE)}
 
-    def add(struct, name, holder, token, words, issue, kind, note):
+    def add(struct, name, holder, token, words, issue, kind, note, offsets):
+        if not note_about(note, offsets):
+            note = hand.get((struct, name, holder, token), "")
         rows.setdefault((struct, name, holder if not struct else "", token if not struct else ""), {
             "struct": struct, "field": name, "holder": holder, "offset": token, "words": words, "issue": issue,
             "kind": kind, "note": note})
@@ -681,7 +699,8 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
             for token, base in tokens:
                 hit = locators[GAME].find(GAME, base)
                 if hit:
-                    add(hit[0], hit[1], holder, token, 1, outside_issue(note, GAME, hit[3], classes), hit[2], note)
+                    add(hit[0], hit[1], holder, token, 1, outside_issue(note, GAME, hit[3], classes), hit[2], note,
+                        [base])
         elif member and "SimGlobals" in locators and tokens:
             loc = locators["SimGlobals"]
             begin = loc.start("SimGlobals", member.group(1))
@@ -691,9 +710,10 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
                 hit = ("SimGlobals", member.group(1), kind, member.group(1)) if kind in KINDS else None
             if hit:
                 add(hit[0], hit[1], holder, tokens[0][0], len(tokens), outside_issue(note, "SimGlobals", "", classes),
-                    hit[2], note)
+                    hit[2], note, [b for _, b in tokens])
         elif tokens:
-            add("", "", holder, tokens[0][0], len(tokens), outside_issue(note, "", "", classes), "", note)
+            add("", "", holder, tokens[0][0], len(tokens), outside_issue(note, "", "", classes), "", note,
+                [b for _, b in tokens])
     return sorted(rows.values(), key=lambda r: (r["struct"], r["field"], r["holder"], r["offset"]))
 
 
@@ -782,6 +802,9 @@ def check(root: Path, result: Result, open_issues: bool = False, gh: str = "gh")
         elif r["file"] != "|".join(sorted(f.files)):
             problems.append("%s: stale row %s.%s: file is %s, expected %s, run `uv run tools/refcheck.py --write`" % (
                 EXCEPTIONS, key[0], key[1], r["file"], "|".join(sorted(f.files))))
+    for r in result.outside:
+        if not r["note"].strip():
+            problems.append("%s: %s has an empty note, write one" % (OUTSIDE, outside_label(r)))
     want = render(OUTSIDE_COLUMNS, result.outside)
     path = root / OUTSIDE
     have = path.read_text() if path.exists() else ""
@@ -796,6 +819,10 @@ def check(root: Path, result: Result, open_issues: bool = False, gh: str = "gh")
             if state != "OPEN":
                 problems.append("%s: issue %s is %s, not open" % (EXCEPTIONS, issue, state or "not readable"))
     return problems
+
+
+def outside_label(r: dict) -> str:
+    return "%s %s %s" % (".".join(x for x in (r["struct"], r["field"]) if x) or "-", r["holder"], r["offset"])
 
 
 def gh_issue_state(number: str, gh: str) -> str | None:

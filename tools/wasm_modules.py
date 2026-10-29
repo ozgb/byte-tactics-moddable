@@ -1,7 +1,8 @@
-"""Build and check the C and Rust wasm module fixtures of tests/wasm/modules.
+"""Build and check the wasm modules: the C and Rust fixtures of tests/wasm/modules and wind_meteors.
 
-    uv run tools/wasm_modules.py build     # build/wasm-modules/c.wasm and rust.wasm
-    uv run tools/wasm_modules.py check     # run both in one wasmtime memory and table
+    uv run tools/wasm_modules.py build     # build/wasm-modules/c.wasm, rust.wasm and wind_meteors.wasm
+    uv run tools/wasm_modules.py check     # run both fixtures in one wasmtime memory and table
+    uv run tools/wasm_modules.py imports   # check every built module's imports and exports
 
 Both fixtures use the fixed-base convention (#562): each imports env.memory and
 env.__indirect_function_table, is linked with its own --global-base and --table-base
@@ -15,18 +16,46 @@ calls it. It fails unless the slot sits at the module's table base, the module's
 lies in its own window from its data base, the call returns the manifest's value, and
 the data of both modules is unchanged after both ran. check runs under the pinned
 wasmtime package, which it fetches with uv. Standard library only apart from that.
+
+wind_meteors (wasm/modules.json) is the 3.1c wind and meteors source built the same way: clang
+--target=wasm32 over src/map/meteors.cpp, src/game/game_state.cpp and src/game/console_commands.cpp
+beside wasm/wind_meteors/module.cpp, linked with --gc-sections and no --allow-undefined, so only the
+module's functions stay and every import is one the module code declares. It compiles against the
+freestanding headers of wasm/include, not MSVC 5's. The build fails when the module's window (data,
+bss and stack, as linked) leaves its manifest window or meets a fixture's, or when its table entries
+leave the module's table range.
+
+imports reads each built module's import and export sections with the pinned wasm-tools (found in
+build/tools/bin, install it with `cargo install wasm-tools --version <pin> --locked --root
+build/tools`, or on PATH). A game-logic module may import only env.memory, env.__indirect_function_table,
+the interface imports and engine services its manifest lists, and no WASI, clock, random, file or
+network import; it must export exactly the manifest's slots and the data the loader fills.
 """
 
 import argparse
+import concurrent.futures
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES = os.path.join(ROOT, "tests", "wasm", "modules")
+GAME_MODULES = os.path.join(ROOT, "wasm", "modules.json")
 OUT = os.path.join(ROOT, "build", "wasm-modules")
+WASM_TOOLS = os.path.join(ROOT, "build", "tools", "bin", "wasm-tools")
+ENV_IMPORTS = {("env", "memory"), ("env", "__indirect_function_table")}
+FIXTURE_EXPORTS = ["module_data", "module_slot"]
+LAYOUT_TYPES = {"Game", "WeaponDef", "Point16", "Vec3", "TdfFile", "TdfRecord", "TdfField"}
+CXX_FLAGS = [
+    "--target=wasm32", "-O2", "-std=gnu++14", "-w", "-fms-compatibility", "-fms-extensions", "-fms-compatibility-version=11.00",
+    "-mms-bitfields", "-fshort-wchar", "-fno-strict-aliasing", "-fwrapv", "-fno-delete-null-pointer-checks", "-ffp-contract=off",
+    "-fno-rtti", "-fno-exceptions", "-ffunction-sections", "-fdata-sections", "-nostdinc", "-nostdinc++",
+]
+C_FLAGS = ["--target=wasm32", "-O2", "-w", "-ffreestanding", "-fno-builtin", "-ffp-contract=off", "-fwrapv", "-fno-strict-aliasing",
+           "-ffunction-sections", "-fdata-sections", "-nostdinc"]
 GUARD = "WASM_MODULES_UNDER_WASMTIME"
 
 
@@ -91,6 +120,276 @@ def build():
     for entry in pins["modules"]:
         {"c": build_c, "rust": build_rust}[entry["name"]](entry, pins["stack_size"])
         print(f"built {os.path.join(OUT, entry['name'] + '.wasm')}")
+    game = game_manifest()
+    check_tools_game(game)
+    for entry in game["modules"]:
+        build_game_module(entry, game)
+
+
+def game_manifest():
+    with open(GAME_MODULES) as f:
+        return json.load(f)
+
+
+def find_wasm_tools(pin):
+    path = os.environ.get("WASM_TOOLS") or (WASM_TOOLS if os.path.exists(WASM_TOOLS) else shutil.which("wasm-tools"))
+    if not path:
+        sys.exit(f"wasm-tools {pin} not found: cargo install wasm-tools --version {pin} --locked --root build/tools")
+    found = tool_version([path, "--version"], r"wasm-tools (\S+)")
+    if found != pin:
+        sys.exit(f"wasm-tools is {found}, wasm/modules.json pins {pin}")
+    return path
+
+
+def leb(data, i, signed=False):
+    result = shift = 0
+    while True:
+        byte = data[i]
+        i += 1
+        result |= (byte & 0x7F) << shift
+        shift += 7
+        if not byte & 0x80:
+            break
+    if signed and byte & 0x40:
+        result -= 1 << shift
+    return result, i
+
+
+def name_at(data, i):
+    size, i = leb(data, i)
+    return data[i:i + size].decode(), i + size
+
+
+def const_expr(data, i):
+    if data[i] != 0x41:
+        raise ValueError(f"offset expression starts with opcode {data[i]:#x}, not i32.const")
+    value, i = leb(data, i + 1, True)
+    if data[i] != 0x0B:
+        raise ValueError("offset expression is not a single i32.const")
+    return value, i + 1
+
+
+def limits_at(data, i):
+    flag = data[i]
+    low, i = leb(data, i + 1)
+    if flag & 1:
+        _, i = leb(data, i)
+    return low, i
+
+
+def parse_module(data):
+    """The facts of a built module the window check needs: its memory and table minimums, stack top, table entries and data segments."""
+    if data[:8] != b"\0asm\1\0\0\0":
+        raise ValueError("not a wasm module")
+    info = {"memory_min": None, "table_min": None, "stack_top": None, "elements": [], "segments": []}
+    i = 8
+    while i < len(data):
+        section, i = data[i], i + 1
+        size, i = leb(data, i)
+        body, end = i, i + size
+        if section == 2:
+            count, j = leb(data, body)
+            for _ in range(count):
+                _, j = name_at(data, j)
+                _, j = name_at(data, j)
+                kind, j = data[j], j + 1
+                if kind == 0:
+                    _, j = leb(data, j)
+                elif kind == 1:
+                    info["table_min"], j = limits_at(data, j + 1)
+                elif kind == 2:
+                    info["memory_min"], j = limits_at(data, j)
+                else:
+                    j += 2
+        elif section == 6:
+            count, j = leb(data, body)
+            for index in range(count):
+                j += 2
+                if data[j] == 0x41 and index == 0:
+                    info["stack_top"], j = const_expr(data, j)
+                else:
+                    while data[j] != 0x0B:
+                        j += 1
+                    j += 1
+        elif section == 9:
+            count, j = leb(data, body)
+            for _ in range(count):
+                flag, j = leb(data, j)
+                if flag == 2:
+                    _, j = leb(data, j)
+                if flag not in (0, 2):
+                    raise ValueError(f"element segment of kind {flag}")
+                offset, j = const_expr(data, j)
+                if flag == 2:
+                    j += 1
+                funcs, j = leb(data, j)
+                for _ in range(funcs):
+                    _, j = leb(data, j)
+                info["elements"].append((offset, funcs))
+        elif section == 11:
+            count, j = leb(data, body)
+            for _ in range(count):
+                flag, j = leb(data, j)
+                if flag == 2:
+                    _, j = leb(data, j)
+                if flag not in (0, 2):
+                    raise ValueError(f"data segment of kind {flag}")
+                offset, j = const_expr(data, j)
+                length, j = leb(data, j)
+                info["segments"].append((offset, length))
+                j += length
+        i = end
+    return info
+
+
+def check_window(entry, pins, info, others):
+    """Reasons the module's linked window or table entries break its manifest or collide with another module's."""
+    problems = []
+    low, window = entry["data_base"], pins["window"]
+    high = low + window
+    extents = [offset + length for offset, length in info["segments"]]
+    top = max(extents + [info["stack_top"]])
+    first = min([offset for offset, _ in info["segments"]] + [info["stack_top"]])
+    if first < low or top > high:
+        problems.append(f"{entry['name']}: data and stack span {first:#x}..{top:#x}, outside its window {low:#x}..{high:#x}")
+    if info["memory_min"] is not None and info["memory_min"] > pins["memory_pages"]:
+        problems.append(f"{entry['name']}: needs {info['memory_min']} pages, the manifest has {pins['memory_pages']}")
+    t_low, t_high = entry["table_base"], entry["table_base"] + pins["table_slots"]
+    for offset, count in info["elements"]:
+        if offset < t_low or offset + count > t_high:
+            problems.append(f"{entry['name']}: table entries {offset}..{offset + count} leave its range {t_low}..{t_high}")
+    if t_high > pins["table_size"]:
+        problems.append(f"{entry['name']}: table range ends at {t_high}, past the table size {pins['table_size']}")
+    if high > pins["memory_pages"] * 65536:
+        problems.append(f"{entry['name']}: window ends at {high:#x}, past {pins['memory_pages']} pages")
+    for other_name, other_low, other_high, other_t_low, other_t_high in others:
+        if low < other_high and other_low < high:
+            problems.append(f"{entry['name']}: window {low:#x}..{high:#x} overlaps {other_name}'s {other_low:#x}..{other_high:#x}")
+        if t_low < other_t_high and other_t_low < t_high:
+            problems.append(f"{entry['name']}: table range {t_low}..{t_high} overlaps {other_name}'s {other_t_low}..{other_t_high}")
+    return problems
+
+
+def fixture_ranges():
+    pins = manifest()
+    return [(m["name"], m["data_base"], m["data_base"] + pins["window"], m["table_base"], m["table_base"] + pins["table_slots"])
+            for m in pins["modules"]]
+
+
+def generated_layout_asserts(path):
+    """The Game, WeaponDef, Vec3 and TDF layout asserts of src/state/layout_asserts.cpp, which the i686 build compiles."""
+    with open(os.path.join(ROOT, "src", "state", "layout_asserts.cpp")) as f:
+        lines = f.read().split("\n")
+    keep = []
+    for line in lines:
+        match = re.match(r"static_assert\((?:sizeof|offsetof)\((\w+)", line)
+        if match and match.group(1) in LAYOUT_TYPES:
+            keep.append(line)
+    if len(keep) < 100:
+        sys.exit(f"src/state/layout_asserts.cpp has only {len(keep)} asserts for {sorted(LAYOUT_TYPES)}")
+    with open(path, "w") as f:
+        f.write("\n".join(keep) + "\n")
+
+
+def run(cmd, **kwargs):
+    result = subprocess.run(cmd, capture_output=True, text=True, **kwargs)
+    if result.returncode:
+        sys.stderr.write(result.stdout + result.stderr)
+        sys.exit(f"failed: {' '.join(cmd[:3])} ...")
+
+
+def build_game_module(entry, pins):
+    out = os.path.join(OUT, entry["name"])
+    os.makedirs(out, exist_ok=True)
+    generated_layout_asserts(os.path.join(out, "layout_generated.h"))
+    tables = os.path.join(out, "bx_tables.c")
+    generator = os.path.join(ROOT, "tools", "bitexact_tables.py")
+    if not os.path.exists(tables) or os.path.getmtime(tables) < os.path.getmtime(generator):
+        run([sys.executable, generator, tables])
+    jobs = []
+    includes = [f"-I{os.path.join(ROOT, d)}" for d in ("wasm/include", "include", ".")] + [f"-I{out}"]
+    for index, source in enumerate(entry["cxx"]):
+        obj = os.path.join(out, f"{index}_{os.path.basename(source)}.o")
+        jobs.append((["clang++", *CXX_FLAGS, *includes, "-c", os.path.join(ROOT, source), "-o", obj], obj))
+    c_includes = [f"-I{os.path.join(ROOT, d)}" for d in ("wasm/include", "lib/bitexact")]
+    for index, source in enumerate(entry["c"] + [tables]):
+        path = source if os.path.isabs(source) else os.path.join(ROOT, source)
+        obj = os.path.join(out, f"c{index}_{os.path.basename(source)}.o")
+        jobs.append((["clang", *C_FLAGS, *c_includes, "-c", path, "-o", obj], obj))
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        list(pool.map(lambda job: run(job[0]), jobs))
+    target = os.path.join(OUT, entry["name"] + ".wasm")
+    exports = [f"--export={name}" for name in entry["data"]]
+    cmd = ["wasm-ld", *link_flags(entry, pins["stack_size"]), "--gc-sections", *exports, *[obj for _, obj in jobs], "-o", target]
+    run(cmd)
+    with open(target, "rb") as f:
+        info = parse_module(f.read())
+    others = [r for r in fixture_ranges()]
+    problems = check_window(entry, pins, info, others)
+    if problems:
+        sys.exit("\n".join(problems))
+    low = min(offset for offset, _ in info["segments"])
+    print(f"built {target}: data {low:#x}..{max(o + n for o, n in info['segments']):#x}, stack top {info['stack_top']:#x}, "
+          f"window {entry['data_base']:#x}..{entry['data_base'] + pins['window']:#x}, "
+          f"table {min(o for o, _ in info['elements'])}..{max(o + n for o, n in info['elements'])}")
+
+
+def check_tools_game(pins):
+    for name in ("clang", "wasm-ld"):
+        found = tool_version([name, "--version"], r"(?:clang version|LLD) (\S+)")
+        if found != pins["tools"]["clang"]:
+            sys.exit(f"{name} is {found}, wasm/modules.json pins {pins['tools']['clang']}")
+
+
+def check_interface(name, imports, exports, spec):
+    """Reasons a module's imports or exports are outside its allowlist; imports and exports are lists of names (module, name) and name."""
+    problems = []
+    allowed = set(ENV_IMPORTS)
+    for module, names in spec.get("imports", {}).items():
+        if module.startswith("wasi") or module == "env":
+            problems.append(f"{name}: the manifest lists imports from {module}")
+        allowed |= {(module, n) for n in names}
+    for module, field in imports:
+        if module.startswith("wasi"):
+            problems.append(f"{name}: imports {module}.{field}, a WASI call")
+        elif (module, field) not in allowed:
+            problems.append(f"{name}: imports {module}.{field}, which its manifest does not list")
+    for module, field in sorted(allowed - set(imports)):
+        problems.append(f"{name}: the manifest lists {module}.{field}, which the module does not import")
+    if sorted(exports) != sorted(spec["exports"]):
+        extra, missing = sorted(set(exports) - set(spec["exports"])), sorted(set(spec["exports"]) - set(exports))
+        problems.append(f"{name}: exports differ from the manifest: extra {extra}, missing {missing}")
+    return problems
+
+
+def module_interface(wasm_tools, path):
+    text = subprocess.run([wasm_tools, "print", path], capture_output=True, text=True, check=True).stdout
+    imports = re.findall(r'^\s*\(import "([^"]*)" "([^"]*)"', text, re.M)
+    exports = re.findall(r'^\s*\(export "([^"]*)"', text, re.M)
+    return imports, exports
+
+
+def run_imports():
+    game = game_manifest()
+    wasm_tools = find_wasm_tools(game["tools"]["wasm-tools"])
+    specs = {m["name"]: {"imports": m["imports"], "exports": m["exports"] + m["data"]} for m in game["modules"]}
+    for entry in manifest()["modules"]:
+        specs[entry["name"]] = {"imports": {}, "exports": FIXTURE_EXPORTS}
+    failures = []
+    for name, spec in specs.items():
+        path = os.path.join(OUT, name + ".wasm")
+        if not os.path.exists(path):
+            sys.exit(f"{path} is missing: build first: uv run tools/wasm_modules.py build")
+        imports, exports = module_interface(wasm_tools, path)
+        problems = check_interface(name, imports, exports, spec)
+        failures += problems
+        print(f"{name}: {len(imports)} imports, {len(exports)} exports" + (": FAIL" if problems else ""))
+    for failure in failures:
+        print("FAIL", failure)
+    if failures:
+        return 1
+    print("ok")
+    return 0
 
 
 def read_i32(memory, store, address):
@@ -173,11 +472,13 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "check"])
+    parser.add_argument("command", choices=["build", "check", "imports"])
     args = parser.parse_args()
     if args.command == "build":
         build()
         return 0
+    if args.command == "imports":
+        return run_imports()
     return check()
 
 

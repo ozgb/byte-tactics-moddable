@@ -282,3 +282,8 @@ add_custom_command(
   DEPENDS ref_test_objects $<TARGET_OBJECTS:ref_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(ref_test DEPENDS "${CMAKE_BINARY_DIR}/ref_test.exe")
+
+add_custom_target(wasm_modules
+  COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  USES_TERMINAL)

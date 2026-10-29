@@ -1,0 +1,14 @@
+#ifndef WASM_MEMORY
+#define WASM_MEMORY
+
+#include <stddef.h>
+
+namespace std {
+template <class T>
+class allocator {
+public:
+    void deallocate(T*, size_t) {}
+};
+}
+
+#endif

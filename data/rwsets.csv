@@ -65,16 +65,16 @@ address,function,file,kind,target
 0x4012a0,UnitResources::SpendEnergyAndMetal,src/game/economy.cpp,field_write,UnitResources::energyUse
 0x4012a0,UnitResources::SpendEnergyAndMetal,src/game/economy.cpp,field_write,UnitResources::metalUse
 0x4012a0,UnitResources::SpendEnergyAndMetal,src/game/economy.cpp,function,
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccountView::x0
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccountView::x1
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccountView::x2
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccountView::x3
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccountView::prev0
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccountView::prev1
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccountView::x0
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccountView::x1
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccountView::x2
-0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccountView::x3
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccount::backlog
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccount::demand
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccount::produced
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccount::used
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::backlog
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::demand
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::lastProduced
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::lastUsed
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::produced
+0x401320,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::used
 0x401320,SettleResourceAccount,src/game/economy.cpp,function,
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,AddIncome
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,AddIncomeD
@@ -1479,6 +1479,7 @@ address,function,file,kind,target
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_escape,Unit::pos
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::modelMaxX
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::modelMinX
+0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_maybe_written,Unit::pos
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Game::units
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Game::unitsEnd
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Seams::units
@@ -2517,8 +2518,8 @@ address,function,file,kind,target
 0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadius]"
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,call,get
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,call,operator=
-0x40ba80,GetBasePosition,src/ai/ai_player.cpp,deref_read,*BasePos
-0x40ba80,GetBasePosition,src/ai/ai_player.cpp,deref_write,*BasePos
+0x40ba80,GetBasePosition,src/ai/ai_player.cpp,deref_read,*Vec3
+0x40ba80,GetBasePosition,src/ai/ai_player.cpp,deref_write,*Vec3
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,function,
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40bab0,GetMirroredBasePosition,src/ai/ai_player.cpp,call,get
@@ -11945,6 +11946,7 @@ address,function,file,kind,target
 0x43adc0,AddOrder,src/orders/order_list.cpp,call,operator Order *
 0x43adc0,AddOrder,src/orders/order_list.cpp,call,operator new
 0x43adc0,AddOrder,src/orders/order_list.cpp,field_maybe_written,Unit::list
+0x43adc0,AddOrder,src/orders/order_list.cpp,field_read,MissionType::index
 0x43adc0,AddOrder,src/orders/order_list.cpp,field_read,Order::flags_42
 0x43adc0,AddOrder,src/orders/order_list.cpp,field_read,Unit::list
 0x43adc0,AddOrder,src/orders/order_list.cpp,field_write,Order::flags_42
@@ -11988,7 +11990,6 @@ address,function,file,kind,target
 0x43b1f0,IssueAttackOrder,src/orders/order_list.cpp,call,operator Order *
 0x43b1f0,IssueAttackOrder,src/orders/order_list.cpp,call,operator new
 0x43b1f0,IssueAttackOrder,src/orders/order_list.cpp,field_escape,Unit::pos
-0x43b1f0,IssueAttackOrder,src/orders/order_list.cpp,field_maybe_written,Unit::pos
 0x43b1f0,IssueAttackOrder,src/orders/order_list.cpp,field_read,MissionType::index
 0x43b1f0,IssueAttackOrder,src/orders/order_list.cpp,field_read,Order::flags_42
 0x43b1f0,IssueAttackOrder,src/orders/order_list.cpp,field_read,Unit::def
@@ -12008,7 +12009,6 @@ address,function,file,kind,target
 0x43b400,IssueRepairOrder,src/orders/order_list.cpp,call,operator Order *
 0x43b400,IssueRepairOrder,src/orders/order_list.cpp,call,operator new
 0x43b400,IssueRepairOrder,src/orders/order_list.cpp,field_escape,Unit::pos
-0x43b400,IssueRepairOrder,src/orders/order_list.cpp,field_maybe_written,Unit::pos
 0x43b400,IssueRepairOrder,src/orders/order_list.cpp,field_read,MissionType::index
 0x43b400,IssueRepairOrder,src/orders/order_list.cpp,field_read,Order::flags_42
 0x43b400,IssueRepairOrder,src/orders/order_list.cpp,field_read,Unit::def
@@ -21770,10 +21770,10 @@ address,function,file,kind,target
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,operator=
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,deref_escape,*Feature
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,deref_escape,*FeatureSpot
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_maybe_written,Feature::anim
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_maybe_written,Feature::shadowAnim
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_maybe_written,FeatureSpot::anim
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_maybe_written,FeatureSpot::shadow
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_escape,Feature::anim
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_escape,Feature::shadowAnim
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_escape,FeatureSpot::anim
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_escape,FeatureSpot::shadow
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_read,Cell::feature
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_read,Cell::flags
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_read,Cell::height
@@ -28996,7 +28996,7 @@ address,function,file,kind,target
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,call,operator->
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,deref_read,*int
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_escape,Game::players
-0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_maybe_written,Game::pos_2caa
+0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_escape,Game::pos_2caa
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,Game::hoverUnitId
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,Game::localPlayer
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,field_read,Game::units
@@ -32843,7 +32843,6 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,GetGafFrame
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,GetGafFrameCount
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,HarnessViewRand
-0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,IsPointVisible
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,PointInRect
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,abs
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,bx_sqrt
@@ -32864,6 +32863,7 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,<anon>::i
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,<anon>::propeller
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,<anon>::s
+0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,AiSeam::IsPointVisible
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Angles16::heading
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Angles16::pitch
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Game::colors_dcb
@@ -32893,6 +32893,7 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Projectile::spawnTick
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Projectile::time
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Projectile::type
+0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Seams::ai
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Vec3::x
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Vec3::y
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_read,Vec3::z
@@ -32910,6 +32911,8 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,field_write,Vec3::z
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,function,
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,global_read,g_game
+0x49be60,DrawProjectiles,src/weapons/weapons.cpp,global_read,g_seams
+0x49be60,DrawProjectiles,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(Player *, Vec3 *) __attribute__((stdcall)) [AiSeam::IsPointVisible]"
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,PlaySoundAt
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,QueryWeaponPiece
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,operator=
@@ -34678,6 +34681,7 @@ address,function,file,kind,target
 0x4a4620,ScheduleGadgetEndTick,src/gui/gui.cpp,function,
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,DrawTextClipped
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,FillBevelBox
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,FillRectangle
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,GetFontHeight
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,GetGafFrame
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,LockScreen
@@ -34713,10 +34717,8 @@ address,function,file,kind,target
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,Rect::left
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,Rect::right
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_write,Rect::top
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,fn_ref,FillRectangle
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,function,
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,global_read,g_guiContext
-0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,indirect_call,"indirect via void (*)(Surface *, Rect *, int) __attribute__((stdcall))"
 0x4a4890,TickProgressBar,src/gui/gui.cpp,call,DrawProgressBarGadget
 0x4a4890,TickProgressBar,src/gui/gui.cpp,call,GetTicks
 0x4a4890,TickProgressBar,src/gui/gui.cpp,deref_escape,*Gadget
@@ -49751,17 +49753,6 @@ address,function,file,kind,target
 ,SettingSetInt,src/host/settings_io.h,function,
 ,SettingSetString,src/host/settings_io.h,call,host_setting_set
 ,SettingSetString,src/host/settings_io.h,function,
-,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccount::backlog
-,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccount::demand
-,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccount::produced
-,SettleResourceAccount,src/game/economy.cpp,field_read,ResourceAccount::used
-,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::backlog
-,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::demand
-,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::lastProduced
-,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::lastUsed
-,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::produced
-,SettleResourceAccount,src/game/economy.cpp,field_write,ResourceAccount::used
-,SettleResourceAccount,src/game/economy.cpp,function,
 ,ShowSelectBox,src/ingame/info_panel.cpp,call,PointInRect
 ,ShowSelectBox,src/ingame/info_panel.cpp,field_escape,Game::rect
 ,ShowSelectBox,src/ingame/info_panel.cpp,field_read,Game::cursorScreenX

@@ -3001,9 +3001,8 @@ players,wind_meteors,shared_write,Vec3::y,1
 players,wind_meteors,shared_write,Vec3::z,1
 presentation,ai,call,GetBuildRating,1
 presentation,ai,call,IsExplored,1
-presentation,ai,call,IsPointVisible,1
 presentation,ai,call,SetUnitSquad,1
-presentation,ai,indirect,IsPointVisible,1
+presentation,ai,indirect,IsPointVisible,2
 presentation,ai,shared_write,Game::difficulty,2
 presentation,ai,shared_write,Game::mapFlags,1
 presentation,ai,shared_write,MissionType::index,1
@@ -3318,7 +3317,7 @@ presentation,orders,shared_write,Fixed::value,8
 presentation,orders,shared_write,Fixed::whole,4
 presentation,orders,shared_write,Game::difficulty,1
 presentation,orders,shared_write,Game::interfaceType,3
-presentation,orders,shared_write,MissionType::index,23
+presentation,orders,shared_write,MissionType::index,24
 presentation,orders,shared_write,Order::flags_42,41
 presentation,orders,shared_write,Player::active,3
 presentation,orders,shared_write,Player::allied,10
@@ -3945,6 +3944,7 @@ seams,players,shared_write,UnitsSeam::SetStateBits,1
 seams,players,shared_write,WeaponsSeam::DamageUnit,2
 seams,players,shared_write,WeaponsSeam::DetonateUnitWeapon,1
 seams,players,shared_write,WeaponsSeam::FindFeatureAtPos,1
+seams,presentation,shared_write,Seams::ai,1
 seams,targeting,call,FindBestTargetIfFireAtWill,1
 seams,targeting,call,GetWeaponTargetPos,1
 seams,targeting,call,SetWeaponTargetPos,1

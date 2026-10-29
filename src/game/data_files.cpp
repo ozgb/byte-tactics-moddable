@@ -512,7 +512,7 @@ void FreeGameFonts()
     GameFreeThunk(g_game->fontSmlFont);
     g_game->fontSmlFont = 0;
     GameFreeThunk(((void*)g_game->fontComix));
-    g_game->fontComix = 0;
+    g_game->fontComix = nullptr;
 }
 
 // FUNCTION: 0x42a400

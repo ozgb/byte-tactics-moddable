@@ -110,7 +110,7 @@ struct Display {
     OPENHAPIFILE** files;
     int count;
     int availPhys;
-    int field_624;
+    int reserved624;
     char cwd[0x100];
     char lastDir[0x100];
 

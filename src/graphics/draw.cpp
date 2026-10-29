@@ -1308,7 +1308,7 @@ int GetTextBackColor()
 // FUNCTION: 0x4c1420
 void __stdcall SetFont(Font* font)
 {
-    if (font != 0) {
+    if (font != nullptr) {
         GetDisplay()->font = font;
     }
 }

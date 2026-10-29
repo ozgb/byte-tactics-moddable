@@ -306,7 +306,7 @@ int __stdcall InitEnvironment(Display* d)
     d->screen.clipper = 0;
     d->screen.ddPalette = 0;
     d->activeSurface = 0;
-    d->field_624 = 0;
+    d->reserved624 = 0;
     d->useOverrideSurface = 0;
     d->flags.bits.quitting = 0;
     d->hwnd = 0;

@@ -44,19 +44,6 @@ struct Layer;
 
 #include "../network/player_info.h"
 
-struct Item {
-    union {
-        int id;
-        int type;
-        int flag;
-        int active;
-    };
-    int unknown_4;
-    int allyGroup;
-    char unknown_c[0x14 - 0xc];
-    int owner;
-};
-
 #include "../game/game.h"
 #include "../state/sim_globals.h"
 #pragma pack(pop)
@@ -1344,9 +1331,9 @@ int CountComputerSlots()
     int count = 0;
     int num_items = g_game->playerCount;
     if (num_items > 0) {
-        Item* ptr = (Item *)g_game->options;
+        SkirmishPlayer* ptr = g_game->options->players;
         do {
-            if (ptr->type == 2) {
+            if (ptr->controller == 2) {
                 count++;
             }
             ptr++;
@@ -1380,7 +1367,7 @@ int __cdecl CountHumanSlots()
 int FindOpenSlot()
 {
     for (int i = 0; i < g_game->playerCount; i++) {
-        if (((Item *)g_game->options)[i].id == 0) {
+        if (g_game->options->players[i].controller == 0) {
             return i;
         }
     }
@@ -1394,9 +1381,9 @@ int AreAllSlotsEmpty()
     Game* g = g_game;
     int n = g->playerCount;
     if (n > 0) {
-        Item* p = (Item *)g->options;
+        SkirmishPlayer* p = g->options->players;
         do {
-            if (p->flag != 0) {
+            if (p->controller != 0) {
                 result = 0;
             }
             p++;
@@ -1410,7 +1397,7 @@ int AreAllSlotsEmpty()
 int __stdcall IsColorTaken(int owner, int skip)
 {
     for (int i = 0; i < g_game->playerCount; i++) {
-        if (((Item *)g_game->options)[i].owner == owner && ((Item *)g_game->options)[i].id != 0 && i != skip) {
+        if (g_game->options->players[i].color == owner && g_game->options->players[i].controller != 0 && i != skip) {
             return 1;
         }
     }
@@ -1423,7 +1410,7 @@ int FindFreeColor()
     for (int owner = 0; owner < 10; owner++) {
         int i;
         for (i = 0; i < g_game->playerCount; i++) {
-            if (((Item *)g_game->options)[i].owner == owner)
+            if (g_game->options->players[i].color == owner)
                 break;
         }
         if (i == g_game->playerCount)
@@ -1437,7 +1424,7 @@ int __stdcall CountPlayersInAllyGroup(int owner)
 {
     int n = 0;
     for (int i = 0; i < g_game->playerCount; i++) {
-        if (((Item *)g_game->options)[i].allyGroup == owner && ((Item *)g_game->options)[i].active != 0) {
+        if (g_game->options->players[i].allyGroup == owner && g_game->options->players[i].controller != 0) {
             n++;
         }
     }

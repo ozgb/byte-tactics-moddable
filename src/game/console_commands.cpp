@@ -155,7 +155,6 @@ unsigned int GetTicks();
 #include "../map/meteors.h"
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"
-extern Display* GetDisplay();
 #include "../graphics/display.h"
 #include "../debug/debug_lib.h"
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);

@@ -16,7 +16,6 @@ struct RestoreCursorBackgroundSurface {
 #pragma pack(pop)
 
 #include "../graphics/display.h"
-Display* GetDisplay(void);
 
 #include "../../link/globals.h"
 

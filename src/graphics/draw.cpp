@@ -48,7 +48,6 @@ void __cdecl BlitLine(Surface* dst, int x0, int y0, int x1, int y1, int color);
 void __cdecl BlitLineRemapped(Surface* dst, int x0, int y0, int x1, int y1,
                               int color, unsigned char* palette);
 #include "display.h"
-Display* GetDisplay();
 void __cdecl FillSolidRect(Surface* s, Rect* r, int color);
 void __cdecl RemapRect(int dst, int pitch, int w, int h, unsigned char* table);
 void __cdecl XorRect(Surface* s, Rect* r, int value);

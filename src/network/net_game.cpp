@@ -964,7 +964,6 @@ void __stdcall SetCursorMode(int n);
 #include "../graphics/object_pool.h"
 void* __cdecl GameReallocTagged(void* ptr, const char* name, unsigned int size);
 #include "../game/players.h"
-Display* GetDisplay(void);
 #include "../graphics/display.h"
 #include "net_stats.h"
 void __stdcall CreateUnitFromPacket(unsigned char p, void* packet);

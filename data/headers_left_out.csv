@@ -113,7 +113,6 @@ GameReallocTagged,mismatch,"definition type not nameable in a header, or no clea
 GetButtonStage,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetButtonStageByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetCobChecksum,mismatch,pointer/int cast: definition's type is likely wrong
-GetDisplay,mismatch,pointer/int cast: definition's type is likely wrong
 GetDisplayModes,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetEnergyIncome,mismatch,pointer/int cast: definition's type is likely wrong
 GetFactoriesInRadius,skip,qualified name std::vector

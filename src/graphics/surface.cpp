@@ -77,7 +77,6 @@ struct DirectDrawSurfaceRefs {
     void* back;
 };
 
-Display* GetDisplay(void);
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
 void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);

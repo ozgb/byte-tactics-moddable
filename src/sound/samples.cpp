@@ -14,7 +14,6 @@
 #include "../graphics/display.h"
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
 
-extern Display* GetDisplay();
 
 struct FileHandle;
 

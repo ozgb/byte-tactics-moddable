@@ -249,7 +249,6 @@ struct Bounds_src_004b8310 {
 };
 
 #include "display.h"
-Display* GetDisplay();
 void __cdecl BlitRectBlended(Surface* p, BlitSourceView* src, Rect* rect,
                              Rect* pos, int colour, unsigned char* palette);
 void __cdecl BlitCompressedLit(unsigned char* pixels, int pitch, Rect* drect,

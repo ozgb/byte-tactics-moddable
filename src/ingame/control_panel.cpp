@@ -78,7 +78,6 @@ Unit* __stdcall FindNextSelectedUnit(Unit*, int);
 #include "../gui/keyboard.h"
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
-Display* GetDisplay();
 
 #include "../util/commands.h"
 void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mask);

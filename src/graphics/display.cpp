@@ -567,9 +567,9 @@ void __stdcall ShutdownEnvironment(DisplayAppView* d)
 }
 
 // FUNCTION: 0x4b6220
-int GetDisplay(void)
+Display* GetDisplay(void)
 {
-    return (int)g_display;
+    return (Display*)g_display;
 }
 
 // FUNCTION: 0x4b6230

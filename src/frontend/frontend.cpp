@@ -119,7 +119,6 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
 void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall SetCursorMode(int param_1);
 char* __stdcall Translate(char* text);
-Display* GetDisplay(void);
 void HideSoftwareCursor();
 #include "../game/game_state.h"
 Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);

@@ -55,7 +55,6 @@ int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name);
 #include "../debug/debug_lib.h"
 #include "../game/main.h"
 #include "../graphics/display.h"
-Display* GetDisplay();
 void __stdcall FrameFromSurface(GafFrame* dst, Surface* src);
 #include "control_panel.h"
 #include "selection.h"

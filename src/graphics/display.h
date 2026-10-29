@@ -103,6 +103,7 @@ struct Display {
 #pragma pack(pop)
 
 
+Display* GetDisplay(void);
 int __stdcall ApplyPalette();
 int __stdcall CheckDirectXVersion(int want0, int want1, int want2, int want3, int want4);
 int __stdcall SetFullScreen(int mode);

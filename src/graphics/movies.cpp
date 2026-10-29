@@ -78,7 +78,6 @@ struct DisplayOffscreenView {
 #include "../../link/globals.h"
 
 #include "display.h"
-Display* GetDisplay();
 void __stdcall SetOffscreenSurface(DisplayOffscreenView* display);
 void FlipScreen();
 

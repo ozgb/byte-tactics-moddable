@@ -114,7 +114,6 @@ extern void __stdcall PopMouseEvent(MouseEvent* out);
 extern void __stdcall DrawTextInput(Gui* control, int index);
 extern int __stdcall GetTextPixelWidth(unsigned char* text);
 #include "../graphics/display.h"
-Display* GetDisplay();
 
 static inline int FindPanelGadget(Layer* layer)
 {

@@ -11,7 +11,6 @@ struct RGBA {
     unsigned char a;
 };
 
-Display* GetDisplay(void);
 #include "../debug/debug_lib.h"
 #include "object_pool.h"
 #include "palette.h"

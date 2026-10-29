@@ -11,7 +11,6 @@ struct Font {
 
 #include "display.h"
 
-Display* GetDisplay(void);
 #include "../util/registry.h"
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);

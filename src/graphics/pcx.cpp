@@ -210,7 +210,6 @@ struct PcxBitmap {
 };
 
 #include "display.h"
-Display* GetDisplay();
 
 // FUNCTION: 0x4caec0
 void __stdcall SaveSurfacePcx(char* name, PcxBitmap* bitmap)

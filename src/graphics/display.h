@@ -1,7 +1,5 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
-struct DisplayAppView;
-
 #include "win_types.h"
 #include "surface.h"
 #include "../util/mouse_event.h"
@@ -24,21 +22,34 @@ union DisplayFlags {
         unsigned short has_cc : 1;
         unsigned short has_d0 : 1;
         unsigned short soundOpt : 1;
-        unsigned short bit11_15 : 5;
+        unsigned short quitting : 1;
+        unsigned short bit12_15 : 4;
     } bits;
 };
 
 struct Screen {
-    char pad_0[0x8];
+    void (__cdecl *callback)(int, int, int);
+    void* ddraw;
     void* primary;
     void* surface;
-    char pad_10[0x14 - 0x10];
+    void* clipper;
     void* ddPalette;
+};
+
+struct FrameRateCounter {
+    int accum;
+    unsigned int lastTick;
+    int frames;
+    int rate;
+
+    void Tick();
 };
 
 #pragma pack(push, 1)
 struct Display {
-    char pad_0[0x40];
+    char pad_0[12];
+    char* title;
+    char pad_10[0x40 - 0x10];
     void* hwnd;
     int windowed;
     char pad_48[8];
@@ -47,7 +58,7 @@ struct Display {
     Surface* activeSurface;
     int haveBackBuffer;
     Rect vec;
-    char pad_b0[0xb4 - 0xb0];
+    void* frameRateFont;
     void* lastBackBuffer;
     char pad_b8[0xbc - 0xb8];
     Surface* overrideSurface;
@@ -59,9 +70,10 @@ struct Display {
     int width;
     int height;
     int useOverrideSurface;
-    char pad_e0[0xe4 - 0xe0];
+    int active;
     int field_e4;
-    char pad_e8[0xf0 - 0xe8];
+    int tickScale;
+    char pad_ec[0xf0 - 0xec];
     DisplayFlags flags;
     int keyQueueSize;
     int keyQueue[30];
@@ -84,7 +96,11 @@ struct Display {
     int cursorThreadEnabled;
     int cursorOverlayEnabled;
     int mouseThreadStop;
-    char pad_1da[0x204 - 0x1da];
+    FrameRateCounter counter;
+    Rect startMode;
+    int startWidth;
+    int startHeight;
+    unsigned short videoFlags;
     Font* font;
     int foreColor;
     int backColor;
@@ -93,7 +109,8 @@ struct Display {
     float paletteBrightness;
     OPENHAPIFILE** files;
     int count;
-    char pad_620[8];
+    int availPhys;
+    int field_624;
     char cwd[0x100];
     char lastDir[0x100];
 
@@ -118,10 +135,10 @@ void __stdcall ResetTimers();
 int __stdcall DrawFrameRate();
 int __stdcall GetFrameRate();
 
-void __stdcall ReleaseDirectDraw(DisplayAppView* d);
-void __stdcall InitDisplayDefaults(DisplayAppView* p);
-int __stdcall InitEnvironment(DisplayAppView* d);
-void __stdcall ShutdownEnvironment(DisplayAppView* d);
+void __stdcall ReleaseDirectDraw(Display* d);
+void __stdcall InitDisplayDefaults(Display* p);
+int __stdcall InitEnvironment(Display* d);
+void __stdcall ShutdownEnvironment(Display* d);
 void __stdcall QuitApp(char* message);
 #include "../../interfaces/services.h"
 unsigned long __stdcall GetMilliseconds(void);

@@ -724,7 +724,7 @@ int __stdcall ExceptionFilter(void* exception, const char* thread)
         app->cursorSprite = nullptr;
         UnlockAllScreens();
         Unlock(held);
-        ReleaseDirectDraw((DisplayAppView *)app);
+        ReleaseDirectDraw(app);
         if (app->hwnd != 0) {
             host_window_set_topmost(0);
         }

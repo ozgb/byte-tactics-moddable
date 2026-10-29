@@ -163,6 +163,7 @@ src/game/statistics.cpp,src/graphics/object_pool.h,#392
 src/game/statistics.cpp,src/ingame/info_panel.h,#392
 src/game/victory.cpp,interfaces/host.h,#392
 src/graphics/display.cpp,interfaces/host.h,#392
+src/graphics/display.cpp,src/graphics/display.h,#392
 src/graphics/display.cpp,src/graphics/object_pool.h,#392
 src/graphics/display.cpp,src/graphics/palette.h,#392
 src/graphics/display.cpp,src/graphics/rect.h,#392

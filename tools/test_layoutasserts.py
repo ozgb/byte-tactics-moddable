@@ -74,10 +74,13 @@ class EmitTests(unittest.TestCase):
         homes = {"A": "src/ai/a.h", "V": "src/util/vec3.h"}
         self.assertEqual(la.include_order(homes), ["../util/vec3.h", "../ai/a.h"])
 
-    def test_split_keeps_ta_types_apart(self):
-        parts = la.split_units({"A": "src/a.h", "T": "include/ta_types.h"})
-        self.assertEqual(parts[la.OUT], {"A": "src/a.h"})
-        self.assertEqual(parts[la.OUT_TA], {"T": "include/ta_types.h"})
+    def test_split_keeps_headers_outside_src_apart(self):
+        parts = la.split_units({"A": "src/a.h", "T": "include/t.h", "V": "include/v.h"}, {"include/t.h"})
+        self.assertEqual(parts[la.OUT], {"A": "src/a.h", "V": "include/v.h"})
+        self.assertEqual(parts[la.OUT_TA], {"T": "include/t.h"})
+
+    def test_split_leaves_out_a_file_with_no_types(self):
+        self.assertEqual(la.split_units({"A": "src/a.h"}), {la.OUT: {"A": "src/a.h"}})
 
 
 class DropTests(unittest.TestCase):

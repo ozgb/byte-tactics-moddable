@@ -314,7 +314,8 @@ class RealTree(unittest.TestCase):
                 return subprocess.run([sys.executable, *a], cwd=root, env=env, capture_output=True, text=True)
 
             schema = (root / "src/harness/trace_schema.h").read_text(errors="replace")
-            types = (root / "include/ta_types.h").read_text(errors="replace")
+            types = "\n".join(p.read_text(errors="replace") for d in ("src", "include") for p in sorted((root / d).rglob("*.h"))
+                              if p.name != "trace_schema.h")
             import re
             field = next(f for f in re.findall(r'"(field_[0-9a-f]+)"', schema)
                          if len(re.findall(rf"\b{f}\b", types)) == 1)

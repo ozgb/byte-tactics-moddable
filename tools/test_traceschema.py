@@ -109,17 +109,20 @@ class FollowedHeadersTest(unittest.TestCase):
             (root / "src/a.h").write_text('#include "c.h"\n')
             (root / "src/b.h").write_text("")
             (root / "src/c.h").write_text('#include "b.h"\n')
+            (root / "src/d.h").write_text('#include "b.h"\n')
             with mock.patch.object(ts, "ROOT", root):
                 found = ts.followed_headers(root / "include/top.h")
-                moved = ts.moved_types(root / "include/top.h")
+                headers = ts.layout_headers([root / "src/d.h", root / "src/a.h"])
             self.assertEqual([p.name for p in found], ["a.h", "c.h", "b.h"])
-            self.assertEqual(moved[0], root / "src/units/unit.h")
+            self.assertEqual([p.name for p in headers], ["d.h", "b.h", "a.h", "c.h"])
 
-    def test_real_list_has_unit_and_game(self):
-        names = [p.name for p in ts.MOVED_TYPES]
+    def test_real_list_has_unit_and_game_under_src_only(self):
+        names = [p.name for p in ts.LAYOUT_HEADERS]
         self.assertEqual(len(names), len(set(names)))
         self.assertIn("unit.h", names)
         self.assertIn("game.h", names)
+        for path in ts.LAYOUT_HEADERS:
+            self.assertIn(ts.ROOT / "src", path.parents)
 
 
 class MovedGlobalsTest(unittest.TestCase):

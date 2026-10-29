@@ -118,14 +118,17 @@ def is_template(files: dict, d: dict) -> bool:
     return d["line"] >= 2 and lines[d["line"] - 2].strip().startswith("template")
 
 
-def block_types(files=None, by_name=None) -> tuple[list[str], dict[str, str], list[str]]:
-    """(header names, name -> defining header, cpp-only names) for the types refcheck says the block holds."""
+def block_types(files=None, by_name=None) -> tuple[list[str], dict[str, str], list[str], set[str]]:
+    """(header names, name -> defining header, cpp-only names, headers outside src/ that redefine a type a src/
+    header defines) for the types refcheck says the block holds."""
     sys.setrecursionlimit(100000)
     files = files if files is not None else typedupes.collect()
     by_name = by_name if by_name is not None else typedupes.definitions(files)
     names = refcheck.block_structs(files, by_name, stateclasses.read_rows(), stateclasses.read_globals())
     homes: dict[str, str] = {}
     cpp_only: list[str] = []
+    redefined = {d["file"] for ds in by_name.values() if any(d["file"].startswith("src/") for d in ds)
+                 for d in ds if d["file"].endswith(HEADER_SUFFIXES) and not d["file"].startswith("src/")}
     for name in sorted(names - SELF_ASSERTED):
         ds = [d for d in by_name.get(name, []) if not d.get("local") and not is_template(files, d)]
         if not ds:
@@ -135,18 +138,18 @@ def block_types(files=None, by_name=None) -> tuple[list[str], dict[str, str], li
             homes[name] = headers[0]
         else:
             cpp_only.append(name)
-    return sorted(homes), homes, cpp_only
+    return sorted(homes), homes, cpp_only, redefined
 
 
-TA_TYPES = "include/ta_types.h"
-
-
-def split_units(homes: dict[str, str]) -> dict[Path, dict[str, str]]:
-    """The output files and the types each holds: ta_types.h redefines types other headers define, so it is apart."""
-    return {
-        OUT: {n: h for n, h in homes.items() if h != TA_TYPES},
-        OUT_TA: {n: h for n, h in homes.items() if h == TA_TYPES},
+def split_units(homes: dict[str, str], redefined: set[str] = frozenset()) -> dict[Path, dict[str, str]]:
+    """The output files and the types each holds: a header that redefines a type a src/ header defines cannot
+    share a unit with it, so the types it is home to are apart; a file with no types is left out."""
+    apart = {n for n, h in homes.items() if h in redefined}
+    parts = {
+        OUT: {n: h for n, h in homes.items() if n not in apart},
+        OUT_TA: {n: h for n, h in homes.items() if n in apart},
     }
+    return {path: part for path, part in parts.items() if part}
 
 
 def include_order(homes: dict[str, str]) -> list[str]:
@@ -188,11 +191,11 @@ def settle(text: str, flags: list[str], directory: str, run=run_clang) -> tuple[
 
 def generate(build_dir: Path, run=run_clang) -> tuple[dict[Path, str], dict]:
     """(output file -> its text, a summary of what the files cover and what they leave out)."""
-    names, homes, cpp_only = block_types()
+    names, homes, cpp_only, redefined = block_types()
     flags, directory = clang_flags(build_dir)
     texts: dict[Path, str] = {}
     info = {"types": 0, "asserts": 0, "dropped": 0, "cpp_only": cpp_only, "missing": []}
-    for path, part in split_units(homes).items():
+    for path, part in split_units(homes, redefined).items():
         includes = include_order(part)
         probe = run(flags, directory, emit(includes, []), True)
         errors = DIAGNOSTIC.findall(probe.stderr)

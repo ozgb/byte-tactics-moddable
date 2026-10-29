@@ -11,7 +11,7 @@ FreeBlockInsertResult,no,2,include/ta_types.h:13913|src/debug/debug_lib.cpp:1005
 FreeBlockIter,no,2,include/ta_types.h:13864|src/debug/free_block_map.h:26,differs,src/debug/free_block_map.h
 Gadget,no,5,src/frontend/multi.cpp:23|src/frontend/options.cpp:27|src/frontend/skirmish_menu.cpp:20|src/gui/gadget.h:10|src/gui/gui.cpp:62,differs,src/gui/gadget.h
 GafDurationEntry,no,2,include/ta_types.h:11497|src/graphics/gaf.cpp:91,identical,src/graphics/gaf.cpp
-Handle,no,2,include/ta_types.h:3637|src/graphics/handle.h:6,differs,src/graphics/handle.h
+Handle,yes,2,include/ta_types.h:3637|src/graphics/handle.h:6,differs,src/graphics/handle.h
 ImageFrame,no,2,include/ta_types.h:3619|src/weapons/explosions.cpp:25,identical,src/weapons/explosions.cpp
 Layer,no,5,src/frontend/frontend.cpp:58|src/frontend/multi.cpp:232|src/gui/dialogs.cpp:12|src/gui/layer.h:8|src/ingame/keys.cpp:9,differs,src/gui/layer.h
 LogoFrameEntry,no,2,include/ta_types.h:5152|src/frontend/multi.cpp:501,identical,src/frontend/multi.cpp

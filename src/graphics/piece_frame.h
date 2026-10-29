@@ -12,7 +12,7 @@ struct PieceFrameFlags {
 struct PieceFrame {
     int unknown_0;
     int count;
-    int unknown_8;
+    int always0;
     unsigned short* indices;
     int ptr_10;
     int unknown_14;

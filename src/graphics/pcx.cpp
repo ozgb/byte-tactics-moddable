@@ -458,8 +458,8 @@ void __stdcall RelocateObject(int delta, Object3do* node)
     }
     PieceFrame* e = node->faces;
     for (int i = 0; i < node->faceCount; i++, e++) {
-        if (e->unknown_8)
-            e->unknown_8 += delta;
+        if (e->always0)
+            e->always0 += delta;
         e->indices = (unsigned short*)((char*)e->indices + delta);
         if (e->ptr_10)
             e->ptr_10 += delta;

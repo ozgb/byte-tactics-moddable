@@ -14,7 +14,7 @@ union DisplayFlags {
     unsigned char byte;
     struct {
         unsigned short flag0 : 1;
-        unsigned short flag1 : 1;
+        unsigned short fullscreen : 1;
         unsigned short gdi : 1;
         unsigned short bit3 : 1;
         unsigned short bit4 : 1;

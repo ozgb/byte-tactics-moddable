@@ -902,7 +902,7 @@ void __stdcall CmdDebugBreak(CommandArgs* args)
             }
         }
         if (args->count == 0 || args->GetIntArg(1, 0) == 0) {
-            if (GetDisplay()->flags.bits.flag1) {
+            if (GetDisplay()->flags.bits.fullscreen) {
                 ToggleFullScreen();
                 host_sleep_ms(500);
             }

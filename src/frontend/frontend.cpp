@@ -416,7 +416,7 @@ void __stdcall HandleMainMenuClick(Gui* gadget)
     if (IsCurrentGadgetNamed((Dialog *)gadget, "INTRO")) {
         PlaySoundByName("smlButton", 0);
         Display* display = GetDisplay();
-        if (!display->flags.bits.flag1) {
+        if (!display->flags.bits.fullscreen) {
             OpenMessageBox(&g_game->gui,
                          "Debug:  You must be in full-screen mode to play a movie.",
                          200, 1, 1);
@@ -455,7 +455,7 @@ void __stdcall HandleMainMenuClick(Gui* gadget)
     if (IsCurrentGadgetNamed((Dialog *)gadget, "Credits")) {
         PlaySoundByName("smlButton", 0);
         Display* display = GetDisplay();
-        if (!display->flags.bits.flag1) {
+        if (!display->flags.bits.fullscreen) {
             OpenMessageBox(&g_game->gui,
                          "Debug:  You must be in full-screen mode to play a movie.",
                          200, 1, 1);
@@ -836,7 +836,7 @@ void RunFrontendStateMachine(void)
     case 0: {
         Display* p = GetDisplay();
         SetCursorOverlayEnabled(0);
-        if (p->flags.bits.flag1) {
+        if (p->flags.bits.fullscreen) {
             if (g_game->playMovie) {
                 PlayMovie(g_zrbMovie1);
                 SetState(1, 0x3dc, g_frontendSourceFile);

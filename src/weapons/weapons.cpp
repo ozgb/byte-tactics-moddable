@@ -56,17 +56,9 @@ union NetDirtyFlagBits {
     } f;
 };
 
-union ReachUnitFixed {
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    } parts;
-};
-
 struct ReachUnitVec3 {
     int x;
-    ReachUnitFixed y;
+    Fixed y;
     int z;
 };
 
@@ -398,18 +390,10 @@ void __stdcall ApplyAreaDamageAt(void* owner, Vec3* pos)
 
 #include <math.h>
 
-union AreaDamageFixed {
-    int raw;
-    struct {
-        unsigned short frac;
-        short whole;
-    } part;
-};
-
 struct FixedVec3 {
-    AreaDamageFixed x;
-    AreaDamageFixed y;
-    AreaDamageFixed z;
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 struct CellPosXZ {
@@ -547,14 +531,9 @@ int AimCobStub(int, int, int, int);
 
 #pragma pack(push, 1)
 
-union ReachPosFixed {
-    int value;
-    struct { unsigned short fraction; short whole; } parts;
-};
-
 struct ReachPosVec3 {
     int x;
-    ReachPosFixed y;
+    Fixed y;
     int z;
 };
 
@@ -590,7 +569,7 @@ int __stdcall WeaponCanReachPos(Unit* a1, ReachPosVec3* a2, ReachPosVec3* a3, in
     if (wdef->flags.b.waterWeapon)
         return 1;
 
-    if (a2->y.parts.whole + a1->def->modelMaxYHigh <= g_game->seaLevel)
+    if (a2->y.whole + a1->def->modelMaxYHigh <= g_game->seaLevel)
         return 0;
 
     if (wdef->flags.b.ballistic) {
@@ -2158,10 +2137,10 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
     memset(&hits, 0, 8);
     int radius = weapon->type->areaOfEffect >> 1;
     int r = radius / 16 + 1;
-    int cx = ((FixedVec3*)pos)->x.part.whole;
+    int cx = ((FixedVec3*)pos)->x.whole;
     int x0 = cx / 16 - r;
     int x1 = cx / 16 + r;
-    int cz = ((FixedVec3*)pos)->z.part.whole;
+    int cz = ((FixedVec3*)pos)->z.whole;
     int z0 = cz / 16 - r;
     int z1 = cz / 16 + r;
     if (x0 < 0)
@@ -2224,9 +2203,9 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                         d.z = 0;
                     }
                 }
-                AreaDamageFixed dist;
-                dist.raw = Length(&d);
-                int distance = dist.part.whole;
+                Fixed dist;
+                dist.value = Length(&d);
+                int distance = dist.whole;
                 if (distance < radius) {
                     float edge = weapon->type->edgeDamage;
                     float scale;
@@ -2275,16 +2254,16 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
             int distance;
             if ((cell->flags & 1) && spot) {
                 Vec3 v = Sub(*pos, spot->pos);
-                AreaDamageFixed dist;
-                dist.raw = VectorLength(&v);
-                distance = dist.part.whole;
+                Fixed dist;
+                dist.value = VectorLength(&v);
+                distance = dist.whole;
             } else {
                 Vec3 centre = g_seams.features->GetFootprintCentre((Point16*)&at, &g_game->features[feature]);
                 Vec3 p = *(Vec3*)&centre;
                 Vec3 v = Sub(*pos, p);
-                AreaDamageFixed dist;
-                dist.raw = (int)sqrt((double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z);
-                distance = dist.part.whole;
+                Fixed dist;
+                dist.value = (int)sqrt((double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z);
+                distance = dist.whole;
             }
             if (distance >= radius)
                 continue;

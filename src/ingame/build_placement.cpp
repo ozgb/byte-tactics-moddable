@@ -37,7 +37,6 @@ void __stdcall UpdateCursorWorldPos(MouseEvent* p);
 void __stdcall IssueMobileBuildOrders(MouseEvent* arg);
 void __stdcall PlaySoundByName(char* name, int broadcast);
 void __stdcall ClickSelectHoverUnit(MouseEvent* arg);
-void __stdcall IssueOrderToSelection(void* a, unsigned char b, MissionType kind, Vec3* d, int e, int f);
 int __stdcall FindGadgetIndexBySubstring(int value, char* name);
 #include "../gui/gui.h"
 void __stdcall SetCursorAnimation(void* a, void* b);
@@ -88,7 +87,7 @@ void __stdcall HandleLeftClick(MouseEvent* mouse)
     {
         MissionType kind;
         kind.index = 0;
-        IssueOrderToSelection(mouse, g_game->orderMode, kind, &g_game->pos, 0, 0);
+        IssueOrderToSelection((OrderTypeEntry*)mouse, g_game->orderMode, kind, (int*)&g_game->pos, 0, 0);
     }
     if (mouse->keyFlags & 4) {
         g_game->inputFlags |= 0x20;
@@ -134,7 +133,7 @@ void __stdcall HandleRightClick(MouseEvent* mouse)
         }
     } else if (g_game->inputFlags & 4) {
         MissionType kind;
-        IssueOrderToSelection(mouse, 1, kind, &g_game->pos, 0, 0);
+        IssueOrderToSelection((OrderTypeEntry*)mouse, 1, kind, (int*)&g_game->pos, 0, 0);
     }
 }
 

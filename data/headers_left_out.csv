@@ -164,7 +164,6 @@ IsCountBelowAiLimit,mismatch,"static risk rule: a convention, parameter count, o
 IsGadgetNamed,mismatch,pointer/int cast: definition's type is likely wrong
 IssueMobileBuildOrders,mismatch,parameter 1 void* vs ViewMouseEvent* (view type): the declaration differs from the definition in a pointer type only
 IssueOrCancelOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-IssueOrderToSelection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 JoinLobbyGameThread,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 JoinNetGame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 LeaveNetGameCallback,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

@@ -1783,7 +1783,6 @@ void IssueOrCancelOrder(unsigned char, int, void*, int, int*, int, int);
 int SendScriptCall(void*, short, char, int, int, int, int);
 void AddTextGadget(void*, char*, char*, int, short, int, int);
 void DrawProgressBar(void*, int, int, void*, void*, int);
-void IssueOrderToSelection(void*, unsigned char, int, int*, int, int);
 void WriteScreenshot(char*, char*, int, int, int, int);
 int ScanDirectory(char*, char*, char*, int, int, int);
 #include "../graphics/gaf.h"

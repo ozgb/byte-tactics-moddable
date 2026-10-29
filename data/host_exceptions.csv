@@ -69,6 +69,7 @@ src/game/console_commands.cpp,src/graphics/model_render.h,#392
 src/game/console_commands.cpp,src/graphics/object_pool.h,#392
 src/game/console_commands.cpp,src/graphics/rect.h,#392
 src/game/console_commands.cpp,src/ingame/control_panel.h,#392
+src/game/console_commands.cpp,src/ingame/selection.h,#392
 src/game/data_files.cpp,src/graphics/display.h,#392
 src/game/data_files.cpp,src/graphics/gaf.h,#392
 src/game/data_files.cpp,src/graphics/gaf_frame.h,#392
@@ -245,6 +246,7 @@ src/ingame/control_panel.cpp,src/gui/gui.h,#392
 src/ingame/control_panel.cpp,src/gui/keyboard.h,#392
 src/ingame/control_panel.cpp,src/gui/layer.h,#392
 src/ingame/control_panel.cpp,src/ingame/control_panel.h,#392
+src/ingame/control_panel.cpp,src/ingame/selection.h,#392
 src/ingame/control_panel.cpp,src/ingame/view_mouse_event.h,#392
 src/ingame/game_dialogs.cpp,src/frontend/frontend.h,#392
 src/ingame/game_dialogs.cpp,src/frontend/multi.h,#392

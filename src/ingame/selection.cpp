@@ -45,14 +45,6 @@ struct SideCommanderName {
     char unknown_42[0x232 - 0x42];
 };
 
-struct OrderTypeEntry {
-    unsigned char index;
-    char unknown_1[0x8 - 0x1];
-    unsigned int flags_a;
-    char unknown_c[0x11 - 0xc];
-    unsigned int flags;
-};
-
 #include "../orders/order_type_entry.h"
 #include "../game/game.h"
 #pragma pack(pop)

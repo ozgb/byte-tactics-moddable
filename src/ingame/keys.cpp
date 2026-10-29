@@ -28,15 +28,6 @@ struct ScreenshotFindData {
     char name[260];
 };
 
-struct BmpWriter {
-    char unknown_0[0xc];
-    void* file;
-    BmpWriter* Init();
-    bool Open(const char* name, int width, int height);
-    bool WriteRows(void* image, int x, int rows, int unused_4, int y, int unused_6, int srcY);
-    void Close();
-};
-
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 

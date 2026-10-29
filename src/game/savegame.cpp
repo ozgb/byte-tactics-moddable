@@ -396,7 +396,7 @@ char* __stdcall ListSavedGames(int* count)
     BuildDataPath(buf, g_savegameDir, "*", "SAV");
     *count = CountDirectoryEntries(buf, 0);
     if (*count == 0) {
-        ConfigureListBoxByName(&g_game->gui, "GAMES", DAT_005119b8, 0, 0);
+        ConfigureListBoxByName(&g_game->gui, "GAMES", DAT_005119b8, 0, nullptr);
         return 0;
     }
     g_savegameFileNames = (char*)GameAllocIgnoreTag("SAVEGAME NAMES", *count << 8);
@@ -431,7 +431,7 @@ char* __stdcall ListSavedGames(int* count)
         }
     }
     GameFreeThunk(copy);
-    ConfigureListBoxByName(&g_game->gui, "GAMES", g_savegameDescs, found, 0);
+    ConfigureListBoxByName(&g_game->gui, "GAMES", g_savegameDescs, found, nullptr);
     *count = found;
     return found ? g_savegameFileNames : 0;
 }
@@ -545,7 +545,7 @@ void ShowLoadGameScreen()
         return;
     }
     g_savegameSideList = BuildSideList();
-    ConfigureListBoxByName(&g_game->gui, "GAMES", g_savegameDescs, count, 0);
+    ConfigureListBoxByName(&g_game->gui, "GAMES", g_savegameDescs, count, nullptr);
     SetGadgetActiveByName((char*)&g_game->message_519[0], "DELETE", 0);
     SetGadgetActiveByName((char*)&g_game->message_519[0], "GAMENAME", 0);
     Gadget* entry = FindGadgetChecked(gadget->entries, "GAMES");

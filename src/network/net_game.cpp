@@ -2136,7 +2136,7 @@ void __stdcall OpenTimeoutDialog(int id)
 
     OutputHeightEntry* out = (OutputHeightEntry*)FindGadgetChecked(entries, "OUTPUT");
     ConfigureListBoxByName(&g_game->gui, "OUTPUT", g_loungeChatter,
-                 (int)out->height / (GetFontLineHeight() + 2), 0);
+                 (int)out->height / (GetFontLineHeight() + 2), nullptr);
 
     gui->onFrame = &UpdateTimeoutDialog;
     BeginTextEdit((Gui *)g_game->menu, FindGadgetIndex(entries, "TALK", 3));

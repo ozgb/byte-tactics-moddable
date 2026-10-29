@@ -248,8 +248,8 @@ void __stdcall RefreshFileList(FileRequester* obj)
     GetDriveDirectory(obj->drive, obj->cwd, 0x100);
     int n = ScanDirectory(obj->maskGadget + 0xb6, obj->names, obj->sizes, 1, 0, 0);
     SortFileList(obj->names, obj->sizes, 0, n);
-    ConfigureListBoxByName(obj->gui, "SWIN", obj->names, n, 0);
-    ConfigureListBoxByName(obj->gui, "SIZE", obj->sizes, n, 0);
+    ConfigureListBoxByName(obj->gui, "SWIN", obj->names, n, nullptr);
+    ConfigureListBoxByName(obj->gui, "SIZE", obj->sizes, n, nullptr);
     obj->slider->knobPos = 0;
     strcpy(obj->pathGadget + 0xb6, obj->cwd);
 }

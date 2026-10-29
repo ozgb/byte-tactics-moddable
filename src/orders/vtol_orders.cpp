@@ -134,7 +134,9 @@ int __cdecl ScaledCos(short, int);
 short __cdecl AngleOfVector(int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 #include "order_list.h"
-MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
+struct UnitOrderTypeView;
+struct FixedPosView;
+#include "order_dispatch.h"
 #include "../../interfaces/seams.h"
 void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
 void __stdcall StartBuildingScript(Unit*, Order*, short);
@@ -497,7 +499,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     g_seams.map->VisitObjectsInRange(&unit->pos,range,(UnitVisitor*)&visitor);
     if (!units.empty()) {
         order->SetAttachedFx(0);
-        MissionType kind=GetOrderType(7,unit,units[0],0);
+        MissionType kind=GetOrderType(7, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)units[0], 0);
         AppendOrder(unit,new (kSim) Order(kind,units[0],0,0,0,0));
         order->flags=0;
         return 3;
@@ -1094,7 +1096,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                 }
             }
             if (g_seams.units->CanRepair(unit, 0, order->target)) {
-                MissionType kind=GetOrderType(8,unit,order->target,0);
+                MissionType kind=GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)(Unit*)order->target, 0);
                 if (kind.index) {
                     order->SetAttachedFx(0);
                     AppendOrder(unit,new (kSim) Order(kind,order->target,0,0,0,0));

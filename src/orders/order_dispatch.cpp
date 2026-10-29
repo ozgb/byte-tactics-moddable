@@ -136,8 +136,7 @@ struct FeatureMarkView {
 #include "../units/unit.h"
 void __stdcall DrawUnit(void*, Unit*);
 
-MissionType __stdcall GetOrderType(unsigned char mode, UnitOrderTypeView* unit,
-                                      UnitOrderTypeView* target, FixedPosView* pos);
+#include "order_dispatch.h"
 
 int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCursorView* target,
                            FixedPosView* pos);

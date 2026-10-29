@@ -57,7 +57,9 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target, Vec3* pos, int param_6, int param_7);
 #include "../orders/order_list.h"
 #include "../orders/order_queue.h"
-MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
+struct UnitOrderTypeView;
+struct FixedPosView;
+#include "../orders/order_dispatch.h"
 #include "../orders/order_targets.h"
 float __stdcall GetEnergyIncome(Player* player);
 float __stdcall GetMetalIncome(Player* player);
@@ -785,7 +787,7 @@ void InstallNativeSeams()
     s_orders.AddOrder = AddOrder;
     s_orders.DeleteOrders = DeleteOrders;
     s_orders.GetOrderFlags = (int (__stdcall *)(Unit *))GetOrderFlags;
-    s_orders.GetOrderType = GetOrderType;
+    s_orders.GetOrderType = (MissionType (__stdcall *)(unsigned char, Unit *, Unit *, Vec3 *))GetOrderType;
     s_orders.IssueAttackOrder = IssueAttackOrder;
     s_orders.RegisterAllOrderTypes = RegisterAllOrderTypes;
     s_orders.ClearOrderTypeTable = ClearOrderTypeTable;

@@ -157,7 +157,6 @@ GetObjectBounds,mismatch,placeholder type Object_004cb2f0: left for the type-nam
 GetObjectHeight,mismatch,placeholder type Object_004cb2f0: left for the type-naming issues
 GetOrderCursor,ambiguous,several definitions share the name
 GetOrderTarget,mismatch,pointer/int cast: definition's type is likely wrong
-GetOrderType,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetPieceAngles,mismatch,placeholder type Obj_0043e180: left for the type-naming issues
 GetPieceOffset,mismatch,placeholder type Object_0043def0: left for the type-naming issues
 GetSessionGuidInstance,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"

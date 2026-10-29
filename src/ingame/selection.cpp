@@ -562,8 +562,9 @@ int __stdcall GetOrderCursor(unsigned char type, Unit* unit, Unit* target, int* 
 
 #include "../units/squad.h"
 
-MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit,
-                                       Unit* target, void* pos);
+struct UnitOrderTypeView;
+struct FixedPosView;
+#include "../orders/order_dispatch.h"
 void __stdcall IssueOrCancelOrder(OrderType kind, int flag, Unit* unit,
                             Unit* target, int* pos, int typeId, int amount);
 
@@ -608,7 +609,7 @@ void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
         if (!(((unsigned char)u->flags) & 0x10) || u == except)
             continue;
         if (mode)
-            kind.index = GetOrderType(mode, u, except, &g_game->pos_2caa).index;
+            kind.index = GetOrderType(mode, (UnitOrderTypeView*)u, (UnitOrderTypeView*)except, (FixedPosView*)&g_game->pos_2caa).index;
         if (!kind.index)
             continue;
         MissionType fire = Order("Standing_FireOrder");

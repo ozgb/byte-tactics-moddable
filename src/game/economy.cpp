@@ -10,16 +10,6 @@
 
 #pragma pack(push, 1)
 
-struct ResourceAccountView {
-    float x0;
-    float x1;
-    float x2;
-    float x3;
-    float prev0;
-    float prev1;
-};
-
-
 struct UnitInfo {
     char unknown_0[0xa8];
     unsigned short id;
@@ -155,17 +145,6 @@ int UnitResources::SpendEnergyAndMetal(float energy, float metal)
     return 0;
 }
 
-// FUNCTION: 0x401320
-void __stdcall SettleResourceAccount(ResourceAccountView* p, float a, float b)
-{
-    p->prev1 = p->x1;
-    p->prev0 = p->x0;
-    p->x3 = p->x3 - a * p->x3 + (p->x2 - b * p->x2);
-    p->x1 = 0;
-    p->x0 = 0;
-    p->x2 = 0;
-}
-
 struct ResourceAccount {
     float produced;
     float used;
@@ -187,6 +166,7 @@ static inline ResourceAccount* MetalAccount(UnitResources* r)
     return reinterpret_cast<ResourceAccount*>(&r->metalMake);
 }
 
+// FUNCTION: 0x401320
 void __stdcall SettleResourceAccount(ResourceAccount* r, float ratioBacklog, float ratioDemand)
 {
     r->lastUsed = r->used;

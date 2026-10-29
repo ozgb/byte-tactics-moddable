@@ -1,4 +1,7 @@
-#include <windows.h>
+#include <stdarg.h>
+#define _X86_
+#include <windef.h>
+#include <winbase.h>
 
 #include "../../../interfaces/host.h"
 

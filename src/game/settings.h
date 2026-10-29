@@ -1,6 +1,8 @@
 #ifndef GAME_SETTINGS_H
 #define GAME_SETTINGS_H
 
+#include "mission_option_flags.h"
+
 #pragma pack(push, 1)
 struct SkirmishPlayer {
     int controller;
@@ -13,10 +15,15 @@ struct SkirmishPlayer {
 
 struct SkirmishOptionsTable {
     SkirmishPlayer players[11];
-    int commanderDeath;
-    int mapping;
-    int lineOfSight;
-    int losType;
+    union {
+        struct {
+            int commanderDeath;
+            int mapping;
+            int lineOfSight;
+            int losType;
+        };
+        MissionOptionFlags missionFlags;
+    };
     int fixedLocations;
     char mapName[0x220 - 0x11c];
     int baseGadgetCount;

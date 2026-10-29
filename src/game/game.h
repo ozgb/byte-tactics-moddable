@@ -1221,8 +1221,8 @@ struct Game {
     Ref<MissionConditions> list_391ed;
     int mode_391f1;
     void (__stdcall *handler)(void);
-    int fontComix;
-    void* fontSmlFont;
+    Font* fontComix;
+    Font* fontSmlFont;
     union {
         struct {
             char pad_39201[1];

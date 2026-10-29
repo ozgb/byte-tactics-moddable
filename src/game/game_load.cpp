@@ -166,7 +166,6 @@ void __stdcall DrawFrame(void*, void*, int, int);
 void* __stdcall FindGafEntry(int, char*);
 #include "../graphics/palette.h"
 void __stdcall SetTextColors(int, int);
-void __stdcall SetFont(int);
 int __stdcall LockScreen(void*);
 #include "../graphics/surface.h"
 void __stdcall SetOffscreenSurface(void*);

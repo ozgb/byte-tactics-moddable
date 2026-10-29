@@ -94,11 +94,11 @@ void* __stdcall LoadBitmapByName(const char* name, int palette)
 
 
 // FUNCTION: 0x4292e0
-void* __stdcall LoadFontByName(const char* name)
+Font* __stdcall LoadFontByName(const char* name)
 {
     char path[256];
     BuildDataPath(path, "fonts", name, "FNT");
-    void* font = HAPI_LoadFile(path, 0);
+    Font* font = (Font*)HAPI_LoadFile(path, 0);
     if (font == 0) {
         FatalError(path);
     }
@@ -502,7 +502,7 @@ void* __stdcall LoadObject3d(const char* name)
 // FUNCTION: 0x42a320
 void LoadGameFonts()
 {
-    g_game->fontComix = (int)(LoadFontByName("COMIX"));
+    g_game->fontComix = LoadFontByName("COMIX");
     g_game->fontSmlFont = LoadFontByName("smlfont");
 }
 
@@ -512,7 +512,7 @@ void FreeGameFonts()
     GameFreeThunk(g_game->fontSmlFont);
     g_game->fontSmlFont = 0;
     GameFreeThunk(((void*)g_game->fontComix));
-    g_game->fontComix = (int)(0);
+    g_game->fontComix = 0;
 }
 
 // FUNCTION: 0x42a400

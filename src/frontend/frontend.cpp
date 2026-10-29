@@ -125,7 +125,6 @@ Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
 #include "../files/files_api.h"
 void __stdcall RemapPaletteToClosestIndices(Gui* sub, int value, void* palette);
 void __stdcall SetKeyboardInput(Gui* sub, int value);
-void __stdcall SetFont(void* param);
 void __stdcall SetGadgetActiveByName(Gui* sub, const char* name, int value);
 void __stdcall SetGadgetTextByName(Gui* sub, const char* name, const char* text);
 int __stdcall FindGadgetIndex(Gadget* gadgets, const char* name, int type);
@@ -550,7 +549,7 @@ void __stdcall OpenMainMenu()
     GameFreeThunk(palette);
     RenderLayer(&g_game->gui, 0xc0);
     SetKeyboardInput(&g_game->gui, 1);
-    SetFont((void *)g_game->fontComix);
+    SetFont(g_game->fontComix);
 
     strcpy(version, "v3.1");
     strcpy(palpath, version);

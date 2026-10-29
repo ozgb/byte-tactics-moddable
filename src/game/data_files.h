@@ -1,9 +1,10 @@
 #ifndef DATA_FILES_H
 #define DATA_FILES_H
+struct Font;
 struct GafFrame;
 
 void __stdcall CheckGpfVersion();
-void* __stdcall LoadFontByName(const char* name);
+Font* __stdcall LoadFontByName(const char* name);
 void* __stdcall LoadPaletteByName(char* name);
 void* __stdcall LoadAnimGaf(char* name);
 void __stdcall FindGafSequence(int gaf, char* name);

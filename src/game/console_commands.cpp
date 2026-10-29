@@ -159,7 +159,6 @@ unsigned int GetTicks();
 #include "../debug/debug_lib.h"
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
 void __stdcall DrawMapTileSelectionOutline(void* a, short* b, int c, int d);
-void __stdcall SetFont(int font);
 #include "../graphics/draw.h"
 void __stdcall SetTextColors(int color, int background);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
@@ -1137,7 +1136,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
                 }
                 PathCell* cell = g_game->pathfinder->grid.At(x, y);
                 if (cell->flags & 4) {
-                    SetFont((int)g_game->fontSmlFont);
+                    SetFont(g_game->fontSmlFont);
                     SetTextColors(HarnessViewRand() & 255, GetTextKeyColor());
                     DrawString(surface, "G", p[0].x, p[0].y, -1);
                 }
@@ -1189,7 +1188,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
                     DrawLine(surface, p[0].x, p[0].y, p[1].x, p[1].y, colors[13]);
                     DrawLine(surface, p[0].x, p[0].y, p[3].x, p[3].y, colors[13]);
                 }
-                SetFont((int)g_game->fontSmlFont);
+                SetFont(g_game->fontSmlFont);
                 SetTextColors(colors[15], GetTextKeyColor());
                 char buffer[20];
                 DrawString(surface, _itoa(tile->metal, buffer, 10), p[0].x + 2, p[0].y + 2, -1);

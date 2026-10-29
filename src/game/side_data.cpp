@@ -61,7 +61,7 @@ void __stdcall ReadSideRect(TdfFile* obj, int* out, char* name, char* side)
 void FreeSideFonts()
 {
     for (int i = 0; i < 5; i++) {
-        int*& buffer = (int*&)g_game->sideDefs[i].font;
+        Font*& buffer = g_game->sideDefs[i].font;
         if (buffer) {
             GameFreeThunk(buffer);
             buffer = 0;
@@ -121,9 +121,9 @@ void __stdcall LoadSideData(void)
         if (parser.current->GetFieldString(name, "commander", 0x20, DAT_005119b8))
             strcpy(s->commander, name);
         if (parser.current->GetFieldString(name, "font", 0x100, DAT_005119b8)) {
-            void* font;
+            Font* font;
             BuildDataPath(fontPath, "fonts", name, "FNT");
-            font = HAPI_LoadFile(fontPath, 0);
+            font = (Font*)HAPI_LoadFile(fontPath, 0);
             if (font == 0)
                 FatalError(fontPath);
             s->font = font;

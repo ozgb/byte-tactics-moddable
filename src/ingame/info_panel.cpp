@@ -210,7 +210,6 @@ void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp, FrameQuad* dst, FrameQua
 char* __stdcall Translate(char* text);
 #include "../graphics/draw.h"
 void __stdcall SetTextColors(int param_1, int param_2);
-void __stdcall SetFont(int param_1);
 void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int maxWidth);
 
 #include "../graphics/display.h"
@@ -891,7 +890,7 @@ static void DrawResourcePanel(Surface* ctx, Player* pl, Resources* res)
     char text[32];
     int side = pl->info->side;
     auto* sideDef = &g_game->sideDefs[side];
-    SetFont((int)sideDef->font);
+    SetFont(sideDef->font);
     GetFontHeight();
     unsigned char* pal = &g_game->colors[0];
     SetTextColors(pal[0xf], GetTextKeyColor());
@@ -918,7 +917,7 @@ static void DrawResourcePanel(Surface* ctx, Player* pl, Resources* res)
     DrawString(ctx, (unsigned char*)text, sideDef->energyNum.left, sideDef->energyNum.top, -1);
     DrawString(ctx, (unsigned char*)"0", sideDef->energy0.left, sideDef->energy0.top, -1);
     sprintf(text, "%d", (int)pl->energyCapacity);
-    int w = GetTextWidth((Font*)sideDef->font, (unsigned char*)text);
+    int w = GetTextWidth(sideDef->font, (unsigned char*)text);
     DrawString(ctx, (unsigned char*)text, sideDef->energyMax.left - w, sideDef->energyMax.top, -1);
     if (res->metalIncome > 99999.0f)
         sprintf(text, "%dK", (int)res->metalIncome / 1000);
@@ -949,7 +948,7 @@ static void DrawResourcePanel(Surface* ctx, Player* pl, Resources* res)
     DrawString(ctx, (unsigned char*)text, sideDef->metalNum.left, sideDef->metalNum.top, -1);
     DrawString(ctx, (unsigned char*)"0", sideDef->metal0.left, sideDef->metal0.top, -1);
     sprintf(text, "%d", (int)pl->metalCapacity);
-    w = GetTextWidth((Font*)sideDef->font, (unsigned char*)text);
+    w = GetTextWidth(sideDef->font, (unsigned char*)text);
     DrawString(ctx, (unsigned char*)text, sideDef->metalMax.left - w, sideDef->metalMax.top, -1);
     sprintf(text, "%.1f", res->energyIncome);
     SetTextColors(pal[0xa], GetTextKeyColor());
@@ -1039,7 +1038,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     idx = g_game->playerIndex;
     mv = &g_game->sortUnits;
     player = &g_game->players_1b63[idx];
-    SetFont((int)g_game->sideDefs[player->info->side].font);
+    SetFont(g_game->sideDefs[player->info->side].font);
     SetTextColors(g_game->colors[15], GetTextKeyColor());
     {
         int vx = g_game->scrollX / 16, vy = g_game->scrollY / 16, h, w, x0, y0, skip;
@@ -1577,7 +1576,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
     PlayerInfo* info = playerInfo->info;
     int side = info->side;
     auto* panel = &g_game->sideDefs[side];
-    SetFont((int)panel->font);
+    SetFont(panel->font);
     int y = 0x81;
     do {
         int dy = GetScreenHeight() - 0x20;
@@ -1620,7 +1619,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                 else
                     strcpy(text, (char*)unit->def.get());
                 int titleX = panel->unitName.left -
-                             GetTextWidth((Font*)panel->font, (unsigned char*)text) / 2;
+                             GetTextWidth(panel->font, (unsigned char*)text) / 2;
                 SetTextColors(0x53, GetTextKeyColor());
                 DrawString((Surface*)surface, (unsigned char*)text, titleX, yOffset + panel->unitName.top, -1);
                 if (unit->player->index == g_game->playerIndex ||
@@ -1665,7 +1664,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     if (snapshot.orderName) {
                         strcpy(amount, Translate((char*)snapshot.orderName));
                         int orderX = panel->missionText.left -
-                                     GetTextWidth((Font*)panel->font, (unsigned char*)amount) / 2;
+                                     GetTextWidth(panel->font, (unsigned char*)amount) / 2;
                         SetTextColors(0x53, GetTextKeyColor());
                         DrawString((Surface*)surface, (unsigned char*)amount, orderX, panel->missionText.top + yOffset, -1);
                     }
@@ -1676,7 +1675,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                         return;
                     char* weaponText = Translate("Weapon");
                     int progressX = panel->unitName2.left -
-                                    GetTextWidth((Font*)panel->font, (unsigned char*)weaponText) / 2;
+                                    GetTextWidth(panel->font, (unsigned char*)weaponText) / 2;
                     SetTextColors(0x53, GetTextKeyColor());
                     DrawString((Surface*)surface, (unsigned char*)weaponText, progressX, panel->unitName2.top + yOffset, -1);
                     DrawPanelBar(surface, &panel->damageBar2, progress, 100, yOffset,
@@ -1688,7 +1687,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     if (!target->unitDefIndex || !IsUnitVisibleToPlayer(playerMap, target))
                         return;
                     int targetX = panel->unitName2.left -
-                                  GetTextWidth((Font*)panel->font, (unsigned char*)(char*)target->def.get()) / 2;
+                                  GetTextWidth(panel->font, (unsigned char*)(char*)target->def.get()) / 2;
                     SetTextColors(0x53, GetTextKeyColor());
                     DrawString((Surface*)surface, (unsigned char*)((char*)target->def.get()), targetX,
                                  panel->unitName2.top + yOffset, -1);
@@ -1703,7 +1702,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                 char* prefix = (char*)(((unsigned char)(unit->flags >> 9) & 1) != 0 ? "S: " : "R: ");
                 char* s = Translate("Unidentified object");
                 sprintf(text, "%s%s", prefix, s);
-                int w = GetTextWidth((Font*)panel->font, (unsigned char*)text);
+                int w = GetTextWidth(panel->font, (unsigned char*)text);
                 int x = panel->unitName.left - w / 2;
                 SetTextColors(0x53, GetTextKeyColor());
                 DrawString((Surface*)surface, (unsigned char*)text, x, panel->unitName.top + yOffset, -1);

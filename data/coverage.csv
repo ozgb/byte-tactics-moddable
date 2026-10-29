@@ -13,7 +13,7 @@ ai,CopyOneByte,src/ai/ai_player.cpp,0,0,0,0,0,0,?CopyOneByte@@YGXPAUPercentByte@
 ai,DestroyPlayerAI,src/ai/ai_player.cpp,1,0,0,0,0,0,?DestroyPlayerAI@@YGXH@Z,0,shutdown
 ai,Direction,src/ai/player_ai.cpp,0,0,0,0,0,0,?Direction@@YG?AUVec3@@FH@Z,1,
 ai,DistSq,src/ai/player_ai.cpp,0,0,0,0,0,0,?DistSq@@YGHABUPoint16@@0@Z,1,
-ai,DumpPlayerAI,src/ai/ai_player.cpp,1,0,0,0,0,0,?DumpPlayerAI@@YGXHPAU_iobuf@@@Z,0,console
+ai,DumpPlayerAI,src/ai/ai_player.cpp,1,0,0,0,0,0,?DumpPlayerAI@@YGXHPAX@Z,0,console
 ai,FUN_00406f40,src/ai/ai_player.cpp,0,0,0,0,0,0,?FUN_00406f40@@YGXXZ,1,
 ai,FreeSquads,src/units/squads.cpp,1,0,0,0,0,0,?FreeSquads@@YGXPAUPlayer@@@Z,0,shutdown
 ai,GetMirroredBasePosition,src/ai/ai_player.cpp,0,0,0,0,0,0,?GetMirroredBasePosition@@YGXHHPAUMirroredBasePos@@@Z,1,

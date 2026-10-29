@@ -751,7 +751,7 @@ game,platform,call,host_window_place,2
 game,platform,call,operator delete,6
 game,platform,call,operator new,5
 game,platform,shared_write,Fixed::whole,1
-game,platform,shared_write,Game::ticks,1
+game,platform,shared_write,Game::ticks,2
 game,platform,shared_write,Point16::x,8
 game,platform,shared_write,Point16::y,8
 game,platform,shared_write,Vec3::x,22
@@ -3954,10 +3954,10 @@ seams,pathfinding,shared_write,UnitsSeam::RefreshMovedUnits,1
 seams,pathfinding,shared_write,UnitsSeam::RefreshUnitIfStale,2
 seams,platform,call,operator delete,2
 seams,platform,shared_write,Seams::weapons,2
-seams,platform,shared_write,Seams::wind_meteors,1
+seams,platform,shared_write,Seams::wind_meteors,2
 seams,platform,shared_write,WeaponsSeam::SpawnProjectile,1
-seams,platform,shared_write,WindMeteorsSeam::UpdateMeteors,1
-seams,platform,shared_write,WindMeteorsSeam::UpdateWind,1
+seams,platform,shared_write,WindMeteorsSeam::UpdateMeteors,3
+seams,platform,shared_write,WindMeteorsSeam::UpdateWind,3
 seams,platform,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 seams,players,call,MissionConditions::Deactivate,1
 seams,players,call,MissionConditions::FreeConditions,1

@@ -1,13 +1,11 @@
 #ifndef GAME_H
 #define GAME_H
 
-#ifndef TA_TYPES_H
 #include "../graphics/rect.h"
 #include "../ingame/frame_timers.h"
 #include "../map/grid.h"
 #include "../network/player.h"
 #include "../network/settings.h"
-#endif
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
 #include "../frontend/net_game_flag_low_bits.h"
@@ -67,10 +65,10 @@ struct BuildMenuPage;
 struct Cell;
 struct ChatPacket;
 class MemoryCacheView;
-struct Object3doView;
+struct Object3do;
 class UnitSyncView;
 struct ParticleListsView;
-struct SpatialBucketView;
+class SpatialBucket;
 class SoundView;
 struct ConnectionBlob;
 struct MainFrameDisplayContext;
@@ -84,7 +82,6 @@ struct Font;
 class HapiBank;
 struct FrameTable;
 struct MapTileSet;
-struct List_00420960;
 class Mission;
 class MissionConditions;
 struct DplConnectionView;
@@ -427,13 +424,13 @@ struct Game {
             Ref<Cell> cells;
             unsigned short* mapValues;
             Grid grid1;
-            Ref<SpatialBucketView> cells_1429f;
+            Ref<SpatialBucket> cells_1429f;
             unsigned int width_142a3;
             unsigned int height_142a7;
             char pad_142ab[4];
             int field_142af;
             int field_142b3;
-            Ref<SpatialBucketView> overflowBucket;
+            Ref<SpatialBucket> overflowBucket;
             Rect viewLimit;
             char radarViewportRect[16];
             void* finalSurface;
@@ -630,7 +627,7 @@ struct Game {
         F14373 autoFollowFlags;
         unsigned int autoFollowFlags_14373;
     };
-    Ref<Object3doView*> types;
+    Ref<Object3do*> types;
     MemoryCacheView* unitTable;
     char pad_1437f[4];
     void* xform;
@@ -757,7 +754,7 @@ struct Game {
     };
     int count_1491b;
     Debris debris[300];
-    List_00420960* lists[3];
+    void* lists[3];
     void* explosionLensFrame;
     Object3do slots[300];
     union {

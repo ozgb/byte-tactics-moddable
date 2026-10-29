@@ -1,9 +1,7 @@
 #ifndef SIDE_DEF_H
 #define SIDE_DEF_H
 
-#ifndef TA_TYPES_H
 #include "../graphics/rect.h"
-#endif
 
 #pragma pack(push, 1)
 struct SideDef {

@@ -37,12 +37,12 @@ economy,UPlayer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 economy,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 economy,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 economy,UpdateResourceSharing,SendPacketToPlayer,TODO(#506): sim sends a packet
-economy,VCobScriptView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 economy,VUnitCategory::?$vector::insert,StringRef::Assign,TODO(#504): engine service
 economy,VUnitCategory::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 economy,VUnitCategory::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
 economy,VUnitDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 economy,VUnitMotion::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+economy,VUnitScript::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,CmdFeature,CommandArgs::GetArg,TODO(#504): engine service
 features,D::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,DamageFeature,GetHostDpid,TODO(#506): sim sends a packet
@@ -90,8 +90,8 @@ los_radar,UDamageTableEntry::?$allocator::construct,StringRef::StringRef,TODO(#5
 los_radar,UFogCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UPlayerInfo::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UScreenPos::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,USpatialBucketView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+los_radar,VSpatialBucket::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,VUnitResources::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,??4MapCacheEntry@@QAEAAV0@ABV0@@Z,StringRef::Assign,TODO(#504): engine service
@@ -134,13 +134,13 @@ map,UMissionFeature::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,UMissionRule::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,UMissionUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,USpatialBucketNode::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,USpatialBucketView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,VMapCacheEntry::?$vector::insert,StringRef::Assign,TODO(#504): engine service
 map,VMapCacheEntry::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 map,VMapCacheEntry::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
 map,VMission::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,VMissionConditions::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+map,VSpatialBucket::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,AiSearchGoal::SerializeNetUnitState,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
 orders,AiSearchGoal::SerializeNetUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
 orders,AirManeuverOrder::AirManeuverOrder,BitReader::ReadBits,TODO(#506): sim sends a packet
@@ -281,7 +281,6 @@ players,UpdatePlayersOnStream,FindHostSlot,TODO(#506): sim sends a packet
 players,UpdatePlayersOnStream,FocusCommander,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,OpenMessageBox,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,RenderLayer,TODO(#505): sim-to-presentation event
-players,VCobScriptView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VMissionCondition::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VOrderFx::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -291,6 +290,7 @@ players,VUnitCategory::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-
 players,VUnitDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VUnitMotion::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VUnitResources::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+players,VUnitScript::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VictoryBuildUnitType::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryCaptureUnitType::OnUnitCaptured,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryDestroyAllUnits::IsSatisfied,PlaySoundByName,TODO(#505): sim-to-presentation event
@@ -380,7 +380,7 @@ units,LoadUnitTypes,UnitTable::Construct,TODO(#505): sim-to-presentation event
 units,LoadUnitTypes,UnitTable::Initialize,TODO(#505): sim-to-presentation event
 units,MakePropList,GameAllocIgnoreTag,TODO(#504): engine service
 units,MakePropList,GetTickRate,TODO(#504): engine service
-units,PAUObject3doView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+units,PAUObject3do::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,PoseUnitModel,UpdateObjectState,TODO(#505): sim-to-presentation event
 units,ReadUnitState,BitReader::ReadBits,TODO(#506): sim sends a packet
 units,ReadUnitState,BitReader::ReadSignedBits,TODO(#506): sim sends a packet
@@ -411,7 +411,6 @@ units,UnitScript::EmitSfx,UpdateObjectState,TODO(#505): sim-to-presentation even
 units,UpdateAllUnits,CycleCameraFollow,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,CycleSelection,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,IsKeyDown,TODO(#505): sim-to-presentation event
-units,VCobScriptView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VMovementClass::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VUnitCategory::?$vector::insert,StringRef::Assign,TODO(#504): engine service
@@ -420,6 +419,7 @@ units,VUnitCategory::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-pr
 units,VUnitDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VUnitMotion::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VUnitRef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+units,VUnitScript::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,WriteUnitState,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
 units,WriteUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
 weapons,??__Fg_tdfGlobalParser@@YAXXZ,g_tdfGlobalParser,TODO(#507): sim reads view data

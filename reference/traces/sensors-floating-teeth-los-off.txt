@@ -1,6 +1,6 @@
 bt-digest 3
 trace_format bt-trace 3
-commit 202d0dd3de78a917ea3cd1555605ccc842845e0d
+commit ae507bde7be3dd4fe5ca45c4b86f45ba7933ef4f
 scenario reference/scenarios/sensors-floating-teeth-los-off.txt
 game_seed 422
 crt_seed 1422

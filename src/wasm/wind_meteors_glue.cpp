@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <excpt.h>
 #include <new>
 #include "../state/game_rand.h"
 
@@ -548,11 +549,28 @@ void __cdecl UpdateWindOnStreamThunk(RandStream stream)
     Call1(SLOT_UPDATE_WIND_ON_STREAM, (unsigned)stream);
 }
 
-const char* __cdecl TimedImport(void* user, wasmtime_val_raw_t* a)
+const char* RunImport(const ImportDef* def, wasmtime_val_raw_t* a)
 {
-    unsigned index = (unsigned)((const ImportDef*)user - kImports);
+    unsigned code = 0;
+    const char* error = nullptr;
+    __try {
+        error = def->function(nullptr, a);
+    } __except (code = GetExceptionCode(), EXCEPTION_EXECUTE_HANDLER) {
+        char text[200];
+        sprintf(text, "import %s: exception 0x%08x", def->name, code);
+        ModulesFatal(text);
+    }
+    return error;
+}
+
+const char* __cdecl GuardedImport(void* user, wasmtime_val_raw_t* a)
+{
+    const ImportDef* def = (const ImportDef*)user;
+    if (!s_timing)
+        return RunImport(def, a);
+    unsigned index = (unsigned)(def - kImports);
     unsigned long long start = host_time_counter();
-    const char* error = kImports[index].function(nullptr, a);
+    const char* error = RunImport(def, a);
     s_importTime[index] += host_time_counter() - start;
     s_importCalls[index]++;
     return error;
@@ -586,7 +604,7 @@ int __stdcall WindMeteorsInstall(wl_loader* loader, int timing)
     s_timing = timing;
     for (unsigned i = 0; i < sizeof kImports / sizeof kImports[0]; i++) {
         const ImportDef& def = kImports[i];
-        if (!wl_define_import(loader, def.module, def.name, def.signature, timing ? TimedImport : def.function, timing ? (void*)&def : nullptr))
+        if (!wl_define_import(loader, def.module, def.name, def.signature, GuardedImport, (void*)&def))
             return 0;
     }
     return 1;

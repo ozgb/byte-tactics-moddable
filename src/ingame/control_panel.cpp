@@ -136,7 +136,7 @@ static inline void CellToWorld(Point16 origin, Point16 c, Vec3* v)
 // FUNCTION: 0x419560
 void InitCommands()
 {
-    DAT_00511c20 = g_game->sideNames_37f5b[4].field_224;
+    DAT_00511c20 = g_game->ticks;
     g_messageBytesReceived = 0;
     g_messageBytesSent = 0;
     MessageByteCounter* p = (MessageByteCounter*)&g_messageBytesByType[1];
@@ -629,9 +629,9 @@ void __stdcall SetPrevNextGadgetNames(Unit* unit)
 {
     char buf[256];
     if (((UnitDef*)unit->def.get())->buildMenuPageCount < 2) {
-        sprintf(buf, "%sPREV", g_game->sideNames_37f5b[unit->player->info->side].name);
+        sprintf(buf, "%sPREV", g_game->sideDefs[unit->player->info->side].nameprefix);
         SetGadgetActiveByName(&g_game->gui, buf, 0);
-        sprintf(buf, "%sNEXT", g_game->sideNames_37f5b[unit->player->info->side].name);
+        sprintf(buf, "%sNEXT", g_game->sideDefs[unit->player->info->side].nameprefix);
         SetGadgetActiveByName(&g_game->gui, buf, 0);
     }
 }
@@ -728,7 +728,7 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
         char name[256];
         BuildDataPath(path, "guis", guiName, "GUI");
         if (HAPI_FileLengthByName(path) == 0)
-            sprintf(name, "%sDL", g_game->sideNames_37f5b[player->info->side].name);
+            sprintf(name, "%sDL", g_game->sideDefs[player->info->side].nameprefix);
         else
             strcpy(name, guiName);
         Layer* layer = LoadGuiLayer(&g_game->gui, name, 0);
@@ -777,7 +777,7 @@ void __stdcall OpenGeneratorDialog(Unit* unit)
 {
     char name[256];
     sprintf(name, "%sGEN.GUI",
-            g_game->sideNames_37f5b[g_game->players[g_game->localPlayer].info->side].name);
+            g_game->sideDefs[g_game->players[g_game->localPlayer].info->side].nameprefix);
     Layer* gadget = LoadGuiLayer(&g_game->gui, name, 0);
     if (gadget != 0) {
         gadget->handler = (void (__stdcall*)(void*))HandleBuildPanelClick;

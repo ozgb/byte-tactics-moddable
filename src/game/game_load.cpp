@@ -334,7 +334,7 @@ void __cdecl LoadMatch(void*)
                 g_seams.map->GetStartPosition(((Mission*)g_game->net), 0, (Vec3*)&pos, which);
                 if (rec->active != 0 && rec->team == 1)
                     start = pos;
-                unsigned short id = g_seams.units->FindUnitTypeId(g_game->sideNames[side].name + 4);
+                unsigned short id = g_seams.units->FindUnitTypeId(g_game->sideDefs[side].commander);
                 g_seams.units->CreateUnit(rec->kind, id, *(Vec3*)&pos, 1, 1, 0);
                 int s1 = pl->energy * 100;
                 int s2 = pl->metal * 100;
@@ -429,7 +429,7 @@ tail:
         LoadPictureCached(0, 0, 0, 0);
         PlayerInfo* pl = rec->data;
         int side = pl->side;
-        sprintf(g_game->name, "%sMAIN2.GUI", g_game->sideNames[side].name);
+        sprintf(g_game->name, "%sMAIN2.GUI", g_game->sideDefs[side].nameprefix);
     }
     LoadedGuiLayer* gadget =
         LoadGuiLayer((LoadGuiLayerParent*)&g_game->menu_519_18, g_game->name, 0x20);

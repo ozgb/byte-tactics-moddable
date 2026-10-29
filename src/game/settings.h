@@ -11,6 +11,23 @@ struct SkirmishPlayer {
     int color;
 };
 
+struct SkirmishOptionsTable {
+    SkirmishPlayer players[11];
+    int commanderDeath;
+    int mapping;
+    int lineOfSight;
+    int losType;
+    int fixedLocations;
+    char mapName[0x220 - 0x11c];
+    int baseGadgetCount;
+    int current;
+    int difficulty;
+};
+
+#if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
+static_assert(sizeof(SkirmishOptionsTable) == 0x22c, "SkirmishOptionsTable");
+#endif
+
 struct Options {
     SkirmishPlayer players[10];
     char unknown_f0[0x108 - 10 * 0x18];

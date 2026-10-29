@@ -6,6 +6,7 @@ struct DisplayAppView;
 #include "../util/mouse_event.h"
 
 struct OPENHAPIFILE;
+struct Font;
 
 union DisplayFlags {
     unsigned short word;
@@ -48,11 +49,11 @@ struct Display {
     void* lastBackBuffer;
     char pad_b8[0xbc - 0xb8];
     Surface* overrideSurface;
-    void* alphaTable;
+    unsigned char* alphaTable;
     unsigned char* shadeTable;
-    void* lightTable;
-    void* grayTable;
-    void* blueTable;
+    unsigned char* lightTable;
+    unsigned char* grayTable;
+    unsigned char* blueTable;
     int width;
     int height;
     int useOverrideSurface;
@@ -74,7 +75,11 @@ struct Display {
     char pad_1c2[0x1ce - 0x1c2];
     int cursorThreadEnabled;
     int cursorOverlayEnabled;
-    char pad_1d6[0x214 - 0x1d6];
+    char pad_1d6[0x204 - 0x1d6];
+    Font* font;
+    int foreColor;
+    int backColor;
+    int keyColor;
     unsigned int entries[256];
     float paletteBrightness;
     OPENHAPIFILE** files;

@@ -41,58 +41,16 @@ struct PolylineSegment {
     Point* to;
 };
 
-struct DisplayFadeView {
-    char unknown_0[0xc4];
-    unsigned char* fade_neg;
-    unsigned char* fade_pos;
-    char unknown_cc[0xd4 - 0xcc];
-    int width;
-    int height;
-};
-
-struct DisplayLitLineView {
-    char unknown_0[0xc8];
-    unsigned int* palette;
-};
-
-struct DisplayBlendLineView {
-    char unknown_0[0xc0];
-    unsigned int* palette;
-};
-
-struct DisplayShadeView {
-    char unknown_0[0xc4];
-    unsigned char* shade;
-};
-
-struct DisplayGrayView {
-    char unknown_0[0xcc];
-    int grayTable;
-    char unknown_d0[0xf1 - 0xd0];
-    unsigned char flags;
-};
-
-struct DisplayKeyColorView {
-    char unknown_0[0x210];
-    int keyColor;
-};
-
-struct Obj {
-    char unknown_0[0x208];
-    int foreColor;
-    int backColor;
-    int keyColor;
-};
-
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
 #include "draw.h"
 void __cdecl BlitLine(Surface* dst, int x0, int y0, int x1, int y1, int color);
 void __cdecl BlitLineRemapped(Surface* dst, int x0, int y0, int x1, int y1,
-                              int color, unsigned int* palette);
-int __stdcall GetDisplay();
+                              int color, unsigned char* palette);
+#include "display.h"
+Display* GetDisplay();
 void __cdecl FillSolidRect(Surface* s, Rect* r, int color);
-void __cdecl RemapRect(int dst, int pitch, int w, int h, int table);
+void __cdecl RemapRect(int dst, int pitch, int w, int h, unsigned char* table);
 void __cdecl XorRect(Surface* s, Rect* r, int value);
 #include "../util/math.h"
 void __cdecl BlitRectKeyed(Surface* dst, Surface* src, Rect* rect, Rect* pos,
@@ -206,8 +164,8 @@ fail:
 Surface* __stdcall DrawLitLine(Surface* surface, int x0, int y0,
                                          int x1, int y1, int color)
 {
-    DisplayLitLineView* app = (DisplayLitLineView*)GetDisplay();
-    if (!app->palette)
+    Display* app = GetDisplay();
+    if (!app->lightTable)
         return 0;
     Surface* ret;
     if (surface == 0) {
@@ -215,12 +173,12 @@ Surface* __stdcall DrawLitLine(Surface* surface, int x0, int y0,
         ret = (Surface*)LockScreen(&screen);
         if (ret) {
             if (ClipLine(&screen, &x0, &y0, &x1, &y1))
-                BlitLineRemapped(&screen, x0, y0, x1, y1, color, app->palette);
+                BlitLineRemapped(&screen, x0, y0, x1, y1, color, app->lightTable);
             UnlockScreen(&screen);
         }
     } else {
         if (ClipLine(surface, &x0, &y0, &x1, &y1))
-            BlitLineRemapped(surface, x0, y0, x1, y1, color, app->palette);
+            BlitLineRemapped(surface, x0, y0, x1, y1, color, app->lightTable);
         ret = (Surface*)1;
     }
     return ret;
@@ -230,19 +188,19 @@ Surface* __stdcall DrawLitLine(Surface* surface, int x0, int y0,
 Surface* __stdcall DrawBlendedLine(Surface* surface, int x0, int y0,
                                          int x1, int y1, int color)
 {
-    DisplayBlendLineView* app = (DisplayBlendLineView*)GetDisplay();
+    Display* app = GetDisplay();
     Surface* ret;
     if (surface == 0) {
         Surface screen;
         ret = (Surface*)LockScreen(&screen);
         if (ret) {
             if (ClipLine(&screen, &x0, &y0, &x1, &y1))
-                BlitLineRemapped(&screen, x0, y0, x1, y1, color, app->palette);
+                BlitLineRemapped(&screen, x0, y0, x1, y1, color, app->alphaTable);
             UnlockScreen(&screen);
         }
     } else {
         if (ClipLine(surface, &x0, &y0, &x1, &y1))
-            BlitLineRemapped(surface, x0, y0, x1, y1, color, app->palette);
+            BlitLineRemapped(surface, x0, y0, x1, y1, color, app->alphaTable);
         ret = (Surface*)1;
     }
     return ret;
@@ -422,7 +380,7 @@ int __stdcall DrawPolylines(Surface* surface, Point* points, int* counts,
 // FUNCTION: 0x4bf4d0
 int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
 {
-    DisplayFadeView* engine = (DisplayFadeView*)GetDisplay();
+    Display* engine = GetDisplay();
     Surface screen;
     Rect r;
     if (surface == 0) {
@@ -447,7 +405,7 @@ int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
         if (level < 0) {
             if (level < -0x20)
                 level = -0x20;
-            table = engine->fade_neg;
+            table = engine->shadeTable;
             level += 0x20;
             if (table == 0)
                 return 0;
@@ -455,7 +413,7 @@ int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
         } else {
             if (level > 0x1f)
                 level = 0x1f;
-            table = engine->fade_pos;
+            table = engine->lightTable;
             if (table == 0)
                 return 0;
             t = table + (level << 8);
@@ -663,8 +621,8 @@ int __stdcall GrayRectangle(Surface* surface, Rect* rect)
 {
     Surface screen;
     Rect r = *rect;
-    DisplayGrayView* g = (DisplayGrayView*)GetDisplay();
-    if ((g->flags & 1) == 0)
+    Display* g = GetDisplay();
+    if (g->flags.bits.has_cc == 0)
         return 0;
     int result;
 #ifdef __clang__
@@ -957,7 +915,7 @@ void __stdcall FillShadedSpan(int row, ScanlineSpan* span, GafFrame* surf, unsig
 {
     unsigned char* p = surf->pixelsOrLayers;
     unsigned char* d = surf->scratch;
-    DisplayShadeView* app = (DisplayShadeView*)GetDisplay();
+    Display* app = GetDisplay();
     int w = span->x2 - span->x1;
     int dz = (span->z2 - span->z1) / w;
     int ds = (span->s2 - span->s1) / w;
@@ -981,7 +939,7 @@ void __stdcall FillShadedSpan(int row, ScanlineSpan* span, GafFrame* surf, unsig
                 unsigned char zi = z >> 16;
                 if (*d <= zi) {
                     int si = s >> 16;
-                    *p = app->shade[(si << 8) + color];
+                    *p = app->shadeTable[(si << 8) + color];
                     *d = zi;
                 }
                 p++;
@@ -992,7 +950,7 @@ void __stdcall FillShadedSpan(int row, ScanlineSpan* span, GafFrame* surf, unsig
         } else {
             while (count--) {
                 int si = s >> 16;
-                *p++ = app->shade[(si << 8) + color];
+                *p++ = app->shadeTable[(si << 8) + color];
                 s += ds;
             }
         }
@@ -1311,44 +1269,40 @@ int __stdcall PointInPolygon(Point* pts, int n, int px, int py)
 // FUNCTION: 0x4c13a0
 void __stdcall SetTextColors(int param_1, int param_2)
 {
-    void* eax = (void*)GetDisplay();
+    Display* d = GetDisplay();
     if (param_1 != -1) {
-        *(int*)((unsigned char*)eax + 0x208) = param_1;
+        d->foreColor = param_1;
     }
     if (param_2 != -1) {
-        *(int*)((unsigned char*)eax + 0x20c) = param_2;
+        d->backColor = param_2;
     }
 }
 
 // FUNCTION: 0x4c13d0
 void __stdcall SetTextKeyColor(int value)
 {
-    DisplayKeyColorView* obj = (DisplayKeyColorView*)GetDisplay();
-    obj->keyColor = value;
+    GetDisplay()->keyColor = value;
 }
 
 
 // FUNCTION: 0x4c13f0
 int GetTextKeyColor()
 {
-    Obj* obj = (Obj*)GetDisplay();
-    return obj->keyColor;
+    return GetDisplay()->keyColor;
 }
 
 
 // FUNCTION: 0x4c1400
 int GetTextForeColor()
 {
-    Obj* obj = (Obj*)GetDisplay();
-    return obj->foreColor;
+    return GetDisplay()->foreColor;
 }
 
 
 // FUNCTION: 0x4c1410
 int GetTextBackColor()
 {
-    Obj* obj = (Obj*)GetDisplay();
-    return obj->backColor;
+    return GetDisplay()->backColor;
 }
 
 
@@ -1356,8 +1310,7 @@ int GetTextBackColor()
 void __stdcall SetFont(int param_1)
 {
     if (param_1 != 0) {
-        int eax = GetDisplay();
-        *(int*)(eax + 0x204) = param_1;
+        GetDisplay()->font = (Font*)param_1;
     }
 }
 
@@ -1365,17 +1318,15 @@ void __stdcall SetFont(int param_1)
 // FUNCTION: 0x4c1440
 int GetFont()
 {
-    return *(int*)(GetDisplay() + 0x204);
+    return (int)GetDisplay()->font;
 }
 
 
 // FUNCTION: 0x4c1450
 int GetFontHeight()
 {
-    int temp = GetDisplay();
-    int ptr = *(int*)(temp + 0x204);
     unsigned int result = 0;
-    result = *(unsigned char*)ptr;
+    result = *(unsigned char*)GetDisplay()->font;
     return result;
 }
 

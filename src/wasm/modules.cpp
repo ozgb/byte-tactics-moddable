@@ -313,11 +313,13 @@ void WriteTiming(unsigned tick)
     unsigned ms = host_time_ms() - s_timingMs;
     WindMeteorsTimingReport(body);
     FILE* file = fopen("moduletime.txt", "wb");
-    if (file == nullptr)
+    if (file != nullptr) {
+        fprintf(file, "bt-moduletime 1\nmode\t%s\nticks\t%u\nwall_counter\t%I64u\nwall_ms\t%u\ntimer_cost\t%I64u\n%s",
+                s_wasm ? "wasm" : "native", tick - s_timingFirstTick + 1, counter, ms, overhead, body);
+        fclose(file);
+    } else {
         ModulesFatal("testmode: cannot write moduletime.txt");
-    fprintf(file, "bt-moduletime 1\nmode\t%s\nticks\t%u\nwall_counter\t%I64u\nwall_ms\t%u\ntimer_cost\t%I64u\n%s",
-            s_wasm ? "wasm" : "native", tick - s_timingFirstTick + 1, counter, ms, overhead, body);
-    fclose(file);
+    }
 }
 
 void TimingTick(unsigned tick)
@@ -348,10 +350,12 @@ void __stdcall ModulesCheckStatics(unsigned tick)
         s_fuelMax = used;
         s_fuelMaxTick = tick;
         FILE* file = fopen("fuel.txt", "wb");
-        if (file == nullptr)
+        if (file != nullptr) {
+            fprintf(file, "bt-fuel 1\n%s\t%u\t%u\n", kModuleName, s_fuelMax, s_fuelMaxTick);
+            fclose(file);
+        } else {
             ModulesFatal("testmode: cannot write fuel.txt");
-        fprintf(file, "bt-fuel 1\n%s\t%u\t%u\n", kModuleName, s_fuelMax, s_fuelMaxTick);
-        fclose(file);
+        }
     }
     unsigned skip[4];
     unsigned skipCount;

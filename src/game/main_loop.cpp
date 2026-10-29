@@ -304,11 +304,11 @@ void __stdcall SetStartingStorageBonus(Player* obj, int height, int width)
 // FUNCTION: 0x496ee0
 void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
 {
-    g_game->players[team].info->side = ((SkirmishOptionsTable*)g_game->options)->players[team].side;
-    g_game->players[team].info->color = ((SkirmishOptionsTable*)g_game->options)->players[team].color;
+    g_game->players[team].info->side = g_game->options->players[team].side;
+    g_game->players[team].info->color = g_game->options->players[team].color;
     Player* p = &g_game->players[team];
-    int w = ((SkirmishOptionsTable*)g_game->options)->players[team].energy;
-    int v = ((SkirmishOptionsTable*)g_game->options)->players[team].metal;
+    int w = g_game->options->players[team].energy;
+    int v = g_game->options->players[team].metal;
     p->bits_148.started = 1;
     p->energyStorageBonus = (float)(w >= 200 ? w : 200);
     p->metalStorageBonus = (float)(v >= 200 ? v : 200);

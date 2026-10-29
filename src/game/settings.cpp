@@ -95,19 +95,19 @@ static inline void ReadSettingInt(const char* key, int SkirmishOptionsTable::* f
 {
     int ok = SettingGetInt((void*)"Total Annihilation", (void*)key, &value);
     if (ok != 0) {
-        ((SkirmishOptionsTable*)g_game->options)->*field = value;
+        g_game->options->*field = value;
     } else {
-        ((SkirmishOptionsTable*)g_game->options)->*field = defaultValue;
-        SettingSetInt((void*)"Total Annihilation", (void*)key, ((SkirmishOptionsTable*)g_game->options)->*field);
+        g_game->options->*field = defaultValue;
+        SettingSetInt((void*)"Total Annihilation", (void*)key, g_game->options->*field);
     }
 }
 
 static inline void ReadPlayerSetting(const char* key, int SkirmishPlayer::* field, int defaultValue, int& value, int i)
 {
     if (SettingGetInt((void*)"Total Annihilation\\Skirmish", (void*)key, &value) != 0) {
-        ((SkirmishOptionsTable*)g_game->options)->players[i].*field = value;
+        g_game->options->players[i].*field = value;
     } else {
-        ((SkirmishOptionsTable*)g_game->options)->players[i].*field = defaultValue;
+        g_game->options->players[i].*field = defaultValue;
     }
 }
 
@@ -349,22 +349,22 @@ void LoadSettings()
     ReadSettingInt("SkirmishLineOfSight", &SkirmishOptionsTable::lineOfSight, 1, value);
     ReadSettingInt("SkirmishLOSType", &SkirmishOptionsTable::losType, 1, value);
     if (SettingGetInt((void*)"Total Annihilation", (void*)"SkirmishDifficulty", &value) != 0) {
-        ((SkirmishOptionsTable*)g_game->options)->difficulty = value & 0xffff;
+        g_game->options->difficulty = value & 0xffff;
     } else {
-        ((SkirmishOptionsTable*)g_game->options)->difficulty = 1;
+        g_game->options->difficulty = 1;
         SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishDifficulty",
-                     ((SkirmishOptionsTable*)g_game->options)->difficulty);
+                     g_game->options->difficulty);
     }
     ReadSettingInt("SkirmishLocation", &SkirmishOptionsTable::fixedLocations, 1, value);
     value = 0x100;
     if (SettingGetString((void*)"Total Annihilation", (void*)"SkirmishMap",
-                     ((SkirmishOptionsTable*)g_game->options)->mapName, &value) == 0) {
+                     g_game->options->mapName, &value) == 0) {
         g_seams.map->SetMissionType(2);
         g_seams.map->RefreshMapList(g_game->net, 0, 0);
-        strncpy(((SkirmishOptionsTable*)g_game->options)->mapName,
+        strncpy(g_game->options->mapName,
                 g_seams.map->GetMissionName(g_game->net), 0x100);
         g_seams.map->SetMissionType(0);
-        SettingSetString((void*)"Total Annihilation", (void*)"SkirmishMap", ((SkirmishOptionsTable*)g_game->options)->mapName);
+        SettingSetString((void*)"Total Annihilation", (void*)"SkirmishMap", g_game->options->mapName);
     }
     for (i = 0; i < g_game->playerCount; i++) {
         sprintf(name, "Player%dController", i);
@@ -418,7 +418,7 @@ void SaveSettings()
     SettingSetInt((void*)"Total Annihilation", (void*)"DisplaymodeWidth", g_game->width_37f1b);
     SettingSetInt((void*)"Total Annihilation", (void*)"DisplaymodeHeight", g_game->height_37f1f);
     SettingSetInt((void*)"Total Annihilation", (void*)"side", g_game->flag_37ef2);
-    SettingSetInt((void*)"Total Annihilation", (void*)"FixedLocations", ((SkirmishOptionsTable*)g_game->options)->fixedLocations);
+    SettingSetInt((void*)"Total Annihilation", (void*)"FixedLocations", g_game->options->fixedLocations);
     SettingSetInt((void*)"Total Annihilation", (void*)"scrollspeed", g_game->scrollSpeed);
     SettingSetInt((void*)"Total Annihilation", (void*)"SingleCommanderDeath", g_game->singleCommanderDeath);
     SettingSetInt((void*)"Total Annihilation", (void*)"SingleMapping", g_game->singleMapping);
@@ -476,31 +476,31 @@ void SaveSettings()
     SettingSetInt((void*)"Total Annihilation", (void*)"MultiLineOfSight", g_game->multiLineOfSight);
     SettingSetInt((void*)"Total Annihilation", (void*)"MultiLOSType", g_game->multiLOSType);
     SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishCommanderDeath",
-                 ((SkirmishOptionsTable*)g_game->options)->commanderDeath);
-    SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishMapping", ((SkirmishOptionsTable*)g_game->options)->mapping);
+                 g_game->options->commanderDeath);
+    SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishMapping", g_game->options->mapping);
     SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishLineOfSight",
-                 ((SkirmishOptionsTable*)g_game->options)->lineOfSight);
-    SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishLOSType", ((SkirmishOptionsTable*)g_game->options)->losType);
-    SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishLocation", ((SkirmishOptionsTable*)g_game->options)->fixedLocations);
+                 g_game->options->lineOfSight);
+    SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishLOSType", g_game->options->losType);
+    SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishLocation", g_game->options->fixedLocations);
     SettingSetInt((void*)"Total Annihilation", (void*)"SkirmishDifficulty",
-                 ((SkirmishOptionsTable*)g_game->options)->difficulty);
-    SettingSetString((void*)"Total Annihilation", (void*)"SkirmishMap", ((SkirmishOptionsTable*)g_game->options)->mapName);
+                 g_game->options->difficulty);
+    SettingSetString((void*)"Total Annihilation", (void*)"SkirmishMap", g_game->options->mapName);
     for (i = 0; i < g_game->playerCount; i++) {
         sprintf(name, "Player%dController", i);
         SettingSetInt((void*)"Total Annihilation\\Skirmish", name,
-                     ((SkirmishOptionsTable*)g_game->options)->players[i].controller);
+                     g_game->options->players[i].controller);
         sprintf(name, "Player%dSide", i);
-        SettingSetInt((void*)"Total Annihilation\\Skirmish", name, ((SkirmishOptionsTable*)g_game->options)->players[i].side);
+        SettingSetInt((void*)"Total Annihilation\\Skirmish", name, g_game->options->players[i].side);
         sprintf(name, "Player%dColor", i);
-        SettingSetInt((void*)"Total Annihilation\\Skirmish", name, ((SkirmishOptionsTable*)g_game->options)->players[i].color);
+        SettingSetInt((void*)"Total Annihilation\\Skirmish", name, g_game->options->players[i].color);
         sprintf(name, "Player%dAllyGroup", i);
         SettingSetInt((void*)"Total Annihilation\\Skirmish", name,
-                     ((SkirmishOptionsTable*)g_game->options)->players[i].allyGroup);
+                     g_game->options->players[i].allyGroup);
         sprintf(name, "Player%dMetal", i);
-        SettingSetInt((void*)"Total Annihilation\\Skirmish", name, ((SkirmishOptionsTable*)g_game->options)->players[i].metal);
+        SettingSetInt((void*)"Total Annihilation\\Skirmish", name, g_game->options->players[i].metal);
         sprintf(name, "Player%dEnergy", i);
         SettingSetInt((void*)"Total Annihilation\\Skirmish", name,
-                     ((SkirmishOptionsTable*)g_game->options)->players[i].energy);
+                     g_game->options->players[i].energy);
     }
     SettingSetInt((void*)"Total Annihilation", (void*)"PlayMovie", g_game->playMovie);
 }

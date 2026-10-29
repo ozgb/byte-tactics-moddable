@@ -6,6 +6,7 @@
 #include "../map/grid.h"
 #include "../network/player.h"
 #include "../network/settings.h"
+#include "settings.h"
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
 #include "../frontend/net_game_flag_low_bits.h"
@@ -72,7 +73,6 @@ struct ConnectionBlob;
 struct MainFrameDisplayContext;
 struct GameDescEntry;
 struct SoundCategoryEntry;
-struct SkirmishOptionsView;
 struct EyeView;
 struct Feature;
 struct FeatureSpot;
@@ -244,7 +244,7 @@ struct Game {
         char message_519[5745];
         char messages[9351];
     };
-    SkirmishOptionsView* options;
+    SkirmishOptionsTable* options;
     union {
         struct {
             int loaded[10];

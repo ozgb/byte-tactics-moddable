@@ -220,7 +220,7 @@ void __cdecl LoadMatch(void*)
     case 2:
         g_game->maxUnitsSetting = g_game->maxUnits_37eec;
         g_nonCampaignGame = 1;
-        ApplyMissionOptionFlags(&((SkirmishOptionsTable*)g_game->options)->missionFlags);
+        ApplyMissionOptionFlags(&g_game->options->missionFlags);
         break;
     case 3: {
         g_game->maxUnitsSetting = g_game->maxUnits_37eec;
@@ -272,7 +272,7 @@ void __cdecl LoadMatch(void*)
             g_seams.players->LoadPlayerControllers(((HapiBank*)g_game->pendingSaveStore));
             if (g_seams.map->GetGameType(((Mission*)g_game->net)) == 2) {
                 int count = 0;
-                SkirmishPlayer* def = ((SkirmishOptionsTable*)g_game->options)->players;
+                SkirmishPlayer* def = g_game->options->players;
                 int i = 0;
                 while (i < 10) {
                     if (def->controller == 1 || def->controller == 2)
@@ -348,7 +348,7 @@ void __cdecl LoadMatch(void*)
             ReportGameEvent(6);
         } else if (g_seams.map->GetGameType(((Mission*)g_game->net)) == 2 &&
             ((HapiBank*)g_game->pendingSaveStore) == 0) {
-            if (((SkirmishOptionsTable*)g_game->options)->fixedLocations != 0) {
+            if (g_game->options->fixedLocations != 0) {
                 for (int i1 = 0; i1 < 10; i1++) {
                     if ((unsigned char)i1 < 10) {
                         LoadingPlayerRecord* rec = &(*(LoadingPlayerRecord(*)[10])&g_game->players)[(unsigned char)i1];

@@ -3,6 +3,7 @@
     uv run tools/wasm_modules.py build     # build/wasm-modules/c.wasm, rust.wasm and wind_meteors.wasm
     uv run tools/wasm_modules.py check     # run both fixtures in one wasmtime memory and table
     uv run tools/wasm_modules.py imports   # check every built module's imports and exports
+    uv run tools/wasm_modules.py statics   # run wind_meteors for 2000 ticks and check its statics never change
 
 Both fixtures use the fixed-base convention (#562): each imports env.memory and
 env.__indirect_function_table, is linked with its own --global-base and --table-base
@@ -30,14 +31,27 @@ build/tools/bin, install it with `cargo install wasm-tools --version <pin> --loc
 build/tools`, or on PATH). A game-logic module may import only env.memory, env.__indirect_function_table,
 the imported globals (env.__sim_base, the block base the loader sets), the interface imports and engine services its manifest lists, and no WASI, clock, random, file or
 network import; it must export exactly the manifest's slots and the data the loader fills.
+
+statics runs wind_meteors under the pinned wasmtime package with the manifest's block layout: a memory of
+memory_pages pages, __sim_base set to block_base, a Game and a SimGlobals zeroed in the block (with the
+size, wind and meteor fields set so showers start within the run), the module's g_game, g_simGlobals and
+g_extTdf written through its exports, and stubs for every import (GameRand and RandomInt from an LCG,
+SpawnProjectile counting its calls, FindWeaponByName returning the first weapon of the Game, FatalError
+raising). It calls InitMeteors, EnableMeteors and SetMeteorParams, then 2000 ticks of UpdateWind and
+UpdateMeteors with Game::ticks incremented, and hashes the module's statics (its data and bss, from
+data_base to the low end of its stack, as linked) after setup and after every tick. A module that keeps
+state outside the block fails at the first tick whose hash differs. The field offsets come from
+src/state/layout_asserts.cpp (Game) and wasm/wind_meteors/layout_asserts.h (SimGlobals).
 """
 
 import argparse
 import concurrent.futures
+import hashlib
 import json
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 
@@ -477,6 +491,147 @@ def run_check():
     return 0
 
 
+STATICS_TICKS = 2000
+STATICS_GAME_AT = 0x1000
+STATICS_SIM_AT = 0x1000 + 0x40000
+
+
+def layout_offsets(wanted):
+    """The offsets {(type, field): offset} of the wanted (type, field) pairs from the layout assert files."""
+    found = {}
+    for path in ("src/state/layout_asserts.cpp", "wasm/wind_meteors/layout_asserts.h"):
+        with open(os.path.join(ROOT, path)) as f:
+            for kind, field, value in re.findall(r"static_assert\(offsetof\((\w+), (\w+)\) == (\d+)", f.read()):
+                if (kind, field) in wanted:
+                    found[(kind, field)] = int(value)
+    missing = sorted(set(wanted) - set(found))
+    if missing:
+        sys.exit(f"no layout assert for {missing}")
+    return found
+
+
+def statics_run():
+    import wasmtime
+
+    pins = game_manifest()
+    entry = pins["modules"][0]
+    path = os.path.join(OUT, entry["name"] + ".wasm")
+    if not os.path.exists(path):
+        sys.exit(f"{path} is missing: build first: uv run tools/wasm_modules.py build")
+    with open(path, "rb") as f:
+        info = parse_module(f.read())
+    statics = (entry["data_base"], info["stack_top"] - pins["stack_size"])
+    base, scratch = pins["block_base"], pins["scratch"][0]
+    game_at, sim_at = base + STATICS_GAME_AT, base + STATICS_SIM_AT
+    fields = [("Game", n) for n in ("ticks", "width", "height", "weapons", "windSpeedMin", "windSpeedMax", "windSpeedDenominator")]
+    fields += [("SimGlobals", "g_meteorWeaponName"), ("SimGlobals", "g_meteorsEnabled")]
+    off = layout_offsets(set(fields))
+
+    store = wasmtime.Store()
+    memory = wasmtime.Memory(store, wasmtime.MemoryType(wasmtime.Limits(pins["memory_pages"], pins["memory_pages"])))
+    table = wasmtime.Table(store, wasmtime.TableType(wasmtime.ValType.funcref(),
+                                                      wasmtime.Limits(pins["table_size"], pins["table_size"])), None)
+    state = {"lcg": 0x2545F491, "spawns": 0}
+
+    def rand32():
+        state["lcg"] = (state["lcg"] * 1103515245 + 12345) & 0x7FFFFFFF
+        return state["lcg"]
+
+    def game_rand(_stream):
+        return (rand32() >> 8) & 0x7FFF
+
+    def random_int(count):
+        return rand32() % count if count > 0 else 0
+
+    def spawn_projectile(_weapon, _pos, _vel, _flag):
+        state["spawns"] += 1
+        return 1
+
+    def fatal_error(_message):
+        raise RuntimeError("the module called FatalError")
+
+    stubs = {("services", "GameRand"): game_rand, ("services", "RandomInt"): random_int,
+             ("weapons", "SpawnProjectile"): spawn_projectile,
+             ("weapons", "FindWeaponByName"): lambda _name: game_at + off[("Game", "weapons")],
+             ("services", "FatalError"): fatal_error}
+
+    def unexpected(name):
+        def stub(*_args):
+            raise RuntimeError(f"the run called {name}, which it should not reach")
+        return stub
+
+    module = wasmtime.Module.from_file(store.engine, path)
+    linker = wasmtime.Linker(store.engine)
+    linker.define(store, "env", "memory", memory)
+    linker.define(store, "env", "__indirect_function_table", table)
+    linker.define(store, "env", "__sim_base", wasmtime.Global(store, wasmtime.GlobalType(wasmtime.ValType.i32(), False),
+                                                              wasmtime.Val.i32(base)))
+    for imp in module.imports:
+        if isinstance(imp.type, wasmtime.FuncType):
+            key = (imp.module, imp.name)
+            linker.define(store, imp.module, imp.name, wasmtime.Func(store, imp.type, stubs.get(key, unexpected(f"{key[0]}.{key[1]}"))))
+    instance = linker.instantiate(store, module)
+    exports = instance.exports(store)
+
+    def put(address, value, size=4):
+        memory.write(store, (value & ((1 << (8 * size)) - 1)).to_bytes(size, "little"), address)
+
+    def get(address):
+        return int.from_bytes(memory.read(store, address, address + 4), "little")
+
+    put(exports["g_game"].value(store), game_at)
+    put(exports["g_simGlobals"].value(store), sim_at)
+    memory.write(store, b"tdf\0", exports["g_extTdf"].value(store))
+    put(game_at + off[("Game", "width")], 4096)
+    put(game_at + off[("Game", "height")], 4096)
+    put(game_at + off[("Game", "windSpeedMin")], 0)
+    put(game_at + off[("Game", "windSpeedMax")], 30)
+    put(game_at + off[("Game", "windSpeedDenominator")], 30)
+
+    params = scratch
+    memory.write(store, b"Meteor\0".ljust(32, b"\0"), params)
+    memory.write(store, (50).to_bytes(4, "little") + struct.pack("<fff", 0.5, 2.0, 3.0), params + 32)
+
+    def call(name, *args):
+        exports[name](store, *args)
+
+    def digest():
+        return hashlib.sha256(memory.read(store, statics[0], statics[1])).hexdigest()
+
+    call("InitMeteors")
+    call("EnableMeteors")
+    call("SetMeteorParams", params)
+    if get(sim_at + off[("SimGlobals", "g_meteorsEnabled")]) != 1:
+        sys.exit("EnableMeteors did not set g_meteorsEnabled in the block")
+    setup = digest()
+    ticks = off[("Game", "ticks")]
+    for tick in range(1, STATICS_TICKS + 1):
+        put(game_at + ticks, tick)
+        call("UpdateWind")
+        call("UpdateMeteors")
+        if digest() != setup:
+            print(f"FAIL: the statics {statics[0]:#x}..{statics[1]:#x} of {entry['name']} changed at tick {tick}")
+            return 1
+    if state["spawns"] == 0:
+        print("FAIL: SpawnProjectile was never called, so no meteor ran")
+        return 1
+    print(f"statics: {STATICS_TICKS} ticks, {state['spawns']} SpawnProjectile calls, {statics[1] - statics[0]} bytes hashed, ok")
+    return 0
+
+
+def run_under_wasmtime(command):
+    try:
+        import wasmtime
+    except ImportError:
+        if os.environ.get(GUARD):
+            raise
+        pin = manifest()["tools"]["wasmtime"]
+        env = dict(os.environ, **{GUARD: "1"})
+        cmd = ["uv", "run", "--no-project", "--with", f"wasmtime=={pin}", "python", "-I", os.path.abspath(__file__), command]
+        return subprocess.run(cmd, env=env).returncode
+    return statics_run() if command == "statics" else -1
+
+
 def check():
     try:
         import wasmtime
@@ -495,13 +650,15 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "check", "imports"])
+    parser.add_argument("command", choices=["build", "check", "imports", "statics"])
     args = parser.parse_args()
     if args.command == "build":
         build()
         return 0
     if args.command == "imports":
         return run_imports()
+    if args.command == "statics":
+        return run_under_wasmtime("statics")
     return check()
 
 

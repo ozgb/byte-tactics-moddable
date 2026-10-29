@@ -7,13 +7,9 @@
 #include <io.h>
 
 
-extern HWND g_cdPlayerWindow;
+#include "../../link/globals.h"
 
 
-extern int g_cdFadeVolume;
-extern int g_cdCategorySavedTrack[];
-extern int g_cdFadeTimer;
-extern int g_cdNextTrackTimer;
 
 #include "../graphics/display.h"
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
@@ -26,16 +22,12 @@ struct FileHandle;
 
 #include "../graphics/object_pool.h"
 
-extern int g_playBufferLooping;
-
 #include "../files/files_api.h"
 #include "../files/lzss_tree.h"
 
 #include "samples.h"
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 
-extern int g_delayedSampleVolume;
-extern char g_delayedSampleName[];
 
 #include "sound.h"
 #include "../util/vec3.h"
@@ -85,19 +77,6 @@ static inline unsigned int FindChunk(FileHandle* file, const char* tag) {
     }
 }
 
-extern Sound* g_cdPlayer;
-
-extern HANDLE g_squashThreadLockEvent;
-extern int g_squashThreadLockTicket;
-
-struct LzssDictTree {
-    LzssTreeNode entries[0x1000];
-    short field_6000;
-    short field_6002;
-    short field_6004;
-};
-
-extern LzssDictTree* g_squashDictTree;
 
 extern void* g_squashWindow;
 
@@ -1052,12 +1031,12 @@ void InitLzssLock()
 // FUNCTION: 0x4d0a10
 void __stdcall LzssInitTree(int index)
 {
-    g_squashDictTree->field_6000 = 0;
-    g_squashDictTree->field_6004 = (short)index;
-    g_squashDictTree->field_6002 = 0;
-    g_squashDictTree->entries[index].parent = 0x1000;
-    g_squashDictTree->entries[index].larger = 0;
-    g_squashDictTree->entries[index].smaller = 0;
+    g_squashDictTree[0x1000].parent = 0;
+    g_squashDictTree[0x1000].larger = index;
+    g_squashDictTree[0x1000].smaller = 0;
+    g_squashDictTree[index].parent = 0x1000;
+    g_squashDictTree[index].larger = 0;
+    g_squashDictTree[index].smaller = 0;
 }
 
 // FUNCTION: 0x4d0a70
@@ -1073,6 +1052,6 @@ int __cdecl LzssAllocWindow(void)
 int LzssAllocTree()
 {
     void* p = calloc(0x1001, 6);
-    g_squashDictTree = (LzssDictTree*)p;
+    g_squashDictTree = (LzssTreeNode*)p;
     return p ? 0 : -1;
 }

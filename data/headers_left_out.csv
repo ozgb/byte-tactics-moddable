@@ -298,8 +298,6 @@ g_readyOrder,mismatch,variable declared with a view type that differs from its d
 g_reportPlayerName,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_ringApproachVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_scorePanelSlidePos,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
-g_squashDictTree,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
-g_squashThreadLockTicket,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_timerSlots,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_vtolOrders,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_weaponAimCobVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses

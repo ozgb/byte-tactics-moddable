@@ -19,6 +19,7 @@ src/frontend/frontend.cpp,src/frontend/options.h,#392
 src/frontend/frontend.cpp,src/frontend/skirmish_menu.h,#392
 src/frontend/frontend.cpp,src/graphics/display.h,#392
 src/frontend/frontend.cpp,src/graphics/draw.h,#392
+src/frontend/frontend.cpp,src/graphics/movies.h,#392
 src/frontend/frontend.cpp,src/graphics/object_pool.h,#392
 src/frontend/frontend.cpp,src/graphics/palette.h,#392
 src/frontend/frontend.cpp,src/graphics/surface.h,#392
@@ -28,6 +29,7 @@ src/frontend/frontend.cpp,src/gui/gui.h,#392
 src/frontend/frontend.cpp,src/gui/keyboard.h,#392
 src/frontend/frontend.cpp,src/gui/layer.h,#392
 src/frontend/frontend.cpp,src/gui/mouse.h,#392
+src/frontend/frontend.cpp,src/sound/sound.h,#392
 src/frontend/multi.cpp,interfaces/host.h,#392
 src/frontend/multi.cpp,src/frontend/frontend.h,#392
 src/frontend/multi.cpp,src/frontend/multi.h,#392
@@ -76,6 +78,7 @@ src/game/console_commands.cpp,src/graphics/object_pool.h,#392
 src/game/console_commands.cpp,src/graphics/rect.h,#392
 src/game/console_commands.cpp,src/ingame/control_panel.h,#392
 src/game/console_commands.cpp,src/ingame/selection.h,#392
+src/game/console_commands.cpp,src/sound/sound.h,#392
 src/game/data_files.cpp,src/graphics/display.h,#392
 src/game/data_files.cpp,src/graphics/gaf.h,#392
 src/game/data_files.cpp,src/graphics/gaf_frame.h,#392
@@ -119,6 +122,7 @@ src/game/game_state.cpp,src/ingame/build_placement.h,#392
 src/game/game_state.cpp,src/ingame/control_panel.h,#392
 src/game/game_state.cpp,src/ingame/info_panel.h,#392
 src/game/game_state.cpp,src/ingame/selection.h,#392
+src/game/game_state.cpp,src/sound/sound.h,#392
 src/game/game_state.cpp,src/sound/sound_types.h,#392
 src/game/main.cpp,interfaces/host.h,#392
 src/game/main.cpp,src/frontend/endgame.h,#392
@@ -130,6 +134,7 @@ src/game/main.cpp,src/graphics/pcx.h,#392
 src/game/main.cpp,src/gui/mouse.h,#392
 src/game/main.cpp,src/ingame/camera.h,#392
 src/game/main.cpp,src/ingame/screenshots.h,#392
+src/game/main.cpp,src/sound/sound.h,#392
 src/game/main_loop.cpp,src/frontend/frontend.h,#392
 src/game/main_loop.cpp,src/graphics/display.h,#392
 src/game/main_loop.cpp,src/graphics/pcx.h,#392
@@ -180,8 +185,10 @@ src/graphics/model_render.cpp,src/graphics/object_pool.h,#392
 src/graphics/model_render.cpp,src/graphics/surface.h,#392
 src/graphics/movies.cpp,interfaces/host.h,#392
 src/graphics/movies.cpp,src/graphics/display.h,#392
+src/graphics/movies.cpp,src/graphics/movies.h,#392
 src/graphics/movies.cpp,windows.h,#392
 src/graphics/palette.cpp,interfaces/host.h,#392
+src/graphics/palette.cpp,src/graphics/display_context.h,#392
 src/graphics/palette.cpp,src/graphics/object_pool.h,#392
 src/graphics/palette.cpp,src/graphics/palette.h,#392
 src/graphics/particles.cpp,src/graphics/draw.h,#392
@@ -235,6 +242,7 @@ src/gui/gui_file.cpp,src/graphics/object_pool.h,#392
 src/gui/gui_file.cpp,src/graphics/palette.h,#392
 src/gui/gui_file.cpp,src/gui/dialogs.h,#392
 src/gui/keyboard.cpp,interfaces/host.h,#392
+src/gui/keyboard.cpp,src/graphics/display_context.h,#392
 src/gui/listbox.cpp,src/graphics/draw.h,#392
 src/gui/listbox.cpp,src/graphics/gaf_frame.h,#392
 src/gui/listbox.cpp,src/graphics/rect.h,#392
@@ -367,6 +375,7 @@ src/sound/sound.cpp,src/graphics/display.h,#392
 src/sound/sound.cpp,src/graphics/object_pool.h,#392
 src/sound/sound.cpp,src/ingame/selection.h,#392
 src/sound/sound.cpp,src/sound/play_sound.h,#392
+src/sound/sound.cpp,src/sound/sound.h,#392
 src/units/cob.cpp,src/graphics/display.h,#392
 src/units/cob.cpp,src/graphics/object_pool.h,#392
 src/units/movement_class.cpp,src/graphics/object_pool.h,#392

@@ -113,7 +113,7 @@ extern void __stdcall PopMouseEvent(MouseEvent* out);
 
 extern void __stdcall DrawTextInput(Gui* control, int index);
 extern int __stdcall GetTextPixelWidth(unsigned char* text);
-void* GetDisplay();
+#include "../graphics/display.h"
 
 static inline int FindPanelGadget(Layer* layer)
 {
@@ -684,7 +684,7 @@ int __stdcall HandleTextEditKey(Gui* control, int index, int key)
                 break;
             case 0xbf:
             case 0xee: {
-                HWND hwnd = *(HWND*)((char*)GetDisplay() + 0x40);
+                HWND hwnd = GetDisplay()->hwnd;
                 unsigned int copied = host_clipboard_text_get(hwnd, text, entry->status - 1);
                 if (copied != 0) {
                     if (copied < 0x80)
@@ -773,7 +773,6 @@ struct PaletteEditorDialog {
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
 int __stdcall IsGadgetNamed(Gadget* entries, int index, char* name);
 char* __stdcall Translate(char* text);
-#include "../graphics/display.h"
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int flag);
 void __stdcall SetKeyboardInput(Gui* menu, int flag);
 void __stdcall UpdateMenu(Gui* menu);

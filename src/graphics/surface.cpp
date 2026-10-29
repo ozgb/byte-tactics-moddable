@@ -77,7 +77,6 @@ struct DirectDrawSurfaceRefs {
     void* back;
 };
 
-Display* GetDisplay(void);
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
 void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);
@@ -340,14 +339,14 @@ void FlipScreen(void)
 // FUNCTION: 0x4c67c0
 void __stdcall DrawCursor(Display* obj, Surface* dst)
 {
-    if (obj->cursorThreadEnabled != 0 && obj->cursorOverlayEnabled != 0 && obj->bmp != 0) {
-        obj->saveMouse1->width = obj->bmp->width;
-        obj->saveMouse1->height = obj->bmp->height;
-        obj->saveMouse1->pitch = obj->bmp->width;
-        obj->x = obj->mouseEvent.x - obj->bmp->xOffset;
-        obj->y = obj->mouseEvent.y - obj->bmp->yOffset;
+    if (obj->cursorThreadEnabled != 0 && obj->cursorOverlayEnabled != 0 && obj->cursorSprite != 0) {
+        obj->saveMouse1->width = obj->cursorSprite->width;
+        obj->saveMouse1->height = obj->cursorSprite->height;
+        obj->saveMouse1->pitch = obj->cursorSprite->width;
+        obj->x = obj->mouseEvent.x - obj->cursorSprite->xOffset;
+        obj->y = obj->mouseEvent.y - obj->cursorSprite->yOffset;
         DrawSurface(obj->saveMouse1, dst, -obj->x, -obj->y);
-        DrawFrame(dst, obj->bmp, obj->mouseEvent.x, obj->mouseEvent.y);
+        DrawFrame(dst, obj->cursorSprite, obj->mouseEvent.x, obj->mouseEvent.y);
     }
 }
 

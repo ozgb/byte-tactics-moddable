@@ -18,10 +18,12 @@ void __stdcall SetBlueTable(unsigned int* table);
 int __stdcall HasExtension(char* name);
 
 int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
+int __stdcall AllocAlphaTable(Display* obj);
 void __stdcall FreeAlphaTable(Display* param);
 int __stdcall AllocShadeTable(Display* obj);
 void __stdcall FreeShadeTable(Display* obj);
 int __stdcall AllocLightTable(Display* obj);
+void __stdcall FreeLightTable(Display* obj);
 int __stdcall AllocGrayTable(Display* obj);
 void __stdcall FreeGrayTable(Display* obj);
 int __stdcall AllocBlueTable(Display* obj);

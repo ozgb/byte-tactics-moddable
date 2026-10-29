@@ -2202,8 +2202,6 @@ struct HandleListBoxInputObject {
 
 void __stdcall TrySetFocus(HandleListBoxInputObject* obj, int index);
 
-int __stdcall AllocAlphaTable(int param_1);
-
 struct HandleListBoxInputItem {
     char unknown_0[0x28];
     GafFrame* row;

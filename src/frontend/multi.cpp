@@ -456,6 +456,7 @@ struct UnitRestrictRecord {
 
 #include "../network/packet_manager.h"
 #include "../state/sim_globals.h"
+#include "../quirks/quirks.h"
 
 struct Dialog;
 struct UnitRestrictPicView;
@@ -1771,7 +1772,7 @@ void OpenLogoSelectDialog()
         }
         layout->seqs[j] = *(LogoAnimSeq*)(LogoTable *)g_game->logos32;
         layout->seqs[j].frame = ((LogoTable *)g_game->logos32)->entries[j].ptr;
-        if (k == 10) {
+        if (k == 10 && (!g_quirks.boundLogoSelect || n < (int)sizeof(layout->selected))) {
             *cursor = &layout->seqs[j];
             ((char*)layout)[n] = (char)j;
             n++;

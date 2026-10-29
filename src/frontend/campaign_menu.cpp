@@ -12,16 +12,6 @@
 
 #include "../map/mission.h"
 
-struct CampaignMissionInfo {
-    char unknown_0[0x30];
-    char name[8];
-};
-
-struct CampaignMissionObject {
-    char unknown_0[0x18];
-    CampaignMissionInfo* info;
-};
-
 struct BriefingPlanetAnim {
     short index;
     char unknown_2[6];
@@ -554,9 +544,9 @@ int HasFewerThanThreeCampaignFiles(void)
 }
 
 // FUNCTION: 0x477510
-void __stdcall ToggleAnyMission(CampaignMissionObject* obj)
+void __stdcall ToggleAnyMission(Gui* menu)
 {
-    if (strncmp(obj->info->name, "DRDEATH", 7) == 0) {
+    if (strncmp(menu->layer->text + 8, "DRDEATH", 7) == 0) {
         if (!(g_game->flags_38d7f & 1)) {
             SetGadgetActiveByName(&g_game->gui, "AnyMsn", 1);
             g_game->flags_38d7f |= 1;
@@ -641,7 +631,7 @@ void OpenSingleMenu()
         SetGadgetActiveByName(&g_game->gui, "AnyMsn", 1);
         g_game->flags_38d7f |= 1;
     }
-    g_game->gui.layer->textHandler = (void (__stdcall*)(void*))ToggleAnyMission;
+    g_game->gui.layer->textHandler = ToggleAnyMission;
     if (GetPreferredLanguage() && _strcmpi((char*)GetPreferredLanguage(), "spanish") == 0) {
         SetQuickKeyByName(&g_game->gui, "Skirmish", 0x73);
     }

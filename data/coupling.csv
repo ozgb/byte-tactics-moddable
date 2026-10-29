@@ -1265,6 +1265,7 @@ harness,presentation,shared_write,Game::playerIndex,20
 harness,presentation,shared_write,Player::alliedBy,4
 harness,presentation,shared_write,PlayerInfo::energy,1
 harness,presentation,shared_write,PlayerInfo::metal,1
+harness,presentation,shared_write,g_quirks,1
 harness,seams,call,InstallNativeSeams,1
 harness,units,call,ApplyUnitDeath,1
 harness,units,call,GetGroundHeight,1

@@ -44,7 +44,6 @@ struct PictureCacheEntry {
     char name[0x20];
 };
 
-#include "../game/display_flags_view.h"
 
 #include "../game/game.h"
 #pragma pack(pop)
@@ -120,7 +119,6 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
 void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall SetCursorMode(int param_1);
 char* __stdcall Translate(char* text);
-DisplayFlagsView* __stdcall GetDisplay(void);
 void HideSoftwareCursor();
 #include "../game/game_state.h"
 Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
@@ -417,8 +415,8 @@ void __stdcall HandleMainMenuClick(Gui* gadget)
     }
     if (IsCurrentGadgetNamed((Dialog *)gadget, "INTRO")) {
         PlaySoundByName("smlButton", 0);
-        DisplayFlagsView* display = GetDisplay();
-        if (!display->fullscreen) {
+        Display* display = GetDisplay();
+        if (!display->flags.bits.flag1) {
             OpenMessageBox(&g_game->gui,
                          "Debug:  You must be in full-screen mode to play a movie.",
                          200, 1, 1);
@@ -456,8 +454,8 @@ void __stdcall HandleMainMenuClick(Gui* gadget)
     }
     if (IsCurrentGadgetNamed((Dialog *)gadget, "Credits")) {
         PlaySoundByName("smlButton", 0);
-        DisplayFlagsView* display = GetDisplay();
-        if (!display->fullscreen) {
+        Display* display = GetDisplay();
+        if (!display->flags.bits.flag1) {
             OpenMessageBox(&g_game->gui,
                          "Debug:  You must be in full-screen mode to play a movie.",
                          200, 1, 1);
@@ -836,9 +834,9 @@ void RunFrontendStateMachine(void)
 
     switch ((unsigned char)(char)g_game->frontendState) {
     case 0: {
-        DisplayFlagsView* p = GetDisplay();
+        Display* p = GetDisplay();
         SetCursorOverlayEnabled(0);
-        if (p->fullscreen) {
+        if (p->flags.bits.flag1) {
             if (g_game->playMovie) {
                 PlayMovie(g_zrbMovie1);
                 SetState(1, 0x3dc, g_frontendSourceFile);

@@ -7,7 +7,6 @@ struct GafEntry;
 struct Gaf;
 struct Gui;
 struct Layer;
-struct Cheat;
 class Mission;
 
 #pragma pack(push, 1)
@@ -999,58 +998,48 @@ void __stdcall HandleSkirmishClick(Gui* menu)
     ClearSelectedGadget(menu);
 }
 
-#pragma pack(push, 1)
-struct CheatText {
-    char unknown_0[4];
-    Gadget* target;
-};
-
-struct Cheat {
-    char unknown_0[0x18];
-    CheatText* text;
-};
-#pragma pack(pop)
 
 
 #include "../game/settings_campaign.h"
 #include "../game/settings.h"
-void __stdcall SelectAdjacentGadget(Cheat*, int);
+void __stdcall SelectAdjacentGadget(Gui*, int);
 
 // FUNCTION: 0x47b9f0
-void __stdcall HandleSkirmishCheatText(Cheat* cheat)
+void __stdcall HandleSkirmishCheatText(Gui* menu)
 {
     int zero = 0;
     int code = 0;
-    if (strncmp((char*)cheat->text + 0x34, g_cheatFourPlayers, 3) == 0)
+    if (strncmp(menu->layer->text + 0xc, g_cheatFourPlayers, 3) == 0)
         code = 4;
-    else if (strncmp((char*)cheat->text + 0x35, g_cheatFivePlayers, 2) == 0)
+    else if (strncmp(menu->layer->text + 0xd, g_cheatFivePlayers, 2) == 0)
         code = 5;
-    else if (strncmp((char*)cheat->text + 0x34, g_cheatSixPlayers, 3) == 0)
+    else if (strncmp(menu->layer->text + 0xc, g_cheatSixPlayers, 3) == 0)
         code = 6;
-    else if (strncmp((char*)cheat->text + 0x33, g_cheatSevenPlayers, 4) == 0)
+    else if (strncmp(menu->layer->text + 0xb, g_cheatSevenPlayers, 4) == 0)
         code = 7;
-    else if (strncmp((char*)cheat->text + 0x32, g_cheatEightPlayers, 5) == 0)
+    else if (strncmp(menu->layer->text + 0xa, g_cheatEightPlayers, 5) == 0)
         code = 8;
-    else if (strncmp((char*)cheat->text + 0x33, g_cheatThreePlayers, 4) == 0)
+    else if (strncmp(menu->layer->text + 0xb, g_cheatThreePlayers, 4) == 0)
         code = 3;
-    else if (strncmp((char*)cheat->text + 0x34, g_cheatNinePlayers, 3) == 0)
+    else if (strncmp(menu->layer->text + 0xc, g_cheatNinePlayers, 3) == 0)
         code = 9;
-    else if (strncmp((char*)cheat->text + 0x35, g_cheatTenPlayers, 2) == 0)
+    else if (strncmp(menu->layer->text + 0xd, g_cheatTenPlayers, 2) == 0)
         code = 10;
 
     if (code != zero) {
         if (code == 3 || code == 4 || code == 8 || code == 9 || code == 10) {
-            for (int i = 0; i < 0xf; i++)
-                ((char*)cheat->text)[i + 0x28] = (char)zero;
+            for (int i = 0; i < 0xe; i++)
+                menu->layer->text[i] = (char)zero;
+            menu->layer->lastKey = (char)zero;
         }
         SaveSettings();
         g_game->playerCount = code;
         SaveNumSkirmishPlayers();
         LoadSettings();
-        cheat->text->target->u.count = g_game->options->baseGadgetCount;
+        menu->layer->entries->u.count = g_game->options->baseGadgetCount;
         RefreshSkirmishSetup();
         PlaySoundByName(g_skirmishCheatSoundName, 0);
-        SelectAdjacentGadget(cheat, 1);
+        SelectAdjacentGadget(menu, 1);
         MarkChanged((Dialog *)&g_game->gui);
     }
 }
@@ -1094,7 +1083,7 @@ void OpenSkirmishMenu(void)
     }
 
     RefreshSkirmishSetup();
-    g_game->gui.layer->textHandler = (void (__stdcall*)(void*))HandleSkirmishCheatText;
+    g_game->gui.layer->textHandler = HandleSkirmishCheatText;
     SetKeyboardInput(&g_game->gui, 1);
     RenderLayer(&g_game->gui, 0x40);
     SetCursorMode(0x13);

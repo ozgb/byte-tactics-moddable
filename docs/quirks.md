@@ -39,7 +39,7 @@ More on the scenario keys: [`reference/README.md`](../reference/README.md),
 
 ## Bug fixes
 
-These four fix 3.1c bugs. With the flag on, the game takes the fixed path,
+These five fix 3.1c bugs. With the flag on, the game takes the fixed path,
 and with it off, it does what 3.1c does. Each fix is written from the bug and
 our own reading of the 3.1c code, not from Open Annihilation's (which is
 GPL, #45).
@@ -96,6 +96,19 @@ GPL, #45).
 - **On:** both copies stop at 63 bytes plus the terminator.
 - **Added in:** [#169](https://github.com/ozgb/byte-tactics-moddable/issues/169)
   (PR [#265](https://github.com/ozgb/byte-tactics-moddable/pull/265)).
+
+### `frontend.bound-logo-select`
+
+- **Scope:** view.
+- **Where:** `OpenLogoSelectDialog` (0x445110), `src/frontend/multi.cpp`, the
+  multiplayer logo picker.
+- **3.1c:** it records each free logo's index in a 24-byte array at the
+  start of a 0x20-byte block. With more than 24 free logos it overwrites the
+  block's two list pointers, and with 32 or more it writes past the block.
+- **On:** the list stops at 24 logos, so every index fits the array.
+- **Reached by:** no stock game, which has fewer logos. A mod with more
+  than 24 does.
+- **Added in:** [#561](https://github.com/ozgb/byte-tactics-moddable/issues/561).
 
 ## 3.1c's non-deterministic reads
 

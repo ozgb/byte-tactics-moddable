@@ -11,7 +11,6 @@ struct RGBA {
     unsigned char a;
 };
 
-Display* GetDisplay(void);
 #include "../debug/debug_lib.h"
 #include "object_pool.h"
 #include "palette.h"
@@ -52,11 +51,11 @@ int __stdcall SetPaletteColors(unsigned char* src, int start, int count)
     int end;
     d = GetDisplay();
     brightness = d->paletteBrightness;
-    unsigned int* p = d->entries + start;
+    tagPALETTEENTRY* p = d->entries + start;
     end = start + count;
     unsigned char* s = src;
     for (i = start; i < end; i++, p++, s += 4)
-        *p = *(unsigned int*)s;
+        *p = *(tagPALETTEENTRY*)s;
     for (i = start; i < end; i++) {
         float v0 = src[i * 4] * brightness;
         if (v0 > 255.0)
@@ -118,10 +117,9 @@ void __stdcall SetBrightness(float brightness)
 }
 
 // FUNCTION: 0x4ba5c0
-int __stdcall AllocAlphaTable(int obj)
+int __stdcall AllocAlphaTable(Display* obj)
 {
-    void* result = GameAllocIgnoreTag(g_alphaTableName, 0x10000);
-    *(void**)((int)obj + 0xc0) = result;
+    obj->alphaTable = (unsigned char*)GameAllocIgnoreTag(g_alphaTableName, 0x10000);
     return 1;
 }
 
@@ -147,20 +145,20 @@ void __stdcall FreeShadeTable(Display* obj)
 // FUNCTION: 0x4ba660
 int __stdcall AllocLightTable(Display* obj)
 {
-    obj->lightTable = GameAllocIgnoreTag("LIGHT TABLE", 0x2000);
+    obj->lightTable = (unsigned char*)GameAllocIgnoreTag("LIGHT TABLE", 0x2000);
     return 1;
 }
 
 // FUNCTION: 0x4ba690
-void __stdcall FreeLightTable(int obj)
+void __stdcall FreeLightTable(Display* obj)
 {
-    GameFreeThunk(*(void**)(obj + 0xc8));
+    GameFreeThunk(obj->lightTable);
 }
 
 // FUNCTION: 0x4ba6b0
 int __stdcall AllocGrayTable(Display* obj)
 {
-    obj->grayTable = GameAllocIgnoreTag("GRAY TABLE", 0x100);
+    obj->grayTable = (unsigned char*)GameAllocIgnoreTag("GRAY TABLE", 0x100);
     return 1;
 }
 
@@ -173,7 +171,7 @@ void __stdcall FreeGrayTable(Display* obj)
 // FUNCTION: 0x4ba700
 int __stdcall AllocBlueTable(Display* obj)
 {
-    obj->blueTable = GameAllocIgnoreTag("BLUE TABLE", 0x100);
+    obj->blueTable = (unsigned char*)GameAllocIgnoreTag("BLUE TABLE", 0x100);
     return 1;
 }
 
@@ -197,13 +195,13 @@ unsigned int* __stdcall BuildAlphaTable(unsigned char* data)
         for (; off < 0x10000; off += 0x100, row++) {
             for (int col = 0; col < 0x100; col++) {
                 if (row == col) {
-                    ((unsigned char*)obj->alphaTable)[off + col] = (unsigned char)row;
+                    obj->alphaTable[off + col] = (unsigned char)row;
                 } else {
                     tagPALETTEENTRY color;
                     color.peRed = (pal[row].r + pal[col].r) / 2;
                     color.peGreen = (pal[row].g + pal[col].g) / 2;
                     color.peBlue = (pal[row].b + pal[col].b) / 2;
-                    ((unsigned char*)obj->alphaTable)[off + col] = NearestColorInBand((tagPALETTEENTRY*)data, sums, idx, color);
+                    obj->alphaTable[off + col] = NearestColorInBand((tagPALETTEENTRY*)data, sums, idx, color);
                 }
             }
         }
@@ -356,11 +354,11 @@ unsigned char* __stdcall BuildLightTable(tagPALETTEENTRY* palette)
                 color.peRed = red;
                 color.peGreen = green;
                 color.peBlue = blue;
-                ((unsigned char*)obj->lightTable)[i + row * 256] =
+                obj->lightTable[i + row * 256] =
                     NearestColorInBand(palette, sums, order, color);
             }
         }
-        return (unsigned char*)obj->lightTable;
+        return obj->lightTable;
     }
     return 0;
 }
@@ -380,9 +378,9 @@ unsigned char* __stdcall BuildGrayTable(tagPALETTEENTRY* palette)
             color.peGreen = gray;
             color.peBlue = gray;
             color.peRed = gray;
-            ((unsigned char*)app->grayTable)[i] = NearestColorInBand(palette, sums, order, color);
+            app->grayTable[i] = NearestColorInBand(palette, sums, order, color);
         }
-        return (unsigned char*)app->grayTable;
+        return app->grayTable;
     }
     return 0;
 }
@@ -440,9 +438,9 @@ unsigned char* __stdcall BuildBlueTable(tagPALETTEENTRY* palette)
                 color.peBlue = 0xff;
             else
                 color.peBlue = b + 0x32;
-            ((unsigned char*)app->blueTable)[i] = NearestColorInBand(palette, sums, order, color);
+            app->blueTable[i] = NearestColorInBand(palette, sums, order, color);
         }
-        return (unsigned char*)app->blueTable;
+        return app->blueTable;
     }
     return 0;
 }

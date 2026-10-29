@@ -71,15 +71,6 @@ extern ConsoleCommandTable g_consoleCommands;
 extern ConsoleCommandTable g_cheatCommands;
 extern ConsoleCommandTable g_debugCommands;
 
-#pragma pack(push, 1)
-struct EdgeScrollDisplay {
-    char unknown_0[0x40];
-    HWND hwnd;
-    char unknown_44[0xf0 - 0x44];
-    unsigned char flags_f0;
-};
-#pragma pack(pop)
-
 Unit* __stdcall FindNextSelectedUnit(Unit*, int);
 #include "../units/unit_commands.h"
 #include "../map/radar.h"
@@ -87,7 +78,6 @@ Unit* __stdcall FindNextSelectedUnit(Unit*, int);
 #include "../gui/keyboard.h"
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
-EdgeScrollDisplay* GetDisplay();
 
 #include "../util/commands.h"
 void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mask);
@@ -1612,8 +1602,8 @@ void UpdateEdgeScroll()
     if (speed == 0)
         return;
     GetCurrentMouseEvent(&mouse);
-    EdgeScrollDisplay* d = GetDisplay();
-    if (!(d->flags_f0 & 2)) {
+    Display* d = GetDisplay();
+    if (!(d->flags.byte & 2)) {
         host_cursor_get((int*)&pt.x, (int*)&pt.y);
         int w = g_game->width_37e1f;
         int h = g_game->screenHeight;

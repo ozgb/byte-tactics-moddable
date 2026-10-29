@@ -899,7 +899,7 @@
         {"name": "nextSmokeTick", "offset": 74, "size": 4, "kind": "scalar", "target": null},
         {"name": "", "offset": 78, "size": 4, "kind": "ref", "target": "heap"},
         {"name": "attacker", "offset": 82, "size": 4, "kind": "ref", "target": "unit"},
-        {"name": "field_56", "offset": 86, "size": 4, "kind": "scalar", "target": null},
+        {"name": "", "offset": 86, "size": 4, "kind": "ref", "target": "projectile"},
         {"name": "cellX", "offset": 90, "size": 2, "kind": "scalar", "target": null},
         {"name": "cellZ", "offset": 92, "size": 2, "kind": "scalar", "target": null},
         {"name": "radius", "offset": 94, "size": 2, "kind": "scalar", "target": null},
@@ -915,7 +915,8 @@
         {"name": "", "offset": 4, "size": 74, "kind": "bytes", "target": null},
         {"name": "", "offset": 78, "size": 4, "kind": "ref", "target": "heap"},
         {"name": "attacker", "offset": 82, "size": 4, "kind": "ref", "target": "unit"},
-        {"name": "", "offset": 86, "size": 21, "kind": "bytes", "target": null}
+        {"name": "", "offset": 86, "size": 4, "kind": "ref", "target": "projectile"},
+        {"name": "", "offset": 90, "size": 17, "kind": "bytes", "target": null}
       ],
       "excluded": [
 

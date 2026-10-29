@@ -30,7 +30,7 @@ struct ActiveBitFlags {
     unsigned int rest : 31;
 };
 
-#include "../../include/mouse_event.h"
+#include "../util/mouse_event.h"
 
 struct DialogRect {
     int left;

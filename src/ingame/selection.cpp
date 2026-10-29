@@ -40,7 +40,7 @@ struct HotRadarSlot {
 };
 
 #include "../orders/order_type_entry.h"
-#include "../../include/mouse_event.h"
+#include "../util/mouse_event.h"
 #include "../game/game.h"
 #pragma pack(pop)
 

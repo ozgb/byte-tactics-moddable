@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #pragma pack(push, 1)
-#include "../../include/mouse_event.h"
+#include "../util/mouse_event.h"
 
 #include "../util/vec3.h"
 

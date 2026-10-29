@@ -44,7 +44,7 @@ struct ConstructionNanoState {
 
 #include "../game/build_menu.h"
 
-#include "../../include/mouse_event.h"
+#include "../util/mouse_event.h"
 
 struct CursorState {
     MouseEvent start;

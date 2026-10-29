@@ -17,7 +17,7 @@
 #include "../graphics/object3do.h"
 #include "../graphics/piece_frame.h"
 #include "../gui/gui.h"
-#include "../../include/mouse_event.h"
+#include "../util/mouse_event.h"
 #include "../ingame/camera_flags.h"
 #include "../ingame/game_cursor_state.h"
 #include "../ingame/net_game_flags.h"

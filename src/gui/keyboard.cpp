@@ -217,7 +217,7 @@ void __stdcall GetCursorPosition(int* x, int* y)
     *y = pt.y;
 }
 
-#include "../../include/mouse_event.h"
+#include "../util/mouse_event.h"
 
 // FUNCTION: 0x4c2340
 void __stdcall GetCurrentMouseEvent(MouseEvent* event)

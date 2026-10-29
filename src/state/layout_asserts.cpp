@@ -11,7 +11,6 @@
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma pack(push, 1)
 #include "../util/vec3.h"
-#include "../../include/mouse_event.h"
 #include "../../include/v4i.h"
 #include "../../interfaces/services.h"
 #include "../ai/ai_search_goal.h"
@@ -115,6 +114,7 @@
 #include "../units/unit_def.h"
 #include "../units/unit_script.h"
 #include "../util/angles.h"
+#include "../util/mouse_event.h"
 #include "../util/point.h"
 #include "../util/rot16.h"
 #include "../util/string_ref.h"

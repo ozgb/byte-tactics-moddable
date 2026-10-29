@@ -1,7 +1,7 @@
 #ifndef GAME_CURSOR_STATE_H
 #define GAME_CURSOR_STATE_H
 
-#include "../../include/mouse_event.h"
+#include "../util/mouse_event.h"
 #include "cursor_point.h"
 
 #pragma pack(push, 1)

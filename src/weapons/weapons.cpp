@@ -222,15 +222,14 @@ struct RockSourceSlotView {
 
 #include "../../interfaces/seams.h"
 
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
+#include "../util/math.h"
 
 // FUNCTION: 0x499c10
 void __stdcall RockUnit(RockUnitView* obj, RockSourceSlotView* src)
 {
     short angle = src->heading - obj->heading;
-    int a = -ScaledSin(angle, 800);
-    int b = -ScaledCos(angle, 800);
+    int a = -ScaledSin((short)angle, 800);
+    int b = -ScaledCos((short)angle, 800);
     g_seams.units->StartScriptWithArgs(obj->anims, "RockUnit", 0, 0, 2, b, a, 0, 0);
 }
 
@@ -869,8 +868,8 @@ int __stdcall TurnUnitTowardsPoint(Projectile* p, Vec3* target)
 // FUNCTION: 0x49b680
 void __stdcall ComputeVelocityFromAngles(Projectile* obj)
 {
-    obj->direction.y = ScaledSin(obj->angles.pitch, obj->speed);
-    int r = ScaledCos(obj->angles.pitch, obj->speed);
+    obj->direction.y = ScaledSin((short)obj->angles.pitch, obj->speed);
+    int r = ScaledCos((short)obj->angles.pitch, obj->speed);
     obj->direction.x = -ScaledSin((short)obj->angles.heading, r);
     obj->direction.z = -ScaledCos((short)obj->angles.heading, r);
 }
@@ -976,8 +975,6 @@ void __stdcall CopyWeaponVelocityParam(Projectile* obj, WeaponDef* src)
 #include <math.h>
 
 short __cdecl AngleOfVector(int x, int z);
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
 #include "../graphics/particles.h"
 
 struct LineOfSightFireSlotView {
@@ -1027,10 +1024,10 @@ int __stdcall FireLineOfSightProjectile(LineOfSightFireSlotView* fire, Unit* uni
         proj->speed = 0;
     }
 
-    proj->direction.y = ScaledSin(a2, proj->speed);
-    int t = ScaledCos(a2, proj->speed);
-    proj->direction.x = -ScaledSin(a1, t);
-    proj->direction.z = -ScaledCos(a1, t);
+    proj->direction.y = ScaledSin((short)a2, proj->speed);
+    int t = ScaledCos((short)a2, proj->speed);
+    proj->direction.x = -ScaledSin((short)a1, t);
+    proj->direction.z = -ScaledCos((short)a1, t);
 
     WeaponDef* u = proj->type;
     if ((unsigned int)u->speed != 0 && !(u->flags.value & 0x8000000))
@@ -1042,8 +1039,8 @@ int __stdcall FireLineOfSightProjectile(LineOfSightFireSlotView* fire, Unit* uni
     proj->active = fire->shot->burst;
     g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(fire->f_1b >> 2) & 3], 0, 0);
     short angle = unit->weapons[(fire->f_1b >> 2) & 3].fireHeading - unit->heading;
-    int a = -ScaledSin(angle, 800);
-    int b = -ScaledCos(angle, 800);
+    int a = -ScaledSin((short)angle, 800);
+    int b = -ScaledCos((short)angle, 800);
     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
 
     if (fire->shot->flags.b.startSmoke)
@@ -1104,8 +1101,8 @@ int __stdcall FireVLaunchProjectile(VLaunchFireSlotView* shot, Unit* unit, Vec3*
     proj->active = shot->def->burst;
     g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
     short angle = unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
-    int a = -ScaledSin(angle, 800);
-    int b = -ScaledCos(angle, 800);
+    int a = -ScaledSin((short)angle, 800);
+    int b = -ScaledCos((short)angle, 800);
     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
     if (shot->def->flags.b.startSmoke)
         EmitWeaponSmoke(pos, 9);
@@ -1144,10 +1141,10 @@ int __stdcall FireBallisticProjectile(BallisticFireSlotView* shot, Unit* unit, V
         proj->angles.heading = shot->heading;
         proj->angles.pitch = shot->pitch;
         int q = (shot->muzzleAimFromDeltaZ / shot->def->speed) * g_game->gravity;
-        proj->direction.y = ScaledSin(shot->pitch, shot->def->speed) - q;
-        int scale = ScaledCos(shot->pitch, shot->def->speed);
-        proj->direction.x = -ScaledSin(shot->heading, scale);
-        proj->direction.z = -ScaledCos(shot->heading, scale);
+        proj->direction.y = ScaledSin((short)shot->pitch, shot->def->speed) - q;
+        int scale = ScaledCos((short)shot->pitch, shot->def->speed);
+        proj->direction.x = -ScaledSin((short)shot->heading, scale);
+        proj->direction.z = -ScaledCos((short)shot->heading, scale);
         if (shot->def->flags.b.burnBlow) {
             proj->time = (int)_hypot((double)(pos->x - aim->x), (double)(pos->z - aim->z)) / scale
                        + g_game->ticks;
@@ -1158,8 +1155,8 @@ int __stdcall FireBallisticProjectile(BallisticFireSlotView* shot, Unit* unit, V
         proj->targetUnitPtr = (Unit*)param_5;
         g_seams.units->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
         short angle = *(int*)&unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
-        int a = -ScaledSin(angle, 800);
-        int b = -ScaledCos(angle, 800);
+        int a = -ScaledSin((short)angle, 800);
+        int b = -ScaledCos((short)angle, 800);
         g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
         if (shot->def->flags.b.startSmoke)
             EmitWeaponSmoke(pos, 9);
@@ -1197,8 +1194,8 @@ int __stdcall SpawnProjectileFromUnitMotion(MotionFireSlotView* shot, Unit* unit
     if (proj) {
         InitProjectile(proj, shot->weapon, pos, 0, g_game->ticks, unit);
         InitMotionProjectile(proj, unit);
-        proj->direction.x = -ScaledSin(proj->angles.heading, ((MotionRangeView*)unit->motion.get())->range);
-        proj->direction.z = -ScaledCos(proj->angles.heading, ((MotionRangeView*)unit->motion.get())->range);
+        proj->direction.x = -ScaledSin((short)proj->angles.heading, ((MotionRangeView*)unit->motion.get())->range);
+        proj->direction.z = -ScaledCos((short)proj->angles.heading, ((MotionRangeView*)unit->motion.get())->range);
         return 1;
     }
     return 0;
@@ -1383,8 +1380,8 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
         proj->angles.heading = unit->heading;
         proj->speed = 0;
         proj->direction.y = 0;
-        proj->direction.x = -ScaledSin(proj->angles.heading, ((DroppedMotionParamView*)unit->motion.get())->param);
-        proj->direction.z = -ScaledCos(proj->angles.heading, ((DroppedMotionParamView*)unit->motion.get())->param);
+        proj->direction.x = -ScaledSin((short)proj->angles.heading, ((DroppedMotionParamView*)unit->motion.get())->param);
+        proj->direction.z = -ScaledCos((short)proj->angles.heading, ((DroppedMotionParamView*)unit->motion.get())->param);
         return;
     }
 }
@@ -1398,7 +1395,6 @@ int __stdcall FireLineOfSightProjectile(Unit* fire, Unit* unit, Vec3* p3,
                            Vec3* point, Unit* target);
 int __stdcall FireBallisticProjectile(Unit* shot, Unit* unit, Vec3* pos,
                            Vec3* aim, Unit* target);
-#include "../util/math.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // FUNCTION: 0x49d580
@@ -1694,8 +1690,8 @@ int __stdcall FireDroppedWeapon(Unit* unit, DroppedAimSlotView* aim,
         projectile->angles.heading = unit->heading;
         projectile->speed = 0;
         projectile->direction.y = 0;
-        projectile->direction.x = -ScaledSin(projectile->angles.heading, ((DroppedMotionIdView*)unit->motion.get())->id);
-        projectile->direction.z = -ScaledCos(projectile->angles.heading, ((DroppedMotionIdView*)unit->motion.get())->id);
+        projectile->direction.x = -ScaledSin((short)projectile->angles.heading, ((DroppedMotionIdView*)unit->motion.get())->id);
+        projectile->direction.z = -ScaledCos((short)projectile->angles.heading, ((DroppedMotionIdView*)unit->motion.get())->id);
         if (g_game->netGameFlags & 1) {
             WeaponFirePacket packet;
             packet.type = 0xd;
@@ -1935,11 +1931,9 @@ char* __stdcall FindWeaponByName(char* name)
 
 void DrawTriangleContours(void*, int, int, int, int, int, int);
 void DrawRangeCircle(void*, void*, void*, int, int, const char*, int);
-void AddOrder(int, int, void*, void*, void*, int, int);
 void IssueOrCancelOrder(unsigned char, int, void*, int, int*, int, int);
 int SendScriptCall(void*, short, char, int, int, int, int);
 void AddTextGadget(void*, char*, char*, int, short, int, int);
-int IsFootprintVisible(void*, int, int, int, int, short);
 void DrawProgressBar(void*, int, int, void*, void*, int);
 void IssueOrderToSelection(void*, unsigned char, int, int*, int, int);
 void WriteScreenshot(char*, char*, int, int, int, int);
@@ -2069,7 +2063,6 @@ void __stdcall DrawModel3doProjected(void* dest, Vec3* pos, void* sprite, void* 
 int __stdcall PointInRect(void* region, int x, int y);
 void __stdcall DrawLine(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
 int __stdcall GetGafFrameCount(void* gaf);
-#include "../ai/ai_player.h"
 #include "../harness/harness.h"
 
 // FUNCTION: 0x49be60
@@ -2105,7 +2098,7 @@ void __stdcall DrawProjectiles(void* surface)
                 else
                     visible = 0;
             } else {
-                visible = IsPointVisible(pb, pos);
+                visible = g_seams.ai->IsPointVisible(pb, pos);
             }
             if (visible) {
                 type = p->type;
@@ -2506,7 +2499,7 @@ void UpdateProjectiles()
                     q->active = 0;
                     if (type->spread != 0) {
                         short ang = RandomInt(type->spread) + (short)(p->angles.heading - (type->spread >> 1));
-                        int t = ScaledCos(p->angles.pitch, type->speed);
+                        int t = ScaledCos((short)p->angles.pitch, type->speed);
                         p->direction.x = -ScaledSin(ang, t);
                         p->direction.z = -ScaledCos(ang, t);
                     }
@@ -2543,10 +2536,10 @@ void UpdateProjectiles()
                         if (TurnUnitTowardsPoint(p, target) == 0)
                             DetonateProjectile(p, nullptr);
                     }
-                    p->direction.y = ScaledSin(p->angles.pitch, p->speed);
-                    int t = ScaledCos(p->angles.pitch, p->speed);
-                    p->direction.x = -ScaledSin(p->angles.heading, t);
-                    p->direction.z = -ScaledCos(p->angles.heading, t);
+                    p->direction.y = ScaledSin((short)p->angles.pitch, p->speed);
+                    int t = ScaledCos((short)p->angles.pitch, p->speed);
+                    p->direction.x = -ScaledSin((short)p->angles.heading, t);
+                    p->direction.z = -ScaledCos((short)p->angles.heading, t);
                 }
             } else if (type->flags.b.burnBlow) {
                 DetonateProjectile(p, nullptr);

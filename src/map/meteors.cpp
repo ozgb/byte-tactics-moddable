@@ -26,8 +26,7 @@ typedef char SimView_g_meteorWeaponName[];
 #undef g_meteorWeaponName
 #define g_meteorWeaponName (*reinterpret_cast<SimView_g_meteorWeaponName*>(&Sim().g_meteorWeaponName))
 
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
+#include "../util/math.h"
 #include "../game/data_files.h"
 #include "../graphics/display.h"
 
@@ -120,9 +119,9 @@ void UpdateMeteors()
             int radius = r << 16;
             int angle = (int)((__int64)GameRand(RAND_STREAM_MAIN) * 0x10000 / 0x8000);
             Vec3 offset;
-            offset.x = -ScaledSin(angle, radius);
+            offset.x = -ScaledSin((short)angle, radius);
             offset.y = 0;
-            offset.z = -ScaledCos(angle, radius);
+            offset.z = -ScaledCos((short)angle, radius);
             Vec3 pos = offset;
             pos.x += g_meteorOrigin.x << 20;
             pos.y = -vel.y * 90;

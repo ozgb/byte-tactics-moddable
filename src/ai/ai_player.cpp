@@ -163,10 +163,6 @@ void RegisterUnitOrders(void);
 
 #include "vec.h"
 
-struct BasePos {
-    int a, b, c;
-};
-
 struct MirroredBasePos {
     int a, b, c;
 };
@@ -216,14 +212,9 @@ void __stdcall RegisterCommand(const char* name, AiCommandFn fn, int flags);
 #include "../state/sim_globals.h"
 #include "../util/file_printf.h"
 #include "../orders/unit_orders.h"
-#include "../util/math.h"
 #include "../sound/sound.h"
 #include "../units/squads.h"
-void __stdcall GetBasePosition(int index, Vec3* out);
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
-int __cdecl ScaledSin(int angle, int distance);
-int __cdecl ScaledCos(int angle, int distance);
+#include "../util/math.h"
 #include "pathfind.h"
 void __stdcall PopHeapFirst(KeyedCell* first, KeyedCell* last, KeyedCell* dest,
                             KeyedCell val, int*);
@@ -232,7 +223,6 @@ void __stdcall PopHeapFirst(KeyedCell* first, KeyedCell* last, KeyedCell* dest,
 int __stdcall GetWeaponRange(Unit*, unsigned char);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
 int __stdcall IsCountBelowAiLimit(int, unsigned short, int);
-void __stdcall GetBasePosition(int index, BasePos* out);
 
 static const float kZeroFloatAi = 0.0f;
 
@@ -640,8 +630,6 @@ static inline AiFixed MakeFixed(int i)
     f.parts.whole = i;
     return f;
 }
-
-void __stdcall GetBasePosition(int index, Vec3* out);
 
 static inline Vec3 GetRallyPoint(int index)
 {
@@ -1623,9 +1611,9 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
 }
 
 // FUNCTION: 0x40ba80
-void __stdcall GetBasePosition(int index, BasePos* out)
+void __stdcall GetBasePosition(int index, Vec3* out)
 {
-    BasePos* entry = (BasePos*)((char*)g_playerAI[index].get() + 0x35);
+    Vec3* entry = (Vec3*)((char*)g_playerAI[index].get() + 0x35);
     *out = *entry;
 }
 

@@ -85,6 +85,7 @@ src/game/game_load.cpp,src/graphics/display.h,#392
 src/game/game_load.cpp,src/graphics/draw.h,#392
 src/game/game_load.cpp,src/graphics/object_pool.h,#392
 src/game/game_load.cpp,src/graphics/palette.h,#392
+src/game/game_load.cpp,src/graphics/pcx.h,#392
 src/game/game_load.cpp,src/graphics/rect.h,#392
 src/game/game_load.cpp,src/graphics/surface.h,#392
 src/game/game_load.cpp,src/gui/gui.h,#392
@@ -119,6 +120,7 @@ src/game/main.cpp,src/frontend/frontend.h,#392
 src/game/main.cpp,src/frontend/options.h,#392
 src/game/main.cpp,src/graphics/display.h,#392
 src/game/main.cpp,src/graphics/palette.h,#392
+src/game/main.cpp,src/graphics/pcx.h,#392
 src/game/main.cpp,src/gui/mouse.h,#392
 src/game/main.cpp,src/ingame/camera.h,#392
 src/game/main.cpp,src/ingame/screenshots.h,#392
@@ -176,6 +178,7 @@ src/graphics/movies.cpp,windows.h,#392
 src/graphics/palette.cpp,interfaces/host.h,#392
 src/graphics/palette.cpp,src/graphics/object_pool.h,#392
 src/graphics/palette.cpp,src/graphics/palette.h,#392
+src/graphics/particles.cpp,src/graphics/draw.h,#392
 src/graphics/particles.cpp,src/graphics/nano_particle_vector.h,#392
 src/graphics/particles.cpp,src/graphics/object_pool.h,#392
 src/graphics/particles.cpp,src/graphics/particle_lists.h,#392
@@ -222,6 +225,7 @@ src/gui/gui_file.cpp,src/graphics/object_pool.h,#392
 src/gui/gui_file.cpp,src/graphics/palette.h,#392
 src/gui/gui_file.cpp,src/gui/dialogs.h,#392
 src/gui/keyboard.cpp,interfaces/host.h,#392
+src/gui/listbox.cpp,src/graphics/draw.h,#392
 src/gui/listbox.cpp,src/graphics/gaf_frame.h,#392
 src/gui/listbox.cpp,src/graphics/rect.h,#392
 src/gui/listbox.cpp,src/gui/gui.h,#392
@@ -259,19 +263,23 @@ src/ingame/game_dialogs.cpp,src/gui/layer.h,#392
 src/ingame/game_dialogs.cpp,src/ingame/control_panel.h,#392
 src/ingame/game_dialogs.cpp,src/ingame/game_dialogs.h,#392
 src/ingame/game_dialogs.cpp,src/sound/sound.h,#392
+src/ingame/info_panel.cpp,src/frontend/options.h,#392
 src/ingame/info_panel.cpp,src/graphics/display.h,#392
 src/ingame/info_panel.cpp,src/graphics/draw.h,#392
 src/ingame/info_panel.cpp,src/graphics/gaf_frame.h,#392
+src/ingame/info_panel.cpp,src/graphics/particles.h,#392
 src/ingame/info_panel.cpp,src/graphics/rect.h,#392
 src/ingame/info_panel.cpp,src/graphics/surface.h,#392
 src/ingame/info_panel.cpp,src/gui/dialogs.h,#392
 src/ingame/info_panel.cpp,src/gui/gui.h,#392
 src/ingame/info_panel.cpp,src/gui/keyboard.h,#392
 src/ingame/info_panel.cpp,src/ingame/frame_timers.h,#392
+src/ingame/info_panel.cpp,src/ingame/game_dialogs.h,#392
 src/ingame/info_panel.cpp,src/ingame/info_panel.h,#392
 src/ingame/info_panel.cpp,src/ingame/light_bar_counters.h,#392
 src/ingame/info_panel.cpp,src/ingame/light_bar_sprite.h,#392
 src/ingame/info_panel.cpp,src/ingame/map_grid.h,#392
+src/ingame/info_panel.cpp,src/ingame/selection.h,#392
 src/ingame/info_panel.cpp,src/ingame/unit_info_snapshot.h,#392
 src/ingame/keys.cpp,src/frontend/options.h,#392
 src/ingame/keys.cpp,src/graphics/gaf.h,#392

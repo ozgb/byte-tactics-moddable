@@ -163,10 +163,9 @@ void __cdecl operator delete(void* p);
 
 #include "../gui/gui.h"
 void __stdcall BlitMenuLayers(Main2Menu* menu, int a, int b);
-void __stdcall FillRectangle(void* surface, void* rect, int color);
 char* __stdcall Translate(char* s);
 
-int __stdcall ExceptionFilter(EXCEPTION_POINTERS* exception, const char* thread);
+#include "../graphics/pcx.h"
 #include "../ingame/build_placement.h"
 #include "../frontend/options.h"
 #include "../frontend/frontend.h"
@@ -506,10 +505,10 @@ void __stdcall DrawSyncStatus(void* surface)
             {
                 r.left = x;
                 r.right = slot + x - 2;
-                FillRectangle(surface, &r, g_game->colors[4]);
+                FillRectangle((Surface*)surface, &r, g_game->colors[4]);
                 int pc = q->percent;
                 r.right = r.left + (pc * (slot - 2)) / 100;
-                FillRectangle(surface, &r, g_game->colors[10]);
+                FillRectangle((Surface*)surface, &r, g_game->colors[10]);
                 DrawTextClipped(surface, q->name, r.left, 420, slot - 2, 0);
                 x += slot;
             }
@@ -544,7 +543,7 @@ static inline void DrawLoadingBar(void* gadget, void* lightbar, int index, unsig
     rect[2] = ((int)(*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[index] * 7) / 2 + 0xcd;
     rect[1] = y;
     rect[3] = y + 0x14;
-    FillRectangle(gadget, rect, color);
+    FillRectangle((Surface*)gadget, (Rect*)rect, color);
     DrawFrame(gadget, lightbar, rect[0], rect[1]);
 }
 // FUNCTION: 0x497f40

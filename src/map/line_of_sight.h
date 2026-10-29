@@ -37,4 +37,7 @@ void __stdcall AddLineOfSight(SightQuery* params);
 void __stdcall RemoveLineOfSight(SightQuery* params);
 void __stdcall BuildFogTiles(void);
 
+void __stdcall DrawMapTiles(void* surface);
+void __stdcall DrawFogOfWar(void* surface);
+
 #endif

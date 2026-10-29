@@ -27,8 +27,7 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 
 #include "../../link/globals.h"
 
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
+#include "../util/math.h"
 int __stdcall CanPlaceUnitFootprint(UnitDef* type, short a, Point16 cell, int b);
 int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, int b);
 void __stdcall PopHeapFirst(KeyedCell* first, KeyedCell* last, KeyedCell* dest,

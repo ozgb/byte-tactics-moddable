@@ -70,7 +70,7 @@ struct OrderTypeEntry {
 #include "../map/cell.h"
 
 #include "../map/line_of_sight.h"
-int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
+#include "../game/players.h"
 
 // FUNCTION: 0x48bae0
 void CollectVisibleUnitIds(void)
@@ -562,8 +562,9 @@ int __stdcall GetOrderCursor(unsigned char type, Unit* unit, Unit* target, int* 
 
 #include "../units/squad.h"
 
-MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit,
-                                       Unit* target, void* pos);
+struct UnitOrderTypeView;
+struct FixedPosView;
+#include "../orders/order_dispatch.h"
 void __stdcall IssueOrCancelOrder(OrderType kind, int flag, Unit* unit,
                             Unit* target, int* pos, int typeId, int amount);
 
@@ -608,7 +609,7 @@ void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
         if (!(((unsigned char)u->flags) & 0x10) || u == except)
             continue;
         if (mode)
-            kind.index = GetOrderType(mode, u, except, &g_game->pos_2caa).index;
+            kind.index = GetOrderType(mode, u, except, (Vec3*)&g_game->pos_2caa).index;
         if (!kind.index)
             continue;
         MissionType fire = Order("Standing_FireOrder");

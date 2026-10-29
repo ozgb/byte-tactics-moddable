@@ -260,6 +260,7 @@ DrawParticleList,TeleportParticles::Render,"Slot2 is Render, slot 2 of ParticleS
 DrawParticleList,ThrustParticles::Render,"Slot2 is Render, slot 2 of ParticleSystem; the lists hold the particle systems made by the Emit functions, ThrustParticles::Render (src/graphics/particles.cpp)"
 DrawParticleList,TimedSubParticles::Render,"Slot2 is Render, slot 2 of ParticleSystem; the lists hold the particle systems made by the Emit functions, TimedSubParticles::Render (src/graphics/particles.cpp)"
 DrawParticleList,WakeParticles::Render,"Slot2 is Render, slot 2 of ParticleSystem; the lists hold the particle systems made by the Emit functions, WakeParticles::Render (src/graphics/particles.cpp)"
+DrawProjectiles,IsPointVisible,"seam slot filled by InstallNativeSeams, AiSeam::IsPointVisible, DrawProjectiles (src/weapons/weapons.cpp), src/seams/native.cpp"
 DrawSelectedGoal,AiSearchGoal::DrawOnSurface,"Method_28 is slot 10 (DrawOnSurface) of the PathGoal family, src/orders/order_targets.cpp"
 DrawSelectedGoal,PathGoal::DrawOnSurface,"Method_28 is slot 10 (DrawOnSurface) of the PathGoal family, src/orders/order_targets.cpp"
 DumpPlayerAI,GetNameSlotNative,"seam slot filled by InstallNativeSeams, MapSeam::GetNameSlot, DumpPlayerAI (src/ai/ai_player.cpp), src/seams/native.cpp"

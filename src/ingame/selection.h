@@ -1,5 +1,6 @@
 #ifndef SELECTION_H
 #define SELECTION_H
+struct Unit;
 
 struct Point;
 struct Unit;
@@ -26,5 +27,7 @@ int __stdcall IsUnitVisible(char* unit);
 void __stdcall SelectUnitsByCategory(char* name, int);
 unsigned short __stdcall PickUnitUnderCursor(void);
 bool __stdcall SelectSquad(int id, int);
+
+void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Unit** sel);
 
 #endif

@@ -1,5 +1,7 @@
 #ifndef CONSOLE_COMMANDS_H
 #define CONSOLE_COMMANDS_H
+class GoalDrawInterface;
+
 struct FixedWorldPos;
 struct Point;
 
@@ -88,5 +90,8 @@ void __stdcall CmdShootAll(int unused);
 void __stdcall WorldToScreenWithHeight(FixedWorldPos* pos, int* screen_x, int* screen_y);
 void __stdcall DrawWorldDeltaLine(void* surface, FixedWorldPos* p, short dx, short dz, int color);
 void __stdcall DrawCellContours(void* surface, Point* corners, unsigned char* heights);
+
+void __stdcall DrawSelectedGoal(int ctx, GoalDrawInterface*** unit);
+void __stdcall DrawMapDebugOverlay(void* surface);
 
 #endif

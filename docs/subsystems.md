@@ -98,7 +98,7 @@ Coverage: 93.8% of functions (15 of 16), 96.4% of lines, 76.3% of branches; 1 li
 
 Issue #11. 32 functions. The resource accounts (`UnitResources`), `UpdatePlayerEconomy`, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`, `UpdateResourceSharing` in `src/network/net_game.cpp`).
 
-Coverage: 93.1% of functions (27 of 29), 78.1% of lines, 43.8% of branches; 2 live functions no scenario enters, and 4 more are dead (data/coverage.csv).
+Coverage: 93.1% of functions (27 of 29), 78.1% of lines, 43.8% of branches; 2 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (2 of 29 after `conditions-dark-side` and `conditions-shore-to-shore` (#420) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445); 27 are entered, 93.1%), by reason:
 
@@ -129,7 +129,7 @@ Coverage: 93.1% of functions (27 of 29), 78.1% of lines, 43.8% of branches; 2 li
 - game (1): `SetStartingStorageBonusInline`
 - platform (1): `CommandArgs::GetIntArg`
 
-**Sim writes.** 42 items in all, 42 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
+**Sim writes.** 36 items in all, 36 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
 `Player::energy` (mixed); `Player::metal` (mixed); `UnitResources::energyUse` (mixed); `UnitResources::energyUsePaid` (mixed); `UnitResources::metalUse` (mixed); `Player::energyCapacity` (sim); `Player::energyIncome` (sim); `Player::energyUsage` (sim); `Player::energyWasted` (sim); `Player::metalCapacity` (sim); `Player::metalIncome` (sim); `Player::metalUsage` (sim)
 
@@ -141,7 +141,7 @@ Coverage: 93.1% of functions (27 of 29), 78.1% of lines, 43.8% of branches; 2 li
 
 - Exports: 20 functions (`UpdatePlayerEconomy`, `UpdateResourceSharing`, the spend and request calls (`UnitResources::SpendEnergy`, `SpendMetal`, `RequestEnergy`, `RequestEnergyAndMetal`), `GetEnergyUse` (ai) and `UpdateMetalExtraction` (units)).
 - Needs from seams: 17 functions in files, network, los_radar, players, seams, game, platform.
-- Owns: 19 named sim items that only this subsystem writes, for example `UnitResources::energyUse`, `UnitResources::player`, `UnitResources::metalUse`, `PlayerInfo::shareMetal`, `UnitResources::energyUsePaid`.
+- Owns: 13 named sim items that only this subsystem writes, for example `UnitResources::energyUse`, `UnitResources::player`, `UnitResources::metalUse`, `PlayerInfo::shareMetal`, `UnitResources::energyUsePaid`.
 - Shares: 23 named sim items that other subsystems also write, for example `Player::energy`, `Player::metal`, `Player::energyCapacity`, `Player::metalCapacity`, `Player::shareEnergy`.
 - `Player::energy` and `Player::metal` are written by four subsystems (economy, game, players, presentation; class `mixed`), so the economy module cannot own them alone. The statistics (`energyWasted`, `totalMetalProduced` and the rest) are also written by network and players.
 - Economy sends packets (`SendPacketToPlayer`, `BroadcastPlayerInfo`, `AddMessage`) and starts COB scripts (`CobScript::StartScriptWithArgs`); both are candidates for events instead of imports.
@@ -488,9 +488,9 @@ Coverage: 88.9% of functions (64 of 72), 82.8% of lines, 72.9% of branches; 8 li
 
 Issue #18. 376 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`). The largest subsystem.
 
-Coverage: 83.1% of functions (305 of 367), 79.4% of lines, 61.6% of branches; 62 live functions no scenario enters, and 25 more are dead (data/coverage.csv).
+Coverage: 83.2% of functions (306 of 368), 79.4% of lines, 61.6% of branches; 62 live functions no scenario enters, and 25 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (62 of 367 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 305 are entered, 83.1%), by reason:
+**Live functions no scenario enters** (62 of 368 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 306 are entered, 83.2%), by reason:
 
 - Network only (22): `LiteGoal::HasNetUnitState`, `LiteGoal::SerializeNetUnitState`, `AiSearchGoal::HasNetUnitState`, `AiSearchGoal::SerializeNetUnitState`, `PackedPosGoal::PackedPosGoal`, `PackedPosGoal::~PackedPosGoal`, `PackedPosGoal::DeserializeNetUnitState`, `PathGoal::DeserializeNetUnitState`, `PathGoal::HasNetUnitState`, `PathGoal::SerializeNetUnitState`, `PathGoal::ExportGoalPose`, `PathGoal::FillWaypointWorldPos`, `PathGoal::HasReadyWaypoints`, `PathGoal::TickTowardGoal`, `PathGoal::TryClaimRepath`, `PatrolGoal::PatrolGoal`, `PatrolGoal::DeserializeNetUnitState`, `PatrolGoal::FillWaypointWorldPos`, `PatrolGoal::HasReadyWaypoints`, `OrderFx::WriteBits`, `AirManeuverOrder::SerializeToBits` and `PathOrder::SerializeToBits`. These are the net-state methods of the goal objects and the bit writers. `PatrolGoal` and `PackedPosGoal` are made only for a player of type 3 (a remote human), and the `PathGoal` methods only run through them.
 - Save and load only (18): `OrderKindFromSavedIndex`, `SerializeSave`, `OrderFx::OrderFx`, `OrderFx::GetType`, `AirManeuverOrder::AirManeuverOrder`, `AirManeuverOrder::AirManeuverOrder`, `AirManeuverOrder::GetType`, `AirManeuverOrder::SerializeToSave`, `ApproachRadius::ApproachRadius`, `ApproachRadius::GetType`, `ApproachRadius::Serialize`, `PathOrder::PathOrder`, `PathOrder::PathOrder`, `PathOrder::GetType`, `PathOrder::SerializeToSave`, `RingApproach::RingApproach`, `RingApproach::GetType` and `RingApproach::Serialize`. The constructors are the load constructors. `save-midgame` enters the save side of `Order`, `PointMarker` and `UnitMotion`, and `load-midgame` (#442) enters `LowerBoundOrderTypes`, `OrderTypeNameLess`, `OrderKindFromName`, `ResolveUnitTypeKey`, `UnitMotion::LoadMotion`, the load constructors of `Order` and `PointMarker`, and `Order::ReattachFxToUnit`.
@@ -660,14 +660,14 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | subsystem | entered of live functions | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
 | **wind_meteors** | 15 of 16 | 93.8% | 96.4% | 76.3% | 1 | 0 |
-| **economy** | 27 of 29 | 93.1% | 78.1% | 43.8% | 2 | 4 |
+| **economy** | 27 of 29 | 93.1% | 78.1% | 43.8% | 2 | 3 |
 | **features** | 42 of 44 | 95.5% | 81.9% | 69.6% | 2 | 4 |
 | **ai** | 93 of 104 | 89.4% | 89.0% | 83.0% | 11 | 35 |
 | **pathfinding** | 45 of 48 | 93.8% | 92.4% | 87.1% | 3 | 10 |
 | **weapons** | 74 of 88 | 84.1% | 84.6% | 70.4% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
 | **los_radar** | 64 of 72 | 88.9% | 82.8% | 72.9% | 8 | 22 |
-| **orders** | 305 of 367 | 83.1% | 79.4% | 61.6% | 62 | 25 |
+| **orders** | 306 of 368 | 83.2% | 79.4% | 61.6% | 62 | 25 |
 | **units** | 131 of 163 | 80.4% | 84.5% | 71.1% | 32 | 33 |
 | **players** | 74 of 143 | 51.7% | 52.8% | 44.2% | 69 | 11 |
 | **map** | 79 of 98 | 80.6% | 86.8% | 75.9% | 19 | 12 |

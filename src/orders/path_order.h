@@ -47,9 +47,9 @@ public:
     PathOrder(int owner, HapiBank* file, char* name);
     PathOrder(Unit* owner_, BitReader* reader);
     PathOrder(Order* order, Unit* unit);
-    PathOrder(Order* source, int unit, short value);
+    PathOrder(Order* source, Unit* unit, short value);
     PathOrder(Order* source, const Vec3& p);
-    PathOrder(Order* source, int unit, const Vec3& p);
+    PathOrder(Order* source, Unit* unit, const Vec3& p);
     void SetAltitude(int param_1);
     void SetHeading(short v);
     void SetApproachRadius(short v);

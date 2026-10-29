@@ -1,5 +1,7 @@
 #ifndef ORDER_QUEUE_H
 #define ORDER_QUEUE_H
+struct Order;
+struct Unit;
 
 struct Order;
 struct Unit;
@@ -12,5 +14,7 @@ int __fastcall GetTableEntryByTypeByte(unsigned char*);
 unsigned int __stdcall WaitIfNotInBuildStance(void*, void*, unsigned int);
 int __stdcall WaitIfCobBusy(char*, char*, unsigned int);
 int __stdcall GetOrderFlags(void* param);
+
+void __stdcall StartBuildingScript(Unit* obj, Order* target, unsigned short);
 
 #endif

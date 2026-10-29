@@ -3,6 +3,8 @@
 struct Vec3;
 struct Vec3f;
 
+int __cdecl ScaledSin(int angle, int scale);
+int __cdecl ScaledCos(int angle, int scale);
 int __stdcall ApproxDistance(int dx, int dy);
 double __stdcall DotProduct(float ax, float ay, float az, float bx, float by, float bz);
 float __stdcall VectorLengthFloat(float x, float y, float z);

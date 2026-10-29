@@ -72,11 +72,10 @@ typedef MissionOrderTableEntry* SimView_g_missionOrderTableBegin;
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
 int __stdcall GetGroundHeight(Pos* pos);
-int __cdecl ScaledSin(int angle, int radius);
-int __cdecl ScaledCos(int angle, int radius);
+#include "../util/math.h"
 void __stdcall DrawFrame(void* surface, void* bmp, int x, int y);
 void __stdcall DrawFrameBlended(void* dest, void* bmp, int x, int y);
-int __stdcall IsUnitVisibleToPlayer(Player* owner, Unit* unit);
+#include "../game/players.h"
 void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos,
                             int radius, int color, const char* text, int index);
 #include "markers.h"

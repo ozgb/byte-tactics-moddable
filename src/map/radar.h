@@ -11,4 +11,6 @@ void __stdcall DrawRadarUnits(void);
 void __stdcall ResizeRadarPicture(GafFrame* pic, int x, int y, int w, int h);
 void __stdcall CalcRadarViewportRect(int*);
 
+void __stdcall DrawRadar(void*);
+
 #endif

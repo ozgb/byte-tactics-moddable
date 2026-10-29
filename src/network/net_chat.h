@@ -7,4 +7,6 @@ int __stdcall ExpireOldestMessage();
 
 void __stdcall CycleMessageUnits(void);
 
+void __stdcall DrawMessages(void* surf);
+
 #endif

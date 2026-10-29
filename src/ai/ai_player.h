@@ -1,5 +1,7 @@
 #ifndef AI_PLAYER_H
 #define AI_PLAYER_H
+struct Vec3;
+
 struct MirroredBasePos;
 struct MovableVec3;
 
@@ -50,5 +52,7 @@ int __stdcall SumUnitRatingsInRange(int player, Vec3* pos, int range);
 
 void __stdcall GetMirroredBasePosition(int index, int unused, MirroredBasePos* out);
 MovableVec3 __stdcall MoveToward(const MovableVec3* from, const MovableVec3* to, int maxLen);
+
+void __stdcall GetBasePosition(int index, Vec3* out);
 
 #endif

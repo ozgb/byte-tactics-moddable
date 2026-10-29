@@ -776,9 +776,9 @@ static inline void Unlock(LONG held)
 }
 
 // FUNCTION: 0x4cbab0
-int __stdcall ExceptionFilter(int exception, int thread)
+int __stdcall ExceptionFilter(void* exception, const char* thread)
 {
-    host_crash_report((void*)exception, (const char*)thread);
+    host_crash_report(exception, thread);
     DisplayScreenshotView* app = GetDisplay();
     if (app != 0) {
         LONG held = Lock();

@@ -2,6 +2,8 @@
 #define MOVEMENT_CLASS_H
 
 #include "../../interfaces/ref.h"
+struct UnitPassMapStampView;
+
 struct PathLockDstView;
 struct PathLockSrcView;
 
@@ -56,5 +58,7 @@ void __stdcall FreeMovementClasses(void);
 void __stdcall RefreshAllPassMaps(Point16 a, Point16 b);
 
 void __stdcall CopyPathLockFields(PathLockDstView* dst, PathLockSrcView* src);
+
+void __stdcall RefreshPassMapsForUnit(UnitPassMapStampView* p);
 
 #endif

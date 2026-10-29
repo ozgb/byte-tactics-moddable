@@ -942,8 +942,6 @@ static_assert(offsetof(Game, vertices) == 125071, "");
 static_assert(offsetof(Game, vertices_1e88f) == 125071, "");
 static_assert(offsetof(Game, frames) == 153871, "");
 static_assert(offsetof(Game, soundCount) == 211471, "");
-static_assert(offsetof(Game, soundIds) == 211475, "");
-static_assert(offsetof(Game, pad_33a17) == 211479, "");
 static_assert(offsetof(Game, sounds) == 211475, "");
 static_assert(offsetof(Game, soundNames) == 212499, "");
 static_assert(offsetof(Game, pad_33e33) == 212531, "");

@@ -761,13 +761,7 @@ struct Game {
     };
     PieceFrame frames[300][6];
     int soundCount;
-    union {
-        struct {
-            int soundIds[1];
-            char pad_33a17[1020];
-        };
-        int sounds[256];
-    };
+    void* sounds[256];
     union {
         struct {
             char soundNames[1][32];
@@ -1383,7 +1377,6 @@ static_assert(offsetof(Game, array_14907) == 0x14907, "array_14907");
 static_assert(offsetof(Game, panelTop) == 0x14907, "panelTop");
 static_assert(offsetof(Game, vertices) == 0x1e88f, "vertices");
 static_assert(offsetof(Game, vertices_1e88f) == 0x1e88f, "vertices_1e88f");
-static_assert(offsetof(Game, soundIds) == 0x33a13, "soundIds");
 static_assert(offsetof(Game, sounds) == 0x33a13, "sounds");
 static_assert(offsetof(Game, soundNames) == 0x33e13, "soundNames");
 static_assert(offsetof(Game, soundNames_33e13) == 0x33e13, "soundNames_33e13");

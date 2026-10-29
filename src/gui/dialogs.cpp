@@ -9,22 +9,12 @@ struct Layer;
 
 #include "gadget.h"
 
-struct Layer {
-    Layer* next;
-    Gadget* entries;
-    void (__stdcall* handler)(Gui*);
-    int data;
-    int flags;
-    int redraw;
-    int keyboardInput;
-    int cb1c;
-    int current;
-    int surface;
-    char unknown_28[0x13];
-    int textHandler;
+#include "layer.h"
+
+struct LayerAllocation {
+    Layer header;
     Gadget gadgets[200];
 };
-
 struct GafSequenceSource;
 
 struct GafSequenceRef {
@@ -40,7 +30,7 @@ struct ActiveBitFlags {
     unsigned int rest : 31;
 };
 
-#include "../../include/mouse_event.h"
+#include "../util/mouse_event.h"
 
 struct DialogRect {
     int left;
@@ -167,7 +157,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
             GetGadgetRect_inlined(cur->entries, (DialogRect*)rect);
             FadeRectangle((Surface *)cur->entries->u.assets.surface, (Rect *)rect, -0x18);
             if (menu->layer != 0)
-                menu->layer->redraw = 1;
+                menu->layer->dirty = 1;
         } else {
             FadeRectangle(0, 0, -0x18);
         }
@@ -183,9 +173,10 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
             layer = menu->layer;
             entry = &layer->entries[layer->entries->u.count + 1];
         } else {
-            layer = (Layer*)GameAllocIgnoreTag(guiName, 0x10f57);
-            memset(layer, 0, 0x10f57);
-            entry = layer->gadgets;
+            LayerAllocation* block = (LayerAllocation*)GameAllocIgnoreTag(guiName, sizeof(LayerAllocation));
+            memset(block, 0, sizeof(LayerAllocation));
+            layer = &block->header;
+            entry = block->gadgets;
         }
         if (ReadGuiFile(entry, layerName) != 0) {
           if (mask != 0) {
@@ -238,7 +229,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
         layer->flags = 0x80;
     layer->flags |= flags & 0x800;
     if (menu->layer != 0)
-        menu->layer->redraw = 1;
+        menu->layer->dirty = 1;
     if (menu->layer != 0)
         menu->layer->keyboardInput = 0;
     strncpy((char*)&entry->name[0], guiName, 0x10);
@@ -375,15 +366,15 @@ int __stdcall BlitLayers(Layer* node, void* surface, DialogRect* clipRect)
     rect.right = g->width + rect.left - 1;
     rect.bottom = g->height + rect.top - 1;
     if (clipRect == 0) {
-        if (node->redraw == 1) {
-            node->redraw = 0;
+        if (node->dirty == 1) {
+            node->dirty = 0;
             DrawSurface(surface, g->u.assets.surface, g->x, g->y);
         }
     } else {
-        if (node->redraw != 1 && RectsOverlap((Rect *)&rect, (Rect *)clipRect) == 0) {
+        if (node->dirty != 1 && RectsOverlap((Rect *)&rect, (Rect *)clipRect) == 0) {
             goto finish;
         }
-        node->redraw = 0;
+        node->dirty = 0;
         DrawSurface(surface, g->u.assets.surface, g->x, g->y);
     }
 finish:
@@ -434,7 +425,7 @@ void __stdcall AddTextGadget(Layer* obj, char* name, char* text,
 }
 
 // FUNCTION: 0x4ab290
-int __stdcall SetBackgroundSurface(Gui* menu, int value)
+int __stdcall SetBackgroundSurface(Gui* menu, void* value)
 {
     if (menu->layer != 0)
         menu->layer->surface = value;
@@ -827,7 +818,7 @@ int __stdcall OpenYesNoDialog(Gui* sub, char* title, char* chc2, char* chc1)
         strcpy(p1->u.text, chc1);
         strcpy(p2->u.text, chc2);
         strcpy(p3->u.text, title);
-        layer->handler = YesNoDialogHandler;
+        layer->handler = (void (__stdcall*)(void*))YesNoDialogHandler;
         return 1;
     }
     return 0;
@@ -912,7 +903,7 @@ int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, in
         }
         SetKeyboardInput(gui, 1);
         RenderLayer(gui, 1);
-        layer->handler = MessageBoxHandler;
+        layer->handler = (void (__stdcall*)(void*))MessageBoxHandler;
         MarkChanged((Dialog *)gui);
         UpdateMenu(gui);
         GameFreeThunk(wrapped);
@@ -936,7 +927,7 @@ int __stdcall OpenNotExistDialog(Gui* sub, char* name)
         int i = FindGadgetIndex(gadgets, "NAME", 5);
         strcpy(gadgets[i].u.text, name);
         gadgets[i].x = -1;
-        dialog->handler = NotExistDialogHandler;
+        dialog->handler = (void (__stdcall*)(void*))NotExistDialogHandler;
         return 1;
     }
     return 0;
@@ -968,7 +959,7 @@ int __stdcall OpenChoice3Dialog(Gui* menu, const char* title, const char* choice
         strcpy(e3->u.text, choice3);
         strcpy(et->u.text, title);
         et->x = 0xffff;
-        dialog->handler = Choice3DialogHandler;
+        dialog->handler = (void (__stdcall*)(void*))Choice3DialogHandler;
         return 1;
     }
     return 0;
@@ -999,7 +990,7 @@ int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, ch
         Gadget* g2 = &gadgets[FindGadgetIndex(gadgets, "CHC2", 1)];
         strcpy(g1->u.text, chc1);
         strcpy(g2->u.text, chc2);
-        dialog->handler = InputDialogHandler;
+        dialog->handler = (void (__stdcall*)(void*))InputDialogHandler;
         return 1;
     }
     return 0;

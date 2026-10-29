@@ -1,7 +1,7 @@
 #ifndef SELECTION_H
 #define SELECTION_H
 class MissionType;
-struct OrderTypeEntry;
+struct MouseEvent;
 
 struct Unit;
 
@@ -33,6 +33,6 @@ bool __stdcall SelectSquad(int id, int);
 
 void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Unit** sel);
 
-void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode, MissionType kind, int* pos, int typeId, int amount);
+void __stdcall IssueOrderToSelection(MouseEvent* entry, unsigned char mode, MissionType kind, int* pos, int typeId, int amount);
 
 #endif

@@ -1,8 +1,1 @@
 name,in_scope,defs,files,layout,canonical
-BmpWriter,no,2,src/graphics/pcx.cpp:562|src/ingame/keys.cpp:35,differs,src/graphics/pcx.cpp
-DisplayContext,no,2,src/graphics/palette.cpp:6|src/gui/keyboard.cpp:16,differs,src/graphics/palette.cpp
-EmptyStringRep,no,2,link/globals.h:214|src/graphics/surface.cpp:1629,identical,link/globals.h
-Gadget,no,5,src/frontend/multi.cpp:23|src/frontend/options.cpp:27|src/frontend/skirmish_menu.cpp:20|src/gui/gadget.h:10|src/gui/gui.cpp:62,differs,src/gui/gadget.h
-Layer,no,5,src/frontend/frontend.cpp:58|src/frontend/multi.cpp:232|src/gui/dialogs.cpp:12|src/gui/layer.h:8|src/ingame/keys.cpp:9,differs,src/gui/layer.h
-MoviePlayer,no,2,src/frontend/frontend.cpp:26|src/graphics/movies.cpp:120,differs,src/graphics/movies.cpp
-Sound,no,6,src/frontend/frontend.cpp:10|src/game/console_commands.cpp:82|src/game/game_state.cpp:212|src/game/main.cpp:81|src/sound/sound.cpp:8|src/sound/sound.h:11,differs,src/sound/sound.h

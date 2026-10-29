@@ -7,29 +7,13 @@
 
 #include "../util/tdf.h"
 
-class Sound {
-public:
-#ifdef __clang__
-    bool HasCdPlayerWindow();
-#else
-    int HasCdPlayerWindow();
-#endif
-    void SetTrackCategory(int value);
-    int HasNoDriver();
-    void CloseCdPlayerWindow();
-};
+#include "../sound/sound.h"
 
 #include "../map/mission.h"
 
 #include "../network/player.h"
 
-class MoviePlayer {
-public:
-    char pad[0x5b8];
-    MoviePlayer(char* path, int a, int b, int c, int d, int e);
-    void Play();
-    void Close();
-};
+#include "../graphics/movies.h"
 
 #pragma pack(push, 1)
 #include "../network/player_info.h"
@@ -50,32 +34,9 @@ struct MenuBackdropBitmap {
     unsigned char* cells;
 };
 
-struct MenuBackdropLayerData {
-    char unknown_0[0xbc];
-    MenuBackdropBitmap* map;
-};
-
-struct Layer {
-    char unknown_0[4];
-    char* gadgets;
-    void (__stdcall* handler)(void*);
-    int data;
-    char unknown_10[0x1c - 0x10];
-    void (__stdcall* cb1c)();
-    char unknown_20[0x24 - 0x20];
-    void* surface;
-};
-
+#include "../gui/gadget.h"
+#include "../gui/layer.h"
 #include "../gui/gui.h"
-
-struct LabelGadgetEntry {
-    unsigned char type;
-    char unknown_1[0x1b - 1];
-    int attribs;
-    char unknown_1f[0xb6 - 0x1f];
-    short count;
-    char unknown_b8[0x15b - 0xb8];
-};
 
 struct PictureCacheEntry {
     void* surface;
@@ -177,14 +138,13 @@ DisplayFlagsView* __stdcall GetDisplay(void);
 void HideSoftwareCursor();
 #include "../game/game_state.h"
 Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
-void __stdcall PlayLoopingSoundByName(char* name, int);
 #include "../files/files_api.h"
 void __stdcall RemapPaletteToClosestIndices(Gui* sub, int value, void* palette);
 void __stdcall SetKeyboardInput(Gui* sub, int value);
 void __stdcall SetFont(void* param);
 void __stdcall SetGadgetActiveByName(Gui* sub, const char* name, int value);
 void __stdcall SetGadgetTextByName(Gui* sub, const char* name, const char* text);
-int __stdcall FindGadgetIndex(char* gadgets, const char* name, int type);
+int __stdcall FindGadgetIndex(Gadget* gadgets, const char* name, int type);
 #include "../graphics/draw.h"
 void __stdcall SetTextColors(unsigned int a, int b);
 void ShowSoftwareCursor();
@@ -194,7 +154,6 @@ void ShowSoftwareCursor();
 #include "../game/data_files.h"
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void __stdcall SetTranslatedTextByName(char* sub, const char* name, const char* text, int param_4);
-void StopAllSounds();
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 int GetTicks(void);
@@ -216,7 +175,6 @@ void __stdcall FinishUnitSync(void);
 #include "endgame.h"
 void __stdcall SetFrontendState(char state, int line, char* file);
 void* __stdcall LoadBitmapByName(const char* name, int param_2);
-int __stdcall SetBackgroundSurface(int param_1, int param_2);
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4256d0
@@ -367,7 +325,7 @@ void UpdateMenuSparks()
     if (terrain->surface != 0) {
         unsigned char* src = ((MenuBackdropBitmap*)terrain->surface)->cells;
         MenuSpark* s = g_menuSparks;
-        unsigned char* dest = ((MenuBackdropLayerData*)terrain->gadgets)->map->cells;
+        unsigned char* dest = ((MenuBackdropBitmap*)terrain->entries->u.assets.surface)->cells;
         int count = 100;
         do {
             if (s->active) {
@@ -547,13 +505,13 @@ void __stdcall OpenCloseCdPlayerDialog()
     Layer* gadget = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x100);
     if (gadget != 0) {
         SetKeyboardInput(&g_game->gui, 1);
-        char* entries = gadget->gadgets;
-        char* choice1 = entries + 0x15b * FindGadgetIndex(entries, "CHOICE1", 1);
-        char* choice2 = entries + 0x15b * FindGadgetIndex(entries, "CHOICE2", 1);
-        strcpy(entries + 0xcc, "CHOICE1");
-        strcpy(entries + 0xdc, "CHOICE2");
-        strcpy(choice1 + 0xb6, Translate("Yes"));
-        strcpy(choice2 + 0xb6, Translate("No"));
+        Gadget* entries = gadget->entries;
+        Gadget* choice1 = entries + FindGadgetIndex(entries, "CHOICE1", 1);
+        Gadget* choice2 = entries + FindGadgetIndex(entries, "CHOICE2", 1);
+        strcpy(entries->u.names.choice, "CHOICE1");
+        strcpy(entries->u.names.choice2, "CHOICE2");
+        strcpy(choice1->u.text, Translate("Yes"));
+        strcpy(choice2->u.text, Translate("No"));
         SetTranslatedTextByName((char*)&g_game->gui, "TITLE", Translate("Close Windows CD Player?"), 0);
         SelectGadgetByName((Gui *)((char*)&g_game->gui), "CHOICE1");
         gadget->handler = (void (__stdcall*)(void*))HandleCloseCdPlayerChoice;
@@ -615,10 +573,9 @@ void __stdcall OpenMainMenu()
     SetGadgetActiveByName(&g_game->gui, "DebugString", 1);
     SetGadgetTextByName(&g_game->gui, "DebugString", palpath);
 
-    char* gadgets = g_game->gui.layer->gadgets;
+    Gadget* gadgets = g_game->gui.layer->entries;
     int width = GetTextPixelWidth(palpath);
-    short* px = (short*)(gadgets + 0x15b * FindGadgetIndex(gadgets, "DebugString", 5) + 0x13);
-    *px += -(width / 2);
+    gadgets[FindGadgetIndex(gadgets, "DebugString", 5)].x += -(width / 2);
 
     SetTextColors(g_game->gui.colours[15], GetTextKeyColor());
     ShowSoftwareCursor();
@@ -1448,7 +1405,7 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
 after:
     if (param_4 == 0) {
         if (g_game->gui.layer != 0) {
-            SetBackgroundSurface((int)&g_game->gui, (int)surface);
+            SetBackgroundSurface(&g_game->gui, surface);
             if (param_3 != 0)
                 SetPaletteColors((unsigned char*)data, 0, 0x100);
         } else {
@@ -1471,8 +1428,8 @@ after:
 // FUNCTION: 0x428b60
 void OrLabelAttribs(void)
 {
-    LabelGadgetEntry* entries = (LabelGadgetEntry*)g_game->gui.layer->gadgets;
-    for (int i = 1; i <= entries->count; i++) {
+    Gadget* entries = g_game->gui.layer->entries;
+    for (int i = 1; i <= entries->u.count; i++) {
         if (entries[i].type == 5) {
             entries[i].attribs |= 8;
         }

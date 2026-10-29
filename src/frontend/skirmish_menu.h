@@ -16,7 +16,7 @@ int __stdcall FindNextAllySlot(int self, int start);
 void __stdcall ApplySlotsToGamePlayers();
 void __cdecl CycleCurrentPlayerSide();
 void __stdcall HandleSkirmishMapClick(Gui* menu);
-void __stdcall UpdateSkirmishMapSelection(Gui* menu, int unused);
+void __stdcall UpdateSkirmishMapSelection(Gui* menu, Gadget* unused);
 void __stdcall OpenSkirmishMapSelector();
 void __stdcall SelectLogosGadget(Gui* obj, void* unused);
 void __stdcall CyclePlayerColor(int reverse);

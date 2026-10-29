@@ -215,7 +215,6 @@ SendScriptCall,mismatch,"static risk rule: a convention, parameter count, or non
 SendScriptCallByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SerializeSave,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetAlliance,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SetBackgroundSurface,mismatch,pointer/int cast: definition's type is likely wrong
 SetBrightness,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetButtonStage,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetButtonStageByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -299,8 +298,6 @@ g_readyOrder,mismatch,variable declared with a view type that differs from its d
 g_reportPlayerName,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_ringApproachVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_scorePanelSlidePos,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
-g_squashDictTree,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
-g_squashThreadLockTicket,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_timerSlots,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_vtolOrders,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 g_weaponAimCobVtable,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses

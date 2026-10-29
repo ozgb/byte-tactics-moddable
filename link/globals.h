@@ -13,7 +13,7 @@ struct Entry_004df590;
 struct Game;
 struct Record_005129b4;
 struct MenuSpark;
-struct LzssDictTree;
+struct LzssTreeNode;
 struct Surface;
 struct WeaponDef;
 
@@ -437,7 +437,7 @@ extern char g_delayedSampleName[112];
 extern char g_lzssPresetWindow[4113];
 extern unsigned char DAT_00520fe1[7];
 extern char g_lzssPresetTree[24584];
-extern LzssDictTree* g_squashDictTree;
+extern LzssTreeNode* g_squashDictTree;
 extern int g_lzssPresetReady;
 extern int g_lzssUsePreset;
 extern char g_memFussyQueried;

@@ -22,67 +22,7 @@ struct ScreenLayer;
 #pragma pack(push, 1)
 
 struct VideoModeSizeList;
-struct OptionsSliderMenu;
-
-struct Gadget {
-    union {
-        unsigned char type;
-        char state;
-    };
-    char unknown_1;
-    char name[0x11];
-    short x;
-    short y;
-    short width;
-    short height;
-    int attribs;
-    char unknown_1f[0x29 - 0x1f];
-    unsigned char active;
-    char unknown_2a[0xb6 - 0x2a];
-    union {
-        short count;
-        char text[0x80];
-        struct {
-            char unknown_b6[0xba - 0xb6];
-            short selected;
-            char unknown_bc[0xbe - 0xbc];
-            void* frames;
-            char unknown_c2[0xc6 - 0xc2];
-            unsigned short frame;
-            char unknown_c8[0xd2 - 0xc8];
-            void* records;
-        };
-        struct {
-            char unknown_b6b[0xbc - 0xb6];
-            Surface* surface;
-            char unknown_c0[0xc4 - 0xc0];
-            int background;
-        };
-    };
-    union {
-        short range;
-        struct {
-            unsigned char stages;
-            unsigned char stageIndex;
-        };
-    };
-    char unknown_138[0x13c - 0x138];
-    int max;
-    short knobPos;
-    short knobSize;
-    void (__stdcall* sliderCallback)(OptionsSliderMenu* obj, int value);
-    char unknown_148[0x14a - 0x148];
-    union {
-        void* sliderUser;
-        VideoModeSizeList* list;
-    };
-    char unknown_14e[0x15b - 0x14e];
-};
-
-struct OptionsSliderLayer {
-    int unknown_0;
-    Gadget* entries;
-};
+struct Gadget;
 
 struct VideoModeSize {
     int width;
@@ -351,6 +291,7 @@ struct OptionsReselectLink {
 };
 
 
+#include "../gui/gadget.h"
 #include "../gui/layer.h"
 
 #include "../graphics/surface.h"
@@ -453,18 +394,17 @@ extern Surface* g_optionsBackupSurface;
 extern int g_battleQuitIntent;
 extern OptionsPrefsSnapshot g_optionsPrefsSnapshot;
 
-void __stdcall SetGadgetActiveByName(OptionsSliderMenu* menu, char* name, int value);
+void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 char* __stdcall FindGadgetChecked_C(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
-void __stdcall SetTranslatedTextByName(OptionsSliderMenu* obj, char* name, char* text, int param_4);
-void __stdcall SetGrayedOut(OptionsSliderMenu* menu, int index, int value);
-void __stdcall SetGrayedOutByName(OptionsSliderMenu* obj, char* name, int value);
-void __stdcall SetGadgetGrayedOutByName(OptionsSliderMenu* obj, char* name, int param_3);
-int __stdcall SetButtonStageByName(OptionsSliderMenu* obj, char* name, int value);
+void __stdcall SetTranslatedTextByName(Gui* obj, char* name, char* text, int param_4);
+void __stdcall SetGrayedOut(Gui* menu, int index, int value);
+void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
+void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3);
+int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
 void __stdcall SetBrightness(float value);
 #include "../game/game_state.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
-void __stdcall SetGadgetStatus(OptionsSliderMenu* menu, int index, short value);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 
 
@@ -600,21 +540,21 @@ void __stdcall SetDirectPlayProvider(int param_1)
 // FUNCTION: 0x45b880
 void __stdcall SetGadgetsDisabledByPrefix(char* name, int value)
 {
-    for (int i = 0; i <= g_game->menu_519_1c.holder->entries->count; i++) {
-        if (strncmp(g_game->menu_519_1c.holder->entries[i].name, name, strlen(name)) == 0 &&
-            g_game->menu_519_1c.holder->entries[i].type == 1) {
-            SetGrayedOut(&g_game->menu_519_1c, i, value);
+    for (int i = 0; i <= g_game->gui.layer->entries->u.count; i++) {
+        if (strncmp(g_game->gui.layer->entries[i].name, name, strlen(name)) == 0 &&
+            g_game->gui.layer->entries[i].type == 1) {
+            SetGrayedOut(&g_game->gui, i, value);
         }
     }
-    MarkChanged((Dialog *)&g_game->menu_519_1c);
+    MarkChanged((Dialog *)&g_game->gui);
 }
 
 // FUNCTION: 0x45b920
 void __stdcall DeactivateGadgetsByPrefix(char* prefix)
 {
-    for (int i = 0; i <= g_game->menu_519_1c.holder->entries[0].count; i++) {
-        if (strncmp(g_game->menu_519_1c.holder->entries[i].name, prefix, strlen(prefix)) == 0) {
-            SetGadgetActiveByName(&g_game->menu_519_1c, g_game->menu_519_1c.holder->entries[i].name, 0);
+    for (int i = 0; i <= g_game->gui.layer->entries[0].u.count; i++) {
+        if (strncmp(g_game->gui.layer->entries[i].name, prefix, strlen(prefix)) == 0) {
+            SetGadgetActiveByName(&g_game->gui, g_game->gui.layer->entries[i].name, 0);
         }
     }
 }
@@ -643,14 +583,14 @@ int __stdcall ReadSliderValue(Gadget* param_1)
 void __stdcall SetGadgetStatusAndText(int index, int state, char* offText, char* onText)
 {
     char name[128];
-    Gadget* entries = g_game->menu_519_1c.holder->entries;
-    SetGadgetStatus(&g_game->menu_519_1c, index, state);
+    Gadget* entries = g_game->gui.layer->entries;
+    SetGadgetStatus(&g_game->gui, index, state);
     GetGadgetName(entries, name, index);
     Gadget* e = FindGadgetOrNull(entries, name);
     if (!state) {
-        strcpy(e->text, offText);
+        strcpy(e->u.text, offText);
     } else {
-        strcpy(e->text, onText);
+        strcpy(e->u.text, onText);
     }
 }
 
@@ -661,14 +601,15 @@ void __stdcall ClearGadgetText(void* param_1, int param_2)
 }
 
 // FUNCTION: 0x45bb00
-void __stdcall UpdateVideoModeLabel(OptionsSliderMenu* param_1, Gadget* param_2)
+void __stdcall UpdateVideoModeLabel(Gui* param_1, Gadget* param_2)
 {
     int i = 0;
-    int count = param_2->list->count;
+    VideoModeSizeList* modeList = (VideoModeSizeList*)param_2->sliderUser;
+    int count = modeList->count;
     if (count > 0) {
         Game* g = g_game;
         int w = g->width_37f1b;
-        VideoModeSize* m = param_2->list->modes;
+        VideoModeSize* m = modeList->modes;
         do {
             if (w != m->width)
                 goto next;
@@ -684,9 +625,9 @@ void __stdcall UpdateVideoModeLabel(OptionsSliderMenu* param_1, Gadget* param_2)
                     f += 1.0;
                 param_2->knobPos = (short)f;
 
-                Gadget* e = (Gadget*)FindGadgetChecked_C(param_1->holder->entries, "VIDVAL");
+                Gadget* e = (Gadget*)FindGadgetChecked_C(param_1->layer->entries, "VIDVAL");
                 if (e)
-                    sprintf(e->text, "%d X %d", m->width, m->height);
+                    sprintf(e->u.text, "%d X %d", m->width, m->height);
                 break;
             }
 next:
@@ -696,17 +637,17 @@ next:
 }
 
 // FUNCTION: 0x45bbf0
-void __stdcall HandleVideoModeSlider(OptionsSliderMenu* obj, int unused)
+void __stdcall HandleVideoModeSlider(Gui* obj, int unused)
 {
-    Gadget* e = FindGadgetChecked_D(obj->holder->entries, "VIDSLDR");
-    VideoModeSizeList* list = e->list;
+    Gadget* e = FindGadgetChecked_D(obj->layer->entries, "VIDSLDR");
+    VideoModeSizeList* list = (VideoModeSizeList*)e->sliderUser;
     if (e != 0) {
         VideoModeSize* r = &list->modes[ReadSliderValue(e)];
-        sprintf(FindGadgetChecked_C(obj->holder->entries, "VIDVAL") + 0xb6, "%d X %d", r->width, r->height);
+        sprintf(FindGadgetChecked_C(obj->layer->entries, "VIDVAL") + 0xb6, "%d X %d", r->width, r->height);
         g_game->width_37f1b = r->width;
         g_game->height_37f1f = r->height;
     }
-    MarkChanged((Dialog *)&g_game->menu_519_1c);
+    MarkChanged((Dialog *)&g_game->gui);
 }
 
 // FUNCTION: 0x45bcc0
@@ -718,9 +659,9 @@ void ApplyBrightnessAndVolume()
 }
 
 // FUNCTION: 0x45bd20
-void __stdcall HandleGammaSlider(OptionsSliderMenu* obj, int unused)
+void __stdcall HandleGammaSlider(Gui* obj, int unused)
 {
-    Gadget* e = FindGadgetChecked_D(obj->holder->entries, "GAMMA");
+    Gadget* e = FindGadgetChecked_D(obj->layer->entries, "GAMMA");
     if (e != 0) {
         g_game->brightness = ReadSliderValue(e);
         ApplyBrightnessAndVolume();
@@ -728,9 +669,9 @@ void __stdcall HandleGammaSlider(OptionsSliderMenu* obj, int unused)
 }
 
 // FUNCTION: 0x45bde0
-void __stdcall HandleEffectsVolumeSlider(OptionsSliderMenu* obj, int unused)
+void __stdcall HandleEffectsVolumeSlider(Gui* obj, int unused)
 {
-    Gadget* e = FindGadgetChecked_D(obj->holder->entries, "FXVOL");
+    Gadget* e = FindGadgetChecked_D(obj->layer->entries, "FXVOL");
     if (e != 0) {
         g_game->volume1 = ReadSliderValue(e);
         ApplyBrightnessAndVolume();
@@ -738,9 +679,9 @@ void __stdcall HandleEffectsVolumeSlider(OptionsSliderMenu* obj, int unused)
 }
 
 // FUNCTION: 0x45bea0
-void __stdcall HandleMusicVolumeSlider(OptionsSliderMenu* obj, int unused)
+void __stdcall HandleMusicVolumeSlider(Gui* obj, int unused)
 {
-    Gadget* e = FindGadgetChecked_D(obj->holder->entries, "MUSICVOL");
+    Gadget* e = FindGadgetChecked_D(obj->layer->entries, "MUSICVOL");
     if (e != 0) {
         g_game->volume2 = ReadSliderValue(e);
         ApplyBrightnessAndVolume();
@@ -764,7 +705,7 @@ void __stdcall SetGameSpeedLabel(char* name, char* label, int speed, int normal)
         text = "Faster";
     }
     sprintf(buf, "%s (%s)", label, text);
-    SetTranslatedTextByName(&g_game->menu_519_1c, name, label, 0);
+    SetTranslatedTextByName(&g_game->gui, name, label, 0);
 }
 
 // FUNCTION: 0x45c010
@@ -776,7 +717,7 @@ void __stdcall SetGadgetTextFromValueTable(ValueTextEntry* table, char* name, in
     while (table->format != 0) {
         if (value <= table->min) {
             sprintf(buf, table->format, value);
-            SetTranslatedTextByName(&g_game->menu_519_1c, name, buf, 0);
+            SetTranslatedTextByName(&g_game->gui, name, buf, 0);
             return;
         }
         table++;
@@ -784,11 +725,11 @@ void __stdcall SetGadgetTextFromValueTable(ValueTextEntry* table, char* name, in
 }
 
 // FUNCTION: 0x45c070
-void __stdcall HandleGameSpeedSlider(OptionsSliderMenu* obj, int unused)
+void __stdcall HandleGameSpeedSlider(Gui* obj, int unused)
 {
     Player* player = &g_game->players[g_game->localPlayer];
     if (player->active == 0 || !((PlayerInfoOptionsView*)player->info.get())->u.flag_9b_6) {
-        Gadget* e = FindGadgetChecked_D(obj->holder->entries, "GAME");
+        Gadget* e = FindGadgetChecked_D(obj->layer->entries, "GAME");
         if (e != 0) {
             int value = ReadSliderValue(e);
             g_game->gameSpeed = (unsigned short)(value < 1 ? 1 : ReadSliderValue(e));
@@ -799,9 +740,9 @@ void __stdcall HandleGameSpeedSlider(OptionsSliderMenu* obj, int unused)
 }
 
 // FUNCTION: 0x45c170
-void __stdcall HandleScreenSlider(OptionsSliderMenu* obj, int unused)
+void __stdcall HandleScreenSlider(Gui* obj, int unused)
 {
-    Gadget* e = FindGadgetChecked_D(obj->holder->entries, "SCREEN");
+    Gadget* e = FindGadgetChecked_D(obj->layer->entries, "SCREEN");
     if (e != 0) {
         g_game->scrollSpeed = ReadSliderValue(e) > 1 ? ReadSliderValue(e) : 1;
         MarkChanged((Dialog *)obj);
@@ -809,10 +750,10 @@ void __stdcall HandleScreenSlider(OptionsSliderMenu* obj, int unused)
 }
 
 // FUNCTION: 0x45c220
-void __stdcall HandleMaxLinesSlider(OptionsSliderMenu* obj, int unused)
+void __stdcall HandleMaxLinesSlider(Gui* obj, int unused)
 {
     char text[20];
-    Gadget* e = FindGadgetChecked_D(obj->holder->entries, "MAXLINES");
+    Gadget* e = FindGadgetChecked_D(obj->layer->entries, "MAXLINES");
     if (e != 0) {
         int v = ReadSliderValue(e);
         g_game->textLines = v < 0 ? 0 : ReadSliderValue(e);
@@ -826,10 +767,10 @@ void __stdcall HandleMaxLinesSlider(OptionsSliderMenu* obj, int unused)
 }
 
 // FUNCTION: 0x45c330
-void __stdcall HandleTextScrollSlider(OptionsSliderMenu* obj, int unused)
+void __stdcall HandleTextScrollSlider(Gui* obj, int unused)
 {
     char text[20];
-    Gadget* e = FindGadgetChecked_D(obj->holder->entries, "TXTSCROL");
+    Gadget* e = FindGadgetChecked_D(obj->layer->entries, "TXTSCROL");
     if (e != 0) {
         g_game->textScroll = ReadSliderValue(e);
         sprintf(text, "%d secs", g_game->textScroll);
@@ -848,9 +789,9 @@ void __stdcall SetLockedCdTrack(int value)
 void UpdateTrackGadgets()
 {
     char buf[12];
-    OptionsSliderMenu* menu = &g_game->menu_519_1c;
+    Gui* menu = &g_game->gui;
 
-    if (FindGadgetIndex(menu->holder->entries, "TRACKTYPE", 1) != -1) {
+    if (FindGadgetIndex(menu->layer->entries, "TRACKTYPE", 1) != -1) {
         int disc = g_musicUiSelectedTrack;
         SetGrayedOutByName(menu, "TRACKTYPE",
                      (((char)g_game->musicMode & 1) && g_game->cdMode == 4) ? 0 : 1);
@@ -871,7 +812,7 @@ void UpdateTrackGadgets()
 // FUNCTION: 0x45c510
 void ApplyTrackType()
 {
-    Gadget* gadgets = g_game->menu_519_1c.holder->entries;
+    Gadget* gadgets = g_game->gui.layer->entries;
     if (g_game->cdMode == 4) {
         int index = FindGadgetIndex(gadgets, "TRACKTYPE", 1);
         ((Sound *)g_game->sound)->SetCategoryOfTrack(g_musicUiSelectedTrack, gadgets[index].stageIndex);
@@ -1057,16 +998,16 @@ void SaveGameSettings()
 // FUNCTION: 0x45ce80
 void EnsureOptionsPanelGadget()
 {
-    Gadget* entries = g_game->menu_519_1c.holder->entries;
+    Gadget* entries = g_game->gui.layer->entries;
     int index = FindGadgetIndex(entries, "PANEL", 0xe);
     if (g_game->ordersPanelFlags & 1) {
         entries->width += 0x96;
         if (index == -1) {
-            short c = entries->count;
+            short c = entries->u.count;
             int i = c;
             i++;
             c++;
-            entries->count = c;
+            entries->u.count = c;
             memset(&entries[i], 0, sizeof(Gadget));
             entries[i].type = 0xb;
             entries[i].x = 0x80;
@@ -1076,7 +1017,7 @@ void EnsureOptionsPanelGadget()
             entries[i].height = entries->height;
             strcpy(entries[i].name, "PANEL");
             entries[i].active = 1;
-            entries[i].background = entries->background;
+            entries[i].u.assets.background = entries->u.assets.background;
         }
     }
 }
@@ -1131,9 +1072,9 @@ void TickMusicOptions()
 // FUNCTION: 0x45d130
 void UpdateMusicGadgets()
 {
-    SetButtonStageByName((Gui*)&g_game->gui, "NOTRAK", g_game->flags_37f14_37f14.notrak & 1);
-    SetButtonStageByName((Gui*)&g_game->gui, "TRACKMODE", g_game->cdMode - 1);
-    SetGadgetGrayedOutByName((Gui*)&g_game->gui, "MUSICVOL", (char)(~g_game->flags_37f14_37f14.notrak & 1));
+    SetButtonStageByName(&g_game->gui, "NOTRAK", g_game->flags_37f14_37f14.notrak & 1);
+    SetButtonStageByName(&g_game->gui, "TRACKMODE", g_game->cdMode - 1);
+    SetGadgetGrayedOutByName(&g_game->gui, "MUSICVOL", (char)(~g_game->flags_37f14_37f14.notrak & 1));
     SetGrayedOutByName((Dialog*)&g_game->gui, "CDPREV", (char)(~g_game->flags_37f14_37f14.notrak & 1));
     SetGrayedOutByName((Dialog*)&g_game->gui, "CDSTOP", (char)(~g_game->flags_37f14_37f14.notrak & 1));
     SetGrayedOutByName((Dialog*)&g_game->gui, "CDPLAY", (char)(~g_game->flags_37f14_37f14.notrak & 1));
@@ -1239,7 +1180,7 @@ void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
     }
     int save = obj->hotGadgetIndex;
     if (obj->hotGadgetIndex != -1) {
-        if (entries[obj->hotGadgetIndex].state != 1) {
+        if (entries[obj->hotGadgetIndex].type != 1) {
             ClearSelectedGadget(obj);
             return;
         }
@@ -1300,11 +1241,11 @@ void OpenMusicOptions()
 // FUNCTION: 0x45d9d0
 void UpdateSoundGadgets()
 {
-    SetButtonStageByName((Gui*)&g_game->gui, g_modeGadgetName, (*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7);
-    SetGadgetActiveByName((Gui*)&g_game->gui, g_volTextGadgetName, ((*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7) != 0);
-    SetGadgetGrayedOutByName((Gui*)&g_game->gui, g_fxVolGadgetName, ((*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7) == 0);
-    SetGadgetGrayedOutByName((Gui*)&g_game->gui, g_testGadgetName, ((*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7) == 0);
-    SetGadgetGrayedOutByName((Gui*)&g_game->gui, g_speechGadgetName, ((*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7) == 0);
+    SetButtonStageByName(&g_game->gui, g_modeGadgetName, (*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7);
+    SetGadgetActiveByName(&g_game->gui, g_volTextGadgetName, ((*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7) != 0);
+    SetGadgetGrayedOutByName(&g_game->gui, g_fxVolGadgetName, ((*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7) == 0);
+    SetGadgetGrayedOutByName(&g_game->gui, g_testGadgetName, ((*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7) == 0);
+    SetGadgetGrayedOutByName(&g_game->gui, g_speechGadgetName, ((*(SoundOptionFlagsView*)&g_game->soundFlags).byte & 7) == 0);
 }
 
 // FUNCTION: 0x45da90
@@ -1415,9 +1356,9 @@ void OpenSoundOptions()
         }
         e->knobPos = (short)f;
     }
-    for (int i = 1; i <= obj->entries->count; i++) {
+    for (int i = 1; i <= obj->entries->u.count; i++) {
         if (obj->entries[i].type == 4)
-            obj->entries[i].sliderCallback((OptionsSliderMenu*)&g_game->gui, 0);
+            obj->entries[i].sliderCallback(&g_game->gui, 0);
     }
     SetButtonStageByName(&g_game->gui, "SPEECH", (*(SoundOptionFlagsView*)&g_game->soundFlags).bits.speech ? g_game->unitChat / 5 : 0);
     SetButtonStageByName(&g_game->gui, "MODE", (*(SoundOptionFlagsView*)&g_game->soundFlags).word & 7);
@@ -1519,7 +1460,7 @@ void __stdcall HandleVisualOptionsClick(Gui* gui)
     }
 
     if (gui->hotGadgetIndex != -1) {
-        if (entries[gui->hotGadgetIndex].state != 1) {
+        if (entries[gui->hotGadgetIndex].type != 1) {
             ClearSelectedGadget(gui);
             return;
         }
@@ -1592,7 +1533,7 @@ void __stdcall OpenVisualOptions(int param_1)
                 Gadget* e = FindGadgetChecked_D(layer->entries, "VIDSLDR");
                 e->max = list->count - 1;
                 e->sliderCallback = HandleVideoModeSlider;
-                e->sliderUser = list;
+                e->sliderUser = (int)list;
                 menu = (VisualOptionsGui*)&g_game->gui;
                 for (int j = 0; j < list->count; j++) {
                     int w = g_game->width_37f1b;
@@ -1618,12 +1559,12 @@ void __stdcall OpenVisualOptions(int param_1)
     } else {
         layer->data = (void*)i;
         if ((*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).byte & 1) {
-            for (i = 0; i <= ((VisualOptionsHolder*)g_game->gui.layer)->entries->count; i++) {
+            for (i = 0; i <= ((VisualOptionsHolder*)g_game->gui.layer)->entries->u.count; i++) {
                 if (strncmp(((VisualOptionsHolder*)g_game->gui.layer)->entries[i].name, "MAP", strlen("MAP")) == 0) {
                     SetGadgetActiveByName(&g_game->gui, ((VisualOptionsHolder*)g_game->gui.layer)->entries[i].name, 0);
                 }
             }
-            for (i = 0; i <= ((VisualOptionsHolder*)g_game->gui.layer)->entries->count; i++) {
+            for (i = 0; i <= ((VisualOptionsHolder*)g_game->gui.layer)->entries->u.count; i++) {
                 if (strncmp(((VisualOptionsHolder*)g_game->gui.layer)->entries[i].name, "VID", strlen("VID")) == 0) {
                     SetGadgetActiveByName(&g_game->gui, ((VisualOptionsHolder*)g_game->gui.layer)->entries[i].name, 0);
                 }
@@ -1804,9 +1745,9 @@ void OpenSpeedOptions()
         e->knobPos = (short)f;
         e->sliderCallback = HandleTextScrollSlider;
     }
-    for (int i = 1; i <= obj->entries->count; i++) {
+    for (int i = 1; i <= obj->entries->u.count; i++) {
         if (obj->entries[i].type == 4)
-            obj->entries[i].sliderCallback((OptionsSliderMenu*)&g_game->gui, 0);
+            obj->entries[i].sliderCallback(&g_game->gui, 0);
     }
     SetKeyboardInput(&g_game->gui, 1);
     OrLabelAttribs();
@@ -1834,7 +1775,7 @@ void ShowGameSettingsDialog()
     Gadget* entries = layer->entries;
     layer->handler = (void (__stdcall *)(void *))HandleGameSettingsDialogClick;
     LoadPictureCached("GameSettings", 0, 0, 0);
-    int count = layer->entries->count;
+    int count = layer->entries->u.count;
     unsigned int index = FindHostSlot();
     index &= 0xff;
     char num[0x40];
@@ -1903,7 +1844,7 @@ void ShowGameSettingsDialog()
     AddTextGadget(layer, "TEXT", Translate((char*)"Max Units:"), 0x12, y, 0x6e, 2);
     AddTextGadget(layer, "TEXT", _itoa(g_game->maxUnitsSetting, num, 10), 0x8c, y, 0x78, 2);
     int i;
-    for (i = count + 1; i <= layer->entries->count; i++)
+    for (i = count + 1; i <= layer->entries->u.count; i++)
         entries[i].attribs = 1;
     SetKeyboardInput((Layer*)&g_game->gui, 1);
     RenderLayer((Gui *)((Layer*)&g_game->gui), 0x40);
@@ -1957,16 +1898,16 @@ static inline void AddLine(HelpPageLines* page, Layer* layer, char* value, int y
         p[-1] = 0;
     }
     AddTextGadget(layer, "TEXT", Translate(SkipTextLines(value, 0)), 0x28, y, 0x4e, 2);
-    layer->entries[layer->entries->count].attribs = 1;
+    layer->entries[layer->entries->u.count].attribs = 1;
     AddTextGadget(layer, "TEXT", Translate(SkipTextLines(value, 1)), 0x7d, y, 0x12c, 2);
-    layer->entries[layer->entries->count].attribs = 1;
+    layer->entries[layer->entries->u.count].attribs = 1;
 }
 
 // FUNCTION: 0x45f8c0
 void __stdcall FillHelpPage(Gui* sub, int page, int lineCount)
 {
     Layer* layer = sub->layer;
-    layer->entries->count = g_helpDialogBaseGadgetCount;
+    layer->entries->u.count = g_helpDialogBaseGadgetCount;
     TdfFile parser;
     char path[256];
     char key[12];
@@ -2023,7 +1964,7 @@ void OpenHelpDialog()
     Layer* g = LoadGuiLayer((HelpGui*)&g_game->gui, "HELP.GUI", 0x1881);
     g->handler = (void (__stdcall *)(void *))HandleHelpClick;
     LoadPictureCached("dhelp", 0, 0, 0);
-    g_helpDialogBaseGadgetCount = g->entries->count;
+    g_helpDialogBaseGadgetCount = g->entries->u.count;
     FillHelpPage((Gui *)((HelpGui*)&g_game->gui), 0, 0x11);
     SetKeyboardInput((HelpGui*)&g_game->gui, 1);
     RenderLayer((Gui *)((HelpGui*)&g_game->gui), 0x40);
@@ -2200,7 +2141,7 @@ void OpenOptionsPanel()
         BlankScreen();
     }
     g_optionsFlipSurface = AllocSurface("FLIPSURFACE", layer->entries->width, layer->entries->height);
-    memcpy(g_optionsFlipSurface->pixels, layer->entries->surface->pixels,
+    memcpy(g_optionsFlipSurface->pixels, ((Surface*)layer->entries->u.assets.surface)->pixels,
            layer->entries->width * layer->entries->height);
     FrameFromSurface((GafFrame*)&g_optionsFlipFrame, g_optionsFlipSurface);
     g_optionsLightbarX = 0;
@@ -2326,8 +2267,8 @@ void OpenSurrenderDialog()
     Gadget* entries = layer->entries;
     FindGadgetIndex(entries, "CHOICE1", 1);
     FindGadgetIndex(entries, "CHOICE2", 1);
-    strcpy(entries->text + 0x16, "CHOICE2");
-    strcpy(entries->text + 0x26, "CHOICE2");
+    strcpy(entries->u.text + 0x16, "CHOICE2");
+    strcpy(entries->u.text + 0x26, "CHOICE2");
     SetTranslatedTextByName((SurrenderGui*)&g_game->gui, "CHOICE1", "Yes", 0);
     SetTranslatedTextByName((SurrenderGui*)&g_game->gui, "CHOICE2", "No", 0);
     if (g_battleQuitIntent == 0) {
@@ -2444,7 +2385,7 @@ void __stdcall HandleInGameOptionsClick(Gui* gui)
         Layer* g = LoadGuiLayer(&g_game->gui, "HELP.GUI", 0x1881);
         g->handler = (void (__stdcall *)(void *))HandleHelpClick;
         LoadPictureCached("dhelp", 0, 0, 0);
-        g_helpDialogBaseGadgetCount = g->entries->count;
+        g_helpDialogBaseGadgetCount = g->entries->u.count;
         FillHelpPage(&g_game->gui, 0, 0x11);
         SetKeyboardInput(&g_game->gui, 1);
         RenderLayer(&g_game->gui, 0x40);

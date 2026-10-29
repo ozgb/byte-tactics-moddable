@@ -79,21 +79,7 @@ struct ViewFlags {
 
 #pragma pack(pop)
 
-class Sound {
-public:
-    void PlayCdTrack(int index, int flag);
-    int Is3DEnabled();
-    void Disable3D();
-    void Enable3D();
-    void SetTrackCategory(int);
-    int StopCdAudio();
-    int GetTrackCount();
-    int GetTrackCategory();
-    int IsFirstTrackData();
-    int GetCurrentTrack();
-    int IsCdPlaying();
-    int GetPlayState();
-};
+#include "../sound/sound.h"
 
 int ScanDirectory(char*, char*);
 
@@ -226,7 +212,7 @@ void __stdcall CmdAssign(CommandArgs* args)
     if (kind.index) {
         int a = args->GetIntArg(1, 0);
         int b = args->GetIntArg(2, 0);
-        IssueOrderToSelection((OrderTypeEntry*)g_game->orders_2c76, 0, kind, nullptr, a, b);
+        IssueOrderToSelection(&g_game->view, 0, kind, nullptr, a, b);
     }
 }
 

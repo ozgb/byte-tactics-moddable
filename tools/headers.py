@@ -71,7 +71,6 @@ ROOT = sources.ROOT
 SKIP_FILES = {"src/harness/trace_schema.h", "src/state/layout_asserts.cpp", "src/util/fixed_trig.cpp"}
 LINK_DATA = "link/data.cpp"
 LINK_HEADER = "link/globals.h"
-PROTOS_HEADER = "include/ta_protos.h"
 TYPE_DIRS = ("src", "include", "interfaces", "link")
 CONVENTIONS = ("__cdecl", "__stdcall", "__fastcall", "__thiscall")
 DEFAULT_CONVENTION = "__stdcall"
@@ -531,7 +530,6 @@ class Decl:
     defn: Def | None = None
     home: str = ""
     diffs: list = field(default_factory=list)
-    phantom: bool = False
 
 
 def ident_tokens(text):
@@ -603,7 +601,7 @@ class World:
                         self.types.setdefault(m.group(1), []).append(TypeDef(path, "template", True))
                 elif it.kind == "other" and it.text.startswith(("typedef", "using")):
                     self.index_typedef(path, it)
-                elif path.endswith(".h") and path != PROTOS_HEADER and not it.scope:
+                elif path.endswith(".h") and not it.scope:
                     if it.kind == "func_proto" and "::" not in it.name:
                         self.hdecls.setdefault(it.name, []).append(Def(path, it))
                     elif it.kind == "var_decl":
@@ -961,7 +959,7 @@ class World:
             cache[header] = [f for f in self.cpps if header in self.closure(f)]
         return cache[header]
 
-    def plan(self, mismatch="skip", protos=True, left_out=frozenset()):
+    def plan(self, mismatch="skip", left_out=frozenset()):
         plan = Plan()
         decls = []
         for path in self.cpps:
@@ -975,42 +973,12 @@ class World:
                     plan.kept_marker.append(d)
                     continue
                 decls.append(d)
-        phantoms = []
-        stale = []
-        users = []
-        if protos and PROTOS_HEADER in self.files:
-            users = [f for f in self.cpps if PROTOS_HEADER in self.closure(f)]
-            used = set()
-            for f in users:
-                used |= set(re.findall(r"[A-Za-z_]\w*", self.files[f].masked))
-            everywhere = None
-            for it in self.files[PROTOS_HEADER].items:
-                d = self.classify(PROTOS_HEADER, it)
-                if d is None:
-                    continue
-                d.phantom = it.name not in used
-                if d.defn is None and d.status == "nodef":
-                    if everywhere is None:
-                        everywhere = set()
-                        for f in self.files.values():
-                            if f.path != PROTOS_HEADER:
-                                everywhere |= set(re.findall(r"[A-Za-z_]\w*", f.masked))
-                    if it.name not in everywhere:
-                        stale.append(d)
-                    else:
-                        plan.protos_kept.append(d)
-                    continue
-                if d.defn is None:
-                    plan.protos_kept.append(d)
-                    continue
-                phantoms.append(d)
-        for d in decls + phantoms:
+        for d in decls:
             if d.defn is None:
-                if d in decls:
-                    (plan.nodef if d.status == "nodef" else plan.ambiguous).append(d)
+                (plan.nodef if d.status == "nodef" else plan.ambiguous).append(d)
                 continue
             d.home = self.home_for(d)
-            if d.status == "mismatch" and d in decls:
+            if d.status == "mismatch":
                 plan.mismatches.append(d)
         bad = set()
         blocked = set()
@@ -1018,9 +986,6 @@ class World:
             if d.home == LINK_HEADER:
                 continue
             if d.status in ("mismatch", "ambiguous"):
-                bad.add((d.kind, d.name))
-        for d in phantoms:
-            if not d.phantom and d.status == "mismatch":
                 bad.add((d.kind, d.name))
         linkdefs = {n: v[0] for n, v in self.vardefs.items() if len(v) == 1 and v[0].path == LINK_DATA}
         for path in self.cpps:
@@ -1034,20 +999,16 @@ class World:
         for d in decls:
             if d.home == LINK_HEADER and d.status in ("mismatch", "ambiguous"):
                 blocked.add((d.path, LINK_HEADER))
-        for d in decls + phantoms:
+        for d in decls:
             if d.defn is not None and d.home and (d.path, d.home) not in blocked:
-                t = None
-                for f in (users if d.path == PROTOS_HEADER and not d.phantom else [d.path]):
-                    t = t or self.type_conflict(f, d.home)
+                t = self.type_conflict(d.path, d.home)
                 if t:
                     blocked.add((d.path, d.home))
                     plan.type_conflicts.append((d, t))
         plan.bad_names = sorted(bad)
         demand = {}
-        for d in decls + phantoms:
+        for d in decls:
             if d.defn is None or (d.kind, d.name) in bad or (d.path, d.home) in blocked:
-                continue
-            if d.home == LINK_HEADER and d.path == PROTOS_HEADER:
                 continue
             demand.setdefault(d.home, {}).setdefault(d.name, []).append(d)
         homed = {}
@@ -1088,17 +1049,12 @@ class World:
                 if home not in have:
                     edits.append((at, at, f'#include "{self.relative(defn.path, home)}"\n'))
                 plan.default_edits.setdefault(defn.path, []).extend(edits)
-        for d in decls + phantoms:
+        for d in decls:
             if d.defn is None or (d.kind, d.name) in bad or (d.path, d.home) in blocked:
                 continue
             if (d.home, d.name) not in homed:
                 continue
             plan.removals.setdefault(d.path, {}).setdefault(d.home, []).append(d)
-        removed = {id(d) for g in plan.removals.get(PROTOS_HEADER, {}).values() for d in g}
-        plan.protos_kept += [d for d in phantoms if id(d) not in removed]
-        if stale:
-            plan.removals.setdefault(PROTOS_HEADER, {}).setdefault("", []).extend(stale)
-            plan.stale = stale
         plan.blocked = sorted(blocked)
         return plan
 
@@ -1271,13 +1227,13 @@ class World:
         left = "".join(left)
         for home, ds in sorted(groups.items()):
             inc = f'#include "{self.relative(path, home)}"' if home else ""
-            real = [d for d in ds if not d.phantom and home]
+            real = [d for d in ds if home]
             first = min([d.item.begin for d in real] or [0])
             unused = not any(re.search(r"\b" + re.escape(d.name) + r"\b", left) for d in real)
             put = not real or home == path or unused or any(off < first and self.resolve_include(path, k, n) == home for off, k, n in includes)
             for d in sorted(ds, key=lambda d: d.item.begin):
                 b, e, full = self.removal_span(text, d.item.begin, d.item.end, keep_blank=not put)
-                if not put and not d.phantom and home:
+                if not put and home:
                     put = True
                     repl = inc + "\n" if full else "\n" + inc + "\n"
                     edits.append((b, e, repl))
@@ -1351,12 +1307,9 @@ class Plan:
     kept_marker: list = field(default_factory=list)
     blocked: list = field(default_factory=list)
     type_conflicts: list = field(default_factory=list)
-    protos_kept: list = field(default_factory=list)
-    stale: list = field(default_factory=list)
     nodef_defined: list = field(default_factory=list)
     bad_names: list = field(default_factory=list)
     left: list = field(default_factory=list)
-    protos_report: list = field(default_factory=list)
     default_edits: dict = field(default_factory=dict)
     header_mismatches: list = field(default_factory=list)
     rewrites: dict = field(default_factory=dict)
@@ -1500,10 +1453,6 @@ def report(w, plan, outs):
     lines.append("== Declarations with no definition in the tree (imports, or stale)")
     for name in sorted({d.name for d in plan.nodef}):
         lines.append(name)
-    if plan.protos_report:
-        lines.append("")
-        lines.append("== include/ta_protos.h")
-        lines.extend(plan.protos_report)
     return "\n".join(lines) + "\n"
 
 
@@ -1512,12 +1461,11 @@ def main(argv=None):
     ap.add_argument("--check", action="store_true", help="exit 1 if a .cpp declares what it does not define and data/headers_left_out.csv does not list it, if a listed name needs no listing, or a write would change a file")
     ap.add_argument("--dry-run", action="store_true", help="print the report, change nothing")
     ap.add_argument("--report", metavar="FILE", help="write the report to FILE, change nothing")
-    ap.add_argument("--keep-ta-protos", action="store_true", help="leave include/ta_protos.h alone (by default its declarations that have a home header, and the stale ones, are deleted)")
     ap.add_argument("--root", default=str(ROOT), help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     w = World(args.root)
     left_out = load_left_out(args.root)
-    plan = w.plan(protos=not args.keep_ta_protos, left_out={name for name, _ in left_out})
+    plan = w.plan(left_out={name for name, _ in left_out})
     outs = w.outputs(plan)
     if args.report or args.dry_run:
         text = report(w, plan, outs)

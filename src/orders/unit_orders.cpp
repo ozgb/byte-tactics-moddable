@@ -1949,8 +1949,6 @@ follow:
     return 7;
 }
 
-void __stdcall EmitTeleportParticles(Vec*,Vec*,int,int);
-
 static inline Vec Add(const Vec& a,const Vec& b) { Vec r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }
 static inline Vec Sub(const Vec& a,const Vec& b) { Vec r; r.x=a.x-b.x; r.y=a.y-b.y; r.z=a.z-b.z; return r; }
 // FUNCTION: 0x406aa0
@@ -1961,7 +1959,7 @@ int __stdcall TeleportOrder(Unit* unit,Order* order,int unused)
     for(Unit* p=g_game->units;p<=g_game->unitsEnd;++p) {
         if(p->pos.x >= low.x && p->pos.x <= high.x && p->pos.z >= low.z && p->pos.z <= high.z && p->pos.y >= low.y && p->pos.y <= high.y && unit != p) {
             Vec dest = Sub(Add(*(Vec*)&order->pos,*(Vec*)&p->pos),*(Vec*)&unit->pos);
-            EmitTeleportParticles((Vec*)&p->pos,&dest,30,5);
+            EmitTeleportParticles(&p->pos,(Vec3*)&dest,30,5);
             g_seams.units->SetUnitPosition(p,*(Vec3*)&dest,1);
         }
     }

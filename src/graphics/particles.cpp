@@ -706,7 +706,7 @@ void __stdcall DrawParticleList(void* msg, short kind)
 }
 
 // FUNCTION: 0x471fd0
-void __stdcall EmitTeleportParticles(int posA, int posB, int lifetime, short index)
+void __stdcall EmitTeleportParticles(Vec3* posA, Vec3* posB, int lifetime, short index)
 {
     ParticleLists* l = (ParticleLists *)g_game->lists_38d77;
     TeleportParticles* p = new TeleportParticles;

@@ -541,7 +541,7 @@ struct Game {
             char pad_2be3_b[11];
             NetGameFlagLowBits lobbyUiDirtyFlags_2bee;
             char pad_2bf0_b[134];
-            char orders[28];
+            char viewSpanB_2c76[28];
             char pad_2c92_a[71017];
             MapInfo info_141fb;
             char pad_14277[10];
@@ -566,7 +566,7 @@ struct Game {
                 unsigned short bits5 : 11;
             } bits_2bee;
             char pad_2bf0_c[134];
-            char orders_2c76[68];
+            char viewSpanC_2c76[68];
             char pad_2cba[70977];
             MapGrid sortUnits;
             char unknown_1428b[102];

@@ -28,6 +28,14 @@ unsigned s_staticsHigh;
 int s_haveBaseline;
 unsigned s_baselineLow;
 unsigned s_baselineHigh;
+unsigned s_fuelMax;
+unsigned s_fuelMaxTick;
+int s_haveFuel;
+int s_timing;
+int s_timingStarted;
+unsigned s_timingMs;
+unsigned s_timingFirstTick;
+unsigned long long s_timingCounter;
 
 void WhereText(char* text)
 {
@@ -40,7 +48,14 @@ void WhereText(char* text)
 void __cdecl OnTrap(void* user, const char* module, const char* message)
 {
     char text[700];
+    unsigned budget;
     (void)user;
+    if (WindMeteorsOutOfFuel(&budget)) {
+        sprintf(text, "%s ran out of fuel", module);
+        WhereText(text);
+        sprintf(text + strlen(text), ": it burned more than its fuel_budget of %u in one tick", budget);
+        ModulesFatal(text);
+    }
     sprintf(text, "%s trapped", module);
     WhereText(text);
     strcat(text, ": ");
@@ -210,7 +225,7 @@ void Start()
     s_memory.scratchSize = layout->scratch_size;
     SimBlockAttach(s_memory.base + layout->block_base);
 
-    if (!WindMeteorsInstall(s_loader))
+    if (!WindMeteorsInstall(s_loader, s_timing))
         LoaderFatal(wl_error(s_loader));
     wl_module* module = wl_load_module_bytes(s_loader, kModuleName, bytes, size);
     unsigned top = 0;
@@ -222,7 +237,10 @@ void Start()
     free(bytes);
     s_staticsLow = (unsigned)dataBase;
     s_staticsHigh = top - layout->stack_size;
-    if (!WindMeteorsBind(s_loader, module))
+    long fuelBudget = 0;
+    if (!wl_module_int(s_loader, kModuleName, "fuel_budget", &fuelBudget) || fuelBudget <= 0)
+        LoaderFatal("the manifest has no fuel_budget");
+    if (!WindMeteorsBind(s_loader, module, (unsigned)fuelBudget))
         LoaderFatal(wl_error(s_loader));
 }
 
@@ -260,6 +278,12 @@ struct Starter {
         strncpy(line, host_command_line(), sizeof line - 1);
         line[sizeof line - 1] = '\0';
         s_testRun = strstr(line, "testmode") != nullptr;
+        if (s_testRun) {
+            FILE* on = fopen("moduletime.on", "rb");
+            s_timing = on != nullptr;
+            if (on != nullptr)
+                fclose(on);
+        }
         s_wasm = 1;
         if (HasSwitch(line, "modules", mode, sizeof mode)) {
             if (_stricmp(mode, "native") == 0)
@@ -276,10 +300,63 @@ Starter s_starter;
 
 }
 
+namespace {
+
+void WriteTiming(unsigned tick)
+{
+    static char body[8192];
+    unsigned long long overheadStart = host_time_counter();
+    for (int i = 0; i < 20000; i++)
+        host_time_counter();
+    unsigned long long overhead = (host_time_counter() - overheadStart) / 20000;
+    unsigned long long counter = host_time_counter() - s_timingCounter;
+    unsigned ms = host_time_ms() - s_timingMs;
+    WindMeteorsTimingReport(body);
+    FILE* file = fopen("moduletime.txt", "wb");
+    if (file != nullptr) {
+        fprintf(file, "bt-moduletime 1\nmode\t%s\nticks\t%u\nwall_counter\t%I64u\nwall_ms\t%u\ntimer_cost\t%I64u\n%s",
+                s_wasm ? "wasm" : "native", tick - s_timingFirstTick + 1, counter, ms, overhead, body);
+        fclose(file);
+    } else {
+        ModulesFatal("testmode: cannot write moduletime.txt");
+    }
+}
+
+void TimingTick(unsigned tick)
+{
+    if (!s_timingStarted) {
+        s_timingStarted = 1;
+        s_timingFirstTick = tick;
+        s_timingMs = host_time_ms();
+        s_timingCounter = host_time_counter();
+        if (!s_wasm)
+            WindMeteorsTimeNative();
+    }
+    if (tick % 600 == 0)
+        WriteTiming(tick);
+}
+
+}
+
 void __stdcall ModulesCheckStatics(unsigned tick)
 {
+    if (s_timing)
+        TimingTick(tick);
     if (!s_wasm)
         return;
+    unsigned used;
+    if (WindMeteorsFuelClose(&used) && (!s_haveFuel || used > s_fuelMax)) {
+        s_haveFuel = 1;
+        s_fuelMax = used;
+        s_fuelMaxTick = tick;
+        FILE* file = fopen("fuel.txt", "wb");
+        if (file != nullptr) {
+            fprintf(file, "bt-fuel 1\n%s\t%u\t%u\n", kModuleName, s_fuelMax, s_fuelMaxTick);
+            fclose(file);
+        } else {
+            ModulesFatal("testmode: cannot write fuel.txt");
+        }
+    }
     unsigned skip[4];
     unsigned skipCount;
     WindMeteorsDataRanges(skip, &skipCount);

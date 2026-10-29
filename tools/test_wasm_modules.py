@@ -232,6 +232,32 @@ class LayoutTests(unittest.TestCase):
         self.assertTrue(wm.check_layout(dict(self.PINS, memory_pages=527), self.RANGES))
 
 
+class Budgets(unittest.TestCase):
+    def test_a_module_over_its_size_budget_fails(self):
+        entry = {"name": "m", "size_budget": 1000}
+        self.assertEqual(wm.check_size(entry, 1000), [])
+        self.assertTrue(any("over its size_budget 1000" in p for p in wm.check_size(entry, 1001)))
+
+    def test_a_module_without_a_size_budget_fails(self):
+        self.assertTrue(wm.check_size({"name": "m"}, 10))
+
+    def test_the_fuel_entry_must_be_the_passes_rule(self):
+        pins = {"fuel": {"rule": wm.wasm_fuel.RULE, "version": wm.wasm_fuel.VERSION}, "modules": [{"name": "m", "fuel_budget": 5}]}
+        self.assertEqual(wm.check_fuel_manifest(pins), [])
+        self.assertTrue(wm.check_fuel_manifest(dict(pins, fuel={"rule": "other", "version": 1})))
+        self.assertTrue(wm.check_fuel_manifest({"modules": pins["modules"]}))
+
+    def test_a_fuel_budget_is_a_positive_int_the_loader_can_read(self):
+        base = {"fuel": {"rule": wm.wasm_fuel.RULE, "version": wm.wasm_fuel.VERSION}}
+        for bad in (None, 0, -1, 1 << 31, "5"):
+            self.assertTrue(wm.check_fuel_manifest(dict(base, modules=[{"name": "m", "fuel_budget": bad}])), bad)
+
+    def test_the_fuel_functions_are_not_slots(self):
+        details = dict(DETAILS, exports={"UpdateWind": (["i32"], "void"), "__fuel_set": (["i64"], "void"), "__fuel_get": ([], "i64")})
+        self.assertEqual(wm.check_interface("m", KIND_IMPORTS, GOOD_EXPORTS + list(wm.wasm_fuel.EXPORTS),
+                                            dict(SPEC_KINDS, exports=SPEC_KINDS["exports"] + list(wm.wasm_fuel.EXPORTS)), details), [])
+
+
 MANIFEST = {
     "majors": {"weapons": 1, "services": 2, "wind_meteors": 1},
     "modules": [{"name": "m", "interface": "wind_meteors", "majors": {"wind_meteors": 1, "weapons": 1, "services": 2},

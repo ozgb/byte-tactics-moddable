@@ -4,3 +4,4 @@ QUIRK(skipEmptyYardmap, "units.skip-empty-yardmap", sim, "units.skip-empty-yardm
 QUIRK(boundLanguageCopy, "util.bound-language-copy", view, "")
 QUIRK(renderPoseReads, "units.render-pose-reads", sim, "")
 QUIRK(hoverBobWallClock, "units.hover-bob-wall-clock", sim, "")
+QUIRK(boundLogoSelect, "frontend.bound-logo-select", view, "")

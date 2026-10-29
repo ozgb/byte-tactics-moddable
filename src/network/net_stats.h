@@ -14,4 +14,6 @@ void __stdcall CountPacket(int size, int overhead, int sent);
 void __stdcall GetByteRates(unsigned int* sent, unsigned int* received);
 void __stdcall SumMessageStats();
 
+void __stdcall FormatNetStats(char* text);
+
 #endif

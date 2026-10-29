@@ -1,5 +1,10 @@
 #ifndef PARTICLES_H
 #define PARTICLES_H
+struct Vec3;
+
+struct NanoTargetBounds;
+struct Vec3;
+
 struct StructRangeElement;
 
 struct Vec3;
@@ -19,5 +24,12 @@ void __stdcall EmitWeaponSmoke(Vec3* p, short index);
 void __stdcall EmitTimedSubParticles(Vec3* p, short index);
 
 StructRangeElement* __stdcall CopyStructRange(StructRangeElement* first, StructRangeElement* last, StructRangeElement* dest);
+
+void __stdcall EmitNanoParticles(Vec3* p, void* posB, short index);
+void __stdcall EmitReverseNanoParticles(NanoTargetBounds* targetBounds, Vec3* origin, short index);
+
+void __stdcall EmitTeleportParticles(Vec3* posA, Vec3* posB, int lifetime, short index);
+
+void __stdcall DrawParticleList(void* msg, short kind);
 
 #endif

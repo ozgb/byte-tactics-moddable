@@ -46,11 +46,10 @@ ai,SumUnitRatingsInRange,src/ai/ai_player.cpp,1,0,0,0,0,0,?SumUnitRatingsInRange
 ai,UpdateConverter,src/ai/ai_player.cpp,0,0,0,0,0,0,?UpdateConverter@@YGXPAUUnit@@@Z,1,
 ai,Vec::Vec,src/ai/vec.h,0,0,0,0,0,0,??0Vec@@QAE@HHH@Z,1,
 ai,std::_Construct,src/ai/ai_player.cpp,0,0,0,0,0,0,?_Construct@std@@YGXPAUPercentByte@@ABU2@@Z,1,
-economy,*,,29,27,584,456,308,135,,4,
+economy,*,,29,27,584,456,308,135,,3,
 economy,CallOnEachReverse,src/game/economy.cpp,0,0,0,0,0,0,?CallOnEachReverse@@YGXPAVArrayElement@@HHP81@AEXXZ@Z,1,
 economy,InitStartingResourcesFromSkirmish,src/game/main_loop.cpp,0,0,0,0,0,0,?InitStartingResourcesFromSkirmish@@YGXXZ,1,
 economy,SetStartingStorageBonusInline,src/game/main_loop.cpp,0,0,0,0,0,0,?SetStartingStorageBonusInline@@YGXPAUPlayer@@HH@Z,1,
-economy,SettleResourceAccount,src/game/economy.cpp,0,0,0,0,0,0,?SettleResourceAccount@@YGXPAUResourceAccountView@@MM@Z,1,
 economy,ShareMapInfo,src/units/units.cpp,1,0,0,0,0,0,?ShareMapInfo@@YGXEE@Z,0,share-dialog
 economy,UpdateResourceSharing,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateResourceSharing@@YGXPAUPlayer@@@Z,0,network-game
 features,*,,44,42,1051,861,448,312,,4,
@@ -595,7 +594,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,367,305,6448,5118,3186,1962,,25,
+orders,*,,368,306,6449,5119,3186,1962,,25,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,AiSearchGoal::HasNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 orders,AiSearchGoal::SerializeNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network
@@ -1397,7 +1396,7 @@ presentation,DrawWorldDeltaLine,src/game/console_commands.cpp,0,0,0,0,0,0,?DrawW
 presentation,DrawWorldSegmentLine,src/game/console_commands.cpp,0,0,0,0,0,0,?DrawWorldSegmentLine@@YGXPAXUPoint16@@FFH@Z,1,
 presentation,DrawWrappedText,src/gui/gui.cpp,1,0,0,0,0,0,?DrawWrappedText@@YGHPAD0HHHHH@Z,0,
 presentation,Dummy,src/ingame/selection.cpp,1,0,0,0,0,0,?Dummy@@YGXXZ,0,
-presentation,EmitTeleportParticles,src/graphics/particles.cpp,1,0,0,0,0,0,?EmitTeleportParticles@@YGXHHHF@Z,0,
+presentation,EmitTeleportParticles,src/graphics/particles.cpp,1,0,0,0,0,0,?EmitTeleportParticles@@YGXPAUVec3@@0HF@Z,0,
 presentation,EmitTimedBlackSmoke,src/graphics/particles.cpp,0,0,0,0,0,0,?EmitTimedBlackSmoke@@YGXPAUVec3@@HHF@Z,1,
 presentation,EmptyMainLoopHook,src/frontend/frontend.cpp,1,0,0,0,0,0,?EmptyMainLoopHook@@YGXXZ,0,
 presentation,EnableBlinkWords,src/gui/file_list.cpp,0,0,0,0,0,0,?EnableBlinkWords@@YGXH@Z,1,
@@ -1409,7 +1408,7 @@ presentation,EnterMainMenuState,src/frontend/frontend.cpp,1,0,0,0,0,0,?EnterMain
 presentation,Entries,src/ingame/control_panel.cpp,0,0,0,0,0,0,?Entries@@YGPAUGadget@@PAU1@@Z,1,
 presentation,EnumModemAddressCallback,src/frontend/multi.cpp,1,0,0,0,0,0,?EnumModemAddressCallback@@YGHABU_GUID@@KPBXPAX@Z,0,
 presentation,EraseFrameDithered,src/graphics/gaf.cpp,1,0,0,0,0,0,?EraseFrameDithered@@YGXPAUSurface@@PAUGafFrame@@HHH@Z,0,
-presentation,ExceptionFilter,src/graphics/pcx.cpp,1,0,0,0,0,0,?ExceptionFilter@@YGHHH@Z,0,
+presentation,ExceptionFilter,src/graphics/pcx.cpp,1,0,0,0,0,0,?ExceptionFilter@@YGHPAXPBD@Z,0,
 presentation,ExitParticlePool,src/graphics/particles.cpp,1,0,0,0,0,0,?ExitParticlePool@@YGXXZ,0,
 presentation,ExpandGadgetTextToType5,src/frontend/multi.cpp,0,0,0,0,0,0,?ExpandGadgetTextToType5@@YGXPAUGadget@@@Z,1,
 presentation,FUN_0042f900,src/sound/sound_types.cpp,0,0,0,0,0,0,?FUN_0042f900@@YGXH@Z,1,

@@ -2942,8 +2942,6 @@ static inline int MeasureProgressBarText(char *text)
     return width;
 }
 
-typedef void (__stdcall* FillRectangleVoid)(Surface*, Rect*, int);
-
 // FUNCTION: 0x4a4660
 void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog *obj, int index)
 {
@@ -2967,7 +2965,7 @@ void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog *obj, int index
     rect.top += 2;
     rect.right -= 2;
     rect.bottom -= 2;
-    ((FillRectangleVoid)FillRectangle)((Surface*)surface, &rect, entry->image);
+    FillRectangle((Surface*)surface, &rect, entry->image);
 
 #ifdef __clang__
     double scale = (double)entry->u.anim.value / entry->u.anim.total;
@@ -2976,7 +2974,7 @@ void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog *obj, int index
     float scale = (float)entry->u.anim.value / entry->u.anim.total;
     rect.right = (int)(scale * (entry->width - 4)) + rect.left;
 #endif
-    ((FillRectangleVoid)FillRectangle)((Surface*)surface, &rect, entry->colours);
+    FillRectangle((Surface*)surface, &rect, entry->colours);
 
     if (entry->u.anim.showText != 0) {
         char text[20];
@@ -3612,7 +3610,6 @@ int WalkStack(int, int, int, int, int, int, int);
 int SendScriptCallByName(int, int, int, int, int, int, int);
 int SendScriptCall(int, int, int, int, int, int, int);
 int IssueOrCancelOrder(int, int, int, int, int, int, int);
-int IsFootprintVisible(int, int, int, int, int, int);
 int DrawProgressBar(int, int, int, int, int, int);
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);

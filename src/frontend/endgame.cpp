@@ -129,7 +129,7 @@ void __stdcall SetKeyboardInput(Gui* menu, int value);
 void __stdcall UpdateMenu(Gui* menu);
 void __stdcall BlitMenuLayers(Gui* menu, void* dest, void* clip);
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);
-void __stdcall DrawMessages(void* surface);
+#include "../network/net_chat.h"
 void __stdcall SetOffscreenSurface(void* surface);
 void* __stdcall AllocSurface(const char* name, int width, int height);
 #include "../network/unit_sync.h"

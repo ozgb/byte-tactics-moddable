@@ -54,10 +54,12 @@ void __stdcall GetFactoriesInRadius(int player, const Vec* pos, int radius, std:
 #include "../units/squads.h"
 int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los);
 int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
-void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target, Vec3* pos, int param_6, int param_7);
+#include "../orders/order_list.h"
 #include "../orders/order_list.h"
 #include "../orders/order_queue.h"
-MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
+struct UnitOrderTypeView;
+struct FixedPosView;
+#include "../orders/order_dispatch.h"
 #include "../orders/order_targets.h"
 float __stdcall GetEnergyIncome(Player* player);
 float __stdcall GetMetalIncome(Player* player);
@@ -91,7 +93,6 @@ void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius,
 
 #include "../map/line_of_sight.h"
 #include "../map/radar.h"
-int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
 
 class HapiBank;
 #include "../map/map_list.h"

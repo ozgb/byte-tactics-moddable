@@ -147,7 +147,6 @@ GafFrame* __stdcall GetGafFrame(void* table, int index);
 #include "../graphics/gaf.h"
 void __stdcall DrawFrame(void* surface, void* header, int x, int y);
 void __stdcall DrawTile(void* dst, int x, int y, unsigned char* pix);
-void __stdcall FillRectangle(void* surface, Rect* rect, int color);
 #include "../graphics/draw.h"
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
@@ -1145,7 +1144,7 @@ void __stdcall DrawFogOfWar(void* surface)
             r.right = r.left + 31;
             r.bottom = r.top + 31;
             if (cell->level0 == 0xf) {
-                FillRectangle(surface, &r, g_game->colors[0]);
+                FillRectangle((Surface*)surface, &r, g_game->colors[0]);
             } else {
                 if (cell->level1 != 0) {
                     if (cell->level1 != 0xf) {

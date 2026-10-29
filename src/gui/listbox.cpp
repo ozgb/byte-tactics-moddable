@@ -41,8 +41,8 @@ struct DrawListboxFrameDialog {
 };
 
 int __stdcall DrawLine(void* surface, int x0, int y0, int x1, int y1, unsigned char color);
-void __stdcall FillRectangle(void* surface, void* rect, int color);
 #include "gui.h"
+#include "../graphics/draw.h"
 DrawListboxFrameGafEntry* __stdcall FindGafEntry(DrawListboxFrameGaf* gaf, const char* name);
 void __stdcall DrawSurface(DrawListboxFrameSurface* dst, DrawListboxFrameCell* cell, int x, int y);
 GafFrame* __stdcall GetGafFrame(DrawListboxFrameGafEntry* bits, int index);
@@ -160,7 +160,7 @@ void __stdcall DrawListboxFrame(DrawListboxFrameDialog* obj, int index, DrawList
             DrawFrame(surface, p, 0, 0);
         }
     } else {
-        FillRectangle(surface, &rect, obj->fill);
+        FillRectangle((Surface*)surface, &rect, obj->fill);
         DrawBevelBorderDarkFirst(surface, &rect, obj->dark, obj->light, obj->fill);
     }
 }
@@ -168,21 +168,21 @@ void __stdcall DrawListboxFrame(DrawListboxFrameDialog* obj, int index, DrawList
 // FUNCTION: 0x4b04b0
 void __stdcall FillBevelBox(void* surface, Rect* rect, int light, int dark, int fill)
 {
-    FillRectangle(surface, rect, fill);
+    FillRectangle((Surface*)surface, rect, fill);
     DrawBevelBorder(surface, rect, light, dark, fill);
 }
 
 // FUNCTION: 0x4b04e0
 void __stdcall FillBevelBoxDarkFirst(void* surface, Rect* rect, int light, int dark, int fill)
 {
-    FillRectangle(surface, rect, fill);
+    FillRectangle((Surface*)surface, rect, fill);
     DrawBevelBorderDarkFirst(surface, rect, light, dark, fill);
 }
 
 // FUNCTION: 0x4b0510
 void __stdcall DrawRaisedBox(void* surface, Rect* rect, int light, unsigned char dark, int fill)
 {
-    FillRectangle(surface, rect, fill);
+    FillRectangle((Surface*)surface, rect, fill);
     DrawLine(surface, rect->left, rect->top, rect->right, rect->top, light);
     DrawLine(surface, rect->left, rect->top, rect->left, rect->bottom, light);
     DrawLine(surface, rect->right, rect->top + 1, rect->right, rect->bottom, dark);
@@ -192,7 +192,7 @@ void __stdcall DrawRaisedBox(void* surface, Rect* rect, int light, unsigned char
 // FUNCTION: 0x4b0590
 void __stdcall DrawSunkenBox(void* surface, Rect* rect, int light, int dark, int fill)
 {
-    FillRectangle(surface, rect, fill);
+    FillRectangle((Surface*)surface, rect, fill);
     DrawLine(surface, rect->left, rect->top, rect->right, rect->top, dark);
     DrawLine(surface, rect->left, rect->top, rect->left, rect->bottom, dark);
     DrawLine(surface, rect->right, rect->top + 1, rect->right, rect->bottom, light);

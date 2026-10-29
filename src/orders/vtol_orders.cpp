@@ -125,18 +125,16 @@ public:
 #include "../../link/globals.h"
 
 #include "../util/math.h"
-int __cdecl ScaledSin(short, int);
-int __cdecl ScaledCos(short, int);
 short __cdecl AngleOfVector(int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 #include "order_list.h"
-MissionType __stdcall GetOrderType(unsigned char, Unit*, Unit*, int);
+struct UnitOrderTypeView;
+struct FixedPosView;
+#include "order_dispatch.h"
 #include "../../interfaces/seams.h"
-void __stdcall AddOrder(MissionType, int, Unit*, Unit*, Vec3*, int, int);
-void __stdcall StartBuildingScript(Unit*, Order*, short);
 #include "order_queue.h"
-void __stdcall EmitNanoParticles(Vec3*, Box*, int);
-void __stdcall EmitReverseNanoParticles(Box*, Vec3*, int);
+#include "order_queue.h"
+#include "../graphics/particles.h"
 void __stdcall DamageUnit(Unit*, Unit*, int, int, int);
 int __stdcall SendScriptCallByName(Unit*, char*, char, int, int, int, int);
 void __stdcall DrawUnit(void*, Unit*);
@@ -493,7 +491,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     g_seams.map->VisitObjectsInRange(&unit->pos,range,(UnitVisitor*)&visitor);
     if (!units.empty()) {
         order->SetAttachedFx(0);
-        MissionType kind=GetOrderType(7,unit,units[0],0);
+        MissionType kind=GetOrderType(7, unit, units[0], nullptr);
         AppendOrder(unit,new (kSim) Order(kind,units[0],0,0,0,0));
         order->flags=0;
         return 3;
@@ -929,7 +927,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         }
         Vec3 off = Offset(angle, range * 2 / 3 << 16);
         Vec3 p = Diff(order->target->pos, off);
-        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, p);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target, p);
         obj->SetApproachRadius(0x10);
         obj->SetAltitude(unit->def->altitude);
         order->SetAttachedFx(obj);
@@ -993,7 +991,7 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "BeginTransport", 0, 1, 1, height, 0, 0, 0);
             SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
             Vec3 offset = g_seams.units->GetPieceOffset(unit, order->piece);
-            PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, -1);
+            PathOrder* obj = new (kSim) PathOrder(order, order->target, -1);
             obj->SetAltitude(-((Vec3Words*)&offset)->yWhole);
             order->SetAttachedFx(obj);
             order->flags = 0x100ea;
@@ -1090,7 +1088,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                 }
             }
             if (g_seams.units->CanRepair(unit, 0, order->target)) {
-                MissionType kind=GetOrderType(8,unit,order->target,0);
+                MissionType kind=GetOrderType(8, unit, (Unit*)order->target, nullptr);
                 if (kind.index) {
                     order->SetAttachedFx(0);
                     AppendOrder(unit,new (kSim) Order(kind,order->target,0,0,0,0));
@@ -1279,7 +1277,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         return 2;
     }
     case 2: {
-        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, -1);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target, -1);
         obj->SetApproachRadius(0xa0);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
@@ -1292,7 +1290,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             QueueUnitSpeech(unit, 7, "Landing failed");
             return 0;
         }
-        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, order->angle);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target, order->angle);
         obj->SetApproachRadius(0x30);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
@@ -1309,7 +1307,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             QueueUnitSpeech(unit, 7, "Landing aborted: all pads are occupied");
             return 0;
         }
-        PathOrder* obj = new (kSim) PathOrder(order, (int)(Unit*)order->target, order->angle);
+        PathOrder* obj = new (kSim) PathOrder(order, order->target, order->angle);
         if (unit->cargo)
             obj->SetAltitude(unit->cargo->def->modelMaxYHigh);
         else
@@ -1507,8 +1505,6 @@ struct Feature;
 
 
 
-void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
-
 // FUNCTION: 0x412710
 int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
 {
@@ -1622,7 +1618,6 @@ struct Unit;
 
 
 static inline UnitDef* Definitions() { return g_game->defs; }
-void __stdcall EmitNanoParticles(Vec3*, Vec3*, int);
 static inline short Angle(Vec3* a,Vec3* b) { return AngleOfVector(a->x-b->x,a->z-b->z); }
 struct Feature;
 // FUNCTION: 0x414380
@@ -1709,7 +1704,6 @@ struct Unit;
 
 
 
-void __stdcall EmitReverseNanoParticles(Box* from, Vec3* to, int count);
 
 // FUNCTION: 0x414770
 int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
@@ -1761,8 +1755,8 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
             box.hi.x += f->footprintX << 20;
             box.hi.z += f->footprintZ << 20;
             box.hi.y += f->height << 16;
-            EmitReverseNanoParticles(&box, &nano, 6);
-            EmitReverseNanoParticles(&box, &nano, 6);
+            EmitReverseNanoParticles((NanoTargetBounds*)&box, &nano, 6);
+            EmitReverseNanoParticles((NanoTargetBounds*)&box, &nano, 6);
         }
         return 2;
     case 4:
@@ -1789,7 +1783,6 @@ struct Unit;
 
 
 
-void __stdcall EmitReverseNanoParticles(Vec3* box, Vec3* from, int count);
 
 // FUNCTION: 0x414a80
 int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
@@ -1848,7 +1841,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
             bounds[1].x += order->target->def->modelMaxX;
             bounds[1].z += order->target->def->modelMaxZ;
             bounds[1].y += order->target->def->modelMaxY;
-            EmitReverseNanoParticles(bounds, &start, 6);
+            EmitReverseNanoParticles((NanoTargetBounds*)bounds, &start, 6);
             order->SetDeadlineTicks(2);
             order->duration += 2;
             return 2;

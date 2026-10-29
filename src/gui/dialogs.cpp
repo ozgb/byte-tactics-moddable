@@ -788,7 +788,6 @@ void __stdcall SetKeyboardInput(Gui* menu, int flag);
 void __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
 int __stdcall GetTextWidth(int font, unsigned char* text);
-int __stdcall FillRectangle(void* surface, DialogRect* rect, int color);
 
 struct FileHandle;
 
@@ -1191,7 +1190,7 @@ void __stdcall DrawColorGrid(Gui* obj)
             rect.top = y + row * 8;
             rect.right = rect.left + 7;
             rect.bottom = rect.top + 7;
-            FillRectangle(surface, &rect, row * 16 + col);
+            FillRectangle((Surface*)surface, (Rect*)&rect, row * 16 + col);
         }
     }
 }

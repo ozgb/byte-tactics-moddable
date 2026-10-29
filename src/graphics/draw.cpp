@@ -94,8 +94,7 @@ int __stdcall GetDisplay();
 void __cdecl FillSolidRect(Surface* s, Rect* r, int color);
 void __cdecl RemapRect(int dst, int pitch, int w, int h, int table);
 void __cdecl XorRect(Surface* s, Rect* r, int value);
-int __cdecl ScaledSin(int angle, int distance);
-int __cdecl ScaledCos(int angle, int distance);
+#include "../util/math.h"
 void __cdecl BlitRectKeyed(Surface* dst, Surface* src, Rect* rect, Rect* pos,
                            int colour);
 void __cdecl BlitRect(Surface* dst, Surface* src, Rect* rect, Rect* pos);

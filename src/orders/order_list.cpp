@@ -190,7 +190,6 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 #include "../ai/ai_search_goal.h"
 #include "unit_motion.h"
 #pragma pack(pop)
-#include "../util/math.h"
 #include "unit_orders.h"
 #include "order_list.h"
 
@@ -208,13 +207,13 @@ extern int __cdecl _strcmpi(const char*, const char*);
 void __stdcall DrawUnitRangeRings(void* a, void* b, Order* e, Vec3* p, int c);
 extern OrderTableEntry g_readyOrder[];
 extern signed char g_slopeSpeedFactor[];
-int __cdecl ScaledSin(short angle, int scale);
-int __cdecl ScaledCos(short angle, int scale);
+#include "../util/math.h"
 void __cdecl RotatePoint2D(short angle, int* xz);
 int __cdecl AngleOfVector(int x, int z);
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
-MissionType __stdcall GetOrderType(unsigned char relation, Unit* unit, Unit* target, Vec3* pos);
-void __stdcall AddOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7);
+struct UnitOrderTypeView;
+struct FixedPosView;
+#include "order_dispatch.h"
 int __stdcall FindWeaponTarget(Unit* unit, int a, int b);
 void RegisterUnitOrders();
 extern int DAT_0051234c;
@@ -632,10 +631,10 @@ static inline void AddFront(Unit* owner, Order* node)
 }
 
 // FUNCTION: 0x43adc0
-void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id,
+void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target,
                             Vec3* pos, int param_6, int param_7)
 {
-    Order* obj = new (kSim) Order(kind, (Unit*)id, pos, param_6, param_7, 0);
+    Order* obj = new (kSim) Order(kind.index, target, pos, param_6, param_7, 0);
 
     if (remove == 0 && !(obj->flags_42 & 0x40))
         PruneLoose(&owner->list, owner->list);
@@ -740,7 +739,7 @@ void __stdcall IssueOrCancelOrder(unsigned char kind, int remove, Unit* owner, i
             }
         }
     }
-    AddOrder(kind, remove, owner, id, pos, param_6, param_7);
+    AddOrder(MissionType(kind), remove, owner, (Unit*)id, (Vec3*)pos, param_6, param_7);
 }
 
 // FUNCTION: 0x43b0b0
@@ -759,7 +758,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
             node->count += amount;
             return;
         }
-        AddOrder((unsigned char)kind, 1, owner, 0, 0, id, amount);
+        AddOrder(MissionType((unsigned char)kind), 1, owner, 0, 0, id, amount);
         return;
     }
     for (;;) {
@@ -825,7 +824,7 @@ int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3)
     if (!kind.index)
         return 0;
     if ((unit->flags & 0xc0000) == 0x40000 && !param_3) {
-        MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
+        MissionType kind2 = GetOrderType(2, unit, 0, (Vec3*)&unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
         Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->maneuverleashlength);
@@ -847,7 +846,7 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
         return 0;
     unsigned int f = unit->flags & 0xc0000;
     if (f == 0 && !param_3) {
-        MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
+        MissionType kind2 = GetOrderType(2, unit, 0, (Vec3*)&unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
         Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->range);
@@ -856,7 +855,7 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
         Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
         return 1;
     } else if (f == 0x40000 && !param_3) {
-        MissionType kind2 = GetOrderType(2, unit, 0, &unit->pos);
+        MissionType kind2 = GetOrderType(2, unit, 0, (Vec3*)&unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
         Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->maneuverleashlength);
@@ -1238,9 +1237,9 @@ static inline void AddFixed(int& v, float f)
 static inline Vec3 Offset(short angle, int distance)
 {
     Vec3 v;
-    v.x = -ScaledSin(angle, distance);
+    v.x = -ScaledSin((short)angle, distance);
     v.y = 0;
-    v.z = -ScaledCos(angle, distance);
+    v.z = -ScaledCos((short)angle, distance);
     return v;
 }
 
@@ -1280,9 +1279,9 @@ void UnitMotion::UpdateVelocityFromHeading(Unit* unit, int amount)
     int dist = speed;
     unsigned short angle = unit->angles.heading;
     Vec3 v;
-    v.x = -ScaledSin(angle, dist);
+    v.x = -ScaledSin((short)angle, dist);
     v.y = 0;
-    v.z = -ScaledCos(angle, dist);
+    v.z = -ScaledCos((short)angle, dist);
     velocity = v;
 }
 
@@ -1559,9 +1558,9 @@ void UnitMotion::UpdatePosition(Unit* u)
             speed = half;
             unsigned short angle = u->angles.heading;
             Vec3 vec;
-            vec.x = -ScaledSin(angle, half);
+            vec.x = -ScaledSin((short)angle, half);
             vec.y = 0;
-            int z = -ScaledCos(angle, half);
+            int z = -ScaledCos((short)angle, half);
             vec.z = z;
             velocity = vec;
         }

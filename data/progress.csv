@@ -9,7 +9,7 @@ address,size,file,symbol,status,similarity
 0x401220,61,src/game/economy.cpp,?SpendEnergy@UnitResources@@QAEHM@Z,matched,100.0
 0x401260,61,src/game/economy.cpp,?SpendMetal@UnitResources@@QAEHM@Z,matched,100.0
 0x4012a0,126,src/game/economy.cpp,?SpendEnergyAndMetal@UnitResources@@QAEHMM@Z,matched,100.0
-0x401320,53,src/game/economy.cpp,?SettleResourceAccount@@YGXPAUResourceAccountView@@MM@Z,matched,100.0
+0x401320,53,src/game/economy.cpp,?SettleResourceAccount@@YGXPAUResourceAccount@@MM@Z,matched,100.0
 0x401360,2239,src/game/economy.cpp,?UpdatePlayerEconomy@@YGXPAUPlayer@@@Z,matched,100.0
 0x401c20,155,src/orders/unit_orders.cpp,?StopOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x401cc0,30,src/orders/unit_orders.cpp,?MakeSelectableOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
@@ -132,7 +132,7 @@ address,size,file,symbol,status,similarity
 0x40b390,401,src/ai/ai_player.cpp,?DestroyPlayerAI@@YGXH@Z,matched,100.0
 0x40b530,627,src/ai/ai_player.cpp,?GetFactoriesInRadius@@YGXHPBUVec@@HPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@@Z,matched,100.0
 0x40b7b0,720,src/ai/ai_player.cpp,?FindWeaponTarget@@YGPAUUnit@@PAU1@EH@Z,matched,100.0
-0x40ba80,37,src/ai/ai_player.cpp,?GetBasePosition@@YGXHPAUBasePos@@@Z,matched,100.0
+0x40ba80,37,src/ai/ai_player.cpp,?GetBasePosition@@YGXHPAUVec3@@@Z,matched,100.0
 0x40bab0,78,src/ai/ai_player.cpp,?GetMirroredBasePosition@@YGXHHPAUMirroredBasePos@@@Z,matched,100.0
 0x40bb00,686,src/ai/ai_player.cpp,?GetBuildRating@@YGHHG@Z,matched,100.0
 0x40bdb0,244,src/ai/ai_player.cpp,?ChooseBuildOption@@YGGIPAUUnit@@@Z,matched,100.0
@@ -743,7 +743,7 @@ address,size,file,symbol,status,similarity
 0x43acb0,87,src/orders/order_list.cpp,?AppendOrder@@YGXPAUUnit@@PAUOrder@@@Z,matched,100.0
 0x43ad10,56,src/orders/order_list.cpp,?AppendOrderToTail@@YGXPAUUnit@@PAUOrder@@@Z,matched,100.0
 0x43ad50,100,src/orders/order_list.cpp,?InsertOrderAfterMarked@@YGXPAUUnit@@PAUOrder@@@Z,matched,100.0
-0x43adc0,500,src/orders/order_list.cpp,?AddOrder@@YGXHHPAUUnit@@PAXPAUVec3@@HH@Z,matched,100.0
+0x43adc0,500,src/orders/order_list.cpp,?AddOrder@@YGXVMissionType@@HPAUUnit@@1PAUVec3@@HH@Z,matched,100.0
 0x43afc0,233,src/orders/order_list.cpp,?IssueOrCancelOrder@@YGXEHPAUUnit@@HPAHHH@Z,matched,100.0
 0x43b0b0,310,src/orders/order_list.cpp,?AdjustBuildCount@@YGXHPAUUnit@@HH@Z,matched,100.0
 0x43b1f0,519,src/orders/order_list.cpp,?IssueAttackOrder@@YGHPAUUnit@@0H@Z,matched,100.0
@@ -789,7 +789,7 @@ address,size,file,symbol,status,similarity
 0x43e400,103,src/units/unit_scripts.cpp,?GetNanoPiecePosition@@YGXPAUObject@@PAUVec3@@@Z,matched,100.0
 0x43e470,29,src/units/unit_scripts.cpp,?OrderModeTakesTarget@@YGHE@Z,matched,100.0
 0x43e490,3152,src/units/unit_scripts.cpp,?GetOrderCursor@@YGHEPAUUnitCursorView@@0PAUFixedPosView@@@Z,matched,100.0
-0x43f0e0,4420,src/orders/order_dispatch.cpp,?GetOrderType@@YG?AVMissionType@@EPAUUnitOrderTypeView@@0PAUFixedPosView@@@Z,matched,100.0
+0x43f0e0,4420,src/orders/order_dispatch.cpp,?GetOrderType@@YG?AVMissionType@@EPAUUnit@@0PAUVec3@@@Z,matched,100.0
 0x440230,92,src/units/movement_class.cpp,_$E6,matched,100.0
 0x440290,65,src/units/movement_class.cpp,_$E3,matched,100.0
 0x4402e0,53,src/units/movement_class.cpp,??0MovementClass@@QAE@XZ,matched,100.0
@@ -950,9 +950,9 @@ address,size,file,symbol,status,similarity
 0x44dfb0,206,src/orders/order_targets.cpp,?SerializeToSave@PathOrder@@QAEHHPAVHapiBank@@PAD@Z,matched,100.0
 0x44e080,258,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUUnit@@PAVBitReader@@@Z,matched,100.0
 0x44e190,183,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUOrder@@PAUUnit@@@Z,matched,100.0
-0x44e250,113,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUOrder@@HF@Z,matched,100.0
+0x44e250,113,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUOrder@@PAUUnit@@F@Z,matched,100.0
 0x44e2d0,95,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z,matched,100.0
-0x44e330,111,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUOrder@@HABUVec3@@@Z,matched,100.0
+0x44e330,111,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUOrder@@PAUUnit@@ABUVec3@@@Z,matched,100.0
 0x44e3a0,22,src/orders/order_targets.cpp,?KeepAfterComplete@PathOrder@@UAEHXZ,matched,100.0
 0x44e3c0,355,src/orders/order_targets.cpp,?FillWorldPos@PathOrder@@UAEHPAUVec3@@@Z,matched,100.0
 0x44e530,124,src/orders/order_targets.cpp,?GetDesiredHeading@PathOrder@@UAEHPAG@Z,matched,100.0
@@ -1464,7 +1464,7 @@ address,size,file,symbol,status,similarity
 0x471eb0,143,src/graphics/particles.cpp,?UpdateParticles@@YGXXZ,matched,100.0
 0x471f40,66,src/graphics/particles.cpp,?DrawParticles@@YGXH@Z,matched,100.0
 0x471f90,62,src/graphics/particles.cpp,?DrawParticleList@@YGXPAXF@Z,matched,100.0
-0x471fd0,248,src/graphics/particles.cpp,?EmitTeleportParticles@@YGXHHHF@Z,matched,100.0
+0x471fd0,248,src/graphics/particles.cpp,?EmitTeleportParticles@@YGXPAUVec3@@0HF@Z,matched,100.0
 0x4720d0,297,src/graphics/particles.cpp,?EmitNanoParticles@@YGXPAUVec3@@PAXF@Z,matched,100.0
 0x472200,297,src/graphics/particles.cpp,?EmitReverseNanoParticles@@YGXPAUNanoTargetBounds@@PAUVec3@@F@Z,matched,100.0
 0x472330,253,src/graphics/particles.cpp,?EmitThrustParticles@@YGXHHHHF@Z,matched,100.0
@@ -2859,7 +2859,7 @@ address,size,file,symbol,status,similarity
 0x4cb7f0,326,src/graphics/pcx.cpp,?Open@BmpWriter@@QAE_NPBDHH@Z,matched,100.0
 0x4cb940,157,src/graphics/pcx.cpp,?WriteRows@BmpWriter@@QAE_NPAUPcxBitmap@@HHHHHH@Z,matched,100.0
 0x4cb9e0,205,src/graphics/pcx.cpp,?SaveBmp@@YGHPADPAUPcxBitmap@@@Z,matched,100.0
-0x4cbab0,189,src/graphics/pcx.cpp,?ExceptionFilter@@YGHHH@Z,matched,100.0
+0x4cbab0,189,src/graphics/pcx.cpp,?ExceptionFilter@@YGHPAXPBD@Z,matched,100.0
 0x4cbb70,105,src/debug/debug_helper.cpp,?PassThroughDebugHelper@@YGHH@Z,matched,100.0
 0x4cd9b0,3,src/sound/cd_audio.cpp,?NopRet4@@YGXH@Z,matched,100.0
 0x4cd9c0,7,src/sound/cd_audio.cpp,?GetDiscSerial@Sound@@QAEHXZ,matched,100.0

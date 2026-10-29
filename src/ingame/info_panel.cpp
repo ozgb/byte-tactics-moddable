@@ -202,7 +202,6 @@ void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
 #include "../util/math.h"
 int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1, int color);
 
-int __stdcall FillRectangle(Surface* surface, Rect* rect, int color);
 
 int __stdcall DrawRectangle(Surface* surface, Rect* r, int color);
 

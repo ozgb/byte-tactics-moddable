@@ -113,7 +113,6 @@ int __stdcall FontHeight(void* font);
 int __stdcall GetTextWidth(void* font, const char* text);
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
-void __stdcall FillRectangle(void* surface, Rect* rect, int colour);
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 unsigned int __cdecl GetTicks();
 int __stdcall GetGafFrame(void* gaf, int frame);
@@ -1017,7 +1016,7 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
     rect.right = rect.left + g->width - 1;
     rect.bottom = rect.top + g->height - 1;
 
-    FillRectangle(surface, &rect, arg1->colours[0]);
+    FillRectangle((Surface*)surface, &rect, arg1->colours[0]);
     SelectFontForEntry(arg1->layer->entries, i);
 
     char text[0x34];
@@ -1064,7 +1063,7 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
 
         unsigned char colour =
             ((unsigned char*)arg2->image)[(int)arg1 + 0x8b2];
-        FillRectangle(surface, &rect2, colour);
+        FillRectangle((Surface*)surface, &rect2, colour);
 
         int x = arg2->x - g_briefingPanoramaScrollX;
         int y = arg2->y;
@@ -1131,7 +1130,7 @@ void __stdcall UpdatePlanet(Gui* arg1, Gadget* arg2)
             int py = arg2->y + arg2->height / 2 - frame->height / 2;
             unsigned char colour =
                 ((unsigned char*)arg2->image)[(int)arg1 + 0x8b2];
-            FillRectangle(surface, &rect, colour);
+            FillRectangle((Surface*)surface, &rect, colour);
             DrawFrame(surface, frame, px, py);
         } else {
             MarkChanged((Dialog *)arg1);

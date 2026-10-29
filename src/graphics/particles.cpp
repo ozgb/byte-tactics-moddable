@@ -14,6 +14,7 @@
 #include "../harness/harness.h"
 #include "../util/vec3.h"
 #include "rect.h"
+#include "draw.h"
 #include "nano_particle_vector.h"
 #include "particle_system.h"
 #include "particle_lists.h"
@@ -385,7 +386,6 @@ extern unsigned char g_particlePoolDestroyed;
 void* __stdcall GetGafFrame(void* a, int b);
 void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 int __stdcall GetGafFrameCount(void* ptr);
-void __stdcall FillRectangle(void* surface, Rect* rect, int color);
 int __stdcall GetGroundHeight(void* pos);
 
 static inline int InsideExplored(Player* p, int col, int row)
@@ -1168,7 +1168,7 @@ void WakeParticle::DrawParticle(void* surface, short px, short py)
     r.right = r.left + 1;
     r.bottom = r.top + 1;
     if (posw.Visible())
-        FillRectangle(surface, &r, value);
+        FillRectangle((Surface*)surface, &r, value);
 }
 #pragma auto_inline(on)
 
@@ -1633,7 +1633,7 @@ void NanoParticle::DrawParticle(int dest, short x, short y)
     }
 
     if (visible)
-        FillRectangle((void*)dest, &r, flags);
+        FillRectangle((Surface*)dest, &r, flags);
 }
 
 static inline int LengthFloat(const Vec3& v)

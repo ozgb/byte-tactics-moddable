@@ -79,7 +79,6 @@ EmptyPostArchiveMountHook,mismatch,pointer/int cast: definition's type is likely
 ExecuteCommandLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FillMissionList,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FillPolygon,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-FillRectangle,mismatch,fixing it changes the generated code of a caller
 FillShadedPolygon,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FindFreeColor,ambiguous,several definitions share the name
 FindGadgetChecked,mismatch,parameter 2 const char* vs char* (const qualifier); parameter 1 void* vs Gadget* (view type); return type LoadGameGadgetInfo* vs Gadget* (view type): the declaration differs from the definition in a pointer type only

@@ -186,7 +186,6 @@ void __stdcall SetFont(int font);
 void __stdcall SetTextColors(int color, int background);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
 void __stdcall FillPolygon(void* surface, Point* points, int count, int color);
-void __stdcall FillRectangle(void* surface, Rect* rect, int color);
 Unit* __stdcall FindNextSelectedUnit(int, int);
 
 // FUNCTION: 0x416240
@@ -1225,7 +1224,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
                     r.right = p[0].x + 5;
                     r.top = p[0].y - 5;
                     r.bottom = p[0].y + 5;
-                    FillRectangle(surface, &r, colors[15]);
+                    FillRectangle((Surface*)surface, &r, colors[15]);
                 }
             }
             if (g_contourSpacing) DrawCellContours(surface, p, heights);

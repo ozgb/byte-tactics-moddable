@@ -240,7 +240,7 @@ void __stdcall SetOwner(Unit* unit, UnitBucket* bucket)
             unit->cargoNext = bucket->first;
             bucket->first = unit;
         }
-        unit->spatialBucket = (SpatialBucketView*)(bucket);
+        unit->spatialBucket = (SpatialBucket*)(bucket);
     }
 }
 

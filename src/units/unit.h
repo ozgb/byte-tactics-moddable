@@ -15,8 +15,8 @@ struct Order;
 struct WeaponDef;
 struct UnitDef;
 struct Player;
-struct SpatialBucketView;
-class CobScriptView;
+class SpatialBucket;
+class UnitScript;
 struct SpotState;
 class PathOrderAttach;
 
@@ -89,13 +89,13 @@ struct Unit {
         };
     };
     Point16 footprint;
-    Ref<SpatialBucketView> spatialBucket;
+    Ref<SpatialBucket> spatialBucket;
     Ref<Unit> carrier;
     Ref<Unit> cargo;
     Ref<Unit> cargoNext;
     Ref<UnitDef> def;
     Ref<Player> player;
-    Ref<CobScriptView> script;
+    Ref<UnitScript> script;
     Ref<SpotState> state;
     Ref<PathOrderAttach> head;
     unsigned short unitDefIndex;

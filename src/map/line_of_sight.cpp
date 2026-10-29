@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "los_tables.h"
+#include "spatial_bucket.h"
 
 #pragma pack(push, 1)
 
@@ -412,7 +413,7 @@ void __stdcall InitUnitSightCircleReveal(SightQuery* params)
 void BuildDerivedLayers(void)
 {
     Rec* rec = new (kSim) Rec;
-    g_game->overflowBucket = (SpatialBucketView*)rec;
+    g_game->overflowBucket = (SpatialBucket*)rec;
     ((Rec *)g_game->overflowBucket.get())->flags = 0x1f;
 
     Grid2* grid2 = &g_game->spatialGrid_1429f;

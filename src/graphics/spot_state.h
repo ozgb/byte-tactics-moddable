@@ -4,7 +4,7 @@
 #include "model_types.h"
 
 struct UnitDrawView;
-struct SpotBitmap;
+struct GafFrame;
 
 #pragma pack(push, 1)
 struct SpotState {
@@ -12,7 +12,7 @@ struct SpotState {
     int cacheDrawCount;
     int animDirty;
     union { UnitDrawView* owner; void* ownerPointer; };
-    SpotBitmap* bitmap;
+    GafFrame* bitmap;
     int shadow;
     Vector3s pos;
     ModelPiece* root;

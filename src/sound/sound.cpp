@@ -47,13 +47,6 @@ union SoundWorldPos {
 };
 
 #pragma pack(push, 1)
-struct SoundIndexPacket {
-    unsigned char type;
-    unsigned char flag;
-    int index;
-    int unknown_6[3];
-};
-
 struct SoundAtPacket {
     unsigned char type;
     unsigned char flag;
@@ -135,6 +128,7 @@ extern SpeechTypeInfo g_speechTypes[24];
 
 #include "../game/main.h"
 #include "play_sound.h"
+#include "../network/play_sound_packet.h"
 #include "../graphics/display.h"
 void* __cdecl operator new(size_t size);
 void __cdecl operator delete(void* p);
@@ -302,7 +296,7 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
         if (g_game->volume1 != 0 && (g_game->soundFlags_37f19 & 7) != 0
             && g_noDirectSound == 0) {
             if (param_2) {
-                SoundIndexPacket packet;
+                PlaySoundPacket packet;
                 packet.type = 0x13;
                 packet.flag = 1;
                 packet.index = index;

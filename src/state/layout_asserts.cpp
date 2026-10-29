@@ -45,6 +45,7 @@
 #include "../game/victory_conditions.h"
 #include "../game/view_flags.h"
 #include "../graphics/gaf_frame.h"
+#include "../graphics/handle.h"
 #include "../graphics/memory_cache.h"
 #include "../graphics/model_types.h"
 #include "../graphics/object3do.h"
@@ -85,6 +86,7 @@
 #include "../map/player_grid.h"
 #include "../map/pool.h"
 #include "../map/radar_timer.h"
+#include "../map/spatial_bucket.h"
 #include "../network/chat_hud_entry.h"
 #include "../network/chat_hud_entry_view.h"
 #include "../network/packet_channel.h"
@@ -1315,6 +1317,12 @@ static_assert(offsetof(Gui, changed) == 3274, "");
 static_assert(offsetof(Gui, clickStatusCache) == 3278, "");
 static_assert(offsetof(Gui, fallback) == 3282, "");
 static_assert(offsetof(Gui, cachedBgName) == 3286, "");
+static_assert(sizeof(Handle) == 12, "");
+static_assert(offsetof(Handle, index) == 0, "");
+static_assert(offsetof(Handle, value) == 2, "");
+static_assert(offsetof(Handle, kind) == 4, "");
+static_assert(offsetof(Handle, unknown_5) == 5, "");
+static_assert(offsetof(Handle, src) == 8, "");
 static_assert(sizeof(InfoModeFlags) == 2, "");
 static_assert(offsetof(InfoModeFlags, raw) == 0, "");
 static_assert(sizeof(KeyedCell) == 8, "");
@@ -2024,6 +2032,9 @@ static_assert(offsetof(SideNameEntry, name) == 0, "");
 static_assert(sizeof(SoundSettingFlags) == 2, "");
 static_assert(offsetof(SoundSettingFlags, word) == 0, "");
 static_assert(offsetof(SoundSettingFlags, bits) == 0, "");
+static_assert(sizeof(SpatialBucket) == 10, "");
+static_assert(offsetof(SpatialBucket, unknown_0) == 0, "");
+static_assert(offsetof(SpatialBucket, head) == 6, "");
 static_assert(sizeof(SpatialTimer) == 60, "");
 static_assert(offsetof(SpatialTimer, best) == 20, "");
 static_assert(offsetof(SpatialTimer, probe) == 32, "");

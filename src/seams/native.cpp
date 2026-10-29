@@ -787,7 +787,7 @@ void InstallNativeSeams()
     s_orders.AddOrder = AddOrder;
     s_orders.DeleteOrders = DeleteOrders;
     s_orders.GetOrderFlags = (int (__stdcall *)(Unit *))GetOrderFlags;
-    s_orders.GetOrderType = (MissionType (__stdcall *)(unsigned char, Unit *, Unit *, Vec3 *))GetOrderType;
+    s_orders.GetOrderType = GetOrderType;
     s_orders.IssueAttackOrder = IssueAttackOrder;
     s_orders.RegisterAllOrderTypes = RegisterAllOrderTypes;
     s_orders.ClearOrderTypeTable = ClearOrderTypeTable;

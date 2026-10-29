@@ -2,9 +2,9 @@
 #define ORDER_DISPATCH_H
 
 class MissionType;
-struct FixedPosView;
-struct UnitOrderTypeView;
+struct Unit;
+struct Vec3;
 
-MissionType __stdcall GetOrderType(unsigned char mode, UnitOrderTypeView* unit, UnitOrderTypeView* target, FixedPosView* pos);
+MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
 
 #endif

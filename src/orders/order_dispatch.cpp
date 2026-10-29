@@ -339,8 +339,10 @@ static inline FeatureMarkView* Lookup(FixedPosView* pos) {
 }
 
 // FUNCTION: 0x43f0e0
-MissionType __stdcall GetOrderType(unsigned char mode, UnitOrderTypeView* unit,
-                                      UnitOrderTypeView* target, FixedPosView* pos) {
+MissionType __stdcall GetOrderType(unsigned char mode, Unit* unitArg, Unit* targetArg, Vec3* posArg) {
+    UnitOrderTypeView* unit = (UnitOrderTypeView*)unitArg;
+    UnitOrderTypeView* target = (UnitOrderTypeView*)targetArg;
+    FixedPosView* pos = (FixedPosView*)posArg;
     UnitDefOrderTypeView* def;
     int friendly = 0;
     int enemy = 0;
@@ -503,7 +505,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, UnitOrderTypeView* unit,
     case 1: {
         if (g_game->interfaceType == 1) {
             if ((def->f245 & 0x10) && enemy)
-                return GetOrderType(3, unit, target, pos);
+                return GetOrderType(3, unitArg, targetArg, posArg);
             if ((def->f245 & 0x400) && enemy)
                 return Pick(def, "VTOL_RECLAIMUNIT", "RECLAIMUNIT");
             if (friendly && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) && target->buildLeft != 0.0f)
@@ -523,11 +525,11 @@ MissionType __stdcall GetOrderType(unsigned char mode, UnitOrderTypeView* unit,
             return Pick(def, "VTOL_MOVE", "MOVE_GROUND");
         } else {
             if ((def->f245 & 0x10) && enemy)
-                return GetOrderType(3, unit, target, pos);
+                return GetOrderType(3, unitArg, targetArg, posArg);
             if ((def->f245 & 0x400) && enemy)
-                return GetOrderType(0xc, unit, target, pos);
+                return GetOrderType(0xc, unitArg, targetArg, posArg);
             if (target && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) && target->buildLeft != 0.0f)
-                return GetOrderType(8, unit, target, pos);
+                return GetOrderType(8, unitArg, targetArg, posArg);
             if (target && target->unknown_ff[0] == g_game->localPlayer && (target->flags & 0x20) &&
                 target->buildLeft == 0.0f && target->postTransferHoldoff == 0 &&
                 (!target->carrier || (target->carrier->flags & 0x40000000)))

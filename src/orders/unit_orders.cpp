@@ -532,9 +532,9 @@ int __stdcall GetBuiltOrder(Unit* unit, Order* order, unsigned int flags)
                 for (Order* node = order->target->list; node; node = node->next) {
                     MissionType kind;
                     if (node->kind == move)
-                        kind = GetOrderType(2, (UnitOrderTypeView*)unit, 0, (FixedPosView*)node->Position());
+                        kind = GetOrderType(2, unit, 0, (Vec3*)node->Position());
                     else if (node->kind.index == patrol.index)
-                        kind = GetOrderType(9, (UnitOrderTypeView*)unit, 0, (FixedPosView*)node->Position());
+                        kind = GetOrderType(9, unit, 0, (Vec3*)node->Position());
                     if (kind.index) {
                         AddOrder(kind, 1, unit, 0, node->Position(), 0, 0);
                         queued = 1;
@@ -694,7 +694,7 @@ void RegisterUnitOrders()
 // FUNCTION: 0x403190
 int __stdcall AttackSpecialOrder(Unit* unit, Order* order, int unused)
 {
-    order->MergeFlagsFromTable(GetOrderType(3, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)(Unit*)order->target, 0).index);
+    order->MergeFlagsFromTable(GetOrderType(3, unit, (Unit*)order->target, 0).index);
     order->weapon = 2;
     return 2;
 }
@@ -1438,7 +1438,7 @@ int __stdcall AttackUTypeOrder(Unit* unit, Order* order, int unused)
             }
         }
         if (best) {
-            MissionType kind = GetOrderType(3, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)best, 0);
+            MissionType kind = GetOrderType(3, unit, best, 0);
             AppendOrder(unit, new (kSim) Order(kind, best, 0, 0, 0, 0));
             return 0;
         }
@@ -1815,7 +1815,7 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
                     if (unit->player->allied[target->player->index]) {
-                        MissionType kind = GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)target, nullptr);
+                        MissionType kind = GetOrderType(8, unit, target, nullptr);
                         if (kind.index) {
                             if (IssueRepairOrder(unit, target, 0)) return 6;
                             return 3;
@@ -1907,7 +1907,7 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
             }
         }
         if ((unsigned int)order->target->health < order->target->def->maxHealth && (unit->def->flags1&0x40)) {
-            MissionType kind=GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)(Unit*)order->target, nullptr);
+            MissionType kind=GetOrderType(8, unit, (Unit*)order->target, nullptr);
             if(kind.index) {
                 order->SetAttachedFx(0);
                 AppendOrder(unit,new (kSim) Order(kind,order->target,0,0,0,0));
@@ -2084,7 +2084,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
     }
     case 6: {
         QueueUnitSpeech(unit, 8, "Resurrection complete");
-        MissionType kind = GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)(Unit*)order->target, nullptr);
+        MissionType kind = GetOrderType(8, unit, (Unit*)order->target, nullptr);
         if (kind.index)
             AppendOrder(unit, new (kSim) Order(kind, order->target, 0, 0, 0, 0));
         return 5;

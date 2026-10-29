@@ -491,7 +491,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     g_seams.map->VisitObjectsInRange(&unit->pos,range,(UnitVisitor*)&visitor);
     if (!units.empty()) {
         order->SetAttachedFx(0);
-        MissionType kind=GetOrderType(7, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)units[0], nullptr);
+        MissionType kind=GetOrderType(7, unit, units[0], nullptr);
         AppendOrder(unit,new (kSim) Order(kind,units[0],0,0,0,0));
         order->flags=0;
         return 3;
@@ -1088,7 +1088,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                 }
             }
             if (g_seams.units->CanRepair(unit, 0, order->target)) {
-                MissionType kind=GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)(Unit*)order->target, nullptr);
+                MissionType kind=GetOrderType(8, unit, (Unit*)order->target, nullptr);
                 if (kind.index) {
                     order->SetAttachedFx(0);
                     AppendOrder(unit,new (kSim) Order(kind,order->target,0,0,0,0));

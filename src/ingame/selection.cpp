@@ -609,7 +609,7 @@ void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
         if (!(((unsigned char)u->flags) & 0x10) || u == except)
             continue;
         if (mode)
-            kind.index = GetOrderType(mode, (UnitOrderTypeView*)u, (UnitOrderTypeView*)except, (FixedPosView*)&g_game->pos_2caa).index;
+            kind.index = GetOrderType(mode, u, except, (Vec3*)&g_game->pos_2caa).index;
         if (!kind.index)
             continue;
         MissionType fire = Order("Standing_FireOrder");

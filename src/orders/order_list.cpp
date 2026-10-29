@@ -820,11 +820,11 @@ int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3)
         return 0;
     if (!(unit->flags & 0x300000) && !param_3)
         return 0;
-    MissionType kind = GetOrderType(3, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)target, 0);
+    MissionType kind = GetOrderType(3, unit, target, 0);
     if (!kind.index)
         return 0;
     if ((unit->flags & 0xc0000) == 0x40000 && !param_3) {
-        MissionType kind2 = GetOrderType(2, (UnitOrderTypeView*)unit, 0, (FixedPosView*)&unit->pos);
+        MissionType kind2 = GetOrderType(2, unit, 0, (Vec3*)&unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
         Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->maneuverleashlength);
@@ -841,12 +841,12 @@ int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3)
 // FUNCTION: 0x43b400
 int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
 {
-    MissionType kind = GetOrderType(8, (UnitOrderTypeView*)unit, (UnitOrderTypeView*)target, 0);
+    MissionType kind = GetOrderType(8, unit, target, 0);
     if (!kind.index)
         return 0;
     unsigned int f = unit->flags & 0xc0000;
     if (f == 0 && !param_3) {
-        MissionType kind2 = GetOrderType(2, (UnitOrderTypeView*)unit, 0, (FixedPosView*)&unit->pos);
+        MissionType kind2 = GetOrderType(2, unit, 0, (Vec3*)&unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
         Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->range);
@@ -855,7 +855,7 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
         Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
         return 1;
     } else if (f == 0x40000 && !param_3) {
-        MissionType kind2 = GetOrderType(2, (UnitOrderTypeView*)unit, 0, (FixedPosView*)&unit->pos);
+        MissionType kind2 = GetOrderType(2, unit, 0, (Vec3*)&unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
         Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
         Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->maneuverleashlength);

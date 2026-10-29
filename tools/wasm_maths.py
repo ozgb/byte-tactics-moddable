@@ -11,9 +11,10 @@ hashes every result with SHA-256. It is built twice from the same source: for th
 for i686 (x87 code, -mno-sse, as the game's files are; lib/bitexact compiled with SSE2 doubles, as the game
 links it) against MSVC 5's headers and LIBCMT.LIB, run under Wine with the FPU at 53-bit precision, round to
 nearest (_control87 0x9001F); and for the module with clang --target=wasm32 and wasm-ld together with
-lib/bitexact and its generated tables, run under the pinned wasmtime package. Cases whose name starts with
-info_ are printed and compared but never fail the check: they record how the two sides treat results that
-overflow int.
+lib/bitexact and its generated tables, run under the pinned wasmtime package. The module is built with
+-mno-nontrapping-fptoint, so every float to int conversion is LLVM's range-checked lowering, which gives
+0x80000000 for overflow and NaN as x87 _ftol does; the meteor_*_overflow, _negative and _special cases
+check that on every expression of SetMeteorParams.
 """
 
 import argparse
@@ -36,7 +37,7 @@ GUARD = "WASM_MATHS_UNDER_WASMTIME"
 WASMTIME = "50.0.1"
 CLANG = "22.1.8"
 LIB_SOURCES = [LIB / "trig.c", LIB / "math.c", LIB / "strtof.c"]
-WASM_FLAGS = ["--target=wasm32", "-O2", "-nostdlib", "-ffp-contract=off", "-fwrapv", "-fno-strict-aliasing", "-w",
+WASM_FLAGS = ["--target=wasm32", "-O2", "-nostdlib", "-ffp-contract=off", "-mno-nontrapping-fptoint", "-fwrapv", "-fno-strict-aliasing", "-w",
               f"-I{LIB}"]
 
 
@@ -155,9 +156,9 @@ def compare(native: dict[str, tuple[int, str]], wasm: dict[str, tuple[int, str]]
     for name in native:
         n, w = native[name], wasm.get(name)
         same = n == w
-        status = "ok" if same else ("differs (info)" if name.startswith("info_") else "MISMATCH")
+        status = "ok" if same else "MISMATCH"
         print(f"{name}: {n[1]} native / {w[1] if w else 'missing'} wasm ({n[0]} cases) {status}")
-        if not same and not name.startswith("info_"):
+        if not same:
             bad += 1
     for name in wasm:
         if name not in native:

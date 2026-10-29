@@ -52,9 +52,9 @@ LAYOUT_TYPES = {"Game", "WeaponDef", "Point16", "Vec3", "TdfFile", "TdfRecord", 
 CXX_FLAGS = [
     "--target=wasm32", "-O2", "-std=gnu++14", "-w", "-fms-compatibility", "-fms-extensions", "-fms-compatibility-version=11.00",
     "-mms-bitfields", "-fshort-wchar", "-fno-strict-aliasing", "-fwrapv", "-fno-delete-null-pointer-checks", "-ffp-contract=off",
-    "-fno-rtti", "-fno-exceptions", "-ffunction-sections", "-fdata-sections", "-nostdinc", "-nostdinc++",
+    "-mno-nontrapping-fptoint", "-fno-rtti", "-fno-exceptions", "-ffunction-sections", "-fdata-sections", "-nostdinc", "-nostdinc++",
 ]
-C_FLAGS = ["--target=wasm32", "-O2", "-w", "-ffreestanding", "-fno-builtin", "-ffp-contract=off", "-fwrapv", "-fno-strict-aliasing",
+C_FLAGS = ["--target=wasm32", "-O2", "-w", "-ffreestanding", "-fno-builtin", "-ffp-contract=off", "-mno-nontrapping-fptoint", "-fwrapv", "-fno-strict-aliasing",
            "-ffunction-sections", "-fdata-sections", "-nostdinc"]
 GUARD = "WASM_MODULES_UNDER_WASMTIME"
 

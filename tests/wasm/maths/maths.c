@@ -1,6 +1,6 @@
 #include "bitexact.h"
 
-#define CASE_COUNT 13
+#define CASE_COUNT 18
 
 typedef struct {
     bx_u32 h[8];
@@ -284,7 +284,9 @@ static void form_range(sha256_t *s, Form form)
 
 #define FORM_SAMPLE 4000000
 
-static void form_sample(sha256_t *s, Form form, int overflow_only)
+enum { SAMPLE_IN_RANGE, SAMPLE_OVERFLOW, SAMPLE_ALL };
+
+static void form_sample(sha256_t *s, Form form, int mode, bx_u32 sign)
 {
     bx_u64 state = 0x0ddba11u;
     bx_u32 bits;
@@ -303,21 +305,39 @@ static void form_sample(sha256_t *s, Form form, int overflow_only)
             bits = lcg32(&state) & 0x7fffffffu;
         if (bits >= 0x7f800000u)
             bits -= 0x00800000u;
-        f = float_from(bits);
-        if (in_int_range(form_value(form, f)) == overflow_only)
+        f = float_from(bits | sign);
+        if (mode != SAMPLE_ALL && in_int_range(form_value(form, f)) == (mode == SAMPLE_OVERFLOW))
             continue;
         r = form_result(form, f);
         put_u32(s, (bx_u32)r);
     }
 }
 
+static const bx_u32 g_special_bits[] = {
+    0x00000000u, 0x80000000u, 0x7f800000u, 0xff800000u, 0x7fc00000u, 0xffc00000u, 0x7f800001u, 0xff800001u,
+    0x7fffffffu, 0xffffffffu, 0x00000001u, 0x80000001u, 0x4f000000u, 0xcf000000u, 0x4f000001u, 0xcf000001u,
+    0x7f7fffffu, 0xff7fffffu, 0x322bcc77u, 0x3310fa8au, 0x4cd9cd9cu, 0x4ce4b7a4u};
+
+static void form_special(sha256_t *s, Form form)
+{
+    unsigned int i;
+
+    for (i = 0; i < sizeof(g_special_bits) / sizeof(g_special_bits[0]); i++)
+        put_u32(s, (bx_u32)form_result(form, float_from(g_special_bits[i])));
+}
+
 static void case_density_range(sha256_t *s) { form_range(s, FORM_DENSITY); }
 static void case_duration_range(sha256_t *s) { form_range(s, FORM_DURATION); }
 static void case_interval_range(sha256_t *s) { form_range(s, FORM_INTERVAL); }
-static void case_density_sample(sha256_t *s) { form_sample(s, FORM_DENSITY, 0); }
-static void case_duration_sample(sha256_t *s) { form_sample(s, FORM_DURATION, 0); }
-static void case_density_overflow(sha256_t *s) { form_sample(s, FORM_DENSITY, 1); }
-static void case_duration_overflow(sha256_t *s) { form_sample(s, FORM_DURATION, 1); }
+static void case_density_sample(sha256_t *s) { form_sample(s, FORM_DENSITY, SAMPLE_IN_RANGE, 0); }
+static void case_duration_sample(sha256_t *s) { form_sample(s, FORM_DURATION, SAMPLE_IN_RANGE, 0); }
+static void case_density_overflow(sha256_t *s) { form_sample(s, FORM_DENSITY, SAMPLE_OVERFLOW, 0); }
+static void case_duration_overflow(sha256_t *s) { form_sample(s, FORM_DURATION, SAMPLE_OVERFLOW, 0); }
+static void case_density_negative(sha256_t *s) { form_sample(s, FORM_DENSITY, SAMPLE_ALL, 0x80000000u); }
+static void case_duration_negative(sha256_t *s) { form_sample(s, FORM_DURATION, SAMPLE_ALL, 0x80000000u); }
+static void case_density_special(sha256_t *s) { form_special(s, FORM_DENSITY); }
+static void case_duration_special(sha256_t *s) { form_special(s, FORM_DURATION); }
+static void case_interval_special(sha256_t *s) { form_special(s, FORM_INTERVAL); }
 
 typedef struct {
     int windSpeed;
@@ -439,8 +459,13 @@ static const Case g_cases[CASE_COUNT] = {
     {"wind_strength", case_wind, 0},
     {"double_to_float", case_double_to_float, 0},
     {"atof_to_float", case_atof, 0},
-    {"info_meteor_density_overflow", case_density_overflow, 1},
-    {"info_meteor_duration_overflow", case_duration_overflow, 1},
+    {"meteor_density_overflow", case_density_overflow, 0},
+    {"meteor_duration_overflow", case_duration_overflow, 0},
+    {"meteor_density_negative", case_density_negative, 0},
+    {"meteor_duration_negative", case_duration_negative, 0},
+    {"meteor_density_special", case_density_special, 0},
+    {"meteor_duration_special", case_duration_special, 0},
+    {"meteor_interval_special", case_interval_special, 0},
 };
 
 static unsigned char g_digest[32];

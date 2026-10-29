@@ -50,6 +50,7 @@ Gadget,u.list.callback,function-pointer,src/gui/gadget.h,#353
 Gadget,u.list.filebuf,pointer,src/gui/gadget.h,#353
 Gadget,u.list.flags,pointer,src/gui/gadget.h,#353
 Gadget,u.list.gaf,pointer,src/gui/gadget.h,#353
+Gadget,u.list.language,pointer,src/gui/gadget.h,#353
 Gadget,u.list.lines,pointer,src/gui/gadget.h,#353
 Gadget,u.list.records,pointer,src/gui/gadget.h,#353
 Gadget,u.list.restrictions,pointer,src/gui/gadget.h,#353
@@ -83,8 +84,6 @@ Game,eyes,pointer,src/game/game.h,#353
 Game,fadeTable,pointer,src/game/game.h,#353
 Game,flamestreamGaf,pointer,src/game/game.h,#353
 Game,fog,int-pointer,src/game/game.h,#353
-Game,font,pointer,src/game/game.h,#353
-Game,fontComix,int-pointer,src/game/game.h,#353
 Game,fontSmlFont,pointer,src/game/game.h,#353
 Game,fxGaf,int-pointer,src/game/game.h,#353
 Game,gaf,pointer,src/game/game.h,#353

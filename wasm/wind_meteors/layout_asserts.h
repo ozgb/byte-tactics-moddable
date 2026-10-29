@@ -1,4 +1,3 @@
-#undef DAT_005119b8
 #undef g_meteorNextStrikeTime
 #undef g_meteorWeaponName
 #undef g_meteorSpawnMagnitude
@@ -13,7 +12,6 @@
 #undef g_meteorTarget
 #undef g_meteorScheduleGap
 static_assert(sizeof(SimGlobals) == 48712, "");
-static_assert(offsetof(SimGlobals, DAT_005119b8) == 4, "");
 static_assert(offsetof(SimGlobals, g_meteorNextStrikeTime) == 568, "");
 static_assert(offsetof(SimGlobals, g_meteorWeaponName) == 576, "");
 static_assert(offsetof(SimGlobals, g_meteorSpawnMagnitude) == 608, "");

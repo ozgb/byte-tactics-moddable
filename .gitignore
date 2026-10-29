@@ -21,3 +21,4 @@ src/**/*.asm
 vc50.idb
 
 TotalA.exe
+/tests/wasm/modules/rust/target/

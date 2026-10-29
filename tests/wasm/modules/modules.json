@@ -1,0 +1,12 @@
+{
+  "tools": {"clang": "22.1.8", "rustc": "1.99.1", "wasmtime": "50.0.1"},
+  "memory_pages": 4,
+  "table_size": 64,
+  "stack_size": 4096,
+  "window": 65536,
+  "table_slots": 16,
+  "modules": [
+    {"name": "rust", "data_base": 65536, "table_base": 16, "slot_arg": 7, "slot_result": 4342, "data_word": 4321},
+    {"name": "c", "data_base": 131072, "table_base": 32, "slot_arg": 7, "slot_result": 1248, "data_word": 1234}
+  ]
+}

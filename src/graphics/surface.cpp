@@ -235,9 +235,7 @@ void RestoreScreen(void)
     d->useOverrideSurface = 0;
 }
 
-extern long g_gfxBlitLockHeld;
-extern long g_gfxBlitLockOwner;
-extern void* g_gfxBlitLockEvent;
+#include "../../link/globals.h"
 
 static inline long Lock()
 {
@@ -1625,9 +1623,6 @@ StringRefAppendView* StringRefAppendView::Append(const StringRefAppendView& othe
     }
     return this;
 }
-
-struct EmptyStringRep { int refs; void* chars; };
-extern EmptyStringRep g_emptyStringRep;
 
 #include "../util/string_ref.h"
 

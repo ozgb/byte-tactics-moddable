@@ -408,6 +408,7 @@ static_assert(offsetof(Gadget, height) == 25, "");
 static_assert(offsetof(Gadget, attribs) == 27, "");
 static_assert(offsetof(Gadget, colours) == 31, "");
 static_assert(offsetof(Gadget, image) == 35, "");
+static_assert(offsetof(Gadget, colour) == 35, "");
 static_assert(offsetof(Gadget, textureNumber) == 39, "");
 static_assert(offsetof(Gadget, tab) == 40, "");
 static_assert(offsetof(Gadget, active) == 41, "");

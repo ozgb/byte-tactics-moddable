@@ -2,6 +2,9 @@
 #define PLAYERS_H
 
 #include "../../interfaces/rand_stream.h"
+struct Player;
+struct Unit;
+
 struct ContinueWatchingDialog;
 
 struct NetMetalSource;
@@ -30,5 +33,8 @@ void __stdcall SavePlayers(HapiBank* file);
 
 float __stdcall GetNetEnergy(void*);
 float __stdcall GetNetMetal(NetMetalSource*);
+
+int __stdcall IsFootprintVisible(Player* player, int x, int y, int dx, int dy, short size);
+int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* u);
 
 #endif

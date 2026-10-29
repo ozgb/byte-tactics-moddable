@@ -76,7 +76,7 @@ int __cdecl ScaledSin(int angle, int radius);
 int __cdecl ScaledCos(int angle, int radius);
 void __stdcall DrawFrame(void* surface, void* bmp, int x, int y);
 void __stdcall DrawFrameBlended(void* dest, void* bmp, int x, int y);
-int __stdcall IsUnitVisibleToPlayer(Player* owner, Unit* unit);
+#include "../game/players.h"
 void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos,
                             int radius, int color, const char* text, int index);
 #include "markers.h"

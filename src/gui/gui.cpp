@@ -3619,7 +3619,6 @@ int WalkStack(int, int, int, int, int, int, int);
 int SendScriptCallByName(int, int, int, int, int, int, int);
 int SendScriptCall(int, int, int, int, int, int, int);
 int IssueOrCancelOrder(int, int, int, int, int, int, int);
-int IsFootprintVisible(int, int, int, int, int, int);
 int DrawProgressBar(int, int, int, int, int, int);
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);

@@ -250,7 +250,7 @@ float __stdcall GetEnergyIncome(int);
 float __stdcall GetEnergyUsage(int);
 float __stdcall GetMetalIncome(int);
 float __stdcall GetMetalUsage(int);
-int __stdcall IsFootprintVisible(int, int, int, int, int, int);
+#include "../game/players.h"
 int __stdcall DrawRadar(int);
 int __stdcall DrawFogOfWar(int);
 int __stdcall FindNextSelectedUnit(int, int);
@@ -269,7 +269,6 @@ int HideSoftwareCursor();
 int ShowSoftwareCursor();
 int __stdcall GetOrderTarget(void* unit);
 int __stdcall GetGafSequenceFrame(Handle* h);
-int __stdcall IsUnitVisibleToPlayer(void* map, void* u);
 void __stdcall DrawFrameBlended(void* dest, short* frame, int x, int y);
 
 // FUNCTION: 0x467440
@@ -1106,7 +1105,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
                     Feature* feat = g_game->features + tile->feature;
                     if (feat->height < 10) {
                         if ((feat->flagsHigh & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
-                            if (IsFootprintVisible((int)player, x, y, feat->footprintX, feat->footprintZ, tile->height))
+                            if (IsFootprintVisible(player, x, y, feat->footprintX, feat->footprintZ, tile->height))
                                 BlitFeatureGaf(&ctx, tile, x, y);
                         } else
                             BlitFeatureGaf(&ctx, tile, x, y);
@@ -1143,7 +1142,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
                 if (tile->flags & 4) {
                     Feature* feat = g_game->features + tile->feature;
                     if ((feat->flagsHigh & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
-                        if (IsFootprintVisible((int)player, x, y, (int)feat->footprintX, feat->footprintZ, tile->height))
+                        if (IsFootprintVisible(player, x, y, (int)feat->footprintX, feat->footprintZ, tile->height))
                             BlitFeatureGaf(&ctx, tile, x, y);
                     } else
                         BlitFeatureGaf(&ctx, tile, x, y);
@@ -1617,7 +1616,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
     } else if (snapshot.selected != 0) {
         Unit* unit = g_game->units.get() + snapshot.selected;
         if (unit->unitDefIndex != 0) {
-            char* playerMap = (char*)&g_game->players[g_game->playerIndex];
+            Player* playerMap = &g_game->players[g_game->playerIndex];
             if (IsUnitVisibleToPlayer(playerMap, unit)) {
                 UnitDef* definition = unit->def;
                 unsigned int unitFlags = definition->flags2;

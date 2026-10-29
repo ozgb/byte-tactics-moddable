@@ -70,7 +70,7 @@ struct OrderTypeEntry {
 #include "../map/cell.h"
 
 #include "../map/line_of_sight.h"
-int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
+#include "../game/players.h"
 
 // FUNCTION: 0x48bae0
 void CollectVisibleUnitIds(void)

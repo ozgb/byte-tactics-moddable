@@ -187,9 +187,7 @@ InitPacketTables,mismatch,placeholder type Class_00451fd0: left for the type-nam
 InitProjectile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 InsertionSortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsCountBelowAiLimit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-IsFootprintVisible,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsGadgetNamed,mismatch,placeholder type Entry_0049f8c0: left for the type-naming issues
-IsUnitVisibleToPlayer,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 IssueMobileBuildOrders,mismatch,placeholder type Arg_00419670: left for the type-naming issues
 IssueOrCancelOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IssueOrderToSelection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

@@ -91,7 +91,6 @@ void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius,
 
 #include "../map/line_of_sight.h"
 #include "../map/radar.h"
-int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
 
 class HapiBank;
 #include "../map/map_list.h"

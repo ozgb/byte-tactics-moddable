@@ -128,7 +128,7 @@ void* __stdcall LoadPcx(char* path, int param);
 #include "../units/unit_targets.h"
 char* __stdcall Translate(char* text);
 void __stdcall AddTextGadget(Layer* obj, char* name, char* text, int x, short y, int w, int flags);
-int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
+#include "../game/players.h"
 #include "../frontend/options.h"
 unsigned int GetTicks();
 #include "../gui/keyboard.h"

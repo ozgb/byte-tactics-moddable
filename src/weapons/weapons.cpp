@@ -1939,7 +1939,6 @@ void AddOrder(int, int, void*, void*, void*, int, int);
 void IssueOrCancelOrder(unsigned char, int, void*, int, int*, int, int);
 int SendScriptCall(void*, short, char, int, int, int, int);
 void AddTextGadget(void*, char*, char*, int, short, int, int);
-int IsFootprintVisible(void*, int, int, int, int, short);
 void DrawProgressBar(void*, int, int, void*, void*, int);
 void IssueOrderToSelection(void*, unsigned char, int, int*, int, int);
 void WriteScreenshot(char*, char*, int, int, int, int);

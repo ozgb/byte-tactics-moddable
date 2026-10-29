@@ -1,0 +1,109 @@
+{
+  "memory_pages": 4,
+  "table_size": 64,
+  "window": 65536,
+  "table_slots": 16,
+  "majors": {"calc": 2, "calc_host": 3},
+  "signatures": {
+    "calc": {
+      "Swap": [["int", "linear"], "int"],
+      "Add3": [["int", "int", "int"], "int"],
+      "Scale": [["int"], "int"],
+      "Count": [["int"], "int"],
+      "Poke": [["int"], "void"],
+      "Same": [["int"], "int"],
+      "RunMix": [["int", "int"], "int"],
+      "RunNeg": [["int"], "int"],
+      "RunMul": [["int"], "int"],
+      "RunNote": [["int"], "int"],
+      "RunTick": [["int"], "int"],
+      "RunEcho": [["int"], "int"]
+    },
+    "calc_host": {
+      "Mix": [["int", "linear"], "int"],
+      "Neg": [["int"], "int"],
+      "Mul": [["int", "int"], "int"],
+      "Note": [["int"], "void"],
+      "Tick": [["int"], "int"],
+      "Echo": [["int"], "int"]
+    }
+  },
+  "adapters": [
+    {"interface": "calc", "from_major": 1, "name": "Swap", "args": [1, 0], "result": "pass"},
+    {"interface": "calc", "from_major": 1, "name": "Add3", "args": [0, 2], "result": "pass"},
+    {"interface": "calc", "from_major": 1, "name": "Scale", "args": [0, {"const": 3}], "result": "pass"},
+    {"interface": "calc", "from_major": 1, "name": "Count", "args": [0], "result": {"const": 7}},
+    {"interface": "calc", "from_major": 1, "name": "Poke", "args": [0], "result": "void"},
+    {"interface": "calc_host", "from_major": 2, "name": "Mix", "args": [1, 0], "result": "pass"},
+    {"interface": "calc_host", "from_major": 2, "name": "Neg", "args": [0], "result": "pass"},
+    {"interface": "calc_host", "from_major": 2, "name": "Mul", "args": [0, {"const": 4}], "result": "pass"},
+    {"interface": "calc_host", "from_major": 2, "name": "Note", "args": [0], "result": {"const": 5}},
+    {"interface": "calc_host", "from_major": 2, "name": "Tick", "args": [0], "result": "void"}
+  ],
+  "modules": [
+    {
+      "name": "old",
+      "interface": "calc",
+      "majors": {"calc": 1, "calc_host": 2},
+      "data_base": 65536,
+      "table_base": 16,
+      "exports": ["Swap", "Add3", "Scale", "Count", "Poke", "Same", "RunMix", "RunNeg", "RunMul", "RunNote", "RunTick", "RunEcho"],
+      "slots": {
+        "Swap": [["linear", "int"], "int"],
+        "Add3": [["int", "int"], "int"],
+        "Scale": [["int", "int"], "int"],
+        "Count": [["int"], "void"],
+        "Poke": [["int"], "int"],
+        "Same": [["int"], "int"],
+        "RunMix": [["int", "int"], "int"],
+        "RunNeg": [["int"], "int"],
+        "RunMul": [["int"], "int"],
+        "RunNote": [["int"], "int"],
+        "RunTick": [["int"], "int"],
+        "RunEcho": [["int"], "int"]
+      },
+      "imports": {
+        "calc_host": {
+          "Mix": [["linear", "int"], "int"],
+          "Neg": [["int", "int"], "int"],
+          "Mul": [["int"], "int"],
+          "Note": [["int"], "int"],
+          "Tick": [["int"], "void"],
+          "Echo": [["int"], "int"]
+        }
+      }
+    },
+    {
+      "name": "current",
+      "interface": "calc",
+      "majors": {"calc": 2, "calc_host": 3},
+      "data_base": 131072,
+      "table_base": 32,
+      "exports": ["Swap", "Add3", "Scale", "Count", "Poke", "Same", "RunMix", "RunNeg", "RunMul", "RunNote", "RunTick", "RunEcho"],
+      "slots": {
+        "Swap": [["int", "linear"], "int"],
+        "Add3": [["int", "int", "int"], "int"],
+        "Scale": [["int"], "int"],
+        "Count": [["int"], "int"],
+        "Poke": [["int"], "void"],
+        "Same": [["int"], "int"],
+        "RunMix": [["int", "int"], "int"],
+        "RunNeg": [["int"], "int"],
+        "RunMul": [["int"], "int"],
+        "RunNote": [["int"], "int"],
+        "RunTick": [["int"], "int"],
+        "RunEcho": [["int"], "int"]
+      },
+      "imports": {
+        "calc_host": {
+          "Mix": [["int", "linear"], "int"],
+          "Neg": [["int"], "int"],
+          "Mul": [["int", "int"], "int"],
+          "Note": [["int"], "void"],
+          "Tick": [["int"], "int"],
+          "Echo": [["int"], "int"]
+        }
+      }
+    }
+  ]
+}

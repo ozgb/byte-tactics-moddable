@@ -46,7 +46,6 @@ struct WeaponDef;
 struct Callback;
 
 struct Order;
-struct _iobuf;
 class MissionType;
 
 #include "../ai/ai_player.h"

@@ -13,7 +13,7 @@ ai,CopyOneByte,src/ai/ai_player.cpp,0,0,0,0,0,0,?CopyOneByte@@YGXPAUPercentByte@
 ai,DestroyPlayerAI,src/ai/ai_player.cpp,1,0,0,0,0,0,?DestroyPlayerAI@@YGXH@Z,0,shutdown
 ai,Direction,src/ai/player_ai.cpp,0,0,0,0,0,0,?Direction@@YG?AUVec3@@FH@Z,1,
 ai,DistSq,src/ai/player_ai.cpp,0,0,0,0,0,0,?DistSq@@YGHABUPoint16@@0@Z,1,
-ai,DumpPlayerAI,src/ai/ai_player.cpp,1,0,0,0,0,0,?DumpPlayerAI@@YGXHPAU_iobuf@@@Z,0,console
+ai,DumpPlayerAI,src/ai/ai_player.cpp,1,0,0,0,0,0,?DumpPlayerAI@@YGXHPAX@Z,0,console
 ai,FUN_00406f40,src/ai/ai_player.cpp,0,0,0,0,0,0,?FUN_00406f40@@YGXXZ,1,
 ai,FreeSquads,src/units/squads.cpp,1,0,0,0,0,0,?FreeSquads@@YGXPAUPlayer@@@Z,0,shutdown
 ai,GetMirroredBasePosition,src/ai/ai_player.cpp,0,0,0,0,0,0,?GetMirroredBasePosition@@YGXHHPAUMirroredBasePos@@@Z,1,
@@ -1190,7 +1190,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1107,454,31712,9821,11818,2555,,294,
+presentation,*,,1107,454,31712,9821,11818,2554,,294,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,

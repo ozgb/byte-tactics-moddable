@@ -302,13 +302,13 @@ void __stdcall SetOrderIntent(unsigned char mode)
 }
 
 // FUNCTION: 0x419be0
-int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
+int __stdcall HandleOrderButtonClick(Gui* menu, Gadget* entries)
 {
     char name[32];
     Gadget* e;
-    if (entries[button->index].type == 1) e = &entries[button->index];
+    if (entries[menu->hotGadgetIndex].type == 1) e = &entries[menu->hotGadgetIndex];
 
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "MOVE")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -318,14 +318,14 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
         PlaySoundByName("immediateorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "STOP")) {
         SetOrderIntent(1);
         IssueOrderToSelection(&g_game->view, 0, "STOP", 0, 0, 0);
         PlaySoundByName("immediateorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "ATTACK")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -335,7 +335,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
         PlaySoundByName("immediateorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "BLAST")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -345,7 +345,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
         PlaySoundByName("immediateorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "DEFEND")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -355,7 +355,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
         PlaySoundByName("immediateorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "REPAIR")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -365,7 +365,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
         PlaySoundByName("specialorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "PATROL")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -375,7 +375,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
         PlaySoundByName("immediateorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "RECLAIM")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -385,7 +385,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
         PlaySoundByName("specialorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "CAPTURE")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -395,7 +395,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
         PlaySoundByName("specialorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "UNLOAD")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -405,7 +405,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
         PlaySoundByName("specialorders", 0);
         return 1;
     }
-    GetGadgetName(entries, name, button->index);
+    GetGadgetName(entries, name, menu->hotGadgetIndex);
     if (strstr(name, "LOAD")) {
         if (e->status == 0) {
             SetOrderIntent(1);
@@ -659,7 +659,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
             g_game->orderMode = 0xe;
             g_game->buildTypeIndex = id;
             PlaySoundByName("addbuild", 0);
-        } else if (!HandleOrdersPanelClick(menu, entries) && !HandleOrderButtonClick((Gadget *)menu, entries)) {
+        } else if (!HandleOrdersPanelClick(menu, entries) && !HandleOrderButtonClick(menu, entries)) {
             if (unit->selected) {
                 char text[256];
                 GetGadgetName(entries, text, menu->hotGadgetIndex);

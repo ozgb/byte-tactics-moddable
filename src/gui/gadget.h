@@ -28,9 +28,7 @@ struct Gadget {
     char commonAttribs;
     void* archive;
     GafEntry* gaf;
-    char helpKey[0x60 - 0x33];
-    int index;
-    char unknown_64[0xb4 - 0x64];
+    char helpKey[0xb4 - 0x33];
     unsigned short shown : 1;
     unsigned short bits_b4 : 15;
     union {

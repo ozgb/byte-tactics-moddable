@@ -414,8 +414,6 @@ static_assert(offsetof(Gadget, commonAttribs) == 42, "");
 static_assert(offsetof(Gadget, archive) == 43, "");
 static_assert(offsetof(Gadget, gaf) == 47, "");
 static_assert(offsetof(Gadget, helpKey) == 51, "");
-static_assert(offsetof(Gadget, index) == 96, "");
-static_assert(offsetof(Gadget, unknown_64) == 100, "");
 static_assert(offsetof(Gadget, u) == 182, "");
 static_assert(offsetof(Gadget, range) == 310, "");
 static_assert(offsetof(Gadget, stages) == 310, "");

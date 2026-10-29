@@ -36,6 +36,7 @@
     X(wasmtime_module_delete)                             \
     X(wasmtime_linker_new)                                \
     X(wasmtime_linker_delete)                             \
+    X(wasmtime_linker_allow_shadowing)                    \
     X(wasmtime_linker_define)                             \
     X(wasmtime_linker_define_func_unchecked)              \
     X(wasmtime_linker_define_unknown_imports_as_traps)    \
@@ -55,6 +56,30 @@ typedef struct {
 #undef WL_FIELD
 } wl_api;
 
+#define WL_MAX_VALUES 16
+
+enum {
+    WL_RESULT_PASS,
+    WL_RESULT_CONST,
+    WL_RESULT_VOID
+};
+
+typedef struct {
+    unsigned caller_room;
+    unsigned callee_room;
+    unsigned callee_params;
+    int from_caller[WL_MAX_VALUES];
+    long constant[WL_MAX_VALUES];
+    int result;
+    long result_constant;
+} wl_adapter;
+
+typedef struct {
+    unsigned count;
+    const char* kind[WL_MAX_VALUES];
+    const char* result;
+} wl_sig;
+
 struct wl_module {
     char* name;
     const wl_json* entry;
@@ -66,8 +91,18 @@ struct wl_module {
     char** data_names;
     unsigned* data_addresses;
     unsigned table_filled;
+    wl_adapter** slot_adapters;
     wl_module* next;
 };
+
+typedef struct import_record {
+    char* module;
+    char* name;
+    char* signature;
+    wl_import_fn function;
+    void* user;
+    struct import_record* next;
+} import_record;
 
 struct wl_loader {
     wl_config config;
@@ -84,6 +119,7 @@ struct wl_loader {
     wasmtime_linker_t* linker;
     int has_memory;
     int trap_missing;
+    import_record* imports;
     wl_module* modules;
 };
 
@@ -92,6 +128,13 @@ typedef struct {
     wl_import_fn function;
     void* user;
 } import_env;
+
+typedef struct {
+    wl_loader* loader;
+    wl_import_fn function;
+    void* user;
+    wl_adapter adapter;
+} adapter_env;
 
 static void set_error(wl_loader* loader, const char* format, ...)
 {
@@ -156,9 +199,10 @@ static int make_engine(wl_loader* loader)
 {
     wl_api* api = &loader->api;
     wasm_config_t* config = api->wasm_config_new();
-    wasmtime_error_t* error = api->wasmtime_config_target_set(config, "pulley32");
+    const char* target = loader->config.target ? loader->config.target : "pulley32";
+    wasmtime_error_t* error = api->wasmtime_config_target_set(config, target);
     if (error) {
-        return fail_wasmtime(loader, "selecting pulley32", error, NULL);
+        return fail_wasmtime(loader, "selecting the target", error, NULL);
     }
     api->wasmtime_config_cranelift_nan_canonicalization_set(config, 1);
     api->wasmtime_config_consume_fuel_set(config, 0);
@@ -167,6 +211,7 @@ static int make_engine(wl_loader* loader)
     loader->store = api->wasmtime_store_new(loader->engine, NULL, NULL);
     loader->context = api->wasmtime_store_context(loader->store);
     loader->linker = api->wasmtime_linker_new(loader->engine);
+    api->wasmtime_linker_allow_shadowing(loader->linker, 1);
     return 1;
 }
 
@@ -184,6 +229,14 @@ wl_loader* wl_create(const wl_config* config, char* error, size_t error_size)
     return loader;
 }
 
+static char* copy_string(const char* text)
+{
+    size_t n = strlen(text) + 1;
+    char* out = (char*)malloc(n);
+    memcpy(out, text, n);
+    return out;
+}
+
 static void free_names(char** names, size_t count)
 {
     size_t i;
@@ -191,6 +244,17 @@ static void free_names(char** names, size_t count)
         free(names[i]);
     }
     free(names);
+}
+
+static void free_adapters(wl_module* module)
+{
+    size_t i;
+    if (module->slot_adapters) {
+        for (i = 0; i < module->slot_count; i++) {
+            free(module->slot_adapters[i]);
+        }
+        free(module->slot_adapters);
+    }
 }
 
 void wl_destroy(wl_loader* loader)
@@ -207,8 +271,17 @@ void wl_destroy(wl_loader* loader)
         free(module->slots);
         free_names(module->data_names, module->data_count);
         free(module->data_addresses);
+        free_adapters(module);
         free(module);
         module = next;
+    }
+    while (loader->imports) {
+        import_record* next = loader->imports->next;
+        free(loader->imports->module);
+        free(loader->imports->name);
+        free(loader->imports->signature);
+        free(loader->imports);
+        loader->imports = next;
     }
     if (loader->linker) {
         loader->api.wasmtime_linker_delete(loader->linker);
@@ -579,30 +652,26 @@ static int fill_types(wl_loader* loader, wasm_valtype_vec_t* vec, const char* le
     return 1;
 }
 
-int wl_define_import(wl_loader* loader, const char* module, const char* name, const char* signature, wl_import_fn function, void* user)
+static int define_function(wl_loader* loader, const char* module, const char* name, const char* signature,
+                           wasmtime_func_unchecked_callback_t callback, void* env, const char* what)
 {
     const char* arrow = strchr(signature, '>');
     wasm_valtype_vec_t params;
     wasm_valtype_vec_t results;
     wasm_functype_t* type;
     wasmtime_error_t* error;
-    import_env* env;
-    char what[160];
-    wl_format(what, sizeof what, "import %s.%s", module, name);
     if (!arrow || strlen(arrow + 1) > 1) {
         set_error(loader, "%s: signature \"%s\" must read params>result with at most one result", what, signature);
+        free(env);
         return 0;
     }
     if (!fill_types(loader, &params, signature, (size_t)(arrow - signature), what)
         || !fill_types(loader, &results, arrow + 1, strlen(arrow + 1), what)) {
+        free(env);
         return 0;
     }
     type = loader->api.wasm_functype_new(&params, &results);
-    env = (import_env*)malloc(sizeof *env);
-    env->loader = loader;
-    env->function = function;
-    env->user = user;
-    error = loader->api.wasmtime_linker_define_func_unchecked(loader->linker, module, strlen(module), name, strlen(name), type, trampoline, env, free);
+    error = loader->api.wasmtime_linker_define_func_unchecked(loader->linker, module, strlen(module), name, strlen(name), type, callback, env, free);
     loader->api.wasm_functype_delete(type);
     if (error) {
         return fail_wasmtime(loader, what, error, NULL);
@@ -610,12 +679,393 @@ int wl_define_import(wl_loader* loader, const char* module, const char* name, co
     return 1;
 }
 
-static char* copy_string(const char* text)
+static import_record* find_import(const wl_loader* loader, const char* module, const char* name)
 {
-    size_t n = strlen(text) + 1;
-    char* out = (char*)malloc(n);
-    memcpy(out, text, n);
-    return out;
+    import_record* record;
+    for (record = loader->imports; record; record = record->next) {
+        if (!strcmp(record->module, module) && !strcmp(record->name, name)) {
+            return record;
+        }
+    }
+    return NULL;
+}
+
+static int define_host_import(wl_loader* loader, const import_record* record)
+{
+    import_env* env = (import_env*)malloc(sizeof *env);
+    char what[160];
+    wl_format(what, sizeof what, "import %s.%s", record->module, record->name);
+    env->loader = loader;
+    env->function = record->function;
+    env->user = record->user;
+    return define_function(loader, record->module, record->name, record->signature, trampoline, env, what);
+}
+
+int wl_define_import(wl_loader* loader, const char* module, const char* name, const char* signature, wl_import_fn function, void* user)
+{
+    import_record* record;
+    if (find_import(loader, module, name)) {
+        set_error(loader, "import %s.%s is already defined", module, name);
+        return 0;
+    }
+    record = (import_record*)calloc(1, sizeof *record);
+    record->module = copy_string(module);
+    record->name = copy_string(name);
+    record->signature = copy_string(signature);
+    record->function = function;
+    record->user = user;
+    if (!define_host_import(loader, record)) {
+        free(record->module);
+        free(record->name);
+        free(record->signature);
+        free(record);
+        return 0;
+    }
+    record->next = loader->imports;
+    loader->imports = record;
+    return 1;
+}
+
+static int is_kind(const char* kind)
+{
+    return !strcmp(kind, "int") || !strcmp(kind, "f64") || !strcmp(kind, "linear") || !strcmp(kind, "block")
+        || !strcmp(kind, "scratch") || !strcmp(kind, "handle");
+}
+
+static int read_sig(const wl_json* node, wl_sig* sig, char* reason, size_t reason_size)
+{
+    const wl_json* params;
+    const wl_json* item;
+    memset(sig, 0, sizeof *sig);
+    if (!node || node->kind != WL_JSON_ARRAY || wl_json_count(node) != 2) {
+        wl_format(reason, reason_size, "a signature must read [[parameter kinds], result kind]");
+        return 0;
+    }
+    params = node->first;
+    sig->result = params->next->kind == WL_JSON_STRING ? params->next->text : NULL;
+    if (params->kind != WL_JSON_ARRAY || !sig->result || !(is_kind(sig->result) || !strcmp(sig->result, "void"))) {
+        wl_format(reason, reason_size, "a signature must read [[parameter kinds], result kind]");
+        return 0;
+    }
+    if (wl_json_count(params) > WL_MAX_VALUES) {
+        wl_format(reason, reason_size, "a signature has at most %d parameters", WL_MAX_VALUES);
+        return 0;
+    }
+    for (item = params->first; item; item = item->next) {
+        if (item->kind != WL_JSON_STRING || !is_kind(item->text)) {
+            wl_format(reason, reason_size, "unknown parameter kind");
+            return 0;
+        }
+        sig->kind[sig->count++] = item->text;
+    }
+    return 1;
+}
+
+static int same_sig(const wl_sig* a, const wl_sig* b)
+{
+    unsigned i;
+    if (a->count != b->count || strcmp(a->result, b->result)) {
+        return 0;
+    }
+    for (i = 0; i < a->count; i++) {
+        if (strcmp(a->kind[i], b->kind[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static char kind_letter(const char* kind)
+{
+    return !strcmp(kind, "f64") ? 'd' : 'i';
+}
+
+static void sig_letters(const wl_sig* sig, char* out, size_t size)
+{
+    unsigned i;
+    size_t n = 0;
+    for (i = 0; i < sig->count && n + 3 < size; i++) {
+        out[n++] = kind_letter(sig->kind[i]);
+    }
+    out[n++] = '>';
+    if (strcmp(sig->result, "void")) {
+        out[n++] = kind_letter(sig->result);
+    }
+    out[n] = 0;
+}
+
+static unsigned room_of(const wl_sig* sig)
+{
+    unsigned results = strcmp(sig->result, "void") ? 1u : 0u;
+    return sig->count > results ? sig->count : results;
+}
+
+static int build_adapter(const wl_json* spec, const wl_sig* caller, const wl_sig* callee, wl_adapter* out, char* reason, size_t reason_size)
+{
+    const wl_json* args = wl_json_get(spec, "args");
+    const wl_json* result = wl_json_get(spec, "result");
+    const wl_json* item;
+    unsigned i = 0;
+    memset(out, 0, sizeof *out);
+    out->caller_room = room_of(caller);
+    out->callee_room = room_of(callee);
+    out->callee_params = callee->count;
+    if (!args || args->kind != WL_JSON_ARRAY) {
+        wl_format(reason, reason_size, "args must be a list with one entry per parameter of the callee");
+        return 0;
+    }
+    if (wl_json_count(args) != callee->count) {
+        wl_format(reason, reason_size, "args has %lu entries, the callee takes %u parameters", (unsigned long)wl_json_count(args), callee->count);
+        return 0;
+    }
+    for (item = args->first; item; item = item->next, i++) {
+        if (item->kind == WL_JSON_NUMBER) {
+            if (item->number < 0 || (unsigned long)item->number >= caller->count) {
+                wl_format(reason, reason_size, "args[%u] reads parameter %ld, the caller passes %u", i, item->number, caller->count);
+                return 0;
+            }
+            if (strcmp(caller->kind[item->number], callee->kind[i])) {
+                wl_format(reason, reason_size, "args[%u]: the caller's %s parameter %ld cannot become the callee's %s parameter without code",
+                          i, caller->kind[item->number], item->number, callee->kind[i]);
+                return 0;
+            }
+            out->from_caller[i] = (int)item->number;
+        } else if (item->kind == WL_JSON_OBJECT && wl_json_get(item, "const") && wl_json_get(item, "const")->kind == WL_JSON_NUMBER) {
+            if (strcmp(callee->kind[i], "int")) {
+                wl_format(reason, reason_size, "args[%u]: a constant can only fill an int parameter, the callee's is %s", i, callee->kind[i]);
+                return 0;
+            }
+            out->from_caller[i] = -1;
+            out->constant[i] = wl_json_get(item, "const")->number;
+        } else {
+            wl_format(reason, reason_size, "args[%u] must be a parameter index or {\"const\": n}", i);
+            return 0;
+        }
+    }
+    if (result && result->kind == WL_JSON_STRING && !strcmp(result->text, "pass")) {
+        out->result = WL_RESULT_PASS;
+        if (!strcmp(caller->result, "void") || !strcmp(callee->result, "void")) {
+            wl_format(reason, reason_size, "result: pass needs a result on both sides, the caller's is %s and the callee's %s", caller->result, callee->result);
+            return 0;
+        }
+        if (strcmp(caller->result, callee->result)) {
+            wl_format(reason, reason_size, "result: the callee's %s cannot become the caller's %s without code", callee->result, caller->result);
+            return 0;
+        }
+    } else if (result && result->kind == WL_JSON_STRING && !strcmp(result->text, "void")) {
+        out->result = WL_RESULT_VOID;
+        if (strcmp(caller->result, "void")) {
+            wl_format(reason, reason_size, "result: void, but the caller expects %s", caller->result);
+            return 0;
+        }
+    } else if (result && result->kind == WL_JSON_OBJECT && wl_json_get(result, "const") && wl_json_get(result, "const")->kind == WL_JSON_NUMBER) {
+        out->result = WL_RESULT_CONST;
+        out->result_constant = wl_json_get(result, "const")->number;
+        if (strcmp(caller->result, "int")) {
+            wl_format(reason, reason_size, "result: a constant can only be an int result, the caller's is %s", caller->result);
+            return 0;
+        }
+    } else {
+        wl_format(reason, reason_size, "result must be \"pass\", \"void\" or {\"const\": n}");
+        return 0;
+    }
+    return 1;
+}
+
+static void adapt_args(const wl_adapter* adapter, const wasmtime_val_raw_t* caller, wasmtime_val_raw_t* callee)
+{
+    unsigned i;
+    for (i = 0; i < adapter->callee_params; i++) {
+        if (adapter->from_caller[i] >= 0) {
+            callee[i] = caller[adapter->from_caller[i]];
+        } else {
+            memset(&callee[i], 0, sizeof callee[i]);
+            callee[i].i32 = (int)adapter->constant[i];
+        }
+    }
+}
+
+static void adapt_result(const wl_adapter* adapter, const wasmtime_val_raw_t* callee, wasmtime_val_raw_t* caller)
+{
+    if (adapter->result == WL_RESULT_PASS) {
+        caller[0] = callee[0];
+    } else if (adapter->result == WL_RESULT_CONST) {
+        memset(&caller[0], 0, sizeof caller[0]);
+        caller[0].i32 = (int)adapter->result_constant;
+    }
+}
+
+static wasm_trap_t* adapter_trampoline(void* env, wasmtime_caller_t* caller, wasmtime_val_raw_t* args_and_results, size_t count)
+{
+    adapter_env* adapted = (adapter_env*)env;
+    wasmtime_val_raw_t callee[WL_MAX_VALUES];
+    const char* message;
+    (void)caller;
+    (void)count;
+    adapt_args(&adapted->adapter, args_and_results, callee);
+    message = adapted->function(adapted->user, callee);
+    if (message) {
+        return adapted->loader->api.wasmtime_trap_new(message, strlen(message));
+    }
+    adapt_result(&adapted->adapter, callee, args_and_results);
+    return NULL;
+}
+
+typedef struct planned {
+    int is_slot;
+    char* interface_name;
+    char* name;
+    wl_adapter adapter;
+    char* old_signature;
+    struct planned* next;
+} planned;
+
+static void free_plan(planned* plan)
+{
+    while (plan) {
+        planned* next = plan->next;
+        free(plan->interface_name);
+        free(plan->name);
+        free(plan->old_signature);
+        free(plan);
+        plan = next;
+    }
+}
+
+static const wl_json* find_adapter(const wl_loader* loader, const char* interface_name, long from_major, const char* name)
+{
+    const wl_json* list = wl_json_get(loader->manifest, "adapters");
+    const wl_json* spec;
+    for (spec = list ? list->first : NULL; spec; spec = spec->next) {
+        const wl_json* i = wl_json_get(spec, "interface");
+        const wl_json* m = wl_json_get(spec, "from_major");
+        const wl_json* n = wl_json_get(spec, "name");
+        if (i && n && m && i->kind == WL_JSON_STRING && n->kind == WL_JSON_STRING && m->kind == WL_JSON_NUMBER
+            && !strcmp(i->text, interface_name) && !strcmp(n->text, name) && m->number == from_major) {
+            return spec;
+        }
+    }
+    return NULL;
+}
+
+static int plan_changed(wl_loader* loader, const wl_json* entry, const char* module, const char* interface_name, long from_major, long to_major,
+                        planned** plan)
+{
+    const wl_json* own = wl_json_get(entry, "interface");
+    int is_slot = own && own->kind == WL_JSON_STRING && !strcmp(own->text, interface_name);
+    const wl_json* table = is_slot ? wl_json_get(entry, "slots") : wl_json_get(wl_json_get(entry, "imports"), interface_name);
+    const wl_json* current = wl_json_get(wl_json_get(loader->manifest, "signatures"), interface_name);
+    const wl_json* item;
+    const char* what = is_slot ? "slot" : "import";
+    char reason[300];
+    for (item = table ? table->first : NULL; item; item = item->next) {
+        const wl_json* now = wl_json_get(current, item->key);
+        const wl_json* spec;
+        wl_sig old_sig, new_sig;
+        wl_adapter adapter;
+        planned* added;
+        if (!now) {
+            set_error(loader, "module %s: %s %s of interface %s has no current signature in the manifest (major %ld to %ld)", module, what, item->key,
+                      interface_name, from_major, to_major);
+            return 0;
+        }
+        if (!read_sig(item, &old_sig, reason, sizeof reason) || !read_sig(now, &new_sig, reason, sizeof reason)) {
+            set_error(loader, "module %s: %s %s of interface %s: %s", module, what, item->key, interface_name, reason);
+            return 0;
+        }
+        if (same_sig(&old_sig, &new_sig)) {
+            continue;
+        }
+        spec = find_adapter(loader, interface_name, from_major, item->key);
+        if (!spec) {
+            set_error(loader, "module %s: %s %s of interface %s changed between major %ld and %ld, and the manifest has no adapter for it", module, what,
+                      item->key, interface_name, from_major, to_major);
+            return 0;
+        }
+        if (!(is_slot ? build_adapter(spec, &new_sig, &old_sig, &adapter, reason, sizeof reason)
+                      : build_adapter(spec, &old_sig, &new_sig, &adapter, reason, sizeof reason))) {
+            set_error(loader, "module %s: the adapter for %s %s of interface %s (major %ld to %ld) is refused: %s", module, what, item->key,
+                      interface_name, from_major, to_major, reason);
+            return 0;
+        }
+        added = (planned*)calloc(1, sizeof *added);
+        added->is_slot = is_slot;
+        added->interface_name = copy_string(interface_name);
+        added->name = copy_string(item->key);
+        added->adapter = adapter;
+        added->next = *plan;
+        *plan = added;
+        if (!is_slot) {
+            char letters[64];
+            const import_record* host = find_import(loader, interface_name, item->key);
+            sig_letters(&new_sig, letters, sizeof letters);
+            if (!host || strcmp(host->signature, letters)) {
+                set_error(loader, "module %s: import %s.%s is adapted from major %ld to %ld, but the host %s", module, interface_name, item->key,
+                          from_major, to_major, host ? "defines it with another signature than the manifest's" : "does not define it");
+                return 0;
+            }
+            sig_letters(&old_sig, letters, sizeof letters);
+            added->old_signature = copy_string(letters);
+        }
+    }
+    return 1;
+}
+
+static int plan_adapters(wl_loader* loader, const wl_json* entry, const char* module, planned** plan)
+{
+    const wl_json* majors = wl_json_get(entry, "majors");
+    const wl_json* current = wl_json_get(loader->manifest, "majors");
+    const wl_json* item;
+    for (item = majors ? majors->first : NULL; item; item = item->next) {
+        const wl_json* now = wl_json_get(current, item->key);
+        if (item->kind != WL_JSON_NUMBER || !now || now->kind != WL_JSON_NUMBER) {
+            set_error(loader, "module %s: majors.%s and the manifest's majors.%s must both be numbers", module, item->key, item->key);
+            return 0;
+        }
+        if (item->number > now->number) {
+            set_error(loader, "module %s: built against interface %s major %ld, the manifest has %ld", module, item->key, item->number, now->number);
+            return 0;
+        }
+        if (item->number < now->number && !plan_changed(loader, entry, module, item->key, item->number, now->number, plan)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int define_adapted_imports(wl_loader* loader, const planned* plan)
+{
+    const planned* one;
+    for (one = plan; one; one = one->next) {
+        const import_record* host = find_import(loader, one->interface_name, one->name);
+        adapter_env* env;
+        char what[160];
+        if (one->is_slot) {
+            continue;
+        }
+        env = (adapter_env*)malloc(sizeof *env);
+        env->loader = loader;
+        env->function = host->function;
+        env->user = host->user;
+        env->adapter = one->adapter;
+        wl_format(what, sizeof what, "adapted import %s.%s", one->interface_name, one->name);
+        if (!define_function(loader, one->interface_name, one->name, one->old_signature, adapter_trampoline, env, what)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int restore_imports(wl_loader* loader, const planned* plan)
+{
+    const planned* one;
+    int ok = 1;
+    for (one = plan; one; one = one->next) {
+        if (!one->is_slot && !define_host_import(loader, find_import(loader, one->interface_name, one->name))) {
+            ok = 0;
+        }
+    }
+    return ok;
 }
 
 static int collect_names(const wl_json* entry, const char* key, char*** names, size_t* count)
@@ -649,6 +1099,9 @@ wl_module* wl_load_module_bytes(wl_loader* loader, const char* name, const unsig
     size_t i;
     unsigned char* memory;
     wasmtime_extern_t item;
+    planned* plan = NULL;
+    planned* one;
+    int restored;
     if (!entry) {
         set_error(loader, "no module %s in the manifest", name);
         return NULL;
@@ -670,12 +1123,23 @@ wl_module* wl_load_module_bytes(wl_loader* loader, const char* name, const unsig
         set_error(loader, "module %s: window [%#x, %#x) is outside the memory", name, data_base, data_base + loader->layout.window);
         return NULL;
     }
+    if (!plan_adapters(loader, entry, name, &plan)) {
+        free_plan(plan);
+        return NULL;
+    }
     memset(memory + data_base, 0, loader->layout.window);
     error = api->wasmtime_module_new(loader->engine, wasm, size, &compiled);
     if (error) {
         char what[160];
         wl_format(what, sizeof what, "module %s: compile", name);
         fail_wasmtime(loader, what, error, NULL);
+        free_plan(plan);
+        return NULL;
+    }
+    if (!define_adapted_imports(loader, plan)) {
+        api->wasmtime_module_delete(compiled);
+        restore_imports(loader, plan);
+        free_plan(plan);
         return NULL;
     }
     if (loader->trap_missing) {
@@ -683,6 +1147,8 @@ wl_module* wl_load_module_bytes(wl_loader* loader, const char* name, const unsig
         if (error) {
             api->wasmtime_module_delete(compiled);
             fail_wasmtime(loader, "stubbing the missing imports", error, NULL);
+            restore_imports(loader, plan);
+            free_plan(plan);
             return NULL;
         }
     }
@@ -691,18 +1157,37 @@ wl_module* wl_load_module_bytes(wl_loader* loader, const char* name, const unsig
     module->entry = entry;
     error = api->wasmtime_linker_instantiate(loader->linker, loader->context, compiled, &module->instance, &trap);
     api->wasmtime_module_delete(compiled);
+    restored = restore_imports(loader, plan);
     if (error || trap) {
         char what[160];
         wl_format(what, sizeof what, "module %s: instantiate", name);
         fail_wasmtime(loader, what, error, trap);
         free(module->name);
         free(module);
+        free_plan(plan);
+        return NULL;
+    }
+    if (!restored) {
+        free(module->name);
+        free(module);
+        free_plan(plan);
         return NULL;
     }
     collect_names(entry, "exports", &module->slot_names, &module->slot_count);
     collect_names(entry, "data", &module->data_names, &module->data_count);
     module->slots = (wasmtime_func_t*)calloc(module->slot_count + 1, sizeof *module->slots);
     module->data_addresses = (unsigned*)calloc(module->data_count + 1, sizeof(unsigned));
+    module->slot_adapters = (wl_adapter**)calloc(module->slot_count + 1, sizeof(wl_adapter*));
+    for (one = plan; one; one = one->next) {
+        for (i = 0; i < module->slot_count && one->is_slot; i++) {
+            if (!strcmp(module->slot_names[i], one->name)) {
+                module->slot_adapters[i] = (wl_adapter*)malloc(sizeof(wl_adapter));
+                *module->slot_adapters[i] = one->adapter;
+            }
+        }
+    }
+    free_plan(plan);
+    plan = NULL;
     for (i = 0; i < module->slot_count; i++) {
         wasmtime_val_t entry_value;
         const char* slot = module->slot_names[i];
@@ -711,7 +1196,7 @@ wl_module* wl_load_module_bytes(wl_loader* loader, const char* name, const unsig
             goto bad;
         }
         module->slots[i] = item.of.func;
-        if (table_base + i < loader->layout.table_size && api->wasmtime_table_get(loader->context, &loader->table, table_base + i, &entry_value)
+        if (!module->slot_adapters[i] && table_base + i < loader->layout.table_size && api->wasmtime_table_get(loader->context, &loader->table, table_base + i, &entry_value)
             && entry_value.kind == WASMTIME_FUNCREF && wasmtime_funcref_is_null(&entry_value.of.funcref)) {
             memset(&entry_value, 0, sizeof entry_value);
             entry_value.kind = WASMTIME_FUNCREF;
@@ -747,6 +1232,7 @@ bad:
     free(module->slots);
     free_names(module->data_names, module->data_count);
     free(module->data_addresses);
+    free_adapters(module);
     free(module);
     return NULL;
 }
@@ -849,10 +1335,37 @@ int wl_table_entry(wl_loader* loader, unsigned index, wasmtime_val_t* value)
         && value->kind == WASMTIME_FUNCREF && !wasmtime_funcref_is_null(&value->of.funcref);
 }
 
+static const wl_adapter* slot_adapter(const wl_module* module, const wasmtime_func_t* func)
+{
+    size_t i;
+    for (i = 0; i < module->slot_count; i++) {
+        if (module->slot_adapters[i] && module->slots[i].store_id == func->store_id && module->slots[i].__private == func->__private) {
+            return module->slot_adapters[i];
+        }
+    }
+    return NULL;
+}
+
 int wl_call(wl_loader* loader, const wl_module* module, const wasmtime_func_t* func, wasmtime_val_raw_t* args_and_results, size_t count)
 {
     wasm_trap_t* trap = NULL;
-    wasmtime_error_t* error = loader->api.wasmtime_func_call_unchecked(loader->context, func, args_and_results, count, &trap);
+    wasmtime_val_raw_t callee[WL_MAX_VALUES];
+    const wl_adapter* adapter = slot_adapter(module, func);
+    wasmtime_error_t* error;
+    if (adapter) {
+        if (count < adapter->caller_room) {
+            set_error(loader, "module %s: an adapted slot is called with room for %lu values, its current signature needs %u", module->name,
+                      (unsigned long)count, adapter->caller_room);
+            return 0;
+        }
+        adapt_args(adapter, args_and_results, callee);
+        error = loader->api.wasmtime_func_call_unchecked(loader->context, func, callee, adapter->callee_room, &trap);
+        if (!error && !trap) {
+            adapt_result(adapter, callee, args_and_results);
+        }
+    } else {
+        error = loader->api.wasmtime_func_call_unchecked(loader->context, func, args_and_results, count, &trap);
+    }
     if (error || trap) {
         char text[400];
         describe(loader, error, trap, text, sizeof text);

@@ -3,6 +3,7 @@
     uv run tools/test_wasm_modules.py
 """
 
+import json
 import unittest
 
 import wasm_modules as wm
@@ -255,6 +256,125 @@ class Budgets(unittest.TestCase):
         details = dict(DETAILS, exports={"UpdateWind": (["i32"], "void"), "__fuel_set": (["i64"], "void"), "__fuel_get": ([], "i64")})
         self.assertEqual(wm.check_interface("m", KIND_IMPORTS, GOOD_EXPORTS + list(wm.wasm_fuel.EXPORTS),
                                             dict(SPEC_KINDS, exports=SPEC_KINDS["exports"] + list(wm.wasm_fuel.EXPORTS)), details), [])
+
+
+MANIFEST = {
+    "majors": {"weapons": 1, "services": 2, "wind_meteors": 1},
+    "modules": [{"name": "m", "interface": "wind_meteors", "majors": {"wind_meteors": 1, "weapons": 1, "services": 2},
+                 "slots": {}, "imports": {"weapons": {}, "services": {}}}],
+}
+
+
+class MajorsTests(unittest.TestCase):
+    def test_matching_majors_pass(self):
+        self.assertEqual(wm.check_majors(MANIFEST, MANIFEST["majors"]), [])
+
+    def test_top_level_majors_must_match_the_headers(self):
+        problems = wm.check_majors(MANIFEST, dict(MANIFEST["majors"], weapons=2))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("differ from interfaces", problems[0])
+
+    def test_module_missing_a_major_fails(self):
+        entry = dict(MANIFEST["modules"][0], majors={"wind_meteors": 1, "weapons": 1})
+        problems = wm.check_majors(dict(MANIFEST, modules=[entry]), MANIFEST["majors"])
+        self.assertEqual(problems, ["m: no major for services, an interface it uses"])
+
+    def test_module_major_ahead_of_the_headers_fails(self):
+        entry = dict(MANIFEST["modules"][0], majors={"wind_meteors": 1, "weapons": 3, "services": 2})
+        problems = wm.check_majors(dict(MANIFEST, modules=[entry]), MANIFEST["majors"])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("built against weapons 3, the headers have 1", problems[0])
+
+    def test_module_major_for_an_unused_interface_fails(self):
+        entry = dict(MANIFEST["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 2, "map": 3})
+        problems = wm.check_majors(dict(MANIFEST, modules=[entry]), dict(MANIFEST["majors"], map=3))
+        self.assertTrue(any("map, which it neither exports slots for nor imports from" in p for p in problems))
+
+    def test_older_module_major_passes_the_majors_check(self):
+        entry = dict(MANIFEST["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 1})
+        self.assertEqual(wm.check_majors(dict(MANIFEST, modules=[entry]), MANIFEST["majors"]), [])
+
+    def test_with_majors_sets_every_module_to_the_headers(self):
+        stale = dict(MANIFEST, majors={}, modules=[dict(MANIFEST["modules"][0], majors={"wind_meteors": 0, "weapons": 0, "services": 0})])
+        fixed = wm.with_majors(stale, MANIFEST["majors"])
+        self.assertEqual(fixed["majors"], MANIFEST["majors"])
+        self.assertEqual(fixed["modules"][0]["majors"], {"wind_meteors": 1, "weapons": 1, "services": 2})
+
+    def test_header_majors_read_every_interface(self):
+        majors = wm.header_majors()
+        self.assertEqual(majors["wind_meteors"], 1)
+        self.assertIn("weapons", majors)
+        self.assertIn("services", majors)
+
+    def test_the_committed_manifest_is_what_build_writes(self):
+        game = wm.game_manifest()
+        with open(wm.GAME_MODULES) as f:
+            self.assertEqual(f.read(), wm.manifest_text(wm.with_majors(game, wm.header_majors())))
+
+    def test_manifest_text_round_trips(self):
+        game = wm.game_manifest()
+        self.assertEqual(json.loads(wm.manifest_text(game)), game)
+
+
+SIGNATURES = {"weapons": {"Spawn": [["block", "int"], "int"]}, "services": {"Rand": [["int"], "int"], "Log": [["linear"], "void"]}}
+ADAPTED = {
+    "majors": {"weapons": 1, "services": 2, "wind_meteors": 1},
+    "signatures": SIGNATURES,
+    "adapters": [],
+    "modules": [{"name": "m", "interface": "wind_meteors", "majors": {"wind_meteors": 1, "weapons": 1, "services": 1}, "slots": {},
+                 "imports": {"weapons": {"Spawn": [["block", "int"], "int"]},
+                             "services": {"Rand": [["int", "int"], "int"], "Log": [["linear"], "void"]}}}],
+}
+RAND_ADAPTER = {"interface": "services", "from_major": 1, "name": "Rand", "args": [0], "result": "pass"}
+
+
+class AdapterManifestTests(unittest.TestCase):
+    def test_a_changed_import_without_an_adapter_fails(self):
+        problems = wm.check_majors(ADAPTED, ADAPTED["majors"])
+        self.assertEqual(problems, ["m: services.Rand changed between major 1 and 2, and the manifest has no adapter for it"])
+
+    def test_an_adapter_covers_the_change(self):
+        self.assertEqual(wm.check_majors(dict(ADAPTED, adapters=[RAND_ADAPTER]), ADAPTED["majors"]), [])
+
+    def test_an_adapter_from_another_major_does_not_cover_it(self):
+        adapter = dict(RAND_ADAPTER, from_major=0)
+        problems = wm.check_majors(dict(ADAPTED, adapters=[adapter]), ADAPTED["majors"])
+        self.assertTrue(any("no adapter for it" in p for p in problems))
+        self.assertTrue(any("from_major must be older" in p for p in problems))
+
+    def test_an_adapter_for_an_unknown_name_fails(self):
+        problems = wm.check_majors(dict(ADAPTED, adapters=[RAND_ADAPTER, dict(RAND_ADAPTER, name="Nope")]), ADAPTED["majors"])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("no Nope for services", problems[0])
+
+    def test_a_current_module_must_match_the_signatures(self):
+        entry = dict(ADAPTED["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 2})
+        problems = wm.check_majors(dict(ADAPTED, modules=[entry]), ADAPTED["majors"])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("services.Rand is [['int', 'int'], 'int'] but the current signature is [['int'], 'int']", problems[0])
+
+    def test_a_name_without_a_signature_fails(self):
+        problems = wm.check_majors(dict(ADAPTED, signatures={"weapons": SIGNATURES["weapons"]}, adapters=[RAND_ADAPTER]), ADAPTED["majors"])
+        self.assertTrue(any("the manifest's signatures have no Rand for services" in p for p in problems))
+
+    def test_signatures_come_from_the_current_modules_over_the_old_ones(self):
+        entry = dict(ADAPTED["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 2},
+                     imports={"weapons": {"Spawn": [["block", "int", "int"], "int"]}, "services": {"Rand": [["int"], "int"]}})
+        game = dict(ADAPTED, modules=[entry])
+        found = wm.current_signatures(game, [entry], ADAPTED["majors"])
+        self.assertEqual(found["weapons"], {"Spawn": [["block", "int", "int"], "int"]})
+        self.assertEqual(found["services"], {"Rand": [["int"], "int"], "Log": [["linear"], "void"]})
+
+    def test_modules_that_disagree_on_a_current_signature_fail(self):
+        first = dict(ADAPTED["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 2}, imports={"services": {"Rand": [["int"], "int"]}})
+        second = dict(first, name="n", imports={"services": {"Rand": [["linear"], "int"]}})
+        with self.assertRaises(SystemExit):
+            wm.current_signatures(ADAPTED, [first, second], ADAPTED["majors"])
+
+    def test_the_manifest_writer_keeps_adapters_one_per_line(self):
+        text = wm.manifest_text(dict(ADAPTED, adapters=[RAND_ADAPTER, dict(RAND_ADAPTER, name="Log")]))
+        self.assertIn('"adapters": [\n    {"interface": "services", "from_major": 1, "name": "Rand", "args": [0], "result": "pass"},\n', text)
+        self.assertEqual(json.loads(text)["adapters"][1]["name"], "Log")
 
 
 if __name__ == "__main__":

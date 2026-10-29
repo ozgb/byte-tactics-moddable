@@ -10,9 +10,72 @@
   "stack_size": 4096,
   "window": 65536,
   "table_slots": 32,
+  "majors": {
+    "ai": 2,
+    "economy": 1,
+    "features": 2,
+    "files": 1,
+    "host": 2,
+    "los_radar": 1,
+    "map": 3,
+    "orders": 1,
+    "pathfinding": 1,
+    "players": 1,
+    "rand_stream": 1,
+    "ref": 2,
+    "services": 1,
+    "targeting": 1,
+    "units": 1,
+    "weapons": 1,
+    "wind_meteors": 1
+  },
+  "signatures": {
+    "services": {
+      "GameRand": [["int"], "int"],
+      "RandomInt": [["int"], "int"],
+      "FatalError": [["linear"], "void"],
+      "BuildDataPath": [["linear", "linear", "linear", "linear"], "linear"],
+      "TdfFile_Construct": [["linear"], "void"],
+      "TdfFile_Destruct": [["linear"], "void"],
+      "TdfFile_LoadFile": [["linear", "linear"], "int"],
+      "TdfFile_SelectRecord": [["linear", "linear"], "int"],
+      "TdfRecord_GetFieldInt": [["handle", "linear", "int"], "int"],
+      "TdfRecord_GetFieldDouble": [["handle", "linear", "f64"], "f64"],
+      "TdfRecord_GetFieldString": [["handle", "linear", "linear", "int", "linear"], "int"],
+      "CommandArgs_GetIntArg": [["scratch", "int", "int"], "int"],
+      "HapiBank_OpenAccount": [["handle", "linear"], "int"],
+      "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
+      "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"]
+    },
+    "weapons": {
+      "SpawnProjectile": [["block", "linear", "linear", "int"], "int"],
+      "FindWeaponByName": [["linear"], "block"]
+    },
+    "wind_meteors": {
+      "UpdateWind": [[], "void"],
+      "UpdateMeteors": [[], "void"],
+      "InitMeteors": [[], "void"],
+      "EmptyShutdownPreCleanup": [[], "void"],
+      "EnableMeteors": [[], "void"],
+      "DisableMeteors": [[], "void"],
+      "SetMeteorParams": [["linear"], "void"],
+      "LoadMeteorDefaults": [["linear"], "void"],
+      "SaveMeteors": [["handle"], "void"],
+      "LoadMeteors": [["handle"], "void"],
+      "CmdMeteor": [["scratch"], "void"],
+      "UpdateWindOnStream": [["int"], "void"]
+    }
+  },
+  "adapters": [],
   "modules": [
     {
       "name": "wind_meteors",
+      "interface": "wind_meteors",
+      "majors": {
+        "wind_meteors": 1,
+        "weapons": 1,
+        "services": 1
+      },
       "fuel_budget": 250,
       "size_budget": 13100,
       "data_base": 196608,

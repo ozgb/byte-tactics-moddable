@@ -34,6 +34,7 @@ typedef struct wl_config {
     wl_close_fn close;
     wl_trap_fn on_trap;
     void* trap_user;
+    const char* target;
 } wl_config;
 
 typedef struct wl_layout {

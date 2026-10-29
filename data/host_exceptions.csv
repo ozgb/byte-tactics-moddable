@@ -430,4 +430,3 @@ src/weapons/weapons.cpp,src/graphics/object_pool.h,#392
 src/weapons/weapons.cpp,src/graphics/particles.h,#392
 src/weapons/weapons.cpp,src/ingame/control_panel.h,#392
 src/weapons/weapons.cpp,src/sound/sound.h,#392
-tests/wasm/host/host.c,windows.h,#564

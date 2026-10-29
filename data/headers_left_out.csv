@@ -90,6 +90,7 @@ EmitSmoke,mismatch,"static risk rule: a convention, parameter count, or non-poin
 EmitTeleportParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 EmitWhiteSmoke,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 EmptyPostArchiveMountHook,mismatch,pointer/int cast: definition's type is likely wrong
+ExceptionFilter,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ExecuteCommandLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FillMissionList,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FillPolygon,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

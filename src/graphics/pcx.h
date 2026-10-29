@@ -21,6 +21,4 @@ void __stdcall RelocateObject(int delta, Object3doLoadView* node);
 void __stdcall AddObjectBounds(Object3doLoadView* obj, Vec3* offset, Vec3* lo, Vec3* hi, int arg);
 int __stdcall SaveBmp(char* name, PcxBitmap* image);
 
-int __stdcall ExceptionFilter(int exception, int thread);
-
 #endif

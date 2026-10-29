@@ -166,7 +166,7 @@ void __stdcall BlitMenuLayers(Main2Menu* menu, int a, int b);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
 char* __stdcall Translate(char* s);
 
-#include "../graphics/pcx.h"
+int __stdcall ExceptionFilter(EXCEPTION_POINTERS* exception, const char* thread);
 #include "../ingame/build_placement.h"
 #include "../frontend/options.h"
 #include "../frontend/frontend.h"
@@ -461,7 +461,7 @@ void __cdecl LoadThreadMain(void* param)
 {
     __try {
         LoadMatch(param);
-    } __except (ExceptionFilter((int)GetExceptionInformation(), (int)"Load Thread")) {
+    } __except (ExceptionFilter(GetExceptionInformation(), "Load Thread")) {
     }
 }
 

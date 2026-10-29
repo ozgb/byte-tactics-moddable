@@ -67,6 +67,13 @@ class InterfaceTests(unittest.TestCase):
         imports = [("env", "memory"), ("env", "__indirect_function_table"), ("wasi_snapshot_preview1", "clock_time_get")]
         self.assertTrue(wm.check_interface("m", imports, GOOD_EXPORTS, spec))
 
+    def test_listed_global_passes_and_unlisted_global_fails(self):
+        spec = dict(SPEC, globals=["__sim_base"])
+        imports = GOOD_IMPORTS + [("env", "__sim_base")]
+        self.assertEqual(wm.check_interface("m", imports, GOOD_EXPORTS, spec), [])
+        self.assertTrue(wm.check_interface("m", imports, GOOD_EXPORTS, SPEC))
+        self.assertTrue(wm.check_interface("m", GOOD_IMPORTS, GOOD_EXPORTS, spec))
+
     def test_unlisted_import_fails(self):
         problems = wm.check_interface("m", GOOD_IMPORTS + [("services", "ClockNow")], GOOD_EXPORTS, SPEC)
         self.assertEqual(len(problems), 1)

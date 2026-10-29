@@ -2,7 +2,7 @@
 #define INTERFACES_REF_H
 
 // Major version of the Ref interface, changed when the stored representation changes.
-#define REF_VERSION_MAJOR 1
+#define REF_VERSION_MAJOR 2
 // Minor version of the Ref interface, changed when a member is added.
 #define REF_VERSION_MINOR 0
 
@@ -34,11 +34,24 @@ inline void RefOutsideBlock(const char* signature)
 #else
 #define REF_SIGNATURE "Ref<T>"
 #endif
+#else
+// The block base, an address in the module's memory: the immutable i32 global env.__sim_base the loader sets.
+static inline unsigned int RefSimBase()
+{
+    unsigned int base;
+    __asm__(".globaltype __sim_base, i32, immutable\n"
+            ".import_module __sim_base, env\n"
+            ".import_name __sim_base, __sim_base\n"
+            "global.get __sim_base\n"
+            "local.set %0"
+            : "=r"(base));
+    return base;
+}
 #endif
 
 #pragma pack(push, 4)
 
-// A reference to a T in the state block: a 4-byte offset from the block base (0 is null) natively, a plain pointer on wasm32.
+// A reference to a T in the state block: a 4-byte offset from the block base (0 is null), on both sides.
 template <class T>
 struct Ref {
 #if !defined(__wasm32__)
@@ -63,21 +76,21 @@ struct Ref {
     // True when they refer to different objects.
     friend bool operator!=(const Ref& a, const Ref& b) { return a.offset != b.offset; }
 #else
-    T* ptr;
+    unsigned int offset;
 
-    // Leaves the pointer unset, so a Ref in zeroed or aggregate-initialised memory stays trivial.
+    // Leaves the offset unset, so a Ref in zeroed or aggregate-initialised memory stays trivial.
     Ref() = default;
-    // Stores p.
-    Ref(T* p) : ptr(p) {}
+    // Stores p as an offset from the block base.
+    Ref(T* p) : offset(p == 0 ? 0u : (unsigned int)p - RefSimBase()) {}
 
     // The referenced object, or null.
-    T* get() const { return ptr; }
+    T* get() const { return offset == 0 ? (T*)0 : (T*)(RefSimBase() + offset); }
     // True unless null.
-    explicit operator bool() const { return ptr != 0; }
+    explicit operator bool() const { return offset != 0; }
     // True when both refer to the same object.
-    friend bool operator==(const Ref& a, const Ref& b) { return a.ptr == b.ptr; }
+    friend bool operator==(const Ref& a, const Ref& b) { return a.offset == b.offset; }
     // True when they refer to different objects.
-    friend bool operator!=(const Ref& a, const Ref& b) { return a.ptr != b.ptr; }
+    friend bool operator!=(const Ref& a, const Ref& b) { return a.offset != b.offset; }
 #endif
 
     // The referenced object as a plain pointer, or null.
@@ -99,9 +112,7 @@ struct Ref {
 
 #pragma pack(pop)
 
-#if !defined(__wasm32__)
 static_assert(sizeof(Ref<int>) == 4, "a Ref is one 4-byte offset");
 static_assert(__alignof(Ref<int>) == 4, "a Ref is aligned to 4 bytes");
-#endif
 
 #endif

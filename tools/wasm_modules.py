@@ -28,7 +28,7 @@ leave the module's table range.
 imports reads each built module's import and export sections with the pinned wasm-tools (found in
 build/tools/bin, install it with `cargo install wasm-tools --version <pin> --locked --root
 build/tools`, or on PATH). A game-logic module may import only env.memory, env.__indirect_function_table,
-the interface imports and engine services its manifest lists, and no WASI, clock, random, file or
+the imported globals (env.__sim_base, the block base the loader sets), the interface imports and engine services its manifest lists, and no WASI, clock, random, file or
 network import; it must export exactly the manifest's slots and the data the loader fills.
 """
 
@@ -367,6 +367,7 @@ def check_interface(name, imports, exports, spec):
     """Reasons a module's imports or exports are outside its allowlist; imports and exports are lists of names (module, name) and name."""
     problems = []
     allowed = set(ENV_IMPORTS)
+    allowed |= {("env", n) for n in spec.get("globals", [])}
     for module, names in spec.get("imports", {}).items():
         if module.startswith("wasi") or module == "env":
             problems.append(f"{name}: the manifest lists imports from {module}")
@@ -394,7 +395,7 @@ def module_interface(wasm_tools, path):
 def run_imports():
     game = game_manifest()
     wasm_tools = find_wasm_tools(game["tools"]["wasm-tools"])
-    specs = {m["name"]: {"imports": m["imports"], "exports": m["exports"] + m["data"]} for m in game["modules"]}
+    specs = {m["name"]: {"imports": m["imports"], "exports": m["exports"] + m["data"], "globals": m.get("globals", [])} for m in game["modules"]}
     for entry in manifest()["modules"]:
         specs[entry["name"]] = {"imports": {}, "exports": FIXTURE_EXPORTS}
     failures = []

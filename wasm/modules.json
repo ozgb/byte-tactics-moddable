@@ -18,6 +18,7 @@
       "exports": ["UpdateWind", "UpdateMeteors", "InitMeteors", "EmptyShutdownPreCleanup", "EnableMeteors", "DisableMeteors",
                   "SetMeteorParams", "LoadMeteorDefaults", "SaveMeteors", "LoadMeteors", "CmdMeteor", "UpdateWindOnStream"],
       "data": ["g_game", "g_simGlobals", "g_extTdf"],
+      "globals": ["__sim_base"],
       "imports": {
         "weapons": ["SpawnProjectile", "FindWeaponByName"],
         "services": ["GameRand", "RandomInt", "FatalError", "BuildDataPath",

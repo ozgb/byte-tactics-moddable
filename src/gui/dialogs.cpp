@@ -83,7 +83,7 @@ struct AddBarGadgetEntry {
 
 #pragma pack(pop)
 
-extern int* g_guiContext;
+extern Font** g_guiContext;
 
 #include "../graphics/draw.h"
 #include "../graphics/palette.h"
@@ -96,7 +96,6 @@ extern void __cdecl ShowSoftwareCursor(void);
 extern void __stdcall SelectAdjacentGadget(Gui* menu, int value);
 extern void __stdcall TrySetFocus(Gui* menu, int value);
 extern void __stdcall SetTextColors(int a, int b);
-extern void __stdcall SetFont(int a);
 #include "keyboard.h"
 #include "dialogs.h"
 
@@ -299,7 +298,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
                 continue;
             }
             if (i == base[1].tab) {
-                SetFont(*(int*)((char*)&base[j] + 0xd6));
+                SetFont(base[j].u.list.language);
                 break;
             }
             i++;
@@ -777,7 +776,7 @@ void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int flag);
 void __stdcall SetKeyboardInput(Gui* menu, int flag);
 void __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
-int __stdcall GetTextWidth(int font, unsigned char* text);
+int __stdcall GetTextWidth(Font* font, unsigned char* text);
 
 struct FileHandle;
 

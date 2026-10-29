@@ -14,11 +14,6 @@ session_14,0x14,game-region,sim,platform,sim: a phase writes it (weak writes onl
 session_14_1,0x14,game-region,sim,platform,sim: a phase writes it (weak writes only),0|1|2|4|5|7|8,0|1|2|4|5|7|8,r,yes,21:AddNetPlayer?|BroadcastPacket?|RemovePlayer?,21:AddNetPlayer|BroadcastPacket|RemovePlayer,Added by game.h (#211); class from the old region session.
 pad_15,0x15,game-region,,platform,"none: unknown range, no access found",,,,,,,Added by game.h (#211); class from the old region session.
 pad_18,0x18,game-region,,platform,"none: unknown range, no access found",,,,,,,"Inside the HAPINET session object. The tool's DrawString/DrawOutlinedString reads are junk: font.cpp declares its own struct Game for the GetDisplay() object, not g_game."
-font,0x204,game-region,,platform,none: no access found,,,,,,,Added by game.h (#211); class from the old region unknown_18.
-colour1,0x208,game-region,,platform,none: no access found,,,,,,,Added by game.h (#211); class from the old region unknown_18.
-colour2,0x20c,game-region,,platform,none: no access found,,,,,,,Added by game.h (#211); class from the old region unknown_18.
-colour3,0x210,game-region,,platform,none: no access found,,,,,,,Added by game.h (#211); class from the old region unknown_18.
-pad_214,0x214,game-region,,platform,"none: unknown range, no access found",,,,,,,Added by game.h (#211); class from the old region unknown_18.
 guids,0x445,game-region,view,platform,"view: only presentation reads it, nothing writes it",,,r,,,1:SelectConnection,"DirectPlay connection GUID list, read by SelectConnection."
 pad_449,0x449,game-region,,platform,"none: unknown range, no access found",,,,,,,Untouched; inside the session/lobby block (neighbours are the GUID list and net settings).
 settings,0x471,game-region,sim,platform,sim: a phase writes it,0,0,,yes,1:HandleNetPackets,1:HandleNetPackets,"Lobby game-info block (Settings, 0x50): host broadcasts it by packet 0x104 (net_game.cpp) and HandleBattleRoomClick edits slot counts (multi.cpp); no tick code reads it, so not sim. Hand to the net layer."

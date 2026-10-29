@@ -3,6 +3,7 @@
 
 #pragma pack(push, 1)
 
+struct Font;
 struct GafEntry;
 struct GafFrame;
 struct Gui;
@@ -61,7 +62,7 @@ struct Gadget {
                 UnitRestrictEntry* restrictions;
             };
             union {
-                int language;
+                Font* language;
                 void* filebuf;
                 char* flags;
             };

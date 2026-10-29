@@ -1306,18 +1306,18 @@ int GetTextBackColor()
 
 
 // FUNCTION: 0x4c1420
-void __stdcall SetFont(int param_1)
+void __stdcall SetFont(Font* font)
 {
-    if (param_1 != 0) {
-        GetDisplay()->font = (Font*)param_1;
+    if (font != nullptr) {
+        GetDisplay()->font = font;
     }
 }
 
 
 // FUNCTION: 0x4c1440
-int GetFont()
+Font* GetFont()
 {
-    return (int)GetDisplay()->font;
+    return GetDisplay()->font;
 }
 
 

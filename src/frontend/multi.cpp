@@ -398,12 +398,6 @@ struct LogoSelectLayout {
     LogoAnimSeq* seqs;
 };
 
-struct LogoSelectClickLayout {
-    char unknown_0[0x18];
-    void* ptrList;
-    void* seqs;
-};
-
 #include "../../include/display_mode.h"
 
 struct ModeList {
@@ -1553,7 +1547,7 @@ void __stdcall CacheLogosGadgetIndex(Gui* param1, Gadget* param2)
 void __stdcall HandleLogoSelectClick(Gui* param_1)
 {
     Gadget* entries = param_1->layer->entries;
-    LogoSelectClickLayout* layout = (LogoSelectClickLayout*)param_1->layer->data;
+    LogoSelectLayout* layout = (LogoSelectLayout*)param_1->layer->data;
 
     if (param_1->hotGadgetIndex == -1) {
         GameFreeThunk(layout->seqs);
@@ -1565,7 +1559,7 @@ void __stdcall HandleLogoSelectClick(Gui* param_1)
     if (IsCurrentGadgetNamed((Dialog *)param_1, "LOGOS") || IsCurrentGadgetNamed((Dialog *)param_1, "SELECT")) {
         Player* player = &g_game->players[g_game->localPlayer];
         Gadget* entry = FindGadgetChecked(entries, "LOGOS");
-        player->info->color = ((char*)layout)[(unsigned char)entry->u.list.selected];
+        player->info->color = layout->selected[(unsigned char)entry->u.list.selected];
         g_game->bits_2bee_1.dirty = 1;
         RequestPlayerColor(player->info->color);
         return;
@@ -1774,7 +1768,7 @@ void OpenLogoSelectDialog()
         layout->seqs[j].frame = ((LogoTable *)g_game->logos32)->entries[j].ptr;
         if (k == 10 && (!g_quirks.boundLogoSelect || n < (int)sizeof(layout->selected))) {
             *cursor = &layout->seqs[j];
-            ((char*)layout)[n] = (char)j;
+            layout->selected[n] = (char)j;
             n++;
             cursor++;
         }

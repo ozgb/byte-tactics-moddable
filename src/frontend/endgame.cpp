@@ -826,7 +826,7 @@ void __stdcall RunEndGameState()
         SetUpEndMissionScreen();
         int next=g_seams.map->MissionExists(g_game->net, 0, g_game->mission+1);
         if(g_seams.map->GetGameType(g_game->net)==1 && g_game->bits_3923b_2.bit4_3923b && !next && !g_game->skip) {
-            if((unsigned char)GetDisplay()->flags.bits.flag1) {
+            if((unsigned char)GetDisplay()->flags.bits.fullscreen) {
                 if(!g_game->players[0].info->side) SetFrontendState(4,0x4ce,"c:\\cavedog\\wargame\\endgame.cpp");
                 else SetFrontendState(5,0x4d3,"c:\\cavedog\\wargame\\endgame.cpp");
             } else SetFrontendState(2,0x4d9,"c:\\cavedog\\wargame\\endgame.cpp");

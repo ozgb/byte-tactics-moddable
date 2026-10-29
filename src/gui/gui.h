@@ -17,6 +17,7 @@ struct Gadget;
 struct Rect;
 
 struct FileRequester;
+struct Font;
 struct FontGlyphTable;
 struct Dialog;
 struct RedrawGadgetRectDialog;
@@ -88,7 +89,7 @@ struct Dialog {
 };
 
 struct Gui {
-    int font;
+    Font* font;
     void* gaf;
     void* values[3];
     void* language;
@@ -210,7 +211,7 @@ void __stdcall SelectGadgetByIndex(Gui* menu, int index);
 int __stdcall RenderLayer(Gui* menu, unsigned int flags);
 void __stdcall CloseTopScreen(Gui* gui);
 void __stdcall SetCurrentGuiContext(Gui* ctx);
-void __stdcall SetDefaultFont(int*, int);
+void __stdcall SetDefaultFont(Font**, Font*);
 
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 

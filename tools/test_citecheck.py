@@ -40,7 +40,7 @@ class CiteCheckTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = tree(tmp, "Foo (foo.cpp)")
             with open(root / "data" / "type_dupes.csv", "w", newline="") as f:
-                csv.writer(f).writerows([["name", "files"], ["T", "include/ta_types.h:4465|src/a.cpp:18"]])
+                csv.writer(f).writerows([["name", "files"], ["T", "src/units/unit_types.h:4465|src/a.cpp:18"]])
             self.assertEqual(citecheck.check(root), [])
 
     def test_the_repository_passes(self):

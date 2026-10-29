@@ -44,6 +44,15 @@ void GonzoAtexitHandler(void)
 }
 
 #include "debug_lib.h"
+#include <memory>
+
+class FreeBlockMap;
+template <class T, class A = std::allocator<T> >
+class FreedBlockRing;
+
+static unsigned int __cdecl AllocDebugBlock(unsigned int n, unsigned int arg2);
+static void __cdecl FreeDebugBlock(void* p, int flags);
+static FreeBlockMap* __stdcall GetFreeBlockSet();
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4d8200
@@ -638,7 +647,7 @@ inline BlockMapInitView::BlockMapInitView(const char& a, const char& b)
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4da8d0
-void* GetBlockMap()
+static void* GetBlockMap()
 {
     if (g_blockMap == 0) {
         char s0, s1;
@@ -704,7 +713,7 @@ extern FreedBlockRing<int>* g_freedBlockRing;
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4da9f0
-FreedBlockRing<int>* GetFreedBlockRing()
+static FreedBlockRing<int>* GetFreedBlockRing()
 {
     if (g_freedBlockRing == 0) {
         g_freedBlockRing = new FreedBlockRing<int>;
@@ -2324,7 +2333,7 @@ int StringMaxSize(void)
 #include "../data/exe_only.h"
 
 // FUNCTION: 0x4d8310
-void __cdecl CheckFillPattern(unsigned int* block, unsigned int fill, unsigned int size)
+static void __cdecl CheckFillPattern(unsigned int* block, unsigned int fill, unsigned int size)
 {
     unsigned int* p = block;
     while (size >= 4) {
@@ -2361,7 +2370,7 @@ void __cdecl InitDebugSupport(unsigned int flags)
 }
 
 // FUNCTION: 0x4dacf0
-unsigned int __cdecl AllocDebugBlock(unsigned int n, unsigned int arg2)
+static unsigned int __cdecl AllocDebugBlock(unsigned int n, unsigned int arg2)
 {
     void* lock = GetAllocLock();
     host_mutex_lock(lock);
@@ -2446,7 +2455,7 @@ FreeBlockMap::FreeBlockMap() : total(0)
 }
 
 // FUNCTION: 0x4db610
-FreeBlockMap* __stdcall GetFreeBlockSet()
+static FreeBlockMap* __stdcall GetFreeBlockSet()
 {
     if (g_freeBlockSet == nullptr)
         g_freeBlockSet = new FreeBlockMap;
@@ -2454,7 +2463,7 @@ FreeBlockMap* __stdcall GetFreeBlockSet()
 }
 
 // FUNCTION: 0x4db7d0
-void __cdecl FreeDebugBlock(void* p, int flags)
+static void __cdecl FreeDebugBlock(void* p, int flags)
 {
     if (p == nullptr)
         return;

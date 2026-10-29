@@ -36,6 +36,54 @@ const char* ImportError(const char* import, const char* what)
     return s_error;
 }
 
+const unsigned kHandleCapacity = 32;
+void* s_handles[kHandleCapacity];
+unsigned s_handleCount;
+int s_slotDepth;
+
+unsigned HandleOf(void* native)
+{
+    if (native == nullptr)
+        return 0;
+    for (unsigned i = 0; i < s_handleCount; i++)
+        if (s_handles[i] == native)
+            return i + 1;
+    if (s_handleCount == kHandleCapacity)
+        ModulesFatal("wind_meteors: the handle table is full");
+    s_handles[s_handleCount] = native;
+    return ++s_handleCount;
+}
+
+const char* NativeOf(const char* import, unsigned handle, void** native)
+{
+    if (handle > s_handleCount) {
+        sprintf(s_error, "import %s: unknown handle %u", import, handle);
+        return s_error;
+    }
+    *native = handle == 0 ? nullptr : s_handles[handle - 1];
+    return nullptr;
+}
+
+const char* FileToNative(const char* import, TdfFile* file)
+{
+    void* root;
+    void* current;
+    const char* error = NativeOf(import, (unsigned)file->root, &root);
+    if (error == nullptr)
+        error = NativeOf(import, (unsigned)file->current, &current);
+    if (error != nullptr)
+        return error;
+    file->root = (TdfRecord*)root;
+    file->current = (TdfRecord*)current;
+    return nullptr;
+}
+
+void FileToHandles(TdfFile* file)
+{
+    file->root = (TdfRecord*)HandleOf(file->root);
+    file->current = (TdfRecord*)HandleOf(file->current);
+}
+
 int InMemory(unsigned p)
 {
     return p < ModulesMemory()->size;
@@ -99,7 +147,12 @@ IMPORT(TdfFileDestructImport)
 {
     (void)user;
     NEED("TdfFile_Destruct", 0);
-    ((TdfFile*)Linear(a[0].i32))->~TdfFile();
+    TdfFile* file = (TdfFile*)Linear(a[0].i32);
+    const char* error = FileToNative("TdfFile_Destruct", file);
+    if (error != nullptr)
+        return error;
+    file->~TdfFile();
+    FileToHandles(file);
     return nullptr;
 }
 
@@ -108,7 +161,12 @@ IMPORT(TdfFileLoadFileImport)
     (void)user;
     NEED("TdfFile_LoadFile", 0);
     NEED("TdfFile_LoadFile", 1);
-    a[0].i32 = ((TdfFile*)Linear(a[0].i32))->LoadFile((char*)Linear(a[1].i32));
+    TdfFile* file = (TdfFile*)Linear(a[0].i32);
+    const char* error = FileToNative("TdfFile_LoadFile", file);
+    if (error != nullptr)
+        return error;
+    a[0].i32 = file->LoadFile((char*)Linear(a[1].i32));
+    FileToHandles(file);
     return nullptr;
 }
 
@@ -117,7 +175,12 @@ IMPORT(TdfFileSelectRecordImport)
     (void)user;
     NEED("TdfFile_SelectRecord", 0);
     NEED("TdfFile_SelectRecord", 1);
-    a[0].i32 = ((TdfFile*)Linear(a[0].i32))->SelectRecord((char*)Linear(a[1].i32));
+    TdfFile* file = (TdfFile*)Linear(a[0].i32);
+    const char* error = FileToNative("TdfFile_SelectRecord", file);
+    if (error != nullptr)
+        return error;
+    a[0].i32 = file->SelectRecord((char*)Linear(a[1].i32));
+    FileToHandles(file);
     return nullptr;
 }
 
@@ -125,7 +188,11 @@ IMPORT(TdfRecordGetFieldIntImport)
 {
     (void)user;
     NEED("TdfRecord_GetFieldInt", 1);
-    a[0].i32 = ((TdfRecord*)(unsigned)a[0].i32)->GetFieldInt((const char*)Linear(a[1].i32), a[2].i32);
+    void* record;
+    const char* error = NativeOf("TdfRecord_GetFieldInt", (unsigned)a[0].i32, &record);
+    if (error != nullptr)
+        return error;
+    a[0].i32 = ((TdfRecord*)record)->GetFieldInt((const char*)Linear(a[1].i32), a[2].i32);
     return nullptr;
 }
 
@@ -133,7 +200,11 @@ IMPORT(TdfRecordGetFieldDoubleImport)
 {
     (void)user;
     NEED("TdfRecord_GetFieldDouble", 1);
-    a[0].f64 = ((TdfRecord*)(unsigned)a[0].i32)->GetFieldDouble((const char*)Linear(a[1].i32), a[2].f64);
+    void* record;
+    const char* error = NativeOf("TdfRecord_GetFieldDouble", (unsigned)a[0].i32, &record);
+    if (error != nullptr)
+        return error;
+    a[0].f64 = ((TdfRecord*)record)->GetFieldDouble((const char*)Linear(a[1].i32), a[2].f64);
     return nullptr;
 }
 
@@ -143,7 +214,11 @@ IMPORT(TdfRecordGetFieldStringImport)
     NEED("TdfRecord_GetFieldString", 1);
     NEED("TdfRecord_GetFieldString", 2);
     NEED("TdfRecord_GetFieldString", 4);
-    a[0].i32 = ((TdfRecord*)(unsigned)a[0].i32)->GetFieldString((char*)Linear(a[1].i32), (char*)Linear(a[2].i32), (size_t)(unsigned)a[3].i32, (char*)Linear(a[4].i32));
+    void* record;
+    const char* error = NativeOf("TdfRecord_GetFieldString", (unsigned)a[0].i32, &record);
+    if (error != nullptr)
+        return error;
+    a[0].i32 = ((TdfRecord*)record)->GetFieldString((char*)Linear(a[1].i32), (char*)Linear(a[2].i32), (size_t)(unsigned)a[3].i32, (char*)Linear(a[4].i32));
     return nullptr;
 }
 
@@ -159,7 +234,11 @@ IMPORT(HapiBankOpenAccountImport)
 {
     (void)user;
     NEED("HapiBank_OpenAccount", 1);
-    a[0].i32 = ((HapiBank*)(unsigned)a[0].i32)->OpenAccount((char*)Linear(a[1].i32));
+    void* bank;
+    const char* error = NativeOf("HapiBank_OpenAccount", (unsigned)a[0].i32, &bank);
+    if (error != nullptr)
+        return error;
+    a[0].i32 = ((HapiBank*)bank)->OpenAccount((char*)Linear(a[1].i32));
     return nullptr;
 }
 
@@ -167,7 +246,11 @@ IMPORT(HapiBankSetIntegerItemImport)
 {
     (void)user;
     NEED("HapiBank_SetIntegerItem", 1);
-    a[0].i32 = ((HapiBank*)(unsigned)a[0].i32)->SetIntegerItem((const char*)Linear(a[1].i32), a[2].i32);
+    void* bank;
+    const char* error = NativeOf("HapiBank_SetIntegerItem", (unsigned)a[0].i32, &bank);
+    if (error != nullptr)
+        return error;
+    a[0].i32 = ((HapiBank*)bank)->SetIntegerItem((const char*)Linear(a[1].i32), a[2].i32);
     return nullptr;
 }
 
@@ -175,7 +258,11 @@ IMPORT(HapiBankGetIntegerItemImport)
 {
     (void)user;
     NEED("HapiBank_GetIntegerItem", 1);
-    a[0].i32 = ((HapiBank*)(unsigned)a[0].i32)->GetIntegerItem((char*)Linear(a[1].i32), a[2].i32);
+    void* bank;
+    const char* error = NativeOf("HapiBank_GetIntegerItem", (unsigned)a[0].i32, &bank);
+    if (error != nullptr)
+        return error;
+    a[0].i32 = ((HapiBank*)bank)->GetIntegerItem((char*)Linear(a[1].i32), a[2].i32);
     return nullptr;
 }
 
@@ -252,6 +339,7 @@ wasmtime_func_t s_slots[SLOT_COUNT];
 unsigned s_gameAddress;
 unsigned s_simAddress;
 unsigned s_extTdfAddress;
+unsigned s_blockBaseAddress;
 
 void Stop(Slot slot, const char* what)
 {
@@ -272,12 +360,17 @@ void Prepare(Slot slot)
     memcpy(ModulesMemory()->base + s_gameAddress, &game, 4);
     memcpy(ModulesMemory()->base + s_simAddress, &sims, 4);
     memcpy(ModulesMemory()->base + s_extTdfAddress, g_extTdf, 4);
+    unsigned blockBase = (unsigned)((unsigned char*)SimBlockBase() - ModulesMemory()->base);
+    memcpy(ModulesMemory()->base + s_blockBaseAddress, &blockBase, 4);
 }
 
 void Call(Slot slot, wasmtime_val_raw_t* a, size_t count)
 {
     Prepare(slot);
+    s_slotDepth++;
     wl_call(s_loader, s_module, &s_slots[slot], a, count);
+    if (--s_slotDepth == 0)
+        s_handleCount = 0;
 }
 
 void Call0(Slot slot)
@@ -339,7 +432,6 @@ void __stdcall DisableMeteorsThunk()
 {
     Call0(SLOT_DISABLE_METEORS);
 }
-unsigned s_blockBaseAddress;
 
 void __stdcall SetMeteorParamsThunk(MeteorParams* params)
 {
@@ -356,14 +448,12 @@ void __fastcall LoadMeteorDefaultsThunk(MeteorParams* params)
 
 void __stdcall SaveMeteorsThunk(HapiBank* file)
 {
-    Call1(SLOT_SAVE_METEORS, (unsigned)file);
+    Call1(SLOT_SAVE_METEORS, HandleOf(file));
 }
 
 void __stdcall LoadMeteorsThunk(HapiBank* file)
-    unsigned blockBase = (unsigned)((unsigned char*)SimBlockBase() - ModulesMemory()->base);
-    memcpy(ModulesMemory()->base + s_blockBaseAddress, &blockBase, 4);
 {
-    Call1(SLOT_LOAD_METEORS, (unsigned)file);
+    Call1(SLOT_LOAD_METEORS, HandleOf(file));
 }
 
 void __stdcall CmdMeteorThunk(CommandArgs* args)
@@ -406,6 +496,8 @@ int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module)
             s_simAddress = wl_data_address(module, i);
         else if (strcmp(name, "g_extTdf") == 0)
             s_extTdfAddress = wl_data_address(module, i);
+        else if (strcmp(name, "g_blockBase") == 0)
+            s_blockBaseAddress = wl_data_address(module, i);
     }
     if (s_gameAddress == 0 || s_simAddress == 0 || s_extTdfAddress == 0 || s_blockBaseAddress == 0)
         return 0;
@@ -437,5 +529,3 @@ void __stdcall WindMeteorsDataRanges(unsigned* addresses, unsigned* count)
     addresses[3] = s_blockBaseAddress;
     *count = 4;
 }
-        else if (strcmp(name, "g_blockBase") == 0)
-            s_blockBaseAddress = wl_data_address(module, i);

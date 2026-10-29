@@ -115,30 +115,7 @@ extern "C" __declspec(dllimport) SmackBufferView *__stdcall SmackBufferOpen(HWND
 extern "C" __declspec(dllimport) void __stdcall SmackBufferNewPalette(SmackBufferView *smk, unsigned char *rgb, unsigned short flag);
 extern "C" __declspec(dllimport) void __stdcall SmackColorRemap(SmackHandleView *smk, DWORD *palette, DWORD paletteColors, DWORD paletteType);
 
-struct SmackerSurface;
-
-class MoviePlayer {
-public:
-    SmackHandleView* smack;
-    unsigned int frame;
-    int stopped;
-    HWND hwnd;
-    PALETTEENTRY entries[256];
-    int paletteResult;
-    int hasSurfaces;
-    char unknown_418[0x5b4 - 0x418];
-    char pad_5b4[4];
-
-    MoviePlayer(char* path, int a, int b, int c, int d, int e);
-    void UpdatePalette(void);
-    void ClearScreen();
-    void PlayFrame(HWND hwnd);
-    void WriteSmackStats();
-    void Play();
-    void Close();
-    int SetupDirectDraw();
-    int GetBlitMode(SmackerSurface* unused);
-};
+#include "movies.h"
 
 static_assert(sizeof(MoviePlayer) == 0x5b8, "MoviePlayer size");
 

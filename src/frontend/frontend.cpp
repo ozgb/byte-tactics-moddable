@@ -23,13 +23,7 @@ public:
 
 #include "../network/player.h"
 
-class MoviePlayer {
-public:
-    char pad[0x5b8];
-    MoviePlayer(char* path, int a, int b, int c, int d, int e);
-    void Play();
-    void Close();
-};
+#include "../graphics/movies.h"
 
 #pragma pack(push, 1)
 #include "../network/player_info.h"

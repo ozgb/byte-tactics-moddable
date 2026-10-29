@@ -9,6 +9,8 @@ struct PcxImage {
 };
 
 #include "../files/files_api.h"
+#include "object3do.h"
+#include "piece_frame.h"
 #include "../debug/debug_lib.h"
 
 static inline void FUN_row(void* file, unsigned char* p, int x)
@@ -379,36 +381,8 @@ int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
     return WritePcx(filename, bitmap->data, bitmap->width, bitmap->height, pal);
 }
 
-struct Object3doPrimitive {
-    int colorIndex;
-    int count;
-    int always0;
-    union {
-        int ptr_c;
-        unsigned short* indices;
-    };
-    int ptr_10;
-    int unknown_14[3];
-};
-
-struct Object3doLoadView {
-    int version;
-    int vertexCount;
-    int count;
-    int index;
-    int x;
-    int y;
-    int z;
-    int name;
-    int always0;
-    Vec3* vertices;
-    Object3doPrimitive* elems;
-    Object3doLoadView* sibling;
-    Object3doLoadView* child;
-};
-
 // FUNCTION: 0x4cb2f0
-int __stdcall AveragePrimitiveY(Object3doLoadView* table, Object3doPrimitive* list)
+int __stdcall AveragePrimitiveY(Object3do* table, PieceFrame* list)
 {
     int sum = 0;
     int n = list->count;
@@ -420,43 +394,43 @@ int __stdcall AveragePrimitiveY(Object3doLoadView* table, Object3doPrimitive* li
 }
 
 // FUNCTION: 0x4cb330
-void __stdcall SwapPrimitives(Object3doPrimitive* a, Object3doPrimitive* b)
+void __stdcall SwapPrimitives(PieceFrame* a, PieceFrame* b)
 {
-    Object3doPrimitive tmp = *a;
+    PieceFrame tmp = *a;
     *a = *b;
     *b = tmp;
 }
 
 // FUNCTION: 0x4cb370
-void __stdcall SortPrimitives(Object3doLoadView* node)
+void __stdcall SortPrimitives(Object3do* node)
 {
-    if (node->index != -1 && node->count > 0) {
-        Object3doPrimitive* elems = node->elems;
-        Object3doPrimitive temp = elems[node->index];
-        elems[node->index] = elems[0];
-        elems[0] = temp;
-        node->index = 0;
+    if (node->firstFace != -1 && node->faceCount > 0) {
+        PieceFrame* faces = node->faces;
+        PieceFrame temp = faces[node->firstFace];
+        faces[node->firstFace] = faces[0];
+        faces[0] = temp;
+        node->firstFace = 0;
     }
-    Object3doPrimitive* e;
+    PieceFrame* e;
     int i;
     int swapped;
     do {
         swapped = 0;
-        e = node->elems + 1;
-        for (i = 1; i < node->count - 1; i++, e++) {
+        e = node->faces + 1;
+        for (i = 1; i < node->faceCount - 1; i++, e++) {
             unsigned short* q = e->indices;
             int a = 0;
             for (int k = e->count; k > 0; k--)
                 a += node->vertices[*q++].y;
             a /= e->count;
-            Object3doPrimitive* p = e + 1;
+            PieceFrame* p = e + 1;
             unsigned short* r = p->indices;
             int b = 0;
             for (int j = p->count; j > 0; j--)
                 b += node->vertices[*r++].y;
             b /= p->count;
             if (a > b) {
-                Object3doPrimitive t = *e;
+                PieceFrame t = *e;
                 *e = *p;
                 *p = t;
                 swapped = 1;
@@ -466,27 +440,27 @@ void __stdcall SortPrimitives(Object3doLoadView* node)
 }
 
 // FUNCTION: 0x4cb4c0
-void __stdcall RelocateObject(int delta, Object3doLoadView* node)
+void __stdcall RelocateObject(int delta, Object3do* node)
 {
     if (node->name)
         node->name += delta;
-    if (node->always0)
-        node->always0 += delta;
+    if (node->active)
+        node->active += delta;
     node->vertices = (Vec3*)((char*)node->vertices + delta);
-    node->elems = (Object3doPrimitive*)((char*)node->elems + delta);
+    node->faces = (PieceFrame*)((char*)node->faces + delta);
     if (node->sibling) {
-        node->sibling = (Object3doLoadView*)((char*)node->sibling + delta);
+        node->sibling = (Object3do*)((char*)node->sibling + delta);
         RelocateObject(delta, node->sibling);
     }
     if (node->child) {
-        node->child = (Object3doLoadView*)((char*)node->child + delta);
+        node->child = (Object3do*)((char*)node->child + delta);
         RelocateObject(delta, node->child);
     }
-    Object3doPrimitive* e = node->elems;
-    for (int i = 0; i < node->count; i++, e++) {
-        if (e->always0)
-            e->always0 += delta;
-        e->ptr_c += delta;
+    PieceFrame* e = node->faces;
+    for (int i = 0; i < node->faceCount; i++, e++) {
+        if (e->unknown_8)
+            e->unknown_8 += delta;
+        e->indices = (unsigned short*)((char*)e->indices + delta);
         if (e->ptr_10)
             e->ptr_10 += delta;
     }
@@ -501,19 +475,19 @@ void* __stdcall Load3do(char* param)
     if (result == 0) {
         return 0;
     }
-    RelocateObject((int)result, (Object3doLoadView*)result);
+    RelocateObject((int)result, (Object3do*)result);
     return result;
 }
 
 // FUNCTION: 0x4cb590
-void __stdcall MirrorObject(Object3doLoadView* obj)
+void __stdcall MirrorObject(Object3do* obj)
 {
     for (int i = 0; i < obj->vertexCount; i++) {
         obj->vertices[i].x = -obj->vertices[i].x;
         obj->vertices[i].z = -obj->vertices[i].z;
     }
-    obj->x = -obj->x;
-    obj->z = -obj->z;
+    obj->box_x = -obj->box_x;
+    obj->box_z = -obj->box_z;
     if (obj->sibling)
         MirrorObject(obj->sibling);
     if (obj->child)
@@ -521,17 +495,17 @@ void __stdcall MirrorObject(Object3doLoadView* obj)
 }
 
 // FUNCTION: 0x4cb5f0
-int __stdcall GetObjectHeight(Object3doLoadView* node)
+int __stdcall GetObjectHeight(Object3do* node)
 {
     int best = 0;
     for (; node; node = node->sibling) {
         for (int i = 0; i < node->vertexCount; i++) {
-            int v = node->vertices[i].y + node->y;
+            int v = node->vertices[i].y + node->box_y;
             if (v > best)
                 best = v;
         }
         if (node->child) {
-            int v = GetObjectHeight(node->child) + node->y;
+            int v = GetObjectHeight(node->child) + node->box_y;
             if (v > best)
                 best = v;
         }
@@ -542,7 +516,7 @@ int __stdcall GetObjectHeight(Object3doLoadView* node)
 #include "pcx.h"
 
 // FUNCTION: 0x4cb650
-void __stdcall GetObjectBounds(Object3doLoadView* obj, Vec3* lo,
+void __stdcall GetObjectBounds(Object3do* obj, Vec3* lo,
                             Vec3* hi, int arg)
 {
     Vec3 offset;
@@ -559,13 +533,13 @@ void __stdcall GetObjectBounds(Object3doLoadView* obj, Vec3* lo,
 }
 
 // FUNCTION: 0x4cb6a0
-void __stdcall AddObjectBounds(Object3doLoadView* obj, Vec3* offset,
+void __stdcall AddObjectBounds(Object3do* obj, Vec3* offset,
                             Vec3* lo, Vec3* hi, int arg)
 {
     Vec3 local;
-    local.x = obj->x + offset->x;
-    local.y = offset->y + obj->y;
-    local.z = obj->z + offset->z;
+    local.x = obj->box_x + offset->x;
+    local.y = offset->y + obj->box_y;
+    local.z = obj->box_z + offset->z;
     if (obj->vertexCount > 2) {
         for (int i = 0; i < obj->vertexCount; i++) {
             Vec3* v = &obj->vertices[i];

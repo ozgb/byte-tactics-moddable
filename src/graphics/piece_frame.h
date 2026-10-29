@@ -14,7 +14,8 @@ struct PieceFrame {
     int count;
     int unknown_8;
     unsigned short* indices;
-    char unknown_10[8];
+    int ptr_10;
+    int unknown_14;
     unsigned short* color;
     PieceFrameFlags flags;
 };

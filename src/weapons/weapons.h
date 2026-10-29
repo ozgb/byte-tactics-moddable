@@ -1,5 +1,7 @@
 #ifndef WEAPONS_H
 #define WEAPONS_H
+struct Vec3;
+
 struct Unit;
 struct UnitWeaponSlot;
 
@@ -62,5 +64,7 @@ Projectile* __stdcall FindRemoteProjectile(RemoteFireEventView* ev);
 void __stdcall DrawProjectiles(void* surface);
 
 int __stdcall AimWithinTolerance(Unit* unit, UnitWeaponSlot* aim, short angle1, short angle2);
+
+int __stdcall VectorLength(Vec3* v);
 
 #endif

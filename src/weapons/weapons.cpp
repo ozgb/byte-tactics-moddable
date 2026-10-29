@@ -435,7 +435,6 @@ struct AreaDamageHits {
     }
 };
 
-int __stdcall VectorLength(Vec3* v);
 int __stdcall BroadcastPacket(int id, void* data, int size);
 
 static inline int Length(Vec3* v)

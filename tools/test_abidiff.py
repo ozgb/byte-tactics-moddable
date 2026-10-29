@@ -28,65 +28,93 @@ struct Data { %s };
 """ % (major, minor, "\n".join(slots), data)
 
 
-def verdict(old: str, new: str, tagged: bool = True, majors: dict | None = None) -> abidiff.Result:
+def manifest(built: int | None = 1, adapters: tuple = (), other: dict | None = None) -> dict:
+    """A module manifest with one module built against major `built` of t (none when built is None) and adapters for the named slots from major 1."""
+    majors = dict(other or {})
+    if built is not None:
+        majors["t"] = built
+    return {"modules": [{"name": "m", "majors": majors}],
+            "adapters": [{"interface": "t", "from_major": 1, "name": name, "args": [], "result": "void"} for name in adapters]}
+
+
+def verdict(old: str, new: str, tagged: bool = True, modules: dict | None = None) -> abidiff.Result:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         (root / "old").mkdir()
         (root / "new").mkdir()
         (root / "old/t.h").write_text(old)
         (root / "new/t.h").write_text(new)
-        (result,) = abidiff.diff_dirs(root / "old", root / "new", tagged, majors)
+        (result,) = abidiff.diff_dirs(root / "old", root / "new", tagged, modules)
     return result
 
 
-class ListedMajorTest(unittest.TestCase):
+class MajorBumpTest(unittest.TestCase):
     old = header([SLOT_A, SLOT_B])
-    listed = {("t", 2): "#499"}
+    new = header([SLOT_A], major=2)
 
-    def test_listed_major_bump_passes(self):
-        result = verdict(self.old, header([SLOT_A], major=2), majors=self.listed)
+    def test_no_module_built_against_the_old_major_passes(self):
+        for modules in (None, {"modules": []}, manifest(built=None), manifest(built=2), manifest(built=None, other={"u": 1})):
+            result = verdict(self.old, self.new, modules=modules)
+            self.assertTrue(result.ok, result)
+            self.assertEqual(result.summary, "ok (major 1->2, no module built against 1)")
+            self.assertTrue(result.details)
+
+    def test_a_module_built_against_the_old_major_needs_an_adapter(self):
+        result = verdict(self.old, self.new, modules=manifest())
+        self.assertFalse(result.ok)
+        self.assertEqual(result.summary, "FAIL (adapter required: B)")
+
+    def test_an_adapter_for_the_removed_slot_passes(self):
+        result = verdict(self.old, self.new, modules=manifest(adapters=("B",)))
         self.assertTrue(result.ok, result)
-        self.assertEqual(result.summary, "ok (major 1->2, no adapter: #499)")
-        self.assertTrue(result.details)
+        self.assertEqual(result.summary, "ok (major 1->2, adapters: B)")
 
-    def test_unlisted_major_bump_fails(self):
-        for majors in ({}, {("t", 3): "#499"}, {("other", 2): "#499"}):
-            result = verdict(self.old, header([SLOT_A], major=2), majors=majors)
-            self.assertFalse(result.ok)
-            self.assertIn("adapter required (#9)", result.summary)
+    def test_every_changed_slot_needs_its_adapter(self):
+        old = header([SLOT_A, SLOT_C, SLOT_B])
+        new = header(["int (__stdcall* A)(Player* unit);", SLOT_C, "void (__fastcall* B)(void);"], major=2)
+        partial = verdict(old, new, modules=manifest(adapters=("A",)))
+        self.assertEqual(partial.summary, "FAIL (adapter required: B)")
+        none = verdict(old, new, modules=manifest())
+        self.assertEqual(none.summary, "FAIL (adapter required: A, B)")
+        full = verdict(old, new, modules=manifest(adapters=("A", "B")))
+        self.assertEqual(full.summary, "ok (major 1->2, adapters: A, B)")
 
-    def test_listed_major_with_a_layout_change_fails(self):
-        result = verdict(self.old, header([SLOT_A], major=2, data="int b; int a;"), majors=self.listed)
+    def test_an_adapter_from_another_major_does_not_count(self):
+        modules = manifest(adapters=("B",))
+        modules["adapters"][0]["from_major"] = 0
+        self.assertEqual(verdict(self.old, self.new, modules=modules).summary, "FAIL (adapter required: B)")
+        modules["adapters"][0].update(from_major=1, interface="other")
+        self.assertEqual(verdict(self.old, self.new, modules=modules).summary, "FAIL (adapter required: B)")
+
+    def test_a_reorder_needs_an_adapter_for_each_slot_it_moves(self):
+        old, new = header([SLOT_A, SLOT_B, SLOT_C]), header([SLOT_C, SLOT_A, SLOT_B], major=2)
+        self.assertEqual(verdict(old, new, modules=manifest()).summary, "FAIL (adapter required: A, B, C)")
+        self.assertEqual(verdict(old, new, modules=manifest(adapters=("A", "B", "C"))).summary, "ok (major 1->2, adapters: A, B, C)")
+
+    def test_a_removed_struct_needs_an_adapter_for_its_slots(self):
+        old = header([SLOT_A]) + "struct Extra { void (__stdcall* X)(void); };\n"
+        new = header([SLOT_A], major=2)
+        self.assertEqual(verdict(old, new, modules=manifest()).summary, "FAIL (adapter required: X)")
+        self.assertEqual(verdict(old, new, modules=manifest(adapters=("X",))).summary, "ok (major 1->2, adapters: X)")
+
+    def test_a_major_bump_with_only_new_slots_needs_no_adapter(self):
+        result = verdict(self.old, header([SLOT_A, SLOT_B, SLOT_C], major=2), modules=manifest())
+        self.assertEqual(result.summary, "ok (major 1->2, no slot changed)")
+
+    def test_a_layout_change_fails_whatever_the_adapters(self):
+        result = verdict(self.old, header([SLOT_A], major=2, data="int b; int a;"), modules=manifest(adapters=("B",)))
         self.assertFalse(result.ok, result)
+        self.assertIn("moved or changed size", result.summary)
 
-    def test_listed_major_going_down_fails(self):
-        result = verdict(header([SLOT_A], major=3), header([SLOT_A], major=2), majors=self.listed)
+    def test_going_down_fails(self):
+        result = verdict(header([SLOT_A], major=3), header([SLOT_A], major=2), modules=manifest())
         self.assertFalse(result.ok)
 
-
-class StaleRowTest(unittest.TestCase):
-    def problems(self, rows: list) -> list[str]:
-        with tempfile.TemporaryDirectory() as tmp:
-            (Path(tmp) / "t.h").write_text(header([SLOT_A], major=2))
-            return abidiff.stale_rows(rows, Path(tmp))
-
-    def test_current_row_is_fine(self):
-        self.assertEqual(self.problems([("t", 2, "#499")]), [])
-
-    def test_wrong_major_is_stale(self):
-        (line,) = self.problems([("t", 3, "#499")])
-        self.assertIn("row 2 (t,3): stale", line)
-
-    def test_unknown_interface_is_stale(self):
-        (line,) = self.problems([("gone", 2, "#499")])
-        self.assertIn("gone", line)
-
-    def test_issue_must_be_a_reference(self):
-        (line,) = self.problems([("t", 2, "later")])
-        self.assertIn("not a #N reference", line)
-
-    def test_the_checked_in_list_is_current(self):
-        self.assertEqual(abidiff.stale_rows(abidiff.load_majors(abidiff.MAJORS_CSV), abidiff.ROOT / "interfaces"), [])
+    def test_the_checked_in_manifest_has_majors_for_its_modules(self):
+        game = abidiff.json.loads(abidiff.MODULES_JSON.read_text())
+        self.assertTrue(game["modules"])
+        for module in game["modules"]:
+            self.assertTrue(set(module["majors"]) <= set(game["majors"]))
 
 
 class NewSlotTest(unittest.TestCase):
@@ -111,10 +139,10 @@ class NewSlotTest(unittest.TestCase):
 class RemovedSlotTest(unittest.TestCase):
     old = header([SLOT_A, SLOT_B])
 
-    def test_major_bump_needs_an_adapter(self):
-        result = verdict(self.old, header([SLOT_A], major=2))
+    def test_major_bump_needs_an_adapter_when_a_module_uses_the_old_major(self):
+        result = verdict(self.old, header([SLOT_A], major=2), modules=manifest())
         self.assertFalse(result.ok)
-        self.assertIn("adapter required (#9)", result.summary)
+        self.assertEqual(result.summary, "FAIL (adapter required: B)")
 
     def test_minor_bump_fails(self):
         result = verdict(self.old, header([SLOT_A], minor=1))
@@ -135,9 +163,9 @@ class RemovedSlotTest(unittest.TestCase):
 class RetypedSlotTest(unittest.TestCase):
     def check(self, old_slot: str, new_slot: str) -> None:
         old = header([old_slot, SLOT_B])
-        major = verdict(old, header([new_slot, SLOT_B], major=2))
+        major = verdict(old, header([new_slot, SLOT_B], major=2), modules=manifest())
         self.assertFalse(major.ok)
-        self.assertIn("adapter required (#9)", major.summary)
+        self.assertEqual(major.summary, "FAIL (adapter required: A)")
         for new in (header([new_slot, SLOT_B], minor=1), header([new_slot, SLOT_B])):
             result = verdict(old, new)
             self.assertFalse(result.ok)
@@ -173,14 +201,14 @@ class RetypeBeforeTagTest(unittest.TestCase):
         self.assertFalse(verdict(self.old, header(self.new), tagged=False).ok)
 
     def test_major_bump_needs_an_adapter(self):
-        result = verdict(self.old, header(self.new, major=2), tagged=False)
-        self.assertIn("adapter required (#9)", result.summary)
+        result = verdict(self.old, header(self.new, major=2), tagged=False, modules=manifest())
+        self.assertEqual(result.summary, "FAIL (adapter required: A)")
 
     def test_after_the_tag_it_is_breaking(self):
         result = verdict(self.old, header(self.new, minor=1))
         self.assertFalse(result.ok)
         self.assertIn("needs a major bump", result.summary)
-        self.assertIn("adapter required (#9)", verdict(self.old, header(self.new, major=2)).summary)
+        self.assertEqual(verdict(self.old, header(self.new, major=2), modules=manifest()).summary, "FAIL (adapter required: A)")
 
     def test_slot_keeping_retypes_pass(self):
         for a, b in (("Unit*", "Player*"), ("UnitDef*", "unsigned short"), ("int", "short"), ("char*", "int")):

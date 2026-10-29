@@ -21,14 +21,20 @@ Every change is classed, and the class decides which bump it needs:
 
   additive  a slot or a field appended at the end, a new struct, or a stand-in retype (below):
             needs a minor bump, or a major bump
-  breaking  a slot removed, reordered, inserted before the end or retyped: needs a major bump and an
-            adapter; until #9 any major bump with a change fails with `adapter required (#9)`
+  breaking  a slot removed, reordered, inserted before the end or retyped: needs a major bump, and an
+            adapter for each changed slot unless no module was built against the old major
   layout    a field that moves or changes size: fails whatever the bump
 
-data/abi_majors.csv (interface,major,issue) lists the major bumps that pass without an adapter: a major bump
-with changes passes when its interface and new major have a row, and reports `ok (major 2->3, no adapter:
-#499)`. A row fails the run when its issue is not a `#N` reference, or when the header has no such major.
-#9 deletes the file and the clause in `judge()`.
+A major bump with changes passes in one of two ways, read from wasm/modules.json (#566):
+
+  - no module in the manifest was built against the old major (its "majors" for the interface), so nothing
+    needs to be adapted: `ok (major 2->3, no module built against 2)`;
+  - the manifest has an adapter ("adapters": interface, from_major, name) for the old major and every slot the
+    change touches, a slot reordered in a struct touching all of that struct's slots: `ok (major 1->2, adapters:
+    Foo, Bar)`.
+
+Otherwise it fails with `FAIL (adapter required: Foo, Bar)`, naming the slots with no adapter. The baseline's
+major is the old major; a module built against a major between the baseline's and the current one is not seen.
 
 A bump with nothing changed is fine. A version that goes down fails.
 
@@ -50,7 +56,6 @@ the newest `interfaces-v*` tag; until one exists, the merge base of HEAD and ori
 """
 
 import argparse
-import csv
 import json
 import re
 import subprocess
@@ -62,8 +67,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE_BRANCH = "origin/moddable"
-MAJORS_CSV = ROOT / "data" / "abi_majors.csv"
-ISSUE = re.compile(r"#[0-9]+")
+MODULES_JSON = ROOT / "wasm" / "modules.json"
 CLANG = ["clang-cl", "--target=i686-pc-windows-msvc", "/nologo", "-TP", "-fms-compatibility",
          "-fms-extensions", "-fms-compatibility-version=11.00", "-fsyntax-only",
          "-Xclang", "-fdump-record-layouts-complete", "-Xclang", "-ast-dump=json"]
@@ -102,6 +106,7 @@ class Interface:
 class Change:
     kind: str
     text: str
+    slots: tuple = ()
 
 
 @dataclass
@@ -229,8 +234,9 @@ def keeps_slot(old: str, new: str) -> bool:
 def compare_signature(where: str, old: Signature, new: Signature, tagged: bool) -> list[Change]:
     if old == new:
         return []
+    slot = (where.split(".")[-1],)
     if tagged or old.conv != new.conv or len(old.params) != len(new.params):
-        return [Change("breaking", "%s: %s -> %s" % (where, old.text(), new.text()))]
+        return [Change("breaking", "%s: %s -> %s" % (where, old.text(), new.text()), slot)]
     out = []
     pairs = [("return", old.ret, new.ret)] + [("param %d" % (i + 1), a, b)
                                               for i, (a, b) in enumerate(zip(old.params, new.params))]
@@ -238,7 +244,7 @@ def compare_signature(where: str, old: Signature, new: Signature, tagged: bool) 
         if a == b:
             continue
         kind = "retype" if keeps_slot(a, b) else "breaking"
-        out.append(Change(kind, "%s %s: %s -> %s" % (where, label, a, b)))
+        out.append(Change(kind, "%s %s: %s -> %s" % (where, label, a, b), slot))
     return out
 
 
@@ -248,11 +254,11 @@ def compare_slots(record: str, old: list, new: list, tagged: bool) -> list[Chang
     old_by, new_by = dict(old), dict(new)
     for name in old_names:
         if name not in new_by:
-            out.append(Change("breaking", "slot removed: %s.%s" % (record, name)))
+            out.append(Change("breaking", "slot removed: %s.%s" % (record, name), (name,)))
     common_old = [n for n in old_names if n in new_by]
     common_new = [n for n in new_names if n in old_by]
     if common_old != common_new:
-        out.append(Change("breaking", "slots reordered in %s" % record))
+        out.append(Change("breaking", "slots reordered in %s" % record, tuple(common_old)))
     tail = new_names[len(old_names):] if new_names[:len(old_names)] == old_names else None
     for name in new_names:
         if name in old_by:
@@ -260,7 +266,7 @@ def compare_slots(record: str, old: list, new: list, tagged: bool) -> list[Chang
         if tail is not None and name in tail:
             out.append(Change("additive", "new slot: %s.%s" % (record, name)))
         else:
-            out.append(Change("breaking", "slot inserted before the end: %s.%s" % (record, name)))
+            out.append(Change("breaking", "slot inserted before the end: %s.%s" % (record, name), (name,)))
     for name in common_old:
         out += compare_signature("%s.%s" % (record, name), old_by[name], new_by[name], tagged)
     return out
@@ -283,7 +289,7 @@ def compare_interfaces(old: Interface, new: Interface, tagged: bool) -> list[Cha
     changes = []
     for record in old.slots:
         if record not in new.slots:
-            changes.append(Change("breaking", "struct removed: %s" % record))
+            changes.append(Change("breaking", "struct removed: %s" % record, tuple(n for n, _ in old.slots[record])))
     for record, slots in new.slots.items():
         if record not in old.slots:
             changes.append(Change("additive", "new struct: %s" % record))
@@ -295,8 +301,18 @@ def compare_interfaces(old: Interface, new: Interface, tagged: bool) -> list[Cha
     return changes
 
 
-def judge(old: Interface, new: Interface, changes: list[Change], majors: dict | None = None) -> Result:
-    """The verdict on the changes, given the version bump."""
+def built_against(manifest: dict | None, interface: str, major: int) -> list[str]:
+    """The names of the modules in the manifest built against the given major of an interface."""
+    return [m["name"] for m in (manifest or {}).get("modules", []) if m.get("majors", {}).get(interface) == major]
+
+
+def adapted_slots(manifest: dict | None, interface: str, major: int) -> set[str]:
+    """The slots and imports the manifest has an adapter for, from the given major of an interface."""
+    return {a["name"] for a in (manifest or {}).get("adapters", []) if a.get("interface") == interface and a.get("from_major") == major}
+
+
+def judge(old: Interface, new: Interface, changes: list[Change], manifest: dict | None = None) -> Result:
+    """The verdict on the changes, given the version bump and the module manifest (wasm/modules.json)."""
     kinds = {c.kind for c in changes}
     details = [c.text if c.kind != "retype" else "retype (before interfaces-v1), " + c.text for c in changes]
     major_up, minor_up = new.major > old.major, new.minor > old.minor
@@ -313,11 +329,15 @@ def judge(old: Interface, new: Interface, changes: list[Change], majors: dict | 
         bump = ", " + bump_text(old, new) if (old.major, old.minor) != (new.major, new.minor) else ""
         return Result(new.name, True, "ok (no change%s)" % bump)
     if major_up:
-        # TODO(#9): delete the list and this clause when adapters exist
-        issue = (majors or {}).get((new.name, new.major))
-        if issue is None:
-            return fail("adapter required (#9)")
-        return Result(new.name, True, "ok (major %d->%d, no adapter: %s)" % (old.major, new.major, issue), details)
+        bump = "major %d->%d" % (old.major, new.major)
+        if not built_against(manifest, new.name, old.major):
+            return Result(new.name, True, "ok (%s, no module built against %d)" % (bump, old.major), details)
+        changed = sorted({slot for c in changes if c.kind in ("breaking", "retype") for slot in c.slots})
+        have = adapted_slots(manifest, new.name, old.major)
+        missing = [slot for slot in changed if slot not in have]
+        if missing:
+            return fail("adapter required: %s" % ", ".join(missing))
+        return Result(new.name, True, "ok (%s, %s)" % (bump, "adapters: " + ", ".join(changed) if changed else "no slot changed"), details)
     if "breaking" in kinds:
         return fail("breaking change needs a major bump, version is %s" % versions)
     if not minor_up:
@@ -331,7 +351,7 @@ def bump_text(old: Interface, new: Interface) -> str:
     return "minor %d->%d" % (old.minor, new.minor)
 
 
-def diff_headers(old_path: Path, new_path: Path, scratch: Path, tagged: bool, majors: dict | None = None) -> Result:
+def diff_headers(old_path: Path, new_path: Path, scratch: Path, tagged: bool, manifest: dict | None = None) -> Result:
     """The verdict for one interface header against its baseline."""
     name = new_path.stem if new_path.exists() else old_path.stem
     if not old_path.exists():
@@ -342,37 +362,17 @@ def diff_headers(old_path: Path, new_path: Path, scratch: Path, tagged: bool, ma
     new = load_interface(new_path, scratch / "new")
     if not new.major and not new.minor and not old.major and not old.minor:
         return Result(name, True, "skipped (no version macros)")
-    return judge(old, new, compare_interfaces(old, new, tagged), majors)
+    return judge(old, new, compare_interfaces(old, new, tagged), manifest)
 
 
-def diff_dirs(old_dir: Path, new_dir: Path, tagged: bool, majors: dict | None = None) -> list[Result]:
+def diff_dirs(old_dir: Path, new_dir: Path, tagged: bool, manifest: dict | None = None) -> list[Result]:
     """The verdicts for every header in either directory, sorted by name."""
     names = sorted({p.name for p in old_dir.glob("*.h")} | {p.name for p in new_dir.glob("*.h")})
     with tempfile.TemporaryDirectory(prefix="abidiff-") as tmp:
         def one(name: str) -> Result:
-            return diff_headers(old_dir / name, new_dir / name, Path(tmp) / name, tagged, majors)
+            return diff_headers(old_dir / name, new_dir / name, Path(tmp) / name, tagged, manifest)
         with ThreadPoolExecutor() as pool:
             return list(pool.map(one, names))
-
-
-def load_majors(path: Path) -> list[tuple[str, int, str]]:
-    """The rows of the major-bump list as (interface, major, issue)."""
-    with open(path, newline="") as f:
-        return [(r["interface"], int(r["major"]), r["issue"]) for r in csv.DictReader(f)]
-
-
-def stale_rows(rows: list, interfaces: Path) -> list[str]:
-    """One message for each row with no issue reference or no such major in the header."""
-    problems = []
-    for number, (name, major, issue) in enumerate(rows, 2):
-        header = interfaces / (name + ".h")
-        found = MAJOR.search(header.read_text()) if header.exists() else None
-        if not ISSUE.fullmatch(issue):
-            problems.append("%s row %d (%s,%d): issue %r is not a #N reference" % (MAJORS_CSV.name, number, name, major, issue))
-        if found is None or int(found.group(2)) != major:
-            problems.append("%s row %d (%s,%d): stale, %s has no major %d"
-                            % (MAJORS_CSV.name, number, name, major, header.name, major))
-    return problems
 
 
 def git(*args: str) -> str:
@@ -423,18 +423,13 @@ def main() -> None:
     ref = args.base or ref
     with tempfile.TemporaryDirectory(prefix="abidiff-base-") as tmp:
         extract_baseline(ref, Path(tmp))
-        rows = load_majors(MAJORS_CSV)
-        majors = {(name, major): issue for name, major, issue in rows}
-        results = diff_dirs(Path(tmp), ROOT / "interfaces", tagged, majors)
-    problems = stale_rows(rows, ROOT / "interfaces")
+        results = diff_dirs(Path(tmp), ROOT / "interfaces", tagged, json.loads(MODULES_JSON.read_text()))
     print("baseline: %s (%s)" % (ref, "interfaces-v* tag exists" if tagged else "before interfaces-v1"))
     for result in results:
         print("%s: %s" % (result.name, result.summary))
         for line in result.details:
             print("    " + line)
-    for line in problems:
-        print(line)
-    sys.exit(0 if all(r.ok for r in results) and not problems else 1)
+    sys.exit(0 if all(r.ok for r in results) else 1)
 
 
 if __name__ == "__main__":

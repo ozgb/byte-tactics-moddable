@@ -19,12 +19,4 @@ public:
 };
 #pragma pack(pop)
 
-#pragma pack(push, 2)
-class PathOrderView : public OrderFx {
-public:
-    char unknown_8[0x36 - 0x8];
-    PathOrderView(GoalOwnerUnit* owner, BitReader* reader);
-};
-#pragma pack(pop)
-
 #endif

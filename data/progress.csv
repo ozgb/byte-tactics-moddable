@@ -2112,7 +2112,7 @@ address,size,file,symbol,status,similarity
 0x49fc50,146,src/gui/gui.cpp,?TrySetFocus@@YGHPAUDialog@@H@Z,matched,100.0
 0x49fcf0,21,src/gui/gui.cpp,?IsFocused@@YGHHH@Z,matched,100.0
 0x49fd10,16,src/gui/gui.cpp,?HasFocus@@YG_NH@Z,matched,100.0
-0x49fd20,53,src/gui/gui.cpp,?FUN_0049fd20@@YGXPAUDialogPointView@@PAUDialogOriginView@@PAUDialogMouseEvent@@@Z,matched,100.0
+0x49fd20,53,src/gui/gui.cpp,?FUN_0049fd20@@YGXPAUDialogPointView@@PAUDialogOriginView@@PAUMouseEvent@@@Z,matched,100.0
 0x49fd60,138,src/gui/gui.cpp,?IsCurrentGadgetNamed@@YGHPAUDialog@@PAD@Z,matched,100.0
 0x49fdf0,99,src/gui/gui.cpp,?FindGadgetIndex@@YGHPAUGadget@@PADH@Z,matched,100.0
 0x49fe60,97,src/gui/gui.cpp,?FindGadgetIndexBySubstring@@YGHPAUGadget@@PAD@Z,matched,100.0
@@ -2687,9 +2687,9 @@ address,size,file,symbol,status,similarity
 0x4c2bb0,20,src/gui/mouse.cpp,?ClearMouseEventQueue@@YGXXZ,matched,100.0
 0x4c2bd0,234,src/gui/mouse.cpp,?InitMouse@@YGXHH@Z,matched,100.0
 0x4c2cc0,156,src/gui/mouse.cpp,?ShutdownMouse@@YGXXZ,matched,100.0
-0x4c2d60,115,src/gui/mouse.cpp,?PopMouseEvent@@YGHPAUMouseQueueEvent@@@Z,matched,100.0
-0x4c2de0,80,src/gui/mouse.cpp,?PeekMouseEvent@@YGHPAUMouseQueueEvent@@@Z,matched,100.0
-0x4c2e30,98,src/gui/mouse.cpp,?PushMouseEvent@@YGXPAUMouseQueueEvent@@@Z,matched,100.0
+0x4c2d60,115,src/gui/mouse.cpp,?PopMouseEvent@@YGHPAUMouseEvent@@@Z,matched,100.0
+0x4c2de0,80,src/gui/mouse.cpp,?PeekMouseEvent@@YGHPAUMouseEvent@@@Z,matched,100.0
+0x4c2e30,98,src/gui/mouse.cpp,?PushMouseEvent@@YGXPAUMouseEvent@@@Z,matched,100.0
 0x4c2ea0,13,src/util/tdf.cpp,??0TdfFile@@QAE@XZ,matched,100.0
 0x4c2eb0,171,src/util/tdf.cpp,??1TdfFile@@QAE@XZ,matched,100.0
 0x4c2f60,434,src/util/tdf.cpp,?LoadFile@TdfFile@@QAEHPAD@Z,matched,100.0

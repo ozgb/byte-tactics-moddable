@@ -4,7 +4,7 @@
 // Major version of the Ref interface, changed when the stored representation changes.
 #define REF_VERSION_MAJOR 2
 // Minor version of the Ref interface, changed when a member is added.
-#define REF_VERSION_MINOR 1
+#define REF_VERSION_MINOR 0
 
 #if !defined(__wasm32__)
 #include "host.h"

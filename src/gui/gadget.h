@@ -6,6 +6,7 @@
 struct GafEntry;
 struct GafFrame;
 struct Gui;
+struct UnitRestrictEntry;
 
 struct Gadget {
     unsigned char type;
@@ -17,7 +18,10 @@ struct Gadget {
     short height;
     int attribs;
     int colours;
-    int image;
+    union {
+        int image;
+        int colour;
+    };
     char textureNumber;
     signed char tab;
     unsigned char active;
@@ -54,10 +58,14 @@ struct Gadget {
             void* rows;
             GafEntry* gaf;
             void (__stdcall* callback)(Gui*, Gadget*);
-            void* records;
+            union {
+                void* records;
+                UnitRestrictEntry* restrictions;
+            };
             union {
                 int language;
                 void* filebuf;
+                char* flags;
             };
             short scroll;
         } list;
@@ -73,7 +81,13 @@ struct Gadget {
             GafEntry* gaf;
             GafFrame* frame;
             short index;
-            unsigned char flags;
+            union {
+                unsigned char flags;
+                struct {
+                    unsigned char clickable : 1;
+                    unsigned char unknown_c8_1 : 7;
+                };
+            };
         } hotspot;
         struct {
             int total;

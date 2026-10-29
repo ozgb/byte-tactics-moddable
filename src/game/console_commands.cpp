@@ -83,13 +83,6 @@ struct ViewFlags {
 
 int ScanDirectory(char*, char*);
 
-struct DebugBreakDisplay {
-    char unknown_0[0xf0];
-    unsigned short bit0 : 1;
-    unsigned short windowed : 1;
-    unsigned short bit2_15 : 14;
-};
-
 struct FixedWorldPos {
     unsigned short x_frac;
     short x;
@@ -162,7 +155,7 @@ unsigned int GetTicks();
 #include "../map/meteors.h"
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"
-extern DebugBreakDisplay* GetDisplay();
+extern Display* GetDisplay();
 #include "../graphics/display.h"
 #include "../debug/debug_lib.h"
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
@@ -910,7 +903,7 @@ void __stdcall CmdDebugBreak(CommandArgs* args)
             }
         }
         if (args->count == 0 || args->GetIntArg(1, 0) == 0) {
-            if (GetDisplay()->windowed) {
+            if (GetDisplay()->flags.bits.flag1) {
                 ToggleFullScreen();
                 host_sleep_ms(500);
             }

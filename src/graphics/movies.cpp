@@ -63,26 +63,6 @@ struct SmackSummaryView {
 
 extern "C" __declspec(dllimport) void __stdcall SmackSummary(SmackHandleView* smk, SmackSummaryView* stats);
 
-struct DirectDrawSurfaceSet {
-    void* ddraw;
-    void* primary;
-    void* back;
-    void* clipper;
-    void* palette;
-};
-static_assert(sizeof(DirectDrawSurfaceSet) == 0x14, "DirectDrawSurfaceSet size");
-
-struct DisplayMovieView {
-    char unknown_0[0x24];
-    void* sound;
-    char unknown_28[0x40 - 0x28];
-    HWND hwnd;
-    char unknown_44[0x84 - 0x44];
-    DirectDrawSurfaceSet surfaces;
-    char unknown_98[0xf0 - 0x98];
-    unsigned short flags;
-};
-
 struct DisplayOffscreenView {
     char unknown_0[8];
     unsigned int width;
@@ -97,8 +77,8 @@ struct DisplayOffscreenView {
 
 #include "../../link/globals.h"
 
-DisplayMovieView* GetDisplay();
 #include "display.h"
+Display* GetDisplay();
 void __stdcall SetOffscreenSurface(DisplayOffscreenView* display);
 void FlipScreen();
 
@@ -133,11 +113,11 @@ MoviePlayer::MoviePlayer(char* path, int a, int b, int c, int d, int e)
         FatalError("Could not open movie file, please check filename in INI.");
     SmackSoundOnOff(smack, sound != 0);
 
-    DisplayMovieView* disp = GetDisplay();
+    Display* disp = GetDisplay();
     hwnd = disp->hwnd;
-    if ((disp->flags & 2) && host_display_is_open()) {
+    if ((disp->flags.word & 2) && host_display_is_open()) {
         hasSurfaces = 0;
-    } else if (!(disp->flags & 2) && !host_display_is_open()) {
+    } else if (!(disp->flags.word & 2) && !host_display_is_open()) {
         if (!SetupDirectDraw())
             FatalError("Could not setup Direct Draw to play movie.");
         hasSurfaces = 1;

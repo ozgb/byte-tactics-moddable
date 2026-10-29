@@ -824,7 +824,6 @@ struct DplConnectionView {
     DPNAME* name;
 };
 
-#include "../game/display_flags_view.h"
 
 struct LobbyJoinArgs {
     char* name;
@@ -965,7 +964,7 @@ void __stdcall SetCursorMode(int n);
 #include "../graphics/object_pool.h"
 void* __cdecl GameReallocTagged(void* ptr, const char* name, unsigned int size);
 #include "../game/players.h"
-DisplayFlagsView* GetDisplay(void);
+Display* GetDisplay(void);
 #include "../graphics/display.h"
 #include "net_stats.h"
 void __stdcall CreateUnitFromPacket(unsigned char p, void* packet);
@@ -1050,7 +1049,7 @@ int __stdcall JoinLobbyGame(Player* p)
         if (host_thread_start(JoinLobbyGameEntry, 0x8000, args)) {
             if (host_event_wait(args->event, 40000) == 0) {
                 SetCursorMode(0x13);
-                if (GetDisplay()->fullscreen) {
+                if (GetDisplay()->flags.bits.flag1) {
                     ToggleFullScreen();
                     host_sleep_ms(500);
                 }
@@ -1143,7 +1142,7 @@ int __stdcall JoinNetGame(JoinGuidView guid, int player)
         if (g_game->dplConnection != 0) {
             result = JoinLobbyGame(p);
             if (result == 0) {
-                if (GetDisplay()->fullscreen) {
+                if (GetDisplay()->flags.bits.flag1) {
                     ToggleFullScreen();
                     host_sleep_ms(500);
                 }

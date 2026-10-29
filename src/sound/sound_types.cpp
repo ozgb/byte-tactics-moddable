@@ -3,11 +3,6 @@
 
 #include "../util/tdf.h"
 
-struct TdfFileCursorView {
-    char unknown_0[4];
-    TdfRecord* tdf;
-};
-
 struct SpeechCategoryInfo {
     char* name;
     int unknown_4[5];
@@ -42,15 +37,15 @@ int __cdecl GameReallocTagged(int block, char* name, int size);
 #include "sound.h"
 
 // FUNCTION: 0x42f450
-int __stdcall ReadSoundEntry(TdfFileCursorView* source, char* key, int* out)
+int __stdcall ReadSoundEntry(TdfFile* source, char* key, int* out)
 {
     char text[0x40];
     char value[0x40];
     char textKey[0x100];
 
-    if (source->tdf->GetFieldString(value, key, 0x40, DAT_005119b8) != 0) {
+    if (source->current->GetFieldString(value, key, 0x40, DAT_005119b8) != 0) {
         sprintf(textKey, "%s%s", key, "text");
-        if (source->tdf->GetFieldString(text, textKey, 0x40, DAT_005119b8) == 0)
+        if (source->current->GetFieldString(text, textKey, 0x40, DAT_005119b8) == 0)
             text[0] = 0;
         out[1] = GameReallocTagged(out[1], g_sayChoiceArrayName, (out[0] + 1) * 0x40);
         out[2] = GameReallocTagged(out[2], g_sayChoiceArrayName, (out[0] + 1) * 0x40);
@@ -86,10 +81,10 @@ void LoadSoundCategories()
                 p = g_speechCategories;
                 int* vals = (int*)(rec + 0x4c);
                 while ((int)p < (int)(g_speechCategories + 23)) {
-                    ReadSoundEntry((TdfFileCursorView*)&obj, p->name, vals);
+                    ReadSoundEntry(&obj, p->name, vals);
                     for (int n = 1; ; n++) {
                         sprintf(name, "%s%i", p->name, n);
-                        if (!ReadSoundEntry((TdfFileCursorView*)&obj, name, vals))
+                        if (!ReadSoundEntry(&obj, name, vals))
                             break;
                     }
                     p++;

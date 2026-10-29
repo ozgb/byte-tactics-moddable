@@ -27,6 +27,23 @@ union DisplayFlags {
     } bits;
 };
 
+union DisplayVideoFlags {
+    unsigned short word;
+    struct {
+        unsigned short b0 : 1;
+        unsigned short b1 : 1;
+        unsigned short b2 : 1;
+        unsigned short b3 : 1;
+        unsigned short b4 : 1;
+        unsigned short b5 : 1;
+        unsigned short b6 : 1;
+        unsigned short b7 : 1;
+        unsigned short b8 : 1;
+        unsigned short b9 : 1;
+        unsigned short spare : 6;
+    } bits;
+};
+
 struct Screen {
     void (__cdecl *callback)(int, int, int);
     void* ddraw;
@@ -47,9 +64,13 @@ struct FrameRateCounter {
 
 #pragma pack(push, 1)
 struct Display {
-    char pad_0[12];
+    void* hInstance;
+    int nCmdShow;
+    char* className;
     char* title;
-    char pad_10[0x40 - 0x10];
+    char pad_10[4];
+    int menuId;
+    char pad_18[0x40 - 0x18];
     void* hwnd;
     int windowed;
     char pad_48[8];
@@ -100,7 +121,7 @@ struct Display {
     Rect startMode;
     int startWidth;
     int startHeight;
-    unsigned short videoFlags;
+    DisplayVideoFlags videoFlags;
     Font* font;
     int foreColor;
     int backColor;

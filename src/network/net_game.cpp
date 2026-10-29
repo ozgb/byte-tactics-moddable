@@ -976,7 +976,6 @@ int __stdcall SendChatMessage(Player* from, char* text, int key, char* to);
 int __stdcall FindGadgetIndex(void* gadgets, const char* name, int flag);
 void* __stdcall LoadGuiLayer(void* obj, const char* name, int size);
 void* __stdcall FindGadgetChecked(void* entries, char* name);
-void __stdcall ConfigureListBoxByName(void* obj, char* name, void* p, int count, int flags);
 void __stdcall SetTranslatedTextByName(void* obj, char* name, void* out, int flag);
 void __stdcall SetKeyboardInput(void* obj, int value);
 
@@ -2136,8 +2135,8 @@ void __stdcall OpenTimeoutDialog(int id)
     memset(p, 0, 0x780);
 
     OutputHeightEntry* out = (OutputHeightEntry*)FindGadgetChecked(entries, "OUTPUT");
-    ConfigureListBoxByName(g_game->menu, "OUTPUT", g_loungeChatter,
-                 (int)out->height / (GetFontLineHeight() + 2), 0);
+    ConfigureListBoxByName(&g_game->gui, "OUTPUT", g_loungeChatter,
+                 (int)out->height / (GetFontLineHeight() + 2), nullptr);
 
     gui->onFrame = &UpdateTimeoutDialog;
     BeginTextEdit((Gui *)g_game->menu, FindGadgetIndex(entries, "TALK", 3));

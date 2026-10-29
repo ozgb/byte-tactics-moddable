@@ -24,7 +24,7 @@ int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 
 #include "sound.h"
 
-extern void __stdcall SetMediaNotifyCallback(void (__stdcall*)(int, int, int));
+#include "../util/registry.h"
 
 // FUNCTION: 0x4cd9b0
 void __stdcall NopRet4(int)
@@ -289,7 +289,7 @@ int Sound::OpenCdAudio()
         return 0;
     discSerial = 0;
     trackCount = QueryDisc();
-    SetMediaNotifyCallback((void (__stdcall*)(int, int, int))HandleCdMessage);
+    SetMediaNotifyCallback(HandleCdMessage);
     open = 1;
     lockedTrack = 1;
     currentTrack = 0;

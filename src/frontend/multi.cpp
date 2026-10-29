@@ -133,7 +133,6 @@ extern GUID g_dpspGuidSerial;
 int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
 void __stdcall BlitMenuLayers(void* menu, int a, int b);
 void __stdcall SetGadgetActiveByName(void* menu, const char* name, int value);
-void __stdcall ConfigureListBoxByName(void* menu, const char* name, char* text, int count, int flag);
 #include "../gui/dialogs.h"
 char* __stdcall Translate(const char* text);
 void __stdcall SetOffscreenSurface(int a);

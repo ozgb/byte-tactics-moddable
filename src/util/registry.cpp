@@ -4,6 +4,7 @@
 #include "../../interfaces/host.h"
 
 #include "../graphics/rect.h"
+#include "../graphics/display.h"
 #include "registry.h"
 
 // FUNCTION: 0x4b6750
@@ -105,10 +106,10 @@ char* __stdcall SkipTextLines(char* text, int n)
     return text + i;
 }
 
-extern void* g_display;
+extern Display* g_display;
 
 // FUNCTION: 0x4b6b60
-void __stdcall SetMediaNotifyCallback(int callback)
+void __stdcall SetMediaNotifyCallback(void (__cdecl* callback)(int, int, int))
 {
-    *(int*)((char*)g_display + 0x80) = callback;
+    g_display->screen.callback = callback;
 }

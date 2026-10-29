@@ -420,6 +420,7 @@ src/units/units.cpp,src/ingame/game_dialogs.h,#392
 src/units/units.cpp,src/sound/sound.h,#392
 src/util/int_map.cpp,src/graphics/object_pool.h,#392
 src/util/math.cpp,interfaces/host.h,#392
+src/util/registry.cpp,src/graphics/display.h,#392
 src/util/registry.cpp,interfaces/host.h,#392
 src/util/registry.cpp,src/graphics/rect.h,#392
 src/util/tdf.cpp,src/graphics/display.h,#392

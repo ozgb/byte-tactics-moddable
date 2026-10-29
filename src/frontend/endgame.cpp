@@ -118,7 +118,6 @@ int __stdcall AddTextGadget(Layer* holder, char* type, char* text, int x, int y,
                            int width, int attribs);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 #include "endgame.h"
-void __stdcall ConfigureListBoxByName(Gui* menu, char* name, void* items, int count, int flag);
 Gadget* __stdcall FindGadgetChecked_D(char* entries, char* name);
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int value);
 void __stdcall SetTranslatedTextByName(Gui* menu, char* name, char* text, int value);

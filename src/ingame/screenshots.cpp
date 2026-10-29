@@ -8,15 +8,6 @@ struct MouseEventWords {
     int fields[6];
 };
 
-struct MainFrameDisplayContext {
-    char pad_0[0x40];
-    void* hwnd;
-    char pad_44[0xcc - 0x44];
-    unsigned char* colorMap;
-    char pad_d0[0xf1 - 0xd0];
-    unsigned char flags;
-};
-
 #pragma pack(push, 1)
 #include "../game/game.h"
 #pragma pack(pop)
@@ -76,6 +67,6 @@ void MainFrameTick()
     else
         (*(MouseEventWords*)&g_game->view) = second;
     UpdateTimers();
-    if (!(g_game->displayContext->flags & 8))
+    if (!(g_game->displayContext->flags.bits.quitting))
         ((void (__cdecl*)())g_game->handler)();
 }

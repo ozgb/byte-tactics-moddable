@@ -30,7 +30,6 @@ ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
 ClickSelectHoverUnit,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 CollectSelectedUnits,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 ComputeUnitScriptChecksum,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-ConfigureListBoxByName,mismatch,fixing it changes the generated code of a caller
 CountHumanSlots,ambiguous,several definitions share the name
 CreatePlayerObjectState,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 CreateUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -234,7 +233,6 @@ SetGadgetTextByName,mismatch,"definition type not nameable in a header, or no cl
 SetGrayedOut,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGrayedOutByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetKeyboardInput,mismatch,pointer/int cast: definition's type is likely wrong
-SetMediaNotifyCallback,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetOffscreenSurface,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetQuickKeyByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetTextColors,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

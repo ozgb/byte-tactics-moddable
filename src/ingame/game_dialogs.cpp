@@ -109,7 +109,6 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 #include "game_dialogs.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 #include "../debug/debug_lib.h"
-void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* text, int count, int flag);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 void __stdcall SetButtonStageByName(Gui* menu, char* name, int value);

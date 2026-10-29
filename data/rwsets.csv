@@ -43673,7 +43673,10 @@ address,function,file,kind,target
 ,Call,src/wasm/wind_meteors_glue.cpp,function,
 ,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_loader
 ,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_module
+,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_slotDepth
 ,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_slots
+,Call,src/wasm/wind_meteors_glue.cpp,global_write,s_handleCount
+,Call,src/wasm/wind_meteors_glue.cpp,global_write,s_slotDepth
 ,Call0,src/wasm/wind_meteors_glue.cpp,call,Call
 ,Call0,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
 ,Call0,src/wasm/wind_meteors_glue.cpp,function,
@@ -44550,6 +44553,18 @@ address,function,file,kind,target
 ,FilePrintf,src/util/file_printf.cpp,call,host_file_write
 ,FilePrintf,src/util/file_printf.cpp,call,malloc
 ,FilePrintf,src/util/file_printf.cpp,function,
+,FileToHandles,src/wasm/wind_meteors_glue.cpp,call,HandleOf
+,FileToHandles,src/wasm/wind_meteors_glue.cpp,field_read,TdfFile::current
+,FileToHandles,src/wasm/wind_meteors_glue.cpp,field_read,TdfFile::root
+,FileToHandles,src/wasm/wind_meteors_glue.cpp,field_write,TdfFile::current
+,FileToHandles,src/wasm/wind_meteors_glue.cpp,field_write,TdfFile::root
+,FileToHandles,src/wasm/wind_meteors_glue.cpp,function,
+,FileToNative,src/wasm/wind_meteors_glue.cpp,call,NativeOf
+,FileToNative,src/wasm/wind_meteors_glue.cpp,field_read,TdfFile::current
+,FileToNative,src/wasm/wind_meteors_glue.cpp,field_read,TdfFile::root
+,FileToNative,src/wasm/wind_meteors_glue.cpp,field_write,TdfFile::current
+,FileToNative,src/wasm/wind_meteors_glue.cpp,field_write,TdfFile::root
+,FileToNative,src/wasm/wind_meteors_glue.cpp,function,
 ,FillCampaignListInline,src/frontend/campaign_menu.cpp,call,BuildCampaignNameList
 ,FillCampaignListInline,src/frontend/campaign_menu.cpp,call,ConfigureListBoxByName
 ,FillCampaignListInline,src/frontend/campaign_menu.cpp,call,FindGadgetIndex
@@ -45719,6 +45734,13 @@ address,function,file,kind,target
 ,HandleHostEvent,src/graphics/display.cpp,global_read,g_timerSlots
 ,HandleHostEvent,src/graphics/display.cpp,indirect_call,indirect via void (*)(int) __attribute__((cdecl)) [TimerSlotTable::closeHandler]
 ,HandleHostEvent,src/graphics/display.cpp,indirect_call,"indirect via void (*)(int, int, int) __attribute__((cdecl)) [DisplayAppView::callback]"
+,HandleOf,src/wasm/wind_meteors_glue.cpp,call,ModulesFatal
+,HandleOf,src/wasm/wind_meteors_glue.cpp,function,
+,HandleOf,src/wasm/wind_meteors_glue.cpp,global_read,kHandleCapacity
+,HandleOf,src/wasm/wind_meteors_glue.cpp,global_read,s_handleCount
+,HandleOf,src/wasm/wind_meteors_glue.cpp,global_read,s_handles
+,HandleOf,src/wasm/wind_meteors_glue.cpp,global_write,s_handleCount
+,HandleOf,src/wasm/wind_meteors_glue.cpp,global_write,s_handles
 ,HandleSet,src/units/unit_motion.cpp,call,operator=
 ,HandleSet,src/units/unit_motion.cpp,deref_write,*Ref<char>
 ,HandleSet,src/units/unit_motion.cpp,deref_write,*void
@@ -45822,6 +45844,7 @@ address,function,file,kind,target
 ,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,Linear
+,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,LiveOf
 ,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
 ,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,function,
@@ -45829,6 +45852,7 @@ address,function,file,kind,target
 ,HapiBankOpenAccountImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,HapiBankOpenAccountImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,HapiBankOpenAccountImport,src/wasm/wind_meteors_glue.cpp,call,Linear
+,HapiBankOpenAccountImport,src/wasm/wind_meteors_glue.cpp,call,LiveOf
 ,HapiBankOpenAccountImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,HapiBankOpenAccountImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
 ,HapiBankOpenAccountImport,src/wasm/wind_meteors_glue.cpp,function,
@@ -45836,6 +45860,7 @@ address,function,file,kind,target
 ,HapiBankSetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,HapiBankSetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,HapiBankSetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,Linear
+,HapiBankSetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,LiveOf
 ,HapiBankSetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,HapiBankSetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
 ,HapiBankSetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,function,
@@ -47553,6 +47578,12 @@ address,function,file,kind,target
 ,ListDirectory,src/files/files_api.h,indirect_call,"indirect via void (*)(const char *, int, FileNameList *) __attribute__((stdcall)) [FilesSeam::ListDirectory]"
 ,ListDirectoryNative,src/seams/native.cpp,call,ListDirectory
 ,ListDirectoryNative,src/seams/native.cpp,function,
+,LiveOf,src/wasm/wind_meteors_glue.cpp,call,NativeOf
+,LiveOf,src/wasm/wind_meteors_glue.cpp,call,sprintf
+,LiveOf,src/wasm/wind_meteors_glue.cpp,deref_read,*void
+,LiveOf,src/wasm/wind_meteors_glue.cpp,function,
+,LiveOf,src/wasm/wind_meteors_glue.cpp,global_escape,s_error
+,LiveOf,src/wasm/wind_meteors_glue.cpp,global_maybe_written,s_error
 ,LoadCampaignNative,src/seams/native.cpp,call,Mission::LoadCampaign
 ,LoadCampaignNative,src/seams/native.cpp,function,
 ,LoadConditionsNative,src/seams/native.cpp,call,MissionConditions::LoadConditions
@@ -47579,6 +47610,7 @@ address,function,file,kind,target
 ,LoadMeteorDefaultsThunk,src/wasm/wind_meteors_glue.cpp,field_read,ModuleMemory::base
 ,LoadMeteorDefaultsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,LoadMeteorsThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
+,LoadMeteorsThunk,src/wasm/wind_meteors_glue.cpp,call,HandleOf
 ,LoadMeteorsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,LoadMissionByNameNative,src/seams/native.cpp,call,Mission::LoadMissionByName
 ,LoadMissionByNameNative,src/seams/native.cpp,function,
@@ -48006,6 +48038,13 @@ address,function,file,kind,target
 ,NameSlot,src/frontend/multi.cpp,call,strlen
 ,NameSlot,src/frontend/multi.cpp,function,
 ,NanoParticles::NanoParticles,src/graphics/particles.cpp,function,
+,NativeOf,src/wasm/wind_meteors_glue.cpp,call,sprintf
+,NativeOf,src/wasm/wind_meteors_glue.cpp,deref_write,*void
+,NativeOf,src/wasm/wind_meteors_glue.cpp,function,
+,NativeOf,src/wasm/wind_meteors_glue.cpp,global_escape,s_error
+,NativeOf,src/wasm/wind_meteors_glue.cpp,global_maybe_written,s_error
+,NativeOf,src/wasm/wind_meteors_glue.cpp,global_read,s_handleCount
+,NativeOf,src/wasm/wind_meteors_glue.cpp,global_read,s_handles
 ,Ne,src/util/tdf.cpp,call,operator==
 ,Ne,src/util/tdf.cpp,function,
 ,Ne,src/weapons/weapon_types.cpp,call,operator==
@@ -48806,6 +48845,7 @@ address,function,file,kind,target
 ,Prepare,src/state/block.cpp,global_read,kFreeBit
 ,Prepare,src/state/block.cpp,global_read,kSimBlockBytes
 ,Prepare,src/wasm/wind_meteors_glue.cpp,call,ModulesMemory
+,Prepare,src/wasm/wind_meteors_glue.cpp,call,SimBlockBase
 ,Prepare,src/wasm/wind_meteors_glue.cpp,call,SimOwns
 ,Prepare,src/wasm/wind_meteors_glue.cpp,call,Stop
 ,Prepare,src/wasm/wind_meteors_glue.cpp,call,memcpy
@@ -48813,6 +48853,7 @@ address,function,file,kind,target
 ,Prepare,src/wasm/wind_meteors_glue.cpp,function,
 ,Prepare,src/wasm/wind_meteors_glue.cpp,global_escape,g_extTdf
 ,Prepare,src/wasm/wind_meteors_glue.cpp,global_read,g_game
+,Prepare,src/wasm/wind_meteors_glue.cpp,global_read,s_blockBaseAddress
 ,Prepare,src/wasm/wind_meteors_glue.cpp,global_read,s_extTdfAddress
 ,Prepare,src/wasm/wind_meteors_glue.cpp,global_read,s_gameAddress
 ,Prepare,src/wasm/wind_meteors_glue.cpp,global_read,s_simAddress
@@ -49531,6 +49572,7 @@ address,function,file,kind,target
 ,SaveConditionsNative,src/seams/native.cpp,call,MissionConditions::SaveConditions
 ,SaveConditionsNative,src/seams/native.cpp,function,
 ,SaveMeteorsThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
+,SaveMeteorsThunk,src/wasm/wind_meteors_glue.cpp,call,HandleOf
 ,SaveMeteorsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,SaveMotionNative,src/seams/native.cpp,call,UnitMotion::SaveMotion
 ,SaveMotionNative,src/seams/native.cpp,function,
@@ -50364,12 +50406,16 @@ address,function,file,kind,target
 ,TdfFileConstructImport,src/wasm/wind_meteors_glue.cpp,call,operator new
 ,TdfFileConstructImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,TdfFileConstructImport,src/wasm/wind_meteors_glue.cpp,function,
+,TdfFileDestructImport,src/wasm/wind_meteors_glue.cpp,call,FileToHandles
+,TdfFileDestructImport,src/wasm/wind_meteors_glue.cpp,call,FileToNative
 ,TdfFileDestructImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,TdfFileDestructImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,TdfFileDestructImport,src/wasm/wind_meteors_glue.cpp,call,Linear
 ,TdfFileDestructImport,src/wasm/wind_meteors_glue.cpp,call,TdfFile::~TdfFile
 ,TdfFileDestructImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,TdfFileDestructImport,src/wasm/wind_meteors_glue.cpp,function,
+,TdfFileLoadFileImport,src/wasm/wind_meteors_glue.cpp,call,FileToHandles
+,TdfFileLoadFileImport,src/wasm/wind_meteors_glue.cpp,call,FileToNative
 ,TdfFileLoadFileImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,TdfFileLoadFileImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,TdfFileLoadFileImport,src/wasm/wind_meteors_glue.cpp,call,Linear
@@ -50377,6 +50423,8 @@ address,function,file,kind,target
 ,TdfFileLoadFileImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,TdfFileLoadFileImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
 ,TdfFileLoadFileImport,src/wasm/wind_meteors_glue.cpp,function,
+,TdfFileSelectRecordImport,src/wasm/wind_meteors_glue.cpp,call,FileToHandles
+,TdfFileSelectRecordImport,src/wasm/wind_meteors_glue.cpp,call,FileToNative
 ,TdfFileSelectRecordImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,TdfFileSelectRecordImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,TdfFileSelectRecordImport,src/wasm/wind_meteors_glue.cpp,call,Linear
@@ -50398,6 +50446,7 @@ address,function,file,kind,target
 ,TdfRecordGetFieldDoubleImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,TdfRecordGetFieldDoubleImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,TdfRecordGetFieldDoubleImport,src/wasm/wind_meteors_glue.cpp,call,Linear
+,TdfRecordGetFieldDoubleImport,src/wasm/wind_meteors_glue.cpp,call,LiveOf
 ,TdfRecordGetFieldDoubleImport,src/wasm/wind_meteors_glue.cpp,call,TdfRecord::GetFieldDouble
 ,TdfRecordGetFieldDoubleImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::f64
 ,TdfRecordGetFieldDoubleImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
@@ -50406,6 +50455,7 @@ address,function,file,kind,target
 ,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,call,Linear
+,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,call,LiveOf
 ,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,call,TdfRecord::GetFieldInt
 ,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
@@ -50413,6 +50463,7 @@ address,function,file,kind,target
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,call,Linear
+,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,call,LiveOf
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,call,TdfRecord::GetFieldString
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
@@ -51581,9 +51632,11 @@ address,function,file,kind,target
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_maybe_written,s_slots
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_read,kSlotNames
+,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_read,s_blockBaseAddress
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_read,s_extTdfAddress
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_read,s_gameAddress
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_read,s_simAddress
+,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_write,s_blockBaseAddress
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_write,s_extTdfAddress
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_write,s_gameAddress
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_write,s_module
@@ -51591,6 +51644,7 @@ address,function,file,kind,target
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_write,s_simAddress
 ,WindMeteorsDataRanges,src/wasm/wind_meteors_glue.cpp,deref_write,*unsigned int
 ,WindMeteorsDataRanges,src/wasm/wind_meteors_glue.cpp,function,
+,WindMeteorsDataRanges,src/wasm/wind_meteors_glue.cpp,global_read,s_blockBaseAddress
 ,WindMeteorsDataRanges,src/wasm/wind_meteors_glue.cpp,global_read,s_extTdfAddress
 ,WindMeteorsDataRanges,src/wasm/wind_meteors_glue.cpp,global_read,s_gameAddress
 ,WindMeteorsDataRanges,src/wasm/wind_meteors_glue.cpp,global_read,s_simAddress

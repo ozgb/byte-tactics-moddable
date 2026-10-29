@@ -220,7 +220,6 @@ SetCursorAnimation,mismatch,"definition type not nameable in a header, or no cle
 SetCursorMode,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetDefaultCommandHandler,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetDescListCleanupFlag,mismatch,pointer/int cast: definition's type is likely wrong
-SetFont,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetFrontendState,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetGadgetActive,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetGadgetActiveByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"

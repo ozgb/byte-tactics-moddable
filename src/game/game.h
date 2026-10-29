@@ -111,12 +111,7 @@ struct Game {
     union {
         struct {
             char session[4];
-            char pad_18[492];
-            Font* font;
-            int colour1;
-            int colour2;
-            int colour3;
-            char pad_214[561];
+            char pad_18[1069];
             V4i* guids;
             char pad_449[40];
             Settings settings;
@@ -1221,8 +1216,8 @@ struct Game {
     Ref<MissionConditions> list_391ed;
     int mode_391f1;
     void (__stdcall *handler)(void);
-    int fontComix;
-    void* fontSmlFont;
+    Font* fontComix;
+    Font* fontSmlFont;
     union {
         struct {
             char pad_39201[1];

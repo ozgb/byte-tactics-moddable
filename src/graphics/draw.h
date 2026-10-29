@@ -1,5 +1,6 @@
 #ifndef DRAW_H
 #define DRAW_H
+struct Font;
 struct GafFrame;
 struct Rect;
 struct Surface;
@@ -40,7 +41,8 @@ void __stdcall DrawDashedCircle(Surface* surface, int cx, int cy, int radius, in
 int __stdcall DrawPolygonEdges(GafFrame* surf, Vec3* pts, int count, int color);
 int __stdcall FillFlatPolygon(GafFrame* surf, Vec3* pts, int n, int color);
 int __stdcall GetTextKeyColor();
-int __stdcall GetFont();
+void __stdcall SetFont(Font* font);
+Font* __stdcall GetFont();
 int __stdcall GetFontHeight();
 
 #endif

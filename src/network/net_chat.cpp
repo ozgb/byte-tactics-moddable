@@ -26,7 +26,6 @@ void __stdcall PlaySoundByName(char* name, int param_2);
 #include "net_game.h"
 void __stdcall ReportGameChat(char* msg);
 #include "../ingame/control_panel.h"
-void __stdcall SetFont(int);
 void __stdcall SetTextColors(int, int);
 #include "../graphics/draw.h"
 void __stdcall BlitSideLogoToRect(void*, void*, Rect*, int);

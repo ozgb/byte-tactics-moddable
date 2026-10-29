@@ -202,7 +202,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     GameSrand(RAND_STREAM_MAIN, HarnessCrtSeed(time(0)));
     if (ParseCommandLine(lpCmdLine, g_appName) == 0)
         return 1;
-    InitDisplayDefaults((DisplayAppView *)&g_displayContext);
+    InitDisplayDefaults((Display *)&g_displayContext);
     g_displayContext.startWidth = 0x280;
     g_displayContext.video.bits.b0 = ~g_cmdlineDisplaySeed;
     g_displayContext.video.bits.b1 = 1;
@@ -218,7 +218,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     g_displayContext.className = (int)g_windowClassName;
     g_displayContext.title = (int)g_appName;
     g_displayContext.menuId = 0;
-    int bGameOk = InitEnvironment((DisplayAppView *)&g_displayContext);
+    int bGameOk = InitEnvironment((Display *)&g_displayContext);
     if (bGameOk == lzero)
         return 0;
     InitTimers(0x1e);
@@ -302,7 +302,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         strcpy(buf40, DAT_005119b8);
         WriteGameRegistryValue((void *)g_cdShellValueName, buf40, 0x32);
     }
-    ShutdownEnvironment((DisplayAppView *)&g_displayContext);
+    ShutdownEnvironment((Display *)&g_displayContext);
     return 0;
 }
 

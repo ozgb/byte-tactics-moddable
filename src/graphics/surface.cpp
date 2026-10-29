@@ -218,7 +218,7 @@ int __stdcall RestoreSurfaces(DirectDrawSurfaceRefs* arg)
 void RestoreScreen(void)
 {
     Display* d = GetDisplay();
-    if (d->flags.bits.flag1) {
+    if (d->flags.bits.fullscreen) {
         if (host_frame_is_lost()) {
             Display* d2 = GetDisplay();
             if (d2->windowed == 0) {

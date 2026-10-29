@@ -6,106 +6,23 @@
 
 #include "rect.h"
 
-union DisplayAppFlags {
-    unsigned short value;
-    struct {
-        unsigned short opt : 1;
-        unsigned short bit1 : 1;
-        unsigned short gdi : 1;
-        unsigned short bit3 : 1;
-        unsigned short bit4 : 1;
-        unsigned short has_c0 : 1;
-        unsigned short has_c4 : 1;
-        unsigned short has_c8 : 1;
-        unsigned short has_cc : 1;
-        unsigned short has_d0 : 1;
-        unsigned short sound_opt : 1;
-        unsigned short quitting : 1;
-        unsigned short bit12 : 4;
-    } bits;
-};
+#include "display.h"
 
-struct FrameRateCounter {
-    int accum;
-    unsigned int lastTick;
-    int frames;
-    int rate;
-
-    void Tick()
-    {
-        unsigned int now = host_time_ms();
-        accum += now - lastTick;
-        lastTick = now;
-        frames++;
-        if (accum > 2000) {
-            accum = 1000;
-        }
-        if (accum > 1000) {
-            rate = frames;
-            accum -= 1000;
-            frames = 0;
-        }
+inline void FrameRateCounter::Tick()
+{
+    unsigned int now = host_time_ms();
+    accum += now - lastTick;
+    lastTick = now;
+    frames++;
+    if (accum > 2000) {
+        accum = 1000;
     }
-};
-
-struct DirectDrawState {
-    void *ddraw;
-    void *primary;
-    void *back;
-    void *clipper;
-    void *palette;
-    void *activeSurface;
-    int haveBackBuffer;
-};
-
-#pragma pack(push, 2)
-struct DisplayAppView {
-    void* hInstance;
-    int nCmdShow;
-    char* className;
-    char* title;
-    void* wndProc;
-    unsigned short menuId;
-    char unknown_16[2];
-    char wc[0x28];
-    void* hwnd;
-    int windowed;
-    char unknown_48[8];
-    char unknown_50[0x80 - 0x50];
-    void (__cdecl *callback)(int, int, int);
-    DirectDrawState draw;
-    Rect mode;
-    void* font;
-    char unknown_b4[0xc4 - 0xb4];
-    int shadeTable;
-    int lightTable;
-    char unknown_cc[0xd4 - 0xcc];
-    int width;
-    int height;
-    int useOverrideSurface;
-    int active;
-    char unknown_e4[0xe8 - 0xe4];
-    int tickScale;
-    int wa_left;
-    DisplayAppFlags flags;
-    char wa_rest[0xfc - 0xf2];
-    char unknown_fc[0x1da - 0xfc];
-    FrameRateCounter counter;
-    Rect startMode;
-    int startWidth;
-    int startHeight;
-    unsigned short videoFlags;
-    char unknown_204[0x214 - 0x204];
-    tagPALETTEENTRY entries[256];
-    float scale;
-    void** items;
-    int itemCount;
-    int availPhys;
-    int unknown_624;
-    char unknown_628[0x728 - 0x628];
-    unsigned char lastDir;
-};
-#pragma pack(pop)
+    if (accum > 1000) {
+        rate = frames;
+        accum -= 1000;
+        frames = 0;
+    }
+}
 
 #include "../../include/display_mode.h"
 
@@ -143,7 +60,7 @@ struct TimerSlotTable {
 
 typedef void (__stdcall *TimerCallback)(int);
 
-extern DisplayAppView* g_display;
+extern Display* g_display;
 extern TimerSlotTable g_timerSlots;
 extern unsigned int g_lastTimerTick;
 extern long g_gfxBlitLockHeld;
@@ -163,7 +80,7 @@ int __stdcall UnlockScreen(Surface *s);
 // FUNCTION: 0x4b4f50
 int ApplyPalette()
 {
-    DisplayAppView* d = g_display;
+    Display* d = g_display;
     if (d->windowed) {
         host_palette_apply();
         return 1;
@@ -179,7 +96,7 @@ void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param)
 }
 
 // FUNCTION: 0x4b4ff0
-void __stdcall ReleaseDirectDraw(DisplayAppView* d)
+void __stdcall ReleaseDirectDraw(Display* d)
 {
     host_display_close();
 }
@@ -207,7 +124,7 @@ int __stdcall CheckDirectXVersion(int want0, int want1, int want2, int want3, in
 }
 
 // FUNCTION: 0x4b52e0
-void __stdcall InitDisplayDefaults(DisplayAppView* p)
+void __stdcall InitDisplayDefaults(Display* p)
 {
     p->videoFlags &= 0xfc00;
     p->startWidth = 640;
@@ -216,7 +133,7 @@ void __stdcall InitDisplayDefaults(DisplayAppView* p)
     p->startMode.top = 0;
     p->startMode.right = 639;
     p->startMode.bottom = 479;
-    p->scale = 1.0f;
+    p->paletteBrightness = 1.0f;
 }
 
 // FUNCTION: 0x4b5330
@@ -276,7 +193,7 @@ int __stdcall GetDisplayModes(DisplayModeTable* list)
     return result;
 }
 
-static inline void ClearWindowedFlag(DisplayAppView *d)
+static inline void ClearWindowedFlag(Display *d)
 {
     d->windowed = 0;
 }
@@ -284,7 +201,7 @@ static inline void ClearWindowedFlag(DisplayAppView *d)
 // FUNCTION: 0x4b5510
 int __stdcall SetFullScreen(int mode) {
     int lockResult;
-    DisplayAppView *d;
+    Display *d;
     Surface surf;
 
     while (1) {
@@ -301,28 +218,27 @@ int __stdcall SetFullScreen(int mode) {
         host_event_wait(g_gfxBlitLockEvent, HOST_WAIT_FOREVER);
     }
     d = g_display;
-    DirectDrawState *dd = &d->draw;
-    dd->haveBackBuffer = 0;
+    d->haveBackBuffer = 0;
     ReleaseDirectDraw(g_display);
 
     ClearWindowedFlag(g_display);
     host_window_resize(g_display->width, g_display->height);
 
     if (mode != 0) {
-        g_display->flags.value |= 2;
+        g_display->flags.word |= 2;
 
         int shown = host_display_mode_set(g_display->width, g_display->height, 0,
                                           (const unsigned char*)g_display->entries);
-        dd->haveBackBuffer = host_display_has_back_buffer();
+        d->haveBackBuffer = host_display_has_back_buffer();
         if (shown == HOST_DISPLAY_FAILED)
             goto fail;
-        if (g_display->draw.activeSurface) {
+        if (g_display->activeSurface) {
             LockScreen(&surf);
-            BlitSurface(&surf, g_display->draw.activeSurface, 0, 0);
+            BlitSurface(&surf, g_display->activeSurface, 0, 0);
             UnlockScreen(&surf);
         }
     } else {
-        g_display->flags.value &= ~2;
+        g_display->flags.word &= ~2;
 
         unsigned char *bits = 0;
         host_frame frame;
@@ -333,7 +249,7 @@ int __stdcall SetFullScreen(int mode) {
                 host_frame_unlock(HOST_FRAME_BACK);
             }
         }
-        InitSurface((Surface *)&d->unknown_50[0], g_display->width, g_display->height,
+        InitSurface(&d->cached, g_display->width, g_display->height,
                      (g_display->width + 3) & ~3, (int)bits);
         host_window_set_topmost(0);
     }
@@ -358,7 +274,7 @@ fail:
 // FUNCTION: 0x4b5910
 void ToggleFullScreen()
 {
-    if (g_display->flags.bits.bit1) {
+    if (g_display->flags.bits.fullscreen) {
         SetFullScreen(0);
     } else {
         SetFullScreen(1);
@@ -370,11 +286,11 @@ void __stdcall SetResolution(int x, int y)
 {
     g_display->width = x;
     g_display->height = y;
-    SetFullScreen(g_display->flags.bits.bit1);
+    SetFullScreen(g_display->flags.bits.fullscreen);
 }
 
 // FUNCTION: 0x4b5980
-int __stdcall InitEnvironment(DisplayAppView* d)
+int __stdcall InitEnvironment(Display* d)
 {
     g_display = d;
     host_memory m;
@@ -384,58 +300,58 @@ int __stdcall InitEnvironment(DisplayAppView* d)
     d->counter.lastTick = host_time_ms();
     d->counter.frames = 0;
     d->counter.rate = 0;
-    d->draw.ddraw = 0;
-    d->draw.primary = 0;
-    d->draw.back = 0;
-    d->draw.clipper = 0;
-    d->draw.palette = 0;
-    d->draw.activeSurface = 0;
-    d->unknown_624 = 0;
+    d->screen.ddraw = 0;
+    d->screen.primary = 0;
+    d->screen.surface = 0;
+    d->screen.clipper = 0;
+    d->screen.ddPalette = 0;
+    d->activeSurface = 0;
+    d->reserved624 = 0;
     d->useOverrideSurface = 0;
     d->flags.bits.quitting = 0;
     d->hwnd = 0;
-    d->flags.bits.sound_opt = (d->videoFlags >> 9) & 1;
+    d->flags.bits.soundOpt = (d->videoFlags >> 9) & 1;
     InitKeyQueue(0x1e);
-    InitMouse(0x14, d->flags.bits.sound_opt);
+    InitMouse(0x14, d->flags.bits.soundOpt);
     MouseEventView view;
     view.x = 0;
     view.y = 0;
     view.buttons = 0;
-    d->lastDir = 0;
+    d->lastDir[0] = 0;
     SaveStartDirectory();
     SetCurrentMouseEvent((MouseEvent *)((int *)&view));
 
-    d->items = 0;
-    d->itemCount = 0;
+    d->files = 0;
+    d->count = 0;
     int w = d->startWidth;
     int h = d->startHeight;
     d->width = w;
     d->height = h;
     int subsys = (d->videoFlags & 0x1fe) << 1;
-    d->flags.value = (d->flags.value & 0xfc03) | subsys | 1;
+    d->flags.word = (d->flags.word & 0xfc03) | subsys | 1;
     if (d->flags.bits.has_c4) {
-        AllocShadeTable((Display *)d);
+        AllocShadeTable(d);
     } else {
         d->shadeTable = 0;
     }
     if (d->flags.bits.has_c0) {
-        AllocAlphaTable((Display *)d);
+        AllocAlphaTable(d);
     }
     if (d->flags.bits.has_c8) {
-        AllocLightTable((Display *)d);
+        AllocLightTable(d);
     } else {
         d->lightTable = 0;
     }
     if (d->flags.bits.has_cc) {
-        AllocGrayTable((Display *)d);
+        AllocGrayTable(d);
     }
     if (d->flags.bits.has_d0) {
-        AllocBlueTable((Display *)d);
+        AllocBlueTable(d);
     }
     if (d->flags.bits.gdi) {
         d->windowed = 0;
-        d->callback = 0;
-        d->mode = d->startMode;
+        d->screen.callback = 0;
+        d->vec = d->startMode;
         d->hwnd = host_window_open(d->title, w, h, d->videoFlags & 1);
         if (d->hwnd != 0) {
             int r = SetFullScreen(d->videoFlags & 1);
@@ -457,7 +373,7 @@ int __stdcall HandleHostEvent(host_event* ev)
     MouseEventView e;
     switch (ev->type) {
     case HOST_EVENT_DESTROY:
-        if (g_display->flags.bits.bit1)
+        if (g_display->flags.bits.fullscreen)
             SetFullScreen(0);
         host_post_quit();
         return 0;
@@ -512,8 +428,8 @@ int __stdcall HandleHostEvent(host_event* ev)
         break;
     case HOST_EVENT_DEVICE_CHANGE:
     case HOST_EVENT_MEDIA_NOTIFY:
-        if (g_display->callback != 0)
-            g_display->callback(ev->type, ev->a, ev->b);
+        if (g_display->screen.callback != 0)
+            g_display->screen.callback(ev->type, ev->a, ev->b);
         return 1;
     case HOST_EVENT_PALETTE_QUERY:
         host_palette_apply();
@@ -544,24 +460,24 @@ int DispatchHostEvents()
 }
 
 // FUNCTION: 0x4b6110
-void __stdcall ShutdownEnvironment(DisplayAppView* d)
+void __stdcall ShutdownEnvironment(Display* d)
 {
     DestroyPreCleanup();
     ShutdownMouse();
-    for (int i = 0; i < d->itemCount; i++)
-        HAPI_CloseArchive((OPENHAPIFILE*)d->items[i]);
-    if (d->items)
-        GameFreeThunk(d->items);
+    for (int i = 0; i < d->count; i++)
+        HAPI_CloseArchive(d->files[i]);
+    if (d->files)
+        GameFreeThunk(d->files);
     if (d->flags.bits.has_c4)
-        FreeShadeTable((Display *)d);
+        FreeShadeTable(d);
     if (d->flags.bits.has_c0)
-        FreeAlphaTable((Display *)d);
+        FreeAlphaTable(d);
     if (d->flags.bits.has_c8)
-        FreeLightTable((Display *)d);
+        FreeLightTable(d);
     if (d->flags.bits.has_cc)
-        FreeGrayTable((Display *)d);
+        FreeGrayTable(d);
     if (d->flags.bits.has_d0)
-        FreeBlueTable((Display *)d);
+        FreeBlueTable(d);
     ReleaseDirectDraw(d);
     d->windowed = 0;
 }
@@ -569,14 +485,14 @@ void __stdcall ShutdownEnvironment(DisplayAppView* d)
 // FUNCTION: 0x4b6220
 Display* GetDisplay(void)
 {
-    return (Display*)g_display;
+    return g_display;
 }
 
 // FUNCTION: 0x4b6230
 void __stdcall QuitApp(char* message)
 {
     g_display->flags.bits.quitting = 1;
-    if (g_display->flags.bits.bit1) {
+    if (g_display->flags.bits.fullscreen) {
         SetFullScreen(0);
     }
     if (message) {
@@ -716,7 +632,7 @@ int __stdcall DrawFrameRate()
     if (!g_display->windowed) {
         char buf[128];
         int len = sprintf(buf, "FRATE %d", g_display->counter.rate);
-        host_frame_text(HOST_FRAME_BACK, g_display->font, 0, 0, buf, len, 0xffff00);
+        host_frame_text(HOST_FRAME_BACK, g_display->frameRateFont, 0, 0, buf, len, 0xffff00);
     }
 
     return g_display->counter.rate;

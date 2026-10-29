@@ -414,7 +414,7 @@ void DrawHelpPage()
     gp->tab = g_game->flag_37ef2 + 1;
     SelectFontForEntry(gadgets, idx);
 
-    int divisor = FontHeight((void *)GetFont()) + 2;
+    int divisor = FontHeight(GetFont()) + 2;
     int linesPerPage = gp->height / divisor;
     int textX = gp->x + 5;
     int y = gp->y + divisor / 2;
@@ -470,7 +470,7 @@ void DrawHelpPage()
                     lineStart++;
                     int colour =
                         g_briefingTextColors[g_game->flag_37ef2 * 4 + sel];
-                    int x = GetTextWidth((void *)GetFont(), gadgets[count].u.text) + textX;
+                    int x = GetTextWidth(GetFont(), gadgets[count].u.text) + textX;
                     int ey = gadgets[count].y;
                     int k = 0;
                     char* q = lineStart;

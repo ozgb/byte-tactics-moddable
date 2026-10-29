@@ -1,7 +1,6 @@
 path,reason
 src/host/win32/guids.cpp,"guids.h declares IID_IDirectSound3DBuffer without extern ""C"" and the definition has it: a different language linkage error"
 src/frontend/skirmish_menu.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
-src/graphics/display.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/graphics/font.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/gui/gui_file.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"
 src/gui/keyboard.cpp,"own header is a presentation or host header that game logic may not include (tools/hostlint.py)"

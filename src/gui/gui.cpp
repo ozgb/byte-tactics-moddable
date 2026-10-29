@@ -2,6 +2,7 @@
 #include "../../interfaces/host.h"
 
 #include "../graphics/display.h"
+#include "../graphics/draw.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -25,7 +26,7 @@ struct ConfigureListBoxByNameHolder {
 };
 
 struct ConfigureListBoxByNameRoot {
-    union { int current; int group; int fontId; };
+    union { Font* current; Font* group; Font* fontId; };
     char unknown_04[0x14 - 0x04];
     union {
         ConfigureListBoxByNameList* language;
@@ -46,9 +47,8 @@ extern ConfigureListBoxByNameRoot* g_guiContext;
 
 void ShowSoftwareCursor();
 char* __stdcall Translate(char* text);
-void __stdcall SetFont(int id);
 int __cdecl tolower(int c);
-int __stdcall GetTextWidth(int font, char* text);
+int __stdcall GetTextWidth(Font* font, char* text);
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall SetTextColors(int colour, int font);
 void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
@@ -1114,8 +1114,6 @@ int __stdcall FindAssocTextInput(Gadget* entries, int index)
 
 struct RedrawGadgetRectSurface;
 
-#include "../graphics/draw.h"
-
 struct RedrawGadgetRectHolder {
     char unknown_0[4];
     Gadget* entries;
@@ -1279,7 +1277,7 @@ void __stdcall DrawListBox(DrawListBoxDialog* obj, int index)
         for (i = 1; i < entries->u.count + 1; i++) {
             if (7 == entries[i].type) {
                 if (t == me->tab) {
-                    SetFont((int)entries[i].u.list.language);
+                    SetFont(entries[i].u.list.language);
                     break;
                 }
                 t++;
@@ -1533,7 +1531,7 @@ struct DrawSliderBarDialog {
 void __stdcall DrawRaisedBox(void* surface, int* r, int a, int b, int c);
 #include "listbox.h"
 void __stdcall SetTextColors(int a, int b);
-void __stdcall GetTextWidth(DrawSliderBarFont* font, char* text);
+int __stdcall GetTextWidth(Font* font, char* text);
 
 static inline void* GetSliderBarSurface(DrawSliderBarObject* o)
 {
@@ -1663,7 +1661,7 @@ void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
         int total = 0;
         if (text != 0) {
             if (g_guiContext->font == 0) {
-                GetTextWidth((DrawSliderBarFont*)GetFont(), text);
+                GetTextWidth(GetFont(), text);
             } else {
                 char* p = text;
                 for (; *p != 0; p++) {
@@ -1995,7 +1993,7 @@ static inline int FindConfigureListBoxPeerByTeam(Gadget* entries, unsigned char 
 }
 
 // FUNCTION: 0x4a32a0
-void __stdcall ConfigureListBoxByName(ConfigureListBoxByNameDialog* param_1, char* name, int bitmap, int count, int flag) {
+void __stdcall ConfigureListBoxByName(ConfigureListBoxByNameDialog* param_1, char* name, int bitmap, int count, Font* flag) {
     ConfigureListBoxByNameHolder* holder = param_1->holder;
     Gadget* entries = holder->entries;
     int index = FindConfigureListBoxEntry(entries, name);
@@ -2795,7 +2793,7 @@ struct DrawProgressBarGadgetLanguage { char unknown_0[0xc]; unsigned short *glyp
 struct DrawProgressBarGadgetLanguageRoot { char unknown_0[0x14]; DrawProgressBarGadgetLanguage *language; };
 
 void __stdcall LockScreen(void *);
-int __stdcall GetTextWidth(int, char *);
+int __stdcall GetTextWidth(Font*, char *);
 void __stdcall UnlockScreen(void *);
 
 static inline int MeasureProgressBarText(char *text)
@@ -3302,7 +3300,7 @@ struct GetTextPixelWidthDialog {
     GetTextPixelWidthFont* font;
 };
 
-int __stdcall GetTextWidth(int param_1, unsigned char* text);
+int __stdcall GetTextWidth(Font* param_1, unsigned char* text);
 
 // FUNCTION: 0x4a5030
 int __stdcall GetTextPixelWidth(unsigned char* text)
@@ -3401,7 +3399,7 @@ struct DrawWrappedTextDialog {
     DrawWrappedTextFont* font;
 };
 
-int __stdcall GetTextWidth(int a, char* text);
+int __stdcall GetTextWidth(Font* a, char* text);
 
 static inline int GetDrawWrappedTextLineHeight()
 {
@@ -5672,7 +5670,7 @@ int GetGuiContext(void)
 }
 
 // FUNCTION: 0x4aa8e0
-void __stdcall SetDefaultFont(int* param_1, int param_2)
+void __stdcall SetDefaultFont(Font** param_1, Font* param_2)
 {
     *param_1 = param_2;
 }

@@ -3,6 +3,8 @@
 
 #include "../graphics/rect.h"
 
+struct Font;
+
 #pragma pack(push, 1)
 struct SideDef {
     char name[30];
@@ -39,7 +41,7 @@ struct SideDef {
     int energyColor;
     int metalColor;
     int sideNumber;
-    void* font;
+    Font* font;
 };
 #pragma pack(pop)
 

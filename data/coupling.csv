@@ -391,6 +391,8 @@ files,platform,call,host_file_size,6
 files,platform,call,host_file_truncate,1
 files,platform,call,host_file_write,7
 files,platform,call,host_thread_id,2
+files,platform,shared_write,Display::count,2
+files,platform,shared_write,Display::files,2
 files,platform,shared_write,_finddata_t::attrib,1
 files,platform,shared_write,_finddata_t::size,1
 files,platform,shared_write,_finddata_t::time_write,1
@@ -2373,6 +2375,8 @@ platform,files,call,ListDirectory,1
 platform,files,call,RemoveFile,1
 platform,files,call,SaveStartDirectory,1
 platform,files,call,WriteBufferToFile,1
+platform,files,shared_write,Display::count,7
+platform,files,shared_write,Display::files,7
 platform,files,shared_write,host_dir_entry::attrib,1
 platform,files,shared_write,host_dir_entry::size,1
 platform,files,shared_write,host_dir_entry::time_write,1

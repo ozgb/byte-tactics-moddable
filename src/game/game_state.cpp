@@ -310,7 +310,6 @@ void __stdcall InitCursorFrames(void* p, void* value);
 void __stdcall LoadGafFile(void* obj, const char* name);
 void __stdcall LoadGafIntoSlot(void* obj, const char* name, int index);
 #include "../graphics/draw.h"
-void __stdcall SetFont(int font);
 #include "main.h"
 
 // FUNCTION: 0x491200
@@ -375,7 +374,7 @@ void InitGame()
     SetGuiPath((Dialog *)&g_game->gui, g_guisDirName);
     SetAnimsPath((Dialog *)&g_game->gui, g_animsDirName);
     SetFontsPath((Dialog *)&g_game->gui, g_fontsDirName);
-    SetDefaultFont((int *)&g_game->gui, g_game->fontComix);
+    SetDefaultFont(&g_game->gui.font, g_game->fontComix);
     InitCursorFrames(&g_game->gui, GetGafFrame(g_game->cursorNormal, 0));
     LoadGafFile(&g_game->gui, g_commonGuiName);
     LoadGafIntoSlot(&g_game->gui, g_hattFont12Name, 0);

@@ -749,6 +749,7 @@ game,platform,call,host_window_place,2
 game,platform,call,operator delete,6
 game,platform,call,operator new,5
 game,platform,shared_write,Fixed::whole,1
+game,platform,shared_write,Game::ticks,1
 game,platform,shared_write,Point16::x,8
 game,platform,shared_write,Point16::y,8
 game,platform,shared_write,Vec3::x,22
@@ -1231,6 +1232,8 @@ harness,pathfinding,shared_write,Game::numPlayers,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
 harness,platform,call,IsMemSet,1
+harness,platform,call,ModulesCheckStatics,1
+harness,platform,call,ModulesHideSwitch,1
 harness,platform,call,host_exit,3
 harness,platform,call,host_file_exe_path,1
 harness,platform,call,host_image_range,1
@@ -2361,7 +2364,10 @@ platform,files,call,HAPI_ResolveShadowedFiles,1
 platform,files,call,HAPI_SeekFile,2
 platform,files,call,HAPI_readfromfile,3
 platform,files,call,HapiBank::CloseBank,1
+platform,files,call,HapiBank::GetIntegerItem,1
 platform,files,call,HapiBank::InitBank,1
+platform,files,call,HapiBank::OpenAccount,1
+platform,files,call,HapiBank::SetIntegerItem,1
 platform,files,call,ListDirectory,1
 platform,files,call,RemoveFile,1
 platform,files,call,SaveStartDirectory,1
@@ -2372,10 +2378,13 @@ platform,files,shared_write,host_dir_entry::time_write,1
 platform,game,call,AllocSite::~AllocSite,12
 platform,game,call,ChdirToExeDirectory,1
 platform,game,call,GameEntry,1
+platform,game,call,GameRand,1
 platform,game,call,GetPreferredLanguage,1
 platform,game,call,SimAlloc,2
+platform,game,call,SimBlockAttach,1
+platform,game,call,SimBlockBase,1
 platform,game,call,SimFree,4
-platform,game,call,SimOwns,4
+platform,game,call,SimOwns,8
 platform,game,call,SimRealloc,1
 platform,game,indirect,CmdAI,1
 platform,game,indirect,CmdATM,1
@@ -2447,9 +2456,13 @@ platform,game,shared_write,Game::count_148e7,1
 platform,game,shared_write,Game::data_148eb,1
 platform,game,shared_write,Point16::x,1
 platform,game,shared_write,Point16::y,1
+platform,game,shared_write,Seams::wind_meteors,5
 platform,game,shared_write,Vec3::x,3
 platform,game,shared_write,Vec3::y,1
 platform,game,shared_write,Vec3::z,3
+platform,game,shared_write,WindMeteorsSeam::UpdateMeteors,1
+platform,game,shared_write,WindMeteorsSeam::UpdateWind,1
+platform,game,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 platform,harness,call,HarnessTestMode,1
 platform,harness,shared_write,g_randomSeed,1
 platform,los_radar,indirect,CmdLOS,1
@@ -2471,6 +2484,7 @@ platform,map,shared_write,Fixed::value,2
 platform,map,shared_write,Fixed::whole,5
 platform,map,shared_write,Point16::x,12
 platform,map,shared_write,Point16::y,12
+platform,map,shared_write,Seams::wind_meteors,1
 platform,map,shared_write,StringRef::data,2
 platform,map,shared_write,Vec3::x,12
 platform,map,shared_write,Vec3::y,4
@@ -2553,7 +2567,11 @@ platform,presentation,shared_write,Vec3::z,43
 platform,presentation,shared_write,Vec3f::x,1
 platform,presentation,shared_write,Vec3f::y,1
 platform,presentation,shared_write,Vec3f::z,1
+platform,seams,shared_write,Seams::wind_meteors,1
 platform,seams,shared_write,Vec3::x,1
+platform,seams,shared_write,WindMeteorsSeam::UpdateMeteors,1
+platform,seams,shared_write,WindMeteorsSeam::UpdateWind,1
+platform,seams,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 platform,targeting,shared_write,Vec3::x,3
 platform,targeting,shared_write,Vec3::y,2
 platform,targeting,shared_write,Vec3::z,3
@@ -2590,9 +2608,11 @@ platform,weapons,shared_write,Vec3f::z,1
 platform,wind_meteors,indirect,CmdMeteor,1
 platform,wind_meteors,shared_write,Point16::x,5
 platform,wind_meteors,shared_write,Point16::y,5
+platform,wind_meteors,shared_write,Seams::wind_meteors,2
 platform,wind_meteors,shared_write,Vec3::x,1
 platform,wind_meteors,shared_write,Vec3::y,1
 platform,wind_meteors,shared_write,Vec3::z,1
+platform,wind_meteors,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 players,ai,indirect,CreatePlayerAI,1
 players,ai,indirect,CreateSquads,1
 players,ai,indirect,DestroyPlayerAI,1
@@ -3928,6 +3948,12 @@ seams,pathfinding,shared_write,UnitsSeam::MovementClassInBounds,1
 seams,pathfinding,shared_write,UnitsSeam::RefreshMovedUnits,1
 seams,pathfinding,shared_write,UnitsSeam::RefreshUnitIfStale,2
 seams,platform,call,operator delete,2
+seams,platform,shared_write,Seams::weapons,2
+seams,platform,shared_write,Seams::wind_meteors,1
+seams,platform,shared_write,WeaponsSeam::SpawnProjectile,1
+seams,platform,shared_write,WindMeteorsSeam::UpdateMeteors,1
+seams,platform,shared_write,WindMeteorsSeam::UpdateWind,1
+seams,platform,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 seams,players,call,MissionConditions::Deactivate,1
 seams,players,call,MissionConditions::FreeConditions,1
 seams,players,call,MissionConditions::LoadConditions,1
@@ -4083,7 +4109,7 @@ seams,weapons,shared_write,UnitsSeam::StartScript,3
 seams,weapons,shared_write,UnitsSeam::StartScriptWithArgs,9
 seams,wind_meteors,call,MeteorParams::LoadMeteorDefaults,1
 seams,wind_meteors,shared_write,Seams::weapons,2
-seams,wind_meteors,shared_write,Seams::wind_meteors,1
+seams,wind_meteors,shared_write,Seams::wind_meteors,2
 seams,wind_meteors,shared_write,WeaponsSeam::SpawnProjectile,1
 seams,wind_meteors,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 targeting,ai,shared_write,Vec3::x,18

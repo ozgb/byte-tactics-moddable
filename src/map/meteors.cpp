@@ -66,9 +66,9 @@ void __stdcall SetMeteorParams(MeteorParams* p)
 {
     strcpy(g_meteorWeaponName, p->name);
     g_meteorSpawnMagnitude = p->radius;
-    g_meteorSpawnInterval = (int)(30.0f / p->density);
-    g_meteorShowerDuration = (int)(p->duration * 30.0f);
-    g_meteorScheduleGap = (int)(p->interval * 30.0f);
+    g_meteorSpawnInterval = (int)(30.0 / p->density);
+    g_meteorShowerDuration = (int)(p->duration * 30.0);
+    g_meteorScheduleGap = (int)(p->interval * 30.0);
 }
 
 static inline Point16 MakePoint(int x, int y)

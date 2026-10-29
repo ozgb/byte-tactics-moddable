@@ -238,6 +238,64 @@ jobs:
           uv run tools/test_subsystemsdoc.py
           uv run tools/subsystemsdoc.py --check
 
+  wasm-modules:
+    name: wasm-modules
+    runs-on: ubuntu-24.04
+    env:
+      LLVM_VERSION: 22.1.8
+      LLVM_SHA256: df0e1ecf16caf3489a272a5eea4eec9b0d82878f6477fa309504f918a0006384
+      UV_VERSION: 0.12.19
+      RUST_VERSION: 1.99.1
+      WASM_TOOLS_VERSION: 1.262.0
+      WASM_TOOLS_SHA256: 655b8df67d54c3ef9b52fc237c4e94bbfbb5f5f43825245cb0940a7002a9ed65
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        run: |
+          curl -LsSf "https://astral.sh/uv/$UV_VERSION/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install LLVM ${{ env.LLVM_VERSION }}
+        run: |
+          url="https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/LLVM-$LLVM_VERSION-Linux-X64.tar.xz"
+          curl -fSL -o "$RUNNER_TEMP/llvm.tar.xz" "$url"
+          echo "$LLVM_SHA256  $RUNNER_TEMP/llvm.tar.xz" | sha256sum -c -
+          mkdir -p "$HOME/llvm"
+          tar -xJf "$RUNNER_TEMP/llvm.tar.xz" -C "$HOME/llvm" --strip-components=1 --wildcards '*/bin/*' '*/lib/*'
+          rm "$RUNNER_TEMP/llvm.tar.xz"
+          echo "$HOME/llvm/bin" >> "$GITHUB_PATH"
+
+      - name: Install Rust ${{ env.RUST_VERSION }}
+        run: |
+          rustup toolchain install "$RUST_VERSION" --profile minimal --target wasm32-unknown-unknown
+          rustup default "$RUST_VERSION"
+
+      - name: Install wasm-tools ${{ env.WASM_TOOLS_VERSION }}
+        run: |
+          url="https://github.com/bytecodealliance/wasm-tools/releases/download/v$WASM_TOOLS_VERSION/wasm-tools-$WASM_TOOLS_VERSION-x86_64-linux.tar.gz"
+          curl -fSL -o "$RUNNER_TEMP/wasm-tools.tar.gz" "$url"
+          echo "$WASM_TOOLS_SHA256  $RUNNER_TEMP/wasm-tools.tar.gz" | sha256sum -c -
+          mkdir -p build/tools/bin
+          tar -xzf "$RUNNER_TEMP/wasm-tools.tar.gz" -C build/tools/bin --strip-components=1 "wasm-tools-$WASM_TOOLS_VERSION-x86_64-linux/wasm-tools"
+
+      - name: Build the modules
+        run: uv run tools/wasm_modules.py build
+
+      - name: Run the fixtures
+        run: uv run tools/wasm_modules.py check
+
+      - name: Import allowlist
+        run: uv run tools/wasm_modules.py imports
+
+      - name: Test the module tools
+        run: uv run tools/test_wasm_modules.py
+
+      - name: The module's maths against the native hashes
+        run: |
+          uv run tools/wasm_maths.py build --wasm-only
+          uv run tools/wasm_maths.py check --wasm-only
+
   bitexact-portable:
     name: bitexact-portable (${{ matrix.name }})
     runs-on: ${{ matrix.os }}

@@ -1,0 +1,17 @@
+#ifndef WASM_VECTOR
+#define WASM_VECTOR
+
+#include <memory>
+
+namespace std {
+template <class T, class A = allocator<T> >
+class vector {
+public:
+    typedef T* iterator;
+    iterator begin();
+    iterator end();
+    iterator erase(iterator it);
+};
+}
+
+#endif

@@ -21,16 +21,6 @@ struct SideData {
     unsigned char bSideId;
 };
 
-struct SkirmishInfo {
-    char unknown_0[0x108];
-    int commanderDeath;
-    int mapping;
-    int lineOfSight;
-    int losType;
-    int fixedLocations;
-    char aMapName[0x100];
-};
-
 struct LoadGameGadgetInfo {
     char unknown_0[0xce];
     void* handler;
@@ -347,7 +337,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
             goto invalid;
         if (g_seams.map->LoadMissionByName(g_game->net, 0, mission) == 0)
             goto invalid;
-        strcpy((char*)&((SkirmishInfo*)g_game->options)->aMapName[0], mission);
+        strcpy(g_game->options->mapName, mission);
         char* thumbs = (((HapiBank*)g_game->pendingSaveStore))->GetStringItem("Thumbs", 0);
         strncpy(g_game->campaignMissionStatus, thumbs, 0x19);
         if (strlen(g_game->campaignMissionStatus) != 0x19)
@@ -356,15 +346,15 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
             (((HapiBank*)g_game->pendingSaveStore))->OpenAccount("summary");
             g_game->numPlayers =
                 (unsigned short)((short)(((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Players", 0));
-            ((SkirmishInfo*)g_game->options)->commanderDeath =
+            g_game->options->commanderDeath =
                 (((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("CommanderDeath", 1);
-            ((SkirmishInfo*)g_game->options)->fixedLocations =
+            g_game->options->fixedLocations =
                 (((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Location", 1);
-            ((SkirmishInfo*)g_game->options)->mapping =
+            g_game->options->mapping =
                 (((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Mapping", 1);
-            ((SkirmishInfo*)g_game->options)->lineOfSight =
+            g_game->options->lineOfSight =
                 (((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("LineOfSight", 1);
-            ((SkirmishInfo*)g_game->options)->losType =
+            g_game->options->losType =
                 (((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("LineOfSightType", 1);
         }
         (*(union Flags_2a44*)&g_game->netGameFlags_2a44).b2 = 1;

@@ -17,7 +17,7 @@ Layer,no,5,src/frontend/frontend.cpp:58|src/frontend/multi.cpp:232|src/gui/dialo
 LogoFrameEntry,no,2,include/ta_types.h:5152|src/frontend/multi.cpp:501,identical,src/frontend/multi.cpp
 MouseEventView,no,2,include/ta_types.h:11341|src/graphics/display.cpp:119,differs,src/graphics/display.cpp
 MoviePlayer,no,3,include/ta_types.h:8343|src/frontend/frontend.cpp:26|src/graphics/movies.cpp:120,differs,src/graphics/movies.cpp
-NanoSegment,no,2,include/ta_types.h:7970|src/graphics/particles.cpp:139,identical,src/graphics/particles.cpp
+NanoSegment,no,2,include/ta_types.h:7970|src/graphics/particles.cpp:140,identical,src/graphics/particles.cpp
 QueryChannelView,no,2,include/ta_types.h:10984|src/units/cob.cpp:8,same-layout,src/units/cob.cpp
 ReportPlayerName,no,2,include/ta_types.h:7102|src/network/unit_sync.cpp:119,identical,src/network/unit_sync.cpp
 Sound,no,6,src/frontend/frontend.cpp:10|src/game/console_commands.cpp:82|src/game/game_state.cpp:212|src/game/main.cpp:81|src/sound/sound.cpp:8|src/sound/sound.h:11,differs,src/sound/sound.h
@@ -25,5 +25,5 @@ SoundCategorySlot,no,2,include/ta_types.h:4208|src/sound/sound_types.cpp:16,iden
 SyncPlayerRecord,no,2,include/ta_types.h:7524|src/network/unit_sync.cpp:1168,differs,src/network/unit_sync.cpp
 UnitSyncPacketRangeView,no,2,include/ta_types.h:7143|src/network/unit_sync.cpp:322,differs,src/network/unit_sync.cpp
 UnsignedLess,no,2,include/ta_types.h:13946|src/debug/free_block_map.h:13,differs,src/debug/free_block_map.h
-WakeParticle,no,2,include/ta_types.h:7883|src/graphics/particles.cpp:237,differs,src/graphics/particles.cpp
+WakeParticle,no,2,include/ta_types.h:7883|src/graphics/particles.cpp:238,differs,src/graphics/particles.cpp
 WeaponSlotFlagBits,no,2,include/ta_types.h:9272|src/units/unit.cpp:17,differs,src/units/unit.cpp

@@ -75,6 +75,7 @@ src/game/console_commands.cpp,src/graphics/draw.h,#392
 src/game/console_commands.cpp,src/graphics/memory_cache.h,#392
 src/game/console_commands.cpp,src/graphics/model_render.h,#392
 src/game/console_commands.cpp,src/graphics/object_pool.h,#392
+src/game/console_commands.cpp,src/graphics/palette.h,#392
 src/game/console_commands.cpp,src/graphics/rect.h,#392
 src/game/console_commands.cpp,src/ingame/control_panel.h,#392
 src/game/console_commands.cpp,src/ingame/selection.h,#392
@@ -113,6 +114,7 @@ src/game/game_state.cpp,src/frontend/options.h,#392
 src/game/game_state.cpp,src/graphics/display.h,#392
 src/game/game_state.cpp,src/graphics/draw.h,#392
 src/game/game_state.cpp,src/graphics/object_pool.h,#392
+src/game/game_state.cpp,src/graphics/palette.h,#392
 src/game/game_state.cpp,src/graphics/palette_tables.h,#392
 src/game/game_state.cpp,src/graphics/particles.h,#392
 src/game/game_state.cpp,src/graphics/surface.h,#392
@@ -189,7 +191,7 @@ src/graphics/movies.cpp,src/graphics/display.h,#392
 src/graphics/movies.cpp,src/graphics/movies.h,#392
 src/graphics/movies.cpp,windows.h,#392
 src/graphics/palette.cpp,interfaces/host.h,#392
-src/graphics/palette.cpp,src/graphics/display_context.h,#392
+src/graphics/palette.cpp,src/graphics/display.h,#392
 src/graphics/palette.cpp,src/graphics/object_pool.h,#392
 src/graphics/palette.cpp,src/graphics/palette.h,#392
 src/graphics/particles.cpp,src/graphics/draw.h,#392

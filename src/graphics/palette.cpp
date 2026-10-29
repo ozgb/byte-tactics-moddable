@@ -1,7 +1,7 @@
 #include <string.h>
 #include "../../interfaces/host.h"
 #include "win_types.h"
-#include "display_context.h"
+#include "display.h"
 
 
 struct RGBA {
@@ -11,7 +11,7 @@ struct RGBA {
     unsigned char a;
 };
 
-DisplayContext* GetDisplay(void);
+Display* GetDisplay(void);
 #include "../debug/debug_lib.h"
 #include "object_pool.h"
 #include "palette.h"
@@ -46,12 +46,12 @@ int __stdcall SetPaletteColors(unsigned char* src, int start, int count)
 {
     long held = Lock();
     float brightness;
-    DisplayContext* d;
+    Display* d;
     unsigned char local[0x400];
     int i;
     int end;
     d = GetDisplay();
-    brightness = *(float*)((char*)d + 0x614);
+    brightness = d->paletteBrightness;
     unsigned int* p = d->entries + start;
     end = start + count;
     unsigned char* s = src;
@@ -79,7 +79,7 @@ int __stdcall SetPaletteColors(unsigned char* src, int start, int count)
             ((unsigned int*)buffer)[i] = ((unsigned int*)local)[i];
         host_palette_create(buffer);
         GameFreeThunk(buffer);
-    } else if (d->gdi) {
+    } else if (d->flags.bits.gdi) {
         if (!host_palette_set(start, count, local + start * 4)) {
             Unlock(held);
             return 0;
@@ -93,8 +93,8 @@ int __stdcall SetPaletteColors(unsigned char* src, int start, int count)
 int __stdcall GetPaletteColors(unsigned char* dest, int first, int count)
 {
     tagPALETTEENTRY pal[256];
-    DisplayContext* d = GetDisplay();
-    if (d->gdi) {
+    Display* d = GetDisplay();
+    if (d->flags.bits.gdi) {
         if (!host_palette_get((unsigned char*)pal))
             return 0;
     }
@@ -110,9 +110,9 @@ int __stdcall GetPaletteColors(unsigned char* dest, int first, int count)
 }
 
 // FUNCTION: 0x4ba590
-void __stdcall SetBrightness(int brightness)
+void __stdcall SetBrightness(float brightness)
 {
-    DisplayContext* p = GetDisplay();
+    Display* p = GetDisplay();
     p->paletteBrightness = brightness;
     SetPaletteColors((unsigned char*)p->entries, 0, 0x100);
 }
@@ -126,26 +126,26 @@ int __stdcall AllocAlphaTable(int obj)
 }
 
 // FUNCTION: 0x4ba5f0
-void __stdcall FreeAlphaTable(DisplayContext* param)
+void __stdcall FreeAlphaTable(Display* param)
 {
     GameFreeThunk(param->alphaTable);
 }
 
 // FUNCTION: 0x4ba610
-int __stdcall AllocShadeTable(DisplayContext* obj) {
+int __stdcall AllocShadeTable(Display* obj) {
     void* result = GameAllocIgnoreTag(g_shadeTableName, 0x2000);
-    obj->shadeTable = result;
+    obj->shadeTable = (unsigned char*)result;
     return 1;
 }
 
 // FUNCTION: 0x4ba640
-void __stdcall FreeShadeTable(DisplayContext* obj)
+void __stdcall FreeShadeTable(Display* obj)
 {
     GameFreeThunk(obj->shadeTable);
 }
 
 // FUNCTION: 0x4ba660
-int __stdcall AllocLightTable(DisplayContext* obj)
+int __stdcall AllocLightTable(Display* obj)
 {
     obj->lightTable = GameAllocIgnoreTag("LIGHT TABLE", 0x2000);
     return 1;
@@ -158,27 +158,27 @@ void __stdcall FreeLightTable(int obj)
 }
 
 // FUNCTION: 0x4ba6b0
-int __stdcall AllocGrayTable(DisplayContext* obj)
+int __stdcall AllocGrayTable(Display* obj)
 {
     obj->grayTable = GameAllocIgnoreTag("GRAY TABLE", 0x100);
     return 1;
 }
 
 // FUNCTION: 0x4ba6e0
-void __stdcall FreeGrayTable(DisplayContext* obj)
+void __stdcall FreeGrayTable(Display* obj)
 {
     GameFreeThunk(obj->grayTable);
 }
 
 // FUNCTION: 0x4ba700
-int __stdcall AllocBlueTable(DisplayContext* obj)
+int __stdcall AllocBlueTable(Display* obj)
 {
     obj->blueTable = GameAllocIgnoreTag("BLUE TABLE", 0x100);
     return 1;
 }
 
 // FUNCTION: 0x4ba730
-void __stdcall FreeBlueTable(DisplayContext* obj)
+void __stdcall FreeBlueTable(Display* obj)
 {
     GameFreeThunk(obj->blueTable);
 }
@@ -186,8 +186,8 @@ void __stdcall FreeBlueTable(DisplayContext* obj)
 // FUNCTION: 0x4ba750
 unsigned int* __stdcall BuildAlphaTable(unsigned char* data)
 {
-    DisplayContext* obj = GetDisplay();
-    if (obj->has_c0) {
+    Display* obj = GetDisplay();
+    if (obj->flags.bits.has_c0) {
         int sums[256];
         unsigned char idx[256];
         SortByBrightness(data, sums, idx);
@@ -282,8 +282,8 @@ unsigned char __stdcall NearestColorInBand(tagPALETTEENTRY* palette, int* band, 
 // FUNCTION: 0x4baad0
 void __stdcall SetAlphaTable(unsigned int* table)
 {
-    DisplayContext* obj = GetDisplay();
-    if (obj->has_c0) {
+    Display* obj = GetDisplay();
+    if (obj->flags.bits.has_c0) {
         memcpy(obj->alphaTable, table, 0x4000 * 4);
     }
 }
@@ -291,8 +291,8 @@ void __stdcall SetAlphaTable(unsigned int* table)
 // FUNCTION: 0x4bab00
 void __stdcall SetShadeTable(unsigned int* table)
 {
-    DisplayContext* obj = GetDisplay();
-    if (obj->has_c4) {
+    Display* obj = GetDisplay();
+    if (obj->flags.bits.has_c4) {
         memcpy(obj->shadeTable, table, 0x800 * 4);
     }
 }
@@ -300,8 +300,8 @@ void __stdcall SetShadeTable(unsigned int* table)
 // FUNCTION: 0x4bab30
 void __stdcall SetLightTable(unsigned int* table)
 {
-    DisplayContext* obj = GetDisplay();
-    if (obj->has_c8) {
+    Display* obj = GetDisplay();
+    if (obj->flags.bits.has_c8) {
         memcpy(obj->lightTable, table, 0x800 * 4);
     }
 }
@@ -309,8 +309,8 @@ void __stdcall SetLightTable(unsigned int* table)
 // FUNCTION: 0x4bab60
 void __stdcall SetGrayTable(unsigned int* table)
 {
-    DisplayContext* obj = GetDisplay();
-    if (obj->has_cc) {
+    Display* obj = GetDisplay();
+    if (obj->flags.bits.has_cc) {
         memcpy(obj->grayTable, table, 0x40 * 4);
     }
 }
@@ -323,8 +323,8 @@ void __stdcall NopRetC(int, int, int)
 // FUNCTION: 0x4baba0
 void __stdcall SetBlueTable(unsigned int* table)
 {
-    DisplayContext* obj = GetDisplay();
-    if (obj->has_d0) {
+    Display* obj = GetDisplay();
+    if (obj->flags.bits.has_d0) {
         memcpy(obj->blueTable, table, 0x40 * 4);
     }
 }
@@ -332,8 +332,8 @@ void __stdcall SetBlueTable(unsigned int* table)
 // FUNCTION: 0x4babd0
 unsigned char* __stdcall BuildLightTable(tagPALETTEENTRY* palette)
 {
-    DisplayContext* obj = GetDisplay();
-    if (obj->has_c8) {
+    Display* obj = GetDisplay();
+    if (obj->flags.bits.has_c8) {
         int sums[256];
         unsigned char order[256];
         SortByBrightness((unsigned char*)palette, sums, order);
@@ -368,8 +368,8 @@ unsigned char* __stdcall BuildLightTable(tagPALETTEENTRY* palette)
 // FUNCTION: 0x4bad30
 unsigned char* __stdcall BuildGrayTable(tagPALETTEENTRY* palette)
 {
-    DisplayContext* app = GetDisplay();
-    if (app->has_cc) {
+    Display* app = GetDisplay();
+    if (app->flags.bits.has_cc) {
         tagPALETTEENTRY color;
         unsigned char order[256];
         int sums[256];
@@ -390,8 +390,8 @@ unsigned char* __stdcall BuildGrayTable(tagPALETTEENTRY* palette)
 // FUNCTION: 0x4badf0
 unsigned char* __stdcall BuildShadeTable(tagPALETTEENTRY* palette)
 {
-    DisplayContext* app = GetDisplay();
-    if (app->has_c4) {
+    Display* app = GetDisplay();
+    if (app->flags.bits.has_c4) {
         tagPALETTEENTRY color;
         unsigned char order[256];
         int sums[256];
@@ -413,12 +413,12 @@ unsigned char* __stdcall BuildShadeTable(tagPALETTEENTRY* palette)
                 color.peBlue = v;
                 if (v > 0xff)
                     color.peBlue = 0xff;
-                ((unsigned char*)app->shadeTable)[offset + i] = NearestColorInBand(palette, sums, order, color);
+                app->shadeTable[offset + i] = NearestColorInBand(palette, sums, order, color);
             }
             factor -= g_shadeStep;
             offset += 0x100;
         } while (offset < 0x2000);
-        return (unsigned char*)app->shadeTable;
+        return app->shadeTable;
     }
     return 0;
 }
@@ -426,8 +426,8 @@ unsigned char* __stdcall BuildShadeTable(tagPALETTEENTRY* palette)
 // FUNCTION: 0x4baf30
 unsigned char* __stdcall BuildBlueTable(tagPALETTEENTRY* palette)
 {
-    DisplayContext* app = GetDisplay();
-    if (app->has_d0) {
+    Display* app = GetDisplay();
+    if (app->flags.bits.has_d0) {
         tagPALETTEENTRY color;
         unsigned char order[256];
         int sums[256];

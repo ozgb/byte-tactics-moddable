@@ -1220,7 +1220,7 @@ void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFram
                     if (*depth <= (unsigned char)value) {
                         unsigned int pixel = 0;
                         pixel = src[(u >> 16) + ((v >> 9) & ~127)];
-                        *dest = display->palette[pixel + ((light >> 16) * 256)];
+                        *dest = display->shadeTable[pixel + ((light >> 16) * 256)];
                         *depth = (unsigned char)value;
                     }
                     v += dv; z += dz; light += dl;
@@ -1235,7 +1235,7 @@ void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFram
                     if (*depth <= (unsigned char)value) {
                         unsigned int pixel = 0;
                         pixel = src[(u >> 16) + ((v >> 10) & ~63)];
-                        *dest = display->palette[pixel + ((light >> 16) * 256)];
+                        *dest = display->shadeTable[pixel + ((light >> 16) * 256)];
                         *depth = (unsigned char)value;
                     }
                     v += dv; z += dz; light += dl;
@@ -1250,7 +1250,7 @@ void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFram
                     if (*depth <= (unsigned char)value) {
                         unsigned int pixel = 0;
                         pixel = src[(u >> 16) + ((v >> 11) & ~31)];
-                        *dest = display->palette[pixel + ((light >> 16) * 256)];
+                        *dest = display->shadeTable[pixel + ((light >> 16) * 256)];
                         *depth = (unsigned char)value;
                     }
                     v += dv; z += dz; light += dl;
@@ -1265,7 +1265,7 @@ void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFram
                     if (*depth <= (unsigned char)value) {
                         unsigned int pixel = 0;
                         pixel = src[(u >> 16) + ((v >> 12) & ~15)];
-                        *dest = display->palette[pixel + ((light >> 16) * 256)];
+                        *dest = display->shadeTable[pixel + ((light >> 16) * 256)];
                         *depth = (unsigned char)value;
                     }
                     v += dv; z += dz; light += dl;
@@ -1280,7 +1280,7 @@ void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFram
                     if (*depth <= (unsigned char)value) {
                         unsigned int pixel = 0;
                         pixel = src[(u >> 16) + ((v >> 13) & ~7)];
-                        *dest = display->palette[pixel + ((light >> 16) * 256)];
+                        *dest = display->shadeTable[pixel + ((light >> 16) * 256)];
                         *depth = (unsigned char)value;
                     }
                     v += dv; z += dz; light += dl;
@@ -1295,7 +1295,7 @@ void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFram
                     if (*depth <= (unsigned char)value) {
                         unsigned int pixel = 0;
                         pixel = src[(u >> 16) + (v >> 16) * texture->width];
-                        *dest = display->palette[pixel + ((light >> 16) * 256)];
+                        *dest = display->shadeTable[pixel + ((light >> 16) * 256)];
                         *depth = (unsigned char)value;
                     }
                     v += dv; z += dz; light += dl;

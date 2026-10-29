@@ -304,7 +304,7 @@ void __stdcall MakeBlueTable(void* palette);
 #include "../debug/debug_lib.h"
 #include "settings.h"
 #include "side_data.h"
-void __stdcall SetBrightness(float brightness);
+#include "../graphics/palette.h"
 void* __stdcall GetGafFrame(void* gaf, int frame);
 void __stdcall InitCursorFrames(void* p, void* value);
 void __stdcall LoadGafFile(void* obj, const char* name);

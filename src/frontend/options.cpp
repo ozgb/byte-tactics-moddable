@@ -417,7 +417,7 @@ void __stdcall SetGrayedOut(Gui* menu, int index, int value);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
-void __stdcall SetBrightness(float value);
+#include "../graphics/palette.h"
 #include "../game/game_state.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);

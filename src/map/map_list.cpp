@@ -11,13 +11,7 @@
 
 class StringRef;
 
-
 #pragma pack(push, 1)
-struct GameOptionSlotView {
-    int active;
-    char unknown_4[0x14];
-};
-
 #include "../game/game.h"
 #pragma pack(pop)
 
@@ -838,7 +832,7 @@ int Mission::SelectSchema(int type, TdfFile* parser, char* schema)
     }
     case 2: {
         for (int i = 0; i < 10; i++) {
-            if (((GameOptionSlotView *)g_game->options)[i].active != 0)
+            if (g_game->options->players[i].controller != 0)
                 players = i + 1;
         }
         order[0] = 3;

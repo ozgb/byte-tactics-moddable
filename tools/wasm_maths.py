@@ -17,6 +17,7 @@ overflow int.
 """
 
 import argparse
+import importlib.util
 import os
 import shutil
 import subprocess
@@ -182,11 +183,9 @@ def check(args: argparse.Namespace) -> int:
 
 
 def check_in_wasmtime(argv: list[str]) -> int:
-    try:
-        import wasmtime  # noqa: F401
-    except ImportError:
+    if importlib.util.find_spec("wasmtime") is None:
         if os.environ.get(GUARD):
-            raise
+            raise ImportError("wasmtime")
         cmd = ["uv", "run", "--no-project", "--with", f"wasmtime=={WASMTIME}", "python",
                os.path.abspath(__file__), *argv]
         return subprocess.run(cmd, env=dict(os.environ, **{GUARD: "1"})).returncode

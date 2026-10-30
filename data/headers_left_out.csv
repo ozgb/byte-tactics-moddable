@@ -161,8 +161,6 @@ LeaveNetGameCallback,mismatch,"static risk rule: a convention, parameter count, 
 LoadBitmapByName,mismatch,fixing it changes the generated code of a caller
 LoadCobScript,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 LoadGaf,mismatch,pointer/int cast: definition's type is likely wrong
-LoadGafFile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-LoadGafIntoSlot,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 LoadGuiLayer,mismatch,pointer/int cast: definition's type is likely wrong
 LoadPcx,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 LoadPictureCached,mismatch,fixing it changes the generated code of a caller

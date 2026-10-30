@@ -1574,8 +1574,6 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
 int WriteScreenshot(int, int, int, int, int, int);
 #pragma pack(pop)
 
-void __stdcall DrawSliderBar(Gui* param_1, int param_2);
-
 // FUNCTION: 0x4a2be0
 void __stdcall SyncAssocGadgets(Gui* param_1, int param_2)
 {
@@ -2210,8 +2208,6 @@ struct DrawSliderFont {
     char unknown_0[0x28];
     GafFrame* glyph;
 };
-
-void __stdcall DrawSliderBar(Gui* gui, int gadgetIndex);
 
 static inline GafFrame* GetDrawSliderGlyph(unsigned char c)
 {
@@ -3058,13 +3054,10 @@ void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colou
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw, int rem, int style);
 
-void __stdcall DrawSliderBar(Gui* obj, int index);
 void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 void __stdcall DrawLineGadget(Gui* obj, int index, unsigned int param3);
 int __stdcall HandleLabelInput(Gui* obj, int index, int key);
 int __stdcall TrySetFocus(Gui* obj, int index);
-int __stdcall HandleListBoxInput(Gui* obj, int index, int key);
-void __stdcall HandleSliderInput(Gui* obj, int index);
 #include "../graphics/object_pool.h"
 int __stdcall SelectFontForEntry(void* entries, int index);
 

@@ -172,4 +172,8 @@ void __stdcall DrawGadgetSelectionBox(Gui* obj, int index, int);
 int __stdcall HandleHotspotInput(Gui* obj, int index);
 void __stdcall DrawTextInput(Gui* obj, int index);
 
+void __stdcall DrawSliderBar(Gui* obj, int index);
+int __stdcall HandleListBoxInput(Gui* obj, int index, int);
+void __stdcall HandleSliderInput(Gui* obj, int index);
+
 #endif

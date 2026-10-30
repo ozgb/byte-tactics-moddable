@@ -88,11 +88,11 @@ typedef Gui Dialog;
 
 #pragma pack(pop)
 
-int __stdcall HasGadgetNamed(Dialog* obj, char* name, int unused);
+int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused);
 void __stdcall ClearChanged(void*);
-void __stdcall ClearLayerChanged(Dialog* param);
-int __stdcall GetKeyboardInput(Dialog* obj);
-void __stdcall ClearFocus(Dialog*);
+void __stdcall ClearLayerChanged(Gui* param);
+int __stdcall GetKeyboardInput(Gui* obj);
+void __stdcall ClearFocus(Gui*);
 int __stdcall IsFocused(int, int);
 bool __stdcall HasFocus(int);
 void __stdcall FUN_0049fd20(DialogPointView*, DialogOriginView*, MouseEvent*);
@@ -128,17 +128,17 @@ void __stdcall ListBoxSelectDown(Gui*, int index);
 int __stdcall HandleGuiCommand(Gui* obj, int cmd);
 int __stdcall GetGuiContext(void);
 
-void __stdcall SetGadgetName(Dialog* obj, char* name, char* text);
-void __stdcall RunWhileScreenNamed(Dialog* menu, char* name);
-void __stdcall EnableKeyCommands(Dialog* p);
-void __stdcall DisableKeyCommands(Dialog* obj);
-void __stdcall MarkChanged(Dialog* obj);
-void __stdcall MarkLayerChanged(Dialog* obj);
-void __stdcall DrawSlider(Dialog* gui, int gadgetIndex);
-void __stdcall SetFontsPath(Dialog* obj, const char* dir);
-void __stdcall SetGuiPath(Dialog* obj, const char* dir);
-void __stdcall SetAnimsPath(Dialog* obj, const char* dir);
-int __stdcall IsCurrentGadgetNamed(Dialog* gui, char* name);
+void __stdcall SetGadgetName(Gui* obj, char* name, char* text);
+void __stdcall RunWhileScreenNamed(Gui* menu, char* name);
+void __stdcall EnableKeyCommands(Gui* p);
+void __stdcall DisableKeyCommands(Gui* obj);
+void __stdcall MarkChanged(Gui* obj);
+void __stdcall MarkLayerChanged(Gui* obj);
+void __stdcall DrawSlider(Gui* gui, int gadgetIndex);
+void __stdcall SetFontsPath(Gui* obj, const char* dir);
+void __stdcall SetGuiPath(Gui* obj, const char* dir);
+void __stdcall SetAnimsPath(Gui* obj, const char* dir);
+int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name);
 void __stdcall GetGadgetRectByIndex(char*, int, Rect*);
 void __stdcall GetGadgetScreenRect(char*, int, Rect*);
 int __stdcall FindBackgroundCell(Gadget* entries, int index);

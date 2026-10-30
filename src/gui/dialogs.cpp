@@ -902,7 +902,7 @@ int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, in
         SetKeyboardInput(gui, 1);
         RenderLayer(gui, 1);
         layer->handler = MessageBoxHandler;
-        MarkChanged((Dialog *)gui);
+        MarkChanged(gui);
         UpdateMenu(gui);
         GameFreeThunk(wrapped);
         return 1;

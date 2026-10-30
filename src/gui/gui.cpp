@@ -95,7 +95,7 @@ static inline int FindEntry(Gadget* entries, char* name)
 }
 
 // FUNCTION: 0x49f8c0
-int __stdcall HasGadgetNamed(Dialog* obj, char* name, int unused)
+int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused)
 {
     Gadget* entries = obj->layer->entries;
     for (int i = 1; i < entries->u.count + 1; i++) {
@@ -107,7 +107,7 @@ int __stdcall HasGadgetNamed(Dialog* obj, char* name, int unused)
 }
 
 // FUNCTION: 0x49f930
-void __stdcall SetGadgetName(Dialog* obj, char* name, char* text)
+void __stdcall SetGadgetName(Gui* obj, char* name, char* text)
 {
     if (obj->layer) {
         Gadget* entries = obj->layer->entries;
@@ -125,7 +125,7 @@ void __stdcall SetGadgetName(Dialog* obj, char* name, char* text)
 }
 
 // FUNCTION: 0x49f9c0
-void __stdcall RunWhileScreenNamed(Dialog* menu, char* name)
+void __stdcall RunWhileScreenNamed(Gui* menu, char* name)
 {
     while (1) {
         if (!menu->layer || _strnicmp(menu->layer->entries->name, name, 16) != 0)
@@ -140,19 +140,19 @@ void __stdcall RunWhileScreenNamed(Dialog* menu, char* name)
 }
 
 // FUNCTION: 0x49fa50
-void __stdcall EnableKeyCommands(Dialog* p)
+void __stdcall EnableKeyCommands(Gui* p)
 {
     p->keyCommands = 1;
 }
 
 // FUNCTION: 0x49fa70
-void __stdcall DisableKeyCommands(Dialog* obj)
+void __stdcall DisableKeyCommands(Gui* obj)
 {
     obj->keyCommands = 0;
 }
 
 // FUNCTION: 0x49fa90
-void __stdcall MarkChanged(Dialog* obj)
+void __stdcall MarkChanged(Gui* obj)
 {
     obj->changed = 1;
 }
@@ -164,7 +164,7 @@ void __stdcall ClearChanged(void* param_1)
 }
 
 // FUNCTION: 0x49fad0
-void __stdcall MarkLayerChanged(Dialog* obj)
+void __stdcall MarkLayerChanged(Gui* obj)
 {
     if (obj->layer != 0) {
         obj->layer->dirty = 1;
@@ -172,7 +172,7 @@ void __stdcall MarkLayerChanged(Dialog* obj)
 }
 
 // FUNCTION: 0x49faf0
-void __stdcall ClearLayerChanged(Dialog* param)
+void __stdcall ClearLayerChanged(Gui* param)
 {
     param->layer->dirty = 0;
 }
@@ -187,7 +187,7 @@ void __stdcall SetKeyboardInput(int param_1, int param_2)
 }
 
 // FUNCTION: 0x49fb30
-int __stdcall GetKeyboardInput(Dialog* obj)
+int __stdcall GetKeyboardInput(Gui* obj)
 {
     if (obj->layer != 0) {
         return obj->layer->keyboardInput;
@@ -196,34 +196,34 @@ int __stdcall GetKeyboardInput(Dialog* obj)
 }
 
 // FUNCTION: 0x49fb50
-void __stdcall SetFontsPath(Dialog* obj, const char* dir)
+void __stdcall SetFontsPath(Gui* obj, const char* dir)
 {
     strncpy(obj->str_bb6, dir, 0x100);
     strcat(obj->str_bb6, "\\");
 }
 
 // FUNCTION: 0x49fba0
-void __stdcall SetGuiPath(Dialog* obj, const char* dir)
+void __stdcall SetGuiPath(Gui* obj, const char* dir)
 {
     strncpy(obj->str_9b6, dir, 0x100);
     strcat(obj->str_9b6, "\\");
 }
 
 // FUNCTION: 0x49fbf0
-void __stdcall SetAnimsPath(Dialog* obj, const char* dir)
+void __stdcall SetAnimsPath(Gui* obj, const char* dir)
 {
     strncpy(obj->str_ab6, dir, 0x100);
     strcat(obj->str_ab6, "\\");
 }
 
 // FUNCTION: 0x49fc40
-void __stdcall ClearFocus(Dialog* param_1)
+void __stdcall ClearFocus(Gui* param_1)
 {
     param_1->focus = 0xffffffff;
 }
 
 // FUNCTION: 0x49fc50
-int __stdcall TrySetFocus(Dialog* obj, int index)
+int __stdcall TrySetFocus(Gui* obj, int index)
 {
     if (obj->focus != -1 && obj->layer->entries[obj->focus].type == 3) {
         obj->focus = -1;
@@ -261,7 +261,7 @@ void __stdcall FUN_0049fd20(DialogPointView* param_1, DialogOriginView* param_2,
 }
 
 // FUNCTION: 0x49fd60
-int __stdcall IsCurrentGadgetNamed(Dialog* gui, char* name)
+int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name)
 {
     if (!gui->layer)
         return 0;
@@ -332,7 +332,7 @@ Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name)
 }
 
 // FUNCTION: 0x4a0090
-void __stdcall UpdateHelpText(Dialog* obj)
+void __stdcall UpdateHelpText(Gui* obj)
 {
     char* text = DAT_005119b8;
     if (obj->hoverGadgetIndex != -1) {
@@ -389,7 +389,7 @@ int __stdcall IsGadgetNamed(Gadget* entries, int i, char* name)
 }
 
 // FUNCTION: 0x4a0340
-void __stdcall ClearPeerStatus(Dialog* param_1, int index)
+void __stdcall ClearPeerStatus(Gui* param_1, int index)
 {
     Gadget* entries = param_1->layer->entries;
     Gadget* me = &entries[index];
@@ -409,7 +409,7 @@ void __stdcall ClearPeerStatus(Dialog* param_1, int index)
 }
 
 // FUNCTION: 0x4a03f0
-void __stdcall SetGadgetActive(Dialog* menu, int index, int value)
+void __stdcall SetGadgetActive(Gui* menu, int index, int value)
 {
     Gadget* entries = menu->layer->entries;
     int i;
@@ -612,7 +612,7 @@ void __stdcall SetGadgetTextByName(GadgetAccessDialog* obj, char* name, char* te
 }
 
 // FUNCTION: 0x4a0880
-void __stdcall SetGadgetText(Dialog* obj, int index, char* text)
+void __stdcall SetGadgetText(Gui* obj, int index, char* text)
 {
     strcpy(obj->layer->entries[index].u.text, text);
     if (obj->focus == index) {
@@ -2041,7 +2041,7 @@ void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* lines, int co
         }
     }
     if (remain < 0) {
-        DrawSlider((Dialog *)g_guiContext, found);
+        DrawSlider((Gui *)g_guiContext, found);
     }
 }
 
@@ -2429,7 +2429,7 @@ struct DrawSliderFont {
     GafFrame* glyph;
 };
 
-void __stdcall DrawSliderBar(Dialog* gui, int gadgetIndex);
+void __stdcall DrawSliderBar(Gui* gui, int gadgetIndex);
 
 static inline GafFrame* GetDrawSliderGlyph(unsigned char c)
 {
@@ -2456,7 +2456,7 @@ static inline int GetDrawSliderRowsHeight(Gadget* e)
 }
 
 // FUNCTION: 0x4a3ef0
-void __stdcall DrawSlider(Dialog* gui, int gadgetIndex)
+void __stdcall DrawSlider(Gui* gui, int gadgetIndex)
 {
     Gadget* entries = (Gadget*)gui->layer->entries;
     Gadget* me = &entries[gadgetIndex];
@@ -4265,11 +4265,11 @@ int __stdcall HandleTextInput(Gui* obj, int index, int key)
                      obj->colours[entries[index].image]);
         int r = HandleTextEditKey(obj, index, key);
         if (r == 13) {
-            ClearFocus((Dialog*)obj);
+            ClearFocus(obj);
             return 1;
         }
         if (r == 27) {
-            ClearFocus((Dialog*)obj);
+            ClearFocus(obj);
             entries[index].u.text[0] = 0;
             return 1;
         }
@@ -5008,7 +5008,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].sliderUser = 0;
                 }
                 if (force || (0x40 & flags))
-                    DrawSlider((Dialog *)menu, i);
+                    DrawSlider(menu, i);
                 break;
             case 5:
                 if (force || (flags & 0x40))

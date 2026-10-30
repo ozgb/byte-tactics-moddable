@@ -506,6 +506,30 @@ def member_idents(d: dict) -> tuple[list[str], list[str]]:
     return names, types
 
 
+def game_fields(by_name: dict[str, list[dict]]) -> dict[str, tuple[list[str], bool]]:
+    """field -> (type identifiers, held by value) for the fields of `struct Game`, anonymous unions and structs flattened."""
+    out = {}
+    for d in by_name.get("Game", []):
+        toks = d["toks"]
+        depth, cur = 0, []
+        for t in toks[toks.index("{") if "{" in toks else len(toks):]:
+            if t == "{":
+                depth += 1
+                cur = []
+            elif t == "}":
+                depth -= 1
+                cur = []
+            elif depth >= 1 and t == ";":
+                cut = next((k for k, x in enumerate(cur) if x in ("[", ":", "=")), len(cur))
+                head = [x for x in cur[:cut] if x == "*" or IDENT.match(x)]
+                if len(head) > 1 and "(" not in cur and head[-1] != "*":
+                    out[head[-1]] = ([x for x in head[:-1] if x != "*"], "*" not in head)
+                cur = []
+            elif depth >= 1:
+                cur.append(t)
+    return out
+
+
 class Scope:
     """Which type names the shared state block reaches."""
 
@@ -528,27 +552,7 @@ class Scope:
         self.game_fields = self.game_field_types()
 
     def game_field_types(self) -> dict[str, list[str]]:
-        out = {}
-        for d in self.by_name.get("Game", []):
-            toks = d["toks"]
-            j = toks.index("{") if "{" in toks else len(toks)
-            depth, cur = 0, []
-            for t in toks[j:]:
-                if t == "{":
-                    depth += 1
-                    cur = [] if depth > 1 else cur
-                elif t == "}":
-                    depth -= 1
-                    cur = []
-                elif depth == 1 and t == ";":
-                    cut = next((k for k, x in enumerate(cur) if x in ("[", ":", "=")), len(cur))
-                    head = [x for x in cur[:cut] if IDENT.match(x)]
-                    if head and "(" not in cur:
-                        out[head[-1]] = head[:-1]
-                    cur = []
-                elif depth == 1:
-                    cur.append(t)
-        return out
+        return {f: types for f, (types, _) in game_fields(self.by_name).items()}
 
     def expand(self, x: str, seen: set) -> set[str]:
         out = set(self.last.get(x, ()))

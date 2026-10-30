@@ -1423,32 +1423,14 @@ void __stdcall DrawGafBar(Gui* param_1, int index)
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
 
 
-struct DrawSliderBarHolder {
-    char unknown_0[4];
-    Gadget* entries;
-};
-
-struct DrawSliderBarObject {
-    char unknown_0[0x18];
-    DrawSliderBarHolder* holder;
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char field_8b2;
-    char unknown_8b3[0x8c1 - 0x8b3];
-    unsigned char field_8c1;
-    char unknown_8c2[0x8c3 - 0x8c2];
-    unsigned char field_8c3;
-    char unknown_8c4[0x8c6 - 0x8c4];
-    unsigned char field_8c6;
-};
-
 void __stdcall DrawRaisedBox(void* surface, int* r, int a, int b, int c);
 #include "listbox.h"
 void __stdcall SetTextColors(int a, int b);
 int __stdcall GetTextWidth(Font* font, char* text);
 
-static inline void* GetSliderBarSurface(DrawSliderBarObject* o)
+static inline void* GetSliderBarSurface(Gui* o)
 {
-    return o->holder->entries->u.assets.surface;
+    return o->layer->entries->u.assets.surface;
 }
 
 #include <setjmp.h>
@@ -1457,9 +1439,9 @@ struct UnitDef;
 struct Unit;
 
 // FUNCTION: 0x4a2580
-void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
+void __stdcall DrawSliderBar(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     void* surface = GetSliderBarSurface(obj);
     GafFrame* g;
@@ -1484,8 +1466,8 @@ void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
 
     GafEntry* gl = e->sliderGaf;
     if (gl == 0) {
-        DrawRaisedBox(surface, r1, obj->field_8b2, obj->field_8c3, obj->field_8c6);
-        DrawSunkenBox(surface, (Rect *)r2, obj->field_8b2, obj->field_8c3, obj->field_8c6);
+        DrawRaisedBox(surface, r1, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
+        DrawSunkenBox(surface, (Rect *)r2, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
     } else {
         short w = e->width;
         short h = e->height;
@@ -1554,7 +1536,7 @@ void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
 
     if (e->attribs & 4) {
         int cur = GetTextKeyColor();
-        SetTextColors(obj->field_8c1, cur);
+        SetTextColors(obj->colours[0xf], cur);
         char buf[0x10];
         if (e->u.text[0] != 0) {
             strcpy(buf, e->u.text);
@@ -2017,49 +1999,16 @@ void __stdcall SetGadgetItems(SetGadgetItemsTable* table, char* name, int* items
 #pragma pack(push, 1)
 int DrawTriangleContours(int, int, int, int, int, int, int);
 
-struct HandleListBoxInputList {
-    char unknown_0[0xc];
-    unsigned short* glyphs;
-};
-
-struct HandleListBoxInputHolder {
-    int current;
-    Gadget* entries;
-    char unknown_08[0x14 - 0x08];
-    HandleListBoxInputList* list;
-    char unknown_18[0x20 - 0x18];
-    int selected;
-};
-
-struct HandleListBoxInputRect { int x0, y0, x1, y1; };
-
-struct HandleListBoxInputPoint {
-    int x;
-    int y;
-    int unknown_08[4];
-};
-
-static inline int PointInListRect(const HandleListBoxInputRect& r, const HandleListBoxInputPoint& p)
-{
-    return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1;
-}
-
-struct HandleListBoxInputObject {
-    char unknown_00[0x18];
-    HandleListBoxInputHolder* holder;
-    char unknown_1c[0x3c - 0x1c];
-    HandleListBoxInputPoint point;
-    char unknown_54[0x60 - 0x54];
-    int hotGadgetIndex;
-    int focus;
-    char unknown_68[0xcca - 0x68];
-    int changed;
-};
 #pragma pack(pop)
 
 #include "../../link/globals.h"
 
-void __stdcall TrySetFocus(HandleListBoxInputObject* obj, int index);
+struct HandleListBoxInputRect { int x0, y0, x1, y1; };
+
+static inline int PointInListRect(const HandleListBoxInputRect& r, const MouseEvent& p)
+{
+    return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1;
+}
 
 struct HandleListBoxInputItem {
     char unknown_0[0x28];
@@ -2095,11 +2044,11 @@ static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
 }
 
 // FUNCTION: 0x4a3780
-int __stdcall HandleListBoxInput(HandleListBoxInputObject* obj, int index, int param_3)
+int __stdcall HandleListBoxInput(Gui* obj, int index, int param_3)
 {
     if (obj->hotGadgetIndex != -1)
         return 0;
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* me = &entries[index];
     int orig_sel = me->u.list.selected;
     if (me->u.list.rowCount == 0)
@@ -2110,7 +2059,7 @@ int __stdcall HandleListBoxInput(HandleListBoxInputObject* obj, int index, int p
     int n = 0;
     r.y0 += 2;
     r.y1 -= 3;
-    HandleListBoxInputPoint point = obj->point;
+    MouseEvent point = obj->point;
     point.x -= entries[0].x;
     point.y -= entries[0].y;
     int i = SelectFontForEntry_inlined(entries, index);
@@ -2121,7 +2070,7 @@ int __stdcall HandleListBoxInput(HandleListBoxInputObject* obj, int index, int p
     int step = (me->height - 2) / span;
     char* s;
 
-    if (IsDoubleClickMessage((Gui *)obj, 1)) {
+    if (IsDoubleClickMessage(obj, 1)) {
         if (PointInListRect(r, point)) {
             if (me->u.list.rowCount == 0) goto skip0;
             if (!(me->attribs & 0x200))
@@ -2140,12 +2089,12 @@ int __stdcall HandleListBoxInput(HandleListBoxInputObject* obj, int index, int p
             return 0;
 skip0:;
         }
-    } else if (IsMouseButtonMessage((Gui *)obj, 1)) {
+    } else if (IsMouseButtonMessage(obj, 1)) {
         if (PointInListRect(r, point)) {
             TrySetFocus(obj, index);
             SetClickMode(obj, 1);
         }
-    } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
+    } else if (IsMouseButtonMessage(obj, 2)) {
         if (PointInListRect(r, point)) {
             TrySetFocus(obj, index);
             SetClickMode(obj, 2);
@@ -2154,10 +2103,10 @@ skip0:;
 
     if (obj->focus != index)
         goto end;
-    if (!HasMouseKeyFlags((Gui *)obj, 3))
+    if (!HasMouseKeyFlags(obj, 3))
         obj->focus = -1;
     if (PointInListRect(r, point)) {
-        obj->holder->selected = index;
+        obj->layer->current = index;
         flags = me->attribs;
         if (flags & 0x10) {
             me->u.list.selected = (point.y - r.y0) / span + me->u.list.firstRow;
@@ -2212,9 +2161,9 @@ skip0:;
             }
         }
         if (orig_sel != me->u.list.selected) {
-            DrawListBox((Gui*)obj, index);
+            DrawListBox(obj, index);
             if (me->u.list.callback)
-                me->u.list.callback((Gui*)obj, me);
+                me->u.list.callback(obj, me);
         }
         if (me->attribs & 0x40) {
 above:
@@ -2252,8 +2201,8 @@ ret1:
                     me->u.list.selected = orig_sel;
             }
 finish:
-            DrawListBox((Gui*)obj, index);
-            SyncAssocGadgets((Gui*)obj, index);
+            DrawListBox(obj, index);
+            SyncAssocGadgets(obj, index);
         }
     }
 end:
@@ -2385,36 +2334,7 @@ void __stdcall DrawSlider(Gui* gui, int gadgetIndex)
 }
 
 
-struct HandleSliderInputHolder {
-    char unknown_00[4];
-    Gadget* entries;
-    char unknown_08[0x14 - 0x08];
-    int dirty;
-};
-
-struct HandleSliderInputPoint {
-    int x;
-    int y;
-    int unknown_08[4];
-};
-
-struct HandleSliderInputObject {
-    char unknown_00[0x18];
-    HandleSliderInputHolder* holder;
-    char unknown_1c[0x3c - 0x1c];
-    HandleSliderInputPoint point;
-    char unknown_54[0x64 - 0x54];
-    int focus;
-    char unknown_68[0x78 - 0x68];
-    int knobDragging;
-    HandleSliderInputPoint saved;
-    short dragKnobPos;
-};
-
-void __stdcall TrySetFocus(HandleSliderInputObject* obj, int index);
-void __stdcall DrawSliderBar(HandleSliderInputObject* obj, int index);
-
-static inline void ClampKnobPosAndNotify(HandleSliderInputObject* obj, int index, Gadget* e, int old)
+static inline void ClampKnobPosAndNotify(Gui* obj, int index, Gadget* e, int old)
 {
     if (e->knobPos > e->range - 1)
         e->knobPos = e->range - 1;
@@ -2422,25 +2342,25 @@ static inline void ClampKnobPosAndNotify(HandleSliderInputObject* obj, int index
         e->knobPos = 0;
     if (e->knobPos == old)
         return;
-    if (obj->holder)
-        obj->holder->dirty = 1;
+    if (obj->layer)
+        obj->layer->dirty = 1;
     DrawSliderBar(obj, index);
-    SyncAssocGadgets((Gui*)obj, index);
+    SyncAssocGadgets(obj, index);
     if (e->sliderCallback)
-        e->sliderCallback((Gui*)obj, e->sliderUser);
+        e->sliderCallback(obj, e->sliderUser);
 }
 
 // FUNCTION: 0x4a4170
-void __stdcall HandleSliderInput(HandleSliderInputObject* obj, int index)
+void __stdcall HandleSliderInput(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     if (e->attribs & 0x10)
         return;
     if (e->sliderLocked)
         return;
 
-    HandleSliderInputPoint p = obj->point;
+    MouseEvent p = obj->point;
     p.x -= entries->x;
     p.y -= entries->y;
     int r1[4];
@@ -2448,7 +2368,7 @@ void __stdcall HandleSliderInput(HandleSliderInputObject* obj, int index)
     GetSliderRects(entries, index, r1, r2);
 
     if (obj->focus == index) {
-        if (!HasMouseKeyFlags((Gui *)obj, 3)) {
+        if (!HasMouseKeyFlags(obj, 3)) {
             obj->focus = -1;
             obj->knobDragging = 0;
         }
@@ -2479,7 +2399,7 @@ void __stdcall HandleSliderInput(HandleSliderInputObject* obj, int index)
 
     if (obj->knobDragging)
         return;
-    if (IsMouseButtonMessage((Gui *)obj, 1)) {
+    if (IsMouseButtonMessage(obj, 1)) {
         obj->knobDragging = 0;
         if (p.x < r1[0] || p.x > r1[2] || p.y < r1[1] || p.y > r1[3])
             return;
@@ -2492,7 +2412,7 @@ void __stdcall HandleSliderInput(HandleSliderInputObject* obj, int index)
         obj->dragKnobPos = e->knobPos;
         return;
     }
-    if (IsMouseButtonMessage((Gui *)obj, 2)) {
+    if (IsMouseButtonMessage(obj, 2)) {
         obj->knobDragging = 0;
         if (p.x < r1[0] || p.x > r1[2] || p.y < r1[1] || p.y > r1[3])
             return;
@@ -2509,31 +2429,12 @@ int __cdecl tolower(int);
 int __cdecl toupper(int);
 
 
-struct HandleLabelInputHolder {
-    int unknown_0;
-    Gadget* entries;
-};
-
-#pragma pack(push, 1)
-struct HandleLabelInputObject {
-    char unknown_0[0x18];
-    HandleLabelInputHolder* holder;
-    char unknown_1c[0x3c - 0x1c];
-    MouseEvent point;
-    char unknown_54[0x64 - 0x54];
-    int focus;
-    char unknown_68[0xcc6 - 0x68];
-    int pathsReady;
-};
-#pragma pack(pop)
-
-int __stdcall TrySetFocus(HandleLabelInputObject* obj, int index);
 #include "keyboard.h"
 
 // FUNCTION: 0x4a4440
-int __stdcall HandleLabelInput(HandleLabelInputObject* obj, int index, char key)
+int __stdcall HandleLabelInput(Gui* obj, int index, char key)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* entry = &entries[index];
     struct HandleLabelInputRect { int x1, y1, x2, y2; } rect;
     MouseEvent point;
@@ -2557,12 +2458,12 @@ int __stdcall HandleLabelInput(HandleLabelInputObject* obj, int index, char key)
     rel_x = point.x - entries->x;
     rel_y = point.y - entries->y;
 
-    if (IsMouseButtonMessage((Gui *)obj, 1)) {
+    if (IsMouseButtonMessage(obj, 1)) {
         if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
             goto fail;
         TrySetFocus(obj, index);
         SetClickMode(obj, 1);
-    } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
+    } else if (IsMouseButtonMessage(obj, 2)) {
         if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
             goto fail;
         TrySetFocus(obj, index);
@@ -2572,7 +2473,7 @@ int __stdcall HandleLabelInput(HandleLabelInputObject* obj, int index, char key)
 fail:
     if (obj->focus != index)
         goto check_queue;
-    if (HasMouseKeyFlags((Gui *)obj, 3))
+    if (HasMouseKeyFlags(obj, 3))
         goto check_queue;
     obj->focus = -1;
     if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
@@ -2821,7 +2722,7 @@ int __stdcall HandleHotspotInput(Gui* obj, int index)
     if (entries[index].u.hotspot.callback)
         entries[index].u.hotspot.callback(obj, &entries[index]);
     if (entries[index].u.hotspot.flags & 1) {
-        if (IsMouseButtonMessage((Gui *)obj, 1)) {
+        if (IsMouseButtonMessage(obj, 1)) {
             Point p;
             p.x = obj->point.x;
             p.y = obj->point.y;
@@ -2829,7 +2730,7 @@ int __stdcall HandleHotspotInput(Gui* obj, int index)
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 1);
             }
-        } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
+        } else if (IsMouseButtonMessage(obj, 2)) {
             Point p;
             p.x = obj->point.x;
             p.y = obj->point.y;
@@ -2838,7 +2739,7 @@ int __stdcall HandleHotspotInput(Gui* obj, int index)
                 SetClickMode(obj, 2);
             }
         }
-        if (obj->focus == index && !HasMouseKeyFlags((Gui *)obj, 3)) {
+        if (obj->focus == index && !HasMouseKeyFlags(obj, 3)) {
             obj->focus = -1;
             Point q;
             q.y = obj->point.y;

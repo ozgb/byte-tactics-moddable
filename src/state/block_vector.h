@@ -14,9 +14,9 @@ public:
     typedef unsigned int size_type;
     typedef T value_type;
     typedef T* iterator;
-    typedef const T* const_iterator;
+    typedef const T* ConstIterator;
 
-    BlockVector() : padding(0), firstWord(0), lastWord(0), endWord(0) {}
+    BlockVector() : padding(0), firstWord(nullptr), lastWord(nullptr), endWord(nullptr) {}
     BlockVector(const BlockVector& x) : padding(0)
     {
         firstWord = Allocate(x.Size());
@@ -39,7 +39,7 @@ public:
             Destroy(s, lastWord.get());
             lastWord = firstWord.get() + x.Size();
         } else if (x.Size() <= Capacity()) {
-            const_iterator s = x.Begin() + Size();
+            ConstIterator s = x.Begin() + Size();
             CopyAssign(x.Begin(), s, firstWord.get());
             Copy(s, x.End(), lastWord.get());
             lastWord = firstWord.get() + x.Size();
@@ -66,9 +66,9 @@ public:
     }
     size_type Capacity() const { return firstWord.get() == nullptr ? 0 : endWord.get() - firstWord.get(); }
     iterator Begin() { return firstWord.get(); }
-    const_iterator Begin() const { return firstWord.get(); }
+    ConstIterator Begin() const { return firstWord.get(); }
     iterator End() { return lastWord.get(); }
-    const_iterator End() const { return lastWord.get(); }
+    ConstIterator End() const { return lastWord.get(); }
     void Resize(size_type n, const T& x = T())
     {
         if (Size() < n)
@@ -141,13 +141,13 @@ private:
         for (; f != l; ++f)
             f->~T();
     }
-    static iterator Copy(const_iterator f, const_iterator l, iterator p)
+    static iterator Copy(ConstIterator f, ConstIterator l, iterator p)
     {
         for (; f != l; ++p, ++f)
             new ((void*)p) T(*f);
         return p;
     }
-    static iterator CopyAssign(const_iterator f, const_iterator l, iterator p)
+    static iterator CopyAssign(ConstIterator f, ConstIterator l, iterator p)
     {
         for (; f != l; ++p, ++f)
             *p = *f;

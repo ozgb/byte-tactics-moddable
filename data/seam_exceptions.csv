@@ -268,7 +268,10 @@ players,LoadReporterDll,ReportGameEventCallback,TODO(#505): sim-to-presentation 
 players,LoadReporterDll,ShowGameMessage,TODO(#505): sim-to-presentation event
 players,LoadReporterDll,g_hapinetOnlineReport,TODO(#507): sim reads view data
 players,LoadThreadMain::0::filt$0,ExceptionFilter,TODO(#504): engine service
+players,ShowContinueWatchingDialog,LoadGuiLayer,TODO(#505): sim-to-presentation event
 players,ShowContinueWatchingDialog,RenderLayer,TODO(#505): sim-to-presentation event
+players,ShowContinueWatchingDialog,SetKeyboardInput,TODO(#505): sim-to-presentation event
+players,ShowContinueWatchingDialog,SetTranslatedTextByName,TODO(#505): sim-to-presentation event
 players,ShowContinueWatchingDialog,g_choice1GadgetName,TODO(#507): sim reads view data
 players,ShowContinueWatchingDialog,g_choice2GadgetName,TODO(#507): sim reads view data
 players,ShowContinueWatchingDialog,g_continueWatchingTitle,TODO(#507): sim reads view data
@@ -289,8 +292,11 @@ players,UpdatePlayersOnStream,CountActiveAIPlayers,TODO(#506): sim sends a packe
 players,UpdatePlayersOnStream,CountCombatPlayers,TODO(#506): sim sends a packet
 players,UpdatePlayersOnStream,FindHostSlot,TODO(#506): sim sends a packet
 players,UpdatePlayersOnStream,FocusCommander,TODO(#505): sim-to-presentation event
+players,UpdatePlayersOnStream,LoadGuiLayer,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,OpenMessageBox,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,RenderLayer,TODO(#505): sim-to-presentation event
+players,UpdatePlayersOnStream,SetKeyboardInput,TODO(#505): sim-to-presentation event
+players,UpdatePlayersOnStream,SetTranslatedTextByName,TODO(#505): sim-to-presentation event
 players,VMissionCondition::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VOrderFx::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service

@@ -10,33 +10,18 @@
 #include <math.h>
 
 struct GafEntry;
-
-struct ConfigureListBoxByNameList {
-    char unknown_0[0xc];
-    union {
-        GafEntry* glyphs;
-    };
-};
-
 struct Gadget;
 
-struct ConfigureListBoxByNameHolder {
-    int unknown_0;
-    Gadget* entries;
+struct FontGlyphTable {
+    char unknown_0[3];
+    unsigned char first;
+    unsigned short offsets[1];
+    char unknown_6[6];
+    GafEntry* glyphs;
 };
 
-struct ConfigureListBoxByNameRoot {
-    union { Font* current; Font* group; Font* fontId; };
-    char unknown_04[0x14 - 0x04];
-    union {
-        ConfigureListBoxByNameList* language;
-        ConfigureListBoxByNameList* font;
-        ConfigureListBoxByNameList* list;
-    };
-    ConfigureListBoxByNameHolder* holder;
-};
-
-extern ConfigureListBoxByNameRoot* g_guiContext;
+struct Gui;
+extern Gui* g_guiContext;
 
 #include "../graphics/rect.h"
 #include "../util/point.h"
@@ -64,20 +49,6 @@ struct Gui;
 class SquadManager;
 
 
-#pragma pack(push, 1)
-
-struct DialogPointView {
-    char unknown_0[0x3c];
-    MouseEvent data;
-};
-
-struct DialogOriginView {
-    char unknown_0[0x13];
-    short val_13;
-    short val_15;
-};
-
-#pragma pack(pop)
 
 int __stdcall UpdateMenu(Gui* menu);
 void __stdcall BlitLayers(void* param_1, unsigned int* param_2, int* param_3);
@@ -253,11 +224,11 @@ bool __stdcall HasFocus(Gui* param_1)
 }
 
 // FUNCTION: 0x49fd20
-void __stdcall FUN_0049fd20(DialogPointView* param_1, DialogOriginView* param_2, MouseEvent* param_3)
+void __stdcall FUN_0049fd20(Gui* param_1, Gadget* param_2, MouseEvent* param_3)
 {
-    *param_3 = param_1->data;
-    param_3->x -= param_2->val_13;
-    param_3->y -= param_2->val_15;
+    *param_3 = param_1->point;
+    param_3->x -= param_2->x;
+    param_3->y -= param_2->y;
 }
 
 // FUNCTION: 0x49fd60
@@ -900,18 +871,18 @@ void __stdcall SetQuickKeyByName(Gui* obj, char* name, char value)
 }
 
 // FUNCTION: 0x4a15c0
-void __stdcall GetGadgetRectByIndex(char* param_1, int param_2, Rect* param_3)
+void __stdcall GetGadgetRectByIndex(Gadget* entries, int index, Rect* rect)
 {
-    char* e = param_1 + param_2 * 0x15b;
-    if (*e == 0) {
-        param_3->left = 0;
-        param_3->top = 0;
+    Gadget* e = &entries[index];
+    if (e->type == 0) {
+        rect->left = 0;
+        rect->top = 0;
     } else {
-        param_3->left = *(short*)(e + 0x13);
-        param_3->top = *(short*)(e + 0x15);
+        rect->left = e->x;
+        rect->top = e->y;
     }
-    param_3->right = *(short*)(e + 0x17) - 1 + param_3->left;
-    param_3->bottom = *(short*)(e + 0x19) - 1 + param_3->top;
+    rect->right = e->width - 1 + rect->left;
+    rect->bottom = e->height - 1 + rect->top;
 }
 
 // FUNCTION: 0x4a1630
@@ -929,17 +900,17 @@ void __stdcall GetGadgetRect(Gadget* entry, Rect* rect)
 }
 
 // FUNCTION: 0x4a1680
-void __stdcall GetGadgetScreenRect(char* param_1, int param_2, Rect* param_3)
+void __stdcall GetGadgetScreenRect(Gadget* entries, int index, Rect* rect)
 {
-    char* e = param_1 + param_2 * 0x15b;
-    param_3->left = *(short*)(e + 0x13);
-    param_3->top = *(short*)(e + 0x15);
-    if (*e != 0) {
-        param_3->left += *(short*)(param_1 + 0x13);
-        param_3->top += *(short*)(param_1 + 0x15);
+    Gadget* e = &entries[index];
+    rect->left = e->x;
+    rect->top = e->y;
+    if (e->type != 0) {
+        rect->left += entries->x;
+        rect->top += entries->y;
     }
-    param_3->right = *(short*)(e + 0x17) - 1 + param_3->left;
-    param_3->bottom = *(short*)(e + 0x19) - 1 + param_3->top;
+    rect->right = e->width - 1 + rect->left;
+    rect->bottom = e->height - 1 + rect->top;
 }
 
 // FUNCTION: 0x4a16f0
@@ -1004,7 +975,7 @@ int __stdcall SelectFontForEntry(Gadget* entries, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->group);
+        SetFont(g_guiContext->font);
         i = -1;
     }
     return i;
@@ -1124,11 +1095,6 @@ struct DrawListBoxPoint { int x; int y; };
 struct DrawListBoxQuad { DrawListBoxPoint points[4]; };
 
 
-struct DrawListBoxItem {
-    char unknown_0[0x28];
-    GafFrame* cell;
-};
-
 #pragma pack(pop)
 
 #include "../graphics/surface.h"
@@ -1222,7 +1188,7 @@ void __stdcall DrawListBox(Gui* obj, int index)
                 t++;
             }
         }
-        if (i == entries->u.count + 1) { SetFont(g_guiContext->current); }
+        if (i == entries->u.count + 1) { SetFont(g_guiContext->font); }
         GetFont();
         font = GetTextKeyColor();
         char* q = SkipTextLines(me->u.list.lines, me->u.list.firstRow);
@@ -1290,7 +1256,7 @@ void __stdcall DrawListBox(Gui* obj, int index)
             }
         }
     } else if (flags & 0xa0) {
-        DrawListBoxItem** colPtr;
+        ListBoxItem** colPtr;
         GafFrame* cellPtr;
         Rect cellRect;
         Rect clip;
@@ -1300,7 +1266,7 @@ void __stdcall DrawListBox(Gui* obj, int index)
         ((Surface*)surf)->SetClipRect(bounds);
         int k = me->u.list.firstRow;
         if (!bp) {
-            colPtr = &((DrawListBoxItem**)me->u.list.rows)[k];
+            colPtr = &((ListBoxItem**)me->u.list.rows)[k];
         } else {
             colPtr = 0;
             cellPtr = &((GafFrame*)me->u.list.rows)[k];
@@ -1438,32 +1404,14 @@ void __stdcall DrawGafBar(Gui* param_1, int index)
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
 
 
-struct DrawSliderBarHolder {
-    char unknown_0[4];
-    Gadget* entries;
-};
-
-struct DrawSliderBarObject {
-    char unknown_0[0x18];
-    DrawSliderBarHolder* holder;
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char field_8b2;
-    char unknown_8b3[0x8c1 - 0x8b3];
-    unsigned char field_8c1;
-    char unknown_8c2[0x8c3 - 0x8c2];
-    unsigned char field_8c3;
-    char unknown_8c4[0x8c6 - 0x8c4];
-    unsigned char field_8c6;
-};
-
 void __stdcall DrawRaisedBox(void* surface, int* r, int a, int b, int c);
 #include "listbox.h"
 void __stdcall SetTextColors(int a, int b);
 int __stdcall GetTextWidth(Font* font, char* text);
 
-static inline void* GetSliderBarSurface(DrawSliderBarObject* o)
+static inline void* GetSliderBarSurface(Gui* o)
 {
-    return o->holder->entries->u.assets.surface;
+    return o->layer->entries->u.assets.surface;
 }
 
 #include <setjmp.h>
@@ -1472,9 +1420,9 @@ struct UnitDef;
 struct Unit;
 
 // FUNCTION: 0x4a2580
-void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
+void __stdcall DrawSliderBar(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     void* surface = GetSliderBarSurface(obj);
     GafFrame* g;
@@ -1491,7 +1439,7 @@ void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
         }
     }
     if (i == entries->u.count + 1)
-        SetFont(g_guiContext->group);
+        SetFont(g_guiContext->font);
 
     int r1[4];
     int r2[4];
@@ -1499,8 +1447,8 @@ void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
 
     GafEntry* gl = e->sliderGaf;
     if (gl == 0) {
-        DrawRaisedBox(surface, r1, obj->field_8b2, obj->field_8c3, obj->field_8c6);
-        DrawSunkenBox(surface, (Rect *)r2, obj->field_8b2, obj->field_8c3, obj->field_8c6);
+        DrawRaisedBox(surface, r1, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
+        DrawSunkenBox(surface, (Rect *)r2, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
     } else {
         short w = e->width;
         short h = e->height;
@@ -1569,7 +1517,7 @@ void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
 
     if (e->attribs & 4) {
         int cur = GetTextKeyColor();
-        SetTextColors(obj->field_8c1, cur);
+        SetTextColors(obj->colours[0xf], cur);
         char buf[0x10];
         if (e->u.text[0] != 0) {
             strcpy(buf, e->u.text);
@@ -1588,22 +1536,22 @@ void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
         char* text = buf;
         int total = 0;
         if (text != 0) {
-            if (g_guiContext->font == 0) {
+            if (g_guiContext->language == 0) {
                 GetTextWidth(GetFont(), text);
             } else {
                 char* p = text;
                 for (; *p != 0; p++) {
                     unsigned char c = *p;
-                    g = (GafFrame*)GetGafFrame((unsigned short*)g_guiContext->font->glyphs, c);
+                    g = (GafFrame*)GetGafFrame((unsigned short*)g_guiContext->language->glyphs, c);
                     if (g != 0)
                         total += g->width;
                 }
             }
         }
-        if (g_guiContext->font == 0)
+        if (g_guiContext->language == 0)
             GetFontHeight();
         else
-            GetGafFrame((unsigned short*)g_guiContext->font->glyphs, 0x49);
+            GetGafFrame((unsigned short*)g_guiContext->language->glyphs, 0x49);
         DrawString(surface, buf, e->x + e->width + 2, e->y + 4, -1);
     }
 
@@ -1625,8 +1573,6 @@ void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
 #pragma pack(push, 1)
 int WriteScreenshot(int, int, int, int, int, int);
 #pragma pack(pop)
-
-void __stdcall DrawSliderBar(Gui* param_1, int param_2);
 
 // FUNCTION: 0x4a2be0
 void __stdcall SyncAssocGadgets(Gui* param_1, int param_2)
@@ -1761,13 +1707,13 @@ void __stdcall SetListBoxScrollByName(Gui* param_1, char* param_2, int param_3) 
         }
     }
     if (i == entries->u.count + 1)
-        SetFont(g_guiContext->current);
+        SetFont(g_guiContext->font);
 
     int size;
-    if (g_guiContext->list == 0)
+    if (g_guiContext->language == 0)
         size = GetFontHeight();
     else
-        size = *(unsigned short*)(GetGafFrame(g_guiContext->list->glyphs, 0x49) + 2) + 2;
+        size = *(unsigned short*)(GetGafFrame(g_guiContext->language->glyphs, 0x49) + 2) + 2;
     int step = (me->height - 2) / (size + 1);
     short last = me->u.list.firstRow;
     short sel = me->u.list.selected;
@@ -1812,13 +1758,13 @@ void __stdcall ResetListBox(Gui* obj, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->group);
+        SetFont(g_guiContext->font);
     }
     int step;
-    if (g_guiContext->font == 0) {
+    if (g_guiContext->language == 0) {
         step = GetFontHeight();
     } else {
-        step = *(unsigned short*)((char*)GetGafFrame(g_guiContext->font->glyphs, 0x49) + 2) + 2;
+        step = *(unsigned short*)((char*)GetGafFrame(g_guiContext->language->glyphs, 0x49) + 2) + 2;
     }
     int h = e->height;
     e->height = h - h % (step + 2);
@@ -1828,24 +1774,23 @@ void __stdcall ResetListBox(Gui* obj, int index)
 void __stdcall TruncateTextWithEllipsis(int a1, char* text, int a3, int a4, int a5);
 
 // FUNCTION: 0x4a31c0
-void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4)
+void __stdcall TruncateListItems(int a1, int a2, char* lines, int count)
 {
-    char* items = (char*)GameAllocIgnoreTag("SCROLLITEMS", *(int*)(a3 - 0x44));
+    char* items = (char*)GameAllocIgnoreTag("SCROLLITEMS", *(int*)(lines - 0x44));
     char* out = items;
-    for (int i = 0; i < a4; i++) {
+    for (int i = 0; i < count; i++) {
         char buf[100];
-        strncpy(buf, SkipTextLines(a3, i), 100);
+        strncpy(buf, SkipTextLines(lines, i), 100);
         TruncateTextWithEllipsis(a1, buf, a2, -1, 0);
         strcpy(out, buf);
         out += strlen(buf);
         *out = 0;
         out++;
     }
-    memcpy(a3, items, out - items);
+    memcpy(lines, items, out - items);
 }
 
 
-void __stdcall SetGadgetActive(ConfigureListBoxByNameRoot* menu, int index, int value);
 
 static inline int ConfigureListBoxFontHeight() {
     if (g_guiContext->language == 0)
@@ -1915,15 +1860,15 @@ void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* lines, int co
     if (found == -1)
         return;
     char* text = (char*)&holder->entries[found].name;
-    ConfigureListBoxByNameRoot* root = g_guiContext;
-    if (root->holder != 0) {
-        int j2 = FindConfigureListBoxEntry(root->holder->entries, text);
+    Gui* root = g_guiContext;
+    if (root->layer != 0) {
+        int j2 = FindConfigureListBoxEntry(root->layer->entries, text);
         if (j2 != -1) {
             SetGadgetActive(root, j2, remain < 0);
         }
     }
     if (remain < 0) {
-        DrawSlider((Gui *)g_guiContext, found);
+        DrawSlider(g_guiContext, found);
     }
 }
 
@@ -2033,61 +1978,24 @@ void __stdcall SetGadgetItems(SetGadgetItemsTable* table, char* name, int* items
 #pragma pack(push, 1)
 int DrawTriangleContours(int, int, int, int, int, int, int);
 
-struct HandleListBoxInputList {
-    char unknown_0[0xc];
-    unsigned short* glyphs;
-};
-
-struct HandleListBoxInputHolder {
-    int current;
-    Gadget* entries;
-    char unknown_08[0x14 - 0x08];
-    HandleListBoxInputList* list;
-    char unknown_18[0x20 - 0x18];
-    int selected;
-};
-
-struct HandleListBoxInputRect { int x0, y0, x1, y1; };
-
-struct HandleListBoxInputPoint {
-    int x;
-    int y;
-    int unknown_08[4];
-};
-
-static inline int PointInListRect(const HandleListBoxInputRect& r, const HandleListBoxInputPoint& p)
-{
-    return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1;
-}
-
-struct HandleListBoxInputObject {
-    char unknown_00[0x18];
-    HandleListBoxInputHolder* holder;
-    char unknown_1c[0x3c - 0x1c];
-    HandleListBoxInputPoint point;
-    char unknown_54[0x60 - 0x54];
-    int hotGadgetIndex;
-    int focus;
-    char unknown_68[0xcca - 0x68];
-    int changed;
-};
 #pragma pack(pop)
 
 #include "../../link/globals.h"
 
-void __stdcall TrySetFocus(HandleListBoxInputObject* obj, int index);
+struct HandleListBoxInputRect { int x0, y0, x1, y1; };
 
-struct HandleListBoxInputItem {
-    char unknown_0[0x28];
-    GafFrame* row;
-};
+static inline int PointInListRect(const HandleListBoxInputRect& r, const MouseEvent& p)
+{
+    return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1;
+}
+
 
 
 static inline int GetHandleListBoxInputLineHeight()
 {
-    if (0 == g_guiContext->list)
+    if (0 == g_guiContext->language)
         return GetFontHeight();
-    return ((GafFrame*)GetGafFrame(g_guiContext->list->glyphs, 0x49))->height + 2;
+    return ((GafFrame*)GetGafFrame(g_guiContext->language->glyphs, 0x49))->height + 2;
 }
 
 static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
@@ -2104,18 +2012,18 @@ static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
         i = -1;
     }
     return i;
 }
 
 // FUNCTION: 0x4a3780
-int __stdcall HandleListBoxInput(HandleListBoxInputObject* obj, int index, int param_3)
+int __stdcall HandleListBoxInput(Gui* obj, int index, int param_3)
 {
     if (obj->hotGadgetIndex != -1)
         return 0;
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* me = &entries[index];
     int orig_sel = me->u.list.selected;
     if (me->u.list.rowCount == 0)
@@ -2126,7 +2034,7 @@ int __stdcall HandleListBoxInput(HandleListBoxInputObject* obj, int index, int p
     int n = 0;
     r.y0 += 2;
     r.y1 -= 3;
-    HandleListBoxInputPoint point = obj->point;
+    MouseEvent point = obj->point;
     point.x -= entries[0].x;
     point.y -= entries[0].y;
     int i = SelectFontForEntry_inlined(entries, index);
@@ -2137,7 +2045,7 @@ int __stdcall HandleListBoxInput(HandleListBoxInputObject* obj, int index, int p
     int step = (me->height - 2) / span;
     char* s;
 
-    if (IsDoubleClickMessage((Gui *)obj, 1)) {
+    if (IsDoubleClickMessage(obj, 1)) {
         if (PointInListRect(r, point)) {
             if (me->u.list.rowCount == 0) goto skip0;
             if (!(me->attribs & 0x200))
@@ -2156,12 +2064,12 @@ int __stdcall HandleListBoxInput(HandleListBoxInputObject* obj, int index, int p
             return 0;
 skip0:;
         }
-    } else if (IsMouseButtonMessage((Gui *)obj, 1)) {
+    } else if (IsMouseButtonMessage(obj, 1)) {
         if (PointInListRect(r, point)) {
             TrySetFocus(obj, index);
             SetClickMode(obj, 1);
         }
-    } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
+    } else if (IsMouseButtonMessage(obj, 2)) {
         if (PointInListRect(r, point)) {
             TrySetFocus(obj, index);
             SetClickMode(obj, 2);
@@ -2170,10 +2078,10 @@ skip0:;
 
     if (obj->focus != index)
         goto end;
-    if (!HasMouseKeyFlags((Gui *)obj, 3))
+    if (!HasMouseKeyFlags(obj, 3))
         obj->focus = -1;
     if (PointInListRect(r, point)) {
-        obj->holder->selected = index;
+        obj->layer->current = index;
         flags = me->attribs;
         if (flags & 0x10) {
             me->u.list.selected = (point.y - r.y0) / span + me->u.list.firstRow;
@@ -2199,16 +2107,16 @@ skip0:;
         } else if (flags & 0x20 | 0x80) {
             int flag8 = (flags >> 7) & 1;
             GafFrame* fixed;
-            HandleListBoxInputItem** ip;
+            ListBoxItem** ip;
             if (flag8)
                 fixed = &((GafFrame*)me->u.list.rows)[me->u.list.firstRow];
             else
-                ip = &((HandleListBoxInputItem**)me->u.list.rows)[me->u.list.firstRow];
+                ip = &((ListBoxItem**)me->u.list.rows)[me->u.list.firstRow];
             int k = me->u.list.firstRow;
             int remain = point.y - r.y0 - 2;
             int n2 = 0;
             for (;;) {
-                GafFrame* row = flag8 ? fixed : (*ip)->row;
+                GafFrame* row = flag8 ? fixed : (*ip)->cell;
                 if (me->u.list.scroll != 0)
                     remain -= span;
                 else
@@ -2228,9 +2136,9 @@ skip0:;
             }
         }
         if (orig_sel != me->u.list.selected) {
-            DrawListBox((Gui*)obj, index);
+            DrawListBox(obj, index);
             if (me->u.list.callback)
-                me->u.list.callback((Gui*)obj, me);
+                me->u.list.callback(obj, me);
         }
         if (me->attribs & 0x40) {
 above:
@@ -2268,8 +2176,8 @@ ret1:
                     me->u.list.selected = orig_sel;
             }
 finish:
-            DrawListBox((Gui*)obj, index);
-            SyncAssocGadgets((Gui*)obj, index);
+            DrawListBox(obj, index);
+            SyncAssocGadgets(obj, index);
         }
     }
 end:
@@ -2301,11 +2209,9 @@ struct DrawSliderFont {
     GafFrame* glyph;
 };
 
-void __stdcall DrawSliderBar(Gui* gui, int gadgetIndex);
-
 static inline GafFrame* GetDrawSliderGlyph(unsigned char c)
 {
-    return (GafFrame*)GetGafFrame(g_guiContext->list->glyphs, c);
+    return (GafFrame*)GetGafFrame(g_guiContext->language->glyphs, c);
 }
 
 static inline int FindDrawSliderPeerByTeam(Gadget* entries, unsigned char kind)
@@ -2353,9 +2259,9 @@ void __stdcall DrawSlider(Gui* gui, int gadgetIndex)
                     }
                 }
                 if (i == entries->u.count + 1) {
-                    SetFont(g_guiContext->current);
+                    SetFont(g_guiContext->font);
                 }
-                int size = (g_guiContext->list == 0) ? GetFontHeight()
+                int size = (g_guiContext->language == 0) ? GetFontHeight()
                     : GetDrawSliderGlyph(0x49)->height + 2;
                 int numerator = e->height - 2;
                 int denominator = (e->u.list.scroll > size + 1) ? e->u.list.scroll : size + 1;
@@ -2401,36 +2307,7 @@ void __stdcall DrawSlider(Gui* gui, int gadgetIndex)
 }
 
 
-struct HandleSliderInputHolder {
-    char unknown_00[4];
-    Gadget* entries;
-    char unknown_08[0x14 - 0x08];
-    int dirty;
-};
-
-struct HandleSliderInputPoint {
-    int x;
-    int y;
-    int unknown_08[4];
-};
-
-struct HandleSliderInputObject {
-    char unknown_00[0x18];
-    HandleSliderInputHolder* holder;
-    char unknown_1c[0x3c - 0x1c];
-    HandleSliderInputPoint point;
-    char unknown_54[0x64 - 0x54];
-    int focus;
-    char unknown_68[0x78 - 0x68];
-    int knobDragging;
-    HandleSliderInputPoint saved;
-    short dragKnobPos;
-};
-
-void __stdcall TrySetFocus(HandleSliderInputObject* obj, int index);
-void __stdcall DrawSliderBar(HandleSliderInputObject* obj, int index);
-
-static inline void ClampKnobPosAndNotify(HandleSliderInputObject* obj, int index, Gadget* e, int old)
+static inline void ClampKnobPosAndNotify(Gui* obj, int index, Gadget* e, int old)
 {
     if (e->knobPos > e->range - 1)
         e->knobPos = e->range - 1;
@@ -2438,25 +2315,25 @@ static inline void ClampKnobPosAndNotify(HandleSliderInputObject* obj, int index
         e->knobPos = 0;
     if (e->knobPos == old)
         return;
-    if (obj->holder)
-        obj->holder->dirty = 1;
+    if (obj->layer)
+        obj->layer->dirty = 1;
     DrawSliderBar(obj, index);
-    SyncAssocGadgets((Gui*)obj, index);
+    SyncAssocGadgets(obj, index);
     if (e->sliderCallback)
-        e->sliderCallback((Gui*)obj, e->sliderUser);
+        e->sliderCallback(obj, e->sliderUser);
 }
 
 // FUNCTION: 0x4a4170
-void __stdcall HandleSliderInput(HandleSliderInputObject* obj, int index)
+void __stdcall HandleSliderInput(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     if (e->attribs & 0x10)
         return;
     if (e->sliderLocked)
         return;
 
-    HandleSliderInputPoint p = obj->point;
+    MouseEvent p = obj->point;
     p.x -= entries->x;
     p.y -= entries->y;
     int r1[4];
@@ -2464,7 +2341,7 @@ void __stdcall HandleSliderInput(HandleSliderInputObject* obj, int index)
     GetSliderRects(entries, index, r1, r2);
 
     if (obj->focus == index) {
-        if (!HasMouseKeyFlags((Gui *)obj, 3)) {
+        if (!HasMouseKeyFlags(obj, 3)) {
             obj->focus = -1;
             obj->knobDragging = 0;
         }
@@ -2495,7 +2372,7 @@ void __stdcall HandleSliderInput(HandleSliderInputObject* obj, int index)
 
     if (obj->knobDragging)
         return;
-    if (IsMouseButtonMessage((Gui *)obj, 1)) {
+    if (IsMouseButtonMessage(obj, 1)) {
         obj->knobDragging = 0;
         if (p.x < r1[0] || p.x > r1[2] || p.y < r1[1] || p.y > r1[3])
             return;
@@ -2508,7 +2385,7 @@ void __stdcall HandleSliderInput(HandleSliderInputObject* obj, int index)
         obj->dragKnobPos = e->knobPos;
         return;
     }
-    if (IsMouseButtonMessage((Gui *)obj, 2)) {
+    if (IsMouseButtonMessage(obj, 2)) {
         obj->knobDragging = 0;
         if (p.x < r1[0] || p.x > r1[2] || p.y < r1[1] || p.y > r1[3])
             return;
@@ -2525,31 +2402,12 @@ int __cdecl tolower(int);
 int __cdecl toupper(int);
 
 
-struct HandleLabelInputHolder {
-    int unknown_0;
-    Gadget* entries;
-};
-
-#pragma pack(push, 1)
-struct HandleLabelInputObject {
-    char unknown_0[0x18];
-    HandleLabelInputHolder* holder;
-    char unknown_1c[0x3c - 0x1c];
-    MouseEvent point;
-    char unknown_54[0x64 - 0x54];
-    int focus;
-    char unknown_68[0xcc6 - 0x68];
-    int pathsReady;
-};
-#pragma pack(pop)
-
-int __stdcall TrySetFocus(HandleLabelInputObject* obj, int index);
 #include "keyboard.h"
 
 // FUNCTION: 0x4a4440
-int __stdcall HandleLabelInput(HandleLabelInputObject* obj, int index, char key)
+int __stdcall HandleLabelInput(Gui* obj, int index, char key)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* entry = &entries[index];
     struct HandleLabelInputRect { int x1, y1, x2, y2; } rect;
     MouseEvent point;
@@ -2573,12 +2431,12 @@ int __stdcall HandleLabelInput(HandleLabelInputObject* obj, int index, char key)
     rel_x = point.x - entries->x;
     rel_y = point.y - entries->y;
 
-    if (IsMouseButtonMessage((Gui *)obj, 1)) {
+    if (IsMouseButtonMessage(obj, 1)) {
         if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
             goto fail;
         TrySetFocus(obj, index);
         SetClickMode(obj, 1);
-    } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
+    } else if (IsMouseButtonMessage(obj, 2)) {
         if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
             goto fail;
         TrySetFocus(obj, index);
@@ -2588,7 +2446,7 @@ int __stdcall HandleLabelInput(HandleLabelInputObject* obj, int index, char key)
 fail:
     if (obj->focus != index)
         goto check_queue;
-    if (HasMouseKeyFlags((Gui *)obj, 3))
+    if (HasMouseKeyFlags(obj, 3))
         goto check_queue;
     obj->focus = -1;
     if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
@@ -2837,7 +2695,7 @@ int __stdcall HandleHotspotInput(Gui* obj, int index)
     if (entries[index].u.hotspot.callback)
         entries[index].u.hotspot.callback(obj, &entries[index]);
     if (entries[index].u.hotspot.flags & 1) {
-        if (IsMouseButtonMessage((Gui *)obj, 1)) {
+        if (IsMouseButtonMessage(obj, 1)) {
             Point p;
             p.x = obj->point.x;
             p.y = obj->point.y;
@@ -2845,7 +2703,7 @@ int __stdcall HandleHotspotInput(Gui* obj, int index)
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 1);
             }
-        } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
+        } else if (IsMouseButtonMessage(obj, 2)) {
             Point p;
             p.x = obj->point.x;
             p.y = obj->point.y;
@@ -2854,7 +2712,7 @@ int __stdcall HandleHotspotInput(Gui* obj, int index)
                 SetClickMode(obj, 2);
             }
         }
-        if (obj->focus == index && !HasMouseKeyFlags((Gui *)obj, 3)) {
+        if (obj->focus == index && !HasMouseKeyFlags(obj, 3)) {
             obj->focus = -1;
             Point q;
             q.y = obj->point.y;
@@ -2947,7 +2805,7 @@ static inline int SelectTextInputFont(Gadget* entries, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
         i = -1;
     }
     return i;
@@ -3009,7 +2867,7 @@ void __stdcall DrawTextInput(Gui* obj, int index)
 // FUNCTION: 0x4a5010
 void* __stdcall GetCharGlyph(unsigned char c)
 {
-    return GetGafFrame(g_guiContext->font->glyphs, c);
+    return GetGafFrame(g_guiContext->language->glyphs, c);
 }
 
 int __stdcall GetTextWidth(Font* param_1, unsigned char* text);
@@ -3020,33 +2878,24 @@ int __stdcall GetTextPixelWidth(unsigned char* text)
     int width = 0;
     if (text == 0)
         return 0;
-    if (g_guiContext->font == 0)
+    if (g_guiContext->language == 0)
         return GetTextWidth(GetFont(), text);
     for (int i = 0; text[i]; i++) {
         unsigned char c = text[i];
-        unsigned short* glyph = (unsigned short*)GetGafFrame(g_guiContext->font->glyphs, c);
+        unsigned short* glyph = (unsigned short*)GetGafFrame(g_guiContext->language->glyphs, c);
         if (glyph)
             width += *glyph;
     }
     return width;
 }
 
-struct FontGlyphTable {
-    char unknown_0[3];
-    unsigned char first;
-    unsigned short offsets[1];
-    char unknown_6[6];
-    void* glyphs;
-};
-
-
 // FUNCTION: 0x4a50b0
 int GetFontLineHeight()
 {
-    if (g_guiContext->font == 0) {
+    if (g_guiContext->language == 0) {
         return GetFontHeight();
     }
-    return ((GafFrame*)GetGafFrame(g_guiContext->font->glyphs, 'I'))->height + 2;
+    return ((GafFrame*)GetGafFrame(g_guiContext->language->glyphs, 'I'))->height + 2;
 }
 
 #include "../graphics/gaf.h"
@@ -3055,7 +2904,7 @@ void __stdcall DrawString(void* surface, char* text, int x, int y, int maxWidth)
 // FUNCTION: 0x4a50e0
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style)
 {
-    if (g_guiContext->font == 0) {
+    if (g_guiContext->language == 0) {
         DrawString(surface, text, x, y, -1);
         return;
     }
@@ -3063,7 +2912,7 @@ void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw
     while (*s) {
         if (*s >= ' ') {
             unsigned char c = *s;
-            GafFrame* g = (GafFrame*)GetGafFrame(g_guiContext->font->glyphs, c);
+            GafFrame* g = (GafFrame*)GetGafFrame(g_guiContext->language->glyphs, c);
             if (g) {
                 if (maxw != -1 && (int)g->width > maxw)
                     return;
@@ -3090,20 +2939,20 @@ int __stdcall GetTextWidth(Font* a, char* text);
 
 static inline int GetDrawWrappedTextLineHeight()
 {
-    if (g_guiContext->font == 0)
+    if (g_guiContext->language == 0)
         return GetFontHeight();
-    return (int)((GafFrame*)GetGafFrame(g_guiContext->font->glyphs, 'I'))->height + 2;
+    return (int)((GafFrame*)GetGafFrame(g_guiContext->language->glyphs, 'I'))->height + 2;
 }
 
 static inline int Measure(char* word, int t)
 {
     if (word == 0)
         return t;
-    if (g_guiContext->font == 0)
+    if (g_guiContext->language == 0)
         return GetTextWidth(GetFont(), word);
     for (char* n = word; *n; n++) {
         unsigned char ch = *n;
-        unsigned short* g = (unsigned short*)GetGafFrame(g_guiContext->font->glyphs, ch);
+        unsigned short* g = (unsigned short*)GetGafFrame(g_guiContext->language->glyphs, ch);
         if (g)
             t += *g;
     }
@@ -3205,13 +3054,10 @@ void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colou
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw, int rem, int style);
 
-void __stdcall DrawSliderBar(Gui* obj, int index);
 void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 void __stdcall DrawLineGadget(Gui* obj, int index, unsigned int param3);
 int __stdcall HandleLabelInput(Gui* obj, int index, int key);
 int __stdcall TrySetFocus(Gui* obj, int index);
-int __stdcall HandleListBoxInput(Gui* obj, int index, int key);
-void __stdcall HandleSliderInput(Gui* obj, int index);
 #include "../graphics/object_pool.h"
 int __stdcall SelectFontForEntry(void* entries, int index);
 
@@ -3262,7 +3108,7 @@ static inline int SelectLabelFont(Gadget* entries, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
         i = -1;
     }
     return i;
@@ -3901,7 +3747,7 @@ void __stdcall BeginTextEdit(Gui* obj, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
     }
 
     TrySetFocus(obj, index);
@@ -3914,7 +3760,7 @@ static inline void Activate(Gui* obj, int index)
 {
     Rect rect;
     Gadget* ep = obj->layer->entries;
-    GetGadgetRectByIndex((char*)ep, index, &rect);
+    GetGadgetRectByIndex(ep, index, &rect);
     SetTextColors(obj->colours[ep[index].colours], GetTextKeyColor());
     SelectFontForEntry((void*)ep, index);
     TrySetFocus(obj, index);
@@ -3928,7 +3774,7 @@ int __stdcall HandleTextInput(Gui* obj, int index, int key)
 {
     Gadget* entries = obj->layer->entries;
     Rect rect;
-    GetGadgetRectByIndex((char*)entries, index, &rect);
+    GetGadgetRectByIndex(entries, index, &rect);
     SelectFontForEntry_inlined(entries, index);
 
     MouseEvent point = obj->point;
@@ -4015,7 +3861,7 @@ static inline void DoSelect(Gui* menu, Gadget* entries, int sel)
         }
     }
     if (i == entries->u.count + 1)
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
     TrySetFocus(menu, sel);
     menu->layer->current = sel;
     CommitTextEdit(menu, sel, entry->u.text, entry->status, 0);
@@ -4061,7 +3907,7 @@ void __stdcall SelectGadgetByIndex(Gui* menu, int index)
             }
         }
         if (j == entries->u.count + 1) {
-            SetFont(g_guiContext->fontId);
+            SetFont(g_guiContext->font);
         }
 
         TrySetFocus(menu, i);
@@ -4669,7 +4515,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                         }
                     }
                     if (j == base[0].u.count + 1)
-                        SetFont(g_guiContext->fontId);
+                        SetFont(g_guiContext->font);
                     if (g_guiContext->language == 0)
                         fh = GetFontHeight();
                     else
@@ -4869,7 +4715,7 @@ void __stdcall ListBoxSelectUp(Gui* param_1, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
     }
     int size;
     if (g_guiContext->language == 0) {
@@ -4930,7 +4776,7 @@ void __stdcall ListBoxSelectDown(Gui* param_1, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
     }
     int size = (g_guiContext->language == 0) ? GetFontHeight()
         : (*(unsigned short*)((int)GetGafFrame(g_guiContext->language->glyphs, 0x49) + 2) + 2);
@@ -5311,7 +5157,7 @@ int __stdcall UpdateMenu(Gui* menu)
 // FUNCTION: 0x4aa850
 void __stdcall SetCurrentGuiContext(Gui* ctx)
 {
-    g_guiContext = (ConfigureListBoxByNameRoot*)ctx;
+    g_guiContext = ctx;
     ctx->layer = 0;
     ctx->str_9b6[0] = 0;
     ctx->str_ab6[0] = 0;

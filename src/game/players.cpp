@@ -440,20 +440,20 @@ int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 #include "../gui/gui.h"
 
 // FUNCTION: 0x464de0
-void __stdcall ContinueWatchingCallback(Gui* gadget)
+void __stdcall ContinueWatchingCallback(Gui* gui)
 {
-    int screen = (int)gadget->layer->entries;
-    if (gadget->hotGadgetIndex == -1)
+    int screen = (int)gui->layer->entries;
+    if (gui->hotGadgetIndex == -1)
         return;
     PlaySoundByName("BigButton", 0);
-    if (IsGadgetNamed(screen, gadget->hotGadgetIndex, "CHOICE1")) {
+    if (IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE1")) {
         BroadcastPlayerInfo();
         g_game->bits.flag4 = 0;
         ReportGameEvent(4);
         return;
     }
-    if (!IsGadgetNamed(screen, gadget->hotGadgetIndex, "CHOICE2")) {
-        ClearSelectedGadget(gadget);
+    if (!IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE2")) {
+        ClearSelectedGadget(gui);
         return;
     }
     g_game->bits.flag2 = 1;
@@ -461,25 +461,22 @@ void __stdcall ContinueWatchingCallback(Gui* gadget)
 }
 
 
-Layer* __stdcall LoadGuiLayer(Menu* menu, char* name, int value);
-void __stdcall SetKeyboardInput(Menu* menu, int flag);
-void __stdcall SetTranslatedTextByName(Menu* menu, char* name, char* text, int value);
 
 // FUNCTION: 0x464e70
 void ShowContinueWatchingDialog()
 {
-    Layer* screen = LoadGuiLayer(&g_game->gui_519, g_yesNoGuiName, 0x900);
+    Layer* screen = LoadGuiLayer(&g_game->gui, g_yesNoGuiName, 0x900);
     if (screen) {
         Gadget* form;
-        SetKeyboardInput(&g_game->gui_519, 1);
+        SetKeyboardInput(&g_game->gui, 1);
         form = screen->entries;
-        SetTranslatedTextByName(&g_game->gui_519, g_choice1GadgetName, g_yesText, 0);
-        SetTranslatedTextByName(&g_game->gui_519, g_choice2GadgetName, g_noText, 0);
-        SetTranslatedTextByName(&g_game->gui_519, g_titleGadgetName, g_continueWatchingTitle, 0);
+        SetTranslatedTextByName(&g_game->gui, g_choice1GadgetName, g_yesText, 0);
+        SetTranslatedTextByName(&g_game->gui, g_choice2GadgetName, g_noText, 0);
+        SetTranslatedTextByName(&g_game->gui, g_titleGadgetName, g_continueWatchingTitle, 0);
         strcpy(form->u.names.choice, g_choice1GadgetName);
         strcpy(form->u.names.choice2, g_choice2GadgetName);
         screen->handler = ContinueWatchingCallback;
-        RenderLayer((Gui *)&g_game->gui_519, 0x40);
+        RenderLayer(&g_game->gui, 0x40);
     }
 }
 
@@ -736,24 +733,24 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                     g_seams.los_radar->RecalculateLineOfSight(1);
                     BroadcastPlayerInfo();
                     if (CountActiveAIPlayers() == 0) {
-                        Layer* dlg = LoadGuiLayer(&g_game->gui_519, "YESORNO.GUI", 0x900);
+                        Layer* dlg = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x900);
                         if (dlg != 0) {
-                            SetKeyboardInput(&g_game->gui_519, 1);
+                            SetKeyboardInput(&g_game->gui, 1);
                             Gadget* w = dlg->entries;
-                            SetTranslatedTextByName(&g_game->gui_519, "CHOICE1", "Yes", 0);
-                            SetTranslatedTextByName(&g_game->gui_519, "CHOICE2", "No", 0);
-                            SetTranslatedTextByName(&g_game->gui_519, "TITLE",
+                            SetTranslatedTextByName(&g_game->gui, "CHOICE1", "Yes", 0);
+                            SetTranslatedTextByName(&g_game->gui, "CHOICE2", "No", 0);
+                            SetTranslatedTextByName(&g_game->gui, "TITLE",
                                          "You're out!  Continue Watching?", 0);
                             strcpy(w->u.names.choice, "CHOICE1");
                             strcpy(w->u.names.choice2, "CHOICE2");
                             dlg->handler = ContinueWatchingCallback;
-                            RenderLayer((Gui *)&g_game->gui_519, 0x40);
+                            RenderLayer(&g_game->gui, 0x40);
                         }
                         goto skip508;
                     }
                     if (CountCombatPlayers() <= 0)
                         goto skip508;
-                    OpenMessageBox((Gui *)&g_game->gui_519,
+                    OpenMessageBox(&g_game->gui,
                                  (char *)Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
                                  500, 1, 1);
                     g_game->endGameFlags &= 0xffef;

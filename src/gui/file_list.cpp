@@ -69,7 +69,6 @@ int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 #include "dialogs.h"
 #include "file_list.h"
-void* __stdcall LoadGuiLayer(void* param_1, char* param_2, int param_3);
 void __stdcall SelectFontForEntry(Gadget* entries, int index);
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);

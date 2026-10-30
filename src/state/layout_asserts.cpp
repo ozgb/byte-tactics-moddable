@@ -1278,7 +1278,7 @@ static_assert(offsetof(Gui, clearQuickKeys) == 112, "");
 static_assert(offsetof(Gui, cursor) == 116, "");
 static_assert(offsetof(Gui, knobDragging) == 120, "");
 static_assert(offsetof(Gui, saved) == 124, "");
-static_assert(offsetof(Gui, pad_94) == 148, "");
+static_assert(offsetof(Gui, dragKnobPos) == 148, "");
 static_assert(offsetof(Gui, time) == 150, "");
 static_assert(offsetof(Gui, animTimer) == 154, "");
 static_assert(offsetof(Gui, inputEnabled) == 158, "");

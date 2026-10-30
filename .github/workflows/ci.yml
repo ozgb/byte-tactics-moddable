@@ -294,6 +294,9 @@ jobs:
       - name: Adapters across major bumps
         run: uv run tools/wasm_modules.py adapters
 
+      - name: A module's fatal exits after the call
+        run: uv run tools/wasm_modules.py fatal
+
       - name: Test the module tools
         run: uv run tools/test_wasm_modules.py
 

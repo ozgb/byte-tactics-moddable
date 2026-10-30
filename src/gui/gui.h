@@ -7,7 +7,6 @@ struct IsBelowRectBottomRect;
 struct Gadget;
 
 struct BlinkWord;
-struct Dialog;
 struct DrawListBoxDialog;
 struct SyncAssocGadgetsDialog;
 struct SetListBoxScrollByNameDialog;
@@ -19,7 +18,6 @@ struct Rect;
 struct FileRequester;
 struct Font;
 struct FontGlyphTable;
-struct Dialog;
 struct RedrawGadgetRectDialog;
 struct ResetSliderGadgetDialog;
 struct ScheduleGadgetEndTickDialog;
@@ -34,65 +32,11 @@ struct Rect;
 
 struct Layer;
 
-struct Dialog {
-    union {
-        struct {
-            int unknown_0;
-            Gadget* entries;
-            void (__stdcall* handler)(void*);
-            void* data;
-            int flags;
-            FontGlyphTable* language;
-        };
-        struct {
-            char path[0x13];
-            short field_13;
-            char unknown_15[0x18 - 0x15];
-        };
-    };
-    Layer* holder;
-    void (__stdcall* field_1c)(void);
-    int field_20;
-    void* surface;
-    char text[14];
-    char field_36;
-    int field_37;
-    char unknown_3b[1];
-    MouseEvent point;
-    unsigned int flags_54;
-    char unknown_58[8];
-    int current;
-    int focus;
-    int index;
-    int used;
-    int field_70;
-    int length;
-    int field_78;
-    MouseEvent saved;
-    short field_94;
-    char unknown_96[12];
-    int keyCommands;
-    BlinkWord* words;
-    int count;
-    int active;
-    char unknown_b2[0x8b2 - 0xb2];
-    unsigned char colour;
-    char unknown_8b3[0x9b6 - 0x8b3];
-    char path_9b6[0x100];
-    char path_ab6[0x100];
-    char path_bb6[0x100];
-    char unknown_cb6[16];
-    int field_cc6;
-    int changed;
-
-    FileRequester* OpenFileRequester(Dialog* self, char* arg2, char* arg3, char* arg4);
-};
-
 struct Gui {
     Font* font;
     void* gaf;
     void* values[3];
-    void* language;
+    FontGlyphTable* language;
     Layer* layer;
     int cursorSharedFrame;
     int cursorDefaultFrame;
@@ -104,12 +48,7 @@ struct Gui {
     unsigned char cursorKind;
     char unknown_35[3];
     void* cursorSrc;
-    int pointX;
-    int pointY;
-    unsigned int pointKeyFlags;
-    int pointTick;
-    int pointMessage;
-    int pointDoubleClick;
+    MouseEvent point;
     int mouseKeyFlags;
     int clickMode;
     unsigned int cursorFlags;
@@ -120,12 +59,15 @@ struct Gui {
     int clearQuickKeys;
     int cursor;
     int knobDragging;
-    char unknown_7c[0x96 - 0x7c];
+    MouseEvent saved;
+    char pad_94[2];
     int time;
     int animTimer;
     int inputEnabled;
-    int dirty;
-    char unknown_a6[0xb2 - 0xa6];
+    int keyCommands;
+    BlinkWord* words;
+    int count;
+    int active;
     unsigned int palette[0x100];
     char unknown_4b2[0x8b2 - 0x4b2];
     unsigned char colours[0x100];
@@ -138,15 +80,17 @@ struct Gui {
     int clickStatusCache;
     void* fallback;
     char cachedBgName[0x20];
+
+    FileRequester* OpenFileRequester(Gui* self, char* arg2, char* arg3, char* arg4);
 };
 
 #pragma pack(pop)
 
-int __stdcall HasGadgetNamed(Dialog* obj, char* name, int unused);
+int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused);
 void __stdcall ClearChanged(void*);
-void __stdcall ClearLayerChanged(Dialog* param);
-int __stdcall GetKeyboardInput(Dialog* obj);
-void __stdcall ClearFocus(Dialog*);
+void __stdcall ClearLayerChanged(Gui* param);
+int __stdcall GetKeyboardInput(Gui* obj);
+void __stdcall ClearFocus(Gui*);
 int __stdcall IsFocused(int, int);
 bool __stdcall HasFocus(int);
 void __stdcall FUN_0049fd20(DialogPointView*, DialogOriginView*, MouseEvent*);
@@ -182,17 +126,17 @@ void __stdcall ListBoxSelectDown(Gui*, int index);
 int __stdcall HandleGuiCommand(Gui* obj, int cmd);
 int __stdcall GetGuiContext(void);
 
-void __stdcall SetGadgetName(Dialog* obj, char* name, char* text);
-void __stdcall RunWhileScreenNamed(Dialog* menu, char* name);
-void __stdcall EnableKeyCommands(Dialog* p);
-void __stdcall DisableKeyCommands(Dialog* obj);
-void __stdcall MarkChanged(Dialog* obj);
-void __stdcall MarkLayerChanged(Dialog* obj);
-void __stdcall DrawSlider(Dialog* gui, int gadgetIndex);
-void __stdcall SetFontsPath(Dialog* obj, const char* dir);
-void __stdcall SetGuiPath(Dialog* obj, const char* dir);
-void __stdcall SetAnimsPath(Dialog* obj, const char* dir);
-int __stdcall IsCurrentGadgetNamed(Dialog* gui, char* name);
+void __stdcall SetGadgetName(Gui* obj, char* name, char* text);
+void __stdcall RunWhileScreenNamed(Gui* menu, char* name);
+void __stdcall EnableKeyCommands(Gui* p);
+void __stdcall DisableKeyCommands(Gui* obj);
+void __stdcall MarkChanged(Gui* obj);
+void __stdcall MarkLayerChanged(Gui* obj);
+void __stdcall DrawSlider(Gui* gui, int gadgetIndex);
+void __stdcall SetFontsPath(Gui* obj, const char* dir);
+void __stdcall SetGuiPath(Gui* obj, const char* dir);
+void __stdcall SetAnimsPath(Gui* obj, const char* dir);
+int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name);
 void __stdcall GetGadgetRectByIndex(char*, int, Rect*);
 void __stdcall GetGadgetScreenRect(char*, int, Rect*);
 int __stdcall FindBackgroundCell(Gadget* entries, int index);
@@ -223,5 +167,8 @@ int __stdcall IsAboveRectTop(IsAboveRectTopRect*, int);
 int __stdcall IsBelowRectBottom(IsBelowRectBottomRect* obj, int value);
 void __stdcall DrawGafBar(GadgetAccessDialog*, int index);
 void __stdcall ResetListBox(GadgetAccessDialog* obj, int index);
+
+void __stdcall UpdateHelpText(Gui* obj);
+void __stdcall SelectAdjacentGadget(Gui* menu, int dir);
 
 #endif

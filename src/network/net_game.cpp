@@ -2010,7 +2010,7 @@ void UpdateTimeoutDialog()
 
     if (g_loungeRefreshTime < GetTicks()) {
         g_loungeRefreshTime = GetTicks() + 2;
-        MarkChanged((Dialog *)g_game->message);
+        MarkChanged((Gui *)g_game->message);
     }
 
     memset(g_loungeChatter, 0, 0xa00);
@@ -2050,7 +2050,7 @@ void UpdateTimeoutDialog()
         sprintf(buf, Translate("will be rejected in %d seconds"),
                 g_game->lobbyTimeoutSecs - elapsed + 0x78);
         SetTranslatedTextByName(g_game->message, "TIMETEXT", buf, 0);
-        MarkChanged((Dialog *)g_game->message);
+        MarkChanged((Gui *)g_game->message);
         if (elapsed < g_game->lobbyTimeoutSecs + 0x78)
             return;
         RejectPlayer(g_timeoutPlayerDpid, 6);
@@ -2070,7 +2070,7 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
         g_loungeChatter = 0;
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "TALK")) {
+    if (IsCurrentGadgetNamed(gadget, "TALK")) {
         TalkGadgetEntry* entry = FindGadgetChecked_B(entries, "TALK");
         if (strlen(entry->text)) {
             SendChatMessage(&g_game->players[g_game->localPlayer], entry->text, 4, 0);
@@ -2079,10 +2079,10 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
         }
         BeginTextEdit((Gui *)g_game->message, FindGadgetIndex(((Layer*)g_game->layer)->entries, "TALK", 3));
         ClearSelectedGadget(g_game->message);
-        MarkChanged((Dialog *)g_game->message);
+        MarkChanged((Gui *)g_game->message);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "REJECT")) {
+    if (IsCurrentGadgetNamed(gadget, "REJECT")) {
         RejectPlayer(g_timeoutPlayerDpid, 6);
         return;
     }

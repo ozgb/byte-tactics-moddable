@@ -347,13 +347,13 @@ void __stdcall FileRequesterHandler(Gui* gadget)
         }
     } else {
         RefreshFileList(req);
-        MarkChanged((Dialog *)gadget);
+        MarkChanged(gadget);
         ClearSelectedGadget(gadget);
     }
 }
 
 // FUNCTION: 0x4afa30
-FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, char* arg4)
+FileRequester* Gui::OpenFileRequester(Gui* self, char* arg2, char* arg3, char* arg4)
 {
     void* gui = LoadGuiLayer(self, "FILEREQ.GUI", 0);
     if (gui == NULL) {
@@ -361,7 +361,7 @@ FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, c
     }
 
     FileRequester* obj = (FileRequester*)GameAllocIgnoreTag("FILE REQUESTER DATA", 0x24c);
-    obj->gui = (Gui*)self;
+    obj->gui = self;
     strcpy(obj->cwd, arg2);
     StripFileName(obj->cwd);
 
@@ -373,7 +373,7 @@ FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, c
     ((void**)gui)[3] = obj;
     obj->callback = 0;
 
-    Gadget* entries = (Gadget*)self->holder->entries;
+    Gadget* entries = (Gadget*)self->layer->entries;
     obj->nameGadget = (char*)FindGadgetChecked_B(entries, "NAME");
     obj->maskGadget = (char*)FindGadgetChecked_B(entries, "MASK");
     obj->pathGadget = (char*)FindGadgetOrNull(entries, "PATH");
@@ -410,7 +410,7 @@ FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, c
 }
 
 // FUNCTION: 0x4afc60
-void __stdcall AllocBlinkWords(Dialog* obj, int count)
+void __stdcall AllocBlinkWords(Gui* obj, int count)
 {
     if (obj->words) {
         GameFreeThunk(obj->words);
@@ -434,7 +434,7 @@ void __stdcall FreeBlinkWords(int param_1)
 }
 
 // FUNCTION: 0x4afd20
-void __stdcall SetBlinkGadget(Dialog* obj, int value)
+void __stdcall SetBlinkGadget(Gui* obj, int value)
 {
     obj->words->value = value;
 }
@@ -457,7 +457,7 @@ void __stdcall DisableBlinkWords(int param_1)
 }
 
 // FUNCTION: 0x4afd80
-int __stdcall AddBlinkWord(Dialog* obj, const char* text, int p2, int p3,
+int __stdcall AddBlinkWord(Gui* obj, const char* text, int p2, int p3,
                            int p4, int p5, float f6, float f7)
 {
     BlinkWord* p = obj->words;
@@ -502,7 +502,7 @@ void __stdcall ClearBlinkWord(void* param1, int param2)
 }
 
 // FUNCTION: 0x4afec0
-void __stdcall ClearBlinkWords(Dialog* obj)
+void __stdcall ClearBlinkWords(Gui* obj)
 {
     if (obj->words != 0) {
         for (int i = 0; i < obj->count; i++) {
@@ -512,7 +512,7 @@ void __stdcall ClearBlinkWords(Dialog* obj)
 }
 
 // FUNCTION: 0x4aff00
-void __stdcall DrawBlinkWords(Dialog* obj)
+void __stdcall DrawBlinkWords(Gui* obj)
 {
     if (obj->active == 0)
         return;
@@ -520,7 +520,7 @@ void __stdcall DrawBlinkWords(Dialog* obj)
     int time = GetTicks();
 
     if (obj->words->value != -1)
-        SelectFontForEntry((Gadget*)obj->holder->entries,
+        SelectFontForEntry((Gadget*)obj->layer->entries,
                      obj->words->value);
 
     for (int i = 0; i < obj->count; i++) {
@@ -545,7 +545,7 @@ void __stdcall DrawBlinkWords(Dialog* obj)
         else
             SetTextColors(obj->words[i].colourA, GetTextKeyColor());
 
-        DrawString((void*)*(int*)((char*)obj->holder->entries + 0xbc),
+        DrawString((void*)*(int*)((char*)obj->layer->entries + 0xbc),
                      obj->words[i].text, obj->words[i].x,
                      obj->words[i].y, -1);
     }

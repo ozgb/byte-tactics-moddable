@@ -56,8 +56,8 @@ void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, c
     if (last != '\n')
         PlaySoundByName("MessageArrived", 0);
     if (IsScreenNamed((Gui *)((char*)&g_game->menu_519_8b2[0]), "TIMEOUT.GUI")) {
-        MarkChanged((Dialog *)((char*)&g_game->menu_519_8b2[0]));
-        MarkLayerChanged((Dialog *)((char*)&g_game->menu_519_8b2[0]));
+        MarkChanged((Gui *)((char*)&g_game->menu_519_8b2[0]));
+        MarkLayerChanged((Gui *)((char*)&g_game->menu_519_8b2[0]));
     }
 }
 

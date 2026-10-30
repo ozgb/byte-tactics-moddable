@@ -634,7 +634,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **presentation** (1393 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 310 functions are called from outside, mostly by game (216 distinct functions); the busiest are `QueueUnitSpeech` (27), `PlaySoundByName` (18), `GetDisplay` (16). It imports 336 functions: platform 156, network 54, files 31, game 26, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
-**platform** (799 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 293 functions are called from outside, by presentation (156 distinct functions), game (94), network (48) and units (47); the busiest are `GameFreeThunk` (164), `operator new` (123), `operator delete` (86), then `Translate` (78) and `GameAllocIgnoreTag` (77). It imports 176 functions: game 76, presentation 46.
+**platform** (799 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 293 functions are called from outside, by presentation (156 distinct functions), game (94), network (48) and units (47); the busiest are `GameFreeThunk` (164), `operator new` (123), `operator delete` (86), then `Translate` (77) and `GameAllocIgnoreTag` (77). It imports 176 functions: game 76, presentation 46.
 
 **seams** (103 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 98 functions are called from outside. It imports 103 functions.
 
@@ -677,7 +677,7 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | game | 113 of 184 | 61.4% | 50.3% | 31.1% | 71 | 23 |
 | network | 50 of 287 | 17.4% | 10.7% | 4.5% | 237 | 73 |
 | platform | 379 of 720 | 52.6% | 39.0% | 25.5% | 341 | 83 |
-| presentation | 454 of 1107 | 41.0% | 31.0% | 21.6% | 653 | 294 |
+| presentation | 454 of 1106 | 41.0% | 31.0% | 21.6% | 652 | 294 |
 | seams | 93 of 103 | 90.3% | 95.3% | - | 10 | 0 |
 | state | 293 of 343 | 85.4% | 80.9% | 51.0% | 50 | 21 |
 

@@ -162,7 +162,7 @@ void InitFrame()
 {
     if (((signed char)g_game->cursorMode) != 0x13) {
         g_game->cursorMode = (char)(0x13);
-        SetCursorAnimation((Gui*)&g_game->gui, g_game->table[0x13]);
+        SetCursorAnimation(&g_game->gui, g_game->table[0x13]);
     }
     ShowSoftwareCursor();
     g_game->bits_2a44.bit2 = 0;
@@ -188,7 +188,7 @@ void ReturnToMainMenuFrame()
     g_game->bits_3923b.flag4_3923b = 0;
     g_game->bits_3923b.flag2_3923b = 0;
     ClearKeyQueue();
-    EnableKeyCommands((Dialog *)&g_game->gui);
+    EnableKeyCommands(&g_game->gui);
     g_game->mode_391f1 = 2;
     g_game->handler = MenuFrame;
     SetCloseHandler(LeaveNetGameCallback, 0);

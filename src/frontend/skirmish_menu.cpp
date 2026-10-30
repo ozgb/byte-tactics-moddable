@@ -72,7 +72,7 @@ void RefreshAllyIcons(void)
             }
         }
     }
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkChanged(&g_game->gui);
 }
 
 #pragma auto_inline(off)
@@ -486,7 +486,7 @@ void RefreshSkirmishSetup()
     }
 
     SetTranslatedTextByName(&g_game->gui, "MapName", g_game->options->mapName, 0);
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkChanged(&g_game->gui);
 }
 
 // FUNCTION: 0x47a700
@@ -587,15 +587,15 @@ void __stdcall HandleSkirmishMapClick(Gui* menu)
         GameFreeThunk(list);
         return;
     }
-    if (!IsCurrentGadgetNamed((Dialog *)menu, "MAPNAMES") && !IsCurrentGadgetNamed((Dialog *)menu, "LOAD")) {
-        if (IsCurrentGadgetNamed((Dialog *)menu, "PREVMENU")) {
+    if (!IsCurrentGadgetNamed(menu, "MAPNAMES") && !IsCurrentGadgetNamed(menu, "LOAD")) {
+        if (IsCurrentGadgetNamed(menu, "PREVMENU")) {
             PlaySoundByName("Previous", 0);
         } else {
             ClearSelectedGadget(menu);
         }
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)menu, "LOAD")) {
+    if (IsCurrentGadgetNamed(menu, "LOAD")) {
         PlaySoundByName("SmallButton", 0);
     }
     Gadget* g = FindGadgetChecked(entries, "MAPNAMES");
@@ -703,7 +703,7 @@ void __stdcall CyclePlayerColor(int reverse)
             gadget->u.hotspot.index = (unsigned short)g_game->options->players[current].color;
         }
     }
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkChanged(&g_game->gui);
 }
 
 // FUNCTION: 0x47ae30
@@ -729,7 +729,6 @@ struct ClickFrame {
 #include "../game/cd_check.h"
 #include "endgame.h"
 #include "../game/settings.h"
-void __stdcall UpdateHelpText(Gui* gui);
 #include "../gui/keyboard.h"
 
 // FUNCTION: 0x47ae60
@@ -749,7 +748,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
     table->current = player;
     frame.bf[strlen(frame.bf) - 1] = 0;
 
-    if (IsCurrentGadgetNamed((Dialog *)menu, "Start")) {
+    if (IsCurrentGadgetNamed(menu, "Start")) {
         PlaySoundByName("BigButton", 0);
         RegisterDataArchives();
 
@@ -847,7 +846,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         return;
     }
 
-    if (IsCurrentGadgetNamed((Dialog *)menu, "PrevMenu")) {
+    if (IsCurrentGadgetNamed(menu, "PrevMenu")) {
         PlaySoundByName("Previous", 0);
         SetCursorMode(0x14);
         (*(char*)&g_game->frontendNextSubState) = 3;
@@ -924,7 +923,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
             _itoa(g_game->options->players[player].metal, frame.sB, 10);
             SetTranslatedTextByName(menu, frame.sA, frame.sB, 10);
         }
-    } else if (IsCurrentGadgetNamed((Dialog *)menu, "CommanderDeath")) {
+    } else if (IsCurrentGadgetNamed(menu, "CommanderDeath")) {
         PlaySoundByName("Skirmish", 0);
         SkirmishOptionsTable* t = g_game->options;
         t->commanderDeath ^= 1;
@@ -935,7 +934,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         else
             strcpy(e->helpKey, Translate("Game continues after Commander is destroyed."));
         UpdateHelpText(&g_game->gui);
-    } else if (IsCurrentGadgetNamed((Dialog *)menu, "StartLocation")) {
+    } else if (IsCurrentGadgetNamed(menu, "StartLocation")) {
         PlaySoundByName("Skirmish", 0);
         SkirmishOptionsTable* t = g_game->options;
         t->fixedLocations ^= 1;
@@ -946,7 +945,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         else
             strcpy(e->helpKey, Translate("Commanders are randomly placed on the battle field."));
         UpdateHelpText(&g_game->gui);
-    } else if (IsCurrentGadgetNamed((Dialog *)menu, "Mapping")) {
+    } else if (IsCurrentGadgetNamed(menu, "Mapping")) {
         PlaySoundByName("Skirmish", 0);
         SkirmishOptionsTable* t = g_game->options;
         t->mapping ^= 1;
@@ -957,7 +956,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         else
             strcpy(e->helpKey, Translate("Terrain is visible."));
         UpdateHelpText(&g_game->gui);
-    } else if (IsCurrentGadgetNamed((Dialog *)menu, "LineOfSight")) {
+    } else if (IsCurrentGadgetNamed(menu, "LineOfSight")) {
         PlaySoundByName("Skirmish", 0);
         int index = FindGadgetIndex(entries, "LineOfSight", 1);
         Gadget* e = &entries[index];
@@ -975,11 +974,11 @@ void __stdcall HandleSkirmishClick(Gui* menu)
             strcpy(e->helpKey, Translate("All mapped terrain is visible."));
         }
         UpdateHelpText(&g_game->gui);
-    } else if (IsCurrentGadgetNamed((Dialog *)menu, "SelectMap")) {
+    } else if (IsCurrentGadgetNamed(menu, "SelectMap")) {
         PlaySoundByName("Skirmish", 0);
         SetCursorMode(0x14);
         OpenSkirmishMapSelector();
-    } else if (IsCurrentGadgetNamed((Dialog *)menu, "Difficulty")) {
+    } else if (IsCurrentGadgetNamed(menu, "Difficulty")) {
         PlaySoundByName("SKirmish", 0);
         int d = g_game->difficulty;
         if (d == 0) {
@@ -1001,7 +1000,6 @@ void __stdcall HandleSkirmishClick(Gui* menu)
 
 #include "../game/settings_campaign.h"
 #include "../game/settings.h"
-void __stdcall SelectAdjacentGadget(Gui*, int);
 
 // FUNCTION: 0x47b9f0
 void __stdcall HandleSkirmishCheatText(Gui* menu)
@@ -1039,7 +1037,7 @@ void __stdcall HandleSkirmishCheatText(Gui* menu)
         RefreshSkirmishSetup();
         PlaySoundByName(g_skirmishCheatSoundName, 0);
         SelectAdjacentGadget(menu, 1);
-        MarkChanged((Dialog *)&g_game->gui);
+        MarkChanged(&g_game->gui);
     }
 }
 
@@ -1074,7 +1072,7 @@ void OpenSkirmishMenu(void)
         difficulty->stageIndex = 2;
         SetGadgetStatusByName(&g_game->gui, g_hardGadgetName, 1);
     }
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkChanged(&g_game->gui);
 
     if (!g_game->net->LoadMissionByName(g_game->options->mapName)) {
         g_game->net->RefreshMapList(0);

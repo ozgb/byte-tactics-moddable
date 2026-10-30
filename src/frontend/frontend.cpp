@@ -374,7 +374,7 @@ void UpdateMenuSparks()
             }
             s++;
         } while (--count);
-        MarkLayerChanged((Dialog *)&g_game->gui);
+        MarkLayerChanged(&g_game->gui);
     }
 }
 
@@ -387,13 +387,13 @@ void __stdcall HandleMainMenuClick(Gui* gadget)
         GameFreeThunk(g_menuSparks);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "SINGLE")) {
+    if (IsCurrentGadgetNamed(gadget, "SINGLE")) {
         PlaySoundByName("BigButton", 0);
         SetCursorMode(0x14);
         (*(char*)&g_game->frontendNextSubState) = 5;
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "MULTI")) {
+    if (IsCurrentGadgetNamed(gadget, "MULTI")) {
         PlaySoundByName("BigButton", 0);
         SetCursorMode(0x14);
         RegisterDataArchives();
@@ -412,7 +412,7 @@ void __stdcall HandleMainMenuClick(Gui* gadget)
         ClearSelectedGadget(&g_game->gui);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "INTRO")) {
+    if (IsCurrentGadgetNamed(gadget, "INTRO")) {
         PlaySoundByName("smlButton", 0);
         Display* display = GetDisplay();
         if (!display->flags.bits.fullscreen) {
@@ -445,13 +445,13 @@ void __stdcall HandleMainMenuClick(Gui* gadget)
         (*(char*)&g_game->frontendNextSubState) = 0;
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "EXIT")) {
+    if (IsCurrentGadgetNamed(gadget, "EXIT")) {
         PlaySoundByName("exit", 0);
         SetCursorMode(0x14);
         (*(char*)&g_game->frontendNextSubState) = 8;
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "Credits")) {
+    if (IsCurrentGadgetNamed(gadget, "Credits")) {
         PlaySoundByName("smlButton", 0);
         Display* display = GetDisplay();
         if (!display->flags.bits.fullscreen) {
@@ -534,7 +534,7 @@ void __stdcall OpenMainMenu()
     LoadPictureCached("FrontendX", 1, 1, 0);
     PlayLoopingSoundByName("BGM", 0);
     ((Sound *)g_game->sound)->SetTrackCategory(4);
-    EnableKeyCommands((Dialog *)&g_game->gui);
+    EnableKeyCommands(&g_game->gui);
 
     char* name = "FrontendX";
     char* found = FindPictureDataByName(name);

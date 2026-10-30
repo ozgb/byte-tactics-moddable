@@ -1611,17 +1611,7 @@ void __stdcall GetMirroredBasePosition(int index, int unused, MirroredBasePos* o
 // FUNCTION: 0x40bb00
 int __stdcall GetBuildRating(int player,unsigned short type)
 {
-#pragma pack(push, 1)
-    struct PlayerAIRatingView {
-        char pad[0x69];
-        BuildRatingWeights* ratings;
-        char pad6d[0x81-0x6d];
-        short* counts;
-        char pad85[0xb1-0x85];
-        unsigned char* weights;
-    };
-#pragma pack(pop)
-    PlayerAIRatingView* owner=(PlayerAIRatingView*)g_playerAI[player].get();
+    PlayerAI* owner=g_playerAI[player];
     Player* p=&g_game->players[player];
     if(p->energy<50.0f) return 0;
     if(p->metal<25.0f) return 0;
@@ -1640,8 +1630,8 @@ int __stdcall GetBuildRating(int player,unsigned short type)
     int energy2=min(max(energy-metal2,0),100);
     int normal=max(100-metal2-energy2,0);
     if(!IsCountBelowAiLimit(player,type,owner->counts[type])) return 0;
-    BuildRatingWeights* r=&owner->ratings[type];
-    return (normal*r->a+r->b*metal2+r->c*energy2)*owner->weights[type]/10000;
+    BuildRatingWeights* r=&owner->vec_65[type];
+    return (normal*r->a+r->b*metal2+r->c*energy2)*owner->vec_ad[type].value/10000;
 }
 
 // FUNCTION: 0x40bdb0
@@ -1704,10 +1694,8 @@ int __stdcall FindBuildPosition(int player, const Vec3* from, UnitDef* type, Vec
 int __stdcall GetUnitCount(int param_1, unsigned int param_2)
 {
     unsigned int idx = param_2 & 0xffff;
-    void* p = g_playerAI[param_1];
-    int* ptr = (int*)((char*)p + 0x81);
-    short* arr = (short*)(*ptr);
-    return (int)arr[idx];
+    PlayerAI* ai = g_playerAI[param_1];
+    return (int)ai->counts[idx];
 }
 
 // FUNCTION: 0x40c230

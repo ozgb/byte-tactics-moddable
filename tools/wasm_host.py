@@ -1,10 +1,14 @@
 """Build and run the wasmtime pilot host for the modern i686 build (#562).
 
-    uv run tools/wasm_host.py build [--out DIR]
+    uv run tools/wasm_host.py build [--out DIR] [--debug]
     uv run tools/wasm_host.py run MODULE.wasm EXPORT [I32 ARGS...] [--loop N] [--out DIR]
     uv run tools/wasm_host.py modules [--overlap] [--out DIR]
     uv run tools/wasm_host.py wind-meteors [--out DIR]
     uv run tools/wasm_host.py headers [--update]
+
+build --debug (DIR defaults to build/wasm_host_debug) builds the DLL with the debugdll profile of its Cargo.toml: panic=unwind,
+debug info, not stripped, so a wasmtime panic prints its message and a backtrace (the C API's extern "C" functions abort
+after the message). The runs of wasm_maths.py --debug and wasm_loop.py set RUST_BACKTRACE=1.
 
 build compiles three things into DIR (default build/wasm_host):
 
@@ -60,6 +64,8 @@ MSVC5 = (ROOT / "toolchain" / "msvc5-sp3").resolve()
 MODULES_DIR = ROOT / "tests" / "wasm" / "modules"
 WASM_MODULES_OUT = ROOT / "build" / "wasm-modules"
 RUST_TARGET = "i686-pc-windows-gnu"
+DEBUG_PROFILE = "debugdll"
+DEBUG_OUT = ROOT / "build" / "wasm_host_debug"
 C_API_PACKAGE = "wasmtime-c-api-impl"
 CONF_H = """#ifndef WASMTIME_CONF_H
 #define WASMTIME_CONF_H
@@ -85,11 +91,12 @@ def cargo_env(out):
     return env
 
 
-def build_dll(out):
+def build_dll(out, debug=False):
     env = cargo_env(out)
     manifest = DLL_CRATE / "Cargo.toml"
-    run(["cargo", "build", "--release", "--locked", "--target", RUST_TARGET, "--manifest-path", manifest], env=env)
-    shutil.copy2(out / "target" / RUST_TARGET / "release" / "wasmtime_host.dll", out / "wasmtime_host.dll")
+    profile = ["--profile", DEBUG_PROFILE] if debug else ["--release"]
+    run(["cargo", "build", *profile, "--locked", "--target", RUST_TARGET, "--manifest-path", manifest], env=env)
+    shutil.copy2(out / "target" / RUST_TARGET / (DEBUG_PROFILE if debug else "release") / "wasmtime_host.dll", out / "wasmtime_host.dll")
 
 
 def crate_include(out):
@@ -168,9 +175,9 @@ def build_host(out):
          "/safeseh:no", *objects, work / "KERNEL32.lib", MSVC5 / "LIB" / "LIBCMT.LIB", MSVC5 / "LIB" / "OLDNAMES.LIB"])
 
 
-def build(out):
+def build(out, debug=False):
     out.mkdir(parents=True, exist_ok=True)
-    build_dll(out)
+    build_dll(out, debug)
     problems = check_headers(crate_include(out))
     if problems:
         sys.exit("the vendored wasmtime headers differ from the crate's:\n  " + "\n  ".join(problems))
@@ -258,18 +265,20 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     for name in ("build", "run", "modules", "wind-meteors", "headers"):
         cmd = sub.add_parser(name)
-        cmd.add_argument("--out", type=Path, default=ROOT / "build" / "wasm_host")
+        cmd.add_argument("--out", type=Path, default=None)
     runner = sub.choices["run"]
     runner.add_argument("module")
     runner.add_argument("export")
     runner.add_argument("args", nargs="*")
     runner.add_argument("--loop", type=int, default=1)
+    sub.choices["build"].add_argument("--debug", action="store_true", help="unstripped DLL with panic=unwind and debug info, into build/wasm_host_debug")
     sub.choices["modules"].add_argument("--overlap", action="store_true")
     sub.choices["headers"].add_argument("--update", action="store_true")
     options = parser.parse_args()
-    out = options.out.resolve()
+    debug = getattr(options, "debug", False)
+    out = (options.out or (DEBUG_OUT if debug else ROOT / "build" / "wasm_host")).resolve()
     if options.command == "build":
-        build(out)
+        build(out, debug)
     elif options.command == "modules":
         sys.exit(run_modules(out, options.overlap))
     elif options.command == "wind-meteors":

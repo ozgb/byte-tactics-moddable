@@ -18,6 +18,8 @@ const ModuleMemory* __stdcall ModulesMemory();
 int __stdcall WindMeteorsInstall(wl_loader* loader, int timing);
 void __stdcall WindMeteorsTimeNative();
 void __stdcall WindMeteorsTimingReport(char* text);
+int __stdcall WindMeteorsDeferFatal(const char* text);
+int __stdcall WindMeteorsFatalPending();
 void __stdcall WindMeteorsUseSeam();
 int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module, unsigned fuelBudget);
 int __stdcall WindMeteorsFuelClose(unsigned* used);

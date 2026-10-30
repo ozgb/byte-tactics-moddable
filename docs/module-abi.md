@@ -479,7 +479,7 @@ signatures are `signatures.services` of the manifest.
 | --- | --- | --- |
 | `GameRand` | `[int] -> int` | advances the named random stream and returns the next value, 0 to 0x7fff; the stream's state is in the block |
 | `RandomInt` | `[int] -> int` | a random number in `[0, range)` from the main stream |
-| `FatalError` | `[linear] -> void` | shows the NUL-terminated message and ends the game; does not return |
+| `FatalError` | `[linear] -> void` | ends the game with the NUL-terminated message after the call unwinds (section 13); does not return to the module |
 | `BuildDataPath` | `[linear, linear, linear, linear] -> linear` | builds `dir/name.ext` below the data directory into the buffer (first argument) and returns the buffer's address; the host traps if the result is not the buffer |
 | `TdfFile_Construct` | `[linear] -> void` | builds an empty `TdfFile` in place |
 | `TdfFile_Destruct` | `[linear] -> void` | unloads the file and frees the engine's records |
@@ -634,8 +634,11 @@ Every error or trap ends the game, in this version. There is no recovery and no 
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the
   scratch area`, and `<module>: the handle table is full`.
-- **A service that ends the game on purpose.** `FatalError(message)` shows the message and ends the
-  game; it is not a trap.
+- **A service that ends the game on purpose.** `FatalError(message)` does not end the process inside
+  the call. The import returns an error carrying the message, so the call unwinds as a trap does, and
+  the game ends with the message itself (not a trap text) once the call has returned: logged, then
+  exit code 2 in test mode, otherwise the fatal-error dialog titled `Byte Tactics`. A fatal of the
+  game's own code reached inside an import (a parse error of a TDF file) ends the game the same way.
 
 A conformance run uses these as pass/fail: a module that traps or runs out of fuel in a scenario
 fails it.

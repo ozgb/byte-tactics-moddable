@@ -294,11 +294,17 @@ jobs:
       - name: Adapters across major bumps
         run: uv run tools/wasm_modules.py adapters
 
+      - name: A module's fatal exits after the call
+        run: uv run tools/wasm_modules.py fatal
+
       - name: Test the module tools
         run: uv run tools/test_wasm_modules.py
 
       - name: Test the fuel metering pass
         run: uv run tools/test_wasm_fuel.py
+
+      - name: Test the embedded check loop
+        run: uv run tools/test_wasm_loop.py
 
       - name: The module's maths against the native hashes
         run: |

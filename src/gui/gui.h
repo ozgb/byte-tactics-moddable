@@ -84,8 +84,6 @@ struct Gui {
     FileRequester* OpenFileRequester(Gui* self, char* arg2, char* arg3, char* arg4);
 };
 
-typedef Gui Dialog;
-
 #pragma pack(pop)
 
 int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused);

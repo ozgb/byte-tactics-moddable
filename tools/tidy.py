@@ -29,7 +29,8 @@ Also fails an added line that introduces a placeholder name from the
 decompiler: FUN_<addr>, DAT_<addr>, field_<offset>, unk*, unknown_<offset>,
 param_N or <Name>_<addr> (an 8 digit hex address starting 00). A name is new when
 the range adds more lines with it than it removes, counted over the whole diff, so a
-move between files passes.
+move between files passes. Generated files (GENERATED) only name what the source
+declares, so their lines neither add nor remove a name.
 
 Prints file:line: message [check] for each finding and exits 1 if there are
 any. A translation unit that clang-tidy cannot parse is a tool error, not a
@@ -53,6 +54,7 @@ from determinismlint import mask_c
 
 DEFAULT_BUILD_DIR = "build/modern"
 TIDY_DIRS = ("src/", "interfaces/")
+GENERATED = {"src/harness/trace_schema.h", "src/state/layout_asserts.cpp"}
 HEADER_SUFFIXES = {".h", ".hpp", ".inc"}
 SOURCE_SUFFIXES = {".c", ".cpp"}
 INCLUDE = re.compile(r'^[ \t]*#[ \t]*include[ \t]*[<"]([^>"]+)[>"]', re.M)
@@ -159,7 +161,7 @@ def lint_placeholders(root, rev_range, lines_by_path):
     """[(path, line, message)] for each added line with a placeholder name the range adds more than it removes."""
     found, gained = {}, {}
     for path, added in lines_by_path.items():
-        if Path(path).suffix not in C_SUFFIXES or not added:
+        if Path(path).suffix not in C_SUFFIXES or not added or path in GENERATED:
             continue
         hits = placeholder_names(new_text(root, rev_range, path), added)
         if hits:
@@ -169,7 +171,7 @@ def lint_placeholders(root, rev_range, lines_by_path):
                 gained[name] = gained.get(name, 0) + 1
     base = base_of(root, rev_range)
     for path, removed in removed_lines(root, rev_range).items():
-        if Path(path).suffix not in C_SUFFIXES or not removed or not found:
+        if Path(path).suffix not in C_SUFFIXES or not removed or not found or path in GENERATED:
             continue
         for row in placeholder_names(git(root, "show", f"{base}:{path}"), removed).values():
             for _, name in row:

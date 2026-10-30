@@ -31,27 +31,6 @@ struct UnitDef;
 
 #include "settings.h"
 
-struct Form {
-    char unknown_0[0xcc];
-    char choice1[0x10];
-    char choice2[0x20];
-};
-
-struct ContinueWatchingDialog;
-
-struct ContinueWatchingLayer {
-    char unknown_0[4];
-    Form* form;
-    void (__stdcall *callback)(ContinueWatchingDialog*);
-};
-
-struct ContinueWatchingDialog {
-    char unknown_0[0x18];
-    ContinueWatchingLayer* screen;
-    char unknown_1c[0x60 - 0x1c];
-    int selected;
-};
-
 #include "game.h"
 #include "../graphics/display.h"
 #include "los_helpers.h"
@@ -456,21 +435,24 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
 void __stdcall PlaySoundByName(char* str, int flag);
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 #include "../gui/dialogs.h"
+#include "../gui/gadget.h"
+#include "../gui/layer.h"
+#include "../gui/gui.h"
 
 // FUNCTION: 0x464de0
-void __stdcall ContinueWatchingCallback(ContinueWatchingDialog* gadget)
+void __stdcall ContinueWatchingCallback(Gui* gadget)
 {
-    int screen = (int)gadget->screen->form;
-    if (gadget->selected == -1)
+    int screen = (int)gadget->layer->entries;
+    if (gadget->hotGadgetIndex == -1)
         return;
     PlaySoundByName("BigButton", 0);
-    if (IsGadgetNamed(screen, gadget->selected, "CHOICE1")) {
+    if (IsGadgetNamed(screen, gadget->hotGadgetIndex, "CHOICE1")) {
         BroadcastPlayerInfo();
         g_game->bits.flag4 = 0;
         ReportGameEvent(4);
         return;
     }
-    if (!IsGadgetNamed(screen, gadget->selected, "CHOICE2")) {
+    if (!IsGadgetNamed(screen, gadget->hotGadgetIndex, "CHOICE2")) {
         ClearSelectedGadget(gadget);
         return;
     }
@@ -479,25 +461,24 @@ void __stdcall ContinueWatchingCallback(ContinueWatchingDialog* gadget)
 }
 
 
-ContinueWatchingLayer* __stdcall LoadGuiLayer(Menu* menu, char* name, int value);
+Layer* __stdcall LoadGuiLayer(Menu* menu, char* name, int value);
 void __stdcall SetKeyboardInput(Menu* menu, int flag);
 void __stdcall SetTranslatedTextByName(Menu* menu, char* name, char* text, int value);
-#include "../gui/gui.h"
 
 // FUNCTION: 0x464e70
 void ShowContinueWatchingDialog()
 {
-    ContinueWatchingLayer* screen = LoadGuiLayer(&g_game->gui_519, g_yesNoGuiName, 0x900);
+    Layer* screen = LoadGuiLayer(&g_game->gui_519, g_yesNoGuiName, 0x900);
     if (screen) {
-        Form* form;
+        Gadget* form;
         SetKeyboardInput(&g_game->gui_519, 1);
-        form = screen->form;
+        form = screen->entries;
         SetTranslatedTextByName(&g_game->gui_519, g_choice1GadgetName, g_yesText, 0);
         SetTranslatedTextByName(&g_game->gui_519, g_choice2GadgetName, g_noText, 0);
         SetTranslatedTextByName(&g_game->gui_519, g_titleGadgetName, g_continueWatchingTitle, 0);
-        strcpy(form->choice1, g_choice1GadgetName);
-        strcpy(form->choice2, g_choice2GadgetName);
-        screen->callback = ContinueWatchingCallback;
+        strcpy(form->u.names.choice, g_choice1GadgetName);
+        strcpy(form->u.names.choice2, g_choice2GadgetName);
+        screen->handler = ContinueWatchingCallback;
         RenderLayer((Gui *)&g_game->gui_519, 0x40);
     }
 }
@@ -755,17 +736,17 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                     g_seams.los_radar->RecalculateLineOfSight(1);
                     BroadcastPlayerInfo();
                     if (CountActiveAIPlayers() == 0) {
-                        ContinueWatchingLayer* dlg = LoadGuiLayer(&g_game->gui_519, "YESORNO.GUI", 0x900);
+                        Layer* dlg = LoadGuiLayer(&g_game->gui_519, "YESORNO.GUI", 0x900);
                         if (dlg != 0) {
                             SetKeyboardInput(&g_game->gui_519, 1);
-                            Form* w = dlg->form;
+                            Gadget* w = dlg->entries;
                             SetTranslatedTextByName(&g_game->gui_519, "CHOICE1", "Yes", 0);
                             SetTranslatedTextByName(&g_game->gui_519, "CHOICE2", "No", 0);
                             SetTranslatedTextByName(&g_game->gui_519, "TITLE",
                                          "You're out!  Continue Watching?", 0);
-                            strcpy(w->choice1, "CHOICE1");
-                            strcpy(w->choice2, "CHOICE2");
-                            dlg->callback = ContinueWatchingCallback;
+                            strcpy(w->u.names.choice, "CHOICE1");
+                            strcpy(w->u.names.choice2, "CHOICE2");
+                            dlg->handler = ContinueWatchingCallback;
                             RenderLayer((Gui *)&g_game->gui_519, 0x40);
                         }
                         goto skip508;

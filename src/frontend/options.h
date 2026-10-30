@@ -1,6 +1,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 struct Gui;
+struct Layer;
 
 struct Gadget;
 struct ValueTextEntry;
@@ -32,7 +33,7 @@ void __stdcall LoadSavedSettings();
 void __stdcall SaveGameSettings();
 void __stdcall EnsureOptionsPanelGadget();
 void __stdcall BlitOptionsPanel();
-int __cdecl OpenOptionsLayout();
+Layer* __cdecl OpenOptionsLayout();
 void __stdcall TickMusicOptions();
 void __stdcall UpdateMusicGadgets();
 void __stdcall OpenMusicOptions();

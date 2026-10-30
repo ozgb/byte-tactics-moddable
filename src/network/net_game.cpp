@@ -785,12 +785,12 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
         unsigned char i = FindPlayerInUse();
         Player* slot = &g_game->players[i];
         if (slot->active != 0 && (slot->type == 1 || slot->type == 2)) {
-            OpenMessageBox((Gui *)g_game->menu,
+            OpenMessageBox(&g_game->gui,
                 Translate("Direct Play failed to add new player.\n\nRecommended you go to previous screen and re-create the game session.\n"),
                 500, 1, 1);
         }
         else {
-            OpenMessageBox((Gui *)g_game->menu,
+            OpenMessageBox(&g_game->gui,
                 Translate("Direct Play failed to add new player.\n\nRecommended you go to previous screen and re-join the game session.\n"),
                 500, 1, 1);
         }
@@ -974,9 +974,7 @@ void __stdcall PlaySoundByName(char* name, int param_2);
 TalkGadgetEntry* __stdcall FindGadgetChecked_B(TalkGadgetEntry* entries, char* name);
 int __stdcall SendChatMessage(Player* from, char* text, int key, char* to);
 int __stdcall FindGadgetIndex(void* gadgets, const char* name, int flag);
-void* __stdcall LoadGuiLayer(void* obj, const char* name, int size);
 void* __stdcall FindGadgetChecked(void* entries, char* name);
-void __stdcall SetTranslatedTextByName(void* obj, char* name, void* out, int flag);
 
 // FUNCTION: 0x451540
 void CreateNetGame(void)
@@ -2009,7 +2007,7 @@ void UpdateTimeoutDialog()
 
     if (g_loungeRefreshTime < GetTicks()) {
         g_loungeRefreshTime = GetTicks() + 2;
-        MarkChanged((Gui *)g_game->message);
+        MarkChanged(&g_game->gui);
     }
 
     memset(g_loungeChatter, 0, 0xa00);
@@ -2048,12 +2046,12 @@ void UpdateTimeoutDialog()
         char buf[200];
         sprintf(buf, Translate("will be rejected in %d seconds"),
                 g_game->lobbyTimeoutSecs - elapsed + 0x78);
-        SetTranslatedTextByName(g_game->message, "TIMETEXT", buf, 0);
-        MarkChanged((Gui *)g_game->message);
+        SetTranslatedTextByName(&g_game->gui, "TIMETEXT", buf, 0);
+        MarkChanged(&g_game->gui);
         if (elapsed < g_game->lobbyTimeoutSecs + 0x78)
             return;
         RejectPlayer(g_timeoutPlayerDpid, 6);
-        CloseTopScreen((Gui *)g_game->message);
+        CloseTopScreen(&g_game->gui);
     }
 }
 
@@ -2076,9 +2074,9 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
             g_game->bits_2bee_1.dirty = 1;
             strcpy(entry->text, DAT_005119b8);
         }
-        BeginTextEdit((Gui *)g_game->message, FindGadgetIndex(((Layer*)g_game->layer)->entries, "TALK", 3));
+        BeginTextEdit(&g_game->gui, FindGadgetIndex(((Layer*)g_game->layer)->entries, "TALK", 3));
         ClearSelectedGadget(g_game->message);
-        MarkChanged((Gui *)g_game->message);
+        MarkChanged(&g_game->gui);
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "REJECT")) {
@@ -2108,9 +2106,9 @@ static __inline unsigned char FindSlotByIdInOpenTimeoutDialog(int id)
 // FUNCTION: 0x453a50
 void __stdcall OpenTimeoutDialog(int id)
 {
-    if (IsScreenNamed((Gui *)g_game->menu, "TIMEOUT.GUI")) {
+    if (IsScreenNamed(&g_game->gui, "TIMEOUT.GUI")) {
         if (id == -1) {
-            CloseTopScreen((Gui *)g_game->menu);
+            CloseTopScreen(&g_game->gui);
         }
         return;
     }
@@ -2123,7 +2121,7 @@ void __stdcall OpenTimeoutDialog(int id)
         return;
     }
 
-    TimeoutDialogLayer* gui = (TimeoutDialogLayer*)LoadGuiLayer(g_game->menu,
+    TimeoutDialogLayer* gui = (TimeoutDialogLayer*)LoadGuiLayer(&g_game->gui,
                                                     "TIMEOUT.GUI", 0x800);
     void* entries = gui->entries;
     gui->callback = (void (__stdcall *)(void *))&HandleTimeoutDialog;
@@ -2138,12 +2136,12 @@ void __stdcall OpenTimeoutDialog(int id)
                  (int)out->height / (GetFontLineHeight() + 2), nullptr);
 
     gui->onFrame = &UpdateTimeoutDialog;
-    BeginTextEdit((Gui *)g_game->menu, FindGadgetIndex(entries, "TALK", 3));
+    BeginTextEdit(&g_game->gui, FindGadgetIndex(entries, "TALK", 3));
 
-    SetTranslatedTextByName(g_game->menu, "NAME",
+    SetTranslatedTextByName(&g_game->gui, "NAME",
                  g_game->players[i].name, 0);
     SetKeyboardInput(&g_game->gui, 1);
-    RenderLayer((Gui *)g_game->menu, 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 static inline int IsTimedOut(Player* p, unsigned int now)

@@ -355,8 +355,6 @@ void __stdcall SetOffscreenSurface(void* p);
 void __stdcall SetOffscreenSurface(int param_1);
 void FlipScreen();
 
-int __stdcall LoadGuiLayer(void* obj, char* buf, int size);
-
 void __stdcall SetGrayedOutByName(void* obj, char* name, int value);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
 int __stdcall GetGadgetText(void* settings, const char* key, char* out);
@@ -956,7 +954,7 @@ void BlitOptionsPanel()
 
 #pragma auto_inline(off)
 // FUNCTION: 0x45cfc0
-int __cdecl OpenOptionsLayout()
+Layer* __cdecl OpenOptionsLayout()
 {
     char buf[256];
     if ((*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).prefsWord.prefs) {
@@ -965,7 +963,7 @@ int __cdecl OpenOptionsLayout()
     } else {
         strcpy(buf, "STARTOPT.GUI");
     }
-    int result = LoadGuiLayer((void*)&g_game->gui, buf, 0x80);
+    Layer* result = LoadGuiLayer(&g_game->gui, buf, 0x80);
     SetGrayedOutByName(&g_game->gui, "MUSIC", *(int*)(Sound *)g_game->sound == 0);
     EnableKeyCommands(&g_game->gui);
     if ((*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).prefsWord.prefs && g_game->net->GetGameType() != 3) {
@@ -1113,7 +1111,7 @@ void __stdcall HandleMusicOptionsClick(Gui* obj)
 // FUNCTION: 0x45d7c0
 void OpenMusicOptions()
 {
-    Layer* obj = (Layer*)OpenOptionsLayout();
+    Layer* obj = OpenOptionsLayout();
     RenderLayer(&g_game->gui, 2);
     EnsureOptionsPanelGadget();
     if ((*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).byte & 1) {
@@ -1246,7 +1244,7 @@ void __stdcall HandleSoundOptionsClick(Gui* obj)
 // FUNCTION: 0x45de30
 void OpenSoundOptions()
 {
-    Layer* obj = (Layer*)OpenOptionsLayout();
+    Layer* obj = OpenOptionsLayout();
     RenderLayer(&g_game->gui, 2);
     EnsureOptionsPanelGadget();
     if ((*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).byte & 1) {
@@ -1427,7 +1425,7 @@ void __stdcall OpenVisualOptions(int param_1)
     if (param_1 != i) {
         layer = LoadGuiLayer(&g_game->gui, "SELVMODE.GUI", 0x800);
     } else {
-        layer = (Layer*)OpenOptionsLayout();
+        layer = OpenOptionsLayout();
         RenderLayer(&g_game->gui, 2);
         EnsureOptionsPanelGadget();
         if ((*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).byte & 1) {
@@ -2070,7 +2068,7 @@ void OpenOptionsPanel()
     g_optionsBackupSurface = AllocSurface("BKUPSURFACE", 300, 480);
     DrawSurface(g_optionsBackupSurface, 0, 0, 0);
     g_optionsLightbarAnim = 0;
-    Layer* panel = (Layer*)OpenOptionsLayout();
+    Layer* panel = OpenOptionsLayout();
     if (!(*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).bits.bit2) {
         LoadPictureCached("options4x", 0, 0, 0);
     }

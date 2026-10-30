@@ -56,7 +56,7 @@ void RegisterUnitOrders();
 
 #include "../graphics/gaf_frame.h"
 
-#include "../graphics/frame_table.h"
+#include "frame_table.h"
 
 #include "eye.h"
 

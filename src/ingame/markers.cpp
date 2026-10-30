@@ -53,7 +53,7 @@ struct Player;
 
 #include "../orders/order.h"
 
-#include "mission_order_table.h"
+#include "../orders/mission_order_table.h"
 
 #include "../game/game.h"
 #include "../state/sim_globals.h"

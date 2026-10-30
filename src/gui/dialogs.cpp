@@ -83,7 +83,7 @@ struct AddBarGadgetEntry {
 
 #pragma pack(pop)
 
-extern Font** g_guiContext;
+extern Gui* g_guiContext;
 
 #include "../graphics/draw.h"
 #include "../graphics/palette.h"
@@ -302,7 +302,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
             i++;
         }
         if (j == base->u.count + 1)
-            SetFont(*g_guiContext);
+            SetFont(g_guiContext->font);
         TrySetFocus(menu, 1);
         menu->layer->current = 1;
         CommitTextEdit(menu, 1, (char*)&sub->u.count,

@@ -132,10 +132,13 @@ Game,value_142f3,int-pointer,src/game/game.h,#353
 Game,vismasks,int-pointer,src/game/game.h,#353
 Game,xform,pointer,src/game/game.h,#353
 Group,units,container,src/ai/group.h,#361
+Gui,blueSlider,pointer,src/gui/gui.h,#353
 Gui,fallback,pointer,src/gui/gui.h,#353
 Gui,gaf,pointer,src/gui/gui.h,#353
+Gui,greenSlider,pointer,src/gui/gui.h,#353
 Gui,language,pointer,src/gui/gui.h,#353
 Gui,layer,pointer,src/gui/gui.h,#353
+Gui,redSlider,pointer,src/gui/gui.h,#353
 Gui,src_28,pointer,src/gui/gui.h,#353
 Gui,src_2c,pointer,src/gui/gui.h,#353
 Gui,values,pointer,src/gui/gui.h,#353

@@ -781,6 +781,7 @@ game,players,shared_write,Game::mapFlags,1
 game,players,shared_write,Game::playerIndex,3
 game,players,shared_write,Game::seaLevel,1
 game,players,shared_write,Game::ticks,5
+game,players,shared_write,Layer::handler,2
 game,players,shared_write,Player::allied,8
 game,players,shared_write,Player::displayTimer,3
 game,players,shared_write,Player::energy,5
@@ -1044,6 +1045,7 @@ game,presentation,shared_write,Game::ticks,36
 game,presentation,shared_write,Game::uiOptionFlags,2
 game,presentation,shared_write,Game::unitIndex,22
 game,presentation,shared_write,Game::version,3
+game,presentation,shared_write,Layer::handler,47
 game,presentation,shared_write,MapViewFlags::bit0,1
 game,presentation,shared_write,MapViewFlags::bit1,2
 game,presentation,shared_write,MapViewFlags::bit2,2
@@ -2716,6 +2718,7 @@ players,game,shared_write,Game::endGameFlags,2
 players,game,shared_write,Game::localPlayer,13
 players,game,shared_write,Game::mapFlags,1
 players,game,shared_write,Game::playerIndex,8
+players,game,shared_write,Layer::handler,3
 players,game,shared_write,Player::active,9
 players,game,shared_write,Player::allied,1
 players,game,shared_write,Player::displayTimer,1
@@ -2908,6 +2911,7 @@ players,presentation,shared_write,Game::localPlayer,69
 players,presentation,shared_write,Game::mapFlags,19
 players,presentation,shared_write,Game::playerIndex,20
 players,presentation,shared_write,Game::tail,2
+players,presentation,shared_write,Layer::handler,47
 players,presentation,shared_write,MissionConditions::active,1
 players,presentation,shared_write,MissionConditions::defeatCount,1
 players,presentation,shared_write,MissionConditions::victoryCount,1
@@ -3169,6 +3173,8 @@ presentation,game,shared_write,Game::textLines,1
 presentation,game,shared_write,Game::uiOptionFlags,4
 presentation,game,shared_write,Game::unitIndex,3
 presentation,game,shared_write,Gui::layer,4
+presentation,game,shared_write,Layer::entries,6
+presentation,game,shared_write,Layer::handler,3
 presentation,game,shared_write,MissionType::index,1
 presentation,game,shared_write,Player::active,9
 presentation,game,shared_write,Player::allied,1
@@ -3330,6 +3336,7 @@ presentation,network,shared_write,Game::pauseFlags,1
 presentation,network,shared_write,Game::textLines,1
 presentation,network,shared_write,Game::uiOptionFlags,1
 presentation,network,shared_write,Gui::layer,1
+presentation,network,shared_write,Layer::entries,1
 presentation,network,shared_write,PlaySoundPacket::flag,1
 presentation,network,shared_write,PlaySoundPacket::index,1
 presentation,network,shared_write,Player::active,55
@@ -3583,6 +3590,9 @@ presentation,players,shared_write,Game::commanderDeath,2
 presentation,players,shared_write,Game::difficulty,3
 presentation,players,shared_write,Game::head,1
 presentation,players,shared_write,Game::mapFlags,1
+presentation,players,shared_write,Gui::layer,1
+presentation,players,shared_write,Layer::entries,3
+presentation,players,shared_write,Layer::handler,2
 presentation,players,shared_write,MissionConditions::active,3
 presentation,players,shared_write,MissionConditions::defeatCount,8
 presentation,players,shared_write,MissionConditions::victoryCount,8

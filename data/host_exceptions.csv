@@ -245,7 +245,9 @@ src/gui/gui.cpp,src/graphics/palette.h,#392
 src/gui/gui.cpp,src/graphics/rect.h,#392
 src/gui/gui.cpp,src/graphics/surface.h,#392
 src/gui/gui.cpp,src/gui/dialogs.h,#392
+src/gui/gui.cpp,src/gui/font_glyph_table.h,#392
 src/gui/gui.cpp,src/gui/gadget.h,#392
+src/gui/gui.cpp,src/gui/gaf_entry.h,#392
 src/gui/gui.cpp,src/gui/gui.h,#392
 src/gui/gui.cpp,src/gui/keyboard.h,#392
 src/gui/gui.cpp,src/gui/layer.h,#392

@@ -38,6 +38,7 @@
 #include "../game/mission_option_flags.h"
 #include "../game/packed_goal.h"
 #include "../game/pre_battle_flags.h"
+#include "../game/side_data.h"
 #include "../game/side_def.h"
 #include "../game/ui_option_flags.h"
 #include "../game/unit_resources.h"
@@ -52,7 +53,10 @@
 #include "../graphics/piece_frame.h"
 #include "../graphics/rect.h"
 #include "../graphics/spot_state.h"
+#include "../gui/blink_word.h"
+#include "../gui/font_glyph_table.h"
 #include "../gui/gadget.h"
+#include "../gui/gaf_entry.h"
 #include "../gui/gui.h"
 #include "../gui/layer.h"
 #include "../ingame/broadcast_toggle_flags.h"
@@ -169,6 +173,17 @@ static_assert(offsetof(AssaultTimer, maximum) == 24, "");
 static_assert(offsetof(AssaultTimer, limit) == 28, "");
 static_assert(offsetof(AssaultTimer, kind) == 32, "");
 static_assert(offsetof(AssaultTimer, attacking) == 36, "");
+static_assert(sizeof(BlinkWord) == 164, "");
+static_assert(offsetof(BlinkWord, text) == 0, "");
+static_assert(offsetof(BlinkWord, x) == 128, "");
+static_assert(offsetof(BlinkWord, y) == 132, "");
+static_assert(offsetof(BlinkWord, colourA) == 136, "");
+static_assert(offsetof(BlinkWord, periodA) == 140, "");
+static_assert(offsetof(BlinkWord, colourB) == 144, "");
+static_assert(offsetof(BlinkWord, periodB) == 148, "");
+static_assert(offsetof(BlinkWord, phase) == 152, "");
+static_assert(offsetof(BlinkWord, nextToggle) == 156, "");
+static_assert(offsetof(BlinkWord, value) == 160, "");
 static_assert(sizeof(BroadcastToggleFlags) == 2, "");
 static_assert(sizeof(BuildMenuEntry) == 37, "");
 static_assert(offsetof(BuildMenuEntry, typeId) == 0, "");
@@ -426,6 +441,12 @@ static_assert(offsetof(Font, glyphs) == 0, "");
 static_assert(offsetof(Font, unknown_1) == 1, "");
 static_assert(offsetof(Font, first) == 3, "");
 static_assert(offsetof(Font, offsets) == 4, "");
+static_assert(sizeof(FontGlyphTable) == 16, "");
+static_assert(offsetof(FontGlyphTable, unknown_0) == 0, "");
+static_assert(offsetof(FontGlyphTable, first) == 3, "");
+static_assert(offsetof(FontGlyphTable, offsets) == 4, "");
+static_assert(offsetof(FontGlyphTable, unknown_6) == 6, "");
+static_assert(offsetof(FontGlyphTable, glyphs) == 12, "");
 static_assert(sizeof(Frame) == 12, "");
 static_assert(offsetof(Frame, tick) == 0, "");
 static_assert(offsetof(Frame, data) == 4, "");
@@ -496,6 +517,9 @@ static_assert(offsetof(Gadget, hotkey) == 327, "");
 static_assert(offsetof(Gadget, flag_148) == 328, "");
 static_assert(offsetof(Gadget, unknown_153) == 339, "");
 static_assert(offsetof(Gadget, sliderLocked) == 343, "");
+static_assert(sizeof(GafEntry) == 4, "");
+static_assert(offsetof(GafEntry, count) == 0, "");
+static_assert(offsetof(GafEntry, unknown_2) == 2, "");
 static_assert(sizeof(GafFrame) == 24, "");
 static_assert(offsetof(GafFrame, width) == 0, "");
 static_assert(offsetof(GafFrame, height) == 2, "");
@@ -2120,6 +2144,9 @@ static_assert(offsetof(Settings, field_471) == 0, "");
 static_assert(offsetof(Settings, flags_475) == 4, "");
 static_assert(offsetof(Settings, bits_475) == 4, "");
 static_assert(offsetof(Settings, pad_479) == 8, "");
+static_assert(sizeof(SideData) == 150, "");
+static_assert(offsetof(SideData, unknown_0) == 0, "");
+static_assert(offsetof(SideData, bSideId) == 149, "");
 static_assert(sizeof(SideDef) == 562, "");
 static_assert(offsetof(SideDef, name) == 0, "");
 static_assert(offsetof(SideDef, nameprefix) == 30, "");

@@ -26,7 +26,7 @@ Feature,seqreclamate,pointer,src/map/feature.h,#353
 Feature,seqreclamateshad,pointer,src/map/feature.h,#353
 Feature,seqshad,pointer,src/map/feature.h,#353
 Feature,shadowTable,pointer,src/map/feature.h,#353
-FontGlyphTable,glyphs,pointer,src/gui/gui.cpp,#353
+FontGlyphTable,glyphs,pointer,src/gui/font_glyph_table.h,#353
 Frame,data,pointer,src/network/frame_ring.h,#353
 FrameQueue,buffer,pointer,src/network/packet_receiver.h,#353
 FrameQueue,recvBuffer,pointer,src/network/packet_receiver.h,#353

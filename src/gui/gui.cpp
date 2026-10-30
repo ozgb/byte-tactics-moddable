@@ -1781,20 +1781,20 @@ void __stdcall ResetListBox(Gui* obj, int index)
 void __stdcall TruncateTextWithEllipsis(int a1, char* text, int a3, int a4, int a5);
 
 // FUNCTION: 0x4a31c0
-void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4)
+void __stdcall TruncateListItems(int a1, int a2, char* lines, int count)
 {
-    char* items = (char*)GameAllocIgnoreTag("SCROLLITEMS", *(int*)(a3 - 0x44));
+    char* items = (char*)GameAllocIgnoreTag("SCROLLITEMS", *(int*)(lines - 0x44));
     char* out = items;
-    for (int i = 0; i < a4; i++) {
+    for (int i = 0; i < count; i++) {
         char buf[100];
-        strncpy(buf, SkipTextLines(a3, i), 100);
+        strncpy(buf, SkipTextLines(lines, i), 100);
         TruncateTextWithEllipsis(a1, buf, a2, -1, 0);
         strcpy(out, buf);
         out += strlen(buf);
         *out = 0;
         out++;
     }
-    memcpy(a3, items, out - items);
+    memcpy(lines, items, out - items);
 }
 
 

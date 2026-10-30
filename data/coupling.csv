@@ -2507,6 +2507,7 @@ platform,orders,shared_write,Vec3::z,84
 platform,pathfinding,call,AdjustHeap,2
 platform,pathfinding,shared_write,Point16::x,7
 platform,pathfinding,shared_write,Point16::y,7
+platform,players,shared_write,Display::availPhys,1
 platform,players,shared_write,Point16::x,3
 platform,players,shared_write,Point16::y,3
 platform,players,shared_write,Vec3::x,3
@@ -2583,6 +2584,7 @@ platform,targeting,shared_write,Vec3::z,3
 platform,units,call,HandleGet,1
 platform,units,call,HandleSet,1
 platform,units,indirect,CompareUnitTypeNames,1
+platform,units,shared_write,Display::availPhys,1
 platform,units,shared_write,Fixed::value,2
 platform,units,shared_write,Fixed::whole,1
 platform,units,shared_write,Point16::x,7
@@ -3204,6 +3206,7 @@ presentation,los_radar,call,IsFootprintVisible,1
 presentation,los_radar,call,IsUnitVisibleToPlayer,4
 presentation,los_radar,call,RecalculateLineOfSight,1
 presentation,los_radar,call,ResizeRadarPicture,1
+presentation,los_radar,shared_write,Display::grayTable,1
 presentation,los_radar,shared_write,GafFrame::height,5
 presentation,los_radar,shared_write,GafFrame::pixelsOrLayers,4
 presentation,los_radar,shared_write,GafFrame::transparency,4

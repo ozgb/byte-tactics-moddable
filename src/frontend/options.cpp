@@ -420,8 +420,6 @@ const char* __stdcall Translate(const char* text);
 #include "../gui/file_list.h"
 
 #include "options.h"
-void __stdcall HandleMusicOptionsClick(Gui* obj);
-void __stdcall HandleSoundOptionsClick(Gui* obj);
 void __stdcall HandleSpeedOptionsClick(void* obj, int arg);
 #include "../game/savegame.h"
 

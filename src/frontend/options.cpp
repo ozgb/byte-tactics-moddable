@@ -428,7 +428,6 @@ void __stdcall SetGrayedOutByName(void* obj, char* name, int value);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
 int __stdcall GetGadgetText(void* settings, const char* key, char* out);
 
-void __stdcall SetKeyboardInput(void* obj, int value);
 void __stdcall SetKeyboardInput(Layer* menu, int flag);
 void __stdcall SetKeyboardInput(OptionsPanelGui* menu, int value);
 void __stdcall SetKeyboardInput(RestartGui* menu, int value);
@@ -1963,7 +1962,7 @@ void OpenHelpDialog()
     LoadPictureCached("dhelp", 0, 0, 0);
     g_helpDialogBaseGadgetCount = g->entries->u.count;
     FillHelpPage((Gui *)((HelpGui*)&g_game->gui), 0, 0x11);
-    SetKeyboardInput((HelpGui*)&g_game->gui, 1);
+    SetKeyboardInput(&g_game->gui, 1);
     RenderLayer((Gui *)((HelpGui*)&g_game->gui), 0x40);
 }
 

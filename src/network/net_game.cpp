@@ -977,7 +977,6 @@ int __stdcall FindGadgetIndex(void* gadgets, const char* name, int flag);
 void* __stdcall LoadGuiLayer(void* obj, const char* name, int size);
 void* __stdcall FindGadgetChecked(void* entries, char* name);
 void __stdcall SetTranslatedTextByName(void* obj, char* name, void* out, int flag);
-void __stdcall SetKeyboardInput(void* obj, int value);
 
 // FUNCTION: 0x451540
 void CreateNetGame(void)
@@ -2143,7 +2142,7 @@ void __stdcall OpenTimeoutDialog(int id)
 
     SetTranslatedTextByName(g_game->menu, "NAME",
                  g_game->players[i].name, 0);
-    SetKeyboardInput(g_game->menu, 1);
+    SetKeyboardInput(&g_game->gui, 1);
     RenderLayer((Gui *)g_game->menu, 0x40);
 }
 

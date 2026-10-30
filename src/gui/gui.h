@@ -78,6 +78,7 @@ struct Gui {
 
 int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused);
 void __stdcall ClearChanged(Gui*);
+void __stdcall SetKeyboardInput(Gui*, int);
 void __stdcall ClearLayerChanged(Gui* param);
 int __stdcall GetKeyboardInput(Gui* obj);
 void __stdcall ClearFocus(Gui*);

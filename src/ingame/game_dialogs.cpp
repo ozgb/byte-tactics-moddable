@@ -212,19 +212,19 @@ void __stdcall HandleShareDialogEvent(Gui* obj)
         g_game->flags_37ebe &= ~0x40;
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)obj, "MAPINFO")) {
-        MarkChanged((Dialog *)obj);
+    if (IsCurrentGadgetNamed(obj, "MAPINFO")) {
+        MarkChanged(obj);
         PlaySoundByName("Options", 0);
         ClearSelectedGadget(obj);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)obj, "SHARUNIT")) {
-        MarkChanged((Dialog *)obj);
+    if (IsCurrentGadgetNamed(obj, "SHARUNIT")) {
+        MarkChanged(obj);
         PlaySoundByName("Options", 0);
         ClearSelectedGadget(obj);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)obj, "OK")) {
+    if (IsCurrentGadgetNamed(obj, "OK")) {
         PlaySoundByName("Options", 0);
         Gadget* plyr = FindGadgetChecked(data, "PLYRLIST");
         short idx = plyr->u.list.selected;
@@ -246,7 +246,7 @@ void __stdcall HandleShareDialogEvent(Gui* obj)
         }
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)obj, "CANCEL")) {
+    if (IsCurrentGadgetNamed(obj, "CANCEL")) {
         PlaySoundByName("Previous", 0);
         return;
     }
@@ -327,7 +327,7 @@ void OpenShareDialog()
         sprintf(text, "%d", ReadSliderValue(e));
         SetTranslatedTextByName(menu, "ENERGY#", text, 0);
     }
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkChanged(&g_game->gui);
     SetKeyboardInput(&g_game->gui, 1);
     RenderLayer(&g_game->gui, 0x40);
 }
@@ -387,11 +387,11 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
         n = atoi(&entries[gadget->hotGadgetIndex].name[8]);
         unsigned char v = (unsigned char)GetButtonStage(gadget, gadget->hotGadgetIndex);
         g_game->chatRecipients[n] = v;
-        MarkChanged((Dialog *)gadget);
+        MarkChanged(gadget);
         ClearSelectedGadget(gadget);
         goto tail;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, g_sendToGadgetName)) {
+    if (IsCurrentGadgetNamed(gadget, g_sendToGadgetName)) {
         PlaySoundByName(g_smallButtonSoundName, 0);
         unsigned char v = (unsigned char)GetButtonStage(gadget, gadget->hotGadgetIndex);
         (*(Flags16*)&g_game->lobbyUiDirtyFlags_2bee).bit8 = v & 1;
@@ -401,7 +401,7 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, g_sendTypeGadgetName)) {
+    if (IsCurrentGadgetNamed(gadget, g_sendTypeGadgetName)) {
         PlaySoundByName(g_smallButtonSoundName, 0);
         g_game->mode_2bf0 = (unsigned char)GetButtonStageByName(gadget, g_sendTypeGadgetName);
         if (g_game->mode_2bf0 >= 4)
@@ -410,7 +410,7 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
         ClearSelectedGadget(gadget);
         goto tail;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, g_talkGadgetName)) {
+    if (IsCurrentGadgetNamed(gadget, g_talkGadgetName)) {
         Gadget* talk = FindGadgetChecked_B(entries, g_talkGadgetName);
         mode = g_game->mode_2bf0;
         {
@@ -530,7 +530,7 @@ void __stdcall HandleUnitInfoDialogEvent(Gui* gadget)
         g_game->flags_37ebe &= ~0x800;
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "DONE")) {
+    if (IsCurrentGadgetNamed(gadget, "DONE")) {
         PlaySoundByName("smlbutton", 0);
         return;
     }
@@ -629,7 +629,7 @@ void __stdcall OpenUnitInfoDialog(void)
 
     GameFreeThunk(stats);
     SetTranslatedTextByName(&g_game->gui, "NAME", def, 0x80);
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkChanged(&g_game->gui);
 }
 
 // FUNCTION: 0x494740
@@ -637,35 +637,35 @@ void __stdcall HandleTabMenuEvent(Gui* gadget)
 {
     if (gadget->hotGadgetIndex == -1) {
         g_game->lobbyUiDirtyFlags &= 0xff1f;
-        DisableKeyCommands((Dialog *)gadget);
+        DisableKeyCommands(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "OPTIONS")) {
+    if (IsCurrentGadgetNamed(gadget, "OPTIONS")) {
         g_game->ordersPanelFlags |= 1;
         PlaySoundByName("BigButton", 0);
         OpenInGameOptions();
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "SHARE")) {
+    if (IsCurrentGadgetNamed(gadget, "SHARE")) {
         PlaySoundByName("BigButton", 0);
         OpenShareDialog();
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "CONTROL")) {
+    if (IsCurrentGadgetNamed(gadget, "CONTROL")) {
         PlaySoundByName("BigButton", 0);
         OpenControlDialog();
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "ALLIES")) {
+    if (IsCurrentGadgetNamed(gadget, "ALLIES")) {
         PlaySoundByName("BigButton", 0);
         OpenAlliesDialog();
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "CANCEL")) {
+    if (IsCurrentGadgetNamed(gadget, "CANCEL")) {
         CloseTopScreen(gadget);
         return;
     }
@@ -677,10 +677,10 @@ void __stdcall HandleTabMenuCancel(Gui* gadget)
 {
     if (gadget->hotGadgetIndex == -1) {
         g_game->lobbyUiDirtyFlags &= 0xff1f;
-        DisableKeyCommands((Dialog *)&g_game->gui);
+        DisableKeyCommands(&g_game->gui);
         return;
     }
-    if (!IsCurrentGadgetNamed((Dialog *)gadget, "CANCEL"))
+    if (!IsCurrentGadgetNamed(gadget, "CANCEL"))
         ClearSelectedGadget(gadget);
 }
 
@@ -931,7 +931,7 @@ void ToggleTabMenu()
         SetGadgetActiveByName(&g_game->gui, "SHARE", 0);
         SetGadgetActiveByName(&g_game->gui, "CONTROL", 0);
     }
-    EnableKeyCommands((Dialog *)&g_game->gui);
+    EnableKeyCommands(&g_game->gui);
     RenderLayer(&g_game->gui, 0x40);
     ShowSoftwareCursor();
 }

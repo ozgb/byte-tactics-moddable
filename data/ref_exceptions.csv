@@ -26,6 +26,7 @@ Feature,seqreclamate,pointer,src/map/feature.h,#353
 Feature,seqreclamateshad,pointer,src/map/feature.h,#353
 Feature,seqshad,pointer,src/map/feature.h,#353
 Feature,shadowTable,pointer,src/map/feature.h,#353
+FontGlyphTable,glyphs,pointer,src/gui/gui.cpp,#353
 Frame,data,pointer,src/network/packets.cpp,#353
 FrameQueue,buffer,pointer,src/network/packet_receiver.h,#353
 FrameQueue,recvBuffer,pointer,src/network/packet_receiver.h,#353
@@ -138,6 +139,7 @@ Gui,layer,pointer,src/gui/gui.h,#353
 Gui,src_28,pointer,src/gui/gui.h,#353
 Gui,src_2c,pointer,src/gui/gui.h,#353
 Gui,values,pointer,src/gui/gui.h,#353
+Gui,words,pointer,src/gui/gui.h,#353
 Layer,cb1c,function-pointer,src/gui/layer.h,#353
 Layer,data,pointer,src/gui/layer.h,#353
 Layer,entries,pointer,src/gui/layer.h,#353

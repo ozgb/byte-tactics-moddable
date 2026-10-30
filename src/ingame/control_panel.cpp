@@ -251,7 +251,7 @@ void __stdcall RefreshBuildCountTexts(Gui* menu, Unit* unit)
         }
         e++;
     }
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkChanged(&g_game->gui);
 }
 
 // FUNCTION: 0x419ac0
@@ -667,7 +667,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
                 if (unit->immobile
                     || (unit->weapons[0].weapon.get()->flags.value & 0x10000000))
                     RefreshBuildCountTexts(menu, unit);
-                MarkChanged((Dialog *)&g_game->gui);
+                MarkChanged(&g_game->gui);
             }
         }
         ClearSelectedGadget(menu);
@@ -973,7 +973,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
             && (target->player->type == 1 || target->player->type == 2)) {
             if (target->flags & 0x20000000) {
                 if (IsScreenNamed(&g_game->gui, "BUILDER.GUI"))
-                    MarkChanged((Dialog *)&g_game->gui);
+                    MarkChanged(&g_game->gui);
             } else {
                 if (target->carrier != 0)
                     AttachUnitToPiece(target, 0, -1, 1);

@@ -448,7 +448,7 @@ void __stdcall DrawSyncStatus(void* surface)
     extern Game* g_game;
 
     RenderLayer((Gui *)&g_game->menu_519_18, 0x40);
-    MarkLayerChanged((Dialog *)&g_game->menu_519_18);
+    MarkLayerChanged((Gui *)&g_game->menu_519_18);
     BlitMenuLayers(&g_game->menu_519_18, 0, 0);
 
     const char* text;
@@ -540,9 +540,9 @@ void LoadingScreenFrame(void)
 
     if (!(*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.started) {
         while (((int)g_game->layer) != 0) {
-            CloseTopScreen((Gui *)&g_game->gui);
+            CloseTopScreen(&g_game->gui);
         }
-        DisableKeyCommands((Dialog *)&g_game->gui);
+        DisableKeyCommands(&g_game->gui);
         if (((unsigned char)g_game->cursorMode) != 0x14) {
             g_game->cursorMode = (char)(0x14);
             SetCursorAnimation(&g_game->gui, (void*)g_game->cursorHourglass);
@@ -553,7 +553,7 @@ void LoadingScreenFrame(void)
             SaveSettings();
         }
         while (((int)g_game->layer) != 0) {
-            CloseTopScreen((Gui *)&g_game->gui);
+            CloseTopScreen(&g_game->gui);
         }
         BlankScreen();
         g_game->width_37e1f = 0x280;

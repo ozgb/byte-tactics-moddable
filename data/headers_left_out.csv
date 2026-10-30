@@ -203,7 +203,6 @@ ResetClipRect,mismatch,"static risk rule: a convention, parameter count, or non-
 ResolveCursorModeForSelection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ScaleUnitWeights,mismatch,fixing it changes the generated code of a caller
 ScanDirectory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SelectAdjacentGadget,mismatch,fixing it changes the generated code of a caller
 SelectFontForEntry,mismatch,fixing it changes the generated code of a caller
 SendChatMessage,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SendPlayerEconomy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -228,7 +227,7 @@ SetGadgetItems,mismatch,"definition type not nameable in a header, or no clean c
 SetGadgetRows,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGadgetStatus,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetGadgetStatusByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SetGadgetText,mismatch,parameter 1 void* vs Dialog* (view type): the declaration differs from the definition in a pointer type only
+SetGadgetText,mismatch,parameter 1 void* vs Gui* (view type): the declaration differs from the definition in a pointer type only
 SetGadgetTextByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGrayedOut,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGrayedOutByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
@@ -256,7 +255,6 @@ TryGetDesiredHeading,mismatch,"static risk rule: a convention, parameter count, 
 TrySetFocus,mismatch,fixing it changes the generated code of a caller
 UnlockScreen,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 UpdateCursorWorldPos,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-UpdateHelpText,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 UpdateMenu,mismatch,fixing it changes the generated code of a caller
 UpdatePlayerEconomy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 UpdateTimeoutDialog,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

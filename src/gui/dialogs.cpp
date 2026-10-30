@@ -589,7 +589,7 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
     if (PeekMouseEvent(&e) != 0) {
         if (p->layer != 0) {
             DialogRect r;
-            GetGadgetScreenRect((char *)p->layer->entries, 0, (Rect *)&r);
+            GetGadgetScreenRect(p->layer->entries, 0, (Rect *)&r);
             if (IsPointInRect((Rect *)&r, e.x, e.y) != 0 || e.keyFlags == 0) {
                 PopMouseEvent(&e);
                 p->mouseKeyFlags = e.keyFlags;

@@ -4530,7 +4530,7 @@ void UpdateBattleRoom()
                     int h;
                     sprintf(buf, "LOGO%i", i);
                     widget = FindGadgetIndex(entries, buf, 0xe);
-                    GetGadgetRectByIndex((char *)entries, widget, (Rect *)&rect);
+                    GetGadgetRectByIndex(entries, widget, (Rect *)&rect);
                     info = p->info;
                     sprintf(buf, "%i.%i", info->versionMajor, info->versionMinor);
                     w = GetTextPixelWidth(buf);

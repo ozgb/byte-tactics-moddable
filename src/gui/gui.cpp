@@ -49,20 +49,6 @@ struct Gui;
 class SquadManager;
 
 
-#pragma pack(push, 1)
-
-struct DialogPointView {
-    char unknown_0[0x3c];
-    MouseEvent data;
-};
-
-struct DialogOriginView {
-    char unknown_0[0x13];
-    short val_13;
-    short val_15;
-};
-
-#pragma pack(pop)
 
 int __stdcall UpdateMenu(Gui* menu);
 void __stdcall BlitLayers(void* param_1, unsigned int* param_2, int* param_3);
@@ -238,11 +224,11 @@ bool __stdcall HasFocus(Gui* param_1)
 }
 
 // FUNCTION: 0x49fd20
-void __stdcall FUN_0049fd20(DialogPointView* param_1, DialogOriginView* param_2, MouseEvent* param_3)
+void __stdcall FUN_0049fd20(Gui* param_1, Gadget* param_2, MouseEvent* param_3)
 {
-    *param_3 = param_1->data;
-    param_3->x -= param_2->val_13;
-    param_3->y -= param_2->val_15;
+    *param_3 = param_1->point;
+    param_3->x -= param_2->x;
+    param_3->y -= param_2->y;
 }
 
 // FUNCTION: 0x49fd60
@@ -885,18 +871,18 @@ void __stdcall SetQuickKeyByName(Gui* obj, char* name, char value)
 }
 
 // FUNCTION: 0x4a15c0
-void __stdcall GetGadgetRectByIndex(char* param_1, int param_2, Rect* param_3)
+void __stdcall GetGadgetRectByIndex(Gadget* entries, int index, Rect* rect)
 {
-    char* e = param_1 + param_2 * 0x15b;
-    if (*e == 0) {
-        param_3->left = 0;
-        param_3->top = 0;
+    Gadget* e = &entries[index];
+    if (e->type == 0) {
+        rect->left = 0;
+        rect->top = 0;
     } else {
-        param_3->left = *(short*)(e + 0x13);
-        param_3->top = *(short*)(e + 0x15);
+        rect->left = e->x;
+        rect->top = e->y;
     }
-    param_3->right = *(short*)(e + 0x17) - 1 + param_3->left;
-    param_3->bottom = *(short*)(e + 0x19) - 1 + param_3->top;
+    rect->right = e->width - 1 + rect->left;
+    rect->bottom = e->height - 1 + rect->top;
 }
 
 // FUNCTION: 0x4a1630
@@ -914,17 +900,17 @@ void __stdcall GetGadgetRect(Gadget* entry, Rect* rect)
 }
 
 // FUNCTION: 0x4a1680
-void __stdcall GetGadgetScreenRect(char* param_1, int param_2, Rect* param_3)
+void __stdcall GetGadgetScreenRect(Gadget* entries, int index, Rect* rect)
 {
-    char* e = param_1 + param_2 * 0x15b;
-    param_3->left = *(short*)(e + 0x13);
-    param_3->top = *(short*)(e + 0x15);
-    if (*e != 0) {
-        param_3->left += *(short*)(param_1 + 0x13);
-        param_3->top += *(short*)(param_1 + 0x15);
+    Gadget* e = &entries[index];
+    rect->left = e->x;
+    rect->top = e->y;
+    if (e->type != 0) {
+        rect->left += entries->x;
+        rect->top += entries->y;
     }
-    param_3->right = *(short*)(e + 0x17) - 1 + param_3->left;
-    param_3->bottom = *(short*)(e + 0x19) - 1 + param_3->top;
+    rect->right = e->width - 1 + rect->left;
+    rect->bottom = e->height - 1 + rect->top;
 }
 
 // FUNCTION: 0x4a16f0
@@ -3790,7 +3776,7 @@ static inline void Activate(Gui* obj, int index)
 {
     Rect rect;
     Gadget* ep = obj->layer->entries;
-    GetGadgetRectByIndex((char*)ep, index, &rect);
+    GetGadgetRectByIndex(ep, index, &rect);
     SetTextColors(obj->colours[ep[index].colours], GetTextKeyColor());
     SelectFontForEntry((void*)ep, index);
     TrySetFocus(obj, index);
@@ -3804,7 +3790,7 @@ int __stdcall HandleTextInput(Gui* obj, int index, int key)
 {
     Gadget* entries = obj->layer->entries;
     Rect rect;
-    GetGadgetRectByIndex((char*)entries, index, &rect);
+    GetGadgetRectByIndex(entries, index, &rect);
     SelectFontForEntry_inlined(entries, index);
 
     MouseEvent point = obj->point;

@@ -13,8 +13,6 @@ struct FileRequester;
 struct Font;
 struct FontGlyphTable;
 struct Gadget;
-struct DialogPointView;
-struct DialogOriginView;
 struct Rect;
 #include "../util/mouse_event.h"
 
@@ -88,7 +86,7 @@ int __stdcall GetKeyboardInput(Gui* obj);
 void __stdcall ClearFocus(Gui*);
 int __stdcall IsFocused(Gui*, int);
 bool __stdcall HasFocus(Gui*);
-void __stdcall FUN_0049fd20(DialogPointView*, DialogOriginView*, MouseEvent*);
+void __stdcall FUN_0049fd20(Gui*, Gadget*, MouseEvent*);
 void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
 int __stdcall FindAssocListBox(Gadget* entries, int index);
 int __stdcall FindAssocSlider(Gadget* entries, int index);
@@ -132,8 +130,8 @@ void __stdcall SetFontsPath(Gui* obj, const char* dir);
 void __stdcall SetGuiPath(Gui* obj, const char* dir);
 void __stdcall SetAnimsPath(Gui* obj, const char* dir);
 int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name);
-void __stdcall GetGadgetRectByIndex(char*, int, Rect*);
-void __stdcall GetGadgetScreenRect(char*, int, Rect*);
+void __stdcall GetGadgetRectByIndex(Gadget*, int, Rect*);
+void __stdcall GetGadgetScreenRect(Gadget*, int, Rect*);
 int __stdcall FindBackgroundCell(Gadget* entries, int index);
 int __stdcall IsPointInRect(Rect* r, int px, int py);
 void __stdcall DrawListBox(Gui* obj, int index);

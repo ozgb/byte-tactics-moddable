@@ -42,7 +42,6 @@ PY_SUFFIXES = {".py"}
 PUBLISHED_INTERFACES = {
     "lib/bitexact/bitexact.h",
     "src/state/block.h",
-    "src/state/block_vector.h",
     "src/state/game_rand.h",
 }
 PUBLISHED_INTERFACE_DIRS = ("interfaces/",)

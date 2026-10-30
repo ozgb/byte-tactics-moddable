@@ -8,7 +8,6 @@
 
 #pragma pack(push, 4)
 
-// A growable array in the state block: Ref words for begin, end and capacity, the growth rule of VC5's std::vector.
 template <class T>
 class BlockVector {
 public:
@@ -17,16 +16,13 @@ public:
     typedef T* iterator;
     typedef const T* const_iterator;
 
-    // An empty vector that owns no storage.
     BlockVector() : padding(0), firstWord(0), lastWord(0), endWord(0) {}
-    // A copy of x in storage of exactly x.Size() elements.
     BlockVector(const BlockVector& x) : padding(0)
     {
         firstWord = Allocate(x.Size());
         lastWord = Copy(x.Begin(), x.End(), firstWord.get());
         endWord = lastWord;
     }
-    // Destroys the elements and returns the storage to the block.
     ~BlockVector()
     {
         Destroy(firstWord.get(), lastWord.get());
@@ -35,7 +31,6 @@ public:
         lastWord = nullptr;
         endWord = nullptr;
     }
-    // Copies x in place when it fits, else into new storage.
     BlockVector& operator=(const BlockVector& x)
     {
         if (this == &x) {
@@ -57,7 +52,6 @@ public:
         }
         return *this;
     }
-    // Grows the storage to n elements when it is smaller.
     void Reserve(size_type n)
     {
         if (Capacity() < n) {
@@ -70,17 +64,11 @@ public:
             firstWord = s;
         }
     }
-    // The elements the storage holds.
     size_type Capacity() const { return firstWord.get() == nullptr ? 0 : endWord.get() - firstWord.get(); }
-    // The first element.
     iterator Begin() { return firstWord.get(); }
-    // The first element.
     const_iterator Begin() const { return firstWord.get(); }
-    // One past the last element.
     iterator End() { return lastWord.get(); }
-    // One past the last element.
     const_iterator End() const { return lastWord.get(); }
-    // Grows with copies of x or shrinks to n elements.
     void Resize(size_type n, const T& x = T())
     {
         if (Size() < n)
@@ -88,24 +76,17 @@ public:
         else if (n < Size())
             Erase(Begin() + n, End());
     }
-    // The elements held.
     size_type Size() const { return firstWord.get() == nullptr ? 0 : lastWord.get() - firstWord.get(); }
-    // True when no element is held.
     bool Empty() const { return Size() == 0; }
-    // The element at p.
     T& operator[](size_type p) { return *(Begin() + p); }
-    // The element at p.
     const T& operator[](size_type p) const { return *(Begin() + p); }
-    // Appends a copy of x.
     void PushBack(const T& x) { Insert(End(), x); }
-    // Inserts a copy of x before p and returns where it went.
     iterator Insert(iterator p, const T& x)
     {
         size_type o = p - Begin();
         Insert(p, 1, x);
         return Begin() + o;
     }
-    // Inserts m copies of x before p, growing to twice the size when the storage is full.
     void Insert(iterator p, size_type m, const T& x)
     {
         if (endWord.get() - lastWord.get() < m) {
@@ -136,7 +117,6 @@ public:
             lastWord = l + m;
         }
     }
-    // Removes the element at p and returns where the next one went.
     iterator Erase(iterator p)
     {
         iterator l = lastWord.get();
@@ -145,7 +125,6 @@ public:
         lastWord = l - 1;
         return p;
     }
-    // Removes the elements from f up to l and returns where the next one went.
     iterator Erase(iterator f, iterator l)
     {
         iterator s = CopyAssign(l, End(), f);
@@ -153,7 +132,6 @@ public:
         lastWord = s;
         return f;
     }
-    // Removes every element and keeps the storage.
     void Clear() { Erase(Begin(), End()); }
 
 private:

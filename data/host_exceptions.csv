@@ -151,7 +151,9 @@ src/game/main_loop.cpp,src/ingame/keys.h,#392
 src/game/main_loop.cpp,src/ingame/selection.h,#392
 src/game/players.cpp,src/graphics/object_pool.h,#392
 src/game/players.cpp,src/gui/dialogs.h,#392
+src/game/players.cpp,src/gui/gadget.h,#392
 src/game/players.cpp,src/gui/gui.h,#392
+src/game/players.cpp,src/gui/layer.h,#392
 src/game/players.cpp,src/ingame/selection.h,#392
 src/game/players.cpp,src/graphics/display.h,#392
 src/game/settings.cpp,src/host/settings_io.h,#392

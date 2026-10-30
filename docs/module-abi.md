@@ -633,7 +633,9 @@ Every error or trap ends the game, in this version. There is no recovery and no 
   `returned a buffer other than the one it was given`, `returned a weapon outside the sim block`.
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the
-  scratch area`, and `<module>: the handle table is full`.
+  scratch area`, `slot <name>: called inside an import` (a slot call made while an import runs; the
+  call does nothing and the game ends once the outer call returns), and `<module>: the handle table
+  is full`.
 - **A service that ends the game on purpose.** `FatalError(message)` does not end the process inside
   the call. The import returns an error carrying the message, so the call unwinds as a trap does, and
   the game ends with the message itself (not a trap text) once the call has returned: logged, then

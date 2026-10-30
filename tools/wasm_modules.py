@@ -6,6 +6,7 @@
     uv run tools/wasm_modules.py statics   # run wind_meteors for 2000 ticks and check its statics never change
     uv run tools/wasm_modules.py adapters  # run the loader's adapters and refusals over tests/wasm/adapters
     uv run tools/wasm_modules.py fatal     # make an import end the game, and check the exit comes after the call
+    uv run tools/wasm_modules.py glue-fatal [--exe EXE] [--game-dir DIR]   # the same through the real glue, under Wine
 
 Both fixtures use the fixed-base convention (#562): each imports env.memory and
 env.__indirect_function_table, is linked with its own --global-base and --table-base
@@ -1055,6 +1056,72 @@ def run_fatal():
     return 0
 
 
+GLUE_FATAL_SCENARIO = os.path.join(ROOT, "reference", "scenarios", "console-ilose.txt")
+GLUE_FATAL_TDF = "[Default]\n\t{\n\tMeteorWeapon=BOGUS;\n\tMeteorRadius=0;\n\tMeteorDensity=0;\n\tMeteorDuration=0;\n\tMeteorInterval=0;\n\t}\n"
+GLUE_FATAL_MESSAGE = "Hey, hoser!  The default meteor shower data was bogus!"
+GLUE_FATAL_RETURNED = "wind_meteors: wl_call returned with a fatal pending"
+
+
+def glue_fatal_problem(exit_codes, log):
+    """The reason a glue-fatal run is wrong (None when right): the exit code, the message, and the order of the glue's line and the message."""
+    if exit_codes != [2]:
+        return f"the exit code was {exit_codes}, expected [2]"
+    message = log.find(GLUE_FATAL_MESSAGE)
+    if message < 0:
+        return f"the log has no {GLUE_FATAL_MESSAGE!r}"
+    returned = log.find(GLUE_FATAL_RETURNED)
+    if returned < 0:
+        return f"the log has no {GLUE_FATAL_RETURNED!r}: the game ended before wl_call returned"
+    if returned > message:
+        return "the message was logged before wl_call returned"
+    if " trapped " in log:
+        return "the log has a module trap text: the exit was not the glue's"
+    return None
+
+
+def run_glue_fatal(exe, game_dir):
+    """Run the exe in test mode with a bogus gamedata/meteor.tdf placed in its game copy; the module's FatalError must end the game after wl_call returned."""
+    exe = os.path.abspath(exe)
+    if not os.path.exists(exe):
+        print(f"FAIL: {exe} is missing: build it first")
+        return 1
+    for name in ("wasmtime_host.dll", "wind_meteors.wasm", "modules.json"):
+        if not os.path.exists(os.path.join(os.path.dirname(exe), name)):
+            print(f"FAIL: {name} is missing next to {exe}: cmake --build build/modern --target wasm_runtime")
+            return 1
+    scratch = os.path.join(ROOT, "build", "scratch", "glue-fatal")
+    os.makedirs(scratch, exist_ok=True)
+    fixture = os.path.join(scratch, "meteor.tdf")
+    with open(fixture, "w") as f:
+        f.write(GLUE_FATAL_TDF)
+    cmd = [sys.executable, os.path.join(ROOT, "tools", "playtest.py"), "--exe", exe, "--testmode", GLUE_FATAL_SCENARIO,
+           "--testmode-timeout", "120", "--put", "gamedata/meteor.tdf", fixture]
+    if game_dir:
+        cmd += ["--game-dir", game_dir]
+    done = subprocess.run(cmd, capture_output=True, text=True)
+    found = re.search(r"^logs and screenshots: (.+)/$", done.stdout, re.M)
+    if not found:
+        print(f"FAIL: playtest.py gave no run directory (exit {done.returncode}):\n{done.stdout}{done.stderr}")
+        return 1
+    session = os.path.join(ROOT, found.group(1))
+    runs = [d for d in os.listdir(session) if os.path.isdir(os.path.join(session, d))]
+    if len(runs) != 1:
+        print(f"FAIL: expected one run in {session}, found {runs}")
+        return 1
+    run = os.path.join(session, runs[0])
+    with open(os.path.join(run, "result.json")) as f:
+        result = json.load(f)
+    log_path = os.path.join(run, "wine.log")
+    log = open(log_path, errors="replace").read() if os.path.exists(log_path) else ""
+    problem = glue_fatal_problem(result["exit_codes"], log)
+    if problem:
+        print(f"FAIL: {problem} (kept: {run})")
+        return 1
+    shutil.rmtree(session)
+    print(f"glue-fatal: exit code 2, {GLUE_FATAL_RETURNED!r} before {GLUE_FATAL_MESSAGE!r}, no trap text, ok")
+    return 0
+
+
 def run_under_wasmtime(command):
     try:
         import wasmtime
@@ -1093,8 +1160,12 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "check", "imports", "statics", "adapters", "fatal"])
+    parser.add_argument("command", choices=["build", "check", "imports", "statics", "adapters", "fatal", "glue-fatal"])
+    parser.add_argument("--exe", default=os.path.join(ROOT, "build", "modern", "TotalA.exe"), help="glue-fatal: the exe to run")
+    parser.add_argument("--game-dir", help="glue-fatal: the game's install (default: Steam's)")
     args = parser.parse_args()
+    if args.command == "glue-fatal":
+        return run_glue_fatal(args.exe, args.game_dir)
     if args.command == "build":
         build()
         return 0

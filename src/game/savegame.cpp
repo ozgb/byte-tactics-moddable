@@ -221,7 +221,7 @@ void __stdcall ShowSavedGameInfo()
         SetTranslatedTextByName(menu, "TIME", DAT_005119b8, 0);
     }
 done:
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkChanged(&g_game->gui);
 #undef gametype
 #undef name
 #undef diffs
@@ -231,7 +231,7 @@ done:
 void __stdcall ShowInvalidSavegameDialog(void* param_1)
 {
     OpenMessageBox((Gui *)param_1, (char *)Translate(g_invalidSavegameText), 0x140, 1, 1);
-    ClearSelectedGadget((Gui*)param_1);
+    ClearSelectedGadget(param_1);
 }
 
 // FUNCTION: 0x492360
@@ -243,9 +243,9 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
     if (gadget->hotGadgetIndex == -1)
         return;
 
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "CANCEL")) {
+    if (IsCurrentGadgetNamed(gadget, "CANCEL")) {
         if ((*(union Flags_2a44*)&g_game->netGameFlags_2a44).b2)
-            DisableKeyCommands((Dialog *)g_game->message_519);
+            DisableKeyCommands((Gui *)g_game->message_519);
         if (g_savegameFileNames)
             GameFreeThunk(g_savegameFileNames);
         if (g_savegameDescs)
@@ -261,7 +261,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
         PlaySoundByName("Previous", 0);
         return;
     }
-    if (!IsCurrentGadgetNamed((Dialog *)gadget, "LOAD") && !IsCurrentGadgetNamed((Dialog *)gadget, "GAMES")) {
+    if (!IsCurrentGadgetNamed(gadget, "LOAD") && !IsCurrentGadgetNamed(gadget, "GAMES")) {
         if (gadget->hotGadgetIndex != -1)
             ClearSelectedGadget(gadget);
         return;
@@ -287,7 +287,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
             SetCursorAnimation(g_game->message_519, ((void*)g_game->cursorHourglass));
         }
         if ((*(union Flags_2a44*)&g_game->netGameFlags_2a44).b2)
-            DisableKeyCommands((Dialog *)g_game->message_519);
+            DisableKeyCommands((Gui *)g_game->message_519);
         PlaySoundByName("SMLBUTTON", 0);
         e = FindGadgetChecked(entries, "GAMES");
         sprintf(g_game->saveName_38c6b, "%s\\%s", g_savegameDir,
@@ -463,13 +463,13 @@ void __stdcall SaveGameScreenHandler(Gui* gadget)
         g_savegameRadarPreview = 0;
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "CANCEL")) {
+    if (IsCurrentGadgetNamed(gadget, "CANCEL")) {
         if ((*(union Flags_2a44*)&g_game->netGameFlags_2a44).bit2_2a44)
-            DisableKeyCommands((Dialog *)g_game->message_519);
+            DisableKeyCommands((Gui *)g_game->message_519);
         PlaySoundByName("Previous", 0);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "DELETE")) {
+    if (IsCurrentGadgetNamed(gadget, "DELETE")) {
         PlaySoundByName("SmallButton", 0);
         Gadget* e = FindGadgetChecked(entries, "GAMES");
         sprintf(save.path, "%s\\%s", g_savegameDir, SkipTextLines(g_savegameFileNames, e->u.list.selected));
@@ -479,14 +479,14 @@ void __stdcall SaveGameScreenHandler(Gui* gadget)
         ShowSavedGameInfo();
         return;
     }
-    if (!IsCurrentGadgetNamed((Dialog *)gadget, "GAMES") && !IsCurrentGadgetNamed((Dialog *)gadget, "LOAD") &&
-        !IsCurrentGadgetNamed((Dialog *)gadget, "GAMENAME")) {
+    if (!IsCurrentGadgetNamed(gadget, "GAMES") && !IsCurrentGadgetNamed(gadget, "LOAD") &&
+        !IsCurrentGadgetNamed(gadget, "GAMENAME")) {
         if (gadget->hotGadgetIndex != -1)
             ClearSelectedGadget(gadget);
         return;
     }
     if ((*(union Flags_2a44*)&g_game->netGameFlags_2a44).bit2_2a44)
-        DisableKeyCommands((Dialog *)g_game->message_519);
+        DisableKeyCommands((Gui *)g_game->message_519);
     PlaySoundByName("smlbutton", 0);
     int index = FindGadgetIndex(entries, "GAMENAME", 3);
     char* text = entries[index].u.text;
@@ -525,7 +525,7 @@ void ShowSaveGameScreen()
     SetKeyboardInput(&g_game->gui, 1);
     OrLabelAttribs();
     SetGadgetActiveByName(&g_game->gui, "LoadGame", 0);
-    EnableKeyCommands((Dialog *)&g_game->gui);
+    EnableKeyCommands(&g_game->gui);
     RenderLayer(&g_game->gui, 0x40);
 }
 
@@ -556,7 +556,7 @@ void ShowLoadGameScreen()
     SetKeyboardInput((char*)&g_game->message_519[0], 1);
     OrLabelAttribs();
     SetGadgetActiveByName((char*)&g_game->message_519[0], "SaveGame", 0);
-    EnableKeyCommands((Dialog *)((char*)&g_game->message_519[0]));
+    EnableKeyCommands((Gui *)((char*)&g_game->message_519[0]));
     RenderLayer((Gui *)((char*)&g_game->message_519[0]), 0x40);
     ((char*)g_game)[0x38a51] |= 1;
 }

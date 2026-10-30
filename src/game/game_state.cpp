@@ -371,9 +371,9 @@ void InitGame()
     LoadLogos();
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
     SetCurrentGuiContext(&g_game->gui);
-    SetGuiPath((Dialog *)&g_game->gui, g_guisDirName);
-    SetAnimsPath((Dialog *)&g_game->gui, g_animsDirName);
-    SetFontsPath((Dialog *)&g_game->gui, g_fontsDirName);
+    SetGuiPath(&g_game->gui, g_guisDirName);
+    SetAnimsPath(&g_game->gui, g_animsDirName);
+    SetFontsPath(&g_game->gui, g_fontsDirName);
     SetDefaultFont(&g_game->gui.font, g_game->fontComix);
     InitCursorFrames(&g_game->gui, GetGafFrame(g_game->cursorNormal, 0));
     LoadGafFile(&g_game->gui, g_commonGuiName);
@@ -598,7 +598,7 @@ void __stdcall SetCursorMode(int n)
 {
     if (((signed char)g_game->cursorMode) != n) {
         g_game->cursorMode = (char)(n);
-        SetCursorAnimation((Gui*)&g_game->gui, g_game->table[n]);
+        SetCursorAnimation(&g_game->gui, g_game->table[n]);
     }
 }
 
@@ -617,7 +617,7 @@ void __stdcall UpdateBattleHoverMode(int unused)
     if ((flags & 2) == 0 && (flags & 1) == 0) {
         if (((signed char)g_game->cursorMode) != 0x13) {
             g_game->cursorMode = (char)(0x13);
-            SetCursorAnimation((Gui*)&g_game->gui, g_game->table[0x13]);
+            SetCursorAnimation(&g_game->gui, g_game->table[0x13]);
         }
         return;
     }
@@ -625,7 +625,7 @@ void __stdcall UpdateBattleHoverMode(int unused)
     int n = ResolveCursorModeForSelection(g_game->orderMode);
     if (((signed char)g_game->cursorMode) != n) {
         g_game->cursorMode = (char)(n);
-        SetCursorAnimation((Gui*)&g_game->gui, g_game->table[n]);
+        SetCursorAnimation(&g_game->gui, g_game->table[n]);
     }
 }
 

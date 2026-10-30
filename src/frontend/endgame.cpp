@@ -513,21 +513,21 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
         display->paletteBrightness = *(float*)&g_game->savedPaletteBrightness;
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "LoadGame")) {
+    if (IsCurrentGadgetNamed(gadget, "LoadGame")) {
         PlaySoundByName("BigButton", 0);
         ShowLoadGameScreen();
         ClearSelectedGadget(gadget);
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "SaveGame")) {
+    if (IsCurrentGadgetNamed(gadget, "SaveGame")) {
         PlaySoundByName("BigButton", 0);
         ShowSaveGameScreen();
         ClearSelectedGadget(gadget);
         ClearSelectedGadget(gadget);
         return;
     }
-    if (IsCurrentGadgetNamed((Dialog *)gadget, "Start") || IsCurrentGadgetNamed((Dialog *)gadget, "Missions")) {
+    if (IsCurrentGadgetNamed(gadget, "Start") || IsCurrentGadgetNamed(gadget, "Missions")) {
         RegisterDataArchives();
         PlaySoundByName("BigButton", 0);
         g_game->frontendNextSubState = 10;
@@ -545,14 +545,14 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
             SetGameMode(2);
             return;
         }
-    } else if (IsCurrentGadgetNamed((Dialog *)gadget, "MainMenu")) {
+    } else if (IsCurrentGadgetNamed(gadget, "MainMenu")) {
         PlaySoundByName("BigButton", 0);
         SetFrontendState(2, 770, "c:\\cavedog\\wargame\\endgame.cpp");
         SetGameMode(1);
         SetCursorOverlayEnabled(1);
         SetCursorMode(0x14);
         return;
-    } else if (IsCurrentGadgetNamed((Dialog *)gadget, "Difficulty")) {
+    } else if (IsCurrentGadgetNamed(gadget, "Difficulty")) {
         PlaySoundByName("SKirmish", 0);
         if (g_game->difficulty == 0) {
             g_game->options->difficulty = 1;
@@ -670,8 +670,8 @@ void EnableEndMissionButtons()
         entries[FindGadgetIndex(entries, "MainMenu", 1)].y = 0x1a0;
         SelectGadgetByName(&g_game->gui, "MainMenu");
     }
-    MarkLayerChanged((Dialog *)&g_game->gui);
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkLayerChanged(&g_game->gui);
+    MarkChanged(&g_game->gui);
 }
 
 // FUNCTION: 0x41f5c0
@@ -693,8 +693,8 @@ void ShowEndMissionScreen()
     OpenEndMissionScreen();
     FillEndGameStatistics();
     EnableEndMissionButtons();
-    MarkLayerChanged((Dialog *)&g_game->gui);
-    MarkChanged((Dialog *)&g_game->gui);
+    MarkLayerChanged(&g_game->gui);
+    MarkChanged(&g_game->gui);
     SetGameMode(7);
     g_game->endGameState = 7;
 }
@@ -703,7 +703,7 @@ void ShowEndMissionScreen()
 void __stdcall HandleCdCheckClick(Gui* gadget)
 {
     if (gadget->hotGadgetIndex != -1) {
-        if (IsCurrentGadgetNamed((Dialog *)gadget, "OK")) {
+        if (IsCurrentGadgetNamed(gadget, "OK")) {
             PlaySoundByName("Options", 0);
             g_game->endGameState = 5;
             return;
@@ -777,8 +777,8 @@ void __stdcall RunEndGameState()
             if(player->rejectReason && player->rejectReason!=2) {
                 const char* name=GetRejectReasonText(player->rejectReason);
                 OpenMessageBox(&g_game->gui,(char *)Translate(name),320,1,1);
-                MarkChanged((Dialog *)&g_game->gui);
-                MarkLayerChanged((Dialog *)&g_game->gui);
+                MarkChanged(&g_game->gui);
+                MarkLayerChanged(&g_game->gui);
                 player->rejectReason=0;
             }
         } else { g_game->lastFrame=0; g_game->endGameState=2; }
@@ -838,7 +838,7 @@ void __stdcall RunEndGameState()
             DrawSurface(((void*)g_game->screen),g_game->image_3907b,0,0);
         } else {
             OpenEndMissionScreen(); FillEndGameStatistics(); EnableEndMissionButtons();
-            MarkLayerChanged((Dialog *)&g_game->gui); MarkChanged((Dialog *)&g_game->gui);
+            MarkLayerChanged(&g_game->gui); MarkChanged(&g_game->gui);
             g_game->endGameState=7;
         }
         break;
@@ -857,7 +857,7 @@ void __stdcall RunEndGameState()
                 if(PopKey() || g_game->cursorKeyFlags) {
                     ((Sound*)g_game->sound)->StopStream();
                     OpenEndMissionScreen(); EnableEndMissionButtons(); FillEndGameStatistics();
-                    MarkLayerChanged((Dialog *)&g_game->gui); MarkChanged((Dialog *)&g_game->gui);
+                    MarkLayerChanged(&g_game->gui); MarkChanged(&g_game->gui);
                     g_game->endGameState=7;
                 }
                 unsigned deadline=GetTickRate()*5+g_game->deadline;
@@ -868,7 +868,7 @@ void __stdcall RunEndGameState()
         break;
     case 7: {
         if(StatsComplete()) {
-            EnableKeyCommands((Dialog *)&g_game->gui);
+            EnableKeyCommands(&g_game->gui);
             g_game->endGameState=8; SetCursorMode(19); SetCursorOverlayEnabled(1);
             break;
         }

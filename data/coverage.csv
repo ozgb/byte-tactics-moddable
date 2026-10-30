@@ -694,7 +694,7 @@ pathfinding,Pathfinder::MarkGoalCell,src/ai/pathfind.cpp,0,0,0,0,0,0,?MarkGoalCe
 pathfinding,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,0,0,0,0,0,0,?ReleaseHeldPathLock@Pathfinder@@QAEXXZ,1,
 pathfinding,Pathfinder::RemoveNode,src/ai/pathfind.cpp,1,0,0,0,0,0,?RemoveNode@Pathfinder@@QAEXH@Z,0,unreachable
 pathfinding,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,1,0,0,0,0,0,??1Pathfinder@@QAE@XZ,0,shutdown
-platform,*,,716,377,8009,3116,3146,804,,83,
+platform,*,,717,379,8029,3139,3148,804,,83,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,
@@ -993,7 +993,6 @@ platform,TdfFieldVector::GetPairCount,src/util/tdf.cpp,0,0,0,0,0,0,?GetPairCount
 platform,TdfFieldVector::Insert,src/util/tdf.cpp,1,0,0,0,0,0,?Insert@TdfFieldVector@@QAEPAUTdfField@@PAU2@ABU2@@Z,0,
 platform,TdfRecord::ComputeRecordChecksum,src/util/tdf.cpp,0,0,0,0,0,0,?ComputeRecordChecksum@TdfRecord@@QAEXPAD0@Z,1,
 platform,TdfRecord::GetFieldCount,src/util/tdf.cpp,0,0,0,0,0,0,?GetFieldCount@TdfRecord@@QAEHXZ,1,
-platform,TimedImport,src/wasm/wind_meteors_glue.cpp,1,0,0,0,0,0,?TimedImport@?A0x@@YAPBDPAXPATwasmtime_val_raw@@@Z,0,
 platform,TimedNativeUpdateMeteors,src/wasm/wind_meteors_glue.cpp,1,0,0,0,0,0,?TimedNativeUpdateMeteors@?A0x@@YGXXZ,0,
 platform,TimedNativeUpdateWind,src/wasm/wind_meteors_glue.cpp,1,0,0,0,0,0,?TimedNativeUpdateWind@?A0x@@YAXXZ,0,
 platform,TimingTick,src/wasm/modules.cpp,1,0,0,0,0,0,?TimingTick@?A0x@@YGXI@Z,0,

@@ -451,7 +451,6 @@ struct UnitRestrictRecord {
 #include "../state/sim_globals.h"
 #include "../quirks/quirks.h"
 
-struct Dialog;
 struct UnitRestrictPicView;
 
 void RegisterUnitOrders();

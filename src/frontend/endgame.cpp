@@ -389,13 +389,13 @@ void FillEndGameStatistics(void)
                     e->u.hotspot.index = g_game->players[i].info->color;
                 }
             }
-            menu->language = menu->values[1];
+            menu->language = (FontGlyphTable*)menu->values[1];
             int h = GetFontLineHeight();
             AddTextGadget(g_game->gui.layer, "TEXT", (char*)&g_game->slots_38dd9[i], 0x10,
                          (0x14 - h) / 2 + bar.h.y, -1, 2);
             entries[entries->u.count].attribs = 2;
             entries[entries->u.count].width = 0x5a;
-            menu->language = menu->values[0];
+            menu->language = (FontGlyphTable*)menu->values[0];
             STAT_BAR(0, 0x70, "Kills%d")
             STAT_BAR(1, 0xba, "Losses%d")
             STAT_BAR(2, 0x104, "EProduced%d")

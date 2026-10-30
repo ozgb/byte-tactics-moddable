@@ -379,7 +379,7 @@ void InitGame()
     LoadGafFile(&g_game->gui, g_commonGuiName);
     LoadGafIntoSlot(&g_game->gui, g_hattFont12Name, 0);
     LoadGafIntoSlot(&g_game->gui, g_hattFont11Name, 1);
-    g_game->gui.language = g_game->gui.values[0];
+    g_game->gui.language = (FontGlyphTable*)g_game->gui.values[0];
     SetTextKeyColor(0xfe);
     SetFont(g_game->fontComix);
     g_game->debugMode = 0;

@@ -1,6 +1,5 @@
 #ifndef FILE_LIST_H
 #define FILE_LIST_H
-struct Dialog;
 
 struct FileRequester;
 struct Gui;

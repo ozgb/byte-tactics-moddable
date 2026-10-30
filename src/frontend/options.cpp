@@ -14,7 +14,6 @@ extern "C" __declspec(dllimport) int __cdecl wsprintfA(char* out, const char* fo
 #include "../../include/display_mode.h"
 
 struct Gui;
-struct Dialog;
 struct Surface;
 struct OptionsReselectLink;
 struct ScreenLayer;

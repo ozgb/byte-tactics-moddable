@@ -43,6 +43,20 @@ void* s_handles[kHandleCapacity];
 unsigned s_handleCount;
 int s_slotDepth;
 unsigned s_slotOwner;
+int s_importDepth;
+unsigned s_importThread;
+int s_fatalPending;
+char s_fatalText[700];
+
+const char* RecordFatal(const char* text)
+{
+    if (!s_fatalPending) {
+        strncpy(s_fatalText, text, sizeof s_fatalText - 1);
+        s_fatalText[sizeof s_fatalText - 1] = '\0';
+        s_fatalPending = 1;
+    }
+    return s_fatalText;
+}
 
 unsigned HandleOf(void* native)
 {
@@ -51,8 +65,12 @@ unsigned HandleOf(void* native)
     for (unsigned i = 0; i < s_handleCount; i++)
         if (s_handles[i] == native)
             return i + 1;
-    if (s_handleCount == kHandleCapacity)
-        ModulesFatal("wind_meteors: the handle table is full");
+    if (s_handleCount == kHandleCapacity) {
+        if (s_importDepth == 0)
+            ModulesFatal("wind_meteors: the handle table is full");
+        RecordFatal("wind_meteors: the handle table is full");
+        return 0;
+    }
     s_handles[s_handleCount] = native;
     return ++s_handleCount;
 }
@@ -131,8 +149,7 @@ IMPORT(FatalErrorImport)
 {
     (void)user;
     NEED("FatalError", 0);
-    ModulesFatal((char*)Linear(a[0].i32));
-    return nullptr;
+    return RecordFatal((char*)Linear(a[0].i32));
 }
 
 IMPORT(BuildDataPathImport)
@@ -440,7 +457,10 @@ void Call(Slot slot, wasmtime_val_raw_t* a, size_t count)
     unsigned long long callStart = s_timing ? host_time_counter() : 0;
     wl_call(s_loader, s_module, &s_slots[slot], a, count);
     unsigned long long callEnd = s_timing ? host_time_counter() : 0;
-    if (--s_slotDepth == 0) {
+    --s_slotDepth;
+    if (s_fatalPending && s_slotDepth == 0)
+        ModulesFatal(s_fatalText);
+    if (s_slotDepth == 0) {
         s_handleCount = 0;
         if (s_timing) {
             s_slotTime[slot] += host_time_counter() - start;
@@ -553,13 +573,18 @@ const char* RunImport(const ImportDef* def, wasmtime_val_raw_t* a)
 {
     unsigned code = 0;
     const char* error = nullptr;
+    if (s_importDepth++ == 0)
+        s_importThread = host_thread_id();
     __try {
         error = def->function(nullptr, a);
     } __except (code = GetExceptionCode(), EXCEPTION_EXECUTE_HANDLER) {
         char text[200];
         sprintf(text, "import %s: exception 0x%08x", def->name, code);
-        ModulesFatal(text);
+        error = RecordFatal(text);
     }
+    s_importDepth--;
+    if (s_fatalPending)
+        return s_fatalText;
     return error;
 }
 
@@ -646,6 +671,11 @@ int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module, unsigned fue
     s_seam.CmdMeteor = CmdMeteorThunk;
     s_seam.UpdateWindOnStream = UpdateWindOnStreamThunk;
     return 1;
+}
+
+int __stdcall WindMeteorsFatalPending()
+{
+    return s_fatalPending;
 }
 
 void __stdcall WindMeteorsUseSeam()

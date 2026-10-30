@@ -30,6 +30,7 @@ struct MusicSettingFlags {
 };
 
 #include "game.h"
+#include "../graphics/display.h"
 
 #include "../units/unit_def.h"
 
@@ -277,7 +278,7 @@ void LoadSettings()
         if (GetWindowsUserName(buf) == 0) {
             strcpy(buf, "user_images");
         }
-        sprintf(g_game->imageOutputDirectory, "%s\\%s", ((char*)g_game->displayContext) + 0x628, buf);
+        sprintf(g_game->imageOutputDirectory, "%s\\%s", g_game->displayContext->cwd, buf);
     }
     ReadSettingIntOr("Movie Output Rate", &Game::movieOutputRate, 10, value);
     ReadSettingIntOr("textlines", &Game::textLines, 10, value);

@@ -9538,7 +9538,6 @@ address,function,file,kind,target
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,call,strncpy
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,deref_escape,*UnitDef
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,deref_read,*UnitDef
-0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,deref_read,*int
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,deref_read,*void
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,deref_write,*UnitDef
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,deref_write,*UnitTable
@@ -9549,6 +9548,7 @@ address,function,file,kind,target
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_escape,UnitDef::objectname
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_escape,UnitDef::unitname
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_maybe_written,UnitDef::unitname
+0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Display::availPhys
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::defs
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::displayContext
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,field_read,Game::screenHeight
@@ -9946,6 +9946,7 @@ address,function,file,kind,target
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_escape,Game::password_2be3_1176a
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_escape,Game::soundFlags
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_escape,SkirmishOptionsTable::mapName
+0x42f9a0,LoadSettings,src/game/settings.cpp,field_maybe_written,Display::cwd
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_maybe_written,Game::gameName_2bc1
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_maybe_written,Game::imageOutputDirectory
 0x42f9a0,LoadSettings,src/game/settings.cpp,field_maybe_written,Game::nickname
@@ -20461,9 +20462,9 @@ address,function,file,kind,target
 0x464290,SetupPlayerSlot,src/game/players.cpp,field_escape,Player::shareVision
 0x464290,SetupPlayerSlot,src/game/players.cpp,field_maybe_written,Player::fullName
 0x464290,SetupPlayerSlot,src/game/players.cpp,field_maybe_written,Player::name
+0x464290,SetupPlayerSlot,src/game/players.cpp,field_read,Display::availPhys
 0x464290,SetupPlayerSlot,src/game/players.cpp,field_read,Game::displayContext
 0x464290,SetupPlayerSlot,src/game/players.cpp,field_read,Game::net
-0x464290,SetupPlayerSlot,src/game/players.cpp,field_read,Map::field_620
 0x464290,SetupPlayerSlot,src/game/players.cpp,field_read,MapSeam::GetGameType
 0x464290,SetupPlayerSlot,src/game/players.cpp,field_read,Player::active
 0x464290,SetupPlayerSlot,src/game/players.cpp,field_read,Player::info
@@ -21130,7 +21131,7 @@ address,function,file,kind,target
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,deref_write,*unsigned char
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_escape,Game::players_1b63_14b
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,<anon>::mapChanged
-0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,DisplayContextColorMapView::colorMap
+0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Display::grayTable
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::displayContext
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::height
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,field_read,Game::mappedSurface
@@ -21852,9 +21853,9 @@ address,function,file,kind,target
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_maybe_written,SideDef::damageBar2
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_maybe_written,SideDef::logo2
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_maybe_written,UnitDef::name
+0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,<anon>::flag0
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,Cell::height
-0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,DisplayContextView::flags
-0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,DisplayContextView::haveBackBuffer
+0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,Display::haveBackBuffer
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,Feature::energy
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,Feature::flagsHigh
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,Feature::metal
@@ -25244,7 +25245,7 @@ address,function,file,kind,target
 0x47ed40,InitSound,src/sound/sound.cpp,call,Sound::InitDirectSound
 0x47ed40,InitSound,src/sound/sound.cpp,call,Sound::OpenCdAudio
 0x47ed40,InitSound,src/sound/sound.cpp,call,operator new
-0x47ed40,InitSound,src/sound/sound.cpp,field_read,DisplayHwndView::hwnd
+0x47ed40,InitSound,src/sound/sound.cpp,field_read,Display::hwnd
 0x47ed40,InitSound,src/sound/sound.cpp,field_read,Game::displayContext
 0x47ed40,InitSound,src/sound/sound.cpp,field_read,Game::sound
 0x47ed40,InitSound,src/sound/sound.cpp,function,

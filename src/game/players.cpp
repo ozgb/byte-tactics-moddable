@@ -19,11 +19,6 @@ class Pathfinder;
 
 #include "../util/vec3.h"
 
-struct Map {
-    char unknown_0[0x620];
-    int field_620;
-};
-
 struct UnitDef;
 #include "../units/unit_def.h"
 
@@ -58,6 +53,7 @@ struct ContinueWatchingDialog {
 };
 
 #include "game.h"
+#include "../graphics/display.h"
 #include "los_helpers.h"
 #include "../state/sim_globals.h"
 #pragma pack(pop)
@@ -96,7 +92,7 @@ void __stdcall SetupPlayerSlot(int player, char type)
     p->rejectReason = 0;
 
     if (p->active != 0 && (p->type == 1 || p->type == 2)) {
-        p->info->memory = ((Map*)g_game->displayContext)->field_620 / 0x100000 + 1;
+        p->info->memory = g_game->displayContext->availPhys / 0x100000 + 1;
     }
 
     if (g_seams.map->GetGameType(g_game->net) == 1) {

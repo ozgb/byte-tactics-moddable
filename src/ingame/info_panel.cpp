@@ -72,13 +72,6 @@ struct StatusPanelTeamTable {
 
 #include "../units/unit_script.h"
 
-struct DisplayContextView {
-    char unknown_0[0x9c];
-    int haveBackBuffer;
-    char unknown_a0[0xf0 - 0xa0];
-    unsigned char flags;
-};
-
 struct LayerView {
     int unknown_0;
     int value;
@@ -1482,8 +1475,8 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         SetFont(g_game->fontComix);
         SetTextColors(0x53, GetTextKeyColor());
         int pfstate = g_game->screenHeight - GetFontHeight() - 1;
-        sprintf(text, "PFSTATE %d, PFABLE %d\n", ((DisplayContextView *)g_game->displayContext)->flags & 1,
-                ((DisplayContextView *)g_game->displayContext)->haveBackBuffer);
+        sprintf(text, "PFSTATE %d, PFABLE %d\n", g_game->displayContext->flags.bits.flag0,
+                g_game->displayContext->haveBackBuffer);
         DrawString((Surface*)surface, (unsigned char*)text, 0x82, pfstate, -1);
 
         if (g_game->hoverUnitId != 0) {

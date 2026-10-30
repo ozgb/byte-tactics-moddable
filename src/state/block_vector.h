@@ -18,147 +18,145 @@ public:
     typedef const T* const_iterator;
 
     // An empty vector that owns no storage.
-    BlockVector() : first_(0), last_(0), end_(0) {}
-    // A copy of x in storage of exactly x.size() elements.
-    BlockVector(const BlockVector& x)
+    BlockVector() : padding(0), firstWord(0), lastWord(0), endWord(0) {}
+    // A copy of x in storage of exactly x.Size() elements.
+    BlockVector(const BlockVector& x) : padding(0)
     {
-        first_ = Allocate(x.size());
-        last_ = Copy(x.begin(), x.end(), first_.get());
-        end_ = last_;
+        firstWord = Allocate(x.Size());
+        lastWord = Copy(x.Begin(), x.End(), firstWord.get());
+        endWord = lastWord;
     }
     // Destroys the elements and returns the storage to the block.
     ~BlockVector()
     {
-        Destroy(first_.get(), last_.get());
-        SimFree(first_.get());
-        first_ = 0;
-        last_ = 0;
-        end_ = 0;
+        Destroy(firstWord.get(), lastWord.get());
+        SimFree(firstWord.get());
+        firstWord = nullptr;
+        lastWord = nullptr;
+        endWord = nullptr;
     }
     // Copies x in place when it fits, else into new storage.
     BlockVector& operator=(const BlockVector& x)
     {
         if (this == &x) {
-        } else if (x.size() <= size()) {
-            iterator s = CopyAssign(x.begin(), x.end(), first_.get());
-            Destroy(s, last_.get());
-            last_ = first_.get() + x.size();
-        } else if (x.size() <= capacity()) {
-            const_iterator s = x.begin() + size();
-            CopyAssign(x.begin(), s, first_.get());
-            Copy(s, x.end(), last_.get());
-            last_ = first_.get() + x.size();
+        } else if (x.Size() <= Size()) {
+            iterator s = CopyAssign(x.Begin(), x.End(), firstWord.get());
+            Destroy(s, lastWord.get());
+            lastWord = firstWord.get() + x.Size();
+        } else if (x.Size() <= Capacity()) {
+            const_iterator s = x.Begin() + Size();
+            CopyAssign(x.Begin(), s, firstWord.get());
+            Copy(s, x.End(), lastWord.get());
+            lastWord = firstWord.get() + x.Size();
         } else {
-            Destroy(first_.get(), last_.get());
-            SimFree(first_.get());
-            first_ = Allocate(x.size());
-            last_ = Copy(x.begin(), x.end(), first_.get());
-            end_ = last_;
+            Destroy(firstWord.get(), lastWord.get());
+            SimFree(firstWord.get());
+            firstWord = Allocate(x.Size());
+            lastWord = Copy(x.Begin(), x.End(), firstWord.get());
+            endWord = lastWord;
         }
         return *this;
     }
     // Grows the storage to n elements when it is smaller.
-    void reserve(size_type n)
+    void Reserve(size_type n)
     {
-        if (capacity() < n) {
+        if (Capacity() < n) {
             iterator s = Allocate(n);
-            Copy(first_.get(), last_.get(), s);
-            Destroy(first_.get(), last_.get());
-            SimFree(first_.get());
-            end_ = s + n;
-            last_ = s + size();
-            first_ = s;
+            Copy(firstWord.get(), lastWord.get(), s);
+            Destroy(firstWord.get(), lastWord.get());
+            SimFree(firstWord.get());
+            endWord = s + n;
+            lastWord = s + Size();
+            firstWord = s;
         }
     }
     // The elements the storage holds.
-    size_type capacity() const { return first_.get() == 0 ? 0 : end_.get() - first_.get(); }
+    size_type Capacity() const { return firstWord.get() == nullptr ? 0 : endWord.get() - firstWord.get(); }
     // The first element.
-    iterator begin() { return first_.get(); }
+    iterator Begin() { return firstWord.get(); }
     // The first element.
-    const_iterator begin() const { return first_.get(); }
+    const_iterator Begin() const { return firstWord.get(); }
     // One past the last element.
-    iterator end() { return last_.get(); }
+    iterator End() { return lastWord.get(); }
     // One past the last element.
-    const_iterator end() const { return last_.get(); }
+    const_iterator End() const { return lastWord.get(); }
     // Grows with copies of x or shrinks to n elements.
-    void resize(size_type n, const T& x = T())
+    void Resize(size_type n, const T& x = T())
     {
-        if (size() < n)
-            insert(end(), n - size(), x);
-        else if (n < size())
-            erase(begin() + n, end());
+        if (Size() < n)
+            Insert(End(), n - Size(), x);
+        else if (n < Size())
+            Erase(Begin() + n, End());
     }
     // The elements held.
-    size_type size() const { return first_.get() == 0 ? 0 : last_.get() - first_.get(); }
+    size_type Size() const { return firstWord.get() == nullptr ? 0 : lastWord.get() - firstWord.get(); }
     // True when no element is held.
-    bool empty() const { return size() == 0; }
+    bool Empty() const { return Size() == 0; }
     // The element at p.
-    T& operator[](size_type p) { return *(begin() + p); }
+    T& operator[](size_type p) { return *(Begin() + p); }
     // The element at p.
-    const T& operator[](size_type p) const { return *(begin() + p); }
+    const T& operator[](size_type p) const { return *(Begin() + p); }
     // Appends a copy of x.
-    void push_back(const T& x) { insert(end(), x); }
+    void PushBack(const T& x) { Insert(End(), x); }
     // Inserts a copy of x before p and returns where it went.
-    iterator insert(iterator p, const T& x)
+    iterator Insert(iterator p, const T& x)
     {
-        size_type o = p - begin();
-        insert(p, 1, x);
-        return begin() + o;
+        size_type o = p - Begin();
+        Insert(p, 1, x);
+        return Begin() + o;
     }
     // Inserts m copies of x before p, growing to twice the size when the storage is full.
-    void insert(iterator p, size_type m, const T& x)
+    void Insert(iterator p, size_type m, const T& x)
     {
-        if (end_.get() - last_.get() < m) {
-            size_type n = size() + (m < size() ? size() : m);
+        if (endWord.get() - lastWord.get() < m) {
+            size_type n = Size() + (m < Size() ? Size() : m);
             iterator s = Allocate(n);
-            iterator q = Copy(first_.get(), p, s);
+            iterator q = Copy(firstWord.get(), p, s);
             Fill(q, m, x);
-            Copy(p, last_.get(), q + m);
-            Destroy(first_.get(), last_.get());
-            SimFree(first_.get());
-            end_ = s + n;
-            last_ = s + size() + m;
-            first_ = s;
-        } else if (last_.get() - p < m) {
-            iterator l = last_.get();
+            Copy(p, lastWord.get(), q + m);
+            Destroy(firstWord.get(), lastWord.get());
+            SimFree(firstWord.get());
+            endWord = s + n;
+            lastWord = s + Size() + m;
+            firstWord = s;
+        } else if (lastWord.get() - p < m) {
+            iterator l = lastWord.get();
             Copy(p, l, p + m);
             Fill(l, m - (l - p), x);
             for (iterator i = p; i != l; ++i)
                 *i = x;
-            last_ = l + m;
+            lastWord = l + m;
         } else if (0 < m) {
-            iterator l = last_.get();
+            iterator l = lastWord.get();
             Copy(l - m, l, l);
             for (iterator from = l - m, to = l; from != p;)
                 *--to = *--from;
             for (iterator i = p; i != p + m; ++i)
                 *i = x;
-            last_ = l + m;
+            lastWord = l + m;
         }
     }
     // Removes the element at p and returns where the next one went.
-    iterator erase(iterator p)
+    iterator Erase(iterator p)
     {
-        iterator l = last_.get();
+        iterator l = lastWord.get();
         CopyAssign(p + 1, l, p);
         Destroy(l - 1, l);
-        last_ = l - 1;
+        lastWord = l - 1;
         return p;
     }
     // Removes the elements from f up to l and returns where the next one went.
-    iterator erase(iterator f, iterator l)
+    iterator Erase(iterator f, iterator l)
     {
-        iterator s = CopyAssign(l, end(), f);
-        Destroy(s, end());
-        last_ = s;
+        iterator s = CopyAssign(l, End(), f);
+        Destroy(s, End());
+        lastWord = s;
         return f;
     }
     // Removes every element and keeps the storage.
-    void clear() { erase(begin(), end()); }
+    void Clear() { Erase(Begin(), End()); }
 
 private:
-    struct Empty {};
-
     static iterator Allocate(size_type n) { return (iterator)SimAlloc((unsigned int)(n * sizeof(T))); }
     static void Destroy(iterator f, iterator l)
     {
@@ -183,14 +181,14 @@ private:
             new ((void*)f) T(x);
     }
 
-    Empty allocator_;
-    Ref<T> first_;
-    Ref<T> last_;
-    Ref<T> end_;
+    unsigned char padding;
+    Ref<T> firstWord;
+    Ref<T> lastWord;
+    Ref<T> endWord;
 };
 
 #pragma pack(pop)
 
-static_assert(sizeof(BlockVector<int>) == 16, "a block vector is an empty member padded to 4 and three words");
+static_assert(sizeof(BlockVector<int>) == 16, "a block vector is a byte padded to 4 and three words");
 
 #endif

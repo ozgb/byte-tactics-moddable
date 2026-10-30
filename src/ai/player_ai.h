@@ -47,7 +47,7 @@ struct AiVec3 {
 
 struct AiUnitList {
     BlockVector<Ref<Unit> > units;
-    void Clear() { units.clear(); }
+    void Clear() { units.Clear(); }
 };
 
 struct FactoryUnitGroup {

@@ -1,6 +1,7 @@
 #include <vector>
 #include "../state/block_vector.h"
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
 #include <algorithm>
 
 #include "squad.h"
@@ -47,11 +48,11 @@ void __stdcall FreeSquads(Player* owner)
 
 static inline void RemoveFast(BlockVector<Ref<Unit> >& v, Unit* u)
 {
-    BlockVector<Ref<Unit> >::iterator it = std::find(v.begin(), v.end(), u);
-    if (it != v.end()) {
-        BlockVector<Ref<Unit> >::iterator last = v.end() - 1;
+    BlockVector<Ref<Unit> >::iterator it = std::find(v.Begin(), v.End(), u);
+    if (it != v.End()) {
+        BlockVector<Ref<Unit> >::iterator last = v.End() - 1;
         *it = *last;
-        v.erase(last);
+        v.Erase(last);
     }
 }
 
@@ -61,7 +62,7 @@ void __stdcall SetUnitSquad(Unit* unit, int index)
     if (unit->group != -1)
         RemoveFast(((Squad*)((Player *)unit->player)->groups.get())[unit->group].items, unit);
     if (index != -1)
-        ((Squad*)((Player *)unit->player)->groups.get())[index].items.push_back(unit);
+        ((Squad*)((Player *)unit->player)->groups.get())[index].items.PushBack(unit);
     unit->group = index;
 }
 

@@ -469,6 +469,7 @@ The build runs its modules in WASM (`wind_meteors` so far): the `wasm_runtime` t
 directory, failing with a message naming the target when they are missing. `--check --native-modules`
 plays every scenario with `-modules=native` instead, the modules as native code, which needs no runtime
 files. Both must report every scenario equal.
+`uv run tools/wasm_modules.py glue-fatal --game-dir ~/.ta` (Wine only, not in CI) runs the exe on a bogus `meteor.tdf` and checks that the module's `FatalError` ends the game with exit code 2 after `wl_call` returned.
 `--check` without `--exe` is an error, since `moddable` does not build the
 reference. Add `--game-dir <dir>` when the game is not in a Steam directory.
 

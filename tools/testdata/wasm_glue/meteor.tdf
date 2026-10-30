@@ -1,0 +1,8 @@
+[Default]
+	{
+	MeteorWeapon=BOGUS;
+	MeteorRadius=0;
+	MeteorDensity=0;
+	MeteorDuration=0;
+	MeteorInterval=0;
+	}

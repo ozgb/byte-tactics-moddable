@@ -2,7 +2,6 @@
 #define DIALOGS_H
 struct Gui;
 
-struct PaletteEditorDialog;
 struct RemapPaletteEntry;
 
 struct Gui;
@@ -47,7 +46,7 @@ char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index);
 void __stdcall DrawColorCellOutline(Gui* obj, int cell, int color);
 
 void __stdcall BuildColorRemapTable(RemapPaletteEntry* src, RemapPaletteEntry* dest, unsigned char* table);
-void __stdcall ApplySlidersToPaletteEntry(PaletteEditorDialog* obj, RemapPaletteEntry* palette);
+void __stdcall ApplySlidersToPaletteEntry(Gui* obj, RemapPaletteEntry* palette);
 
 int __stdcall SetBackgroundSurface(Gui* menu, void* value);
 

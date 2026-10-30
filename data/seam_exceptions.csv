@@ -1,4 +1,5 @@
 subsystem,function,symbol,reason
+ai,??4?$BlockVector@V?$BlockVector@UBuildRatingWeights@@@@@@QAEAAV0@ABV0@@Z,HarnessTestMode,TODO(#504): engine service
 ai,BuildTimer::OnTimer,QueueBuildOrder,TODO(#505): sim-to-presentation event
 ai,BuildTimer::TryIssueIdleFactoryBuildOrder,QueueBuildOrder,TODO(#505): sim-to-presentation event
 ai,CmdLimit,CommandArgs::GetArg,TODO(#504): engine service
@@ -7,6 +8,8 @@ ai,CmdPlan,CommandArgs::GetArg,TODO(#504): engine service
 ai,CmdWeight,CommandArgs::GetArg,TODO(#504): engine service
 ai,CmdWeight,CommandArgs::GetFloatArg,TODO(#504): engine service
 ai,DumpPlayerAI,FilePrintf,TODO(#504): engine service
+ai,E::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+ai,F::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 ai,PAUUnit::?$vector::insert,CopyDwordIfNonNull,TODO(#504): engine service
 ai,ParseDownloadableAiWeightScripts,CommandArgs::InitArgs,TODO(#504): engine service
 ai,ParseDownloadableAiWeightScripts,ExecuteCommandText,TODO(#504): engine service
@@ -18,9 +21,16 @@ ai,ProtectUnitDefsReadWrite,ProtectBlockReadWrite,TODO(#504): engine service
 ai,ReactToAttack,QueueUnitSpeechIfNotVisible,TODO(#505): sim-to-presentation event
 ai,ReparseAiWeightScriptsIfLimitNotSticky,CommandArgs::InitArgs,TODO(#504): engine service
 ai,ReparseAiWeightScriptsIfLimitNotSticky,ExecuteCommandText,TODO(#504): engine service
+ai,UBuildRatingWeights::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 ai,UGroup::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+ai,UKeyedCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+ai,UKeyedCell::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+ai,UPercentByte::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 ai,UPlayer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 ai,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+ai,UUnit::U?$Ref::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+ai,UUnit::U?$Ref::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+ai,UUnitTypeInt::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 ai,VPlayerAI::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 ai,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 ai,VSquadTimer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -301,12 +311,22 @@ players,VictoryKillUnitType::OnUnitDied,PlaySoundByName,TODO(#505): sim-to-prese
 players,VictoryMoveUnitToRadius::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryUnitTypePassesX::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryUnitTypePassesZ::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
+targeting,??4?$BlockVector@V?$BlockVector@UBuildRatingWeights@@@@@@QAEAAV0@ABV0@@Z,HarnessTestMode,TODO(#504): engine service
+targeting,E::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+targeting,F::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,FindWeaponTarget,UnitSwapEraseVector::EraseSwapBack,TODO(#504): engine service
 targeting,PAUUnit::?$vector::insert,CopyDwordIfNonNull,TODO(#504): engine service
+targeting,UBuildRatingWeights::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UGroup::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+targeting,UKeyedCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+targeting,UKeyedCell::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+targeting,UPercentByte::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UPlayer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+targeting,UUnit::U?$Ref::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+targeting,UUnit::U?$Ref::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+targeting,UUnitTypeInt::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VPathGoalVtableView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VPlayerAI::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service

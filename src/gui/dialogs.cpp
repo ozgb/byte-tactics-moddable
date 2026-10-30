@@ -93,7 +93,6 @@ extern int __stdcall ReadGuiFile(void* entry, char* path);
 #include "../graphics/object_pool.h"
 extern void __cdecl HideSoftwareCursor(void);
 extern void __cdecl ShowSoftwareCursor(void);
-extern void __stdcall SelectAdjacentGadget(Gui* menu, int value);
 extern void __stdcall TrySetFocus(Gui* menu, int value);
 extern void __stdcall SetTextColors(int a, int b);
 #include "keyboard.h"

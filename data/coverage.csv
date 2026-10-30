@@ -1336,7 +1336,7 @@ presentation,DecrementCountArgument,src/graphics/model_render.cpp,0,0,0,0,0,0,?D
 presentation,DecrementKnobPos,src/gui/gui.cpp,1,0,0,0,0,0,?DecrementKnobPos@@YGXPAUGui@@H@Z,0,
 presentation,DestroyParticleLists,src/graphics/particles.cpp,1,0,0,0,0,0,?DestroyParticleLists@@YGXXZ,0,
 presentation,DestroyPreCleanup,src/gui/keyboard.cpp,1,0,0,0,0,0,?DestroyPreCleanup@@YGXXZ,0,
-presentation,Dialog::OpenFileRequester,src/gui/file_list.cpp,0,0,0,0,0,0,?OpenFileRequester@Dialog@@QAEPAUFileRequester@@PAU1@PAD11@Z,1,
+presentation,Gui::OpenFileRequester,src/gui/file_list.cpp,0,0,0,0,0,0,?OpenFileRequester@Gui@@QAEPAUFileRequester@@PAU1@PAD11@Z,1,
 presentation,DisableBlinkWords,src/gui/file_list.cpp,0,0,0,0,0,0,?DisableBlinkWords@@YGXH@Z,1,
 presentation,DisableUnavailableBuildMenuEntries,src/ingame/control_panel.cpp,0,0,0,0,0,0,?DisableUnavailableBuildMenuEntries@@YGXPAUGui@@@Z,1,
 presentation,Display::LockPrimary,src/graphics/surface.cpp,1,0,0,0,0,0,?LockPrimary@Display@@QAEHPAUSurface@@@Z,0,

@@ -82,7 +82,6 @@ int __stdcall UpdateMenu(Gui* menu);
 void __stdcall BlitLayers(void* param_1, unsigned int* param_2, int* param_3);
 void FlipScreen();
 void __stdcall DrawButton(Gui* param_1, int param_2);
-void __stdcall SelectAdjacentGadget(Gui* menu, int value);
 
 
 static inline int FindEntry(Gadget* entries, char* name)

@@ -168,4 +168,7 @@ int __stdcall IsBelowRectBottom(IsBelowRectBottomRect* obj, int value);
 void __stdcall DrawGafBar(GadgetAccessDialog*, int index);
 void __stdcall ResetListBox(GadgetAccessDialog* obj, int index);
 
+void __stdcall UpdateHelpText(Gui* obj);
+void __stdcall SelectAdjacentGadget(Gui* menu, int dir);
+
 #endif

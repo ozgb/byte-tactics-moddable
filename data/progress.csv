@@ -2310,7 +2310,7 @@ address,size,file,symbol,status,similarity
 0x4af320,642,src/gui/file_list.cpp,?ScanDirectory@@YGHPAD00HHH@Z,matched,100.0
 0x4af5b0,192,src/gui/file_list.cpp,?RefreshFileList@@YGXPAUFileRequester@@@Z,matched,100.0
 0x4af670,945,src/gui/file_list.cpp,?FileRequesterHandler@@YGXPAUGui@@@Z,matched,100.0
-0x4afa30,552,src/gui/file_list.cpp,?OpenFileRequester@Dialog@@QAEPAUFileRequester@@PAU1@PAD11@Z,matched,100.0
+0x4afa30,552,src/gui/file_list.cpp,?OpenFileRequester@Gui@@QAEPAUFileRequester@@PAU1@PAD11@Z,matched,100.0
 0x4afc60,135,src/gui/file_list.cpp,?AllocBlinkWords@@YGXPAUDialog@@H@Z,matched,100.0
 0x4afcf0,38,src/gui/file_list.cpp,?FreeBlinkWords@@YGXH@Z,matched,100.0
 0x4afd20,23,src/gui/file_list.cpp,?SetBlinkGadget@@YGXPAUDialog@@H@Z,matched,100.0

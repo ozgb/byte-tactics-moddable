@@ -729,7 +729,6 @@ struct ClickFrame {
 #include "../game/cd_check.h"
 #include "endgame.h"
 #include "../game/settings.h"
-void __stdcall UpdateHelpText(Gui* gui);
 #include "../gui/keyboard.h"
 
 // FUNCTION: 0x47ae60
@@ -1001,7 +1000,6 @@ void __stdcall HandleSkirmishClick(Gui* menu)
 
 #include "../game/settings_campaign.h"
 #include "../game/settings.h"
-void __stdcall SelectAdjacentGadget(Gui*, int);
 
 // FUNCTION: 0x47b9f0
 void __stdcall HandleSkirmishCheatText(Gui* menu)

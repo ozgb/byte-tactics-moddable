@@ -3442,7 +3442,7 @@ presentation,platform,call,TdfRecord::CopyRecordName,2
 presentation,platform,call,TdfRecord::GetFieldInt,10
 presentation,platform,call,TdfRecord::GetFieldString,13
 presentation,platform,call,TdfRecord::GetSubRecordCount,1
-presentation,platform,call,Translate,53
+presentation,platform,call,Translate,52
 presentation,platform,call,Vec3::Scale,1
 presentation,platform,call,VectorFromToInt,1
 presentation,platform,call,WorldToCell,2

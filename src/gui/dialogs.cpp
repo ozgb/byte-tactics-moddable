@@ -602,10 +602,10 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
 }
 
 // FUNCTION: 0x4ab690
-void __stdcall SetClickMode(void* gui, int mode)
+void __stdcall SetClickMode(Gui* gui, int mode)
 {
-    *(int*)((char*)gui + 0x58) = mode;
-    *(int*)(*(int*)((char*)gui + 0x18) + 0x37) = mode;
+    gui->clickMode = mode;
+    gui->layer->clickMode = mode;
 }
 
 // FUNCTION: 0x4ab6b0
@@ -757,7 +757,6 @@ int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
 int __stdcall IsGadgetNamed(Gadget* entries, int index, char* name);
 char* __stdcall Translate(char* text);
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int flag);
-void __stdcall SetKeyboardInput(Gui* menu, int flag);
 void __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
 int __stdcall GetTextWidth(Font* font, unsigned char* text);

@@ -216,7 +216,6 @@ SetGadgetStatusByName,mismatch,"static risk rule: a convention, parameter count,
 SetGadgetText,mismatch,parameter 1 void* vs Gui* (view type): the declaration differs from the definition in a pointer type only
 SetGadgetTextByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGrayedOutByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-SetKeyboardInput,mismatch,pointer/int cast: definition's type is likely wrong
 SetOffscreenSurface,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetQuickKeyByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetTextColors,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

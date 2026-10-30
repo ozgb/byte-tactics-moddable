@@ -96,7 +96,6 @@ int AreAllPlayersInOneAllyGroup(void)
 #pragma auto_inline(on)
 
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
-void __stdcall SetTranslatedTextByName(Gui* menu, char* key, char* text, int flag);
 char* __stdcall Translate(char* key);
 
 int __cdecl CountHumanSlots()
@@ -616,11 +615,9 @@ void __stdcall UpdateSkirmishMapSelection(Gui* menu, Gadget* unused)
 }
 
 #include "../map/map_list.h"
-Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 #include "../debug/debug_lib.h"
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "../gui/file_list.h"
-void __stdcall SetKeyboardInput(Gui* menu, int value);
 void __stdcall SetCursorMode(int value);
 
 // FUNCTION: 0x47aaf0

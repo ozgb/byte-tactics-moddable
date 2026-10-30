@@ -338,7 +338,6 @@ extern OptionsPrefsSnapshot g_optionsPrefsSnapshot;
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 char* __stdcall FindGadgetChecked_C(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
-void __stdcall SetTranslatedTextByName(Gui* obj, char* name, char* text, int param_4);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
@@ -357,23 +356,11 @@ void __stdcall SetOffscreenSurface(int param_1);
 void FlipScreen();
 
 int __stdcall LoadGuiLayer(void* obj, char* buf, int size);
-Layer* __stdcall LoadGuiLayer(VisualOptionsGui* menu, char* name, int flags);
-Layer* __stdcall LoadGuiLayer(Layer* menu, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(BriefingGui* sub, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(HelpGui* sub, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(RestartGui* menu, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(SurrenderGui* sub, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
 
 void __stdcall SetGrayedOutByName(void* obj, char* name, int value);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
 int __stdcall GetGadgetText(void* settings, const char* key, char* out);
 
-void __stdcall SetKeyboardInput(Layer* menu, int flag);
-void __stdcall SetKeyboardInput(OptionsPanelGui* menu, int value);
-void __stdcall SetKeyboardInput(RestartGui* menu, int value);
-void __stdcall SetKeyboardInput(SurrenderGui* sub, int value);
-void __stdcall SetKeyboardInput(Gui* sub, int value);
 
 int __stdcall SetButtonStageByName(void* obj, char* name, int value);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
@@ -383,10 +370,7 @@ void __stdcall SetGadgetActiveByName(VisualOptionsGui* menu, char* name, int val
 void __stdcall SetGadgetActiveByName(Gui* sub, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(void* obj, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int value);
-void __stdcall SetTranslatedTextByName(void* obj, char* name, char* text, int value);
 void __stdcall SetTranslatedTextByName(RestartGui* menu, const char* name, int value, int count);
-void __stdcall SetTranslatedTextByName(SurrenderGui* sub, const char* name, const char* text, int param_4);
-void __stdcall SetTranslatedTextByName(Gui* sub, const char* name, const char* value, int flags);
 
 
 int __stdcall GetButtonStageByName(void* obj, char* name);
@@ -1441,7 +1425,7 @@ void __stdcall OpenVisualOptions(int param_1)
     VisualOptionsGui* menu;
 
     if (param_1 != i) {
-        layer = LoadGuiLayer((VisualOptionsGui*)&g_game->gui, "SELVMODE.GUI", 0x800);
+        layer = LoadGuiLayer(&g_game->gui, "SELVMODE.GUI", 0x800);
     } else {
         layer = (Layer*)OpenOptionsLayout();
         RenderLayer(&g_game->gui, 2);
@@ -1706,7 +1690,7 @@ void ShowGameSettingsDialog()
 {
 
 
-    Layer* layer = LoadGuiLayer((Layer*)&g_game->gui, "GAMEOPTIONS.GUI", 0x1881);
+    Layer* layer = LoadGuiLayer(&g_game->gui, "GAMEOPTIONS.GUI", 0x1881);
     Gadget* entries = layer->entries;
     layer->handler = HandleGameSettingsDialogClick;
     LoadPictureCached("GameSettings", 0, 0, 0);
@@ -1781,8 +1765,8 @@ void ShowGameSettingsDialog()
     int i;
     for (i = count + 1; i <= layer->entries->u.count; i++)
         entries[i].attribs = 1;
-    SetKeyboardInput((Layer*)&g_game->gui, 1);
-    RenderLayer((Gui *)((Layer*)&g_game->gui), 0x40);
+    SetKeyboardInput(&g_game->gui, 1);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 // FUNCTION: 0x45f770
@@ -1809,7 +1793,7 @@ void __stdcall HandleBriefingClick(Gui* gui)
 // FUNCTION: 0x45f800
 void OpenBriefingDialog()
 {
-    Layer* g = LoadGuiLayer((BriefingGui*)&g_game->gui, "BRIEFING.GUI", 0);
+    Layer* g = LoadGuiLayer(&g_game->gui, "BRIEFING.GUI", 0);
     Gadget* gadgets = g->entries;
     g->handler = HandleBriefingClick;
     int i = FindGadgetIndex(gadgets, "MOREBAR", 0xe);
@@ -1896,7 +1880,7 @@ void __stdcall HandleHelpClick(Gui* gui)
 // FUNCTION: 0x45fb30
 void OpenHelpDialog()
 {
-    Layer* g = LoadGuiLayer((HelpGui*)&g_game->gui, "HELP.GUI", 0x1881);
+    Layer* g = LoadGuiLayer(&g_game->gui, "HELP.GUI", 0x1881);
     g->handler = HandleHelpClick;
     LoadPictureCached("dhelp", 0, 0, 0);
     g_helpDialogBaseGadgetCount = g->entries->u.count;
@@ -2100,8 +2084,8 @@ void OpenOptionsPanel()
     for (int i = 0; i < 100; i++) {
         g_optionsBackupTrackTypes[i] = ((Sound *)g_game->sound)->GetCategoryOfTrack(i);
     }
-    SetKeyboardInput((OptionsPanelGui*)&g_game->gui, 1);
-    RenderLayer((Gui *)((OptionsPanelGui*)&g_game->gui), 0xc0);
+    SetKeyboardInput(&g_game->gui, 1);
+    RenderLayer(&g_game->gui, 0xc0);
     if ((*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).bits.bit2) {
         PlaySoundByName("Panel", 0);
     }
@@ -2141,7 +2125,7 @@ void __stdcall HandleRestartDialogClick(Gui* gui)
 void OpenRestartDialog()
 {
     RestartGui* menu = (RestartGui*)&g_game->gui;
-    Layer* dialog = LoadGuiLayer(menu, "RESTART.GUI", 0x1000);
+    Layer* dialog = LoadGuiLayer(&g_game->gui, "RESTART.GUI", 0x1000);
     Gadget* gadgets = dialog->entries;
     dialog->handler = HandleRestartDialogClick;
     LoadPictureCached("drestart", 0, 0, 0);
@@ -2158,8 +2142,8 @@ void OpenRestartDialog()
         SetTranslatedTextByName((RestartGui*)&g_game->gui, "MISSIONNAME1", (int)second, 0x80);
     }
     ApplyDifficultyButtons();
-    SetKeyboardInput((RestartGui*)&g_game->gui, 1);
-    RenderLayer((Gui *)((RestartGui*)&g_game->gui), 0x40);
+    SetKeyboardInput(&g_game->gui, 1);
+    RenderLayer(&g_game->gui, 0x40);
     SetCursorMode(0x13);
 }
 
@@ -2194,24 +2178,24 @@ void __stdcall HandleSurrenderChoice(Gui* gui)
 // FUNCTION: 0x460680
 void OpenSurrenderDialog()
 {
-    Layer* layer = LoadGuiLayer((SurrenderGui*)&g_game->gui, "YESORNO.GUI", 0x1000);
+    Layer* layer = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x1000);
     if (layer == 0) {
         return;
     }
-    SetKeyboardInput((SurrenderGui*)&g_game->gui, 1);
+    SetKeyboardInput(&g_game->gui, 1);
     Gadget* entries = layer->entries;
     FindGadgetIndex(entries, "CHOICE1", 1);
     FindGadgetIndex(entries, "CHOICE2", 1);
     strcpy(entries->u.text + 0x16, "CHOICE2");
     strcpy(entries->u.text + 0x26, "CHOICE2");
-    SetTranslatedTextByName((SurrenderGui*)&g_game->gui, "CHOICE1", "Yes", 0);
-    SetTranslatedTextByName((SurrenderGui*)&g_game->gui, "CHOICE2", "No", 0);
+    SetTranslatedTextByName(&g_game->gui, "CHOICE1", "Yes", 0);
+    SetTranslatedTextByName(&g_game->gui, "CHOICE2", "No", 0);
     if (g_battleQuitIntent == 0) {
-        SetTranslatedTextByName((SurrenderGui*)&g_game->gui, "TITLE", "Surrender this battle and return to main menu?", 0);
+        SetTranslatedTextByName(&g_game->gui, "TITLE", "Surrender this battle and return to main menu?", 0);
     } else if (g_battleQuitIntent == 2) {
         const char* title = (*(LobbyUiFlagBits*)&g_game->lobbyUiDirtyFlags_2bee).flag4 ? "Exit the Battle"
                                                 : "Surrender this battle and exit to Windows?";
-        SetTranslatedTextByName((SurrenderGui*)&g_game->gui, "TITLE", title, 0);
+        SetTranslatedTextByName(&g_game->gui, "TITLE", const_cast<char*>(title), 0);
     }
     SelectGadgetByName((Gui *)((SurrenderGui*)&g_game->gui), "CHOICE2");
     layer->handler = HandleSurrenderChoice;

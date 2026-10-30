@@ -525,7 +525,6 @@ extern int g_rejectPlayer;
 
 int __stdcall TrySetFocus(void* menu, int index);
 void __stdcall SetDescListCleanupFlag(void* gui, int flag);
-void __stdcall SetTranslatedTextByName(void* menu, const char* name, char* text, int param_4);
 void __stdcall SetGrayedOutByName(void* menu, const char* name, int value);
 void __stdcall SetGrayedOutByName(void* gui, char* name, int value);
 void __stdcall SetTranslatedText(void* menu, int index, int param_3, int param_4);
@@ -541,7 +540,6 @@ void __stdcall SetGadgetStatusByName(void* gui, char* name, int value);
 void __stdcall SetGadgetRows(void* table, char* name, int* pics, int count);
 void __stdcall DrawButton(void* gadget, int value);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-Layer* __stdcall LoadGuiLayer(void* menu, const char* name, int flags);
 void __stdcall PlaySoundByName(const char* name, int flag);
 void __stdcall PlaySoundByName(char* str, int flag);
 #include "frontend.h"
@@ -3829,7 +3827,7 @@ void __stdcall HandleUnitCountSlider(void* obj, char* gadget)
         &g_game->defs.get()[g_unitRestrictEntries[n + desc->u.list.firstRow].unitIndex], value);
     desc->u.list.flags[n + desc->u.list.firstRow] = g_unitRestrictEntries[n + desc->u.list.firstRow].peerEnabled == 0;
     desc->u.list.flags[n + desc->u.list.firstRow] |= g_unitRestrictEntries[n + desc->u.list.firstRow].max == 0 ? 2 : 0;
-    SetTranslatedTextByName(obj, count, (char*)buf, 0);
+    SetTranslatedTextByName((Gui*)obj, count, (char*)buf, 0);
 }
 
 // FUNCTION: 0x44bfd0

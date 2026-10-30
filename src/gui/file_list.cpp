@@ -15,20 +15,9 @@ unsigned int GetTicks();
 
 #pragma pack(push, 1)
 
-struct BlinkWord {
-    char text[0x80];
-    int x;
-    int y;
-    int colourA;
-    float periodA;
-    int colourB;
-    float periodB;
-    int phase;
-    float nextToggle;
-    int value;
-};
 
 #include "gadget.h"
+#include "blink_word.h"
 
 struct ReqSub {
     char unknown_0[0x140];

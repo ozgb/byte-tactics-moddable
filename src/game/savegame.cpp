@@ -16,11 +16,6 @@ int DrawTriangleContours(int, int, int, int, int, int, int);
 int DrawRangeCircle(int, int, int, int, int, int, int);
 int UpdatePlayerEconomy(int);
 
-struct SideData {
-    char unknown_0[0x95];
-    unsigned char bSideId;
-};
-
 struct SaveGameScreenState {
     int games;
     int count;
@@ -104,6 +99,7 @@ void __stdcall SetCursorAnimation(void* menu, void* data);
 void __stdcall SetDescListCleanupFlag(Gui* menu, int flag);
 const char* __stdcall Translate(const char* key);
 #include "savegame.h"
+#include "side_data.h"
 
 __inline void DeleteHapiBank(HapiBank* obj)
 {

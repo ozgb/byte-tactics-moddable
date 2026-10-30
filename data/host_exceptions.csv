@@ -180,6 +180,7 @@ src/graphics/draw.cpp,src/graphics/gaf_frame.h,#392
 src/graphics/draw.cpp,src/graphics/rect.h,#392
 src/graphics/draw.cpp,src/graphics/surface.h,#392
 src/graphics/font.cpp,src/graphics/display.h,#392
+src/graphics/font.cpp,src/graphics/font.h,#392
 src/graphics/font.cpp,src/graphics/surface.h,#392
 src/graphics/gaf.cpp,src/graphics/display.h,#392
 src/graphics/gaf.cpp,src/graphics/gaf.h,#392

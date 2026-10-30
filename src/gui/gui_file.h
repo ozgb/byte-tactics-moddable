@@ -1,9 +1,10 @@
 #ifndef GUI_FILE_H
 #define GUI_FILE_H
+struct Gui;
+
 class TdfFile;
 struct FileHandle;
-struct FreeCommonGuiGafDialog;
-struct FreeGafSlotDialog;
+struct Gui;
 struct GuiFileCommonFields;
 struct ReadButtonFieldsRecord;
 struct ReadButtonFieldsSource;
@@ -68,7 +69,10 @@ void __stdcall WriteSurfFilenameField(WriteSurfFilenameFieldRecord* obj, FileHan
 void __stdcall ReadSurfFilenameField(ReadSurfFilenameFieldRecord* obj, ReadSurfFilenameFieldSource* src);
 void __stdcall WriteNuttinField(WriteNuttinFieldRecord* obj, FileHandle* out, int indent);
 void __stdcall ReadNuttinField(ReadNuttinFieldRecord* a, ReadNuttinFieldSource* b);
-void __stdcall FreeGafSlot(FreeGafSlotDialog* obj, int i);
-void __stdcall FreeCommonGuiGaf(FreeCommonGuiGafDialog* obj);
+void __stdcall FreeGafSlot(Gui* obj, int i);
+void __stdcall FreeCommonGuiGaf(Gui* obj);
+
+void __stdcall LoadGafIntoSlot(Gui* obj, const char* name, int index);
+void __stdcall LoadGafFile(Gui* obj, const char* name);
 
 #endif

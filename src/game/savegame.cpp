@@ -86,7 +86,6 @@ void __stdcall FrameFromSurface(void* dst, void* src);
 void __stdcall PlaySoundByName(char* name, int param);
 #include "game_state.h"
 #include "main_loop.h"
-void __stdcall SetKeyboardInput(void* menu, int value);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "data_files.h"
 #include "../frontend/campaign_menu.h"
@@ -553,7 +552,7 @@ void ShowLoadGameScreen()
         entry->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))SavedGameSelectHandler;
     }
     ShowSavedGameInfo();
-    SetKeyboardInput((char*)&g_game->message_519[0], 1);
+    SetKeyboardInput(&g_game->gui, 1);
     OrLabelAttribs();
     SetGadgetActiveByName((char*)&g_game->message_519[0], "SaveGame", 0);
     EnableKeyCommands((Gui *)((char*)&g_game->message_519[0]));

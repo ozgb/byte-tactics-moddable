@@ -1,5 +1,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
+struct Gui;
+
 struct Gadget;
 struct ValueTextEntry;
 
@@ -75,5 +77,8 @@ void __stdcall HandleMaxLinesSlider(Gui* obj, int unused);
 void __stdcall HandleTextScrollSlider(Gui* obj, int unused);
 
 void __stdcall DrawOptionsScrollBar(void* surf);
+
+void __stdcall HandleMusicOptionsClick(Gui* obj);
+void __stdcall HandleSoundOptionsClick(Gui* obj);
 
 #endif

@@ -148,64 +148,6 @@ struct OptionsPrefsSnapshot {
     unsigned short rest : 14;
 };
 
-struct MusicOptionsVtable {
-    char unknown_0[8];
-    void (__stdcall* FUN_8)(void* obj);
-};
-
-struct MusicOptionsHolder {
-    MusicOptionsVtable* next;
-    Gadget* entries;
-};
-
-struct MusicOptionsDialog {
-    char unknown_0[0x18];
-    MusicOptionsHolder* holder;
-    char unknown_1c[0x60 - 0x1c];
-    int hotGadgetIndex;
-};
-
-struct MusicLayerGadgets {
-    int unknown_0;
-    Gadget* gadgets;
-};
-
-struct MusicOptionsLayer {
-    char unknown_0[4];
-    Gadget* gadgets;
-    void (__stdcall* callback8)(int value);
-    char unknown_c[0x1c - 0xc];
-    void (__stdcall* callback1c)();
-};
-
-struct SoundOptionsVtable {
-    char unknown_0[8];
-    void (__stdcall* FUN_8)(void* obj);
-};
-
-struct SoundOptionsHolder {
-    SoundOptionsVtable* next;
-    Gadget* entries;
-};
-
-struct SoundOptionsDialog {
-    char unknown_0[0x18];
-    SoundOptionsHolder* holder;
-    char unknown_1c[0x60 - 0x1c];
-    int hotGadgetIndex;
-};
-
-struct SoundOptionsLayer {
-    char unknown_0[4];
-    Gadget* entries;
-    void (__stdcall *fn)(void* obj, int arg);
-};
-
-struct SoundOptionsGui {
-    char unknown_0[0x18];
-    void* holder;
-};
-
 struct VideoModeList {
     int count;
     DisplayMode* modes;
@@ -397,7 +339,6 @@ void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 char* __stdcall FindGadgetChecked_C(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
 void __stdcall SetTranslatedTextByName(Gui* obj, char* name, char* text, int param_4);
-void __stdcall SetGrayedOut(Gui* menu, int index, int value);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
@@ -416,7 +357,6 @@ void __stdcall SetOffscreenSurface(int param_1);
 void FlipScreen();
 
 int __stdcall LoadGuiLayer(void* obj, char* buf, int size);
-int __stdcall LoadGuiLayer(SoundOptionsGui* obj, char* name, int size);
 Layer* __stdcall LoadGuiLayer(VisualOptionsGui* menu, char* name, int flags);
 Layer* __stdcall LoadGuiLayer(Layer* menu, const char* name, int flags);
 Layer* __stdcall LoadGuiLayer(BriefingGui* sub, const char* name, int flags);
@@ -427,10 +367,8 @@ Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
 
 void __stdcall SetGrayedOutByName(void* obj, char* name, int value);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
-void __stdcall SetGrayedOut(Gui* sub, int index, int value);
 int __stdcall GetGadgetText(void* settings, const char* key, char* out);
 
-void __stdcall SetKeyboardInput(void* obj, int value);
 void __stdcall SetKeyboardInput(Layer* menu, int flag);
 void __stdcall SetKeyboardInput(OptionsPanelGui* menu, int value);
 void __stdcall SetKeyboardInput(RestartGui* menu, int value);
@@ -478,12 +416,10 @@ void __stdcall AddTextGadget(Layer* layer, char* type, char* text, int x, int y,
 char* __stdcall Translate(char* text);
 const char* __stdcall Translate(const char* text);
 #include "campaign_menu.h"
-void __stdcall FreeBlinkWords(int param_1);
+#include "../gui/file_list.h"
 #include "../gui/file_list.h"
 
 #include "options.h"
-void __stdcall HandleMusicOptionsClick(int value);
-void __stdcall HandleSoundOptionsClick(void* obj, int arg);
 void __stdcall HandleSpeedOptionsClick(void* obj, int arg);
 #include "../game/savegame.h"
 
@@ -1083,9 +1019,9 @@ void UpdateMusicGadgets()
 }
 
 // FUNCTION: 0x45d280
-void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
+void __stdcall HandleMusicOptionsClick(Gui* obj)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     if (obj->hotGadgetIndex == -1) {
         if (!(*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).prefsByte.prefs) {
             ((Sound *)g_game->sound)->StopCdAudio();
@@ -1096,8 +1032,8 @@ void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
         (*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).loadedBits.loaded = 0;
         return;
     }
-    MarkChanged((Gui *)obj);
-    int notrak = IsCurrentGadgetNamed((Gui *)obj, g_notrakGadgetName);
+    MarkChanged(obj);
+    int notrak = IsCurrentGadgetNamed(obj, g_notrakGadgetName);
     if (notrak != 0) {
         PlaySoundByName(g_optionsSoundName, 0);
         int v = GetButtonStageByName(obj, g_notrakGadgetName);
@@ -1106,7 +1042,7 @@ void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
         ((Sound *)g_game->sound)->EnableCdAudio(g_game->flags_37f14_37f14.word & 1);
         ClearSelectedGadget(obj);
         UpdateMusicGadgets();
-    } else if (IsCurrentGadgetNamed((Gui *)obj, g_trackModeGadgetName)) {
+    } else if (IsCurrentGadgetNamed(obj, g_trackModeGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         g_game->cdMode = GetButtonStageByName(obj, g_trackModeGadgetName) + 1;
         ((Sound *)g_game->sound)->SetPlaybackOrder(g_game->cdMode);
@@ -1123,7 +1059,7 @@ void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
         ClearSelectedGadget(obj);
         UpdateTrackGadgets();
         return;
-    } else if (IsCurrentGadgetNamed((Gui *)obj, g_trackTypeGadgetName)) {
+    } else if (IsCurrentGadgetNamed(obj, g_trackTypeGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         int i = obj->hotGadgetIndex;
         ((Sound *)g_game->sound)->SetCategoryOfTrack(g_musicUiSelectedTrack, entries[i].stageIndex);
@@ -1131,12 +1067,12 @@ void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
         ClearSelectedGadget(obj);
         return;
     }
-    if (IsCurrentGadgetNamed((Gui *)obj, g_cdPlayGadgetName)) {
+    if (IsCurrentGadgetNamed(obj, g_cdPlayGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         ((Sound *)g_game->sound)->PlayCdTrack(g_musicUiSelectedTrack, 1);
         ClearSelectedGadget(obj);
         return;
-    } else if (IsCurrentGadgetNamed((Gui *)obj, g_cdNextGadgetName)) {
+    } else if (IsCurrentGadgetNamed(obj, g_cdNextGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         g_musicUiSelectedTrack = g_musicUiSelectedTrack + 1;
         int n = ((Sound *)g_game->sound)->GetTrackCount();
@@ -1146,7 +1082,7 @@ void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
         UpdateTrackGadgets();
         ClearSelectedGadget(obj);
         return;
-    } else if (IsCurrentGadgetNamed((Gui *)obj, g_cdPrevGadgetName)) {
+    } else if (IsCurrentGadgetNamed(obj, g_cdPrevGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         g_musicUiSelectedTrack = g_musicUiSelectedTrack - 1;
         if (g_musicUiSelectedTrack < 1)
@@ -1155,7 +1091,7 @@ void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
         UpdateTrackGadgets();
         ClearSelectedGadget(obj);
         return;
-    } else if (IsCurrentGadgetNamed((Gui *)obj, g_cdStopGadgetName)) {
+    } else if (IsCurrentGadgetNamed(obj, g_cdStopGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         ((Sound *)g_game->sound)->StopCdAudio();
         g_musicUiSelectedTrack = ((Sound *)g_game->sound)->SelectTrack(1);
@@ -1163,17 +1099,17 @@ void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
         ClearSelectedGadget(obj);
         return;
     }
-    if (IsCurrentGadgetNamed((Gui *)obj, g_undoGadgetName)) {
+    if (IsCurrentGadgetNamed(obj, g_undoGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         LoadSavedAudioSettings();
-        CloseTopScreen((Gui *)obj);
+        CloseTopScreen(obj);
         OpenMusicOptions();
         return;
     }
-    if (IsCurrentGadgetNamed((Gui *)obj, g_restoreGadgetName)) {
+    if (IsCurrentGadgetNamed(obj, g_restoreGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         ApplyDefaultMusicOptions();
-        CloseTopScreen((Gui *)obj);
+        CloseTopScreen(obj);
         OpenMusicOptions();
         return;
     }
@@ -1183,17 +1119,17 @@ void __stdcall HandleMusicOptionsClick(MusicOptionsDialog* obj)
             ClearSelectedGadget(obj);
             return;
         }
-        MusicOptionsVtable* p = obj->holder->next;
-        CloseTopScreen((Gui *)obj);
+        Layer* p = obj->layer->next;
+        CloseTopScreen(obj);
         obj->hotGadgetIndex = save;
-        p->FUN_8(obj);
+        p->handler(obj);
     }
 }
 
 // FUNCTION: 0x45d7c0
 void OpenMusicOptions()
 {
-    MusicOptionsLayer* obj = (MusicOptionsLayer*)OpenOptionsLayout();
+    Layer* obj = (Layer*)OpenOptionsLayout();
     RenderLayer(&g_game->gui, 2);
     EnsureOptionsPanelGadget();
     if ((*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).byte & 1) {
@@ -1202,12 +1138,12 @@ void OpenMusicOptions()
         LoadGuiLayer(&g_game->gui, "MUSIC", 0x200);
         LoadPictureCached("optmusic4x", 0, 0, 0);
     }
-    obj->callback8 = HandleMusicOptionsClick;
+    obj->handler = HandleMusicOptionsClick;
     EnableKeyCommands(&g_game->gui);
-    obj->callback1c = TickMusicOptions;
+    obj->cb1c = TickMusicOptions;
     SetGadgetStatusByName(&g_game->gui, "MUSIC", 1);
-    if (FindGadgetIndex(obj->gadgets, "MUSICVOL", 0xe) != -1) {
-        Gadget* e = FindGadgetChecked_D(obj->gadgets, "MUSICVOL");
+    if (FindGadgetIndex(obj->entries, "MUSICVOL", 0xe) != -1) {
+        Gadget* e = FindGadgetChecked_D(obj->entries, "MUSICVOL");
         e->max = 0x40;
         e->sliderCallback = HandleMusicVolumeSlider;
         e->knobPos = g_game->volume2Word;
@@ -1226,7 +1162,7 @@ void OpenMusicOptions()
         g_musicUiSelectedTrack = ((Sound *)g_game->sound)->GetLockedTrack();
     }
     UpdateTrackGadgets();
-    Gadget* gadgets = ((MusicLayerGadgets*)g_game->gui.layer)->gadgets;
+    Gadget* gadgets = g_game->gui.layer->entries;
     if (g_game->cdMode == 4) {
         int index = FindGadgetIndex(gadgets, "TRACKTYPE", 1);
         ((Sound *)g_game->sound)->SetCategoryOfTrack(g_musicUiSelectedTrack, gadgets[index].stageIndex);
@@ -1248,21 +1184,21 @@ void UpdateSoundGadgets()
 }
 
 // FUNCTION: 0x45da90
-void __stdcall HandleSoundOptionsClick(SoundOptionsDialog* obj)
+void __stdcall HandleSoundOptionsClick(Gui* obj)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     if (obj->hotGadgetIndex == -1) {
         (*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).loadedBits.loaded = 0;
         return;
     }
-    MarkChanged((Gui *)obj);
+    MarkChanged(obj);
     int mode = obj->hotGadgetIndex;
-    if (IsCurrentGadgetNamed((Gui *)obj, g_speechGadgetName)) {
+    if (IsCurrentGadgetNamed(obj, g_speechGadgetName)) {
         PlaySoundByName(g_optionsSoundName, 0);
         (*(SoundOptionFlagsView*)&g_game->soundFlags).bits.speech = entries[obj->hotGadgetIndex].stageIndex != 0;
         g_game->unitChat = entries[obj->hotGadgetIndex].stageIndex * 5;
         ClearSelectedGadget(obj);
-    } else if (IsCurrentGadgetNamed((Gui *)obj, g_modeGadgetName)) {
+    } else if (IsCurrentGadgetNamed(obj, g_modeGadgetName)) {
         int v = GetButtonStageByName(obj, g_modeGadgetName);
         unsigned short f = (*(SoundOptionFlagsView*)&g_game->soundFlags).word;
         (*(SoundOptionFlagsView*)&g_game->soundFlags).word = f ^ ((f ^ v) & 7);
@@ -1283,14 +1219,14 @@ void __stdcall HandleSoundOptionsClick(SoundOptionsDialog* obj)
         PlaySoundByName(g_optionsSoundName, 0);
         return;
     }
-    if (IsCurrentGadgetNamed((Gui *)obj, g_undoGadgetName)) {
+    if (IsCurrentGadgetNamed(obj, g_undoGadgetName)) {
         RestoreSoundOptions();
-        CloseTopScreen((Gui *)obj);
+        CloseTopScreen(obj);
         OpenSoundOptions();
         PlaySoundByName(g_optionsSoundName, 0);
         return;
     }
-    if (IsCurrentGadgetNamed((Gui *)obj, g_restoreGadgetName)) {
+    if (IsCurrentGadgetNamed(obj, g_restoreGadgetName)) {
         g_game->volume1 = 0x1b;
         (*(SoundOptionFlagsView*)&g_game->soundFlags).bits.b4 = 1;
         (*(SoundOptionFlagsView*)&g_game->soundFlags).bits.b5 = 1;
@@ -1301,12 +1237,12 @@ void __stdcall HandleSoundOptionsClick(SoundOptionsDialog* obj)
         SetBrightness(0.5 - g_game->brightness * -0.041666668f);
         ((Sound *)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
         ((Sound *)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
-        CloseTopScreen((Gui *)obj);
+        CloseTopScreen(obj);
         OpenSoundOptions();
         PlaySoundByName(g_optionsSoundName, 0);
         return;
     }
-    if (IsCurrentGadgetNamed((Gui *)obj, g_testGadgetName)) {
+    if (IsCurrentGadgetNamed(obj, g_testGadgetName)) {
         PlaySoundFile(g_explodeSoundFile);
         ClearSelectedGadget(obj);
         return;
@@ -1316,17 +1252,17 @@ void __stdcall HandleSoundOptionsClick(SoundOptionsDialog* obj)
             ClearSelectedGadget(obj);
             return;
         }
-        SoundOptionsVtable* p = obj->holder->next;
-        CloseTopScreen((Gui *)obj);
+        Layer* p = obj->layer->next;
+        CloseTopScreen(obj);
         obj->hotGadgetIndex = mode;
-        p->FUN_8(obj);
+        p->handler(obj);
     }
 }
 
 // FUNCTION: 0x45de30
 void OpenSoundOptions()
 {
-    SoundOptionsLayer* obj = (SoundOptionsLayer*)OpenOptionsLayout();
+    Layer* obj = (Layer*)OpenOptionsLayout();
     RenderLayer(&g_game->gui, 2);
     EnsureOptionsPanelGadget();
     if ((*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).byte & 1) {
@@ -1336,7 +1272,7 @@ void OpenSoundOptions()
         LoadPictureCached("optsound4x", 0, 0, 0);
     }
     Gadget* entries = obj->entries;
-    obj->fn = HandleSoundOptionsClick;
+    obj->handler = HandleSoundOptionsClick;
     EnableKeyCommands(&g_game->gui);
     SetGadgetStatusByName(&g_game->gui, "SOUND", 1);
     int found = FindGadgetIndex(obj->entries, "FXVOL", 0xe);
@@ -1853,7 +1789,7 @@ void ShowGameSettingsDialog()
 void __stdcall HandleBriefingClick(Gui* gui)
 {
     if (gui->hotGadgetIndex == -1) {
-        FreeBlinkWords((int)&g_game->gui);
+        FreeBlinkWords(&g_game->gui);
         return;
     }
     if (IsCurrentGadgetNamed(gui, "OK")) {
@@ -1965,7 +1901,7 @@ void OpenHelpDialog()
     LoadPictureCached("dhelp", 0, 0, 0);
     g_helpDialogBaseGadgetCount = g->entries->u.count;
     FillHelpPage((Gui *)((HelpGui*)&g_game->gui), 0, 0x11);
-    SetKeyboardInput((HelpGui*)&g_game->gui, 1);
+    SetKeyboardInput(&g_game->gui, 1);
     RenderLayer((Gui *)((HelpGui*)&g_game->gui), 0x40);
 }
 

@@ -109,7 +109,6 @@ extern int __stdcall GetGafSequenceFrame(GafSequenceRef* ref);
 extern void __stdcall AdvanceGafSequence(GafSequenceRef* ref, int step);
 extern void __stdcall PopMouseEvent(MouseEvent* out);
 
-extern void __stdcall DrawTextInput(Gui* control, int index);
 extern int __stdcall GetTextPixelWidth(unsigned char* text);
 #include "../graphics/display.h"
 
@@ -750,20 +749,6 @@ struct RemapPalette {
     unsigned char table[256];
 };
 
-struct PaletteSliderGadget {
-    char unknown_0[0x140];
-    unsigned char value;
-};
-
-struct PaletteEditorDialog {
-    char unknown_0[0x9b2];
-    int index;
-    char unknown_9b6[0xcb6 - 0x9b6];
-    PaletteSliderGadget* red;
-    PaletteSliderGadget* green;
-    PaletteSliderGadget* blue;
-};
-
 #pragma pack(pop)
 
 #include "../../link/globals.h"
@@ -1270,14 +1255,14 @@ int __stdcall GetColorCellAt(Gui* obj, int x, int y)
 }
 
 // FUNCTION: 0x4acc70
-void __stdcall ApplySlidersToPaletteEntry(PaletteEditorDialog* obj, RemapPaletteEntry* palette)
+void __stdcall ApplySlidersToPaletteEntry(Gui* obj, RemapPaletteEntry* palette)
 {
     RemapPaletteEntry c;
-    c.r = obj->red->value;
-    c.g = obj->green->value;
-    c.b = obj->blue->value;
-    palette[obj->index] = c;
-    SetPaletteColors((unsigned char*)&c, obj->index, 1);
+    c.r = obj->redSlider->knobPos;
+    c.g = obj->greenSlider->knobPos;
+    c.b = obj->blueSlider->knobPos;
+    palette[obj->selectedColour] = c;
+    SetPaletteColors((unsigned char*)&c, obj->selectedColour, 1);
 }
 
 // FUNCTION: 0x4accd0

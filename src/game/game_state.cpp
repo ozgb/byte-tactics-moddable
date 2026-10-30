@@ -307,8 +307,7 @@ void __stdcall MakeBlueTable(void* palette);
 #include "../graphics/palette.h"
 void* __stdcall GetGafFrame(void* gaf, int frame);
 void __stdcall InitCursorFrames(void* p, void* value);
-void __stdcall LoadGafFile(void* obj, const char* name);
-void __stdcall LoadGafIntoSlot(void* obj, const char* name, int index);
+#include "../gui/gui_file.h"
 #include "../graphics/draw.h"
 #include "main.h"
 
@@ -419,9 +418,9 @@ void ShutdownGame(void)
     }
     WriteGameRegistryValue((void*)"CDLISTS", &g_cdListsDiscEntries, 0xaa0);
     FreePictureCache();
-    FreeGafSlot((FreeGafSlotDialog*)&g_game->gui, 1);
-    FreeGafSlot((FreeGafSlotDialog*)&g_game->gui, 0);
-    FreeCommonGuiGaf((FreeCommonGuiGafDialog*)&g_game->gui);
+    FreeGafSlot(&g_game->gui, 1);
+    FreeGafSlot(&g_game->gui, 0);
+    FreeCommonGuiGaf(&g_game->gui);
     FreeLogos();
     FreeSideFonts();
     FreeSounds();

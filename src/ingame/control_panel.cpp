@@ -96,7 +96,6 @@ void __stdcall SetGadgetStatus(Gui* menu, int index, int value);
 void __stdcall PlaySoundByName(char* name, int broadcast);
 void __stdcall AdjustBuildCount(MissionType kind, Unit* unit, int id, int count);
 #include "selection.h"
-void __stdcall SetGrayedOut(Gui* menu, int index, int value);
 void __stdcall SetGadgetActive(Gui* menu, int index, char value);
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 #include "../gui/dialogs.h"

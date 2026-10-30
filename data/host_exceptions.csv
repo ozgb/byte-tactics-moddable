@@ -151,7 +151,9 @@ src/game/main_loop.cpp,src/ingame/keys.h,#392
 src/game/main_loop.cpp,src/ingame/selection.h,#392
 src/game/players.cpp,src/graphics/object_pool.h,#392
 src/game/players.cpp,src/gui/dialogs.h,#392
+src/game/players.cpp,src/gui/gadget.h,#392
 src/game/players.cpp,src/gui/gui.h,#392
+src/game/players.cpp,src/gui/layer.h,#392
 src/game/players.cpp,src/ingame/selection.h,#392
 src/game/players.cpp,src/graphics/display.h,#392
 src/game/settings.cpp,src/host/settings_io.h,#392
@@ -250,12 +252,15 @@ src/gui/gui.cpp,src/gui/listbox.h,#392
 src/gui/gui_file.cpp,src/graphics/object_pool.h,#392
 src/gui/gui_file.cpp,src/graphics/palette.h,#392
 src/gui/gui_file.cpp,src/gui/dialogs.h,#392
+src/gui/gui_file.cpp,src/gui/gui.h,#392
 src/gui/keyboard.cpp,interfaces/host.h,#392
 src/gui/keyboard.cpp,src/graphics/display.h,#392
 src/gui/listbox.cpp,src/graphics/draw.h,#392
 src/gui/listbox.cpp,src/graphics/gaf_frame.h,#392
 src/gui/listbox.cpp,src/graphics/rect.h,#392
+src/gui/listbox.cpp,src/gui/gadget.h,#392
 src/gui/listbox.cpp,src/gui/gui.h,#392
+src/gui/listbox.cpp,src/gui/layer.h,#392
 src/gui/mouse.cpp,interfaces/host.h,#392
 src/gui/mouse.cpp,src/graphics/display.h,#392
 src/gui/mouse.cpp,src/graphics/gaf_frame.h,#392

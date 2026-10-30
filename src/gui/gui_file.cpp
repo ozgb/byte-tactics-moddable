@@ -13,6 +13,7 @@
 
 #include "../files/files_api.h"
 #include "dialogs.h"
+#include "gui.h"
 #include "../graphics/palette.h"
 char* __stdcall Translate(char* text);
 void* __stdcall LoadGaf(char* path);
@@ -1022,19 +1023,13 @@ int __stdcall ReadGuiFile(GuiFileGadget* obj, char* name)
     return ret;
 }
 
-struct FreeGafSlotDialog {
-    char unknown_0[8];
-    int* buffers[3];
-    int activeFontGaf;
-};
-
 // FUNCTION: 0x4aeda0
-void __stdcall FreeGafSlot(FreeGafSlotDialog* obj, int i)
+void __stdcall FreeGafSlot(Gui* obj, int i)
 {
-    if (obj->buffers[i] != 0) {
-        GameFreeThunk(obj->buffers[i]);
-        obj->buffers[i] = 0;
-        obj->activeFontGaf = 0;
+    if (obj->values[i] != 0) {
+        GameFreeThunk(obj->values[i]);
+        obj->values[i] = 0;
+        obj->language = 0;
     }
 }
 
@@ -1044,26 +1039,17 @@ struct LoadGafIntoSlotGafTable {
     void* entries[1];
 };
 
-struct LoadGafIntoSlotDialog {
-    char unknown_0[8];
-    void* items[1];
-    char unknown_c[0x14 - 0xc];
-    void* activeFontGaf;
-    char unknown_18[0xab6 - 0x18];
-    char dir[0x100];
-};
-
 // FUNCTION: 0x4aedd0
-void __stdcall LoadGafIntoSlot(LoadGafIntoSlotDialog* obj, char* name, int index)
+void __stdcall LoadGafIntoSlot(Gui* obj, const char* name, int index)
 {
     int unknown;
     char path[256];
-    strncpy(path, obj->dir, 0x100);
+    strncpy(path, obj->str_ab6, 0x100);
     strcat(path, name);
     ChangeExtension(path, path, "GAF");
     if (HAPI_FileLengthByName(path)) {
         void* gaf = LoadGaf(path);
-        obj->items[index] = gaf;
+        obj->values[index] = gaf;
         LoadGafIntoSlotGafTable* table = *(LoadGafIntoSlotGafTable**)((char*)gaf + 0xc);
         char* e = (char*)GetGafFrame(table, 0x49);
         int d;
@@ -1076,25 +1062,18 @@ void __stdcall LoadGafIntoSlot(LoadGafIntoSlotDialog* obj, char* name, int index
             if (f)
                 *(short*)(f + 6) -= d;
         }
-        obj->activeFontGaf = obj->items[index];
+        obj->language = (FontGlyphTable*)obj->values[index];
     } else {
-        obj->items[index] = 0;
+        obj->values[index] = 0;
         return;
     }
 }
 
-struct LoadGafFileDialog {
-    int font;
-    void* gaf;
-    char unknown_8[0xab6 - 0x8];
-    char dir[0x100];
-};
-
 // FUNCTION: 0x4aeee0
-void __stdcall LoadGafFile(LoadGafFileDialog* obj, char* name)
+void __stdcall LoadGafFile(Gui* obj, const char* name)
 {
     char path[256];
-    strncpy(path, obj->dir, 0x100);
+    strncpy(path, obj->str_ab6, 0x100);
     strcat(path, name);
     ChangeExtension(path, path, "GAF");
     if (HAPI_FileLengthByName(path)) {
@@ -1102,13 +1081,8 @@ void __stdcall LoadGafFile(LoadGafFileDialog* obj, char* name)
     }
 }
 
-struct FreeCommonGuiGafDialog {
-    char unknown_0[4];
-    int* gaf;
-};
-
 // FUNCTION: 0x4aef80
-void __stdcall FreeCommonGuiGaf(FreeCommonGuiGafDialog* obj)
+void __stdcall FreeCommonGuiGaf(Gui* obj)
 {
     if (obj->gaf) {
         GameFreeThunk(obj->gaf);

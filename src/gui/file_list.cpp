@@ -425,12 +425,11 @@ void __stdcall AllocBlinkWords(Gui* obj, int count)
 }
 
 // FUNCTION: 0x4afcf0
-void __stdcall FreeBlinkWords(int param_1)
+void __stdcall FreeBlinkWords(Gui* param_1)
 {
-    int ptr = *(int*)(param_1 + 0xa6);
-    GameFreeThunk((void*)ptr);
-    *(int*)(param_1 + 0xa6) = 0;
-    *(int*)(param_1 + 0xae) = 0;
+    GameFreeThunk(param_1->words);
+    param_1->words = nullptr;
+    param_1->active = 0;
 }
 
 // FUNCTION: 0x4afd20
@@ -440,19 +439,19 @@ void __stdcall SetBlinkGadget(Gui* obj, int value)
 }
 
 // FUNCTION: 0x4afd40
-void __stdcall EnableBlinkWords(int param_1)
+void __stdcall EnableBlinkWords(Gui* param_1)
 {
-    int ecx = *(int*)(param_1 + 0xa6);
-    if (ecx != 0) {
-        *(int*)(param_1 + 0xae) = 1;
+    BlinkWord* words = param_1->words;
+    if (words != nullptr) {
+        param_1->active = 1;
     }
 }
 
 // FUNCTION: 0x4afd60
-void __stdcall DisableBlinkWords(int param_1)
+void __stdcall DisableBlinkWords(Gui* param_1)
 {
-    if (*(int*)(param_1 + 0xa6) != 0) {
-        *(int*)(param_1 + 0xae) = 0;
+    if (param_1->words != nullptr) {
+        param_1->active = 0;
     }
 }
 
@@ -490,14 +489,11 @@ int __stdcall AddBlinkWord(Gui* obj, const char* text, int p2, int p3,
 }
 
 // FUNCTION: 0x4afe90
-void __stdcall ClearBlinkWord(void* param1, int param2)
+void __stdcall ClearBlinkWord(Gui* param1, int param2)
 {
-    int max = *(int*)((char*)param1 + 0xaa);
+    int max = param1->count;
     if (param2 <= max) {
-        void* ptr = *(void**)((char*)param1 + 0xa6);
-        int calc = param2 + param2 * 4;
-        int offset = (param2 + calc * 8) * 4;
-        *(unsigned char*)((char*)ptr + offset) = 0;
+        param1->words[param2].text[0] = 0;
     }
 }
 

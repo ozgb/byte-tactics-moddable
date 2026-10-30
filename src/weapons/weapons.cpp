@@ -1787,7 +1787,6 @@ void WriteScreenshot(char*, char*, int, int, int, int);
 int ScanDirectory(char*, char*, char*, int, int, int);
 #include "../graphics/gaf.h"
 void OrderSquad(void*, int, unsigned char, int, void*, int, int, int);
-int AddBlinkWord(void*, const char*, int, int, int, int, float, float);
 
 // FUNCTION: 0x49b090
 void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)

@@ -7,7 +7,7 @@ struct Player;
 struct Player;
 struct Unit;
 
-struct ContinueWatchingDialog;
+struct Gui;
 
 struct NetMetalSource;
 
@@ -22,7 +22,7 @@ void __stdcall InitPlayers();
 void __stdcall RebuildAIFeatureCells();
 void __stdcall FreePlayers();
 void __stdcall RefreshOwnedUnitsLineOfSight(Player* range);
-void __stdcall ContinueWatchingCallback(ContinueWatchingDialog* gadget);
+void __stdcall ContinueWatchingCallback(Gui* gadget);
 void __stdcall ShowContinueWatchingDialog();
 void __stdcall UpdatePlayers();
 void __stdcall UpdatePlayersOnStream(RandStream stream);

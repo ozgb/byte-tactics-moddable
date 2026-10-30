@@ -67,11 +67,6 @@ public:
     virtual void ClaimFootprint(Unit* obj);
 };
 
-struct ReclaimableResource {
-    Vec3 pos;
-    float val;
-};
-
 #pragma pack(pop)
 
 #include "../../link/globals.h"

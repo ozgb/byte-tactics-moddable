@@ -31,11 +31,6 @@ union SumFixed {
     } parts;
 };
 
-struct CacheChunk {
-    void** owner;
-    int size;
-};
-
 #include "../graphics/gaf_frame.h"
 
 #include "../graphics/model_types.h"

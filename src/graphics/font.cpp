@@ -2,12 +2,7 @@
 
 #include "surface.h"
 
-struct Font {
-    unsigned char glyphs[1];
-    char unknown_1[2];
-    unsigned char first;
-    unsigned short offsets[1];
-};
+#include "font.h"
 
 #include "display.h"
 

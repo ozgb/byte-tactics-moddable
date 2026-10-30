@@ -116,14 +116,11 @@ int __stdcall AddHotspotGadget(Gui* menu, Button* record);
 int __stdcall AddBarGadget(Gui* menu, Bar* record);
 int __stdcall AddTextGadget(Layer* holder, char* type, char* text, int x, int y,
                            int width, int attribs);
-Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 #include "endgame.h"
 Gadget* __stdcall FindGadgetChecked_D(char* entries, char* name);
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int value);
-void __stdcall SetTranslatedTextByName(Gui* menu, char* name, char* text, int value);
 int __stdcall GetGafFrame(unsigned short* gaf, int frame);
 void __stdcall DrawFrame(void* dst, int bmp, int x, int y);
-void __stdcall SetKeyboardInput(Gui* menu, int value);
 void __stdcall UpdateMenu(Gui* menu);
 void __stdcall BlitMenuLayers(Gui* menu, void* dest, void* clip);
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);

@@ -38,7 +38,7 @@ void __stdcall ClearSelectedGadget(void* gui);
 int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons);
 int __stdcall IsDoubleClickMessage(Gui* obj, unsigned char buttons);
 int __stdcall HasMouseKeyFlags(Gui* obj, unsigned int mask);
-void __stdcall SetClickMode(void* gui, int mode);
+void __stdcall SetClickMode(Gui* gui, int mode);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, char* chc1, int unused);
 char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index);

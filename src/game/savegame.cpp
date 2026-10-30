@@ -78,7 +78,6 @@ int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 void __stdcall SetGadgetText(Gui* menu, int index, char* text);
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
 void __stdcall SetGadgetActiveByName(void* menu, char* name, int value);
-void __stdcall SetTranslatedTextByName(void* menu, char* name, char* text, int param_4);
 #include "../util/registry.h"
 void __stdcall FrameFromSurface(void* dst, void* src);
 #include "../graphics/surface.h"
@@ -100,7 +99,6 @@ void __cdecl LeaveNetGameCallback(int param);
 #include "../debug/debug_lib.h"
 void __cdecl operator delete(void* p);
 void* __cdecl operator new(unsigned int size);
-Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 #include "../gui/dialogs.h"
 void __stdcall SetCursorAnimation(void* menu, void* data);
 void __stdcall SetDescListCleanupFlag(Gui* menu, int flag);

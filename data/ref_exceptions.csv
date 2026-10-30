@@ -1,5 +1,4 @@
 struct,field,kind,file,issue
-AiUnitList,units,container,src/ai/player_ai.h,#361
 CMemoryCache,base,int-pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,basePointer,pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,bitmap,pointer,src/graphics/memory_cache.h,#353
@@ -131,7 +130,6 @@ Game,unitTable,pointer,src/game/game.h,#353
 Game,value_142f3,int-pointer,src/game/game.h,#353
 Game,vismasks,int-pointer,src/game/game.h,#353
 Game,xform,pointer,src/game/game.h,#353
-Group,units,container,src/ai/group.h,#361
 Gui,blueSlider,pointer,src/gui/gui.h,#353
 Gui,fallback,pointer,src/gui/gui.h,#353
 Gui,gaf,pointer,src/gui/gui.h,#353
@@ -192,15 +190,6 @@ PacketRing,buf,pointer,src/network/packet_ring.h,#353
 PathOrderAttach,value,pointer,src/orders/path_order_attach.h,#352
 PieceFrame,indices,pointer,src/graphics/piece_frame.h,#353
 PieceRec,desc,pointer,src/weapons/explosions.cpp,#352
-PlayerAI,cells,container,src/ai/player_ai.h,#361
-PlayerAI,counts,container,src/ai/player_ai.h,#361
-PlayerAI,locked,container,src/ai/player_ai.h,#361
-PlayerAI,values,container,src/ai/player_ai.h,#361
-PlayerAI,vec_65,container,src/ai/player_ai.h,#361
-PlayerAI,vec_8d,container,src/ai/player_ai.h,#361
-PlayerAI,vec_ad,container,src/ai/player_ai.h,#361
-PlayerAI,vec_bd,container,src/ai/player_ai.h,#361
-PlayerAI,weights,container,src/ai/player_ai.h,#361
 PlayerFrameInfo,frame,pointer,src/network/packet_receiver.h,#353
 ScriptTable,code,pointer,src/units/cob_types.h,#352
 ScriptTable,entries,pointer,src/units/cob_types.h,#352

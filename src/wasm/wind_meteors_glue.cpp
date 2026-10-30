@@ -444,6 +444,12 @@ void FuelBegin()
 
 void Call(Slot slot, wasmtime_val_raw_t* a, size_t count)
 {
+    if (s_importDepth > 0) {
+        char text[200];
+        sprintf(text, "slot %s: called inside an import", kSlotNames[slot]);
+        RecordFatal(text);
+        return;
+    }
     unsigned long long start = s_timing ? host_time_counter() : 0;
     unsigned thread = host_thread_id();
     if (s_slotDepth != 0 && thread != s_slotOwner)
@@ -458,8 +464,10 @@ void Call(Slot slot, wasmtime_val_raw_t* a, size_t count)
     wl_call(s_loader, s_module, &s_slots[slot], a, count);
     unsigned long long callEnd = s_timing ? host_time_counter() : 0;
     --s_slotDepth;
-    if (s_fatalPending && s_slotDepth == 0)
+    if (s_fatalPending && s_slotDepth == 0) {
+        host_log("wind_meteors: wl_call returned with a fatal pending\n");
         ModulesFatal(s_fatalText);
+    }
     if (s_slotDepth == 0) {
         s_handleCount = 0;
         if (s_timing) {

@@ -60,7 +60,7 @@ struct Gui {
     int cursor;
     int knobDragging;
     MouseEvent saved;
-    char unknown_94[2];
+    char pad_94[2];
     int time;
     int animTimer;
     int inputEnabled;

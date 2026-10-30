@@ -3166,7 +3166,6 @@ struct Gui;
 int WalkFrameChain(int, int, int, int, int, int, int, int, int, int);
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int OrderSquad(int, int, int, int, int, int, int, int);
-int AddBlinkWord(int, int, int, int, int, int, int, int);
 int WalkStack(int, int, int, int, int, int, int);
 int SendScriptCallByName(int, int, int, int, int, int, int);
 int SendScriptCall(int, int, int, int, int, int, int);

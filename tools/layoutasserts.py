@@ -44,7 +44,7 @@ RECORD_HEAD = re.compile(r"^ *0 \| (?:struct|class|union) (\S+?)( \(empty\))?$",
 SIZE_LINE = re.compile(r"\[sizeof=(\d+)")
 DIAGNOSTIC = re.compile(r"^(?P<file>.*?):(?P<line>\d+):\d+: error: (?P<text>.*)$", re.M)
 SYSTEM_INCLUDES = ["<stddef.h>", "<stdio.h>", "<string.h>", "<stdlib.h>", "<math.h>", "<vector>", "<memory>",
-                   '"../state/block.h"', '"../state/sim_allocator.h"', '"win_types.h"']
+                   '"../state/block.h"', '"../state/block_vector.h"', '"win_types.h"']
 FIRST_HEADERS = ["src/util/vec3.h"]
 SELF_ASSERTED = {"SimGlobals"}
 PRELUDE = ['#pragma clang diagnostic ignored "-Winvalid-offsetof"', "#pragma pack(push, 1)"]

@@ -6,7 +6,7 @@
 #include <vector>
 #include <memory>
 #include "../state/block.h"
-#include "../state/sim_allocator.h"
+#include "../state/block_vector.h"
 #include "win_types.h"
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma pack(push, 1)
@@ -106,6 +106,7 @@
 #include "../orders/unit_motion.h"
 #include "../quirks/quirks.h"
 #include "../sound/sound_setting_flags.h"
+#include "block_vector.h"
 #include "../units/cob_script.h"
 #include "../units/cob_types.h"
 #include "../units/f14373.h"

@@ -7,7 +7,7 @@
 #include <math.h>
 #include <vector>
 #include <new>
-#include "../state/sim_allocator.h"
+#include "../state/block_vector.h"
 #include "win_types.h"
 
 
@@ -458,7 +458,7 @@ int SquadTimer::GetAveragePosition(Vec3* out)
     if (n == 0)
         return 0;
     int x = 0, y = 0, z = 0;
-    for (SimVector<Unit*>::iterator it = g->units.begin(); it != g->units.end(); ++it) {
+    for (BlockVector<Ref<Unit> >::iterator it = g->units.begin(); it != g->units.end(); ++it) {
         x += (*it)->xWhole;
         y += (*it)->yWhole;
         z += (*it)->zWhole;
@@ -498,7 +498,7 @@ void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
         SetUnitSquad(other->group->units[0], group->id);
     }
     int sx = 0, sz = 0;
-    SimVector<Unit*>::iterator it;
+    BlockVector<Ref<Unit> >::iterator it;
     for (it = group->units.begin(); it != group->units.end(); ++it) {
         sx += (*it)->xWhole;
         sz += (*it)->zWhole;
@@ -511,7 +511,7 @@ void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
         if (g->units.size() == 1)
             break;
         int maxd = 0;
-        SimVector<Unit*>::iterator best = g->units.end();
+        BlockVector<Ref<Unit> >::iterator best = g->units.end();
         for (it = g->units.begin(); it != g->units.end(); ++it) {
             int dx = (*it)->xWhole - cx;
             int dz = (*it)->zWhole - cz;
@@ -535,8 +535,8 @@ void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
         if (d < limit * (int)group->units.size())
             list.push_back(*it);
     }
-    for (it = list.begin(); it != list.end(); ++it)
-        SetUnitSquad(*it, group->id);
+    for (std::vector<Unit*>::iterator moved = list.begin(); moved != list.end(); ++moved)
+        SetUnitSquad(*moved, group->id);
 }
 
 static inline int Rally(Ref<SquadManager>& owner, Vec3* pos)
@@ -722,7 +722,7 @@ void SpatialTimer::OnTimer()
             best = probe;
         }
     }
-    for (SimVector<Unit*>::iterator it = group->units.begin();
+    for (BlockVector<Ref<Unit> >::iterator it = group->units.begin();
          it != group->units.end(); ++it) {
         Unit* u = *it;
         if (u->def->c04) {
@@ -773,7 +773,7 @@ void ScoutTimer::OnTimer()
     next = (unsigned int)g_game->ticks + 90;
     Vec3 origin;
     GetBasePosition(player, &origin);
-    SimVector<Unit*>::iterator it;
+    BlockVector<Ref<Unit> >::iterator it;
     for (it = group->units.begin(); it != group->units.end(); ++it) {
         Unit* u = *it;
         if (u->def->count
@@ -875,7 +875,7 @@ void __stdcall UpdateConverter(Unit* unit)
 void BuildTimer::OnTimer()
 {
     next = (unsigned int)g_game->ticks + 30;
-    for (SimVector<Unit*>::iterator it = group->units.begin(); it != group->units.end(); ++it) {
+    for (BlockVector<Ref<Unit> >::iterator it = group->units.begin(); it != group->units.end(); ++it) {
         Unit* u = *it;
         if ((u->flags & 0x20000000) && (u->flags & 0x10000000) && !(u->flags & 0x4000)) {
             if (u->def->makesMetal) {
@@ -1033,9 +1033,9 @@ void SquadManager::DeleteTimers()
     }
 }
 
-typedef SimVector<Unit*> UnitPtrVectorInsert;
+typedef BlockVector<Ref<Unit> > UnitPtrVectorInsert;
 typedef void (UnitPtrVectorInsert::*UnitPtrInsertFn)(
-    UnitPtrVectorInsert::iterator, UnitPtrVectorInsert::size_type, Unit* const&);
+    UnitPtrVectorInsert::iterator, UnitPtrVectorInsert::size_type, const Ref<Unit>&);
 
 void __stdcall ReserveUnitPtrVector(UnitPtrVectorInsert* units, int extra)
 {
@@ -1338,7 +1338,7 @@ void PlayerAI::InitPlacementGrid()
 }
 
 // FUNCTION: 0x40a260
-bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<KeyedCell>* list, int range, Point16* out)
+bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, BlockVector<KeyedCell>* list, int range, Point16* out)
 {
     if (list->empty())
         return false;
@@ -1346,7 +1346,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<KeyedCel
     heap.reserve(list->size());
     int rangeSq = range * range;
     Point16 center = WorldToCell(*pos, *(Point16*)&type->f14a);
-    for (SimVector<KeyedCell>::iterator p = list->begin(); p != list->end(); p++) {
+    for (BlockVector<KeyedCell>::iterator p = list->begin(); p != list->end(); p++) {
         int d = DistSq(p->pos, center);
         if (d <= rangeSq) {
             heap.push_back(*p);
@@ -1444,8 +1444,8 @@ void __stdcall ProbeUnitDefEnergyRate(int unused1, int unused2, int param_3)
 void __stdcall GetVisibleEnemiesInRadius(int player,const Vec* pos,int radius,int flags,std::vector<Unit*>* out)
 {
     int radius2=radius*radius;
-    SimVector<Unit*>& visible=g_playerAI[player]->visible.units;
-    SimVector<Unit*>::iterator it;
+    BlockVector<Ref<Unit> >& visible=g_playerAI[player]->visible.units;
+    BlockVector<Ref<Unit> >::iterator it;
     for(it=visible.begin();it!=visible.end();++it) {
         Unit* unit=*it;
         int dz=pos->z-unit->pos.z;
@@ -1470,8 +1470,8 @@ bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range)
 {
     int r2 = range * range;
     PlayerAI* t = g_playerAI[player];
-    SimVector<Unit*>& units = t->visible.units;
-    SimVector<Unit*>::iterator it = units.begin();
+    BlockVector<Ref<Unit> >& units = t->visible.units;
+    BlockVector<Ref<Unit> >::iterator it = units.begin();
     if (it != units.end()) {
         do {
             Unit* u = *it;
@@ -1492,8 +1492,8 @@ int __stdcall SumUnitRatingsInRange(int player, Vec3* pos, int range)
     int total = 0;
     PlayerAI* p = g_playerAI[player];
     int r2 = range * range;
-    SimVector<Unit*>& units = p->visible.units;
-    for (SimVector<Unit*>::iterator it = units.begin(); it != units.end(); it++) {
+    BlockVector<Ref<Unit> >& units = p->visible.units;
+    for (BlockVector<Ref<Unit> >::iterator it = units.begin(); it != units.end(); it++) {
         Unit* u = *it;
         int dz = pos->z - u->pos.z;
         int dx = pos->x - u->pos.x;
@@ -1545,9 +1545,9 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int 
 // FUNCTION: 0x40b530
 void __stdcall GetFactoriesInRadius(int player,const Vec* pos,int radius,std::vector<Unit*>* out)
 {
-    SimVector<Unit*>& list=g_playerAI[player]->factories.list.units;
+    BlockVector<Ref<Unit> >& list=g_playerAI[player]->factories.list.units;
     radius*=radius;
-    for(SimVector<Unit*>::iterator it=list.begin();it!=list.end();++it) {
+    for(BlockVector<Ref<Unit> >::iterator it=list.begin();it!=list.end();++it) {
         Unit* unit=*it;
         if((unit->def->flags1&0x40) && (unit->def->flags1&0x200) && (unit->activateFlags&1)) {
             int dz=pos->z-unit->pos.z;
@@ -1756,7 +1756,7 @@ int __stdcall HasSpecialUnit(int param_1)
     return *(int*)((char*)g_playerAI[param_1].get() + 0x79);
 }
 
-template class std::vector<Unit*, SimAllocator<Unit*> >;
+template class BlockVector<Ref<Unit> >;
 
 // FUNCTION: 0x40c510 ??0?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@ABV?$allocator@PAUUnit@@@1@@Z
 
@@ -1767,15 +1767,15 @@ inline void _Construct(PercentByte* dest, const PercentByte& src) { CopyOneByte(
 inline void _Construct(KeyedCell* dest, const KeyedCell& src) { CopyDwordPair(dest, &src); }
 }
 
-typedef SimVector<Unit*> SimUnitPtrVector;
-typedef SimVector<KeyedCell> KeyedCellVector;
-typedef SimVector<BuildRatingWeights> BuildRatingVector;
-typedef SimVector<PercentByte> PercentByteVector;
-typedef SimVector<UnitTypeInt> UnitTypeIntVector;
-typedef SimVector<short> ShortVector;
-typedef SimVector<unsigned char> ByteVector;
+typedef BlockVector<Ref<Unit> > SimUnitPtrVector;
+typedef BlockVector<KeyedCell> KeyedCellVector;
+typedef BlockVector<BuildRatingWeights> BuildRatingVector;
+typedef BlockVector<PercentByte> PercentByteVector;
+typedef BlockVector<UnitTypeInt> UnitTypeIntVector;
+typedef BlockVector<short> ShortVector;
+typedef BlockVector<unsigned char> ByteVector;
 
-typedef SimVector<SimUnitPtrVector> UnitPtrVectorVector;
+typedef BlockVector<SimUnitPtrVector> UnitPtrVectorVector;
 typedef UnitPtrVectorVector& (UnitPtrVectorVector::*UnitPtrVectorVectorAssignFn)(const UnitPtrVectorVector&);
 // FUNCTION: 0x40c530 ??1?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAE@XZ
 UnitPtrVectorVectorAssignFn g_assign_0040c530 = &UnitPtrVectorVector::operator=;
@@ -1784,7 +1784,7 @@ typedef SimUnitPtrVector::size_type (SimUnitPtrVector::*UnitPtrVectorSizeFn)() c
 // FUNCTION: 0x40c560 ?size@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QBEIXZ
 UnitPtrVectorSizeFn g_size_0040c560 = &SimUnitPtrVector::size;
 
-typedef SimVector<KeyedCellVector> KeyedCellVectorVector;
+typedef BlockVector<KeyedCellVector> KeyedCellVectorVector;
 typedef KeyedCellVectorVector& (KeyedCellVectorVector::*KeyedCellVectorVectorAssignFn)(const KeyedCellVectorVector&);
 // FUNCTION: 0x40c580 ??1?$vector@UKeyedCell@@V?$allocator@UKeyedCell@@@std@@@std@@QAE@XZ
 KeyedCellVectorVectorAssignFn g_assign_0040c580 = &KeyedCellVectorVector::operator=;
@@ -1793,7 +1793,7 @@ typedef KeyedCellVector::size_type (KeyedCellVector::*KeyedCellVectorSizeFn)() c
 // FUNCTION: 0x40c5b0 ?size@?$vector@UKeyedCell@@V?$allocator@UKeyedCell@@@std@@@std@@QBEIXZ
 KeyedCellVectorSizeFn g_size_0040c5b0 = &KeyedCellVector::size;
 
-typedef SimVector<BuildRatingVector> BuildRatingVectorVector;
+typedef BlockVector<BuildRatingVector> BuildRatingVectorVector;
 typedef BuildRatingVectorVector& (BuildRatingVectorVector::*BuildRatingVectorVectorAssignFn)(const BuildRatingVectorVector&);
 // FUNCTION: 0x40c5d0 ??1?$vector@UBuildRatingWeights@@V?$allocator@UBuildRatingWeights@@@std@@@std@@QAE@XZ
 BuildRatingVectorVectorAssignFn g_assign_0040c5d0 = &BuildRatingVectorVector::operator=;
@@ -1853,8 +1853,8 @@ typedef ShortVector::iterator (ShortVector::*ShortVectorEraseFn)(
 ShortVectorEraseFn g_erase_0040d240 = &ShortVector::erase;
 
 // FUNCTION: 0x40d290 ?insert@?$vector@EV?$allocator@E@std@@@std@@QAEXPAEIABE@Z
-void (SimVector<unsigned char>::*g_insert_0040d290)(unsigned char*, unsigned int,
-                                                      const unsigned char&) = &SimVector<unsigned char>::insert;
+void (BlockVector<unsigned char>::*g_insert_0040d290)(unsigned char*, unsigned int,
+                                                      const unsigned char&) = &BlockVector<unsigned char>::insert;
 
 typedef ByteVector::iterator (ByteVector::*ByteVectorEraseFn)(
     ByteVector::iterator, ByteVector::iterator);

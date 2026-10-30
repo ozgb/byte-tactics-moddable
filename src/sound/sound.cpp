@@ -7,11 +7,6 @@
 
 #include "sound.h"
 
-struct DisplayHwndView {
-    char unknown_0[0x40];
-    HWND hwnd;
-};
-
 union SoundWorldPos {
     struct {
         short xFrac;
@@ -149,7 +144,7 @@ void InitSound(void)
         g_noDirectSound = 1;
     }
     if (!g_noDirectSound) {
-        int hr = ((Sound *)g_game->sound)->InitDirectSound(0x2b11, 0x10, 2, ((DisplayHwndView *)g_game->displayContext)->hwnd);
+        int hr = ((Sound *)g_game->sound)->InitDirectSound(0x2b11, 0x10, 2, g_game->displayContext->hwnd);
         if (hr == 0) {
             if (((Sound *)g_game->sound)->HasNoDriver())
                 g_noDirectSound = 1;

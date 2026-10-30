@@ -32,11 +32,6 @@ struct MapTileSet {
     unsigned char (*cell)[32][32];
 };
 
-struct DisplayContextColorMapView {
-    char unknown_0[0xcc];
-    unsigned char* colorMap;
-};
-
 struct WeaponDef;
 
 struct InterceptorDefFlags {
@@ -70,6 +65,7 @@ struct RadarUnitDefView {
 #include "../weapons/projectile.h"
 
 #include "../game/game.h"
+#include "../graphics/display.h"
 #pragma pack(pop)
 
 #include "../../link/globals.h"
@@ -272,7 +268,7 @@ void UpdateRadarMapped()
                 } else if (t->explored[index]) {
                     *dst = *src;
                 } else {
-                    *dst = ((DisplayContextColorMapView *)g_game->displayContext)->colorMap[*src];
+                    *dst = g_game->displayContext->grayTable[*src];
                 }
                 j++;
                 mapX += halfWidth;

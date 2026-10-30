@@ -153,8 +153,10 @@ src/game/players.cpp,src/graphics/object_pool.h,#392
 src/game/players.cpp,src/gui/dialogs.h,#392
 src/game/players.cpp,src/gui/gui.h,#392
 src/game/players.cpp,src/ingame/selection.h,#392
+src/game/players.cpp,src/graphics/display.h,#392
 src/game/settings.cpp,src/host/settings_io.h,#392
 src/game/settings.cpp,src/sound/sound.h,#392
+src/game/settings.cpp,src/graphics/display.h,#392
 src/game/settings_campaign.cpp,src/graphics/surface.h,#392
 src/game/settings_campaign.cpp,src/host/settings_io.h,#392
 src/game/settings_campaign.cpp,src/ingame/camera.h,#392
@@ -351,6 +353,7 @@ src/map/radar.cpp,src/graphics/gaf.h,#392
 src/map/radar.cpp,src/graphics/gaf_frame.h,#392
 src/map/radar.cpp,src/graphics/object_pool.h,#392
 src/map/radar.cpp,src/graphics/surface.h,#392
+src/map/radar.cpp,src/graphics/display.h,#392
 src/network/net_chat.cpp,src/graphics/draw.h,#392
 src/network/net_chat.cpp,src/graphics/rect.h,#392
 src/network/net_chat.cpp,src/gui/dialogs.h,#392

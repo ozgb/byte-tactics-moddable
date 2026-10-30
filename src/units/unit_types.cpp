@@ -817,7 +817,7 @@ void LoadUnitTypes() {
     int t = g_game->screenHeight * g_game->width_37e1f * 2;
     int v = (int)(t * 1.3);
 
-    int n = *(int*)((char*)(void *)g_game->displayContext + 0x620) / 0x100000 + 1;
+    int n = g_game->displayContext->availPhys / 0x100000 + 1;
     float scale = 1.0f;
     if (n > 0x10) {
         double d = (double)n * 0.0625;

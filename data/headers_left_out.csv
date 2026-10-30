@@ -100,7 +100,6 @@ FireVLaunchWeapon,mismatch,"definition type not nameable in a header, or no clea
 FlipScreen,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FontHeight,mismatch,pointer/int cast: definition's type is likely wrong
 FrameFromSurface,mismatch,parameter 1 void* vs GafFrame* (view type); parameter 2 void* vs Surface* (view type): the declaration differs from the definition in a pointer type only
-FreeBlinkWords,mismatch,pointer/int cast: definition's type is likely wrong
 FreeCobScript,mismatch,pointer/int cast: definition's type is likely wrong
 FreeObjectState,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GameAllocThunk,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

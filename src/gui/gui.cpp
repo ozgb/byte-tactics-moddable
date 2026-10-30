@@ -158,9 +158,9 @@ void __stdcall MarkChanged(Gui* obj)
 }
 
 // FUNCTION: 0x49fab0
-void __stdcall ClearChanged(void* param_1)
+void __stdcall ClearChanged(Gui* param_1)
 {
-    *(int*)((char*)param_1 + 0xcca) = 0;
+    param_1->changed = 0;
 }
 
 // FUNCTION: 0x49fad0
@@ -178,11 +178,11 @@ void __stdcall ClearLayerChanged(Gui* param)
 }
 
 // FUNCTION: 0x49fb10
-void __stdcall SetKeyboardInput(int param_1, int param_2)
+void __stdcall SetKeyboardInput(Gui* param_1, int param_2)
 {
-    int eax = *(int*)(param_1 + 0x18);
-    if (eax != 0) {
-        *(int*)(eax + 0x18) = param_2;
+    Layer* layer = param_1->layer;
+    if (layer != 0) {
+        layer->keyboardInput = param_2;
     }
 }
 
@@ -239,17 +239,17 @@ int __stdcall TrySetFocus(Gui* obj, int index)
 }
 
 // FUNCTION: 0x49fcf0
-int __stdcall IsFocused(int param_1, int param_2)
+int __stdcall IsFocused(Gui* param_1, int param_2)
 {
     int result = 0;
-    result = *(int*)(param_1 + 0x64) == param_2;
+    result = param_1->focus == param_2;
     return result;
 }
 
 // FUNCTION: 0x49fd10
-bool __stdcall HasFocus(int param_1)
+bool __stdcall HasFocus(Gui* param_1)
 {
-    return *(int*)(param_1 + 0x64) != -1;
+    return param_1->focus != -1;
 }
 
 // FUNCTION: 0x49fd20
@@ -3947,7 +3947,7 @@ int __stdcall HandleTextInput(Gui* obj, int index, int key)
         }
     }
 
-    if (IsFocused((int)obj, index)) {
+    if (IsFocused(obj, index)) {
         SetTextColors(obj->colours[entries[index].colours],
                      obj->colours[entries[index].image]);
         int r = HandleTextEditKey(obj, index, key);

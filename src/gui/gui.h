@@ -77,12 +77,12 @@ struct Gui {
 #pragma pack(pop)
 
 int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused);
-void __stdcall ClearChanged(void*);
+void __stdcall ClearChanged(Gui*);
 void __stdcall ClearLayerChanged(Gui* param);
 int __stdcall GetKeyboardInput(Gui* obj);
 void __stdcall ClearFocus(Gui*);
-int __stdcall IsFocused(int, int);
-bool __stdcall HasFocus(int);
+int __stdcall IsFocused(Gui*, int);
+bool __stdcall HasFocus(Gui*);
 void __stdcall FUN_0049fd20(DialogPointView*, DialogOriginView*, MouseEvent*);
 void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
 int __stdcall FindAssocListBox(Gadget* entries, int index);

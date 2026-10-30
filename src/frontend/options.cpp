@@ -476,7 +476,7 @@ void __stdcall AddTextGadget(Layer* layer, char* type, char* text, int x, int y,
 char* __stdcall Translate(char* text);
 const char* __stdcall Translate(const char* text);
 #include "campaign_menu.h"
-void __stdcall FreeBlinkWords(int param_1);
+#include "../gui/file_list.h"
 #include "../gui/file_list.h"
 
 #include "options.h"
@@ -1851,7 +1851,7 @@ void ShowGameSettingsDialog()
 void __stdcall HandleBriefingClick(Gui* gui)
 {
     if (gui->hotGadgetIndex == -1) {
-        FreeBlinkWords((int)&g_game->gui);
+        FreeBlinkWords(&g_game->gui);
         return;
     }
     if (IsCurrentGadgetNamed(gui, "OK")) {

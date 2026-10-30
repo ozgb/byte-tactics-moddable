@@ -84,7 +84,6 @@ void __stdcall SetGadgetColorByName(Gui* menu, const char* name, int value);
 void __stdcall AddBlinkWord(Gui* menu, char* text, int x, int y, int count,
                             int colour, float a, float b);
 #include "../gui/file_list.h"
-void __stdcall FreeBlinkWords(Gui* menu);
 #include "../graphics/draw.h"
 int __stdcall FontHeight(void* font);
 int __stdcall GetTextWidth(void* font, const char* text);

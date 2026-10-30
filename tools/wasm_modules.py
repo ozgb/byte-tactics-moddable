@@ -1057,7 +1057,7 @@ def run_fatal():
 
 
 GLUE_FATAL_SCENARIO = os.path.join(ROOT, "reference", "scenarios", "console-ilose.txt")
-GLUE_FATAL_TDF = os.path.join(ROOT, "tools", "testdata", "wasm_glue", "meteor.tdf")
+GLUE_FATAL_TDF = "[Default]\n\t{\n\tMeteorWeapon=BOGUS;\n\tMeteorRadius=0;\n\tMeteorDensity=0;\n\tMeteorDuration=0;\n\tMeteorInterval=0;\n\t}\n"
 GLUE_FATAL_MESSAGE = "Hey, hoser!  The default meteor shower data was bogus!"
 GLUE_FATAL_RETURNED = "wind_meteors: wl_call returned with a fatal pending"
 
@@ -1089,8 +1089,13 @@ def run_glue_fatal(exe, game_dir):
         if not os.path.exists(os.path.join(os.path.dirname(exe), name)):
             print(f"FAIL: {name} is missing next to {exe}: cmake --build build/modern --target wasm_runtime")
             return 1
+    scratch = os.path.join(ROOT, "build", "scratch", "glue-fatal")
+    os.makedirs(scratch, exist_ok=True)
+    fixture = os.path.join(scratch, "meteor.tdf")
+    with open(fixture, "w") as f:
+        f.write(GLUE_FATAL_TDF)
     cmd = [sys.executable, os.path.join(ROOT, "tools", "playtest.py"), "--exe", exe, "--testmode", GLUE_FATAL_SCENARIO,
-           "--testmode-timeout", "120", "--put", "gamedata/meteor.tdf", GLUE_FATAL_TDF]
+           "--testmode-timeout", "120", "--put", "gamedata/meteor.tdf", fixture]
     if game_dir:
         cmd += ["--game-dir", game_dir]
     done = subprocess.run(cmd, capture_output=True, text=True)

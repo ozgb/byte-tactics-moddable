@@ -1095,11 +1095,6 @@ struct DrawListBoxPoint { int x; int y; };
 struct DrawListBoxQuad { DrawListBoxPoint points[4]; };
 
 
-struct DrawListBoxItem {
-    char unknown_0[0x28];
-    GafFrame* cell;
-};
-
 #pragma pack(pop)
 
 #include "../graphics/surface.h"
@@ -1261,7 +1256,7 @@ void __stdcall DrawListBox(Gui* obj, int index)
             }
         }
     } else if (flags & 0xa0) {
-        DrawListBoxItem** colPtr;
+        ListBoxItem** colPtr;
         GafFrame* cellPtr;
         Rect cellRect;
         Rect clip;
@@ -1271,7 +1266,7 @@ void __stdcall DrawListBox(Gui* obj, int index)
         ((Surface*)surf)->SetClipRect(bounds);
         int k = me->u.list.firstRow;
         if (!bp) {
-            colPtr = &((DrawListBoxItem**)me->u.list.rows)[k];
+            colPtr = &((ListBoxItem**)me->u.list.rows)[k];
         } else {
             colPtr = 0;
             cellPtr = &((GafFrame*)me->u.list.rows)[k];
@@ -1996,10 +1991,6 @@ static inline int PointInListRect(const HandleListBoxInputRect& r, const MouseEv
     return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1;
 }
 
-struct HandleListBoxInputItem {
-    char unknown_0[0x28];
-    GafFrame* row;
-};
 
 
 static inline int GetHandleListBoxInputLineHeight()
@@ -2118,16 +2109,16 @@ skip0:;
         } else if (flags & 0x20 | 0x80) {
             int flag8 = (flags >> 7) & 1;
             GafFrame* fixed;
-            HandleListBoxInputItem** ip;
+            ListBoxItem** ip;
             if (flag8)
                 fixed = &((GafFrame*)me->u.list.rows)[me->u.list.firstRow];
             else
-                ip = &((HandleListBoxInputItem**)me->u.list.rows)[me->u.list.firstRow];
+                ip = &((ListBoxItem**)me->u.list.rows)[me->u.list.firstRow];
             int k = me->u.list.firstRow;
             int remain = point.y - r.y0 - 2;
             int n2 = 0;
             for (;;) {
-                GafFrame* row = flag8 ? fixed : (*ip)->row;
+                GafFrame* row = flag8 ? fixed : (*ip)->cell;
                 if (me->u.list.scroll != 0)
                     remain -= span;
                 else

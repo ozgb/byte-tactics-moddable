@@ -68,7 +68,7 @@ struct Gui {
     Gadget* redSlider;
     Gadget* greenSlider;
     Gadget* blueSlider;
-    char unknown_cc2[4];
+    char pad_cc2[4];
     int pathsReady;
     int changed;
     int clickStatusCache;

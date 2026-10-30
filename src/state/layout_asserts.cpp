@@ -1297,7 +1297,7 @@ static_assert(offsetof(Gui, str_bb6) == 2998, "");
 static_assert(offsetof(Gui, redSlider) == 3254, "");
 static_assert(offsetof(Gui, greenSlider) == 3258, "");
 static_assert(offsetof(Gui, blueSlider) == 3262, "");
-static_assert(offsetof(Gui, unknown_cc2) == 3266, "");
+static_assert(offsetof(Gui, pad_cc2) == 3266, "");
 static_assert(offsetof(Gui, pathsReady) == 3270, "");
 static_assert(offsetof(Gui, changed) == 3274, "");
 static_assert(offsetof(Gui, clickStatusCache) == 3278, "");

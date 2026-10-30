@@ -428,7 +428,7 @@ void __stdcall AllocBlinkWords(Gui* obj, int count)
 void __stdcall FreeBlinkWords(Gui* param_1)
 {
     GameFreeThunk(param_1->words);
-    param_1->words = 0;
+    param_1->words = nullptr;
     param_1->active = 0;
 }
 
@@ -442,7 +442,7 @@ void __stdcall SetBlinkGadget(Gui* obj, int value)
 void __stdcall EnableBlinkWords(Gui* param_1)
 {
     BlinkWord* words = param_1->words;
-    if (words != 0) {
+    if (words != nullptr) {
         param_1->active = 1;
     }
 }
@@ -450,7 +450,7 @@ void __stdcall EnableBlinkWords(Gui* param_1)
 // FUNCTION: 0x4afd60
 void __stdcall DisableBlinkWords(Gui* param_1)
 {
-    if (param_1->words != 0) {
+    if (param_1->words != nullptr) {
         param_1->active = 0;
     }
 }

@@ -181,7 +181,7 @@ void __stdcall ClearLayerChanged(Gui* param)
 void __stdcall SetKeyboardInput(Gui* param_1, int param_2)
 {
     Layer* layer = param_1->layer;
-    if (layer != 0) {
+    if (layer != nullptr) {
         layer->keyboardInput = param_2;
     }
 }

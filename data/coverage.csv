@@ -378,8 +378,8 @@ network,FormatNetStats,src/network/net_stats.cpp,1,0,0,0,0,0,?FormatNetStats@@YG
 network,FrameQueue::QueueFrames,src/network/packets.cpp,1,0,0,0,0,0,?QueueFrames@FrameQueue@@QAEHPADIHHHH@Z,0,network
 network,FrameQueue::ResetFrames,src/network/packets.cpp,1,0,0,0,0,0,?ResetFrames@FrameQueue@@QAEHXZ,0,network
 network,FrameQueue::~FrameQueue,src/network/packets.cpp,1,0,0,0,0,0,??1FrameQueue@@QAE@XZ,0,network
-network,FrameRing::Pop,src/network/packets.cpp,1,0,0,0,0,0,?Pop@FrameRing@@QAEPAUFrame@@XZ,0,network
-network,FrameRing::Push,src/network/packets.cpp,1,0,0,0,0,0,?Push@FrameRing@@QAEHHPAXH@Z,0,network
+network,FrameRing::Pop,src/network/frame_ring.h,1,0,0,0,0,0,?Pop@FrameRing@@QAEPAUFrame@@XZ,0,network
+network,FrameRing::Push,src/network/frame_ring.h,1,0,0,0,0,0,?Push@FrameRing@@QAEHHPAXH@Z,0,network
 network,FreeTeam,src/network/net_game.cpp,1,0,0,0,0,0,?FreeTeam@@YGEXZ,0,network
 network,GetByteRates,src/network/net_stats.cpp,1,0,0,0,0,0,?GetByteRates@@YGXPAI0@Z,0,console
 network,GetCreatedLobbyInterface,src/network/online_report.cpp,1,0,0,0,0,0,?GetCreatedLobbyInterface@@YGHPAUNetReportBlockView@@@Z,0,network

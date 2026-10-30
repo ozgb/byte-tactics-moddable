@@ -673,6 +673,14 @@ int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module, unsigned fue
     return 1;
 }
 
+int __stdcall WindMeteorsDeferFatal(const char* text)
+{
+    if (s_importDepth == 0 || s_importThread != host_thread_id())
+        return 0;
+    RecordFatal(text);
+    return 1;
+}
+
 int __stdcall WindMeteorsFatalPending()
 {
     return s_fatalPending;

@@ -298,10 +298,19 @@ add_custom_target(wasm_modules
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   USES_TERMINAL)
 
+option(BT_WASM_HOST_DEBUG "Build wasmtime_host.dll unstripped with panic=unwind (build/wasm_host_debug)" OFF)
+if(BT_WASM_HOST_DEBUG)
+  set(WASM_HOST_ARGS --debug)
+  set(WASM_HOST_DIR "${CMAKE_SOURCE_DIR}/build/wasm_host_debug")
+else()
+  set(WASM_HOST_ARGS)
+  set(WASM_HOST_DIR "${CMAKE_SOURCE_DIR}/build/wasm_host")
+endif()
+
 add_custom_target(wasm_runtime
-  COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_host.py" build
+  COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_host.py" build ${WASM_HOST_ARGS}
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build
-  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm_host/wasmtime_host.dll" "${CMAKE_BINARY_DIR}/wasmtime_host.dll"
+  COMMAND "${CMAKE_COMMAND}" -E copy "${WASM_HOST_DIR}/wasmtime_host.dll" "${CMAKE_BINARY_DIR}/wasmtime_host.dll"
   COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm-modules/wind_meteors.wasm" "${CMAKE_BINARY_DIR}/wind_meteors.wasm"
   COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/wasm/modules.json" "${CMAKE_BINARY_DIR}/modules.json"
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"

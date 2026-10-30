@@ -5,11 +5,16 @@
     uv run tools/wasm_maths.py check --write         # also write the native hashes to tests/wasm/maths/hashes.txt
     uv run tools/wasm_maths.py check --wasm-only     # compare the wasm side with hashes.txt (no Wine)
     uv run tools/wasm_maths.py check --embedded      # run maths.wasm under the game's engine, compare with hashes.txt
+    uv run tools/wasm_maths.py check --embedded --debug [--host DIR] [--prefix DIR]
 
 check runs native (Wine), maths.wasm under the wasmtime package, and maths.wasm under the game's own engine
 (wasmtime 50.0.0 on Pulley, NaN canonicalisation on, through lib/wasmloader and tests/wasm/host/host.c as
 wasmtime_host.dll and host.exe under Wine), and every case must agree across all three. The embedded runs need
 `uv run tools/wasm_host.py build` first. CI runs only --wasm-only, which needs no Wine.
+
+--debug runs the host that `uv run tools/wasm_host.py build --debug` writes to build/wasm_host_debug (--host DIR picks
+another) with RUST_BACKTRACE=1, so that a wasmtime panic prints a backtrace; --prefix DIR picks the Wine prefix, which
+tools/wasm_loop.py gives each of its parallel runs.
 
 tests/wasm/maths/maths.c walks the input range of each helper the module reaches (ScaledSin and ScaledCos,
 FixedSine, the float expressions of SetMeteorParams, the wind division and clamp, double to float, atof) and
@@ -157,12 +162,13 @@ def run_wasm() -> dict[str, tuple[int, str]]:
     return result
 
 
-def run_embedded() -> dict[str, tuple[int, str]]:
-    host = ROOT / "build/wasm_host"
+def run_embedded(host: Path, prefix: Path, debug: bool) -> dict[str, tuple[int, str]]:
     for name in ("host.exe", "wasmtime_host.dll"):
         if not (host / name).exists():
             sys.exit(f"{host / name} is missing: run `uv run tools/wasm_host.py build` first")
-    env = dict(os.environ, WINEDEBUG="-all", WINEARCH="win64", WINEPREFIX=str(host / "prefix"))
+    env = dict(os.environ, WINEDEBUG="-all", WINEARCH="win64", WINEPREFIX=str(prefix))
+    if debug:
+        env["RUST_BACKTRACE"] = "1"
     for var in ("DISPLAY", "WAYLAND_DISPLAY"):
         env.pop(var, None)
     proc = subprocess.run(["wine", str(host / "host.exe"), "--maths", str(OUT / "maths.wasm")], env=env, cwd=host,
@@ -206,7 +212,8 @@ def check(args: argparse.Namespace) -> int:
     if not args.embedded:
         others["wasm"] = run_wasm()
     if not args.wasm_only:
-        others["embedded"] = run_embedded()
+        host = args.host or ROOT / ("build/wasm_host_debug" if args.debug else "build/wasm_host")
+        others["embedded"] = run_embedded(host.resolve(), (args.prefix or host / "prefix").resolve(), args.debug)
     if args.write:
         HASHES.write_text("".join(f"{name} {count} {digest}\n" for name, (count, digest) in native.items()))
         print(f"wrote {HASHES}")
@@ -234,10 +241,15 @@ def main() -> int:
     chk.add_argument("--wasm-only", action="store_true", help="compare with tests/wasm/maths/hashes.txt, no Wine")
     chk.add_argument("--embedded", action="store_true",
                      help="run maths.wasm under the game's engine (Wine) and compare with hashes.txt")
+    chk.add_argument("--debug", action="store_true", help="with --embedded: the debug host, RUST_BACKTRACE=1")
+    chk.add_argument("--host", type=Path, help="with --embedded: the directory of host.exe and wasmtime_host.dll")
+    chk.add_argument("--prefix", type=Path, help="with --embedded: the Wine prefix (default: prefix in the host directory)")
     chk.add_argument("--write", action="store_true", help="write the native hashes to tests/wasm/maths/hashes.txt")
     args = parser.parse_args()
     if args.command == "check" and args.wasm_only and args.embedded:
         parser.error("--wasm-only and --embedded exclude each other")
+    if args.command == "check" and (args.debug or args.host or args.prefix) and not args.embedded:
+        parser.error("--debug, --host and --prefix need --embedded")
     if args.command == "build":
         return build(not args.wasm_only)
     code = -1 if args.embedded else check_in_wasmtime(sys.argv[1:])

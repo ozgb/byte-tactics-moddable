@@ -50,6 +50,8 @@ void __cdecl OnTrap(void* user, const char* module, const char* message)
     char text[700];
     unsigned budget;
     (void)user;
+    if (WindMeteorsFatalPending())
+        return;
     if (WindMeteorsOutOfFuel(&budget)) {
         sprintf(text, "%s ran out of fuel", module);
         WhereText(text);

@@ -5,6 +5,7 @@
     uv run tools/wasm_modules.py imports   # check every built module's imports and exports
     uv run tools/wasm_modules.py statics   # run wind_meteors for 2000 ticks and check its statics never change
     uv run tools/wasm_modules.py adapters  # run the loader's adapters and refusals over tests/wasm/adapters
+    uv run tools/wasm_modules.py fatal     # make an import end the game, and check the exit comes after the call
 
 Both fixtures use the fixed-base convention (#562): each imports env.memory and
 env.__indirect_function_table, is linked with its own --global-base and --table-base
@@ -968,6 +969,92 @@ def statics_run(path=None, report=None):
     return 0
 
 
+FATAL_ORDER = ["import FatalError", "call returned", "fatal exit 2"]
+
+
+def fatal_run(path=None):
+    """Run wind_meteors' LoadMeteorDefaults into bogus data: the FatalError import records the message and traps; returns the events in order."""
+    import wasmtime
+
+    pins = game_manifest()
+    entry = pins["modules"][0]
+    path = path or os.path.join(OUT, entry["name"] + ".wasm")
+    if not os.path.exists(path):
+        sys.exit(f"{path} is missing: build first: uv run tools/wasm_modules.py build")
+    base, scratch = pins["block_base"], pins["scratch"][0]
+    game_at, sim_at = base + STATICS_GAME_AT, base + STATICS_SIM_AT
+    store = wasmtime.Store()
+    memory = wasmtime.Memory(store, wasmtime.MemoryType(wasmtime.Limits(pins["memory_pages"], pins["memory_pages"])))
+    table = wasmtime.Table(store, wasmtime.TableType(wasmtime.ValType.funcref(),
+                                                      wasmtime.Limits(pins["table_size"], pins["table_size"])), None)
+    events = []
+    recorded = []
+
+    def fatal_error(address):
+        end = address
+        while memory.read(store, end, end + 1)[0] != 0:
+            end += 1
+        recorded.append(bytes(memory.read(store, address, end)).decode("latin-1"))
+        events.append("import FatalError")
+        raise RuntimeError("the import ends the game")
+
+    def build_data_path(buf, _dir, _name, _ext):
+        return buf
+
+    stubs = {("services", "FatalError"): fatal_error, ("services", "BuildDataPath"): build_data_path,
+             ("services", "TdfFile_LoadFile"): lambda _file, _path: 1,
+             ("services", "TdfFile_SelectRecord"): lambda _file, _name: 1,
+             ("services", "TdfRecord_GetFieldString"): lambda _record, _dst, _key, _size, _def: 1,
+             ("services", "TdfRecord_GetFieldInt"): lambda _record, _key, _def: 0,
+             ("services", "TdfRecord_GetFieldDouble"): lambda _record, _key, _def: 0.0}
+
+    def after(name, results):
+        def stub(*_args):
+            events.append(f"import {name}")
+            return 0 if results else None
+        return stub
+
+    module = wasmtime.Module.from_file(store.engine, path)
+    linker = wasmtime.Linker(store.engine)
+    linker.define(store, "env", "memory", memory)
+    linker.define(store, "env", "__indirect_function_table", table)
+    for imp in module.imports:
+        if isinstance(imp.type, wasmtime.FuncType):
+            key = (imp.module, imp.name)
+            linker.define(store, imp.module, imp.name, wasmtime.Func(store, imp.type, stubs.get(key, after(imp.name, imp.type.results))))
+    exports = linker.instantiate(store, module).exports(store)
+
+    def put(address, value):
+        memory.write(store, value.to_bytes(4, "little"), address)
+
+    put(exports["g_game"].value(store), game_at)
+    put(exports["g_simGlobals"].value(store), sim_at)
+    memory.write(store, b"tdf\0", exports["g_extTdf"].value(store))
+    put(exports["g_blockBase"].value(store), base)
+    exports["__fuel_set"](store, entry["fuel_budget"])
+    try:
+        exports["LoadMeteorDefaults"](store, scratch)
+        events.append("call completed")
+    except (wasmtime.Trap, wasmtime.WasmtimeError, RuntimeError):
+        events.append("call returned")
+    if recorded:
+        events.append("fatal exit 2")
+    return events, recorded
+
+
+def run_fatal():
+    events, recorded = fatal_run()
+    expected = [event for event in events if event in FATAL_ORDER]
+    if expected != FATAL_ORDER or events[-1] != FATAL_ORDER[-1] or events[events.index("call returned") - 1] != FATAL_ORDER[0]:
+        print(f"FAIL: expected {FATAL_ORDER} with nothing between the import and the trap, got {events}")
+        return 1
+    if recorded != ["Hey, hoser!  The default meteor shower data was bogus!"]:
+        print(f"FAIL: the message was {recorded}")
+        return 1
+    print(f"fatal: {' -> '.join(events)}; message {recorded[0]!r}, ok")
+    return 0
+
+
 def run_under_wasmtime(command):
     try:
         import wasmtime
@@ -978,6 +1065,8 @@ def run_under_wasmtime(command):
         env = dict(os.environ, **{GUARD: "1"})
         cmd = ["uv", "run", "--no-project", "--with", f"wasmtime=={pin}", "python", "-I", os.path.abspath(__file__), command]
         return subprocess.run(cmd, env=env).returncode
+    if command == "fatal":
+        return run_fatal()
     return statics_run() if command == "statics" else run_adapters()
 
 
@@ -1004,7 +1093,7 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "check", "imports", "statics", "adapters"])
+    parser.add_argument("command", choices=["build", "check", "imports", "statics", "adapters", "fatal"])
     args = parser.parse_args()
     if args.command == "build":
         build()
@@ -1015,6 +1104,8 @@ def main():
         return run_under_wasmtime("statics")
     if args.command == "adapters":
         return run_under_wasmtime("adapters")
+    if args.command == "fatal":
+        return run_under_wasmtime("fatal")
     return check()
 
 

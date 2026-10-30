@@ -72,6 +72,7 @@ extern void* g_gfxBlitLockEvent;
 #include "../gui/keyboard.h"
 #include "../gui/mouse.h"
 #include "palette.h"
+#include "../wasm/modules.h"
 int __stdcall LockScreen(Surface *s);
 void __cdecl BlitSurface(Surface *dst, void *src, int x, int y);
 int __stdcall UnlockScreen(Surface *s);
@@ -504,6 +505,8 @@ void __stdcall QuitApp(char* message)
 // FUNCTION: 0x4b6290
 void __stdcall FatalError(char* message)
 {
+    if (WindMeteorsDeferFatal(message))
+        return;
     host_fatal(g_display->hwnd, g_display->title, message);
 }
 

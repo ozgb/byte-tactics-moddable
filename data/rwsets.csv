@@ -43685,6 +43685,8 @@ address,function,file,kind,target
 ,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,function,
 ,Call,src/wasm/wind_meteors_glue.cpp,call,FuelBegin
 ,Call,src/wasm/wind_meteors_glue.cpp,call,Prepare
+,Call,src/wasm/wind_meteors_glue.cpp,call,Stop
+,Call,src/wasm/wind_meteors_glue.cpp,call,host_thread_id
 ,Call,src/wasm/wind_meteors_glue.cpp,call,host_time_counter
 ,Call,src/wasm/wind_meteors_glue.cpp,call,wl_call
 ,Call,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i64
@@ -43695,6 +43697,7 @@ address,function,file,kind,target
 ,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_module
 ,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_slotCalls
 ,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_slotDepth
+,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_slotOwner
 ,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_slotTime
 ,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_slots
 ,Call,src/wasm/wind_meteors_glue.cpp,global_read,s_timing
@@ -43704,6 +43707,7 @@ address,function,file,kind,target
 ,Call,src/wasm/wind_meteors_glue.cpp,global_write,s_handleCount
 ,Call,src/wasm/wind_meteors_glue.cpp,global_write,s_slotCalls
 ,Call,src/wasm/wind_meteors_glue.cpp,global_write,s_slotDepth
+,Call,src/wasm/wind_meteors_glue.cpp,global_write,s_slotOwner
 ,Call,src/wasm/wind_meteors_glue.cpp,global_write,s_slotTime
 ,Call,src/wasm/wind_meteors_glue.cpp,global_write,s_warmCalls
 ,Call,src/wasm/wind_meteors_glue.cpp,global_write,s_warmTime
@@ -44557,10 +44561,10 @@ address,function,file,kind,target
 ,Fatal,src/state/block.cpp,function,
 ,Fatal,src/state/block.cpp,global_maybe_written,_iob
 ,Fatal,src/state/block.cpp,global_read,kSimBlockBytes
-,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,call,FatalError
 ,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,call,Linear
+,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,call,ModulesFatal
 ,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,function,
 ,FeatureVec3,src/map/features.cpp,field_write,Vec3::x
@@ -45643,6 +45647,15 @@ address,function,file,kind,target
 ,Guard::~Guard,src/state/block.cpp,function,
 ,Guard::~Guard,src/state/block.cpp,global_read,g_lock
 ,Guard::~Guard,src/state/block.cpp,global_write,g_insideThread
+,GuardedImport,src/wasm/wind_meteors_glue.cpp,call,RunImport
+,GuardedImport,src/wasm/wind_meteors_glue.cpp,call,host_time_counter
+,GuardedImport,src/wasm/wind_meteors_glue.cpp,function,
+,GuardedImport,src/wasm/wind_meteors_glue.cpp,global_escape,kImports
+,GuardedImport,src/wasm/wind_meteors_glue.cpp,global_read,s_importCalls
+,GuardedImport,src/wasm/wind_meteors_glue.cpp,global_read,s_importTime
+,GuardedImport,src/wasm/wind_meteors_glue.cpp,global_read,s_timing
+,GuardedImport,src/wasm/wind_meteors_glue.cpp,global_write,s_importCalls
+,GuardedImport,src/wasm/wind_meteors_glue.cpp,global_write,s_importTime
 ,HAPI_AddArchive,src/files/files_api.h,field_read,FilesSeam::AddArchive
 ,HAPI_AddArchive,src/files/files_api.h,field_read,Seams::files
 ,HAPI_AddArchive,src/files/files_api.h,function,
@@ -49604,6 +49617,13 @@ address,function,file,kind,target
 ,Rows,src/util/tdf.cpp,deref_read,*std::vector<TdfField>
 ,Rows,src/util/tdf.cpp,field_escape,TdfEntries::v
 ,Rows,src/util/tdf.cpp,function,
+,RunImport,src/wasm/wind_meteors_glue.cpp,call,ModulesFatal
+,RunImport,src/wasm/wind_meteors_glue.cpp,call,_exception_code
+,RunImport,src/wasm/wind_meteors_glue.cpp,call,sprintf
+,RunImport,src/wasm/wind_meteors_glue.cpp,field_read,ImportDef::function
+,RunImport,src/wasm/wind_meteors_glue.cpp,field_read,ImportDef::name
+,RunImport,src/wasm/wind_meteors_glue.cpp,function,
+,RunImport,src/wasm/wind_meteors_glue.cpp,indirect_call,"indirect via const char *(*const)(void *, wasmtime_val_raw_t *) __attribute__((cdecl)) [ImportDef::function]"
 ,RunScriptedConsole,src/harness/harness.cpp,call,ConsoleWordAllowed
 ,RunScriptedConsole,src/harness/harness.cpp,call,ConsoleWordIsUnitType
 ,RunScriptedConsole,src/harness/harness.cpp,call,ExecuteCommandLine
@@ -50588,16 +50608,6 @@ address,function,file,kind,target
 ,TickProgressBar,src/gui/gui.cpp,field_write,<anon>::next
 ,TickProgressBar,src/gui/gui.cpp,field_write,<anon>::value
 ,TickProgressBar,src/gui/gui.cpp,function,
-,TimedImport,src/wasm/wind_meteors_glue.cpp,call,host_time_counter
-,TimedImport,src/wasm/wind_meteors_glue.cpp,field_read,ImportDef::function
-,TimedImport,src/wasm/wind_meteors_glue.cpp,function,
-,TimedImport,src/wasm/wind_meteors_glue.cpp,global_escape,kImports
-,TimedImport,src/wasm/wind_meteors_glue.cpp,global_read,kImports
-,TimedImport,src/wasm/wind_meteors_glue.cpp,global_read,s_importCalls
-,TimedImport,src/wasm/wind_meteors_glue.cpp,global_read,s_importTime
-,TimedImport,src/wasm/wind_meteors_glue.cpp,global_write,s_importCalls
-,TimedImport,src/wasm/wind_meteors_glue.cpp,global_write,s_importTime
-,TimedImport,src/wasm/wind_meteors_glue.cpp,indirect_call,"indirect via const char *(*const)(void *, wasmtime_val_raw_t *) __attribute__((cdecl)) [ImportDef::function]"
 ,TimedNativeUpdateMeteors,src/wasm/wind_meteors_glue.cpp,call,host_time_counter
 ,TimedNativeUpdateMeteors,src/wasm/wind_meteors_glue.cpp,field_read,WindMeteorsSeam::UpdateMeteors
 ,TimedNativeUpdateMeteors,src/wasm/wind_meteors_glue.cpp,function,
@@ -51774,11 +51784,10 @@ address,function,file,kind,target
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,global_read,s_fuelOpen
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,global_write,s_fuelOpen
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,call,wl_define_import
-,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,field_read,ImportDef::function
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,field_read,ImportDef::module
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,field_read,ImportDef::name
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,field_read,ImportDef::signature
-,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,fn_ref,TimedImport
+,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,fn_ref,GuardedImport
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,global_read,kImports
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,global_write,s_loader

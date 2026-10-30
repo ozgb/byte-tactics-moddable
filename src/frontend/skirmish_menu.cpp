@@ -565,7 +565,6 @@ void __cdecl CycleCurrentPlayerSide()
 void __stdcall PlaySoundByName(const char* name, int broadcast);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
-void __stdcall SetControlTextByName(Gui* menu, char* name, char* value);
 #include "../gui/dialogs.h"
 #include "../util/registry.h"
 
@@ -646,7 +645,7 @@ void OpenSkirmishMapSelector()
 
     for (int i = 0; i < n; i++) {
         if (strcmp(g_game->options->mapName, SkipTextLines(data->items, i)) == 0) {
-            SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "MAPNAMES", i);
+            SetListBoxScrollByName(&g_game->gui, "MAPNAMES", i);
             break;
         }
     }

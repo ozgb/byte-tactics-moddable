@@ -109,7 +109,6 @@ extern int __stdcall GetGafSequenceFrame(GafSequenceRef* ref);
 extern void __stdcall AdvanceGafSequence(GafSequenceRef* ref, int step);
 extern void __stdcall PopMouseEvent(MouseEvent* out);
 
-extern void __stdcall DrawTextInput(Gui* control, int index);
 extern int __stdcall GetTextPixelWidth(unsigned char* text);
 #include "../graphics/display.h"
 

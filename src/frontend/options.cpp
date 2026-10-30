@@ -397,7 +397,6 @@ void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 char* __stdcall FindGadgetChecked_C(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
 void __stdcall SetTranslatedTextByName(Gui* obj, char* name, char* text, int param_4);
-void __stdcall SetGrayedOut(Gui* menu, int index, int value);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
@@ -427,7 +426,6 @@ Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
 
 void __stdcall SetGrayedOutByName(void* obj, char* name, int value);
 void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
-void __stdcall SetGrayedOut(Gui* sub, int index, int value);
 int __stdcall GetGadgetText(void* settings, const char* key, char* out);
 
 void __stdcall SetKeyboardInput(void* obj, int value);

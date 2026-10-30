@@ -39,6 +39,7 @@ struct ConfigureListBoxByNameRoot {
 extern ConfigureListBoxByNameRoot* g_guiContext;
 
 #include "../graphics/rect.h"
+#include "../util/point.h"
 #include "../state/sim_globals.h"
 #include "../files/files_api.h"
 #include "gadget.h"
@@ -456,27 +457,10 @@ struct Pad_p2_0 { int field; };
 
 int __cdecl CountHumanSlots();
 
-struct GadgetAccessHolder {
-    GadgetAccessHolder* unknown_0;
-    Gadget* entries;
-};
-
-struct GadgetAccessDialog {
-    int group;
-    char unknown_04[0x18 - 0x04];
-    GadgetAccessHolder* holder;
-    char unknown_1c[0x64 - 0x1c];
-    int current;
-    char unknown_68[0x74 - 0x68];
-    int length;
-    char unknown_78[0xcca - 0x78];
-    int changed;
-};
 
 #pragma pack(pop)
 
-void __stdcall SetGadgetActive(GadgetAccessDialog* menu, int index, int value);
-void __stdcall ClearPeerStatus(GadgetAccessDialog* obj, int index);
+void __stdcall SetGadgetActive(Gui* menu, int index, int value);
 void __stdcall DrawLitRectangle(int surface, Rect* rect, int level);
 
 
@@ -490,25 +474,25 @@ static inline int FindGadgetAccessEntry(Gadget* entries, char* name)
     return -1;
 }
 
-static inline Gadget* GetEntry(GadgetAccessDialog* obj, int index)
+static inline Gadget* GetEntry(Gui* obj, int index)
 {
-    return obj->holder->entries + index;
+    return obj->layer->entries + index;
 }
 
-static inline Gadget* GetEntries(GadgetAccessDialog* obj)
+static inline Gadget* GetEntries(Gui* obj)
 {
-    return obj->holder->entries;
+    return obj->layer->entries;
 }
 
-static inline char* GetData(GadgetAccessDialog* obj)
+static inline char* GetData(Gui* obj)
 {
-    return (char*)obj->holder->entries;
+    return (char*)obj->layer->entries;
 }
 
 // FUNCTION: 0x4a04f0
-char __stdcall GetGadgetActiveByName(GadgetAccessDialog* obj, char* name)
+char __stdcall GetGadgetActiveByName(Gui* obj, char* name)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindGadgetAccessEntry(entries, name);
     if (i == -1) {
         return -1;
@@ -517,17 +501,17 @@ char __stdcall GetGadgetActiveByName(GadgetAccessDialog* obj, char* name)
 }
 
 // FUNCTION: 0x4a0570
-void __stdcall SetGadgetActiveByName(GadgetAccessDialog* obj, char* name, int param_3)
+void __stdcall SetGadgetActiveByName(Gui* obj, char* name, int param_3)
 {
-    if (obj->holder) {
-        int index = FindGadgetAccessEntry(obj->holder->entries, name);
+    if (obj->layer) {
+        int index = FindGadgetAccessEntry(obj->layer->entries, name);
         if (index != -1)
             SetGadgetActive(obj, index, param_3);
     }
 }
 
 // FUNCTION: 0x4a05e0
-void __stdcall AssignQuickKey(GadgetAccessDialog* obj, int index)
+void __stdcall AssignQuickKey(Gui* obj, int index)
 {
     Gadget* entries;
     Gadget* scan;
@@ -540,7 +524,7 @@ void __stdcall AssignQuickKey(GadgetAccessDialog* obj, int index)
     if (index == -1)
         return;
 
-    entries = obj->holder->entries;
+    entries = obj->layer->entries;
     entry = entries + index;
     if (entry->type == 1) {
         if ((entry->attribs & 0x10000) != 0)
@@ -597,10 +581,10 @@ void __stdcall AssignQuickKey(GadgetAccessDialog* obj, int index)
 }
 
 // FUNCTION: 0x4a07d0
-void __stdcall SetGadgetTextByName(GadgetAccessDialog* obj, char* name, char* text)
+void __stdcall SetGadgetTextByName(Gui* obj, char* name, char* text)
 {
-    if (obj->holder) {
-        Gadget* entries = obj->holder->entries;
+    if (obj->layer) {
+        Gadget* entries = obj->layer->entries;
         int index = FindGadgetAccessEntry(entries, name);
         if (index != -1) {
             strncpy(entries[index].u.text, text, 0x80);
@@ -620,7 +604,7 @@ void __stdcall SetGadgetText(Gui* obj, int index, char* text)
 }
 
 // FUNCTION: 0x4a08f0
-void __stdcall TranslateGadgetItems(GadgetAccessDialog* obj, int index)
+void __stdcall TranslateGadgetItems(Gui* obj, int index)
 {
     Gadget* entry = GetEntry(obj, index);
     char temp[0x80];
@@ -637,11 +621,11 @@ void __stdcall TranslateGadgetItems(GadgetAccessDialog* obj, int index)
 }
 
 // FUNCTION: 0x4a09c0
-void __stdcall SetTranslatedText(GadgetAccessDialog* context, int index, char* source, int value)
+void __stdcall SetTranslatedText(Gui* context, int index, char* source, int value)
 {
-    if (index == -1 || context->holder == 0)
+    if (index == -1 || context->layer == 0)
         return;
-    Gadget* entries = context->holder->entries;
+    Gadget* entries = context->layer->entries;
     char* text = Translate(source);
 
     switch (entries[index].type) {
@@ -652,9 +636,9 @@ void __stdcall SetTranslatedText(GadgetAccessDialog* context, int index, char* s
         break;
     case 3:
         if (text != 0) {
-            strcpy(context->holder->entries[index].u.text, text);
-            if (context->current == index)
-                context->length = strlen(text);
+            strcpy(context->layer->entries[index].u.text, text);
+            if (context->focus == index)
+                context->cursor = strlen(text);
         }
         if (value != 0)
             entries[index].status = (short)value;
@@ -669,7 +653,7 @@ void __stdcall SetTranslatedText(GadgetAccessDialog* context, int index, char* s
                     *p = 0;
                 p++;
             }
-            Gadget* entry = &context->holder->entries[index];
+            Gadget* entry = &context->layer->entries[index];
             char temp[0x80];
             char* dst = temp;
             char* src = entry->u.text;
@@ -688,10 +672,10 @@ void __stdcall SetTranslatedText(GadgetAccessDialog* context, int index, char* s
 }
 
 // FUNCTION: 0x4a0bf0
-void __stdcall SetTranslatedTextByName(GadgetAccessDialog* obj, char* name, char* param_3, int param_4)
+void __stdcall SetTranslatedTextByName(Gui* obj, char* name, char* param_3, int param_4)
 {
-    if (obj->holder != 0) {
-        int index = FindGadgetAccessEntry(obj->holder->entries, name);
+    if (obj->layer != 0) {
+        int index = FindGadgetAccessEntry(obj->layer->entries, name);
         if (index != -1) {
             SetTranslatedText(obj, index, param_3, param_4);
         }
@@ -699,10 +683,10 @@ void __stdcall SetTranslatedTextByName(GadgetAccessDialog* obj, char* name, char
 }
 
 // FUNCTION: 0x4a0c70
-void __stdcall SetGadgetColorByName(GadgetAccessDialog* obj, char* name, int value)
+void __stdcall SetGadgetColorByName(Gui* obj, char* name, int value)
 {
-    if (obj->holder) {
-        Gadget* entries = obj->holder->entries;
+    if (obj->layer) {
+        Gadget* entries = obj->layer->entries;
         int index = FindGadgetAccessEntry(entries, name);
         if (index != -1) {
             entries[index].colours = value;
@@ -712,13 +696,13 @@ void __stdcall SetGadgetColorByName(GadgetAccessDialog* obj, char* name, int val
 }
 
 // FUNCTION: 0x4a0d00
-char* __stdcall GetGadgetText(GadgetAccessDialog* obj, char* name, char* buf)
+char* __stdcall GetGadgetText(Gui* obj, char* name, char* buf)
 {
     char* desc = 0;
-    if (obj->holder == 0) {
+    if (obj->layer == 0) {
         FatalError("Internal error");
     }
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int index = FindGadgetAccessEntry(entries, name);
     if (index != -1) {
         switch (entries[index].type) {
@@ -736,19 +720,19 @@ char* __stdcall GetGadgetText(GadgetAccessDialog* obj, char* name, char* buf)
 }
 
 // FUNCTION: 0x4a0e00
-void __stdcall SetControlTextByName(GadgetAccessDialog* obj, char* name, char* text)
+void __stdcall SetControlTextByName(Gui* obj, char* name, char* text)
 {
-    Gadget* entries = obj->holder->unknown_0->entries;
-    if (obj->holder->unknown_0 == 0)
+    Gadget* entries = obj->layer->next->entries;
+    if (obj->layer->next == 0)
         return;
     int index = FindGadgetAccessEntry(entries, name);
     if (index == -1)
         return;
     switch (entries[index].type) {
     case 3:
-        strcpy(obj->holder->entries[index].u.text, text);
-        if (obj->current == index)
-            obj->length = strlen(text);
+        strcpy(obj->layer->entries[index].u.text, text);
+        if (obj->focus == index)
+            obj->cursor = strlen(text);
         break;
     case 1:
         strncpy(entries[index].u.text, text, 0x80);
@@ -761,15 +745,15 @@ void __stdcall SetControlTextByName(GadgetAccessDialog* obj, char* name, char* t
 }
 
 // FUNCTION: 0x4a0f30
-int __stdcall GetGadgetStatus(GadgetAccessDialog* obj, int index)
+int __stdcall GetGadgetStatus(Gui* obj, int index)
 {
     return GetEntries(obj)[index].status;
 }
 
 // FUNCTION: 0x4a0f60
-int __stdcall GetButtonStageByName(GadgetAccessDialog* obj, char* name)
+int __stdcall GetButtonStageByName(Gui* obj, char* name)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindGadgetAccessEntry(entries, name);
     if (i != -1 && entries[i].type == 1) {
         return entries[i].stageIndex;
@@ -778,9 +762,9 @@ int __stdcall GetButtonStageByName(GadgetAccessDialog* obj, char* name)
 }
 
 // FUNCTION: 0x4a0ff0
-int __stdcall GetButtonStage(GadgetAccessDialog* obj, int index)
+int __stdcall GetButtonStage(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     if (entries[index].type == 1) {
         return entries[index].stageIndex;
     }
@@ -788,9 +772,9 @@ int __stdcall GetButtonStage(GadgetAccessDialog* obj, int index)
 }
 
 // FUNCTION: 0x4a1030
-int __stdcall SetButtonStage(GadgetAccessDialog* obj, int index, char value)
+int __stdcall SetButtonStage(Gui* obj, int index, char value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     if (entries[index].type == 1) {
         entries[index].stageIndex = value;
         return 1;
@@ -799,9 +783,9 @@ int __stdcall SetButtonStage(GadgetAccessDialog* obj, int index, char value)
 }
 
 // FUNCTION: 0x4a1080
-int __stdcall SetButtonStageByName(GadgetAccessDialog* obj, char* name, char value)
+int __stdcall SetButtonStageByName(Gui* obj, char* name, char value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindGadgetAccessEntry(entries, name);
     if (i != -1) {
         entries[i].stageIndex = value;
@@ -811,9 +795,9 @@ int __stdcall SetButtonStageByName(GadgetAccessDialog* obj, char* name, char val
 }
 
 // FUNCTION: 0x4a1110
-int __stdcall SetGadgetStatusByName(GadgetAccessDialog* obj, char* name, int value)
+int __stdcall SetGadgetStatusByName(Gui* obj, char* name, int value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindGadgetAccessEntry(entries, name);
     if (i != -1) {
         entries[i].status = value;
@@ -828,23 +812,23 @@ int __stdcall SetGadgetStatusByName(GadgetAccessDialog* obj, char* name, int val
 
 
 // FUNCTION: 0x4a11c0
-void __stdcall SetGadgetStatus(GadgetAccessDialog* param_1, int param_2, short param_3)
+void __stdcall SetGadgetStatus(Gui* param_1, int param_2, short param_3)
 {
     *(short*)(GetData(param_1) + param_2 * 347 + 0x138) = param_3;
     ClearPeerStatus(param_1, param_2);
 }
 
 // FUNCTION: 0x4a1200
-void __stdcall SetGrayedOut(GadgetAccessDialog* obj, int index, int value)
+void __stdcall SetGrayedOut(Gui* obj, int index, int value)
 {
     GetEntries(obj)[index].flag_bit = value;
     obj->changed = 1;
 }
 
 // FUNCTION: 0x4a1250
-void __stdcall SetGrayedOutByName(GadgetAccessDialog* obj, char* name, int value)
+void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindGadgetAccessEntry(entries, name);
     if (i != -1) {
         entries[i].flag_bit = value;
@@ -852,9 +836,9 @@ void __stdcall SetGrayedOutByName(GadgetAccessDialog* obj, char* name, int value
 }
 
 // FUNCTION: 0x4a12e0
-void __stdcall SetGadgetGrayedOut(GadgetAccessDialog* obj, int index, int value)
+void __stdcall SetGadgetGrayedOut(Gui* obj, int index, int value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     if (index == -1) {
         return;
     }
@@ -892,26 +876,26 @@ void __stdcall SetGadgetGrayedOut(GadgetAccessDialog* obj, int index, int value)
 }
 
 // FUNCTION: 0x4a1450
-void __stdcall SetGadgetGrayedOutByName(GadgetAccessDialog* obj, char* name, int param_3)
+void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3)
 {
-    int index = FindGadgetAccessEntry(obj->holder->entries, name);
+    int index = FindGadgetAccessEntry(obj->layer->entries, name);
     if (index != -1)
         SetGadgetGrayedOut(obj, index, param_3);
 }
 
 // FUNCTION: 0x4a14c0
-void __stdcall SetGadgetGrayedOutByNameTwin(GadgetAccessDialog* obj, char* name, int param_3)
+void __stdcall SetGadgetGrayedOutByNameTwin(Gui* obj, char* name, int param_3)
 {
-    int index = FindGadgetAccessEntry(obj->holder->entries, name);
+    int index = FindGadgetAccessEntry(obj->layer->entries, name);
     if (index != -1)
         SetGadgetGrayedOut(obj, index, param_3);
 }
 
 // FUNCTION: 0x4a1530
-void __stdcall SetQuickKeyByName(GadgetAccessDialog* obj, char* name, char value)
+void __stdcall SetQuickKeyByName(Gui* obj, char* name, char value)
 {
-    int i = FindGadgetAccessEntry(obj->holder->entries, name);
-    obj->holder->entries[i].quickKey = value;
+    int i = FindGadgetAccessEntry(obj->layer->entries, name);
+    obj->layer->entries[i].quickKey = value;
     obj->changed = 1;
 }
 
@@ -959,9 +943,9 @@ void __stdcall GetGadgetScreenRect(char* param_1, int param_2, Rect* param_3)
 }
 
 // FUNCTION: 0x4a16f0
-void __stdcall DrawGadgetSelectionBox(GadgetAccessDialog* obj, int index, int param_3)
+void __stdcall DrawGadgetSelectionBox(Gui* obj, int index, int param_3)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i;
     Rect rect;
     int level;
@@ -999,7 +983,7 @@ void __stdcall DrawGadgetSelectionBox(GadgetAccessDialog* obj, int index, int pa
             rect.top--;
             rect.right++;
             rect.bottom++;
-            DrawLitRectangle((int)obj->holder->entries->u.assets.surface, &rect, level);
+            DrawLitRectangle((int)obj->layer->entries->u.assets.surface, &rect, level);
             level += -3 - step;
         }
     }
@@ -1111,23 +1095,11 @@ int __stdcall FindAssocTextInput(Gadget* entries, int index)
     return 0;
 }
 
-struct RedrawGadgetRectSurface;
-
-struct RedrawGadgetRectHolder {
-    char unknown_0[4];
-    Gadget* entries;
-};
-
-struct RedrawGadgetRectDialog {
-    char unknown_0[0x18];
-    RedrawGadgetRectHolder* holder;
-};
-
 
 // FUNCTION: 0x4a1ab0
-void __stdcall RedrawGadgetRect(RedrawGadgetRectDialog* obj, int index)
+void __stdcall RedrawGadgetRect(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     Rect rect;
     if (e->type == 0) {
@@ -1139,46 +1111,14 @@ void __stdcall RedrawGadgetRect(RedrawGadgetRectDialog* obj, int index)
     }
     rect.right = e->width + rect.left - 1;
     rect.bottom = e->height + rect.top - 1;
-    GrayRectangle((Surface *)(RedrawGadgetRectSurface*)entries->u.assets.surface, &rect);
-    FadeRectangle((Surface *)(RedrawGadgetRectSurface*)entries->u.assets.surface, &rect, -0x14);
+    GrayRectangle((Surface *)entries->u.assets.surface, &rect);
+    FadeRectangle((Surface *)entries->u.assets.surface, &rect, -0x14);
 }
 
 #pragma pack(push, 1)
 
 
-struct DrawListBoxHolder {
-    char unknown_00[4];
-    Gadget* entries;
-    char unknown_08[0x10 - 0x08];
-    int flags;
-    int dirty;
-    char unknown_18[0x20 - 0x18];
-    int current;
-    void* surface;
-};
-
-struct DrawListBoxDialog {
-    char unknown_00[0x18];
-    DrawListBoxHolder* holder;
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char colour[0x8be - 0x8b2];
-    unsigned char colour_8be;
-    char unknown_8bf[0xcd2 - 0x8bf];
-    void* fallback;
-};
-
 #include "../graphics/gaf_frame.h"
-
-struct DrawListBoxLanguage {
-    char unknown_0[0xc];
-    unsigned short* glyphs;
-};
-
-struct DrawListBoxLanguageRoot {
-    int current;
-    char unknown_04[0x14 - 0x04];
-    DrawListBoxLanguage* language;
-};
 
 struct DrawListBoxPoint { int x; int y; };
 struct DrawListBoxQuad { DrawListBoxPoint points[4]; };
@@ -1194,7 +1134,7 @@ struct DrawListBoxItem {
 #include "../graphics/surface.h"
 
 
-void __stdcall DrawListboxFrame(DrawListBoxDialog* obj, int index, void* bmp);
+void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 #include "../util/registry.h"
 #include "gui.h"
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw,
@@ -1237,7 +1177,7 @@ extern int Pad_a1b40_e3;
 
 
 // FUNCTION: 0x4a1b40
-void __stdcall DrawListBox(DrawListBoxDialog* obj, int index)
+void __stdcall DrawListBox(Gui* obj, int index)
 {
     unsigned char font;
     int yoff;
@@ -1245,11 +1185,11 @@ void __stdcall DrawListBox(DrawListBoxDialog* obj, int index)
     Rect bounds;
     int xw;
     int flag = 0;
-    if (0 != obj->holder)
-        obj->holder->dirty = 1;
-    DrawListBoxHolder* holder = obj->holder;
+    if (0 != obj->layer)
+        obj->layer->dirty = 1;
+    Layer* holder = obj->layer;
     Gadget* entries;
-    entries = obj->holder->entries;
+    entries = obj->layer->entries;
     Gadget* me = &entries[index];
     int h = me->height;
     void* surface;
@@ -1295,7 +1235,7 @@ void __stdcall DrawListBox(DrawListBoxDialog* obj, int index)
             rowRect.top = bounds.top + yoff + 2;
             rowRect.bottom = rowRect.top + step;
             int w = MeasureDrawListBoxText(q);
-            int col = obj->colour[me->colours];
+            int col = obj->colours[me->colours];
             if (me->u.list.filebuf == 0 || ((char*)me->u.list.filebuf)[y] != 1) {
                 if (*q == '&') {
                     if (q[1] == 'G')
@@ -1331,7 +1271,7 @@ void __stdcall DrawListBox(DrawListBoxDialog* obj, int index)
                 FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, -0x15);
                 FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, -0x16);
             } else if (!(me->attribs & 0x100) && me->u.list.selected == line + me->u.list.firstRow && me->u.list.rowCount) {
-                if (obj->holder->current == index)
+                if (obj->layer->current == index)
                     FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, 0x1e);
                 else
                     FadeRectangle((Surface *)entries->u.assets.surface, &rowRect, 0x1e);
@@ -1404,10 +1344,10 @@ void __stdcall DrawListBox(DrawListBoxDialog* obj, int index)
                 if (1 & v) {
                     FadeRectangle((Surface *)surf, &cellRect, -0x14);
                 } else if ((2 & v) != 0) {
-                    DrawLine(surf, cellRect.left + 1, cellRect.bottom - 1, cellRect.right - 2, 1 + cellRect.top, obj->colour_8be);
-                    DrawLine(surf, 2 + cellRect.left, cellRect.bottom - 1, cellRect.right - 1, cellRect.top + 1, obj->colour_8be);
-                    DrawLine(surf, 1 + cellRect.left, cellRect.top + 2, cellRect.right - 1, cellRect.bottom - 2, obj->colour_8be);
-                    DrawLine(surf, cellRect.left + 2, cellRect.top + 2, cellRect.right - 2, cellRect.bottom - 2, obj->colour_8be);
+                    DrawLine(surf, cellRect.left + 1, cellRect.bottom - 1, cellRect.right - 2, 1 + cellRect.top, obj->colours[0xc]);
+                    DrawLine(surf, 2 + cellRect.left, cellRect.bottom - 1, cellRect.right - 1, cellRect.top + 1, obj->colours[0xc]);
+                    DrawLine(surf, 1 + cellRect.left, cellRect.top + 2, cellRect.right - 1, cellRect.bottom - 2, obj->colours[0xc]);
+                    DrawLine(surf, cellRect.left + 2, cellRect.top + 2, cellRect.right - 2, cellRect.bottom - 2, obj->colours[0xc]);
                 }
             }
             if (!(me->attribs & 0x100) && me->u.list.selected == k) {
@@ -1468,9 +1408,9 @@ extern int Pad_a2480_e4;
 struct FixedPosView;
 
 // FUNCTION: 0x4a2480
-void __stdcall DrawGafBar(GadgetAccessDialog* param_1, int index)
+void __stdcall DrawGafBar(Gui* param_1, int index)
 {
-    Gadget* base = param_1->holder->entries;
+    Gadget* base = param_1->layer->entries;
     void* surface = base->u.assets.surface;
     Gadget* e = &base[index];
     GafEntry* glyphs = e->inputGaf;
@@ -1514,17 +1454,6 @@ struct DrawSliderBarObject {
     unsigned char field_8c3;
     char unknown_8c4[0x8c6 - 0x8c4];
     unsigned char field_8c6;
-};
-
-struct DrawSliderBarFont {
-    char unknown_0[0xc];
-    void* glyphs;
-};
-
-struct DrawSliderBarDialog {
-    int group;
-    char unknown_04[0x14 - 0x04];
-    DrawSliderBarFont* font;
 };
 
 void __stdcall DrawRaisedBox(void* surface, int* r, int a, int b, int c);
@@ -1697,25 +1626,12 @@ void __stdcall DrawSliderBar(DrawSliderBarObject* obj, int index)
 int WriteScreenshot(int, int, int, int, int, int);
 #pragma pack(pop)
 
-struct SyncAssocGadgetsHolder {
-    int current;
-    Gadget* entries;
-    char unknown_08[0x14 - 0x08];
-    void* list;
-};
-
-struct SyncAssocGadgetsDialog {
-    char unknown_0[0x18];
-    SyncAssocGadgetsHolder* holder;
-};
-
-void __stdcall DrawSliderBar(SyncAssocGadgetsDialog* param_1, int param_2);
-void __stdcall DrawTextInput(SyncAssocGadgetsDialog* param_1, int param_2);
+void __stdcall DrawSliderBar(Gui* param_1, int param_2);
 
 // FUNCTION: 0x4a2be0
-void __stdcall SyncAssocGadgets(SyncAssocGadgetsDialog* param_1, int param_2)
+void __stdcall SyncAssocGadgets(Gui* param_1, int param_2)
 {
-    Gadget* entries = param_1->holder->entries;
+    Gadget* entries = param_1->layer->entries;
     int i = 1;
     char* me = (char*)entries + param_2 * 0x15b;
     int type = *(unsigned char*)me;
@@ -1729,7 +1645,7 @@ void __stdcall SyncAssocGadgets(SyncAssocGadgetsDialog* param_1, int param_2)
                     if (type == 2) {
                         *(short*)(entry - 0x84) = *(short*)(me + 0xbc);
                         *(short*)(entry - 0x86) = *(short*)(me + 0xba);
-                        DrawListBox((DrawListBoxDialog *)param_1, i);
+                        DrawListBox(param_1, i);
                     } else if (type == 4) {
                         int esi_val;
                         if (*(unsigned char*)(entry - 0x125) & 0x20) {
@@ -1751,7 +1667,7 @@ void __stdcall SyncAssocGadgets(SyncAssocGadgetsDialog* param_1, int param_2)
 #endif
                             *(short*)(entry - 0x84) = result;
                         }
-                        DrawListBox((DrawListBoxDialog *)param_1, i);
+                        DrawListBox(param_1, i);
                     }
                     break;
                 case 3:
@@ -1796,28 +1712,6 @@ void __stdcall SyncAssocGadgets(SyncAssocGadgetsDialog* param_1, int param_2)
 #include "dialogs.h"
 #pragma pack(pop)
 
-struct SetListBoxScrollByNameList {
-    char unknown_0[0x0c];
-    unsigned short* glyphs;
-};
-
-struct SetListBoxScrollByNameHolder {
-    int current;
-    Gadget* entries;
-    char unknown_08[0x14 - 0x08];
-    SetListBoxScrollByNameList* list;
-};
-
-#pragma pack(push, 1)
-struct SetListBoxScrollByNameDialog {
-    char unknown_00[0x18];
-    SetListBoxScrollByNameHolder* holder;
-    char unknown_1c[0xcca - 0x1c];
-    int changed;
-};
-#pragma pack(pop)
-
-
 static inline int FindSetListBoxScrollEntry(Gadget* entries, char* name) {
     int i;
     for (i = 1; i < entries->u.count + 1; i++) {
@@ -1846,8 +1740,8 @@ extern int Pad_a2e40_e1;
 extern int Pad_a2e40_e2;
 
 // FUNCTION: 0x4a2e40
-void __stdcall SetListBoxScrollByName(SetListBoxScrollByNameDialog* param_1, char* param_2, int param_3) {
-    Gadget* entries = param_1->holder->entries;
+void __stdcall SetListBoxScrollByName(Gui* param_1, char* param_2, int param_3) {
+    Gadget* entries = param_1->layer->entries;
     int found = FindSetListBoxScrollEntry(entries, param_2);
     if (found == -1)
         return;
@@ -1898,22 +1792,11 @@ void __stdcall SetListBoxScrollByName(SetListBoxScrollByNameDialog* param_1, cha
 }
 
 
-struct ResetListBoxFont {
-    char unknown_0[0xc];
-    void* glyphs;
-};
-
-struct ResetListBoxDialog {
-    int group;
-    char unknown_04[0x14 - 0x04];
-    ResetListBoxFont* font;
-};
-
 
 // FUNCTION: 0x4a30c0
-void __stdcall ResetListBox(GadgetAccessDialog* obj, int index)
+void __stdcall ResetListBox(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     e->u.list.firstRow = 0;
     e->u.list.selected = 0;
@@ -2345,7 +2228,7 @@ skip0:;
             }
         }
         if (orig_sel != me->u.list.selected) {
-            DrawListBox((DrawListBoxDialog *)obj, index);
+            DrawListBox((Gui*)obj, index);
             if (me->u.list.callback)
                 me->u.list.callback((Gui*)obj, me);
         }
@@ -2385,8 +2268,8 @@ ret1:
                     me->u.list.selected = orig_sel;
             }
 finish:
-            DrawListBox((DrawListBoxDialog *)obj, index);
-            SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, index);
+            DrawListBox((Gui*)obj, index);
+            SyncAssocGadgets((Gui*)obj, index);
         }
     }
 end:
@@ -2394,16 +2277,6 @@ end:
 }
 
 
-
-struct ResetSliderGadgetTable {
-    char unknown_0[4];
-    Gadget* entries;
-};
-
-struct ResetSliderGadgetDialog {
-    char unknown_0[0x18];
-    ResetSliderGadgetTable* table;
-};
 
 static inline void ClearEntry(Gadget* e)
 {
@@ -2417,9 +2290,9 @@ struct Pad_a3eb0_1 { int field; };
 struct Pad_a3eb0_2 { int field; };
 
 // FUNCTION: 0x4a3eb0
-void __stdcall ResetSliderGadget(ResetSliderGadgetDialog* obj, int i)
+void __stdcall ResetSliderGadget(Gui* obj, int i)
 {
-    ClearEntry(&obj->table->entries[i]);
+    ClearEntry(&obj->layer->entries[i]);
 }
 
 
@@ -2568,7 +2441,7 @@ static inline void ClampKnobPosAndNotify(HandleSliderInputObject* obj, int index
     if (obj->holder)
         obj->holder->dirty = 1;
     DrawSliderBar(obj, index);
-    SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, index);
+    SyncAssocGadgets((Gui*)obj, index);
     if (e->sliderCallback)
         e->sliderCallback((Gui*)obj, e->sliderUser);
 }
@@ -2740,51 +2613,16 @@ final_check:
 }
 
 
-struct ScheduleGadgetEndTickTable {
-    char unknown_0[4];
-    Gadget* entries;
-};
-
-struct ScheduleGadgetEndTickDialog {
-    char unknown_0[0x18];
-    ScheduleGadgetEndTickTable* table;
-};
-
-
 #include <time.h>
 
 extern int Pad_a4620_e0;
 
 // FUNCTION: 0x4a4620
-void __stdcall ScheduleGadgetEndTick(ScheduleGadgetEndTickDialog* obj, int i)
+void __stdcall ScheduleGadgetEndTick(Gui* obj, int i)
 {
-    Gadget* e = &obj->table->entries[i];
+    Gadget* e = &obj->layer->entries[i];
     e->u.anim.next = GetTicks() + e->u.anim.interval;
 }
-
-struct DrawProgressBarGadgetHolder {
-    char unknown_0[4];
-    Gadget *entries;
-};
-
-struct DrawProgressBarGadgetDialog {
-    char unknown_0[0xc];
-    void *surface;
-    int unknown_10;
-    void *oldSurface;
-    DrawProgressBarGadgetHolder *holder;
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char color1;
-    char unknown_8b3[0x8c3 - 0x8b3];
-    unsigned char color2;
-    char unknown_8c4[2];
-    unsigned char color3;
-    char unknown_8c7[0xcd2 - 0x8c7];
-    void *fallbackSurface;
-};
-
-struct DrawProgressBarGadgetLanguage { char unknown_0[0xc]; unsigned short *glyphs; };
-struct DrawProgressBarGadgetLanguageRoot { char unknown_0[0x14]; DrawProgressBarGadgetLanguage *language; };
 
 void __stdcall LockScreen(void *);
 int __stdcall GetTextWidth(Font*, char *);
@@ -2811,15 +2649,15 @@ static inline int MeasureProgressBarText(char *text)
 }
 
 // FUNCTION: 0x4a4660
-void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog *obj, int index)
+void __stdcall DrawProgressBarGadget(Gui* obj, int index)
 {
-    Gadget *entries = obj->holder->entries;
+    Gadget *entries = obj->layer->entries;
     Gadget *entry = (Gadget *)((char *)entries + index * 0x15b);
-    obj->oldSurface = obj->surface;
+    obj->language = (FontGlyphTable*)obj->values[1];
 
     void *surface = entries->u.assets.surface;
     if (surface == 0)
-        surface = *(void **)((char *)obj + 0xcd2);
+        surface = obj->fallback;
     LockScreen(surface);
 
     Rect rect;
@@ -2827,7 +2665,7 @@ void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog *obj, int index
     rect.top = entry->y;
     rect.right = entry->width + entry->x;
     rect.bottom = entry->height + entry->y;
-    FillBevelBox(surface, &rect, obj->color1, obj->color2, obj->color3);
+    FillBevelBox(surface, &rect, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
 
     rect.left += 2;
     rect.top += 2;
@@ -2861,26 +2699,15 @@ void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog *obj, int index
             (entry->height / 2 - height / 2) + entry->y, -1, 0);
     }
 
-    obj->oldSurface = *(void **)((char *)obj + 8);
+    obj->language = (FontGlyphTable*)obj->values[0];
     UnlockScreen(surface);
 }
 
 
-struct TickProgressBarTable {
-    char unknown_0[4];
-    Gadget* entries;
-};
-
-struct TickProgressBarDialog {
-    char unknown_0[0x18];
-    TickProgressBarTable* table;
-};
-
-
 // FUNCTION: 0x4a4890
-void __stdcall TickProgressBar(TickProgressBarDialog* obj, int i)
+void __stdcall TickProgressBar(Gui* obj, int i)
 {
-    Gadget* e = &obj->table->entries[i];
+    Gadget* e = &obj->layer->entries[i];
     if (e->u.anim.active && e->u.anim.value < e->u.anim.max) {
         if ((int)GetTicks() > e->u.anim.next) {
             e->u.anim.value += (int)e->u.anim.step;
@@ -2890,43 +2717,19 @@ void __stdcall TickProgressBar(TickProgressBarDialog* obj, int i)
             }
             e->u.anim.next = GetTicks() + e->u.anim.interval;
         }
-        DrawProgressBarGadget((DrawProgressBarGadgetDialog *)obj, i);
+        DrawProgressBarGadget(obj, i);
     }
 }
-struct ResetProgressBarEntries {
-    char unknown_0[4];
-    char* base;
-};
-
-struct ResetProgressBarDialog {
-    char unknown_0[0x18];
-    ResetProgressBarEntries* arr;
-};
-
 // FUNCTION: 0x4a4930
-void __stdcall ResetProgressBar(ResetProgressBarDialog* param_1, int index)
+void __stdcall ResetProgressBar(Gui* param_1, int index)
 {
-    char* e = param_1->arr->base + index * 0x15b;
+    char* e = (char*)param_1->layer->entries + index * 0x15b;
     *(int*)(e + 0xb6) = 0;
     *(int*)(e + 0xbe) = 0;
     *(int*)(e + 0xc2) = 0;
     *(short*)(e + 0xc6) = 0;
 }
 
-
-struct DrawHotspotHolder {
-    char unknown_0[4];
-    Gadget* entries;
-};
-
-#pragma pack(push, 1)
-struct DrawHotspotDialog {
-    char unknown_0[0x18];
-    DrawHotspotHolder* holder;
-    char unknown_1c[0x8b9 - 0x1c];
-    unsigned char colour7;
-};
-#pragma pack(pop)
 
 struct DrawHotspotPoint {
     int x;
@@ -2942,9 +2745,9 @@ void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 void __stdcall DrawFrameQuad(void* surf, void* entry, DrawHotspotQuad* dst, DrawHotspotQuad* src);
 
 // FUNCTION: 0x4a4980
-void __stdcall DrawHotspot(DrawHotspotDialog* obj, int index)
+void __stdcall DrawHotspot(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
 
     Rect rect;
@@ -2996,18 +2799,13 @@ void __stdcall DrawHotspot(DrawHotspotDialog* obj, int index)
         src.p[3].y = e->u.hotspot.frame->height - 1;
         DrawFrameQuad(entries->u.assets.surface, e->u.hotspot.frame, &dst, &src);
     } else {
-        FillRectangle((Surface*)entries->u.assets.surface, &rect, obj->colour7);
+        FillRectangle((Surface*)entries->u.assets.surface, &rect, obj->colours[7]);
     }
 }
 
 struct Feature;
 struct WeaponDef;
 struct Explosion;
-
-#pragma pack(push, 1)
-
-struct HandleHotspotInputDialog;
-struct HandleHotspotInputPoint { int x, y; };
 
 int GetType();
 int KeepAfterComplete();
@@ -3016,32 +2814,16 @@ void TickTowardGoal();
 int HasNetUnitState();
 int TryClaimRepath();
 
-struct HandleHotspotInputTable {
-    char unknown_0[4];
-    Gadget* entries;
-};
 
-struct HandleHotspotInputDialog {
-    char unknown_0[0x18];
-    HandleHotspotInputTable* table;
-    char unknown_1c[0x3c - 0x1c];
-    HandleHotspotInputPoint pos;
-    char unknown_44[0x64 - 0x44];
-    int focus;
-};
-#pragma pack(pop)
-
-extern int __stdcall TrySetFocus(HandleHotspotInputDialog* obj, int index);
-
-static inline int PointInHotspotRect(const Rect& r, const HandleHotspotInputPoint& p)
+static inline int PointInHotspotRect(const Rect& r, const Point& p)
 {
     return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
 }
 
 // FUNCTION: 0x4a4b50
-int __stdcall HandleHotspotInput(HandleHotspotInputDialog* obj, int index)
+int __stdcall HandleHotspotInput(Gui* obj, int index)
 {
-    Gadget* entries = obj->table->entries;
+    Gadget* entries = obj->layer->entries;
     Rect r;
     if (entries[index].type == 0) {
         r.left = 0;
@@ -3053,16 +2835,20 @@ int __stdcall HandleHotspotInput(HandleHotspotInputDialog* obj, int index)
     r.right = entries[index].width - 1 + r.left;
     r.bottom = entries[index].height - 1 + r.top;
     if (entries[index].u.hotspot.callback)
-        entries[index].u.hotspot.callback((Gui*)obj, &entries[index]);
+        entries[index].u.hotspot.callback(obj, &entries[index]);
     if (entries[index].u.hotspot.flags & 1) {
         if (IsMouseButtonMessage((Gui *)obj, 1)) {
-            HandleHotspotInputPoint p = obj->pos;
+            Point p;
+            p.x = obj->point.x;
+            p.y = obj->point.y;
             if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 1);
             }
         } else if (IsMouseButtonMessage((Gui *)obj, 2)) {
-            HandleHotspotInputPoint p = obj->pos;
+            Point p;
+            p.x = obj->point.x;
+            p.y = obj->point.y;
             if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 2);
@@ -3070,10 +2856,9 @@ int __stdcall HandleHotspotInput(HandleHotspotInputDialog* obj, int index)
         }
         if (obj->focus == index && !HasMouseKeyFlags((Gui *)obj, 3)) {
             obj->focus = -1;
-            HandleHotspotInputPoint* pp = &obj->pos;
-            HandleHotspotInputPoint q;
-            q.y = pp->y;
-            q.x = pp->x;
+            Point q;
+            q.y = obj->point.y;
+            q.x = obj->point.x;
             if (PointInHotspotRect(r, q))
                 return 1;
         }
@@ -3082,18 +2867,6 @@ int __stdcall HandleHotspotInput(HandleHotspotInputDialog* obj, int index)
 }
 
 int GetHostDpid();
-
-struct DrawLineGadgetHolder {
-    char unknown_0[4];
-    Gadget* entries;
-};
-
-struct DrawLineGadgetDialog {
-    char unknown_0[0x18];
-    DrawLineGadgetHolder* holder;
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char colour[0x100];
-};
 
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int color);
@@ -3112,62 +2885,27 @@ static inline void GetLineGadgetRect(Gadget* e, Rect* r)
 }
 
 // FUNCTION: 0x4a4c90
-void __stdcall DrawLineGadget(DrawLineGadgetDialog* obj, int index, unsigned char param_3)
+void __stdcall DrawLineGadget(Gui* obj, int index, unsigned char param_3)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = (Gadget*)((char*)entries + index * 0x15b);
     Rect rect;
     GetLineGadgetRect(e, &rect);
     if (param_3 & 1) {
         if (e->attribs & 1)
             DrawLine(entries->u.assets.surface, rect.left, rect.top, rect.right, rect.top,
-                         obj->colour[e->colours]);
+                         obj->colours[e->colours]);
         else if (e->attribs & 2)
             DrawLine(entries->u.assets.surface, rect.left, rect.top, rect.left, rect.bottom,
-                         obj->colour[e->colours]);
+                         obj->colours[e->colours]);
         else if (e->attribs & 4)
             DrawLine(entries->u.assets.surface, rect.left, rect.top, rect.right, rect.bottom,
-                         obj->colour[e->colours]);
+                         obj->colours[e->colours]);
     }
 }
 
 void InitNetConnection();
 
-#pragma pack(push, 1)
-struct DrawTextInputList {
-    char unknown_0[0x0c];
-    unsigned short* glyphs;
-};
-
-struct DrawTextInputHolder {
-    int current;
-    Gadget* entries;
-    char unknown_08[0x14 - 0x08];
-    DrawTextInputList* language;
-    char unknown_18[0x24 - 0x18];
-    void* surface;
-};
-
-struct DrawTextInputDialog {
-    char unknown_00[0x18];
-    DrawTextInputHolder* holder;
-    char unknown_1c[0x64 - 0x1c];
-    int focus;
-    char unknown_68[0x74 - 0x68];
-    int cursor;
-    char unknown_78[0x8b2 - 0x78];
-    unsigned char colours[0xcd2 - 0x8b2];
-    void* fallback;
-};
-
-struct DrawTextInputLanguageRoot {
-    int current;
-    char unknown_04[0x14 - 0x04];
-    DrawTextInputList* language;
-};
-#pragma pack(pop)
-
-int __stdcall DrawListboxFrame(DrawTextInputDialog* obj, int index, void* bmp);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int colour);
 
@@ -3216,9 +2954,9 @@ static inline int SelectTextInputFont(Gadget* entries, int index)
 }
 
 // FUNCTION: 0x4a4d70
-void __stdcall DrawTextInput(DrawTextInputDialog* obj, int index)
+void __stdcall DrawTextInput(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     SelectTextInputFont(entries, index);
 
     Gadget* me = &entries[index];
@@ -3237,7 +2975,7 @@ void __stdcall DrawTextInput(DrawTextInputDialog* obj, int index)
     if (me->attribs & 1) {
         FillRectangle((Surface*)entries->u.assets.surface, &rect, obj->colours[0]);
     } else {
-        void* surface = obj->holder->surface;
+        void* surface = obj->layer->surface;
         if (surface == 0)
             surface = obj->fallback;
         if (surface == 0) {
@@ -3268,31 +3006,11 @@ void __stdcall DrawTextInput(DrawTextInputDialog* obj, int index)
     }
 }
 
-struct GetCharGlyphFont {
-    char unknown_0[0xc];
-    void* glyphs;
-};
-
-struct GetCharGlyphDialog {
-    char unknown_0[0x14];
-    GetCharGlyphFont* font;
-};
-
 // FUNCTION: 0x4a5010
 void* __stdcall GetCharGlyph(unsigned char c)
 {
     return GetGafFrame(g_guiContext->font->glyphs, c);
 }
-
-struct GetTextPixelWidthFont {
-    char unknown_0[0xc];
-    void* glyphs;
-};
-
-struct GetTextPixelWidthDialog {
-    char unknown_0[0x14];
-    GetTextPixelWidthFont* font;
-};
 
 int __stdcall GetTextWidth(Font* param_1, unsigned char* text);
 
@@ -3321,11 +3039,6 @@ struct FontGlyphTable {
     void* glyphs;
 };
 
-struct GetFontLineHeightDialog {
-    char unknown_0[0x14];
-    FontGlyphTable* font;
-};
-
 
 // FUNCTION: 0x4a50b0
 int GetFontLineHeight()
@@ -3335,16 +3048,6 @@ int GetFontLineHeight()
     }
     return ((GafFrame*)GetGafFrame(g_guiContext->font->glyphs, 'I'))->height + 2;
 }
-
-struct DrawTextClippedFont {
-    char unknown_0[0xc];
-    void* glyphs;
-};
-
-struct DrawTextClippedDialog {
-    char unknown_0[0x14];
-    DrawTextClippedFont* font;
-};
 
 #include "../graphics/gaf.h"
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxWidth);
@@ -3382,16 +3085,6 @@ void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw
     }
 }
 
-
-struct DrawWrappedTextFont {
-    char unknown_0[0xc];
-    void* glyphs;
-};
-
-struct DrawWrappedTextDialog {
-    char unknown_0[0x14];
-    DrawWrappedTextFont* font;
-};
 
 int __stdcall GetTextWidth(Font* a, char* text);
 
@@ -3513,15 +3206,10 @@ void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colou
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw, int rem, int style);
 
-void __stdcall AssignQuickKey(Gui* obj, int index);
-void __stdcall ClearPeerStatus(Gui* obj, int index);
-void __stdcall DrawGadgetSelectionBox(Gui* obj, int index, int param3);
 void __stdcall DrawSliderBar(Gui* obj, int index);
-void __stdcall DrawTextInput(Gui* obj, int index);
 void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 void __stdcall DrawLineGadget(Gui* obj, int index, unsigned int param3);
 int __stdcall HandleLabelInput(Gui* obj, int index, int key);
-int __stdcall HandleHotspotInput(Gui* obj, int index);
 int __stdcall TrySetFocus(Gui* obj, int index);
 int __stdcall HandleListBoxInput(Gui* obj, int index, int key);
 void __stdcall HandleSliderInput(Gui* obj, int index);
@@ -4163,7 +3851,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
         if (obj->layer)
             obj->layer->dirty = 1;
         DrawSliderBar(obj, found);
-        SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, found);
+        SyncAssocGadgets(obj, found);
         if (f->sliderCallback)
             f->sliderCallback(obj, f->sliderUser);
         return 0;
@@ -4992,7 +4680,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].u.list.sortKey = GetTicks();
                 }
                 if (force || (flags & 0x40))
-                    DrawListBox((DrawListBoxDialog *)menu, i);
+                    DrawListBox(menu, i);
                 break;
             }
             case 3:
@@ -5022,7 +4710,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].u.hotspot.index = 0;
                 }
                 if (force || (flags & 0x40))
-                    DrawHotspot((DrawHotspotDialog *)menu, i);
+                    DrawHotspot(menu, i);
                 break;
             case 13:
                 if (force) {
@@ -5030,7 +4718,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                     base[i].u.anim.next = GetTicks() + base[i].u.anim.interval;
                 }
                 if (force || (flags & 0x40))
-                    DrawProgressBarGadget((DrawProgressBarGadgetDialog *)menu, i);
+                    DrawProgressBarGadget(menu, i);
                 break;
             case 10:
                 if (force || (flags & 0x40))
@@ -5116,7 +4804,7 @@ void __stdcall DecrementKnobPos(Gui* obj, int index)
     if (e->knobPos != old) {
         obj->changed = 1;
         DrawSliderBar(obj, index);
-        SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, index);
+        SyncAssocGadgets(obj, index);
     }
     if (e->sliderCallback) {
         e->sliderCallback(obj, e->sliderUser);
@@ -5145,7 +4833,7 @@ void __stdcall IncrementKnobPos(Gui* obj, int index)
     if (e->knobPos != old) {
         obj->changed = 1;
         DrawSliderBar(obj, index);
-        SyncAssocGadgets((SyncAssocGadgetsDialog *)obj, index);
+        SyncAssocGadgets(obj, index);
     }
     if (e->sliderCallback) {
         e->sliderCallback(obj, e->sliderUser);
@@ -5215,12 +4903,12 @@ void __stdcall ListBoxSelectUp(Gui* param_1, int index)
                 me->u.list.selected = isel;
             }
         }
-        DrawListBox((DrawListBoxDialog *)param_1, index);
-        SyncAssocGadgets((SyncAssocGadgetsDialog *)param_1, index);
+        DrawListBox(param_1, index);
+        SyncAssocGadgets(param_1, index);
         return;
     }
     if (me->u.list.rowCount != 0) {
-        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)param_1, me->name, isel);
+        SetListBoxScrollByName(param_1, me->name, isel);
     }
 }
 
@@ -5271,13 +4959,13 @@ void __stdcall ListBoxSelectDown(Gui* param_1, int index)
                     me->u.list.selected = isel;
                 }
             }
-            DrawListBox((DrawListBoxDialog *)param_1, index);
-            SyncAssocGadgets((SyncAssocGadgetsDialog *)param_1, index);
+            DrawListBox(param_1, index);
+            SyncAssocGadgets(param_1, index);
             return;
         }
     }
     if (me->u.list.rowCount != 0) {
-        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)param_1, me->name, isel);
+        SetListBoxScrollByName(param_1, me->name, isel);
     }
 }
 
@@ -5407,7 +5095,7 @@ static inline void SelectCurrentByName(Gui* menu, Gadget* entries, int sel)
     ClearKeyQueue();
 }
 
-static inline void TickProgressBar(Gui* menu, int i)
+static inline void TickProgressBarGadget(Gui* menu, int i)
 {
     Gadget* entries = menu->layer->entries;
     Gadget* e = &entries[i];
@@ -5420,7 +5108,7 @@ static inline void TickProgressBar(Gui* menu, int i)
             }
             e->u.anim.next = GetTicks() + e->u.anim.interval;
         }
-        DrawProgressBarGadget((DrawProgressBarGadgetDialog *)menu, i);
+        DrawProgressBarGadget(menu, i);
     }
 }
 
@@ -5588,7 +5276,7 @@ int __stdcall UpdateMenu(Gui* menu)
                     sel = i;
                 break;
             case 13:
-                TickProgressBar(menu, i);
+                TickProgressBarGadget(menu, i);
                 break;
             case 12:
                 if (e->colours != 0 && elapsed) {

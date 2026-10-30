@@ -1,28 +1,18 @@
 #ifndef GUI_H
 #define GUI_H
-struct GadgetAccessDialog;
 struct IsAboveRectTopRect;
 struct IsBelowRectBottomRect;
 
 struct Gadget;
 
 struct BlinkWord;
-struct DrawListBoxDialog;
-struct SyncAssocGadgetsDialog;
-struct SetListBoxScrollByNameDialog;
-struct DrawProgressBarGadgetDialog;
-struct DrawHotspotDialog;
 struct Gadget;
 struct Rect;
 
 struct FileRequester;
 struct Font;
 struct FontGlyphTable;
-struct RedrawGadgetRectDialog;
-struct ResetSliderGadgetDialog;
-struct ScheduleGadgetEndTickDialog;
 struct Gadget;
-struct ResetProgressBarDialog;
 struct DialogPointView;
 struct DialogOriginView;
 struct Rect;
@@ -98,13 +88,13 @@ void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
 int __stdcall FindAssocListBox(Gadget* entries, int index);
 int __stdcall FindAssocSlider(Gadget* entries, int index);
 int __stdcall FindAssocTextInput(Gadget* entries, int index);
-void __stdcall RedrawGadgetRect(RedrawGadgetRectDialog* obj, int index);
+void __stdcall RedrawGadgetRect(Gui* obj, int index);
 void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2);
 void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4);
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* lines, int count, Font* flag);
-void __stdcall ResetSliderGadget(ResetSliderGadgetDialog* obj, int i);
-void __stdcall ScheduleGadgetEndTick(ScheduleGadgetEndTickDialog* obj, int i);
-void __stdcall ResetProgressBar(ResetProgressBarDialog*, int index);
+void __stdcall ResetSliderGadget(Gui* obj, int i);
+void __stdcall ScheduleGadgetEndTick(Gui* obj, int i);
+void __stdcall ResetProgressBar(Gui*, int index);
 void* __stdcall GetCharGlyph(unsigned char c);
 int __stdcall GetFontLineHeight();
 void __stdcall LayoutLabelText(Gui* obj, int index);
@@ -141,11 +131,11 @@ void __stdcall GetGadgetRectByIndex(char*, int, Rect*);
 void __stdcall GetGadgetScreenRect(char*, int, Rect*);
 int __stdcall FindBackgroundCell(Gadget* entries, int index);
 int __stdcall IsPointInRect(Rect* r, int px, int py);
-void __stdcall DrawListBox(DrawListBoxDialog* obj, int index);
-void __stdcall SyncAssocGadgets(SyncAssocGadgetsDialog*, int);
-void __stdcall SetListBoxScrollByName(SetListBoxScrollByNameDialog*, char*, int);
-void __stdcall DrawProgressBarGadget(DrawProgressBarGadgetDialog * obj, int index);
-void __stdcall DrawHotspot(DrawHotspotDialog* obj, int index);
+void __stdcall DrawListBox(Gui* obj, int index);
+void __stdcall SyncAssocGadgets(Gui*, int);
+void __stdcall SetListBoxScrollByName(Gui*, char*, int);
+void __stdcall DrawProgressBarGadget(Gui* obj, int index);
+void __stdcall DrawHotspot(Gui* obj, int index);
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 void __stdcall SetCurrentFont(Gui* p, int index);
 int __stdcall TruncateGadgetText(Gui* menu, int index);
@@ -160,15 +150,23 @@ void __stdcall SetDefaultFont(Font**, Font*);
 
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 
-void __stdcall TranslateGadgetItems(GadgetAccessDialog* obj, int index);
-void __stdcall SetGadgetGrayedOut(GadgetAccessDialog* obj, int index, int value);
-void __stdcall SetGadgetGrayedOutByNameTwin(GadgetAccessDialog* obj, char* name, int);
+void __stdcall TranslateGadgetItems(Gui* obj, int index);
+void __stdcall SetGadgetGrayedOut(Gui* obj, int index, int value);
+void __stdcall SetGadgetGrayedOutByNameTwin(Gui* obj, char* name, int);
 int __stdcall IsAboveRectTop(IsAboveRectTopRect*, int);
 int __stdcall IsBelowRectBottom(IsBelowRectBottomRect* obj, int value);
-void __stdcall DrawGafBar(GadgetAccessDialog*, int index);
-void __stdcall ResetListBox(GadgetAccessDialog* obj, int index);
+void __stdcall DrawGafBar(Gui*, int index);
+void __stdcall ResetListBox(Gui* obj, int index);
 
 void __stdcall UpdateHelpText(Gui* obj);
 void __stdcall SelectAdjacentGadget(Gui* menu, int dir);
+
+void __stdcall ClearPeerStatus(Gui*, int index);
+void __stdcall AssignQuickKey(Gui* obj, int index);
+void __stdcall SetControlTextByName(Gui* obj, char* name, char* text);
+void __stdcall SetGrayedOut(Gui* obj, int index, int value);
+void __stdcall DrawGadgetSelectionBox(Gui* obj, int index, int);
+int __stdcall HandleHotspotInput(Gui* obj, int index);
+void __stdcall DrawTextInput(Gui* obj, int index);
 
 #endif

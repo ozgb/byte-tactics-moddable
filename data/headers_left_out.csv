@@ -14,7 +14,6 @@ AllocDepthFrame,mismatch,fixing it changes the generated code of a caller
 AllocSurface,mismatch,pointer/int cast: definition's type is likely wrong
 ApplyProjectileHitPacket,mismatch,pointer/int cast: definition's type is likely wrong
 ApplyWeaponFirePacket,mismatch,pointer/int cast: definition's type is likely wrong
-AssignQuickKey,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 AttachUnitToPiece,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BindModelTextures,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 BlitLayers,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -26,7 +25,6 @@ BuildGrayTable,mismatch,pointer/int cast: definition's type is likely wrong
 CalcAimAngles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 CanBuildAt,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 CanPlaceUnitFootprint,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-ClearPeerStatus,mismatch,fixing it changes the generated code of a caller
 ClickSelectHoverUnit,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 CollectSelectedUnits,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 ComputeUnitScriptChecksum,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -48,7 +46,6 @@ DrawButton,mismatch,fixing it changes the generated code of a caller
 DrawFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawFrameBlended,mismatch,pointer/int cast: definition's type is likely wrong
 DrawFrameQuad,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-DrawGadgetSelectionBox,mismatch,fixing it changes the generated code of a caller
 DrawLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawLineGadget,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawListboxFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -62,7 +59,6 @@ DrawRectangle,mismatch,pointer/int cast: definition's type is likely wrong
 DrawSliderBar,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 DrawString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawSurface,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-DrawTextInput,mismatch,fixing it changes the generated code of a caller
 DrawTile,mismatch,pointer/int cast: definition's type is likely wrong
 DrawTriangleContours,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -142,7 +138,6 @@ GroundPickupOrder,mismatch,"static risk rule: a convention, parameter count, or 
 HAPI_RelocateDirectory,mismatch,pointer/int cast: definition's type is likely wrong
 HAPI_WriteArchiveData,skip,unknown name cb
 HandleHostEvent,skip,unknown name host_event
-HandleHotspotInput,mismatch,fixing it changes the generated code of a caller
 HandleLabelInput,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 HandleListBoxInput,mismatch,fixing it changes the generated code of a caller
 HandleMusicOptionsClick,mismatch,pointer/int cast: definition's type is likely wrong
@@ -213,7 +208,6 @@ SetAlliance,mismatch,"static risk rule: a convention, parameter count, or non-po
 SetButtonStage,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetButtonStageByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetCloseHandler,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SetControlTextByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetCursorAnimation,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetCursorMode,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetDefaultCommandHandler,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -229,7 +223,6 @@ SetGadgetStatus,mismatch,"static risk rule: a convention, parameter count, or no
 SetGadgetStatusByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetGadgetText,mismatch,parameter 1 void* vs Gui* (view type): the declaration differs from the definition in a pointer type only
 SetGadgetTextByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-SetGrayedOut,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGrayedOutByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetKeyboardInput,mismatch,pointer/int cast: definition's type is likely wrong
 SetOffscreenSurface,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

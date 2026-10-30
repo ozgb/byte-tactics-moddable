@@ -632,8 +632,8 @@ void __stdcall OpenEndMissionScreen()
         ConfigureListBoxByName(&g_game->gui, "Missions", data->items, count, 0);
         Gadget* knob = FindGadgetChecked_D(entries, "KNOB");
         knob->range = knob->height - knob->knobSize - 3;
-        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "Missions", g_game->mission);
-        SetListBoxScrollByName((SetListBoxScrollByNameDialog *)&g_game->gui, "Missions", g_game->mission + (g_game->won != 0));
+        SetListBoxScrollByName(&g_game->gui, "Missions", g_game->mission);
+        SetListBoxScrollByName(&g_game->gui, "Missions", g_game->mission + (g_game->won != 0));
         ApplyDifficultyButtons();
     }
     Player* player = &g_game->players[g_game->localPlayer];

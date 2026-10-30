@@ -653,7 +653,7 @@ void __stdcall FillCampaignList(char* param_1)
                  g_campaignNameList, count, 0);
     int index = FindGadgetIndex(layer->entries,
                              "Campaign", 2);
-    SyncAssocGadgets((SyncAssocGadgetsDialog *)&g_game->gui, index);
+    SyncAssocGadgets(&g_game->gui, index);
     MarkChanged(&g_game->gui);
 }
 
@@ -670,7 +670,7 @@ void __stdcall FillMissionList(Gui* menu, int unused)
     g_game->net->LoadCampaign(SkipTextLines(layout->u.list.lines, layout->u.list.selected));
     int count = g_game->net->BuildMissionList(&g_missionNameList);
     ConfigureListBoxByName(menu, "Missions", g_missionNameList, count, 0);
-    SyncAssocGadgets((SyncAssocGadgetsDialog *)&g_game->gui,
+    SyncAssocGadgets(&g_game->gui,
                  FindGadgetIndex(layer->entries, "Missions", 2));
     MarkChanged(&g_game->gui);
 }
@@ -686,7 +686,7 @@ static inline void FillCampaignListInline(int side)
     int count = BuildCampaignNameList(&g_campaignNameList, side);
     ConfigureListBoxByName(&g_game->gui, "Campaign", g_campaignNameList, count, 0);
     int index = FindGadgetIndex(layer->entries, "Campaign", 2);
-    SyncAssocGadgets((SyncAssocGadgetsDialog *)&g_game->gui, index);
+    SyncAssocGadgets(&g_game->gui, index);
     MarkChanged(&g_game->gui);
 }
 
@@ -703,7 +703,7 @@ static inline void FillMissionListInline(Gui* menu, Gadget* unused)
         SkipTextLines(layout->u.list.lines, layout->u.list.selected));
     int count = g_game->net->BuildMissionList(&g_missionNameList);
     ConfigureListBoxByName(menu, "Missions", g_missionNameList, count, 0);
-    SyncAssocGadgets((SyncAssocGadgetsDialog *)&g_game->gui,
+    SyncAssocGadgets(&g_game->gui,
                  FindGadgetIndex(layer->entries, "Missions", 2));
     MarkChanged(&g_game->gui);
 }
@@ -926,7 +926,7 @@ void __stdcall OpenNewGameMenu(int param_1)
         int count = BuildCampaignNameList(&g_campaignNameList, side);
         ConfigureListBoxByName(&g_game->gui, "Campaign", g_campaignNameList, count, 0);
         int ci = FindGadgetIndex(cur->entries, "Campaign", 2);
-        SyncAssocGadgets((SyncAssocGadgetsDialog *)&g_game->gui, ci);
+        SyncAssocGadgets(&g_game->gui, ci);
         MarkChanged(&g_game->gui);
 
         if (param_1 != 0) {
@@ -948,7 +948,7 @@ void __stdcall OpenNewGameMenu(int param_1)
                 &g_missionNameList);
             ConfigureListBoxByName(menu, "Missions", g_missionNameList, mc, 0);
             int mi = FindGadgetIndex(mlayer->entries, "Missions", 2);
-            SyncAssocGadgets((SyncAssocGadgetsDialog *)&g_game->gui, mi);
+            SyncAssocGadgets(&g_game->gui, mi);
             MarkChanged(&g_game->gui);
         }
     }

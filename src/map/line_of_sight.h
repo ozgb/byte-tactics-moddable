@@ -9,6 +9,16 @@ struct SightQuery;
 struct Unit;
 struct Vec3;
 
+#pragma pack(push, 1)
+struct Rec {
+    Rec() { a = 0; b = 0; flags = 0; field_6 = 0; }
+    unsigned char a;
+    unsigned char b;
+    int flags;
+    int field_6;
+};
+#pragma pack(pop)
+
 void __stdcall FreeLosTables();
 void __stdcall InitEyeballs();
 void __stdcall FreeEyeballs();

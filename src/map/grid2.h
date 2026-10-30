@@ -2,9 +2,20 @@
 #define GRID2_H
 #include "../../interfaces/ref.h"
 
-struct FogCell;
-
 #pragma pack(push, 1)
+struct FogCell {
+    union {
+        struct {
+            unsigned char lo;
+            unsigned char hi;
+        };
+        struct {
+            unsigned char level0;
+            unsigned char level1;
+        };
+    };
+};
+
 struct Grid2 {
     Ref<FogCell> cells;
     unsigned int width;

@@ -77,7 +77,7 @@ void __stdcall DrawListboxFrame(Gui* obj, int index, DrawListboxFrameGafEntry* b
     int h;
     GafFrame* sub;
     entries = obj->layer->entries;
-    GetGadgetRectByIndex((char*)entries, index, &rect);
+    GetGadgetRectByIndex(entries, index, &rect);
 
     if (bmp == 0) {
         if (obj->gaf == 0)

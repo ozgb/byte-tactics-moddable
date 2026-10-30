@@ -56,7 +56,6 @@ DrawProgressBar,mismatch,"static risk rule: a convention, parameter count, or no
 DrawRaisedBox,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawRangeCircle,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawRectangle,mismatch,pointer/int cast: definition's type is likely wrong
-DrawSliderBar,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 DrawString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawSurface,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 DrawTile,mismatch,pointer/int cast: definition's type is likely wrong
@@ -138,8 +137,6 @@ HAPI_RelocateDirectory,mismatch,pointer/int cast: definition's type is likely wr
 HAPI_WriteArchiveData,skip,unknown name cb
 HandleHostEvent,skip,unknown name host_event
 HandleLabelInput,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-HandleListBoxInput,mismatch,fixing it changes the generated code of a caller
-HandleSliderInput,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 HandleSpeedOptionsClick,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 HideSoftwareCursor,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 InitCursorFrames,mismatch,pointer/int cast: definition's type is likely wrong
@@ -158,7 +155,6 @@ LeaveNetGameCallback,mismatch,"static risk rule: a convention, parameter count, 
 LoadBitmapByName,mismatch,fixing it changes the generated code of a caller
 LoadCobScript,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 LoadGaf,mismatch,pointer/int cast: definition's type is likely wrong
-LoadGuiLayer,mismatch,pointer/int cast: definition's type is likely wrong
 LoadPcx,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 LoadPictureCached,mismatch,fixing it changes the generated code of a caller
 LoadReporterDll,mismatch,pointer/int cast: definition's type is likely wrong
@@ -219,7 +215,6 @@ SetGadgetStatusByName,mismatch,"static risk rule: a convention, parameter count,
 SetGadgetText,mismatch,parameter 1 void* vs Gui* (view type): the declaration differs from the definition in a pointer type only
 SetGadgetTextByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGrayedOutByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-SetKeyboardInput,mismatch,pointer/int cast: definition's type is likely wrong
 SetOffscreenSurface,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetQuickKeyByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetTextColors,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

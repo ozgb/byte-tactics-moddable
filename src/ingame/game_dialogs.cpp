@@ -93,7 +93,6 @@ extern int g_usePacketManager;
 
 Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
 #include "../frontend/options.h"
-void __stdcall SetTranslatedTextByName(Gui* menu, char* name, char* text, int param_4);
 void __stdcall PlaySoundByName(char* name, int flag);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 #include "../graphics/object_pool.h"
@@ -105,11 +104,9 @@ int __stdcall GetButtonStageByName(Gui* menu, char* name);
 #include "../units/units.h"
 void __stdcall CollectSelectedUnits(std::vector<Unit*>* list);
 #include "../units/unit_commands.h"
-Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 #include "game_dialogs.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 #include "../debug/debug_lib.h"
-void __stdcall SetKeyboardInput(Gui* menu, int value);
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 void __stdcall SetButtonStageByName(Gui* menu, char* name, int value);
 int __stdcall GetButtonStage(Gui* menu, int index);

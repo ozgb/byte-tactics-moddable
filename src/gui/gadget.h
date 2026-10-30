@@ -9,6 +9,11 @@ struct GafFrame;
 struct Gui;
 struct UnitRestrictEntry;
 
+struct ListBoxItem {
+    char unknown_0[0x28];
+    GafFrame* cell;
+};
+
 struct Gadget {
     unsigned char type;
     unsigned char team;

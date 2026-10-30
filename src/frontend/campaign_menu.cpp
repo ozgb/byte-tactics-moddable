@@ -79,7 +79,6 @@ void __stdcall FillMissionList();
 char* __stdcall Translate(const char* text);
 void __stdcall AddTextGadget(Layer* dialog, const char* name, char* text, int x, int y,
                             int w, int flags);
-void __stdcall SetTranslatedTextByName(Gui* menu, const char* name, char* text, int value);
 void __stdcall SetGadgetColorByName(Gui* menu, const char* name, int value);
 void __stdcall AddBlinkWord(Gui* menu, char* text, int x, int y, int count,
                             int colour, float a, float b);
@@ -99,8 +98,6 @@ int __stdcall GetButtonStageByName(Gui* menu, char* name);
 int __stdcall SetButtonStageByName(Gui* menu, char* name, char value);
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int value);
 void __stdcall SetQuickKeyByName(Gui* menu, const char* name, char value);
-void __stdcall SetKeyboardInput(Gui* menu, int value);
-Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 void __stdcall RemapPaletteToClosestIndices(Gui* menu, void* param_2, void* param_3);
 void __stdcall PlaySoundByName(const char* name, int value);
 #include "../game/cd_check.h"

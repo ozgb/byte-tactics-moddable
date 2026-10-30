@@ -134,7 +134,6 @@ void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "main_loop.h"
 void __stdcall CreateUnit(unsigned char team, unsigned short id, CreateUnitPos pos, int a,
     int b, int c);
-Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
 #include "../ingame/game_dialogs.h"
 void __cdecl operator delete(void* p);
 

@@ -83,7 +83,7 @@ struct AddBarGadgetEntry {
 
 #pragma pack(pop)
 
-extern Font** g_guiContext;
+extern Gui* g_guiContext;
 
 #include "../graphics/draw.h"
 #include "../graphics/palette.h"
@@ -302,7 +302,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
             i++;
         }
         if (j == base->u.count + 1)
-            SetFont(*g_guiContext);
+            SetFont(g_guiContext->font);
         TrySetFocus(menu, 1);
         menu->layer->current = 1;
         CommitTextEdit(menu, 1, (char*)&sub->u.count,
@@ -589,7 +589,7 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
     if (PeekMouseEvent(&e) != 0) {
         if (p->layer != 0) {
             DialogRect r;
-            GetGadgetScreenRect((char *)p->layer->entries, 0, (Rect *)&r);
+            GetGadgetScreenRect(p->layer->entries, 0, (Rect *)&r);
             if (IsPointInRect((Rect *)&r, e.x, e.y) != 0 || e.keyFlags == 0) {
                 PopMouseEvent(&e);
                 p->mouseKeyFlags = e.keyFlags;
@@ -602,10 +602,10 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
 }
 
 // FUNCTION: 0x4ab690
-void __stdcall SetClickMode(void* gui, int mode)
+void __stdcall SetClickMode(Gui* gui, int mode)
 {
-    *(int*)((char*)gui + 0x58) = mode;
-    *(int*)(*(int*)((char*)gui + 0x18) + 0x37) = mode;
+    gui->clickMode = mode;
+    gui->layer->clickMode = mode;
 }
 
 // FUNCTION: 0x4ab6b0
@@ -757,7 +757,6 @@ int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
 int __stdcall IsGadgetNamed(Gadget* entries, int index, char* name);
 char* __stdcall Translate(char* text);
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int flag);
-void __stdcall SetKeyboardInput(Gui* menu, int flag);
 void __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
 int __stdcall GetTextWidth(Font* font, unsigned char* text);

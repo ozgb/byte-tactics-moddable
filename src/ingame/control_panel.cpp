@@ -103,7 +103,6 @@ void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 #include "../gui/dialogs.h"
 #include "../game/data_files.h"
 #include "../files/files_api.h"
-Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4);
 #include "../network/net_game.h"
 

@@ -13,8 +13,6 @@ struct FileRequester;
 struct Font;
 struct FontGlyphTable;
 struct Gadget;
-struct DialogPointView;
-struct DialogOriginView;
 struct Rect;
 #include "../util/mouse_event.h"
 
@@ -50,7 +48,7 @@ struct Gui {
     int cursor;
     int knobDragging;
     MouseEvent saved;
-    char pad_94[2];
+    short dragKnobPos;
     int time;
     int animTimer;
     int inputEnabled;
@@ -83,19 +81,21 @@ struct Gui {
 int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused);
 void __stdcall ClearChanged(Gui*);
 void __stdcall SetKeyboardInput(Gui*, int);
+Layer* __stdcall LoadGuiLayer(Gui*, const char*, unsigned int);
+void __stdcall SetTranslatedTextByName(Gui*, char*, char*, int);
 void __stdcall ClearLayerChanged(Gui* param);
 int __stdcall GetKeyboardInput(Gui* obj);
 void __stdcall ClearFocus(Gui*);
 int __stdcall IsFocused(Gui*, int);
 bool __stdcall HasFocus(Gui*);
-void __stdcall FUN_0049fd20(DialogPointView*, DialogOriginView*, MouseEvent*);
+void __stdcall FUN_0049fd20(Gui*, Gadget*, MouseEvent*);
 void __stdcall GetGadgetRect(Gadget* entry, Rect* rect);
 int __stdcall FindAssocListBox(Gadget* entries, int index);
 int __stdcall FindAssocSlider(Gadget* entries, int index);
 int __stdcall FindAssocTextInput(Gadget* entries, int index);
 void __stdcall RedrawGadgetRect(Gui* obj, int index);
 void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2);
-void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4);
+void __stdcall TruncateListItems(int a1, int a2, char* lines, int count);
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* lines, int count, Font* flag);
 void __stdcall ResetSliderGadget(Gui* obj, int i);
 void __stdcall ScheduleGadgetEndTick(Gui* obj, int i);
@@ -132,8 +132,8 @@ void __stdcall SetFontsPath(Gui* obj, const char* dir);
 void __stdcall SetGuiPath(Gui* obj, const char* dir);
 void __stdcall SetAnimsPath(Gui* obj, const char* dir);
 int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name);
-void __stdcall GetGadgetRectByIndex(char*, int, Rect*);
-void __stdcall GetGadgetScreenRect(char*, int, Rect*);
+void __stdcall GetGadgetRectByIndex(Gadget*, int, Rect*);
+void __stdcall GetGadgetScreenRect(Gadget*, int, Rect*);
 int __stdcall FindBackgroundCell(Gadget* entries, int index);
 int __stdcall IsPointInRect(Rect* r, int px, int py);
 void __stdcall DrawListBox(Gui* obj, int index);
@@ -173,5 +173,9 @@ void __stdcall SetGrayedOut(Gui* obj, int index, int value);
 void __stdcall DrawGadgetSelectionBox(Gui* obj, int index, int);
 int __stdcall HandleHotspotInput(Gui* obj, int index);
 void __stdcall DrawTextInput(Gui* obj, int index);
+
+void __stdcall DrawSliderBar(Gui* obj, int index);
+int __stdcall HandleListBoxInput(Gui* obj, int index, int);
+void __stdcall HandleSliderInput(Gui* obj, int index);
 
 #endif

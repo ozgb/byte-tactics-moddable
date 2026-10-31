@@ -28,7 +28,6 @@ void __stdcall SetCursorMode(int n);
 
 #include "../../interfaces/services.h"
 
-// FUNCTION: 0x434b90
 void FreeOtaEnumCache()
 {
     if (g_otaEnumFileList) {

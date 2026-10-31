@@ -289,7 +289,7 @@ int __stdcall GetOrderTarget(int param_1)
 }
 
 // FUNCTION: 0x439df0
-int __stdcall GetOrderName(Unit* obj)
+const char* __stdcall GetOrderName(Unit* obj)
 {
     if (obj && obj->list) {
         return g_missionOrderTableVec[obj->list->kind.index].value;

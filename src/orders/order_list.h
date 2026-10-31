@@ -33,7 +33,7 @@ void __stdcall ClearOrderTypeTable();
 void __stdcall DrawOrderOverlays(Unit* unit, unsigned int mask, void* obj, void* sel, int flag);
 int __stdcall GetBuildWeaponPercent(Unit* owner);
 int __stdcall SumQueuedBuildCount(Unit* owner, int index);
-int __stdcall GetOrderName(Unit* obj);
+const char* __stdcall GetOrderName(Unit* obj);
 int __stdcall ReadyOrder(int arg1, int arg2, int arg3);
 int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int);
 

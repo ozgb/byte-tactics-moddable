@@ -1656,7 +1656,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                         DrawString((Surface*)surface, (unsigned char*)killsText, killsX, killsY, -1);
                     }
                     if (snapshot.orderName) {
-                        strcpy(amount, Translate((char*)snapshot.orderName));
+                        strcpy(amount, Translate(snapshot.orderName));
                         int orderX = panel->missionText.left -
                                      GetTextWidth(panel->font, (unsigned char*)amount) / 2;
                         SetTextColors(0x53, GetTextKeyColor());

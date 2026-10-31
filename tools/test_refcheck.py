@@ -38,7 +38,7 @@ struct Plain { int a; void *vtable; };
 struct Holds { Base b; int y; };
 struct Item { int a; char *p; };
 struct Game { int x; char *view; Item items[3]; int tail; };
-struct SimGlobals { int a; char *list; };
+struct SimGlobals { int a; char *list; char *table; };
 void use(Derived *d, Holds *h, Game *g, SimGlobals *s, Plain *p) { (void)d; (void)h; (void)g; (void)s;
     char *c = (char *)d->handle; (void)c; }
 """
@@ -198,6 +198,17 @@ class ClangTest(unittest.TestCase):
         self.assertIsNone(locator.find("Game", 8))
         self.assertIsNone(locator.find("Game", 32))
 
+    def test_locator_ignores_offsets_inside_a_field(self):
+        locator = rc.Locator(self.scan)
+        for offset in (5, 6, 7, 13, 14, 15, 29, 30, 31):
+            self.assertIsNone(locator.find("Game", offset))
+
+    def test_straddling_token_adds_no_row(self):
+        out = self.outside_notes([("0x6 0xe+0x8*k", "Game.view")])
+        self.assertEqual(out, {})
+        out = self.outside_notes([("0x4 0xc+0x8*k", "Game.view")])
+        self.assertEqual(sorted(out), [("p", "0xc+0x8*k"), ("view", "0x4")])
+
     def test_outside_rows(self):
         data = self.root / "data"
         data.mkdir(exist_ok=True)
@@ -205,18 +216,20 @@ class ClangTest(unittest.TestCase):
         rows = ['CreateGameObject,0x4 0xc+0x8*k 0x0,T,1,1,-,outside,"Game.view"',
                 'CreateGameObject,0x14,T,1,1,-,not-a-pointer,skip',
                 '"LoadUnitInfo: UNITINFO",0x47a+0x249*k 0x191c,T,1,1,-,outside,"UnitType.data"',
-                'SimGlobals.list,0x0,T,1,1,-,outside,"LOS table vector"']
+                'SimGlobals.list,0x0,T,1,1,-,outside,"LOS table vector"',
+                'SimGlobals.table,0x0,T,1,1,-,outside,"damage table vector"']
         (data / "block_pointers.csv").write_text(header + "\n".join(rows) + "\n")
         locators = {"Game": rc.Locator(self.scan), "SimGlobals": rc.Locator(self.scan)}
         classes = {"view": "view", "items": "sim"}
         out = rc.outside_rows(self.root, locators, classes)
         keyed = {(r["struct"], r["field"], r["holder"]): r for r in out}
         self.assertEqual(keyed[("Game", "view", "CreateGameObject")]["issue"], "#392")
-        self.assertEqual(keyed[("Item", "p", "CreateGameObject")]["issue"], "#350")
+        self.assertEqual(keyed[("Item", "p", "CreateGameObject")]["issue"], "#352")
         self.assertEqual(keyed[("", "", "UNITINFO")]["words"], 2)
         self.assertEqual(keyed[("", "", "UNITINFO")]["offset"], "0x47a+0x249*k")
-        self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "#350")
-        self.assertEqual(len(out), 4)
+        self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "#352")
+        self.assertEqual(keyed[("SimGlobals", "table", "SimGlobals.table")]["issue"], "#596")
+        self.assertEqual(len(out), 5)
 
     def outside_notes(self, rows, hand=()):
         data = self.root / "data"
@@ -389,23 +402,27 @@ class IssueTest(unittest.TestCase):
         return rc.exception_issue(rc.Found(struct, field, "pointer", {file}), self.TABLE, self.CLASSES)
 
     def test_by_subsystem(self):
-        self.assertEqual(self.issue("Thing", "p", "src/units/unit.h"), "#349")
-        self.assertEqual(self.issue("Packet", "p", "src/network/packets.cpp"), "#351")
-        self.assertEqual(self.issue("Cell", "p", "src/map/a.h"), "#350")
+        self.assertEqual(self.issue("Thing", "p", "src/units/unit.h"), "#353")
+        self.assertEqual(self.issue("Packet", "p", "src/network/packets.cpp"), "#353")
+        self.assertEqual(self.issue("Cell", "p", "src/map/a.h"), "#353")
         self.assertEqual(self.issue("Panel", "p", "src/gui/x.h"), "#353")
         self.assertEqual(self.issue("Thing", "p", "src/elsewhere/y.h"), "#353")
 
     def test_named_structs_and_game_regions(self):
-        self.assertEqual(self.issue("Mission", "p", "src/map/mission.h"), "#349")
-        self.assertEqual(self.issue("Game", "units", "src/game/game.h"), "#350")
-        self.assertEqual(self.issue("Game", "tab", "src/game/game.h"), "#350")
+        self.assertEqual(self.issue("Mission", "p", "src/map/mission.h"), "#353")
+        self.assertEqual(self.issue("Game", "units", "src/game/game.h"), "#353")
+        self.assertEqual(self.issue("Game", "tab", "src/game/game.h"), "#353")
         self.assertEqual(self.issue("Game", "view", "src/game/game.h"), "#353")
         self.assertEqual(self.issue("Game", "unknown", "src/game/game.h"), "#353")
+
+    def test_container_exception_takes_the_container_issue(self):
+        found = rc.Found("Thing", "v", "container", {"src/units/unit.h"})
+        self.assertEqual(rc.exception_issue(found, self.TABLE, self.CLASSES), "#596")
 
     def test_outside_issue(self):
         self.assertEqual(rc.outside_issue("", "Game", "view", self.CLASSES), "#392")
         self.assertEqual(rc.outside_issue("", "Game", "gaf", self.CLASSES), "#392")
-        self.assertEqual(rc.outside_issue("", "Game", "units", self.CLASSES), "#350")
+        self.assertEqual(rc.outside_issue("", "Game", "units", self.CLASSES), "#352")
         self.assertEqual(rc.outside_issue("FeatureAnim.state (0x4)", "", "", self.CLASSES), "#392")
         self.assertEqual(rc.outside_issue("UnitType.data", "", "", self.CLASSES), "#352")
 

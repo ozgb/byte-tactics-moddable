@@ -538,7 +538,6 @@ void __stdcall SetCursorMode(int value);
 #include "../game/statistics.h"
 #include "../graphics/object_pool.h"
 int __stdcall LoadReporterDll(unsigned int* a, unsigned int* b);
-unsigned char FindHostSlot();
 #include "../network/net_game.h"
 #include "../graphics/palette.h"
 void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* param_3);

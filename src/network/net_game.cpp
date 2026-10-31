@@ -95,7 +95,6 @@ int GetTicks();
 #include "../units/unit_commands.h"
 #include "../units/units.h"
 #include "../game/game_state.h"
-unsigned char FindHostSlot();
 void __stdcall TransferMetal(unsigned char, unsigned char, int, int);
 void __stdcall TransferEnergy(unsigned char, unsigned char, int, int);
 

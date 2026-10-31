@@ -431,17 +431,6 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
     }
 }
 
-// FUNCTION: 0x456850
-unsigned char FindHostSlot()
-{
-    unsigned char i;
-    for (i = 0; i < 10; i++) {
-        if (g_game->players[i].type != 0 && (g_game->players[i].info->flags_97 & 1))
-            return i;
-    }
-    return 10;
-}
-
 // FUNCTION: 0x457bc0
 int CountActiveAIPlayers()
 {

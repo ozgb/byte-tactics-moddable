@@ -57,6 +57,8 @@ void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int*, HeapEntry*);
 int __stdcall GetSlotDpid(unsigned char index);
 // Returns the slot of the player with a net id, or 10 when there is none.
 unsigned char __stdcall FindSlotByDpid(int id);
+// Returns the slot of the host, or 10 when there is none.
+unsigned char FindHostSlot();
 
 // Returns the translation of a key.
 char* __stdcall Translate(const char* key);

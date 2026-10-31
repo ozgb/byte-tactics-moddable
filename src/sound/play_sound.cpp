@@ -7,7 +7,7 @@ extern int* g_diskWav;
 
 void* __stdcall HAPI_LoadFile(char* path, int flags);
 void __cdecl GameFreeThunk(int* p);
-void __stdcall HarnessSoundEvent(const char* kind, const void* sample, const char* file, const int* volume, const int* position);
+void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position);
 
 // FUNCTION: 0x49f610
 int IsWindowsSoundAvailable(void)
@@ -38,7 +38,6 @@ void StopWindowsSound()
 // FUNCTION: 0x49f680
 void __stdcall PlayWavMemory(const char* sound)
 {
-    HarnessSoundEvent("wav", sound, NULL, NULL, NULL);
     PlaySoundA(sound, 0, SND_ASYNC | SND_MEMORY);
 }
 
@@ -46,7 +45,6 @@ void __stdcall PlayWavMemory(const char* sound)
 void __stdcall PlayLoopingWavMemory(char* sound)
 {
     g_loopingWav = sound;
-    HarnessSoundEvent("wav_loop", sound, NULL, NULL, NULL);
     PlaySoundA(sound, 0, 0xd);
 }
 
@@ -55,10 +53,10 @@ void __stdcall PlayLoopingWavMemory(char* sound)
 // FUNCTION: 0x49f6c0
 BOOL __stdcall PlayWavFromDisk(char* path)
 {
+    HarnessSoundEvent("wav_file", -1, path, NULL, NULL);
     int* sound = (int*)HAPI_LoadFile(path, 0);
     if (sound == 0)
         return 0;
-    HarnessSoundEvent("wav_file", NULL, path, NULL, NULL);
     BOOL result = PlaySoundA((LPCSTR)sound, 0, SND_ASYNC | SND_MEMORY);
     if (g_diskWav != 0)
         GameFreeThunk(g_diskWav);

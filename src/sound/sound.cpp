@@ -217,6 +217,7 @@ void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, c
 BOOL __stdcall PlayWavFromDisk(char* path);
 int __stdcall PlayWavMemory(int sound);
 int __stdcall PlayLoopingWavMemory(int sound);
+void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position);
 void ResumeLoopingWav();
 void StopWindowsSound();
 int __cdecl GetLocalDpid();
@@ -390,6 +391,7 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
     if (index != 0xffff) {
         int sound = g_game->sounds[index];
         if (g_useWindowsSound) {
+            HarnessSoundEvent(g_playLooping ? "wav_loop" : "wav", index, NULL, NULL, NULL);
             if (g_playLooping)
                 return PlayLoopingWavMemory(sound);
             return PlayWavMemory(sound);
@@ -403,6 +405,8 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
                 packet.index = index;
                 BroadcastPacket(GetLocalDpid(), &packet, sizeof(packet));
             }
+            int loggedVolume = -585;
+            HarnessSoundEvent(g_playLooping ? "loop" : "play", index, NULL, &loggedVolume, NULL);
             if (g_playLooping)
                 return g_game->sound->PlayLooping(sound, -585);
             return g_game->sound->PlaySampleSet(sound, -585, 0);
@@ -519,6 +523,12 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
                 + (pos->y >> 1) - pos->z;
             // p.z is written before p.y: the store order follows the original.
             p.y = 0;
+            int loggedPosition[3];
+            loggedPosition[0] = p.x;
+            loggedPosition[1] = p.y;
+            loggedPosition[2] = p.z;
+            int loggedVolume = -585;
+            HarnessSoundEvent("play", index, NULL, &loggedVolume, loggedPosition);
             g_game->sound->Set3DDistances(
                 (float)(((g_game->viewWidthTiles + g_game->viewHeightTiles) / 2) * 16),
                 (float)((g_game->mapWidthTiles + g_game->mapHeightTiles) * 16));
@@ -526,8 +536,13 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
         } else {
             if (g_game->scrollX > pos->x || g_game->scrollY > pos->z
                 || g_game->scrollX + g_game->viewWidthTiles * 16 < pos->x
-                || g_game->scrollY + g_game->viewHeightTiles * 16 < pos->z)
+                || g_game->scrollY + g_game->viewHeightTiles * 16 < pos->z) {
+                int loggedVolume = -1585;
+                HarnessSoundEvent("play", index, NULL, &loggedVolume, NULL);
                 return g_game->sound->PlaySampleSet(sound, -1585, 0);
+            }
+            int loggedVolume = -585;
+            HarnessSoundEvent("play", index, NULL, &loggedVolume, NULL);
             return g_game->sound->PlaySampleSet(sound, -585, 0);
         }
     }

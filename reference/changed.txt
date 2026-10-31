@@ -26,6 +26,8 @@
 0x478790 UpdateSolarSystem
 0x478e80 OpenMissionBriefing
 0x47bd70 AnnounceForcesDestroyed
+0x47f0c0 PlaySoundByIndex
+0x47f300 PlaySoundAt
 0x47fd70 SpeechQueue::PlaySpeech
 0x48a490 AlignUnitToGround
 0x4917d0 LoadBattleAssets
@@ -36,14 +38,9 @@
 0x497180 LoadMatch
 0x49be60 DrawProjectiles
 0x49e830 GameMain
-0x49f680 PlayWavMemory
-0x49f6a0 PlayLoopingWavMemory
 0x49f6c0 PlayWavFromDisk
 0x4cdb40 Sound::PlayNextTrack
 0x4cf150 Sound::StopAllBuffers
-0x4cf180 Sound::StopOldestBuffer
-0x4cf570 Sound::PlaySampleSet
-0x4cf800 Sound::PlayMemorySample
-0x4cf8a0 Sound::PlayFileSample
 0x4cfb40 Sound::StopStream
+0x4d0640 Sound::PlaySample
 0x4d84c0 GameRealloc

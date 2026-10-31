@@ -3277,27 +3277,30 @@ void HarnessBeforeStep()
     }
 }
 
-void __stdcall HarnessSoundEvent(const char* kind, const void* sample, const char* file, const int* volume, const int* position)
+void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position)
 {
     if (!s_testMode || s_sound == NULL)
         return;
+    char text[33];
     const char* name = NULL;
     if (file != NULL) {
         name = file;
-        for (const char* p = file; *p != '\0'; p++) {
-            if (*p == '\\' || *p == '/')
-                name = p + 1;
-        }
-    } else if (sample != NULL) {
-        const void* const* ids = (const void* const*)&g_game->soundIds[0];
+    } else if (index >= 0 && index < g_game->soundCount && index < 256) {
         const char(*names)[32] = (const char(*)[32])&g_game->soundNames[0][0];
-        int i;
-        for (i = 0; i < g_game->soundCount && i < 256; i++) {
-            if (ids[i] == sample) {
-                name = names[i];
-                break;
-            }
+        const char(*files)[32] = (const char(*)[32])&g_game->soundFiles[0][0];
+        const char* source = names[index][0] != '\0' ? names[index] : files[index];
+        memcpy(text, source, 32);
+        text[32] = '\0';
+        name = text;
+    }
+    if (name != NULL) {
+        const char* base = name;
+        const char* p;
+        for (p = name; *p != '\0'; p++) {
+            if (*p == '\\' || *p == '/')
+                base = p + 1;
         }
+        name = base;
     }
     if (name == NULL || name[0] == '\0')
         name = "-";

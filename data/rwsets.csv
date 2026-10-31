@@ -7564,6 +7564,7 @@ address,function,file,kind,target
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_maybe_written,Spot::shadow
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Cell::feature
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Cell::flags
+0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Cell::height
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Feature::burnTime
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Feature::seqburn
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Feature::seqburnshad
@@ -7585,6 +7586,7 @@ address,function,file,kind,target
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Spot::x
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Spot::z
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Vec3::x
+0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Vec3::y
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Vec3::z
 0x4233a0,StartFeatureBurning,src/map/features.cpp,function,
 0x4233a0,StartFeatureBurning,src/map/features.cpp,global_read,g_game

@@ -418,7 +418,7 @@ void __stdcall InitUnitScript(Unit* self)
 {
     Object3do* obj = ((Object3do **)g_game->types.get())[self->unitDefIndex];
     if (self->def->data) {
-        self->script = new (kSim) UnitScript;
+        self->script = NewUnitScript();
         ((CobScript*)self->script.get())->SetCob((ScriptTable*)self->def->data);
         self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, self);
         ((UnitScript*)self->script.get())->SetObjectState((int)self->state.get());
@@ -430,10 +430,6 @@ void __stdcall InitUnitScript(Unit* self)
     }
     ((SpotStateUnitView*)self->state.get())->drawFrame = 0;
 }
-
-// FUNCTION: 0x485e30 ??_GUnitScript@@UAEPAXI@Z
-static UnitScript* s_object;
-UnitScript* EmitUnitScriptDeletingDtor() { return new UnitScript; }
 
 #include "../orders/unit_motion.h"
 

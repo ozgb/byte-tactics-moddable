@@ -66,4 +66,6 @@ public:
     void SetObjectState(int newState);
 };
 
+UnitScript* NewUnitScript();
+
 #endif

@@ -18,7 +18,7 @@ struct,field,holder,offset,words,issue,kind,note
 ,,UNITINFO,0x7389,10,,load,"UnitType.data (0x18e), weaponCategories (0x231 0x235 0x239) and categories (0x23d), stride 0x249: loaded with the unit types; target names change with the heap layout (its offsets fall under rows of more than one class: not-a-pointer, outside; classed outside because some offset is a pointer field)"
 ,,UNITINFO,0xa13d,3,,load,"UnitType.data (0x18e), weaponCategories (0x231 0x235 0x239) and categories (0x23d), stride 0x249: loaded with the unit types; target names change with the heap layout (its offsets fall under rows of more than one class: not-a-pointer, outside; classed outside because some offset is a pointer field)"
 CobScript,table,InitUnitScript,0x8,1,,load,"CobScript.table (0x8): the unit type COB script (UnitDef.data, a HAPI_LoadFile buffer relocated in place by LoadCobScript), set by SetCob and only read after"
-DebrisPiece,name,CreateGameObject,0x1abef,1,,load,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
+DebrisPiece,name,CreateGameObject,0x1abef,1,,load,"DebrisPiece.name (0x1c): the loaded 3DO piece name, or the string literal ""explodepiece"", in the explosion debris slots of Game.slots (0x1abbb+0x34*k, 300 slots); read-only either way"
 Face,vindex,CreateGameObject,0x2591b+0x20*k,1800,,load,"Face.vindex (0xc): the loaded 3DO face index list, or g_faceVertexIndices (read-only table in the exe image) for the explosion debris slots"
 GafRef,pic,CreateGameObject,0x2591f+0x20*k,1800,,load,"GafRef.pic in Game.frames Face.tex (0x10): a frame of the loaded GAF (GetGafFrame), never written by the frame itself"
 GafRef,src,CreateGameObject,0x25927+0x20*k,1800,,load,GafRef.src in Game.frames Face.tex (0x18): a sequence record of the loaded GAF (InitGafSequence); Debris and DebrisView carry the same type
@@ -85,7 +85,6 @@ LightBarSprite,lightbar,CreateGameObject,0x37e94,1,,load,"Game resource pointers
 Main2Menu,data,CreateGameObject,0x52d+0x8*k,1,#392,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
 Mission,mapList,SetMissionType,0xd24,1,,load,"Mission.mapList (0xd24): map name list that LoadMapList copies from the OTA enumeration (GameAlloc MULTI MAPS); replaced only by RefreshMapList in the lobby, never by a tick; the scenarios never open the lobby, so the scan never saw it"
 MovementClass,name,SimGlobals.g_movementClasses,0x0+0x20*k,32,,load,"MovementClass.name (0x0, stride 0x20): GameStrdup of the MOVEINFO.TDF class name, set at load by LoadUnitTypes and only compared after"
-Object3D,name,CreateGameObject,0x1abbb+0x34*k,300,,load,"Object3D.name (0x1c): the loaded 3DO piece name, or the string literal ""explodepiece"" for the explosion debris slots in Game.slots; read-only either way"
 PieceFrame,color,CreateGameObject,0x25967+0x140*k,1,,load,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
 PieceRec,desc,Object State,0x22+0x36*k,1,,load,"PieceRec.desc (0x0, in Object State piece records at 0x22+0x36*k): the Object3D of the loaded 3DO piece, never written after load"
 ScriptTable,code,LoadCobScript,0x24,1,,load,"ScriptTable.code (0x24): code words inside the same HAPI_LoadFile COB buffer, relocated by LoadCobScript"

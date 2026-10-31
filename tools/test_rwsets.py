@@ -118,6 +118,25 @@ def rows_of(source):
 
 
 @unittest.skipUnless(shutil.which("clang-cl"), "clang-cl is not installed")
+class DuplicateMarkerTest(unittest.TestCase):
+    def duplicates(self, source):
+        rows, _ = rows_of(source)
+        return rwsets.duplicate_markers(rows)
+
+    def test_one_address_on_two_functions_is_reported(self):
+        source = "// FUNCTION: 0x401000\nvoid A() {}\n\n// FUNCTION: 0x401000\nvoid B() {}\n"
+        self.assertEqual(self.duplicates(source), {"0x401000": [("A", "src/a.cpp"), ("B", "src/a.cpp")]})
+
+    def test_distinct_addresses_and_unmarked_functions_pass(self):
+        source = "// FUNCTION: 0x401000\nvoid A() {}\n\n// FUNCTION: 0x401010\nvoid B() {}\n\nvoid C() {}\nvoid D() {}\n"
+        self.assertEqual(self.duplicates(source), {})
+
+    def test_overloads_with_distinct_addresses_pass(self):
+        source = "// FUNCTION: 0x401000\nvoid A(int) {}\n\n// FUNCTION: 0x401010\nvoid A(char) {}\n"
+        self.assertEqual(self.duplicates(source), {})
+
+
+@unittest.skipUnless(shutil.which("clang-cl"), "clang-cl is not installed")
 class RwsetsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

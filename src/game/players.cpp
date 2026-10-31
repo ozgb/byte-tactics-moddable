@@ -461,25 +461,6 @@ void __stdcall ContinueWatchingCallback(Gui* gui)
 
 
 
-// FUNCTION: 0x464e70
-void ShowContinueWatchingDialog()
-{
-    Layer* screen = LoadGuiLayer(&g_game->gui, g_yesNoGuiName, 0x900);
-    if (screen) {
-        Gadget* form;
-        SetKeyboardInput(&g_game->gui, 1);
-        form = screen->entries;
-        SetTranslatedTextByName(&g_game->gui, g_choice1GadgetName, g_yesText, 0);
-        SetTranslatedTextByName(&g_game->gui, g_choice2GadgetName, g_noText, 0);
-        SetTranslatedTextByName(&g_game->gui, g_titleGadgetName, g_continueWatchingTitle, 0);
-        strcpy(form->u.names.choice, g_choice1GadgetName);
-        strcpy(form->u.names.choice2, g_choice2GadgetName);
-        screen->handler = ContinueWatchingCallback;
-        RenderLayer(&g_game->gui, 0x40);
-    }
-}
-
-
 unsigned char __stdcall FindHostSlot();
 #include "../util/math.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,

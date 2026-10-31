@@ -1,0 +1,3 @@
+bt-sound 1
+0 stop_all - - - - -
+20 play ADDBUILD -585 - - -

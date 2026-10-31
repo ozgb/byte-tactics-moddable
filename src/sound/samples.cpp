@@ -30,6 +30,7 @@ int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 
 #include "sound.h"
 #include "../util/vec3.h"
+#include "../harness/harness.h"
 
 static inline int ClampVolume(int v)
 {
@@ -176,6 +177,7 @@ void Sound::ReapFinishedBuffers()
 // FUNCTION: 0x4cf150
 void Sound::StopAllBuffers()
 {
+    HarnessSoundEvent("stop_all", -1, nullptr, nullptr, nullptr);
     void** slot = buffers;
     for (int i = 0x20; i != 0; i--) {
         void* obj = *slot;
@@ -494,6 +496,7 @@ void Sound::StartStream(FileHandle* file, int sampleRate, int bits,
 // FUNCTION: 0x4cfb40
 void Sound::StopStream()
 {
+    HarnessSoundEvent("stop_stream", -1, nullptr, nullptr, nullptr);
     if (streamTimer != -1) {
         RemoveTimer(streamTimer);
         streamTimer = -1;
@@ -893,6 +896,8 @@ void* Sound::LoadSample(char* path)
 // FUNCTION: 0x4d0640
 int Sound::PlaySample(const char* param1, int param2, int param3)
 {
+    int loggedVolume = param2;
+    HarnessSoundEvent("play_file", -1, param1, &loggedVolume, nullptr);
     return OpenSample((char*)param1, 1, param2, param3);
 }
 

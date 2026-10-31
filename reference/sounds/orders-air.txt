@@ -1,0 +1,21 @@
+bt-sound 1
+0 stop_all - - - - -
+78 play_file nanlath1.WAV -585 - - -
+835 play_file kcarmmov.WAV -585 - - -
+899 play ADDBUILD -585 - - -
+900 play ADDBUILD -585 - - -
+901 play ADDBUILD -585 - - -
+902 play ADDBUILD -585 - - -
+1025 play_file pairwork.WAV -585 - - -
+1580 play_file vtolarld.WAV -585 - - -
+2394 play_file vtolarld.WAV -585 - - -
+3156 play_file vtolarld.WAV -585 - - -
+3660 play_file nanlath1.WAV -585 - - -
+3700 play_file vtolarmv.WAV -585 - - -
+4000 play_file vtolarmv.WAV -585 - - -
+4035 play_file reclaim1.WAV -585 - - -
+4100 play_file vtolarmv.WAV -585 - - -
+4300 play_file vtolarmv.WAV -585 - - -
+4360 play_file vtolarmv.WAV -585 - - -
+4534 play rocklit3 -1585 - - -
+4570 play xplosml2 -1585 - - -

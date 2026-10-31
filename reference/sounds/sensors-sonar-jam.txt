@@ -1,0 +1,9 @@
+bt-sound 1
+0 stop_all - - - - -
+71 play lasrfir1 -585 - - -
+76 play lasrhit2 -585 - - -
+96 play lasrfir1 -585 - - -
+101 play lasrhit2 -585 - - -
+121 play lasrfir1 -585 - - -
+126 play lasrhit2 -585 - - -
+146 play lasrfir1 -585 - - -

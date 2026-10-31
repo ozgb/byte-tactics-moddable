@@ -28,6 +28,42 @@ class NameMismatchTest(unittest.TestCase):
         self.assertIn("extra: none", reference.name_mismatch({"a"}, {"a", "b"}))
 
 
+class SoundLogTest(unittest.TestCase):
+    LOG = "bt-sound 1\n1 play a -585 - - -\n2 stop_all - - - - -\n"
+
+    def test_equal_logs(self):
+        self.assertIsNone(reference.sound_difference(self.LOG, self.LOG))
+
+    def test_first_differing_line_is_named(self):
+        got = self.LOG.replace("-585", "-1585")
+        self.assertEqual(reference.sound_difference(self.LOG, got),
+                         "sound line 2: stored `1 play a -585 - - -`, got `1 play a -1585 - - -`")
+
+    def test_a_longer_log_differs_at_the_extra_line(self):
+        self.assertIn("sound line 4: only the got log has it", reference.sound_difference(self.LOG, self.LOG + "3 play b -585 - - -\n"))
+        self.assertIn("sound line 3: only the stored log has it", reference.sound_difference(self.LOG, "bt-sound 1\n1 play a -585 - - -\n"))
+
+    def test_report_counts_unstored_logs_and_fails_only_on_stored_ones(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "same.txt").write_text(self.LOG)
+            (directory / "other.txt").write_text(self.LOG)
+            scenarios = {n: Path(n) for n in ("same", "other", "none")}
+            logs = {"same": self.LOG, "other": self.LOG + "x\n", "none": self.LOG}
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                differing, lines = reference.sound_report(scenarios, logs, directory)
+        self.assertEqual(differing, ["other"])
+        self.assertIn("1 of 3 equal, 1 differ, 1 with no stored log", lines[-1])
+
+    def test_a_run_with_no_sound_log_differs_from_a_stored_one(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "a.txt").write_text(self.LOG)
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                differing, _ = reference.sound_report({"a": Path("a")}, {"a": None}, directory)
+        self.assertEqual(differing, ["a"])
+
+
 class StepsPerFrameTest(unittest.TestCase):
     def test_copies_end_with_the_key(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -184,7 +220,7 @@ class ScanRunTest(unittest.TestCase):
     def run_scenario(self, scans, scan_every, retry_any, errors):
         timeouts = []
 
-        def fake_play(exe, scenario, game_dir, want, timeout, poison, every):
+        def fake_play(exe, scenario, game_dir, want, timeout, poison, every, collect=()):
             timeouts.append(timeout)
             if errors:
                 raise reference.tracediff.Error(errors.pop(0))
@@ -234,7 +270,7 @@ class FailedAttemptTest(unittest.TestCase):
             (run / "trace.txt").write_text("")
             attempts = []
 
-            def fake_play(exe, scenario, game_dir, want, timeout, poison, every):
+            def fake_play(exe, scenario, game_dir, want, timeout, poison, every, collect=()):
                 attempts.append(1)
                 if len(attempts) == 1:
                     raise reference.tracediff.Error(message)
@@ -407,7 +443,7 @@ class LoadOrderTest(unittest.TestCase):
                 reference.play_scenario(Path("x.exe"), Path(tmp) / "s.txt", None, save_to=target)
             self.assertEqual((target / "harness.sav").read_bytes(), b"data")
             self.assertEqual((target / "harness.opt").read_bytes(), b"options")
-            self.assertEqual(seen["collect"], ("savegame/harness.sav", "savegame/harness.opt"))
+            self.assertEqual(seen["collect"][-2:], ("savegame/harness.sav", "savegame/harness.opt"))
             self.assertFalse(run.parent.exists())
 
 

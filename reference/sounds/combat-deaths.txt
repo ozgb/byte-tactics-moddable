@@ -1,0 +1,14 @@
+bt-sound 1
+0 stop_all - - - - -
+36 play_file nanlath1.WAV -585 - - -
+433 play_file nanlath1.WAV -585 - - -
+700 play_file count1.WAV -585 - - -
+730 play_file count2.WAV -585 - - -
+760 play_file count3.WAV -585 - - -
+790 play_file count4.WAV -585 - - -
+820 play_file count5.WAV -585 - - -
+850 play_file count6.WAV -585 - - -
+890 play_file count4.WAV -585 - - -
+920 play_file count5.WAV -585 - - -
+950 play_file count6.WAV -585 - - -
+964 play xplomed1 -585 - - -

@@ -986,7 +986,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
         }
         if (target->player->active != 0
             && (target->player->type == 1 || target->player->type == 2))
-            BroadcastBuilderLink(unit, target);
+            g_seams.network->SendBuilderLink(unit, target);
         if ((unit->flags & 0x10) || (target->flags & 0x10))
             g_game->ordersPanelFlags_37ebe_6.raw |= 0x10;
     }

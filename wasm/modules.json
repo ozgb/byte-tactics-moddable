@@ -18,6 +18,7 @@
     "host": 2,
     "los_radar": 1,
     "map": 3,
+    "network": 1,
     "orders": 1,
     "pathfinding": 1,
     "players": 1,

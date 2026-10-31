@@ -11,7 +11,6 @@ struct RockUnitView;
 struct Unit;
 struct UnitWeaponSlot;
 struct Vec3;
-struct WeaponFireUnitView;
 
 struct Projectile;
 struct Unit;
@@ -52,7 +51,7 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit, Unit* target, V
 
 void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit);
 
-void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, WeaponFireUnitView* source, WeaponFireUnitView* target, Vec3* a, Vec3* b);
+void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, Unit* source, Unit* target, Vec3* a, Vec3* b);
 void __stdcall BroadcastWeaponFire(char, Vec3* a, Vec3* b);
 void __stdcall RockUnit(RockUnitView* obj, UnitWeaponSlot* src);
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3* pos);

@@ -41,7 +41,7 @@ typedef std::vector<Point16> PointMarkerCellVector;
 
 #pragma pack(push, 2)
 
-#include "../network/bit_writer.h"
+#include "../../interfaces/services.h"
 
 class BitReader;
 struct Order;
@@ -78,7 +78,6 @@ struct PathOrderRecord {
 
 #pragma pack(pop)
 
-#include "../network/bit_reader.h"
 
 class Pathfinder;
 

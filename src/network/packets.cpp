@@ -34,7 +34,7 @@ struct NetFrameAddressView {
 
 #include "frame_ring.h"
 
-#include "bit_reader.h"
+#include "../../interfaces/services.h"
 
 #include "packet_receiver.h"
 

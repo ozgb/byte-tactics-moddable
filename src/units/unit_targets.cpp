@@ -251,19 +251,9 @@ unsigned char Unit::ChooseWeapon()
     return result;
 }
 
-#pragma pack(push, 1)
-struct UnitDamagePacketOut {
-    unsigned char type;
-    short victimId;
-    short attackerId;
-    short amount;
-    unsigned char headingByte;
-    unsigned char damageKind;
-};
-#pragma pack(pop)
-
+#include "../network/wire_packets.h"
+#include "../../interfaces/seams.h"
 #include "unit_targets.h"
-void __stdcall BroadcastPacket(int who, UnitDamagePacketOut* dmg, int size);
 #include "../network/net_game.h"
 
 // FUNCTION: 0x489bb0
@@ -288,12 +278,8 @@ void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsi
     d.headingByte = (unsigned char)(extra >> 8);
     d.damageKind = type;
     ApplyUnitDamage((UnitDamagePacket *)&d);
-    if (target->player->active != 0 && target->player->type == 3 && type != 11) {
-        if (source)
-            BroadcastPacket(source->player->id, &d, 9);
-        else
-            BroadcastPacket(GetLocalDpid(), &d, 9);
-    }
+    if (target->player->active != 0 && target->player->type == 3 && type != 11)
+        g_seams.network->SendUnitDamage(source, target, dmg, type, extra);
 }
 
 #include "../orders/mission_type.h"

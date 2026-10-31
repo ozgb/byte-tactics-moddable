@@ -125,8 +125,6 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot1
 #include "../util/math.h"
 void __stdcall PlaySoundAtByName(char* name, Vec3* pos, int param_3);
 #include "../network/net_game.h"
-int GetHostDpid();
-int __stdcall BroadcastPacket(int player, void* data, int size);
 int __stdcall StepGafSequence(Handle* anim);
 GafFrame* __stdcall GetGafSequenceFrame(Handle* anim);
 void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
@@ -558,14 +556,8 @@ void __stdcall StartFeatureBurning(int x, int z, int flag)
     pos.x = x << 20;
     pos.z = z << 20;
     PlaySoundAtByName("treeburn", &pos, 0);
-    if (flag == 0) {
-        FeatureDamagePacket packet;
-        packet.type = 0xf;
-        packet.sub = 0xfe;
-        packet.x = x;
-        packet.z = z;
-        BroadcastPacket(GetLocalDpid(), &packet, 6);
-    }
+    if (flag == 0)
+        g_seams.network->SendFeatureBurning(x, z);
 }
 
 // FUNCTION: 0x423550
@@ -705,14 +697,8 @@ int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
         unit->metal += metal;
     }
     KillFeature(x, z, 1);
-    if (g_seams.map->GetGameType(g_game->net) == 3) {
-        FeatureDamagePacket packet;
-        packet.type = 0xf;
-        packet.sub = 0xff;
-        packet.x = x;
-        packet.z = z;
-        BroadcastPacket(((Player*)unit->player)->id, &packet, 6);
-    }
+    if (g_seams.map->GetGameType(g_game->net) == 3)
+        g_seams.network->SendFeatureReclaimed(unit, x, z);
     return 1;
 }
 
@@ -981,19 +967,14 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
     Feature* f = &g_game->features[cell->feature];
     if (f->indestructible)
         return;
-    FeatureDamagePacket packet;
     int send;
+    int killed = 0;
     if (g_seams.map->GetGameType(g_game->net) == 3) {
         if (!(g_game->players[g_game->playerIndex].info->flags_97 & 1)) {
-            packet.type = 0xf;
-            packet.sub = weapon->index;
-            packet.x = x;
-            packet.z = z;
-            SendPacketToPlayer(GetLocalDpid(), GetHostDpid(), (unsigned char *)&packet, 6);
+            g_seams.network->SendFeatureHit(weapon, x, z);
             return;
         }
         send = 1;
-        packet.sub = 0xfc;
     } else {
         send = 0;
     }
@@ -1009,24 +990,20 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
             s->damage += weapon->damage;
             if (s->damage >= f->damage) {
                 KillFeature(s->x, s->z, 0);
-                packet.sub = 0xfd;
+                killed = 1;
             }
         }
     } else {
         int d = weapon->damage + cell->spot;
         if (d >= f->damage) {
             KillFeature(x, z, 0);
-            packet.sub = 0xfd;
+            killed = 1;
         } else {
             cell->spot = d;
         }
     }
-    if (send && packet.sub > 0xfc) {
-        packet.type = 0xf;
-        packet.x = x;
-        packet.z = z;
-        BroadcastPacket(GetLocalDpid(), &packet, 6);
-    }
+    if (send && killed)
+        g_seams.network->SendFeatureKilled(x, z);
 }
 
 static inline void ClearCell(Cell* c)

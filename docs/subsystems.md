@@ -643,7 +643,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 ## The sim event queue
 
-Sim tells presentation what happened through one queue, so that sim calls no presentation function and keeps no result of one. The queue is a ring of 256 records of 32 bytes in the shared state block (one allocation tagged `SIM EVENTS`, made with the sim globals), classed `view`, and in no trace, so it never changes a digest. A save does not hold it: it is empty at the start of a match, after a load and after each frame's drain.
+Sim tells presentation what happened through one queue, so that sim calls no presentation function and keeps no result of one. The queue is a ring of 512 records of 32 bytes in the shared state block (one allocation tagged `SIM EVENTS`, made with the sim globals), classed `view`, and in no trace, so it never changes a digest. A save does not hold it: it is empty at the start of a match, after a load and after each frame's drain.
 
 A record is, in order, `kind` (u16), `flags` (u16), `tick` (u32, the tick the event was recorded in) and six u32 arguments (unused ones are 0). The queue also holds a head and a tail, which count the records drained and recorded, and a count of the events dropped. The records between head and tail are the pending events, oldest first.
 
@@ -651,7 +651,7 @@ Sim records an event with `RecordSimEvent(kind, flags, args, count)`, a service 
 
 Presentation drains the queue once per frame, after all the frame's sim steps (one in a test-mode run, up to five when playing) and before the frame is drawn. It takes the records in order, oldest first, and acts on each as the call it replaced did. A step's effects therefore come after every sim change of the same frame, and in a frame of several steps all steps' events come together. Drawing from the view random stream, the only stream presentation draws from, moves with the effect to the drain, and it is not hashed.
 
-When the queue is full, a test-mode run ends with a fatal error naming the queue, so that a scenario can never lose an event unseen. When playing, the new event is dropped and counted. The most that one step recorded in the 65 scenarios of the suite is 9 records, so the ring holds more than 28 times as many.
+When the queue is full, a test-mode run ends with a fatal error naming the queue, so that a scenario can never lose an event unseen. When playing, the new event is dropped and counted. The most that one step recorded in the 65 scenarios of the suite is 32 records, so the ring holds 16 times as many.
 
 To add a kind of event: add its name and the meaning of its arguments to `SimEventKind` in `interfaces/services.h`, record it in sim, and handle it in the drain of presentation.
 

@@ -123,7 +123,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,184,113,4386,2204,1728,538,,23,
+game,*,,184,113,4387,2205,1728,538,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -692,7 +692,7 @@ pathfinding,Pathfinder::MarkGoalCell,src/ai/pathfind.cpp,0,0,0,0,0,0,?MarkGoalCe
 pathfinding,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,0,0,0,0,0,0,?ReleaseHeldPathLock@Pathfinder@@QAEXXZ,1,
 pathfinding,Pathfinder::RemoveNode,src/ai/pathfind.cpp,1,0,0,0,0,0,?RemoveNode@Pathfinder@@QAEXH@Z,0,unreachable
 pathfinding,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,1,0,0,0,0,0,??1Pathfinder@@QAE@XZ,0,shutdown
-platform,*,,720,379,8069,3146,3170,808,,83,
+platform,*,,723,381,8082,3154,3172,808,,83,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,
@@ -751,7 +751,7 @@ platform,CheckOnlineVersion,src/host/win32/net.cpp,1,0,0,0,0,0,?CheckOnlineVersi
 platform,ClearCommandTable,src/util/commands.cpp,0,0,0,0,0,0,?ClearCommandTable@@YGXXZ,1,
 platform,CloseLoadedImage,src/host/win32/crash.cpp,0,0,0,0,0,0,?CloseLoadedImage@@YGXXZ,1,
 platform,CollectMode,src/host/win32/display.cpp,1,0,0,0,0,0,?CollectMode@?A0x@@YGJPAU_DDSURFACEDESC@@PAX@Z,0,
-platform,CommandArgs::GetArgPtr,src/util/commands.h,1,0,0,0,0,0,?GetArgPtr@CommandArgs@@QAEPADHPAD@Z,0,
+platform,CommandArgs::GetArgPtr,interfaces/services.h,1,0,0,0,0,0,?GetArgPtr@CommandArgs@@QAEPADHPAD@Z,0,
 platform,CommandArgs::ShiftArgs,src/util/commands.cpp,0,0,0,0,0,0,?ShiftArgs@CommandArgs@@QAEXH@Z,1,
 platform,CommandLineNumber::~CommandLineNumber,src/debug/debug_lib.cpp,1,0,0,0,0,0,??1CommandLineNumber@@QAE@XZ,0,
 platform,CommandLineSwitch::~CommandLineSwitch,src/debug/command_line.h,1,0,0,0,0,0,??1CommandLineSwitch@@QAE@XZ,0,
@@ -875,6 +875,7 @@ platform,GetFreedBlockRing,src/debug/debug_lib.cpp,1,0,0,0,0,0,?GetFreedBlockRin
 platform,GetModuleBase,src/host/win32/crash.cpp,1,0,0,0,0,0,?GetModuleBase@@YGXHH@Z,0,
 platform,GetStackHigh,src/host/win32/crash.cpp,1,0,0,0,0,0,?GetStackHigh@@YGPAXXZ,0,
 platform,GetStackLow,src/host/win32/crash.cpp,1,0,0,0,0,0,?GetStackLow@@YAHXZ,0,
+platform,GetTickRate,src/graphics/display.cpp,1,0,0,0,0,0,?GetTickRate@@YGHXZ,0,
 platform,GonzoAtexitHandler,src/debug/debug_lib.cpp,0,0,0,0,0,0,?GonzoAtexitHandler@@YGXXZ,1,
 platform,HAPINET_enumconnections,src/host/win32/net.cpp,1,0,0,0,0,0,?HAPINET_enumconnections@?A0x@@YGHPAUhost_guid@@PAXKPAUDPName@?A0x@@KPAUhost_net@@@Z,0,
 platform,HAPINET_getgamescallback,src/host/win32/net.cpp,1,0,0,0,0,0,?HAPINET_getgamescallback@?A0x@@YGHPAUSessionDesc@?A0x@@PAHIPAUhost_net@@@Z,0,
@@ -1198,7 +1199,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1106,454,31699,9821,11814,2554,,293,
+presentation,*,,1105,453,31691,9815,11814,2554,,293,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,
@@ -1424,7 +1425,6 @@ presentation,EnterMainMenuState,src/frontend/frontend.cpp,1,0,0,0,0,0,?EnterMain
 presentation,Entries,src/ingame/control_panel.cpp,0,0,0,0,0,0,?Entries@@YGPAUGadget@@PAU1@@Z,1,
 presentation,EnumModemAddressCallback,src/frontend/multi.cpp,1,0,0,0,0,0,?EnumModemAddressCallback@@YGHABU_GUID@@KPBXPAX@Z,0,
 presentation,EraseFrameDithered,src/graphics/gaf.cpp,1,0,0,0,0,0,?EraseFrameDithered@@YGXPAUSurface@@PAUGafFrame@@HHH@Z,0,
-presentation,ExceptionFilter,src/graphics/pcx.cpp,1,0,0,0,0,0,?ExceptionFilter@@YGHPAXPBD@Z,0,
 presentation,ExitParticlePool,src/graphics/particles.cpp,1,0,0,0,0,0,?ExitParticlePool@@YGXXZ,0,
 presentation,ExpandGadgetTextToType5,src/frontend/multi.cpp,0,0,0,0,0,0,?ExpandGadgetTextToType5@@YGXPAUGadget@@@Z,1,
 presentation,FUN_0042f900,src/sound/sound_types.cpp,0,0,0,0,0,0,?FUN_0042f900@@YGXH@Z,1,
@@ -1849,6 +1849,7 @@ presentation,RefreshFileList,src/gui/file_list.cpp,0,0,0,0,0,0,?RefreshFileList@
 presentation,RefreshOrderButtons,src/ingame/control_panel.cpp,1,0,0,0,0,0,?RefreshOrderButtons@@YGXPAUUnit@@@Z,0,
 presentation,RefreshSkirmishSetup,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?RefreshSkirmishSetup@@YGXXZ,0,
 presentation,RefreshTeamIcons,src/frontend/multi.cpp,1,0,0,0,0,0,?RefreshTeamIcons@@YGXXZ,0,
+presentation,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,1,0,0,0,0,0,?ReleaseDisplayAfterCrash@@YAXXZ,0,
 presentation,ReportDialogFrame,src/frontend/multi.cpp,1,0,0,0,0,0,?ReportDialogFrame@@YGXXZ,0,
 presentation,ReportGameEventCallback,src/ingame/info_panel.cpp,1,0,0,0,0,0,?ReportGameEventCallback@@YGXH@Z,0,
 presentation,ResetListBox,src/gui/gui.cpp,0,0,0,0,0,0,?ResetListBox@@YGXPAUGui@@H@Z,1,
@@ -2157,7 +2158,7 @@ seams,LoadMeteorDefaultsNative,src/seams/native.cpp,1,0,0,0,0,0,?LoadMeteorDefau
 seams,MissionExistsNative,src/seams/native.cpp,1,0,0,0,0,0,?MissionExistsNative@@YIHPAVMission@@HH@Z,0,
 seams,SelectMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?SelectMissionNative@@YIHPAVMission@@HH@Z,0,
 seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadManagerDeleteTimersNative@@YIXPAVSquadManager@@H@Z,0,
-state,*,,522,446,1620,1114,1064,522,,60,
+state,*,,523,447,1624,1118,1064,522,,60,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@G@@PAG@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@G@@PAG@Z,0,unused-instance

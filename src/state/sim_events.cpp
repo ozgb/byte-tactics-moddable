@@ -1,9 +1,11 @@
 #include "sim_events.h"
 #include "sim_globals.h"
+#include "block.h"
+#include "../../interfaces/services.h"
 #include "../game/game.h"
 #include "../../link/globals.h"
 
-SimEventQueue* g_simEvents;
+static SimEventQueue* g_simEvents;
 
 void SimEventsCreate()
 {
@@ -13,7 +15,7 @@ void SimEventsCreate()
 
 SimEventQueue& SimEvents()
 {
-    if (g_simEvents == 0)
+    if (g_simEvents == nullptr)
         SimCreate();
     return *g_simEvents;
 }
@@ -29,7 +31,7 @@ void SimEventsClear()
 void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count)
 {
     SimEventQueue* queue = g_simEvents;
-    if (queue == 0) {
+    if (queue == nullptr) {
         if (HarnessTestMode())
             FatalError("The sim event queue does not exist.");
         return;

@@ -4,6 +4,7 @@
 #include "../../link/globals.h"
 #include "../sound/sound.h"
 #include "../state/sim_events.h"
+#include "../../interfaces/services.h"
 #include "../units/unit.h"
 
 static void DrainUnitSpeech(const SimEvent& e)

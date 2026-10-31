@@ -213,6 +213,7 @@ void __stdcall RegisterCommand(const char* name, AiCommandFn fn, int flags);
 #include "../orders/unit_orders.h"
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
+#include "../../interfaces/services.h"
 #include "../units/squads.h"
 #include "../util/math.h"
 #include "pathfind.h"

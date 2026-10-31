@@ -22,8 +22,6 @@ struct SimEventQueue {
 
 static_assert(sizeof(SimEvent) == 32, "SimEvent size");
 
-extern SimEventQueue* g_simEvents;
-
 SimEventQueue& SimEvents();
 
 void SimEventsCreate();

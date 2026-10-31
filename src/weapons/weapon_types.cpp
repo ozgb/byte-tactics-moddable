@@ -8,7 +8,7 @@
 
 #define PI 3.14159265358979
 
-#include "../util/string_ref.h"
+#include "../../interfaces/services.h"
 
 static inline bool operator==(const StringRef& a, const StringRef& b) {
     return strcmp(a.ptr, b.ptr) == 0;
@@ -25,8 +25,8 @@ static inline bool Less(const char* a, const char* b) {
 #include "../map/los_tables.h"
 
 inline DamageTableEntry* DamageTable::LowerBound(const char* key) {
-    DamageTableEntry* first = v.begin();
-    DamageTableEntry* last = v.end();
+    DamageTableEntry* first = v.Begin();
+    DamageTableEntry* last = v.End();
     while (first != last) {
         DamageTableEntry* mid = first + (last - first) / 2;
         if (Less(mid->name.ptr, key))
@@ -248,8 +248,8 @@ model_done:
                 DamageTable* m = w->table;
                 DamageTableEntry* e = m->LowerBound(name.ptr);
                 int* r;
-                if (e == m->v.end() || Ne(e->name, name)) {
-                    e = m->v.insert(e, DamageTableEntry(name, 0));
+                if (e == m->v.End() || Ne(e->name, name)) {
+                    e = m->v.Insert(e, DamageTableEntry(name, 0));
                     r = &e->value;
                 } else {
                     r = &e->value;

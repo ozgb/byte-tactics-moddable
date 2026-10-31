@@ -6,6 +6,7 @@
 #include <float.h>
 #include <time.h>
 #include "../../interfaces/host.h"
+#include "../../interfaces/services.h"
 
 #include "../game/game.h"
 #include "../map/mission.h"
@@ -47,7 +48,6 @@ struct PlayerSpec {
     int energyLine;
 };
 
-static int s_testMode = 0;
 static unsigned s_gameSeed = 1;
 static unsigned s_crtSeed = 1;
 static unsigned s_viewSeed = 1;
@@ -1190,7 +1190,7 @@ void HarnessInit(char* cmdLine)
     strcpy(s_scenarioPath, path);
     memset(flag, ' ', q - flag);
 
-    s_testMode = 1;
+    EnterHarnessTestMode();
     ReadScenario(path);
     ResolveQuirks();
     s_viewState = s_viewSeed;
@@ -1212,11 +1212,6 @@ void HarnessInit(char* cmdLine)
     }
 }
 
-int HarnessTestMode()
-{
-    return s_testMode;
-}
-
 unsigned HarnessStepsPerFrame()
 {
     return s_stepsPerFrame;
@@ -1224,12 +1219,12 @@ unsigned HarnessStepsPerFrame()
 
 unsigned HarnessGameSeed(unsigned live)
 {
-    return s_testMode ? s_gameSeed : live;
+    return HarnessTestMode() ? s_gameSeed : live;
 }
 
 unsigned HarnessCrtSeed(unsigned live)
 {
-    return s_testMode ? s_crtSeed : live;
+    return HarnessTestMode() ? s_crtSeed : live;
 }
 
 int HarnessViewRand()
@@ -1240,7 +1235,7 @@ int HarnessViewRand()
 
 void HarnessStartSkirmish()
 {
-    if (!s_testMode || s_started)
+    if (!HarnessTestMode() || s_started)
         return;
     s_started = 1;
     if (s_loadLine != 0)
@@ -1252,9 +1247,9 @@ void HarnessStartSkirmish()
 
 void HarnessAfterStep()
 {
-    if (s_testMode && s_blockScan)
+    if (HarnessTestMode() && s_blockScan)
         BlockScanTick((unsigned)g_game->ticks, s_ticks);
-    if (s_testMode && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
+    if (HarnessTestMode() && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
         char directory[] = "savegame";
         char path[] = "savegame\\harness.sav";
         char description[] = "Harness save";
@@ -1270,7 +1265,7 @@ void HarnessAfterStep()
             Fail(msg);
         }
     }
-    if (!s_testMode)
+    if (!HarnessTestMode())
         return;
     ModulesCheckStatics((unsigned)g_game->ticks);
     int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
@@ -2431,13 +2426,9 @@ static void NumberUnitHeap(unsigned char* units, unsigned count)
     }
 }
 
-typedef OrderTableEntry* SimView_g_missionOrderTableBegin;
-#undef g_missionOrderTableBegin
-#define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-
 static const char* OrderKindName(unsigned order)
 {
-    return (const char*)ReadU32At((unsigned)g_missionOrderTableBegin + *(const unsigned char*)(order + ORDER_KIND) * ORDER_TABLE_STRIDE, ORDER_TABLE_NAME);
+    return (const char*)ReadU32At((unsigned)g_missionOrderTableVec.Begin() + *(const unsigned char*)(order + ORDER_KIND) * ORDER_TABLE_STRIDE, ORDER_TABLE_NAME);
 }
 
 static int OrderPosYUnset(unsigned order)
@@ -2979,8 +2970,8 @@ static void VisitWeaponTable(const char* path, unsigned table)
     HashByte(table != 0);
     if (table == 0)
         return;
-    first = ReadU32At(table, WEAPON_TABLE_FIRST);
-    last = ReadU32At(table, WEAPON_TABLE_LAST);
+    first = ReadRefAt(table, WEAPON_TABLE_FIRST);
+    last = ReadRefAt(table, WEAPON_TABLE_LAST);
     n = first != 0 && last >= first && (last - first) % WEAPON_ENTRY_SIZE == 0
         ? (last - first) / WEAPON_ENTRY_SIZE : 0;
     if (n > VECTOR_LIMIT)
@@ -3005,7 +2996,7 @@ static void VisitWeaponDefs()
         sprintf(path, "weapons[%u]", i);
         VisitElement(path, w, &kWeaponDefDataTable);
         strcat(path, ".damage");
-        VisitWeaponTable(path, ReadU32At((unsigned)w, WEAPON_TABLE));
+        VisitWeaponTable(path, ReadRefAt((unsigned)w, WEAPON_TABLE));
     }
     EndSection();
 }
@@ -3440,7 +3431,7 @@ static void ReachQuirkGuard()
 
 void HarnessBeforeStep()
 {
-    if (!s_testMode)
+    if (!HarnessTestMode())
         return;
     unsigned tick = GameU32(GAME_TICK);
     if (s_gameType == 3) {
@@ -3472,7 +3463,7 @@ void HarnessBeforeStep()
 
 void HarnessPhase(int phase)
 {
-    if (!s_testMode || s_trace == NULL)
+    if (!HarnessTestMode() || s_trace == NULL)
         return;
     unsigned tick = GameU32(GAME_TICK);
     unsigned holdrand = GameHoldrand(RAND_STREAM_MAIN);

@@ -64,7 +64,7 @@ int RIReport(int, int, int, int, int, int, int, int, int, int);
 
 #include "../util/vec3.h"
 
-#include "../util/string_ref.h"
+#include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
 
 struct TntFileHeader {

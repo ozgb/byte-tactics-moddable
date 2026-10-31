@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "../../interfaces/seams.h"
-#include "../util/string_ref.h"
+#include "../../interfaces/services.h"
 #include "files_bank.h"
 #include "file_handle.h"
 

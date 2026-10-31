@@ -8,7 +8,7 @@
 #include <new>
 
 #include "../../link/globals.h"
-#include "string_ref.h"
+#include "../../interfaces/services.h"
 #include "tdf.h"
 #include "../state/block.h"
 #include "../state/sim_globals.h"

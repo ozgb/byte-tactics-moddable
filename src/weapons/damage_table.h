@@ -1,15 +1,14 @@
 #ifndef DAMAGE_TABLE_H
 #define DAMAGE_TABLE_H
 
-#include <vector>
-
-struct DamageTableEntry;
+#include "../map/los_tables.h"
+#include "../state/block_vector.h"
 
 #pragma pack(push, 1)
 
 struct DamageTable {
     char less;
-    std::vector<DamageTableEntry> v;
+    BlockVector<DamageTableEntry> v;
 
     DamageTableEntry* LowerBound(const char* key);
 };

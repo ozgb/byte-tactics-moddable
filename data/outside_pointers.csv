@@ -103,3 +103,8 @@ WeaponDef,explosionSeq,CreateGameObject,0x2f95+0x67e*k,1,,load,"Game resource po
 WeaponDef,fire,CreateGameObject,0x2d53+0x115*k,256,,code,"WeaponDef.fire (0x60, stride 0x115): fire routine in the exe image (WeaponFireFn, set by the weapon setup to FireTurretWeapon and its siblings)"
 WeaponDef,model,CreateGameObject,0x30a6+0x115*k,1,,load,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
 WeaponDef,splash,CreateGameObject,0x2f99+0x9bd*k,1,,load,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
+PieceFrame,color,CreateGameObject,0x25967+0x140*k,1,#352,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
+SideDef,font,CreateGameObject,0x3816b,1,#352,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
+WeaponDef,explosionSeq,CreateGameObject,0x2f95+0x67e*k,1,#352,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
+WeaponDef,model,CreateGameObject,0x30a6+0x115*k,1,#352,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
+WeaponDef,splash,CreateGameObject,0x2f99+0x9bd*k,1,#352,pointer,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"

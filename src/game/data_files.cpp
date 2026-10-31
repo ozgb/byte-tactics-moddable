@@ -583,7 +583,7 @@ void FreeTextureGafs()
 
 #include "../units/unit_def.h"
 
-#include "../util/string_ref.h"
+#include "../../interfaces/services.h"
 
 #include "../util/math.h"
 #include "../debug/debug_lib.h"

@@ -83,6 +83,7 @@
 #include "../map/grid.h"
 #include "../map/grid2.h"
 #include "../map/line_of_sight.h"
+#include "../map/los_lines.h"
 #include "../map/los_tables.h"
 #include "../map/map_info.h"
 #include "../map/mission.h"
@@ -106,12 +107,12 @@
 #include "../network/settings.h"
 #include "../orders/air_maneuver_order.h"
 #include "../orders/approach_areas.h"
-#include "../orders/mission_order_table.h"
 #include "../orders/mission_type.h"
 #include "../orders/order.h"
 #include "../orders/order_base.h"
 #include "../orders/order_fx.h"
 #include "../orders/order_goals.h"
+#include "../orders/order_type_entry.h"
 #include "../orders/path_order.h"
 #include "../orders/path_order_attach.h"
 #include "../orders/unit_motion.h"
@@ -128,7 +129,6 @@
 #include "../util/mouse_event.h"
 #include "../util/point.h"
 #include "../util/rot16.h"
-#include "../util/string_ref.h"
 #include "../weapons/damage_table.h"
 #include "../weapons/debris.h"
 #include "../weapons/explosion_types.h"
@@ -1459,10 +1459,12 @@ static_assert(offsetof(LoadingPlayerSlots, inGame) == 0, "");
 static_assert(offsetof(LoadingPlayerSlots, unknown_28) == 40, "");
 static_assert(offsetof(LoadingPlayerSlots, flag40) == 44, "");
 static_assert(offsetof(LoadingPlayerSlots, unknown_54) == 84, "");
-static_assert(sizeof(LosTables) == 13, "");
-static_assert(offsetof(LosTables, first) == 1, "");
-static_assert(offsetof(LosTables, last) == 5, "");
-static_assert(offsetof(LosTables, end) == 9, "");
+static_assert(sizeof(LosLine) == 16, "");
+static_assert(sizeof(LosStep) == 4, "");
+static_assert(offsetof(LosStep, a) == 0, "");
+static_assert(offsetof(LosStep, b) == 2, "");
+static_assert(sizeof(LosTable) == 16, "");
+static_assert(sizeof(LosTables) == 16, "");
 static_assert(sizeof(Main2Menu) == 24, "");
 static_assert(offsetof(Main2Menu, field_51d) == 0, "");
 static_assert(offsetof(Main2Menu, unknown_8) == 4, "");
@@ -1548,10 +1550,6 @@ static_assert(offsetof(MissionOptionFlags, value) == 0, "");
 static_assert(offsetof(MissionOptionFlags, flag_4) == 4, "");
 static_assert(offsetof(MissionOptionFlags, flag_8) == 8, "");
 static_assert(offsetof(MissionOptionFlags, flag_c) == 12, "");
-static_assert(sizeof(MissionOrderTableEntry) == 25, "");
-static_assert(offsetof(MissionOrderTableEntry, unknown_0) == 0, "");
-static_assert(offsetof(MissionOrderTableEntry, markerAnim) == 16, "");
-static_assert(offsetof(MissionOrderTableEntry, unknown_11) == 17, "");
 static_assert(sizeof(MissionRule) == 12, "");
 static_assert(offsetof(MissionRule, type) == 0, "");
 static_assert(offsetof(MissionRule, id) == 4, "");
@@ -1740,6 +1738,14 @@ static_assert(offsetof(Order, attached) == 82, "");
 static_assert(sizeof(OrderBase) == 4, "");
 static_assert(sizeof(OrderFx) == 8, "");
 static_assert(offsetof(OrderFx, source) == 4, "");
+static_assert(sizeof(OrderTableEntry) == 25, "");
+static_assert(offsetof(OrderTableEntry, value) == 0, "");
+static_assert(offsetof(OrderTableEntry, notify) == 4, "");
+static_assert(offsetof(OrderTableEntry, unknown_8) == 8, "");
+static_assert(offsetof(OrderTableEntry, drawMask) == 12, "");
+static_assert(offsetof(OrderTableEntry, markerAnim) == 16, "");
+static_assert(offsetof(OrderTableEntry, flags) == 17, "");
+static_assert(offsetof(OrderTableEntry, name) == 21, "");
 static_assert(sizeof(Orders) == 6, "");
 static_assert(offsetof(Orders, raw) == 0, "");
 static_assert(offsetof(Orders, lo) == 0, "");

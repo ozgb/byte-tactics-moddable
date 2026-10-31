@@ -24,7 +24,14 @@ public:
     typedef std::vector<Unit*> UnitVector;
     UnitVector units;
 
-    UnitVector::iterator EraseSwapBack(UnitVector::iterator where);
+    // FUNCTION: 0x4800c0
+    UnitVector::iterator EraseSwapBack(UnitVector::iterator where)
+    {
+        UnitVector::iterator last = units.end() - 1;
+        *where = *last;
+        units.erase(last);
+        return where;
+    }
 };
 
 class IntDynArray {

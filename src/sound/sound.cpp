@@ -656,15 +656,6 @@ void SpeechQueue::RemoveSpeechOfId(Unit* unit)
 #include <vector>
 #include <algorithm>
 
-// FUNCTION: 0x4800c0
-UnitSwapEraseVector::UnitVector::iterator UnitSwapEraseVector::EraseSwapBack(UnitVector::iterator where)
-{
-    UnitVector::iterator last = units.end() - 1;
-    *where = *last;
-    units.erase(last);
-    return where;
-}
-
 // FUNCTION: 0x480100
 int IntDynArray::EraseByValue(int value)
 {

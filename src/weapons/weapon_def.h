@@ -1,6 +1,8 @@
 #ifndef WEAPON_DEF_H
 #define WEAPON_DEF_H
 
+#include "../../interfaces/ref.h"
+
 #pragma pack(push, 1)
 
 struct DamageTable;
@@ -9,7 +11,7 @@ struct WeaponDef {
     char name[0x20];
     char description[0x40];
     void* fire;
-    DamageTable* table;
+    Ref<DamageTable> table;
     int speed;
     int startSpeed;
     int acceleration;

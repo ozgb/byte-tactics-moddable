@@ -44,7 +44,7 @@ SOURCE_SUFFIXES = (".cpp", ".h", ".inl")
 
 TYPE_OVERRIDES = {
     "g_explodedPieces": "ExplodedPiece*[100]",
-    "g_missionOrderTableVec": "MsvcVector<int>",
+    "g_missionOrderTableVec": "BlockVector<OrderTableEntry>",
     "g_missionOrderTableBegin": "char*",
     "g_playerAI": "PlayerAI*[10]",
     "g_quirks": "Quirks",
@@ -199,7 +199,7 @@ def resolve_plain_type(row: Row) -> str:
         sys.exit(f"simglobals: {row.name} has no row in data/globals.csv and no entry in TYPE_OVERRIDES")
     t = row.type
     if row.leaf == "g_missionOrderTableVec":
-        t = "MsvcVector<int>"
+        t = "BlockVector<OrderTableEntry>"
     elif "(" not in t and "[]" in t and not row.interior:
         elem = t[:t.index("[")]
         width = 4 if elem.endswith("*") else ELEMENT_SIZES.get(elem)

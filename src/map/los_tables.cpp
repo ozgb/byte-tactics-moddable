@@ -8,7 +8,8 @@
 #include <vector>
 #include "los_tables.h"
 
-#include "../util/string_ref.h"
+#include "../state/block_vector.h"
+#include "../../interfaces/services.h"
 
 struct OwnedString {
     char* data;
@@ -33,8 +34,6 @@ typedef std::vector<LosLineData> LineList;
 
 #include "../util/tdf.h"
 #include "../game/data_files.h"
-
-typedef std::vector<LosStep> LosTableView;
 
 struct IntValueElem {
     int value;
@@ -142,13 +141,7 @@ typedef std::vector<LineList> TableList;
 // FUNCTION: 0x4330b0
 void LosTables::FreeTables()
 {
-    ((TableList*)this)->~vector();
-}
-
-static inline LosTable* GetTable(LosTables* self, short n)
-{
-    n--;
-    return (LosTable*)&(*(TableList*)self)[n];
+    BlockVector<LosTable>::~BlockVector();
 }
 
 // FUNCTION: 0x433380
@@ -158,7 +151,7 @@ void LosTables::LoadLosTable(TdfFile* file, short table)
     sprintf(name, "TABLE%d", table + 1);
     file->ResetCurrentRecord();
     if (file->SelectRecord(name)) {
-        LosTable* t = GetTable(this, table + 1);
+        LosTable* t = &(*this)[table];
         short numlines = (short)file->current->GetFieldInt("numlines", 0);
         t->SetNumLines(numlines);
         short n2 = numlines * 2;
@@ -175,7 +168,7 @@ void LosTables::LoadLosTable(TdfFile* file, short table)
 // FUNCTION: 0x433520
 int LosTables::GetLosTableCount()
 {
-    return ((TableList*)this)->size();
+    return Size();
 }
 
 typedef std::vector<LosStep> LosLineSteps;
@@ -187,26 +180,26 @@ LosStepDestroyFn g_destroy_00434020 = &std::allocator<LosStep>::destroy;
 // FUNCTION: 0x433540
 void LosTable::FreeLines()
 {
-    ((LosTableLines*)this)->~vector();
+    BlockVector<LosLine>::~BlockVector();
 }
 
 // FUNCTION: 0x4335c0
 int LosTable::GetLosLineCount()
 {
-    return size();
+    return Size();
 }
 
 // FUNCTION: 0x4335f0
 void LosTable::ResizeLines(short n)
 {
     LosLineData x;
-    resize(n * 4, x);
+    Resize(n * 4, x);
 }
 
 // FUNCTION: 0x4335e0
 LosLine* LosTable::GetLosLine(short param_1)
 {
-    return (LosLine*)&(*this)[param_1];
+    return &(*this)[param_1];
 }
 
 typedef std::vector<IntValueElem> IntValueElemRow;
@@ -231,7 +224,7 @@ void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
             return;
         short n = atoi(tok);
         LosStep x;
-        resize(n, x);
+        Resize(n, x);
         short i;
         switch (mode) {
         case 0:
@@ -261,26 +254,22 @@ void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
         }
     } else {
         LosStep x;
-        resize(0, x);
+        Resize(0, x);
     }
 }
 
 // FUNCTION: 0x4339c0
 int LosLine::GetLosLineStepCount()
 {
-    return size();
+    return Size();
 }
 
 // FUNCTION: 0x4339e0
 void LosLine::GetLosLineStep(short index, unsigned short* out1, unsigned short* out2)
 {
-    int idx = index;
-    unsigned char* base = (unsigned char*)*(void**)((char*)this + 4);
-    unsigned char* ptr = base + idx * 4;
-    unsigned short val1 = *(unsigned short*)ptr;
-    *out1 = val1;
-    unsigned short val2 = *(unsigned short*)(ptr + 2);
-    *out2 = val2;
+    const LosStep& step = (*this)[index];
+    *out1 = step.a;
+    *out2 = step.b;
 }
 
 bool operator==(const LosStep&, const LosStep&);
@@ -401,9 +390,9 @@ typedef LosLineDataVectorAssign& (LosLineDataVectorAssign::*LosLineDataVectorAss
 LosLineDataVectorAssignFn g_assign_00434770 = &LosLineDataVectorAssign::operator=;
 
 // FUNCTION: 0x433500
-LosTableView* LosTables::GetLosTable(int n)
+LosTable* LosTables::GetLosTable(int n)
 {
-    return (LosTableView*)&(*(TableList*)this)[(short)(n - 1)];
+    return &(*this)[(short)(n - 1)];
 }
 
 // FUNCTION: 0x432d40
@@ -432,13 +421,12 @@ void LosTables::LoadLosTables()
         if ((&tdf)->SelectRecord("TABLEINFO") != 0) {
             short numtables = (short)tdf.current->GetFieldInt("numtables", 0);
             {
-                TableList& tables = *(TableList*)this;
-                LineList temp;
+                LosTable temp;
                 unsigned n = (unsigned)numtables;
-                if (tables.size() < n)
-                    tables.insert(tables.end(), n - tables.size(), temp);
-                else if (n < tables.size())
-                    tables.erase(tables.begin() + n, tables.end());
+                if (Size() < n)
+                    Insert(End(), n - Size(), temp);
+                else if (n < Size())
+                    Erase(Begin() + n, End());
             }
             for (short i = 0; i < numtables; i++)
                 LoadLosTable(&tdf, i);
@@ -450,8 +438,8 @@ void LosTables::LoadLosTables()
 // FUNCTION: 0x433270
 void LosTables::ResizeTables(short n)
 {
-    LineList x;
-    ((TableList*)this)->resize(n, x);
+    LosTable x;
+    Resize(n, x);
 }
 
 typedef TableList& (TableList::*TableListAssignFn)(const TableList&);

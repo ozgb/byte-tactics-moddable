@@ -8,7 +8,6 @@ ai,features,shared_write,Point16::y,10
 ai,features,shared_write,Vec3::x,6
 ai,features,shared_write,Vec3::y,4
 ai,features,shared_write,Vec3::z,6
-ai,game,call,Reserve,2
 ai,game,call,SimAllocTagged,1
 ai,game,shared_write,Point16::x,1
 ai,game,shared_write,Point16::y,1
@@ -505,7 +504,6 @@ game,harness,call,HarnessInit,1
 game,harness,call,HarnessPhase,1
 game,harness,call,HarnessStartSkirmish,1
 game,harness,call,HarnessStepsPerFrame,1
-game,harness,call,HarnessTestMode,1
 game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::endGameFlags,1
 game,harness,shared_write,Game::localPlayer,1
@@ -677,6 +675,7 @@ game,platform,call,GetMilliseconds,2
 game,platform,call,GetTickRate,1
 game,platform,call,GetTicks,10
 game,platform,call,GetWindowsUserName,1
+game,platform,call,HarnessTestMode,1
 game,platform,call,InitDebugSupport,1
 game,platform,call,InitEnvironment,1
 game,platform,call,InitTimers,1
@@ -719,7 +718,8 @@ game,platform,call,ToggleFullScreen,2
 game,platform,call,Translate,7
 game,platform,call,UpdateTimers,1
 game,platform,call,host_alert,1
-game,platform,call,host_crash_report,1
+game,platform,call,host_crash_report,3
+game,platform,call,host_crash_set_cleanup,1
 game,platform,call,host_debug_break,1
 game,platform,call,host_dir_set_current,1
 game,platform,call,host_file_close,3
@@ -847,7 +847,6 @@ game,presentation,call,EmptyPreFrontendInitHook,1
 game,presentation,call,EnableEndMissionButtons,1
 game,presentation,call,EnableKeyCommands,4
 game,presentation,call,EnterMainMenuState,1
-game,presentation,call,ExceptionFilter,2
 game,presentation,call,FadeRectangle,1
 game,presentation,call,FillEndGameStatistics,1
 game,presentation,call,FindGadgetChecked,5
@@ -1234,8 +1233,10 @@ harness,orders,shared_write,Game::difficulty,1
 harness,orders,shared_write,Game::localPlayer,2
 harness,orders,shared_write,Game::playerIndex,1
 harness,pathfinding,shared_write,Game::numPlayers,1
+harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
+harness,platform,call,HarnessTestMode,7
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
@@ -2103,7 +2104,7 @@ orders,platform,call,UnitDef::EnergyCost,1
 orders,platform,call,UnitDef::MaxHealth,1
 orders,platform,call,UnitDef::MetalCost,1
 orders,platform,call,WorldToCell,3
-orders,platform,call,copy,4
+orders,platform,call,copy,3
 orders,platform,call,operator delete,20
 orders,platform,call,operator new,46
 orders,platform,call,operator-,1
@@ -2471,7 +2472,6 @@ platform,game,shared_write,Vec3::z,3
 platform,game,shared_write,WindMeteorsSeam::UpdateMeteors,1
 platform,game,shared_write,WindMeteorsSeam::UpdateWind,1
 platform,game,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
-platform,harness,call,HarnessTestMode,1
 platform,harness,shared_write,g_randomSeed,1
 platform,los_radar,indirect,CmdLOS,1
 platform,los_radar,indirect,CmdLOSType,1
@@ -3456,7 +3456,6 @@ presentation,platform,call,VectorFromToInt,1
 presentation,platform,call,WorldToCell,2
 presentation,platform,call,host_atomic_exchange,10
 presentation,platform,call,host_clipboard_text_get,1
-presentation,platform,call,host_crash_report,1
 presentation,platform,call,host_cursor_get,5
 presentation,platform,call,host_cursor_set,1
 presentation,platform,call,host_display_close,1
@@ -4151,13 +4150,13 @@ targeting,orders,shared_write,Vec3::y,60
 targeting,orders,shared_write,Vec3::z,84
 targeting,platform,call,Bits::Test,1
 targeting,platform,call,RandomInt,1
+targeting,platform,call,UnitSwapEraseVector::EraseSwapBack,1
 targeting,platform,shared_write,Vec3::x,22
 targeting,platform,shared_write,Vec3::y,13
 targeting,platform,shared_write,Vec3::z,22
 targeting,players,shared_write,Vec3::x,3
 targeting,players,shared_write,Vec3::y,3
 targeting,players,shared_write,Vec3::z,3
-targeting,presentation,call,UnitSwapEraseVector::EraseSwapBack,1
 targeting,presentation,shared_write,Vec3::x,44
 targeting,presentation,shared_write,Vec3::y,45
 targeting,presentation,shared_write,Vec3::z,43
@@ -4553,8 +4552,6 @@ units,platform,call,GameFreeThunk,10
 units,platform,call,GameStrdup,1
 units,platform,call,GetCobChecksum,1
 units,platform,call,GetLocalizedString,2
-units,platform,call,GetTickRate,2
-units,platform,call,GetTicks,1
 units,platform,call,LoadCobScript,2
 units,platform,call,MakeFixed,1
 units,platform,call,OvrFile::~OvrFile,1
@@ -4585,6 +4582,7 @@ units,platform,call,Translate,3
 units,platform,call,Unguarded_insert,1
 units,platform,call,UsesDataArchives,2
 units,platform,call,WorldToCell,1
+units,platform,call,host_time_ms,1
 units,platform,call,operator delete,6
 units,platform,call,operator new,9
 units,platform,call,operator-,1

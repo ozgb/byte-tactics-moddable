@@ -123,7 +123,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,184,113,4387,2205,1728,538,,23,
+game,*,,216,143,4559,2357,1752,556,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -191,6 +191,8 @@ game,OutOfMemoryHandler,src/game/main.cpp,1,0,0,0,0,0,?OutOfMemoryHandler@@YGXXZ
 game,PreBattleFrame,src/game/main_loop.cpp,1,0,0,0,0,0,?PreBattleFrame@@YGXXZ,0,network
 game,QuirksFlipFirstSim,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksFlipFirstSim@@YG_NPAUQuirks@@@Z,0,test-only
 game,QuirksNormalise,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksNormalise@@YG_NPBDPADH@Z,0,moddable-only
+game,RecordFocusCommander,src/state/sim_effects.h,1,0,0,0,0,0,?RecordFocusCommander@@YGXH@Z,0,start-commander
+game,RecordTeleportParticles,src/state/sim_effects.h,1,0,0,0,0,0,?RecordTeleportParticles@@YGXABUVec3@@0HF@Z,0,no-teleport
 game,ReportViaException,src/game/main.cpp,1,0,0,0,0,0,?ReportViaException@@YGXPBD@Z,0,error-path
 game,Reserve,src/state/block.cpp,1,0,0,0,0,0,?Reserve@?A0x@@YGXXZ,0,wasm
 game,ResetGameSpeed,src/game/game_state.cpp,0,0,0,0,0,0,?ResetGameSpeed@@YGXXZ,1,
@@ -218,7 +220,7 @@ game,SimHighWater,src/state/block.cpp,0,0,0,0,0,0,?SimHighWater@@YAIXZ,1,
 game,UpdateBattleHoverMode,src/game/game_state.cpp,0,0,0,0,0,0,?UpdateBattleHoverMode@@YGXH@Z,1,
 game,UpdateBattleRoom,src/frontend/multi.cpp,1,0,0,0,0,0,?UpdateBattleRoom@@YGXXZ,0,network
 game,WriteGameRegistryValue,src/game/settings.cpp,1,0,0,0,0,0,?WriteGameRegistryValue@@YGXPAX0H@Z,0,shutdown
-los_radar,*,,68,62,1934,1603,890,649,,23,
+los_radar,*,,66,60,1873,1562,880,646,,23,
 los_radar,AssignRange,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRange@@YGXPAUStringValueElem@@00@Z,1,
 los_radar,AssignRangeBack,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRangeBack@@YGPAUStringValueElem@@PAU1@00@Z,1,
 los_radar,CmdShareMapping,src/game/share_commands.cpp,1,0,0,0,0,0,?CmdShareMapping@@YGXH@Z,0,network
@@ -248,7 +250,7 @@ los_radar,StoreDwordIfDst,src/map/los_tables.cpp,0,0,0,0,0,0,?StoreDwordIfDst@@Y
 los_radar,ToggleShareLos,src/game/share_commands.cpp,0,0,0,0,0,0,?ToggleShareLos@@YGXH@Z,1,
 los_radar,UpdateAllCellHeightRanges,src/map/line_of_sight.cpp,0,0,0,0,0,0,?UpdateAllCellHeightRanges@@YGXXZ,1,
 los_radar,Visible,src/units/unit_scripts.cpp,1,0,0,0,0,0,?Visible@@YGHPAUUnitCursorView@@PAUFixedPosView@@@Z,0,menu-cursor
-map,*,,96,78,2138,1859,1022,776,,12,
+map,*,,95,77,2061,1796,992,761,,12,
 map,ClaimFootprintsInArea,src/map/terrain.cpp,0,0,0,0,0,0,?ClaimFootprintsInArea@@YGXUPoint16@@0@Z,1,
 map,ClampBucketCoord,src/map/terrain.cpp,0,0,0,0,0,0,?ClampBucketCoord@@YGHHI@Z,1,
 map,FUN_0047caf0,src/map/terrain.cpp,0,0,0,0,0,0,?FUN_0047caf0@@YGXXZ,1,
@@ -279,7 +281,7 @@ map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?Resiz
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
 map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVUnitVisitor@@@Z,1,
-network,*,,287,50,5310,567,2590,117,,73,
+network,*,,288,50,5315,567,2592,117,,73,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,0,menu
 network,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,1,
@@ -494,6 +496,7 @@ network,Player::IsPlayableSlot,src/network/net_game.cpp,1,0,0,0,0,0,?IsPlayableS
 network,PlayerFrameInfo::Initialize,src/network/packets.cpp,1,0,0,0,0,0,?Initialize@PlayerFrameInfo@@QAEXJ@Z,0,network
 network,PlayerFrameInfo::~PlayerFrameInfo,src/network/packets.cpp,1,0,0,0,0,0,??1PlayerFrameInfo@@QAE@XZ,0,network
 network,PrevFrameSeqInReceiveFrame,src/network/packets.cpp,1,0,0,0,0,0,?PrevFrameSeqInReceiveFrame@@YGHH@Z,0,network
+network,PumpNetPackets,src/network/net_game.cpp,1,0,0,0,0,0,?PumpNetPackets@@YGXXZ,0,network
 network,QueryOnlineFlags,src/network/online_report.cpp,1,0,0,0,0,0,?QueryOnlineFlags@@YGHH@Z,0,network
 network,QueueCount,src/network/packets.cpp,1,0,0,0,0,0,?QueueCount@@YGHPAVFrameQueue@@@Z,0,network
 network,RIReport,src/network/online_report.cpp,1,0,0,0,0,0,?RIReport@@YGHHHHHHHHHHH@Z,0,network
@@ -1118,7 +1121,7 @@ platform,host_window_place,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_pla
 platform,host_window_post,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_post,0,
 platform,host_window_raise,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_raise,0,
 platform,host_window_set_topmost,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_set_topmost,0,
-players,*,,143,74,1913,1011,804,355,,11,
+players,*,,140,74,1840,1011,770,355,,10,
 players,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,src/units/units.cpp,0,0,0,0,0,0,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,1,
 players,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,src/units/units.cpp,0,0,0,0,0,0,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,1,
 players,??$_Iter_swap@PAPAUPlayer@@PAPAU1@PAU1@@std@@YGXPAPAUPlayer@@00@Z,src/units/units.cpp,0,0,0,0,0,0,??$_Iter_swap@PAPAUPlayer@@PAPAU1@PAU1@@std@@YGXPAPAUPlayer@@00@Z,1,
@@ -1150,19 +1153,15 @@ players,DefeatDeathTimerRunsOut::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?Loa
 players,DefeatDeathTimerRunsOut::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@DefeatDeathTimerRunsOut@@UAEXPAVHapiBank@@@Z,0,save-load
 players,DefeatUnitTypeKilled::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@DefeatUnitTypeKilled@@UAEXPAVHapiBank@@@Z,0,save-load
 players,DefeatUnitTypeKilled::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@DefeatUnitTypeKilled@@UAEXPAVHapiBank@@@Z,0,save-load
-players,EnableReporter,src/game/statistics.cpp,1,0,0,0,0,0,?EnableReporter@@YGHH@Z,0,network
 players,FillScoreTables,src/game/statistics.cpp,1,0,0,0,0,0,?FillScoreTables@@YGHXZ,0,network
 players,FreePlayers,src/game/players.cpp,1,0,0,0,0,0,?FreePlayers@@YGXXZ,0,shutdown
 players,IsLocalPlayerEliminated,src/game/victory.cpp,0,0,0,0,0,0,?IsLocalPlayerEliminated@@YGHXZ,1,
 players,IsLocalPlayerOutOfUnits,src/game/victory.cpp,0,0,0,0,0,0,?IsLocalPlayerOutOfUnits@@YGHXZ,1,
 players,IsReporterDllLoaded,src/game/statistics.cpp,1,0,0,0,0,0,?IsReporterDllLoaded@@YG_NXZ,0,network
-players,LoadReporterDll,src/game/statistics.cpp,1,0,0,0,0,0,?LoadReporterDll@@YGHPAHH@Z,0,network
 players,PlayerRecordAt,src/game/game_load.cpp,1,0,0,0,0,0,?PlayerRecordAt@@YGPADPAUGame@@H@Z,0,network
 players,QueryGlobalMemoryStatus,src/game/victory.cpp,0,0,0,0,0,0,?QueryGlobalMemoryStatus@@YGXXZ,1,
 players,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,0,0,0,0,0,0,?RefreshOwnedUnitsLineOfSight@@YGXPAUPlayer@@@Z,1,
 players,SaveNumSkirmishPlayers,src/game/settings_campaign.cpp,1,0,0,0,0,0,?SaveNumSkirmishPlayers@@YGXXZ,0,menu
-players,ShowContinueWatchingDialog,src/game/players.cpp,0,0,0,0,0,0,?ShowContinueWatchingDialog@@YGXXZ,1,
-players,ShutdownScoreTables,src/game/statistics.cpp,1,0,0,0,0,0,?ShutdownScoreTables@@YGXXZ,0,network
 players,UnitList::ForEach,src/game/victory.cpp,1,0,0,0,0,0,?ForEach@UnitList@@QAEXPAVUnitScanVisitor@@@Z,0,campaign-game
 players,VictoryBuildUnitType::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?IsSatisfied@VictoryBuildUnitType@@UAEHXZ,0,campaign-game
 players,VictoryBuildUnitType::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryBuildUnitType@@UAEXPAVHapiBank@@@Z,0,save-load
@@ -1199,7 +1198,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1105,453,31691,9815,11814,2554,,293,
+presentation,*,,1126,468,32077,10067,11966,2627,,295,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,
@@ -1343,6 +1342,7 @@ presentation,DisableUnavailableBuildMenuEntries,src/ingame/control_panel.cpp,0,0
 presentation,Display::LockPrimary,src/graphics/surface.cpp,1,0,0,0,0,0,?LockPrimary@Display@@QAEHPAUSurface@@@Z,0,
 presentation,DitherRectangle,src/graphics/draw.cpp,1,0,0,0,0,0,?DitherRectangle@@YGHPAUSurface@@PAURect@@H@Z,0,
 presentation,DoSelect,src/gui/gui.cpp,1,0,0,0,0,0,?DoSelect@@YGXPAUGui@@PAUGadget@@H@Z,0,
+presentation,DrainTeleport,src/ingame/sim_event_drain.cpp,1,0,0,0,0,0,?DrainTeleport@@YGXAAUSimEventQueue@@ABUSimEvent@@@Z,0,
 presentation,DrawBevelBorder,src/gui/listbox.cpp,1,0,0,0,0,0,?DrawBevelBorder@@YGXPAXPAURect@@HEH@Z,0,
 presentation,DrawBevelBorderDarkFirst,src/gui/listbox.cpp,1,0,0,0,0,0,?DrawBevelBorderDarkFirst@@YGXPAXPAURect@@HHH@Z,0,
 presentation,DrawBitmapBackground,src/frontend/campaign_menu.cpp,0,0,0,0,0,0,?DrawBitmapBackground@@YGXPADH@Z,1,
@@ -1419,6 +1419,7 @@ presentation,EmptyMainLoopHook,src/frontend/frontend.cpp,1,0,0,0,0,0,?EmptyMainL
 presentation,EnableBlinkWords,src/gui/file_list.cpp,0,0,0,0,0,0,?EnableBlinkWords@@YGXPAUGui@@@Z,1,
 presentation,EnableEndMissionButtons,src/frontend/endgame.cpp,1,0,0,0,0,0,?EnableEndMissionButtons@@YGXXZ,0,
 presentation,EnableKeyCommands,src/gui/gui.cpp,1,0,0,0,0,0,?EnableKeyCommands@@YGXPAUGui@@@Z,0,
+presentation,EnableReporter,src/frontend/reporter.cpp,1,0,0,0,0,0,?EnableReporter@@YGHH@Z,0,
 presentation,EndMouseScroll,src/ingame/control_panel.cpp,0,0,0,0,0,0,?EndMouseScroll@@YGXXZ,1,
 presentation,EnsureOptionsPanelGadget,src/frontend/options.cpp,1,0,0,0,0,0,?EnsureOptionsPanelGadget@@YGXXZ,0,
 presentation,EnterMainMenuState,src/frontend/frontend.cpp,1,0,0,0,0,0,?EnterMainMenuState@@YGXXZ,0,
@@ -1492,6 +1493,7 @@ presentation,FreeGafSlot,src/gui/gui_file.cpp,1,0,0,0,0,0,?FreeGafSlot@@YGXPAUGu
 presentation,FreeGrayTable,src/graphics/palette.cpp,1,0,0,0,0,0,?FreeGrayTable@@YGXPAUDisplay@@@Z,0,
 presentation,FreeLightTable,src/graphics/palette.cpp,1,0,0,0,0,0,?FreeLightTable@@YGXPAUDisplay@@@Z,0,
 presentation,FreeMemoryCache,src/frontend/endgame.cpp,1,0,0,0,0,0,?FreeMemoryCache@@YAXXZ,0,
+presentation,FreeOtaEnumCache,src/frontend/map_enum.cpp,1,0,0,0,0,0,?FreeOtaEnumCache@@YGXXZ,0,
 presentation,FreeSaveListBuffers,src/frontend/multi.cpp,0,0,0,0,0,0,?FreeSaveListBuffers@@YGXXZ,1,
 presentation,FreeShadeTable,src/graphics/palette.cpp,1,0,0,0,0,0,?FreeShadeTable@@YGXPAUDisplay@@@Z,0,
 presentation,FreeSoundCategories,src/sound/sound_types.cpp,1,0,0,0,0,0,?FreeSoundCategories@@YGXXZ,0,
@@ -1686,6 +1688,7 @@ presentation,ListBoxSelectUp,src/gui/gui.cpp,1,0,0,0,0,0,?ListBoxSelectUp@@YGXPA
 presentation,ListCampaignFiles,src/frontend/campaign_menu.cpp,0,0,0,0,0,0,?ListCampaignFiles@@YGHPAPAX@Z,1,
 presentation,ListSaveGameFiles,src/frontend/multi.cpp,1,0,0,0,0,0,?ListSaveGameFiles@@YGPAXPAH@Z,0,
 presentation,LoadPcxPalette,src/graphics/pcx.cpp,1,0,0,0,0,0,?LoadPcxPalette@@YGHPADPAI@Z,0,
+presentation,LoadReporterDll,src/frontend/reporter.cpp,1,0,0,0,0,0,?LoadReporterDll@@YGHPAHH@Z,0,
 presentation,LoadSavedAudioSettings,src/frontend/options.cpp,1,0,0,0,0,0,?LoadSavedAudioSettings@@YGXXZ,0,
 presentation,LoadSavedSettings,src/frontend/options.cpp,0,0,0,0,0,0,?LoadSavedSettings@@YGXXZ,1,
 presentation,LoadScreenGaf,src/gui/gui.cpp,1,0,0,0,0,0,?LoadScreenGaf@@YGHPAUGui@@PAD@Z,0,
@@ -1825,6 +1828,8 @@ presentation,PresentFrontendFrame,src/frontend/frontend.cpp,1,0,0,0,0,0,?Present
 presentation,PushKey,src/gui/keyboard.cpp,1,0,0,0,0,0,?PushKey@@YGXH@Z,0,
 presentation,PushKeyCode,src/gui/keyboard.cpp,1,0,0,0,0,0,?PushKeyCode@@YGXH@Z,0,
 presentation,PushMouseEvent,src/gui/mouse.cpp,1,0,0,0,0,0,?PushMouseEvent@@YGXPAUMouseEvent@@@Z,0,
+presentation,QueueUnitSpeech,src/sound/sound.cpp,1,0,0,0,0,0,?QueueUnitSpeech@@YGXPAUUnit@@HPAD@Z,0,
+presentation,QueueUnitSpeechIfNotVisible,src/sound/sound.cpp,0,0,0,0,0,0,?QueueUnitSpeechIfNotVisible@@YGXPAUUnit@@HPAD@Z,1,
 presentation,QueueUnitSpeechIfVisible,src/sound/sound.cpp,0,0,0,0,0,0,?QueueUnitSpeechIfVisible@@YGXPAUUnit@@HPAD@Z,1,
 presentation,ReadButtonFields,src/gui/gui_file.cpp,1,0,0,0,0,0,?ReadButtonFields@@YGXPAUReadButtonFieldsRecord@@PAUReadButtonFieldsSource@@@Z,0,
 presentation,ReadFontFilenameField,src/gui/gui_file.cpp,0,0,0,0,0,0,?ReadFontFilenameField@@YGXPAUReadFontFilenameFieldRecord@@PAUReadFontFilenameFieldSource@@@Z,1,
@@ -1970,6 +1975,7 @@ presentation,SetUpEndMissionScreen,src/frontend/endgame.cpp,1,0,0,0,0,0,?SetUpEn
 presentation,SetUseWindowsSound,src/sound/sound.cpp,1,0,0,0,0,0,?SetUseWindowsSound@@YGXXZ,0,
 presentation,SetValue,src/gui/dialogs.cpp,1,0,0,0,0,0,?SetValue@@YGXPAUGui@@H@Z,0,
 presentation,ShouldShowNextMission,src/frontend/endgame.cpp,0,0,0,0,0,0,?ShouldShowNextMission@@YGHXZ,1,
+presentation,ShowContinueWatchingDialog,src/ingame/game_dialogs.cpp,0,0,0,0,0,0,?ShowContinueWatchingDialog@@YGXXZ,1,
 presentation,ShowEndMissionScreen,src/frontend/endgame.cpp,1,0,0,0,0,0,?ShowEndMissionScreen@@YGXXZ,0,
 presentation,ShowFrontendErrorText,src/frontend/frontend.cpp,1,0,0,0,0,0,?ShowFrontendErrorText@@YGXXZ,0,
 presentation,ShowGameMessage,src/ingame/info_panel.cpp,1,0,0,0,0,0,?ShowGameMessage@@YGHPADH@Z,0,
@@ -1980,6 +1986,7 @@ presentation,ShowSelectedMapInfo,src/frontend/multi.cpp,1,0,0,0,0,0,?ShowSelecte
 presentation,ShowSelectedSaveGame,src/frontend/multi.cpp,1,0,0,0,0,0,?ShowSelectedSaveGame@@YGXPAUGui@@PAUGadget@@@Z,0,
 presentation,ShowSelectedUnitCosts,src/frontend/multi.cpp,1,0,0,0,0,0,?ShowSelectedUnitCosts@@YGXPAUGui@@PAUGadget@@@Z,0,
 presentation,ShutdownMouse,src/gui/mouse.cpp,1,0,0,0,0,0,?ShutdownMouse@@YGXXZ,0,
+presentation,ShutdownScoreTables,src/frontend/reporter.cpp,1,0,0,0,0,0,?ShutdownScoreTables@@YGXXZ,0,
 presentation,ShutdownSound,src/sound/sound.cpp,1,0,0,0,0,0,?ShutdownSound@@YGXXZ,0,
 presentation,SkipToPageOffset,src/frontend/campaign_menu.cpp,0,0,0,0,0,0,?SkipToPageOffset@@YGPADPADHH@Z,1,
 presentation,SmokeParticle::DrawParticle,src/graphics/particles.cpp,0,0,0,0,0,0,?DrawParticle@SmokeParticle@@QAEXPAXFF@Z,1,
@@ -2297,7 +2304,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,10,10,131,126,76,56,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,164,132,4094,3460,1696,1207,,32,
+units,*,,165,133,4093,3459,1690,1204,,32,
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0,unused-slot
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,

@@ -3963,6 +3963,7 @@ RecordFocusCommander,src/state/sim_effects.h,game,phase:UpdatePlayers,game
 RecordForcesDestroyed,src/state/sim_effects.h,game,phase:UpdateAllUnits,game
 RecordGuiChangedIfScreen,src/state/sim_effects.h,game,default,
 RecordNanoParticles,src/state/sim_effects.h,game,default,
+RecordPlayerLeft,src/state/sim_effects.h,units,phase:UpdateAllUnits,
 RecordPlayerTookLead,src/state/sim_effects.h,units,phase:UpdateAllUnits,
 RecordPointParticles,src/state/sim_effects.h,game,default,
 RecordPopToGameLayout,src/state/sim_effects.h,game,phase:UpdateAllUnits,game

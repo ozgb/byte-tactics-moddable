@@ -110,7 +110,7 @@ struct ModelState {
     Ref<ModelPiece> root;
     ModelPiece pieces[1];
 
-    UnitDrawView* ownerView() const { return (UnitDrawView*)owner.get(); }
+    UnitDrawView* OwnerView() const { return (UnitDrawView*)owner.get(); }
 };
 #pragma pack(pop)
 

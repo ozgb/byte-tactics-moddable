@@ -1888,10 +1888,6 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
 
 #include "../util/tdf.h"
 
-// FUNCTION: 0x49e610 _$E5
-// FUNCTION: 0x49e630 _$E3
-TdfFile g_tdfGlobalParser;
-
 #include "../util/angles.h"
 
 #pragma pack(push, 1)

@@ -306,6 +306,9 @@ jobs:
       - name: Test the embedded check loop
         run: uv run tools/test_wasm_loop.py
 
+      - name: Test the host build options
+        run: uv run tools/test_wasm_host.py
+
       - name: The module's maths against the native hashes
         run: |
           uv run tools/wasm_maths.py build --wasm-only

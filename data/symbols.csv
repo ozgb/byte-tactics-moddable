@@ -4456,7 +4456,7 @@ address,name
 0x512c84,g_cmdlineHostMode
 0x512c8c,DAT_00512c8c
 0x512c94,g_netFrameRateConfig
-0x512c98,DAT_00512c98
+0x512c98,g_userNameSetting
 0x512ca8,g_cmdlineHostGameName
 0x512ce8,g_lobbyMapName
 0x512d28,g_onlineLobbyPassword

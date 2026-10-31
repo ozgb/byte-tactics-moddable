@@ -16,6 +16,7 @@ src/frontend/frontend.cpp,src/frontend/endgame.h,#392
 src/frontend/frontend.cpp,src/frontend/frontend.h,#392
 src/frontend/frontend.cpp,src/frontend/multi.h,#392
 src/frontend/frontend.cpp,src/frontend/options.h,#392
+src/frontend/frontend.cpp,src/frontend/reporter.h,#392
 src/frontend/frontend.cpp,src/frontend/skirmish_menu.h,#392
 src/frontend/frontend.cpp,src/graphics/display.h,#392
 src/frontend/frontend.cpp,src/graphics/draw.h,#392
@@ -32,8 +33,10 @@ src/frontend/frontend.cpp,src/gui/mouse.h,#392
 src/frontend/frontend.cpp,src/sound/sound.h,#392
 src/frontend/multi.cpp,interfaces/host.h,#392
 src/frontend/multi.cpp,src/frontend/frontend.h,#392
+src/frontend/multi.cpp,src/frontend/map_enum.h,#392
 src/frontend/multi.cpp,src/frontend/multi.h,#392
 src/frontend/multi.cpp,src/frontend/options.h,#392
+src/frontend/multi.cpp,src/frontend/reporter.h,#392
 src/frontend/multi.cpp,src/graphics/display.h,#392
 src/frontend/multi.cpp,src/graphics/object_pool.h,#392
 src/frontend/multi.cpp,src/graphics/palette.h,#392
@@ -60,6 +63,7 @@ src/frontend/options.cpp,src/gui/layer.h,#392
 src/frontend/options.cpp,src/sound/sound.h,#392
 src/frontend/skirmish_menu.cpp,src/frontend/endgame.h,#392
 src/frontend/skirmish_menu.cpp,src/frontend/frontend.h,#392
+src/frontend/skirmish_menu.cpp,src/frontend/map_enum.h,#392
 src/frontend/skirmish_menu.cpp,src/frontend/multi.h,#392
 src/frontend/skirmish_menu.cpp,src/graphics/object_pool.h,#392
 src/frontend/skirmish_menu.cpp,src/gui/dialogs.h,#392
@@ -165,6 +169,7 @@ src/game/settings_campaign.cpp,src/graphics/surface.h,#392
 src/game/settings_campaign.cpp,src/host/settings_io.h,#392
 src/game/settings_campaign.cpp,src/ingame/camera.h,#392
 src/game/statistics.cpp,interfaces/host.h,#392
+src/game/statistics.cpp,src/frontend/reporter.h,#392
 src/game/statistics.cpp,src/graphics/object_pool.h,#392
 src/game/statistics.cpp,src/ingame/info_panel.h,#392
 src/game/victory.cpp,interfaces/host.h,#392
@@ -353,6 +358,7 @@ src/map/line_of_sight.cpp,src/graphics/gaf.h,#392
 src/map/line_of_sight.cpp,src/graphics/gaf_frame.h,#392
 src/map/line_of_sight.cpp,src/graphics/object_pool.h,#392
 src/map/line_of_sight.cpp,src/graphics/rect.h,#392
+src/map/map_list.cpp,src/frontend/map_enum.h,#392
 src/map/map_list.cpp,src/graphics/display.h,#392
 src/map/map_list.cpp,src/graphics/object_pool.h,#392
 src/map/map_list.cpp,src/graphics/palette.h,#392
@@ -372,6 +378,7 @@ src/network/net_chat.cpp,src/ingame/control_panel.h,#392
 src/network/net_condenser.cpp,interfaces/host.h,#392
 src/network/net_game.cpp,interfaces/host.h,#392
 src/network/net_game.cpp,src/frontend/multi.h,#392
+src/network/net_game.cpp,src/frontend/reporter.h,#392
 src/network/net_game.cpp,src/graphics/display.h,#392
 src/network/net_game.cpp,src/graphics/object_pool.h,#392
 src/network/net_game.cpp,src/gui/dialogs.h,#392

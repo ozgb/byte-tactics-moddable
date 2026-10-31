@@ -13,7 +13,7 @@ struct Projectile;
 // Minor version of the network interface, changed when a slot is added.
 #define NETWORK_VERSION_MINOR 0
 
-// The messages the simulation sends to the other players of a net game. Every slot reads its payload from the game state when it is called, and sends nothing outside a net game or from a player that is not local or computer-controlled.
+// The messages the simulation sends to the other players of a net game. Every slot reads its payload from the game state when it is called (SendUnitStates also writes goal state, see its comment), and sends nothing outside a net game or from a player that is not local or computer-controlled.
 struct NetworkSeam {
     // Sends every connected player's setup record and alliance to the remote humans, then flushes the queue. Hooks: none.
     void (__stdcall* BroadcastPlayerInfo)(void);
@@ -57,7 +57,7 @@ struct NetworkSeam {
     void (__stdcall* SendShareMapInfo)(unsigned char from, unsigned char to);
     // Sends a player's kills, losses, resource amounts and flow to every remote human who watches. Hooks: none.
     void (__stdcall* BroadcastPlayerEconomy)(Player* player);
-    // Builds and sends the bit stream of a player's unit states (the motion of each unit that has one, and one full unit) to the remote humans. Hooks: none.
+    // Builds and sends the bit stream of a player's unit states (the motion of each unit that has one, and one full unit) to the remote humans; packing sets a unit's goal state (the mode of a simple goal, flag 2 of an AI search goal) until the 0x200-byte limit is reached, so the units past it keep the old values. Hooks: none.
     void (__stdcall* SendUnitStates)(Player* owner);
 };
 

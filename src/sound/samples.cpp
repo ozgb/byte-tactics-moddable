@@ -30,6 +30,7 @@ int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 
 #include "sound.h"
 #include "../util/vec3.h"
+#include "../harness/harness.h"
 
 static inline int ClampVolume(int v)
 {
@@ -176,6 +177,7 @@ void Sound::ReapFinishedBuffers()
 // FUNCTION: 0x4cf150
 void Sound::StopAllBuffers()
 {
+    HarnessSoundEvent("stop_all", 0, 0, 0, 0);
     void** slot = buffers;
     for (int i = 0x20; i != 0; i--) {
         void* obj = *slot;
@@ -191,6 +193,7 @@ void Sound::StopAllBuffers()
 // FUNCTION: 0x4cf180
 void Sound::StopOldestBuffer()
 {
+    HarnessSoundEvent("stop_oldest", 0, 0, 0, 0);
     int i;
     for (i = 0; i < 0x20; i++) {
         if (buffers[i] != 0 && (flags[i] & 1) == 0)
@@ -389,6 +392,15 @@ int Sound::PlaySampleSet(void** set, LONG volume, Vec3* pos)
             break;
         }
     }
+    int loggedPosition[3];
+    if (use3D != 0 && pos != 0) {
+        loggedPosition[0] = pos->x;
+        loggedPosition[1] = pos->y;
+        loggedPosition[2] = pos->z;
+    }
+    int loggedVolume = volume;
+    HarnessSoundEvent(g_playBufferLooping != 0 ? "loop" : "play", set, 0, &loggedVolume,
+                      use3D != 0 && pos != 0 ? loggedPosition : 0);
     return 1;
 }
 
@@ -406,6 +418,7 @@ int Sound::PlayMemorySample(void* src, unsigned long bytes, int sampleRate, int 
                 sets[i] = 0;
                 return 0;
             }
+            HarnessSoundEvent("play_memory", 0, 0, 0, 0);
             return 1;
         }
     }
@@ -426,6 +439,7 @@ int Sound::PlayFileSample(FileHandle* file, unsigned long bytes, int sampleRate,
                 sets[i] = 0;
                 return 0;
             }
+            HarnessSoundEvent("play_file", 0, 0, 0, 0);
             return 1;
         }
     }
@@ -499,6 +513,7 @@ void Sound::StopStream()
         streamTimer = -1;
     }
     if (stream != 0) {
+        HarnessSoundEvent("stop_stream", 0, 0, 0, 0);
         host_sound_buffer_stop(stream);
         host_sound_buffer_free(stream);
         stream = 0;

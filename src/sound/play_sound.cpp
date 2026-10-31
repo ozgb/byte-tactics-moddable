@@ -4,6 +4,7 @@
 
 #include "../files/files_api.h"
 #include "../graphics/object_pool.h"
+#include "../harness/harness.h"
 
 // FUNCTION: 0x49f610
 int IsWindowsSoundAvailable(void)
@@ -33,6 +34,7 @@ void StopWindowsSound()
 // FUNCTION: 0x49f680
 void __stdcall PlayWavMemory(const char* sound)
 {
+    HarnessSoundEvent("wav", sound, 0, 0, 0);
     host_sound_wav_play(sound, 0);
 }
 
@@ -40,6 +42,7 @@ void __stdcall PlayWavMemory(const char* sound)
 void __stdcall PlayLoopingWavMemory(char* sound)
 {
     g_loopingWav = sound;
+    HarnessSoundEvent("wav_loop", sound, 0, 0, 0);
     host_sound_wav_play(sound, HOST_WAV_LOOP);
 }
 
@@ -49,6 +52,7 @@ int __stdcall PlayWavFromDisk(char* path)
     int* sound = (int*)HAPI_LoadFile(path, 0);
     if (sound == 0)
         return 0;
+    HarnessSoundEvent("wav_file", 0, path, 0, 0);
     int result = host_sound_wav_play(sound, 0);
     if (g_diskWav != 0)
         GameFreeThunk(g_diskWav);

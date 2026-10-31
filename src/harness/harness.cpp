@@ -82,6 +82,7 @@ static char s_commit[64] = "-";
 static char s_scenarioPath[512];
 static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
+static FILE* s_sound = NULL;
 static unsigned s_dumpTick = 0;
 static char s_scenarioQuirks[512];
 static Quirks s_scenarioQuirkSet;
@@ -1276,8 +1277,11 @@ void HarnessAfterStep()
         fclose(s_trace);
     if (s_dump != NULL)
         fclose(s_dump);
+    if (s_sound != NULL)
+        fclose(s_sound);
     s_trace = NULL;
     s_dump = NULL;
+    s_sound = NULL;
     if (s_blockScan)
         BlockScanWrite(strcmp(s_commit, "unknown") == 0 ? "-" : s_commit);
     if (gameOver && (unsigned)g_game->ticks < s_ticks)
@@ -3459,6 +3463,38 @@ void HarnessBeforeStep()
     }
 }
 
+void __stdcall HarnessSoundEvent(const char* kind, const void* sample, const char* file, const int* volume, const int* position)
+{
+    if (!HarnessTestMode() || s_sound == NULL)
+        return;
+    const char* name = NULL;
+    if (file != NULL) {
+        name = file;
+        for (const char* p = file; *p != '\0'; p++) {
+            if (*p == '\\' || *p == '/')
+                name = p + 1;
+        }
+    } else if (sample != NULL) {
+        for (int i = 0; i < g_game->soundCount && i < 256; i++) {
+            if (g_game->sounds[i] == sample) {
+                name = g_game->soundNames_33e13_4000[i];
+                break;
+            }
+        }
+    }
+    if (name == NULL || name[0] == '\0')
+        name = "-";
+    fprintf(s_sound, "%u %s %s ", GameU32(GAME_TICK), kind, name);
+    if (volume != NULL)
+        fprintf(s_sound, "%d ", *volume);
+    else
+        fprintf(s_sound, "- ");
+    if (position != NULL)
+        fprintf(s_sound, "%d %d %d\n", position[0], position[1], position[2]);
+    else
+        fprintf(s_sound, "- - -\n");
+}
+
 void HarnessPhase(int phase)
 {
     if (!HarnessTestMode() || s_trace == NULL)
@@ -3494,6 +3530,8 @@ void HarnessPhase(int phase)
     }
     if (phase == 7) {
         fflush(s_trace);
+        if (s_sound != NULL)
+            fflush(s_sound);
         if (s_dumpNow)
             fflush(s_dump);
     }
@@ -3529,6 +3567,10 @@ static void OpenTrace(unsigned controlWord)
     s_trace = fopen("trace.txt", "wb");
     if (s_trace == NULL)
         Fail("testmode: cannot write trace.txt\n");
+    s_sound = fopen("sound.txt", "wb");
+    if (s_sound == NULL)
+        Fail("testmode: cannot write sound.txt\n");
+    fprintf(s_sound, "bt-sound 1\n");
     fprintf(s_trace, "bt-trace %d\ncommit %s\nscenario %s\ngame_seed %u\ncrt_seed %u\nview_seed %u\n"
                      "fpu_control_word 0x%05X\n",
             TRACE_FORMAT, commit, s_scenarioPath, s_gameSeed, s_crtSeed, s_viewSeed, controlWord);

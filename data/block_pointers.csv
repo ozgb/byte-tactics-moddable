@@ -197,6 +197,7 @@ holder,offsets,target,scenarios,ticks,target_offsets,class,note
 ?Insert@?$BlockVector@UUnitTypeInt@@@@QAEXPAUUnitTypeInt@@IABU2@@Z,*,*,0,0,-,not-a-pointer,"words of the BlockVector<UnitTypeInt> insert allocation (int elements, at unaligned offsets) that only look like addresses"
 ?Insert@?$BlockVector@VLosLine@@@@QAEXPAVLosLine@@IABV2@@Z,*,*,0,0,-,not-a-pointer,"LOS table lines: the pad byte and the Ref words of a LosLine read as an address, at offsets 2 mod 4"
 ?Insert@?$BlockVector@VLosTable@@@@QAEXPAVLosTable@@IABV2@@Z,*,*,0,0,-,not-a-pointer,"LOS tables: the pad byte and the Ref words of a LosTable read as an address, at offsets 2 mod 4"
+?Reserve@?$BlockVector@UOrderTableEntry@@@@QAEXI@Z,*,*,0,0,-,not-a-pointer,"Mission order table entries: the packed 25-byte OrderTableEntry has no aligned pointer slot, so words that straddle its value, notify, flags and name fields read as an address"
 AddBeCarriedOrder,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 AddBeCarriedOrder,0xc,AllocDepthFrame: CompositeBuffer,1,2576,0x7ffdf,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 AddBeCarriedOrder,0xc,AllocFrame: TED GENERATED PIC,1,1235,0x40e7,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"

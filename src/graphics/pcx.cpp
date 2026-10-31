@@ -715,9 +715,8 @@ static inline void Unlock(LONG held)
 }
 
 // FUNCTION: 0x4cbab0
-int __stdcall ExceptionFilter(void* exception, const char* thread)
+void HOST_CALL ReleaseDisplayAfterCrash(void)
 {
-    host_crash_report(exception, thread);
     Display* app = GetDisplay();
     if (app != 0) {
         LONG held = Lock();
@@ -729,5 +728,4 @@ int __stdcall ExceptionFilter(void* exception, const char* thread)
             host_window_set_topmost(0);
         }
     }
-    return 0;
 }

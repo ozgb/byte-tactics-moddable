@@ -2915,7 +2915,7 @@ void __stdcall NetSendUnitKilled(Unit* unit, int severity, int wreckageLevel, in
     cmd.wreckageLevel = wreckageLevel;
     cmd.killType = killType;
     cmd.attackerPlayerNetId = GetSlotDpid(unit->lastAttackerSlot);
-    if (unit->attacker == 0)
+    if (unit->attacker == nullptr)
         cmd.attackerUnitId = 0;
     else
         cmd.attackerUnitId = unit->attacker->id;
@@ -2941,11 +2941,11 @@ void __stdcall NetSendAttach(Unit* unit, Unit* carrier, char piece, char mode)
 {
     OrderView packet;
     packet.type = 0xa;
-    if (unit == 0)
+    if (unit == nullptr)
         packet.id1 = 0;
     else
         packet.id1 = unit->id;
-    if (carrier == 0)
+    if (carrier == nullptr)
         packet.id2 = 0;
     else
         packet.id2 = carrier->id;
@@ -2987,8 +2987,8 @@ void __stdcall NetSendWeaponFire(Unit* shooter, UnitWeaponSlot* slot, Unit* targ
     msg.aimOrVel = *aimOrVel;
     msg.weaponDefIndex = slot->weapon->index;
     msg.weaponSlotIndex = slot->flags >> 2 & 3;
-    msg.ownerUnitId = shooter == 0 ? 0 : shooter->id;
-    msg.targetUnitId = target == 0 ? 0 : target->id;
+    msg.ownerUnitId = shooter->id;
+    msg.targetUnitId = target == nullptr ? 0 : target->id;
     msg.fireHeading = slot->fireHeading;
     msg.firePitch = slot->firePitch;
     msg.flag = slot->weapon->flags.b.interceptor;
@@ -3074,7 +3074,7 @@ void __stdcall NetSendShareEnergy(unsigned char from, unsigned char to, float am
 
 void __stdcall NetBroadcastPlayerEconomy(Player* player)
 {
-    SendPlayerEconomy(player, 0, 0);
+    SendPlayerEconomy(player, nullptr, 0);
 }
 
 void __stdcall NetSendUnitStates(Player* owner, BitWriter* stream)

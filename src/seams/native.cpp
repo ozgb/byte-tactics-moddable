@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/network.h"
 #include "../files/files_impl.h"
 #include "../files/files_bank.h"
 #include "../game/unit_resources.h"

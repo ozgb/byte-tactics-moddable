@@ -633,7 +633,7 @@ int __stdcall IsUnitCommander(Unit* unit)
 #include "../game/game_state.h"
 
 // FUNCTION: 0x4864b0
-void __stdcall KillUnit(Unit* unit, int param_2)
+void __stdcall KillUnit(Unit* unit, int killType)
 {
     if ((unit->flags & 0x10000000) != 0) {
         int same = _strcmpi(g_game->sideDefs[unit->player->info->side].commander,
@@ -643,10 +643,10 @@ void __stdcall KillUnit(Unit* unit, int param_2)
         }
         int amount;
         int flag;
-        if (param_2 == 7) {
+        if (killType == 7) {
             flag = 1;
             amount = 0;
-        } else if (param_2 == 4 || param_2 == 5 || param_2 == 9 || unit->health > 0) {
+        } else if (killType == 4 || killType == 5 || killType == 9 || unit->health > 0) {
             amount = 0;
             flag = 0;
         } else {
@@ -665,7 +665,7 @@ void __stdcall KillUnit(Unit* unit, int param_2)
         cmd.cobKilledSeverity = amount;
         cmd.type = 0xc;
         cmd.wreckageLevel = flag;
-        cmd.killType = param_2;
+        cmd.killType = killType;
         cmd.attackerPlayerNetId = GetSlotDpid(unit->lastAttackerSlot);
         if (unit->attacker == 0)
             cmd.attackerUnitId = 0;
@@ -673,7 +673,7 @@ void __stdcall KillUnit(Unit* unit, int param_2)
             cmd.attackerUnitId = unit->attacker->id;
         if (unit->player->active != 0 &&
             (unit->player->type == 1 || unit->player->type == 2)) {
-            g_seams.network->SendUnitKilled(unit, amount, flag, param_2);
+            g_seams.network->SendUnitKilled(unit, amount, flag, killType);
         }
         ApplyUnitDeath(&cmd, 1);
         if (same && g_game->commanderDeath != 0 && unit->player->active != 0 &&

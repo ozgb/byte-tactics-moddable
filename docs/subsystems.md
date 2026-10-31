@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4484 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4481 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -23,7 +23,7 @@ The subsystems and the issue each maps to:
 | [pathfinding](#pathfinding) | 56 | #14 |
 | [weapons](#weapons) | 101 | #15 |
 | [targeting](#targeting) | 11 | #16 |
-| [los_radar](#los_radar) | 95 | #17 |
+| [los_radar](#los_radar) | 92 | #17 |
 | [orders](#orders) | 374 | #18 |
 | [units](#the-remaining-subsystems) | 192 | none yet |
 | [players](#the-remaining-subsystems) | 144 | none yet |
@@ -236,16 +236,16 @@ Coverage: 89.3% of functions (92 of 103), 88.8% of lines, 83.0% of branches; 11 
 - `CopyOneByte` (1 from platform)
 - By calling subsystem (functions called): players 8, platform 5, seams 5, presentation 4, game 2, los_radar 2, network 2, orders 1, units 1, weapons 1
 
-**Imports.** 41 functions of 11 subsystems, by target, each with the number of functions it calls there:
+**Imports.** 40 functions of 11 subsystems, by target, each with the number of functions it calls there:
 
 - platform (20): `RandomInt`, `operator new`, `CommandArgs::GetArg`, `CommandArgs::InitArgs`, and 16 more
 - seams (4): `SetWeaponTargetUnitNative`, `UnitTypeSetAddTypeOrCategoryNative`, `GetNameSlotNative`, `SetWeaponTargetPosNative`
 - orders (3): `DeleteOrders`, `GetOrderFlags`, `IssueAttackOrder`
 - presentation (3): `GetBuildSiteMetal`, `QueueBuildOrder`, `QueueUnitSpeechIfNotVisible`
 - targeting (3): `GetWeaponTargetUnit`, `ClearWeaponTarget`, `FindWeaponTarget`
-- game (2): `Reserve`, `SimAllocTagged`
 - los_radar (2): `GetMapCell`, `IsUnitVisibleToPlayer`
 - economy (1): `GetEnergyUse`
+- game (1): `SimAllocTagged`
 - 3 smaller targets: players (1), units (1), weapons (1)
 
 **Sim writes.** 29 items in all, 24 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
@@ -259,7 +259,7 @@ Coverage: 89.3% of functions (92 of 103), 88.8% of lines, 83.0% of branches; 11 
 **Draft interface.**
 
 - Exports: 29 functions (`UpdatePlayerAI`, `SquadManager::TickIfActive`, the create, reset and destroy calls from game, `SetUnitSquad` (units), `SquadManager::MarkOwnerNetDirtyFromDamageSplit` (weapons) and helpers other subsystems borrow: `GetFactoriesInRadius` (orders), `GetVisibleEnemiesInRadius` (orders, targeting), `IsPointVisible` (los_radar)).
-- Needs from seams: 41 functions in platform, seams, orders, presentation, targeting, game, los_radar, economy, players, units, weapons.
+- Needs from seams: 40 functions in platform, seams, orders, presentation, targeting, los_radar, economy, game, players, units, weapons.
 - Owns: 22 named sim items that only this subsystem writes, for example `g_playerAI`, `SquadManager::timers`, `SquadTimer::next`, `SquadManager::player`, `g_aiCommandsEnabled`.
 - Shares: 2 named sim items that other subsystems also write, for example `Unit::flags`, `Unit::group`.
 - It acts through other modules: orders (`AddOrder`, `IssueAttackOrder`, `DeleteOrders`), targeting and `Unit::SetStateBits`. Its own sim writes are few.
@@ -430,7 +430,7 @@ Coverage: 100.0% of functions (10 of 10), 96.2% of lines, 73.7% of branches; 0 l
 
 ## los_radar
 
-Issue #17. 95 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
+Issue #17. 92 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
 Coverage: 88.9% of functions (64 of 72), 82.8% of lines, 72.9% of branches; 8 live functions no scenario enters, and 22 more are dead (data/coverage.csv).
 
@@ -597,7 +597,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Command-line switch only (2): `Onl_LoadConfigFile`, `SetPacketRate`. Switches a scenario cannot pass (`-blockscan` and the network options).
 - Entered by the console scenarios (#445): `SendShareEnergy`, `SendShareMetal`, `SendPacketToPlayer`, `FindSlotByDpidInSendPacketToPlayer`, `PlayerReady` and `Player::SetType`, which the console commands `Give` and `AI` reach.
 
-**game** (210 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 113 functions are called from outside, by platform (76 distinct functions) and presentation (26); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 469 functions, the most of any subsystem, 216 of them from presentation, then platform 94, network 31, files 23 and units 22.
+**game** (210 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 112 functions are called from outside, by platform (76 distinct functions) and presentation (26); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 469 functions, the most of any subsystem, 216 of them from presentation, then platform 94, network 31, files 23 and units 22.
 
 **game, functions no scenario enters** (71 of 184 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 113 are entered, 61.4%), by reason:
 

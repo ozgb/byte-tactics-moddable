@@ -191,9 +191,12 @@ holder,offsets,target,scenarios,ticks,target_offsets,class,note
 ?Insert@?$BlockVector@U?$Ref@UUnit@@@@@@QAEXPAU?$Ref@UUnit@@@@IABU2@@Z,0x2+0x4*k 0x16 0x1a 0x22,HAPI_LoadFile,2,59734,0x1257-0xa0279,not-a-pointer,SimVector<Unit*> copies: the Unit* elements point into the block; these are misaligned reads (offset 2 mod 4) of them
 ?Insert@?$BlockVector@UBuildRatingWeights@@@@QAEXPAUBuildRatingWeights@@IABU2@@Z,*,*,0,0,-,not-a-pointer,words of the SimVector insert allocation that only look like addresses
 ?Insert@?$BlockVector@UBuildRatingWeights@@@@QAEXPAUBuildRatingWeights@@IABU2@@Z,0x194,LoadTntMap: TILE SET,1,150,0xaffe0,not-a-pointer,"SimVector buffer grown by insert: element words (coordinates, ids) that only look like addresses"
+?Insert@?$BlockVector@UDamageTableEntry@@@@QAEXPAUDamageTableEntry@@IABU2@@Z,*,*,0,0,-,not-a-pointer,"Damage table entries: a name pointer's high half and the next value's low half read as an address, at offsets 2 mod 4"
 ?Insert@?$BlockVector@UKeyedCell@@@@QAEXPAUKeyedCell@@IABU2@@Z,*,*,0,0,-,not-a-pointer,words of the SimVector insert allocation that only look like addresses
 ?Insert@?$BlockVector@UPercentByte@@@@QAEXPAUPercentByte@@IABU2@@Z,*,*,0,0,-,not-a-pointer,AI weight bytes inside the PlayerAI element vector that only look like addresses when a host heap block covers them
 ?Insert@?$BlockVector@UUnitTypeInt@@@@QAEXPAUUnitTypeInt@@IABU2@@Z,*,*,0,0,-,not-a-pointer,"words of the SimVector<UnitTypeInt> insert allocation (int elements, at unaligned offsets) that only look like addresses"
+?Insert@?$BlockVector@VLosLine@@@@QAEXPAVLosLine@@IABV2@@Z,*,*,0,0,-,not-a-pointer,"LOS table lines: the pad byte and the Ref words of a LosLine read as an address, at offsets 2 mod 4"
+?Insert@?$BlockVector@VLosTable@@@@QAEXPAVLosTable@@IABV2@@Z,*,*,0,0,-,not-a-pointer,"LOS tables: the pad byte and the Ref words of a LosTable read as an address, at offsets 2 mod 4"
 AddBeCarriedOrder,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 AddBeCarriedOrder,0xc,AllocDepthFrame: CompositeBuffer,1,2576,0x7ffdf,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 AddBeCarriedOrder,0xc,AllocFrame: TED GENERATED PIC,1,1235,0x40e7,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"

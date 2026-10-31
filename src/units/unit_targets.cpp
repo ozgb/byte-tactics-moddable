@@ -44,6 +44,7 @@ struct UnitMotionBodyView {
 struct ModelGroundView;
 
 #include "../game/game.h"
+#include "../state/sim_effects.h"
 #pragma pack(pop)
 
 #include "../../link/globals.h"
@@ -352,7 +353,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
         unit->lastAttackerSlot = c;
         unit->attacker = target;
         if (target->playerIndex == g_game->localPlayer || unit->playerIndex == g_game->localPlayer)
-            AddCdActivitySample(1);
+            RecordCdActivity(1, target->playerIndex, unit->playerIndex);
     }
 
     if (ev->damageKind == 2) {

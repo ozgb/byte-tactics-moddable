@@ -45,6 +45,7 @@ struct Pair16 { short lo, hi; };
 #include "../map/mission.h"
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
+#include "../state/sim_effects.h"
 struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;
@@ -600,8 +601,8 @@ static inline int IsAhead(Unit* unit, Order* order)
 // FUNCTION: 0x413d80
 int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
 {
-    if (flags&2) { MarkSelectionOrdersDirty(unit); return 5; }
-    if (flags&8) { RecordUnitSpeech(unit,7,SIM_SPEECH_CONSTRUCTION_TERMINATED); MarkSelectionOrdersDirty(unit); return 8; }
+    if (flags&2) { RecordSelectionOrdersDirty(unit); return 5; }
+    if (flags&8) { RecordUnitSpeech(unit,7,SIM_SPEECH_CONSTRUCTION_TERMINATED); RecordSelectionOrdersDirty(unit); return 8; }
     unsigned int state=0; state=order->state;
     switch(state) {
     case 0:
@@ -648,7 +649,7 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         RecordUnitSpeech(unit,9,SIM_SPEECH_STARTING_CONSTRUCTION);
         AddOrder("GETBUILT",1,order->target,unit,0,0,0);
         StartBuildingScript(unit,order,AngleOfVector(unit->pos.x-order->target->pos.x,unit->pos.z-order->target->pos.z)-unit->heading);
-        MarkSelectionOrdersDirty(unit);
+        RecordSelectionOrdersDirty(unit);
         return 1;
     }
     case 3:
@@ -670,7 +671,7 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
             Vec3 bounds[2];
             bounds[0]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMinX);
             bounds[1]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMaxX);
-            EmitNanoParticles(&start,(Box*)bounds,6);
+            RecordNanoParticles(start, bounds, 6);
         }
         if (order->target->buildLeft!=0.0f) {
             order->SetDeadlineTicks(1);
@@ -753,7 +754,7 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
             box.hi.x += order->target->def->modelMaxX;
             box.hi.z += order->target->def->modelMaxZ;
             box.hi.y += order->target->def->modelMaxY;
-            EmitNanoParticles(&nano, &box, 6);
+            RecordNanoParticles(nano, box, 6);
         }
         order->SetDeadlineTicks(1);
         order->flags |= 8;
@@ -1624,7 +1625,7 @@ struct Feature;
 int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
 {
     if (order->target && !(flags&8)) {
-        if (flags&2) { MarkSelectionOrdersDirty(unit); return 5; }
+        if (flags&2) { RecordSelectionOrdersDirty(unit); return 5; }
         unsigned int state=0; state=order->state;
         switch(state) {
         case 0:
@@ -1658,7 +1659,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
         if (flags&0x40) return 8;
         if (order->target->buildLeft==0.0f) return 5;
         StartBuildingScript(unit,order,(short)GetHeadingBetween(&unit->pos,&order->target->pos));
-        MarkSelectionOrdersDirty(unit);
+        RecordSelectionOrdersDirty(unit);
         return 1;
     case 3: {
         if ((unsigned int)g_game->ticks%150==0) {
@@ -1679,7 +1680,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
             Vec3 bounds[2];
             bounds[0]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMinX);
             bounds[1]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMaxX);
-            EmitNanoParticles(&start,bounds,6);
+            RecordNanoParticles(start, bounds, 6);
         }
         if (order->target->buildLeft!=0.0f) {
             order->SetDeadlineTicks(1);
@@ -1692,7 +1693,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
         return 7;
     }
     RecordUnitSpeech(unit,7,SIM_SPEECH_CONSTRUCTION_TERMINATED_BY_HOSTILE_ACTION);
-    MarkSelectionOrdersDirty(unit);
+    RecordSelectionOrdersDirty(unit);
     return 8;
 }
 
@@ -1755,8 +1756,8 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
             box.hi.x += f->footprintX << 20;
             box.hi.z += f->footprintZ << 20;
             box.hi.y += f->height << 16;
-            EmitReverseNanoParticles((NanoTargetBounds*)&box, &nano, 6);
-            EmitReverseNanoParticles((NanoTargetBounds*)&box, &nano, 6);
+            RecordReverseNanoParticles(box, nano, 6);
+            RecordReverseNanoParticles(box, nano, 6);
         }
         return 2;
     case 4:
@@ -1841,7 +1842,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
             bounds[1].x += order->target->def->modelMaxX;
             bounds[1].z += order->target->def->modelMaxZ;
             bounds[1].y += order->target->def->modelMaxY;
-            EmitReverseNanoParticles((NanoTargetBounds*)bounds, &start, 6);
+            RecordReverseNanoParticles(bounds, start, 6);
             order->SetDeadlineTicks(2);
             order->duration += 2;
             return 2;

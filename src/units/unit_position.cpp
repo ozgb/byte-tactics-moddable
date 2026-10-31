@@ -65,6 +65,7 @@ public:
 #include "f14373.h"
 
 #include "../game/game.h"
+#include "../state/sim_effects.h"
 
 struct OrderView {
     unsigned char type;
@@ -266,7 +267,7 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                                     g_seams.orders->AddBeCarriedOrder(u);
                             }
                         }
-                        DeselectIfIneligible(u);
+                        RecordDeselectIfIneligible(u);
                     }
                 }
             }

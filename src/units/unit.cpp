@@ -10,6 +10,7 @@
 #include "../map/mission.h"
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
+#include "../state/sim_effects.h"
 
 
 struct Unit;
@@ -244,7 +245,7 @@ void Unit::SetStateBits(int mask, int set)
             }
             if (lost & 4)
                 RecordUnitSpeech(this, 0xf, SIM_SPEECH_KIND_TEXT);
-            MarkSelectionOrdersDirty(this);
+            RecordSelectionOrdersDirty(this);
             if (player->active != 0) {
                 if (player->type == 1 || player->type == 2) {
                     ActivateFlagsPacket packet;

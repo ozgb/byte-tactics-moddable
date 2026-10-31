@@ -104,7 +104,7 @@ int __stdcall PointInRect(void* rect, int x, int y);
 void* __stdcall GetGafSequenceFrame(GafRef* ref);
 void* __stdcall GetGafFrame(GafSequence* table, int index);
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
-void __stdcall DrawModel3doProjected(void* surface, Vec3* offset, DebrisPiece* piece, short* angles);
+#include "../ingame/info_panel.h"
 void __stdcall FillPolygon(void* surface, Point* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src);
 #include "../util/math.h"
@@ -246,7 +246,7 @@ void __stdcall DrawExplosions(void* surface)
         if (PointInRect(g_game->viewport, x, y)) {
             if (d->obj) {
                 Vec3 offset = {pos.x.value, pos.y.value, pos.z.value};
-                DrawModel3doProjected(surface, &offset, d->obj.get(), &d->angle_x);
+                DrawDebrisProjected(surface, &offset, d->obj.get(), &d->angle_x);
             }
             if (d->ref1.src) DrawFrame(surface, GetGafSequenceFrame(&d->ref1), x, y);
         }

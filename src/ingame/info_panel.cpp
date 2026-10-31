@@ -1872,10 +1872,14 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
     DrawProjectedFaces(surface, offset, angles, obj->verts, obj->count, obj->prims, obj->faceCount, obj->firstFace);
 }
 
-void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
+void __stdcall DrawDebrisProjected(void* surface, Vec3* offset,
                             DebrisPiece* piece, short* angles)
 {
-    DrawProjectedFaces(surface, offset, angles, piece->verts.get(), piece->vertexCount, piece->faces.get(), piece->faceCount, piece->firstFace);
+    Vec3* verts = piece->verts.get();
+    Face* faces = piece->faces.get();
+    if (verts == 0 || faces == 0)
+        return;
+    DrawProjectedFaces(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace);
 }
 
 // FUNCTION: 0x46bc60

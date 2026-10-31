@@ -25,7 +25,6 @@ Feature,shadowTable,pointer,src/map/feature.h,#353
 FeatureAnimEntry,src,pointer,src/map/feature_anim_pool.h,#353
 FeatureAnimEntry,state,pointer,src/map/feature_anim_pool.h,#353
 Frame,data,pointer,src/network/frame_ring.h,#353
-FrameQueue,buffer,pointer,src/network/packet_receiver.h,#353
 FrameQueue,recvBuffer,pointer,src/network/packet_receiver.h,#353
 FrameTable,entries,pointer,src/map/frame_table.h,#353
 Gadget,sliderUser,int-pointer,src/gui/gadget.h,#353
@@ -120,8 +119,6 @@ Object3do,name,pointer,src/graphics/object3do.h,#353
 Object3do,sibling,pointer,src/graphics/object3do.h,#353
 Object3do,vertices,pointer,src/graphics/object3do.h,#353
 OptionsSliderMenu,holder,pointer,src/frontend/options_slider_menu.h,#353
-OrderTableEntry,name,pointer,src/orders/order_type_entry.h,#353
-OrderTableEntry,notify,function-pointer,src/orders/order_type_entry.h,#353
 PacketBuffer,first,pointer,src/network/packet_buffer.h,#353
 PacketChannel,buffers,pointer,src/network/packet_channel.h,#353
 PacketChannel,firstPacket,pointer,src/network/packet_channel.h,#353
@@ -148,4 +145,3 @@ TdfRecord,text,pointer,interfaces/services.h,#353
 TdfRecordList,end,pointer,interfaces/services.h,#353
 TdfRecordList,first,pointer,interfaces/services.h,#353
 TdfRecordList,last,pointer,interfaces/services.h,#353
-UnitInfoSnapshot,orderName,int-pointer,src/ingame/unit_info_snapshot.h,#353

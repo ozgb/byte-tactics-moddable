@@ -1096,3 +1096,10 @@ void __stdcall AnnounceForcesDestroyed(Player* player)
     sprintf(buf, "%s %s", side, Translate(g_forcesDestroyedTexts[(unsigned int)HarnessViewRand() % 3]));
     AddMessage(buf, 4, 0, player->index);
 }
+
+void __stdcall AnnouncePlayerTookLead(const char* name, int kills)
+{
+    char text[100];
+    sprintf(text, Translate(g_takenLeadFormat), name, kills);
+    AddMessage(text, 2, 0, 10);
+}

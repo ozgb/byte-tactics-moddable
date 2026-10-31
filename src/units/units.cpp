@@ -701,7 +701,6 @@ void __stdcall KillUnit(Unit* unit, int param_2)
 void __stdcall RemoveSpeechOfUnit(void* unit);
 void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
 #include "../ingame/game_dialogs.h"
-void __stdcall AddMessage(char* text, int a, int b, int c);
 #include "unit_targets.h"
 void __stdcall FreeObjectState(void* state);
 void __cdecl operator delete(void* p);
@@ -824,10 +823,8 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
                 } while (i != 0);
                 rec->rank = best;
                 if (best == 0) {
-                    char text[100];
-                    sprintf(text, Translate(g_takenLeadFormat), rec->name,
-                            g_game->commanderDeath == 2 ? rec->commanderKills : rec->kills);
-                    AddMessage(text, 2, 0, 10);
+                    AnnouncePlayerTookLead(rec->name,
+                                           g_game->commanderDeath == 2 ? rec->commanderKills : rec->kills);
                 }
             }
         }

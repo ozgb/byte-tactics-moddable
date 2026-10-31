@@ -48438,11 +48438,13 @@ address,function,file,kind,target
 ,OpenTrace,src/harness/harness.cpp,call,host_file_exe_path
 ,OpenTrace,src/harness/harness.cpp,call,isspace
 ,OpenTrace,src/harness/harness.cpp,call,memcpy
+,OpenTrace,src/harness/harness.cpp,call,setvbuf
 ,OpenTrace,src/harness/harness.cpp,call,strcpy
 ,OpenTrace,src/harness/harness.cpp,function,
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_commit@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_quirkSpec@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_scenarioPath@src/harness/harness.cpp
+,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_soundBuffer@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,g_quirks
 ,OpenTrace,src/harness/harness.cpp,global_read,s_crtSeed@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp

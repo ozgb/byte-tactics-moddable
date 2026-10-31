@@ -953,6 +953,7 @@ InitPlayerSlot #2,0x2,LoadSoundCategories #4,1,420,0x15,not-a-pointer,Player slo
 InitPlayerSlot #2,0x2 0x37,LoadTntMap: TILE SET,11,1857,0x2e4-0x9402cf,not-a-pointer,Player slot bytes and counters
 InitPlayerSlot #2,0x2 0x37,NanoParticles::Emit,8,2022,0x45-0x1b6,not-a-pointer,Player slot bytes and counters
 InitPlayerSlot #2,0x2,ThrustParticles::Emit,1,1,0x75,not-a-pointer,Player slot bytes and counters
+InitPlayerSlot #3,*,*,0,0,-,not-a-pointer,Words of a player slot allocation that only look like addresses
 InitSpawnedUnit,*,*,0,0,-,not-a-pointer,"words of InitSpawnedUnit that only look like addresses: block offsets, small integers that fall inside outside allocations, so the scan reads them as addresses"
 InitSpawnedUnit,0x1f,??0SpeechQueue@@QAE@HH@Z,2,2,0x4f,not-a-pointer,"Ref fields of the unit object states: block offsets, small integers that fall inside outside allocations, so the scan reads them as addresses"
 InitSpawnedUnit,0x6+0x8*k 0xf 0x12 0x1a 0x1f 0x28,??4?$vector@UTimedSubParticle@@V?$allocator@UTimedSubParticle@@@std@@@std@@QAEAAV01@ABV01@@Z,3,14,0x88-0x778,not-a-pointer,"Ref fields of the unit object states: block offsets, small integers that fall inside outside allocations, so the scan reads them as addresses"
@@ -1268,6 +1269,7 @@ RunOrders,0x8 0x2a,ReleaseFileHandle: HAPIFILE header,5,56,0x16de-0x8f51,not-a-p
 SetMissionType,*,*,0,0,-,not-a-pointer,Mission table words that only look like addresses
 SetMissionType,0xa02 0xc1e,HAPI_LoadFile,2,18000,0x1e20-0x14fa8,not-a-pointer,Mission table words that only look like addresses
 SetMissionType,0xc1d,LoadTntMap: TILE SET,1,7200,0xaffe0,not-a-pointer,Mission table words that only look like addresses
+SimGlobals.DAT_005119b8,*,*,0,0,-,not-a-pointer,Filler bytes of the sim globals that only look like an address in some runs
 SimGlobals.DAT_00512350,*,*,0,0,-,not-a-pointer,"the 8-byte gap before g_movementClasses, whose unaligned word at +6 takes the low half of entries[0].name"
 SimGlobals.g_cdMismatchDefeatTick,*,*,0,0,-,not-a-pointer,"g_cdMismatchDefeatTick: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_cdMismatchDefeatTick,0x2,??4?$vector@UTimedSubParticle@@V?$allocator@UTimedSubParticle@@@std@@@std@@QAEAAV01@ABV01@@Z,1,2,0x460,not-a-pointer,"g_cdMismatchDefeatTick: integers (ticks, counts, seed) that only look like addresses"
@@ -1492,3 +1494,4 @@ VtolStandbyOrder,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) 
 VtolStandbyOrder,0x20 0x22,CMemoryCache::InitCache: CMemoryCache CCH,1,85,0x2b02af-0x2c5489,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolStandbyOrder,0x1c+0x6*k 0x27 0x2a,HAPI_LoadFile,2,121,0x204-0xe616,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolStandbyOrder,0x22,NanoParticles::Emit,1,38,0x16,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
+unknown,*,*,0,0,-,not-a-pointer,"The sim event queue, allocated before the allocation hooks are on and so without a site: its tick and argument words, read at every byte offset, sometimes look like addresses"

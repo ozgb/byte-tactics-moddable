@@ -363,7 +363,6 @@ void __stdcall HandleSpeedOptionsClick(void* obj, int arg);
 #include "../debug/debug_lib.h"
 void __stdcall SortDisplayModes(VideoModeList* list);
 int __stdcall GetDisplayModes(VideoModeList* list);
-int FindHostSlot();
 char* __cdecl _itoa(int value, char* buf, int radix);
 int __stdcall SetCursorMode(int value);
 #include "../game/cd_check.h"

@@ -3,12 +3,17 @@
 #include "../../interfaces/ref.h"
 
 struct UnitDef;
+struct ModelState;
+struct GafEntry;
 
 #pragma pack(push, 1)
 struct FeatureAnimEntry {
     short next;
     short prev;
-    char unknown_4[0x2c];
+    ModelState* state;
+    char bytes_8[4];
+    GafEntry* src;
+    char bytes_10[0x20];
 };
 
 struct FeaturePseudoUnit {
@@ -36,6 +41,7 @@ struct FeatureAnimPool {
 #pragma pack(pop)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
+static_assert(sizeof(FeatureAnimEntry) == 0x30, "FeatureAnimEntry");
 static_assert(sizeof(FeatureAnimPool) == 120, "FeatureAnimPool");
 #endif
 

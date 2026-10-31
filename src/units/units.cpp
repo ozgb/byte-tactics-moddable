@@ -395,7 +395,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
 struct SpotStateUnitView {
     char unknown_0[8];
     int dirty;
-    void* unit;
+    Ref<Unit> unit;
     int drawFrame;
 };
 
@@ -410,7 +410,7 @@ struct BmpInfoHeader;
 #include "unit_script.h"
 
 void* __cdecl operator new(size_t size);
-SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, int player);
+SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, Unit* owner);
 #include "../graphics/model_render.h"
 
 // FUNCTION: 0x485d40
@@ -420,7 +420,7 @@ void __stdcall InitUnitScript(Unit* self)
     if (self->def->data) {
         self->script = new (kSim) UnitScript;
         ((CobScript*)self->script.get())->SetCob((ScriptTable*)self->def->data);
-        self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, (int)self);
+        self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, self);
         ((UnitScript*)self->script.get())->SetObjectState((int)self->state.get());
         ((CobScript*)self->script.get())->StartScript("Create", 0, 1);
     } else {
@@ -529,10 +529,10 @@ found:
     unit->mode = mode;
     UpdateUnitHeight(unit);
     g_seams.map->AddUnitToMap(unit);
-    SendNewUnit(unit);
+    g_seams.network->SendNewUnit(unit);
     if (param_5) {
         if (type->mobile == 0)
-            BroadcastBuilderLink(unit, unit);
+            g_seams.network->SendBuilderLink(unit, unit);
         if (((TypeFlags*)&unit->def->flags1)->bit18)
             ((Unit*)unit)->SetStateBits(1, 1);
         if (((TypeFlags*)&unit->def->flags1)->bit24) {
@@ -598,7 +598,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
         if (id >= 0xfffb) {
             return;
         }
-        id = ((FeatureNextView *)g_game->features)[id].next;
+        id = ((FeatureNextView *)g_game->features.get())[id].next;
     }
     if (id < 0xfffb) {
         void* target = g_seams.los_radar->GetMapCell(unit->cell.x, unit->cell.y);
@@ -629,23 +629,11 @@ int __stdcall IsUnitCommander(Unit* unit)
     return _strcmpi(g_game->sideDefs[unit->player->info->side].commander, unit->def->unitname) == 0;
 }
 
-#pragma pack(push, 1)
-struct UnitKilledPacket {
-    unsigned char type;
-    unsigned short unitId;
-    int attackerPlayerNetId;
-    unsigned short attackerUnitId;
-    signed char cobKilledSeverity;
-    unsigned char wreckageLevel : 4;
-    unsigned char killType : 4;
-};
-#pragma pack(pop)
-
-int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
+#include "../network/wire_packets.h"
 #include "../game/game_state.h"
 
 // FUNCTION: 0x4864b0
-void __stdcall KillUnit(Unit* unit, int param_2)
+void __stdcall KillUnit(Unit* unit, int killType)
 {
     if ((unit->flags & 0x10000000) != 0) {
         int same = _strcmpi(g_game->sideDefs[unit->player->info->side].commander,
@@ -655,10 +643,10 @@ void __stdcall KillUnit(Unit* unit, int param_2)
         }
         int amount;
         int flag;
-        if (param_2 == 7) {
+        if (killType == 7) {
             flag = 1;
             amount = 0;
-        } else if (param_2 == 4 || param_2 == 5 || param_2 == 9 || unit->health > 0) {
+        } else if (killType == 4 || killType == 5 || killType == 9 || unit->health > 0) {
             amount = 0;
             flag = 0;
         } else {
@@ -677,7 +665,7 @@ void __stdcall KillUnit(Unit* unit, int param_2)
         cmd.cobKilledSeverity = amount;
         cmd.type = 0xc;
         cmd.wreckageLevel = flag;
-        cmd.killType = param_2;
+        cmd.killType = killType;
         cmd.attackerPlayerNetId = GetSlotDpid(unit->lastAttackerSlot);
         if (unit->attacker == 0)
             cmd.attackerUnitId = 0;
@@ -685,7 +673,7 @@ void __stdcall KillUnit(Unit* unit, int param_2)
             cmd.attackerUnitId = unit->attacker->id;
         if (unit->player->active != 0 &&
             (unit->player->type == 1 || unit->player->type == 2)) {
-            BroadcastPacket(unit->player->id, (unsigned char*)&cmd, 0xb);
+            g_seams.network->SendUnitKilled(unit, amount, flag, killType);
         }
         ApplyUnitDeath(&cmd, 1);
         if (same && g_game->commanderDeath != 0 && unit->player->active != 0 &&

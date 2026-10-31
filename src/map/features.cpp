@@ -125,8 +125,6 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot1
 #include "../util/math.h"
 void __stdcall PlaySoundAtByName(char* name, Vec3* pos, int param_3);
 #include "../network/net_game.h"
-int GetHostDpid();
-int __stdcall BroadcastPacket(int player, void* data, int size);
 int __stdcall StepGafSequence(Handle* anim);
 GafFrame* __stdcall GetGafSequenceFrame(Handle* anim);
 void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
@@ -246,7 +244,7 @@ void FreeFeaturePool()
         }
     }
 
-    GameFreeThunk(g_game->features);
+    GameFreeThunk((int*)g_game->features.get());
     g_game->features = 0;
     g_game->featureCount = 0;
 }
@@ -332,7 +330,7 @@ int __stdcall LoadFeatureType(char* name)
         sprintf(path, "Record \"%s\" missing from feature files", name);
         FatalError(path);
     }
-    g_game->features = (Feature*)GameReallocTagged(g_game->features, "FEATURES", (g_game->featureCount + 1) * 0x100);
+    g_game->features = (Feature*)SimRealloc(g_game->features, (g_game->featureCount + 1) * 0x100);
     Feature* def = &g_game->features[g_game->featureCount];
     strncpy(def->name, name, 0x80);
     entry->current->GetFieldString(def->description, "Description", 0x14, DAT_005119b8);
@@ -438,25 +436,23 @@ unsigned short __stdcall FindOrLoadFeatureType(char* name)
 void ResolveFeatureLinks()
 {
     char buf[0x100];
-    Feature** features;
     int i = 0;
     int* count = &g_game->featureCount;
     if (*count > 0) {
-        features = &g_game->features;
         do {
-            TdfRecord* parser = (TdfRecord*)FindFeatureFile((*features)[i].name)->current;
+            TdfRecord* parser = (TdfRecord*)FindFeatureFile(g_game->features[i].name)->current;
             if (parser->GetFieldString(buf, "featuredead", 0x100, DAT_005119b8))
-                (*features)[i].dead = FindOrLoadFeatureType(buf);
+                g_game->features[i].dead = FindOrLoadFeatureType(buf);
             else
-                (*features)[i].dead = 0xffff;
+                g_game->features[i].dead = 0xffff;
             if (parser->GetFieldString(buf, "featurereclamate", 0x100, DAT_005119b8))
-                (*features)[i].reclamate = FindOrLoadFeatureType(buf);
+                g_game->features[i].reclamate = FindOrLoadFeatureType(buf);
             else
-                (*features)[i].reclamate = 0xffff;
+                g_game->features[i].reclamate = 0xffff;
             if (parser->GetFieldString(buf, "featureburnt", 0x100, DAT_005119b8))
-                (*features)[i].burnt = FindOrLoadFeatureType(buf);
+                g_game->features[i].burnt = FindOrLoadFeatureType(buf);
             else
-                (*features)[i].burnt = 0xffff;
+                g_game->features[i].burnt = 0xffff;
             g_game->loadPercent = (unsigned char)((i + 1) * 100 / *count);
             i++;
         } while (i < *count);
@@ -561,14 +557,8 @@ void __stdcall StartFeatureBurning(int x, int z, int flag)
     pos.z = z << 20;
     pos.y = cell->height << 16;
     PlaySoundAtByName("treeburn", &pos, 0);
-    if (flag == 0) {
-        FeatureDamagePacket packet;
-        packet.type = 0xf;
-        packet.sub = 0xfe;
-        packet.x = x;
-        packet.z = z;
-        BroadcastPacket(GetLocalDpid(), &packet, 6);
-    }
+    if (flag == 0)
+        g_seams.network->SendFeatureBurning(x, z);
 }
 
 // FUNCTION: 0x423550
@@ -708,14 +698,8 @@ int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
         unit->metal += metal;
     }
     KillFeature(x, z, 1);
-    if (g_seams.map->GetGameType(g_game->net) == 3) {
-        FeatureDamagePacket packet;
-        packet.type = 0xf;
-        packet.sub = 0xff;
-        packet.x = x;
-        packet.z = z;
-        BroadcastPacket(((Player*)unit->player)->id, &packet, 6);
-    }
+    if (g_seams.map->GetGameType(g_game->net) == 3)
+        g_seams.network->SendFeatureReclaimed(unit, x, z);
     return 1;
 }
 
@@ -984,19 +968,14 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
     Feature* f = &g_game->features[cell->feature];
     if (f->indestructible)
         return;
-    FeatureDamagePacket packet;
     int send;
+    int killed = 0;
     if (g_seams.map->GetGameType(g_game->net) == 3) {
         if (!(g_game->players[g_game->playerIndex].info->flags_97 & 1)) {
-            packet.type = 0xf;
-            packet.sub = weapon->index;
-            packet.x = x;
-            packet.z = z;
-            SendPacketToPlayer(GetLocalDpid(), GetHostDpid(), (unsigned char *)&packet, 6);
+            g_seams.network->SendFeatureHit(weapon, x, z);
             return;
         }
         send = 1;
-        packet.sub = 0xfc;
     } else {
         send = 0;
     }
@@ -1012,24 +991,20 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
             s->damage += weapon->damage;
             if (s->damage >= f->damage) {
                 KillFeature(s->x, s->z, 0);
-                packet.sub = 0xfd;
+                killed = 1;
             }
         }
     } else {
         int d = weapon->damage + cell->spot;
         if (d >= f->damage) {
             KillFeature(x, z, 0);
-            packet.sub = 0xfd;
+            killed = 1;
         } else {
             cell->spot = d;
         }
     }
-    if (send && packet.sub > 0xfc) {
-        packet.type = 0xf;
-        packet.x = x;
-        packet.z = z;
-        BroadcastPacket(GetLocalDpid(), &packet, 6);
-    }
+    if (send && killed)
+        g_seams.network->SendFeatureKilled(x, z);
 }
 
 static inline void ClearCell(Cell* c)

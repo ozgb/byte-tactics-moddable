@@ -62,7 +62,6 @@ OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTab
                                        char* const& value, int(__stdcall* pred)(int, char*),
                                        int* unused);
 #include "../network/net_game.h"
-void __stdcall SendScriptCall(Unit* obj, int index, int param_3, int param_4, int param_5, int param_6, int param_7);
 #include "../sound/sound.h"
 
 #include "../../link/globals.h"
@@ -124,7 +123,7 @@ void __stdcall StartBuildingScript(Unit* obj, Order* target, unsigned short para
 {
     int index = g_seams.units->FindScript((CobScript*)obj->script.get(), "StartBuilding");
     g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 1, param_3, 0, 0, 0);
-    SendScriptCall(obj, index, 1, param_3, 0, 0, 0);
+    g_seams.network->SendScriptCall(obj, index, 1, param_3, 0, 0, 0);
     target->flags_42 |= 0x400000;
 }
 
@@ -134,7 +133,7 @@ void __stdcall StopBuildingScript(Unit* obj, Order* target)
     if (target->flags_42 & 0x400000) {
         int index = g_seams.units->FindScript((CobScript*)obj->script.get(), "StopBuilding");
         g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
-        SendScriptCallNoArgs(obj, index);
+        g_seams.network->SendScriptCall(obj, index, 0, 0, 0, 0, 0);
         target->flags_42 &= ~0x400000;
     }
 }
@@ -374,7 +373,7 @@ Order::~Order()
         Unit* obj = unit;
         int index = g_seams.units->FindScript((CobScript*)obj->script.get(), "StopBuilding");
         g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
-        SendScriptCallNoArgs(obj, index);
+        g_seams.network->SendScriptCall(obj, index, 0, 0, 0, 0, 0);
         flags_42 &= ~0x400000;
     }
     if (((UnitMotionSlotView *)unit->motion.get()) != 0) {

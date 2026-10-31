@@ -4,17 +4,18 @@
 #include "../../interfaces/ref.h"
 
 struct Unit;
+class OrderBase;
 
 class PathOrderAttach {
 public:
     Ref<Unit> owner;
     Ref<PathOrderAttach> next;
-    void* value;
+    Ref<OrderBase> value;
 
-    PathOrderAttach(Unit* o, int v);
+    PathOrderAttach(Unit* o, OrderBase* v);
     virtual ~PathOrderAttach();
     void SetUnit(Unit* o);
-    void SetValue(void* v) { value = v; }
+    void SetValue(OrderBase* v) { value = v; }
     Unit* Get() { return owner; }
 };
 

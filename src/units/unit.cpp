@@ -57,7 +57,6 @@ struct ActivateFlagsPacket {
 
 #include "../orders/order_base.h"
 
-#include "../orders/order.h"
 #include "../orders/path_order_attach.h"
 
 #include "unit.h"
@@ -239,7 +238,7 @@ void Unit::SetStateBits(int mask, int set)
                 QueueUnitSpeech(this, 0xe, 0);
                 for (link = head; link; link = link->next) {
                     if (link->value)
-                        link->value->OrStatusFlags(0x10000);
+                        ((OrderBase*)link->value)->OrStatusFlags(0x10000);
                 }
             }
             if (lost & 4)

@@ -1,37 +1,11 @@
 #include <string.h>
 #include "../../interfaces/host.h"
 
-struct DpspGuid {
-    unsigned long data1;
-    unsigned long data2;
-    unsigned long data3;
-    unsigned long data4;
-};
-
 #pragma pack(push, 1)
 #include "../game/game.h"
 #pragma pack(pop)
 
-struct OnlineReportPlayer {
-    char* name;
-    int id;
-    int flags;
-    char* side;
-    int numAllies;
-    OnlineReportPlayer** allies;
-};
-
-struct OnlineReportScore {
-    char* name;
-    int value;
-};
-
-struct OnlineReportScoreBoard {
-    int score;
-    int count;
-    OnlineReportScore** scores;
-};
-
+#include "../game/statistics.h"
 #include "../../link/globals.h"
 extern char DAT_00512c98[];
 extern DpspGuid g_dpspGuidIpx;
@@ -49,7 +23,6 @@ extern RiEnableFn g_riEnable;
 extern RiTerminateFn g_riTerminate;
 
 #include "reporter.h"
-#include "../game/statistics.h"
 #include "../debug/debug_lib.h"
 #include "../ingame/info_panel.h"
 #include "../network/online_report.h"

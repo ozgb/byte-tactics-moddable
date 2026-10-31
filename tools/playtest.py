@@ -466,7 +466,7 @@ class Instance:
         self.base.mkdir(parents=True, exist_ok=True)
         link_prefix(template, self.prefix)
         copy_game(game_src, self.game)
-        for stale in ("trace.txt", "dump.txt", "blockptrs.txt"):
+        for stale in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt"):
             (self.game / stale).unlink(missing_ok=True)
         for dest, _ in self.run.put:
             (self.game / dest).unlink(missing_ok=True)
@@ -758,7 +758,7 @@ class Instance:
     def collect_traces(self) -> None:
         if not self.run.testmode:
             return
-        for name in ("trace.txt", "dump.txt", "blockptrs.txt", CRASH_FILE):
+        for name in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt", CRASH_FILE):
             if (self.game / name).is_file():
                 shutil.copyfile(self.game / name, self.run.out / name)
                 self.run.notes.append(f"{name}: {self.run.out / name}")

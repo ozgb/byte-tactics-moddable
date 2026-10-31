@@ -8,6 +8,7 @@
 #include <vector>
 #include "los_tables.h"
 
+#include "../state/block_vector.h"
 #include "../util/string_ref.h"
 
 struct OwnedString {

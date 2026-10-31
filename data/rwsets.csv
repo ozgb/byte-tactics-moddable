@@ -953,6 +953,7 @@ address,function,file,kind,target
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
+0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator Feature *
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator bool
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator->
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator=
@@ -1014,6 +1015,7 @@ address,function,file,kind,target
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Cell *
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Feature *
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator FeatureSpot *
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Mission *
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Unit *
@@ -2323,6 +2325,7 @@ address,function,file,kind,target
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,BlockVector::Clear
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,BlockVector::PushBack
+0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,operator Feature *
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,deref_escape,*Feature
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,field_maybe_written,PlayerAI::cells
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,field_read,Cell::feature
@@ -4144,6 +4147,7 @@ address,function,file,kind,target
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,RecordReverseNanoParticles
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
+0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator Feature *
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator new
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator->
@@ -6823,14 +6827,21 @@ address,function,file,kind,target
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,CMemoryCache::InitSimCache
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,MakeExplosion
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,memset
+0x420620,InitExplosions,src/weapons/explosions.cpp,call,operator=
 0x420620,InitExplosions,src/weapons/explosions.cpp,deref_read,*Explosion
 0x420620,InitExplosions,src/weapons/explosions.cpp,deref_read,*Face
-0x420620,InitExplosions,src/weapons/explosions.cpp,deref_read,*Object3D
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_escape,Game::frames
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_escape,Game::lists
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_escape,Game::slots
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_escape,Game::vertices_1e88f
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_read,FaceFlags::raw
+0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,DebrisPiece::active
+0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,DebrisPiece::faceCount
+0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,DebrisPiece::faces
+0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,DebrisPiece::firstFace
+0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,DebrisPiece::name
+0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,DebrisPiece::state
+0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,DebrisPiece::vertexCount
+0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,DebrisPiece::verts
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Face::color
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Face::nverts
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Face::vindex
@@ -6838,14 +6849,6 @@ address,function,file,kind,target
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Game::count_1491b
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Game::explosionLensFrame
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Game::shade
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Object3D::active
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Object3D::faceCount
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Object3D::faces
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Object3D::firstFace
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Object3D::name
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Object3D::state
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Object3D::vertexCount
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Object3D::verts
 0x420620,InitExplosions,src/weapons/explosions.cpp,function,
 0x420620,InitExplosions,src/weapons/explosions.cpp,global_escape,g_explodedPieces
 0x420620,InitExplosions,src/weapons/explosions.cpp,global_escape,g_faceVertexIndices
@@ -6869,10 +6872,9 @@ address,function,file,kind,target
 0x420620,InitExplosions,src/weapons/explosions.cpp,global_write,g_explosion2Duration
 0x420620,InitExplosions,src/weapons/explosions.cpp,global_write,g_explosion2EndSize
 0x420620,InitExplosions,src/weapons/explosions.cpp,global_write,g_explosion2StartSize
-0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,deref_read,*Object3D
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,field_escape,Game::slots
-0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,field_read,Object3D::state
-0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,field_write,Object3D::state
+0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,field_read,DebrisPiece::state
+0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,field_write,DebrisPiece::state
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,function,
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,global_read,g_game
 0x420960,FreeExplosions,src/weapons/explosions.cpp,call,CMemoryCache::FreeCache
@@ -6905,12 +6907,13 @@ address,function,file,kind,target
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,field_write,GafRef::src
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,function,
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,global_read,g_game
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawDebrisProjected
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawExplodedPiece
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawFrame
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawFrameShadow
-0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawModel3doProjected
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,GetGafSequenceFrame
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,PointInRect
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,get
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator ExplodedPiece *
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator bool
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator=
@@ -6921,6 +6924,7 @@ address,function,file,kind,target
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_maybe_written,DebrisView::ref1
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_maybe_written,DebrisView::ref2
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,DebrisView::obj
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,Fixed::value
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,Fixed::whole
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,GafRef::src
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,Game::scrollX
@@ -6977,7 +6981,9 @@ address,function,file,kind,target
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,get
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator ExplodedPiece *
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator!=
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator->
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator=
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator==
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,deref_read,*DebrisView
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,deref_read,*int
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,deref_read,*short
@@ -7009,12 +7015,12 @@ address,function,file,kind,target
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Vec3::x
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Vec3::y
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Vec3::z
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,DebrisPiece::state
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,DebrisView::angle_x
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,DebrisView::angle_y
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,DebrisView::angle_z
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,DebrisView::obj
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,DebrisView::pos
-0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,Object3D::state
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,Vec3::x
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,Vec3::y
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_write,Vec3::z
@@ -7198,18 +7204,24 @@ address,function,file,kind,target
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,RandomInt
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,VectorFromTo
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,get
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator DebrisPiece *
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator Face *
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator Player *
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator Unit *
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator Vec3 *
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator bool
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator->
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator=
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator==
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,deref_read,*Vec3
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,deref_read,*int
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,deref_read,*unsigned short
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,deref_write,*Vec3
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,deref_write,*int
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_escape,Game::count_1491b
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,DebrisPiece::faceCount
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,DebrisPiece::faces
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,DebrisPiece::verts
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,DebrisView::obj
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,ExplodedPiece::b5
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,ExplodedPiece::index
@@ -7226,7 +7238,6 @@ address,function,file,kind,target
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,Object3D::faceCount
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,Object3D::faces
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,Object3D::firstFace
-0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,Object3D::verts
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,PieceRec::desc
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,PieceRec::pos
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,PieceRec::verts
@@ -7266,6 +7277,7 @@ address,function,file,kind,target
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_write,Vec3f::z
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,function,
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,global_read,g_game
+0x421da0,FindFeatureAtPos,src/weapons/explosions.cpp,call,operator Feature *
 0x421da0,FindFeatureAtPos,src/weapons/explosions.cpp,call,operator=
 0x421da0,FindFeatureAtPos,src/weapons/explosions.cpp,deref_write,*Point16
 0x421da0,FindFeatureAtPos,src/weapons/explosions.cpp,field_read,Cell::feature
@@ -7335,6 +7347,7 @@ address,function,file,kind,target
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,function,
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,global_read,g_game
 0x422040,StampFeatureMetal,src/map/features.cpp,call,operator Cell *
+0x422040,StampFeatureMetal,src/map/features.cpp,call,operator Feature *
 0x422040,StampFeatureMetal,src/map/features.cpp,deref_escape,*Feature
 0x422040,StampFeatureMetal,src/map/features.cpp,field_read,Cell::feature
 0x422040,StampFeatureMetal,src/map/features.cpp,field_read,Feature::flags16
@@ -7354,6 +7367,8 @@ address,function,file,kind,target
 0x422040,StampFeatureMetal,src/map/features.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
 0x422170,FreeFeaturePool,src/map/features.cpp,call,FreeObjectState
 0x422170,FreeFeaturePool,src/map/features.cpp,call,GameFreeThunk
+0x422170,FreeFeaturePool,src/map/features.cpp,call,get
+0x422170,FreeFeaturePool,src/map/features.cpp,call,operator Feature *
 0x422170,FreeFeaturePool,src/map/features.cpp,call,operator Spot *
 0x422170,FreeFeaturePool,src/map/features.cpp,call,operator SpotState *
 0x422170,FreeFeaturePool,src/map/features.cpp,call,operator char *
@@ -7412,16 +7427,17 @@ address,function,file,kind,target
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,BuildDataPath
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,FatalError
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,FindFeatureFile
-0x4224b0,LoadFeatureType,src/map/features.cpp,call,GameReallocTagged
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,InitGafSequence
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,LoadFeatureSeq
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,LoadFeatureSeqOnce
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,LoadGaf
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,LoadObject3d
+0x4224b0,LoadFeatureType,src/map/features.cpp,call,SimRealloc
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,TdfRecord::GetFieldDouble
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,TdfRecord::GetFieldInt
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,TdfRecord::GetFieldString
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,_strcmpi
+0x4224b0,LoadFeatureType,src/map/features.cpp,call,operator Feature *
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,operator=
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,sprintf
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,strcpy
@@ -7488,6 +7504,7 @@ address,function,file,kind,target
 0x4224b0,LoadFeatureType,src/map/features.cpp,global_read,g_seams
 0x4224b0,LoadFeatureType,src/map/features.cpp,indirect_call,indirect via WeaponDef *(*)(char *) __attribute__((stdcall)) [WeaponsSeam::FindWeaponByName]
 0x422dd0,FindFeatureType,src/map/features.cpp,call,_strcmpi
+0x422dd0,FindFeatureType,src/map/features.cpp,call,operator Feature *
 0x422dd0,FindFeatureType,src/map/features.cpp,field_escape,Feature::name
 0x422dd0,FindFeatureType,src/map/features.cpp,field_read,Game::featureCount
 0x422dd0,FindFeatureType,src/map/features.cpp,field_read,Game::features
@@ -7499,11 +7516,11 @@ address,function,file,kind,target
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,call,FindFeatureFile
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,call,FindOrLoadFeatureType
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,call,TdfRecord::GetFieldString
-0x422ea0,ResolveFeatureLinks,src/map/features.cpp,deref_read,*Feature
+0x422ea0,ResolveFeatureLinks,src/map/features.cpp,call,operator Feature *
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,deref_read,*int
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,field_escape,Game::featureCount
-0x422ea0,ResolveFeatureLinks,src/map/features.cpp,field_escape,Game::features
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,field_maybe_written,Feature::name
+0x422ea0,ResolveFeatureLinks,src/map/features.cpp,field_read,Game::features
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,field_read,TdfFile::current
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,field_write,Feature::burnt
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,field_write,Feature::dead
@@ -7515,6 +7532,7 @@ address,function,file,kind,target
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,FindFeatureType
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,LoadFeatureType
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,PlaceFeature
+0x423160,PlaceMissionFeatures,src/map/features.cpp,call,operator Feature *
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,operator MissionFeature *
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,operator->
 0x423160,PlaceMissionFeatures,src/map/features.cpp,deref_escape,*Feature
@@ -7567,6 +7585,7 @@ address,function,file,kind,target
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,InitGafSequence
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,PlaySoundAtByName
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,RandomInt
+0x4233a0,StartFeatureBurning,src/map/features.cpp,call,operator Feature *
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,operator Spot *
 0x4233a0,StartFeatureBurning,src/map/features.cpp,deref_escape,*Feature
 0x4233a0,StartFeatureBurning,src/map/features.cpp,deref_escape,*Spot
@@ -7602,6 +7621,7 @@ address,function,file,kind,target
 0x423550,KillFeature,src/map/features.cpp,call,AllocFeatureSpot
 0x423550,KillFeature,src/map/features.cpp,call,InitGafSequence
 0x423550,KillFeature,src/map/features.cpp,call,ReplaceFeatureWithDead
+0x423550,KillFeature,src/map/features.cpp,call,operator Feature *
 0x423550,KillFeature,src/map/features.cpp,call,operator Spot *
 0x423550,KillFeature,src/map/features.cpp,call,operator=
 0x423550,KillFeature,src/map/features.cpp,deref_escape,*Feature
@@ -7638,6 +7658,7 @@ address,function,file,kind,target
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,call,PlaceFeature
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,call,RemoveFeature
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,call,get
+0x423710,ReplaceFeatureWithDead,src/map/features.cpp,call,operator Feature *
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,deref_escape,*Feature
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,field_maybe_written,Spot::pos
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,field_maybe_written,Spot::rot
@@ -7690,6 +7711,7 @@ address,function,file,kind,target
 0x4239c0,SpreadFire,src/map/features.cpp,call,RandomInt
 0x4239c0,SpreadFire,src/map/features.cpp,call,StartFeatureBurning
 0x4239c0,SpreadFire,src/map/features.cpp,call,get
+0x4239c0,SpreadFire,src/map/features.cpp,call,operator Feature *
 0x4239c0,SpreadFire,src/map/features.cpp,call,operator bool
 0x4239c0,SpreadFire,src/map/features.cpp,deref_escape,*Feature
 0x4239c0,SpreadFire,src/map/features.cpp,field_read,Cell::feature
@@ -7716,6 +7738,7 @@ address,function,file,kind,target
 0x4239c0,SpreadFire,src/map/features.cpp,indirect_call,"indirect via void (*)(WeaponDef *, Vec3 *) __attribute__((stdcall)) [WeaponsSeam::ApplyAreaDamageAt]"
 0x423bf0,ReplaceFeatureWithBurnt,src/map/features.cpp,call,PlaceFeature
 0x423bf0,ReplaceFeatureWithBurnt,src/map/features.cpp,call,RemoveFeature
+0x423bf0,ReplaceFeatureWithBurnt,src/map/features.cpp,call,operator Feature *
 0x423bf0,ReplaceFeatureWithBurnt,src/map/features.cpp,field_read,Feature::burnt
 0x423bf0,ReplaceFeatureWithBurnt,src/map/features.cpp,field_read,FeatureSite::entry
 0x423bf0,ReplaceFeatureWithBurnt,src/map/features.cpp,field_read,FeatureSite::x
@@ -7734,6 +7757,7 @@ address,function,file,kind,target
 0x423c50,PlaceFeature,src/map/features.cpp,call,RemoveFeature
 0x423c50,PlaceFeature,src/map/features.cpp,call,memset
 0x423c50,PlaceFeature,src/map/features.cpp,call,operator Cell *
+0x423c50,PlaceFeature,src/map/features.cpp,call,operator Feature *
 0x423c50,PlaceFeature,src/map/features.cpp,call,operator Spot *
 0x423c50,PlaceFeature,src/map/features.cpp,call,operator=
 0x423c50,PlaceFeature,src/map/features.cpp,deref_escape,*Cell
@@ -7786,6 +7810,7 @@ address,function,file,kind,target
 0x424050,UpdateFeatures,src/map/features.cpp,call,StepGafSequence
 0x424050,UpdateFeatures,src/map/features.cpp,call,Vec3NonZero
 0x424050,UpdateFeatures,src/map/features.cpp,call,operator Cell *
+0x424050,UpdateFeatures,src/map/features.cpp,call,operator Feature *
 0x424050,UpdateFeatures,src/map/features.cpp,call,operator Spot *
 0x424050,UpdateFeatures,src/map/features.cpp,call,operator+=
 0x424050,UpdateFeatures,src/map/features.cpp,call,operator=
@@ -7846,6 +7871,7 @@ address,function,file,kind,target
 0x4244b0,DamageFeature,src/map/features.cpp,call,KillFeature
 0x4244b0,DamageFeature,src/map/features.cpp,call,StartFeatureBurning
 0x4244b0,DamageFeature,src/map/features.cpp,call,get
+0x4244b0,DamageFeature,src/map/features.cpp,call,operator Feature *
 0x4244b0,DamageFeature,src/map/features.cpp,call,operator Mission *
 0x4244b0,DamageFeature,src/map/features.cpp,call,operator->
 0x4244b0,DamageFeature,src/map/features.cpp,deref_escape,*Feature
@@ -7887,6 +7913,7 @@ address,function,file,kind,target
 0x4246b0,RemoveFeature,src/map/features.cpp,call,MoveFeatureSpot
 0x4246b0,RemoveFeature,src/map/features.cpp,call,get
 0x4246b0,RemoveFeature,src/map/features.cpp,call,operator Cell *
+0x4246b0,RemoveFeature,src/map/features.cpp,call,operator Feature *
 0x4246b0,RemoveFeature,src/map/features.cpp,call,operator SpotState *
 0x4246b0,RemoveFeature,src/map/features.cpp,call,operator=
 0x4246b0,RemoveFeature,src/map/features.cpp,deref_escape,*Cell
@@ -7935,6 +7962,7 @@ address,function,file,kind,target
 0x424890,SaveFeatures,src/map/features.cpp,call,begin
 0x424890,SaveFeatures,src/map/features.cpp,call,get
 0x424890,SaveFeatures,src/map/features.cpp,call,operator Cell *
+0x424890,SaveFeatures,src/map/features.cpp,call,operator Feature *
 0x424890,SaveFeatures,src/map/features.cpp,call,operator=
 0x424890,SaveFeatures,src/map/features.cpp,call,strncpy
 0x424890,SaveFeatures,src/map/features.cpp,deref_escape,*Feature
@@ -7993,6 +8021,7 @@ address,function,file,kind,target
 0x424c00,LoadFeatures,src/map/features.cpp,call,_strcmpi
 0x424c00,LoadFeatures,src/map/features.cpp,call,begin
 0x424c00,LoadFeatures,src/map/features.cpp,call,get
+0x424c00,LoadFeatures,src/map/features.cpp,call,operator Feature *
 0x424c00,LoadFeatures,src/map/features.cpp,call,operator[]
 0x424c00,LoadFeatures,src/map/features.cpp,call,resize
 0x424c00,LoadFeatures,src/map/features.cpp,deref_escape,*Spot
@@ -12501,6 +12530,7 @@ address,function,file,kind,target
 0x43de30,UnitMotion::LoadMotion,src/orders/order_list.cpp,field_write,UnitMotion::velocity
 0x43de30,UnitMotion::LoadMotion,src/orders/order_list.cpp,function,
 0x43def0,GetPieceOffset,src/units/unit_scripts.cpp,call,RotateByAngles
+0x43def0,GetPieceOffset,src/units/unit_scripts.cpp,call,operator PieceRecord *
 0x43def0,GetPieceOffset,src/units/unit_scripts.cpp,call,operator PieceTable *
 0x43def0,GetPieceOffset,src/units/unit_scripts.cpp,call,operator==
 0x43def0,GetPieceOffset,src/units/unit_scripts.cpp,field_escape,PieceTable::items
@@ -17710,19 +17740,20 @@ address,function,file,kind,target
 0x458310,CMemoryCache::AddModelBounds,src/graphics/model_render.cpp,function,
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,call,CMemoryCache::DrawObjectPicture
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,call,CMemoryCache::DrawPiece
+0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,call,operator Vec3 *
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,field_read,<anon>::visible
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,field_read,ModelPiece::object
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,field_read,ModelPiece::points
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,field_read,ModelState::bitmap
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,field_read,ModelState::count
-0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,field_read,ModelState::owner
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,field_read,UnitDrawView::playerIndex
 0x458430,CMemoryCache::DrawObjectPieces,src/graphics/model_render.cpp,function,
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,DrawFrameQuad
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,FillPolygon
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,GetGafFrame
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,GetGafSequenceFrame
+0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,get
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,call,operator=
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,deref_read,*unsigned short
@@ -17736,7 +17767,6 @@ address,function,file,kind,target
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,ModelFace::indices
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,ModelFace::pic
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,ModelFace::unknown_0
-0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,ModelState::owner
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Object3do::faceCount
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Object3do::faces
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,field_read,Object3do::firstFace
@@ -17761,6 +17791,7 @@ address,function,file,kind,target
 0x4584d0,CMemoryCache::DrawPiece,src/graphics/model_render.cpp,global_read,g_game
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,call,CMemoryCache::AllocBitmap
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,call,CMemoryCache::AllocTwoPlaneBitmap
+0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,call,UnitTable::DrawLitPieces
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,call,UnitTable::DrawPieces
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,call,UnitTable::MeasureModel
@@ -17769,7 +17800,6 @@ address,function,file,kind,target
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,field_escape,Game::flags_37f06
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,field_maybe_written,ModelState::bitmap
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,field_read,ModelState::bitmap
-0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,field_read,ModelState::owner
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,field_read,UnitDrawView::buildLeft
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,field_read,UnitDrawView::flags
 0x4586a0,UnitTable::BuildObjectPicture,src/graphics/model_render.cpp,field_read,UnitDrawView::playerIndex
@@ -17785,6 +17815,7 @@ address,function,file,kind,target
 0x4587b0,HalveFrame,src/graphics/model_render.cpp,field_read,GafFrame::width
 0x4587b0,HalveFrame,src/graphics/model_render.cpp,function,
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,call,CMemoryCache::DrawObjectPieces
+0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,call,ModelState::OwnerView
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,call,UnitTable::BuildObjectPicture
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,call,operator char *
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,deref_read,*int
@@ -17793,7 +17824,6 @@ address,function,file,kind,target
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,field_read,Game::scrollY
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,field_read,ModelState::bitmap
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,field_read,ModelState::cacheDrawCount
-0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,field_read,ModelState::owner
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,field_read,UnitDrawView::activateFlags
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,field_read,UnitDrawView::buildLeft
 0x458810,CMemoryCache::DrawObjectState,src/units/unit_motion.cpp,field_read,UnitDrawView::flags
@@ -17808,6 +17838,7 @@ address,function,file,kind,target
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,call,CMemoryCache::AddModelBounds
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,call,CMemoryCache::ShadeByIntensity
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,call,DrawFrame
+0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,call,SurfaceFromFrame
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,call,Swap
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,call,memcpy
@@ -17825,7 +17856,6 @@ address,function,file,kind,target
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,field_read,GafFrame::width
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,field_read,GafFrame::xOffset
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,field_read,GafFrame::yOffset
-0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,field_read,ModelState::owner
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,field_read,UnitDrawView::cargo
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,field_read,UnitDrawView::cargoNext
 0x4589c0,CMemoryCache::MergeIntoComposite,src/graphics/model_render.cpp,field_read,UnitDrawView::flags
@@ -17860,15 +17890,16 @@ address,function,file,kind,target
 0x458d30,CMemoryCache::RecolorByShade,src/graphics/model_render.cpp,function,
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,call,CMemoryCache::DrawPieceEdges
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,call,CMemoryCache::RecolorByShade
+0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,call,Scale
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,field_read,GafFrame::scratch
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,field_read,Game::ticks
-0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,field_read,ModelState::owner
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,field_read,UnitDrawView::buildLeft
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,field_read,UnitDrawView::id
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,function,
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,global_read,g_game
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,call,DrawPolygonEdges
+0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,call,get
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,call,operator=
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,call,shade_bias
@@ -17882,7 +17913,6 @@ address,function,file,kind,target
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,ModelPiece::points
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,ModelPieceFlags::word
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,ModelState::count
-0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,ModelState::owner
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Object3do::faceCount
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Object3do::faces
 0x458fa0,CMemoryCache::DrawPieceEdges,src/graphics/model_render.cpp,field_read,Object3do::firstFace
@@ -17919,6 +17949,7 @@ address,function,file,kind,target
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,DrawFrameBlended
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,DrawFrameDepth
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,GetGroundHeight
+0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,TintFrameBelow
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,UnitTable::BuildObjectPicture
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,call,UnitTable::DrawPieces
@@ -17947,7 +17978,6 @@ address,function,file,kind,target
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,ModelPieceFlags::word
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,ModelState::bitmap
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,ModelState::count
-0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,ModelState::owner
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,ModelState::shadow
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,UnitDef::flags1
 0x459200,CMemoryCache::DrawObjectPicture,src/graphics/model_render.cpp,field_read,UnitDrawView::activateFlags
@@ -17975,6 +18005,7 @@ address,function,file,kind,target
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,call,FillFlatPolygon
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,call,GetGafFrame
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,call,GetGafSequenceFrame
+0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,call,get
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,call,memset
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,call,operator Vec3 *
@@ -18008,7 +18039,6 @@ address,function,file,kind,target
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,ModelPiece::object
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,ModelPiece::points
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,ModelState::count
-0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,ModelState::owner
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Object3do::faceCount
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Object3do::faces
 0x459830,UnitTable::DrawPieces,src/graphics/model_render.cpp,field_read,Object3do::firstFace
@@ -18037,6 +18067,7 @@ address,function,file,kind,target
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,FillShadedPolygon
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,GetGafFrame
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,GetGafSequenceFrame
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,NormalizeVector
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,VectorFromToInt
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,get
@@ -18072,7 +18103,6 @@ address,function,file,kind,target
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,ModelPiece::object
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,ModelPiece::points
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,ModelState::count
-0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,ModelState::owner
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Object3do::faceCount
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Object3do::faces
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,field_read,Object3do::firstFace
@@ -18187,6 +18217,7 @@ address,function,file,kind,target
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,call,CountObjects
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,call,SimAllocTagged
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,call,memset
+0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,call,operator=
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,field_read,Object3do::child
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,field_read,Object3do::sibling
 0x45a8d0,CreateObjectState,src/graphics/model_render.cpp,field_write,ModelState::animDirty
@@ -18226,6 +18257,7 @@ address,function,file,kind,target
 0x45ab10,UpdateObjectState,src/graphics/model_render.cpp,call,FarFrom
 0x45ab10,UpdateObjectState,src/graphics/model_render.cpp,call,PoseModel
 0x45ab10,UpdateObjectState,src/graphics/model_render.cpp,call,RestorePieceVertices
+0x45ab10,UpdateObjectState,src/graphics/model_render.cpp,call,operator ModelPiece *
 0x45ab10,UpdateObjectState,src/graphics/model_render.cpp,call,operator ModelState *
 0x45ab10,UpdateObjectState,src/graphics/model_render.cpp,call,operator->
 0x45ab10,UpdateObjectState,src/graphics/model_render.cpp,call,operator=
@@ -18243,6 +18275,7 @@ address,function,file,kind,target
 0x45ac20,DrawUnit,src/graphics/model_render.cpp,call,FarFrom
 0x45ac20,DrawUnit,src/graphics/model_render.cpp,call,PoseModel
 0x45ac20,DrawUnit,src/graphics/model_render.cpp,call,RestorePieceVertices
+0x45ac20,DrawUnit,src/graphics/model_render.cpp,call,operator ModelPiece *
 0x45ac20,DrawUnit,src/graphics/model_render.cpp,call,operator ModelState *
 0x45ac20,DrawUnit,src/graphics/model_render.cpp,call,operator UnitDrawView *
 0x45ac20,DrawUnit,src/graphics/model_render.cpp,call,operator->
@@ -18290,6 +18323,7 @@ address,function,file,kind,target
 0x45aec0,AddStateEntries,src/graphics/model_render.cpp,field_write,ModelState::count
 0x45aec0,AddStateEntries,src/graphics/model_render.cpp,function,
 0x45af90,LinkStateEntries,src/graphics/model_render.cpp,call,LinkStateEntries
+0x45af90,LinkStateEntries,src/graphics/model_render.cpp,call,operator=
 0x45af90,LinkStateEntries,src/graphics/model_render.cpp,field_escape,ModelState::pieces
 0x45af90,LinkStateEntries,src/graphics/model_render.cpp,field_read,ModelPiece::object
 0x45af90,LinkStateEntries,src/graphics/model_render.cpp,field_read,ModelState::count
@@ -18301,7 +18335,9 @@ address,function,file,kind,target
 0x45af90,LinkStateEntries,src/graphics/model_render.cpp,function,
 0x45b030,RestorePieceVertices,src/graphics/model_render.cpp,call,RestorePieceVertices
 0x45b030,RestorePieceVertices,src/graphics/model_render.cpp,call,memcpy
+0x45b030,RestorePieceVertices,src/graphics/model_render.cpp,call,operator ModelPiece *
 0x45b030,RestorePieceVertices,src/graphics/model_render.cpp,call,operator Vec3 *
+0x45b030,RestorePieceVertices,src/graphics/model_render.cpp,call,operator bool
 0x45b030,RestorePieceVertices,src/graphics/model_render.cpp,field_read,ModelPiece::child
 0x45b030,RestorePieceVertices,src/graphics/model_render.cpp,field_read,ModelPiece::modified
 0x45b030,RestorePieceVertices,src/graphics/model_render.cpp,field_read,ModelPiece::object
@@ -18316,6 +18352,8 @@ address,function,file,kind,target
 0x45b030,RestorePieceVertices,src/graphics/model_render.cpp,function,
 0x45b0a0,PoseModel,src/graphics/model_render.cpp,call,PoseModel
 0x45b0a0,PoseModel,src/graphics/model_render.cpp,call,TransformPieces
+0x45b0a0,PoseModel,src/graphics/model_render.cpp,call,operator ModelPiece *
+0x45b0a0,PoseModel,src/graphics/model_render.cpp,call,operator bool
 0x45b0a0,PoseModel,src/graphics/model_render.cpp,field_read,ModelPiece::child
 0x45b0a0,PoseModel,src/graphics/model_render.cpp,field_read,ModelPiece::object
 0x45b0a0,PoseModel,src/graphics/model_render.cpp,field_read,ModelPiece::rot_x
@@ -18340,7 +18378,9 @@ address,function,file,kind,target
 0x45b0a0,PoseModel,src/graphics/model_render.cpp,function,
 0x45b150,TransformPieces,src/graphics/model_render.cpp,call,RotateByAngles
 0x45b150,TransformPieces,src/graphics/model_render.cpp,call,TransformPieces
+0x45b150,TransformPieces,src/graphics/model_render.cpp,call,operator ModelPiece *
 0x45b150,TransformPieces,src/graphics/model_render.cpp,call,operator Vec3 *
+0x45b150,TransformPieces,src/graphics/model_render.cpp,call,operator bool
 0x45b150,TransformPieces,src/graphics/model_render.cpp,deref_escape,*Vec3
 0x45b150,TransformPieces,src/graphics/model_render.cpp,deref_maybe_written,*Vec3
 0x45b150,TransformPieces,src/graphics/model_render.cpp,field_escape,ModelPiece::offset
@@ -21600,6 +21640,7 @@ address,function,file,kind,target
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,Translate
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,get
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,memcmp
+0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,operator Feature *
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,operator!=
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,operator->
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,operator=
@@ -21774,6 +21815,7 @@ address,function,file,kind,target
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,GetGafFrame
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,GetGafSequenceFrame
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,get
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,operator Feature *
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,operator FeatureSpot *
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,operator Unit *
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,operator=
@@ -21836,6 +21878,7 @@ address,function,file,kind,target
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,memcpy
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,memset
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,operator Cell *
+0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,operator Feature *
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,operator Player *
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,operator PlayerInfo *
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,operator UnitDef *
@@ -21983,35 +22026,13 @@ address,function,file,kind,target
 0x46ba80,DrawClosedPolygon,src/ingame/info_panel.cpp,field_read,Point::x
 0x46ba80,DrawClosedPolygon,src/ingame/info_panel.cpp,field_read,Point::y
 0x46ba80,DrawClosedPolygon,src/ingame/info_panel.cpp,function,
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,DrawFrameQuad
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,FillPolygon
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,GetGafSequenceFrame
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,RotateByAngles
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,operator=
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,deref_read,*Point
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,deref_read,*unsigned short
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,deref_write,*Point
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::assemPoints
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::projected
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::xform
+0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,DrawProjectedFaces
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::count
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::faceCount
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::firstFace
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::prims
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::verts
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::colorIndex
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::count
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::flag0
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::indices
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::pic
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::texIndexed
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Vec3::x
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Vec3::y
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Vec3::z
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_write,Point::x
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_write,Point::y
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,function,
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,global_read,g_game
 0x46bc60,ReportGameEventCallback,src/ingame/info_panel.cpp,call,ReportGameEvent
 0x46bc60,ReportGameEventCallback,src/ingame/info_panel.cpp,function,
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,call,AddMessage
@@ -25056,6 +25077,7 @@ address,function,file,kind,target
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,UnitDef::mobile
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Vec3::y
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,function,
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator Feature *
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator Unit *
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator bool
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator->
@@ -25085,6 +25107,7 @@ address,function,file,kind,target
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,function,
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,global_read,g_game
 0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator Cell *
+0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator Feature *
 0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator Unit *
 0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator bool
 0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator->
@@ -25120,6 +25143,7 @@ address,function,file,kind,target
 0x47e1f0,GetPassMapFootprintValueWithEdgeStrips,src/map/terrain.cpp,field_read,MovementClass::footprintZ
 0x47e1f0,GetPassMapFootprintValueWithEdgeStrips,src/map/terrain.cpp,function,
 0x47e2d0,CanPlaceFootprintAt,src/map/terrain.cpp,call,operator Cell *
+0x47e2d0,CanPlaceFootprintAt,src/map/terrain.cpp,call,operator Feature *
 0x47e2d0,CanPlaceFootprintAt,src/map/terrain.cpp,call,operator UnitDef *
 0x47e2d0,CanPlaceFootprintAt,src/map/terrain.cpp,call,operator unsigned short *
 0x47e2d0,CanPlaceFootprintAt,src/map/terrain.cpp,deref_escape,*Cell
@@ -25211,6 +25235,7 @@ address,function,file,kind,target
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,indirect_call,virtual DamagedAllyCollector::CollectDamagedAlly
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,RandomInt
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,SimAlloc
+0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,operator Feature *
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,operator delete
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,operator=
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,deref_read,*Vec3
@@ -25652,6 +25677,7 @@ address,function,file,kind,target
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,call,GetPiecePosition
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,call,GetUnit
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,call,bx_hypot
+0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,call,operator Unit *
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,call,operator->
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,call,operator=
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,field_read,ObjectState::unit
@@ -25676,6 +25702,7 @@ address,function,file,kind,target
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,field_write,Vec3::z
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,function,
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,call,Unit::SetStateBits
+0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,call,operator Unit *
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,call,operator->
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_read,MapSeam::SetYardOpen
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_read,ObjectState::unit
@@ -25727,12 +25754,12 @@ address,function,file,kind,target
 0x480d50,UnitScript::SetPieceVisible,src/units/unit_script.cpp,function,
 0x480db0,UnitScript::SetPieceCached,src/units/unit_script.cpp,call,operator->
 0x480db0,UnitScript::SetPieceCached,src/units/unit_script.cpp,field_read,UnitScript::state
-0x480db0,UnitScript::SetPieceCached,src/units/unit_script.cpp,field_write,ObjectState::field_10
+0x480db0,UnitScript::SetPieceCached,src/units/unit_script.cpp,field_write,ObjectState::bitmap
 0x480db0,UnitScript::SetPieceCached,src/units/unit_script.cpp,field_write,PieceState::cached
 0x480db0,UnitScript::SetPieceCached,src/units/unit_script.cpp,function,
 0x480df0,UnitScript::SetPieceShaded,src/units/unit_script.cpp,call,operator->
 0x480df0,UnitScript::SetPieceShaded,src/units/unit_script.cpp,field_read,UnitScript::state
-0x480df0,UnitScript::SetPieceShaded,src/units/unit_script.cpp,field_write,ObjectState::field_10
+0x480df0,UnitScript::SetPieceShaded,src/units/unit_script.cpp,field_write,ObjectState::bitmap
 0x480df0,UnitScript::SetPieceShaded,src/units/unit_script.cpp,field_write,PieceState::shaded
 0x480df0,UnitScript::SetPieceShaded,src/units/unit_script.cpp,function,
 0x480e30,UnitScript::IsPieceVisible,src/units/unit_script.cpp,call,operator->
@@ -25755,6 +25782,8 @@ address,function,file,kind,target
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordThrustParticles
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordWakeParticles
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,UpdateObjectState
+0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,get
+0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,operator Unit *
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,operator int *
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,operator->
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,operator=
@@ -25781,6 +25810,7 @@ address,function,file,kind,target
 0x481140,UnitScript::ExplodePiece,src/units/unit_script.cpp,call,AddExplosionEffect
 0x481140,UnitScript::ExplodePiece,src/units/unit_script.cpp,call,RandomInt
 0x481140,UnitScript::ExplodePiece,src/units/unit_script.cpp,call,StartExplodePiece
+0x481140,UnitScript::ExplodePiece,src/units/unit_script.cpp,call,operator Unit *
 0x481140,UnitScript::ExplodePiece,src/units/unit_script.cpp,call,operator->
 0x481140,UnitScript::ExplodePiece,src/units/unit_script.cpp,call,operator=
 0x481140,UnitScript::ExplodePiece,src/units/unit_script.cpp,field_read,ExplodedPieceInit::bits
@@ -25806,6 +25836,7 @@ address,function,file,kind,target
 0x481140,UnitScript::ExplodePiece,src/units/unit_script.cpp,indirect_call,"indirect via Vec3 (*)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::GetPiecePosition]"
 0x481340,UnitScript::AttachUnit,src/units/unit_script.cpp,call,AttachUnitToPiece
 0x481340,UnitScript::AttachUnit,src/units/unit_script.cpp,call,GetUnit
+0x481340,UnitScript::AttachUnit,src/units/unit_script.cpp,call,operator Unit *
 0x481340,UnitScript::AttachUnit,src/units/unit_script.cpp,call,operator->
 0x481340,UnitScript::AttachUnit,src/units/unit_script.cpp,call,operator==
 0x481340,UnitScript::AttachUnit,src/units/unit_script.cpp,field_read,ObjectState::unit
@@ -27080,6 +27111,7 @@ address,function,file,kind,target
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,EmitSmoke
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,GetGroundHeight
+0x486360,CreateUnitCorpse,src/units/units.cpp,call,get
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,operator->
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_escape,Unit::angles
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_escape,Unit::pos
@@ -27920,7 +27952,7 @@ address,function,file,kind,target
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_write,UnitRef::next
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_write,UnitRef::owner
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,function,
-0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,indirect_call,virtual UnitRefListener::Notify
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,indirect_call,virtual OrderBase::OrStatusFlags
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,call,get
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,call,operator Unit *
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,call,operator bool
@@ -27939,14 +27971,16 @@ address,function,file,kind,target
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_write,UnitRef::next
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_write,UnitRef::owner
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,function,
-0x489740,ClearUnitRefs,src/units/unit_targets.cpp,indirect_call,virtual UnitRefListener::Notify
+0x489740,ClearUnitRefs,src/units/unit_targets.cpp,indirect_call,virtual OrderBase::OrStatusFlags
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,get
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,operator UnitRef *
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,operator bool
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,operator->
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,Unit::head
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::listener
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::next
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,function,
-0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,indirect_call,virtual UnitRefListener::Notify
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,indirect_call,virtual OrderBase::OrStatusFlags
 0x4897e0,Unit::ChooseWeapon,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::flags
 0x4897e0,Unit::ChooseWeapon,src/units/unit_targets.cpp,function,
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,call,Unit::ReleaseWeapons
@@ -28455,6 +28489,7 @@ address,function,file,kind,target
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,Unit::GetState
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,get
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator PathOrderAttach *
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator bool
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator->
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,NetworkSeam::SendActivateFlags
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,PathOrderAttach::next
@@ -32367,6 +32402,7 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,bx_sqrt
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,memset
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator Cell *
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator Feature *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator FeatureSpot *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator Projectile *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator SquadManager *
@@ -32541,6 +32577,7 @@ address,function,file,kind,target
 0x49b000,DetonateUnitWeapon,src/weapons/weapons.cpp,field_write,Projectile::type
 0x49b000,DetonateUnitWeapon,src/weapons/weapons.cpp,function,
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,DetonateProjectile
+0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator Feature *
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator Unit *
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator bool
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator->
@@ -43536,6 +43573,7 @@ address,function,file,kind,target
 ,BuildSpans,src/harness/block_scan.cpp,global_write,g_spanMin
 ,BurnOut,src/map/features.cpp,call,PlaceFeature
 ,BurnOut,src/map/features.cpp,call,RemoveFeature
+,BurnOut,src/map/features.cpp,call,operator Feature *
 ,BurnOut,src/map/features.cpp,field_read,Feature::burnt
 ,BurnOut,src/map/features.cpp,field_read,Game::features
 ,BurnOut,src/map/features.cpp,field_read,LosRadarSeam::GetMapCell
@@ -43613,6 +43651,7 @@ address,function,file,kind,target
 ,CellAt,src/map/terrain.cpp,field_read,Game::width
 ,CellAt,src/map/terrain.cpp,function,
 ,CellAt,src/map/terrain.cpp,global_read,g_game
+,CellFeatureBlocks,src/map/terrain.cpp,call,get
 ,CellFeatureBlocks,src/map/terrain.cpp,deref_read,*unsigned char
 ,CellFeatureBlocks,src/map/terrain.cpp,field_read,Cell::feature
 ,CellFeatureBlocks,src/map/terrain.cpp,field_read,Cell::offsetX
@@ -44289,6 +44328,14 @@ address,function,file,kind,target
 ,DrawClippedLine,src/graphics/draw.cpp,call,LockScreen
 ,DrawClippedLine,src/graphics/draw.cpp,call,UnlockScreen
 ,DrawClippedLine,src/graphics/draw.cpp,function,
+,DrawDebrisProjected,src/ingame/info_panel.cpp,call,DrawProjectedFaces
+,DrawDebrisProjected,src/ingame/info_panel.cpp,call,get
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::faceCount
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::faces
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::firstFace
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::vertexCount
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::verts
+,DrawDebrisProjected,src/ingame/info_panel.cpp,function,
 ,DrawFlags,src/ingame/info_panel.cpp,field_read,Game::visualFlagsByte
 ,DrawFlags,src/ingame/info_panel.cpp,function,
 ,DrawFlags,src/ingame/info_panel.cpp,global_read,g_game
@@ -45326,6 +45373,7 @@ address,function,file,kind,target
 ,GetCellCachedWidth,src/map/terrain.cpp,field_read,Game::width
 ,GetCellCachedWidth,src/map/terrain.cpp,function,
 ,GetCellCachedWidth,src/map/terrain.cpp,global_read,g_game
+,GetCellFeatureDef,src/map/terrain.cpp,call,get
 ,GetCellFeatureDef,src/map/terrain.cpp,field_read,Cell::feature
 ,GetCellFeatureDef,src/map/terrain.cpp,field_read,Cell::offsetX
 ,GetCellFeatureDef,src/map/terrain.cpp,field_read,Cell::offsetY
@@ -45396,6 +45444,7 @@ address,function,file,kind,target
 ,GetEntry,src/gui/gui.cpp,function,
 ,GetFactoriesInRadiusNative,src/seams/native.cpp,call,GetFactoriesInRadius
 ,GetFactoriesInRadiusNative,src/seams/native.cpp,function,
+,GetFeature,src/map/features.cpp,call,operator Feature *
 ,GetFeature,src/map/features.cpp,deref_escape,*Feature
 ,GetFeature,src/map/features.cpp,field_read,Cell::feature
 ,GetFeature,src/map/features.cpp,field_read,Cell::offsetX
@@ -45405,6 +45454,7 @@ address,function,file,kind,target
 ,GetFeature,src/map/features.cpp,field_read,Game::width
 ,GetFeature,src/map/features.cpp,function,
 ,GetFeature,src/map/features.cpp,global_read,g_game
+,GetFeature,src/orders/order_dispatch.cpp,call,get
 ,GetFeature,src/orders/order_dispatch.cpp,deref_escape,*FeatureCursorView
 ,GetFeature,src/orders/order_dispatch.cpp,field_read,Cell::feature
 ,GetFeature,src/orders/order_dispatch.cpp,field_read,Cell::offsetX
@@ -45414,6 +45464,7 @@ address,function,file,kind,target
 ,GetFeature,src/orders/order_dispatch.cpp,field_read,Game::width
 ,GetFeature,src/orders/order_dispatch.cpp,function,
 ,GetFeature,src/orders/order_dispatch.cpp,global_read,g_game
+,GetFeature,src/units/unit_scripts.cpp,call,get
 ,GetFeature,src/units/unit_scripts.cpp,deref_escape,*FeatureCursorView
 ,GetFeature,src/units/unit_scripts.cpp,field_read,Cell::feature
 ,GetFeature,src/units/unit_scripts.cpp,field_read,Cell::offsetX
@@ -47844,6 +47895,7 @@ address,function,file,kind,target
 ,LogStateChange,src/frontend/frontend.cpp,function,
 ,LogStateChange,src/frontend/frontend.cpp,global_escape,g_frontendStateChangeFormat
 ,LogStateChange,src/frontend/frontend.cpp,global_read,g_game
+,Lookup,src/orders/order_dispatch.cpp,call,get
 ,Lookup,src/orders/order_dispatch.cpp,field_read,Cell::feature
 ,Lookup,src/orders/order_dispatch.cpp,field_read,Cell::offsetX
 ,Lookup,src/orders/order_dispatch.cpp,field_read,Cell::offsetY
@@ -48053,6 +48105,9 @@ address,function,file,kind,target
 ,ModelBoundsOrigin::ModelBoundsOrigin,src/graphics/model_render.cpp,field_write,ModelBoundsOrigin::y
 ,ModelBoundsOrigin::ModelBoundsOrigin,src/graphics/model_render.cpp,field_write,ModelBoundsOrigin::z
 ,ModelBoundsOrigin::ModelBoundsOrigin,src/graphics/model_render.cpp,function,
+,ModelState::OwnerView,src/graphics/model_types.h,call,get
+,ModelState::OwnerView,src/graphics/model_types.h,field_read,ModelState::owner
+,ModelState::OwnerView,src/graphics/model_types.h,function,
 ,ModulesCheckStatics,src/wasm/modules.cpp,call,ModulesFatal
 ,ModulesCheckStatics,src/wasm/modules.cpp,call,TimingTick
 ,ModulesCheckStatics,src/wasm/modules.cpp,call,WindMeteorsDataRanges
@@ -48846,6 +48901,7 @@ address,function,file,kind,target
 ,PathOrderAttach::Get,src/orders/path_order_attach.h,call,operator Unit *
 ,PathOrderAttach::Get,src/orders/path_order_attach.h,field_read,PathOrderAttach::owner
 ,PathOrderAttach::Get,src/orders/path_order_attach.h,function,
+,PathOrderAttach::SetValue,src/orders/path_order_attach.h,call,operator=
 ,PathOrderAttach::SetValue,src/orders/path_order_attach.h,field_write,PathOrderAttach::value
 ,PathOrderAttach::SetValue,src/orders/path_order_attach.h,function,
 ,PathOrderAttach::~PathOrderAttach,src/units/unit_targets.cpp,call,operator!=
@@ -49129,6 +49185,7 @@ address,function,file,kind,target
 ,PoseUnitModel,src/units/unit_scripts.cpp,call,UpdateObjectState
 ,PoseUnitModel,src/units/unit_scripts.cpp,call,memcpy
 ,PoseUnitModel,src/units/unit_scripts.cpp,call,operator SpotState *
+,PoseUnitModel,src/units/unit_scripts.cpp,call,operator->
 ,PoseUnitModel,src/units/unit_scripts.cpp,field_maybe_written,SpotState::pos
 ,PoseUnitModel,src/units/unit_scripts.cpp,field_read,SpotState::root
 ,PoseUnitModel,src/units/unit_scripts.cpp,field_read,Unit::angles
@@ -50693,6 +50750,7 @@ address,function,file,kind,target
 ,StatsComplete,src/frontend/endgame.cpp,field_read,Layer::entries
 ,StatsComplete,src/frontend/endgame.cpp,function,
 ,StatsComplete,src/frontend/endgame.cpp,global_read,g_game
+,SteepCell,src/map/terrain.cpp,call,operator Feature *
 ,SteepCell,src/map/terrain.cpp,field_read,Cell::feature
 ,SteepCell,src/map/terrain.cpp,field_read,Cell::offsetX
 ,SteepCell,src/map/terrain.cpp,field_read,Cell::offsetY
@@ -51411,6 +51469,27 @@ address,function,file,kind,target
 ,VictoryUnitTypePassesZ::VictoryUnitTypePassesZ,src/game/victory_conditions.h,field_write,VictoryUnitTypePassesZ::name
 ,VictoryUnitTypePassesZ::VictoryUnitTypePassesZ,src/game/victory_conditions.h,field_write,VictoryUnitTypePassesZ::z
 ,VictoryUnitTypePassesZ::VictoryUnitTypePassesZ,src/game/victory_conditions.h,function,
+,ViewFace,src/ingame/info_panel.cpp,field_escape,Face::tex
+,ViewFace,src/ingame/info_panel.cpp,field_read,<anon>::a
+,ViewFace,src/ingame/info_panel.cpp,field_read,<anon>::b
+,ViewFace,src/ingame/info_panel.cpp,field_read,Face::color
+,ViewFace,src/ingame/info_panel.cpp,field_read,Face::nverts
+,ViewFace,src/ingame/info_panel.cpp,field_read,Face::vindex
+,ViewFace,src/ingame/info_panel.cpp,field_read,GafRef::pic
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::colorIndex
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::count
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::flag0
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::indices
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::pic
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::texIndexed
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::colorIndex
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::count
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::cursor
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::flat
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::indices
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::pic
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::texIndexed
+,ViewFace,src/ingame/info_panel.cpp,function,
 ,VisibilityWord,src/map/terrain.cpp,call,operator unsigned short *
 ,VisibilityWord,src/map/terrain.cpp,deref_read,*unsigned short
 ,VisibilityWord,src/map/terrain.cpp,field_read,Fixed::whole
@@ -51548,12 +51627,12 @@ address,function,file,kind,target
 ,VisitExplosions,src/harness/harness.cpp,call,GameU32
 ,VisitExplosions,src/harness/harness.cpp,call,HashByte
 ,VisitExplosions,src/harness/harness.cpp,call,HashU32
+,VisitExplosions,src/harness/harness.cpp,call,ReadRefAt
 ,VisitExplosions,src/harness/harness.cpp,call,VisitElement
 ,VisitExplosions,src/harness/harness.cpp,call,VisitRaw
 ,VisitExplosions,src/harness/harness.cpp,call,memset
 ,VisitExplosions,src/harness/harness.cpp,call,operator unsigned char *
 ,VisitExplosions,src/harness/harness.cpp,call,sprintf
-,VisitExplosions,src/harness/harness.cpp,deref_read,*unsigned int
 ,VisitExplosions,src/harness/harness.cpp,function,
 ,VisitExplosions,src/harness/harness.cpp,global_read,g_explodedPieces
 ,VisitExplosions,src/harness/harness.cpp,global_read,kDebrisTable@src/harness/trace_schema.h

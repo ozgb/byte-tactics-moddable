@@ -79,7 +79,7 @@ struct PieceRecord {
     short f12;
     short f14;
     char unknown_16[0x32 - 0x16];
-    PieceRecord* next;
+    Ref<PieceRecord> next;
 };
 
 struct PieceTable {

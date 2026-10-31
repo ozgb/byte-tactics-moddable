@@ -396,7 +396,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
 struct SpotStateUnitView {
     char unknown_0[8];
     int dirty;
-    void* unit;
+    Ref<Unit> unit;
     int drawFrame;
 };
 

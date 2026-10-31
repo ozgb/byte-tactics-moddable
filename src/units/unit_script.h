@@ -25,7 +25,7 @@ struct ObjectState {
     int unknown_0;
     int unknown_4;
     int dirty;
-    Unit* unit;
+    Ref<Unit> unit;
     int field_10;
     char unknown_14[0x22 - 0x14];
     PieceState pieces[1];

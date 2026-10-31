@@ -2035,15 +2035,15 @@ static void VisitValue(const char* path, unsigned value, unsigned size)
     }
 }
 
-static void VisitPointer(const char* path, unsigned value, int target)
+static void VisitPointer(const char* path, unsigned value, int target, bool isRef = false)
 {
     TraceField f;
-    HashPointer(value, target);
+    HashPointer(value, target, isRef);
     if (s_dumpNow) {
         f.name = "";
         f.offset = 0;
         f.size = 4;
-        f.kind = TF_POINTER;
+        f.kind = isRef ? TF_REF : TF_POINTER;
         f.target = (unsigned char)target;
         f.mask = 0;
         DumpPrefix(path);
@@ -2748,8 +2748,8 @@ static int ConditionClassOf(unsigned condition)
 
 static unsigned VectorCount(unsigned vec, unsigned elem, const unsigned char** first)
 {
-    unsigned begin = ReadU32At(vec, VECTOR_FIRST);
-    unsigned end = ReadU32At(vec, VECTOR_LAST);
+    unsigned begin = ReadRefAt(vec, VECTOR_FIRST);
+    unsigned end = ReadRefAt(vec, VECTOR_LAST);
     *first = (const unsigned char*)begin;
     if (begin == 0 || end < begin || (end - begin) % elem != 0 || (end - begin) / elem > VECTOR_LIMIT)
         return 0;
@@ -2773,7 +2773,7 @@ static void VisitUnitVector(const char* path, unsigned vec)
     VisitU32(name, n);
     for (unsigned k = 0; k < n; k++) {
         sprintf(name, "%s[%u]", path, k);
-        VisitPointer(name, *(const unsigned*)(first + k * 4), TT_UNIT);
+        VisitPointer(name, ReadU32At((unsigned)first, k * 4), TT_UNIT, true);
     }
 }
 

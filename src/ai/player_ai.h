@@ -1,7 +1,7 @@
 #ifndef PLAYER_AI_H
 #define PLAYER_AI_H
 
-#include "../state/sim_allocator.h"
+#include "../state/block_vector.h"
 #include "../../interfaces/ref.h"
 
 struct Player;
@@ -46,8 +46,8 @@ struct AiVec3 {
 };
 
 struct AiUnitList {
-    SimVector<Unit*> units;
-    void Clear() { units.clear(); }
+    BlockVector<Ref<Unit> > units;
+    void Clear() { units.Clear(); }
 };
 
 struct FactoryUnitGroup {
@@ -64,18 +64,18 @@ public:
     FactoryUnitGroup factories;
     AiVec3 centre;
     AiVec3 pos_41;
-    SimVector<KeyedCell> cells;
+    BlockVector<KeyedCell> cells;
     CenterPos center;
-    SimVector<BuildRatingWeights> vec_65;
+    BlockVector<BuildRatingWeights> vec_65;
     int builders;
     int hasSpecial;
-    SimVector<short> counts;
-    SimVector<unsigned char> vec_8d;
-    SimVector<unsigned char> weights;
-    SimVector<PercentByte> vec_ad;
-    SimVector<UnitTypeInt> vec_bd;
-    SimVector<UnitTypeInt> values;
-    SimVector<UnitTypeInt> locked;
+    BlockVector<short> counts;
+    BlockVector<unsigned char> vec_8d;
+    BlockVector<unsigned char> weights;
+    BlockVector<PercentByte> vec_ad;
+    BlockVector<UnitTypeInt> vec_bd;
+    BlockVector<UnitTypeInt> values;
+    BlockVector<UnitTypeInt> locked;
     unsigned int lastTick;
     Point16 spacing0;
     Point16 offset0;
@@ -89,7 +89,7 @@ public:
     void InitUnitTables();
     void InitPlacementGrid();
     void ComputeBaseWeights();
-    bool FindCellNearFeatures(UnitDef* type, Vec3* pos, SimVector<KeyedCell>* list, int range, Point16* out);
+    bool FindCellNearFeatures(UnitDef* type, Vec3* pos, BlockVector<KeyedCell>* list, int range, Point16* out);
     bool FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Point16* out);
     void BuildFeatureCells();
     void RefreshUnitLists();

@@ -271,6 +271,30 @@ class ClangTest(unittest.TestCase):
         out = rc.outside_rows(self.root, {}, {})
         self.assertEqual({r["holder"]: r["note"] for r in out}, {"H": "X (0x20)", "G": ""})
 
+    def hand_rows(self, rows):
+        data = self.root / "data"
+        data.mkdir(exist_ok=True)
+        header = "holder,offsets,target,scenarios,ticks,target_offsets,class,note\n"
+        (data / "block_pointers.csv").write_text(header + 'CreateGameObject,0x4 0xc,T,1,1,-,outside,"Game.view"\n')
+        (data / "outside_pointers.csv").write_text(rc.render(rc.OUTSIDE_COLUMNS, rows))
+        return rc.outside_rows(self.root, {"Game": rc.Locator(self.scan)}, {"view": "view", "items": "sim"})
+
+    def hand_row(self, struct, field, kind, holder="CreateGameObject", offset="0x4"):
+        return {"struct": struct, "field": field, "holder": holder, "offset": offset, "words": 1, "issue": "",
+                "kind": kind, "note": "hand"}
+
+    def test_load_kind_is_kept_over_the_scan_and_has_no_issue(self):
+        out = self.hand_rows([self.hand_row("Game", "view", "load")])
+        keyed = {r["field"]: r for r in out}
+        self.assertEqual((keyed["view"]["kind"], keyed["view"]["issue"]), ("load", ""))
+        self.assertEqual((keyed["p"]["kind"], keyed["p"]["issue"]), ("pointer", "#352"))
+
+    def test_hand_only_code_row_survives_without_a_scan_row(self):
+        row = self.hand_row("WeaponDef", "fire", "code", holder="hand", offset="+0x60")
+        out = self.hand_rows([row])
+        kept = [r for r in out if r["field"] == "fire"]
+        self.assertEqual([(r["kind"], r["issue"], r["note"]) for r in kept], [("code", "", "hand")])
+
     def test_outside_rows_fail_when_the_game_holder_is_gone(self):
         data = self.root / "data"
         data.mkdir(exist_ok=True)
@@ -362,6 +386,36 @@ class CheckTest(unittest.TestCase):
         problems = rc.check(self.root, make_result({}, [row]))
         self.assertEqual(len(problems), 1)
         self.assertIn("Game.sounds H 0x4 has an empty note", problems[0])
+
+    def test_load_row_passes_without_an_issue(self):
+        self.exceptions()
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
+               "kind": "load", "note": "n"}
+        self.outside([row])
+        self.assertEqual(rc.check(self.root, make_result(found_field("Game", "view"), [row])), [])
+
+    def test_load_row_with_an_issue_fails(self):
+        self.exceptions()
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "#352",
+               "kind": "load", "note": "n"}
+        self.outside([row])
+        self.assertIn("names none", rc.check(self.root, make_result({}, [row]))[0])
+
+    def test_blank_kind_without_an_issue_fails(self):
+        self.exceptions()
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
+               "kind": "pointer", "note": "n"}
+        self.outside([row])
+        self.assertIn("expected #<number>", rc.check(self.root, make_result({}, [row]))[0])
+
+    def test_load_field_drops_its_exception_row(self):
+        self.exceptions(("Game", "view", "pointer", "src/a.h", "#352"))
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
+               "kind": "load", "note": "n"}
+        result = make_result(found_field("Game", "view"), [row])
+        rc.write(self.root, result, init=False)
+        self.assertEqual(rc.read_csv(self.root / rc.EXCEPTIONS), [])
+        self.assertEqual(rc.check(self.root, result), [])
 
     def test_bad_issue_fails(self):
         self.exceptions(("Unit", "def", "pointer", "src/a.h", "later"))

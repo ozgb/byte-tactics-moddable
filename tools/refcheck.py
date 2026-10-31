@@ -37,6 +37,13 @@ a struct (Game, SimGlobals) is mapped through its record layout to the field tha
 other holders have no struct, so their rows have a blank field and the first offset of the row. A field on
 this list needs no exceptions row.
 
+A row whose kind is `load` (a pointer into loaded game data: HAPI_LoadFile buffers and what is built from them
+at load) or `code` (a pointer to code in the exe image) is written by hand: --write keeps that kind over the clang
+kind, matched by (struct, field) or, for a holder-only row, by (holder, offset), and gives the row no issue,
+because no issue removes it. A `load` or `code` row with no outside row in block_pointers.csv (the scan never
+flagged it) is kept verbatim; a scan row for the same key wins and takes the hand kind. Every other row needs an
+open `#n` issue.
+
 A block_pointers.csv row lists many offsets under one note. Its note is copied to an outside row only when it
 is about that row: it names no offset, or names an offset the row stands for (the row's own offset for a Game
 row, any offset of the block row for a SimGlobals or holder-only row, which stands for all of them). Otherwise
@@ -74,6 +81,7 @@ REPO = "ozgb/byte-tactics-moddable"
 EXCEPTION_COLUMNS = ["struct", "field", "kind", "file", "issue"]
 OUTSIDE_COLUMNS = ["struct", "field", "holder", "offset", "words", "issue", "kind", "note"]
 KINDS = ("pointer", "function-pointer", "container", "int-pointer")
+HAND_KINDS = ("load", "code")
 DEFAULT_BUILD_DIR = ROOT / "build/modern"
 HOLDERS = {"Game": "CreateGameObject"}
 EXTRA_BLOCK = ("Game", "SimGlobals")
@@ -659,11 +667,19 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
         sys.exit("refcheck: %s has no outside rows for the Game holder %s: it was renamed, set HOLDERS in "
                  "tools/refcheck.py to its new name" % (BLOCK_POINTERS, HOLDERS[GAME]))
     rows: dict[tuple, dict] = {}
-    hand = {(r["struct"], r["field"], r["holder"], r["offset"]): r["note"] for r in read_csv(root / OUTSIDE)}
+    old = read_csv(root / OUTSIDE)
+    hand = {(r["struct"], r["field"], r["holder"], r["offset"]): r["note"] for r in old}
+    hand_kinds = {(r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"]): r["kind"]
+                  for r in old if r["kind"] in HAND_KINDS}
+    matched = set()
 
     def add(struct, name, holder, token, words, issue, kind, note, offsets):
         if not note_about(note, offsets):
             note = hand.get((struct, name, holder, token), "")
+        key = (struct, name) if struct else (holder, token)
+        if key in hand_kinds:
+            kind, issue = hand_kinds[key], ""
+            matched.add(key)
         rows.setdefault((struct, name, holder if not struct else "", token if not struct else ""), {
             "struct": struct, "field": name, "holder": holder, "offset": token, "words": words, "issue": issue,
             "kind": kind, "note": note})
@@ -692,6 +708,10 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
         elif tokens:
             add("", "", holder, tokens[0][0], len(tokens), outside_issue(note, "", "", classes), "", note,
                 [b for _, b in tokens])
+    for r in old:
+        key = (r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"])
+        if r["kind"] in HAND_KINDS and key not in matched:
+            rows.setdefault((r["struct"], r["field"], r["holder"], r["offset"]), {**r, "issue": ""})
     return sorted(rows.values(), key=lambda r: (r["struct"], r["field"], r["holder"], r["offset"]))
 
 
@@ -781,6 +801,13 @@ def check(root: Path, result: Result, open_issues: bool = False, gh: str = "gh")
             problems.append("%s: stale row %s.%s: file is %s, expected %s, run `uv run tools/refcheck.py --write`" % (
                 EXCEPTIONS, key[0], key[1], r["file"], "|".join(sorted(f.files))))
     for r in result.outside:
+        if r["kind"] in HAND_KINDS:
+            if r["issue"]:
+                problems.append("%s: %s has kind %s and an issue, a %s row names none" % (
+                    OUTSIDE, outside_label(r), r["kind"], r["kind"]))
+        elif not re.fullmatch(r"#[0-9]+", r["issue"]):
+            problems.append("%s: %s has issue %r, expected #<number> (or kind load or code with no issue)" % (
+                OUTSIDE, outside_label(r), r["issue"]))
         if not r["note"].strip():
             problems.append("%s: %s has an empty note, write one" % (OUTSIDE, outside_label(r)))
     want = render(OUTSIDE_COLUMNS, result.outside)
@@ -838,7 +865,7 @@ def summary(result: Result) -> list[str]:
     lines.append("refcheck: outside rows by kind: " + ", ".join(
         "%s %d" % (k or "unstructured", n) for k, n in sorted(Counter(r["kind"] for r in result.outside).items())))
     lines.append("refcheck: outside rows by issue: " + ", ".join(
-        "%s %d" % (k, n) for k, n in sorted(Counter(r["issue"] for r in result.outside).items())))
+        "%s %d" % (k or "none", n) for k, n in sorted(Counter(r["issue"] for r in result.outside).items())))
     for r in result.unresolved:
         lines.append("refcheck: gap: %s %s resolves to no struct definition" % (r["kind"], r["name"]))
     return lines

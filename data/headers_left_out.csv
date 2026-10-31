@@ -17,7 +17,6 @@ ApplyWeaponFirePacket,mismatch,pointer/int cast: definition's type is likely wro
 AttachUnitToPiece,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BindModelTextures,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 BlitLayers,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-BlitMenuLayers,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BlitSideLogoToRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 BroadcastPacket,mismatch,fixing it changes the generated code of a caller
 BuildBlueTable,mismatch,pointer/int cast: definition's type is likely wrong
@@ -104,14 +103,11 @@ FreeObjectState,mismatch,"definition type not nameable in a header, or no clean 
 GameAllocThunk,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GameReallocTagged,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetButtonStage,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-GetButtonStageByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetCobChecksum,mismatch,pointer/int cast: definition's type is likely wrong
 GetDisplayModes,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetEnergyIncome,mismatch,pointer/int cast: definition's type is likely wrong
 GetFactoriesInRadius,skip,qualified name std::vector
 GetGadgetActiveByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-GetGadgetStatus,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-GetGadgetText,mismatch,fixing it changes the generated code of a caller
 GetGafFrame,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetGafFrameCount,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetGafSequenceFrame,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
@@ -146,7 +142,6 @@ InitPacketTables,mismatch,"static risk rule: a convention, parameter count, or n
 InitProjectile,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 InsertionSortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 IsCountBelowAiLimit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-IsGadgetNamed,mismatch,pointer/int cast: definition's type is likely wrong
 IssueMobileBuildOrders,mismatch,parameter 1 void* vs ViewMouseEvent* (view type): the declaration differs from the definition in a pointer type only
 IssueOrCancelOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 JoinLobbyGameThread,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -202,18 +197,14 @@ SetCloseHandler,mismatch,"static risk rule: a convention, parameter count, or no
 SetCursorAnimation,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetCursorMode,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetDefaultCommandHandler,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SetDescListCleanupFlag,mismatch,pointer/int cast: definition's type is likely wrong
 SetFrontendState,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetGadgetActive,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SetGadgetActiveByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGadgetColorByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-SetGadgetGrayedOutByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGadgetRows,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGadgetStatus,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetGadgetStatusByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetGadgetText,mismatch,parameter 1 void* vs Gui* (view type): the declaration differs from the definition in a pointer type only
 SetGadgetTextByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-SetGrayedOutByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetOffscreenSurface,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetQuickKeyByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetTextColors,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -229,10 +220,8 @@ SubtractVec3,mismatch,fixing it changes the generated code of a caller
 TintFrameBelow,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 TransferEnergy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 TransferMetal,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-Translate,mismatch,pointer/int cast: definition's type is likely wrong
 TruncateTextWithEllipsis,mismatch,pointer/int cast: definition's type is likely wrong
 TryGetDesiredHeading,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-TrySetFocus,mismatch,fixing it changes the generated code of a caller
 UnlockScreen,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 UpdateCursorWorldPos,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 UpdateMenu,mismatch,fixing it changes the generated code of a caller

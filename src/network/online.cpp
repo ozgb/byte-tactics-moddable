@@ -5,9 +5,7 @@
 #include "../../link/globals.h"
 #include "link_info.h"
 #include "online.h"
-
-void __stdcall Translate(unsigned char* text);
-char* __stdcall Translate(char* text);
+#include "../util/tdf.h"
 
 // FUNCTION: 0x45b250
 int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int size)
@@ -37,7 +35,7 @@ int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int
 // FUNCTION: 0x45b480
 void __stdcall OnlineTranslate(unsigned char* text)
 {
-    Translate(text);
+    Translate((const char*)text);
 }
 
 // FUNCTION: 0x45b490

@@ -80,6 +80,14 @@ struct Gui {
 #pragma pack(pop)
 
 int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused);
+int __stdcall TrySetFocus(Gui* obj, int index);
+int __stdcall IsGadgetNamed(Gadget* entries, int i, const char* name);
+void __stdcall SetGadgetActiveByName(Gui* obj, const char* name, int value);
+char* __stdcall GetGadgetText(Gui* obj, const char* name, char* buf);
+int __stdcall GetGadgetStatus(Gui* obj, int index);
+int __stdcall GetButtonStageByName(Gui* obj, const char* name);
+void __stdcall SetGrayedOutByName(Gui* obj, const char* name, int value);
+void __stdcall SetGadgetGrayedOutByName(Gui* obj, const char* name, int value);
 void __stdcall ClearChanged(Gui*);
 void __stdcall SetKeyboardInput(Gui*, int);
 Layer* __stdcall LoadGuiLayer(Gui*, const char*, unsigned int);

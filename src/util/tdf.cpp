@@ -708,13 +708,13 @@ void __stdcall LoadTranslations(char* filename, char* section)
 }
 
 // FUNCTION: 0x4c5740
-char* __stdcall Translate(char* key)
+char* __stdcall Translate(const char* key)
 {
     if (key == nullptr)
         return nullptr;
     TranslationTable* c = g_translations;
     if (c == nullptr)
-        return key;
+        return (char*)key;
 
     TdfField* first = c->v.begin();
     TdfField* last = c->v.end();
@@ -738,7 +738,7 @@ char* __stdcall Translate(char* key)
     }
     if (found != nullptr)
         return *found;
-    return key;
+    return (char*)key;
 }
 
 // FUNCTION: 0x4c5840

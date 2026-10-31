@@ -11,6 +11,7 @@
 #include "../util/angles.h"
 #include "../util/vec3.h"
 #include "../quirks/quirks.h"
+#include "../util/tdf.h"
 
 class UnitRef;
 
@@ -48,7 +49,6 @@ struct ModelGroundView;
 #include "../../link/globals.h"
 
 #include "../debug/debug_lib.h"
-char* __stdcall Translate(const char* text);
 #include "../graphics/display.h"
 
 static inline float spd(int v)

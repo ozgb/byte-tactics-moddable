@@ -8272,7 +8272,7 @@ address,function,file,kind,target
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,fn_ref,HandleMainMenuClick
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,fn_ref,UpdateMenuSparks
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,function,
-0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,global_maybe_written,g_directXWarningText
+0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,global_escape,g_directXWarningText
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,global_read,g_cdPlayerDialogShown
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,global_read,g_directXCheckDone
 0x4263b0,OpenMainMenu,src/frontend/frontend.cpp,global_read,g_game
@@ -15181,11 +15181,11 @@ address,function,file,kind,target
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,deref_maybe_written,*UnitDef
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,deref_write,*int
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_escape,Game::gui
+0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_escape,UnitDef::side
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_escape,UnitDef::unitname
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_escape,UnitRestrictEntry::name
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_maybe_written,UnitDef::name
-0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_maybe_written,UnitDef::side
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_maybe_written,UnitRestrictEntry::name
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_read,<anon>::scroll
 0x44c7e0,OpenUnitRestrictions,src/frontend/multi.cpp,field_read,<anon>::selected
@@ -17155,12 +17155,12 @@ address,function,file,kind,target
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,PlayerInfo::color
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,Settings::flags_475
 0x453d40,HandleNetPackets,src/network/net_game.cpp,function,
+0x453d40,HandleNetPackets,src/network/net_game.cpp,global_escape,g_integrityBreachText
+0x453d40,HandleNetPackets,src/network/net_game.cpp,global_escape,g_playerDisconnectedText
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_escape,g_playerMessageFormat
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_maybe_written,DAT_005119b8
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_maybe_written,g_allySoundName
-0x453d40,HandleNetPackets,src/network/net_game.cpp,global_maybe_written,g_integrityBreachText
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_maybe_written,g_packetManager
-0x453d40,HandleNetPackets,src/network/net_game.cpp,global_maybe_written,g_playerDisconnectedText
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_read,g_game
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_read,g_usePacketManager
 0x456030,Player::IsPlayableSlot,src/network/net_game.cpp,field_read,Player::active
@@ -18398,7 +18398,6 @@ address,function,file,kind,target
 0x45b920,DeactivateGadgetsByPrefix,src/frontend/options.cpp,call,strlen
 0x45b920,DeactivateGadgetsByPrefix,src/frontend/options.cpp,call,strncmp
 0x45b920,DeactivateGadgetsByPrefix,src/frontend/options.cpp,field_escape,Gadget::name
-0x45b920,DeactivateGadgetsByPrefix,src/frontend/options.cpp,field_maybe_written,Gadget::name
 0x45b920,DeactivateGadgetsByPrefix,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x45b920,DeactivateGadgetsByPrefix,src/frontend/options.cpp,field_read,<anon>::count
 0x45b920,DeactivateGadgetsByPrefix,src/frontend/options.cpp,field_read,Gui::layer
@@ -18809,7 +18808,6 @@ address,function,file,kind,target
 0x45cf60,BlitOptionsPanel,src/frontend/options.cpp,call,RenderLayer
 0x45cf60,BlitOptionsPanel,src/frontend/options.cpp,call,SetOffscreenSurface
 0x45cf60,BlitOptionsPanel,src/frontend/options.cpp,deref_read,*NetGameFlagsUnion
-0x45cf60,BlitOptionsPanel,src/frontend/options.cpp,field_escape,Game::gui
 0x45cf60,BlitOptionsPanel,src/frontend/options.cpp,field_escape,Game::netGameFlags_2a44
 0x45cf60,BlitOptionsPanel,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x45cf60,BlitOptionsPanel,src/frontend/options.cpp,field_read,<anon>::bit2
@@ -18898,6 +18896,8 @@ address,function,file,kind,target
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_write,Gui::hotGadgetIndex
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,field_write,TrackOptionFlags::word
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,function,
+0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,global_escape,g_notrakGadgetName
+0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,global_escape,g_trackModeGadgetName
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,global_maybe_written,g_cdNextGadgetName
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,global_maybe_written,g_cdPlayGadgetName
 0x45d280,HandleMusicOptionsClick,src/frontend/options.cpp,global_maybe_written,g_cdPrevGadgetName
@@ -18960,11 +18960,11 @@ address,function,file,kind,target
 0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,field_read,SoundOptionFlagsView::byte
 0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,function,
-0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_maybe_written,g_fxVolGadgetName
+0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_escape,g_fxVolGadgetName
+0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_escape,g_speechGadgetName
+0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_escape,g_testGadgetName
+0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_escape,g_volTextGadgetName
 0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_maybe_written,g_modeGadgetName
-0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_maybe_written,g_speechGadgetName
-0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_maybe_written,g_testGadgetName
-0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_maybe_written,g_volTextGadgetName
 0x45d9d0,UpdateSoundGadgets,src/frontend/options.cpp,global_read,g_game
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,call,ClearSelectedGadget
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,call,CloseTopScreen
@@ -19014,16 +19014,19 @@ address,function,file,kind,target
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_write,Gui::hotGadgetIndex
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,field_write,SoundOptionFlagsView::word
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,function,
+0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_escape,g_fxVolGadgetName
+0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_escape,g_modeGadgetName
+0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_escape,g_speechGadgetName
+0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_escape,g_testGadgetName
+0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_escape,g_volTextGadgetName
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_bgmSoundName
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_explodeSoundFile
-0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_fxVolGadgetName
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_modeGadgetName
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_optionsSoundName
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_restoreGadgetName
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_speechGadgetName
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_testGadgetName
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_undoGadgetName
-0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_maybe_written,g_volTextGadgetName
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,global_read,g_game
 0x45da90,HandleSoundOptionsClick,src/frontend/options.cpp,indirect_call,indirect via void (*)(Gui *) __attribute__((stdcall)) [Layer::handler]
 0x45de30,OpenSoundOptions,src/frontend/options.cpp,call,EnableKeyCommands
@@ -19156,7 +19159,6 @@ address,function,file,kind,target
 0x45e5e0,OpenVisualOptions,src/frontend/options.cpp,field_escape,Game::flags_37f06
 0x45e5e0,OpenVisualOptions,src/frontend/options.cpp,field_escape,Game::gui
 0x45e5e0,OpenVisualOptions,src/frontend/options.cpp,field_escape,Game::ordersPanelFlags_37ebe
-0x45e5e0,OpenVisualOptions,src/frontend/options.cpp,field_maybe_written,Gadget::name
 0x45e5e0,OpenVisualOptions,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x45e5e0,OpenVisualOptions,src/frontend/options.cpp,field_read,<anon>::count
 0x45e5e0,OpenVisualOptions,src/frontend/options.cpp,field_read,DisplayMode::height
@@ -19419,7 +19421,6 @@ address,function,file,kind,target
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,call,Sound::SetPlaybackOrder
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,call,Sound::SetWaveVolume
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,deref_read,*NetGameFlagsUnion
-0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_escape,Game::gui
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_escape,Game::netGameFlags_2a44
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x45fc60,HandleOptionsPanelClick,src/frontend/options.cpp,field_read,<anon>::bit2
@@ -19573,15 +19574,13 @@ address,function,file,kind,target
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,call,WordWrapText
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,call,operator->
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,call,strtok
-0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_escape,Game::gui
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_maybe_written,Game::gui
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_read,Gadget::width
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_read,Game::net
+0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_read,Gui::values
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_read,Layer::entries
-0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_read,RestartGui::field_8
-0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_read,RestartGui::field_c
+0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_write,Gui::language
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_write,Layer::handler
-0x4604a0,OpenRestartDialog,src/frontend/options.cpp,field_write,RestartGui::language
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,fn_ref,HandleRestartDialogClick
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,function,
 0x4604a0,OpenRestartDialog,src/frontend/options.cpp,global_read,g_game
@@ -27256,8 +27255,8 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_write,Unit::unitDefIndex
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_write,UnitResources::metalMake
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,function,
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,global_escape,g_takenLeadFormat
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,global_maybe_written,g_killedScriptName
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,global_maybe_written,g_takenLeadFormat
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,global_read,g_game
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,global_read,g_quirks
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,global_read,g_seams
@@ -30886,6 +30885,8 @@ address,function,file,kind,target
 0x493bf0,HandleTalkDialogEvent,src/ingame/game_dialogs.cpp,global_escape,g_chatTargetSeparators
 0x493bf0,HandleTalkDialogEvent,src/ingame/game_dialogs.cpp,global_escape,g_enemiesChatTarget
 0x493bf0,HandleTalkDialogEvent,src/ingame/game_dialogs.cpp,global_escape,g_livePlayerPrefix
+0x493bf0,HandleTalkDialogEvent,src/ingame/game_dialogs.cpp,global_escape,g_sendTypeGadgetName
+0x493bf0,HandleTalkDialogEvent,src/ingame/game_dialogs.cpp,global_escape,g_talkGadgetName
 0x493bf0,HandleTalkDialogEvent,src/ingame/game_dialogs.cpp,global_maybe_written,g_chatDraftText
 0x493bf0,HandleTalkDialogEvent,src/ingame/game_dialogs.cpp,global_maybe_written,g_sendToGadgetName
 0x493bf0,HandleTalkDialogEvent,src/ingame/game_dialogs.cpp,global_maybe_written,g_sendTypeGadgetName
@@ -31798,9 +31799,8 @@ address,function,file,kind,target
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,call,Translate
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,call,sprintf
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,deref_read,*LoadingPlayerRecord
-0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_escape,Game::menu_519_18
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_escape,Game::players
-0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_maybe_written,Game::menu_519_18
+0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_maybe_written,Game::gui
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_maybe_written,LoadingPlayerEntry::name
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,<anon>::synced
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,field_read,Game::colors
@@ -34951,7 +34951,7 @@ address,function,file,kind,target
 0x4a5d50,TruncateGadgetText,src/gui/gui.cpp,call,GetTextPixelWidth
 0x4a5d50,TruncateGadgetText,src/gui/gui.cpp,call,strlen
 0x4a5d50,TruncateGadgetText,src/gui/gui.cpp,deref_write,*char
-0x4a5d50,TruncateGadgetText,src/gui/gui.cpp,field_maybe_written,Gadget::name
+0x4a5d50,TruncateGadgetText,src/gui/gui.cpp,field_escape,Gadget::name
 0x4a5d50,TruncateGadgetText,src/gui/gui.cpp,field_read,Gadget::attribs
 0x4a5d50,TruncateGadgetText,src/gui/gui.cpp,field_read,Gadget::type
 0x4a5d50,TruncateGadgetText,src/gui/gui.cpp,field_read,Gadget::width
@@ -35773,7 +35773,7 @@ address,function,file,kind,target
 0x4ab170,BlitMenuLayers,src/gui/dialogs.cpp,call,BlitLayers
 0x4ab170,BlitMenuLayers,src/gui/dialogs.cpp,field_read,Gui::layer
 0x4ab170,BlitMenuLayers,src/gui/dialogs.cpp,function,
-0x4ab190,SetDescListCleanupFlag,src/gui/dialogs.cpp,deref_write,*int
+0x4ab190,SetDescListCleanupFlag,src/gui/dialogs.cpp,field_write,Gui::pathsReady
 0x4ab190,SetDescListCleanupFlag,src/gui/dialogs.cpp,function,
 0x4ab1b0,AddTextGadget,src/gui/dialogs.cpp,call,strcpy
 0x4ab1b0,AddTextGadget,src/gui/dialogs.cpp,call,strncpy
@@ -35954,7 +35954,7 @@ address,function,file,kind,target
 0x4abd00,MessageBoxHandler,src/gui/dialogs.cpp,field_read,Gui::layer
 0x4abd00,MessageBoxHandler,src/gui/dialogs.cpp,field_read,Layer::entries
 0x4abd00,MessageBoxHandler,src/gui/dialogs.cpp,function,
-0x4abd00,MessageBoxHandler,src/gui/dialogs.cpp,global_maybe_written,g_okGadgetName
+0x4abd00,MessageBoxHandler,src/gui/dialogs.cpp,global_escape,g_okGadgetName
 0x4abd20,IsMessageBoxScreen,src/gui/dialogs.cpp,call,strcmp
 0x4abd20,IsMessageBoxScreen,src/gui/dialogs.cpp,field_escape,Gadget::name
 0x4abd20,IsMessageBoxScreen,src/gui/dialogs.cpp,field_read,Gui::layer
@@ -36000,7 +36000,7 @@ address,function,file,kind,target
 0x4ac080,NotExistDialogHandler,src/gui/dialogs.cpp,field_read,Gui::layer
 0x4ac080,NotExistDialogHandler,src/gui/dialogs.cpp,field_read,Layer::entries
 0x4ac080,NotExistDialogHandler,src/gui/dialogs.cpp,function,
-0x4ac080,NotExistDialogHandler,src/gui/dialogs.cpp,global_maybe_written,g_okGadgetName
+0x4ac080,NotExistDialogHandler,src/gui/dialogs.cpp,global_escape,g_okGadgetName
 0x4ac0a0,OpenNotExistDialog,src/gui/dialogs.cpp,call,FindGadgetIndex
 0x4ac0a0,OpenNotExistDialog,src/gui/dialogs.cpp,call,LoadGuiLayer
 0x4ac0a0,OpenNotExistDialog,src/gui/dialogs.cpp,call,strcpy
@@ -36298,6 +36298,7 @@ address,function,file,kind,target
 0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,call,TdfRecord::GetFieldString
 0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,call,Translate
 0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,call,strcpy
+0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,field_escape,ReadTextInputFieldsRecord::text
 0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,field_maybe_written,ReadTextInputFieldsRecord::text
 0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,field_read,ReadTextInputFieldsRecord::maxchars
 0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,field_read,ReadTextInputFieldsSource::tdf
@@ -36317,6 +36318,7 @@ address,function,file,kind,target
 0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,call,TdfRecord::GetFieldString
 0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,call,Translate
 0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,call,strcpy
+0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,field_escape,SliderFieldsRecord::text
 0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,field_maybe_written,SliderFieldsRecord::text
 0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,field_read,ReadSliderFieldsSource::tdf
 0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,field_write,SliderFieldsRecord::knobpos

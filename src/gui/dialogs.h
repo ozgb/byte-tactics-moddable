@@ -49,5 +49,7 @@ void __stdcall BuildColorRemapTable(RemapPaletteEntry* src, RemapPaletteEntry* d
 void __stdcall ApplySlidersToPaletteEntry(Gui* obj, RemapPaletteEntry* palette);
 
 int __stdcall SetBackgroundSurface(Gui* menu, void* value);
+void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect);
+void __stdcall SetDescListCleanupFlag(Gui* gui, int flag);
 
 #endif

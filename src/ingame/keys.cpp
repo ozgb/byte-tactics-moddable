@@ -74,7 +74,6 @@ void __stdcall CollectSelectedUnits(void* param);
 #include "camera.h"
 #include "../network/net_chat.h"
 #include "../network/packets.h"
-void __stdcall SetDescListCleanupFlag(Gui* gui, int param);
 #include "../network/net_game.h"
 void __stdcall BroadcastPacket(int id, void* packet, int size);
 #include "../frontend/options.h"

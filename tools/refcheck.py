@@ -83,18 +83,20 @@ PEELED = ("ImplicitCastExpr", "ParenExpr", "CStyleCastExpr", "CXXFunctionalCastE
 REPO_DIRS = ("src/", "include/", "link/", "interfaces/")
 GAME = "Game"
 VIEW_ISSUE = "#392"
-GAME_SIM_ISSUE = "#350"
+LOADED_ISSUE = "#352"
 OTHER_ISSUE = "#353"
-SUBSYSTEM_ISSUES = {"units": "#349", "orders": "#349", "weapons": "#349", "pathfinding": "#350", "map": "#350",
-                    "los_radar": "#350", "game": "#350", "network": "#351", "ai": "#351", "players": "#351"}
-STRUCT_ISSUES = {"Unit": "#349", "UnitDef": "#349", "WeaponDef": "#349", "Order": "#349", "OrderFx": "#349",
-                 "Mission": "#349"}
+CONTAINER_ISSUE = "#596"
+SUBSYSTEM_ISSUES = {"units": OTHER_ISSUE, "orders": OTHER_ISSUE, "weapons": OTHER_ISSUE, "pathfinding": OTHER_ISSUE,
+                    "map": OTHER_ISSUE, "los_radar": OTHER_ISSUE, "game": OTHER_ISSUE, "network": OTHER_ISSUE,
+                    "ai": OTHER_ISSUE, "players": OTHER_ISSUE}
+STRUCT_ISSUES = {"Unit": OTHER_ISSUE, "UnitDef": OTHER_ISSUE, "WeaponDef": OTHER_ISSUE, "Order": OTHER_ISSUE,
+                 "OrderFx": OTHER_ISSUE, "Mission": OTHER_ISSUE}
 OUTSIDE_ISSUES = [
     (re.compile(r"FeatureAnim\.state|view state|presentation|render cache"), VIEW_ISSUE),
-    (re.compile(r"Mission order|damage table"), "#349"),
-    (re.compile(r"MovementClass|LOS table"), GAME_SIM_ISSUE),
+    (re.compile(r"Mission order|damage table"), CONTAINER_ISSUE),
+    (re.compile(r"MovementClass|LOS table"), LOADED_ISSUE),
 ]
-OUTSIDE_DEFAULT_ISSUE = "#352"
+OUTSIDE_DEFAULT_ISSUE = LOADED_ISSUE
 COUNTER_PATTERN = re.compile(r"^(0x[0-9a-f]+)(?:\+(0x[0-9a-f]+)\*k)?$")
 ARRAY_SUFFIX = re.compile(r"\s*\[([^\]]*)\]")
 LAYOUT_ROW = re.compile(r"^\s*(\d+)(?::\d+-\d+)? \|( *)(.*?)\s*$")
@@ -540,9 +542,8 @@ def game_field_classes(rows: list[dict]) -> dict[str, str]:
 
 
 def exception_issue(f: Found, table: dict[str, Counter], classes: dict[str, str]) -> str:
-    if f.struct == GAME:
-        cls = classes.get(f.field.split(".")[0], "")
-        return GAME_SIM_ISSUE if cls in ("sim", "mixed") else OTHER_ISSUE
+    if f.kind == "container":
+        return CONTAINER_ISSUE
     if f.struct in STRUCT_ISSUES:
         return STRUCT_ISSUES[f.struct]
     return SUBSYSTEM_ISSUES.get(subsystem_of(sorted(f.files)[0], table), OTHER_ISSUE)
@@ -584,8 +585,9 @@ class Locator:
     def extent(self, leaf: Leaf) -> tuple[int, str | None, int]:
         """(count, element record or None, element size) of a leaf, for arrays of structs and of pointers."""
         count = 1
-        for dim in re.findall(r"\[(\d+)\]", leaf.type):
-            count *= int(dim)
+        if not re.search(r"\(\*+\)\s*\[", leaf.type):
+            for dim in re.findall(r"\[(\d+)\]", leaf.type):
+                count *= int(dim)
         elem = re.sub(r"(?:\[\d+\])+$", "", leaf.type).strip()
         if elem.endswith("*") or "(*" in elem:
             return count, None, 4
@@ -599,12 +601,14 @@ class Locator:
         return None
 
     def find(self, record: str, offset: int, depth: int = 0) -> tuple[str, str, str, str] | None:
-        """(owner struct, field path, kind, top-level field) of the raw field of `record` that covers `offset`."""
+        """(owner struct, field path, kind, top-level field) of the raw field of `record` that starts at `offset`."""
         if depth > 8:
             return None
         for leaf in self.leaves(record):
             count, elem, size = self.extent(leaf)
             if not size or not leaf.offset <= offset < leaf.offset + count * size:
+                continue
+            if elem is None and (offset - leaf.offset) % size:
                 continue
             if elem is not None:
                 found = self.find(elem, (offset - leaf.offset) % size, depth + 1)
@@ -640,7 +644,7 @@ def note_about(note: str, offsets: list[int]) -> bool:
 
 def outside_issue(note: str, struct: str, top: str, classes: dict[str, str]) -> str:
     if struct == GAME:
-        return VIEW_ISSUE if classes.get(top, "") in ("view", "platform") else GAME_SIM_ISSUE
+        return VIEW_ISSUE if classes.get(top, "") in ("view", "platform") else LOADED_ISSUE
     for pattern, issue in OUTSIDE_ISSUES:
         if pattern.search(note):
             return issue
@@ -679,7 +683,7 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
             loc = locators["SimGlobals"]
             begin = loc.start("SimGlobals", member.group(1))
             hit = loc.find("SimGlobals", begin + tokens[0][1]) if begin is not None else None
-            if hit is None:
+            if hit is None and tokens[0][1] % 4 == 0:
                 kind = kind_of_leaf(loc.records.get("SimGlobals"), member.group(1))
                 hit = ("SimGlobals", member.group(1), kind, member.group(1)) if kind in KINDS else None
             if hit:

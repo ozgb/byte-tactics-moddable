@@ -31,7 +31,7 @@ struct FeatureAnimPool {
     char unknown_24[52];
     int nameCount;
     char unknown_5c[24];
-    char (*names)[256];
+    Ref<char[256]> names;
 };
 #pragma pack(pop)
 

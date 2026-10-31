@@ -19,6 +19,7 @@ struct Flags_38d75 {
 #include "../ingame/frame_timers.h"
 
 #include "../gui/gui.h"
+#include "../gui/dialogs.h"
 
 struct CampaignSetupRecord {
     char unknown_0[0x96];
@@ -67,7 +68,6 @@ void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 #include "../harness/harness.h"
 void HideSoftwareCursor();
 #include "game_load.h"
-void __stdcall BlitMenuLayers(Gui* sub, unsigned int* dest, int* clip);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 #include "../network/net_game.h"
 void __stdcall CreateUnit(int team, unsigned short id, CreateUnitPos pos, int a, int b,

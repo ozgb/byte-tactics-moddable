@@ -5,6 +5,7 @@
 #include "../../interfaces/host.h"
 #include "../state/game_rand.h"
 #include "../state/sim_globals.h"
+#include "../util/tdf.h"
 
 struct DPNAME {
     unsigned long dwSize;
@@ -75,7 +76,6 @@ extern Game* g_game;
 #include "net_game.h"
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 #include "../graphics/display.h"
-char* __stdcall Translate(char* text);
 void __stdcall AddMessage(char* text, int key, int value, char last);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall SetupPlayerSlot(unsigned char player, char type);

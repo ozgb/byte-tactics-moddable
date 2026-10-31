@@ -98,7 +98,6 @@ static int s_weaponTdfLoadedCount;
 static int s_weaponTdfAllocCount;
 
 void __stdcall ShowErrorBox(const char* text, const char* caption);
-char* __stdcall Translate(char* text);
 
 #define COPYRIGHT "Copyright 0000 Humongous Entertainment. All rights reserved."
 

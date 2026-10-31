@@ -15,7 +15,6 @@
 #include "dialogs.h"
 #include "gui.h"
 #include "../graphics/palette.h"
-char* __stdcall Translate(char* text);
 void* __stdcall LoadGaf(char* path);
 void* __stdcall GetGafFrame(void* table, int index);
 #include "../graphics/object_pool.h"

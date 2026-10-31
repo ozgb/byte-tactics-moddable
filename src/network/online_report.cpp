@@ -2,12 +2,11 @@
 
 #include "../../interfaces/host.h"
 #include "online_report.h"
+#include "../util/tdf.h"
 
 struct NetReportBlockView;
 
 #include "../../link/globals.h"
-
-char* __stdcall Translate(char* text);
 
 // FUNCTION: 0x4c9750
 char* GetEnumSessionsErrorText()
@@ -15,7 +14,7 @@ char* GetEnumSessionsErrorText()
     const char* s = strstr(host_net_error_string(host_net_enum_sessions_result()), " - ");
     if (s == 0)
         return (char*)host_net_error_string(0x80004005);
-    return Translate((char*)s + 3);
+    return Translate(s + 3);
 }
 
 // FUNCTION: 0x4ca9d0

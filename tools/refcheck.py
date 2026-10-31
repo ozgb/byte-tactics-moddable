@@ -19,7 +19,7 @@ the vftable slots. A field is one of these kinds, anything else is not a pointer
 
   pointer           T *, an array of them, a reference, in nested or anonymous structs and unions too
   function-pointer  a pointer to a function or to a member
-  container         a std:: type, MsvcVector or SyncTaggedVector: pointers inside
+  container         a std:: type or SyncTaggedVector: pointers inside
   int-pointer       an integer field that code casts to a pointer (see CASTS), found in the syntax trees
   Ref<T>            allowed, not listed
 
@@ -89,7 +89,7 @@ HAND_KINDS = ("load", "code")
 DEFAULT_BUILD_DIR = ROOT / "build/modern"
 HOLDERS = {"Game": "CreateGameObject"}
 EXTRA_BLOCK = ("Game", "SimGlobals")
-CONTAINERS = ("MsvcVector", "SyncTaggedVector")
+CONTAINERS = ("SyncTaggedVector",)
 RECORD_KINDS = ("RecordDecl", "CXXRecordDecl")
 PEELED = ("ImplicitCastExpr", "ParenExpr", "CStyleCastExpr", "CXXFunctionalCastExpr")
 REPO_DIRS = ("src/", "include/", "link/", "interfaces/")
@@ -97,7 +97,7 @@ GAME = "Game"
 VIEW_ISSUE = "#392"
 UNCLASSIFIED = ""
 OTHER_ISSUE = "#353"
-CONTAINER_ISSUE = "#596"
+CONTAINER_ISSUE = "#353"
 SUBSYSTEM_ISSUES = {"units": OTHER_ISSUE, "orders": OTHER_ISSUE, "weapons": OTHER_ISSUE, "pathfinding": OTHER_ISSUE,
                     "map": OTHER_ISSUE, "los_radar": OTHER_ISSUE, "game": OTHER_ISSUE, "network": OTHER_ISSUE,
                     "ai": OTHER_ISSUE, "players": OTHER_ISSUE}
@@ -403,11 +403,23 @@ def scan_unit(job: tuple[dict, bool]) -> UnitScan:
     return UnitScan(records, typedefs, by_name, by_loc, casts)
 
 
+def hand_fields(root: Path) -> frozenset:
+    """The (struct, field) pairs the outside list tags `load` or `code`: data the closure does not walk through."""
+    return frozenset((r["struct"], r["field"]) for r in read_csv(root / OUTSIDE)
+                     if r["kind"] in HAND_KINDS and r["struct"] and r["field"])
+
+
 def block_structs(files: dict, by_name: dict, state_rows: list[dict], globals_rows: list[dict],
-                  extra=EXTRA_BLOCK) -> set[str]:
+                  extra=EXTRA_BLOCK, hand: frozenset = frozenset()) -> set[str]:
     """The type names the state block holds: the closure from the sim and mixed rows, Game, SimGlobals, the
-    types of Game's sim and mixed fields, and the structs Game holds by value."""
+    types of Game's sim and mixed fields, and the structs Game holds by value. The closure does not walk
+    through the (struct, field) pairs in hand, which hold loaded data or code."""
     scope = typedupes.Scope(files, by_name)
+    for name, ds in by_name.items():
+        skip = frozenset(f for s, f in hand if s == short(name))
+        if skip:
+            for d in ds:
+                scope.members[d["id"]] = typedupes.member_idents(d, skip)[1]
     fields = typedupes.game_fields(by_name)
     rows = [r for r in state_rows if r["class"] in ("sim", "mixed") and r["kind"] != "game-region"]
     rows += [{"kind": "heap", "name": "new: " + name} for name in extra]
@@ -708,9 +720,10 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
     matched = set()
 
     def add(struct, name, holder, token, words, issue, kind, note, offsets):
-        if not note_about(note, offsets):
-            note = hand.get((struct, name, holder, token), "")
         key = (struct, name) if struct else (holder, token)
+        written = hand.get((struct, name, holder, token), "")
+        if not note_about(note, offsets) or (key in hand_kinds and written.startswith("%s.%s " % (struct, name))):
+            note = written
         if key in hand_kinds:
             kind, issue = hand_kinds[key], ""
             matched.add(key)
@@ -806,7 +819,7 @@ def analyse(root: Path, build_dir: Path, jobs: int) -> Result:
     by_name = typedupes.definitions(files)
     state_rows = stateclasses.read_rows()
     globals_rows = stateclasses.read_globals()
-    names = block_structs(files, by_name, state_rows, globals_rows)
+    names = block_structs(files, by_name, state_rows, globals_rows, hand=hand_fields(root))
     defs, scans, casts = read_definitions(build_dir, names, by_name, files, jobs)
     classes = game_field_classes(state_rows)
     table = file_subsystems(root)

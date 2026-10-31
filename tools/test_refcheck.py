@@ -20,7 +20,7 @@ typedef char *LPSTR;
 typedef int (*Fn)(int);
 typedef struct { int a; char *b; HANDLE h; } Anon;
 template <class T> struct Ref { unsigned offset; };
-template <class T> struct MsvcVector { T *first; T *last; };
+template <class T> struct SyncTaggedVector { T *first; T *last; };
 template <class T> struct BlockVector { unsigned char padding; Ref<T> first; };
 struct Base { virtual void f(); int x; };
 struct Derived : Base {
@@ -30,7 +30,7 @@ struct Derived : Base {
     Anon an[2];
     const char *const cc[3];
     void (*arr[2])();
-    MsvcVector<int> vec;
+    SyncTaggedVector<int> vec;
     BlockVector<int> block;
     Ref<Base> ref;
     int handle;
@@ -89,7 +89,7 @@ class FieldKindTest(unittest.TestCase):
                  ("void (*[2])()", None, "function-pointer"),
                  ("int (Derived::*)(int) __attribute__((thiscall))", None, "function-pointer"),
                  ("std::vector<int *>", None, "container"), ("BlockVector<int>", None, None),
-                 ("MsvcVector<Unit *>", None, "container"), ("SyncTaggedVector<Order>", None, "container"),
+                 ("SyncTaggedVector<Unit *>", None, "container"), ("SyncTaggedVector<Order>", None, "container"),
                  ("Ref<Unit>", None, "ref"), ("Ref<Unit>[4]", None, "ref"), ("Ref<Unit> *", None, "pointer"),
                  ("Unit", None, None), ("Point16[4]", None, None), ("Foo &", None, "pointer"),
                  ("int (*)[4]", None, "pointer")]
@@ -231,7 +231,7 @@ class ClangTest(unittest.TestCase):
         self.assertEqual(keyed[("", "", "UNITINFO")]["words"], 2)
         self.assertEqual(keyed[("", "", "UNITINFO")]["offset"], "0x47a+0x249*k")
         self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "")
-        self.assertEqual(keyed[("SimGlobals", "table", "SimGlobals.table")]["issue"], "#596")
+        self.assertEqual(keyed[("SimGlobals", "table", "SimGlobals.table")]["issue"], "#353")
         self.assertEqual(len(out), 5)
 
     def test_progression_hits_two_fields(self):
@@ -306,6 +306,11 @@ class ClangTest(unittest.TestCase):
         keyed = {r["field"]: r for r in out}
         self.assertEqual((keyed["view"]["kind"], keyed["view"]["issue"]), ("load", ""))
         self.assertEqual((keyed["p"]["kind"], keyed["p"]["issue"]), ("pointer", ""))
+
+    def test_hand_note_naming_the_field_wins_over_the_block_note_on_a_load_row(self):
+        row = {**self.hand_row("Game", "view", "load", offset="0x4"), "note": "Game.view (0x4): loaded at start"}
+        out = self.hand_rows([row])
+        self.assertEqual({r["field"]: r["note"] for r in out}["view"], "Game.view (0x4): loaded at start")
 
     def test_hand_only_code_row_survives_without_a_scan_row(self):
         row = self.hand_row("WeaponDef", "fire", "code", holder="hand", offset="+0x60")
@@ -489,7 +494,7 @@ class IssueTest(unittest.TestCase):
 
     def test_container_exception_takes_the_container_issue(self):
         found = rc.Found("Thing", "v", "container", {"src/units/unit.h"})
-        self.assertEqual(rc.exception_issue(found, self.TABLE, self.CLASSES), "#596")
+        self.assertEqual(rc.exception_issue(found, self.TABLE, self.CLASSES), "#353")
 
     def test_outside_issue(self):
         self.assertEqual(rc.outside_issue("", "Game", "view", self.CLASSES), "#392")
@@ -497,6 +502,42 @@ class IssueTest(unittest.TestCase):
         self.assertEqual(rc.outside_issue("", "Game", "units", self.CLASSES), "")
         self.assertEqual(rc.outside_issue("FeatureAnim.state (0x4)", "", "", self.CLASSES), "#392")
         self.assertEqual(rc.outside_issue("UnitType.data", "", "", self.CLASSES), "")
+
+
+class ClosureTest(unittest.TestCase):
+    SOURCE = """struct Piece { int n; };
+struct Plain { int n; };
+struct Rec { Piece *desc; Plain *kept; };
+struct Sim { Rec rec; };
+"""
+
+    def reached(self, hand):
+        import typedupes
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "src").mkdir()
+            (root / "src" / "a.h").write_text(self.SOURCE)
+            files = typedupes.collect(root)
+            return rc.block_structs(files, typedupes.definitions(files), [], [], extra=("Sim",), hand=hand)
+
+    def test_closure_walks_every_field_by_default(self):
+        self.assertEqual(self.reached(frozenset()), {"Sim", "Rec", "Piece", "Plain"})
+
+    def test_closure_stops_at_a_load_pointer(self):
+        self.assertEqual(self.reached(frozenset({("Rec", "desc")})), {"Sim", "Rec", "Plain"})
+
+    def test_hand_fields_reads_load_and_code_rows_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "data").mkdir()
+            (root / rc.OUTSIDE).write_text(rc.render(rc.OUTSIDE_COLUMNS, [
+                {"struct": "Rec", "field": "desc", "holder": "", "offset": "", "words": 1, "issue": "", "kind": "load",
+                 "note": "n"},
+                {"struct": "Rec", "field": "kept", "holder": "", "offset": "", "words": 1, "issue": "#353",
+                 "kind": "pointer", "note": "n"},
+                {"struct": "", "field": "", "holder": "H", "offset": "0x0", "words": 1, "issue": "", "kind": "code",
+                 "note": "n"}]))
+            self.assertEqual(rc.hand_fields(root), frozenset({("Rec", "desc")}))
 
 
 class OffsetTest(unittest.TestCase):

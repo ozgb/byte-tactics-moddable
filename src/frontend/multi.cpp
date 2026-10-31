@@ -536,6 +536,7 @@ void __stdcall SetFrontendState(int a, int line, char* file);
 #include "../game/settings.h"
 void __stdcall SetCursorMode(int value);
 #include "../game/statistics.h"
+#include "reporter.h"
 #include "../graphics/object_pool.h"
 int __stdcall LoadReporterDll(unsigned int* a, unsigned int* b);
 unsigned char FindHostSlot();

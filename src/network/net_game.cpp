@@ -73,6 +73,7 @@ extern Game* g_game;
 
 #include "packets.h"
 #include "../game/statistics.h"
+#include "../frontend/reporter.h"
 #include "net_game.h"
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 #include "../graphics/display.h"

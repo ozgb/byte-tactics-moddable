@@ -1,6 +1,6 @@
 """Build and run the wasmtime pilot host for the modern i686 build (#562).
 
-    uv run tools/wasm_host.py build [--out DIR] [--debug]
+    uv run tools/wasm_host.py build [--out DIR] [--debug] [--target TARGET] [--xwin DIR]
     uv run tools/wasm_host.py run MODULE.wasm EXPORT [I32 ARGS...] [--loop N] [--out DIR]
     uv run tools/wasm_host.py modules [--overlap] [--out DIR]
     uv run tools/wasm_host.py wind-meteors [--out DIR]
@@ -9,6 +9,10 @@
 build --debug (DIR defaults to build/wasm_host_debug) builds the DLL with the debugdll profile of its Cargo.toml: panic=unwind,
 debug info, not stripped, so a wasmtime panic prints its message and a backtrace (the C API's extern "C" functions abort
 after the message). The runs of wasm_maths.py --debug and wasm_loop.py set RUST_BACKTRACE=1.
+
+build --target i686-pc-windows-msvc (DIR defaults to build/wasm_host_msvc) builds the DLL with rustup's cargo
+(. "$HOME/.cargo/env", target installed with rustup) and lld-link against the x86 CRT and SDK libraries that
+`xwin --arch x86 splat` wrote to --xwin DIR (default: $BT_XWIN, else ~/.xwin-x86). host.exe is the same.
 
 build compiles three things into DIR (default build/wasm_host):
 
@@ -64,6 +68,8 @@ MSVC5 = (ROOT / "toolchain" / "msvc5-sp3").resolve()
 MODULES_DIR = ROOT / "tests" / "wasm" / "modules"
 WASM_MODULES_OUT = ROOT / "build" / "wasm-modules"
 RUST_TARGET = "i686-pc-windows-gnu"
+RUST_TARGETS = ("i686-pc-windows-gnu", "i686-pc-windows-msvc")
+XWIN_LIBS = ("crt/lib/x86", "sdk/lib/um/x86", "sdk/lib/ucrt/x86")
 DEBUG_PROFILE = "debugdll"
 DEBUG_OUT = ROOT / "build" / "wasm_host_debug"
 C_API_PACKAGE = "wasmtime-c-api-impl"
@@ -84,26 +90,36 @@ def run(command, **kwargs):
         sys.exit(result.returncode)
 
 
-def cargo_env(out):
+def default_xwin():
+    return Path(os.environ.get("BT_XWIN") or Path.home() / ".xwin-x86")
+
+
+def cargo_env(out, target=RUST_TARGET, xwin=None):
     env = dict(os.environ)
     env["CARGO_TARGET_DIR"] = str(out / "target")
-    env["CARGO_TARGET_I686_PC_WINDOWS_GNU_LINKER"] = "i686-w64-mingw32-gcc"
+    if target == "i686-pc-windows-msvc":
+        xwin = Path(xwin or default_xwin())
+        env["CARGO_TARGET_I686_PC_WINDOWS_MSVC_LINKER"] = "lld-link"
+        flags = " ".join(f"-Lnative={xwin / lib}" for lib in XWIN_LIBS)
+        env["RUSTFLAGS"] = f"{env.get('RUSTFLAGS', '')} {flags}".strip()
+    else:
+        env["CARGO_TARGET_I686_PC_WINDOWS_GNU_LINKER"] = "i686-w64-mingw32-gcc"
     return env
 
 
-def build_dll(out, debug=False):
-    env = cargo_env(out)
+def build_dll(out, debug=False, target=RUST_TARGET, xwin=None):
+    env = cargo_env(out, target, xwin)
     manifest = DLL_CRATE / "Cargo.toml"
     profile = ["--profile", DEBUG_PROFILE] if debug else ["--release"]
-    run(["cargo", "build", *profile, "--locked", "--target", RUST_TARGET, "--manifest-path", manifest], env=env)
-    shutil.copy2(out / "target" / RUST_TARGET / (DEBUG_PROFILE if debug else "release") / "wasmtime_host.dll", out / "wasmtime_host.dll")
+    run(["cargo", "build", *profile, "--locked", "--target", target, "--manifest-path", manifest], env=env)
+    shutil.copy2(out / "target" / target / (DEBUG_PROFILE if debug else "release") / "wasmtime_host.dll", out / "wasmtime_host.dll")
 
 
-def crate_include(out):
-    env = cargo_env(out)
+def crate_include(out, target=RUST_TARGET, xwin=None):
+    env = cargo_env(out, target, xwin)
     manifest = DLL_CRATE / "Cargo.toml"
     metadata = subprocess.run(
-        ["cargo", "metadata", "--format-version", "1", "--locked", "--filter-platform", RUST_TARGET, "--manifest-path", str(manifest)],
+        ["cargo", "metadata", "--format-version", "1", "--locked", "--filter-platform", target, "--manifest-path", str(manifest)],
         check=True, capture_output=True, text=True, env=env).stdout
     for package in json.loads(metadata)["packages"]:
         if package["name"] == C_API_PACKAGE:
@@ -140,8 +156,8 @@ def check_headers(crate, update=False):
     return problems
 
 
-def headers(out, update):
-    problems = check_headers(crate_include(out), update)
+def headers(out, update, target=RUST_TARGET):
+    problems = check_headers(crate_include(out, target), update)
     for problem in problems:
         print(problem, file=sys.stderr)
     if problems:
@@ -175,10 +191,10 @@ def build_host(out):
          "/safeseh:no", *objects, work / "KERNEL32.lib", MSVC5 / "LIB" / "LIBCMT.LIB", MSVC5 / "LIB" / "OLDNAMES.LIB"])
 
 
-def build(out, debug=False):
+def build(out, debug=False, target=RUST_TARGET, xwin=None):
     out.mkdir(parents=True, exist_ok=True)
-    build_dll(out, debug)
-    problems = check_headers(crate_include(out))
+    build_dll(out, debug, target, xwin)
+    problems = check_headers(crate_include(out, target, xwin))
     if problems:
         sys.exit("the vendored wasmtime headers differ from the crate's:\n  " + "\n  ".join(problems))
     build_host(out)
@@ -271,14 +287,17 @@ def main():
     runner.add_argument("export")
     runner.add_argument("args", nargs="*")
     runner.add_argument("--loop", type=int, default=1)
+    sub.choices["build"].add_argument("--target", choices=RUST_TARGETS, default=RUST_TARGET, help="the Rust target of wasmtime_host.dll")
+    sub.choices["build"].add_argument("--xwin", type=Path, help="msvc target: the xwin splat directory (default: $BT_XWIN, else ~/.xwin-x86)")
     sub.choices["build"].add_argument("--debug", action="store_true", help="unstripped DLL with panic=unwind and debug info, into build/wasm_host_debug")
     sub.choices["modules"].add_argument("--overlap", action="store_true")
     sub.choices["headers"].add_argument("--update", action="store_true")
     options = parser.parse_args()
     debug = getattr(options, "debug", False)
-    out = (options.out or (DEBUG_OUT if debug else ROOT / "build" / "wasm_host")).resolve()
+    msvc = getattr(options, "target", RUST_TARGET) == "i686-pc-windows-msvc"
+    out = (options.out or (DEBUG_OUT if debug else ROOT / "build" / ("wasm_host_msvc" if msvc else "wasm_host"))).resolve()
     if options.command == "build":
-        build(out, debug)
+        build(out, debug, options.target, options.xwin)
     elif options.command == "modules":
         sys.exit(run_modules(out, options.overlap))
     elif options.command == "wind-meteors":

@@ -26,6 +26,7 @@ Feature,seqreclamate,pointer,src/map/feature.h,#353
 Feature,seqreclamateshad,pointer,src/map/feature.h,#353
 Feature,seqshad,pointer,src/map/feature.h,#353
 Feature,shadowTable,pointer,src/map/feature.h,#353
+FeatureAnimPool,names,pointer,src/map/feature_anim_pool.h,#353
 FontGlyphTable,glyphs,pointer,src/gui/font_glyph_table.h,#353
 Frame,data,pointer,src/network/frame_ring.h,#353
 FrameQueue,buffer,pointer,src/network/packet_receiver.h,#353
@@ -95,6 +96,7 @@ Game,handler,function-pointer,src/game/game.h,#353
 Game,hotRadar,pointer,src/game/game.h,#353
 Game,igTitles,int-pointer,src/game/game.h,#353
 Game,igpaused,int-pointer,src/game/game.h,#353
+Game,image_14813,pointer,src/game/game.h,#352
 Game,image_14817,pointer,src/game/game.h,#353
 Game,image_3907b,pointer,src/game/game.h,#353
 Game,infos,pointer,src/game/game.h,#353
@@ -176,6 +178,7 @@ Object3do,color,pointer,src/graphics/object3do.h,#353
 Object3do,faces,pointer,src/graphics/object3do.h,#353
 Object3do,name,pointer,src/graphics/object3do.h,#353
 Object3do,sibling,pointer,src/graphics/object3do.h,#353
+Object3do,vertices,pointer,src/graphics/object3do.h,#353
 OptionsSliderMenu,holder,pointer,src/frontend/options_slider_menu.h,#353
 PacketBuffer,first,pointer,src/network/packet_buffer.h,#353
 PacketChannel,buffers,pointer,src/network/packet_channel.h,#353
@@ -226,3 +229,4 @@ UnitDef,data,pointer,src/units/unit_def.h,#352
 UnitDef,weaponCategories,pointer,src/units/unit_def.h,#352
 UnitInfoSnapshot,orderName,int-pointer,src/ingame/unit_info_snapshot.h,#353
 WeaponDef,fire,pointer,src/weapons/weapon_def.h,#352
+WeaponDef,table,pointer,src/weapons/weapon_def.h,#596

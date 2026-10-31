@@ -64,6 +64,7 @@ OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTab
 #include "../network/net_game.h"
 void __stdcall SendScriptCall(Unit* obj, int index, int param_3, int param_4, int param_5, int param_6, int param_7);
 #include "../sound/sound.h"
+#include "../units/unit_speech.h"
 
 #include "../../link/globals.h"
 
@@ -228,7 +229,7 @@ void Order::AnnounceStatusIfFlagged(const char* text)
 {
     if (flags_42 & 0x2000) {
         flags_42 &= ~0x2000;
-        QueueUnitSpeech(unit, 5, (char*)text);
+        RecordUnitSpeech(unit, 5, (char*)text);
     }
 }
 

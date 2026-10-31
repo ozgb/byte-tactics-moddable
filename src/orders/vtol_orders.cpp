@@ -44,6 +44,7 @@ struct Pair16 { short lo, hi; };
 #include "../files/files_api.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
+#include "../units/unit_speech.h"
 struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;
@@ -429,7 +430,7 @@ int __stdcall VtolMoveOrder(Unit* unit, Order* order, int flags)
         return 1;
     case 2:
         if (!order->next)
-            QueueUnitSpeech(unit, 6, 0);
+            RecordUnitSpeech(unit, 6, 0);
         return 5;
     }
     return 7;
@@ -541,7 +542,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
             order->flags = 0xe8;
             return 1;
         }
-        QueueUnitSpeech(unit, 7, "Unable to unload unit");
+        RecordUnitSpeech(unit, 7, "Unable to unload unit");
         return 9;
     }
     case 2: {
@@ -549,7 +550,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
             return 9;
         Unit* cargo = order->target;
         if (!g_seams.map->CanPlaceUnitFootprint(cargo->def, 0, WorldToCell16(order->pos, *(Point16*)&cargo->footprint), 1)) {
-            QueueUnitSpeech(unit, 7, "Unable to unload unit");
+            RecordUnitSpeech(unit, 7, "Unable to unload unit");
             return 9;
         }
         g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
@@ -561,7 +562,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
         return 1;
     }
     case 3:
-        QueueUnitSpeech(unit, 0xd, 0);
+        RecordUnitSpeech(unit, 0xd, 0);
         return 5;
     }
     return 7;
@@ -600,7 +601,7 @@ static inline int IsAhead(Unit* unit, Order* order)
 int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
 {
     if (flags&2) { MarkSelectionOrdersDirty(unit); return 5; }
-    if (flags&8) { QueueUnitSpeech(unit,7,"Construction terminated"); MarkSelectionOrdersDirty(unit); return 8; }
+    if (flags&8) { RecordUnitSpeech(unit,7,"Construction terminated"); MarkSelectionOrdersDirty(unit); return 8; }
     unsigned int state=0; state=order->state;
     switch(state) {
     case 0:
@@ -635,16 +636,16 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         if (flags&0x40) return 8;
         UnitDef* def=&g_game->defs[order->type];
         if (!g_seams.map->CanPlaceUnitFootprint(def,0,WorldToCell16(order->pos,*(Point16*)&g_game->defs[order->type].footprintx),1)) {
-            if (!order->retries) QueueUnitSpeech(unit,7,"Waiting for target area to clear");
-            else if (order->retries>10) { QueueUnitSpeech(unit,7,"Target area was blocked"); return 8; }
+            if (!order->retries) RecordUnitSpeech(unit,7,"Waiting for target area to clear");
+            else if (order->retries>10) { RecordUnitSpeech(unit,7,"Target area was blocked"); return 8; }
             ++order->retries;
             order->SetDeadlineTicks(30);
             return 2;
         }
         g_seams.map->SnapWorldPosToFootprint(def,&order->pos);
         order->link.SetUnit(g_seams.units->CreateUnit(unit->playerIndex,(short)order->type,order->pos,0,1,0));
-        if (!order->target) { QueueUnitSpeech(unit,7,"Unable to create any more units"); return 8; }
-        QueueUnitSpeech(unit,9,"Starting construction");
+        if (!order->target) { RecordUnitSpeech(unit,7,"Unable to create any more units"); return 8; }
+        RecordUnitSpeech(unit,9,"Starting construction");
         AddOrder("GETBUILT",1,order->target,unit,0,0,0);
         StartBuildingScript(unit,order,AngleOfVector(unit->pos.x-order->target->pos.x,unit->pos.z-order->target->pos.z)-unit->heading);
         MarkSelectionOrdersDirty(unit);
@@ -679,7 +680,7 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         return 1;
     }
     case 5:
-        QueueUnitSpeech(unit,8,"Building complete");
+        RecordUnitSpeech(unit,8,"Building complete");
         return 5;
     }
     return 7;
@@ -699,13 +700,13 @@ void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b)
 int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
 {
     if (!order->target) {
-        QueueUnitSpeech(unit, 7, "Repairs unsuccessful.");
+        RecordUnitSpeech(unit, 7, "Repairs unsuccessful.");
         return 8;
     }
     if (order->range && (int)_hypot(unit->xWhole - order->x, unit->zWhole - order->z) >= order->range)
         return 5;
     if (order->target->mode != 1) {
-        QueueUnitSpeech(unit, 7, "Repairs unsuccessful.");
+        RecordUnitSpeech(unit, 7, "Repairs unsuccessful.");
         return 5;
     }
     Vec3* dst = &order->pos;
@@ -714,7 +715,7 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
     case 0:
         if (unit->motion && (unit->def->flags1 & 0x800)) {
             if (!g_seams.units->CanRepair(unit, 0, order->target)) {
-                QueueUnitSpeech(unit, 7, "Repair mission failed");
+                RecordUnitSpeech(unit, 7, "Repair mission failed");
                 return 8;
             }
             order->AnnounceStatusIfFlagged("Repairing");
@@ -758,7 +759,7 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
         order->flags |= 8;
         return 2;
     case 3:
-        QueueUnitSpeech(unit, 10, "Unit repaired");
+        RecordUnitSpeech(unit, 10, "Unit repaired");
         return 5;
     }
     return 7;
@@ -768,7 +769,7 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
 int __stdcall VtolGetRepairedOrder(Unit* unit, Order* order, int unused)
 {
     if (order->target == 0) {
-        QueueUnitSpeech(unit, 7, "Repair aborted.");
+        RecordUnitSpeech(unit, 7, "Repair aborted.");
         return 8;
     }
     switch (order->state) {
@@ -779,7 +780,7 @@ int __stdcall VtolGetRepairedOrder(Unit* unit, Order* order, int unused)
         order->groups.started = 1;
         return 2;
     case 1:
-        QueueUnitSpeech(unit, 10, "Unit repaired");
+        RecordUnitSpeech(unit, 10, "Unit repaired");
         return 5;
     default:
         return 7;
@@ -954,7 +955,7 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
     Unit* target = order->target;
     if (target && !(flags & 0x10048)) {
         if (BelowSeaLevel(order)) {
-            QueueUnitSpeech(unit, 7, "Transport mission failed");
+            RecordUnitSpeech(unit, 7, "Transport mission failed");
             return 8;
         }
         if (unit->cargo)
@@ -963,7 +964,7 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
         case 0:
             if (unit->motion && (unit->def->flags1 & 0x800)) {
                 if (target->footprint.x > (short)unit->def->capacity) {
-                    QueueUnitSpeech(unit, 7, "Unit is too heavy to transport");
+                    RecordUnitSpeech(unit, 7, "Unit is too heavy to transport");
                     return 8;
                 }
                 order->AnnounceStatusIfFlagged("Loading");
@@ -1002,7 +1003,7 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
                 return 8;
             }
             g_seams.units->AttachUnitToPiece(target, unit, order->piece, 0);
-            QueueUnitSpeech(unit, 12, 0);
+            RecordUnitSpeech(unit, 12, 0);
             PathOrder* obj = new (kSim) PathOrder(order, unit->pos);
             obj->SetAltitude(unit->def->altitude);
             order->flags |= 0xe0;
@@ -1013,7 +1014,7 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
         }
         return 7;
     }
-    QueueUnitSpeech(unit, 7, "Transport mission failed");
+    RecordUnitSpeech(unit, 7, "Transport mission failed");
     return 8;
 }
 
@@ -1247,7 +1248,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
     int radius = ((WeaponDef*)unit->weapon)->range;
     Unit* host = order->target;
     if (!host) {
-        QueueUnitSpeech(unit, 7, "Landing aborted");
+        RecordUnitSpeech(unit, 7, "Landing aborted");
         return 8;
     }
     unsigned int state = 0;
@@ -1286,7 +1287,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         int pad = FindLandingPad(host, -1);
         order->angle = pad;
         if (pad == -1) {
-            QueueUnitSpeech(unit, 7, "Landing failed");
+            RecordUnitSpeech(unit, 7, "Landing failed");
             return 0;
         }
         PathOrder* obj = new (kSim) PathOrder(order, order->target, order->angle);
@@ -1303,7 +1304,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         int pad = FindLandingPad(host, order->angle);
         order->angle = pad;
         if (pad == -1) {
-            QueueUnitSpeech(unit, 7, "Landing aborted: all pads are occupied");
+            RecordUnitSpeech(unit, 7, "Landing aborted: all pads are occupied");
             return 0;
         }
         PathOrder* obj = new (kSim) PathOrder(order, order->target, order->angle);
@@ -1323,7 +1324,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         if (flags & 0x40)
             return 8;
         if (!g_seams.map->IsPadSlotFree(host, order->angle)) {
-            QueueUnitSpeech(unit, 7, "Landing aborted: no pads available");
+            RecordUnitSpeech(unit, 7, "Landing aborted: no pads available");
             return 0;
         }
         if (unit->cargo) {
@@ -1690,7 +1691,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
     }
         return 7;
     }
-    QueueUnitSpeech(unit,7,"Construction terminated by hostile action");
+    RecordUnitSpeech(unit,7,"Construction terminated by hostile action");
     MarkSelectionOrdersDirty(unit);
     return 8;
 }
@@ -1711,7 +1712,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
     Point16 size;
     unsigned short index = g_seams.weapons->FindFeatureAtPos(&order->pos, &cell, &size);
     if (index == 0xffff) {
-        QueueUnitSpeech(unit, 7, "Reclamation failed");
+        RecordUnitSpeech(unit, 7, "Reclamation failed");
         return 8;
     }
     Feature* f = &g_game->features[index];
@@ -1735,7 +1736,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
         if (flags & 0x40)
             return 8;
         order->time = (int)(30.0f - (f->metal + f->energy) * -0.5f);
-        QueueUnitSpeech(unit, 11, 0);
+        RecordUnitSpeech(unit, 11, 0);
         return 1;
     case 3:
         order->SetDeadlineTicks(2);
@@ -1793,11 +1794,11 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     case 0:
         if (unit->motion && (unit->def->flags1 & 0x800)) {
             if (!(unit->def->flags2 & 0x400)) {
-                QueueUnitSpeech(unit, 7, "Reclamation failed");
+                RecordUnitSpeech(unit, 7, "Reclamation failed");
                 return 7;
             }
             if (!g_seams.units->CanReclaim(unit, 0, target)) {
-                QueueUnitSpeech(unit, 7, "That unit cannot be reclaimed");
+                RecordUnitSpeech(unit, 7, "That unit cannot be reclaimed");
                 return 8;
             }
             order->AnnounceStatusIfFlagged("Reclaiming");
@@ -1814,7 +1815,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         PathOrder* obj = new (kSim) PathOrder(order, order->target->pos);
         order->SetAttachedFx(obj);
         order->flags |= 0x100e8;
-        QueueUnitSpeech(unit, 11, 0);
+        RecordUnitSpeech(unit, 11, 0);
         return 1;
     }
     case 2: {

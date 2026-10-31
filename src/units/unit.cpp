@@ -9,6 +9,7 @@
 #include "../files/files_api.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
+#include "unit_speech.h"
 
 
 struct Unit;
@@ -224,25 +225,25 @@ void Unit::SetStateBits(int mask, int set)
             lost = (unsigned char)newLost;
             if (gained & 1) {
                 ((CobScript*)script.get())->StartScript("Activate", 0, 0);
-                QueueUnitSpeech(this, 3, 0);
+                RecordUnitSpeech(this, 3, 0);
             }
             if (lost & 1) {
                 ((CobScript*)script.get())->StartScript("Deactivate", 0, 0);
-                QueueUnitSpeech(this, 4, 0);
+                RecordUnitSpeech(this, 4, 0);
             }
             if (gained & 8)
                 ((CobScript*)script.get())->StartScript("StartBuilding", 0, 0);
             if (lost & 8)
                 ((CobScript*)script.get())->StartScript("StopBuilding", 0, 0);
             if (gained & 4) {
-                QueueUnitSpeech(this, 0xe, 0);
+                RecordUnitSpeech(this, 0xe, 0);
                 for (link = head; link; link = link->next) {
                     if (link->value)
                         ((OrderBase*)link->value)->OrStatusFlags(0x10000);
                 }
             }
             if (lost & 4)
-                QueueUnitSpeech(this, 0xf, 0);
+                RecordUnitSpeech(this, 0xf, 0);
             MarkSelectionOrdersDirty(this);
             if (player->active != 0) {
                 if (player->type == 1 || player->type == 2) {

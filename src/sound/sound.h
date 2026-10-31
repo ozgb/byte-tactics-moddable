@@ -137,6 +137,7 @@ void __stdcall PlayLoopingSoundByName(char* name, int);
 int __stdcall PlaySoundFile(char* name);
 void __stdcall StopAllSounds();
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
+void __stdcall PresentUnitSpeech(Unit* unit, int kind, char* text);
 void __stdcall QueueUnitSpeechIfNotVisible(Unit* unit, int kind, char* text);
 
 #endif

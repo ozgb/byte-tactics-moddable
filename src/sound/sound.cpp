@@ -441,11 +441,16 @@ void StopAllSounds()
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text)
 {
     if (unit->playerIndex == g_game->playerIndex && (unit->flags & 0x10000000) && !(unit->flags & 0x4000)) {
-        if (text == 0) {
-            text = g_speechTypes[kind].text;
-        }
-        g_speechQueue->EnqueueSpeech(unit, kind, Translate(text));
+        PresentUnitSpeech(unit, kind, text);
     }
+}
+
+void __stdcall PresentUnitSpeech(Unit* unit, int kind, char* text)
+{
+    if (text == 0) {
+        text = g_speechTypes[kind].text;
+    }
+    g_speechQueue->EnqueueSpeech(unit, kind, Translate(text));
 }
 
 // FUNCTION: 0x47f7e0

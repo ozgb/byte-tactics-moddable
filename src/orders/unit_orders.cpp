@@ -32,6 +32,7 @@ struct UnitDef;
 #include "../units/cob_script.h"
 
 #include "../sound/sound.h"
+#include "../units/unit_speech.h"
 struct Chunk;
 class SquadManager;
 class AssaultTimer;
@@ -189,13 +190,13 @@ int __stdcall SelfDestructOrder(Unit* unit, Order* order, int flags)
     if(!order->done && unit->def->selfdestructcountdown>0) {
         int sounds[6]={22,21,20,19,18,17};
         if(flags&2) {
-            if(!(unit->flags&0x4000)) { QueueUnitSpeech(unit,23,0); return 5; }
+            if(!(unit->flags&0x4000)) { RecordUnitSpeech(unit,23,0); return 5; }
         } else {
             int count=order->count&0x0fffffff;
             if(!count) order->done=1;
             else order->count=(count-1)|0xf0000000;
             if(count>=0) {
-                QueueUnitSpeech(unit,sounds[count],0);
+                RecordUnitSpeech(unit,sounds[count],0);
                 if(count>0) {
                     order->SetDeadlineTicks(30);
                     order->flags|=2; return 1;
@@ -295,7 +296,7 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
 int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
 {
     if (order->target == 0) {
-        QueueUnitSpeech(unit, 7, "Repair aborted.");
+        RecordUnitSpeech(unit, 7, "Repair aborted.");
         return 8;
     }
     switch (order->state) {
@@ -328,7 +329,7 @@ int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
         order->flags |= 8;
         return 2;
     case 2:
-        QueueUnitSpeech(unit, 10, "Unit repaired");
+        RecordUnitSpeech(unit, 10, "Unit repaired");
         return 5;
     default:
         return 7;
@@ -373,7 +374,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         return 5;
     }
     if (flags & 8) {
-        QueueUnitSpeech(unit, 7, "Construction stopped");
+        RecordUnitSpeech(unit, 7, "Construction stopped");
         order->count--;
         UpdateBuildMenuIfFocusUnit(unit);
         return 0;
@@ -405,12 +406,12 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         }
         order->link.SetUnit(g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
         if (order->target == 0) {
-            QueueUnitSpeech(unit, 7, "Unable to create any more units");
+            RecordUnitSpeech(unit, 7, "Unable to create any more units");
             order->SetDeadlineTicks(300);
             order->flags |= 2;
             return 2;
         }
-        QueueUnitSpeech(unit, 9, "Starting construction");
+        RecordUnitSpeech(unit, 9, "Starting construction");
         g_seams.units->AttachUnitToPiece(order->target, unit, piece, 1);
         order->target->moveOrder = unit->moveOrder;
         order->target->fireOrder = unit->fireOrder;
@@ -443,7 +444,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 4:
-        QueueUnitSpeech(unit, 8, 0);
+        RecordUnitSpeech(unit, 8, 0);
         g_seams.units->SetStateBits(unit, 8, 0);
         g_seams.units->FinishConstruction(unit, order->target);
         order->link.SetUnit(0);
@@ -711,7 +712,7 @@ int __stdcall MoveGroundOrder(Unit* unit, Order* order, int flags)
         return 1;
     case 1:
         if (flags & 0x20) {
-            QueueUnitSpeech(unit, 6, 0);
+            RecordUnitSpeech(unit, 6, 0);
             return 5;
         }
         return 9;
@@ -735,7 +736,7 @@ int __stdcall AttackKamikazeOrder(Unit* unit, Order* order, unsigned flags)
         order->flags|=0xe0; return 1;
     case 1:
         if(flags&0x20) {
-            QueueUnitSpeech(unit,6,0);
+            RecordUnitSpeech(unit,6,0);
             AppendOrder(unit,new (kSim) Order("SELFDESTRUCT",0,0,1,0,0));
             return 5;
         }
@@ -944,7 +945,7 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
 {
     Unit* target = order->link.Get();
     if (!target || (flags & 0x10008)) {
-        QueueUnitSpeech(unit, 7, "Capture failed");
+        RecordUnitSpeech(unit, 7, "Capture failed");
         return 8;
     }
     unsigned int state = 0;
@@ -954,11 +955,11 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         if (!unit->motion) return 7;
         if (!(unit->def->flags2 & 0x1000)) return 7;
         if (target->def->capture) {
-            QueueUnitSpeech(unit, 7, "That unit cannot be captured");
+            RecordUnitSpeech(unit, 7, "That unit cannot be captured");
             return 8;
         }
         if (target->buildLeft != kZeroFloatOrders) {
-            QueueUnitSpeech(unit, 7, "That unit is a cloud of vapor and cannot be captured");
+            RecordUnitSpeech(unit, 7, "That unit is a cloud of vapor and cannot be captured");
             return 8;
         }
         order->AnnounceStatusIfFlagged("Capturing");
@@ -989,7 +990,7 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
     case 2:
         return WaitIfNotInBuildStance(unit, order, 0x10008);
     case 3:
-        QueueUnitSpeech(unit, 11, 0);
+        RecordUnitSpeech(unit, 11, 0);
         return 1;
     case 4: {
         if (target->motion && (target->flags & 0xc)) {
@@ -1016,7 +1017,7 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
     }
     case 5:
         g_seams.players->GiveUnitToPlayer(target, unit->player, 0);
-        QueueUnitSpeech(unit, 16, 0);
+        RecordUnitSpeech(unit, 16, 0);
         return 5;
     }
     return 7;
@@ -1046,15 +1047,15 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     case 0:
         if (unit->motion && (unit->def->flags2 & 0x400)) {
             if (!g_seams.units->CanReclaim(unit, 0, target)) {
-                QueueUnitSpeech(unit, 7, "That unit cannot be reclaimed");
-                QueueUnitSpeech(unit, 7, "Reclamation failed");
+                RecordUnitSpeech(unit, 7, "That unit cannot be reclaimed");
+                RecordUnitSpeech(unit, 7, "Reclamation failed");
                 return 8;
             }
             order->AnnounceStatusIfFlagged("Reclaiming");
             g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
             return 1;
         }
-        QueueUnitSpeech(unit, 7, "Reclamation failed");
+        RecordUnitSpeech(unit, 7, "Reclamation failed");
         return 7;
     case 1:
         if (flags & 0x20) return 1;
@@ -1071,7 +1072,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     case 3:
         return WaitIfNotInBuildStance(unit, order, 0x10008);
     case 4:
-        QueueUnitSpeech(unit, 11, 0);
+        RecordUnitSpeech(unit, 11, 0);
         return 1;
     case 5: {
         Vec3 delta = Vec3Sub(unit->pos, target->pos);
@@ -1112,13 +1113,13 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
 int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
 {
     if (!order->target) {
-        QueueUnitSpeech(unit, 7, "Repairs unsuccessful.");
+        RecordUnitSpeech(unit, 7, "Repairs unsuccessful.");
         return 5;
     }
     if (order->range && (int)_hypot(Whole(unit->pos.x) - order->start.x, Whole(unit->pos.z) - order->start.y) >= order->range)
         return 5;
     if (order->target->mode != 1) {
-        QueueUnitSpeech(unit, 7, "Repairs unsuccessful.");
+        RecordUnitSpeech(unit, 7, "Repairs unsuccessful.");
         return 5;
     }
     switch (order->state) {
@@ -1175,7 +1176,7 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
         order->flags |= 8;
         return 2;
     case 4:
-        QueueUnitSpeech(unit, 10, "Unit repaired");
+        RecordUnitSpeech(unit, 10, "Unit repaired");
         return 5;
     }
     return 7;
@@ -1186,7 +1187,7 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
 {
     Unit* target = order->link.Get();
     if (!target) {
-        QueueUnitSpeech(unit, 7, "Repairs unsuccessful.");
+        RecordUnitSpeech(unit, 7, "Repairs unsuccessful.");
         return 5;
     }
     unsigned int state = 0;
@@ -1223,7 +1224,7 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
         return 2;
     }
     case 2:
-        QueueUnitSpeech(unit, 10, "Unit repaired");
+        RecordUnitSpeech(unit, 10, "Unit repaired");
         return 5;
     }
     return 7;
@@ -1335,7 +1336,7 @@ int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
             if (!unit->motion) break;
             if (!(unit->def->flags2 & 0x100)) break;
             if (target->footprint.x > (short)unit->def->capacity) {
-                QueueUnitSpeech(unit, 7, "Unit is too large to transport"); return 8;
+                RecordUnitSpeech(unit, 7, "Unit is too large to transport"); return 8;
             }
             order->AnnounceStatusIfFlagged("Loading unit"); return 1;
         case 1: return WaitIfCobBusy((char *)unit, (char *)order, 8);
@@ -1343,7 +1344,7 @@ int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
             {
             int id = target->id;
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportPickup", 0, 1, 1, id, 0, 0, 0);
-            QueueUnitSpeech(unit, 12, 0);
+            RecordUnitSpeech(unit, 12, 0);
             ++order->attempts;
             order->SetDeadlineTicks(15); return 1;
             }
@@ -1358,14 +1359,14 @@ int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
         }
         return 7;
     }
-    QueueUnitSpeech(unit, 7, "Transport mission failed"); return 8;
+    RecordUnitSpeech(unit, 7, "Transport mission failed"); return 8;
 }
 
 // FUNCTION: 0x406900
 int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
 {
     if (flags&8) {
-        QueueUnitSpeech(unit,7,"Unloading process is proceeding non-optimally");
+        RecordUnitSpeech(unit,7,"Unloading process is proceeding non-optimally");
         return 8;
     }
     switch(order->state) {
@@ -1382,7 +1383,7 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
         return 1;
     case 1: return WaitIfCobBusy((char *)unit,(char *)order,8);
     case 2:
-        if (order->target->carrier!=unit) { QueueUnitSpeech(unit,13,0); return 5; }
+        if (order->target->carrier!=unit) { RecordUnitSpeech(unit,13,0); return 5; }
         if (order->attempts>=3) return 9;
         if ((unsigned char)(unit->def->flags1>>12)&1)
             order->AttachApproachRadiusGoal(&order->pos,(int)(unit->def->height180*1.5));
@@ -1466,7 +1467,7 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
     if (flags & 2) { MarkSelectionOrdersDirty(unit); return 5; }
     Unit* target = order->target;
     if (!target) {
-        QueueUnitSpeech(unit, 7, "Construction terminated");
+        RecordUnitSpeech(unit, 7, "Construction terminated");
         return 8;
     }
     unsigned int state = 0;
@@ -1485,7 +1486,7 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
     }
     case 1:
         if (flags & 0x40) {
-            QueueUnitSpeech(unit, 7, "I can't get there");
+            RecordUnitSpeech(unit, 7, "I can't get there");
             return 8;
         }
         if (target->buildLeft == 0.0f) return 5;
@@ -1515,7 +1516,7 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
         return 1;
     }
     case 4:
-        QueueUnitSpeech(unit, 8, "Building complete");
+        RecordUnitSpeech(unit, 8, "Building complete");
         order->flags |= 2;
         return 5;
     }
@@ -1632,7 +1633,7 @@ struct Feature;
 int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 8) {
-        QueueUnitSpeech(unit, 7, "Construction terminated");
+        RecordUnitSpeech(unit, 7, "Construction terminated");
         MarkSelectionOrdersDirty(unit);
         return 8;
     }
@@ -1662,15 +1663,15 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
             unsigned int range = 0;
             range = unit->def->buildRange;
             if (gap > (int)range) {
-                QueueUnitSpeech(unit, 7, "I can't reach the construction site");
+                RecordUnitSpeech(unit, 7, "I can't reach the construction site");
                 return 8;
             }
         }
         if (!g_seams.map->CanPlaceUnitFootprint(def, 0, WorldToCell16(order->pos, *(Point16*)&Definitions()[order->type].footprintx), 1)) {
             if (!order->retries)
-                QueueUnitSpeech(unit, 7, "Waiting for target area to clear");
+                RecordUnitSpeech(unit, 7, "Waiting for target area to clear");
             else if (order->retries > 10) {
-                QueueUnitSpeech(unit, 7, "Target area was blocked");
+                RecordUnitSpeech(unit, 7, "Target area was blocked");
                 return 8;
             }
             order->retries++;
@@ -1682,11 +1683,11 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
         ((PathOrderAttach*)((char*)order + 0x12))->SetUnit(
             g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, order->pos, 0, 1, 0));
         if (!order->target) {
-            QueueUnitSpeech(unit, 7, "Unable to create any more units");
+            RecordUnitSpeech(unit, 7, "Unable to create any more units");
             order->SetDeadlineTicks(300);
             return 2;
         }
-        QueueUnitSpeech(unit, 9, "Starting construction");
+        RecordUnitSpeech(unit, 9, "Starting construction");
         MarkSelectionOrdersDirty(unit);
         AddOrder("getbuilt", 1, order->target, unit, 0, 0, 0);
         StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &order->target->pos) - unit->heading);
@@ -1714,7 +1715,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
         return 1;
     }
     case 4:
-        QueueUnitSpeech(unit, 8, "Building complete");
+        RecordUnitSpeech(unit, 8, "Building complete");
         return 5;
     }
     return 7;
@@ -1732,7 +1733,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
     Point16 size;
     unsigned short index = g_seams.weapons->FindFeatureAtPos(&order->pos, &cell, &size);
     if (index == 0xffff) {
-        QueueUnitSpeech(unit, 7, "Reclamation failed");
+        RecordUnitSpeech(unit, 7, "Reclamation failed");
         return 8;
     }
     Feature* f = &g_game->features[index];
@@ -1760,7 +1761,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
     case 2:
         return WaitIfNotInBuildStance(unit, order, 0);
     case 3:
-        QueueUnitSpeech(unit, 11, 0);
+        RecordUnitSpeech(unit, 11, 0);
     case 4:
         order->SetDeadlineTicks(2);
         order->time -= 2;
@@ -1979,7 +1980,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
     if (order->state <= 5) {
         unsigned short index = g_seams.weapons->FindFeatureAtPos(&order->pos, &cell, &size);
         if (index == 0xffff) {
-            QueueUnitSpeech(unit, 7, "Resurrection failed");
+            RecordUnitSpeech(unit, 7, "Resurrection failed");
             return 8;
         }
         f = &g_game->features[index];
@@ -2024,11 +2025,11 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
         }
         order->unitType = g_seams.units->FindUnitTypeId(name);
         if (!order->unitType) {
-            QueueUnitSpeech(unit, 7, "Ressurection failed");
+            RecordUnitSpeech(unit, 7, "Ressurection failed");
             return 8;
         }
         order->countdown = (int)(g_game->defs[order->unitType].buildtime * 0.3 / (unit->def->buildRate / 30));
-        QueueUnitSpeech(unit, 11, 0);
+        RecordUnitSpeech(unit, 11, 0);
         return 1;
     }
     case 4:
@@ -2052,7 +2053,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
     case 5: {
         order->link.SetUnit(g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
         if (!order->target) {
-            QueueUnitSpeech(unit, 7, "Unable to create any more units");
+            RecordUnitSpeech(unit, 7, "Unable to create any more units");
             order->SetDeadlineTicks(300);
             return 2;
         }
@@ -2082,7 +2083,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
         break;
     }
     case 6: {
-        QueueUnitSpeech(unit, 8, "Resurrection complete");
+        RecordUnitSpeech(unit, 8, "Resurrection complete");
         MissionType kind = GetOrderType(8, unit, (Unit*)order->target, nullptr);
         if (kind.index)
             AppendOrder(unit, new (kSim) Order(kind, order->target, 0, 0, 0, 0));

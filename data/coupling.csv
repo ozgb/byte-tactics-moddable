@@ -1236,7 +1236,7 @@ harness,pathfinding,shared_write,Game::numPlayers,1
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
-harness,platform,call,HarnessTestMode,7
+harness,platform,call,HarnessTestMode,8
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
@@ -3195,6 +3195,7 @@ presentation,game,shared_write,Unit::flags,3
 presentation,game,shared_write,Vec3::x,3
 presentation,game,shared_write,Vec3::y,1
 presentation,game,shared_write,Vec3::z,3
+presentation,harness,call,HarnessSoundEvent,9
 presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::numPlayers,2

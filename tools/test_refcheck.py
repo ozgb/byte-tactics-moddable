@@ -227,10 +227,10 @@ class ClangTest(unittest.TestCase):
         out = rc.outside_rows(self.root, locators, classes)
         keyed = {(r["struct"], r["field"], r["holder"]): r for r in out}
         self.assertEqual(keyed[("Game", "view", "CreateGameObject")]["issue"], "#392")
-        self.assertEqual(keyed[("Item", "p", "CreateGameObject")]["issue"], "#352")
+        self.assertEqual(keyed[("Item", "p", "CreateGameObject")]["issue"], "")
         self.assertEqual(keyed[("", "", "UNITINFO")]["words"], 2)
         self.assertEqual(keyed[("", "", "UNITINFO")]["offset"], "0x47a+0x249*k")
-        self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "#352")
+        self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "")
         self.assertEqual(keyed[("SimGlobals", "table", "SimGlobals.table")]["issue"], "#596")
         self.assertEqual(len(out), 5)
 
@@ -305,7 +305,7 @@ class ClangTest(unittest.TestCase):
         out = self.hand_rows([self.hand_row("Game", "view", "load")])
         keyed = {r["field"]: r for r in out}
         self.assertEqual((keyed["view"]["kind"], keyed["view"]["issue"]), ("load", ""))
-        self.assertEqual((keyed["p"]["kind"], keyed["p"]["issue"]), ("pointer", "#352"))
+        self.assertEqual((keyed["p"]["kind"], keyed["p"]["issue"]), ("pointer", ""))
 
     def test_hand_only_code_row_survives_without_a_scan_row(self):
         row = self.hand_row("WeaponDef", "fire", "code", holder="hand", offset="+0x60")
@@ -390,7 +390,7 @@ class CheckTest(unittest.TestCase):
     def test_outside_list_out_of_date_fails(self):
         self.exceptions()
         self.outside()
-        row = {"struct": "", "field": "", "holder": "H", "offset": "0x4", "words": 1, "issue": "#352", "kind": "",
+        row = {"struct": "", "field": "", "holder": "H", "offset": "0x4", "words": 1, "issue": "#353", "kind": "",
                "note": "n"}
         problems = rc.check(self.root, make_result({}, [row]))
         self.assertEqual(len(problems), 1)
@@ -414,7 +414,7 @@ class CheckTest(unittest.TestCase):
 
     def test_load_row_with_an_issue_fails(self):
         self.exceptions()
-        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "#352",
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "#353",
                "kind": "load", "note": "n"}
         self.outside([row])
         self.assertIn("names none", rc.check(self.root, make_result({}, [row]))[0])
@@ -427,7 +427,7 @@ class CheckTest(unittest.TestCase):
         self.assertIn("expected #<number>", rc.check(self.root, make_result({}, [row]))[0])
 
     def test_load_field_drops_its_exception_row(self):
-        self.exceptions(("Game", "view", "pointer", "src/a.h", "#352"))
+        self.exceptions(("Game", "view", "pointer", "src/a.h", "#353"))
         row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
                "kind": "load", "note": "n"}
         result = make_result(found_field("Game", "view"), [row])
@@ -494,9 +494,9 @@ class IssueTest(unittest.TestCase):
     def test_outside_issue(self):
         self.assertEqual(rc.outside_issue("", "Game", "view", self.CLASSES), "#392")
         self.assertEqual(rc.outside_issue("", "Game", "gaf", self.CLASSES), "#392")
-        self.assertEqual(rc.outside_issue("", "Game", "units", self.CLASSES), "#352")
+        self.assertEqual(rc.outside_issue("", "Game", "units", self.CLASSES), "")
         self.assertEqual(rc.outside_issue("FeatureAnim.state (0x4)", "", "", self.CLASSES), "#392")
-        self.assertEqual(rc.outside_issue("UnitType.data", "", "", self.CLASSES), "#352")
+        self.assertEqual(rc.outside_issue("UnitType.data", "", "", self.CLASSES), "")
 
 
 class OffsetTest(unittest.TestCase):

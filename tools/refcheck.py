@@ -95,7 +95,7 @@ PEELED = ("ImplicitCastExpr", "ParenExpr", "CStyleCastExpr", "CXXFunctionalCastE
 REPO_DIRS = ("src/", "include/", "link/", "interfaces/")
 GAME = "Game"
 VIEW_ISSUE = "#392"
-LOADED_ISSUE = "#352"
+UNCLASSIFIED = ""
 OTHER_ISSUE = "#353"
 CONTAINER_ISSUE = "#596"
 SUBSYSTEM_ISSUES = {"units": OTHER_ISSUE, "orders": OTHER_ISSUE, "weapons": OTHER_ISSUE, "pathfinding": OTHER_ISSUE,
@@ -106,9 +106,7 @@ STRUCT_ISSUES = {"Unit": OTHER_ISSUE, "UnitDef": OTHER_ISSUE, "WeaponDef": OTHER
 OUTSIDE_ISSUES = [
     (re.compile(r"FeatureAnim\.state|view state|presentation|render cache"), VIEW_ISSUE),
     (re.compile(r"Mission order|damage table"), CONTAINER_ISSUE),
-    (re.compile(r"MovementClass|LOS table"), LOADED_ISSUE),
 ]
-OUTSIDE_DEFAULT_ISSUE = LOADED_ISSUE
 COUNTER_PATTERN = re.compile(r"^(0x[0-9a-f]+)(?:\+(0x[0-9a-f]+)\*k)?$")
 ARRAY_SUFFIX = re.compile(r"\s*\[([^\]]*)\]")
 LAYOUT_ROW = re.compile(r"^\s*(\d+)(?::\d+-\d+)? \|( *)(.*?)\s*$")
@@ -688,11 +686,11 @@ def note_about(note: str, offsets: list[int]) -> bool:
 
 def outside_issue(note: str, struct: str, top: str, classes: dict[str, str]) -> str:
     if struct == GAME:
-        return VIEW_ISSUE if classes.get(top, "") in ("view", "platform") else LOADED_ISSUE
+        return VIEW_ISSUE if classes.get(top, "") in ("view", "platform") else UNCLASSIFIED
     for pattern, issue in OUTSIDE_ISSUES:
         if pattern.search(note):
             return issue
-    return OUTSIDE_DEFAULT_ISSUE
+    return UNCLASSIFIED
 
 
 def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, str]) -> list[dict]:

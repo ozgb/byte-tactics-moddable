@@ -136,8 +136,8 @@ ModelState,shadow,pointer,src/graphics/model_types.h,#353
 NetPacketPendingEntry,next,pointer,src/network/packet_buffer.h,#353
 NetPacketPendingEntry,owner,pointer,src/network/packet_buffer.h,#353
 NetPacketPendingEntry,prev,pointer,src/network/packet_buffer.h,#353
-Object3D,faces,pointer,src/weapons/explosion_types.h,#352
-Object3D,verts,pointer,src/weapons/explosion_types.h,#352
+Object3D,faces,pointer,src/weapons/explosion_types.h,#353
+Object3D,verts,pointer,src/weapons/explosion_types.h,#353
 Object3do,child,pointer,src/graphics/object3do.h,#353
 Object3do,color,pointer,src/graphics/object3do.h,#353
 Object3do,faces,pointer,src/graphics/object3do.h,#353

@@ -48,6 +48,7 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 
 extern int g_playBufferLooping;
+void __stdcall HarnessSoundEvent(const char* kind, const void* sample, const char* file, const int* volume, const int* position);
 
 extern const GUID IID_IDirectSound3DBuffer;
 
@@ -218,6 +219,7 @@ void Sound::ReleaseDirectSound()
         streamTimer = -1;
     }
     if (stream != 0) {
+        HarnessSoundEvent("stop_stream", NULL, NULL, NULL, NULL);
         stream->Stop();
         stream->Release();
         stream = 0;
@@ -305,6 +307,7 @@ void Sound::ReapFinishedBuffers()
 // FUNCTION: 0x4cf150
 void Sound::StopAllBuffers()
 {
+    HarnessSoundEvent("stop_all", NULL, NULL, NULL, NULL);
     IDirectSoundBuffer** slot = buffers;
     for (int i = 0x20; i != 0; i--) {
         IDirectSoundBuffer* obj = *slot;
@@ -323,6 +326,7 @@ void Sound::StopAllBuffers()
 // FUNCTION: 0x4cf180
 void Sound::StopOldestBuffer()
 {
+    HarnessSoundEvent("stop_oldest", NULL, NULL, NULL, NULL);
     int i;
     for (i = 0; i < 0x20; i++) {
         if (buffers[i] != 0 && (flags[i] & 1) == 0)
@@ -577,6 +581,15 @@ int Sound::PlaySampleSet(IDirectSoundBuffer** set, LONG volume, Pos_004cf570* po
             break;
         }
     }
+    int loggedPosition[3];
+    if (use3D != 0 && pos != 0) {
+        loggedPosition[0] = pos->x;
+        loggedPosition[1] = pos->y;
+        loggedPosition[2] = pos->z;
+    }
+    int loggedVolume = volume;
+    HarnessSoundEvent(g_playBufferLooping != 0 ? "loop" : "play", set, NULL, &loggedVolume,
+                      use3D != 0 && pos != 0 ? loggedPosition : NULL);
     return 1;
 }
 
@@ -597,6 +610,7 @@ int Sound::PlayMemorySample(void* src, DWORD bytes, int sampleRate, int bits, in
                 sets[i] = 0;
                 return 0;
             }
+            HarnessSoundEvent("play_memory", NULL, NULL, NULL, NULL);
             return 1;
         }
     }
@@ -620,6 +634,7 @@ int Sound::PlayFileSample(FileHandle* file, DWORD bytes, int sampleRate, int bit
                 sets[i] = 0;
                 return 0;
             }
+            HarnessSoundEvent("play_file", NULL, NULL, NULL, NULL);
             return 1;
         }
     }

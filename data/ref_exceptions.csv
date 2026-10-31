@@ -11,7 +11,6 @@ CMemoryCache,shadow,pointer,src/graphics/memory_cache.h,#353
 CacheChunk,owner,pointer,src/graphics/memory_cache.h,#353
 CobScript,table,pointer,src/units/cob_script.h,#352
 ConnectionBlob,data,pointer,src/frontend/connection_blob.h,#353
-DamageTable,v,container,src/weapons/damage_table.h,#596
 Face,vindex,pointer,src/weapons/explosion_types.h,#352
 Feature,animTable,pointer,src/map/feature.h,#353
 Feature,anims,pointer,src/map/feature.h,#353
@@ -146,10 +145,6 @@ Layer,handler,function-pointer,src/gui/layer.h,#353
 Layer,next,pointer,src/gui/layer.h,#353
 Layer,surface,pointer,src/gui/layer.h,#353
 Layer,textHandler,function-pointer,src/gui/layer.h,#353
-LosTables,allocator,container,src/map/los_tables.h,#596
-LosTables,end,pointer,src/map/los_tables.h,#596
-LosTables,first,pointer,src/map/los_tables.h,#596
-LosTables,last,pointer,src/map/los_tables.h,#596
 MapGrid,buf,pointer,src/ingame/map_grid.h,#353
 MapGrid,count,pointer,src/ingame/map_grid.h,#353
 MapGrid,cursor,pointer,src/ingame/map_grid.h,#353
@@ -177,6 +172,8 @@ Object3do,name,pointer,src/graphics/object3do.h,#353
 Object3do,sibling,pointer,src/graphics/object3do.h,#353
 Object3do,vertices,pointer,src/graphics/object3do.h,#353
 OptionsSliderMenu,holder,pointer,src/frontend/options_slider_menu.h,#353
+OrderTableEntry,name,pointer,src/orders/order_type_entry.h,#353
+OrderTableEntry,notify,function-pointer,src/orders/order_type_entry.h,#353
 PacketBuffer,first,pointer,src/network/packet_buffer.h,#353
 PacketChannel,buffers,pointer,src/network/packet_channel.h,#353
 PacketChannel,firstPacket,pointer,src/network/packet_channel.h,#353
@@ -217,4 +214,3 @@ UnitDef,data,pointer,src/units/unit_def.h,#352
 UnitDef,weaponCategories,pointer,src/units/unit_def.h,#352
 UnitInfoSnapshot,orderName,int-pointer,src/ingame/unit_info_snapshot.h,#353
 WeaponDef,fire,pointer,src/weapons/weapon_def.h,#352
-WeaponDef,table,pointer,src/weapons/weapon_def.h,#596

@@ -1272,7 +1272,7 @@ void __stdcall RevealAroundUnit(SightQuery* params)
         FogGrid* grid = (FogGrid*)&g_game->grid1;
         if ((unsigned)x < grid->width && (unsigned)y < grid->height) {
             LosTable* table =
-                (LosTable*)g_losTables
+                g_losTables
                     .GetLosTable(
                         (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32) <
                                 (short)g_losTables.GetLosTableCount() - 1
@@ -1471,7 +1471,7 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
             return;
         if ((unsigned)y >= grid->height)
             return;
-        LosTable* table = (LosTable*)g_losTables.GetLosTable(
+        LosTable* table = g_losTables.GetLosTable(
             (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32) <
                     (short)g_losTables.GetLosTableCount() - 1
                 ? (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32)
@@ -1562,7 +1562,7 @@ void __stdcall AddLineOfSight(SightQuery* params)
             return;
         if ((unsigned)y >= grid->height)
             return;
-        LosTable* table = (LosTable*)g_losTables.GetLosTable(
+        LosTable* table = g_losTables.GetLosTable(
             (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32) <
                     (short)g_losTables.GetLosTableCount() - 1
                 ? (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32)

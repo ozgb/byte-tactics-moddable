@@ -2429,13 +2429,9 @@ static void NumberUnitHeap(unsigned char* units, unsigned count)
     }
 }
 
-typedef OrderTableEntry* SimView_g_missionOrderTableBegin;
-#undef g_missionOrderTableBegin
-#define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-
 static const char* OrderKindName(unsigned order)
 {
-    return (const char*)ReadU32At((unsigned)g_missionOrderTableBegin + *(const unsigned char*)(order + ORDER_KIND) * ORDER_TABLE_STRIDE, ORDER_TABLE_NAME);
+    return (const char*)ReadU32At((unsigned)g_missionOrderTableVec.Begin() + *(const unsigned char*)(order + ORDER_KIND) * ORDER_TABLE_STRIDE, ORDER_TABLE_NAME);
 }
 
 static int OrderPosYUnset(unsigned order)
@@ -2977,8 +2973,8 @@ static void VisitWeaponTable(const char* path, unsigned table)
     HashByte(table != 0);
     if (table == 0)
         return;
-    first = ReadU32At(table, WEAPON_TABLE_FIRST);
-    last = ReadU32At(table, WEAPON_TABLE_LAST);
+    first = ReadRefAt(table, WEAPON_TABLE_FIRST);
+    last = ReadRefAt(table, WEAPON_TABLE_LAST);
     n = first != 0 && last >= first && (last - first) % WEAPON_ENTRY_SIZE == 0
         ? (last - first) / WEAPON_ENTRY_SIZE : 0;
     if (n > VECTOR_LIMIT)
@@ -3003,7 +2999,7 @@ static void VisitWeaponDefs()
         sprintf(path, "weapons[%u]", i);
         VisitElement(path, w, &kWeaponDefDataTable);
         strcat(path, ".damage");
-        VisitWeaponTable(path, ReadU32At((unsigned)w, WEAPON_TABLE));
+        VisitWeaponTable(path, ReadRefAt((unsigned)w, WEAPON_TABLE));
     }
     EndSection();
 }

@@ -98,9 +98,14 @@ los_radar,ToggleShareLos,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 los_radar,UCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UDamageTableEntry::?$allocator::construct,StringRef::StringRef,TODO(#505): sim-to-presentation event
 los_radar,UFogCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+los_radar,ULosStep::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UPlayerInfo::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UScreenPos::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+los_radar,VLosLine::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+los_radar,VLosLine::V?$vector::?$vector::_Ucopy,HarnessTestMode,TODO(#504): engine service
+los_radar,VLosLine::V?$vector::?$vector::_Ufill,HarnessTestMode,TODO(#504): engine service
+los_radar,VLosTable::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,VSpatialBucket::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,VUnitResources::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -210,6 +215,7 @@ orders,SelfRepairOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,StopBuildingScript,SendScriptCallNoArgs,TODO(#506): sim sends a packet
 orders,TeleportOrder,EmitTeleportParticles,TODO(#505): sim-to-presentation event
 orders,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+orders,UOrderTableEntry::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,UnitMotion::SteerGroundUnit,GetHeadingBetween,TODO(#504): engine service
 orders,VMissionCondition::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -330,6 +336,7 @@ targeting,UGroup::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UKeyedCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UKeyedCell::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+targeting,UOrderTableEntry::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UPercentByte::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UPlayer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -424,6 +431,7 @@ units,SendUnitStates,BitWriter::SetByteAt,TODO(#506): sim sends a packet
 units,SendUnitStates,BitWriter::WriteBits,TODO(#506): sim sends a packet
 units,UCallback::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,UDamageTableEntry::?$allocator::construct,StringRef::StringRef,TODO(#505): sim-to-presentation event
+units,ULosStep::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,UObjectState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,UPiece::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -441,6 +449,10 @@ units,UnitScript::EmitSfx,UpdateObjectState,TODO(#505): sim-to-presentation even
 units,UpdateAllUnits,CycleCameraFollow,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,CycleSelection,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,IsKeyDown,TODO(#505): sim-to-presentation event
+units,VLosLine::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+units,VLosLine::V?$vector::?$vector::_Ucopy,HarnessTestMode,TODO(#504): engine service
+units,VLosLine::V?$vector::?$vector::_Ufill,HarnessTestMode,TODO(#504): engine service
+units,VLosTable::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VMovementClass::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VUnitCategory::?$vector::insert,StringRef::Assign,TODO(#504): engine service
@@ -494,9 +506,11 @@ weapons,ParalyzeUnit,MissionType::MissionType,TODO(#508): constructor across a s
 weapons,SpawnProjectile,GetLocalDpid,TODO(#506): sim sends a packet
 weapons,StartExplodePiece,CMemoryCache::AllocHandle,TODO(#504): engine service
 weapons,UCallback::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UDamageTableEntry::?$vector::insert,StringRef::Assign,TODO(#504): engine service
-weapons,UDamageTableEntry::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-weapons,UDamageTableEntry::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
+weapons,UDamageTable::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+weapons,UDamageTableEntry::?$BlockVector::Insert,StringRef::Assign,TODO(#504): engine service
+weapons,UDamageTableEntry::?$BlockVector::Insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
+weapons,UDamageTableEntry::?$BlockVector::Insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
+weapons,UDamageTableEntry::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UObjectState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UPiece::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UPieceRec::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service

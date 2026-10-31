@@ -53,7 +53,7 @@ struct Player;
 
 #include "../orders/order.h"
 
-#include "../orders/mission_order_table.h"
+#include "../orders/order_type_entry.h"
 
 #include "../game/game.h"
 #include "../state/sim_globals.h"
@@ -61,9 +61,6 @@ struct Player;
 #pragma pack(pop)
 
 #include "../../link/globals.h"
-typedef MissionOrderTableEntry* SimView_g_missionOrderTableBegin;
-#undef g_missionOrderTableBegin
-#define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
 
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
@@ -367,12 +364,12 @@ void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
     } else {
         pos = *(Pos*)&order->pos;
     }
-    if (g_missionOrderTableBegin[order->kind.index].markerAnim == 0) {
+    if (g_missionOrderTableVec[order->kind.index].markerAnim == 0) {
         *out = pos;
         return;
     }
     if (g_game->showRanges != 0 &&
-        (g_missionOrderTableBegin[order->kind.index].markerAnim == 1 || g_missionOrderTableBegin[order->kind.index].markerAnim == 2)) {
+        (g_missionOrderTableVec[order->kind.index].markerAnim == 1 || g_missionOrderTableVec[order->kind.index].markerAnim == 2)) {
         int color;
         if ((unsigned int)g_game->ticks & 1)
             color = g_game->colors[4];
@@ -394,7 +391,7 @@ void __stdcall DrawWeaponCoverage(void* surface, View* view, Order* order,
         if (len != 0)
             DrawRangeCircle(surface, view, &pos, len, color, "attack length", 2);
     }
-    Anim* anim = (*(Anim * (*)[21])&g_game->cursorModeSeq)[g_missionOrderTableBegin[order->kind.index].markerAnim];
+    Anim* anim = (*(Anim * (*)[21])&g_game->cursorModeSeq)[g_missionOrderTableVec[order->kind.index].markerAnim];
     unsigned int n = (unsigned int)g_game->ticks / ((unsigned int)anim->duration * 2);
     n = n % anim->count;
     void* bmp = *(void**)((char*)anim + n * 8 + 0x28);

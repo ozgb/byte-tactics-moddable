@@ -10,7 +10,8 @@
 #include "../../interfaces/ref.h"
 #include "../graphics/memory_cache.h"
 #include "../map/los_tables.h"
-#include "../map/msvc_vector.h"
+#include "../orders/order_type_entry.h"
+#include "block_vector.h"
 #include "../network/packet_manager.h"
 #include "../quirks/quirks.h"
 #include "../units/movement_class.h"
@@ -47,7 +48,7 @@ struct SimGlobals {
     Point16 g_meteorTarget;
     int g_meteorScheduleGap;
     unsigned char DAT_0051233c[4];
-    MsvcVector<int> g_missionOrderTableVec;
+    BlockVector<OrderTableEntry> g_missionOrderTableVec;
     unsigned char DAT_00512350[8];
     MovementClassTable g_movementClasses;
     unsigned char DAT_00512758[8];
@@ -168,10 +169,6 @@ static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #define g_quirks (Sim().g_quirks)
 typedef unsigned char SimType_DAT_005122f4[28];
 #define DAT_005122f4 (*reinterpret_cast<SimType_DAT_005122f4*>(reinterpret_cast<char*>(&g_meteorWeaponName) + 0x4))
-typedef char* SimType_g_missionOrderTableBegin;
-#define g_missionOrderTableBegin (*reinterpret_cast<SimType_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-typedef int SimType_g_missionOrderTableEnd;
-#define g_missionOrderTableEnd (*reinterpret_cast<SimType_g_missionOrderTableEnd*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x8))
 typedef char SimType_DAT_00512370[];
 #define DAT_00512370 (*reinterpret_cast<SimType_DAT_00512370*>(reinterpret_cast<char*>(&g_movementClasses) + 0x18))
 typedef int (__stdcall* SimType_g_packetHandlerType2)(int);

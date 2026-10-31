@@ -240,8 +240,8 @@ void __stdcall DamageUnit(Unit* source, Unit* target,
 static inline int* FindDamageValue(DamageTable* table, char* name)
 {
     DamageNameLess less;
-    DamageTableEntry* first = table->v.begin();
-    DamageTableEntry* last = table->v.end();
+    DamageTableEntry* first = table->v.Begin();
+    DamageTableEntry* last = table->v.End();
     while (first != last) {
         DamageTableEntry* mid = first + (last - first) / 2;
         if (less(mid->name.ptr, name))
@@ -249,7 +249,7 @@ static inline int* FindDamageValue(DamageTable* table, char* name)
         else
             last = mid;
     }
-    if (first == table->v.end() || less(name, first->name.ptr))
+    if (first == table->v.End() || less(name, first->name.ptr))
         return 0;
     return &first->value;
 }

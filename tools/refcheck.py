@@ -19,7 +19,7 @@ the vftable slots. A field is one of these kinds, anything else is not a pointer
 
   pointer           T *, an array of them, a reference, in nested or anonymous structs and unions too
   function-pointer  a pointer to a function or to a member
-  container         a std:: type, MsvcVector, SimVector or SyncTaggedVector: pointers inside
+  container         a std:: type, MsvcVector or SyncTaggedVector: pointers inside
   int-pointer       an integer field that code casts to a pointer (see CASTS), found in the syntax trees
   Ref<T>            allowed, not listed
 
@@ -77,7 +77,7 @@ KINDS = ("pointer", "function-pointer", "container", "int-pointer")
 DEFAULT_BUILD_DIR = ROOT / "build/modern"
 HOLDERS = {"Game": "CreateGameObject"}
 EXTRA_BLOCK = ("Game", "SimGlobals")
-CONTAINERS = ("MsvcVector", "SimVector", "SyncTaggedVector")
+CONTAINERS = ("MsvcVector", "SyncTaggedVector")
 RECORD_KINDS = ("RecordDecl", "CXXRecordDecl")
 PEELED = ("ImplicitCastExpr", "ParenExpr", "CStyleCastExpr", "CXXFunctionalCastExpr")
 REPO_DIRS = ("src/", "include/", "link/", "interfaces/")

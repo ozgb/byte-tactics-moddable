@@ -44325,10 +44325,12 @@ address,function,file,kind,target
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,call,PresentUnitSpeech
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,call,operator Unit *
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,deref_escape,*Unit
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Game::playerIndex
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Game::units
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,SimEvent::flags
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Unit::flags
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Unit::playerIndex
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,function,
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,global_read,g_game
 ,DrawClippedLine,src/graphics/draw.cpp,call,BlitLine
@@ -49406,14 +49408,11 @@ address,function,file,kind,target
 ,RecordSimEvent,src/state/sim_events.cpp,field_write,SimEventQueue::tail
 ,RecordSimEvent,src/state/sim_events.cpp,function,
 ,RecordSimEvent,src/state/sim_events.cpp,global_read,g_game
-,RecordSimEvent,src/state/sim_events.cpp,global_read,g_simEvents
+,RecordSimEvent,src/state/sim_events.cpp,global_read,g_simEvents@src/state/sim_events.cpp
 ,RecordUnitSpeech,src/state/sim_speech.h,call,RecordSimEvent
-,RecordUnitSpeech,src/state/sim_speech.h,field_read,Game::playerIndex
 ,RecordUnitSpeech,src/state/sim_speech.h,field_read,Unit::flags
 ,RecordUnitSpeech,src/state/sim_speech.h,field_read,Unit::id
-,RecordUnitSpeech,src/state/sim_speech.h,field_read,Unit::playerIndex
 ,RecordUnitSpeech,src/state/sim_speech.h,function,
-,RecordUnitSpeech,src/state/sim_speech.h,global_read,g_game
 ,RefAbs,src/harness/harness.cpp,call,SimBlockBase
 ,RefAbs,src/harness/harness.cpp,function,
 ,RefreshMapListNative,src/seams/native.cpp,call,Mission::RefreshMapList
@@ -50209,7 +50208,7 @@ address,function,file,kind,target
 ,SimEvents,src/state/sim_events.cpp,call,SimCreate
 ,SimEvents,src/state/sim_events.cpp,deref_read,*SimEventQueue
 ,SimEvents,src/state/sim_events.cpp,function,
-,SimEvents,src/state/sim_events.cpp,global_read,g_simEvents
+,SimEvents,src/state/sim_events.cpp,global_read,g_simEvents@src/state/sim_events.cpp
 ,SimEventsClear,src/state/sim_events.cpp,call,SimEvents
 ,SimEventsClear,src/state/sim_events.cpp,field_write,SimEventQueue::dropped
 ,SimEventsClear,src/state/sim_events.cpp,field_write,SimEventQueue::head
@@ -50218,8 +50217,8 @@ address,function,file,kind,target
 ,SimEventsCreate,src/state/sim_events.cpp,call,SimAllocTagged
 ,SimEventsCreate,src/state/sim_events.cpp,call,SimBlockTrack
 ,SimEventsCreate,src/state/sim_events.cpp,function,
-,SimEventsCreate,src/state/sim_events.cpp,global_escape,g_simEvents
-,SimEventsCreate,src/state/sim_events.cpp,global_write,g_simEvents
+,SimEventsCreate,src/state/sim_events.cpp,global_escape,g_simEvents@src/state/sim_events.cpp
+,SimEventsCreate,src/state/sim_events.cpp,global_write,g_simEvents@src/state/sim_events.cpp
 ,SimFree,src/state/block.cpp,call,FreeLocked
 ,SimFree,src/state/block.cpp,call,Guard::~Guard
 ,SimFree,src/state/block.cpp,field_read,AllocHooks::removed

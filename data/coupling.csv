@@ -1040,7 +1040,7 @@ game,presentation,shared_write,Game::mapWidth,6
 game,presentation,shared_write,Game::maxUnitsSetting,2
 game,presentation,shared_write,Game::mode_391f1,5
 game,presentation,shared_write,Game::numPlayers,4
-game,presentation,shared_write,Game::playerIndex,20
+game,presentation,shared_write,Game::playerIndex,21
 game,presentation,shared_write,Game::seaLevel,4
 game,presentation,shared_write,Game::ticks,36
 game,presentation,shared_write,Game::uiOptionFlags,2
@@ -1210,7 +1210,7 @@ harness,game,shared_write,Game::difficulty,4
 harness,game,shared_write,Game::localPlayer,13
 harness,game,shared_write,Game::mode_391f1,12
 harness,game,shared_write,Game::numPlayers,5
-harness,game,shared_write,Game::playerIndex,9
+harness,game,shared_write,Game::playerIndex,8
 harness,game,shared_write,LoadingFlags::value,1
 harness,game,shared_write,PlayerInfo::energy,2
 harness,game,shared_write,PlayerInfo::metal,2
@@ -1276,7 +1276,7 @@ harness,presentation,shared_write,Game::difficulty,10
 harness,presentation,shared_write,Game::localPlayer,69
 harness,presentation,shared_write,Game::mode_391f1,5
 harness,presentation,shared_write,Game::numPlayers,4
-harness,presentation,shared_write,Game::playerIndex,20
+harness,presentation,shared_write,Game::playerIndex,21
 harness,presentation,shared_write,Player::alliedBy,4
 harness,presentation,shared_write,PlayerInfo::energy,1
 harness,presentation,shared_write,PlayerInfo::metal,1
@@ -2724,7 +2724,7 @@ players,game,shared_write,Game::endGameCountdown,1
 players,game,shared_write,Game::endGameFlags,2
 players,game,shared_write,Game::localPlayer,13
 players,game,shared_write,Game::mapFlags,1
-players,game,shared_write,Game::playerIndex,9
+players,game,shared_write,Game::playerIndex,8
 players,game,shared_write,Layer::handler,3
 players,game,shared_write,Player::active,9
 players,game,shared_write,Player::allied,1
@@ -2916,7 +2916,7 @@ players,presentation,shared_write,Game::endGameFlags,2
 players,presentation,shared_write,Game::head,2
 players,presentation,shared_write,Game::localPlayer,69
 players,presentation,shared_write,Game::mapFlags,19
-players,presentation,shared_write,Game::playerIndex,20
+players,presentation,shared_write,Game::playerIndex,21
 players,presentation,shared_write,Game::tail,2
 players,presentation,shared_write,Layer::handler,47
 players,presentation,shared_write,MissionConditions::active,1

@@ -10,7 +10,7 @@
 static void DrainUnitSpeech(const SimEvent& e)
 {
     Unit* unit = &g_game->units[e.args[0]];
-    if (!(unit->flags & 0x10000000))
+    if (!(unit->flags & 0x10000000) || unit->playerIndex != g_game->playerIndex)
         return;
     if ((e.flags & SIM_EVENT_SPEECH_IF_NOT_VISIBLE) && IsUnitVisible((char*)unit))
         return;

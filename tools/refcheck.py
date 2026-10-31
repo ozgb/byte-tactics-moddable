@@ -412,7 +412,7 @@ def hand_fields(root: Path) -> frozenset:
 def block_structs(files: dict, by_name: dict, state_rows: list[dict], globals_rows: list[dict],
                   extra=EXTRA_BLOCK, hand: frozenset = frozenset()) -> set[str]:
     """The type names the state block holds: the closure from the sim and mixed rows, Game, SimGlobals, the
-    types of Game's sim and mixed fields, and the structs Game holds by value. The closure does not walk
+    types of Game's sim and mixed fields (less the ones in hand), and the structs Game holds by value. The closure does not walk
     through the (struct, field) pairs in hand, which hold loaded data or code."""
     scope = typedupes.Scope(files, by_name)
     for name, ds in by_name.items():
@@ -426,6 +426,7 @@ def block_structs(files: dict, by_name: dict, state_rows: list[dict], globals_ro
     wanted = {f for r in state_rows if r["kind"] == "game-region" and r["class"] in ("sim", "mixed")
               for f in r["name"].split("|")}
     wanted |= {f for f, (_, by_value) in fields.items() if by_value}
+    wanted -= {f for s, f in hand if s == "Game"}
     rows += [{"kind": "heap", "name": "new: " + " ".join(fields[f][0])} for f in sorted(wanted) if f in fields]
     return scope.closure(rows, {g["name"]: g for g in globals_rows})
 

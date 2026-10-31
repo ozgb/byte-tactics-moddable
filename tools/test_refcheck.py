@@ -526,6 +526,21 @@ struct Sim { Rec rec; };
     def test_closure_stops_at_a_load_pointer(self):
         self.assertEqual(self.reached(frozenset({("Rec", "desc")})), {"Sim", "Rec", "Plain"})
 
+    def test_game_field_of_loaded_data_does_not_seed_its_type(self):
+        import typedupes
+        source = "struct Model { int n; };\nstruct Game { Model *types; int tick; };\n"
+        rows = [{"kind": "game-region", "class": "sim", "name": "types"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "src").mkdir()
+            (root / "src" / "a.h").write_text(source)
+            files = typedupes.collect(root)
+            by_name = typedupes.definitions(files)
+            seeded = rc.block_structs(files, by_name, rows, [])
+            loaded = rc.block_structs(files, by_name, rows, [], hand=frozenset({("Game", "types")}))
+        self.assertIn("Model", seeded)
+        self.assertNotIn("Model", loaded)
+
     def test_hand_fields_reads_load_and_code_rows_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -61,13 +61,6 @@ static inline float GetFloat(TdfRecord* section, const char* key)
 
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 
-struct MissionRule {
-    int type;
-    int id;
-    short x;
-    short z;
-};
-
 #include "../debug/debug_lib.h"
 
 #include "../util/vec3.h"

@@ -4,7 +4,12 @@
 #include "../util/tdf.h"
 #include "../../interfaces/ref.h"
 
-struct MissionRule;
+struct MissionRule {
+    int type;
+    int id;
+    short x;
+    short z;
+};
 struct Vec3;
 
 struct MissionUnit {

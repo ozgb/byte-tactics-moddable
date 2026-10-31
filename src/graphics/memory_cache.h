@@ -2,7 +2,10 @@
 #define MEMORY_CACHE_H
 
 struct GafFrame;
-struct CacheChunk;
+struct CacheChunk {
+    void** owner;
+    int size;
+};
 struct Vec3;
 union FixedVec3Union;
 struct ModelState;

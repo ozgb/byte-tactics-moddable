@@ -32,7 +32,6 @@ struct UnitDef;
 #include "../units/cob_script.h"
 
 #include "../sound/sound.h"
-struct FrameTable;
 struct Chunk;
 class SquadManager;
 class AssaultTimer;

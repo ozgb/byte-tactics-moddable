@@ -20,20 +20,6 @@ struct SavedScript {
     int activeCount;
 };
 
-struct SavedPiece {
-    int move[3];
-    int moveSpeed[3];
-    int turn[3];
-    int turnSpeed[3];
-    int spin[3];
-    int acceleration[3];
-    int translation[3];
-    int rotation[3];
-    int visible;
-    int cached;
-    int shaded;
-};
-
 #include "../files/files_api.h"
 
 #include "../graphics/display.h"

@@ -11,7 +11,6 @@ struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;
 struct CalcedExplosion;
-struct FrameTable;
 struct Chunk;
 class DamagedAllyCollector;
 class AssaultTimer;

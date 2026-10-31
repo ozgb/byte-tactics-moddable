@@ -12,13 +12,6 @@
 struct GafEntry;
 struct Gadget;
 
-struct FontGlyphTable {
-    char unknown_0[3];
-    unsigned char first;
-    unsigned short offsets[1];
-    char unknown_6[6];
-    GafEntry* glyphs;
-};
 
 struct Gui;
 extern Gui* g_guiContext;
@@ -28,6 +21,8 @@ extern Gui* g_guiContext;
 #include "../state/sim_globals.h"
 #include "../files/files_api.h"
 #include "gadget.h"
+#include "gaf_entry.h"
+#include "font_glyph_table.h"
 #include "layer.h"
 #include "gui.h"
 
@@ -3004,11 +2999,6 @@ done:
 
 
 #pragma pack(push, 1)
-
-struct GafEntry {
-    unsigned short count;
-    unsigned short unknown_2;
-};
 
 struct Gui;
 

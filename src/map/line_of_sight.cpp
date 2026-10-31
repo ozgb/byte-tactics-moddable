@@ -19,18 +19,7 @@
 #include "../map/cell.h"
 #include "../map/tnt_info.h"
 
-struct FogCell {
-    union {
-        struct {
-            unsigned char lo;
-            unsigned char hi;
-        };
-        struct {
-            unsigned char level0;
-            unsigned char level1;
-        };
-    };
-};
+#include "grid2.h"
 
 struct FogGrid {
     Ref<FogCell> cells;
@@ -44,14 +33,6 @@ struct MapFogGrid {
     unsigned int width;
     unsigned int height;
     int count;
-};
-
-struct Rec {
-    Rec() { a = 0; b = 0; flags = 0; field_6 = 0; }
-    unsigned char a;
-    unsigned char b;
-    int flags;
-    int field_6;
 };
 
 struct PlayerGridView {
@@ -75,14 +56,7 @@ void RegisterUnitOrders();
 
 #include "../graphics/gaf_frame.h"
 
-struct FrameTable {
-    unsigned short count;
-    char unknown_2[0x28 - 2];
-    void* entries;
-};
-static_assert(sizeof(FrameTable) == 44, "");
-static_assert(offsetof(FrameTable, count) == 0, "");
-static_assert(offsetof(FrameTable, entries) == 40, "");
+#include "frame_table.h"
 
 #include "eye.h"
 

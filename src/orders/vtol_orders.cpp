@@ -48,7 +48,6 @@ struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;
 struct CalcedExplosion;
-struct FrameTable;
 struct Chunk;
 class SquadManager;
 class AssaultTimer;

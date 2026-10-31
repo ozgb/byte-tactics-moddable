@@ -391,38 +391,12 @@ def scan_unit(job: tuple[dict, bool]) -> UnitScan:
     return UnitScan(records, typedefs, by_name, by_loc, casts)
 
 
-def game_fields(by_name: dict) -> dict[str, tuple[list[str], bool]]:
-    """field -> (type identifiers, held by value) for the fields of `struct Game`, anonymous unions and structs flattened.
-
-    typedupes.Scope reads Game wherever it is defined, as this does."""
-    out = {}
-    for d in by_name.get("Game", []):
-        toks = d["toks"]
-        depth, cur = 0, []
-        for t in toks[toks.index("{") if "{" in toks else len(toks):]:
-            if t == "{":
-                depth += 1
-                cur = []
-            elif t == "}":
-                depth -= 1
-                cur = []
-            elif depth >= 1 and t == ";":
-                cut = next((k for k, x in enumerate(cur) if x in ("[", ":", "=")), len(cur))
-                head = [x for x in cur[:cut] if x == "*" or typedupes.IDENT.match(x)]
-                if len(head) > 1 and "(" not in cur and head[-1] != "*":
-                    out[head[-1]] = ([x for x in head[:-1] if x != "*"], "*" not in head)
-                cur = []
-            elif depth >= 1:
-                cur.append(t)
-    return out
-
-
 def block_structs(files: dict, by_name: dict, state_rows: list[dict], globals_rows: list[dict],
                   extra=EXTRA_BLOCK) -> set[str]:
     """The type names the state block holds: the closure from the sim and mixed rows, Game, SimGlobals, the
     types of Game's sim and mixed fields, and the structs Game holds by value."""
     scope = typedupes.Scope(files, by_name)
-    fields = game_fields(by_name)
+    fields = typedupes.game_fields(by_name)
     rows = [r for r in state_rows if r["class"] in ("sim", "mixed") and r["kind"] != "game-region"]
     rows += [{"kind": "heap", "name": "new: " + name} for name in extra]
     wanted = {f for r in state_rows if r["kind"] == "game-region" and r["class"] in ("sim", "mixed")

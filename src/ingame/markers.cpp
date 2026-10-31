@@ -53,11 +53,7 @@ struct Player;
 
 #include "../orders/order.h"
 
-struct MissionOrderTableEntry {
-    char unknown_0[0x10];
-    unsigned char markerAnim;
-    char unknown_11[0x19 - 0x11];
-};
+#include "../orders/mission_order_table.h"
 
 #include "../game/game.h"
 #include "../state/sim_globals.h"

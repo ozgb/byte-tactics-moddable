@@ -61,7 +61,6 @@ GafFrame,scratch,pointer,src/graphics/gaf_frame.h,#353
 GafRef,pic,pointer,src/weapons/explosion_types.h,#352
 GafRef,src,pointer,src/weapons/explosion_types.h,#352
 Game,alfboom1,int-pointer,src/game/game.h,#353
-Game,assemPoints,pointer,src/game/game.h,#353
 Game,buildLists,pointer,src/game/game.h,#353
 Game,build_date,pointer,src/game/game.h,#353
 Game,build_time,pointer,src/game/game.h,#353
@@ -111,7 +110,6 @@ Game,nuke1,int-pointer,src/game/game.h,#353
 Game,palette_3907f,pointer,src/game/game.h,#353
 Game,pathIcon,int-pointer,src/game/game.h,#353
 Game,pendingSaveStore,pointer,src/game/game.h,#352
-Game,projected,pointer,src/game/game.h,#353
 Game,radlogo,pointer,src/game/game.h,#353
 Game,sessions,pointer,src/game/game.h,#353
 Game,shared,pointer,src/game/game.h,#353
@@ -130,7 +128,6 @@ Game,tracked,pointer,src/game/game.h,#353
 Game,unitTable,pointer,src/game/game.h,#353
 Game,value_142f3,int-pointer,src/game/game.h,#353
 Game,vismasks,int-pointer,src/game/game.h,#353
-Game,xform,pointer,src/game/game.h,#353
 Group,units,container,src/ai/group.h,#361
 Gui,blueSlider,pointer,src/gui/gui.h,#353
 Gui,fallback,pointer,src/gui/gui.h,#353

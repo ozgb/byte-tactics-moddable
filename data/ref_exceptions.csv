@@ -161,10 +161,7 @@ PlayerFrameInfo,frame,pointer,src/network/packet_receiver.h,#353
 SpatialBucket,head,pointer,src/map/spatial_bucket.h,#353
 SpotState,bitmap,pointer,src/graphics/spot_state.h,#353
 StringRef,data,pointer,interfaces/services.h,#353
-StringRef,data,pointer,interfaces/services.h,#353
 StringRef,p,pointer,interfaces/services.h,#353
-StringRef,p,pointer,interfaces/services.h,#353
-StringRef,ptr,pointer,interfaces/services.h,#353
 StringRef,ptr,pointer,interfaces/services.h,#353
 TdfFieldList,end,pointer,interfaces/services.h,#353
 TdfFieldList,first,pointer,interfaces/services.h,#353

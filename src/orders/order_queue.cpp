@@ -225,11 +225,11 @@ void Order::OrStatusFlags(unsigned int param_1)
 }
 
 // FUNCTION: 0x438880
-void Order::AnnounceStatusIfFlagged(const char* text)
+void Order::AnnounceStatusIfFlagged(SimSpeechText text)
 {
     if (flags_42 & 0x2000) {
         flags_42 &= ~0x2000;
-        RecordUnitSpeech(unit, 5, (char*)text);
+        RecordUnitSpeech(unit, 5, text);
     }
 }
 

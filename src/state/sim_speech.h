@@ -4,10 +4,10 @@
 #include "../units/unit.h"
 #include "sim_events.h"
 
-inline void __stdcall RecordUnitSpeech(Unit* unit, int kind, char* text, unsigned int flags = 0)
+inline void __stdcall RecordUnitSpeech(Unit* unit, int kind, SimSpeechText text, unsigned int flags = 0)
 {
     if ((unit->flags & 0x10000000) && !(unit->flags & 0x4000)) {
-        unsigned int args[3] = {unit->id, (unsigned int)kind, reinterpret_cast<unsigned int>(text)};
+        unsigned int args[3] = {unit->id, (unsigned int)kind, (unsigned int)text};
         RecordSimEvent(SIM_EVENT_UNIT_SPEECH, flags, args, 3);
     }
 }

@@ -225,25 +225,25 @@ void Unit::SetStateBits(int mask, int set)
             lost = (unsigned char)newLost;
             if (gained & 1) {
                 ((CobScript*)script.get())->StartScript("Activate", 0, 0);
-                RecordUnitSpeech(this, 3, 0);
+                RecordUnitSpeech(this, 3, SIM_SPEECH_KIND_TEXT);
             }
             if (lost & 1) {
                 ((CobScript*)script.get())->StartScript("Deactivate", 0, 0);
-                RecordUnitSpeech(this, 4, 0);
+                RecordUnitSpeech(this, 4, SIM_SPEECH_KIND_TEXT);
             }
             if (gained & 8)
                 ((CobScript*)script.get())->StartScript("StartBuilding", 0, 0);
             if (lost & 8)
                 ((CobScript*)script.get())->StartScript("StopBuilding", 0, 0);
             if (gained & 4) {
-                RecordUnitSpeech(this, 0xe, 0);
+                RecordUnitSpeech(this, 0xe, SIM_SPEECH_KIND_TEXT);
                 for (link = head; link; link = link->next) {
                     if (link->value)
                         ((OrderBase*)link->value)->OrStatusFlags(0x10000);
                 }
             }
             if (lost & 4)
-                RecordUnitSpeech(this, 0xf, 0);
+                RecordUnitSpeech(this, 0xf, SIM_SPEECH_KIND_TEXT);
             MarkSelectionOrdersDirty(this);
             if (player->active != 0) {
                 if (player->type == 1 || player->type == 2) {

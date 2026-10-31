@@ -78,11 +78,60 @@ void* __stdcall LoadAnimGaf(char* name);
 enum SimEventKind : unsigned short {
     // Marks an empty record, never recorded.
     SIM_EVENT_NONE = 0,
-    // A unit speaks: the unit index, the speech kind and the address of the text key (0 for the kind's own text).
+    // A unit speaks: the unit index, the speech kind and a SimSpeechText.
     SIM_EVENT_UNIT_SPEECH = 1,
 };
 // Flag of SIM_EVENT_UNIT_SPEECH: the unit stays silent when it is on screen.
 #define SIM_EVENT_SPEECH_IF_NOT_VISIBLE 1u
+
+// The texts that go with a unit's speech line; 0 is the text of the line's kind.
+enum SimSpeechText : unsigned short {
+    SIM_SPEECH_KIND_TEXT = 0,
+    SIM_SPEECH_ATTACKING = 1,
+    SIM_SPEECH_BUILDING = 2,
+    SIM_SPEECH_BUILDING_COMPLETE = 3,
+    SIM_SPEECH_CAPTURE_FAILED = 4,
+    SIM_SPEECH_CAPTURING = 5,
+    SIM_SPEECH_CONSTRUCTION_STOPPED = 6,
+    SIM_SPEECH_CONSTRUCTION_TERMINATED = 7,
+    SIM_SPEECH_CONSTRUCTION_TERMINATED_BY_HOSTILE_ACTION = 8,
+    SIM_SPEECH_GUARDING = 9,
+    SIM_SPEECH_I_CANT_GET_THERE = 10,
+    SIM_SPEECH_I_CANT_REACH_THE_CONSTRUCTION_SITE = 11,
+    SIM_SPEECH_LANDING = 12,
+    SIM_SPEECH_LANDING_ABORTED = 13,
+    SIM_SPEECH_LANDING_ABORTED_ALL_PADS_ARE_OCCUPIED = 14,
+    SIM_SPEECH_LANDING_ABORTED_NO_PADS_AVAILABLE = 15,
+    SIM_SPEECH_LANDING_FAILED = 16,
+    SIM_SPEECH_LOADING = 17,
+    SIM_SPEECH_LOADING_UNIT = 18,
+    SIM_SPEECH_PATROLLING = 19,
+    SIM_SPEECH_PREPARING_FOR_TRANSPORT = 20,
+    SIM_SPEECH_RECLAIMING = 21,
+    SIM_SPEECH_RECLAMATION_FAILED = 22,
+    SIM_SPEECH_REPAIR_ABORTED = 23,
+    SIM_SPEECH_REPAIRING = 24,
+    SIM_SPEECH_REPAIR_MISSION_FAILED = 25,
+    SIM_SPEECH_REPAIRS_UNSUCCESSFUL = 26,
+    SIM_SPEECH_RESSURECTION_FAILED = 27,
+    SIM_SPEECH_RESURRECTION_COMPLETE = 28,
+    SIM_SPEECH_RESURRECTION_FAILED = 29,
+    SIM_SPEECH_STARTING_CONSTRUCTION = 30,
+    SIM_SPEECH_TARGET_AREA_WAS_BLOCKED = 31,
+    SIM_SPEECH_THAT_UNIT_CANNOT_BE_CAPTURED = 32,
+    SIM_SPEECH_THAT_UNIT_CANNOT_BE_RECLAIMED = 33,
+    SIM_SPEECH_THAT_UNIT_IS_A_CLOUD_OF_VAPOR_AND_CANNOT_BE_CAPTURED = 34,
+    SIM_SPEECH_TRANSPORT_MISSION_FAILED = 35,
+    SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS = 36,
+    SIM_SPEECH_UNABLE_TO_UNLOAD_UNIT = 37,
+    SIM_SPEECH_UNIT_IS_TOO_HEAVY_TO_TRANSPORT = 38,
+    SIM_SPEECH_UNIT_IS_TOO_LARGE_TO_TRANSPORT = 39,
+    SIM_SPEECH_UNIT_REPAIRED = 40,
+    SIM_SPEECH_UNLOADING = 41,
+    SIM_SPEECH_UNLOADING_PROCESS_IS_PROCEEDING_NON_OPTIMALLY = 42,
+    SIM_SPEECH_WAITING_FOR_TARGET_AREA_TO_CLEAR = 43,
+    SIM_SPEECH_TEXT_COUNT = 44,
+};
 
 // Records an event for presentation with up to six arguments; a full queue drops it and counts it, and in test mode ends the program.
 void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);

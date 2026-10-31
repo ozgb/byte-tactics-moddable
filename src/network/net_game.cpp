@@ -73,6 +73,7 @@ extern Game* g_game;
 
 #include "packets.h"
 #include "../game/statistics.h"
+#include "../frontend/reporter.h"
 #include "net_game.h"
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 #include "../graphics/display.h"
@@ -2268,6 +2269,13 @@ static inline int CommandAllowed(unsigned char* bytes)
     return 0;
 }
 
+void __stdcall PumpNetPackets()
+{
+    HandleNetPackets();
+    if (g_usePacketManager != 0)
+        g_packetManager.SendAllQueued(0);
+}
+
 // FUNCTION: 0x453d40
 int HandleNetPackets()
 {
@@ -2837,7 +2845,7 @@ struct ShareLosAckPacket {
 #pragma pack(pop)
 
 extern char g_cmdlineHostGameName[];
-extern char DAT_00512c98[];
+extern char g_userNameSetting[];
 
 void __stdcall SendPlayerEconomy(Player* from, Player* to, unsigned char flag);
 #include "../map/map_list.h"
@@ -3459,8 +3467,8 @@ int InitLobbiedConnection()
             username[0] = 0;
             if (g_cmdlineHostGameName[0] != 0) {
                 strncat(username, g_cmdlineHostGameName, 0x10);
-            } else if (DAT_00512c98[0] != 0) {
-                strncat(username, DAT_00512c98, 0x10);
+            } else if (g_userNameSetting[0] != 0) {
+                strncat(username, g_userNameSetting, 0x10);
             } else {
                 unsigned int size = host_user_name(username, 0xf);
                 if (size != 0)

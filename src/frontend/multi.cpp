@@ -536,6 +536,7 @@ void __stdcall SetFrontendState(int a, int line, char* file);
 #include "../game/settings.h"
 void __stdcall SetCursorMode(int value);
 #include "../game/statistics.h"
+#include "reporter.h"
 #include "../graphics/object_pool.h"
 int __stdcall LoadReporterDll(unsigned int* a, unsigned int* b);
 unsigned char FindHostSlot();
@@ -550,6 +551,7 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../network/unit_sync.h"
 #include "../network/unit_sync_state.h"
 #include "../map/map_list.h"
+#include "map_enum.h"
 #include "../gui/file_list.h"
 #include "options.h"
 void __stdcall RejectPlayer(int param_1, int param_2);

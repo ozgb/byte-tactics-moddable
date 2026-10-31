@@ -164,7 +164,7 @@ int UnitTable::BuildObjectPicture(ModelState* list, int param_2, int param_3)
     int h;
     int oy;
     int ox;
-    UnitDrawView* owner = list->owner;
+    UnitDrawView* owner = list->ownerView();
     MeasureModel(&w, &h, &oy, &ox, list, 0);
     if (param_2 == 0 && (owner->zBufferFlag & 1) == 0 && owner->buildLeft == 0.0f) {
         this->AllocBitmap(&list->bitmap, w, h);
@@ -196,7 +196,7 @@ void UnitTable::DrawPieces(GafFrame* bitmap, ModelState* list,
     int mode;
     GafFrame* src;
     if ((*(Flags_37f06*)&g_game->flags_37f06).bits.antiAlias) {
-        if ((list->owner->flags & 0x20000000) != 0 && useColor != 0) {
+        if ((list->ownerView()->flags & 0x20000000) != 0 && useColor != 0) {
             GafFrame* shadow = this->shadow;
             mode = 1;
             shadow->width = (unsigned short)(bitmap->width << 1);
@@ -219,7 +219,7 @@ void UnitTable::DrawPieces(GafFrame* bitmap, ModelState* list,
     for (int p = list->count - 1; p >= 0; p--) {
         if (list->pieces[p].flags.bits.visible) {
             if (useColor == -1 || useColor == list->pieces[p].flags.bits.colored
-                    || list->owner->buildLeft != 0.0f) {
+                    || list->ownerView()->buildLeft != 0.0f) {
                 Object3do* info = list->pieces[p].object;
                 int n = list->pieces[p].object->vertexCount;
                 Vec3* verts = list->pieces[p].points;
@@ -238,8 +238,8 @@ void UnitTable::DrawPieces(GafFrame* bitmap, ModelState* list,
                     }
                     vertex[k].x = x;
                     vertex[k].y = z - (y >> 1);
-                    if (mode) vertex[k].z = y/2 + shade_bias(list->owner);
-                    else vertex[k].z = y + shade_bias(list->owner);
+                    if (mode) vertex[k].z = y/2 + shade_bias(list->ownerView());
+                    else vertex[k].z = y + shade_bias(list->ownerView());
                     vertex[k].x += (short)bitmap->xOffset;
                     vertex[k].y += (short)bitmap->yOffset;
                     verts++;
@@ -350,7 +350,7 @@ void CMemoryCache::DrawObjectPieces(int param_1, ModelState* list, Vec3 v, int p
     for (int i = list->count - 1; i >= 0; i--) {
         if (list->pieces[i].flags.bits.visible) {
             DrawPiece(list, (void*)param_1, &v, list->pieces[i].object,
-                                                  list->pieces[i].points, list->owner->playerIndex, param_6);
+                                                  list->pieces[i].points, list->ownerView()->playerIndex, param_6);
         }
     }
 }
@@ -390,7 +390,7 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, ModelState* model)
     int maxY = 0;
 
     AddModelBounds(&minX, &maxX, &minY, &maxY, model, origin);
-    UnitDrawView* child = model->owner->cargo;
+    UnitDrawView* child = model->ownerView()->cargo;
     while (child != 0) {
         if ((child->flags & 0x20000) == 0) {
             int cminX = 0;
@@ -398,7 +398,7 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, ModelState* model)
             int cmaxX = 0;
             int cmaxY = 0;
             AddModelBounds(&cminX, &cmaxX, &cminY, &cmaxY, child->state, origin);
-            int* op = &model->owner->pos_x;
+            int* op = &model->ownerView()->pos_x;
             Vec3 d;
             d.x = child->pos_x - op[0];
             d.y = child->pos_y - op[1];
@@ -515,7 +515,7 @@ int CMemoryCache::ShadeByIntensity(GafFrame* image, ModelState* model)
     if (image->scratch == 0)
         return 0;
 
-    UnitDrawView* owner = model->owner;
+    UnitDrawView* owner = model->ownerView();
     if (owner->buildLeft == 0.0f)
         return 0;
 
@@ -688,7 +688,7 @@ struct ModelBuildList {
 };
 
 // FUNCTION: 0x45a950
-ModelState* __stdcall CreatePlayerObjectState(Object3do* obj, ModelBuildList* list, UnitDrawView* owner)
+ModelState* __stdcall CreatePlayerObjectState(Object3do* obj, ModelBuildList* list, Unit* owner)
 {
     int count = 1;
     if (obj->child != 0) {
@@ -974,7 +974,7 @@ void CMemoryCache::DrawPiece(ModelState* model, void* surface, Vec3* camera,
     int unit;
     Point projected[2000];
     Point poly[25];
-    UnitDrawView* view = model->owner;
+    UnitDrawView* view = model->ownerView();
     struct PieceDrawOffset { int a; int y; int b; };
     PieceDrawOffset off;
     off.a = view->pos_x - camera->x;
@@ -1042,7 +1042,7 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, ModelState* model, int color)
                 Object3do* info = piece->object;
                 Vec3* v = (Vec3*)piece->points.get();
                 for (int j = 0; j < info->vertexCount; j++, v++) {
-                    int bright = shade_bias(model->owner);
+                    int bright = shade_bias(model->ownerView());
                     int x = (short)(v->x >> 16);
                     int y = (short)(v->y >> 16);
                     int z = (short)(-v->z >> 16);
@@ -1086,10 +1086,10 @@ void CMemoryCache::DrawObjectPicture(int param_2, ModelState* model, FixedVec3Un
     FixedVec3Union cv;
     FixedVec3Union d;
     cv = v;
-    v.v[0] = model->owner->pos_x - v.v[0];
-    v.v[1] = model->owner->pos_y;
-    v.v[2] = model->owner->pos_z - cv.v[2];
-    int altitude = GetGroundHeight((FixedVec3Parts*)&model->owner->pos_x);
+    v.v[0] = model->ownerView()->pos_x - v.v[0];
+    v.v[1] = model->ownerView()->pos_y;
+    v.v[2] = model->ownerView()->pos_z - cv.v[2];
+    int altitude = GetGroundHeight((FixedVec3Parts*)&model->ownerView()->pos_x);
     int z = v.p.z.whole - (v.p.y.whole >> 1) + 0x20;
     int y = v.p.z.whole - (altitude >> 1) + 0x20;
     short dx = v.p.y.whole;
@@ -1097,11 +1097,11 @@ void CMemoryCache::DrawObjectPicture(int param_2, ModelState* model, FixedVec3Un
     if (bmp->scratch == 0) {
         Flags_37f06 gameFlags = (*(Flags_37f06*)&g_game->flags_37f06);
         if (gameFlags.whole & 4) {
-            f = model->owner->def->flags1;
+            f = model->ownerView()->def->flags1;
             if ((f & 0x2000000) == 0) {
-                if ((model->owner->flags & 0x20000000)
+                if ((model->ownerView()->flags & 0x20000000)
                     && (f & 0x40000000) == 0) {
-                    if (model->owner->unitDefIndex != 0 || dx >= g_game->seaLevel) {
+                    if (model->ownerView()->unitDefIndex != 0 || dx >= g_game->seaLevel) {
                         if (model->shadow == 0)
                             BuildShadow(model,bmp);
                         DrawFrameBlended(param_2, model->shadow, v.p.x.whole + 0x85, y);
@@ -1120,24 +1120,24 @@ void CMemoryCache::DrawObjectPicture(int param_2, ModelState* model, FixedVec3Un
             ((UnitTable*)this)->BuildObjectPicture(model, 0, 1);
             bmp = model->bitmap;
         }
-        if (!(model->owner->activateFlags & 4) && g_game->debugMode == 0)
+        if (!(model->ownerView()->activateFlags & 4) && g_game->debugMode == 0)
             DrawFrame((Surface*)param_2, bmp, v.p.x.whole + 0x80, z);
         else
             DrawFrameBlended(param_2, bmp, v.p.x.whole + 0x80, z);
         for (int i = model->count - 1; i >= 0; i--) {
             if ((1 & model->pieces[i].flags.word) && !(model->pieces[i].flags.word & 2)) {
                     DrawPiece(model, (void*)param_2, (Vec3*)&cv, model->pieces[i].object,
-                                 model->pieces[i].points, model->owner->playerIndex, useColor);
+                                 model->pieces[i].points, model->ownerView()->playerIndex, useColor);
                 }
         }
-        UnitDrawView* unit = model->owner->cargo;
+        UnitDrawView* unit = model->ownerView()->cargo;
         while (unit) {
             if (!(unit->flags & 0x20000)) {
                 for (int i = unit->state->count - 1; i >= 0; i--) {
                     ModelPiece* piece = &unit->state->pieces[i];
                     if (piece->flags.word & 1) {
                         DrawPiece(unit->state, (void*)param_2, (Vec3*)&cv, piece->object, piece->points,
-                                     unit->state->owner->playerIndex, useColor);
+                                     unit->state->ownerView()->playerIndex, useColor);
                     }
                 }
             }
@@ -1149,15 +1149,15 @@ void CMemoryCache::DrawObjectPicture(int param_2, ModelState* model, FixedVec3Un
     {
         Flags_37f06 gameFlags = (*(Flags_37f06*)&g_game->flags_37f06);
         if (gameFlags.whole & 4) {
-            f = model->owner->def->flags1;
+            f = model->ownerView()->def->flags1;
             if ((f & 0x2000000) == 0) {
                 if ((f >> 30) & 1) {
                     MakeSilhouette(bmp);
-                    CutFrameBelow(this->bitmap, shade_bias(model->owner));
+                    CutFrameBelow(this->bitmap, shade_bias(model->ownerView()));
                     DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
                 } else {
-                    if (model->owner->flags & 0x20000000) {
-                        if (model->owner->unitDefIndex != 0 || dx >= g_game->seaLevel) {
+                    if (model->ownerView()->flags & 0x20000000) {
+                        if (model->ownerView()->unitDefIndex != 0 || dx >= g_game->seaLevel) {
                             if (model->shadow == 0)
                                 BuildShadow(model,bmp);
                             DrawFrameBlended(param_2, model->shadow, v.p.x.whole + 0x85, y);
@@ -1168,7 +1168,7 @@ void CMemoryCache::DrawObjectPicture(int param_2, ModelState* model, FixedVec3Un
                                 MakeSilhouette(bmp);
                                 int diff = g_game->seaLevel - dx;
                                 if (diff > 0) {
-                                    diff += shade_bias(model->owner);
+                                    diff += shade_bias(model->ownerView());
                                     do {} while (0);
                                     CutFrameBelow(this->bitmap, diff);
                                 }
@@ -1184,15 +1184,15 @@ void CMemoryCache::DrawObjectPicture(int param_2, ModelState* model, FixedVec3Un
             bmp = model->bitmap;
         }
         MergeIntoComposite(bmp, model);
-        if ((model->owner->flags & 0x20000000) == 0 || model->owner->buildLeft == DAT_004fd4c0)
-            ((UnitTable*)this)->DrawPieces(this->bitmap,model,model->owner->playerIndex,0);
-        UnitDrawView* unit = model->owner->cargo;
+        if ((model->ownerView()->flags & 0x20000000) == 0 || model->ownerView()->buildLeft == DAT_004fd4c0)
+            ((UnitTable*)this)->DrawPieces(this->bitmap,model,model->ownerView()->playerIndex,0);
+        UnitDrawView* unit = model->ownerView()->cargo;
         while (unit) {
             if (!(unit->flags & 0x20000)) {
                 ((UnitTable*)this)->BuildObjectPicture(unit->state,1,-1);
                 if (unit->state->bitmap) {
                     ShadeByIntensity(unit->state->bitmap,unit->state);
-                    int* op = &model->owner->pos_x;
+                    int* op = &model->ownerView()->pos_x;
                     d.v[0] = unit->pos_x - op[0];
                     d.v[1] = unit->pos_y - op[1];
                     d.v[2] = unit->pos_z - op[2];
@@ -1205,16 +1205,16 @@ void CMemoryCache::DrawObjectPicture(int param_2, ModelState* model, FixedVec3Un
         }
         int diff = g_game->seaLevel - dx;
         if (diff > 0) {
-            diff += shade_bias(model->owner);
-            if ((model->owner->flags & 0x200) == 0 && model->owner->playerIndex != g_game->playerIndex) {
+            diff += shade_bias(model->ownerView());
+            if ((model->ownerView()->flags & 0x200) == 0 && model->ownerView()->playerIndex != g_game->playerIndex) {
                 CutFrameBelow(this->bitmap, diff);
             } else {
                 TintFrameBelow(this->bitmap, diff);
             }
         }
-        if ((model->owner->def->flags1 >> 30) & 1)
+        if ((model->ownerView()->def->flags1 >> 30) & 1)
             CutFrameBelow(this->bitmap, 0x7d);
-        if (!(model->owner->activateFlags & 4) && g_game->debugMode == 0)
+        if (!(model->ownerView()->activateFlags & 4) && g_game->debugMode == 0)
             DrawFrame((Surface*)param_2, this->bitmap, v.p.x.whole + 0x80, z);
         else
             DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x80, z);
@@ -1235,7 +1235,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, ModelState* list,
     int mode;
     GafFrame* src;
     if (((Flags_37f06*)&g_game->flags_37f06)->bits.antiAlias) {
-        if ((list->owner->flags & 0x20000000) != 0 && useColor != 0) {
+        if ((list->ownerView()->flags & 0x20000000) != 0 && useColor != 0) {
             GafFrame* shadow = this->shadow;
             mode = 1;
             shadow->width = (unsigned short)(bitmap->width << 1);
@@ -1258,7 +1258,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, ModelState* list,
     for (int p = list->count - 1; p >= 0; p--) {
         if (list->pieces[p].flags.bits.visible) {
             if (useColor == -1 || useColor == list->pieces[p].flags.bits.colored
-                    || list->owner->buildLeft != 0.0f) {
+                    || list->ownerView()->buildLeft != 0.0f) {
                 Vec3* verts = list->pieces[p].points;
                 Vec3* v = list->pieces[p].points;
                 info = list->pieces[p].object;
@@ -1279,8 +1279,8 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, ModelState* list,
                     int s = (k * 3) & 0x1f;
                     vertex[k].x = x;
                     vertex[k].y = z - (y >> 1);
-                    if (mode) vertex[k].z = y/2 + shade_bias(list->owner);
-                    else vertex[k].z = y + shade_bias(list->owner);
+                    if (mode) vertex[k].z = y/2 + shade_bias(list->ownerView());
+                    else vertex[k].z = y + shade_bias(list->ownerView());
                     vertex[k].shade = s;
                     vertex[k].x += (short)bitmap->xOffset;
                     vertex[k].y += (short)bitmap->yOffset;

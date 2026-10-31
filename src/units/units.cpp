@@ -14,7 +14,6 @@ class UnitMotion;
 class UnitResources;
 struct SpotStateUnitView;
 struct Object3do;
-struct UnitDrawView;
 
 #pragma pack(push, 1)
 #include "../map/cell.h"
@@ -411,7 +410,7 @@ struct BmpInfoHeader;
 #include "unit_script.h"
 
 void* __cdecl operator new(size_t size);
-SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, UnitDrawView* owner);
+SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, Unit* owner);
 #include "../graphics/model_render.h"
 
 // FUNCTION: 0x485d40
@@ -421,7 +420,7 @@ void __stdcall InitUnitScript(Unit* self)
     if (self->def->data) {
         self->script = new (kSim) UnitScript;
         ((CobScript*)self->script.get())->SetCob((ScriptTable*)self->def->data);
-        self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, (UnitDrawView*)self);
+        self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, self);
         ((UnitScript*)self->script.get())->SetObjectState((int)self->state.get());
         ((CobScript*)self->script.get())->StartScript("Create", 0, 1);
     } else {

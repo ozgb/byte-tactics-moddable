@@ -64,6 +64,7 @@ struct ModelPiece {
 };
 #pragma pack(pop)
 
+struct Unit;
 struct UnitDef;
 struct ModelState;
 
@@ -102,12 +103,15 @@ struct ModelState {
     int count;
     int cacheDrawCount;
     int animDirty;
-    Ref<UnitDrawView> owner;
+    Ref<Unit> owner;
     GafFrame* bitmap;
     GafFrame* shadow;
     Vector3s pos;
     Ref<ModelPiece> root;
     ModelPiece pieces[1];
+
+    // The draw view of the owning unit.
+    UnitDrawView* ownerView() const { return (UnitDrawView*)owner.get(); }
 };
 #pragma pack(pop)
 

@@ -4,8 +4,11 @@
 #include "cob_script.h"
 #include "../../interfaces/ref.h"
 #include "../util/vec3.h"
+#include "../graphics/model_types.h"
 
 struct Unit;
+struct GafFrame;
+struct ModelPiece;
 
 #pragma pack(push, 1)
 struct PieceState {
@@ -18,7 +21,9 @@ struct PieceState {
     unsigned short visible : 1;
     unsigned short cached : 1;
     unsigned short shaded : 1;
-    char unknown_2a[0x36 - 0x2a];
+    Ref<PieceState> sibling;
+    Ref<PieceState> child;
+    Ref<PieceState> parent;
 };
 
 struct ObjectState {
@@ -26,8 +31,10 @@ struct ObjectState {
     int unknown_4;
     int dirty;
     Ref<Unit> unit;
-    int field_10;
-    char unknown_14[0x22 - 0x14];
+    GafFrame* bitmap;
+    GafFrame* shadow;
+    Vector3s pos;
+    Ref<ModelPiece> root;
     PieceState pieces[1];
 };
 #pragma pack(pop)

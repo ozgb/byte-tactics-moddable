@@ -230,14 +230,14 @@ void UnitScript::SetPieceVisible(int index, int flag)
 void UnitScript::SetPieceCached(int index, int flag)
 {
     state->pieces[index].cached = flag;
-    state->field_10 = 0;
+    state->bitmap = 0;
 }
 
 // FUNCTION: 0x480df0
 void UnitScript::SetPieceShaded(int index, int flag)
 {
     state->pieces[index].shaded = flag;
-    state->field_10 = 0;
+    state->bitmap = 0;
 }
 
 // FUNCTION: 0x480e30

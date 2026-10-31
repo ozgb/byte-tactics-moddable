@@ -3,7 +3,7 @@
 
 #include "model_types.h"
 
-struct UnitDrawView;
+struct Unit;
 struct GafFrame;
 
 #pragma pack(push, 1)
@@ -11,7 +11,7 @@ struct SpotState {
     int count;
     int cacheDrawCount;
     int animDirty;
-    Ref<UnitDrawView> owner;
+    Ref<Unit> owner;
     GafFrame* bitmap;
     int shadow;
     Vector3s pos;

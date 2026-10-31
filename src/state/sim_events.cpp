@@ -5,6 +5,12 @@
 
 SimEventQueue* g_simEvents;
 
+void SimEventsCreate()
+{
+    g_simEvents = static_cast<SimEventQueue*>(SimAllocTagged("SIM EVENTS", sizeof(SimEventQueue)));
+    SimBlockTrack(reinterpret_cast<void**>(&g_simEvents));
+}
+
 SimEventQueue& SimEvents()
 {
     if (g_simEvents == 0)
@@ -22,14 +28,20 @@ void SimEventsClear()
 
 void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count)
 {
-    SimEventQueue& q = SimEvents();
-    if (q.tail - q.head >= kSimEventCapacity) {
+    SimEventQueue* queue = g_simEvents;
+    if (queue == 0) {
+        if (HarnessTestMode())
+            FatalError("The sim event queue does not exist.");
+        return;
+    }
+    SimEventQueue& q = *queue;
+    if (q.tail - q.head >= SIM_EVENT_CAPACITY) {
         if (HarnessTestMode())
             FatalError("The sim event queue is full.");
         q.dropped++;
         return;
     }
-    SimEvent& e = q.records[q.tail % kSimEventCapacity];
+    SimEvent& e = q.records[q.tail % SIM_EVENT_CAPACITY];
     e.kind = kind;
     e.flags = (unsigned short)flags;
     e.tick = (unsigned int)g_game->ticks;

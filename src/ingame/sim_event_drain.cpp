@@ -20,7 +20,7 @@ void DrainSimEvents()
 {
     SimEventQueue& q = SimEvents();
     while (q.head != q.tail) {
-        const SimEvent e = q.records[q.head % kSimEventCapacity];
+        const SimEvent e = q.records[q.head % SIM_EVENT_CAPACITY];
         q.head++;
         switch (e.kind) {
         case SIM_EVENT_UNIT_SPEECH:

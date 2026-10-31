@@ -44,7 +44,7 @@ struct Pair16 { short lo, hi; };
 #include "../files/files_api.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
-#include "../units/unit_speech.h"
+#include "../state/sim_speech.h"
 struct BmpFileHeader;
 struct BmpInfo;
 struct BmpInfoHeader;

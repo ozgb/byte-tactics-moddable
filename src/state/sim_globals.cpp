@@ -22,8 +22,7 @@ SimGlobals& SimCreate()
     g_simGlobals = static_cast<SimGlobals*>(mem);
     SimBlockTrack(reinterpret_cast<void**>(&g_simGlobals));
     new (mem) SimGlobals();
-    g_simEvents = static_cast<SimEventQueue*>(SimAllocTagged("SIM EVENTS", sizeof(SimEventQueue)));
-    SimBlockTrack(reinterpret_cast<void**>(&g_simEvents));
+    SimEventsCreate();
     if (!registered) {
         registered = true;
         atexit(DestroySimGlobals);

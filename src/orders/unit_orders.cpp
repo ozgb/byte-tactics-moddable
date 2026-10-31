@@ -32,7 +32,7 @@ struct UnitDef;
 #include "../units/cob_script.h"
 
 #include "../sound/sound.h"
-#include "../units/unit_speech.h"
+#include "../state/sim_speech.h"
 struct Chunk;
 class SquadManager;
 class AssaultTimer;

@@ -3,7 +3,7 @@
 
 #include "../../interfaces/services.h"
 
-const unsigned int kSimEventCapacity = 256;
+enum : unsigned int { SIM_EVENT_CAPACITY = 256 };
 
 struct SimEvent {
     unsigned short kind;
@@ -17,7 +17,7 @@ struct SimEventQueue {
     unsigned int tail;
     unsigned int dropped;
     unsigned int reserved;
-    SimEvent records[kSimEventCapacity];
+    SimEvent records[SIM_EVENT_CAPACITY];
 };
 
 static_assert(sizeof(SimEvent) == 32, "SimEvent size");
@@ -25,6 +25,8 @@ static_assert(sizeof(SimEvent) == 32, "SimEvent size");
 extern SimEventQueue* g_simEvents;
 
 SimEventQueue& SimEvents();
+
+void SimEventsCreate();
 
 void SimEventsClear();
 

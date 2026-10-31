@@ -64,7 +64,7 @@ OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTab
 #include "../network/net_game.h"
 void __stdcall SendScriptCall(Unit* obj, int index, int param_3, int param_4, int param_5, int param_6, int param_7);
 #include "../sound/sound.h"
-#include "../units/unit_speech.h"
+#include "../state/sim_speech.h"
 
 #include "../../link/globals.h"
 

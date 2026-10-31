@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4506 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4505 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -24,7 +24,7 @@ The subsystems and the issue each maps to:
 | [weapons](#weapons) | 101 | #15 |
 | [targeting](#targeting) | 11 | #16 |
 | [los_radar](#los_radar) | 90 | #17 |
-| [orders](#orders) | 374 | #18 |
+| [orders](#orders) | 373 | #18 |
 | [units](#the-remaining-subsystems) | 192 | none yet |
 | [players](#the-remaining-subsystems) | 142 | none yet |
 | [map](#the-remaining-subsystems) | 106 | none yet |
@@ -487,9 +487,9 @@ Coverage: 90.9% of functions (60 of 66), 83.4% of lines, 73.4% of branches; 6 li
 
 ## orders
 
-Issue #18. 374 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`). The largest subsystem.
+Issue #18. 373 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`). The largest subsystem.
 
-Coverage: 83.1% of functions (304 of 366), 79.4% of lines, 61.6% of branches; 62 live functions no scenario enters, and 25 more are dead (data/coverage.csv).
+Coverage: 83.1% of functions (304 of 366), 79.4% of lines, 61.6% of branches; 62 live functions no scenario enters, and 24 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (62 of 366 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 304 are entered, 83.1%), by reason:
 
@@ -670,7 +670,7 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | **weapons** | 74 of 88 | 84.1% | 87.6% | 71.7% | 14 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
 | **los_radar** | 60 of 66 | 90.9% | 83.4% | 73.4% | 6 | 23 |
-| **orders** | 304 of 366 | 83.1% | 79.4% | 61.6% | 62 | 25 |
+| **orders** | 304 of 366 | 83.1% | 79.4% | 61.6% | 62 | 24 |
 | **units** | 132 of 164 | 80.5% | 85.2% | 71.8% | 32 | 32 |
 | **players** | 75 of 142 | 52.8% | 55.3% | 45.8% | 67 | 10 |
 | **map** | 77 of 95 | 81.1% | 87.1% | 76.7% | 18 | 12 |

@@ -1,4 +1,4 @@
-#include "sim_event_drain.h"
+#include "game_dialogs.h"
 #include "selection.h"
 #include "../game/game.h"
 #include "../../link/globals.h"

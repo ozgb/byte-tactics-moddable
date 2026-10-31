@@ -939,7 +939,6 @@ void OpenMain2Layout()
 
 #include "../../interfaces/ref.h"
 #include "../harness/harness.h"
-#include "sim_event_drain.h"
 
 // FUNCTION: 0x495230
 void UpdateFramePacing()

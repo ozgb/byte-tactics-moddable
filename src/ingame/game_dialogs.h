@@ -5,6 +5,7 @@ struct Gui;
 struct Gadget;
 struct Gui;
 
+void DrainSimEvents();
 void __stdcall UpdateMetalReadout(Gui* obj, int unused);
 void __stdcall UpdateEnergyReadout(Gui* obj, int unused);
 void __stdcall GiveSelectedUnitsToPlayer(unsigned char player);

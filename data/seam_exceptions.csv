@@ -244,6 +244,7 @@ players,??__Fs_unitCategories@@YAXXZ,StringRef::ReleaseRef,TODO(#505): sim-to-pr
 players,AllocScoreTables,GameAllocIgnoreTag,TODO(#504): engine service
 players,ContinueWatchingCallback,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 players,ContinueWatchingCallback,ClearSelectedGadget,TODO(#505): sim-to-presentation event
+players,ContinueWatchingCallback,IsGadgetNamed,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,ReportGameEvent,TODO(#506): sim sends a packet
 players,E::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -258,6 +259,7 @@ players,LoadReporterDll,ReportGameEventCallback,TODO(#505): sim-to-presentation 
 players,LoadReporterDll,ShowGameMessage,TODO(#505): sim-to-presentation event
 players,LoadReporterDll,g_hapinetOnlineReport,TODO(#507): sim reads view data
 players,LoadThreadMain::0::filt$0,ExceptionFilter,TODO(#504): engine service
+players,SetupPlayerSlot,Translate,TODO(#504): engine service
 players,ShowContinueWatchingDialog,LoadGuiLayer,TODO(#505): sim-to-presentation event
 players,ShowContinueWatchingDialog,RenderLayer,TODO(#505): sim-to-presentation event
 players,ShowContinueWatchingDialog,SetKeyboardInput,TODO(#505): sim-to-presentation event
@@ -287,6 +289,7 @@ players,UpdatePlayersOnStream,OpenMessageBox,TODO(#505): sim-to-presentation eve
 players,UpdatePlayersOnStream,RenderLayer,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,SetKeyboardInput,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,SetTranslatedTextByName,TODO(#505): sim-to-presentation event
+players,UpdatePlayersOnStream,Translate,TODO(#504): engine service
 players,VMissionCondition::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VOrderFx::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -386,6 +389,7 @@ units,LoadUnitTypes,UnitTable::Construct,TODO(#505): sim-to-presentation event
 units,LoadUnitTypes,UnitTable::Initialize,TODO(#505): sim-to-presentation event
 units,MakePropList,GameAllocIgnoreTag,TODO(#504): engine service
 units,MakePropList,GetTickRate,TODO(#504): engine service
+units,MakePropList,Translate,TODO(#504): engine service
 units,PAUObject3do::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,PoseUnitModel,UpdateObjectState,TODO(#505): sim-to-presentation event
 units,ReadUnitState,BitReader::ReadBits,TODO(#506): sim sends a packet

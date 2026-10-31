@@ -3464,24 +3464,25 @@ void HarnessBeforeStep()
     }
 }
 
-void __stdcall HarnessSoundEvent(const char* kind, const void* sample, const char* file, const int* volume, const int* position)
+void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position)
 {
     if (!HarnessTestMode() || s_sound == nullptr)
         return;
-    const char* name = nullptr;
-    if (file != nullptr) {
-        name = file;
-        for (const char* p = file; *p != '\0'; p++) {
+    char text[33];
+    const char* name = file;
+    if (name == nullptr && index >= 0 && index < g_game->soundCount && index < 256) {
+        const char* source = g_game->soundNames_33e13[index][0] != '\0' ? g_game->soundNames_33e13[index] : g_game->soundFiles[index];
+        memcpy(text, source, 32);
+        text[32] = '\0';
+        name = text;
+    }
+    if (name != nullptr) {
+        const char* base = name;
+        for (const char* p = name; *p != '\0'; p++) {
             if (*p == '\\' || *p == '/')
-                name = p + 1;
+                base = p + 1;
         }
-    } else if (sample != nullptr) {
-        for (int i = 0; i < g_game->soundCount && i < 256; i++) {
-            if (g_game->sounds[i] == sample) {
-                name = g_game->soundNames_33e13_4000[i];
-                break;
-            }
-        }
+        name = base;
     }
     if (name == nullptr || name[0] == '\0')
         name = "-";

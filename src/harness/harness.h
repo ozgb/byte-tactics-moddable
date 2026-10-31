@@ -10,6 +10,6 @@ void __stdcall HarnessStartSkirmish();
 void __stdcall HarnessAfterStep();
 void __stdcall HarnessBeforeStep();
 void __stdcall HarnessPhase(int phase);
-void __stdcall HarnessSoundEvent(const char* kind, const void* sample, const char* file, const int* volume, const int* position);
+void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position);
 
 #endif

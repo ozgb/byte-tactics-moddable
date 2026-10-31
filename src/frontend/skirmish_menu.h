@@ -25,5 +25,6 @@ void __stdcall HandleSkirmishCheatText(Gui* menu);
 void __stdcall OpenSkirmishMenu(void);
 
 void __stdcall AnnounceForcesDestroyed(Player* player);
+void __stdcall AnnouncePlayerTookLead(const char* name, int kills);
 
 #endif

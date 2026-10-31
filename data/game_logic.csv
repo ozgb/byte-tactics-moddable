@@ -636,8 +636,6 @@ address,function,file
 0x465e30,InitPlayerResources,src/game/players.cpp
 0x465fb0,LoadPlayerControllers,src/game/players.cpp
 0x466050,LoadPlayers,src/game/players.cpp
-0x466780,BuildRadarPicture,src/map/radar.cpp
-0x4669b0,InitRadar,src/map/radar.cpp
 0x466b00,DrawRadar,src/map/radar.cpp
 0x466b70,CalcRadarViewportRect,src/map/radar.cpp
 0x466c20,UpdateRadarMapped,src/map/radar.cpp

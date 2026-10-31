@@ -149,6 +149,7 @@ int __stdcall JoinNetGame(V4i v, int idx);
 void __stdcall FinishUnitSync(void);
 #include "../network/unit_sync.h"
 #include "../game/statistics.h"
+#include "reporter.h"
 #include "endgame.h"
 void __stdcall SetFrontendState(char state, int line, char* file);
 void* __stdcall LoadBitmapByName(const char* name, int param_2);

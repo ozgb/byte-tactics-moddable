@@ -614,6 +614,7 @@ void __stdcall UpdateSkirmishMapSelection(Gui* menu, Gadget* unused)
 }
 
 #include "../map/map_list.h"
+#include "map_enum.h"
 #include "../debug/debug_lib.h"
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "../gui/file_list.h"
@@ -1094,4 +1095,11 @@ void __stdcall AnnounceForcesDestroyed(Player* player)
         side = "Arm";
     sprintf(buf, "%s %s", side, Translate(g_forcesDestroyedTexts[(unsigned int)HarnessViewRand() % 3]));
     AddMessage(buf, 4, 0, player->index);
+}
+
+void __stdcall AnnouncePlayerTookLead(const char* name, int kills)
+{
+    char text[100];
+    sprintf(text, Translate(g_takenLeadFormat), name, kills);
+    AddMessage(text, 2, 0, 10);
 }

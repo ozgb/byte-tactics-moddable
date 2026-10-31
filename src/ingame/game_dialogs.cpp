@@ -91,6 +91,13 @@ extern int g_cdActivityRingWriteIdx;
 extern int g_cdActivitySampleRing[];
 extern int g_lastCdActivityMode;
 extern int g_usePacketManager;
+extern char g_yesNoGuiName[];
+extern char g_choice1GadgetName[];
+extern char g_choice2GadgetName[];
+extern char g_titleGadgetName[];
+extern char g_continueWatchingTitle[];
+extern char g_yesText[];
+extern char g_noText[];
 
 Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
 #include "../frontend/options.h"
@@ -1120,5 +1127,23 @@ void __stdcall HandleDebugHotkey(int eventType)
     }
     default:
         break;
+    }
+}
+
+// FUNCTION: 0x464e70
+void ShowContinueWatchingDialog()
+{
+    Layer* screen = LoadGuiLayer(&g_game->gui, g_yesNoGuiName, 0x900);
+    if (screen) {
+        Gadget* form;
+        SetKeyboardInput(&g_game->gui, 1);
+        form = screen->entries;
+        SetTranslatedTextByName(&g_game->gui, g_choice1GadgetName, g_yesText, 0);
+        SetTranslatedTextByName(&g_game->gui, g_choice2GadgetName, g_noText, 0);
+        SetTranslatedTextByName(&g_game->gui, g_titleGadgetName, g_continueWatchingTitle, 0);
+        strcpy(form->u.names.choice, g_choice1GadgetName);
+        strcpy(form->u.names.choice2, g_choice2GadgetName);
+        screen->handler = ContinueWatchingCallback;
+        RenderLayer(&g_game->gui, 0x40);
     }
 }

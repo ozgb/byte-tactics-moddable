@@ -904,6 +904,15 @@ def merge(results: list[list[list]]) -> list[list[str]]:
     return [list(row) for row in sorted(rows, key=order)]
 
 
+def duplicate_markers(rows: list[list[str]]) -> dict[str, list[tuple[str, str]]]:
+    """Each address that marks the definitions of two different functions, with those functions."""
+    owners: dict[str, set[tuple[str, str]]] = {}
+    for address, name, file, kind, _ in rows:
+        if address and kind == "function":
+            owners.setdefault(address, set()).add((name, file))
+    return {a: sorted(o) for a, o in sorted(owners.items()) if len(o) > 1}
+
+
 def render(rows: list[list[str]]) -> str:
     out = io.StringIO()
     writer = csv.writer(out, lineterminator="\n")
@@ -924,7 +933,13 @@ def generate(build_dir: Path, jobs: int, only: list[str]) -> tuple[str, int]:
     with ProcessPoolExecutor(max_workers=jobs) as pool:
         results = list(pool.map(analyse, [(ROOT, argv, directory) for _, argv, directory in commands],
                                 chunksize=4))
-    return render(merge(results)), len(commands)
+    rows = merge(results)
+    clashes = duplicate_markers(rows)
+    if clashes:
+        raise SystemExit("rwsets: one // FUNCTION: address marks two definitions (a new function has no address):\n"
+                         + "\n".join("  %s: %s" % (a, ", ".join("%s (%s)" % f for f in fs))
+                                      for a, fs in clashes.items()))
+    return render(rows), len(commands)
 
 
 def main() -> None:

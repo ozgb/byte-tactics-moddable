@@ -419,6 +419,7 @@ src/units/unit_script.cpp,src/graphics/particles.h,#392
 src/units/unit_scripts.cpp,src/graphics/model_render.h,#392
 src/units/unit_scripts.cpp,src/graphics/spot_state.h,#392
 src/units/unit_scripts.cpp,src/sound/sound.h,#392
+src/units/unit_targets.cpp,interfaces/host.h,#392
 src/units/unit_targets.cpp,src/graphics/display.h,#392
 src/units/unit_targets.cpp,src/ingame/game_dialogs.h,#392
 src/units/unit_types.cpp,src/graphics/display.h,#392

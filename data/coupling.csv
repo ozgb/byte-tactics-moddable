@@ -718,7 +718,8 @@ game,platform,call,ToggleFullScreen,2
 game,platform,call,Translate,7
 game,platform,call,UpdateTimers,1
 game,platform,call,host_alert,1
-game,platform,call,host_crash_report,1
+game,platform,call,host_crash_report,3
+game,platform,call,host_crash_set_cleanup,1
 game,platform,call,host_debug_break,1
 game,platform,call,host_dir_set_current,1
 game,platform,call,host_file_close,3
@@ -846,7 +847,6 @@ game,presentation,call,EmptyPreFrontendInitHook,1
 game,presentation,call,EnableEndMissionButtons,1
 game,presentation,call,EnableKeyCommands,4
 game,presentation,call,EnterMainMenuState,1
-game,presentation,call,ExceptionFilter,2
 game,presentation,call,FadeRectangle,1
 game,presentation,call,FillEndGameStatistics,1
 game,presentation,call,FindGadgetChecked,5
@@ -3455,7 +3455,6 @@ presentation,platform,call,VectorFromToInt,1
 presentation,platform,call,WorldToCell,2
 presentation,platform,call,host_atomic_exchange,10
 presentation,platform,call,host_clipboard_text_get,1
-presentation,platform,call,host_crash_report,1
 presentation,platform,call,host_cursor_get,5
 presentation,platform,call,host_cursor_set,1
 presentation,platform,call,host_display_close,1

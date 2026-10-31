@@ -53,7 +53,6 @@ los_radar,BuildRadarPicture,DrawPixel,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,FreeSurface,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,g_radarPicTempName,TODO(#507): sim reads view data
 los_radar,BuildRadarPicture,g_radarPictureName,TODO(#507): sim reads view data
-los_radar,CmdLOS,SaveSettings,TODO(#504): engine service
 los_radar,CmdShareMapping,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 los_radar,CmdShareRadar,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 los_radar,D::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -216,7 +215,6 @@ players,LoadReporterDll,RISetCallbacks,TODO(#506): sim sends a packet
 players,LoadReporterDll,ReportGameEventCallback,TODO(#505): sim-to-presentation event
 players,LoadReporterDll,ShowGameMessage,TODO(#505): sim-to-presentation event
 players,LoadReporterDll,g_hapinetOnlineReport,TODO(#507): sim reads view data
-players,LoadThreadMain::0::filt$0,ExceptionFilter,TODO(#504): engine service
 players,ShowContinueWatchingDialog,LoadGuiLayer,TODO(#505): sim-to-presentation event
 players,ShowContinueWatchingDialog,RenderLayer,TODO(#505): sim-to-presentation event
 players,ShowContinueWatchingDialog,SetKeyboardInput,TODO(#505): sim-to-presentation event

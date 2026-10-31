@@ -215,7 +215,7 @@ guard:
     memset(bref, 0, sz);
     g_seams.ai->CreateSquads(p);
     if (!p->active || p->type != 3) {
-        p->ai = new (kSim) SquadManager(p);
+        p->ai = g_seams.ai->CreateSquadManager(p);
         g_seams.ai->CreatePlayerAI(p->index);
     }
 }

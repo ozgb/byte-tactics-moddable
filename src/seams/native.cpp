@@ -202,6 +202,11 @@ static void __fastcall SquadManagerDeleteTimersNative(SquadManager* self, int un
     self->DeleteTimers();
 }
 
+static SquadManager* __stdcall CreateSquadManagerNative(Player* player)
+{
+    return new (kSim) SquadManager(player);
+}
+
 static void __stdcall UnitTypeSetAddTypeOrCategoryNative(UnitTypeSet* self, char* text, int* out)
 {
     self->AddTypeOrCategory(text, out);
@@ -457,6 +462,21 @@ static void __fastcall DestroyMotionObjectNative(UnitMotion* self)
     self->DestroyObject();
 }
 
+static UnitMotion* __stdcall NewUnitMotionNative(Unit* unit)
+{
+    return new (kSim) UnitMotion(unit);
+}
+
+static Order* __stdcall LoadOrderNative(Unit* unit, HapiBank* file, char* name)
+{
+    return new (kSim) Order(unit, file, name);
+}
+
+static MissionType __stdcall MissionTypeFromNameNative(const char* name)
+{
+    return MissionType(name);
+}
+
 static void __fastcall LoadMotionNative(UnitMotion* self, int unusedEdx, Unit* unit, HapiBank* file)
 {
     self->LoadMotion(unit, file);
@@ -515,6 +535,11 @@ static void __stdcall AbortIfGoalMatchNative(Pathfinder* self, AiSearchGoal* goa
 static void __stdcall DestroyPathfinderNative(Pathfinder* self)
 {
     delete self;
+}
+
+static Pathfinder* __stdcall CreatePathfinderNative()
+{
+    return new (kSim) Pathfinder;
 }
 
 Seams g_seams;
@@ -724,6 +749,7 @@ void InstallNativeSeams()
     s_pathfinding.RunSearches = RunSearchesNative;
     s_pathfinding.AbortIfGoalMatch = AbortIfGoalMatchNative;
     s_pathfinding.Destroy = DestroyPathfinderNative;
+    s_pathfinding.Create = CreatePathfinderNative;
     s_orders.AiSearchGoalSetWaypoints = AiSearchGoalSetWaypointsNative;
     s_orders.OrderFxAddFlags = OrderFxAddFlagsNative;
     s_units.MovementClassGet = MovementClassGetNative;
@@ -783,6 +809,7 @@ void InstallNativeSeams()
     s_ai.SetUnitSquad = SetUnitSquad;
     s_ai.SquadManagerTickIfActive = SquadManagerTickIfActiveNative;
     s_ai.SquadManagerDeleteTimers = SquadManagerDeleteTimersNative;
+    s_ai.CreateSquadManager = CreateSquadManagerNative;
     s_map.CanBuildAt = CanBuildAt;
     s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
     s_orders.AddOrder = AddOrder;
@@ -903,6 +930,9 @@ void InstallNativeSeams()
     s_orders.RunOrders = RunOrders;
     s_orders.RunSecondaryOrders = RunSecondaryOrders;
     s_orders.DestroyMotionObject = DestroyMotionObjectNative;
+    s_orders.NewUnitMotion = NewUnitMotionNative;
+    s_orders.LoadOrder = LoadOrderNative;
+    s_orders.MissionTypeFromName = MissionTypeFromNameNative;
     s_orders.LoadMotion = LoadMotionNative;
     s_orders.SaveMotion = SaveMotionNative;
     s_orders.UpdateMotion = UpdateMotionNative;

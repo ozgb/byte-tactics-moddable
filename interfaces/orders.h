@@ -14,7 +14,7 @@ class MissionType;
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
 #define ORDERS_VERSION_MAJOR 1
 // Minor version of the orders interface, changed when a slot is added.
-#define ORDERS_VERSION_MINOR 5
+#define ORDERS_VERSION_MINOR 6
 
 // Unit orders and command queues.
 struct OrdersSeam {
@@ -60,6 +60,12 @@ struct OrdersSeam {
     void (__stdcall* CreatePathfinder)(void);
     // Destroys the pathfinder of a game and clears it in the game state. Hooks: none.
     void (__stdcall* DestroyPathfinder)(void);
+    // Allocates the movement of a unit from the sim block, builds it and returns it. Hooks: none.
+    UnitMotion* (__stdcall* NewUnitMotion)(Unit* unit);
+    // Allocates an order from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
+    Order* (__stdcall* LoadOrder)(Unit* unit, HapiBank* file, char* name);
+    // Returns the order kind a name in the order type table stands for. Hooks: none.
+    MissionType (__stdcall* MissionTypeFromName)(const char* name);
 };
 
 #endif

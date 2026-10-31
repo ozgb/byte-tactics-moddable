@@ -7,7 +7,7 @@ class AiSearchGoal;
 // Major version of the pathfinding interface, changed when a slot is removed or its signature changes.
 #define PATHFINDING_VERSION_MAJOR 1
 // Minor version of the pathfinding interface, changed when a slot is added.
-#define PATHFINDING_VERSION_MINOR 1
+#define PATHFINDING_VERSION_MINOR 2
 
 // Unit movement planning.
 struct PathfindingSeam {
@@ -17,6 +17,8 @@ struct PathfindingSeam {
     void (__stdcall* AbortIfGoalMatch)(Pathfinder* self, AiSearchGoal* goal);
     // Destroys a pathfinder and releases its memory. Hooks: none.
     void (__stdcall* Destroy)(Pathfinder* self);
+    // Allocates a pathfinder from the sim block, builds it and returns it. Hooks: none.
+    Pathfinder* (__stdcall* Create)(void);
 };
 
 #endif

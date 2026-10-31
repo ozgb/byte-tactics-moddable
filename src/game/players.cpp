@@ -431,6 +431,48 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
     }
 }
 
+// FUNCTION: 0x456850
+unsigned char FindHostSlot()
+{
+    unsigned char i;
+    for (i = 0; i < 10; i++) {
+        if (g_game->players[i].type != 0 && (g_game->players[i].info->flags_97 & 1))
+            return i;
+    }
+    return 10;
+}
+
+// FUNCTION: 0x457bc0
+int CountActiveAIPlayers()
+{
+    int count = 0;
+    for (int i = 0; i < 10; i++) {
+        if (g_game->players[i].active != 0
+            && g_game->players[i].type == 2
+            && g_game->players[i].index != 10
+            && (g_game->players[i].unitCount != 0 || g_game->players[i].unitsCreated == 0))
+            count++;
+    }
+    return count;
+}
+
+// FUNCTION: 0x457cb0
+int CountCombatPlayers()
+{
+    int count = 0;
+    for (int i = 0; i < 10; i++) {
+        if (g_game->players[i].active != 0
+            && (g_game->players[i].type == 1 || g_game->players[i].type == 2 || g_game->players[i].type == 3)
+            && g_game->players[i].index != 10
+            && (g_game->players[i].unitCount != 0 || g_game->players[i].unitsCreated == 0)
+            && (g_game->players[i].type == 1
+                || (g_game->players[i].type == 3 && g_game->players[i].info->kind == 1))
+            && !(g_game->players[i].info->flags_9b & 0x40))
+            count++;
+    }
+    return count;
+}
+
 #include "../network/unit_sync.h"
 void __stdcall PlaySoundByName(char* str, int flag);
 #include "../gui/dialogs.h"
@@ -479,8 +521,6 @@ void ShowContinueWatchingDialog()
     }
 }
 
-
-unsigned char __stdcall FindHostSlot();
 #include "../util/math.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                            Vec3 pos, int a, int b, int c);

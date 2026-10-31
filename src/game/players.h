@@ -30,6 +30,10 @@ void __stdcall InitPlayerResources();
 void __stdcall LoadPlayerControllers(HapiBank* file);
 void __stdcall UpdateBlink();
 
+unsigned char FindHostSlot();
+int CountActiveAIPlayers();
+int CountCombatPlayers();
+
 void __stdcall LoadPlayers(HapiBank* file);
 void __stdcall SavePlayers(HapiBank* file);
 

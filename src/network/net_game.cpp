@@ -166,20 +166,6 @@ int GetLocalHumanDpid()
     return -1;
 }
 
-#pragma auto_inline(off)
-// FUNCTION: 0x44fe40
-unsigned char __stdcall FindSlotByDpid(int id)
-{
-    if (id != -1) {
-        for (unsigned char i = 0; i < 10; i++) {
-            if (GetSlotDpid(i) == id)
-                return i;
-        }
-    }
-    return 10;
-}
-#pragma auto_inline(on)
-
 // FUNCTION: 0x44feb0
 unsigned char __stdcall GetPlayerSlot(Player* player)
 {
@@ -196,16 +182,6 @@ Player* __stdcall FindPlayerByDpid(int id)
         return 0;
     return &g_game->players[FindSlotByDpid(id)];
 }
-
-#pragma auto_inline(off)
-// FUNCTION: 0x44ffd0
-int __stdcall GetSlotDpid(unsigned char index)
-{
-    if (index != 10 && g_game->players[index].type != 0)
-        return g_game->players[index].id;
-    return -1;
-}
-#pragma auto_inline(on)
 
 // FUNCTION: 0x450010
 int __stdcall GetPlayerDpid(Player* obj)
@@ -3063,17 +3039,6 @@ int AreAllPlayersReady()
     return all == 0;
 }
 
-// FUNCTION: 0x456850
-unsigned char FindHostSlot()
-{
-    unsigned char i;
-    for (i = 0; i < 10; i++) {
-        if (g_game->players[i].type != 0 && (g_game->players[i].info->flags_97 & 1))
-            return i;
-    }
-    return 10;
-}
-
 // FUNCTION: 0x4568b0
 void __stdcall ReportPacketGap(int, int, int)
 {
@@ -3600,20 +3565,6 @@ int CountLocalComputerPlayers()
     return count;
 }
 
-// FUNCTION: 0x457bc0
-int CountActiveAIPlayers()
-{
-    int count = 0;
-    for (int i = 0; i < 10; i++) {
-        if (g_game->players[i].active != 0
-            && g_game->players[i].type == 2
-            && g_game->players[i].index != 10
-            && (g_game->players[i].unitCount != 0 || g_game->players[i].unitsCreated == 0))
-            count++;
-    }
-    return count;
-}
-
 // FUNCTION: 0x457c10
 int CountActiveHumanOrAiPlayers()
 {
@@ -3636,23 +3587,6 @@ int CountRemotePlayers()
     for (int i = 0; i < 10; i++) {
         Player* p = &g_game->players[i];
         if (p->active != 0 && p->type == 3)
-            count++;
-    }
-    return count;
-}
-
-// FUNCTION: 0x457cb0
-int CountCombatPlayers()
-{
-    int count = 0;
-    for (int i = 0; i < 10; i++) {
-        if (g_game->players[i].active != 0
-            && (g_game->players[i].type == 1 || g_game->players[i].type == 2 || g_game->players[i].type == 3)
-            && g_game->players[i].index != 10
-            && (g_game->players[i].unitCount != 0 || g_game->players[i].unitsCreated == 0)
-            && (g_game->players[i].type == 1
-                || (g_game->players[i].type == 3 && g_game->players[i].info->kind == 1))
-            && !(g_game->players[i].info->flags_9b & 0x40))
             count++;
     }
     return count;

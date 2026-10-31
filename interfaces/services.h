@@ -53,6 +53,11 @@ void __stdcall CopyDwordIfNonNull(int* dest, int* src);
 // Arranges a range of path search entries into a heap.
 void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int*, HeapEntry*);
 
+// Returns the net id of the player in a slot, or -1 for an empty slot.
+int __stdcall GetSlotDpid(unsigned char index);
+// Returns the slot of the player with a net id, or 10 when there is none.
+unsigned char __stdcall FindSlotByDpid(int id);
+
 // Returns the translation of a key.
 char* __stdcall Translate(const char* key);
 // Returns the index of a translation key.

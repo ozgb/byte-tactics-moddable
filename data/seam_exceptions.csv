@@ -496,15 +496,15 @@ weapons,InitExplosions,g_explosion2Duration,TODO(#507): sim reads view data
 weapons,InitExplosions,g_explosion2EndSize,TODO(#507): sim reads view data
 weapons,InitExplosions,g_explosion2StartSize,TODO(#507): sim reads view data
 weapons,LoadWeaponType,Load3do,TODO(#505): sim-to-presentation event
-weapons,LoadWeaponType,LoadAnimGaf,TODO(#504): engine service
-weapons,LoadWeaponType,LoadSoundByName,TODO(#504): engine service
+weapons,LoadWeaponType,LoadAnimGaf,TODO(#505): sim-to-presentation event
+weapons,LoadWeaponType,LoadSoundByName,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponType,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponType,StringRef::StringRef,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponTypes,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponTypes,UsesDataArchives,TODO(#504): engine service
 weapons,ParalyzeUnit,MissionType::MissionType,TODO(#508): constructor across a seam
 weapons,SpawnProjectile,GetLocalDpid,TODO(#506): sim sends a packet
-weapons,StartExplodePiece,CMemoryCache::AllocHandle,TODO(#504): engine service
+weapons,StartExplodePiece,CMemoryCache::AllocHandle,TODO(#505): sim-to-presentation event
 weapons,UCallback::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UDamageTable::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UDamageTableEntry::?$BlockVector::Insert,StringRef::Assign,TODO(#504): engine service

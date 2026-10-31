@@ -5,22 +5,13 @@ ai,PlayerAI::FindCellNearFeatures,GetBuildSiteMetal,TODO(#505): sim-to-presentat
 ai,PlayerAI::FindRandomPlacementCell,GetBuildSiteMetal,TODO(#505): sim-to-presentation event
 ai,ReactToAttack,QueueUnitSpeechIfNotVisible,TODO(#505): sim-to-presentation event
 economy,??_GUnitScript@@UAEPAXI@Z,CobScript::~CobScript,TODO(#508): constructor across a seam
-economy,CmdShareEnergy,BroadcastPlayerInfo,TODO(#506): sim sends a packet
-economy,CmdShareMetal,BroadcastPlayerInfo,TODO(#506): sim sends a packet
-economy,UpdateResourceSharing,SendPacketToPlayer,TODO(#506): sim sends a packet
-features,DamageFeature,GetHostDpid,TODO(#506): sim sends a packet
-features,DamageFeature,GetLocalDpid,TODO(#506): sim sends a packet
-features,DamageFeature,SendPacketToPlayer,TODO(#506): sim sends a packet
 features,PlaceFeature,CreateObjectState,TODO(#505): sim-to-presentation event
 features,PlaceFeature,EmitTimedSubParticles,TODO(#505): sim-to-presentation event
-features,StartFeatureBurning,GetLocalDpid,TODO(#506): sim sends a packet
 los_radar,BuildRadarPicture,DownsampleFrame,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,DrawPixel,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,FreeSurface,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,g_radarPicTempName,TODO(#507): sim reads view data
 los_radar,BuildRadarPicture,g_radarPictureName,TODO(#507): sim reads view data
-los_radar,CmdShareMapping,BroadcastPlayerInfo,TODO(#506): sim sends a packet
-los_radar,CmdShareRadar,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 los_radar,DrawRadarUnits,DrawCircle,TODO(#505): sim-to-presentation event
 los_radar,DrawRadarUnits,DrawDashedCircle,TODO(#505): sim-to-presentation event
 los_radar,DrawRadarUnits,DrawPixel,TODO(#505): sim-to-presentation event
@@ -32,7 +23,6 @@ los_radar,LoadTntMap,SurfaceFromFrame,TODO(#505): sim-to-presentation event
 los_radar,ResizeRadarPicture,AllocFrame,TODO(#505): sim-to-presentation event
 los_radar,ResizeRadarPicture,FillSurface,TODO(#505): sim-to-presentation event
 los_radar,ResizeRadarPicture,SurfaceFromFrame,TODO(#505): sim-to-presentation event
-los_radar,ToggleShareLos,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 map,FreeOtaEnumCacheAndMission,g_otaEnumCacheComplete,TODO(#507): sim reads view data
 map,FreeOtaEnumCacheAndMission,g_otaEnumFileCount,TODO(#507): sim reads view data
 map,FreeOtaEnumCacheAndMission,g_otaEnumFileList,TODO(#507): sim reads view data
@@ -50,10 +40,6 @@ map,Mission::BuildCampaignFilePath,StripExtension,TODO(#505): sim-to-presentatio
 map,Mission::LoadCampaign,OpenMessageBox,TODO(#505): sim-to-presentation event
 map,Mission::LoadMission,MissionConditions::MissionConditions,TODO(#505): sim-to-presentation event
 map,Mission::LoadMission,OpenMessageBox,TODO(#505): sim-to-presentation event
-orders,AiSearchGoal::SerializeNetUnitState,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
-orders,AiSearchGoal::SerializeNetUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
-orders,AirManeuverOrder::AirManeuverOrder,BitReader::ReadBits,TODO(#506): sim sends a packet
-orders,AirManeuverOrder::SerializeToBits,BitWriter::WriteBits,TODO(#506): sim sends a packet
 orders,AttackKamikazeOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,BuildWeaponOrder,UpdateBuildMenuIfFocusUnit,TODO(#505): sim-to-presentation event
 orders,BuildingBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
@@ -68,17 +54,11 @@ orders,GroundUnloadOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,HelpBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
 orders,HelpBuildOrder,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
 orders,HelpBuildOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,LiteGoal::SerializeNetUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
 orders,MobileBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
 orders,MobileBuildOrder,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
 orders,MobileBuildOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,MoveGroundOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,Order::AnnounceStatusIfFlagged,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,Order::~Order,SendScriptCallNoArgs,TODO(#506): sim sends a packet
-orders,PackedPosGoal::DeserializeNetUnitState,BitReader::ReadBits,TODO(#506): sim sends a packet
-orders,PathOrder::PathOrder,BitReader::ReadBits,TODO(#506): sim sends a packet
-orders,PathOrder::SerializeToBits,BitWriter::WriteBits,TODO(#506): sim sends a packet
-orders,PatrolGoal::DeserializeNetUnitState,BitReader::ReadBits,TODO(#506): sim sends a packet
 orders,ReclaimOrder,EmitReverseNanoParticles,TODO(#505): sim-to-presentation event
 orders,ReclaimOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,ReclaimUnitOrder,EmitReverseNanoParticles,TODO(#505): sim-to-presentation event
@@ -93,7 +73,6 @@ orders,ResurrectOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,SelfDestructOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,SelfRepairOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
 orders,SelfRepairOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,StopBuildingScript,SendScriptCallNoArgs,TODO(#506): sim sends a packet
 orders,TeleportOrder,EmitTeleportParticles,TODO(#505): sim-to-presentation event
 orders,VtolGetRepairedOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolHelpBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
@@ -105,7 +84,6 @@ orders,VtolMobileBuildOrder,MarkSelectionOrdersDirty,TODO(#505): sim-to-presenta
 orders,VtolMobileBuildOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolMoveOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolPickupOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,VtolPickupOrder,SendScriptCallByName,TODO(#506): sim sends a packet
 orders,VtolReclaimOrder,EmitReverseNanoParticles,TODO(#505): sim-to-presentation event
 orders,VtolReclaimOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolReclaimUnitOrder,EmitReverseNanoParticles,TODO(#505): sim-to-presentation event
@@ -114,14 +92,11 @@ orders,VtolRepairUnitOrder,EmitNanoParticles,TODO(#505): sim-to-presentation eve
 orders,VtolRepairUnitOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolUnloadOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 players,??_GUnitScript@@UAEPAXI@Z,CobScript::~CobScript,TODO(#508): constructor across a seam
-players,ContinueWatchingCallback,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 players,ContinueWatchingCallback,ClearSelectedGadget,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,IsGadgetNamed,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,ReportGameEvent,TODO(#506): sim sends a packet
 players,EnableReporter,g_riEnable,TODO(#507): sim reads view data
-players,GiveUnitToPlayer,GetPlayerDpid,TODO(#506): sim sends a packet
-players,InitPlayerResources,FindHostSlot,TODO(#506): sim sends a packet
 players,InitPlayerSlot,SquadManager::SquadManager,TODO(#508): constructor across a seam
 players,LoadReporterDll,RISetCallbacks,TODO(#506): sim sends a packet
 players,LoadReporterDll,ReportGameEventCallback,TODO(#505): sim-to-presentation event
@@ -141,12 +116,6 @@ players,ShowContinueWatchingDialog,g_yesText,TODO(#507): sim reads view data
 players,ShutdownScoreTables,RISetCallbacks,TODO(#506): sim sends a packet
 players,ShutdownScoreTables,g_hapinetOnlineReport,TODO(#507): sim reads view data
 players,ShutdownScoreTables,g_riTerminate,TODO(#507): sim reads view data
-players,TransferEnergy,SendShareEnergy,TODO(#506): sim sends a packet
-players,TransferMetal,SendShareMetal,TODO(#506): sim sends a packet
-players,UpdatePlayersOnStream,BroadcastPlayerInfo,TODO(#506): sim sends a packet
-players,UpdatePlayersOnStream,CountActiveAIPlayers,TODO(#506): sim sends a packet
-players,UpdatePlayersOnStream,CountCombatPlayers,TODO(#506): sim sends a packet
-players,UpdatePlayersOnStream,FindHostSlot,TODO(#506): sim sends a packet
 players,UpdatePlayersOnStream,FocusCommander,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,LoadGuiLayer,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,OpenMessageBox,TODO(#505): sim-to-presentation event
@@ -166,15 +135,10 @@ players,VictoryUnitTypePassesZ::VisitUnit,PlaySoundByName,TODO(#505): sim-to-pre
 units,ApplyAttachUnit,DeselectIfIneligible,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,AddCdActivitySample,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,AnnounceForcesDestroyed,TODO(#505): sim-to-presentation event
-units,ApplyUnitDeath,AnnouncePlayerLeft,TODO(#506): sim sends a packet
-units,ApplyUnitDeath,FindSlotByDpid,TODO(#506): sim sends a packet
+units,ApplyUnitDeath,AnnouncePlayerLeft,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,FlashScorePanelKillLoss,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,g_takenLeadFormat,TODO(#507): sim reads view data
-units,AttachUnitToPiece,GetLocalDpid,TODO(#506): sim sends a packet
-units,CreateUnit,BroadcastBuilderLink,TODO(#506): sim sends a packet
-units,CreateUnit,SendNewUnit,TODO(#506): sim sends a packet
 units,CreateUnitMotion,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
-units,FinishConstruction,BroadcastBuilderLink,TODO(#506): sim sends a packet
 units,FinishConstruction,IsScreenNamed,TODO(#505): sim-to-presentation event
 units,FinishConstruction,MarkChanged,TODO(#505): sim-to-presentation event
 units,FinishConstruction,RefreshBuildCountTexts,TODO(#505): sim-to-presentation event
@@ -183,8 +147,6 @@ units,GetSweetSpot,UpdateObjectState,TODO(#505): sim-to-presentation event
 units,InitSpawnedUnit,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
 units,InitUnit,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
 units,InitUnitScript,CreateObjectState,TODO(#505): sim-to-presentation event
-units,KillUnit,BroadcastPacket,TODO(#506): sim sends a packet
-units,KillUnit,GetSlotDpid,TODO(#506): sim sends a packet
 units,KillUnit,PopUntilNamedLayout,TODO(#505): sim-to-presentation event
 units,LoadUnit,Order::Order,TODO(#508): constructor across a seam
 units,LoadUnitFbi,MissionType::MissionType,TODO(#508): constructor across a seam
@@ -194,14 +156,6 @@ units,LoadUnitTypes,StripExtension,TODO(#505): sim-to-presentation event
 units,LoadUnitTypes,UnitTable::Construct,TODO(#505): sim-to-presentation event
 units,LoadUnitTypes,UnitTable::Initialize,TODO(#505): sim-to-presentation event
 units,PoseUnitModel,UpdateObjectState,TODO(#505): sim-to-presentation event
-units,ReadUnitState,BitReader::ReadBits,TODO(#506): sim sends a packet
-units,ReadUnitState,BitReader::ReadSignedBits,TODO(#506): sim sends a packet
-units,ReceiveUnitStates,BitReader::ReadBits,TODO(#506): sim sends a packet
-units,SendUnitStates,BitWriter::BitWriter,TODO(#506): sim sends a packet
-units,SendUnitStates,BitWriter::FreeBuffer,TODO(#506): sim sends a packet
-units,SendUnitStates,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
-units,SendUnitStates,BitWriter::SetByteAt,TODO(#506): sim sends a packet
-units,SendUnitStates,BitWriter::WriteBits,TODO(#506): sim sends a packet
 units,Unit::SetStateBits,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
 units,Unit::SetStateBits,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 units,UnitScript::EmitSfx,EmitBubbles,TODO(#505): sim-to-presentation event
@@ -211,14 +165,10 @@ units,UnitScript::EmitSfx,UpdateObjectState,TODO(#505): sim-to-presentation even
 units,UpdateAllUnits,CycleCameraFollow,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,CycleSelection,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,IsKeyDown,TODO(#505): sim-to-presentation event
-units,WriteUnitState,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
-units,WriteUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
 weapons,??__Fg_tdfGlobalParser@@YAXXZ,g_tdfGlobalParser,TODO(#507): sim reads view data
 weapons,ApplyUnitDamage,AddCdActivitySample,TODO(#505): sim-to-presentation event
 weapons,ApplyUnitDamage,MissionType::MissionType,TODO(#508): constructor across a seam
-weapons,BroadcastWeaponFire,GetLocalDpid,TODO(#506): sim sends a packet
 weapons,BuildExplosionFrame,AllocFrame,TODO(#505): sim-to-presentation event
-weapons,DamageUnit,GetLocalDpid,TODO(#506): sim sends a packet
 weapons,DetonateProjectile,AccumulateScreenShake,TODO(#505): sim-to-presentation event
 weapons,FireBallisticProjectile,EmitWeaponSmoke,TODO(#505): sim-to-presentation event
 weapons,FireLineOfSightProjectile,EmitWeaponSmoke,TODO(#505): sim-to-presentation event
@@ -238,7 +188,6 @@ weapons,InitExplosions,g_explosion2StartSize,TODO(#507): sim reads view data
 weapons,LoadWeaponType,Load3do,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponType,LoadSoundByName,TODO(#505): sim-to-presentation event
 weapons,ParalyzeUnit,MissionType::MissionType,TODO(#508): constructor across a seam
-weapons,SpawnProjectile,GetLocalDpid,TODO(#506): sim sends a packet
 weapons,StartExplodePiece,CMemoryCache::AllocHandle,TODO(#505): sim-to-presentation event
 weapons,UpdateUnitWeapons,UpdateBuildMenuIfFocusUnit,TODO(#505): sim-to-presentation event
 weapons,_GLOBAL__sub_I_weapons.cpp,g_tdfGlobalParser,TODO(#507): sim reads view data

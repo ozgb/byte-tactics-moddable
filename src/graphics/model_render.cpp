@@ -688,7 +688,7 @@ struct ModelBuildList {
 };
 
 // FUNCTION: 0x45a950
-ModelState* __stdcall CreatePlayerObjectState(Object3do* obj, ModelBuildList* list, int player)
+ModelState* __stdcall CreatePlayerObjectState(Object3do* obj, ModelBuildList* list, UnitDrawView* owner)
 {
     int count = 1;
     if (obj->child != 0) {
@@ -703,7 +703,7 @@ ModelState* __stdcall CreatePlayerObjectState(Object3do* obj, ModelBuildList* li
     memset(state, 0, size);
     state->root = AddStateEntries(state, obj, 0);
     state->animDirty = 1;
-    state->owner = (UnitDrawView*)player;
+    state->owner = owner;
     for (int i = 0; i < list->count; i++) {
         for (int j = i; j < state->count; j++) {
             if (_strcmpi(list->names[i], state->pieces[j].object->name) == 0) {

@@ -58,9 +58,9 @@ struct ModelPiece {
     Ref<Vec3> points;
     short modified;
     ModelPieceFlags flags;
-    ModelPiece* sibling;
-    ModelPiece* child;
-    ModelPiece* parent;
+    Ref<ModelPiece> sibling;
+    Ref<ModelPiece> child;
+    Ref<ModelPiece> parent;
 };
 #pragma pack(pop)
 
@@ -102,11 +102,11 @@ struct ModelState {
     int count;
     int cacheDrawCount;
     int animDirty;
-    UnitDrawView* owner;
+    Ref<UnitDrawView> owner;
     GafFrame* bitmap;
     GafFrame* shadow;
     Vector3s pos;
-    ModelPiece* root;
+    Ref<ModelPiece> root;
     ModelPiece pieces[1];
 };
 #pragma pack(pop)

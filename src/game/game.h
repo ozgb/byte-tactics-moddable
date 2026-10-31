@@ -750,7 +750,7 @@ struct Game {
     Debris debris[300];
     void* lists[3];
     void* explosionLensFrame;
-    Object3do slots[300];
+    DebrisPiece slots[300];
     union {
         char vertices[300][96];
         Vec3 vertices_1e88f[300][8];

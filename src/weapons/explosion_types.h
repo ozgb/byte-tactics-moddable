@@ -74,7 +74,9 @@ struct PieceRec {
     Ref<Vec3> verts;
     char unknown_26[2];
     unsigned short flags;
-    char unknown_2a[0x36 - 0x2a];
+    Ref<PieceRec> sibling;
+    Ref<PieceRec> child;
+    Ref<PieceRec> parent;
 };
 
 struct ExplodedPiece {

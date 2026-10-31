@@ -16,6 +16,7 @@
 #include "../graphics/display.h"
 
 #include "../network/packet_manager.h"
+#include "../util/tdf.h"
 
 struct Game;
 
@@ -122,7 +123,6 @@ void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 #include "../game/data_files.h"
 void* __stdcall LoadPcx(char* path, int param);
 #include "../units/unit_targets.h"
-char* __stdcall Translate(char* text);
 void __stdcall AddTextGadget(Layer* obj, char* name, char* text, int x, short y, int w, int flags);
 #include "../game/players.h"
 #include "../frontend/options.h"

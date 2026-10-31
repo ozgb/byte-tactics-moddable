@@ -76,7 +76,6 @@ void __stdcall SelectFontForEntry(Gadget* entries, int index);
 #include "../gui/dialogs.h"
 #include "campaign_menu.h"
 void __stdcall FillMissionList();
-char* __stdcall Translate(const char* text);
 void __stdcall AddTextGadget(Layer* dialog, const char* name, char* text, int x, int y,
                             int w, int flags);
 void __stdcall SetGadgetColorByName(Gui* menu, const char* name, int value);

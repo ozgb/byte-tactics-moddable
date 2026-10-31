@@ -13,6 +13,7 @@
 #include "../graphics/memory_cache.h"
 
 #include "../map/grid.h"
+#include "../util/tdf.h"
 
 #pragma pack(push, 1)
 
@@ -107,7 +108,6 @@ void __stdcall SetFrontendState(int state, int line, const char* file);
 #include "../map/map_list.h"
 void __stdcall SetCursorMode(int n);
 #include "campaign_menu.h"
-const char* __stdcall Translate(const char* text);
 #include "../gui/dialogs.h"
 void __stdcall PlaySoundByName(const char* name, int broadcast);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
@@ -773,7 +773,7 @@ void __stdcall RunEndGameState()
             Player* player=&g_game->players[g_game->localPlayer];
             if(player->rejectReason && player->rejectReason!=2) {
                 const char* name=GetRejectReasonText(player->rejectReason);
-                OpenMessageBox(&g_game->gui,(char *)Translate(name),320,1,1);
+                OpenMessageBox(&g_game->gui,Translate(name),320,1,1);
                 MarkChanged(&g_game->gui);
                 MarkLayerChanged(&g_game->gui);
                 player->rejectReason=0;

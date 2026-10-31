@@ -8,6 +8,7 @@
 #include "../../interfaces/host.h"
 #include "../units/unit_def.h"
 #include "../../interfaces/seams.h"
+#include "../util/tdf.h"
 
 struct Gadget;
 struct Layer;
@@ -134,7 +135,6 @@ int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
 void __stdcall BlitMenuLayers(void* menu, int a, int b);
 void __stdcall SetGadgetActiveByName(void* menu, const char* name, int value);
 #include "../gui/dialogs.h"
-char* __stdcall Translate(const char* text);
 void __stdcall SetOffscreenSurface(int a);
 void FlipScreen();
 #include "../gui/keyboard.h"
@@ -540,7 +540,6 @@ void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void __stdcall PlaySoundByName(const char* name, int flag);
 void __stdcall PlaySoundByName(char* str, int flag);
 #include "frontend.h"
-char* __stdcall Translate(char* text);
 void __stdcall SetFrontendState(int state, int line, const char* file);
 void __stdcall SetFrontendState(int a, int line, char* file);
 #include "frontend.h"

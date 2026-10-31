@@ -6,6 +6,7 @@
 #include "../units/squad.h"
 
 #include "sound.h"
+#include "../util/tdf.h"
 
 union SoundWorldPos {
     struct {
@@ -119,7 +120,6 @@ int __stdcall PlayLoopingWavMemory(void* sound);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 struct Cell;
 #include "../map/line_of_sight.h"
-char* __stdcall Translate(char* text);
 #include "../ingame/selection.h"
 
 // FUNCTION: 0x47f960

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include "../util/tdf.h"
 
 class Mission;
 
@@ -97,7 +98,6 @@ void* __cdecl operator new(unsigned int size);
 #include "../gui/dialogs.h"
 void __stdcall SetCursorAnimation(void* menu, void* data);
 void __stdcall SetDescListCleanupFlag(Gui* menu, int flag);
-const char* __stdcall Translate(const char* key);
 #include "savegame.h"
 #include "side_data.h"
 
@@ -223,7 +223,7 @@ done:
 // FUNCTION: 0x492330
 void __stdcall ShowInvalidSavegameDialog(void* param_1)
 {
-    OpenMessageBox((Gui *)param_1, (char *)Translate(g_invalidSavegameText), 0x140, 1, 1);
+    OpenMessageBox((Gui *)param_1, Translate(g_invalidSavegameText), 0x140, 1, 1);
     ClearSelectedGadget(param_1);
 }
 
@@ -373,7 +373,7 @@ invalid:
         DeleteHapiBank(((HapiBank*)g_game->pendingSaveStore));
     }
     g_game->pendingSaveStore = (int)(0);
-    OpenMessageBox(gadget, (char *)Translate("Invalid savegame file"), 0x140, 1, 1);
+    OpenMessageBox(gadget, Translate("Invalid savegame file"), 0x140, 1, 1);
     ClearSelectedGadget(gadget);
 }
 
@@ -533,7 +533,7 @@ void ShowLoadGameScreen()
     if (ListSavedGames(&count) == 0) {
         CloseTopScreen((Gui *)((char*)&g_game->message_519[0]));
         OpenMessageBox((Gui *)((char*)&g_game->message_519[0]),
-                     (char *)Translate("There are no saved games to choose from"),
+                     Translate("There are no saved games to choose from"),
                      0x140, 1, 1);
         return;
     }

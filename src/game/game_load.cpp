@@ -11,6 +11,7 @@
 #include "../files/files_api.h"
 
 #include "../../interfaces/ref.h"
+#include "../util/tdf.h"
 #pragma pack(push, 1)
 
 #include "game.h"
@@ -140,7 +141,6 @@ void __cdecl operator delete(void* p);
 #include "../gui/gui.h"
 #include "../gui/layer.h"
 void __stdcall BlitMenuLayers(Main2Menu* menu, int a, int b);
-char* __stdcall Translate(char* s);
 
 #include "../graphics/pcx.h"
 #include "../ingame/build_placement.h"
@@ -514,7 +514,7 @@ static inline void DrawLoadingBar(void* gadget, void* lightbar, int index, unsig
     }
     flash = alphas[slot];
     *prev = (*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[index];
-    DrawTextClipped(gadget, (char*)Translate(label), 0x5a, y, -1, flash);
+    DrawTextClipped(gadget, Translate(label), 0x5a, y, -1, flash);
     rect[0] = 0xcd;
     rect[2] = ((int)(*(volatile unsigned char(*)[6])&g_game->progress_38d6f)[index] * 7) / 2 + 0xcd;
     rect[1] = y;
@@ -680,7 +680,7 @@ void LoadingScreenFrame(void)
             if (GetPreferredLanguage() != 0 && _strcmpi((const char*)GetPreferredLanguage(), "english") != 0) {
                 _strlwr(namebuf);
             }
-            sprintf(buf, "%s: %s", (char*)Translate("Map"), (char*)Translate(namebuf));
+            sprintf(buf, "%s: %s", Translate("Map"), Translate(namebuf));
             textWidth = GetTextPixelWidth(buf);
             {
                 int x = gadget.width / 2 - textWidth / 2;

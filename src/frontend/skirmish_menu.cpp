@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "../util/tdf.h"
 
 struct GafEntry;
 struct Gaf;
@@ -96,7 +97,6 @@ int AreAllPlayersInOneAllyGroup(void)
 #pragma auto_inline(on)
 
 void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
-char* __stdcall Translate(char* key);
 
 int __cdecl CountHumanSlots()
 {

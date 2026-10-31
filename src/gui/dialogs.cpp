@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include "win_types.h"
 #include "../../interfaces/host.h"
+#include "../util/tdf.h"
 
 #pragma pack(push, 1)
 
@@ -755,7 +756,6 @@ struct RemapPalette {
 
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
 int __stdcall IsGadgetNamed(Gadget* entries, int index, char* name);
-char* __stdcall Translate(char* text);
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int flag);
 void __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);

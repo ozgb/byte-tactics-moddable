@@ -382,8 +382,6 @@ void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void __stdcall AddTextGadget(Layer* layer, char* type, char* text, int x, int y,
                              int width, int attr);
 #include "../util/registry.h"
-char* __stdcall Translate(char* text);
-const char* __stdcall Translate(const char* text);
 #include "campaign_menu.h"
 #include "../gui/file_list.h"
 #include "../gui/file_list.h"
@@ -1692,10 +1690,10 @@ void ShowGameSettingsDialog()
     char* cheatStrs[2] = { "Disallowed", "Allowed" };
     char* watchStrs[2] = { "Disallowed", "Allowed" };
     char* diffStrs[3] = { "Easy", "Medium", "Hard" };
-    AddTextGadget(layer, "TEXT", Translate((char*)"Commander Death:"), 0x12, 0x5a, 0x6e, 2);
+    AddTextGadget(layer, "TEXT", Translate("Commander Death:"), 0x12, 0x5a, 0x6e, 2);
     AddTextGadget(layer, "TEXT", Translate(deathStrs[g_game->commanderDeath]), 0x8c,
                  0x5a, 0x78, 2);
-    AddTextGadget(layer, "TEXT", Translate((char*)"Starting Locations:"), 0x12, 0x6c, 0x6e, 2);
+    AddTextGadget(layer, "TEXT", Translate("Starting Locations:"), 0x12, 0x6c, 0x6e, 2);
     if (g_game->net->GetGameType() == 2) {
         AddTextGadget(layer, "TEXT", Translate(locStrs[g_game->options->fixedLocations]), 0x8c,
                      0x6c, 0x78, 2);
@@ -1703,33 +1701,33 @@ void ShowGameSettingsDialog()
         AddTextGadget(layer, "TEXT", Translate(locStrs[opts->u.b.b14]), 0x8c, 0x6c,
                      0x78, 2);
     }
-    AddTextGadget(layer, "TEXT", Translate((char*)"Mapping Mode:"), 0x12, 0x7e, 0x6e, 2);
+    AddTextGadget(layer, "TEXT", Translate("Mapping Mode:"), 0x12, 0x7e, 0x6e, 2);
     AddTextGadget(layer, "TEXT", Translate(mapStrs[g_game->mapFlags_14281.bit0]), 0x8c, 0x7e, 0x78, 2);
-    AddTextGadget(layer, "TEXT", Translate((char*)"Line of Sight:"), 0x12, 0x90, 0x6e, 2);
+    AddTextGadget(layer, "TEXT", Translate("Line of Sight:"), 0x12, 0x90, 0x6e, 2);
     unsigned short losFlags = g_game->mapFlags_14281.raw;
     int losIdx = !(losFlags & 2) ? 2 : (int)(((unsigned char)~losFlags >> 2) & 1);
     AddTextGadget(layer, "TEXT", Translate(losStrs[losIdx]), 0x8c, 0x90, 0x78, 2);
     int y;
     if (g_game->net->GetGameType() == 3) {
-        AddTextGadget(layer, "TEXT", Translate((char*)"Cheat Codes:"), 0x12, 0xa2, 0x6e, 2);
+        AddTextGadget(layer, "TEXT", Translate("Cheat Codes:"), 0x12, 0xa2, 0x6e, 2);
         AddTextGadget(layer, "TEXT", Translate(cheatStrs[opts->u.b.b13]), 0x8c,
                      0xa2, 0x78, 2);
-        AddTextGadget(layer, "TEXT", Translate((char*)"Watching:"), 0x12, 0xb4, 0x6e, 2);
+        AddTextGadget(layer, "TEXT", Translate("Watching:"), 0x12, 0xb4, 0x6e, 2);
         AddTextGadget(layer, "TEXT", Translate(watchStrs[opts->u.b.b7]), 0x8c, 0xb4,
                      0x78, 2);
         y = 0xc6;
     } else {
-        AddTextGadget(layer, "TEXT", Translate((char*)"Difficulty:"), 0x12, 0xa2, 0x6e, 2);
+        AddTextGadget(layer, "TEXT", Translate("Difficulty:"), 0x12, 0xa2, 0x6e, 2);
         AddTextGadget(layer, "TEXT", Translate(diffStrs[g_game->difficulty]), 0x8c, 0xa2,
                      0x78, 2);
         y = 0xb4;
     }
-    AddTextGadget(layer, "TEXT", Translate((char*)"Map:"), 0x12, y, 0x6e, 2);
+    AddTextGadget(layer, "TEXT", Translate("Map:"), 0x12, y, 0x6e, 2);
     AddTextGadget(layer, "TEXT",
                  Translate(g_game->net->GetMissionName()), 0x8c, y,
                  0x78, 2);
     y += 0x12;
-    AddTextGadget(layer, "TEXT", Translate((char*)"Starting Metal:"), 0x12, y, 0x6e, 2);
+    AddTextGadget(layer, "TEXT", Translate("Starting Metal:"), 0x12, y, 0x6e, 2);
     if (g_game->net->GetGameType() == 3) {
         AddTextGadget(layer, "TEXT", _itoa(opts->startMetal * 100, num, 10), 0x8c, y, 0x78,
                      2);
@@ -1737,7 +1735,7 @@ void ShowGameSettingsDialog()
         AddTextGadget(layer, "TEXT", _itoa(rule->metal, num, 10), 0x8c, y, 0x78, 2);
     }
     y += 0x12;
-    AddTextGadget(layer, "TEXT", Translate((char*)"Starting Energy:"), 0x12, y, 0x6e, 2);
+    AddTextGadget(layer, "TEXT", Translate("Starting Energy:"), 0x12, y, 0x6e, 2);
     if (g_game->net->GetGameType() == 3) {
         AddTextGadget(layer, "TEXT", _itoa(opts->startEnergy * 100, num, 10), 0x8c, y,
                      0x78, 2);
@@ -1745,7 +1743,7 @@ void ShowGameSettingsDialog()
         AddTextGadget(layer, "TEXT", _itoa(rule->energy, num, 10), 0x8c, y, 0x78, 2);
     }
     y += 0x12;
-    AddTextGadget(layer, "TEXT", Translate((char*)"Max Units:"), 0x12, y, 0x6e, 2);
+    AddTextGadget(layer, "TEXT", Translate("Max Units:"), 0x12, y, 0x6e, 2);
     AddTextGadget(layer, "TEXT", _itoa(g_game->maxUnitsSetting, num, 10), 0x8c, y, 0x78, 2);
     int i;
     for (i = count + 1; i <= layer->entries->u.count; i++)
@@ -2224,12 +2222,12 @@ void OpenExitMenu()
     FindGadgetIndex(dialog->entries, "RESTART", 1);
     if (g_game->net->GetGameType() == 1) {
         SetGadgetActiveByName(&g_game->gui, "RESTART", 1);
-        SetTranslatedTextByName(&g_game->gui, "RESTART", Translate((char*)"Restart"), 0x80);
+        SetTranslatedTextByName(&g_game->gui, "RESTART", Translate("Restart"), 0x80);
         goto tail;
     }
     if (g_game->net->GetGameType() == 2) {
         SetGadgetActiveByName(&g_game->gui, "RESTART", 1);
-        SetTranslatedTextByName(&g_game->gui, "RESTART", Translate((char*)"Restart"), 0x80);
+        SetTranslatedTextByName(&g_game->gui, "RESTART", Translate("Restart"), 0x80);
         goto tail;
     }
     if ((*(LobbyUiFlagBits*)&g_game->lobbyUiDirtyFlags_2bee).flag4) {
@@ -2337,7 +2335,7 @@ void OpenInGameOptions()
     SetGrayedOut(&g_game->gui, FindGadgetIndex(layer->entries, "LOADGAME", 1),
                  g_game->net->GetGameType() == 3);
     if (g_game->net->GetGameType() == 3 || g_game->net->GetGameType() == 2) {
-        SetTranslatedTextByName(&g_game->gui, "MISSION", Translate((char*)"Settings"), 0x80);
+        SetTranslatedTextByName(&g_game->gui, "MISSION", Translate("Settings"), 0x80);
     }
     EnableKeyCommands(&g_game->gui);
     SetKeyboardInput(&g_game->gui, 1);

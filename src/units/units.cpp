@@ -6,6 +6,7 @@
 #include <stddef.h>
 
 #include "../map/mission.h"
+#include "../util/tdf.h"
 
 class MissionConditions;
 class CobScript;
@@ -700,7 +701,6 @@ void __stdcall KillUnit(Unit* unit, int param_2)
 void __stdcall RemoveSpeechOfUnit(void* unit);
 void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
 #include "../ingame/game_dialogs.h"
-char* __stdcall Translate(char* text);
 void __stdcall AddMessage(char* text, int a, int b, int c);
 #include "unit_targets.h"
 void __stdcall FreeObjectState(void* state);

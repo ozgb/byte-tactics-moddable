@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
+#include "../util/tdf.h"
 
 struct GafEntry;
 struct Gadget;
@@ -27,7 +28,6 @@ extern Gui* g_guiContext;
 #include "gui.h"
 
 void ShowSoftwareCursor();
-char* __stdcall Translate(const char* text);
 int __cdecl tolower(int c);
 int __stdcall GetTextWidth(Font* font, char* text);
 char* __stdcall GetGafFrame(void* glyphs, int c);
@@ -3013,7 +3013,6 @@ GafFrame* __stdcall GetGafFrame(GafEntry* table, int index);
 GafEntry* __stdcall FindGafEntry(void* gaf, const char* name);
 void* __stdcall LoadGaf(char* path);
 #include "../graphics/palette.h"
-char* __stdcall Translate(char* key);
 char* __stdcall GetGadgetText(Gui* menu, char* name, char* buf);
 
 void* __stdcall AllocSurface(char* name, int width, int height);

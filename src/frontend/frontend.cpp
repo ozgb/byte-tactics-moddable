@@ -118,7 +118,6 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
 #include "../graphics/object_pool.h"
 void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall SetCursorMode(int param_1);
-char* __stdcall Translate(char* text);
 void HideSoftwareCursor();
 #include "../game/game_state.h"
 #include "../files/files_api.h"

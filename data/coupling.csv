@@ -216,6 +216,7 @@ features,files,call,HapiBank::SetIntegerItem,1
 features,files,call,HapiBank::WriteBox,1
 features,game,call,GameRand,1
 features,game,call,SimAllocTagged,1
+features,game,call,SimRealloc,1
 features,game,call,StepGafSequence,1
 features,game,shared_write,Fixed::whole,1
 features,game,shared_write,Point16::x,1
@@ -281,7 +282,6 @@ features,platform,call,BuildDataPath,1
 features,platform,call,CommandArgs::GetArg,1
 features,platform,call,FatalError,1
 features,platform,call,GameFreeThunk,1
-features,platform,call,GameReallocTagged,1
 features,platform,call,LoadObject3d,1
 features,platform,call,RandomInt,3
 features,platform,call,TdfFile::LoadFile,1
@@ -5033,11 +5033,6 @@ weapons,presentation,shared_write,Game::projectiles,1
 weapons,presentation,shared_write,Game::tracked,6
 weapons,presentation,shared_write,Game::trackedPos,1
 weapons,presentation,shared_write,Game::value_1434b,6
-weapons,presentation,shared_write,Object3D::faceCount,1
-weapons,presentation,shared_write,Object3D::faces,1
-weapons,presentation,shared_write,Object3D::firstFace,1
-weapons,presentation,shared_write,Object3D::vertexCount,2
-weapons,presentation,shared_write,Object3D::verts,1
 weapons,presentation,shared_write,PieceRec::angle_10,1
 weapons,presentation,shared_write,PieceRec::angle_12,1
 weapons,presentation,shared_write,PieceRec::angle_14,1

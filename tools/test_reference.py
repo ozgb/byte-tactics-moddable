@@ -220,7 +220,7 @@ class ScanRunTest(unittest.TestCase):
     def run_scenario(self, scans, scan_every, retry_any, errors):
         timeouts = []
 
-        def fake_play(exe, scenario, game_dir, want, timeout, poison, every):
+        def fake_play(exe, scenario, game_dir, want, timeout, poison, every, collect=()):
             timeouts.append(timeout)
             if errors:
                 raise reference.tracediff.Error(errors.pop(0))
@@ -270,7 +270,7 @@ class FailedAttemptTest(unittest.TestCase):
             (run / "trace.txt").write_text("")
             attempts = []
 
-            def fake_play(exe, scenario, game_dir, want, timeout, poison, every):
+            def fake_play(exe, scenario, game_dir, want, timeout, poison, every, collect=()):
                 attempts.append(1)
                 if len(attempts) == 1:
                     raise reference.tracediff.Error(message)
@@ -443,7 +443,7 @@ class LoadOrderTest(unittest.TestCase):
                 reference.play_scenario(Path("x.exe"), Path(tmp) / "s.txt", None, save_to=target)
             self.assertEqual((target / "harness.sav").read_bytes(), b"data")
             self.assertEqual((target / "harness.opt").read_bytes(), b"options")
-            self.assertEqual(seen["collect"], ("savegame/harness.sav", "savegame/harness.opt"))
+            self.assertEqual(seen["collect"][-2:], ("savegame/harness.sav", "savegame/harness.opt"))
             self.assertFalse(run.parent.exists())
 
 

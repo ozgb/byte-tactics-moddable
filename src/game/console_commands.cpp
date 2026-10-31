@@ -1080,7 +1080,6 @@ void __stdcall DrawCellContours(void* surface, Point* corners, unsigned char* he
 struct TdfRecord;
 struct Mission;
 struct MissionUnit;
-struct MissionRule;
 struct MissionFeature;
 struct HapiFile;
 struct StringPool;

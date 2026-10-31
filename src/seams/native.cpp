@@ -35,7 +35,6 @@ struct Player;
 struct Cell;
 struct Point16;
 struct Feature;
-struct Spot;
 struct Rot16;
 struct TntInfo;
 struct GroundHeightPos;

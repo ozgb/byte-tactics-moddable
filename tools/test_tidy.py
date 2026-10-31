@@ -239,6 +239,13 @@ class TidyTest(Repo, unittest.TestCase):
         self.commit()
         self.assertEqual(self.placeholders(), [])
 
+    def test_generated_asserts_on_a_moved_type_pass(self):
+        self.write("src/b.cpp", '#include "a.h"\n')
+        self.write("src/c.cpp", LEGACY)
+        self.write("src/state/layout_asserts.cpp", 'static_assert(offsetof(D, field_10) == 0, "");\n')
+        self.commit()
+        self.assertEqual(self.placeholders(), [])
+
     def test_move_out_of_a_deleted_file_passes(self):
         self.write("src/c.cpp", LEGACY)
         self.git("rm", "-q", "src/b.cpp")

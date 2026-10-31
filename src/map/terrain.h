@@ -1,6 +1,7 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 #include <vector>
+#include "../util/vec3.h"
 class UnitVisitor;
 
 class MovementClass;
@@ -14,6 +15,11 @@ struct Point16;
 struct Unit;
 struct UnitBucket;
 struct Vec3;
+
+struct ReclaimableResource {
+    Vec3 pos;
+    float val;
+};
 
 class DamagedAllyCollector {
 public:

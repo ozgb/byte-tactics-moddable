@@ -37,11 +37,13 @@
 #include "../game/mission_option_flags.h"
 #include "../game/packed_goal.h"
 #include "../game/pre_battle_flags.h"
+#include "../game/side_data.h"
 #include "../game/side_def.h"
 #include "../game/ui_option_flags.h"
 #include "../game/unit_resources.h"
 #include "../game/victory_conditions.h"
 #include "../game/view_flags.h"
+#include "../graphics/font.h"
 #include "../graphics/gaf_frame.h"
 #include "../graphics/handle.h"
 #include "../graphics/memory_cache.h"
@@ -50,7 +52,10 @@
 #include "../graphics/piece_frame.h"
 #include "../graphics/rect.h"
 #include "../graphics/spot_state.h"
+#include "../gui/blink_word.h"
+#include "../gui/font_glyph_table.h"
 #include "../gui/gadget.h"
+#include "../gui/gaf_entry.h"
 #include "../gui/gui.h"
 #include "../gui/layer.h"
 #include "../ingame/broadcast_toggle_flags.h"
@@ -74,8 +79,10 @@
 #include "../map/feature.h"
 #include "../map/feature_anim_pool.h"
 #include "../map/feature_spot.h"
+#include "../map/frame_table.h"
 #include "../map/grid.h"
 #include "../map/grid2.h"
+#include "../map/line_of_sight.h"
 #include "../map/los_tables.h"
 #include "../map/map_info.h"
 #include "../map/mission.h"
@@ -83,8 +90,12 @@
 #include "../map/pool.h"
 #include "../map/radar_timer.h"
 #include "../map/spatial_bucket.h"
+#include "../map/spot.h"
+#include "../map/terrain.h"
 #include "../network/chat_hud_entry.h"
 #include "../network/chat_hud_entry_view.h"
+#include "../network/frame_ring.h"
+#include "../network/packet_buffer.h"
 #include "../network/packet_channel.h"
 #include "../network/packet_manager.h"
 #include "../network/packet_receiver.h"
@@ -95,6 +106,7 @@
 #include "../network/settings.h"
 #include "../orders/air_maneuver_order.h"
 #include "../orders/approach_areas.h"
+#include "../orders/mission_order_table.h"
 #include "../orders/mission_type.h"
 #include "../orders/order.h"
 #include "../orders/order_base.h"
@@ -119,6 +131,7 @@
 #include "../util/string_ref.h"
 #include "../weapons/damage_table.h"
 #include "../weapons/debris.h"
+#include "../weapons/explosion_types.h"
 #include "../weapons/projectile.h"
 #include "../weapons/weapon_def.h"
 
@@ -159,6 +172,17 @@ static_assert(offsetof(AssaultTimer, maximum) == 24, "");
 static_assert(offsetof(AssaultTimer, limit) == 28, "");
 static_assert(offsetof(AssaultTimer, kind) == 32, "");
 static_assert(offsetof(AssaultTimer, attacking) == 36, "");
+static_assert(sizeof(BlinkWord) == 164, "");
+static_assert(offsetof(BlinkWord, text) == 0, "");
+static_assert(offsetof(BlinkWord, x) == 128, "");
+static_assert(offsetof(BlinkWord, y) == 132, "");
+static_assert(offsetof(BlinkWord, colourA) == 136, "");
+static_assert(offsetof(BlinkWord, periodA) == 140, "");
+static_assert(offsetof(BlinkWord, colourB) == 144, "");
+static_assert(offsetof(BlinkWord, periodB) == 148, "");
+static_assert(offsetof(BlinkWord, phase) == 152, "");
+static_assert(offsetof(BlinkWord, nextToggle) == 156, "");
+static_assert(offsetof(BlinkWord, value) == 160, "");
 static_assert(sizeof(BroadcastToggleFlags) == 2, "");
 static_assert(sizeof(BuildMenuEntry) == 37, "");
 static_assert(offsetof(BuildMenuEntry, typeId) == 0, "");
@@ -185,6 +209,9 @@ static_assert(offsetof(CMemoryCache, shadow) == 16, "");
 static_assert(offsetof(CMemoryCache, buffer) == 16, "");
 static_assert(offsetof(CMemoryCache, ptr) == 16, "");
 static_assert(offsetof(CMemoryCache, field_10) == 16, "");
+static_assert(sizeof(CacheChunk) == 8, "");
+static_assert(offsetof(CacheChunk, owner) == 0, "");
+static_assert(offsetof(CacheChunk, size) == 4, "");
 static_assert(sizeof(Callback) == 4, "");
 static_assert(sizeof(CameraFlags) == 2, "");
 static_assert(offsetof(CameraFlags, raw) == 0, "");
@@ -293,6 +320,18 @@ static_assert(offsetof(EndGamePlayerSlot, unknown_1) == 1, "");
 static_assert(offsetof(EndGamePlayerSlot, stats) == 30, "");
 static_assert(sizeof(EscortTimer) == 24, "");
 static_assert(offsetof(EscortTimer, other) == 20, "");
+static_assert(sizeof(ExplodedPiece) == 48, "");
+static_assert(offsetof(ExplodedPiece, unit) == 0, "");
+static_assert(offsetof(ExplodedPiece, index) == 4, "");
+static_assert(offsetof(ExplodedPiece, angVelZ) == 8, "");
+static_assert(offsetof(ExplodedPiece, angVelX) == 12, "");
+static_assert(offsetof(ExplodedPiece, angVelY) == 16, "");
+static_assert(offsetof(ExplodedPiece, vel_x) == 20, "");
+static_assert(offsetof(ExplodedPiece, vel_y) == 24, "");
+static_assert(offsetof(ExplodedPiece, vel_z) == 28, "");
+static_assert(offsetof(ExplodedPiece, ticks) == 32, "");
+static_assert(offsetof(ExplodedPiece, scale) == 36, "");
+static_assert(offsetof(ExplodedPiece, rec) == 44, "");
 static_assert(sizeof(Eye) == 36, "");
 static_assert(offsetof(Eye, player) == 0, "");
 static_assert(offsetof(Eye, screen) == 4, "");
@@ -306,6 +345,16 @@ static_assert(offsetof(Eye, screenPos) == 32, "");
 static_assert(sizeof(F14373) == 4, "");
 static_assert(offsetof(F14373, bits) == 0, "");
 static_assert(offsetof(F14373, all) == 0, "");
+static_assert(sizeof(Face) == 32, "");
+static_assert(offsetof(Face, color) == 0, "");
+static_assert(offsetof(Face, nverts) == 4, "");
+static_assert(offsetof(Face, unknown_8) == 8, "");
+static_assert(offsetof(Face, vindex) == 12, "");
+static_assert(offsetof(Face, tex) == 16, "");
+static_assert(offsetof(Face, flags) == 28, "");
+static_assert(sizeof(FaceFlags) == 4, "");
+static_assert(offsetof(FaceFlags, raw) == 0, "");
+static_assert(offsetof(FaceFlags, bits) == 0, "");
 static_assert(sizeof(FactoryUnitGroup) == 16, "");
 static_assert(offsetof(FactoryUnitGroup, list) == 0, "");
 static_assert(sizeof(Feature) == 256, "");
@@ -381,6 +430,26 @@ static_assert(offsetof(FeatureSpot, vel) == 20, "");
 static_assert(offsetof(FeatureSpot, rot) == 32, "");
 static_assert(offsetof(FeatureSpot, unknown_26) == 38, "");
 static_assert(offsetof(FeatureSpot, spotFlags) == 47, "");
+static_assert(sizeof(FogCell) == 2, "");
+static_assert(offsetof(FogCell, lo) == 0, "");
+static_assert(offsetof(FogCell, hi) == 1, "");
+static_assert(offsetof(FogCell, level0) == 0, "");
+static_assert(offsetof(FogCell, level1) == 1, "");
+static_assert(sizeof(Font) == 6, "");
+static_assert(offsetof(Font, glyphs) == 0, "");
+static_assert(offsetof(Font, unknown_1) == 1, "");
+static_assert(offsetof(Font, first) == 3, "");
+static_assert(offsetof(Font, offsets) == 4, "");
+static_assert(sizeof(FontGlyphTable) == 16, "");
+static_assert(offsetof(FontGlyphTable, unknown_0) == 0, "");
+static_assert(offsetof(FontGlyphTable, first) == 3, "");
+static_assert(offsetof(FontGlyphTable, offsets) == 4, "");
+static_assert(offsetof(FontGlyphTable, unknown_6) == 6, "");
+static_assert(offsetof(FontGlyphTable, glyphs) == 12, "");
+static_assert(sizeof(Frame) == 12, "");
+static_assert(offsetof(Frame, tick) == 0, "");
+static_assert(offsetof(Frame, data) == 4, "");
+static_assert(offsetof(Frame, size) == 8, "");
 static_assert(sizeof(FrameQueue) == 28, "");
 static_assert(offsetof(FrameQueue, baseTick) == 0, "");
 static_assert(offsetof(FrameQueue, bufferSize) == 4, "");
@@ -389,6 +458,15 @@ static_assert(offsetof(FrameQueue, recvBuffer) == 12, "");
 static_assert(offsetof(FrameQueue, buffer) == 16, "");
 static_assert(offsetof(FrameQueue, fromId) == 20, "");
 static_assert(offsetof(FrameQueue, toId) == 24, "");
+static_assert(sizeof(FrameRing) == 6156, "");
+static_assert(offsetof(FrameRing, count) == 0, "");
+static_assert(offsetof(FrameRing, head) == 4, "");
+static_assert(offsetof(FrameRing, tail) == 8, "");
+static_assert(offsetof(FrameRing, frames) == 12, "");
+static_assert(sizeof(FrameTable) == 44, "");
+static_assert(offsetof(FrameTable, count) == 0, "");
+static_assert(offsetof(FrameTable, unknown_2) == 2, "");
+static_assert(offsetof(FrameTable, entries) == 40, "");
 static_assert(sizeof(FrameTimers) == 80, "");
 static_assert(offsetof(FrameTimers, last) == 0, "");
 static_assert(offsetof(FrameTimers, total) == 4, "");
@@ -438,6 +516,9 @@ static_assert(offsetof(Gadget, hotkey) == 327, "");
 static_assert(offsetof(Gadget, flag_148) == 328, "");
 static_assert(offsetof(Gadget, unknown_153) == 339, "");
 static_assert(offsetof(Gadget, sliderLocked) == 343, "");
+static_assert(sizeof(GafEntry) == 4, "");
+static_assert(offsetof(GafEntry, count) == 0, "");
+static_assert(offsetof(GafEntry, unknown_2) == 2, "");
 static_assert(sizeof(GafFrame) == 24, "");
 static_assert(offsetof(GafFrame, width) == 0, "");
 static_assert(offsetof(GafFrame, height) == 2, "");
@@ -450,6 +531,19 @@ static_assert(offsetof(GafFrame, blend) == 11, "");
 static_assert(offsetof(GafFrame, reserved) == 12, "");
 static_assert(offsetof(GafFrame, pixelsOrLayers) == 16, "");
 static_assert(offsetof(GafFrame, scratch) == 20, "");
+static_assert(sizeof(GafRef) == 12, "");
+static_assert(offsetof(GafRef, pic) == 0, "");
+static_assert(offsetof(GafRef, tex) == 0, "");
+static_assert(offsetof(GafRef, index) == 0, "");
+static_assert(offsetof(GafRef, value) == 2, "");
+static_assert(offsetof(GafRef, kind) == 4, "");
+static_assert(offsetof(GafRef, unknown_5) == 5, "");
+static_assert(offsetof(GafRef, src) == 8, "");
+static_assert(sizeof(GafSequence) == 52, "");
+static_assert(offsetof(GafSequence, count) == 0, "");
+static_assert(offsetof(GafSequence, kind) == 2, "");
+static_assert(offsetof(GafSequence, unknown_3) == 3, "");
+static_assert(offsetof(GafSequence, entries) == 44, "");
 static_assert(sizeof(Game) == 234061, "");
 static_assert(offsetof(Game, unknown_0) == 0, "");
 static_assert(offsetof(Game, version) == 1, "");
@@ -1439,6 +1533,15 @@ static_assert(offsetof(MissionOptionFlags, value) == 0, "");
 static_assert(offsetof(MissionOptionFlags, flag_4) == 4, "");
 static_assert(offsetof(MissionOptionFlags, flag_8) == 8, "");
 static_assert(offsetof(MissionOptionFlags, flag_c) == 12, "");
+static_assert(sizeof(MissionOrderTableEntry) == 25, "");
+static_assert(offsetof(MissionOrderTableEntry, unknown_0) == 0, "");
+static_assert(offsetof(MissionOrderTableEntry, markerAnim) == 16, "");
+static_assert(offsetof(MissionOrderTableEntry, unknown_11) == 17, "");
+static_assert(sizeof(MissionRule) == 12, "");
+static_assert(offsetof(MissionRule, type) == 0, "");
+static_assert(offsetof(MissionRule, id) == 4, "");
+static_assert(offsetof(MissionRule, x) == 8, "");
+static_assert(offsetof(MissionRule, z) == 10, "");
 static_assert(sizeof(MissionType) == 1, "");
 static_assert(offsetof(MissionType, index) == 0, "");
 static_assert(sizeof(MissionUnit) == 36, "");
@@ -1509,6 +1612,15 @@ static_assert(sizeof(NetGameFlagLowBits) == 2, "");
 static_assert(sizeof(NetGameFlags) == 2, "");
 static_assert(offsetof(NetGameFlags, value) == 0, "");
 static_assert(offsetof(NetGameFlags, bits) == 0, "");
+static_assert(sizeof(NetPacketPendingEntry) == 32, "");
+static_assert(offsetof(NetPacketPendingEntry, frame) == 0, "");
+static_assert(offsetof(NetPacketPendingEntry, offset) == 4, "");
+static_assert(offsetof(NetPacketPendingEntry, size) == 8, "");
+static_assert(offsetof(NetPacketPendingEntry, owner) == 12, "");
+static_assert(offsetof(NetPacketPendingEntry, queued) == 16, "");
+static_assert(offsetof(NetPacketPendingEntry, sentTime) == 20, "");
+static_assert(offsetof(NetPacketPendingEntry, prev) == 24, "");
+static_assert(offsetof(NetPacketPendingEntry, next) == 28, "");
 static_assert(sizeof(Node) == 20, "");
 static_assert(offsetof(Node, index) == 0, "");
 static_assert(offsetof(Node, data) == 4, "");
@@ -1518,6 +1630,18 @@ static_assert(offsetof(NodeData, g) == 4, "");
 static_assert(offsetof(NodeData, f) == 8, "");
 static_assert(offsetof(NodeData, penalty) == 12, "");
 static_assert(offsetof(NodeData, steps) == 14, "");
+static_assert(sizeof(Object3D) == 52, "");
+static_assert(offsetof(Object3D, state) == 0, "");
+static_assert(offsetof(Object3D, unknown_1) == 1, "");
+static_assert(offsetof(Object3D, vertexCount) == 4, "");
+static_assert(offsetof(Object3D, faceCount) == 8, "");
+static_assert(offsetof(Object3D, firstFace) == 12, "");
+static_assert(offsetof(Object3D, unknown_10) == 16, "");
+static_assert(offsetof(Object3D, name) == 28, "");
+static_assert(offsetof(Object3D, active) == 32, "");
+static_assert(offsetof(Object3D, verts) == 36, "");
+static_assert(offsetof(Object3D, faces) == 40, "");
+static_assert(offsetof(Object3D, unknown_2c) == 44, "");
 static_assert(sizeof(Object3do) == 52, "");
 static_assert(offsetof(Object3do, state) == 0, "");
 static_assert(offsetof(Object3do, unknown_1) == 1, "");
@@ -1613,6 +1737,13 @@ static_assert(offsetof(PackedGoal, vel) == 24, "");
 static_assert(offsetof(PackedGoal, heading) == 36, "");
 static_assert(offsetof(PackedGoal, field_26) == 38, "");
 static_assert(sizeof(PackedPosGoal) == 39, "");
+static_assert(sizeof(PacketBuffer) == 1086, "");
+static_assert(offsetof(PacketBuffer, pool) == 0, "");
+static_assert(offsetof(PacketBuffer, start) == 4, "");
+static_assert(offsetof(PacketBuffer, count) == 8, "");
+static_assert(offsetof(PacketBuffer, length) == 12, "");
+static_assert(offsetof(PacketBuffer, first) == 16, "");
+static_assert(offsetof(PacketBuffer, data) == 20, "");
 static_assert(sizeof(PacketChannel) == 4164, "");
 static_assert(offsetof(PacketChannel, bufferIndex) == 0, "");
 static_assert(offsetof(PacketChannel, sendPacingTicks) == 4, "");
@@ -1727,6 +1858,17 @@ static_assert(offsetof(PieceFrame, unknown_14) == 20, "");
 static_assert(offsetof(PieceFrame, color) == 24, "");
 static_assert(offsetof(PieceFrame, flags) == 28, "");
 static_assert(sizeof(PieceFrameFlags) == 4, "");
+static_assert(sizeof(PieceRec) == 54, "");
+static_assert(offsetof(PieceRec, desc) == 0, "");
+static_assert(offsetof(PieceRec, unknown_4) == 4, "");
+static_assert(offsetof(PieceRec, angle_10) == 16, "");
+static_assert(offsetof(PieceRec, angle_12) == 18, "");
+static_assert(offsetof(PieceRec, angle_14) == 20, "");
+static_assert(offsetof(PieceRec, pos) == 22, "");
+static_assert(offsetof(PieceRec, verts) == 34, "");
+static_assert(offsetof(PieceRec, unknown_26) == 38, "");
+static_assert(offsetof(PieceRec, flags) == 40, "");
+static_assert(offsetof(PieceRec, unknown_2a) == 42, "");
 static_assert(sizeof(Player) == 331, "");
 static_assert(offsetof(Player, active) == 0, "");
 static_assert(offsetof(Player, id) == 4, "");
@@ -1943,6 +2085,14 @@ static_assert(sizeof(RadarTimer) == 4, "");
 static_assert(offsetof(RadarTimer, word) == 0, "");
 static_assert(offsetof(RadarTimer, byte) == 0, "");
 static_assert(sizeof(RadiusUnitVisitor) == 4, "");
+static_assert(sizeof(Rec) == 10, "");
+static_assert(offsetof(Rec, a) == 0, "");
+static_assert(offsetof(Rec, b) == 1, "");
+static_assert(offsetof(Rec, flags) == 2, "");
+static_assert(offsetof(Rec, field_6) == 6, "");
+static_assert(sizeof(ReclaimableResource) == 16, "");
+static_assert(offsetof(ReclaimableResource, pos) == 0, "");
+static_assert(offsetof(ReclaimableResource, val) == 12, "");
 static_assert(sizeof(Rect) == 16, "");
 static_assert(offsetof(Rect, left) == 0, "");
 static_assert(offsetof(Rect, top) == 4, "");
@@ -1961,6 +2111,18 @@ static_assert(sizeof(Rot16) == 6, "");
 static_assert(offsetof(Rot16, x) == 0, "");
 static_assert(offsetof(Rot16, y) == 2, "");
 static_assert(offsetof(Rot16, z) == 4, "");
+static_assert(sizeof(SavedPiece) == 108, "");
+static_assert(offsetof(SavedPiece, move) == 0, "");
+static_assert(offsetof(SavedPiece, moveSpeed) == 12, "");
+static_assert(offsetof(SavedPiece, turn) == 24, "");
+static_assert(offsetof(SavedPiece, turnSpeed) == 36, "");
+static_assert(offsetof(SavedPiece, spin) == 48, "");
+static_assert(offsetof(SavedPiece, acceleration) == 60, "");
+static_assert(offsetof(SavedPiece, translation) == 72, "");
+static_assert(offsetof(SavedPiece, rotation) == 84, "");
+static_assert(offsetof(SavedPiece, visible) == 96, "");
+static_assert(offsetof(SavedPiece, cached) == 100, "");
+static_assert(offsetof(SavedPiece, shaded) == 104, "");
 static_assert(sizeof(ScoutTimer) == 20, "");
 static_assert(sizeof(ScreenPos) == 4, "");
 static_assert(offsetof(ScreenPos, x) == 0, "");
@@ -1981,6 +2143,9 @@ static_assert(offsetof(Settings, field_471) == 0, "");
 static_assert(offsetof(Settings, flags_475) == 4, "");
 static_assert(offsetof(Settings, bits_475) == 4, "");
 static_assert(offsetof(Settings, pad_479) == 8, "");
+static_assert(sizeof(SideData) == 150, "");
+static_assert(offsetof(SideData, unknown_0) == 0, "");
+static_assert(offsetof(SideData, bSideId) == 149, "");
 static_assert(sizeof(SideDef) == 562, "");
 static_assert(offsetof(SideDef, name) == 0, "");
 static_assert(offsetof(SideDef, nameprefix) == 30, "");
@@ -2028,6 +2193,29 @@ static_assert(offsetof(SpatialTimer, best) == 20, "");
 static_assert(offsetof(SpatialTimer, probe) == 32, "");
 static_assert(offsetof(SpatialTimer, step) == 44, "");
 static_assert(offsetof(SpatialTimer, bestRating) == 56, "");
+static_assert(sizeof(Spot) == 48, "");
+static_assert(offsetof(Spot, prev) == 0, "");
+static_assert(offsetof(Spot, next) == 2, "");
+static_assert(offsetof(Spot, anim) == 4, "");
+static_assert(offsetof(Spot, shadow) == 16, "");
+static_assert(offsetof(Spot, state) == 4, "");
+static_assert(offsetof(Spot, pos) == 8, "");
+static_assert(offsetof(Spot, vel) == 20, "");
+static_assert(offsetof(Spot, frame) == 4, "");
+static_assert(offsetof(Spot, unknown_5) == 5, "");
+static_assert(offsetof(Spot, pos2) == 8, "");
+static_assert(offsetof(Spot, unknown_8) == 8, "");
+static_assert(offsetof(Spot, animIndex) == 12, "");
+static_assert(offsetof(Spot, rot) == 32, "");
+static_assert(offsetof(Spot, damage) == 38, "");
+static_assert(offsetof(Spot, x) == 40, "");
+static_assert(offsetof(Spot, z) == 42, "");
+static_assert(offsetof(Spot, cell) == 40, "");
+static_assert(offsetof(Spot, feature) == 44, "");
+static_assert(offsetof(Spot, burnTime) == 46, "");
+static_assert(offsetof(Spot, timer) == 46, "");
+static_assert(offsetof(Spot, animBits) == 46, "");
+static_assert(offsetof(Spot, flags) == 47, "");
 static_assert(sizeof(SpotState) == 118, "");
 static_assert(offsetof(SpotState, count) == 0, "");
 static_assert(offsetof(SpotState, cacheDrawCount) == 4, "");

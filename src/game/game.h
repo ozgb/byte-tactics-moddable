@@ -652,7 +652,7 @@ struct Game {
     void* smoke1;
     void* smoke2;
     int fire1;
-    int alfboom1;
+    void* alfboom1;
     void* radlogo;
     void* radlogohigh;
     void* nuclogo;
@@ -662,18 +662,18 @@ struct Game {
     union {
         struct {
             void* src3;
-            int explode2;
-            int explode3;
-            int explode4;
-            int explode5;
-            int nuke1;
+            void* explode2;
+            void* explode3;
+            void* explode4;
+            void* explode5;
+            void* nuke1;
         };
         void* sources[6];
     };
     void* gaf_1480f;
     unsigned short* image_14813;
     unsigned short* image_14817;
-    int igpaused;
+    void* igpaused;
     union {
         struct {
             unsigned short* sidePanelTopSeq[5];
@@ -723,11 +723,11 @@ struct Game {
             int cursorRed;
             int cursorGrn;
             unsigned short* cursorNormal;
-            int cursorHourglass;
+            void* cursorHourglass;
         };
         void* cursorModeSeq[21];
     };
-    int pathIcon;
+    void* pathIcon;
     void* logos;
     void* logos32;
     int count_148df;
@@ -735,11 +735,11 @@ struct Game {
     int count_148e7;
     int* data_148eb;
     int gafAnimClearedSlot;
-    int fxGaf;
-    int igTitles;
-    int vismasks;
-    int fog;
-    int cursorsGaf;
+    void* fxGaf;
+    void* igTitles;
+    void* vismasks;
+    void* fog;
+    void* cursorsGaf;
     union {
         struct {
             int array_14907[1];

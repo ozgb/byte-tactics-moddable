@@ -272,12 +272,12 @@ void LoadGameResources()
 {
     char* gaf;
 
-    g_game->fxGaf = (int)LoadAnimGaf("fx");
+    g_game->fxGaf = LoadAnimGaf("fx");
     gaf = (char*)g_game->fxGaf;
     g_game->smoke1 = (void*)((int)FindGafEntry(gaf, "smoke 1"));
     g_game->smoke2 = (void*)((int)FindGafEntry(gaf, "smoke 2"));
     g_game->fire1 = (int)FindGafEntry(gaf, "fire1");
-    g_game->alfboom1 = (int)FindGafEntry(gaf, "alfboom1");
+    g_game->alfboom1 = FindGafEntry(gaf, "alfboom1");
     FLAG(g_game->alfboom1);
     g_game->radlogo = (void*)((int)FindGafEntry(gaf, "radlogo"));
     g_game->radlogohigh = (void*)((int)FindGafEntry(gaf, "radlogohigh"));
@@ -294,29 +294,29 @@ void LoadGameResources()
     g_game->flamestreamGaf = (void*)((int)FindGafEntry(gaf, "flamestream"));
     g_game->src3 = (void*)((int)FindGafEntry(gaf, "explosion"));
     FLAG(((int)g_game->src3));
-    g_game->explode2 = (int)FindGafEntry(gaf, "explode2");
+    g_game->explode2 = FindGafEntry(gaf, "explode2");
     FLAG(g_game->explode2);
-    g_game->explode3 = (int)FindGafEntry(gaf, "explode3");
+    g_game->explode3 = FindGafEntry(gaf, "explode3");
     FLAG(g_game->explode3);
-    g_game->explode4 = (int)FindGafEntry(gaf, "explode4");
+    g_game->explode4 = FindGafEntry(gaf, "explode4");
     FLAG(g_game->explode4);
-    g_game->explode5 = (int)FindGafEntry(gaf, "explode5");
+    g_game->explode5 = FindGafEntry(gaf, "explode5");
     FLAG(g_game->explode5);
-    g_game->nuke1 = (int)FindGafEntry(gaf, "nuke1");
+    g_game->nuke1 = FindGafEntry(gaf, "nuke1");
     FLAG(g_game->nuke1);
     g_game->gaf_1480f = (void*)((int)FindGafEntry(gaf, "shadow"));
 
-    g_game->igTitles = (int)LoadAnimGaf("igtitles");
+    g_game->igTitles = LoadAnimGaf("igtitles");
     gaf = (char*)g_game->igTitles;
     g_game->image_14813 = (unsigned short*)((int)FindGafEntry(gaf, "igvictory"));
     g_game->image_14817 = (unsigned short*)((int)FindGafEntry(gaf, "igdefeat"));
-    g_game->igpaused = (int)FindGafEntry(gaf, "igpaused");
+    g_game->igpaused = FindGafEntry(gaf, "igpaused");
 
-    g_game->vismasks = (int)LoadAnimGaf("vismasks");
+    g_game->vismasks = LoadAnimGaf("vismasks");
     gaf = (char*)g_game->vismasks;
     g_game->losTable = (FrameTable*)((int)FindGafEntry(gaf, "vismask"));
 
-    g_game->fog = (int)LoadAnimGaf("fog");
+    g_game->fog = LoadAnimGaf("fog");
     gaf = (char*)g_game->fog;
     g_game->black1Seq = (int)FindGafEntry(gaf, "Black1");
     g_game->black2 = (int)FindGafEntry(gaf, "Black2");
@@ -327,7 +327,7 @@ void LoadGameResources()
     g_game->gray3 = (int)FindGafEntry(gaf, "Gray3");
     g_game->gray4 = (int)FindGafEntry(gaf, "Gray4");
 
-    g_game->cursorsGaf = (int)LoadAnimGaf("cursors");
+    g_game->cursorsGaf = LoadAnimGaf("cursors");
     gaf = (char*)g_game->cursorsGaf;
     g_game->cursorAttack = (int)FindGafEntry(gaf, "cursorattack");
     g_game->cursorAirstrike = (int)FindGafEntry(gaf, "cursorairstrike");
@@ -347,8 +347,8 @@ void LoadGameResources()
     g_game->cursorRed = (int)FindGafEntry(gaf, "cursorred");
     g_game->cursorGrn = (int)FindGafEntry(gaf, "cursorgrn");
     g_game->cursorNormal = (unsigned short*)((int)FindGafEntry(gaf, "cursornormal"));
-    g_game->cursorHourglass = (int)FindGafEntry(gaf, "cursorhourglass");
-    g_game->pathIcon = (int)FindGafEntry(gaf, "pathicon");
+    g_game->cursorHourglass = FindGafEntry(gaf, "cursorhourglass");
+    g_game->pathIcon = FindGafEntry(gaf, "pathicon");
     g_game->cursorRevive = (int)FindGafEntry(gaf, "cursorrevive");
 
     TdfFile parser;
@@ -398,8 +398,8 @@ void FreeAnimFiles()
     for (i = 0; i < g_game->sides; i++) {
         g_game->panelTop[i] = 0;
     }
-    g_game->gafAnimClearedSlot = g_game->fxGaf = g_game->igTitles =
-        g_game->vismasks = g_game->fog = g_game->cursorsGaf = 0;
+    g_game->gafAnimClearedSlot = 0;
+    g_game->fxGaf = g_game->igTitles = g_game->vismasks = g_game->fog = g_game->cursorsGaf = 0;
 }
 
 // FUNCTION: 0x42a0e0

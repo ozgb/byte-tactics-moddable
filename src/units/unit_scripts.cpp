@@ -381,14 +381,14 @@ static inline FeatureCursorView* GetFeature(Cell* cell) {
     if (id < 0xfffb) {
         if (id >= g_game->featureCount)
             return 0;
-        return &((FeatureCursorView *)g_game->features)[id];
+        return &((FeatureCursorView *)g_game->features.get())[id];
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->width + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return &((FeatureCursorView *)g_game->features)[id];
+    return &((FeatureCursorView *)g_game->features.get())[id];
 }
 
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \

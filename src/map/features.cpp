@@ -246,7 +246,7 @@ void FreeFeaturePool()
         }
     }
 
-    GameFreeThunk(g_game->features);
+    GameFreeThunk((int*)g_game->features.get());
     g_game->features = 0;
     g_game->featureCount = 0;
 }
@@ -332,7 +332,7 @@ int __stdcall LoadFeatureType(char* name)
         sprintf(path, "Record \"%s\" missing from feature files", name);
         FatalError(path);
     }
-    g_game->features = (Feature*)GameReallocTagged(g_game->features, "FEATURES", (g_game->featureCount + 1) * 0x100);
+    g_game->features = (Feature*)SimRealloc(g_game->features, (g_game->featureCount + 1) * 0x100);
     Feature* def = &g_game->features[g_game->featureCount];
     strncpy(def->name, name, 0x80);
     entry->current->GetFieldString(def->description, "Description", 0x14, DAT_005119b8);
@@ -438,25 +438,23 @@ unsigned short __stdcall FindOrLoadFeatureType(char* name)
 void ResolveFeatureLinks()
 {
     char buf[0x100];
-    Feature** features;
     int i = 0;
     int* count = &g_game->featureCount;
     if (*count > 0) {
-        features = &g_game->features;
         do {
-            TdfRecord* parser = (TdfRecord*)FindFeatureFile((*features)[i].name)->current;
+            TdfRecord* parser = (TdfRecord*)FindFeatureFile(g_game->features[i].name)->current;
             if (parser->GetFieldString(buf, "featuredead", 0x100, DAT_005119b8))
-                (*features)[i].dead = FindOrLoadFeatureType(buf);
+                g_game->features[i].dead = FindOrLoadFeatureType(buf);
             else
-                (*features)[i].dead = 0xffff;
+                g_game->features[i].dead = 0xffff;
             if (parser->GetFieldString(buf, "featurereclamate", 0x100, DAT_005119b8))
-                (*features)[i].reclamate = FindOrLoadFeatureType(buf);
+                g_game->features[i].reclamate = FindOrLoadFeatureType(buf);
             else
-                (*features)[i].reclamate = 0xffff;
+                g_game->features[i].reclamate = 0xffff;
             if (parser->GetFieldString(buf, "featureburnt", 0x100, DAT_005119b8))
-                (*features)[i].burnt = FindOrLoadFeatureType(buf);
+                g_game->features[i].burnt = FindOrLoadFeatureType(buf);
             else
-                (*features)[i].burnt = 0xffff;
+                g_game->features[i].burnt = 0xffff;
             g_game->loadPercent = (unsigned char)((i + 1) * 100 / *count);
             i++;
         } while (i < *count);

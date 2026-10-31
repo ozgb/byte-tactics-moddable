@@ -598,7 +598,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,366,304,6419,5099,3188,1964,,25,
+orders,*,,366,304,6419,5099,3188,1964,,24,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,AiSearchGoal::HasNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 orders,AiSearchGoal::SerializeNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network
@@ -632,7 +632,6 @@ orders,HalfNegated,src/orders/unit_orders.cpp,0,0,0,0,0,0,?HalfNegated@@YGMM@Z,1
 orders,LiteGoal::HasNetUnitState,src/game/victory.cpp,1,0,0,0,0,0,?HasNetUnitState@LiteGoal@@UAEHXZ,0,network
 orders,LiteGoal::SerializeNetUnitState,src/game/victory.cpp,1,0,0,0,0,0,?SerializeNetUnitState@LiteGoal@@UAEXPAVBitWriter@@@Z,0,network
 orders,Marked,src/orders/order_dispatch.cpp,1,0,0,0,0,0,?Marked@@YGHPAUFeatureMarkView@@@Z,0,info-panel
-orders,MissionOrderTable::GetCount,src/orders/order_list.cpp,0,0,0,0,0,0,?GetCount@MissionOrderTable@@QAEHXZ,1,
 orders,MoveOrderToTail,src/orders/order_list.cpp,0,0,0,0,0,0,?MoveOrderToTail@@YGXPAD0@Z,1,
 orders,OrderBase::OrStatusFlags,src/orders/order_list.cpp,0,0,0,0,0,0,?OrStatusFlags@OrderBase@@UAEXI@Z,1,
 orders,OrderFx::ApproxDist,src/orders/order_targets.cpp,1,0,0,0,0,0,?ApproxDist@OrderFx@@UAEHHH@Z,0,no-caller

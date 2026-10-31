@@ -12181,9 +12181,6 @@ address,function,file,kind,target
 0x43c350,ClearOrderTypeTable,src/orders/order_list.cpp,call,BlockVector::Clear
 0x43c350,ClearOrderTypeTable,src/orders/order_list.cpp,function,
 0x43c350,ClearOrderTypeTable,src/orders/order_list.cpp,global_maybe_written,g_missionOrderTableVec@src/orders/order_list.cpp
-0x43c360,MissionOrderTable::GetCount,src/orders/order_list.cpp,field_read,MissionOrderTable::first
-0x43c360,MissionOrderTable::GetCount,src/orders/order_list.cpp,field_read,MissionOrderTable::last
-0x43c360,MissionOrderTable::GetCount,src/orders/order_list.cpp,function,
 0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,deref_read,*OrderTableEntry
 0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,function,
 0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const OrderTableEntry &, char *) __attribute__((stdcall)) [pred]"

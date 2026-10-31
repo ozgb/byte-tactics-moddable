@@ -10469,13 +10469,6 @@ address,function,file,kind,target
 0x434ab0,SetMissionType,src/map/map_list.cpp,function,
 0x434ab0,SetMissionType,src/map/map_list.cpp,global_read,g_game
 0x434ab0,SetMissionType,src/map/map_list.cpp,global_read,kSim
-0x434b90,FreeOtaEnumCache,src/frontend/map_enum.cpp,call,GameFreeThunk
-0x434b90,FreeOtaEnumCache,src/frontend/map_enum.cpp,function,
-0x434b90,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_read,g_otaEnumFileList
-0x434b90,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumCacheComplete
-0x434b90,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumFileCount
-0x434b90,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumFileList
-0x434b90,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumFileListBytes
 0x434b90,FreeOtaEnumCacheAndMission,src/map/map_list.cpp,call,FreeOtaEnumCache
 0x434b90,FreeOtaEnumCacheAndMission,src/map/map_list.cpp,call,Mission::~Mission
 0x434b90,FreeOtaEnumCacheAndMission,src/map/map_list.cpp,call,operator Mission *
@@ -45221,6 +45214,13 @@ address,function,file,kind,target
 ,FreeLocked,src/state/block.cpp,function,
 ,FreeLocked,src/state/block.cpp,global_read,g_base
 ,FreeLocked,src/state/block.cpp,global_read,kFreeBit
+,FreeOtaEnumCache,src/frontend/map_enum.cpp,call,GameFreeThunk
+,FreeOtaEnumCache,src/frontend/map_enum.cpp,function,
+,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_read,g_otaEnumFileList
+,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumCacheComplete
+,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumFileCount
+,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumFileList
+,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumFileListBytes
 ,FreeTeam,src/network/net_game.cpp,call,IsValid
 ,FreeTeam,src/network/net_game.cpp,field_escape,Game::players
 ,FreeTeam,src/network/net_game.cpp,field_read,Player::index

@@ -1877,7 +1877,7 @@ void __stdcall DrawDebrisProjected(void* surface, Vec3* offset,
 {
     Vec3* verts = piece->verts.get();
     Face* faces = piece->faces.get();
-    if (verts == 0 || faces == 0)
+    if (verts == nullptr || faces == nullptr)
         return;
     DrawProjectedFaces(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace);
 }

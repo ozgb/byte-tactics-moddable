@@ -1,9 +1,10 @@
 #include "../state/block.h"
+#include "unit.h"
 #include "unit_script.h"
 
-UnitScript* NewUnitScript()
+void NewUnitScript(Unit* self)
 {
-    return new (kSim) UnitScript;
+    self->script = new (kSim) UnitScript;
 }
 
 // FUNCTION: 0x485e30 ??_GUnitScript@@UAEPAXI@Z

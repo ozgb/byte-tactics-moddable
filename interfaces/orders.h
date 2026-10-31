@@ -60,8 +60,8 @@ struct OrdersSeam {
     void (__stdcall* CreatePathfinder)(void);
     // Destroys the pathfinder of a game and clears it in the game state. Hooks: none.
     void (__stdcall* DestroyPathfinder)(void);
-    // Allocates the movement of a unit from the sim block, builds it and returns it. Hooks: none.
-    UnitMotion* (__stdcall* NewUnitMotion)(Unit* unit);
+    // Allocates the movement of a unit from the sim block, builds it and stores it in the unit. Hooks: none.
+    void (__stdcall* NewUnitMotion)(Unit* unit);
     // Allocates an order from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
     Order* (__stdcall* LoadOrder)(Unit* unit, HapiBank* file, char* name);
     // Returns the order kind a name in the order type table stands for. Hooks: none.

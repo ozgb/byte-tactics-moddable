@@ -1501,7 +1501,7 @@ void PatrolGoal::FillWaypointWorldPos(Vec3* out, int unused, int n)
 // FUNCTION: 0x44f6a0
 void CreatePathfinder()
 {
-    g_game->pathfinder = g_seams.pathfinding->Create();
+    g_seams.pathfinding->Create();
 }
 
 // FUNCTION: 0x44f6e0

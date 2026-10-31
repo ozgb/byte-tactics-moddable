@@ -66,6 +66,7 @@ public:
     void SetObjectState(int newState);
 };
 
-UnitScript* NewUnitScript();
+struct Unit;
+void NewUnitScript(Unit* self);
 
 #endif

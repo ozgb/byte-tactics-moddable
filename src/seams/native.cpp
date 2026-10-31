@@ -3,6 +3,10 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/network.h"
+#include "../state/block.h"
+#include "../network/player.h"
+#include "../game/game.h"
+#include "../game/los_helpers.h"
 #include "../files/files_impl.h"
 #include "../files/files_bank.h"
 #include "../game/unit_resources.h"
@@ -202,9 +206,9 @@ static void __fastcall SquadManagerDeleteTimersNative(SquadManager* self, int un
     self->DeleteTimers();
 }
 
-static SquadManager* __stdcall CreateSquadManagerNative(Player* player)
+static void __stdcall CreateSquadManagerNative(Player* player)
 {
-    return new (kSim) SquadManager(player);
+    player->ai = new (kSim) SquadManager(player);
 }
 
 static void __stdcall UnitTypeSetAddTypeOrCategoryNative(UnitTypeSet* self, char* text, int* out)
@@ -462,9 +466,9 @@ static void __fastcall DestroyMotionObjectNative(UnitMotion* self)
     self->DestroyObject();
 }
 
-static UnitMotion* __stdcall NewUnitMotionNative(Unit* unit)
+static void __stdcall NewUnitMotionNative(Unit* unit)
 {
-    return new (kSim) UnitMotion(unit);
+    unit->motion = new (kSim) UnitMotion(unit);
 }
 
 static Order* __stdcall LoadOrderNative(Unit* unit, HapiBank* file, char* name)
@@ -537,9 +541,9 @@ static void __stdcall DestroyPathfinderNative(Pathfinder* self)
     delete self;
 }
 
-static Pathfinder* __stdcall CreatePathfinderNative()
+static void __stdcall CreatePathfinderNative()
 {
-    return new (kSim) Pathfinder;
+    g_game->pathfinder = new (kSim) Pathfinder;
 }
 
 Seams g_seams;

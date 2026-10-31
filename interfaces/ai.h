@@ -59,8 +59,8 @@ struct AiSeam {
     void (__fastcall* SquadManagerTickIfActive)(SquadManager* self, int unusedEdx);
     // Deletes the timers of a squad manager (thiscall in 3.1c: this in ecx, edx unused). Hooks: none.
     void (__fastcall* SquadManagerDeleteTimers)(SquadManager* self, int unusedEdx);
-    // Allocates the squad manager of a player from the sim block, builds it and returns it. Hooks: none.
-    SquadManager* (__stdcall* CreateSquadManager)(Player* player);
+    // Allocates the squad manager of a player from the sim block, builds it and stores it in the player. Hooks: none.
+    void (__stdcall* CreateSquadManager)(Player* player);
 };
 
 #endif

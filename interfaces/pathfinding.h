@@ -17,8 +17,8 @@ struct PathfindingSeam {
     void (__stdcall* AbortIfGoalMatch)(Pathfinder* self, AiSearchGoal* goal);
     // Destroys a pathfinder and releases its memory. Hooks: none.
     void (__stdcall* Destroy)(Pathfinder* self);
-    // Allocates a pathfinder from the sim block, builds it and returns it. Hooks: none.
-    Pathfinder* (__stdcall* Create)(void);
+    // Allocates the pathfinder of a game from the sim block, builds it and stores it in the game state. Hooks: none.
+    void (__stdcall* Create)(void);
 };
 
 #endif

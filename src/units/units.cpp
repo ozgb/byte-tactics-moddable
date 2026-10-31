@@ -418,7 +418,7 @@ void __stdcall InitUnitScript(Unit* self)
 {
     Object3do* obj = ((Object3do **)g_game->types.get())[self->unitDefIndex];
     if (self->def->data) {
-        self->script = NewUnitScript();
+        NewUnitScript(self);
         ((CobScript*)self->script.get())->SetCob((ScriptTable*)self->def->data);
         self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, self);
         ((UnitScript*)self->script.get())->SetObjectState((int)self->state.get());
@@ -436,7 +436,7 @@ void __stdcall InitUnitScript(Unit* self)
 // FUNCTION: 0x485e50
 void __stdcall CreateUnitMotion(Unit* unit)
 {
-    unit->motion = g_seams.orders->NewUnitMotion(unit);
+    g_seams.orders->NewUnitMotion(unit);
     unit->angles.heading = unit->def->buildangleUnsigned;
 }
 
@@ -456,7 +456,7 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
     g_seams.weapons->InitUnitWeaponSlots(unit);
     g_seams.economy->UpdateMetalExtraction((Unit*)unit);
     if (type->mobile == 1) {
-        unit->motion = g_seams.orders->NewUnitMotion(unit);
+        g_seams.orders->NewUnitMotion(unit);
         unit->angles.heading = unit->def->buildangleUnsigned;
     }
 }
@@ -482,7 +482,7 @@ static inline void __stdcall InitSpawnedUnit(unsigned short unitType, Vec3 pos,
     g_seams.weapons->InitUnitWeaponSlots(unit);
     g_seams.economy->UpdateMetalExtraction((Unit*)unit);
     if (type->mobile == 1) {
-        unit->motion = g_seams.orders->NewUnitMotion(unit);
+        g_seams.orders->NewUnitMotion(unit);
         unit->angles.heading = unit->def->buildangleUnsigned;
     }
 }

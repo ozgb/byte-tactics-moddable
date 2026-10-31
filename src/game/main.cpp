@@ -15,6 +15,7 @@
 #include "../network/net_game.h"
 #include "../state/game_rand.h"
 #include "../../interfaces/host.h"
+#include "../graphics/pcx.h"
 
 struct FileHandle;
 
@@ -134,6 +135,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     int lzero = 0;
 
     HarnessInit(lpCmdLine);
+    host_crash_set_cleanup(ReleaseDisplayAfterCrash);
     (void)hPrevInstance;
 
     InitDebugSupport(8);
@@ -265,7 +267,7 @@ int __stdcall GameEntry(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
     __try {
         return GameMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-    } __except (ExceptionFilter(GetExceptionInformation(), "Main Thread")) {
+    } __except (host_crash_report(GetExceptionInformation(), "Main Thread"), EXCEPTION_CONTINUE_SEARCH) {
     }
     return 0;
 }

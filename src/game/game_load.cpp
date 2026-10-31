@@ -436,7 +436,7 @@ void __cdecl LoadThreadMain(void* param)
 {
     __try {
         LoadMatch(param);
-    } __except (ExceptionFilter(GetExceptionInformation(), "Load Thread")) {
+    } __except (host_crash_report(GetExceptionInformation(), "Load Thread"), EXCEPTION_CONTINUE_SEARCH) {
     }
 }
 

@@ -1107,8 +1107,6 @@ class AiSearchGoal;
 #include "../orders/path_order.h"
 #include "../orders/order_goals.h"
 
-unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
-
 // FUNCTION: 0x4905e0
 // FUNCTION: 0x490630 ??_GPackedGoal@@UAEPAXI@Z
 PackedGoal::PackedGoal(GoalOwnerUnit* p)

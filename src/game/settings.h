@@ -2,6 +2,7 @@
 #define GAME_SETTINGS_H
 
 #include "mission_option_flags.h"
+#include "../../interfaces/services.h"
 
 #pragma pack(push, 1)
 struct SkirmishPlayer {
@@ -42,6 +43,5 @@ void __stdcall ApplyUseOnlyUnits();
 
 void __stdcall WriteGameRegistryValue(void* key, void* buf, int value);
 int __stdcall ReadGameRegistryValue(const char* key, void* buf, unsigned int* size);
-void __stdcall SaveSettings();
 
 #endif

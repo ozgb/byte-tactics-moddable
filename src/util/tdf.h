@@ -10,7 +10,5 @@ TdfField* __stdcall AssignPairRangeBack(TdfField* first, TdfField* last, TdfFiel
 void __stdcall ConstructPair(TdfField* p, const TdfField& value);
 
 void __stdcall LoadTranslations(char* filename, char* section);
-int __stdcall FindTranslation(char* name);
-char* __stdcall Translate(const char* key);
 
 #endif

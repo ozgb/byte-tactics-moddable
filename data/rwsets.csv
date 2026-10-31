@@ -27856,7 +27856,6 @@ address,function,file,kind,target
 0x489260,UnitCategory::UnitCategory,src/units/unit_commands.cpp,field_read,UnitCategory::value
 0x489260,UnitCategory::UnitCategory,src/units/unit_commands.cpp,function,
 0x489280,MakePropList,src/units/unit_targets.cpp,call,GameAllocIgnoreTag
-0x489280,MakePropList,src/units/unit_targets.cpp,call,GetTickRate
 0x489280,MakePropList,src/units/unit_targets.cpp,call,Translate
 0x489280,MakePropList,src/units/unit_targets.cpp,call,memset
 0x489280,MakePropList,src/units/unit_targets.cpp,call,spd
@@ -28225,11 +28224,11 @@ address,function,file,kind,target
 0x48a440,IsTargetingUnit,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::aimTargetZOrUnitSentinel
 0x48a440,IsTargetingUnit,src/units/unit_targets.cpp,function,
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,AngleOfVector
-0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,GetTicks
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,RotatePoint2D
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,ScaledCos
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,abs
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,get
+0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,host_time_ms
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,operator->
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,deref_read,*ModelGroundView
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,deref_read,*unsigned char
@@ -31806,9 +31805,9 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [PlayersSeam::LoadPlayerControllers]
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayersOnStream]
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
-0x497c70,LoadThreadMain,src/game/game_load.cpp,call,ExceptionFilter
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,LoadMatch
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,_exception_info
+0x497c70,LoadThreadMain,src/game/game_load.cpp,call,host_crash_report
 0x497c70,LoadThreadMain,src/game/game_load.cpp,function,
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,call,BlitMenuLayers
 0x497ce0,DrawSyncStatus,src/game/game_load.cpp,call,DrawTextClipped
@@ -33659,6 +33658,7 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,call,Sound::SetTrackCategory
 0x49e830,GameMain,src/game/main.cpp,call,WriteGameRegistryValue
 0x49e830,GameMain,src/game/main.cpp,call,atexit
+0x49e830,GameMain,src/game/main.cpp,call,host_crash_set_cleanup
 0x49e830,GameMain,src/game/main.cpp,call,host_instance_running
 0x49e830,GameMain,src/game/main.cpp,call,host_pump_events
 0x49e830,GameMain,src/game/main.cpp,call,host_setting_get
@@ -33697,6 +33697,7 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,field_write,Game::versionMinor
 0x49e830,GameMain,src/game/main.cpp,fn_ref,AtexitNoOp
 0x49e830,GameMain,src/game/main.cpp,fn_ref,OutOfMemoryHandler
+0x49e830,GameMain,src/game/main.cpp,fn_ref,ReleaseDisplayAfterCrash
 0x49e830,GameMain,src/game/main.cpp,fn_ref,ReopenCdAudio
 0x49e830,GameMain,src/game/main.cpp,function,
 0x49e830,GameMain,src/game/main.cpp,global_escape,DAT_005119b8
@@ -33727,9 +33728,9 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,global_write,g_displayContext
 0x49e830,GameMain,src/game/main.cpp,global_write,g_lastSoundReapTick
 0x49ed90,AtexitNoOp,src/game/main.cpp,function,
-0x49eda0,GameEntry,src/game/main.cpp,call,ExceptionFilter
 0x49eda0,GameEntry,src/game/main.cpp,call,GameMain
 0x49eda0,GameEntry,src/game/main.cpp,call,_exception_info
+0x49eda0,GameEntry,src/game/main.cpp,call,host_crash_report
 0x49eda0,GameEntry,src/game/main.cpp,function,
 0x49ee30,ParseCommandLine,src/game/main.cpp,call,IsDebugKeyword
 0x49ee30,ParseCommandLine,src/game/main.cpp,call,Onl_LoadConfigFile
@@ -36757,7 +36758,6 @@ address,function,file,kind,target
 0x4b0590,DrawSunkenBox,src/gui/listbox.cpp,field_read,Rect::right
 0x4b0590,DrawSunkenBox,src/gui/listbox.cpp,field_read,Rect::top
 0x4b0590,DrawSunkenBox,src/gui/listbox.cpp,function,
-0x4b0610,CobScript::CobScript,src/units/cob.cpp,call,GetTickRate
 0x4b0610,CobScript::CobScript,src/units/cob.cpp,call,operator=
 0x4b0610,CobScript::CobScript,src/units/cob.cpp,field_write,Channel::state
 0x4b0610,CobScript::CobScript,src/units/cob.cpp,field_write,CobScript::activeCount
@@ -41345,16 +41345,15 @@ address,function,file,kind,target
 0x4cb9e0,SaveBmp,src/graphics/pcx.cpp,field_read,PcxBitmap::width
 0x4cb9e0,SaveBmp,src/graphics/pcx.cpp,field_write,BmpWriter::file
 0x4cb9e0,SaveBmp,src/graphics/pcx.cpp,function,
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,call,GetDisplay
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,call,Lock
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,call,ReleaseDirectDraw
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,call,Unlock
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,call,UnlockAllScreens
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,call,host_crash_report
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,call,host_window_set_topmost
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,field_read,Display::hwnd
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,field_write,Display::cursorSprite
-0x4cbab0,ExceptionFilter,src/graphics/pcx.cpp,function,
+0x4cbab0,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,call,GetDisplay
+0x4cbab0,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,call,Lock
+0x4cbab0,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,call,ReleaseDirectDraw
+0x4cbab0,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,call,Unlock
+0x4cbab0,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,call,UnlockAllScreens
+0x4cbab0,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,call,host_window_set_topmost
+0x4cbab0,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,field_read,Display::hwnd
+0x4cbab0,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,field_write,Display::cursorSprite
+0x4cbab0,ReleaseDisplayAfterCrash,src/graphics/pcx.cpp,function,
 0x4cbbe0,BlitSurface,src/graphics/blit.cpp,asm,inline
 0x4cbbe0,BlitSurface,src/graphics/blit.cpp,function,
 0x4cc3d0,BlitCompressedLit,src/graphics/blit.cpp,asm,inline
@@ -44009,9 +44008,9 @@ address,function,file,kind,target
 ,CommandAllowed,src/network/net_game.cpp,function,
 ,CommandAllowed,src/network/net_game.cpp,global_read,g_game
 ,CommandAllowed,src/network/net_game.cpp,global_read,g_packetModes
-,CommandArgs::GetArgPtr,src/util/commands.h,field_read,CommandArgs::args
-,CommandArgs::GetArgPtr,src/util/commands.h,field_read,CommandArgs::count
-,CommandArgs::GetArgPtr,src/util/commands.h,function,
+,CommandArgs::GetArgPtr,interfaces/services.h,field_read,CommandArgs::args
+,CommandArgs::GetArgPtr,interfaces/services.h,field_read,CommandArgs::count
+,CommandArgs::GetArgPtr,interfaces/services.h,function,
 ,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,CommandArgs::GetIntArg
 ,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
@@ -52079,6 +52078,10 @@ address,function,file,kind,target
 ,host_crash_install,src/host/win32/crash.cpp,function,
 ,host_crash_report,src/host/win32/crash.cpp,call,ReportException
 ,host_crash_report,src/host/win32/crash.cpp,function,
+,host_crash_report,src/host/win32/crash.cpp,global_read,g_crashCleanup@src/host/win32/crash.cpp
+,host_crash_report,src/host/win32/crash.cpp,indirect_call,indirect via void (*)() __attribute__((cdecl)) [g_crashCleanup]
+,host_crash_set_cleanup,src/host/win32/crash.cpp,function,
+,host_crash_set_cleanup,src/host/win32/crash.cpp,global_write,g_crashCleanup@src/host/win32/crash.cpp
 ,host_cursor_get,src/host/win32/window.cpp,call,GetCursorPos
 ,host_cursor_get,src/host/win32/window.cpp,call,HeadlessCursorGet
 ,host_cursor_get,src/host/win32/window.cpp,call,HostHeadless

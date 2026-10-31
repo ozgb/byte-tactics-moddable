@@ -1,5 +1,6 @@
 #ifndef UNIT_ORDERS_H
 #define UNIT_ORDERS_H
+#include "../../interfaces/services.h"
 struct Order;
 struct Unit;
 
@@ -51,6 +52,5 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags);
 int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags);
 int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags);
 int __stdcall TeleportOrder(Unit* unit, Order* order, int unused);
-void __stdcall CopyDwordIfNonNull(int* dest, int* src);
 
 #endif

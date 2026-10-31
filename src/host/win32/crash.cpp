@@ -863,9 +863,18 @@ void __cdecl NormalizeLineEndings(char *text, int size)
     *text = '\0';
 }
 
+static void (HOST_CALL* g_crashCleanup)(void);
+
 extern "C" void HOST_CALL host_crash_report(void* exception, const char* handler)
 {
     ReportException((EXCEPTION_POINTERS*)exception, (char*)handler);
+    if (g_crashCleanup != nullptr)
+        g_crashCleanup();
+}
+
+extern "C" void HOST_CALL host_crash_set_cleanup(void (HOST_CALL* cleanup)(void))
+{
+    g_crashCleanup = cleanup;
 }
 
 extern "C" void HOST_CALL host_crash_install(void)

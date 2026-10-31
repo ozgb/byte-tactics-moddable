@@ -38,7 +38,6 @@ GetServiceProviderIndex,0x441bc0,src/frontend/multi.cpp,end-of,g_dpspGuidTcpip,0
 BuildCompoundAddress,0x441c30,src/frontend/multi.cpp,end-of,g_dpspGuidModem,0,g_dpspGuidSerial,,none
 BuildCompoundAddress,0x441c30,src/frontend/multi.cpp,end-of,g_dpspGuidSerial,0,g_dpspGuidTcpip,,none
 BuildCompoundAddress,0x441c30,src/frontend/multi.cpp,end-of,g_dpspGuidTcpip,0,g_dpspGuidIpx,,none
-FillProviderList,0x444580,src/frontend/multi.cpp,past-end,g_linkInfo,-4,g_linkInfo,DAT_0051278c+0x38,none
 ListSaveGameFiles,0x44b4e0,src/frontend/multi.cpp,end-of,g_lstExtension,0,g_savegameNamesName,,none
 ListSaveGameFiles,0x44b4e0,src/frontend/multi.cpp,end-of,g_savegameDescsName,0,g_gamesGadgetName,,none
 ListSaveGameFiles,0x44b4e0,src/frontend/multi.cpp,end-of,g_savegameNamesName,0,g_savegameDescsName,,none

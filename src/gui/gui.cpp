@@ -27,7 +27,7 @@ extern Gui* g_guiContext;
 #include "gui.h"
 
 void ShowSoftwareCursor();
-char* __stdcall Translate(char* text);
+char* __stdcall Translate(const char* text);
 int __cdecl tolower(int c);
 int __stdcall GetTextWidth(Font* font, char* text);
 char* __stdcall GetGafFrame(void* glyphs, int c);
@@ -430,7 +430,7 @@ void __stdcall SetGadgetActive(Gui* menu, int index, int value);
 void __stdcall DrawLitRectangle(int surface, Rect* rect, int level);
 
 
-static inline int FindGadgetAccessEntry(Gadget* entries, char* name)
+static inline int FindGadgetAccessEntry(Gadget* entries, const char* name)
 {
     for (int i = 1; i < entries->u.count + 1; i++) {
         if (strncmp(entries[i].name, name, 0x10) == 0) {
@@ -587,7 +587,7 @@ void __stdcall TranslateGadgetItems(Gui* obj, int index)
 }
 
 // FUNCTION: 0x4a09c0
-void __stdcall SetTranslatedText(Gui* context, int index, char* source, int value)
+void __stdcall SetTranslatedText(Gui* context, int index, const char* source, int value)
 {
     if (index == -1 || context->layer == 0)
         return;
@@ -638,7 +638,7 @@ void __stdcall SetTranslatedText(Gui* context, int index, char* source, int valu
 }
 
 // FUNCTION: 0x4a0bf0
-void __stdcall SetTranslatedTextByName(Gui* obj, char* name, char* param_3, int param_4)
+void __stdcall SetTranslatedTextByName(Gui* obj, const char* name, const char* param_3, int param_4)
 {
     if (obj->layer != 0) {
         int index = FindGadgetAccessEntry(obj->layer->entries, name);
@@ -1918,31 +1918,11 @@ void __stdcall SetGadgetRows(SetGadgetRowsTable* table, char* name,
     }
 }
 
-struct SetGadgetItemsTable {
-    char unknown_0[4];
-    Gadget* entries;
-};
-
-struct SetGadgetItemsItem {
-    char unknown_0[0x28];
-    int cell;
-};
-
-static inline int FindSetGadgetItemsEntry(Gadget* entries, char* name)
-{
-    for (int i = 1; i < entries->u.count + 1; i++) {
-        if (strncmp(entries[i].name, name, 0x10) == 0) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 // FUNCTION: 0x4a36a0
-void __stdcall SetGadgetItems(SetGadgetItemsTable* table, char* name, int* items, int count)
+void __stdcall SetGadgetItems(Layer* table, const char* name, ListBoxItem** items, int count)
 {
     Gadget* entries = table->entries;
-    int i = FindSetGadgetItemsEntry(entries, name);
+    int i = FindGadgetAccessEntry(entries, name);
     Gadget* e;
     if (i != -1) {
         e = &entries[i];
@@ -1956,12 +1936,10 @@ void __stdcall SetGadgetItems(SetGadgetItemsTable* table, char* name, int* items
     e->u.list.firstRow = 0;
     e->u.list.selected = 0;
     e->attribs |= 0x20;
-    int* p = &items[count - 1];
+    ListBoxItem** p = &items[count - 1];
     e->u.list.maxFirstRow = (short)(count - 1);
     for (int j = count - 1; j > -1; ) {
-        SetGadgetItemsItem* item = (SetGadgetItemsItem*)*p;
-        unsigned short w = *(unsigned short*)(item->cell + 2);
-        v -= w;
+        v -= (*p)->cell->height;
         if (v < 0) {
             break;
         }

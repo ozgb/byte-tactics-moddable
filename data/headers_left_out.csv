@@ -208,7 +208,6 @@ SetGadgetActive,mismatch,"static risk rule: a convention, parameter count, or no
 SetGadgetActiveByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGadgetColorByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGadgetGrayedOutByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-SetGadgetItems,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGadgetRows,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetGadgetStatus,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetGadgetStatusByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -218,8 +217,6 @@ SetGrayedOutByName,mismatch,"definition type not nameable in a header, or no cle
 SetOffscreenSurface,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetQuickKeyByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetTextColors,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-SetTranslatedText,mismatch,fixing it changes the generated code of a caller
-SetTranslatedTextByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 SetUnitLimits,mismatch,fixing it changes the generated code of a caller
 SetupPlayerSlot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ShowErrorBox,mismatch,pointer/int cast: definition's type is likely wrong

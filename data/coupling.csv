@@ -4,7 +4,7 @@ ai,economy,shared_write,Unit::flags,1
 ai,features,shared_write,Point16::x,11
 ai,features,shared_write,Point16::y,2
 ai,features,shared_write,Vec3::x,7
-ai,features,shared_write,Vec3::y,5
+ai,features,shared_write,Vec3::y,6
 ai,features,shared_write,Vec3::z,7
 ai,game,shared_write,Unit::flags,3
 ai,game,shared_write,Vec3::x,2
@@ -1033,7 +1033,7 @@ los_radar,features,shared_write,GafFrame::height,1
 los_radar,features,shared_write,GafFrame::width,1
 los_radar,features,shared_write,Game::heightMap,6
 los_radar,features,shared_write,Vec3::x,7
-los_radar,features,shared_write,Vec3::y,5
+los_radar,features,shared_write,Vec3::y,6
 los_radar,features,shared_write,Vec3::z,7
 los_radar,game,call,SaveSettings,1
 los_radar,game,shared_write,Game::finalSurface,1
@@ -1200,7 +1200,7 @@ map,features,shared_write,Game::mapInfo,3
 map,features,shared_write,Point16::x,11
 map,features,shared_write,Point16::y,2
 map,features,shared_write,Vec3::x,7
-map,features,shared_write,Vec3::y,5
+map,features,shared_write,Vec3::y,6
 map,features,shared_write,Vec3::z,7
 map,game,call,GetPreferredLanguage,2
 map,game,call,SetCursorMode,1
@@ -1652,7 +1652,7 @@ orders,features,shared_write,FeatureDamagePacket::z,3
 orders,features,shared_write,Point16::x,11
 orders,features,shared_write,Point16::y,2
 orders,features,shared_write,Vec3::x,7
-orders,features,shared_write,Vec3::y,5
+orders,features,shared_write,Vec3::y,6
 orders,features,shared_write,Vec3::z,7
 orders,game,shared_write,Angles16::heading,1
 orders,game,shared_write,Game::pathfinder,1
@@ -2146,7 +2146,7 @@ players,features,shared_write,Player::type,2
 players,features,shared_write,Point16::x,11
 players,features,shared_write,Point16::y,2
 players,features,shared_write,Vec3::x,7
-players,features,shared_write,Vec3::y,5
+players,features,shared_write,Vec3::y,6
 players,features,shared_write,Vec3::z,7
 players,game,shared_write,Game::endGameCountdown,1
 players,game,shared_write,Game::localPlayer,13
@@ -2467,7 +2467,7 @@ presentation,features,shared_write,Player::active,2
 presentation,features,shared_write,Point16::x,11
 presentation,features,shared_write,Point16::y,2
 presentation,features,shared_write,Vec3::x,7
-presentation,features,shared_write,Vec3::y,5
+presentation,features,shared_write,Vec3::y,6
 presentation,features,shared_write,Vec3::z,7
 presentation,features,shared_write,g_game,34
 presentation,game,call,ApplySlotsToGamePlayers,1
@@ -3063,7 +3063,7 @@ units,features,shared_write,Game::unitDefs,1
 units,features,shared_write,Point16::x,11
 units,features,shared_write,Point16::y,2
 units,features,shared_write,Vec3::x,7
-units,features,shared_write,Vec3::y,5
+units,features,shared_write,Vec3::y,6
 units,features,shared_write,Vec3::z,7
 units,game,shared_write,Angles16::heading,1
 units,game,shared_write,Game::autoFollowTicks,1
@@ -3532,7 +3532,7 @@ weapons,features,shared_write,Fixed::whole,2
 weapons,features,shared_write,Point16::x,11
 weapons,features,shared_write,Point16::z,9
 weapons,features,shared_write,Vec3::x,7
-weapons,features,shared_write,Vec3::y,5
+weapons,features,shared_write,Vec3::y,6
 weapons,features,shared_write,Vec3::z,7
 weapons,game,call,StepGafSequence,1
 weapons,game,shared_write,Game::selected,1
@@ -3733,7 +3733,7 @@ wind_meteors,features,shared_write,Game::windZ,1
 wind_meteors,features,shared_write,Point16::x,11
 wind_meteors,features,shared_write,Point16::y,2
 wind_meteors,features,shared_write,Vec3::x,7
-wind_meteors,features,shared_write,Vec3::y,5
+wind_meteors,features,shared_write,Vec3::y,6
 wind_meteors,features,shared_write,Vec3::z,7
 wind_meteors,game,shared_write,Game::windCounter,1
 wind_meteors,game,shared_write,Vec3::x,2

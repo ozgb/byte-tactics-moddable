@@ -4151,6 +4151,7 @@ targeting,orders,shared_write,Vec3::y,60
 targeting,orders,shared_write,Vec3::z,84
 targeting,platform,call,Bits::Test,1
 targeting,platform,call,RandomInt,1
+targeting,platform,call,UnitSwapEraseVector::EraseSwapBack,1
 targeting,platform,shared_write,Vec3::x,22
 targeting,platform,shared_write,Vec3::y,13
 targeting,platform,shared_write,Vec3::z,22
@@ -4167,7 +4168,6 @@ targeting,seams,indirect,GetVisibleEnemiesInRadiusNative,1
 targeting,seams,indirect,GetWeaponRangeNative,1
 targeting,seams,indirect,StartScriptWithArgsNative,2
 targeting,seams,shared_write,Vec3::x,1
-targeting,units,call,UnitSwapEraseVector::EraseSwapBack,1
 targeting,units,shared_write,Vec3::x,9
 targeting,units,shared_write,Vec3::y,10
 targeting,units,shared_write,Vec3::z,9

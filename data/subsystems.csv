@@ -1555,7 +1555,7 @@ SpeechQueue::PlayNextSpeechEntry,src/sound/sound.cpp,presentation,presentation,
 SpeechQueue::PlaySpeech,src/sound/sound.cpp,presentation,presentation,
 SpeechQueue::RemoveSpeechAt,src/sound/sound.cpp,presentation,presentation,
 SpeechQueue::RemoveSpeechOfId,src/sound/sound.cpp,presentation,presentation,
-UnitSwapEraseVector::EraseSwapBack,src/units/squad.h,units,default:src/units/,
+UnitSwapEraseVector::EraseSwapBack,src/units/squad.h,platform,default:src/units/,platform
 IntDynArray::EraseByValue,src/sound/sound.cpp,presentation,presentation,
 Squad::Squad,src/sound/sound.cpp,presentation,presentation,
 CreateSquads,src/units/squads.cpp,ai,name:Squad,

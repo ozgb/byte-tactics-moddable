@@ -44,13 +44,13 @@ ai,SumUnitRatingsInRange,src/ai/ai_player.cpp,1,0,0,0,0,0,?SumUnitRatingsInRange
 ai,UpdateConverter,src/ai/ai_player.cpp,0,0,0,0,0,0,?UpdateConverter@@YGXPAUUnit@@@Z,1,
 ai,Vec::Vec,src/ai/vec.h,0,0,0,0,0,0,??0Vec@@QAE@HHH@Z,1,
 ai,std::_Construct,src/ai/ai_player.cpp,0,0,0,0,0,0,?_Construct@std@@YGXPAUPercentByte@@ABU2@@Z,1,
-economy,*,,29,27,584,456,308,135,,3,
+economy,*,,29,27,576,456,308,135,,3,
 economy,CallOnEachReverse,src/game/economy.cpp,0,0,0,0,0,0,?CallOnEachReverse@@YGXPAVArrayElement@@HHP81@AEXXZ@Z,1,
 economy,InitStartingResourcesFromSkirmish,src/game/main_loop.cpp,0,0,0,0,0,0,?InitStartingResourcesFromSkirmish@@YGXXZ,1,
 economy,SetStartingStorageBonusInline,src/game/main_loop.cpp,0,0,0,0,0,0,?SetStartingStorageBonusInline@@YGXPAUPlayer@@HH@Z,1,
 economy,ShareMapInfo,src/units/units.cpp,1,0,0,0,0,0,?ShareMapInfo@@YGXEE@Z,0,share-dialog
 economy,UpdateResourceSharing,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateResourceSharing@@YGXPAUPlayer@@@Z,0,network-game
-features,*,,44,42,1051,861,448,312,,4,
+features,*,,44,42,1030,851,448,312,,4,
 features,??$copy@PAGPAG@std@@YGPAGPAG00@Z,src/map/features.cpp,0,0,0,0,0,0,??$copy@PAGPAG@std@@YGPAGPAG00@Z,1,
 features,AssignTdfFileVector,src/map/features.cpp,0,0,0,0,0,0,?AssignTdfFileVector@@YGXPAV?$vector@PAVTdfFile@@V?$allocator@PAVTdfFile@@@std@@@std@@PBV12@@Z,1,
 features,FreeFeaturePool,src/map/features.cpp,1,0,0,0,0,0,?FreeFeaturePool@@YGXXZ,0,shutdown
@@ -281,7 +281,7 @@ map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?Resiz
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
 map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVUnitVisitor@@@Z,1,
-network,*,,288,50,5315,567,2592,117,,73,
+network,*,,298,54,5419,590,2570,99,,74,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,0,menu
 network,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,1,
@@ -313,7 +313,6 @@ network,AddNetPlayer,src/network/net_game.cpp,1,0,0,0,0,0,?AddNetPlayer@@YGHH@Z,
 network,AreAllPlayersReady,src/network/net_game.cpp,1,0,0,0,0,0,?AreAllPlayersReady@@YGHXZ,0,menu
 network,AssignPlayerColor,src/network/net_game.cpp,1,0,0,0,0,0,?AssignPlayerColor@@YGHHHH@Z,0,network
 network,AssignStartPositions,src/network/net_game.cpp,1,0,0,0,0,0,?AssignStartPositions@@YGHXZ,0,network
-network,BitReader::ReadBit,src/network/bit_reader.h,1,0,0,0,0,0,?ReadBit@BitReader@@QAEHXZ,0,network
 network,BitReader::ReadBits,src/network/net_stats.cpp,1,0,0,0,0,0,?ReadBits@BitReader@@QAEHH@Z,0,network
 network,BitReader::ReadSignedBits,src/network/net_stats.cpp,1,0,0,0,0,0,?ReadSignedBits@BitReader@@QAEHH@Z,0,network
 network,BitWriter::BitWriter,src/network/net_stats.cpp,1,0,0,0,0,0,??0BitWriter@@QAE@XZ,0,network
@@ -332,7 +331,6 @@ network,CmdCompression,src/game/share_commands.cpp,1,0,0,0,0,0,?CmdCompression@@
 network,CommandAllowed,src/network/net_game.cpp,1,0,0,0,0,0,?CommandAllowed@@YGHPAE@Z,0,network
 network,CopyDwordRangeOverwrite,src/network/unit_sync.cpp,1,0,0,0,0,0,?CopyDwordRangeOverwrite@@YGPAHPAH00@Z,0,menu
 network,CopyWords,src/network/net_stats.cpp,1,0,0,0,0,0,?CopyWords@@YGXPAI00@Z,0,network
-network,CountActiveAIPlayers,src/network/net_game.cpp,1,0,0,0,0,0,?CountActiveAIPlayers@@YGHXZ,0,network
 network,CountActiveHumanOrAiPlayers,src/network/net_game.cpp,0,0,0,0,0,0,?CountActiveHumanOrAiPlayers@@YGHXZ,1,
 network,CountComputerPlayers,src/network/net_game.cpp,1,0,0,0,0,0,?CountComputerPlayers@@YGHXZ,0,menu
 network,CountHumanPlayers,src/network/net_game.cpp,1,0,0,0,0,0,?CountHumanPlayers@@YGHXZ,0,menu
@@ -433,6 +431,14 @@ network,NetCondenser::~NetCondenser,src/network/net_condenser.cpp,1,0,0,0,0,0,??
 network,NetPacket::DispatchPacket,src/network/net_game.cpp,0,0,0,0,0,0,?DispatchPacket@NetPacket@@QAEXXZ,1,
 network,NetPacketPendingEntry::GetData,src/network/packets.cpp,0,0,0,0,0,0,?GetData@NetPacketPendingEntry@@QAEHXZ,1,
 network,NetPacketPendingEntry::RemoveFromBuffer,src/network/packets.cpp,0,0,0,0,0,0,?RemoveFromBuffer@NetPacketPendingEntry@@QAEXXZ,1,
+network,NetSendFeatureHit,src/network/net_game.cpp,1,0,0,0,0,0,?NetSendFeatureHit@@YGXPAUWeaponDef@@HH@Z,0,network
+network,NetSendFeatureReclaimed,src/network/net_game.cpp,1,0,0,0,0,0,?NetSendFeatureReclaimed@@YGXPAUUnit@@HH@Z,0,network
+network,NetSendOwnershipTransfer,src/network/net_game.cpp,1,0,0,0,0,0,?NetSendOwnershipTransfer@@YGXPAUUnit@@PAUPlayer@@@Z,0,network
+network,NetSendProjectileDetonated,src/network/net_game.cpp,1,0,0,0,0,0,?NetSendProjectileDetonated@@YGXPAUUnit@@PAUProjectile@@@Z,0,network
+network,NetSendUnitDamage,src/network/net_game.cpp,1,0,0,0,0,0,?NetSendUnitDamage@@YGXPAUUnit@@0HHG@Z,0,network
+network,NetSendUnitStates,src/network/net_game.cpp,1,0,0,0,0,0,?NetSendUnitStates@@YGXPAUPlayer@@@Z,0,network
+network,NetSendWeaponFire,src/network/net_game.cpp,1,0,0,0,0,0,?NetSendWeaponFire@@YGXPAUUnit@@PAUUnitWeaponSlot@@0PAUVec3@@2@Z,0,network
+network,NetSendWeaponFireAt,src/network/net_game.cpp,1,0,0,0,0,0,?NetSendWeaponFireAt@@YGXEPAUVec3@@0@Z,0,network
 network,NextFrameSeqInReceiveFrame,src/network/packets.cpp,1,0,0,0,0,0,?NextFrameSeqInReceiveFrame@@YGHH@Z,0,network
 network,NopChecksumEntryDtor,src/network/unit_sync.cpp,1,0,0,0,0,0,?NopChecksumEntryDtor@@YGXH@Z,0,menu
 network,NopRetC_B,src/network/packets.cpp,0,0,0,0,0,0,?NopRetC_B@@YGXHHH@Z,1,
@@ -524,6 +530,7 @@ network,SendChatPacket,src/network/net_game.cpp,1,0,0,0,0,0,?SendChatPacket@@YGH
 network,SendLobbySyncRequests,src/network/net_game.cpp,1,0,0,0,0,0,?SendLobbySyncRequests@@YGXXZ,0,network
 network,SendNetHeartbeat,src/network/net_game.cpp,1,0,0,0,0,0,?SendNetHeartbeat@@YGXXZ,0,menu
 network,SendPacket,src/network/unit_sync.cpp,0,0,0,0,0,0,?SendPacket@@YGXIPAUUnitSyncPacket@@@Z,1,
+network,SendScriptCallNoArgs,src/network/net_game.cpp,0,0,0,0,0,0,?SendScriptCallNoArgs@@YGHPAUUnit@@F@Z,1,
 network,SendScriptCallNoArgsByName,src/network/net_game.cpp,0,0,0,0,0,0,?SendScriptCallNoArgsByName@@YGHPAUUnit@@PAD@Z,1,
 network,SendShareMapInfo,src/network/net_game.cpp,1,0,0,0,0,0,?SendShareMapInfo@@YGXEE@Z,0,menu
 network,SendToDPID,src/network/packets.cpp,0,0,0,0,0,0,?SendToDPID@@YGHHHPAXH@Z,1,
@@ -593,7 +600,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,366,304,6424,5099,3188,1964,,25,
+orders,*,,366,304,6419,5099,3188,1964,,25,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,AiSearchGoal::HasNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 orders,AiSearchGoal::SerializeNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network
@@ -695,7 +702,7 @@ pathfinding,Pathfinder::MarkGoalCell,src/ai/pathfind.cpp,0,0,0,0,0,0,?MarkGoalCe
 pathfinding,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,0,0,0,0,0,0,?ReleaseHeldPathLock@Pathfinder@@QAEXXZ,1,
 pathfinding,Pathfinder::RemoveNode,src/ai/pathfind.cpp,1,0,0,0,0,0,?RemoveNode@Pathfinder@@QAEXH@Z,0,unreachable
 pathfinding,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,1,0,0,0,0,0,??1Pathfinder@@QAE@XZ,0,shutdown
-platform,*,,723,381,8082,3154,3172,808,,83,
+platform,*,,727,384,8112,3176,3190,819,,83,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,
@@ -707,6 +714,7 @@ platform,AssignPairRange,src/util/tdf.cpp,0,0,0,0,0,0,?AssignPairRange@@YGXPAUTd
 platform,AssignPairRangeBack,src/util/tdf.cpp,0,0,0,0,0,0,?AssignPairRangeBack@@YGPAUTdfField@@PAU1@00@Z,1,
 platform,AvWriteDetectStub,src/debug/debug_lib.cpp,0,0,0,0,0,0,?AvWriteDetectStub@@YADK@Z,1,
 platform,BackAlignAtexitHandler,src/debug/debug_lib.cpp,0,0,0,0,0,0,?BackAlignAtexitHandler@@YGXXZ,1,
+platform,BitReader::ReadBit,interfaces/services.h,1,0,0,0,0,0,?ReadBit@BitReader@@QAEHXZ,0,
 platform,BlockInfo::BlockInfo,src/debug/debug_lib.cpp,1,0,0,0,0,0,??0BlockInfo@@QAE@HHHHPBD@Z,0,
 platform,BlockInfo::SetName,src/debug/debug_lib.cpp,1,0,0,0,0,0,?SetName@BlockInfo@@QAEXPAD@Z,0,
 platform,BlockMap::Begin,src/debug/debug_lib.cpp,1,0,0,0,0,0,?Begin@BlockMap@@QAE?AVBlockMapIter@@XZ,0,
@@ -1121,7 +1129,7 @@ platform,host_window_place,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_pla
 platform,host_window_post,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_post,0,
 platform,host_window_raise,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_raise,0,
 platform,host_window_set_topmost,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_set_topmost,0,
-players,*,,140,74,1840,1011,770,355,,10,
+players,*,,142,75,1854,1025,800,366,,10,
 players,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,src/units/units.cpp,0,0,0,0,0,0,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,1,
 players,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,src/units/units.cpp,0,0,0,0,0,0,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,1,
 players,??$_Iter_swap@PAPAUPlayer@@PAPAU1@PAU1@@std@@YGXPAPAUPlayer@@00@Z,src/units/units.cpp,0,0,0,0,0,0,??$_Iter_swap@PAPAUPlayer@@PAPAU1@PAU1@@std@@YGXPAPAUPlayer@@00@Z,1,
@@ -1130,6 +1138,7 @@ players,??$iter_swap@PAPAUPlayer@@PAPAU1@@std@@YGXPAPAUPlayer@@0@Z,src/units/uni
 players,AllocScoreTables,src/game/statistics.cpp,1,0,0,0,0,0,?AllocScoreTables@@YGHXZ,0,network
 players,AreEnemiesEliminated,src/game/victory.cpp,0,0,0,0,0,0,?AreEnemiesEliminated@@YGHXZ,1,
 players,ContinueWatchingCallback,src/game/players.cpp,1,0,0,0,0,0,?ContinueWatchingCallback@@YGXPAUGui@@@Z,0,menu
+players,CountActiveAIPlayers,src/game/players.cpp,1,0,0,0,0,0,?CountActiveAIPlayers@@YGHXZ,0,network
 players,DefeatAllUnitsKilled::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?IsSatisfied@DefeatAllUnitsKilled@@UAEHXZ,0,campaign-game
 players,DefeatAllUnitsKilled::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@DefeatAllUnitsKilled@@UAEXPAVHapiBank@@@Z,0,save-load
 players,DefeatAllUnitsKilled::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@DefeatAllUnitsKilled@@UAEXPAVHapiBank@@@Z,0,save-load
@@ -1198,7 +1207,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1126,468,32077,10067,11966,2627,,295,
+presentation,*,,1126,468,32080,10070,11968,2629,,295,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,
@@ -2154,7 +2163,7 @@ presentation,YesNoDialogHandler,src/gui/dialogs.cpp,0,0,0,0,0,0,?YesNoDialogHand
 presentation,clear_screen,src/graphics/surface.cpp,1,0,0,0,0,0,?clear_screen@@YGXPAUDisplay@@H@Z,0,
 presentation,color_taken,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?color_taken@@YGHH@Z,0,
 presentation,entry_at,src/gui/gui.cpp,1,0,0,0,0,0,?entry_at@@YGPAUGadget@@PAUGui@@H@Z,0,
-seams,*,,103,93,641,611,0,0,,0,
+seams,*,,103,93,664,634,0,0,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YIHPAVMission@@@Z,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YIHPAVMission@@@Z,0,
 seams,DestroyPathfinderNative,src/seams/native.cpp,1,0,0,0,0,0,?DestroyPathfinderNative@@YGXPAVPathfinder@@@Z,0,
@@ -2165,7 +2174,7 @@ seams,LoadMeteorDefaultsNative,src/seams/native.cpp,1,0,0,0,0,0,?LoadMeteorDefau
 seams,MissionExistsNative,src/seams/native.cpp,1,0,0,0,0,0,?MissionExistsNative@@YIHPAVMission@@HH@Z,0,
 seams,SelectMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?SelectMissionNative@@YIHPAVMission@@HH@Z,0,
 seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadManagerDeleteTimersNative@@YIXPAVSquadManager@@H@Z,0,
-state,*,,523,447,1624,1118,1064,522,,60,
+state,*,,521,447,1622,1118,1062,522,,58,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@G@@PAG@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@G@@PAG@Z,0,unused-instance
@@ -2270,10 +2279,8 @@ state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UPlayerResourceView@@@@QB
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UScreenPos@@@@QBEPAUScreenPos@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UUnitCursorView@@@@QBEPAUUnitCursorView@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UUnitOrderTypeView@@@@QBEPAUUnitOrderTypeView@@XZ,0,unused-instance
-state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UVLaunchPlayerView@@@@QBEPAUVLaunchPlayerView@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UWeaponDefCursorView@@@@QBEPAUWeaponDefCursorView@@XZ,0,unused-instance
 state,Ref::get,interfaces/ref.h,1,0,0,0,0,0,?get@?$Ref@UWeaponDefShotCostView@@@@QBEPAUWeaponDefShotCostView@@XZ,0,unused-instance
-state,Ref::get,interfaces/ref.h,0,0,0,0,0,0,?get@?$Ref@UWeaponFirePlayerView@@@@QBEPAUWeaponFirePlayerView@@XZ,1,
 state,Ref::get,interfaces/ref.h,0,0,0,0,0,0,?get@?$Ref@V?$BlockVector@U?$Ref@UUnit@@@@@@@@QBEPAV?$BlockVector@U?$Ref@UUnit@@@@@@XZ,1,
 state,Ref::get,interfaces/ref.h,0,0,0,0,0,0,?get@?$Ref@V?$BlockVector@UBuildRatingWeights@@@@@@QBEPAV?$BlockVector@UBuildRatingWeights@@@@XZ,1,
 state,Ref::get,interfaces/ref.h,0,0,0,0,0,0,?get@?$Ref@V?$BlockVector@UKeyedCell@@@@@@QBEPAV?$BlockVector@UKeyedCell@@@@XZ,1,
@@ -2294,8 +2301,6 @@ state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@USideData@@@@QBEPAUS
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@USpatialBucketNode@@@@QBEPAUSpatialBucketNode@@XZ,0,unused-instance
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UUnitCursorView@@@@QBEPAUUnitCursorView@@XZ,0,unused-instance
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UUnitOrderTypeView@@@@QBEPAUUnitOrderTypeView@@XZ,0,unused-instance
-state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@UVLaunchPlayerView@@@@QBEPAUVLaunchPlayerView@@XZ,0,unused-instance
-state,Ref::operator?C,interfaces/ref.h,0,0,0,0,0,0,??C?$Ref@UWeaponFirePlayerView@@@@QBEPAUWeaponFirePlayerView@@XZ,1,
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VMotionSerializer@@@@QBEPAVMotionSerializer@@XZ,0,unused-instance
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VPacketChannel@@@@QBEPAVPacketChannel@@XZ,0,unused-instance
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VPlayerFrameInfo@@@@QBEPAVPlayerFrameInfo@@XZ,0,unused-instance
@@ -2304,7 +2309,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,10,10,131,126,76,56,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,165,133,4093,3459,1690,1204,,32,
+units,*,,166,134,4058,3458,1676,1204,,32,
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0,unused-slot
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
@@ -2369,7 +2374,7 @@ units,UnitScript::IsCarryingUnit,src/units/unit_script.cpp,1,0,0,0,0,0,?IsCarryi
 units,UnitScript::PlaySoundNoop,src/units/unit_script.cpp,1,0,0,0,0,0,?PlaySoundNoop@UnitScript@@UAEXH@Z,0,unused-opcode
 units,WriteUnitState,src/units/unit_position.cpp,1,0,0,0,0,0,?WriteUnitState@@YGXPAVBitWriter@@PAUUnit@@@Z,0,network
 units,spd,src/units/unit_targets.cpp,1,0,0,0,0,0,?spd@@YGMH@Z,0,unit-info
-weapons,*,,88,74,2369,2004,1010,711,,17,
+weapons,*,,88,74,2293,2009,992,711,,17,
 weapons,??8@YG_NABVStringRef@@0@Z,src/weapons/weapon_types.cpp,1,0,0,0,0,0,??8@YG_NABVStringRef@@0@Z,0,unset-case
 weapons,ApplyProjectileHitPacket,src/weapons/weapons.cpp,1,0,0,0,0,0,?ApplyProjectileHitPacket@@YGXHPAUProjectileDetonatePacket@@@Z,0,network
 weapons,ApplyWeaponFirePacket,src/weapons/weapons.cpp,1,0,0,0,0,0,?ApplyWeaponFirePacket@@YGXHPAUWeaponFirePacket@@@Z,0,network
@@ -2396,7 +2401,7 @@ weapons,RockUnit,src/weapons/weapons.cpp,0,0,0,0,0,0,?RockUnit@@YGXPAURockUnitVi
 weapons,SamePos,src/weapons/weapons.cpp,0,0,0,0,0,0,?SamePos@@YGHAAUVec3@@0@Z,1,
 weapons,SamePos,src/weapons/weapons.cpp,1,0,0,0,0,0,?SamePos@@YGHABUVec3@@0@Z,0,network
 weapons,SameTargetPos,src/weapons/weapons.cpp,1,0,0,0,0,0,?SameTargetPos@@YGHAAUVec3@@0@Z,0,network
-weapons,SendWeaponFirePacket,src/weapons/weapons.cpp,0,0,0,0,0,0,?SendWeaponFirePacket@@YGXPAUUnitWeaponSlot@@PAUWeaponFireUnitView@@1PAUVec3@@2@Z,1,
+weapons,SendWeaponFirePacket,src/weapons/weapons.cpp,0,0,0,0,0,0,?SendWeaponFirePacket@@YGXPAUUnitWeaponSlot@@PAUUnit@@1PAUVec3@@2@Z,1,
 weapons,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,0,0,0,0,0,0,?SpawnProjectileFromUnitMotion@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@@Z,1,
 weapons,UnitScript::ExplodeLegacy,src/units/unit_script.cpp,1,0,0,0,0,0,?ExplodeLegacy@UnitScript@@UAEXHHH@Z,0,unset-case
 weapons,UntrackProjectile,src/weapons/weapons.cpp,0,0,0,0,0,0,?UntrackProjectile@@YGXPAUProjectile@@@Z,1,

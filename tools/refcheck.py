@@ -44,6 +44,10 @@ because no issue removes it. A `load` or `code` row with no outside row in block
 flagged it) is kept verbatim; a scan row for the same key wins and takes the hand kind. Every other row needs an
 open `#n` issue.
 
+A `base+stride*k` offset of a Game row stands for a run of offsets the scan saw but did not count. The tool walks
+k = 1, 2, ... while the offset is inside Game and a raw field starts there, gives each such field its own row
+(offset `0x...` for that k) unless a token of its own made one, and stops at the first k that starts no raw field.
+
 A block_pointers.csv row lists many offsets under one note. Its note is copied to an outside row only when it
 is about that row: it names no offset, or names an offset the row stands for (the row's own offset for a Game
 row, any offset of the block row for a SimGlobals or holder-only row, which stands for all of them). Otherwise
@@ -574,6 +578,8 @@ class Locator:
         self.casts = {(r, p) for r, _, p in casts}
         self.records = {r.name: r for r in scan.records}
         self.cache: dict[str, list[Leaf]] = {}
+        self.starts_cache: dict[str, frozenset[int]] = {}
+        self.extent_cache: dict[str, tuple[int, str | None, int]] = {}
 
     def layout(self, name: str) -> Layout | None:
         name = strip_keyword(name)
@@ -592,6 +598,11 @@ class Locator:
 
     def extent(self, leaf: Leaf) -> tuple[int, str | None, int]:
         """(count, element record or None, element size) of a leaf, for arrays of structs and of pointers."""
+        if leaf.type not in self.extent_cache:
+            self.extent_cache[leaf.type] = self.measure(leaf)
+        return self.extent_cache[leaf.type]
+
+    def measure(self, leaf: Leaf) -> tuple[int, str | None, int]:
         count = 1
         if not re.search(r"\(\*+\)\s*\[", leaf.type):
             for dim in re.findall(r"\[(\d+)\]", leaf.type):
@@ -630,6 +641,22 @@ class Locator:
                 return short(leaf.owner), leaf.path, kind, leaf.path.split(".")[0]
         return None
 
+    def raw_starts(self, record: str, depth: int = 0) -> frozenset[int]:
+        """The offsets at which a raw field of `record` starts, through arrays of structs and of pointers."""
+        if record in self.starts_cache:
+            return self.starts_cache[record]
+        out: set[int] = set()
+        if depth <= 8:
+            for leaf in self.leaves(record):
+                count, elem, size = self.extent(leaf)
+                if not size:
+                    continue
+                inner = {0} if elem is None else self.raw_starts(elem, depth + 1)
+                for i in range(count):
+                    out.update(leaf.offset + i * size + o for o in inner)
+        self.starts_cache[record] = frozenset(out)
+        return self.starts_cache[record]
+
 
 def expand_offsets(cell: str) -> list[tuple[str, int]]:
     """(token, base offset) of each offset in a block_pointers.csv cell; `a+s*k` stands for a, a+s, ..."""
@@ -639,6 +666,15 @@ def expand_offsets(cell: str) -> list[tuple[str, int]]:
         if m:
             out.append((token, int(m.group(1), 16)))
     return out
+
+
+def progression_offsets(token: str, limit: int) -> list[int]:
+    """The offsets below `limit` that a `base+stride*k` token stands for, k from 1 (the base is the token's own)."""
+    m = COUNTER_PATTERN.match(token)
+    if not m or not m.group(2) or int(m.group(2), 16) == 0:
+        return []
+    base, stride = int(m.group(1), 16), int(m.group(2), 16)
+    return list(range(base + stride, limit, stride))
 
 
 HEX_PATTERN = re.compile(r"\b0x([0-9a-fA-F]+)\b")
@@ -684,17 +720,23 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
             "struct": struct, "field": name, "holder": holder, "offset": token, "words": words, "issue": issue,
             "kind": kind, "note": note})
 
+    later = []
     for r in source:
         holder = r["holder"].split(": ")[-1]
         tokens = expand_offsets(r["offsets"])
         note = r["note"]
         member = re.fullmatch(r"SimGlobals\.(\w+)", holder)
         if holder == HOLDERS[GAME] and GAME in locators:
+            lay = locators[GAME].layout(GAME)
             for token, base in tokens:
                 hit = locators[GAME].find(GAME, base)
                 if hit:
                     add(hit[0], hit[1], holder, token, 1, outside_issue(note, GAME, hit[3], classes), hit[2], note,
                         [base])
+                for offset in progression_offsets(token, lay.size if lay else 0):
+                    if not hit or not locators[GAME].find(GAME, offset):
+                        break
+                    later.append((holder, offset, note))
         elif member and "SimGlobals" in locators and tokens:
             loc = locators["SimGlobals"]
             begin = loc.start("SimGlobals", member.group(1))
@@ -708,6 +750,11 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
         elif tokens:
             add("", "", holder, tokens[0][0], len(tokens), outside_issue(note, "", "", classes), "", note,
                 [b for _, b in tokens])
+    for holder, offset, note in later:
+        hit = locators[GAME].find(GAME, offset)
+        if hit:
+            add(hit[0], hit[1], holder, hex(offset), 1, outside_issue(note, GAME, hit[3], classes), hit[2], note,
+                [offset])
     for r in old:
         key = (r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"])
         if r["kind"] in HAND_KINDS and key not in matched:

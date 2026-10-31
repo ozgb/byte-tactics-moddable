@@ -231,6 +231,21 @@ class ClangTest(unittest.TestCase):
         self.assertEqual(keyed[("SimGlobals", "table", "SimGlobals.table")]["issue"], "#596")
         self.assertEqual(len(out), 5)
 
+    def test_progression_hits_two_fields(self):
+        out = self.outside_notes([("0x4+0x8*k", "Game.view")])
+        self.assertEqual(sorted(out), [("p", "0xc"), ("view", "0x4+0x8*k")])
+
+    def test_progression_does_not_double_count_a_field_with_its_own_token(self):
+        out = self.outside_notes([("0x4+0x8*k 0x14", "Game.view")])
+        self.assertEqual(sorted(out), [("p", "0x14"), ("view", "0x4+0x8*k")])
+
+    def test_progression_stops_at_the_first_offset_with_no_raw_field(self):
+        out = self.outside_notes([("0x4+0x4*k", "Game.view")])
+        self.assertEqual(sorted(out), [("view", "0x4+0x4*k")])
+
+    def test_straddling_progression_adds_no_row(self):
+        self.assertEqual(self.outside_notes([("0x6+0x8*k", "Game.view")]), {})
+
     def outside_notes(self, rows, hand=()):
         data = self.root / "data"
         data.mkdir(exist_ok=True)

@@ -19,8 +19,9 @@ FIXTURE = """typedef void *HANDLE;
 typedef char *LPSTR;
 typedef int (*Fn)(int);
 typedef struct { int a; char *b; HANDLE h; } Anon;
-template <class T> struct BlockVector { T *first; T *last; };
 template <class T> struct Ref { unsigned offset; };
+template <class T> struct MsvcVector { T *first; T *last; };
+template <class T> struct BlockVector { unsigned char padding; Ref<T> first; };
 struct Base { virtual void f(); int x; };
 struct Derived : Base {
     LPSTR s; Fn fn; int (Derived::*mp)(int);
@@ -29,7 +30,8 @@ struct Derived : Base {
     Anon an[2];
     const char *const cc[3];
     void (*arr[2])();
-    BlockVector<int> vec;
+    MsvcVector<int> vec;
+    BlockVector<int> block;
     Ref<Base> ref;
     int handle;
     int plain;
@@ -86,7 +88,7 @@ class FieldKindTest(unittest.TestCase):
                  ("int (*)(int)", None, "function-pointer"), ("Fn", "int (*)(int)", "function-pointer"),
                  ("void (*[2])()", None, "function-pointer"),
                  ("int (Derived::*)(int) __attribute__((thiscall))", None, "function-pointer"),
-                 ("std::vector<int *>", None, "container"), ("BlockVector<int>", None, "container"),
+                 ("std::vector<int *>", None, "container"), ("BlockVector<int>", None, None),
                  ("MsvcVector<Unit *>", None, "container"), ("SyncTaggedVector<Order>", None, "container"),
                  ("Ref<Unit>", None, "ref"), ("Ref<Unit>[4]", None, "ref"), ("Ref<Unit> *", None, "pointer"),
                  ("Unit", None, None), ("Point16[4]", None, None), ("Foo &", None, "pointer"),
@@ -156,6 +158,7 @@ class ClangTest(unittest.TestCase):
     def test_containers_and_refs(self):
         kinds = self.kinds("Derived")
         self.assertEqual(kinds["vec"], "container")
+        self.assertIsNone(kinds["block"])
         self.assertEqual(kinds["ref"], "ref")
 
     def test_polymorphic_and_vptr(self):

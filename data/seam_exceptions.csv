@@ -3,7 +3,6 @@ ai,BuildTimer::OnTimer,QueueBuildOrder,TODO(#505): sim-to-presentation event
 ai,BuildTimer::TryIssueIdleFactoryBuildOrder,QueueBuildOrder,TODO(#505): sim-to-presentation event
 ai,PlayerAI::FindCellNearFeatures,GetBuildSiteMetal,TODO(#505): sim-to-presentation event
 ai,PlayerAI::FindRandomPlacementCell,GetBuildSiteMetal,TODO(#505): sim-to-presentation event
-ai,ReactToAttack,QueueUnitSpeechIfNotVisible,TODO(#505): sim-to-presentation event
 economy,??_GUnitScript@@UAEPAXI@Z,CobScript::~CobScript,TODO(#508): constructor across a seam
 economy,CmdShareEnergy,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 economy,CmdShareMetal,BroadcastPlayerInfo,TODO(#506): sim sends a packet
@@ -54,65 +53,39 @@ orders,AiSearchGoal::SerializeNetUnitState,BitWriter::GrowBuffer,TODO(#506): sim
 orders,AiSearchGoal::SerializeNetUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
 orders,AirManeuverOrder::AirManeuverOrder,BitReader::ReadBits,TODO(#506): sim sends a packet
 orders,AirManeuverOrder::SerializeToBits,BitWriter::WriteBits,TODO(#506): sim sends a packet
-orders,AttackKamikazeOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,BuildWeaponOrder,UpdateBuildMenuIfFocusUnit,TODO(#505): sim-to-presentation event
 orders,BuildingBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
-orders,BuildingBuildOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,BuildingBuildOrder,UpdateBuildMenuIfFocusUnit,TODO(#505): sim-to-presentation event
 orders,CaptureOrder,EmitReverseNanoParticles,TODO(#505): sim-to-presentation event
-orders,CaptureOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,CreatePathfinder,Pathfinder::Pathfinder,TODO(#508): constructor across a seam
 orders,GetBuiltOrder,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
-orders,GroundPickupOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,GroundUnloadOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,HelpBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
 orders,HelpBuildOrder,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
-orders,HelpBuildOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,LiteGoal::SerializeNetUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
 orders,MobileBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
 orders,MobileBuildOrder,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
-orders,MobileBuildOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,MoveGroundOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,Order::AnnounceStatusIfFlagged,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,Order::~Order,SendScriptCallNoArgs,TODO(#506): sim sends a packet
 orders,PackedPosGoal::DeserializeNetUnitState,BitReader::ReadBits,TODO(#506): sim sends a packet
 orders,PathOrder::PathOrder,BitReader::ReadBits,TODO(#506): sim sends a packet
 orders,PathOrder::SerializeToBits,BitWriter::WriteBits,TODO(#506): sim sends a packet
 orders,PatrolGoal::DeserializeNetUnitState,BitReader::ReadBits,TODO(#506): sim sends a packet
 orders,ReclaimOrder,EmitReverseNanoParticles,TODO(#505): sim-to-presentation event
-orders,ReclaimOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,ReclaimUnitOrder,EmitReverseNanoParticles,TODO(#505): sim-to-presentation event
-orders,ReclaimUnitOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,RepairUnitNoMoveOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
-orders,RepairUnitNoMoveOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,RepairUnitOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
-orders,RepairUnitOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,ResurrectOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
 orders,ResurrectOrder,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
-orders,ResurrectOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,SelfDestructOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,SelfRepairOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
-orders,SelfRepairOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,StopBuildingScript,SendScriptCallNoArgs,TODO(#506): sim sends a packet
 orders,TeleportOrder,EmitTeleportParticles,TODO(#505): sim-to-presentation event
-orders,VtolGetRepairedOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolHelpBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
 orders,VtolHelpBuildOrder,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
-orders,VtolHelpBuildOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,VtolLandingOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolMobileBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
 orders,VtolMobileBuildOrder,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
-orders,VtolMobileBuildOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,VtolMoveOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,VtolPickupOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolPickupOrder,SendScriptCallByName,TODO(#506): sim sends a packet
 orders,VtolReclaimOrder,EmitReverseNanoParticles,TODO(#505): sim-to-presentation event
-orders,VtolReclaimOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolReclaimUnitOrder,EmitReverseNanoParticles,TODO(#505): sim-to-presentation event
-orders,VtolReclaimUnitOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolRepairUnitOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
-orders,VtolRepairUnitOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-orders,VtolUnloadOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 players,??_GUnitScript@@UAEPAXI@Z,CobScript::~CobScript,TODO(#508): constructor across a seam
 players,ContinueWatchingCallback,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 players,ContinueWatchingCallback,ClearSelectedGadget,TODO(#505): sim-to-presentation event
@@ -203,7 +176,6 @@ units,SendUnitStates,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
 units,SendUnitStates,BitWriter::SetByteAt,TODO(#506): sim sends a packet
 units,SendUnitStates,BitWriter::WriteBits,TODO(#506): sim sends a packet
 units,Unit::SetStateBits,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
-units,Unit::SetStateBits,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 units,UnitScript::EmitSfx,EmitBubbles,TODO(#505): sim-to-presentation event
 units,UnitScript::EmitSfx,EmitThrustParticles,TODO(#505): sim-to-presentation event
 units,UnitScript::EmitSfx,EmitWakeParticles,TODO(#505): sim-to-presentation event

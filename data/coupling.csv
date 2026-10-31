@@ -8,10 +8,11 @@ ai,features,shared_write,Point16::y,10
 ai,features,shared_write,Vec3::x,6
 ai,features,shared_write,Vec3::y,4
 ai,features,shared_write,Vec3::z,6
+ai,game,call,RecordUnitSpeech,1
 ai,game,call,SimAllocTagged,1
 ai,game,shared_write,Point16::x,1
 ai,game,shared_write,Point16::y,1
-ai,game,shared_write,Unit::flags,3
+ai,game,shared_write,Unit::flags,4
 ai,game,shared_write,Vec3::x,3
 ai,game,shared_write,Vec3::y,1
 ai,game,shared_write,Vec3::z,3
@@ -77,10 +78,9 @@ ai,players,shared_write,Vec3::y,3
 ai,players,shared_write,Vec3::z,3
 ai,presentation,call,GetBuildSiteMetal,2
 ai,presentation,call,QueueBuildOrder,2
-ai,presentation,call,QueueUnitSpeechIfNotVisible,1
 ai,presentation,shared_write,Point16::x,5
 ai,presentation,shared_write,Point16::y,5
-ai,presentation,shared_write,Unit::flags,29
+ai,presentation,shared_write,Unit::flags,30
 ai,presentation,shared_write,Unit::group,5
 ai,presentation,shared_write,Vec3::x,44
 ai,presentation,shared_write,Vec3::y,45
@@ -665,7 +665,7 @@ game,platform,call,DispatchHostEvents,1
 game,platform,call,EmptyPostArchiveMountHook,1
 game,platform,call,ExecuteCommand,1
 game,platform,call,ExecuteCommandText,2
-game,platform,call,FatalError,6
+game,platform,call,FatalError,7
 game,platform,call,FreeAnimFiles,1
 game,platform,call,FreeGameFonts,1
 game,platform,call,FreeTextureGafs,1
@@ -675,7 +675,7 @@ game,platform,call,GetMilliseconds,2
 game,platform,call,GetTickRate,1
 game,platform,call,GetTicks,10
 game,platform,call,GetWindowsUserName,1
-game,platform,call,HarnessTestMode,1
+game,platform,call,HarnessTestMode,2
 game,platform,call,InitDebugSupport,1
 game,platform,call,InitEnvironment,1
 game,platform,call,InitTimers,1
@@ -828,6 +828,7 @@ game,presentation,call,CreateParticleLists,1
 game,presentation,call,DestroyParticleLists,1
 game,presentation,call,DisableKeyCommands,3
 game,presentation,call,DispatchOrdersPanelPageFlags,1
+game,presentation,call,DrainSimEvents,1
 game,presentation,call,DrawBattleFrame,1
 game,presentation,call,DrawFrame,1
 game,presentation,call,DrawLightBars,1
@@ -1060,7 +1061,12 @@ game,presentation,shared_write,PlayerInfo::flags_9b,10
 game,presentation,shared_write,PlayerInfo::side,18
 game,presentation,shared_write,Point16::x,5
 game,presentation,shared_write,Point16::y,5
-game,presentation,shared_write,Unit::flags,29
+game,presentation,shared_write,SimEvent::args,1
+game,presentation,shared_write,SimEvent::flags,1
+game,presentation,shared_write,SimEvent::kind,1
+game,presentation,shared_write,SimEventQueue::head,1
+game,presentation,shared_write,SimEventQueue::tail,1
+game,presentation,shared_write,Unit::flags,30
 game,presentation,shared_write,Unit::health,3
 game,presentation,shared_write,UnitDef::flags1,6
 game,presentation,shared_write,Vec3::x,44
@@ -1204,7 +1210,7 @@ harness,game,shared_write,Game::difficulty,4
 harness,game,shared_write,Game::localPlayer,13
 harness,game,shared_write,Game::mode_391f1,12
 harness,game,shared_write,Game::numPlayers,5
-harness,game,shared_write,Game::playerIndex,8
+harness,game,shared_write,Game::playerIndex,9
 harness,game,shared_write,LoadingFlags::value,1
 harness,game,shared_write,PlayerInfo::energy,2
 harness,game,shared_write,PlayerInfo::metal,2
@@ -1334,7 +1340,7 @@ los_radar,game,shared_write,Game::screen_h,2
 los_radar,game,shared_write,Game::width_142eb,2
 los_radar,game,shared_write,Point16::x,1
 los_radar,game,shared_write,Point16::y,1
-los_radar,game,shared_write,Unit::flags,3
+los_radar,game,shared_write,Unit::flags,4
 los_radar,game,shared_write,Vec3::x,3
 los_radar,game,shared_write,Vec3::y,1
 los_radar,game,shared_write,Vec3::z,3
@@ -1437,7 +1443,7 @@ los_radar,presentation,shared_write,Game::width_142eb,1
 los_radar,presentation,shared_write,MapViewFlags::raw,2
 los_radar,presentation,shared_write,Point16::x,5
 los_radar,presentation,shared_write,Point16::y,5
-los_radar,presentation,shared_write,Unit::flags,29
+los_radar,presentation,shared_write,Unit::flags,30
 los_radar,presentation,shared_write,Vec3::x,44
 los_radar,presentation,shared_write,Vec3::y,45
 los_radar,presentation,shared_write,Vec3::z,43
@@ -1527,7 +1533,7 @@ map,game,shared_write,Grid::height,1
 map,game,shared_write,Grid::width,1
 map,game,shared_write,Point16::x,1
 map,game,shared_write,Point16::y,1
-map,game,shared_write,Unit::flags,3
+map,game,shared_write,Unit::flags,4
 map,game,shared_write,Vec3::x,3
 map,game,shared_write,Vec3::y,1
 map,game,shared_write,Vec3::z,3
@@ -1625,7 +1631,7 @@ map,presentation,shared_write,Mission::killMul,1
 map,presentation,shared_write,Mission::timeMul,1
 map,presentation,shared_write,Point16::x,5
 map,presentation,shared_write,Point16::y,5
-map,presentation,shared_write,Unit::flags,29
+map,presentation,shared_write,Unit::flags,30
 map,presentation,shared_write,Vec3::x,44
 map,presentation,shared_write,Vec3::y,45
 map,presentation,shared_write,Vec3::z,43
@@ -2037,12 +2043,13 @@ orders,files,call,HapiBank::ReadBox,7
 orders,files,call,HapiBank::SeekBox,14
 orders,files,call,HapiBank::SetStringItem,2
 orders,files,call,HapiBank::WriteBox,7
+orders,game,call,RecordUnitSpeech,26
 orders,game,shared_write,Angles16::heading,1
 orders,game,shared_write,Game::pathfinder,1
 orders,game,shared_write,MissionType::index,1
 orders,game,shared_write,Point16::x,1
 orders,game,shared_write,Point16::y,1
-orders,game,shared_write,Unit::flags,3
+orders,game,shared_write,Unit::flags,4
 orders,game,shared_write,Unit::health,1
 orders,game,shared_write,Vec3::x,3
 orders,game,shared_write,Vec3::y,1
@@ -2133,7 +2140,6 @@ orders,presentation,call,EmitNanoParticles,10
 orders,presentation,call,EmitReverseNanoParticles,5
 orders,presentation,call,EmitTeleportParticles,1
 orders,presentation,call,MarkSelectionOrdersDirty,6
-orders,presentation,call,QueueUnitSpeech,26
 orders,presentation,call,UpdateBuildMenuIfFocusUnit,2
 orders,presentation,shared_write,AiSearchGoal::active,1
 orders,presentation,shared_write,AiSearchGoal::count,1
@@ -2153,7 +2159,7 @@ orders,presentation,shared_write,Point16::y,5
 orders,presentation,shared_write,Unit::angles,3
 orders,presentation,shared_write,Unit::buildLeft,15
 orders,presentation,shared_write,Unit::fireOrder,1
-orders,presentation,shared_write,Unit::flags,29
+orders,presentation,shared_write,Unit::flags,30
 orders,presentation,shared_write,Unit::group,5
 orders,presentation,shared_write,Unit::health,3
 orders,presentation,shared_write,Unit::mode,1
@@ -2718,7 +2724,7 @@ players,game,shared_write,Game::endGameCountdown,1
 players,game,shared_write,Game::endGameFlags,2
 players,game,shared_write,Game::localPlayer,13
 players,game,shared_write,Game::mapFlags,1
-players,game,shared_write,Game::playerIndex,8
+players,game,shared_write,Game::playerIndex,9
 players,game,shared_write,Layer::handler,3
 players,game,shared_write,Player::active,9
 players,game,shared_write,Player::allied,1
@@ -2740,7 +2746,7 @@ players,game,shared_write,PlayerInfo::color,4
 players,game,shared_write,PlayerInfo::side,7
 players,game,shared_write,Point16::x,1
 players,game,shared_write,Point16::y,1
-players,game,shared_write,Unit::flags,3
+players,game,shared_write,Unit::flags,4
 players,game,shared_write,Unit::health,1
 players,game,shared_write,Vec3::x,3
 players,game,shared_write,Vec3::y,1
@@ -2960,7 +2966,7 @@ players,presentation,shared_write,Point16::x,5
 players,presentation,shared_write,Point16::y,5
 players,presentation,shared_write,Unit::angles,3
 players,presentation,shared_write,Unit::buildLeft,15
-players,presentation,shared_write,Unit::flags,29
+players,presentation,shared_write,Unit::flags,30
 players,presentation,shared_write,Unit::health,3
 players,presentation,shared_write,Unit::postTransferHoldoff,13
 players,presentation,shared_write,UnitWeaponSlot::stockpile,1
@@ -3149,6 +3155,7 @@ presentation,game,call,ShutdownIngameAndQuit,1
 presentation,game,call,ShutdownIngameSystems,1
 presentation,game,call,SimAlloc,1
 presentation,game,call,SimAllocTagged,4
+presentation,game,call,SimEvents,1
 presentation,game,call,StepGafSequence,1
 presentation,game,call,UpdateBattleRoom,1
 presentation,game,call,WriteGameRegistryValue,3
@@ -3191,7 +3198,8 @@ presentation,game,shared_write,PlayerInfo::metal,2
 presentation,game,shared_write,PlayerInfo::side,7
 presentation,game,shared_write,Point16::x,1
 presentation,game,shared_write,Point16::y,1
-presentation,game,shared_write,Unit::flags,3
+presentation,game,shared_write,SimEventQueue::head,2
+presentation,game,shared_write,Unit::flags,4
 presentation,game,shared_write,Vec3::x,3
 presentation,game,shared_write,Vec3::y,1
 presentation,game,shared_write,Vec3::z,3
@@ -4284,6 +4292,7 @@ units,files,call,HapiBank::SeekBox,4
 units,files,call,HapiBank::SetIntegerItem,1
 units,files,call,HapiBank::WriteBox,2
 units,files,call,ListDirectory,3
+units,game,call,RecordUnitSpeech,1
 units,game,call,SimAllocTagged,6
 units,game,call,SimRealloc,1
 units,game,shared_write,Angles16::heading,1
@@ -4297,7 +4306,7 @@ units,game,shared_write,Player::unitsCreated,1
 units,game,shared_write,Point16::x,1
 units,game,shared_write,Point16::y,1
 units,game,shared_write,Unit::def,1
-units,game,shared_write,Unit::flags,3
+units,game,shared_write,Unit::flags,4
 units,game,shared_write,Unit::health,1
 units,game,shared_write,Unit::motion,1
 units,game,shared_write,UnitDef::flags1,1
@@ -4658,7 +4667,6 @@ units,presentation,call,MarkChanged,1
 units,presentation,call,MarkSelectionOrdersDirty,1
 units,presentation,call,MirrorObject,1
 units,presentation,call,PopUntilNamedLayout,1
-units,presentation,call,QueueUnitSpeech,1
 units,presentation,call,RefreshBuildCountTexts,1
 units,presentation,call,RemoveSpeechOfUnit,1
 units,presentation,call,StringRef::ReleaseRef,1
@@ -4675,7 +4683,7 @@ units,presentation,shared_write,Game::defs,18
 units,presentation,shared_write,Game::hotRadar,1
 units,presentation,shared_write,Game::types,2
 units,presentation,shared_write,Game::unitDefCount,5
-units,presentation,shared_write,Game::units,29
+units,presentation,shared_write,Game::units,30
 units,presentation,shared_write,Game::unitsEnd,10
 units,presentation,shared_write,ModelPiece::modified,5
 units,presentation,shared_write,Player::commanderKills,1
@@ -4700,7 +4708,7 @@ units,presentation,shared_write,Unit::cell,1
 units,presentation,shared_write,Unit::cloakOn,1
 units,presentation,shared_write,Unit::def,22
 units,presentation,shared_write,Unit::fireOrder,1
-units,presentation,shared_write,Unit::flags,29
+units,presentation,shared_write,Unit::flags,30
 units,presentation,shared_write,Unit::footprint,1
 units,presentation,shared_write,Unit::group,5
 units,presentation,shared_write,Unit::health,3
@@ -4881,7 +4889,7 @@ weapons,game,call,StepGafSequence,1
 weapons,game,shared_write,Angles16::heading,1
 weapons,game,shared_write,Point16::x,1
 weapons,game,shared_write,Point16::y,1
-weapons,game,shared_write,Unit::flags,3
+weapons,game,shared_write,Unit::flags,4
 weapons,game,shared_write,Unit::health,1
 weapons,game,shared_write,Vec3::x,3
 weapons,game,shared_write,Vec3::y,1
@@ -5050,7 +5058,7 @@ weapons,presentation,shared_write,Projectile::start,1
 weapons,presentation,shared_write,Projectile::time,1
 weapons,presentation,shared_write,Projectile::type,1
 weapons,presentation,shared_write,Unit::attacker,1
-weapons,presentation,shared_write,Unit::flags,29
+weapons,presentation,shared_write,Unit::flags,30
 weapons,presentation,shared_write,Unit::health,3
 weapons,presentation,shared_write,Unit::lastAttackerSlot,1
 weapons,presentation,shared_write,UnitWeaponSlot::flags,2

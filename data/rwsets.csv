@@ -219,8 +219,8 @@ address,function,file,kind,target
 0x401fd0,WaitForAttackOrder,src/orders/unit_orders.cpp,field_write,Order::flags
 0x401fd0,WaitForAttackOrder,src/orders/unit_orders.cpp,function,
 0x402010,SelfDestructOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
-0x402010,SelfDestructOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
 0x402010,SelfDestructOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x402010,SelfDestructOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x402010,SelfDestructOrder,src/orders/unit_orders.cpp,call,operator->
 0x402010,SelfDestructOrder,src/orders/unit_orders.cpp,field_read,Order::count
 0x402010,SelfDestructOrder,src/orders/unit_orders.cpp,field_read,Order::done
@@ -294,7 +294,7 @@ address,function,file,kind,target
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadius]"
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
-0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,operator->
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,operator=
@@ -342,7 +342,7 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,GridCell
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
-0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,UpdateBuildMenuIfFocusUnit
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,get
@@ -558,7 +558,7 @@ address,function,file,kind,target
 0x403190,AttackSpecialOrder,src/orders/unit_orders.cpp,function,
 0x4031d0,MoveGroundOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x4031d0,MoveGroundOrder,src/orders/unit_orders.cpp,call,Order::AttachApproachRadiusGoal
-0x4031d0,MoveGroundOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x4031d0,MoveGroundOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x4031d0,MoveGroundOrder,src/orders/unit_orders.cpp,call,operator!=
 0x4031d0,MoveGroundOrder,src/orders/unit_orders.cpp,field_maybe_written,Order::pos
 0x4031d0,MoveGroundOrder,src/orders/unit_orders.cpp,field_read,Order::approachRadius
@@ -570,7 +570,7 @@ address,function,file,kind,target
 0x403260,AttackKamikazeOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x403260,AttackKamikazeOrder,src/orders/unit_orders.cpp,call,Order::AttachApproachRadiusGoal
 0x403260,AttackKamikazeOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
-0x403260,AttackKamikazeOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x403260,AttackKamikazeOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x403260,AttackKamikazeOrder,src/orders/unit_orders.cpp,call,operator bool
 0x403260,AttackKamikazeOrder,src/orders/unit_orders.cpp,call,operator new
 0x403260,AttackKamikazeOrder,src/orders/unit_orders.cpp,call,operator->
@@ -703,7 +703,7 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,PosPlus
-0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WorldToCell
@@ -769,7 +769,7 @@ address,function,file,kind,target
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,MarkSelectionOrdersDirty
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,Order::AttachRingApproachGoal
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
-0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator Unit *
@@ -815,7 +815,7 @@ address,function,file,kind,target
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::Get
-0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,StopBuildingScript
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,UnitDef::EnergyCost
@@ -890,7 +890,7 @@ address,function,file,kind,target
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::Get
-0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,SquaredDistance
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,StopBuildingScript
@@ -949,8 +949,8 @@ address,function,file,kind,target
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
-0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator bool
@@ -1010,8 +1010,8 @@ address,function,file,kind,target
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
-0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Cell *
@@ -1116,8 +1116,8 @@ address,function,file,kind,target
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
-0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,StopBuildingScript
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
@@ -1182,7 +1182,7 @@ address,function,file,kind,target
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::Get
-0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,operator->
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,operator=
@@ -1409,7 +1409,7 @@ address,function,file,kind,target
 0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,Order::AttachApproachRadiusGoal
 0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,Order::SetAttachedFx
 0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
-0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,WaitIfCobBusy
 0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,get
 0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,operator Unit *
@@ -1438,7 +1438,7 @@ address,function,file,kind,target
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,Order::AttachApproachRadiusGoal
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
-0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,QueueUnitSpeech
+0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,WaitIfCobBusy
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,get
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,operator Unit *
@@ -1552,8 +1552,8 @@ address,function,file,kind,target
 0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,field_write,UnitNetDirtyFlagsView::flag6
 0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,function,
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,Contains
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,QueueUnitSpeechIfNotVisible
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,RandomInt
+0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,RecordUnitSpeech
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,operator bool
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,operator->
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_escape,Unit::weapons
@@ -3230,7 +3230,7 @@ address,function,file,kind,target
 0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
-0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
+0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,Snap
 0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,operator new
@@ -3529,7 +3529,7 @@ address,function,file,kind,target
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
-0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
+0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,SendScriptCallByName
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,get
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,operator Unit *
@@ -3573,7 +3573,7 @@ address,function,file,kind,target
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrderAttach::SetUnit
-0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
+0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,WorldToCell16
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,get
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,operator Unit *
@@ -3627,8 +3627,8 @@ address,function,file,kind,target
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
-0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,get
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x4118e0,VtolLandingOrder,src/orders/vtol_orders.cpp,call,operator WeaponDef *
@@ -4009,7 +4009,7 @@ address,function,file,kind,target
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetHeading
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrderAttach::SetUnit
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PosMinus
-0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
+0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,StartBuildingScript
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,WaitIfNotInBuildStance
@@ -4094,7 +4094,7 @@ address,function,file,kind,target
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetHeading
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PosMinus
-0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
+0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,StartBuildingScript
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,operator Unit *
@@ -4145,7 +4145,7 @@ address,function,file,kind,target
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
-0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
+0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator new
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator->
@@ -4203,7 +4203,7 @@ address,function,file,kind,target
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
-0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
+0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,Square
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,Sub
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,WorldToCell
@@ -4259,7 +4259,7 @@ address,function,file,kind,target
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
-0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
+0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,_hypot
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator bool
@@ -4313,7 +4313,7 @@ address,function,file,kind,target
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanRepair]"
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x415250,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
-0x415250,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
+0x415250,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x415250,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,call,operator->
 0x415250,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,call,operator==
 0x415250,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,field_read,Order::state
@@ -11311,7 +11311,7 @@ address,function,file,kind,target
 0x438870,Order::OrStatusFlags,src/orders/order_queue.cpp,field_read,Order::subFlags
 0x438870,Order::OrStatusFlags,src/orders/order_queue.cpp,field_write,Order::subFlags
 0x438870,Order::OrStatusFlags,src/orders/order_queue.cpp,function,
-0x438880,Order::AnnounceStatusIfFlagged,src/orders/order_queue.cpp,call,QueueUnitSpeech
+0x438880,Order::AnnounceStatusIfFlagged,src/orders/order_queue.cpp,call,RecordUnitSpeech
 0x438880,Order::AnnounceStatusIfFlagged,src/orders/order_queue.cpp,call,operator Unit *
 0x438880,Order::AnnounceStatusIfFlagged,src/orders/order_queue.cpp,field_read,Order::flags_42
 0x438880,Order::AnnounceStatusIfFlagged,src/orders/order_queue.cpp,field_read,Order::unit
@@ -25431,16 +25431,12 @@ address,function,file,kind,target
 0x47f750,StopAllSounds,src/sound/sound.cpp,global_read,g_game
 0x47f750,StopAllSounds,src/sound/sound.cpp,global_read,g_noDirectSound
 0x47f750,StopAllSounds,src/sound/sound.cpp,global_read,g_useWindowsSound
-0x47f780,QueueUnitSpeech,src/sound/sound.cpp,call,SpeechQueue::EnqueueSpeech
-0x47f780,QueueUnitSpeech,src/sound/sound.cpp,call,Translate
+0x47f780,QueueUnitSpeech,src/sound/sound.cpp,call,PresentUnitSpeech
 0x47f780,QueueUnitSpeech,src/sound/sound.cpp,field_read,Game::playerIndex
-0x47f780,QueueUnitSpeech,src/sound/sound.cpp,field_read,SpeechTypeInfo::text
 0x47f780,QueueUnitSpeech,src/sound/sound.cpp,field_read,Unit::flags
 0x47f780,QueueUnitSpeech,src/sound/sound.cpp,field_read,Unit::playerIndex
 0x47f780,QueueUnitSpeech,src/sound/sound.cpp,function,
 0x47f780,QueueUnitSpeech,src/sound/sound.cpp,global_read,g_game
-0x47f780,QueueUnitSpeech,src/sound/sound.cpp,global_read,g_speechQueue
-0x47f780,QueueUnitSpeech,src/sound/sound.cpp,global_read,g_speechTypes
 0x47f7e0,QueueUnitSpeechIfVisible,src/sound/sound.cpp,call,IsUnitVisible
 0x47f7e0,QueueUnitSpeechIfVisible,src/sound/sound.cpp,call,QueueUnitSpeech
 0x47f7e0,QueueUnitSpeechIfVisible,src/sound/sound.cpp,function,
@@ -28465,7 +28461,7 @@ address,function,file,kind,target
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,CobScript::StartScript
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,LostBits
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,MarkSelectionOrdersDirty
-0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,QueueUnitSpeech
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,RecordUnitSpeech
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,Unit::GetState
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,get
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator PathOrderAttach *
@@ -30245,6 +30241,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetCameraState
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetChatHudIndices
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetSpeech
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimEventsClear
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,memset
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,operator Mission *
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_maybe_written,Game::chatRecipients_2bf1_b
@@ -31196,6 +31193,7 @@ address,function,file,kind,target
 0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,function,
 0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,global_read,g_game
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,AccumulateProfileTime
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,DrainSimEvents
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,EmptyPostSimStepHook
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,EmptyPostSimStepHook_B
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,EmptyPostSimStepHook_C
@@ -44315,6 +44313,24 @@ address,function,file,kind,target
 ,DoSelect,src/gui/gui.cpp,field_write,Layer::current
 ,DoSelect,src/gui/gui.cpp,function,
 ,DoSelect,src/gui/gui.cpp,global_read,g_guiContext
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainUnitSpeech
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,SimEvents
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEvent::kind
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEventQueue::head
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEventQueue::records
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEventQueue::tail
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_write,SimEventQueue::head
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,function,
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,call,IsUnitVisible
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,call,PresentUnitSpeech
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,call,operator Unit *
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,deref_escape,*Unit
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Game::units
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,SimEvent::flags
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Unit::flags
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,function,
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,global_read,g_game
 ,DrawClippedLine,src/graphics/draw.cpp,call,BlitLine
 ,DrawClippedLine,src/graphics/draw.cpp,call,ClipLine
 ,DrawClippedLine,src/graphics/draw.cpp,call,LockScreen
@@ -48947,6 +48963,12 @@ address,function,file,kind,target
 ,Prepare,src/wasm/wind_meteors_glue.cpp,global_read,s_extTdfAddress
 ,Prepare,src/wasm/wind_meteors_glue.cpp,global_read,s_gameAddress
 ,Prepare,src/wasm/wind_meteors_glue.cpp,global_read,s_simAddress
+,PresentUnitSpeech,src/sound/sound.cpp,call,SpeechQueue::EnqueueSpeech
+,PresentUnitSpeech,src/sound/sound.cpp,call,Translate
+,PresentUnitSpeech,src/sound/sound.cpp,field_read,SpeechTypeInfo::text
+,PresentUnitSpeech,src/sound/sound.cpp,function,
+,PresentUnitSpeech,src/sound/sound.cpp,global_read,g_speechQueue
+,PresentUnitSpeech,src/sound/sound.cpp,global_read,g_speechTypes
 ,PrevFrameSeqInReceiveFrame,src/network/packets.cpp,function,
 ,PruneLoose,src/orders/order_list.cpp,call,UnlinkNode
 ,PruneLoose,src/orders/order_list.cpp,call,operator Order *
@@ -49367,6 +49389,31 @@ address,function,file,kind,target
 ,RecordFatal,src/wasm/wind_meteors_glue.cpp,global_read,s_fatalPending
 ,RecordFatal,src/wasm/wind_meteors_glue.cpp,global_write,s_fatalPending
 ,RecordFatal,src/wasm/wind_meteors_glue.cpp,global_write,s_fatalText
+,RecordSimEvent,src/state/sim_events.cpp,call,FatalError
+,RecordSimEvent,src/state/sim_events.cpp,call,HarnessTestMode
+,RecordSimEvent,src/state/sim_events.cpp,deref_read,*SimEventQueue
+,RecordSimEvent,src/state/sim_events.cpp,deref_read,*unsigned int
+,RecordSimEvent,src/state/sim_events.cpp,field_read,Game::ticks
+,RecordSimEvent,src/state/sim_events.cpp,field_read,SimEventQueue::dropped
+,RecordSimEvent,src/state/sim_events.cpp,field_read,SimEventQueue::head
+,RecordSimEvent,src/state/sim_events.cpp,field_read,SimEventQueue::records
+,RecordSimEvent,src/state/sim_events.cpp,field_read,SimEventQueue::tail
+,RecordSimEvent,src/state/sim_events.cpp,field_write,SimEvent::args
+,RecordSimEvent,src/state/sim_events.cpp,field_write,SimEvent::flags
+,RecordSimEvent,src/state/sim_events.cpp,field_write,SimEvent::kind
+,RecordSimEvent,src/state/sim_events.cpp,field_write,SimEvent::tick
+,RecordSimEvent,src/state/sim_events.cpp,field_write,SimEventQueue::dropped
+,RecordSimEvent,src/state/sim_events.cpp,field_write,SimEventQueue::tail
+,RecordSimEvent,src/state/sim_events.cpp,function,
+,RecordSimEvent,src/state/sim_events.cpp,global_read,g_game
+,RecordSimEvent,src/state/sim_events.cpp,global_read,g_simEvents
+,RecordUnitSpeech,src/state/sim_speech.h,call,RecordSimEvent
+,RecordUnitSpeech,src/state/sim_speech.h,field_read,Game::playerIndex
+,RecordUnitSpeech,src/state/sim_speech.h,field_read,Unit::flags
+,RecordUnitSpeech,src/state/sim_speech.h,field_read,Unit::id
+,RecordUnitSpeech,src/state/sim_speech.h,field_read,Unit::playerIndex
+,RecordUnitSpeech,src/state/sim_speech.h,function,
+,RecordUnitSpeech,src/state/sim_speech.h,global_read,g_game
 ,RefAbs,src/harness/harness.cpp,call,SimBlockBase
 ,RefAbs,src/harness/harness.cpp,function,
 ,RefreshMapListNative,src/seams/native.cpp,call,Mission::RefreshMapList
@@ -50151,6 +50198,7 @@ address,function,file,kind,target
 ,SimBlockTrack,src/state/block.cpp,global_write,g_trackedCount
 ,SimCreate,src/state/sim_globals.cpp,call,SimAlloc
 ,SimCreate,src/state/sim_globals.cpp,call,SimBlockTrack
+,SimCreate,src/state/sim_globals.cpp,call,SimEventsCreate
 ,SimCreate,src/state/sim_globals.cpp,call,atexit
 ,SimCreate,src/state/sim_globals.cpp,call,operator new
 ,SimCreate,src/state/sim_globals.cpp,deref_read,*SimGlobals
@@ -50158,6 +50206,20 @@ address,function,file,kind,target
 ,SimCreate,src/state/sim_globals.cpp,function,
 ,SimCreate,src/state/sim_globals.cpp,global_read,registered@SimCreate
 ,SimCreate,src/state/sim_globals.cpp,global_write,registered@SimCreate
+,SimEvents,src/state/sim_events.cpp,call,SimCreate
+,SimEvents,src/state/sim_events.cpp,deref_read,*SimEventQueue
+,SimEvents,src/state/sim_events.cpp,function,
+,SimEvents,src/state/sim_events.cpp,global_read,g_simEvents
+,SimEventsClear,src/state/sim_events.cpp,call,SimEvents
+,SimEventsClear,src/state/sim_events.cpp,field_write,SimEventQueue::dropped
+,SimEventsClear,src/state/sim_events.cpp,field_write,SimEventQueue::head
+,SimEventsClear,src/state/sim_events.cpp,field_write,SimEventQueue::tail
+,SimEventsClear,src/state/sim_events.cpp,function,
+,SimEventsCreate,src/state/sim_events.cpp,call,SimAllocTagged
+,SimEventsCreate,src/state/sim_events.cpp,call,SimBlockTrack
+,SimEventsCreate,src/state/sim_events.cpp,function,
+,SimEventsCreate,src/state/sim_events.cpp,global_escape,g_simEvents
+,SimEventsCreate,src/state/sim_events.cpp,global_write,g_simEvents
 ,SimFree,src/state/block.cpp,call,FreeLocked
 ,SimFree,src/state/block.cpp,call,Guard::~Guard
 ,SimFree,src/state/block.cpp,field_read,AllocHooks::removed

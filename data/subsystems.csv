@@ -950,10 +950,10 @@ RejectPacketType8,src/network/net_game.cpp,network,file:src/network/,
 NetPacket::DispatchPacket,src/network/net_game.cpp,network,file:src/network/,
 GetLocalDpid,src/network/net_game.cpp,network,file:src/network/,
 GetLocalHumanDpid,src/network/net_game.cpp,network,file:src/network/,
-FindSlotByDpid,src/game/player_slots.cpp,platform,phase:UpdateAllUnits,platform
+FindSlotByDpid,src/game/player_slots.cpp,platform,default:src/game/,platform
 GetPlayerSlot,src/network/net_game.cpp,network,file:src/network/,
 FindPlayerByDpid,src/network/net_game.cpp,network,file:src/network/,
-GetSlotDpid,src/game/player_slots.cpp,platform,phase:UpdateAllUnits,platform
+GetSlotDpid,src/game/player_slots.cpp,platform,default:src/game/,platform
 GetPlayerDpid,src/network/net_game.cpp,network,file:src/network/,
 GetHostDpid,src/network/net_game.cpp,network,file:src/network/,
 SetPlayerName,src/network/net_game.cpp,network,file:src/network/,

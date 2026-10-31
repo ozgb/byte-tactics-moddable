@@ -134,6 +134,8 @@ economy,los_radar,indirect,CmdShareMapping,1
 economy,los_radar,indirect,CmdShareRadar,1
 economy,los_radar,indirect,GetMapCell,1
 economy,network,call,AddMessage,4
+economy,network,indirect,BroadcastPlayerInfo,2
+economy,network,indirect,SendShareMapInfo,1
 economy,network,shared_write,Player::energy,1
 economy,network,shared_write,Player::energyWasted,2
 economy,network,shared_write,Player::metal,1
@@ -239,6 +241,10 @@ features,map,shared_write,Point16::y,12
 features,map,shared_write,Vec3::x,12
 features,map,shared_write,Vec3::y,4
 features,map,shared_write,Vec3::z,12
+features,network,indirect,NetSendFeatureBurning,1
+features,network,indirect,NetSendFeatureHit,1
+features,network,indirect,NetSendFeatureKilled,1
+features,network,indirect,NetSendFeatureReclaimed,1
 features,orders,shared_write,Cell::feature,2
 features,orders,shared_write,Cell::offsetX,3
 features,orders,shared_write,Cell::offsetY,3
@@ -1335,6 +1341,7 @@ los_radar,map,shared_write,Vec3::z,12
 los_radar,map,shared_write,Vec3Words::xWhole,2
 los_radar,map,shared_write,Vec3Words::zWhole,3
 los_radar,network,call,AddMessage,3
+los_radar,network,indirect,BroadcastPlayerInfo,2
 los_radar,network,shared_write,Unit::flags,2
 los_radar,orders,shared_write,Cell::feature,2
 los_radar,orders,shared_write,Game::cells,1
@@ -2093,6 +2100,9 @@ orders,network,call,BitWriter::GrowBuffer,1
 orders,network,call,BitWriter::WriteBits,4
 orders,network,call,Player::GetEnergy,1
 orders,network,call,Player::GetMetal,1
+orders,network,indirect,NetSendFeatureReclaimed,1
+orders,network,indirect,SendScriptCall,3
+orders,network,indirect,SendScriptCallByName,1
 orders,network,shared_write,BitWriter::bit,3
 orders,network,shared_write,BitWriter::index,3
 orders,network,shared_write,Unit::angles,2
@@ -2807,6 +2817,11 @@ players,map,shared_write,Vec3::z,12
 players,network,call,Player::Clear,1
 players,network,call,RISetCallbacks,2
 players,network,call,ReportGameEvent,1
+players,network,indirect,BroadcastPlayerInfo,2
+players,network,indirect,NetBroadcastPlayerEconomy,1
+players,network,indirect,NetSendOwnershipTransfer,1
+players,network,indirect,NetSendShareEnergy,1
+players,network,indirect,NetSendShareMetal,1
 players,network,shared_write,Game::endGameFlags,1
 players,network,shared_write,Game::head,5
 players,network,shared_write,Game::localPlayer,19
@@ -4440,6 +4455,12 @@ units,network,call,BitWriter::GrowBuffer,2
 units,network,call,BitWriter::SetByteAt,1
 units,network,call,BitWriter::WriteBits,2
 units,network,call,CreateUnitFromPacket,2
+units,network,indirect,BroadcastBuilderLink,2
+units,network,indirect,NetSendActivateFlags,1
+units,network,indirect,NetSendAttach,1
+units,network,indirect,NetSendUnitKilled,1
+units,network,indirect,NetSendUnitStates,1
+units,network,indirect,SendNewUnit,1
 units,network,shared_write,BitReader::bit,2
 units,network,shared_write,BitReader::data,2
 units,network,shared_write,BitReader::index,2
@@ -4971,6 +4992,11 @@ weapons,map,shared_write,Unit::flags,5
 weapons,map,shared_write,Vec3::x,12
 weapons,map,shared_write,Vec3::y,4
 weapons,map,shared_write,Vec3::z,12
+weapons,network,indirect,NetSendProjectileDetonated,1
+weapons,network,indirect,NetSendUnitDamage,1
+weapons,network,indirect,NetSendWeaponFire,4
+weapons,network,indirect,NetSendWeaponFireAt,1
+weapons,network,indirect,SendScriptCallByName,1
 weapons,network,shared_write,Projectile::target,1
 weapons,network,shared_write,Projectile::type,1
 weapons,network,shared_write,Unit::attacker,1

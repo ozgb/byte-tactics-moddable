@@ -35,7 +35,7 @@ static_assert(sizeof(HapiBank) == 4, "");
 static_assert(sizeof(CommandArgs) == 212, "");
 static_assert(offsetof(CommandArgs, buffer) == 80, "");
 static_assert(offsetof(CommandArgs, count) == 208, "");
-static_assert(sizeof(Seams) == 52, "");
+static_assert(sizeof(Seams) == 56, "");
 static_assert(offsetof(Seams, weapons) == 20, "");
 static_assert(offsetof(Seams, files) == 48, "");
 static_assert(sizeof(WindMeteorsSeam) == 48, "");

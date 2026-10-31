@@ -2977,8 +2977,8 @@ static void VisitWeaponTable(const char* path, unsigned table)
     HashByte(table != 0);
     if (table == 0)
         return;
-    first = ReadU32At(table, WEAPON_TABLE_FIRST);
-    last = ReadU32At(table, WEAPON_TABLE_LAST);
+    first = ReadRefAt(table, WEAPON_TABLE_FIRST);
+    last = ReadRefAt(table, WEAPON_TABLE_LAST);
     n = first != 0 && last >= first && (last - first) % WEAPON_ENTRY_SIZE == 0
         ? (last - first) / WEAPON_ENTRY_SIZE : 0;
     if (n > VECTOR_LIMIT)

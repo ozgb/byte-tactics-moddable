@@ -1276,6 +1276,7 @@ RunOrders,0x8 0x2a,ReleaseFileHandle: HAPIFILE header,5,56,0x16de-0x8f51,not-a-p
 SetMissionType,*,*,0,0,-,not-a-pointer,Mission table words that only look like addresses
 SetMissionType,0xa02 0xc1e,HAPI_LoadFile,2,18000,0x1e20-0x14fa8,not-a-pointer,Mission table words that only look like addresses
 SetMissionType,0xc1d,LoadTntMap: TILE SET,1,7200,0xaffe0,not-a-pointer,Mission table words that only look like addresses
+SimGlobals.DAT_005119b8,*,*,0,0,-,not-a-pointer,"the 8-byte gap before g_playerAI, whose unaligned word at +6 takes the low half of g_playerAI[0]"
 SimGlobals.DAT_00512350,*,*,0,0,-,not-a-pointer,"the 8-byte gap before g_movementClasses, whose unaligned word at +6 takes the low half of entries[0].name"
 SimGlobals.g_cdMismatchDefeatTick,*,*,0,0,-,not-a-pointer,"g_cdMismatchDefeatTick: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_cdMismatchDefeatTick,0x2,??4?$vector@UTimedSubParticle@@V?$allocator@UTimedSubParticle@@@std@@@std@@QAEAAV01@ABV01@@Z,1,2,0x460,not-a-pointer,"g_cdMismatchDefeatTick: integers (ticks, counts, seed) that only look like addresses"

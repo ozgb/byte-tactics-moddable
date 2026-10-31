@@ -36,6 +36,8 @@ union Orders_37ebe {
 #include "../orders/order_type_entry.h"
 #include "../util/mouse_event.h"
 #include "../game/game.h"
+#include "hot_radar_slot.h"
+#include "../../interfaces/ref.h"
 #pragma pack(pop)
 
 #include "../../link/globals.h"

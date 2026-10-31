@@ -92,6 +92,7 @@ struct ClampedPos {
 #include "unit.h"
 
 #include "../game/game.h"
+#include "../ingame/hot_radar_slot.h"
 #include "../quirks/quirks.h"
 #pragma pack(pop)
 

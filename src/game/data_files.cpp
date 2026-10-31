@@ -399,7 +399,7 @@ void FreeAnimFiles()
         g_game->panelTop[i] = 0;
     }
     g_game->gafAnimClearedSlot = 0;
-    g_game->fxGaf = g_game->igTitles = g_game->vismasks = g_game->fog = g_game->cursorsGaf = 0;
+    g_game->fxGaf = g_game->igTitles = g_game->vismasks = g_game->fog = g_game->cursorsGaf = nullptr;
 }
 
 // FUNCTION: 0x42a0e0

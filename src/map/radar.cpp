@@ -54,6 +54,7 @@ struct RadarUnitDefView {
 #include "../weapons/projectile.h"
 
 #include "../game/game.h"
+#include "../ingame/hot_radar_slot.h"
 #include "../graphics/display.h"
 #pragma pack(pop)
 

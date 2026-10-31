@@ -3003,7 +3003,7 @@ static void VisitWeaponDefs()
         sprintf(path, "weapons[%u]", i);
         VisitElement(path, w, &kWeaponDefDataTable);
         strcat(path, ".damage");
-        VisitWeaponTable(path, ReadU32At((unsigned)w, WEAPON_TABLE));
+        VisitWeaponTable(path, ReadRefAt((unsigned)w, WEAPON_TABLE));
     }
     EndSection();
 }

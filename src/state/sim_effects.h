@@ -136,6 +136,12 @@ inline void RecordForcesDestroyed(int player)
     RecordSimEvent(SIM_EVENT_FORCES_DESTROYED, 0, args, 1);
 }
 
+inline void RecordPlayerTookLead(int player, int kills)
+{
+    unsigned int args[2] = {(unsigned int)player, (unsigned int)kills};
+    RecordSimEvent(SIM_EVENT_PLAYER_TOOK_LEAD, 0, args, 2);
+}
+
 inline void RecordScoreFlash(int killer, int loser)
 {
     unsigned int args[2] = {(unsigned int)killer, (unsigned int)loser};

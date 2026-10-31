@@ -239,6 +239,9 @@ void DrainSimEvents()
         case SIM_EVENT_FORCES_DESTROYED:
             AnnounceForcesDestroyed(&g_game->players[e.args[0]]);
             break;
+        case SIM_EVENT_PLAYER_TOOK_LEAD:
+            AnnouncePlayerTookLead(g_game->players[e.args[0]].name, (int)e.args[1]);
+            break;
         case SIM_EVENT_SCORE_FLASH:
             DrainScoreFlash(e);
             break;

@@ -705,7 +705,6 @@ void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
 #include "unit_targets.h"
 void __stdcall FreeObjectState(void* state);
 void __cdecl operator delete(void* p);
-#include "../frontend/skirmish_menu.h"
 
 // FUNCTION: 0x4866d0
 void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
@@ -824,8 +823,8 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
                 } while (i != 0);
                 rec->rank = best;
                 if (best == 0) {
-                    AnnouncePlayerTookLead(rec->name,
-                                           g_game->commanderDeath == 2 ? rec->commanderKills : rec->kills);
+                    RecordPlayerTookLead(rec->index,
+                                         g_game->commanderDeath == 2 ? rec->commanderKills : rec->kills);
                 }
             }
         }

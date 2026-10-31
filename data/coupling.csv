@@ -1417,7 +1417,7 @@ los_radar,presentation,call,GetGafFrame,9
 los_radar,presentation,call,StringRef::ReleaseRef,1
 los_radar,presentation,call,SurfaceFromFrame,2
 los_radar,presentation,shared_write,Cell::feature,2
-los_radar,presentation,shared_write,GafFrame::height,64
+los_radar,presentation,shared_write,GafFrame::height,65
 los_radar,presentation,shared_write,GafFrame::pixelsOrLayers,41
 los_radar,presentation,shared_write,GafFrame::transparency,25
 los_radar,presentation,shared_write,GafFrame::width,65

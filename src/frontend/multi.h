@@ -35,7 +35,7 @@ void __stdcall OpenReportDialog(unsigned int* count, char** names);
 int __stdcall InitScoreReporting(void);
 void __stdcall HandleSelectGameClick(Gui*);
 void __stdcall OpenSelectGameDialog();
-int __stdcall CloneServiceSlot(Gadget* entries, int, short, int, char*);
+int __stdcall CloneServiceSlot(Gadget* entries, int, short, const char*, char*);
 void __stdcall CacheLogosGadgetIndex(Gui* param1, Gadget* param2);
 void __stdcall HandleLogoSelectClick(Gui*);
 void __stdcall ShowSelectedMapInfo();

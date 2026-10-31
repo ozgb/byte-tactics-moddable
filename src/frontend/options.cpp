@@ -171,20 +171,8 @@ struct SpeedOptionsLayer {
     void (__stdcall* fn)(void* obj, int arg);
 };
 
-struct BriefingGui {
-    char unknown_0[0x10];
-};
-
-struct HelpGui {
-    char unknown_0[0x10];
-};
-
 struct OptionsPanelGui {
     char unknown_0[0x18];
-};
-
-struct SurrenderGui {
-    char unknown_0[0x10];
 };
 
 #pragma pack(pop)
@@ -368,7 +356,6 @@ void __stdcall SetGadgetActiveByName(VisualOptionsGui* menu, char* name, int val
 void __stdcall SetGadgetActiveByName(Gui* sub, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(void* obj, char* name, int value);
 void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int value);
-void __stdcall SetTranslatedTextByName(RestartGui* menu, const char* name, int value, int count);
 
 
 int __stdcall GetButtonStageByName(void* obj, char* name);
@@ -945,8 +932,8 @@ void BlitOptionsPanel()
     if ((*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).bits.bit2) {
         return;
     }
-    RenderLayer((Gui *)((OptionsBlitGui*)&g_game->gui), 0x40);
-    MarkChanged((Gui *)((OptionsBlitGui*)&g_game->gui));
+    RenderLayer(&g_game->gui, 0x40);
+    MarkChanged(&g_game->gui);
     BlitMenuLayers((OptionsBlitGui*)&g_game->gui, 0, 0);
     SetOffscreenSurface((void *)g_game->screen);
     FlipScreen();
@@ -1799,9 +1786,9 @@ void OpenBriefingDialog()
     i = FindGadgetIndex(gadgets, "TextRegion", 0xe);
     gadgets[i].attribs &= ~0x10;
     LoadPictureCached("igmbrief", 0, 0, 0);
-    AllocBlinkWords((Gui *)((BriefingGui*)&g_game->gui), 0xf);
+    AllocBlinkWords(&g_game->gui, 0xf);
     InitBriefingText();
-    RenderLayer((Gui *)((BriefingGui*)&g_game->gui), 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 static inline void AddLine(HelpPageLines* page, Layer* layer, char* value, int y)
@@ -1882,9 +1869,9 @@ void OpenHelpDialog()
     g->handler = HandleHelpClick;
     LoadPictureCached("dhelp", 0, 0, 0);
     g_helpDialogBaseGadgetCount = g->entries->u.count;
-    FillHelpPage((Gui *)((HelpGui*)&g_game->gui), 0, 0x11);
+    FillHelpPage(&g_game->gui, 0, 0x11);
     SetKeyboardInput(&g_game->gui, 1);
-    RenderLayer((Gui *)((HelpGui*)&g_game->gui), 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 // FUNCTION: 0x45fbc0
@@ -1919,8 +1906,8 @@ void __stdcall HandleOptionsPanelClick(Gui* gui)
         SetGadgetStatus(gui, gui->hotGadgetIndex, 1);
         if ((*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).bits.bit2) {
         } else {
-            RenderLayer((Gui *)((char*)&g_game->gui), 0x40);
-            MarkChanged((Gui *)((char*)&g_game->gui));
+            RenderLayer(&g_game->gui, 0x40);
+            MarkChanged(&g_game->gui);
             BlitMenuLayers((char*)&g_game->gui, 0, 0);
             SetOffscreenSurface((int)(void *)g_game->screen);
             FlipScreen();
@@ -2044,7 +2031,7 @@ void __stdcall DrawOptionsScrollBar(void* surf)
         src.p[2].y = g_optionsFlipFrame.h - 1;
         src.p[3].y = g_optionsFlipFrame.h - 1;
         DrawFrameQuad(surf, &g_optionsFlipFrame, &dst, &src);
-        MarkChanged((Gui *)((char*)&g_game->gui));
+        MarkChanged(&g_game->gui);
         g_game->flags_142f1 |= 2;
         g_game->field_37e98 = 1;
     }
@@ -2129,15 +2116,15 @@ void OpenRestartDialog()
     LoadPictureCached("drestart", 0, 0, 0);
     int index = FindGadgetIndex(gadgets, "MISSIONNAME", 5);
     menu->language = menu->field_c;
-    char* text = WordWrapText((Gui *)((RestartGui*)&g_game->gui),
+    char* text = WordWrapText(&g_game->gui,
                               g_game->net->GetMissionName(),
                               gadgets[index].width, -1);
     menu->language = menu->field_8;
     char* first = strtok(text, "\n");
-    SetTranslatedTextByName((RestartGui*)&g_game->gui, "MISSIONNAME", (int)first, 0x80);
+    SetTranslatedTextByName(&g_game->gui, "MISSIONNAME", first, 0x80);
     char* second = strtok(0, "\n");
     if (second) {
-        SetTranslatedTextByName((RestartGui*)&g_game->gui, "MISSIONNAME1", (int)second, 0x80);
+        SetTranslatedTextByName(&g_game->gui, "MISSIONNAME1", second, 0x80);
     }
     ApplyDifficultyButtons();
     SetKeyboardInput(&g_game->gui, 1);
@@ -2193,11 +2180,11 @@ void OpenSurrenderDialog()
     } else if (g_battleQuitIntent == 2) {
         const char* title = (*(LobbyUiFlagBits*)&g_game->lobbyUiDirtyFlags_2bee).flag4 ? "Exit the Battle"
                                                 : "Surrender this battle and exit to Windows?";
-        SetTranslatedTextByName(&g_game->gui, "TITLE", const_cast<char*>(title), 0);
+        SetTranslatedTextByName(&g_game->gui, "TITLE", title, 0);
     }
-    SelectGadgetByName((Gui *)((SurrenderGui*)&g_game->gui), "CHOICE2");
+    SelectGadgetByName(&g_game->gui, "CHOICE2");
     layer->handler = HandleSurrenderChoice;
-    RenderLayer((Gui *)((SurrenderGui*)&g_game->gui), 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 // FUNCTION: 0x460800

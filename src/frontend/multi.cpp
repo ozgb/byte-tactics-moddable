@@ -365,7 +365,7 @@ shown:
 #undef temp
 
 struct LogoFrameEntry {
-    void* ptr;
+    GafFrame* ptr;
     int unknown_4;
 };
 
@@ -385,15 +385,13 @@ struct MapSelectClickLayout {
     void* items;
 };
 
-struct LogoAnimSeq {
-    char unknown_0[0x28];
-    void* frame;
+struct LogoAnimSeq : ListBoxItem {
     char unknown_2c[0x30 - 0x2c];
 };
 
 struct LogoSelectLayout {
     char selected[0x18];
-    void** ptrList;
+    ListBoxItem** ptrList;
     LogoAnimSeq* seqs;
 };
 
@@ -527,7 +525,6 @@ int __stdcall TrySetFocus(void* menu, int index);
 void __stdcall SetDescListCleanupFlag(void* gui, int flag);
 void __stdcall SetGrayedOutByName(void* menu, const char* name, int value);
 void __stdcall SetGrayedOutByName(void* gui, char* name, int value);
-void __stdcall SetTranslatedText(void* menu, int index, int param_3, int param_4);
 void __stdcall SetGadgetGrayedOutByName(void* menu, char* name, int value);
 char* __stdcall GetGadgetText(void* menu, const char* key, char* out);
 int __stdcall GetGadgetStatus(void* menu, int handle);
@@ -565,7 +562,6 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../network/unit_sync_state.h"
 #include "../map/map_list.h"
 #include "../gui/file_list.h"
-void __stdcall SetGadgetItems(void* gui, const char* name, void** items, int count);
 #include "options.h"
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void __stdcall RejectPlayer(int param_1, int param_2);
@@ -1518,7 +1514,7 @@ void OpenSelectGameDialog()
 }
 
 // FUNCTION: 0x4444d0
-int __stdcall CloneServiceSlot(Gadget* entries, int param_2, short param_3, int param_4, char* param_5)
+int __stdcall CloneServiceSlot(Gadget* entries, int param_2, short param_3, const char* param_4, char* param_5)
 {
     int index = ++entries[0].u.count;
     Gadget* d = &entries[index];
@@ -1748,9 +1744,9 @@ void OpenLogoSelectDialog()
     LogoSelectLayout* layout = (LogoSelectLayout*)GameAllocIgnoreTag("SELECT TEAM LOGO", 0x20);
     gui->data = layout;
     int count = ((LogoTable *)g_game->logos32)->count;
-    layout->ptrList = (void**)GameAllocIgnoreTag("ANIMSEQ PTR LIST", count * 4);
+    layout->ptrList = (ListBoxItem**)GameAllocIgnoreTag("ANIMSEQ PTR LIST", count * 4);
     layout->seqs = (LogoAnimSeq*)GameAllocIgnoreTag("ACTUAL ANIMSEQS", count * 0x30);
-    void** cursor = layout->ptrList;
+    ListBoxItem** cursor = layout->ptrList;
     int n = 0;
     for (int j = 0; j < count; j++) {
         int k;
@@ -1760,7 +1756,7 @@ void OpenLogoSelectDialog()
                 break;
         }
         layout->seqs[j] = *(LogoAnimSeq*)(LogoTable *)g_game->logos32;
-        layout->seqs[j].frame = ((LogoTable *)g_game->logos32)->entries[j].ptr;
+        layout->seqs[j].cell = ((LogoTable *)g_game->logos32)->entries[j].ptr;
         if (k == 10 && (!g_quirks.boundLogoSelect || n < (int)sizeof(layout->selected))) {
             *cursor = &layout->seqs[j];
             layout->selected[n] = (char)j;
@@ -4229,7 +4225,7 @@ void FillProviderList()
                 n++;
                 char name[0x1c];
                 sprintf(name, "SERVICE%d", k);
-                CloneServiceSlot(entries, tmpl, y, (int)g_linkInfo[k].name, name);
+                CloneServiceSlot(entries, tmpl, y, g_linkInfo[k].name, name);
                 y += entries[tmpl].height + 1;
             }
         }

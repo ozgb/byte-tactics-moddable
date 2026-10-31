@@ -4,6 +4,7 @@ struct IsAboveRectTopRect;
 struct IsBelowRectBottomRect;
 
 struct Gadget;
+struct ListBoxItem;
 
 struct BlinkWord;
 struct Gadget;
@@ -82,7 +83,9 @@ int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused);
 void __stdcall ClearChanged(Gui*);
 void __stdcall SetKeyboardInput(Gui*, int);
 Layer* __stdcall LoadGuiLayer(Gui*, const char*, unsigned int);
-void __stdcall SetTranslatedTextByName(Gui*, char*, char*, int);
+void __stdcall SetTranslatedTextByName(Gui*, const char*, const char*, int);
+void __stdcall SetTranslatedText(Gui*, int, const char*, int);
+void __stdcall SetGadgetItems(Layer*, const char*, ListBoxItem**, int);
 void __stdcall ClearLayerChanged(Gui* param);
 int __stdcall GetKeyboardInput(Gui* obj);
 void __stdcall ClearFocus(Gui*);

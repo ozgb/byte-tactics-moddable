@@ -1,0 +1,24 @@
+bt-sound 1
+0 stop_all - - - - -
+262 play - -585 - - -
+262 play_file - - - - -
+475 play - -585 - - -
+475 play_file - - - - -
+676 play - -585 - - -
+676 play_file - - - - -
+959 play - -585 - - -
+959 play_file - - - - -
+1237 play - -585 - - -
+1237 play_file - - - - -
+2690 play - -585 - - -
+2690 play_file - - - - -
+3019 play - -585 - - -
+3019 play_file - - - - -
+3213 play - -585 - - -
+3213 play_file - - - - -
+4766 play - -585 - - -
+4766 play_file - - - - -
+4979 play - -585 - - -
+4979 play_file - - - - -
+5138 play - -585 - - -
+5138 play_file - - - - -

@@ -1,0 +1,8 @@
+bt-sound 1
+0 stop_all - - - - -
+36 play - -585 - - -
+36 play_file - - - - -
+150 play - -585 - - -
+150 play_file - - - - -
+250 play - -585 - - -
+250 play_file - - - - -

@@ -529,10 +529,10 @@ found:
     unit->mode = mode;
     UpdateUnitHeight(unit);
     g_seams.map->AddUnitToMap(unit);
-    SendNewUnit(unit);
+    g_seams.network->SendNewUnit(unit);
     if (param_5) {
         if (type->mobile == 0)
-            BroadcastBuilderLink(unit, unit);
+            g_seams.network->SendBuilderLink(unit, unit);
         if (((TypeFlags*)&unit->def->flags1)->bit18)
             ((Unit*)unit)->SetStateBits(1, 1);
         if (((TypeFlags*)&unit->def->flags1)->bit24) {
@@ -629,19 +629,7 @@ int __stdcall IsUnitCommander(Unit* unit)
     return _strcmpi(g_game->sideDefs[unit->player->info->side].commander, unit->def->unitname) == 0;
 }
 
-#pragma pack(push, 1)
-struct UnitKilledPacket {
-    unsigned char type;
-    unsigned short unitId;
-    int attackerPlayerNetId;
-    unsigned short attackerUnitId;
-    signed char cobKilledSeverity;
-    unsigned char wreckageLevel : 4;
-    unsigned char killType : 4;
-};
-#pragma pack(pop)
-
-int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
+#include "../network/wire_packets.h"
 #include "../game/game_state.h"
 
 // FUNCTION: 0x4864b0
@@ -685,7 +673,7 @@ void __stdcall KillUnit(Unit* unit, int param_2)
             cmd.attackerUnitId = unit->attacker->id;
         if (unit->player->active != 0 &&
             (unit->player->type == 1 || unit->player->type == 2)) {
-            BroadcastPacket(unit->player->id, (unsigned char*)&cmd, 0xb);
+            g_seams.network->SendUnitKilled(unit, amount, flag, param_2);
         }
         ApplyUnitDeath(&cmd, 1);
         if (same && g_game->commanderDeath != 0 && unit->player->active != 0 &&

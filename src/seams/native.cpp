@@ -530,6 +530,7 @@ static UnitsSeam s_units;
 static PlayersSeam s_players;
 static MapSeam s_map;
 static FilesSeam s_files;
+static NetworkSeam s_network;
 
 static void __fastcall LoadMeteorDefaultsNative(MeteorParams* params)
 {
@@ -966,6 +967,28 @@ void InstallNativeSeams()
     s_files.BankSeekBox = BankSeekBoxNative;
     s_files.BankReadBox = BankReadBoxNative;
     s_files.BankWriteBox = BankWriteBoxNative;
+    s_network.BroadcastPlayerInfo = BroadcastPlayerInfo;
+    s_network.SendNewUnit = SendNewUnit;
+    s_network.SendBuilderLink = BroadcastBuilderLink;
+    s_network.SendUnitKilled = NetSendUnitKilled;
+    s_network.SendUnitDamage = NetSendUnitDamage;
+    s_network.SendAttach = NetSendAttach;
+    s_network.SendOwnershipTransfer = NetSendOwnershipTransfer;
+    s_network.SendActivateFlags = NetSendActivateFlags;
+    s_network.SendWeaponFire = NetSendWeaponFire;
+    s_network.SendWeaponFireAt = NetSendWeaponFireAt;
+    s_network.SendProjectileDetonated = NetSendProjectileDetonated;
+    s_network.SendFeatureHit = NetSendFeatureHit;
+    s_network.SendFeatureKilled = NetSendFeatureKilled;
+    s_network.SendFeatureBurning = NetSendFeatureBurning;
+    s_network.SendFeatureReclaimed = NetSendFeatureReclaimed;
+    s_network.SendScriptCall = SendScriptCall;
+    s_network.SendScriptCallByName = SendScriptCallByName;
+    s_network.SendShareMetal = NetSendShareMetal;
+    s_network.SendShareEnergy = NetSendShareEnergy;
+    s_network.SendShareMapInfo = SendShareMapInfo;
+    s_network.BroadcastPlayerEconomy = NetBroadcastPlayerEconomy;
+    s_network.SendUnitStates = NetSendUnitStates;
     g_seams.wind_meteors = &s_wind_meteors;
     g_seams.economy = &s_economy;
     g_seams.features = &s_features;
@@ -979,4 +1002,5 @@ void InstallNativeSeams()
     g_seams.players = &s_players;
     g_seams.map = &s_map;
     g_seams.files = &s_files;
+    g_seams.network = &s_network;
 }

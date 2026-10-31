@@ -66,13 +66,7 @@ public:
 
 #include "../game/game.h"
 
-struct OrderView {
-    unsigned char type;
-    unsigned short id1;
-    unsigned short id2;
-    char param;
-    unsigned char param2;
-};
+#include "../network/wire_packets.h"
 
 struct Spawn {
     unsigned char player;
@@ -106,7 +100,6 @@ int __stdcall GetGroundHeight(Vec3* pos);
 #include "../../interfaces/seams.h"
 int __cdecl AngleOfVector(int x, int z);
 #include "../network/net_game.h"
-int __stdcall BroadcastPacket(int player, void* data, int size);
 #include "unit_position.h"
 #include "../ingame/selection.h"
 #include "unit_motion.h"
@@ -214,7 +207,7 @@ void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4)
             packet.id2 = target->id;
         packet.param = p3;
         packet.param2 = p4;
-        BroadcastPacket(GetLocalDpid(), &packet, 7);
+        g_seams.network->SendAttach(unit, target, p3, p4);
         ApplyAttachUnit(&packet);
     }
 }
@@ -547,7 +540,7 @@ void __stdcall SendUnitStates(Player* p)
         1, (char)(((stream.bit + 7) >> 3) + (unsigned char)stream.index * 4));
     stream.SetByteAt(
         2, (char)((((stream.bit + 7) >> 3) + stream.index * 4) >> 8));
-    BroadcastPacket(p->id, stream.data, ((stream.bit + 7) >> 3) + stream.index * 4);
+    g_seams.network->SendUnitStates(p, &stream);
     stream.FreeBuffer();
 }
 

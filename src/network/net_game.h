@@ -7,6 +7,11 @@ struct PlayerViewStatePacket;
 
 struct Player;
 struct Unit;
+struct Vec3;
+struct UnitWeaponSlot;
+struct WeaponDef;
+struct Projectile;
+class BitWriter;
 
 int __stdcall DefaultPacketHandler(int arg1);
 int __stdcall RejectPacketType2(int arg1);
@@ -45,6 +50,8 @@ void __stdcall SendNewUnit(Unit* obj);
 void __stdcall BroadcastBuilderLink(Unit* obj, Unit* target);
 int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name);
 int __stdcall SendScriptCallNoArgs(Unit* obj, short index);
+int __stdcall SendScriptCall(Unit* obj, short index, char argCount, int arg0, int arg1, int arg2, int arg3);
+int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount, int arg0, int arg1, int arg2, int arg3);
 void __stdcall SendNetHeartbeat();
 int __stdcall AreAllPlayersReady();
 void __stdcall ReportPacketGap(int, int, int);
@@ -79,5 +86,23 @@ void __stdcall SendLoadProgress();
 void __stdcall HandlePlayerEconomy(PlayerViewStatePacket* packet, Player* player);
 void __stdcall SendLobbySyncRequests();
 int __stdcall HandleNetPackets();
+int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
+void __stdcall SendPlayerEconomy(Player* player, Player* target, unsigned char flag);
+void __stdcall NetSendUnitKilled(Unit* unit, int severity, int wreckageLevel, int killType);
+void __stdcall NetSendUnitDamage(Unit* source, Unit* target, int amount, int kind, unsigned short extra);
+void __stdcall NetSendAttach(Unit* unit, Unit* carrier, char piece, char mode);
+void __stdcall NetSendOwnershipTransfer(Unit* unit, Player* newOwner);
+void __stdcall NetSendActivateFlags(Unit* unit);
+void __stdcall NetSendWeaponFire(Unit* shooter, UnitWeaponSlot* slot, Unit* target, Vec3* origin, Vec3* aimOrVel);
+void __stdcall NetSendWeaponFireAt(unsigned char weaponIndex, Vec3* origin, Vec3* aimOrVel);
+void __stdcall NetSendProjectileDetonated(Unit* attacker, Projectile* projectile);
+void __stdcall NetSendFeatureHit(WeaponDef* weapon, int x, int z);
+void __stdcall NetSendFeatureKilled(int x, int z);
+void __stdcall NetSendFeatureBurning(int x, int z);
+void __stdcall NetSendFeatureReclaimed(Unit* reclaimer, int x, int z);
+void __stdcall NetSendShareMetal(unsigned char from, unsigned char to, float amount);
+void __stdcall NetSendShareEnergy(unsigned char from, unsigned char to, float amount);
+void __stdcall NetBroadcastPlayerEconomy(Player* player);
+void __stdcall NetSendUnitStates(Player* owner, BitWriter* stream);
 
 #endif

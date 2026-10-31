@@ -46,11 +46,6 @@ struct CargoLinkView {
 
 #include "../network/player.h"
 
-struct ActivateFlagsPacket {
-    unsigned char type;
-    short unitId;
-    unsigned char activateFlags;
-};
 #pragma pack(pop)
 
 #include "../../link/globals.h"
@@ -64,7 +59,6 @@ struct ActivateFlagsPacket {
 inline unsigned char Unit::GetState() { return activateFlags; }
 
 #include "../ingame/control_panel.h"
-int __stdcall BroadcastPacket(int player, void* data, int size);
 
 #include "../../interfaces/seams.h"
 
@@ -245,13 +239,8 @@ void Unit::SetStateBits(int mask, int set)
                 QueueUnitSpeech(this, 0xf, 0);
             MarkSelectionOrdersDirty(this);
             if (player->active != 0) {
-                if (player->type == 1 || player->type == 2) {
-                    ActivateFlagsPacket packet;
-                    packet.type = 0x11;
-                    packet.unitId = id;
-                    packet.activateFlags = activateFlags;
-                    BroadcastPacket(player->id, &packet, 4);
-                }
+                if (player->type == 1 || player->type == 2)
+                    g_seams.network->SendActivateFlags(this);
             }
         }
     }

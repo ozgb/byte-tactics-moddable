@@ -219,7 +219,6 @@ void Sound::ReleaseDirectSound()
         streamTimer = -1;
     }
     if (stream != 0) {
-        HarnessSoundEvent("stop_stream", NULL, NULL, NULL, NULL);
         stream->Stop();
         stream->Release();
         stream = 0;
@@ -732,6 +731,7 @@ void Sound::StopStream()
         streamTimer = -1;
     }
     if (stream != 0) {
+        HarnessSoundEvent("stop_stream", NULL, NULL, NULL, NULL);
         stream->Stop();
         stream->Release();
         stream = 0;

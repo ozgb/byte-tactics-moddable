@@ -78,7 +78,7 @@ players,AllocScoreTables,ShutdownScoreTables,TODO(#505): sim-to-presentation eve
 players,ContinueWatchingCallback,ClearSelectedGadget,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,IsGadgetNamed,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,PlaySoundByName,TODO(#505): sim-to-presentation event
-players,ContinueWatchingCallback,ReportGameEvent,TODO(#506): sim sends a packet
+players,ContinueWatchingCallback,ReportGameEvent,TODO(#505): sim-to-presentation event
 players,InitPlayerSlot,SquadManager::SquadManager,TODO(#508): constructor across a seam
 players,UpdatePlayersOnStream,FocusCommander,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,LoadGuiLayer,TODO(#505): sim-to-presentation event
@@ -99,7 +99,7 @@ players,VictoryUnitTypePassesZ::VisitUnit,PlaySoundByName,TODO(#505): sim-to-pre
 units,ApplyAttachUnit,DeselectIfIneligible,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,AddCdActivitySample,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,AnnounceForcesDestroyed,TODO(#505): sim-to-presentation event
-units,ApplyUnitDeath,AnnouncePlayerLeft,TODO(#506): sim sends a packet
+units,ApplyUnitDeath,AnnouncePlayerLeft,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,AnnouncePlayerTookLead,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,FlashScorePanelKillLoss,TODO(#505): sim-to-presentation event
 units,CreateUnitMotion,UnitMotion::UnitMotion,TODO(#508): constructor across a seam

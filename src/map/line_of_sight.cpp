@@ -171,20 +171,6 @@ void FreeLosTables()
     g_losTables.FreeTables();
 }
 
-// FUNCTION: 0x481500
-void InitEyeballs()
-{
-    g_game->count_14277 = 0;
-    (*(Eye **)&g_game->eyes) = (Eye*)GameAllocIgnoreTag("EYEBALL MEMORY", 0x2d0);
-}
-
-// FUNCTION: 0x481530
-void FreeEyeballs()
-{
-    int temp = (int)(Eye *)g_game->eyes;
-    GameFreeThunk((void*)temp);
-}
-
 // FUNCTION: 0x481550
 Cell* __stdcall GetMapCell(int x, int y)
 {

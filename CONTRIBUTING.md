@@ -47,6 +47,10 @@ and meteors run in WASM by default: `wasmtime_host.dll` (needs cargo with the
 `i686-pc-windows-gnu` target and `i686-w64-mingw32-gcc`), `wind_meteors.wasm`
 and `modules.json`, copied beside `TotalA.exe`. Without them the game stops at
 start-up naming the missing file; `-modules=native` runs without them.
+`uv run tools/wasm_host.py build --target i686-pc-windows-msvc` builds the
+host DLL for the msvc target instead, into `build/wasm_host_msvc`. It needs
+rustup's cargo with that target and the x86 CRT and SDK libraries from `xwin
+--arch x86 splat`, found through `--xwin DIR`, `$BT_XWIN` or `~/.xwin-x86`.
 
 Every play-test run is private: its own Xvfb display, Wine prefix, game copy
 and audio sink. The `mp` scenario (two instances, DirectPlay over TCP/IP) also

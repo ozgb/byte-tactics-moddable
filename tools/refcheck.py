@@ -93,7 +93,8 @@ STRUCT_ISSUES = {"Unit": OTHER_ISSUE, "UnitDef": OTHER_ISSUE, "WeaponDef": OTHER
                  "OrderFx": OTHER_ISSUE, "Mission": OTHER_ISSUE}
 OUTSIDE_ISSUES = [
     (re.compile(r"FeatureAnim\.state|view state|presentation|render cache"), VIEW_ISSUE),
-    (re.compile(r"Mission order|damage table|MovementClass|LOS table"), CONTAINER_ISSUE),
+    (re.compile(r"Mission order|damage table"), CONTAINER_ISSUE),
+    (re.compile(r"MovementClass|LOS table"), LOADED_ISSUE),
 ]
 OUTSIDE_DEFAULT_ISSUE = LOADED_ISSUE
 COUNTER_PATTERN = re.compile(r"^(0x[0-9a-f]+)(?:\+(0x[0-9a-f]+)\*k)?$")

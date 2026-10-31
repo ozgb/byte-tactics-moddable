@@ -38,7 +38,7 @@ struct Plain { int a; void *vtable; };
 struct Holds { Base b; int y; };
 struct Item { int a; char *p; };
 struct Game { int x; char *view; Item items[3]; int tail; };
-struct SimGlobals { int a; char *list; };
+struct SimGlobals { int a; char *list; char *table; };
 void use(Derived *d, Holds *h, Game *g, SimGlobals *s, Plain *p) { (void)d; (void)h; (void)g; (void)s;
     char *c = (char *)d->handle; (void)c; }
 """
@@ -216,7 +216,8 @@ class ClangTest(unittest.TestCase):
         rows = ['CreateGameObject,0x4 0xc+0x8*k 0x0,T,1,1,-,outside,"Game.view"',
                 'CreateGameObject,0x14,T,1,1,-,not-a-pointer,skip',
                 '"LoadUnitInfo: UNITINFO",0x47a+0x249*k 0x191c,T,1,1,-,outside,"UnitType.data"',
-                'SimGlobals.list,0x0,T,1,1,-,outside,"LOS table vector"']
+                'SimGlobals.list,0x0,T,1,1,-,outside,"LOS table vector"',
+                'SimGlobals.table,0x0,T,1,1,-,outside,"damage table vector"']
         (data / "block_pointers.csv").write_text(header + "\n".join(rows) + "\n")
         locators = {"Game": rc.Locator(self.scan), "SimGlobals": rc.Locator(self.scan)}
         classes = {"view": "view", "items": "sim"}
@@ -226,8 +227,9 @@ class ClangTest(unittest.TestCase):
         self.assertEqual(keyed[("Item", "p", "CreateGameObject")]["issue"], "#352")
         self.assertEqual(keyed[("", "", "UNITINFO")]["words"], 2)
         self.assertEqual(keyed[("", "", "UNITINFO")]["offset"], "0x47a+0x249*k")
-        self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "#596")
-        self.assertEqual(len(out), 4)
+        self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "#352")
+        self.assertEqual(keyed[("SimGlobals", "table", "SimGlobals.table")]["issue"], "#596")
+        self.assertEqual(len(out), 5)
 
     def outside_notes(self, rows, hand=()):
         data = self.root / "data"

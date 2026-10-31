@@ -618,10 +618,6 @@ TdfFile::~TdfFile()
     flags = 0;
 }
 
-// FUNCTION: 0x49e610 _$E5
-// FUNCTION: 0x49e630 _$E3
-TdfFile g_tdfGlobalParser;
-
 class TdfFieldVector : public std::vector<TdfField> {
 public:
     int GetPairCount(void);

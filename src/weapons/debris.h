@@ -27,16 +27,16 @@ struct Debris {
 
 struct DebrisPiece {
     signed char state;
-    char unknown_1[3];
+    char pad_1[3];
     int vertexCount;
     int faceCount;
     int firstFace;
-    char unknown_10[12];
+    char pad_10[12];
     const char* name;
     int active;
     Ref<Vec3> verts;
     Ref<Face> faces;
-    char unknown_2c[8];
+    char pad_2c[8];
 };
 #pragma pack(pop)
 

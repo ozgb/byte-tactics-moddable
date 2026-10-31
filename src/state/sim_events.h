@@ -3,7 +3,7 @@
 
 #include "../../interfaces/services.h"
 
-enum : unsigned int { SIM_EVENT_CAPACITY = 256 };
+enum : unsigned int { SIM_EVENT_CAPACITY = 512 };
 
 struct SimEvent {
     unsigned short kind;

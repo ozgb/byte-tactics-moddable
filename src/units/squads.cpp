@@ -1,6 +1,7 @@
 #include <vector>
-#include "../state/sim_allocator.h"
+#include "../state/block_vector.h"
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
 #include <algorithm>
 
 #include "squad.h"
@@ -30,7 +31,7 @@ void __stdcall CreateSquads(Player* owner)
         squad->index = i;
         squad->field_8 = 0;
         squad->field_c = 0;
-        new (&squad->items) SimVector<int>;
+        new (&squad->items) BlockVector<Ref<Unit> >;
     }
 }
 
@@ -39,19 +40,19 @@ void __stdcall FreeSquads(Player* owner)
 {
     if (owner->groups) {
         for (int i = 0; i < 10; i++)
-            ((Squad*)owner->groups.get())[i].items.~vector();
+            ((Squad*)owner->groups.get())[i].items.~BlockVector();
         GameFreeThunk((int*)owner->groups.get());
         owner->groups = 0;
     }
 }
 
-static inline void RemoveFast(SimVector<Unit*>& v, Unit* u)
+static inline void RemoveFast(BlockVector<Ref<Unit> >& v, Unit* u)
 {
-    SimVector<Unit*>::iterator it = std::find(v.begin(), v.end(), u);
-    if (it != v.end()) {
-        SimVector<Unit*>::iterator last = v.end() - 1;
+    BlockVector<Ref<Unit> >::iterator it = std::find(v.Begin(), v.End(), u);
+    if (it != v.End()) {
+        BlockVector<Ref<Unit> >::iterator last = v.End() - 1;
         *it = *last;
-        v.erase(last);
+        v.Erase(last);
     }
 }
 
@@ -59,9 +60,9 @@ static inline void RemoveFast(SimVector<Unit*>& v, Unit* u)
 void __stdcall SetUnitSquad(Unit* unit, int index)
 {
     if (unit->group != -1)
-        RemoveFast((SimVector<Unit*>&)((Squad*)((Player *)unit->player)->groups.get())[unit->group].items, unit);
+        RemoveFast(((Squad*)((Player *)unit->player)->groups.get())[unit->group].items, unit);
     if (index != -1)
-        ((SimVector<Unit*>&)((Squad*)((Player *)unit->player)->groups.get())[index].items).push_back(unit);
+        ((Squad*)((Player *)unit->player)->groups.get())[index].items.PushBack(unit);
     unit->group = index;
 }
 

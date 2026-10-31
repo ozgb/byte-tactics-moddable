@@ -1,7 +1,7 @@
 #ifndef GROUP_H
 #define GROUP_H
 
-#include "../state/sim_allocator.h"
+#include "../state/block_vector.h"
 #include "../../interfaces/ref.h"
 
 struct Player;
@@ -12,7 +12,7 @@ struct Group {
     Ref<Player> player;
     int id;
     char unknown_8[0x10 - 0x8];
-    SimVector<Unit*> units;
+    BlockVector<Ref<Unit> > units;
 
     void Send(unsigned char mode, int remove, Unit* target, Vec3* pos, int flags, int extra);
 };

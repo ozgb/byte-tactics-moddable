@@ -6,7 +6,6 @@
 #include <vector>
 #include <memory>
 #include "../state/block.h"
-#include "../state/sim_allocator.h"
 #include "win_types.h"
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma pack(push, 1)

@@ -1874,7 +1874,7 @@ void __stdcall HandleOptionsPanelClick(Gui* gui)
         } else {
             RenderLayer(&g_game->gui, 0x40);
             MarkChanged(&g_game->gui);
-            BlitMenuLayers(&g_game->gui, 0, 0);
+            BlitMenuLayers(&g_game->gui, nullptr, nullptr);
             SetOffscreenSurface((int)(void *)g_game->screen);
             FlipScreen();
         }

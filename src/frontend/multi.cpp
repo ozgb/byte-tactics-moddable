@@ -250,7 +250,7 @@ conn:
     msg = "Connecting  (ESC to abort)";
 shown:
     OpenMessageBox(&g_game->gui, Translate(msg), 0x96, 0, 1);
-    BlitMenuLayers(&g_game->gui, (unsigned int*)g_game->screen, 0);
+    BlitMenuLayers(&g_game->gui, (unsigned int*)g_game->screen, nullptr);
     SetOffscreenSurface((int)g_game->screen);
     FlipScreen();
     FlipScreen();

@@ -448,7 +448,7 @@ void __stdcall DrawSyncStatus(void* surface)
 
     RenderLayer(&g_game->gui, 0x40);
     MarkLayerChanged(&g_game->gui);
-    BlitMenuLayers(&g_game->gui, 0, 0);
+    BlitMenuLayers(&g_game->gui, nullptr, nullptr);
 
     const char* text;
     if (g_game->netBits.synced) {

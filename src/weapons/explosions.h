@@ -5,14 +5,14 @@ struct ExplodedPiece;
 struct ExplodedPiece;
 struct Explosion;
 struct GafFrame;
-struct Object3D;
+struct DebrisPiece;
 struct PieceRec;
 struct Point16;
 struct Unit;
 struct Vec3;
 
 void __stdcall InitExplosions();
-Object3D* __stdcall AllocExplodePieceObject();
+DebrisPiece* __stdcall AllocExplodePieceObject();
 void __stdcall FreeExplosions(void);
 Explosion* __stdcall BuildCalcedExplosion(int n, int from, int to);
 void __stdcall ExplodeUnitPieces(Unit* unit);

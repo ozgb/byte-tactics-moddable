@@ -1658,7 +1658,7 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
         count = GameU32(GAME_PROJECTILE_COUNT);
         break;
     case TT_FEATURE:
-        base = GameU32(GAME_FEATURES);
+        base = GameRef(GAME_FEATURES);
         stride = FEATURE_STRIDE;
         count = GameU32(GAME_FEATURE_COUNT);
         break;
@@ -1857,6 +1857,8 @@ static void VisitProjectiles()
     EndSection();
 }
 
+static unsigned ReadRefAt(unsigned p, unsigned offset);
+
 static void VisitExplosions()
 {
     char path[64];
@@ -1883,7 +1885,7 @@ static void VisitExplosions()
     HashByte(4);
     for (unsigned d = 0; d < debrisCount; d++) {
         unsigned char* e = GameAt(GAME_DEBRIS) + d * DEBRIS_STRIDE;
-        unsigned obj = *(unsigned*)e;
+        unsigned obj = ReadRefAt((unsigned)e, 0);
         if (obj == 0)
             continue;
         HashU32(d);
@@ -1929,7 +1931,7 @@ static void VisitFeatures()
     unsigned char* entries = (unsigned char*)GameRef(GAME_SPOT_ENTRIES);
     unsigned char list[SPOT_CAPACITY];
     unsigned featureCount = GameU32(GAME_FEATURE_COUNT);
-    unsigned char* defs = (unsigned char*)GameU32(GAME_FEATURES);
+    unsigned char* defs = (unsigned char*)GameRef(GAME_FEATURES);
     char path[64];
     memset(list, 0, sizeof list);
     HashByte(7);

@@ -141,6 +141,9 @@ struct OrderQueueNode {
 #include "../graphics/surface.h"
 
 #include "frame_timers.h"
+#include "../weapons/explosion_types.h"
+#include "../weapons/debris.h"
+#include "../weapons/explosions.h"
 
 struct SelectionBoxFlags {
     unsigned short low : 2;
@@ -1781,15 +1784,50 @@ void __stdcall DrawClosedPolygon(void* surface, Point* points, int count, int co
 }
 
 
-// FUNCTION: 0x46bae0
-void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
-                            ProjectedModel* obj, short* angles)
+struct ProjectedFaceView {
+    int count;
+    unsigned short* indices;
+    bool flat;
+    int colorIndex;
+    bool texIndexed;
+    GafFrameCursor* cursor;
+    void* pic;
+};
+
+static ProjectedFaceView ViewFace(ProjectedPrimitive* e)
 {
-    Vec3* v = obj->verts;
+    ProjectedFaceView v;
+    v.count = e->count;
+    v.indices = e->indices;
+    v.flat = e->flag0;
+    v.colorIndex = e->colorIndex;
+    v.texIndexed = e->texIndexed;
+    v.cursor = (GafFrameCursor*)((short*)((char*)e + 0x10));
+    v.pic = (void*)e->pic;
+    return v;
+}
+
+static ProjectedFaceView ViewFace(Face* f)
+{
+    ProjectedFaceView v;
+    v.count = f->nverts;
+    v.indices = f->vindex;
+    v.flat = f->flags.bits.a;
+    v.colorIndex = f->color;
+    v.texIndexed = f->flags.bits.b;
+    v.cursor = (GafFrameCursor*)&f->tex;
+    v.pic = f->tex.pic;
+    return v;
+}
+
+template <class Prim>
+static void DrawProjectedFaces(void* surface, Vec3* offset, short* angles, Vec3* v, int vertexCount,
+                               Prim* e, int faceCount, int firstFace)
+{
     Vec3* scratch = (Vec3 *)g_game->xform;
     Point* points = (Point *)g_game->projected;
     int i = 0;
-    for (; i < obj->count; i++, v++, scratch++, points++) {
+    for (; i < vertexCount; i++, v++, scratch++, points++) {
         RotateByAngles(v, scratch, angles);
         int y = (short)((scratch->y + offset->y) >> 16);
         int z = (short)((offset->z - scratch->z) >> 16);
@@ -1799,32 +1837,49 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
     }
 
     int j;
-    ProjectedPrimitive* e = obj->prims;
-    if (obj->firstFace != -1) {
+    if (firstFace != -1) {
         e++;
         j = 1;
     } else {
         j = 0;
     }
-    for (; j < obj->faceCount; j++, e++) {
-        unsigned short* idx = e->indices;
+    for (; j < faceCount; j++, e++) {
+        ProjectedFaceView f = ViewFace(e);
+        unsigned short* idx = f.indices;
         Point* dst = (Point *)g_game->assemPoints;
-        for (int k = 0; k < e->count; k++, idx++, dst++) {
+        for (int k = 0; k < f.count; k++, idx++, dst++) {
             *dst = ((Point *)g_game->projected)[*idx];
         }
-        if (!e->flag0) {
-            if (e->count == 4) {
+        if (!f.flat) {
+            if (f.count == 4) {
                 void* tex;
-                if (e->texIndexed)
-                    tex = (void*)GetGafSequenceFrame((GafFrameCursor*)((short*)((char*)e + 0x10)));
+                if (f.texIndexed)
+                    tex = (void*)GetGafSequenceFrame(f.cursor);
                 else
-                    tex = (void*)e->pic;
+                    tex = f.pic;
                 DrawFrameQuad(surface, (GafFrame*)tex, (FrameQuad*)((Point *)g_game->assemPoints), 0);
             }
         } else {
-            FillPolygon((Surface*)surface, (Point *)g_game->assemPoints, e->count, e->colorIndex);
+            FillPolygon((Surface*)surface, (Point *)g_game->assemPoints, f.count, f.colorIndex);
         }
     }
+}
+
+// FUNCTION: 0x46bae0
+void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
+                            ProjectedModel* obj, short* angles)
+{
+    DrawProjectedFaces(surface, offset, angles, obj->verts, obj->count, obj->prims, obj->faceCount, obj->firstFace);
+}
+
+void __stdcall DrawDebrisProjected(void* surface, Vec3* offset,
+                            DebrisPiece* piece, short* angles)
+{
+    Vec3* verts = piece->verts.get();
+    Face* faces = piece->faces.get();
+    if (verts == nullptr || faces == nullptr)
+        return;
+    DrawProjectedFaces(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace);
 }
 
 // FUNCTION: 0x46bc60

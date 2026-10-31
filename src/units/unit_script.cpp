@@ -231,14 +231,14 @@ void UnitScript::SetPieceVisible(int index, int flag)
 void UnitScript::SetPieceCached(int index, int flag)
 {
     state->pieces[index].cached = flag;
-    state->field_10 = 0;
+    state->bitmap = nullptr;
 }
 
 // FUNCTION: 0x480df0
 void UnitScript::SetPieceShaded(int index, int flag)
 {
     state->pieces[index].shaded = flag;
-    state->field_10 = 0;
+    state->bitmap = nullptr;
 }
 
 // FUNCTION: 0x480e30
@@ -274,7 +274,7 @@ void UnitScript::EmitSfx(int a, int b)
 {
     if (!g_seams.los_radar->IsUnitVisibleToPlayer(&g_game->players[g_game->playerIndex], state->unit))
         return;
-    UpdateObjectState((UnitDrawView *)state->unit);
+    UpdateObjectState((UnitDrawView *)state->unit.get());
 
     Vec3 v1;
     Vec3 v2;

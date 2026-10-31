@@ -37,6 +37,17 @@ a struct (Game, SimGlobals) is mapped through its record layout to the field tha
 other holders have no struct, so their rows have a blank field and the first offset of the row. A field on
 this list needs no exceptions row.
 
+A row whose kind is `load` (a pointer into loaded game data: HAPI_LoadFile buffers and what is built from them
+at load) or `code` (a pointer to code in the exe image) is written by hand: --write keeps that kind over the clang
+kind, matched by (struct, field) or, for a holder-only row, by (holder, offset), and gives the row no issue,
+because no issue removes it. A `load` or `code` row with no outside row in block_pointers.csv (the scan never
+flagged it) is kept verbatim; a scan row for the same key wins and takes the hand kind. Every other row needs an
+open `#n` issue.
+
+A `base+stride*k` offset of a Game row stands for a run of offsets the scan saw but did not count. The tool walks
+k = 1, 2, ... while the offset is inside Game and a raw field starts there, gives each such field its own row
+(offset `0x...` for that k) unless a token of its own made one, and stops at the first k that starts no raw field.
+
 A block_pointers.csv row lists many offsets under one note. Its note is copied to an outside row only when it
 is about that row: it names no offset, or names an offset the row stands for (the row's own offset for a Game
 row, any offset of the block row for a SimGlobals or holder-only row, which stands for all of them). Otherwise
@@ -74,6 +85,7 @@ REPO = "ozgb/byte-tactics-moddable"
 EXCEPTION_COLUMNS = ["struct", "field", "kind", "file", "issue"]
 OUTSIDE_COLUMNS = ["struct", "field", "holder", "offset", "words", "issue", "kind", "note"]
 KINDS = ("pointer", "function-pointer", "container", "int-pointer")
+HAND_KINDS = ("load", "code")
 DEFAULT_BUILD_DIR = ROOT / "build/modern"
 HOLDERS = {"Game": "CreateGameObject"}
 EXTRA_BLOCK = ("Game", "SimGlobals")
@@ -83,7 +95,7 @@ PEELED = ("ImplicitCastExpr", "ParenExpr", "CStyleCastExpr", "CXXFunctionalCastE
 REPO_DIRS = ("src/", "include/", "link/", "interfaces/")
 GAME = "Game"
 VIEW_ISSUE = "#392"
-LOADED_ISSUE = "#352"
+UNCLASSIFIED = ""
 OTHER_ISSUE = "#353"
 CONTAINER_ISSUE = "#596"
 SUBSYSTEM_ISSUES = {"units": OTHER_ISSUE, "orders": OTHER_ISSUE, "weapons": OTHER_ISSUE, "pathfinding": OTHER_ISSUE,
@@ -94,9 +106,7 @@ STRUCT_ISSUES = {"Unit": OTHER_ISSUE, "UnitDef": OTHER_ISSUE, "WeaponDef": OTHER
 OUTSIDE_ISSUES = [
     (re.compile(r"FeatureAnim\.state|view state|presentation|render cache"), VIEW_ISSUE),
     (re.compile(r"Mission order|damage table"), CONTAINER_ISSUE),
-    (re.compile(r"MovementClass|LOS table"), LOADED_ISSUE),
 ]
-OUTSIDE_DEFAULT_ISSUE = LOADED_ISSUE
 COUNTER_PATTERN = re.compile(r"^(0x[0-9a-f]+)(?:\+(0x[0-9a-f]+)\*k)?$")
 ARRAY_SUFFIX = re.compile(r"\s*\[([^\]]*)\]")
 LAYOUT_ROW = re.compile(r"^\s*(\d+)(?::\d+-\d+)? \|( *)(.*?)\s*$")
@@ -566,6 +576,8 @@ class Locator:
         self.casts = {(r, p) for r, _, p in casts}
         self.records = {r.name: r for r in scan.records}
         self.cache: dict[str, list[Leaf]] = {}
+        self.starts_cache: dict[str, frozenset[int]] = {}
+        self.extent_cache: dict[str, tuple[int, str | None, int]] = {}
 
     def layout(self, name: str) -> Layout | None:
         name = strip_keyword(name)
@@ -584,6 +596,11 @@ class Locator:
 
     def extent(self, leaf: Leaf) -> tuple[int, str | None, int]:
         """(count, element record or None, element size) of a leaf, for arrays of structs and of pointers."""
+        if leaf.type not in self.extent_cache:
+            self.extent_cache[leaf.type] = self.measure(leaf)
+        return self.extent_cache[leaf.type]
+
+    def measure(self, leaf: Leaf) -> tuple[int, str | None, int]:
         count = 1
         if not re.search(r"\(\*+\)\s*\[", leaf.type):
             for dim in re.findall(r"\[(\d+)\]", leaf.type):
@@ -622,6 +639,22 @@ class Locator:
                 return short(leaf.owner), leaf.path, kind, leaf.path.split(".")[0]
         return None
 
+    def raw_starts(self, record: str, depth: int = 0) -> frozenset[int]:
+        """The offsets at which a raw field of `record` starts, through arrays of structs and of pointers."""
+        if record in self.starts_cache:
+            return self.starts_cache[record]
+        out: set[int] = set()
+        if depth <= 8:
+            for leaf in self.leaves(record):
+                count, elem, size = self.extent(leaf)
+                if not size:
+                    continue
+                inner = {0} if elem is None else self.raw_starts(elem, depth + 1)
+                for i in range(count):
+                    out.update(leaf.offset + i * size + o for o in inner)
+        self.starts_cache[record] = frozenset(out)
+        return self.starts_cache[record]
+
 
 def expand_offsets(cell: str) -> list[tuple[str, int]]:
     """(token, base offset) of each offset in a block_pointers.csv cell; `a+s*k` stands for a, a+s, ..."""
@@ -631,6 +664,15 @@ def expand_offsets(cell: str) -> list[tuple[str, int]]:
         if m:
             out.append((token, int(m.group(1), 16)))
     return out
+
+
+def progression_offsets(token: str, limit: int) -> list[int]:
+    """The offsets below `limit` that a `base+stride*k` token stands for, k from 1 (the base is the token's own)."""
+    m = COUNTER_PATTERN.match(token)
+    if not m or not m.group(2) or int(m.group(2), 16) == 0:
+        return []
+    base, stride = int(m.group(1), 16), int(m.group(2), 16)
+    return list(range(base + stride, limit, stride))
 
 
 HEX_PATTERN = re.compile(r"\b0x([0-9a-fA-F]+)\b")
@@ -644,11 +686,11 @@ def note_about(note: str, offsets: list[int]) -> bool:
 
 def outside_issue(note: str, struct: str, top: str, classes: dict[str, str]) -> str:
     if struct == GAME:
-        return VIEW_ISSUE if classes.get(top, "") in ("view", "platform") else LOADED_ISSUE
+        return VIEW_ISSUE if classes.get(top, "") in ("view", "platform") else UNCLASSIFIED
     for pattern, issue in OUTSIDE_ISSUES:
         if pattern.search(note):
             return issue
-    return OUTSIDE_DEFAULT_ISSUE
+    return UNCLASSIFIED
 
 
 def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, str]) -> list[dict]:
@@ -659,26 +701,40 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
         sys.exit("refcheck: %s has no outside rows for the Game holder %s: it was renamed, set HOLDERS in "
                  "tools/refcheck.py to its new name" % (BLOCK_POINTERS, HOLDERS[GAME]))
     rows: dict[tuple, dict] = {}
-    hand = {(r["struct"], r["field"], r["holder"], r["offset"]): r["note"] for r in read_csv(root / OUTSIDE)}
+    old = read_csv(root / OUTSIDE)
+    hand = {(r["struct"], r["field"], r["holder"], r["offset"]): r["note"] for r in old}
+    hand_kinds = {(r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"]): r["kind"]
+                  for r in old if r["kind"] in HAND_KINDS}
+    matched = set()
 
     def add(struct, name, holder, token, words, issue, kind, note, offsets):
         if not note_about(note, offsets):
             note = hand.get((struct, name, holder, token), "")
+        key = (struct, name) if struct else (holder, token)
+        if key in hand_kinds:
+            kind, issue = hand_kinds[key], ""
+            matched.add(key)
         rows.setdefault((struct, name, holder if not struct else "", token if not struct else ""), {
             "struct": struct, "field": name, "holder": holder, "offset": token, "words": words, "issue": issue,
             "kind": kind, "note": note})
 
+    later = []
     for r in source:
         holder = r["holder"].split(": ")[-1]
         tokens = expand_offsets(r["offsets"])
         note = r["note"]
         member = re.fullmatch(r"SimGlobals\.(\w+)", holder)
         if holder == HOLDERS[GAME] and GAME in locators:
+            lay = locators[GAME].layout(GAME)
             for token, base in tokens:
                 hit = locators[GAME].find(GAME, base)
                 if hit:
                     add(hit[0], hit[1], holder, token, 1, outside_issue(note, GAME, hit[3], classes), hit[2], note,
                         [base])
+                for offset in progression_offsets(token, lay.size if lay else 0):
+                    if not hit or not locators[GAME].find(GAME, offset):
+                        break
+                    later.append((holder, offset, note))
         elif member and "SimGlobals" in locators and tokens:
             loc = locators["SimGlobals"]
             begin = loc.start("SimGlobals", member.group(1))
@@ -692,6 +748,15 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
         elif tokens:
             add("", "", holder, tokens[0][0], len(tokens), outside_issue(note, "", "", classes), "", note,
                 [b for _, b in tokens])
+    for holder, offset, note in later:
+        hit = locators[GAME].find(GAME, offset)
+        if hit:
+            add(hit[0], hit[1], holder, hex(offset), 1, outside_issue(note, GAME, hit[3], classes), hit[2], note,
+                [offset])
+    for r in old:
+        key = (r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"])
+        if r["kind"] in HAND_KINDS and key not in matched:
+            rows.setdefault((r["struct"], r["field"], r["holder"], r["offset"]), {**r, "issue": ""})
     return sorted(rows.values(), key=lambda r: (r["struct"], r["field"], r["holder"], r["offset"]))
 
 
@@ -781,6 +846,13 @@ def check(root: Path, result: Result, open_issues: bool = False, gh: str = "gh")
             problems.append("%s: stale row %s.%s: file is %s, expected %s, run `uv run tools/refcheck.py --write`" % (
                 EXCEPTIONS, key[0], key[1], r["file"], "|".join(sorted(f.files))))
     for r in result.outside:
+        if r["kind"] in HAND_KINDS:
+            if r["issue"]:
+                problems.append("%s: %s has kind %s and an issue, a %s row names none" % (
+                    OUTSIDE, outside_label(r), r["kind"], r["kind"]))
+        elif not re.fullmatch(r"#[0-9]+", r["issue"]):
+            problems.append("%s: %s has issue %r, expected #<number> (or kind load or code with no issue)" % (
+                OUTSIDE, outside_label(r), r["issue"]))
         if not r["note"].strip():
             problems.append("%s: %s has an empty note, write one" % (OUTSIDE, outside_label(r)))
     want = render(OUTSIDE_COLUMNS, result.outside)
@@ -838,7 +910,7 @@ def summary(result: Result) -> list[str]:
     lines.append("refcheck: outside rows by kind: " + ", ".join(
         "%s %d" % (k or "unstructured", n) for k, n in sorted(Counter(r["kind"] for r in result.outside).items())))
     lines.append("refcheck: outside rows by issue: " + ", ".join(
-        "%s %d" % (k, n) for k, n in sorted(Counter(r["issue"] for r in result.outside).items())))
+        "%s %d" % (k or "none", n) for k, n in sorted(Counter(r["issue"] for r in result.outside).items())))
     for r in result.unresolved:
         lines.append("refcheck: gap: %s %s resolves to no struct definition" % (r["kind"], r["name"]))
     return lines

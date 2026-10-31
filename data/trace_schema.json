@@ -120,7 +120,7 @@
     "Debris": {
       "size": 84,
       "fields": [
-        {"name": "obj", "offset": 0, "size": 4, "kind": "pointer", "target": "piece"},
+        {"name": "obj", "offset": 0, "size": 4, "kind": "ref", "target": "piece"},
         {"name": "ref1.index", "offset": 4, "size": 2, "kind": "scalar", "target": null},
         {"name": "ref1.value", "offset": 6, "size": 2, "kind": "scalar", "target": null},
         {"name": "ref1.kind", "offset": 8, "size": 1, "kind": "scalar", "target": null},
@@ -149,7 +149,7 @@
         {"name": "flag", "offset": 82, "size": 2, "kind": "scalar", "target": null}
       ],
       "plan": [
-        {"name": "obj", "offset": 0, "size": 4, "kind": "pointer", "target": "piece"},
+        {"name": "obj", "offset": 0, "size": 4, "kind": "ref", "target": "piece"},
         {"name": "", "offset": 4, "size": 8, "kind": "bytes", "target": null},
         {"name": "ref1.src", "offset": 12, "size": 4, "kind": "pointer", "target": "heap"},
         {"name": "", "offset": 16, "size": 8, "kind": "bytes", "target": null},
@@ -395,7 +395,7 @@
         {"name": "unit", "offset": 14, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "linkOwner", "offset": 22, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "linkNext", "offset": 26, "size": 4, "kind": "ref", "target": "link"},
-        {"name": "linkValue", "offset": 30, "size": 4, "kind": "pointer", "target": "order"},
+        {"name": "linkValue", "offset": 30, "size": 4, "kind": "ref", "target": "order"},
         {"name": "pos.x", "offset": 34, "size": 4, "kind": "scalar", "target": null},
         {"name": "pos.z", "offset": 42, "size": 4, "kind": "scalar", "target": null},
         {"name": "start.x", "offset": 46, "size": 2, "kind": "scalar", "target": null},
@@ -413,7 +413,7 @@
         {"name": "unit", "offset": 14, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "linkOwner", "offset": 22, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "linkNext", "offset": 26, "size": 4, "kind": "ref", "target": "link"},
-        {"name": "linkValue", "offset": 30, "size": 4, "kind": "pointer", "target": "order"},
+        {"name": "linkValue", "offset": 30, "size": 4, "kind": "ref", "target": "order"},
         {"name": "", "offset": 34, "size": 4, "kind": "bytes", "target": null},
         {"name": "", "offset": 42, "size": 8, "kind": "bytes", "target": null},
         {"name": "", "offset": 54, "size": 12, "kind": "bytes", "target": null},
@@ -472,7 +472,7 @@
         {"name": "unit", "offset": 18, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "refOwner", "offset": 26, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "refNext", "offset": 30, "size": 4, "kind": "ref", "target": "link"},
-        {"name": "refValue", "offset": 34, "size": 4, "kind": "pointer", "target": "order"},
+        {"name": "refValue", "offset": 34, "size": 4, "kind": "ref", "target": "order"},
         {"name": "pos.x", "offset": 38, "size": 4, "kind": "scalar", "target": null},
         {"name": "pos.z", "offset": 46, "size": 4, "kind": "scalar", "target": null}
       ],
@@ -482,7 +482,7 @@
         {"name": "unit", "offset": 18, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "refOwner", "offset": 26, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "refNext", "offset": 30, "size": 4, "kind": "ref", "target": "link"},
-        {"name": "refValue", "offset": 34, "size": 4, "kind": "pointer", "target": "order"},
+        {"name": "refValue", "offset": 34, "size": 4, "kind": "ref", "target": "order"},
         {"name": "", "offset": 38, "size": 4, "kind": "bytes", "target": null},
         {"name": "", "offset": 46, "size": 4, "kind": "bytes", "target": null}
       ],

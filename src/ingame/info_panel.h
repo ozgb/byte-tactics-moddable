@@ -1,5 +1,8 @@
 #ifndef INFO_PANEL_H
 #define INFO_PANEL_H
+struct DebrisPiece;
+struct Vec3;
+
 struct Cell;
 struct Surface;
 struct Unit;
@@ -34,5 +37,7 @@ void __stdcall DrawSelectionBox(Vec3* view, Unit* unit);
 void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy);
 void __stdcall DrawUnitInfoPanel(void* surface);
 void __stdcall DrawProfileBarLine(int surface, const char* text, int index);
+
+void __stdcall DrawDebrisProjected(void* surface, Vec3* offset, DebrisPiece* piece, short* angles);
 
 #endif

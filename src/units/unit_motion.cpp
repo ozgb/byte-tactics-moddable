@@ -286,7 +286,7 @@ void CMemoryCache::DrawObjectState(ModelState* list, void* result)
     int x = g_game->scrollX << 16;
     int z = g_game->scrollY << 16;
     int visible;
-    UnitDrawView* owner = list->owner;
+    UnitDrawView* owner = list->OwnerView();
     if (owner->flags & 0x20000000) {
         int t = (unsigned char)~owner->activateFlags;
         if (t & 1)

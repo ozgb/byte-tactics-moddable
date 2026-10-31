@@ -449,6 +449,7 @@ src/weapons/explosions.cpp,src/graphics/gaf.h,#392
 src/weapons/explosions.cpp,src/graphics/gaf_frame.h,#392
 src/weapons/explosions.cpp,src/graphics/memory_cache.h,#392
 src/weapons/explosions.cpp,src/graphics/object_pool.h,#392
+src/weapons/explosions.cpp,src/ingame/info_panel.h,#392
 src/weapons/weapon_types.cpp,src/graphics/display.h,#392
 src/weapons/weapon_types.cpp,src/graphics/object_pool.h,#392
 src/weapons/weapon_types.cpp,src/graphics/pcx.h,#392

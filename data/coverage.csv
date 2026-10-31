@@ -191,8 +191,8 @@ game,OutOfMemoryHandler,src/game/main.cpp,1,0,0,0,0,0,?OutOfMemoryHandler@@YGXXZ
 game,PreBattleFrame,src/game/main_loop.cpp,1,0,0,0,0,0,?PreBattleFrame@@YGXXZ,0,network
 game,QuirksFlipFirstSim,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksFlipFirstSim@@YG_NPAUQuirks@@@Z,0,test-only
 game,QuirksNormalise,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksNormalise@@YG_NPBDPADH@Z,0,moddable-only
-game,RecordFocusCommander,src/state/sim_effects.h,1,0,0,0,0,0,?RecordFocusCommander@@YGXH@Z,0,start-commander
-game,RecordTeleportParticles,src/state/sim_effects.h,1,0,0,0,0,0,?RecordTeleportParticles@@YGXABUVec3@@0HF@Z,0,no-teleport
+game,RecordFocusCommander,src/state/sim_effects.h,1,0,0,0,0,0,?RecordFocusCommander@@YGXH@Z,0,unset-case
+game,RecordTeleportParticles,src/state/sim_effects.h,1,0,0,0,0,0,?RecordTeleportParticles@@YGXABUVec3@@0HF@Z,0,unset-case
 game,ReportViaException,src/game/main.cpp,1,0,0,0,0,0,?ReportViaException@@YGXPBD@Z,0,error-path
 game,Reserve,src/state/block.cpp,1,0,0,0,0,0,?Reserve@?A0x@@YGXXZ,0,wasm
 game,ResetGameSpeed,src/game/game_state.cpp,0,0,0,0,0,0,?ResetGameSpeed@@YGXXZ,1,

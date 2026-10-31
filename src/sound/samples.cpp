@@ -393,14 +393,14 @@ int Sound::PlaySampleSet(void** set, LONG volume, Vec3* pos)
         }
     }
     int loggedPosition[3];
-    if (use3D != 0 && pos != 0) {
+    if (use3D != 0 && pos != nullptr) {
         loggedPosition[0] = pos->x;
         loggedPosition[1] = pos->y;
         loggedPosition[2] = pos->z;
     }
     int loggedVolume = volume;
     HarnessSoundEvent(g_playBufferLooping != 0 ? "loop" : "play", set, nullptr, &loggedVolume,
-                      use3D != 0 && pos != 0 ? loggedPosition : nullptr);
+                      use3D != 0 && pos != nullptr ? loggedPosition : nullptr);
     return 1;
 }
 

@@ -11,7 +11,6 @@ class StringRef;
 
 #include "../../link/globals.h"
 
-#include "../network/packet_manager.h"
 
 #include "../files/files_api.h"
 
@@ -28,7 +27,6 @@ void __stdcall SetCursorMode(int n);
 
 
 #include "../../interfaces/services.h"
-#include "../state/sim_globals.h"
 
 // FUNCTION: 0x434b90
 void FreeOtaEnumCache()

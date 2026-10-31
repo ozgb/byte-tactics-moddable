@@ -144,8 +144,8 @@ void UnitRef::UnlinkFromUnit()
 #include "../orders/path_order_attach.h"
 
 // FUNCTION: 0x4895c0
-PathOrderAttach::PathOrderAttach(Unit* o, int v)
-    : value((void*)v)
+PathOrderAttach::PathOrderAttach(Unit* o, Order* v)
+    : value(v)
 {
     if (o != 0 && o->unitDefIndex != 0) {
         owner = o;

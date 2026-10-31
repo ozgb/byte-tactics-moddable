@@ -10,7 +10,7 @@ struct GafEntry;
 struct FeatureAnimEntry {
     short next;
     short prev;
-    ModelState* state;
+    Ref<ModelState> state;
     char bytes_8[4];
     GafEntry* src;
     char bytes_10[0x20];

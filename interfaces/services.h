@@ -272,7 +272,7 @@ public:
     char* name;
     TdfRecordList children;
     TdfEntries entries;
-    char* text;
+    int text;
 
     // Parses a record and its children from text, setting nextblock past it.
     TdfRecord(char* name, char* text, char** nextblock, char* filename);

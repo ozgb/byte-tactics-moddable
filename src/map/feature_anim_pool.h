@@ -11,9 +11,9 @@ struct FeatureAnimEntry {
     short next;
     short prev;
     ModelState* state;
-    char unknown_8[4];
+    char bytes_8[4];
     GafEntry* src;
-    char unknown_10[0x20];
+    char bytes_10[0x20];
 };
 
 struct FeaturePseudoUnit {

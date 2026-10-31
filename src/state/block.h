@@ -7,7 +7,7 @@
 
 // The size of the block every sim allocation comes from, in bytes.
 const unsigned int kSimBlockBytes = 32u << 20;
-enum : unsigned int { kSimTicksPerSecond = 30 };
+enum : unsigned int { SIM_TICKS_PER_SECOND = 30 };
 
 // Allocates size zeroed bytes from the sim block, 8-byte aligned.
 void* __cdecl SimAlloc(unsigned int size);

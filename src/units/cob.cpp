@@ -37,7 +37,7 @@ CobScript::CobScript()
         channels[i].state = 0;
     }
     activeCount = 0;
-    scale = kSimTicksPerSecond;
+    scale = SIM_TICKS_PER_SECOND;
 }
 
 // FUNCTION: 0x4b0650

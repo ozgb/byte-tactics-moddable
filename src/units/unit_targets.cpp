@@ -79,16 +79,16 @@ char* __stdcall MakePropList(UnitDef* obj)
     p += strlen(p) + 1;
 
     if (obj->mobile) {
-        sprintf(p, "%.1f %s ", (double)kSimTicksPerSecond * spd(obj->maxvelocity) * 0.4,
+        sprintf(p, "%.1f %s ", (double)SIM_TICKS_PER_SECOND * spd(obj->maxvelocity) * 0.4,
                 Translate("m/s"));
         p += strlen(p) + 1;
 
-        sprintf(p, "%.2f %s", (double)kSimTicksPerSecond * spd(obj->acceleration) * 0.4,
+        sprintf(p, "%.2f %s", (double)SIM_TICKS_PER_SECOND * spd(obj->acceleration) * 0.4,
                 Translate("m/s/s"));
         p += strlen(p) + 1;
 
         sprintf(p, "%.0f %s",
-                (double)kSimTicksPerSecond * obj->turnrateUnsigned * 0.0054931640625,
+                (double)SIM_TICKS_PER_SECOND * obj->turnrateUnsigned * 0.0054931640625,
                 Translate("deg/s"));
     } else {
         sprintf(p, "%s", Translate("N/A"));
@@ -614,7 +614,7 @@ void __stdcall AlignUnitToGround(Unit* u)
                 int H = hs[k].h;
                 int sea = g_game->seaLevel;
                 hs[k].h = max(H, sea);
-                unsigned int bobClock = g_quirks.hoverBobWallClock ? host_time_ms() * kSimTicksPerSecond / 1000 : g_game->ticks;
+                unsigned int bobClock = g_quirks.hoverBobWallClock ? host_time_ms() * SIM_TICKS_PER_SECOND / 1000 : g_game->ticks;
                 short p = (short)(((bobClock & 0x1f) + k * 8) * 2048 + u->hoverBobPhase);
                 int s = u->def->maxvelocity / 2;
                 UnitMotionBodyView* o = (UnitMotionBodyView*)u->motion.get();

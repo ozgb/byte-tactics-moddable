@@ -64,13 +64,15 @@ void WriteScreenshot(char*, char*, int, int, int, int);
 #include "../units/unit.h"
 #include "../quirks/quirks.h"
 
+#include "debris.h"
+
 struct ExplodedBlock {
     ExplodedPiece header;
     PieceRec rec;
 };
 
 struct DebrisView {
-    Object3D* obj;
+    DebrisPiece* obj;
     GafRef ref1;
     GafRef ref2;
     Vec3 pos;
@@ -143,14 +145,14 @@ void InitExplosions()
     g_game->shade = 100;
     int i;
     for (i = 0; i < 300; ++i) {
-        (*(Object3D (*)[300])&g_game->slots)[i].state = -1;
-        (*(Object3D (*)[300])&g_game->slots)[i].vertexCount = 8;
-        (*(Object3D (*)[300])&g_game->slots)[i].faceCount = 6;
-        (*(Object3D (*)[300])&g_game->slots)[i].firstFace = -1;
-        (*(Object3D (*)[300])&g_game->slots)[i].name = "explodepiece";
-        (*(Object3D (*)[300])&g_game->slots)[i].active = 0;
-        (*(Object3D (*)[300])&g_game->slots)[i].verts = g_game->vertices_1e88f[i];
-        (*(Object3D (*)[300])&g_game->slots)[i].faces = (*(Face (*)[300][6])&g_game->frames)[i];
+        g_game->slots[i].state = -1;
+        g_game->slots[i].vertexCount = 8;
+        g_game->slots[i].faceCount = 6;
+        g_game->slots[i].firstFace = -1;
+        g_game->slots[i].name = "explodepiece";
+        g_game->slots[i].active = 0;
+        g_game->slots[i].verts = g_game->vertices_1e88f[i];
+        g_game->slots[i].faces = (*(Face (*)[300][6])&g_game->frames)[i];
     }
     for (i = 0; i < 300; ++i)
         for (int j = 0; j < 6; ++j) {
@@ -164,12 +166,12 @@ void InitExplosions()
 }
 
 // FUNCTION: 0x420920
-Object3D* AllocExplodePieceObject()
+DebrisPiece* AllocExplodePieceObject()
 {
     for (int i = 0; i < 300; i++) {
-        if ((*(Object3D (*)[300])&g_game->slots)[i].state == -1) {
-            (*(Object3D (*)[300])&g_game->slots)[i].state = 0;
-            return &(*(Object3D (*)[300])&g_game->slots)[i];
+        if (g_game->slots[i].state == -1) {
+            g_game->slots[i].state = 0;
+            return &g_game->slots[i];
         }
     }
     return 0;
@@ -654,7 +656,7 @@ void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
             d->angle_z = 0;
             d->ref1.src = 0;
             d->ref2.src = 0;
-            Object3D* o = d->obj;
+            DebrisPiece* o = d->obj;
             int k;
             for (k = 0; k < desc->faces[i].nverts; k++) {
                 o->verts[k] = verts[desc->faces[i].vindex[k]];

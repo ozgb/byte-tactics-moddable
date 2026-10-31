@@ -3,6 +3,7 @@
 0x41c6f0 UpdateScreenShake
 0x421620 StartExplodePiece
 0x421700 BreakPieceIntoDebris
+0x4233a0 StartFeatureBurning
 0x425b80 UpdateMenuSparks
 0x432610 LoadSavedGameState
 0x4326b0 SaveGameFile

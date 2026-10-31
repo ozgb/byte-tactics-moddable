@@ -227,12 +227,27 @@ class ClangTest(unittest.TestCase):
         out = rc.outside_rows(self.root, locators, classes)
         keyed = {(r["struct"], r["field"], r["holder"]): r for r in out}
         self.assertEqual(keyed[("Game", "view", "CreateGameObject")]["issue"], "#392")
-        self.assertEqual(keyed[("Item", "p", "CreateGameObject")]["issue"], "#352")
+        self.assertEqual(keyed[("Item", "p", "CreateGameObject")]["issue"], "")
         self.assertEqual(keyed[("", "", "UNITINFO")]["words"], 2)
         self.assertEqual(keyed[("", "", "UNITINFO")]["offset"], "0x47a+0x249*k")
-        self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "#352")
+        self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "")
         self.assertEqual(keyed[("SimGlobals", "table", "SimGlobals.table")]["issue"], "#596")
         self.assertEqual(len(out), 5)
+
+    def test_progression_hits_two_fields(self):
+        out = self.outside_notes([("0x4+0x8*k", "Game.view")])
+        self.assertEqual(sorted(out), [("p", "0xc"), ("view", "0x4+0x8*k")])
+
+    def test_progression_does_not_double_count_a_field_with_its_own_token(self):
+        out = self.outside_notes([("0x4+0x8*k 0x14", "Game.view")])
+        self.assertEqual(sorted(out), [("p", "0x14"), ("view", "0x4+0x8*k")])
+
+    def test_progression_stops_at_the_first_offset_with_no_raw_field(self):
+        out = self.outside_notes([("0x4+0x4*k", "Game.view")])
+        self.assertEqual(sorted(out), [("view", "0x4+0x4*k")])
+
+    def test_straddling_progression_adds_no_row(self):
+        self.assertEqual(self.outside_notes([("0x6+0x8*k", "Game.view")]), {})
 
     def outside_notes(self, rows, hand=()):
         data = self.root / "data"
@@ -273,6 +288,30 @@ class ClangTest(unittest.TestCase):
         (data / "outside_pointers.csv").write_text(rc.render(rc.OUTSIDE_COLUMNS, []))
         out = rc.outside_rows(self.root, {}, {})
         self.assertEqual({r["holder"]: r["note"] for r in out}, {"H": "X (0x20)", "G": ""})
+
+    def hand_rows(self, rows):
+        data = self.root / "data"
+        data.mkdir(exist_ok=True)
+        header = "holder,offsets,target,scenarios,ticks,target_offsets,class,note\n"
+        (data / "block_pointers.csv").write_text(header + 'CreateGameObject,0x4 0xc,T,1,1,-,outside,"Game.view"\n')
+        (data / "outside_pointers.csv").write_text(rc.render(rc.OUTSIDE_COLUMNS, rows))
+        return rc.outside_rows(self.root, {"Game": rc.Locator(self.scan)}, {"view": "view", "items": "sim"})
+
+    def hand_row(self, struct, field, kind, holder="CreateGameObject", offset="0x4"):
+        return {"struct": struct, "field": field, "holder": holder, "offset": offset, "words": 1, "issue": "",
+                "kind": kind, "note": "hand"}
+
+    def test_load_kind_is_kept_over_the_scan_and_has_no_issue(self):
+        out = self.hand_rows([self.hand_row("Game", "view", "load")])
+        keyed = {r["field"]: r for r in out}
+        self.assertEqual((keyed["view"]["kind"], keyed["view"]["issue"]), ("load", ""))
+        self.assertEqual((keyed["p"]["kind"], keyed["p"]["issue"]), ("pointer", ""))
+
+    def test_hand_only_code_row_survives_without_a_scan_row(self):
+        row = self.hand_row("WeaponDef", "fire", "code", holder="hand", offset="+0x60")
+        out = self.hand_rows([row])
+        kept = [r for r in out if r["field"] == "fire"]
+        self.assertEqual([(r["kind"], r["issue"], r["note"]) for r in kept], [("code", "", "hand")])
 
     def test_outside_rows_fail_when_the_game_holder_is_gone(self):
         data = self.root / "data"
@@ -351,7 +390,7 @@ class CheckTest(unittest.TestCase):
     def test_outside_list_out_of_date_fails(self):
         self.exceptions()
         self.outside()
-        row = {"struct": "", "field": "", "holder": "H", "offset": "0x4", "words": 1, "issue": "#352", "kind": "",
+        row = {"struct": "", "field": "", "holder": "H", "offset": "0x4", "words": 1, "issue": "#353", "kind": "",
                "note": "n"}
         problems = rc.check(self.root, make_result({}, [row]))
         self.assertEqual(len(problems), 1)
@@ -365,6 +404,36 @@ class CheckTest(unittest.TestCase):
         problems = rc.check(self.root, make_result({}, [row]))
         self.assertEqual(len(problems), 1)
         self.assertIn("Game.sounds H 0x4 has an empty note", problems[0])
+
+    def test_load_row_passes_without_an_issue(self):
+        self.exceptions()
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
+               "kind": "load", "note": "n"}
+        self.outside([row])
+        self.assertEqual(rc.check(self.root, make_result(found_field("Game", "view"), [row])), [])
+
+    def test_load_row_with_an_issue_fails(self):
+        self.exceptions()
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "#353",
+               "kind": "load", "note": "n"}
+        self.outside([row])
+        self.assertIn("names none", rc.check(self.root, make_result({}, [row]))[0])
+
+    def test_blank_kind_without_an_issue_fails(self):
+        self.exceptions()
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
+               "kind": "pointer", "note": "n"}
+        self.outside([row])
+        self.assertIn("expected #<number>", rc.check(self.root, make_result({}, [row]))[0])
+
+    def test_load_field_drops_its_exception_row(self):
+        self.exceptions(("Game", "view", "pointer", "src/a.h", "#353"))
+        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
+               "kind": "load", "note": "n"}
+        result = make_result(found_field("Game", "view"), [row])
+        rc.write(self.root, result, init=False)
+        self.assertEqual(rc.read_csv(self.root / rc.EXCEPTIONS), [])
+        self.assertEqual(rc.check(self.root, result), [])
 
     def test_bad_issue_fails(self):
         self.exceptions(("Unit", "def", "pointer", "src/a.h", "later"))
@@ -425,9 +494,9 @@ class IssueTest(unittest.TestCase):
     def test_outside_issue(self):
         self.assertEqual(rc.outside_issue("", "Game", "view", self.CLASSES), "#392")
         self.assertEqual(rc.outside_issue("", "Game", "gaf", self.CLASSES), "#392")
-        self.assertEqual(rc.outside_issue("", "Game", "units", self.CLASSES), "#352")
+        self.assertEqual(rc.outside_issue("", "Game", "units", self.CLASSES), "")
         self.assertEqual(rc.outside_issue("FeatureAnim.state (0x4)", "", "", self.CLASSES), "#392")
-        self.assertEqual(rc.outside_issue("UnitType.data", "", "", self.CLASSES), "#352")
+        self.assertEqual(rc.outside_issue("UnitType.data", "", "", self.CLASSES), "")
 
 
 class OffsetTest(unittest.TestCase):

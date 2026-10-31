@@ -287,7 +287,7 @@ static const TraceField kPlayerPlan[] = {
 };
 
 static const TraceField kDebrisFields[] = {
-    { "obj", 0x0, 4, TF_POINTER, TT_PIECE, 0x0 },
+    { "obj", 0x0, 4, TF_REF, TT_PIECE, 0x0 },
     { "ref1.index", 0x4, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "ref1.value", 0x6, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "ref1.kind", 0x8, 1, TF_SCALAR, TT_NONE, 0x0 },
@@ -317,7 +317,7 @@ static const TraceField kDebrisFields[] = {
 };
 
 static const TraceField kDebrisPlan[] = {
-    { "", 0x0, 4, TF_POINTER, TT_PIECE, 0x0 },
+    { "", 0x0, 4, TF_REF, TT_PIECE, 0x0 },
     { "", 0x4, 8, TF_BYTES, TT_NONE, 0x0 },
     { "", 0xc, 4, TF_POINTER, TT_HEAP, 0x0 },
     { "", 0x10, 8, TF_BYTES, TT_NONE, 0x0 },
@@ -636,7 +636,7 @@ static const TraceField kOrderFields[] = {
     { "unit", 0xe, 4, TF_REF, TT_UNIT, 0x0 },
     { "linkOwner", 0x16, 4, TF_REF, TT_UNIT, 0x0 },
     { "linkNext", 0x1a, 4, TF_REF, TT_LINK, 0x0 },
-    { "linkValue", 0x1e, 4, TF_POINTER, TT_ORDER, 0x0 },
+    { "linkValue", 0x1e, 4, TF_REF, TT_ORDER, 0x0 },
     { "pos.x", 0x22, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "pos.z", 0x2a, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "start.x", 0x2e, 2, TF_SCALAR, TT_NONE, 0x0 },
@@ -655,7 +655,7 @@ static const TraceField kOrderPlan[] = {
     { "", 0xe, 4, TF_REF, TT_UNIT, 0x0 },
     { "", 0x16, 4, TF_REF, TT_UNIT, 0x0 },
     { "", 0x1a, 4, TF_REF, TT_LINK, 0x0 },
-    { "", 0x1e, 4, TF_POINTER, TT_ORDER, 0x0 },
+    { "", 0x1e, 4, TF_REF, TT_ORDER, 0x0 },
     { "", 0x22, 4, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x2a, 8, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x36, 12, TF_BYTES, TT_NONE, 0x0 },
@@ -722,7 +722,7 @@ static const TraceField kPathOrderFields[] = {
     { "unit", 0x12, 4, TF_REF, TT_UNIT, 0x0 },
     { "refOwner", 0x1a, 4, TF_REF, TT_UNIT, 0x0 },
     { "refNext", 0x1e, 4, TF_REF, TT_LINK, 0x0 },
-    { "refValue", 0x22, 4, TF_POINTER, TT_ORDER, 0x0 },
+    { "refValue", 0x22, 4, TF_REF, TT_ORDER, 0x0 },
     { "pos.x", 0x26, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "pos.z", 0x2e, 4, TF_SCALAR, TT_NONE, 0x0 },
 };
@@ -733,7 +733,7 @@ static const TraceField kPathOrderPlan[] = {
     { "", 0x12, 4, TF_REF, TT_UNIT, 0x0 },
     { "", 0x1a, 4, TF_REF, TT_UNIT, 0x0 },
     { "", 0x1e, 4, TF_REF, TT_LINK, 0x0 },
-    { "", 0x22, 4, TF_POINTER, TT_ORDER, 0x0 },
+    { "", 0x22, 4, TF_REF, TT_ORDER, 0x0 },
     { "", 0x26, 4, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x2e, 4, TF_BYTES, TT_NONE, 0x0 },
 };

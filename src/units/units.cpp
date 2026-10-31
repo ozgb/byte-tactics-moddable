@@ -395,7 +395,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
 struct SpotStateUnitView {
     char unknown_0[8];
     int dirty;
-    void* unit;
+    Ref<Unit> unit;
     int drawFrame;
 };
 
@@ -410,7 +410,7 @@ struct BmpInfoHeader;
 #include "unit_script.h"
 
 void* __cdecl operator new(size_t size);
-SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, int player);
+SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, Unit* owner);
 #include "../graphics/model_render.h"
 
 // FUNCTION: 0x485d40
@@ -420,7 +420,7 @@ void __stdcall InitUnitScript(Unit* self)
     if (self->def->data) {
         self->script = new (kSim) UnitScript;
         ((CobScript*)self->script.get())->SetCob((ScriptTable*)self->def->data);
-        self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, (int)self);
+        self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, self);
         ((UnitScript*)self->script.get())->SetObjectState((int)self->state.get());
         ((CobScript*)self->script.get())->StartScript("Create", 0, 1);
     } else {
@@ -598,7 +598,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
         if (id >= 0xfffb) {
             return;
         }
-        id = ((FeatureNextView *)g_game->features)[id].next;
+        id = ((FeatureNextView *)g_game->features.get())[id].next;
     }
     if (id < 0xfffb) {
         void* target = g_seams.los_radar->GetMapCell(unit->cell.x, unit->cell.y);

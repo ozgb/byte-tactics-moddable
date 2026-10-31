@@ -478,7 +478,7 @@ static int CellFeatureBlocks(Cell* c)
     if (v < 0xfffb) {
         if ((int)v >= g_game->featureCount)
             return 1;
-        return (((unsigned char *)g_game->features)[v * 0x100 + 0xfe] >> 6) & 1;
+        return (((unsigned char *)g_game->features.get())[v * 0x100 + 0xfe] >> 6) & 1;
     }
     if (v != 0xfffe)
         return 1;
@@ -486,7 +486,7 @@ static int CellFeatureBlocks(Cell* c)
     unsigned short v2 = ref->feature;
     if (v2 >= 0xfffb)
         return 0;
-    return (((unsigned char *)g_game->features)[v2 * 0x100 + 0xfe] >> 6) & 1;
+    return (((unsigned char *)g_game->features.get())[v2 * 0x100 + 0xfe] >> 6) & 1;
 }
 
 static unsigned char* GetCellFeatureDef(
@@ -498,7 +498,7 @@ Cell* c)
     if (v < 0xfffb) {
         if ((int)v >= g_game->featureCount)
             return 0;
-        return (unsigned char *)g_game->features + v * 0x100;
+        return (unsigned char *)g_game->features.get() + v * 0x100;
     }
     if (v != 0xfffe)
         return 0;
@@ -506,7 +506,7 @@ Cell* c)
     unsigned short v2 = ref->feature;
     if (v2 >= 0xfffb)
         return 0;
-    return (unsigned char *)g_game->features + v2 * 0x100;
+    return (unsigned char *)g_game->features.get() + v2 * 0x100;
 }
 
 // FUNCTION: 0x47d2e0
@@ -1284,7 +1284,7 @@ int __stdcall FindHighestPointOnLine(Vec3 a, Vec3 b)
     for (int i = 0; i <= n; i++) {
         Cell* c = CellAt(a.x / 0x100000, a.z / 0x100000);
         if (c) {
-            short v = ((unsigned char*)g_game->features)[c->feature * 256 + 0xfa] + c->height;
+            short v = ((unsigned char*)g_game->features.get())[c->feature * 256 + 0xfa] + c->height;
             if (best < v) best = v;
             if (c->unit) {
                 Unit* o = &g_game->units[c->unit];

@@ -157,14 +157,14 @@ static inline FeatureCursorView* GetFeature(Cell* cell) {
     if (id < 0xfffb) {
         if (id >= g_game->featureCount)
             return 0;
-        return &((struct FeatureCursorView *)g_game->features)[id];
+        return &((struct FeatureCursorView *)g_game->features.get())[id];
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->width + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return &((struct FeatureCursorView *)g_game->features)[id];
+    return &((struct FeatureCursorView *)g_game->features.get())[id];
 }
 
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \
@@ -328,14 +328,14 @@ static inline FeatureMarkView* Lookup(FixedPosView* pos) {
     if (id < 0xfffb) {
         if (id >= g_game->featureCount)
             return 0;
-        return (FeatureMarkView*)((char*)(struct FeatureCursorView *)g_game->features + (id << 8));
+        return (FeatureMarkView*)((char*)(struct FeatureCursorView *)g_game->features.get() + (id << 8));
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->width + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return (FeatureMarkView*)((char*)(struct FeatureCursorView *)g_game->features + (id << 8));
+    return (FeatureMarkView*)((char*)(struct FeatureCursorView *)g_game->features.get() + (id << 8));
 }
 
 // FUNCTION: 0x43f0e0

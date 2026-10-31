@@ -15,10 +15,6 @@
 
 class UnitRef;
 
-class UnitRefListener {
-public:
-    virtual void Notify(int code);
-};
 
 #pragma pack(push, 1)
 struct WeaponDefTargetView {
@@ -114,6 +110,7 @@ int __stdcall UnitCanBuild(Unit* unit, short id)
 }
 
 #include "unit_ref.h"
+#include "../orders/order_base.h"
 
 // FUNCTION: 0x489540
 void UnitRef::LinkToUnit(Unit* o)
@@ -144,8 +141,8 @@ void UnitRef::UnlinkFromUnit()
 #include "../orders/path_order_attach.h"
 
 // FUNCTION: 0x4895c0
-PathOrderAttach::PathOrderAttach(Unit* o, int v)
-    : value((void*)v)
+PathOrderAttach::PathOrderAttach(Unit* o, OrderBase* v)
+    : value(v)
 {
     if (o != 0 && o->unitDefIndex != 0) {
         owner = o;
@@ -203,7 +200,7 @@ void UnitRef::ClearRef(void)
 {
     Unit* saved = owner;
     if (listener)
-        listener->Notify(8);
+        listener->OrStatusFlags(8);
     if (owner == saved && owner) {
         Ref<UnitRef>* pp = (Ref<UnitRef>*)&owner->head;
         while (*pp != this)
@@ -220,7 +217,7 @@ void __stdcall ClearUnitRefs(Unit* obj)
     for (UnitRef* n = (UnitRef*)obj->head.get(); n != 0; n = (UnitRef*)obj->head.get()) {
         Unit* saved = n->owner;
         if (n->listener)
-            n->listener->Notify(8);
+            n->listener->OrStatusFlags(8);
         if (n->owner == saved && n->owner) {
             Ref<UnitRef>* pp = (Ref<UnitRef>*)&n->owner->head;
             while (*pp != n)
@@ -236,8 +233,8 @@ void __stdcall ClearUnitRefs(Unit* obj)
 void __stdcall NotifyUnitRefs(Unit* obj, int event)
 {
     for (UnitRef* n = (UnitRef*)obj->head.get(); n != 0; n = n->next) {
-        if (n->listener != 0)
-            n->listener->Notify(event);
+        if (n->listener)
+            n->listener->OrStatusFlags(event);
     }
 }
 

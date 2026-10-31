@@ -3195,7 +3195,7 @@ presentation,game,shared_write,Unit::flags,3
 presentation,game,shared_write,Vec3::x,3
 presentation,game,shared_write,Vec3::y,1
 presentation,game,shared_write,Vec3::z,3
-presentation,harness,call,HarnessSoundEvent,9
+presentation,harness,call,HarnessSoundEvent,6
 presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::numPlayers,2

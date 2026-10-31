@@ -83,6 +83,7 @@ static char s_scenarioPath[512];
 static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
 static FILE* s_sound = nullptr;
+static char s_soundBuffer[4096];
 static unsigned s_dumpTick = 0;
 static char s_scenarioQuirks[512];
 static Quirks s_scenarioQuirkSet;
@@ -3570,6 +3571,7 @@ static void OpenTrace(unsigned controlWord)
     s_sound = fopen("sound.txt", "wb");
     if (s_sound == nullptr)
         Fail("testmode: cannot write sound.txt\n");
+    setvbuf(s_sound, s_soundBuffer, _IOFBF, sizeof s_soundBuffer);
     fprintf(s_sound, "bt-sound 1\n");
     fprintf(s_trace, "bt-trace %d\ncommit %s\nscenario %s\ngame_seed %u\ncrt_seed %u\nview_seed %u\n"
                      "fpu_control_word 0x%05X\n",

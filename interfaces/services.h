@@ -127,6 +127,8 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_POP_TO_GAME_LAYOUT = 20,
     // A player takes the lead: the player index and the kills that put it there.
     SIM_EVENT_PLAYER_TOOK_LEAD = 21,
+    // A player has no units left in a game with leaving players: the player's network id.
+    SIM_EVENT_PLAYER_LEFT = 22,
 };
 // Flag of SIM_EVENT_UNIT_SPEECH: the unit stays silent when it is on screen.
 #define SIM_EVENT_SPEECH_IF_NOT_VISIBLE 1u

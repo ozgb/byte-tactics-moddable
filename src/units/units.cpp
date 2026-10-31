@@ -868,7 +868,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     unit->player->unitCount--;
     if (unit->player->unitCount == 0) {
         if (g_seams.map->GetGameType(g_game->net) == 3)
-            AnnouncePlayerLeft(unit->player->id);
+            RecordPlayerLeft(unit->player->id);
         if (g_seams.map->GetGameType(g_game->net) == 2)
             RecordForcesDestroyed(unit->player->index);
     }

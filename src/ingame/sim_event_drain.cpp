@@ -4,6 +4,7 @@
 #include "../game/game.h"
 #include "../../link/globals.h"
 #include "../frontend/skirmish_menu.h"
+#include "../network/net_game.h"
 #include "../graphics/particles.h"
 #include "../gui/dialogs.h"
 #include "../gui/gui.h"
@@ -238,6 +239,9 @@ void DrainSimEvents()
             break;
         case SIM_EVENT_FORCES_DESTROYED:
             AnnounceForcesDestroyed(&g_game->players[e.args[0]]);
+            break;
+        case SIM_EVENT_PLAYER_LEFT:
+            AnnouncePlayerLeft((int)e.args[0]);
             break;
         case SIM_EVENT_PLAYER_TOOK_LEAD:
             AnnouncePlayerTookLead(g_game->players[e.args[0]].name, (int)e.args[1]);

@@ -136,6 +136,12 @@ inline void RecordForcesDestroyed(int player)
     RecordSimEvent(SIM_EVENT_FORCES_DESTROYED, 0, args, 1);
 }
 
+inline void RecordPlayerLeft(int id)
+{
+    unsigned int args[1] = {(unsigned int)id};
+    RecordSimEvent(SIM_EVENT_PLAYER_LEFT, 0, args, 1);
+}
+
 inline void RecordPlayerTookLead(int player, int kills)
 {
     unsigned int args[2] = {(unsigned int)player, (unsigned int)kills};

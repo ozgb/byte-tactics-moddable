@@ -287,7 +287,7 @@ static const TraceField kPlayerPlan[] = {
 };
 
 static const TraceField kDebrisFields[] = {
-    { "obj", 0x0, 4, TF_POINTER, TT_PIECE, 0x0 },
+    { "obj", 0x0, 4, TF_REF, TT_PIECE, 0x0 },
     { "ref1.index", 0x4, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "ref1.value", 0x6, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "ref1.kind", 0x8, 1, TF_SCALAR, TT_NONE, 0x0 },
@@ -317,7 +317,7 @@ static const TraceField kDebrisFields[] = {
 };
 
 static const TraceField kDebrisPlan[] = {
-    { "", 0x0, 4, TF_POINTER, TT_PIECE, 0x0 },
+    { "", 0x0, 4, TF_REF, TT_PIECE, 0x0 },
     { "", 0x4, 8, TF_BYTES, TT_NONE, 0x0 },
     { "", 0xc, 4, TF_POINTER, TT_HEAP, 0x0 },
     { "", 0x10, 8, TF_BYTES, TT_NONE, 0x0 },

@@ -1862,6 +1862,8 @@ static void VisitProjectiles()
     EndSection();
 }
 
+static unsigned ReadRefAt(unsigned p, unsigned offset);
+
 static void VisitExplosions()
 {
     char path[64];
@@ -1888,7 +1890,7 @@ static void VisitExplosions()
     HashByte(4);
     for (unsigned d = 0; d < debrisCount; d++) {
         unsigned char* e = GameAt(GAME_DEBRIS) + d * DEBRIS_STRIDE;
-        unsigned obj = *(unsigned*)e;
+        unsigned obj = ReadRefAt((unsigned)e, 0);
         if (obj == 0)
             continue;
         HashU32(d);

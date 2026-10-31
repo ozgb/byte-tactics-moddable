@@ -72,7 +72,7 @@ struct ExplodedBlock {
 };
 
 struct DebrisView {
-    DebrisPiece* obj;
+    Ref<DebrisPiece> obj;
     GafRef ref1;
     GafRef ref2;
     Vec3 pos;

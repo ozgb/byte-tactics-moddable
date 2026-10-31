@@ -8,10 +8,11 @@
 #include "../../interfaces/ref.h"
 
 struct Face;
+struct DebrisPiece;
 
 #pragma pack(push, 1)
 struct Debris {
-    int field_0;
+    Ref<DebrisPiece> field_0;
     Handle ref1;
     Handle ref2;
     Vec3 pos;

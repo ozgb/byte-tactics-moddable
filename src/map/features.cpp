@@ -556,6 +556,7 @@ void __stdcall StartFeatureBurning(int x, int z, int flag)
     Vec3 pos;
     pos.x = x << 20;
     pos.z = z << 20;
+    pos.y = cell->height << 16;
     PlaySoundAtByName("treeburn", &pos, 0);
     if (flag == 0)
         g_seams.network->SendFeatureBurning(x, z);

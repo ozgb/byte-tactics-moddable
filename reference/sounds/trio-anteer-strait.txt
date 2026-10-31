@@ -1,0 +1,13 @@
+bt-sound 1
+0 stop_all - - - - -
+262 play_file nanlath1.WAV -585 - - -
+475 play_file mexrun1.WAV -585 - - -
+676 play_file nanlath1.WAV -585 - - -
+959 play_file solar1.WAV -585 - - -
+1237 play_file nanlath1.WAV -585 - - -
+2690 play_file nanlath1.WAV -585 - - -
+3019 play_file metlon1.WAV -585 - - -
+3213 play_file nanlath1.WAV -585 - - -
+4766 play_file nanlath1.WAV -585 - - -
+4979 play_file mexrun1.WAV -585 - - -
+5138 play_file nanlath1.WAV -585 - - -

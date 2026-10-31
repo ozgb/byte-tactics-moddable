@@ -1,0 +1,14 @@
+bt-sound 1
+0 stop_all - - - - -
+42 play lasrfir3 -1585 - - -
+43 play lasrhit2 -1585 - - -
+43 play_file warning1.WAV -585 - - -
+57 play lasrfir3 -1585 - - -
+58 play lasrhit2 -1585 - - -
+72 play lasrfir3 -1585 - - -
+73 play lasrhit2 -1585 - - -
+87 play lasrfir3 -1585 - - -
+88 play lasrhit2 -1585 - - -
+102 play lasrfir3 -1585 - - -
+103 play lasrhit2 -1585 - - -
+104 play xplomed2 -1585 - - -

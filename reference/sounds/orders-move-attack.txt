@@ -1,0 +1,4 @@
+bt-sound 1
+0 stop_all - - - - -
+100 play_file kcarmmov.WAV -585 - - -
+400 play_file kcarmmov.WAV -585 - - -

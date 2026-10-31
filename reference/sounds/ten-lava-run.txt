@@ -1,0 +1,16 @@
+bt-sound 1
+0 stop_all - - - - -
+320 play_file nanlath1.WAV -585 - - -
+533 play_file mexrun1.WAV -585 - - -
+901 play_file nanlath1.WAV -585 - - -
+1184 play_file solar1.WAV -585 - - -
+1378 play_file nanlath1.WAV -585 - - -
+1591 play_file mexrun1.WAV -585 - - -
+1766 play_file nanlath1.WAV -585 - - -
+2489 play_file nanlath1.WAV -585 - - -
+2772 play_file solar1.WAV -585 - - -
+3295 play_file nanlath1.WAV -585 - - -
+4221 play_file nanlath1.WAV -585 - - -
+4688 play_file nanlath1.WAV -585 - - -
+5372 play_file kcarmmov.WAV -585 - - -
+5400 play ADDBUILD -585 - - -

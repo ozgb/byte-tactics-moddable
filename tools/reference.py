@@ -6,7 +6,8 @@
 
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
 time, default half the CPUs and at most 6, under Wine through tools/playtest.py)
-and compares the digest of each tick (tools/tracedigest.py) with the stored one.
+and compares the digest of each tick (tools/tracedigest.py) with the stored one. It also compares
+each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md).
 On the first difference it builds the reference from the commit the trace
 records, prints tools/tracediff.py's report for that scenario and exits 1. A
 missing or extra trace or scenario exits 1. `--quick` restricts `--check` to the
@@ -25,7 +26,7 @@ stored trace. It builds no reference and is not the gate.
 `--traces` checks out origin/reference in build/reference/branch, runs that
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
 build with the original compiler and plays the scenarios), and copies the
-traces it wrote into reference/traces/.
+traces it wrote into reference/traces/, and the sound logs it wrote into reference/sounds/ (if it wrote any).
 Set WINEARCH=win64 for Wine; `--game-dir` names the game's
 install.
 """
@@ -50,6 +51,8 @@ ROOT = Path(__file__).resolve().parent.parent
 OUTPUTS = ("TotalA.exe", "SMACKW32.DLL", "commit.txt")
 SCENARIOS = ROOT / "reference/scenarios"
 TRACES = ROOT / "reference/traces"
+SOUNDS = ROOT / "reference/sounds"
+SOUND_FILE = "sound.txt"
 MAX_PARALLEL = 6
 QUICK = ("eight-full-moon", "eight-greenhaven", "duel-coast-to-coast", "duel-great-divide", "orders-move-attack")
 RUN_SECONDS_BASE = 120
@@ -59,6 +62,7 @@ RUN_ATTEMPTS = 2
 GATE_SCAN_EVERY = 8
 FUEL_FILE = "fuel.txt"
 FUEL: dict[str, dict[str, tuple[int, int]]] = {}
+SOUND_LOGS: dict[str, str | None] = {}
 RETRY_DIALOG = "dialog-directx"
 
 
@@ -171,7 +175,7 @@ def keep_run(run: Path, scenario: str, suffix: str = "") -> Path:
     """Copy the run's trace.txt (and dump.txt and blockptrs.txt, if any) to build/scratch/check-<scenario>-<time>/."""
     kept = ROOT / "build/scratch" / f"check-{scenario}{suffix}-{time.strftime('%Y%m%d-%H%M%S')}"
     kept.mkdir(parents=True, exist_ok=True)
-    for name in ("trace.txt", "dump.txt", "blockptrs.txt"):
+    for name in ("trace.txt", SOUND_FILE, "dump.txt", "blockptrs.txt"):
         if (run / name).is_file():
             shutil.copy2(run / name, kept / name)
     return kept
@@ -266,7 +270,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {"collect": (FUEL_FILE, *(tracediff.SAVE_FILES if save_to is not None else ()))}
+            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, *(tracediff.SAVE_FILES if save_to is not None else ()))}
             if load_from is not None:
                 extra["put"] = tracediff.save_put(load_from, scenario.stem, load_from.name)
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, scan_every if scans is not None else 0, **extra)
@@ -283,6 +287,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         if save_to is not None:
             tracediff.copy_save(run, save_to)
         FUEL[scenario.stem] = parse_fuel(run / FUEL_FILE)
+        sound_log = run / SOUND_FILE
+        SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
         for key in ("game_seed", "crt_seed", "view_seed"):
             if key not in header:
@@ -425,6 +431,41 @@ def first_difference(stored: list[tuple[int, str]], got: list[tuple[int, str]]) 
     return None
 
 
+def sound_difference(stored: str, got: str) -> str | None:
+    """Where two sound logs first differ (a line number with both lines), or None when they are equal."""
+    want, have = stored.splitlines(), got.splitlines()
+    for number, (a, b) in enumerate(zip(want, have), 1):
+        if a != b:
+            return f"sound line {number}: stored `{a}`, got `{b}`"
+    if len(want) != len(have):
+        number = min(len(want), len(have)) + 1
+        longer, which = (want, "stored") if len(want) > len(have) else (have, "got")
+        return f"sound line {number}: only the {which} log has it (`{longer[number - 1]}`)"
+    return None
+
+
+def sound_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path) -> tuple[list[str], list[str]]:
+    """(the scenarios whose sound log differs from reference/sounds/, the report lines): stored logs missing are only counted."""
+    differing: list[str] = []
+    lines: list[str] = []
+    unstored: list[str] = []
+    equal = 0
+    for name in scenarios:
+        stored = directory / f"{name}.txt"
+        if not stored.is_file():
+            unstored.append(name)
+            continue
+        got = logs.get(name)
+        diff = sound_difference(stored.read_text(), got) if got is not None else "the run wrote no sound.txt"
+        if diff:
+            differing.append(name)
+            lines.append(f"DIFF {name} {diff}")
+        else:
+            equal += 1
+    lines.append(f"sound logs: {equal} of {len(scenarios)} equal, {len(differing)} differ, {len(unstored)} with no stored log in {directory.relative_to(ROOT)}")
+    return differing, lines
+
+
 def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = False, poison: bool = False,
                  steps_per_frame: int | None = None, quirks: str | None = None,
                  save_blockptrs: Path | None = None) -> None:
@@ -477,14 +518,18 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = F
         header, digests, elapsed, kept = results[name]
         diff = difference(expected[name], header, digests)
         where = f" [kept: {kept.relative_to(ROOT)}]" if kept else ""
-        print(f"{'DIFF' if diff else 'ok':4} {name} ({len(digests)} ticks, {clock(elapsed)})" + (f" {diff}{where}" if diff else ""))
+        logged = SOUND_LOGS.get(name)
+        sounds = f", {max(len(logged.splitlines()) - 1, 0)} sound lines" if logged is not None else ""
+        print(f"{'DIFF' if diff else 'ok':4} {name} ({len(digests)} ticks, {clock(elapsed)}{sounds})" + (f" {diff}{where}" if diff else ""))
         if diff:
             bad.append(name)
     print(f"{len(scenarios) - len(bad)} of {len(scenarios)} scenarios equal, total {clock(wall)}")
+    sound_bad, sound_lines = sound_report(scenarios, SOUND_LOGS, SOUNDS)
+    print("\n".join(sound_lines))
     pointers = report_block_pointers(exe, scans, quick, save_blockptrs)
     pointers += report_fuel(exe, scenarios)
     if not bad:
-        if pointers:
+        if pointers or sound_bad:
             sys.exit(1)
         if quick:
             print("quick subset passed; this is not the gate, a pull request needs the full --check")
@@ -653,6 +698,16 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     for path in produced:
         shutil.copyfile(path, TRACES / path.name)
     print(f"{len(produced)} traces copied to {TRACES.relative_to(ROOT)}")
+    sounds = sorted((directory / "reference/sounds").glob("*.txt"))
+    if not sounds:
+        print("the reference branch wrote no sound logs; reference/sounds/ is untouched")
+        return
+    SOUNDS.mkdir(parents=True, exist_ok=True)
+    for old in SOUNDS.glob("*.txt"):
+        old.unlink()
+    for path in sounds:
+        shutil.copyfile(path, SOUNDS / path.name)
+    print(f"{len(sounds)} sound logs copied to {SOUNDS.relative_to(ROOT)}")
 
 
 def main() -> None:

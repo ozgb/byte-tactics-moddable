@@ -1,0 +1,4 @@
+bt-sound 1
+900 stop_all - - - - -
+1159 play_file solar1.WAV -585 - - -
+1709 play_file solar1.WAV -585 - - -

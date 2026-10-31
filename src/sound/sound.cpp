@@ -106,6 +106,7 @@ extern SpeechTypeInfo g_speechTypes[24];
 
 #include "../game/main.h"
 #include "play_sound.h"
+#include "../harness/harness.h"
 #include "../network/play_sound_packet.h"
 #include "../graphics/display.h"
 void* __cdecl operator new(size_t size);
@@ -266,6 +267,7 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
     if (index != 0xffff) {
         void* sound = g_game->sounds[index];
         if (g_useWindowsSound) {
+            HarnessSoundEvent(g_playLooping ? "wav_loop" : "wav", index, nullptr, nullptr, nullptr);
             if (g_playLooping)
                 return PlayLoopingWavMemory(sound);
             return PlayWavMemory(sound);
@@ -279,6 +281,8 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
                 packet.index = index;
                 BroadcastPacket(GetLocalDpid(), &packet, sizeof(packet));
             }
+            int loggedVolume = -585;
+            HarnessSoundEvent(g_playLooping ? "loop" : "play", index, nullptr, &loggedVolume, nullptr);
             if (g_playLooping)
                 return ((Sound *)g_game->sound)->PlayLooping((void**)sound, -585);
             return ((Sound *)g_game->sound)->PlaySampleSet((void**)sound, -585, nullptr);
@@ -381,6 +385,12 @@ int __stdcall PlaySoundAt(int index, SoundWorldPos* pos, int param_3)
             p.z = g_game->scrollY + (g_game->screenTilesY / 2) * 16
                 + (pos->y >> 1) - pos->z;
             p.y = 0;
+            int loggedPosition[3];
+            loggedPosition[0] = p.x;
+            loggedPosition[1] = p.y;
+            loggedPosition[2] = p.z;
+            int loggedVolume = -585;
+            HarnessSoundEvent("play", index, nullptr, &loggedVolume, loggedPosition);
             ((Sound *)g_game->sound)->Set3DDistances(
                 (float)(((g_game->screenTilesX + g_game->screenTilesY) / 2) * 16),
                 (float)((g_game->width + g_game->height) * 16));
@@ -388,8 +398,13 @@ int __stdcall PlaySoundAt(int index, SoundWorldPos* pos, int param_3)
         } else {
             if (g_game->scrollX > pos->x || g_game->scrollY > pos->z
                 || g_game->scrollX + g_game->screenTilesX * 16 < pos->x
-                || g_game->scrollY + g_game->screenTilesY * 16 < pos->z)
+                || g_game->scrollY + g_game->screenTilesY * 16 < pos->z) {
+                int loggedVolume = -1585;
+                HarnessSoundEvent("play", index, nullptr, &loggedVolume, nullptr);
                 return ((Sound *)g_game->sound)->PlaySampleSet(sound, -1585, 0);
+            }
+            int loggedVolume = -585;
+            HarnessSoundEvent("play", index, nullptr, &loggedVolume, nullptr);
             return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, nullptr);
         }
     }

@@ -8,6 +8,7 @@ ai,features,shared_write,Point16::y,10
 ai,features,shared_write,Vec3::x,6
 ai,features,shared_write,Vec3::y,4
 ai,features,shared_write,Vec3::z,6
+ai,game,call,Reserve,2
 ai,game,call,SimAllocTagged,1
 ai,game,shared_write,Point16::x,1
 ai,game,shared_write,Point16::y,1

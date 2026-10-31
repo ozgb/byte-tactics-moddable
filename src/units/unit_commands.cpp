@@ -268,6 +268,12 @@ protected:
 };
 }
 
+void std::vector<Unit*, std::allocator<Unit*> >::_Ufill(Unit** _F, size_type _N, Unit* const& _X)
+{
+    for (; 0 < _N; --_N, ++_F)
+        *_F = _X;
+}
+
 // FUNCTION: 0x488310
 void __cdecl CreateMissionUnits()
 {

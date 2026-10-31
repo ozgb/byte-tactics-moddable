@@ -1,6 +1,6 @@
 #include "win_types.h"
 #include <vector>
-#include "../state/sim_allocator.h"
+#include "../state/block_vector.h"
 #include <math.h>
 #include <io.h>
 
@@ -71,16 +71,16 @@ void PlayerAI::RefreshUnitLists()
     known.Clear();
     builders=0; hasSpecial=0;
     struct { float x,y,z,total; } sum={0,0,0,0};
-    std::fill(counts.begin(),counts.end(),(short)0);
+    std::fill(counts.Begin(),counts.End(),(short)0);
     for(Unit* u=g_game->units+1;u<=g_game->unitsEnd;++u) {
         if(u->Ready()) {
             if(!owner->allied[u->PlayerIndex()]) {
-                if(g_seams.los_radar->IsUnitVisibleToPlayer(owner,u) && !(u->flags&0x8000)) visible.units.push_back(u);
-                if((unsigned char)(u->flags>>8)&1) known.units.push_back(u);
+                if(g_seams.los_radar->IsUnitVisibleToPlayer(owner,u) && !(u->flags&0x8000)) visible.units.PushBack(u);
+                if((unsigned char)(u->flags>>8)&1) known.units.PushBack(u);
             } else if(u->PlayerIndex()==owner->index && u->buildLeft==0.0) {
                 ++counts[u->unitDefIndex];
                 if(u->def.get()->ids.offset) ++builders;
-                if((u->def.get()->flags1&0x40) && (u->def.get()->flags1&0x200) && (u->activateFlags&1)) factories.list.units.push_back(u);
+                if((u->def.get()->flags1&0x40) && (u->def.get()->flags1&0x200) && (u->activateFlags&1)) factories.list.units.PushBack(u);
                 if((u->def.get()->flags1&0x400) && (u->activateFlags&1)) hasSpecial=1;
                 float weight=(char)weights[u->unitDefIndex];
                 sum.total+=weight;

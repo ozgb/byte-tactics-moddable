@@ -2,7 +2,7 @@
 #define SQUAD_H
 
 #include <vector>
-#include "../state/sim_allocator.h"
+#include "../state/block_vector.h"
 #include "../../interfaces/ref.h"
 
 struct Player;
@@ -14,7 +14,7 @@ public:
     union { int field_4; int index; };
     int field_8;
     int field_c;
-    SimVector<int> items;
+    BlockVector<Ref<Unit> > items;
     Squad(Squad&);
     Squad(Player*, int);
 };

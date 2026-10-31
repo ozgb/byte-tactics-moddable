@@ -63,7 +63,7 @@ features,LoadFeatureType,LoadObject3d,TODO(#504): engine service
 features,PlaceFeature,CreateObjectState,TODO(#505): sim-to-presentation event
 features,PlaceFeature,EmitTimedSubParticles,TODO(#505): sim-to-presentation event
 features,StartFeatureBurning,GetLocalDpid,TODO(#506): sim sends a packet
-features,UFeature::?$Ref::?$Ref,HarnessTestMode,TODO(#0): triage
+features,UFeature::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,UFeatureAnimEntry::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,UFeaturePseudoUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -102,7 +102,7 @@ los_radar,UFogCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UPlayerInfo::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,UScreenPos::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#0): triage
+los_radar,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,VSpatialBucket::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,VUnitResources::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -215,7 +215,7 @@ orders,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,UnitMotion::SteerGroundUnit,GetHeadingBetween,TODO(#504): engine service
 orders,VMissionCondition::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-orders,VOrderBase::?$Ref::?$Ref,HarnessTestMode,TODO(#0): triage
+orders,VOrderBase::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,VOrderFx::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,VPathGoalVtableView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -339,7 +339,7 @@ targeting,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UUnit::U?$Ref::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UUnit::U?$Ref::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,UUnitTypeInt::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,VOrderBase::?$Ref::?$Ref,HarnessTestMode,TODO(#0): triage
+targeting,VOrderBase::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VPathGoalVtableView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 targeting,VPlayerAI::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -446,7 +446,7 @@ units,UpdateAllUnits,CycleCameraFollow,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,CycleSelection,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,IsKeyDown,TODO(#505): sim-to-presentation event
 units,VMovementClass::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,VOrderBase::?$Ref::?$Ref,HarnessTestMode,TODO(#0): triage
+units,VOrderBase::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,VUnitCategory::?$vector::insert,StringRef::Assign,TODO(#504): engine service
 units,VUnitCategory::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
@@ -502,8 +502,8 @@ weapons,UCallback::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UDamageTableEntry::?$vector::insert,StringRef::Assign,TODO(#504): engine service
 weapons,UDamageTableEntry::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 weapons,UDamageTableEntry::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
-weapons,UDebrisPiece::?$Ref::?$Ref,HarnessTestMode,TODO(#0): triage
-weapons,UFace::?$Ref::?$Ref,HarnessTestMode,TODO(#0): triage
+weapons,UDebrisPiece::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
+weapons,UFace::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UObjectState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UPiece::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UPieceRec::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
@@ -512,7 +512,7 @@ weapons,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UVec3::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UWeaponDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UpdateUnitWeapons,UpdateBuildMenuIfFocusUnit,TODO(#505): sim-to-presentation event
-weapons,VOrderBase::?$Ref::?$Ref,HarnessTestMode,TODO(#0): triage
+weapons,VOrderBase::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,VUnitRef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,_GLOBAL__sub_I_weapons.cpp,g_tdfGlobalParser,TODO(#507): sim reads view data

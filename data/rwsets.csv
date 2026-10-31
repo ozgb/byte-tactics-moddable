@@ -44009,9 +44009,9 @@ address,function,file,kind,target
 ,CommandAllowed,src/network/net_game.cpp,function,
 ,CommandAllowed,src/network/net_game.cpp,global_read,g_game
 ,CommandAllowed,src/network/net_game.cpp,global_read,g_packetModes
-,CommandArgs::GetArgPtr,src/util/commands.h,field_read,CommandArgs::args
-,CommandArgs::GetArgPtr,src/util/commands.h,field_read,CommandArgs::count
-,CommandArgs::GetArgPtr,src/util/commands.h,function,
+,CommandArgs::GetArgPtr,interfaces/services.h,field_read,CommandArgs::args
+,CommandArgs::GetArgPtr,interfaces/services.h,field_read,CommandArgs::count
+,CommandArgs::GetArgPtr,interfaces/services.h,function,
 ,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,CommandArgs::GetIntArg
 ,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,InMemory

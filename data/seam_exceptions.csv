@@ -403,7 +403,6 @@ weapons,InitExplosions,g_explosion2Duration,TODO(#507): sim reads view data
 weapons,InitExplosions,g_explosion2EndSize,TODO(#507): sim reads view data
 weapons,InitExplosions,g_explosion2StartSize,TODO(#507): sim reads view data
 weapons,LoadWeaponType,Load3do,TODO(#505): sim-to-presentation event
-weapons,LoadWeaponType,LoadAnimGaf,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponType,LoadSoundByName,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponType,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponType,StringRef::StringRef,TODO(#505): sim-to-presentation event

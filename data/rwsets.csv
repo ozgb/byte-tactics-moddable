@@ -27856,7 +27856,6 @@ address,function,file,kind,target
 0x489260,UnitCategory::UnitCategory,src/units/unit_commands.cpp,field_read,UnitCategory::value
 0x489260,UnitCategory::UnitCategory,src/units/unit_commands.cpp,function,
 0x489280,MakePropList,src/units/unit_targets.cpp,call,GameAllocIgnoreTag
-0x489280,MakePropList,src/units/unit_targets.cpp,call,GetTickRate
 0x489280,MakePropList,src/units/unit_targets.cpp,call,Translate
 0x489280,MakePropList,src/units/unit_targets.cpp,call,memset
 0x489280,MakePropList,src/units/unit_targets.cpp,call,spd
@@ -28225,11 +28224,11 @@ address,function,file,kind,target
 0x48a440,IsTargetingUnit,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::aimTargetZOrUnitSentinel
 0x48a440,IsTargetingUnit,src/units/unit_targets.cpp,function,
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,AngleOfVector
-0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,GetTicks
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,RotatePoint2D
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,ScaledCos
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,abs
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,get
+0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,host_time_ms
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,call,operator->
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,deref_read,*ModelGroundView
 0x48a490,AlignUnitToGround,src/units/unit_targets.cpp,deref_read,*unsigned char
@@ -36757,7 +36756,6 @@ address,function,file,kind,target
 0x4b0590,DrawSunkenBox,src/gui/listbox.cpp,field_read,Rect::right
 0x4b0590,DrawSunkenBox,src/gui/listbox.cpp,field_read,Rect::top
 0x4b0590,DrawSunkenBox,src/gui/listbox.cpp,function,
-0x4b0610,CobScript::CobScript,src/units/cob.cpp,call,GetTickRate
 0x4b0610,CobScript::CobScript,src/units/cob.cpp,call,operator=
 0x4b0610,CobScript::CobScript,src/units/cob.cpp,field_write,Channel::state
 0x4b0610,CobScript::CobScript,src/units/cob.cpp,field_write,CobScript::activeCount

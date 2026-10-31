@@ -1939,7 +1939,7 @@ network,presentation,shared_write,PlayerInfo::versionMinor,1
 network,presentation,shared_write,UnitSyncEntry::fbiChecksum,1
 network,presentation,shared_write,UnitSyncEntry::limit,2
 network,presentation,shared_write,UnitSyncEntry::peerEnabled,2
-network,presentation,shared_write,g_packetManager,2
+network,presentation,shared_write,g_packetManager,1
 network,targeting,shared_write,Player::active,1
 network,targeting,shared_write,Player::type,1
 network,units,call,ApplyAttachUnit,1
@@ -3299,7 +3299,6 @@ presentation,network,call,GetByteRates,1
 presentation,network,call,GetLocalDpid,3
 presentation,network,call,GetRejectReasonText,1
 presentation,network,call,GetSlotDpid,2
-presentation,network,call,HandleNetPackets,1
 presentation,network,call,InitLobbiedConnection,1
 presentation,network,call,InitNetConnection,3
 presentation,network,call,InitPacketManager,1
@@ -3310,8 +3309,9 @@ presentation,network,call,LeaveNetGame,3
 presentation,network,call,OnlineGetLinkInfo,1
 presentation,network,call,OnlineProcessButtonCommand,1
 presentation,network,call,OnlineUnload,1
-presentation,network,call,PacketManager::SendAllQueued,2
+presentation,network,call,PacketManager::SendAllQueued,1
 presentation,network,call,Player::SetType,4
+presentation,network,call,PumpNetPackets,1
 presentation,network,call,RISetCallbacks,2
 presentation,network,call,RejectPlayer,4
 presentation,network,call,ReportGameEvent,4

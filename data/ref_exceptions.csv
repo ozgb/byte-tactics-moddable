@@ -10,8 +10,6 @@ CMemoryCache,ptr,pointer,src/graphics/memory_cache.h,#353
 CMemoryCache,shadow,pointer,src/graphics/memory_cache.h,#353
 CacheChunk,owner,pointer,src/graphics/memory_cache.h,#353
 ConnectionBlob,data,pointer,src/frontend/connection_blob.h,#353
-DamageTable,v,container,src/weapons/damage_table.h,#596
-Face,vindex,pointer,src/weapons/explosion_types.h,#352
 Feature,animTable,pointer,src/map/feature.h,#353
 Feature,anims,pointer,src/map/feature.h,#353
 Feature,object,pointer,src/map/feature.h,#353
@@ -162,14 +160,11 @@ PieceFrame,indices,pointer,src/graphics/piece_frame.h,#353
 PlayerFrameInfo,frame,pointer,src/network/packet_receiver.h,#353
 SpatialBucket,head,pointer,src/map/spatial_bucket.h,#353
 SpotState,bitmap,pointer,src/graphics/spot_state.h,#353
-StringRef,data,pointer,src/util/string_ref.h,#353
-StringRef,p,pointer,src/util/string_ref.h,#353
-StringRef,ptr,pointer,src/util/string_ref.h,#353
-SpotState,owner,pointer,src/graphics/spot_state.h,#353
-SpotState,ownerPointer,pointer,src/graphics/spot_state.h,#353
-SpotState,root,pointer,src/graphics/spot_state.h,#353
+StringRef,data,pointer,interfaces/services.h,#353
 StringRef,data,pointer,interfaces/services.h,#353
 StringRef,p,pointer,interfaces/services.h,#353
+StringRef,p,pointer,interfaces/services.h,#353
+StringRef,ptr,pointer,interfaces/services.h,#353
 StringRef,ptr,pointer,interfaces/services.h,#353
 TdfFieldList,end,pointer,interfaces/services.h,#353
 TdfFieldList,first,pointer,interfaces/services.h,#353
@@ -182,5 +177,3 @@ TdfRecordList,end,pointer,interfaces/services.h,#353
 TdfRecordList,first,pointer,interfaces/services.h,#353
 TdfRecordList,last,pointer,interfaces/services.h,#353
 UnitInfoSnapshot,orderName,int-pointer,src/ingame/unit_info_snapshot.h,#353
-WeaponDef,table,pointer,src/weapons/weapon_def.h,#596
-WeaponDef,fire,pointer,src/weapons/weapon_def.h,#352

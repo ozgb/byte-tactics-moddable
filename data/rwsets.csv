@@ -2329,6 +2329,7 @@ address,function,file,kind,target
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,BlockVector::Clear
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,BlockVector::PushBack
+0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,operator Feature *
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,deref_escape,*Feature
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,field_maybe_written,PlayerAI::cells
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,field_read,Cell::feature
@@ -6894,13 +6895,13 @@ address,function,file,kind,target
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,field_write,GafRef::src
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,function,
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,global_read,g_game
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawDebrisProjected
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawExplodedPiece
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawFrame
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawFrameShadow
-0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawModel3doProjected
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,GetGafSequenceFrame
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,PointInRect
-0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator DebrisPiece *
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,get
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator ExplodedPiece *
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator bool
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator=
@@ -6911,6 +6912,7 @@ address,function,file,kind,target
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_maybe_written,DebrisView::ref1
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_maybe_written,DebrisView::ref2
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,DebrisView::obj
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,Fixed::value
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,Fixed::whole
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,GafRef::src
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,field_read,Game::scrollX
@@ -22023,35 +22025,13 @@ address,function,file,kind,target
 0x46ba80,DrawClosedPolygon,src/ingame/info_panel.cpp,field_read,Point::x
 0x46ba80,DrawClosedPolygon,src/ingame/info_panel.cpp,field_read,Point::y
 0x46ba80,DrawClosedPolygon,src/ingame/info_panel.cpp,function,
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,DrawFrameQuad
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,FillPolygon
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,GetGafSequenceFrame
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,RotateByAngles
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,operator=
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,deref_read,*Point
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,deref_read,*unsigned short
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,deref_write,*Point
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::assemPoints
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::projected
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Game::xform
+0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,call,DrawProjectedFaces
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::count
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::faceCount
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::firstFace
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::prims
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedModel::verts
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::colorIndex
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::count
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::flag0
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::indices
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::pic
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::texIndexed
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Vec3::x
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Vec3::y
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_read,Vec3::z
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_write,Point::x
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,field_write,Point::y
 0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,function,
-0x46bae0,DrawModel3doProjected,src/ingame/info_panel.cpp,global_read,g_game
 0x46bc60,ReportGameEventCallback,src/ingame/info_panel.cpp,call,ReportGameEvent
 0x46bc60,ReportGameEventCallback,src/ingame/info_panel.cpp,function,
 0x46bc70,ShowGameMessage,src/ingame/info_panel.cpp,call,AddMessage
@@ -44379,6 +44359,14 @@ address,function,file,kind,target
 ,DrawClippedLine,src/graphics/draw.cpp,call,LockScreen
 ,DrawClippedLine,src/graphics/draw.cpp,call,UnlockScreen
 ,DrawClippedLine,src/graphics/draw.cpp,function,
+,DrawDebrisProjected,src/ingame/info_panel.cpp,call,DrawProjectedFaces
+,DrawDebrisProjected,src/ingame/info_panel.cpp,call,get
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::faceCount
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::faces
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::firstFace
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::vertexCount
+,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::verts
+,DrawDebrisProjected,src/ingame/info_panel.cpp,function,
 ,DrawFlags,src/ingame/info_panel.cpp,field_read,Game::visualFlagsByte
 ,DrawFlags,src/ingame/info_panel.cpp,function,
 ,DrawFlags,src/ingame/info_panel.cpp,global_read,g_game
@@ -51139,6 +51127,27 @@ address,function,file,kind,target
 ,VictoryUnitTypePassesZ::VictoryUnitTypePassesZ,src/game/victory_conditions.h,field_write,VictoryUnitTypePassesZ::name
 ,VictoryUnitTypePassesZ::VictoryUnitTypePassesZ,src/game/victory_conditions.h,field_write,VictoryUnitTypePassesZ::z
 ,VictoryUnitTypePassesZ::VictoryUnitTypePassesZ,src/game/victory_conditions.h,function,
+,ViewFace,src/ingame/info_panel.cpp,field_escape,Face::tex
+,ViewFace,src/ingame/info_panel.cpp,field_read,<anon>::a
+,ViewFace,src/ingame/info_panel.cpp,field_read,<anon>::b
+,ViewFace,src/ingame/info_panel.cpp,field_read,Face::color
+,ViewFace,src/ingame/info_panel.cpp,field_read,Face::nverts
+,ViewFace,src/ingame/info_panel.cpp,field_read,Face::vindex
+,ViewFace,src/ingame/info_panel.cpp,field_read,GafRef::pic
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::colorIndex
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::count
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::flag0
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::indices
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::pic
+,ViewFace,src/ingame/info_panel.cpp,field_read,ProjectedPrimitive::texIndexed
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::colorIndex
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::count
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::cursor
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::flat
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::indices
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::pic
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::texIndexed
+,ViewFace,src/ingame/info_panel.cpp,function,
 ,VisibilityWord,src/map/terrain.cpp,call,operator unsigned short *
 ,VisibilityWord,src/map/terrain.cpp,deref_read,*unsigned short
 ,VisibilityWord,src/map/terrain.cpp,field_read,Fixed::whole
